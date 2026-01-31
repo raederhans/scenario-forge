@@ -397,6 +397,7 @@ export const state = {
   topology: null,
   landData: null,
   specialZonesData: null,
+  specialZones: {},
   riversData: null,
   oceanData: null,
   landBgData: null,

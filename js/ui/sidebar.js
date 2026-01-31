@@ -2,6 +2,7 @@
 import { state, countryNames, countryPresets, PRESET_STORAGE_KEY, defaultCountryPalette } from "../core/state.js";
 import { invalidateBorderCache } from "../core/map_renderer.js";
 import { applyCountryColor, resetCountryColors } from "../core/logic.js";
+import { FileManager } from "../core/file_manager.js";
 import { t } from "./i18n.js";
 
 function loadCustomPresets() {
@@ -193,6 +194,55 @@ function initSidebar({ render } = {}) {
   const presetTree = document.getElementById("presetTree");
   const searchInput = document.getElementById("countrySearch");
   const resetBtn = document.getElementById("resetCountryColors");
+  const sidebar = document.getElementById("rightSidebar");
+  const sidebarStack = sidebar?.querySelector(".space-y-5");
+
+  let projectSection = document.getElementById("projectManagement");
+  if (!projectSection && sidebarStack) {
+    projectSection = document.createElement("div");
+    projectSection.id = "projectManagement";
+    projectSection.className = "rounded-lg border border-slate-200 bg-white p-4";
+
+    const title = document.createElement("div");
+    title.id = "lblProjectManagement";
+    title.className = "text-xs font-semibold uppercase tracking-wide text-slate-500";
+    title.textContent = t("Project Management", "ui");
+
+    const actions = document.createElement("div");
+    actions.className = "mt-3 flex flex-col gap-2";
+
+    const downloadBtn = document.createElement("button");
+    downloadBtn.id = "downloadProjectBtn";
+    downloadBtn.type = "button";
+    downloadBtn.className =
+      "w-full rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800";
+    downloadBtn.textContent = t("Download Project", "ui");
+
+    const uploadBtn = document.createElement("button");
+    uploadBtn.id = "uploadProjectBtn";
+    uploadBtn.type = "button";
+    uploadBtn.className =
+      "w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100";
+    uploadBtn.textContent = t("Load Project", "ui");
+
+    const fileInput = document.createElement("input");
+    fileInput.id = "projectFileInput";
+    fileInput.type = "file";
+    fileInput.accept = ".json,application/json";
+    fileInput.className = "hidden";
+
+    actions.appendChild(downloadBtn);
+    actions.appendChild(uploadBtn);
+    actions.appendChild(fileInput);
+
+    projectSection.appendChild(title);
+    projectSection.appendChild(actions);
+    sidebarStack.appendChild(projectSection);
+  }
+
+  const downloadProjectBtn = document.getElementById("downloadProjectBtn");
+  const uploadProjectBtn = document.getElementById("uploadProjectBtn");
+  const projectFileInput = document.getElementById("projectFileInput");
 
   const entries = Object.keys(countryNames)
     .map((code) => {
@@ -468,6 +518,35 @@ function initSidebar({ render } = {}) {
       }
     });
     resetBtn.dataset.bound = "true";
+  }
+
+  if (downloadProjectBtn && !downloadProjectBtn.dataset.bound) {
+    downloadProjectBtn.addEventListener("click", () => {
+      FileManager.exportProject(state);
+    });
+    downloadProjectBtn.dataset.bound = "true";
+  }
+
+  if (uploadProjectBtn && projectFileInput && !uploadProjectBtn.dataset.bound) {
+    uploadProjectBtn.addEventListener("click", () => {
+      projectFileInput.click();
+    });
+    uploadProjectBtn.dataset.bound = "true";
+  }
+
+  if (projectFileInput && !projectFileInput.dataset.bound) {
+    projectFileInput.addEventListener("change", () => {
+      const file = projectFileInput.files?.[0];
+      if (!file) return;
+      FileManager.importProject(file, (data) => {
+        state.colors = data.colors || {};
+        state.specialZones = data.specialZones || {};
+        invalidateBorderCache();
+        if (render) render();
+      });
+      projectFileInput.value = "";
+    });
+    projectFileInput.dataset.bound = "true";
   }
 
   renderList();

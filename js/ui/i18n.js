@@ -30,6 +30,9 @@ function updateUIText() {
     ["lblCountryColors", "Country Colors"],
     ["resetCountryColors", "Reset Country Colors"],
     ["lblSpecialZones", "Special Zones"],
+    ["lblProjectManagement", "Project Management"],
+    ["downloadProjectBtn", "Download Project"],
+    ["uploadProjectBtn", "Load Project"],
   ];
 
   uiMap.forEach(([id, label]) => {
