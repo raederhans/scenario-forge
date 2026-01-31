@@ -1,8 +1,9 @@
 // Sidebar UI (Phase 13)
 import { state, countryNames, countryPresets, PRESET_STORAGE_KEY, defaultCountryPalette } from "../core/state.js";
-import { invalidateBorderCache } from "../core/map_renderer.js";
+import { invalidateBorderCache, renderLegend } from "../core/map_renderer.js";
 import { applyCountryColor, resetCountryColors } from "../core/logic.js";
 import { FileManager } from "../core/file_manager.js";
+import { LegendManager } from "../core/legend_manager.js";
 import { t } from "./i18n.js";
 
 function loadCustomPresets() {
@@ -240,9 +241,30 @@ function initSidebar({ render } = {}) {
     sidebarStack.appendChild(projectSection);
   }
 
+  let legendSection = document.getElementById("legendEditor");
+  if (!legendSection && sidebarStack) {
+    legendSection = document.createElement("div");
+    legendSection.id = "legendEditor";
+    legendSection.className = "rounded-lg border border-slate-200 bg-white p-4";
+
+    const title = document.createElement("div");
+    title.id = "lblLegendEditor";
+    title.className = "text-xs font-semibold uppercase tracking-wide text-slate-500";
+    title.textContent = t("Legend Editor", "ui");
+
+    const list = document.createElement("div");
+    list.id = "legendEditorList";
+    list.className = "mt-3 space-y-2";
+
+    legendSection.appendChild(title);
+    legendSection.appendChild(list);
+    sidebarStack.appendChild(legendSection);
+  }
+
   const downloadProjectBtn = document.getElementById("downloadProjectBtn");
   const uploadProjectBtn = document.getElementById("uploadProjectBtn");
   const projectFileInput = document.getElementById("projectFileInput");
+  const legendList = document.getElementById("legendEditorList");
 
   const entries = Object.keys(countryNames)
     .map((code) => {
@@ -498,6 +520,51 @@ function initSidebar({ render } = {}) {
 
   state.renderPresetTreeFn = renderPresetTree;
 
+  let lastLegendKey = null;
+  const refreshLegendEditor = () => {
+    if (!legendList) return;
+    const colors = LegendManager.getUniqueColors(state);
+    const key = colors.join("|");
+    if (key === lastLegendKey && legendList.dataset.ready === "true") return;
+    lastLegendKey = key;
+    legendList.dataset.ready = "true";
+    legendList.innerHTML = "";
+
+    if (!colors.length) {
+      const empty = document.createElement("div");
+      empty.className = "text-xs text-slate-400";
+      empty.textContent = "Paint regions to generate a legend.";
+      legendList.appendChild(empty);
+      return;
+    }
+
+    colors.forEach((color, index) => {
+      const row = document.createElement("div");
+      row.className = "flex items-center gap-2";
+
+      const swatch = document.createElement("span");
+      swatch.className = "h-4 w-4 rounded border border-slate-300";
+      swatch.style.backgroundColor = color;
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className =
+        "flex-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-700";
+      input.placeholder = `Category ${index + 1}`;
+      input.value = LegendManager.getLabel(color);
+      input.addEventListener("input", (event) => {
+        LegendManager.setLabel(color, event.target.value);
+        renderLegend(colors, LegendManager.getLabels());
+      });
+
+      row.appendChild(swatch);
+      row.appendChild(input);
+      legendList.appendChild(row);
+    });
+  };
+
+  state.updateLegendUI = refreshLegendEditor;
+
   if (searchInput && !searchInput.dataset.bound) {
     searchInput.addEventListener("input", () => {
       if (typeof state.renderCountryListFn === "function") {
@@ -551,6 +618,7 @@ function initSidebar({ render } = {}) {
 
   renderList();
   renderPresetTree();
+  refreshLegendEditor();
 
   globalThis.togglePresetRegion = (id) => togglePresetRegion(id, render);
 }

@@ -1,5 +1,6 @@
 // Rendering engine (Phase 13)
 import { state } from "./state.js";
+import { LegendManager } from "./legend_manager.js";
 import { getTooltipText } from "../ui/i18n.js";
 
 let mapContainer = null;
@@ -14,6 +15,11 @@ let hitCtx = null;
 let specialZonesSvg = null;
 let specialZonesGroup = null;
 let specialZonesPath = null;
+let legendSvg = null;
+let legendGroup = null;
+let legendItemsGroup = null;
+let legendBackground = null;
+let lastLegendKey = null;
 
 let projection = null;
 let boundsPath = null;
@@ -176,6 +182,138 @@ function initSpecialZonesSvg() {
 function resizeSpecialZonesSvg() {
   if (!specialZonesSvg) return;
   specialZonesSvg.attr("width", state.width).attr("height", state.height);
+}
+
+function resizeLegendSvg() {
+  if (!legendSvg) return;
+  legendSvg.attr("width", state.width).attr("height", state.height);
+}
+
+function initLegendSvg() {
+  if (!mapContainer || !globalThis.d3) return;
+  let svgNode = document.getElementById("legendSvg");
+  if (!svgNode) {
+    svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svgNode.setAttribute("id", "legendSvg");
+    svgNode.classList.add("map-layer", "map-layer-top");
+    svgNode.style.pointerEvents = "none";
+    mapContainer.appendChild(svgNode);
+  }
+  legendSvg = globalThis.d3.select(svgNode);
+  legendSvg
+    .attr("width", state.width)
+    .attr("height", state.height)
+    .style("position", "absolute")
+    .style("inset", "0");
+
+  initLegendGroup();
+}
+
+function initLegendGroup() {
+  if (!legendSvg) return;
+  legendGroup = legendSvg.select("g.legend-group");
+  if (legendGroup.empty()) {
+    legendGroup = legendSvg.append("g").attr("class", "legend-group");
+    legendGroup.attr("pointer-events", "none");
+  }
+
+  legendBackground = legendGroup.select("rect.legend-bg");
+  if (legendBackground.empty()) {
+    legendBackground = legendGroup
+      .append("rect")
+      .attr("class", "legend-bg")
+      .attr("fill", "rgba(255,255,255,0.85)")
+      .attr("stroke", "#d1d5db")
+      .attr("stroke-width", 1)
+      .attr("rx", 8)
+      .attr("ry", 8);
+  }
+
+  legendItemsGroup = legendGroup.select("g.legend-items");
+  if (legendItemsGroup.empty()) {
+    legendItemsGroup = legendGroup.append("g").attr("class", "legend-items");
+  }
+}
+
+export function renderLegend(uniqueColors = null, labels = null) {
+  if (!legendSvg) {
+    initLegendSvg();
+  }
+  if (!legendSvg) return;
+  initLegendGroup();
+  if (!legendGroup || !legendItemsGroup || !legendBackground) return;
+
+  const colors = Array.isArray(uniqueColors)
+    ? uniqueColors
+    : LegendManager.getUniqueColors(state);
+  const labelMap = labels || LegendManager.getLabels();
+  const colorKey = colors.join("|");
+  const normalizedLabels = colors.map((color) => {
+    const key = String(color || "").toLowerCase();
+    return labelMap?.[key] || "";
+  });
+  const legendKey = `${colorKey}::${normalizedLabels.join("|")}`;
+  const shouldRebuild = legendKey !== lastLegendKey;
+
+  if (!colors.length) {
+    legendGroup.attr("display", "none");
+    lastLegendKey = legendKey;
+    return;
+  }
+
+  legendGroup.attr("display", null);
+
+  if (shouldRebuild) {
+    legendItemsGroup.selectAll("*").remove();
+    const itemHeight = 18;
+    const swatchSize = 12;
+    const textOffset = swatchSize + 8;
+
+    colors.forEach((color, index) => {
+      const y = index * itemHeight;
+      const normalized = String(color || "").toLowerCase();
+      const label = labelMap?.[normalized] || `Category ${index + 1}`;
+
+      legendItemsGroup
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", y)
+        .attr("width", swatchSize)
+        .attr("height", swatchSize)
+        .attr("rx", 2)
+        .attr("ry", 2)
+        .attr("fill", color)
+        .attr("stroke", "#1f2937")
+        .attr("stroke-width", 0.4);
+
+      legendItemsGroup
+        .append("text")
+        .attr("x", textOffset)
+        .attr("y", y - 1)
+        .attr("dominant-baseline", "hanging")
+        .attr("font-size", 11)
+        .attr("fill", "#111827")
+        .text(label);
+    });
+  }
+
+  const bbox = legendItemsGroup.node().getBBox();
+  const padding = 8;
+  const width = bbox.width + padding * 2;
+  const height = bbox.height + padding * 2;
+
+  legendBackground
+    .attr("x", bbox.x - padding)
+    .attr("y", bbox.y - padding)
+    .attr("width", width)
+    .attr("height", height);
+
+  const margin = 14;
+  const x = margin;
+  const y = Math.max(margin, state.height - height - margin);
+  legendGroup.attr("transform", `translate(${x},${y})`);
+
+  lastLegendKey = legendKey;
 }
 
 function getSpecialZoneFill(feature) {
@@ -380,6 +518,10 @@ function render() {
   renderColorLayer();
   renderSpecialZones();
   renderLineLayer();
+  renderLegend();
+  if (typeof state.updateLegendUI === "function") {
+    state.updateLegendUI();
+  }
 }
 
 function drawHover() {
@@ -628,6 +770,7 @@ function handleResize() {
   fitProjection();
   buildSpatialIndex();
   updateSpecialZonesPaths();
+  resizeLegendSvg();
   render();
 }
 
@@ -670,6 +813,7 @@ export function initMap({ containerId = "mapContainer" } = {}) {
   }
 
   initSpecialZonesSvg();
+  initLegendSvg();
   updateSpecialZonesPaths();
 
   buildIndex();

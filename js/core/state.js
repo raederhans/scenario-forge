@@ -448,6 +448,7 @@ export const state = {
   },
   recentColors: [],
   updateRecentUI: null,
+  updateLegendUI: null,
   updateSwatchUIFn: null,
   updateToolUIFn: null,
   renderCountryListFn: null,

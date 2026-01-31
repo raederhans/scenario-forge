@@ -33,6 +33,7 @@ function updateUIText() {
     ["lblProjectManagement", "Project Management"],
     ["downloadProjectBtn", "Download Project"],
     ["uploadProjectBtn", "Load Project"],
+    ["lblLegendEditor", "Legend Editor"],
   ];
 
   uiMap.forEach(([id, label]) => {

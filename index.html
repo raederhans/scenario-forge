@@ -4,161 +4,88 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Map Creator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css" />
   </head>
-  <body class="h-screen w-screen overflow-hidden">
-    <div class="flex h-full w-full">
-      <aside class="w-[300px] shrink-0 border-r border-slate-200 bg-white p-6 max-h-screen overflow-y-auto">
-        <div class="space-y-6">
+  <body>
+    <div class="app-layout">
+      <aside class="sidebar">
+        <div class="sidebar-sections">
           <div>
             <div class="flex items-start justify-between gap-3">
-              <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Map Creator</h1>
-              <button
-                id="btnToggleLang"
-                class="px-2 py-1 text-[10px] font-bold border border-slate-300 rounded hover:bg-slate-100 transition-colors"
-              >
-                EN / 中文
-              </button>
+              <h1 class="app-title">Map Creator</h1>
+              <button id="btnToggleLang" class="btn-lang">EN / 中文</button>
             </div>
-            <p class="mt-2 text-sm text-slate-600">
+            <p class="body-text mt-2">
               Click counties to paint. Use the palette below to set the active color.
             </p>
           </div>
 
-          <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
-            <div
-              id="lblCurrentTool"
-              class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-            >
-              Current Tool
-            </div>
-            <div id="currentTool" class="mt-2 text-lg font-medium text-slate-900">Fill</div>
-            <div class="mt-3 flex gap-2">
-              <button
-                id="toolFillBtn"
-                class="tool-button flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-                data-tool="fill"
-              >
-                Fill
-              </button>
-              <button
-                id="toolEraserBtn"
-                class="tool-button flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-                data-tool="eraser"
-              >
-                Eraser
-              </button>
-              <button
-                id="toolEyedropperBtn"
-                class="tool-button flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-                data-tool="eyedropper"
-              >
-                Eyedropper
-              </button>
+          <div class="card-flat">
+            <div id="lblCurrentTool" class="section-header">Current Tool</div>
+            <div id="currentTool" class="current-tool-value">Fill</div>
+            <div class="flex gap-2 mt-3">
+              <button id="toolFillBtn" class="btn-tool" data-tool="fill">Fill</button>
+              <button id="toolEraserBtn" class="btn-tool" data-tool="eraser">Eraser</button>
+              <button id="toolEyedropperBtn" class="btn-tool" data-tool="eyedropper">Eyedropper</button>
             </div>
           </div>
 
           <div>
-            <div id="lblRecent" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Recent
-            </div>
-            <div id="recentColors" class="mt-3 flex flex-wrap gap-2"></div>
+            <div id="lblRecent" class="section-header">Recent</div>
+            <div id="recentColors" class="flex flex-wrap gap-2 mt-3"></div>
           </div>
 
           <div>
-            <div id="lblPalette" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Color Palette
-            </div>
-            <select
-              id="themeSelect"
-              class="mt-3 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700"
-            >
+            <div id="lblPalette" class="section-header">Color Palette</div>
+            <select id="themeSelect" class="select-input mt-3">
               <option value="HOI4 Vanilla">HOI4 Vanilla</option>
               <option value="TNO (The New Order)">TNO (The New Order)</option>
               <option value="Kaiserreich">Kaiserreich</option>
               <option value="Red Flood (Avant-Garde)">Red Flood (Avant-Garde)</option>
             </select>
-            <div id="paletteGrid" class="color-grid mt-3 grid grid-cols-6 gap-2"></div>
-            <div class="mt-3 flex items-center gap-3">
-              <label
-                id="lblCustom"
-                class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-                for="customColor"
-              >
-                Custom
-              </label>
-              <input id="customColor" type="color" value="#1f3a5f" class="h-8 w-16 cursor-pointer rounded-md border border-slate-300 bg-white" />
+            <div id="paletteGrid" class="color-grid mt-3"></div>
+            <div class="flex items-center gap-3 mt-3">
+              <label id="lblCustom" class="section-header" for="customColor">Custom</label>
+              <input id="customColor" type="color" value="#1f3a5f" class="color-input" />
             </div>
           </div>
 
-          <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <div class="card">
             <div class="flex items-center justify-between">
-              <div id="lblExport" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Export Map
-              </div>
-              <div class="group relative">
-                <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <div id="lblExport" class="section-header">Export Map</div>
+              <div class="relative info-trigger">
+                <svg class="info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
                   <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
                 </svg>
-                <div class="absolute right-0 z-10 mt-2 w-48 rounded-md bg-slate-900 px-3 py-2 text-xs text-white opacity-0 transition group-hover:opacity-100">
-                  Export the visible map as a PNG or JPG snapshot.
-                </div>
+                <div class="info-tooltip">Export the visible map as a PNG or JPG snapshot.</div>
               </div>
             </div>
-            <label
-              id="lblExportFormat"
-              class="mt-3 block text-xs font-semibold uppercase tracking-wide text-slate-500"
-              for="exportFormat"
-            >
-              Format
-            </label>
-            <select
-              id="exportFormat"
-              class="mt-2 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700"
-            >
+            <label id="lblExportFormat" class="section-header-block mt-3" for="exportFormat">Format</label>
+            <select id="exportFormat" class="select-input mt-2">
               <option value="png">PNG</option>
               <option value="jpg">JPG</option>
             </select>
-            <button
-              id="exportBtn"
-              class="mt-4 w-full rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
-            >
-              Download Snapshot
-            </button>
+            <button id="exportBtn" class="btn-primary mt-4">Download Snapshot</button>
           </div>
 
-          <div class="rounded-lg border border-slate-200 p-4 text-xs text-slate-500">
-            Tip: Scroll to zoom and drag to pan. Hover highlights counties.
+          <div class="card-compact">
+            <p class="tip-text">Tip: Scroll to zoom and drag to pan. Hover highlights counties.</p>
           </div>
 
-          <div class="rounded-lg border border-slate-200 bg-white p-4">
+          <div class="card">
             <div class="flex items-center justify-between">
-            <div id="lblTexture" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Texture
-            </div>
-              <div class="group relative">
-                <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <div id="lblTexture" class="section-header">Texture</div>
+              <div class="relative info-trigger">
+                <svg class="info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
                   <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
                 </svg>
-                <div class="absolute right-0 z-10 mt-2 w-56 rounded-md bg-slate-900 px-3 py-2 text-xs text-white opacity-0 transition group-hover:opacity-100">
-                  Apply a subtle overlay texture for a vintage map feel.
-                </div>
+                <div class="info-tooltip" style="width: 220px;">Apply a subtle overlay texture for a vintage map feel.</div>
               </div>
             </div>
-            <label
-              id="lblOverlay"
-              class="mt-3 block text-xs font-semibold uppercase tracking-wide text-slate-500"
-              for="textureSelect"
-            >
-              Overlay
-            </label>
-            <select
-              id="textureSelect"
-              class="mt-2 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700"
-            >
+            <label id="lblOverlay" class="section-header-block mt-3" for="textureSelect">Overlay</label>
+            <select id="textureSelect" class="select-input mt-2">
               <option value="none">Clean (None)</option>
               <option value="paper" selected>Old Paper</option>
               <option value="canvas">Canvas</option>
@@ -166,266 +93,165 @@
             </select>
           </div>
 
-          <div class="rounded-lg border border-slate-200 bg-white p-4">
-            <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Layer Toggles</div>
-            <label class="mt-3 flex items-center gap-2 text-sm text-slate-700">
-              <input id="toggleUrban" type="checkbox" class="h-4 w-4 rounded border-slate-300" checked />
+          <div class="card">
+            <div class="section-header">Layer Toggles</div>
+            <label class="toggle-label mt-3">
+              <input id="toggleUrban" type="checkbox" class="checkbox-input" checked />
               Urban Areas
             </label>
-            <label class="mt-2 flex items-center gap-2 text-sm text-slate-700">
-              <input id="togglePhysical" type="checkbox" class="h-4 w-4 rounded border-slate-300" checked />
+            <label class="toggle-label mt-2">
+              <input id="togglePhysical" type="checkbox" class="checkbox-input" checked />
               Physical Regions (Mountains/etc)
             </label>
-            <label class="mt-2 flex items-center gap-2 text-sm text-slate-700">
-              <input id="toggleRivers" type="checkbox" class="h-4 w-4 rounded border-slate-300" checked />
+            <label class="toggle-label mt-2">
+              <input id="toggleRivers" type="checkbox" class="checkbox-input" checked />
               Rivers
             </label>
-            <label class="mt-2 flex items-center gap-2 text-sm text-slate-700">
-              <input id="toggleSpecialZones" type="checkbox" class="h-4 w-4 rounded border-slate-300" checked />
+            <label class="toggle-label mt-2">
+              <input id="toggleSpecialZones" type="checkbox" class="checkbox-input" checked />
               <span id="lblSpecialZones">Special Zones</span>
             </label>
           </div>
 
-          <div class="rounded-lg border border-slate-200 bg-white p-4">
-            <div id="lblMapStyle" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Map Style
-            </div>
-            <button
-              id="presetPolitical"
-              class="mt-3 flex w-full items-center justify-center gap-2 rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
-            >
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <div class="card">
+            <div id="lblMapStyle" class="section-header">Map Style</div>
+            <button id="presetPolitical" class="btn-primary mt-3">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M5 3h9l-1.5 2H5v6h7l-1.5 2H5v8H3V3h2z" />
                 <path d="M13.5 3H21l-2 3 2 3h-7.5l2-3-2-3z" />
               </svg>
               <span id="labelPresetPolitical">Auto-Fill Countries</span>
             </button>
-            <button
-              id="presetClear"
-              class="mt-2 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
-            >
-              Clear Map
-            </button>
+            <button id="presetClear" class="btn-secondary mt-2">Clear Map</button>
           </div>
 
-          <details class="rounded-lg border border-slate-200 bg-white p-4" open>
-            <summary
-              id="labelMapStyle"
-              class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-slate-500"
-            >
-              Map Style
-            </summary>
-            <div class="mt-4 space-y-4">
+          <details class="card" open>
+            <summary id="labelMapStyle" class="section-header">Map Style</summary>
+            <div class="space-y-4 mt-4">
               <div class="space-y-2">
-                <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Internal Borders
-                </div>
+                <div class="section-header">Internal Borders</div>
                 <div class="flex items-center justify-between gap-3">
-                  <label class="text-xs text-slate-600" for="internalBorderColor">Color</label>
-                  <input
-                    id="internalBorderColor"
-                    type="color"
-                    value="#cccccc"
-                    class="h-8 w-12 cursor-pointer rounded-md border border-slate-300 bg-white"
-                  />
+                  <label class="range-label" for="internalBorderColor">Color</label>
+                  <input id="internalBorderColor" type="color" value="#cccccc" class="color-input" />
                 </div>
                 <div>
-                  <div class="flex items-center justify-between">
-                    <label class="text-xs text-slate-600" for="internalBorderOpacity">Opacity</label>
-                    <span id="internalBorderOpacityValue" class="text-xs text-slate-500">100%</span>
+                  <div class="range-row">
+                    <label class="range-label" for="internalBorderOpacity">Opacity</label>
+                    <span id="internalBorderOpacityValue" class="range-value">100%</span>
                   </div>
-                  <input
-                    id="internalBorderOpacity"
-                    type="range"
-                    min="0"
-                    max="100"
-                    value="100"
-                    class="mt-1 w-full"
-                  />
+                  <input id="internalBorderOpacity" type="range" min="0" max="100" value="100" class="range-input" />
                 </div>
                 <div>
-                  <div class="flex items-center justify-between">
-                    <label class="text-xs text-slate-600" for="internalBorderWidth">Width</label>
-                    <span id="internalBorderWidthValue" class="text-xs text-slate-500">0.5</span>
+                  <div class="range-row">
+                    <label class="range-label" for="internalBorderWidth">Width</label>
+                    <span id="internalBorderWidthValue" class="range-value">0.5</span>
                   </div>
-                  <input
-                    id="internalBorderWidth"
-                    type="range"
-                    min="0.1"
-                    max="2.0"
-                    step="0.1"
-                    value="0.5"
-                    class="mt-1 w-full"
-                  />
+                  <input id="internalBorderWidth" type="range" min="0.1" max="2.0" step="0.1" value="0.5" class="range-input" />
                 </div>
               </div>
 
               <div class="space-y-2">
-                <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Empire Borders
-                </div>
+                <div class="section-header">Empire Borders</div>
                 <div class="flex items-center justify-between gap-3">
-                  <label class="text-xs text-slate-600" for="empireBorderColor">Color</label>
-                  <input
-                    id="empireBorderColor"
-                    type="color"
-                    value="#000000"
-                    class="h-8 w-12 cursor-pointer rounded-md border border-slate-300 bg-white"
-                  />
+                  <label class="range-label" for="empireBorderColor">Color</label>
+                  <input id="empireBorderColor" type="color" value="#000000" class="color-input" />
                 </div>
                 <div>
-                  <div class="flex items-center justify-between">
-                    <label class="text-xs text-slate-600" for="empireBorderWidth">Width</label>
-                    <span id="empireBorderWidthValue" class="text-xs text-slate-500">1.0</span>
+                  <div class="range-row">
+                    <label class="range-label" for="empireBorderWidth">Width</label>
+                    <span id="empireBorderWidthValue" class="range-value">1.0</span>
                   </div>
-                  <input
-                    id="empireBorderWidth"
-                    type="range"
-                    min="0.5"
-                    max="5.0"
-                    step="0.1"
-                    value="1.0"
-                    class="mt-1 w-full"
-                  />
+                  <input id="empireBorderWidth" type="range" min="0.5" max="5.0" step="0.1" value="1.0" class="range-input" />
                 </div>
               </div>
 
               <div class="space-y-2">
-                <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Coastlines
-                </div>
+                <div class="section-header">Coastlines</div>
                 <div class="flex items-center justify-between gap-3">
-                  <label class="text-xs text-slate-600" for="coastlineColor">Color</label>
-                  <input
-                    id="coastlineColor"
-                    type="color"
-                    value="#333333"
-                    class="h-8 w-12 cursor-pointer rounded-md border border-slate-300 bg-white"
-                  />
+                  <label class="range-label" for="coastlineColor">Color</label>
+                  <input id="coastlineColor" type="color" value="#333333" class="color-input" />
                 </div>
                 <div>
-                  <div class="flex items-center justify-between">
-                    <label class="text-xs text-slate-600" for="coastlineWidth">Width</label>
-                    <span id="coastlineWidthValue" class="text-xs text-slate-500">1.2</span>
+                  <div class="range-row">
+                    <label class="range-label" for="coastlineWidth">Width</label>
+                    <span id="coastlineWidthValue" class="range-value">1.2</span>
                   </div>
-                  <input
-                    id="coastlineWidth"
-                    type="range"
-                    min="0.5"
-                    max="3.0"
-                    step="0.1"
-                    value="1.2"
-                    class="mt-1 w-full"
-                  />
+                  <input id="coastlineWidth" type="range" min="0.5" max="3.0" step="0.1" value="1.2" class="range-input" />
                 </div>
               </div>
             </div>
           </details>
 
-          <div class="rounded-lg border border-slate-200 bg-white p-4">
-            <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Reference Image</div>
-            <input
-              id="referenceImageInput"
-              type="file"
-              accept="image/*"
-              class="mt-3 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-xs text-slate-700"
-            />
-            <div class="mt-4 space-y-3 text-xs text-slate-600">
+          <div class="card">
+            <div class="section-header">Reference Image</div>
+            <input id="referenceImageInput" type="file" accept="image/*" class="file-input mt-3" />
+            <div class="space-y-3 mt-4">
               <div>
-                <div class="flex items-center justify-between">
-                  <label for="referenceOpacity">Opacity</label>
-                  <span id="referenceOpacityValue" class="text-slate-500">60%</span>
+                <div class="range-row">
+                  <label class="range-label" for="referenceOpacity">Opacity</label>
+                  <span id="referenceOpacityValue" class="range-value">60%</span>
                 </div>
-                <input id="referenceOpacity" type="range" min="0" max="100" value="60" class="mt-1 w-full" />
+                <input id="referenceOpacity" type="range" min="0" max="100" value="60" class="range-input" />
               </div>
               <div>
-                <div class="flex items-center justify-between">
-                  <label for="referenceScale">Scale</label>
-                  <span id="referenceScaleValue" class="text-slate-500">1.00×</span>
+                <div class="range-row">
+                  <label class="range-label" for="referenceScale">Scale</label>
+                  <span id="referenceScaleValue" class="range-value">1.00×</span>
                 </div>
-                <input id="referenceScale" type="range" min="0.2" max="3.0" step="0.01" value="1.00" class="mt-1 w-full" />
+                <input id="referenceScale" type="range" min="0.2" max="3.0" step="0.01" value="1.00" class="range-input" />
               </div>
               <div>
-                <div class="flex items-center justify-between">
-                  <label for="referenceOffsetX">Offset X</label>
-                  <span id="referenceOffsetXValue" class="text-slate-500">0px</span>
+                <div class="range-row">
+                  <label class="range-label" for="referenceOffsetX">Offset X</label>
+                  <span id="referenceOffsetXValue" class="range-value">0px</span>
                 </div>
-                <input id="referenceOffsetX" type="range" min="-1000" max="1000" step="1" value="0" class="mt-1 w-full" />
+                <input id="referenceOffsetX" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
               </div>
               <div>
-                <div class="flex items-center justify-between">
-                  <label for="referenceOffsetY">Offset Y</label>
-                  <span id="referenceOffsetYValue" class="text-slate-500">0px</span>
+                <div class="range-row">
+                  <label class="range-label" for="referenceOffsetY">Offset Y</label>
+                  <span id="referenceOffsetYValue" class="range-value">0px</span>
                 </div>
-                <input id="referenceOffsetY" type="range" min="-1000" max="1000" step="1" value="0" class="mt-1 w-full" />
+                <input id="referenceOffsetY" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
               </div>
             </div>
           </div>
         </div>
       </aside>
 
-      <main class="relative flex-1 bg-slate-100">
+      <main class="map-main">
         <div id="mapContainer">
           <img id="referenceImage" class="reference-image" alt="" />
           <canvas id="colorCanvas" class="map-layer"></canvas>
           <canvas id="lineCanvas" class="map-layer map-layer-top"></canvas>
-          <div id="textureOverlay" class="texture-overlay decorative-layer absolute inset-0"></div>
+          <div id="textureOverlay" class="texture-overlay decorative-layer"></div>
         </div>
       </main>
 
-      <aside
-        id="rightSidebar"
-        class="w-[280px] shrink-0 border-l border-slate-200 bg-white p-6 max-h-screen overflow-y-auto"
-      >
-        <div class="space-y-5">
+      <aside id="rightSidebar" class="sidebar-right">
+        <div class="sidebar-sections">
           <div>
-            <label
-              id="lblCountrySearch"
-              class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-              for="countrySearch"
-            >
-              Search Countries
-            </label>
-            <input
-              id="countrySearch"
-              type="text"
-              placeholder="Search..."
-              class="mt-2 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700"
-            />
+            <label id="lblCountrySearch" class="section-header" for="countrySearch">Search Countries</label>
+            <input id="countrySearch" type="text" placeholder="Search..." class="input mt-2" />
           </div>
 
-          <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
-            <div id="lblHistoricalPresets" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Historical Presets
-            </div>
-            <p class="mt-1 text-xs text-slate-400">Click to fill regions with active color</p>
-            <div id="presetTree" class="mt-3 space-y-2"></div>
+          <div class="card-flat">
+            <div id="lblHistoricalPresets" class="section-header">Historical Presets</div>
+            <p class="tip-text mt-2">Click to fill regions with active color</p>
+            <div id="presetTree" class="space-y-2 mt-3"></div>
           </div>
 
           <div>
-            <div id="lblCountryColors" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Country Colors
-            </div>
-            <div
-              id="countryList"
-              class="mt-3 max-h-[40vh] space-y-2 overflow-y-auto pr-1"
-            ></div>
+            <div id="lblCountryColors" class="section-header">Country Colors</div>
+            <div id="countryList" class="country-list space-y-2 mt-3"></div>
           </div>
 
-          <button
-            id="resetCountryColors"
-            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
-          >
-            Reset Country Colors
-          </button>
+          <button id="resetCountryColors" class="btn-secondary">Reset Country Colors</button>
         </div>
       </aside>
     </div>
 
-    <div
-      id="tooltip"
-      class="fixed z-50 bg-slate-900/90 text-white text-xs font-medium px-2 py-1 rounded shadow-lg backdrop-blur-sm transition-opacity duration-75 pointer-events-none opacity-0"
-    ></div>
+    <div id="tooltip"></div>
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/topojson-client@3"></script>

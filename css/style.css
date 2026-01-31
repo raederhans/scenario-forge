@@ -1,3 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ── Design Tokens ─────────────────────────────────────── */
+:root {
+  --bg-app: #F5F7FA;
+  --bg-surface: #FFFFFF;
+  --bg-input: #F0F2F5;
+  --text-primary: #2D3436;
+  --text-secondary: #636E72;
+  --color-accent: #002FA7;
+  --color-accent-hover: #0038c7;
+  --border-subtle: rgba(0, 0, 0, 0.05);
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --radius-card: 16px;
+  --radius-btn: 8px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+}
+
+/* ── Reset & Global ────────────────────────────────────── */
 * {
   box-sizing: border-box;
 }
@@ -8,7 +29,623 @@ body {
   padding: 0;
   width: 100%;
   height: 100%;
-  background: #f0f0f0;
+  background: var(--bg-app);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Layout ────────────────────────────────────────────── */
+.app-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* ── Sidebar ───────────────────────────────────────────── */
+.sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-soft);
+  border-right: 1px solid var(--border-subtle);
+  padding: var(--spacing-lg) var(--spacing-md);
+  max-height: 100vh;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.sidebar-right {
+  width: 300px;
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-soft);
+  border-left: 1px solid var(--border-subtle);
+  padding: var(--spacing-lg) var(--spacing-md);
+  max-height: 100vh;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.sidebar-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Scrollbar */
+.sidebar::-webkit-scrollbar,
+.sidebar-right::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.sidebar-right::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.sidebar-right::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+/* ── Typography ────────────────────────────────────────── */
+.app-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.section-header {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.section-header-block {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin: 0;
+  display: block;
+}
+
+.body-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.tip-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.card-compact {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
+  padding: 16px;
+}
+
+.btn-primary svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Card ──────────────────────────────────────────────── */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
+  padding: 20px;
+}
+
+.card-flat {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  padding: 20px;
+}
+
+/* ── Inputs & Selects ──────────────────────────────────── */
+.input,
+.select-input {
+  width: 100%;
+  border: none;
+  background: var(--bg-input);
+  border-radius: var(--radius-btn);
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-family: inherit;
+  outline: none;
+  transition: box-shadow 0.2s ease;
+}
+
+.input:focus,
+.select-input:focus {
+  box-shadow: 0 0 0 2px rgba(0, 47, 167, 0.15);
+}
+
+.input::placeholder {
+  color: #B2BEC3;
+}
+
+input[type="color"].color-input {
+  height: 36px;
+  width: 56px;
+  cursor: pointer;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-btn);
+  background: var(--bg-surface);
+  padding: 2px;
+}
+
+input[type="range"].range-input {
+  width: 100%;
+  margin-top: 4px;
+  accent-color: var(--color-accent);
+}
+
+input[type="file"].file-input {
+  width: 100%;
+  border: 2px dashed rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-btn);
+  background: var(--bg-input);
+  padding: 12px 16px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+input[type="file"].file-input:hover {
+  border-color: rgba(0, 47, 167, 0.2);
+}
+
+input[type="checkbox"].checkbox-input {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+/* ── Buttons ───────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: var(--color-accent);
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 0.875rem;
+  font-family: inherit;
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: var(--color-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+  box-shadow: none;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  font-family: inherit;
+  padding: 12px 24px;
+  border: 1px solid #ddd;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--bg-input);
+  border-color: #ccc;
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+.btn-tool {
+  flex: 1;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.8rem;
+  font-family: inherit;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-tool:hover {
+  background: var(--bg-input);
+}
+
+.btn-tool.active {
+  background: var(--color-accent);
+  color: #FFFFFF;
+  border-color: var(--color-accent);
+}
+
+.btn-lang {
+  padding: 4px 10px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: inherit;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-btn);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-lang:hover {
+  background: var(--bg-input);
+}
+
+/* ── Utilities ─────────────────────────────────────────── */
+.flex { display: flex; }
+.flex-1 { flex: 1; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mt-4 { margin-top: 16px; }
+.w-full { width: 100%; }
+.relative { position: relative; }
+
+.flex-wrap { flex-wrap: wrap; }
+
+.space-y-2 > * + * { margin-top: 8px; }
+.space-y-3 > * + * { margin-top: 12px; }
+.space-y-4 > * + * { margin-top: 16px; }
+
+/* ── Current Tool Display ──────────────────────────────── */
+.current-tool-value {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-top: 8px;
+}
+
+/* ── Color Swatches ────────────────────────────────────── */
+.color-swatch {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--border-subtle);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.color-swatch:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+/* ── Info Icon & Tooltip ───────────────────────────────── */
+.info-icon {
+  width: 16px;
+  height: 16px;
+  color: #B2BEC3;
+}
+
+.info-tooltip {
+  position: absolute;
+  right: 0;
+  z-index: 10;
+  margin-top: 8px;
+  width: 220px;
+  background: var(--text-primary);
+  color: #FFFFFF;
+  font-size: 0.7rem;
+  padding: 8px 12px;
+  border-radius: var(--radius-btn);
+  line-height: 1.4;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.info-trigger:hover .info-tooltip {
+  opacity: 1;
+}
+
+/* ── Layer Toggle Label ────────────────────────────────── */
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+/* ── Details / Accordion ───────────────────────────────── */
+details.card > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+details.card > summary::-webkit-details-marker {
+  display: none;
+}
+
+details.card > summary::after {
+  content: '▸';
+  float: right;
+  color: var(--text-secondary);
+  transition: transform 0.2s ease;
+}
+
+details.card[open] > summary::after {
+  transform: rotate(90deg);
+}
+
+/* ── Range Slider Labels ───────────────────────────────── */
+.range-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.range-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.range-value {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* ── Country List ──────────────────────────────────────── */
+.country-list {
+  max-height: 40vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* ── Right Sidebar Lists & Hierarchy ───────────────────── */
+.sidebar-right .country-list,
+.sidebar-right #presetTree,
+.sidebar-right ul,
+.sidebar-right .country-group,
+.sidebar-right .region-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+/* Top-level country rows */
+.sidebar-right .country-list > div:not(.ml-2) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-btn);
+  background: var(--bg-input);
+}
+
+/* Indent nested items */
+.sidebar-right .country-list .ml-2 {
+  padding-left: 16px;
+  border-left: 2px solid rgba(0, 0, 0, 0.06);
+  background-color: rgba(0, 0, 0, 0.01);
+}
+
+/* ── Accordion (details/summary) in right sidebar ───────── */
+.sidebar-right details {
+  width: 100%;
+  margin-bottom: 4px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-btn);
+  overflow: hidden;
+  background: var(--bg-surface);
+}
+
+.sidebar-right summary {
+  cursor: pointer;
+  padding: 10px 14px;
+  background-color: var(--bg-surface);
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  list-style: none;
+}
+
+.sidebar-right summary::-webkit-details-marker {
+  display: none;
+}
+
+.sidebar-right summary::marker {
+  content: "";
+}
+
+.sidebar-right summary::after {
+  content: '▼';
+  font-size: 0.7em;
+  color: var(--text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.sidebar-right details[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.sidebar-right summary svg {
+  display: none;
+}
+
+/* ── Country list buttons ──────────────────────────────── */
+.sidebar-right .country-list button.country-btn,
+.sidebar-right .country-list .layer-btn,
+.sidebar-right .country-list button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.sidebar-right .country-list button.country-btn:hover,
+.sidebar-right .country-list .layer-btn:hover,
+.sidebar-right .country-list button:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  color: var(--color-accent);
+  border-left-color: var(--color-accent);
+  padding-left: 16px;
+}
+
+.country-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.country-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+/* ── Preset Tree ───────────────────────────────────────── */
+#presetTree {
+  margin-top: 12px;
+}
+
+/* Preset rows: make sub-country buttons full-width rows */
+.sidebar-right #presetTree details .ml-6 {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-right #presetTree details .ml-6 > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-btn);
+  background: var(--bg-surface);
+  flex-wrap: nowrap;
+}
+
+.sidebar-right #presetTree details .ml-6 > div > button.flex-1 {
+  flex: 1 1 auto;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  padding: 4px 6px;
+}
+
+.sidebar-right #presetTree details .ml-6 > div > .flex {
+  flex: 0 0 auto;
+  display: inline-flex;
+  gap: 8px;
+}
+
+.sidebar-right #presetTree details .ml-6 > div > .flex button {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.sidebar-right #presetTree details .ml-6 > div > .flex button:hover {
+  color: var(--color-accent);
+  border-color: rgba(0, 47, 167, 0.2);
+}
+
+/* ── Map Container ─────────────────────────────────────── */
+.map-main {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  background: var(--bg-app);
+  overflow: hidden;
+}
+
+#mapContainer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: 0 0;
+  will-change: transform;
+  background-color: #aadaff;
 }
 
 .map-layer {
@@ -24,33 +661,6 @@ body {
   pointer-events: none;
 }
 
-#mapContainer {
-  position: absolute;
-  inset: 0;
-  transform-origin: 0 0;
-  will-change: transform;
-  background-color: #aadaff;
-}
-
-.color-swatch {
-  display: inline-block;
-  width: 2rem;
-  height: 2rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 0.375rem;
-  cursor: pointer;
-}
-
-.texture-overlay {
-  mix-blend-mode: color-burn;
-  opacity: 0.6;
-  background-size: 320px 320px;
-}
-
-.decorative-layer {
-  pointer-events: none;
-}
-
 #referenceImage {
   position: absolute;
   top: 0;
@@ -60,6 +670,19 @@ body {
   transform-origin: 0 0;
   pointer-events: none;
   opacity: 0;
+}
+
+/* ── Textures ──────────────────────────────────────────── */
+.texture-overlay {
+  mix-blend-mode: color-burn;
+  opacity: 0.6;
+  background-size: 320px 320px;
+}
+
+.decorative-layer {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
 }
 
 .texture-overlay.texture-none {
@@ -87,8 +710,20 @@ body {
   opacity: 0.2;
 }
 
-.color-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.5rem;
+/* ── Floating Tooltip ──────────────────────────────────── */
+#tooltip {
+  position: fixed;
+  z-index: 50;
+  background: rgba(45, 52, 54, 0.92);
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: var(--radius-btn);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 75ms ease;
 }
