@@ -6,7 +6,7 @@ URL = (
     "NUTS_RG_10M_2021_3035_LEVL_3.geojson"
 )
 RIVERS_URL = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_rivers_lake_centerlines.zip"
-BORDERS_URL = "https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_admin_0_countries.zip"
+BORDERS_URL = "https://naturalearth.s3.amazonaws.com/50m_cultural/ne_50m_admin_0_countries.zip"
 BORDER_LINES_URL = "https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_admin_0_boundary_lines_land.zip"
 OCEAN_URL = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_ocean.zip"
 LAND_BG_URL = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_land.zip"
@@ -94,9 +94,22 @@ EXTENSION_COUNTRIES = {
     "LK",
     "PK",
     "BD",
+    "TH",
+    "KH",
+    "VN",
+    "LA",
+    "MY",
+    "SG",
+    "PH",
 }
 EXCLUDED_NUTS_PREFIXES = ("FRY", "PT2", "PT3", "ES7")
-MAP_BOUNDS = (-25.0, 5.0, 180.0, 83.0)
+MAP_BOUNDS = (-25.0, 0.0, 180.0, 83.0)
+
+PROJECTION = {
+    "center": (85.0, 30.0),
+    "parallels": (20.0, 55.0),
+    "scale": 0.9,
+}
 
 # Simplification tolerances (WGS84 degrees)
 SIMPLIFY_NUTS3 = 0.002
