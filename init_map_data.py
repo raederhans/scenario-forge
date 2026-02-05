@@ -42,6 +42,7 @@ import geopandas as gpd
 import pandas as pd
 import requests
 from shapely.geometry import box
+from shapely.ops import clip_by_rect
 
 from map_builder import config as cfg
 from map_builder.geo.topology import build_topology
@@ -61,6 +62,40 @@ from map_builder.processors.south_asia import apply_south_asia_replacement
 from map_builder.processors.special_zones import build_special_zones
 from map_builder.outputs.save import save_outputs
 from tools import generate_hierarchy, translate_manager
+
+
+LATITUDE_CROP_BOUNDS = (-180.0, -55.0, 180.0, 73.0)
+LATITUDE_CROP_BOX = box(*LATITUDE_CROP_BOUNDS)
+
+
+def crop_to_latitude_band(gdf: gpd.GeoDataFrame, label: str) -> gpd.GeoDataFrame:
+    if gdf is None or gdf.empty or "geometry" not in gdf.columns:
+        return gdf
+
+    minx, miny, maxx, maxy = LATITUDE_CROP_BOUNDS
+    cropped = gdf.to_crs("EPSG:4326").copy()
+    try:
+        cropped = cropped.cx[minx:maxx, miny:maxy].copy()
+    except Exception:
+        # If spatial slicing is unavailable, fall back to full geometry clipping.
+        pass
+
+    def _clip_geom(geom):
+        if geom is None or geom.is_empty:
+            return geom
+        try:
+            return clip_by_rect(geom, minx, miny, maxx, maxy)
+        except Exception:
+            return geom.intersection(LATITUDE_CROP_BOX)
+
+    cropped["geometry"] = cropped.geometry.apply(_clip_geom)
+    before = len(cropped)
+    cropped = cropped[cropped.geometry.notna()]
+    cropped = cropped[~cropped.geometry.is_empty]
+    dropped = before - len(cropped)
+    if dropped:
+        print(f"Latitude crop ({label}): removed {dropped} empty geometries.")
+    return cropped
 
 
 
@@ -451,6 +486,17 @@ def main() -> None:
         .str.upper()
     )
     final_hybrid.loc[final_hybrid["cntr_code"] == "", "cntr_code"] = None
+
+    filtered = crop_to_latitude_band(filtered, "land")
+    rivers_clipped = crop_to_latitude_band(rivers_clipped, "rivers")
+    border_lines = crop_to_latitude_band(border_lines, "border lines")
+    ocean_clipped = crop_to_latitude_band(ocean_clipped, "ocean")
+    land_bg_clipped = crop_to_latitude_band(land_bg_clipped, "land background")
+    urban_clipped = crop_to_latitude_band(urban_clipped, "urban")
+    physical_filtered = crop_to_latitude_band(physical_filtered, "physical")
+    hybrid = crop_to_latitude_band(hybrid, "hybrid")
+    final_hybrid = crop_to_latitude_band(final_hybrid, "political")
+    special_zones = crop_to_latitude_band(special_zones, "special zones")
 
     script_dir = Path(__file__).resolve().parent
     output_dir = script_dir / "data"

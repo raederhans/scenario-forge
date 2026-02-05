@@ -1,5 +1,6 @@
 // Rendering engine (Phase 13)
 import { state } from "./state.js";
+import { ColorManager } from "./color_manager.js";
 import { LegendManager } from "./legend_manager.js";
 import { getTooltipText } from "../ui/i18n.js";
 
@@ -26,6 +27,12 @@ let boundsPath = null;
 let colorPath = null;
 let linePath = null;
 let hitPath = null;
+let zoomBehavior = null;
+
+const PROJECTION_PRECISION = 0.1;
+const PATH_POINT_RADIUS = 2;
+const VIEWPORT_CULL_OVERSCAN_PX = 96;
+const MAP_PAN_PADDING_PX = 50;
 
 function pathBoundsInScreen(feature) {
   if (!boundsPath) return false;
@@ -34,7 +41,19 @@ function pathBoundsInScreen(feature) {
   const minY = bounds[0][1] * state.zoomTransform.k + state.zoomTransform.y;
   const maxX = bounds[1][0] * state.zoomTransform.k + state.zoomTransform.x;
   const maxY = bounds[1][1] * state.zoomTransform.k + state.zoomTransform.y;
-  return !(maxX < 0 || maxY < 0 || minX > state.width || minY > state.height);
+  if (![minX, minY, maxX, maxY].every(Number.isFinite)) {
+    return false;
+  }
+  const overscan = Math.max(
+    VIEWPORT_CULL_OVERSCAN_PX,
+    Math.min(state.width, state.height) * 0.08
+  );
+  return !(
+    maxX < -overscan ||
+    maxY < -overscan ||
+    minX > state.width + overscan ||
+    minY > state.height + overscan
+  );
 }
 
 function getFeatureId(feature) {
@@ -43,6 +62,23 @@ function getFeatureId(feature) {
     feature?.properties?.NUTS_ID ||
     feature?.id ||
     null
+  );
+}
+
+function getFeatureRegionTag(feature) {
+  const props = feature?.properties || {};
+  return (
+    props.subregion ||
+    props.SUBREGION ||
+    props.region_un ||
+    props.REGION_UN ||
+    props.region_wb ||
+    props.REGION_WB ||
+    props.continent ||
+    props.CONTINENT ||
+    props.cntr_code ||
+    props.CNTR_CODE ||
+    "Unknown"
   );
 }
 
@@ -176,7 +212,7 @@ function initSpecialZonesSvg() {
   if (specialZonesGroup.empty()) {
     specialZonesGroup = specialZonesSvg.append("g").attr("class", "special-zones-layer");
   }
-  specialZonesPath = globalThis.d3.geoPath(projection);
+  specialZonesPath = globalThis.d3.geoPath(projection).pointRadius(PATH_POINT_RADIUS);
 }
 
 function resizeSpecialZonesSvg() {
@@ -524,6 +560,30 @@ function render() {
   }
 }
 
+function autoFillMap(mode = "region") {
+  if (!state.landData?.features?.length) return;
+
+  const nextColors = {};
+  if (mode === "political" && state.topology?.objects?.political) {
+    const politicalMap = ColorManager.computePoliticalColors(state.topology, "political");
+    const fallbackPalette = ColorManager.strictPoliticalPalette;
+    state.landData.features.forEach((feature, index) => {
+      const id = getFeatureId(feature) || `feature-${index}`;
+      nextColors[id] = politicalMap[id] || fallbackPalette[index % fallbackPalette.length];
+    });
+  } else {
+    state.landData.features.forEach((feature, index) => {
+      const id = getFeatureId(feature) || `feature-${index}`;
+      const tag = getFeatureRegionTag(feature);
+      nextColors[id] = ColorManager.getRegionColor(tag);
+    });
+  }
+
+  state.colors = nextColors;
+  invalidateBorderCache();
+  render();
+}
+
 function drawHover() {
   const k = state.zoomTransform.k;
   if (state.hoveredId && state.landIndex.has(state.hoveredId)) {
@@ -753,6 +813,31 @@ function setCanvasSize() {
   resizeSpecialZonesSvg();
 }
 
+function calculatePanExtent() {
+  const fallback = [
+    [-MAP_PAN_PADDING_PX, -MAP_PAN_PADDING_PX],
+    [state.width + MAP_PAN_PADDING_PX, state.height + MAP_PAN_PADDING_PX],
+  ];
+  if (!boundsPath || !state.landData || !state.landData.features?.length) return fallback;
+  const [[minX, minY], [maxX, maxY]] = boundsPath.bounds(state.landData);
+  if (![minX, minY, maxX, maxY].every(Number.isFinite)) return fallback;
+  return [
+    [minX - MAP_PAN_PADDING_PX, minY - MAP_PAN_PADDING_PX],
+    [maxX + MAP_PAN_PADDING_PX, maxY + MAP_PAN_PADDING_PX],
+  ];
+}
+
+function updateZoomTranslateExtent() {
+  if (!zoomBehavior || state.width <= 0 || state.height <= 0) return;
+  zoomBehavior.extent([[0, 0], [state.width, state.height]]);
+  zoomBehavior.translateExtent(calculatePanExtent());
+}
+
+function enforceZoomConstraints() {
+  if (!zoomBehavior || !colorCanvas || !globalThis.d3) return;
+  globalThis.d3.select(colorCanvas).call(zoomBehavior.translateBy, 0, 0);
+}
+
 function fitProjection() {
   if (!state.landData || !state.landData.features || state.landData.features.length === 0) {
     console.warn("fitProjection: No land data available");
@@ -763,11 +848,13 @@ function fitProjection() {
     return;
   }
   projection.fitSize([state.width, state.height], state.landData);
+  updateZoomTranslateExtent();
 }
 
 function handleResize() {
   setCanvasSize();
   fitProjection();
+  enforceZoomConstraints();
   buildSpatialIndex();
   updateSpecialZonesPaths();
   resizeLegendSvg();
@@ -796,11 +883,11 @@ export function initMap({ containerId = "mapContainer" } = {}) {
   hitCanvas = document.createElement("canvas");
   hitCtx = hitCanvas.getContext("2d", { willReadFrequently: true });
 
-  projection = globalThis.d3.geoMercator();
-  boundsPath = globalThis.d3.geoPath(projection);
-  colorPath = globalThis.d3.geoPath(projection, colorCtx);
-  linePath = globalThis.d3.geoPath(projection, lineCtx);
-  hitPath = globalThis.d3.geoPath(projection, hitCtx);
+  projection = globalThis.d3.geoMercator().precision(PROJECTION_PRECISION);
+  boundsPath = globalThis.d3.geoPath(projection).pointRadius(PATH_POINT_RADIUS);
+  colorPath = globalThis.d3.geoPath(projection, colorCtx).pointRadius(PATH_POINT_RADIUS);
+  linePath = globalThis.d3.geoPath(projection, lineCtx).pointRadius(PATH_POINT_RADIUS);
+  hitPath = globalThis.d3.geoPath(projection, hitCtx).pointRadius(PATH_POINT_RADIUS);
 
   state.colorCanvas = colorCanvas;
   state.lineCanvas = lineCanvas;
@@ -821,9 +908,10 @@ export function initMap({ containerId = "mapContainer" } = {}) {
   rebuildStaticMeshes();
   invalidateBorderCache();
 
-  const zoom = globalThis.d3
+  zoomBehavior = globalThis.d3
     .zoom()
     .scaleExtent([1, 50])
+    .extent([[0, 0], [state.width, state.height]])
     .on("start", () => {
       state.isInteracting = true;
     })
@@ -843,7 +931,9 @@ export function initMap({ containerId = "mapContainer" } = {}) {
       render();
     });
 
-  globalThis.d3.select(colorCanvas).call(zoom);
+  updateZoomTranslateExtent();
+  globalThis.d3.select(colorCanvas).call(zoomBehavior);
+  enforceZoomConstraints();
 
   colorCanvas.addEventListener("mousemove", handleMouseMove);
   colorCanvas.addEventListener("click", handleClick);
@@ -864,7 +954,8 @@ export function setMapData() {
   rebuildStaticMeshes();
   invalidateBorderCache();
   fitProjection();
+  enforceZoomConstraints();
   updateSpecialZonesPaths();
 }
 
-export { render, rebuildStaticMeshes, invalidateBorderCache };
+export { render, autoFillMap, rebuildStaticMeshes, invalidateBorderCache };

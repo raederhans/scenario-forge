@@ -1,7 +1,6 @@
 // Toolbar UI (Phase 13)
 import { state, PALETTE_THEMES } from "../core/state.js";
-import { applyPaletteToMap } from "../core/logic.js";
-import { invalidateBorderCache } from "../core/map_renderer.js";
+import { invalidateBorderCache, autoFillMap } from "../core/map_renderer.js";
 import { toggleLanguage, updateUIText, t } from "./i18n.js";
 
 function renderPalette(themeName) {
@@ -49,6 +48,7 @@ function initToolbar({ render } = {}) {
   const recentContainer = document.getElementById("recentColors");
   const presetPolitical = document.getElementById("presetPolitical");
   const presetClear = document.getElementById("presetClear");
+  const colorModeSelect = document.getElementById("colorModeSelect");
   const internalBorderColor = document.getElementById("internalBorderColor");
   const internalBorderOpacity = document.getElementById("internalBorderOpacity");
   const internalBorderWidth = document.getElementById("internalBorderWidth");
@@ -215,7 +215,16 @@ function initToolbar({ render } = {}) {
 
   if (presetPolitical) {
     presetPolitical.addEventListener("click", () => {
-      applyPaletteToMap();
+      autoFillMap(state.colorMode);
+    });
+  }
+
+  if (colorModeSelect) {
+    colorModeSelect.value = state.colorMode;
+    colorModeSelect.addEventListener("change", (event) => {
+      const value = String(event.target.value || "region");
+      state.colorMode = value === "political" ? "political" : "region";
+      autoFillMap(state.colorMode);
     });
   }
 

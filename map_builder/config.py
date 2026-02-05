@@ -67,6 +67,11 @@ UKR_ADM2_FILENAME = "geoBoundaries-UKR-ADM2.geojson"
 IND_ADM2_FILENAME = "geoBoundaries-IND-ADM2.geojson"
 
 # Geography configuration
+MAP_NAME = "Eurasia Optimized Cut"
+MAP_DESCRIPTION = (
+    "Eurasia-focused topology with latitude crop (-55 to 73) to remove polar overhead."
+)
+
 COUNTRY_CODES = {"DE", "PL", "IT", "FR", "NL", "BE", "LU", "AT", "CH"}
 EXTENSION_COUNTRIES = {
     "RU",

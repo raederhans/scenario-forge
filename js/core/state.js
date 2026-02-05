@@ -412,6 +412,7 @@ export const state = {
 
   colors: {},
   currentPaletteTheme: "HOI4 Vanilla",
+  colorMode: "region",
   selectedColor: PALETTE_THEMES["HOI4 Vanilla"][0],
   currentTool: "fill",
   hoveredId: null,
