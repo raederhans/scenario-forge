@@ -30,6 +30,8 @@ def build_extension_admin1(land: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     name_col = pick_column(admin1, ["adm0_name", "admin", "admin0_name"])
     iso_col = pick_column(admin1, ["iso_a2", "adm0_a2", "iso_3166_1_"])
     code_col = pick_column(admin1, ["adm1_code", "gn_id", "id"])
+    name_local_col = pick_column(admin1, ["name_ja", "NAME_JA", "name_local", "NAME_LOCAL"])
+    geonunit_col = pick_column(admin1, ["geonunit", "GEONUNIT", "geounit", "GEOUNIT"])
 
     if not name_col or not iso_col:
         print("Admin1 dataset missing expected country columns.")
@@ -54,6 +56,23 @@ def build_extension_admin1(land: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
                 "Bhutan",
                 "Myanmar",
                 "Sri Lanka",
+                "Morocco",
+                "Algeria",
+                "Tunisia",
+                "Libya",
+                "Egypt",
+                "Saudi Arabia",
+                "United Arab Emirates",
+                "Qatar",
+                "Bahrain",
+                "Kuwait",
+                "Oman",
+                "Yemen",
+                "Syria",
+                "Jordan",
+                "Lebanon",
+                "Israel",
+                "Palestine",
             }
         )
     ].copy()
@@ -85,7 +104,33 @@ def build_extension_admin1(land: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     if "name" not in admin1.columns and "name_en" in admin1.columns:
         admin1["name"] = admin1["name_en"]
 
-    admin1 = admin1[["id", "name", "cntr_code", "geometry"]].copy()
+    admin1["cntr_code"] = admin1["cntr_code"].fillna("").astype(str).str.upper()
+
+    if name_local_col and name_local_col in admin1.columns:
+        jp_mask = admin1["cntr_code"].isin({"JP"})
+        admin1["name_local"] = None
+        admin1.loc[jp_mask, "name_local"] = (
+            admin1.loc[jp_mask, name_local_col].fillna("").astype(str).str.strip()
+        )
+        admin1.loc[admin1["name_local"] == "", "name_local"] = None
+
+    if geonunit_col and geonunit_col in admin1.columns:
+        gb_mask = admin1["cntr_code"].isin({"GB", "UK"})
+        admin1["constituent_country"] = None
+        admin1.loc[gb_mask, "constituent_country"] = (
+            admin1.loc[gb_mask, geonunit_col].fillna("").astype(str).str.strip()
+        )
+        admin1.loc[admin1["constituent_country"] == "", "constituent_country"] = None
+
+    keep_cols = [
+        "id",
+        "name",
+        "cntr_code",
+        "geometry",
+        "name_local",
+        "constituent_country",
+    ]
+    admin1 = admin1[[col for col in keep_cols if col in admin1.columns]].copy()
     admin1["geometry"] = admin1.geometry.simplify(
         tolerance=cfg.SIMPLIFY_ADMIN1, preserve_topology=True
     )

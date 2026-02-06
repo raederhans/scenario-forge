@@ -262,11 +262,18 @@ function initToolbar({ render } = {}) {
     });
   }
   if (internalBorderWidth) {
+    const initialInternalWidth = Number(internalBorderWidth.value);
+    if (Number.isFinite(initialInternalWidth)) {
+      state.styleConfig.internalBorders.width = initialInternalWidth;
+      if (internalBorderWidthValue) {
+        internalBorderWidthValue.textContent = initialInternalWidth.toFixed(2);
+      }
+    }
     internalBorderWidth.addEventListener("input", (event) => {
       const value = Number(event.target.value);
       state.styleConfig.internalBorders.width = Number.isFinite(value) ? value : 0.5;
       if (internalBorderWidthValue) {
-        internalBorderWidthValue.textContent = value.toFixed(1);
+        internalBorderWidthValue.textContent = value.toFixed(2);
       }
       if (render) render();
     });
@@ -279,11 +286,18 @@ function initToolbar({ render } = {}) {
     });
   }
   if (empireBorderWidth) {
+    const initialEmpireWidth = Number(empireBorderWidth.value);
+    if (Number.isFinite(initialEmpireWidth)) {
+      state.styleConfig.empireBorders.width = initialEmpireWidth;
+      if (empireBorderWidthValue) {
+        empireBorderWidthValue.textContent = initialEmpireWidth.toFixed(2);
+      }
+    }
     empireBorderWidth.addEventListener("input", (event) => {
       const value = Number(event.target.value);
       state.styleConfig.empireBorders.width = Number.isFinite(value) ? value : 1.0;
       if (empireBorderWidthValue) {
-        empireBorderWidthValue.textContent = value.toFixed(1);
+        empireBorderWidthValue.textContent = value.toFixed(2);
       }
       if (render) render();
     });

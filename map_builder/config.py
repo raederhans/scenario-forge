@@ -73,10 +73,28 @@ MAP_DESCRIPTION = (
 )
 
 COUNTRY_CODES = {"DE", "PL", "IT", "FR", "NL", "BE", "LU", "AT", "CH"}
+SUBDIVISIONS = {"DE", "JP", "GB"}
 EXTENSION_COUNTRIES = {
     "RU",
     "BY",
     "MD",
+    "MA",
+    "DZ",
+    "TN",
+    "LY",
+    "EG",
+    "SA",
+    "AE",
+    "QA",
+    "BH",
+    "KW",
+    "OM",
+    "YE",
+    "SY",
+    "JO",
+    "LB",
+    "IL",
+    "PS",
     "KZ",
     "UZ",
     "TM",

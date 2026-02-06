@@ -40,7 +40,17 @@ def build_topology(
         if layer_name == "special_zones":
             keep_cols = ["id", "name", "label", "type", "claimants", "cntr_code", "geometry"]
         else:
-            keep_cols = ["id", "name", "cntr_code", "geometry"]
+            # Preserve selected admin context/localized fields when present.
+            keep_cols = [
+                "id",
+                "name",
+                "cntr_code",
+                "admin1_group",
+                "name_local",
+                "constituent_country",
+                "adm1_name",
+                "geometry",
+            ]
         existing = [col for col in keep_cols if col in gdf.columns]
         if "geometry" not in existing:
             existing.append("geometry")

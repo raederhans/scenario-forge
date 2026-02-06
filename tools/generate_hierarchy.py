@@ -19,6 +19,11 @@ except ImportError as exc:
         "requests is required. Install with: uv pip install requests"
     ) from exc
 
+try:
+    from map_builder import config as cfg
+except Exception:
+    cfg = None
+
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 DEFAULT_CHINA_ADM2 = DATA_DIR / "china_adm2.geojson"
 DEFAULT_FR_ARR = DATA_DIR / "france_arrondissements.geojson"
@@ -553,6 +558,49 @@ def build_france_groups(arr_path: Path):
     return groups, labels
 
 
+def build_topology_admin1_groups(topology_path: Path, subdivision_codes: set[str]):
+    if not topology_path.exists() or not subdivision_codes:
+        return {}, {}
+
+    try:
+        topo = json.loads(topology_path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        print(f"[Hierarchy] Failed to read topology for admin1 groups: {exc}")
+        return {}, {}
+
+    geoms = (
+        topo.get("objects", {})
+        .get("political", {})
+        .get("geometries", [])
+    )
+    groups = defaultdict(list)
+    labels = {}
+
+    for geom in geoms:
+        props = geom.get("properties", {}) or {}
+        child_id = str(props.get("id", "")).strip()
+        code = str(props.get("cntr_code", "")).strip().upper()
+        if not child_id or not code:
+            continue
+
+        norm_code = "GB" if code == "UK" else code
+        if norm_code not in subdivision_codes:
+            continue
+
+        group_name = str(props.get("admin1_group", "")).strip()
+        if not group_name and norm_code == "GB":
+            group_name = str(props.get("constituent_country", "")).strip()
+        if not group_name:
+            continue
+
+        group_id = f"{norm_code}_{slugify(group_name)}"
+        if child_id not in groups[group_id]:
+            groups[group_id].append(child_id)
+        labels[group_id] = group_name
+
+    return dict(groups), labels
+
+
 def main():
     adm2_path = DEFAULT_CHINA_ADM2
     adm1_path = find_ne_admin1(DATA_DIR)
@@ -607,6 +655,22 @@ def main():
     ]:
         groups.update(source_groups)
         labels.update(source_labels)
+
+    topology_path = DATA_DIR / "europe_topology.json"
+    configured_subdivisions = set()
+    if cfg is not None:
+        configured_subdivisions = {
+            str(code).upper().strip()
+            for code in getattr(cfg, "SUBDIVISIONS", set())
+            if str(code).strip()
+        }
+    if configured_subdivisions:
+        topo_groups, topo_labels = build_topology_admin1_groups(
+            topology_path,
+            configured_subdivisions,
+        )
+        groups.update(topo_groups)
+        labels.update(topo_labels)
 
     output = {"groups": groups, "labels": labels}
     output_path = DATA_DIR / "hierarchy.json"
