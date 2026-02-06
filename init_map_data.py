@@ -1,6 +1,7 @@
 """Initialize and prepare NUTS-3 map data for Map Creator."""
 from __future__ import annotations
 
+import math
 import sys
 import subprocess
 from pathlib import Path
@@ -80,15 +81,43 @@ def crop_to_latitude_band(gdf: gpd.GeoDataFrame, label: str) -> gpd.GeoDataFrame
         # If spatial slicing is unavailable, fall back to full geometry clipping.
         pass
 
-    def _clip_geom(geom):
-        if geom is None or geom.is_empty:
-            return geom
+    # Large background polygons (ocean/land) can produce clipping artifacts with
+    # low-level rectangle clipping; use GeoPandas clip for these layers.
+    if label in {"ocean", "land background"}:
         try:
-            return clip_by_rect(geom, minx, miny, maxx, maxy)
-        except Exception:
-            return geom.intersection(LATITUDE_CROP_BOX)
+            cropped = gpd.clip(cropped, LATITUDE_CROP_BOX)
+        except Exception as exc:
+            print(f"Latitude crop ({label}) fallback after clip failure: {exc}")
+            try:
+                if hasattr(cropped.geometry, "make_valid"):
+                    cropped = cropped.set_geometry(cropped.geometry.make_valid())
+                else:
+                    cropped = cropped.set_geometry(cropped.geometry.buffer(0))
+                cropped = gpd.clip(cropped, LATITUDE_CROP_BOX)
+            except Exception as fix_exc:
+                print(f"Latitude crop ({label}) skipped due to clip errors: {fix_exc}")
+    else:
+        def _clip_geom(geom):
+            if geom is None or geom.is_empty:
+                return geom
+            try:
+                return clip_by_rect(geom, minx, miny, maxx, maxy)
+            except Exception:
+                return geom.intersection(LATITUDE_CROP_BOX)
 
-    cropped["geometry"] = cropped.geometry.apply(_clip_geom)
+        cropped["geometry"] = cropped.geometry.apply(_clip_geom)
+
+    if hasattr(cropped.geometry, "is_valid"):
+        invalid = ~cropped.geometry.is_valid
+        if invalid.any():
+            try:
+                if hasattr(cropped.geometry, "make_valid"):
+                    cropped.loc[invalid, "geometry"] = cropped.loc[invalid, "geometry"].make_valid()
+                else:
+                    cropped.loc[invalid, "geometry"] = cropped.loc[invalid, "geometry"].buffer(0)
+            except Exception as exc:
+                print(f"Latitude crop ({label}) geometry fix failed: {exc}")
+
     before = len(cropped)
     cropped = cropped[cropped.geometry.notna()]
     cropped = cropped[~cropped.geometry.is_empty]
@@ -96,6 +125,39 @@ def crop_to_latitude_band(gdf: gpd.GeoDataFrame, label: str) -> gpd.GeoDataFrame
     if dropped:
         print(f"Latitude crop ({label}): removed {dropped} empty geometries.")
     return cropped
+
+
+def cull_small_geometries(
+    gdf: gpd.GeoDataFrame,
+    label: str,
+    group_col: str | None = None,
+    threshold_km2: float = cfg.MIN_VISIBLE_AREA_KM2,
+) -> gpd.GeoDataFrame:
+    """Cull tiny polygon fragments using a consistent global area threshold."""
+    if gdf is None or gdf.empty or "geometry" not in gdf.columns:
+        return gdf
+
+    geom_types = set(gdf.geometry.geom_type.dropna().unique())
+    has_polygonal = any(
+        ("Polygon" in geom_type) or (geom_type == "GeometryCollection")
+        for geom_type in geom_types
+    )
+    if not has_polygonal:
+        return gdf
+
+    before = len(gdf)
+    cull_group = group_col if group_col and group_col in gdf.columns else "__missing_group__"
+    culled = smart_island_cull(
+        gdf,
+        group_col=cull_group,
+        threshold_km2=threshold_km2,
+    )
+    removed = before - len(culled)
+    if removed > 0:
+        print(
+            f"[Cull] {label}: removed {removed} geometries below {threshold_km2:.1f} km^2 threshold."
+        )
+    return culled
 
 
 
@@ -163,7 +225,9 @@ def build_border_lines() -> gpd.GeoDataFrame:
 
 
 def despeckle_hybrid(
-    gdf: gpd.GeoDataFrame, area_km2: float = 500.0, tolerance: float = cfg.SIMPLIFY_NUTS3
+    gdf: gpd.GeoDataFrame,
+    area_km2: float = cfg.MIN_VISIBLE_AREA_KM2,
+    tolerance: float = cfg.SIMPLIFY_NUTS3,
 ) -> gpd.GeoDataFrame:
     if gdf.empty or "id" not in gdf.columns:
         return gdf
@@ -173,7 +237,7 @@ def despeckle_hybrid(
         return gdf
 
     try:
-        proj = exploded.to_crs("EPSG:3035")
+        proj = exploded.to_crs(cfg.AREA_CRS)
         areas = proj.geometry.area / 1_000_000.0
         keep = areas >= area_km2
         filtered = exploded.loc[keep].copy()
@@ -506,14 +570,17 @@ def main() -> None:
     border_lines = build_border_lines()
     ocean = fetch_ne_zip(cfg.OCEAN_URL, "ocean")
     ocean = clip_to_europe_bounds(ocean, "ocean")
-    ocean_clipped = clip_to_land_bounds(ocean, filtered, "ocean")
+    # Keep raw ocean geometry until political bounds are finalized to avoid
+    # early bbox clipping artifacts.
+    ocean_clipped = ocean.copy()
     ocean_clipped = ocean_clipped.copy()
     ocean_clipped["geometry"] = ocean_clipped.geometry.simplify(
         tolerance=cfg.SIMPLIFY_BACKGROUND, preserve_topology=True
     )
     land_bg = fetch_ne_zip(cfg.LAND_BG_URL, "land")
     land_bg = clip_to_europe_bounds(land_bg, "land background")
-    land_bg_clipped = clip_to_land_bounds(land_bg, filtered, "land background")
+    # Keep raw land background geometry until political bounds are finalized.
+    land_bg_clipped = land_bg.copy()
     land_bg_clipped = land_bg_clipped.copy()
     land_bg_clipped["geometry"] = land_bg_clipped.geometry.simplify(
         tolerance=cfg.SIMPLIFY_BACKGROUND, preserve_topology=True
@@ -600,7 +667,7 @@ def main() -> None:
     except Exception as exc:
         print(f"[Special Zones] Failed to build special zones; continuing without: {exc}")
     hybrid = apply_south_asia_replacement(hybrid, land_bg_clipped)
-    final_hybrid = smart_island_cull(hybrid, group_col="id", threshold_km2=1000.0)
+    final_hybrid = hybrid.copy()
 
     final_hybrid["cntr_code"] = final_hybrid["cntr_code"].fillna("").astype(str).str.strip()
     final_hybrid.loc[final_hybrid["cntr_code"] == "", "cntr_code"] = None
@@ -648,6 +715,20 @@ def main() -> None:
     final_hybrid.loc[final_hybrid["cntr_code"] == "", "cntr_code"] = None
     final_hybrid = apply_config_subdivisions(final_hybrid)
 
+    # Re-clip background layers to the final political extent.
+    try:
+        hybrid_bounds = final_hybrid.to_crs("EPSG:4326").total_bounds
+        if (
+            len(hybrid_bounds) == 4
+            and all(math.isfinite(v) for v in hybrid_bounds)
+            and hybrid_bounds[2] > hybrid_bounds[0]
+            and hybrid_bounds[3] > hybrid_bounds[1]
+        ):
+            ocean_clipped = clip_to_bounds(ocean_clipped, hybrid_bounds, "ocean")
+            land_bg_clipped = clip_to_bounds(land_bg_clipped, hybrid_bounds, "land background")
+    except Exception as exc:
+        print(f"Background layer clip-to-political-bounds skipped: {exc}")
+
     filtered = crop_to_latitude_band(filtered, "land")
     rivers_clipped = crop_to_latitude_band(rivers_clipped, "rivers")
     border_lines = crop_to_latitude_band(border_lines, "border lines")
@@ -658,6 +739,16 @@ def main() -> None:
     hybrid = crop_to_latitude_band(hybrid, "hybrid")
     final_hybrid = crop_to_latitude_band(final_hybrid, "political")
     special_zones = crop_to_latitude_band(special_zones, "special zones")
+
+    # Global polygon culling pass to reduce payload while preserving VIP geometries.
+    filtered = cull_small_geometries(filtered, "land", group_col="NUTS_ID")
+    ocean_clipped = cull_small_geometries(ocean_clipped, "ocean")
+    land_bg_clipped = cull_small_geometries(land_bg_clipped, "land background")
+    urban_clipped = cull_small_geometries(urban_clipped, "urban")
+    physical_filtered = cull_small_geometries(physical_filtered, "physical")
+    hybrid = cull_small_geometries(hybrid, "hybrid", group_col="id")
+    final_hybrid = cull_small_geometries(final_hybrid, "political", group_col="id")
+    special_zones = cull_small_geometries(special_zones, "special zones", group_col="id")
 
     script_dir = Path(__file__).resolve().parent
     output_dir = script_dir / "data"
@@ -684,7 +775,7 @@ def main() -> None:
         rivers=rivers_clipped,
         special_zones=special_zones,
         output_path=topology_path,
-        quantization=100_000,
+        quantization=cfg.TOPOLOGY_QUANTIZATION,
     )
 
     print("[INFO] Generating Hierarchy Data....")

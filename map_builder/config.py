@@ -134,6 +134,11 @@ PROJECTION = {
     "scale": 0.9,
 }
 
+# Equal-area CRS + global visibility threshold used for geometry culling.
+AREA_CRS = "EPSG:6933"
+MIN_VISIBLE_AREA_KM2 = 50.0
+TOPOLOGY_QUANTIZATION = 10_000
+
 # Simplification tolerances (WGS84 degrees)
 SIMPLIFY_NUTS3 = 0.002
 SIMPLIFY_ADMIN1 = 0.02

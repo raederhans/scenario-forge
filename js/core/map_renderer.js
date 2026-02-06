@@ -1,60 +1,39 @@
-// Rendering engine (Phase 13)
+// Hybrid canvas + SVG rendering engine.
 import { state } from "./state.js";
 import { ColorManager } from "./color_manager.js";
 import { LegendManager } from "./legend_manager.js";
 import { getTooltipText } from "../ui/i18n.js";
 
 let mapContainer = null;
-let colorCanvas = null;
-let lineCanvas = null;
+let mapCanvas = null;
+let mapSvg = null;
+let interactionRect = null;
 let textureOverlay = null;
 let tooltip = null;
-let colorCtx = null;
-let lineCtx = null;
-let hitCanvas = null;
-let hitCtx = null;
-let specialZonesSvg = null;
+let context = null;
+
+let projection = null;
+let pathSVG = null;
+let pathCanvas = null;
+let zoomBehavior = null;
+
+let viewportGroup = null;
 let specialZonesGroup = null;
-let specialZonesPath = null;
-let legendSvg = null;
+let hoverGroup = null;
 let legendGroup = null;
 let legendItemsGroup = null;
 let legendBackground = null;
 let lastLegendKey = null;
 
-let projection = null;
-let boundsPath = null;
-let colorPath = null;
-let linePath = null;
-let hitPath = null;
-let zoomBehavior = null;
-
 const PROJECTION_PRECISION = 0.1;
 const PATH_POINT_RADIUS = 2;
 const VIEWPORT_CULL_OVERSCAN_PX = 96;
 const MAP_PAN_PADDING_PX = 50;
-
-function pathBoundsInScreen(feature) {
-  if (!boundsPath) return false;
-  const bounds = boundsPath.bounds(feature);
-  const minX = bounds[0][0] * state.zoomTransform.k + state.zoomTransform.x;
-  const minY = bounds[0][1] * state.zoomTransform.k + state.zoomTransform.y;
-  const maxX = bounds[1][0] * state.zoomTransform.k + state.zoomTransform.x;
-  const maxY = bounds[1][1] * state.zoomTransform.k + state.zoomTransform.y;
-  if (![minX, minY, maxX, maxY].every(Number.isFinite)) {
-    return false;
-  }
-  const overscan = Math.max(
-    VIEWPORT_CULL_OVERSCAN_PX,
-    Math.min(state.width, state.height) * 0.08
-  );
-  return !(
-    maxX < -overscan ||
-    maxY < -overscan ||
-    minX > state.width + overscan ||
-    minY > state.height + overscan
-  );
-}
+const MIN_ZOOM_SCALE = 1;
+const MAX_ZOOM_SCALE = 50;
+const OCEAN_FILL_COLOR = "#aadaff";
+const LAND_FILL_COLOR = "#f0f0f0";
+const BORDER_FALLBACK_COLOR = "rgba(0, 0, 0, 0.2)";
 
 function getFeatureId(feature) {
   return (
@@ -65,11 +44,27 @@ function getFeatureId(feature) {
   );
 }
 
+function getFeatureCountryCode(feature) {
+  return (
+    feature?.properties?.cntr_code ||
+    feature?.properties?.CNTR_CODE ||
+    feature?.properties?.iso_a2 ||
+    feature?.properties?.ISO_A2 ||
+    ""
+  );
+}
+
 function getFeatureRegionTag(feature) {
   const props = feature?.properties || {};
   return (
     props.subregion ||
     props.SUBREGION ||
+    props.mapcolor7 ||
+    props.MAPCOLOR7 ||
+    props.mapcolor8 ||
+    props.MAPCOLOR8 ||
+    props.mapcolor9 ||
+    props.MAPCOLOR9 ||
     props.region_un ||
     props.REGION_UN ||
     props.region_wb ||
@@ -87,14 +82,209 @@ function getColorsHash() {
   return JSON.stringify(entries);
 }
 
+function pathBoundsInScreen(feature) {
+  if (!pathSVG) return false;
+  const bounds = pathSVG.bounds(feature);
+  const minX = bounds[0][0] * state.zoomTransform.k + state.zoomTransform.x;
+  const minY = bounds[0][1] * state.zoomTransform.k + state.zoomTransform.y;
+  const maxX = bounds[1][0] * state.zoomTransform.k + state.zoomTransform.x;
+  const maxY = bounds[1][1] * state.zoomTransform.k + state.zoomTransform.y;
+  if (![minX, minY, maxX, maxY].every(Number.isFinite)) return false;
+
+  const overscan = Math.max(
+    VIEWPORT_CULL_OVERSCAN_PX,
+    Math.min(state.width, state.height) * 0.08
+  );
+
+  return !(
+    maxX < -overscan ||
+    maxY < -overscan ||
+    minX > state.width + overscan ||
+    minY > state.height + overscan
+  );
+}
+
+function ensureLayerDataFromTopology() {
+  if (!state.topology || !state.topology.objects || !globalThis.topojson) return;
+  const objects = state.topology.objects;
+
+  if (!state.oceanData && objects.ocean) {
+    state.oceanData = globalThis.topojson.feature(state.topology, objects.ocean);
+  }
+  if (!state.landBgData && objects.land) {
+    state.landBgData = globalThis.topojson.feature(state.topology, objects.land);
+  }
+  if (!state.riversData && objects.rivers) {
+    state.riversData = globalThis.topojson.feature(state.topology, objects.rivers);
+  }
+  if (!state.urbanData && objects.urban) {
+    state.urbanData = globalThis.topojson.feature(state.topology, objects.urban);
+  }
+  if (!state.physicalData && objects.physical) {
+    state.physicalData = globalThis.topojson.feature(state.topology, objects.physical);
+  }
+  if (!state.specialZonesData && objects.special_zones) {
+    state.specialZonesData = globalThis.topojson.feature(state.topology, objects.special_zones);
+  }
+}
+
+function createCanvasElement() {
+  const canvas = document.createElement("canvas");
+  canvas.id = "map-canvas";
+  canvas.className = "map-layer";
+  canvas.style.position = "absolute";
+  canvas.style.inset = "0";
+  canvas.style.display = "block";
+  canvas.style.zIndex = "0";
+  return canvas;
+}
+
+function createSvgElement() {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("id", "map-svg");
+  svg.classList.add("map-layer", "map-layer-top");
+  svg.style.position = "absolute";
+  svg.style.inset = "0";
+  svg.style.display = "block";
+  svg.style.zIndex = "1";
+  svg.style.pointerEvents = "none";
+  return svg;
+}
+
+function ensureHybridLayers() {
+  const legacySpecialZones = document.getElementById("specialZonesSvg");
+  if (legacySpecialZones) legacySpecialZones.remove();
+  const legacyLegend = document.getElementById("legendSvg");
+  if (legacyLegend) legacyLegend.remove();
+
+  const legacyColorCanvas = document.getElementById("colorCanvas");
+  const legacyLineCanvas = document.getElementById("lineCanvas");
+
+  mapCanvas = mapContainer.querySelector("#map-canvas");
+  if (!mapCanvas) {
+    mapCanvas = createCanvasElement();
+    const anchor = legacyColorCanvas || legacyLineCanvas || textureOverlay || null;
+    if (anchor && mapContainer.contains(anchor)) {
+      mapContainer.insertBefore(mapCanvas, anchor);
+    } else {
+      mapContainer.appendChild(mapCanvas);
+    }
+  }
+  mapCanvas.style.display = "block";
+  mapCanvas.style.zIndex = "0";
+
+  if (legacyColorCanvas && legacyColorCanvas !== mapCanvas) {
+    legacyColorCanvas.style.display = "none";
+    legacyColorCanvas.style.pointerEvents = "none";
+  }
+  if (legacyLineCanvas) {
+    legacyLineCanvas.style.display = "none";
+    legacyLineCanvas.style.pointerEvents = "none";
+  }
+
+  mapSvg = mapContainer.querySelector("#map-svg");
+  if (!mapSvg) {
+    mapSvg = createSvgElement();
+    if (textureOverlay && mapContainer.contains(textureOverlay)) {
+      mapContainer.insertBefore(mapSvg, textureOverlay);
+    } else {
+      mapContainer.appendChild(mapSvg);
+    }
+  }
+  mapSvg.style.display = "block";
+  mapSvg.style.zIndex = "1";
+
+  const svg = globalThis.d3.select(mapSvg);
+  svg.style("pointer-events", "none");
+
+  viewportGroup = svg.select("g.viewport-layer");
+  if (viewportGroup.empty()) {
+    viewportGroup = svg.append("g").attr("class", "viewport-layer");
+  }
+  viewportGroup.style("pointer-events", "none");
+
+  specialZonesGroup = viewportGroup.select("g.special-zones-layer");
+  if (specialZonesGroup.empty()) {
+    specialZonesGroup = viewportGroup.append("g").attr("class", "special-zones-layer");
+  }
+  specialZonesGroup.style("pointer-events", "none");
+
+  hoverGroup = viewportGroup.select("g.hover-layer");
+  if (hoverGroup.empty()) {
+    hoverGroup = viewportGroup.append("g").attr("class", "hover-layer");
+  }
+  hoverGroup.style("pointer-events", "none");
+
+  legendGroup = svg.select("g.legend-group");
+  if (legendGroup.empty()) {
+    legendGroup = svg.append("g").attr("class", "legend-group");
+  }
+  legendGroup.style("pointer-events", "none");
+
+  legendBackground = legendGroup.select("rect.legend-bg");
+  if (legendBackground.empty()) {
+    legendBackground = legendGroup
+      .append("rect")
+      .attr("class", "legend-bg")
+      .attr("fill", "rgba(255,255,255,0.85)")
+      .attr("stroke", "#d1d5db")
+      .attr("stroke-width", 1)
+      .attr("rx", 8)
+      .attr("ry", 8);
+  }
+
+  legendItemsGroup = legendGroup.select("g.legend-items");
+  if (legendItemsGroup.empty()) {
+    legendItemsGroup = legendGroup.append("g").attr("class", "legend-items");
+  }
+
+  interactionRect = svg.select("rect.interaction-layer");
+  if (interactionRect.empty()) {
+    interactionRect = svg
+      .append("rect")
+      .attr("class", "interaction-layer")
+      .attr("fill", "transparent");
+  }
+  interactionRect.style("pointer-events", "all");
+}
+
+function setCanvasSize() {
+  if (!mapCanvas || !mapSvg) return;
+
+  state.dpr = globalThis.devicePixelRatio || 1;
+  const rect = mapContainer?.getBoundingClientRect?.();
+  const measuredWidth = rect?.width || mapContainer?.clientWidth || globalThis.innerWidth;
+  const measuredHeight = rect?.height || mapContainer?.clientHeight || globalThis.innerHeight;
+
+  state.width = Math.round(measuredWidth);
+  state.height = Math.round(measuredHeight);
+
+  if (state.width < 100) state.width = Math.max(100, globalThis.innerWidth - 580);
+  if (state.height < 100) state.height = Math.max(100, globalThis.innerHeight);
+
+  const scaledW = Math.floor(state.width * state.dpr);
+  const scaledH = Math.floor(state.height * state.dpr);
+
+  mapCanvas.width = scaledW;
+  mapCanvas.height = scaledH;
+  mapCanvas.style.width = `${state.width}px`;
+  mapCanvas.style.height = `${state.height}px`;
+
+  const svg = globalThis.d3.select(mapSvg);
+  svg.attr("width", state.width).attr("height", state.height);
+  interactionRect.attr("x", 0).attr("y", 0).attr("width", state.width).attr("height", state.height);
+}
+
 function rebuildDynamicBorders() {
   if (!state.topology || !state.topology.objects?.political || !globalThis.topojson) {
     state.cachedBorders = null;
     state.cachedColorsHash = null;
     return;
   }
+
   const currentHash = getColorsHash();
   if (state.cachedBorders && state.cachedColorsHash === currentHash) return;
+
   state.cachedBorders = globalThis.topojson.mesh(
     state.topology,
     state.topology.objects.political,
@@ -116,11 +306,13 @@ function rebuildStaticMeshes() {
     state.cachedGridLines = null;
     return;
   }
+
   state.cachedCoastlines = globalThis.topojson.mesh(
     state.topology,
     state.topology.objects.political,
     (a, b) => !b
   );
+
   state.cachedGridLines = globalThis.topojson.mesh(
     state.topology,
     state.topology.objects.political,
@@ -134,149 +326,294 @@ function invalidateBorderCache() {
   rebuildDynamicBorders();
 }
 
-function absoluteClear(ctx, canvas) {
-  ctx.save();
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.restore();
+function buildIndex() {
+  state.landIndex.clear();
+  state.idToKey.clear();
+  state.keyToId.clear();
+
+  if (!state.landData || !state.landData.features) return;
+  state.landData.features.forEach((feature, index) => {
+    const id = getFeatureId(feature) || `feature-${index}`;
+    state.landIndex.set(id, feature);
+    const key = index + 1;
+    state.idToKey.set(id, key);
+    state.keyToId.set(key, id);
+  });
 }
 
-function applyTransform(ctx) {
-  ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
-  ctx.translate(state.zoomTransform.x, state.zoomTransform.y);
-  ctx.scale(state.zoomTransform.k, state.zoomTransform.k);
+function buildSpatialIndex() {
+  state.spatialItems = [];
+  state.spatialIndex = null;
+  if (!state.landData || !state.landData.features || !pathSVG) return;
+
+  for (const feature of state.landData.features) {
+    const id = getFeatureId(feature);
+    if (!id) continue;
+    const bounds = pathSVG.bounds(feature);
+    const minX = bounds[0][0];
+    const minY = bounds[0][1];
+    const maxX = bounds[1][0];
+    const maxY = bounds[1][1];
+    if (![minX, minY, maxX, maxY].every(Number.isFinite)) continue;
+
+    state.spatialItems.push({
+      id,
+      feature,
+      minX,
+      minY,
+      maxX,
+      maxY,
+      cx: (minX + maxX) / 2,
+      cy: (minY + maxY) / 2,
+    });
+  }
+
+  state.spatialIndex = globalThis.d3
+    .quadtree()
+    .x((item) => item.cx)
+    .y((item) => item.cy)
+    .addAll(state.spatialItems);
 }
 
-function buildSpecialZonePatterns(defs) {
-  defs.select("#pattern-disputed").remove();
-  defs.select("#pattern-wasteland").remove();
-  const disputed = defs
-    .append("pattern")
-    .attr("id", "pattern-disputed")
-    .attr("patternUnits", "userSpaceOnUse")
-    .attr("width", 6)
-    .attr("height", 6)
-    .attr("patternTransform", "rotate(45)");
-  disputed
-    .append("line")
-    .attr("x1", 0)
-    .attr("y1", 0)
-    .attr("x2", 0)
-    .attr("y2", 6)
-    .attr("stroke", "#f97316")
-    .attr("stroke-width", 1)
-    .attr("stroke-opacity", 0.7);
+function getFeatureIdFromEvent(event) {
+  if (!state.landData || !mapSvg || !projection) return null;
 
-  const wasteland = defs
-    .append("pattern")
-    .attr("id", "pattern-wasteland")
-    .attr("patternUnits", "userSpaceOnUse")
-    .attr("width", 6)
-    .attr("height", 6);
-  wasteland
-    .append("path")
-    .attr("d", "M0 0 L6 6 M6 0 L0 6")
-    .attr("stroke", "#39ff14")
-    .attr("stroke-width", 1)
-    .attr("stroke-opacity", 0.65);
-}
+  const [sx, sy] = globalThis.d3.pointer(event, mapSvg);
+  const px = (sx - state.zoomTransform.x) / state.zoomTransform.k;
+  const py = (sy - state.zoomTransform.y) / state.zoomTransform.k;
+  if (!Number.isFinite(px) || !Number.isFinite(py)) return null;
 
-function initSpecialZonesSvg() {
-  if (!mapContainer || !globalThis.d3) return;
-  let svgNode = document.getElementById("specialZonesSvg");
-  if (!svgNode) {
-    svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svgNode.setAttribute("id", "specialZonesSvg");
-    svgNode.classList.add("map-layer", "map-layer-top");
-    svgNode.style.pointerEvents = "none";
-    if (lineCanvas && mapContainer.contains(lineCanvas)) {
-      mapContainer.insertBefore(svgNode, lineCanvas);
-    } else {
-      mapContainer.appendChild(svgNode);
+  const lonLat = projection.invert([px, py]);
+  if (!lonLat) return null;
+
+  const candidates = [];
+  if (state.spatialIndex) {
+    state.spatialIndex.visit((node, x0, y0, x1, y1) => {
+      if (px < x0 || px > x1 || py < y0 || py > y1) return true;
+      if (!node.length) {
+        let current = node;
+        do {
+          const item = current.data;
+          if (
+            item &&
+            px >= item.minX && px <= item.maxX &&
+            py >= item.minY && py <= item.maxY
+          ) {
+            candidates.push(item);
+          }
+          current = current.next;
+        } while (current);
+      }
+      return false;
+    });
+  }
+
+  for (const candidate of candidates) {
+    if (globalThis.d3.geoContains(candidate.feature, lonLat)) {
+      return candidate.id;
     }
   }
-  specialZonesSvg = globalThis.d3.select(svgNode);
-  specialZonesSvg
-    .attr("width", state.width)
-    .attr("height", state.height)
-    .style("position", "absolute")
-    .style("inset", "0");
 
-  let defs = specialZonesSvg.select("defs");
-  if (defs.empty()) {
-    defs = specialZonesSvg.append("defs");
-  }
-  buildSpecialZonePatterns(defs);
-
-  specialZonesGroup = specialZonesSvg.select("g.special-zones-layer");
-  if (specialZonesGroup.empty()) {
-    specialZonesGroup = specialZonesSvg.append("g").attr("class", "special-zones-layer");
-  }
-  specialZonesPath = globalThis.d3.geoPath(projection).pointRadius(PATH_POINT_RADIUS);
+  return null;
 }
 
-function resizeSpecialZonesSvg() {
-  if (!specialZonesSvg) return;
-  specialZonesSvg.attr("width", state.width).attr("height", state.height);
+function drawCanvas() {
+  if (!context || !pathCanvas || !state.landData) return;
+  ensureLayerDataFromTopology();
+
+  const canvasWidth = context.canvas.width;
+  const canvasHeight = context.canvas.height;
+  const transform = state.zoomTransform || globalThis.d3.zoomIdentity;
+  const k = Math.max(0.0001, transform.k || 1);
+
+  // Hard reset before every frame to avoid stale composition/clip state.
+  context.setTransform(1, 0, 0, 1, 0, 0);
+  context.globalCompositeOperation = "source-over";
+  context.globalAlpha = 1.0;
+  context.shadowBlur = 0;
+  context.filter = "none";
+  context.clearRect(0, 0, canvasWidth, canvasHeight);
+
+  context.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+  context.translate(transform.x, transform.y);
+  context.scale(k, k);
+
+  if (state.oceanData) {
+    context.save();
+    context.fillStyle = OCEAN_FILL_COLOR;
+    context.globalAlpha = 1.0;
+    context.beginPath();
+    pathCanvas(state.oceanData);
+    context.fill();
+    context.restore();
+  }
+
+  if (state.landBgData) {
+    context.beginPath();
+    pathCanvas(state.landBgData);
+    context.fillStyle = LAND_FILL_COLOR;
+    context.fill();
+  }
+
+  if (state.showPhysical && state.physicalData) {
+    context.save();
+    context.fillStyle = "rgba(255,255,255,0.18)";
+    for (const feature of state.physicalData.features) {
+      if (!pathBoundsInScreen(feature)) continue;
+      context.beginPath();
+      pathCanvas(feature);
+      context.fill();
+    }
+    context.restore();
+  }
+
+  for (const feature of state.landData.features) {
+    if (!pathBoundsInScreen(feature)) continue;
+    const id = getFeatureId(feature);
+    const fill = id && state.colors[id] ? state.colors[id] : "#d6d6d6";
+
+    context.beginPath();
+    pathCanvas(feature);
+    context.fillStyle = fill;
+    context.fill();
+  }
+
+  if (state.showUrban && state.urbanData) {
+    context.save();
+    context.fillStyle = "rgba(80,80,80,0.18)";
+    for (const feature of state.urbanData.features) {
+      if (!pathBoundsInScreen(feature)) continue;
+      context.beginPath();
+      pathCanvas(feature);
+      context.fill();
+    }
+    context.restore();
+  }
+
+  if (state.cachedCoastlines) {
+    context.beginPath();
+    pathCanvas(state.cachedCoastlines);
+    context.strokeStyle = state.styleConfig.coastlines.color || BORDER_FALLBACK_COLOR;
+    context.lineWidth = state.styleConfig.coastlines.width / k;
+    context.stroke();
+  }
+
+  if (state.cachedGridLines) {
+    context.save();
+    context.globalAlpha = state.styleConfig.internalBorders.opacity;
+    context.beginPath();
+    pathCanvas(state.cachedGridLines);
+    context.strokeStyle = state.styleConfig.internalBorders.color || BORDER_FALLBACK_COLOR;
+    context.lineWidth = state.styleConfig.internalBorders.width / k;
+    context.stroke();
+    context.restore();
+  }
+
+  rebuildDynamicBorders();
+  if (state.cachedBorders) {
+    context.beginPath();
+    pathCanvas(state.cachedBorders);
+    context.strokeStyle = state.styleConfig.empireBorders.color || BORDER_FALLBACK_COLOR;
+    context.lineWidth = state.styleConfig.empireBorders.width / k;
+    context.stroke();
+  }
+
+  if (state.showRivers && state.riversData) {
+    context.beginPath();
+    pathCanvas(state.riversData);
+    context.strokeStyle = "#3498db";
+    context.lineWidth = 0.8 / k;
+    context.stroke();
+  }
+
+  if (state.isEditingPreset && state.editingPresetIds.size > 0) {
+    context.save();
+    context.strokeStyle = "#f97316";
+    context.lineWidth = 2 / k;
+    for (const id of state.editingPresetIds) {
+      const feature = state.landIndex.get(id);
+      if (!feature || !pathBoundsInScreen(feature)) continue;
+      context.beginPath();
+      pathCanvas(feature);
+      context.stroke();
+    }
+    context.restore();
+  }
+
 }
 
-function resizeLegendSvg() {
-  if (!legendSvg) return;
-  legendSvg.attr("width", state.width).attr("height", state.height);
+function updateSpecialZonesPaths() {
+  if (!specialZonesGroup || !pathSVG) return;
+
+  const features = state.specialZonesData?.features || [];
+  if (!features.length) {
+    specialZonesGroup.selectAll("path.special-zone").remove();
+    return;
+  }
+
+  const selection = specialZonesGroup
+    .selectAll("path.special-zone")
+    .data(features, (d, i) => d?.properties?.id || `special-zone-${i}`);
+
+  selection
+    .enter()
+    .append("path")
+    .attr("class", "special-zone")
+    .attr("vector-effect", "non-scaling-stroke")
+    .merge(selection)
+    .attr("d", pathSVG)
+    .attr("fill", (d) => {
+      const type = d?.properties?.type || "";
+      if (type === "disputed") return "rgba(249,115,22,0.15)";
+      if (type === "wasteland") return "rgba(220,38,38,0.12)";
+      return "none";
+    })
+    .attr("stroke", (d) => {
+      const type = d?.properties?.type || "";
+      if (type === "disputed") return "#f97316";
+      if (type === "wasteland") return "#dc2626";
+      return "#111827";
+    })
+    .attr("stroke-width", 1.2)
+    .attr("opacity", 0.85);
+
+  selection.exit().remove();
 }
 
-function initLegendSvg() {
-  if (!mapContainer || !globalThis.d3) return;
-  let svgNode = document.getElementById("legendSvg");
-  if (!svgNode) {
-    svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svgNode.setAttribute("id", "legendSvg");
-    svgNode.classList.add("map-layer", "map-layer-top");
-    svgNode.style.pointerEvents = "none";
-    mapContainer.appendChild(svgNode);
-  }
-  legendSvg = globalThis.d3.select(svgNode);
-  legendSvg
-    .attr("width", state.width)
-    .attr("height", state.height)
-    .style("position", "absolute")
-    .style("inset", "0");
+function renderHoverOverlay() {
+  if (!hoverGroup || !pathSVG) return;
 
-  initLegendGroup();
+  const feature = state.hoveredId ? state.landIndex.get(state.hoveredId) : null;
+  const data = feature ? [feature] : [];
+
+  const selection = hoverGroup
+    .selectAll("path.hovered-feature")
+    .data(data, (d) => getFeatureId(d) || "hover");
+
+  selection
+    .enter()
+    .append("path")
+    .attr("class", "hovered-feature")
+    .attr("vector-effect", "non-scaling-stroke")
+    .merge(selection)
+    .attr("d", pathSVG)
+    .attr("fill", "none")
+    .attr("stroke", "#f1c40f")
+    .attr("stroke-width", 2.0);
+
+  selection.exit().remove();
 }
 
-function initLegendGroup() {
-  if (!legendSvg) return;
-  legendGroup = legendSvg.select("g.legend-group");
-  if (legendGroup.empty()) {
-    legendGroup = legendSvg.append("g").attr("class", "legend-group");
-    legendGroup.attr("pointer-events", "none");
+function renderSpecialZones() {
+  if (!specialZonesGroup) return;
+  if (!state.showSpecialZones) {
+    specialZonesGroup.attr("display", "none");
+    return;
   }
-
-  legendBackground = legendGroup.select("rect.legend-bg");
-  if (legendBackground.empty()) {
-    legendBackground = legendGroup
-      .append("rect")
-      .attr("class", "legend-bg")
-      .attr("fill", "rgba(255,255,255,0.85)")
-      .attr("stroke", "#d1d5db")
-      .attr("stroke-width", 1)
-      .attr("rx", 8)
-      .attr("ry", 8);
-  }
-
-  legendItemsGroup = legendGroup.select("g.legend-items");
-  if (legendItemsGroup.empty()) {
-    legendItemsGroup = legendGroup.append("g").attr("class", "legend-items");
-  }
+  specialZonesGroup.attr("display", null);
 }
 
 export function renderLegend(uniqueColors = null, labels = null) {
-  if (!legendSvg) {
-    initLegendSvg();
-  }
-  if (!legendSvg) return;
-  initLegendGroup();
   if (!legendGroup || !legendItemsGroup || !legendBackground) return;
 
   const colors = Array.isArray(uniqueColors)
@@ -352,208 +689,10 @@ export function renderLegend(uniqueColors = null, labels = null) {
   lastLegendKey = legendKey;
 }
 
-function getSpecialZoneFill(feature) {
-  const zoneType = feature?.properties?.type || "";
-  if (zoneType === "disputed") return "url(#pattern-disputed)";
-  if (zoneType === "wasteland") return "url(#pattern-wasteland)";
-  return "none";
-}
-
-function getSpecialZoneStroke(feature) {
-  const zoneType = feature?.properties?.type || "";
-  if (zoneType === "disputed") return "#f97316";
-  if (zoneType === "wasteland") return "#dc2626";
-  return "#111827";
-}
-
-function updateSpecialZonesPaths() {
-  if (!specialZonesGroup || !specialZonesPath) return;
-  const features = state.specialZonesData?.features || [];
-  if (!features.length) {
-    specialZonesGroup.selectAll("path.special-zone").remove();
-    return;
-  }
-  const selection = specialZonesGroup
-    .selectAll("path.special-zone")
-    .data(features, (d, i) => d?.properties?.id || `special-zone-${i}`);
-
-  selection
-    .enter()
-    .append("path")
-    .attr("class", "special-zone")
-    .attr("fill", (d) => getSpecialZoneFill(d))
-    .attr("stroke", (d) => getSpecialZoneStroke(d))
-    .attr("stroke-width", 1.1)
-    .attr("vector-effect", "non-scaling-stroke")
-    .attr("opacity", 0.85)
-    .merge(selection)
-    .attr("d", specialZonesPath)
-    .attr("fill", (d) => getSpecialZoneFill(d))
-    .attr("stroke", (d) => getSpecialZoneStroke(d));
-
-  selection.exit().remove();
-}
-
-function renderSpecialZones() {
-  if (!specialZonesGroup) return;
-  if (!state.showSpecialZones) {
-    specialZonesGroup.attr("display", "none");
-    return;
-  }
-  specialZonesGroup.attr("display", null);
-  const t = state.zoomTransform;
-  specialZonesGroup.attr("transform", `translate(${t.x},${t.y}) scale(${t.k})`);
-}
-
-function renderColorLayer() {
-  if (!state.landData || !colorCtx) return;
-  const k = state.zoomTransform.k;
-
-  absoluteClear(colorCtx, colorCanvas);
-  applyTransform(colorCtx);
-
-  if (state.landBgData) {
-    colorCtx.beginPath();
-    colorPath(state.landBgData);
-    colorCtx.fillStyle = "#e4e4e4";
-    colorCtx.fill();
-  }
-
-  colorCtx.fillStyle = "#d6d6d6";
-  for (const feature of state.landData.features) {
-    if ((k < 2 && boundsPath.area(feature) * k * k < state.TINY_AREA) || !pathBoundsInScreen(feature)) {
-      continue;
-    }
-    colorCtx.beginPath();
-    colorPath(feature);
-    colorCtx.fill();
-  }
-
-  for (const feature of state.landData.features) {
-    const id = getFeatureId(feature);
-    if (!id || !state.colors[id]) continue;
-    if ((k < 2 && boundsPath.area(feature) * k * k < state.TINY_AREA) || !pathBoundsInScreen(feature)) {
-      continue;
-    }
-    colorCtx.fillStyle = state.colors[id];
-    colorCtx.beginPath();
-    colorPath(feature);
-    colorCtx.fill();
-  }
-}
-
-function renderLineLayer() {
-  if (!state.landData || !lineCtx) return;
-  const k = state.zoomTransform.k;
-
-  absoluteClear(lineCtx, lineCanvas);
-  applyTransform(lineCtx);
-  lineCtx.lineJoin = "round";
-  lineCtx.lineCap = "round";
-  const internalOpacityBase = k < 2 ? 0.3 : k < 4 ? 0.6 : 0.85;
-  const internalWidth =
-    (state.styleConfig.internalBorders.width * (k < 3 ? 0.6 : 1.6)) / k;
-  const empireWidth =
-    (state.styleConfig.empireBorders.width * (k < 2 ? 1.5 : 1.2)) / k;
-  const coastlineWidth =
-    (state.styleConfig.coastlines.width * (k < 2 ? 0.9 : 1.1)) / k;
-
-  if (state.showPhysical && state.physicalData) {
-    for (const feature of state.physicalData.features) {
-      if ((k < 2 && boundsPath.area(feature) * k * k < state.TINY_AREA) || !pathBoundsInScreen(feature)) {
-        continue;
-      }
-      lineCtx.globalAlpha = 0.15;
-      lineCtx.fillStyle = "#ffffff";
-      lineCtx.beginPath();
-      linePath(feature);
-      lineCtx.fill();
-    }
-  }
-
-  if (state.showUrban && state.urbanData) {
-    lineCtx.save();
-    lineCtx.globalAlpha = 0.2;
-    lineCtx.fillStyle = "#999999";
-    for (const feature of state.urbanData.features) {
-      if ((k < 2 && boundsPath.area(feature) * k * k < state.TINY_AREA) || !pathBoundsInScreen(feature)) {
-        continue;
-      }
-      lineCtx.beginPath();
-      linePath(feature);
-      lineCtx.fill();
-    }
-    lineCtx.restore();
-  }
-
-  lineCtx.globalAlpha = 1;
-
-  if (state.topology && state.topology.objects?.political) {
-    const coastlines = state.cachedCoastlines;
-    if (coastlines) {
-      lineCtx.globalAlpha = 1;
-      lineCtx.beginPath();
-      linePath(coastlines);
-      lineCtx.strokeStyle = state.styleConfig.coastlines.color;
-      lineCtx.lineWidth = coastlineWidth;
-      lineCtx.stroke();
-    }
-
-    const gridLines = state.cachedGridLines;
-    if (gridLines) {
-      lineCtx.globalAlpha =
-        state.styleConfig.internalBorders.opacity * internalOpacityBase;
-      lineCtx.beginPath();
-      linePath(gridLines);
-      lineCtx.strokeStyle = state.styleConfig.internalBorders.color;
-      lineCtx.lineWidth = internalWidth;
-      lineCtx.stroke();
-    }
-
-    rebuildDynamicBorders();
-    const dynamicBorders = state.cachedBorders;
-    if (dynamicBorders) {
-      lineCtx.globalAlpha = 1;
-      lineCtx.beginPath();
-      linePath(dynamicBorders);
-      lineCtx.strokeStyle = state.styleConfig.empireBorders.color;
-      lineCtx.lineWidth = empireWidth;
-      lineCtx.stroke();
-    }
-  }
-
-  if (state.showRivers && state.riversData) {
-    lineCtx.beginPath();
-    linePath(state.riversData);
-    lineCtx.strokeStyle = "#3498db";
-    lineCtx.lineWidth = 1 / k;
-    lineCtx.stroke();
-  }
-
-  if (state.isEditingPreset && state.editingPresetIds.size > 0) {
-    lineCtx.save();
-    lineCtx.globalAlpha = 0.9;
-    lineCtx.strokeStyle = "#f97316";
-    lineCtx.lineWidth = 2 / k;
-    for (const id of state.editingPresetIds) {
-      const feature = state.landIndex.get(id);
-      if (!feature) continue;
-      if (!pathBoundsInScreen(feature)) continue;
-      lineCtx.beginPath();
-      linePath(feature);
-      lineCtx.stroke();
-    }
-    lineCtx.restore();
-  }
-
-  drawHover();
-  markHitDirty();
-}
-
 function render() {
-  renderColorLayer();
+  drawCanvas();
   renderSpecialZones();
-  renderLineLayer();
+  renderHoverOverlay();
   renderLegend();
   if (typeof state.updateLegendUI === "function") {
     state.updateLegendUI();
@@ -566,10 +705,36 @@ function autoFillMap(mode = "region") {
   const nextColors = {};
   if (mode === "political" && state.topology?.objects?.political) {
     const politicalMap = ColorManager.computePoliticalColors(state.topology, "political");
-    const fallbackPalette = ColorManager.strictPoliticalPalette;
+    const topologyGeometries = state.topology.objects.political?.geometries || [];
+    const colorByCountry = {};
+
+    topologyGeometries.forEach((geometry, index) => {
+      const geometryId = ColorManager.getFeatureId(geometry, index);
+      const countryCode = String(
+        ColorManager.getCountryCode(geometry, index) || ""
+      ).toUpperCase();
+      if (!countryCode) return;
+      const colorForGeometry =
+        politicalMap[geometryId] ||
+        politicalMap[countryCode] ||
+        colorByCountry[countryCode] ||
+        null;
+      if (colorForGeometry) {
+        colorByCountry[countryCode] = colorForGeometry;
+      }
+    });
+
     state.landData.features.forEach((feature, index) => {
       const id = getFeatureId(feature) || `feature-${index}`;
-      nextColors[id] = politicalMap[id] || fallbackPalette[index % fallbackPalette.length];
+      const countryCode = String(
+        getFeatureCountryCode(feature) || ColorManager.getCountryCode(feature, index) || ""
+      ).toUpperCase();
+      const fallbackToken = countryCode || id;
+      nextColors[id] =
+        politicalMap[id] ||
+        politicalMap[countryCode] ||
+        colorByCountry[countryCode] ||
+        ColorManager.getPoliticalFallbackColor(fallbackToken, index);
     });
   } else {
     state.landData.features.forEach((feature, index) => {
@@ -584,164 +749,28 @@ function autoFillMap(mode = "region") {
   render();
 }
 
-function drawHover() {
-  const k = state.zoomTransform.k;
-  if (state.hoveredId && state.landIndex.has(state.hoveredId)) {
-    const feature = state.landIndex.get(state.hoveredId);
-    if (!((k < 2 && boundsPath.area(feature) * k * k < state.TINY_AREA) || !pathBoundsInScreen(feature))) {
-      lineCtx.beginPath();
-      linePath(feature);
-      lineCtx.strokeStyle = "#f1c40f";
-      lineCtx.lineWidth = 2 / k;
-      lineCtx.stroke();
-    }
-  }
-}
-
-function markHitDirty() {
-  state.hitCanvasDirty = true;
-}
-
-function drawHidden() {
-  if (!state.landData || !state.hitCanvasDirty) return;
-  state.hitCanvasDirty = false;
-
-  absoluteClear(hitCtx, hitCanvas);
-  applyTransform(hitCtx);
-
-  for (const feature of state.landData.features) {
-    const id = feature.properties?.id || feature.properties?.NUTS_ID;
-    const key = state.idToKey.get(id);
-    if (!key) continue;
-    if (!pathBoundsInScreen(feature)) continue;
-    const r = (key >> 16) & 255;
-    const g = (key >> 8) & 255;
-    const b = key & 255;
-    hitCtx.fillStyle = `rgb(${r},${g},${b})`;
-    hitCtx.beginPath();
-    hitPath(feature);
-    hitCtx.fill();
-  }
-}
-
-function buildIndex() {
-  state.landIndex.clear();
-  state.idToKey.clear();
-  state.keyToId.clear();
-
-  if (!state.landData || !state.landData.features) return;
-  state.landData.features.forEach((feature, index) => {
-    const id = getFeatureId(feature) || `feature-${index}`;
-    state.landIndex.set(id, feature);
-    const key = index + 1;
-    state.idToKey.set(id, key);
-    state.keyToId.set(key, id);
-  });
-}
-
-function buildSpatialIndex() {
-  state.spatialItems = [];
-  state.spatialIndex = null;
-  if (!state.landData || !state.landData.features) return;
-
-  for (const feature of state.landData.features) {
-    const id = getFeatureId(feature);
-    if (!id) continue;
-    const bounds = boundsPath.bounds(feature);
-    const minX = bounds[0][0];
-    const minY = bounds[0][1];
-    const maxX = bounds[1][0];
-    const maxY = bounds[1][1];
-    if (![minX, minY, maxX, maxY].every(Number.isFinite)) continue;
-    state.spatialItems.push({
-      id,
-      feature,
-      minX,
-      minY,
-      maxX,
-      maxY,
-      cx: (minX + maxX) / 2,
-      cy: (minY + maxY) / 2,
-    });
-  }
-
-  state.spatialIndex = globalThis.d3
-    .quadtree()
-    .x((d) => d.cx)
-    .y((d) => d.cy)
-    .addAll(state.spatialItems);
-}
-
-function getFeatureIdFromEvent(event) {
-  if (!state.landData) return null;
-  const [sx, sy] = globalThis.d3.pointer(event, colorCanvas);
-  const px = (sx - state.zoomTransform.x) / state.zoomTransform.k;
-  const py = (sy - state.zoomTransform.y) / state.zoomTransform.k;
-  if (!Number.isFinite(px) || !Number.isFinite(py)) return null;
-
-  const lonLat = projection.invert([px, py]);
-  if (!lonLat) return null;
-
-  const candidates = [];
-  if (state.spatialIndex) {
-    state.spatialIndex.visit((node, x0, y0, x1, y1) => {
-      if (px < x0 || px > x1 || py < y0 || py > y1) return true;
-      if (!node.length) {
-        let current = node;
-        do {
-          const d = current.data;
-          if (d && px >= d.minX && px <= d.maxX && py >= d.minY && py <= d.maxY) {
-            candidates.push(d);
-          }
-          current = current.next;
-        } while (current);
-      }
-      return false;
-    });
-  }
-
-  for (const candidate of candidates) {
-    if (globalThis.d3.geoContains(candidate.feature, lonLat)) {
-      return candidate.id;
-    }
-  }
-
-  return null;
-}
-
 function handleMouseMove(event) {
   const now = performance.now();
   if (now - state.lastMouseMoveTime < state.MOUSE_THROTTLE_MS) return;
   state.lastMouseMoveTime = now;
-  if (!state.landData) return;
-  if (state.isInteracting) return;
+  if (!state.landData || state.isInteracting) return;
+
   const id = getFeatureIdFromEvent(event);
   if (id !== state.hoveredId) {
     state.hoveredId = id;
-    drawHover();
+    renderHoverOverlay();
   }
 
   if (!tooltip) return;
   if (id && state.landIndex.has(id)) {
     const feature = state.landIndex.get(id);
-    const text = getTooltipText(feature);
-    tooltip.textContent = text;
+    tooltip.textContent = getTooltipText(feature);
     tooltip.style.left = `${event.clientX + 12}px`;
     tooltip.style.top = `${event.clientY + 12}px`;
     tooltip.style.opacity = "1";
   } else {
     tooltip.style.opacity = "0";
   }
-}
-
-function paintSingleRegion(feature, color) {
-  colorCtx.save();
-  applyTransform(colorCtx);
-  colorCtx.fillStyle = color;
-  colorCtx.beginPath();
-  colorPath(feature);
-  colorCtx.fill();
-  colorCtx.restore();
 }
 
 function addRecentColor(color) {
@@ -758,6 +787,7 @@ function addRecentColor(color) {
 
 function handleClick(event) {
   if (!state.landData) return;
+
   const id = getFeatureIdFromEvent(event);
   if (!id) return;
   const feature = state.landIndex.get(id);
@@ -774,7 +804,10 @@ function handleClick(event) {
     delete state.colors[id];
     invalidateBorderCache();
     render();
-  } else if (state.currentTool === "eyedropper") {
+    return;
+  }
+
+  if (state.currentTool === "eyedropper") {
     const picked = state.colors[id];
     if (picked) {
       state.selectedColor = picked;
@@ -782,35 +815,13 @@ function handleClick(event) {
         state.updateSwatchUIFn();
       }
     }
-  } else {
-    state.colors[id] = state.selectedColor;
-    addRecentColor(state.selectedColor);
-    paintSingleRegion(feature, state.selectedColor);
-    invalidateBorderCache();
-    renderLineLayer();
+    return;
   }
-}
 
-function setCanvasSize() {
-  state.dpr = globalThis.devicePixelRatio || 1;
-
-  const container = mapContainer || colorCanvas.parentElement;
-  state.width = colorCanvas.clientWidth || container?.clientWidth || globalThis.innerWidth;
-  state.height = colorCanvas.clientHeight || container?.clientHeight || globalThis.innerHeight;
-
-  if (state.width < 100) state.width = globalThis.innerWidth - 580;
-  if (state.height < 100) state.height = globalThis.innerHeight;
-
-  const scaledW = Math.floor(state.width * state.dpr);
-  const scaledH = Math.floor(state.height * state.dpr);
-
-  colorCanvas.width = scaledW;
-  colorCanvas.height = scaledH;
-  lineCanvas.width = scaledW;
-  lineCanvas.height = scaledH;
-  hitCanvas.width = scaledW;
-  hitCanvas.height = scaledH;
-  resizeSpecialZonesSvg();
+  state.colors[id] = state.selectedColor;
+  addRecentColor(state.selectedColor);
+  invalidateBorderCache();
+  render();
 }
 
 function calculatePanExtent() {
@@ -818,9 +829,34 @@ function calculatePanExtent() {
     [-MAP_PAN_PADDING_PX, -MAP_PAN_PADDING_PX],
     [state.width + MAP_PAN_PADDING_PX, state.height + MAP_PAN_PADDING_PX],
   ];
-  if (!boundsPath || !state.landData || !state.landData.features?.length) return fallback;
-  const [[minX, minY], [maxX, maxY]] = boundsPath.bounds(state.landData);
+
+  if (!pathSVG || !state.landData || !state.landData.features?.length) return fallback;
+
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const feature of state.landData.features) {
+    const bounds = pathSVG.bounds(feature);
+    if (!bounds || bounds.length !== 2) continue;
+
+    const featureMinX = bounds[0][0];
+    const featureMinY = bounds[0][1];
+    const featureMaxX = bounds[1][0];
+    const featureMaxY = bounds[1][1];
+    if (![featureMinX, featureMinY, featureMaxX, featureMaxY].every(Number.isFinite)) {
+      continue;
+    }
+
+    minX = Math.min(minX, featureMinX);
+    minY = Math.min(minY, featureMinY);
+    maxX = Math.max(maxX, featureMaxX);
+    maxY = Math.max(maxY, featureMaxY);
+  }
+
   if (![minX, minY, maxX, maxY].every(Number.isFinite)) return fallback;
+
   return [
     [minX - MAP_PAN_PADDING_PX, minY - MAP_PAN_PADDING_PX],
     [maxX + MAP_PAN_PADDING_PX, maxY + MAP_PAN_PADDING_PX],
@@ -829,133 +865,156 @@ function calculatePanExtent() {
 
 function updateZoomTranslateExtent() {
   if (!zoomBehavior || state.width <= 0 || state.height <= 0) return;
+  zoomBehavior.scaleExtent([MIN_ZOOM_SCALE, MAX_ZOOM_SCALE]);
   zoomBehavior.extent([[0, 0], [state.width, state.height]]);
   zoomBehavior.translateExtent(calculatePanExtent());
 }
 
+function updateMap(transform) {
+  state.zoomTransform = transform;
+  if (viewportGroup) {
+    viewportGroup.attr("transform", `translate(${transform.x},${transform.y}) scale(${transform.k})`);
+  }
+  drawCanvas();
+}
+
+function resetZoomToFit() {
+  if (!zoomBehavior || !interactionRect || !globalThis.d3) return;
+  const identity = globalThis.d3.zoomIdentity;
+  state.zoomTransform = identity;
+  globalThis.d3.select(interactionRect.node()).call(zoomBehavior.transform, identity);
+}
+
 function enforceZoomConstraints() {
-  if (!zoomBehavior || !colorCanvas || !globalThis.d3) return;
-  globalThis.d3.select(colorCanvas).call(zoomBehavior.translateBy, 0, 0);
+  if (!zoomBehavior || !interactionRect || !globalThis.d3) return;
+  globalThis.d3.select(interactionRect.node()).call(zoomBehavior.translateBy, 0, 0);
 }
 
 function fitProjection() {
-  if (!state.landData || !state.landData.features || state.landData.features.length === 0) {
-    console.warn("fitProjection: No land data available");
-    return;
-  }
-  if (state.width <= 0 || state.height <= 0) {
-    console.warn("fitProjection: Invalid dimensions", { width: state.width, height: state.height });
+  if (!state.landData?.features?.length || state.width <= 0 || state.height <= 0) {
     return;
   }
   projection.fitSize([state.width, state.height], state.landData);
+  buildSpatialIndex();
+  updateSpecialZonesPaths();
   updateZoomTranslateExtent();
 }
 
 function handleResize() {
   setCanvasSize();
   fitProjection();
+  resetZoomToFit();
   enforceZoomConstraints();
-  buildSpatialIndex();
-  updateSpecialZonesPaths();
-  resizeLegendSvg();
   render();
 }
 
-export function initMap({ containerId = "mapContainer" } = {}) {
+function initZoom() {
+  zoomBehavior = globalThis.d3
+    .zoom()
+    .scaleExtent([MIN_ZOOM_SCALE, MAX_ZOOM_SCALE])
+    .extent([[0, 0], [state.width, state.height]])
+    .on("start", () => {
+      state.isInteracting = true;
+    })
+    .on("zoom", (event) => {
+      if (!state.zoomRenderScheduled) {
+        state.zoomRenderScheduled = true;
+        requestAnimationFrame(() => {
+          updateMap(event.transform);
+          state.zoomRenderScheduled = false;
+        });
+      }
+    })
+    .on("end", (event) => {
+      state.isInteracting = false;
+      updateMap(event.transform);
+      renderHoverOverlay();
+    });
+
+  updateZoomTranslateExtent();
+  globalThis.d3.select(interactionRect.node()).call(zoomBehavior);
+  resetZoomToFit();
+  enforceZoomConstraints();
+}
+
+function bindEvents() {
+  if (!interactionRect) return;
+  interactionRect.on("mousemove", handleMouseMove);
+  interactionRect.on("mouseleave", () => {
+    state.hoveredId = null;
+    renderHoverOverlay();
+    if (tooltip) tooltip.style.opacity = "0";
+  });
+  interactionRect.on("click", handleClick);
+  window.addEventListener("resize", handleResize);
+}
+
+function initMap({ containerId = "mapContainer" } = {}) {
   if (!globalThis.d3) {
     console.error("D3 is required for map renderer.");
     return;
   }
 
   mapContainer = document.getElementById(containerId);
-  colorCanvas = document.getElementById("colorCanvas");
-  lineCanvas = document.getElementById("lineCanvas");
   textureOverlay = document.getElementById("textureOverlay");
   tooltip = document.getElementById("tooltip");
 
-  if (!colorCanvas || !lineCanvas) {
-    console.error("Canvas elements not found.");
+  if (!mapContainer) {
+    console.error("Map container not found.");
     return;
   }
 
-  colorCtx = colorCanvas.getContext("2d");
-  lineCtx = lineCanvas.getContext("2d");
-  hitCanvas = document.createElement("canvas");
-  hitCtx = hitCanvas.getContext("2d", { willReadFrequently: true });
+  ensureHybridLayers();
+
+  context = mapCanvas.getContext("2d");
+  if (!context) {
+    console.error("Canvas 2D context unavailable.");
+    return;
+  }
 
   projection = globalThis.d3.geoMercator().precision(PROJECTION_PRECISION);
-  boundsPath = globalThis.d3.geoPath(projection).pointRadius(PATH_POINT_RADIUS);
-  colorPath = globalThis.d3.geoPath(projection, colorCtx).pointRadius(PATH_POINT_RADIUS);
-  linePath = globalThis.d3.geoPath(projection, lineCtx).pointRadius(PATH_POINT_RADIUS);
-  hitPath = globalThis.d3.geoPath(projection, hitCtx).pointRadius(PATH_POINT_RADIUS);
+  projection.clipExtent(null);
+  pathSVG = globalThis.d3.geoPath(projection).pointRadius(PATH_POINT_RADIUS);
+  pathCanvas = globalThis.d3.geoPath(projection, context).pointRadius(PATH_POINT_RADIUS);
+  ensureLayerDataFromTopology();
 
-  state.colorCanvas = colorCanvas;
-  state.lineCanvas = lineCanvas;
-  state.colorCtx = colorCtx;
-  state.lineCtx = lineCtx;
+  state.colorCanvas = mapCanvas;
+  state.lineCanvas = null;
+  state.colorCtx = context;
+  state.lineCtx = null;
+
+  mapCanvas.style.pointerEvents = "none";
+  mapCanvas.style.touchAction = "none";
+  if (textureOverlay) textureOverlay.style.pointerEvents = "none";
+  console.info(
+    "[Map Layers]",
+    "canvas display=", mapCanvas.style.display || "(default)",
+    "canvas z-index=", mapCanvas.style.zIndex || "(auto)",
+    "svg display=", mapSvg.style.display || "(default)",
+    "svg z-index=", mapSvg.style.zIndex || "(auto)"
+  );
 
   setCanvasSize();
-  if (state.landData) {
-    fitProjection();
-  }
-
-  initSpecialZonesSvg();
-  initLegendSvg();
-  updateSpecialZonesPaths();
-
   buildIndex();
-  buildSpatialIndex();
-  rebuildStaticMeshes();
-  invalidateBorderCache();
-
-  zoomBehavior = globalThis.d3
-    .zoom()
-    .scaleExtent([1, 50])
-    .extent([[0, 0], [state.width, state.height]])
-    .on("start", () => {
-      state.isInteracting = true;
-    })
-    .on("zoom", (event) => {
-      state.zoomTransform = event.transform;
-      if (!state.zoomRenderScheduled) {
-        state.zoomRenderScheduled = true;
-        requestAnimationFrame(() => {
-          render();
-          state.zoomRenderScheduled = false;
-        });
-      }
-    })
-    .on("end", (event) => {
-      state.zoomTransform = event.transform;
-      state.isInteracting = false;
-      render();
-    });
-
-  updateZoomTranslateExtent();
-  globalThis.d3.select(colorCanvas).call(zoomBehavior);
-  enforceZoomConstraints();
-
-  colorCanvas.addEventListener("mousemove", handleMouseMove);
-  colorCanvas.addEventListener("click", handleClick);
-  window.addEventListener("resize", handleResize);
-
-  colorCanvas.style.pointerEvents = "auto";
-  lineCanvas.style.pointerEvents = "none";
-  if (textureOverlay) {
-    textureOverlay.style.pointerEvents = "none";
-  }
-
-  colorCanvas.style.touchAction = "none";
-}
-
-export function setMapData() {
-  buildIndex();
-  buildSpatialIndex();
   rebuildStaticMeshes();
   invalidateBorderCache();
   fitProjection();
-  enforceZoomConstraints();
-  updateSpecialZonesPaths();
+  initZoom();
+  bindEvents();
+
+  render();
 }
 
-export { render, autoFillMap, rebuildStaticMeshes, invalidateBorderCache };
+function setMapData() {
+  ensureLayerDataFromTopology();
+  buildIndex();
+  rebuildStaticMeshes();
+  invalidateBorderCache();
+  fitProjection();
+  resetZoomToFit();
+  enforceZoomConstraints();
+  drawCanvas();
+  render();
+}
+
+export { initMap, setMapData, render, autoFillMap, rebuildStaticMeshes, invalidateBorderCache };

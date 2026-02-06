@@ -60,13 +60,13 @@ def apply_poland_replacement(main_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     pl_gdf["id"] = "PL_POW_" + pl_gdf["terc"].astype(str)
     pl_gdf["name"] = pl_gdf["name"].astype(str)
     pl_gdf["cntr_code"] = "PL"
-    # Drop oversized artifacts using area in EPSG:4326 (square degrees).
-    pl_gdf["temp_area"] = pl_gdf.geometry.area
+    # Drop oversized artifacts using projected area (km^2), not square degrees.
+    pl_gdf["temp_area_km2"] = pl_gdf.to_crs(cfg.AREA_CRS).geometry.area / 1_000_000.0
     before_count = len(pl_gdf)
-    pl_gdf = pl_gdf[pl_gdf["temp_area"] < 2.0].copy()
+    pl_gdf = pl_gdf[pl_gdf["temp_area_km2"] < 25_000.0].copy()
     after_count = len(pl_gdf)
     print(f"   [Poland Clean] Removed {before_count - after_count} oversized artifact(s).")
-    pl_gdf = pl_gdf.drop(columns=["temp_area"])
+    pl_gdf = pl_gdf.drop(columns=["temp_area_km2"])
     pl_gdf = pl_gdf[["id", "name", "cntr_code", "geometry"]].copy()
     pl_gdf["geometry"] = pl_gdf.geometry.simplify(
         tolerance=cfg.SIMPLIFY_NUTS3, preserve_topology=True

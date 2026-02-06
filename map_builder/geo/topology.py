@@ -7,6 +7,7 @@ import math
 import geopandas as gpd
 import topojson as tp
 
+from map_builder import config as cfg
 from map_builder.geo.utils import round_geometries
 
 
@@ -19,7 +20,7 @@ def build_topology(
     rivers: gpd.GeoDataFrame,
     output_path,
     special_zones: gpd.GeoDataFrame | None = None,
-    quantization: int = 100_000,
+    quantization: int = cfg.TOPOLOGY_QUANTIZATION,
 ) -> None:
     print("Building TopoJSON topology...")
 
@@ -45,6 +46,18 @@ def build_topology(
                 "id",
                 "name",
                 "cntr_code",
+                "subregion",
+                "SUBREGION",
+                "region_un",
+                "REGION_UN",
+                "region_wb",
+                "REGION_WB",
+                "mapcolor7",
+                "MAPCOLOR7",
+                "mapcolor8",
+                "MAPCOLOR8",
+                "mapcolor9",
+                "MAPCOLOR9",
                 "admin1_group",
                 "name_local",
                 "constituent_country",
@@ -87,6 +100,8 @@ def build_topology(
         gdf = prune_columns(gdf, name)
         gdf = scrub_geometry(gdf)
         gdf = round_geometries(gdf)
+        # Rounding can create self-intersections on tight rings; scrub again.
+        gdf = scrub_geometry(gdf)
         if not has_valid_bounds(gdf):
             if name == "political":
                 print("Political layer is empty or invalid; cannot build topology.")

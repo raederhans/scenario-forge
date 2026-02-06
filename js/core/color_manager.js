@@ -36,33 +36,119 @@ class ColorManager {
     );
   }
 
+  static getCountryCode(item, fallbackIndex) {
+    const props = item?.properties || {};
+    const raw =
+      props.cntr_code ||
+      props.CNTR_CODE ||
+      props.iso_a2 ||
+      props.ISO_A2 ||
+      props.adm0_a2 ||
+      props.ADM0_A2 ||
+      "";
+    const code = String(raw || "").trim().toUpperCase();
+    if (code) return code;
+    return `feature-${fallbackIndex}`;
+  }
+
+  static stableHash(input) {
+    const text = String(input || "");
+    let hash = 0;
+    for (let i = 0; i < text.length; i += 1) {
+      hash = (hash * 31 + text.charCodeAt(i)) >>> 0;
+    }
+    return hash;
+  }
+
+  static pickPaletteColor(palette, used, seedIndex = 0) {
+    if (!Array.isArray(palette) || palette.length === 0) return null;
+    const start = Math.abs(seedIndex) % palette.length;
+    for (let offset = 0; offset < palette.length; offset += 1) {
+      const candidate = palette[(start + offset) % palette.length];
+      if (!used.has(candidate)) return candidate;
+    }
+    return palette[start];
+  }
+
+  static getPoliticalFallbackColor(token, fallbackIndex = 0) {
+    const palette = ColorManager.strictPoliticalPalette;
+    const seed = ColorManager.stableHash(token) + Number(fallbackIndex || 0);
+    return palette[Math.abs(seed) % palette.length];
+  }
+
   static computePoliticalColors(topology, objectName) {
     const result = {};
     const object = topology?.objects?.[objectName];
     const geometries = object?.geometries || [];
-    if (!geometries.length || !globalThis.topojson?.neighbors) {
+    if (!geometries.length) {
       return result;
     }
 
-    const neighbors = globalThis.topojson.neighbors(geometries);
     const palette = ColorManager.strictPoliticalPalette;
+    const countryByIndex = geometries.map((geometry, index) =>
+      ColorManager.getCountryCode(geometry, index)
+    );
+    const countryAdjacency = new Map();
 
     geometries.forEach((geometry, index) => {
-      const neighborIndexes = neighbors[index] || [];
-      const used = new Set();
-      neighborIndexes.forEach((neighborIndex) => {
-        const neighborId = ColorManager.getFeatureId(geometries[neighborIndex], neighborIndex);
-        if (result[neighborId]) {
-          used.add(result[neighborId]);
-        }
-      });
-
-      let chosen = palette.find((color) => !used.has(color));
-      if (!chosen) {
-        chosen = palette[Math.floor(Math.random() * palette.length)];
+      const countryCode = countryByIndex[index];
+      if (!countryAdjacency.has(countryCode)) {
+        countryAdjacency.set(countryCode, new Set());
       }
+    });
 
+    let neighbors = [];
+    try {
+      if (globalThis.topojson?.neighbors) {
+        neighbors = globalThis.topojson.neighbors(geometries) || [];
+      }
+    } catch (error) {
+      neighbors = [];
+      console.warn("Political neighbor graph failed, falling back to hash coloring:", error);
+    }
+    if (!Array.isArray(neighbors) || neighbors.length !== geometries.length) {
+      neighbors = new Array(geometries.length).fill(null).map(() => []);
+    }
+
+    geometries.forEach((_, index) => {
+      const countryCode = countryByIndex[index];
+      const neighborIndexes = neighbors[index] || [];
+      for (const neighborIndex of neighborIndexes) {
+        if (!Number.isInteger(neighborIndex)) continue;
+        if (neighborIndex < 0 || neighborIndex >= countryByIndex.length) continue;
+        const neighborCode = countryByIndex[neighborIndex];
+        if (!neighborCode || neighborCode === countryCode) continue;
+        countryAdjacency.get(countryCode)?.add(neighborCode);
+        countryAdjacency.get(neighborCode)?.add(countryCode);
+      }
+    });
+
+    const countryOrder = Array.from(countryAdjacency.keys()).sort((a, b) => {
+      const degreeA = countryAdjacency.get(a)?.size || 0;
+      const degreeB = countryAdjacency.get(b)?.size || 0;
+      if (degreeA !== degreeB) return degreeB - degreeA;
+      return String(a).localeCompare(String(b));
+    });
+    const colorByCountry = new Map();
+
+    countryOrder.forEach((countryCode) => {
+      const used = new Set();
+      const neighborsForCountry = countryAdjacency.get(countryCode) || new Set();
+      neighborsForCountry.forEach((neighborCode) => {
+        const color = colorByCountry.get(neighborCode);
+        if (color) used.add(color);
+      });
+      const seed = ColorManager.stableHash(countryCode);
+      const chosen = ColorManager.pickPaletteColor(palette, used, seed);
+      colorByCountry.set(countryCode, chosen);
+    });
+
+    geometries.forEach((geometry, index) => {
       const id = ColorManager.getFeatureId(geometry, index);
+      const countryCode = countryByIndex[index];
+      const chosen =
+        colorByCountry.get(countryCode) ||
+        ColorManager.getPoliticalFallbackColor(countryCode, index);
       result[id] = chosen;
     });
 

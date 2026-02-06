@@ -71,7 +71,9 @@ def clip_to_europe_bounds(gdf: gpd.GeoDataFrame, label: str) -> gpd.GeoDataFrame
 
 
 def smart_island_cull(
-    gdf: gpd.GeoDataFrame, group_col: str, threshold_km2: float = 1000.0
+    gdf: gpd.GeoDataFrame,
+    group_col: str,
+    threshold_km2: float = cfg.MIN_VISIBLE_AREA_KM2,
 ) -> gpd.GeoDataFrame:
     if gdf.empty or "geometry" not in gdf.columns:
         return gdf
@@ -81,8 +83,9 @@ def smart_island_cull(
         return gdf
 
     exploded = exploded.copy()
+    exploded["__row_id"] = exploded.index
     try:
-        projected = exploded.to_crs("EPSG:3035")
+        projected = exploded.to_crs(cfg.AREA_CRS)
         exploded["area_km2"] = projected.geometry.area / 1_000_000.0
     except Exception as exc:
         print(f"Smart cull area calc failed, keeping original: {exc}")
@@ -119,7 +122,7 @@ def smart_island_cull(
         print("Smart cull removed all geometries; keeping original.")
         return gdf
 
-    helper_cols = ["area_km2", "vip_keep", "largest_keep", "keep"]
+    helper_cols = ["__row_id", "area_km2", "vip_keep", "largest_keep", "keep"]
     filtered = filtered.drop(columns=[col for col in helper_cols if col in filtered.columns])
 
     if group_col in filtered.columns:

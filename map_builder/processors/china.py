@@ -78,12 +78,13 @@ def apply_china_replacement(main_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     cn_gdf = cn_gdf[cn_gdf.geometry.notna() & ~cn_gdf.geometry.is_empty].copy()
     cn_gdf = clip_to_europe_bounds(cn_gdf, "china city")
 
-    cn_gdf["temp_area"] = cn_gdf.geometry.area
+    # Drop oversized artifacts using projected area (km^2), not square degrees.
+    cn_gdf["temp_area_km2"] = cn_gdf.to_crs(cfg.AREA_CRS).geometry.area / 1_000_000.0
     before_count = len(cn_gdf)
-    cn_gdf = cn_gdf[cn_gdf["temp_area"] < 50.0].copy()
+    cn_gdf = cn_gdf[cn_gdf["temp_area_km2"] < 600_000.0].copy()
     after_count = len(cn_gdf)
     print(f"   [China Clean] Dropped {before_count - after_count} oversized artifact(s).")
-    cn_gdf = cn_gdf.drop(columns=["temp_area"])
+    cn_gdf = cn_gdf.drop(columns=["temp_area_km2"])
 
     try:
         cn_gdf["geometry"] = cn_gdf.geometry.make_valid()
