@@ -34,23 +34,51 @@ const MAX_ZOOM_SCALE = 50;
 const OCEAN_FILL_COLOR = "#aadaff";
 const LAND_FILL_COLOR = "#f0f0f0";
 const BORDER_FALLBACK_COLOR = "rgba(0, 0, 0, 0.2)";
+const COLOR_HEX_RE = /^#(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+const COLOR_FUNC_RE = /^(?:rgb|rgba|hsl|hsla)\([^)]*\)$/i;
+const COLOR_NAME_RE = /^[a-z]+$/i;
 
 function getFeatureId(feature) {
-  return (
-    feature?.properties?.id ||
-    feature?.properties?.NUTS_ID ||
-    feature?.id ||
-    null
-  );
+  const raw =
+    feature?.properties?.id ??
+    feature?.properties?.NUTS_ID ??
+    feature?.id;
+  if (raw === null || raw === undefined) return null;
+  const text = String(raw).trim();
+  return text.length > 0 ? text : null;
+}
+
+function extractCountryCodeFromId(value) {
+  const text = String(value || "").trim().toUpperCase();
+  if (!text) return "";
+
+  const prefix = text.split(/[-_]/)[0];
+  if (/^[A-Z]{2,3}$/.test(prefix)) {
+    return prefix;
+  }
+
+  const alphaPrefix = prefix.match(/^[A-Z]{2,3}/);
+  return alphaPrefix ? alphaPrefix[0] : "";
 }
 
 function getFeatureCountryCode(feature) {
-  return (
-    feature?.properties?.cntr_code ||
-    feature?.properties?.CNTR_CODE ||
-    feature?.properties?.iso_a2 ||
-    feature?.properties?.ISO_A2 ||
+  const props = feature?.properties || {};
+  const direct = (
+    props.cntr_code ||
+    props.CNTR_CODE ||
+    props.iso_a2 ||
+    props.ISO_A2 ||
+    props.adm0_a2 ||
+    props.ADM0_A2 ||
     ""
+  );
+  const normalizedDirect = String(direct).trim().toUpperCase();
+  if (normalizedDirect) return normalizedDirect;
+
+  return (
+    extractCountryCodeFromId(props.id) ||
+    extractCountryCodeFromId(props.NUTS_ID) ||
+    extractCountryCodeFromId(feature?.id)
   );
 }
 
@@ -80,6 +108,44 @@ function getFeatureRegionTag(feature) {
 function getColorsHash() {
   const entries = Object.entries(state.colors).sort((a, b) => a[0].localeCompare(b[0]));
   return JSON.stringify(entries);
+}
+
+function isProbablyCanvasColor(value) {
+  if (typeof value !== "string") return false;
+  const candidate = value.trim();
+  if (!candidate || candidate.includes("var(")) return false;
+  if (COLOR_HEX_RE.test(candidate)) {
+    return true;
+  }
+  if (!COLOR_FUNC_RE.test(candidate) && !COLOR_NAME_RE.test(candidate)) {
+    return false;
+  }
+  if (globalThis.CSS?.supports) {
+    return globalThis.CSS.supports("color", candidate);
+  }
+  return false;
+}
+
+function getSafeCanvasColor(value, fallback) {
+  if (isProbablyCanvasColor(value)) {
+    return String(value).trim();
+  }
+  return fallback;
+}
+
+function sanitizeColorMap(input) {
+  const sanitized = {};
+  if (!input || typeof input !== "object") return sanitized;
+
+  for (const [rawId, rawColor] of Object.entries(input)) {
+    const id = String(rawId || "").trim();
+    if (!id) continue;
+    const color = getSafeCanvasColor(rawColor, null);
+    if (!color) continue;
+    sanitized[id] = color;
+  }
+
+  return sanitized;
 }
 
 function pathBoundsInScreen(feature) {
@@ -125,6 +191,19 @@ function ensureLayerDataFromTopology() {
   }
   if (!state.specialZonesData && objects.special_zones) {
     state.specialZonesData = globalThis.topojson.feature(state.topology, objects.special_zones);
+  }
+
+  // Ensure interactive land features are sourced from political geometry, not merged land background.
+  if (objects.political) {
+    const expectedCount = Array.isArray(objects.political.geometries)
+      ? objects.political.geometries.length
+      : 0;
+    const currentCount = Array.isArray(state.landData?.features)
+      ? state.landData.features.length
+      : 0;
+    if (currentCount !== expectedCount) {
+      state.landData = globalThis.topojson.feature(state.topology, objects.political);
+    }
   }
 }
 
@@ -292,8 +371,8 @@ function rebuildDynamicBorders() {
       if (!b) return false;
       const idA = getFeatureId(a);
       const idB = getFeatureId(b);
-      const colorA = idA ? state.colors[idA] : null;
-      const colorB = idB ? state.colors[idB] : null;
+      const colorA = idA ? getSafeCanvasColor(state.colors[idA], null) : null;
+      const colorB = idB ? getSafeCanvasColor(state.colors[idB], null) : null;
       return !colorA || !colorB || colorA !== colorB;
     }
   );
@@ -418,121 +497,75 @@ function getFeatureIdFromEvent(event) {
 }
 
 function drawCanvas() {
-  if (!context || !pathCanvas || !state.landData) return;
+  if (!context || !pathCanvas) return;
   ensureLayerDataFromTopology();
 
-  const canvasWidth = context.canvas.width;
-  const canvasHeight = context.canvas.height;
-  const transform = state.zoomTransform || globalThis.d3.zoomIdentity;
-  const k = Math.max(0.0001, transform.k || 1);
+  const width = context.canvas.width;
+  const height = context.canvas.height;
+  const t = state.zoomTransform || globalThis.d3.zoomIdentity;
+  const k = Math.max(0.0001, t.k || 1);
 
-  // Hard reset before every frame to avoid stale composition/clip state.
+  // 1. Clear + reset
   context.setTransform(1, 0, 0, 1, 0, 0);
+  context.clearRect(0, 0, width, height);
   context.globalCompositeOperation = "source-over";
   context.globalAlpha = 1.0;
   context.shadowBlur = 0;
   context.filter = "none";
-  context.clearRect(0, 0, canvasWidth, canvasHeight);
 
+  // 2. Apply zoom (with DPR scaling for crisp rendering)
   context.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
-  context.translate(transform.x, transform.y);
+  context.translate(t.x, t.y);
   context.scale(k, k);
 
+  // 3. Draw ocean
   if (state.oceanData) {
-    context.save();
     context.fillStyle = OCEAN_FILL_COLOR;
-    context.globalAlpha = 1.0;
     context.beginPath();
     pathCanvas(state.oceanData);
     context.fill();
-    context.restore();
   }
 
-  if (state.showPhysical && state.physicalData) {
-    context.save();
-    context.fillStyle = "rgba(255,255,255,0.18)";
-    for (const feature of state.physicalData.features) {
-      if (!pathBoundsInScreen(feature)) continue;
+  // 4. Draw political features only (no base land layer)
+  if (state.landData?.features?.length) {
+    context.lineWidth = 0.5 / k;
+    context.strokeStyle = "#333";
+
+    state.landData.features.forEach((feature, index) => {
+      const id = getFeatureId(feature) || `feature-${index}`;
+      const bounds = pathCanvas.bounds(feature);
+      if (bounds && bounds.length === 2) {
+        const minX = bounds[0][0];
+        const minY = bounds[0][1];
+        const maxX = bounds[1][0];
+        const maxY = bounds[1][1];
+        if ([minX, minY, maxX, maxY].every(Number.isFinite)) {
+          const featureWidth = maxX - minX;
+          const featureHeight = maxY - minY;
+          const canvasWidth = width / Math.max(state.dpr || 1, 1);
+          const canvasHeight = height / Math.max(state.dpr || 1, 1);
+          if (
+            featureWidth > canvasWidth * 0.8 &&
+            featureHeight > canvasHeight * 0.8
+          ) {
+            return;
+          }
+        }
+      }
+
+      // 5. Debug color strategy: explicit visible fallback if no mapped color.
+      let fillColor = getSafeCanvasColor(state.colors[id], null);
+      if (!fillColor) {
+        fillColor = index % 2 === 0 ? "#ffc0cb" : "#90ee90";
+      }
+
       context.beginPath();
       pathCanvas(feature);
+      context.fillStyle = fillColor;
       context.fill();
-    }
-    context.restore();
-  }
-
-  state.landData.features.forEach((feature, index) => {
-    if (!pathBoundsInScreen(feature)) return;
-    const id = getFeatureId(feature) || `feature-${index}`;
-    const fill = state.colors[id] || LAND_FILL_COLOR;
-
-    context.beginPath();
-    pathCanvas(feature);
-    context.fillStyle = fill;
-    context.fill();
-  });
-
-  if (state.showUrban && state.urbanData) {
-    context.save();
-    context.fillStyle = "rgba(80,80,80,0.18)";
-    for (const feature of state.urbanData.features) {
-      if (!pathBoundsInScreen(feature)) continue;
-      context.beginPath();
-      pathCanvas(feature);
-      context.fill();
-    }
-    context.restore();
-  }
-
-  if (state.cachedCoastlines) {
-    context.beginPath();
-    pathCanvas(state.cachedCoastlines);
-    context.strokeStyle = state.styleConfig.coastlines.color || BORDER_FALLBACK_COLOR;
-    context.lineWidth = state.styleConfig.coastlines.width / k;
-    context.stroke();
-  }
-
-  if (state.cachedGridLines) {
-    context.save();
-    context.globalAlpha = state.styleConfig.internalBorders.opacity;
-    context.beginPath();
-    pathCanvas(state.cachedGridLines);
-    context.strokeStyle = state.styleConfig.internalBorders.color || BORDER_FALLBACK_COLOR;
-    context.lineWidth = state.styleConfig.internalBorders.width / k;
-    context.stroke();
-    context.restore();
-  }
-
-  rebuildDynamicBorders();
-  if (state.cachedBorders) {
-    context.beginPath();
-    pathCanvas(state.cachedBorders);
-    context.strokeStyle = state.styleConfig.empireBorders.color || BORDER_FALLBACK_COLOR;
-    context.lineWidth = state.styleConfig.empireBorders.width / k;
-    context.stroke();
-  }
-
-  if (state.showRivers && state.riversData) {
-    context.beginPath();
-    pathCanvas(state.riversData);
-    context.strokeStyle = "#3498db";
-    context.lineWidth = 0.8 / k;
-    context.stroke();
-  }
-
-  if (state.isEditingPreset && state.editingPresetIds.size > 0) {
-    context.save();
-    context.strokeStyle = "#f97316";
-    context.lineWidth = 2 / k;
-    for (const id of state.editingPresetIds) {
-      const feature = state.landIndex.get(id);
-      if (!feature || !pathBoundsInScreen(feature)) continue;
-      context.beginPath();
-      pathCanvas(feature);
       context.stroke();
-    }
-    context.restore();
+    });
   }
-
 }
 
 function updateSpecialZonesPaths() {
@@ -701,46 +734,54 @@ function autoFillMap(mode = "region") {
   const nextColors = {};
 
   if (mode === "political" && state.topology?.objects?.political) {
-    const { featureColors, countryColors } =
-      ColorManager.computePoliticalColors(state.topology, "political");
+    const computed = ColorManager.computePoliticalColors(state.topology, "political");
+    // Backward compatible with both {featureColors,countryColors} and legacy flat map returns.
+    const featureColors =
+      computed && typeof computed === "object" && computed.featureColors
+        ? computed.featureColors
+        : (computed && typeof computed === "object" ? computed : {});
+    const countryColors =
+      computed && typeof computed === "object" && computed.countryColors
+        ? computed.countryColors
+        : {};
 
     // Broadcast: for every land feature, resolve its color via feature ID → country code chain
     state.landData.features.forEach((feature, index) => {
       const id = getFeatureId(feature) || `feature-${index}`;
-      const countryCode = String(
-        getFeatureCountryCode(feature) || ColorManager.getCountryCode(feature, index) || ""
-      ).toUpperCase();
+      const idCandidates = [
+        id,
+        String(feature?.properties?.id || "").trim(),
+        String(feature?.properties?.NUTS_ID || "").trim(),
+        String(feature?.id || "").trim(),
+      ].filter(Boolean);
+      const directFeatureColor = idCandidates.reduce((matchedColor, candidateId) => {
+        if (matchedColor) return matchedColor;
+        return featureColors[candidateId] || null;
+      }, null);
+
+      const countryCode = String(getFeatureCountryCode(feature) || "").toUpperCase();
 
       // Priority: direct feature match → country-level computed → user palette → hash fallback
       const color =
-        featureColors[id] ||
+        directFeatureColor ||
+        (countryCode && featureColors[countryCode]) ||
         (countryCode && countryColors[countryCode]) ||
         (countryCode && state.countryPalette && state.countryPalette[countryCode]) ||
         ColorManager.getPoliticalFallbackColor(countryCode || id, index);
 
-      nextColors[id] = color;
+      nextColors[id] = getSafeCanvasColor(color, LAND_FILL_COLOR);
     });
 
-    console.log(
-      `[autoFillMap] Political: ${Object.keys(nextColors).length} features colored,`,
-      `${Object.keys(countryColors).length} countries resolved,`,
-      `${new Set(Object.values(nextColors)).size} unique colors`
-    );
   } else {
     // Region mode: color by region tag (cntr_code, subregion, etc.)
     state.landData.features.forEach((feature, index) => {
       const id = getFeatureId(feature) || `feature-${index}`;
       const tag = getFeatureRegionTag(feature);
-      nextColors[id] = ColorManager.getRegionColor(tag);
+      nextColors[id] = getSafeCanvasColor(ColorManager.getRegionColor(tag), LAND_FILL_COLOR);
     });
-
-    console.log(
-      `[autoFillMap] Region: ${Object.keys(nextColors).length} features colored,`,
-      `${new Set(Object.values(nextColors)).size} unique colors`
-    );
   }
 
-  state.colors = nextColors;
+  state.colors = sanitizeColorMap(nextColors);
   invalidateBorderCache();
   render();
 }
@@ -804,7 +845,7 @@ function handleClick(event) {
   }
 
   if (state.currentTool === "eyedropper") {
-    const picked = state.colors[id];
+    const picked = getSafeCanvasColor(state.colors[id], null);
     if (picked) {
       state.selectedColor = picked;
       if (typeof state.updateSwatchUIFn === "function") {
@@ -814,8 +855,10 @@ function handleClick(event) {
     return;
   }
 
-  state.colors[id] = state.selectedColor;
-  addRecentColor(state.selectedColor);
+  const selectedColor = getSafeCanvasColor(state.selectedColor, LAND_FILL_COLOR);
+  state.selectedColor = selectedColor;
+  state.colors[id] = selectedColor;
+  addRecentColor(selectedColor);
   invalidateBorderCache();
   render();
 }
@@ -978,6 +1021,7 @@ function initMap({ containerId = "mapContainer" } = {}) {
   state.lineCanvas = null;
   state.colorCtx = context;
   state.lineCtx = null;
+  state.colors = sanitizeColorMap(state.colors);
 
   mapCanvas.style.pointerEvents = "none";
   mapCanvas.style.touchAction = "none";
@@ -996,6 +1040,10 @@ function initMap({ containerId = "mapContainer" } = {}) {
 
 function setMapData() {
   ensureLayerDataFromTopology();
+  if (state.topology?.objects?.political && globalThis.topojson) {
+    state.landData = globalThis.topojson.feature(state.topology, state.topology.objects.political);
+  }
+  state.colors = sanitizeColorMap(state.colors);
   buildIndex();
   rebuildStaticMeshes();
   invalidateBorderCache();
