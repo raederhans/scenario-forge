@@ -34,6 +34,7 @@ const MAX_ZOOM_SCALE = 50;
 const OCEAN_FILL_COLOR = "#aadaff";
 const LAND_FILL_COLOR = "#f0f0f0";
 const BORDER_FALLBACK_COLOR = "rgba(0, 0, 0, 0.2)";
+const RENDER_MODE = "PROD"; // Options: "PROD", "DEBUG_PINK", "DEBUG_OCEAN"
 const COLOR_HEX_RE = /^#(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 const COLOR_FUNC_RE = /^(?:rgb|rgba|hsl|hsla)\([^)]*\)$/i;
 const COLOR_NAME_RE = /^[a-z]+$/i;
@@ -529,7 +530,7 @@ function drawCanvas() {
   // 4. Draw political features only (no base land layer)
   if (state.landData?.features?.length) {
     context.lineWidth = 0.5 / k;
-    context.strokeStyle = "#333";
+    context.strokeStyle = "rgba(0, 0, 0, 0.3)";
 
     state.landData.features.forEach((feature, index) => {
       const id = getFeatureId(feature) || `feature-${index}`;
@@ -553,10 +554,16 @@ function drawCanvas() {
         }
       }
 
-      // 5. Debug color strategy: explicit visible fallback if no mapped color.
+      // 5. Fill strategy controlled by render mode.
       let fillColor = getSafeCanvasColor(state.colors[id], null);
       if (!fillColor) {
+        fillColor = LAND_FILL_COLOR;
+      }
+
+      if (RENDER_MODE === "DEBUG_PINK") {
         fillColor = index % 2 === 0 ? "#ffc0cb" : "#90ee90";
+      } else if (RENDER_MODE === "DEBUG_OCEAN") {
+        fillColor = OCEAN_FILL_COLOR;
       }
 
       context.beginPath();
