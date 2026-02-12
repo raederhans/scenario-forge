@@ -448,13 +448,6 @@ function drawCanvas() {
     context.restore();
   }
 
-  if (state.landBgData) {
-    context.beginPath();
-    pathCanvas(state.landBgData);
-    context.fillStyle = LAND_FILL_COLOR;
-    context.fill();
-  }
-
   if (state.showPhysical && state.physicalData) {
     context.save();
     context.fillStyle = "rgba(255,255,255,0.18)";
@@ -467,16 +460,16 @@ function drawCanvas() {
     context.restore();
   }
 
-  for (const feature of state.landData.features) {
-    if (!pathBoundsInScreen(feature)) continue;
-    const id = getFeatureId(feature);
-    const fill = id && state.colors[id] ? state.colors[id] : "#d6d6d6";
+  state.landData.features.forEach((feature, index) => {
+    if (!pathBoundsInScreen(feature)) return;
+    const id = getFeatureId(feature) || `feature-${index}`;
+    const fill = state.colors[id] || LAND_FILL_COLOR;
 
     context.beginPath();
     pathCanvas(feature);
     context.fillStyle = fill;
     context.fill();
-  }
+  });
 
   if (state.showUrban && state.urbanData) {
     context.save();
@@ -700,48 +693,51 @@ function render() {
 }
 
 function autoFillMap(mode = "region") {
-  if (!state.landData?.features?.length) return;
+  if (!state.landData?.features?.length) {
+    console.warn("[autoFillMap] No land features available, aborting.");
+    return;
+  }
 
   const nextColors = {};
+
   if (mode === "political" && state.topology?.objects?.political) {
-    const politicalMap = ColorManager.computePoliticalColors(state.topology, "political");
-    const topologyGeometries = state.topology.objects.political?.geometries || [];
-    const colorByCountry = {};
+    const { featureColors, countryColors } =
+      ColorManager.computePoliticalColors(state.topology, "political");
 
-    topologyGeometries.forEach((geometry, index) => {
-      const geometryId = ColorManager.getFeatureId(geometry, index);
-      const countryCode = String(
-        ColorManager.getCountryCode(geometry, index) || ""
-      ).toUpperCase();
-      if (!countryCode) return;
-      const colorForGeometry =
-        politicalMap[geometryId] ||
-        politicalMap[countryCode] ||
-        colorByCountry[countryCode] ||
-        null;
-      if (colorForGeometry) {
-        colorByCountry[countryCode] = colorForGeometry;
-      }
-    });
-
+    // Broadcast: for every land feature, resolve its color via feature ID → country code chain
     state.landData.features.forEach((feature, index) => {
       const id = getFeatureId(feature) || `feature-${index}`;
       const countryCode = String(
         getFeatureCountryCode(feature) || ColorManager.getCountryCode(feature, index) || ""
       ).toUpperCase();
-      const fallbackToken = countryCode || id;
-      nextColors[id] =
-        politicalMap[id] ||
-        politicalMap[countryCode] ||
-        colorByCountry[countryCode] ||
-        ColorManager.getPoliticalFallbackColor(fallbackToken, index);
+
+      // Priority: direct feature match → country-level computed → user palette → hash fallback
+      const color =
+        featureColors[id] ||
+        (countryCode && countryColors[countryCode]) ||
+        (countryCode && state.countryPalette && state.countryPalette[countryCode]) ||
+        ColorManager.getPoliticalFallbackColor(countryCode || id, index);
+
+      nextColors[id] = color;
     });
+
+    console.log(
+      `[autoFillMap] Political: ${Object.keys(nextColors).length} features colored,`,
+      `${Object.keys(countryColors).length} countries resolved,`,
+      `${new Set(Object.values(nextColors)).size} unique colors`
+    );
   } else {
+    // Region mode: color by region tag (cntr_code, subregion, etc.)
     state.landData.features.forEach((feature, index) => {
       const id = getFeatureId(feature) || `feature-${index}`;
       const tag = getFeatureRegionTag(feature);
       nextColors[id] = ColorManager.getRegionColor(tag);
     });
+
+    console.log(
+      `[autoFillMap] Region: ${Object.keys(nextColors).length} features colored,`,
+      `${new Set(Object.values(nextColors)).size} unique colors`
+    );
   }
 
   state.colors = nextColors;
@@ -986,13 +982,6 @@ function initMap({ containerId = "mapContainer" } = {}) {
   mapCanvas.style.pointerEvents = "none";
   mapCanvas.style.touchAction = "none";
   if (textureOverlay) textureOverlay.style.pointerEvents = "none";
-  console.info(
-    "[Map Layers]",
-    "canvas display=", mapCanvas.style.display || "(default)",
-    "canvas z-index=", mapCanvas.style.zIndex || "(auto)",
-    "svg display=", mapSvg.style.display || "(default)",
-    "svg z-index=", mapSvg.style.zIndex || "(auto)"
-  );
 
   setCanvasSize();
   buildIndex();

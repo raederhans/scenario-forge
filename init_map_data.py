@@ -750,6 +750,33 @@ def main() -> None:
     final_hybrid = cull_small_geometries(final_hybrid, "political", group_col="id")
     special_zones = cull_small_geometries(special_zones, "special zones", group_col="id")
 
+    # ── Validate and stabilize feature IDs ──────────────────────
+    if "id" in final_hybrid.columns:
+        final_hybrid["id"] = final_hybrid["id"].fillna("").astype(str).str.strip()
+        # Fill empty IDs with cntr_code + index
+        empty_id_mask = final_hybrid["id"] == ""
+        if empty_id_mask.any():
+            for idx in final_hybrid.index[empty_id_mask]:
+                cc = str(final_hybrid.loc[idx, "cntr_code"] or "UNK").upper()
+                final_hybrid.loc[idx, "id"] = f"{cc}_{idx}"
+            print(f"[ID Fix] Filled {empty_id_mask.sum()} empty IDs")
+        # Deduplicate: append suffix to duplicate IDs
+        seen: dict[str, int] = {}
+        dup_count = 0
+        for idx in final_hybrid.index:
+            fid = final_hybrid.loc[idx, "id"]
+            if fid in seen:
+                seen[fid] += 1
+                final_hybrid.loc[idx, "id"] = f"{fid}__d{seen[fid]}"
+                dup_count += 1
+            else:
+                seen[fid] = 0
+        if dup_count:
+            print(f"[ID Fix] De-duplicated {dup_count} IDs")
+        print(f"[ID Validation] {len(final_hybrid)} features, {final_hybrid['id'].nunique()} unique IDs")
+    else:
+        print("[ID Validation] WARNING: 'id' column missing from final_hybrid!")
+
     script_dir = Path(__file__).resolve().parent
     output_dir = script_dir / "data"
     save_outputs(

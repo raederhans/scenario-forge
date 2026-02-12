@@ -78,10 +78,11 @@ class ColorManager {
 
   static computePoliticalColors(topology, objectName) {
     const result = {};
+    const countryColors = {};
     const object = topology?.objects?.[objectName];
     const geometries = object?.geometries || [];
     if (!geometries.length) {
-      return result;
+      return { featureColors: result, countryColors };
     }
 
     const palette = ColorManager.strictPoliticalPalette;
@@ -98,13 +99,31 @@ class ColorManager {
     });
 
     let neighbors = [];
-    try {
-      if (globalThis.topojson?.neighbors) {
-        neighbors = globalThis.topojson.neighbors(geometries) || [];
+    let neighborGraphPopulated = false;
+    let neighborSource = "none";
+
+    // 1. Prefer embedded spatial neighbor graph (computed by Python pipeline)
+    const embeddedNeighbors = object?.computed_neighbors;
+    if (
+      Array.isArray(embeddedNeighbors) &&
+      embeddedNeighbors.length === geometries.length
+    ) {
+      neighbors = embeddedNeighbors;
+      neighborSource = "embedded";
+      console.log(
+        `[ColorManager] Using embedded computed_neighbors (${neighbors.length} entries)`
+      );
+    } else {
+      // 2. Fall back to topojson.neighbors() (arc-based)
+      try {
+        if (globalThis.topojson?.neighbors) {
+          neighbors = globalThis.topojson.neighbors(geometries) || [];
+          neighborSource = "topojson";
+        }
+      } catch (error) {
+        neighbors = [];
+        console.warn("[ColorManager] topojson.neighbors() failed:", error);
       }
-    } catch (error) {
-      neighbors = [];
-      console.warn("Political neighbor graph failed, falling back to hash coloring:", error);
     }
     if (!Array.isArray(neighbors) || neighbors.length !== geometries.length) {
       neighbors = new Array(geometries.length).fill(null).map(() => []);
@@ -120,6 +139,7 @@ class ColorManager {
         if (!neighborCode || neighborCode === countryCode) continue;
         countryAdjacency.get(countryCode)?.add(neighborCode);
         countryAdjacency.get(neighborCode)?.add(countryCode);
+        neighborGraphPopulated = true;
       }
     });
 
@@ -131,17 +151,30 @@ class ColorManager {
     });
     const colorByCountry = new Map();
 
-    countryOrder.forEach((countryCode) => {
-      const used = new Set();
-      const neighborsForCountry = countryAdjacency.get(countryCode) || new Set();
-      neighborsForCountry.forEach((neighborCode) => {
-        const color = colorByCountry.get(neighborCode);
-        if (color) used.add(color);
+    if (neighborGraphPopulated) {
+      console.log(
+        `[ColorManager] Neighbor graph populated (source: ${neighborSource}), ` +
+          `${countryAdjacency.size} countries, graph-coloring with ${palette.length}-color palette`
+      );
+      countryOrder.forEach((countryCode) => {
+        const used = new Set();
+        const neighborsForCountry = countryAdjacency.get(countryCode) || new Set();
+        neighborsForCountry.forEach((neighborCode) => {
+          const color = colorByCountry.get(neighborCode);
+          if (color) used.add(color);
+        });
+        const seed = ColorManager.stableHash(countryCode);
+        const chosen = ColorManager.pickPaletteColor(palette, used, seed);
+        colorByCountry.set(countryCode, chosen);
       });
-      const seed = ColorManager.stableHash(countryCode);
-      const chosen = ColorManager.pickPaletteColor(palette, used, seed);
-      colorByCountry.set(countryCode, chosen);
-    });
+    } else {
+      console.warn("[ColorManager] Neighbor graph empty — using hash-distributed coloring");
+      countryOrder.forEach((countryCode, orderIndex) => {
+        const seed = ColorManager.stableHash(countryCode);
+        const colorIndex = (seed + orderIndex) % palette.length;
+        colorByCountry.set(countryCode, palette[colorIndex]);
+      });
+    }
 
     geometries.forEach((geometry, index) => {
       const id = ColorManager.getFeatureId(geometry, index);
@@ -152,7 +185,11 @@ class ColorManager {
       result[id] = chosen;
     });
 
-    return result;
+    colorByCountry.forEach((color, code) => {
+      countryColors[code] = color;
+    });
+
+    return { featureColors: result, countryColors };
   }
 }
 
