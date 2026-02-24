@@ -163,6 +163,62 @@ body {
   padding: 20px;
 }
 
+.sidebar-tool-card {
+  padding: 18px;
+}
+
+.sidebar-tool-title {
+  margin: 0;
+}
+
+.sidebar-tool-hint {
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.sidebar-tool-card-debug {
+  border-color: #f2d794;
+  background: #fffdf3;
+}
+
+.sidebar-tool-card-debug .sidebar-tool-title {
+  color: #92400e;
+}
+
+.project-file-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-btn);
+  background: var(--bg-input);
+}
+
+.project-file-name {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.legend-empty-state {
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-btn);
+  background: var(--bg-input);
+  padding: 10px 12px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
 /* ── Inputs & Selects ──────────────────────────────────── */
 .input,
 .select-input {
@@ -185,6 +241,32 @@ body {
 
 .input::placeholder {
   color: #B2BEC3;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-group > label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #92400e;
+}
+
+#debug-mode-select.debug-select {
+  border: 1px solid #eab308;
+  background: #fff8cc;
+  color: #111827;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.8rem;
+}
+
+#debug-mode-select.debug-select:focus {
+  box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.35);
+  border-color: #d97706;
 }
 
 input[type="color"].color-input {
@@ -340,6 +422,7 @@ input[type="checkbox"].checkbox-input {
 .mt-4 { margin-top: 16px; }
 .w-full { width: 100%; }
 .relative { position: relative; }
+.hidden { display: none !important; }
 
 .flex-wrap { flex-wrap: wrap; }
 

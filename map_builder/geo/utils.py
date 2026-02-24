@@ -43,8 +43,8 @@ def round_geometries(gdf: gpd.GeoDataFrame, precision: int = 4) -> gpd.GeoDataFr
     return gdf
 
 
-def clip_to_europe_bounds(gdf: gpd.GeoDataFrame, label: str) -> gpd.GeoDataFrame:
-    minx, miny, maxx, maxy = cfg.MAP_BOUNDS
+def clip_to_map_bounds(gdf: gpd.GeoDataFrame, label: str) -> gpd.GeoDataFrame:
+    minx, miny, maxx, maxy = cfg.GLOBAL_BOUNDS
     bbox_geom = box(minx, miny, maxx, maxy)
     try:
         gdf = gdf.to_crs("EPSG:4326")
@@ -68,6 +68,11 @@ def clip_to_europe_bounds(gdf: gpd.GeoDataFrame, label: str) -> gpd.GeoDataFrame
             print(f"Map bounds clip produced empty result for {label}; keeping original.")
             return gdf
         return clipped
+
+
+def clip_to_europe_bounds(gdf: gpd.GeoDataFrame, label: str) -> gpd.GeoDataFrame:
+    """Backward-compatible alias. Use clip_to_map_bounds for global pipeline."""
+    return clip_to_map_bounds(gdf, label)
 
 
 def smart_island_cull(

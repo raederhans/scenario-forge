@@ -72,7 +72,13 @@ class ColorManager {
 
   static getPoliticalFallbackColor(token, fallbackIndex = 0) {
     const palette = ColorManager.strictPoliticalPalette;
-    const seed = ColorManager.stableHash(token) + Number(fallbackIndex || 0);
+    const stableToken = token || `fallback-${fallbackIndex}`;
+    return ColorManager.getHashedPaletteColor(stableToken, palette);
+  }
+
+  static getHashedPaletteColor(token, palette) {
+    if (!Array.isArray(palette) || palette.length === 0) return null;
+    const seed = ColorManager.stableHash(token);
     return palette[Math.abs(seed) % palette.length];
   }
 
@@ -157,6 +163,14 @@ class ColorManager {
           `${countryAdjacency.size} countries, graph-coloring with ${palette.length}-color palette`
       );
       countryOrder.forEach((countryCode) => {
+        const degree = countryAdjacency.get(countryCode)?.size || 0;
+        if (degree === 0) {
+          colorByCountry.set(
+            countryCode,
+            ColorManager.getHashedPaletteColor(countryCode, palette)
+          );
+          return;
+        }
         const used = new Set();
         const neighborsForCountry = countryAdjacency.get(countryCode) || new Set();
         neighborsForCountry.forEach((neighborCode) => {
@@ -169,10 +183,11 @@ class ColorManager {
       });
     } else {
       console.warn("[ColorManager] Neighbor graph empty — using hash-distributed coloring");
-      countryOrder.forEach((countryCode, orderIndex) => {
-        const seed = ColorManager.stableHash(countryCode);
-        const colorIndex = (seed + orderIndex) % palette.length;
-        colorByCountry.set(countryCode, palette[colorIndex]);
+      countryOrder.forEach((countryCode) => {
+        colorByCountry.set(
+          countryCode,
+          ColorManager.getHashedPaletteColor(countryCode, palette)
+        );
       });
     }
 

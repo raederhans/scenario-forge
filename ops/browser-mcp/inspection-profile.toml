@@ -1,0 +1,149 @@
+version = 1
+
+[defaults]
+base_host = "localhost"
+port_range_start = 8000
+port_range_end = 8010
+server_title_pattern = "Map Creator"
+wsl_windows_fallback = true
+
+[decision]
+default_mode = "auto"
+auto_start_mode = "quick"
+upgrade_on_cross_section_anomaly = true
+cross_section_threshold = 2
+upgrade_on_insufficient_evidence = true
+min_sections_for_confidence = 4
+full_trigger_keywords = [
+  "遍历所有版块",
+  "全量巡检",
+  "检查全部子版块",
+  "scan all sections",
+  "full sweep"
+]
+quick_trigger_keywords = [
+  "用浏览器检视",
+  "你自己打开页面看看",
+  "我描述不清楚",
+  "check this page",
+  "inspect ui"
+]
+
+[budgets.quick]
+max_sections = 6
+max_screenshots = 8
+max_runtime_sec = 180
+max_network_entries = 300
+
+[budgets.full]
+max_sections = 20
+max_screenshots = 24
+max_runtime_sec = 420
+max_network_entries = 300
+
+[evidence]
+console_min_level = "warning"
+network_include_static = true
+network_failed_only = true
+
+[outputs]
+artifact_dir = ".mcp-artifacts"
+report_path = "docs/ai-browser-mcp-smoketest.md"
+
+[[routes]]
+id = "home"
+url = "/"
+scroll = 900
+screenshot = true
+capture_console = true
+capture_network = true
+enabled_modes = ["quick", "full"]
+
+[[routes]]
+id = "docs"
+url = "/docs/"
+scroll = 1200
+screenshot = true
+capture_console = true
+capture_network = true
+enabled_modes = ["quick", "full"]
+
+[[routes]]
+id = "data_readme"
+url = "/data/ne_10m_admin_1_states_provinces.README.html"
+scroll = 1400
+screenshot = true
+capture_console = true
+capture_network = true
+enabled_modes = ["quick", "full"]
+
+[[sections]]
+id = "left_sidebar"
+page = "home"
+selector = "aside.sidebar .sidebar-sections"
+expand = "none"
+scroll = 700
+screenshot = "always"
+priority = "high"
+enabled_modes = ["quick", "full"]
+
+[[sections]]
+id = "right_sidebar"
+page = "home"
+selector = "#rightSidebar .sidebar-sections"
+expand = "none"
+scroll = 700
+screenshot = "always"
+priority = "high"
+enabled_modes = ["quick", "full"]
+
+[[sections]]
+id = "preset_tree"
+page = "home"
+selector = "#presetTree"
+expand = "none"
+scroll = 500
+screenshot = "on_error"
+priority = "normal"
+enabled_modes = ["quick", "full"]
+
+[[sections]]
+id = "country_list"
+page = "home"
+selector = "#countryList"
+expand = "none"
+scroll = 600
+screenshot = "on_error"
+priority = "normal"
+enabled_modes = ["quick", "full"]
+
+[[sections]]
+id = "map_style_details"
+page = "home"
+selector = "details.card"
+expand = "toggle"
+scroll = 400
+screenshot = "on_error"
+priority = "low"
+enabled_modes = ["full"]
+
+[[sections]]
+id = "map_container"
+page = "home"
+selector = "#mapContainer"
+expand = "none"
+scroll = 0
+screenshot = "on_error"
+priority = "high"
+enabled_modes = ["quick", "full"]
+
+[[gestures]]
+id = "map_pan_zoom"
+page = "home"
+selector = "#mapContainer"
+type = "drag_zoom"
+from = [980, 500]
+to = [1120, 580]
+wheel = 700
+screenshot = true
+enabled_modes = ["quick", "full"]

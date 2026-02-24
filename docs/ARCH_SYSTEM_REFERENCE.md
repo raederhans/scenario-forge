@@ -36,22 +36,20 @@ This document is a technical reference for contributors and future agents workin
 - Build/diagnostic utilities, not runtime app code.
 - Examples: `generate_hierarchy.py`, `translate_manager.py`, `debug_topology.py`, `patch_topology.py`, `scout_russia.py`, `dev_server.py`.
 
-## Data Pipeline (Current Europe/Eurasia Build)
+## Data Pipeline (Current Global Admin-0 Build)
 
 ### End-to-end flow
 1. `init_map_data.py` bootstraps dependencies and downloads base datasets.
-2. Base NUTS data is parsed and normalized to EPSG:4326.
-3. Geographic clipping/filtering runs (`clip_to_europe_bounds`, country prefix filters, latitude crop).
+2. Admin-0 source data is parsed and normalized to EPSG:4326.
+3. Global clipping/filtering runs (`clip_to_map_bounds`, optional allowlist, micro-island blacklist).
 4. Core layers are fetched and simplified (`rivers`, `borders`, `ocean`, `land`, `urban`, `physical`).
-5. Hybrid political layer is assembled:
-   - NUTS-derived features
-   - Admin-1 extension (`build_extension_admin1`)
-   - Country-specific replacements (FR, RU/UA, PL, CN, IN)
-   - Special zones generation
-6. Metadata enrichment runs (`cntr_code` recovery, subdivision grouping fields like `admin1_group`).
-7. Global culling/cleanup runs (tiny geometry cull, ID fill + de-duplication).
+5. Political layer schema is normalized:
+   - `id`: stable unique string, based on ISO code and deterministic suffixing (`ISO__n`) for duplicates.
+   - `cntr_code`: normalized uppercase country code.
+6. Metadata enrichment runs (country-code recovery, optional subdivision fields).
+7. Global culling/cleanup runs (tiny geometry cull, ID stabilization, de-duplication checks).
 8. `save_outputs(...)` writes intermediate artifacts and preview image.
-9. `build_topology(...)` writes `data/europe_topology.json`.
+9. `build_topology(...)` writes `data/europe_topology.json` (kept for compatibility).
 10. Post-build tooling runs:
     - `tools/generate_hierarchy.py` -> `data/hierarchy.json`
     - `tools/translate_manager.py` -> `data/locales.json`
@@ -60,7 +58,10 @@ This document is a technical reference for contributors and future agents workin
 `map_builder/geo/topology.py` performs:
 - Layer column pruning and geometry cleaning.
 - TopoJSON generation via `topojson.Topology(...)` with quantization (`TOPOLOGY_QUANTIZATION`) and shared coordinates.
-- Promotion of `properties.id` to top-level `geometry.id` (stable string IDs).
+- Strict political schema normalization:
+  - `properties.id` required, stable, unique string.
+  - `properties.cntr_code` required and normalized.
+  - top-level `geometry.id` mirrors `properties.id`.
 - Spatial neighbor graph computation (`compute_neighbor_graph`) using GeoPandas spatial index/`intersects`.
 - Embedding of graph as `objects.political.computed_neighbors`.
 
@@ -69,7 +70,7 @@ This document is a technical reference for contributors and future agents workin
 ### Startup path
 1. `js/main.js` calls `loadMapData()`.
 2. Topology objects are decoded into GeoJSON features (`topojson.feature(...)`).
-3. `initMap()` initializes renderer internals, projection, canvas/SVG layers, caches, and events.
+3. `initMap()` initializes renderer internals with global projection (`d3.geoEqualEarth`), canvas/SVG layers, caches, and events.
 4. `setMapData()` rebuilds indexes/meshes and fits projection.
 5. UI modules (`toolbar`, `sidebar`, `i18n`) bind controls and mutate shared `state`.
 
@@ -84,6 +85,8 @@ This keeps heavy polygon drawing off the DOM while preserving SVG ergonomics for
 - Global mutable state lives in `state.js`.
 - Hit-testing uses a quadtree of feature bounds + `d3.geoContains` final check.
 - Zoom/pan is D3 zoom; renderer redraws canvas on transform updates.
+- Giant-artifact culling is unified across draw, spatial index, and autofill candidate loops.
+- Large-country allowlist (`RU`, `CA`, `CN`, `US`, `AQ`, `ATA`) prevents accidental culling in global projection.
 - Color maps are sanitized before use to prevent invalid canvas style values.
 
 ## Key Algorithms
@@ -98,11 +101,22 @@ Implemented by `ColorManager.computePoliticalColors(...)` + `autoFillMap("politi
    - user `state.countryPalette`
    - deterministic hash fallback
 
+### Island Coloring Strategy
+Implemented in `ColorManager.computePoliticalColors(...)`:
+- Countries with neighbors (`degree > 0`) use greedy graph coloring.
+- Isolated countries (`degree == 0`) use deterministic hash-based palette selection by country code.
+- If neighbor graph is unavailable globally, all countries use hash-based palette selection (order-independent).
+- Feature-level fallback colors use hashed feature/country token, never fixed index defaults.
+
 ### Artifact Culling in Render Loop
-Implemented in `drawCanvas()`:
-- Compute feature screen bounds (`pathCanvas.bounds(feature)`).
-- Skip drawing features that cover more than 80% of canvas width *and* height.
-- Purpose: hide giant world-extent/bounding-polygon artifacts without regenerating source data.
+Implemented in `map_renderer.js`:
+- Compute feature projected bounds (`pathCanvas.bounds(feature)`).
+- Flag as giant when feature bounds exceed 95% of canvas width and height.
+- Cull only non-allowlisted giant features.
+- Apply the same predicate in:
+  - `drawCanvas()` (visual suppression)
+  - `buildSpatialIndex()` (prevent hidden artifacts from capturing hits)
+  - `autoFillMap()` (prevent hidden artifacts from polluting color maps)
 
 ## Current Baseline Metrics (from `data/europe_topology.json`)
 - File size: `7,147,228` bytes (~6.9 MB)
@@ -112,6 +126,6 @@ Implemented in `drawCanvas()`:
 - Embedded political neighbor rows: `8,305`
 
 ## Architectural Notes
-- The current pipeline is still region-specialized (Europe/Eurasia assumptions are hardcoded in config and clipping utilities).
+- The pipeline now targets global Admin-0 with compatibility-preserving output path names.
 - UI modules directly mutate `state` and call render functions; this is simple but tightly coupled.
-- Renderer has production/debug modes and keeps defensive color sanitation active.
+- Renderer keeps production/debug modes, defensive color sanitation, and global-safe artifact suppression.

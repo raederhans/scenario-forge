@@ -1,6 +1,6 @@
 // Toolbar UI (Phase 13)
 import { state, PALETTE_THEMES } from "../core/state.js";
-import { invalidateBorderCache, autoFillMap } from "../core/map_renderer.js";
+import { autoFillMap, refreshColorState } from "../core/map_renderer.js";
 import { toggleLanguage, updateUIText, t } from "./i18n.js";
 
 function renderPalette(themeName) {
@@ -49,6 +49,7 @@ function initToolbar({ render } = {}) {
   const presetPolitical = document.getElementById("presetPolitical");
   const presetClear = document.getElementById("presetClear");
   const colorModeSelect = document.getElementById("colorModeSelect");
+  const paintGranularitySelect = document.getElementById("paintGranularitySelect");
   const internalBorderColor = document.getElementById("internalBorderColor");
   const internalBorderOpacity = document.getElementById("internalBorderOpacity");
   const internalBorderWidth = document.getElementById("internalBorderWidth");
@@ -111,7 +112,7 @@ function initToolbar({ render } = {}) {
 
   function updateToolUI() {
     if (state.isEditingPreset) {
-      currentToolLabel.textContent = "Editing Preset";
+      currentToolLabel.textContent = t("Editing Preset", "ui");
     } else if (state.currentTool === "eraser") {
       currentToolLabel.textContent = t("Eraser", "ui");
     } else if (state.currentTool === "eyedropper") {
@@ -224,17 +225,22 @@ function initToolbar({ render } = {}) {
     colorModeSelect.addEventListener("change", (event) => {
       const value = String(event.target.value || "region");
       state.colorMode = value === "political" ? "political" : "region";
-      autoFillMap(state.colorMode);
+    });
+  }
+
+  if (paintGranularitySelect) {
+    paintGranularitySelect.value = state.interactionGranularity || "subdivision";
+    paintGranularitySelect.addEventListener("change", (event) => {
+      const value = String(event.target.value || "subdivision");
+      state.interactionGranularity = value === "country" ? "country" : "subdivision";
     });
   }
 
   if (presetClear) {
     presetClear.addEventListener("click", () => {
-      Object.keys(state.colors).forEach((key) => delete state.colors[key]);
-      invalidateBorderCache();
-      if (typeof globalThis.renderApp === "function") {
-        globalThis.renderApp();
-      }
+      state.countryBaseColors = {};
+      state.featureOverrides = {};
+      refreshColorState({ renderNow: true });
     });
   }
 

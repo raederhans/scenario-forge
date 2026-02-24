@@ -23,3 +23,7 @@ Thumbs.db
 
 # Ignore large raw GeoJSON sources
 data/geoBoundaries-*.geojson
+
+# Browser MCP runtime artifacts
+.mcp-artifacts/
+.playwright-cli/

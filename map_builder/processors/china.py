@@ -7,7 +7,7 @@ import geopandas as gpd
 import pandas as pd
 
 from map_builder import config as cfg
-from map_builder.geo.utils import clip_to_europe_bounds
+from map_builder.geo.utils import clip_to_map_bounds
 from map_builder.io.fetch import fetch_or_load_geojson
 
 
@@ -76,7 +76,7 @@ def apply_china_replacement(main_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         )
 
     cn_gdf = cn_gdf[cn_gdf.geometry.notna() & ~cn_gdf.geometry.is_empty].copy()
-    cn_gdf = clip_to_europe_bounds(cn_gdf, "china city")
+    cn_gdf = clip_to_map_bounds(cn_gdf, "china city")
 
     # Drop oversized artifacts using projected area (km^2), not square degrees.
     cn_gdf["temp_area_km2"] = cn_gdf.to_crs(cfg.AREA_CRS).geometry.area / 1_000_000.0

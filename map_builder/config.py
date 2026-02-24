@@ -67,10 +67,12 @@ UKR_ADM2_FILENAME = "geoBoundaries-UKR-ADM2.geojson"
 IND_ADM2_FILENAME = "geoBoundaries-IND-ADM2.geojson"
 
 # Geography configuration
-MAP_NAME = "Eurasia Optimized Cut"
+MAP_NAME = "Global Admin-0 Skeleton"
 MAP_DESCRIPTION = (
-    "Eurasia-focused topology with latitude crop (-55 to 73) to remove polar overhead."
+    "Global-focused topology with Admin-0 baseline and micro-island exclusions for stable first-pass coverage."
 )
+
+GLOBAL_BOUNDS = (-180.0, -90.0, 180.0, 90.0)
 
 COUNTRY_CODES = {"DE", "PL", "IT", "FR", "NL", "BE", "LU", "AT", "CH"}
 SUBDIVISIONS = {"DE", "JP", "GB"}
@@ -126,7 +128,45 @@ EXTENSION_COUNTRIES = {
     "PH",
 }
 EXCLUDED_NUTS_PREFIXES = ("FRY", "PT2", "PT3", "ES7")
-MAP_BOUNDS = (-25.0, 0.0, 180.0, 83.0)
+MAP_BOUNDS = GLOBAL_BOUNDS
+
+MICRO_ISLAND_BLACKLIST = {
+    # Pacific
+    "AS", "CK", "FJ", "FM", "GU", "KI", "MH", "MP", "NC", "NF", "NR",
+    "NU", "PF", "PN", "PW", "SB", "TK", "TO", "TV", "VU", "WF", "WS",
+    # Caribbean
+    "AG", "AI", "AW", "BB", "BL", "BM", "CW", "DM", "GD", "KN", "KY",
+    "LC", "MF", "MS", "SX", "TC", "VC", "VG", "VI",
+}
+
+GLOBAL_TARGET_COUNTRIES = {
+    # North America
+    "BZ", "CA", "CR", "CU", "DO", "SV", "GL", "GT", "HT", "HN", "JM",
+    "MX", "NI", "PA", "PR", "PM", "BS", "TT", "US",
+    # South America
+    "AR", "BO", "BR", "CL", "CO", "EC", "FK", "GY", "PY", "PE", "SR",
+    "UY", "VE",
+    # Africa
+    "AO", "BJ", "BW", "BF", "BI", "CV", "CM", "CF", "TD", "KM", "CD",
+    "DJ", "GQ", "ER", "ET", "GA", "GM", "GH", "GN", "GW", "CI", "KE",
+    "LS", "LR", "MG", "MW", "ML", "MR", "MZ", "NA", "NE", "NG", "CG",
+    "RW", "SN", "SL", "SO", "ZA", "SS", "SD", "ST", "TG", "UG", "TZ",
+    "EH", "ZM", "ZW", "SZ",
+    # Oceania
+    "AU", "NZ", "PG",
+    # Asia
+    "BN", "TL", "HK", "ID", "MO",
+    # Europe (remaining)
+    "AX", "AD", "FO", "GR", "GG", "IM", "JE", "MC", "SM", "GB", "VA",
+}
+
+# Global Admin-0 skeleton mode:
+# Leave allowlist empty to include all countries from the source dataset,
+# then remove deferred micro-islands via MICRO_ISLAND_BLACKLIST.
+COUNTRIES: set[str] = set()
+
+GLOBAL_SKELETON_MODE = True
+ENABLE_SUBDIVISION_ENRICHMENT = False
 
 PROJECTION = {
     "center": (85.0, 30.0),

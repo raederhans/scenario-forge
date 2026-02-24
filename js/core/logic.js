@@ -1,6 +1,17 @@
 // Shared map logic helpers (Phase 13)
 import { state, countryPalette, defaultCountryPalette } from "./state.js";
-import { invalidateBorderCache } from "./map_renderer.js";
+import { refreshColorState } from "./map_renderer.js";
+
+const COUNTRY_CODE_ALIASES = {
+  UK: "GB",
+  EL: "GR",
+};
+
+function normalizeCountryCode(rawCode) {
+  const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
+  if (!code) return "";
+  return COUNTRY_CODE_ALIASES[code] || code;
+}
 
 function getCountryCode(feature) {
   const code =
@@ -8,54 +19,47 @@ function getCountryCode(feature) {
     feature.properties?.CNTR_CODE ||
     feature.properties?.CNTR ||
     "";
-  return code ? String(code).toUpperCase() : "";
+  return normalizeCountryCode(code);
 }
 
 function applyCountryColor(code, color) {
   if (!state.landData) return;
-  const target = String(code || "").toUpperCase();
+  const target = normalizeCountryCode(code);
   if (!target) return;
-  for (const feature of state.landData.features) {
-    const id = feature.properties?.id || feature.properties?.NUTS_ID;
-    if (!id) continue;
-    if (getCountryCode(feature) !== target) continue;
-    state.colors[id] = color;
-  }
-  invalidateBorderCache();
-  if (typeof globalThis.renderApp === "function") {
-    globalThis.renderApp();
-  }
+  state.countryBaseColors[target] = color;
+  refreshColorState({ renderNow: true });
 }
 
 function resetCountryColors() {
   Object.keys(defaultCountryPalette).forEach((code) => {
     countryPalette[code] = defaultCountryPalette[code];
   });
-  if (typeof globalThis.renderApp === "function") {
-    globalThis.renderApp();
-  }
+  state.countryBaseColors = {};
+  refreshColorState({ renderNow: true });
 }
 
 function applyPaletteToMap() {
   if (!state.landData) return;
   for (const feature of state.landData.features) {
-    const id = feature.properties?.id || feature.properties?.NUTS_ID;
-    if (!id) continue;
     const code = getCountryCode(feature);
     const color = countryPalette[code];
     if (color) {
-      state.colors[id] = color;
+      state.countryBaseColors[code] = color;
     }
   }
-  invalidateBorderCache();
-  if (typeof globalThis.renderApp === "function") {
-    globalThis.renderApp();
-  }
+  refreshColorState({ renderNow: true });
 }
 
 function saveMapState() {
   try {
-    localStorage.setItem("map_colors", JSON.stringify(state.colors));
+    localStorage.setItem(
+      "map_colors",
+      JSON.stringify({
+        schemaVersion: 2,
+        countryBaseColors: state.countryBaseColors || {},
+        featureOverrides: state.featureOverrides || {},
+      })
+    );
   } catch (error) {
     console.warn("Unable to save map state:", error);
   }

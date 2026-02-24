@@ -1,10 +1,25 @@
 // Translation helpers (Phase 13)
 import { state } from "../core/state.js";
 
+function resolveGeoLocaleEntry(key) {
+  const geoLocales = state.locales?.geo || {};
+  if (geoLocales[key]) return geoLocales[key];
+
+  const stableKey = state.geoAliasToStableKey?.[key];
+  if (stableKey && geoLocales[stableKey]) {
+    return geoLocales[stableKey];
+  }
+  return null;
+}
+
 function t(key, type = "geo") {
   if (!key) return "";
+  const entry = type === "geo" ? resolveGeoLocaleEntry(key) : state.locales?.[type]?.[key];
   if (state.currentLanguage === "zh") {
-    return state.locales?.[type]?.[key]?.zh || key;
+    return entry?.zh || key;
+  }
+  if (type === "geo") {
+    return entry?.en || key;
   }
   return key;
 }
@@ -27,6 +42,9 @@ function updateUIText() {
     ["lblColorMode", "Color Mode"],
     ["optColorModeRegion", "By Region"],
     ["optColorModePolitical", "By Neighbor (Political)"],
+    ["lblPaintGranularity", "Paint Granularity"],
+    ["optPaintSubdivision", "By Subdivision"],
+    ["optPaintCountry", "By Country"],
     ["labelPresetPolitical", "Auto-Fill Countries"],
     ["presetClear", "Clear Map"],
     ["lblCountrySearch", "Search Countries"],
@@ -34,9 +52,17 @@ function updateUIText() {
     ["resetCountryColors", "Reset Country Colors"],
     ["lblSpecialZones", "Special Zones"],
     ["lblProjectManagement", "Project Management"],
+    ["lblProjectHint", "Save or load your map state as a project file."],
     ["downloadProjectBtn", "Download Project"],
     ["uploadProjectBtn", "Load Project"],
+    ["lblProjectFile", "Selected File"],
     ["lblLegendEditor", "Legend Editor"],
+    ["lblLegendHint", "Paint regions to generate a legend."],
+    ["debugOptionPROD", "Normal View"],
+    ["debugOptionGEOMETRY", "1. Geometry Check (Pink/Green)"],
+    ["debugOptionARTIFACTS", "2. Artifact Hunter (Red Giants)"],
+    ["debugOptionISLANDS", "3. Island Detector (Orange)"],
+    ["debugOptionID_HASH", "4. ID Stability"],
   ];
 
   uiMap.forEach(([id, label]) => {
@@ -53,6 +79,11 @@ function updateUIText() {
   const searchInput = document.getElementById("countrySearch");
   if (searchInput) {
     searchInput.setAttribute("placeholder", t("Search...", "ui"));
+  }
+
+  const projectFileName = document.getElementById("projectFileName");
+  if (projectFileName && !projectFileName.textContent.trim()) {
+    projectFileName.textContent = t("No file selected", "ui");
   }
 }
 
@@ -86,7 +117,7 @@ function getTooltipText(feature) {
     "Unknown Region";
   const name = t(rawName, "geo");
   const code = (feature?.properties?.cntr_code || "").toUpperCase();
-  const label = state.currentLanguage === "zh" ? "区域" : "Region";
+  const label = state.currentLanguage === "zh" ? t("Region", "ui") : "Region";
   if (!name && !code) return label;
   if (code) return `${label}: ${name} (${code})`;
   return `${label}: ${name}`;

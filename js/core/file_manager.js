@@ -1,10 +1,13 @@
 // Project file manager (Phase 13)
+import { t } from "../ui/i18n.js";
 
 class FileManager {
   static exportProject(appState) {
     if (!appState) return;
     const payload = {
-      colors: appState.colors || {},
+      schemaVersion: 2,
+      countryBaseColors: appState.countryBaseColors || {},
+      featureOverrides: appState.featureOverrides || {},
       specialZones: appState.specialZones || {},
       timestamp: Date.now(),
     };
@@ -30,21 +33,35 @@ class FileManager {
       try {
         const text = typeof reader.result === "string" ? reader.result : "";
         const data = JSON.parse(text);
-        if (!data || typeof data !== "object" || !data.colors) {
-          throw new Error("Invalid project file: missing colors");
+        if (!data || typeof data !== "object") {
+          throw new Error("Invalid project file");
         }
+
+        // Backward compatibility: v1 only had `colors`.
+        if (data.colors && !data.featureOverrides && !data.countryBaseColors) {
+          data.featureOverrides = data.colors;
+          data.countryBaseColors = {};
+        }
+
+        if (!data.featureOverrides || typeof data.featureOverrides !== "object") {
+          data.featureOverrides = {};
+        }
+        if (!data.countryBaseColors || typeof data.countryBaseColors !== "object") {
+          data.countryBaseColors = {};
+        }
+
         if (typeof callback === "function") {
           callback(data);
         }
       } catch (error) {
         console.error("Failed to import project:", error);
-        alert("Invalid project file. Please select a valid map_project.json.");
+        alert(t("Invalid project file. Please select a valid map_project.json.", "ui"));
       }
     };
 
     reader.onerror = () => {
       console.error("Failed to read project file:", reader.error);
-      alert("Unable to read the selected file.");
+      alert(t("Unable to read the selected file.", "ui"));
     };
 
     reader.readAsText(file);

@@ -393,8 +393,12 @@ export {
 
 export const state = {
   locales: { ui: {}, geo: {} },
+  geoAliasToStableKey: {},
   currentLanguage: globalThis.currentLanguage || "en",
   topology: null,
+  topologyPrimary: null,
+  topologyDetail: null,
+  topologyBundleMode: "single",
   landData: null,
   specialZonesData: null,
   specialZones: {},
@@ -410,7 +414,14 @@ export const state = {
   height: 0,
   dpr: globalThis.devicePixelRatio || 1,
 
+  // Resolved colors used by canvas render/legend.
   colors: {},
+  // Country-level base colors (applies when no subdivision override exists).
+  countryBaseColors: {},
+  // Subdivision-level explicit color overrides keyed by feature ID.
+  featureOverrides: {},
+  // Click/paint granularity: subdivision | country.
+  interactionGranularity: "subdivision",
   currentPaletteTheme: "HOI4 Vanilla",
   colorMode: "region",
   selectedColor: PALETTE_THEMES["HOI4 Vanilla"][0],
@@ -422,6 +433,9 @@ export const state = {
   showRivers: true,
   showSpecialZones: true,
   cachedBorders: null,
+  cachedCountryBorders: null,
+  cachedProvinceBorders: null,
+  cachedLocalBorders: null,
   cachedColorsHash: null,
   cachedCoastlines: null,
   cachedGridLines: null,
@@ -467,6 +481,7 @@ export const state = {
   countryPresets,
 
   landIndex: new Map(),
+  countryToFeatureIds: new Map(),
   idToKey: new Map(),
   keyToId: new Map(),
   spatialIndex: null,

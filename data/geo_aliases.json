@@ -1,0 +1,2003 @@
+{
+  "version": 1,
+  "generated_at": "2026-02-24T15:00:50.766649+00:00",
+  "source": "C:\\Users\\raede\\Desktop\\dev\\mapcreator\\data\\europe_topology.json",
+  "entry_count": 199,
+  "alias_count": 199,
+  "conflict_count": 0,
+  "conflicts": [],
+  "entries": [
+    {
+      "stable_key": "id::AD",
+      "feature_id": "AD",
+      "country_code": "AD",
+      "primary_name": "Andorra",
+      "aliases": [
+        "Andorra"
+      ]
+    },
+    {
+      "stable_key": "id::AE",
+      "feature_id": "AE",
+      "country_code": "AE",
+      "primary_name": "United Arab Emirates",
+      "aliases": [
+        "United Arab Emirates"
+      ]
+    },
+    {
+      "stable_key": "id::AF",
+      "feature_id": "AF",
+      "country_code": "AF",
+      "primary_name": "Afghanistan",
+      "aliases": [
+        "Afghanistan"
+      ]
+    },
+    {
+      "stable_key": "id::AL",
+      "feature_id": "AL",
+      "country_code": "AL",
+      "primary_name": "Albania",
+      "aliases": [
+        "Albania"
+      ]
+    },
+    {
+      "stable_key": "id::AM",
+      "feature_id": "AM",
+      "country_code": "AM",
+      "primary_name": "Armenia",
+      "aliases": [
+        "Armenia"
+      ]
+    },
+    {
+      "stable_key": "id::AO",
+      "feature_id": "AO",
+      "country_code": "AO",
+      "primary_name": "Angola",
+      "aliases": [
+        "Angola"
+      ]
+    },
+    {
+      "stable_key": "id::AQ",
+      "feature_id": "AQ",
+      "country_code": "AQ",
+      "primary_name": "Antarctica",
+      "aliases": [
+        "Antarctica"
+      ]
+    },
+    {
+      "stable_key": "id::AR",
+      "feature_id": "AR",
+      "country_code": "AR",
+      "primary_name": "Argentina",
+      "aliases": [
+        "Argentina"
+      ]
+    },
+    {
+      "stable_key": "id::AT",
+      "feature_id": "AT",
+      "country_code": "AT",
+      "primary_name": "Austria",
+      "aliases": [
+        "Austria"
+      ]
+    },
+    {
+      "stable_key": "id::AU",
+      "feature_id": "AU",
+      "country_code": "AU",
+      "primary_name": "Australia",
+      "aliases": [
+        "Australia"
+      ]
+    },
+    {
+      "stable_key": "id::AU__1",
+      "feature_id": "AU__1",
+      "country_code": "AU",
+      "primary_name": "Ashmore and Cartier Islands",
+      "aliases": [
+        "Ashmore and Cartier Islands"
+      ]
+    },
+    {
+      "stable_key": "id::AU__2",
+      "feature_id": "AU__2",
+      "country_code": "AU",
+      "primary_name": "Indian Ocean Territories",
+      "aliases": [
+        "Indian Ocean Territories"
+      ]
+    },
+    {
+      "stable_key": "id::AX",
+      "feature_id": "AX",
+      "country_code": "AX",
+      "primary_name": "Aland",
+      "aliases": [
+        "Aland"
+      ]
+    },
+    {
+      "stable_key": "id::AZ",
+      "feature_id": "AZ",
+      "country_code": "AZ",
+      "primary_name": "Azerbaijan",
+      "aliases": [
+        "Azerbaijan"
+      ]
+    },
+    {
+      "stable_key": "id::BA",
+      "feature_id": "BA",
+      "country_code": "BA",
+      "primary_name": "Bosnia and Herzegovina",
+      "aliases": [
+        "Bosnia and Herzegovina"
+      ]
+    },
+    {
+      "stable_key": "id::BD",
+      "feature_id": "BD",
+      "country_code": "BD",
+      "primary_name": "Bangladesh",
+      "aliases": [
+        "Bangladesh"
+      ]
+    },
+    {
+      "stable_key": "id::BE",
+      "feature_id": "BE",
+      "country_code": "BE",
+      "primary_name": "Belgium",
+      "aliases": [
+        "Belgium"
+      ]
+    },
+    {
+      "stable_key": "id::BF",
+      "feature_id": "BF",
+      "country_code": "BF",
+      "primary_name": "Burkina Faso",
+      "aliases": [
+        "Burkina Faso"
+      ]
+    },
+    {
+      "stable_key": "id::BG",
+      "feature_id": "BG",
+      "country_code": "BG",
+      "primary_name": "Bulgaria",
+      "aliases": [
+        "Bulgaria"
+      ]
+    },
+    {
+      "stable_key": "id::BH",
+      "feature_id": "BH",
+      "country_code": "BH",
+      "primary_name": "Bahrain",
+      "aliases": [
+        "Bahrain"
+      ]
+    },
+    {
+      "stable_key": "id::BI",
+      "feature_id": "BI",
+      "country_code": "BI",
+      "primary_name": "Burundi",
+      "aliases": [
+        "Burundi"
+      ]
+    },
+    {
+      "stable_key": "id::BJ",
+      "feature_id": "BJ",
+      "country_code": "BJ",
+      "primary_name": "Benin",
+      "aliases": [
+        "Benin"
+      ]
+    },
+    {
+      "stable_key": "id::BN",
+      "feature_id": "BN",
+      "country_code": "BN",
+      "primary_name": "Brunei",
+      "aliases": [
+        "Brunei"
+      ]
+    },
+    {
+      "stable_key": "id::BO",
+      "feature_id": "BO",
+      "country_code": "BO",
+      "primary_name": "Bolivia",
+      "aliases": [
+        "Bolivia"
+      ]
+    },
+    {
+      "stable_key": "id::BR",
+      "feature_id": "BR",
+      "country_code": "BR",
+      "primary_name": "Brazil",
+      "aliases": [
+        "Brazil"
+      ]
+    },
+    {
+      "stable_key": "id::BS",
+      "feature_id": "BS",
+      "country_code": "BS",
+      "primary_name": "The Bahamas",
+      "aliases": [
+        "The Bahamas"
+      ]
+    },
+    {
+      "stable_key": "id::BT",
+      "feature_id": "BT",
+      "country_code": "BT",
+      "primary_name": "Bhutan",
+      "aliases": [
+        "Bhutan"
+      ]
+    },
+    {
+      "stable_key": "id::BW",
+      "feature_id": "BW",
+      "country_code": "BW",
+      "primary_name": "Botswana",
+      "aliases": [
+        "Botswana"
+      ]
+    },
+    {
+      "stable_key": "id::BY",
+      "feature_id": "BY",
+      "country_code": "BY",
+      "primary_name": "Belarus",
+      "aliases": [
+        "Belarus"
+      ]
+    },
+    {
+      "stable_key": "id::BZ",
+      "feature_id": "BZ",
+      "country_code": "BZ",
+      "primary_name": "Belize",
+      "aliases": [
+        "Belize"
+      ]
+    },
+    {
+      "stable_key": "id::CA",
+      "feature_id": "CA",
+      "country_code": "CA",
+      "primary_name": "Canada",
+      "aliases": [
+        "Canada"
+      ]
+    },
+    {
+      "stable_key": "id::CD",
+      "feature_id": "CD",
+      "country_code": "CD",
+      "primary_name": "Democratic Republic of the Congo",
+      "aliases": [
+        "Democratic Republic of the Congo"
+      ]
+    },
+    {
+      "stable_key": "id::CF",
+      "feature_id": "CF",
+      "country_code": "CF",
+      "primary_name": "Central African Republic",
+      "aliases": [
+        "Central African Republic"
+      ]
+    },
+    {
+      "stable_key": "id::CG",
+      "feature_id": "CG",
+      "country_code": "CG",
+      "primary_name": "Republic of the Congo",
+      "aliases": [
+        "Republic of the Congo"
+      ]
+    },
+    {
+      "stable_key": "id::CH",
+      "feature_id": "CH",
+      "country_code": "CH",
+      "primary_name": "Switzerland",
+      "aliases": [
+        "Switzerland"
+      ]
+    },
+    {
+      "stable_key": "id::CI",
+      "feature_id": "CI",
+      "country_code": "CI",
+      "primary_name": "Ivory Coast",
+      "aliases": [
+        "Ivory Coast"
+      ]
+    },
+    {
+      "stable_key": "id::CL",
+      "feature_id": "CL",
+      "country_code": "CL",
+      "primary_name": "Chile",
+      "aliases": [
+        "Chile"
+      ]
+    },
+    {
+      "stable_key": "id::CM",
+      "feature_id": "CM",
+      "country_code": "CM",
+      "primary_name": "Cameroon",
+      "aliases": [
+        "Cameroon"
+      ]
+    },
+    {
+      "stable_key": "id::CN",
+      "feature_id": "CN",
+      "country_code": "CN",
+      "primary_name": "China",
+      "aliases": [
+        "China"
+      ]
+    },
+    {
+      "stable_key": "id::CO",
+      "feature_id": "CO",
+      "country_code": "CO",
+      "primary_name": "Colombia",
+      "aliases": [
+        "Colombia"
+      ]
+    },
+    {
+      "stable_key": "id::CR",
+      "feature_id": "CR",
+      "country_code": "CR",
+      "primary_name": "Costa Rica",
+      "aliases": [
+        "Costa Rica"
+      ]
+    },
+    {
+      "stable_key": "id::CU",
+      "feature_id": "CU",
+      "country_code": "CU",
+      "primary_name": "Cuba",
+      "aliases": [
+        "Cuba"
+      ]
+    },
+    {
+      "stable_key": "id::CV",
+      "feature_id": "CV",
+      "country_code": "CV",
+      "primary_name": "Cabo Verde",
+      "aliases": [
+        "Cabo Verde"
+      ]
+    },
+    {
+      "stable_key": "id::CY",
+      "feature_id": "CY",
+      "country_code": "CY",
+      "primary_name": "Cyprus",
+      "aliases": [
+        "Cyprus"
+      ]
+    },
+    {
+      "stable_key": "id::CZ",
+      "feature_id": "CZ",
+      "country_code": "CZ",
+      "primary_name": "Czechia",
+      "aliases": [
+        "Czechia"
+      ]
+    },
+    {
+      "stable_key": "id::DE",
+      "feature_id": "DE",
+      "country_code": "DE",
+      "primary_name": "Germany",
+      "aliases": [
+        "Germany"
+      ]
+    },
+    {
+      "stable_key": "id::DJ",
+      "feature_id": "DJ",
+      "country_code": "DJ",
+      "primary_name": "Djibouti",
+      "aliases": [
+        "Djibouti"
+      ]
+    },
+    {
+      "stable_key": "id::DK",
+      "feature_id": "DK",
+      "country_code": "DK",
+      "primary_name": "Denmark",
+      "aliases": [
+        "Denmark"
+      ]
+    },
+    {
+      "stable_key": "id::DO",
+      "feature_id": "DO",
+      "country_code": "DO",
+      "primary_name": "Dominican Republic",
+      "aliases": [
+        "Dominican Republic"
+      ]
+    },
+    {
+      "stable_key": "id::DZ",
+      "feature_id": "DZ",
+      "country_code": "DZ",
+      "primary_name": "Algeria",
+      "aliases": [
+        "Algeria"
+      ]
+    },
+    {
+      "stable_key": "id::EC",
+      "feature_id": "EC",
+      "country_code": "EC",
+      "primary_name": "Ecuador",
+      "aliases": [
+        "Ecuador"
+      ]
+    },
+    {
+      "stable_key": "id::EE",
+      "feature_id": "EE",
+      "country_code": "EE",
+      "primary_name": "Estonia",
+      "aliases": [
+        "Estonia"
+      ]
+    },
+    {
+      "stable_key": "id::EG",
+      "feature_id": "EG",
+      "country_code": "EG",
+      "primary_name": "Egypt",
+      "aliases": [
+        "Egypt"
+      ]
+    },
+    {
+      "stable_key": "id::EH",
+      "feature_id": "EH",
+      "country_code": "EH",
+      "primary_name": "Western Sahara",
+      "aliases": [
+        "Western Sahara"
+      ]
+    },
+    {
+      "stable_key": "id::ER",
+      "feature_id": "ER",
+      "country_code": "ER",
+      "primary_name": "Eritrea",
+      "aliases": [
+        "Eritrea"
+      ]
+    },
+    {
+      "stable_key": "id::ES",
+      "feature_id": "ES",
+      "country_code": "ES",
+      "primary_name": "Spain",
+      "aliases": [
+        "Spain"
+      ]
+    },
+    {
+      "stable_key": "id::ET",
+      "feature_id": "ET",
+      "country_code": "ET",
+      "primary_name": "Ethiopia",
+      "aliases": [
+        "Ethiopia"
+      ]
+    },
+    {
+      "stable_key": "id::FI",
+      "feature_id": "FI",
+      "country_code": "FI",
+      "primary_name": "Finland",
+      "aliases": [
+        "Finland"
+      ]
+    },
+    {
+      "stable_key": "id::FK",
+      "feature_id": "FK",
+      "country_code": "FK",
+      "primary_name": "Falkland Islands",
+      "aliases": [
+        "Falkland Islands"
+      ]
+    },
+    {
+      "stable_key": "id::FO",
+      "feature_id": "FO",
+      "country_code": "FO",
+      "primary_name": "Faroe Islands",
+      "aliases": [
+        "Faroe Islands"
+      ]
+    },
+    {
+      "stable_key": "id::FR",
+      "feature_id": "FR",
+      "country_code": "FR",
+      "primary_name": "France",
+      "aliases": [
+        "France"
+      ]
+    },
+    {
+      "stable_key": "id::GA",
+      "feature_id": "GA",
+      "country_code": "GA",
+      "primary_name": "Gabon",
+      "aliases": [
+        "Gabon"
+      ]
+    },
+    {
+      "stable_key": "id::GB",
+      "feature_id": "GB",
+      "country_code": "GB",
+      "primary_name": "United Kingdom",
+      "aliases": [
+        "United Kingdom"
+      ]
+    },
+    {
+      "stable_key": "id::GE",
+      "feature_id": "GE",
+      "country_code": "GE",
+      "primary_name": "Georgia",
+      "aliases": [
+        "Georgia"
+      ]
+    },
+    {
+      "stable_key": "id::GG",
+      "feature_id": "GG",
+      "country_code": "GG",
+      "primary_name": "Guernsey",
+      "aliases": [
+        "Guernsey"
+      ]
+    },
+    {
+      "stable_key": "id::GH",
+      "feature_id": "GH",
+      "country_code": "GH",
+      "primary_name": "Ghana",
+      "aliases": [
+        "Ghana"
+      ]
+    },
+    {
+      "stable_key": "id::GL",
+      "feature_id": "GL",
+      "country_code": "GL",
+      "primary_name": "Greenland",
+      "aliases": [
+        "Greenland"
+      ]
+    },
+    {
+      "stable_key": "id::GM",
+      "feature_id": "GM",
+      "country_code": "GM",
+      "primary_name": "Gambia",
+      "aliases": [
+        "Gambia"
+      ]
+    },
+    {
+      "stable_key": "id::GN",
+      "feature_id": "GN",
+      "country_code": "GN",
+      "primary_name": "Guinea",
+      "aliases": [
+        "Guinea"
+      ]
+    },
+    {
+      "stable_key": "id::GQ",
+      "feature_id": "GQ",
+      "country_code": "GQ",
+      "primary_name": "Equatorial Guinea",
+      "aliases": [
+        "Equatorial Guinea"
+      ]
+    },
+    {
+      "stable_key": "id::GR",
+      "feature_id": "GR",
+      "country_code": "GR",
+      "primary_name": "Greece",
+      "aliases": [
+        "Greece"
+      ]
+    },
+    {
+      "stable_key": "id::GS",
+      "feature_id": "GS",
+      "country_code": "GS",
+      "primary_name": "South Georgia and the Islands",
+      "aliases": [
+        "South Georgia and the Islands"
+      ]
+    },
+    {
+      "stable_key": "id::GT",
+      "feature_id": "GT",
+      "country_code": "GT",
+      "primary_name": "Guatemala",
+      "aliases": [
+        "Guatemala"
+      ]
+    },
+    {
+      "stable_key": "id::GW",
+      "feature_id": "GW",
+      "country_code": "GW",
+      "primary_name": "Guinea-Bissau",
+      "aliases": [
+        "Guinea-Bissau"
+      ]
+    },
+    {
+      "stable_key": "id::GY",
+      "feature_id": "GY",
+      "country_code": "GY",
+      "primary_name": "Guyana",
+      "aliases": [
+        "Guyana"
+      ]
+    },
+    {
+      "stable_key": "id::HK",
+      "feature_id": "HK",
+      "country_code": "HK",
+      "primary_name": "Hong Kong S.A.R.",
+      "aliases": [
+        "Hong Kong S.A.R."
+      ]
+    },
+    {
+      "stable_key": "id::HM",
+      "feature_id": "HM",
+      "country_code": "HM",
+      "primary_name": "Heard Island and McDonald Islands",
+      "aliases": [
+        "Heard Island and McDonald Islands"
+      ]
+    },
+    {
+      "stable_key": "id::HN",
+      "feature_id": "HN",
+      "country_code": "HN",
+      "primary_name": "Honduras",
+      "aliases": [
+        "Honduras"
+      ]
+    },
+    {
+      "stable_key": "id::HR",
+      "feature_id": "HR",
+      "country_code": "HR",
+      "primary_name": "Croatia",
+      "aliases": [
+        "Croatia"
+      ]
+    },
+    {
+      "stable_key": "id::HT",
+      "feature_id": "HT",
+      "country_code": "HT",
+      "primary_name": "Haiti",
+      "aliases": [
+        "Haiti"
+      ]
+    },
+    {
+      "stable_key": "id::HU",
+      "feature_id": "HU",
+      "country_code": "HU",
+      "primary_name": "Hungary",
+      "aliases": [
+        "Hungary"
+      ]
+    },
+    {
+      "stable_key": "id::ID",
+      "feature_id": "ID",
+      "country_code": "ID",
+      "primary_name": "Indonesia",
+      "aliases": [
+        "Indonesia"
+      ]
+    },
+    {
+      "stable_key": "id::IE",
+      "feature_id": "IE",
+      "country_code": "IE",
+      "primary_name": "Ireland",
+      "aliases": [
+        "Ireland"
+      ]
+    },
+    {
+      "stable_key": "id::IL",
+      "feature_id": "IL",
+      "country_code": "IL",
+      "primary_name": "Israel",
+      "aliases": [
+        "Israel"
+      ]
+    },
+    {
+      "stable_key": "id::IM",
+      "feature_id": "IM",
+      "country_code": "IM",
+      "primary_name": "Isle of Man",
+      "aliases": [
+        "Isle of Man"
+      ]
+    },
+    {
+      "stable_key": "id::IN",
+      "feature_id": "IN",
+      "country_code": "IN",
+      "primary_name": "India",
+      "aliases": [
+        "India"
+      ]
+    },
+    {
+      "stable_key": "id::IO",
+      "feature_id": "IO",
+      "country_code": "IO",
+      "primary_name": "British Indian Ocean Territory",
+      "aliases": [
+        "British Indian Ocean Territory"
+      ]
+    },
+    {
+      "stable_key": "id::IQ",
+      "feature_id": "IQ",
+      "country_code": "IQ",
+      "primary_name": "Iraq",
+      "aliases": [
+        "Iraq"
+      ]
+    },
+    {
+      "stable_key": "id::IR",
+      "feature_id": "IR",
+      "country_code": "IR",
+      "primary_name": "Iran",
+      "aliases": [
+        "Iran"
+      ]
+    },
+    {
+      "stable_key": "id::IS",
+      "feature_id": "IS",
+      "country_code": "IS",
+      "primary_name": "Iceland",
+      "aliases": [
+        "Iceland"
+      ]
+    },
+    {
+      "stable_key": "id::IT",
+      "feature_id": "IT",
+      "country_code": "IT",
+      "primary_name": "Italy",
+      "aliases": [
+        "Italy"
+      ]
+    },
+    {
+      "stable_key": "id::JE",
+      "feature_id": "JE",
+      "country_code": "JE",
+      "primary_name": "Jersey",
+      "aliases": [
+        "Jersey"
+      ]
+    },
+    {
+      "stable_key": "id::JM",
+      "feature_id": "JM",
+      "country_code": "JM",
+      "primary_name": "Jamaica",
+      "aliases": [
+        "Jamaica"
+      ]
+    },
+    {
+      "stable_key": "id::JO",
+      "feature_id": "JO",
+      "country_code": "JO",
+      "primary_name": "Jordan",
+      "aliases": [
+        "Jordan"
+      ]
+    },
+    {
+      "stable_key": "id::JP",
+      "feature_id": "JP",
+      "country_code": "JP",
+      "primary_name": "Japan",
+      "aliases": [
+        "Japan"
+      ]
+    },
+    {
+      "stable_key": "id::KE",
+      "feature_id": "KE",
+      "country_code": "KE",
+      "primary_name": "Kenya",
+      "aliases": [
+        "Kenya"
+      ]
+    },
+    {
+      "stable_key": "id::KG",
+      "feature_id": "KG",
+      "country_code": "KG",
+      "primary_name": "Kyrgyzstan",
+      "aliases": [
+        "Kyrgyzstan"
+      ]
+    },
+    {
+      "stable_key": "id::KH",
+      "feature_id": "KH",
+      "country_code": "KH",
+      "primary_name": "Cambodia",
+      "aliases": [
+        "Cambodia"
+      ]
+    },
+    {
+      "stable_key": "id::KM",
+      "feature_id": "KM",
+      "country_code": "KM",
+      "primary_name": "Comoros",
+      "aliases": [
+        "Comoros"
+      ]
+    },
+    {
+      "stable_key": "id::KP",
+      "feature_id": "KP",
+      "country_code": "KP",
+      "primary_name": "North Korea",
+      "aliases": [
+        "North Korea"
+      ]
+    },
+    {
+      "stable_key": "id::KR",
+      "feature_id": "KR",
+      "country_code": "KR",
+      "primary_name": "South Korea",
+      "aliases": [
+        "South Korea"
+      ]
+    },
+    {
+      "stable_key": "id::KW",
+      "feature_id": "KW",
+      "country_code": "KW",
+      "primary_name": "Kuwait",
+      "aliases": [
+        "Kuwait"
+      ]
+    },
+    {
+      "stable_key": "id::KZ",
+      "feature_id": "KZ",
+      "country_code": "KZ",
+      "primary_name": "Kazakhstan",
+      "aliases": [
+        "Kazakhstan"
+      ]
+    },
+    {
+      "stable_key": "id::LA",
+      "feature_id": "LA",
+      "country_code": "LA",
+      "primary_name": "Laos",
+      "aliases": [
+        "Laos"
+      ]
+    },
+    {
+      "stable_key": "id::LB",
+      "feature_id": "LB",
+      "country_code": "LB",
+      "primary_name": "Lebanon",
+      "aliases": [
+        "Lebanon"
+      ]
+    },
+    {
+      "stable_key": "id::LI",
+      "feature_id": "LI",
+      "country_code": "LI",
+      "primary_name": "Liechtenstein",
+      "aliases": [
+        "Liechtenstein"
+      ]
+    },
+    {
+      "stable_key": "id::LK",
+      "feature_id": "LK",
+      "country_code": "LK",
+      "primary_name": "Sri Lanka",
+      "aliases": [
+        "Sri Lanka"
+      ]
+    },
+    {
+      "stable_key": "id::LR",
+      "feature_id": "LR",
+      "country_code": "LR",
+      "primary_name": "Liberia",
+      "aliases": [
+        "Liberia"
+      ]
+    },
+    {
+      "stable_key": "id::LS",
+      "feature_id": "LS",
+      "country_code": "LS",
+      "primary_name": "Lesotho",
+      "aliases": [
+        "Lesotho"
+      ]
+    },
+    {
+      "stable_key": "id::LT",
+      "feature_id": "LT",
+      "country_code": "LT",
+      "primary_name": "Lithuania",
+      "aliases": [
+        "Lithuania"
+      ]
+    },
+    {
+      "stable_key": "id::LU",
+      "feature_id": "LU",
+      "country_code": "LU",
+      "primary_name": "Luxembourg",
+      "aliases": [
+        "Luxembourg"
+      ]
+    },
+    {
+      "stable_key": "id::LV",
+      "feature_id": "LV",
+      "country_code": "LV",
+      "primary_name": "Latvia",
+      "aliases": [
+        "Latvia"
+      ]
+    },
+    {
+      "stable_key": "id::LY",
+      "feature_id": "LY",
+      "country_code": "LY",
+      "primary_name": "Libya",
+      "aliases": [
+        "Libya"
+      ]
+    },
+    {
+      "stable_key": "id::MA",
+      "feature_id": "MA",
+      "country_code": "MA",
+      "primary_name": "Morocco",
+      "aliases": [
+        "Morocco"
+      ]
+    },
+    {
+      "stable_key": "id::MC",
+      "feature_id": "MC",
+      "country_code": "MC",
+      "primary_name": "Monaco",
+      "aliases": [
+        "Monaco"
+      ]
+    },
+    {
+      "stable_key": "id::MD",
+      "feature_id": "MD",
+      "country_code": "MD",
+      "primary_name": "Moldova",
+      "aliases": [
+        "Moldova"
+      ]
+    },
+    {
+      "stable_key": "id::ME",
+      "feature_id": "ME",
+      "country_code": "ME",
+      "primary_name": "Montenegro",
+      "aliases": [
+        "Montenegro"
+      ]
+    },
+    {
+      "stable_key": "id::MG",
+      "feature_id": "MG",
+      "country_code": "MG",
+      "primary_name": "Madagascar",
+      "aliases": [
+        "Madagascar"
+      ]
+    },
+    {
+      "stable_key": "id::MK",
+      "feature_id": "MK",
+      "country_code": "MK",
+      "primary_name": "North Macedonia",
+      "aliases": [
+        "North Macedonia"
+      ]
+    },
+    {
+      "stable_key": "id::ML",
+      "feature_id": "ML",
+      "country_code": "ML",
+      "primary_name": "Mali",
+      "aliases": [
+        "Mali"
+      ]
+    },
+    {
+      "stable_key": "id::MM",
+      "feature_id": "MM",
+      "country_code": "MM",
+      "primary_name": "Myanmar",
+      "aliases": [
+        "Myanmar"
+      ]
+    },
+    {
+      "stable_key": "id::MN",
+      "feature_id": "MN",
+      "country_code": "MN",
+      "primary_name": "Mongolia",
+      "aliases": [
+        "Mongolia"
+      ]
+    },
+    {
+      "stable_key": "id::MO",
+      "feature_id": "MO",
+      "country_code": "MO",
+      "primary_name": "Macao S.A.R",
+      "aliases": [
+        "Macao S.A.R"
+      ]
+    },
+    {
+      "stable_key": "id::MR",
+      "feature_id": "MR",
+      "country_code": "MR",
+      "primary_name": "Mauritania",
+      "aliases": [
+        "Mauritania"
+      ]
+    },
+    {
+      "stable_key": "id::MT",
+      "feature_id": "MT",
+      "country_code": "MT",
+      "primary_name": "Malta",
+      "aliases": [
+        "Malta"
+      ]
+    },
+    {
+      "stable_key": "id::MU",
+      "feature_id": "MU",
+      "country_code": "MU",
+      "primary_name": "Mauritius",
+      "aliases": [
+        "Mauritius"
+      ]
+    },
+    {
+      "stable_key": "id::MV",
+      "feature_id": "MV",
+      "country_code": "MV",
+      "primary_name": "Maldives",
+      "aliases": [
+        "Maldives"
+      ]
+    },
+    {
+      "stable_key": "id::MW",
+      "feature_id": "MW",
+      "country_code": "MW",
+      "primary_name": "Malawi",
+      "aliases": [
+        "Malawi"
+      ]
+    },
+    {
+      "stable_key": "id::MX",
+      "feature_id": "MX",
+      "country_code": "MX",
+      "primary_name": "Mexico",
+      "aliases": [
+        "Mexico"
+      ]
+    },
+    {
+      "stable_key": "id::MY",
+      "feature_id": "MY",
+      "country_code": "MY",
+      "primary_name": "Malaysia",
+      "aliases": [
+        "Malaysia"
+      ]
+    },
+    {
+      "stable_key": "id::MZ",
+      "feature_id": "MZ",
+      "country_code": "MZ",
+      "primary_name": "Mozambique",
+      "aliases": [
+        "Mozambique"
+      ]
+    },
+    {
+      "stable_key": "id::NA",
+      "feature_id": "NA",
+      "country_code": "NA",
+      "primary_name": "Namibia",
+      "aliases": [
+        "Namibia"
+      ]
+    },
+    {
+      "stable_key": "id::NE",
+      "feature_id": "NE",
+      "country_code": "NE",
+      "primary_name": "Niger",
+      "aliases": [
+        "Niger"
+      ]
+    },
+    {
+      "stable_key": "id::NG",
+      "feature_id": "NG",
+      "country_code": "NG",
+      "primary_name": "Nigeria",
+      "aliases": [
+        "Nigeria"
+      ]
+    },
+    {
+      "stable_key": "id::NI",
+      "feature_id": "NI",
+      "country_code": "NI",
+      "primary_name": "Nicaragua",
+      "aliases": [
+        "Nicaragua"
+      ]
+    },
+    {
+      "stable_key": "id::NL",
+      "feature_id": "NL",
+      "country_code": "NL",
+      "primary_name": "Netherlands",
+      "aliases": [
+        "Netherlands"
+      ]
+    },
+    {
+      "stable_key": "id::NO",
+      "feature_id": "NO",
+      "country_code": "NO",
+      "primary_name": "Norway",
+      "aliases": [
+        "Norway"
+      ]
+    },
+    {
+      "stable_key": "id::NP",
+      "feature_id": "NP",
+      "country_code": "NP",
+      "primary_name": "Nepal",
+      "aliases": [
+        "Nepal"
+      ]
+    },
+    {
+      "stable_key": "id::NZ",
+      "feature_id": "NZ",
+      "country_code": "NZ",
+      "primary_name": "New Zealand",
+      "aliases": [
+        "New Zealand"
+      ]
+    },
+    {
+      "stable_key": "id::OM",
+      "feature_id": "OM",
+      "country_code": "OM",
+      "primary_name": "Oman",
+      "aliases": [
+        "Oman"
+      ]
+    },
+    {
+      "stable_key": "id::PA",
+      "feature_id": "PA",
+      "country_code": "PA",
+      "primary_name": "Panama",
+      "aliases": [
+        "Panama"
+      ]
+    },
+    {
+      "stable_key": "id::PE",
+      "feature_id": "PE",
+      "country_code": "PE",
+      "primary_name": "Peru",
+      "aliases": [
+        "Peru"
+      ]
+    },
+    {
+      "stable_key": "id::PG",
+      "feature_id": "PG",
+      "country_code": "PG",
+      "primary_name": "Papua New Guinea",
+      "aliases": [
+        "Papua New Guinea"
+      ]
+    },
+    {
+      "stable_key": "id::PH",
+      "feature_id": "PH",
+      "country_code": "PH",
+      "primary_name": "Philippines",
+      "aliases": [
+        "Philippines"
+      ]
+    },
+    {
+      "stable_key": "id::PK",
+      "feature_id": "PK",
+      "country_code": "PK",
+      "primary_name": "Pakistan",
+      "aliases": [
+        "Pakistan"
+      ]
+    },
+    {
+      "stable_key": "id::PL",
+      "feature_id": "PL",
+      "country_code": "PL",
+      "primary_name": "Poland",
+      "aliases": [
+        "Poland"
+      ]
+    },
+    {
+      "stable_key": "id::PM",
+      "feature_id": "PM",
+      "country_code": "PM",
+      "primary_name": "Saint Pierre and Miquelon",
+      "aliases": [
+        "Saint Pierre and Miquelon"
+      ]
+    },
+    {
+      "stable_key": "id::PR",
+      "feature_id": "PR",
+      "country_code": "PR",
+      "primary_name": "Puerto Rico",
+      "aliases": [
+        "Puerto Rico"
+      ]
+    },
+    {
+      "stable_key": "id::PS",
+      "feature_id": "PS",
+      "country_code": "PS",
+      "primary_name": "Palestine",
+      "aliases": [
+        "Palestine"
+      ]
+    },
+    {
+      "stable_key": "id::PT",
+      "feature_id": "PT",
+      "country_code": "PT",
+      "primary_name": "Portugal",
+      "aliases": [
+        "Portugal"
+      ]
+    },
+    {
+      "stable_key": "id::PY",
+      "feature_id": "PY",
+      "country_code": "PY",
+      "primary_name": "Paraguay",
+      "aliases": [
+        "Paraguay"
+      ]
+    },
+    {
+      "stable_key": "id::QA",
+      "feature_id": "QA",
+      "country_code": "QA",
+      "primary_name": "Qatar",
+      "aliases": [
+        "Qatar"
+      ]
+    },
+    {
+      "stable_key": "id::RO",
+      "feature_id": "RO",
+      "country_code": "RO",
+      "primary_name": "Romania",
+      "aliases": [
+        "Romania"
+      ]
+    },
+    {
+      "stable_key": "id::RS",
+      "feature_id": "RS",
+      "country_code": "RS",
+      "primary_name": "Republic of Serbia",
+      "aliases": [
+        "Republic of Serbia"
+      ]
+    },
+    {
+      "stable_key": "id::RU",
+      "feature_id": "RU",
+      "country_code": "RU",
+      "primary_name": "Russia",
+      "aliases": [
+        "Russia"
+      ]
+    },
+    {
+      "stable_key": "id::RW",
+      "feature_id": "RW",
+      "country_code": "RW",
+      "primary_name": "Rwanda",
+      "aliases": [
+        "Rwanda"
+      ]
+    },
+    {
+      "stable_key": "id::SA",
+      "feature_id": "SA",
+      "country_code": "SA",
+      "primary_name": "Saudi Arabia",
+      "aliases": [
+        "Saudi Arabia"
+      ]
+    },
+    {
+      "stable_key": "id::SC",
+      "feature_id": "SC",
+      "country_code": "SC",
+      "primary_name": "Seychelles",
+      "aliases": [
+        "Seychelles"
+      ]
+    },
+    {
+      "stable_key": "id::SD",
+      "feature_id": "SD",
+      "country_code": "SD",
+      "primary_name": "Sudan",
+      "aliases": [
+        "Sudan"
+      ]
+    },
+    {
+      "stable_key": "id::SE",
+      "feature_id": "SE",
+      "country_code": "SE",
+      "primary_name": "Sweden",
+      "aliases": [
+        "Sweden"
+      ]
+    },
+    {
+      "stable_key": "id::SG",
+      "feature_id": "SG",
+      "country_code": "SG",
+      "primary_name": "Singapore",
+      "aliases": [
+        "Singapore"
+      ]
+    },
+    {
+      "stable_key": "id::SH",
+      "feature_id": "SH",
+      "country_code": "SH",
+      "primary_name": "Saint Helena",
+      "aliases": [
+        "Saint Helena"
+      ]
+    },
+    {
+      "stable_key": "id::SI",
+      "feature_id": "SI",
+      "country_code": "SI",
+      "primary_name": "Slovenia",
+      "aliases": [
+        "Slovenia"
+      ]
+    },
+    {
+      "stable_key": "id::SK",
+      "feature_id": "SK",
+      "country_code": "SK",
+      "primary_name": "Slovakia",
+      "aliases": [
+        "Slovakia"
+      ]
+    },
+    {
+      "stable_key": "id::SL",
+      "feature_id": "SL",
+      "country_code": "SL",
+      "primary_name": "Sierra Leone",
+      "aliases": [
+        "Sierra Leone"
+      ]
+    },
+    {
+      "stable_key": "id::SM",
+      "feature_id": "SM",
+      "country_code": "SM",
+      "primary_name": "San Marino",
+      "aliases": [
+        "San Marino"
+      ]
+    },
+    {
+      "stable_key": "id::SN",
+      "feature_id": "SN",
+      "country_code": "SN",
+      "primary_name": "Senegal",
+      "aliases": [
+        "Senegal"
+      ]
+    },
+    {
+      "stable_key": "id::SO",
+      "feature_id": "SO",
+      "country_code": "SO",
+      "primary_name": "Somalia",
+      "aliases": [
+        "Somalia"
+      ]
+    },
+    {
+      "stable_key": "id::SR",
+      "feature_id": "SR",
+      "country_code": "SR",
+      "primary_name": "Suriname",
+      "aliases": [
+        "Suriname"
+      ]
+    },
+    {
+      "stable_key": "id::SS",
+      "feature_id": "SS",
+      "country_code": "SS",
+      "primary_name": "South Sudan",
+      "aliases": [
+        "South Sudan"
+      ]
+    },
+    {
+      "stable_key": "id::ST",
+      "feature_id": "ST",
+      "country_code": "ST",
+      "primary_name": "São Tomé and Principe",
+      "aliases": [
+        "São Tomé and Principe"
+      ]
+    },
+    {
+      "stable_key": "id::SV",
+      "feature_id": "SV",
+      "country_code": "SV",
+      "primary_name": "El Salvador",
+      "aliases": [
+        "El Salvador"
+      ]
+    },
+    {
+      "stable_key": "id::SY",
+      "feature_id": "SY",
+      "country_code": "SY",
+      "primary_name": "Syria",
+      "aliases": [
+        "Syria"
+      ]
+    },
+    {
+      "stable_key": "id::SZ",
+      "feature_id": "SZ",
+      "country_code": "SZ",
+      "primary_name": "eSwatini",
+      "aliases": [
+        "eSwatini"
+      ]
+    },
+    {
+      "stable_key": "id::TD",
+      "feature_id": "TD",
+      "country_code": "TD",
+      "primary_name": "Chad",
+      "aliases": [
+        "Chad"
+      ]
+    },
+    {
+      "stable_key": "id::TF",
+      "feature_id": "TF",
+      "country_code": "TF",
+      "primary_name": "French Southern and Antarctic Lands",
+      "aliases": [
+        "French Southern and Antarctic Lands"
+      ]
+    },
+    {
+      "stable_key": "id::TG",
+      "feature_id": "TG",
+      "country_code": "TG",
+      "primary_name": "Togo",
+      "aliases": [
+        "Togo"
+      ]
+    },
+    {
+      "stable_key": "id::TH",
+      "feature_id": "TH",
+      "country_code": "TH",
+      "primary_name": "Thailand",
+      "aliases": [
+        "Thailand"
+      ]
+    },
+    {
+      "stable_key": "id::TJ",
+      "feature_id": "TJ",
+      "country_code": "TJ",
+      "primary_name": "Tajikistan",
+      "aliases": [
+        "Tajikistan"
+      ]
+    },
+    {
+      "stable_key": "id::TL",
+      "feature_id": "TL",
+      "country_code": "TL",
+      "primary_name": "East Timor",
+      "aliases": [
+        "East Timor"
+      ]
+    },
+    {
+      "stable_key": "id::TM",
+      "feature_id": "TM",
+      "country_code": "TM",
+      "primary_name": "Turkmenistan",
+      "aliases": [
+        "Turkmenistan"
+      ]
+    },
+    {
+      "stable_key": "id::TN",
+      "feature_id": "TN",
+      "country_code": "TN",
+      "primary_name": "Tunisia",
+      "aliases": [
+        "Tunisia"
+      ]
+    },
+    {
+      "stable_key": "id::TR",
+      "feature_id": "TR",
+      "country_code": "TR",
+      "primary_name": "Turkey",
+      "aliases": [
+        "Turkey"
+      ]
+    },
+    {
+      "stable_key": "id::TT",
+      "feature_id": "TT",
+      "country_code": "TT",
+      "primary_name": "Trinidad and Tobago",
+      "aliases": [
+        "Trinidad and Tobago"
+      ]
+    },
+    {
+      "stable_key": "id::TW",
+      "feature_id": "TW",
+      "country_code": "TW",
+      "primary_name": "Taiwan",
+      "aliases": [
+        "Taiwan"
+      ]
+    },
+    {
+      "stable_key": "id::TZ",
+      "feature_id": "TZ",
+      "country_code": "TZ",
+      "primary_name": "United Republic of Tanzania",
+      "aliases": [
+        "United Republic of Tanzania"
+      ]
+    },
+    {
+      "stable_key": "id::UA",
+      "feature_id": "UA",
+      "country_code": "UA",
+      "primary_name": "Ukraine",
+      "aliases": [
+        "Ukraine"
+      ]
+    },
+    {
+      "stable_key": "id::UG",
+      "feature_id": "UG",
+      "country_code": "UG",
+      "primary_name": "Uganda",
+      "aliases": [
+        "Uganda"
+      ]
+    },
+    {
+      "stable_key": "id::US",
+      "feature_id": "US",
+      "country_code": "US",
+      "primary_name": "United States of America",
+      "aliases": [
+        "United States of America"
+      ]
+    },
+    {
+      "stable_key": "id::UY",
+      "feature_id": "UY",
+      "country_code": "UY",
+      "primary_name": "Uruguay",
+      "aliases": [
+        "Uruguay"
+      ]
+    },
+    {
+      "stable_key": "id::UZ",
+      "feature_id": "UZ",
+      "country_code": "UZ",
+      "primary_name": "Uzbekistan",
+      "aliases": [
+        "Uzbekistan"
+      ]
+    },
+    {
+      "stable_key": "id::VA",
+      "feature_id": "VA",
+      "country_code": "VA",
+      "primary_name": "Vatican",
+      "aliases": [
+        "Vatican"
+      ]
+    },
+    {
+      "stable_key": "id::VE",
+      "feature_id": "VE",
+      "country_code": "VE",
+      "primary_name": "Venezuela",
+      "aliases": [
+        "Venezuela"
+      ]
+    },
+    {
+      "stable_key": "id::VN",
+      "feature_id": "VN",
+      "country_code": "VN",
+      "primary_name": "Vietnam",
+      "aliases": [
+        "Vietnam"
+      ]
+    },
+    {
+      "stable_key": "id::XK",
+      "feature_id": "XK",
+      "country_code": "XK",
+      "primary_name": "Kosovo",
+      "aliases": [
+        "Kosovo"
+      ]
+    },
+    {
+      "stable_key": "id::YE",
+      "feature_id": "YE",
+      "country_code": "YE",
+      "primary_name": "Yemen",
+      "aliases": [
+        "Yemen"
+      ]
+    },
+    {
+      "stable_key": "id::ZA",
+      "feature_id": "ZA",
+      "country_code": "ZA",
+      "primary_name": "South Africa",
+      "aliases": [
+        "South Africa"
+      ]
+    },
+    {
+      "stable_key": "id::ZM",
+      "feature_id": "ZM",
+      "country_code": "ZM",
+      "primary_name": "Zambia",
+      "aliases": [
+        "Zambia"
+      ]
+    },
+    {
+      "stable_key": "id::ZW",
+      "feature_id": "ZW",
+      "country_code": "ZW",
+      "primary_name": "Zimbabwe",
+      "aliases": [
+        "Zimbabwe"
+      ]
+    }
+  ],
+  "alias_to_stable_key": {
+    "Afghanistan": "id::AF",
+    "Aland": "id::AX",
+    "Albania": "id::AL",
+    "Algeria": "id::DZ",
+    "Andorra": "id::AD",
+    "Angola": "id::AO",
+    "Antarctica": "id::AQ",
+    "Argentina": "id::AR",
+    "Armenia": "id::AM",
+    "Ashmore and Cartier Islands": "id::AU__1",
+    "Australia": "id::AU",
+    "Austria": "id::AT",
+    "Azerbaijan": "id::AZ",
+    "Bahrain": "id::BH",
+    "Bangladesh": "id::BD",
+    "Belarus": "id::BY",
+    "Belgium": "id::BE",
+    "Belize": "id::BZ",
+    "Benin": "id::BJ",
+    "Bhutan": "id::BT",
+    "Bolivia": "id::BO",
+    "Bosnia and Herzegovina": "id::BA",
+    "Botswana": "id::BW",
+    "Brazil": "id::BR",
+    "British Indian Ocean Territory": "id::IO",
+    "Brunei": "id::BN",
+    "Bulgaria": "id::BG",
+    "Burkina Faso": "id::BF",
+    "Burundi": "id::BI",
+    "Cabo Verde": "id::CV",
+    "Cambodia": "id::KH",
+    "Cameroon": "id::CM",
+    "Canada": "id::CA",
+    "Central African Republic": "id::CF",
+    "Chad": "id::TD",
+    "Chile": "id::CL",
+    "China": "id::CN",
+    "Colombia": "id::CO",
+    "Comoros": "id::KM",
+    "Costa Rica": "id::CR",
+    "Croatia": "id::HR",
+    "Cuba": "id::CU",
+    "Cyprus": "id::CY",
+    "Czechia": "id::CZ",
+    "Democratic Republic of the Congo": "id::CD",
+    "Denmark": "id::DK",
+    "Djibouti": "id::DJ",
+    "Dominican Republic": "id::DO",
+    "East Timor": "id::TL",
+    "Ecuador": "id::EC",
+    "Egypt": "id::EG",
+    "El Salvador": "id::SV",
+    "Equatorial Guinea": "id::GQ",
+    "Eritrea": "id::ER",
+    "Estonia": "id::EE",
+    "Ethiopia": "id::ET",
+    "Falkland Islands": "id::FK",
+    "Faroe Islands": "id::FO",
+    "Finland": "id::FI",
+    "France": "id::FR",
+    "French Southern and Antarctic Lands": "id::TF",
+    "Gabon": "id::GA",
+    "Gambia": "id::GM",
+    "Georgia": "id::GE",
+    "Germany": "id::DE",
+    "Ghana": "id::GH",
+    "Greece": "id::GR",
+    "Greenland": "id::GL",
+    "Guatemala": "id::GT",
+    "Guernsey": "id::GG",
+    "Guinea": "id::GN",
+    "Guinea-Bissau": "id::GW",
+    "Guyana": "id::GY",
+    "Haiti": "id::HT",
+    "Heard Island and McDonald Islands": "id::HM",
+    "Honduras": "id::HN",
+    "Hong Kong S.A.R.": "id::HK",
+    "Hungary": "id::HU",
+    "Iceland": "id::IS",
+    "India": "id::IN",
+    "Indian Ocean Territories": "id::AU__2",
+    "Indonesia": "id::ID",
+    "Iran": "id::IR",
+    "Iraq": "id::IQ",
+    "Ireland": "id::IE",
+    "Isle of Man": "id::IM",
+    "Israel": "id::IL",
+    "Italy": "id::IT",
+    "Ivory Coast": "id::CI",
+    "Jamaica": "id::JM",
+    "Japan": "id::JP",
+    "Jersey": "id::JE",
+    "Jordan": "id::JO",
+    "Kazakhstan": "id::KZ",
+    "Kenya": "id::KE",
+    "Kosovo": "id::XK",
+    "Kuwait": "id::KW",
+    "Kyrgyzstan": "id::KG",
+    "Laos": "id::LA",
+    "Latvia": "id::LV",
+    "Lebanon": "id::LB",
+    "Lesotho": "id::LS",
+    "Liberia": "id::LR",
+    "Libya": "id::LY",
+    "Liechtenstein": "id::LI",
+    "Lithuania": "id::LT",
+    "Luxembourg": "id::LU",
+    "Macao S.A.R": "id::MO",
+    "Madagascar": "id::MG",
+    "Malawi": "id::MW",
+    "Malaysia": "id::MY",
+    "Maldives": "id::MV",
+    "Mali": "id::ML",
+    "Malta": "id::MT",
+    "Mauritania": "id::MR",
+    "Mauritius": "id::MU",
+    "Mexico": "id::MX",
+    "Moldova": "id::MD",
+    "Monaco": "id::MC",
+    "Mongolia": "id::MN",
+    "Montenegro": "id::ME",
+    "Morocco": "id::MA",
+    "Mozambique": "id::MZ",
+    "Myanmar": "id::MM",
+    "Namibia": "id::NA",
+    "Nepal": "id::NP",
+    "Netherlands": "id::NL",
+    "New Zealand": "id::NZ",
+    "Nicaragua": "id::NI",
+    "Niger": "id::NE",
+    "Nigeria": "id::NG",
+    "North Korea": "id::KP",
+    "North Macedonia": "id::MK",
+    "Norway": "id::NO",
+    "Oman": "id::OM",
+    "Pakistan": "id::PK",
+    "Palestine": "id::PS",
+    "Panama": "id::PA",
+    "Papua New Guinea": "id::PG",
+    "Paraguay": "id::PY",
+    "Peru": "id::PE",
+    "Philippines": "id::PH",
+    "Poland": "id::PL",
+    "Portugal": "id::PT",
+    "Puerto Rico": "id::PR",
+    "Qatar": "id::QA",
+    "Republic of Serbia": "id::RS",
+    "Republic of the Congo": "id::CG",
+    "Romania": "id::RO",
+    "Russia": "id::RU",
+    "Rwanda": "id::RW",
+    "Saint Helena": "id::SH",
+    "Saint Pierre and Miquelon": "id::PM",
+    "San Marino": "id::SM",
+    "Saudi Arabia": "id::SA",
+    "Senegal": "id::SN",
+    "Seychelles": "id::SC",
+    "Sierra Leone": "id::SL",
+    "Singapore": "id::SG",
+    "Slovakia": "id::SK",
+    "Slovenia": "id::SI",
+    "Somalia": "id::SO",
+    "South Africa": "id::ZA",
+    "South Georgia and the Islands": "id::GS",
+    "South Korea": "id::KR",
+    "South Sudan": "id::SS",
+    "Spain": "id::ES",
+    "Sri Lanka": "id::LK",
+    "Sudan": "id::SD",
+    "Suriname": "id::SR",
+    "Sweden": "id::SE",
+    "Switzerland": "id::CH",
+    "Syria": "id::SY",
+    "São Tomé and Principe": "id::ST",
+    "Taiwan": "id::TW",
+    "Tajikistan": "id::TJ",
+    "Thailand": "id::TH",
+    "The Bahamas": "id::BS",
+    "Togo": "id::TG",
+    "Trinidad and Tobago": "id::TT",
+    "Tunisia": "id::TN",
+    "Turkey": "id::TR",
+    "Turkmenistan": "id::TM",
+    "Uganda": "id::UG",
+    "Ukraine": "id::UA",
+    "United Arab Emirates": "id::AE",
+    "United Kingdom": "id::GB",
+    "United Republic of Tanzania": "id::TZ",
+    "United States of America": "id::US",
+    "Uruguay": "id::UY",
+    "Uzbekistan": "id::UZ",
+    "Vatican": "id::VA",
+    "Venezuela": "id::VE",
+    "Vietnam": "id::VN",
+    "Western Sahara": "id::EH",
+    "Yemen": "id::YE",
+    "Zambia": "id::ZM",
+    "Zimbabwe": "id::ZW",
+    "eSwatini": "id::SZ"
+  }
+}

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 from collections import Counter
 
 import geopandas as gpd
@@ -90,6 +91,39 @@ def _count_arc_sharing(geometries: list[dict]) -> dict:
     shared = sum(1 for c in arc_usage.values() if c > 1)
     single = sum(1 for c in arc_usage.values() if c == 1)
     return {"shared": shared, "single": single, "total_referenced": len(arc_usage)}
+
+
+def _extract_country_code_from_id(value: object) -> str:
+    text = str(value or "").strip().upper()
+    if not text:
+        return ""
+    prefix = text.split("_")[0].split("-")[0]
+    if re.fullmatch(r"[A-Z]{2,3}", prefix):
+        return prefix
+    alpha_prefix = re.match(r"^[A-Z]{2,3}", prefix)
+    return alpha_prefix.group(0) if alpha_prefix else ""
+
+
+def _normalize_country_code(props: dict, stable_id: str) -> str:
+    candidates = [
+        props.get("cntr_code"),
+        props.get("CNTR_CODE"),
+        props.get("iso_a2"),
+        props.get("ISO_A2"),
+        props.get("iso_a2_eh"),
+        props.get("ISO_A2_EH"),
+        props.get("adm0_a2"),
+        props.get("ADM0_A2"),
+        _extract_country_code_from_id(stable_id),
+    ]
+    for candidate in candidates:
+        code = str(candidate or "").strip().upper()
+        if code in {"", "-99", "NONE", "NULL"}:
+            continue
+        code = re.sub(r"[^A-Z]", "", code)
+        if re.fullmatch(r"[A-Z]{2,3}", code):
+            return code
+    return "UNK"
 
 
 def build_topology(
@@ -228,19 +262,24 @@ def build_topology(
         output_path.write_text(topo_json, encoding="utf-8")
         return
 
-    # 1. Fix top-level geometry IDs: promote properties.id to geometry.id
+    # 1. Fix geometry IDs + country code normalization
     id_set: set[str] = set()
     for i, geom in enumerate(geometries):
-        props = geom.get("properties", {})
-        stable_id = str(props.get("id", "")).strip()
+        props = geom.get("properties")
+        if not isinstance(props, dict):
+            props = {}
+            geom["properties"] = props
+
+        stable_id = str(props.get("id", "")).strip() or str(geom.get("id", "")).strip()
         if not stable_id:
             stable_id = f"feature-{i}"
-            props["id"] = stable_id
         # Ensure uniqueness
         if stable_id in id_set:
             stable_id = f"{stable_id}__dup{i}"
-            props["id"] = stable_id
         id_set.add(stable_id)
+
+        props["id"] = stable_id
+        props["cntr_code"] = _normalize_country_code(props, stable_id)
         geom["id"] = stable_id
 
     # 2. Count arc-level sharing (from the topojson library output)
@@ -301,10 +340,26 @@ def build_topology(
         print(f"  - Country adjacency: {len(country_adj)} countries with cross-border neighbors")
 
     # 4. Final validation
-    sample = geometries[0].get("properties", {})
-    missing = [key for key in ("id", "cntr_code") if key not in sample]
-    if missing:
-        print(f"  - WARNING: TopoJSON missing properties: {missing}")
+    missing_id_count = 0
+    missing_code_count = 0
+    mismatch_id_count = 0
+    for geom in geometries:
+        props = geom.get("properties", {})
+        pid = str(props.get("id", "")).strip()
+        gid = str(geom.get("id", "")).strip()
+        code = str(props.get("cntr_code", "")).strip()
+        if not pid:
+            missing_id_count += 1
+        if not code:
+            missing_code_count += 1
+        if pid != gid:
+            mismatch_id_count += 1
+    if missing_id_count or missing_code_count or mismatch_id_count:
+        raise ValueError(
+            "Political topology schema invalid: "
+            f"missing id={missing_id_count}, missing cntr_code={missing_code_count}, "
+            f"id mismatches={mismatch_id_count}"
+        )
 
     # Verify top-level IDs are strings, not numeric indices
     sample_ids = [g.get("id") for g in geometries[:5]]

@@ -43,12 +43,11 @@ import geopandas as gpd
 import pandas as pd
 import requests
 from shapely.geometry import box
-from shapely.ops import clip_by_rect
 
 from map_builder import config as cfg
 from map_builder.geo.topology import build_topology
 from map_builder.geo.utils import (
-    clip_to_europe_bounds,
+    clip_to_map_bounds,
     pick_column,
     smart_island_cull,
 )
@@ -62,69 +61,7 @@ from map_builder.processors.russia_ukraine import apply_russia_ukraine_replaceme
 from map_builder.processors.south_asia import apply_south_asia_replacement
 from map_builder.processors.special_zones import build_special_zones
 from map_builder.outputs.save import save_outputs
-from tools import generate_hierarchy, translate_manager
-
-
-LATITUDE_CROP_BOUNDS = (-180.0, -55.0, 180.0, 73.0)
-LATITUDE_CROP_BOX = box(*LATITUDE_CROP_BOUNDS)
-
-
-def crop_to_latitude_band(gdf: gpd.GeoDataFrame, label: str) -> gpd.GeoDataFrame:
-    if gdf is None or gdf.empty or "geometry" not in gdf.columns:
-        return gdf
-
-    minx, miny, maxx, maxy = LATITUDE_CROP_BOUNDS
-    cropped = gdf.to_crs("EPSG:4326").copy()
-    try:
-        cropped = cropped.cx[minx:maxx, miny:maxy].copy()
-    except Exception:
-        # If spatial slicing is unavailable, fall back to full geometry clipping.
-        pass
-
-    # Large background polygons (ocean/land) can produce clipping artifacts with
-    # low-level rectangle clipping; use GeoPandas clip for these layers.
-    if label in {"ocean", "land background"}:
-        try:
-            cropped = gpd.clip(cropped, LATITUDE_CROP_BOX)
-        except Exception as exc:
-            print(f"Latitude crop ({label}) fallback after clip failure: {exc}")
-            try:
-                if hasattr(cropped.geometry, "make_valid"):
-                    cropped = cropped.set_geometry(cropped.geometry.make_valid())
-                else:
-                    cropped = cropped.set_geometry(cropped.geometry.buffer(0))
-                cropped = gpd.clip(cropped, LATITUDE_CROP_BOX)
-            except Exception as fix_exc:
-                print(f"Latitude crop ({label}) skipped due to clip errors: {fix_exc}")
-    else:
-        def _clip_geom(geom):
-            if geom is None or geom.is_empty:
-                return geom
-            try:
-                return clip_by_rect(geom, minx, miny, maxx, maxy)
-            except Exception:
-                return geom.intersection(LATITUDE_CROP_BOX)
-
-        cropped["geometry"] = cropped.geometry.apply(_clip_geom)
-
-    if hasattr(cropped.geometry, "is_valid"):
-        invalid = ~cropped.geometry.is_valid
-        if invalid.any():
-            try:
-                if hasattr(cropped.geometry, "make_valid"):
-                    cropped.loc[invalid, "geometry"] = cropped.loc[invalid, "geometry"].make_valid()
-                else:
-                    cropped.loc[invalid, "geometry"] = cropped.loc[invalid, "geometry"].buffer(0)
-            except Exception as exc:
-                print(f"Latitude crop ({label}) geometry fix failed: {exc}")
-
-    before = len(cropped)
-    cropped = cropped[cropped.geometry.notna()]
-    cropped = cropped[~cropped.geometry.is_empty]
-    dropped = before - len(cropped)
-    if dropped:
-        print(f"Latitude crop ({label}): removed {dropped} empty geometries.")
-    return cropped
+from tools import generate_hierarchy, geo_key_normalizer, translate_manager
 
 
 def cull_small_geometries(
@@ -185,38 +122,106 @@ def build_geodataframe(data: dict) -> gpd.GeoDataFrame:
         print("GeoDataFrame is empty. Check the downloaded data.")
         raise SystemExit(1)
     if gdf.crs is None:
-        gdf = gdf.set_crs("EPSG:3035", allow_override=True)
+        gdf = gdf.set_crs("EPSG:4326", allow_override=True)
     if gdf.crs.to_epsg() != 4326:
         gdf = gdf.to_crs("EPSG:4326")
     return gdf
 
 
 def filter_countries(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    print("Filtering NUTS-3 to Europe...")
+    print("Filtering global political features...")
     filtered = gdf.copy()
-    if "NUTS_ID" in filtered.columns:
-        mask = ~filtered["NUTS_ID"].str.startswith(cfg.EXCLUDED_NUTS_PREFIXES)
-        filtered = filtered[mask]
-    else:
-        print("Column NUTS_ID not found; overseas prefix filter skipped.")
+    iso_candidates = [
+        "iso_a2",
+        "ISO_A2",
+        "iso_a2_eh",
+        "ISO_A2_EH",
+        "adm0_a2",
+        "ADM0_A2",
+        "iso_3166_1_",
+        "ISO_3166_1_",
+    ]
+    iso_cols = [col for col in iso_candidates if col in filtered.columns]
+    name_col = pick_column(filtered, ["ADMIN", "admin", "NAME", "name", "NAME_EN", "name_en"])
 
-    try:
-        gdf_ll = filtered.to_crs("EPSG:4326")
-        reps = gdf_ll.geometry.representative_point()
-        geo_mask = (reps.y >= 30) & (reps.x >= -30)
-        filtered = filtered.loc[geo_mask].copy()
-    except Exception as exc:
-        print(f"Geographic filter skipped due to error: {exc}")
+    if not iso_cols:
+        print("Country filter failed: missing ISO A2 column.")
+        raise SystemExit(1)
+
+    # Resolve ISO per row: fallback across available A2 columns
+    # (e.g. France has ISO_A2=-99 but ISO_A2_EH=FR in Natural Earth).
+    iso_values = filtered[iso_cols].copy()
+    for col in iso_cols:
+        normalized = iso_values[col].fillna("").astype(str).str.upper().str.strip()
+        normalized = normalized.where(normalized.str.match(r"^[A-Z]{2}$"), "")
+        iso_values[col] = normalized.where(normalized != "-99", "")
+    filtered["cntr_code"] = (
+        iso_values.replace("", pd.NA).bfill(axis=1).iloc[:, 0].fillna("")
+    )
+    filtered = filtered[filtered["cntr_code"] != ""].copy()
+
+    target_codes = set(getattr(cfg, "COUNTRIES", set()) or set())
+    if target_codes:
+        filtered = filtered[filtered["cntr_code"].isin(target_codes)].copy()
+
+    blacklist = set(getattr(cfg, "MICRO_ISLAND_BLACKLIST", set()) or set())
+    if blacklist:
+        filtered = filtered[~filtered["cntr_code"].isin(blacklist)].copy()
+
+    if name_col:
+        filtered["name"] = filtered[name_col].fillna("").astype(str).str.strip()
+    else:
+        filtered["name"] = filtered["cntr_code"]
+    filtered.loc[filtered["name"] == "", "name"] = filtered.loc[filtered["name"] == "", "cntr_code"]
+
+    filtered["id"] = filtered["cntr_code"].astype(str)
+    dup_ordinals = filtered.groupby("id").cumcount()
+    dup_mask = dup_ordinals > 0
+    if dup_mask.any():
+        filtered.loc[dup_mask, "id"] = (
+            filtered.loc[dup_mask, "id"] + "__" + dup_ordinals.loc[dup_mask].astype(str)
+        )
+
+    filtered = filtered[["id", "name", "cntr_code", "geometry"]].copy()
+    filtered = filtered[filtered.geometry.notna() & ~filtered.geometry.is_empty].copy()
 
     if filtered.empty:
-        print("Filtered GeoDataFrame is empty. Check NUTS data scope.")
+        print("Filtered GeoDataFrame is empty. Check configured countries and blacklist.")
         raise SystemExit(1)
-    return filtered
+    return gpd.GeoDataFrame(filtered, crs="EPSG:4326")
+
+
+def validate_political_schema(gdf: gpd.GeoDataFrame, label: str = "Political Filter") -> None:
+    if gdf is None or gdf.empty:
+        raise SystemExit(f"{label}: dataset is empty.")
+    if "id" not in gdf.columns or "cntr_code" not in gdf.columns:
+        raise SystemExit(f"{label}: required columns 'id'/'cntr_code' are missing.")
+
+    ids = gdf["id"].fillna("").astype(str).str.strip()
+    codes = gdf["cntr_code"].fillna("").astype(str).str.upper().str.strip()
+    empty_id_count = int((ids == "").sum())
+    empty_code_count = int((codes == "").sum())
+    duplicate_id_count = int(ids.duplicated().sum())
+    unique_country_count = int(codes[codes != ""].nunique())
+    deduped_id_count = int(ids.str.contains("__", regex=False).sum())
+
+    print(
+        f"[{label}] rows={len(gdf)}, countries={unique_country_count}, "
+        f"deduped_ids={deduped_id_count}, duplicate_ids={duplicate_id_count}, "
+        f"empty_id={empty_id_count}, empty_cntr_code={empty_code_count}"
+    )
+
+    if empty_id_count > 0:
+        raise SystemExit(f"{label}: found empty id values.")
+    if empty_code_count > 0:
+        raise SystemExit(f"{label}: found empty cntr_code values.")
+    if duplicate_id_count > 0:
+        raise SystemExit(f"{label}: found duplicate id values.")
 
 
 def build_border_lines() -> gpd.GeoDataFrame:
     border_lines = fetch_ne_zip(cfg.BORDER_LINES_URL, "border_lines")
-    border_lines = clip_to_europe_bounds(border_lines, "border lines")
+    border_lines = clip_to_map_bounds(border_lines, "border lines")
     border_lines = border_lines.copy()
     border_lines["geometry"] = border_lines.geometry.simplify(
         tolerance=cfg.SIMPLIFY_BORDER_LINES, preserve_topology=True
@@ -326,7 +331,7 @@ def build_balkan_fallback(
     if admin0 is None:
         admin0 = fetch_ne_zip(cfg.BORDERS_URL, "admin0_balkan")
     admin0 = admin0.to_crs("EPSG:4326")
-    admin0 = clip_to_europe_bounds(admin0, "balkan fallback")
+    admin0 = clip_to_map_bounds(admin0, "balkan fallback")
 
     iso_col = pick_column(
         admin0,
@@ -404,7 +409,7 @@ def load_subdivision_admin1_context(subdivision_codes: set[str]) -> gpd.GeoDataF
 
     admin1 = fetch_ne_zip(cfg.ADMIN1_URL, "admin1_subdivisions")
     admin1 = admin1.to_crs("EPSG:4326")
-    admin1 = clip_to_europe_bounds(admin1, "admin1 subdivisions")
+    admin1 = clip_to_map_bounds(admin1, "admin1 subdivisions")
 
     iso_col = pick_column(admin1, ["iso_a2", "adm0_a2", "iso_3166_1_", "ISO_A2", "ADM0_A2"])
     name_col = pick_column(admin1, ["name", "name_en", "gn_name", "NAME", "NAME_EN"])
@@ -556,20 +561,30 @@ def apply_config_subdivisions(hybrid: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
 
 def main() -> None:
-    data = fetch_geojson(cfg.URL)
-    gdf = build_geodataframe(data)
-    gdf = clip_to_europe_bounds(gdf, "nuts")
-    filtered = filter_countries(gdf)
-    filtered = filtered.copy()
-    filtered["geometry"] = filtered.geometry.simplify(
-        tolerance=cfg.SIMPLIFY_NUTS3, preserve_topology=True
-    )
-    rivers_clipped = load_rivers()
     borders = fetch_ne_zip(cfg.BORDERS_URL, "borders")
-    borders = clip_to_europe_bounds(borders, "borders")
+    borders = clip_to_map_bounds(borders, "borders")
+
+    if getattr(cfg, "GLOBAL_SKELETON_MODE", False):
+        filtered = filter_countries(borders)
+        filtered = filtered.copy()
+        filtered["geometry"] = filtered.geometry.simplify(
+            tolerance=cfg.SIMPLIFY_BORDERS, preserve_topology=True
+        )
+    else:
+        data = fetch_geojson(cfg.URL)
+        gdf = build_geodataframe(data)
+        gdf = clip_to_map_bounds(gdf, "nuts")
+        filtered = filter_countries(gdf)
+        filtered = filtered.copy()
+        filtered["geometry"] = filtered.geometry.simplify(
+            tolerance=cfg.SIMPLIFY_NUTS3, preserve_topology=True
+        )
+    validate_political_schema(filtered, "Political Filter")
+
+    rivers_clipped = load_rivers()
     border_lines = build_border_lines()
     ocean = fetch_ne_zip(cfg.OCEAN_URL, "ocean")
-    ocean = clip_to_europe_bounds(ocean, "ocean")
+    ocean = clip_to_map_bounds(ocean, "ocean")
     # Keep raw ocean geometry until political bounds are finalized to avoid
     # early bbox clipping artifacts.
     ocean_clipped = ocean.copy()
@@ -578,7 +593,7 @@ def main() -> None:
         tolerance=cfg.SIMPLIFY_BACKGROUND, preserve_topology=True
     )
     land_bg = fetch_ne_zip(cfg.LAND_BG_URL, "land")
-    land_bg = clip_to_europe_bounds(land_bg, "land background")
+    land_bg = clip_to_map_bounds(land_bg, "land background")
     # Keep raw land background geometry until political bounds are finalized.
     land_bg_clipped = land_bg.copy()
     land_bg_clipped = land_bg_clipped.copy()
@@ -595,7 +610,7 @@ def main() -> None:
     if physical_filtered.empty:
         print("Physical regions filter returned empty dataset, keeping all clipped features.")
         physical_filtered = fetch_ne_zip(cfg.PHYSICAL_URL, "physical")
-        physical_filtered = clip_to_europe_bounds(physical_filtered, "physical")
+        physical_filtered = clip_to_map_bounds(physical_filtered, "physical")
     # Simplify physical regions to reduce vertex count
     physical_filtered = physical_filtered.copy()
     physical_filtered["geometry"] = physical_filtered.geometry.simplify(
@@ -613,60 +628,57 @@ def main() -> None:
     ]
     physical_filtered = physical_filtered[[col for col in keep_cols if col in physical_filtered.columns]]
 
-    # Build hybrid interactive layer (NUTS-3 + Admin-1 extension)
-    nuts_name_col = "NUTS_NAME" if "NUTS_NAME" in filtered.columns else "NAME_LATN"
-    nuts_hybrid = filtered.rename(
-        columns={
-            "NUTS_ID": "id",
-            nuts_name_col: "name",
-            "CNTR_CODE": "cntr_code",
-        }
-    )[["id", "name", "cntr_code", "geometry"]].copy()
+    # Build hybrid interactive layer.
+    nuts_hybrid = filtered[["id", "name", "cntr_code", "geometry"]].copy()
 
-    extension_hybrid = build_extension_admin1(filtered)
-    hybrid = gpd.GeoDataFrame(
-        pd.concat([nuts_hybrid, extension_hybrid], ignore_index=True),
-        crs="EPSG:4326",
-    )
-    balkan_fallback = build_balkan_fallback(hybrid, admin0=borders)
-    if not balkan_fallback.empty:
-        hybrid = gpd.GeoDataFrame(
-            pd.concat([hybrid, balkan_fallback], ignore_index=True),
-            crs="EPSG:4326",
-        )
-    hybrid = apply_holistic_replacements(hybrid)
-    hybrid = apply_russia_ukraine_replacement(hybrid)
-    hybrid = apply_poland_replacement(hybrid)
-    hybrid = apply_china_replacement(hybrid)
     special_zones = gpd.GeoDataFrame(
         columns=["id", "name", "type", "label", "claimants", "cntr_code", "geometry"],
         crs="EPSG:4326",
     )
-    try:
-        print("Downloading India ADM2 (raw) for special zones...")
-        india_raw = fetch_or_load_geojson(
-            cfg.IND_ADM2_URL,
-            cfg.IND_ADM2_FILENAME,
-            fallback_urls=cfg.IND_ADM2_FALLBACK_URLS,
+    hybrid = nuts_hybrid.copy()
+
+    if not getattr(cfg, "GLOBAL_SKELETON_MODE", False):
+        extension_hybrid = build_extension_admin1(filtered)
+        hybrid = gpd.GeoDataFrame(
+            pd.concat([nuts_hybrid, extension_hybrid], ignore_index=True),
+            crs="EPSG:4326",
         )
-        if india_raw.empty:
-            print("[Special Zones] India ADM2 GeoDataFrame is empty; skipping disputed zone.")
-        else:
-            if india_raw.crs is None:
-                india_raw = india_raw.set_crs("EPSG:4326", allow_override=True)
-            if india_raw.crs.to_epsg() != 4326:
-                india_raw = india_raw.to_crs("EPSG:4326")
-            china_gdf = hybrid[
-                hybrid["cntr_code"].astype(str).str.upper() == "CN"
-            ].copy()
-            special_zones = build_special_zones(china_gdf, india_raw)
-            if special_zones.empty:
-                print("[Special Zones] No special zones were generated.")
+        balkan_fallback = build_balkan_fallback(hybrid, admin0=borders)
+        if not balkan_fallback.empty:
+            hybrid = gpd.GeoDataFrame(
+                pd.concat([hybrid, balkan_fallback], ignore_index=True),
+                crs="EPSG:4326",
+            )
+        hybrid = apply_holistic_replacements(hybrid)
+        hybrid = apply_russia_ukraine_replacement(hybrid)
+        hybrid = apply_poland_replacement(hybrid)
+        hybrid = apply_china_replacement(hybrid)
+        try:
+            print("Downloading India ADM2 (raw) for special zones...")
+            india_raw = fetch_or_load_geojson(
+                cfg.IND_ADM2_URL,
+                cfg.IND_ADM2_FILENAME,
+                fallback_urls=cfg.IND_ADM2_FALLBACK_URLS,
+            )
+            if india_raw.empty:
+                print("[Special Zones] India ADM2 GeoDataFrame is empty; skipping disputed zone.")
             else:
-                print(f"[Special Zones] Generated {len(special_zones)} special zones.")
-    except Exception as exc:
-        print(f"[Special Zones] Failed to build special zones; continuing without: {exc}")
-    hybrid = apply_south_asia_replacement(hybrid, land_bg_clipped)
+                if india_raw.crs is None:
+                    india_raw = india_raw.set_crs("EPSG:4326", allow_override=True)
+                if india_raw.crs.to_epsg() != 4326:
+                    india_raw = india_raw.to_crs("EPSG:4326")
+                china_gdf = hybrid[
+                    hybrid["cntr_code"].astype(str).str.upper() == "CN"
+                ].copy()
+                special_zones = build_special_zones(china_gdf, india_raw)
+                if special_zones.empty:
+                    print("[Special Zones] No special zones were generated.")
+                else:
+                    print(f"[Special Zones] Generated {len(special_zones)} special zones.")
+        except Exception as exc:
+            print(f"[Special Zones] Failed to build special zones; continuing without: {exc}")
+        hybrid = apply_south_asia_replacement(hybrid, land_bg_clipped)
+
     final_hybrid = hybrid.copy()
 
     final_hybrid["cntr_code"] = final_hybrid["cntr_code"].fillna("").astype(str).str.strip()
@@ -713,7 +725,8 @@ def main() -> None:
         .str.upper()
     )
     final_hybrid.loc[final_hybrid["cntr_code"] == "", "cntr_code"] = None
-    final_hybrid = apply_config_subdivisions(final_hybrid)
+    if getattr(cfg, "ENABLE_SUBDIVISION_ENRICHMENT", False):
+        final_hybrid = apply_config_subdivisions(final_hybrid)
 
     # Re-clip background layers to the final political extent.
     try:
@@ -729,19 +742,9 @@ def main() -> None:
     except Exception as exc:
         print(f"Background layer clip-to-political-bounds skipped: {exc}")
 
-    filtered = crop_to_latitude_band(filtered, "land")
-    rivers_clipped = crop_to_latitude_band(rivers_clipped, "rivers")
-    border_lines = crop_to_latitude_band(border_lines, "border lines")
-    ocean_clipped = crop_to_latitude_band(ocean_clipped, "ocean")
-    land_bg_clipped = crop_to_latitude_band(land_bg_clipped, "land background")
-    urban_clipped = crop_to_latitude_band(urban_clipped, "urban")
-    physical_filtered = crop_to_latitude_band(physical_filtered, "physical")
-    hybrid = crop_to_latitude_band(hybrid, "hybrid")
-    final_hybrid = crop_to_latitude_band(final_hybrid, "political")
-    special_zones = crop_to_latitude_band(special_zones, "special zones")
-
     # Global polygon culling pass to reduce payload while preserving VIP geometries.
-    filtered = cull_small_geometries(filtered, "land", group_col="NUTS_ID")
+    filtered_group_col = "id" if "id" in filtered.columns else "NUTS_ID"
+    filtered = cull_small_geometries(filtered, "land", group_col=filtered_group_col)
     ocean_clipped = cull_small_geometries(ocean_clipped, "ocean")
     land_bg_clipped = cull_small_geometries(land_bg_clipped, "land background")
     urban_clipped = cull_small_geometries(urban_clipped, "urban")
@@ -807,6 +810,9 @@ def main() -> None:
 
     print("[INFO] Generating Hierarchy Data....")
     generate_hierarchy.main()
+
+    print("[INFO] Normalizing GEO keys....")
+    geo_key_normalizer.main()
 
     print("[INFO] Syncing Translations....")
     translate_manager.main()

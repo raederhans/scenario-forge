@@ -5,7 +5,7 @@ import geopandas as gpd
 import pandas as pd
 
 from map_builder import config as cfg
-from map_builder.geo.utils import clip_to_europe_bounds, pick_column
+from map_builder.geo.utils import clip_to_map_bounds, pick_column
 from map_builder.io.fetch import fetch_ne_zip
 
 
@@ -25,7 +25,7 @@ def extract_country_code(id_val: object) -> str:
 def build_extension_admin1(land: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     admin1 = fetch_ne_zip(cfg.ADMIN1_URL, "admin1")
     admin1 = admin1.to_crs("EPSG:4326")
-    admin1 = clip_to_europe_bounds(admin1, "admin1")
+    admin1 = clip_to_map_bounds(admin1, "admin1")
 
     name_col = pick_column(admin1, ["adm0_name", "admin", "admin0_name"])
     iso_col = pick_column(admin1, ["iso_a2", "adm0_a2", "iso_3166_1_"])

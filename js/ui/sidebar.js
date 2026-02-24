@@ -1,6 +1,6 @@
 // Sidebar UI (Phase 13)
 import { state, countryNames, countryPresets, PRESET_STORAGE_KEY, defaultCountryPalette } from "../core/state.js";
-import { invalidateBorderCache, renderLegend } from "../core/map_renderer.js";
+import * as mapRenderer from "../core/map_renderer.js";
 import { applyCountryColor, resetCountryColors } from "../core/logic.js";
 import { FileManager } from "../core/file_manager.js";
 import { LegendManager } from "../core/legend_manager.js";
@@ -94,9 +94,9 @@ function applyHierarchyGroup(group, color, render) {
   if (!group || !group.children) return;
   const colorToApply = color || state.selectedColor;
   group.children.forEach((id) => {
-    state.colors[id] = colorToApply;
+    state.featureOverrides[id] = colorToApply;
   });
-  invalidateBorderCache();
+  mapRenderer.refreshColorState({ renderNow: false });
   if (render) render();
   addRecentColor(colorToApply);
 }
@@ -124,10 +124,10 @@ function applyPreset(countryCode, presetIndex, color, render) {
   const colorToApply = color || state.selectedColor;
 
   preset.ids.forEach((id) => {
-    state.colors[id] = colorToApply;
+    state.featureOverrides[id] = colorToApply;
   });
 
-  invalidateBorderCache();
+  mapRenderer.refreshColorState({ renderNow: false });
   if (render) render();
 
   if (!state.recentColors.includes(colorToApply)) {
@@ -196,18 +196,23 @@ function initSidebar({ render } = {}) {
   const searchInput = document.getElementById("countrySearch");
   const resetBtn = document.getElementById("resetCountryColors");
   const sidebar = document.getElementById("rightSidebar");
-  const sidebarStack = sidebar?.querySelector(".space-y-5");
+  const sidebarStack = sidebar?.querySelector(".sidebar-sections, .space-y-5") || sidebar;
 
   let projectSection = document.getElementById("projectManagement");
   if (!projectSection && sidebarStack) {
     projectSection = document.createElement("div");
     projectSection.id = "projectManagement";
-    projectSection.className = "rounded-lg border border-slate-200 bg-white p-4";
+    projectSection.className = "card sidebar-tool-card";
 
     const title = document.createElement("div");
     title.id = "lblProjectManagement";
-    title.className = "text-xs font-semibold uppercase tracking-wide text-slate-500";
+    title.className = "section-header sidebar-tool-title";
     title.textContent = t("Project Management", "ui");
+
+    const hint = document.createElement("p");
+    hint.id = "lblProjectHint";
+    hint.className = "sidebar-tool-hint";
+    hint.textContent = t("Save or load your map state as a project file.", "ui");
 
     const actions = document.createElement("div");
     actions.className = "mt-3 flex flex-col gap-2";
@@ -215,15 +220,13 @@ function initSidebar({ render } = {}) {
     const downloadBtn = document.createElement("button");
     downloadBtn.id = "downloadProjectBtn";
     downloadBtn.type = "button";
-    downloadBtn.className =
-      "w-full rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800";
+    downloadBtn.className = "btn-primary";
     downloadBtn.textContent = t("Download Project", "ui");
 
     const uploadBtn = document.createElement("button");
     uploadBtn.id = "uploadProjectBtn";
     uploadBtn.type = "button";
-    uploadBtn.className =
-      "w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100";
+    uploadBtn.className = "btn-secondary";
     uploadBtn.textContent = t("Load Project", "ui");
 
     const fileInput = document.createElement("input");
@@ -232,11 +235,30 @@ function initSidebar({ render } = {}) {
     fileInput.accept = ".json,application/json";
     fileInput.className = "hidden";
 
+    const fileMeta = document.createElement("div");
+    fileMeta.id = "projectFileMeta";
+    fileMeta.className = "project-file-meta";
+
+    const fileMetaLabel = document.createElement("span");
+    fileMetaLabel.id = "lblProjectFile";
+    fileMetaLabel.className = "section-header";
+    fileMetaLabel.textContent = t("Selected File", "ui");
+
+    const fileName = document.createElement("span");
+    fileName.id = "projectFileName";
+    fileName.className = "project-file-name";
+    fileName.textContent = t("No file selected", "ui");
+
+    fileMeta.appendChild(fileMetaLabel);
+    fileMeta.appendChild(fileName);
+
     actions.appendChild(downloadBtn);
     actions.appendChild(uploadBtn);
+    actions.appendChild(fileMeta);
     actions.appendChild(fileInput);
 
     projectSection.appendChild(title);
+    projectSection.appendChild(hint);
     projectSection.appendChild(actions);
     sidebarStack.appendChild(projectSection);
   }
@@ -245,26 +267,85 @@ function initSidebar({ render } = {}) {
   if (!legendSection && sidebarStack) {
     legendSection = document.createElement("div");
     legendSection.id = "legendEditor";
-    legendSection.className = "rounded-lg border border-slate-200 bg-white p-4";
+    legendSection.className = "card sidebar-tool-card";
 
     const title = document.createElement("div");
     title.id = "lblLegendEditor";
-    title.className = "text-xs font-semibold uppercase tracking-wide text-slate-500";
+    title.className = "section-header sidebar-tool-title";
     title.textContent = t("Legend Editor", "ui");
+
+    const hint = document.createElement("p");
+    hint.id = "lblLegendHint";
+    hint.className = "sidebar-tool-hint";
+    hint.textContent = t("Paint regions to generate a legend.", "ui");
 
     const list = document.createElement("div");
     list.id = "legendEditorList";
     list.className = "mt-3 space-y-2";
 
     legendSection.appendChild(title);
+    legendSection.appendChild(hint);
     legendSection.appendChild(list);
     sidebarStack.appendChild(legendSection);
+  }
+
+  let debugViewSection = document.getElementById("debugViewControl");
+  if (!debugViewSection && sidebarStack) {
+    debugViewSection = document.createElement("div");
+    debugViewSection.id = "debugViewControl";
+    debugViewSection.className = "card sidebar-tool-card sidebar-tool-card-debug";
+
+    const title = document.createElement("div");
+    title.className = "section-header sidebar-tool-title";
+    title.textContent = t("Debug Mode", "ui");
+
+    const hint = document.createElement("p");
+    hint.className = "sidebar-tool-hint";
+    hint.textContent = t("Use diagnostics to inspect geometry and artifact behavior.", "ui");
+
+    const group = document.createElement("div");
+    group.className = "control-group mt-3";
+
+    const label = document.createElement("label");
+    label.setAttribute("for", "debug-mode-select");
+    label.textContent = t("View", "ui");
+
+    const select = document.createElement("select");
+    select.id = "debug-mode-select";
+    select.className = "select-input debug-select";
+
+    [
+      ["PROD", "Normal View"],
+      ["GEOMETRY", "1. Geometry Check (Pink/Green)"],
+      ["ARTIFACTS", "2. Artifact Hunter (Red Giants)"],
+      ["ISLANDS", "3. Island Detector (Orange)"],
+      ["ID_HASH", "4. ID Stability"],
+    ].forEach(([value, label]) => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.id = `debugOption${value}`;
+      option.textContent = t(label, "ui");
+      select.appendChild(option);
+    });
+
+    group.appendChild(label);
+    group.appendChild(select);
+    debugViewSection.appendChild(title);
+    debugViewSection.appendChild(hint);
+    debugViewSection.appendChild(group);
+    sidebarStack.appendChild(debugViewSection);
   }
 
   const downloadProjectBtn = document.getElementById("downloadProjectBtn");
   const uploadProjectBtn = document.getElementById("uploadProjectBtn");
   const projectFileInput = document.getElementById("projectFileInput");
+  const projectFileName = document.getElementById("projectFileName");
   const legendList = document.getElementById("legendEditorList");
+  const debugModeSelect = document.getElementById("debug-mode-select");
+
+  if (projectFileName && !projectFileName.textContent.trim()) {
+    projectFileName.textContent = t("No file selected", "ui");
+  }
 
   const entries = Object.keys(countryNames)
     .map((code) => {
@@ -355,7 +436,7 @@ function initSidebar({ render } = {}) {
           child.className = "ml-2 space-y-2 pb-2";
           const header = document.createElement("div");
           header.className = "px-2 text-[10px] uppercase tracking-wide text-slate-400";
-          header.textContent = "--- Provinces/Regions ---";
+          header.textContent = t("--- Provinces/Regions ---", "ui");
           child.appendChild(header);
           hierarchyGroups.forEach((group) => {
             const btn = document.createElement("button");
@@ -376,7 +457,7 @@ function initSidebar({ render } = {}) {
           child.className = "ml-2 space-y-2 pb-2";
           const header = document.createElement("div");
           header.className = "px-2 text-[10px] uppercase tracking-wide text-slate-400";
-          header.textContent = "--- Presets ---";
+          header.textContent = t("--- Presets ---", "ui");
           child.appendChild(header);
           presets.forEach((preset, presetIndex) => {
             const btn = document.createElement("button");
@@ -468,7 +549,7 @@ function initSidebar({ render } = {}) {
         const editBtn = document.createElement("button");
         editBtn.type = "button";
         editBtn.className = "text-[11px] text-slate-500 hover:text-slate-700";
-        editBtn.textContent = isEditingThis ? "Cancel" : "Edit";
+        editBtn.textContent = isEditingThis ? t("Cancel", "ui") : t("Edit", "ui");
         editBtn.addEventListener("click", () => {
           if (isEditingThis) {
             stopPresetEdit(render);
@@ -480,7 +561,7 @@ function initSidebar({ render } = {}) {
         const saveBtn = document.createElement("button");
         saveBtn.type = "button";
         saveBtn.className = "text-[11px] text-slate-500 hover:text-slate-700";
-        saveBtn.textContent = "Save";
+        saveBtn.textContent = t("Save", "ui");
         if (!isEditingThis) {
           saveBtn.classList.add("hidden");
         }
@@ -498,7 +579,7 @@ function initSidebar({ render } = {}) {
         const copyBtn = document.createElement("button");
         copyBtn.type = "button";
         copyBtn.className = "text-[11px] text-slate-500 hover:text-slate-700";
-        copyBtn.textContent = "Copy";
+        copyBtn.textContent = t("Copy", "ui");
         copyBtn.addEventListener("click", () => {
           const ids = isEditingThis ? Array.from(state.editingPresetIds) : preset.ids;
           copyPresetIds(ids || []);
@@ -532,8 +613,8 @@ function initSidebar({ render } = {}) {
 
     if (!colors.length) {
       const empty = document.createElement("div");
-      empty.className = "text-xs text-slate-400";
-      empty.textContent = "Paint regions to generate a legend.";
+      empty.className = "legend-empty-state";
+      empty.textContent = t("Paint regions to generate a legend.", "ui");
       legendList.appendChild(empty);
       return;
     }
@@ -554,7 +635,7 @@ function initSidebar({ render } = {}) {
       input.value = LegendManager.getLabel(color);
       input.addEventListener("input", (event) => {
         LegendManager.setLabel(color, event.target.value);
-        renderLegend(colors, LegendManager.getLabels());
+        mapRenderer.renderLegend(colors, LegendManager.getLabels());
       });
 
       row.appendChild(swatch);
@@ -604,16 +685,33 @@ function initSidebar({ render } = {}) {
   if (projectFileInput && !projectFileInput.dataset.bound) {
     projectFileInput.addEventListener("change", () => {
       const file = projectFileInput.files?.[0];
-      if (!file) return;
+      if (!file) {
+        if (projectFileName) {
+          projectFileName.textContent = t("No file selected", "ui");
+        }
+        return;
+      }
+      if (projectFileName) {
+        projectFileName.textContent = file.name;
+      }
       FileManager.importProject(file, (data) => {
-        state.colors = data.colors || {};
+        state.countryBaseColors = data.countryBaseColors || {};
+        state.featureOverrides = data.featureOverrides || {};
         state.specialZones = data.specialZones || {};
-        invalidateBorderCache();
+        mapRenderer.refreshColorState({ renderNow: false });
         if (render) render();
       });
       projectFileInput.value = "";
     });
     projectFileInput.dataset.bound = "true";
+  }
+
+  if (debugModeSelect && !debugModeSelect.dataset.bound) {
+    debugModeSelect.value = String(state.debugMode || "PROD").toUpperCase();
+    debugModeSelect.addEventListener("change", (event) => {
+      mapRenderer.setDebugMode(event.target.value);
+    });
+    debugModeSelect.dataset.bound = "true";
   }
 
   renderList();

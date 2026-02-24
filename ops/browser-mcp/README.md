@@ -1,0 +1,33 @@
+# Browser MCP Ops
+
+This folder centralizes non-essential operational helpers for browser inspection.
+
+## Files
+- `inspection-profile.toml`: profile-driven traversal config (routes, sections, gestures, budgets, auto-upgrade).
+- `inspection-profile.schema.md`: field definitions and constraints for the profile.
+- `start-playwright-mcp-edge.sh`: starts Playwright MCP server (Edge, localhost-only policy) in standalone HTTP mode on `127.0.0.1:8931`.
+- `run-smoke-browser-inspection.sh`: reuses or starts local dev server, then runs profile-driven browser smoke via Playwright CLI MCP commands on Edge.
+
+## Quick use
+```bash
+bash ops/browser-mcp/run-smoke-browser-inspection.sh
+```
+
+## CLI options
+```bash
+bash ops/browser-mcp/run-smoke-browser-inspection.sh --mode auto
+bash ops/browser-mcp/run-smoke-browser-inspection.sh --mode quick
+bash ops/browser-mcp/run-smoke-browser-inspection.sh --mode full
+bash ops/browser-mcp/run-smoke-browser-inspection.sh --profile ops/browser-mcp/inspection-profile.toml
+bash ops/browser-mcp/run-smoke-browser-inspection.sh --max-runtime-sec 240
+```
+
+Options:
+- `--profile <path>`: traversal profile path, default `ops/browser-mcp/inspection-profile.toml`
+- `--mode quick|full|auto`: run mode, default from profile decision
+- `--max-runtime-sec <n>`: runtime override for active phase
+
+## Performance guidance
+- Prefer `auto` for routine debugging.
+- Use `quick` for fast signal collection.
+- Use `full` only when user explicitly asks all sections or quick evidence is insufficient.

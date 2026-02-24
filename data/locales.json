@@ -1,8 +1,52 @@
 {
   "ui": {
+    "--- Presets ---": {
+      "en": "--- Presets ---",
+      "zh": "--- 预设 ---"
+    },
+    "--- Provinces/Regions ---": {
+      "en": "--- Provinces/Regions ---",
+      "zh": "--- 省/区域 ---"
+    },
+    "1. Geometry Check (Pink/Green)": {
+      "en": "1. Geometry Check (Pink/Green)",
+      "zh": "1. 几何检查（粉/绿）"
+    },
+    "2. Artifact Hunter (Red Giants)": {
+      "en": "2. Artifact Hunter (Red Giants)",
+      "zh": "2. 伪影猎人（红色巨物）"
+    },
+    "3. Island Detector (Orange)": {
+      "en": "3. Island Detector (Orange)",
+      "zh": "3. 岛屿检测（橙色）"
+    },
+    "4. ID Stability": {
+      "en": "4. ID Stability",
+      "zh": "4. ID 稳定性"
+    },
     "Auto-Fill Countries": {
       "en": "Auto-Fill Countries",
       "zh": "自动填充国家"
+    },
+    "By Country": {
+      "en": "By Country",
+      "zh": "按国家"
+    },
+    "By Neighbor (Political)": {
+      "en": "By Neighbor (Political)",
+      "zh": "按邻接（政治）"
+    },
+    "By Region": {
+      "en": "By Region",
+      "zh": "按地区"
+    },
+    "By Subdivision": {
+      "en": "By Subdivision",
+      "zh": "按子区域"
+    },
+    "Cancel": {
+      "en": "Cancel",
+      "zh": "取消"
     },
     "Clear Map": {
       "en": "Clear Map",
@@ -12,9 +56,17 @@
       "en": "Coastlines",
       "zh": "海岸线"
     },
+    "Color Mode": {
+      "en": "Color Mode",
+      "zh": "配色模式"
+    },
     "Color Palette": {
       "en": "Color Palette",
       "zh": "调色板"
+    },
+    "Copy": {
+      "en": "Copy",
+      "zh": "复制"
     },
     "Country Colors": {
       "en": "Country Colors",
@@ -28,9 +80,25 @@
       "en": "Custom",
       "zh": "自定义"
     },
+    "Debug Mode": {
+      "en": "Debug Mode",
+      "zh": "调试模式"
+    },
+    "Download Project": {
+      "en": "Download Project",
+      "zh": "下载项目"
+    },
     "Download Snapshot": {
       "en": "Download Snapshot",
       "zh": "下载截图"
+    },
+    "Edit": {
+      "en": "Edit",
+      "zh": "编辑"
+    },
+    "Editing Preset": {
+      "en": "Editing Preset",
+      "zh": "正在编辑预设"
     },
     "Empire Borders": {
       "en": "Empire Borders",
@@ -60,9 +128,29 @@
       "en": "Internal Borders",
       "zh": "内部边界"
     },
+    "Invalid project file. Please select a valid map_project.json.": {
+      "en": "Invalid project file. Please select a valid map_project.json.",
+      "zh": "项目文件无效，请选择有效的 map_project.json。"
+    },
+    "Legend Editor": {
+      "en": "Legend Editor",
+      "zh": "图例编辑器"
+    },
+    "Load Project": {
+      "en": "Load Project",
+      "zh": "加载项目"
+    },
     "Map Style": {
       "en": "Map Style",
       "zh": "地图样式"
+    },
+    "No file selected": {
+      "en": "No file selected",
+      "zh": "未选择文件"
+    },
+    "Normal View": {
+      "en": "Normal View",
+      "zh": "正常视图"
     },
     "Opacity": {
       "en": "Opacity",
@@ -72,9 +160,25 @@
       "en": "Overlay",
       "zh": "覆盖层"
     },
+    "Paint Granularity": {
+      "en": "Paint Granularity",
+      "zh": "涂色粒度"
+    },
+    "Paint regions to generate a legend.": {
+      "en": "Paint regions to generate a legend.",
+      "zh": "为区域上色以生成图例。"
+    },
+    "Project Management": {
+      "en": "Project Management",
+      "zh": "项目管理"
+    },
     "Recent": {
       "en": "Recent",
       "zh": "最近使用"
+    },
+    "Region": {
+      "en": "Region",
+      "zh": "区域"
     },
     "Reset Colors": {
       "en": "Reset Colors",
@@ -83,6 +187,14 @@
     "Reset Country Colors": {
       "en": "Reset Country Colors",
       "zh": "重置颜色"
+    },
+    "Save": {
+      "en": "Save",
+      "zh": "保存"
+    },
+    "Save or load your map state as a project file.": {
+      "en": "Save or load your map state as a project file.",
+      "zh": "将当前地图状态保存或加载为项目文件。"
     },
     "Search Countries": {
       "en": "Search Countries",
@@ -96,9 +208,33 @@
       "en": "Search...",
       "zh": "搜索..."
     },
+    "Selected File": {
+      "en": "Selected File",
+      "zh": "已选文件"
+    },
+    "Special Zones": {
+      "en": "Special Zones",
+      "zh": "特殊区域"
+    },
     "Texture": {
       "en": "Texture",
       "zh": "纹理"
+    },
+    "Unable to read the selected file.": {
+      "en": "Unable to read the selected file.",
+      "zh": "无法读取所选文件。"
+    },
+    "Unknown Region": {
+      "en": "Unknown Region",
+      "zh": "未知区域"
+    },
+    "Use diagnostics to inspect geometry and artifact behavior.": {
+      "en": "Use diagnostics to inspect geometry and artifact behavior.",
+      "zh": "使用诊断视图检查几何与异常行为。"
+    },
+    "View": {
+      "en": "View",
+      "zh": "视图"
     },
     "Width": {
       "en": "Width",
@@ -229,6 +365,10 @@
     "Afanasyevsky District": {
       "en": "Afanasyevsky District",
       "zh": "[TODO] Afanasyevsky District"
+    },
+    "Afghanistan": {
+      "en": "Afghanistan",
+      "zh": "[TODO] Afghanistan"
     },
     "Afyonkarahisar": {
       "en": "Afyonkarahisar",
@@ -606,6 +746,10 @@
       "en": "Alagirsky District",
       "zh": "[TODO] Alagirsky District"
     },
+    "Aland": {
+      "en": "Aland",
+      "zh": "[TODO] Aland"
+    },
     "Alappuzha": {
       "en": "Alappuzha",
       "zh": "[TODO] Alappuzha"
@@ -637,6 +781,10 @@
     "Albacete": {
       "en": "Albacete",
       "zh": "[TODO] Albacete"
+    },
+    "Albania": {
+      "en": "Albania",
+      "zh": "[TODO] Albania"
     },
     "Albay": {
       "en": "Albay",
@@ -709,6 +857,10 @@
     "Alger": {
       "en": "Alger",
       "zh": "[TODO] Alger"
+    },
+    "Algeria": {
+      "en": "Algeria",
+      "zh": "[TODO] Algeria"
     },
     "Alicante/Alacant": {
       "en": "Alicante/Alacant",
@@ -954,6 +1106,10 @@
       "en": "Andijon",
       "zh": "[TODO] Andijon"
     },
+    "Andorra": {
+      "en": "Andorra",
+      "zh": "[TODO] Andorra"
+    },
     "Andreapolsky District": {
       "en": "Andreapolsky District",
       "zh": "[TODO] Andreapolsky District"
@@ -993,6 +1149,10 @@
     "Anglesey": {
       "en": "Anglesey",
       "zh": "[TODO] Anglesey"
+    },
+    "Angola": {
+      "en": "Angola",
+      "zh": "[TODO] Angola"
     },
     "Angoulême": {
       "en": "Angoulême",
@@ -1105,6 +1265,10 @@
     "Antalya": {
       "en": "Antalya",
       "zh": "[TODO] Antalya"
+    },
+    "Antarctica": {
+      "en": "Antarctica",
+      "zh": "[TODO] Antarctica"
     },
     "Antique": {
       "en": "Antique",
@@ -1334,6 +1498,10 @@
       "en": "Argenteuil",
       "zh": "[TODO] Argenteuil"
     },
+    "Argentina": {
+      "en": "Argentina",
+      "zh": "[TODO] Argentina"
+    },
     "Argeş": {
       "en": "Argeş",
       "zh": "[TODO] Argeş"
@@ -1373,6 +1541,10 @@
     "Armavir": {
       "en": "Armavir",
       "zh": "[TODO] Armavir"
+    },
+    "Armenia": {
+      "en": "Armenia",
+      "zh": "[TODO] Armenia"
     },
     "Arnhem/Nijmegen": {
       "en": "Arnhem/Nijmegen",
@@ -1646,6 +1818,10 @@
       "en": "Ashinsky District",
       "zh": "[TODO] Ashinsky District"
     },
+    "Ashmore and Cartier Islands": {
+      "en": "Ashmore and Cartier Islands",
+      "zh": "[TODO] Ashmore and Cartier Islands"
+    },
     "Ashoknagar": {
       "en": "Ashoknagar",
       "zh": "[TODO] Ashoknagar"
@@ -1758,6 +1934,14 @@
       "en": "Aurora",
       "zh": "[TODO] Aurora"
     },
+    "Australia": {
+      "en": "Australia",
+      "zh": "[TODO] Australia"
+    },
+    "Austria": {
+      "en": "Austria",
+      "zh": "[TODO] Austria"
+    },
     "Autun": {
       "en": "Autun",
       "zh": "[TODO] Autun"
@@ -1817,6 +2001,10 @@
     "Azamgarh": {
       "en": "Azamgarh",
       "zh": "[TODO] Azamgarh"
+    },
+    "Azerbaijan": {
+      "en": "Azerbaijan",
+      "zh": "[TODO] Azerbaijan"
     },
     "Aznakayevsky District": {
       "en": "Aznakayevsky District",
@@ -1993,6 +2181,10 @@
     "Bahraich": {
       "en": "Bahraich",
       "zh": "[TODO] Bahraich"
+    },
+    "Bahrain": {
+      "en": "Bahrain",
+      "zh": "[TODO] Bahrain"
     },
     "Baicheng": {
       "en": "Baicheng",
@@ -2237,6 +2429,10 @@
     "Bangkok Metropolis": {
       "en": "Bangkok Metropolis",
       "zh": "[TODO] Bangkok Metropolis"
+    },
+    "Bangladesh": {
+      "en": "Bangladesh",
+      "zh": "[TODO] Bangladesh"
     },
     "Bani Suwayf": {
       "en": "Bani Suwayf",
@@ -2678,6 +2874,10 @@
       "en": "Bekovsky District",
       "zh": "[TODO] Bekovsky District"
     },
+    "Belarus": {
+      "en": "Belarus",
+      "zh": "[TODO] Belarus"
+    },
     "Belebeyevsky District": {
       "en": "Belebeyevsky District",
       "zh": "[TODO] Belebeyevsky District"
@@ -2694,6 +2894,10 @@
       "en": "Belgaum",
       "zh": "[TODO] Belgaum"
     },
+    "Belgium": {
+      "en": "Belgium",
+      "zh": "[TODO] Belgium"
+    },
     "Belgorodsky District": {
       "en": "Belgorodsky District",
       "zh": "[TODO] Belgorodsky District"
@@ -2701,6 +2905,10 @@
     "Belinsky District": {
       "en": "Belinsky District",
       "zh": "[TODO] Belinsky District"
+    },
+    "Belize": {
+      "en": "Belize",
+      "zh": "[TODO] Belize"
     },
     "Bellac": {
       "en": "Bellac",
@@ -2781,6 +2989,10 @@
     "Benguet": {
       "en": "Benguet",
       "zh": "[TODO] Benguet"
+    },
+    "Benin": {
+      "en": "Benin",
+      "zh": "[TODO] Benin"
     },
     "Benxi": {
       "en": "Benxi",
@@ -2973,6 +3185,10 @@
     "Bhopal": {
       "en": "Bhopal",
       "zh": "[TODO] Bhopal"
+    },
+    "Bhutan": {
+      "en": "Bhutan",
+      "zh": "[TODO] Bhutan"
     },
     "Bianbaxian": {
       "en": "Bianbaxian",
@@ -3338,6 +3554,10 @@
       "en": "Bolikhamxai",
       "zh": "[TODO] Bolikhamxai"
     },
+    "Bolivia": {
+      "en": "Bolivia",
+      "zh": "[TODO] Bolivia"
+    },
     "Bolixian": {
       "en": "Bolixian",
       "zh": "[TODO] Bolixian"
@@ -3506,6 +3726,10 @@
       "en": "Botoşani",
       "zh": "[TODO] Botoşani"
     },
+    "Botswana": {
+      "en": "Botswana",
+      "zh": "[TODO] Botswana"
+    },
     "Bottrop, Kreisfreie Stadt": {
       "en": "Bottrop, Kreisfreie Stadt",
       "zh": "[TODO] Bottrop, Kreisfreie Stadt"
@@ -3594,6 +3818,10 @@
       "en": "Braunschweig, Kreisfreie Stadt",
       "zh": "[TODO] Braunschweig, Kreisfreie Stadt"
     },
+    "Brazil": {
+      "en": "Brazil",
+      "zh": "[TODO] Brazil"
+    },
     "Braşov": {
       "en": "Braşov",
       "zh": "[TODO] Braşov"
@@ -3678,6 +3906,10 @@
       "en": "Bristol, City of",
       "zh": "[TODO] Bristol, City of"
     },
+    "British Indian Ocean Territory": {
+      "en": "British Indian Ocean Territory",
+      "zh": "[TODO] British Indian Ocean Territory"
+    },
     "Brive-la-Gaillarde": {
       "en": "Brive-la-Gaillarde",
       "zh": "[TODO] Brive-la-Gaillarde"
@@ -3697,6 +3929,10 @@
     "Brovary": {
       "en": "Brovary",
       "zh": "[TODO] Brovary"
+    },
+    "Brunei": {
+      "en": "Brunei",
+      "zh": "[TODO] Brunei"
     },
     "Brusyliv": {
       "en": "Brusyliv",
@@ -3794,6 +4030,10 @@
       "en": "Bulgan",
       "zh": "[TODO] Bulgan"
     },
+    "Bulgaria": {
+      "en": "Bulgaria",
+      "zh": "[TODO] Bulgaria"
+    },
     "Bumthang": {
       "en": "Bumthang",
       "zh": "[TODO] Bumthang"
@@ -3830,9 +4070,17 @@
       "en": "Buri Ram",
       "zh": "[TODO] Buri Ram"
     },
+    "Burkina Faso": {
+      "en": "Burkina Faso",
+      "zh": "[TODO] Burkina Faso"
+    },
     "Bursa": {
       "en": "Bursa",
       "zh": "[TODO] Bursa"
+    },
+    "Burundi": {
+      "en": "Burundi",
+      "zh": "[TODO] Burundi"
     },
     "Bury": {
       "en": "Bury",
@@ -4002,6 +4250,10 @@
       "en": "Bến Tre",
       "zh": "[TODO] Bến Tre"
     },
+    "Cabo Verde": {
+      "en": "Cabo Verde",
+      "zh": "[TODO] Cabo Verde"
+    },
     "Cachar": {
       "en": "Cachar",
       "zh": "[TODO] Cachar"
@@ -4074,6 +4326,10 @@
       "en": "Camarines Sur",
       "zh": "[TODO] Camarines Sur"
     },
+    "Cambodia": {
+      "en": "Cambodia",
+      "zh": "[TODO] Cambodia"
+    },
     "Cambrai": {
       "en": "Cambrai",
       "zh": "[TODO] Cambrai"
@@ -4098,6 +4354,10 @@
       "en": "Camenca",
       "zh": "[TODO] Camenca"
     },
+    "Cameroon": {
+      "en": "Cameroon",
+      "zh": "[TODO] Cameroon"
+    },
     "Camiguin": {
       "en": "Camiguin",
       "zh": "[TODO] Camiguin"
@@ -4109,6 +4369,10 @@
     "Can Tho": {
       "en": "Can Tho",
       "zh": "[TODO] Can Tho"
+    },
+    "Canada": {
+      "en": "Canada",
+      "zh": "[TODO] Canada"
     },
     "Cantabria": {
       "en": "Cantabria",
@@ -4226,6 +4490,10 @@
       "en": "Central",
       "zh": "[TODO] Central"
     },
+    "Central African Republic": {
+      "en": "Central African Republic",
+      "zh": "[TODO] Central African Republic"
+    },
     "Central Bedfordshire": {
       "en": "Central Bedfordshire",
       "zh": "[TODO] Central Bedfordshire"
@@ -4257,6 +4525,10 @@
     "Chachoengsao": {
       "en": "Chachoengsao",
       "zh": "[TODO] Chachoengsao"
+    },
+    "Chad": {
+      "en": "Chad",
+      "zh": "[TODO] Chad"
     },
     "Chagang-do": {
       "en": "Chagang-do",
@@ -4870,6 +5142,10 @@
       "en": "Chikmagalur",
       "zh": "[TODO] Chikmagalur"
     },
+    "Chile": {
+      "en": "Chile",
+      "zh": "[TODO] Chile"
+    },
     "Chilixian": {
       "en": "Chilixian",
       "zh": "[TODO] Chilixian"
@@ -4877,6 +5153,10 @@
     "Chin": {
       "en": "Chin",
       "zh": "[TODO] Chin"
+    },
+    "China": {
+      "en": "China",
+      "zh": "[TODO] China"
     },
     "Chinon": {
       "en": "Chinon",
@@ -5194,6 +5474,10 @@
       "en": "Colmar-Ribeauvillé",
       "zh": "[TODO] Colmar-Ribeauvillé"
     },
+    "Colombia": {
+      "en": "Colombia",
+      "zh": "[TODO] Colombia"
+    },
     "Commercy": {
       "en": "Commercy",
       "zh": "[TODO] Commercy"
@@ -5201,6 +5485,10 @@
     "Como": {
       "en": "Como",
       "zh": "[TODO] Como"
+    },
+    "Comoros": {
+      "en": "Comoros",
+      "zh": "[TODO] Comoros"
     },
     "Compiègne": {
       "en": "Compiègne",
@@ -5266,6 +5554,10 @@
       "en": "Cosne-Cours-sur-Loire",
       "zh": "[TODO] Cosne-Cours-sur-Loire"
     },
+    "Costa Rica": {
+      "en": "Costa Rica",
+      "zh": "[TODO] Costa Rica"
+    },
     "Cotabato": {
       "en": "Cotabato",
       "zh": "[TODO] Cotabato"
@@ -5298,6 +5590,10 @@
       "en": "Criuleni",
       "zh": "[TODO] Criuleni"
     },
+    "Croatia": {
+      "en": "Croatia",
+      "zh": "[TODO] Croatia"
+    },
     "Crotone": {
       "en": "Crotone",
       "zh": "[TODO] Crotone"
@@ -5313,6 +5609,10 @@
     "Csongrád": {
       "en": "Csongrád",
       "zh": "[TODO] Csongrád"
+    },
+    "Cuba": {
+      "en": "Cuba",
+      "zh": "[TODO] Cuba"
     },
     "Cuddalore": {
       "en": "Cuddalore",
@@ -5357,6 +5657,14 @@
     "Cuxhaven": {
       "en": "Cuxhaven",
       "zh": "[TODO] Cuxhaven"
+    },
+    "Cyprus": {
+      "en": "Cyprus",
+      "zh": "[TODO] Cyprus"
+    },
+    "Czechia": {
+      "en": "Czechia",
+      "zh": "[TODO] Czechia"
     },
     "Częstochowa": {
       "en": "Częstochowa",
@@ -5850,6 +6158,10 @@
       "en": "Demidovsky District",
       "zh": "[TODO] Demidovsky District"
     },
+    "Democratic Republic of the Congo": {
+      "en": "Democratic Republic of the Congo",
+      "zh": "[TODO] Democratic Republic of the Congo"
+    },
     "Demyansky District": {
       "en": "Demyansky District",
       "zh": "[TODO] Demyansky District"
@@ -5877,6 +6189,10 @@
     "Denizli": {
       "en": "Denizli",
       "zh": "[TODO] Denizli"
+    },
+    "Denmark": {
+      "en": "Denmark",
+      "zh": "[TODO] Denmark"
     },
     "Deoghar": {
       "en": "Deoghar",
@@ -6182,6 +6498,10 @@
       "en": "Djelfa",
       "zh": "[TODO] Djelfa"
     },
+    "Djibouti": {
+      "en": "Djibouti",
+      "zh": "[TODO] Djibouti"
+    },
     "Dmitriyevsky District": {
       "en": "Dmitriyevsky District",
       "zh": "[TODO] Dmitriyevsky District"
@@ -6261,6 +6581,10 @@
     "Domanivka": {
       "en": "Domanivka",
       "zh": "[TODO] Domanivka"
+    },
+    "Dominican Republic": {
+      "en": "Dominican Republic",
+      "zh": "[TODO] Dominican Republic"
     },
     "Domodedovsky District": {
       "en": "Domodedovsky District",
@@ -6794,6 +7118,10 @@
       "en": "East Sussex CC",
       "zh": "[TODO] East Sussex CC"
     },
+    "East Timor": {
+      "en": "East Timor",
+      "zh": "[TODO] East Timor"
+    },
     "Eastern Samar": {
       "en": "Eastern Samar",
       "zh": "[TODO] Eastern Samar"
@@ -6801,6 +7129,10 @@
     "Ebersberg": {
       "en": "Ebersberg",
       "zh": "[TODO] Ebersberg"
+    },
+    "Ecuador": {
+      "en": "Ecuador",
+      "zh": "[TODO] Ecuador"
     },
     "Edinburgh": {
       "en": "Edinburgh",
@@ -6817,6 +7149,10 @@
     "Edirne": {
       "en": "Edirne",
       "zh": "[TODO] Edirne"
+    },
+    "Egypt": {
+      "en": "Egypt",
+      "zh": "[TODO] Egypt"
     },
     "Ehime": {
       "en": "Ehime",
@@ -6857,6 +7193,10 @@
     "El Oued": {
       "en": "El Oued",
       "zh": "[TODO] El Oued"
+    },
+    "El Salvador": {
+      "en": "El Salvador",
+      "zh": "[TODO] El Salvador"
     },
     "El Tarf": {
       "en": "El Tarf",
@@ -6934,6 +7274,10 @@
       "en": "Enzkreis",
       "zh": "[TODO] Enzkreis"
     },
+    "Equatorial Guinea": {
+      "en": "Equatorial Guinea",
+      "zh": "[TODO] Equatorial Guinea"
+    },
     "Erbianyizuzizhixian": {
       "en": "Erbianyizuzizhixian",
       "zh": "[TODO] Erbianyizuzizhixian"
@@ -6949,6 +7293,10 @@
     "Erfurt, Kreisfreie Stadt": {
       "en": "Erfurt, Kreisfreie Stadt",
       "zh": "[TODO] Erfurt, Kreisfreie Stadt"
+    },
+    "Eritrea": {
+      "en": "Eritrea",
+      "zh": "[TODO] Eritrea"
     },
     "Erlangen, Kreisfreie Stadt": {
       "en": "Erlangen, Kreisfreie Stadt",
@@ -7038,6 +7386,10 @@
       "en": "Esslingen",
       "zh": "[TODO] Esslingen"
     },
+    "Estonia": {
+      "en": "Estonia",
+      "zh": "[TODO] Estonia"
+    },
     "Etah": {
       "en": "Etah",
       "zh": "[TODO] Etah"
@@ -7057,6 +7409,10 @@
     "Etelä-Savo": {
       "en": "Etelä-Savo",
       "zh": "[TODO] Etelä-Savo"
+    },
+    "Ethiopia": {
+      "en": "Ethiopia",
+      "zh": "[TODO] Ethiopia"
     },
     "Euskirchen": {
       "en": "Euskirchen",
@@ -7089,6 +7445,10 @@
     "Falkirk": {
       "en": "Falkirk",
       "zh": "[TODO] Falkirk"
+    },
+    "Falkland Islands": {
+      "en": "Falkland Islands",
+      "zh": "[TODO] Falkland Islands"
     },
     "Falyonsky District": {
       "en": "Falyonsky District",
@@ -7133,6 +7493,10 @@
     "Faridkot": {
       "en": "Faridkot",
       "zh": "[TODO] Faridkot"
+    },
+    "Faroe Islands": {
+      "en": "Faroe Islands",
+      "zh": "[TODO] Faroe Islands"
     },
     "Farrukhabad": {
       "en": "Farrukhabad",
@@ -7330,6 +7694,10 @@
       "en": "Figeac",
       "zh": "[TODO] Figeac"
     },
+    "Finland": {
+      "en": "Finland",
+      "zh": "[TODO] Finland"
+    },
     "Firenze": {
       "en": "Firenze",
       "zh": "[TODO] Firenze"
@@ -7422,6 +7790,10 @@
       "en": "Fougères-Vitré",
       "zh": "[TODO] Fougères-Vitré"
     },
+    "France": {
+      "en": "France",
+      "zh": "[TODO] France"
+    },
     "Frankenthal (Pfalz), Kreisfreie Stadt": {
       "en": "Frankenthal (Pfalz), Kreisfreie Stadt",
       "zh": "[TODO] Frankenthal (Pfalz), Kreisfreie Stadt"
@@ -7445,6 +7817,10 @@
     "Freising": {
       "en": "Freising",
       "zh": "[TODO] Freising"
+    },
+    "French Southern and Antarctic Lands": {
+      "en": "French Southern and Antarctic Lands",
+      "zh": "[TODO] French Southern and Antarctic Lands"
     },
     "Freudenstadt": {
       "en": "Freudenstadt",
@@ -7646,6 +8022,10 @@
       "en": "Făleşti",
       "zh": "[TODO] Făleşti"
     },
+    "Gabon": {
+      "en": "Gabon",
+      "zh": "[TODO] Gabon"
+    },
     "Gabès": {
       "en": "Gabès",
       "zh": "[TODO] Gabès"
@@ -7697,6 +8077,10 @@
     "Galichsky District": {
       "en": "Galichsky District",
       "zh": "[TODO] Galichsky District"
+    },
+    "Gambia": {
+      "en": "Gambia",
+      "zh": "[TODO] Gambia"
     },
     "Gampaha": {
       "en": "Gampaha",
@@ -7970,6 +8354,10 @@
       "en": "Genève",
       "zh": "[TODO] Genève"
     },
+    "Georgia": {
+      "en": "Georgia",
+      "zh": "[TODO] Georgia"
+    },
     "Georgiyevsk": {
       "en": "Georgiyevsk",
       "zh": "[TODO] Georgiyevsk"
@@ -7986,6 +8374,10 @@
       "en": "Gergebilsky District",
       "zh": "[TODO] Gergebilsky District"
     },
+    "Germany": {
+      "en": "Germany",
+      "zh": "[TODO] Germany"
+    },
     "Germersheim": {
       "en": "Germersheim",
       "zh": "[TODO] Germersheim"
@@ -8001,6 +8393,10 @@
     "Ghadamis": {
       "en": "Ghadamis",
       "zh": "[TODO] Ghadamis"
+    },
+    "Ghana": {
+      "en": "Ghana",
+      "zh": "[TODO] Ghana"
     },
     "Gharb - Chrarda - Béni Hssen": {
       "en": "Gharb - Chrarda - Béni Hssen",
@@ -8354,6 +8750,14 @@
       "en": "Greater Manchester South West",
       "zh": "[TODO] Greater Manchester South West"
     },
+    "Greece": {
+      "en": "Greece",
+      "zh": "[TODO] Greece"
+    },
+    "Greenland": {
+      "en": "Greenland",
+      "zh": "[TODO] Greenland"
+    },
     "Greenwich": {
       "en": "Greenwich",
       "zh": "[TODO] Greenwich"
@@ -8510,6 +8914,10 @@
       "en": "Guanyunxian",
       "zh": "[TODO] Guanyunxian"
     },
+    "Guatemala": {
+      "en": "Guatemala",
+      "zh": "[TODO] Guatemala"
+    },
     "Gubkinsky Urban Okrug": {
       "en": "Gubkinsky Urban Okrug",
       "zh": "[TODO] Gubkinsky Urban Okrug"
@@ -8529,6 +8937,10 @@
     "Guelmim - Es-Semara": {
       "en": "Guelmim - Es-Semara",
       "zh": "[TODO] Guelmim - Es-Semara"
+    },
+    "Guernsey": {
+      "en": "Guernsey",
+      "zh": "[TODO] Guernsey"
     },
     "Guichi": {
       "en": "Guichi",
@@ -8561,6 +8973,14 @@
     "Guinanxian": {
       "en": "Guinanxian",
       "zh": "[TODO] Guinanxian"
+    },
+    "Guinea": {
+      "en": "Guinea",
+      "zh": "[TODO] Guinea"
+    },
+    "Guinea-Bissau": {
+      "en": "Guinea-Bissau",
+      "zh": "[TODO] Guinea-Bissau"
     },
     "Guingamp": {
       "en": "Guingamp",
@@ -8657,6 +9077,10 @@
     "Guxian": {
       "en": "Guxian",
       "zh": "[TODO] Guxian"
+    },
+    "Guyana": {
+      "en": "Guyana",
+      "zh": "[TODO] Guyana"
     },
     "Guyangxian": {
       "en": "Guyangxian",
@@ -8861,6 +9285,10 @@
     "Haisyn": {
       "en": "Haisyn",
       "zh": "[TODO] Haisyn"
+    },
+    "Haiti": {
+      "en": "Haiti",
+      "zh": "[TODO] Haiti"
     },
     "Haivoron": {
       "en": "Haivoron",
@@ -9121,6 +9549,10 @@
     "Haÿ-les-Roses": {
       "en": "Haÿ-les-Roses",
       "zh": "[TODO] Haÿ-les-Roses"
+    },
+    "Heard Island and McDonald Islands": {
+      "en": "Heard Island and McDonald Islands",
+      "zh": "[TODO] Heard Island and McDonald Islands"
     },
     "Heart of Essex": {
       "en": "Heart of Essex",
@@ -9481,6 +9913,14 @@
     "Homs (Hims)": {
       "en": "Homs (Hims)",
       "zh": "[TODO] Homs (Hims)"
+    },
+    "Honduras": {
+      "en": "Honduras",
+      "zh": "[TODO] Honduras"
+    },
+    "Hong Kong S.A.R.": {
+      "en": "Hong Kong S.A.R.",
+      "zh": "[TODO] Hong Kong S.A.R."
     },
     "Honganxian": {
       "en": "Honganxian",
@@ -9894,6 +10334,10 @@
       "en": "Hunedoara",
       "zh": "[TODO] Hunedoara"
     },
+    "Hungary": {
+      "en": "Hungary",
+      "zh": "[TODO] Hungary"
+    },
     "Hunyuanxian": {
       "en": "Hunyuanxian",
       "zh": "[TODO] Hunyuanxian"
@@ -10026,6 +10470,10 @@
       "en": "Ibresinsky District",
       "zh": "[TODO] Ibresinsky District"
     },
+    "Iceland": {
+      "en": "Iceland",
+      "zh": "[TODO] Iceland"
+    },
     "Ichalkovsky District": {
       "en": "Ichalkovsky District",
       "zh": "[TODO] Ichalkovsky District"
@@ -10134,6 +10582,18 @@
       "en": "Incheon",
       "zh": "[TODO] Incheon"
     },
+    "India": {
+      "en": "India",
+      "zh": "[TODO] India"
+    },
+    "Indian Ocean Territories": {
+      "en": "Indian Ocean Territories",
+      "zh": "[TODO] Indian Ocean Territories"
+    },
+    "Indonesia": {
+      "en": "Indonesia",
+      "zh": "[TODO] Indonesia"
+    },
     "Indore": {
       "en": "Indore",
       "zh": "[TODO] Indore"
@@ -10186,9 +10646,21 @@
       "en": "Irafsky District",
       "zh": "[TODO] Irafsky District"
     },
+    "Iran": {
+      "en": "Iran",
+      "zh": "[TODO] Iran"
+    },
+    "Iraq": {
+      "en": "Iraq",
+      "zh": "[TODO] Iraq"
+    },
     "Irbid": {
       "en": "Irbid",
       "zh": "[TODO] Irbid"
+    },
+    "Ireland": {
+      "en": "Ireland",
+      "zh": "[TODO] Ireland"
     },
     "Irkutsk": {
       "en": "Irkutsk",
@@ -10222,6 +10694,10 @@
       "en": "Isle of Anglesey",
       "zh": "[TODO] Isle of Anglesey"
     },
+    "Isle of Man": {
+      "en": "Isle of Man",
+      "zh": "[TODO] Isle of Man"
+    },
     "Isle of Wight": {
       "en": "Isle of Wight",
       "zh": "[TODO] Isle of Wight"
@@ -10237,6 +10713,10 @@
     "Isparta": {
       "en": "Isparta",
       "zh": "[TODO] Isparta"
+    },
+    "Israel": {
+      "en": "Israel",
+      "zh": "[TODO] Israel"
     },
     "Issinsky District": {
       "en": "Issinsky District",
@@ -10261,6 +10741,10 @@
     "Istrinsky District": {
       "en": "Istrinsky District",
       "zh": "[TODO] Istrinsky District"
+    },
+    "Italy": {
+      "en": "Italy",
+      "zh": "[TODO] Italy"
     },
     "Itum-Kalinsky District": {
       "en": "Itum-Kalinsky District",
@@ -10297,6 +10781,10 @@
     "Ivnyansky District": {
       "en": "Ivnyansky District",
       "zh": "[TODO] Ivnyansky District"
+    },
+    "Ivory Coast": {
+      "en": "Ivory Coast",
+      "zh": "[TODO] Ivory Coast"
     },
     "Iwate": {
       "en": "Iwate",
@@ -10394,6 +10882,10 @@
       "en": "Jalpaiguri",
       "zh": "[TODO] Jalpaiguri"
     },
+    "Jamaica": {
+      "en": "Jamaica",
+      "zh": "[TODO] Jamaica"
+    },
     "Jammu": {
       "en": "Jammu",
       "zh": "[TODO] Jammu"
@@ -10429,6 +10921,10 @@
     "Janub Sina'": {
       "en": "Janub Sina'",
       "zh": "[TODO] Janub Sina'"
+    },
+    "Japan": {
+      "en": "Japan",
+      "zh": "[TODO] Japan"
     },
     "Jarash": {
       "en": "Jarash",
@@ -10485,6 +10981,10 @@
     "Jerichower Land": {
       "en": "Jerichower Land",
       "zh": "[TODO] Jerichower Land"
+    },
+    "Jersey": {
+      "en": "Jersey",
+      "zh": "[TODO] Jersey"
     },
     "Jerusalem": {
       "en": "Jerusalem",
@@ -11105,6 +11605,10 @@
     "Jonzac": {
       "en": "Jonzac",
       "zh": "[TODO] Jonzac"
+    },
+    "Jordan": {
+      "en": "Jordan",
+      "zh": "[TODO] Jordan"
     },
     "Jorhat": {
       "en": "Jorhat",
@@ -11822,6 +12326,10 @@
       "en": "Kaytagsky District",
       "zh": "[TODO] Kaytagsky District"
     },
+    "Kazakhstan": {
+      "en": "Kazakhstan",
+      "zh": "[TODO] Kazakhstan"
+    },
     "Kazan": {
       "en": "Kazan",
       "zh": "[TODO] Kazan"
@@ -11945,6 +12453,10 @@
     "Kent Thames Gateway": {
       "en": "Kent Thames Gateway",
       "zh": "[TODO] Kent Thames Gateway"
+    },
+    "Kenya": {
+      "en": "Kenya",
+      "zh": "[TODO] Kenya"
     },
     "Kep": {
       "en": "Kep",
@@ -13298,6 +13810,10 @@
       "en": "Kuvshinovsky District",
       "zh": "[TODO] Kuvshinovsky District"
     },
+    "Kuwait": {
+      "en": "Kuwait",
+      "zh": "[TODO] Kuwait"
+    },
     "Kuybyshevsky District": {
       "en": "Kuybyshevsky District",
       "zh": "[TODO] Kuybyshevsky District"
@@ -13349,6 +13865,10 @@
     "Kymenlaakso": {
       "en": "Kymenlaakso",
       "zh": "[TODO] Kymenlaakso"
+    },
+    "Kyrgyzstan": {
+      "en": "Kyrgyzstan",
+      "zh": "[TODO] Kyrgyzstan"
     },
     "Kyōto": {
       "en": "Kyōto",
@@ -13678,6 +14198,10 @@
       "en": "Laon",
       "zh": "[TODO] Laon"
     },
+    "Laos": {
+      "en": "Laos",
+      "zh": "[TODO] Laos"
+    },
     "Lappi": {
       "en": "Lappi",
       "zh": "[TODO] Lappi"
@@ -13722,6 +14246,10 @@
       "en": "Latur",
       "zh": "[TODO] Latur"
     },
+    "Latvia": {
+      "en": "Latvia",
+      "zh": "[TODO] Latvia"
+    },
     "Laukaa District": {
       "en": "Laukaa District",
       "zh": "[TODO] Laukaa District"
@@ -13749,6 +14277,10 @@
     "Leanxian": {
       "en": "Leanxian",
       "zh": "[TODO] Leanxian"
+    },
+    "Lebanon": {
+      "en": "Lebanon",
+      "zh": "[TODO] Lebanon"
     },
     "Lebedyansky District": {
       "en": "Lebedyansky District",
@@ -13909,6 +14441,10 @@
     "Lesnoy District": {
       "en": "Lesnoy District",
       "zh": "[TODO] Lesnoy District"
+    },
+    "Lesotho": {
+      "en": "Lesotho",
+      "zh": "[TODO] Lesotho"
     },
     "Lesparre-Médoc": {
       "en": "Lesparre-Médoc",
@@ -14074,6 +14610,10 @@
       "en": "Liberecký kraj",
       "zh": "[TODO] Liberecký kraj"
     },
+    "Liberia": {
+      "en": "Liberia",
+      "zh": "[TODO] Liberia"
+    },
     "Libourne": {
       "en": "Libourne",
       "zh": "[TODO] Libourne"
@@ -14081,6 +14621,10 @@
     "Liboxian": {
       "en": "Liboxian",
       "zh": "[TODO] Liboxian"
+    },
+    "Libya": {
+      "en": "Libya",
+      "zh": "[TODO] Libya"
     },
     "Lichengxian": {
       "en": "Lichengxian",
@@ -14405,6 +14949,10 @@
     "Litangxian": {
       "en": "Litangxian",
       "zh": "[TODO] Litangxian"
+    },
+    "Lithuania": {
+      "en": "Lithuania",
+      "zh": "[TODO] Lithuania"
     },
     "Lityn": {
       "en": "Lityn",
@@ -15138,6 +15686,10 @@
       "en": "Mabianyizuzizhixian",
       "zh": "[TODO] Mabianyizuzizhixian"
     },
+    "Macao S.A.R": {
+      "en": "Macao S.A.R",
+      "zh": "[TODO] Macao S.A.R"
+    },
     "Macerata": {
       "en": "Macerata",
       "zh": "[TODO] Macerata"
@@ -15149,6 +15701,10 @@
     "Madaba": {
       "en": "Madaba",
       "zh": "[TODO] Madaba"
+    },
+    "Madagascar": {
+      "en": "Madagascar",
+      "zh": "[TODO] Madagascar"
     },
     "Madhepura": {
       "en": "Madhepura",
@@ -15358,9 +15914,21 @@
       "en": "Malatya",
       "zh": "[TODO] Malatya"
     },
+    "Malawi": {
+      "en": "Malawi",
+      "zh": "[TODO] Malawi"
+    },
+    "Malaysia": {
+      "en": "Malaysia",
+      "zh": "[TODO] Malaysia"
+    },
     "Maldah": {
       "en": "Maldah",
       "zh": "[TODO] Maldah"
+    },
+    "Maldives": {
+      "en": "Maldives",
+      "zh": "[TODO] Maldives"
     },
     "Malgobek": {
       "en": "Malgobek",
@@ -15369,6 +15937,10 @@
     "Malgobeksky District": {
       "en": "Malgobeksky District",
       "zh": "[TODO] Malgobeksky District"
+    },
+    "Mali": {
+      "en": "Mali",
+      "zh": "[TODO] Mali"
     },
     "Malipoxian": {
       "en": "Malipoxian",
@@ -15686,6 +16258,14 @@
       "en": "Mauriac",
       "zh": "[TODO] Mauriac"
     },
+    "Mauritania": {
+      "en": "Mauritania",
+      "zh": "[TODO] Mauritania"
+    },
+    "Mauritius": {
+      "en": "Mauritius",
+      "zh": "[TODO] Mauritius"
+    },
     "Mayangmiaozuzizhixian": {
       "en": "Mayangmiaozuzizhixian",
       "zh": "[TODO] Mayangmiaozuzizhixian"
@@ -15957,6 +16537,10 @@
     "Mewat": {
       "en": "Mewat",
       "zh": "[TODO] Mewat"
+    },
+    "Mexico": {
+      "en": "Mexico",
+      "zh": "[TODO] Mexico"
     },
     "Mezensky District": {
       "en": "Mezensky District",
@@ -16314,6 +16898,10 @@
       "en": "Mokshansky District",
       "zh": "[TODO] Mokshansky District"
     },
+    "Moldova": {
+      "en": "Moldova",
+      "zh": "[TODO] Moldova"
+    },
     "Molidawadahanerzuzizhiqi": {
       "en": "Molidawadahanerzuzizhiqi",
       "zh": "[TODO] Molidawadahanerzuzizhiqi"
@@ -16329,6 +16917,10 @@
     "Mon": {
       "en": "Mon",
       "zh": "[TODO] Mon"
+    },
+    "Monaco": {
+      "en": "Monaco",
+      "zh": "[TODO] Monaco"
     },
     "Monastir": {
       "en": "Monastir",
@@ -16349,6 +16941,10 @@
     "Mongar": {
       "en": "Mongar",
       "zh": "[TODO] Mongar"
+    },
+    "Mongolia": {
+      "en": "Mongolia",
+      "zh": "[TODO] Mongolia"
     },
     "Monmouthshire": {
       "en": "Monmouthshire",
@@ -16385,6 +16981,10 @@
     "Montdidier": {
       "en": "Montdidier",
       "zh": "[TODO] Montdidier"
+    },
+    "Montenegro": {
+      "en": "Montenegro",
+      "zh": "[TODO] Montenegro"
     },
     "Montluçon": {
       "en": "Montluçon",
@@ -16445,6 +17045,10 @@
     "Morlaix": {
       "en": "Morlaix",
       "zh": "[TODO] Morlaix"
+    },
+    "Morocco": {
+      "en": "Morocco",
+      "zh": "[TODO] Morocco"
     },
     "Morozovsky District": {
       "en": "Morozovsky District",
@@ -16513,6 +17117,10 @@
     "Moyuxian": {
       "en": "Moyuxian",
       "zh": "[TODO] Moyuxian"
+    },
+    "Mozambique": {
+      "en": "Mozambique",
+      "zh": "[TODO] Mozambique"
     },
     "Mozdoksky District": {
       "en": "Mozdoksky District",
@@ -16685,6 +17293,10 @@
     "Muş": {
       "en": "Muş",
       "zh": "[TODO] Muş"
+    },
+    "Myanmar": {
+      "en": "Myanmar",
+      "zh": "[TODO] Myanmar"
     },
     "Myasnikovsky District": {
       "en": "Myasnikovsky District",
@@ -16933,6 +17545,10 @@
     "Namangan": {
       "en": "Namangan",
       "zh": "[TODO] Namangan"
+    },
+    "Namibia": {
+      "en": "Namibia",
+      "zh": "[TODO] Namibia"
     },
     "Namsai": {
       "en": "Namsai",
@@ -17350,6 +17966,10 @@
       "en": "Nenjiangxian",
       "zh": "[TODO] Nenjiangxian"
     },
+    "Nepal": {
+      "en": "Nepal",
+      "zh": "[TODO] Nepal"
+    },
     "Nerekhtsky District": {
       "en": "Nerekhtsky District",
       "zh": "[TODO] Nerekhtsky District"
@@ -17357,6 +17977,10 @@
     "Nesterovsky District": {
       "en": "Nesterovsky District",
       "zh": "[TODO] Nesterovsky District"
+    },
+    "Netherlands": {
+      "en": "Netherlands",
+      "zh": "[TODO] Netherlands"
     },
     "Neu-Ulm": {
       "en": "Neu-Ulm",
@@ -17430,6 +18054,10 @@
       "en": "New Taipei City",
       "zh": "[TODO] New Taipei City"
     },
+    "New Zealand": {
+      "en": "New Zealand",
+      "zh": "[TODO] New Zealand"
+    },
     "Newcastle upon Tyne": {
       "en": "Newcastle upon Tyne",
       "zh": "[TODO] Newcastle upon Tyne"
@@ -17462,6 +18090,10 @@
       "en": "Nghệ An",
       "zh": "[TODO] Nghệ An"
     },
+    "Nicaragua": {
+      "en": "Nicaragua",
+      "zh": "[TODO] Nicaragua"
+    },
     "Nice": {
       "en": "Nice",
       "zh": "[TODO] Nice"
@@ -17489,6 +18121,14 @@
     "Nierongxian": {
       "en": "Nierongxian",
       "zh": "[TODO] Nierongxian"
+    },
+    "Niger": {
+      "en": "Niger",
+      "zh": "[TODO] Niger"
+    },
+    "Nigeria": {
+      "en": "Nigeria",
+      "zh": "[TODO] Nigeria"
     },
     "Niigata": {
       "en": "Niigata",
@@ -17842,6 +18482,10 @@
       "en": "North Khorasan",
       "zh": "[TODO] North Khorasan"
     },
+    "North Korea": {
+      "en": "North Korea",
+      "zh": "[TODO] North Korea"
+    },
     "North Lanarkshire": {
       "en": "North Lanarkshire",
       "zh": "[TODO] North Lanarkshire"
@@ -17853,6 +18497,10 @@
     "North Lincolnshire": {
       "en": "North Lincolnshire",
       "zh": "[TODO] North Lincolnshire"
+    },
+    "North Macedonia": {
+      "en": "North Macedonia",
+      "zh": "[TODO] North Macedonia"
     },
     "North Northamptonshire": {
       "en": "North Northamptonshire",
@@ -17917,6 +18565,10 @@
     "North and West Norfolk": {
       "en": "North and West Norfolk",
       "zh": "[TODO] North and West Norfolk"
+    },
+    "Norway": {
+      "en": "Norway",
+      "zh": "[TODO] Norway"
     },
     "Norwich and East Norfolk": {
       "en": "Norwich and East Norfolk",
@@ -18398,6 +19050,10 @@
       "en": "Omagh",
       "zh": "[TODO] Omagh"
     },
+    "Oman": {
+      "en": "Oman",
+      "zh": "[TODO] Oman"
+    },
     "Omsk": {
       "en": "Omsk",
       "zh": "[TODO] Omsk"
@@ -18702,6 +19358,10 @@
       "en": "Pahang",
       "zh": "[TODO] Pahang"
     },
+    "Pakistan": {
+      "en": "Pakistan",
+      "zh": "[TODO] Pakistan"
+    },
     "Paktika": {
       "en": "Paktika",
       "zh": "[TODO] Paktika"
@@ -18742,6 +19402,10 @@
       "en": "Palermo",
       "zh": "[TODO] Palermo"
     },
+    "Palestine": {
+      "en": "Palestine",
+      "zh": "[TODO] Palestine"
+    },
     "Palghar": {
       "en": "Palghar",
       "zh": "[TODO] Palghar"
@@ -18773,6 +19437,10 @@
     "Pan": {
       "en": "Pan",
       "zh": "[TODO] Pan"
+    },
+    "Panama": {
+      "en": "Panama",
+      "zh": "[TODO] Panama"
     },
     "Pananxian": {
       "en": "Pananxian",
@@ -18822,9 +19490,17 @@
       "en": "Panzhihua",
       "zh": "[TODO] Panzhihua"
     },
+    "Papua New Guinea": {
+      "en": "Papua New Guinea",
+      "zh": "[TODO] Papua New Guinea"
+    },
     "Papum Pare": {
       "en": "Papum Pare",
       "zh": "[TODO] Papum Pare"
+    },
+    "Paraguay": {
+      "en": "Paraguay",
+      "zh": "[TODO] Paraguay"
     },
     "Paranaque": {
       "en": "Paranaque",
@@ -19106,6 +19782,10 @@
       "en": "Perthshire and Kinross",
       "zh": "[TODO] Perthshire and Kinross"
     },
+    "Peru": {
+      "en": "Peru",
+      "zh": "[TODO] Peru"
+    },
     "Perugia": {
       "en": "Perugia",
       "zh": "[TODO] Perugia"
@@ -19237,6 +19917,10 @@
     "Phichit": {
       "en": "Phichit",
       "zh": "[TODO] Phichit"
+    },
+    "Philippines": {
+      "en": "Philippines",
+      "zh": "[TODO] Philippines"
     },
     "Phitsanulok": {
       "en": "Phitsanulok",
@@ -19606,6 +20290,10 @@
       "en": "Pokrovske",
       "zh": "[TODO] Pokrovske"
     },
+    "Poland": {
+      "en": "Poland",
+      "zh": "[TODO] Poland"
+    },
     "Polessky District": {
       "en": "Polessky District",
       "zh": "[TODO] Polessky District"
@@ -19693,6 +20381,10 @@
     "Portsmouth": {
       "en": "Portsmouth",
       "zh": "[TODO] Portsmouth"
+    },
+    "Portugal": {
+      "en": "Portugal",
+      "zh": "[TODO] Portugal"
     },
     "Posavska": {
       "en": "Posavska",
@@ -19918,6 +20610,10 @@
       "en": "Puerto Princesa",
       "zh": "[TODO] Puerto Princesa"
     },
+    "Puerto Rico": {
+      "en": "Puerto Rico",
+      "zh": "[TODO] Puerto Rico"
+    },
     "Pugachyovsky District": {
       "en": "Pugachyovsky District",
       "zh": "[TODO] Pugachyovsky District"
@@ -20105,6 +20801,10 @@
     "Qaraghandy": {
       "en": "Qaraghandy",
       "zh": "[TODO] Qaraghandy"
+    },
+    "Qatar": {
+      "en": "Qatar",
+      "zh": "[TODO] Qatar"
     },
     "Qax": {
       "en": "Qax",
@@ -20890,6 +21590,14 @@
       "en": "Renxian",
       "zh": "[TODO] Renxian"
     },
+    "Republic of Serbia": {
+      "en": "Republic of Serbia",
+      "zh": "[TODO] Republic of Serbia"
+    },
+    "Republic of the Congo": {
+      "en": "Republic of the Congo",
+      "zh": "[TODO] Republic of the Congo"
+    },
     "Repyovsky District": {
       "en": "Repyovsky District",
       "zh": "[TODO] Repyovsky District"
@@ -21098,6 +21806,10 @@
       "en": "Roma",
       "zh": "[TODO] Roma"
     },
+    "Romania": {
+      "en": "Romania",
+      "zh": "[TODO] Romania"
+    },
     "Romaniv": {
       "en": "Romaniv",
       "zh": "[TODO] Romaniv"
@@ -21302,6 +22014,10 @@
       "en": "Rushan",
       "zh": "[TODO] Rushan"
     },
+    "Russia": {
+      "en": "Russia",
+      "zh": "[TODO] Russia"
+    },
     "Rutland": {
       "en": "Rutland",
       "zh": "[TODO] Rutland"
@@ -21333,6 +22049,10 @@
     "Ruzsky District": {
       "en": "Ruzsky District",
       "zh": "[TODO] Ruzsky District"
+    },
+    "Rwanda": {
+      "en": "Rwanda",
+      "zh": "[TODO] Rwanda"
     },
     "Ryanggang": {
       "en": "Ryanggang",
@@ -21497,6 +22217,14 @@
     "Saiha": {
       "en": "Saiha",
       "zh": "[TODO] Saiha"
+    },
+    "Saint Helena": {
+      "en": "Saint Helena",
+      "zh": "[TODO] Saint Helena"
+    },
+    "Saint Pierre and Miquelon": {
+      "en": "Saint Pierre and Miquelon",
+      "zh": "[TODO] Saint Pierre and Miquelon"
     },
     "Saint-Amand-Montrond": {
       "en": "Saint-Amand-Montrond",
@@ -21742,6 +22470,10 @@
       "en": "San Juan",
       "zh": "[TODO] San Juan"
     },
+    "San Marino": {
+      "en": "San Marino",
+      "zh": "[TODO] San Marino"
+    },
     "Sana'a": {
       "en": "Sana'a",
       "zh": "[TODO] Sana'a"
@@ -21942,6 +22674,10 @@
       "en": "Satun",
       "zh": "[TODO] Satun"
     },
+    "Saudi Arabia": {
+      "en": "Saudi Arabia",
+      "zh": "[TODO] Saudi Arabia"
+    },
     "Saumur": {
       "en": "Saumur",
       "zh": "[TODO] Saumur"
@@ -22122,6 +22858,10 @@
       "en": "Senapati",
       "zh": "[TODO] Senapati"
     },
+    "Senegal": {
+      "en": "Senegal",
+      "zh": "[TODO] Senegal"
+    },
     "Sengileyevsky District": {
       "en": "Sengileyevsky District",
       "zh": "[TODO] Sengileyevsky District"
@@ -22201,6 +22941,10 @@
     "Sevsky District": {
       "en": "Sevsky District",
       "zh": "[TODO] Sevsky District"
+    },
+    "Seychelles": {
+      "en": "Seychelles",
+      "zh": "[TODO] Seychelles"
     },
     "Sfax": {
       "en": "Sfax",
@@ -23034,6 +23778,10 @@
       "en": "Siena",
       "zh": "[TODO] Siena"
     },
+    "Sierra Leone": {
+      "en": "Sierra Leone",
+      "zh": "[TODO] Sierra Leone"
+    },
     "Sigmaringen": {
       "en": "Sigmaringen",
       "zh": "[TODO] Sigmaringen"
@@ -23085,6 +23833,10 @@
     "Sing Buri": {
       "en": "Sing Buri",
       "zh": "[TODO] Sing Buri"
+    },
+    "Singapore": {
+      "en": "Singapore",
+      "zh": "[TODO] Singapore"
     },
     "Singrauli": {
       "en": "Singrauli",
@@ -23234,6 +23986,14 @@
       "en": "Slough",
       "zh": "[TODO] Slough"
     },
+    "Slovakia": {
+      "en": "Slovakia",
+      "zh": "[TODO] Slovakia"
+    },
+    "Slovenia": {
+      "en": "Slovenia",
+      "zh": "[TODO] Slovenia"
+    },
     "Slovianoserbsk": {
       "en": "Slovianoserbsk",
       "zh": "[TODO] Slovianoserbsk"
@@ -23345,6 +24105,10 @@
     "Solothurn": {
       "en": "Solothurn",
       "zh": "[TODO] Solothurn"
+    },
+    "Somalia": {
+      "en": "Somalia",
+      "zh": "[TODO] Somalia"
     },
     "Somerset": {
       "en": "Somerset",
@@ -23482,6 +24246,10 @@
       "en": "South",
       "zh": "[TODO] South"
     },
+    "South Africa": {
+      "en": "South Africa",
+      "zh": "[TODO] South Africa"
+    },
     "South Ayrshire": {
       "en": "South Ayrshire",
       "zh": "[TODO] South Ayrshire"
@@ -23505,6 +24273,10 @@
     "South Garo Hills": {
       "en": "South Garo Hills",
       "zh": "[TODO] South Garo Hills"
+    },
+    "South Georgia and the Islands": {
+      "en": "South Georgia and the Islands",
+      "zh": "[TODO] South Georgia and the Islands"
     },
     "South Gloucestershire": {
       "en": "South Gloucestershire",
@@ -23534,6 +24306,10 @@
       "en": "South Khorasan",
       "zh": "[TODO] South Khorasan"
     },
+    "South Korea": {
+      "en": "South Korea",
+      "zh": "[TODO] South Korea"
+    },
     "South Lanarkshire": {
       "en": "South Lanarkshire",
       "zh": "[TODO] South Lanarkshire"
@@ -23549,6 +24325,10 @@
     "South Salmara-Mankachar": {
       "en": "South Salmara-Mankachar",
       "zh": "[TODO] South Salmara-Mankachar"
+    },
+    "South Sudan": {
+      "en": "South Sudan",
+      "zh": "[TODO] South Sudan"
     },
     "South Teesside": {
       "en": "South Teesside",
@@ -23618,6 +24398,10 @@
       "en": "Sovietsky",
       "zh": "[TODO] Sovietsky"
     },
+    "Spain": {
+      "en": "Spain",
+      "zh": "[TODO] Spain"
+    },
     "Spas-Demensky District": {
       "en": "Spas-Demensky District",
       "zh": "[TODO] Spas-Demensky District"
@@ -23645,6 +24429,10 @@
     "Sredneakhtubinsky District": {
       "en": "Sredneakhtubinsky District",
       "zh": "[TODO] Sredneakhtubinsky District"
+    },
+    "Sri Lanka": {
+      "en": "Sri Lanka",
+      "zh": "[TODO] Sri Lanka"
     },
     "Sri Potti Sriramulu Nellore": {
       "en": "Sri Potti Sriramulu Nellore",
@@ -23918,6 +24706,10 @@
       "en": "Sud Sardegna",
       "zh": "[TODO] Sud Sardegna"
     },
+    "Sudan": {
+      "en": "Sudan",
+      "zh": "[TODO] Sudan"
+    },
     "Sudislavsky District": {
       "en": "Sudislavsky District",
       "zh": "[TODO] Sudislavsky District"
@@ -24102,6 +24894,10 @@
       "en": "Surin",
       "zh": "[TODO] Surin"
     },
+    "Suriname": {
+      "en": "Suriname",
+      "zh": "[TODO] Suriname"
+    },
     "Surkhandarya": {
       "en": "Surkhandarya",
       "zh": "[TODO] Surkhandarya"
@@ -24202,9 +24998,17 @@
       "en": "Swansea",
       "zh": "[TODO] Swansea"
     },
+    "Sweden": {
+      "en": "Sweden",
+      "zh": "[TODO] Sweden"
+    },
     "Swindon": {
       "en": "Swindon",
       "zh": "[TODO] Swindon"
+    },
+    "Switzerland": {
+      "en": "Switzerland",
+      "zh": "[TODO] Switzerland"
     },
     "Syamzhensky District": {
       "en": "Syamzhensky District",
@@ -24234,6 +25038,10 @@
       "en": "Synelnykove",
       "zh": "[TODO] Synelnykove"
     },
+    "Syria": {
+      "en": "Syria",
+      "zh": "[TODO] Syria"
+    },
     "Sysolsky District": {
       "en": "Sysolsky District",
       "zh": "[TODO] Sysolsky District"
@@ -24261,6 +25069,10 @@
     "Szczecin": {
       "en": "Szczecin",
       "zh": "[TODO] Szczecin"
+    },
+    "São Tomé and Principe": {
+      "en": "São Tomé and Principe",
+      "zh": "[TODO] São Tomé and Principe"
     },
     "Sächsische Schweiz-Osterzgebirge": {
       "en": "Sächsische Schweiz-Osterzgebirge",
@@ -24454,6 +25266,10 @@
       "en": "Taitung",
       "zh": "[TODO] Taitung"
     },
+    "Taiwan": {
+      "en": "Taiwan",
+      "zh": "[TODO] Taiwan"
+    },
     "Taixingxian": {
       "en": "Taixingxian",
       "zh": "[TODO] Taixingxian"
@@ -24473,6 +25289,10 @@
     "Taizhou": {
       "en": "Taizhou",
       "zh": "[TODO] Taizhou"
+    },
+    "Tajikistan": {
+      "en": "Tajikistan",
+      "zh": "[TODO] Tajikistan"
     },
     "Tajura' wa an Nawahi al Arba": {
       "en": "Tajura' wa an Nawahi al Arba",
@@ -24862,6 +25682,10 @@
       "en": "Teykovsky District",
       "zh": "[TODO] Teykovsky District"
     },
+    "Thailand": {
+      "en": "Thailand",
+      "zh": "[TODO] Thailand"
+    },
     "Thane": {
       "en": "Thane",
       "zh": "[TODO] Thane"
@@ -24877,6 +25701,10 @@
     "Thann-Guebwiller": {
       "en": "Thann-Guebwiller",
       "zh": "[TODO] Thann-Guebwiller"
+    },
+    "The Bahamas": {
+      "en": "The Bahamas",
+      "zh": "[TODO] The Bahamas"
     },
     "The Dangs": {
       "en": "The Dangs",
@@ -25145,6 +25973,10 @@
     "Tochigi": {
       "en": "Tochigi",
       "zh": "[TODO] Tochigi"
+    },
+    "Togo": {
+      "en": "Togo",
+      "zh": "[TODO] Togo"
     },
     "Tokaryovsky District": {
       "en": "Tokaryovsky District",
@@ -25474,6 +26306,10 @@
       "en": "Trikuṇāmalaya",
       "zh": "[TODO] Trikuṇāmalaya"
     },
+    "Trinidad and Tobago": {
+      "en": "Trinidad and Tobago",
+      "zh": "[TODO] Trinidad and Tobago"
+    },
     "Trnavský kraj": {
       "en": "Trnavský kraj",
       "zh": "[TODO] Trnavský kraj"
@@ -25598,6 +26434,10 @@
       "en": "Tunis",
       "zh": "[TODO] Tunis"
     },
+    "Tunisia": {
+      "en": "Tunisia",
+      "zh": "[TODO] Tunisia"
+    },
     "Tunliuxian": {
       "en": "Tunliuxian",
       "zh": "[TODO] Tunliuxian"
@@ -25645,6 +26485,14 @@
     "Turka": {
       "en": "Turka",
       "zh": "[TODO] Turka"
+    },
+    "Turkey": {
+      "en": "Turkey",
+      "zh": "[TODO] Turkey"
+    },
+    "Turkmenistan": {
+      "en": "Turkmenistan",
+      "zh": "[TODO] Turkmenistan"
     },
     "Turkmensky District": {
       "en": "Turkmensky District",
@@ -25806,6 +26654,10 @@
       "en": "Ufimsky District",
       "zh": "[TODO] Ufimsky District"
     },
+    "Uganda": {
+      "en": "Uganda",
+      "zh": "[TODO] Uganda"
+    },
     "Uglichsky District": {
       "en": "Uglichsky District",
       "zh": "[TODO] Uglichsky District"
@@ -25833,6 +26685,10 @@
     "Ukhta Urban Okrug": {
       "en": "Ukhta Urban Okrug",
       "zh": "[TODO] Ukhta Urban Okrug"
+    },
+    "Ukraine": {
+      "en": "Ukraine",
+      "zh": "[TODO] Ukraine"
     },
     "Ulaanbaatar": {
       "en": "Ulaanbaatar",
@@ -25886,6 +26742,22 @@
       "en": "Uninsky District",
       "zh": "[TODO] Uninsky District"
     },
+    "United Arab Emirates": {
+      "en": "United Arab Emirates",
+      "zh": "[TODO] United Arab Emirates"
+    },
+    "United Kingdom": {
+      "en": "United Kingdom",
+      "zh": "[TODO] United Kingdom"
+    },
+    "United Republic of Tanzania": {
+      "en": "United Republic of Tanzania",
+      "zh": "[TODO] United Republic of Tanzania"
+    },
+    "United States of America": {
+      "en": "United States of America",
+      "zh": "[TODO] United States of America"
+    },
     "Unna": {
       "en": "Unna",
       "zh": "[TODO] Unna"
@@ -25937,6 +26809,10 @@
     "Urmarsky District": {
       "en": "Urmarsky District",
       "zh": "[TODO] Urmarsky District"
+    },
+    "Uruguay": {
+      "en": "Uruguay",
+      "zh": "[TODO] Uruguay"
     },
     "Urupsky District": {
       "en": "Urupsky District",
@@ -26074,6 +26950,10 @@
       "en": "Uvs",
       "zh": "[TODO] Uvs"
     },
+    "Uzbekistan": {
+      "en": "Uzbekistan",
+      "zh": "[TODO] Uzbekistan"
+    },
     "Uzhhorod": {
       "en": "Uzhhorod",
       "zh": "[TODO] Uzhhorod"
@@ -26210,6 +27090,10 @@
       "en": "Vasylkivka",
       "zh": "[TODO] Vasylkivka"
     },
+    "Vatican": {
+      "en": "Vatican",
+      "zh": "[TODO] Vatican"
+    },
     "Vaud": {
       "en": "Vaud",
       "zh": "[TODO] Vaud"
@@ -26309,6 +27193,10 @@
     "Venezia": {
       "en": "Venezia",
       "zh": "[TODO] Venezia"
+    },
+    "Venezuela": {
+      "en": "Venezuela",
+      "zh": "[TODO] Venezuela"
     },
     "Venyovsky District": {
       "en": "Venyovsky District",
@@ -26505,6 +27393,10 @@
     "Vierzon": {
       "en": "Vierzon",
       "zh": "[TODO] Vierzon"
+    },
+    "Vietnam": {
+      "en": "Vietnam",
+      "zh": "[TODO] Vietnam"
     },
     "Vigan": {
       "en": "Vigan",
@@ -27305,6 +28197,10 @@
     "West-Noord-Brabant": {
       "en": "West-Noord-Brabant",
       "zh": "[TODO] West-Noord-Brabant"
+    },
+    "Western Sahara": {
+      "en": "Western Sahara",
+      "zh": "[TODO] Western Sahara"
     },
     "Westerwaldkreis": {
       "en": "Westerwaldkreis",
@@ -28638,6 +29534,10 @@
       "en": "Yelovsky District",
       "zh": "[TODO] Yelovsky District"
     },
+    "Yemen": {
+      "en": "Yemen",
+      "zh": "[TODO] Yemen"
+    },
     "Yemilchyne": {
       "en": "Yemilchyne",
       "zh": "[TODO] Yemilchyne"
@@ -29350,6 +30250,10 @@
       "en": "Zambales",
       "zh": "[TODO] Zambales"
     },
+    "Zambia": {
+      "en": "Zambia",
+      "zh": "[TODO] Zambia"
+    },
     "Zamboanga": {
       "en": "Zamboanga",
       "zh": "[TODO] Zamboanga"
@@ -29970,6 +30874,10 @@
       "en": "Zilairsky District",
       "zh": "[TODO] Zilairsky District"
     },
+    "Zimbabwe": {
+      "en": "Zimbabwe",
+      "zh": "[TODO] Zimbabwe"
+    },
     "Zinkiv": {
       "en": "Zinkiv",
       "zh": "[TODO] Zinkiv"
@@ -30338,6 +31246,10 @@
       "en": "dębicki",
       "zh": "[TODO] dębicki"
     },
+    "eSwatini": {
+      "en": "eSwatini",
+      "zh": "[TODO] eSwatini"
+    },
     "elbląski": {
       "en": "elbląski",
       "zh": "[TODO] elbląski"
@@ -30437,6 +31349,802 @@
     "hrubieszowski": {
       "en": "hrubieszowski",
       "zh": "[TODO] hrubieszowski"
+    },
+    "id::AD": {
+      "en": "Andorra",
+      "zh": "[TODO] Andorra"
+    },
+    "id::AE": {
+      "en": "United Arab Emirates",
+      "zh": "[TODO] United Arab Emirates"
+    },
+    "id::AF": {
+      "en": "Afghanistan",
+      "zh": "[TODO] Afghanistan"
+    },
+    "id::AL": {
+      "en": "Albania",
+      "zh": "[TODO] Albania"
+    },
+    "id::AM": {
+      "en": "Armenia",
+      "zh": "[TODO] Armenia"
+    },
+    "id::AO": {
+      "en": "Angola",
+      "zh": "[TODO] Angola"
+    },
+    "id::AQ": {
+      "en": "Antarctica",
+      "zh": "[TODO] Antarctica"
+    },
+    "id::AR": {
+      "en": "Argentina",
+      "zh": "[TODO] Argentina"
+    },
+    "id::AT": {
+      "en": "Austria",
+      "zh": "[TODO] Austria"
+    },
+    "id::AU": {
+      "en": "Australia",
+      "zh": "[TODO] Australia"
+    },
+    "id::AU__1": {
+      "en": "Ashmore and Cartier Islands",
+      "zh": "[TODO] Ashmore and Cartier Islands"
+    },
+    "id::AU__2": {
+      "en": "Indian Ocean Territories",
+      "zh": "[TODO] Indian Ocean Territories"
+    },
+    "id::AX": {
+      "en": "Aland",
+      "zh": "[TODO] Aland"
+    },
+    "id::AZ": {
+      "en": "Azerbaijan",
+      "zh": "[TODO] Azerbaijan"
+    },
+    "id::BA": {
+      "en": "Bosnia and Herzegovina",
+      "zh": "[TODO] Bosnia and Herzegovina"
+    },
+    "id::BD": {
+      "en": "Bangladesh",
+      "zh": "[TODO] Bangladesh"
+    },
+    "id::BE": {
+      "en": "Belgium",
+      "zh": "[TODO] Belgium"
+    },
+    "id::BF": {
+      "en": "Burkina Faso",
+      "zh": "[TODO] Burkina Faso"
+    },
+    "id::BG": {
+      "en": "Bulgaria",
+      "zh": "[TODO] Bulgaria"
+    },
+    "id::BH": {
+      "en": "Bahrain",
+      "zh": "[TODO] Bahrain"
+    },
+    "id::BI": {
+      "en": "Burundi",
+      "zh": "[TODO] Burundi"
+    },
+    "id::BJ": {
+      "en": "Benin",
+      "zh": "[TODO] Benin"
+    },
+    "id::BN": {
+      "en": "Brunei",
+      "zh": "[TODO] Brunei"
+    },
+    "id::BO": {
+      "en": "Bolivia",
+      "zh": "[TODO] Bolivia"
+    },
+    "id::BR": {
+      "en": "Brazil",
+      "zh": "[TODO] Brazil"
+    },
+    "id::BS": {
+      "en": "The Bahamas",
+      "zh": "[TODO] The Bahamas"
+    },
+    "id::BT": {
+      "en": "Bhutan",
+      "zh": "[TODO] Bhutan"
+    },
+    "id::BW": {
+      "en": "Botswana",
+      "zh": "[TODO] Botswana"
+    },
+    "id::BY": {
+      "en": "Belarus",
+      "zh": "[TODO] Belarus"
+    },
+    "id::BZ": {
+      "en": "Belize",
+      "zh": "[TODO] Belize"
+    },
+    "id::CA": {
+      "en": "Canada",
+      "zh": "[TODO] Canada"
+    },
+    "id::CD": {
+      "en": "Democratic Republic of the Congo",
+      "zh": "[TODO] Democratic Republic of the Congo"
+    },
+    "id::CF": {
+      "en": "Central African Republic",
+      "zh": "[TODO] Central African Republic"
+    },
+    "id::CG": {
+      "en": "Republic of the Congo",
+      "zh": "[TODO] Republic of the Congo"
+    },
+    "id::CH": {
+      "en": "Switzerland",
+      "zh": "[TODO] Switzerland"
+    },
+    "id::CI": {
+      "en": "Ivory Coast",
+      "zh": "[TODO] Ivory Coast"
+    },
+    "id::CL": {
+      "en": "Chile",
+      "zh": "[TODO] Chile"
+    },
+    "id::CM": {
+      "en": "Cameroon",
+      "zh": "[TODO] Cameroon"
+    },
+    "id::CN": {
+      "en": "China",
+      "zh": "[TODO] China"
+    },
+    "id::CO": {
+      "en": "Colombia",
+      "zh": "[TODO] Colombia"
+    },
+    "id::CR": {
+      "en": "Costa Rica",
+      "zh": "[TODO] Costa Rica"
+    },
+    "id::CU": {
+      "en": "Cuba",
+      "zh": "[TODO] Cuba"
+    },
+    "id::CV": {
+      "en": "Cabo Verde",
+      "zh": "[TODO] Cabo Verde"
+    },
+    "id::CY": {
+      "en": "Cyprus",
+      "zh": "[TODO] Cyprus"
+    },
+    "id::CZ": {
+      "en": "Czechia",
+      "zh": "[TODO] Czechia"
+    },
+    "id::DE": {
+      "en": "Germany",
+      "zh": "[TODO] Germany"
+    },
+    "id::DJ": {
+      "en": "Djibouti",
+      "zh": "[TODO] Djibouti"
+    },
+    "id::DK": {
+      "en": "Denmark",
+      "zh": "[TODO] Denmark"
+    },
+    "id::DO": {
+      "en": "Dominican Republic",
+      "zh": "[TODO] Dominican Republic"
+    },
+    "id::DZ": {
+      "en": "Algeria",
+      "zh": "[TODO] Algeria"
+    },
+    "id::EC": {
+      "en": "Ecuador",
+      "zh": "[TODO] Ecuador"
+    },
+    "id::EE": {
+      "en": "Estonia",
+      "zh": "[TODO] Estonia"
+    },
+    "id::EG": {
+      "en": "Egypt",
+      "zh": "[TODO] Egypt"
+    },
+    "id::EH": {
+      "en": "Western Sahara",
+      "zh": "[TODO] Western Sahara"
+    },
+    "id::ER": {
+      "en": "Eritrea",
+      "zh": "[TODO] Eritrea"
+    },
+    "id::ES": {
+      "en": "Spain",
+      "zh": "[TODO] Spain"
+    },
+    "id::ET": {
+      "en": "Ethiopia",
+      "zh": "[TODO] Ethiopia"
+    },
+    "id::FI": {
+      "en": "Finland",
+      "zh": "[TODO] Finland"
+    },
+    "id::FK": {
+      "en": "Falkland Islands",
+      "zh": "[TODO] Falkland Islands"
+    },
+    "id::FO": {
+      "en": "Faroe Islands",
+      "zh": "[TODO] Faroe Islands"
+    },
+    "id::FR": {
+      "en": "France",
+      "zh": "[TODO] France"
+    },
+    "id::GA": {
+      "en": "Gabon",
+      "zh": "[TODO] Gabon"
+    },
+    "id::GB": {
+      "en": "United Kingdom",
+      "zh": "[TODO] United Kingdom"
+    },
+    "id::GE": {
+      "en": "Georgia",
+      "zh": "[TODO] Georgia"
+    },
+    "id::GG": {
+      "en": "Guernsey",
+      "zh": "[TODO] Guernsey"
+    },
+    "id::GH": {
+      "en": "Ghana",
+      "zh": "[TODO] Ghana"
+    },
+    "id::GL": {
+      "en": "Greenland",
+      "zh": "[TODO] Greenland"
+    },
+    "id::GM": {
+      "en": "Gambia",
+      "zh": "[TODO] Gambia"
+    },
+    "id::GN": {
+      "en": "Guinea",
+      "zh": "[TODO] Guinea"
+    },
+    "id::GQ": {
+      "en": "Equatorial Guinea",
+      "zh": "[TODO] Equatorial Guinea"
+    },
+    "id::GR": {
+      "en": "Greece",
+      "zh": "[TODO] Greece"
+    },
+    "id::GS": {
+      "en": "South Georgia and the Islands",
+      "zh": "[TODO] South Georgia and the Islands"
+    },
+    "id::GT": {
+      "en": "Guatemala",
+      "zh": "[TODO] Guatemala"
+    },
+    "id::GW": {
+      "en": "Guinea-Bissau",
+      "zh": "[TODO] Guinea-Bissau"
+    },
+    "id::GY": {
+      "en": "Guyana",
+      "zh": "[TODO] Guyana"
+    },
+    "id::HK": {
+      "en": "Hong Kong S.A.R.",
+      "zh": "[TODO] Hong Kong S.A.R."
+    },
+    "id::HM": {
+      "en": "Heard Island and McDonald Islands",
+      "zh": "[TODO] Heard Island and McDonald Islands"
+    },
+    "id::HN": {
+      "en": "Honduras",
+      "zh": "[TODO] Honduras"
+    },
+    "id::HR": {
+      "en": "Croatia",
+      "zh": "[TODO] Croatia"
+    },
+    "id::HT": {
+      "en": "Haiti",
+      "zh": "[TODO] Haiti"
+    },
+    "id::HU": {
+      "en": "Hungary",
+      "zh": "[TODO] Hungary"
+    },
+    "id::ID": {
+      "en": "Indonesia",
+      "zh": "[TODO] Indonesia"
+    },
+    "id::IE": {
+      "en": "Ireland",
+      "zh": "[TODO] Ireland"
+    },
+    "id::IL": {
+      "en": "Israel",
+      "zh": "[TODO] Israel"
+    },
+    "id::IM": {
+      "en": "Isle of Man",
+      "zh": "[TODO] Isle of Man"
+    },
+    "id::IN": {
+      "en": "India",
+      "zh": "[TODO] India"
+    },
+    "id::IO": {
+      "en": "British Indian Ocean Territory",
+      "zh": "[TODO] British Indian Ocean Territory"
+    },
+    "id::IQ": {
+      "en": "Iraq",
+      "zh": "[TODO] Iraq"
+    },
+    "id::IR": {
+      "en": "Iran",
+      "zh": "[TODO] Iran"
+    },
+    "id::IS": {
+      "en": "Iceland",
+      "zh": "[TODO] Iceland"
+    },
+    "id::IT": {
+      "en": "Italy",
+      "zh": "[TODO] Italy"
+    },
+    "id::JE": {
+      "en": "Jersey",
+      "zh": "[TODO] Jersey"
+    },
+    "id::JM": {
+      "en": "Jamaica",
+      "zh": "[TODO] Jamaica"
+    },
+    "id::JO": {
+      "en": "Jordan",
+      "zh": "[TODO] Jordan"
+    },
+    "id::JP": {
+      "en": "Japan",
+      "zh": "[TODO] Japan"
+    },
+    "id::KE": {
+      "en": "Kenya",
+      "zh": "[TODO] Kenya"
+    },
+    "id::KG": {
+      "en": "Kyrgyzstan",
+      "zh": "[TODO] Kyrgyzstan"
+    },
+    "id::KH": {
+      "en": "Cambodia",
+      "zh": "[TODO] Cambodia"
+    },
+    "id::KM": {
+      "en": "Comoros",
+      "zh": "[TODO] Comoros"
+    },
+    "id::KP": {
+      "en": "North Korea",
+      "zh": "[TODO] North Korea"
+    },
+    "id::KR": {
+      "en": "South Korea",
+      "zh": "[TODO] South Korea"
+    },
+    "id::KW": {
+      "en": "Kuwait",
+      "zh": "[TODO] Kuwait"
+    },
+    "id::KZ": {
+      "en": "Kazakhstan",
+      "zh": "[TODO] Kazakhstan"
+    },
+    "id::LA": {
+      "en": "Laos",
+      "zh": "[TODO] Laos"
+    },
+    "id::LB": {
+      "en": "Lebanon",
+      "zh": "[TODO] Lebanon"
+    },
+    "id::LI": {
+      "en": "Liechtenstein",
+      "zh": "[TODO] Liechtenstein"
+    },
+    "id::LK": {
+      "en": "Sri Lanka",
+      "zh": "[TODO] Sri Lanka"
+    },
+    "id::LR": {
+      "en": "Liberia",
+      "zh": "[TODO] Liberia"
+    },
+    "id::LS": {
+      "en": "Lesotho",
+      "zh": "[TODO] Lesotho"
+    },
+    "id::LT": {
+      "en": "Lithuania",
+      "zh": "[TODO] Lithuania"
+    },
+    "id::LU": {
+      "en": "Luxembourg",
+      "zh": "卢森堡"
+    },
+    "id::LV": {
+      "en": "Latvia",
+      "zh": "[TODO] Latvia"
+    },
+    "id::LY": {
+      "en": "Libya",
+      "zh": "[TODO] Libya"
+    },
+    "id::MA": {
+      "en": "Morocco",
+      "zh": "[TODO] Morocco"
+    },
+    "id::MC": {
+      "en": "Monaco",
+      "zh": "[TODO] Monaco"
+    },
+    "id::MD": {
+      "en": "Moldova",
+      "zh": "[TODO] Moldova"
+    },
+    "id::ME": {
+      "en": "Montenegro",
+      "zh": "[TODO] Montenegro"
+    },
+    "id::MG": {
+      "en": "Madagascar",
+      "zh": "[TODO] Madagascar"
+    },
+    "id::MK": {
+      "en": "North Macedonia",
+      "zh": "[TODO] North Macedonia"
+    },
+    "id::ML": {
+      "en": "Mali",
+      "zh": "[TODO] Mali"
+    },
+    "id::MM": {
+      "en": "Myanmar",
+      "zh": "[TODO] Myanmar"
+    },
+    "id::MN": {
+      "en": "Mongolia",
+      "zh": "[TODO] Mongolia"
+    },
+    "id::MO": {
+      "en": "Macao S.A.R",
+      "zh": "[TODO] Macao S.A.R"
+    },
+    "id::MR": {
+      "en": "Mauritania",
+      "zh": "[TODO] Mauritania"
+    },
+    "id::MT": {
+      "en": "Malta",
+      "zh": "[TODO] Malta"
+    },
+    "id::MU": {
+      "en": "Mauritius",
+      "zh": "[TODO] Mauritius"
+    },
+    "id::MV": {
+      "en": "Maldives",
+      "zh": "[TODO] Maldives"
+    },
+    "id::MW": {
+      "en": "Malawi",
+      "zh": "[TODO] Malawi"
+    },
+    "id::MX": {
+      "en": "Mexico",
+      "zh": "[TODO] Mexico"
+    },
+    "id::MY": {
+      "en": "Malaysia",
+      "zh": "[TODO] Malaysia"
+    },
+    "id::MZ": {
+      "en": "Mozambique",
+      "zh": "[TODO] Mozambique"
+    },
+    "id::NA": {
+      "en": "Namibia",
+      "zh": "[TODO] Namibia"
+    },
+    "id::NE": {
+      "en": "Niger",
+      "zh": "[TODO] Niger"
+    },
+    "id::NG": {
+      "en": "Nigeria",
+      "zh": "[TODO] Nigeria"
+    },
+    "id::NI": {
+      "en": "Nicaragua",
+      "zh": "[TODO] Nicaragua"
+    },
+    "id::NL": {
+      "en": "Netherlands",
+      "zh": "[TODO] Netherlands"
+    },
+    "id::NO": {
+      "en": "Norway",
+      "zh": "[TODO] Norway"
+    },
+    "id::NP": {
+      "en": "Nepal",
+      "zh": "[TODO] Nepal"
+    },
+    "id::NZ": {
+      "en": "New Zealand",
+      "zh": "[TODO] New Zealand"
+    },
+    "id::OM": {
+      "en": "Oman",
+      "zh": "[TODO] Oman"
+    },
+    "id::PA": {
+      "en": "Panama",
+      "zh": "[TODO] Panama"
+    },
+    "id::PE": {
+      "en": "Peru",
+      "zh": "[TODO] Peru"
+    },
+    "id::PG": {
+      "en": "Papua New Guinea",
+      "zh": "[TODO] Papua New Guinea"
+    },
+    "id::PH": {
+      "en": "Philippines",
+      "zh": "[TODO] Philippines"
+    },
+    "id::PK": {
+      "en": "Pakistan",
+      "zh": "[TODO] Pakistan"
+    },
+    "id::PL": {
+      "en": "Poland",
+      "zh": "[TODO] Poland"
+    },
+    "id::PM": {
+      "en": "Saint Pierre and Miquelon",
+      "zh": "[TODO] Saint Pierre and Miquelon"
+    },
+    "id::PR": {
+      "en": "Puerto Rico",
+      "zh": "[TODO] Puerto Rico"
+    },
+    "id::PS": {
+      "en": "Palestine",
+      "zh": "[TODO] Palestine"
+    },
+    "id::PT": {
+      "en": "Portugal",
+      "zh": "[TODO] Portugal"
+    },
+    "id::PY": {
+      "en": "Paraguay",
+      "zh": "[TODO] Paraguay"
+    },
+    "id::QA": {
+      "en": "Qatar",
+      "zh": "[TODO] Qatar"
+    },
+    "id::RO": {
+      "en": "Romania",
+      "zh": "[TODO] Romania"
+    },
+    "id::RS": {
+      "en": "Republic of Serbia",
+      "zh": "[TODO] Republic of Serbia"
+    },
+    "id::RU": {
+      "en": "Russia",
+      "zh": "[TODO] Russia"
+    },
+    "id::RW": {
+      "en": "Rwanda",
+      "zh": "[TODO] Rwanda"
+    },
+    "id::SA": {
+      "en": "Saudi Arabia",
+      "zh": "[TODO] Saudi Arabia"
+    },
+    "id::SC": {
+      "en": "Seychelles",
+      "zh": "[TODO] Seychelles"
+    },
+    "id::SD": {
+      "en": "Sudan",
+      "zh": "[TODO] Sudan"
+    },
+    "id::SE": {
+      "en": "Sweden",
+      "zh": "[TODO] Sweden"
+    },
+    "id::SG": {
+      "en": "Singapore",
+      "zh": "[TODO] Singapore"
+    },
+    "id::SH": {
+      "en": "Saint Helena",
+      "zh": "[TODO] Saint Helena"
+    },
+    "id::SI": {
+      "en": "Slovenia",
+      "zh": "[TODO] Slovenia"
+    },
+    "id::SK": {
+      "en": "Slovakia",
+      "zh": "[TODO] Slovakia"
+    },
+    "id::SL": {
+      "en": "Sierra Leone",
+      "zh": "[TODO] Sierra Leone"
+    },
+    "id::SM": {
+      "en": "San Marino",
+      "zh": "[TODO] San Marino"
+    },
+    "id::SN": {
+      "en": "Senegal",
+      "zh": "[TODO] Senegal"
+    },
+    "id::SO": {
+      "en": "Somalia",
+      "zh": "[TODO] Somalia"
+    },
+    "id::SR": {
+      "en": "Suriname",
+      "zh": "[TODO] Suriname"
+    },
+    "id::SS": {
+      "en": "South Sudan",
+      "zh": "[TODO] South Sudan"
+    },
+    "id::ST": {
+      "en": "São Tomé and Principe",
+      "zh": "[TODO] São Tomé and Principe"
+    },
+    "id::SV": {
+      "en": "El Salvador",
+      "zh": "[TODO] El Salvador"
+    },
+    "id::SY": {
+      "en": "Syria",
+      "zh": "[TODO] Syria"
+    },
+    "id::SZ": {
+      "en": "eSwatini",
+      "zh": "[TODO] eSwatini"
+    },
+    "id::TD": {
+      "en": "Chad",
+      "zh": "[TODO] Chad"
+    },
+    "id::TF": {
+      "en": "French Southern and Antarctic Lands",
+      "zh": "[TODO] French Southern and Antarctic Lands"
+    },
+    "id::TG": {
+      "en": "Togo",
+      "zh": "[TODO] Togo"
+    },
+    "id::TH": {
+      "en": "Thailand",
+      "zh": "[TODO] Thailand"
+    },
+    "id::TJ": {
+      "en": "Tajikistan",
+      "zh": "[TODO] Tajikistan"
+    },
+    "id::TL": {
+      "en": "East Timor",
+      "zh": "[TODO] East Timor"
+    },
+    "id::TM": {
+      "en": "Turkmenistan",
+      "zh": "[TODO] Turkmenistan"
+    },
+    "id::TN": {
+      "en": "Tunisia",
+      "zh": "[TODO] Tunisia"
+    },
+    "id::TR": {
+      "en": "Turkey",
+      "zh": "[TODO] Turkey"
+    },
+    "id::TT": {
+      "en": "Trinidad and Tobago",
+      "zh": "[TODO] Trinidad and Tobago"
+    },
+    "id::TW": {
+      "en": "Taiwan",
+      "zh": "[TODO] Taiwan"
+    },
+    "id::TZ": {
+      "en": "United Republic of Tanzania",
+      "zh": "[TODO] United Republic of Tanzania"
+    },
+    "id::UA": {
+      "en": "Ukraine",
+      "zh": "[TODO] Ukraine"
+    },
+    "id::UG": {
+      "en": "Uganda",
+      "zh": "[TODO] Uganda"
+    },
+    "id::US": {
+      "en": "United States of America",
+      "zh": "[TODO] United States of America"
+    },
+    "id::UY": {
+      "en": "Uruguay",
+      "zh": "[TODO] Uruguay"
+    },
+    "id::UZ": {
+      "en": "Uzbekistan",
+      "zh": "[TODO] Uzbekistan"
+    },
+    "id::VA": {
+      "en": "Vatican",
+      "zh": "[TODO] Vatican"
+    },
+    "id::VE": {
+      "en": "Venezuela",
+      "zh": "[TODO] Venezuela"
+    },
+    "id::VN": {
+      "en": "Vietnam",
+      "zh": "[TODO] Vietnam"
+    },
+    "id::XK": {
+      "en": "Kosovo",
+      "zh": "[TODO] Kosovo"
+    },
+    "id::YE": {
+      "en": "Yemen",
+      "zh": "[TODO] Yemen"
+    },
+    "id::ZA": {
+      "en": "South Africa",
+      "zh": "[TODO] South Africa"
+    },
+    "id::ZM": {
+      "en": "Zambia",
+      "zh": "[TODO] Zambia"
+    },
+    "id::ZW": {
+      "en": "Zimbabwe",
+      "zh": "[TODO] Zimbabwe"
     },
     "inowrocławski": {
       "en": "inowrocławski",

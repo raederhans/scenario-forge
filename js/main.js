@@ -47,41 +47,64 @@ async function bootstrap() {
   hydrateLanguage();
 
   try {
-    const { topology, locales, hierarchy } = await loadMapData();
-    state.topology = topology;
+    const {
+      topology,
+      topologyPrimary,
+      topologyDetail,
+      topologyBundleMode,
+      locales,
+      geoAliases,
+      hierarchy,
+    } = await loadMapData();
+    state.topology = topology || topologyPrimary || topologyDetail;
+    state.topologyPrimary = topologyPrimary || state.topology;
+    state.topologyDetail = topologyDetail || null;
+    state.topologyBundleMode = topologyBundleMode || "single";
     state.locales = locales || { ui: {}, geo: {} };
+    state.geoAliasToStableKey = geoAliases?.alias_to_stable_key || {};
     processHierarchyData(hierarchy);
 
-    if (!state.topology) {
+    if (!state.topologyPrimary) {
       console.error("CRITICAL: TopoJSON file loaded but is null/undefined");
       return;
     }
 
-    const objects = state.topology.objects || {};
+    const objects = state.topologyPrimary.objects || {};
     if (!objects.political) {
       console.error("CRITICAL: 'political' object missing from TopoJSON");
       return;
     }
+    const primaryCount = Array.isArray(objects.political.geometries)
+      ? objects.political.geometries.length
+      : 0;
+    const detailCount =
+      state.topologyDetail?.objects?.political?.geometries &&
+      Array.isArray(state.topologyDetail.objects.political.geometries)
+        ? state.topologyDetail.objects.political.geometries.length
+        : 0;
+    console.log(
+      `[main] Loaded topology bundle mode=${state.topologyBundleMode}, primary=${primaryCount}, detail=${detailCount}.`
+    );
 
-    state.landData = globalThis.topojson.feature(state.topology, objects.political);
+    state.landData = globalThis.topojson.feature(state.topologyPrimary, objects.political);
 
     if (objects.special_zones) {
-      state.specialZonesData = globalThis.topojson.feature(state.topology, objects.special_zones);
+      state.specialZonesData = globalThis.topojson.feature(state.topologyPrimary, objects.special_zones);
     }
     if (objects.rivers) {
-      state.riversData = globalThis.topojson.feature(state.topology, objects.rivers);
+      state.riversData = globalThis.topojson.feature(state.topologyPrimary, objects.rivers);
     }
     if (objects.ocean) {
-      state.oceanData = globalThis.topojson.feature(state.topology, objects.ocean);
+      state.oceanData = globalThis.topojson.feature(state.topologyPrimary, objects.ocean);
     }
     if (objects.land) {
-      state.landBgData = globalThis.topojson.feature(state.topology, objects.land);
+      state.landBgData = globalThis.topojson.feature(state.topologyPrimary, objects.land);
     }
     if (objects.urban) {
-      state.urbanData = globalThis.topojson.feature(state.topology, objects.urban);
+      state.urbanData = globalThis.topojson.feature(state.topologyPrimary, objects.urban);
     }
     if (objects.physical) {
-      state.physicalData = globalThis.topojson.feature(state.topology, objects.physical);
+      state.physicalData = globalThis.topojson.feature(state.topologyPrimary, objects.physical);
     }
 
     initPresetState();
