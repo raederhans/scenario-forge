@@ -63,6 +63,9 @@ from map_builder.processors.special_zones import build_special_zones
 from map_builder.outputs.save import save_outputs
 from tools import generate_hierarchy, geo_key_normalizer, translate_manager
 
+GLOBAL_OCEAN_MIN_BBOX_WIDTH = 220.0
+GLOBAL_OCEAN_MIN_BBOX_HEIGHT = 90.0
+
 
 def cull_small_geometries(
     gdf: gpd.GeoDataFrame,
@@ -96,6 +99,95 @@ def cull_small_geometries(
         )
     return culled
 
+
+def _bounds_to_tuple(bounds: Iterable[float]) -> tuple[float, float, float, float]:
+    minx, miny, maxx, maxy = bounds
+    return (float(minx), float(miny), float(maxx), float(maxy))
+
+
+def _compute_bbox_metrics(
+    gdf: gpd.GeoDataFrame,
+    target_bounds: Iterable[float],
+) -> tuple[float, float, float]:
+    if gdf is None or gdf.empty:
+        return 0.0, 0.0, 0.0
+    try:
+        gdf = gdf.to_crs("EPSG:4326")
+        minx, miny, maxx, maxy = map(float, gdf.total_bounds)
+    except Exception:
+        return 0.0, 0.0, 0.0
+
+    width = max(0.0, maxx - minx)
+    height = max(0.0, maxy - miny)
+    tminx, tminy, tmaxx, tmaxy = _bounds_to_tuple(target_bounds)
+    full_area = max((tmaxx - tminx) * (tmaxy - tminy), 1e-9)
+    ratio = min(1.0, max(0.0, (width * height) / full_area))
+    return width, height, ratio
+
+
+def _build_ocean_fallback_from_land(
+    land_gdf: gpd.GeoDataFrame,
+    target_bounds: Iterable[float],
+) -> gpd.GeoDataFrame:
+    tminx, tminy, tmaxx, tmaxy = _bounds_to_tuple(target_bounds)
+    world_box = box(tminx, tminy, tmaxx, tmaxy)
+
+    land_ll = land_gdf.to_crs("EPSG:4326").copy()
+    land_ll = land_ll[land_ll.geometry.notna() & ~land_ll.geometry.is_empty].copy()
+    if land_ll.empty:
+        return gpd.GeoDataFrame(geometry=[world_box], crs="EPSG:4326")
+
+    try:
+        land_union = land_ll.geometry.unary_union
+        ocean_geom = world_box.difference(land_union)
+    except Exception as exc:
+        print(f"[Ocean Coverage] Land-difference fallback failed; using world bbox ocean: {exc}")
+        ocean_geom = world_box
+
+    fallback = gpd.GeoDataFrame(geometry=[ocean_geom], crs="EPSG:4326")
+    fallback = fallback.explode(index_parts=False, ignore_index=True)
+    fallback = fallback[fallback.geometry.notna() & ~fallback.geometry.is_empty].copy()
+    fallback = fallback[fallback.geometry.geom_type.isin(["Polygon", "MultiPolygon"])].copy()
+    if fallback.empty:
+        fallback = gpd.GeoDataFrame(geometry=[world_box], crs="EPSG:4326")
+    return fallback
+
+
+def ensure_ocean_coverage(
+    ocean_gdf: gpd.GeoDataFrame,
+    land_bg_gdf: gpd.GeoDataFrame,
+    target_bounds: Iterable[float] | None = None,
+    stage_label: str = "unknown",
+) -> gpd.GeoDataFrame:
+    bounds = target_bounds or getattr(cfg, "MAP_BOUNDS", cfg.GLOBAL_BOUNDS)
+    bminx, bminy, bmaxx, bmaxy = _bounds_to_tuple(bounds)
+    bounds_width = max(0.0, bmaxx - bminx)
+    bounds_height = max(0.0, bmaxy - bminy)
+    global_like = bounds_width >= 340 and bounds_height >= 150
+
+    min_width = GLOBAL_OCEAN_MIN_BBOX_WIDTH if global_like else bounds_width * (220.0 / 360.0)
+    min_height = GLOBAL_OCEAN_MIN_BBOX_HEIGHT if global_like else bounds_height * 0.5
+
+    width, height, ratio = _compute_bbox_metrics(ocean_gdf, bounds)
+    print(
+        f"[Ocean Coverage:{stage_label}] bbox width={width:.2f}°, height={height:.2f}°, "
+        f"coverage={ratio:.3f}, threshold width>={min_width:.2f}°, height>={min_height:.2f}°"
+    )
+
+    if width >= min_width and height >= min_height:
+        return ocean_gdf
+
+    print(
+        f"[Ocean Coverage:{stage_label}] Ocean layer under-covered; "
+        "forcing world_bbox - land_union fallback."
+    )
+    fallback = _build_ocean_fallback_from_land(land_bg_gdf, bounds)
+    f_width, f_height, f_ratio = _compute_bbox_metrics(fallback, bounds)
+    print(
+        f"[Ocean Coverage:{stage_label}] Fallback bbox width={f_width:.2f}°, "
+        f"height={f_height:.2f}°, coverage={f_ratio:.3f}"
+    )
+    return fallback
 
 
 def fetch_geojson(url: str) -> dict:
@@ -585,18 +677,23 @@ def main() -> None:
     border_lines = build_border_lines()
     ocean = fetch_ne_zip(cfg.OCEAN_URL, "ocean")
     ocean = clip_to_map_bounds(ocean, "ocean")
+    land_bg = fetch_ne_zip(cfg.LAND_BG_URL, "land")
+    land_bg = clip_to_map_bounds(land_bg, "land background")
+    ocean = ensure_ocean_coverage(
+        ocean,
+        land_bg,
+        target_bounds=getattr(cfg, "MAP_BOUNDS", cfg.GLOBAL_BOUNDS),
+        stage_label="initial",
+    )
+
     # Keep raw ocean geometry until political bounds are finalized to avoid
     # early bbox clipping artifacts.
     ocean_clipped = ocean.copy()
-    ocean_clipped = ocean_clipped.copy()
     ocean_clipped["geometry"] = ocean_clipped.geometry.simplify(
         tolerance=cfg.SIMPLIFY_BACKGROUND, preserve_topology=True
     )
-    land_bg = fetch_ne_zip(cfg.LAND_BG_URL, "land")
-    land_bg = clip_to_map_bounds(land_bg, "land background")
     # Keep raw land background geometry until political bounds are finalized.
     land_bg_clipped = land_bg.copy()
-    land_bg_clipped = land_bg_clipped.copy()
     land_bg_clipped["geometry"] = land_bg_clipped.geometry.simplify(
         tolerance=cfg.SIMPLIFY_BACKGROUND, preserve_topology=True
     )
@@ -741,6 +838,13 @@ def main() -> None:
             land_bg_clipped = clip_to_bounds(land_bg_clipped, hybrid_bounds, "land background")
     except Exception as exc:
         print(f"Background layer clip-to-political-bounds skipped: {exc}")
+
+    ocean_clipped = ensure_ocean_coverage(
+        ocean_clipped,
+        land_bg_clipped,
+        target_bounds=getattr(cfg, "MAP_BOUNDS", cfg.GLOBAL_BOUNDS),
+        stage_label="pre-topology",
+    )
 
     # Global polygon culling pass to reduce payload while preserving VIP geometries.
     filtered_group_col = "id" if "id" in filtered.columns else "NUTS_ID"

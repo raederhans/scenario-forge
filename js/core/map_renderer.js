@@ -45,6 +45,22 @@ const WRAP_ARTIFACT_WIDTH_RATIO = 0.9;
 const WRAP_ARTIFACT_HEIGHT_RATIO = 0.3;
 const WRAP_ARTIFACT_AREA_RATIO = 0.35;
 const WRAP_ARTIFACT_ASPECT_MIN = 1.6;
+const HIT_GRID_TARGET_COLS = 24;
+const HIT_GRID_MIN_CELL_PX = 32;
+const HIT_GRID_MAX_CELL_PX = 96;
+const HIT_SNAP_RADIUS_PX = 8;
+const HIT_MAX_CELLS_PER_ITEM = 400;
+const COASTLINE_LOD_LOW_ZOOM_MAX = 1.8;
+const COASTLINE_LOD_MID_ZOOM_MAX = 3.2;
+const COASTLINE_SIMPLIFY_MID_EPSILON = 0.09;
+const COASTLINE_SIMPLIFY_LOW_EPSILON = 0.22;
+const COASTLINE_SIMPLIFY_MID_MIN_LENGTH = 0.2;
+const COASTLINE_SIMPLIFY_LOW_MIN_LENGTH = 0.45;
+const OCEAN_PATTERN_BASE_SIZE = 160;
+const OCEAN_ADVANCED_STYLES_ENABLED = false;
+const OCEAN_MASK_MODE_TOPOLOGY = "topology_ocean";
+const OCEAN_MASK_MODE_SPHERE_MINUS_LAND = "sphere_minus_land";
+const OCEAN_MASK_MIN_QUALITY = 0.35;
 const KNOWN_BAD_FEATURE_IDS = new Set([
   "RU_RAY_50074027B10564453072266",
   "RU_RAY_50074027B19237962816289",
@@ -61,6 +77,7 @@ let islandNeighborsCache = {
   count: 0,
   neighbors: [],
 };
+const oceanPatternCache = new Map();
 
 function canonicalCountryCode(rawCode) {
   const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
@@ -733,6 +750,7 @@ function setCanvasSize() {
   mapCanvas.height = scaledH;
   mapCanvas.style.width = `${state.width}px`;
   mapCanvas.style.height = `${state.height}px`;
+  oceanPatternCache.clear();
 
   const svg = globalThis.d3.select(mapSvg);
   svg.attr("width", state.width).attr("height", state.height);
@@ -795,18 +813,6 @@ function buildSourceBorderMeshes(topology, includedCountries) {
     return !!(groupA && groupB && groupA !== groupB);
   };
 
-  const countryMesh = globalThis.topojson.mesh(
-    topology,
-    object,
-    (a, b) => {
-      if (!a || !b) return false;
-      if (!inScope(a) || !inScope(b)) return false;
-      const codeA = getFeatureCountryCodeNormalized(a);
-      const codeB = getFeatureCountryCodeNormalized(b);
-      return !!(codeA && codeB && codeA !== codeB);
-    }
-  );
-
   const provinceMesh = globalThis.topojson.mesh(
     topology,
     object,
@@ -833,17 +839,150 @@ function buildSourceBorderMeshes(topology, includedCountries) {
     }
   );
 
-  const coastlineMesh = globalThis.topojson.mesh(
-    topology,
-    object,
-    (a, b) => !!(a && !b && inScope(a))
-  );
-
   return {
-    countryMesh,
     provinceMesh,
     localMesh,
-    coastlineMesh,
+  };
+}
+
+function buildGlobalCountryBorderMesh(primaryTopology) {
+  const object = primaryTopology?.objects?.political;
+  if (!object || !globalThis.topojson) return null;
+
+  return globalThis.topojson.mesh(
+    primaryTopology,
+    object,
+    (a, b) => {
+      if (!a || !b) return false;
+      const codeA = getFeatureCountryCodeNormalized(a);
+      const codeB = getFeatureCountryCodeNormalized(b);
+      return !!(codeA && codeB && codeA !== codeB);
+    }
+  );
+}
+
+function buildGlobalCoastlineMesh(primaryTopology) {
+  if (!primaryTopology?.objects || !globalThis.topojson) return null;
+  if (primaryTopology.objects.land) {
+    return globalThis.topojson.mesh(primaryTopology, primaryTopology.objects.land);
+  }
+  if (primaryTopology.objects.political) {
+    return globalThis.topojson.mesh(
+      primaryTopology,
+      primaryTopology.objects.political,
+      (a, b) => !!(a && !b)
+    );
+  }
+  return null;
+}
+
+function getLineLength(line) {
+  if (!Array.isArray(line) || line.length < 2) return 0;
+  let total = 0;
+  for (let i = 1; i < line.length; i += 1) {
+    const prev = line[i - 1];
+    const curr = line[i];
+    if (!prev || !curr) continue;
+    total += Math.hypot(curr[0] - prev[0], curr[1] - prev[1]);
+  }
+  return total;
+}
+
+function getSqPointToSegmentDistance(point, start, end) {
+  const vx = end[0] - start[0];
+  const vy = end[1] - start[1];
+  const wx = point[0] - start[0];
+  const wy = point[1] - start[1];
+  const lengthSq = vx * vx + vy * vy;
+  if (lengthSq <= 0) {
+    return wx * wx + wy * wy;
+  }
+  let t = (wx * vx + wy * vy) / lengthSq;
+  t = clamp(t, 0, 1);
+  const projX = start[0] + t * vx;
+  const projY = start[1] + t * vy;
+  const dx = point[0] - projX;
+  const dy = point[1] - projY;
+  return dx * dx + dy * dy;
+}
+
+function simplifyPolylineRDP(points, epsilon) {
+  if (!Array.isArray(points) || points.length <= 2) {
+    return Array.isArray(points) ? points.slice() : [];
+  }
+
+  const eps = Math.max(0, Number(epsilon) || 0);
+  if (eps <= 0) {
+    return points.slice();
+  }
+
+  const sqEps = eps * eps;
+  const keep = new Array(points.length).fill(false);
+  keep[0] = true;
+  keep[points.length - 1] = true;
+
+  const stack = [[0, points.length - 1]];
+  while (stack.length > 0) {
+    const [startIdx, endIdx] = stack.pop();
+    let maxSqDist = -1;
+    let splitIdx = -1;
+    const start = points[startIdx];
+    const end = points[endIdx];
+    for (let i = startIdx + 1; i < endIdx; i += 1) {
+      const sqDist = getSqPointToSegmentDistance(points[i], start, end);
+      if (sqDist > maxSqDist) {
+        maxSqDist = sqDist;
+        splitIdx = i;
+      }
+    }
+
+    if (splitIdx >= 0 && maxSqDist > sqEps) {
+      keep[splitIdx] = true;
+      stack.push([startIdx, splitIdx], [splitIdx, endIdx]);
+    }
+  }
+
+  const result = [];
+  for (let i = 0; i < points.length; i += 1) {
+    if (keep[i]) {
+      result.push(points[i]);
+    }
+  }
+  return result.length >= 2 ? result : points.slice(0, 2);
+}
+
+function sanitizePolyline(line) {
+  if (!Array.isArray(line)) return [];
+  const result = [];
+  line.forEach((point) => {
+    if (!Array.isArray(point) || point.length < 2) return;
+    const x = Number(point[0]);
+    const y = Number(point[1]);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+    const prev = result[result.length - 1];
+    if (prev && prev[0] === x && prev[1] === y) return;
+    result.push([x, y]);
+  });
+  return result;
+}
+
+function simplifyCoastlineMesh(mesh, { epsilon = 0, minLength = 0 } = {}) {
+  if (!isUsableMesh(mesh)) return null;
+  const simplifiedCoordinates = [];
+
+  mesh.coordinates.forEach((line) => {
+    const sanitized = sanitizePolyline(line);
+    if (sanitized.length < 2) return;
+    const simplified = simplifyPolylineRDP(sanitized, epsilon);
+    if (simplified.length < 2) return;
+    if (getLineLength(simplified) < Math.max(0, Number(minLength) || 0)) return;
+    simplifiedCoordinates.push(simplified);
+  });
+
+  if (!simplifiedCoordinates.length) return null;
+  return {
+    type: "MultiLineString",
+    coordinates: simplifiedCoordinates,
   };
 }
 
@@ -852,6 +991,9 @@ function rebuildStaticMeshes() {
   state.cachedProvinceBorders = [];
   state.cachedLocalBorders = [];
   state.cachedCoastlines = [];
+  state.cachedCoastlinesHigh = [];
+  state.cachedCoastlinesMid = [];
+  state.cachedCoastlinesLow = [];
   state.cachedGridLines = [];
   if (!globalThis.topojson) return;
 
@@ -868,11 +1010,43 @@ function rebuildStaticMeshes() {
     const meshes = buildSourceBorderMeshes(topology, includedCountries);
     if (!meshes) return;
 
-    if (isUsableMesh(meshes.countryMesh)) state.cachedCountryBorders.push(meshes.countryMesh);
     if (isUsableMesh(meshes.provinceMesh)) state.cachedProvinceBorders.push(meshes.provinceMesh);
     if (isUsableMesh(meshes.localMesh)) state.cachedLocalBorders.push(meshes.localMesh);
-    if (isUsableMesh(meshes.coastlineMesh)) state.cachedCoastlines.push(meshes.coastlineMesh);
   });
+
+  const primaryTopology = state.topologyPrimary || state.topology;
+  const countryMesh = buildGlobalCountryBorderMesh(primaryTopology);
+  if (isUsableMesh(countryMesh)) {
+    state.cachedCountryBorders.push(countryMesh);
+  }
+
+  const coastlineMesh = buildGlobalCoastlineMesh(primaryTopology);
+  if (isUsableMesh(coastlineMesh)) {
+    state.cachedCoastlines.push(coastlineMesh);
+    state.cachedCoastlinesHigh.push(coastlineMesh);
+
+    const coastlineMid = simplifyCoastlineMesh(coastlineMesh, {
+      epsilon: COASTLINE_SIMPLIFY_MID_EPSILON,
+      minLength: COASTLINE_SIMPLIFY_MID_MIN_LENGTH,
+    });
+    const coastlineLow = simplifyCoastlineMesh(coastlineMesh, {
+      epsilon: COASTLINE_SIMPLIFY_LOW_EPSILON,
+      minLength: COASTLINE_SIMPLIFY_LOW_MIN_LENGTH,
+    });
+
+    if (isUsableMesh(coastlineMid)) {
+      state.cachedCoastlinesMid.push(coastlineMid);
+    } else {
+      state.cachedCoastlinesMid.push(coastlineMesh);
+    }
+    if (isUsableMesh(coastlineLow)) {
+      state.cachedCoastlinesLow.push(coastlineLow);
+    } else if (isUsableMesh(coastlineMid)) {
+      state.cachedCoastlinesLow.push(coastlineMid);
+    } else {
+      state.cachedCoastlinesLow.push(coastlineMesh);
+    }
+  }
 
   // Backward compatibility: expose local boundaries as "grid lines".
   state.cachedGridLines = [...(state.cachedLocalBorders || [])];
@@ -880,6 +1054,199 @@ function rebuildStaticMeshes() {
 
 function invalidateBorderCache() {
   rebuildDynamicBorders();
+}
+
+function createHitResult(overrides = {}) {
+  return {
+    id: null,
+    countryCode: null,
+    viaSnap: false,
+    strict: false,
+    distancePx: Infinity,
+    ...overrides,
+  };
+}
+
+function getSpatialBucketKey(col, row) {
+  return `${col},${row}`;
+}
+
+function getBBoxDistanceToPoint(item, px, py) {
+  const dx = px < item.minX ? item.minX - px : px > item.maxX ? px - item.maxX : 0;
+  const dy = py < item.minY ? item.minY - py : py > item.maxY ? py - item.maxY : 0;
+  return Math.hypot(dx, dy);
+}
+
+function buildSpatialGrid(items, canvasWidth, canvasHeight) {
+  const width = Math.max(1, canvasWidth || 1);
+  const height = Math.max(1, canvasHeight || 1);
+  const cellSize = clamp(
+    Math.round(width / HIT_GRID_TARGET_COLS),
+    HIT_GRID_MIN_CELL_PX,
+    HIT_GRID_MAX_CELL_PX
+  );
+  const cols = Math.max(1, Math.ceil(width / cellSize));
+  const rows = Math.max(1, Math.ceil(height / cellSize));
+  const grid = new Map();
+  const globals = [];
+  const itemsById = new Map();
+
+  const pushToCell = (col, row, item) => {
+    const key = getSpatialBucketKey(col, row);
+    if (!grid.has(key)) {
+      grid.set(key, []);
+    }
+    grid.get(key).push(item);
+  };
+
+  items.forEach((item) => {
+    if (!item?.id) return;
+    itemsById.set(item.id, item);
+    const c0 = clamp(Math.floor(item.minX / cellSize), 0, cols - 1);
+    const c1 = clamp(Math.floor(item.maxX / cellSize), 0, cols - 1);
+    const r0 = clamp(Math.floor(item.minY / cellSize), 0, rows - 1);
+    const r1 = clamp(Math.floor(item.maxY / cellSize), 0, rows - 1);
+    const covered = (c1 - c0 + 1) * (r1 - r0 + 1);
+
+    if (covered > HIT_MAX_CELLS_PER_ITEM) {
+      globals.push(item);
+      return;
+    }
+
+    for (let row = r0; row <= r1; row += 1) {
+      for (let col = c0; col <= c1; col += 1) {
+        pushToCell(col, row, item);
+      }
+    }
+  });
+
+  state.spatialGrid = grid;
+  state.spatialGridMeta = {
+    cellSize,
+    cols,
+    rows,
+    width,
+    height,
+    globals,
+  };
+  state.spatialItemsById = itemsById;
+}
+
+function collectGridCandidates(px, py, radiusProj = 0) {
+  const meta = state.spatialGridMeta;
+  if (!meta || !state.spatialGrid) return [];
+  const { cellSize, cols, rows, globals } = meta;
+  if (!cellSize || cols <= 0 || rows <= 0) return [];
+
+  const radius = Math.max(0, radiusProj || 0);
+  const minX = px - radius;
+  const maxX = px + radius;
+  const minY = py - radius;
+  const maxY = py + radius;
+  const c0 = clamp(Math.floor(minX / cellSize), 0, cols - 1);
+  const c1 = clamp(Math.floor(maxX / cellSize), 0, cols - 1);
+  const r0 = clamp(Math.floor(minY / cellSize), 0, rows - 1);
+  const r1 = clamp(Math.floor(maxY / cellSize), 0, rows - 1);
+
+  const buckets = [];
+  for (let row = r0; row <= r1; row += 1) {
+    for (let col = c0; col <= c1; col += 1) {
+      const key = getSpatialBucketKey(col, row);
+      const bucket = state.spatialGrid.get(key);
+      if (bucket?.length) {
+        buckets.push(bucket);
+      }
+    }
+  }
+
+  const seen = new Set();
+  const candidates = [];
+  const strict = radius <= 0;
+
+  const maybePush = (item) => {
+    if (!item?.id || seen.has(item.id)) return;
+    seen.add(item.id);
+    const distanceProj = getBBoxDistanceToPoint(item, px, py);
+    if (strict) {
+      if (distanceProj > 0) return;
+    } else if (distanceProj > radius) {
+      return;
+    }
+    candidates.push({ item, distanceProj });
+  };
+
+  buckets.forEach((bucket) => {
+    bucket.forEach(maybePush);
+  });
+  globals?.forEach(maybePush);
+
+  return candidates;
+}
+
+function rankCandidates(candidates, lonLat) {
+  if (!Array.isArray(candidates) || !candidates.length) return [];
+
+  const ranked = candidates.map((candidate) => {
+    const feature = candidate.item?.feature;
+    let containsGeo = false;
+    if (feature && lonLat && globalThis.d3?.geoContains) {
+      try {
+        containsGeo = !!globalThis.d3.geoContains(feature, lonLat);
+      } catch (error) {
+        containsGeo = false;
+      }
+    }
+    const source = String(candidate.item?.source || feature?.properties?.__source || "primary");
+    const sourceRank = source === "detail" ? 0 : 1;
+    const bboxArea = Number.isFinite(candidate.item?.bboxArea)
+      ? candidate.item.bboxArea
+      : Math.max(0, (candidate.item.maxX - candidate.item.minX) * (candidate.item.maxY - candidate.item.minY));
+    return {
+      ...candidate,
+      containsGeo,
+      sourceRank,
+      bboxArea,
+    };
+  });
+
+  ranked.sort((a, b) => {
+    if (a.containsGeo !== b.containsGeo) return a.containsGeo ? -1 : 1;
+    if (a.sourceRank !== b.sourceRank) return a.sourceRank - b.sourceRank;
+    if (a.bboxArea !== b.bboxArea) return a.bboxArea - b.bboxArea;
+    if (a.distanceProj !== b.distanceProj) return a.distanceProj - b.distanceProj;
+    return String(a.item?.id || "").localeCompare(String(b.item?.id || ""));
+  });
+
+  return ranked;
+}
+
+function getPointerProjectionPosition(event) {
+  if (!mapSvg || !projection || !globalThis.d3) return null;
+  const [sx, sy] = globalThis.d3.pointer(event, mapSvg);
+  const transform = state.zoomTransform || globalThis.d3.zoomIdentity;
+  const zoomK = Math.max(0.0001, transform?.k || 1);
+  const px = (sx - (transform?.x || 0)) / zoomK;
+  const py = (sy - (transform?.y || 0)) / zoomK;
+  if (!Number.isFinite(px) || !Number.isFinite(py)) return null;
+  const lonLat = projection.invert([px, py]);
+  if (!lonLat) return null;
+  return {
+    px,
+    py,
+    lonLat,
+    zoomK,
+  };
+}
+
+function toHitResult(candidate, { viaSnap = false, strict = false, zoomK = 1 } = {}) {
+  if (!candidate?.item?.id) return createHitResult();
+  return createHitResult({
+    id: candidate.item.id,
+    countryCode: candidate.item.countryCode || getFeatureCountryCodeNormalized(candidate.item.feature),
+    viaSnap,
+    strict,
+    distancePx: candidate.distanceProj * zoomK,
+  });
 }
 
 function buildIndex() {
@@ -907,6 +1274,9 @@ function buildIndex() {
 function buildSpatialIndex() {
   state.spatialItems = [];
   state.spatialIndex = null;
+  state.spatialGrid = new Map();
+  state.spatialGridMeta = null;
+  state.spatialItemsById = new Map();
   if (!state.landData || !state.landData.features || !pathSVG) return;
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
 
@@ -924,62 +1294,72 @@ function buildSpatialIndex() {
     state.spatialItems.push({
       id,
       feature,
+      countryCode: getFeatureCountryCodeNormalized(feature),
+      source: String(feature?.properties?.__source || "primary"),
       minX,
       minY,
       maxX,
       maxY,
-      cx: (minX + maxX) / 2,
-      cy: (minY + maxY) / 2,
+      bboxArea: Math.max(0, maxX - minX) * Math.max(0, maxY - minY),
     });
   }
 
-  state.spatialIndex = globalThis.d3
-    .quadtree()
-    .x((item) => item.cx)
-    .y((item) => item.cy)
-    .addAll(state.spatialItems);
+  buildSpatialGrid(state.spatialItems, canvasWidth, canvasHeight);
+  state.spatialIndex = null;
+}
+
+function getHitFromEvent(
+  event,
+  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown" } = {}
+) {
+  if (!state.landData || !state.spatialItems?.length) return createHitResult();
+  const pointer = getPointerProjectionPosition(event);
+  if (!pointer) return createHitResult();
+
+  const strictCandidates = collectGridCandidates(pointer.px, pointer.py, 0);
+  const strictRanked = rankCandidates(strictCandidates, pointer.lonLat);
+  if (strictRanked.length > 0) {
+    const strictContainsGeo = strictRanked.find((candidate) => candidate.containsGeo);
+    if (!strictContainsGeo) return createHitResult();
+    return toHitResult(strictContainsGeo, {
+      viaSnap: false,
+      strict: true,
+      zoomK: pointer.zoomK,
+    });
+  }
+
+  if (!enableSnap) return createHitResult();
+
+  const snapRadiusPx = Number.isFinite(Number(snapPx))
+    ? Math.max(0, Number(snapPx))
+    : HIT_SNAP_RADIUS_PX;
+  const radiusProj = snapRadiusPx / pointer.zoomK;
+  if (radiusProj <= 0) return createHitResult();
+
+  const snapCandidates = collectGridCandidates(pointer.px, pointer.py, radiusProj);
+  const snapRanked = rankCandidates(snapCandidates, pointer.lonLat);
+  if (!snapRanked.length) return createHitResult();
+
+  const chosen = snapRanked.find((candidate) => candidate.containsGeo);
+  if (!chosen) return createHitResult();
+  const hit = toHitResult(chosen, {
+    viaSnap: true,
+    strict: false,
+    zoomK: pointer.zoomK,
+  });
+  if (eventType === "click" && hit.id) {
+    return hit;
+  }
+  return hit;
 }
 
 function getFeatureIdFromEvent(event) {
-  if (!state.landData || !mapSvg || !projection) return null;
-
-  const [sx, sy] = globalThis.d3.pointer(event, mapSvg);
-  const px = (sx - state.zoomTransform.x) / state.zoomTransform.k;
-  const py = (sy - state.zoomTransform.y) / state.zoomTransform.k;
-  if (!Number.isFinite(px) || !Number.isFinite(py)) return null;
-
-  const lonLat = projection.invert([px, py]);
-  if (!lonLat) return null;
-
-  const candidates = [];
-  if (state.spatialIndex) {
-    state.spatialIndex.visit((node, x0, y0, x1, y1) => {
-      if (px < x0 || px > x1 || py < y0 || py > y1) return true;
-      if (!node.length) {
-        let current = node;
-        do {
-          const item = current.data;
-          if (
-            item &&
-            px >= item.minX && px <= item.maxX &&
-            py >= item.minY && py <= item.maxY
-          ) {
-            candidates.push(item);
-          }
-          current = current.next;
-        } while (current);
-      }
-      return false;
-    });
-  }
-
-  for (const candidate of candidates) {
-    if (globalThis.d3.geoContains(candidate.feature, lonLat)) {
-      return candidate.id;
-    }
-  }
-
-  return null;
+  const hit = getHitFromEvent(event, {
+    enableSnap: true,
+    snapPx: HIT_SNAP_RADIUS_PX,
+    eventType: "compat",
+  });
+  return hit.id;
 }
 
 function clamp(value, min, max) {
@@ -999,8 +1379,11 @@ function drawMeshCollection(meshCollection, strokeStyle, lineWidth) {
 }
 
 function drawHierarchicalBorders(k) {
-  const zoomK = clamp(k, 1, 6);
-  const t = (zoomK - 1) / 5;
+  const kEff = clamp(k, 1, 8);
+  const t = (kEff - 1) / 7;
+  const kDenom = Math.max(0.0001, k);
+  const lowZoomDeclutter = k < COASTLINE_LOD_LOW_ZOOM_MAX ? 0.7 : 1;
+  const lowZoomWidthScale = k < COASTLINE_LOD_LOW_ZOOM_MAX ? 0.82 : 1;
   const internal = state.styleConfig?.internalBorders || {};
   const empire = state.styleConfig?.empireBorders || {};
   const coast = state.styleConfig?.coastlines || {};
@@ -1014,15 +1397,23 @@ function drawHierarchicalBorders(k) {
   const coastWidthBase = Number(coast.width) || 1.2;
   const internalOpacity = Number.isFinite(Number(internal.opacity)) ? Number(internal.opacity) : 1;
 
-  const countryAlpha = 0.88;
-  const provinceAlpha = clamp(internalOpacity * (0.28 + 0.30 * t), 0.18, 0.62);
-  const localAlpha = clamp(internalOpacity * (0.10 + 0.22 * t), 0.07, 0.35);
-  const coastAlpha = 0.80;
+  const countryAlpha = 0.90;
+  const provinceAlpha = clamp(internalOpacity * (0.22 + 0.50 * t) * lowZoomDeclutter, 0.12, 0.70);
+  const localAlpha = clamp(internalOpacity * (0.08 + 0.34 * t) * lowZoomDeclutter, 0.04, 0.42);
+  const coastAlpha = clamp(0.74 + 0.12 * t, 0.74, 0.86);
 
-  const countryWidth = (empireWidthBase * (1.0 + 0.20 * t)) / k;
-  const provinceWidth = (internalWidthBase * (0.90 + 0.20 * t)) / k;
-  const localWidth = Math.max(0.18, internalWidthBase * 0.55 * (0.85 + 0.20 * t)) / k;
-  const coastWidth = coastWidthBase / k;
+  const countryWidth = (empireWidthBase * (0.95 + 0.40 * t)) / kDenom;
+  const provinceWidth = (internalWidthBase * (0.72 + 0.65 * t) * lowZoomWidthScale) / kDenom;
+  const localWidth = Math.max(
+    0.14,
+    internalWidthBase * 0.40 * (0.70 + 0.55 * t) * lowZoomWidthScale
+  ) / kDenom;
+  const coastWidth = (coastWidthBase * (0.90 + 0.30 * t)) / kDenom;
+  const coastlineCollection = k < COASTLINE_LOD_LOW_ZOOM_MAX
+    ? (state.cachedCoastlinesLow?.length ? state.cachedCoastlinesLow : state.cachedCoastlines)
+    : k < COASTLINE_LOD_MID_ZOOM_MAX
+      ? (state.cachedCoastlinesMid?.length ? state.cachedCoastlinesMid : state.cachedCoastlines)
+      : (state.cachedCoastlinesHigh?.length ? state.cachedCoastlinesHigh : state.cachedCoastlines);
 
   context.globalAlpha = localAlpha;
   drawMeshCollection(state.cachedLocalBorders, internalColor, localWidth);
@@ -1034,9 +1425,256 @@ function drawHierarchicalBorders(k) {
   drawMeshCollection(state.cachedCountryBorders, empireColor, countryWidth);
 
   context.globalAlpha = coastAlpha;
-  drawMeshCollection(state.cachedCoastlines, coastColor, coastWidth);
+  drawMeshCollection(coastlineCollection, coastColor, coastWidth);
 
   context.globalAlpha = 1.0;
+}
+
+function normalizeOceanPreset(value) {
+  const candidate = String(value || "flat").trim().toLowerCase();
+  if (
+    candidate === "flat" ||
+    candidate === "bathymetry_soft" ||
+    candidate === "bathymetry_contours" ||
+    candidate === "wave_hachure"
+  ) {
+    return candidate;
+  }
+  return "flat";
+}
+
+function getOceanStyleConfig() {
+  const ocean = state.styleConfig?.ocean || {};
+  return {
+    preset: normalizeOceanPreset(ocean.preset),
+    opacity: clamp(Number.isFinite(Number(ocean.opacity)) ? Number(ocean.opacity) : 0.72, 0, 1),
+    scale: clamp(Number.isFinite(Number(ocean.scale)) ? Number(ocean.scale) : 1, 0.6, 2.4),
+    contourStrength: clamp(
+      Number.isFinite(Number(ocean.contourStrength)) ? Number(ocean.contourStrength) : 0.75,
+      0,
+      1
+    ),
+  };
+}
+
+function getOceanBaseFillColor() {
+  return getSafeCanvasColor(state.styleConfig?.ocean?.fillColor, OCEAN_FILL_COLOR) || OCEAN_FILL_COLOR;
+}
+
+function getPathBounds(shape) {
+  if (!pathCanvas || !shape) return null;
+  try {
+    const bounds = pathCanvas.bounds(shape);
+    if (!bounds || bounds.length !== 2) return null;
+    const minX = bounds[0][0];
+    const minY = bounds[0][1];
+    const maxX = bounds[1][0];
+    const maxY = bounds[1][1];
+    if (![minX, minY, maxX, maxY].every(Number.isFinite)) return null;
+    if (maxX <= minX || maxY <= minY) return null;
+    return { minX, minY, maxX, maxY };
+  } catch (error) {
+    return null;
+  }
+}
+
+function getBoundsArea(bounds) {
+  if (!bounds) return 0;
+  return Math.max(0, bounds.maxX - bounds.minX) * Math.max(0, bounds.maxY - bounds.minY);
+}
+
+function resolveOceanMask() {
+  let mode = OCEAN_MASK_MODE_SPHERE_MINUS_LAND;
+  let quality = 0;
+
+  const sphereBounds = getPathBounds({ type: "Sphere" });
+  const sphereArea = getBoundsArea(sphereBounds);
+
+  if (state.oceanData) {
+    const oceanBounds = getPathBounds(state.oceanData);
+    const oceanArea = getBoundsArea(oceanBounds);
+    if (sphereArea > 0 && oceanArea > 0) {
+      quality = clamp(oceanArea / sphereArea, 0, 1);
+    } else if (oceanArea > 0) {
+      quality = 1;
+    }
+  }
+
+  if (state.oceanData && quality >= OCEAN_MASK_MIN_QUALITY) {
+    mode = OCEAN_MASK_MODE_TOPOLOGY;
+  }
+
+  state.oceanMaskMode = mode;
+  state.oceanMaskQuality = quality;
+  return { mode, quality };
+}
+
+function applyOceanClipMask(maskMode) {
+  context.beginPath();
+  if (maskMode === OCEAN_MASK_MODE_TOPOLOGY && state.oceanData) {
+    pathCanvas(state.oceanData);
+    context.clip();
+    return;
+  }
+
+  pathCanvas({ type: "Sphere" });
+  const landMask = Array.isArray(state.landData?.features) && state.landData.features.length
+    ? state.landData
+    : (Array.isArray(state.landBgData?.features) && state.landBgData.features.length ? state.landBgData : null);
+
+  if (landMask) {
+    pathCanvas(landMask);
+    try {
+      context.clip("evenodd");
+    } catch (error) {
+      context.clip();
+    }
+    return;
+  }
+
+  context.clip();
+}
+
+function createOceanPatternTile(preset, size, contourStrength) {
+  const tile = document.createElement("canvas");
+  tile.width = size;
+  tile.height = size;
+  const ctx = tile.getContext("2d");
+  if (!ctx) return null;
+
+  const strength = clamp(contourStrength, 0, 1);
+  const xStep = Math.max(8, Math.round(size / 12));
+  const yStepBase = Math.max(10, Math.round(size / (8 + strength * 7)));
+
+  if (preset === "wave_hachure") {
+    ctx.strokeStyle = `rgba(15, 60, 105, ${0.34 + 0.46 * strength})`;
+    ctx.lineWidth = 1.1 + 1.2 * strength;
+    const diagStep = Math.max(8, Math.round(size / (8 + strength * 5)));
+    for (let offset = -size; offset <= size * 1.6; offset += diagStep) {
+      ctx.beginPath();
+      for (let x = 0; x <= size; x += xStep) {
+        const y = offset + x * 0.45 + Math.sin((x / size) * Math.PI * 2) * (3 + 6 * strength);
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    return tile;
+  }
+
+  const contourAlpha = preset === "bathymetry_soft"
+    ? 0.2 + 0.34 * strength
+    : 0.28 + 0.52 * strength;
+  ctx.strokeStyle = `rgba(16, 65, 112, ${contourAlpha})`;
+  ctx.lineWidth = preset === "bathymetry_soft" ? 0.85 + 0.5 * strength : 1.1 + 1.05 * strength;
+
+  const yStep = preset === "bathymetry_soft" ? Math.round(yStepBase * 1.25) : yStepBase;
+  const amp = preset === "bathymetry_soft"
+    ? Math.max(2.2, size * (0.018 + strength * 0.02))
+    : Math.max(3, size * (0.022 + strength * 0.028));
+
+  for (let y = -yStep; y <= size + yStep; y += yStep) {
+    ctx.beginPath();
+    for (let x = 0; x <= size; x += xStep) {
+      const phase = (x / size) * Math.PI * 2.2 + y * 0.06;
+      const wave = Math.sin(phase) * amp + Math.sin(phase * 0.5 + 1.4) * amp * 0.35;
+      const yy = y + wave;
+      if (x === 0) ctx.moveTo(x, yy);
+      else ctx.lineTo(x, yy);
+    }
+    ctx.stroke();
+  }
+
+  if (preset === "bathymetry_contours") {
+    ctx.strokeStyle = `rgba(9, 36, 76, ${0.34 + 0.48 * strength})`;
+    ctx.lineWidth = 1.35 + 1.15 * strength;
+    const majorStep = yStep * 3;
+    for (let y = 0; y <= size + majorStep; y += majorStep) {
+      ctx.beginPath();
+      for (let x = 0; x <= size; x += xStep) {
+        const phase = (x / size) * Math.PI * 2 + y * 0.05;
+        const yy = y + Math.sin(phase) * amp * 1.1;
+        if (x === 0) ctx.moveTo(x, yy);
+        else ctx.lineTo(x, yy);
+      }
+      ctx.stroke();
+    }
+  }
+
+  return tile;
+}
+
+function getOceanPattern({ preset, scale, contourStrength }) {
+  if (!context || preset === "flat") return null;
+  const size = clamp(Math.round(OCEAN_PATTERN_BASE_SIZE * scale), 64, 512);
+  const key = `${preset}:${size}:${contourStrength.toFixed(2)}`;
+  const cached = oceanPatternCache.get(key);
+  if (cached) return cached;
+
+  const tile = createOceanPatternTile(preset, size, contourStrength);
+  if (!tile) return null;
+  const pattern = context.createPattern(tile, "repeat");
+  if (!pattern) return null;
+  oceanPatternCache.set(key, pattern);
+  return pattern;
+}
+
+function drawOceanStyle() {
+  if (!context || !pathCanvas) return;
+  if (!OCEAN_ADVANCED_STYLES_ENABLED) {
+    state.oceanMaskMode = OCEAN_MASK_MODE_TOPOLOGY;
+    state.oceanMaskQuality = 0;
+    return;
+  }
+  const oceanStyle = getOceanStyleConfig();
+  if (oceanStyle.preset === "flat") return;
+  const oceanMask = resolveOceanMask();
+
+  const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
+  const fillX = -canvasWidth * 2;
+  const fillY = -canvasHeight * 2;
+  const fillW = canvasWidth * 5;
+  const fillH = canvasHeight * 5;
+
+  context.save();
+  applyOceanClipMask(oceanMask.mode);
+
+  const gradient = context.createLinearGradient(
+    0,
+    -canvasHeight * 0.3,
+    0,
+    canvasHeight * 1.3
+  );
+  if (oceanStyle.preset === "wave_hachure") {
+    gradient.addColorStop(0, "#9fe5fb");
+    gradient.addColorStop(0.42, "#63c5e6");
+    gradient.addColorStop(1, "#2d84be");
+  } else if (oceanStyle.preset === "bathymetry_soft") {
+    gradient.addColorStop(0, "#bfe9fb");
+    gradient.addColorStop(0.5, "#78c6eb");
+    gradient.addColorStop(1, "#3f95cb");
+  } else {
+    gradient.addColorStop(0, "#a5def8");
+    gradient.addColorStop(0.45, "#4fa7d8");
+    gradient.addColorStop(1, "#206fa7");
+  }
+
+  context.globalAlpha = clamp(oceanStyle.opacity * 0.98, 0, 1);
+  context.fillStyle = gradient;
+  context.fillRect(fillX, fillY, fillW, fillH);
+
+  const pattern = getOceanPattern(oceanStyle);
+  if (pattern) {
+    const patternAlpha = oceanStyle.preset === "bathymetry_soft"
+      ? clamp(oceanStyle.opacity * (0.48 + oceanStyle.contourStrength * 0.3), 0, 0.84)
+      : clamp(oceanStyle.opacity * (0.62 + oceanStyle.contourStrength * 0.42), 0, 1);
+    context.globalAlpha = patternAlpha;
+    context.fillStyle = pattern;
+    context.fillRect(fillX, fillY, fillW, fillH);
+  }
+
+  context.restore();
+  context.globalAlpha = 1;
 }
 
 function drawCanvas() {
@@ -1063,17 +1701,19 @@ function drawCanvas() {
   context.scale(k, k);
 
   // 3. Draw ocean
-  context.fillStyle = OCEAN_FILL_COLOR;
+  const oceanFillColor = getOceanBaseFillColor();
+  context.fillStyle = oceanFillColor;
   context.beginPath();
   pathCanvas({ type: "Sphere" });
   context.fill();
 
   if (state.oceanData) {
-    context.fillStyle = OCEAN_FILL_COLOR;
+    context.fillStyle = oceanFillColor;
     context.beginPath();
     pathCanvas(state.oceanData);
     context.fill();
   }
+  drawOceanStyle();
 
   // 4. Draw political features only (no base land layer)
   if (state.landData?.features?.length) {
@@ -1342,7 +1982,12 @@ function handleMouseMove(event) {
   state.lastMouseMoveTime = now;
   if (!state.landData || state.isInteracting) return;
 
-  const id = getFeatureIdFromEvent(event);
+  const hit = getHitFromEvent(event, {
+    enableSnap: true,
+    snapPx: HIT_SNAP_RADIUS_PX,
+    eventType: "hover",
+  });
+  const id = hit.id;
   if (id !== state.hoveredId) {
     state.hoveredId = id;
     renderHoverOverlay();
@@ -1387,11 +2032,16 @@ function resolveInteractionTargetIds(feature, id) {
 function handleClick(event) {
   if (!state.landData) return;
 
-  const id = getFeatureIdFromEvent(event);
+  const hit = getHitFromEvent(event, {
+    enableSnap: true,
+    snapPx: HIT_SNAP_RADIUS_PX,
+    eventType: "click",
+  });
+  const id = hit.id;
   if (!id) return;
   const feature = state.landIndex.get(id);
   if (!feature) return;
-  const countryCode = getFeatureCountryCodeNormalized(feature);
+  const countryCode = hit.countryCode || getFeatureCountryCodeNormalized(feature);
   const targetIds = resolveInteractionTargetIds(feature, id);
 
   if (state.isEditingPreset) {

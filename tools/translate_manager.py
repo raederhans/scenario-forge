@@ -200,9 +200,16 @@ def normalize_entry(key: str, value) -> dict:
 
 
 class MachineTranslator:
-    def __init__(self, enabled: bool = False, delay_seconds: float = 0.0):
+    def __init__(
+        self,
+        enabled: bool = False,
+        delay_seconds: float = 0.0,
+        max_requests: int | None = None,
+    ):
         self.enabled = enabled
         self.delay_seconds = max(0.0, delay_seconds)
+        self.max_requests = max_requests if max_requests and max_requests > 0 else None
+        self.requests_made = 0
         self.cache = {}
 
     def translate(self, text: str) -> str | None:
@@ -213,6 +220,8 @@ class MachineTranslator:
             return None
         if value in self.cache:
             return self.cache[value]
+        if self.max_requests is not None and self.requests_made >= self.max_requests:
+            return None
 
         query = urllib.parse.urlencode(
             {
@@ -226,6 +235,7 @@ class MachineTranslator:
         url = f"https://translate.googleapis.com/translate_a/single?{query}"
         req = urllib.request.Request(url, headers={"User-Agent": "mapcreator-translate-manager/1.0"})
         translated = None
+        self.requests_made += 1
         try:
             with urllib.request.urlopen(req, timeout=8) as response:
                 payload = json.loads(response.read().decode("utf-8"))
@@ -363,6 +373,12 @@ def parse_args() -> argparse.Namespace:
         help="Optional delay between translation requests.",
     )
     parser.add_argument(
+        "--max-machine-translations",
+        type=int,
+        default=0,
+        help="Maximum number of machine translation requests per run (0 = unlimited).",
+    )
+    parser.add_argument(
         "--no-stable-geo-keys",
         action="store_true",
         help="Do not emit stable geo keys (id::<feature_id>) into locales.geo.",
@@ -385,6 +401,7 @@ def main() -> None:
     translator = MachineTranslator(
         enabled=args.machine_translate,
         delay_seconds=args.translator_delay_seconds,
+        max_requests=args.max_machine_translations,
     )
 
     ui_payload = merge_ui(existing.get("ui", {}), discovered_ui_keys, translator)
@@ -409,7 +426,8 @@ def main() -> None:
     print(
         "OK: synced translations. "
         f"ui_keys={len(ui_payload)}, geo_keys={len(geo_payload)}, "
-        f"geo_todo={missing_geo_todo}, alias_map={len(alias_to_stable)}"
+        f"geo_todo={missing_geo_todo}, alias_map={len(alias_to_stable)}, "
+        f"mt_requests={translator.requests_made}"
     )
     print(f"Saved locales to: {output_path}")
 

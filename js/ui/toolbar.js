@@ -35,6 +35,12 @@ function renderPalette(themeName) {
 
 
 function initToolbar({ render } = {}) {
+  const OCEAN_ADVANCED_STYLES_ENABLED = false;
+  const OCEAN_ADVANCED_PRESETS = new Set([
+    "bathymetry_soft",
+    "bathymetry_contours",
+    "wave_hachure",
+  ]);
   const toolButtons = document.querySelectorAll(".tool-button");
   const currentToolLabel = document.getElementById("currentTool");
   const customColor = document.getElementById("customColor");
@@ -57,6 +63,11 @@ function initToolbar({ render } = {}) {
   const empireBorderWidth = document.getElementById("empireBorderWidth");
   const coastlineColor = document.getElementById("coastlineColor");
   const coastlineWidth = document.getElementById("coastlineWidth");
+  const oceanFillColor = document.getElementById("oceanFillColor");
+  const oceanStyleSelect = document.getElementById("oceanStyleSelect");
+  const oceanTextureOpacity = document.getElementById("oceanTextureOpacity");
+  const oceanTextureScale = document.getElementById("oceanTextureScale");
+  const oceanContourStrength = document.getElementById("oceanContourStrength");
   const toggleLang = document.getElementById("btnToggleLang");
   const themeSelect = document.getElementById("themeSelect");
   const referenceImageInput = document.getElementById("referenceImageInput");
@@ -69,10 +80,68 @@ function initToolbar({ render } = {}) {
   const internalBorderWidthValue = document.getElementById("internalBorderWidthValue");
   const empireBorderWidthValue = document.getElementById("empireBorderWidthValue");
   const coastlineWidthValue = document.getElementById("coastlineWidthValue");
+  const oceanTextureOpacityValue = document.getElementById("oceanTextureOpacityValue");
+  const oceanTextureScaleValue = document.getElementById("oceanTextureScaleValue");
+  const oceanContourStrengthValue = document.getElementById("oceanContourStrengthValue");
   const referenceOpacityValue = document.getElementById("referenceOpacityValue");
   const referenceScaleValue = document.getElementById("referenceScaleValue");
   const referenceOffsetXValue = document.getElementById("referenceOffsetXValue");
   const referenceOffsetYValue = document.getElementById("referenceOffsetYValue");
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const normalizeOceanPreset = (value) => {
+    const candidate = String(value || "flat").trim().toLowerCase();
+    if (
+      candidate === "flat" ||
+      candidate === "bathymetry_soft" ||
+      candidate === "bathymetry_contours" ||
+      candidate === "wave_hachure"
+    ) {
+      return candidate;
+    }
+    return "flat";
+  };
+  const normalizeOceanFillColor = (value) => {
+    const candidate = String(value || "").trim();
+    if (/^#(?:[0-9a-f]{6})$/i.test(candidate)) return candidate;
+    if (/^#(?:[0-9a-f]{3})$/i.test(candidate)) {
+      return `#${candidate[1]}${candidate[1]}${candidate[2]}${candidate[2]}${candidate[3]}${candidate[3]}`;
+    }
+    return "#aadaff";
+  };
+  if (!state.styleConfig.ocean || typeof state.styleConfig.ocean !== "object") {
+    state.styleConfig.ocean = {};
+  }
+  state.styleConfig.ocean.preset = normalizeOceanPreset(state.styleConfig.ocean.preset || "flat");
+  if (!OCEAN_ADVANCED_STYLES_ENABLED && OCEAN_ADVANCED_PRESETS.has(state.styleConfig.ocean.preset)) {
+    state.styleConfig.ocean.preset = "flat";
+  }
+  state.styleConfig.ocean.fillColor = normalizeOceanFillColor(state.styleConfig.ocean.fillColor);
+  state.styleConfig.ocean.opacity = clamp(
+    Number.isFinite(Number(state.styleConfig.ocean.opacity)) ? Number(state.styleConfig.ocean.opacity) : 0.72,
+    0,
+    1
+  );
+  state.styleConfig.ocean.scale = clamp(
+    Number.isFinite(Number(state.styleConfig.ocean.scale)) ? Number(state.styleConfig.ocean.scale) : 1,
+    0.6,
+    2.4
+  );
+  state.styleConfig.ocean.contourStrength = clamp(
+    Number.isFinite(Number(state.styleConfig.ocean.contourStrength))
+      ? Number(state.styleConfig.ocean.contourStrength)
+      : 0.75,
+    0,
+    1
+  );
+
+  if (oceanFillColor) {
+    oceanFillColor.value = state.styleConfig.ocean.fillColor;
+    oceanFillColor.addEventListener("input", (event) => {
+      state.styleConfig.ocean.fillColor = normalizeOceanFillColor(event.target.value);
+      if (render) render();
+    });
+  }
 
   function renderRecentColors() {
     if (!recentContainer) return;
@@ -324,6 +393,89 @@ function initToolbar({ render } = {}) {
       }
       if (render) render();
     });
+  }
+
+  if (oceanStyleSelect) {
+    if (!OCEAN_ADVANCED_STYLES_ENABLED) {
+      Array.from(oceanStyleSelect.options).forEach((option) => {
+        if (OCEAN_ADVANCED_PRESETS.has(option.value)) {
+          option.disabled = true;
+        }
+      });
+      oceanStyleSelect.title = "Advanced ocean styles are temporarily disabled for performance.";
+      oceanStyleSelect.value = "flat";
+    }
+    oceanStyleSelect.value = state.styleConfig.ocean.preset || "flat";
+    oceanStyleSelect.addEventListener("change", (event) => {
+      const nextPreset = normalizeOceanPreset(event.target.value);
+      if (!OCEAN_ADVANCED_STYLES_ENABLED && OCEAN_ADVANCED_PRESETS.has(nextPreset)) {
+        state.styleConfig.ocean.preset = "flat";
+        event.target.value = "flat";
+      } else {
+        state.styleConfig.ocean.preset = nextPreset;
+      }
+      if (render) render();
+    });
+  }
+
+  if (oceanTextureOpacity) {
+    const initial = Math.round((state.styleConfig.ocean.opacity || 0.72) * 100);
+    oceanTextureOpacity.value = String(clamp(initial, 0, 100));
+    if (oceanTextureOpacityValue) {
+      oceanTextureOpacityValue.textContent = `${oceanTextureOpacity.value}%`;
+    }
+    oceanTextureOpacity.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      state.styleConfig.ocean.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.72, 0, 1);
+      if (oceanTextureOpacityValue) {
+        oceanTextureOpacityValue.textContent = `${event.target.value}%`;
+      }
+      if (render) render();
+    });
+    if (!OCEAN_ADVANCED_STYLES_ENABLED) {
+      oceanTextureOpacity.disabled = true;
+      oceanTextureOpacity.title = "Temporarily disabled while advanced ocean styles are off.";
+    }
+  }
+
+  if (oceanTextureScale) {
+    const initial = state.styleConfig.ocean.scale || 1;
+    oceanTextureScale.value = String(Math.round(clamp(initial, 0.6, 2.4) * 100));
+    if (oceanTextureScaleValue) {
+      oceanTextureScaleValue.textContent = `${(Number(oceanTextureScale.value) / 100).toFixed(2)}x`;
+    }
+    oceanTextureScale.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      state.styleConfig.ocean.scale = clamp(Number.isFinite(value) ? value / 100 : 1, 0.6, 2.4);
+      if (oceanTextureScaleValue) {
+        oceanTextureScaleValue.textContent = `${state.styleConfig.ocean.scale.toFixed(2)}x`;
+      }
+      if (render) render();
+    });
+    if (!OCEAN_ADVANCED_STYLES_ENABLED) {
+      oceanTextureScale.disabled = true;
+      oceanTextureScale.title = "Temporarily disabled while advanced ocean styles are off.";
+    }
+  }
+
+  if (oceanContourStrength) {
+    const initial = Math.round((state.styleConfig.ocean.contourStrength || 0.75) * 100);
+    oceanContourStrength.value = String(clamp(initial, 0, 100));
+    if (oceanContourStrengthValue) {
+      oceanContourStrengthValue.textContent = `${oceanContourStrength.value}%`;
+    }
+    oceanContourStrength.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      state.styleConfig.ocean.contourStrength = clamp(Number.isFinite(value) ? value / 100 : 0.75, 0, 1);
+      if (oceanContourStrengthValue) {
+        oceanContourStrengthValue.textContent = `${event.target.value}%`;
+      }
+      if (render) render();
+    });
+    if (!OCEAN_ADVANCED_STYLES_ENABLED) {
+      oceanContourStrength.disabled = true;
+      oceanContourStrength.title = "Temporarily disabled while advanced ocean styles are off.";
+    }
   }
 
   const referenceImage = document.getElementById("referenceImage");

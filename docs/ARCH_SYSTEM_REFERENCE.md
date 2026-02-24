@@ -43,6 +43,8 @@ This document is a technical reference for contributors and future agents workin
 2. Admin-0 source data is parsed and normalized to EPSG:4326.
 3. Global clipping/filtering runs (`clip_to_map_bounds`, optional allowlist, micro-island blacklist).
 4. Core layers are fetched and simplified (`rivers`, `borders`, `ocean`, `land`, `urban`, `physical`).
+   - Ocean coverage is validated with bbox thresholds before topology export.
+   - If under-covered, ocean is rebuilt as `world_bbox - unary_union(land)` fallback.
 5. Political layer schema is normalized:
    - `id`: stable unique string, based on ISO code and deterministic suffixing (`ISO__n`) for duplicates.
    - `cntr_code`: normalized uppercase country code.
@@ -81,9 +83,21 @@ This document is a technical reference for contributors and future agents workin
 
 This keeps heavy polygon drawing off the DOM while preserving SVG ergonomics for overlay layers.
 
+Ocean rendering sequence on canvas:
+1. Base sphere/ocean fill (`#aadaff`).
+2. Optional ocean style overlay (`flat`, `bathymetry_soft`, `bathymetry_contours`, `wave_hachure`).
+   - Renderer resolves mask mode per frame:
+     - `topology_ocean` when ocean bbox quality is sufficient.
+     - `sphere_minus_land` fallback when topology ocean coverage is too small.
+   - As of 2026-02-24, advanced presets are temporarily runtime-disabled for performance stabilization.
+3. Political land fills.
+4. Hierarchical borders (`local -> province -> country -> coastline`), with zoom-aware styling.
+
 ### State and interaction model
 - Global mutable state lives in `state.js`.
-- Hit-testing uses a quadtree of feature bounds + `d3.geoContains` final check.
+- Hit-testing uses a screen-space spatial grid (`spatialGrid`) over projected feature bounds.
+- Strict land hit policy: a candidate is valid only when `d3.geoContains(feature, lonLat) === true`.
+- Hover and click share the same hit pipeline (`getHitFromEvent`), and ocean areas return empty hit results.
 - Zoom/pan is D3 zoom; renderer redraws canvas on transform updates.
 - Giant-artifact culling is unified across draw, spatial index, and autofill candidate loops.
 - Large-country allowlist (`RU`, `CA`, `CN`, `US`, `AQ`, `ATA`) prevents accidental culling in global projection.
@@ -118,12 +132,38 @@ Implemented in `map_renderer.js`:
   - `buildSpatialIndex()` (prevent hidden artifacts from capturing hits)
   - `autoFillMap()` (prevent hidden artifacts from polluting color maps)
 
+### Coastline LOD and De-clutter
+Implemented in `map_renderer.js`:
+- Coastline mesh is generated from primary topology and cached as three levels:
+  - `cachedCoastlinesHigh` (raw)
+  - `cachedCoastlinesMid` (moderate simplification)
+  - `cachedCoastlinesLow` (aggressive simplification)
+- Simplification uses client-side Ramer-Douglas-Peucker plus short-segment filtering.
+- Runtime LOD selection by zoom:
+  - `k < 1.8 -> low`
+  - `1.8 <= k < 3.2 -> mid`
+  - `k >= 3.2 -> high`
+- At low zoom, local/province internal borders are intentionally weakened to reduce high-latitude line crowding.
+
+### Ocean Mask Fallback (Hybrid)
+Implemented in `map_renderer.js` + `init_map_data.py`:
+- Frontend diagnostic state:
+  - `state.oceanMaskMode`: `topology_ocean` or `sphere_minus_land`
+  - `state.oceanMaskQuality`: bbox-area quality score in `[0, 1]`
+- Frontend runtime selection:
+  - Compute `ocean_bbox_area / sphere_bbox_area`.
+  - Use topology mask when quality `>= 0.35`; otherwise use `Sphere - Land` clip (`evenodd`).
+- Pipeline guardrails:
+  - Validate ocean bbox against global thresholds (`width >= 220°`, `height >= 90°` on global builds).
+  - If invalid, force fallback ocean geometry from `world_bbox - unary_union(land_bg)`.
+
 ## Current Baseline Metrics (from `data/europe_topology.json`)
-- File size: `7,147,228` bytes (~6.9 MB)
+- File size: `3,391,805` bytes (~3.2 MB)
 - Objects: political, special_zones, ocean, land, urban, physical, rivers
-- Arcs: `91,877`
-- Political geometries: `8,305`
-- Embedded political neighbor rows: `8,305`
+- Arcs: `36,370`
+- Political geometries: `199`
+- Ocean geometries: `2` (known sparse-coverage input; frontend fallback handles runtime masking)
+- Embedded political neighbor rows: `199`
 
 ## Architectural Notes
 - The pipeline now targets global Admin-0 with compatibility-preserving output path names.

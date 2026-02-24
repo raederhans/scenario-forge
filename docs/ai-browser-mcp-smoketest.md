@@ -1,6 +1,6 @@
 # AI Browser MCP Smoke Test
 
-Date: 2026-02-24 14:55:06 UTC
+Date: 2026-02-24 21:59:18 UTC
 Profile: ops/browser-mcp/inspection-profile.toml
 Requested Mode: quick
 Executed Phases: quick
@@ -23,12 +23,12 @@ Base URL: http://localhost:8000
 - None
 
 ## Screenshot files
-- .mcp-artifacts/screenshots/gesture-map_pan_zoom-quick-20260224-095322.png
-- .mcp-artifacts/screenshots/route-data_readme-quick-20260224-095322.png
-- .mcp-artifacts/screenshots/route-docs-quick-20260224-095322.png
-- .mcp-artifacts/screenshots/route-home-quick-20260224-095322.png
-- .mcp-artifacts/screenshots/section-left_sidebar-quick-20260224-095322.png
-- .mcp-artifacts/screenshots/section-right_sidebar-quick-20260224-095322.png
+- .mcp-artifacts/screenshots/gesture-map_pan_zoom-quick-20260224-165626.png
+- .mcp-artifacts/screenshots/route-data_readme-quick-20260224-165626.png
+- .mcp-artifacts/screenshots/route-docs-quick-20260224-165626.png
+- .mcp-artifacts/screenshots/route-home-quick-20260224-165626.png
+- .mcp-artifacts/screenshots/section-left_sidebar-quick-20260224-165626.png
+- .mcp-artifacts/screenshots/section-right_sidebar-quick-20260224-165626.png
 
 ## Console summary
 - [quick][route:data_readme] 4:[ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8000/data/favicon.ico:0

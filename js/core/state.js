@@ -404,6 +404,8 @@ export const state = {
   specialZones: {},
   riversData: null,
   oceanData: null,
+  oceanMaskMode: "topology_ocean",
+  oceanMaskQuality: 1,
   landBgData: null,
   urbanData: null,
   physicalData: null,
@@ -438,6 +440,9 @@ export const state = {
   cachedLocalBorders: null,
   cachedColorsHash: null,
   cachedCoastlines: null,
+  cachedCoastlinesHigh: null,
+  cachedCoastlinesMid: null,
+  cachedCoastlinesLow: null,
   cachedGridLines: null,
   referenceImageUrl: null,
   referenceImageState: {
@@ -459,6 +464,13 @@ export const state = {
     coastlines: {
       color: "#333333",
       width: 1.2,
+    },
+    ocean: {
+      preset: "flat",
+      fillColor: "#aadaff",
+      opacity: 0.72,
+      scale: 1,
+      contourStrength: 0.75,
     },
   },
   recentColors: [],
@@ -486,6 +498,9 @@ export const state = {
   keyToId: new Map(),
   spatialIndex: null,
   spatialItems: [],
+  spatialGrid: new Map(),
+  spatialGridMeta: null,
+  spatialItemsById: new Map(),
 
   TINY_AREA: 6,
   MOUSE_THROTTLE_MS: 16,

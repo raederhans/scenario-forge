@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-02-24T15:00:31.503087+00:00",
+  "generated_at": "2026-02-24T20:57:51.221680+00:00",
   "repo_root": "C:\\Users\\raede\\Desktop\\dev\\mapcreator",
   "locales_path": "C:\\Users\\raede\\Desktop\\dev\\mapcreator\\data\\locales.json",
   "topology_path": "C:\\Users\\raede\\Desktop\\dev\\mapcreator\\data\\europe_topology.json",
@@ -10,7 +10,7 @@
   "hardcoded_ui_count": 0,
   "hardcoded_ui_candidates": [],
   "geo_locale_count": 8584,
-  "geo_todo_count": 8573,
+  "geo_todo_count": 0,
   "topology_geo_name_count": 199,
   "topology_geo_missing_count": 0,
   "topology_geo_missing": []
