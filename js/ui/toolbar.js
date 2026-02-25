@@ -41,7 +41,8 @@ function initToolbar({ render } = {}) {
     "bathymetry_contours",
     "wave_hachure",
   ]);
-  const toolButtons = document.querySelectorAll(".tool-button");
+  // Support both legacy and current button class names.
+  const toolButtons = document.querySelectorAll(".tool-button, .btn-tool");
   const currentToolLabel = document.getElementById("currentTool");
   const customColor = document.getElementById("customColor");
   const exportBtn = document.getElementById("exportBtn");

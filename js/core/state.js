@@ -508,4 +508,8 @@ export const state = {
   hitCanvasDirty: true,
   zoomRenderScheduled: false,
   isInteracting: false,
+  renderPhase: "idle",
+  phaseEnteredAt: 0,
+  renderPhaseTimerId: null,
+  projectedBoundsById: new Map(),
 };

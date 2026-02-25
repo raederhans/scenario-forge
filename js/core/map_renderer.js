@@ -56,6 +56,14 @@ const COASTLINE_SIMPLIFY_MID_EPSILON = 0.09;
 const COASTLINE_SIMPLIFY_LOW_EPSILON = 0.22;
 const COASTLINE_SIMPLIFY_MID_MIN_LENGTH = 0.2;
 const COASTLINE_SIMPLIFY_LOW_MIN_LENGTH = 0.45;
+const RENDER_PHASE_IDLE = "idle";
+const RENDER_PHASE_INTERACTING = "interacting";
+const RENDER_PHASE_SETTLING = "settling";
+const RENDER_SETTLE_DURATION_MS = 200;
+const INTERNAL_BORDER_PROVINCE_MIN_ALPHA = 0.30;
+const INTERNAL_BORDER_LOCAL_MIN_ALPHA = 0.22;
+const INTERNAL_BORDER_PROVINCE_MIN_WIDTH = 0.52;
+const INTERNAL_BORDER_LOCAL_MIN_WIDTH = 0.36;
 const OCEAN_PATTERN_BASE_SIZE = 160;
 const OCEAN_ADVANCED_STYLES_ENABLED = false;
 const OCEAN_MASK_MODE_TOPOLOGY = "topology_ocean";
@@ -314,10 +322,35 @@ function getLogicalCanvasDimensions() {
   return [width, height];
 }
 
-function getProjectedFeatureBounds(feature) {
+function nowMs() {
+  if (globalThis.performance?.now) {
+    return globalThis.performance.now();
+  }
+  return Date.now();
+}
+
+function ensureProjectedBoundsCache() {
+  if (!(state.projectedBoundsById instanceof Map)) {
+    state.projectedBoundsById = new Map();
+  }
+  return state.projectedBoundsById;
+}
+
+function clearProjectedBoundsCache() {
+  ensureProjectedBoundsCache().clear();
+}
+
+function computeProjectedFeatureBounds(feature) {
   const pathRef = pathCanvas || pathSVG;
   if (!pathRef || !feature) return null;
-  const bounds = pathRef.bounds(feature);
+
+  let bounds = null;
+  try {
+    bounds = pathRef.bounds(feature);
+  } catch (error) {
+    return null;
+  }
+
   if (!bounds || bounds.length !== 2) return null;
   const minX = bounds[0][0];
   const minY = bounds[0][1];
@@ -336,6 +369,39 @@ function getProjectedFeatureBounds(feature) {
     height: featureHeight,
     area: Math.max(0, featureWidth) * Math.max(0, featureHeight),
   };
+}
+
+function rebuildProjectedBoundsCache() {
+  clearProjectedBoundsCache();
+  if (!state.landData?.features?.length) return;
+
+  const cache = ensureProjectedBoundsCache();
+  state.landData.features.forEach((feature) => {
+    const featureId = getFeatureId(feature);
+    if (!featureId) return;
+    const bounds = computeProjectedFeatureBounds(feature);
+    if (!bounds) return;
+    cache.set(featureId, bounds);
+  });
+}
+
+function getProjectedFeatureBounds(feature, { featureId = null, allowCompute = true } = {}) {
+  const resolvedFeatureId = featureId || getFeatureId(feature);
+  if (resolvedFeatureId) {
+    const cache = ensureProjectedBoundsCache();
+    if (cache.has(resolvedFeatureId)) {
+      return cache.get(resolvedFeatureId) || null;
+    }
+    if (!allowCompute) return null;
+    const computed = computeProjectedFeatureBounds(feature);
+    if (computed) {
+      cache.set(resolvedFeatureId, computed);
+    }
+    return computed;
+  }
+
+  if (!allowCompute) return null;
+  return computeProjectedFeatureBounds(feature);
 }
 
 function isKnownBadFeatureId(featureId) {
@@ -393,7 +459,7 @@ function shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd = fal
     return true;
   }
 
-  const bounds = getProjectedFeatureBounds(feature);
+  const bounds = getProjectedFeatureBounds(feature, { featureId });
   if (!bounds) {
     return false;
   }
@@ -503,6 +569,28 @@ function collectCountryCoverageStats(features = []) {
   };
 }
 
+function clearRenderPhaseTimer() {
+  if (state.renderPhaseTimerId) {
+    globalThis.clearTimeout(state.renderPhaseTimerId);
+    state.renderPhaseTimerId = null;
+  }
+}
+
+function setRenderPhase(phase) {
+  state.renderPhase = phase;
+  state.phaseEnteredAt = nowMs();
+  state.isInteracting = phase === RENDER_PHASE_INTERACTING;
+}
+
+function scheduleRenderPhaseIdle() {
+  clearRenderPhaseTimer();
+  state.renderPhaseTimerId = globalThis.setTimeout(() => {
+    state.renderPhaseTimerId = null;
+    setRenderPhase(RENDER_PHASE_IDLE);
+    render();
+  }, RENDER_SETTLE_DURATION_MS);
+}
+
 function getResolvedFeatureColor(feature, id) {
   const direct = getSafeCanvasColor(state.featureOverrides?.[id], null);
   if (direct) return direct;
@@ -547,11 +635,12 @@ function refreshColorState({ renderNow = true } = {}) {
 
 function pathBoundsInScreen(feature) {
   if (!pathSVG) return false;
-  const bounds = pathSVG.bounds(feature);
-  const minX = bounds[0][0] * state.zoomTransform.k + state.zoomTransform.x;
-  const minY = bounds[0][1] * state.zoomTransform.k + state.zoomTransform.y;
-  const maxX = bounds[1][0] * state.zoomTransform.k + state.zoomTransform.x;
-  const maxY = bounds[1][1] * state.zoomTransform.k + state.zoomTransform.y;
+  const bounds = getProjectedFeatureBounds(feature, { allowCompute: false }) || getProjectedFeatureBounds(feature);
+  if (!bounds) return false;
+  const minX = bounds.minX * state.zoomTransform.k + state.zoomTransform.x;
+  const minY = bounds.minY * state.zoomTransform.k + state.zoomTransform.y;
+  const maxX = bounds.maxX * state.zoomTransform.k + state.zoomTransform.x;
+  const maxY = bounds.maxY * state.zoomTransform.k + state.zoomTransform.y;
   if (![minX, minY, maxX, maxY].every(Number.isFinite)) return false;
 
   const overscan = Math.max(
@@ -751,6 +840,7 @@ function setCanvasSize() {
   mapCanvas.style.width = `${state.width}px`;
   mapCanvas.style.height = `${state.height}px`;
   oceanPatternCache.clear();
+  clearProjectedBoundsCache();
 
   const svg = globalThis.d3.select(mapSvg);
   svg.attr("width", state.width).attr("height", state.height);
@@ -1284,23 +1374,20 @@ function buildSpatialIndex() {
     const id = getFeatureId(feature);
     if (!id) continue;
     if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) continue;
-    const bounds = pathSVG.bounds(feature);
-    const minX = bounds[0][0];
-    const minY = bounds[0][1];
-    const maxX = bounds[1][0];
-    const maxY = bounds[1][1];
-    if (![minX, minY, maxX, maxY].every(Number.isFinite)) continue;
+    const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: false })
+      || getProjectedFeatureBounds(feature, { featureId: id });
+    if (!bounds) continue;
 
     state.spatialItems.push({
       id,
       feature,
       countryCode: getFeatureCountryCodeNormalized(feature),
       source: String(feature?.properties?.__source || "primary"),
-      minX,
-      minY,
-      maxX,
-      maxY,
-      bboxArea: Math.max(0, maxX - minX) * Math.max(0, maxY - minY),
+      minX: bounds.minX,
+      minY: bounds.minY,
+      maxX: bounds.maxX,
+      maxY: bounds.maxY,
+      bboxArea: bounds.area,
     });
   }
 
@@ -1378,12 +1465,13 @@ function drawMeshCollection(meshCollection, strokeStyle, lineWidth) {
   });
 }
 
-function drawHierarchicalBorders(k) {
+function drawHierarchicalBorders(k, { interactive = false } = {}) {
   const kEff = clamp(k, 1, 8);
   const t = (kEff - 1) / 7;
   const kDenom = Math.max(0.0001, k);
-  const lowZoomDeclutter = k < COASTLINE_LOD_LOW_ZOOM_MAX ? 0.7 : 1;
-  const lowZoomWidthScale = k < COASTLINE_LOD_LOW_ZOOM_MAX ? 0.82 : 1;
+  const lowZoomDeclutter = k < COASTLINE_LOD_LOW_ZOOM_MAX ? 0.82 : 1;
+  const lowZoomWidthScale = k < COASTLINE_LOD_LOW_ZOOM_MAX ? 0.92 : 1;
+  const lowZoomInternalBoost = k < 1.45 ? 1.55 : 1;
   const internal = state.styleConfig?.internalBorders || {};
   const empire = state.styleConfig?.empireBorders || {};
   const coast = state.styleConfig?.coastlines || {};
@@ -1397,15 +1485,43 @@ function drawHierarchicalBorders(k) {
   const coastWidthBase = Number(coast.width) || 1.2;
   const internalOpacity = Number.isFinite(Number(internal.opacity)) ? Number(internal.opacity) : 1;
 
+  if (interactive) {
+    const countryWidth = (empireWidthBase * 0.95) / kDenom;
+    const coastWidth = (coastWidthBase * 0.88) / kDenom;
+    const coastlineLow = state.cachedCoastlinesLow?.length
+      ? state.cachedCoastlinesLow
+      : (state.cachedCoastlines?.length ? state.cachedCoastlines : state.cachedCoastlinesHigh);
+
+    context.globalAlpha = 0.88;
+    drawMeshCollection(state.cachedCountryBorders, empireColor, countryWidth);
+
+    context.globalAlpha = 0.78;
+    drawMeshCollection(coastlineLow, coastColor, coastWidth);
+
+    context.globalAlpha = 1.0;
+    return;
+  }
+
   const countryAlpha = 0.90;
-  const provinceAlpha = clamp(internalOpacity * (0.22 + 0.50 * t) * lowZoomDeclutter, 0.12, 0.70);
-  const localAlpha = clamp(internalOpacity * (0.08 + 0.34 * t) * lowZoomDeclutter, 0.04, 0.42);
+  const provinceAlpha = clamp(
+    internalOpacity * (0.22 + 0.50 * t) * lowZoomDeclutter * lowZoomInternalBoost,
+    INTERNAL_BORDER_PROVINCE_MIN_ALPHA,
+    0.74
+  );
+  const localAlpha = clamp(
+    internalOpacity * (0.08 + 0.34 * t) * lowZoomDeclutter * (lowZoomInternalBoost + 0.2),
+    INTERNAL_BORDER_LOCAL_MIN_ALPHA,
+    0.48
+  );
   const coastAlpha = clamp(0.74 + 0.12 * t, 0.74, 0.86);
 
   const countryWidth = (empireWidthBase * (0.95 + 0.40 * t)) / kDenom;
-  const provinceWidth = (internalWidthBase * (0.72 + 0.65 * t) * lowZoomWidthScale) / kDenom;
+  const provinceWidth = Math.max(
+    INTERNAL_BORDER_PROVINCE_MIN_WIDTH,
+    internalWidthBase * (0.72 + 0.65 * t) * lowZoomWidthScale
+  ) / kDenom;
   const localWidth = Math.max(
-    0.14,
+    INTERNAL_BORDER_LOCAL_MIN_WIDTH,
     internalWidthBase * 0.40 * (0.70 + 0.55 * t) * lowZoomWidthScale
   ) / kDenom;
   const coastWidth = (coastWidthBase * (0.90 + 0.30 * t)) / kDenom;
@@ -1686,6 +1802,7 @@ function drawCanvas() {
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
   const t = state.zoomTransform || globalThis.d3.zoomIdentity;
   const k = Math.max(0.0001, t.k || 1);
+  const isInteractingFrame = state.renderPhase === RENDER_PHASE_INTERACTING;
 
   // 1. Clear + reset
   context.setTransform(1, 0, 0, 1, 0, 0);
@@ -1757,7 +1874,7 @@ function drawCanvas() {
     });
 
     // 5. Draw border hierarchy (country > province > local) after fills.
-    drawHierarchicalBorders(k);
+    drawHierarchicalBorders(k, { interactive: isInteractingFrame });
   }
 }
 
@@ -1801,6 +1918,11 @@ function updateSpecialZonesPaths() {
 
 function renderHoverOverlay() {
   if (!hoverGroup || !pathSVG) return;
+
+  if (state.renderPhase !== RENDER_PHASE_IDLE) {
+    hoverGroup.selectAll("path.hovered-feature").remove();
+    return;
+  }
 
   const feature = state.hoveredId ? state.landIndex.get(state.hoveredId) : null;
   const data = feature ? [feature] : [];
@@ -1912,9 +2034,11 @@ function render() {
   drawCanvas();
   renderSpecialZones();
   renderHoverOverlay();
-  renderLegend();
-  if (typeof state.updateLegendUI === "function") {
-    state.updateLegendUI();
+  if (state.renderPhase === RENDER_PHASE_IDLE) {
+    renderLegend();
+    if (typeof state.updateLegendUI === "function") {
+      state.updateLegendUI();
+    }
   }
 }
 
@@ -1980,17 +2104,20 @@ function handleMouseMove(event) {
   const now = performance.now();
   if (now - state.lastMouseMoveTime < state.MOUSE_THROTTLE_MS) return;
   state.lastMouseMoveTime = now;
-  if (!state.landData || state.isInteracting) return;
+  if (!state.landData) return;
 
+  const reducedHoverPhase = state.renderPhase !== RENDER_PHASE_IDLE;
   const hit = getHitFromEvent(event, {
-    enableSnap: true,
+    enableSnap: !reducedHoverPhase,
     snapPx: HIT_SNAP_RADIUS_PX,
     eventType: "hover",
   });
   const id = hit.id;
   if (id !== state.hoveredId) {
     state.hoveredId = id;
-    renderHoverOverlay();
+    if (!reducedHoverPhase) {
+      renderHoverOverlay();
+    }
   }
 
   if (!tooltip) return;
@@ -2107,16 +2234,15 @@ function calculatePanExtent() {
 
   for (const feature of state.landData.features) {
     if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) continue;
-    const bounds = pathSVG.bounds(feature);
-    if (!bounds || bounds.length !== 2) continue;
+    const featureId = getFeatureId(feature);
+    const bounds = getProjectedFeatureBounds(feature, { featureId, allowCompute: false })
+      || getProjectedFeatureBounds(feature, { featureId });
+    if (!bounds) continue;
 
-    const featureMinX = bounds[0][0];
-    const featureMinY = bounds[0][1];
-    const featureMaxX = bounds[1][0];
-    const featureMaxY = bounds[1][1];
-    if (![featureMinX, featureMinY, featureMaxX, featureMaxY].every(Number.isFinite)) {
-      continue;
-    }
+    const featureMinX = bounds.minX;
+    const featureMinY = bounds.minY;
+    const featureMaxX = bounds.maxX;
+    const featureMaxY = bounds.maxY;
 
     minX = Math.min(minX, featureMinX);
     minY = Math.min(minY, featureMinY);
@@ -2174,6 +2300,7 @@ function fitProjection() {
     ? { type: "FeatureCollection", features: renderableFeatures }
     : state.landData;
   projection.fitExtent([[padding, padding], [x1, y1]], fitTarget);
+  rebuildProjectedBoundsCache();
   buildSpatialIndex();
   updateSpecialZonesPaths();
   updateZoomTranslateExtent();
@@ -2193,7 +2320,9 @@ function initZoom() {
     .scaleExtent([MIN_ZOOM_SCALE, MAX_ZOOM_SCALE])
     .extent([[0, 0], [state.width, state.height]])
     .on("start", () => {
-      state.isInteracting = true;
+      clearRenderPhaseTimer();
+      setRenderPhase(RENDER_PHASE_INTERACTING);
+      renderHoverOverlay();
     })
     .on("zoom", (event) => {
       if (!state.zoomRenderScheduled) {
@@ -2205,9 +2334,9 @@ function initZoom() {
       }
     })
     .on("end", (event) => {
-      state.isInteracting = false;
+      setRenderPhase(RENDER_PHASE_SETTLING);
       updateMap(event.transform);
-      renderHoverOverlay();
+      scheduleRenderPhaseIdle();
     });
 
   updateZoomTranslateExtent();
@@ -2265,6 +2394,11 @@ function initMap({ containerId = "mapContainer" } = {}) {
   state.featureOverrides = sanitizeColorMap(state.featureOverrides);
   state.colors = sanitizeColorMap(state.colors);
   state.debugMode = debugMode;
+  clearRenderPhaseTimer();
+  state.renderPhase = RENDER_PHASE_IDLE;
+  state.phaseEnteredAt = nowMs();
+  state.renderPhaseTimerId = null;
+  state.projectedBoundsById = new Map();
 
   mapCanvas.style.pointerEvents = "none";
   mapCanvas.style.touchAction = "none";
@@ -2282,6 +2416,8 @@ function initMap({ containerId = "mapContainer" } = {}) {
 }
 
 function setMapData() {
+  clearRenderPhaseTimer();
+  setRenderPhase(RENDER_PHASE_IDLE);
   ensureLayerDataFromTopology();
   const primaryTopology = state.topologyPrimary || state.topology;
   const detailTopology = state.topologyBundleMode === "composite" ? state.topologyDetail : null;
@@ -2307,10 +2443,11 @@ function setMapData() {
     neighbors: [],
   };
   buildIndex();
-  rebuildResolvedColors();
+  rebuildProjectedBoundsCache();
   rebuildStaticMeshes();
   invalidateBorderCache();
   fitProjection();
+  rebuildResolvedColors();
   resetZoomToFit();
   enforceZoomConstraints();
   drawCanvas();
