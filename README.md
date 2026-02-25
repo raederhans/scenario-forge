@@ -1,117 +1,67 @@
-🗺️ Map Creator: High-Precision Historical Mapping Tool
-Map Creator is a specialized web-based GIS tool designed for creating detailed historical and alternate history maps (e.g., for Hearts of Iron IV modding communities like TNO, Kaiserreich).
+# 🗺️ Map Creator
 
-Unlike generic map chart tools, Map Creator features a Hybrid-Resolution Engine that mixes standard NUTS-3 regions with high-fidelity District-level data (Admin-Level 2) for specific countries, allowing for the accurate reconstruction of historical borders (e.g., 1871 Prussia, Vichy France, Pre-WW2 Poland).
+Map Creator 是一个面向历史/架空地图创作的网页制图工具。  
+它支持全球范围的政治填色、分区编辑、预设批量上色、参考图描图和快照导出，适合做世界观设定图、mod 地图草案和教学演示图。
 
-(Replace with actual screenshot)
+## ✨ 核心功能
 
-✨ Key Features
-🌍 Hybrid-Resolution Geometry
-Base Layer: European NUTS-3 regions for general mapping.
+- 🎨 **交互式填色**
+  - `Fill / Eraser / Eyedropper` 三种工具
+  - 主题色板 + 自定义颜色 + 最近使用颜色
+  - 支持按 **Subdivision** 或按 **Country** 上色
 
-Holistic Replacement:
+- ⚡ **快速上色**
+  - `Auto-Fill Countries` 一键自动配色
+  - `By Region` / `By Neighbor (Political)` 两种配色模式
+  - `Clear Map` 快速清空当前着色
 
-🇫🇷 France: Fully replaced with ~300+ Arrondissements (Districts) for precise internal borders (Vichy, Burgundy).
+- 🌊 **海洋样式**
+  - 可直接选择海洋填充颜色（不再固定淡蓝）
+  - 海洋高级样式（Bathymetry / Hachure）**目前保留 UI 但暂时禁用**（性能稳定优先）
 
-🇵🇱 Poland: Fully replaced with ~380 Powiaty (Counties) to accurately depict 1939 borders and Prussian territories.
+- 🧭 **地图视觉控制**
+  - 内部边界、国家边界、海岸线样式独立调节
+  - 纹理叠层（纸张 / 画布 / 网格）
+  - 图层开关（Urban / Physical / Rivers / Special Zones）
 
-Surgical Stitching: Seamless integration of high-res datasets without geometry overlap or "ghosting."
+- 🖼️ **参考图描图**
+  - 上传本地参考图
+  - 调整透明度、缩放、X/Y 偏移用于对齐描绘
 
-🎨 Visual & Scenario Editor (The "Tracer" Suite)
-Map Style Panel: Customize internal border opacity/width to hide data seams. Separate controls for "Empire Borders" and Coastlines.
+- 🧩 **预设与分组编辑**
+  - 国家/地区预设一键应用
+  - 预设编辑模式可直接点选区域并复制 ID
+  - 右侧国家列表支持搜索和单国调色
 
-Image Overlay (Tracer): Upload local historical maps or reference images, adjust opacity/scale, and overlay them directly on the map to guide your creation.
+- 💾 **项目与导出**
+  - 项目状态导出/导入（JSON）
+  - 地图快照导出（PNG / JPG）
 
-Preset Builder: A built-in "Dev Mode" allows you to visually select regions and export ID lists to create new historical country presets (no more manual ID typing!).
+- 🌐 **双语界面**
+  - 支持 `EN / 中文` 一键切换
 
-🌐 Localization System
-Auto-Translation: Python-based CLI that automatically generates locales.json.
+## 🚀 怎么用（面向使用）
 
-Incremental Updates: Detects new geometry IDs and appends them to the translation file without overwriting existing work.
+1. 进入页面后先选工具（默认 `Fill`）和颜色。  
+2. 点击地图区域上色；滚轮缩放、拖拽平移。  
+3. 需要快速出图时，点击 `Auto-Fill Countries`。  
+4. 在 `Map Style` 里调边界、海洋、纹理和图层可见性。  
+5. 需要对照历史图时，上传 `Reference Image` 进行描图。  
+6. 完成后导出快照，或保存项目 JSON 以便下次继续。  
 
-Offline Seeds: Built-in dictionary for major European regions to minimize manual translation work.
+## 🌍 数据来源
 
-🚀 Quick Start
-Prerequisites
-Python 3.8+ (for data processing pipeline)
+本项目数据由公开地理数据源抓取、清洗并生成前端可用拓扑数据，主要包括：
 
-Local Web Server (e.g., Python http.server or Node http-server)
+- **Natural Earth**（国家边界、海洋、陆地、河流、城市区、物理区域、Admin-1）
+- **Eurostat / GISCO NUTS**
+- **geoBoundaries**（中国 / 俄罗斯 / 乌克兰 / 印度的 ADM2）
+- **France GeoJSON（arrondissements）**
+- **PolandGeoJson（powiaty）**
 
-Installation
-Clone the repository
+说明：不同数据源各自遵循其原始许可与使用条款。
 
-Bash
-git clone https://github.com/yourusername/map-creator.git
-cd map-creator
-Install Python Dependencies
+## 📄 开源协议
 
-Bash
-pip install geopandas topojson mapclassify matplotlib requests
-Run the Development Environment Simply run the batch script. This will update translations and start the server.
-
-DOS
-.\start_dev.bat
-Or manually:
-
-Bash
-python tools/translate_manager.py
-python -m http.server 8000
-Open Browser Navigate to http://localhost:8000.
-
-🛠️ Data Pipeline (init_map_data.py)
-The core engine is powered by init_map_data.py, which performs the following:
-
-Download: Fetches raw GeoJSONs from Natural Earth and specific GitHub repositories (France/Poland).
-
-The Purge: Removes low-res NUTS-3 regions for target countries.
-
-Holistic Replacement: Injects high-res Admin-2 data, standardizes IDs (e.g., FR_ARR_, PL_POW_), and unifies coordinate systems.
-
-Topology: Converts the merged GeoDataFrame into TopoJSON for efficient web rendering.
-
-To regenerate map data (e.g., after modifying the script):
-
-Bash
-python init_map_data.py
-🎮 How to Create a New Historical Preset
-Find a Reference: Locate a map image of the country you want to add (e.g., "Republic of Komi").
-
-Upload Overlay: In the Map Creator left sidebar, upload the image and align it with the map using the Scale/Opacity sliders.
-
-Enter Edit Mode: In the Right Sidebar ("Historical Presets"), click "Edit" (or toggle Dev Mode).
-
-Trace: Click the regions on the map that match your reference image.
-
-Save/Export:
-
-Click Save to keep it in your local browser.
-
-Click Copy IDs to get the JSON array, then paste it into js/presets.js to make it permanent for all users.
-
-📂 Project Structure
-map-creator/
-├── data/
-│   ├── europe_topology.json  # Generated map data
-│   ├── locales.json          # Translation file (EN/ZH)
-│   └── ...                   # Cached GeoJSONs
-├── js/
-│   ├── app.js                # Main frontend logic (D3/Canvas)
-│   └── presets.js            # Historical state definitions
-├── tools/
-│   ├── translate_manager.py  # Incremental translation tool
-│   └── geo_seeds.py          # Offline translation dictionary
-├── init_map_data.py          # The Python Geometry Engine
-├── index.html                # Main entry point
-├── start_dev.bat             # One-click launcher
-└── README.md
-🤝 Credits & Data Sources
-GIS Base: Natural Earth & Eurostat NUTS.
-
-France Data: gregoire-david/france-geojson (Arrondissements).
-
-Poland Data: jusuff/PolandGeoJson (Powiaty).
-
-Tech Stack: D3.js, TopoJSON, GeoPandas.
-
-📝 License
-MIT License. Feel free to fork and build your own history!
+- 项目当前按 **MIT License** 使用（以仓库声明为准）。
+- 第三方地理数据不自动转为 MIT，请同时遵守对应数据源许可证。
