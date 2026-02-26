@@ -31,6 +31,9 @@ function applyCountryColor(code, color) {
 }
 
 function resetCountryColors() {
+  Object.keys(countryPalette).forEach((code) => {
+    delete countryPalette[code];
+  });
   Object.keys(defaultCountryPalette).forEach((code) => {
     countryPalette[code] = defaultCountryPalette[code];
   });

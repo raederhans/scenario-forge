@@ -64,6 +64,13 @@ function initToolbar({ render } = {}) {
   const empireBorderWidth = document.getElementById("empireBorderWidth");
   const coastlineColor = document.getElementById("coastlineColor");
   const coastlineWidth = document.getElementById("coastlineWidth");
+  const parentBorderColor = document.getElementById("parentBorderColor");
+  const parentBorderOpacity = document.getElementById("parentBorderOpacity");
+  const parentBorderWidth = document.getElementById("parentBorderWidth");
+  const parentBorderCountryList = document.getElementById("parentBorderCountryList");
+  const parentBorderEnableAll = document.getElementById("parentBorderEnableAll");
+  const parentBorderDisableAll = document.getElementById("parentBorderDisableAll");
+  const parentBorderEmpty = document.getElementById("parentBorderEmpty");
   const oceanFillColor = document.getElementById("oceanFillColor");
   const oceanStyleSelect = document.getElementById("oceanStyleSelect");
   const oceanTextureOpacity = document.getElementById("oceanTextureOpacity");
@@ -81,6 +88,8 @@ function initToolbar({ render } = {}) {
   const internalBorderWidthValue = document.getElementById("internalBorderWidthValue");
   const empireBorderWidthValue = document.getElementById("empireBorderWidthValue");
   const coastlineWidthValue = document.getElementById("coastlineWidthValue");
+  const parentBorderOpacityValue = document.getElementById("parentBorderOpacityValue");
+  const parentBorderWidthValue = document.getElementById("parentBorderWidthValue");
   const oceanTextureOpacityValue = document.getElementById("oceanTextureOpacityValue");
   const oceanTextureScaleValue = document.getElementById("oceanTextureScaleValue");
   const oceanContourStrengthValue = document.getElementById("oceanContourStrengthValue");
@@ -135,6 +144,29 @@ function initToolbar({ render } = {}) {
     0,
     1
   );
+  if (!state.styleConfig.parentBorders || typeof state.styleConfig.parentBorders !== "object") {
+    state.styleConfig.parentBorders = {};
+  }
+  state.styleConfig.parentBorders.color = String(
+    state.styleConfig.parentBorders.color || "#4b5563"
+  );
+  state.styleConfig.parentBorders.opacity = clamp(
+    Number.isFinite(Number(state.styleConfig.parentBorders.opacity))
+      ? Number(state.styleConfig.parentBorders.opacity)
+      : 0.85,
+    0,
+    1
+  );
+  state.styleConfig.parentBorders.width = clamp(
+    Number.isFinite(Number(state.styleConfig.parentBorders.width))
+      ? Number(state.styleConfig.parentBorders.width)
+      : 1.1,
+    0.2,
+    4
+  );
+  if (!state.parentBorderEnabledByCountry || typeof state.parentBorderEnabledByCountry !== "object") {
+    state.parentBorderEnabledByCountry = {};
+  }
 
   if (oceanFillColor) {
     oceanFillColor.value = state.styleConfig.ocean.fillColor;
@@ -160,6 +192,71 @@ function initToolbar({ render } = {}) {
     });
   }
   state.updateRecentUI = renderRecentColors;
+
+  function normalizeParentBorderEnabledMap() {
+    const supported = Array.isArray(state.parentBorderSupportedCountries)
+      ? state.parentBorderSupportedCountries
+      : [];
+    const prev = state.parentBorderEnabledByCountry && typeof state.parentBorderEnabledByCountry === "object"
+      ? state.parentBorderEnabledByCountry
+      : {};
+    const next = {};
+    supported.forEach((countryCode) => {
+      next[countryCode] = !!prev[countryCode];
+    });
+    state.parentBorderEnabledByCountry = next;
+  }
+
+  function renderParentBorderCountryList() {
+    if (!parentBorderCountryList) return;
+    normalizeParentBorderEnabledMap();
+    const supported = Array.isArray(state.parentBorderSupportedCountries)
+      ? [...state.parentBorderSupportedCountries]
+      : [];
+
+    parentBorderCountryList.replaceChildren();
+    if (!supported.length) {
+      if (parentBorderEmpty) {
+        parentBorderEmpty.classList.remove("hidden");
+      }
+      return;
+    }
+    if (parentBorderEmpty) {
+      parentBorderEmpty.classList.add("hidden");
+    }
+
+    const entries = supported
+      .map((code) => {
+        const rawName = state.countryNames?.[code] || code;
+        return {
+          code,
+          displayName: t(rawName, "geo"),
+        };
+      })
+      .sort((a, b) => a.displayName.localeCompare(b.displayName));
+
+    entries.forEach(({ code, displayName }) => {
+      const label = document.createElement("label");
+      label.className = "toggle-label parent-border-country-item";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className = "checkbox-input";
+      checkbox.checked = !!state.parentBorderEnabledByCountry?.[code];
+      checkbox.addEventListener("change", (event) => {
+        state.parentBorderEnabledByCountry[code] = !!event.target.checked;
+        if (render) render();
+      });
+
+      const text = document.createElement("span");
+      text.textContent = `${displayName} (${code})`;
+
+      label.appendChild(checkbox);
+      label.appendChild(text);
+      parentBorderCountryList.appendChild(label);
+    });
+  }
+  state.updateParentBorderCountryListFn = renderParentBorderCountryList;
 
   function updateSwatchUI() {
     let matched = false;
@@ -396,6 +493,72 @@ function initToolbar({ render } = {}) {
     });
   }
 
+  if (parentBorderColor) {
+    parentBorderColor.value = state.styleConfig.parentBorders.color || "#4b5563";
+    parentBorderColor.addEventListener("input", (event) => {
+      state.styleConfig.parentBorders.color = event.target.value;
+      if (render) render();
+    });
+  }
+  if (parentBorderOpacity) {
+    const initial = Math.round((state.styleConfig.parentBorders.opacity || 0.85) * 100);
+    parentBorderOpacity.value = String(clamp(initial, 0, 100));
+    if (parentBorderOpacityValue) {
+      parentBorderOpacityValue.textContent = `${parentBorderOpacity.value}%`;
+    }
+    parentBorderOpacity.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      state.styleConfig.parentBorders.opacity = clamp(
+        Number.isFinite(value) ? value / 100 : 0.85,
+        0,
+        1
+      );
+      if (parentBorderOpacityValue) {
+        parentBorderOpacityValue.textContent = `${event.target.value}%`;
+      }
+      if (render) render();
+    });
+  }
+  if (parentBorderWidth) {
+    const initial = Number(state.styleConfig.parentBorders.width || 1.1);
+    parentBorderWidth.value = String(clamp(initial, 0.2, 4));
+    if (parentBorderWidthValue) {
+      parentBorderWidthValue.textContent = Number(parentBorderWidth.value).toFixed(2);
+    }
+    parentBorderWidth.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      state.styleConfig.parentBorders.width = clamp(Number.isFinite(value) ? value : 1.1, 0.2, 4);
+      if (parentBorderWidthValue) {
+        parentBorderWidthValue.textContent = state.styleConfig.parentBorders.width.toFixed(2);
+      }
+      if (render) render();
+    });
+  }
+  if (parentBorderEnableAll) {
+    parentBorderEnableAll.addEventListener("click", () => {
+      const supported = Array.isArray(state.parentBorderSupportedCountries)
+        ? state.parentBorderSupportedCountries
+        : [];
+      supported.forEach((countryCode) => {
+        state.parentBorderEnabledByCountry[countryCode] = true;
+      });
+      renderParentBorderCountryList();
+      if (render) render();
+    });
+  }
+  if (parentBorderDisableAll) {
+    parentBorderDisableAll.addEventListener("click", () => {
+      const supported = Array.isArray(state.parentBorderSupportedCountries)
+        ? state.parentBorderSupportedCountries
+        : [];
+      supported.forEach((countryCode) => {
+        state.parentBorderEnabledByCountry[countryCode] = false;
+      });
+      renderParentBorderCountryList();
+      if (render) render();
+    });
+  }
+
   if (oceanStyleSelect) {
     if (!OCEAN_ADVANCED_STYLES_ENABLED) {
       Array.from(oceanStyleSelect.options).forEach((option) => {
@@ -570,6 +733,7 @@ function initToolbar({ render } = {}) {
 
   renderPalette(state.currentPaletteTheme);
   renderRecentColors();
+  renderParentBorderCountryList();
   updateSwatchUI();
   updateToolUI();
   updateUIText();

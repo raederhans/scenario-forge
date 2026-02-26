@@ -390,7 +390,10 @@ def main() -> None:
     args = parse_args()
     base_dir = Path(__file__).resolve().parents[1]
 
-    topo_path = args.topology or (base_dir / "data" / "europe_topology.json")
+    default_topology = base_dir / "data" / "europe_topology.highres.json"
+    if not default_topology.exists():
+        default_topology = base_dir / "data" / "europe_topology.json"
+    topo_path = args.topology or default_topology
     output_path = args.locales or (base_dir / "data" / "locales.json")
     geo_aliases_path = args.geo_aliases or (base_dir / "data" / "geo_aliases.json")
 

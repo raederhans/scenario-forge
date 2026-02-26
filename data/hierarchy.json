@@ -3336,7 +3336,8 @@
       "RU_RAY_50074027B43970917695104",
       "RU_RAY_50074027B93528412842449",
       "RU_RAY_50074027B32318639490132",
-      "RU_RAY_50074027B38418473006455"
+      "RU_RAY_50074027B38418473006455",
+      "RU_CITY_MOSCOW"
     ],
     "RU_Republic_of_Tatarstan": [
       "RU_RAY_50074027B50222515317782",
@@ -3581,7 +3582,8 @@
       "RU_RAY_50074027B51159964054862",
       "RU_RAY_50074027B41643930675404",
       "RU_RAY_50074027B71591309638211",
-      "RU_RAY_50074027B32782787425978"
+      "RU_RAY_50074027B32782787425978",
+      "RU_CITY_ARKHANGELSK"
     ],
     "RU_Voronezh": [
       "RU_RAY_50074027B21233041988666",
@@ -3979,7 +3981,8 @@
       "RU_RAY_50074027B6123322766775",
       "RU_RAY_50074027B4882309977182",
       "RU_RAY_50074027B78770724987560",
-      "RU_RAY_50074027B30425971595491"
+      "RU_RAY_50074027B30425971595491",
+      "RU_CITY_VOLGOGRAD"
     ],
     "RU_Republic_of_Adygea": [
       "RU_RAY_50074027B8362971409233",
@@ -4233,6 +4236,9 @@
     ],
     "RU_Republic_of_Khakassia": [
       "RUS-2402"
+    ],
+    "RU_Saint_Petersburg": [
+      "RU_CITY_SAINT_PETERSBURG"
     ],
     "IN_Madhya_Pradesh": [
       "IN_ADM2_76128533B75548370501185",
@@ -6448,6 +6454,7 @@
     "RU_Kemerovo": "Kemerovo",
     "RU_Irkutsk": "Irkutsk",
     "RU_Republic_of_Khakassia": "Republic of Khakassia",
+    "RU_Saint_Petersburg": "Saint Petersburg",
     "IN_Madhya_Pradesh": "IN - Madhya Pradesh",
     "IN_Maharashtra": "IN - Maharashtra",
     "IN_Chhattisgarh": "IN - Chhattisgarh",

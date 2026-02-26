@@ -37,7 +37,7 @@ def collect_aliases(properties: dict) -> list[str]:
 
 def stable_key_for_geometry(geometry: dict, primary_name: str) -> str:
     properties = geometry.get("properties") or {}
-    raw_id = geometry.get("id") or properties.get("id")
+    raw_id = properties.get("id") or geometry.get("id")
     if isinstance(raw_id, (str, int, float)):
         stable_id = str(raw_id).strip()
         if stable_id:
@@ -131,7 +131,10 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     base_dir = Path(__file__).resolve().parents[1]
-    topology_path = args.topology or (base_dir / "data" / "europe_topology.json")
+    default_topology = base_dir / "data" / "europe_topology.highres.json"
+    if not default_topology.exists():
+        default_topology = base_dir / "data" / "europe_topology.json"
+    topology_path = args.topology or default_topology
     output_path = args.output or (base_dir / "data" / "geo_aliases.json")
 
     payload = normalize_geokeys(topology_path)

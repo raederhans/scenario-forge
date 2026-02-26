@@ -537,6 +537,47 @@ details.card[open] > summary::after {
   color: var(--text-secondary);
 }
 
+.parent-border-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.parent-border-actions .btn-secondary {
+  flex: 1 1 0;
+  min-height: 30px;
+  padding: 6px 8px;
+  font-size: 0.72rem;
+}
+
+.parent-border-empty {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.parent-border-country-list {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-btn);
+  background: var(--bg-input);
+  padding: 6px 8px;
+}
+
+.parent-border-country-item {
+  font-size: 0.78rem;
+  padding: 3px 0;
+}
+
+.parent-border-country-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.parent-border-country-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 999px;
+}
+
 /* ── Country List ──────────────────────────────────────── */
 .country-list {
   max-height: 40vh;

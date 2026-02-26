@@ -417,6 +417,37 @@ def clip_borders(gdf: gpd.GeoDataFrame, land: gpd.GeoDataFrame) -> gpd.GeoDataFr
     return clip_to_land_bounds(gdf, land, "borders")
 
 
+def build_ru_city_detail_topology(script_dir: Path, output_dir: Path) -> None:
+    source_topology = output_dir / "europe_topology.json.bak"
+    if not source_topology.exists():
+        print(
+            "[RU City Detail] Skipped: source detail topology not found at "
+            f"{source_topology}."
+        )
+        return
+
+    patch_script = script_dir / "tools" / "patch_ru_city_detail.py"
+    if not patch_script.exists():
+        print(f"[RU City Detail] Skipped: patch script missing at {patch_script}.")
+        return
+
+    cmd = [
+        sys.executable,
+        str(patch_script),
+        "--source-topology",
+        str(source_topology),
+        "--output-topology",
+        str(output_dir / "europe_topology.highres.json"),
+        "--ru-adm2",
+        str(output_dir / cfg.RUS_ADM2_FILENAME),
+    ]
+    print("[RU City Detail] Building patched detail topology...")
+    try:
+        subprocess.check_call(cmd, cwd=script_dir)
+    except subprocess.CalledProcessError as exc:
+        print(f"[RU City Detail] Failed to patch detail topology: {exc}")
+
+
 def build_balkan_fallback(
     existing: gpd.GeoDataFrame, admin0: gpd.GeoDataFrame | None = None
 ) -> gpd.GeoDataFrame:
@@ -911,6 +942,7 @@ def main() -> None:
         output_path=topology_path,
         quantization=cfg.TOPOLOGY_QUANTIZATION,
     )
+    build_ru_city_detail_topology(script_dir, output_dir)
 
     print("[INFO] Generating Hierarchy Data....")
     generate_hierarchy.main()

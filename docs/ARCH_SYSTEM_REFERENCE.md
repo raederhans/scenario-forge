@@ -145,6 +145,27 @@ Implemented in `map_renderer.js`:
   - `k >= 3.2 -> high`
 - At low zoom, local/province internal borders are intentionally weakened to reduce high-latitude line crowding.
 
+### Parent Unit Borders (Per-country, Auto-discovered)
+Implemented in `map_renderer.js` + `toolbar.js`:
+- New runtime state:
+  - `state.parentBorderSupportedCountries`
+  - `state.parentBorderEnabledByCountry`
+  - `state.parentBorderMetaByCountry`
+  - `state.parentGroupByFeatureId`
+  - `state.cachedParentBordersByCountry`
+- Group source resolver is automatic per country:
+  - priority: `hierarchy` -> `admin1_group`
+  - GB special-case: reject coarse 4-nation grouping; fallback to `id` prefix grouping (`UK***`) when hierarchy is not fine enough.
+  - DE special-case: enforce federal-state level (`admin1_group`) with city-state presence (`Berlin`, `Hamburg`, `Bremen`).
+- Quality gates for auto-enrollment:
+  - minimum grouped coverage: `>= 0.70`
+  - dominant group share: `<= 0.90`
+  - renderable groups: `>= 2` (groups with at least 2 members)
+- Rendering behavior:
+  - parent borders are opt-in per country and cached lazily.
+  - border order: `local -> province -> parent -> country -> coastline`.
+  - parent borders are skipped during interaction phase to avoid pan/zoom jank.
+
 ### Ocean Mask Fallback (Hybrid)
 Implemented in `map_renderer.js` + `init_map_data.py`:
 - Frontend diagnostic state:

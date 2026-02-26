@@ -5,10 +5,14 @@ class FileManager {
   static exportProject(appState) {
     if (!appState) return;
     const payload = {
-      schemaVersion: 2,
+      schemaVersion: 3,
       countryBaseColors: appState.countryBaseColors || {},
       featureOverrides: appState.featureOverrides || {},
       specialZones: appState.specialZones || {},
+      parentBorderEnabledByCountry: appState.parentBorderEnabledByCountry || {},
+      styleConfig: {
+        parentBorders: appState.styleConfig?.parentBorders || null,
+      },
       timestamp: Date.now(),
     };
 
@@ -48,6 +52,15 @@ class FileManager {
         }
         if (!data.countryBaseColors || typeof data.countryBaseColors !== "object") {
           data.countryBaseColors = {};
+        }
+        if (!data.parentBorderEnabledByCountry || typeof data.parentBorderEnabledByCountry !== "object") {
+          data.parentBorderEnabledByCountry = {};
+        }
+        if (!data.styleConfig || typeof data.styleConfig !== "object") {
+          data.styleConfig = {};
+        }
+        if (!data.styleConfig.parentBorders || typeof data.styleConfig.parentBorders !== "object") {
+          data.styleConfig.parentBorders = null;
         }
 
         if (typeof callback === "function") {

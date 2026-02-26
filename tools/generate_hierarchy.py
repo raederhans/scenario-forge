@@ -5,6 +5,10 @@ import zipfile
 from collections import defaultdict
 from pathlib import Path
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 try:
     import geopandas as gpd
 except ImportError as exc:
@@ -23,6 +27,15 @@ try:
     from map_builder import config as cfg
 except Exception:
     cfg = None
+
+try:
+    from map_builder.processors.ru_city_overrides import (
+        RU_CITY_GROUP_BY_ID,
+        build_ru_city_overrides,
+    )
+except Exception:
+    RU_CITY_GROUP_BY_ID = {}
+    build_ru_city_overrides = None
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 DEFAULT_CHINA_ADM2 = DATA_DIR / "china_adm2.geojson"
@@ -499,6 +512,22 @@ def build_russia_groups_hybrid(adm2_path: Path, adm1_path: Path):
                 groups[group_id].append(child_id)
             if group_id not in labels:
                 labels[group_id] = str(region)
+
+    if build_ru_city_overrides is not None and RU_CITY_GROUP_BY_ID:
+        try:
+            city_overrides = build_ru_city_overrides(adm2, adm1_country, strict=False)
+            for _, row in city_overrides.iterrows():
+                city_id = str(row.get("id", "")).strip()
+                if not city_id:
+                    continue
+                group_id = RU_CITY_GROUP_BY_ID.get(city_id)
+                if not group_id:
+                    continue
+                if city_id not in groups[group_id]:
+                    groups[group_id].append(city_id)
+                labels[group_id] = str(row.get("name", "")).strip() or group_id
+        except Exception as exc:
+            print(f"[Hierarchy] RU city override injection skipped: {exc}")
 
     return groups, labels
 

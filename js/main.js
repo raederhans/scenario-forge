@@ -55,6 +55,7 @@ async function bootstrap() {
       locales,
       geoAliases,
       hierarchy,
+      ruCityOverrides,
     } = await loadMapData();
     state.topology = topology || topologyPrimary || topologyDetail;
     state.topologyPrimary = topologyPrimary || state.topology;
@@ -62,6 +63,7 @@ async function bootstrap() {
     state.topologyBundleMode = topologyBundleMode || "single";
     state.locales = locales || { ui: {}, geo: {} };
     state.geoAliasToStableKey = geoAliases?.alias_to_stable_key || {};
+    state.ruCityOverrides = ruCityOverrides || null;
     processHierarchyData(hierarchy);
 
     if (!state.topologyPrimary) {
@@ -82,8 +84,11 @@ async function bootstrap() {
       Array.isArray(state.topologyDetail.objects.political.geometries)
         ? state.topologyDetail.objects.political.geometries.length
         : 0;
+    const overrideCount = Array.isArray(state.ruCityOverrides?.features)
+      ? state.ruCityOverrides.features.length
+      : 0;
     console.log(
-      `[main] Loaded topology bundle mode=${state.topologyBundleMode}, primary=${primaryCount}, detail=${detailCount}.`
+      `[main] Loaded topology bundle mode=${state.topologyBundleMode}, primary=${primaryCount}, detail=${detailCount}, ruOverrides=${overrideCount}.`
     );
 
     state.landData = globalThis.topojson.feature(state.topologyPrimary, objects.political);

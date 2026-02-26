@@ -229,6 +229,37 @@
                 </div>
               </div>
 
+              <div class="space-y-2">
+                <div id="lblParentBorders" class="section-header">Parent Unit Borders</div>
+                <div class="flex items-center justify-between gap-3">
+                  <label id="lblParentBorderColor" class="range-label" for="parentBorderColor">Color</label>
+                  <input id="parentBorderColor" type="color" value="#4b5563" class="color-input" />
+                </div>
+                <div>
+                  <div class="range-row">
+                    <label id="lblParentBorderOpacity" class="range-label" for="parentBorderOpacity">Opacity</label>
+                    <span id="parentBorderOpacityValue" class="range-value">85%</span>
+                  </div>
+                  <input id="parentBorderOpacity" type="range" min="0" max="100" value="85" class="range-input" />
+                </div>
+                <div>
+                  <div class="range-row">
+                    <label id="lblParentBorderWidth" class="range-label" for="parentBorderWidth">Width</label>
+                    <span id="parentBorderWidthValue" class="range-value">1.10</span>
+                  </div>
+                  <input id="parentBorderWidth" type="range" min="0.2" max="4.0" step="0.05" value="1.10" class="range-input" />
+                </div>
+                <div id="lblParentBorderCountries" class="range-label mt-2">Show Parent Borders By Country</div>
+                <div class="parent-border-actions mt-2">
+                  <button id="parentBorderEnableAll" type="button" class="btn-secondary">Enable All</button>
+                  <button id="parentBorderDisableAll" type="button" class="btn-secondary">Clear All</button>
+                </div>
+                <div id="parentBorderEmpty" class="parent-border-empty mt-2 hidden">
+                  No supported countries in current dataset.
+                </div>
+                <div id="parentBorderCountryList" class="parent-border-country-list mt-2"></div>
+              </div>
+
             </div>
           </details>
 

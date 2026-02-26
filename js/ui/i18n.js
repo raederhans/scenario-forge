@@ -55,6 +55,14 @@ function updateUIText() {
     ["lblOceanOpacity", "Opacity"],
     ["lblOceanScale", "Scale"],
     ["lblOceanContourStrength", "Contour Strength"],
+    ["lblParentBorders", "Parent Unit Borders"],
+    ["lblParentBorderColor", "Color"],
+    ["lblParentBorderOpacity", "Opacity"],
+    ["lblParentBorderWidth", "Width"],
+    ["lblParentBorderCountries", "Show Parent Borders By Country"],
+    ["parentBorderEnableAll", "Enable All"],
+    ["parentBorderDisableAll", "Clear All"],
+    ["parentBorderEmpty", "No supported countries in current dataset."],
     ["labelPresetPolitical", "Auto-Fill Countries"],
     ["presetClear", "Clear Map"],
     ["lblCountrySearch", "Search Countries"],
@@ -111,6 +119,9 @@ function toggleLanguage() {
   }
   if (typeof state.renderPresetTreeFn === "function") {
     state.renderPresetTreeFn();
+  }
+  if (typeof state.updateParentBorderCountryListFn === "function") {
+    state.updateParentBorderCountryListFn();
   }
 }
 

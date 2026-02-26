@@ -1,10 +1,138 @@
 // Sidebar UI (Phase 13)
 import { state, countryNames, countryPresets, PRESET_STORAGE_KEY, defaultCountryPalette } from "../core/state.js";
+import { ColorManager } from "../core/color_manager.js";
 import * as mapRenderer from "../core/map_renderer.js";
 import { applyCountryColor, resetCountryColors } from "../core/logic.js";
 import { FileManager } from "../core/file_manager.js";
 import { LegendManager } from "../core/legend_manager.js";
 import { t } from "./i18n.js";
+
+const COUNTRY_CODE_ALIASES = {
+  UK: "GB",
+  EL: "GR",
+};
+
+function normalizeCountryCode(rawCode) {
+  const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
+  if (!code) return "";
+  return COUNTRY_CODE_ALIASES[code] || code;
+}
+
+function extractCountryCodeFromId(value) {
+  const text = String(value || "").trim().toUpperCase();
+  if (!text) return "";
+  const prefix = text.split(/[-_]/)[0];
+  if (/^[A-Z]{2,3}$/.test(prefix)) {
+    return normalizeCountryCode(prefix);
+  }
+  const alphaPrefix = prefix.match(/^[A-Z]{2,3}/);
+  return normalizeCountryCode(alphaPrefix ? alphaPrefix[0] : "");
+}
+
+function getCountryCodeFromProps(props = {}, fallbackId = "") {
+  return normalizeCountryCode(
+    props.cntr_code ||
+      props.CNTR_CODE ||
+      props.iso_a2 ||
+      props.ISO_A2 ||
+      props.iso_a2_eh ||
+      props.ISO_A2_EH ||
+      props.adm0_a2 ||
+      props.ADM0_A2 ||
+      extractCountryCodeFromId(props.id || props.NUTS_ID || fallbackId)
+  );
+}
+
+function getCountryNameFromProps(props = {}) {
+  const candidate =
+    props.name_en ||
+    props.name ||
+    props.NAME_EN ||
+    props.NAME ||
+    props.admin ||
+    props.ADMIN ||
+    "";
+  return String(candidate || "").trim();
+}
+
+function collectCountryNameByCode() {
+  const nameByCode = new Map();
+
+  const primaryGeometries = state.topologyPrimary?.objects?.political?.geometries;
+  if (Array.isArray(primaryGeometries)) {
+    primaryGeometries.forEach((geometry) => {
+      const props = geometry?.properties || {};
+      const code = getCountryCodeFromProps(props, geometry?.id);
+      if (!code || nameByCode.has(code)) return;
+      const name = getCountryNameFromProps(props);
+      if (name) {
+        nameByCode.set(code, name);
+      }
+    });
+  }
+
+  if (Array.isArray(state.landData?.features)) {
+    state.landData.features.forEach((feature) => {
+      const props = feature?.properties || {};
+      const code = getCountryCodeFromProps(props, feature?.id);
+      if (!code || nameByCode.has(code)) return;
+      const name = getCountryNameFromProps(props);
+      if (name) {
+        nameByCode.set(code, name);
+      }
+    });
+  }
+
+  return nameByCode;
+}
+
+function getDynamicCountryEntries() {
+  const codes = new Set();
+
+  if (state.countryToFeatureIds instanceof Map && state.countryToFeatureIds.size > 0) {
+    state.countryToFeatureIds.forEach((_ids, rawCode) => {
+      const code = normalizeCountryCode(rawCode);
+      if (code) codes.add(code);
+    });
+  } else if (Array.isArray(state.landData?.features)) {
+    state.landData.features.forEach((feature) => {
+      const code = getCountryCodeFromProps(feature?.properties || {}, feature?.id);
+      if (code) codes.add(code);
+    });
+  }
+
+  if (!codes.size) {
+    Object.keys(countryNames || {}).forEach((rawCode) => {
+      const code = normalizeCountryCode(rawCode);
+      if (code) codes.add(code);
+    });
+  }
+
+  const nameByCode = collectCountryNameByCode();
+  return Array.from(codes)
+    .map((code) => {
+      const name = nameByCode.get(code) || state.countryNames?.[code] || countryNames[code] || code;
+      const displayName = t(name, "geo") || code;
+      return { code, name, displayName };
+    })
+    .sort((a, b) => a.displayName.localeCompare(b.displayName));
+}
+
+function ensureCountryPaletteColor(code, fallbackIndex = 0) {
+  const normalizedCode = normalizeCountryCode(code);
+  if (!normalizedCode) return "#cccccc";
+
+  const existing = state.countryPalette?.[normalizedCode] || defaultCountryPalette[normalizedCode];
+  if (existing) {
+    state.countryPalette[normalizedCode] = existing;
+    return existing;
+  }
+
+  const generated =
+    ColorManager.getPoliticalFallbackColor(normalizedCode, fallbackIndex) || "#cccccc";
+  state.countryPalette[normalizedCode] = generated;
+  return generated;
+}
 
 function loadCustomPresets() {
   try {
@@ -347,21 +475,15 @@ function initSidebar({ render } = {}) {
     projectFileName.textContent = t("No file selected", "ui");
   }
 
-  const entries = Object.keys(countryNames)
-    .map((code) => {
-      const name = countryNames[code];
-      return { code, name, displayName: t(name, "geo") };
-    })
-    .sort((a, b) => a.displayName.localeCompare(b.displayName));
-
   const expanded = new Set();
   const getSearchTerm = () => (searchInput?.value || "").trim().toLowerCase();
 
   const renderList = () => {
     const term = getSearchTerm();
+    const entries = getDynamicCountryEntries();
     list.innerHTML = "";
 
-    entries.forEach(({ code, name, displayName }) => {
+    entries.forEach(({ code, name, displayName }, entryIndex) => {
       const presets = state.presetsState[code] || [];
       const hierarchyGroups = getHierarchyGroupsForCode(code);
       const countryMatch =
@@ -397,7 +519,8 @@ function initSidebar({ render } = {}) {
 
       const input = document.createElement("input");
       input.type = "color";
-      input.value = state.countryPalette[code] || defaultCountryPalette[code] || "#cccccc";
+      const fallbackColor = ensureCountryPaletteColor(code, entryIndex);
+      input.value = state.countryBaseColors[code] || state.countryPalette[code] || fallbackColor;
       input.className =
         "h-8 w-10 cursor-pointer rounded-md border border-slate-300 bg-white";
       input.addEventListener("change", (event) => {
@@ -481,6 +604,7 @@ function initSidebar({ render } = {}) {
   const renderPresetTree = () => {
     if (!presetTree) return;
     const term = getSearchTerm();
+    const entries = getDynamicCountryEntries();
     presetTree.innerHTML = "";
 
     entries.forEach(({ code, name, displayName }) => {
@@ -698,6 +822,30 @@ function initSidebar({ render } = {}) {
         state.countryBaseColors = data.countryBaseColors || {};
         state.featureOverrides = data.featureOverrides || {};
         state.specialZones = data.specialZones || {};
+        const supportedCountries = Array.isArray(state.parentBorderSupportedCountries)
+          ? state.parentBorderSupportedCountries
+          : [];
+        const importedParentEnabled =
+          data.parentBorderEnabledByCountry && typeof data.parentBorderEnabledByCountry === "object"
+            ? data.parentBorderEnabledByCountry
+            : {};
+        const normalizedParentEnabled = {};
+        supportedCountries.forEach((countryCode) => {
+          normalizedParentEnabled[countryCode] = !!importedParentEnabled[countryCode];
+        });
+        state.parentBorderEnabledByCountry = normalizedParentEnabled;
+        if (
+          data.styleConfig?.parentBorders &&
+          typeof data.styleConfig.parentBorders === "object"
+        ) {
+          state.styleConfig.parentBorders = {
+            ...(state.styleConfig.parentBorders || {}),
+            ...data.styleConfig.parentBorders,
+          };
+        }
+        if (typeof state.updateParentBorderCountryListFn === "function") {
+          state.updateParentBorderCountryListFn();
+        }
         mapRenderer.refreshColorState({ renderNow: false });
         if (render) render();
       });

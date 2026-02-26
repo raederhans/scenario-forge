@@ -9,6 +9,7 @@ const DETAIL_SOURCES = {
   highres: "data/europe_topology.highres.json",
   legacy_bak: "data/europe_topology.json.bak",
 };
+const RU_CITY_OVERRIDES_URL = "data/ru_city_overrides.geojson";
 
 function getSearchParams() {
   const search = globalThis?.location?.search || "";
@@ -115,6 +116,43 @@ async function loadExplicitVariant({
   throw new Error(`Unable to load topology dataset. Tried: ${attempted.join(", ") || topologyUrl}`);
 }
 
+async function loadDetailTopologyWithFallback({
+  d3Client,
+  detailSource,
+} = {}) {
+  const candidates = [];
+  if (detailSource?.key && detailSource?.url) {
+    candidates.push({ key: detailSource.key, url: detailSource.url });
+  }
+
+  if (detailSource?.key !== "legacy_bak") {
+    candidates.push({ key: "legacy_bak", url: DETAIL_SOURCES.legacy_bak });
+  }
+
+  let firstError = null;
+  for (const candidate of candidates) {
+    try {
+      const topology = await loadTopologyUrl(
+        d3Client,
+        candidate.url,
+        `detail(${candidate.key})`
+      );
+      return { topology, sourceKey: candidate.key };
+    } catch (error) {
+      firstError = firstError || error;
+      console.warn(
+        `[data_loader] Detail topology (${candidate.key}) unavailable at ${candidate.url}.`,
+        error
+      );
+    }
+  }
+
+  if (firstError) {
+    console.warn("[data_loader] Detail topology could not be loaded from any candidate.");
+  }
+  return { topology: null, sourceKey: null };
+}
+
 async function loadTopologyBundle({
   topologyUrl,
   d3Client,
@@ -149,13 +187,14 @@ async function loadTopologyBundle({
     };
   }
 
-  let topologyDetail = null;
-  try {
-    topologyDetail = await loadTopologyUrl(d3Client, detailSource.url, `detail(${detailSource.key})`);
-  } catch (error) {
-    console.warn(
-      `[data_loader] Detail topology (${detailSource.key}) unavailable at ${detailSource.url}; continuing with primary only.`,
-      error
+  const { topology: topologyDetail, sourceKey: detailSourceUsed } =
+    await loadDetailTopologyWithFallback({
+      d3Client,
+      detailSource,
+    });
+  if (detailSourceUsed && detailSourceUsed !== detailSource.key) {
+    console.info(
+      `[data_loader] Detail topology fallback activated: requested=${detailSource.key}, using=${detailSourceUsed}.`
     );
   }
 
@@ -177,13 +216,14 @@ export async function loadMapData({
   localesUrl = "data/locales.json",
   geoAliasesUrl = "data/geo_aliases.json",
   hierarchyUrl = "data/hierarchy.json",
+  ruCityOverridesUrl = RU_CITY_OVERRIDES_URL,
   d3Client = globalThis.d3,
 } = {}) {
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available. Ensure D3 is loaded before calling loadMapData().");
   }
 
-  const [topologyBundle, localeData, geoAliases, hierarchy] = await Promise.all([
+  const [topologyBundle, localeData, geoAliases, hierarchy, ruCityOverrides] = await Promise.all([
     loadTopologyBundle({ topologyUrl, d3Client }),
     d3Client.json(localesUrl).catch((err) => {
       console.warn("Locales file missing or invalid, using defaults.", err);
@@ -197,6 +237,19 @@ export async function loadMapData({
       console.warn("Hierarchy file missing or invalid, using defaults.", err);
       return null;
     }),
+    d3Client.json(ruCityOverridesUrl).then((payload) => {
+      if (!Array.isArray(payload?.features)) {
+        console.warn(`[data_loader] RU city overrides payload invalid at ${ruCityOverridesUrl}. Ignoring.`);
+        return null;
+      }
+      return {
+        type: "FeatureCollection",
+        features: payload.features,
+      };
+    }).catch((err) => {
+      console.warn("RU city overrides file missing or invalid, continuing without overrides.", err);
+      return null;
+    }),
   ]);
 
   return {
@@ -204,5 +257,6 @@ export async function loadMapData({
     locales: localeData || { ui: {}, geo: {} },
     geoAliases: geoAliases || { alias_to_stable_key: {} },
     hierarchy,
+    ruCityOverrides,
   };
 }

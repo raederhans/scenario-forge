@@ -64,20 +64,26 @@ const INTERNAL_BORDER_PROVINCE_MIN_ALPHA = 0.30;
 const INTERNAL_BORDER_LOCAL_MIN_ALPHA = 0.22;
 const INTERNAL_BORDER_PROVINCE_MIN_WIDTH = 0.52;
 const INTERNAL_BORDER_LOCAL_MIN_WIDTH = 0.36;
+const PARENT_BORDER_MIN_COVERAGE = 0.70;
+const PARENT_BORDER_MAX_DOMINANT_SHARE = 0.90;
+const PARENT_BORDER_MIN_RENDERABLE_GROUPS = 2;
+const GB_PARENT_MIN_GROUPS = 20;
+const GB_ID_PATTERN_RE = /^[A-Z]{2}[A-Z0-9]{3}$/;
+const DE_STATE_GROUP_MIN = 12;
+const DE_STATE_GROUP_MAX = 20;
+const DE_CITY_STATES = new Set(["Berlin", "Hamburg", "Bremen"]);
 const OCEAN_PATTERN_BASE_SIZE = 160;
 const OCEAN_ADVANCED_STYLES_ENABLED = false;
 const OCEAN_MASK_MODE_TOPOLOGY = "topology_ocean";
 const OCEAN_MASK_MODE_SPHERE_MINUS_LAND = "sphere_minus_land";
 const OCEAN_MASK_MIN_QUALITY = 0.35;
-const KNOWN_BAD_FEATURE_IDS = new Set([
-  "RU_RAY_50074027B10564453072266",
-  "RU_RAY_50074027B19237962816289",
-  "RU_RAY_50074027B45979560927325",
-]);
+// Keep this list empty by default. Polygon winding issues are repaired dynamically.
+const KNOWN_BAD_FEATURE_IDS = new Set();
 const DEBUG_MODES = new Set(["PROD", "GEOMETRY", "ARTIFACTS", "ISLANDS", "ID_HASH"]);
 const COLOR_HEX_RE = /^#(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 const COLOR_FUNC_RE = /^(?:rgb|rgba|hsl|hsla)\([^)]*\)$/i;
 const COLOR_NAME_RE = /^[a-z]+$/i;
+const RENDER_DIAG_PARAM = "render_diag";
 let debugMode = "PROD";
 let islandNeighborsCache = {
   topologyRef: null,
@@ -86,6 +92,82 @@ let islandNeighborsCache = {
   neighbors: [],
 };
 const oceanPatternCache = new Map();
+const renderDiag = {
+  enabled: false,
+  seenKeys: new Set(),
+  skippedByReason: new Map(),
+  skippedByCountry: new Map(),
+  sampleByReason: new Map(),
+};
+const rewoundFeatureLogKeys = new Set();
+
+function readSearchParam(name) {
+  const search = globalThis?.location?.search || "";
+  if (!search || !globalThis.URLSearchParams) return "";
+  try {
+    const params = new globalThis.URLSearchParams(search);
+    return String(params.get(name) || "").trim().toLowerCase();
+  } catch (_error) {
+    return "";
+  }
+}
+
+function isRenderDiagEnabled() {
+  const raw = readSearchParam(RENDER_DIAG_PARAM);
+  return ["1", "true", "yes", "on"].includes(raw);
+}
+
+function resetRenderDiagnostics() {
+  renderDiag.enabled = isRenderDiagEnabled();
+  renderDiag.seenKeys = new Set();
+  renderDiag.skippedByReason = new Map();
+  renderDiag.skippedByCountry = new Map();
+  renderDiag.sampleByReason = new Map();
+  if (!renderDiag.enabled) {
+    delete globalThis.__mapRenderDiag;
+  } else {
+    globalThis.__mapRenderDiag = {
+      enabled: true,
+      skippedTotal: 0,
+      skippedByReason: {},
+      skippedByCountry: {},
+      sampleByReason: {},
+    };
+    console.info(`[map_renderer] ${RENDER_DIAG_PARAM}=1 enabled. Collecting skip diagnostics.`);
+  }
+}
+
+function recordSkipDiagnostic(feature, decision) {
+  if (!renderDiag.enabled || !decision?.skip) return;
+  const featureId = decision.featureId || getFeatureId(feature) || "(unknown)";
+  const reason = decision.reason || "unknown";
+  const country = decision.countryCode || getFeatureCountryCodeNormalized(feature) || "UNK";
+  const key = `${reason}::${featureId}`;
+  if (renderDiag.seenKeys.has(key)) return;
+  renderDiag.seenKeys.add(key);
+
+  renderDiag.skippedByReason.set(reason, (renderDiag.skippedByReason.get(reason) || 0) + 1);
+  renderDiag.skippedByCountry.set(country, (renderDiag.skippedByCountry.get(country) || 0) + 1);
+
+  const reasonSamples = renderDiag.sampleByReason.get(reason) || [];
+  if (reasonSamples.length < 30) {
+    reasonSamples.push({
+      id: featureId,
+      country,
+      name: String(feature?.properties?.name || "").trim(),
+      bounds: decision.bounds || null,
+    });
+    renderDiag.sampleByReason.set(reason, reasonSamples);
+  }
+
+  globalThis.__mapRenderDiag = {
+    enabled: true,
+    skippedTotal: renderDiag.seenKeys.size,
+    skippedByReason: Object.fromEntries(renderDiag.skippedByReason.entries()),
+    skippedByCountry: Object.fromEntries(renderDiag.skippedByCountry.entries()),
+    sampleByReason: Object.fromEntries(renderDiag.sampleByReason.entries()),
+  };
+}
 
 function canonicalCountryCode(rawCode) {
   const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
@@ -449,32 +531,77 @@ function isProjectedWrapArtifact(feature, canvasWidth, canvasHeight, boundsOverr
   );
 }
 
-function shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd = false } = {}) {
+function evaluateSkipFeature(feature, canvasWidth, canvasHeight, { forceProd = false } = {}) {
   if (!forceProd && debugMode !== "PROD") {
-    return false;
+    return { skip: false, reason: null, featureId: getFeatureId(feature), countryCode: "" };
   }
 
   const featureId = getFeatureId(feature);
   if (isKnownBadFeatureId(featureId)) {
-    return true;
+    return {
+      skip: true,
+      reason: "known_bad_id",
+      featureId,
+      countryCode: getFeatureCountryCodeNormalized(feature),
+      bounds: null,
+    };
   }
 
   const bounds = getProjectedFeatureBounds(feature, { featureId });
   if (!bounds) {
-    return false;
+    return {
+      skip: false,
+      reason: null,
+      featureId,
+      countryCode: getFeatureCountryCodeNormalized(feature),
+      bounds: null,
+    };
   }
 
   const giant = isGiantFeature(feature, canvasWidth, canvasHeight, bounds);
   const wrapArtifact = isProjectedWrapArtifact(feature, canvasWidth, canvasHeight, bounds);
   if (!giant && !wrapArtifact) {
-    return false;
+    return {
+      skip: false,
+      reason: null,
+      featureId,
+      countryCode: getFeatureCountryCodeNormalized(feature),
+      bounds,
+    };
   }
 
   const countryCode = getFeatureCountryCodeNormalized(feature);
   const isTrustedAdmin0Shell =
     GIANT_FEATURE_ALLOWLIST.has(countryCode) &&
     isAdmin0ShellFeature(feature, featureId);
-  return !isTrustedAdmin0Shell;
+  if (isTrustedAdmin0Shell) {
+    return {
+      skip: false,
+      reason: null,
+      featureId,
+      countryCode,
+      bounds,
+    };
+  }
+
+  let reason = "skip_unknown";
+  if (giant && wrapArtifact) reason = "giant_wrap_artifact";
+  else if (giant) reason = "giant_feature";
+  else if (wrapArtifact) reason = "wrap_artifact";
+
+  return {
+    skip: true,
+    reason,
+    featureId,
+    countryCode,
+    bounds,
+  };
+}
+
+function shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd = false } = {}) {
+  const decision = evaluateSkipFeature(feature, canvasWidth, canvasHeight, { forceProd });
+  recordSkipDiagnostic(feature, decision);
+  return Boolean(decision.skip);
 }
 
 function getRenderableLandFeatures(canvasWidth, canvasHeight, { forceProd = false } = {}) {
@@ -492,20 +619,168 @@ function getPoliticalFeatureCollection(topology, sourceName) {
   const features = Array.isArray(collection?.features) ? collection.features : [];
   return {
     type: "FeatureCollection",
-    features: features.map((feature) => ({
-      ...feature,
-      properties: {
-        ...(feature?.properties || {}),
-        __source: sourceName,
-      },
-    })),
+    features: features.map((feature) => {
+      const normalizedFeature = normalizeFeatureGeometry(feature, { sourceLabel: sourceName });
+      return {
+        ...normalizedFeature,
+        properties: {
+          ...(normalizedFeature?.properties || {}),
+          __source: sourceName,
+        },
+      };
+    }),
   };
 }
 
-function composePoliticalFeatures(primaryTopology, detailTopology) {
+function parseReplaceFeatureIds(rawValue) {
+  if (Array.isArray(rawValue)) {
+    return rawValue
+      .map((item) => String(item || "").trim())
+      .filter(Boolean);
+  }
+
+  const text = String(rawValue || "").trim();
+  if (!text) return [];
+  return text
+    .split(/[,\n;|]+/)
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+}
+
+function reverseGeometryRings(geometry) {
+  if (!geometry || !geometry.type || !geometry.coordinates) return null;
+  if (geometry.type === "Polygon") {
+    return {
+      ...geometry,
+      coordinates: geometry.coordinates.map((ring) =>
+        Array.isArray(ring) ? [...ring].reverse() : ring
+      ),
+    };
+  }
+  if (geometry.type === "MultiPolygon") {
+    return {
+      ...geometry,
+      coordinates: geometry.coordinates.map((polygon) =>
+        Array.isArray(polygon)
+          ? polygon.map((ring) => (Array.isArray(ring) ? [...ring].reverse() : ring))
+          : polygon
+      ),
+    };
+  }
+  return null;
+}
+
+function normalizeFeatureGeometry(feature, { sourceLabel = "detail" } = {}) {
+  if (!feature?.geometry || !globalThis.d3?.geoArea) {
+    return feature;
+  }
+
+  let area = null;
+  try {
+    area = globalThis.d3.geoArea(feature);
+  } catch (_error) {
+    return feature;
+  }
+  if (!Number.isFinite(area) || area <= Math.PI * 2) {
+    return feature;
+  }
+
+  const rewoundGeometry = reverseGeometryRings(feature.geometry);
+  if (!rewoundGeometry) return feature;
+  const rewoundFeature = {
+    ...feature,
+    geometry: rewoundGeometry,
+  };
+
+  try {
+    const rewoundArea = globalThis.d3.geoArea(rewoundFeature);
+    if (Number.isFinite(rewoundArea) && rewoundArea < area) {
+      const featureId = getFeatureId(feature) || "(unknown)";
+      const logKey = `${sourceLabel}::${featureId}`;
+      if (renderDiag.enabled && !rewoundFeatureLogKeys.has(logKey)) {
+        rewoundFeatureLogKeys.add(logKey);
+        console.warn(
+          `[map_renderer] Rewound ${sourceLabel} feature orientation for ${featureId}. area=${area.toFixed(5)} -> ${rewoundArea.toFixed(5)}`
+        );
+      }
+      return rewoundFeature;
+    }
+  } catch (_error) {
+    return feature;
+  }
+  return feature;
+}
+
+function mergeOverrideFeatures(baseFeatures, overrideCollection) {
+  const order = [];
+  const featureById = new Map();
+
+  baseFeatures.forEach((feature) => {
+    const featureId = getFeatureId(feature);
+    if (!featureId || featureById.has(featureId)) return;
+    order.push(featureId);
+    featureById.set(featureId, feature);
+  });
+
+  let applied = 0;
+  let replaced = 0;
+
+  const overrides = Array.isArray(overrideCollection?.features)
+    ? overrideCollection.features
+    : [];
+  overrides.forEach((feature) => {
+    if (!feature?.geometry) return;
+    const normalizedFeature = normalizeFeatureGeometry(feature, { sourceLabel: "ru_override" });
+    const featureId = getFeatureId(normalizedFeature);
+    if (!featureId) return;
+
+    const replaceIds = parseReplaceFeatureIds(
+      normalizedFeature?.properties?.replace_ids ??
+      normalizedFeature?.properties?.replaceIds ??
+      ""
+    );
+    replaceIds.forEach((replaceId) => {
+      if (featureById.delete(replaceId)) {
+        replaced += 1;
+      }
+    });
+
+    const existing = featureById.has(featureId);
+    featureById.set(featureId, {
+      ...normalizedFeature,
+      properties: {
+        ...(normalizedFeature?.properties || {}),
+        __source: "ru_override",
+      },
+    });
+    if (!existing) {
+      order.push(featureId);
+    }
+    applied += 1;
+  });
+
+  if (applied > 0) {
+    console.info(
+      `[map_renderer] Applied RU city overrides: injected=${applied}, replaced=${replaced}.`
+    );
+  }
+
+  return order
+    .filter((id) => featureById.has(id))
+    .map((id) => featureById.get(id));
+}
+
+function composePoliticalFeatures(primaryTopology, detailTopology, overrideCollection = null) {
   const primaryCollection = getPoliticalFeatureCollection(primaryTopology, "primary");
   if (!detailTopology) {
-    return primaryCollection;
+    const baseFeatures = primaryCollection.features;
+    const features = overrideCollection
+      ? mergeOverrideFeatures(baseFeatures, overrideCollection)
+      : baseFeatures;
+    return {
+      type: "FeatureCollection",
+      features,
+    };
   }
 
   const detailCollection = getPoliticalFeatureCollection(detailTopology, "detail");
@@ -533,9 +808,13 @@ function composePoliticalFeatures(primaryTopology, detailTopology) {
     pushIfUnique(feature);
   });
 
+  const mergedFeatures = overrideCollection
+    ? mergeOverrideFeatures(features, overrideCollection)
+    : features;
+
   return {
     type: "FeatureCollection",
-    features,
+    features: mergedFeatures,
   };
 }
 
@@ -862,6 +1141,275 @@ function getAdmin1Group(entity) {
   return String(value).trim();
 }
 
+function asFeatureLike(entity) {
+  if (!entity) return null;
+  return {
+    id: entity.id,
+    properties: entity.properties || {},
+  };
+}
+
+function getEntityFeatureId(entity) {
+  const featureLike = asFeatureLike(entity);
+  return featureLike ? getFeatureId(featureLike) : null;
+}
+
+function getEntityCountryCode(entity) {
+  const featureLike = asFeatureLike(entity);
+  return featureLike ? getFeatureCountryCodeNormalized(featureLike) : "";
+}
+
+function getCountryFeatureEntriesMap() {
+  const byCountry = new Map();
+  const features = Array.isArray(state.landData?.features) ? state.landData.features : [];
+  features.forEach((feature) => {
+    const id = getFeatureId(feature);
+    const countryCode = getFeatureCountryCodeNormalized(feature);
+    if (!id || !countryCode) return;
+    const list = byCountry.get(countryCode) || [];
+    list.push({ id, feature });
+    byCountry.set(countryCode, list);
+  });
+  return byCountry;
+}
+
+function evaluateCountryGroupingCandidate(countryCode, source, featureEntries, featureToGroup) {
+  if (!featureEntries?.length || !(featureToGroup instanceof Map) || !featureToGroup.size) return null;
+
+  const groupCounts = new Map();
+  let groupedCount = 0;
+  featureEntries.forEach(({ id }) => {
+    const group = featureToGroup.get(id);
+    if (!group) return;
+    groupedCount += 1;
+    groupCounts.set(group, (groupCounts.get(group) || 0) + 1);
+  });
+
+  if (!groupedCount || !groupCounts.size) return null;
+
+  const totalCount = featureEntries.length;
+  const groupSizes = Array.from(groupCounts.values());
+  const renderableGroupCount = groupSizes.filter((count) => count >= 2).length;
+  const coverage = totalCount > 0 ? groupedCount / totalCount : 0;
+  const dominantShare = groupedCount > 0 ? Math.max(...groupSizes) / groupedCount : 1;
+
+  return {
+    countryCode,
+    source,
+    featureToGroup,
+    groupCounts,
+    totalCount,
+    groupedCount,
+    groupCount: renderableGroupCount,
+    groupCountTotal: groupCounts.size,
+    coverage,
+    dominantShare,
+    accepted:
+      renderableGroupCount >= PARENT_BORDER_MIN_RENDERABLE_GROUPS &&
+      coverage >= PARENT_BORDER_MIN_COVERAGE &&
+      dominantShare <= PARENT_BORDER_MAX_DOMINANT_SHARE,
+  };
+}
+
+function buildHierarchyGroupingCandidate(countryCode, featureEntries) {
+  const groups = state.hierarchyData?.groups;
+  if (!groups || typeof groups !== "object") return null;
+
+  const idSet = new Set(featureEntries.map((entry) => entry.id));
+  const featureToGroup = new Map();
+  Object.entries(groups).forEach(([groupId, children]) => {
+    const groupCountry = canonicalCountryCode(String(groupId || "").split("_")[0]);
+    if (!groupCountry || groupCountry !== countryCode) return;
+    if (!Array.isArray(children)) return;
+    children.forEach((child) => {
+      const childId = String(child || "").trim();
+      if (!childId || !idSet.has(childId)) return;
+      if (!featureToGroup.has(childId)) {
+        featureToGroup.set(childId, groupId);
+      }
+    });
+  });
+
+  return evaluateCountryGroupingCandidate(countryCode, "hierarchy", featureEntries, featureToGroup);
+}
+
+function buildAdmin1GroupingCandidate(countryCode, featureEntries) {
+  const featureToGroup = new Map();
+  featureEntries.forEach(({ id, feature }) => {
+    const group = getAdmin1Group(feature);
+    if (!group) return;
+    featureToGroup.set(id, group);
+  });
+  return evaluateCountryGroupingCandidate(countryCode, "admin1_group", featureEntries, featureToGroup);
+}
+
+function buildIdPrefixGroupingCandidate(countryCode, featureEntries, prefixLength) {
+  const length = Number(prefixLength);
+  if (!Number.isFinite(length) || length < 3) return null;
+
+  const featureToGroup = new Map();
+  let validIds = 0;
+  featureEntries.forEach(({ id }) => {
+    const text = String(id || "").trim().toUpperCase();
+    if (!GB_ID_PATTERN_RE.test(text)) return;
+    validIds += 1;
+    featureToGroup.set(id, text.slice(0, length));
+  });
+
+  if (!featureToGroup.size || !featureEntries.length) return null;
+  const idPatternCoverage = validIds / featureEntries.length;
+  if (idPatternCoverage < 0.95) return null;
+
+  const candidate = evaluateCountryGroupingCandidate(countryCode, "id_prefix", featureEntries, featureToGroup);
+  if (!candidate) return null;
+  return {
+    ...candidate,
+    prefixLength: length,
+    idPatternCoverage,
+  };
+}
+
+function isGermanStateLevelCandidate(candidate) {
+  if (!candidate || candidate.source !== "admin1_group") return false;
+  if (candidate.groupCountTotal < DE_STATE_GROUP_MIN || candidate.groupCountTotal > DE_STATE_GROUP_MAX) {
+    return false;
+  }
+  const groups = new Set(candidate.groupCounts ? Array.from(candidate.groupCounts.keys()) : []);
+  return Array.from(DE_CITY_STATES).every((name) => groups.has(name));
+}
+
+function resolveCountryParentGroupingCandidate(countryCode, featureEntries) {
+  if (!countryCode || !featureEntries?.length) return null;
+
+  const hierarchyCandidate = buildHierarchyGroupingCandidate(countryCode, featureEntries);
+  const adminCandidate = buildAdmin1GroupingCandidate(countryCode, featureEntries);
+
+  if (countryCode === "DE") {
+    if (adminCandidate && isGermanStateLevelCandidate(adminCandidate)) {
+      return {
+        ...adminCandidate,
+        accepted: true,
+        forcedRule: "de_state_level",
+      };
+    }
+    if (hierarchyCandidate?.accepted) return hierarchyCandidate;
+    if (adminCandidate?.accepted) return adminCandidate;
+    return null;
+  }
+
+  if (countryCode === "GB") {
+    const hierarchyFineEnough =
+      hierarchyCandidate?.accepted &&
+      Math.max(hierarchyCandidate.groupCount, hierarchyCandidate.groupCountTotal) >= GB_PARENT_MIN_GROUPS;
+    if (hierarchyFineEnough) return hierarchyCandidate;
+
+    const idPrefixCandidate = [
+      buildIdPrefixGroupingCandidate(countryCode, featureEntries, 4),
+      buildIdPrefixGroupingCandidate(countryCode, featureEntries, 3),
+    ].find(
+      (candidate) =>
+        candidate?.accepted &&
+        Math.max(candidate.groupCount, candidate.groupCountTotal) >= GB_PARENT_MIN_GROUPS
+    );
+    if (idPrefixCandidate) return idPrefixCandidate;
+    return null;
+  }
+
+  if (hierarchyCandidate?.accepted) return hierarchyCandidate;
+  if (adminCandidate?.accepted) return adminCandidate;
+  return null;
+}
+
+function syncParentBorderEnabledByCountry(supportedCountries) {
+  const prev = state.parentBorderEnabledByCountry && typeof state.parentBorderEnabledByCountry === "object"
+    ? state.parentBorderEnabledByCountry
+    : {};
+  const next = {};
+  supportedCountries.forEach((countryCode) => {
+    next[countryCode] = !!prev[countryCode];
+  });
+  state.parentBorderEnabledByCountry = next;
+}
+
+function refreshParentBorderSupport() {
+  const byCountry = getCountryFeatureEntriesMap();
+  const supported = [];
+  const meta = {};
+  const featureToGroup = new Map();
+
+  byCountry.forEach((featureEntries, countryCode) => {
+    const candidate = resolveCountryParentGroupingCandidate(countryCode, featureEntries);
+    if (!candidate?.accepted) return;
+
+    supported.push(countryCode);
+    candidate.featureToGroup.forEach((group, featureId) => {
+      featureToGroup.set(featureId, group);
+    });
+    meta[countryCode] = {
+      source: candidate.source,
+      groupCount: candidate.groupCountTotal,
+      coverage: Number(candidate.coverage.toFixed(3)),
+      dominantShare: Number(candidate.dominantShare.toFixed(3)),
+      prefixLength: candidate.prefixLength || null,
+      idPatternCoverage: Number.isFinite(candidate.idPatternCoverage)
+        ? Number(candidate.idPatternCoverage.toFixed(3))
+        : null,
+    };
+  });
+
+  supported.sort((a, b) => a.localeCompare(b));
+  state.parentGroupByFeatureId = featureToGroup;
+  state.parentBorderMetaByCountry = meta;
+  state.parentBorderSupportedCountries = supported;
+  syncParentBorderEnabledByCountry(supported);
+
+  if (typeof state.updateParentBorderCountryListFn === "function") {
+    state.updateParentBorderCountryListFn();
+  }
+}
+
+function getParentGroupForEntity(entity) {
+  const featureId = getEntityFeatureId(entity);
+  if (!featureId || !state.parentGroupByFeatureId) return "";
+  const group = state.parentGroupByFeatureId.get(featureId);
+  if (group === null || group === undefined) return "";
+  return String(group).trim();
+}
+
+function buildCountryParentBorderMeshes(countryCode) {
+  const normalizedCode = canonicalCountryCode(countryCode);
+  if (!normalizedCode || !globalThis.topojson) return [];
+
+  const sourceCountries = getSourceCountrySets();
+  const sources = [
+    { key: "detail", topology: state.topologyDetail },
+    { key: "primary", topology: state.topologyPrimary || state.topology },
+  ];
+  const meshes = [];
+
+  sources.forEach(({ key, topology }) => {
+    if (!topology?.objects?.political) return;
+    if (!sourceCountries[key]?.has(normalizedCode)) return;
+    const object = topology.objects.political;
+    const mesh = globalThis.topojson.mesh(
+      topology,
+      object,
+      (a, b) => {
+        if (!a || !b) return false;
+        const codeA = getEntityCountryCode(a);
+        const codeB = getEntityCountryCode(b);
+        if (!codeA || !codeB || codeA !== normalizedCode || codeB !== normalizedCode) return false;
+        const groupA = getParentGroupForEntity(a);
+        const groupB = getParentGroupForEntity(b);
+        return !!(groupA && groupB && groupA !== groupB);
+      }
+    );
+    if (isUsableMesh(mesh)) meshes.push(mesh);
+  });
+
+  return meshes;
+}
+
 function getSourceCountrySets() {
   const sets = {
     primary: new Set(),
@@ -1084,8 +1632,20 @@ function rebuildStaticMeshes() {
   state.cachedCoastlinesHigh = [];
   state.cachedCoastlinesMid = [];
   state.cachedCoastlinesLow = [];
+  state.cachedParentBordersByCountry = new Map();
   state.cachedGridLines = [];
-  if (!globalThis.topojson) return;
+  state.parentGroupByFeatureId = new Map();
+  state.parentBorderMetaByCountry = {};
+  state.parentBorderSupportedCountries = [];
+  if (!globalThis.topojson) {
+    syncParentBorderEnabledByCountry([]);
+    if (typeof state.updateParentBorderCountryListFn === "function") {
+      state.updateParentBorderCountryListFn();
+    }
+    return;
+  }
+
+  refreshParentBorderSupport();
 
   const sourceCountries = getSourceCountrySets();
   const sources = [
@@ -1359,6 +1919,13 @@ function buildIndex() {
     state.idToKey.set(id, key);
     state.keyToId.set(key, id);
   });
+
+  if (typeof state.renderCountryListFn === "function") {
+    state.renderCountryListFn();
+  }
+  if (typeof state.renderPresetTreeFn === "function") {
+    state.renderPresetTreeFn();
+  }
 }
 
 function buildSpatialIndex() {
@@ -1475,15 +2042,23 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
   const internal = state.styleConfig?.internalBorders || {};
   const empire = state.styleConfig?.empireBorders || {};
   const coast = state.styleConfig?.coastlines || {};
+  const parent = state.styleConfig?.parentBorders || {};
 
   const empireColor = getSafeCanvasColor(empire.color, "#666666");
   const internalColor = getSafeCanvasColor(internal.color, "#cccccc");
   const coastColor = getSafeCanvasColor(coast.color, "#333333");
+  const parentColor = getSafeCanvasColor(parent.color, "#4b5563");
 
   const empireWidthBase = Number(empire.width) || 1;
   const internalWidthBase = Number(internal.width) || 0.5;
   const coastWidthBase = Number(coast.width) || 1.2;
+  const parentWidthBase = Number(parent.width) || 1.1;
   const internalOpacity = Number.isFinite(Number(internal.opacity)) ? Number(internal.opacity) : 1;
+  const parentOpacity = clamp(
+    Number.isFinite(Number(parent.opacity)) ? Number(parent.opacity) : 0.85,
+    0,
+    1
+  );
 
   if (interactive) {
     const countryWidth = (empireWidthBase * 0.95) / kDenom;
@@ -1513,6 +2088,7 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
     INTERNAL_BORDER_LOCAL_MIN_ALPHA,
     0.48
   );
+  const parentAlpha = clamp(parentOpacity * (0.55 + 0.25 * t), 0.30, 0.90);
   const coastAlpha = clamp(0.74 + 0.12 * t, 0.74, 0.86);
 
   const countryWidth = (empireWidthBase * (0.95 + 0.40 * t)) / kDenom;
@@ -1524,6 +2100,7 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
     INTERNAL_BORDER_LOCAL_MIN_WIDTH,
     internalWidthBase * 0.40 * (0.70 + 0.55 * t) * lowZoomWidthScale
   ) / kDenom;
+  const parentWidth = (parentWidthBase * (0.90 + 0.35 * t)) / kDenom;
   const coastWidth = (coastWidthBase * (0.90 + 0.30 * t)) / kDenom;
   const coastlineCollection = k < COASTLINE_LOD_LOW_ZOOM_MAX
     ? (state.cachedCoastlinesLow?.length ? state.cachedCoastlinesLow : state.cachedCoastlines)
@@ -1536,6 +2113,23 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
 
   context.globalAlpha = provinceAlpha;
   drawMeshCollection(state.cachedProvinceBorders, internalColor, provinceWidth);
+
+  const enabledParentCountries = (state.parentBorderSupportedCountries || []).filter(
+    (countryCode) => !!state.parentBorderEnabledByCountry?.[countryCode]
+  );
+  if (enabledParentCountries.length > 0) {
+    context.globalAlpha = parentAlpha;
+    enabledParentCountries.forEach((countryCode) => {
+      let meshes = state.cachedParentBordersByCountry?.get(countryCode);
+      if (!meshes) {
+        meshes = buildCountryParentBorderMeshes(countryCode);
+        if (state.cachedParentBordersByCountry instanceof Map) {
+          state.cachedParentBordersByCountry.set(countryCode, meshes);
+        }
+      }
+      drawMeshCollection(meshes, parentColor, parentWidth);
+    });
+  }
 
   context.globalAlpha = countryAlpha;
   drawMeshCollection(state.cachedCountryBorders, empireColor, countryWidth);
@@ -2098,6 +2692,9 @@ function autoFillMap(mode = "region") {
   state.featureOverrides = {};
   state.countryBaseColors = sanitizeCountryColorMap(nextCountryBaseColors);
   refreshColorState({ renderNow: true });
+  if (typeof state.renderCountryListFn === "function") {
+    state.renderCountryListFn();
+  }
 }
 
 function handleMouseMove(event) {
@@ -2179,6 +2776,7 @@ function handleClick(event) {
   }
 
   if (state.currentTool === "eraser") {
+    const shouldRefreshCountryList = state.interactionGranularity === "country" && !!countryCode;
     if (state.interactionGranularity === "country" && countryCode) {
       delete state.countryBaseColors[countryCode];
     } else {
@@ -2187,6 +2785,9 @@ function handleClick(event) {
       });
     }
     refreshColorState({ renderNow: true });
+    if (shouldRefreshCountryList && typeof state.renderCountryListFn === "function") {
+      state.renderCountryListFn();
+    }
     return;
   }
 
@@ -2216,6 +2817,13 @@ function handleClick(event) {
   }
   addRecentColor(selectedColor);
   refreshColorState({ renderNow: true });
+  if (
+    state.interactionGranularity === "country" &&
+    countryCode &&
+    typeof state.renderCountryListFn === "function"
+  ) {
+    state.renderCountryListFn();
+  }
 }
 
 function calculatePanExtent() {
@@ -2394,6 +3002,7 @@ function initMap({ containerId = "mapContainer" } = {}) {
   state.featureOverrides = sanitizeColorMap(state.featureOverrides);
   state.colors = sanitizeColorMap(state.colors);
   state.debugMode = debugMode;
+  resetRenderDiagnostics();
   clearRenderPhaseTimer();
   state.renderPhase = RENDER_PHASE_IDLE;
   state.phaseEnteredAt = nowMs();
@@ -2418,12 +3027,14 @@ function initMap({ containerId = "mapContainer" } = {}) {
 function setMapData() {
   clearRenderPhaseTimer();
   setRenderPhase(RENDER_PHASE_IDLE);
+  resetRenderDiagnostics();
   ensureLayerDataFromTopology();
   const primaryTopology = state.topologyPrimary || state.topology;
   const detailTopology = state.topologyBundleMode === "composite" ? state.topologyDetail : null;
+  const overrideCollection = state.topologyBundleMode === "composite" ? state.ruCityOverrides : null;
   if (primaryTopology?.objects?.political && globalThis.topojson) {
     state.landData = state.topologyBundleMode === "composite"
-      ? composePoliticalFeatures(primaryTopology, detailTopology)
+      ? composePoliticalFeatures(primaryTopology, detailTopology, overrideCollection)
       : getPoliticalFeatureCollection(primaryTopology, "primary");
   }
 
