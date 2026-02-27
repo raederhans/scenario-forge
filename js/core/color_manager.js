@@ -10,9 +10,24 @@ class ColorManager {
 
   static strictPoliticalPalette = [
     "#1f77b4", "#d62728", "#2ca02c", "#ff7f0e", "#9467bd", "#17becf",
+    "#8c564b", "#e377c2", "#bcbd22", "#7f7f7f", "#4e79a7", "#e15759",
+    "#76b7b2", "#f28e2b", "#59a14f", "#edc948",
+  ];
+
+  static strictPoliticalMinDeltaE = 24;
+
+  static strictPoliticalVariantTweaks = [
+    { hueShift: 0, saturationScale: 1, lightnessShift: 0 },
+    { hueShift: 0, saturationScale: 1, lightnessShift: 8 },
+    { hueShift: 0, saturationScale: 1, lightnessShift: -8 },
+    { hueShift: 12, saturationScale: 0.95, lightnessShift: 4 },
+    { hueShift: -12, saturationScale: 0.95, lightnessShift: -4 },
+    { hueShift: 20, saturationScale: 1.05, lightnessShift: 2 },
+    { hueShift: -20, saturationScale: 1.05, lightnessShift: -2 },
   ];
 
   static regionColorMap = new Map();
+  static labCache = new Map();
 
   static getRegionColor(tag) {
     const key = String(tag || "Unknown").trim() || "Unknown";
@@ -64,10 +79,12 @@ class ColorManager {
     if (!Array.isArray(palette) || palette.length === 0) return null;
     const start = Math.abs(seedIndex) % palette.length;
     for (let offset = 0; offset < palette.length; offset += 1) {
-      const candidate = palette[(start + offset) % palette.length];
-      if (!used.has(candidate)) return candidate;
+      const candidate = ColorManager.normalizeHexColor(
+        palette[(start + offset) % palette.length]
+      );
+      if (candidate && !used.has(candidate)) return candidate;
     }
-    return palette[start];
+    return ColorManager.normalizeHexColor(palette[start]);
   }
 
   static getPoliticalFallbackColor(token, fallbackIndex = 0) {
@@ -79,7 +96,298 @@ class ColorManager {
   static getHashedPaletteColor(token, palette) {
     if (!Array.isArray(palette) || palette.length === 0) return null;
     const seed = ColorManager.stableHash(token);
-    return palette[Math.abs(seed) % palette.length];
+    return ColorManager.normalizeHexColor(palette[Math.abs(seed) % palette.length]);
+  }
+
+  static clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  static normalizeHexColor(value) {
+    const input = String(value || "").trim().toLowerCase();
+    const shortHex = /^#([0-9a-f]{3})$/.exec(input);
+    if (shortHex) {
+      return `#${shortHex[1]
+        .split("")
+        .map((char) => `${char}${char}`)
+        .join("")}`;
+    }
+    if (/^#[0-9a-f]{6}$/.test(input)) return input;
+    return null;
+  }
+
+  static hexToRgb(hex) {
+    const normalized = ColorManager.normalizeHexColor(hex);
+    if (!normalized) return null;
+    return {
+      r: parseInt(normalized.slice(1, 3), 16),
+      g: parseInt(normalized.slice(3, 5), 16),
+      b: parseInt(normalized.slice(5, 7), 16),
+    };
+  }
+
+  static rgbToHex(r, g, b) {
+    const toHex = (value) =>
+      Math.round(ColorManager.clamp(value, 0, 255))
+        .toString(16)
+        .padStart(2, "0");
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  }
+
+  static rgbToHsl(r, g, b) {
+    const rn = ColorManager.clamp(r / 255, 0, 1);
+    const gn = ColorManager.clamp(g / 255, 0, 1);
+    const bn = ColorManager.clamp(b / 255, 0, 1);
+    const max = Math.max(rn, gn, bn);
+    const min = Math.min(rn, gn, bn);
+    const delta = max - min;
+
+    let hue = 0;
+    if (delta !== 0) {
+      if (max === rn) {
+        hue = ((gn - bn) / delta) % 6;
+      } else if (max === gn) {
+        hue = (bn - rn) / delta + 2;
+      } else {
+        hue = (rn - gn) / delta + 4;
+      }
+      hue *= 60;
+      if (hue < 0) hue += 360;
+    }
+
+    const lightness = (max + min) / 2;
+    const saturation =
+      delta === 0 ? 0 : delta / (1 - Math.abs(2 * lightness - 1));
+
+    return { h: hue, s: saturation, l: lightness };
+  }
+
+  static hslToRgb(h, s, l) {
+    const hue = ((h % 360) + 360) % 360;
+    const sat = ColorManager.clamp(s, 0, 1);
+    const light = ColorManager.clamp(l, 0, 1);
+    const chroma = (1 - Math.abs(2 * light - 1)) * sat;
+    const hp = hue / 60;
+    const x = chroma * (1 - Math.abs((hp % 2) - 1));
+
+    let r1 = 0;
+    let g1 = 0;
+    let b1 = 0;
+
+    if (hp >= 0 && hp < 1) {
+      r1 = chroma;
+      g1 = x;
+    } else if (hp >= 1 && hp < 2) {
+      r1 = x;
+      g1 = chroma;
+    } else if (hp >= 2 && hp < 3) {
+      g1 = chroma;
+      b1 = x;
+    } else if (hp >= 3 && hp < 4) {
+      g1 = x;
+      b1 = chroma;
+    } else if (hp >= 4 && hp < 5) {
+      r1 = x;
+      b1 = chroma;
+    } else if (hp >= 5 && hp < 6) {
+      r1 = chroma;
+      b1 = x;
+    }
+
+    const m = light - chroma / 2;
+    return {
+      r: (r1 + m) * 255,
+      g: (g1 + m) * 255,
+      b: (b1 + m) * 255,
+    };
+  }
+
+  static transformHexColor(hex, tweak = {}) {
+    const rgb = ColorManager.hexToRgb(hex);
+    if (!rgb) return null;
+
+    const hsl = ColorManager.rgbToHsl(rgb.r, rgb.g, rgb.b);
+    const hueShift = Number(tweak.hueShift || 0);
+    const saturationScale =
+      Number.isFinite(tweak.saturationScale) ? Number(tweak.saturationScale) : 1;
+    const lightnessShift = Number(tweak.lightnessShift || 0) / 100;
+
+    const h = ((hsl.h + hueShift) % 360 + 360) % 360;
+    const s = ColorManager.clamp(hsl.s * saturationScale, 0.22, 0.95);
+    const l = ColorManager.clamp(hsl.l + lightnessShift, 0.24, 0.78);
+    const nextRgb = ColorManager.hslToRgb(h, s, l);
+
+    return ColorManager.rgbToHex(nextRgb.r, nextRgb.g, nextRgb.b);
+  }
+
+  static srgbToLinear(value) {
+    if (value <= 0.04045) return value / 12.92;
+    return ((value + 0.055) / 1.055) ** 2.4;
+  }
+
+  static colorToLab(hex) {
+    const normalized = ColorManager.normalizeHexColor(hex);
+    if (!normalized) return null;
+
+    const cached = ColorManager.labCache.get(normalized);
+    if (cached) return cached;
+
+    const rgb = ColorManager.hexToRgb(normalized);
+    if (!rgb) return null;
+
+    const r = ColorManager.srgbToLinear(rgb.r / 255);
+    const g = ColorManager.srgbToLinear(rgb.g / 255);
+    const b = ColorManager.srgbToLinear(rgb.b / 255);
+
+    const x = r * 0.4124564 + g * 0.3575761 + b * 0.1804375;
+    const y = r * 0.2126729 + g * 0.7151522 + b * 0.072175;
+    const z = r * 0.0193339 + g * 0.119192 + b * 0.9503041;
+
+    const xr = x / 0.95047;
+    const yr = y / 1.0;
+    const zr = z / 1.08883;
+    const f = (t) => (t > 0.008856 ? t ** (1 / 3) : 7.787 * t + 16 / 116);
+
+    const fx = f(xr);
+    const fy = f(yr);
+    const fz = f(zr);
+
+    const lab = {
+      l: 116 * fy - 16,
+      a: 500 * (fx - fy),
+      b: 200 * (fy - fz),
+    };
+
+    ColorManager.labCache.set(normalized, lab);
+    return lab;
+  }
+
+  static deltaE(colorA, colorB) {
+    const labA = ColorManager.colorToLab(colorA);
+    const labB = ColorManager.colorToLab(colorB);
+    if (!labA || !labB) return 0;
+
+    const dl = labA.l - labB.l;
+    const da = labA.a - labB.a;
+    const db = labA.b - labB.b;
+    return Math.sqrt(dl * dl + da * da + db * db);
+  }
+
+  static getPoliticalPaletteCandidates(token) {
+    const palette = Array.isArray(ColorManager.strictPoliticalPalette)
+      ? ColorManager.strictPoliticalPalette
+      : [];
+    if (palette.length === 0) return [];
+
+    const seed = ColorManager.stableHash(token || "country");
+    const paletteStart = Math.abs(seed) % palette.length;
+    const tweakList = ColorManager.strictPoliticalVariantTweaks;
+    const tweakStart = tweakList.length ? Math.abs(seed >>> 1) % tweakList.length : 0;
+
+    const candidates = [];
+    const seen = new Set();
+
+    for (let paletteOffset = 0; paletteOffset < palette.length; paletteOffset += 1) {
+      const base =
+        ColorManager.normalizeHexColor(
+          palette[(paletteStart + paletteOffset) % palette.length]
+        ) || null;
+      if (!base) continue;
+
+      for (let tweakOffset = 0; tweakOffset < tweakList.length; tweakOffset += 1) {
+        const tweak =
+          tweakList[(tweakStart + tweakOffset) % tweakList.length] ||
+          tweakList[0] ||
+          { hueShift: 0, saturationScale: 1, lightnessShift: 0 };
+        const candidate = ColorManager.transformHexColor(base, tweak);
+        if (!candidate || seen.has(candidate)) continue;
+        seen.add(candidate);
+        candidates.push(candidate);
+      }
+    }
+
+    if (candidates.length === 0) {
+      palette.forEach((value) => {
+        const normalized = ColorManager.normalizeHexColor(value);
+        if (normalized && !seen.has(normalized)) {
+          seen.add(normalized);
+          candidates.push(normalized);
+        }
+      });
+    }
+
+    return candidates;
+  }
+
+  static chooseNeighborDistinctColor(countryCode, neighborColors = []) {
+    const normalizedNeighborColors = neighborColors
+      .map((value) => ColorManager.normalizeHexColor(value))
+      .filter(Boolean);
+    const neighborSet = new Set(normalizedNeighborColors);
+
+    const candidates = ColorManager.getPoliticalPaletteCandidates(countryCode);
+    let bestColor = null;
+    let bestMinDeltaE = -1;
+
+    candidates.forEach((candidate) => {
+      if (!candidate || neighborSet.has(candidate)) return;
+
+      let minDeltaE = Number.POSITIVE_INFINITY;
+      normalizedNeighborColors.forEach((neighborColor) => {
+        minDeltaE = Math.min(minDeltaE, ColorManager.deltaE(candidate, neighborColor));
+      });
+
+      if (minDeltaE > bestMinDeltaE) {
+        bestMinDeltaE = minDeltaE;
+        bestColor = candidate;
+      }
+    });
+
+    if (bestColor) return bestColor;
+
+    const fallback = ColorManager.getPoliticalFallbackColor(countryCode);
+    if (fallback && !neighborSet.has(fallback)) return fallback;
+
+    const fallbackCandidates = ColorManager.getPoliticalPaletteCandidates(
+      `${countryCode || "country"}-fallback`
+    );
+    for (const candidate of fallbackCandidates) {
+      if (!neighborSet.has(candidate)) return candidate;
+    }
+
+    return fallback || "#808080";
+  }
+
+  static computeAdjacencyContrast(countryAdjacency, colorByCountry) {
+    const threshold = ColorManager.strictPoliticalMinDeltaE;
+    let edgeCount = 0;
+    let sameColorEdges = 0;
+    let lowContrastEdges = 0;
+    const seen = new Set();
+
+    countryAdjacency.forEach((neighbors, countryCode) => {
+      neighbors.forEach((neighborCode) => {
+        const key = [countryCode, neighborCode].sort().join("|");
+        if (seen.has(key)) return;
+        seen.add(key);
+        edgeCount += 1;
+
+        const colorA = ColorManager.normalizeHexColor(colorByCountry.get(countryCode));
+        const colorB = ColorManager.normalizeHexColor(colorByCountry.get(neighborCode));
+        if (!colorA || !colorB) return;
+
+        if (colorA === colorB) {
+          sameColorEdges += 1;
+          lowContrastEdges += 1;
+          return;
+        }
+
+        const delta = ColorManager.deltaE(colorA, colorB);
+        if (delta < threshold) lowContrastEdges += 1;
+      });
+    });
+
+    return { edgeCount, sameColorEdges, lowContrastEdges, threshold };
   }
 
   static computePoliticalColors(topology, objectName) {
@@ -97,7 +405,7 @@ class ColorManager {
     );
     const countryAdjacency = new Map();
 
-    geometries.forEach((geometry, index) => {
+    geometries.forEach((_, index) => {
       const countryCode = countryByIndex[index];
       if (!countryAdjacency.has(countryCode)) {
         countryAdjacency.set(countryCode, new Set());
@@ -131,6 +439,7 @@ class ColorManager {
         console.warn("[ColorManager] topojson.neighbors() failed:", error);
       }
     }
+
     if (!Array.isArray(neighbors) || neighbors.length !== geometries.length) {
       neighbors = new Array(geometries.length).fill(null).map(() => []);
     }
@@ -171,18 +480,32 @@ class ColorManager {
           );
           return;
         }
-        const used = new Set();
+
+        const assignedNeighborColors = [];
         const neighborsForCountry = countryAdjacency.get(countryCode) || new Set();
         neighborsForCountry.forEach((neighborCode) => {
           const color = colorByCountry.get(neighborCode);
-          if (color) used.add(color);
+          if (color) assignedNeighborColors.push(color);
         });
-        const seed = ColorManager.stableHash(countryCode);
-        const chosen = ColorManager.pickPaletteColor(palette, used, seed);
+
+        const chosen = ColorManager.chooseNeighborDistinctColor(
+          countryCode,
+          assignedNeighborColors
+        );
         colorByCountry.set(countryCode, chosen);
       });
+
+      const contrastStats = ColorManager.computeAdjacencyContrast(
+        countryAdjacency,
+        colorByCountry
+      );
+      console.log(
+        `[ColorManager] Adjacency contrast: ${contrastStats.edgeCount} edges, ` +
+          `${contrastStats.sameColorEdges} same-color, ` +
+          `${contrastStats.lowContrastEdges} below DeltaE ${contrastStats.threshold}`
+      );
     } else {
-      console.warn("[ColorManager] Neighbor graph empty — using hash-distributed coloring");
+      console.warn("[ColorManager] Neighbor graph empty, using hash-distributed coloring");
       countryOrder.forEach((countryCode) => {
         colorByCountry.set(
           countryCode,

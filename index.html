@@ -94,26 +94,6 @@
           </div>
 
           <div class="card">
-            <div class="section-header">Layer Toggles</div>
-            <label class="toggle-label mt-3">
-              <input id="toggleUrban" type="checkbox" class="checkbox-input" checked />
-              Urban Areas
-            </label>
-            <label class="toggle-label mt-2">
-              <input id="togglePhysical" type="checkbox" class="checkbox-input" checked />
-              Physical Regions (Mountains/etc)
-            </label>
-            <label class="toggle-label mt-2">
-              <input id="toggleRivers" type="checkbox" class="checkbox-input" checked />
-              Rivers
-            </label>
-            <label class="toggle-label mt-2">
-              <input id="toggleSpecialZones" type="checkbox" class="checkbox-input" checked />
-              <span id="lblSpecialZones">Special Zones</span>
-            </label>
-          </div>
-
-          <div class="card">
             <div id="lblMapStyle" class="section-header">Map Style</div>
             <label id="lblColorMode" class="section-header-block mt-3" for="colorModeSelect">Color Mode</label>
             <select id="colorModeSelect" class="select-input mt-2">
@@ -258,6 +238,239 @@
                   No supported countries in current dataset.
                 </div>
                 <div id="parentBorderCountryList" class="parent-border-country-list mt-2"></div>
+              </div>
+
+              <div class="space-y-2">
+                <div id="lblContextLayers" class="section-header">Context Layers</div>
+                <label class="toggle-label mt-2">
+                  <input id="togglePhysical" type="checkbox" class="checkbox-input" checked />
+                  <span id="lblPhysicalLayer">Physical Regions</span>
+                </label>
+                <div class="ml-5 space-y-2">
+                  <div class="flex items-center justify-between gap-3">
+                    <label id="lblPhysicalPreset" class="range-label" for="physicalPreset">Preset</label>
+                    <select id="physicalPreset" class="select-input">
+                      <option id="optPhysicalAtlasSoft" value="atlas_soft" selected>Atlas Soft</option>
+                      <option id="optPhysicalContourOnly" value="contour_only">Contour Only</option>
+                      <option id="optPhysicalTintOnly" value="tint_only">Tint Only</option>
+                    </select>
+                  </div>
+                  <div class="flex items-center justify-between gap-3">
+                    <label id="lblPhysicalTintColor" class="range-label" for="physicalTintColor">Tint Color</label>
+                    <input id="physicalTintColor" type="color" value="#8f6b4e" class="color-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblPhysicalOpacity" class="range-label" for="physicalOpacity">Opacity</label>
+                      <span id="physicalOpacityValue" class="range-value">24%</span>
+                    </div>
+                    <input id="physicalOpacity" type="range" min="0" max="100" value="24" class="range-input" />
+                  </div>
+                  <div class="flex items-center justify-between gap-3">
+                    <label id="lblPhysicalContourColor" class="range-label" for="physicalContourColor">Contour Color</label>
+                    <input id="physicalContourColor" type="color" value="#6f4e37" class="color-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblPhysicalContourOpacity" class="range-label" for="physicalContourOpacity">Contour Opacity</label>
+                      <span id="physicalContourOpacityValue" class="range-value">30%</span>
+                    </div>
+                    <input id="physicalContourOpacity" type="range" min="0" max="100" value="30" class="range-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblPhysicalContourWidth" class="range-label" for="physicalContourWidth">Contour Width</label>
+                      <span id="physicalContourWidthValue" class="range-value">0.70</span>
+                    </div>
+                    <input id="physicalContourWidth" type="range" min="0.2" max="2.5" step="0.05" value="0.70" class="range-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblPhysicalContourSpacing" class="range-label" for="physicalContourSpacing">Contour Spacing</label>
+                      <span id="physicalContourSpacingValue" class="range-value">18</span>
+                    </div>
+                    <input id="physicalContourSpacing" type="range" min="8" max="36" step="1" value="18" class="range-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblPhysicalBlendMode" class="range-label" for="physicalBlendMode">Blend Mode</label>
+                    </div>
+                    <select id="physicalBlendMode" class="select-input mt-2">
+                      <option value="multiply" selected>Multiply</option>
+                      <option value="soft-light">Soft Light</option>
+                      <option value="overlay">Overlay</option>
+                      <option value="source-over">Normal</option>
+                    </select>
+                  </div>
+                </div>
+
+                <label class="toggle-label mt-2">
+                  <input id="toggleUrban" type="checkbox" class="checkbox-input" checked />
+                  <span id="lblUrbanLayer">Urban Areas</span>
+                </label>
+                <div class="ml-5 space-y-2">
+                  <div class="flex items-center justify-between gap-3">
+                    <label id="lblUrbanColor" class="range-label" for="urbanColor">Color</label>
+                    <input id="urbanColor" type="color" value="#4b5563" class="color-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblUrbanOpacity" class="range-label" for="urbanOpacity">Opacity</label>
+                      <span id="urbanOpacityValue" class="range-value">22%</span>
+                    </div>
+                    <input id="urbanOpacity" type="range" min="0" max="100" value="22" class="range-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblUrbanBlendMode" class="range-label" for="urbanBlendMode">Blend Mode</label>
+                    </div>
+                    <select id="urbanBlendMode" class="select-input mt-2">
+                      <option value="multiply" selected>Multiply</option>
+                      <option value="source-over">Normal</option>
+                      <option value="overlay">Overlay</option>
+                    </select>
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblUrbanMinArea" class="range-label" for="urbanMinArea">Min Area (px)</label>
+                      <span id="urbanMinAreaValue" class="range-value">8</span>
+                    </div>
+                    <input id="urbanMinArea" type="range" min="0" max="80" value="8" class="range-input" />
+                  </div>
+                </div>
+
+                <label class="toggle-label mt-2">
+                  <input id="toggleRivers" type="checkbox" class="checkbox-input" checked />
+                  <span id="lblRiversLayer">Rivers</span>
+                </label>
+                <div class="ml-5 space-y-2">
+                  <div class="flex items-center justify-between gap-3">
+                    <label id="lblRiversColor" class="range-label" for="riversColor">Color</label>
+                    <input id="riversColor" type="color" value="#3b82f6" class="color-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblRiversOpacity" class="range-label" for="riversOpacity">Opacity</label>
+                      <span id="riversOpacityValue" class="range-value">88%</span>
+                    </div>
+                    <input id="riversOpacity" type="range" min="0" max="100" value="88" class="range-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblRiversWidth" class="range-label" for="riversWidth">Width</label>
+                      <span id="riversWidthValue" class="range-value">1.10</span>
+                    </div>
+                    <input id="riversWidth" type="range" min="0.2" max="4.0" step="0.05" value="1.10" class="range-input" />
+                  </div>
+                  <div class="flex items-center justify-between gap-3">
+                    <label id="lblRiversOutlineColor" class="range-label" for="riversOutlineColor">Outline Color</label>
+                    <input id="riversOutlineColor" type="color" value="#e2efff" class="color-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblRiversOutlineWidth" class="range-label" for="riversOutlineWidth">Outline Width</label>
+                      <span id="riversOutlineWidthValue" class="range-value">0.90</span>
+                    </div>
+                    <input id="riversOutlineWidth" type="range" min="0.0" max="3.0" step="0.05" value="0.90" class="range-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblRiversDashStyle" class="range-label" for="riversDashStyle">Dash</label>
+                    </div>
+                    <select id="riversDashStyle" class="select-input mt-2">
+                      <option value="solid" selected>Solid</option>
+                      <option value="dashed">Dashed</option>
+                      <option value="dotted">Dotted</option>
+                    </select>
+                  </div>
+                </div>
+
+                <label class="toggle-label mt-2">
+                  <input id="toggleSpecialZones" type="checkbox" class="checkbox-input" checked />
+                  <span id="lblSpecialZones">Special Zones</span>
+                </label>
+                <div class="ml-5 space-y-2">
+                  <div class="flex items-center justify-between gap-3">
+                    <label id="lblSpecialZonesDisputedFill" class="range-label" for="specialZonesDisputedFill">Disputed Fill</label>
+                    <input id="specialZonesDisputedFill" type="color" value="#f97316" class="color-input" />
+                  </div>
+                  <div class="flex items-center justify-between gap-3">
+                    <label id="lblSpecialZonesDisputedStroke" class="range-label" for="specialZonesDisputedStroke">Disputed Stroke</label>
+                    <input id="specialZonesDisputedStroke" type="color" value="#ea580c" class="color-input" />
+                  </div>
+                  <div class="flex items-center justify-between gap-3">
+                    <label id="lblSpecialZonesWastelandFill" class="range-label" for="specialZonesWastelandFill">Wasteland Fill</label>
+                    <input id="specialZonesWastelandFill" type="color" value="#dc2626" class="color-input" />
+                  </div>
+                  <div class="flex items-center justify-between gap-3">
+                    <label id="lblSpecialZonesWastelandStroke" class="range-label" for="specialZonesWastelandStroke">Wasteland Stroke</label>
+                    <input id="specialZonesWastelandStroke" type="color" value="#b91c1c" class="color-input" />
+                  </div>
+                  <div class="flex items-center justify-between gap-3">
+                    <label id="lblSpecialZonesCustomFill" class="range-label" for="specialZonesCustomFill">Custom Fill</label>
+                    <input id="specialZonesCustomFill" type="color" value="#8b5cf6" class="color-input" />
+                  </div>
+                  <div class="flex items-center justify-between gap-3">
+                    <label id="lblSpecialZonesCustomStroke" class="range-label" for="specialZonesCustomStroke">Custom Stroke</label>
+                    <input id="specialZonesCustomStroke" type="color" value="#6d28d9" class="color-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblSpecialZonesOpacity" class="range-label" for="specialZonesOpacity">Opacity</label>
+                      <span id="specialZonesOpacityValue" class="range-value">32%</span>
+                    </div>
+                    <input id="specialZonesOpacity" type="range" min="0" max="100" value="32" class="range-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblSpecialZonesStrokeWidth" class="range-label" for="specialZonesStrokeWidth">Stroke Width</label>
+                      <span id="specialZonesStrokeWidthValue" class="range-value">1.30</span>
+                    </div>
+                    <input id="specialZonesStrokeWidth" type="range" min="0.4" max="4.0" step="0.05" value="1.30" class="range-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblSpecialZonesDashStyle" class="range-label" for="specialZonesDashStyle">Dash</label>
+                    </div>
+                    <select id="specialZonesDashStyle" class="select-input mt-2">
+                      <option value="solid">Solid</option>
+                      <option value="dashed" selected>Dashed</option>
+                      <option value="dotted">Dotted</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <div id="lblSpecialZoneEditor" class="section-header">Special Zone Editor</div>
+                <div class="flex items-center justify-between gap-3">
+                  <label id="lblSpecialZoneType" class="range-label" for="specialZoneTypeSelect">Type</label>
+                  <select id="specialZoneTypeSelect" class="select-input">
+                    <option value="disputed">Disputed</option>
+                    <option value="wasteland">Wasteland</option>
+                    <option value="custom" selected>Custom</option>
+                  </select>
+                </div>
+                <div>
+                  <label id="lblSpecialZoneLabel" class="range-label" for="specialZoneLabelInput">Label</label>
+                  <input id="specialZoneLabelInput" type="text" class="input mt-2" placeholder="e.g. Buffer Zone A" />
+                </div>
+                <div class="parent-border-actions mt-2">
+                  <button id="specialZoneStartBtn" type="button" class="btn-secondary">Start Draw</button>
+                  <button id="specialZoneUndoBtn" type="button" class="btn-secondary">Undo Vertex</button>
+                </div>
+                <div class="parent-border-actions mt-2">
+                  <button id="specialZoneFinishBtn" type="button" class="btn-secondary">Finish</button>
+                  <button id="specialZoneCancelBtn" type="button" class="btn-secondary">Cancel</button>
+                </div>
+                <div>
+                  <label id="lblSpecialZoneList" class="range-label" for="specialZoneFeatureList">Manual Zones</label>
+                  <select id="specialZoneFeatureList" class="select-input mt-2"></select>
+                </div>
+                <button id="specialZoneDeleteBtn" type="button" class="btn-secondary mt-2">Delete Selected</button>
+                <div id="specialZoneEditorHint" class="parent-border-empty mt-2">
+                  Click map to add vertices, double-click to finish.
+                </div>
               </div>
 
             </div>

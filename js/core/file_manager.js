@@ -5,13 +5,25 @@ class FileManager {
   static exportProject(appState) {
     if (!appState) return;
     const payload = {
-      schemaVersion: 3,
+      schemaVersion: 4,
       countryBaseColors: appState.countryBaseColors || {},
       featureOverrides: appState.featureOverrides || {},
       specialZones: appState.specialZones || {},
       parentBorderEnabledByCountry: appState.parentBorderEnabledByCountry || {},
+      manualSpecialZones: appState.manualSpecialZones || { type: "FeatureCollection", features: [] },
+      layerVisibility: {
+        showUrban: !!appState.showUrban,
+        showPhysical: !!appState.showPhysical,
+        showRivers: !!appState.showRivers,
+        showSpecialZones: !!appState.showSpecialZones,
+      },
       styleConfig: {
         parentBorders: appState.styleConfig?.parentBorders || null,
+        ocean: appState.styleConfig?.ocean || null,
+        urban: appState.styleConfig?.urban || null,
+        physical: appState.styleConfig?.physical || null,
+        rivers: appState.styleConfig?.rivers || null,
+        specialZones: appState.styleConfig?.specialZones || null,
       },
       timestamp: Date.now(),
     };
@@ -62,6 +74,42 @@ class FileManager {
         if (!data.styleConfig.parentBorders || typeof data.styleConfig.parentBorders !== "object") {
           data.styleConfig.parentBorders = null;
         }
+        if (!data.styleConfig.ocean || typeof data.styleConfig.ocean !== "object") {
+          data.styleConfig.ocean = null;
+        }
+        if (!data.styleConfig.urban || typeof data.styleConfig.urban !== "object") {
+          data.styleConfig.urban = null;
+        }
+        if (!data.styleConfig.physical || typeof data.styleConfig.physical !== "object") {
+          data.styleConfig.physical = null;
+        }
+        if (!data.styleConfig.rivers || typeof data.styleConfig.rivers !== "object") {
+          data.styleConfig.rivers = null;
+        }
+        if (!data.styleConfig.specialZones || typeof data.styleConfig.specialZones !== "object") {
+          data.styleConfig.specialZones = null;
+        }
+        if (
+          !data.manualSpecialZones ||
+          typeof data.manualSpecialZones !== "object" ||
+          data.manualSpecialZones.type !== "FeatureCollection" ||
+          !Array.isArray(data.manualSpecialZones.features)
+        ) {
+          data.manualSpecialZones = { type: "FeatureCollection", features: [] };
+        }
+        if (!data.layerVisibility || typeof data.layerVisibility !== "object") {
+          data.layerVisibility = {};
+        }
+        data.layerVisibility.showUrban =
+          data.layerVisibility.showUrban === undefined ? true : !!data.layerVisibility.showUrban;
+        data.layerVisibility.showPhysical =
+          data.layerVisibility.showPhysical === undefined ? true : !!data.layerVisibility.showPhysical;
+        data.layerVisibility.showRivers =
+          data.layerVisibility.showRivers === undefined ? true : !!data.layerVisibility.showRivers;
+        data.layerVisibility.showSpecialZones =
+          data.layerVisibility.showSpecialZones === undefined
+            ? true
+            : !!data.layerVisibility.showSpecialZones;
 
         if (typeof callback === "function") {
           callback(data);

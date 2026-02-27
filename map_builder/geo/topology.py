@@ -155,6 +155,48 @@ def build_topology(
     def prune_columns(gdf: gpd.GeoDataFrame, layer_name: str) -> gpd.GeoDataFrame:
         if layer_name == "special_zones":
             keep_cols = ["id", "name", "label", "type", "claimants", "cntr_code", "geometry"]
+        elif layer_name == "urban":
+            keep_cols = [
+                "id",
+                "name",
+                "featurecla",
+                "FEATURECLA",
+                "scalerank",
+                "SCALERANK",
+                "area_sqkm",
+                "AREA_SQKM",
+                "min_zoom",
+                "MIN_ZOOM",
+                "geometry",
+            ]
+        elif layer_name == "physical":
+            keep_cols = [
+                "id",
+                "name",
+                "name_en",
+                "NAME",
+                "NAME_EN",
+                "featurecla",
+                "FEATURECLA",
+                "region",
+                "REGION",
+                "subregion",
+                "SUBREGION",
+                "geometry",
+            ]
+        elif layer_name == "rivers":
+            keep_cols = [
+                "id",
+                "name",
+                "name_en",
+                "featurecla",
+                "FEATURECLA",
+                "scalerank",
+                "SCALERANK",
+                "min_zoom",
+                "MIN_ZOOM",
+                "geometry",
+            ]
         else:
             # Preserve selected admin context/localized fields when present.
             keep_cols = [

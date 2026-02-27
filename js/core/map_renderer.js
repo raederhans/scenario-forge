@@ -19,6 +19,7 @@ let zoomBehavior = null;
 
 let viewportGroup = null;
 let specialZonesGroup = null;
+let specialZoneEditorGroup = null;
 let hoverGroup = null;
 let legendGroup = null;
 let legendItemsGroup = null;
@@ -77,6 +78,10 @@ const OCEAN_ADVANCED_STYLES_ENABLED = false;
 const OCEAN_MASK_MODE_TOPOLOGY = "topology_ocean";
 const OCEAN_MASK_MODE_SPHERE_MINUS_LAND = "sphere_minus_land";
 const OCEAN_MASK_MIN_QUALITY = 0.35;
+const CONTEXT_LAYER_MIN_SCORE = 0.08;
+const LAYER_DIAG_PREFIX = "[layer-resolver]";
+const DEFAULT_SPECIAL_ZONE_TYPE = "custom";
+const PHYSICAL_PATTERN_BASE_SIZE = 96;
 // Keep this list empty by default. Polygon winding issues are repaired dynamically.
 const KNOWN_BAD_FEATURE_IDS = new Set();
 const DEBUG_MODES = new Set(["PROD", "GEOMETRY", "ARTIFACTS", "ISLANDS", "ID_HASH"]);
@@ -92,6 +97,12 @@ let islandNeighborsCache = {
   neighbors: [],
 };
 const oceanPatternCache = new Map();
+const physicalPatternCache = new Map();
+const layerResolverCache = {
+  primaryRef: null,
+  detailRef: null,
+  bundleMode: null,
+};
 const renderDiag = {
   enabled: false,
   seenKeys: new Set(),
@@ -935,45 +946,204 @@ function pathBoundsInScreen(feature) {
   );
 }
 
+function getLayerFeatureCollection(topology, layerName) {
+  if (!topology?.objects || !globalThis.topojson) return null;
+  const object = topology.objects[layerName];
+  if (!object) return null;
+  try {
+    const collection = globalThis.topojson.feature(topology, object);
+    if (!collection || !Array.isArray(collection.features)) return null;
+    return collection;
+  } catch (error) {
+    console.warn(`${LAYER_DIAG_PREFIX} Failed to decode layer "${layerName}":`, error);
+    return null;
+  }
+}
+
+function computeLayerCoverageScore(collection) {
+  if (!collection?.features?.length || !globalThis.d3?.geoBounds) return 0;
+  try {
+    const [[minLon, minLat], [maxLon, maxLat]] = globalThis.d3.geoBounds(collection);
+    if (![minLon, minLat, maxLon, maxLat].every(Number.isFinite)) return 0;
+    let width = maxLon - minLon;
+    if (width < 0) width += 360;
+    const height = Math.max(0, maxLat - minLat);
+    const normalizedArea = clamp((width * height) / (360 * 180), 0, 1);
+    const densityBoost = Math.min(1, Math.log10(collection.features.length + 1) / 4);
+    return clamp(normalizedArea * 0.8 + densityBoost * 0.2, 0, 1);
+  } catch (_error) {
+    return 0;
+  }
+}
+
+function pickBestLayerSource(primaryCollection, detailCollection, policy = {}) {
+  const minScore = Number.isFinite(Number(policy.minScore))
+    ? Number(policy.minScore)
+    : CONTEXT_LAYER_MIN_SCORE;
+  const preferDetailWhenPrimaryEmpty = !!policy.preferDetailWhenPrimaryEmpty;
+  const primaryCount = Array.isArray(primaryCollection?.features) ? primaryCollection.features.length : 0;
+  const detailCount = Array.isArray(detailCollection?.features) ? detailCollection.features.length : 0;
+  const primaryScore = computeLayerCoverageScore(primaryCollection);
+  const detailScore = computeLayerCoverageScore(detailCollection);
+
+  if (!primaryCount && !detailCount) {
+    return {
+      collection: null,
+      source: "none",
+      primaryScore,
+      detailScore,
+      primaryCount,
+      detailCount,
+    };
+  }
+
+  if (!primaryCount && detailCount) {
+    return {
+      collection: detailCollection,
+      source: "detail",
+      primaryScore,
+      detailScore,
+      primaryCount,
+      detailCount,
+    };
+  }
+
+  if (primaryCount && !detailCount) {
+    return {
+      collection: primaryCollection,
+      source: "primary",
+      primaryScore,
+      detailScore,
+      primaryCount,
+      detailCount,
+    };
+  }
+
+  if (preferDetailWhenPrimaryEmpty && primaryCount === 0 && detailCount > 0) {
+    return {
+      collection: detailCollection,
+      source: "detail",
+      primaryScore,
+      detailScore,
+      primaryCount,
+      detailCount,
+    };
+  }
+
+  if (primaryScore >= minScore && primaryScore >= detailScore * 0.65) {
+    return {
+      collection: primaryCollection,
+      source: "primary",
+      primaryScore,
+      detailScore,
+      primaryCount,
+      detailCount,
+    };
+  }
+
+  if (detailScore > primaryScore || detailCount > primaryCount * 1.25) {
+    return {
+      collection: detailCollection,
+      source: "detail",
+      primaryScore,
+      detailScore,
+      primaryCount,
+      detailCount,
+    };
+  }
+
+  return {
+    collection: primaryCollection,
+    source: "primary",
+    primaryScore,
+    detailScore,
+    primaryCount,
+    detailCount,
+  };
+}
+
+function resolveContextLayerData(layerName) {
+  const primaryTopology = state.topologyPrimary || state.topology;
+  const detailTopology = state.topologyDetail;
+  const primaryCollection = getLayerFeatureCollection(primaryTopology, layerName);
+  const detailCollection = getLayerFeatureCollection(detailTopology, layerName);
+  const pick = pickBestLayerSource(primaryCollection, detailCollection, {
+    minScore: layerName === "special_zones" ? 0 : CONTEXT_LAYER_MIN_SCORE,
+    preferDetailWhenPrimaryEmpty: layerName === "special_zones",
+  });
+
+  if (!state.layerDataDiagnostics || typeof state.layerDataDiagnostics !== "object") {
+    state.layerDataDiagnostics = {};
+  }
+  if (!state.contextLayerSourceByName || typeof state.contextLayerSourceByName !== "object") {
+    state.contextLayerSourceByName = {};
+  }
+
+  state.contextLayerSourceByName[layerName] = pick.source;
+  state.layerDataDiagnostics[layerName] = {
+    source: pick.source,
+    primaryCount: pick.primaryCount,
+    detailCount: pick.detailCount,
+    primaryScore: Number(pick.primaryScore.toFixed(3)),
+    detailScore: Number(pick.detailScore.toFixed(3)),
+  };
+
+  return pick.collection;
+}
+
 function ensureLayerDataFromTopology() {
-  const baseTopology = state.topologyPrimary || state.topology;
-  if (!baseTopology || !baseTopology.objects || !globalThis.topojson) return;
-  const objects = baseTopology.objects;
+  const primaryTopology = state.topologyPrimary || state.topology;
+  if (!primaryTopology || !globalThis.topojson) return;
 
-  if (!state.oceanData && objects.ocean) {
-    state.oceanData = globalThis.topojson.feature(baseTopology, objects.ocean);
+  if (!state.manualSpecialZones || state.manualSpecialZones.type !== "FeatureCollection") {
+    state.manualSpecialZones = { type: "FeatureCollection", features: [] };
   }
-  if (!state.landBgData && objects.land) {
-    state.landBgData = globalThis.topojson.feature(baseTopology, objects.land);
-  }
-  if (!state.riversData && objects.rivers) {
-    state.riversData = globalThis.topojson.feature(baseTopology, objects.rivers);
-  }
-  if (!state.urbanData && objects.urban) {
-    state.urbanData = globalThis.topojson.feature(baseTopology, objects.urban);
-  }
-  if (!state.physicalData && objects.physical) {
-    state.physicalData = globalThis.topojson.feature(baseTopology, objects.physical);
-  }
-  if (!state.specialZonesData && objects.special_zones) {
-    state.specialZonesData = globalThis.topojson.feature(baseTopology, objects.special_zones);
+  if (!Array.isArray(state.manualSpecialZones.features)) {
+    state.manualSpecialZones.features = [];
   }
 
-  // Composite mode owns state.landData and must not be overwritten by primary political-only data.
-  if (state.topologyBundleMode === "composite") {
+  const sameSource =
+    layerResolverCache.primaryRef === primaryTopology &&
+    layerResolverCache.detailRef === state.topologyDetail &&
+    layerResolverCache.bundleMode === state.topologyBundleMode;
+  if (sameSource) {
     return;
   }
 
-  if (objects.political) {
-    const expectedCount = Array.isArray(objects.political.geometries)
-      ? objects.political.geometries.length
+  state.oceanData = resolveContextLayerData("ocean");
+  state.landBgData = resolveContextLayerData("land");
+  state.riversData = resolveContextLayerData("rivers");
+  state.urbanData = resolveContextLayerData("urban");
+  state.physicalData = resolveContextLayerData("physical");
+  state.specialZonesData = resolveContextLayerData("special_zones");
+
+  const diag = state.layerDataDiagnostics || {};
+  console.info(
+    `${LAYER_DIAG_PREFIX} sources: ocean=${diag.ocean?.source || "none"}, `
+      + `land=${diag.land?.source || "none"}, rivers=${diag.rivers?.source || "none"}, `
+      + `urban=${diag.urban?.source || "none"}, physical=${diag.physical?.source || "none"}, `
+      + `special_zones=${diag.special_zones?.source || "none"}`
+  );
+
+  // Composite mode owns state.landData and must not be overwritten by primary political-only data.
+  if (state.topologyBundleMode !== "composite" && primaryTopology?.objects?.political) {
+    const expectedCount = Array.isArray(primaryTopology.objects.political.geometries)
+      ? primaryTopology.objects.political.geometries.length
       : 0;
     const currentCount = Array.isArray(state.landData?.features)
       ? state.landData.features.length
       : 0;
     if (currentCount !== expectedCount) {
-      state.landData = globalThis.topojson.feature(baseTopology, objects.political);
+      state.landData = globalThis.topojson.feature(primaryTopology, primaryTopology.objects.political);
     }
+  }
+
+  layerResolverCache.primaryRef = primaryTopology;
+  layerResolverCache.detailRef = state.topologyDetail;
+  layerResolverCache.bundleMode = state.topologyBundleMode;
+
+  if (typeof state.updateSpecialZoneEditorUIFn === "function") {
+    state.updateSpecialZoneEditorUIFn();
   }
 }
 
@@ -1057,6 +1227,12 @@ function ensureHybridLayers() {
     specialZonesGroup = viewportGroup.append("g").attr("class", "special-zones-layer");
   }
   specialZonesGroup.style("pointer-events", "none");
+
+  specialZoneEditorGroup = viewportGroup.select("g.special-zone-editor-layer");
+  if (specialZoneEditorGroup.empty()) {
+    specialZoneEditorGroup = viewportGroup.append("g").attr("class", "special-zone-editor-layer");
+  }
+  specialZoneEditorGroup.style("pointer-events", "none");
 
   hoverGroup = viewportGroup.select("g.hover-layer");
   if (hoverGroup.empty()) {
@@ -2387,6 +2563,194 @@ function drawOceanStyle() {
   context.globalAlpha = 1;
 }
 
+function getSafeBlendMode(value, fallback = "source-over") {
+  const mode = String(value || fallback).trim();
+  return mode || fallback;
+}
+
+function getDashPattern(styleName, baseWidth = 1) {
+  const style = String(styleName || "solid").trim().toLowerCase();
+  if (style === "dashed") {
+    return [Math.max(2, baseWidth * 4), Math.max(2, baseWidth * 2.4)];
+  }
+  if (style === "dotted") {
+    return [Math.max(1, baseWidth * 1.2), Math.max(2, baseWidth * 2.1)];
+  }
+  return [];
+}
+
+function estimateProjectedAreaPx(feature, zoomScale) {
+  const bounds = getProjectedFeatureBounds(feature);
+  if (!bounds) return 0;
+  const area = Math.max(0, bounds.width * bounds.height);
+  const scale = Math.max(0.1, Number(zoomScale) || 1);
+  return area * scale * scale;
+}
+
+function getPhysicalPattern(config) {
+  const spacing = clamp(Number(config.contourSpacing) || 18, 8, 36);
+  const width = clamp(Number(config.contourWidth) || 0.7, 0.2, 2.5);
+  const color = getSafeCanvasColor(config.contourColor, "#6f4e37");
+  const key = `${spacing}|${width.toFixed(2)}|${color}`;
+  const cached = physicalPatternCache.get(key);
+  if (cached) return cached;
+
+  const size = PHYSICAL_PATTERN_BASE_SIZE;
+  const tile = document.createElement("canvas");
+  tile.width = size;
+  tile.height = size;
+  const tileCtx = tile.getContext("2d");
+  if (!tileCtx) return null;
+
+  tileCtx.clearRect(0, 0, size, size);
+  tileCtx.strokeStyle = color;
+  tileCtx.lineWidth = width;
+
+  for (let y = -size; y <= size * 2; y += spacing) {
+    tileCtx.beginPath();
+    tileCtx.moveTo(-8, y);
+    tileCtx.lineTo(size + 8, y - size * 0.25);
+    tileCtx.stroke();
+  }
+
+  const pattern = context?.createPattern(tile, "repeat") || null;
+  if (pattern) {
+    physicalPatternCache.set(key, pattern);
+  }
+  return pattern;
+}
+
+function drawPhysicalLayer(k, { interactive = false } = {}) {
+  if (!state.showPhysical || !state.physicalData?.features?.length) return;
+  const cfg = state.styleConfig?.physical || {};
+  const preset = String(cfg.preset || "atlas_soft").trim().toLowerCase();
+  const blendMode = getSafeBlendMode(cfg.blendMode, "multiply");
+  const tintColor = getSafeCanvasColor(cfg.tintColor, "#8f6b4e");
+  const tintOpacity = clamp(Number.isFinite(Number(cfg.opacity)) ? Number(cfg.opacity) : 0.24, 0, 1);
+  const contourOpacity = clamp(
+    Number.isFinite(Number(cfg.contourOpacity)) ? Number(cfg.contourOpacity) : 0.30,
+    0,
+    1
+  );
+  const contourColor = getSafeCanvasColor(cfg.contourColor, "#6f4e37");
+  const contourWidth = clamp(Number.isFinite(Number(cfg.contourWidth)) ? Number(cfg.contourWidth) : 0.7, 0.2, 2.5);
+
+  context.save();
+  context.globalCompositeOperation = blendMode;
+
+  if (preset !== "contour_only" && tintOpacity > 0) {
+    context.globalAlpha = interactive ? Math.min(tintOpacity, 0.18) : tintOpacity;
+    context.fillStyle = tintColor;
+    state.physicalData.features.forEach((feature) => {
+      context.beginPath();
+      pathCanvas(feature);
+      context.fill();
+    });
+  }
+
+  if (preset !== "tint_only") {
+    if (interactive) {
+      context.globalAlpha = Math.min(contourOpacity, 0.2);
+      context.strokeStyle = contourColor;
+      context.lineWidth = contourWidth / Math.max(0.0001, k);
+      state.physicalData.features.forEach((feature) => {
+        context.beginPath();
+        pathCanvas(feature);
+        context.stroke();
+      });
+    } else {
+      const pattern = getPhysicalPattern(cfg);
+      if (pattern) {
+        context.save();
+        context.beginPath();
+        state.physicalData.features.forEach((feature) => pathCanvas(feature));
+        context.clip();
+        context.globalAlpha = contourOpacity;
+        context.fillStyle = pattern;
+        context.fillRect(-4096, -4096, 8192, 8192);
+        context.restore();
+      } else {
+        context.globalAlpha = contourOpacity;
+        context.strokeStyle = contourColor;
+        context.lineWidth = contourWidth / Math.max(0.0001, k);
+        state.physicalData.features.forEach((feature) => {
+          context.beginPath();
+          pathCanvas(feature);
+          context.stroke();
+        });
+      }
+    }
+  }
+
+  context.restore();
+}
+
+function drawUrbanLayer(k, { interactive = false } = {}) {
+  if (!state.showUrban || !state.urbanData?.features?.length) return;
+  const cfg = state.styleConfig?.urban || {};
+  const color = getSafeCanvasColor(cfg.color, "#4b5563");
+  const opacity = clamp(Number.isFinite(Number(cfg.opacity)) ? Number(cfg.opacity) : 0.22, 0, 1);
+  const minAreaPx = clamp(Number.isFinite(Number(cfg.minAreaPx)) ? Number(cfg.minAreaPx) : 8, 0, 80);
+  const blendMode = getSafeBlendMode(cfg.blendMode, "multiply");
+
+  context.save();
+  context.globalCompositeOperation = blendMode;
+  context.globalAlpha = interactive ? Math.min(opacity, 0.15) : opacity;
+  context.fillStyle = color;
+
+  state.urbanData.features.forEach((feature) => {
+    if (minAreaPx > 0 && estimateProjectedAreaPx(feature, k) < minAreaPx) return;
+    context.beginPath();
+    pathCanvas(feature);
+    context.fill();
+  });
+
+  context.restore();
+}
+
+function drawRiversLayer(k, { interactive = false } = {}) {
+  if (!state.showRivers || !state.riversData?.features?.length) return;
+  const cfg = state.styleConfig?.rivers || {};
+  const color = getSafeCanvasColor(cfg.color, "#3b82f6");
+  const opacity = clamp(Number.isFinite(Number(cfg.opacity)) ? Number(cfg.opacity) : 0.88, 0, 1);
+  const widthBase = clamp(Number.isFinite(Number(cfg.width)) ? Number(cfg.width) : 1.1, 0.2, 4);
+  const outlineColor = getSafeCanvasColor(cfg.outlineColor, "#e2efff");
+  const outlineWidth = clamp(Number.isFinite(Number(cfg.outlineWidth)) ? Number(cfg.outlineWidth) : 0.9, 0, 3);
+  const dashPattern = getDashPattern(cfg.dashStyle, widthBase);
+  const scale = Math.max(0.0001, k);
+
+  context.save();
+
+  if (outlineWidth > 0) {
+    context.globalAlpha = interactive ? Math.min(opacity * 0.7, 0.65) : Math.min(opacity, 0.95);
+    context.strokeStyle = outlineColor;
+    context.lineWidth = (widthBase + outlineWidth * 2) / scale;
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.setLineDash([]);
+    state.riversData.features.forEach((feature) => {
+      context.beginPath();
+      pathCanvas(feature);
+      context.stroke();
+    });
+  }
+
+  context.globalAlpha = interactive ? Math.min(opacity, 0.78) : opacity;
+  context.strokeStyle = color;
+  context.lineWidth = widthBase / scale;
+  context.lineCap = "round";
+  context.lineJoin = "round";
+  context.setLineDash(dashPattern);
+  state.riversData.features.forEach((feature) => {
+    context.beginPath();
+    pathCanvas(feature);
+    context.stroke();
+  });
+  context.setLineDash([]);
+
+  context.restore();
+}
+
 function drawCanvas() {
   if (!context || !pathCanvas) return;
   ensureLayerDataFromTopology();
@@ -2426,7 +2790,7 @@ function drawCanvas() {
   }
   drawOceanStyle();
 
-  // 4. Draw political features only (no base land layer)
+  // 4. Draw political land fill first.
   if (state.landData?.features?.length) {
     const islandNeighbors = debugMode === "ISLANDS" ? getIslandNeighborGraph() : null;
 
@@ -2466,21 +2830,122 @@ function drawCanvas() {
       context.fillStyle = fillColor;
       context.fill();
     });
+  }
 
-    // 5. Draw border hierarchy (country > province > local) after fills.
+  // 5. Draw context layers between land fill and borders.
+  drawPhysicalLayer(k, { interactive: isInteractingFrame });
+  drawUrbanLayer(k, { interactive: isInteractingFrame });
+  drawRiversLayer(k, { interactive: isInteractingFrame });
+
+  // 6. Draw border hierarchy (country > province > local) after fills.
+  if (state.landData?.features?.length) {
     drawHierarchicalBorders(k, { interactive: isInteractingFrame });
   }
+}
+
+function ensureSpecialZoneEditorState() {
+  if (!state.manualSpecialZones || state.manualSpecialZones.type !== "FeatureCollection") {
+    state.manualSpecialZones = { type: "FeatureCollection", features: [] };
+  }
+  if (!Array.isArray(state.manualSpecialZones.features)) {
+    state.manualSpecialZones.features = [];
+  }
+  if (!state.specialZoneEditor || typeof state.specialZoneEditor !== "object") {
+    state.specialZoneEditor = {};
+  }
+  if (!Array.isArray(state.specialZoneEditor.vertices)) {
+    state.specialZoneEditor.vertices = [];
+  }
+  if (!Number.isFinite(Number(state.specialZoneEditor.counter))) {
+    state.specialZoneEditor.counter = 1;
+  }
+  if (!state.specialZoneEditor.zoneType) {
+    state.specialZoneEditor.zoneType = DEFAULT_SPECIAL_ZONE_TYPE;
+  }
+  if (typeof state.specialZoneEditor.label !== "string") {
+    state.specialZoneEditor.label = "";
+  }
+  if (state.specialZoneEditor.selectedId === undefined) {
+    state.specialZoneEditor.selectedId = null;
+  }
+}
+
+function getManualSpecialZoneFeatures() {
+  ensureSpecialZoneEditorState();
+  return state.manualSpecialZones.features || [];
+}
+
+function getEffectiveSpecialZonesFeatureCollection() {
+  const topologyFeatures = Array.isArray(state.specialZonesData?.features)
+    ? state.specialZonesData.features
+    : [];
+  const manualFeatures = getManualSpecialZoneFeatures();
+  const features = [
+    ...topologyFeatures.map((feature, index) => ({
+      ...feature,
+      properties: {
+        ...(feature?.properties || {}),
+        __source: "topology",
+        id: String(feature?.properties?.id || `special_zone_topology_${index + 1}`),
+      },
+    })),
+    ...manualFeatures.map((feature, index) => ({
+      ...feature,
+      properties: {
+        ...(feature?.properties || {}),
+        __source: "manual",
+        id: String(feature?.properties?.id || `manual_sz_${index + 1}`),
+      },
+    })),
+  ];
+  return { type: "FeatureCollection", features };
+}
+
+function getSpecialZoneStyle(feature) {
+  const config = state.styleConfig?.specialZones || {};
+  const type = String(feature?.properties?.type || "").toLowerCase();
+  const fillOpacity = clamp(Number.isFinite(Number(config.opacity)) ? Number(config.opacity) : 0.32, 0, 1);
+  const strokeWidth = clamp(Number.isFinite(Number(config.strokeWidth)) ? Number(config.strokeWidth) : 1.3, 0.4, 4);
+  const dashStyle = String(config.dashStyle || "dashed");
+  const dash = getDashPattern(dashStyle, strokeWidth);
+
+  if (type === "disputed") {
+    return {
+      fill: getSafeCanvasColor(config.disputedFill, "#f97316"),
+      stroke: getSafeCanvasColor(config.disputedStroke, "#ea580c"),
+      fillOpacity,
+      strokeWidth,
+      dash,
+    };
+  }
+  if (type === "wasteland") {
+    return {
+      fill: getSafeCanvasColor(config.wastelandFill, "#dc2626"),
+      stroke: getSafeCanvasColor(config.wastelandStroke, "#b91c1c"),
+      fillOpacity,
+      strokeWidth,
+      dash,
+    };
+  }
+  return {
+    fill: getSafeCanvasColor(config.customFill, "#8b5cf6"),
+    stroke: getSafeCanvasColor(config.customStroke, "#6d28d9"),
+    fillOpacity,
+    strokeWidth,
+    dash,
+  };
 }
 
 function updateSpecialZonesPaths() {
   if (!specialZonesGroup || !pathSVG) return;
 
-  const features = state.specialZonesData?.features || [];
+  const features = getEffectiveSpecialZonesFeatureCollection().features;
   if (!features.length) {
     specialZonesGroup.selectAll("path.special-zone").remove();
     return;
   }
 
+  const selectedId = String(state.specialZoneEditor?.selectedId || "");
   const selection = specialZonesGroup
     .selectAll("path.special-zone")
     .data(features, (d, i) => d?.properties?.id || `special-zone-${i}`);
@@ -2492,22 +2957,96 @@ function updateSpecialZonesPaths() {
     .attr("vector-effect", "non-scaling-stroke")
     .merge(selection)
     .attr("d", pathSVG)
-    .attr("fill", (d) => {
-      const type = d?.properties?.type || "";
-      if (type === "disputed") return "rgba(249,115,22,0.15)";
-      if (type === "wasteland") return "rgba(220,38,38,0.12)";
-      return "none";
+    .attr("fill", (d) => getSpecialZoneStyle(d).fill)
+    .attr("fill-opacity", (d) => getSpecialZoneStyle(d).fillOpacity)
+    .attr("stroke", (d) => getSpecialZoneStyle(d).stroke)
+    .attr("stroke-width", (d) => {
+      const base = getSpecialZoneStyle(d).strokeWidth;
+      const id = String(d?.properties?.id || "");
+      return id && id === selectedId ? base + 0.9 : base;
     })
-    .attr("stroke", (d) => {
-      const type = d?.properties?.type || "";
-      if (type === "disputed") return "#f97316";
-      if (type === "wasteland") return "#dc2626";
-      return "#111827";
-    })
-    .attr("stroke-width", 1.2)
-    .attr("opacity", 0.85);
+    .attr("stroke-dasharray", (d) => getSpecialZoneStyle(d).dash.join(" "))
+    .attr("opacity", 0.95);
 
   selection.exit().remove();
+}
+
+function renderSpecialZoneEditorOverlay() {
+  if (!specialZoneEditorGroup || !pathSVG) return;
+  ensureSpecialZoneEditorState();
+
+  const vertices = state.specialZoneEditor.vertices || [];
+  const isActive = !!state.specialZoneEditor.active;
+
+  if (!isActive || vertices.length === 0) {
+    specialZoneEditorGroup.selectAll("*").remove();
+    return;
+  }
+
+  const lineFeature = {
+    type: "Feature",
+    geometry: {
+      type: "LineString",
+      coordinates: vertices,
+    },
+    properties: {},
+  };
+  const polygonFeature = vertices.length >= 3
+    ? {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [[...vertices, vertices[0]]],
+      },
+      properties: {},
+    }
+    : null;
+
+  const style = getSpecialZoneStyle({
+    properties: { type: state.specialZoneEditor.zoneType || DEFAULT_SPECIAL_ZONE_TYPE },
+  });
+
+  const paths = [];
+  if (polygonFeature) paths.push({ id: "draw-poly", feature: polygonFeature, fill: true });
+  paths.push({ id: "draw-line", feature: lineFeature, fill: false });
+
+  const pathSelection = specialZoneEditorGroup
+    .selectAll("path.special-zone-editor-path")
+    .data(paths, (d) => d.id);
+
+  pathSelection
+    .enter()
+    .append("path")
+    .attr("class", "special-zone-editor-path")
+    .attr("vector-effect", "non-scaling-stroke")
+    .merge(pathSelection)
+    .attr("d", (d) => pathSVG(d.feature))
+    .attr("fill", (d) => (d.fill ? style.fill : "none"))
+    .attr("fill-opacity", (d) => (d.fill ? Math.min(style.fillOpacity * 0.85, 0.6) : 0))
+    .attr("stroke", style.stroke)
+    .attr("stroke-width", Math.max(1.2, style.strokeWidth + 0.5))
+    .attr("stroke-dasharray", style.dash.join(" "));
+
+  pathSelection.exit().remove();
+
+  const points = vertices.map((coord, index) => ({ coord, key: `v-${index}` }));
+  const pointSelection = specialZoneEditorGroup
+    .selectAll("circle.special-zone-editor-point")
+    .data(points, (d) => d.key);
+
+  pointSelection
+    .enter()
+    .append("circle")
+    .attr("class", "special-zone-editor-point")
+    .merge(pointSelection)
+    .attr("r", 3.4)
+    .attr("cx", (d) => projection(d.coord)?.[0] ?? -9999)
+    .attr("cy", (d) => projection(d.coord)?.[1] ?? -9999)
+    .attr("fill", "#ffffff")
+    .attr("stroke", style.stroke)
+    .attr("stroke-width", 1.3);
+
+  pointSelection.exit().remove();
 }
 
 function renderHoverOverlay() {
@@ -2540,12 +3079,17 @@ function renderHoverOverlay() {
 }
 
 function renderSpecialZones() {
-  if (!specialZonesGroup) return;
-  if (!state.showSpecialZones) {
+  if (!specialZonesGroup || !specialZoneEditorGroup) return;
+  updateSpecialZonesPaths();
+  renderSpecialZoneEditorOverlay();
+  const isDrawing = !!state.specialZoneEditor?.active;
+  if (!state.showSpecialZones && !isDrawing) {
     specialZonesGroup.attr("display", "none");
+    specialZoneEditorGroup.attr("display", "none");
     return;
   }
-  specialZonesGroup.attr("display", null);
+  specialZonesGroup.attr("display", state.showSpecialZones ? null : "none");
+  specialZoneEditorGroup.attr("display", null);
 }
 
 export function renderLegend(uniqueColors = null, labels = null) {
@@ -2697,11 +3241,151 @@ function autoFillMap(mode = "region") {
   }
 }
 
+function getMapLonLatFromEvent(event) {
+  if (!projection || !interactionRect?.node || !globalThis.d3?.pointer) return null;
+  const [sx, sy] = globalThis.d3.pointer(event, interactionRect.node());
+  if (![sx, sy].every(Number.isFinite)) return null;
+  const t = state.zoomTransform || globalThis.d3.zoomIdentity;
+  const k = Math.max(0.0001, t.k || 1);
+  const mapX = (sx - t.x) / k;
+  const mapY = (sy - t.y) / k;
+  const lonLat = projection.invert([mapX, mapY]);
+  if (!Array.isArray(lonLat) || lonLat.length < 2) return null;
+  const lon = Number(lonLat[0]);
+  const lat = Number(lonLat[1]);
+  if (!Number.isFinite(lon) || !Number.isFinite(lat)) return null;
+  return [lon, clamp(lat, -90, 90)];
+}
+
+function updateSpecialZoneEditorUI() {
+  if (typeof state.updateSpecialZoneEditorUIFn === "function") {
+    state.updateSpecialZoneEditorUIFn();
+  }
+}
+
+function ensureManualSpecialZoneCounter() {
+  ensureSpecialZoneEditorState();
+  const used = new Set(
+    getManualSpecialZoneFeatures().map((feature) => String(feature?.properties?.id || ""))
+  );
+  let counter = Math.max(1, Number(state.specialZoneEditor.counter) || 1);
+  while (used.has(`manual_sz_${counter}`)) {
+    counter += 1;
+  }
+  state.specialZoneEditor.counter = counter;
+}
+
+function appendSpecialZoneVertexFromEvent(event) {
+  ensureSpecialZoneEditorState();
+  const coord = getMapLonLatFromEvent(event);
+  if (!coord) return false;
+  state.specialZoneEditor.vertices.push(coord);
+  updateSpecialZoneEditorUI();
+  renderSpecialZoneEditorOverlay();
+  return true;
+}
+
+function startSpecialZoneDraw({ zoneType = DEFAULT_SPECIAL_ZONE_TYPE, label = "" } = {}) {
+  ensureSpecialZoneEditorState();
+  state.specialZoneEditor.active = true;
+  state.specialZoneEditor.vertices = [];
+  state.specialZoneEditor.zoneType = String(zoneType || DEFAULT_SPECIAL_ZONE_TYPE);
+  state.specialZoneEditor.label = String(label || "");
+  updateSpecialZoneEditorUI();
+  if (context) render();
+}
+
+function undoSpecialZoneVertex() {
+  ensureSpecialZoneEditorState();
+  if (!state.specialZoneEditor.active || !state.specialZoneEditor.vertices.length) return;
+  state.specialZoneEditor.vertices.pop();
+  updateSpecialZoneEditorUI();
+  if (context) render();
+}
+
+function cancelSpecialZoneDraw() {
+  ensureSpecialZoneEditorState();
+  state.specialZoneEditor.active = false;
+  state.specialZoneEditor.vertices = [];
+  updateSpecialZoneEditorUI();
+  if (context) render();
+}
+
+function finishSpecialZoneDraw() {
+  ensureSpecialZoneEditorState();
+  const vertices = state.specialZoneEditor.vertices || [];
+  if (!state.specialZoneEditor.active || vertices.length < 3) {
+    cancelSpecialZoneDraw();
+    return false;
+  }
+
+  ensureManualSpecialZoneCounter();
+  const id = `manual_sz_${state.specialZoneEditor.counter}`;
+  const zoneType = String(state.specialZoneEditor.zoneType || DEFAULT_SPECIAL_ZONE_TYPE);
+  const labelText = String(state.specialZoneEditor.label || `${zoneType} zone`).trim() || `${zoneType} zone`;
+  const feature = {
+    type: "Feature",
+    properties: {
+      id,
+      name: labelText,
+      label: labelText,
+      type: zoneType,
+      claimants: [],
+      cntr_code: "",
+      __source: "manual",
+    },
+    geometry: {
+      type: "Polygon",
+      coordinates: [[...vertices, vertices[0]]],
+    },
+  };
+  state.manualSpecialZones.features.push(feature);
+  state.specialZoneEditor.counter += 1;
+  state.specialZoneEditor.selectedId = id;
+  state.specialZoneEditor.active = false;
+  state.specialZoneEditor.vertices = [];
+  updateSpecialZoneEditorUI();
+  if (context) render();
+  return true;
+}
+
+function selectSpecialZoneById(id) {
+  ensureSpecialZoneEditorState();
+  const next = String(id || "").trim();
+  state.specialZoneEditor.selectedId = next || null;
+  updateSpecialZoneEditorUI();
+  if (context) render();
+}
+
+function deleteSelectedManualSpecialZone() {
+  ensureSpecialZoneEditorState();
+  const selectedId = String(state.specialZoneEditor.selectedId || "").trim();
+  if (!selectedId) return false;
+  const before = getManualSpecialZoneFeatures().length;
+  state.manualSpecialZones.features = getManualSpecialZoneFeatures().filter(
+    (feature) => String(feature?.properties?.id || "").trim() !== selectedId
+  );
+  const removed = before - state.manualSpecialZones.features.length;
+  if (removed > 0) {
+    state.specialZoneEditor.selectedId = null;
+    updateSpecialZoneEditorUI();
+    if (context) render();
+    return true;
+  }
+  return false;
+}
+
 function handleMouseMove(event) {
   const now = performance.now();
   if (now - state.lastMouseMoveTime < state.MOUSE_THROTTLE_MS) return;
   state.lastMouseMoveTime = now;
   if (!state.landData) return;
+  if (state.specialZoneEditor?.active) {
+    state.hoveredId = null;
+    renderHoverOverlay();
+    if (tooltip) tooltip.style.opacity = "0";
+    return;
+  }
 
   const reducedHoverPhase = state.renderPhase !== RENDER_PHASE_IDLE;
   const hit = getHitFromEvent(event, {
@@ -2755,6 +3439,10 @@ function resolveInteractionTargetIds(feature, id) {
 
 function handleClick(event) {
   if (!state.landData) return;
+  if (state.specialZoneEditor?.active) {
+    appendSpecialZoneVertexFromEvent(event);
+    return;
+  }
 
   const hit = getHitFromEvent(event, {
     enableSnap: true,
@@ -2824,6 +3512,12 @@ function handleClick(event) {
   ) {
     state.renderCountryListFn();
   }
+}
+
+function handleDoubleClick(event) {
+  if (!state.specialZoneEditor?.active) return;
+  if (event?.preventDefault) event.preventDefault();
+  finishSpecialZoneDraw();
 }
 
 function calculatePanExtent() {
@@ -2911,6 +3605,7 @@ function fitProjection() {
   rebuildProjectedBoundsCache();
   buildSpatialIndex();
   updateSpecialZonesPaths();
+  renderSpecialZoneEditorOverlay();
   updateZoomTranslateExtent();
 }
 
@@ -2948,7 +3643,9 @@ function initZoom() {
     });
 
   updateZoomTranslateExtent();
-  globalThis.d3.select(interactionRect.node()).call(zoomBehavior);
+  const zoomTarget = globalThis.d3.select(interactionRect.node());
+  zoomTarget.call(zoomBehavior);
+  zoomTarget.on("dblclick.zoom", null);
   resetZoomToFit();
   enforceZoomConstraints();
 }
@@ -2962,6 +3659,7 @@ function bindEvents() {
     if (tooltip) tooltip.style.opacity = "0";
   });
   interactionRect.on("click", handleClick);
+  interactionRect.on("dblclick", handleDoubleClick);
   window.addEventListener("resize", handleResize);
 }
 
@@ -2992,6 +3690,9 @@ function initMap({ containerId = "mapContainer" } = {}) {
   projection.clipExtent(null);
   pathSVG = globalThis.d3.geoPath(projection).pointRadius(PATH_POINT_RADIUS);
   pathCanvas = globalThis.d3.geoPath(projection, context).pointRadius(PATH_POINT_RADIUS);
+  layerResolverCache.primaryRef = null;
+  layerResolverCache.detailRef = null;
+  layerResolverCache.bundleMode = null;
   ensureLayerDataFromTopology();
 
   state.colorCanvas = mapCanvas;
@@ -3028,6 +3729,9 @@ function setMapData() {
   clearRenderPhaseTimer();
   setRenderPhase(RENDER_PHASE_IDLE);
   resetRenderDiagnostics();
+  layerResolverCache.primaryRef = null;
+  layerResolverCache.detailRef = null;
+  layerResolverCache.bundleMode = null;
   ensureLayerDataFromTopology();
   const primaryTopology = state.topologyPrimary || state.topology;
   const detailTopology = state.topologyBundleMode === "composite" ? state.topologyDetail : null;
@@ -3070,6 +3774,12 @@ export {
   setMapData,
   render,
   autoFillMap,
+  startSpecialZoneDraw,
+  undoSpecialZoneVertex,
+  finishSpecialZoneDraw,
+  cancelSpecialZoneDraw,
+  deleteSelectedManualSpecialZone,
+  selectSpecialZoneById,
   rebuildStaticMeshes,
   invalidateBorderCache,
   refreshColorState,

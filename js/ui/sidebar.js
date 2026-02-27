@@ -822,6 +822,10 @@ function initSidebar({ render } = {}) {
         state.countryBaseColors = data.countryBaseColors || {};
         state.featureOverrides = data.featureOverrides || {};
         state.specialZones = data.specialZones || {};
+        state.manualSpecialZones =
+          data.manualSpecialZones && data.manualSpecialZones.type === "FeatureCollection"
+            ? data.manualSpecialZones
+            : { type: "FeatureCollection", features: [] };
         const supportedCountries = Array.isArray(state.parentBorderSupportedCountries)
           ? state.parentBorderSupportedCountries
           : [];
@@ -843,8 +847,50 @@ function initSidebar({ render } = {}) {
             ...data.styleConfig.parentBorders,
           };
         }
+        if (data.styleConfig?.ocean && typeof data.styleConfig.ocean === "object") {
+          state.styleConfig.ocean = {
+            ...(state.styleConfig.ocean || {}),
+            ...data.styleConfig.ocean,
+          };
+        }
+        if (data.styleConfig?.urban && typeof data.styleConfig.urban === "object") {
+          state.styleConfig.urban = {
+            ...(state.styleConfig.urban || {}),
+            ...data.styleConfig.urban,
+          };
+        }
+        if (data.styleConfig?.physical && typeof data.styleConfig.physical === "object") {
+          state.styleConfig.physical = {
+            ...(state.styleConfig.physical || {}),
+            ...data.styleConfig.physical,
+          };
+        }
+        if (data.styleConfig?.rivers && typeof data.styleConfig.rivers === "object") {
+          state.styleConfig.rivers = {
+            ...(state.styleConfig.rivers || {}),
+            ...data.styleConfig.rivers,
+          };
+        }
+        if (data.styleConfig?.specialZones && typeof data.styleConfig.specialZones === "object") {
+          state.styleConfig.specialZones = {
+            ...(state.styleConfig.specialZones || {}),
+            ...data.styleConfig.specialZones,
+          };
+        }
+        if (data.layerVisibility && typeof data.layerVisibility === "object") {
+          state.showUrban = !!data.layerVisibility.showUrban;
+          state.showPhysical = !!data.layerVisibility.showPhysical;
+          state.showRivers = !!data.layerVisibility.showRivers;
+          state.showSpecialZones =
+            data.layerVisibility.showSpecialZones === undefined
+              ? true
+              : !!data.layerVisibility.showSpecialZones;
+        }
         if (typeof state.updateParentBorderCountryListFn === "function") {
           state.updateParentBorderCountryListFn();
+        }
+        if (typeof state.updateSpecialZoneEditorUIFn === "function") {
+          state.updateSpecialZoneEditorUIFn();
         }
         mapRenderer.refreshColorState({ renderNow: false });
         if (render) render();

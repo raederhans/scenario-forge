@@ -78,8 +78,8 @@ This document is a technical reference for contributors and future agents workin
 
 ### Hybrid renderer model
 `js/core/map_renderer.js` uses two rendering surfaces:
-- Canvas (`#map-canvas`): high-volume geometry draw path (ocean + political fill/stroke).
-- SVG (`#map-svg`): interaction rectangle + overlays (hover highlight, special zones, legend).
+- Canvas (`#map-canvas`): high-volume geometry draw path (`ocean -> political -> physical -> urban -> rivers -> borders`).
+- SVG (`#map-svg`): interaction rectangle + overlays (hover highlight, special zones, editor preview, legend).
 
 This keeps heavy polygon drawing off the DOM while preserving SVG ergonomics for overlay layers.
 
@@ -91,7 +91,18 @@ Ocean rendering sequence on canvas:
      - `sphere_minus_land` fallback when topology ocean coverage is too small.
    - As of 2026-02-24, advanced presets are temporarily runtime-disabled for performance stabilization.
 3. Political land fills.
-4. Hierarchical borders (`local -> province -> country -> coastline`), with zoom-aware styling.
+4. Context layers (`physical`, `urban`, `rivers`) with style-configurable blend/opacity/line systems.
+5. Hierarchical borders (`local -> province -> parent -> country -> coastline`), with zoom-aware styling.
+
+Context layer source resolution:
+- Runtime resolver evaluates `primary` vs `detail` per layer via:
+  - `computeLayerCoverageScore(collection)`
+  - `pickBestLayerSource(primary, detail, policy)`
+  - `resolveContextLayerData(layerName)`
+- Resolver records diagnostics in:
+  - `state.contextLayerSourceByName`
+  - `state.layerDataDiagnostics`
+- `special_zones` supports detail-first fallback when primary layer is missing.
 
 ### State and interaction model
 - Global mutable state lives in `state.js`.
@@ -178,13 +189,30 @@ Implemented in `map_renderer.js` + `init_map_data.py`:
   - Validate ocean bbox against global thresholds (`width >= 220°`, `height >= 90°` on global builds).
   - If invalid, force fallback ocean geometry from `world_bbox - unary_union(land_bg)`.
 
-## Current Baseline Metrics (from `data/europe_topology.json`)
+### Special Zone Manual Editor (Project-local)
+Implemented in `map_renderer.js` + `toolbar.js` + `file_manager.js`:
+- Draw model: `Vertex Polygon` (click add vertex, double-click finish).
+- Runtime state:
+  - `state.manualSpecialZones` (FeatureCollection)
+  - `state.specialZoneEditor` (active/type/label/vertices/selectedId/counter)
+- Effective render set:
+  - `topology special_zones + manualSpecialZones`.
+- Styling:
+  - type-aware (`disputed`, `wasteland`, `custom`) fill/stroke palette from `styleConfig.specialZones`.
+- Persistence:
+  - Project schema v4 includes `manualSpecialZones` and all context style/visibility fields.
+
+## Current Baseline Metrics
+`data/europe_topology.json` (primary):
 - File size: `3,391,805` bytes (~3.2 MB)
-- Objects: political, special_zones, ocean, land, urban, physical, rivers
+- Objects: political, ocean, land, urban, physical, rivers
 - Arcs: `36,370`
 - Political geometries: `199`
 - Ocean geometries: `2` (known sparse-coverage input; frontend fallback handles runtime masking)
 - Embedded political neighbor rows: `199`
+
+`data/europe_topology.highres.json` / `.bak` (detail):
+- Includes `special_zones` object (`2` features), used as runtime fallback source.
 
 ## Architectural Notes
 - The pipeline now targets global Admin-0 with compatibility-preserving output path names.

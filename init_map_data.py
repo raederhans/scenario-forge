@@ -190,6 +190,20 @@ def ensure_ocean_coverage(
     return fallback
 
 
+def log_layer_coverage(layer_name: str, gdf: gpd.GeoDataFrame, bounds: Iterable[float]) -> None:
+    width, height, ratio = _compute_bbox_metrics(gdf, bounds)
+    count = 0 if gdf is None else len(gdf)
+    print(
+        f"[Layer Coverage] {layer_name}: features={count}, "
+        f"bbox width={width:.2f}°, height={height:.2f}°, ratio={ratio:.4f}"
+    )
+    if count > 0 and ratio < 0.02:
+        print(
+            f"[Layer Coverage] WARNING {layer_name} coverage appears low (ratio={ratio:.4f}); "
+            "fallback source may be required at runtime."
+        )
+
+
 def fetch_geojson(url: str) -> dict:
     print("Downloading GeoJSON...")
     try:
@@ -781,31 +795,33 @@ def main() -> None:
         hybrid = apply_russia_ukraine_replacement(hybrid)
         hybrid = apply_poland_replacement(hybrid)
         hybrid = apply_china_replacement(hybrid)
-        try:
-            print("Downloading India ADM2 (raw) for special zones...")
-            india_raw = fetch_or_load_geojson(
-                cfg.IND_ADM2_URL,
-                cfg.IND_ADM2_FILENAME,
-                fallback_urls=cfg.IND_ADM2_FALLBACK_URLS,
-            )
-            if india_raw.empty:
-                print("[Special Zones] India ADM2 GeoDataFrame is empty; skipping disputed zone.")
-            else:
-                if india_raw.crs is None:
-                    india_raw = india_raw.set_crs("EPSG:4326", allow_override=True)
-                if india_raw.crs.to_epsg() != 4326:
-                    india_raw = india_raw.to_crs("EPSG:4326")
-                china_gdf = hybrid[
-                    hybrid["cntr_code"].astype(str).str.upper() == "CN"
-                ].copy()
-                special_zones = build_special_zones(china_gdf, india_raw)
-                if special_zones.empty:
-                    print("[Special Zones] No special zones were generated.")
-                else:
-                    print(f"[Special Zones] Generated {len(special_zones)} special zones.")
-        except Exception as exc:
-            print(f"[Special Zones] Failed to build special zones; continuing without: {exc}")
         hybrid = apply_south_asia_replacement(hybrid, land_bg_clipped)
+
+    # Build special zones for both skeleton and enriched pipelines.
+    try:
+        print("Downloading India ADM2 (raw) for special zones...")
+        india_raw = fetch_or_load_geojson(
+            cfg.IND_ADM2_URL,
+            cfg.IND_ADM2_FILENAME,
+            fallback_urls=cfg.IND_ADM2_FALLBACK_URLS,
+        )
+        if india_raw.empty:
+            print("[Special Zones] India ADM2 GeoDataFrame is empty; skipping disputed zone.")
+        else:
+            if india_raw.crs is None:
+                india_raw = india_raw.set_crs("EPSG:4326", allow_override=True)
+            if india_raw.crs.to_epsg() != 4326:
+                india_raw = india_raw.to_crs("EPSG:4326")
+            china_gdf = hybrid[
+                hybrid["cntr_code"].astype(str).str.upper() == "CN"
+            ].copy()
+            special_zones = build_special_zones(china_gdf, india_raw)
+            if special_zones.empty:
+                print("[Special Zones] No special zones were generated.")
+            else:
+                print(f"[Special Zones] Generated {len(special_zones)} special zones.")
+    except Exception as exc:
+        print(f"[Special Zones] Failed to build special zones; continuing without: {exc}")
 
     final_hybrid = hybrid.copy()
 
@@ -887,6 +903,15 @@ def main() -> None:
     hybrid = cull_small_geometries(hybrid, "hybrid", group_col="id")
     final_hybrid = cull_small_geometries(final_hybrid, "political", group_col="id")
     special_zones = cull_small_geometries(special_zones, "special zones", group_col="id")
+
+    target_bounds = getattr(cfg, "MAP_BOUNDS", cfg.GLOBAL_BOUNDS)
+    log_layer_coverage("political", final_hybrid, target_bounds)
+    log_layer_coverage("ocean", ocean_clipped, target_bounds)
+    log_layer_coverage("land", land_bg_clipped, target_bounds)
+    log_layer_coverage("urban", urban_clipped, target_bounds)
+    log_layer_coverage("physical", physical_filtered, target_bounds)
+    log_layer_coverage("rivers", rivers_clipped, target_bounds)
+    log_layer_coverage("special_zones", special_zones, target_bounds)
 
     # ── Validate and stabilize feature IDs ──────────────────────
     if "id" in final_hybrid.columns:

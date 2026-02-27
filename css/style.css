@@ -420,6 +420,7 @@ input[type="checkbox"].checkbox-input {
 .mt-2 { margin-top: 8px; }
 .mt-3 { margin-top: 12px; }
 .mt-4 { margin-top: 16px; }
+.ml-5 { margin-left: 20px; }
 .w-full { width: 100%; }
 .relative { position: relative; }
 .hidden { display: none !important; }

@@ -1,6 +1,15 @@
 // Toolbar UI (Phase 13)
 import { state, PALETTE_THEMES } from "../core/state.js";
-import { autoFillMap, refreshColorState } from "../core/map_renderer.js";
+import {
+  autoFillMap,
+  refreshColorState,
+  startSpecialZoneDraw,
+  undoSpecialZoneVertex,
+  finishSpecialZoneDraw,
+  cancelSpecialZoneDraw,
+  deleteSelectedManualSpecialZone,
+  selectSpecialZoneById,
+} from "../core/map_renderer.js";
 import { toggleLanguage, updateUIText, t } from "./i18n.js";
 
 function renderPalette(themeName) {
@@ -52,6 +61,42 @@ function initToolbar({ render } = {}) {
   const togglePhysical = document.getElementById("togglePhysical");
   const toggleRivers = document.getElementById("toggleRivers");
   const toggleSpecialZones = document.getElementById("toggleSpecialZones");
+  const urbanColor = document.getElementById("urbanColor");
+  const urbanOpacity = document.getElementById("urbanOpacity");
+  const urbanBlendMode = document.getElementById("urbanBlendMode");
+  const urbanMinArea = document.getElementById("urbanMinArea");
+  const physicalPreset = document.getElementById("physicalPreset");
+  const physicalTintColor = document.getElementById("physicalTintColor");
+  const physicalOpacity = document.getElementById("physicalOpacity");
+  const physicalContourColor = document.getElementById("physicalContourColor");
+  const physicalContourOpacity = document.getElementById("physicalContourOpacity");
+  const physicalContourWidth = document.getElementById("physicalContourWidth");
+  const physicalContourSpacing = document.getElementById("physicalContourSpacing");
+  const physicalBlendMode = document.getElementById("physicalBlendMode");
+  const riversColor = document.getElementById("riversColor");
+  const riversOpacity = document.getElementById("riversOpacity");
+  const riversWidth = document.getElementById("riversWidth");
+  const riversOutlineColor = document.getElementById("riversOutlineColor");
+  const riversOutlineWidth = document.getElementById("riversOutlineWidth");
+  const riversDashStyle = document.getElementById("riversDashStyle");
+  const specialZonesDisputedFill = document.getElementById("specialZonesDisputedFill");
+  const specialZonesDisputedStroke = document.getElementById("specialZonesDisputedStroke");
+  const specialZonesWastelandFill = document.getElementById("specialZonesWastelandFill");
+  const specialZonesWastelandStroke = document.getElementById("specialZonesWastelandStroke");
+  const specialZonesCustomFill = document.getElementById("specialZonesCustomFill");
+  const specialZonesCustomStroke = document.getElementById("specialZonesCustomStroke");
+  const specialZonesOpacity = document.getElementById("specialZonesOpacity");
+  const specialZonesStrokeWidth = document.getElementById("specialZonesStrokeWidth");
+  const specialZonesDashStyle = document.getElementById("specialZonesDashStyle");
+  const specialZoneTypeSelect = document.getElementById("specialZoneTypeSelect");
+  const specialZoneLabelInput = document.getElementById("specialZoneLabelInput");
+  const specialZoneStartBtn = document.getElementById("specialZoneStartBtn");
+  const specialZoneUndoBtn = document.getElementById("specialZoneUndoBtn");
+  const specialZoneFinishBtn = document.getElementById("specialZoneFinishBtn");
+  const specialZoneCancelBtn = document.getElementById("specialZoneCancelBtn");
+  const specialZoneFeatureList = document.getElementById("specialZoneFeatureList");
+  const specialZoneDeleteBtn = document.getElementById("specialZoneDeleteBtn");
+  const specialZoneEditorHint = document.getElementById("specialZoneEditorHint");
   const recentContainer = document.getElementById("recentColors");
   const presetPolitical = document.getElementById("presetPolitical");
   const presetClear = document.getElementById("presetClear");
@@ -90,6 +135,17 @@ function initToolbar({ render } = {}) {
   const coastlineWidthValue = document.getElementById("coastlineWidthValue");
   const parentBorderOpacityValue = document.getElementById("parentBorderOpacityValue");
   const parentBorderWidthValue = document.getElementById("parentBorderWidthValue");
+  const urbanOpacityValue = document.getElementById("urbanOpacityValue");
+  const urbanMinAreaValue = document.getElementById("urbanMinAreaValue");
+  const physicalOpacityValue = document.getElementById("physicalOpacityValue");
+  const physicalContourOpacityValue = document.getElementById("physicalContourOpacityValue");
+  const physicalContourWidthValue = document.getElementById("physicalContourWidthValue");
+  const physicalContourSpacingValue = document.getElementById("physicalContourSpacingValue");
+  const riversOpacityValue = document.getElementById("riversOpacityValue");
+  const riversWidthValue = document.getElementById("riversWidthValue");
+  const riversOutlineWidthValue = document.getElementById("riversOutlineWidthValue");
+  const specialZonesOpacityValue = document.getElementById("specialZonesOpacityValue");
+  const specialZonesStrokeWidthValue = document.getElementById("specialZonesStrokeWidthValue");
   const oceanTextureOpacityValue = document.getElementById("oceanTextureOpacityValue");
   const oceanTextureScaleValue = document.getElementById("oceanTextureScaleValue");
   const oceanContourStrengthValue = document.getElementById("oceanContourStrengthValue");
@@ -167,6 +223,134 @@ function initToolbar({ render } = {}) {
   if (!state.parentBorderEnabledByCountry || typeof state.parentBorderEnabledByCountry !== "object") {
     state.parentBorderEnabledByCountry = {};
   }
+  if (!state.styleConfig.urban || typeof state.styleConfig.urban !== "object") {
+    state.styleConfig.urban = {};
+  }
+  state.styleConfig.urban.color = normalizeOceanFillColor(state.styleConfig.urban.color || "#4b5563");
+  state.styleConfig.urban.opacity = clamp(
+    Number.isFinite(Number(state.styleConfig.urban.opacity)) ? Number(state.styleConfig.urban.opacity) : 0.22,
+    0,
+    1
+  );
+  state.styleConfig.urban.blendMode = String(state.styleConfig.urban.blendMode || "multiply");
+  state.styleConfig.urban.minAreaPx = clamp(
+    Number.isFinite(Number(state.styleConfig.urban.minAreaPx)) ? Number(state.styleConfig.urban.minAreaPx) : 8,
+    0,
+    80
+  );
+
+  if (!state.styleConfig.physical || typeof state.styleConfig.physical !== "object") {
+    state.styleConfig.physical = {};
+  }
+  state.styleConfig.physical.preset = String(state.styleConfig.physical.preset || "atlas_soft");
+  state.styleConfig.physical.tintColor = normalizeOceanFillColor(
+    state.styleConfig.physical.tintColor || "#8f6b4e"
+  );
+  state.styleConfig.physical.opacity = clamp(
+    Number.isFinite(Number(state.styleConfig.physical.opacity)) ? Number(state.styleConfig.physical.opacity) : 0.24,
+    0,
+    1
+  );
+  state.styleConfig.physical.contourColor = normalizeOceanFillColor(
+    state.styleConfig.physical.contourColor || "#6f4e37"
+  );
+  state.styleConfig.physical.contourOpacity = clamp(
+    Number.isFinite(Number(state.styleConfig.physical.contourOpacity))
+      ? Number(state.styleConfig.physical.contourOpacity)
+      : 0.30,
+    0,
+    1
+  );
+  state.styleConfig.physical.contourWidth = clamp(
+    Number.isFinite(Number(state.styleConfig.physical.contourWidth))
+      ? Number(state.styleConfig.physical.contourWidth)
+      : 0.7,
+    0.2,
+    2.5
+  );
+  state.styleConfig.physical.contourSpacing = clamp(
+    Number.isFinite(Number(state.styleConfig.physical.contourSpacing))
+      ? Number(state.styleConfig.physical.contourSpacing)
+      : 18,
+    8,
+    36
+  );
+  state.styleConfig.physical.blendMode = String(state.styleConfig.physical.blendMode || "multiply");
+
+  if (!state.styleConfig.rivers || typeof state.styleConfig.rivers !== "object") {
+    state.styleConfig.rivers = {};
+  }
+  state.styleConfig.rivers.color = normalizeOceanFillColor(state.styleConfig.rivers.color || "#3b82f6");
+  state.styleConfig.rivers.opacity = clamp(
+    Number.isFinite(Number(state.styleConfig.rivers.opacity)) ? Number(state.styleConfig.rivers.opacity) : 0.88,
+    0,
+    1
+  );
+  state.styleConfig.rivers.width = clamp(
+    Number.isFinite(Number(state.styleConfig.rivers.width)) ? Number(state.styleConfig.rivers.width) : 1.1,
+    0.2,
+    4
+  );
+  state.styleConfig.rivers.outlineColor = normalizeOceanFillColor(
+    state.styleConfig.rivers.outlineColor || "#e2efff"
+  );
+  state.styleConfig.rivers.outlineWidth = clamp(
+    Number.isFinite(Number(state.styleConfig.rivers.outlineWidth))
+      ? Number(state.styleConfig.rivers.outlineWidth)
+      : 0.9,
+    0,
+    3
+  );
+  state.styleConfig.rivers.dashStyle = String(state.styleConfig.rivers.dashStyle || "solid");
+
+  if (!state.styleConfig.specialZones || typeof state.styleConfig.specialZones !== "object") {
+    state.styleConfig.specialZones = {};
+  }
+  state.styleConfig.specialZones.disputedFill = normalizeOceanFillColor(
+    state.styleConfig.specialZones.disputedFill || "#f97316"
+  );
+  state.styleConfig.specialZones.disputedStroke = normalizeOceanFillColor(
+    state.styleConfig.specialZones.disputedStroke || "#ea580c"
+  );
+  state.styleConfig.specialZones.wastelandFill = normalizeOceanFillColor(
+    state.styleConfig.specialZones.wastelandFill || "#dc2626"
+  );
+  state.styleConfig.specialZones.wastelandStroke = normalizeOceanFillColor(
+    state.styleConfig.specialZones.wastelandStroke || "#b91c1c"
+  );
+  state.styleConfig.specialZones.customFill = normalizeOceanFillColor(
+    state.styleConfig.specialZones.customFill || "#8b5cf6"
+  );
+  state.styleConfig.specialZones.customStroke = normalizeOceanFillColor(
+    state.styleConfig.specialZones.customStroke || "#6d28d9"
+  );
+  state.styleConfig.specialZones.opacity = clamp(
+    Number.isFinite(Number(state.styleConfig.specialZones.opacity))
+      ? Number(state.styleConfig.specialZones.opacity)
+      : 0.32,
+    0,
+    1
+  );
+  state.styleConfig.specialZones.strokeWidth = clamp(
+    Number.isFinite(Number(state.styleConfig.specialZones.strokeWidth))
+      ? Number(state.styleConfig.specialZones.strokeWidth)
+      : 1.3,
+    0.4,
+    4
+  );
+  state.styleConfig.specialZones.dashStyle = String(state.styleConfig.specialZones.dashStyle || "dashed");
+
+  if (!state.manualSpecialZones || state.manualSpecialZones.type !== "FeatureCollection") {
+    state.manualSpecialZones = { type: "FeatureCollection", features: [] };
+  }
+  if (!Array.isArray(state.manualSpecialZones.features)) {
+    state.manualSpecialZones.features = [];
+  }
+  if (!state.specialZoneEditor || typeof state.specialZoneEditor !== "object") {
+    state.specialZoneEditor = {};
+  }
+  state.specialZoneEditor.zoneType = String(state.specialZoneEditor.zoneType || "custom");
+  state.specialZoneEditor.label = String(state.specialZoneEditor.label || "");
 
   if (oceanFillColor) {
     oceanFillColor.value = state.styleConfig.ocean.fillColor;
@@ -257,6 +441,127 @@ function initToolbar({ render } = {}) {
     });
   }
   state.updateParentBorderCountryListFn = renderParentBorderCountryList;
+
+  function renderSpecialZoneEditorUI() {
+    if (toggleUrban) toggleUrban.checked = !!state.showUrban;
+    if (togglePhysical) togglePhysical.checked = !!state.showPhysical;
+    if (toggleRivers) toggleRivers.checked = !!state.showRivers;
+    if (toggleSpecialZones) toggleSpecialZones.checked = !!state.showSpecialZones;
+
+    if (urbanColor) urbanColor.value = state.styleConfig.urban.color;
+    if (urbanOpacity) urbanOpacity.value = String(Math.round(state.styleConfig.urban.opacity * 100));
+    if (urbanOpacityValue) urbanOpacityValue.textContent = `${Math.round(state.styleConfig.urban.opacity * 100)}%`;
+    if (urbanBlendMode) urbanBlendMode.value = state.styleConfig.urban.blendMode;
+    if (urbanMinArea) urbanMinArea.value = String(Math.round(state.styleConfig.urban.minAreaPx));
+    if (urbanMinAreaValue) urbanMinAreaValue.textContent = `${Math.round(state.styleConfig.urban.minAreaPx)}`;
+
+    if (physicalPreset) physicalPreset.value = state.styleConfig.physical.preset;
+    if (physicalTintColor) physicalTintColor.value = state.styleConfig.physical.tintColor;
+    if (physicalOpacity) physicalOpacity.value = String(Math.round(state.styleConfig.physical.opacity * 100));
+    if (physicalOpacityValue) {
+      physicalOpacityValue.textContent = `${Math.round(state.styleConfig.physical.opacity * 100)}%`;
+    }
+    if (physicalContourColor) physicalContourColor.value = state.styleConfig.physical.contourColor;
+    if (physicalContourOpacity) {
+      physicalContourOpacity.value = String(Math.round(state.styleConfig.physical.contourOpacity * 100));
+    }
+    if (physicalContourOpacityValue) {
+      physicalContourOpacityValue.textContent = `${Math.round(state.styleConfig.physical.contourOpacity * 100)}%`;
+    }
+    if (physicalContourWidth) {
+      physicalContourWidth.value = String(Number(state.styleConfig.physical.contourWidth).toFixed(2));
+    }
+    if (physicalContourWidthValue) {
+      physicalContourWidthValue.textContent = Number(state.styleConfig.physical.contourWidth).toFixed(2);
+    }
+    if (physicalContourSpacing) {
+      physicalContourSpacing.value = String(Math.round(state.styleConfig.physical.contourSpacing));
+    }
+    if (physicalContourSpacingValue) {
+      physicalContourSpacingValue.textContent = `${Math.round(state.styleConfig.physical.contourSpacing)}`;
+    }
+    if (physicalBlendMode) physicalBlendMode.value = state.styleConfig.physical.blendMode;
+
+    if (riversColor) riversColor.value = state.styleConfig.rivers.color;
+    if (riversOpacity) riversOpacity.value = String(Math.round(state.styleConfig.rivers.opacity * 100));
+    if (riversOpacityValue) riversOpacityValue.textContent = `${Math.round(state.styleConfig.rivers.opacity * 100)}%`;
+    if (riversWidth) riversWidth.value = String(Number(state.styleConfig.rivers.width).toFixed(2));
+    if (riversWidthValue) riversWidthValue.textContent = Number(state.styleConfig.rivers.width).toFixed(2);
+    if (riversOutlineColor) riversOutlineColor.value = state.styleConfig.rivers.outlineColor;
+    if (riversOutlineWidth) {
+      riversOutlineWidth.value = String(Number(state.styleConfig.rivers.outlineWidth).toFixed(2));
+    }
+    if (riversOutlineWidthValue) {
+      riversOutlineWidthValue.textContent = Number(state.styleConfig.rivers.outlineWidth).toFixed(2);
+    }
+    if (riversDashStyle) riversDashStyle.value = state.styleConfig.rivers.dashStyle;
+
+    if (specialZonesDisputedFill) specialZonesDisputedFill.value = state.styleConfig.specialZones.disputedFill;
+    if (specialZonesDisputedStroke) specialZonesDisputedStroke.value = state.styleConfig.specialZones.disputedStroke;
+    if (specialZonesWastelandFill) specialZonesWastelandFill.value = state.styleConfig.specialZones.wastelandFill;
+    if (specialZonesWastelandStroke) {
+      specialZonesWastelandStroke.value = state.styleConfig.specialZones.wastelandStroke;
+    }
+    if (specialZonesCustomFill) specialZonesCustomFill.value = state.styleConfig.specialZones.customFill;
+    if (specialZonesCustomStroke) specialZonesCustomStroke.value = state.styleConfig.specialZones.customStroke;
+    if (specialZonesOpacity) specialZonesOpacity.value = String(Math.round(state.styleConfig.specialZones.opacity * 100));
+    if (specialZonesOpacityValue) {
+      specialZonesOpacityValue.textContent = `${Math.round(state.styleConfig.specialZones.opacity * 100)}%`;
+    }
+    if (specialZonesStrokeWidth) {
+      specialZonesStrokeWidth.value = String(Number(state.styleConfig.specialZones.strokeWidth).toFixed(2));
+    }
+    if (specialZonesStrokeWidthValue) {
+      specialZonesStrokeWidthValue.textContent = Number(state.styleConfig.specialZones.strokeWidth).toFixed(2);
+    }
+    if (specialZonesDashStyle) specialZonesDashStyle.value = state.styleConfig.specialZones.dashStyle;
+
+    const manualFeatures = Array.isArray(state.manualSpecialZones?.features)
+      ? state.manualSpecialZones.features
+      : [];
+    if (specialZoneFeatureList) {
+      const selectedId = state.specialZoneEditor?.selectedId || "";
+      specialZoneFeatureList.replaceChildren();
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = t("No manual zones", "ui");
+      specialZoneFeatureList.appendChild(placeholder);
+
+      manualFeatures.forEach((feature, index) => {
+        const id = String(feature?.properties?.id || `manual_sz_${index + 1}`);
+        const label = String(feature?.properties?.label || feature?.properties?.name || id);
+        const option = document.createElement("option");
+        option.value = id;
+        option.textContent = `${label} (${id})`;
+        specialZoneFeatureList.appendChild(option);
+      });
+      specialZoneFeatureList.value = selectedId && manualFeatures.some((f) => String(f?.properties?.id || "") === selectedId)
+        ? selectedId
+        : "";
+    }
+
+    if (specialZoneTypeSelect) {
+      specialZoneTypeSelect.value = String(state.specialZoneEditor?.zoneType || "custom");
+    }
+    if (specialZoneLabelInput) {
+      specialZoneLabelInput.value = String(state.specialZoneEditor?.label || "");
+    }
+
+    const isDrawing = !!state.specialZoneEditor?.active;
+    if (specialZoneStartBtn) specialZoneStartBtn.disabled = isDrawing;
+    if (specialZoneUndoBtn) specialZoneUndoBtn.disabled = !isDrawing;
+    if (specialZoneFinishBtn) specialZoneFinishBtn.disabled = !isDrawing;
+    if (specialZoneCancelBtn) specialZoneCancelBtn.disabled = !isDrawing;
+    if (specialZoneDeleteBtn) {
+      specialZoneDeleteBtn.disabled = !state.specialZoneEditor?.selectedId;
+    }
+    if (specialZoneEditorHint) {
+      specialZoneEditorHint.textContent = isDrawing
+        ? t("Drawing in progress: click map to add vertices, double-click to finish.", "ui")
+        : t("Click map to add vertices, double-click to finish.", "ui");
+    }
+  }
+  state.updateSpecialZoneEditorUIFn = renderSpecialZoneEditorUI;
 
   function updateSwatchUI() {
     let matched = false;
@@ -353,6 +658,7 @@ function initToolbar({ render } = {}) {
   }
 
   if (toggleUrban) {
+    toggleUrban.checked = !!state.showUrban;
     toggleUrban.addEventListener("change", (event) => {
       state.showUrban = event.target.checked;
       if (render) render();
@@ -360,6 +666,7 @@ function initToolbar({ render } = {}) {
   }
 
   if (togglePhysical) {
+    togglePhysical.checked = !!state.showPhysical;
     togglePhysical.addEventListener("change", (event) => {
       state.showPhysical = event.target.checked;
       if (render) render();
@@ -367,6 +674,7 @@ function initToolbar({ render } = {}) {
   }
 
   if (toggleRivers) {
+    toggleRivers.checked = !!state.showRivers;
     toggleRivers.addEventListener("change", (event) => {
       state.showRivers = event.target.checked;
       if (render) render();
@@ -377,6 +685,285 @@ function initToolbar({ render } = {}) {
     toggleSpecialZones.checked = state.showSpecialZones;
     toggleSpecialZones.addEventListener("change", (event) => {
       state.showSpecialZones = event.target.checked;
+      if (render) render();
+    });
+  }
+  if (urbanColor) {
+    urbanColor.addEventListener("input", (event) => {
+      state.styleConfig.urban.color = normalizeOceanFillColor(event.target.value);
+      if (render) render();
+    });
+  }
+  if (urbanOpacity) {
+    urbanOpacity.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      state.styleConfig.urban.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.22, 0, 1);
+      if (urbanOpacityValue) urbanOpacityValue.textContent = `${Math.round(state.styleConfig.urban.opacity * 100)}%`;
+      if (render) render();
+    });
+  }
+  if (urbanBlendMode) {
+    urbanBlendMode.addEventListener("change", (event) => {
+      state.styleConfig.urban.blendMode = String(event.target.value || "multiply");
+      if (render) render();
+    });
+  }
+  if (urbanMinArea) {
+    urbanMinArea.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      state.styleConfig.urban.minAreaPx = clamp(Number.isFinite(value) ? value : 8, 0, 80);
+      if (urbanMinAreaValue) urbanMinAreaValue.textContent = `${Math.round(state.styleConfig.urban.minAreaPx)}`;
+      if (render) render();
+    });
+  }
+
+  if (physicalPreset) {
+    physicalPreset.addEventListener("change", (event) => {
+      state.styleConfig.physical.preset = String(event.target.value || "atlas_soft");
+      if (render) render();
+    });
+  }
+  if (physicalTintColor) {
+    physicalTintColor.addEventListener("input", (event) => {
+      state.styleConfig.physical.tintColor = normalizeOceanFillColor(event.target.value);
+      if (render) render();
+    });
+  }
+  if (physicalOpacity) {
+    physicalOpacity.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      state.styleConfig.physical.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.24, 0, 1);
+      if (physicalOpacityValue) {
+        physicalOpacityValue.textContent = `${Math.round(state.styleConfig.physical.opacity * 100)}%`;
+      }
+      if (render) render();
+    });
+  }
+  if (physicalContourColor) {
+    physicalContourColor.addEventListener("input", (event) => {
+      state.styleConfig.physical.contourColor = normalizeOceanFillColor(event.target.value);
+      if (render) render();
+    });
+  }
+  if (physicalContourOpacity) {
+    physicalContourOpacity.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      state.styleConfig.physical.contourOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.30, 0, 1);
+      if (physicalContourOpacityValue) {
+        physicalContourOpacityValue.textContent = `${Math.round(state.styleConfig.physical.contourOpacity * 100)}%`;
+      }
+      if (render) render();
+    });
+  }
+  if (physicalContourWidth) {
+    physicalContourWidth.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      state.styleConfig.physical.contourWidth = clamp(Number.isFinite(value) ? value : 0.7, 0.2, 2.5);
+      if (physicalContourWidthValue) {
+        physicalContourWidthValue.textContent = Number(state.styleConfig.physical.contourWidth).toFixed(2);
+      }
+      if (render) render();
+    });
+  }
+  if (physicalContourSpacing) {
+    physicalContourSpacing.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      state.styleConfig.physical.contourSpacing = clamp(Number.isFinite(value) ? value : 18, 8, 36);
+      if (physicalContourSpacingValue) {
+        physicalContourSpacingValue.textContent = `${Math.round(state.styleConfig.physical.contourSpacing)}`;
+      }
+      if (render) render();
+    });
+  }
+  if (physicalBlendMode) {
+    physicalBlendMode.addEventListener("change", (event) => {
+      state.styleConfig.physical.blendMode = String(event.target.value || "multiply");
+      if (render) render();
+    });
+  }
+
+  if (riversColor) {
+    riversColor.addEventListener("input", (event) => {
+      state.styleConfig.rivers.color = normalizeOceanFillColor(event.target.value);
+      if (render) render();
+    });
+  }
+  if (riversOpacity) {
+    riversOpacity.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      state.styleConfig.rivers.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.88, 0, 1);
+      if (riversOpacityValue) {
+        riversOpacityValue.textContent = `${Math.round(state.styleConfig.rivers.opacity * 100)}%`;
+      }
+      if (render) render();
+    });
+  }
+  if (riversWidth) {
+    riversWidth.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      state.styleConfig.rivers.width = clamp(Number.isFinite(value) ? value : 1.1, 0.2, 4);
+      if (riversWidthValue) {
+        riversWidthValue.textContent = Number(state.styleConfig.rivers.width).toFixed(2);
+      }
+      if (render) render();
+    });
+  }
+  if (riversOutlineColor) {
+    riversOutlineColor.addEventListener("input", (event) => {
+      state.styleConfig.rivers.outlineColor = normalizeOceanFillColor(event.target.value);
+      if (render) render();
+    });
+  }
+  if (riversOutlineWidth) {
+    riversOutlineWidth.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      state.styleConfig.rivers.outlineWidth = clamp(Number.isFinite(value) ? value : 0.9, 0, 3);
+      if (riversOutlineWidthValue) {
+        riversOutlineWidthValue.textContent = Number(state.styleConfig.rivers.outlineWidth).toFixed(2);
+      }
+      if (render) render();
+    });
+  }
+  if (riversDashStyle) {
+    riversDashStyle.addEventListener("change", (event) => {
+      state.styleConfig.rivers.dashStyle = String(event.target.value || "solid");
+      if (render) render();
+    });
+  }
+
+  const onSpecialZonesStyleChange = () => {
+    if (render) render();
+  };
+  if (specialZonesDisputedFill) {
+    specialZonesDisputedFill.addEventListener("input", (event) => {
+      state.styleConfig.specialZones.disputedFill = normalizeOceanFillColor(event.target.value);
+      onSpecialZonesStyleChange();
+    });
+  }
+  if (specialZonesDisputedStroke) {
+    specialZonesDisputedStroke.addEventListener("input", (event) => {
+      state.styleConfig.specialZones.disputedStroke = normalizeOceanFillColor(event.target.value);
+      onSpecialZonesStyleChange();
+    });
+  }
+  if (specialZonesWastelandFill) {
+    specialZonesWastelandFill.addEventListener("input", (event) => {
+      state.styleConfig.specialZones.wastelandFill = normalizeOceanFillColor(event.target.value);
+      onSpecialZonesStyleChange();
+    });
+  }
+  if (specialZonesWastelandStroke) {
+    specialZonesWastelandStroke.addEventListener("input", (event) => {
+      state.styleConfig.specialZones.wastelandStroke = normalizeOceanFillColor(event.target.value);
+      onSpecialZonesStyleChange();
+    });
+  }
+  if (specialZonesCustomFill) {
+    specialZonesCustomFill.addEventListener("input", (event) => {
+      state.styleConfig.specialZones.customFill = normalizeOceanFillColor(event.target.value);
+      onSpecialZonesStyleChange();
+    });
+  }
+  if (specialZonesCustomStroke) {
+    specialZonesCustomStroke.addEventListener("input", (event) => {
+      state.styleConfig.specialZones.customStroke = normalizeOceanFillColor(event.target.value);
+      onSpecialZonesStyleChange();
+    });
+  }
+  if (specialZonesOpacity) {
+    specialZonesOpacity.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      state.styleConfig.specialZones.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.32, 0, 1);
+      if (specialZonesOpacityValue) {
+        specialZonesOpacityValue.textContent = `${Math.round(state.styleConfig.specialZones.opacity * 100)}%`;
+      }
+      onSpecialZonesStyleChange();
+    });
+  }
+  if (specialZonesStrokeWidth) {
+    specialZonesStrokeWidth.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      state.styleConfig.specialZones.strokeWidth = clamp(Number.isFinite(value) ? value : 1.3, 0.4, 4);
+      if (specialZonesStrokeWidthValue) {
+        specialZonesStrokeWidthValue.textContent = Number(state.styleConfig.specialZones.strokeWidth).toFixed(2);
+      }
+      onSpecialZonesStyleChange();
+    });
+  }
+  if (specialZonesDashStyle) {
+    specialZonesDashStyle.addEventListener("change", (event) => {
+      state.styleConfig.specialZones.dashStyle = String(event.target.value || "dashed");
+      onSpecialZonesStyleChange();
+    });
+  }
+
+  if (specialZoneTypeSelect) {
+    specialZoneTypeSelect.addEventListener("change", (event) => {
+      state.specialZoneEditor.zoneType = String(event.target.value || "custom");
+      if (typeof state.updateSpecialZoneEditorUIFn === "function") {
+        state.updateSpecialZoneEditorUIFn();
+      }
+    });
+  }
+  if (specialZoneLabelInput) {
+    specialZoneLabelInput.addEventListener("input", (event) => {
+      state.specialZoneEditor.label = String(event.target.value || "");
+    });
+  }
+  if (specialZoneStartBtn) {
+    specialZoneStartBtn.addEventListener("click", () => {
+      startSpecialZoneDraw({
+        zoneType: String(specialZoneTypeSelect?.value || state.specialZoneEditor.zoneType || "custom"),
+        label: String(specialZoneLabelInput?.value || state.specialZoneEditor.label || ""),
+      });
+      if (typeof state.updateSpecialZoneEditorUIFn === "function") {
+        state.updateSpecialZoneEditorUIFn();
+      }
+      if (render) render();
+    });
+  }
+  if (specialZoneUndoBtn) {
+    specialZoneUndoBtn.addEventListener("click", () => {
+      undoSpecialZoneVertex();
+      if (typeof state.updateSpecialZoneEditorUIFn === "function") {
+        state.updateSpecialZoneEditorUIFn();
+      }
+      if (render) render();
+    });
+  }
+  if (specialZoneFinishBtn) {
+    specialZoneFinishBtn.addEventListener("click", () => {
+      finishSpecialZoneDraw();
+      if (typeof state.updateSpecialZoneEditorUIFn === "function") {
+        state.updateSpecialZoneEditorUIFn();
+      }
+      if (render) render();
+    });
+  }
+  if (specialZoneCancelBtn) {
+    specialZoneCancelBtn.addEventListener("click", () => {
+      cancelSpecialZoneDraw();
+      if (typeof state.updateSpecialZoneEditorUIFn === "function") {
+        state.updateSpecialZoneEditorUIFn();
+      }
+      if (render) render();
+    });
+  }
+  if (specialZoneFeatureList) {
+    specialZoneFeatureList.addEventListener("change", (event) => {
+      selectSpecialZoneById(String(event.target.value || ""));
+      if (typeof state.updateSpecialZoneEditorUIFn === "function") {
+        state.updateSpecialZoneEditorUIFn();
+      }
+      if (render) render();
+    });
+  }
+  if (specialZoneDeleteBtn) {
+    specialZoneDeleteBtn.addEventListener("click", () => {
+      deleteSelectedManualSpecialZone();
+      if (typeof state.updateSpecialZoneEditorUIFn === "function") {
+        state.updateSpecialZoneEditorUIFn();
+      }
       if (render) render();
     });
   }
@@ -734,6 +1321,7 @@ function initToolbar({ render } = {}) {
   renderPalette(state.currentPaletteTheme);
   renderRecentColors();
   renderParentBorderCountryList();
+  renderSpecialZoneEditorUI();
   updateSwatchUI();
   updateToolUI();
   updateUIText();
