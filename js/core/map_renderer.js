@@ -1063,6 +1063,27 @@ function pickBestLayerSource(primaryCollection, detailCollection, policy = {}) {
 }
 
 function resolveContextLayerData(layerName) {
+  if (
+    layerName === "special_zones" &&
+    Array.isArray(state.specialZonesExternalData?.features)
+  ) {
+    if (!state.layerDataDiagnostics || typeof state.layerDataDiagnostics !== "object") {
+      state.layerDataDiagnostics = {};
+    }
+    if (!state.contextLayerSourceByName || typeof state.contextLayerSourceByName !== "object") {
+      state.contextLayerSourceByName = {};
+    }
+    state.contextLayerSourceByName[layerName] = "external";
+    state.layerDataDiagnostics[layerName] = {
+      source: "external",
+      primaryCount: 0,
+      detailCount: state.specialZonesExternalData.features.length,
+      primaryScore: 0,
+      detailScore: 1,
+    };
+    return state.specialZonesExternalData;
+  }
+
   const primaryTopology = state.topologyPrimary || state.topology;
   const detailTopology = state.topologyDetail;
   const primaryCollection = getLayerFeatureCollection(primaryTopology, layerName);

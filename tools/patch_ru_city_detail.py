@@ -14,6 +14,8 @@ import sys
 import geopandas as gpd
 import pandas as pd
 import topojson as tp
+from shapely.geometry import box
+from shapely.ops import unary_union
 from topojson.utils import serialize_as_geodataframe, serialize_as_geojson
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -31,6 +33,7 @@ DEFAULT_ADMIN1_CANDIDATES = (
 )
 
 LAYER_NAMES = ("political", "special_zones", "ocean", "land", "urban", "physical", "rivers")
+ARCTIC_CIRCLE_LAT = 66.5
 
 
 def _empty_gdf() -> gpd.GeoDataFrame:
@@ -119,6 +122,100 @@ def _apply_city_overrides(
     merged["id"] = merged["id"].fillna("").astype(str).str.strip()
     merged = merged[merged["id"] != ""].copy()
     merged = merged.drop_duplicates(subset=["id"], keep="last").reset_index(drop=True)
+    return merged
+
+
+def _make_valid(geom):
+    if geom is None or geom.is_empty:
+        return None
+    try:
+        if hasattr(geom, "make_valid"):
+            geom = geom.make_valid()
+        else:
+            geom = geom.buffer(0)
+    except Exception:
+        try:
+            geom = geom.buffer(0)
+        except Exception:
+            return None
+    if geom is None or geom.is_empty:
+        return None
+    return geom
+
+
+def _sanitize_polygon_layer(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    if gdf.empty:
+        return _empty_gdf()
+    clean = _ensure_epsg4326(gdf.copy())
+    clean["geometry"] = clean.geometry.apply(_make_valid)
+    clean = clean[clean.geometry.notna() & ~clean.geometry.is_empty].copy()
+    if clean.empty:
+        return _empty_gdf()
+    clean = clean[clean.geometry.geom_type.isin(["Polygon", "MultiPolygon"])].copy()
+    if clean.empty:
+        return _empty_gdf()
+    return clean
+
+
+def _restore_ru_arctic_shell_fragments(
+    political: gpd.GeoDataFrame,
+    shell_political: gpd.GeoDataFrame,
+) -> gpd.GeoDataFrame:
+    if political.empty or shell_political.empty or "cntr_code" not in political.columns:
+        return political
+
+    base = political.copy()
+    base["cntr_code"] = base["cntr_code"].fillna("").astype(str).str.upper().str.strip()
+    ru_detail = _sanitize_polygon_layer(base[base["cntr_code"] == "RU"].copy())
+    if ru_detail.empty:
+        return political
+
+    shell = shell_political.copy()
+    shell["cntr_code"] = shell["cntr_code"].fillna("").astype(str).str.upper().str.strip()
+    ru_shell = _sanitize_polygon_layer(shell[shell["cntr_code"] == "RU"].copy())
+    if ru_shell.empty:
+        return political
+
+    arctic_cap = box(-180.0, ARCTIC_CIRCLE_LAT, 180.0, 90.0)
+    shell_union = _make_valid(unary_union(ru_shell.geometry.tolist()))
+    detail_union = _make_valid(unary_union(ru_detail.geometry.tolist()))
+    if shell_union is None or detail_union is None:
+        return political
+
+    shell_cap = _make_valid(shell_union.intersection(arctic_cap))
+    detail_cap = _make_valid(detail_union.intersection(arctic_cap))
+    if shell_cap is None or shell_cap.is_empty:
+        return political
+
+    missing = _make_valid(shell_cap.difference(detail_cap)) if detail_cap is not None else shell_cap
+    if missing is None or missing.is_empty:
+        return political
+
+    fallback = gpd.GeoDataFrame(geometry=[missing], crs="EPSG:4326")
+    fallback = fallback.explode(index_parts=False, ignore_index=True)
+    fallback["geometry"] = fallback.geometry.apply(_make_valid)
+    fallback = fallback[fallback.geometry.notna() & ~fallback.geometry.is_empty].copy()
+    fallback = fallback[fallback.geometry.geom_type.isin(["Polygon", "MultiPolygon"])].copy()
+    if fallback.empty:
+        return political
+
+    try:
+        projected = fallback.to_crs(cfg.AREA_CRS)
+        fallback["__area_km2"] = projected.geometry.area / 1_000_000.0
+        fallback = fallback[fallback["__area_km2"] >= cfg.MIN_VISIBLE_AREA_KM2].copy()
+    except Exception:
+        fallback["__area_km2"] = None
+    if fallback.empty:
+        return political
+
+    fallback["id"] = [f"RU_ARCTIC_FB_{idx:03d}" for idx in range(1, len(fallback) + 1)]
+    fallback["name"] = [f"Russia Arctic Fallback {idx}" for idx in range(1, len(fallback) + 1)]
+    fallback["cntr_code"] = "RU"
+    fallback = fallback[["id", "name", "cntr_code", "geometry"]].copy()
+
+    merged = gpd.GeoDataFrame(pd.concat([base, fallback], ignore_index=True), crs="EPSG:4326")
+    merged = merged.drop_duplicates(subset=["id"], keep="last").reset_index(drop=True)
+    print(f"[RU patch] Restored {len(fallback)} RU Arctic fallback fragment(s).")
     return merged
 
 
@@ -224,6 +321,12 @@ def main() -> None:
     topology_dict = _load_topology(source_path)
     layers = _load_layers_from_topology(topology_dict)
     print(f"[RU patch] Source political features: {len(layers['political'])}")
+    primary_topology_path = source_path.with_name("europe_topology.json")
+    primary_layers = None
+    if primary_topology_path.exists():
+        print(f"[RU patch] Loading primary topology shell: {primary_topology_path}")
+        primary_topology_dict = _load_topology(primary_topology_path)
+        primary_layers = _load_layers_from_topology(primary_topology_dict)
 
     admin1_path = _find_admin1_path(data_dir, args.admin1)
     ru_adm2_path = args.ru_adm2
@@ -243,6 +346,11 @@ def main() -> None:
     )
 
     patched_political = _apply_city_overrides(layers["political"], overrides)
+    if primary_layers is not None:
+        patched_political = _restore_ru_arctic_shell_fragments(
+            patched_political,
+            primary_layers["political"],
+        )
     print(f"[RU patch] Patched political features: {len(patched_political)}")
     layers["political"] = patched_political
 

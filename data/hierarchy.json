@@ -6339,6 +6339,5276 @@
       "FR_ARR_95001",
       "FR_ARR_95002",
       "FR_ARR_95003"
+    ],
+    "GB_England": [
+      "UKC11",
+      "UKC12",
+      "UKC13",
+      "UKC14",
+      "UKC21",
+      "UKC22",
+      "UKC23",
+      "UKD11",
+      "UKD12",
+      "UKD33",
+      "UKD34",
+      "UKD35",
+      "UKD36",
+      "UKD37",
+      "UKD41",
+      "UKD42",
+      "UKD44",
+      "UKD45",
+      "UKD46",
+      "UKD47",
+      "UKD61",
+      "UKD62",
+      "UKD63",
+      "UKD71",
+      "UKD72",
+      "UKD73",
+      "UKD74",
+      "UKE11",
+      "UKE12",
+      "UKE13",
+      "UKE21",
+      "UKE22",
+      "UKE31",
+      "UKE32",
+      "UKE41",
+      "UKE42",
+      "UKE44",
+      "UKE45",
+      "UKF11",
+      "UKF12",
+      "UKF13",
+      "UKF14",
+      "UKF15",
+      "UKF16",
+      "UKF21",
+      "UKF22",
+      "UKF24",
+      "UKF25",
+      "UKF30",
+      "UKG11",
+      "UKG12",
+      "UKG13",
+      "UKG21",
+      "UKG22",
+      "UKG23",
+      "UKG24",
+      "UKG31",
+      "UKG32",
+      "UKG33",
+      "UKG36",
+      "UKG37",
+      "UKG38",
+      "UKG39",
+      "UKH11",
+      "UKH12",
+      "UKH14",
+      "UKH15",
+      "UKH16",
+      "UKH17",
+      "UKH21",
+      "UKH23",
+      "UKH24",
+      "UKH25",
+      "UKH31",
+      "UKH32",
+      "UKH34",
+      "UKH35",
+      "UKH36",
+      "UKH37",
+      "UKI31",
+      "UKI32",
+      "UKI33",
+      "UKI34",
+      "UKI41",
+      "UKI42",
+      "UKI43",
+      "UKI44",
+      "UKI45",
+      "UKI51",
+      "UKI52",
+      "UKI53",
+      "UKI54",
+      "UKI61",
+      "UKI62",
+      "UKI63",
+      "UKI71",
+      "UKI72",
+      "UKI73",
+      "UKI74",
+      "UKI75",
+      "UKJ11",
+      "UKJ12",
+      "UKJ13",
+      "UKJ14",
+      "UKJ21",
+      "UKJ22",
+      "UKJ25",
+      "UKJ26",
+      "UKJ27",
+      "UKJ28",
+      "UKJ31",
+      "UKJ32",
+      "UKJ34",
+      "UKJ35",
+      "UKJ36",
+      "UKJ37",
+      "UKJ41",
+      "UKJ43",
+      "UKJ44",
+      "UKJ45",
+      "UKJ46",
+      "UKK11",
+      "UKK12",
+      "UKK13",
+      "UKK14",
+      "UKK15",
+      "UKK23",
+      "UKK24",
+      "UKK25",
+      "UKK30",
+      "UKK41",
+      "UKK42",
+      "UKK43"
+    ],
+    "GB_Wales": [
+      "UKL11",
+      "UKL12",
+      "UKL13",
+      "UKL14",
+      "UKL15",
+      "UKL16",
+      "UKL17",
+      "UKL18",
+      "UKL21",
+      "UKL22",
+      "UKL23",
+      "UKL24",
+      "GB_NUTS1_UKL"
+    ],
+    "GB_Scotland": [
+      "UKM50",
+      "UKM61",
+      "UKM62",
+      "UKM63",
+      "UKM64",
+      "UKM65",
+      "UKM66",
+      "UKM71",
+      "UKM72",
+      "UKM73",
+      "UKM75",
+      "UKM76",
+      "UKM77",
+      "UKM78",
+      "UKM81",
+      "UKM82",
+      "UKM83",
+      "UKM84",
+      "UKM91",
+      "UKM92",
+      "UKM93",
+      "UKM94",
+      "UKM95",
+      "GB_NUTS1_UKM"
+    ],
+    "GB_Northern_Ireland": [
+      "UKN06",
+      "UKN07",
+      "UKN08",
+      "UKN09",
+      "UKN0A",
+      "UKN0B",
+      "UKN0C",
+      "UKN0D",
+      "UKN0E",
+      "UKN0F",
+      "UKN0G",
+      "GB_NUTS1_UKN"
+    ],
+    "CA_Newfoundland_and_Labrador": [
+      "CA_FED_10001",
+      "CA_FED_10002",
+      "CA_FED_10003",
+      "CA_FED_10004",
+      "CA_FED_10005",
+      "CA_FED_10006",
+      "CA_FED_10007"
+    ],
+    "CA_Prince_Edward_Island": [
+      "CA_FED_11001",
+      "CA_FED_11002",
+      "CA_FED_11003",
+      "CA_FED_11004"
+    ],
+    "CA_Nova_Scotia": [
+      "CA_FED_12001",
+      "CA_FED_12002",
+      "CA_FED_12003",
+      "CA_FED_12004",
+      "CA_FED_12005",
+      "CA_FED_12006",
+      "CA_FED_12007",
+      "CA_FED_12008",
+      "CA_FED_12009",
+      "CA_FED_12010",
+      "CA_FED_12011"
+    ],
+    "CA_New_Brunswick": [
+      "CA_FED_13001",
+      "CA_FED_13002",
+      "CA_FED_13003",
+      "CA_FED_13004",
+      "CA_FED_13005",
+      "CA_FED_13006",
+      "CA_FED_13007",
+      "CA_FED_13008",
+      "CA_FED_13009",
+      "CA_FED_13010"
+    ],
+    "CA_Quebec": [
+      "CA_FED_24001",
+      "CA_FED_24002",
+      "CA_FED_24003",
+      "CA_FED_24004",
+      "CA_FED_24005",
+      "CA_FED_24006",
+      "CA_FED_24007",
+      "CA_FED_24008",
+      "CA_FED_24009",
+      "CA_FED_24010",
+      "CA_FED_24011",
+      "CA_FED_24012",
+      "CA_FED_24013",
+      "CA_FED_24014",
+      "CA_FED_24015",
+      "CA_FED_24016",
+      "CA_FED_24017",
+      "CA_FED_24018",
+      "CA_FED_24019",
+      "CA_FED_24020",
+      "CA_FED_24021",
+      "CA_FED_24022",
+      "CA_FED_24023",
+      "CA_FED_24024",
+      "CA_FED_24025",
+      "CA_FED_24026",
+      "CA_FED_24027",
+      "CA_FED_24028",
+      "CA_FED_24029",
+      "CA_FED_24030",
+      "CA_FED_24031",
+      "CA_FED_24032",
+      "CA_FED_24033",
+      "CA_FED_24034",
+      "CA_FED_24035",
+      "CA_FED_24036",
+      "CA_FED_24037",
+      "CA_FED_24038",
+      "CA_FED_24039",
+      "CA_FED_24040",
+      "CA_FED_24041",
+      "CA_FED_24042",
+      "CA_FED_24043",
+      "CA_FED_24044",
+      "CA_FED_24045",
+      "CA_FED_24046",
+      "CA_FED_24047",
+      "CA_FED_24048",
+      "CA_FED_24049",
+      "CA_FED_24050",
+      "CA_FED_24051",
+      "CA_FED_24052",
+      "CA_FED_24053",
+      "CA_FED_24054",
+      "CA_FED_24055",
+      "CA_FED_24056",
+      "CA_FED_24057",
+      "CA_FED_24058",
+      "CA_FED_24059",
+      "CA_FED_24060",
+      "CA_FED_24061",
+      "CA_FED_24062",
+      "CA_FED_24063",
+      "CA_FED_24064",
+      "CA_FED_24065",
+      "CA_FED_24066",
+      "CA_FED_24067",
+      "CA_FED_24068",
+      "CA_FED_24069",
+      "CA_FED_24070",
+      "CA_FED_24071",
+      "CA_FED_24072",
+      "CA_FED_24073",
+      "CA_FED_24074",
+      "CA_FED_24075",
+      "CA_FED_24076",
+      "CA_FED_24077",
+      "CA_FED_24078"
+    ],
+    "CA_Ontario": [
+      "CA_FED_35001",
+      "CA_FED_35002",
+      "CA_FED_35003",
+      "CA_FED_35004",
+      "CA_FED_35005",
+      "CA_FED_35006",
+      "CA_FED_35007",
+      "CA_FED_35008",
+      "CA_FED_35009",
+      "CA_FED_35010",
+      "CA_FED_35011",
+      "CA_FED_35012",
+      "CA_FED_35013",
+      "CA_FED_35014",
+      "CA_FED_35015",
+      "CA_FED_35016",
+      "CA_FED_35017",
+      "CA_FED_35018",
+      "CA_FED_35019",
+      "CA_FED_35020",
+      "CA_FED_35021",
+      "CA_FED_35022",
+      "CA_FED_35023",
+      "CA_FED_35024",
+      "CA_FED_35025",
+      "CA_FED_35026",
+      "CA_FED_35027",
+      "CA_FED_35028",
+      "CA_FED_35029",
+      "CA_FED_35030",
+      "CA_FED_35031",
+      "CA_FED_35032",
+      "CA_FED_35033",
+      "CA_FED_35034",
+      "CA_FED_35035",
+      "CA_FED_35036",
+      "CA_FED_35037",
+      "CA_FED_35038",
+      "CA_FED_35039",
+      "CA_FED_35040",
+      "CA_FED_35041",
+      "CA_FED_35042",
+      "CA_FED_35043",
+      "CA_FED_35044",
+      "CA_FED_35045",
+      "CA_FED_35046",
+      "CA_FED_35047",
+      "CA_FED_35048",
+      "CA_FED_35049",
+      "CA_FED_35050",
+      "CA_FED_35051",
+      "CA_FED_35052",
+      "CA_FED_35053",
+      "CA_FED_35054",
+      "CA_FED_35055",
+      "CA_FED_35056",
+      "CA_FED_35057",
+      "CA_FED_35058",
+      "CA_FED_35059",
+      "CA_FED_35060",
+      "CA_FED_35061",
+      "CA_FED_35062",
+      "CA_FED_35063",
+      "CA_FED_35064",
+      "CA_FED_35065",
+      "CA_FED_35066",
+      "CA_FED_35067",
+      "CA_FED_35068",
+      "CA_FED_35069",
+      "CA_FED_35070",
+      "CA_FED_35071",
+      "CA_FED_35072",
+      "CA_FED_35073",
+      "CA_FED_35074",
+      "CA_FED_35075",
+      "CA_FED_35076",
+      "CA_FED_35077",
+      "CA_FED_35078",
+      "CA_FED_35079",
+      "CA_FED_35080",
+      "CA_FED_35081",
+      "CA_FED_35082",
+      "CA_FED_35083",
+      "CA_FED_35084",
+      "CA_FED_35085",
+      "CA_FED_35086",
+      "CA_FED_35087",
+      "CA_FED_35088",
+      "CA_FED_35089",
+      "CA_FED_35090",
+      "CA_FED_35091",
+      "CA_FED_35092",
+      "CA_FED_35093",
+      "CA_FED_35094",
+      "CA_FED_35095",
+      "CA_FED_35096",
+      "CA_FED_35097",
+      "CA_FED_35098",
+      "CA_FED_35099",
+      "CA_FED_35100",
+      "CA_FED_35101",
+      "CA_FED_35102",
+      "CA_FED_35103",
+      "CA_FED_35104",
+      "CA_FED_35105",
+      "CA_FED_35106",
+      "CA_FED_35107",
+      "CA_FED_35108",
+      "CA_FED_35109",
+      "CA_FED_35110",
+      "CA_FED_35111",
+      "CA_FED_35112",
+      "CA_FED_35113",
+      "CA_FED_35114",
+      "CA_FED_35115",
+      "CA_FED_35116",
+      "CA_FED_35117",
+      "CA_FED_35118",
+      "CA_FED_35119",
+      "CA_FED_35120",
+      "CA_FED_35121",
+      "CA_FED_35122"
+    ],
+    "CA_Manitoba": [
+      "CA_FED_46001",
+      "CA_FED_46002",
+      "CA_FED_46003",
+      "CA_FED_46004",
+      "CA_FED_46005",
+      "CA_FED_46006",
+      "CA_FED_46007",
+      "CA_FED_46008",
+      "CA_FED_46009",
+      "CA_FED_46010",
+      "CA_FED_46011",
+      "CA_FED_46012",
+      "CA_FED_46013",
+      "CA_FED_46014"
+    ],
+    "CA_Saskatchewan": [
+      "CA_FED_47001",
+      "CA_FED_47002",
+      "CA_FED_47003",
+      "CA_FED_47004",
+      "CA_FED_47005",
+      "CA_FED_47006",
+      "CA_FED_47007",
+      "CA_FED_47008",
+      "CA_FED_47009",
+      "CA_FED_47010",
+      "CA_FED_47011",
+      "CA_FED_47012",
+      "CA_FED_47013",
+      "CA_FED_47014"
+    ],
+    "CA_Alberta": [
+      "CA_FED_48001",
+      "CA_FED_48002",
+      "CA_FED_48003",
+      "CA_FED_48004",
+      "CA_FED_48005",
+      "CA_FED_48006",
+      "CA_FED_48007",
+      "CA_FED_48008",
+      "CA_FED_48009",
+      "CA_FED_48010",
+      "CA_FED_48011",
+      "CA_FED_48012",
+      "CA_FED_48013",
+      "CA_FED_48014",
+      "CA_FED_48015",
+      "CA_FED_48016",
+      "CA_FED_48017",
+      "CA_FED_48018",
+      "CA_FED_48019",
+      "CA_FED_48020",
+      "CA_FED_48021",
+      "CA_FED_48022",
+      "CA_FED_48023",
+      "CA_FED_48024",
+      "CA_FED_48025",
+      "CA_FED_48026",
+      "CA_FED_48027",
+      "CA_FED_48028",
+      "CA_FED_48029",
+      "CA_FED_48030",
+      "CA_FED_48031",
+      "CA_FED_48032",
+      "CA_FED_48033",
+      "CA_FED_48034",
+      "CA_FED_48035",
+      "CA_FED_48036",
+      "CA_FED_48037"
+    ],
+    "CA_British_Columbia": [
+      "CA_FED_59001",
+      "CA_FED_59002",
+      "CA_FED_59003",
+      "CA_FED_59004",
+      "CA_FED_59005",
+      "CA_FED_59006",
+      "CA_FED_59007",
+      "CA_FED_59008",
+      "CA_FED_59009",
+      "CA_FED_59010",
+      "CA_FED_59011",
+      "CA_FED_59012",
+      "CA_FED_59013",
+      "CA_FED_59014",
+      "CA_FED_59015",
+      "CA_FED_59016",
+      "CA_FED_59017",
+      "CA_FED_59018",
+      "CA_FED_59019",
+      "CA_FED_59020",
+      "CA_FED_59021",
+      "CA_FED_59022",
+      "CA_FED_59023",
+      "CA_FED_59024",
+      "CA_FED_59025",
+      "CA_FED_59026",
+      "CA_FED_59027",
+      "CA_FED_59028",
+      "CA_FED_59029",
+      "CA_FED_59030",
+      "CA_FED_59031",
+      "CA_FED_59032",
+      "CA_FED_59033",
+      "CA_FED_59034",
+      "CA_FED_59035",
+      "CA_FED_59036",
+      "CA_FED_59037",
+      "CA_FED_59038",
+      "CA_FED_59039",
+      "CA_FED_59040",
+      "CA_FED_59041",
+      "CA_FED_59042",
+      "CA_FED_59043"
+    ],
+    "CA_Yukon": [
+      "CA_FED_60001"
+    ],
+    "CA_Northwest_Territories": [
+      "CA_FED_61001"
+    ],
+    "CA_Nunavut": [
+      "CA_FED_62001"
+    ],
+    "MX_Aguascalientes": [
+      "MX_ZN_01_001",
+      "MX_ZN_01_002"
+    ],
+    "MX_Baja_California": [
+      "MX_ZN_02_001",
+      "MX_ZN_02_002"
+    ],
+    "MX_Baja_California_Sur": [
+      "MX_ZN_03_001",
+      "MX_ZN_03_002"
+    ],
+    "MX_Campeche": [
+      "MX_ZN_04_001",
+      "MX_ZN_04_002"
+    ],
+    "MX_Chiapas": [
+      "MX_ZN_05_001",
+      "MX_ZN_05_002",
+      "MX_ZN_05_003",
+      "MX_ZN_05_004",
+      "MX_ZN_05_005",
+      "MX_ZN_05_006",
+      "MX_ZN_05_007",
+      "MX_ZN_05_008",
+      "MX_ZN_05_009",
+      "MX_ZN_05_010",
+      "MX_ZN_05_011",
+      "MX_ZN_05_012",
+      "MX_ZN_05_013",
+      "MX_ZN_05_014"
+    ],
+    "MX_Chihuahua": [
+      "MX_ZN_06_001",
+      "MX_ZN_06_002",
+      "MX_ZN_06_003",
+      "MX_ZN_06_004",
+      "MX_ZN_06_005",
+      "MX_ZN_06_006",
+      "MX_ZN_06_007",
+      "MX_ZN_06_008"
+    ],
+    "MX_Coahuila": [
+      "MX_ZN_07_001",
+      "MX_ZN_07_002",
+      "MX_ZN_07_003",
+      "MX_ZN_07_004",
+      "MX_ZN_07_005"
+    ],
+    "MX_Colima": [
+      "MX_ZN_08_001",
+      "MX_ZN_08_002"
+    ],
+    "MX_Durango": [
+      "MX_ZN_09_001",
+      "MX_ZN_09_002",
+      "MX_ZN_09_003",
+      "MX_ZN_09_004",
+      "MX_ZN_09_005"
+    ],
+    "MX_Guanajuato": [
+      "MX_ZN_10_001",
+      "MX_ZN_10_002",
+      "MX_ZN_10_003",
+      "MX_ZN_10_004",
+      "MX_ZN_10_005",
+      "MX_ZN_10_006"
+    ],
+    "MX_Guerrero": [
+      "MX_ZN_11_001",
+      "MX_ZN_11_002",
+      "MX_ZN_11_003",
+      "MX_ZN_11_004",
+      "MX_ZN_11_005",
+      "MX_ZN_11_006",
+      "MX_ZN_11_007",
+      "MX_ZN_11_008",
+      "MX_ZN_11_009",
+      "MX_ZN_11_010"
+    ],
+    "MX_Hidalgo": [
+      "MX_ZN_12_001",
+      "MX_ZN_12_002",
+      "MX_ZN_12_003",
+      "MX_ZN_12_004",
+      "MX_ZN_12_005",
+      "MX_ZN_12_006",
+      "MX_ZN_12_007",
+      "MX_ZN_12_008",
+      "MX_ZN_12_009",
+      "MX_ZN_12_010"
+    ],
+    "MX_Jalisco": [
+      "MX_ZN_13_001",
+      "MX_ZN_13_002",
+      "MX_ZN_13_003",
+      "MX_ZN_13_004",
+      "MX_ZN_13_005",
+      "MX_ZN_13_006",
+      "MX_ZN_13_007",
+      "MX_ZN_13_008",
+      "MX_ZN_13_009",
+      "MX_ZN_13_010",
+      "MX_ZN_13_011",
+      "MX_ZN_13_012",
+      "MX_ZN_13_013",
+      "MX_ZN_13_014",
+      "MX_ZN_13_015"
+    ],
+    "MX_Mexico": [
+      "MX_ZN_14_001",
+      "MX_ZN_14_002",
+      "MX_ZN_14_003"
+    ],
+    "MX_Michoac_n": [
+      "MX_ZN_15_001",
+      "MX_ZN_15_002",
+      "MX_ZN_15_003",
+      "MX_ZN_15_004",
+      "MX_ZN_15_005",
+      "MX_ZN_15_006",
+      "MX_ZN_15_007",
+      "MX_ZN_15_008",
+      "MX_ZN_15_009",
+      "MX_ZN_15_010",
+      "MX_ZN_15_011",
+      "MX_ZN_15_012",
+      "MX_ZN_15_013"
+    ],
+    "MX_Morelos": [
+      "MX_ZN_16_001",
+      "MX_ZN_16_002",
+      "MX_ZN_16_003",
+      "MX_ZN_16_004",
+      "MX_ZN_16_005"
+    ],
+    "MX_Nayarit": [
+      "MX_ZN_17_001",
+      "MX_ZN_17_002",
+      "MX_ZN_17_003"
+    ],
+    "MX_Nuevo_Le_n": [
+      "MX_ZN_18_001",
+      "MX_ZN_18_002",
+      "MX_ZN_18_003",
+      "MX_ZN_18_004",
+      "MX_ZN_18_005",
+      "MX_ZN_18_006",
+      "MX_ZN_18_007"
+    ],
+    "MX_Oaxaca": [
+      "MX_ZN_19_001",
+      "MX_ZN_19_002",
+      "MX_ZN_19_003",
+      "MX_ZN_19_004",
+      "MX_ZN_19_005",
+      "MX_ZN_19_006",
+      "MX_ZN_19_007",
+      "MX_ZN_19_008",
+      "MX_ZN_19_009",
+      "MX_ZN_19_010",
+      "MX_ZN_19_011",
+      "MX_ZN_19_012",
+      "MX_ZN_19_013",
+      "MX_ZN_19_014",
+      "MX_ZN_19_015",
+      "MX_ZN_19_016",
+      "MX_ZN_19_017",
+      "MX_ZN_19_018",
+      "MX_ZN_19_019",
+      "MX_ZN_19_020",
+      "MX_ZN_19_021",
+      "MX_ZN_19_022",
+      "MX_ZN_19_023",
+      "MX_ZN_19_024",
+      "MX_ZN_19_025",
+      "MX_ZN_19_026",
+      "MX_ZN_19_027",
+      "MX_ZN_19_028",
+      "MX_ZN_19_029",
+      "MX_ZN_19_030",
+      "MX_ZN_19_031",
+      "MX_ZN_19_032",
+      "MX_ZN_19_033",
+      "MX_ZN_19_034",
+      "MX_ZN_19_035",
+      "MX_ZN_19_036",
+      "MX_ZN_19_037",
+      "MX_ZN_19_038",
+      "MX_ZN_19_039",
+      "MX_ZN_19_040",
+      "MX_ZN_19_041",
+      "MX_ZN_19_042",
+      "MX_ZN_19_043",
+      "MX_ZN_19_044",
+      "MX_ZN_19_045",
+      "MX_ZN_19_046",
+      "MX_ZN_19_047",
+      "MX_ZN_19_048",
+      "MX_ZN_19_049",
+      "MX_ZN_19_050",
+      "MX_ZN_19_051",
+      "MX_ZN_19_052",
+      "MX_ZN_19_053",
+      "MX_ZN_19_054",
+      "MX_ZN_19_055",
+      "MX_ZN_19_056",
+      "MX_ZN_19_057",
+      "MX_ZN_19_058",
+      "MX_ZN_19_059",
+      "MX_ZN_19_060",
+      "MX_ZN_19_061",
+      "MX_ZN_19_062"
+    ],
+    "MX_Puebla": [
+      "MX_ZN_20_001",
+      "MX_ZN_20_002",
+      "MX_ZN_20_003",
+      "MX_ZN_20_004",
+      "MX_ZN_20_005",
+      "MX_ZN_20_006",
+      "MX_ZN_20_007",
+      "MX_ZN_20_008",
+      "MX_ZN_20_009",
+      "MX_ZN_20_010",
+      "MX_ZN_20_011",
+      "MX_ZN_20_012",
+      "MX_ZN_20_013",
+      "MX_ZN_20_014",
+      "MX_ZN_20_015",
+      "MX_ZN_20_016",
+      "MX_ZN_20_017",
+      "MX_ZN_20_018",
+      "MX_ZN_20_019",
+      "MX_ZN_20_020",
+      "MX_ZN_20_021",
+      "MX_ZN_20_022",
+      "MX_ZN_20_023",
+      "MX_ZN_20_024",
+      "MX_ZN_20_025"
+    ],
+    "MX_Quer_taro": [
+      "MX_ZN_21_001",
+      "MX_ZN_21_002",
+      "MX_ZN_21_003"
+    ],
+    "MX_Quintana_Roo": [
+      "MX_ZN_22_001",
+      "MX_ZN_22_002"
+    ],
+    "MX_San_Luis_Potos": [
+      "MX_ZN_23_001",
+      "MX_ZN_23_002",
+      "MX_ZN_23_003",
+      "MX_ZN_23_004",
+      "MX_ZN_23_005",
+      "MX_ZN_23_006",
+      "MX_ZN_23_007"
+    ],
+    "MX_Sinaloa": [
+      "MX_ZN_24_001",
+      "MX_ZN_24_002",
+      "MX_ZN_24_003"
+    ],
+    "MX_Sonora": [
+      "MX_ZN_25_001",
+      "MX_ZN_25_002",
+      "MX_ZN_25_003",
+      "MX_ZN_25_004",
+      "MX_ZN_25_005",
+      "MX_ZN_25_006",
+      "MX_ZN_25_007",
+      "MX_ZN_25_008",
+      "MX_ZN_25_009"
+    ],
+    "MX_State_of_Mexico": [
+      "MX_ZN_26_001",
+      "MX_ZN_26_002",
+      "MX_ZN_26_003",
+      "MX_ZN_26_004",
+      "MX_ZN_26_005",
+      "MX_ZN_26_006",
+      "MX_ZN_26_007",
+      "MX_ZN_26_008",
+      "MX_ZN_26_009",
+      "MX_ZN_26_010",
+      "MX_ZN_26_011",
+      "MX_ZN_26_012",
+      "MX_ZN_26_013",
+      "MX_ZN_26_014",
+      "MX_ZN_26_015"
+    ],
+    "MX_Tabasco": [
+      "MX_ZN_27_001",
+      "MX_ZN_27_002",
+      "MX_ZN_27_003"
+    ],
+    "MX_Tamaulipas": [
+      "MX_ZN_28_001",
+      "MX_ZN_28_002",
+      "MX_ZN_28_003",
+      "MX_ZN_28_004",
+      "MX_ZN_28_005",
+      "MX_ZN_28_006"
+    ],
+    "MX_Tlaxcala": [
+      "MX_ZN_29_001",
+      "MX_ZN_29_002",
+      "MX_ZN_29_003",
+      "MX_ZN_29_004",
+      "MX_ZN_29_005",
+      "MX_ZN_29_006",
+      "MX_ZN_29_007"
+    ],
+    "MX_Veracruz": [
+      "MX_ZN_30_001",
+      "MX_ZN_30_002",
+      "MX_ZN_30_003",
+      "MX_ZN_30_004",
+      "MX_ZN_30_005",
+      "MX_ZN_30_006",
+      "MX_ZN_30_007",
+      "MX_ZN_30_008",
+      "MX_ZN_30_009",
+      "MX_ZN_30_010",
+      "MX_ZN_30_011",
+      "MX_ZN_30_012",
+      "MX_ZN_30_013",
+      "MX_ZN_30_014",
+      "MX_ZN_30_015",
+      "MX_ZN_30_016",
+      "MX_ZN_30_017",
+      "MX_ZN_30_018",
+      "MX_ZN_30_019",
+      "MX_ZN_30_020",
+      "MX_ZN_30_021",
+      "MX_ZN_30_022",
+      "MX_ZN_30_023",
+      "MX_ZN_30_024"
+    ],
+    "MX_Yucat_n": [
+      "MX_ZN_31_001",
+      "MX_ZN_31_002",
+      "MX_ZN_31_003",
+      "MX_ZN_31_004",
+      "MX_ZN_31_005",
+      "MX_ZN_31_006",
+      "MX_ZN_31_007",
+      "MX_ZN_31_008",
+      "MX_ZN_31_009",
+      "MX_ZN_31_010",
+      "MX_ZN_31_011",
+      "MX_ZN_31_012",
+      "MX_ZN_31_013"
+    ],
+    "MX_Zacatecas": [
+      "MX_ZN_32_001",
+      "MX_ZN_32_002",
+      "MX_ZN_32_003",
+      "MX_ZN_32_004",
+      "MX_ZN_32_005",
+      "MX_ZN_32_006",
+      "MX_ZN_32_007"
+    ],
+    "US_Alaska": [
+      "US_ZN_02_001",
+      "US_ZN_02_002",
+      "US_ZN_02_003",
+      "US_ZN_02_004",
+      "US_ZN_02_005"
+    ],
+    "US_Alabama": [
+      "US_ZN_01_001",
+      "US_ZN_01_002",
+      "US_ZN_01_003",
+      "US_ZN_01_004",
+      "US_ZN_01_005",
+      "US_ZN_01_006",
+      "US_ZN_01_007",
+      "US_ZN_01_008",
+      "US_ZN_01_009",
+      "US_ZN_01_010",
+      "US_ZN_01_011",
+      "US_ZN_01_012"
+    ],
+    "US_Arkansas": [
+      "US_ZN_05_001",
+      "US_ZN_05_002",
+      "US_ZN_05_003",
+      "US_ZN_05_004",
+      "US_ZN_05_005",
+      "US_ZN_05_006",
+      "US_ZN_05_007",
+      "US_ZN_05_008",
+      "US_ZN_05_009"
+    ],
+    "US_Arizona": [
+      "US_CNTY_04015",
+      "US_CNTY_04013",
+      "US_CNTY_04007",
+      "US_CNTY_04001",
+      "US_CNTY_04025",
+      "US_CNTY_04009",
+      "US_CNTY_04027",
+      "US_CNTY_04021",
+      "US_CNTY_04005",
+      "US_CNTY_04012",
+      "US_CNTY_04003",
+      "US_CNTY_04019",
+      "US_CNTY_04017",
+      "US_CNTY_04011",
+      "US_CNTY_04023"
+    ],
+    "US_California": [
+      "US_CNTY_06079",
+      "US_CNTY_06081",
+      "US_CNTY_06091",
+      "US_CNTY_06067",
+      "US_CNTY_06107",
+      "US_CNTY_06069",
+      "US_CNTY_06007",
+      "US_CNTY_06047",
+      "US_CNTY_06109",
+      "US_CNTY_06059",
+      "US_CNTY_06037",
+      "US_CNTY_06087",
+      "US_CNTY_06097",
+      "US_CNTY_06041",
+      "US_CNTY_06001",
+      "US_CNTY_06003",
+      "US_CNTY_06061",
+      "US_CNTY_06057",
+      "US_CNTY_06113",
+      "US_CNTY_06019",
+      "US_CNTY_06105",
+      "US_CNTY_06089",
+      "US_CNTY_06115",
+      "US_CNTY_06011",
+      "US_CNTY_06065",
+      "US_CNTY_06013",
+      "US_CNTY_06023",
+      "US_CNTY_06073",
+      "US_CNTY_06053",
+      "US_CNTY_06045",
+      "US_CNTY_06017",
+      "US_CNTY_06093",
+      "US_CNTY_06039",
+      "US_CNTY_06033",
+      "US_CNTY_06111",
+      "US_CNTY_06101",
+      "US_CNTY_06021",
+      "US_CNTY_06043",
+      "US_CNTY_06071",
+      "US_CNTY_06099",
+      "US_CNTY_06025",
+      "US_CNTY_06085",
+      "US_CNTY_06009",
+      "US_CNTY_06103",
+      "US_CNTY_06083",
+      "US_CNTY_06051",
+      "US_CNTY_06015",
+      "US_CNTY_06055",
+      "US_CNTY_06095",
+      "US_CNTY_06049",
+      "US_CNTY_06077",
+      "US_CNTY_06027",
+      "US_CNTY_06063",
+      "US_CNTY_06005",
+      "US_CNTY_06075",
+      "US_CNTY_06031",
+      "US_CNTY_06035",
+      "US_CNTY_06029"
+    ],
+    "US_Colorado": [
+      "US_CNTY_08031",
+      "US_CNTY_08041",
+      "US_ZN_08_001",
+      "US_ZN_08_002",
+      "US_ZN_08_003",
+      "US_ZN_08_004",
+      "US_ZN_08_005",
+      "US_ZN_08_006",
+      "US_ZN_08_007",
+      "US_ZN_08_008",
+      "US_ZN_08_009",
+      "US_ZN_08_010",
+      "US_ZN_08_011"
+    ],
+    "US_Connecticut": [
+      "US_CNTY_09190",
+      "US_CNTY_09170",
+      "US_CNTY_09180",
+      "US_CNTY_09110",
+      "US_CNTY_09140",
+      "US_CNTY_09130",
+      "US_CNTY_09160",
+      "US_CNTY_09120",
+      "US_CNTY_09150"
+    ],
+    "US_District_of_Columbia": [
+      "US_CNTY_11001"
+    ],
+    "US_Delaware": [
+      "US_CNTY_10005",
+      "US_CNTY_10003",
+      "US_CNTY_10001"
+    ],
+    "US_Florida": [
+      "US_CNTY_12007",
+      "US_CNTY_12009",
+      "US_CNTY_12131",
+      "US_CNTY_12053",
+      "US_CNTY_12047",
+      "US_CNTY_12065",
+      "US_CNTY_12031",
+      "US_CNTY_12117",
+      "US_CNTY_12041",
+      "US_CNTY_12013",
+      "US_CNTY_12103",
+      "US_CNTY_12057",
+      "US_CNTY_12075",
+      "US_CNTY_12086",
+      "US_CNTY_12071",
+      "US_CNTY_12113",
+      "US_CNTY_12037",
+      "US_CNTY_12073",
+      "US_CNTY_12069",
+      "US_CNTY_12083",
+      "US_CNTY_12023",
+      "US_CNTY_12119",
+      "US_CNTY_12097",
+      "US_CNTY_12121",
+      "US_CNTY_12125",
+      "US_CNTY_12123",
+      "US_CNTY_12101",
+      "US_CNTY_12033",
+      "US_CNTY_12089",
+      "US_CNTY_12105",
+      "US_CNTY_12045",
+      "US_CNTY_12029",
+      "US_CNTY_12129",
+      "US_CNTY_12001",
+      "US_CNTY_12095",
+      "US_CNTY_12093",
+      "US_CNTY_12107",
+      "US_CNTY_12039",
+      "US_CNTY_12055",
+      "US_CNTY_12133",
+      "US_CNTY_12017",
+      "US_CNTY_12087",
+      "US_CNTY_12021",
+      "US_CNTY_12027",
+      "US_CNTY_12015",
+      "US_CNTY_12059",
+      "US_CNTY_12079",
+      "US_CNTY_12003",
+      "US_CNTY_12081",
+      "US_CNTY_12115",
+      "US_CNTY_12111",
+      "US_CNTY_12099",
+      "US_CNTY_12005",
+      "US_CNTY_12019",
+      "US_CNTY_12067",
+      "US_CNTY_12049",
+      "US_CNTY_12077",
+      "US_CNTY_12011",
+      "US_CNTY_12127",
+      "US_CNTY_12061",
+      "US_CNTY_12091",
+      "US_CNTY_12051",
+      "US_CNTY_12085",
+      "US_CNTY_12063",
+      "US_CNTY_12109",
+      "US_CNTY_12035",
+      "US_CNTY_12043"
+    ],
+    "US_Georgia": [
+      "US_CNTY_13121",
+      "US_CNTY_13067",
+      "US_CNTY_13089",
+      "US_CNTY_13135",
+      "US_ZN_13_001",
+      "US_ZN_13_002",
+      "US_ZN_13_003",
+      "US_ZN_13_004",
+      "US_ZN_13_005",
+      "US_ZN_13_006",
+      "US_ZN_13_007",
+      "US_ZN_13_008",
+      "US_ZN_13_009",
+      "US_ZN_13_010",
+      "US_ZN_13_011",
+      "US_ZN_13_012",
+      "US_ZN_13_013",
+      "US_ZN_13_014"
+    ],
+    "US_Hawaii": [
+      "US_CNTY_15003",
+      "US_CNTY_15001",
+      "US_CNTY_15009",
+      "US_CNTY_15007",
+      "US_CNTY_15005"
+    ],
+    "US_Iowa": [
+      "US_ZN_19_001",
+      "US_ZN_19_002",
+      "US_ZN_19_003",
+      "US_ZN_19_004",
+      "US_ZN_19_005",
+      "US_ZN_19_006",
+      "US_ZN_19_007",
+      "US_ZN_19_008",
+      "US_ZN_19_009",
+      "US_ZN_19_010"
+    ],
+    "US_Idaho": [
+      "US_ZN_16_001",
+      "US_ZN_16_002",
+      "US_ZN_16_003",
+      "US_ZN_16_004",
+      "US_ZN_16_005",
+      "US_ZN_16_006",
+      "US_ZN_16_007"
+    ],
+    "US_Illinois": [
+      "US_CNTY_17043",
+      "US_CNTY_17031",
+      "US_ZN_17_001",
+      "US_ZN_17_002",
+      "US_ZN_17_003",
+      "US_ZN_17_004",
+      "US_ZN_17_005",
+      "US_ZN_17_006",
+      "US_ZN_17_007",
+      "US_ZN_17_008",
+      "US_ZN_17_009",
+      "US_ZN_17_010",
+      "US_ZN_17_011",
+      "US_ZN_17_012",
+      "US_ZN_17_013",
+      "US_ZN_17_014",
+      "US_ZN_17_015",
+      "US_ZN_17_016",
+      "US_ZN_17_017"
+    ],
+    "US_Indiana": [
+      "US_CNTY_18097",
+      "US_ZN_18_001",
+      "US_ZN_18_002",
+      "US_ZN_18_003",
+      "US_ZN_18_004",
+      "US_ZN_18_005",
+      "US_ZN_18_006",
+      "US_ZN_18_007",
+      "US_ZN_18_008",
+      "US_ZN_18_009",
+      "US_ZN_18_010",
+      "US_ZN_18_011",
+      "US_ZN_18_012",
+      "US_ZN_18_013"
+    ],
+    "US_Kansas": [
+      "US_ZN_20_001",
+      "US_ZN_20_002",
+      "US_ZN_20_003",
+      "US_ZN_20_004",
+      "US_ZN_20_005",
+      "US_ZN_20_006",
+      "US_ZN_20_007",
+      "US_ZN_20_008",
+      "US_ZN_20_009"
+    ],
+    "US_Kentucky": [
+      "US_CNTY_21111",
+      "US_ZN_21_001",
+      "US_ZN_21_002",
+      "US_ZN_21_003",
+      "US_ZN_21_004",
+      "US_ZN_21_005",
+      "US_ZN_21_006",
+      "US_ZN_21_007",
+      "US_ZN_21_008",
+      "US_ZN_21_009",
+      "US_ZN_21_010"
+    ],
+    "US_Louisiana": [
+      "US_ZN_22_001",
+      "US_ZN_22_002",
+      "US_ZN_22_003",
+      "US_ZN_22_004",
+      "US_ZN_22_005",
+      "US_ZN_22_006",
+      "US_ZN_22_007",
+      "US_ZN_22_008",
+      "US_ZN_22_009",
+      "US_ZN_22_010",
+      "US_ZN_22_011"
+    ],
+    "US_Massachusetts": [
+      "US_CNTY_25001",
+      "US_CNTY_25017",
+      "US_CNTY_25025",
+      "US_CNTY_25021",
+      "US_CNTY_25013",
+      "US_CNTY_25015",
+      "US_CNTY_25011",
+      "US_CNTY_25023",
+      "US_CNTY_25005",
+      "US_CNTY_25027",
+      "US_CNTY_25009",
+      "US_CNTY_25019",
+      "US_CNTY_25007",
+      "US_CNTY_25003"
+    ],
+    "US_Maryland": [
+      "US_CNTY_24005",
+      "US_CNTY_24033",
+      "US_CNTY_24031",
+      "US_ZN_24_001",
+      "US_ZN_24_002",
+      "US_ZN_24_003",
+      "US_ZN_24_004",
+      "US_ZN_24_005",
+      "US_ZN_24_006",
+      "US_ZN_24_007",
+      "US_ZN_24_008",
+      "US_ZN_24_009",
+      "US_ZN_24_010"
+    ],
+    "US_Maine": [
+      "US_ZN_23_001",
+      "US_ZN_23_002",
+      "US_ZN_23_003",
+      "US_ZN_23_004",
+      "US_ZN_23_005",
+      "US_ZN_23_006"
+    ],
+    "US_Michigan": [
+      "US_CNTY_26163",
+      "US_CNTY_26099",
+      "US_CNTY_26125",
+      "US_ZN_26_001",
+      "US_ZN_26_002",
+      "US_ZN_26_003",
+      "US_ZN_26_004",
+      "US_ZN_26_005",
+      "US_ZN_26_006",
+      "US_ZN_26_007",
+      "US_ZN_26_008",
+      "US_ZN_26_009",
+      "US_ZN_26_010",
+      "US_ZN_26_011",
+      "US_ZN_26_012",
+      "US_ZN_26_013",
+      "US_ZN_26_014"
+    ],
+    "US_Minnesota": [
+      "US_CNTY_27053",
+      "US_ZN_27_001",
+      "US_ZN_27_002",
+      "US_ZN_27_003",
+      "US_ZN_27_004",
+      "US_ZN_27_005",
+      "US_ZN_27_006",
+      "US_ZN_27_007",
+      "US_ZN_27_008",
+      "US_ZN_27_009",
+      "US_ZN_27_010",
+      "US_ZN_27_011",
+      "US_ZN_27_012"
+    ],
+    "US_Missouri": [
+      "US_CNTY_29189",
+      "US_ZN_29_001",
+      "US_ZN_29_002",
+      "US_ZN_29_003",
+      "US_ZN_29_004",
+      "US_ZN_29_005",
+      "US_ZN_29_006",
+      "US_ZN_29_007",
+      "US_ZN_29_008",
+      "US_ZN_29_009",
+      "US_ZN_29_010",
+      "US_ZN_29_011",
+      "US_ZN_29_012"
+    ],
+    "US_Mississippi": [
+      "US_ZN_28_001",
+      "US_ZN_28_002",
+      "US_ZN_28_003",
+      "US_ZN_28_004",
+      "US_ZN_28_005",
+      "US_ZN_28_006",
+      "US_ZN_28_007",
+      "US_ZN_28_008",
+      "US_ZN_28_009"
+    ],
+    "US_Montana": [
+      "US_ZN_30_001",
+      "US_ZN_30_002",
+      "US_ZN_30_003",
+      "US_ZN_30_004",
+      "US_ZN_30_005",
+      "US_ZN_30_006"
+    ],
+    "US_North_Carolina": [
+      "US_CNTY_37119",
+      "US_CNTY_37183",
+      "US_ZN_37_001",
+      "US_ZN_37_002",
+      "US_ZN_37_003",
+      "US_ZN_37_004",
+      "US_ZN_37_005",
+      "US_ZN_37_006",
+      "US_ZN_37_007",
+      "US_ZN_37_008",
+      "US_ZN_37_009",
+      "US_ZN_37_010",
+      "US_ZN_37_011",
+      "US_ZN_37_012",
+      "US_ZN_37_013",
+      "US_ZN_37_014",
+      "US_ZN_37_015",
+      "US_ZN_37_016"
+    ],
+    "US_North_Dakota": [
+      "US_ZN_38_001",
+      "US_ZN_38_002",
+      "US_ZN_38_003",
+      "US_ZN_38_004",
+      "US_ZN_38_005"
+    ],
+    "US_Nebraska": [
+      "US_ZN_31_001",
+      "US_ZN_31_002",
+      "US_ZN_31_003",
+      "US_ZN_31_004",
+      "US_ZN_31_005",
+      "US_ZN_31_006",
+      "US_ZN_31_007",
+      "US_ZN_31_008"
+    ],
+    "US_New_Hampshire": [
+      "US_ZN_33_001",
+      "US_ZN_33_002",
+      "US_ZN_33_003",
+      "US_ZN_33_004",
+      "US_ZN_33_005",
+      "US_ZN_33_006"
+    ],
+    "US_New_Jersey": [
+      "US_CNTY_34023",
+      "US_CNTY_34013",
+      "US_CNTY_34003",
+      "US_CNTY_34017",
+      "US_ZN_34_001",
+      "US_ZN_34_002",
+      "US_ZN_34_003",
+      "US_ZN_34_004",
+      "US_ZN_34_005",
+      "US_ZN_34_006",
+      "US_ZN_34_007",
+      "US_ZN_34_008",
+      "US_ZN_34_009",
+      "US_ZN_34_010",
+      "US_ZN_34_011",
+      "US_ZN_34_012"
+    ],
+    "US_New_Mexico": [
+      "US_ZN_35_001",
+      "US_ZN_35_002",
+      "US_ZN_35_003",
+      "US_ZN_35_004",
+      "US_ZN_35_005",
+      "US_ZN_35_006",
+      "US_ZN_35_007",
+      "US_ZN_35_008"
+    ],
+    "US_Nevada": [
+      "US_CNTY_32003",
+      "US_ZN_32_001",
+      "US_ZN_32_002",
+      "US_ZN_32_003",
+      "US_ZN_32_004",
+      "US_ZN_32_005",
+      "US_ZN_32_006",
+      "US_ZN_32_007",
+      "US_ZN_32_008",
+      "US_ZN_32_009"
+    ],
+    "US_New_York": [
+      "US_CNTY_36005",
+      "US_CNTY_36119",
+      "US_CNTY_36029",
+      "US_CNTY_36047",
+      "US_CNTY_36061",
+      "US_CNTY_36059",
+      "US_CNTY_36103",
+      "US_CNTY_36055",
+      "US_CNTY_36081",
+      "US_ZN_36_001",
+      "US_ZN_36_002",
+      "US_ZN_36_003",
+      "US_ZN_36_004",
+      "US_ZN_36_005",
+      "US_ZN_36_006",
+      "US_ZN_36_007",
+      "US_ZN_36_008",
+      "US_ZN_36_009",
+      "US_ZN_36_010",
+      "US_ZN_36_011",
+      "US_ZN_36_012",
+      "US_ZN_36_013",
+      "US_ZN_36_014",
+      "US_ZN_36_015"
+    ],
+    "US_Ohio": [
+      "US_CNTY_39035",
+      "US_CNTY_39061",
+      "US_CNTY_39049",
+      "US_ZN_39_001",
+      "US_ZN_39_002",
+      "US_ZN_39_003",
+      "US_ZN_39_004",
+      "US_ZN_39_005",
+      "US_ZN_39_006",
+      "US_ZN_39_007",
+      "US_ZN_39_008",
+      "US_ZN_39_009",
+      "US_ZN_39_010",
+      "US_ZN_39_011",
+      "US_ZN_39_012",
+      "US_ZN_39_013",
+      "US_ZN_39_014",
+      "US_ZN_39_015"
+    ],
+    "US_Oklahoma": [
+      "US_CNTY_40109",
+      "US_ZN_40_001",
+      "US_ZN_40_002",
+      "US_ZN_40_003",
+      "US_ZN_40_004",
+      "US_ZN_40_005",
+      "US_ZN_40_006",
+      "US_ZN_40_007",
+      "US_ZN_40_008",
+      "US_ZN_40_009",
+      "US_ZN_40_010"
+    ],
+    "US_Oregon": [
+      "US_CNTY_41051",
+      "US_ZN_41_001",
+      "US_ZN_41_002",
+      "US_ZN_41_003",
+      "US_ZN_41_004",
+      "US_ZN_41_005",
+      "US_ZN_41_006",
+      "US_ZN_41_007",
+      "US_ZN_41_008",
+      "US_ZN_41_009",
+      "US_ZN_41_010"
+    ],
+    "US_Pennsylvania": [
+      "US_CNTY_42091",
+      "US_CNTY_42003",
+      "US_CNTY_42101",
+      "US_ZN_42_001",
+      "US_ZN_42_002",
+      "US_ZN_42_003",
+      "US_ZN_42_004",
+      "US_ZN_42_005",
+      "US_ZN_42_006",
+      "US_ZN_42_007",
+      "US_ZN_42_008",
+      "US_ZN_42_009",
+      "US_ZN_42_010",
+      "US_ZN_42_011",
+      "US_ZN_42_012",
+      "US_ZN_42_013",
+      "US_ZN_42_014",
+      "US_ZN_42_015",
+      "US_ZN_42_016"
+    ],
+    "US_Rhode_Island": [
+      "US_CNTY_44007",
+      "US_CNTY_44009",
+      "US_CNTY_44005",
+      "US_CNTY_44001",
+      "US_CNTY_44003"
+    ],
+    "US_South_Carolina": [
+      "US_ZN_45_001",
+      "US_ZN_45_002",
+      "US_ZN_45_003",
+      "US_ZN_45_004",
+      "US_ZN_45_005",
+      "US_ZN_45_006",
+      "US_ZN_45_007",
+      "US_ZN_45_008",
+      "US_ZN_45_009",
+      "US_ZN_45_010",
+      "US_ZN_45_011",
+      "US_ZN_45_012"
+    ],
+    "US_South_Dakota": [
+      "US_ZN_46_001",
+      "US_ZN_46_002",
+      "US_ZN_46_003",
+      "US_ZN_46_004",
+      "US_ZN_46_005"
+    ],
+    "US_Tennessee": [
+      "US_CNTY_47157",
+      "US_CNTY_47037",
+      "US_ZN_47_001",
+      "US_ZN_47_002",
+      "US_ZN_47_003",
+      "US_ZN_47_004",
+      "US_ZN_47_005",
+      "US_ZN_47_006",
+      "US_ZN_47_007",
+      "US_ZN_47_008",
+      "US_ZN_47_009",
+      "US_ZN_47_010",
+      "US_ZN_47_011",
+      "US_ZN_47_012"
+    ],
+    "US_Texas": [
+      "US_CNTY_48287",
+      "US_CNTY_48037",
+      "US_CNTY_48273",
+      "US_CNTY_48229",
+      "US_CNTY_48419",
+      "US_CNTY_48301",
+      "US_CNTY_48339",
+      "US_CNTY_48029",
+      "US_CNTY_48245",
+      "US_CNTY_48457",
+      "US_CNTY_48157",
+      "US_CNTY_48139",
+      "US_CNTY_48499",
+      "US_CNTY_48041",
+      "US_CNTY_48459",
+      "US_CNTY_48343",
+      "US_CNTY_48393",
+      "US_CNTY_48289",
+      "US_CNTY_48349",
+      "US_CNTY_48185",
+      "US_CNTY_48467",
+      "US_CNTY_48125",
+      "US_CNTY_48105",
+      "US_CNTY_48415",
+      "US_CNTY_48379",
+      "US_CNTY_48261",
+      "US_CNTY_48213",
+      "US_CNTY_48355",
+      "US_CNTY_48427",
+      "US_CNTY_48409",
+      "US_CNTY_48039",
+      "US_CNTY_48443",
+      "US_CNTY_48211",
+      "US_CNTY_48067",
+      "US_CNTY_48387",
+      "US_CNTY_48219",
+      "US_CNTY_48127",
+      "US_CNTY_48471",
+      "US_CNTY_48089",
+      "US_CNTY_48131",
+      "US_CNTY_48475",
+      "US_CNTY_48225",
+      "US_CNTY_48347",
+      "US_CNTY_48153",
+      "US_CNTY_48469",
+      "US_CNTY_48223",
+      "US_CNTY_48025",
+      "US_CNTY_48119",
+      "US_CNTY_48455",
+      "US_CNTY_48015",
+      "US_CNTY_48151",
+      "US_CNTY_48407",
+      "US_CNTY_48405",
+      "US_CNTY_48477",
+      "US_CNTY_48435",
+      "US_CNTY_48071",
+      "US_CNTY_48377",
+      "US_CNTY_48087",
+      "US_CNTY_48269",
+      "US_CNTY_48345",
+      "US_CNTY_48061",
+      "US_CNTY_48473",
+      "US_CNTY_48161",
+      "US_CNTY_48453",
+      "US_CNTY_48495",
+      "US_CNTY_48491",
+      "US_CNTY_48423",
+      "US_CNTY_48461",
+      "US_CNTY_48373",
+      "US_CNTY_48241",
+      "US_CNTY_48449",
+      "US_CNTY_48389",
+      "US_CNTY_48437",
+      "US_CNTY_48173",
+      "US_CNTY_48361",
+      "US_CNTY_48167",
+      "US_CNTY_48007",
+      "US_CNTY_48465",
+      "US_CNTY_48403",
+      "US_CNTY_48315",
+      "US_CNTY_48257",
+      "US_CNTY_48277",
+      "US_CNTY_48005",
+      "US_CNTY_48507",
+      "US_CNTY_48401",
+      "US_CNTY_48003",
+      "US_CNTY_48395",
+      "US_CNTY_48371",
+      "US_CNTY_48051",
+      "US_CNTY_48239",
+      "US_CNTY_48351",
+      "US_CNTY_48103",
+      "US_CNTY_48237",
+      "US_CNTY_48327",
+      "US_CNTY_48053",
+      "US_CNTY_48463",
+      "US_CNTY_48311",
+      "US_CNTY_48187",
+      "US_CNTY_48203",
+      "US_CNTY_48391",
+      "US_CNTY_48057",
+      "US_CNTY_48133",
+      "US_CNTY_48155",
+      "US_CNTY_48073",
+      "US_CNTY_48063",
+      "US_CNTY_48141",
+      "US_CNTY_48001",
+      "US_CNTY_48199",
+      "US_CNTY_48243",
+      "US_CNTY_48329",
+      "US_CNTY_48323",
+      "US_CNTY_48503",
+      "US_CNTY_48043",
+      "US_CNTY_48333",
+      "US_CNTY_48215",
+      "US_CNTY_48481",
+      "US_CNTY_48169",
+      "US_CNTY_48135",
+      "US_CNTY_48055",
+      "US_CNTY_48445",
+      "US_CNTY_48497",
+      "US_CNTY_48069",
+      "US_CNTY_48309",
+      "US_CNTY_48331",
+      "US_CNTY_48091",
+      "US_CNTY_48183",
+      "US_CNTY_48195",
+      "US_CNTY_48353",
+      "US_CNTY_48031",
+      "US_CNTY_48297",
+      "US_CNTY_48179",
+      "US_CNTY_48123",
+      "US_CNTY_48285",
+      "US_CNTY_48247",
+      "US_CNTY_48045",
+      "US_CNTY_48383",
+      "US_CNTY_48283",
+      "US_CNTY_48205",
+      "US_CNTY_48033",
+      "US_CNTY_48321",
+      "US_CNTY_48337",
+      "US_CNTY_48077",
+      "US_CNTY_48295",
+      "US_CNTY_48079",
+      "US_CNTY_48487",
+      "US_CNTY_48117",
+      "US_CNTY_48489",
+      "US_CNTY_48479",
+      "US_CNTY_48201",
+      "US_CNTY_48165",
+      "US_CNTY_48369",
+      "US_CNTY_48147",
+      "US_CNTY_48111",
+      "US_CNTY_48085",
+      "US_CNTY_48431",
+      "US_CNTY_48209",
+      "US_CNTY_48121",
+      "US_CNTY_48303",
+      "US_CNTY_48399",
+      "US_CNTY_48259",
+      "US_CNTY_48325",
+      "US_CNTY_48249",
+      "US_CNTY_48193",
+      "US_CNTY_48293",
+      "US_CNTY_48191",
+      "US_CNTY_48305",
+      "US_CNTY_48107",
+      "US_CNTY_48137",
+      "US_CNTY_48027",
+      "US_CNTY_48021",
+      "US_CNTY_48441",
+      "US_CNTY_48291",
+      "US_CNTY_48197",
+      "US_CNTY_48483",
+      "US_CNTY_48017",
+      "US_CNTY_48439",
+      "US_CNTY_48485",
+      "US_CNTY_48307",
+      "US_CNTY_48177",
+      "US_CNTY_48221",
+      "US_CNTY_48501",
+      "US_CNTY_48227",
+      "US_CNTY_48099",
+      "US_CNTY_48451",
+      "US_CNTY_48149",
+      "US_CNTY_48447",
+      "US_CNTY_48009",
+      "US_CNTY_48013",
+      "US_CNTY_48143",
+      "US_CNTY_48375",
+      "US_CNTY_48341",
+      "US_CNTY_48233",
+      "US_CNTY_48319",
+      "US_CNTY_48019",
+      "US_CNTY_48279",
+      "US_CNTY_48175",
+      "US_CNTY_48023",
+      "US_CNTY_48317",
+      "US_CNTY_48275",
+      "US_CNTY_48425",
+      "US_CNTY_48163",
+      "US_CNTY_48313",
+      "US_CNTY_48411",
+      "US_CNTY_48263",
+      "US_CNTY_48075",
+      "US_CNTY_48433",
+      "US_CNTY_48109",
+      "US_CNTY_48413",
+      "US_CNTY_48011",
+      "US_CNTY_48095",
+      "US_CNTY_48421",
+      "US_CNTY_48365",
+      "US_CNTY_48265",
+      "US_CNTY_48251",
+      "US_CNTY_48035",
+      "US_CNTY_48081",
+      "US_CNTY_48217",
+      "US_CNTY_48363",
+      "US_CNTY_48335",
+      "US_CNTY_48189",
+      "US_CNTY_48159",
+      "US_CNTY_48101",
+      "US_CNTY_48171",
+      "US_CNTY_48093",
+      "US_CNTY_48049",
+      "US_CNTY_48267",
+      "US_CNTY_48429",
+      "US_CNTY_48235",
+      "US_CNTY_48065",
+      "US_CNTY_48129",
+      "US_CNTY_48181",
+      "US_CNTY_48493",
+      "US_CNTY_48253",
+      "US_CNTY_48417",
+      "US_CNTY_48385",
+      "US_CNTY_48255",
+      "US_CNTY_48505",
+      "US_CNTY_48357",
+      "US_CNTY_48097",
+      "US_CNTY_48115",
+      "US_CNTY_48381",
+      "US_CNTY_48207",
+      "US_CNTY_48281",
+      "US_CNTY_48271",
+      "US_CNTY_48359",
+      "US_CNTY_48113",
+      "US_CNTY_48083",
+      "US_CNTY_48367",
+      "US_CNTY_48299",
+      "US_CNTY_48047",
+      "US_CNTY_48397",
+      "US_CNTY_48059",
+      "US_CNTY_48145",
+      "US_CNTY_48231"
+    ],
+    "US_Utah": [
+      "US_CNTY_49049",
+      "US_CNTY_49035",
+      "US_ZN_49_001",
+      "US_ZN_49_002",
+      "US_ZN_49_003",
+      "US_ZN_49_004",
+      "US_ZN_49_005",
+      "US_ZN_49_006",
+      "US_ZN_49_007",
+      "US_ZN_49_008"
+    ],
+    "US_Virginia": [
+      "US_CNTY_51059",
+      "US_ZN_51_001",
+      "US_ZN_51_002",
+      "US_ZN_51_003",
+      "US_ZN_51_004",
+      "US_ZN_51_005",
+      "US_ZN_51_006",
+      "US_ZN_51_007",
+      "US_ZN_51_008",
+      "US_ZN_51_009",
+      "US_ZN_51_010",
+      "US_ZN_51_011",
+      "US_ZN_51_012",
+      "US_ZN_51_013",
+      "US_ZN_51_014",
+      "US_ZN_51_015"
+    ],
+    "US_Vermont": [
+      "US_ZN_50_001",
+      "US_ZN_50_002",
+      "US_ZN_50_003",
+      "US_ZN_50_004"
+    ],
+    "US_Washington": [
+      "US_CNTY_53053",
+      "US_CNTY_53033",
+      "US_CNTY_53061",
+      "US_ZN_53_001",
+      "US_ZN_53_002",
+      "US_ZN_53_003",
+      "US_ZN_53_004",
+      "US_ZN_53_005",
+      "US_ZN_53_006",
+      "US_ZN_53_007",
+      "US_ZN_53_008",
+      "US_ZN_53_009",
+      "US_ZN_53_010",
+      "US_ZN_53_011",
+      "US_ZN_53_012"
+    ],
+    "US_Wisconsin": [
+      "US_CNTY_55079",
+      "US_ZN_55_001",
+      "US_ZN_55_002",
+      "US_ZN_55_003",
+      "US_ZN_55_004",
+      "US_ZN_55_005",
+      "US_ZN_55_006",
+      "US_ZN_55_007",
+      "US_ZN_55_008",
+      "US_ZN_55_009",
+      "US_ZN_55_010",
+      "US_ZN_55_011",
+      "US_ZN_55_012"
+    ],
+    "US_West_Virginia": [
+      "US_ZN_54_001",
+      "US_ZN_54_002",
+      "US_ZN_54_003",
+      "US_ZN_54_004",
+      "US_ZN_54_005",
+      "US_ZN_54_006",
+      "US_ZN_54_007"
+    ],
+    "US_Wyoming": [
+      "US_ZN_56_001",
+      "US_ZN_56_002",
+      "US_ZN_56_003",
+      "US_ZN_56_004"
+    ],
+    "AO_Lunda_Norte": [
+      "AO_ADM1_AGO-1874"
+    ],
+    "AO_Lunda_Sul": [
+      "AO_ADM1_AGO-1875"
+    ],
+    "AO_Malanje": [
+      "AO_ADM1_AGO-1876"
+    ],
+    "AO_Bengo": [
+      "AO_ADM1_AGO-1877"
+    ],
+    "AO_Cuanza_Norte": [
+      "AO_ADM1_AGO-1878"
+    ],
+    "AO_Cuanza_Sul": [
+      "AO_ADM1_AGO-1879"
+    ],
+    "AO_Luanda": [
+      "AO_ADM1_AGO-1880"
+    ],
+    "AO_U_ge": [
+      "AO_ADM1_AGO-1881"
+    ],
+    "AO_Zaire": [
+      "AO_ADM1_AGO-1882"
+    ],
+    "AO_Cabinda": [
+      "AO_ADM1_AGO-1885"
+    ],
+    "AO_Bi": [
+      "AO_ADM1_AGO-1886"
+    ],
+    "AO_Benguela": [
+      "AO_ADM1_AGO-1887"
+    ],
+    "AO_Cuando_Cubango": [
+      "AO_ADM1_AGO-1888"
+    ],
+    "AO_Cunene": [
+      "AO_ADM1_AGO-1889"
+    ],
+    "AO_Huambo": [
+      "AO_ADM1_AGO-1890"
+    ],
+    "AO_Hu_la": [
+      "AO_ADM1_AGO-1891"
+    ],
+    "AO_Moxico": [
+      "AO_ADM1_AGO-1892"
+    ],
+    "AO_Namibe": [
+      "AO_ADM1_AGO-1893"
+    ],
+    "BJ_Borgou": [
+      "BJ_ADM1_BEN-2169"
+    ],
+    "BJ_Alibori": [
+      "BJ_ADM1_BEN-2170"
+    ],
+    "BJ_Collines": [
+      "BJ_ADM1_BEN-2171"
+    ],
+    "BJ_Atlantique": [
+      "BJ_ADM1_BEN-2174"
+    ],
+    "BJ_Littoral": [
+      "BJ_ADM1_BEN-2175"
+    ],
+    "BJ_Kouffo": [
+      "BJ_ADM1_BEN-2176"
+    ],
+    "BJ_Ou_m": [
+      "BJ_ADM1_BEN-2177"
+    ],
+    "BJ_Zou": [
+      "BJ_ADM1_BEN-2178"
+    ],
+    "BJ_Plateau": [
+      "BJ_ADM1_BEN-2179"
+    ],
+    "BJ_Mono": [
+      "BJ_ADM1_BEN-2180"
+    ],
+    "BJ_Atakora": [
+      "BJ_ADM1_BEN-2181"
+    ],
+    "BJ_Donga": [
+      "BJ_ADM1_BEN-2182"
+    ],
+    "BW_Ghanzi": [
+      "BW_ADM1_BWA-1191"
+    ],
+    "BW_Kgalagadi": [
+      "BW_ADM1_BWA-2625"
+    ],
+    "BW_North_West": [
+      "BW_ADM1_BWA-2629"
+    ],
+    "BW_Central": [
+      "BW_ADM1_BWA-2630"
+    ],
+    "BW_Kgatleng": [
+      "BW_ADM1_BWA-2646"
+    ],
+    "BW_Kweneng": [
+      "BW_ADM1_BWA-2647"
+    ],
+    "BW_South_East": [
+      "BW_ADM1_BWA-2648"
+    ],
+    "BW_Southern": [
+      "BW_ADM1_BWA-2649"
+    ],
+    "BW_North_East": [
+      "BW_ADM1_BWA-4853"
+    ],
+    "BW_Gaborone": [
+      "BW_ADM1_BWA-5501"
+    ],
+    "BW_Francistown": [
+      "BW_ADM1_BWA-5502"
+    ],
+    "BW_Lobatse": [
+      "BW_ADM1_BWA-5503"
+    ],
+    "BW_Selebi_Phikwe": [
+      "BW_ADM1_BWA-5504"
+    ],
+    "BW_Sowa": [
+      "BW_ADM1_BWA-5505"
+    ],
+    "BW_Jwaneng": [
+      "BW_ADM1_BWA-5506"
+    ],
+    "BI_Cankuzo": [
+      "BI_ADM1_BDI-2632"
+    ],
+    "BI_Karuzi": [
+      "BI_ADM1_BDI-2633"
+    ],
+    "BI_Rutana": [
+      "BI_ADM1_BDI-2634"
+    ],
+    "BI_Ruyigi": [
+      "BI_ADM1_BDI-2635"
+    ],
+    "BI_Bubanza": [
+      "BI_ADM1_BDI-2636"
+    ],
+    "BI_Bururi": [
+      "BI_ADM1_BDI-2637"
+    ],
+    "BI_Cibitoke": [
+      "BI_ADM1_BDI-2638"
+    ],
+    "BI_Gitega": [
+      "BI_ADM1_BDI-2639"
+    ],
+    "BI_Kayanza": [
+      "BI_ADM1_BDI-2640"
+    ],
+    "BI_Makamba": [
+      "BI_ADM1_BDI-2641"
+    ],
+    "BI_Ngozi": [
+      "BI_ADM1_BDI-2642"
+    ],
+    "BI_Kirundo": [
+      "BI_ADM1_BDI-2643"
+    ],
+    "BI_Muyinga": [
+      "BI_ADM1_BDI-2644"
+    ],
+    "BI_Bujumbura_Mairie": [
+      "BI_ADM1_BDI-3364"
+    ],
+    "BI_Muramvya": [
+      "BI_ADM1_BDI-3365"
+    ],
+    "BI_Bujumbura_Rural": [
+      "BI_ADM1_BDI-4854"
+    ],
+    "BI_Mwaro": [
+      "BI_ADM1_BDI-5588"
+    ],
+    "CM_Far_North": [
+      "CM_ADM1_CMR-1462"
+    ],
+    "CM_Littoral": [
+      "CM_ADM1_CMR-1476"
+    ],
+    "CM_Northwest": [
+      "CM_ADM1_CMR-1477"
+    ],
+    "CM_Centre": [
+      "CM_ADM1_CMR-1480"
+    ],
+    "CM_East": [
+      "CM_ADM1_CMR-1481"
+    ],
+    "CM_Adamawa": [
+      "CM_ADM1_CMR-1482"
+    ],
+    "CM_North": [
+      "CM_ADM1_CMR-1483"
+    ],
+    "CM_West": [
+      "CM_ADM1_CMR-798"
+    ],
+    "CM_Southwest": [
+      "CM_ADM1_CMR-799"
+    ],
+    "CM_South": [
+      "CM_ADM1_CMR-803"
+    ],
+    "CV_Brava": [
+      "CV_ADM1_CPV-5041"
+    ],
+    "CV_S_o_Filipe": [
+      "CV_ADM1_CPV-5042"
+    ],
+    "CV_Mosteiros": [
+      "CV_ADM1_CPV-5043"
+    ],
+    "CV_Santa_Catarina_do_Fogo": [
+      "CV_ADM1_CPV-5044"
+    ],
+    "CV_Tarrafal": [
+      "CV_ADM1_CPV-5045"
+    ],
+    "CV_Santa_Catarina": [
+      "CV_ADM1_CPV-5046"
+    ],
+    "CV_S_o_Miguel": [
+      "CV_ADM1_CPV-5047"
+    ],
+    "CV_Santa_Cruz": [
+      "CV_ADM1_CPV-5048"
+    ],
+    "CV_S_o_Salvador_do_Mundo": [
+      "CV_ADM1_CPV-5049"
+    ],
+    "CV_S_o_Louren_o_dos_rg_os": [
+      "CV_ADM1_CPV-5050"
+    ],
+    "CV_S_o_Domingos": [
+      "CV_ADM1_CPV-5051"
+    ],
+    "CV_Ribeira_Grande_de_Santiago": [
+      "CV_ADM1_CPV-5052"
+    ],
+    "CV_Praia": [
+      "CV_ADM1_CPV-5053"
+    ],
+    "CV_Maio": [
+      "CV_ADM1_CPV-5054"
+    ],
+    "CV_Boa_Vista": [
+      "CV_ADM1_CPV-5055"
+    ],
+    "CV_Sal": [
+      "CV_ADM1_CPV-5056"
+    ],
+    "CV_Ribeira_Brava": [
+      "CV_ADM1_CPV-5057"
+    ],
+    "CV_Tarrafal_de_S_o_Nicolau": [
+      "CV_ADM1_CPV-5058"
+    ],
+    "CV_S_o_Vicente": [
+      "CV_ADM1_CPV-5059"
+    ],
+    "CV_Porto_Novo": [
+      "CV_ADM1_CPV-5060"
+    ],
+    "CV_Ribeira_Grande": [
+      "CV_ADM1_CPV-5061"
+    ],
+    "CV_Paul": [
+      "CV_ADM1_CPV-5062"
+    ],
+    "CF_Bangui": [
+      "CF_ADM1_CAF-1460"
+    ],
+    "CF_Ombella_M_Poko_Prefecture": [
+      "CF_ADM1_CAF-4856"
+    ],
+    "CF_Basse_Kotto_Prefecture": [
+      "CF_ADM1_CAF-794"
+    ],
+    "CF_Lobaye_Prefecture": [
+      "CF_ADM1_CAF-795"
+    ],
+    "CF_Mamb_r_Kad": [
+      "CF_ADM1_CAF-801"
+    ],
+    "CF_Sangha_Mba_r": [
+      "CF_ADM1_CAF-802"
+    ],
+    "CF_Nana_Mamb_r_Prefecture": [
+      "CF_ADM1_CAF-804"
+    ],
+    "CF_Ouham_Pend_Prefecture": [
+      "CF_ADM1_CAF-805"
+    ],
+    "CF_Bamingui_Bangoran_Prefecture": [
+      "CF_ADM1_CAF-806"
+    ],
+    "CF_Nana_Gr_bizi_Economic_Prefecture": [
+      "CF_ADM1_CAF-807"
+    ],
+    "CF_K_mo_Prefecture": [
+      "CF_ADM1_CAF-808"
+    ],
+    "CF_Ouaka_Prefecture": [
+      "CF_ADM1_CAF-809"
+    ],
+    "CF_Ouham_Prefecture": [
+      "CF_ADM1_CAF-810"
+    ],
+    "CF_Vakaga_Prefecture": [
+      "CF_ADM1_CAF-812"
+    ],
+    "CF_Haute_Kotto_Prefecture": [
+      "CF_ADM1_CAF-866"
+    ],
+    "CF_Haut_Mbomou_Prefecture": [
+      "CF_ADM1_CAF-867"
+    ],
+    "CF_Mbomou_Prefecture": [
+      "CF_ADM1_CAF-868"
+    ],
+    "TD_Hadjer_Lamis": [
+      "TD_ADM1_TCD-1464"
+    ],
+    "TD_Kanem": [
+      "TD_ADM1_TCD-1465"
+    ],
+    "TD_Lac": [
+      "TD_ADM1_TCD-1466"
+    ],
+    "TD_Batha": [
+      "TD_ADM1_TCD-1472"
+    ],
+    "TD_Wadi_Fira": [
+      "TD_ADM1_TCD-1473"
+    ],
+    "TD_Gu_ra": [
+      "TD_ADM1_TCD-1474"
+    ],
+    "TD_Ouadda": [
+      "TD_ADM1_TCD-1475"
+    ],
+    "TD_Logone_Occidental": [
+      "TD_ADM1_TCD-1484"
+    ],
+    "TD_Logone_Oriental": [
+      "TD_ADM1_TCD-1485"
+    ],
+    "TD_Mayo_Kebbi_Est": [
+      "TD_ADM1_TCD-1486"
+    ],
+    "TD_Tandjil": [
+      "TD_ADM1_TCD-1487"
+    ],
+    "TD_Mandoul": [
+      "TD_ADM1_TCD-1488"
+    ],
+    "TD_Salamat": [
+      "TD_ADM1_TCD-1489"
+    ],
+    "TD_N_Djamena": [
+      "TD_ADM1_TCD-4857"
+    ],
+    "TD_Mayo_Kebbi_Ouest": [
+      "TD_ADM1_TCD-4858"
+    ],
+    "TD_Borkou": [
+      "TD_ADM1_TCD-5577"
+    ],
+    "TD_Tibesti": [
+      "TD_ADM1_TCD-5578"
+    ],
+    "TD_Ennedi": [
+      "TD_ADM1_TCD-5579"
+    ],
+    "TD_Chari_Baguirmi": [
+      "TD_ADM1_TCD-5580"
+    ],
+    "TD_Bahr_el_Gazel": [
+      "TD_ADM1_TCD-5581"
+    ],
+    "TD_Sila": [
+      "TD_ADM1_TCD-5582"
+    ],
+    "TD_Moyen_Chari": [
+      "TD_ADM1_TCD-5583"
+    ],
+    "KM_Moh_li": [
+      "KM_ADM1_COM-4934"
+    ],
+    "KM_Andjaz_dja": [
+      "KM_ADM1_COM-4935"
+    ],
+    "KM_Anjouan": [
+      "KM_ADM1_COM-4936"
+    ],
+    "CD_quateur": [
+      "CD_ADM1_COD-1461"
+    ],
+    "CD_Orientale": [
+      "CD_ADM1_COD-1559"
+    ],
+    "CD_Bandundu": [
+      "CD_ADM1_COD-1871"
+    ],
+    "CD_Kasa_Occidental": [
+      "CD_ADM1_COD-1872"
+    ],
+    "CD_Kongo_Central": [
+      "CD_ADM1_COD-1883"
+    ],
+    "CD_Kinshasa": [
+      "CD_ADM1_COD-1884"
+    ],
+    "CD_South_Kivu": [
+      "CD_ADM1_COD-1894"
+    ],
+    "CD_Maniema": [
+      "CD_ADM1_COD-1895"
+    ],
+    "CD_Kasa_Oriental": [
+      "CD_ADM1_COD-1896"
+    ],
+    "CD_Katanga": [
+      "CD_ADM1_COD-1897"
+    ],
+    "CD_North_Kivu": [
+      "CD_ADM1_COD-1898"
+    ],
+    "DJ_Ali_Sabieh": [
+      "DJ_ADM1_DJI-1566"
+    ],
+    "DJ_Djibouti": [
+      "DJ_ADM1_DJI-1567"
+    ],
+    "DJ_Arta": [
+      "DJ_ADM1_DJI-1568"
+    ],
+    "DJ_Dikhil": [
+      "DJ_ADM1_DJI-1569"
+    ],
+    "DJ_Obock": [
+      "DJ_ADM1_DJI-1570"
+    ],
+    "DJ_Tadjourah": [
+      "DJ_ADM1_DJI-1571"
+    ],
+    "GQ_Annob_n": [
+      "GQ_ADM1_GNQ-1467"
+    ],
+    "GQ_Centro_Sur": [
+      "GQ_ADM1_GNQ-1468"
+    ],
+    "GQ_Ki_Ntem": [
+      "GQ_ADM1_GNQ-1469"
+    ],
+    "GQ_Litoral": [
+      "GQ_ADM1_GNQ-1470"
+    ],
+    "GQ_Wele_Nzas": [
+      "GQ_ADM1_GNQ-1471"
+    ],
+    "GQ_Bioko_Norte": [
+      "GQ_ADM1_GNQ-1478"
+    ],
+    "GQ_Bioko_Sur": [
+      "GQ_ADM1_GNQ-1479"
+    ],
+    "ER_Gash_Barka": [
+      "ER_ADM1_ERI-1560"
+    ],
+    "ER_Anseba": [
+      "ER_ADM1_ERI-1561"
+    ],
+    "ER_Debub": [
+      "ER_ADM1_ERI-1562"
+    ],
+    "ER_Northern_Red_Sea": [
+      "ER_ADM1_ERI-1563"
+    ],
+    "ER_Maekel": [
+      "ER_ADM1_ERI-1564"
+    ],
+    "ER_Southern_Red_Sea": [
+      "ER_ADM1_ERI-1565"
+    ],
+    "SZ_Hhohho": [
+      "SZ_ADM1_SWZ-534"
+    ],
+    "SZ_Lubombo": [
+      "SZ_ADM1_SWZ-535"
+    ],
+    "SZ_Manzini": [
+      "SZ_ADM1_SWZ-536"
+    ],
+    "SZ_Shiselweni": [
+      "SZ_ADM1_SWZ-537"
+    ],
+    "ET_Amhara": [
+      "ET_ADM1_ETH-3109"
+    ],
+    "ET_Tigray": [
+      "ET_ADM1_ETH-3110"
+    ],
+    "ET_Afar": [
+      "ET_ADM1_ETH-3111"
+    ],
+    "ET_Southern_Nations": [
+      "ET_ADM1_ETH-3129"
+    ],
+    "ET_Gambela": [
+      "ET_ADM1_ETH-3130"
+    ],
+    "ET_Oromia": [
+      "ET_ADM1_ETH-3131"
+    ],
+    "ET_Benishangul_Gumuz": [
+      "ET_ADM1_ETH-3132"
+    ],
+    "ET_Addis_Ababa": [
+      "ET_ADM1_ETH-3133"
+    ],
+    "ET_Somali": [
+      "ET_ADM1_ETH-3134"
+    ],
+    "ET_Dire_Dawa": [
+      "ET_ADM1_ETH-3135"
+    ],
+    "ET_Harari": [
+      "ET_ADM1_ETH-3136"
+    ],
+    "GA_Estuaire": [
+      "GA_ADM1_GAB-2168"
+    ],
+    "GA_Ogoou_Ivindo": [
+      "GA_ADM1_GAB-2186"
+    ],
+    "GA_Woleu_Ntem": [
+      "GA_ADM1_GAB-2187"
+    ],
+    "GA_Moyen_Ogoou": [
+      "GA_ADM1_GAB-2621"
+    ],
+    "GA_Ngouni": [
+      "GA_ADM1_GAB-2622"
+    ],
+    "GA_Nyanga": [
+      "GA_ADM1_GAB-2623"
+    ],
+    "GA_Ogoou_Maritime": [
+      "GA_ADM1_GAB-2624"
+    ],
+    "GA_Haut_Ogoou": [
+      "GA_ADM1_GAB-2627"
+    ],
+    "GA_Ogoou_Lolo": [
+      "GA_ADM1_GAB-2628"
+    ],
+    "GH_Northern": [
+      "GH_ADM1_GHA-2155"
+    ],
+    "GH_Upper_East": [
+      "GH_ADM1_GHA-2156"
+    ],
+    "GH_Upper_West": [
+      "GH_ADM1_GHA-2157"
+    ],
+    "GH_Ashanti": [
+      "GH_ADM1_GHA-2158"
+    ],
+    "GH_Brong_Ahafo": [
+      "GH_ADM1_GHA-2159"
+    ],
+    "GH_Central": [
+      "GH_ADM1_GHA-2160"
+    ],
+    "GH_Eastern": [
+      "GH_ADM1_GHA-2161"
+    ],
+    "GH_Western": [
+      "GH_ADM1_GHA-2162"
+    ],
+    "GH_Greater_Accra": [
+      "GH_ADM1_GHA-2172"
+    ],
+    "GH_Volta": [
+      "GH_ADM1_GHA-2173"
+    ],
+    "GW_Biombo": [
+      "GW_ADM1_GNB-5500"
+    ],
+    "GW_Bissau": [
+      "GW_ADM1_GNB-769"
+    ],
+    "GW_Bolama": [
+      "GW_ADM1_GNB-770"
+    ],
+    "GW_Cacheu": [
+      "GW_ADM1_GNB-771"
+    ],
+    "GW_Oio": [
+      "GW_ADM1_GNB-772"
+    ],
+    "GW_Quinara": [
+      "GW_ADM1_GNB-773"
+    ],
+    "GW_Bafat": [
+      "GW_ADM1_GNB-776"
+    ],
+    "GW_Gab": [
+      "GW_ADM1_GNB-777"
+    ],
+    "GW_Tombali": [
+      "GW_ADM1_GNB-778"
+    ],
+    "KE_Coast": [
+      "KE_ADM1_KEN-1193"
+    ],
+    "KE_Central": [
+      "KE_ADM1_KEN-1195"
+    ],
+    "KE_Nairobi": [
+      "KE_ADM1_KEN-1196"
+    ],
+    "KE_Nyanza": [
+      "KE_ADM1_KEN-1197"
+    ],
+    "KE_Eastern": [
+      "KE_ADM1_KEN-889"
+    ],
+    "KE_Rift_Valley": [
+      "KE_ADM1_KEN-890"
+    ],
+    "KE_Western": [
+      "KE_ADM1_KEN-891"
+    ],
+    "KE_North_Eastern": [
+      "KE_ADM1_KEN-893"
+    ],
+    "LS_Berea": [
+      "LS_ADM1_LSO-1202"
+    ],
+    "LS_Maseru": [
+      "LS_ADM1_LSO-1203"
+    ],
+    "LS_Mohale_s_Hoek": [
+      "LS_ADM1_LSO-1204"
+    ],
+    "LS_Quthing": [
+      "LS_ADM1_LSO-1205"
+    ],
+    "LS_Butha_Buthe": [
+      "LS_ADM1_LSO-1211"
+    ],
+    "LS_Leribe": [
+      "LS_ADM1_LSO-1212"
+    ],
+    "LS_Mokhotlong": [
+      "LS_ADM1_LSO-1213"
+    ],
+    "LS_Qacha_s_Nek": [
+      "LS_ADM1_LSO-1214"
+    ],
+    "LS_Thaba_Tseka": [
+      "LS_ADM1_LSO-1215"
+    ],
+    "LS_Mafeteng": [
+      "LS_ADM1_LSO-3453"
+    ],
+    "LR_River_Gee": [
+      "LR_ADM1_LBR-1458"
+    ],
+    "LR_Gbarpolu": [
+      "LR_ADM1_LBR-1459"
+    ],
+    "LR_Grand_Kru": [
+      "LR_ADM1_LBR-780"
+    ],
+    "LR_Maryland": [
+      "LR_ADM1_LBR-781"
+    ],
+    "LR_Sinoe": [
+      "LR_ADM1_LBR-782"
+    ],
+    "LR_Bomi": [
+      "LR_ADM1_LBR-783"
+    ],
+    "LR_Bong": [
+      "LR_ADM1_LBR-784"
+    ],
+    "LR_Grand_Bassa": [
+      "LR_ADM1_LBR-785"
+    ],
+    "LR_Grand_Cape_Mount": [
+      "LR_ADM1_LBR-786"
+    ],
+    "LR_Lofa": [
+      "LR_ADM1_LBR-787"
+    ],
+    "LR_Montserrado": [
+      "LR_ADM1_LBR-788"
+    ],
+    "LR_Margibi": [
+      "LR_ADM1_LBR-789"
+    ],
+    "LR_Nimba": [
+      "LR_ADM1_LBR-791"
+    ],
+    "LR_River_Cess": [
+      "LR_ADM1_LBR-792"
+    ],
+    "LR_Grand_Gedeh": [
+      "LR_ADM1_LBR-793"
+    ],
+    "MG_Toamasina": [
+      "MG_ADM1_MDG-5860",
+      "MG_ADM1_MDG-5863",
+      "MG_ADM1_MDG-5868"
+    ],
+    "MG_Amoron_i_Mania": [
+      "MG_ADM1_MDG-5861"
+    ],
+    "MG_Antananarivo": [
+      "MG_ADM1_MDG-5862",
+      "MG_ADM1_MDG-5871",
+      "MG_ADM1_MDG-5875",
+      "MG_ADM1_MDG-5881"
+    ],
+    "MG_Androy": [
+      "MG_ADM1_MDG-5864"
+    ],
+    "MG_Anosy": [
+      "MG_ADM1_MDG-5865"
+    ],
+    "MG_Atsimo_Andrefana": [
+      "MG_ADM1_MDG-5866"
+    ],
+    "MG_Atsimo_Atsinanana": [
+      "MG_ADM1_MDG-5867"
+    ],
+    "MG_Betsiboka": [
+      "MG_ADM1_MDG-5869"
+    ],
+    "MG_Boeny": [
+      "MG_ADM1_MDG-5870"
+    ],
+    "MG_Diana": [
+      "MG_ADM1_MDG-5872"
+    ],
+    "MG_Haute_Matsiatra": [
+      "MG_ADM1_MDG-5873"
+    ],
+    "MG_Ihorombe": [
+      "MG_ADM1_MDG-5874"
+    ],
+    "MG_Melaky": [
+      "MG_ADM1_MDG-5876"
+    ],
+    "MG_Menabe": [
+      "MG_ADM1_MDG-5878"
+    ],
+    "MG_Sava": [
+      "MG_ADM1_MDG-5879"
+    ],
+    "MG_Sofia": [
+      "MG_ADM1_MDG-5880"
+    ],
+    "MG_Vatovavy_Fitovinany": [
+      "MG_ADM1_MDG-5882"
+    ],
+    "ML_Tombouctou": [
+      "ML_ADM1_MLI-2688"
+    ],
+    "ML_Kidal": [
+      "ML_ADM1_MLI-2689"
+    ],
+    "ML_Gao": [
+      "ML_ADM1_MLI-2690"
+    ],
+    "ML_Bamako": [
+      "ML_ADM1_MLI-2792"
+    ],
+    "ML_Kayes": [
+      "ML_ADM1_MLI-2793"
+    ],
+    "ML_Wassoulou": [
+      "ML_ADM1_MLI-2794"
+    ],
+    "ML_Mopti": [
+      "ML_ADM1_MLI-2809"
+    ],
+    "ML_S_gou": [
+      "ML_ADM1_MLI-2810"
+    ],
+    "ML_Koulikoro": [
+      "ML_ADM1_MLI-4860"
+    ],
+    "MR_Tiris_Zemmour": [
+      "MR_ADM1_MRT-2783"
+    ],
+    "MR_Brakna": [
+      "MR_ADM1_MRT-2784"
+    ],
+    "MR_Dakhlet_Nouadhibou": [
+      "MR_ADM1_MRT-2785"
+    ],
+    "MR_Inchiri": [
+      "MR_ADM1_MRT-2786"
+    ],
+    "MR_Nouakchott": [
+      "MR_ADM1_MRT-2787"
+    ],
+    "MR_Trarza": [
+      "MR_ADM1_MRT-2788"
+    ],
+    "MR_Assaba": [
+      "MR_ADM1_MRT-2789"
+    ],
+    "MR_Guidimaka": [
+      "MR_ADM1_MRT-2790"
+    ],
+    "MR_Gorgol": [
+      "MR_ADM1_MRT-2791"
+    ],
+    "MR_Adrar": [
+      "MR_ADM1_MRT-2795"
+    ],
+    "MR_Hodh_Ech_Chargui": [
+      "MR_ADM1_MRT-2796"
+    ],
+    "MR_Hodh_El_Gharbi": [
+      "MR_ADM1_MRT-2797"
+    ],
+    "MR_Tagant": [
+      "MR_ADM1_MRT-2798"
+    ],
+    "MZ_Tete": [
+      "MZ_ADM1_MOZ-1190"
+    ],
+    "MZ_Manica": [
+      "MZ_ADM1_MOZ-1192"
+    ],
+    "MZ_Cabo_Delgado": [
+      "MZ_ADM1_MOZ-1198"
+    ],
+    "MZ_Niassa": [
+      "MZ_ADM1_MOZ-1199"
+    ],
+    "MZ_Nampula": [
+      "MZ_ADM1_MOZ-1200"
+    ],
+    "MZ_Gaza": [
+      "MZ_ADM1_MOZ-1207"
+    ],
+    "MZ_Sofala": [
+      "MZ_ADM1_MOZ-1905"
+    ],
+    "MZ_Zambezia": [
+      "MZ_ADM1_MOZ-1906"
+    ],
+    "MZ_Inhambane": [
+      "MZ_ADM1_MOZ-1925"
+    ],
+    "MZ_Maputo": [
+      "MZ_ADM1_MOZ-1927",
+      "MZ_ADM1_MOZ-5854"
+    ],
+    "NA_Karas": [
+      "NA_ADM1_NAM-3338"
+    ],
+    "NA_Hardap": [
+      "NA_ADM1_NAM-3339"
+    ],
+    "NA_Khomas": [
+      "NA_ADM1_NAM-3340"
+    ],
+    "NA_Kunene": [
+      "NA_ADM1_NAM-3347"
+    ],
+    "NA_Erongo": [
+      "NA_ADM1_NAM-3348"
+    ],
+    "NA_Otjozondjupa": [
+      "NA_ADM1_NAM-3349"
+    ],
+    "NA_Omusati": [
+      "NA_ADM1_NAM-3350"
+    ],
+    "NA_Oshana": [
+      "NA_ADM1_NAM-3351"
+    ],
+    "NA_Ohangwena": [
+      "NA_ADM1_NAM-3352"
+    ],
+    "NA_Omaheke": [
+      "NA_ADM1_NAM-3353"
+    ],
+    "NA_Kavango": [
+      "NA_ADM1_NAM-3354"
+    ],
+    "NA_Oshikoto": [
+      "NA_ADM1_NAM-3355"
+    ],
+    "NA_Zambezi": [
+      "NA_ADM1_NAM-3356"
+    ],
+    "NE_Tillab_ri": [
+      "NE_ADM1_NER-4859"
+    ],
+    "NE_Diffa": [
+      "NE_ADM1_NER-796"
+    ],
+    "NE_Agadez": [
+      "NE_ADM1_NER-800"
+    ],
+    "NE_Maradi": [
+      "NE_ADM1_NER-91"
+    ],
+    "NE_Zinder": [
+      "NE_ADM1_NER-92"
+    ],
+    "NE_Dosso": [
+      "NE_ADM1_NER-93"
+    ],
+    "NE_Niamey": [
+      "NE_ADM1_NER-94"
+    ],
+    "NE_Tahoua": [
+      "NE_ADM1_NER-95"
+    ],
+    "NG_Borno_State": [
+      "NG_ADM1_NGA-2839"
+    ],
+    "NG_Abia_State": [
+      "NG_ADM1_NGA-2841"
+    ],
+    "NG_Akwa_Ibom_State": [
+      "NG_ADM1_NGA-2842"
+    ],
+    "NG_Imo_State": [
+      "NG_ADM1_NGA-2843"
+    ],
+    "NG_Rivers_State": [
+      "NG_ADM1_NGA-2844"
+    ],
+    "NG_Bayelsa_State": [
+      "NG_ADM1_NGA-2845"
+    ],
+    "NG_Benue_State": [
+      "NG_ADM1_NGA-2846"
+    ],
+    "NG_Cross_River_State": [
+      "NG_ADM1_NGA-2847"
+    ],
+    "NG_Taraba_State": [
+      "NG_ADM1_NGA-2848"
+    ],
+    "NG_Kwara_State": [
+      "NG_ADM1_NGA-2849"
+    ],
+    "NG_Lagos": [
+      "NG_ADM1_NGA-2850"
+    ],
+    "NG_Niger_State": [
+      "NG_ADM1_NGA-2851"
+    ],
+    "NG_Ogun_State": [
+      "NG_ADM1_NGA-2852"
+    ],
+    "NG_Ondo_State": [
+      "NG_ADM1_NGA-2853"
+    ],
+    "NG_Ekiti_State": [
+      "NG_ADM1_NGA-2854"
+    ],
+    "NG_Osun_State": [
+      "NG_ADM1_NGA-2855"
+    ],
+    "NG_Oyo_State": [
+      "NG_ADM1_NGA-2856"
+    ],
+    "NG_Anambra_State": [
+      "NG_ADM1_NGA-2857"
+    ],
+    "NG_Bauchi_State": [
+      "NG_ADM1_NGA-2858"
+    ],
+    "NG_Gombe_State": [
+      "NG_ADM1_NGA-2859"
+    ],
+    "NG_Delta_State": [
+      "NG_ADM1_NGA-2860"
+    ],
+    "NG_Edo_State": [
+      "NG_ADM1_NGA-2861"
+    ],
+    "NG_Enugu_State": [
+      "NG_ADM1_NGA-2862"
+    ],
+    "NG_Ebonyi_State": [
+      "NG_ADM1_NGA-2863"
+    ],
+    "NG_Kaduna_State": [
+      "NG_ADM1_NGA-2864"
+    ],
+    "NG_Kogi_State": [
+      "NG_ADM1_NGA-2865"
+    ],
+    "NG_Plateau_State": [
+      "NG_ADM1_NGA-2866"
+    ],
+    "NG_Nasarawa_State": [
+      "NG_ADM1_NGA-2867"
+    ],
+    "NG_Jigawa_State": [
+      "NG_ADM1_NGA-2868"
+    ],
+    "NG_Kano_State": [
+      "NG_ADM1_NGA-2869"
+    ],
+    "NG_Katsina_State": [
+      "NG_ADM1_NGA-2870"
+    ],
+    "NG_Sokoto_State": [
+      "NG_ADM1_NGA-2871"
+    ],
+    "NG_Zamfara_State": [
+      "NG_ADM1_NGA-2872"
+    ],
+    "NG_Yobe_State": [
+      "NG_ADM1_NGA-2873"
+    ],
+    "NG_Kebbi_State": [
+      "NG_ADM1_NGA-2879"
+    ],
+    "NG_Adamawa_State": [
+      "NG_ADM1_NGA-2881"
+    ],
+    "NG_Federal_Capital_Territory": [
+      "NG_ADM1_NGA-3470"
+    ],
+    "CG_Cuvette_Ouest": [
+      "CG_ADM1_COG-2185"
+    ],
+    "CG_Bouenza": [
+      "CG_ADM1_COG-2626"
+    ],
+    "CG_Likouala": [
+      "CG_ADM1_COG-2838"
+    ],
+    "CG_Sangha": [
+      "CG_ADM1_COG-2880"
+    ],
+    "CG_Pool": [
+      "CG_ADM1_COG-3341"
+    ],
+    "CG_Cuvette": [
+      "CG_ADM1_COG-3342"
+    ],
+    "CG_Kouilou": [
+      "CG_ADM1_COG-3343"
+    ],
+    "CG_L_koumou": [
+      "CG_ADM1_COG-3344"
+    ],
+    "CG_Niari": [
+      "CG_ADM1_COG-3345"
+    ],
+    "CG_Plateaux": [
+      "CG_ADM1_COG-3346"
+    ],
+    "CG_Brazzaville": [
+      "CG_ADM1_COG-4855"
+    ],
+    "CG_Pointe_Noire": [
+      "CG_ADM1_COG-5855"
+    ],
+    "RW_Southern": [
+      "RW_ADM1_RWA-3491"
+    ],
+    "RW_Western": [
+      "RW_ADM1_RWA-3492"
+    ],
+    "RW_Eastern": [
+      "RW_ADM1_RWA-3493"
+    ],
+    "RW_Northern": [
+      "RW_ADM1_RWA-3494"
+    ],
+    "RW_Kigali": [
+      "RW_ADM1_RWA-3495"
+    ],
+    "SN_S_dhiou": [
+      "SN_ADM1_SEN-5514"
+    ],
+    "SN_K_dougou": [
+      "SN_ADM1_SEN-5515"
+    ],
+    "SN_Kaffrine": [
+      "SN_ADM1_SEN-5516"
+    ],
+    "SN_Saint_Louis": [
+      "SN_ADM1_SEN-5517"
+    ],
+    "SN_Dakar": [
+      "SN_ADM1_SEN-759"
+    ],
+    "SN_Diourbel": [
+      "SN_ADM1_SEN-763"
+    ],
+    "SN_Fatick": [
+      "SN_ADM1_SEN-764"
+    ],
+    "SN_Kaolack": [
+      "SN_ADM1_SEN-765"
+    ],
+    "SN_Louga": [
+      "SN_ADM1_SEN-766"
+    ],
+    "SN_Matam": [
+      "SN_ADM1_SEN-767"
+    ],
+    "SN_Thi_s": [
+      "SN_ADM1_SEN-768"
+    ],
+    "SN_Kolda": [
+      "SN_ADM1_SEN-774"
+    ],
+    "SN_Ziguinchor": [
+      "SN_ADM1_SEN-775"
+    ],
+    "SN_Tambacounda": [
+      "SN_ADM1_SEN-779"
+    ],
+    "SL_Southern": [
+      "SL_ADM1_SLE-760"
+    ],
+    "SL_Western_Area": [
+      "SL_ADM1_SLE-761"
+    ],
+    "SL_Northern": [
+      "SL_ADM1_SLE-762"
+    ],
+    "SL_Eastern": [
+      "SL_ADM1_SLE-790"
+    ],
+    "SO_Bari": [
+      "SO_ADM1_SOM-1"
+    ],
+    "SO_Bakool": [
+      "SO_ADM1_SOM-2312"
+    ],
+    "SO_Bay": [
+      "SO_ADM1_SOM-2313"
+    ],
+    "SO_Gedo": [
+      "SO_ADM1_SOM-2314"
+    ],
+    "SO_Middle_Juba": [
+      "SO_ADM1_SOM-2315"
+    ],
+    "SO_Lower_Shebelle": [
+      "SO_ADM1_SOM-2316"
+    ],
+    "SO_Banaadir": [
+      "SO_ADM1_SOM-2407"
+    ],
+    "SO_Galguduud": [
+      "SO_ADM1_SOM-2408"
+    ],
+    "SO_Hiran": [
+      "SO_ADM1_SOM-2409"
+    ],
+    "SO_Middle_Shebelle": [
+      "SO_ADM1_SOM-2410"
+    ],
+    "SO_Mudug": [
+      "SO_ADM1_SOM-2412"
+    ],
+    "SO_Nugal": [
+      "SO_ADM1_SOM-2413"
+    ],
+    "SO_Lower_Juba": [
+      "SO_ADM1_SOM-2645"
+    ],
+    "ZA_Northern_Cape": [
+      "ZA_ADM1_ZAF-1188"
+    ],
+    "ZA_Western_Cape": [
+      "ZA_ADM1_ZAF-1189"
+    ],
+    "ZA_North_West": [
+      "ZA_ADM1_ZAF-1201"
+    ],
+    "ZA_Free_State": [
+      "ZA_ADM1_ZAF-1206"
+    ],
+    "ZA_Gauteng": [
+      "ZA_ADM1_ZAF-1208"
+    ],
+    "ZA_Mpumalanga": [
+      "ZA_ADM1_ZAF-1209"
+    ],
+    "ZA_Limpopo": [
+      "ZA_ADM1_ZAF-1210"
+    ],
+    "ZA_KwaZulu_Natal": [
+      "ZA_ADM1_ZAF-1216"
+    ],
+    "ZA_Eastern_Cape": [
+      "ZA_ADM1_ZAF-1926"
+    ],
+    "SS_Northern_Bahr_el_Ghazal": [
+      "SS_ADM1_SDS-147"
+    ],
+    "SS_Lakes": [
+      "SS_ADM1_SDS-863"
+    ],
+    "SS_Western_Equatoria": [
+      "SS_ADM1_SDS-864"
+    ],
+    "SS_Central_Equatoria": [
+      "SS_ADM1_SDS-865"
+    ],
+    "SS_Upper_Nile": [
+      "SS_ADM1_SDS-869"
+    ],
+    "SS_Jonglei": [
+      "SS_ADM1_SDS-870"
+    ],
+    "SS_Unity": [
+      "SS_ADM1_SDS-871"
+    ],
+    "SS_Warrap": [
+      "SS_ADM1_SDS-872"
+    ],
+    "SS_Western_Bahr_el_Ghazal": [
+      "SS_ADM1_SDS-873"
+    ],
+    "SS_Eastern_Equatoria": [
+      "SS_ADM1_SDS-892"
+    ],
+    "SD_Blue_Nile": [
+      "SD_ADM1_SDN-148"
+    ],
+    "SD_Red_Sea": [
+      "SD_ADM1_SDN-149"
+    ],
+    "SD_South_Darfur": [
+      "SD_ADM1_SDN-5856"
+    ],
+    "SD_East_Darfur": [
+      "SD_ADM1_SDN-5857"
+    ],
+    "SD_West_Soudan": [
+      "SD_ADM1_SDN-5858"
+    ],
+    "SD_Central_Darfur": [
+      "SD_ADM1_SDN-5859"
+    ],
+    "SD_Khartoum": [
+      "SD_ADM1_SDN-874"
+    ],
+    "SD_Al_Jazirah": [
+      "SD_ADM1_SDN-875"
+    ],
+    "SD_Al_Qadarif": [
+      "SD_ADM1_SDN-876"
+    ],
+    "SD_River_Nile": [
+      "SD_ADM1_SDN-877"
+    ],
+    "SD_Northern": [
+      "SD_ADM1_SDN-878"
+    ],
+    "SD_White_Nile": [
+      "SD_ADM1_SDN-879"
+    ],
+    "SD_Sennar": [
+      "SD_ADM1_SDN-880"
+    ],
+    "SD_North_Darfur": [
+      "SD_ADM1_SDN-881"
+    ],
+    "SD_South_Kordofan": [
+      "SD_ADM1_SDN-882"
+    ],
+    "SD_North_Kordofan": [
+      "SD_ADM1_SDN-883"
+    ],
+    "SD_Kassala": [
+      "SD_ADM1_SDN-884"
+    ],
+    "ST_S_o_Tom": [
+      "ST_ADM1_STP-4861"
+    ],
+    "ST_Pr_ncipe": [
+      "ST_ADM1_STP-4862"
+    ],
+    "TZ_Mbeya": [
+      "TZ_ADM1_TZA-3335"
+    ],
+    "TZ_Rukwa": [
+      "TZ_ADM1_TZA-3336"
+    ],
+    "TZ_Unguja_South": [
+      "TZ_ADM1_TZA-3337"
+    ],
+    "TZ_Mwanza": [
+      "TZ_ADM1_TZA-3357"
+    ],
+    "TZ_Shinyanga": [
+      "TZ_ADM1_TZA-3358"
+    ],
+    "TZ_Tabora": [
+      "TZ_ADM1_TZA-3359"
+    ],
+    "TZ_Kagera": [
+      "TZ_ADM1_TZA-3360"
+    ],
+    "TZ_Kigoma": [
+      "TZ_ADM1_TZA-3363"
+    ],
+    "TZ_Dar_es_Salaam": [
+      "TZ_ADM1_TZA-3378"
+    ],
+    "TZ_Morogoro": [
+      "TZ_ADM1_TZA-3379"
+    ],
+    "TZ_North_Pemba": [
+      "TZ_ADM1_TZA-3380"
+    ],
+    "TZ_South_Pemba": [
+      "TZ_ADM1_TZA-3381"
+    ],
+    "TZ_Pwani": [
+      "TZ_ADM1_TZA-3382"
+    ],
+    "TZ_Unguja_North": [
+      "TZ_ADM1_TZA-3383"
+    ],
+    "TZ_Mjini_Magharibi": [
+      "TZ_ADM1_TZA-3384"
+    ],
+    "TZ_Dodoma": [
+      "TZ_ADM1_TZA-3385"
+    ],
+    "TZ_Iringa": [
+      "TZ_ADM1_TZA-3386"
+    ],
+    "TZ_Lindi": [
+      "TZ_ADM1_TZA-3387"
+    ],
+    "TZ_Mtwara": [
+      "TZ_ADM1_TZA-3388"
+    ],
+    "TZ_Ruvuma": [
+      "TZ_ADM1_TZA-3389"
+    ],
+    "TZ_Singida": [
+      "TZ_ADM1_TZA-3390"
+    ],
+    "TZ_Arusha": [
+      "TZ_ADM1_TZA-3391"
+    ],
+    "TZ_Manyara": [
+      "TZ_ADM1_TZA-3392"
+    ],
+    "TZ_Kilimanjaro": [
+      "TZ_ADM1_TZA-3393"
+    ],
+    "TZ_Mara": [
+      "TZ_ADM1_TZA-3394"
+    ],
+    "TZ_Tanga": [
+      "TZ_ADM1_TZA-3395"
+    ],
+    "TZ_Katavi": [
+      "TZ_ADM1_TZA-5584"
+    ],
+    "TZ_Simiyu": [
+      "TZ_ADM1_TZA-5585"
+    ],
+    "TZ_Geita": [
+      "TZ_ADM1_TZA-5586"
+    ],
+    "TZ_Njombe": [
+      "TZ_ADM1_TZA-5587"
+    ],
+    "GM_Central_River": [
+      "GM_ADM1_GMB-2151"
+    ],
+    "GM_Upper_River": [
+      "GM_ADM1_GMB-2152"
+    ],
+    "GM_Banjul": [
+      "GM_ADM1_GMB-2153"
+    ],
+    "GM_Lower_River": [
+      "GM_ADM1_GMB-2154"
+    ],
+    "GM_West_Coast": [
+      "GM_ADM1_GMB-5512"
+    ],
+    "GM_North_Bank": [
+      "GM_ADM1_GMB-5513"
+    ],
+    "TG_Plateaux": [
+      "TG_ADM1_TGO-86"
+    ],
+    "TG_Maritime": [
+      "TG_ADM1_TGO-87"
+    ],
+    "TG_Kara": [
+      "TG_ADM1_TGO-88"
+    ],
+    "TG_Centre": [
+      "TG_ADM1_TGO-89"
+    ],
+    "TG_Savanes": [
+      "TG_ADM1_TGO-90"
+    ],
+    "ZM_Luapula": [
+      "ZM_ADM1_ZMB-514"
+    ],
+    "ZM_Northern": [
+      "ZM_ADM1_ZMB-515"
+    ],
+    "ZM_Central": [
+      "ZM_ADM1_ZMB-516"
+    ],
+    "ZM_Copperbelt": [
+      "ZM_ADM1_ZMB-517"
+    ],
+    "ZM_Eastern": [
+      "ZM_ADM1_ZMB-518"
+    ],
+    "ZM_Lusaka": [
+      "ZM_ADM1_ZMB-520"
+    ],
+    "ZM_Northwestern": [
+      "ZM_ADM1_ZMB-521"
+    ],
+    "ZM_Southern": [
+      "ZM_ADM1_ZMB-522"
+    ],
+    "ZM_Western": [
+      "ZM_ADM1_ZMB-523"
+    ],
+    "ZM_Muchinga": [
+      "ZM_ADM1_ZMB-5511"
+    ],
+    "ZW_Mashonaland_Central": [
+      "ZW_ADM1_ZWE-524"
+    ],
+    "ZW_Harare": [
+      "ZW_ADM1_ZWE-525"
+    ],
+    "ZW_Matabeleland_North": [
+      "ZW_ADM1_ZWE-526"
+    ],
+    "ZW_Midlands": [
+      "ZW_ADM1_ZWE-527"
+    ],
+    "ZW_Mashonaland_East": [
+      "ZW_ADM1_ZWE-528"
+    ],
+    "ZW_Manicaland": [
+      "ZW_ADM1_ZWE-529"
+    ],
+    "ZW_Matabeleland_South": [
+      "ZW_ADM1_ZWE-530"
+    ],
+    "ZW_Bulawayo": [
+      "ZW_ADM1_ZWE-531"
+    ],
+    "ZW_Masvingo": [
+      "ZW_ADM1_ZWE-532"
+    ],
+    "ZW_Mashonaland_West": [
+      "ZW_ADM1_ZWE-533"
+    ],
+    "BF_Centre": [
+      "BF_ADM1_92566538B14190085014946"
+    ],
+    "BF_Hauts_Bassins": [
+      "BF_ADM1_92566538B19127906733451"
+    ],
+    "BF_Sud_Ouest": [
+      "BF_ADM1_92566538B26761698110708"
+    ],
+    "BF_Centre_Est": [
+      "BF_ADM1_92566538B37033565003987"
+    ],
+    "BF_Centre_Sud": [
+      "BF_ADM1_92566538B49759193106183"
+    ],
+    "BF_Est": [
+      "BF_ADM1_92566538B57532963969301"
+    ],
+    "BF_Centre_Ouest": [
+      "BF_ADM1_92566538B57875752774417"
+    ],
+    "BF_Centre_Nord": [
+      "BF_ADM1_92566538B59117792838125"
+    ],
+    "BF_Boucle_du_Mouhoun": [
+      "BF_ADM1_92566538B5930876876994"
+    ],
+    "BF_Nord": [
+      "BF_ADM1_92566538B60283727543208"
+    ],
+    "BF_Cascades": [
+      "BF_ADM1_92566538B65696039363280"
+    ],
+    "BF_Plateau_Central": [
+      "BF_ADM1_92566538B74906977122081"
+    ],
+    "BF_Sahel": [
+      "BF_ADM1_92566538B81581720767285"
+    ],
+    "GN_Labe": [
+      "GN_ADM1_385441B21537995001042"
+    ],
+    "GN_Conakry": [
+      "GN_ADM1_385441B29247776226513"
+    ],
+    "GN_Kindia": [
+      "GN_ADM1_385441B58689174477974"
+    ],
+    "GN_Faranah": [
+      "GN_ADM1_385441B61717407014046"
+    ],
+    "GN_Nzerekore": [
+      "GN_ADM1_385441B82784678606818"
+    ],
+    "GN_Mamou": [
+      "GN_ADM1_385441B8345275251802"
+    ],
+    "GN_Kankan": [
+      "GN_ADM1_385441B85233176952124"
+    ],
+    "GN_Boke": [
+      "GN_ADM1_385441B97135885584055"
+    ],
+    "CI_Denguele": [
+      "CI_ADM1_83157122B12160353323799"
+    ],
+    "CI_Lacs": [
+      "CI_ADM1_83157122B20352934117266"
+    ],
+    "CI_Savanes": [
+      "CI_ADM1_83157122B28791092437733"
+    ],
+    "CI_District_Autonome_De_Yamoussoukro": [
+      "CI_ADM1_83157122B30232425959699"
+    ],
+    "CI_Goh_Djiboua": [
+      "CI_ADM1_83157122B34711482467037"
+    ],
+    "CI_Woroba": [
+      "CI_ADM1_83157122B58892240487392"
+    ],
+    "CI_Valle_Du_Bandama": [
+      "CI_ADM1_83157122B62906982633778"
+    ],
+    "CI_Montagnes": [
+      "CI_ADM1_83157122B69310198422077"
+    ],
+    "CI_Lagunes": [
+      "CI_ADM1_83157122B73612976130091"
+    ],
+    "CI_Sassandra_Marahoue": [
+      "CI_ADM1_83157122B74959515955757"
+    ],
+    "CI_District_Autonome_D_Abidjan": [
+      "CI_ADM1_83157122B76853064397847"
+    ],
+    "CI_Zanzan": [
+      "CI_ADM1_83157122B79983119233374"
+    ],
+    "CI_Comoe": [
+      "CI_ADM1_83157122B96325295181308"
+    ],
+    "CI_Bas_Sassandra": [
+      "CI_ADM1_83157122B96959932745266"
+    ],
+    "MW_Central_Region": [
+      "MW_ADM1_82672581B12520625652479"
+    ],
+    "MW_Northern_Region": [
+      "MW_ADM1_82672581B33227208107325"
+    ],
+    "MW_Southern_Region": [
+      "MW_ADM1_82672581B71595037145626"
+    ],
+    "UG_Central_Region": [
+      "UG_ADM1_17295835B48340970483027"
+    ],
+    "UG_Eastern_Region": [
+      "UG_ADM1_17295835B57878138064711"
+    ],
+    "UG_Northern_Region": [
+      "UG_ADM1_17295835B80141219017784"
+    ],
+    "UG_Western_Region": [
+      "UG_ADM1_17295835B91329899113986"
+    ],
+    "AD_Andorra_la_Vella": [
+      "AD_ADM1_AND-4876"
+    ],
+    "AD_La_Massana": [
+      "AD_ADM1_AND-4877"
+    ],
+    "AD_Ordino": [
+      "AD_ADM1_AND-4878"
+    ],
+    "AD_Canillo": [
+      "AD_ADM1_AND-4879"
+    ],
+    "AD_Encamp": [
+      "AD_ADM1_AND-4880"
+    ],
+    "AD_Escaldes_Engordany": [
+      "AD_ADM1_AND-4881"
+    ],
+    "AD_Sant_Juli_de_L_ria": [
+      "AD_ADM1_AND-4882"
+    ],
+    "AR_Santa_Cruz": [
+      "AR_ADM1_ARG-1271"
+    ],
+    "AR_Tierra_del_Fuego": [
+      "AR_ADM1_ARG-1272"
+    ],
+    "AR_San_Juan": [
+      "AR_ADM1_ARG-1273"
+    ],
+    "AR_Chubut": [
+      "AR_ADM1_ARG-1274"
+    ],
+    "AR_Mendoza": [
+      "AR_ADM1_ARG-1275"
+    ],
+    "AR_Neuqu_n": [
+      "AR_ADM1_ARG-1276"
+    ],
+    "AR_Buenos_Aires": [
+      "AR_ADM1_ARG-1295",
+      "AR_ADM1_ARG-5493"
+    ],
+    "AR_La_Pampa": [
+      "AR_ADM1_ARG-1296"
+    ],
+    "AR_R_o_Negro": [
+      "AR_ADM1_ARG-1297"
+    ],
+    "AR_San_Luis": [
+      "AR_ADM1_ARG-1298"
+    ],
+    "AR_C_rdoba": [
+      "AR_ADM1_ARG-1299"
+    ],
+    "AR_Catamarca": [
+      "AR_ADM1_ARG-1300"
+    ],
+    "AR_Jujuy": [
+      "AR_ADM1_ARG-1301"
+    ],
+    "AR_La_Rioja": [
+      "AR_ADM1_ARG-1302"
+    ],
+    "AR_Salta": [
+      "AR_ADM1_ARG-1303"
+    ],
+    "AR_Santiago_del_Estero": [
+      "AR_ADM1_ARG-1304"
+    ],
+    "AR_Tucum_n": [
+      "AR_ADM1_ARG-1305"
+    ],
+    "AR_Chaco": [
+      "AR_ADM1_ARG-1306"
+    ],
+    "AR_Formosa": [
+      "AR_ADM1_ARG-1307"
+    ],
+    "AR_Corrientes": [
+      "AR_ADM1_ARG-1308"
+    ],
+    "AR_Entre_R_os": [
+      "AR_ADM1_ARG-1309"
+    ],
+    "AR_Santa_Fe": [
+      "AR_ADM1_ARG-1310"
+    ],
+    "AR_Misiones": [
+      "AR_ADM1_ARG-1312"
+    ],
+    "BN_Belait": [
+      "BN_ADM1_BRN-1181"
+    ],
+    "BN_Brunei_Muara": [
+      "BN_ADM1_BRN-1182"
+    ],
+    "BN_Temburong": [
+      "BN_ADM1_BRN-1183"
+    ],
+    "BN_Tutong": [
+      "BN_ADM1_BRN-1184"
+    ],
+    "BO_Cochabamba": [
+      "BO_ADM1_BOL-1291"
+    ],
+    "BO_Chuquisaca": [
+      "BO_ADM1_BOL-1292"
+    ],
+    "BO_Beni": [
+      "BO_ADM1_BOL-1293"
+    ],
+    "BO_La_Paz": [
+      "BO_ADM1_BOL-1936"
+    ],
+    "BO_Oruro": [
+      "BO_ADM1_BOL-1937"
+    ],
+    "BO_Pando": [
+      "BO_ADM1_BOL-1938"
+    ],
+    "BO_Potos": [
+      "BO_ADM1_BOL-1939"
+    ],
+    "BO_Santa_Cruz": [
+      "BO_ADM1_BOL-1940"
+    ],
+    "BO_Tarija": [
+      "BO_ADM1_BOL-1941"
+    ],
+    "BR_Goi_s": [
+      "BR_ADM1_BRA-1294"
+    ],
+    "BR_S_o_Paulo": [
+      "BR_ADM1_BRA-1311"
+    ],
+    "BR_Pernambuco": [
+      "BR_ADM1_BRA-1313"
+    ],
+    "BR_Acre": [
+      "BR_ADM1_BRA-576"
+    ],
+    "BR_Amazonas": [
+      "BR_ADM1_BRA-592"
+    ],
+    "BR_Maranh_o": [
+      "BR_ADM1_BRA-593"
+    ],
+    "BR_Par": [
+      "BR_ADM1_BRA-594"
+    ],
+    "BR_Rond_nia": [
+      "BR_ADM1_BRA-595"
+    ],
+    "BR_Tocantins": [
+      "BR_ADM1_BRA-596"
+    ],
+    "BR_Federal": [
+      "BR_ADM1_BRA-599"
+    ],
+    "BR_Mato_Grosso_do_Sul": [
+      "BR_ADM1_BRA-600"
+    ],
+    "BR_Minas_Gerais": [
+      "BR_ADM1_BRA-601"
+    ],
+    "BR_Mato_Grosso": [
+      "BR_ADM1_BRA-602"
+    ],
+    "BR_Rio_Grande_do_Sul": [
+      "BR_ADM1_BRA-612"
+    ],
+    "BR_Paran": [
+      "BR_ADM1_BRA-613"
+    ],
+    "BR_Santa_Catarina": [
+      "BR_ADM1_BRA-614"
+    ],
+    "BR_Cear": [
+      "BR_ADM1_BRA-621"
+    ],
+    "BR_Piau": [
+      "BR_ADM1_BRA-622"
+    ],
+    "BR_Alagoas": [
+      "BR_ADM1_BRA-623"
+    ],
+    "BR_Bahia": [
+      "BR_ADM1_BRA-624"
+    ],
+    "BR_Esp_rito_Santo": [
+      "BR_ADM1_BRA-625"
+    ],
+    "BR_Para_ba": [
+      "BR_ADM1_BRA-626"
+    ],
+    "BR_Rio_de_Janeiro": [
+      "BR_ADM1_BRA-627"
+    ],
+    "BR_Rio_Grande_do_Norte": [
+      "BR_ADM1_BRA-628"
+    ],
+    "BR_Sergipe": [
+      "BR_ADM1_BRA-629"
+    ],
+    "BR_Roraima": [
+      "BR_ADM1_BRA-670"
+    ],
+    "BR_Amap": [
+      "BR_ADM1_BRA-681"
+    ],
+    "BZ_Belize": [
+      "BZ_ADM1_BLZ-1323"
+    ],
+    "BZ_Cayo": [
+      "BZ_ADM1_BLZ-1324"
+    ],
+    "BZ_Corozal": [
+      "BZ_ADM1_BLZ-1325"
+    ],
+    "BZ_Orange_Walk": [
+      "BZ_ADM1_BLZ-1326"
+    ],
+    "BZ_Stann_Creek": [
+      "BZ_ADM1_BLZ-1355"
+    ],
+    "BZ_Toledo": [
+      "BZ_ADM1_BLZ-1356"
+    ],
+    "CL_uble": [
+      "CL_ADM1_CHL-20010"
+    ],
+    "CL_Ays_n": [
+      "CL_ADM1_CHL-2691"
+    ],
+    "CL_Magellan_and_the_Chilean_Antarctic": [
+      "CL_ADM1_CHL-2692"
+    ],
+    "CL_Tarapac": [
+      "CL_ADM1_CHL-2693"
+    ],
+    "CL_Arica_y_Parinacota": [
+      "CL_ADM1_CHL-2694"
+    ],
+    "CL_Antofagasta": [
+      "CL_ADM1_CHL-2695"
+    ],
+    "CL_Atacama": [
+      "CL_ADM1_CHL-2696"
+    ],
+    "CL_Coquimbo": [
+      "CL_ADM1_CHL-2697"
+    ],
+    "CL_Santiago": [
+      "CL_ADM1_CHL-2698"
+    ],
+    "CL_Valpara_so": [
+      "CL_ADM1_CHL-2699"
+    ],
+    "CL_Araucan_a": [
+      "CL_ADM1_CHL-2700"
+    ],
+    "CL_Los_R_os": [
+      "CL_ADM1_CHL-2701"
+    ],
+    "CL_Biob_o": [
+      "CL_ADM1_CHL-2702"
+    ],
+    "CL_O_Higgins": [
+      "CL_ADM1_CHL-2703"
+    ],
+    "CL_Los_Lagos": [
+      "CL_ADM1_CHL-2704"
+    ],
+    "CL_Maule": [
+      "CL_ADM1_CHL-2705"
+    ],
+    "CO_COL_99": [
+      "CO_ADM1_COL+99?"
+    ],
+    "CO_Amazonas": [
+      "CO_ADM1_COL-1283"
+    ],
+    "CO_Antioquia": [
+      "CO_ADM1_COL-1314"
+    ],
+    "CO_Boyac": [
+      "CO_ADM1_COL-1315"
+    ],
+    "CO_C_rdoba": [
+      "CO_ADM1_COL-1316"
+    ],
+    "CO_Santander": [
+      "CO_ADM1_COL-1317"
+    ],
+    "CO_La_Guajira": [
+      "CO_ADM1_COL-1318"
+    ],
+    "CO_Archipelago_of_Saint_Andr_ws": [
+      "CO_ADM1_COL-1342"
+    ],
+    "CO_Caldas": [
+      "CO_ADM1_COL-1397"
+    ],
+    "CO_Cundinamarca": [
+      "CO_ADM1_COL-1398"
+    ],
+    "CO_Bogot": [
+      "CO_ADM1_COL-1399"
+    ],
+    "CO_Quind_o": [
+      "CO_ADM1_COL-1400"
+    ],
+    "CO_Risaralda": [
+      "CO_ADM1_COL-1401"
+    ],
+    "CO_Tolima": [
+      "CO_ADM1_COL-1402"
+    ],
+    "CO_Caquet": [
+      "CO_ADM1_COL-1403"
+    ],
+    "CO_Cauca": [
+      "CO_ADM1_COL-1404"
+    ],
+    "CO_Huila": [
+      "CO_ADM1_COL-1405"
+    ],
+    "CO_Nari_o": [
+      "CO_ADM1_COL-1406"
+    ],
+    "CO_Putumayo": [
+      "CO_ADM1_COL-1407"
+    ],
+    "CO_Valle_del_Cauca": [
+      "CO_ADM1_COL-1408"
+    ],
+    "CO_Atl_ntico": [
+      "CO_ADM1_COL-1412"
+    ],
+    "CO_Bol_var": [
+      "CO_ADM1_COL-1413"
+    ],
+    "CO_Cesar": [
+      "CO_ADM1_COL-1414"
+    ],
+    "CO_Choc": [
+      "CO_ADM1_COL-1415"
+    ],
+    "CO_Magdalena": [
+      "CO_ADM1_COL-1416"
+    ],
+    "CO_Sucre": [
+      "CO_ADM1_COL-1417"
+    ],
+    "CO_Arauca": [
+      "CO_ADM1_COL-1420"
+    ],
+    "CO_Norte_de_Santander": [
+      "CO_ADM1_COL-1421"
+    ],
+    "CO_Casanare": [
+      "CO_ADM1_COL-1422"
+    ],
+    "CO_Guaviare": [
+      "CO_ADM1_COL-1423"
+    ],
+    "CO_Guain_a": [
+      "CO_ADM1_COL-1424"
+    ],
+    "CO_Meta": [
+      "CO_ADM1_COL-1425"
+    ],
+    "CO_Vaup_s": [
+      "CO_ADM1_COL-1426"
+    ],
+    "CO_Vichada": [
+      "CO_ADM1_COL-1427"
+    ],
+    "CR_Cartago": [
+      "CR_ADM1_CRI-1327"
+    ],
+    "CR_Heredia": [
+      "CR_ADM1_CRI-1328"
+    ],
+    "CR_Lim_n": [
+      "CR_ADM1_CRI-1329"
+    ],
+    "CR_Puntarenas": [
+      "CR_ADM1_CRI-1330"
+    ],
+    "CR_San_Jos": [
+      "CR_ADM1_CRI-1331"
+    ],
+    "CR_Alajuela": [
+      "CR_ADM1_CRI-1333"
+    ],
+    "CR_Guanacaste": [
+      "CR_ADM1_CRI-1334"
+    ],
+    "DO_Santiago": [
+      "DO_ADM1_DOM-1390"
+    ],
+    "DO_Santiago_Rodr_guez": [
+      "DO_ADM1_DOM-1391"
+    ],
+    "DO_Valverde": [
+      "DO_ADM1_DOM-1392"
+    ],
+    "DO_San_Juan": [
+      "DO_ADM1_DOM-1393"
+    ],
+    "DO_Santo_Domingo": [
+      "DO_ADM1_DOM-1394"
+    ],
+    "DO_S_nchez_Ram_rez": [
+      "DO_ADM1_DOM-1395"
+    ],
+    "DO_San_Pedro_de_Macor_s": [
+      "DO_ADM1_DOM-1396"
+    ],
+    "DO_Monte_Cristi": [
+      "DO_ADM1_DOM-1964"
+    ],
+    "DO_Puerto_Plata": [
+      "DO_ADM1_DOM-1965"
+    ],
+    "DO_Dajab_n": [
+      "DO_ADM1_DOM-1966"
+    ],
+    "DO_Espaillat": [
+      "DO_ADM1_DOM-1967"
+    ],
+    "DO_Hermanas_Mirabal": [
+      "DO_ADM1_DOM-1968"
+    ],
+    "DO_Baoruco": [
+      "DO_ADM1_DOM-1969"
+    ],
+    "DO_Barahona": [
+      "DO_ADM1_DOM-1970"
+    ],
+    "DO_Independencia": [
+      "DO_ADM1_DOM-1971"
+    ],
+    "DO_La_Estrelleta": [
+      "DO_ADM1_DOM-1972"
+    ],
+    "DO_Pedernales": [
+      "DO_ADM1_DOM-1973"
+    ],
+    "DO_Azua": [
+      "DO_ADM1_DOM-1974"
+    ],
+    "DO_La_Vega": [
+      "DO_ADM1_DOM-1975"
+    ],
+    "DO_Monse_or_Nouel": [
+      "DO_ADM1_DOM-1976"
+    ],
+    "DO_Peravia": [
+      "DO_ADM1_DOM-1977"
+    ],
+    "DO_San_Jos_de_Ocoa": [
+      "DO_ADM1_DOM-1978"
+    ],
+    "DO_Duarte": [
+      "DO_ADM1_DOM-1979"
+    ],
+    "DO_Hato_Mayor": [
+      "DO_ADM1_DOM-1980"
+    ],
+    "DO_Monte_Plata": [
+      "DO_ADM1_DOM-1981"
+    ],
+    "DO_Mar_a_Trinidad_S_nchez": [
+      "DO_ADM1_DOM-1982"
+    ],
+    "DO_Saman": [
+      "DO_ADM1_DOM-1983"
+    ],
+    "DO_San_Crist_bal": [
+      "DO_ADM1_DOM-1984"
+    ],
+    "DO_Nacional": [
+      "DO_ADM1_DOM-1985"
+    ],
+    "DO_El_Seibo": [
+      "DO_ADM1_DOM-1986"
+    ],
+    "DO_La_Altagracia": [
+      "DO_ADM1_DOM-1987"
+    ],
+    "DO_La_Romana": [
+      "DO_ADM1_DOM-1988"
+    ],
+    "EC_Azuay": [
+      "EC_ADM1_ECU-1266"
+    ],
+    "EC_El_Oro": [
+      "EC_ADM1_ECU-1267"
+    ],
+    "EC_Loja": [
+      "EC_ADM1_ECU-1268"
+    ],
+    "EC_Zamora_Chinchipe": [
+      "EC_ADM1_ECU-1269"
+    ],
+    "EC_Gal_pagos": [
+      "EC_ADM1_ECU-1270"
+    ],
+    "EC_Bol_var": [
+      "EC_ADM1_ECU-1277"
+    ],
+    "EC_Ca_ar": [
+      "EC_ADM1_ECU-1278"
+    ],
+    "EC_Cotopaxi": [
+      "EC_ADM1_ECU-1279"
+    ],
+    "EC_Guayas": [
+      "EC_ADM1_ECU-1280"
+    ],
+    "EC_Los_R_os": [
+      "EC_ADM1_ECU-1281"
+    ],
+    "EC_Manab": [
+      "EC_ADM1_ECU-1282"
+    ],
+    "EC_Chimborazo": [
+      "EC_ADM1_ECU-1284"
+    ],
+    "EC_Morona_Santiago": [
+      "EC_ADM1_ECU-1285"
+    ],
+    "EC_Orellana": [
+      "EC_ADM1_ECU-1286"
+    ],
+    "EC_Pichincha": [
+      "EC_ADM1_ECU-1287"
+    ],
+    "EC_Pastaza": [
+      "EC_ADM1_ECU-1288"
+    ],
+    "EC_Napo": [
+      "EC_ADM1_ECU-1289"
+    ],
+    "EC_Tungurahua": [
+      "EC_ADM1_ECU-1290"
+    ],
+    "EC_Esmeraldas": [
+      "EC_ADM1_ECU-1335"
+    ],
+    "EC_Carchi": [
+      "EC_ADM1_ECU-1409"
+    ],
+    "EC_Imbabura": [
+      "EC_ADM1_ECU-1410"
+    ],
+    "EC_Sucumb_os": [
+      "EC_ADM1_ECU-1411"
+    ],
+    "EC_Santa_Elena": [
+      "EC_ADM1_ECU-5507"
+    ],
+    "EC_Santo_Domingo_de_los_Ts_chilas": [
+      "EC_ADM1_ECU-5508"
+    ],
+    "GR_Ionian_Islands": [
+      "GR_ADM1_GRC-2883"
+    ],
+    "GR_Attica": [
+      "GR_ADM1_GRC-2884"
+    ],
+    "GR_Peloponnese": [
+      "GR_ADM1_GRC-2885"
+    ],
+    "GR_West_Greece": [
+      "GR_ADM1_GRC-2886"
+    ],
+    "GR_West_Macedonia": [
+      "GR_ADM1_GRC-2892"
+    ],
+    "GR_Thessalia": [
+      "GR_ADM1_GRC-2900"
+    ],
+    "GR_Epirus": [
+      "GR_ADM1_GRC-2949"
+    ],
+    "GR_North_Aegean": [
+      "GR_ADM1_GRC-2988"
+    ],
+    "GR_Central_Greece": [
+      "GR_ADM1_GRC-2989"
+    ],
+    "GR_Crete": [
+      "GR_ADM1_GRC-2990"
+    ],
+    "GR_Centre_Macedonia": [
+      "GR_ADM1_GRC-2991"
+    ],
+    "GR_Mount_Athos": [
+      "GR_ADM1_GRC-2992"
+    ],
+    "GR_East_Macedonia_and_Thrace": [
+      "GR_ADM1_GRC-3001"
+    ],
+    "GR_South_Aegean": [
+      "GR_ADM1_GRC-3013"
+    ],
+    "GT_Baja_Verapaz": [
+      "GT_ADM1_GTM-1942"
+    ],
+    "GT_Huehuetenango": [
+      "GT_ADM1_GTM-1943"
+    ],
+    "GT_Pet_n": [
+      "GT_ADM1_GTM-1944"
+    ],
+    "GT_Quetzaltenango": [
+      "GT_ADM1_GTM-1945"
+    ],
+    "GT_Retalhuleu": [
+      "GT_ADM1_GTM-1946"
+    ],
+    "GT_San_Marcos": [
+      "GT_ADM1_GTM-1947"
+    ],
+    "GT_Alta_Verapaz": [
+      "GT_ADM1_GTM-1948"
+    ],
+    "GT_Chimaltenango": [
+      "GT_ADM1_GTM-1949"
+    ],
+    "GT_Escuintla": [
+      "GT_ADM1_GTM-1950"
+    ],
+    "GT_Guatemala": [
+      "GT_ADM1_GTM-1951"
+    ],
+    "GT_Suchitep_quez": [
+      "GT_ADM1_GTM-1952"
+    ],
+    "GT_Sacatep_quez": [
+      "GT_ADM1_GTM-1953"
+    ],
+    "GT_Solol": [
+      "GT_ADM1_GTM-1954"
+    ],
+    "GT_Totonicap_n": [
+      "GT_ADM1_GTM-1955"
+    ],
+    "GT_El_Progreso": [
+      "GT_ADM1_GTM-1956"
+    ],
+    "GT_Santa_Rosa": [
+      "GT_ADM1_GTM-1957"
+    ],
+    "GT_Izabal": [
+      "GT_ADM1_GTM-1959"
+    ],
+    "GT_Chiquimula": [
+      "GT_ADM1_GTM-1960"
+    ],
+    "GT_Jalapa": [
+      "GT_ADM1_GTM-1961"
+    ],
+    "GT_Jutiapa": [
+      "GT_ADM1_GTM-1962"
+    ],
+    "GT_Zacapa": [
+      "GT_ADM1_GTM-1963"
+    ],
+    "GT_Quich": [
+      "GT_ADM1_GTM-3467"
+    ],
+    "GY_Mahaica_Berbice": [
+      "GY_ADM1_GUY-671",
+      "GY_ADM1_GUY-679"
+    ],
+    "GY_Potaro_Siparuni": [
+      "GY_ADM1_GUY-672"
+    ],
+    "GY_Upper_Takutu_Upper_Essequibo": [
+      "GY_ADM1_GUY-673"
+    ],
+    "GY_Upper_Demerara_Berbice": [
+      "GY_ADM1_GUY-674"
+    ],
+    "GY_Barima_Waini": [
+      "GY_ADM1_GUY-675"
+    ],
+    "GY_Pomeroon_Supenaam": [
+      "GY_ADM1_GUY-676"
+    ],
+    "GY_East_Berbice_Corentyne": [
+      "GY_ADM1_GUY-677"
+    ],
+    "GY_Demerara_Mahaica": [
+      "GY_ADM1_GUY-678"
+    ],
+    "GY_Cuyuni_Mazaruni": [
+      "GY_ADM1_GUY-680"
+    ],
+    "HN_Atl_ntida": [
+      "HN_ADM1_HND-637"
+    ],
+    "HN_Col_n": [
+      "HN_ADM1_HND-638"
+    ],
+    "HN_Francisco_Moraz_n": [
+      "HN_ADM1_HND-639"
+    ],
+    "HN_Gracias_a_Dios": [
+      "HN_ADM1_HND-640"
+    ],
+    "HN_Bay_Islands": [
+      "HN_ADM1_HND-641"
+    ],
+    "HN_Olancho": [
+      "HN_ADM1_HND-642"
+    ],
+    "HN_Yoro": [
+      "HN_ADM1_HND-643"
+    ],
+    "HN_Valle": [
+      "HN_ADM1_HND-645"
+    ],
+    "HN_Comayagua": [
+      "HN_ADM1_HND-646"
+    ],
+    "HN_Cort_s": [
+      "HN_ADM1_HND-647"
+    ],
+    "HN_Intibuc": [
+      "HN_ADM1_HND-648"
+    ],
+    "HN_La_Paz": [
+      "HN_ADM1_HND-649"
+    ],
+    "HN_Santa_B_rbara": [
+      "HN_ADM1_HND-650"
+    ],
+    "HN_Cop_n": [
+      "HN_ADM1_HND-651"
+    ],
+    "HN_Lempira": [
+      "HN_ADM1_HND-652"
+    ],
+    "HN_Ocotepeque": [
+      "HN_ADM1_HND-653"
+    ],
+    "HN_Choluteca": [
+      "HN_ADM1_HND-661"
+    ],
+    "HN_El_Para_so": [
+      "HN_ADM1_HND-662"
+    ],
+    "HT_Grand_Anse": [
+      "HT_ADM1_HTI-1359"
+    ],
+    "HT_Nippes": [
+      "HT_ADM1_HTI-1360"
+    ],
+    "HT_Nord_Ouest": [
+      "HT_ADM1_HTI-1361"
+    ],
+    "HT_Sud": [
+      "HT_ADM1_HTI-1362"
+    ],
+    "HT_Artibonite": [
+      "HT_ADM1_HTI-1384"
+    ],
+    "HT_Centre": [
+      "HT_ADM1_HTI-1385"
+    ],
+    "HT_Nord_Est": [
+      "HT_ADM1_HTI-1386"
+    ],
+    "HT_Nord": [
+      "HT_ADM1_HTI-1387"
+    ],
+    "HT_Ouest": [
+      "HT_ADM1_HTI-1388"
+    ],
+    "HT_Sud_Est": [
+      "HT_ADM1_HTI-1389"
+    ],
+    "HK_Central_and_Western_District": [
+      "HK_ADM1_HKG-5153"
+    ],
+    "HK_Wan_Chai": [
+      "HK_ADM1_HKG-5154"
+    ],
+    "HK_Siu_Ma_Shan": [
+      "HK_ADM1_HKG-5155"
+    ],
+    "HK_Southern_District": [
+      "HK_ADM1_HKG-5156"
+    ],
+    "HK_Yau_Tsim_Mong": [
+      "HK_ADM1_HKG-5157"
+    ],
+    "HK_Kowloon_City": [
+      "HK_ADM1_HKG-5158"
+    ],
+    "HK_Sham_Shui_Po": [
+      "HK_ADM1_HKG-5159"
+    ],
+    "HK_Wong_Tai_Sin_District": [
+      "HK_ADM1_HKG-5160"
+    ],
+    "HK_Kwun_Tong": [
+      "HK_ADM1_HKG-5161"
+    ],
+    "HK_Sai_Kung": [
+      "HK_ADM1_HKG-5162"
+    ],
+    "HK_Sha_Tin": [
+      "HK_ADM1_HKG-5163"
+    ],
+    "HK_Kwai_Tsing": [
+      "HK_ADM1_HKG-5164"
+    ],
+    "HK_Tsuen_Wan": [
+      "HK_ADM1_HKG-5165"
+    ],
+    "HK_Tuen_Mun": [
+      "HK_ADM1_HKG-5166"
+    ],
+    "HK_Yuen_Long": [
+      "HK_ADM1_HKG-5167"
+    ],
+    "HK_North_District": [
+      "HK_ADM1_HKG-5168"
+    ],
+    "HK_Tai_Po": [
+      "HK_ADM1_HKG-5169"
+    ],
+    "HK_Lantau_Island": [
+      "HK_ADM1_HKG-5170"
+    ],
+    "LI_Triesenberg": [
+      "LI_ADM1_LIE-4892"
+    ],
+    "LI_Triesen": [
+      "LI_ADM1_LIE-4893"
+    ],
+    "LI_Balzers": [
+      "LI_ADM1_LIE-4894"
+    ],
+    "LI_Vaduz": [
+      "LI_ADM1_LIE-4895"
+    ],
+    "LI_Schaan": [
+      "LI_ADM1_LIE-4896"
+    ],
+    "LI_Gamprin": [
+      "LI_ADM1_LIE-4897"
+    ],
+    "LI_Ruggell": [
+      "LI_ADM1_LIE-4898"
+    ],
+    "LI_Schellenberg": [
+      "LI_ADM1_LIE-4899"
+    ],
+    "LI_Mauren": [
+      "LI_ADM1_LIE-4900"
+    ],
+    "LI_Planken": [
+      "LI_ADM1_LIE-4901"
+    ],
+    "LI_Eschen": [
+      "LI_ADM1_LIE-4902"
+    ],
+    "LU_Diekirch": [
+      "LU_ADM1_LUX-906"
+    ],
+    "LU_Grevenmacher": [
+      "LU_ADM1_LUX-907"
+    ],
+    "LU_Luxembourg": [
+      "LU_ADM1_LUX-908"
+    ],
+    "ME_Bar": [
+      "ME_ADM1_MNE-1496"
+    ],
+    "ME_Ulcinj": [
+      "ME_ADM1_MNE-1497"
+    ],
+    "ME_Budva": [
+      "ME_ADM1_MNE-1499"
+    ],
+    "ME_Cetinje": [
+      "ME_ADM1_MNE-1500"
+    ],
+    "ME_Ro_aje": [
+      "ME_ADM1_MNE-1501"
+    ],
+    "ME_Plav": [
+      "ME_ADM1_MNE-1503"
+    ],
+    "ME_Herceg_Novi": [
+      "ME_ADM1_MNE-1506"
+    ],
+    "ME_Kotor": [
+      "ME_ADM1_MNE-1507"
+    ],
+    "ME_Andrijevica": [
+      "ME_ADM1_MNE-1508"
+    ],
+    "ME_Berane": [
+      "ME_ADM1_MNE-1509"
+    ],
+    "ME_Bijelo_Polje": [
+      "ME_ADM1_MNE-1510"
+    ],
+    "ME_Danilovgrad": [
+      "ME_ADM1_MNE-1511"
+    ],
+    "ME_Kola_in": [
+      "ME_ADM1_MNE-1512"
+    ],
+    "ME_Mojkovac": [
+      "ME_ADM1_MNE-1513"
+    ],
+    "ME_Nik_i": [
+      "ME_ADM1_MNE-1514"
+    ],
+    "ME_Plu_ine": [
+      "ME_ADM1_MNE-1515"
+    ],
+    "ME_Pljevlja": [
+      "ME_ADM1_MNE-1516"
+    ],
+    "ME_Podgorica": [
+      "ME_ADM1_MNE-1517"
+    ],
+    "ME_Tivat": [
+      "ME_ADM1_MNE-1518"
+    ],
+    "ME_avnik": [
+      "ME_ADM1_MNE-1519"
+    ],
+    "ME_abljak": [
+      "ME_ADM1_MNE-1520"
+    ],
+    "NI_Rivas": [
+      "NI_ADM1_NIC-24"
+    ],
+    "NI_R_o_San_Juan": [
+      "NI_ADM1_NIC-4800"
+    ],
+    "NI_South_Caribbean_Coast": [
+      "NI_ADM1_NIC-644"
+    ],
+    "NI_Carazo": [
+      "NI_ADM1_NIC-654"
+    ],
+    "NI_Granada": [
+      "NI_ADM1_NIC-655"
+    ],
+    "NI_Jinotega": [
+      "NI_ADM1_NIC-656"
+    ],
+    "NI_North_Caribbean_Coast": [
+      "NI_ADM1_NIC-657"
+    ],
+    "NI_Le_n": [
+      "NI_ADM1_NIC-658"
+    ],
+    "NI_Managua": [
+      "NI_ADM1_NIC-659"
+    ],
+    "NI_Masaya": [
+      "NI_ADM1_NIC-660"
+    ],
+    "NI_Chinandega": [
+      "NI_ADM1_NIC-663"
+    ],
+    "NI_Estel": [
+      "NI_ADM1_NIC-664"
+    ],
+    "NI_Madriz": [
+      "NI_ADM1_NIC-665"
+    ],
+    "NI_Matagalpa": [
+      "NI_ADM1_NIC-666"
+    ],
+    "NI_Nueva_Segovia": [
+      "NI_ADM1_NIC-667"
+    ],
+    "NI_Boaco": [
+      "NI_ADM1_NIC-668"
+    ],
+    "NI_Chontales": [
+      "NI_ADM1_NIC-669"
+    ],
+    "PA_Chiriqu": [
+      "PA_ADM1_PAN-1332"
+    ],
+    "PA_Cocl": [
+      "PA_ADM1_PAN-1336"
+    ],
+    "PA_Col_n": [
+      "PA_ADM1_PAN-1337"
+    ],
+    "PA_Herrera": [
+      "PA_ADM1_PAN-1338"
+    ],
+    "PA_Los_Santos": [
+      "PA_ADM1_PAN-1339"
+    ],
+    "PA_Panam": [
+      "PA_ADM1_PAN-1340"
+    ],
+    "PA_Veraguas": [
+      "PA_ADM1_PAN-1341"
+    ],
+    "PA_Dari_n": [
+      "PA_ADM1_PAN-1418"
+    ],
+    "PA_Guna_Yala": [
+      "PA_ADM1_PAN-1419"
+    ],
+    "PA_comarca_Ng_be_Bugl": [
+      "PA_ADM1_PAN-1958"
+    ],
+    "PA_Ng_be_Bugl_Comarca": [
+      "PA_ADM1_PAN-3454"
+    ],
+    "PA_Ember_Wounaan_Comarca": [
+      "PA_ADM1_PAN-3455"
+    ],
+    "PE_Callao": [
+      "PE_ADM1_PER-3505"
+    ],
+    "PE_Lambayeque": [
+      "PE_ADM1_PER-566"
+    ],
+    "PE_Piura": [
+      "PE_ADM1_PER-567"
+    ],
+    "PE_Tumbes": [
+      "PE_ADM1_PER-568"
+    ],
+    "PE_Apur_mac": [
+      "PE_ADM1_PER-569"
+    ],
+    "PE_Arequipa": [
+      "PE_ADM1_PER-570"
+    ],
+    "PE_Cusco_Departament": [
+      "PE_ADM1_PER-571"
+    ],
+    "PE_Madre_de_Dios": [
+      "PE_ADM1_PER-572"
+    ],
+    "PE_Puno": [
+      "PE_ADM1_PER-573"
+    ],
+    "PE_Moquegua": [
+      "PE_ADM1_PER-574"
+    ],
+    "PE_Tacna": [
+      "PE_ADM1_PER-575"
+    ],
+    "PE_ncash": [
+      "PE_ADM1_PER-577"
+    ],
+    "PE_Cajamarca": [
+      "PE_ADM1_PER-578"
+    ],
+    "PE_Huanuco": [
+      "PE_ADM1_PER-579"
+    ],
+    "PE_La_Libertad": [
+      "PE_ADM1_PER-580"
+    ],
+    "PE_Pasco": [
+      "PE_ADM1_PER-581"
+    ],
+    "PE_San_Mart_n": [
+      "PE_ADM1_PER-582"
+    ],
+    "PE_Ucayali": [
+      "PE_ADM1_PER-583"
+    ],
+    "PE_Amazonas": [
+      "PE_ADM1_PER-584"
+    ],
+    "PE_Loreto": [
+      "PE_ADM1_PER-585"
+    ],
+    "PE_Ayacucho": [
+      "PE_ADM1_PER-586"
+    ],
+    "PE_Lima": [
+      "PE_ADM1_PER-587",
+      "PE_ADM1_PER-591"
+    ],
+    "PE_Huancavelica": [
+      "PE_ADM1_PER-588"
+    ],
+    "PE_Ica": [
+      "PE_ADM1_PER-589"
+    ],
+    "PE_Jun_n": [
+      "PE_ADM1_PER-590"
+    ],
+    "PG_Enga": [
+      "PG_ADM1_PNG-1238"
+    ],
+    "PG_East_Sepik": [
+      "PG_ADM1_PNG-1239"
+    ],
+    "PG_Madang": [
+      "PG_ADM1_PNG-1240"
+    ],
+    "PG_Sandaun": [
+      "PG_ADM1_PNG-1241"
+    ],
+    "PG_Chimbu": [
+      "PG_ADM1_PNG-1242"
+    ],
+    "PG_Eastern_Highlands": [
+      "PG_ADM1_PNG-1243"
+    ],
+    "PG_Gulf": [
+      "PG_ADM1_PNG-1244"
+    ],
+    "PG_of_Bougainville": [
+      "PG_ADM1_PNG-1245"
+    ],
+    "PG_Southern_Highlands": [
+      "PG_ADM1_PNG-1246"
+    ],
+    "PG_Western_Highlands": [
+      "PG_ADM1_PNG-1247"
+    ],
+    "PG_Western": [
+      "PG_ADM1_PNG-1248"
+    ],
+    "PG_Central": [
+      "PG_ADM1_PNG-1249"
+    ],
+    "PG_East_New_Britain": [
+      "PG_ADM1_PNG-1250"
+    ],
+    "PG_Manus": [
+      "PG_ADM1_PNG-1251"
+    ],
+    "PG_Milne_Bay": [
+      "PG_ADM1_PNG-1252"
+    ],
+    "PG_Morobe": [
+      "PG_ADM1_PNG-1253"
+    ],
+    "PG_Port_Moresby": [
+      "PG_ADM1_PNG-1254"
+    ],
+    "PG_New_Ireland": [
+      "PG_ADM1_PNG-1255"
+    ],
+    "PG_Oro": [
+      "PG_ADM1_PNG-1256"
+    ],
+    "PG_West_New_Britain": [
+      "PG_ADM1_PNG-1257"
+    ],
+    "PY_Asunci_n": [
+      "PY_ADM1_PRY-4837"
+    ],
+    "PY_Alto_Paraguay": [
+      "PY_ADM1_PRY-597"
+    ],
+    "PY_Boquer_n": [
+      "PY_ADM1_PRY-598"
+    ],
+    "PY_Concepci_n": [
+      "PY_ADM1_PRY-603"
+    ],
+    "PY_Cordillera": [
+      "PY_ADM1_PRY-604"
+    ],
+    "PY_Presidente_Hayes": [
+      "PY_ADM1_PRY-605"
+    ],
+    "PY_San_Pedro": [
+      "PY_ADM1_PRY-606"
+    ],
+    "PY_Central": [
+      "PY_ADM1_PRY-607"
+    ],
+    "PY_Guair": [
+      "PY_ADM1_PRY-608"
+    ],
+    "PY_Misiones": [
+      "PY_ADM1_PRY-609"
+    ],
+    "PY_eembuc": [
+      "PY_ADM1_PRY-610"
+    ],
+    "PY_Paraguar": [
+      "PY_ADM1_PRY-611"
+    ],
+    "PY_Amambay": [
+      "PY_ADM1_PRY-615"
+    ],
+    "PY_Alto_Paran": [
+      "PY_ADM1_PRY-616"
+    ],
+    "PY_Caaguaz": [
+      "PY_ADM1_PRY-617"
+    ],
+    "PY_Caazap": [
+      "PY_ADM1_PRY-618"
+    ],
+    "PY_Canindey": [
+      "PY_ADM1_PRY-619"
+    ],
+    "PY_Itap_a": [
+      "PY_ADM1_PRY-620"
+    ],
+    "SM_Borgo_Maggiore": [
+      "SM_ADM1_SMR-4883"
+    ],
+    "SM_San_Marino": [
+      "SM_ADM1_SMR-4884"
+    ],
+    "SM_Acquaviva": [
+      "SM_ADM1_SMR-4885"
+    ],
+    "SM_Serravalle": [
+      "SM_ADM1_SMR-4886"
+    ],
+    "SM_Domagnano": [
+      "SM_ADM1_SMR-4887"
+    ],
+    "SM_Faetano": [
+      "SM_ADM1_SMR-4888"
+    ],
+    "SM_Montegiardino": [
+      "SM_ADM1_SMR-4889"
+    ],
+    "SM_Fiorentino": [
+      "SM_ADM1_SMR-4890"
+    ],
+    "SM_Chiesanuova": [
+      "SM_ADM1_SMR-4891"
+    ],
+    "SR_Nickerie": [
+      "SR_ADM1_SUR-37"
+    ],
+    "SR_Brokopondo": [
+      "SR_ADM1_SUR-66"
+    ],
+    "SR_Marowijne": [
+      "SR_ADM1_SUR-67"
+    ],
+    "SR_Para": [
+      "SR_ADM1_SUR-68"
+    ],
+    "SR_Sipaliwini": [
+      "SR_ADM1_SUR-69"
+    ],
+    "SR_Commewijne": [
+      "SR_ADM1_SUR-70"
+    ],
+    "SR_Coronie": [
+      "SR_ADM1_SUR-71"
+    ],
+    "SR_Paramaribo": [
+      "SR_ADM1_SUR-72"
+    ],
+    "SR_Saramacca": [
+      "SR_ADM1_SUR-73"
+    ],
+    "SR_Wanica": [
+      "SR_ADM1_SUR-74"
+    ],
+    "SV_Ahuachap_n": [
+      "SV_ADM1_SLV-1343"
+    ],
+    "SV_Caba_as": [
+      "SV_ADM1_SLV-1344"
+    ],
+    "SV_Cuscatl_n": [
+      "SV_ADM1_SLV-1345"
+    ],
+    "SV_La_Libertad": [
+      "SV_ADM1_SLV-1346"
+    ],
+    "SV_La_Paz": [
+      "SV_ADM1_SLV-1347"
+    ],
+    "SV_Sonsonate": [
+      "SV_ADM1_SLV-1348"
+    ],
+    "SV_San_Salvador": [
+      "SV_ADM1_SLV-1349"
+    ],
+    "SV_La_Uni_n": [
+      "SV_ADM1_SLV-1350"
+    ],
+    "SV_Moraz_n": [
+      "SV_ADM1_SLV-1351"
+    ],
+    "SV_San_Miguel": [
+      "SV_ADM1_SLV-1352"
+    ],
+    "SV_San_Vicente": [
+      "SV_ADM1_SLV-1353"
+    ],
+    "SV_Usulut_n": [
+      "SV_ADM1_SLV-1354"
+    ],
+    "SV_Chalatenango": [
+      "SV_ADM1_SLV-1357"
+    ],
+    "SV_Santa_Ana": [
+      "SV_ADM1_SLV-1358"
+    ],
+    "TL_Dili": [
+      "TL_ADM1_TLS-541"
+    ],
+    "TL_Liqui": [
+      "TL_ADM1_TLS-542"
+    ],
+    "TL_Oe_Cusse_Ambeno": [
+      "TL_ADM1_TLS-543"
+    ],
+    "TL_Aileu": [
+      "TL_ADM1_TLS-544"
+    ],
+    "TL_Ainaro": [
+      "TL_ADM1_TLS-545"
+    ],
+    "TL_Baucau": [
+      "TL_ADM1_TLS-546"
+    ],
+    "TL_Bobonaro": [
+      "TL_ADM1_TLS-547"
+    ],
+    "TL_Cova_Lima": [
+      "TL_ADM1_TLS-548"
+    ],
+    "TL_Ermera": [
+      "TL_ADM1_TLS-549"
+    ],
+    "TL_Manatuto": [
+      "TL_ADM1_TLS-550"
+    ],
+    "TL_Manufahi": [
+      "TL_ADM1_TLS-551"
+    ],
+    "TL_Viqueque": [
+      "TL_ADM1_TLS-552"
+    ],
+    "TL_Laut_m": [
+      "TL_ADM1_TLS-553"
+    ],
+    "UY_Salto": [
+      "UY_ADM1_URY-10"
+    ],
+    "UY_Soriano": [
+      "UY_ADM1_URY-11"
+    ],
+    "UY_Cerro_Largo": [
+      "UY_ADM1_URY-12"
+    ],
+    "UY_Durazno": [
+      "UY_ADM1_URY-13"
+    ],
+    "UY_Rivera": [
+      "UY_ADM1_URY-14"
+    ],
+    "UY_Tacuaremb": [
+      "UY_ADM1_URY-15"
+    ],
+    "UY_Treinta_y_Tres": [
+      "UY_ADM1_URY-16"
+    ],
+    "UY_Canelones": [
+      "UY_ADM1_URY-17"
+    ],
+    "UY_Florida": [
+      "UY_ADM1_URY-18"
+    ],
+    "UY_Lavalleja": [
+      "UY_ADM1_URY-19"
+    ],
+    "UY_Maldonado": [
+      "UY_ADM1_URY-20"
+    ],
+    "UY_Montevideo": [
+      "UY_ADM1_URY-21"
+    ],
+    "UY_Rocha": [
+      "UY_ADM1_URY-22"
+    ],
+    "UY_Colonia": [
+      "UY_ADM1_URY-4"
+    ],
+    "UY_San_Jos": [
+      "UY_ADM1_URY-5"
+    ],
+    "UY_Artigas": [
+      "UY_ADM1_URY-6"
+    ],
+    "UY_Flores": [
+      "UY_ADM1_URY-7"
+    ],
+    "UY_Paysand": [
+      "UY_ADM1_URY-8"
+    ],
+    "UY_R_o_Negro": [
+      "UY_ADM1_URY-9"
+    ],
+    "VE_VEN_99": [
+      "VE_ADM1_VEN+99?"
+    ],
+    "VE_Falc_n": [
+      "VE_ADM1_VEN-23"
+    ],
+    "VE_Apure": [
+      "VE_ADM1_VEN-25"
+    ],
+    "VE_Barinas": [
+      "VE_ADM1_VEN-26"
+    ],
+    "VE_Merida": [
+      "VE_ADM1_VEN-27"
+    ],
+    "VE_Tachira": [
+      "VE_ADM1_VEN-28"
+    ],
+    "VE_Trujillo": [
+      "VE_ADM1_VEN-29"
+    ],
+    "VE_Zulia": [
+      "VE_ADM1_VEN-31"
+    ],
+    "VE_Cojedes": [
+      "VE_ADM1_VEN-32"
+    ],
+    "VE_Carabobo": [
+      "VE_ADM1_VEN-33"
+    ],
+    "VE_Lara": [
+      "VE_ADM1_VEN-34"
+    ],
+    "VE_Portuguesa": [
+      "VE_ADM1_VEN-35"
+    ],
+    "VE_Yaracuy": [
+      "VE_ADM1_VEN-36"
+    ],
+    "VE_Amazonas": [
+      "VE_ADM1_VEN-38"
+    ],
+    "VE_Bol_var": [
+      "VE_ADM1_VEN-39"
+    ],
+    "VE_Anzo_tegui": [
+      "VE_ADM1_VEN-40"
+    ],
+    "VE_Aragua": [
+      "VE_ADM1_VEN-41"
+    ],
+    "VE_Vargas_state": [
+      "VE_ADM1_VEN-42"
+    ],
+    "VE_Capital": [
+      "VE_ADM1_VEN-43"
+    ],
+    "VE_Federal_Dependencies": [
+      "VE_ADM1_VEN-44"
+    ],
+    "VE_Gu_rico_State": [
+      "VE_ADM1_VEN-45"
+    ],
+    "VE_Monagas": [
+      "VE_ADM1_VEN-46"
+    ],
+    "VE_Miranda": [
+      "VE_ADM1_VEN-47"
+    ],
+    "VE_Nueva_Esparta": [
+      "VE_ADM1_VEN-48"
+    ],
+    "VE_Sucre": [
+      "VE_ADM1_VEN-49"
+    ],
+    "VE_Delta_Amacuro": [
+      "VE_ADM1_VEN-65"
+    ],
+    "XK_Peja": [
+      "XK_ADM1_KOS-5886"
+    ],
+    "XK_Istok": [
+      "XK_ADM1_KOS-5887"
+    ],
+    "XK_Klina": [
+      "XK_ADM1_KOS-5888"
+    ],
+    "XK_De_ani": [
+      "XK_ADM1_KOS-5889"
+    ],
+    "XK_Gjakova": [
+      "XK_ADM1_KOS-5890"
+    ],
+    "XK_Orahovac": [
+      "XK_ADM1_KOS-5891"
+    ],
+    "XK_Zve_an": [
+      "XK_ADM1_KOS-5892"
+    ],
+    "XK_Leposavi": [
+      "XK_ADM1_KOS-5893"
+    ],
+    "XK_Kosovska_Mitrovica": [
+      "XK_ADM1_KOS-5894"
+    ],
+    "XK_Vu_itrn": [
+      "XK_ADM1_KOS-5895"
+    ],
+    "XK_Skenderaj_Srbica": [
+      "XK_ADM1_KOS-5896"
+    ],
+    "XK_Zubin_Potok": [
+      "XK_ADM1_KOS-5897"
+    ],
+    "XK_Kosovo_Polje": [
+      "XK_ADM1_KOS-5898"
+    ],
+    "XK_Glogovac": [
+      "XK_ADM1_KOS-5899"
+    ],
+    "XK_Obiliq": [
+      "XK_ADM1_KOS-5900"
+    ],
+    "XK_Podujevo_Podujeva": [
+      "XK_ADM1_KOS-5901"
+    ],
+    "XK_Kosovo_and_Metohija": [
+      "XK_ADM1_KOS-5902"
+    ],
+    "XK_Lipljan": [
+      "XK_ADM1_KOS-5903"
+    ],
+    "XK_Gnjilane": [
+      "XK_ADM1_KOS-5904"
+    ],
+    "XK_Viti_Vitina": [
+      "XK_ADM1_KOS-5905"
+    ],
+    "XK_Novo_Brdo": [
+      "XK_ADM1_KOS-5906"
+    ],
+    "XK_Kosovo_Pomoravlje": [
+      "XK_ADM1_KOS-5907"
+    ],
+    "XK_Plu_ine": [
+      "XK_ADM1_KOS-5908"
+    ],
+    "XK_Draga": [
+      "XK_ADM1_KOS-5909"
+    ],
+    "XK_Suva_Reka": [
+      "XK_ADM1_KOS-5910"
+    ],
+    "XK_Mali_evo": [
+      "XK_ADM1_KOS-5911"
+    ],
+    "XK_timlje": [
+      "XK_ADM1_KOS-5912"
+    ],
+    "XK_Uro_evac_ferizaj": [
+      "XK_ADM1_KOS-5913"
+    ],
+    "XK_trpce": [
+      "XK_ADM1_KOS-5914"
+    ],
+    "XK_Ka_anik": [
+      "XK_ADM1_KOS-5915"
+    ],
+    "GB_North_East_England": [
+      "GB_NUTS1_UKC"
+    ],
+    "GB_North_West_England": [
+      "GB_NUTS1_UKD"
+    ],
+    "GB_Yorkshire_and_the_Humber": [
+      "GB_NUTS1_UKE"
+    ],
+    "GB_East_Midlands_England": [
+      "GB_NUTS1_UKF"
+    ],
+    "GB_West_Midlands_England": [
+      "GB_NUTS1_UKG"
+    ],
+    "GB_East_of_England": [
+      "GB_NUTS1_UKH"
+    ],
+    "GB_London": [
+      "GB_NUTS1_UKI"
+    ],
+    "GB_South_East_England": [
+      "GB_NUTS1_UKJ"
+    ],
+    "GB_South_West_England": [
+      "GB_NUTS1_UKK"
+    ],
+    "BA_Federation_of_Bosnia_and_Herzegovina": [
+      "BA_ADM1_54001226B17629474923252"
+    ],
+    "BA_Republika_Srpska": [
+      "BA_ADM1_54001226B66267900922909"
+    ],
+    "BA_Br_ko_District": [
+      "BA_ADM1_54001226B82378099338701"
+    ],
+    "ID_Bangka_Belitung_Islands": [
+      "ID_ADM1_65028918B10722647473585"
+    ],
+    "ID_Riau": [
+      "ID_ADM1_65028918B11286430647546"
+    ],
+    "ID_Central_Java": [
+      "ID_ADM1_65028918B13838862025135"
+    ],
+    "ID_Jakarta_Special_Capital_Region": [
+      "ID_ADM1_65028918B14696209246677"
+    ],
+    "ID_Papua": [
+      "ID_ADM1_65028918B16658067687714"
+    ],
+    "ID_South_Sulawesi": [
+      "ID_ADM1_65028918B17554737605304"
+    ],
+    "ID_West_Kalimantan": [
+      "ID_ADM1_65028918B19721185942402"
+    ],
+    "ID_North_Sulawesi": [
+      "ID_ADM1_65028918B26897900130576"
+    ],
+    "ID_Central_Kalimantan": [
+      "ID_ADM1_65028918B28198720309323"
+    ],
+    "ID_West_Java": [
+      "ID_ADM1_65028918B28366581005022"
+    ],
+    "ID_Jambi": [
+      "ID_ADM1_65028918B29194895292819"
+    ],
+    "ID_South_Kalimantan": [
+      "ID_ADM1_65028918B30993740608215"
+    ],
+    "ID_Bengkulu": [
+      "ID_ADM1_65028918B30999004822283"
+    ],
+    "ID_North_Sumatra": [
+      "ID_ADM1_65028918B37605681672150"
+    ],
+    "ID_West_Sumatra": [
+      "ID_ADM1_65028918B4119458748300"
+    ],
+    "ID_East_Java": [
+      "ID_ADM1_65028918B43243108525571"
+    ],
+    "ID_West_Sulawesi": [
+      "ID_ADM1_65028918B46678513676023"
+    ],
+    "ID_Maluku": [
+      "ID_ADM1_65028918B48178230554278"
+    ],
+    "ID_North_Maluku": [
+      "ID_ADM1_65028918B51364455052819"
+    ],
+    "ID_North_Kalimantan": [
+      "ID_ADM1_65028918B52923737893214"
+    ],
+    "ID_Central_Sulawesi": [
+      "ID_ADM1_65028918B55787629749874"
+    ],
+    "ID_Special_Region_of_Yogyakarta": [
+      "ID_ADM1_65028918B6070530336190"
+    ],
+    "ID_Bali": [
+      "ID_ADM1_65028918B6690755070061"
+    ],
+    "ID_East_Kalimantan": [
+      "ID_ADM1_65028918B68445169823185"
+    ],
+    "ID_West_Papua": [
+      "ID_ADM1_65028918B84835514626455"
+    ],
+    "ID_Lampung": [
+      "ID_ADM1_65028918B88589358118692"
+    ],
+    "ID_Riau_Islands": [
+      "ID_ADM1_65028918B90123187256494"
+    ],
+    "ID_East_Nusa_Tenggara": [
+      "ID_ADM1_65028918B90323071856071"
+    ],
+    "ID_Aceh": [
+      "ID_ADM1_65028918B93184959873838"
+    ],
+    "ID_Southeast_Sulawesi": [
+      "ID_ADM1_65028918B94007491868798"
+    ],
+    "ID_Gorontalo": [
+      "ID_ADM1_65028918B94020759558104"
+    ],
+    "ID_South_Sumatra": [
+      "ID_ADM1_65028918B9551391119865"
+    ],
+    "ID_West_Nusa_Tenggara": [
+      "ID_ADM1_65028918B98829509874887"
+    ],
+    "ID_Banten": [
+      "ID_ADM1_65028918B99918739720671"
     ]
   },
   "labels": {
@@ -6539,6 +11809,2790 @@
     "FR_Bourgogne_Franche_Comte": "Bourgogne-Franche-Comte Region",
     "FR_Bretagne": "Bretagne Region",
     "FR_Pays_de_la_Loire": "Pays de la Loire Region",
-    "FR_Ile_de_France": "Ile-de-France Region"
+    "FR_Ile_de_France": "Ile-de-France Region",
+    "GB_England": "England",
+    "GB_Wales": "Wales",
+    "GB_Scotland": "Scotland",
+    "GB_Northern_Ireland": "Northern Ireland",
+    "CA_Newfoundland_and_Labrador": "Newfoundland and Labrador",
+    "CA_Prince_Edward_Island": "Prince Edward Island",
+    "CA_Nova_Scotia": "Nova Scotia",
+    "CA_New_Brunswick": "New Brunswick",
+    "CA_Quebec": "Quebec",
+    "CA_Ontario": "Ontario",
+    "CA_Manitoba": "Manitoba",
+    "CA_Saskatchewan": "Saskatchewan",
+    "CA_Alberta": "Alberta",
+    "CA_British_Columbia": "British Columbia",
+    "CA_Yukon": "Yukon",
+    "CA_Northwest_Territories": "Northwest Territories",
+    "CA_Nunavut": "Nunavut",
+    "MX_Aguascalientes": "Aguascalientes",
+    "MX_Baja_California": "Baja California",
+    "MX_Baja_California_Sur": "Baja California Sur",
+    "MX_Campeche": "Campeche",
+    "MX_Chiapas": "Chiapas",
+    "MX_Chihuahua": "Chihuahua",
+    "MX_Coahuila": "Coahuila",
+    "MX_Colima": "Colima",
+    "MX_Durango": "Durango",
+    "MX_Guanajuato": "Guanajuato",
+    "MX_Guerrero": "Guerrero",
+    "MX_Hidalgo": "Hidalgo",
+    "MX_Jalisco": "Jalisco",
+    "MX_Mexico": "Mexico",
+    "MX_Michoac_n": "Michoac\u00e1n",
+    "MX_Morelos": "Morelos",
+    "MX_Nayarit": "Nayarit",
+    "MX_Nuevo_Le_n": "Nuevo Le\u00f3n",
+    "MX_Oaxaca": "Oaxaca",
+    "MX_Puebla": "Puebla",
+    "MX_Quer_taro": "Quer\u00e9taro",
+    "MX_Quintana_Roo": "Quintana Roo",
+    "MX_San_Luis_Potos": "San Luis Potos\u00ed",
+    "MX_Sinaloa": "Sinaloa",
+    "MX_Sonora": "Sonora",
+    "MX_State_of_Mexico": "State of Mexico",
+    "MX_Tabasco": "Tabasco",
+    "MX_Tamaulipas": "Tamaulipas",
+    "MX_Tlaxcala": "Tlaxcala",
+    "MX_Veracruz": "Veracruz",
+    "MX_Yucat_n": "Yucat\u00e1n",
+    "MX_Zacatecas": "Zacatecas",
+    "US_Alaska": "Alaska",
+    "US_Alabama": "Alabama",
+    "US_Arkansas": "Arkansas",
+    "US_Arizona": "Arizona",
+    "US_California": "California",
+    "US_Colorado": "Colorado",
+    "US_Connecticut": "Connecticut",
+    "US_District_of_Columbia": "District of Columbia",
+    "US_Delaware": "Delaware",
+    "US_Florida": "Florida",
+    "US_Georgia": "Georgia",
+    "US_Hawaii": "Hawaii",
+    "US_Iowa": "Iowa",
+    "US_Idaho": "Idaho",
+    "US_Illinois": "Illinois",
+    "US_Indiana": "Indiana",
+    "US_Kansas": "Kansas",
+    "US_Kentucky": "Kentucky",
+    "US_Louisiana": "Louisiana",
+    "US_Massachusetts": "Massachusetts",
+    "US_Maryland": "Maryland",
+    "US_Maine": "Maine",
+    "US_Michigan": "Michigan",
+    "US_Minnesota": "Minnesota",
+    "US_Missouri": "Missouri",
+    "US_Mississippi": "Mississippi",
+    "US_Montana": "Montana",
+    "US_North_Carolina": "North Carolina",
+    "US_North_Dakota": "North Dakota",
+    "US_Nebraska": "Nebraska",
+    "US_New_Hampshire": "New Hampshire",
+    "US_New_Jersey": "New Jersey",
+    "US_New_Mexico": "New Mexico",
+    "US_Nevada": "Nevada",
+    "US_New_York": "New York",
+    "US_Ohio": "Ohio",
+    "US_Oklahoma": "Oklahoma",
+    "US_Oregon": "Oregon",
+    "US_Pennsylvania": "Pennsylvania",
+    "US_Rhode_Island": "Rhode Island",
+    "US_South_Carolina": "South Carolina",
+    "US_South_Dakota": "South Dakota",
+    "US_Tennessee": "Tennessee",
+    "US_Texas": "Texas",
+    "US_Utah": "Utah",
+    "US_Virginia": "Virginia",
+    "US_Vermont": "Vermont",
+    "US_Washington": "Washington",
+    "US_Wisconsin": "Wisconsin",
+    "US_West_Virginia": "West Virginia",
+    "US_Wyoming": "Wyoming",
+    "AO_Lunda_Norte": "Lunda Norte",
+    "AO_Lunda_Sul": "Lunda Sul",
+    "AO_Malanje": "Malanje",
+    "AO_Bengo": "Bengo",
+    "AO_Cuanza_Norte": "Cuanza Norte",
+    "AO_Cuanza_Sul": "Cuanza Sul",
+    "AO_Luanda": "Luanda",
+    "AO_U_ge": "U\u00edge",
+    "AO_Zaire": "Zaire",
+    "AO_Cabinda": "Cabinda",
+    "AO_Bi": "Bi\u00e9",
+    "AO_Benguela": "Benguela",
+    "AO_Cuando_Cubango": "Cuando Cubango",
+    "AO_Cunene": "Cunene",
+    "AO_Huambo": "Huambo",
+    "AO_Hu_la": "Hu\u00edla",
+    "AO_Moxico": "Moxico",
+    "AO_Namibe": "Namibe",
+    "BJ_Borgou": "Borgou",
+    "BJ_Alibori": "Alibori",
+    "BJ_Collines": "Collines",
+    "BJ_Atlantique": "Atlantique",
+    "BJ_Littoral": "Littoral",
+    "BJ_Kouffo": "Kouffo",
+    "BJ_Ou_m": "Ou\u00e9m\u00e9",
+    "BJ_Zou": "Zou",
+    "BJ_Plateau": "Plateau",
+    "BJ_Mono": "Mono",
+    "BJ_Atakora": "Atakora",
+    "BJ_Donga": "Donga",
+    "BW_Ghanzi": "Ghanzi",
+    "BW_Kgalagadi": "Kgalagadi",
+    "BW_North_West": "North-West",
+    "BW_Central": "Central",
+    "BW_Kgatleng": "Kgatleng",
+    "BW_Kweneng": "Kweneng",
+    "BW_South_East": "South-East",
+    "BW_Southern": "Southern",
+    "BW_North_East": "North-East",
+    "BW_Gaborone": "Gaborone",
+    "BW_Francistown": "Francistown",
+    "BW_Lobatse": "Lobatse",
+    "BW_Selebi_Phikwe": "Selebi-Phikwe",
+    "BW_Sowa": "Sowa",
+    "BW_Jwaneng": "Jwaneng",
+    "BI_Cankuzo": "Cankuzo",
+    "BI_Karuzi": "Karuzi",
+    "BI_Rutana": "Rutana",
+    "BI_Ruyigi": "Ruyigi",
+    "BI_Bubanza": "Bubanza",
+    "BI_Bururi": "Bururi",
+    "BI_Cibitoke": "Cibitoke",
+    "BI_Gitega": "Gitega",
+    "BI_Kayanza": "Kayanza",
+    "BI_Makamba": "Makamba",
+    "BI_Ngozi": "Ngozi",
+    "BI_Kirundo": "Kirundo",
+    "BI_Muyinga": "Muyinga",
+    "BI_Bujumbura_Mairie": "Bujumbura Mairie",
+    "BI_Muramvya": "Muramvya",
+    "BI_Bujumbura_Rural": "Bujumbura Rural",
+    "BI_Mwaro": "Mwaro",
+    "CM_Far_North": "Far North",
+    "CM_Littoral": "Littoral",
+    "CM_Northwest": "Northwest",
+    "CM_Centre": "Centre",
+    "CM_East": "East",
+    "CM_Adamawa": "Adamawa",
+    "CM_North": "North",
+    "CM_West": "West",
+    "CM_Southwest": "Southwest",
+    "CM_South": "South",
+    "CV_Brava": "Brava",
+    "CV_S_o_Filipe": "S\u00e3o Filipe",
+    "CV_Mosteiros": "Mosteiros",
+    "CV_Santa_Catarina_do_Fogo": "Santa Catarina do Fogo",
+    "CV_Tarrafal": "Tarrafal",
+    "CV_Santa_Catarina": "Santa Catarina",
+    "CV_S_o_Miguel": "S\u00e3o Miguel",
+    "CV_Santa_Cruz": "Santa Cruz",
+    "CV_S_o_Salvador_do_Mundo": "S\u00e3o Salvador do Mundo",
+    "CV_S_o_Louren_o_dos_rg_os": "S\u00e3o Louren\u00e7o dos \u00d3rg\u00e3os",
+    "CV_S_o_Domingos": "S\u00e3o Domingos",
+    "CV_Ribeira_Grande_de_Santiago": "Ribeira Grande de Santiago",
+    "CV_Praia": "Praia",
+    "CV_Maio": "Maio",
+    "CV_Boa_Vista": "Boa Vista",
+    "CV_Sal": "Sal",
+    "CV_Ribeira_Brava": "Ribeira Brava",
+    "CV_Tarrafal_de_S_o_Nicolau": "Tarrafal de S\u00e3o Nicolau",
+    "CV_S_o_Vicente": "S\u00e3o Vicente",
+    "CV_Porto_Novo": "Porto Novo",
+    "CV_Ribeira_Grande": "Ribeira Grande",
+    "CV_Paul": "Paul",
+    "CF_Bangui": "Bangui",
+    "CF_Ombella_M_Poko_Prefecture": "Ombella-M'Poko Prefecture",
+    "CF_Basse_Kotto_Prefecture": "Basse-Kotto Prefecture",
+    "CF_Lobaye_Prefecture": "Lobaye Prefecture",
+    "CF_Mamb_r_Kad": "Mamb\u00e9r\u00e9-Kad\u00e9\u00ef",
+    "CF_Sangha_Mba_r": "Sangha-Mba\u00e9r\u00e9",
+    "CF_Nana_Mamb_r_Prefecture": "Nana-Mamb\u00e9r\u00e9 Prefecture",
+    "CF_Ouham_Pend_Prefecture": "Ouham-Pend\u00e9 Prefecture",
+    "CF_Bamingui_Bangoran_Prefecture": "Bamingui-Bangoran Prefecture",
+    "CF_Nana_Gr_bizi_Economic_Prefecture": "Nana-Gr\u00e9bizi Economic Prefecture",
+    "CF_K_mo_Prefecture": "K\u00e9mo Prefecture",
+    "CF_Ouaka_Prefecture": "Ouaka Prefecture",
+    "CF_Ouham_Prefecture": "Ouham Prefecture",
+    "CF_Vakaga_Prefecture": "Vakaga Prefecture",
+    "CF_Haute_Kotto_Prefecture": "Haute-Kotto Prefecture",
+    "CF_Haut_Mbomou_Prefecture": "Haut-Mbomou Prefecture",
+    "CF_Mbomou_Prefecture": "Mbomou Prefecture",
+    "TD_Hadjer_Lamis": "Hadjer-Lamis",
+    "TD_Kanem": "Kanem",
+    "TD_Lac": "Lac",
+    "TD_Batha": "Batha",
+    "TD_Wadi_Fira": "Wadi Fira",
+    "TD_Gu_ra": "Gu\u00e9ra",
+    "TD_Ouadda": "Ouadda\u00ef",
+    "TD_Logone_Occidental": "Logone Occidental",
+    "TD_Logone_Oriental": "Logone Oriental",
+    "TD_Mayo_Kebbi_Est": "Mayo-Kebbi Est",
+    "TD_Tandjil": "Tandjil\u00e9",
+    "TD_Mandoul": "Mandoul",
+    "TD_Salamat": "Salamat",
+    "TD_N_Djamena": "N'Djamena",
+    "TD_Mayo_Kebbi_Ouest": "Mayo-Kebbi Ouest",
+    "TD_Borkou": "Borkou",
+    "TD_Tibesti": "Tibesti",
+    "TD_Ennedi": "Ennedi",
+    "TD_Chari_Baguirmi": "Chari-Baguirmi",
+    "TD_Bahr_el_Gazel": "Bahr el Gazel",
+    "TD_Sila": "Sila",
+    "TD_Moyen_Chari": "Moyen-Chari",
+    "KM_Moh_li": "Moh\u00e9li",
+    "KM_Andjaz_dja": "Andjaz\u00eedja",
+    "KM_Anjouan": "Anjouan",
+    "CD_quateur": "\u00c9quateur",
+    "CD_Orientale": "Orientale",
+    "CD_Bandundu": "Bandundu",
+    "CD_Kasa_Occidental": "Kasa\u00ef-Occidental",
+    "CD_Kongo_Central": "Kongo Central",
+    "CD_Kinshasa": "Kinshasa",
+    "CD_South_Kivu": "South Kivu",
+    "CD_Maniema": "Maniema",
+    "CD_Kasa_Oriental": "Kasa\u00ef-Oriental",
+    "CD_Katanga": "Katanga",
+    "CD_North_Kivu": "North Kivu",
+    "DJ_Ali_Sabieh": "Ali Sabieh",
+    "DJ_Djibouti": "Djibouti",
+    "DJ_Arta": "Arta",
+    "DJ_Dikhil": "Dikhil",
+    "DJ_Obock": "Obock",
+    "DJ_Tadjourah": "Tadjourah",
+    "GQ_Annob_n": "Annob\u00f3n",
+    "GQ_Centro_Sur": "Centro Sur",
+    "GQ_Ki_Ntem": "Ki\u00e9-Ntem",
+    "GQ_Litoral": "Litoral",
+    "GQ_Wele_Nzas": "Wele-Nzas",
+    "GQ_Bioko_Norte": "Bioko Norte",
+    "GQ_Bioko_Sur": "Bioko Sur",
+    "ER_Gash_Barka": "Gash-Barka",
+    "ER_Anseba": "Anseba",
+    "ER_Debub": "Debub",
+    "ER_Northern_Red_Sea": "Northern Red Sea",
+    "ER_Maekel": "Maekel",
+    "ER_Southern_Red_Sea": "Southern Red Sea",
+    "SZ_Hhohho": "Hhohho",
+    "SZ_Lubombo": "Lubombo",
+    "SZ_Manzini": "Manzini",
+    "SZ_Shiselweni": "Shiselweni",
+    "ET_Amhara": "Amhara",
+    "ET_Tigray": "Tigray",
+    "ET_Afar": "Afar",
+    "ET_Southern_Nations": "Southern Nations",
+    "ET_Gambela": "Gambela",
+    "ET_Oromia": "Oromia",
+    "ET_Benishangul_Gumuz": "Benishangul-Gumuz",
+    "ET_Addis_Ababa": "Addis Ababa",
+    "ET_Somali": "Somali",
+    "ET_Dire_Dawa": "Dire Dawa",
+    "ET_Harari": "Harari",
+    "GA_Estuaire": "Estuaire",
+    "GA_Ogoou_Ivindo": "Ogoou\u00e9-Ivindo",
+    "GA_Woleu_Ntem": "Woleu-Ntem",
+    "GA_Moyen_Ogoou": "Moyen-Ogoou\u00e9",
+    "GA_Ngouni": "Ngouni\u00e9",
+    "GA_Nyanga": "Nyanga",
+    "GA_Ogoou_Maritime": "Ogoou\u00e9-Maritime",
+    "GA_Haut_Ogoou": "Haut-Ogoou\u00e9",
+    "GA_Ogoou_Lolo": "Ogoou\u00e9-Lolo",
+    "GH_Northern": "Northern",
+    "GH_Upper_East": "Upper East",
+    "GH_Upper_West": "Upper West",
+    "GH_Ashanti": "Ashanti",
+    "GH_Brong_Ahafo": "Brong-Ahafo",
+    "GH_Central": "Central",
+    "GH_Eastern": "Eastern",
+    "GH_Western": "Western",
+    "GH_Greater_Accra": "Greater Accra",
+    "GH_Volta": "Volta",
+    "GW_Biombo": "Biombo",
+    "GW_Bissau": "Bissau",
+    "GW_Bolama": "Bolama",
+    "GW_Cacheu": "Cacheu",
+    "GW_Oio": "Oio",
+    "GW_Quinara": "Quinara",
+    "GW_Bafat": "Bafat\u00e1",
+    "GW_Gab": "Gab\u00fa",
+    "GW_Tombali": "Tombali",
+    "KE_Coast": "Coast",
+    "KE_Central": "Central",
+    "KE_Nairobi": "Nairobi",
+    "KE_Nyanza": "Nyanza",
+    "KE_Eastern": "Eastern",
+    "KE_Rift_Valley": "Rift Valley",
+    "KE_Western": "Western",
+    "KE_North_Eastern": "North Eastern",
+    "LS_Berea": "Berea",
+    "LS_Maseru": "Maseru",
+    "LS_Mohale_s_Hoek": "Mohale's Hoek",
+    "LS_Quthing": "Quthing",
+    "LS_Butha_Buthe": "Butha-Buthe",
+    "LS_Leribe": "Leribe",
+    "LS_Mokhotlong": "Mokhotlong",
+    "LS_Qacha_s_Nek": "Qacha's Nek",
+    "LS_Thaba_Tseka": "Thaba-Tseka",
+    "LS_Mafeteng": "Mafeteng",
+    "LR_River_Gee": "River Gee",
+    "LR_Gbarpolu": "Gbarpolu",
+    "LR_Grand_Kru": "Grand Kru",
+    "LR_Maryland": "Maryland",
+    "LR_Sinoe": "Sinoe",
+    "LR_Bomi": "Bomi",
+    "LR_Bong": "Bong",
+    "LR_Grand_Bassa": "Grand Bassa",
+    "LR_Grand_Cape_Mount": "Grand Cape Mount",
+    "LR_Lofa": "Lofa",
+    "LR_Montserrado": "Montserrado",
+    "LR_Margibi": "Margibi",
+    "LR_Nimba": "Nimba",
+    "LR_River_Cess": "River Cess",
+    "LR_Grand_Gedeh": "Grand Gedeh",
+    "MG_Toamasina": "Toamasina",
+    "MG_Amoron_i_Mania": "Amoron'i Mania",
+    "MG_Antananarivo": "Antananarivo",
+    "MG_Androy": "Androy",
+    "MG_Anosy": "Anosy",
+    "MG_Atsimo_Andrefana": "Atsimo-Andrefana",
+    "MG_Atsimo_Atsinanana": "Atsimo-Atsinanana",
+    "MG_Betsiboka": "Betsiboka",
+    "MG_Boeny": "Boeny",
+    "MG_Diana": "Diana",
+    "MG_Haute_Matsiatra": "Haute Matsiatra",
+    "MG_Ihorombe": "Ihorombe",
+    "MG_Melaky": "Melaky",
+    "MG_Menabe": "Menabe",
+    "MG_Sava": "Sava",
+    "MG_Sofia": "Sofia",
+    "MG_Vatovavy_Fitovinany": "Vatovavy-Fitovinany",
+    "ML_Tombouctou": "Tombouctou",
+    "ML_Kidal": "Kidal",
+    "ML_Gao": "Gao",
+    "ML_Bamako": "Bamako",
+    "ML_Kayes": "Kayes",
+    "ML_Wassoulou": "Wassoulou",
+    "ML_Mopti": "Mopti",
+    "ML_S_gou": "S\u00e9gou",
+    "ML_Koulikoro": "Koulikoro",
+    "MR_Tiris_Zemmour": "Tiris Zemmour",
+    "MR_Brakna": "Brakna",
+    "MR_Dakhlet_Nouadhibou": "Dakhlet Nouadhibou",
+    "MR_Inchiri": "Inchiri",
+    "MR_Nouakchott": "Nouakchott",
+    "MR_Trarza": "Trarza",
+    "MR_Assaba": "Assaba",
+    "MR_Guidimaka": "Guidimaka",
+    "MR_Gorgol": "Gorgol",
+    "MR_Adrar": "Adrar",
+    "MR_Hodh_Ech_Chargui": "Hodh Ech Chargui",
+    "MR_Hodh_El_Gharbi": "Hodh El Gharbi",
+    "MR_Tagant": "Tagant",
+    "MZ_Tete": "Tete",
+    "MZ_Manica": "Manica",
+    "MZ_Cabo_Delgado": "Cabo Delgado",
+    "MZ_Niassa": "Niassa",
+    "MZ_Nampula": "Nampula",
+    "MZ_Gaza": "Gaza",
+    "MZ_Sofala": "Sofala",
+    "MZ_Zambezia": "Zambezia",
+    "MZ_Inhambane": "Inhambane",
+    "MZ_Maputo": "Maputo",
+    "NA_Karas": "Karas",
+    "NA_Hardap": "Hardap",
+    "NA_Khomas": "Khomas",
+    "NA_Kunene": "Kunene",
+    "NA_Erongo": "Erongo",
+    "NA_Otjozondjupa": "Otjozondjupa",
+    "NA_Omusati": "Omusati",
+    "NA_Oshana": "Oshana",
+    "NA_Ohangwena": "Ohangwena",
+    "NA_Omaheke": "Omaheke",
+    "NA_Kavango": "Kavango",
+    "NA_Oshikoto": "Oshikoto",
+    "NA_Zambezi": "Zambezi",
+    "NE_Tillab_ri": "Tillab\u00e9ri",
+    "NE_Diffa": "Diffa",
+    "NE_Agadez": "Agadez",
+    "NE_Maradi": "Maradi",
+    "NE_Zinder": "Zinder",
+    "NE_Dosso": "Dosso",
+    "NE_Niamey": "Niamey",
+    "NE_Tahoua": "Tahoua",
+    "NG_Borno_State": "Borno State",
+    "NG_Abia_State": "Abia State",
+    "NG_Akwa_Ibom_State": "Akwa Ibom State",
+    "NG_Imo_State": "Imo State",
+    "NG_Rivers_State": "Rivers State",
+    "NG_Bayelsa_State": "Bayelsa State",
+    "NG_Benue_State": "Benue State",
+    "NG_Cross_River_State": "Cross River State",
+    "NG_Taraba_State": "Taraba State",
+    "NG_Kwara_State": "Kwara State",
+    "NG_Lagos": "Lagos",
+    "NG_Niger_State": "Niger State",
+    "NG_Ogun_State": "Ogun State",
+    "NG_Ondo_State": "Ondo State",
+    "NG_Ekiti_State": "Ekiti State",
+    "NG_Osun_State": "Osun State",
+    "NG_Oyo_State": "Oyo State",
+    "NG_Anambra_State": "Anambra State",
+    "NG_Bauchi_State": "Bauchi State",
+    "NG_Gombe_State": "Gombe State",
+    "NG_Delta_State": "Delta State",
+    "NG_Edo_State": "Edo State",
+    "NG_Enugu_State": "Enugu State",
+    "NG_Ebonyi_State": "Ebonyi State",
+    "NG_Kaduna_State": "Kaduna State",
+    "NG_Kogi_State": "Kogi State",
+    "NG_Plateau_State": "Plateau State",
+    "NG_Nasarawa_State": "Nasarawa State",
+    "NG_Jigawa_State": "Jigawa State",
+    "NG_Kano_State": "Kano State",
+    "NG_Katsina_State": "Katsina State",
+    "NG_Sokoto_State": "Sokoto State",
+    "NG_Zamfara_State": "Zamfara State",
+    "NG_Yobe_State": "Yobe State",
+    "NG_Kebbi_State": "Kebbi State",
+    "NG_Adamawa_State": "Adamawa State",
+    "NG_Federal_Capital_Territory": "Federal Capital Territory",
+    "CG_Cuvette_Ouest": "Cuvette-Ouest",
+    "CG_Bouenza": "Bouenza",
+    "CG_Likouala": "Likouala",
+    "CG_Sangha": "Sangha",
+    "CG_Pool": "Pool",
+    "CG_Cuvette": "Cuvette",
+    "CG_Kouilou": "Kouilou",
+    "CG_L_koumou": "L\u00e9koumou",
+    "CG_Niari": "Niari",
+    "CG_Plateaux": "Plateaux",
+    "CG_Brazzaville": "Brazzaville",
+    "CG_Pointe_Noire": "Pointe-Noire",
+    "RW_Southern": "Southern",
+    "RW_Western": "Western",
+    "RW_Eastern": "Eastern",
+    "RW_Northern": "Northern",
+    "RW_Kigali": "Kigali",
+    "SN_S_dhiou": "S\u00e9dhiou",
+    "SN_K_dougou": "K\u00e9dougou",
+    "SN_Kaffrine": "Kaffrine",
+    "SN_Saint_Louis": "Saint-Louis",
+    "SN_Dakar": "Dakar",
+    "SN_Diourbel": "Diourbel",
+    "SN_Fatick": "Fatick",
+    "SN_Kaolack": "Kaolack",
+    "SN_Louga": "Louga",
+    "SN_Matam": "Matam",
+    "SN_Thi_s": "Thi\u00e8s",
+    "SN_Kolda": "Kolda",
+    "SN_Ziguinchor": "Ziguinchor",
+    "SN_Tambacounda": "Tambacounda",
+    "SL_Southern": "Southern",
+    "SL_Western_Area": "Western Area",
+    "SL_Northern": "Northern",
+    "SL_Eastern": "Eastern",
+    "SO_Bari": "Bari",
+    "SO_Bakool": "Bakool",
+    "SO_Bay": "Bay",
+    "SO_Gedo": "Gedo",
+    "SO_Middle_Juba": "Middle Juba",
+    "SO_Lower_Shebelle": "Lower Shebelle",
+    "SO_Banaadir": "Banaadir",
+    "SO_Galguduud": "Galguduud",
+    "SO_Hiran": "Hiran",
+    "SO_Middle_Shebelle": "Middle Shebelle",
+    "SO_Mudug": "Mudug",
+    "SO_Nugal": "Nugal",
+    "SO_Lower_Juba": "Lower Juba",
+    "ZA_Northern_Cape": "Northern Cape",
+    "ZA_Western_Cape": "Western Cape",
+    "ZA_North_West": "North West",
+    "ZA_Free_State": "Free State",
+    "ZA_Gauteng": "Gauteng",
+    "ZA_Mpumalanga": "Mpumalanga",
+    "ZA_Limpopo": "Limpopo",
+    "ZA_KwaZulu_Natal": "KwaZulu-Natal",
+    "ZA_Eastern_Cape": "Eastern Cape",
+    "SS_Northern_Bahr_el_Ghazal": "Northern Bahr el Ghazal",
+    "SS_Lakes": "Lakes",
+    "SS_Western_Equatoria": "Western Equatoria",
+    "SS_Central_Equatoria": "Central Equatoria",
+    "SS_Upper_Nile": "Upper Nile",
+    "SS_Jonglei": "Jonglei",
+    "SS_Unity": "Unity",
+    "SS_Warrap": "Warrap",
+    "SS_Western_Bahr_el_Ghazal": "Western Bahr el Ghazal",
+    "SS_Eastern_Equatoria": "Eastern Equatoria",
+    "SD_Blue_Nile": "Blue Nile",
+    "SD_Red_Sea": "Red Sea",
+    "SD_South_Darfur": "South Darfur",
+    "SD_East_Darfur": "East Darfur",
+    "SD_West_Soudan": "West Soudan",
+    "SD_Central_Darfur": "Central Darfur",
+    "SD_Khartoum": "Khartoum",
+    "SD_Al_Jazirah": "Al Jazirah",
+    "SD_Al_Qadarif": "Al Qadarif",
+    "SD_River_Nile": "River Nile",
+    "SD_Northern": "Northern",
+    "SD_White_Nile": "White Nile",
+    "SD_Sennar": "Sennar",
+    "SD_North_Darfur": "North Darfur",
+    "SD_South_Kordofan": "South Kordofan",
+    "SD_North_Kordofan": "North Kordofan",
+    "SD_Kassala": "Kassala",
+    "ST_S_o_Tom": "S\u00e3o Tom\u00e9",
+    "ST_Pr_ncipe": "Pr\u00edncipe",
+    "TZ_Mbeya": "Mbeya",
+    "TZ_Rukwa": "Rukwa",
+    "TZ_Unguja_South": "Unguja South",
+    "TZ_Mwanza": "Mwanza",
+    "TZ_Shinyanga": "Shinyanga",
+    "TZ_Tabora": "Tabora",
+    "TZ_Kagera": "Kagera",
+    "TZ_Kigoma": "Kigoma",
+    "TZ_Dar_es_Salaam": "Dar es Salaam",
+    "TZ_Morogoro": "Morogoro",
+    "TZ_North_Pemba": "North Pemba",
+    "TZ_South_Pemba": "South Pemba",
+    "TZ_Pwani": "Pwani",
+    "TZ_Unguja_North": "Unguja North",
+    "TZ_Mjini_Magharibi": "Mjini Magharibi",
+    "TZ_Dodoma": "Dodoma",
+    "TZ_Iringa": "Iringa",
+    "TZ_Lindi": "Lindi",
+    "TZ_Mtwara": "Mtwara",
+    "TZ_Ruvuma": "Ruvuma",
+    "TZ_Singida": "Singida",
+    "TZ_Arusha": "Arusha",
+    "TZ_Manyara": "Manyara",
+    "TZ_Kilimanjaro": "Kilimanjaro",
+    "TZ_Mara": "Mara",
+    "TZ_Tanga": "Tanga",
+    "TZ_Katavi": "Katavi",
+    "TZ_Simiyu": "Simiyu",
+    "TZ_Geita": "Geita",
+    "TZ_Njombe": "Njombe",
+    "GM_Central_River": "Central River",
+    "GM_Upper_River": "Upper River",
+    "GM_Banjul": "Banjul",
+    "GM_Lower_River": "Lower River",
+    "GM_West_Coast": "West Coast",
+    "GM_North_Bank": "North Bank",
+    "TG_Plateaux": "Plateaux",
+    "TG_Maritime": "Maritime",
+    "TG_Kara": "Kara",
+    "TG_Centre": "Centre",
+    "TG_Savanes": "Savanes",
+    "ZM_Luapula": "Luapula",
+    "ZM_Northern": "Northern",
+    "ZM_Central": "Central",
+    "ZM_Copperbelt": "Copperbelt",
+    "ZM_Eastern": "Eastern",
+    "ZM_Lusaka": "Lusaka",
+    "ZM_Northwestern": "Northwestern",
+    "ZM_Southern": "Southern",
+    "ZM_Western": "Western",
+    "ZM_Muchinga": "Muchinga",
+    "ZW_Mashonaland_Central": "Mashonaland Central",
+    "ZW_Harare": "Harare",
+    "ZW_Matabeleland_North": "Matabeleland North",
+    "ZW_Midlands": "Midlands",
+    "ZW_Mashonaland_East": "Mashonaland East",
+    "ZW_Manicaland": "Manicaland",
+    "ZW_Matabeleland_South": "Matabeleland South",
+    "ZW_Bulawayo": "Bulawayo",
+    "ZW_Masvingo": "Masvingo",
+    "ZW_Mashonaland_West": "Mashonaland West",
+    "BF_Centre": "Centre",
+    "BF_Hauts_Bassins": "Hauts-Bassins",
+    "BF_Sud_Ouest": "Sud-Ouest",
+    "BF_Centre_Est": "Centre-Est",
+    "BF_Centre_Sud": "Centre-Sud",
+    "BF_Est": "Est",
+    "BF_Centre_Ouest": "Centre-Ouest",
+    "BF_Centre_Nord": "Centre-Nord",
+    "BF_Boucle_du_Mouhoun": "Boucle du Mouhoun",
+    "BF_Nord": "Nord",
+    "BF_Cascades": "Cascades",
+    "BF_Plateau_Central": "Plateau Central",
+    "BF_Sahel": "Sahel",
+    "GN_Labe": "Labe",
+    "GN_Conakry": "Conakry",
+    "GN_Kindia": "Kindia",
+    "GN_Faranah": "Faranah",
+    "GN_Nzerekore": "Nzerekore",
+    "GN_Mamou": "Mamou",
+    "GN_Kankan": "Kankan",
+    "GN_Boke": "Boke",
+    "CI_Denguele": "Denguele",
+    "CI_Lacs": "Lacs",
+    "CI_Savanes": "Savanes",
+    "CI_District_Autonome_De_Yamoussoukro": "District Autonome De Yamoussoukro",
+    "CI_Goh_Djiboua": "Goh-Djiboua",
+    "CI_Woroba": "Woroba",
+    "CI_Valle_Du_Bandama": "Valle Du Bandama",
+    "CI_Montagnes": "Montagnes",
+    "CI_Lagunes": "Lagunes",
+    "CI_Sassandra_Marahoue": "Sassandra-Marahoue",
+    "CI_District_Autonome_D_Abidjan": "District Autonome D'Abidjan",
+    "CI_Zanzan": "Zanzan",
+    "CI_Comoe": "Comoe",
+    "CI_Bas_Sassandra": "Bas-Sassandra",
+    "MW_Central_Region": "Central Region",
+    "MW_Northern_Region": "Northern Region",
+    "MW_Southern_Region": "Southern Region",
+    "UG_Central_Region": "Central Region",
+    "UG_Eastern_Region": "Eastern Region",
+    "UG_Northern_Region": "Northern Region",
+    "UG_Western_Region": "Western Region",
+    "AD_Andorra_la_Vella": "Andorra la Vella",
+    "AD_La_Massana": "La Massana",
+    "AD_Ordino": "Ordino",
+    "AD_Canillo": "Canillo",
+    "AD_Encamp": "Encamp",
+    "AD_Escaldes_Engordany": "Escaldes-Engordany",
+    "AD_Sant_Juli_de_L_ria": "Sant Juli\u00e0 de L\u00f2ria",
+    "AR_Santa_Cruz": "Santa Cruz",
+    "AR_Tierra_del_Fuego": "Tierra del Fuego",
+    "AR_San_Juan": "San Juan",
+    "AR_Chubut": "Chubut",
+    "AR_Mendoza": "Mendoza",
+    "AR_Neuqu_n": "Neuqu\u00e9n",
+    "AR_Buenos_Aires": "Buenos Aires",
+    "AR_La_Pampa": "La Pampa",
+    "AR_R_o_Negro": "R\u00edo Negro",
+    "AR_San_Luis": "San Luis",
+    "AR_C_rdoba": "C\u00f3rdoba",
+    "AR_Catamarca": "Catamarca",
+    "AR_Jujuy": "Jujuy",
+    "AR_La_Rioja": "La Rioja",
+    "AR_Salta": "Salta",
+    "AR_Santiago_del_Estero": "Santiago del Estero",
+    "AR_Tucum_n": "Tucum\u00e1n",
+    "AR_Chaco": "Chaco",
+    "AR_Formosa": "Formosa",
+    "AR_Corrientes": "Corrientes",
+    "AR_Entre_R_os": "Entre R\u00edos",
+    "AR_Santa_Fe": "Santa Fe",
+    "AR_Misiones": "Misiones",
+    "BN_Belait": "Belait",
+    "BN_Brunei_Muara": "Brunei-Muara",
+    "BN_Temburong": "Temburong",
+    "BN_Tutong": "Tutong",
+    "BO_Cochabamba": "Cochabamba",
+    "BO_Chuquisaca": "Chuquisaca",
+    "BO_Beni": "Beni",
+    "BO_La_Paz": "La Paz",
+    "BO_Oruro": "Oruro",
+    "BO_Pando": "Pando",
+    "BO_Potos": "Potos\u00ed",
+    "BO_Santa_Cruz": "Santa Cruz",
+    "BO_Tarija": "Tarija",
+    "BR_Goi_s": "Goi\u00e1s",
+    "BR_S_o_Paulo": "S\u00e3o Paulo",
+    "BR_Pernambuco": "Pernambuco",
+    "BR_Acre": "Acre",
+    "BR_Amazonas": "Amazonas",
+    "BR_Maranh_o": "Maranh\u00e3o",
+    "BR_Par": "Par\u00e1",
+    "BR_Rond_nia": "Rond\u00f4nia",
+    "BR_Tocantins": "Tocantins",
+    "BR_Federal": "Federal",
+    "BR_Mato_Grosso_do_Sul": "Mato Grosso do Sul",
+    "BR_Minas_Gerais": "Minas Gerais",
+    "BR_Mato_Grosso": "Mato Grosso",
+    "BR_Rio_Grande_do_Sul": "Rio Grande do Sul",
+    "BR_Paran": "Paran\u00e1",
+    "BR_Santa_Catarina": "Santa Catarina",
+    "BR_Cear": "Cear\u00e1",
+    "BR_Piau": "Piau\u00ed",
+    "BR_Alagoas": "Alagoas",
+    "BR_Bahia": "Bahia",
+    "BR_Esp_rito_Santo": "Esp\u00edrito Santo",
+    "BR_Para_ba": "Para\u00edba",
+    "BR_Rio_de_Janeiro": "Rio de Janeiro",
+    "BR_Rio_Grande_do_Norte": "Rio Grande do Norte",
+    "BR_Sergipe": "Sergipe",
+    "BR_Roraima": "Roraima",
+    "BR_Amap": "Amap\u00e1",
+    "BZ_Belize": "Belize",
+    "BZ_Cayo": "Cayo",
+    "BZ_Corozal": "Corozal",
+    "BZ_Orange_Walk": "Orange Walk",
+    "BZ_Stann_Creek": "Stann Creek",
+    "BZ_Toledo": "Toledo",
+    "CL_uble": "\u00d1uble",
+    "CL_Ays_n": "Ays\u00e9n",
+    "CL_Magellan_and_the_Chilean_Antarctic": "Magellan and the Chilean Antarctic",
+    "CL_Tarapac": "Tarapac\u00e1",
+    "CL_Arica_y_Parinacota": "Arica y Parinacota",
+    "CL_Antofagasta": "Antofagasta",
+    "CL_Atacama": "Atacama",
+    "CL_Coquimbo": "Coquimbo",
+    "CL_Santiago": "Santiago",
+    "CL_Valpara_so": "Valpara\u00edso",
+    "CL_Araucan_a": "Araucan\u00eda",
+    "CL_Los_R_os": "Los R\u00edos",
+    "CL_Biob_o": "Biob\u00edo",
+    "CL_O_Higgins": "O'Higgins",
+    "CL_Los_Lagos": "Los Lagos",
+    "CL_Maule": "Maule",
+    "CO_COL_99": "COL+99?",
+    "CO_Amazonas": "Amazonas",
+    "CO_Antioquia": "Antioquia",
+    "CO_Boyac": "Boyac\u00e1",
+    "CO_C_rdoba": "C\u00f3rdoba",
+    "CO_Santander": "Santander",
+    "CO_La_Guajira": "La Guajira",
+    "CO_Archipelago_of_Saint_Andr_ws": "Archipelago of Saint Andr\u00e9ws",
+    "CO_Caldas": "Caldas",
+    "CO_Cundinamarca": "Cundinamarca",
+    "CO_Bogot": "Bogot\u00e1",
+    "CO_Quind_o": "Quind\u00edo",
+    "CO_Risaralda": "Risaralda",
+    "CO_Tolima": "Tolima",
+    "CO_Caquet": "Caquet\u00e1",
+    "CO_Cauca": "Cauca",
+    "CO_Huila": "Huila",
+    "CO_Nari_o": "Nari\u00f1o",
+    "CO_Putumayo": "Putumayo",
+    "CO_Valle_del_Cauca": "Valle del Cauca",
+    "CO_Atl_ntico": "Atl\u00e1ntico",
+    "CO_Bol_var": "Bol\u00edvar",
+    "CO_Cesar": "Cesar",
+    "CO_Choc": "Choc\u00f3",
+    "CO_Magdalena": "Magdalena",
+    "CO_Sucre": "Sucre",
+    "CO_Arauca": "Arauca",
+    "CO_Norte_de_Santander": "Norte de Santander",
+    "CO_Casanare": "Casanare",
+    "CO_Guaviare": "Guaviare",
+    "CO_Guain_a": "Guain\u00eda",
+    "CO_Meta": "Meta",
+    "CO_Vaup_s": "Vaup\u00e9s",
+    "CO_Vichada": "Vichada",
+    "CR_Cartago": "Cartago",
+    "CR_Heredia": "Heredia",
+    "CR_Lim_n": "Lim\u00f3n",
+    "CR_Puntarenas": "Puntarenas",
+    "CR_San_Jos": "San Jos\u00e9",
+    "CR_Alajuela": "Alajuela",
+    "CR_Guanacaste": "Guanacaste",
+    "DO_Santiago": "Santiago",
+    "DO_Santiago_Rodr_guez": "Santiago Rodr\u00edguez",
+    "DO_Valverde": "Valverde",
+    "DO_San_Juan": "San Juan",
+    "DO_Santo_Domingo": "Santo Domingo",
+    "DO_S_nchez_Ram_rez": "S\u00e1nchez Ram\u00edrez",
+    "DO_San_Pedro_de_Macor_s": "San Pedro de Macor\u00eds",
+    "DO_Monte_Cristi": "Monte Cristi",
+    "DO_Puerto_Plata": "Puerto Plata",
+    "DO_Dajab_n": "Dajab\u00f3n",
+    "DO_Espaillat": "Espaillat",
+    "DO_Hermanas_Mirabal": "Hermanas Mirabal",
+    "DO_Baoruco": "Baoruco",
+    "DO_Barahona": "Barahona",
+    "DO_Independencia": "Independencia",
+    "DO_La_Estrelleta": "La Estrelleta",
+    "DO_Pedernales": "Pedernales",
+    "DO_Azua": "Azua",
+    "DO_La_Vega": "La Vega",
+    "DO_Monse_or_Nouel": "Monse\u00f1or Nouel",
+    "DO_Peravia": "Peravia",
+    "DO_San_Jos_de_Ocoa": "San Jos\u00e9 de Ocoa",
+    "DO_Duarte": "Duarte",
+    "DO_Hato_Mayor": "Hato Mayor",
+    "DO_Monte_Plata": "Monte Plata",
+    "DO_Mar_a_Trinidad_S_nchez": "Mar\u00eda Trinidad S\u00e1nchez",
+    "DO_Saman": "Saman\u00e1",
+    "DO_San_Crist_bal": "San Crist\u00f3bal",
+    "DO_Nacional": "Nacional",
+    "DO_El_Seibo": "El Seibo",
+    "DO_La_Altagracia": "La Altagracia",
+    "DO_La_Romana": "La Romana",
+    "EC_Azuay": "Azuay",
+    "EC_El_Oro": "El Oro",
+    "EC_Loja": "Loja",
+    "EC_Zamora_Chinchipe": "Zamora Chinchipe",
+    "EC_Gal_pagos": "Gal\u00e1pagos",
+    "EC_Bol_var": "Bol\u00edvar",
+    "EC_Ca_ar": "Ca\u00f1ar",
+    "EC_Cotopaxi": "Cotopaxi",
+    "EC_Guayas": "Guayas",
+    "EC_Los_R_os": "Los R\u00edos",
+    "EC_Manab": "Manab\u00ed",
+    "EC_Chimborazo": "Chimborazo",
+    "EC_Morona_Santiago": "Morona-Santiago",
+    "EC_Orellana": "Orellana",
+    "EC_Pichincha": "Pichincha",
+    "EC_Pastaza": "Pastaza",
+    "EC_Napo": "Napo",
+    "EC_Tungurahua": "Tungurahua",
+    "EC_Esmeraldas": "Esmeraldas",
+    "EC_Carchi": "Carchi",
+    "EC_Imbabura": "Imbabura",
+    "EC_Sucumb_os": "Sucumb\u00edos",
+    "EC_Santa_Elena": "Santa Elena",
+    "EC_Santo_Domingo_de_los_Ts_chilas": "Santo Domingo de los Ts\u00e1chilas",
+    "GR_Ionian_Islands": "Ionian Islands",
+    "GR_Attica": "Attica",
+    "GR_Peloponnese": "Peloponnese",
+    "GR_West_Greece": "West Greece",
+    "GR_West_Macedonia": "West Macedonia",
+    "GR_Thessalia": "Thessalia",
+    "GR_Epirus": "Epirus",
+    "GR_North_Aegean": "North Aegean",
+    "GR_Central_Greece": "Central Greece",
+    "GR_Crete": "Crete",
+    "GR_Centre_Macedonia": "Centre Macedonia",
+    "GR_Mount_Athos": "Mount Athos",
+    "GR_East_Macedonia_and_Thrace": "East Macedonia and Thrace",
+    "GR_South_Aegean": "South Aegean",
+    "GT_Baja_Verapaz": "Baja Verapaz",
+    "GT_Huehuetenango": "Huehuetenango",
+    "GT_Pet_n": "Pet\u00e9n",
+    "GT_Quetzaltenango": "Quetzaltenango",
+    "GT_Retalhuleu": "Retalhuleu",
+    "GT_San_Marcos": "San Marcos",
+    "GT_Alta_Verapaz": "Alta Verapaz",
+    "GT_Chimaltenango": "Chimaltenango",
+    "GT_Escuintla": "Escuintla",
+    "GT_Guatemala": "Guatemala",
+    "GT_Suchitep_quez": "Suchitep\u00e9quez",
+    "GT_Sacatep_quez": "Sacatep\u00e9quez",
+    "GT_Solol": "Solol\u00e1",
+    "GT_Totonicap_n": "Totonicap\u00e1n",
+    "GT_El_Progreso": "El Progreso",
+    "GT_Santa_Rosa": "Santa Rosa",
+    "GT_Izabal": "Izabal",
+    "GT_Chiquimula": "Chiquimula",
+    "GT_Jalapa": "Jalapa",
+    "GT_Jutiapa": "Jutiapa",
+    "GT_Zacapa": "Zacapa",
+    "GT_Quich": "Quich\u00e9",
+    "GY_Mahaica_Berbice": "Mahaica-Berbice",
+    "GY_Potaro_Siparuni": "Potaro-Siparuni",
+    "GY_Upper_Takutu_Upper_Essequibo": "Upper Takutu-Upper Essequibo",
+    "GY_Upper_Demerara_Berbice": "Upper Demerara-Berbice",
+    "GY_Barima_Waini": "Barima-Waini",
+    "GY_Pomeroon_Supenaam": "Pomeroon-Supenaam",
+    "GY_East_Berbice_Corentyne": "East Berbice-Corentyne",
+    "GY_Demerara_Mahaica": "Demerara-Mahaica",
+    "GY_Cuyuni_Mazaruni": "Cuyuni-Mazaruni",
+    "HN_Atl_ntida": "Atl\u00e1ntida",
+    "HN_Col_n": "Col\u00f3n",
+    "HN_Francisco_Moraz_n": "Francisco Moraz\u00e1n",
+    "HN_Gracias_a_Dios": "Gracias a Dios",
+    "HN_Bay_Islands": "Bay Islands",
+    "HN_Olancho": "Olancho",
+    "HN_Yoro": "Yoro",
+    "HN_Valle": "Valle",
+    "HN_Comayagua": "Comayagua",
+    "HN_Cort_s": "Cort\u00e9s",
+    "HN_Intibuc": "Intibuc\u00e1",
+    "HN_La_Paz": "La Paz",
+    "HN_Santa_B_rbara": "Santa B\u00e1rbara",
+    "HN_Cop_n": "Cop\u00e1n",
+    "HN_Lempira": "Lempira",
+    "HN_Ocotepeque": "Ocotepeque",
+    "HN_Choluteca": "Choluteca",
+    "HN_El_Para_so": "El Para\u00edso",
+    "HT_Grand_Anse": "Grand'Anse",
+    "HT_Nippes": "Nippes",
+    "HT_Nord_Ouest": "Nord-Ouest",
+    "HT_Sud": "Sud",
+    "HT_Artibonite": "Artibonite",
+    "HT_Centre": "Centre",
+    "HT_Nord_Est": "Nord-Est",
+    "HT_Nord": "Nord",
+    "HT_Ouest": "Ouest",
+    "HT_Sud_Est": "Sud-Est",
+    "HK_Central_and_Western_District": "Central and Western District",
+    "HK_Wan_Chai": "Wan Chai",
+    "HK_Siu_Ma_Shan": "Siu Ma Shan",
+    "HK_Southern_District": "Southern District",
+    "HK_Yau_Tsim_Mong": "Yau Tsim Mong",
+    "HK_Kowloon_City": "Kowloon City",
+    "HK_Sham_Shui_Po": "Sham Shui Po",
+    "HK_Wong_Tai_Sin_District": "Wong Tai Sin District",
+    "HK_Kwun_Tong": "Kwun Tong",
+    "HK_Sai_Kung": "Sai Kung",
+    "HK_Sha_Tin": "Sha Tin",
+    "HK_Kwai_Tsing": "Kwai Tsing",
+    "HK_Tsuen_Wan": "Tsuen Wan",
+    "HK_Tuen_Mun": "Tuen Mun",
+    "HK_Yuen_Long": "Yuen Long",
+    "HK_North_District": "North District",
+    "HK_Tai_Po": "Tai Po",
+    "HK_Lantau_Island": "Lantau Island",
+    "LI_Triesenberg": "Triesenberg",
+    "LI_Triesen": "Triesen",
+    "LI_Balzers": "Balzers",
+    "LI_Vaduz": "Vaduz",
+    "LI_Schaan": "Schaan",
+    "LI_Gamprin": "Gamprin",
+    "LI_Ruggell": "Ruggell",
+    "LI_Schellenberg": "Schellenberg",
+    "LI_Mauren": "Mauren",
+    "LI_Planken": "Planken",
+    "LI_Eschen": "Eschen",
+    "LU_Diekirch": "Diekirch",
+    "LU_Grevenmacher": "Grevenmacher",
+    "LU_Luxembourg": "Luxembourg",
+    "ME_Bar": "Bar",
+    "ME_Ulcinj": "Ulcinj",
+    "ME_Budva": "Budva",
+    "ME_Cetinje": "Cetinje",
+    "ME_Ro_aje": "Ro\u017eaje",
+    "ME_Plav": "Plav",
+    "ME_Herceg_Novi": "Herceg Novi",
+    "ME_Kotor": "Kotor",
+    "ME_Andrijevica": "Andrijevica",
+    "ME_Berane": "Berane",
+    "ME_Bijelo_Polje": "Bijelo Polje",
+    "ME_Danilovgrad": "Danilovgrad",
+    "ME_Kola_in": "Kola\u0161in",
+    "ME_Mojkovac": "Mojkovac",
+    "ME_Nik_i": "Nik\u0161i\u0107",
+    "ME_Plu_ine": "Plu\u017eine",
+    "ME_Pljevlja": "Pljevlja",
+    "ME_Podgorica": "Podgorica",
+    "ME_Tivat": "Tivat",
+    "ME_avnik": "\u0160avnik",
+    "ME_abljak": "\u017dabljak",
+    "NI_Rivas": "Rivas",
+    "NI_R_o_San_Juan": "R\u00edo San Juan",
+    "NI_South_Caribbean_Coast": "South Caribbean Coast",
+    "NI_Carazo": "Carazo",
+    "NI_Granada": "Granada",
+    "NI_Jinotega": "Jinotega",
+    "NI_North_Caribbean_Coast": "North Caribbean Coast",
+    "NI_Le_n": "Le\u00f3n",
+    "NI_Managua": "Managua",
+    "NI_Masaya": "Masaya",
+    "NI_Chinandega": "Chinandega",
+    "NI_Estel": "Estel\u00ed",
+    "NI_Madriz": "Madriz",
+    "NI_Matagalpa": "Matagalpa",
+    "NI_Nueva_Segovia": "Nueva Segovia",
+    "NI_Boaco": "Boaco",
+    "NI_Chontales": "Chontales",
+    "PA_Chiriqu": "Chiriqu\u00ed",
+    "PA_Cocl": "Cocl\u00e9",
+    "PA_Col_n": "Col\u00f3n",
+    "PA_Herrera": "Herrera",
+    "PA_Los_Santos": "Los Santos",
+    "PA_Panam": "Panam\u00e1",
+    "PA_Veraguas": "Veraguas",
+    "PA_Dari_n": "Dari\u00e9n",
+    "PA_Guna_Yala": "Guna Yala",
+    "PA_comarca_Ng_be_Bugl": "comarca Ng\u00e4be-Bugl\u00e9",
+    "PA_Ng_be_Bugl_Comarca": "Ng\u00f6be-Bugl\u00e9 Comarca",
+    "PA_Ember_Wounaan_Comarca": "Ember\u00e1-Wounaan Comarca",
+    "PE_Callao": "Callao",
+    "PE_Lambayeque": "Lambayeque",
+    "PE_Piura": "Piura",
+    "PE_Tumbes": "Tumbes",
+    "PE_Apur_mac": "Apur\u00edmac",
+    "PE_Arequipa": "Arequipa",
+    "PE_Cusco_Departament": "Cusco Departament",
+    "PE_Madre_de_Dios": "Madre de Dios",
+    "PE_Puno": "Puno",
+    "PE_Moquegua": "Moquegua",
+    "PE_Tacna": "Tacna",
+    "PE_ncash": "\u00c1ncash",
+    "PE_Cajamarca": "Cajamarca",
+    "PE_Huanuco": "Huanuco",
+    "PE_La_Libertad": "La Libertad",
+    "PE_Pasco": "Pasco",
+    "PE_San_Mart_n": "San Mart\u00edn",
+    "PE_Ucayali": "Ucayali",
+    "PE_Amazonas": "Amazonas",
+    "PE_Loreto": "Loreto",
+    "PE_Ayacucho": "Ayacucho",
+    "PE_Lima": "Lima",
+    "PE_Huancavelica": "Huancavelica",
+    "PE_Ica": "Ica",
+    "PE_Jun_n": "Jun\u00edn",
+    "PG_Enga": "Enga",
+    "PG_East_Sepik": "East Sepik",
+    "PG_Madang": "Madang",
+    "PG_Sandaun": "Sandaun",
+    "PG_Chimbu": "Chimbu",
+    "PG_Eastern_Highlands": "Eastern Highlands",
+    "PG_Gulf": "Gulf",
+    "PG_of_Bougainville": "of Bougainville",
+    "PG_Southern_Highlands": "Southern Highlands",
+    "PG_Western_Highlands": "Western Highlands",
+    "PG_Western": "Western",
+    "PG_Central": "Central",
+    "PG_East_New_Britain": "East New Britain",
+    "PG_Manus": "Manus",
+    "PG_Milne_Bay": "Milne Bay",
+    "PG_Morobe": "Morobe",
+    "PG_Port_Moresby": "Port Moresby",
+    "PG_New_Ireland": "New Ireland",
+    "PG_Oro": "Oro",
+    "PG_West_New_Britain": "West New Britain",
+    "PY_Asunci_n": "Asunci\u00f3n",
+    "PY_Alto_Paraguay": "Alto Paraguay",
+    "PY_Boquer_n": "Boquer\u00f3n",
+    "PY_Concepci_n": "Concepci\u00f3n",
+    "PY_Cordillera": "Cordillera",
+    "PY_Presidente_Hayes": "Presidente Hayes",
+    "PY_San_Pedro": "San Pedro",
+    "PY_Central": "Central",
+    "PY_Guair": "Guair\u00e1",
+    "PY_Misiones": "Misiones",
+    "PY_eembuc": "\u00d1eembuc\u00fa",
+    "PY_Paraguar": "Paraguar\u00ed",
+    "PY_Amambay": "Amambay",
+    "PY_Alto_Paran": "Alto Paran\u00e1",
+    "PY_Caaguaz": "Caaguaz\u00fa",
+    "PY_Caazap": "Caazap\u00e1",
+    "PY_Canindey": "Canindey\u00fa",
+    "PY_Itap_a": "Itap\u00faa",
+    "SM_Borgo_Maggiore": "Borgo Maggiore",
+    "SM_San_Marino": "San Marino",
+    "SM_Acquaviva": "Acquaviva",
+    "SM_Serravalle": "Serravalle",
+    "SM_Domagnano": "Domagnano",
+    "SM_Faetano": "Faetano",
+    "SM_Montegiardino": "Montegiardino",
+    "SM_Fiorentino": "Fiorentino",
+    "SM_Chiesanuova": "Chiesanuova",
+    "SR_Nickerie": "Nickerie",
+    "SR_Brokopondo": "Brokopondo",
+    "SR_Marowijne": "Marowijne",
+    "SR_Para": "Para",
+    "SR_Sipaliwini": "Sipaliwini",
+    "SR_Commewijne": "Commewijne",
+    "SR_Coronie": "Coronie",
+    "SR_Paramaribo": "Paramaribo",
+    "SR_Saramacca": "Saramacca",
+    "SR_Wanica": "Wanica",
+    "SV_Ahuachap_n": "Ahuachap\u00e1n",
+    "SV_Caba_as": "Caba\u00f1as",
+    "SV_Cuscatl_n": "Cuscatl\u00e1n",
+    "SV_La_Libertad": "La Libertad",
+    "SV_La_Paz": "La Paz",
+    "SV_Sonsonate": "Sonsonate",
+    "SV_San_Salvador": "San Salvador",
+    "SV_La_Uni_n": "La Uni\u00f3n",
+    "SV_Moraz_n": "Moraz\u00e1n",
+    "SV_San_Miguel": "San Miguel",
+    "SV_San_Vicente": "San Vicente",
+    "SV_Usulut_n": "Usulut\u00e1n",
+    "SV_Chalatenango": "Chalatenango",
+    "SV_Santa_Ana": "Santa Ana",
+    "TL_Dili": "Dili",
+    "TL_Liqui": "Liqui\u00e7\u00e1",
+    "TL_Oe_Cusse_Ambeno": "Oe-Cusse Ambeno",
+    "TL_Aileu": "Aileu",
+    "TL_Ainaro": "Ainaro",
+    "TL_Baucau": "Baucau",
+    "TL_Bobonaro": "Bobonaro",
+    "TL_Cova_Lima": "Cova Lima",
+    "TL_Ermera": "Ermera",
+    "TL_Manatuto": "Manatuto",
+    "TL_Manufahi": "Manufahi",
+    "TL_Viqueque": "Viqueque",
+    "TL_Laut_m": "Laut\u00e9m",
+    "UY_Salto": "Salto",
+    "UY_Soriano": "Soriano",
+    "UY_Cerro_Largo": "Cerro Largo",
+    "UY_Durazno": "Durazno",
+    "UY_Rivera": "Rivera",
+    "UY_Tacuaremb": "Tacuaremb\u00f3",
+    "UY_Treinta_y_Tres": "Treinta y Tres",
+    "UY_Canelones": "Canelones",
+    "UY_Florida": "Florida",
+    "UY_Lavalleja": "Lavalleja",
+    "UY_Maldonado": "Maldonado",
+    "UY_Montevideo": "Montevideo",
+    "UY_Rocha": "Rocha",
+    "UY_Colonia": "Colonia",
+    "UY_San_Jos": "San Jos\u00e9",
+    "UY_Artigas": "Artigas",
+    "UY_Flores": "Flores",
+    "UY_Paysand": "Paysand\u00fa",
+    "UY_R_o_Negro": "R\u00edo Negro",
+    "VE_VEN_99": "VEN+99?",
+    "VE_Falc_n": "Falc\u00f3n",
+    "VE_Apure": "Apure",
+    "VE_Barinas": "Barinas",
+    "VE_Merida": "Merida",
+    "VE_Tachira": "Tachira",
+    "VE_Trujillo": "Trujillo",
+    "VE_Zulia": "Zulia",
+    "VE_Cojedes": "Cojedes",
+    "VE_Carabobo": "Carabobo",
+    "VE_Lara": "Lara",
+    "VE_Portuguesa": "Portuguesa",
+    "VE_Yaracuy": "Yaracuy",
+    "VE_Amazonas": "Amazonas",
+    "VE_Bol_var": "Bol\u00edvar",
+    "VE_Anzo_tegui": "Anzo\u00e1tegui",
+    "VE_Aragua": "Aragua",
+    "VE_Vargas_state": "Vargas state",
+    "VE_Capital": "Capital",
+    "VE_Federal_Dependencies": "Federal Dependencies",
+    "VE_Gu_rico_State": "Gu\u00e1rico State",
+    "VE_Monagas": "Monagas",
+    "VE_Miranda": "Miranda",
+    "VE_Nueva_Esparta": "Nueva Esparta",
+    "VE_Sucre": "Sucre",
+    "VE_Delta_Amacuro": "Delta Amacuro",
+    "XK_Peja": "Peja",
+    "XK_Istok": "Istok",
+    "XK_Klina": "Klina",
+    "XK_De_ani": "De\u010dani",
+    "XK_Gjakova": "Gjakova",
+    "XK_Orahovac": "Orahovac",
+    "XK_Zve_an": "Zve\u010dan",
+    "XK_Leposavi": "Leposavi\u0107",
+    "XK_Kosovska_Mitrovica": "Kosovska Mitrovica",
+    "XK_Vu_itrn": "Vu\u010ditrn",
+    "XK_Skenderaj_Srbica": "Skenderaj/Srbica",
+    "XK_Zubin_Potok": "Zubin Potok",
+    "XK_Kosovo_Polje": "Kosovo Polje",
+    "XK_Glogovac": "Glogovac",
+    "XK_Obiliq": "Obiliq",
+    "XK_Podujevo_Podujeva": "Podujevo/Podujeva",
+    "XK_Kosovo_and_Metohija": "Kosovo and Metohija",
+    "XK_Lipljan": "Lipljan",
+    "XK_Gnjilane": "Gnjilane",
+    "XK_Viti_Vitina": "Viti/Vitina",
+    "XK_Novo_Brdo": "Novo Brdo",
+    "XK_Kosovo_Pomoravlje": "Kosovo-Pomoravlje",
+    "XK_Plu_ine": "Plu\u017eine",
+    "XK_Draga": "Draga\u0161",
+    "XK_Suva_Reka": "Suva Reka",
+    "XK_Mali_evo": "Mali\u0161evo",
+    "XK_timlje": "\u0160timlje",
+    "XK_Uro_evac_ferizaj": "Uro\u0161evac/ferizaj",
+    "XK_trpce": "\u0160trpce",
+    "XK_Ka_anik": "Ka\u010danik",
+    "GB_North_East_England": "North East (England)",
+    "GB_North_West_England": "North West (England)",
+    "GB_Yorkshire_and_the_Humber": "Yorkshire and the Humber",
+    "GB_East_Midlands_England": "East Midlands (England)",
+    "GB_West_Midlands_England": "West Midlands (England)",
+    "GB_East_of_England": "East of England",
+    "GB_London": "London",
+    "GB_South_East_England": "South East (England)",
+    "GB_South_West_England": "South West (England)",
+    "BA_Federation_of_Bosnia_and_Herzegovina": "Federation of Bosnia and Herzegovina",
+    "BA_Republika_Srpska": "Republika Srpska",
+    "BA_Br_ko_District": "Br\u010dko District",
+    "ID_Bangka_Belitung_Islands": "Bangka-Belitung Islands",
+    "ID_Riau": "Riau",
+    "ID_Central_Java": "Central Java",
+    "ID_Jakarta_Special_Capital_Region": "Jakarta Special Capital Region",
+    "ID_Papua": "Papua",
+    "ID_South_Sulawesi": "South Sulawesi",
+    "ID_West_Kalimantan": "West Kalimantan",
+    "ID_North_Sulawesi": "North Sulawesi",
+    "ID_Central_Kalimantan": "Central Kalimantan",
+    "ID_West_Java": "West Java",
+    "ID_Jambi": "Jambi",
+    "ID_South_Kalimantan": "South Kalimantan",
+    "ID_Bengkulu": "Bengkulu",
+    "ID_North_Sumatra": "North Sumatra",
+    "ID_West_Sumatra": "West Sumatra",
+    "ID_East_Java": "East Java",
+    "ID_West_Sulawesi": "West Sulawesi",
+    "ID_Maluku": "Maluku",
+    "ID_North_Maluku": "North Maluku",
+    "ID_North_Kalimantan": "North Kalimantan",
+    "ID_Central_Sulawesi": "Central Sulawesi",
+    "ID_Special_Region_of_Yogyakarta": "Special Region of Yogyakarta",
+    "ID_Bali": "Bali",
+    "ID_East_Kalimantan": "East Kalimantan",
+    "ID_West_Papua": "West Papua",
+    "ID_Lampung": "Lampung",
+    "ID_Riau_Islands": "Riau Islands",
+    "ID_East_Nusa_Tenggara": "East Nusa Tenggara",
+    "ID_Aceh": "Aceh",
+    "ID_Southeast_Sulawesi": "Southeast Sulawesi",
+    "ID_Gorontalo": "Gorontalo",
+    "ID_South_Sumatra": "South Sumatra",
+    "ID_West_Nusa_Tenggara": "West Nusa Tenggara",
+    "ID_Banten": "Banten"
+  },
+  "country_groups": {
+    "version": 1,
+    "continents": [
+      {
+        "id": "continent_africa",
+        "label": "Africa",
+        "subregions": [
+          {
+            "id": "subregion_eastern_africa",
+            "label": "Eastern Africa",
+            "countries": [
+              "BI",
+              "KM",
+              "DJ",
+              "ER",
+              "ET",
+              "KE",
+              "MG",
+              "MW",
+              "MU",
+              "MZ",
+              "RW",
+              "SC",
+              "SO",
+              "SS",
+              "TZ",
+              "UG",
+              "ZM",
+              "ZW"
+            ]
+          },
+          {
+            "id": "subregion_middle_africa",
+            "label": "Middle Africa",
+            "countries": [
+              "AO",
+              "CM",
+              "CF",
+              "TD",
+              "CD",
+              "GQ",
+              "GA",
+              "CG",
+              "ST"
+            ]
+          },
+          {
+            "id": "subregion_northern_africa",
+            "label": "Northern Africa",
+            "countries": [
+              "DZ",
+              "EG",
+              "LY",
+              "MA",
+              "SD",
+              "TN",
+              "EH"
+            ]
+          },
+          {
+            "id": "subregion_southern_africa",
+            "label": "Southern Africa",
+            "countries": [
+              "BW",
+              "SZ",
+              "LS",
+              "NA",
+              "ZA"
+            ]
+          },
+          {
+            "id": "subregion_unclassified",
+            "label": "Unclassified",
+            "countries": [
+              "IO",
+              "TF",
+              "HM"
+            ]
+          },
+          {
+            "id": "subregion_western_africa",
+            "label": "Western Africa",
+            "countries": [
+              "BJ",
+              "BF",
+              "CI",
+              "GH",
+              "GN",
+              "GW",
+              "LR",
+              "ML",
+              "MR",
+              "NE",
+              "NG",
+              "CV",
+              "SH",
+              "SN",
+              "SL",
+              "GM",
+              "TG"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "continent_asia",
+        "label": "Asia",
+        "subregions": [
+          {
+            "id": "subregion_central_asia",
+            "label": "Central Asia",
+            "countries": [
+              "KZ",
+              "KG",
+              "TJ",
+              "TM",
+              "UZ"
+            ]
+          },
+          {
+            "id": "subregion_eastern_asia",
+            "label": "Eastern Asia",
+            "countries": [
+              "CN",
+              "KP",
+              "HK",
+              "JP",
+              "MO",
+              "MN",
+              "KR",
+              "TW"
+            ]
+          },
+          {
+            "id": "subregion_south_eastern_asia",
+            "label": "South-Eastern Asia",
+            "countries": [
+              "BN",
+              "KH",
+              "ID",
+              "LA",
+              "MY",
+              "MM",
+              "PH",
+              "SG",
+              "TH",
+              "TL",
+              "VN"
+            ]
+          },
+          {
+            "id": "subregion_southern_asia",
+            "label": "Southern Asia",
+            "countries": [
+              "AF",
+              "BD",
+              "BT",
+              "IN",
+              "IR",
+              "MV",
+              "NP",
+              "PK",
+              "LK"
+            ]
+          },
+          {
+            "id": "subregion_western_asia",
+            "label": "Western Asia",
+            "countries": [
+              "AM",
+              "AZ",
+              "BH",
+              "CY",
+              "GE",
+              "IQ",
+              "IL",
+              "JO",
+              "KW",
+              "LB",
+              "OM",
+              "PS",
+              "QA",
+              "SA",
+              "SY",
+              "TR",
+              "AE",
+              "YE"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "continent_europe",
+        "label": "Europe",
+        "subregions": [
+          {
+            "id": "subregion_eastern_europe",
+            "label": "Eastern Europe",
+            "countries": [
+              "BY",
+              "BG",
+              "CZ",
+              "HU",
+              "MD",
+              "PL",
+              "RO",
+              "RU",
+              "SK",
+              "UA"
+            ]
+          },
+          {
+            "id": "subregion_northern_europe",
+            "label": "Northern Europe",
+            "countries": [
+              "DK",
+              "EE",
+              "FO",
+              "FI",
+              "GG",
+              "IS",
+              "IE",
+              "IM",
+              "JE",
+              "LV",
+              "LT",
+              "NO",
+              "SE",
+              "GB",
+              "AX"
+            ]
+          },
+          {
+            "id": "subregion_southern_europe",
+            "label": "Southern Europe",
+            "countries": [
+              "AL",
+              "AD",
+              "BA",
+              "HR",
+              "GR",
+              "IT",
+              "XK",
+              "MT",
+              "ME",
+              "MK",
+              "PT",
+              "SM",
+              "RS",
+              "SI",
+              "ES",
+              "VA"
+            ]
+          },
+          {
+            "id": "subregion_western_europe",
+            "label": "Western Europe",
+            "countries": [
+              "AT",
+              "BE",
+              "FR",
+              "DE",
+              "LI",
+              "LU",
+              "MC",
+              "NL",
+              "CH"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "continent_north_america",
+        "label": "North America",
+        "subregions": [
+          {
+            "id": "subregion_caribbean",
+            "label": "Caribbean",
+            "countries": [
+              "BS",
+              "CU",
+              "DO",
+              "HT",
+              "JM",
+              "PR",
+              "TT"
+            ]
+          },
+          {
+            "id": "subregion_central_america",
+            "label": "Central America",
+            "countries": [
+              "BZ",
+              "CR",
+              "SV",
+              "GT",
+              "HN",
+              "MX",
+              "NI",
+              "PA"
+            ]
+          },
+          {
+            "id": "subregion_northern_america",
+            "label": "Northern America",
+            "countries": [
+              "CA",
+              "GL",
+              "PM",
+              "US"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "continent_south_america",
+        "label": "South America",
+        "subregions": [
+          {
+            "id": "subregion_south_america",
+            "label": "South America",
+            "countries": [
+              "AR",
+              "BO",
+              "BR",
+              "CL",
+              "CO",
+              "EC",
+              "FK",
+              "GY",
+              "PY",
+              "PE",
+              "SR",
+              "UY",
+              "VE"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "continent_oceania",
+        "label": "Oceania",
+        "subregions": [
+          {
+            "id": "subregion_australia_and_new_zealand",
+            "label": "Australia and New Zealand",
+            "countries": [
+              "AU",
+              "NZ"
+            ]
+          },
+          {
+            "id": "subregion_melanesia",
+            "label": "Melanesia",
+            "countries": [
+              "PG"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "continent_antarctica",
+        "label": "Antarctica",
+        "subregions": [
+          {
+            "id": "subregion_antarctica",
+            "label": "Antarctica",
+            "countries": [
+              "AQ"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "continent_other",
+        "label": "Other",
+        "subregions": [
+          {
+            "id": "subregion_unclassified",
+            "label": "Unclassified",
+            "countries": [
+              "GS"
+            ]
+          }
+        ]
+      }
+    ],
+    "country_meta": {
+      "AD": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe"
+      },
+      "AE": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "AF": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_southern_asia",
+        "subregion_label": "Southern Asia"
+      },
+      "AL": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe"
+      },
+      "AM": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "AO": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_middle_africa",
+        "subregion_label": "Middle Africa"
+      },
+      "AQ": {
+        "continent_id": "continent_antarctica",
+        "continent_label": "Antarctica",
+        "subregion_id": "subregion_antarctica",
+        "subregion_label": "Antarctica"
+      },
+      "AR": {
+        "continent_id": "continent_south_america",
+        "continent_label": "South America",
+        "subregion_id": "subregion_south_america",
+        "subregion_label": "South America"
+      },
+      "AT": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_western_europe",
+        "subregion_label": "Western Europe"
+      },
+      "AU": {
+        "continent_id": "continent_oceania",
+        "continent_label": "Oceania",
+        "subregion_id": "subregion_australia_and_new_zealand",
+        "subregion_label": "Australia and New Zealand"
+      },
+      "AX": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_northern_europe",
+        "subregion_label": "Northern Europe"
+      },
+      "AZ": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "BA": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe"
+      },
+      "BD": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_southern_asia",
+        "subregion_label": "Southern Asia"
+      },
+      "BE": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_western_europe",
+        "subregion_label": "Western Europe"
+      },
+      "BF": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "BG": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_eastern_europe",
+        "subregion_label": "Eastern Europe"
+      },
+      "BH": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "BI": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "BJ": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "BN": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_south_eastern_asia",
+        "subregion_label": "South-Eastern Asia"
+      },
+      "BO": {
+        "continent_id": "continent_south_america",
+        "continent_label": "South America",
+        "subregion_id": "subregion_south_america",
+        "subregion_label": "South America"
+      },
+      "BR": {
+        "continent_id": "continent_south_america",
+        "continent_label": "South America",
+        "subregion_id": "subregion_south_america",
+        "subregion_label": "South America"
+      },
+      "BS": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_caribbean",
+        "subregion_label": "Caribbean"
+      },
+      "BT": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_southern_asia",
+        "subregion_label": "Southern Asia"
+      },
+      "BW": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_southern_africa",
+        "subregion_label": "Southern Africa"
+      },
+      "BY": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_eastern_europe",
+        "subregion_label": "Eastern Europe"
+      },
+      "BZ": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_central_america",
+        "subregion_label": "Central America"
+      },
+      "CA": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_northern_america",
+        "subregion_label": "Northern America"
+      },
+      "CD": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_middle_africa",
+        "subregion_label": "Middle Africa"
+      },
+      "CF": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_middle_africa",
+        "subregion_label": "Middle Africa"
+      },
+      "CG": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_middle_africa",
+        "subregion_label": "Middle Africa"
+      },
+      "CH": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_western_europe",
+        "subregion_label": "Western Europe"
+      },
+      "CI": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "CL": {
+        "continent_id": "continent_south_america",
+        "continent_label": "South America",
+        "subregion_id": "subregion_south_america",
+        "subregion_label": "South America"
+      },
+      "CM": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_middle_africa",
+        "subregion_label": "Middle Africa"
+      },
+      "CN": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_eastern_asia",
+        "subregion_label": "Eastern Asia"
+      },
+      "CO": {
+        "continent_id": "continent_south_america",
+        "continent_label": "South America",
+        "subregion_id": "subregion_south_america",
+        "subregion_label": "South America"
+      },
+      "CR": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_central_america",
+        "subregion_label": "Central America"
+      },
+      "CU": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_caribbean",
+        "subregion_label": "Caribbean"
+      },
+      "CV": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "CY": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "CZ": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_eastern_europe",
+        "subregion_label": "Eastern Europe"
+      },
+      "DE": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_western_europe",
+        "subregion_label": "Western Europe"
+      },
+      "DJ": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "DK": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_northern_europe",
+        "subregion_label": "Northern Europe"
+      },
+      "DO": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_caribbean",
+        "subregion_label": "Caribbean"
+      },
+      "DZ": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_northern_africa",
+        "subregion_label": "Northern Africa"
+      },
+      "EC": {
+        "continent_id": "continent_south_america",
+        "continent_label": "South America",
+        "subregion_id": "subregion_south_america",
+        "subregion_label": "South America"
+      },
+      "EE": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_northern_europe",
+        "subregion_label": "Northern Europe"
+      },
+      "EG": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_northern_africa",
+        "subregion_label": "Northern Africa"
+      },
+      "EH": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_northern_africa",
+        "subregion_label": "Northern Africa"
+      },
+      "ER": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "ES": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe"
+      },
+      "ET": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "FI": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_northern_europe",
+        "subregion_label": "Northern Europe"
+      },
+      "FK": {
+        "continent_id": "continent_south_america",
+        "continent_label": "South America",
+        "subregion_id": "subregion_south_america",
+        "subregion_label": "South America"
+      },
+      "FO": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_northern_europe",
+        "subregion_label": "Northern Europe"
+      },
+      "FR": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_western_europe",
+        "subregion_label": "Western Europe"
+      },
+      "GA": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_middle_africa",
+        "subregion_label": "Middle Africa"
+      },
+      "GB": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_northern_europe",
+        "subregion_label": "Northern Europe"
+      },
+      "GE": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "GG": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_northern_europe",
+        "subregion_label": "Northern Europe"
+      },
+      "GH": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "GL": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_northern_america",
+        "subregion_label": "Northern America"
+      },
+      "GM": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "GN": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "GQ": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_middle_africa",
+        "subregion_label": "Middle Africa"
+      },
+      "GR": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe"
+      },
+      "GS": {
+        "continent_id": "continent_other",
+        "continent_label": "Other",
+        "subregion_id": "subregion_unclassified",
+        "subregion_label": "Unclassified"
+      },
+      "GT": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_central_america",
+        "subregion_label": "Central America"
+      },
+      "GW": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "GY": {
+        "continent_id": "continent_south_america",
+        "continent_label": "South America",
+        "subregion_id": "subregion_south_america",
+        "subregion_label": "South America"
+      },
+      "HK": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_eastern_asia",
+        "subregion_label": "Eastern Asia"
+      },
+      "HM": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_unclassified",
+        "subregion_label": "Unclassified"
+      },
+      "HN": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_central_america",
+        "subregion_label": "Central America"
+      },
+      "HR": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe"
+      },
+      "HT": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_caribbean",
+        "subregion_label": "Caribbean"
+      },
+      "HU": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_eastern_europe",
+        "subregion_label": "Eastern Europe"
+      },
+      "ID": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_south_eastern_asia",
+        "subregion_label": "South-Eastern Asia"
+      },
+      "IE": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_northern_europe",
+        "subregion_label": "Northern Europe"
+      },
+      "IL": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "IM": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_northern_europe",
+        "subregion_label": "Northern Europe"
+      },
+      "IN": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_southern_asia",
+        "subregion_label": "Southern Asia"
+      },
+      "IO": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_unclassified",
+        "subregion_label": "Unclassified"
+      },
+      "IQ": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "IR": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_southern_asia",
+        "subregion_label": "Southern Asia"
+      },
+      "IS": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_northern_europe",
+        "subregion_label": "Northern Europe"
+      },
+      "IT": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe"
+      },
+      "JE": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_northern_europe",
+        "subregion_label": "Northern Europe"
+      },
+      "JM": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_caribbean",
+        "subregion_label": "Caribbean"
+      },
+      "JO": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "JP": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_eastern_asia",
+        "subregion_label": "Eastern Asia"
+      },
+      "KE": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "KG": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_central_asia",
+        "subregion_label": "Central Asia"
+      },
+      "KH": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_south_eastern_asia",
+        "subregion_label": "South-Eastern Asia"
+      },
+      "KM": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "KP": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_eastern_asia",
+        "subregion_label": "Eastern Asia"
+      },
+      "KR": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_eastern_asia",
+        "subregion_label": "Eastern Asia"
+      },
+      "KW": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "KZ": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_central_asia",
+        "subregion_label": "Central Asia"
+      },
+      "LA": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_south_eastern_asia",
+        "subregion_label": "South-Eastern Asia"
+      },
+      "LB": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "LI": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_western_europe",
+        "subregion_label": "Western Europe"
+      },
+      "LK": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_southern_asia",
+        "subregion_label": "Southern Asia"
+      },
+      "LR": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "LS": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_southern_africa",
+        "subregion_label": "Southern Africa"
+      },
+      "LT": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_northern_europe",
+        "subregion_label": "Northern Europe"
+      },
+      "LU": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_western_europe",
+        "subregion_label": "Western Europe"
+      },
+      "LV": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_northern_europe",
+        "subregion_label": "Northern Europe"
+      },
+      "LY": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_northern_africa",
+        "subregion_label": "Northern Africa"
+      },
+      "MA": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_northern_africa",
+        "subregion_label": "Northern Africa"
+      },
+      "MC": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_western_europe",
+        "subregion_label": "Western Europe"
+      },
+      "MD": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_eastern_europe",
+        "subregion_label": "Eastern Europe"
+      },
+      "ME": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe"
+      },
+      "MG": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "MK": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe"
+      },
+      "ML": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "MM": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_south_eastern_asia",
+        "subregion_label": "South-Eastern Asia"
+      },
+      "MN": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_eastern_asia",
+        "subregion_label": "Eastern Asia"
+      },
+      "MO": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_eastern_asia",
+        "subregion_label": "Eastern Asia"
+      },
+      "MR": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "MT": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe"
+      },
+      "MU": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "MV": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_southern_asia",
+        "subregion_label": "Southern Asia"
+      },
+      "MW": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "MX": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_central_america",
+        "subregion_label": "Central America"
+      },
+      "MY": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_south_eastern_asia",
+        "subregion_label": "South-Eastern Asia"
+      },
+      "MZ": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "NA": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_southern_africa",
+        "subregion_label": "Southern Africa"
+      },
+      "NE": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "NG": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "NI": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_central_america",
+        "subregion_label": "Central America"
+      },
+      "NL": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_western_europe",
+        "subregion_label": "Western Europe"
+      },
+      "NO": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_northern_europe",
+        "subregion_label": "Northern Europe"
+      },
+      "NP": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_southern_asia",
+        "subregion_label": "Southern Asia"
+      },
+      "NZ": {
+        "continent_id": "continent_oceania",
+        "continent_label": "Oceania",
+        "subregion_id": "subregion_australia_and_new_zealand",
+        "subregion_label": "Australia and New Zealand"
+      },
+      "OM": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "PA": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_central_america",
+        "subregion_label": "Central America"
+      },
+      "PE": {
+        "continent_id": "continent_south_america",
+        "continent_label": "South America",
+        "subregion_id": "subregion_south_america",
+        "subregion_label": "South America"
+      },
+      "PG": {
+        "continent_id": "continent_oceania",
+        "continent_label": "Oceania",
+        "subregion_id": "subregion_melanesia",
+        "subregion_label": "Melanesia"
+      },
+      "PH": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_south_eastern_asia",
+        "subregion_label": "South-Eastern Asia"
+      },
+      "PK": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_southern_asia",
+        "subregion_label": "Southern Asia"
+      },
+      "PL": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_eastern_europe",
+        "subregion_label": "Eastern Europe"
+      },
+      "PM": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_northern_america",
+        "subregion_label": "Northern America"
+      },
+      "PR": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_caribbean",
+        "subregion_label": "Caribbean"
+      },
+      "PS": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "PT": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe"
+      },
+      "PY": {
+        "continent_id": "continent_south_america",
+        "continent_label": "South America",
+        "subregion_id": "subregion_south_america",
+        "subregion_label": "South America"
+      },
+      "QA": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "RO": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_eastern_europe",
+        "subregion_label": "Eastern Europe"
+      },
+      "RS": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe"
+      },
+      "RU": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_eastern_europe",
+        "subregion_label": "Eastern Europe"
+      },
+      "RW": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "SA": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "SC": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "SD": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_northern_africa",
+        "subregion_label": "Northern Africa"
+      },
+      "SE": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_northern_europe",
+        "subregion_label": "Northern Europe"
+      },
+      "SG": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_south_eastern_asia",
+        "subregion_label": "South-Eastern Asia"
+      },
+      "SH": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "SI": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe"
+      },
+      "SK": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_eastern_europe",
+        "subregion_label": "Eastern Europe"
+      },
+      "SL": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "SM": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe"
+      },
+      "SN": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "SO": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "SR": {
+        "continent_id": "continent_south_america",
+        "continent_label": "South America",
+        "subregion_id": "subregion_south_america",
+        "subregion_label": "South America"
+      },
+      "SS": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "ST": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_middle_africa",
+        "subregion_label": "Middle Africa"
+      },
+      "SV": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_central_america",
+        "subregion_label": "Central America"
+      },
+      "SY": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "SZ": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_southern_africa",
+        "subregion_label": "Southern Africa"
+      },
+      "TD": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_middle_africa",
+        "subregion_label": "Middle Africa"
+      },
+      "TF": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_unclassified",
+        "subregion_label": "Unclassified"
+      },
+      "TG": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_western_africa",
+        "subregion_label": "Western Africa"
+      },
+      "TH": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_south_eastern_asia",
+        "subregion_label": "South-Eastern Asia"
+      },
+      "TJ": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_central_asia",
+        "subregion_label": "Central Asia"
+      },
+      "TL": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_south_eastern_asia",
+        "subregion_label": "South-Eastern Asia"
+      },
+      "TM": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_central_asia",
+        "subregion_label": "Central Asia"
+      },
+      "TN": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_northern_africa",
+        "subregion_label": "Northern Africa"
+      },
+      "TR": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "TT": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_caribbean",
+        "subregion_label": "Caribbean"
+      },
+      "TW": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_eastern_asia",
+        "subregion_label": "Eastern Asia"
+      },
+      "TZ": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "UA": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_eastern_europe",
+        "subregion_label": "Eastern Europe"
+      },
+      "UG": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "US": {
+        "continent_id": "continent_north_america",
+        "continent_label": "North America",
+        "subregion_id": "subregion_northern_america",
+        "subregion_label": "Northern America"
+      },
+      "UY": {
+        "continent_id": "continent_south_america",
+        "continent_label": "South America",
+        "subregion_id": "subregion_south_america",
+        "subregion_label": "South America"
+      },
+      "UZ": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_central_asia",
+        "subregion_label": "Central Asia"
+      },
+      "VA": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe"
+      },
+      "VE": {
+        "continent_id": "continent_south_america",
+        "continent_label": "South America",
+        "subregion_id": "subregion_south_america",
+        "subregion_label": "South America"
+      },
+      "VN": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_south_eastern_asia",
+        "subregion_label": "South-Eastern Asia"
+      },
+      "XK": {
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe"
+      },
+      "YE": {
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_western_asia",
+        "subregion_label": "Western Asia"
+      },
+      "ZA": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_southern_africa",
+        "subregion_label": "Southern Africa"
+      },
+      "ZM": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      },
+      "ZW": {
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_eastern_africa",
+        "subregion_label": "Eastern Africa"
+      }
+    }
   }
 }

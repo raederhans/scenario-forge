@@ -174,11 +174,24 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def resolve_default_topology(repo_root: Path) -> Path:
+    candidates = [
+        repo_root / "data" / "europe_topology.na_v2.json",
+        repo_root / "data" / "europe_topology.na_v1.json",
+        repo_root / "data" / "europe_topology.highres.json",
+        repo_root / "data" / "europe_topology.json",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[-1]
+
+
 def main() -> None:
     args = parse_args()
     repo_root = args.repo_root.resolve()
     locales_path = args.locales or (repo_root / "data" / "locales.json")
-    topology_path = args.topology or (repo_root / "data" / "europe_topology.json")
+    topology_path = args.topology or resolve_default_topology(repo_root)
     markdown_out = args.markdown_out or (repo_root / "docs" / "translation_coverage_report.md")
     json_out = args.json_out or (repo_root / "qa_reports" / "translation_coverage_report.json")
 

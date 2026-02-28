@@ -128,12 +128,23 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def resolve_default_topology(base_dir: Path) -> Path:
+    candidates = [
+        base_dir / "data" / "europe_topology.na_v2.json",
+        base_dir / "data" / "europe_topology.na_v1.json",
+        base_dir / "data" / "europe_topology.highres.json",
+        base_dir / "data" / "europe_topology.json",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[-1]
+
+
 def main() -> None:
     args = parse_args()
     base_dir = Path(__file__).resolve().parents[1]
-    default_topology = base_dir / "data" / "europe_topology.highres.json"
-    if not default_topology.exists():
-        default_topology = base_dir / "data" / "europe_topology.json"
+    default_topology = resolve_default_topology(base_dir)
     topology_path = args.topology or default_topology
     output_path = args.output or (base_dir / "data" / "geo_aliases.json")
 

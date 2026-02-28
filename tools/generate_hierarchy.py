@@ -44,6 +44,7 @@ DEFAULT_PL_POW = DATA_DIR / "poland_powiaty.geojson"
 DEFAULT_IND_ADM2 = DATA_DIR / "geoBoundaries-IND-ADM2.geojson"
 DEFAULT_RUS_ADM2 = DATA_DIR / "geoBoundaries-RUS-ADM2.geojson"
 DEFAULT_UKR_ADM2 = DATA_DIR / "geoBoundaries-UKR-ADM2.geojson"
+DEFAULT_ADMIN0_COUNTRIES = DATA_DIR / "ne_50m_admin_0_countries.zip"
 NE_ADMIN1_URL = "https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_admin_1_states_provinces.zip"
 
 DEFAULT_NE_ADM1_CANDIDATES = [
@@ -60,6 +61,21 @@ ADMIN1_ISO_COLS = ["iso_a2", "adm0_a2", "iso_3166_1_", "iso_3166_1_alpha_2"]
 ADMIN1_ADM0_COLS = ["admin", "adm0_name", "admin0_name"]
 ADMIN1_ID_COLS = ["adm1_code", "gn_id", "id"]
 URAL_LONGITUDE = 60.0
+COUNTRY_CODE_ALIASES = {
+    "UK": "GB",
+    "EL": "GR",
+}
+COUNTRY_GROUP_CONTINENT_ORDER = [
+    "Africa",
+    "Asia",
+    "Europe",
+    "North America",
+    "South America",
+    "Oceania",
+    "Antarctica",
+    "Other",
+]
+VALID_COUNTRY_GROUP_CONTINENTS = set(COUNTRY_GROUP_CONTINENT_ORDER) | {"Americas"}
 
 POLAND_VOIVODESHIPS = {
     "02": "Lower Silesian",
@@ -230,6 +246,149 @@ def representative_longitudes(gdf):
 def slugify(text):
     cleaned = re.sub(r"[^A-Za-z0-9]+", "_", str(text).strip())
     return cleaned.strip("_")
+
+
+def normalize_country_code(raw):
+    code = re.sub(r"[^A-Z]", "", str(raw or "").strip().upper())
+    if not code or code == "ZZ":
+        return ""
+    return COUNTRY_CODE_ALIASES.get(code, code)
+
+
+def normalize_country_group_continent(continent, region_un):
+    continent_label = str(continent or "").strip()
+    region_un_label = str(region_un or "").strip()
+
+    if continent_label in COUNTRY_GROUP_CONTINENT_ORDER:
+        return continent_label
+    if region_un_label in COUNTRY_GROUP_CONTINENT_ORDER:
+        return region_un_label
+    if continent_label == "Americas" or region_un_label == "Americas":
+        return "Other"
+    if continent_label in VALID_COUNTRY_GROUP_CONTINENTS:
+        return continent_label
+    if region_un_label in VALID_COUNTRY_GROUP_CONTINENTS:
+        return region_un_label
+    return "Other"
+
+
+def normalize_country_group_subregion(subregion):
+    subregion_label = str(subregion or "").strip()
+    if not subregion_label or subregion_label == "Seven seas (open ocean)":
+        return "Unclassified"
+    return subregion_label
+
+
+def load_admin0_countries(admin0_path: Path):
+    if not admin0_path.exists():
+        raise FileNotFoundError(f"Missing admin0 countries source: {admin0_path}")
+    source = f"zip://{admin0_path}" if admin0_path.suffix.lower() == ".zip" else admin0_path
+    return gpd.read_file(source)
+
+
+def collect_active_country_codes(topology_path: Path):
+    if not topology_path.exists():
+        raise FileNotFoundError(f"Missing topology for country groups: {topology_path}")
+
+    topo = json.loads(topology_path.read_text(encoding="utf-8"))
+    geoms = topo.get("objects", {}).get("political", {}).get("geometries", [])
+    codes = set()
+    for geom in geoms:
+        props = geom.get("properties", {}) or {}
+        code = normalize_country_code(props.get("cntr_code") or props.get("CNTR_CODE") or "")
+        if code:
+            codes.add(code)
+    return codes
+
+
+def build_country_groups_from_admin0(admin0_path: Path, active_country_codes: set[str]):
+    admin0 = load_admin0_countries(admin0_path)
+    records = {}
+
+    for _, row in admin0.iterrows():
+        continent = normalize_country_group_continent(
+            row.get("CONTINENT", ""),
+            row.get("REGION_UN", ""),
+        )
+        subregion = normalize_country_group_subregion(row.get("SUBREGION", ""))
+        country_name = (
+            str(row.get("NAME_LONG", "") or "").strip()
+            or str(row.get("ADMIN", "") or "").strip()
+        )
+
+        for key in ("ISO_A2_EH", "ISO_A2"):
+            if key not in admin0.columns:
+                continue
+            code = normalize_country_code(row.get(key))
+            if not code or code == "-99" or code in records:
+                continue
+            records[code] = {
+                "country_name": country_name or code,
+                "continent_label": continent,
+                "subregion_label": subregion,
+            }
+
+    buckets = defaultdict(lambda: defaultdict(list))
+    country_meta = {}
+    country_name_by_code = {}
+
+    for code in sorted(active_country_codes):
+        record = records.get(code)
+        continent_label = record["continent_label"] if record else "Other"
+        subregion_label = record["subregion_label"] if record else "Unclassified"
+        country_name = record["country_name"] if record else code
+
+        continent_id = f"continent_{slugify(continent_label).lower() or 'other'}"
+        subregion_id = f"subregion_{slugify(subregion_label).lower() or 'unclassified'}"
+
+        country_meta[code] = {
+            "continent_id": continent_id,
+            "continent_label": continent_label,
+            "subregion_id": subregion_id,
+            "subregion_label": subregion_label,
+        }
+        country_name_by_code[code] = country_name
+        buckets[continent_label][subregion_label].append(code)
+
+    ordered_continents = []
+    seen_continents = set()
+    for continent in COUNTRY_GROUP_CONTINENT_ORDER:
+        if continent in buckets:
+            ordered_continents.append(continent)
+            seen_continents.add(continent)
+    for continent in sorted(set(buckets.keys()) - seen_continents):
+        ordered_continents.append(continent)
+
+    continents = []
+    for continent_label in ordered_continents:
+        subregions = []
+        continent_buckets = buckets[continent_label]
+        for subregion_label in sorted(continent_buckets.keys()):
+            countries = sorted(
+                continent_buckets[subregion_label],
+                key=lambda code: country_name_by_code.get(code, code),
+            )
+            subregions.append(
+                {
+                    "id": f"subregion_{slugify(subregion_label).lower() or 'unclassified'}",
+                    "label": subregion_label,
+                    "countries": countries,
+                }
+            )
+
+        continents.append(
+            {
+                "id": f"continent_{slugify(continent_label).lower() or 'other'}",
+                "label": continent_label,
+                "subregions": subregions,
+            }
+        )
+
+    return {
+        "version": 1,
+        "continents": continents,
+        "country_meta": country_meta,
+    }
 
 
 def find_ne_admin1(data_dir: Path):
@@ -685,28 +844,61 @@ def main():
         groups.update(source_groups)
         labels.update(source_labels)
 
-    topology_path = DATA_DIR / "europe_topology.json"
-    configured_subdivisions = set()
+    topology_candidates = [
+        DATA_DIR / "europe_topology.na_v2.json",
+        DATA_DIR / "europe_topology.na_v1.json",
+        DATA_DIR / "europe_topology.highres.json",
+    ]
+    topology_admin1_codes = set()
     if cfg is not None:
-        configured_subdivisions = {
+        topology_admin1_codes = {
             str(code).upper().strip()
-            for code in getattr(cfg, "SUBDIVISIONS", set())
+            for code in getattr(cfg, "TOPOLOGY_ADMIN1_HIERARCHY_CODES", set())
             if str(code).strip()
         }
-    if configured_subdivisions:
-        topo_groups, topo_labels = build_topology_admin1_groups(
-            topology_path,
-            configured_subdivisions,
-        )
-        groups.update(topo_groups)
-        labels.update(topo_labels)
+        if not topology_admin1_codes:
+            topology_admin1_codes = {
+                str(code).upper().strip()
+                for code in getattr(cfg, "DETAIL_PARENT_SUBDIVISIONS", set())
+                if str(code).strip()
+            }
+    if topology_admin1_codes:
+        for candidate in topology_candidates:
+            if not candidate.exists():
+                continue
+            topo_groups, topo_labels = build_topology_admin1_groups(
+                candidate,
+                topology_admin1_codes,
+            )
+            for group_id, children in topo_groups.items():
+                if group_id not in groups:
+                    groups[group_id] = children
+            for group_id, label in topo_labels.items():
+                if group_id not in labels:
+                    labels[group_id] = label
 
-    output = {"groups": groups, "labels": labels}
+    primary_topology_path = DATA_DIR / "europe_topology.json"
+    active_country_codes = collect_active_country_codes(primary_topology_path)
+    country_groups = build_country_groups_from_admin0(
+        DEFAULT_ADMIN0_COUNTRIES,
+        active_country_codes,
+    )
+
+    output = {
+        "groups": groups,
+        "labels": labels,
+        "country_groups": country_groups,
+    }
     output_path = DATA_DIR / "hierarchy.json"
     output_path.write_text(json.dumps(output, indent=2, ensure_ascii=True), encoding="utf-8")
 
     print(f"Wrote {output_path}")
     print(f"Groups: {len(groups)}")
+    print(
+        "[Hierarchy] Country groups: "
+        f"{len(country_groups.get('continents', []))} continents, "
+        f"{len(country_groups.get('country_meta', {}))} countries"
+    )
 
 
 if __name__ == "__main__":

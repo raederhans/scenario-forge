@@ -56,6 +56,7 @@ from map_builder.io.readers import load_physical, load_rivers, load_urban
 from map_builder.processors.admin1 import build_extension_admin1, extract_country_code
 from map_builder.processors.china import apply_china_replacement
 from map_builder.processors.france import apply_holistic_replacements
+from map_builder.processors.north_america import apply_north_america_replacement
 from map_builder.processors.poland import apply_poland_replacement
 from map_builder.processors.russia_ukraine import apply_russia_ukraine_replacement
 from map_builder.processors.south_asia import apply_south_asia_replacement
@@ -462,6 +463,34 @@ def build_ru_city_detail_topology(script_dir: Path, output_dir: Path) -> None:
         print(f"[RU City Detail] Failed to patch detail topology: {exc}")
 
 
+def build_na_detail_topology(script_dir: Path, output_dir: Path) -> None:
+    source_topology = output_dir / "europe_topology.highres.json"
+    if not source_topology.exists():
+        source_topology = output_dir / "europe_topology.json.bak"
+    if not source_topology.exists():
+        print("[Detail Bundle] Skipped: no source detail topology found.")
+        return
+
+    patch_script = script_dir / "tools" / "build_na_detail_topology.py"
+    if not patch_script.exists():
+        print(f"[Detail Bundle] Skipped: patch script missing at {patch_script}.")
+        return
+
+    cmd = [
+        sys.executable,
+        str(patch_script),
+        "--source-topology",
+        str(source_topology),
+        "--output-topology",
+        str(output_dir / "europe_topology.na_v2.json"),
+    ]
+    print("[Detail Bundle] Building enriched detail topology...")
+    try:
+        subprocess.check_call(cmd, cwd=script_dir)
+    except subprocess.CalledProcessError as exc:
+        print(f"[Detail Bundle] Failed to build enriched detail topology: {exc}")
+
+
 def build_balkan_fallback(
     existing: gpd.GeoDataFrame, admin0: gpd.GeoDataFrame | None = None
 ) -> gpd.GeoDataFrame:
@@ -796,6 +825,7 @@ def main() -> None:
         hybrid = apply_poland_replacement(hybrid)
         hybrid = apply_china_replacement(hybrid)
         hybrid = apply_south_asia_replacement(hybrid, land_bg_clipped)
+        hybrid = apply_north_america_replacement(hybrid)
 
     # Build special zones for both skeleton and enriched pipelines.
     try:
@@ -968,6 +998,7 @@ def main() -> None:
         quantization=cfg.TOPOLOGY_QUANTIZATION,
     )
     build_ru_city_detail_topology(script_dir, output_dir)
+    build_na_detail_topology(script_dir, output_dir)
 
     print("[INFO] Generating Hierarchy Data....")
     generate_hierarchy.main()

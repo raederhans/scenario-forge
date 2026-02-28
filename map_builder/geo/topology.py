@@ -138,6 +138,7 @@ def build_topology(
     quantization: int = cfg.TOPOLOGY_QUANTIZATION,
 ) -> None:
     print("Building TopoJSON topology...")
+    output_path = output_path
 
     def has_valid_bounds(gdf: gpd.GeoDataFrame) -> bool:
         if gdf.empty:
@@ -219,6 +220,7 @@ def build_topology(
                 "name_local",
                 "constituent_country",
                 "adm1_name",
+                "detail_tier",
                 "geometry",
             ]
         existing = [col for col in keep_cols if col in gdf.columns]
@@ -237,8 +239,21 @@ def build_topology(
             gdf = gdf[gdf.geometry.is_valid]
         return gdf
 
+    def write_special_zones_geojson(gdf: gpd.GeoDataFrame | None) -> None:
+        if gdf is None or gdf.empty:
+            return
+        try:
+            out_gdf = gdf.to_crs("EPSG:4326").copy()
+            out_gdf = prune_columns(out_gdf, "special_zones")
+            geojson_path = output_path.with_name("special_zones.geojson")
+            geojson_path.write_text(out_gdf.to_json(drop_id=True), encoding="utf-8")
+            print(f"Special zones GeoJSON saved to {geojson_path}")
+        except Exception as exc:
+            print(f"Special zones GeoJSON export skipped: {exc}")
+
     candidates = [("political", political)]
     if special_zones is not None:
+        write_special_zones_geojson(special_zones)
         candidates.append(("special_zones", special_zones))
     candidates.extend(
         [

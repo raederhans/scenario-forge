@@ -1,15 +1,20 @@
-// Data loading helpers (Phase 13 scaffold)
+﻿// Data loading helpers (Phase 13 scaffold)
 
 const TOPOLOGY_VARIANT_URLS = {
   highres: "data/europe_topology.highres.json",
   legacy_bak: "data/europe_topology.json.bak",
+  na_v1: "data/europe_topology.na_v1.json",
+  na_v2: "data/europe_topology.na_v2.json",
 };
 
 const DETAIL_SOURCES = {
   highres: "data/europe_topology.highres.json",
   legacy_bak: "data/europe_topology.json.bak",
+  na_v1: "data/europe_topology.na_v1.json",
+  na_v2: "data/europe_topology.na_v2.json",
 };
 const RU_CITY_OVERRIDES_URL = "data/ru_city_overrides.geojson";
+const SPECIAL_ZONES_URL = "data/special_zones.geojson";
 
 function getSearchParams() {
   const search = globalThis?.location?.search || "";
@@ -29,7 +34,7 @@ function resolveTopologyVariant() {
   const key = String(raw).trim().toLowerCase();
   if (!Object.prototype.hasOwnProperty.call(TOPOLOGY_VARIANT_URLS, key)) {
     console.warn(
-      `[data_loader] Ignoring unknown topology_variant="${raw}". Allowed values: highres, legacy_bak.`
+      `[data_loader] Ignoring unknown topology_variant="${raw}". Allowed values: highres, legacy_bak, na_v1, na_v2.`
     );
     return null;
   }
@@ -52,20 +57,20 @@ function resolveDetailLayerEnabled() {
 function resolveDetailSource() {
   const params = getSearchParams();
   if (!params) {
-    return { key: "legacy_bak", url: DETAIL_SOURCES.legacy_bak };
+    return { key: "na_v1", url: DETAIL_SOURCES.na_v1 };
   }
 
   const raw = params.get("detail_source");
   if (!raw) {
-    return { key: "legacy_bak", url: DETAIL_SOURCES.legacy_bak };
+    return { key: "na_v1", url: DETAIL_SOURCES.na_v1 };
   }
 
   const key = String(raw).trim().toLowerCase();
   if (!Object.prototype.hasOwnProperty.call(DETAIL_SOURCES, key)) {
     console.warn(
-      `[data_loader] Ignoring unknown detail_source="${raw}". Allowed values: highres, legacy_bak.`
+      `[data_loader] Ignoring unknown detail_source="${raw}". Allowed values: highres, legacy_bak, na_v1, na_v2.`
     );
-    return { key: "legacy_bak", url: DETAIL_SOURCES.legacy_bak };
+    return { key: "na_v1", url: DETAIL_SOURCES.na_v1 };
   }
 
   return { key, url: DETAIL_SOURCES[key] };
@@ -125,12 +130,24 @@ async function loadDetailTopologyWithFallback({
     candidates.push({ key: detailSource.key, url: detailSource.url });
   }
 
+  if (detailSource?.key !== "na_v1") {
+    candidates.push({ key: "na_v1", url: DETAIL_SOURCES.na_v1 });
+  }
+
   if (detailSource?.key !== "legacy_bak") {
     candidates.push({ key: "legacy_bak", url: DETAIL_SOURCES.legacy_bak });
   }
 
+  const deduped = [];
+  const seen = new Set();
+  candidates.forEach((candidate) => {
+    if (!candidate?.url || seen.has(candidate.url)) return;
+    seen.add(candidate.url);
+    deduped.push(candidate);
+  });
+
   let firstError = null;
-  for (const candidate of candidates) {
+  for (const candidate of deduped) {
     try {
       const topology = await loadTopologyUrl(
         d3Client,
@@ -217,13 +234,14 @@ export async function loadMapData({
   geoAliasesUrl = "data/geo_aliases.json",
   hierarchyUrl = "data/hierarchy.json",
   ruCityOverridesUrl = RU_CITY_OVERRIDES_URL,
+  specialZonesUrl = SPECIAL_ZONES_URL,
   d3Client = globalThis.d3,
 } = {}) {
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available. Ensure D3 is loaded before calling loadMapData().");
   }
 
-  const [topologyBundle, localeData, geoAliases, hierarchy, ruCityOverrides] = await Promise.all([
+  const [topologyBundle, localeData, geoAliases, hierarchy, ruCityOverrides, specialZones] = await Promise.all([
     loadTopologyBundle({ topologyUrl, d3Client }),
     d3Client.json(localesUrl).catch((err) => {
       console.warn("Locales file missing or invalid, using defaults.", err);
@@ -246,8 +264,21 @@ export async function loadMapData({
         type: "FeatureCollection",
         features: payload.features,
       };
+      }).catch((err) => {
+        console.warn("RU city overrides file missing or invalid, continuing without overrides.", err);
+        return null;
+      }),
+    d3Client.json(specialZonesUrl).then((payload) => {
+      if (!Array.isArray(payload?.features)) {
+        console.warn(`[data_loader] Special zones payload invalid at ${specialZonesUrl}. Ignoring.`);
+        return null;
+      }
+      return {
+        type: "FeatureCollection",
+        features: payload.features,
+      };
     }).catch((err) => {
-      console.warn("RU city overrides file missing or invalid, continuing without overrides.", err);
+      console.warn("Special zones file missing or invalid, falling back to topology layer.", err);
       return null;
     }),
   ]);
@@ -258,5 +289,7 @@ export async function loadMapData({
     geoAliases: geoAliases || { alias_to_stable_key: {} },
     hierarchy,
     ruCityOverrides,
+    specialZones,
   };
 }
+

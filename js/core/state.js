@@ -402,6 +402,7 @@ export const state = {
   topologyBundleMode: "single",
   landData: null,
   specialZonesData: null,
+  specialZonesExternalData: null,
   specialZones: {},
   riversData: null,
   oceanData: null,
@@ -412,6 +413,8 @@ export const state = {
   physicalData: null,
   hierarchyData: null,
   hierarchyGroupsByCode: new Map(),
+  countryGroupsData: null,
+  countryGroupMetaByCode: new Map(),
   layerDataDiagnostics: {},
   contextLayerSourceByName: {},
 

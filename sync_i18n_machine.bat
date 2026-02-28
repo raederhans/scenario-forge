@@ -2,4 +2,4 @@
 setlocal
 
 cd /d "%~dp0"
-call sync_i18n.bat --machine --max-machine-translations 300
+call sync_i18n.bat --machine --max-machine-translations 1000

@@ -218,6 +218,83 @@ function getHierarchyGroupsForCode(code) {
   return groups;
 }
 
+function getCountryGroupingMeta(code) {
+  const normalizedCode = normalizeCountryCode(code);
+  if (!normalizedCode || !(state.countryGroupMetaByCode instanceof Map)) return null;
+  return state.countryGroupMetaByCode.get(normalizedCode) || null;
+}
+
+function buildCountryColorTree(entries) {
+  const tree = new Map();
+  const continentOrder = new Map();
+  const subregionOrder = new Map();
+  const configuredContinents = Array.isArray(state.countryGroupsData?.continents)
+    ? state.countryGroupsData.continents
+    : [];
+
+  configuredContinents.forEach((continent, continentIndex) => {
+    const continentId = String(continent?.id || "").trim();
+    if (!continentId) return;
+    continentOrder.set(continentId, continentIndex);
+    const subregions = Array.isArray(continent?.subregions) ? continent.subregions : [];
+    subregions.forEach((subregion, subregionIndex) => {
+      const subregionId = String(subregion?.id || "").trim();
+      if (!subregionId) return;
+      subregionOrder.set(`${continentId}::${subregionId}`, subregionIndex);
+    });
+  });
+
+  entries.forEach((entry) => {
+    const meta = getCountryGroupingMeta(entry.code);
+    const continentId = meta?.continentId || "continent_other";
+    const continentLabel = meta?.continentLabel || "Other";
+    const subregionId = meta?.subregionId || "subregion_unclassified";
+    const subregionLabel = meta?.subregionLabel || "Unclassified";
+
+    if (!tree.has(continentId)) {
+      tree.set(continentId, {
+        id: continentId,
+        label: continentLabel,
+        displayLabel: t(continentLabel, "geo") || continentLabel,
+        sortIndex: continentOrder.has(continentId) ? continentOrder.get(continentId) : Number.MAX_SAFE_INTEGER,
+        subregions: new Map(),
+      });
+    }
+
+    const continentNode = tree.get(continentId);
+    const subregionKey = `${continentId}::${subregionId}`;
+    if (!continentNode.subregions.has(subregionId)) {
+      continentNode.subregions.set(subregionId, {
+        id: subregionId,
+        label: subregionLabel,
+        displayLabel: t(subregionLabel, "geo") || subregionLabel,
+        sortIndex: subregionOrder.has(subregionKey) ? subregionOrder.get(subregionKey) : Number.MAX_SAFE_INTEGER,
+        countries: [],
+      });
+    }
+
+    continentNode.subregions.get(subregionId).countries.push(entry);
+  });
+
+  return Array.from(tree.values())
+    .map((continentNode) => ({
+      ...continentNode,
+      subregions: Array.from(continentNode.subregions.values())
+        .map((subregionNode) => ({
+          ...subregionNode,
+          countries: [...subregionNode.countries].sort((a, b) => a.displayName.localeCompare(b.displayName)),
+        }))
+        .sort((a, b) => {
+          if (a.sortIndex !== b.sortIndex) return a.sortIndex - b.sortIndex;
+          return a.displayLabel.localeCompare(b.displayLabel);
+        }),
+    }))
+    .sort((a, b) => {
+      if (a.sortIndex !== b.sortIndex) return a.sortIndex - b.sortIndex;
+      return a.displayLabel.localeCompare(b.displayLabel);
+    });
+}
+
 function applyHierarchyGroup(group, color, render) {
   if (!group || !group.children) return;
   const colorToApply = color || state.selectedColor;
@@ -476,127 +553,308 @@ function initSidebar({ render } = {}) {
   }
 
   const expanded = new Set();
+  const expandedContinents = new Set();
+  const expandedSubregions = new Set();
   const getSearchTerm = () => (searchInput?.value || "").trim().toLowerCase();
+  const matchesTerm = (value, term) => String(value || "").toLowerCase().includes(term);
+
+  const appendCountryChildren = (parent, countryState) => {
+    const { code, presets, hierarchyGroups } = countryState;
+
+    if (hierarchyGroups.length > 0) {
+      const child = document.createElement("div");
+      child.className = "ml-2 space-y-2 pb-2";
+      const header = document.createElement("div");
+      header.className = "px-2 text-[10px] uppercase tracking-wide text-slate-400";
+      header.textContent = t("--- Provinces/Regions ---", "ui");
+      child.appendChild(header);
+      hierarchyGroups.forEach((group) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className =
+          "w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-left text-xs text-slate-600 hover:bg-slate-100";
+        btn.textContent = group.label;
+        btn.addEventListener("click", () => {
+          applyHierarchyGroup(group, state.selectedColor, render);
+        });
+        child.appendChild(btn);
+      });
+      parent.appendChild(child);
+    }
+
+    if (presets.length > 0) {
+      const child = document.createElement("div");
+      child.className = "ml-2 space-y-2 pb-2";
+      const header = document.createElement("div");
+      header.className = "px-2 text-[10px] uppercase tracking-wide text-slate-400";
+      header.textContent = t("--- Presets ---", "ui");
+      child.appendChild(header);
+      presets.forEach((preset, presetIndex) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className =
+          "w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-left text-xs text-slate-600 hover:bg-slate-100";
+        btn.textContent = `Apply ${preset.name}`;
+        btn.addEventListener("click", () => {
+          applyPreset(code, presetIndex, state.selectedColor, render);
+        });
+        child.appendChild(btn);
+      });
+      parent.appendChild(child);
+    }
+  };
+
+  const renderCountryRow = (parent, countryState) => {
+    const { code, displayName, fallbackIndex, hasChildren, isOpen } = countryState;
+    const row = document.createElement("div");
+    row.className =
+      "flex items-center justify-between gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2";
+
+    const label = document.createElement("div");
+    label.className = "text-sm font-medium text-slate-700";
+    label.textContent = `${displayName} (${code})`;
+
+    const controls = document.createElement("div");
+    controls.className = "flex items-center gap-2";
+
+    if (hasChildren) {
+      const toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className =
+        "rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-500 hover:bg-slate-100";
+      toggle.textContent = isOpen ? "v" : ">";
+      toggle.addEventListener("click", () => {
+        if (expanded.has(code)) {
+          expanded.delete(code);
+        } else {
+          expanded.add(code);
+        }
+        renderList();
+      });
+      controls.appendChild(toggle);
+    }
+
+    const input = document.createElement("input");
+    input.type = "color";
+    const fallbackColor = ensureCountryPaletteColor(code, fallbackIndex);
+    input.value = state.countryBaseColors[code] || state.countryPalette[code] || fallbackColor;
+    input.className = "h-8 w-10 cursor-pointer rounded-md border border-slate-300 bg-white";
+    input.addEventListener("change", (event) => {
+      const value = event.target.value;
+      state.countryPalette[code] = value;
+      applyCountryColor(code, value, render);
+    });
+    controls.appendChild(input);
+
+    row.appendChild(label);
+    row.appendChild(controls);
+    parent.appendChild(row);
+
+    if (isOpen) {
+      appendCountryChildren(parent, countryState);
+    }
+  };
+
+  const renderFlatCountryList = (entries, term) => {
+    entries.forEach(({ code, name, displayName }, entryIndex) => {
+      const presets = state.presetsState[code] || [];
+      const hierarchyGroups = getHierarchyGroupsForCode(code);
+      const countryMatch =
+        !term ||
+        matchesTerm(name, term) ||
+        matchesTerm(displayName, term) ||
+        matchesTerm(code, term);
+      const presetMatch = term
+        ? presets.some((preset) => matchesTerm(preset.name, term))
+        : false;
+      const hierarchyMatch = term
+        ? hierarchyGroups.some((group) => matchesTerm(group.label, term))
+        : false;
+
+      if (!countryMatch && !presetMatch && !hierarchyMatch) return;
+
+      renderCountryRow(list, {
+        code,
+        displayName,
+        fallbackIndex: entryIndex,
+        presets,
+        hierarchyGroups,
+        hasChildren: presets.length > 0 || hierarchyGroups.length > 0,
+        isOpen: expanded.has(code) || (term && (presetMatch || hierarchyMatch)),
+      });
+    });
+  };
 
   const renderList = () => {
     const term = getSearchTerm();
     const entries = getDynamicCountryEntries();
     list.innerHTML = "";
 
-    entries.forEach(({ code, name, displayName }, entryIndex) => {
-      const presets = state.presetsState[code] || [];
-      const hierarchyGroups = getHierarchyGroupsForCode(code);
-      const countryMatch =
-        !term ||
-        name.toLowerCase().includes(term) ||
-        displayName.toLowerCase().includes(term) ||
-        code.toLowerCase().includes(term);
-      const presetMatch = term
-        ? presets.some((preset) => preset.name.toLowerCase().includes(term))
+    const hasCountryGrouping =
+      Array.isArray(state.countryGroupsData?.continents) &&
+      state.countryGroupsData.continents.length > 0;
+    if (!hasCountryGrouping) {
+      renderFlatCountryList(entries, term);
+      return;
+    }
+
+    const groupedEntries = buildCountryColorTree(entries);
+
+    const entryIndexByCode = new Map(entries.map((entry, entryIndex) => [entry.code, entryIndex]));
+    const fragment = document.createDocumentFragment();
+
+    groupedEntries.forEach((continent) => {
+      const continentMatch = term
+        ? matchesTerm(continent.label, term) || matchesTerm(continent.displayLabel, term)
         : false;
-      const hierarchyMatch = term
-        ? hierarchyGroups.some((group) => group.label.toLowerCase().includes(term))
-        : false;
+      const visibleSubregions = [];
 
-      if (!countryMatch && !presetMatch && !hierarchyMatch) return;
-      if (presetMatch) {
-        expanded.add(code);
-      }
-      if (hierarchyMatch) {
-        expanded.add(code);
-      }
+      continent.subregions.forEach((subregion) => {
+        const subregionMatch = term
+          ? matchesTerm(subregion.label, term) || matchesTerm(subregion.displayLabel, term)
+          : false;
+        const forceVisible = !term || continentMatch || subregionMatch;
+        const visibleCountries = [];
 
-      const row = document.createElement("div");
-      row.className =
-        "flex items-center justify-between gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2";
+        subregion.countries.forEach(({ code, name, displayName }) => {
+          const presets = state.presetsState[code] || [];
+          const hierarchyGroups = getHierarchyGroupsForCode(code);
+          const countryMatch =
+            !term ||
+            matchesTerm(name, term) ||
+            matchesTerm(displayName, term) ||
+            matchesTerm(code, term);
+          const presetMatch = term
+            ? presets.some((preset) => matchesTerm(preset.name, term))
+            : false;
+          const hierarchyMatch = term
+            ? hierarchyGroups.some((group) => matchesTerm(group.label, term))
+            : false;
+          const hasOwnMatch = countryMatch || presetMatch || hierarchyMatch;
 
-      const label = document.createElement("div");
-      label.className = "text-sm font-medium text-slate-700";
-      label.textContent = `${displayName} (${code})`;
+          if (!forceVisible && !hasOwnMatch) return;
 
-      const controls = document.createElement("div");
-      controls.className = "flex items-center gap-2";
+          const hasChildren = presets.length > 0 || hierarchyGroups.length > 0;
+          visibleCountries.push({
+            code,
+            name,
+            displayName,
+            presets,
+            hierarchyGroups,
+            hasChildren,
+            fallbackIndex: entryIndexByCode.get(code) || 0,
+            autoExpandCountry: presetMatch || hierarchyMatch,
+            autoExpandPath: hasOwnMatch,
+          });
+        });
 
-      const input = document.createElement("input");
-      input.type = "color";
-      const fallbackColor = ensureCountryPaletteColor(code, entryIndex);
-      input.value = state.countryBaseColors[code] || state.countryPalette[code] || fallbackColor;
-      input.className =
-        "h-8 w-10 cursor-pointer rounded-md border border-slate-300 bg-white";
-      input.addEventListener("change", (event) => {
-        const value = event.target.value;
-        state.countryPalette[code] = value;
-        applyCountryColor(code, value, render);
+        if (!visibleCountries.length) return;
+        visibleSubregions.push({
+          ...subregion,
+          subregionMatch,
+          forceVisible,
+          countries: visibleCountries,
+          autoExpandPath:
+            forceVisible || visibleCountries.some((countryState) => countryState.autoExpandPath),
+        });
       });
 
-      const hasChildren = presets.length > 0 || hierarchyGroups.length > 0;
-      if (hasChildren) {
-        const toggle = document.createElement("button");
-        toggle.type = "button";
-        toggle.className =
-          "rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-500 hover:bg-slate-100";
-        toggle.textContent = expanded.has(code) ? "v" : ">";
-        toggle.addEventListener("click", () => {
-          if (expanded.has(code)) {
-            expanded.delete(code);
-          } else {
-            expanded.add(code);
+      if (!visibleSubregions.length) return;
+
+      const continentKey = `continent::${continent.id}`;
+      const continentOpen = term
+        ? continentMatch || visibleSubregions.some((subregion) => subregion.autoExpandPath)
+        : expandedContinents.has(continentKey);
+
+      const continentWrapper = document.createElement("div");
+      continentWrapper.className = "space-y-2";
+
+      const continentToggle = document.createElement("button");
+      continentToggle.type = "button";
+      continentToggle.className =
+        "flex w-full items-center justify-between rounded-md border border-slate-200 bg-slate-100 px-3 py-2 text-left hover:bg-slate-200";
+      continentToggle.addEventListener("click", () => {
+        if (expandedContinents.has(continentKey)) {
+          expandedContinents.delete(continentKey);
+        } else {
+          expandedContinents.add(continentKey);
+        }
+        renderList();
+      });
+
+      const continentTitle = document.createElement("div");
+      continentTitle.className = "text-sm font-semibold text-slate-700";
+      continentTitle.textContent = `${continent.displayLabel} (${continent.subregions.reduce((sum, item) => sum + item.countries.length, 0)})`;
+
+      const continentChevron = document.createElement("span");
+      continentChevron.className = "text-xs text-slate-500";
+      continentChevron.textContent = continentOpen ? "v" : ">";
+
+      continentToggle.appendChild(continentTitle);
+      continentToggle.appendChild(continentChevron);
+      continentWrapper.appendChild(continentToggle);
+
+      if (continentOpen) {
+        const continentChildren = document.createElement("div");
+        continentChildren.className = "ml-2 space-y-2";
+
+        visibleSubregions.forEach((subregion) => {
+          const subregionKey = `subregion::${continent.id}::${subregion.id}`;
+          const subregionOpen = term
+            ? subregion.autoExpandPath
+            : expandedSubregions.has(subregionKey);
+
+          const subregionWrapper = document.createElement("div");
+          subregionWrapper.className = "space-y-2";
+
+          const subregionToggle = document.createElement("button");
+          subregionToggle.type = "button";
+          subregionToggle.className =
+            "flex w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-left hover:bg-slate-50";
+          subregionToggle.addEventListener("click", () => {
+            if (expandedSubregions.has(subregionKey)) {
+              expandedSubregions.delete(subregionKey);
+            } else {
+              expandedSubregions.add(subregionKey);
+            }
+            renderList();
+          });
+
+          const subregionTitle = document.createElement("div");
+          subregionTitle.className = "text-xs font-semibold uppercase tracking-wide text-slate-500";
+          subregionTitle.textContent = `${subregion.displayLabel} (${subregion.countries.length})`;
+
+          const subregionChevron = document.createElement("span");
+          subregionChevron.className = "text-xs text-slate-500";
+          subregionChevron.textContent = subregionOpen ? "v" : ">";
+
+          subregionToggle.appendChild(subregionTitle);
+          subregionToggle.appendChild(subregionChevron);
+          subregionWrapper.appendChild(subregionToggle);
+
+          if (subregionOpen) {
+            const subregionChildren = document.createElement("div");
+            subregionChildren.className = "ml-3 space-y-2";
+            subregion.countries.forEach((countryState) => {
+              const isOpen = expanded.has(countryState.code) || (term && countryState.autoExpandCountry);
+              renderCountryRow(subregionChildren, {
+                ...countryState,
+                isOpen,
+              });
+            });
+            subregionWrapper.appendChild(subregionChildren);
           }
-          renderList();
+
+          continentChildren.appendChild(subregionWrapper);
         });
-        controls.appendChild(toggle);
+
+        continentWrapper.appendChild(continentChildren);
       }
 
-      controls.appendChild(input);
-
-      row.appendChild(label);
-      row.appendChild(controls);
-      list.appendChild(row);
-
-      if (expanded.has(code)) {
-        if (hierarchyGroups.length > 0) {
-          const child = document.createElement("div");
-          child.className = "ml-2 space-y-2 pb-2";
-          const header = document.createElement("div");
-          header.className = "px-2 text-[10px] uppercase tracking-wide text-slate-400";
-          header.textContent = t("--- Provinces/Regions ---", "ui");
-          child.appendChild(header);
-          hierarchyGroups.forEach((group) => {
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.className =
-              "w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-left text-xs text-slate-600 hover:bg-slate-100";
-            btn.textContent = group.label;
-            btn.addEventListener("click", () => {
-              applyHierarchyGroup(group, state.selectedColor, render);
-            });
-            child.appendChild(btn);
-          });
-          list.appendChild(child);
-        }
-
-        if (presets.length > 0) {
-          const child = document.createElement("div");
-          child.className = "ml-2 space-y-2 pb-2";
-          const header = document.createElement("div");
-          header.className = "px-2 text-[10px] uppercase tracking-wide text-slate-400";
-          header.textContent = t("--- Presets ---", "ui");
-          child.appendChild(header);
-          presets.forEach((preset, presetIndex) => {
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.className =
-              "w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-left text-xs text-slate-600 hover:bg-slate-100";
-            btn.textContent = `Apply ${preset.name}`;
-            btn.addEventListener("click", () => {
-              applyPreset(code, presetIndex, state.selectedColor, render);
-            });
-            child.appendChild(btn);
-          });
-          list.appendChild(child);
-        }
-      }
+      fragment.appendChild(continentWrapper);
     });
+
+    list.appendChild(fragment);
   };
 
   state.renderCountryListFn = renderList;

@@ -6,24 +6,52 @@ import { initSidebar, initPresetState } from "./ui/sidebar.js";
 import { initToolbar } from "./ui/toolbar.js";
 import { initTranslations } from "./ui/i18n.js";
 
+const COUNTRY_CODE_ALIASES = {
+  UK: "GB",
+  EL: "GR",
+};
+
+function normalizeCountryCode(rawCode) {
+  const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
+  if (!code) return "";
+  return COUNTRY_CODE_ALIASES[code] || code;
+}
+
 function processHierarchyData(data) {
   state.hierarchyData = data || null;
   state.hierarchyGroupsByCode = new Map();
-  if (!state.hierarchyData || !state.hierarchyData.groups) return;
-  const labels = state.hierarchyData.labels || {};
-  Object.entries(state.hierarchyData.groups).forEach(([groupId, children]) => {
-    const code = groupId.split("_")[0];
-    if (!code) return;
-    const list = state.hierarchyGroupsByCode.get(code) || [];
-    list.push({
-      id: groupId,
-      label: labels[groupId] || groupId,
-      children: Array.isArray(children) ? children : [],
+  state.countryGroupsData = state.hierarchyData?.country_groups || null;
+  state.countryGroupMetaByCode = new Map();
+
+  if (state.hierarchyData?.groups) {
+    const labels = state.hierarchyData.labels || {};
+    Object.entries(state.hierarchyData.groups).forEach(([groupId, children]) => {
+      const code = normalizeCountryCode(groupId.split("_")[0]);
+      if (!code) return;
+      const list = state.hierarchyGroupsByCode.get(code) || [];
+      list.push({
+        id: groupId,
+        label: labels[groupId] || groupId,
+        children: Array.isArray(children) ? children : [],
+      });
+      state.hierarchyGroupsByCode.set(code, list);
     });
-    state.hierarchyGroupsByCode.set(code, list);
-  });
+  }
+
   state.hierarchyGroupsByCode.forEach((groups) => {
     groups.sort((a, b) => a.label.localeCompare(b.label));
+  });
+
+  const countryMeta = state.countryGroupsData?.country_meta || {};
+  Object.entries(countryMeta).forEach(([rawCode, meta]) => {
+    const code = normalizeCountryCode(rawCode);
+    if (!code || !meta || typeof meta !== "object") return;
+    state.countryGroupMetaByCode.set(code, {
+      continentId: String(meta.continent_id || "").trim(),
+      continentLabel: String(meta.continent_label || "").trim(),
+      subregionId: String(meta.subregion_id || "").trim(),
+      subregionLabel: String(meta.subregion_label || "").trim(),
+    });
   });
 }
 
@@ -56,6 +84,7 @@ async function bootstrap() {
       geoAliases,
       hierarchy,
       ruCityOverrides,
+      specialZones,
     } = await loadMapData();
     state.topology = topology || topologyPrimary || topologyDetail;
     state.topologyPrimary = topologyPrimary || state.topology;
@@ -64,6 +93,7 @@ async function bootstrap() {
     state.locales = locales || { ui: {}, geo: {} };
     state.geoAliasToStableKey = geoAliases?.alias_to_stable_key || {};
     state.ruCityOverrides = ruCityOverrides || null;
+    state.specialZonesExternalData = specialZones || null;
     processHierarchyData(hierarchy);
 
     if (!state.topologyPrimary) {
@@ -93,7 +123,9 @@ async function bootstrap() {
 
     state.landData = globalThis.topojson.feature(state.topologyPrimary, objects.political);
 
-    if (objects.special_zones) {
+    if (state.specialZonesExternalData?.features) {
+      state.specialZonesData = state.specialZonesExternalData;
+    } else if (objects.special_zones) {
       state.specialZonesData = globalThis.topojson.feature(state.topologyPrimary, objects.special_zones);
     }
     if (objects.rivers) {
