@@ -57,12 +57,12 @@ function resolveDetailLayerEnabled() {
 function resolveDetailSource() {
   const params = getSearchParams();
   if (!params) {
-    return { key: "na_v1", url: DETAIL_SOURCES.na_v1 };
+    return { key: "na_v2", url: DETAIL_SOURCES.na_v2 };
   }
 
   const raw = params.get("detail_source");
   if (!raw) {
-    return { key: "na_v1", url: DETAIL_SOURCES.na_v1 };
+    return { key: "na_v2", url: DETAIL_SOURCES.na_v2 };
   }
 
   const key = String(raw).trim().toLowerCase();
@@ -70,7 +70,7 @@ function resolveDetailSource() {
     console.warn(
       `[data_loader] Ignoring unknown detail_source="${raw}". Allowed values: highres, legacy_bak, na_v1, na_v2.`
     );
-    return { key: "na_v1", url: DETAIL_SOURCES.na_v1 };
+    return { key: "na_v2", url: DETAIL_SOURCES.na_v2 };
   }
 
   return { key, url: DETAIL_SOURCES[key] };
@@ -128,6 +128,10 @@ async function loadDetailTopologyWithFallback({
   const candidates = [];
   if (detailSource?.key && detailSource?.url) {
     candidates.push({ key: detailSource.key, url: detailSource.url });
+  }
+
+  if (detailSource?.key !== "na_v2") {
+    candidates.push({ key: "na_v2", url: DETAIL_SOURCES.na_v2 });
   }
 
   if (detailSource?.key !== "na_v1") {

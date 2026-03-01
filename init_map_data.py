@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import math
+import os
 import sys
 import subprocess
 from pathlib import Path
@@ -1007,7 +1008,41 @@ def main() -> None:
     geo_key_normalizer.main()
 
     print("[INFO] Syncing Translations....")
-    translate_manager.main()
+    translation_result = translate_manager.sync_translations(
+        topology_path=output_dir / "europe_topology.na_v2.json",
+        output_path=output_dir / "locales.json",
+        geo_aliases_path=output_dir / "geo_aliases.json",
+        hierarchy_path=output_dir / "hierarchy.json",
+        machine_translate=False,
+        network_mode="off",
+    )
+    print(
+        "[INFO] Translation sync result: "
+        f"geo_missing_like={translation_result['geo_missing_like']}, "
+        f"todo_markers={translation_result['geo_literal_todo_markers']}, "
+        f"mt_requests={translation_result['mt_requests']}"
+    )
+
+    build_mt_mode = str(os.environ.get("MAPCREATOR_BUILD_MT", "off")).strip().lower()
+    if build_mt_mode in {"auto", "on"}:
+        print(f"[INFO] Running optional machine translation pass (mode={build_mt_mode})....")
+        translation_result = translate_manager.sync_translations(
+            topology_path=output_dir / "europe_topology.na_v2.json",
+            output_path=output_dir / "locales.json",
+            geo_aliases_path=output_dir / "geo_aliases.json",
+            hierarchy_path=output_dir / "hierarchy.json",
+            machine_translate=True,
+            translator_delay_seconds=0.05,
+            max_machine_translations=2500,
+            auto_country_codes="visible-missing",
+            network_mode=build_mt_mode,
+        )
+        print(
+            "[INFO] Optional translation result: "
+            f"geo_missing_like={translation_result['geo_missing_like']}, "
+            f"todo_markers={translation_result['geo_literal_todo_markers']}, "
+            f"mt_requests={translation_result['mt_requests']}"
+        )
 
     print(f"Features with missing CNTR_CODE: {final_hybrid['cntr_code'].isnull().sum()}")
     print("Done.")

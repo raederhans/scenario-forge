@@ -573,7 +573,7 @@ function initSidebar({ render } = {}) {
         btn.type = "button";
         btn.className =
           "w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-left text-xs text-slate-600 hover:bg-slate-100";
-        btn.textContent = group.label;
+        btn.textContent = t(group.label, "geo") || group.label;
         btn.addEventListener("click", () => {
           applyHierarchyGroup(group, state.selectedColor, render);
         });

@@ -4,6 +4,11 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
+try:
+    from tools.translate_manager import has_literal_todo_marker, is_missing_like
+except ImportError:
+    from translate_manager import has_literal_todo_marker, is_missing_like
+
 UI_T_CALL_RE = re.compile(r"""t\(\s*(['\"])(?P<text>.*?)\1\s*,\s*(['\"])ui\3\s*\)""")
 GEO_T_CALL_RE = re.compile(r"""t\(\s*(['\"])(?P<text>.*?)\1\s*,\s*(['\"])geo\3\s*\)""")
 MODAL_CALL_RE = re.compile(r"""\b(?:alert|confirm|prompt)\(\s*(['\"])(?P<text>.*?)\1\s*\)""")
@@ -18,17 +23,6 @@ def decode_js_string(text: str) -> str:
     value = value.replace(r"\'", "'").replace(r'\"', '"')
     value = value.replace(r"\n", " ").replace(r"\r", " ").replace(r"\t", " ")
     return " ".join(value.split())
-
-
-def is_todo_like(text: str, en: str = "") -> bool:
-    value = (text or "").strip()
-    if not value:
-        return True
-    if value.startswith("[TODO]"):
-        return True
-    return bool(en) and value == en
-
-
 def is_user_visible_candidate(value: str) -> bool:
     text = (value or "").strip()
     if len(text) < 3:
@@ -130,7 +124,8 @@ def render_markdown(report: dict) -> str:
     lines.append(f"- Missing UI locale keys: {report['ui_missing_count']}")
     lines.append(f"- Hardcoded visible UI string candidates (not wrapped in t): {report['hardcoded_ui_count']}")
     lines.append(f"- GEO locale keys: {report['geo_locale_count']}")
-    lines.append(f"- GEO TODO-like entries: {report['geo_todo_count']}")
+    lines.append(f"- GEO missing-like entries: {report['geo_missing_like_count']}")
+    lines.append(f"- Literal TODO markers: {report['geo_todo_marker_count']}")
     lines.append(f"- Topology-derived geo names: {report['topology_geo_name_count']}")
     lines.append(f"- Topology names missing in locales.geo: {report['topology_geo_missing_count']}")
     lines.append("")
@@ -204,10 +199,15 @@ def main() -> None:
     ui_used = set(code_strings["ui_t_keys"]) | set(code_strings["modal_keys"])
     ui_missing = sorted(key for key in ui_used if key not in ui_locale_keys)
 
-    geo_todo_count = sum(
+    geo_missing_like_count = sum(
         1
         for key, value in geo_locale.items()
-        if is_todo_like((value or {}).get("zh", ""), (value or {}).get("en", key))
+        if is_missing_like((value or {}).get("zh", ""), (value or {}).get("en", key))
+    )
+    geo_todo_marker_count = sum(
+        1
+        for value in geo_locale.values()
+        if has_literal_todo_marker((value or {}).get("zh", ""))
     )
 
     topology_names = []
@@ -227,7 +227,9 @@ def main() -> None:
         "hardcoded_ui_count": len(code_strings["hardcoded_ui_candidates"]),
         "hardcoded_ui_candidates": code_strings["hardcoded_ui_candidates"],
         "geo_locale_count": len(geo_locale),
-        "geo_todo_count": geo_todo_count,
+        "geo_todo_count": geo_missing_like_count,
+        "geo_missing_like_count": geo_missing_like_count,
+        "geo_todo_marker_count": geo_todo_marker_count,
         "topology_geo_name_count": len(topology_names),
         "topology_geo_missing_count": len(topology_missing),
         "topology_geo_missing": topology_missing,
@@ -243,7 +245,8 @@ def main() -> None:
         "OK: i18n audit complete. "
         f"ui_missing={report['ui_missing_count']}, "
         f"hardcoded_ui={report['hardcoded_ui_count']}, "
-        f"geo_todo={report['geo_todo_count']}"
+        f"geo_missing_like={report['geo_missing_like_count']}, "
+        f"todo_markers={report['geo_todo_marker_count']}"
     )
     print(f"Markdown report: {markdown_out}")
     print(f"JSON report: {json_out}")
