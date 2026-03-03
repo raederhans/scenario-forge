@@ -32,6 +32,10 @@
       "en": "Active Sovereign",
       "zh": "当前主权国"
     },
+    "Ambiguous identity": {
+      "en": "Ambiguous identity",
+      "zh": "身份存在歧义"
+    },
     "Auto-Fill Countries": {
       "en": "Auto-Fill Countries",
       "zh": "自动填充国家"
@@ -47,6 +51,22 @@
     "Borders up to date": {
       "en": "Borders up to date",
       "zh": "边界已更新"
+    },
+    "Brush": {
+      "en": "Brush",
+      "zh": "笔刷"
+    },
+    "Brush Off": {
+      "en": "Brush Off",
+      "zh": "笔刷关闭"
+    },
+    "Brush On": {
+      "en": "Brush On",
+      "zh": "笔刷开启"
+    },
+    "Browse All Colors": {
+      "en": "Browse All Colors",
+      "zh": "浏览全部颜色"
     },
     "By Country": {
       "en": "By Country",
@@ -64,10 +84,6 @@
       "en": "By Subdivision",
       "zh": "按子区域"
     },
-    "Browse All Colors": {
-      "en": "Browse All Colors",
-      "zh": "浏览全部颜色"
-    },
     "Cancel": {
       "en": "Cancel",
       "zh": "取消"
@@ -80,9 +96,21 @@
       "en": "Click map to add vertices, double-click to finish.",
       "zh": "单击地图添加顶点，双击完成。"
     },
+    "Clipboard unavailable": {
+      "en": "Clipboard unavailable",
+      "zh": "Clipboard unavailable"
+    },
+    "Clipboard unavailable. Preset IDs were logged to the console.": {
+      "en": "Clipboard unavailable. Preset IDs were logged to the console.",
+      "zh": "Clipboard unavailable. Preset IDs were logged to the console."
+    },
     "Coastlines": {
       "en": "Coastlines",
       "zh": "海岸线"
+    },
+    "Colonial predecessor": {
+      "en": "Colonial predecessor",
+      "zh": "殖民前身实体"
     },
     "Color Mode": {
       "en": "Color Mode",
@@ -92,13 +120,45 @@
       "en": "Color Palette",
       "zh": "调色板"
     },
+    "Copied": {
+      "en": "Copied",
+      "zh": "Copied"
+    },
     "Copy": {
       "en": "Copy",
       "zh": "复制"
     },
+    "Confirm Clear": {
+      "en": "Confirm Clear",
+      "zh": "确认清空"
+    },
+    "Confirm Delete": {
+      "en": "Confirm Delete",
+      "zh": "确认删除"
+    },
+    "Confirm Reset": {
+      "en": "Confirm Reset",
+      "zh": "确认重置"
+    },
     "Country Colors": {
       "en": "Country Colors",
       "zh": "国家配色"
+    },
+    "Country Groups": {
+      "en": "Country Groups",
+      "zh": "国家分组"
+    },
+    "Country Inspector": {
+      "en": "Country Inspector",
+      "zh": "国家检查器"
+    },
+    "Country Presets": {
+      "en": "Country Presets",
+      "zh": "国家预设"
+    },
+    "Current Color": {
+      "en": "Current Color",
+      "zh": "当前颜色"
     },
     "Current Tool": {
       "en": "Current Tool",
@@ -128,6 +188,10 @@
       "en": "Dynamic borders disabled",
       "zh": "动态边界已禁用"
     },
+    "Dynamic tag": {
+      "en": "Dynamic tag",
+      "zh": "动态 tag"
+    },
     "Edit": {
       "en": "Edit",
       "zh": "编辑"
@@ -144,29 +208,69 @@
       "en": "Eraser",
       "zh": "橡皮擦"
     },
+    "Eraser tool": {
+      "en": "Eraser tool",
+      "zh": "橡皮擦工具"
+    },
+    "Export": {
+      "en": "Export",
+      "zh": "导出"
+    },
     "Export Map": {
       "en": "Export Map",
       "zh": "导出地图"
+    },
+    "Export tools": {
+      "en": "Export tools",
+      "zh": "导出工具"
     },
     "Eyedropper": {
       "en": "Eyedropper",
       "zh": "吸管"
     },
+    "Eyedropper tool": {
+      "en": "Eyedropper tool",
+      "zh": "吸管工具"
+    },
+    "Fictional / alt-history": {
+      "en": "Fictional / alt-history",
+      "zh": "虚构或架空历史"
+    },
     "Fill": {
       "en": "Fill",
       "zh": "填充"
+    },
+    "Fill tool": {
+      "en": "Fill tool",
+      "zh": "填充工具"
+    },
+    "Fit": {
+      "en": "Fit",
+      "zh": "适应"
     },
     "Format": {
       "en": "Format",
       "zh": "格式"
     },
-    "Internal Borders": {
-      "en": "Internal Borders",
-      "zh": "内部边界"
-    },
     "Hide Color Library": {
       "en": "Hide Color Library",
       "zh": "收起颜色库"
+    },
+    "Historical predecessor": {
+      "en": "Historical predecessor",
+      "zh": "历史前身实体"
+    },
+    "Import failed": {
+      "en": "Import failed",
+      "zh": "Import failed"
+    },
+    "Inspector": {
+      "en": "Inspector",
+      "zh": "Inspector"
+    },
+    "Internal Borders": {
+      "en": "Internal Borders",
+      "zh": "内部边界"
     },
     "Invalid project file. Please select a valid map_project.json.": {
       "en": "Invalid project file. Please select a valid map_project.json.",
@@ -184,29 +288,49 @@
       "en": "Map Style",
       "zh": "地图样式"
     },
+    "Map snapshot downloaded.": {
+      "en": "Map snapshot downloaded.",
+      "zh": "Map snapshot downloaded."
+    },
     "Mapped to": {
       "en": "Mapped to",
       "zh": "映射到"
+    },
+    "No countries available": {
+      "en": "No countries available",
+      "zh": "No countries available"
+    },
+    "No country groups": {
+      "en": "No country groups",
+      "zh": "No country groups"
+    },
+    "No country presets": {
+      "en": "No country presets",
+      "zh": "No country presets"
     },
     "No file selected": {
       "en": "No file selected",
       "zh": "未选择文件"
     },
-    "No palette colors match the current search.": {
-      "en": "No palette colors match the current search.",
-      "zh": "没有颜色与当前搜索匹配。"
+    "No presets available.": {
+      "en": "No presets available.",
+      "zh": "当前没有可用预设。"
     },
     "No manual zones": {
       "en": "No manual zones",
       "zh": "无手动区域"
     },
+    "No matching countries": {
+      "en": "No matching countries",
+      "zh": "No matching countries"
+    },
+    "No palette colors match the current search.": {
+      "en": "No palette colors match the current search.",
+      "zh": "没有颜色与当前搜索匹配。"
+    },
     "None selected": {
       "en": "None selected",
       "zh": "未选择"
-    },
-    "Dynamic tag": {
-      "en": "Dynamic tag",
-      "zh": "动态 tag"
     },
     "Normal View": {
       "en": "Normal View",
@@ -232,25 +356,61 @@
       "en": "Paint regions to generate a legend.",
       "zh": "为区域上色以生成图例。"
     },
+    "Panels": {
+      "en": "Panels",
+      "zh": "Panels"
+    },
+    "Preset IDs copied to clipboard.": {
+      "en": "Preset IDs copied to clipboard.",
+      "zh": "Preset IDs copied to clipboard."
+    },
     "Project Management": {
       "en": "Project Management",
       "zh": "项目管理"
+    },
+    "Project file downloaded.": {
+      "en": "Project file downloaded.",
+      "zh": "Project file downloaded."
+    },
+    "Project file loaded successfully.": {
+      "en": "Project file loaded successfully.",
+      "zh": "Project file loaded successfully."
+    },
+    "Project imported": {
+      "en": "Project imported",
+      "zh": "Project imported"
+    },
+    "Project saved": {
+      "en": "Project saved",
+      "zh": "Project saved"
+    },
+    "Quick Colors": {
+      "en": "Quick Colors",
+      "zh": "Quick Colors"
     },
     "Recalculate Borders": {
       "en": "Recalculate Borders",
       "zh": "重算边界"
     },
+    "Redo": {
+      "en": "Redo",
+      "zh": "重做"
+    },
     "Recent": {
       "en": "Recent",
       "zh": "最近使用"
     },
-    "Unmapped": {
-      "en": "Unmapped",
-      "zh": "未映射"
-    },
     "Region": {
       "en": "Region",
       "zh": "区域"
+    },
+    "Reference": {
+      "en": "Reference",
+      "zh": "参考图"
+    },
+    "Reference tools": {
+      "en": "Reference tools",
+      "zh": "参考图工具"
     },
     "Reset Colors": {
       "en": "Reset Colors",
@@ -260,6 +420,10 @@
       "en": "Reset Country Colors",
       "zh": "重置国家配色"
     },
+    "Select a country to edit": {
+      "en": "Select a country to edit",
+      "zh": "选择一个国家开始编辑"
+    },
     "Save": {
       "en": "Save",
       "zh": "保存"
@@ -268,13 +432,13 @@
       "en": "Save or load your map state as a project file.",
       "zh": "将当前地图状态保存或加载为项目文件。"
     },
-    "Search Countries": {
-      "en": "Search Countries",
-      "zh": "搜索国家"
-    },
     "Search Colors": {
       "en": "Search Colors",
       "zh": "搜索颜色"
+    },
+    "Search Countries": {
+      "en": "Search Countries",
+      "zh": "搜索国家"
     },
     "Search countries": {
       "en": "Search countries",
@@ -284,49 +448,49 @@
       "en": "Search country, ISO-2, or source tag...",
       "zh": "搜索国家、ISO-2 或来源 tag..."
     },
+    "Search country or code...": {
+      "en": "Search country or code...",
+      "zh": "搜索国家或代码..."
+    },
     "Search...": {
       "en": "Search...",
       "zh": "搜索..."
-    },
-    "Unsupported runtime country": {
-      "en": "Unsupported runtime country",
-      "zh": "运行时国家未收录"
-    },
-    "Historical predecessor": {
-      "en": "Historical predecessor",
-      "zh": "历史前身实体"
-    },
-    "Colonial predecessor": {
-      "en": "Colonial predecessor",
-      "zh": "殖民前身实体"
-    },
-    "Split state": {
-      "en": "Split state",
-      "zh": "分裂态国家"
-    },
-    "Warlord / regional tag": {
-      "en": "Warlord / regional tag",
-      "zh": "军阀或地区性 tag"
-    },
-    "Fictional / alt-history": {
-      "en": "Fictional / alt-history",
-      "zh": "虚构或架空历史"
-    },
-    "Ambiguous identity": {
-      "en": "Ambiguous identity",
-      "zh": "身份存在歧义"
-    },
-    "Unreviewed": {
-      "en": "Unreviewed",
-      "zh": "未审核"
     },
     "Selected File": {
       "en": "Selected File",
       "zh": "已选文件"
     },
+    "Selected color": {
+      "en": "Selected color",
+      "zh": "Selected color"
+    },
     "Set Active": {
       "en": "Set Active",
       "zh": "设为当前"
+    },
+    "Choose a country above to edit its color, active sovereign state, groups, and presets.": {
+      "en": "Choose a country above to edit its color, active sovereign state, groups, and presets.",
+      "zh": "在上方选择一个国家，以编辑其颜色、当前主权状态、分组和预设。"
+    },
+    "Click a region to start painting, or use Auto-Fill to color all countries": {
+      "en": "Click a region to start painting, or use Auto-Fill to color all countries",
+      "zh": "点击区域开始上色，或使用自动填充为所有国家着色"
+    },
+    "All Presets & Hierarchy": {
+      "en": "All Presets & Hierarchy",
+      "zh": "全部预设与层级"
+    },
+    "Key countries first, then A-Z": {
+      "en": "Key countries first, then A-Z",
+      "zh": "重点国家优先，其余按字母排序"
+    },
+    "Snapshot exported": {
+      "en": "Snapshot exported",
+      "zh": "Snapshot exported"
+    },
+    "Snapshot failed": {
+      "en": "Snapshot failed",
+      "zh": "Snapshot failed"
     },
     "Sovereignty": {
       "en": "Sovereignty",
@@ -336,9 +500,21 @@
       "en": "Special Zones",
       "zh": "特殊区域"
     },
+    "Special Zone Editor": {
+      "en": "Special Zone Editor",
+      "zh": "特殊区域编辑器"
+    },
+    "Split state": {
+      "en": "Split state",
+      "zh": "分裂态国家"
+    },
     "Texture": {
       "en": "Texture",
       "zh": "纹理"
+    },
+    "Unable to export the map snapshot.": {
+      "en": "Unable to export the map snapshot.",
+      "zh": "Unable to export the map snapshot."
     },
     "Unable to read the selected file.": {
       "en": "Unable to read the selected file.",
@@ -348,9 +524,29 @@
       "en": "Unknown Region",
       "zh": "未知区域"
     },
+    "Unmapped": {
+      "en": "Unmapped",
+      "zh": "未映射"
+    },
+    "Unreviewed": {
+      "en": "Unreviewed",
+      "zh": "未审核"
+    },
+    "Unsupported runtime country": {
+      "en": "Unsupported runtime country",
+      "zh": "运行时国家未收录"
+    },
     "Use diagnostics to inspect geometry and artifact behavior.": {
       "en": "Use diagnostics to inspect geometry and artifact behavior.",
       "zh": "使用诊断视图检查几何与异常行为。"
+    },
+    "Undo": {
+      "en": "Undo",
+      "zh": "撤销"
+    },
+    "You have unsaved changes. Loading a project will replace the current map.": {
+      "en": "You have unsaved changes. Loading a project will replace the current map.",
+      "zh": "你有未保存的更改。加载项目会覆盖当前地图。"
     },
     "View": {
       "en": "View",
@@ -360,9 +556,29 @@
       "en": "Visual",
       "zh": "视觉"
     },
+    "Warlord / regional tag": {
+      "en": "Warlord / regional tag",
+      "zh": "军阀或地区性 tag"
+    },
     "Width": {
       "en": "Width",
       "zh": "宽度"
+    },
+    "Zoom": {
+      "en": "Zoom",
+      "zh": "缩放"
+    },
+    "Zoom in": {
+      "en": "Zoom in",
+      "zh": "放大"
+    },
+    "Zoom out": {
+      "en": "Zoom out",
+      "zh": "缩小"
+    },
+    "Zoom percentage": {
+      "en": "Zoom percentage",
+      "zh": "缩放百分比"
     }
   },
   "geo": {
@@ -4858,6 +5074,14 @@
       "en": "Auch (FR)",
       "zh": "奥赫"
     },
+    "Auckland": {
+      "en": "Auckland",
+      "zh": "Auckland"
+    },
+    "Auckland (NZ)": {
+      "en": "Auckland (NZ)",
+      "zh": "Auckland (NZ)"
+    },
     "Augsburg, Kreisfreie Stadt": {
       "en": "Augsburg, Kreisfreie Stadt",
       "zh": "奥格斯堡, 克莱斯自由城"
@@ -4969,6 +5193,14 @@
     "Australia and New Zealand": {
       "en": "Australia and New Zealand",
       "zh": "澳大利亚与新西兰"
+    },
+    "Australian Capital Territory": {
+      "en": "Australian Capital Territory",
+      "zh": "Australian Capital Territory"
+    },
+    "Australian Capital Territory (AU)": {
+      "en": "Australian Capital Territory (AU)",
+      "zh": "Australian Capital Territory (AU)"
     },
     "Austria": {
       "en": "Austria",
@@ -7057,6 +7289,14 @@
     "Bay [Florida]": {
       "en": "Bay [Florida]",
       "zh": "湾"
+    },
+    "Bay of Plenty": {
+      "en": "Bay of Plenty",
+      "zh": "Bay of Plenty"
+    },
+    "Bay of Plenty (NZ)": {
+      "en": "Bay of Plenty (NZ)",
+      "zh": "Bay of Plenty (NZ)"
     },
     "Bay of Quinte": {
       "en": "Bay of Quinte",
@@ -11734,6 +11974,14 @@
       "en": "Cantemir (MD)",
       "zh": "坎特米尔"
     },
+    "Canterbury": {
+      "en": "Canterbury",
+      "zh": "Canterbury"
+    },
+    "Canterbury (NZ)": {
+      "en": "Canterbury (NZ)",
+      "zh": "Canterbury (NZ)"
+    },
     "Cao Bằng": {
       "en": "Cao Bằng",
       "zh": "高平"
@@ -13193,6 +13441,14 @@
     "Chastinsky District (RU)": {
       "en": "Chastinsky District (RU)",
       "zh": "查斯汀斯基区"
+    },
+    "Chatham Islands": {
+      "en": "Chatham Islands",
+      "zh": "Chatham Islands"
+    },
+    "Chatham Islands (NZ)": {
+      "en": "Chatham Islands (NZ)",
+      "zh": "Chatham Islands (NZ)"
     },
     "Chatham-Kent—Leamington": {
       "en": "Chatham-Kent—Leamington",
@@ -24014,6 +24270,14 @@
       "en": "Girona (ES)",
       "zh": "赫罗纳"
     },
+    "Gisborne": {
+      "en": "Gisborne",
+      "zh": "Gisborne"
+    },
+    "Gisborne (NZ)": {
+      "en": "Gisborne (NZ)",
+      "zh": "Gisborne (NZ)"
+    },
     "Gitega": {
       "en": "Gitega",
       "zh": "基特加"
@@ -27134,6 +27398,14 @@
       "en": "Hawalli (KW)",
       "zh": "哈瓦利"
     },
+    "Hawke's Bay": {
+      "en": "Hawke's Bay",
+      "zh": "Hawke's Bay"
+    },
+    "Hawke's Bay (NZ)": {
+      "en": "Hawke's Bay (NZ)",
+      "zh": "Hawke's Bay (NZ)"
+    },
     "Hays": {
       "en": "Hays",
       "zh": "海斯"
@@ -30172,6 +30444,10 @@
     },
     "Indian Ocean Territories": {
       "en": "Indian Ocean Territories",
+      "zh": "印度洋领土"
+    },
+    "Indian Ocean Territories (AU)": {
+      "en": "Indian Ocean Territories (AU)",
       "zh": "印度洋领土"
     },
     "Indian River": {
@@ -44206,6 +44482,14 @@
       "en": "Manatuto (TL)",
       "zh": "马纳图托"
     },
+    "Manawatū-Whanganui": {
+      "en": "Manawatū-Whanganui",
+      "zh": "Manawatū-Whanganui"
+    },
+    "Manawatū-Whanganui (NZ)": {
+      "en": "Manawatū-Whanganui (NZ)",
+      "zh": "Manawatū-Whanganui (NZ)"
+    },
     "Manaxian": {
       "en": "Manaxian",
       "zh": "玛那仙"
@@ -44789,6 +45073,14 @@
     "Marksovsky District (RU)": {
       "en": "Marksovsky District (RU)",
       "zh": "马尔索夫斯基区"
+    },
+    "Marlborough": {
+      "en": "Marlborough",
+      "zh": "Marlborough"
+    },
+    "Marlborough (NZ)": {
+      "en": "Marlborough (NZ)",
+      "zh": "Marlborough (NZ)"
     },
     "Marmande": {
       "en": "Marmande",
@@ -50822,6 +51114,14 @@
       "en": "Nelidovsky District (RU)",
       "zh": "涅利多夫斯基区"
     },
+    "Nelson": {
+      "en": "Nelson",
+      "zh": "Nelson"
+    },
+    "Nelson (NZ)": {
+      "en": "Nelson (NZ)",
+      "zh": "Nelson (NZ)"
+    },
     "Nemansky District": {
       "en": "Nemansky District",
       "zh": "涅曼斯基区"
@@ -51517,6 +51817,14 @@
     "New Mexico Zone 8 [New Mexico]": {
       "en": "New Mexico Zone 8 [New Mexico]",
       "zh": "新墨西哥州 8 区"
+    },
+    "New South Wales": {
+      "en": "New South Wales",
+      "zh": "New South Wales"
+    },
+    "New South Wales (AU)": {
+      "en": "New South Wales (AU)",
+      "zh": "New South Wales (AU)"
     },
     "New Taipei City": {
       "en": "New Taipei City",
@@ -53453,6 +53761,22 @@
     "Northern Samar (PH)": {
       "en": "Northern Samar (PH)",
       "zh": "北萨马岛"
+    },
+    "Northern Territory": {
+      "en": "Northern Territory",
+      "zh": "Northern Territory"
+    },
+    "Northern Territory (AU)": {
+      "en": "Northern Territory (AU)",
+      "zh": "Northern Territory (AU)"
+    },
+    "Northland": {
+      "en": "Northland",
+      "zh": "Northland"
+    },
+    "Northland (NZ)": {
+      "en": "Northland (NZ)",
+      "zh": "Northland (NZ)"
     },
     "Northumberland": {
       "en": "Northumberland",
@@ -56710,6 +57034,14 @@
       "en": "Osun State (NG)",
       "zh": "奥孙州"
     },
+    "Otago": {
+      "en": "Otago",
+      "zh": "Otago"
+    },
+    "Otago (NZ)": {
+      "en": "Otago (NZ)",
+      "zh": "Otago (NZ)"
+    },
     "Otdar Mean Chey": {
       "en": "Otdar Mean Chey",
       "zh": "奥达·明·切伊"
@@ -58318,6 +58650,10 @@
       "en": "Perpignan (FR)",
       "zh": "佩皮尼昂"
     },
+    "Perth": {
+      "en": "Perth",
+      "zh": "Perth"
+    },
     "Perth & Kinross and Stirling": {
       "en": "Perth & Kinross and Stirling",
       "zh": "珀斯、金罗斯和斯特灵"
@@ -58329,6 +58665,14 @@
     "Perth & Kinross and Stirling [Scotland]": {
       "en": "Perth & Kinross and Stirling [Scotland]",
       "zh": "珀斯、金罗斯和斯特灵"
+    },
+    "Perth (AU)": {
+      "en": "Perth (AU)",
+      "zh": "Perth (AU)"
+    },
+    "Perth [Western Australia]": {
+      "en": "Perth [Western Australia]",
+      "zh": "Perth [Western Australia]"
     },
     "Perthshire and Kinross": {
       "en": "Perthshire and Kinross",
@@ -61869,6 +62213,14 @@
     "Queens [New York]": {
       "en": "Queens [New York]",
       "zh": "皇后区"
+    },
+    "Queensland": {
+      "en": "Queensland",
+      "zh": "Queensland"
+    },
+    "Queensland (AU)": {
+      "en": "Queensland (AU)",
+      "zh": "Queensland (AU)"
     },
     "Querétaro Zone 1": {
       "en": "Querétaro Zone 1",
@@ -71618,6 +71970,14 @@
       "en": "South America",
       "zh": "南美洲"
     },
+    "South Australia": {
+      "en": "South Australia",
+      "zh": "South Australia"
+    },
+    "South Australia (AU)": {
+      "en": "South Australia (AU)",
+      "zh": "South Australia (AU)"
+    },
     "South Ayrshire": {
       "en": "South Ayrshire",
       "zh": "南艾尔郡"
@@ -72337,6 +72697,14 @@
     "Southern Region (MW)": {
       "en": "Southern Region (MW)",
       "zh": "南部地区"
+    },
+    "Southland": {
+      "en": "Southland",
+      "zh": "Southland"
+    },
+    "Southland (NZ)": {
+      "en": "Southland (NZ)",
+      "zh": "Southland (NZ)"
     },
     "Southwark": {
       "en": "Southwark",
@@ -74190,6 +74558,18 @@
       "en": "Sydjylland (DK)",
       "zh": "南日德兰半岛"
     },
+    "Sydney": {
+      "en": "Sydney",
+      "zh": "Sydney"
+    },
+    "Sydney (AU)": {
+      "en": "Sydney (AU)",
+      "zh": "Sydney (AU)"
+    },
+    "Sydney [New South Wales]": {
+      "en": "Sydney [New South Wales]",
+      "zh": "Sydney [New South Wales]"
+    },
     "Sydney—Glace Bay": {
       "en": "Sydney—Glace Bay",
       "zh": "悉尼—格莱斯湾"
@@ -75294,6 +75674,14 @@
       "en": "Taraclia (MD)",
       "zh": "混乱"
     },
+    "Taranaki": {
+      "en": "Taranaki",
+      "zh": "Taranaki"
+    },
+    "Taranaki (NZ)": {
+      "en": "Taranaki (NZ)",
+      "zh": "Taranaki (NZ)"
+    },
     "Taranto": {
       "en": "Taranto",
       "zh": "塔兰托"
@@ -75485,6 +75873,22 @@
     "Tashlinsky District (RU)": {
       "en": "Tashlinsky District (RU)",
       "zh": "塔什林斯基区"
+    },
+    "Tasman": {
+      "en": "Tasman",
+      "zh": "Tasman"
+    },
+    "Tasman (NZ)": {
+      "en": "Tasman (NZ)",
+      "zh": "Tasman (NZ)"
+    },
+    "Tasmania": {
+      "en": "Tasmania",
+      "zh": "Tasmania"
+    },
+    "Tasmania (AU)": {
+      "en": "Tasmania (AU)",
+      "zh": "Tasmania (AU)"
     },
     "Tataouine": {
       "en": "Tataouine",
@@ -80830,6 +81234,10 @@
       "en": "Victoria",
       "zh": "维多利亚"
     },
+    "Victoria (AU)": {
+      "en": "Victoria (AU)",
+      "zh": "维多利亚"
+    },
     "Victoria (CA)": {
       "en": "Victoria (CA)",
       "zh": "维多利亚"
@@ -81958,6 +82366,14 @@
       "en": "Wafangdian (CN)",
       "zh": "瓦房店"
     },
+    "Waikato": {
+      "en": "Waikato",
+      "zh": "Waikato"
+    },
+    "Waikato (NZ)": {
+      "en": "Waikato (NZ)",
+      "zh": "Waikato (NZ)"
+    },
     "Wakayama": {
       "en": "Wakayama",
       "zh": "和歌山"
@@ -82790,6 +83206,14 @@
       "en": "Wele-Nzas (GQ)",
       "zh": "韦勒-恩扎斯"
     },
+    "Wellington": {
+      "en": "Wellington",
+      "zh": "Wellington"
+    },
+    "Wellington (NZ)": {
+      "en": "Wellington (NZ)",
+      "zh": "Wellington (NZ)"
+    },
     "Wellington—Halton Hills North": {
       "en": "Wellington—Halton Hills North",
       "zh": "惠灵顿—荷顿山北"
@@ -83016,6 +83440,10 @@
     },
     "West Coast (GM)": {
       "en": "West Coast (GM)",
+      "zh": "西海岸"
+    },
+    "West Coast (NZ)": {
+      "en": "West Coast (NZ)",
       "zh": "西海岸"
     },
     "West Cumbria": {
@@ -83437,6 +83865,14 @@
     "Western Asia": {
       "en": "Western Asia",
       "zh": "西亚"
+    },
+    "Western Australia": {
+      "en": "Western Australia",
+      "zh": "Western Australia"
+    },
+    "Western Australia (AU)": {
+      "en": "Western Australia (AU)",
+      "zh": "Western Australia (AU)"
     },
     "Western Bahr el Ghazal": {
       "en": "Western Bahr el Ghazal",
@@ -91321,6 +91757,50 @@
     "id::AU": {
       "en": "id::AU",
       "zh": "澳大利亚"
+    },
+    "id::AU_ADM1_AUS-2650": {
+      "en": "Northern Territory",
+      "zh": "Northern Territory"
+    },
+    "id::AU_ADM1_AUS-2651": {
+      "en": "Western Australia",
+      "zh": "Western Australia"
+    },
+    "id::AU_ADM1_AUS-2653": {
+      "en": "Australian Capital Territory",
+      "zh": "Australian Capital Territory"
+    },
+    "id::AU_ADM1_AUS-2654": {
+      "en": "New South Wales",
+      "zh": "New South Wales"
+    },
+    "id::AU_ADM1_AUS-2655": {
+      "en": "South Australia",
+      "zh": "South Australia"
+    },
+    "id::AU_ADM1_AUS-2656": {
+      "en": "Victoria",
+      "zh": "维多利亚"
+    },
+    "id::AU_ADM1_AUS-2657": {
+      "en": "Queensland",
+      "zh": "Queensland"
+    },
+    "id::AU_ADM1_AUS-2660": {
+      "en": "Tasmania",
+      "zh": "Tasmania"
+    },
+    "id::AU_CITY_PERTH": {
+      "en": "Perth",
+      "zh": "Perth"
+    },
+    "id::AU_CITY_SYDNEY": {
+      "en": "Sydney",
+      "zh": "Sydney"
+    },
+    "id::AU_REMOTE_INDIAN_OCEAN_TERRITORIES": {
+      "en": "Indian Ocean Territories",
+      "zh": "印度洋领土"
     },
     "id::AU__1": {
       "en": "id::AU__1",
@@ -116181,6 +116661,74 @@
     "id::NZ": {
       "en": "id::NZ",
       "zh": "新西兰"
+    },
+    "id::NZ_ADM1_NZL-3334": {
+      "en": "Manawatū-Whanganui",
+      "zh": "Manawatū-Whanganui"
+    },
+    "id::NZ_ADM1_NZL-3396": {
+      "en": "Gisborne",
+      "zh": "Gisborne"
+    },
+    "id::NZ_ADM1_NZL-3397": {
+      "en": "Hawke's Bay",
+      "zh": "Hawke's Bay"
+    },
+    "id::NZ_ADM1_NZL-3398": {
+      "en": "Auckland",
+      "zh": "Auckland"
+    },
+    "id::NZ_ADM1_NZL-3399": {
+      "en": "Bay of Plenty",
+      "zh": "Bay of Plenty"
+    },
+    "id::NZ_ADM1_NZL-3400": {
+      "en": "Canterbury",
+      "zh": "Canterbury"
+    },
+    "id::NZ_ADM1_NZL-3401": {
+      "en": "Marlborough",
+      "zh": "Marlborough"
+    },
+    "id::NZ_ADM1_NZL-3402": {
+      "en": "Nelson",
+      "zh": "Nelson"
+    },
+    "id::NZ_ADM1_NZL-3403": {
+      "en": "Tasman",
+      "zh": "Tasman"
+    },
+    "id::NZ_ADM1_NZL-3404": {
+      "en": "Northland",
+      "zh": "Northland"
+    },
+    "id::NZ_ADM1_NZL-3405": {
+      "en": "Taranaki",
+      "zh": "Taranaki"
+    },
+    "id::NZ_ADM1_NZL-3406": {
+      "en": "West Coast",
+      "zh": "西海岸"
+    },
+    "id::NZ_ADM1_NZL-3407": {
+      "en": "Otago",
+      "zh": "Otago"
+    },
+    "id::NZ_ADM1_NZL-3408": {
+      "en": "Southland",
+      "zh": "Southland"
+    },
+    "id::NZ_ADM1_NZL-5468": {
+      "en": "Waikato",
+      "zh": "Waikato"
+    },
+    "id::NZ_ADM1_NZL-5469": {
+      "en": "Wellington",
+      "zh": "Wellington"
+    },
+    "id::NZ_ADM1_NZL-5470": {
+      "en": "Chatham Islands",
+      "zh": "Chatham Islands"
     },
     "id::OM": {
       "en": "id::OM",

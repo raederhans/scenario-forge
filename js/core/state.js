@@ -382,6 +382,134 @@ const countryPresets = {
 const PRESET_STORAGE_KEY = "custom_presets";
 
 const defaultZoom = globalThis.d3?.zoomIdentity || { k: 1, x: 0, y: 0 };
+const TEXTURE_MODE_ALIASES = {
+  none: "none",
+  paper: "paper",
+  canvas: "draft_grid",
+  draft_grid: "draft_grid",
+  grid: "graticule",
+  graticule: "graticule",
+};
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function toFiniteNumber(value, fallback) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function normalizeTextureMode(value) {
+  const raw = String(value || "").trim().toLowerCase();
+  return TEXTURE_MODE_ALIASES[raw] || "none";
+}
+
+function createDefaultTextureStyleConfig() {
+  return {
+    mode: "none",
+    opacity: 0.88,
+    sphereClip: true,
+    paper: {
+      assetId: "paper_vintage_01",
+      scale: 1,
+      warmth: 0.62,
+      grain: 0.34,
+      wear: 0.26,
+      vignette: 0.18,
+      blendMode: "multiply",
+    },
+    graticule: {
+      majorStep: 30,
+      minorStep: 15,
+      labelStep: 60,
+      majorWidth: 1.0,
+      minorWidth: 0.55,
+      majorOpacity: 0.24,
+      minorOpacity: 0.10,
+      color: "#64748b",
+      labelColor: "#475569",
+      labelSize: 11,
+    },
+    draftGrid: {
+      majorStep: 24,
+      minorStep: 12,
+      lonOffset: 0,
+      latOffset: 12,
+      roll: -18,
+      width: 0.85,
+      majorOpacity: 0.18,
+      minorOpacity: 0.08,
+      color: "#5c677d",
+      dash: "dashed",
+    },
+  };
+}
+
+function normalizeTextureStyleConfig(rawConfig) {
+  const defaults = createDefaultTextureStyleConfig();
+  const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
+  const rawPaper = raw.paper && typeof raw.paper === "object" ? raw.paper : {};
+  const rawGraticule = raw.graticule && typeof raw.graticule === "object" ? raw.graticule : {};
+  const rawDraftGrid = raw.draftGrid && typeof raw.draftGrid === "object" ? raw.draftGrid : {};
+
+  const majorStep = clamp(Math.round(toFiniteNumber(rawGraticule.majorStep, defaults.graticule.majorStep)), 10, 90);
+  const minorStep = clamp(Math.round(toFiniteNumber(rawGraticule.minorStep, defaults.graticule.minorStep)), 5, majorStep);
+  const draftMajorStep = clamp(
+    Math.round(toFiniteNumber(rawDraftGrid.majorStep, defaults.draftGrid.majorStep)),
+    12,
+    90
+  );
+  const draftMinorStep = clamp(
+    Math.round(toFiniteNumber(rawDraftGrid.minorStep, defaults.draftGrid.minorStep)),
+    4,
+    draftMajorStep
+  );
+  const dash = String(rawDraftGrid.dash || defaults.draftGrid.dash).trim().toLowerCase();
+
+  return {
+    mode: normalizeTextureMode(raw.mode),
+    opacity: clamp(toFiniteNumber(raw.opacity, defaults.opacity), 0, 1),
+    sphereClip: raw.sphereClip === undefined ? defaults.sphereClip : !!raw.sphereClip,
+    paper: {
+      assetId: String(rawPaper.assetId || defaults.paper.assetId).trim() || defaults.paper.assetId,
+      scale: clamp(toFiniteNumber(rawPaper.scale, defaults.paper.scale), 0.55, 2.4),
+      warmth: clamp(toFiniteNumber(rawPaper.warmth, defaults.paper.warmth), 0, 1),
+      grain: clamp(toFiniteNumber(rawPaper.grain, defaults.paper.grain), 0, 1),
+      wear: clamp(toFiniteNumber(rawPaper.wear, defaults.paper.wear), 0, 1),
+      vignette: clamp(toFiniteNumber(rawPaper.vignette, defaults.paper.vignette), 0, 1),
+      blendMode: String(rawPaper.blendMode || defaults.paper.blendMode).trim() || defaults.paper.blendMode,
+    },
+    graticule: {
+      majorStep,
+      minorStep,
+      labelStep: clamp(
+        Math.round(toFiniteNumber(rawGraticule.labelStep, defaults.graticule.labelStep)),
+        majorStep,
+        180
+      ),
+      majorWidth: clamp(toFiniteNumber(rawGraticule.majorWidth, defaults.graticule.majorWidth), 0.2, 4),
+      minorWidth: clamp(toFiniteNumber(rawGraticule.minorWidth, defaults.graticule.minorWidth), 0.1, 3),
+      majorOpacity: clamp(toFiniteNumber(rawGraticule.majorOpacity, defaults.graticule.majorOpacity), 0, 1),
+      minorOpacity: clamp(toFiniteNumber(rawGraticule.minorOpacity, defaults.graticule.minorOpacity), 0, 1),
+      color: String(rawGraticule.color || defaults.graticule.color).trim() || defaults.graticule.color,
+      labelColor: String(rawGraticule.labelColor || defaults.graticule.labelColor).trim() || defaults.graticule.labelColor,
+      labelSize: clamp(Math.round(toFiniteNumber(rawGraticule.labelSize, defaults.graticule.labelSize)), 9, 24),
+    },
+    draftGrid: {
+      majorStep: draftMajorStep,
+      minorStep: draftMinorStep,
+      lonOffset: clamp(toFiniteNumber(rawDraftGrid.lonOffset, defaults.draftGrid.lonOffset), -180, 180),
+      latOffset: clamp(toFiniteNumber(rawDraftGrid.latOffset, defaults.draftGrid.latOffset), -80, 80),
+      roll: clamp(toFiniteNumber(rawDraftGrid.roll, defaults.draftGrid.roll), -180, 180),
+      width: clamp(toFiniteNumber(rawDraftGrid.width, defaults.draftGrid.width), 0.2, 4),
+      majorOpacity: clamp(toFiniteNumber(rawDraftGrid.majorOpacity, defaults.draftGrid.majorOpacity), 0, 1),
+      minorOpacity: clamp(toFiniteNumber(rawDraftGrid.minorOpacity, defaults.draftGrid.minorOpacity), 0, 1),
+      color: String(rawDraftGrid.color || defaults.draftGrid.color).trim() || defaults.draftGrid.color,
+      dash: dash === "solid" || dash === "dotted" ? dash : defaults.draftGrid.dash,
+    },
+  };
+}
 
 export {
   PALETTE_THEMES,
@@ -391,6 +519,9 @@ export {
   countryNames,
   countryPresets,
   PRESET_STORAGE_KEY,
+  createDefaultTextureStyleConfig,
+  normalizeTextureMode,
+  normalizeTextureStyleConfig,
 };
 
 export const state = {
@@ -472,7 +603,15 @@ export const state = {
   currentPaletteTheme: "HOI4 Vanilla",
   colorMode: "political",
   selectedColor: PALETTE_THEMES["HOI4 Vanilla"][0],
+  selectedInspectorCountryCode: "",
+  inspectorExpansionInitialized: false,
+  inspectorHighlightCountryCode: "",
   currentTool: "fill",
+  brushModeEnabled: false,
+  activeDockPopover: "",
+  isDirty: false,
+  dirtyRevision: 0,
+  onboardingDismissed: false,
   hoveredId: null,
   zoomTransform: defaultZoom,
   showUrban: false,
@@ -576,6 +715,7 @@ export const state = {
       strokeWidth: 1.3,
       dashStyle: "dashed",
     },
+    texture: createDefaultTextureStyleConfig(),
   },
   recentColors: [],
   historyPast: [],
@@ -594,6 +734,7 @@ export const state = {
   updateActiveSovereignUIFn: null,
   updateDynamicBorderStatusUIFn: null,
   updateZoomUIFn: null,
+  updateTextureUIFn: null,
   updateParentBorderCountryListFn: null,
   updateSpecialZoneEditorUIFn: null,
   renderCountryListFn: null,
@@ -607,6 +748,7 @@ export const state = {
   editingPresetIds: new Set(),
   customPresets: {},
   presetsState: {},
+  expandedInspectorContinents: new Set(),
   expandedPresetCountries: new Set(),
 
   countryPalette,

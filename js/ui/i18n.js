@@ -29,6 +29,7 @@ function updateUIText() {
     ["lblCurrentTool", "Tools"],
     ["lblHistory", "History"],
     ["lblZoom", "Zoom"],
+    ["lblSpecialZoneEditor", "Special Zone Editor"],
     ["lblQuickPalette", "Quick Colors"],
     ["lblColorLibrary", "Color Library"],
     ["lblPaletteSearch", "Search Colors"],
@@ -38,6 +39,23 @@ function updateUIText() {
     ["lblEditingRules", "Editing Rules"],
     ["lblTexture", "Texture"],
     ["lblOverlay", "Overlay"],
+    ["optTextureNone", "Clean"],
+    ["optTexturePaper", "Old Paper"],
+    ["optTextureDraftGrid", "Draft Grid"],
+    ["optTextureGraticule", "Graticule"],
+    ["lblTextureOpacity", "Opacity"],
+    ["lblTexturePaperScale", "Paper Scale"],
+    ["lblTexturePaperWarmth", "Warmth"],
+    ["lblTexturePaperGrain", "Grain"],
+    ["lblTexturePaperWear", "Wear"],
+    ["lblTextureGraticuleMajorStep", "Major Step"],
+    ["lblTextureGraticuleMinorStep", "Minor Step"],
+    ["lblTextureGraticuleLabelStep", "Label Step"],
+    ["lblTextureDraftMajorStep", "Major Step"],
+    ["lblTextureDraftMinorStep", "Minor Step"],
+    ["lblTextureDraftLonOffset", "Longitude Offset"],
+    ["lblTextureDraftLatOffset", "Latitude Tilt"],
+    ["lblTextureDraftRoll", "Roll"],
     ["lblMapStyle", "Auto-Fill"],
     ["labelMapStyle", "Appearance"],
     ["lblColorMode", "Color Mode"],
@@ -102,11 +120,17 @@ function updateUIText() {
     ["presetClear", "Clear Map"],
     ["zoomResetBtn", "Fit"],
     ["lblCountrySearch", "Search Countries"],
-    ["lblPresetsHierarchy", "Presets & Hierarchy"],
+    ["lblPresetsHierarchy", "All Presets & Hierarchy"],
     ["lblCountryInspector", "Country Inspector"],
     ["lblProjectLegend", "Project & Legend"],
     ["lblDiagnostics", "Diagnostics"],
     ["lblCountryColors", "Country Colors"],
+    ["countryInspectorOrderingHint", "Key countries first, then A-Z"],
+    ["countryInspectorEmptyTitle", "Select a country to edit"],
+    ["countryInspectorEmptyHint", "Choose a country above to edit its color, active sovereign state, groups, and presets."],
+    ["lblCountryInspectorColor", "Current Color"],
+    ["lblCountryInspectorGroups", "Country Groups"],
+    ["lblCountryInspectorPresets", "Country Presets"],
     ["resetCountryColors", "Reset Country Colors"],
     ["lblSpecialZones", "Special Zones"],
     ["lblSpecialZonesDisputedFill", "Disputed Fill"],
@@ -166,7 +190,7 @@ function updateUIText() {
 
   const searchInput = document.getElementById("countrySearch");
   if (searchInput) {
-    searchInput.setAttribute("placeholder", t("Search...", "ui"));
+    searchInput.setAttribute("placeholder", t("Search country or code...", "ui"));
   }
 
   const paletteLibrarySearch = document.getElementById("paletteLibrarySearch");
@@ -190,11 +214,14 @@ function updateUIText() {
     ["toolFillBtn", "Fill tool"],
     ["toolEraserBtn", "Eraser tool"],
     ["toolEyedropperBtn", "Eyedropper tool"],
+    ["brushModeBtn", "Brush"],
     ["undoBtn", "Undo"],
     ["redoBtn", "Redo"],
     ["zoomInBtn", "Zoom in"],
     ["zoomOutBtn", "Zoom out"],
     ["zoomResetBtn", "Fit"],
+    ["dockReferenceBtn", "Reference"],
+    ["dockExportBtn", "Export"],
   ];
   iconButtonLabels.forEach(([id, label]) => {
     const el = document.getElementById(id);
@@ -214,6 +241,43 @@ function updateUIText() {
   if (projectFileName && !projectFileName.textContent.trim()) {
     projectFileName.textContent = t("No file selected", "ui");
   }
+
+  const toolHudChip = document.getElementById("toolHudChip");
+  if (toolHudChip && !toolHudChip.classList.contains("hidden")) {
+    const currentText = toolHudChip.textContent?.trim();
+    if (currentText) {
+      toolHudChip.textContent = t(currentText, "ui");
+    }
+  }
+
+  const onboardingHint = document.getElementById("mapOnboardingHint");
+  if (onboardingHint) {
+    onboardingHint.textContent = t(
+      "Click a region to start painting, or use Auto-Fill to color all countries",
+      "ui"
+    );
+  }
+
+  const referencePopover = document.getElementById("dockReferencePopover");
+  if (referencePopover) {
+    referencePopover.setAttribute("aria-label", t("Reference tools", "ui"));
+  }
+
+  const exportPopover = document.getElementById("dockExportPopover");
+  if (exportPopover) {
+    exportPopover.setAttribute("aria-label", t("Export tools", "ui"));
+  }
+
+  const confirmableButtons = [
+    ["presetClear", "Clear Map"],
+    ["resetCountryColors", "Reset Country Colors"],
+    ["specialZoneDeleteBtn", "Delete Selected"],
+  ];
+  confirmableButtons.forEach(([id, idleLabel]) => {
+    const button = document.getElementById(id);
+    if (!button || button.dataset.confirmState) return;
+    button.textContent = t(idleLabel, "ui");
+  });
 
   const leftPanelToggle = document.getElementById("leftPanelToggle");
   if (leftPanelToggle) {

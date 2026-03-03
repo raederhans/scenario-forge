@@ -12,7 +12,10 @@
         <div class="sidebar-sections">
           <div class="sidebar-header-block">
             <div class="flex items-start justify-between gap-3">
-              <h1 class="app-title">Map Creator</h1>
+              <div class="app-title-row">
+                <h1 class="app-title">Map Creator</h1>
+                <span id="appDirtyIndicator" class="app-dirty-indicator hidden" aria-hidden="true">*</span>
+              </div>
               <button id="btnToggleLang" class="btn-lang">EN / 中文</button>
             </div>
             <p class="body-text mt-2">
@@ -32,387 +35,6 @@
             </div>
           </div>
 
-          <details class="card" open>
-            <summary id="labelMapStyle" class="section-header">Appearance</summary>
-            <div class="space-y-4 mt-4">
-              <div class="space-y-2">
-                <div id="lblOcean" class="section-header">Ocean</div>
-                <div class="flex items-center justify-between gap-3">
-                  <label id="lblOceanFillColor" class="range-label" for="oceanFillColor">Fill Color</label>
-                  <input id="oceanFillColor" type="color" value="#aadaff" class="color-input" />
-                </div>
-                <div>
-                  <div class="range-row">
-                    <label id="lblOceanStyle" class="range-label" for="oceanStyleSelect">Style</label>
-                  </div>
-                  <select id="oceanStyleSelect" class="select-input mt-2">
-                    <option id="optOceanFlat" value="flat" selected>Flat Blue</option>
-                    <option id="optOceanBathymetrySoft" value="bathymetry_soft" disabled>Bathymetry Soft</option>
-                    <option id="optOceanBathymetryContours" value="bathymetry_contours" disabled>Bathymetry Contours</option>
-                    <option id="optOceanWaveHachure" value="wave_hachure" disabled>Wave Hachure</option>
-                  </select>
-                </div>
-                <div>
-                  <div class="range-row">
-                    <label id="lblOceanOpacity" class="range-label" for="oceanTextureOpacity">Opacity</label>
-                    <span id="oceanTextureOpacityValue" class="range-value">72%</span>
-                  </div>
-                  <input id="oceanTextureOpacity" type="range" min="0" max="100" value="72" class="range-input" />
-                </div>
-                <div>
-                  <div class="range-row">
-                    <label id="lblOceanScale" class="range-label" for="oceanTextureScale">Scale</label>
-                    <span id="oceanTextureScaleValue" class="range-value">1.00x</span>
-                  </div>
-                  <input id="oceanTextureScale" type="range" min="60" max="240" step="1" value="100" class="range-input" />
-                </div>
-                <div>
-                  <div class="range-row">
-                    <label id="lblOceanContourStrength" class="range-label" for="oceanContourStrength">Contour Strength</label>
-                    <span id="oceanContourStrengthValue" class="range-value">75%</span>
-                  </div>
-                  <input id="oceanContourStrength" type="range" min="0" max="100" value="75" class="range-input" />
-                </div>
-              </div>
-
-              <div class="space-y-2">
-                <div class="section-header">Internal Borders</div>
-                <div class="flex items-center justify-between gap-3">
-                  <label class="range-label" for="internalBorderColor">Color</label>
-                  <input id="internalBorderColor" type="color" value="#cccccc" class="color-input" />
-                </div>
-                <div>
-                  <div class="range-row">
-                    <label class="range-label" for="internalBorderOpacity">Opacity</label>
-                    <span id="internalBorderOpacityValue" class="range-value">100%</span>
-                  </div>
-                  <input id="internalBorderOpacity" type="range" min="0" max="100" value="100" class="range-input" />
-                </div>
-                <div>
-                  <div class="range-row">
-                    <label class="range-label" for="internalBorderWidth">Width</label>
-                    <span id="internalBorderWidthValue" class="range-value">0.5</span>
-                  </div>
-                  <input id="internalBorderWidth" type="range" min="0.01" max="2.0" step="0.01" value="0.5" class="range-input" />
-                </div>
-              </div>
-
-              <div class="space-y-2">
-                <div class="section-header">Empire Borders</div>
-                <div class="flex items-center justify-between gap-3">
-                  <label class="range-label" for="empireBorderColor">Color</label>
-                  <input id="empireBorderColor" type="color" value="#000000" class="color-input" />
-                </div>
-                <div>
-                  <div class="range-row">
-                    <label class="range-label" for="empireBorderWidth">Width</label>
-                    <span id="empireBorderWidthValue" class="range-value">1.0</span>
-                  </div>
-                  <input id="empireBorderWidth" type="range" min="0.01" max="5.0" step="0.01" value="1.0" class="range-input" />
-                </div>
-              </div>
-
-              <div class="space-y-2">
-                <div class="section-header">Coastlines</div>
-                <div class="flex items-center justify-between gap-3">
-                  <label class="range-label" for="coastlineColor">Color</label>
-                  <input id="coastlineColor" type="color" value="#333333" class="color-input" />
-                </div>
-                <div>
-                  <div class="range-row">
-                    <label class="range-label" for="coastlineWidth">Width</label>
-                    <span id="coastlineWidthValue" class="range-value">1.2</span>
-                  </div>
-                  <input id="coastlineWidth" type="range" min="0.5" max="3.0" step="0.1" value="1.2" class="range-input" />
-                </div>
-              </div>
-
-              <div class="space-y-2">
-                <div id="lblParentBorders" class="section-header">Parent Unit Borders</div>
-                <div class="flex items-center justify-between gap-3">
-                  <label id="lblParentBorderColor" class="range-label" for="parentBorderColor">Color</label>
-                  <input id="parentBorderColor" type="color" value="#4b5563" class="color-input" />
-                </div>
-                <div>
-                  <div class="range-row">
-                    <label id="lblParentBorderOpacity" class="range-label" for="parentBorderOpacity">Opacity</label>
-                    <span id="parentBorderOpacityValue" class="range-value">85%</span>
-                  </div>
-                  <input id="parentBorderOpacity" type="range" min="0" max="100" value="85" class="range-input" />
-                </div>
-                <div>
-                  <div class="range-row">
-                    <label id="lblParentBorderWidth" class="range-label" for="parentBorderWidth">Width</label>
-                    <span id="parentBorderWidthValue" class="range-value">1.10</span>
-                  </div>
-                  <input id="parentBorderWidth" type="range" min="0.2" max="4.0" step="0.05" value="1.10" class="range-input" />
-                </div>
-                <div id="lblParentBorderCountries" class="range-label mt-2">Show Parent Borders By Country</div>
-                <div class="parent-border-actions mt-2">
-                  <button id="parentBorderEnableAll" type="button" class="btn-secondary">Enable All</button>
-                  <button id="parentBorderDisableAll" type="button" class="btn-secondary">Clear All</button>
-                </div>
-                <div id="parentBorderEmpty" class="parent-border-empty mt-2 hidden">
-                  No supported countries in current dataset.
-                </div>
-                <div id="parentBorderCountryList" class="parent-border-country-list mt-2"></div>
-              </div>
-
-              <div class="space-y-2">
-                <div id="lblContextLayers" class="section-header">Context Layers</div>
-                <label class="toggle-label mt-2">
-                  <input id="togglePhysical" type="checkbox" class="checkbox-input" />
-                  <span id="lblPhysicalLayer">Physical Regions</span>
-                </label>
-                <div class="ml-5 space-y-2">
-                  <div class="flex items-center justify-between gap-3">
-                    <label id="lblPhysicalPreset" class="range-label" for="physicalPreset">Preset</label>
-                    <select id="physicalPreset" class="select-input">
-                      <option id="optPhysicalAtlasSoft" value="atlas_soft" selected>Atlas Soft</option>
-                      <option id="optPhysicalContourOnly" value="contour_only">Contour Only</option>
-                      <option id="optPhysicalTintOnly" value="tint_only">Tint Only</option>
-                    </select>
-                  </div>
-                  <div class="flex items-center justify-between gap-3">
-                    <label id="lblPhysicalTintColor" class="range-label" for="physicalTintColor">Tint Color</label>
-                    <input id="physicalTintColor" type="color" value="#8f6b4e" class="color-input" />
-                  </div>
-                  <div>
-                    <div class="range-row">
-                      <label id="lblPhysicalOpacity" class="range-label" for="physicalOpacity">Opacity</label>
-                      <span id="physicalOpacityValue" class="range-value">24%</span>
-                    </div>
-                    <input id="physicalOpacity" type="range" min="0" max="100" value="24" class="range-input" />
-                  </div>
-                  <div class="flex items-center justify-between gap-3">
-                    <label id="lblPhysicalContourColor" class="range-label" for="physicalContourColor">Contour Color</label>
-                    <input id="physicalContourColor" type="color" value="#6f4e37" class="color-input" />
-                  </div>
-                  <div>
-                    <div class="range-row">
-                      <label id="lblPhysicalContourOpacity" class="range-label" for="physicalContourOpacity">Contour Opacity</label>
-                      <span id="physicalContourOpacityValue" class="range-value">30%</span>
-                    </div>
-                    <input id="physicalContourOpacity" type="range" min="0" max="100" value="30" class="range-input" />
-                  </div>
-                  <div>
-                    <div class="range-row">
-                      <label id="lblPhysicalContourWidth" class="range-label" for="physicalContourWidth">Contour Width</label>
-                      <span id="physicalContourWidthValue" class="range-value">0.70</span>
-                    </div>
-                    <input id="physicalContourWidth" type="range" min="0.2" max="2.5" step="0.05" value="0.70" class="range-input" />
-                  </div>
-                  <div>
-                    <div class="range-row">
-                      <label id="lblPhysicalContourSpacing" class="range-label" for="physicalContourSpacing">Contour Spacing</label>
-                      <span id="physicalContourSpacingValue" class="range-value">18</span>
-                    </div>
-                    <input id="physicalContourSpacing" type="range" min="8" max="36" step="1" value="18" class="range-input" />
-                  </div>
-                  <div>
-                    <div class="range-row">
-                      <label id="lblPhysicalBlendMode" class="range-label" for="physicalBlendMode">Blend Mode</label>
-                    </div>
-                    <select id="physicalBlendMode" class="select-input mt-2">
-                      <option value="multiply" selected>Multiply</option>
-                      <option value="soft-light">Soft Light</option>
-                      <option value="overlay">Overlay</option>
-                      <option value="source-over">Normal</option>
-                    </select>
-                  </div>
-                </div>
-
-                <label class="toggle-label mt-2">
-                  <input id="toggleUrban" type="checkbox" class="checkbox-input" />
-                  <span id="lblUrbanLayer">Urban Areas</span>
-                </label>
-                <div class="ml-5 space-y-2">
-                  <div class="flex items-center justify-between gap-3">
-                    <label id="lblUrbanColor" class="range-label" for="urbanColor">Color</label>
-                    <input id="urbanColor" type="color" value="#4b5563" class="color-input" />
-                  </div>
-                  <div>
-                    <div class="range-row">
-                      <label id="lblUrbanOpacity" class="range-label" for="urbanOpacity">Opacity</label>
-                      <span id="urbanOpacityValue" class="range-value">22%</span>
-                    </div>
-                    <input id="urbanOpacity" type="range" min="0" max="100" value="22" class="range-input" />
-                  </div>
-                  <div>
-                    <div class="range-row">
-                      <label id="lblUrbanBlendMode" class="range-label" for="urbanBlendMode">Blend Mode</label>
-                    </div>
-                    <select id="urbanBlendMode" class="select-input mt-2">
-                      <option value="multiply" selected>Multiply</option>
-                      <option value="source-over">Normal</option>
-                      <option value="overlay">Overlay</option>
-                    </select>
-                  </div>
-                  <div>
-                    <div class="range-row">
-                      <label id="lblUrbanMinArea" class="range-label" for="urbanMinArea">Min Area (px)</label>
-                      <span id="urbanMinAreaValue" class="range-value">8</span>
-                    </div>
-                    <input id="urbanMinArea" type="range" min="0" max="80" value="8" class="range-input" />
-                  </div>
-                </div>
-
-                <label class="toggle-label mt-2">
-                  <input id="toggleRivers" type="checkbox" class="checkbox-input" checked />
-                  <span id="lblRiversLayer">Rivers</span>
-                </label>
-                <div class="ml-5 space-y-2">
-                  <div class="flex items-center justify-between gap-3">
-                    <label id="lblRiversColor" class="range-label" for="riversColor">Color</label>
-                    <input id="riversColor" type="color" value="#3b82f6" class="color-input" />
-                  </div>
-                  <div>
-                    <div class="range-row">
-                      <label id="lblRiversOpacity" class="range-label" for="riversOpacity">Opacity</label>
-                      <span id="riversOpacityValue" class="range-value">88%</span>
-                    </div>
-                    <input id="riversOpacity" type="range" min="0" max="100" value="88" class="range-input" />
-                  </div>
-                  <div>
-                    <div class="range-row">
-                      <label id="lblRiversWidth" class="range-label" for="riversWidth">Width</label>
-                      <span id="riversWidthValue" class="range-value">0.50</span>
-                    </div>
-                    <input id="riversWidth" type="range" min="0.2" max="4.0" step="0.05" value="0.50" class="range-input" />
-                  </div>
-                  <div class="flex items-center justify-between gap-3">
-                    <label id="lblRiversOutlineColor" class="range-label" for="riversOutlineColor">Outline Color</label>
-                    <input id="riversOutlineColor" type="color" value="#e2efff" class="color-input" />
-                  </div>
-                  <div>
-                    <div class="range-row">
-                      <label id="lblRiversOutlineWidth" class="range-label" for="riversOutlineWidth">Outline Width</label>
-                      <span id="riversOutlineWidthValue" class="range-value">0.25</span>
-                    </div>
-                    <input id="riversOutlineWidth" type="range" min="0.0" max="3.0" step="0.05" value="0.25" class="range-input" />
-                  </div>
-                  <div>
-                    <div class="range-row">
-                      <label id="lblRiversDashStyle" class="range-label" for="riversDashStyle">Dash</label>
-                    </div>
-                    <select id="riversDashStyle" class="select-input mt-2">
-                      <option value="solid" selected>Solid</option>
-                      <option value="dashed">Dashed</option>
-                      <option value="dotted">Dotted</option>
-                    </select>
-                  </div>
-                </div>
-
-                <label class="toggle-label mt-2">
-                  <input id="toggleSpecialZones" type="checkbox" class="checkbox-input" />
-                  <span id="lblSpecialZones">Special Zones</span>
-                </label>
-                <div class="ml-5 space-y-2">
-                  <div class="flex items-center justify-between gap-3">
-                    <label id="lblSpecialZonesDisputedFill" class="range-label" for="specialZonesDisputedFill">Disputed Fill</label>
-                    <input id="specialZonesDisputedFill" type="color" value="#f97316" class="color-input" />
-                  </div>
-                  <div class="flex items-center justify-between gap-3">
-                    <label id="lblSpecialZonesDisputedStroke" class="range-label" for="specialZonesDisputedStroke">Disputed Stroke</label>
-                    <input id="specialZonesDisputedStroke" type="color" value="#ea580c" class="color-input" />
-                  </div>
-                  <div class="flex items-center justify-between gap-3">
-                    <label id="lblSpecialZonesWastelandFill" class="range-label" for="specialZonesWastelandFill">Wasteland Fill</label>
-                    <input id="specialZonesWastelandFill" type="color" value="#dc2626" class="color-input" />
-                  </div>
-                  <div class="flex items-center justify-between gap-3">
-                    <label id="lblSpecialZonesWastelandStroke" class="range-label" for="specialZonesWastelandStroke">Wasteland Stroke</label>
-                    <input id="specialZonesWastelandStroke" type="color" value="#b91c1c" class="color-input" />
-                  </div>
-                  <div class="flex items-center justify-between gap-3">
-                    <label id="lblSpecialZonesCustomFill" class="range-label" for="specialZonesCustomFill">Custom Fill</label>
-                    <input id="specialZonesCustomFill" type="color" value="#8b5cf6" class="color-input" />
-                  </div>
-                  <div class="flex items-center justify-between gap-3">
-                    <label id="lblSpecialZonesCustomStroke" class="range-label" for="specialZonesCustomStroke">Custom Stroke</label>
-                    <input id="specialZonesCustomStroke" type="color" value="#6d28d9" class="color-input" />
-                  </div>
-                  <div>
-                    <div class="range-row">
-                      <label id="lblSpecialZonesOpacity" class="range-label" for="specialZonesOpacity">Opacity</label>
-                      <span id="specialZonesOpacityValue" class="range-value">32%</span>
-                    </div>
-                    <input id="specialZonesOpacity" type="range" min="0" max="100" value="32" class="range-input" />
-                  </div>
-                  <div>
-                    <div class="range-row">
-                      <label id="lblSpecialZonesStrokeWidth" class="range-label" for="specialZonesStrokeWidth">Stroke Width</label>
-                      <span id="specialZonesStrokeWidthValue" class="range-value">1.30</span>
-                    </div>
-                    <input id="specialZonesStrokeWidth" type="range" min="0.4" max="4.0" step="0.05" value="1.30" class="range-input" />
-                  </div>
-                  <div>
-                    <div class="range-row">
-                      <label id="lblSpecialZonesDashStyle" class="range-label" for="specialZonesDashStyle">Dash</label>
-                    </div>
-                    <select id="specialZonesDashStyle" class="select-input mt-2">
-                      <option value="solid">Solid</option>
-                      <option value="dashed" selected>Dashed</option>
-                      <option value="dotted">Dotted</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div class="space-y-2">
-                <div id="lblSpecialZoneEditor" class="section-header">Special Zone Editor</div>
-                <div class="flex items-center justify-between gap-3">
-                  <label id="lblSpecialZoneType" class="range-label" for="specialZoneTypeSelect">Type</label>
-                  <select id="specialZoneTypeSelect" class="select-input">
-                    <option value="disputed">Disputed</option>
-                    <option value="wasteland">Wasteland</option>
-                    <option value="custom" selected>Custom</option>
-                  </select>
-                </div>
-                <div>
-                  <label id="lblSpecialZoneLabel" class="range-label" for="specialZoneLabelInput">Label</label>
-                  <input id="specialZoneLabelInput" type="text" class="input mt-2" placeholder="e.g. Buffer Zone A" />
-                </div>
-                <div class="parent-border-actions mt-2">
-                  <button id="specialZoneStartBtn" type="button" class="btn-secondary">Start Draw</button>
-                  <button id="specialZoneUndoBtn" type="button" class="btn-secondary">Undo Vertex</button>
-                </div>
-                <div class="parent-border-actions mt-2">
-                  <button id="specialZoneFinishBtn" type="button" class="btn-secondary">Finish</button>
-                  <button id="specialZoneCancelBtn" type="button" class="btn-secondary">Cancel</button>
-                </div>
-                <div>
-                  <label id="lblSpecialZoneList" class="range-label" for="specialZoneFeatureList">Manual Zones</label>
-                  <select id="specialZoneFeatureList" class="select-input mt-2"></select>
-                </div>
-                <button id="specialZoneDeleteBtn" type="button" class="btn-secondary mt-2">Delete Selected</button>
-                <div id="specialZoneEditorHint" class="parent-border-empty mt-2">
-                  Click map to add vertices, double-click to finish.
-                </div>
-              </div>
-
-              <div class="space-y-2">
-                <div class="flex items-center justify-between">
-                  <div id="lblTexture" class="section-header">Texture</div>
-                  <div class="relative info-trigger">
-                    <svg class="info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                      <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                    </svg>
-                    <div class="info-tooltip" style="width: 220px;">Apply a subtle overlay texture for a vintage map feel.</div>
-                  </div>
-                </div>
-                <label id="lblOverlay" class="section-header-block mt-2" for="textureSelect">Overlay</label>
-                <select id="textureSelect" class="select-input mt-2">
-                  <option value="none">Clean (None)</option>
-                  <option value="paper" selected>Old Paper</option>
-                  <option value="canvas">Canvas</option>
-                  <option value="grid">Grid</option>
-                </select>
-              </div>
-            </div>
-          </details>
-
           <div class="card">
             <div id="lblEditingRules" class="section-header">Editing Rules</div>
             <label id="lblPaintGranularity" class="section-header-block mt-3" for="paintGranularitySelect">Paint Granularity</label>
@@ -431,59 +53,525 @@
             <div id="dynamicBorderStatus" class="body-text mt-2">Borders up to date</div>
           </div>
 
-          <div class="card">
-            <div id="lblReferenceImage" class="section-header">Reference Image</div>
-            <input id="referenceImageInput" type="file" accept="image/*" class="file-input mt-3" />
+          <details class="card">
+            <summary id="lblSpecialZoneEditor" class="section-header">Special Zone Editor</summary>
             <div class="space-y-3 mt-4">
-              <div>
-                <div class="range-row">
-                  <label class="range-label" for="referenceOpacity">Opacity</label>
-                  <span id="referenceOpacityValue" class="range-value">60%</span>
-                </div>
-                <input id="referenceOpacity" type="range" min="0" max="100" value="60" class="range-input" />
+              <div class="flex items-center justify-between gap-3">
+                <label id="lblSpecialZoneType" class="range-label" for="specialZoneTypeSelect">Type</label>
+                <select id="specialZoneTypeSelect" class="select-input">
+                  <option value="disputed">Disputed</option>
+                  <option value="wasteland">Wasteland</option>
+                  <option value="custom" selected>Custom</option>
+                </select>
               </div>
               <div>
-                <div class="range-row">
-                  <label class="range-label" for="referenceScale">Scale</label>
-                  <span id="referenceScaleValue" class="range-value">1.00×</span>
-                </div>
-                <input id="referenceScale" type="range" min="0.2" max="3.0" step="0.01" value="1.00" class="range-input" />
+                <label id="lblSpecialZoneLabel" class="range-label" for="specialZoneLabelInput">Label</label>
+                <input id="specialZoneLabelInput" type="text" class="input mt-2" placeholder="e.g. Buffer Zone A" />
+              </div>
+              <div class="parent-border-actions mt-2">
+                <button id="specialZoneStartBtn" type="button" class="btn-secondary">Start Draw</button>
+                <button id="specialZoneUndoBtn" type="button" class="btn-secondary">Undo Vertex</button>
+              </div>
+              <div class="parent-border-actions mt-2">
+                <button id="specialZoneFinishBtn" type="button" class="btn-secondary">Finish</button>
+                <button id="specialZoneCancelBtn" type="button" class="btn-secondary">Cancel</button>
               </div>
               <div>
-                <div class="range-row">
-                  <label class="range-label" for="referenceOffsetX">Offset X</label>
-                  <span id="referenceOffsetXValue" class="range-value">0px</span>
-                </div>
-                <input id="referenceOffsetX" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
+                <label id="lblSpecialZoneList" class="range-label" for="specialZoneFeatureList">Manual Zones</label>
+                <select id="specialZoneFeatureList" class="select-input mt-2"></select>
               </div>
-              <div>
-                <div class="range-row">
-                  <label class="range-label" for="referenceOffsetY">Offset Y</label>
-                  <span id="referenceOffsetYValue" class="range-value">0px</span>
-                </div>
-                <input id="referenceOffsetY" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
+              <button id="specialZoneDeleteBtn" type="button" class="btn-secondary mt-2">Delete Selected</button>
+              <div id="specialZoneEditorHint" class="parent-border-empty mt-2">
+                Click map to add vertices, double-click to finish.
               </div>
             </div>
-          </div>
+          </details>
 
-          <div class="card">
-            <div class="flex items-center justify-between">
-              <div id="lblExport" class="section-header">Export Map</div>
-              <div class="relative info-trigger">
-                <svg class="info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                </svg>
-                <div class="info-tooltip">Export the visible map as a PNG or JPG snapshot.</div>
-              </div>
+          <details class="card" open>
+            <summary id="labelMapStyle" class="section-header">Appearance</summary>
+            <div class="appearance-stack mt-4">
+              <details class="card-flat appearance-subsection">
+                <summary id="lblOcean" class="section-header">Ocean</summary>
+                <div class="space-y-3 mt-3">
+                  <div class="flex items-center justify-between gap-3">
+                    <label id="lblOceanFillColor" class="range-label" for="oceanFillColor">Fill Color</label>
+                    <input id="oceanFillColor" type="color" value="#aadaff" class="color-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblOceanStyle" class="range-label" for="oceanStyleSelect">Style</label>
+                    </div>
+                    <select id="oceanStyleSelect" class="select-input mt-2">
+                      <option id="optOceanFlat" value="flat" selected>Flat Blue</option>
+                      <option id="optOceanBathymetrySoft" value="bathymetry_soft" disabled>Bathymetry Soft</option>
+                      <option id="optOceanBathymetryContours" value="bathymetry_contours" disabled>Bathymetry Contours</option>
+                      <option id="optOceanWaveHachure" value="wave_hachure" disabled>Wave Hachure</option>
+                    </select>
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblOceanOpacity" class="range-label" for="oceanTextureOpacity">Opacity</label>
+                      <span id="oceanTextureOpacityValue" class="range-value">72%</span>
+                    </div>
+                    <input id="oceanTextureOpacity" type="range" min="0" max="100" value="72" class="range-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblOceanScale" class="range-label" for="oceanTextureScale">Scale</label>
+                      <span id="oceanTextureScaleValue" class="range-value">1.00x</span>
+                    </div>
+                    <input id="oceanTextureScale" type="range" min="60" max="240" step="1" value="100" class="range-input" />
+                  </div>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblOceanContourStrength" class="range-label" for="oceanContourStrength">Contour Strength</label>
+                      <span id="oceanContourStrengthValue" class="range-value">75%</span>
+                    </div>
+                    <input id="oceanContourStrength" type="range" min="0" max="100" value="75" class="range-input" />
+                  </div>
+                </div>
+              </details>
+
+              <details class="card-flat appearance-subsection">
+                <summary class="section-header">Borders</summary>
+                <div class="appearance-subsection-stack mt-3">
+                  <details class="appearance-mini-section">
+                    <summary class="section-header">Internal Borders</summary>
+                    <div class="space-y-3 mt-3">
+                      <div class="flex items-center justify-between gap-3">
+                        <label class="range-label" for="internalBorderColor">Color</label>
+                        <input id="internalBorderColor" type="color" value="#cccccc" class="color-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label class="range-label" for="internalBorderOpacity">Opacity</label>
+                          <span id="internalBorderOpacityValue" class="range-value">100%</span>
+                        </div>
+                        <input id="internalBorderOpacity" type="range" min="0" max="100" value="100" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label class="range-label" for="internalBorderWidth">Width</label>
+                          <span id="internalBorderWidthValue" class="range-value">0.5</span>
+                        </div>
+                        <input id="internalBorderWidth" type="range" min="0.01" max="2.0" step="0.01" value="0.5" class="range-input" />
+                      </div>
+                    </div>
+                  </details>
+
+                  <details class="appearance-mini-section">
+                    <summary class="section-header">Empire Borders</summary>
+                    <div class="space-y-3 mt-3">
+                      <div class="flex items-center justify-between gap-3">
+                        <label class="range-label" for="empireBorderColor">Color</label>
+                        <input id="empireBorderColor" type="color" value="#000000" class="color-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label class="range-label" for="empireBorderWidth">Width</label>
+                          <span id="empireBorderWidthValue" class="range-value">1.0</span>
+                        </div>
+                        <input id="empireBorderWidth" type="range" min="0.01" max="5.0" step="0.01" value="1.0" class="range-input" />
+                      </div>
+                    </div>
+                  </details>
+
+                  <details class="appearance-mini-section">
+                    <summary class="section-header">Coastlines</summary>
+                    <div class="space-y-3 mt-3">
+                      <div class="flex items-center justify-between gap-3">
+                        <label class="range-label" for="coastlineColor">Color</label>
+                        <input id="coastlineColor" type="color" value="#333333" class="color-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label class="range-label" for="coastlineWidth">Width</label>
+                          <span id="coastlineWidthValue" class="range-value">1.2</span>
+                        </div>
+                        <input id="coastlineWidth" type="range" min="0.5" max="3.0" step="0.1" value="1.2" class="range-input" />
+                      </div>
+                    </div>
+                  </details>
+
+                  <details class="appearance-mini-section">
+                    <summary id="lblParentBorders" class="section-header">Parent Unit Borders</summary>
+                    <div class="space-y-3 mt-3">
+                      <div class="flex items-center justify-between gap-3">
+                        <label id="lblParentBorderColor" class="range-label" for="parentBorderColor">Color</label>
+                        <input id="parentBorderColor" type="color" value="#4b5563" class="color-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblParentBorderOpacity" class="range-label" for="parentBorderOpacity">Opacity</label>
+                          <span id="parentBorderOpacityValue" class="range-value">85%</span>
+                        </div>
+                        <input id="parentBorderOpacity" type="range" min="0" max="100" value="85" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblParentBorderWidth" class="range-label" for="parentBorderWidth">Width</label>
+                          <span id="parentBorderWidthValue" class="range-value">1.10</span>
+                        </div>
+                        <input id="parentBorderWidth" type="range" min="0.2" max="4.0" step="0.05" value="1.10" class="range-input" />
+                      </div>
+                      <div id="lblParentBorderCountries" class="range-label mt-2">Show Parent Borders By Country</div>
+                      <div class="parent-border-actions mt-2">
+                        <button id="parentBorderEnableAll" type="button" class="btn-secondary">Enable All</button>
+                        <button id="parentBorderDisableAll" type="button" class="btn-secondary">Clear All</button>
+                      </div>
+                      <div id="parentBorderEmpty" class="parent-border-empty mt-2 hidden">
+                        No supported countries in current dataset.
+                      </div>
+                      <div id="parentBorderCountryList" class="parent-border-country-list mt-2"></div>
+                    </div>
+                  </details>
+                </div>
+              </details>
+
+              <details class="card-flat appearance-subsection">
+                <summary id="lblContextLayers" class="section-header">Context Layers</summary>
+                <div class="appearance-subsection-stack mt-3">
+                  <details class="appearance-mini-section">
+                    <summary class="section-header">Physical Regions</summary>
+                    <div class="mt-3">
+                      <label class="toggle-label mt-2">
+                        <input id="togglePhysical" type="checkbox" class="checkbox-input" />
+                        <span id="lblPhysicalLayer">Physical Regions</span>
+                      </label>
+                      <div class="ml-5 space-y-2">
+                        <div class="flex items-center justify-between gap-3">
+                          <label id="lblPhysicalPreset" class="range-label" for="physicalPreset">Preset</label>
+                          <select id="physicalPreset" class="select-input">
+                            <option id="optPhysicalAtlasSoft" value="atlas_soft" selected>Atlas Soft</option>
+                            <option id="optPhysicalContourOnly" value="contour_only">Contour Only</option>
+                            <option id="optPhysicalTintOnly" value="tint_only">Tint Only</option>
+                          </select>
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                          <label id="lblPhysicalTintColor" class="range-label" for="physicalTintColor">Tint Color</label>
+                          <input id="physicalTintColor" type="color" value="#8f6b4e" class="color-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblPhysicalOpacity" class="range-label" for="physicalOpacity">Opacity</label>
+                            <span id="physicalOpacityValue" class="range-value">24%</span>
+                          </div>
+                          <input id="physicalOpacity" type="range" min="0" max="100" value="24" class="range-input" />
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                          <label id="lblPhysicalContourColor" class="range-label" for="physicalContourColor">Contour Color</label>
+                          <input id="physicalContourColor" type="color" value="#6f4e37" class="color-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblPhysicalContourOpacity" class="range-label" for="physicalContourOpacity">Contour Opacity</label>
+                            <span id="physicalContourOpacityValue" class="range-value">30%</span>
+                          </div>
+                          <input id="physicalContourOpacity" type="range" min="0" max="100" value="30" class="range-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblPhysicalContourWidth" class="range-label" for="physicalContourWidth">Contour Width</label>
+                            <span id="physicalContourWidthValue" class="range-value">0.70</span>
+                          </div>
+                          <input id="physicalContourWidth" type="range" min="0.2" max="2.5" step="0.05" value="0.70" class="range-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblPhysicalContourSpacing" class="range-label" for="physicalContourSpacing">Contour Spacing</label>
+                            <span id="physicalContourSpacingValue" class="range-value">18</span>
+                          </div>
+                          <input id="physicalContourSpacing" type="range" min="8" max="36" step="1" value="18" class="range-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblPhysicalBlendMode" class="range-label" for="physicalBlendMode">Blend Mode</label>
+                          </div>
+                          <select id="physicalBlendMode" class="select-input mt-2">
+                            <option value="multiply" selected>Multiply</option>
+                            <option value="soft-light">Soft Light</option>
+                            <option value="overlay">Overlay</option>
+                            <option value="source-over">Normal</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </details>
+
+                  <details class="appearance-mini-section">
+                    <summary class="section-header">Urban Areas</summary>
+                    <div class="mt-3">
+                      <label class="toggle-label mt-2">
+                        <input id="toggleUrban" type="checkbox" class="checkbox-input" />
+                        <span id="lblUrbanLayer">Urban Areas</span>
+                      </label>
+                      <div class="ml-5 space-y-2">
+                        <div class="flex items-center justify-between gap-3">
+                          <label id="lblUrbanColor" class="range-label" for="urbanColor">Color</label>
+                          <input id="urbanColor" type="color" value="#4b5563" class="color-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblUrbanOpacity" class="range-label" for="urbanOpacity">Opacity</label>
+                            <span id="urbanOpacityValue" class="range-value">22%</span>
+                          </div>
+                          <input id="urbanOpacity" type="range" min="0" max="100" value="22" class="range-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblUrbanBlendMode" class="range-label" for="urbanBlendMode">Blend Mode</label>
+                          </div>
+                          <select id="urbanBlendMode" class="select-input mt-2">
+                            <option value="multiply" selected>Multiply</option>
+                            <option value="source-over">Normal</option>
+                            <option value="overlay">Overlay</option>
+                          </select>
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblUrbanMinArea" class="range-label" for="urbanMinArea">Min Area (px)</label>
+                            <span id="urbanMinAreaValue" class="range-value">8</span>
+                          </div>
+                          <input id="urbanMinArea" type="range" min="0" max="80" value="8" class="range-input" />
+                        </div>
+                      </div>
+                    </div>
+                  </details>
+
+                  <details class="appearance-mini-section">
+                    <summary class="section-header">Rivers</summary>
+                    <div class="mt-3">
+                      <label class="toggle-label mt-2">
+                        <input id="toggleRivers" type="checkbox" class="checkbox-input" checked />
+                        <span id="lblRiversLayer">Rivers</span>
+                      </label>
+                      <div class="ml-5 space-y-2">
+                        <div class="flex items-center justify-between gap-3">
+                          <label id="lblRiversColor" class="range-label" for="riversColor">Color</label>
+                          <input id="riversColor" type="color" value="#3b82f6" class="color-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblRiversOpacity" class="range-label" for="riversOpacity">Opacity</label>
+                            <span id="riversOpacityValue" class="range-value">88%</span>
+                          </div>
+                          <input id="riversOpacity" type="range" min="0" max="100" value="88" class="range-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblRiversWidth" class="range-label" for="riversWidth">Width</label>
+                            <span id="riversWidthValue" class="range-value">0.50</span>
+                          </div>
+                          <input id="riversWidth" type="range" min="0.2" max="4.0" step="0.05" value="0.50" class="range-input" />
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                          <label id="lblRiversOutlineColor" class="range-label" for="riversOutlineColor">Outline Color</label>
+                          <input id="riversOutlineColor" type="color" value="#e2efff" class="color-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblRiversOutlineWidth" class="range-label" for="riversOutlineWidth">Outline Width</label>
+                            <span id="riversOutlineWidthValue" class="range-value">0.25</span>
+                          </div>
+                          <input id="riversOutlineWidth" type="range" min="0.0" max="3.0" step="0.05" value="0.25" class="range-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblRiversDashStyle" class="range-label" for="riversDashStyle">Dash</label>
+                          </div>
+                          <select id="riversDashStyle" class="select-input mt-2">
+                            <option value="solid" selected>Solid</option>
+                            <option value="dashed">Dashed</option>
+                            <option value="dotted">Dotted</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </details>
+
+                  <details class="appearance-mini-section">
+                    <summary class="section-header">Special Zones Style</summary>
+                    <div class="mt-3">
+                      <label class="toggle-label mt-2">
+                        <input id="toggleSpecialZones" type="checkbox" class="checkbox-input" />
+                        <span id="lblSpecialZones">Special Zones</span>
+                      </label>
+                      <div class="ml-5 space-y-2">
+                        <div class="flex items-center justify-between gap-3">
+                          <label id="lblSpecialZonesDisputedFill" class="range-label" for="specialZonesDisputedFill">Disputed Fill</label>
+                          <input id="specialZonesDisputedFill" type="color" value="#f97316" class="color-input" />
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                          <label id="lblSpecialZonesDisputedStroke" class="range-label" for="specialZonesDisputedStroke">Disputed Stroke</label>
+                          <input id="specialZonesDisputedStroke" type="color" value="#ea580c" class="color-input" />
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                          <label id="lblSpecialZonesWastelandFill" class="range-label" for="specialZonesWastelandFill">Wasteland Fill</label>
+                          <input id="specialZonesWastelandFill" type="color" value="#dc2626" class="color-input" />
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                          <label id="lblSpecialZonesWastelandStroke" class="range-label" for="specialZonesWastelandStroke">Wasteland Stroke</label>
+                          <input id="specialZonesWastelandStroke" type="color" value="#b91c1c" class="color-input" />
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                          <label id="lblSpecialZonesCustomFill" class="range-label" for="specialZonesCustomFill">Custom Fill</label>
+                          <input id="specialZonesCustomFill" type="color" value="#8b5cf6" class="color-input" />
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                          <label id="lblSpecialZonesCustomStroke" class="range-label" for="specialZonesCustomStroke">Custom Stroke</label>
+                          <input id="specialZonesCustomStroke" type="color" value="#6d28d9" class="color-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblSpecialZonesOpacity" class="range-label" for="specialZonesOpacity">Opacity</label>
+                            <span id="specialZonesOpacityValue" class="range-value">32%</span>
+                          </div>
+                          <input id="specialZonesOpacity" type="range" min="0" max="100" value="32" class="range-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblSpecialZonesStrokeWidth" class="range-label" for="specialZonesStrokeWidth">Stroke Width</label>
+                            <span id="specialZonesStrokeWidthValue" class="range-value">1.30</span>
+                          </div>
+                          <input id="specialZonesStrokeWidth" type="range" min="0.4" max="4.0" step="0.05" value="1.30" class="range-input" />
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblSpecialZonesDashStyle" class="range-label" for="specialZonesDashStyle">Dash</label>
+                          </div>
+                          <select id="specialZonesDashStyle" class="select-input mt-2">
+                            <option value="solid">Solid</option>
+                            <option value="dashed" selected>Dashed</option>
+                            <option value="dotted">Dotted</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </details>
+                </div>
+              </details>
+
+              <details class="card-flat appearance-subsection">
+                <summary id="lblTexture" class="section-header">Texture</summary>
+                <div class="space-y-3 mt-3">
+                  <div class="flex items-center justify-between">
+                    <div id="lblTextureInfo" class="section-header">Texture Overlay</div>
+                    <div class="relative info-trigger">
+                      <svg class="info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
+                        <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                      </svg>
+                      <div class="info-tooltip" style="width: 220px;">Apply a subtle overlay texture for a vintage map feel.</div>
+                    </div>
+                  </div>
+                  <label id="lblOverlay" class="section-header-block mt-2" for="textureSelect">Overlay</label>
+                  <select id="textureSelect" class="select-input mt-2">
+                    <option id="optTextureNone" value="none" selected>Clean</option>
+                    <option id="optTexturePaper" value="paper">Old Paper</option>
+                    <option id="optTextureDraftGrid" value="draft_grid">Draft Grid</option>
+                    <option id="optTextureGraticule" value="graticule">Graticule</option>
+                  </select>
+                  <div>
+                    <div class="range-row">
+                      <label id="lblTextureOpacity" class="range-label" for="textureOpacity">Opacity</label>
+                      <span id="textureOpacityValue" class="range-value">88%</span>
+                    </div>
+                    <input id="textureOpacity" type="range" min="0" max="100" value="88" class="range-input" />
+                  </div>
+                  <div id="texturePaperControls" class="space-y-2 hidden">
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTexturePaperScale" class="range-label" for="texturePaperScale">Paper Scale</label>
+                        <span id="texturePaperScaleValue" class="range-value">1.00x</span>
+                      </div>
+                      <input id="texturePaperScale" type="range" min="55" max="240" step="1" value="100" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTexturePaperWarmth" class="range-label" for="texturePaperWarmth">Warmth</label>
+                        <span id="texturePaperWarmthValue" class="range-value">62%</span>
+                      </div>
+                      <input id="texturePaperWarmth" type="range" min="0" max="100" value="62" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTexturePaperGrain" class="range-label" for="texturePaperGrain">Grain</label>
+                        <span id="texturePaperGrainValue" class="range-value">34%</span>
+                      </div>
+                      <input id="texturePaperGrain" type="range" min="0" max="100" value="34" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTexturePaperWear" class="range-label" for="texturePaperWear">Wear</label>
+                        <span id="texturePaperWearValue" class="range-value">26%</span>
+                      </div>
+                      <input id="texturePaperWear" type="range" min="0" max="100" value="26" class="range-input" />
+                    </div>
+                  </div>
+                  <div id="textureGraticuleControls" class="space-y-2 hidden">
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTextureGraticuleMajorStep" class="range-label" for="textureGraticuleMajorStep">Major Step</label>
+                        <span id="textureGraticuleMajorStepValue" class="range-value">30°</span>
+                      </div>
+                      <input id="textureGraticuleMajorStep" type="range" min="10" max="90" step="5" value="30" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTextureGraticuleMinorStep" class="range-label" for="textureGraticuleMinorStep">Minor Step</label>
+                        <span id="textureGraticuleMinorStepValue" class="range-value">15°</span>
+                      </div>
+                      <input id="textureGraticuleMinorStep" type="range" min="5" max="45" step="5" value="15" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTextureGraticuleLabelStep" class="range-label" for="textureGraticuleLabelStep">Label Step</label>
+                        <span id="textureGraticuleLabelStepValue" class="range-value">60°</span>
+                      </div>
+                      <input id="textureGraticuleLabelStep" type="range" min="30" max="180" step="15" value="60" class="range-input" />
+                    </div>
+                  </div>
+                  <div id="textureDraftGridControls" class="space-y-2 hidden">
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTextureDraftMajorStep" class="range-label" for="textureDraftMajorStep">Major Step</label>
+                        <span id="textureDraftMajorStepValue" class="range-value">24°</span>
+                      </div>
+                      <input id="textureDraftMajorStep" type="range" min="12" max="90" step="2" value="24" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTextureDraftMinorStep" class="range-label" for="textureDraftMinorStep">Minor Step</label>
+                        <span id="textureDraftMinorStepValue" class="range-value">12°</span>
+                      </div>
+                      <input id="textureDraftMinorStep" type="range" min="4" max="45" step="1" value="12" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTextureDraftLonOffset" class="range-label" for="textureDraftLonOffset">Longitude Offset</label>
+                        <span id="textureDraftLonOffsetValue" class="range-value">0°</span>
+                      </div>
+                      <input id="textureDraftLonOffset" type="range" min="-180" max="180" step="1" value="0" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTextureDraftLatOffset" class="range-label" for="textureDraftLatOffset">Latitude Tilt</label>
+                        <span id="textureDraftLatOffsetValue" class="range-value">12°</span>
+                      </div>
+                      <input id="textureDraftLatOffset" type="range" min="-80" max="80" step="1" value="12" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label id="lblTextureDraftRoll" class="range-label" for="textureDraftRoll">Roll</label>
+                        <span id="textureDraftRollValue" class="range-value">-18°</span>
+                      </div>
+                      <input id="textureDraftRoll" type="range" min="-180" max="180" step="1" value="-18" class="range-input" />
+                    </div>
+                  </div>
+                </div>
+              </details>
             </div>
-            <label id="lblExportFormat" class="section-header-block mt-3" for="exportFormat">Format</label>
-            <select id="exportFormat" class="select-input mt-2">
-              <option value="png">PNG</option>
-              <option value="jpg">JPG</option>
-            </select>
-            <button id="exportBtn" class="btn-primary mt-4">Download Snapshot</button>
-          </div>
+          </details>
 
           <div class="card-compact">
             <p class="tip-text">Tip: Scroll to zoom and drag to pan. Hover highlights counties.</p>
@@ -497,7 +585,6 @@
             <img id="referenceImage" class="reference-image" alt="" />
             <canvas id="colorCanvas" class="map-layer"></canvas>
             <canvas id="lineCanvas" class="map-layer map-layer-top"></canvas>
-            <div id="textureOverlay" class="texture-overlay decorative-layer"></div>
           </div>
 
           <div class="map-overlay-controls">
@@ -507,6 +594,11 @@
             <button id="rightPanelToggle" class="panel-toggle panel-toggle-right" type="button" aria-controls="rightSidebar" aria-label="Toggle right panel">
               Inspector
             </button>
+          </div>
+
+          <div id="toolHudChip" class="tool-hud-chip hidden" aria-live="polite"></div>
+          <div id="mapOnboardingHint" class="map-onboarding-hint">
+            Click a region to start painting, or use Auto-Fill to color all countries
           </div>
 
           <div id="toastViewport" class="toast-viewport" aria-live="polite" aria-atomic="false"></div>
@@ -539,6 +631,12 @@
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="m14 6 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
                       <path d="m8 16 8.5-8.5a2.12 2.12 0 0 0-3-3L5 13v3h3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
+                    </svg>
+                  </button>
+                  <button id="brushModeBtn" class="dock-icon-btn dock-tool-btn" type="button" aria-label="Brush" title="Brush">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M7 15c-1.5 1-2 2.3-2 3.5 0 1.4 1.1 2.5 2.5 2.5 2.3 0 4.5-1.8 4.5-4.8 0-.7-.2-1.5-.6-2.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                      <path d="m14 4 6 6-5.2 5.2a1.8 1.8 0 0 1-2.5 0l-3.5-3.5a1.8 1.8 0 0 1 0-2.5L14 4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
                     </svg>
                   </button>
                 </div>
@@ -590,6 +688,78 @@
                   <button id="presetClear" class="btn-secondary dock-clear-btn" type="button">Clear Map</button>
                 </div>
               </div>
+
+              <div id="dockUtilityGroup" class="dock-group dock-group-utilities">
+                <div class="dock-group-label">Utilities</div>
+                <div class="dock-icon-row">
+                  <button id="dockReferenceBtn" class="dock-icon-btn" type="button" aria-label="Reference" title="Reference">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <rect x="4" y="5" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.6"></rect>
+                      <path d="M7 15.5 10.5 12l2.5 2.5 2.5-3 1.5 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                      <circle cx="9" cy="9.5" r="1.2" fill="currentColor"></circle>
+                    </svg>
+                  </button>
+                  <button id="dockExportBtn" class="dock-icon-btn" type="button" aria-label="Export" title="Export">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M12 4v10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                      <path d="m8 10 4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                      <path d="M5 18h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                    </svg>
+                  </button>
+                </div>
+                <div id="dockReferencePopover" class="dock-utility-popover hidden" role="dialog" aria-label="Reference tools">
+                  <div id="lblReferenceImage" class="section-header">Reference Image</div>
+                  <input id="referenceImageInput" type="file" accept="image/*" class="file-input mt-3" />
+                  <div class="space-y-3 mt-4">
+                    <div>
+                      <div class="range-row">
+                        <label class="range-label" for="referenceOpacity">Opacity</label>
+                        <span id="referenceOpacityValue" class="range-value">60%</span>
+                      </div>
+                      <input id="referenceOpacity" type="range" min="0" max="100" value="60" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label class="range-label" for="referenceScale">Scale</label>
+                        <span id="referenceScaleValue" class="range-value">1.00×</span>
+                      </div>
+                      <input id="referenceScale" type="range" min="0.2" max="3.0" step="0.01" value="1.00" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label class="range-label" for="referenceOffsetX">Offset X</label>
+                        <span id="referenceOffsetXValue" class="range-value">0px</span>
+                      </div>
+                      <input id="referenceOffsetX" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
+                    </div>
+                    <div>
+                      <div class="range-row">
+                        <label class="range-label" for="referenceOffsetY">Offset Y</label>
+                        <span id="referenceOffsetYValue" class="range-value">0px</span>
+                      </div>
+                      <input id="referenceOffsetY" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
+                    </div>
+                  </div>
+                </div>
+                <div id="dockExportPopover" class="dock-utility-popover hidden" role="dialog" aria-label="Export tools">
+                  <div class="flex items-center justify-between">
+                    <div id="lblExport" class="section-header">Export Map</div>
+                    <div class="relative info-trigger">
+                      <svg class="info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
+                        <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                      </svg>
+                      <div class="info-tooltip">Export the visible map as a PNG or JPG snapshot.</div>
+                    </div>
+                  </div>
+                  <label id="lblExportFormat" class="section-header-block mt-3" for="exportFormat">Format</label>
+                  <select id="exportFormat" class="select-input mt-2">
+                    <option value="png">PNG</option>
+                    <option value="jpg">JPG</option>
+                  </select>
+                  <button id="exportBtn" class="btn-primary mt-4">Download Snapshot</button>
+                </div>
+              </div>
             </div>
 
             <div class="bottom-dock-swatches">
@@ -605,26 +775,70 @@
         <div class="sidebar-sections inspector-sidebar-sections">
           <div class="inspector-search-shell">
             <div class="card-flat inspector-search-block">
-              <label id="lblCountrySearch" class="section-header" for="countrySearch">Search Countries</label>
-              <input id="countrySearch" type="text" placeholder="Search..." class="input mt-2" />
+              <label id="lblCountrySearch" class="visually-hidden" for="countrySearch">Search Countries</label>
+              <div class="inspector-search-input-row">
+                <svg class="inspector-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
+                  <path d="M16 16 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                </svg>
+                <input id="countrySearch" type="text" placeholder="Search country or code..." class="input inspector-search-input" />
+              </div>
             </div>
           </div>
-
-          <details class="card inspector-section" open>
-            <summary id="lblPresetsHierarchy" class="section-header">Presets &amp; Hierarchy</summary>
-            <div class="inspector-panel-body">
-              <div class="section-header-block" id="lblHistoricalPresets">Historical Presets</div>
-              <p class="tip-text mt-2">Click to fill regions with active color</p>
-              <div id="presetTree" class="inspector-scroll preset-tree mt-3"></div>
-            </div>
-          </details>
 
           <details class="card inspector-section" open>
             <summary id="lblCountryInspector" class="section-header">Country Inspector</summary>
             <div class="inspector-panel-body">
               <div id="lblCountryColors" class="section-header-block">Country Colors</div>
+              <p id="countryInspectorOrderingHint" class="sidebar-tool-hint inspector-ordering-hint mt-2">
+                Key countries first, then A-Z
+              </p>
               <div id="countryList" class="country-list inspector-scroll mt-3"></div>
+              <div id="countryInspectorDetail" class="inspector-detail-card mt-3">
+                <div id="countryInspectorEmpty" class="inspector-empty-state">
+                  <div id="countryInspectorEmptyTitle" class="section-header-block">Select a country to edit</div>
+                  <p id="countryInspectorEmptyHint" class="sidebar-tool-hint">
+                    Choose a country above to edit its color, active sovereign state, groups, and presets.
+                  </p>
+                </div>
+                <div id="countryInspectorSelected" class="hidden">
+                  <div class="inspector-detail-header">
+                    <div class="inspector-detail-header-copy">
+                      <div id="countryInspectorTitle" class="section-header"></div>
+                      <div id="countryInspectorMeta" class="inspector-detail-meta"></div>
+                    </div>
+                    <span id="countryInspectorSwatch" class="country-select-swatch inspector-detail-swatch" aria-hidden="true"></span>
+                  </div>
+
+                  <div class="inspector-detail-actions mt-3">
+                    <button id="countryInspectorSetActive" type="button" class="btn-secondary inspector-detail-primary-btn">Set Active</button>
+                    <label class="inspector-detail-color-field" for="countryInspectorColorInput">
+                      <span id="lblCountryInspectorColor" class="inspector-mini-label">Current Color</span>
+                      <input id="countryInspectorColorInput" type="color" class="color-input" aria-label="Current Color" />
+                    </label>
+                  </div>
+
+                  <div class="inspector-detail-section mt-3">
+                    <div id="lblCountryInspectorGroups" class="section-header-block">Country Groups</div>
+                    <div id="countryInspectorGroups" class="inspector-action-list mt-2"></div>
+                  </div>
+
+                  <div class="inspector-detail-section mt-3">
+                    <div id="lblCountryInspectorPresets" class="section-header-block">Country Presets</div>
+                    <div id="countryInspectorPresets" class="inspector-action-list mt-2"></div>
+                  </div>
+                </div>
+              </div>
               <button id="resetCountryColors" class="btn-secondary mt-3">Reset Country Colors</button>
+            </div>
+          </details>
+
+          <details class="card inspector-section">
+            <summary id="lblPresetsHierarchy" class="section-header">All Presets &amp; Hierarchy</summary>
+            <div class="inspector-panel-body">
+              <div class="section-header-block" id="lblHistoricalPresets">Historical Presets</div>
+              <p class="tip-text mt-2">Click to fill regions with active color</p>
+              <div id="presetTree" class="inspector-scroll preset-tree mt-3"></div>
             </div>
           </details>
 

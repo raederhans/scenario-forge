@@ -102,6 +102,13 @@ IDN_ADM1_FALLBACK_URLS = [
     "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/IDN/ADM1/"
     "geoBoundaries-IDN-ADM1.geojson",
 ]
+ABS_SUA_2021_GDA94_URL = (
+    "https://www.abs.gov.au/statistics/standards/"
+    "australian-statistical-geography-standard-asgs-edition-3/"
+    "jul2021-jun2026/access-and-downloads/digital-boundary-files/"
+    "SUA_2021_AUST_GDA94.zip"
+)
+ABS_SUA_2021_GDA94_FALLBACK_URLS: list[str] = []
 
 # Local filenames (cache)
 FR_ARR_FILENAME = "france_arrondissements.geojson"
@@ -118,6 +125,7 @@ US_COUNTY_POP_2024_FILENAME = "co-est2024-alldata.csv"
 GB_NUTS1_2021_FILENAME = "gisco_nuts_2021_level1.geojson"
 BIH_ADM1_FILENAME = "geoBoundaries-BIH-ADM1.geojson"
 IDN_ADM1_FILENAME = "geoBoundaries-IDN-ADM1.geojson"
+ABS_SUA_2021_GDA94_FILENAME = "abs_sua_2021_aust_gda94_shp.zip"
 
 # Geography configuration
 MAP_NAME = "Global Admin-0 Skeleton"
@@ -374,6 +382,85 @@ GLOBAL_BASIC_NE_COUNTRIES = {
     "VE": 26,
     "XK": 30,
 }
+GLOBAL_BASIC_NE_COUNTRY_RULES = {
+    iso_code: {
+        "source_type": "ne_admin1",
+        "expected_count": expected_count,
+        "include_adm1_codes": [],
+        "merge_minor_adm1_to_parent": {},
+        "preserve_primary_features": [],
+        "rename_map": {},
+        "detail_tier": "adm1_basic",
+    }
+    for iso_code, expected_count in GLOBAL_BASIC_NE_COUNTRIES.items()
+}
+GLOBAL_BASIC_NE_COUNTRY_RULES.update(
+    {
+        "AU": {
+            "source_type": "ne_admin1",
+            "expected_count": 10,
+            "include_adm1_codes": [
+                "AUS-2651",
+                "AUS-2650",
+                "AUS-2655",
+                "AUS-2657",
+                "AUS-2654",
+                "AUS-2656",
+                "AUS-2660",
+                "AUS-2653",
+            ],
+            "merge_minor_adm1_to_parent": {
+                "AUS-1932": "AUS-2653",
+                "AUS-2659": "AUS-2654",
+                "AUS+00?": "AUS-2660",
+            },
+            "preserve_primary_features": [
+                {
+                    "source_id": "AU__1",
+                    "target_id": "AU_REMOTE_ASHMORE_CARTIER",
+                    "target_name": "Ashmore and Cartier Islands",
+                    "detail_tier": "admin0_passthrough",
+                    "fallback_ne_code": "ATC+00?",
+                },
+                {
+                    "source_id": "AU__2",
+                    "target_id": "AU_REMOTE_INDIAN_OCEAN_TERRITORIES",
+                    "target_name": "Indian Ocean Territories",
+                    "detail_tier": "admin0_passthrough",
+                },
+            ],
+            "rename_map": {},
+            "detail_tier": "adm1_basic",
+        },
+        "NZ": {
+            "source_type": "ne_admin1",
+            "expected_count": 17,
+            "include_adm1_codes": [
+                "NZL-3408",
+                "NZL-3401",
+                "NZL-3402",
+                "NZL-3403",
+                "NZL-3406",
+                "NZL-3407",
+                "NZL-3400",
+                "NZL-3398",
+                "NZL-5468",
+                "NZL-5469",
+                "NZL-3334",
+                "NZL-3405",
+                "NZL-3404",
+                "NZL-3399",
+                "NZL-3396",
+                "NZL-3397",
+                "NZL-5470",
+            ],
+            "merge_minor_adm1_to_parent": {},
+            "preserve_primary_features": [],
+            "rename_map": {},
+            "detail_tier": "adm1_basic",
+        },
+    }
+)
 GLOBAL_BASIC_SPECIAL_SOURCES = {
     "GB": {
         "source_type": "gisco_nuts1",
@@ -402,7 +489,7 @@ TOPOLOGY_ADMIN1_HIERARCHY_CODES = (
     set(DETAIL_PARENT_SUBDIVISIONS)
     | set(AFRICA_BASIC_NE_COUNTRIES.keys())
     | set(AFRICA_BASIC_GB_OVERRIDES.keys())
-    | set(GLOBAL_BASIC_NE_COUNTRIES.keys())
+    | set(GLOBAL_BASIC_NE_COUNTRY_RULES.keys())
     | set(GLOBAL_BASIC_SPECIAL_SOURCES.keys())
 )
 

@@ -214,12 +214,167 @@ def _finalize_country(
     return out
 
 
+def _normalize_ne_country_rule(rule: dict | int) -> dict:
+    if isinstance(rule, int):
+        return {
+            "source_type": "ne_admin1",
+            "expected_count": int(rule),
+            "include_adm1_codes": [],
+            "merge_minor_adm1_to_parent": {},
+            "preserve_primary_features": [],
+            "rename_map": {},
+            "detail_tier": "adm1_basic",
+        }
+    normalized = dict(rule or {})
+    normalized.setdefault("source_type", "ne_admin1")
+    normalized.setdefault("expected_count", 0)
+    normalized.setdefault("include_adm1_codes", [])
+    normalized.setdefault("merge_minor_adm1_to_parent", {})
+    normalized.setdefault("preserve_primary_features", [])
+    normalized.setdefault("rename_map", {})
+    normalized.setdefault("detail_tier", "adm1_basic")
+    return normalized
+
+
+def _collapse_ne_rows(source: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    if source.empty:
+        return source
+    rows = []
+    for source_code, group in source.groupby("__source_code", dropna=False):
+        geometries = [
+            geom for geom in group.geometry.tolist()
+            if geom is not None and not geom.is_empty
+        ]
+        geometry = _make_valid_geom(unary_union(geometries)) if geometries else None
+        if geometry is None or geometry.is_empty:
+            continue
+        row = group.iloc[0].copy()
+        row["geometry"] = geometry
+        row["__source_code"] = str(source_code or "").strip()
+        rows.append(row)
+    if not rows:
+        return gpd.GeoDataFrame(columns=list(source.columns), geometry="geometry", crs="EPSG:4326")
+    collapsed = gpd.GeoDataFrame(rows, geometry="geometry", crs=source.crs or "EPSG:4326")
+    return ensure_crs(collapsed)
+
+
+def _merge_minor_units(source: gpd.GeoDataFrame, merge_map: dict[str, str], iso_code: str) -> gpd.GeoDataFrame:
+    if source.empty or not merge_map:
+        return source
+
+    out = source.copy().set_index("__source_code", drop=False)
+    missing_children = [minor for minor in merge_map if minor not in out.index]
+    missing_parents = [parent for parent in merge_map.values() if parent not in out.index]
+    if missing_children or missing_parents:
+        details = []
+        if missing_children:
+            details.append(f"missing merge children={missing_children}")
+        if missing_parents:
+            details.append(f"missing merge parents={missing_parents}")
+        raise SystemExit(f"[Global Basic] {iso_code} merge map invalid: {'; '.join(details)}")
+
+    for minor_code, parent_code in merge_map.items():
+        parent_geom = out.at[parent_code, "geometry"]
+        minor_geom = out.at[minor_code, "geometry"]
+        merged_geom = _make_valid_geom(unary_union([parent_geom, minor_geom]))
+        if merged_geom is None or merged_geom.is_empty:
+            raise SystemExit(
+                f"[Global Basic] {iso_code} merge produced empty geometry for {parent_code} <- {minor_code}."
+            )
+        out.at[parent_code, "geometry"] = merged_geom
+
+    out = out[~out.index.isin(set(merge_map.keys()))].copy()
+    return gpd.GeoDataFrame(out.reset_index(drop=True), geometry="geometry", crs="EPSG:4326")
+
+
+def _build_preserved_primary_features(
+    primary_shell_source: gpd.GeoDataFrame,
+    ne_admin1: gpd.GeoDataFrame,
+    iso_code: str,
+    preserve_specs: list[dict],
+    shell_geom,
+) -> gpd.GeoDataFrame:
+    if not preserve_specs:
+        return gpd.GeoDataFrame(
+            columns=["id", "name", "cntr_code", "admin1_group", "detail_tier", "geometry"],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+
+    if "id" not in primary_shell_source.columns:
+        raise SystemExit("[Global Basic] Primary topology is missing feature IDs for passthrough copy.")
+
+    primary = ensure_crs(primary_shell_source.copy())
+    source_ids = primary["id"].fillna("").astype(str).str.strip()
+    ne_iso_col = pick_column(ne_admin1, ["iso_a2", "adm0_a2", "iso_3166_1_"])
+    ne_id_col = pick_column(ne_admin1, ["adm1_code", "iso_3166_2", "gn_id", "id"])
+    rows = []
+    for spec in preserve_specs:
+        source_id = str(spec.get("source_id", "")).strip()
+        target_id = str(spec.get("target_id", "")).strip()
+        target_name = str(spec.get("target_name", "")).strip()
+        detail_tier = str(spec.get("detail_tier", "admin0_passthrough")).strip() or "admin0_passthrough"
+        fallback_ne_code = str(spec.get("fallback_ne_code", "")).strip()
+        if not source_id or not target_id or not target_name:
+            raise SystemExit(f"[Global Basic] {iso_code} preserve_primary_features entry is incomplete: {spec}")
+        matched = primary[source_ids == source_id].copy()
+        geometry = _make_valid_geom(matched.geometry.iloc[0]) if not matched.empty else None
+        if (geometry is None or geometry.is_empty) and fallback_ne_code:
+            if not ne_iso_col or not ne_id_col:
+                raise SystemExit(
+                    f"[Global Basic] {iso_code} missing Natural Earth columns for fallback passthrough geometry."
+                )
+            fallback_source = ne_admin1[
+                ne_admin1[ne_iso_col].fillna("").astype(str).str.upper().str.strip() == iso_code
+            ].copy()
+            fallback_source = fallback_source[
+                fallback_source[ne_id_col].fillna("").astype(str).str.strip() == fallback_ne_code
+            ].copy()
+            if not fallback_source.empty:
+                geometry = _make_valid_geom(unary_union(fallback_source.geometry.tolist()))
+        if geometry is None or geometry.is_empty:
+            if matched.empty:
+                raise SystemExit(
+                    f"[Global Basic] {iso_code} missing primary passthrough source feature: {source_id}"
+                )
+            raise SystemExit(
+                f"[Global Basic] {iso_code} passthrough source feature has invalid geometry: {source_id}"
+            )
+        try:
+            clipped = _make_valid_geom(geometry.intersection(shell_geom))
+            if clipped is not None and not clipped.is_empty:
+                geometry = clipped
+        except Exception:
+            pass
+        rows.append(
+            {
+                "id": target_id,
+                "name": target_name,
+                "cntr_code": iso_code,
+                "admin1_group": "",
+                "detail_tier": detail_tier,
+                "geometry": geometry,
+            }
+        )
+
+    out = gpd.GeoDataFrame(rows, geometry="geometry", crs="EPSG:4326")
+    out = _sanitize_polygon_layer(out)
+    if len(out) != len(preserve_specs):
+        raise SystemExit(
+            f"[Global Basic] {iso_code} preserved primary features dropped during sanitize: "
+            f"expected {len(preserve_specs)}, got {len(out)}"
+        )
+    return out
+
+
 def _build_ne_country_features(
     ne_admin1: gpd.GeoDataFrame,
     iso_code: str,
-    expected_count: int,
+    rule: dict | int,
     shell_geom,
+    primary_shell_source: gpd.GeoDataFrame,
 ) -> gpd.GeoDataFrame:
+    spec = _normalize_ne_country_rule(rule)
     iso_col = pick_column(ne_admin1, ["iso_a2", "adm0_a2", "iso_3166_1_"])
     if not iso_col:
         raise SystemExit("[Global Basic] Natural Earth admin1 missing ISO country column.")
@@ -238,39 +393,109 @@ def _build_ne_country_features(
             f"Available: {source.columns.tolist()}"
         )
 
+    source = source.copy()
     source["name"] = _coalesce_text_columns(source, name_candidates)
+    source["__source_code"] = ""
     if id_col:
-        token = (
+        source["__source_code"] = (
             source[id_col]
             .fillna("")
             .astype(str)
             .str.strip()
-            .replace("", pd.NA)
         )
-        fallback_token = source["name"].map(_slugify).replace("", pd.NA).fillna("unit")
-        token = token.fillna(fallback_token)
-        source["id"] = iso_code + "_ADM1_" + token
-    else:
-        source["id"] = iso_code + "_ADM1_" + source["name"].map(_slugify)
+    source["__source_code"] = (
+        source["__source_code"]
+        .replace("", pd.NA)
+        .fillna(source["name"].map(_slugify).replace("", pd.NA).fillna("unit"))
+        .astype(str)
+        .str.strip()
+    )
+
+    include_codes = {
+        str(code).strip()
+        for code in spec.get("include_adm1_codes", [])
+        if str(code).strip()
+    }
+    merge_map = {
+        str(child).strip(): str(parent).strip()
+        for child, parent in dict(spec.get("merge_minor_adm1_to_parent", {})).items()
+        if str(child).strip() and str(parent).strip()
+    }
+    relevant_codes = include_codes | set(merge_map.keys()) | set(merge_map.values())
+    if relevant_codes:
+        source = source[source["__source_code"].isin(relevant_codes)].copy()
+        if source.empty:
+            raise SystemExit(
+                f"[Global Basic] Natural Earth admin1 filter removed all rows for {iso_code}."
+            )
+
+    source = _collapse_ne_rows(source)
+    source = _merge_minor_units(source, merge_map, iso_code)
+    if include_codes:
+        source = source[source["__source_code"].isin(include_codes)].copy()
+        if source.empty:
+            raise SystemExit(
+                f"[Global Basic] Natural Earth admin1 include list produced zero rows for {iso_code}."
+            )
+
+    rename_map = {
+        str(key).strip(): str(value).strip()
+        for key, value in dict(spec.get("rename_map", {})).items()
+        if str(key).strip() and str(value).strip()
+    }
+    if rename_map:
+        source["name"] = [
+            rename_map.get(
+                str(row.get("__source_code", "")).strip(),
+                rename_map.get(str(row.get("name", "")).strip(), str(row.get("name", "")).strip()),
+            )
+            for row in source.to_dict("records")
+        ]
+
+    source["id"] = iso_code + "_ADM1_" + source["__source_code"].astype(str).str.strip()
     missing_name = source["name"] == ""
     if missing_name.any():
         source.loc[missing_name, "name"] = (
-            source.loc[missing_name, "id"]
+            source.loc[missing_name, "__source_code"]
             .astype(str)
-            .str.replace(f"^{iso_code}_ADM1_", "", regex=True)
             .str.replace("_", " ", regex=False)
             .str.strip()
         )
     source["cntr_code"] = iso_code
     source["admin1_group"] = source["name"]
-    source["detail_tier"] = "adm1_basic"
-    return _finalize_country(
+    source["detail_tier"] = str(spec.get("detail_tier", "adm1_basic")).strip() or "adm1_basic"
+
+    preserve_specs = list(spec.get("preserve_primary_features") or [])
+    expected_total = int(spec.get("expected_count", 0))
+    core_expected = expected_total - len(preserve_specs)
+    if core_expected < 0:
+        raise SystemExit(
+            f"[Global Basic] {iso_code} expected_count is smaller than preserved feature count."
+        )
+
+    core = _finalize_country(
         source,
         iso_code=iso_code,
-        expected_count=expected_count,
+        expected_count=core_expected,
         shell_geom=shell_geom,
         tolerance=cfg.SIMPLIFY_GLOBAL_BASIC_ADMIN1,
     )
+    preserved = _build_preserved_primary_features(
+        primary_shell_source,
+        ne_admin1,
+        iso_code,
+        preserve_specs,
+        shell_geom,
+    )
+    if preserved.empty:
+        combined = core
+    else:
+        combined = gpd.GeoDataFrame(pd.concat([core, preserved], ignore_index=True), crs="EPSG:4326")
+    if combined["id"].duplicated().any():
+        dupes = combined.loc[combined["id"].duplicated(), "id"].astype(str).tolist()[:10]
+        raise SystemExit(f"[Global Basic] Duplicate IDs detected for {iso_code}: {dupes}")
+    _validate_count(combined, iso_code, expected_total)
+    return combined
 
 
 def _build_geo_boundaries_features(
@@ -385,7 +610,7 @@ def apply_global_basic_admin1_replacement(detail_gdf: gpd.GeoDataFrame) -> gpd.G
         return detail_gdf
 
     target_codes = (
-        set(cfg.GLOBAL_BASIC_NE_COUNTRIES.keys())
+        set(cfg.GLOBAL_BASIC_NE_COUNTRY_RULES.keys())
         | set(cfg.GLOBAL_BASIC_SPECIAL_SOURCES.keys())
         | set(cfg.GLOBAL_BASIC_PASSTHROUGH_COUNTRIES)
     )
@@ -408,13 +633,14 @@ def apply_global_basic_admin1_replacement(detail_gdf: gpd.GeoDataFrame) -> gpd.G
     ne_admin1 = _load_ne_admin1()
     outputs: list[gpd.GeoDataFrame] = [base]
 
-    for iso_code, expected_count in cfg.GLOBAL_BASIC_NE_COUNTRIES.items():
+    for iso_code, rule in cfg.GLOBAL_BASIC_NE_COUNTRY_RULES.items():
         print(f"[Global Basic] Building Natural Earth admin1 detail for {iso_code}...")
         country_gdf = _build_ne_country_features(
             ne_admin1,
             iso_code,
-            int(expected_count),
+            rule,
             shells[iso_code],
+            primary_shell_source,
         )
         print(f"[Global Basic] {iso_code} features: {len(country_gdf)}")
         outputs.append(country_gdf)

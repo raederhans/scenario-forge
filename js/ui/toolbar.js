@@ -1,5 +1,10 @@
 // Toolbar UI (Phase 13)
-import { state, PALETTE_THEMES } from "../core/state.js";
+import {
+  state,
+  PALETTE_THEMES,
+  normalizeTextureMode,
+  normalizeTextureStyleConfig,
+} from "../core/state.js";
 import {
   autoFillMap,
   getZoomPercent,
@@ -29,6 +34,7 @@ import {
 import { toggleLanguage, updateUIText, t } from "./i18n.js";
 import { resetAllFeatureOwnersToCanonical } from "../core/sovereignty_manager.js";
 import { showToast } from "./toast.js";
+import { markDirty, updateDirtyIndicator } from "../core/dirty_state.js";
 
 function renderPalette(themeName) {
   const paletteGrid = document.getElementById("paletteGrid");
@@ -109,6 +115,22 @@ function initToolbar({ render } = {}) {
   const exportBtn = document.getElementById("exportBtn");
   const exportFormat = document.getElementById("exportFormat");
   const textureSelect = document.getElementById("textureSelect");
+  const textureOpacity = document.getElementById("textureOpacity");
+  const texturePaperControls = document.getElementById("texturePaperControls");
+  const texturePaperScale = document.getElementById("texturePaperScale");
+  const texturePaperWarmth = document.getElementById("texturePaperWarmth");
+  const texturePaperGrain = document.getElementById("texturePaperGrain");
+  const texturePaperWear = document.getElementById("texturePaperWear");
+  const textureGraticuleControls = document.getElementById("textureGraticuleControls");
+  const textureGraticuleMajorStep = document.getElementById("textureGraticuleMajorStep");
+  const textureGraticuleMinorStep = document.getElementById("textureGraticuleMinorStep");
+  const textureGraticuleLabelStep = document.getElementById("textureGraticuleLabelStep");
+  const textureDraftGridControls = document.getElementById("textureDraftGridControls");
+  const textureDraftMajorStep = document.getElementById("textureDraftMajorStep");
+  const textureDraftMinorStep = document.getElementById("textureDraftMinorStep");
+  const textureDraftLonOffset = document.getElementById("textureDraftLonOffset");
+  const textureDraftLatOffset = document.getElementById("textureDraftLatOffset");
+  const textureDraftRoll = document.getElementById("textureDraftRoll");
   const toggleUrban = document.getElementById("toggleUrban");
   const togglePhysical = document.getElementById("togglePhysical");
   const toggleRivers = document.getElementById("toggleRivers");
@@ -160,13 +182,21 @@ function initToolbar({ render } = {}) {
   const presetClear = document.getElementById("presetClear");
   const colorModeSelect = document.getElementById("colorModeSelect");
   const bottomDock = document.getElementById("bottomDock");
+  const mapContainer = document.getElementById("mapContainer");
   const selectedColorPreview = document.getElementById("selectedColorPreview");
   const undoBtn = document.getElementById("undoBtn");
   const redoBtn = document.getElementById("redoBtn");
+  const brushModeBtn = document.getElementById("brushModeBtn");
   const zoomInBtn = document.getElementById("zoomInBtn");
   const zoomOutBtn = document.getElementById("zoomOutBtn");
   const zoomResetBtn = document.getElementById("zoomResetBtn");
   const zoomPercentInput = document.getElementById("zoomPercentInput");
+  const toolHudChip = document.getElementById("toolHudChip");
+  const mapOnboardingHint = document.getElementById("mapOnboardingHint");
+  const dockReferenceBtn = document.getElementById("dockReferenceBtn");
+  const dockExportBtn = document.getElementById("dockExportBtn");
+  const dockReferencePopover = document.getElementById("dockReferencePopover");
+  const dockExportPopover = document.getElementById("dockExportPopover");
   const leftPanelToggle = document.getElementById("leftPanelToggle");
   const rightPanelToggle = document.getElementById("rightPanelToggle");
   const paintGranularitySelect = document.getElementById("paintGranularitySelect");
@@ -218,6 +248,19 @@ function initToolbar({ render } = {}) {
   const riversOutlineWidthValue = document.getElementById("riversOutlineWidthValue");
   const specialZonesOpacityValue = document.getElementById("specialZonesOpacityValue");
   const specialZonesStrokeWidthValue = document.getElementById("specialZonesStrokeWidthValue");
+  const textureOpacityValue = document.getElementById("textureOpacityValue");
+  const texturePaperScaleValue = document.getElementById("texturePaperScaleValue");
+  const texturePaperWarmthValue = document.getElementById("texturePaperWarmthValue");
+  const texturePaperGrainValue = document.getElementById("texturePaperGrainValue");
+  const texturePaperWearValue = document.getElementById("texturePaperWearValue");
+  const textureGraticuleMajorStepValue = document.getElementById("textureGraticuleMajorStepValue");
+  const textureGraticuleMinorStepValue = document.getElementById("textureGraticuleMinorStepValue");
+  const textureGraticuleLabelStepValue = document.getElementById("textureGraticuleLabelStepValue");
+  const textureDraftMajorStepValue = document.getElementById("textureDraftMajorStepValue");
+  const textureDraftMinorStepValue = document.getElementById("textureDraftMinorStepValue");
+  const textureDraftLonOffsetValue = document.getElementById("textureDraftLonOffsetValue");
+  const textureDraftLatOffsetValue = document.getElementById("textureDraftLatOffsetValue");
+  const textureDraftRollValue = document.getElementById("textureDraftRollValue");
   const oceanTextureOpacityValue = document.getElementById("oceanTextureOpacityValue");
   const oceanTextureScaleValue = document.getElementById("oceanTextureScaleValue");
   const oceanContourStrengthValue = document.getElementById("oceanContourStrengthValue");
@@ -227,6 +270,241 @@ function initToolbar({ render } = {}) {
   const referenceOffsetYValue = document.getElementById("referenceOffsetYValue");
 
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  let toolHudTimerId = null;
+  let dockPopoverCloseBound = false;
+  const dismissOnboardingHint = () => {
+    if (!mapOnboardingHint || state.onboardingDismissed) return;
+    state.onboardingDismissed = true;
+    mapOnboardingHint.classList.add("is-hidden");
+  };
+  state.dismissOnboardingHintFn = dismissOnboardingHint;
+
+  const showToolHud = (message) => {
+    if (!toolHudChip || !message) return;
+    toolHudChip.textContent = message;
+    toolHudChip.classList.remove("hidden", "is-hidden");
+    toolHudChip.classList.add("is-visible");
+    if (toolHudTimerId) {
+      globalThis.clearTimeout(toolHudTimerId);
+    }
+    toolHudTimerId = globalThis.setTimeout(() => {
+      toolHudChip.classList.remove("is-visible");
+      toolHudChip.classList.add("is-hidden");
+      globalThis.setTimeout(() => {
+        toolHudChip.classList.add("hidden");
+      }, 180);
+    }, 1200);
+  };
+
+  const closeDockPopover = () => {
+    state.activeDockPopover = "";
+    dockReferencePopover?.classList.add("hidden");
+    dockExportPopover?.classList.add("hidden");
+    dockReferenceBtn?.classList.remove("is-active");
+    dockExportBtn?.classList.remove("is-active");
+    dockReferenceBtn?.setAttribute("aria-expanded", "false");
+    dockExportBtn?.setAttribute("aria-expanded", "false");
+  };
+  state.closeDockPopoverFn = closeDockPopover;
+
+  const openDockPopover = (kind) => {
+    const target = kind === "reference" ? dockReferencePopover : dockExportPopover;
+    if (!target) return;
+    const nextKind = state.activeDockPopover === kind ? "" : kind;
+    closeDockPopover();
+    if (!nextKind) return;
+    state.activeDockPopover = nextKind;
+    target.classList.remove("hidden");
+    if (nextKind === "reference") {
+      dockReferenceBtn?.classList.add("is-active");
+      dockReferenceBtn?.setAttribute("aria-expanded", "true");
+    } else {
+      dockExportBtn?.classList.add("is-active");
+      dockExportBtn?.setAttribute("aria-expanded", "true");
+    }
+  };
+
+  const bindDockPopoverDismiss = () => {
+    if (dockPopoverCloseBound) return;
+    document.addEventListener("click", (event) => {
+      if (!state.activeDockPopover) return;
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const insidePopover = target.closest("#dockReferencePopover, #dockExportPopover, #dockReferenceBtn, #dockExportBtn");
+      if (!insidePopover) {
+        closeDockPopover();
+      }
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && state.activeDockPopover) {
+        closeDockPopover();
+      }
+    });
+    dockPopoverCloseBound = true;
+  };
+
+  const setToolCursorClass = () => {
+    if (!mapContainer) return;
+    mapContainer.classList.remove("tool-fill", "tool-eraser", "tool-eyedropper", "tool-special-zone");
+    if (state.specialZoneEditor?.active) {
+      mapContainer.classList.add("tool-special-zone");
+      return;
+    }
+    mapContainer.classList.add(`tool-${state.currentTool || "fill"}`);
+  };
+
+  const bindConfirmAction = (button, { key, idleLabel, confirmLabel, onConfirm }) => {
+    if (!button || button.dataset.confirmBound === "true") return;
+    let timerId = null;
+    const reset = () => {
+      if (timerId) globalThis.clearTimeout(timerId);
+      timerId = null;
+      delete button.dataset.confirmState;
+      button.classList.remove("is-danger-confirm");
+      button.textContent = idleLabel();
+    };
+    button.addEventListener("click", () => {
+      if (button.dataset.confirmState === key) {
+        reset();
+        onConfirm();
+        return;
+      }
+      button.dataset.confirmState = key;
+      button.classList.add("is-danger-confirm");
+      button.textContent = confirmLabel();
+      timerId = globalThis.setTimeout(reset, 3000);
+    });
+    button.dataset.confirmReset = "true";
+    button.dataset.confirmBound = "true";
+    button.resetConfirmState = reset;
+  };
+  const renderDirty = (reason) => {
+    markDirty(reason);
+    if (render) render();
+  };
+  const textureStylePaths = [
+    "styleConfig.texture.mode",
+    "styleConfig.texture.opacity",
+    "styleConfig.texture.paper.assetId",
+    "styleConfig.texture.paper.scale",
+    "styleConfig.texture.paper.warmth",
+    "styleConfig.texture.paper.grain",
+    "styleConfig.texture.paper.wear",
+    "styleConfig.texture.paper.vignette",
+    "styleConfig.texture.paper.blendMode",
+    "styleConfig.texture.graticule.majorStep",
+    "styleConfig.texture.graticule.minorStep",
+    "styleConfig.texture.graticule.labelStep",
+    "styleConfig.texture.graticule.majorWidth",
+    "styleConfig.texture.graticule.minorWidth",
+    "styleConfig.texture.graticule.majorOpacity",
+    "styleConfig.texture.graticule.minorOpacity",
+    "styleConfig.texture.draftGrid.majorStep",
+    "styleConfig.texture.draftGrid.minorStep",
+    "styleConfig.texture.draftGrid.lonOffset",
+    "styleConfig.texture.draftGrid.latOffset",
+    "styleConfig.texture.draftGrid.roll",
+    "styleConfig.texture.draftGrid.width",
+    "styleConfig.texture.draftGrid.majorOpacity",
+    "styleConfig.texture.draftGrid.minorOpacity",
+    "styleConfig.texture.draftGrid.dash",
+  ];
+  let textureHistoryBefore = null;
+
+  const beginTextureHistoryCapture = () => {
+    if (textureHistoryBefore) return;
+    textureHistoryBefore = captureHistoryState({
+      stylePaths: textureStylePaths,
+    });
+  };
+
+  const commitTextureHistory = (kind = "texture-style") => {
+    if (!textureHistoryBefore) return;
+    pushHistoryEntry({
+      kind,
+      before: textureHistoryBefore,
+      after: captureHistoryState({
+        stylePaths: textureStylePaths,
+      }),
+    });
+    textureHistoryBefore = null;
+  };
+
+  const syncTextureConfig = () => {
+    state.styleConfig.texture = normalizeTextureStyleConfig(state.styleConfig.texture);
+    return state.styleConfig.texture;
+  };
+
+  const updateTextureValueLabel = (element, text) => {
+    if (element) element.textContent = text;
+  };
+
+  const renderTextureModePanels = (mode = state.styleConfig.texture?.mode || "none") => {
+    texturePaperControls?.classList.toggle("hidden", mode !== "paper");
+    textureGraticuleControls?.classList.toggle("hidden", mode !== "graticule");
+    textureDraftGridControls?.classList.toggle("hidden", mode !== "draft_grid");
+  };
+
+  const renderTextureUI = () => {
+    const texture = syncTextureConfig();
+    const mode = normalizeTextureMode(texture.mode);
+    if (textureSelect) textureSelect.value = mode;
+    if (textureOpacity) textureOpacity.value = String(Math.round(texture.opacity * 100));
+    updateTextureValueLabel(textureOpacityValue, `${Math.round(texture.opacity * 100)}%`);
+
+    if (texturePaperScale) texturePaperScale.value = String(Math.round(texture.paper.scale * 100));
+    updateTextureValueLabel(texturePaperScaleValue, `${texture.paper.scale.toFixed(2)}x`);
+    if (texturePaperWarmth) texturePaperWarmth.value = String(Math.round(texture.paper.warmth * 100));
+    updateTextureValueLabel(texturePaperWarmthValue, `${Math.round(texture.paper.warmth * 100)}%`);
+    if (texturePaperGrain) texturePaperGrain.value = String(Math.round(texture.paper.grain * 100));
+    updateTextureValueLabel(texturePaperGrainValue, `${Math.round(texture.paper.grain * 100)}%`);
+    if (texturePaperWear) texturePaperWear.value = String(Math.round(texture.paper.wear * 100));
+    updateTextureValueLabel(texturePaperWearValue, `${Math.round(texture.paper.wear * 100)}%`);
+
+    if (textureGraticuleMajorStep) textureGraticuleMajorStep.value = String(texture.graticule.majorStep);
+    updateTextureValueLabel(textureGraticuleMajorStepValue, `${Math.round(texture.graticule.majorStep)}°`);
+    if (textureGraticuleMinorStep) textureGraticuleMinorStep.value = String(texture.graticule.minorStep);
+    updateTextureValueLabel(textureGraticuleMinorStepValue, `${Math.round(texture.graticule.minorStep)}°`);
+    if (textureGraticuleLabelStep) textureGraticuleLabelStep.value = String(texture.graticule.labelStep);
+    updateTextureValueLabel(textureGraticuleLabelStepValue, `${Math.round(texture.graticule.labelStep)}°`);
+
+    if (textureDraftMajorStep) textureDraftMajorStep.value = String(texture.draftGrid.majorStep);
+    updateTextureValueLabel(textureDraftMajorStepValue, `${Math.round(texture.draftGrid.majorStep)}°`);
+    if (textureDraftMinorStep) textureDraftMinorStep.value = String(texture.draftGrid.minorStep);
+    updateTextureValueLabel(textureDraftMinorStepValue, `${Math.round(texture.draftGrid.minorStep)}°`);
+    if (textureDraftLonOffset) textureDraftLonOffset.value = String(Math.round(texture.draftGrid.lonOffset));
+    updateTextureValueLabel(textureDraftLonOffsetValue, `${Math.round(texture.draftGrid.lonOffset)}°`);
+    if (textureDraftLatOffset) textureDraftLatOffset.value = String(Math.round(texture.draftGrid.latOffset));
+    updateTextureValueLabel(textureDraftLatOffsetValue, `${Math.round(texture.draftGrid.latOffset)}°`);
+    if (textureDraftRoll) textureDraftRoll.value = String(Math.round(texture.draftGrid.roll));
+    updateTextureValueLabel(textureDraftRollValue, `${Math.round(texture.draftGrid.roll)}°`);
+
+    renderTextureModePanels(mode);
+  };
+
+  const updateTextureStyle = (mutate, { historyKind = "texture-style", commitHistory = false } = {}) => {
+    beginTextureHistoryCapture();
+    const texture = syncTextureConfig();
+    if (typeof mutate === "function") mutate(texture);
+    syncTextureConfig();
+    renderTextureUI();
+    renderDirty("texture-style");
+    if (commitHistory) {
+      commitTextureHistory(historyKind);
+    }
+  };
+
+  const bindTextureRange = (element, handler) => {
+    if (!element || element.dataset.bound === "true") return;
+    element.addEventListener("input", (event) => {
+      handler(event, false);
+    });
+    element.addEventListener("change", (event) => {
+      handler(event, true);
+    });
+    element.dataset.bound = "true";
+  };
+
   const refreshActiveSovereignLabel = () => {
     if (!activeSovereignLabel) return;
     const code = String(state.activeSovereignCode || "").trim().toUpperCase();
@@ -442,6 +720,7 @@ function initToolbar({ render } = {}) {
     4
   );
   state.styleConfig.specialZones.dashStyle = String(state.styleConfig.specialZones.dashStyle || "dashed");
+  state.styleConfig.texture = normalizeTextureStyleConfig(state.styleConfig.texture);
 
   if (!state.manualSpecialZones || state.manualSpecialZones.type !== "FeatureCollection") {
     state.manualSpecialZones = { type: "FeatureCollection", features: [] };
@@ -459,14 +738,14 @@ function initToolbar({ render } = {}) {
     oceanFillColor.value = state.styleConfig.ocean.fillColor;
     oceanFillColor.addEventListener("input", (event) => {
       state.styleConfig.ocean.fillColor = normalizeOceanFillColor(event.target.value);
-      if (render) render();
+      renderDirty("ocean-fill");
     });
   }
 
   function renderRecentColors() {
     if (!recentContainer) return;
     recentContainer.replaceChildren();
-    const visibleRecentColors = state.recentColors.slice(0, 4);
+    const visibleRecentColors = state.recentColors.slice(0, 10);
     dockRecentDivider?.classList.toggle("hidden", visibleRecentColors.length === 0);
     visibleRecentColors.forEach((color) => {
       const normalized = normalizeHexColor(color);
@@ -611,15 +890,13 @@ function initToolbar({ render } = {}) {
 
       const subtitle = document.createElement("span");
       subtitle.className = "palette-library-subtitle";
-      const statusText = entry.mappedIso2
-        ? `${t("Mapped to", "ui")} ${entry.mappedIso2}`
-        : `${t("Unmapped", "ui")}: ${formatPaletteReason(entry)}`;
-      const subtitleParts = [entry.sourceTag];
-      if (entry.countryFileLabel && entry.countryFileLabel !== entry.localizedName) {
-        subtitleParts.push(entry.countryFileLabel);
-      }
-      subtitleParts.push(statusText);
-      subtitle.textContent = subtitleParts.filter(Boolean).join(" · ");
+      subtitle.textContent = entry.mappedIso2 || entry.sourceTag || "";
+      row.title = [
+        entry.localizedName || entry.label,
+        entry.sourceTag,
+        entry.countryFileLabel,
+        entry.mappedIso2 ? `${t("Mapped to", "ui")} ${entry.mappedIso2}` : `${t("Unmapped", "ui")}: ${formatPaletteReason(entry)}`,
+      ].filter(Boolean).join(" · ");
 
       meta.appendChild(title);
       meta.appendChild(subtitle);
@@ -701,7 +978,7 @@ function initToolbar({ render } = {}) {
       checkbox.checked = !!state.parentBorderEnabledByCountry?.[code];
       checkbox.addEventListener("change", (event) => {
         state.parentBorderEnabledByCountry[code] = !!event.target.checked;
-        if (render) render();
+        renderDirty("parent-border-country");
       });
 
       const text = document.createElement("span");
@@ -832,6 +1109,7 @@ function initToolbar({ render } = {}) {
         ? t("Drawing in progress: click map to add vertices, double-click to finish.", "ui")
         : t("Click map to add vertices, double-click to finish.", "ui");
     }
+    updateToolUI();
   }
   state.updateSpecialZoneEditorUIFn = renderSpecialZoneEditorUI;
 
@@ -865,9 +1143,17 @@ function initToolbar({ render } = {}) {
       button.classList.toggle("is-active", isActive);
       button.setAttribute("aria-pressed", String(isActive));
     });
+    if (brushModeBtn) {
+      const disableBrush = state.currentTool === "eyedropper" || !!state.specialZoneEditor?.active;
+      brushModeBtn.disabled = disableBrush;
+      brushModeBtn.classList.toggle("is-active", !!state.brushModeEnabled && !disableBrush);
+      brushModeBtn.setAttribute("aria-pressed", String(!!state.brushModeEnabled && !disableBrush));
+    }
     if (bottomDock) {
       bottomDock.classList.toggle("is-editing-preset", !!state.isEditingPreset);
     }
+    setToolCursorClass();
+    updateDirtyIndicator();
   }
   state.updateToolUIFn = updateToolUI;
 
@@ -915,7 +1201,9 @@ function initToolbar({ render } = {}) {
     if (themeSelect) {
       themeSelect.value = String(state.activePaletteId || themeSelect.value || "");
     }
+    renderTextureUI();
   };
+  state.updateTextureUIFn = renderTextureUI;
 
   if (customColor) {
     customColor.addEventListener("input", (event) => {
@@ -927,9 +1215,32 @@ function initToolbar({ render } = {}) {
   toolButtons.forEach((button) => {
     button.addEventListener("click", () => {
       state.currentTool = button.dataset.tool || "fill";
+      if (state.currentTool === "eyedropper") {
+        state.brushModeEnabled = false;
+      }
       updateToolUI();
+      dismissOnboardingHint();
+      showToolHud(t(
+        state.currentTool === "eraser"
+          ? "Eraser"
+          : state.currentTool === "eyedropper"
+            ? "Eyedropper"
+            : "Fill",
+        "ui"
+      ));
     });
   });
+
+  if (brushModeBtn && !brushModeBtn.dataset.bound) {
+    brushModeBtn.addEventListener("click", () => {
+      if (brushModeBtn.disabled) return;
+      state.brushModeEnabled = !state.brushModeEnabled;
+      updateToolUI();
+      dismissOnboardingHint();
+      showToolHud(t(state.brushModeEnabled ? "Brush On" : "Brush Off", "ui"));
+    });
+    brushModeBtn.dataset.bound = "true";
+  }
 
   if (selectedColorPreview && customColor && !selectedColorPreview.dataset.bound) {
     selectedColorPreview.addEventListener("click", () => {
@@ -954,6 +1265,7 @@ function initToolbar({ render } = {}) {
 
   if (zoomInBtn && !zoomInBtn.dataset.bound) {
     zoomInBtn.addEventListener("click", () => {
+      dismissOnboardingHint();
       zoomByStep(1);
     });
     zoomInBtn.dataset.bound = "true";
@@ -961,6 +1273,7 @@ function initToolbar({ render } = {}) {
 
   if (zoomOutBtn && !zoomOutBtn.dataset.bound) {
     zoomOutBtn.addEventListener("click", () => {
+      dismissOnboardingHint();
       zoomByStep(-1);
     });
     zoomOutBtn.dataset.bound = "true";
@@ -968,6 +1281,7 @@ function initToolbar({ render } = {}) {
 
   if (zoomResetBtn && !zoomResetBtn.dataset.bound) {
     zoomResetBtn.addEventListener("click", () => {
+      dismissOnboardingHint();
       resetZoomToFit();
     });
     zoomResetBtn.dataset.bound = "true";
@@ -981,6 +1295,7 @@ function initToolbar({ render } = {}) {
     zoomPercentInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         event.preventDefault();
+        dismissOnboardingHint();
         commitZoomInputValue();
         zoomPercentInput.blur();
         return;
@@ -1000,6 +1315,7 @@ function initToolbar({ render } = {}) {
 
   if (leftPanelToggle && !leftPanelToggle.dataset.bound) {
     leftPanelToggle.addEventListener("click", () => {
+      closeDockPopover();
       const next = !document.body.classList.contains("left-drawer-open");
       document.body.classList.toggle("left-drawer-open", next);
       document.body.classList.remove("right-drawer-open");
@@ -1011,6 +1327,7 @@ function initToolbar({ render } = {}) {
 
   if (rightPanelToggle && !rightPanelToggle.dataset.bound) {
     rightPanelToggle.addEventListener("click", () => {
+      closeDockPopover();
       const next = !document.body.classList.contains("right-drawer-open");
       document.body.classList.toggle("right-drawer-open", next);
       document.body.classList.remove("left-drawer-open");
@@ -1024,6 +1341,22 @@ function initToolbar({ render } = {}) {
     toggleLang.addEventListener("click", toggleLanguage);
     toggleLang.dataset.bound = "true";
   }
+
+  if (dockReferenceBtn && !dockReferenceBtn.dataset.bound) {
+    dockReferenceBtn.addEventListener("click", () => {
+      openDockPopover("reference");
+    });
+    dockReferenceBtn.dataset.bound = "true";
+  }
+
+  if (dockExportBtn && !dockExportBtn.dataset.bound) {
+    dockExportBtn.addEventListener("click", () => {
+      openDockPopover("export");
+    });
+    dockExportBtn.dataset.bound = "true";
+  }
+
+  bindDockPopoverDismiss();
 
   if (exportBtn && exportFormat) {
     exportBtn.addEventListener("click", () => {
@@ -1061,24 +1394,116 @@ function initToolbar({ render } = {}) {
     });
   }
 
-  if (textureSelect) {
-    const textureOverlay = document.getElementById("textureOverlay");
-    const applyTexture = (value) => {
-      if (textureOverlay) {
-        textureOverlay.className = `texture-overlay decorative-layer absolute inset-0 texture-${value}`;
-      }
-    };
-    applyTexture(textureSelect.value);
+  renderTextureUI();
+
+  if (textureSelect && !textureSelect.dataset.bound) {
     textureSelect.addEventListener("change", (event) => {
-      applyTexture(event.target.value);
+      updateTextureStyle((texture) => {
+        texture.mode = normalizeTextureMode(event.target.value);
+      }, { historyKind: "texture-mode", commitHistory: true });
     });
+    textureSelect.dataset.bound = "true";
   }
+
+  bindTextureRange(textureOpacity, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.88, 0, 1);
+    }, { historyKind: "texture-opacity", commitHistory: commit });
+  });
+
+  bindTextureRange(texturePaperScale, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.paper.scale = clamp(Number.isFinite(value) ? value / 100 : 1, 0.55, 2.4);
+    }, { historyKind: "texture-paper-scale", commitHistory: commit });
+  });
+
+  bindTextureRange(texturePaperWarmth, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.paper.warmth = clamp(Number.isFinite(value) ? value / 100 : 0.62, 0, 1);
+    }, { historyKind: "texture-paper-warmth", commitHistory: commit });
+  });
+
+  bindTextureRange(texturePaperGrain, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.paper.grain = clamp(Number.isFinite(value) ? value / 100 : 0.34, 0, 1);
+    }, { historyKind: "texture-paper-grain", commitHistory: commit });
+  });
+
+  bindTextureRange(texturePaperWear, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.paper.wear = clamp(Number.isFinite(value) ? value / 100 : 0.26, 0, 1);
+    }, { historyKind: "texture-paper-wear", commitHistory: commit });
+  });
+
+  bindTextureRange(textureGraticuleMajorStep, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.graticule.majorStep = clamp(Number.isFinite(value) ? value : 30, 10, 90);
+      texture.graticule.minorStep = Math.min(texture.graticule.minorStep, texture.graticule.majorStep);
+      texture.graticule.labelStep = Math.max(texture.graticule.labelStep, texture.graticule.majorStep);
+    }, { historyKind: "texture-graticule-major", commitHistory: commit });
+  });
+
+  bindTextureRange(textureGraticuleMinorStep, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.graticule.minorStep = clamp(Number.isFinite(value) ? value : 15, 5, texture.graticule.majorStep);
+    }, { historyKind: "texture-graticule-minor", commitHistory: commit });
+  });
+
+  bindTextureRange(textureGraticuleLabelStep, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.graticule.labelStep = clamp(Number.isFinite(value) ? value : 60, texture.graticule.majorStep, 180);
+    }, { historyKind: "texture-graticule-label", commitHistory: commit });
+  });
+
+  bindTextureRange(textureDraftMajorStep, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.draftGrid.majorStep = clamp(Number.isFinite(value) ? value : 24, 12, 90);
+      texture.draftGrid.minorStep = Math.min(texture.draftGrid.minorStep, texture.draftGrid.majorStep);
+    }, { historyKind: "texture-draft-major", commitHistory: commit });
+  });
+
+  bindTextureRange(textureDraftMinorStep, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.draftGrid.minorStep = clamp(Number.isFinite(value) ? value : 12, 4, texture.draftGrid.majorStep);
+    }, { historyKind: "texture-draft-minor", commitHistory: commit });
+  });
+
+  bindTextureRange(textureDraftLonOffset, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.draftGrid.lonOffset = clamp(Number.isFinite(value) ? value : 0, -180, 180);
+    }, { historyKind: "texture-draft-longitude", commitHistory: commit });
+  });
+
+  bindTextureRange(textureDraftLatOffset, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.draftGrid.latOffset = clamp(Number.isFinite(value) ? value : 12, -80, 80);
+    }, { historyKind: "texture-draft-latitude", commitHistory: commit });
+  });
+
+  bindTextureRange(textureDraftRoll, (event, commit) => {
+    const value = Number(event.target.value);
+    updateTextureStyle((texture) => {
+      texture.draftGrid.roll = clamp(Number.isFinite(value) ? value : -18, -180, 180);
+    }, { historyKind: "texture-draft-roll", commitHistory: commit });
+  });
 
   if (toggleUrban) {
     toggleUrban.checked = !!state.showUrban;
     toggleUrban.addEventListener("change", (event) => {
       state.showUrban = event.target.checked;
-      if (render) render();
+      renderDirty("toggle-urban");
     });
   }
 
@@ -1086,7 +1511,7 @@ function initToolbar({ render } = {}) {
     togglePhysical.checked = !!state.showPhysical;
     togglePhysical.addEventListener("change", (event) => {
       state.showPhysical = event.target.checked;
-      if (render) render();
+      renderDirty("toggle-physical");
     });
   }
 
@@ -1094,7 +1519,7 @@ function initToolbar({ render } = {}) {
     toggleRivers.checked = !!state.showRivers;
     toggleRivers.addEventListener("change", (event) => {
       state.showRivers = event.target.checked;
-      if (render) render();
+      renderDirty("toggle-rivers");
     });
   }
 
@@ -1102,13 +1527,13 @@ function initToolbar({ render } = {}) {
     toggleSpecialZones.checked = state.showSpecialZones;
     toggleSpecialZones.addEventListener("change", (event) => {
       state.showSpecialZones = event.target.checked;
-      if (render) render();
+      renderDirty("toggle-special-zones");
     });
   }
   if (urbanColor) {
     urbanColor.addEventListener("input", (event) => {
       state.styleConfig.urban.color = normalizeOceanFillColor(event.target.value);
-      if (render) render();
+      renderDirty("urban-color");
     });
   }
   if (urbanOpacity) {
@@ -1116,13 +1541,13 @@ function initToolbar({ render } = {}) {
       const value = Number(event.target.value);
       state.styleConfig.urban.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.22, 0, 1);
       if (urbanOpacityValue) urbanOpacityValue.textContent = `${Math.round(state.styleConfig.urban.opacity * 100)}%`;
-      if (render) render();
+      renderDirty("urban-opacity");
     });
   }
   if (urbanBlendMode) {
     urbanBlendMode.addEventListener("change", (event) => {
       state.styleConfig.urban.blendMode = String(event.target.value || "multiply");
-      if (render) render();
+      renderDirty("urban-blend");
     });
   }
   if (urbanMinArea) {
@@ -1130,20 +1555,20 @@ function initToolbar({ render } = {}) {
       const value = Number(event.target.value);
       state.styleConfig.urban.minAreaPx = clamp(Number.isFinite(value) ? value : 8, 0, 80);
       if (urbanMinAreaValue) urbanMinAreaValue.textContent = `${Math.round(state.styleConfig.urban.minAreaPx)}`;
-      if (render) render();
+      renderDirty("urban-area");
     });
   }
 
   if (physicalPreset) {
     physicalPreset.addEventListener("change", (event) => {
       state.styleConfig.physical.preset = String(event.target.value || "atlas_soft");
-      if (render) render();
+      renderDirty("physical-preset");
     });
   }
   if (physicalTintColor) {
     physicalTintColor.addEventListener("input", (event) => {
       state.styleConfig.physical.tintColor = normalizeOceanFillColor(event.target.value);
-      if (render) render();
+      renderDirty("physical-tint");
     });
   }
   if (physicalOpacity) {
@@ -1153,13 +1578,13 @@ function initToolbar({ render } = {}) {
       if (physicalOpacityValue) {
         physicalOpacityValue.textContent = `${Math.round(state.styleConfig.physical.opacity * 100)}%`;
       }
-      if (render) render();
+      renderDirty("physical-opacity");
     });
   }
   if (physicalContourColor) {
     physicalContourColor.addEventListener("input", (event) => {
       state.styleConfig.physical.contourColor = normalizeOceanFillColor(event.target.value);
-      if (render) render();
+      renderDirty("physical-contour-color");
     });
   }
   if (physicalContourOpacity) {
@@ -1169,7 +1594,7 @@ function initToolbar({ render } = {}) {
       if (physicalContourOpacityValue) {
         physicalContourOpacityValue.textContent = `${Math.round(state.styleConfig.physical.contourOpacity * 100)}%`;
       }
-      if (render) render();
+      renderDirty("physical-contour-opacity");
     });
   }
   if (physicalContourWidth) {
@@ -1179,7 +1604,7 @@ function initToolbar({ render } = {}) {
       if (physicalContourWidthValue) {
         physicalContourWidthValue.textContent = Number(state.styleConfig.physical.contourWidth).toFixed(2);
       }
-      if (render) render();
+      renderDirty("physical-contour-width");
     });
   }
   if (physicalContourSpacing) {
@@ -1189,20 +1614,20 @@ function initToolbar({ render } = {}) {
       if (physicalContourSpacingValue) {
         physicalContourSpacingValue.textContent = `${Math.round(state.styleConfig.physical.contourSpacing)}`;
       }
-      if (render) render();
+      renderDirty("physical-contour-spacing");
     });
   }
   if (physicalBlendMode) {
     physicalBlendMode.addEventListener("change", (event) => {
       state.styleConfig.physical.blendMode = String(event.target.value || "multiply");
-      if (render) render();
+      renderDirty("physical-blend");
     });
   }
 
   if (riversColor) {
     riversColor.addEventListener("input", (event) => {
       state.styleConfig.rivers.color = normalizeOceanFillColor(event.target.value);
-      if (render) render();
+      renderDirty("rivers-color");
     });
   }
   if (riversOpacity) {
@@ -1212,7 +1637,7 @@ function initToolbar({ render } = {}) {
       if (riversOpacityValue) {
         riversOpacityValue.textContent = `${Math.round(state.styleConfig.rivers.opacity * 100)}%`;
       }
-      if (render) render();
+      renderDirty("rivers-opacity");
     });
   }
   if (riversWidth) {
@@ -1222,13 +1647,13 @@ function initToolbar({ render } = {}) {
       if (riversWidthValue) {
         riversWidthValue.textContent = Number(state.styleConfig.rivers.width).toFixed(2);
       }
-      if (render) render();
+      renderDirty("rivers-width");
     });
   }
   if (riversOutlineColor) {
     riversOutlineColor.addEventListener("input", (event) => {
       state.styleConfig.rivers.outlineColor = normalizeOceanFillColor(event.target.value);
-      if (render) render();
+      renderDirty("rivers-outline-color");
     });
   }
   if (riversOutlineWidth) {
@@ -1238,18 +1663,18 @@ function initToolbar({ render } = {}) {
       if (riversOutlineWidthValue) {
         riversOutlineWidthValue.textContent = Number(state.styleConfig.rivers.outlineWidth).toFixed(2);
       }
-      if (render) render();
+      renderDirty("rivers-outline-width");
     });
   }
   if (riversDashStyle) {
     riversDashStyle.addEventListener("change", (event) => {
       state.styleConfig.rivers.dashStyle = String(event.target.value || "solid");
-      if (render) render();
+      renderDirty("rivers-dash");
     });
   }
 
   const onSpecialZonesStyleChange = () => {
-    if (render) render();
+    renderDirty("special-zone-style");
   };
   if (specialZonesDisputedFill) {
     specialZonesDisputedFill.addEventListener("input", (event) => {
@@ -1320,11 +1745,13 @@ function initToolbar({ render } = {}) {
       if (typeof state.updateSpecialZoneEditorUIFn === "function") {
         state.updateSpecialZoneEditorUIFn();
       }
+      markDirty("special-zone-type");
     });
   }
   if (specialZoneLabelInput) {
     specialZoneLabelInput.addEventListener("input", (event) => {
       state.specialZoneEditor.label = String(event.target.value || "");
+      markDirty("special-zone-label");
     });
   }
   if (specialZoneStartBtn) {
@@ -1336,6 +1763,8 @@ function initToolbar({ render } = {}) {
       if (typeof state.updateSpecialZoneEditorUIFn === "function") {
         state.updateSpecialZoneEditorUIFn();
       }
+      dismissOnboardingHint();
+      updateToolUI();
       if (render) render();
     });
   }
@@ -1345,14 +1774,19 @@ function initToolbar({ render } = {}) {
       if (typeof state.updateSpecialZoneEditorUIFn === "function") {
         state.updateSpecialZoneEditorUIFn();
       }
+      updateToolUI();
       if (render) render();
     });
   }
   if (specialZoneFinishBtn) {
     specialZoneFinishBtn.addEventListener("click", () => {
-      finishSpecialZoneDraw();
+      const didFinish = finishSpecialZoneDraw();
       if (typeof state.updateSpecialZoneEditorUIFn === "function") {
         state.updateSpecialZoneEditorUIFn();
+      }
+      updateToolUI();
+      if (didFinish) {
+        markDirty("special-zone-finish");
       }
       if (render) render();
     });
@@ -1363,6 +1797,7 @@ function initToolbar({ render } = {}) {
       if (typeof state.updateSpecialZoneEditorUIFn === "function") {
         state.updateSpecialZoneEditorUIFn();
       }
+      updateToolUI();
       if (render) render();
     });
   }
@@ -1375,25 +1810,40 @@ function initToolbar({ render } = {}) {
       if (render) render();
     });
   }
-  if (specialZoneDeleteBtn) {
-    specialZoneDeleteBtn.addEventListener("click", () => {
+  bindConfirmAction(specialZoneDeleteBtn, {
+    key: "special-zone-delete",
+    idleLabel: () => t("Delete Selected", "ui"),
+    confirmLabel: () => t("Confirm Delete", "ui"),
+    onConfirm: () => {
       deleteSelectedManualSpecialZone();
       if (typeof state.updateSpecialZoneEditorUIFn === "function") {
         state.updateSpecialZoneEditorUIFn();
       }
+      markDirty("special-zone-delete");
       if (render) render();
-    });
-  }
+    },
+  });
 
   if (presetPolitical) {
-    presetPolitical.addEventListener("click", () => {
+    presetPolitical.addEventListener("click", async () => {
+      if (presetPolitical.disabled) return;
+      presetPolitical.disabled = true;
+      presetPolitical.classList.add("is-loading");
       const nextOceanFill = applyAutoFillOceanColor();
-      autoFillMap(state.colorMode || "political", {
-        styleUpdates: {
-          "ocean.fillColor": nextOceanFill,
-        },
-      });
-      if (render) render();
+      dismissOnboardingHint();
+      try {
+        await Promise.resolve();
+        autoFillMap(state.colorMode || "political", {
+          styleUpdates: {
+            "ocean.fillColor": nextOceanFill,
+          },
+        });
+        markDirty("auto-fill");
+        if (render) render();
+      } finally {
+        presetPolitical.disabled = false;
+        presetPolitical.classList.remove("is-loading");
+      }
     });
   }
 
@@ -1445,8 +1895,11 @@ function initToolbar({ render } = {}) {
     });
   }
 
-  if (presetClear) {
-    presetClear.addEventListener("click", () => {
+  bindConfirmAction(presetClear, {
+    key: "clear-map",
+    idleLabel: () => t("Clear Map", "ui"),
+    confirmLabel: () => t("Confirm Clear", "ui"),
+    onConfirm: () => {
       const featureIds = Object.keys(state.visualOverrides || {});
       const ownerCodes = Array.from(new Set([
         ...Object.keys(state.sovereignBaseColors || {}),
@@ -1473,6 +1926,7 @@ function initToolbar({ render } = {}) {
       refreshColorState({ renderNow: true });
       refreshActiveSovereignLabel();
       refreshDynamicBorderStatus();
+      markDirty("clear-map");
       pushHistoryEntry({
         kind: "clear-map",
         before,
@@ -1485,8 +1939,8 @@ function initToolbar({ render } = {}) {
           affectsSovereignty: state.paintMode === "sovereignty",
         },
       });
-    });
-  }
+    },
+  });
 
   if (themeSelect) {
     populatePaletteSourceOptions(themeSelect);
@@ -1523,7 +1977,7 @@ function initToolbar({ render } = {}) {
   if (internalBorderColor) {
     internalBorderColor.addEventListener("input", (event) => {
       state.styleConfig.internalBorders.color = event.target.value;
-      if (render) render();
+      renderDirty("internal-border-color");
     });
   }
   if (internalBorderOpacity) {
@@ -1533,7 +1987,7 @@ function initToolbar({ render } = {}) {
       if (internalBorderOpacityValue) {
         internalBorderOpacityValue.textContent = `${event.target.value}%`;
       }
-      if (render) render();
+      renderDirty("internal-border-opacity");
     });
   }
   if (internalBorderWidth) {
@@ -1550,14 +2004,14 @@ function initToolbar({ render } = {}) {
       if (internalBorderWidthValue) {
         internalBorderWidthValue.textContent = value.toFixed(2);
       }
-      if (render) render();
+      renderDirty("internal-border-width");
     });
   }
 
   if (empireBorderColor) {
     empireBorderColor.addEventListener("input", (event) => {
       state.styleConfig.empireBorders.color = event.target.value;
-      if (render) render();
+      renderDirty("empire-border-color");
     });
   }
   if (empireBorderWidth) {
@@ -1574,14 +2028,14 @@ function initToolbar({ render } = {}) {
       if (empireBorderWidthValue) {
         empireBorderWidthValue.textContent = value.toFixed(2);
       }
-      if (render) render();
+      renderDirty("empire-border-width");
     });
   }
 
   if (coastlineColor) {
     coastlineColor.addEventListener("input", (event) => {
       state.styleConfig.coastlines.color = event.target.value;
-      if (render) render();
+      renderDirty("coastline-color");
     });
   }
   if (coastlineWidth) {
@@ -1591,7 +2045,7 @@ function initToolbar({ render } = {}) {
       if (coastlineWidthValue) {
         coastlineWidthValue.textContent = value.toFixed(1);
       }
-      if (render) render();
+      renderDirty("coastline-width");
     });
   }
 
@@ -1599,7 +2053,7 @@ function initToolbar({ render } = {}) {
     parentBorderColor.value = state.styleConfig.parentBorders.color || "#4b5563";
     parentBorderColor.addEventListener("input", (event) => {
       state.styleConfig.parentBorders.color = event.target.value;
-      if (render) render();
+      renderDirty("parent-border-color");
     });
   }
   if (parentBorderOpacity) {
@@ -1618,7 +2072,7 @@ function initToolbar({ render } = {}) {
       if (parentBorderOpacityValue) {
         parentBorderOpacityValue.textContent = `${event.target.value}%`;
       }
-      if (render) render();
+      renderDirty("parent-border-opacity");
     });
   }
   if (parentBorderWidth) {
@@ -1633,7 +2087,7 @@ function initToolbar({ render } = {}) {
       if (parentBorderWidthValue) {
         parentBorderWidthValue.textContent = state.styleConfig.parentBorders.width.toFixed(2);
       }
-      if (render) render();
+      renderDirty("parent-border-width");
     });
   }
   if (parentBorderEnableAll) {
@@ -1645,7 +2099,7 @@ function initToolbar({ render } = {}) {
         state.parentBorderEnabledByCountry[countryCode] = true;
       });
       renderParentBorderCountryList();
-      if (render) render();
+      renderDirty("parent-border-enable-all");
     });
   }
   if (parentBorderDisableAll) {
@@ -1657,7 +2111,7 @@ function initToolbar({ render } = {}) {
         state.parentBorderEnabledByCountry[countryCode] = false;
       });
       renderParentBorderCountryList();
-      if (render) render();
+      renderDirty("parent-border-disable-all");
     });
   }
 
@@ -1680,7 +2134,7 @@ function initToolbar({ render } = {}) {
       } else {
         state.styleConfig.ocean.preset = nextPreset;
       }
-      if (render) render();
+      renderDirty("ocean-style");
     });
   }
 
@@ -1696,7 +2150,7 @@ function initToolbar({ render } = {}) {
       if (oceanTextureOpacityValue) {
         oceanTextureOpacityValue.textContent = `${event.target.value}%`;
       }
-      if (render) render();
+      renderDirty("ocean-opacity");
     });
     if (!OCEAN_ADVANCED_STYLES_ENABLED) {
       oceanTextureOpacity.disabled = true;
@@ -1716,7 +2170,7 @@ function initToolbar({ render } = {}) {
       if (oceanTextureScaleValue) {
         oceanTextureScaleValue.textContent = `${state.styleConfig.ocean.scale.toFixed(2)}x`;
       }
-      if (render) render();
+      renderDirty("ocean-scale");
     });
     if (!OCEAN_ADVANCED_STYLES_ENABLED) {
       oceanTextureScale.disabled = true;
@@ -1736,7 +2190,7 @@ function initToolbar({ render } = {}) {
       if (oceanContourStrengthValue) {
         oceanContourStrengthValue.textContent = `${event.target.value}%`;
       }
-      if (render) render();
+      renderDirty("ocean-contour");
     });
     if (!OCEAN_ADVANCED_STYLES_ENABLED) {
       oceanContourStrength.disabled = true;
@@ -1762,6 +2216,7 @@ function initToolbar({ render } = {}) {
         }
         referenceImage.src = "";
         referenceImage.style.opacity = "0";
+        markDirty("reference-image-clear");
         return;
       }
       if (state.referenceImageUrl) {
@@ -1770,6 +2225,7 @@ function initToolbar({ render } = {}) {
       state.referenceImageUrl = URL.createObjectURL(file);
       referenceImage.src = state.referenceImageUrl;
       applyReferenceStyles();
+      markDirty("reference-image-file");
     });
   }
 
@@ -1785,6 +2241,7 @@ function initToolbar({ render } = {}) {
         referenceOpacityValue.textContent = `${event.target.value}%`;
       }
       applyReferenceStyles();
+      markDirty("reference-opacity");
     });
   }
 
@@ -1800,6 +2257,7 @@ function initToolbar({ render } = {}) {
         referenceScaleValue.textContent = `${state.referenceImageState.scale.toFixed(2)}x`;
       }
       applyReferenceStyles();
+      markDirty("reference-scale");
     });
   }
 
@@ -1815,6 +2273,7 @@ function initToolbar({ render } = {}) {
         referenceOffsetXValue.textContent = `${state.referenceImageState.offsetX}px`;
       }
       applyReferenceStyles();
+      markDirty("reference-offset-x");
     });
   }
 
@@ -1830,6 +2289,7 @@ function initToolbar({ render } = {}) {
         referenceOffsetYValue.textContent = `${state.referenceImageState.offsetY}px`;
       }
       applyReferenceStyles();
+      markDirty("reference-offset-y");
     });
   }
 
@@ -1852,6 +2312,18 @@ function initToolbar({ render } = {}) {
   updateZoomUi();
   updateSwatchUI();
   updateToolUI();
+  closeDockPopover();
+  if (mapContainer && !mapContainer.dataset.onboardingBound) {
+    ["pointerdown", "wheel"].forEach((eventName) => {
+      mapContainer.addEventListener(eventName, dismissOnboardingHint, { passive: true });
+    });
+    mapContainer.dataset.onboardingBound = "true";
+  }
+  if (mapOnboardingHint && !state.onboardingDismissed) {
+    globalThis.setTimeout(() => {
+      dismissOnboardingHint();
+    }, 3000);
+  }
   updateUIText();
 }
 

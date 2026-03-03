@@ -1,9 +1,10 @@
 // Hybrid canvas + SVG rendering engine.
-import { state } from "./state.js";
+import { normalizeTextureStyleConfig, state } from "./state.js";
 import { ColorManager } from "./color_manager.js";
 import { LegendManager } from "./legend_manager.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import { getTooltipText } from "../ui/i18n.js";
+import { markDirty } from "./dirty_state.js";
 import {
   ensureSovereigntyState,
   getFeatureOwnerCode,
@@ -18,7 +19,6 @@ let mapCanvas = null;
 let hitCanvas = null;
 let mapSvg = null;
 let interactionRect = null;
-let textureOverlay = null;
 let tooltip = null;
 let context = null;
 let hitContext = null;
@@ -33,10 +33,12 @@ let viewportGroup = null;
 let specialZonesGroup = null;
 let specialZoneEditorGroup = null;
 let hoverGroup = null;
+let inspectorHighlightGroup = null;
 let legendGroup = null;
 let legendItemsGroup = null;
 let legendBackground = null;
 let lastLegendKey = null;
+let brushSession = null;
 
 const PROJECTION_PRECISION = 0.1;
 const PATH_POINT_RADIUS = 2;
@@ -98,6 +100,13 @@ const CONTEXT_LAYER_MIN_SCORE = 0.08;
 const LAYER_DIAG_PREFIX = "[layer-resolver]";
 const DEFAULT_SPECIAL_ZONE_TYPE = "custom";
 const PHYSICAL_PATTERN_BASE_SIZE = 96;
+const PAPER_TEXTURE_BASE_TILE_SIZE = 512;
+const PAPER_NOISE_TILE_SIZE = 192;
+const TEXTURE_LABEL_SERIF_STACK = "\"Iowan Old Style\", \"Palatino Linotype\", Georgia, serif";
+const GRATICULE_SAMPLE_DEGREES = 2;
+const PAPER_TEXTURE_ASSET_URLS = {
+  paper_vintage_01: new URL("../../vendor/textures/paper_vintage_01.svg", import.meta.url).href,
+};
 // Keep this list empty by default. Polygon winding issues are repaired dynamically.
 const KNOWN_BAD_FEATURE_IDS = new Set();
 const DEBUG_MODES = new Set(["PROD", "GEOMETRY", "ARTIFACTS", "ISLANDS", "ID_HASH"]);
@@ -114,10 +123,19 @@ let islandNeighborsCache = {
 };
 const oceanPatternCache = new Map();
 const physicalPatternCache = new Map();
+const textureAssetCache = new Map();
+const texturePatternCache = new Map();
+const textureGeometryCache = new Map();
+const textureNoiseTileCache = new Map();
 const layerResolverCache = {
   primaryRef: null,
   detailRef: null,
   bundleMode: null,
+};
+let admin0MergedCache = {
+  topologyRef: null,
+  featureCount: 0,
+  entries: [],
 };
 const renderDiag = {
   enabled: false,
@@ -1401,7 +1419,7 @@ function ensureHybridLayers() {
   mapCanvas = mapContainer.querySelector("#map-canvas");
   if (!mapCanvas) {
     mapCanvas = createCanvasElement();
-    const anchor = legacyColorCanvas || legacyLineCanvas || textureOverlay || null;
+    const anchor = legacyColorCanvas || legacyLineCanvas || null;
     if (anchor && mapContainer.contains(anchor)) {
       mapContainer.insertBefore(mapCanvas, anchor);
     } else {
@@ -1423,11 +1441,7 @@ function ensureHybridLayers() {
   mapSvg = mapContainer.querySelector("#map-svg");
   if (!mapSvg) {
     mapSvg = createSvgElement();
-    if (textureOverlay && mapContainer.contains(textureOverlay)) {
-      mapContainer.insertBefore(mapSvg, textureOverlay);
-    } else {
-      mapContainer.appendChild(mapSvg);
-    }
+    mapContainer.appendChild(mapSvg);
   }
   mapSvg.style.display = "block";
   mapSvg.style.zIndex = "1";
@@ -1458,6 +1472,12 @@ function ensureHybridLayers() {
     hoverGroup = viewportGroup.append("g").attr("class", "hover-layer");
   }
   hoverGroup.style("pointer-events", "none");
+
+  inspectorHighlightGroup = viewportGroup.select("g.inspector-highlight-layer");
+  if (inspectorHighlightGroup.empty()) {
+    inspectorHighlightGroup = viewportGroup.append("g").attr("class", "inspector-highlight-layer");
+  }
+  inspectorHighlightGroup.style("pointer-events", "none");
 
   legendGroup = svg.select("g.legend-group");
   if (legendGroup.empty()) {
@@ -1519,6 +1539,8 @@ function setCanvasSize() {
     hitCanvas.height = scaledH;
   }
   oceanPatternCache.clear();
+  texturePatternCache.clear();
+  textureNoiseTileCache.clear();
   clearProjectedBoundsCache();
   state.hitCanvasDirty = true;
 
@@ -3214,6 +3236,564 @@ function drawRiversLayer(k, { interactive = false } = {}) {
   context.restore();
 }
 
+function getTextureStyleConfig() {
+  if (!state.styleConfig || typeof state.styleConfig !== "object") {
+    state.styleConfig = {};
+  }
+  state.styleConfig.texture = normalizeTextureStyleConfig(state.styleConfig.texture);
+  return state.styleConfig.texture;
+}
+
+function requestTextureRerender() {
+  if (typeof state.renderNowFn === "function") {
+    state.renderNowFn();
+    return;
+  }
+  if (context) {
+    drawCanvas();
+  }
+}
+
+function resolvePaperTextureAssetUrl(assetId) {
+  return PAPER_TEXTURE_ASSET_URLS[String(assetId || "").trim()] || null;
+}
+
+function ensureTextureAssetImage(assetId) {
+  const normalizedId = String(assetId || "").trim();
+  if (!normalizedId) return null;
+  const existing = textureAssetCache.get(normalizedId);
+  if (existing) {
+    return existing.status === "ready" ? existing.image : null;
+  }
+  const url = resolvePaperTextureAssetUrl(normalizedId);
+  if (!url) return null;
+
+  const image = new Image();
+  const entry = {
+    status: "loading",
+    image,
+    url,
+  };
+  textureAssetCache.set(normalizedId, entry);
+  image.decoding = "async";
+  image.onload = () => {
+    entry.status = "ready";
+    texturePatternCache.clear();
+    requestTextureRerender();
+  };
+  image.onerror = () => {
+    entry.status = "error";
+  };
+  image.src = url;
+  return null;
+}
+
+function createSeededRandom(seedInput) {
+  let seed = Number(seedInput) || 1;
+  return () => {
+    seed |= 0;
+    seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function getTexturePattern(source, cacheKey, scale = 1) {
+  if (!context || !source || !cacheKey) return null;
+  const normalizedScale = clamp(Number(scale) || 1, 0.25, 4);
+  const key = `${cacheKey}|${normalizedScale.toFixed(3)}`;
+  const cached = texturePatternCache.get(key);
+  if (cached) return cached;
+
+  const pattern = context.createPattern(source, "repeat");
+  if (!pattern) return null;
+  if (pattern.setTransform && globalThis.DOMMatrix) {
+    const matrix = new globalThis.DOMMatrix();
+    matrix.scaleSelf(normalizedScale, normalizedScale);
+    pattern.setTransform(matrix);
+  }
+  texturePatternCache.set(key, pattern);
+  return pattern;
+}
+
+function getPaperNoiseTile(paperConfig) {
+  const scaleBucket = Math.round((paperConfig?.scale || 1) * 100);
+  const grainBucket = Math.round((paperConfig?.grain || 0) * 100);
+  const wearBucket = Math.round((paperConfig?.wear || 0) * 100);
+  const warmthBucket = Math.round((paperConfig?.warmth || 0) * 100);
+  const key = `${scaleBucket}|${grainBucket}|${wearBucket}|${warmthBucket}`;
+  const cached = textureNoiseTileCache.get(key);
+  if (cached) return cached;
+
+  const tile = document.createElement("canvas");
+  tile.width = PAPER_NOISE_TILE_SIZE;
+  tile.height = PAPER_NOISE_TILE_SIZE;
+  const tileCtx = tile.getContext("2d");
+  if (!tileCtx) return null;
+
+  const rng = createSeededRandom(scaleBucket * 17 + grainBucket * 29 + wearBucket * 43 + warmthBucket * 59);
+  tileCtx.clearRect(0, 0, tile.width, tile.height);
+
+  const speckCount = Math.round(900 + grainBucket * 14);
+  for (let index = 0; index < speckCount; index += 1) {
+    const alpha = 0.012 + rng() * 0.03;
+    const shade = Math.round(88 + rng() * 70);
+    tileCtx.fillStyle = `rgba(${shade}, ${shade - 6}, ${Math.max(24, shade - 22)}, ${alpha})`;
+    const x = rng() * tile.width;
+    const y = rng() * tile.height;
+    const size = rng() < 0.82 ? 1 : 2 + rng() * 1.8;
+    tileCtx.fillRect(x, y, size, size);
+  }
+
+  const fiberCount = Math.round(260 + grainBucket * 2.6);
+  tileCtx.lineCap = "round";
+  for (let index = 0; index < fiberCount; index += 1) {
+    const x = rng() * tile.width;
+    const y = rng() * tile.height;
+    const length = 4 + rng() * 12;
+    const angle = rng() * Math.PI * 2;
+    tileCtx.strokeStyle = `rgba(98, 74, 52, ${0.018 + rng() * 0.025})`;
+    tileCtx.lineWidth = 0.35 + rng() * 0.8;
+    tileCtx.beginPath();
+    tileCtx.moveTo(x, y);
+    tileCtx.lineTo(x + Math.cos(angle) * length, y + Math.sin(angle) * length);
+    tileCtx.stroke();
+  }
+
+  const stainCount = Math.round(10 + wearBucket * 0.1);
+  for (let index = 0; index < stainCount; index += 1) {
+    const radius = 12 + rng() * 26;
+    const x = rng() * tile.width;
+    const y = rng() * tile.height;
+    const gradient = tileCtx.createRadialGradient(x, y, radius * 0.12, x, y, radius);
+    gradient.addColorStop(0, `rgba(128, 92, 54, ${0.022 + rng() * 0.028})`);
+    gradient.addColorStop(1, "rgba(128, 92, 54, 0)");
+    tileCtx.fillStyle = gradient;
+    tileCtx.beginPath();
+    tileCtx.arc(x, y, radius, 0, Math.PI * 2);
+    tileCtx.fill();
+  }
+
+  if (warmthBucket > 0) {
+    tileCtx.fillStyle = `rgba(171, 132, 78, ${0.02 + warmthBucket / 5500})`;
+    tileCtx.fillRect(0, 0, tile.width, tile.height);
+  }
+
+  textureNoiseTileCache.set(key, tile);
+  return tile;
+}
+
+function withTextureSphereClip(shouldClip, drawFn) {
+  if (!context || !pathCanvas || typeof drawFn !== "function") return;
+  context.save();
+  if (shouldClip) {
+    context.beginPath();
+    pathCanvas({ type: "Sphere" });
+    context.clip();
+  }
+  drawFn();
+  context.restore();
+}
+
+function buildTextureAxisValues(limit, step) {
+  const values = [];
+  const safeStep = Math.max(1, Number(step) || 1);
+  for (let value = -limit + safeStep; value < limit; value += safeStep) {
+    values.push(Number(value.toFixed(6)));
+  }
+  return values;
+}
+
+function shouldIncludeTextureLabel(value, step) {
+  const normalizedStep = Math.max(1, Number(step) || 1);
+  return Math.abs(value / normalizedStep - Math.round(value / normalizedStep)) < 1e-6;
+}
+
+function formatLongitudeLabel(value) {
+  const abs = Math.round(Math.abs(value));
+  if (abs === 0) return "0°";
+  return `${abs}°${value < 0 ? "W" : "E"}`;
+}
+
+function formatLatitudeLabel(value) {
+  const abs = Math.round(Math.abs(value));
+  if (abs === 0) return "0°";
+  return `${abs}°${value < 0 ? "S" : "N"}`;
+}
+
+function buildTextureLine(kind, fixedValue, rotatePoint, label = "") {
+  const coordinates = [];
+  if (kind === "meridian") {
+    for (let lat = -89.5; lat <= 89.5; lat += GRATICULE_SAMPLE_DEGREES) {
+      coordinates.push(rotatePoint([fixedValue, lat]));
+    }
+    coordinates.push(rotatePoint([fixedValue, 89.5]));
+  } else {
+    for (let lon = -180; lon <= 180; lon += GRATICULE_SAMPLE_DEGREES) {
+      coordinates.push(rotatePoint([lon, fixedValue]));
+    }
+    coordinates.push(rotatePoint([180, fixedValue]));
+  }
+  return {
+    kind,
+    value: fixedValue,
+    label,
+    geometry: {
+      type: "LineString",
+      coordinates,
+    },
+  };
+}
+
+function buildTextureGraticuleGeometry(cacheKey, {
+  majorStep,
+  minorStep,
+  labelStep,
+  rotation = [0, 0, 0],
+  includeLabels = true,
+} = {}) {
+  const cached = textureGeometryCache.get(cacheKey);
+  if (cached) return cached;
+  const rotatePoint = globalThis.d3?.geoRotation ? globalThis.d3.geoRotation(rotation) : ((point) => point);
+  const geometry = {
+    majorLines: [],
+    minorLines: [],
+  };
+  const majorMeridians = new Set(buildTextureAxisValues(180, majorStep).map((value) => value.toFixed(6)));
+  const majorParallels = new Set(buildTextureAxisValues(90, majorStep).map((value) => value.toFixed(6)));
+
+  buildTextureAxisValues(180, majorStep).forEach((value) => {
+    geometry.majorLines.push(
+      buildTextureLine(
+        "meridian",
+        value,
+        rotatePoint,
+        includeLabels && shouldIncludeTextureLabel(value, labelStep) ? formatLongitudeLabel(value) : ""
+      )
+    );
+  });
+  buildTextureAxisValues(90, majorStep).forEach((value) => {
+    geometry.majorLines.push(
+      buildTextureLine(
+        "parallel",
+        value,
+        rotatePoint,
+        includeLabels && shouldIncludeTextureLabel(value, labelStep) ? formatLatitudeLabel(value) : ""
+      )
+    );
+  });
+
+  if (minorStep < majorStep) {
+    buildTextureAxisValues(180, minorStep).forEach((value) => {
+      if (majorMeridians.has(value.toFixed(6))) return;
+      geometry.minorLines.push(buildTextureLine("meridian", value, rotatePoint));
+    });
+    buildTextureAxisValues(90, minorStep).forEach((value) => {
+      if (majorParallels.has(value.toFixed(6))) return;
+      geometry.minorLines.push(buildTextureLine("parallel", value, rotatePoint));
+    });
+  }
+
+  textureGeometryCache.set(cacheKey, geometry);
+  return geometry;
+}
+
+function getTextureLineAnchor(line) {
+  if (!projection || !Array.isArray(line?.geometry?.coordinates)) return null;
+  let best = null;
+  line.geometry.coordinates.forEach((coordinate) => {
+    const projected = projection(coordinate);
+    if (!projected || projected.length < 2 || !projected.every(Number.isFinite)) return;
+    const [x, y] = projected;
+    if (line.kind === "meridian") {
+      if (!best || y < best.y) {
+        best = { x, y, align: "center", baseline: "top", offsetX: 0, offsetY: 8 };
+      }
+    } else if (!best || x < best.x) {
+      best = { x, y, align: "left", baseline: "middle", offsetX: 8, offsetY: 0 };
+    }
+  });
+  return best;
+}
+
+function drawTextureLabels(lines, config, k, opacity) {
+  if (!context || !Array.isArray(lines) || !lines.length) return;
+  const occupied = [];
+  const minDistance = 34 / Math.max(0.8, k);
+  const fontSize = clamp((Number(config.labelSize) || 11) / Math.max(0.75, k), 8, 18);
+
+  context.save();
+  context.fillStyle = getSafeCanvasColor(config.labelColor, "#475569");
+  context.globalAlpha = clamp(opacity, 0, 1);
+  context.font = `${fontSize}px ${TEXTURE_LABEL_SERIF_STACK}`;
+  context.shadowColor = "rgba(255,255,255,0.8)";
+  context.shadowBlur = 5 / Math.max(0.85, k);
+
+  lines.forEach((line) => {
+    if (!line?.label) return;
+    const anchor = getTextureLineAnchor(line);
+    if (!anchor) return;
+    const x = anchor.x + anchor.offsetX / Math.max(0.8, k);
+    const y = anchor.y + anchor.offsetY / Math.max(0.8, k);
+    const overlaps = occupied.some((point) => Math.hypot(point.x - x, point.y - y) < minDistance);
+    if (overlaps) return;
+    occupied.push({ x, y });
+    context.textAlign = anchor.align;
+    context.textBaseline = anchor.baseline;
+    context.fillText(line.label, x, y);
+  });
+
+  context.restore();
+}
+
+function drawOldPaperTexture(k, { interactive = false } = {}) {
+  if (!context || !pathCanvas || !pathSVG) return;
+  const texture = getTextureStyleConfig();
+  const paper = texture.paper || {};
+  const assetImage = ensureTextureAssetImage(paper.assetId);
+  const noiseTile = getPaperNoiseTile(paper);
+  const sphereBounds = pathSVG.bounds({ type: "Sphere" });
+  const minX = sphereBounds?.[0]?.[0] || 0;
+  const minY = sphereBounds?.[0]?.[1] || 0;
+  const maxX = sphereBounds?.[1]?.[0] || state.width;
+  const maxY = sphereBounds?.[1]?.[1] || state.height;
+  const centerX = (minX + maxX) / 2;
+  const centerY = (minY + maxY) / 2;
+  const radius = Math.max(maxX - minX, maxY - minY) * 0.58;
+
+  withTextureSphereClip(texture.sphereClip, () => {
+    context.save();
+    context.globalCompositeOperation = "multiply";
+    context.globalAlpha = clamp(texture.opacity * (0.24 + paper.warmth * 0.22), 0, interactive ? 0.28 : 0.42);
+    context.fillStyle = `rgba(205, 182, 138, ${0.42 + paper.warmth * 0.18})`;
+    context.beginPath();
+    pathCanvas({ type: "Sphere" });
+    context.fill();
+
+    if (assetImage) {
+      const assetPattern = getTexturePattern(assetImage, `paper-asset:${paper.assetId}`, paper.scale);
+      if (assetPattern) {
+        context.globalCompositeOperation = getSafeBlendMode(paper.blendMode, "multiply");
+        context.globalAlpha = clamp(texture.opacity * (interactive ? 0.15 : 0.34), 0, 0.42);
+        context.fillStyle = assetPattern;
+        context.beginPath();
+        pathCanvas({ type: "Sphere" });
+        context.fill();
+      }
+    }
+
+    if (noiseTile) {
+      const noisePattern = getTexturePattern(
+        noiseTile,
+        `paper-noise:${Math.round(paper.grain * 100)}:${Math.round(paper.wear * 100)}:${Math.round(paper.warmth * 100)}`,
+        paper.scale * 0.88
+      );
+      if (noisePattern) {
+        context.globalCompositeOperation = "multiply";
+        context.globalAlpha = clamp(texture.opacity * (0.22 + paper.grain * 0.3 + paper.wear * 0.22), 0, interactive ? 0.24 : 0.48);
+        context.fillStyle = noisePattern;
+        context.beginPath();
+        pathCanvas({ type: "Sphere" });
+        context.fill();
+      }
+    }
+
+    const vignette = context.createRadialGradient(
+      centerX,
+      centerY,
+      radius * 0.24,
+      centerX,
+      centerY,
+      radius * 1.06
+    );
+    vignette.addColorStop(0, "rgba(88, 62, 34, 0)");
+    vignette.addColorStop(1, `rgba(88, 62, 34, ${0.18 + paper.vignette * 0.42})`);
+    context.globalCompositeOperation = "multiply";
+    context.globalAlpha = clamp(texture.opacity * (0.14 + paper.vignette * 0.65), 0, 0.32);
+    context.fillStyle = vignette;
+    context.fillRect(minX - 24, minY - 24, maxX - minX + 48, maxY - minY + 48);
+    context.restore();
+  });
+}
+
+function drawProjectedTextureLines(lines, {
+  color = "#64748b",
+  width = 1,
+  opacity = 0.2,
+  dash = [],
+  k = 1,
+} = {}) {
+  if (!context || !pathCanvas || !Array.isArray(lines) || !lines.length) return;
+  context.save();
+  context.strokeStyle = getSafeCanvasColor(color, "#64748b");
+  context.globalAlpha = clamp(opacity, 0, 1);
+  context.lineWidth = clamp(Number(width) || 1, 0.1, 4) / Math.max(0.0001, k);
+  context.setLineDash(Array.isArray(dash) ? dash : []);
+  lines.forEach((line) => {
+    if (!line?.geometry) return;
+    context.beginPath();
+    pathCanvas(line.geometry);
+    context.stroke();
+  });
+  context.restore();
+}
+
+function drawGraticuleTexture(k, { interactive = false } = {}) {
+  const texture = getTextureStyleConfig();
+  const config = texture.graticule || {};
+  const cacheKey = [
+    "graticule",
+    config.majorStep,
+    config.minorStep,
+    config.labelStep,
+    config.majorWidth,
+    config.minorWidth,
+  ].join("|");
+  const geometry = buildTextureGraticuleGeometry(cacheKey, {
+    majorStep: config.majorStep,
+    minorStep: config.minorStep,
+    labelStep: config.labelStep,
+    includeLabels: true,
+  });
+
+  withTextureSphereClip(texture.sphereClip, () => {
+    drawProjectedTextureLines(geometry.minorLines, {
+      color: config.color,
+      width: config.minorWidth,
+      opacity: texture.opacity * config.minorOpacity * (interactive ? 0.9 : 1),
+      k,
+    });
+    drawProjectedTextureLines(geometry.majorLines, {
+      color: config.color,
+      width: config.majorWidth,
+      opacity: texture.opacity * config.majorOpacity,
+      k,
+    });
+    drawTextureLabels(
+      geometry.majorLines,
+      config,
+      k,
+      texture.opacity * clamp(config.majorOpacity * 1.18, 0, 0.6)
+    );
+  });
+}
+
+function drawDraftGridTexture(k, { interactive = false } = {}) {
+  const texture = getTextureStyleConfig();
+  const config = texture.draftGrid || {};
+  const cacheKey = [
+    "draft-grid",
+    config.majorStep,
+    config.minorStep,
+    Math.round(config.lonOffset),
+    Math.round(config.latOffset),
+    Math.round(config.roll),
+  ].join("|");
+  const geometry = buildTextureGraticuleGeometry(cacheKey, {
+    majorStep: config.majorStep,
+    minorStep: config.minorStep,
+    labelStep: 999,
+    rotation: [config.lonOffset, config.latOffset, config.roll],
+    includeLabels: false,
+  });
+  const majorDash = getDashPattern(config.dash || "dashed", Number(config.width) || 1);
+  const minorDash = config.dash === "solid"
+    ? []
+    : getDashPattern(config.dash || "dashed", Math.max(0.5, (Number(config.width) || 1) * 0.75));
+  const drawMinor = !interactive || k > 1.15;
+
+  withTextureSphereClip(texture.sphereClip, () => {
+    if (drawMinor) {
+      drawProjectedTextureLines(geometry.minorLines, {
+        color: config.color,
+        width: Math.max(0.22, (Number(config.width) || 1) * 0.68),
+        opacity: texture.opacity * config.minorOpacity,
+        dash: minorDash,
+        k,
+      });
+    }
+    drawProjectedTextureLines(geometry.majorLines, {
+      color: config.color,
+      width: config.width,
+      opacity: texture.opacity * config.majorOpacity,
+      dash: majorDash,
+      k,
+    });
+  });
+}
+
+function drawTextureLayer(k, { interactive = false } = {}) {
+  const texture = getTextureStyleConfig();
+  const mode = String(texture.mode || "none").trim().toLowerCase();
+  if (mode === "none") return;
+  if (mode === "paper") {
+    drawOldPaperTexture(k, { interactive });
+    return;
+  }
+  if (mode === "graticule") {
+    drawGraticuleTexture(k, { interactive });
+    return;
+  }
+  if (mode === "draft_grid") {
+    drawDraftGridTexture(k, { interactive });
+  }
+}
+
+function buildAdmin0MergedShapes() {
+  const topology = state.topologyPrimary || state.topology;
+  if (!topology?.objects?.political || !globalThis.topojson?.merge) return [];
+
+  const geometries = topology.objects.political.geometries || [];
+  const currentFeatureCount = state.landData?.features?.length || 0;
+
+  if (
+    admin0MergedCache.topologyRef === topology &&
+    admin0MergedCache.featureCount === currentFeatureCount
+  ) {
+    return admin0MergedCache.entries;
+  }
+
+  const byCountry = new Map();
+  geometries.forEach((geom) => {
+    const code = String(geom?.properties?.cntr_code || "").trim().toUpperCase();
+    if (!code) return;
+    if (!byCountry.has(code)) byCountry.set(code, []);
+    byCountry.get(code).push(geom);
+  });
+
+  const entries = [];
+  byCountry.forEach((geoms, code) => {
+    try {
+      const mergedShape = globalThis.topojson.merge(topology, geoms);
+      entries.push({ code, mergedShape });
+    } catch (_e) {
+      // Skip countries that fail to merge
+    }
+  });
+
+  admin0MergedCache = { topologyRef: topology, featureCount: currentFeatureCount, entries };
+  return entries;
+}
+
+function drawAdmin0BackgroundFills() {
+  const entries = buildAdmin0MergedShapes();
+  if (!entries.length) return;
+
+  entries.forEach(({ code, mergedShape }) => {
+    const color =
+      (state.sovereignBaseColors && state.sovereignBaseColors[code]) ||
+      (state.countryBaseColors && state.countryBaseColors[code]) ||
+      null;
+    const fillColor = getSafeCanvasColor(color, null) || LAND_FILL_COLOR;
+
+    context.beginPath();
+    pathCanvas(mergedShape);
+    context.fillStyle = fillColor;
+    context.fill();
+  });
+}
+
 function drawCanvas() {
   if (!context || !pathCanvas) return;
   ensureLayerDataFromTopology();
@@ -3252,6 +3832,11 @@ function drawCanvas() {
     context.fill();
   }
   drawOceanStyle();
+
+  // 3.5 Admin0 background fills: merged country silhouettes cover subdivision gaps
+  if (debugMode === "PROD") {
+    drawAdmin0BackgroundFills();
+  }
 
   // 4. Draw political land fill first.
   if (state.landData?.features?.length) {
@@ -3293,10 +3878,21 @@ function drawCanvas() {
       pathCanvas(feature);
       context.fillStyle = fillColor;
       context.fill();
+
+      // Fill-colored stroke: expand fill by ~0.25px to cover anti-aliasing seams
+      if (debugMode === "PROD") {
+        context.strokeStyle = fillColor;
+        context.lineWidth = 0.5 / k;
+        context.lineJoin = "round";
+        context.stroke();
+      }
     });
   }
 
-  // 5. Draw context layers between land fill and borders.
+  // 5. Draw projected texture overlays within the sphere.
+  drawTextureLayer(k, { interactive: isInteractingFrame });
+
+  // 6. Draw context layers between land fill and borders.
   const shouldDrawContextLayers = !isInteractingFrame || String(state.renderProfile || "auto") === "full";
   if (shouldDrawContextLayers) {
     drawPhysicalLayer(k, { interactive: isInteractingFrame });
@@ -3304,7 +3900,7 @@ function drawCanvas() {
     drawRiversLayer(k, { interactive: isInteractingFrame });
   }
 
-  // 6. Draw border hierarchy (country > province > local) after fills.
+  // 7. Draw border hierarchy (country > province > local) after fills.
   if (state.landData?.features?.length) {
     drawHierarchicalBorders(k, { interactive: isInteractingFrame });
   }
@@ -3551,6 +4147,32 @@ function renderHoverOverlay() {
   selection.exit().remove();
 }
 
+function renderInspectorHighlightOverlay() {
+  if (!inspectorHighlightGroup || !pathSVG) return;
+  const code = String(state.inspectorHighlightCountryCode || "").trim().toUpperCase();
+  if (!code) {
+    inspectorHighlightGroup.selectAll("path.inspector-highlight").remove();
+    return;
+  }
+  const data = (state.landData?.features || []).filter((feature) => getFeatureCountryCodeNormalized(feature) === code);
+  const selection = inspectorHighlightGroup
+    .selectAll("path.inspector-highlight")
+    .data(data, (d, index) => getFeatureId(d) || `${code}-${index}`);
+
+  selection
+    .enter()
+    .append("path")
+    .attr("class", "inspector-highlight")
+    .attr("vector-effect", "non-scaling-stroke")
+    .merge(selection)
+    .attr("d", pathSVG)
+    .attr("fill", "none")
+    .attr("stroke", "rgba(0, 47, 167, 0.6)")
+    .attr("stroke-width", 2.4);
+
+  selection.exit().remove();
+}
+
 function renderSpecialZones() {
   if (!specialZonesGroup || !specialZoneEditorGroup) return;
   updateSpecialZonesPaths();
@@ -3647,6 +4269,7 @@ function render() {
     ensureHitCanvasUpToDate();
   }
   renderSpecialZones();
+  renderInspectorHighlightOverlay();
   renderHoverOverlay();
   if (state.renderPhase === RENDER_PHASE_IDLE) {
     renderLegend();
@@ -3749,6 +4372,7 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
       cursor[segments[segments.length - 1]] = value;
     });
   }
+  markDirty(mode === "political" ? "auto-fill-political" : "auto-fill-region");
   refreshResolvedColorsForOwners(Object.keys(nextCountryBaseColors), { renderNow: true });
   if (typeof state.renderCountryListFn === "function") {
     state.renderCountryListFn();
@@ -3980,8 +4604,188 @@ function resolveInteractionTargetIds(feature, id) {
   return ids.length ? ids : [id];
 }
 
+function mergeHistorySnapshot(target, snapshot) {
+  if (!snapshot || typeof snapshot !== "object") return;
+  Object.entries(snapshot).forEach(([section, patch]) => {
+    if (!patch || typeof patch !== "object") return;
+    target[section] = target[section] || {};
+    Object.assign(target[section], patch);
+  });
+}
+
+function ensureBrushSession(event) {
+  if (brushSession) return brushSession;
+  brushSession = {
+    active: true,
+    dragging: false,
+    startX: Number(event?.clientX || 0),
+    startY: Number(event?.clientY || 0),
+    visitedFeatureIds: new Set(),
+    visitedOwnerCodes: new Set(),
+    affectedFeatureIds: new Set(),
+    affectedOwnerCodes: new Set(),
+    affectedSovereigntyIds: new Set(),
+    before: {},
+    changed: false,
+  };
+  return brushSession;
+}
+
+function applyBrushHit(hit) {
+  if (!hit?.id) return false;
+  const feature = state.landIndex.get(hit.id);
+  if (!feature) return false;
+  const id = hit.id;
+  const countryCode = hit.countryCode || getFeatureCountryCodeNormalized(feature);
+  const targetIds = resolveInteractionTargetIds(feature, id);
+  const selectedColor = getSafeCanvasColor(state.selectedColor, LAND_FILL_COLOR);
+
+  if (state.currentTool === "eyedropper") return false;
+  if (state.currentTool === "eraser") {
+    if (isSovereigntyModeActive()) {
+      const freshIds = targetIds.filter((targetId) => !brushSession.affectedSovereigntyIds.has(targetId));
+      if (!freshIds.length) return false;
+      mergeHistorySnapshot(brushSession.before, captureHistoryState({ sovereigntyFeatureIds: freshIds }));
+      freshIds.forEach((targetId) => brushSession.affectedSovereigntyIds.add(targetId));
+      const changed = resetFeatureOwnerCodes(targetIds);
+      if (changed > 0) {
+        brushSession.changed = true;
+        refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+        scheduleDynamicBorderRecompute("brush-sovereignty-reset", 90);
+        return true;
+      }
+      return false;
+    }
+    if (state.interactionGranularity === "country" && countryCode) {
+      if (brushSession.visitedOwnerCodes.has(countryCode)) return false;
+      brushSession.visitedOwnerCodes.add(countryCode);
+      mergeHistorySnapshot(brushSession.before, captureHistoryState({ ownerCodes: [countryCode] }));
+      brushSession.affectedOwnerCodes.add(countryCode);
+      delete state.sovereignBaseColors[countryCode];
+      delete state.countryBaseColors[countryCode];
+      refreshResolvedColorsForOwners([countryCode], { renderNow: false });
+      brushSession.changed = true;
+      return true;
+    }
+    const freshIds = targetIds.filter((targetId) => !brushSession.visitedFeatureIds.has(targetId));
+    if (!freshIds.length) return false;
+    mergeHistorySnapshot(brushSession.before, captureHistoryState({ featureIds: freshIds }));
+    freshIds.forEach((targetId) => {
+      brushSession.visitedFeatureIds.add(targetId);
+      brushSession.affectedFeatureIds.add(targetId);
+      delete state.visualOverrides[targetId];
+      delete state.featureOverrides[targetId];
+    });
+    refreshResolvedColorsForFeatures(freshIds, { renderNow: false });
+    brushSession.changed = true;
+    return true;
+  }
+
+  if (isSovereigntyModeActive()) {
+    if (!state.activeSovereignCode) return false;
+    const freshIds = targetIds.filter((targetId) => !brushSession.affectedSovereigntyIds.has(targetId));
+    if (!freshIds.length) return false;
+    mergeHistorySnapshot(brushSession.before, captureHistoryState({ sovereigntyFeatureIds: freshIds }));
+    freshIds.forEach((targetId) => brushSession.affectedSovereigntyIds.add(targetId));
+    const changed = setFeatureOwnerCodes(targetIds, state.activeSovereignCode);
+    if (changed > 0) {
+      brushSession.changed = true;
+      refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+      scheduleDynamicBorderRecompute("brush-sovereignty-fill", 90);
+      return true;
+    }
+    return false;
+  }
+
+  if (state.interactionGranularity === "country" && countryCode) {
+    if (brushSession.visitedOwnerCodes.has(countryCode)) return false;
+    brushSession.visitedOwnerCodes.add(countryCode);
+    mergeHistorySnapshot(brushSession.before, captureHistoryState({ ownerCodes: [countryCode] }));
+    brushSession.affectedOwnerCodes.add(countryCode);
+    state.sovereignBaseColors[countryCode] = selectedColor;
+    state.countryBaseColors[countryCode] = selectedColor;
+    refreshResolvedColorsForOwners([countryCode], { renderNow: false });
+    brushSession.changed = true;
+    return true;
+  }
+
+  const freshIds = targetIds.filter((targetId) => !brushSession.visitedFeatureIds.has(targetId));
+  if (!freshIds.length) return false;
+  mergeHistorySnapshot(brushSession.before, captureHistoryState({ featureIds: freshIds }));
+  freshIds.forEach((targetId) => {
+    brushSession.visitedFeatureIds.add(targetId);
+    brushSession.affectedFeatureIds.add(targetId);
+    state.visualOverrides[targetId] = selectedColor;
+    state.featureOverrides[targetId] = selectedColor;
+  });
+  refreshResolvedColorsForFeatures(freshIds, { renderNow: false });
+  brushSession.changed = true;
+  return true;
+}
+
+function flushBrushSession() {
+  if (!brushSession) return;
+  const current = brushSession;
+  brushSession = null;
+  if (!current.dragging || !current.changed) return;
+  const featureIds = Array.from(current.affectedFeatureIds);
+  const ownerCodes = Array.from(current.affectedOwnerCodes);
+  const sovereigntyFeatureIds = Array.from(current.affectedSovereigntyIds);
+  const after = captureHistoryState({ featureIds, ownerCodes, sovereigntyFeatureIds });
+  pushHistoryEntry({
+    kind: state.currentTool === "eraser" ? "brush-erase" : "brush-fill",
+    before: current.before,
+    after,
+    meta: {
+      affectsSovereignty: isSovereigntyModeActive(),
+    },
+  });
+  if (state.currentTool !== "eyedropper") {
+    addRecentColor(state.selectedColor);
+  }
+  markDirty("brush-stroke");
+  if (typeof state.renderCountryListFn === "function") {
+    state.renderCountryListFn();
+  }
+  if (typeof state.renderNowFn === "function") {
+    state.renderNowFn();
+  }
+}
+
+function handleBrushPointerDown(event) {
+  if (!state.brushModeEnabled || state.currentTool === "eyedropper" || state.specialZoneEditor?.active) return;
+  if ((event.buttons & 1) !== 1) return;
+  ensureBrushSession(event);
+}
+
+function handleBrushPointerMove(event) {
+  if (!brushSession || !state.brushModeEnabled || state.currentTool === "eyedropper" || state.specialZoneEditor?.active) {
+    return;
+  }
+  if ((event.buttons & 1) !== 1) {
+    flushBrushSession();
+    return;
+  }
+  const dx = Number(event.clientX || 0) - brushSession.startX;
+  const dy = Number(event.clientY || 0) - brushSession.startY;
+  if (!brushSession.dragging && Math.hypot(dx, dy) <= 3) return;
+  brushSession.dragging = true;
+  const hit = getHitFromEvent(event, {
+    enableSnap: false,
+    snapPx: 0,
+    eventType: "brush",
+  });
+  if (!hit?.id) return;
+  if (applyBrushHit(hit) && context) {
+    render();
+  }
+}
+
 function handleClick(event) {
   if (!state.landData) return;
+  if (typeof state.dismissOnboardingHintFn === "function") {
+    state.dismissOnboardingHintFn();
+  }
   if (state.specialZoneEditor?.active) {
     appendSpecialZoneVertexFromEvent(event);
     return;
@@ -4016,6 +4820,7 @@ function handleClick(event) {
       const changed = resetFeatureOwnerCodes(targetIds);
       refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
       if (changed > 0) {
+        markDirty("erase-sovereignty");
         if (targetIds.length > 1) {
           scheduleDynamicBorderRecompute("sovereignty-batch-reset", 90);
         } else {
@@ -4037,6 +4842,7 @@ function handleClick(event) {
       delete state.sovereignBaseColors[countryCode];
       delete state.countryBaseColors[countryCode];
       refreshResolvedColorsForOwners([countryCode], { renderNow: false });
+      markDirty("erase-country-color");
       commitHistoryEntry({
         kind: "erase-country-color",
         before: historyBefore,
@@ -4053,6 +4859,7 @@ function handleClick(event) {
         delete state.featureOverrides[targetId];
       });
       refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+      markDirty("erase-feature-color");
       commitHistoryEntry({
         kind: "erase-feature-color",
         before: historyBefore,
@@ -4118,6 +4925,7 @@ function handleClick(event) {
       }
     }
     if (changed > 0) {
+      markDirty("fill-sovereignty");
       commitHistoryEntry({
         kind: "fill-sovereignty",
         before: historyBefore,
@@ -4134,6 +4942,7 @@ function handleClick(event) {
     state.sovereignBaseColors[countryCode] = selectedColor;
     state.countryBaseColors[countryCode] = selectedColor;
     refreshResolvedColorsForOwners([countryCode], { renderNow: false });
+    markDirty("fill-country-color");
     commitHistoryEntry({
       kind: "fill-country-color",
       before: historyBefore,
@@ -4150,6 +4959,7 @@ function handleClick(event) {
       state.featureOverrides[targetId] = selectedColor;
     });
     refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+    markDirty("fill-feature-color");
     commitHistoryEntry({
       kind: "fill-feature-color",
       before: historyBefore,
@@ -4336,6 +5146,8 @@ function initZoom() {
 function bindEvents() {
   if (!interactionRect) return;
   interactionRect.on("mousemove", handleMouseMove);
+  interactionRect.on("mousedown.brush", handleBrushPointerDown);
+  interactionRect.on("mousemove.brush", handleBrushPointerMove);
   interactionRect.on("mouseleave", () => {
     state.hoveredId = null;
     renderHoverOverlay();
@@ -4346,6 +5158,7 @@ function bindEvents() {
   });
   interactionRect.on("click", handleClick);
   interactionRect.on("dblclick", handleDoubleClick);
+  window.addEventListener("mouseup", flushBrushSession);
   window.addEventListener("resize", handleResize);
 }
 
@@ -4356,7 +5169,6 @@ function initMap({ containerId = "mapContainer" } = {}) {
   }
 
   mapContainer = document.getElementById(containerId);
-  textureOverlay = document.getElementById("textureOverlay");
   tooltip = document.getElementById("tooltip");
   state.refreshColorStateFn = refreshColorState;
   state.recomputeDynamicBordersNowFn = recomputeDynamicBordersNow;
@@ -4415,7 +5227,6 @@ function initMap({ containerId = "mapContainer" } = {}) {
 
   mapCanvas.style.pointerEvents = "none";
   mapCanvas.style.touchAction = "none";
-  if (textureOverlay) textureOverlay.style.pointerEvents = "none";
 
   buildRuntimePoliticalMeta();
   setCanvasSize();

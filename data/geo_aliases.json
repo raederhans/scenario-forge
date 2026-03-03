@@ -1,12 +1,12 @@
 {
   "version": 1,
-  "generated_at": "2026-03-03T00:44:40.443219+00:00",
+  "generated_at": "2026-03-03T14:54:20.725890+00:00",
   "source": "C:\\Users\\raede\\Desktop\\dev\\mapcreator\\data\\europe_topology.na_v2.json",
-  "entry_count": 11106,
-  "alias_count": 23038,
+  "entry_count": 11133,
+  "alias_count": 23091,
   "conflict_count": 0,
   "conflicts": [],
-  "ambiguous_alias_count": 620,
+  "ambiguous_alias_count": 621,
   "ambiguous_aliases_sample": [
     {
       "alias": "Adrar",
@@ -3189,6 +3189,118 @@
       "aliases": [
         "Rheintal-Bodenseegebiet",
         "Rheintal-Bodenseegebiet (AT)"
+      ]
+    },
+    {
+      "stable_key": "id::AU_ADM1_AUS-2650",
+      "feature_id": "AU_ADM1_AUS-2650",
+      "country_code": "AU",
+      "primary_name": "Northern Territory",
+      "aliases": [
+        "Northern Territory",
+        "Northern Territory (AU)"
+      ]
+    },
+    {
+      "stable_key": "id::AU_ADM1_AUS-2651",
+      "feature_id": "AU_ADM1_AUS-2651",
+      "country_code": "AU",
+      "primary_name": "Western Australia",
+      "aliases": [
+        "Western Australia",
+        "Western Australia (AU)"
+      ]
+    },
+    {
+      "stable_key": "id::AU_ADM1_AUS-2653",
+      "feature_id": "AU_ADM1_AUS-2653",
+      "country_code": "AU",
+      "primary_name": "Australian Capital Territory",
+      "aliases": [
+        "Australian Capital Territory",
+        "Australian Capital Territory (AU)"
+      ]
+    },
+    {
+      "stable_key": "id::AU_ADM1_AUS-2654",
+      "feature_id": "AU_ADM1_AUS-2654",
+      "country_code": "AU",
+      "primary_name": "New South Wales",
+      "aliases": [
+        "New South Wales",
+        "New South Wales (AU)"
+      ]
+    },
+    {
+      "stable_key": "id::AU_ADM1_AUS-2655",
+      "feature_id": "AU_ADM1_AUS-2655",
+      "country_code": "AU",
+      "primary_name": "South Australia",
+      "aliases": [
+        "South Australia",
+        "South Australia (AU)"
+      ]
+    },
+    {
+      "stable_key": "id::AU_ADM1_AUS-2656",
+      "feature_id": "AU_ADM1_AUS-2656",
+      "country_code": "AU",
+      "primary_name": "Victoria",
+      "aliases": [
+        "Victoria",
+        "Victoria (AU)"
+      ]
+    },
+    {
+      "stable_key": "id::AU_ADM1_AUS-2657",
+      "feature_id": "AU_ADM1_AUS-2657",
+      "country_code": "AU",
+      "primary_name": "Queensland",
+      "aliases": [
+        "Queensland",
+        "Queensland (AU)"
+      ]
+    },
+    {
+      "stable_key": "id::AU_ADM1_AUS-2660",
+      "feature_id": "AU_ADM1_AUS-2660",
+      "country_code": "AU",
+      "primary_name": "Tasmania",
+      "aliases": [
+        "Tasmania",
+        "Tasmania (AU)"
+      ]
+    },
+    {
+      "stable_key": "id::AU_CITY_PERTH",
+      "feature_id": "AU_CITY_PERTH",
+      "country_code": "AU",
+      "primary_name": "Perth",
+      "aliases": [
+        "Perth",
+        "Perth (AU)",
+        "Perth [Western Australia]"
+      ]
+    },
+    {
+      "stable_key": "id::AU_CITY_SYDNEY",
+      "feature_id": "AU_CITY_SYDNEY",
+      "country_code": "AU",
+      "primary_name": "Sydney",
+      "aliases": [
+        "Sydney",
+        "Sydney (AU)",
+        "Sydney [New South Wales]"
+      ]
+    },
+    {
+      "stable_key": "id::AU_REMOTE_INDIAN_OCEAN_TERRITORIES",
+      "feature_id": "AU_REMOTE_INDIAN_OCEAN_TERRITORIES",
+      "country_code": "AU",
+      "primary_name": "Indian Ocean Territories",
+      "aliases": [
+        "Indian Ocean Territories",
+        "Indian Ocean Territories (AU)"
       ]
     },
     {
@@ -34929,16 +35041,6 @@
       "aliases": [
         "La Guajira",
         "La Guajira (CO)"
-      ]
-    },
-    {
-      "stable_key": "id::CO_ADM1_COL-1342",
-      "feature_id": "CO_ADM1_COL-1342",
-      "country_code": "CO",
-      "primary_name": "Archipelago of Saint Andréws",
-      "aliases": [
-        "Archipelago of Saint Andréws",
-        "Archipelago of Saint Andréws (CO)"
       ]
     },
     {
@@ -67583,6 +67685,176 @@
       "aliases": [
         "Rapti",
         "Rapti (NP)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-3334",
+      "feature_id": "NZ_ADM1_NZL-3334",
+      "country_code": "NZ",
+      "primary_name": "Manawatū-Whanganui",
+      "aliases": [
+        "Manawatū-Whanganui",
+        "Manawatū-Whanganui (NZ)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-3396",
+      "feature_id": "NZ_ADM1_NZL-3396",
+      "country_code": "NZ",
+      "primary_name": "Gisborne",
+      "aliases": [
+        "Gisborne",
+        "Gisborne (NZ)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-3397",
+      "feature_id": "NZ_ADM1_NZL-3397",
+      "country_code": "NZ",
+      "primary_name": "Hawke's Bay",
+      "aliases": [
+        "Hawke's Bay",
+        "Hawke's Bay (NZ)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-3398",
+      "feature_id": "NZ_ADM1_NZL-3398",
+      "country_code": "NZ",
+      "primary_name": "Auckland",
+      "aliases": [
+        "Auckland",
+        "Auckland (NZ)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-3399",
+      "feature_id": "NZ_ADM1_NZL-3399",
+      "country_code": "NZ",
+      "primary_name": "Bay of Plenty",
+      "aliases": [
+        "Bay of Plenty",
+        "Bay of Plenty (NZ)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-3400",
+      "feature_id": "NZ_ADM1_NZL-3400",
+      "country_code": "NZ",
+      "primary_name": "Canterbury",
+      "aliases": [
+        "Canterbury",
+        "Canterbury (NZ)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-3401",
+      "feature_id": "NZ_ADM1_NZL-3401",
+      "country_code": "NZ",
+      "primary_name": "Marlborough",
+      "aliases": [
+        "Marlborough",
+        "Marlborough (NZ)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-3402",
+      "feature_id": "NZ_ADM1_NZL-3402",
+      "country_code": "NZ",
+      "primary_name": "Nelson",
+      "aliases": [
+        "Nelson",
+        "Nelson (NZ)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-3403",
+      "feature_id": "NZ_ADM1_NZL-3403",
+      "country_code": "NZ",
+      "primary_name": "Tasman",
+      "aliases": [
+        "Tasman",
+        "Tasman (NZ)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-3404",
+      "feature_id": "NZ_ADM1_NZL-3404",
+      "country_code": "NZ",
+      "primary_name": "Northland",
+      "aliases": [
+        "Northland",
+        "Northland (NZ)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-3405",
+      "feature_id": "NZ_ADM1_NZL-3405",
+      "country_code": "NZ",
+      "primary_name": "Taranaki",
+      "aliases": [
+        "Taranaki",
+        "Taranaki (NZ)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-3406",
+      "feature_id": "NZ_ADM1_NZL-3406",
+      "country_code": "NZ",
+      "primary_name": "West Coast",
+      "aliases": [
+        "West Coast",
+        "West Coast (NZ)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-3407",
+      "feature_id": "NZ_ADM1_NZL-3407",
+      "country_code": "NZ",
+      "primary_name": "Otago",
+      "aliases": [
+        "Otago",
+        "Otago (NZ)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-3408",
+      "feature_id": "NZ_ADM1_NZL-3408",
+      "country_code": "NZ",
+      "primary_name": "Southland",
+      "aliases": [
+        "Southland",
+        "Southland (NZ)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-5468",
+      "feature_id": "NZ_ADM1_NZL-5468",
+      "country_code": "NZ",
+      "primary_name": "Waikato",
+      "aliases": [
+        "Waikato",
+        "Waikato (NZ)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-5469",
+      "feature_id": "NZ_ADM1_NZL-5469",
+      "country_code": "NZ",
+      "primary_name": "Wellington",
+      "aliases": [
+        "Wellington",
+        "Wellington (NZ)"
+      ]
+    },
+    {
+      "stable_key": "id::NZ_ADM1_NZL-5470",
+      "feature_id": "NZ_ADM1_NZL-5470",
+      "country_code": "NZ",
+      "primary_name": "Chatham Islands",
+      "aliases": [
+        "Chatham Islands",
+        "Chatham Islands (NZ)"
       ]
     },
     {
@@ -116432,8 +116704,6 @@
     "Archer": "id::US_CNTY_48009",
     "Archer (US)": "id::US_CNTY_48009",
     "Archer [Texas]": "id::US_CNTY_48009",
-    "Archipelago of Saint Andréws": "id::CO_ADM1_COL-1342",
-    "Archipelago of Saint Andréws (CO)": "id::CO_ADM1_COL-1342",
     "Ardahan": "id::TRA24",
     "Ardahan (TR)": "id::TRA24",
     "Ardatovsky District": "id::RU_RAY_50074027B75586198550724",
@@ -116720,6 +116990,8 @@
     "Aubusson (FR)": "id::FR_ARR_23001",
     "Auch": "id::FR_ARR_32001",
     "Auch (FR)": "id::FR_ARR_32001",
+    "Auckland": "id::NZ_ADM1_NZL-3398",
+    "Auckland (NZ)": "id::NZ_ADM1_NZL-3398",
     "Augsburg, Kreisfreie Stadt": "id::DE271",
     "Augsburg, Kreisfreie Stadt (DE)": "id::DE271",
     "Augsburg, Kreisfreie Stadt [Bayern]": "id::DE271",
@@ -116745,6 +117017,8 @@
     "Austin": "id::US_CNTY_48015",
     "Austin (US)": "id::US_CNTY_48015",
     "Austin [Texas]": "id::US_CNTY_48015",
+    "Australian Capital Territory": "id::AU_ADM1_AUS-2653",
+    "Australian Capital Territory (AU)": "id::AU_ADM1_AUS-2653",
     "Autun": "id::FR_ARR_71001",
     "Autun (FR)": "id::FR_ARR_71001",
     "Auxerre": "id::FR_ARR_89001",
@@ -117248,6 +117522,8 @@
     "Bay Islands": "id::HN_ADM1_HND-641",
     "Bay Islands (HN)": "id::HN_ADM1_HND-641",
     "Bay [Florida]": "id::US_CNTY_12005",
+    "Bay of Plenty": "id::NZ_ADM1_NZL-3399",
+    "Bay of Plenty (NZ)": "id::NZ_ADM1_NZL-3399",
     "Bay of Quinte": "id::CA_FED_35006",
     "Bay of Quinte (CA)": "id::CA_FED_35006",
     "Bay of Quinte [Ontario]": "id::CA_FED_35006",
@@ -118369,6 +118645,8 @@
     "Cantabria (ES)": "id::ES130",
     "Cantemir": "id::MDA-1631",
     "Cantemir (MD)": "id::MDA-1631",
+    "Canterbury": "id::NZ_ADM1_NZL-3400",
+    "Canterbury (NZ)": "id::NZ_ADM1_NZL-3400",
     "Cao Bằng": "id::VNM-511",
     "Cao Bằng (VN)": "id::VNM-511",
     "Caoxian": "id::CN_CITY_17275852B27372587859268",
@@ -118711,6 +118989,8 @@
     "Chartres (FR)": "id::FR_ARR_28001",
     "Chastinsky District": "id::RU_RAY_50074027B63090995624909",
     "Chastinsky District (RU)": "id::RU_RAY_50074027B63090995624909",
+    "Chatham Islands": "id::NZ_ADM1_NZL-5470",
+    "Chatham Islands (NZ)": "id::NZ_ADM1_NZL-5470",
     "Chatham-Kent—Leamington": "id::CA_FED_35021",
     "Chatham-Kent—Leamington (CA)": "id::CA_FED_35021",
     "Chatham-Kent—Leamington [Ontario]": "id::CA_FED_35021",
@@ -121315,6 +121595,8 @@
     "Giridih (IN)": "id::IN_ADM2_76128533B75529869544465",
     "Girona": "id::ES512",
     "Girona (ES)": "id::ES512",
+    "Gisborne": "id::NZ_ADM1_NZL-3396",
+    "Gisborne (NZ)": "id::NZ_ADM1_NZL-3396",
     "Gitega": "id::BI_ADM1_BDI-2639",
     "Gitega (BI)": "id::BI_ADM1_BDI-2639",
     "Giurgiu": "id::RO314",
@@ -122063,6 +122345,8 @@
     "Hawaii (US)": "id::US_CNTY_15001",
     "Hawalli": "id::KWT-3506",
     "Hawalli (KW)": "id::KWT-3506",
+    "Hawke's Bay": "id::NZ_ADM1_NZL-3397",
+    "Hawke's Bay (NZ)": "id::NZ_ADM1_NZL-3397",
     "Hays": "id::US_CNTY_48209",
     "Hays (US)": "id::US_CNTY_48209",
     "Hays [Texas]": "id::US_CNTY_48209",
@@ -122799,6 +123083,8 @@
     "Inchiri (MR)": "id::MR_ADM1_MRT-2786",
     "Independencia": "id::DO_ADM1_DOM-1971",
     "Independencia (DO)": "id::DO_ADM1_DOM-1971",
+    "Indian Ocean Territories": "id::AU_REMOTE_INDIAN_OCEAN_TERRITORIES",
+    "Indian Ocean Territories (AU)": "id::AU_REMOTE_INDIAN_OCEAN_TERRITORIES",
     "Indian River": "id::US_CNTY_12061",
     "Indian River (US)": "id::US_CNTY_12061",
     "Indian River [Florida]": "id::US_CNTY_12061",
@@ -126189,6 +126475,8 @@
     "Manatee [Florida]": "id::US_CNTY_12081",
     "Manatuto": "id::TL_ADM1_TLS-550",
     "Manatuto (TL)": "id::TL_ADM1_TLS-550",
+    "Manawatū-Whanganui": "id::NZ_ADM1_NZL-3334",
+    "Manawatū-Whanganui (NZ)": "id::NZ_ADM1_NZL-3334",
     "Manaxian": "id::CN_CITY_17275852B65393579518201",
     "Manaxian (CN)": "id::CN_CITY_17275852B65393579518201",
     "Manchengxian": "id::CN_CITY_17275852B48628808884304",
@@ -126331,6 +126619,8 @@
     "Markivka (UA)": "id::UA_RAY_74538382B45881397075814",
     "Marksovsky District": "id::RU_RAY_50074027B43964217190383",
     "Marksovsky District (RU)": "id::RU_RAY_50074027B43964217190383",
+    "Marlborough": "id::NZ_ADM1_NZL-3401",
+    "Marlborough (NZ)": "id::NZ_ADM1_NZL-3401",
     "Marmande": "id::FR_ARR_47002",
     "Marmande (FR)": "id::FR_ARR_47002",
     "Marowijne": "id::SR_ADM1_SUR-67",
@@ -127790,6 +128080,8 @@
     "Nekrasovsky District (RU)": "id::RU_RAY_50074027B42067007010763",
     "Nelidovsky District": "id::RU_RAY_50074027B24884281398381",
     "Nelidovsky District (RU)": "id::RU_RAY_50074027B24884281398381",
+    "Nelson": "id::NZ_ADM1_NZL-3402",
+    "Nelson (NZ)": "id::NZ_ADM1_NZL-3402",
     "Nemansky District": "id::RU_RAY_50074027B93803510078780",
     "Nemansky District (RU)": "id::RU_RAY_50074027B93803510078780",
     "Nemsky District": "id::RU_RAY_50074027B76252732369206",
@@ -127961,6 +128253,8 @@
     "New Mexico Zone 8": "id::US_ZN_35_008",
     "New Mexico Zone 8 (US)": "id::US_ZN_35_008",
     "New Mexico Zone 8 [New Mexico]": "id::US_ZN_35_008",
+    "New South Wales": "id::AU_ADM1_AUS-2654",
+    "New South Wales (AU)": "id::AU_ADM1_AUS-2654",
     "New Taipei City": "id::TWN-1167",
     "New Taipei City (TW)": "id::TWN-1167",
     "New Tecumseth—Gwillimbury": "id::CA_FED_35069",
@@ -128406,6 +128700,10 @@
     "Northern Region (UG)": "id::UG_ADM1_17295835B80141219017784",
     "Northern Samar": "id::PHL-2586",
     "Northern Samar (PH)": "id::PHL-2586",
+    "Northern Territory": "id::AU_ADM1_AUS-2650",
+    "Northern Territory (AU)": "id::AU_ADM1_AUS-2650",
+    "Northland": "id::NZ_ADM1_NZL-3404",
+    "Northland (NZ)": "id::NZ_ADM1_NZL-3404",
     "Northumberland": "id::UKC21",
     "Northumberland (UK)": "id::UKC21",
     "Northumberland [England]": "id::UKC21",
@@ -129207,6 +129505,8 @@
     "Osttirol (AT)": "id::AT333",
     "Osun State": "id::NG_ADM1_NGA-2855",
     "Osun State (NG)": "id::NG_ADM1_NGA-2855",
+    "Otago": "id::NZ_ADM1_NZL-3407",
+    "Otago (NZ)": "id::NZ_ADM1_NZL-3407",
     "Otdar Mean Chey": "id::KHM-1782",
     "Otdar Mean Chey (KH)": "id::KHM-1782",
     "Otjozondjupa": "id::NA_ADM1_NAM-3349",
@@ -129595,9 +129895,12 @@
     "Pernambuco (BR)": "id::BR_ADM1_BRA-1313",
     "Perpignan": "id::FR_ARR_66002",
     "Perpignan (FR)": "id::FR_ARR_66002",
+    "Perth": "id::AU_CITY_PERTH",
     "Perth & Kinross and Stirling": "id::UKM77",
     "Perth & Kinross and Stirling (UK)": "id::UKM77",
     "Perth & Kinross and Stirling [Scotland]": "id::UKM77",
+    "Perth (AU)": "id::AU_CITY_PERTH",
+    "Perth [Western Australia]": "id::AU_CITY_PERTH",
     "Perth—Wellington": "id::CA_FED_35085",
     "Perth—Wellington (CA)": "id::CA_FED_35085",
     "Perth—Wellington [Ontario]": "id::CA_FED_35085",
@@ -130445,6 +130748,8 @@
     "Queens": "id::US_CNTY_36081",
     "Queens (US)": "id::US_CNTY_36081",
     "Queens [New York]": "id::US_CNTY_36081",
+    "Queensland": "id::AU_ADM1_AUS-2657",
+    "Queensland (AU)": "id::AU_ADM1_AUS-2657",
     "Querétaro Zone 1": "id::MX_ZN_21_001",
     "Querétaro Zone 1 (MX)": "id::MX_ZN_21_001",
     "Querétaro Zone 1 [Querétaro]": "id::MX_ZN_21_001",
@@ -132807,6 +133112,8 @@
     "South (IN)": "id::IN_ADM2_76128533B97089774514948",
     "South Aegean": "id::GR_ADM1_GRC-3013",
     "South Aegean (GR)": "id::GR_ADM1_GRC-3013",
+    "South Australia": "id::AU_ADM1_AUS-2655",
+    "South Australia (AU)": "id::AU_ADM1_AUS-2655",
     "South Ayrshire": "id::UKM94",
     "South Ayrshire (UK)": "id::UKM94",
     "South Ayrshire [Scotland]": "id::UKM94",
@@ -132973,6 +133280,8 @@
     "Southern Red Sea (ER)": "id::ER_ADM1_ERI-1565",
     "Southern Region": "id::MW_ADM1_82672581B71595037145626",
     "Southern Region (MW)": "id::MW_ADM1_82672581B71595037145626",
+    "Southland": "id::NZ_ADM1_NZL-3408",
+    "Southland (NZ)": "id::NZ_ADM1_NZL-3408",
     "Southwest": "id::CM_ADM1_CMR-799",
     "Southwest (CM)": "id::CM_ADM1_CMR-799",
     "Sovietsky": "id::UA_RAY_74538382B10810755627981",
@@ -133412,6 +133721,9 @@
     "Sychyovsky District (RU)": "id::RU_RAY_50074027B5206924624978",
     "Sydjylland": "id::DK032",
     "Sydjylland (DK)": "id::DK032",
+    "Sydney": "id::AU_CITY_SYDNEY",
+    "Sydney (AU)": "id::AU_CITY_SYDNEY",
+    "Sydney [New South Wales]": "id::AU_CITY_SYDNEY",
     "Sydney—Glace Bay": "id::CA_FED_12011",
     "Sydney—Glace Bay (CA)": "id::CA_FED_12011",
     "Sydney—Glace Bay [Nova Scotia]": "id::CA_FED_12011",
@@ -133679,6 +133991,8 @@
     "Taraba State (NG)": "id::NG_ADM1_NGA-2848",
     "Taraclia": "id::MDA-1625",
     "Taraclia (MD)": "id::MDA-1625",
+    "Taranaki": "id::NZ_ADM1_NZL-3405",
+    "Taranaki (NZ)": "id::NZ_ADM1_NZL-3405",
     "Taranto": "id::ITF43",
     "Taranto (IT)": "id::ITF43",
     "Tarapacá": "id::CL_ADM1_CHL-2693",
@@ -133726,6 +134040,10 @@
     "Tashigang (BT)": "id::BTN-2493",
     "Tashlinsky District": "id::RU_RAY_50074027B24150612748554",
     "Tashlinsky District (RU)": "id::RU_RAY_50074027B24150612748554",
+    "Tasman": "id::NZ_ADM1_NZL-3403",
+    "Tasman (NZ)": "id::NZ_ADM1_NZL-3403",
+    "Tasmania": "id::AU_ADM1_AUS-2660",
+    "Tasmania (AU)": "id::AU_ADM1_AUS-2660",
     "Tataouine": "id::TUN-98",
     "Tataouine (TN)": "id::TUN-98",
     "Tatarbunary": "id::UA_RAY_74538382B88986400051477",
@@ -135019,6 +135337,7 @@
     "Vichugsky District (RU)": "id::RU_RAY_50074027B79429337914676",
     "Vichy": "id::FR_ARR_03003",
     "Vichy (FR)": "id::FR_ARR_03003",
+    "Victoria (AU)": "id::AU_ADM1_AUS-2656",
     "Victoria (CA)": "id::CA_FED_59042",
     "Victoria (US)": "id::US_CNTY_48469",
     "Victoria [British Columbia]": "id::CA_FED_59042",
@@ -135297,6 +135616,8 @@
     "Wadi al Hayaa (LY)": "id::LBY-5488",
     "Wafangdian": "id::CN_CITY_17275852B24476472807157",
     "Wafangdian (CN)": "id::CN_CITY_17275852B24476472807157",
+    "Waikato": "id::NZ_ADM1_NZL-5468",
+    "Waikato (NZ)": "id::NZ_ADM1_NZL-5468",
     "Wakayama": "id::JPN-1854",
     "Wakayama (JP)": "id::JPN-1854",
     "Wake": "id::US_CNTY_37183",
@@ -135499,6 +135820,8 @@
     "Weißenburg-Gunzenhausen [Bayern]": "id::DE25C",
     "Wele-Nzas": "id::GQ_ADM1_GNQ-1471",
     "Wele-Nzas (GQ)": "id::GQ_ADM1_GNQ-1471",
+    "Wellington": "id::NZ_ADM1_NZL-5469",
+    "Wellington (NZ)": "id::NZ_ADM1_NZL-5469",
     "Wellington—Halton Hills North": "id::CA_FED_35115",
     "Wellington—Halton Hills North (CA)": "id::CA_FED_35115",
     "Wellington—Halton Hills North [Ontario]": "id::CA_FED_35115",
@@ -135550,8 +135873,8 @@
     "West Azarbaijan (IR)": "id::IRN-3237",
     "West Bank": "id::WEB+00?",
     "West Bank (PS)": "id::WEB+00?",
-    "West Coast": "id::GM_ADM1_GMB-5512",
     "West Coast (GM)": "id::GM_ADM1_GMB-5512",
+    "West Coast (NZ)": "id::NZ_ADM1_NZL-3406",
     "West Cumbria": "id::UKD11",
     "West Cumbria (UK)": "id::UKD11",
     "West Cumbria [England]": "id::UKD11",
@@ -135652,6 +135975,8 @@
     "Western (ZM)": "id::ZM_ADM1_ZMB-523",
     "Western Area": "id::SL_ADM1_SLE-761",
     "Western Area (SL)": "id::SL_ADM1_SLE-761",
+    "Western Australia": "id::AU_ADM1_AUS-2651",
+    "Western Australia (AU)": "id::AU_ADM1_AUS-2651",
     "Western Bahr el Ghazal": "id::SS_ADM1_SDS-873",
     "Western Bahr el Ghazal (SS)": "id::SS_ADM1_SDS-873",
     "Western Cape": "id::ZA_ADM1_ZAF-1189",

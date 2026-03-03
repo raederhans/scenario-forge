@@ -11,6 +11,7 @@ __pycache__/
 # IDE Settings
 .vscode/
 .idea/
+node_modules/
 
 # OS Files
 .DS_Store
@@ -27,3 +28,9 @@ data/geoBoundaries-*.geojson
 # Browser MCP runtime artifacts
 .mcp-artifacts/
 .playwright-cli/
+
+# Local server logs
+http_server_*.log
+
+# Generated QA screenshot dumps
+qa/screenshots_qa*/

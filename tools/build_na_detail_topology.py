@@ -19,6 +19,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from map_builder import config as cfg
 from map_builder.geo.topology import build_topology, compute_neighbor_graph
 from map_builder.processors.africa_admin1 import apply_africa_admin1_replacement
+from map_builder.processors.au_city_overrides import apply_au_city_overrides
 from map_builder.processors.global_basic_admin1 import apply_global_basic_admin1_replacement
 from map_builder.processors.north_america import apply_north_america_replacement
 
@@ -290,6 +291,7 @@ def main() -> None:
     patched_political = apply_north_america_replacement(layers["political"])
     patched_political = apply_africa_admin1_replacement(patched_political)
     patched_political = apply_global_basic_admin1_replacement(patched_political)
+    patched_political = apply_au_city_overrides(patched_political)
     patched_political = _repair_political_metadata(patched_political)
     patched_political = _repair_political_geometries(patched_political)
     layers["political"] = patched_political

@@ -1,6 +1,6 @@
 # AI Browser MCP Smoke Test
 
-Date: 2026-03-03 04:22:13 UTC
+Date: 2026-03-03 16:23:56 UTC
 Profile: ops/browser-mcp/inspection-profile.toml
 Requested Mode: quick
 Executed Phases: quick
@@ -23,18 +23,19 @@ Base URL: http://localhost:8000
 - None
 
 ## Screenshot files
-- .mcp-artifacts/screenshots/gesture-map_pan_zoom-quick-20260302-232012.png
-- .mcp-artifacts/screenshots/route-data_readme-quick-20260302-232012.png
-- .mcp-artifacts/screenshots/route-docs-quick-20260302-232012.png
-- .mcp-artifacts/screenshots/route-home-quick-20260302-232012.png
-- .mcp-artifacts/screenshots/section-left_sidebar-quick-20260302-232012.png
-- .mcp-artifacts/screenshots/section-right_sidebar-quick-20260302-232012.png
+- .mcp-artifacts/screenshots/gesture-map_pan_zoom-quick-20260303-112221.png
+- .mcp-artifacts/screenshots/route-data_readme-quick-20260303-112221.png
+- .mcp-artifacts/screenshots/route-docs-quick-20260303-112221.png
+- .mcp-artifacts/screenshots/route-home-quick-20260303-112221.png
+- .mcp-artifacts/screenshots/section-left_sidebar-quick-20260303-112221.png
+- .mcp-artifacts/screenshots/section-right_sidebar-quick-20260303-112221.png
 
 ## Console summary
-- [quick][route:data_readme] 4:TypeError: $(...).ready is not a function
+- [quick][route:data_readme] 4:[ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8000/data/favicon.ico:0
+- [quick][route:data_readme] 5:TypeError: $(...).ready is not a function
 
 ## Network summary
-- [quick][route:data_readme] 3:[   38020ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8000/data/favicon.ico:0
+- No 4xx/5xx lines matched the summary filter.
 
 ## Initial rendering diagnosis clues
 - Favicon requests include 404 responses (low severity noise).

@@ -1,4 +1,4 @@
-import { state } from "./state.js";
+import { normalizeTextureMode, state } from "./state.js";
 
 const COUNTRY_CODE_ALIASES = {
   UK: "GB",
@@ -228,6 +228,18 @@ function migrateImportedProjectData(data) {
   payload.activeSovereignCode = normalizeOwnerCode(payload.activeSovereignCode || "");
   payload.dynamicBordersDirty = !!payload.dynamicBordersDirty;
   payload.dynamicBordersDirtyReason = String(payload.dynamicBordersDirtyReason || "");
+  if (!payload.styleConfig || typeof payload.styleConfig !== "object") {
+    payload.styleConfig = {};
+  }
+  if (payload.styleConfig.textureMode && !payload.styleConfig.texture) {
+    payload.styleConfig.texture = { mode: payload.styleConfig.textureMode };
+  }
+  if (payload.styleConfig.texture && typeof payload.styleConfig.texture === "object") {
+    payload.styleConfig.texture = {
+      ...payload.styleConfig.texture,
+      mode: normalizeTextureMode(payload.styleConfig.texture.mode),
+    };
+  }
   return payload;
 }
 

@@ -1,13 +1,15 @@
 // Project file manager (Phase 13)
+import { normalizeTextureStyleConfig } from "./state.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
 import { migrateImportedProjectData } from "./sovereignty_manager.js";
+import { clearDirty } from "./dirty_state.js";
 
 class FileManager {
   static exportProject(appState) {
     if (!appState) return;
     const payload = {
-      schemaVersion: 5,
+      schemaVersion: 6,
       countryBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
       featureOverrides: appState.visualOverrides || appState.featureOverrides || {},
       sovereignBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
@@ -33,6 +35,7 @@ class FileManager {
         physical: appState.styleConfig?.physical || null,
         rivers: appState.styleConfig?.rivers || null,
         specialZones: appState.styleConfig?.specialZones || null,
+        texture: normalizeTextureStyleConfig(appState.styleConfig?.texture),
       },
       timestamp: Date.now(),
     };
@@ -52,6 +55,7 @@ class FileManager {
       title: t("Project saved", "ui"),
       tone: "success",
     });
+    clearDirty("project-export");
   }
 
   static importProject(file, callback) {
@@ -114,6 +118,7 @@ class FileManager {
         if (!data.styleConfig.specialZones || typeof data.styleConfig.specialZones !== "object") {
           data.styleConfig.specialZones = null;
         }
+        data.styleConfig.texture = normalizeTextureStyleConfig(data.styleConfig.texture);
         if (
           !data.manualSpecialZones ||
           typeof data.manualSpecialZones !== "object" ||
@@ -139,6 +144,7 @@ class FileManager {
         if (typeof callback === "function") {
           callback(data);
         }
+        clearDirty("project-import");
         showToast(t("Project file loaded successfully.", "ui"), {
           title: t("Project imported", "ui"),
           tone: "success",

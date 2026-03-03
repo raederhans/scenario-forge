@@ -8,6 +8,7 @@ import { initShortcuts } from "./ui/shortcuts.js";
 import { initToolbar } from "./ui/toolbar.js";
 import { initTranslations } from "./ui/i18n.js";
 import { initToast } from "./ui/toast.js";
+import { bindBeforeUnload } from "./core/dirty_state.js";
 
 const COUNTRY_CODE_ALIASES = {
   UK: "GB",
@@ -155,6 +156,7 @@ async function bootstrap() {
   hydrateLanguage();
 
   try {
+    bindBeforeUnload();
     const {
       topology,
       topologyPrimary,

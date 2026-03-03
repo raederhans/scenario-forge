@@ -10153,9 +10153,6 @@
     "CO_La_Guajira": [
       "CO_ADM1_COL-1318"
     ],
-    "CO_Archipelago_of_Saint_Andr_ws": [
-      "CO_ADM1_COL-1342"
-    ],
     "CO_Caldas": [
       "CO_ADM1_COL-1397"
     ],
@@ -11427,6 +11424,57 @@
     "XK_Ka_anik": [
       "XK_ADM1_KOS-5915"
     ],
+    "NZ_Manawat_Whanganui": [
+      "NZ_ADM1_NZL-3334"
+    ],
+    "NZ_Gisborne": [
+      "NZ_ADM1_NZL-3396"
+    ],
+    "NZ_Hawke_s_Bay": [
+      "NZ_ADM1_NZL-3397"
+    ],
+    "NZ_Auckland": [
+      "NZ_ADM1_NZL-3398"
+    ],
+    "NZ_Bay_of_Plenty": [
+      "NZ_ADM1_NZL-3399"
+    ],
+    "NZ_Canterbury": [
+      "NZ_ADM1_NZL-3400"
+    ],
+    "NZ_Marlborough": [
+      "NZ_ADM1_NZL-3401"
+    ],
+    "NZ_Nelson": [
+      "NZ_ADM1_NZL-3402"
+    ],
+    "NZ_Tasman": [
+      "NZ_ADM1_NZL-3403"
+    ],
+    "NZ_Northland": [
+      "NZ_ADM1_NZL-3404"
+    ],
+    "NZ_Taranaki": [
+      "NZ_ADM1_NZL-3405"
+    ],
+    "NZ_West_Coast": [
+      "NZ_ADM1_NZL-3406"
+    ],
+    "NZ_Otago": [
+      "NZ_ADM1_NZL-3407"
+    ],
+    "NZ_Southland": [
+      "NZ_ADM1_NZL-3408"
+    ],
+    "NZ_Waikato": [
+      "NZ_ADM1_NZL-5468"
+    ],
+    "NZ_Wellington": [
+      "NZ_ADM1_NZL-5469"
+    ],
+    "NZ_Chatham_Islands": [
+      "NZ_ADM1_NZL-5470"
+    ],
     "GB_North_East_England": [
       "GB_NUTS1_UKC"
     ],
@@ -11564,6 +11612,32 @@
     ],
     "ID_Banten": [
       "ID_ADM1_65028918B99918739720671"
+    ],
+    "AU_Northern_Territory": [
+      "AU_ADM1_AUS-2650"
+    ],
+    "AU_Western_Australia": [
+      "AU_ADM1_AUS-2651",
+      "AU_CITY_PERTH"
+    ],
+    "AU_Australian_Capital_Territory": [
+      "AU_ADM1_AUS-2653"
+    ],
+    "AU_New_South_Wales": [
+      "AU_ADM1_AUS-2654",
+      "AU_CITY_SYDNEY"
+    ],
+    "AU_South_Australia": [
+      "AU_ADM1_AUS-2655"
+    ],
+    "AU_Victoria": [
+      "AU_ADM1_AUS-2656"
+    ],
+    "AU_Queensland": [
+      "AU_ADM1_AUS-2657"
+    ],
+    "AU_Tasmania": [
+      "AU_ADM1_AUS-2660"
     ]
   },
   "labels": {
@@ -12500,7 +12574,6 @@
     "CO_C_rdoba": "C\u00f3rdoba",
     "CO_Santander": "Santander",
     "CO_La_Guajira": "La Guajira",
-    "CO_Archipelago_of_Saint_Andr_ws": "Archipelago of Saint Andr\u00e9ws",
     "CO_Caldas": "Caldas",
     "CO_Cundinamarca": "Cundinamarca",
     "CO_Bogot": "Bogot\u00e1",
@@ -12924,6 +12997,23 @@
     "XK_Uro_evac_ferizaj": "Uro\u0161evac/ferizaj",
     "XK_trpce": "\u0160trpce",
     "XK_Ka_anik": "Ka\u010danik",
+    "NZ_Manawat_Whanganui": "Manawat\u016b-Whanganui",
+    "NZ_Gisborne": "Gisborne",
+    "NZ_Hawke_s_Bay": "Hawke's Bay",
+    "NZ_Auckland": "Auckland",
+    "NZ_Bay_of_Plenty": "Bay of Plenty",
+    "NZ_Canterbury": "Canterbury",
+    "NZ_Marlborough": "Marlborough",
+    "NZ_Nelson": "Nelson",
+    "NZ_Tasman": "Tasman",
+    "NZ_Northland": "Northland",
+    "NZ_Taranaki": "Taranaki",
+    "NZ_West_Coast": "West Coast",
+    "NZ_Otago": "Otago",
+    "NZ_Southland": "Southland",
+    "NZ_Waikato": "Waikato",
+    "NZ_Wellington": "Wellington",
+    "NZ_Chatham_Islands": "Chatham Islands",
     "GB_North_East_England": "North East (England)",
     "GB_North_West_England": "North West (England)",
     "GB_Yorkshire_and_the_Humber": "Yorkshire and the Humber",
@@ -12969,7 +13059,15 @@
     "ID_Gorontalo": "Gorontalo",
     "ID_South_Sumatra": "South Sumatra",
     "ID_West_Nusa_Tenggara": "West Nusa Tenggara",
-    "ID_Banten": "Banten"
+    "ID_Banten": "Banten",
+    "AU_Northern_Territory": "Northern Territory",
+    "AU_Western_Australia": "Western Australia",
+    "AU_Australian_Capital_Territory": "Australian Capital Territory",
+    "AU_New_South_Wales": "New South Wales",
+    "AU_South_Australia": "South Australia",
+    "AU_Victoria": "Victoria",
+    "AU_Queensland": "Queensland",
+    "AU_Tasmania": "Tasmania"
   },
   "country_groups": {
     "version": 1,
@@ -13358,6 +13456,71 @@
         ]
       }
     ],
+    "priority_by_continent": {
+      "continent_europe": [
+        "DE",
+        "FR",
+        "GB",
+        "IT",
+        "ES",
+        "PL",
+        "UA",
+        "NL",
+        "SE"
+      ],
+      "continent_asia": [
+        "CN",
+        "IN",
+        "JP",
+        "KR",
+        "ID",
+        "PK",
+        "IR",
+        "SA",
+        "TH",
+        "VN"
+      ],
+      "continent_africa": [
+        "NG",
+        "ZA",
+        "EG",
+        "ET",
+        "DZ",
+        "MA",
+        "KE",
+        "CD"
+      ],
+      "continent_north_america": [
+        "US",
+        "CA",
+        "MX",
+        "CU",
+        "GT",
+        "PA",
+        "DO",
+        "CR"
+      ],
+      "continent_south_america": [
+        "BR",
+        "AR",
+        "CO",
+        "CL",
+        "PE",
+        "VE",
+        "UY",
+        "BO"
+      ],
+      "continent_oceania": [
+        "AU",
+        "NZ",
+        "PG",
+        "FJ",
+        "SB"
+      ],
+      "continent_antarctica": [
+        "AQ"
+      ]
+    },
     "country_meta": {
       "AD": {
         "continent_id": "continent_europe",

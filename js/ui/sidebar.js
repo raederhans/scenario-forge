@@ -9,6 +9,7 @@ import { LegendManager } from "../core/legend_manager.js";
 import { t } from "./i18n.js";
 import { showToast } from "./toast.js";
 import { setFeatureOwnerCodes, ensureSovereigntyState } from "../core/sovereignty_manager.js";
+import { markDirty } from "../core/dirty_state.js";
 
 const COUNTRY_CODE_ALIASES = {
   UK: "GB",
@@ -227,32 +228,60 @@ function getCountryGroupingMeta(code) {
   return state.countryGroupMetaByCode.get(normalizedCode) || null;
 }
 
+function getPriorityCountryOrderMap() {
+  const priorityByContinent = state.countryGroupsData?.priority_by_continent || {};
+  const priorityOrderMap = new Map();
+
+  Object.entries(priorityByContinent).forEach(([continentId, rawCodes]) => {
+    const continentOrder = new Map();
+    (Array.isArray(rawCodes) ? rawCodes : []).forEach((rawCode, index) => {
+      const code = normalizeCountryCode(rawCode);
+      if (code && !continentOrder.has(code)) {
+        continentOrder.set(code, index);
+      }
+    });
+    priorityOrderMap.set(continentId, continentOrder);
+  });
+
+  return priorityOrderMap;
+}
+
+function getCountryPriorityRank(countryState, priorityOrderMap = getPriorityCountryOrderMap()) {
+  if (!countryState?.continentId || !countryState?.code) return Number.MAX_SAFE_INTEGER;
+  const continentOrder = priorityOrderMap.get(countryState.continentId);
+  if (!continentOrder || !continentOrder.has(countryState.code)) {
+    return Number.MAX_SAFE_INTEGER;
+  }
+  return continentOrder.get(countryState.code);
+}
+
+function sortCountriesWithinContinent(entries, priorityOrderMap = getPriorityCountryOrderMap()) {
+  return [...entries].sort((a, b) => {
+    const priorityDelta =
+      getCountryPriorityRank(a, priorityOrderMap) - getCountryPriorityRank(b, priorityOrderMap);
+    if (priorityDelta !== 0) return priorityDelta;
+    return a.displayName.localeCompare(b.displayName);
+  });
+}
+
 function buildCountryColorTree(entries) {
   const tree = new Map();
   const continentOrder = new Map();
-  const subregionOrder = new Map();
   const configuredContinents = Array.isArray(state.countryGroupsData?.continents)
     ? state.countryGroupsData.continents
     : [];
+  const priorityOrderMap = getPriorityCountryOrderMap();
 
   configuredContinents.forEach((continent, continentIndex) => {
     const continentId = String(continent?.id || "").trim();
     if (!continentId) return;
     continentOrder.set(continentId, continentIndex);
-    const subregions = Array.isArray(continent?.subregions) ? continent.subregions : [];
-    subregions.forEach((subregion, subregionIndex) => {
-      const subregionId = String(subregion?.id || "").trim();
-      if (!subregionId) return;
-      subregionOrder.set(`${continentId}::${subregionId}`, subregionIndex);
-    });
   });
 
   entries.forEach((entry) => {
     const meta = getCountryGroupingMeta(entry.code);
     const continentId = meta?.continentId || "continent_other";
     const continentLabel = meta?.continentLabel || "Other";
-    const subregionId = meta?.subregionId || "subregion_unclassified";
-    const subregionLabel = meta?.subregionLabel || "Unclassified";
 
     if (!tree.has(continentId)) {
       tree.set(continentId, {
@@ -260,42 +289,55 @@ function buildCountryColorTree(entries) {
         label: continentLabel,
         displayLabel: t(continentLabel, "geo") || continentLabel,
         sortIndex: continentOrder.has(continentId) ? continentOrder.get(continentId) : Number.MAX_SAFE_INTEGER,
-        subregions: new Map(),
-      });
-    }
-
-    const continentNode = tree.get(continentId);
-    const subregionKey = `${continentId}::${subregionId}`;
-    if (!continentNode.subregions.has(subregionId)) {
-      continentNode.subregions.set(subregionId, {
-        id: subregionId,
-        label: subregionLabel,
-        displayLabel: t(subregionLabel, "geo") || subregionLabel,
-        sortIndex: subregionOrder.has(subregionKey) ? subregionOrder.get(subregionKey) : Number.MAX_SAFE_INTEGER,
         countries: [],
       });
     }
 
-    continentNode.subregions.get(subregionId).countries.push(entry);
+    tree.get(continentId).countries.push(entry);
   });
 
   return Array.from(tree.values())
     .map((continentNode) => ({
       ...continentNode,
-      subregions: Array.from(continentNode.subregions.values())
-        .map((subregionNode) => ({
-          ...subregionNode,
-          countries: [...subregionNode.countries].sort((a, b) => a.displayName.localeCompare(b.displayName)),
-        }))
-        .sort((a, b) => {
-          if (a.sortIndex !== b.sortIndex) return a.sortIndex - b.sortIndex;
-          return a.displayLabel.localeCompare(b.displayLabel);
-        }),
+      countries: sortCountriesWithinContinent(continentNode.countries, priorityOrderMap),
     }))
     .sort((a, b) => {
       if (a.sortIndex !== b.sortIndex) return a.sortIndex - b.sortIndex;
       return a.displayLabel.localeCompare(b.displayLabel);
     });
+}
+
+function getDefaultExpandedContinentId(groupedEntries = []) {
+  const selectedCode = normalizeCountryCode(state.selectedInspectorCountryCode);
+  const selectedContinentId = getCountryGroupingMeta(selectedCode)?.continentId;
+  if (selectedContinentId) return selectedContinentId;
+
+  const activeCode = normalizeCountryCode(state.activeSovereignCode);
+  const activeContinentId = getCountryGroupingMeta(activeCode)?.continentId;
+  if (activeContinentId) return activeContinentId;
+
+  const europeNode = groupedEntries.find((entry) => entry.id === "continent_europe");
+  if (europeNode) return europeNode.id;
+
+  return groupedEntries[0]?.id || "";
+}
+
+function ensureInitialInspectorExpansion(groupedEntries = []) {
+  if (state.inspectorExpansionInitialized || !groupedEntries.length) return;
+  if (!(state.expandedInspectorContinents instanceof Set)) {
+    state.expandedInspectorContinents = new Set();
+  }
+
+  if (state.expandedInspectorContinents.size > 0) {
+    state.inspectorExpansionInitialized = true;
+    return;
+  }
+
+  const defaultContinentId = getDefaultExpandedContinentId(groupedEntries);
+  if (defaultContinentId) {
+    state.expandedInspectorContinents.add(`continent::${defaultContinentId}`);
+  }
+  state.inspectorExpansionInitialized = true;
 }
 
 function applyHierarchyGroup(group, color, render) {
@@ -338,6 +380,7 @@ function applyHierarchyGroup(group, color, render) {
   mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
   if (render) render();
   addRecentColor(colorToApply);
+  markDirty("hierarchy-apply-color");
   pushHistoryEntry({
     kind: "hierarchy-apply-color",
     before,
@@ -354,8 +397,8 @@ function addRecentColor(color) {
   if (!color) return;
   state.recentColors = state.recentColors.filter((value) => value !== color);
   state.recentColors.unshift(color);
-  if (state.recentColors.length > 4) {
-    state.recentColors = state.recentColors.slice(0, 4);
+  if (state.recentColors.length > 10) {
+    state.recentColors = state.recentColors.slice(0, 10);
   }
   if (typeof state.updateRecentUI === "function") {
     state.updateRecentUI();
@@ -385,6 +428,7 @@ function applyPreset(countryCode, presetIndex, color, render) {
     mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
     if (changed) {
       mapRenderer.scheduleDynamicBorderRecompute("sidebar-preset-batch", 90);
+      markDirty("preset-apply-sovereignty");
       pushHistoryEntry({
         kind: "preset-apply-sovereignty",
         before,
@@ -410,10 +454,11 @@ function applyPreset(countryCode, presetIndex, color, render) {
 
   mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
   if (render) render();
+  markDirty("preset-apply-color");
 
   if (!state.recentColors.includes(colorToApply)) {
     state.recentColors.unshift(colorToApply);
-    if (state.recentColors.length > 4) state.recentColors.pop();
+    if (state.recentColors.length > 10) state.recentColors.pop();
     if (typeof state.updateRecentUI === "function") state.updateRecentUI();
   }
 
@@ -644,323 +689,405 @@ function initSidebar({ render } = {}) {
   const projectFileName = document.getElementById("projectFileName");
   const legendList = document.getElementById("legendEditorList");
   const debugModeSelect = document.getElementById("debug-mode-select");
+  const countryInspectorEmpty = document.getElementById("countryInspectorEmpty");
+  const countryInspectorSelected = document.getElementById("countryInspectorSelected");
+  const countryInspectorTitle = document.getElementById("countryInspectorTitle");
+  const countryInspectorMeta = document.getElementById("countryInspectorMeta");
+  const countryInspectorSwatch = document.getElementById("countryInspectorSwatch");
+  const countryInspectorSetActive = document.getElementById("countryInspectorSetActive");
+  const countryInspectorColorInput = document.getElementById("countryInspectorColorInput");
+  const countryInspectorGroups = document.getElementById("countryInspectorGroups");
+  const countryInspectorPresets = document.getElementById("countryInspectorPresets");
 
   if (projectFileName && !projectFileName.textContent.trim()) {
     projectFileName.textContent = t("No file selected", "ui");
   }
 
-  const expanded = new Set();
-  const expandedContinents = new Set();
-  const expandedSubregions = new Set();
+  if (!(state.expandedInspectorContinents instanceof Set)) {
+    state.expandedInspectorContinents = new Set();
+  }
+  if (typeof state.selectedInspectorCountryCode !== "string") {
+    state.selectedInspectorCountryCode = "";
+  }
+  if (typeof state.inspectorExpansionInitialized !== "boolean") {
+    state.inspectorExpansionInitialized = false;
+  }
+
+  let latestCountryStatesByCode = new Map();
   const getSearchTerm = () => (searchInput?.value || "").trim().toLowerCase();
   const matchesTerm = (value, term) => String(value || "").toLowerCase().includes(term);
 
-  const appendCountryChildren = (parent, countryState) => {
-    const { code, presets, hierarchyGroups } = countryState;
+  const createCountryInspectorState = (entry, fallbackIndex = 0) => {
+    const groupingMeta = getCountryGroupingMeta(entry.code) || {};
+    const continentLabel = groupingMeta.continentLabel || "Other";
+    const subregionLabel = groupingMeta.subregionLabel || "Unclassified";
+    return {
+      ...entry,
+      fallbackIndex,
+      presets: state.presetsState[entry.code] || [],
+      hierarchyGroups: getHierarchyGroupsForCode(entry.code),
+      continentId: groupingMeta.continentId || "continent_other",
+      continentLabel,
+      continentDisplayLabel: t(continentLabel, "geo") || continentLabel,
+      subregionId: groupingMeta.subregionId || "subregion_unclassified",
+      subregionLabel,
+      subregionDisplayLabel: t(subregionLabel, "geo") || subregionLabel,
+    };
+  };
 
-    if (hierarchyGroups.length > 0) {
-      const child = document.createElement("div");
-      child.className = "country-children";
-      const header = document.createElement("div");
-      header.className = "inspector-mini-label";
-      header.textContent = t("--- Provinces/Regions ---", "ui");
-      child.appendChild(header);
-      hierarchyGroups.forEach((group) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "inspector-item-btn";
-        btn.textContent = t(group.label, "geo") || group.label;
-        btn.addEventListener("click", () => {
-          applyHierarchyGroup(group, state.selectedColor, render);
-        });
-        child.appendChild(btn);
-      });
-      parent.appendChild(child);
+  const getResolvedCountryColor = (countryState) => {
+    if (!countryState?.code) return "#cccccc";
+    const fallbackColor = ensureCountryPaletteColor(countryState.code, countryState.fallbackIndex || 0);
+    return (
+      state.sovereignBaseColors?.[countryState.code] ||
+      state.countryBaseColors?.[countryState.code] ||
+      state.countryPalette?.[countryState.code] ||
+      fallbackColor
+    );
+  };
+
+  const createEmptyNote = (text) => {
+    const note = document.createElement("div");
+    note.className = "inspector-empty-note";
+    note.textContent = text;
+    return note;
+  };
+
+  const createInspectorActionButton = (label, onClick) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "inspector-item-btn";
+    button.textContent = label;
+    button.addEventListener("click", onClick);
+    return button;
+  };
+
+  const ensureSelectedInspectorCountry = () => {
+    const normalized = normalizeCountryCode(state.selectedInspectorCountryCode);
+    if (!normalized) {
+      state.selectedInspectorCountryCode = "";
+      state.inspectorHighlightCountryCode = "";
+      return "";
+    }
+    if (!latestCountryStatesByCode.has(normalized)) {
+      state.selectedInspectorCountryCode = "";
+      state.inspectorHighlightCountryCode = "";
+      return "";
+    }
+    state.selectedInspectorCountryCode = normalized;
+    return normalized;
+  };
+
+  const selectInspectorCountry = (code) => {
+    const normalized = normalizeCountryCode(code);
+    if (!normalized) return;
+    const countryState = latestCountryStatesByCode.get(normalized);
+    if (countryState?.continentId) {
+      state.expandedInspectorContinents.add(`continent::${countryState.continentId}`);
+    }
+    state.selectedInspectorCountryCode = normalized;
+    state.inspectorHighlightCountryCode = normalized;
+    if (typeof state.renderNowFn === "function") {
+      state.renderNowFn();
+    }
+    renderList();
+  };
+
+  const getCountrySearchRank = (countryState, term, upperTerm) => {
+    const code = String(countryState.code || "").toUpperCase();
+    const name = String(countryState.name || "").toLowerCase();
+    const displayName = String(countryState.displayName || "").toLowerCase();
+    const subregion = String(countryState.subregionDisplayLabel || "").toLowerCase();
+    const continent = String(countryState.continentDisplayLabel || "").toLowerCase();
+    const countryMatch =
+      code.includes(upperTerm) ||
+      matchesTerm(name, term) ||
+      matchesTerm(displayName, term) ||
+      matchesTerm(subregion, term) ||
+      matchesTerm(continent, term);
+
+    if (!countryMatch) {
+      return null;
+    }
+    if (code === upperTerm) return 0;
+    if (displayName === term || name === term) return 1;
+    if (displayName.startsWith(term) || name.startsWith(term)) return 2;
+    if (code.startsWith(upperTerm)) return 3;
+    if (subregion.startsWith(term) || continent.startsWith(term)) return 4;
+    return 5;
+  };
+
+  const renderCountrySelectRow = (parent, countryState) => {
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "country-select-row";
+    const isSelected = state.selectedInspectorCountryCode === countryState.code;
+    row.classList.toggle("is-selected", isSelected);
+    row.setAttribute("aria-pressed", String(isSelected));
+    row.addEventListener("click", () => {
+      selectInspectorCountry(countryState.code);
+    });
+
+    const main = document.createElement("div");
+    main.className = "country-select-main";
+
+    const title = document.createElement("div");
+    title.className = "country-select-title";
+    title.textContent = `${countryState.displayName} (${countryState.code})`;
+
+    const meta = document.createElement("div");
+    meta.className = "country-select-meta";
+    meta.textContent = countryState.subregionDisplayLabel;
+
+    const side = document.createElement("div");
+    side.className = "country-select-side";
+
+    if (state.activeSovereignCode === countryState.code) {
+      const badge = document.createElement("span");
+      badge.className = "country-active-badge";
+      badge.textContent = t("Active", "ui");
+      side.appendChild(badge);
     }
 
-    if (presets.length > 0) {
-      const child = document.createElement("div");
-      child.className = "country-children";
-      const header = document.createElement("div");
-      header.className = "inspector-mini-label";
-      header.textContent = t("--- Presets ---", "ui");
-      child.appendChild(header);
-      presets.forEach((preset, presetIndex) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "inspector-item-btn";
-        btn.textContent = `Apply ${preset.name}`;
-        btn.addEventListener("click", () => {
-          applyPreset(code, presetIndex, state.selectedColor, render);
+    const swatch = document.createElement("span");
+    swatch.className = "country-select-swatch";
+    swatch.style.backgroundColor = getResolvedCountryColor(countryState);
+    side.appendChild(swatch);
+
+    main.appendChild(title);
+    main.appendChild(meta);
+    row.appendChild(main);
+    row.appendChild(side);
+    parent.appendChild(row);
+  };
+
+  const renderCountryInspectorDetail = () => {
+    if (!countryInspectorEmpty || !countryInspectorSelected) return;
+
+    const selectedCode = ensureSelectedInspectorCountry();
+    const countryState = selectedCode ? latestCountryStatesByCode.get(selectedCode) : null;
+    const isEmpty = !countryState;
+
+    countryInspectorEmpty.classList.toggle("hidden", !isEmpty);
+    countryInspectorSelected.classList.toggle("hidden", isEmpty);
+
+    if (!countryState) {
+      if (countryInspectorColorInput) {
+        countryInspectorColorInput.disabled = true;
+      }
+      if (countryInspectorSetActive) {
+        countryInspectorSetActive.disabled = true;
+        countryInspectorSetActive.classList.remove("is-active");
+      }
+      return;
+    }
+
+    const resolvedColor = getResolvedCountryColor(countryState);
+    if (countryInspectorTitle) {
+      countryInspectorTitle.textContent = `${countryState.displayName} (${countryState.code})`;
+    }
+    if (countryInspectorMeta) {
+      countryInspectorMeta.textContent = [countryState.subregionDisplayLabel, countryState.continentDisplayLabel]
+        .filter(Boolean)
+        .join(" · ");
+    }
+    if (countryInspectorSwatch) {
+      countryInspectorSwatch.style.backgroundColor = resolvedColor;
+    }
+    if (countryInspectorColorInput) {
+      countryInspectorColorInput.disabled = false;
+      countryInspectorColorInput.value = resolvedColor;
+    }
+    if (countryInspectorSetActive) {
+      const isActive = state.activeSovereignCode === countryState.code;
+      countryInspectorSetActive.disabled = isActive;
+      countryInspectorSetActive.classList.toggle("is-active", isActive);
+      countryInspectorSetActive.textContent = isActive ? t("Active", "ui") : t("Set Active", "ui");
+      countryInspectorSetActive.setAttribute("aria-pressed", String(isActive));
+    }
+
+    if (countryInspectorGroups) {
+      countryInspectorGroups.replaceChildren();
+      if (countryState.hierarchyGroups.length > 0) {
+        countryState.hierarchyGroups.forEach((group) => {
+          const button = createInspectorActionButton(
+            t(group.label, "geo") || group.label,
+            () => applyHierarchyGroup(group, state.selectedColor, render)
+          );
+          countryInspectorGroups.appendChild(button);
         });
-        child.appendChild(btn);
-      });
-      parent.appendChild(child);
+      } else {
+        countryInspectorGroups.appendChild(createEmptyNote(t("No country groups", "ui")));
+      }
+    }
+
+    if (countryInspectorPresets) {
+      countryInspectorPresets.replaceChildren();
+      if (countryState.presets.length > 0) {
+        countryState.presets.forEach((preset, presetIndex) => {
+          const button = createInspectorActionButton(preset.name, () => {
+            applyPreset(countryState.code, presetIndex, state.selectedColor, render);
+          });
+          countryInspectorPresets.appendChild(button);
+        });
+      } else {
+        countryInspectorPresets.appendChild(createEmptyNote(t("No country presets", "ui")));
+      }
     }
   };
 
-  const renderCountryRow = (parent, countryState) => {
-    const { code, displayName, fallbackIndex, hasChildren, isOpen } = countryState;
-    const row = document.createElement("div");
-    row.className = "country-row";
+  const renderCountrySearchResults = (countryStates, term, priorityOrderMap) => {
+    const upperTerm = String(term || "").trim().toUpperCase();
+    const matches = countryStates
+      .map((countryState) => ({
+        ...countryState,
+        searchRank: getCountrySearchRank(countryState, term, upperTerm),
+      }))
+      .filter((countryState) => countryState.searchRank !== null)
+      .sort((a, b) => {
+        if (a.searchRank !== b.searchRank) return a.searchRank - b.searchRank;
+        const priorityDelta =
+          getCountryPriorityRank(a, priorityOrderMap) - getCountryPriorityRank(b, priorityOrderMap);
+        if (priorityDelta !== 0) return priorityDelta;
+        return a.displayName.localeCompare(b.displayName);
+      });
 
-    const label = document.createElement("div");
-    label.className = "country-row-title";
-    label.textContent = `${displayName} (${code})`;
+    if (!matches.length) {
+      list.appendChild(createEmptyNote(t("No matching countries", "ui")));
+      return;
+    }
 
-    const controls = document.createElement("div");
-    controls.className = "country-row-actions";
-
-    const activeBtn = document.createElement("button");
-    activeBtn.type = "button";
-    activeBtn.className = "country-action-btn";
-    activeBtn.textContent = state.activeSovereignCode === code ? t("Active", "ui") : t("Set Active", "ui");
-    activeBtn.classList.toggle("is-active", state.activeSovereignCode === code);
-    activeBtn.addEventListener("click", () => {
-      state.activeSovereignCode = code;
-      if (typeof state.updateActiveSovereignUIFn === "function") {
-        state.updateActiveSovereignUIFn();
-      }
-      renderList();
+    matches.forEach((countryState) => {
+      renderCountrySelectRow(list, countryState);
     });
-    controls.appendChild(activeBtn);
+  };
 
-    if (hasChildren) {
-      const toggle = document.createElement("button");
-      toggle.type = "button";
-      toggle.className = "country-action-btn";
-      toggle.textContent = isOpen ? "v" : ">";
-      toggle.addEventListener("click", () => {
-        if (expanded.has(code)) {
-          expanded.delete(code);
+  const renderGroupedCountryExplorer = (countryStates) => {
+    const hasCountryGrouping =
+      Array.isArray(state.countryGroupsData?.continents) &&
+      state.countryGroupsData.continents.length > 0;
+
+    if (!hasCountryGrouping) {
+      countryStates.forEach((countryState) => {
+        renderCountrySelectRow(list, countryState);
+      });
+      return;
+    }
+
+    const groupedEntries = buildCountryColorTree(countryStates);
+    ensureInitialInspectorExpansion(groupedEntries);
+    const fragment = document.createDocumentFragment();
+
+    groupedEntries.forEach((continent) => {
+      const countries = continent.countries
+        .map((entry) => latestCountryStatesByCode.get(entry.code))
+        .filter(Boolean);
+
+      if (!countries.length) return;
+
+      const continentKey = `continent::${continent.id}`;
+      const isOpen = state.expandedInspectorContinents.has(continentKey);
+
+      const group = document.createElement("div");
+      group.className = "country-explorer-group";
+
+      const header = document.createElement("button");
+      header.type = "button";
+      header.className = "inspector-accordion-btn country-explorer-header";
+      header.setAttribute("aria-expanded", String(isOpen));
+      header.addEventListener("click", () => {
+        if (state.expandedInspectorContinents.has(continentKey)) {
+          state.expandedInspectorContinents.delete(continentKey);
         } else {
-          expanded.add(code);
+          state.expandedInspectorContinents.add(continentKey);
         }
         renderList();
       });
-      controls.appendChild(toggle);
-    }
 
-    const input = document.createElement("input");
-    input.type = "color";
-    const fallbackColor = ensureCountryPaletteColor(code, fallbackIndex);
-    input.value = state.sovereignBaseColors[code] || state.countryBaseColors[code] || state.countryPalette[code] || fallbackColor;
-    input.className = "color-input";
-    input.addEventListener("change", (event) => {
-      const value = event.target.value;
-      state.countryPalette[code] = value;
-      applyCountryColor(code, value, render);
+      const heading = document.createElement("div");
+      heading.className = "country-explorer-heading";
+
+      const title = document.createElement("div");
+      title.className = "country-row-title";
+      title.textContent = `${continent.displayLabel} (${countries.length})`;
+
+      const chevron = document.createElement("span");
+      chevron.className = "inspector-mini-label";
+      chevron.textContent = isOpen ? "v" : ">";
+
+      heading.appendChild(title);
+      header.appendChild(heading);
+      header.appendChild(chevron);
+      group.appendChild(header);
+
+      if (isOpen) {
+        const groupList = document.createElement("div");
+        groupList.className = "country-explorer-list";
+        countries.forEach((countryState) => {
+          renderCountrySelectRow(groupList, countryState);
+        });
+        group.appendChild(groupList);
+      }
+
+      fragment.appendChild(group);
     });
-    controls.appendChild(input);
 
-    row.appendChild(label);
-    row.appendChild(controls);
-    parent.appendChild(row);
-
-    if (isOpen) {
-      appendCountryChildren(parent, countryState);
-    }
-  };
-
-  const renderFlatCountryList = (entries, term) => {
-    entries.forEach(({ code, name, displayName }, entryIndex) => {
-      const presets = state.presetsState[code] || [];
-      const hierarchyGroups = getHierarchyGroupsForCode(code);
-      const countryMatch =
-        !term ||
-        matchesTerm(name, term) ||
-        matchesTerm(displayName, term) ||
-        matchesTerm(code, term);
-      const presetMatch = term
-        ? presets.some((preset) => matchesTerm(preset.name, term))
-        : false;
-      const hierarchyMatch = term
-        ? hierarchyGroups.some((group) => matchesTerm(group.label, term))
-        : false;
-
-      if (!countryMatch && !presetMatch && !hierarchyMatch) return;
-
-      renderCountryRow(list, {
-        code,
-        displayName,
-        fallbackIndex: entryIndex,
-        presets,
-        hierarchyGroups,
-        hasChildren: presets.length > 0 || hierarchyGroups.length > 0,
-        isOpen: expanded.has(code) || (term && (presetMatch || hierarchyMatch)),
-      });
-    });
+    list.appendChild(fragment);
   };
 
   const renderList = () => {
     const term = getSearchTerm();
     const entries = getDynamicCountryEntries();
-    list.innerHTML = "";
+    const countryStates = entries.map((entry, entryIndex) => createCountryInspectorState(entry, entryIndex));
+    const priorityOrderMap = getPriorityCountryOrderMap();
+    latestCountryStatesByCode = new Map(countryStates.map((countryState) => [countryState.code, countryState]));
+    ensureSelectedInspectorCountry();
+    list.replaceChildren();
 
-    const hasCountryGrouping =
-      Array.isArray(state.countryGroupsData?.continents) &&
-      state.countryGroupsData.continents.length > 0;
-    if (!hasCountryGrouping) {
-      renderFlatCountryList(entries, term);
+    if (!countryStates.length) {
+      list.appendChild(createEmptyNote(t("No countries available", "ui")));
+      renderCountryInspectorDetail();
       return;
     }
 
-    const groupedEntries = buildCountryColorTree(entries);
+    if (term) {
+      renderCountrySearchResults(countryStates, term, priorityOrderMap);
+    } else {
+      renderGroupedCountryExplorer(countryStates);
+    }
 
-    const entryIndexByCode = new Map(entries.map((entry, entryIndex) => [entry.code, entryIndex]));
-    const fragment = document.createDocumentFragment();
-
-    groupedEntries.forEach((continent) => {
-      const continentMatch = term
-        ? matchesTerm(continent.label, term) || matchesTerm(continent.displayLabel, term)
-        : false;
-      const visibleSubregions = [];
-
-      continent.subregions.forEach((subregion) => {
-        const subregionMatch = term
-          ? matchesTerm(subregion.label, term) || matchesTerm(subregion.displayLabel, term)
-          : false;
-        const forceVisible = !term || continentMatch || subregionMatch;
-        const visibleCountries = [];
-
-        subregion.countries.forEach(({ code, name, displayName }) => {
-          const presets = state.presetsState[code] || [];
-          const hierarchyGroups = getHierarchyGroupsForCode(code);
-          const countryMatch =
-            !term ||
-            matchesTerm(name, term) ||
-            matchesTerm(displayName, term) ||
-            matchesTerm(code, term);
-          const presetMatch = term
-            ? presets.some((preset) => matchesTerm(preset.name, term))
-            : false;
-          const hierarchyMatch = term
-            ? hierarchyGroups.some((group) => matchesTerm(group.label, term))
-            : false;
-          const hasOwnMatch = countryMatch || presetMatch || hierarchyMatch;
-
-          if (!forceVisible && !hasOwnMatch) return;
-
-          const hasChildren = presets.length > 0 || hierarchyGroups.length > 0;
-          visibleCountries.push({
-            code,
-            name,
-            displayName,
-            presets,
-            hierarchyGroups,
-            hasChildren,
-            fallbackIndex: entryIndexByCode.get(code) || 0,
-            autoExpandCountry: presetMatch || hierarchyMatch,
-            autoExpandPath: hasOwnMatch,
-          });
-        });
-
-        if (!visibleCountries.length) return;
-        visibleSubregions.push({
-          ...subregion,
-          subregionMatch,
-          forceVisible,
-          countries: visibleCountries,
-          autoExpandPath:
-            forceVisible || visibleCountries.some((countryState) => countryState.autoExpandPath),
-        });
-      });
-
-      if (!visibleSubregions.length) return;
-
-      const continentKey = `continent::${continent.id}`;
-      const continentOpen = term
-        ? continentMatch || visibleSubregions.some((subregion) => subregion.autoExpandPath)
-        : expandedContinents.has(continentKey);
-
-      const continentWrapper = document.createElement("div");
-      continentWrapper.className = "country-children";
-
-      const continentToggle = document.createElement("button");
-      continentToggle.type = "button";
-      continentToggle.className = "inspector-accordion-btn";
-      continentToggle.addEventListener("click", () => {
-        if (expandedContinents.has(continentKey)) {
-          expandedContinents.delete(continentKey);
-        } else {
-          expandedContinents.add(continentKey);
-        }
-        renderList();
-      });
-
-      const continentTitle = document.createElement("div");
-      continentTitle.className = "country-row-title";
-      continentTitle.textContent = `${continent.displayLabel} (${continent.subregions.reduce((sum, item) => sum + item.countries.length, 0)})`;
-
-      const continentChevron = document.createElement("span");
-      continentChevron.className = "inspector-mini-label";
-      continentChevron.textContent = continentOpen ? "v" : ">";
-
-      continentToggle.appendChild(continentTitle);
-      continentToggle.appendChild(continentChevron);
-      continentWrapper.appendChild(continentToggle);
-
-      if (continentOpen) {
-        const continentChildren = document.createElement("div");
-        continentChildren.className = "country-children";
-
-        visibleSubregions.forEach((subregion) => {
-          const subregionKey = `subregion::${continent.id}::${subregion.id}`;
-          const subregionOpen = term
-            ? subregion.autoExpandPath
-            : expandedSubregions.has(subregionKey);
-
-          const subregionWrapper = document.createElement("div");
-          subregionWrapper.className = "country-children";
-
-          const subregionToggle = document.createElement("button");
-          subregionToggle.type = "button";
-          subregionToggle.className = "inspector-accordion-btn";
-          subregionToggle.addEventListener("click", () => {
-            if (expandedSubregions.has(subregionKey)) {
-              expandedSubregions.delete(subregionKey);
-            } else {
-              expandedSubregions.add(subregionKey);
-            }
-            renderList();
-          });
-
-          const subregionTitle = document.createElement("div");
-          subregionTitle.className = "inspector-mini-label";
-          subregionTitle.textContent = `${subregion.displayLabel} (${subregion.countries.length})`;
-
-          const subregionChevron = document.createElement("span");
-          subregionChevron.className = "inspector-mini-label";
-          subregionChevron.textContent = subregionOpen ? "v" : ">";
-
-          subregionToggle.appendChild(subregionTitle);
-          subregionToggle.appendChild(subregionChevron);
-          subregionWrapper.appendChild(subregionToggle);
-
-          if (subregionOpen) {
-            const subregionChildren = document.createElement("div");
-            subregionChildren.className = "country-children";
-            subregion.countries.forEach((countryState) => {
-              const isOpen = expanded.has(countryState.code) || (term && countryState.autoExpandCountry);
-              renderCountryRow(subregionChildren, {
-                ...countryState,
-                isOpen,
-              });
-            });
-            subregionWrapper.appendChild(subregionChildren);
-          }
-
-          continentChildren.appendChild(subregionWrapper);
-        });
-
-        continentWrapper.appendChild(continentChildren);
-      }
-
-      fragment.appendChild(continentWrapper);
-    });
-
-    list.appendChild(fragment);
+    renderCountryInspectorDetail();
   };
+
+  if (countryInspectorSetActive && !countryInspectorSetActive.dataset.bound) {
+    countryInspectorSetActive.addEventListener("click", () => {
+      const selectedCode = ensureSelectedInspectorCountry();
+      if (!selectedCode || state.activeSovereignCode === selectedCode) return;
+      state.activeSovereignCode = selectedCode;
+      markDirty("set-active-sovereign");
+      if (typeof state.updateActiveSovereignUIFn === "function") {
+        state.updateActiveSovereignUIFn();
+      }
+      if (typeof state.renderNowFn === "function") {
+        state.renderNowFn();
+      }
+      renderList();
+    });
+    countryInspectorSetActive.dataset.bound = "true";
+  }
+
+  if (countryInspectorColorInput && !countryInspectorColorInput.dataset.bound) {
+    countryInspectorColorInput.addEventListener("change", (event) => {
+      const selectedCode = ensureSelectedInspectorCountry();
+      if (!selectedCode) return;
+      const value = event.target.value;
+      state.countryPalette[selectedCode] = value;
+      applyCountryColor(selectedCode, value);
+      markDirty("country-color-change");
+      renderList();
+    });
+    countryInspectorColorInput.dataset.bound = "true";
+  }
 
   state.renderCountryListFn = renderList;
 
@@ -969,6 +1096,7 @@ function initSidebar({ render } = {}) {
     const term = getSearchTerm();
     const entries = getDynamicCountryEntries();
     presetTree.innerHTML = "";
+    let renderedCount = 0;
 
     entries.forEach(({ code, name, displayName }) => {
       const presets = state.presetsState[code] || [];
@@ -979,18 +1107,12 @@ function initSidebar({ render } = {}) {
         name.toLowerCase().includes(term) ||
         displayName.toLowerCase().includes(term) ||
         code.toLowerCase().includes(term);
-      const presetMatch = term
-        ? presets.some((preset) => preset.name.toLowerCase().includes(term))
-        : false;
 
-      if (!countryMatch && !presetMatch) return;
-      if (presetMatch) {
-        state.expandedPresetCountries.add(code);
-      }
+      if (!countryMatch) return;
 
       const details = document.createElement("details");
       details.className = "inspector-preset-details";
-      details.open = state.expandedPresetCountries.has(code) || presetMatch;
+      details.open = state.expandedPresetCountries.has(code);
       details.addEventListener("toggle", () => {
         if (details.open) {
           state.expandedPresetCountries.add(code);
@@ -1011,7 +1133,7 @@ function initSidebar({ render } = {}) {
       details.appendChild(summary);
 
       const child = document.createElement("div");
-      child.className = "country-children";
+      child.className = "preset-country-body";
       presets.forEach((preset, index) => {
         const row = document.createElement("div");
         row.className = "preset-row";
@@ -1086,7 +1208,16 @@ function initSidebar({ render } = {}) {
       });
       details.appendChild(child);
       presetTree.appendChild(details);
+      renderedCount += 1;
     });
+
+    if (renderedCount === 0) {
+      const empty = document.createElement("div");
+      empty.id = "presetTreeEmptyState";
+      empty.className = "legend-empty-state";
+      empty.textContent = t("No presets available.", "ui");
+      presetTree.appendChild(empty);
+    }
   };
 
   state.renderPresetTreeFn = renderPresetTree;
@@ -1148,10 +1279,31 @@ function initSidebar({ render } = {}) {
   }
 
   if (resetBtn && !resetBtn.dataset.bound) {
+    let resetConfirmTimer = null;
     resetBtn.addEventListener("click", () => {
+      if (resetBtn.dataset.confirmState === "reset-country-colors") {
+        resetBtn.dataset.confirmState = "";
+        resetBtn.classList.remove("is-danger-confirm");
+        resetBtn.textContent = t("Reset Country Colors", "ui");
+        if (resetConfirmTimer) globalThis.clearTimeout(resetConfirmTimer);
+      } else {
+        resetBtn.dataset.confirmState = "reset-country-colors";
+        resetBtn.classList.add("is-danger-confirm");
+        resetBtn.textContent = t("Confirm Reset", "ui");
+        resetConfirmTimer = globalThis.setTimeout(() => {
+          resetBtn.dataset.confirmState = "";
+          resetBtn.classList.remove("is-danger-confirm");
+          resetBtn.textContent = t("Reset Country Colors", "ui");
+        }, 3000);
+        return;
+      }
       resetCountryColors();
+      markDirty("reset-country-colors");
       if (typeof state.renderCountryListFn === "function") {
         state.renderCountryListFn();
+      }
+      if (typeof state.renderNowFn === "function") {
+        state.renderNowFn();
       }
     });
     resetBtn.dataset.bound = "true";
@@ -1166,6 +1318,12 @@ function initSidebar({ render } = {}) {
 
   if (uploadProjectBtn && projectFileInput && !uploadProjectBtn.dataset.bound) {
     uploadProjectBtn.addEventListener("click", () => {
+      if (state.isDirty) {
+        const shouldContinue = globalThis.confirm(
+          t("You have unsaved changes. Loading a project will replace the current map.", "ui")
+        );
+        if (!shouldContinue) return;
+      }
       projectFileInput.click();
     });
     uploadProjectBtn.dataset.bound = "true";
@@ -1252,6 +1410,24 @@ function initSidebar({ render } = {}) {
             ...data.styleConfig.specialZones,
           };
         }
+        if (data.styleConfig?.texture && typeof data.styleConfig.texture === "object") {
+          state.styleConfig.texture = {
+            ...(state.styleConfig.texture || {}),
+            ...data.styleConfig.texture,
+            paper: {
+              ...(state.styleConfig.texture?.paper || {}),
+              ...(data.styleConfig.texture.paper || {}),
+            },
+            graticule: {
+              ...(state.styleConfig.texture?.graticule || {}),
+              ...(data.styleConfig.texture.graticule || {}),
+            },
+            draftGrid: {
+              ...(state.styleConfig.texture?.draftGrid || {}),
+              ...(data.styleConfig.texture.draftGrid || {}),
+            },
+          };
+        }
         if (data.layerVisibility && typeof data.layerVisibility === "object") {
           state.showUrban = !!data.layerVisibility.showUrban;
           state.showPhysical = !!data.layerVisibility.showPhysical;
@@ -1276,8 +1452,20 @@ function initSidebar({ render } = {}) {
         if (typeof state.updateDynamicBorderStatusUIFn === "function") {
           state.updateDynamicBorderStatusUIFn();
         }
+        if (typeof state.updateToolbarInputsFn === "function") {
+          state.updateToolbarInputsFn();
+        }
         mapRenderer.refreshColorState({ renderNow: false });
         if (render) render();
+        if (typeof state.renderCountryListFn === "function") {
+          state.renderCountryListFn();
+        }
+        if (typeof state.renderPresetTreeFn === "function") {
+          state.renderPresetTreeFn();
+        }
+        if (typeof state.updateLegendUI === "function") {
+          state.updateLegendUI();
+        }
       });
       projectFileInput.value = "";
     });
