@@ -15,6 +15,7 @@ class ColorManager {
   ];
 
   static strictPoliticalMinDeltaE = 24;
+  static sovereignPoliticalMinDeltaE = 18;
 
   static strictPoliticalVariantTweaks = [
     { hueShift: 0, saturationScale: 1, lightnessShift: 0 },
@@ -358,8 +359,7 @@ class ColorManager {
     return fallback || "#808080";
   }
 
-  static computeAdjacencyContrast(countryAdjacency, colorByCountry) {
-    const threshold = ColorManager.strictPoliticalMinDeltaE;
+  static computeAdjacencyContrast(countryAdjacency, colorByCountry, threshold = ColorManager.strictPoliticalMinDeltaE) {
     let edgeCount = 0;
     let sameColorEdges = 0;
     let lowContrastEdges = 0;
@@ -497,7 +497,8 @@ class ColorManager {
 
       const contrastStats = ColorManager.computeAdjacencyContrast(
         countryAdjacency,
-        colorByCountry
+        colorByCountry,
+        ColorManager.strictPoliticalMinDeltaE
       );
       console.log(
         `[ColorManager] Adjacency contrast: ${contrastStats.edgeCount} edges, ` +
@@ -528,6 +529,106 @@ class ColorManager {
     });
 
     return { featureColors: result, countryColors };
+  }
+
+  static computeOwnerColors(runtimeTopologyOrMeta, sovereigntyByFeatureId = {}) {
+    const result = {};
+    const ownerColors = {};
+    const runtimeMeta =
+      runtimeTopologyOrMeta?.featureIds && runtimeTopologyOrMeta?.neighborGraph
+        ? runtimeTopologyOrMeta
+        : null;
+    const object = runtimeMeta ? null : runtimeTopologyOrMeta?.objects?.political;
+    const geometries = runtimeMeta ? [] : object?.geometries || [];
+    const featureIds = runtimeMeta?.featureIds || geometries.map((geometry, index) => ColorManager.getFeatureId(geometry, index));
+    const canonicalByFeatureId = runtimeMeta?.canonicalCountryByFeatureId || null;
+    const neighborGraph = runtimeMeta?.neighborGraph || null;
+    if (!featureIds.length) {
+      return { featureColors: result, ownerColors, contrastStats: null };
+    }
+
+    const ownerByIndex = featureIds.map((featureId, index) => {
+      const rawOwner =
+        sovereigntyByFeatureId?.[featureId] ||
+        canonicalByFeatureId?.[featureId] ||
+        (!runtimeMeta ? ColorManager.getCountryCode(geometries[index], index) : "");
+      return String(rawOwner || "").trim().toUpperCase();
+    });
+    const ownerAdjacency = new Map();
+    ownerByIndex.forEach((ownerCode) => {
+      if (!ownerAdjacency.has(ownerCode)) {
+        ownerAdjacency.set(ownerCode, new Set());
+      }
+    });
+
+    let neighbors = [];
+    if (Array.isArray(neighborGraph) && neighborGraph.length === featureIds.length) {
+      neighbors = neighborGraph;
+    } else {
+      const embeddedNeighbors = object?.computed_neighbors;
+      if (Array.isArray(embeddedNeighbors) && embeddedNeighbors.length === geometries.length) {
+        neighbors = embeddedNeighbors;
+      } else {
+        try {
+          neighbors = globalThis.topojson?.neighbors?.(geometries) || [];
+        } catch (_error) {
+          neighbors = [];
+        }
+      }
+    }
+    if (!Array.isArray(neighbors) || neighbors.length !== featureIds.length) {
+      neighbors = new Array(featureIds.length).fill(null).map(() => []);
+    }
+
+    featureIds.forEach((_, index) => {
+      const ownerCode = ownerByIndex[index];
+      const neighborIndexes = neighbors[index] || [];
+      neighborIndexes.forEach((neighborIndex) => {
+        if (!Number.isInteger(neighborIndex) || neighborIndex < 0 || neighborIndex >= ownerByIndex.length) {
+          return;
+        }
+        const neighborOwner = ownerByIndex[neighborIndex];
+        if (!ownerCode || !neighborOwner || ownerCode === neighborOwner) return;
+        ownerAdjacency.get(ownerCode)?.add(neighborOwner);
+        ownerAdjacency.get(neighborOwner)?.add(ownerCode);
+      });
+    });
+
+    const ownerOrder = Array.from(ownerAdjacency.keys()).sort((a, b) => {
+      const degreeA = ownerAdjacency.get(a)?.size || 0;
+      const degreeB = ownerAdjacency.get(b)?.size || 0;
+      if (degreeA !== degreeB) return degreeB - degreeA;
+      return String(a).localeCompare(String(b));
+    });
+    const colorByOwner = new Map();
+    ownerOrder.forEach((ownerCode) => {
+      const assignedNeighborColors = [];
+      (ownerAdjacency.get(ownerCode) || new Set()).forEach((neighborCode) => {
+        const color = colorByOwner.get(neighborCode);
+        if (color) assignedNeighborColors.push(color);
+      });
+      const chosen = ColorManager.chooseNeighborDistinctColor(ownerCode, assignedNeighborColors);
+      colorByOwner.set(ownerCode, chosen);
+    });
+
+    featureIds.forEach((featureId, index) => {
+      const ownerCode = ownerByIndex[index];
+      const color =
+        colorByOwner.get(ownerCode) ||
+        ColorManager.getPoliticalFallbackColor(ownerCode || featureId, index);
+      result[featureId] = color;
+    });
+
+    colorByOwner.forEach((color, ownerCode) => {
+      ownerColors[ownerCode] = color;
+    });
+
+    const contrastStats = ColorManager.computeAdjacencyContrast(
+      ownerAdjacency,
+      colorByOwner,
+      ColorManager.sovereignPoliticalMinDeltaE
+    );
+    return { featureColors: result, ownerColors, contrastStats };
   }
 }
 

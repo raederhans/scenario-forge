@@ -1,6 +1,6 @@
 // App entry point (Phase 13)
 import { state } from "./core/state.js";
-import { loadMapData } from "./core/data_loader.js";
+import { loadDeferredDetailBundle, loadMapData } from "./core/data_loader.js";
 import { initMap, setMapData, render } from "./core/map_renderer.js";
 import { initSidebar, initPresetState } from "./ui/sidebar.js";
 import { initToolbar } from "./ui/toolbar.js";
@@ -66,6 +66,83 @@ function hydrateLanguage() {
   }
 }
 
+function createRenderDispatcher(renderFn) {
+  let framePending = false;
+
+  const flush = () => {
+    framePending = false;
+    renderFn();
+  };
+
+  const schedule = () => {
+    if (framePending) return;
+    framePending = true;
+    globalThis.requestAnimationFrame(flush);
+  };
+
+  return { schedule, flush };
+}
+
+function getDeferredPromotionDelay(profile) {
+  if (profile === "balanced") return 250;
+  if (profile === "auto") return 1200;
+  return 0;
+}
+
+function scheduleDeferredDetailPromotion(renderDispatcher) {
+  if (!state.detailDeferred || state.detailPromotionCompleted || state.detailPromotionInFlight) {
+    return;
+  }
+
+  const runPromotion = async () => {
+    if (!state.detailDeferred || state.detailPromotionCompleted || state.detailPromotionInFlight) {
+      return;
+    }
+
+    state.detailPromotionInFlight = true;
+    try {
+      const {
+        topologyDetail,
+        runtimePoliticalTopology,
+        topologyBundleMode,
+        detailSourceUsed,
+      } = await loadDeferredDetailBundle({
+        detailSourceKey: state.detailSourceRequested,
+      });
+
+      if (!topologyDetail) {
+        state.detailDeferred = false;
+        console.warn("[main] Deferred detail promotion skipped: no detail topology was loaded.");
+        return;
+      }
+
+      state.topologyDetail = topologyDetail;
+      state.runtimePoliticalTopology = runtimePoliticalTopology || state.runtimePoliticalTopology;
+      state.topologyBundleMode = topologyBundleMode || "composite";
+      state.detailDeferred = false;
+      state.detailPromotionCompleted = true;
+      state.detailSourceRequested = detailSourceUsed || state.detailSourceRequested;
+
+      console.info(
+        `[main] Deferred detail promotion applied. source=${state.detailSourceRequested}, mode=${state.topologyBundleMode}.`
+      );
+      setMapData({ refitProjection: false, resetZoom: false });
+      renderDispatcher.schedule();
+    } catch (error) {
+      console.warn("[main] Deferred detail promotion failed:", error);
+    } finally {
+      state.detailPromotionInFlight = false;
+    }
+  };
+
+  const delayMs = getDeferredPromotionDelay(state.renderProfile);
+  if (typeof globalThis.requestIdleCallback === "function") {
+    globalThis.requestIdleCallback(runPromotion, { timeout: Math.max(600, delayMs) });
+  } else {
+    globalThis.setTimeout(runPromotion, delayMs);
+  }
+}
+
 async function bootstrap() {
   if (!globalThis.d3 || !globalThis.topojson) {
     console.error("D3/topojson not loaded. Ensure scripts are included before main.js.");
@@ -79,7 +156,11 @@ async function bootstrap() {
       topology,
       topologyPrimary,
       topologyDetail,
+      runtimePoliticalTopology,
       topologyBundleMode,
+      renderProfile,
+      detailDeferred,
+      detailSourceRequested,
       locales,
       geoAliases,
       hierarchy,
@@ -89,7 +170,13 @@ async function bootstrap() {
     state.topology = topology || topologyPrimary || topologyDetail;
     state.topologyPrimary = topologyPrimary || state.topology;
     state.topologyDetail = topologyDetail || null;
+    state.runtimePoliticalTopology = runtimePoliticalTopology || null;
     state.topologyBundleMode = topologyBundleMode || "single";
+    state.renderProfile = renderProfile || "auto";
+    state.detailDeferred = !!detailDeferred;
+    state.detailSourceRequested = detailSourceRequested || "na_v2";
+    state.detailPromotionInFlight = false;
+    state.detailPromotionCompleted = !detailDeferred;
     state.locales = locales || { ui: {}, geo: {} };
     state.geoAliasToStableKey = geoAliases?.alias_to_stable_key || {};
     state.ruCityOverrides = ruCityOverrides || null;
@@ -148,16 +235,19 @@ async function bootstrap() {
     initMap();
     setMapData();
 
+    const renderDispatcher = createRenderDispatcher(render);
     const renderApp = () => {
-      render();
+      renderDispatcher.schedule();
     };
     globalThis.renderApp = renderApp;
+    globalThis.renderNow = renderDispatcher.flush;
 
     initToolbar({ render: renderApp });
     initTranslations();
     initSidebar({ render: renderApp });
 
-    renderApp();
+    renderDispatcher.flush();
+    scheduleDeferredDetailPromotion(renderDispatcher);
     console.log("Initial render complete.");
   } catch (error) {
     console.error("Failed to load TopoJSON:", error);

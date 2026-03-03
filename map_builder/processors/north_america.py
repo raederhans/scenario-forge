@@ -49,6 +49,22 @@ def _ensure_epsg4326(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     return gdf
 
 
+def _sjoin_nearest_projected(
+    left: gpd.GeoDataFrame,
+    right: gpd.GeoDataFrame,
+    *,
+    distance_col: str,
+) -> gpd.GeoDataFrame:
+    left_proj = _ensure_epsg4326(left).to_crs(cfg.AREA_CRS).copy()
+    right_proj = _ensure_epsg4326(right).to_crs(cfg.AREA_CRS).copy()
+    return gpd.sjoin_nearest(
+        left_proj,
+        right_proj,
+        how="left",
+        distance_col=distance_col,
+    )
+
+
 def _download_to_cache(
     url: str,
     filename: str,
@@ -189,10 +205,9 @@ def _assign_admin1_group(
     unresolved = out[output_col].fillna("").astype(str).str.strip() == ""
     if unresolved.any():
         try:
-            nearest = gpd.sjoin_nearest(
+            nearest = _sjoin_nearest_projected(
                 reps.loc[unresolved].copy(),
                 candidates,
-                how="left",
                 distance_col="__dist",
             )
             nearest_map = nearest[name_col].groupby(level=0).first()

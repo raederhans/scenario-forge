@@ -1,10 +1,16 @@
 """Initialize and prepare NUTS-3 map data for Map Creator."""
 from __future__ import annotations
 
+import argparse
+import hashlib
+import json
 import math
 import os
+import re
 import sys
 import subprocess
+import shutil
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
@@ -65,8 +71,19 @@ from map_builder.processors.special_zones import build_special_zones
 from map_builder.outputs.save import save_outputs
 from tools import generate_hierarchy, geo_key_normalizer, translate_manager
 
+PROJECT_ROOT = Path(__file__).resolve().parent
+D3_VENDOR_PATH = PROJECT_ROOT / 'vendor' / 'd3.v7.min.js'
+TOPOJSON_VENDOR_PATH = PROJECT_ROOT / 'vendor' / 'topojson-client.min.js'
+
 GLOBAL_OCEAN_MIN_BBOX_WIDTH = 220.0
 GLOBAL_OCEAN_MIN_BBOX_HEIGHT = 90.0
+ALLOWED_SENTINEL_FEATURE_IDS = {
+    "GAZ+00?",
+    "WEB+00?",
+    "RUS+99?",
+    "CO_ADM1_COL+99?",
+    "VE_ADM1_VEN+99?",
+}
 
 
 def cull_small_geometries(
@@ -492,6 +509,37 @@ def build_na_detail_topology(script_dir: Path, output_dir: Path) -> None:
         print(f"[Detail Bundle] Failed to build enriched detail topology: {exc}")
 
 
+def build_runtime_political_topology(script_dir: Path, output_dir: Path) -> None:
+    primary_topology = output_dir / "europe_topology.json"
+    detail_topology = output_dir / "europe_topology.na_v2.json"
+    runtime_script = script_dir / "tools" / "build_runtime_political_topology.py"
+
+    if not primary_topology.exists():
+        print("[Runtime Political] Skipped: primary topology not found.")
+        return
+    if not runtime_script.exists():
+        print(f"[Runtime Political] Skipped: script missing at {runtime_script}.")
+        return
+
+    cmd = [
+        sys.executable,
+        str(runtime_script),
+        "--primary-topology",
+        str(primary_topology),
+        "--detail-topology",
+        str(detail_topology),
+        "--ru-overrides",
+        str(output_dir / "ru_city_overrides.geojson"),
+        "--output-topology",
+        str(output_dir / "europe_topology.runtime_political_v1.json"),
+    ]
+    print("[Runtime Political] Building unified runtime political topology...")
+    try:
+        subprocess.check_call(cmd, cwd=script_dir)
+    except subprocess.CalledProcessError as exc:
+        print(f"[Runtime Political] Failed to build unified runtime topology: {exc}")
+
+
 def build_balkan_fallback(
     existing: gpd.GeoDataFrame, admin0: gpd.GeoDataFrame | None = None
 ) -> gpd.GeoDataFrame:
@@ -727,7 +775,426 @@ def apply_config_subdivisions(hybrid: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     return enriched
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Build Map Creator data artifacts.")
+    parser.add_argument(
+        "--mode",
+        choices=["all", "primary", "detail", "i18n"],
+        default="all",
+        help="Build scope. all=full pipeline, primary=coarse topology, detail=detail/runtime artifacts, i18n=hierarchy/aliases/locales.",
+    )
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Fail when validation detects contract drift or schema issues.",
+    )
+    return parser.parse_args()
+
+
+def _read_json(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _extract_world_bounds_feature_ids(path: Path, normalize_geometry: bool = False) -> list[str]:
+    node_path = shutil.which('node')
+    if not node_path or not D3_VENDOR_PATH.exists() or not TOPOJSON_VENDOR_PATH.exists() or not path.exists():
+        return []
+
+    script = f"""
+const fs = require('fs');
+const vm = require('vm');
+const normalizeGeometry = {json.dumps(True)} if False else {json.dumps(False)};
+const context = {{ console }};
+context.global = context;
+context.globalThis = context;
+context.window = context;
+context.self = context;
+vm.createContext(context);
+vm.runInContext(fs.readFileSync({json.dumps(str(D3_VENDOR_PATH))}, 'utf8'), context, {{ filename: 'd3.v7.min.js' }});
+vm.runInContext(fs.readFileSync({json.dumps(str(TOPOJSON_VENDOR_PATH))}, 'utf8'), context, {{ filename: 'topojson-client.min.js' }});
+const data = JSON.parse(fs.readFileSync({json.dumps(str(path))}, 'utf8'));
+const object = data?.objects?.political;
+const features = object ? context.topojson.feature(data, object).features : [];
+function getRingOrientationAccumulator(ring) {{
+  if (!Array.isArray(ring) || ring.length < 4) return 0;
+  let total = 0;
+  for (let index = 0; index < ring.length - 1; index += 1) {{
+    const start = ring[index];
+    const end = ring[index + 1];
+    if (!Array.isArray(start) || !Array.isArray(end)) continue;
+    total += (Number(end[0]) - Number(start[0])) * (Number(end[1]) + Number(start[1]));
+  }}
+  return total;
+}}
+function orientRingCoordinates(ring, clockwise) {{
+  if (!Array.isArray(ring) || ring.length < 4) return ring;
+  const signed = getRingOrientationAccumulator(ring);
+  const isClockwise = signed > 0;
+  if (clockwise === isClockwise) return ring;
+  return [...ring].reverse();
+}}
+function rewindGeometryRings(geometry) {{
+  if (!geometry || !geometry.type || !geometry.coordinates) return null;
+  if (geometry.type === 'Polygon') {{
+    return {{
+      ...geometry,
+      coordinates: geometry.coordinates.map((ring, index) => orientRingCoordinates(ring, index === 0)),
+    }};
+  }}
+  if (geometry.type === 'MultiPolygon') {{
+    return {{
+      ...geometry,
+      coordinates: geometry.coordinates.map((polygon) =>
+        Array.isArray(polygon)
+          ? polygon.map((ring, index) => orientRingCoordinates(ring, index === 0))
+          : polygon
+      ),
+    }};
+  }}
+  return null;
+}}
+function normalizeFeatureGeometry(feature) {{
+  if (!normalizeGeometry || !feature?.geometry) return feature;
+  let area = null;
+  try {{
+    area = context.d3.geoArea(feature);
+  }} catch (_error) {{
+    return feature;
+  }}
+  if (!Number.isFinite(area) || area <= Math.PI * 2) return feature;
+  const rewoundGeometry = rewindGeometryRings(feature.geometry);
+  if (!rewoundGeometry) return feature;
+  const rewoundFeature = {{ ...feature, geometry: rewoundGeometry }};
+  try {{
+    const rewoundArea = context.d3.geoArea(rewoundFeature);
+    if (Number.isFinite(rewoundArea) && rewoundArea < area) return rewoundFeature;
+  }} catch (_error) {{}}
+  return feature;
+}}
+const bad = [];
+for (const rawFeature of features) {{
+  const feature = normalizeFeatureGeometry(rawFeature);
+  const props = feature?.properties || {{}};
+  const id = String(props.id || feature.id || '').trim();
+  if (!id) continue;
+  try {{
+    const area = Number(context.d3.geoArea(feature));
+    const bounds = context.d3.geoBounds(feature);
+    const isWorld = Array.isArray(bounds)
+      && bounds.length === 2
+      && Array.isArray(bounds[0])
+      && Array.isArray(bounds[1])
+      && Math.abs(Number(bounds[0][0]) + 180) < 1e-9
+      && Math.abs(Number(bounds[0][1]) + 90) < 1e-9
+      && Math.abs(Number(bounds[1][0]) - 180) < 1e-9
+      && Math.abs(Number(bounds[1][1]) - 90) < 1e-9;
+    if (isWorld || area > Math.PI * 2) bad.push(id);
+  }} catch (_error) {{}}
+}}
+process.stdout.write(JSON.stringify(bad));
+""".replace("const normalizeGeometry = true if False else false;", f"const normalizeGeometry = {str(normalize_geometry).lower()};")
+
+    try:
+        completed = subprocess.run(
+            [node_path, '-e', script],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except Exception:
+        return []
+    if completed.returncode != 0:
+        return []
+    try:
+        payload = json.loads(completed.stdout.strip() or '[]')
+    except json.JSONDecodeError:
+        return []
+    return [str(item).strip() for item in payload if str(item).strip()]
+
+
+def _topology_summary(path: Path) -> dict:
+    data = _read_json(path)
+    objects = data.get("objects", {}) if isinstance(data, dict) else {}
+    political = objects.get("political", {}) if isinstance(objects, dict) else {}
+    geometries = political.get("geometries", []) if isinstance(political, dict) else []
+    arcs = data.get("arcs", []) if isinstance(data, dict) else []
+    raw_world_bounds_ids = _extract_world_bounds_feature_ids(path, normalize_geometry=False)
+    normalized_world_bounds_ids = _extract_world_bounds_feature_ids(path, normalize_geometry=True)
+    return {
+        "type": "topology",
+        "object_names": sorted(objects.keys()) if isinstance(objects, dict) else [],
+        "political_geometries": len(geometries) if isinstance(geometries, list) else 0,
+        "has_computed_neighbors": bool(political.get("computed_neighbors")) if isinstance(political, dict) else False,
+        "arc_count": len(arcs) if isinstance(arcs, list) else 0,
+        "arc_point_count": sum(len(arc) for arc in arcs if isinstance(arc, list)),
+        "world_bounds_geometries": len(normalized_world_bounds_ids),
+        "raw_world_bounds_geometries": len(raw_world_bounds_ids),
+    }
+
+
+def _extract_political_topology_ids(path: Path) -> tuple[set[str], list[str], list[str], list[str]]:
+    data = _read_json(path)
+    geometries = data.get("objects", {}).get("political", {}).get("geometries", [])
+    ids: list[str] = []
+    missing_names: list[str] = []
+    illegal_ids: list[str] = []
+    for geom in geometries if isinstance(geometries, list) else []:
+        props = geom.get("properties", {}) or {}
+        feature_id = str(props.get("id") or geom.get("id") or "").strip()
+        if feature_id:
+            ids.append(feature_id)
+            if re.search(r"[?+]", feature_id) and feature_id not in ALLOWED_SENTINEL_FEATURE_IDS:
+                illegal_ids.append(feature_id)
+        name = str(props.get("name") or "").strip()
+        if not name and feature_id:
+            missing_names.append(feature_id)
+    seen: set[str] = set()
+    duplicates: list[str] = []
+    for feature_id in ids:
+        if feature_id in seen:
+            duplicates.append(feature_id)
+        else:
+            seen.add(feature_id)
+    return set(ids), duplicates, missing_names, illegal_ids
+
+
+def _collect_hierarchy_child_ids(path: Path) -> set[str]:
+    data = _read_json(path)
+    groups = data.get("groups", {}) if isinstance(data, dict) else {}
+    child_ids: set[str] = set()
+    if isinstance(groups, dict):
+        for children in groups.values():
+            if not isinstance(children, list):
+                continue
+            for child_id in children:
+                text = str(child_id or "").strip()
+                if text:
+                    child_ids.add(text)
+    return child_ids
+
+
+def write_data_manifest(output_dir: Path) -> Path:
+    roles = {
+        "europe_topology.json": "primary_topology",
+        "europe_topology.na_v1.json": "detail_topology_na_v1",
+        "europe_topology.na_v2.json": "detail_topology_na_v2",
+        "europe_topology.runtime_political_v1.json": "runtime_political_topology",
+        "hierarchy.json": "hierarchy",
+        "geo_aliases.json": "geo_aliases",
+        "locales.json": "locales",
+    }
+    outputs: dict[str, dict] = {}
+    for file_name, role in roles.items():
+        path = output_dir / file_name
+        if not path.exists():
+            continue
+        item: dict[str, object] = {
+            "role": role,
+            "size_bytes": path.stat().st_size,
+            "sha256": _sha256_file(path),
+        }
+        if path.suffix == ".json":
+            try:
+                if "topology" in file_name:
+                    item.update(_topology_summary(path))
+                elif file_name == "hierarchy.json":
+                    payload = _read_json(path)
+                    groups = payload.get("groups", {}) if isinstance(payload, dict) else {}
+                    item.update(
+                        {
+                            "type": "hierarchy",
+                            "group_count": len(groups) if isinstance(groups, dict) else 0,
+                            "child_count": len(_collect_hierarchy_child_ids(path)),
+                        }
+                    )
+                elif file_name == "geo_aliases.json":
+                    payload = _read_json(path)
+                    item.update(
+                        {
+                            "type": "geo_aliases",
+                            "entry_count": int(payload.get("entry_count", 0)),
+                            "alias_count": int(payload.get("alias_count", 0)),
+                            "conflict_count": int(payload.get("conflict_count", 0)),
+                        }
+                    )
+                elif file_name == "locales.json":
+                    payload = _read_json(path)
+                    geo_entries = payload.get("geo", {}) if isinstance(payload, dict) else {}
+                    ui_entries = payload.get("ui", {}) if isinstance(payload, dict) else {}
+                    item.update(
+                        {
+                            "type": "locales",
+                            "geo_entry_count": len(geo_entries) if isinstance(geo_entries, dict) else 0,
+                            "ui_entry_count": len(ui_entries) if isinstance(ui_entries, dict) else 0,
+                        }
+                    )
+            except Exception as exc:
+                item["inspection_error"] = str(exc)
+        outputs[file_name] = item
+
+    manifest = {
+        "version": 1,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "outputs": outputs,
+    }
+    manifest_path = output_dir / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"[Manifest] Wrote {manifest_path}")
+    return manifest_path
+
+
+def validate_build_outputs(output_dir: Path, strict: bool = False) -> None:
+    problems: list[str] = []
+
+    primary_path = output_dir / "europe_topology.json"
+    detail_path = output_dir / "europe_topology.na_v2.json"
+    runtime_path = output_dir / "europe_topology.runtime_political_v1.json"
+    hierarchy_path = output_dir / "hierarchy.json"
+    aliases_path = output_dir / "geo_aliases.json"
+
+    for topology_path in [primary_path, detail_path, runtime_path]:
+        if not topology_path.exists():
+            continue
+        ids, duplicates, missing_names, illegal_ids = _extract_political_topology_ids(topology_path)
+        if duplicates:
+            problems.append(f"{topology_path.name}: duplicate ids={len(duplicates)}")
+        if strict and missing_names:
+            problems.append(f"{topology_path.name}: missing names={len(missing_names)}")
+        if strict and illegal_ids:
+            problems.append(f"{topology_path.name}: illegal sentinel ids={len(illegal_ids)}")
+
+        summary = _topology_summary(topology_path)
+        world_bounds_count = int(summary.get("world_bounds_geometries", 0))
+        raw_world_bounds_count = int(summary.get("raw_world_bounds_geometries", 0))
+        if strict and summary["political_geometries"] > 0 and not summary["has_computed_neighbors"]:
+            problems.append(f"{topology_path.name}: missing computed_neighbors")
+        if strict and world_bounds_count > 0:
+            problems.append(f"{topology_path.name}: world-bounds geometries={world_bounds_count}")
+
+        print(
+            f"[Validate] {topology_path.name}: ids={len(ids)}, "
+            f"duplicates={len(duplicates)}, missing_names={len(missing_names)}, "
+            f"illegal_ids={len(illegal_ids)}, world_bounds={world_bounds_count}, "
+            f"raw_world_bounds={raw_world_bounds_count}"
+        )
+
+    if hierarchy_path.exists():
+        hierarchy_child_ids = _collect_hierarchy_child_ids(hierarchy_path)
+        reference_topology_path = runtime_path if runtime_path.exists() else detail_path if detail_path.exists() else primary_path
+        if reference_topology_path.exists():
+            reference_ids, _duplicates, _missing_names, _illegal_ids = _extract_political_topology_ids(reference_topology_path)
+            missing_children = sorted(hierarchy_child_ids - reference_ids)
+            if missing_children:
+                problems.append(
+                    f"hierarchy.json: child ids missing from {reference_topology_path.name}={len(missing_children)}"
+                )
+            print(
+                f"[Validate] hierarchy.json: children={len(hierarchy_child_ids)}, "
+                f"missing_from_{reference_topology_path.name}={len(missing_children)}"
+            )
+
+    if aliases_path.exists():
+        aliases_payload = _read_json(aliases_path)
+        conflict_count = int(aliases_payload.get("conflict_count", 0))
+        print(f"[Validate] geo_aliases.json: conflicts={conflict_count}")
+        if strict and conflict_count > 0:
+            problems.append(f"geo_aliases.json: conflicts={conflict_count}")
+
+    if strict and primary_path.exists() and detail_path.exists() and runtime_path.exists():
+        try:
+            from tools.build_runtime_political_topology import _compose_political_features, _load_topology
+
+            override_path = output_dir / "ru_city_overrides.geojson"
+            override_collection = _read_json(override_path) if override_path.exists() else None
+            expected_runtime = _compose_political_features(
+                primary_topology=_load_topology(primary_path),
+                detail_topology=_load_topology(detail_path) if detail_path.exists() else None,
+                override_collection=override_collection,
+            )
+            expected_ids = {
+                str(feature_id).strip()
+                for feature_id in expected_runtime.get("id", [])
+                if str(feature_id).strip()
+            }
+            runtime_ids, _duplicates, _missing_names, _illegal_ids = _extract_political_topology_ids(runtime_path)
+            if expected_ids != runtime_ids:
+                problems.append(
+                    "runtime political ids drift: "
+                    f"expected={len(expected_ids)}, actual={len(runtime_ids)}, "
+                    f"missing={len(expected_ids - runtime_ids)}, extra={len(runtime_ids - expected_ids)}"
+                )
+        except Exception as exc:
+            problems.append(f"runtime political validation failed: {exc}")
+
+    if problems:
+        for problem in problems:
+            print(f"[Validate] WARNING: {problem}")
+        if strict:
+            raise SystemExit("Strict validation failed. See warnings above.")
+
+
+def run_geo_alias_normalization(output_dir: Path) -> None:
+    topology_path = geo_key_normalizer.resolve_default_topology(Path(__file__).resolve().parent)
+    payload = geo_key_normalizer.normalize_geokeys(topology_path)
+    output_path = output_dir / "geo_aliases.json"
+    output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(
+        f"OK: geo aliases generated. entries={payload['entry_count']}, "
+        f"aliases={payload['alias_count']}, conflicts={payload['conflict_count']}"
+    )
+    print(f"Saved geo aliases to: {output_path}")
+
+
 def main() -> None:
+    args = parse_args()
+    script_dir = Path(__file__).resolve().parent
+    output_dir = script_dir / "data"
+
+    if args.mode == "detail":
+        build_ru_city_detail_topology(script_dir, output_dir)
+        build_na_detail_topology(script_dir, output_dir)
+        build_runtime_political_topology(script_dir, output_dir)
+        write_data_manifest(output_dir)
+        validate_build_outputs(output_dir, strict=args.strict)
+        print("Done.")
+        return
+
+    if args.mode == "i18n":
+        print("[INFO] Generating Hierarchy Data....")
+        generate_hierarchy.main()
+
+        print("[INFO] Normalizing GEO keys....")
+        run_geo_alias_normalization(output_dir)
+
+        print("[INFO] Syncing Translations....")
+        translation_result = translate_manager.sync_translations(
+            topology_path=output_dir / "europe_topology.na_v2.json",
+            output_path=output_dir / "locales.json",
+            geo_aliases_path=output_dir / "geo_aliases.json",
+            hierarchy_path=output_dir / "hierarchy.json",
+            machine_translate=False,
+            network_mode="off",
+        )
+        print(
+            "[INFO] Translation sync result: "
+            f"geo_missing_like={translation_result['geo_missing_like']}, "
+            f"todo_markers={translation_result['geo_literal_todo_markers']}, "
+            f"mt_requests={translation_result['mt_requests']}"
+        )
+        write_data_manifest(output_dir)
+        validate_build_outputs(output_dir, strict=args.strict)
+        print("Done.")
+        return
+
     borders = fetch_ne_zip(cfg.BORDERS_URL, "borders")
     borders = clip_to_map_bounds(borders, "borders")
 
@@ -971,8 +1438,6 @@ def main() -> None:
     else:
         print("[ID Validation] WARNING: 'id' column missing from final_hybrid!")
 
-    script_dir = Path(__file__).resolve().parent
-    output_dir = script_dir / "data"
     save_outputs(
         filtered,
         rivers_clipped,
@@ -998,14 +1463,22 @@ def main() -> None:
         output_path=topology_path,
         quantization=cfg.TOPOLOGY_QUANTIZATION,
     )
+    if args.mode == "primary":
+        write_data_manifest(output_dir)
+        validate_build_outputs(output_dir, strict=args.strict)
+        print(f"Features with missing CNTR_CODE: {final_hybrid['cntr_code'].isnull().sum()}")
+        print("Done.")
+        return
+
     build_ru_city_detail_topology(script_dir, output_dir)
     build_na_detail_topology(script_dir, output_dir)
+    build_runtime_political_topology(script_dir, output_dir)
 
     print("[INFO] Generating Hierarchy Data....")
     generate_hierarchy.main()
 
     print("[INFO] Normalizing GEO keys....")
-    geo_key_normalizer.main()
+    run_geo_alias_normalization(output_dir)
 
     print("[INFO] Syncing Translations....")
     translation_result = translate_manager.sync_translations(
@@ -1044,6 +1517,8 @@ def main() -> None:
             f"mt_requests={translation_result['mt_requests']}"
         )
 
+    write_data_manifest(output_dir)
+    validate_build_outputs(output_dir, strict=args.strict)
     print(f"Features with missing CNTR_CODE: {final_hybrid['cntr_code'].isnull().sum()}")
     print("Done.")
 

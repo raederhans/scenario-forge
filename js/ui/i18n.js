@@ -45,6 +45,13 @@ function updateUIText() {
     ["lblPaintGranularity", "Paint Granularity"],
     ["optPaintSubdivision", "By Subdivision"],
     ["optPaintCountry", "By Country"],
+    ["lblPaintMeaning", "Paint Meaning"],
+    ["labelActiveSovereign", "Active Sovereign"],
+    ["optPaintMeaningVisual", "Visual"],
+    ["optPaintMeaningSovereignty", "Sovereignty"],
+    ["activeSovereignLabel", "None selected"],
+    ["recalculateBordersBtn", "Recalculate Borders"],
+    ["dynamicBorderStatus", "Borders up to date"],
     ["lblOcean", "Ocean"],
     ["lblOceanFillColor", "Fill Color"],
     ["lblOceanStyle", "Style"],
@@ -148,6 +155,10 @@ function updateUIText() {
   const projectFileName = document.getElementById("projectFileName");
   if (projectFileName && !projectFileName.textContent.trim()) {
     projectFileName.textContent = t("No file selected", "ui");
+  }
+
+  if (typeof state.updateActiveSovereignUIFn === "function") {
+    state.updateActiveSovereignUIFn();
   }
 }
 

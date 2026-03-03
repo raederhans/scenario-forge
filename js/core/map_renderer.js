@@ -3,18 +3,29 @@ import { state } from "./state.js";
 import { ColorManager } from "./color_manager.js";
 import { LegendManager } from "./legend_manager.js";
 import { getTooltipText } from "../ui/i18n.js";
+import {
+  ensureSovereigntyState,
+  getFeatureOwnerCode,
+  getFeatureIdsForOwner,
+  migrateLegacyColorState,
+  setFeatureOwnerCodes,
+  resetFeatureOwnerCodes,
+} from "./sovereignty_manager.js";
 
 let mapContainer = null;
 let mapCanvas = null;
+let hitCanvas = null;
 let mapSvg = null;
 let interactionRect = null;
 let textureOverlay = null;
 let tooltip = null;
 let context = null;
+let hitContext = null;
 
 let projection = null;
 let pathSVG = null;
 let pathCanvas = null;
+let pathHitCanvas = null;
 let zoomBehavior = null;
 
 let viewportGroup = null;
@@ -50,7 +61,11 @@ const HIT_GRID_TARGET_COLS = 24;
 const HIT_GRID_MIN_CELL_PX = 32;
 const HIT_GRID_MAX_CELL_PX = 96;
 const HIT_SNAP_RADIUS_PX = 8;
+const HIT_SNAP_RADIUS_HOVER_PX = 0;
+const HIT_SNAP_RADIUS_CLICK_PX = 3;
 const HIT_MAX_CELLS_PER_ITEM = 400;
+const HIT_MODE_PARAM = "hit_mode";
+const HIT_MODES = new Set(["auto", "canvas", "spatial"]);
 const COASTLINE_LOD_LOW_ZOOM_MAX = 1.8;
 const COASTLINE_LOD_MID_ZOOM_MAX = 3.2;
 const COASTLINE_SIMPLIFY_MID_EPSILON = 0.09;
@@ -126,6 +141,51 @@ function readSearchParam(name) {
 function isRenderDiagEnabled() {
   const raw = readSearchParam(RENDER_DIAG_PARAM);
   return ["1", "true", "yes", "on"].includes(raw);
+}
+
+function resolveHitMode() {
+  const raw = readSearchParam(HIT_MODE_PARAM);
+  if (!raw) return "auto";
+  if (!HIT_MODES.has(raw)) return "auto";
+  return raw;
+}
+
+function isDynamicBordersEnabled() {
+  if (!state.runtimePoliticalTopology?.objects?.political || !globalThis.topojson) {
+    return false;
+  }
+  const raw = readSearchParam("dynamic_borders");
+  if (!raw) return true;
+  return !["0", "false", "off", "no"].includes(raw);
+}
+
+function isSovereigntyModeActive() {
+  return String(state.paintMode || "visual").toLowerCase() === "sovereignty";
+}
+
+function clearPendingDynamicBorderTimer() {
+  if (state.pendingDynamicBorderTimerId) {
+    globalThis.clearTimeout(state.pendingDynamicBorderTimerId);
+    state.pendingDynamicBorderTimerId = null;
+  }
+}
+
+function updateDynamicBorderStatusUI() {
+  if (typeof state.updateDynamicBorderStatusUIFn === "function") {
+    state.updateDynamicBorderStatusUIFn();
+  }
+}
+
+function markDynamicBordersDirty(reason = "") {
+  if (!isDynamicBordersEnabled()) {
+    state.dynamicBordersDirty = false;
+    state.dynamicBordersDirtyReason = "";
+    updateDynamicBorderStatusUI();
+    return;
+  }
+  state.dynamicBordersDirty = true;
+  state.dynamicBordersDirtyReason = String(reason || "").trim();
+  updateDynamicBorderStatusUI();
 }
 
 function resetRenderDiagnostics() {
@@ -273,9 +333,11 @@ function getFeatureRegionTag(feature) {
 }
 
 function getColorsHash() {
-  const countryEntries = Object.entries(state.countryBaseColors || {}).sort((a, b) => a[0].localeCompare(b[0]));
-  const featureEntries = Object.entries(state.featureOverrides || {}).sort((a, b) => a[0].localeCompare(b[0]));
-  return JSON.stringify([countryEntries, featureEntries]);
+  const sovereignEntries = Object.entries(state.sovereignBaseColors || {}).sort((a, b) => a[0].localeCompare(b[0]));
+  const visualEntries = Object.entries(state.visualOverrides || {}).sort((a, b) => a[0].localeCompare(b[0]));
+  const legacyCountryEntries = Object.entries(state.countryBaseColors || {}).sort((a, b) => a[0].localeCompare(b[0]));
+  const legacyFeatureEntries = Object.entries(state.featureOverrides || {}).sort((a, b) => a[0].localeCompare(b[0]));
+  return JSON.stringify([sovereignEntries, visualEntries, legacyCountryEntries, legacyFeatureEntries, state.paintMode || "visual"]);
 }
 
 function isProbablyCanvasColor(value) {
@@ -559,13 +621,28 @@ function evaluateSkipFeature(feature, canvasWidth, canvasHeight, { forceProd = f
   }
 
   const bounds = getProjectedFeatureBounds(feature, { featureId });
+  const countryCode = getFeatureCountryCodeNormalized(feature);
   if (!bounds) {
     return {
       skip: false,
       reason: null,
       featureId,
-      countryCode: getFeatureCountryCodeNormalized(feature),
+      countryCode,
       bounds: null,
+    };
+  }
+
+  const isTrustedAdmin0Shell =
+    GIANT_FEATURE_ALLOWLIST.has(countryCode) &&
+    isAdmin0ShellFeature(feature, featureId);
+  const spherical = getSphericalFeatureDiagnostics(feature, { featureId });
+  if (spherical?.invalid && !isTrustedAdmin0Shell) {
+    return {
+      skip: true,
+      reason: spherical.isWorldBounds ? "world_bounds" : "spherical_area",
+      featureId,
+      countryCode,
+      bounds,
     };
   }
 
@@ -581,10 +658,6 @@ function evaluateSkipFeature(feature, canvasWidth, canvasHeight, { forceProd = f
     };
   }
 
-  const countryCode = getFeatureCountryCodeNormalized(feature);
-  const isTrustedAdmin0Shell =
-    GIANT_FEATURE_ALLOWLIST.has(countryCode) &&
-    isAdmin0ShellFeature(feature, featureId);
   if (isTrustedAdmin0Shell) {
     return {
       skip: false,
@@ -658,13 +731,33 @@ function parseReplaceFeatureIds(rawValue) {
     .filter(Boolean);
 }
 
-function reverseGeometryRings(geometry) {
+function getRingOrientationAccumulator(ring) {
+  if (!Array.isArray(ring) || ring.length < 4) return 0;
+  let total = 0;
+  for (let index = 0; index < ring.length - 1; index += 1) {
+    const start = ring[index];
+    const end = ring[index + 1];
+    if (!Array.isArray(start) || !Array.isArray(end)) continue;
+    total += (Number(end[0]) - Number(start[0])) * (Number(end[1]) + Number(start[1]));
+  }
+  return total;
+}
+
+function orientRingCoordinates(ring, clockwise) {
+  if (!Array.isArray(ring) || ring.length < 4) return ring;
+  const signed = getRingOrientationAccumulator(ring);
+  const isClockwise = signed > 0;
+  if (clockwise === isClockwise) return ring;
+  return [...ring].reverse();
+}
+
+function rewindGeometryRings(geometry) {
   if (!geometry || !geometry.type || !geometry.coordinates) return null;
   if (geometry.type === "Polygon") {
     return {
       ...geometry,
-      coordinates: geometry.coordinates.map((ring) =>
-        Array.isArray(ring) ? [...ring].reverse() : ring
+      coordinates: geometry.coordinates.map((ring, index) =>
+        orientRingCoordinates(ring, index === 0)
       ),
     };
   }
@@ -673,12 +766,60 @@ function reverseGeometryRings(geometry) {
       ...geometry,
       coordinates: geometry.coordinates.map((polygon) =>
         Array.isArray(polygon)
-          ? polygon.map((ring) => (Array.isArray(ring) ? [...ring].reverse() : ring))
+          ? polygon.map((ring, index) => orientRingCoordinates(ring, index === 0))
           : polygon
       ),
     };
   }
   return null;
+}
+
+function isWorldBounds(bounds) {
+  return !!(
+    Array.isArray(bounds) &&
+    bounds.length === 2 &&
+    Array.isArray(bounds[0]) &&
+    Array.isArray(bounds[1]) &&
+    Math.abs(Number(bounds[0][0]) + 180) < 1e-9 &&
+    Math.abs(Number(bounds[0][1]) + 90) < 1e-9 &&
+    Math.abs(Number(bounds[1][0]) - 180) < 1e-9 &&
+    Math.abs(Number(bounds[1][1]) - 90) < 1e-9
+  );
+}
+
+function getSphericalFeatureDiagnostics(feature, { featureId = null, allowCompute = true } = {}) {
+  const resolvedFeatureId = featureId || getFeatureId(feature);
+  if (resolvedFeatureId && state.sphericalFeatureDiagnosticsById?.has(resolvedFeatureId)) {
+    return state.sphericalFeatureDiagnosticsById.get(resolvedFeatureId) || null;
+  }
+  if (!allowCompute || !globalThis.d3?.geoArea || !globalThis.d3?.geoBounds || !feature?.geometry) {
+    return null;
+  }
+
+  try {
+    const area = Number(globalThis.d3.geoArea(feature));
+    const bounds = globalThis.d3.geoBounds(feature);
+    const diagnostics = {
+      area,
+      bounds,
+      isWorldBounds: isWorldBounds(bounds),
+      hasExcessiveSphereArea: Number.isFinite(area) && area > Math.PI * 2,
+    };
+    diagnostics.invalid = diagnostics.isWorldBounds || diagnostics.hasExcessiveSphereArea;
+    if (resolvedFeatureId) {
+      state.sphericalFeatureDiagnosticsById.set(resolvedFeatureId, diagnostics);
+    }
+    return diagnostics;
+  } catch (_error) {
+    return null;
+  }
+}
+
+function getMaxDprForProfile(renderProfile) {
+  const profile = String(renderProfile || "auto").trim().toLowerCase();
+  if (profile === "full") return Math.max(1, Number(globalThis.devicePixelRatio) || 1);
+  if (profile === "balanced") return 1.5;
+  return 1.25;
 }
 
 function normalizeFeatureGeometry(feature, { sourceLabel = "detail" } = {}) {
@@ -696,7 +837,7 @@ function normalizeFeatureGeometry(feature, { sourceLabel = "detail" } = {}) {
     return feature;
   }
 
-  const rewoundGeometry = reverseGeometryRings(feature.geometry);
+  const rewoundGeometry = rewindGeometryRings(feature.geometry);
   if (!rewoundGeometry) return feature;
   const rewoundFeature = {
     ...feature,
@@ -882,18 +1023,27 @@ function scheduleRenderPhaseIdle() {
 }
 
 function getResolvedFeatureColor(feature, id) {
-  const direct = getSafeCanvasColor(state.featureOverrides?.[id], null);
+  const direct =
+    getSafeCanvasColor(state.visualOverrides?.[id], null) ||
+    getSafeCanvasColor(state.featureOverrides?.[id], null);
   if (direct) return direct;
 
-  const code = getFeatureCountryCodeNormalized(feature);
-  if (!code) return null;
+  const ownerCode = getFeatureOwnerCode(id) || getFeatureCountryCodeNormalized(feature);
+  if (!ownerCode) return null;
 
-  return getSafeCanvasColor(state.countryBaseColors?.[code], null);
+  return (
+    getSafeCanvasColor(state.sovereignBaseColors?.[ownerCode], null) ||
+    getSafeCanvasColor(state.countryBaseColors?.[ownerCode], null)
+  );
 }
 
 function rebuildResolvedColors() {
-  state.countryBaseColors = sanitizeCountryColorMap(state.countryBaseColors);
-  state.featureOverrides = sanitizeColorMap(state.featureOverrides);
+  migrateLegacyColorState();
+  ensureSovereigntyState();
+  state.sovereignBaseColors = sanitizeCountryColorMap(state.sovereignBaseColors);
+  state.visualOverrides = sanitizeColorMap(state.visualOverrides);
+  state.countryBaseColors = { ...state.sovereignBaseColors };
+  state.featureOverrides = { ...state.visualOverrides };
 
   const nextColors = {};
   if (!state.landData?.features?.length) {
@@ -914,6 +1064,45 @@ function rebuildResolvedColors() {
 
   state.colors = nextColors;
   return nextColors;
+}
+
+function refreshResolvedColorsForFeatures(featureIds, { renderNow = false } = {}) {
+  migrateLegacyColorState();
+  ensureSovereigntyState();
+  state.sovereignBaseColors = sanitizeCountryColorMap(state.sovereignBaseColors);
+  state.visualOverrides = sanitizeColorMap(state.visualOverrides);
+  state.countryBaseColors = { ...state.sovereignBaseColors };
+  state.featureOverrides = { ...state.visualOverrides };
+
+  const ids = Array.isArray(featureIds)
+    ? Array.from(new Set(featureIds.map((value) => String(value || "").trim()).filter(Boolean)))
+    : [];
+  ids.forEach((id) => {
+    const feature = state.landIndex?.get(id);
+    if (!feature) {
+      delete state.colors[id];
+      return;
+    }
+    const resolved = getResolvedFeatureColor(feature, id);
+    if (resolved) {
+      state.colors[id] = resolved;
+    } else {
+      delete state.colors[id];
+    }
+  });
+
+  if (renderNow && context) {
+    render();
+  }
+}
+
+function refreshResolvedColorsForOwners(ownerCodes, { renderNow = false } = {}) {
+  const codes = Array.isArray(ownerCodes) ? ownerCodes : [];
+  const ids = [];
+  codes.forEach((ownerCode) => {
+    getFeatureIdsForOwner(ownerCode).forEach((id) => ids.push(id));
+  });
+  refreshResolvedColorsForFeatures(ids, { renderNow });
 }
 
 function refreshColorState({ renderNow = true } = {}) {
@@ -1179,6 +1368,14 @@ function createCanvasElement() {
   return canvas;
 }
 
+function createHitCanvasElement() {
+  const canvas = document.createElement("canvas");
+  canvas.id = "map-hit-canvas";
+  canvas.width = 1;
+  canvas.height = 1;
+  return canvas;
+}
+
 function createSvgElement() {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("id", "map-svg");
@@ -1297,7 +1494,8 @@ function ensureHybridLayers() {
 function setCanvasSize() {
   if (!mapCanvas || !mapSvg) return;
 
-  state.dpr = globalThis.devicePixelRatio || 1;
+  const deviceDpr = Math.max(Number(globalThis.devicePixelRatio || 1), 1);
+  state.dpr = Math.min(deviceDpr, getMaxDprForProfile(state.renderProfile));
   const rect = mapContainer?.getBoundingClientRect?.();
   const measuredWidth = rect?.width || mapContainer?.clientWidth || globalThis.innerWidth;
   const measuredHeight = rect?.height || mapContainer?.clientHeight || globalThis.innerHeight;
@@ -1315,8 +1513,13 @@ function setCanvasSize() {
   mapCanvas.height = scaledH;
   mapCanvas.style.width = `${state.width}px`;
   mapCanvas.style.height = `${state.height}px`;
+  if (hitCanvas) {
+    hitCanvas.width = scaledW;
+    hitCanvas.height = scaledH;
+  }
   oceanPatternCache.clear();
   clearProjectedBoundsCache();
+  state.hitCanvasDirty = true;
 
   const svg = globalThis.d3.select(mapSvg);
   svg.attr("width", state.width).attr("height", state.height);
@@ -1326,6 +1529,58 @@ function setCanvasSize() {
 function rebuildDynamicBorders() {
   state.cachedBorders = null;
   state.cachedColorsHash = getColorsHash();
+  if (!isDynamicBordersEnabled()) {
+    state.cachedDynamicOwnerBorders = null;
+    state.cachedDynamicBordersHash = null;
+    state.dynamicBordersDirty = false;
+    state.dynamicBordersDirtyReason = "";
+    clearPendingDynamicBorderTimer();
+    updateDynamicBorderStatusUI();
+    return;
+  }
+  ensureSovereigntyState();
+  const nextHash = `rev:${Number(state.sovereigntyRevision) || 0}`;
+  if (state.cachedDynamicBordersHash === nextHash && state.cachedDynamicOwnerBorders) {
+    state.dynamicBordersDirty = false;
+    state.dynamicBordersDirtyReason = "";
+    updateDynamicBorderStatusUI();
+    return;
+  }
+  state.cachedDynamicOwnerBorders = buildDynamicOwnerBorderMesh(
+    state.runtimePoliticalTopology,
+    state.sovereigntyByFeatureId
+  );
+  state.cachedDynamicBordersHash = nextHash;
+  state.dynamicBordersDirty = false;
+  state.dynamicBordersDirtyReason = "";
+  updateDynamicBorderStatusUI();
+}
+
+function recomputeDynamicBordersNow({ renderNow = true, reason = "" } = {}) {
+  clearPendingDynamicBorderTimer();
+  if (!isDynamicBordersEnabled()) {
+    state.dynamicBordersDirty = false;
+    state.dynamicBordersDirtyReason = "";
+    updateDynamicBorderStatusUI();
+    return false;
+  }
+  if (reason) {
+    state.dynamicBordersDirtyReason = String(reason);
+  }
+  rebuildDynamicBorders();
+  if (renderNow && context) {
+    render();
+  }
+  return true;
+}
+
+function scheduleDynamicBorderRecompute(reason = "", delayMs = 150) {
+  markDynamicBordersDirty(reason);
+  clearPendingDynamicBorderTimer();
+  state.pendingDynamicBorderTimerId = globalThis.setTimeout(() => {
+    state.pendingDynamicBorderTimerId = null;
+    recomputeDynamicBordersNow({ renderNow: true, reason });
+  }, Math.max(0, Number(delayMs) || 0));
 }
 
 function isUsableMesh(mesh) {
@@ -1354,6 +1609,26 @@ function getEntityFeatureId(entity) {
 function getEntityCountryCode(entity) {
   const featureLike = asFeatureLike(entity);
   return featureLike ? getFeatureCountryCodeNormalized(featureLike) : "";
+}
+
+function getEntityOwnerCode(entity) {
+  const featureId = getEntityFeatureId(entity);
+  if (!featureId) return "";
+  return getFeatureOwnerCode(featureId);
+}
+
+function buildDynamicOwnerBorderMesh(runtimeTopology, sovereigntyByFeatureId) {
+  const object = runtimeTopology?.objects?.political;
+  if (!object || !globalThis.topojson) return null;
+  return globalThis.topojson.mesh(runtimeTopology, object, (a, b) => {
+    if (!a || !b) return false;
+    const idA = getEntityFeatureId(a);
+    const idB = getEntityFeatureId(b);
+    if (!idA || !idB) return false;
+    const ownerA = String(sovereigntyByFeatureId?.[idA] || getEntityCountryCode(a) || "").trim();
+    const ownerB = String(sovereigntyByFeatureId?.[idB] || getEntityCountryCode(b) || "").trim();
+    return !!(ownerA && ownerB && ownerA !== ownerB);
+  });
 }
 
 function getCountryFeatureEntriesMap() {
@@ -1861,13 +2136,16 @@ function rebuildStaticMeshes() {
     if (isUsableMesh(meshes.localMesh)) state.cachedLocalBorders.push(meshes.localMesh);
   });
 
-  const primaryTopology = state.topologyPrimary || state.topology;
-  const countryMesh = buildGlobalCountryBorderMesh(primaryTopology);
+  const unifiedBorderTopology =
+    state.topologyBundleMode === "composite" && state.runtimePoliticalTopology?.objects?.political
+      ? state.runtimePoliticalTopology
+      : (state.topologyPrimary || state.topology);
+  const countryMesh = buildGlobalCountryBorderMesh(unifiedBorderTopology);
   if (isUsableMesh(countryMesh)) {
     state.cachedCountryBorders.push(countryMesh);
   }
 
-  const coastlineMesh = buildGlobalCoastlineMesh(primaryTopology);
+  const coastlineMesh = buildGlobalCoastlineMesh(unifiedBorderTopology);
   if (isUsableMesh(coastlineMesh)) {
     state.cachedCoastlines.push(coastlineMesh);
     state.cachedCoastlinesHigh.push(coastlineMesh);
@@ -1912,6 +2190,114 @@ function createHitResult(overrides = {}) {
     distancePx: Infinity,
     ...overrides,
   };
+}
+
+function keyToHitColor(key) {
+  const value = Math.max(0, Math.min(0xffffff, Number(key) || 0));
+  const r = value & 255;
+  const g = (value >> 8) & 255;
+  const b = (value >> 16) & 255;
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+function hitColorToKey(pixel) {
+  if (!pixel || pixel.length < 3) return 0;
+  return (pixel[0] || 0) | ((pixel[1] || 0) << 8) | ((pixel[2] || 0) << 16);
+}
+
+function drawHitCanvas() {
+  if (!hitContext || !pathHitCanvas || !state.landData?.features?.length) {
+    state.hitCanvasDirty = false;
+    return false;
+  }
+
+  const width = hitCanvas?.width || 0;
+  const height = hitCanvas?.height || 0;
+  if (width <= 0 || height <= 0) {
+    state.hitCanvasDirty = false;
+    return false;
+  }
+
+  const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
+  const t = state.zoomTransform || globalThis.d3.zoomIdentity;
+  const k = Math.max(0.0001, t.k || 1);
+
+  hitContext.save();
+  hitContext.setTransform(1, 0, 0, 1, 0, 0);
+  hitContext.clearRect(0, 0, width, height);
+  hitContext.globalCompositeOperation = "source-over";
+  hitContext.globalAlpha = 1;
+  hitContext.filter = "none";
+  hitContext.shadowBlur = 0;
+  hitContext.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+  hitContext.translate(t.x, t.y);
+  hitContext.scale(k, k);
+
+  state.landData.features.forEach((feature, index) => {
+    const id = getFeatureId(feature) || `feature-${index}`;
+    const key = state.idToKey.get(id);
+    if (!key) return;
+    if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) return;
+    if (!pathBoundsInScreen(feature)) return;
+    hitContext.beginPath();
+    pathHitCanvas(feature);
+    hitContext.fillStyle = keyToHitColor(key);
+    hitContext.fill();
+  });
+
+  hitContext.restore();
+  state.hitCanvasDirty = false;
+  return true;
+}
+
+function ensureHitCanvasUpToDate({ force = false } = {}) {
+  if (!hitContext || !pathHitCanvas) return false;
+  if (!force && !state.hitCanvasDirty) return true;
+  return drawHitCanvas();
+}
+
+function getHitResultFromCanvas(event) {
+  if (!mapSvg || !hitContext || !state.keyToId?.size || !globalThis.d3?.pointer) {
+    return createHitResult();
+  }
+  const [sx, sy] = globalThis.d3.pointer(event, mapSvg);
+  if (![sx, sy].every(Number.isFinite)) return createHitResult();
+  const px = Math.max(0, Math.min((hitCanvas?.width || 1) - 1, Math.round(sx * state.dpr)));
+  const py = Math.max(0, Math.min((hitCanvas?.height || 1) - 1, Math.round(sy * state.dpr)));
+
+  let pixel = null;
+  try {
+    pixel = hitContext.getImageData(px, py, 1, 1).data;
+  } catch (_error) {
+    return createHitResult();
+  }
+
+  const key = hitColorToKey(pixel);
+  if (!key) return createHitResult();
+  const id = state.keyToId.get(key);
+  if (!id) return createHitResult();
+  const feature = state.landIndex.get(id);
+  const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
+  if (!feature || shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) {
+    return createHitResult();
+  }
+  return createHitResult({
+    id,
+    countryCode: getFeatureCountryCodeNormalized(feature),
+    viaSnap: false,
+    strict: true,
+    distancePx: 0,
+  });
+}
+
+function getValidatedCanvasHit(event, strictIds = null) {
+  if (state.renderPhase !== RENDER_PHASE_IDLE || !ensureHitCanvasUpToDate()) {
+    return createHitResult();
+  }
+  const hit = getHitResultFromCanvas(event);
+  if (!hit.id) return hit;
+  if (!strictIds?.size || strictIds.has(hit.id)) return hit;
+  return createHitResult();
 }
 
 function getSpatialBucketKey(col, row) {
@@ -2123,6 +2509,33 @@ function buildIndex() {
   if (typeof state.renderPresetTreeFn === "function") {
     state.renderPresetTreeFn();
   }
+  state.hitCanvasDirty = true;
+}
+
+function buildRuntimePoliticalMeta() {
+  state.runtimeFeatureIndexById = new Map();
+  state.runtimeFeatureIds = [];
+  state.runtimeNeighborGraph = [];
+  state.runtimeCanonicalCountryByFeatureId = {};
+
+  const geometries = state.runtimePoliticalTopology?.objects?.political?.geometries || [];
+  if (!Array.isArray(geometries) || !geometries.length) return;
+
+  const neighbors = Array.isArray(state.runtimePoliticalTopology?.objects?.political?.computed_neighbors)
+    ? state.runtimePoliticalTopology.objects.political.computed_neighbors
+    : [];
+
+  geometries.forEach((geometry, index) => {
+    const id = getEntityFeatureId(geometry);
+    if (!id) return;
+    state.runtimeFeatureIds.push(id);
+    state.runtimeFeatureIndexById.set(id, index);
+    state.runtimeCanonicalCountryByFeatureId[id] = getEntityCountryCode(geometry);
+  });
+  state.runtimeNeighborGraph =
+    Array.isArray(neighbors) && neighbors.length === geometries.length
+      ? neighbors
+      : new Array(geometries.length).fill(null).map(() => []);
 }
 
 function buildSpatialIndex() {
@@ -2157,6 +2570,7 @@ function buildSpatialIndex() {
 
   buildSpatialGrid(state.spatialItems, canvasWidth, canvasHeight);
   state.spatialIndex = null;
+  state.hitCanvasDirty = true;
 }
 
 function getHitFromEvent(
@@ -2164,6 +2578,13 @@ function getHitFromEvent(
   { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown" } = {}
 ) {
   if (!state.landData || !state.spatialItems?.length) return createHitResult();
+  const hitMode = resolveHitMode();
+  if (hitMode === "canvas" && eventType !== "compat") {
+    const hitFromCanvas = getValidatedCanvasHit(event);
+    if (hitFromCanvas.id) {
+      return hitFromCanvas;
+    }
+  }
   const pointer = getPointerProjectionPosition(event);
   if (!pointer) return createHitResult();
 
@@ -2172,6 +2593,13 @@ function getHitFromEvent(
   if (strictRanked.length > 0) {
     const strictContainsGeo = strictRanked.find((candidate) => candidate.containsGeo);
     if (!strictContainsGeo) return createHitResult();
+    if (hitMode === "auto" && eventType !== "compat") {
+      const strictIds = new Set(strictRanked.map((candidate) => candidate.item.id));
+      const hitFromCanvas = getValidatedCanvasHit(event, strictIds);
+      if (hitFromCanvas.id === strictContainsGeo.item.id) {
+        return hitFromCanvas;
+      }
+    }
     return toHitResult(strictContainsGeo, {
       viaSnap: false,
       strict: true,
@@ -2256,6 +2684,10 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
     0,
     1
   );
+  const empireMeshes =
+    isDynamicBordersEnabled() && isUsableMesh(state.cachedDynamicOwnerBorders)
+      ? [state.cachedDynamicOwnerBorders]
+      : state.cachedCountryBorders;
 
   if (interactive) {
     const countryWidth = (empireWidthBase * 0.95) / kDenom;
@@ -2265,7 +2697,7 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
       : (state.cachedCoastlines?.length ? state.cachedCoastlines : state.cachedCoastlinesHigh);
 
     context.globalAlpha = 0.88;
-    drawMeshCollection(state.cachedCountryBorders, empireColor, countryWidth);
+    drawMeshCollection(empireMeshes, empireColor, countryWidth);
 
     context.globalAlpha = 0.78;
     drawMeshCollection(coastlineLow, coastColor, coastWidth);
@@ -2329,7 +2761,7 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
   }
 
   context.globalAlpha = countryAlpha;
-  drawMeshCollection(state.cachedCountryBorders, empireColor, countryWidth);
+  drawMeshCollection(empireMeshes, empireColor, countryWidth);
 
   context.globalAlpha = coastAlpha;
   drawMeshCollection(coastlineCollection, coastColor, coastWidth);
@@ -2663,6 +3095,7 @@ function drawPhysicalLayer(k, { interactive = false } = {}) {
     context.globalAlpha = interactive ? Math.min(tintOpacity, 0.18) : tintOpacity;
     context.fillStyle = tintColor;
     state.physicalData.features.forEach((feature) => {
+      if (!pathBoundsInScreen(feature)) return;
       context.beginPath();
       pathCanvas(feature);
       context.fill();
@@ -2675,6 +3108,7 @@ function drawPhysicalLayer(k, { interactive = false } = {}) {
       context.strokeStyle = contourColor;
       context.lineWidth = contourWidth / Math.max(0.0001, k);
       state.physicalData.features.forEach((feature) => {
+        if (!pathBoundsInScreen(feature)) return;
         context.beginPath();
         pathCanvas(feature);
         context.stroke();
@@ -2684,7 +3118,10 @@ function drawPhysicalLayer(k, { interactive = false } = {}) {
       if (pattern) {
         context.save();
         context.beginPath();
-        state.physicalData.features.forEach((feature) => pathCanvas(feature));
+        state.physicalData.features.forEach((feature) => {
+          if (!pathBoundsInScreen(feature)) return;
+          pathCanvas(feature);
+        });
         context.clip();
         context.globalAlpha = contourOpacity;
         context.fillStyle = pattern;
@@ -2695,6 +3132,7 @@ function drawPhysicalLayer(k, { interactive = false } = {}) {
         context.strokeStyle = contourColor;
         context.lineWidth = contourWidth / Math.max(0.0001, k);
         state.physicalData.features.forEach((feature) => {
+          if (!pathBoundsInScreen(feature)) return;
           context.beginPath();
           pathCanvas(feature);
           context.stroke();
@@ -2721,6 +3159,7 @@ function drawUrbanLayer(k, { interactive = false } = {}) {
 
   state.urbanData.features.forEach((feature) => {
     if (minAreaPx > 0 && estimateProjectedAreaPx(feature, k) < minAreaPx) return;
+    if (!pathBoundsInScreen(feature)) return;
     context.beginPath();
     pathCanvas(feature);
     context.fill();
@@ -2750,6 +3189,7 @@ function drawRiversLayer(k, { interactive = false } = {}) {
     context.lineJoin = "round";
     context.setLineDash([]);
     state.riversData.features.forEach((feature) => {
+      if (!pathBoundsInScreen(feature)) return;
       context.beginPath();
       pathCanvas(feature);
       context.stroke();
@@ -2763,6 +3203,7 @@ function drawRiversLayer(k, { interactive = false } = {}) {
   context.lineJoin = "round";
   context.setLineDash(dashPattern);
   state.riversData.features.forEach((feature) => {
+    if (!pathBoundsInScreen(feature)) return;
     context.beginPath();
     pathCanvas(feature);
     context.stroke();
@@ -2818,6 +3259,7 @@ function drawCanvas() {
     state.landData.features.forEach((feature, index) => {
       const id = getFeatureId(feature) || `feature-${index}`;
       if (shouldSkipFeature(feature, canvasWidth, canvasHeight)) return;
+      if (!pathBoundsInScreen(feature)) return;
 
       // 5. Fill strategy controlled by render mode.
       let fillColor = LAND_FILL_COLOR;
@@ -2854,9 +3296,12 @@ function drawCanvas() {
   }
 
   // 5. Draw context layers between land fill and borders.
-  drawPhysicalLayer(k, { interactive: isInteractingFrame });
-  drawUrbanLayer(k, { interactive: isInteractingFrame });
-  drawRiversLayer(k, { interactive: isInteractingFrame });
+  const shouldDrawContextLayers = !isInteractingFrame || String(state.renderProfile || "auto") === "full";
+  if (shouldDrawContextLayers) {
+    drawPhysicalLayer(k, { interactive: isInteractingFrame });
+    drawUrbanLayer(k, { interactive: isInteractingFrame });
+    drawRiversLayer(k, { interactive: isInteractingFrame });
+  }
 
   // 6. Draw border hierarchy (country > province > local) after fills.
   if (state.landData?.features?.length) {
@@ -3191,6 +3636,9 @@ export function renderLegend(uniqueColors = null, labels = null) {
 
 function render() {
   drawCanvas();
+  if (state.renderPhase === RENDER_PHASE_IDLE) {
+    ensureHitCanvasUpToDate();
+  }
   renderSpecialZones();
   renderHoverOverlay();
   if (state.renderPhase === RENDER_PHASE_IDLE) {
@@ -3207,33 +3655,35 @@ function autoFillMap(mode = "region") {
     return;
   }
 
+  migrateLegacyColorState();
+  ensureSovereigntyState();
   const nextCountryBaseColors = {};
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
 
-  if (mode === "political" && (state.topologyPrimary || state.topology)?.objects?.political) {
-    const computed = ColorManager.computePoliticalColors(state.topologyPrimary || state.topology, "political");
-    const featureColors =
-      computed && typeof computed === "object" && computed.featureColors
-        ? computed.featureColors
-        : (computed && typeof computed === "object" ? computed : {});
-    const countryColors =
-      computed && typeof computed === "object" && computed.countryColors
-        ? computed.countryColors
-        : {};
-
+  if (mode === "political" && state.runtimePoliticalTopology?.objects?.political) {
+    const computed = ColorManager.computeOwnerColors(
+      {
+        featureIds: state.runtimeFeatureIds,
+        canonicalCountryByFeatureId: state.runtimeCanonicalCountryByFeatureId,
+        neighborGraph: state.runtimeNeighborGraph,
+      },
+      state.sovereigntyByFeatureId
+    );
+    const ownerColors = computed?.ownerColors || {};
     state.landData.features.forEach((feature, index) => {
       const id = getFeatureId(feature) || `feature-${index}`;
       if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) return;
-      const countryCode = getFeatureCountryCodeNormalized(feature);
-      if (!countryCode || nextCountryBaseColors[countryCode]) return;
+      const ownerCode = getFeatureOwnerCode(id) || getFeatureCountryCodeNormalized(feature);
+      if (!ownerCode || nextCountryBaseColors[ownerCode]) return;
       const color =
-        (countryCode && getColorByCanonicalCountryCode(countryColors, countryCode)) ||
-        (countryCode && getColorByCanonicalCountryCode(featureColors, countryCode)) ||
-        (countryCode && state.countryPalette && state.countryPalette[countryCode]) ||
-        ColorManager.getPoliticalFallbackColor(countryCode || id, index);
-
-      nextCountryBaseColors[countryCode] = getSafeCanvasColor(color, LAND_FILL_COLOR);
+        getColorByCanonicalCountryCode(ownerColors, ownerCode) ||
+        (ownerCode && state.countryPalette && state.countryPalette[ownerCode]) ||
+        ColorManager.getPoliticalFallbackColor(ownerCode || id, index);
+      nextCountryBaseColors[ownerCode] = getSafeCanvasColor(color, LAND_FILL_COLOR);
     });
+    state.sovereignContrastWarnings = computed?.contrastStats?.lowContrastEdges
+      ? [computed.contrastStats]
+      : [];
 
   } else {
     // Region mode: assign one region-derived color per country to country base colors.
@@ -3254,9 +3704,11 @@ function autoFillMap(mode = "region") {
     });
   }
 
+  state.visualOverrides = {};
   state.featureOverrides = {};
-  state.countryBaseColors = sanitizeCountryColorMap(nextCountryBaseColors);
-  refreshColorState({ renderNow: true });
+  state.sovereignBaseColors = sanitizeCountryColorMap(nextCountryBaseColors);
+  state.countryBaseColors = { ...state.sovereignBaseColors };
+  refreshResolvedColorsForOwners(Object.keys(nextCountryBaseColors), { renderNow: true });
   if (typeof state.renderCountryListFn === "function") {
     state.renderCountryListFn();
   }
@@ -3404,14 +3856,17 @@ function handleMouseMove(event) {
   if (state.specialZoneEditor?.active) {
     state.hoveredId = null;
     renderHoverOverlay();
-    if (tooltip) tooltip.style.opacity = "0";
+    if (tooltip) {
+      tooltip.textContent = "";
+      tooltip.style.opacity = "0";
+    }
     return;
   }
 
   const reducedHoverPhase = state.renderPhase !== RENDER_PHASE_IDLE;
   const hit = getHitFromEvent(event, {
-    enableSnap: !reducedHoverPhase,
-    snapPx: HIT_SNAP_RADIUS_PX,
+    enableSnap: false,
+    snapPx: HIT_SNAP_RADIUS_HOVER_PX,
     eventType: "hover",
   });
   const id = hit.id;
@@ -3430,6 +3885,7 @@ function handleMouseMove(event) {
     tooltip.style.top = `${event.clientY + 12}px`;
     tooltip.style.opacity = "1";
   } else {
+    tooltip.textContent = "";
     tooltip.style.opacity = "0";
   }
 }
@@ -3447,6 +3903,9 @@ function addRecentColor(color) {
 }
 
 function resolveInteractionTargetIds(feature, id) {
+  if (isSovereigntyModeActive()) {
+    return [id];
+  }
   if (state.interactionGranularity !== "country") {
     return [id];
   }
@@ -3467,7 +3926,7 @@ function handleClick(event) {
 
   const hit = getHitFromEvent(event, {
     enableSnap: true,
-    snapPx: HIT_SNAP_RADIUS_PX,
+    snapPx: HIT_SNAP_RADIUS_CLICK_PX,
     eventType: "click",
   });
   const id = hit.id;
@@ -3485,15 +3944,31 @@ function handleClick(event) {
   }
 
   if (state.currentTool === "eraser") {
-    const shouldRefreshCountryList = state.interactionGranularity === "country" && !!countryCode;
-    if (state.interactionGranularity === "country" && countryCode) {
+    const shouldRefreshCountryList = (!!countryCode);
+    if (isSovereigntyModeActive()) {
+      const changed = resetFeatureOwnerCodes(targetIds);
+      refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+      if (changed > 0) {
+        if (targetIds.length > 1) {
+          scheduleDynamicBorderRecompute("sovereignty-batch-reset", 90);
+        } else {
+          scheduleDynamicBorderRecompute("sovereignty-single-reset", 150);
+        }
+      }
+    } else if (state.interactionGranularity === "country" && countryCode) {
+      delete state.sovereignBaseColors[countryCode];
       delete state.countryBaseColors[countryCode];
+      refreshResolvedColorsForOwners([countryCode], { renderNow: false });
     } else {
       targetIds.forEach((targetId) => {
+        delete state.visualOverrides[targetId];
         delete state.featureOverrides[targetId];
       });
+      refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
     }
-    refreshColorState({ renderNow: true });
+    if (context) {
+      render();
+    }
     if (shouldRefreshCountryList && typeof state.renderCountryListFn === "function") {
       state.renderCountryListFn();
     }
@@ -3501,15 +3976,28 @@ function handleClick(event) {
   }
 
   if (state.currentTool === "eyedropper") {
-    const picked =
-      (state.interactionGranularity === "country" && countryCode
-        ? getSafeCanvasColor(state.countryBaseColors?.[countryCode], null)
-        : null) ||
-      getSafeCanvasColor(state.colors[id], null);
-    if (picked) {
-      state.selectedColor = picked;
-      if (typeof state.updateSwatchUIFn === "function") {
-        state.updateSwatchUIFn();
+    if (isSovereigntyModeActive()) {
+      const ownerCode = getFeatureOwnerCode(id) || countryCode;
+      if (ownerCode) {
+        state.activeSovereignCode = ownerCode;
+        if (typeof state.updateActiveSovereignUIFn === "function") {
+          state.updateActiveSovereignUIFn();
+        }
+        if (typeof state.renderCountryListFn === "function") {
+          state.renderCountryListFn();
+        }
+      }
+    } else {
+      const picked =
+        (state.interactionGranularity === "country" && countryCode
+          ? getSafeCanvasColor(state.sovereignBaseColors?.[countryCode] || state.countryBaseColors?.[countryCode], null)
+          : null) ||
+        getSafeCanvasColor(state.colors[id], null);
+      if (picked) {
+        state.selectedColor = picked;
+        if (typeof state.updateSwatchUIFn === "function") {
+          state.updateSwatchUIFn();
+        }
       }
     }
     return;
@@ -3517,15 +4005,35 @@ function handleClick(event) {
 
   const selectedColor = getSafeCanvasColor(state.selectedColor, LAND_FILL_COLOR);
   state.selectedColor = selectedColor;
-  if (state.interactionGranularity === "country" && countryCode) {
+  if (isSovereigntyModeActive()) {
+    if (!state.activeSovereignCode) {
+      console.warn("[sovereignty] No active sovereign selected.");
+      return;
+    }
+    const changed = setFeatureOwnerCodes(targetIds, state.activeSovereignCode);
+    refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+    if (changed > 0) {
+      if (targetIds.length > 1) {
+        scheduleDynamicBorderRecompute("sovereignty-batch-fill", 90);
+      } else {
+        scheduleDynamicBorderRecompute("sovereignty-single-fill", 150);
+      }
+    }
+  } else if (state.interactionGranularity === "country" && countryCode) {
+    state.sovereignBaseColors[countryCode] = selectedColor;
     state.countryBaseColors[countryCode] = selectedColor;
+    refreshResolvedColorsForOwners([countryCode], { renderNow: false });
   } else {
     targetIds.forEach((targetId) => {
+      state.visualOverrides[targetId] = selectedColor;
       state.featureOverrides[targetId] = selectedColor;
     });
+    refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
   }
   addRecentColor(selectedColor);
-  refreshColorState({ renderNow: true });
+  if (context) {
+    render();
+  }
   if (
     state.interactionGranularity === "country" &&
     countryCode &&
@@ -3590,6 +4098,7 @@ function updateZoomTranslateExtent() {
 
 function updateMap(transform) {
   state.zoomTransform = transform;
+  state.hitCanvasDirty = true;
   if (viewportGroup) {
     viewportGroup.attr("transform", `translate(${transform.x},${transform.y}) scale(${transform.k})`);
   }
@@ -3625,6 +4134,7 @@ function fitProjection() {
   projection.fitExtent([[padding, padding], [x1, y1]], fitTarget);
   rebuildProjectedBoundsCache();
   buildSpatialIndex();
+  state.hitCanvasDirty = true;
   updateSpecialZonesPaths();
   renderSpecialZoneEditorOverlay();
   updateZoomTranslateExtent();
@@ -3677,7 +4187,10 @@ function bindEvents() {
   interactionRect.on("mouseleave", () => {
     state.hoveredId = null;
     renderHoverOverlay();
-    if (tooltip) tooltip.style.opacity = "0";
+    if (tooltip) {
+      tooltip.textContent = "";
+      tooltip.style.opacity = "0";
+    }
   });
   interactionRect.on("click", handleClick);
   interactionRect.on("dblclick", handleDoubleClick);
@@ -3701,9 +4214,18 @@ function initMap({ containerId = "mapContainer" } = {}) {
 
   ensureHybridLayers();
 
+  if (!hitCanvas) {
+    hitCanvas = createHitCanvasElement();
+  }
+
   context = mapCanvas.getContext("2d");
   if (!context) {
     console.error("Canvas 2D context unavailable.");
+    return;
+  }
+  hitContext = hitCanvas.getContext("2d", { willReadFrequently: true });
+  if (!hitContext) {
+    console.error("Hit canvas 2D context unavailable.");
     return;
   }
 
@@ -3711,6 +4233,7 @@ function initMap({ containerId = "mapContainer" } = {}) {
   projection.clipExtent(null);
   pathSVG = globalThis.d3.geoPath(projection).pointRadius(PATH_POINT_RADIUS);
   pathCanvas = globalThis.d3.geoPath(projection, context).pointRadius(PATH_POINT_RADIUS);
+  pathHitCanvas = globalThis.d3.geoPath(projection, hitContext).pointRadius(PATH_POINT_RADIUS);
   layerResolverCache.primaryRef = null;
   layerResolverCache.detailRef = null;
   layerResolverCache.bundleMode = null;
@@ -3720,8 +4243,12 @@ function initMap({ containerId = "mapContainer" } = {}) {
   state.lineCanvas = null;
   state.colorCtx = context;
   state.lineCtx = null;
+  migrateLegacyColorState();
+  ensureSovereigntyState();
   state.countryBaseColors = sanitizeCountryColorMap(state.countryBaseColors);
   state.featureOverrides = sanitizeColorMap(state.featureOverrides);
+  state.sovereignBaseColors = sanitizeCountryColorMap(state.sovereignBaseColors);
+  state.visualOverrides = sanitizeColorMap(state.visualOverrides);
   state.colors = sanitizeColorMap(state.colors);
   state.debugMode = debugMode;
   resetRenderDiagnostics();
@@ -3730,15 +4257,18 @@ function initMap({ containerId = "mapContainer" } = {}) {
   state.phaseEnteredAt = nowMs();
   state.renderPhaseTimerId = null;
   state.projectedBoundsById = new Map();
+  state.sphericalFeatureDiagnosticsById = new Map();
 
   mapCanvas.style.pointerEvents = "none";
   mapCanvas.style.touchAction = "none";
   if (textureOverlay) textureOverlay.style.pointerEvents = "none";
 
+  buildRuntimePoliticalMeta();
   setCanvasSize();
   buildIndex();
   rebuildStaticMeshes();
   invalidateBorderCache();
+  updateDynamicBorderStatusUI();
   fitProjection();
   initZoom();
   bindEvents();
@@ -3746,7 +4276,7 @@ function initMap({ containerId = "mapContainer" } = {}) {
   render();
 }
 
-function setMapData() {
+function setMapData({ refitProjection = true, resetZoom = true } = {}) {
   clearRenderPhaseTimer();
   setRenderPhase(RENDER_PHASE_IDLE);
   resetRenderDiagnostics();
@@ -3772,20 +4302,37 @@ function setMapData() {
 
   state.countryBaseColors = sanitizeCountryColorMap(state.countryBaseColors);
   state.featureOverrides = sanitizeColorMap(state.featureOverrides);
+  migrateLegacyColorState();
+  buildRuntimePoliticalMeta();
+  state.sovereigntyInitialized = false;
   islandNeighborsCache = {
     topologyRef: null,
     objectRef: null,
     count: 0,
     neighbors: [],
   };
+  state.sphericalFeatureDiagnosticsById = new Map();
   buildIndex();
+  ensureSovereigntyState();
   rebuildProjectedBoundsCache();
   rebuildStaticMeshes();
   invalidateBorderCache();
-  fitProjection();
+  updateDynamicBorderStatusUI();
   rebuildResolvedColors();
-  resetZoomToFit();
-  enforceZoomConstraints();
+  if (refitProjection) {
+    fitProjection();
+  } else {
+    buildSpatialIndex();
+    updateSpecialZonesPaths();
+    renderSpecialZoneEditorOverlay();
+    updateZoomTranslateExtent();
+  }
+  if (resetZoom) {
+    resetZoomToFit();
+    enforceZoomConstraints();
+  } else {
+    state.hitCanvasDirty = true;
+  }
   drawCanvas();
   render();
 }
@@ -3804,5 +4351,10 @@ export {
   rebuildStaticMeshes,
   invalidateBorderCache,
   refreshColorState,
+  refreshResolvedColorsForFeatures,
+  refreshResolvedColorsForOwners,
+  markDynamicBordersDirty,
+  recomputeDynamicBordersNow,
+  scheduleDynamicBorderRecompute,
   setDebugMode,
 };

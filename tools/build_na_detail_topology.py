@@ -8,6 +8,8 @@ import sys
 
 import geopandas as gpd
 import topojson as tp
+from shapely.geometry import GeometryCollection, MultiPolygon, Polygon
+from shapely.geometry.polygon import orient
 from topojson.utils import serialize_as_geodataframe, serialize_as_geojson
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -15,11 +17,15 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from map_builder import config as cfg
+from map_builder.geo.topology import build_topology, compute_neighbor_graph
 from map_builder.processors.africa_admin1 import apply_africa_admin1_replacement
 from map_builder.processors.global_basic_admin1 import apply_global_basic_admin1_replacement
 from map_builder.processors.north_america import apply_north_america_replacement
 
 LAYER_NAMES = ("political", "special_zones", "ocean", "land", "urban", "physical", "rivers")
+SPECIAL_NAME_FALLBACKS = {
+    "RUS+99?": "Russia Special Region",
+}
 
 
 def _empty_gdf() -> gpd.GeoDataFrame:
@@ -32,6 +38,55 @@ def _ensure_epsg4326(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     if gdf.crs.to_epsg() != 4326:
         return gdf.to_crs("EPSG:4326")
     return gdf
+
+
+def _iter_polygonal_parts(geometry) -> list[Polygon]:
+    if geometry is None or geometry.is_empty:
+        return []
+    if isinstance(geometry, Polygon):
+        return [geometry]
+    if isinstance(geometry, MultiPolygon):
+        return [part for part in geometry.geoms if not part.is_empty]
+    if isinstance(geometry, GeometryCollection):
+        parts: list[Polygon] = []
+        for part in geometry.geoms:
+            parts.extend(_iter_polygonal_parts(part))
+        return parts
+    return []
+
+
+def _normalize_polygonal_geometry(geometry):
+    if geometry is None or geometry.is_empty:
+        return None
+
+    candidate = geometry
+    try:
+        if not candidate.is_valid:
+            candidate = candidate.make_valid()
+    except Exception:
+        try:
+            candidate = geometry.buffer(0)
+        except Exception:
+            candidate = geometry
+
+    parts: list[Polygon] = []
+    for part in _iter_polygonal_parts(candidate):
+        normalized = part
+        try:
+            if not normalized.is_valid:
+                normalized = normalized.buffer(0)
+        except Exception:
+            pass
+        if normalized is None or normalized.is_empty:
+            continue
+        if isinstance(normalized, Polygon):
+            parts.append(orient(normalized, sign=-1.0))
+        elif isinstance(normalized, MultiPolygon):
+            parts.extend(orient(poly, sign=-1.0) for poly in normalized.geoms if not poly.is_empty)
+
+    if not parts:
+        return None
+    return parts[0] if len(parts) == 1 else MultiPolygon(parts)
 
 
 def _load_topology(path: Path) -> dict:
@@ -114,6 +169,97 @@ def _promote_geometry_ids(topology_dict: dict) -> None:
                 props["id"] = preferred
 
 
+def _clean_text(value: object) -> str:
+    text = "" if value is None else str(value).strip()
+    if text.lower() in {"none", "nan", "null"}:
+        return ""
+    return text
+
+
+def _derive_name_fallback(row: dict) -> str:
+    feature_id = _clean_text(row.get("id"))
+    if feature_id in SPECIAL_NAME_FALLBACKS:
+        return SPECIAL_NAME_FALLBACKS[feature_id]
+
+    for key in ("admin1_group", "adm1_name", "constituent_country", "name_local"):
+        fallback = _clean_text(row.get(key))
+        if fallback:
+            return fallback
+
+    if feature_id.startswith("CN_CITY_"):
+        return f"CN ADM2 {feature_id.replace('CN_CITY_', '', 1)}"
+    if feature_id:
+        return feature_id
+    return "Unnamed Region"
+
+
+def _repair_political_metadata(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    if gdf.empty:
+        return gdf
+    out = _ensure_epsg4326(gdf.copy())
+    repaired_names = []
+    for row in out.to_dict("records"):
+        name = _clean_text(row.get("name"))
+        if not name:
+            name = _derive_name_fallback(row)
+        repaired_names.append(name)
+    out["name"] = repaired_names
+    return out
+
+
+def _repair_political_geometries(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    if gdf.empty:
+        return gdf
+
+    out = _ensure_epsg4326(gdf.copy())
+    geom_series = out.geometry.copy()
+    repaired = 0
+    dropped = 0
+
+    for index in out.index:
+        geometry = geom_series.loc[index]
+        normalized = _normalize_polygonal_geometry(geometry)
+        if normalized is None:
+            geom_series.loc[index] = None
+            dropped += 1
+            continue
+        try:
+            changed = not normalized.equals(geometry)
+        except Exception:
+            changed = True
+        if changed:
+            repaired += 1
+        geom_series.loc[index] = normalized
+
+    out = out.set_geometry(geom_series)
+    out = out[out.geometry.notnull()].copy()
+    out = out[~out.geometry.is_empty].copy()
+    if repaired or dropped:
+        print(
+            f"[Detail patch] Repaired polygon winding/validity for {repaired} features; "
+            f"dropped={dropped}."
+        )
+    return out
+
+
+def _inject_computed_neighbors(topology_dict: dict, political_gdf: gpd.GeoDataFrame) -> None:
+    objects = topology_dict.get("objects", {})
+    political = objects.get("political", {}) if isinstance(objects, dict) else {}
+    geometries = political.get("geometries", []) if isinstance(political, dict) else []
+    if not isinstance(geometries, list) or not geometries:
+        return
+
+    clean = _ensure_epsg4326(political_gdf.copy()).reset_index(drop=True)
+    if len(clean) != len(geometries):
+        print(
+            "[Detail patch] Skipped computed_neighbors injection: "
+            f"gdf={len(clean)} topo={len(geometries)}"
+        )
+        return
+
+    political["computed_neighbors"] = compute_neighbor_graph(clean)
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build the enriched detail topology bundle.")
     parser.add_argument(
@@ -144,17 +290,41 @@ def main() -> None:
     patched_political = apply_north_america_replacement(layers["political"])
     patched_political = apply_africa_admin1_replacement(patched_political)
     patched_political = apply_global_basic_admin1_replacement(patched_political)
+    patched_political = _repair_political_metadata(patched_political)
+    patched_political = _repair_political_geometries(patched_political)
     layers["political"] = patched_political
     print(f"[Detail patch] Patched political features: {len(patched_political)}")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    out_dict = _build_topology_dict_from_layers(layers)
-    _promote_geometry_ids(out_dict)
-    output_path.write_text(
-        json.dumps(out_dict, separators=(",", ":")),
-        encoding="utf-8",
+
+    staging_dict = _build_topology_dict_from_layers(layers)
+    _promote_geometry_ids(staging_dict)
+    _inject_computed_neighbors(staging_dict, patched_political)
+
+    roundtrip_political = _topology_object_to_gdf(staging_dict, "political")
+    roundtrip_political = _repair_political_geometries(roundtrip_political)
+    if roundtrip_political.empty:
+        raise ValueError("Detail topology round-trip repair removed all political geometries.")
+    if len(roundtrip_political) != len(patched_political):
+        print(
+            "[Detail patch] Round-trip topology repair adjusted political feature count: "
+            f"before={len(patched_political)}, after={len(roundtrip_political)}"
+        )
+    layers["political"] = roundtrip_political
+
+    build_topology(
+        political=roundtrip_political,
+        ocean=layers.get("ocean", _empty_gdf()),
+        land=layers.get("land", _empty_gdf()),
+        urban=layers.get("urban", _empty_gdf()),
+        physical=layers.get("physical", _empty_gdf()),
+        rivers=layers.get("rivers", _empty_gdf()),
+        special_zones=layers.get("special_zones"),
+        output_path=output_path,
+        quantization=cfg.TOPOLOGY_QUANTIZATION,
     )
-    count = len(out_dict.get("objects", {}).get("political", {}).get("geometries", []))
+    output_dict = _load_topology(output_path)
+    count = len(output_dict.get("objects", {}).get("political", {}).get("geometries", []))
     print(f"[Detail patch] Output political features: {count}")
     print(f"[Detail patch] OK: wrote {output_path}")
 

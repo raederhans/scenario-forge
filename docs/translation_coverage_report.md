@@ -1,10 +1,10 @@
 # Translation Coverage Report
 
-Generated at: 2026-03-01T02:05:02.109185+00:00
+Generated at: 2026-03-02T02:20:51.079519+00:00
 
 ## Summary
-- UI locale keys: 63
-- UI keys used via t(..., "ui"): 28
+- UI locale keys: 74
+- UI keys used via t(..., "ui"): 34
 - Missing UI locale keys: 0
 - Hardcoded visible UI string candidates (not wrapped in t): 0
 - GEO locale keys: 22106

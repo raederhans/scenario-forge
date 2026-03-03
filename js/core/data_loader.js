@@ -15,6 +15,8 @@ const DETAIL_SOURCES = {
 };
 const RU_CITY_OVERRIDES_URL = "data/ru_city_overrides.geojson";
 const SPECIAL_ZONES_URL = "data/special_zones.geojson";
+const RUNTIME_POLITICAL_URL = "data/europe_topology.runtime_political_v1.json";
+const RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
 
 function getSearchParams() {
   const search = globalThis?.location?.search || "";
@@ -43,6 +45,21 @@ function resolveTopologyVariant() {
     key,
     url: TOPOLOGY_VARIANT_URLS[key],
   };
+}
+
+function resolveRenderProfile() {
+  const params = getSearchParams();
+  const raw = params?.get("render_profile");
+  const value = String(raw || "auto").trim().toLowerCase();
+  if (!RENDER_PROFILES.has(value)) {
+    if (raw) {
+      console.warn(
+        `[data_loader] Ignoring unknown render_profile="${raw}". Allowed values: auto, balanced, full.`
+      );
+    }
+    return "auto";
+  }
+  return value;
 }
 
 function resolveDetailLayerEnabled() {
@@ -83,6 +100,21 @@ function getPoliticalGeometryCount(topology) {
       ? topology.objects.political.geometries.length
       : 0
   );
+}
+
+function shouldDeferDetailLoad(renderProfile) {
+  if (renderProfile === "full") return false;
+  if (renderProfile === "balanced") return true;
+
+  const nav = globalThis?.navigator || {};
+  const deviceMemory = Number(nav.deviceMemory || 0);
+  const hardwareConcurrency = Number(nav.hardwareConcurrency || 0);
+  const dpr = Math.max(Number(globalThis?.devicePixelRatio || 1), 1);
+
+  if (deviceMemory && deviceMemory <= 8) return true;
+  if (hardwareConcurrency && hardwareConcurrency <= 8) return true;
+  if (dpr > 1.5) return true;
+  return false;
 }
 
 async function loadTopologyUrl(d3Client, url, label) {
@@ -177,6 +209,7 @@ async function loadDetailTopologyWithFallback({
 async function loadTopologyBundle({
   topologyUrl,
   d3Client,
+  renderProfile,
 } = {}) {
   const variant = resolveTopologyVariant();
   if (variant?.url) {
@@ -190,6 +223,8 @@ async function loadTopologyBundle({
       topologyDetail: null,
       topologyBundleMode: "single",
       topologyVariant: variant.key,
+      detailDeferred: false,
+      detailSourceRequested: null,
     };
   }
 
@@ -205,6 +240,23 @@ async function loadTopologyBundle({
       topologyDetail: null,
       topologyBundleMode: "single",
       topologyVariant: null,
+      detailDeferred: false,
+      detailSourceRequested: detailSource.key,
+    };
+  }
+
+  if (shouldDeferDetailLoad(renderProfile)) {
+    console.info(
+      `[data_loader] render_profile=${renderProfile} deferred detail loading. Starting in coarse-only primary mode.`
+    );
+    return {
+      topology: topologyPrimary,
+      topologyPrimary,
+      topologyDetail: null,
+      topologyBundleMode: "single",
+      topologyVariant: null,
+      detailDeferred: true,
+      detailSourceRequested: detailSource.key,
     };
   }
 
@@ -229,6 +281,44 @@ async function loadTopologyBundle({
     topologyDetail,
     topologyBundleMode: bundleMode,
     topologyVariant: null,
+    detailDeferred: false,
+    detailSourceRequested: detailSource.key,
+  };
+}
+
+export async function loadDeferredDetailBundle({
+  d3Client = globalThis.d3,
+  detailSourceKey = null,
+  runtimePoliticalUrl = RUNTIME_POLITICAL_URL,
+} = {}) {
+  if (!d3Client || typeof d3Client.json !== "function") {
+    throw new Error("d3.json is not available. Ensure D3 is loaded before calling loadDeferredDetailBundle().");
+  }
+
+  const fallbackDetailSource = resolveDetailSource();
+  const resolvedKey =
+    detailSourceKey && Object.prototype.hasOwnProperty.call(DETAIL_SOURCES, detailSourceKey)
+      ? detailSourceKey
+      : fallbackDetailSource.key;
+  const detailSource = {
+    key: resolvedKey,
+    url: DETAIL_SOURCES[resolvedKey],
+  };
+
+  const [{ topology: topologyDetail, sourceKey: detailSourceUsed }, runtimePoliticalTopology] =
+    await Promise.all([
+      loadDetailTopologyWithFallback({ d3Client, detailSource }),
+      d3Client.json(runtimePoliticalUrl).catch((err) => {
+        console.warn("Runtime political topology missing or invalid during deferred load.", err);
+        return null;
+      }),
+    ]);
+
+  return {
+    topologyDetail,
+    runtimePoliticalTopology,
+    topologyBundleMode: topologyDetail ? "composite" : "single",
+    detailSourceUsed: detailSourceUsed || resolvedKey,
   };
 }
 
@@ -239,14 +329,30 @@ export async function loadMapData({
   hierarchyUrl = "data/hierarchy.json",
   ruCityOverridesUrl = RU_CITY_OVERRIDES_URL,
   specialZonesUrl = SPECIAL_ZONES_URL,
+  runtimePoliticalUrl = RUNTIME_POLITICAL_URL,
   d3Client = globalThis.d3,
 } = {}) {
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available. Ensure D3 is loaded before calling loadMapData().");
   }
 
-  const [topologyBundle, localeData, geoAliases, hierarchy, ruCityOverrides, specialZones] = await Promise.all([
-    loadTopologyBundle({ topologyUrl, d3Client }),
+  const renderProfile = resolveRenderProfile();
+  const topologyBundle = await loadTopologyBundle({ topologyUrl, d3Client, renderProfile });
+  const runtimePoliticalPromise = topologyBundle.detailDeferred
+    ? Promise.resolve(null)
+    : d3Client.json(runtimePoliticalUrl).catch((err) => {
+      console.warn("Runtime political topology missing or invalid, continuing without dynamic sovereignty.", err);
+      return null;
+    });
+
+  const [
+    localeData,
+    geoAliases,
+    hierarchy,
+    ruCityOverrides,
+    specialZones,
+    runtimePoliticalTopology,
+  ] = await Promise.all([
     d3Client.json(localesUrl).catch((err) => {
       console.warn("Locales file missing or invalid, using defaults.", err);
       return { ui: {}, geo: {} };
@@ -285,15 +391,18 @@ export async function loadMapData({
       console.warn("Special zones file missing or invalid, falling back to topology layer.", err);
       return null;
     }),
+    runtimePoliticalPromise,
   ]);
 
   return {
     ...topologyBundle,
+    renderProfile,
     locales: localeData || { ui: {}, geo: {} },
     geoAliases: geoAliases || { alias_to_stable_key: {} },
     hierarchy,
     ruCityOverrides,
     specialZones,
+    runtimePoliticalTopology,
   };
 }
 

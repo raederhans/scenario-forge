@@ -1,13 +1,21 @@
 // Project file manager (Phase 13)
 import { t } from "../ui/i18n.js";
+import { migrateImportedProjectData } from "./sovereignty_manager.js";
 
 class FileManager {
   static exportProject(appState) {
     if (!appState) return;
     const payload = {
-      schemaVersion: 4,
-      countryBaseColors: appState.countryBaseColors || {},
-      featureOverrides: appState.featureOverrides || {},
+      schemaVersion: 5,
+      countryBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
+      featureOverrides: appState.visualOverrides || appState.featureOverrides || {},
+      sovereignBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
+      visualOverrides: appState.visualOverrides || appState.featureOverrides || {},
+      sovereigntyByFeatureId: appState.sovereigntyByFeatureId || {},
+      paintMode: appState.paintMode || "visual",
+      activeSovereignCode: appState.activeSovereignCode || "",
+      dynamicBordersDirty: !!appState.dynamicBordersDirty,
+      dynamicBordersDirtyReason: appState.dynamicBordersDirtyReason || "",
       specialZones: appState.specialZones || {},
       parentBorderEnabledByCountry: appState.parentBorderEnabledByCountry || {},
       manualSpecialZones: appState.manualSpecialZones || { type: "FeatureCollection", features: [] },
@@ -48,10 +56,11 @@ class FileManager {
     reader.onload = () => {
       try {
         const text = typeof reader.result === "string" ? reader.result : "";
-        const data = JSON.parse(text);
+        let data = JSON.parse(text);
         if (!data || typeof data !== "object") {
           throw new Error("Invalid project file");
         }
+        data = migrateImportedProjectData(data);
 
         // Backward compatibility: v1 only had `colors`.
         if (data.colors && !data.featureOverrides && !data.countryBaseColors) {
@@ -65,6 +74,17 @@ class FileManager {
         if (!data.countryBaseColors || typeof data.countryBaseColors !== "object") {
           data.countryBaseColors = {};
         }
+        if (!data.visualOverrides || typeof data.visualOverrides !== "object") {
+          data.visualOverrides = data.featureOverrides;
+        }
+        if (!data.sovereignBaseColors || typeof data.sovereignBaseColors !== "object") {
+          data.sovereignBaseColors = data.countryBaseColors;
+        }
+        if (!data.sovereigntyByFeatureId || typeof data.sovereigntyByFeatureId !== "object") {
+          data.sovereigntyByFeatureId = {};
+        }
+        data.dynamicBordersDirty = !!data.dynamicBordersDirty;
+        data.dynamicBordersDirtyReason = String(data.dynamicBordersDirtyReason || "");
         if (!data.parentBorderEnabledByCountry || typeof data.parentBorderEnabledByCountry !== "object") {
           data.parentBorderEnabledByCountry = {};
         }

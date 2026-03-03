@@ -21,6 +21,12 @@ def choose_primary_name(properties: dict) -> str:
     for value in candidates:
         if isinstance(value, str) and value.strip():
             return value.strip()
+    raw_id = properties.get("id")
+    if isinstance(raw_id, (str, int, float)) and str(raw_id).strip():
+        return str(raw_id).strip()
+    country_code = str(properties.get("cntr_code", "")).strip().upper()
+    if country_code:
+        return f"{country_code} Region"
     return "Unknown Region"
 
 
@@ -32,6 +38,18 @@ def collect_aliases(properties: dict) -> list[str]:
         if isinstance(value, str) and value.strip():
             aliases.add(value.strip())
     aliases.discard("")
+    return sorted(aliases)
+
+
+def collect_disambiguated_aliases(properties: dict, primary_name: str) -> list[str]:
+    aliases = set()
+    country_code = str(properties.get("cntr_code", "")).strip().upper()
+    admin1_group = str(properties.get("admin1_group", "")).strip()
+
+    if primary_name and country_code:
+        aliases.add(f"{primary_name} ({country_code})")
+    if primary_name and admin1_group and admin1_group != primary_name:
+        aliases.add(f"{primary_name} [{admin1_group}]")
     return sorted(aliases)
 
 
@@ -70,8 +88,7 @@ def normalize_geokeys(topology_path: Path) -> dict:
     geometries = load_political_geometries(topology_path)
 
     entries = []
-    alias_to_stable = {}
-    conflicts = []
+    alias_candidates: dict[str, set[str]] = {}
     used_stable_keys = set()
 
     for index, geometry in enumerate(geometries):
@@ -86,14 +103,12 @@ def normalize_geokeys(topology_path: Path) -> dict:
         aliases = collect_aliases(properties)
         if primary_name not in aliases:
             aliases.append(primary_name)
+        aliases.extend(collect_disambiguated_aliases(properties, primary_name))
         aliases = sorted(set(aliases))
 
         for alias in aliases:
-            existing = alias_to_stable.get(alias)
-            if existing and existing != stable_key:
-                conflicts.append({"alias": alias, "first": existing, "second": stable_key})
-                continue
-            alias_to_stable[alias] = stable_key
+            bucket = alias_candidates.setdefault(alias, set())
+            bucket.add(stable_key)
 
         entries.append(
             {
@@ -106,7 +121,19 @@ def normalize_geokeys(topology_path: Path) -> dict:
         )
 
     entries.sort(key=lambda item: item["stable_key"])
-    alias_to_stable = {key: alias_to_stable[key] for key in sorted(alias_to_stable.keys())}
+    alias_to_stable = {
+        alias: next(iter(stable_keys))
+        for alias, stable_keys in sorted(alias_candidates.items())
+        if len(stable_keys) == 1
+    }
+    ambiguous_aliases = [
+        {
+            "alias": alias,
+            "stable_keys": sorted(stable_keys),
+        }
+        for alias, stable_keys in sorted(alias_candidates.items())
+        if len(stable_keys) > 1
+    ]
 
     return {
         "version": 1,
@@ -114,8 +141,10 @@ def normalize_geokeys(topology_path: Path) -> dict:
         "source": str(topology_path),
         "entry_count": len(entries),
         "alias_count": len(alias_to_stable),
-        "conflict_count": len(conflicts),
-        "conflicts": conflicts,
+        "conflict_count": 0,
+        "conflicts": [],
+        "ambiguous_alias_count": len(ambiguous_aliases),
+        "ambiguous_aliases_sample": ambiguous_aliases[:200],
         "entries": entries,
         "alias_to_stable_key": alias_to_stable,
     }

@@ -237,6 +237,21 @@ def centroid_points(gdf, epsg=3857):
     projected["geometry"] = projected.geometry.centroid
     return projected.to_crs(original_crs)
 
+
+def nearest_join_projected(left, right, distance_col="distance"):
+    left = ensure_crs(left)
+    right = ensure_crs(right)
+    metric_crs = getattr(cfg, "AREA_CRS", "EPSG:6933") if cfg is not None else "EPSG:6933"
+    left_proj = left.to_crs(metric_crs).copy()
+    right_proj = right.to_crs(metric_crs).copy()
+    return gpd.sjoin_nearest(
+        left_proj,
+        right_proj,
+        how="left",
+        distance_col=distance_col,
+    )
+
+
 def representative_longitudes(gdf):
     gdf = ensure_crs(gdf)
     reps = gdf.geometry.representative_point()
@@ -455,10 +470,9 @@ def build_china_groups(adm2_path: Path, adm1_path: Path):
     if joined[name_col].isna().any():
         try:
             missing = joined[name_col].isna()
-            nearest = gpd.sjoin_nearest(
+            nearest = nearest_join_projected(
                 centroids.loc[missing].copy(),
                 adm1_china,
-                how="left",
                 distance_col="distance",
             )
             joined.loc[missing, name_col] = nearest[name_col].values
@@ -507,10 +521,9 @@ def build_admin2_groups(adm2_path: Path, adm1_path: Path, iso_code: str, child_p
     if joined[name_col].isna().any():
         try:
             missing = joined[name_col].isna()
-            nearest = gpd.sjoin_nearest(
+            nearest = nearest_join_projected(
                 centroids.loc[missing].copy(),
                 adm1_country,
-                how="left",
                 distance_col="distance",
             )
             joined.loc[missing, name_col] = nearest[name_col].values
@@ -617,10 +630,9 @@ def build_russia_groups_hybrid(adm2_path: Path, adm1_path: Path):
         if joined[name_col].isna().any():
             try:
                 missing = joined[name_col].isna()
-                nearest = gpd.sjoin_nearest(
+                nearest = nearest_join_projected(
                     centroids.loc[missing].copy(),
                     adm1_join,
-                    how="left",
                     distance_col="distance",
                 )
                 joined.loc[missing, name_col] = nearest[name_col].values
@@ -789,6 +801,62 @@ def build_topology_admin1_groups(topology_path: Path, subdivision_codes: set[str
     return dict(groups), labels
 
 
+def load_authoritative_feature_ids() -> tuple[set[str], Path | None]:
+    candidates = [
+        DATA_DIR / "europe_topology.runtime_political_v1.json",
+        DATA_DIR / "europe_topology.na_v2.json",
+        DATA_DIR / "europe_topology.highres.json",
+        DATA_DIR / "europe_topology.json",
+    ]
+    for path in candidates:
+        if not path.exists():
+            continue
+        try:
+            topo = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        geoms = topo.get("objects", {}).get("political", {}).get("geometries", [])
+        ids = {
+            str((geom.get("properties") or {}).get("id") or "").strip()
+            for geom in geoms
+            if str((geom.get("properties") or {}).get("id") or "").strip()
+        }
+        if ids:
+            return ids, path
+    return set(), None
+
+
+def filter_groups_to_authoritative_ids(groups: dict, labels: dict, valid_ids: set[str]):
+    if not valid_ids:
+        return dict(groups), dict(labels), 0
+
+    filtered_groups = {}
+    filtered_labels = {}
+    dropped_children = 0
+
+    for group_id, children in groups.items():
+        kept = []
+        seen = set()
+        for child in children or []:
+            child_id = str(child or "").strip()
+            if not child_id:
+                continue
+            if child_id not in valid_ids:
+                dropped_children += 1
+                continue
+            if child_id in seen:
+                continue
+            seen.add(child_id)
+            kept.append(child_id)
+        if not kept:
+            continue
+        filtered_groups[group_id] = kept
+        if group_id in labels:
+            filtered_labels[group_id] = labels[group_id]
+
+    return filtered_groups, filtered_labels, dropped_children
+
+
 def main():
     adm2_path = DEFAULT_CHINA_ADM2
     adm1_path = find_ne_admin1(DATA_DIR)
@@ -845,6 +913,7 @@ def main():
         labels.update(source_labels)
 
     topology_candidates = [
+        DATA_DIR / "europe_topology.runtime_political_v1.json",
         DATA_DIR / "europe_topology.na_v2.json",
         DATA_DIR / "europe_topology.na_v1.json",
         DATA_DIR / "europe_topology.highres.json",
@@ -876,6 +945,18 @@ def main():
             for group_id, label in topo_labels.items():
                 if group_id not in labels:
                     labels[group_id] = label
+
+    authoritative_ids, authoritative_path = load_authoritative_feature_ids()
+    groups, labels, dropped_children = filter_groups_to_authoritative_ids(
+        groups,
+        labels,
+        authoritative_ids,
+    )
+    if authoritative_path is not None:
+        print(
+            "[Hierarchy] Authority filter: "
+            f"source={authoritative_path.name}, groups={len(groups)}, dropped_children={dropped_children}"
+        )
 
     primary_topology_path = DATA_DIR / "europe_topology.json"
     active_country_codes = collect_active_country_codes(primary_topology_path)

@@ -2643,7 +2643,6 @@
       "RU_RAY_50074027B12014197778868",
       "RU_RAY_50074027B35283992627642",
       "RU_RAY_50074027B63365100968819",
-      "RU_RAY_50074027B3226583010199",
       "RU_RAY_50074027B85690776295658",
       "RU_RAY_50074027B38429551881690",
       "RU_RAY_50074027B97557760790791",
@@ -2664,7 +2663,6 @@
       "RU_RAY_50074027B65758721423350",
       "RU_RAY_50074027B21852504227041",
       "RU_RAY_50074027B20858489153060",
-      "RU_RAY_50074027B75699624456558",
       "RU_RAY_50074027B61635819691965",
       "RU_RAY_50074027B98842183632399",
       "RU_RAY_50074027B81264038936345",
@@ -2902,7 +2900,6 @@
       "RU_RAY_50074027B5317421503294",
       "RU_RAY_50074027B56135401776723",
       "RU_RAY_50074027B66126711442497",
-      "RU_RAY_50074027B50737742198919",
       "RU_RAY_50074027B9814729903160",
       "RU_RAY_50074027B16069237925080",
       "RU_RAY_50074027B98725284766499",
@@ -3757,7 +3754,6 @@
       "RU_RAY_50074027B30798664015080",
       "RU_RAY_50074027B46464127774733",
       "RU_RAY_50074027B24584151932572",
-      "RU_RAY_50074027B83535390579003",
       "RU_RAY_50074027B8472367264626",
       "RU_RAY_50074027B7177074133240",
       "RU_RAY_50074027B74120248027506",
@@ -3947,9 +3943,7 @@
       "RU_RAY_50074027B60205066083435",
       "RU_RAY_50074027B12225471433206",
       "RU_RAY_50074027B56228072351606",
-      "RU_RAY_50074027B61241799946425",
       "RU_RAY_50074027B88958089507858",
-      "RU_RAY_50074027B44154738908147",
       "RU_RAY_50074027B96829973998974",
       "RU_RAY_50074027B48803928009277",
       "RU_RAY_50074027B3691210145247",
@@ -4099,7 +4093,6 @@
       "RU_RAY_50074027B72825662041749",
       "RU_RAY_50074027B51628846179321",
       "RU_RAY_50074027B24281986961151",
-      "RU_RAY_50074027B76144209526439",
       "RU_RAY_50074027B9218213171589",
       "RU_RAY_50074027B65160650442922",
       "RU_RAY_50074027B53964407639404",
@@ -4160,8 +4153,6 @@
       "RU_RAY_50074027B96103137717036"
     ],
     "RU_Chukotka_Autonomous_Okrug": [
-      "RU_RAY_50074027B3022028163112",
-      "RU_RAY_50074027B2401368915177",
       "RUS-2321"
     ],
     "RU_Altai_Republic": [
@@ -4790,7 +4781,6 @@
       "IN_ADM2_76128533B49597693387243",
       "IN_ADM2_76128533B75110579117636",
       "IN_ADM2_76128533B33966968116377",
-      "IN_ADM2_76128533B4839184447445",
       "IN_ADM2_76128533B83278580643229",
       "IN_ADM2_76128533B54775433755383",
       "IN_ADM2_76128533B85389886560116",
@@ -4803,17 +4793,11 @@
       "IN_ADM2_76128533B66719908763317",
       "IN_ADM2_76128533B9892158671522"
     ],
-    "IN_Andaman_and_Nicobar_Islands": [
-      "IN_ADM2_76128533B28397307540277",
-      "IN_ADM2_76128533B22587307937261",
-      "IN_ADM2_76128533B33103505211400"
-    ],
     "IN_Assam": [
       "IN_ADM2_76128533B6828791241172",
       "IN_ADM2_76128533B9558749744242",
       "IN_ADM2_76128533B61235952222315",
       "IN_ADM2_76128533B38784530776316",
-      "IN_ADM2_76128533B17472905712757",
       "IN_ADM2_76128533B40995085026980",
       "IN_ADM2_76128533B21722277889516",
       "IN_ADM2_76128533B8920527783032",
@@ -4843,24 +4827,14 @@
       "IN_ADM2_76128533B15157901669242",
       "IN_ADM2_76128533B40714385808093",
       "IN_ADM2_76128533B70315194619807",
-      "IN_ADM2_76128533B24017517661394",
       "IN_ADM2_76128533B19898496046456",
       "IN_ADM2_76128533B49993259380917"
     ],
     "IN_Arunachal_Pradesh": [
-      "IN_ADM2_76128533B95764075909869",
       "IN_ADM2_76128533B84689409020934",
-      "IN_ADM2_76128533B90913053845537",
-      "IN_ADM2_76128533B76129461078086",
-      "IN_ADM2_76128533B76058958071350",
       "IN_ADM2_76128533B55878637000592",
-      "IN_ADM2_76128533B95910687666425",
       "IN_ADM2_76128533B11651252780045",
-      "IN_ADM2_76128533B31405919461443",
-      "IN_ADM2_76128533B18668117085772",
-      "IN_ADM2_76128533B12129983841645",
-      "IN_ADM2_76128533B46084756537322",
-      "IN_ADM2_76128533B25448742967716"
+      "IN_ADM2_76128533B18668117085772"
     ],
     "IN_Nagaland": [
       "IN_ADM2_76128533B22715430000002",
@@ -4870,7 +4844,6 @@
     ],
     "IN_Meghalaya": [
       "IN_ADM2_76128533B91472319248603",
-      "IN_ADM2_76128533B17968019348564",
       "IN_ADM2_76128533B66682530790248",
       "IN_ADM2_76128533B38230828972906",
       "IN_ADM2_76128533B79750857313751",
@@ -5032,9 +5005,6 @@
       "IN_ADM2_76128533B58170186574016",
       "IN_ADM2_76128533B14968875277413",
       "IN_ADM2_76128533B84398038505400"
-    ],
-    "IN_Lakshadweep": [
-      "IN_ADM2_76128533B41477629049356"
     ],
     "IN_Sikkim": [
       "IN_ADM2_76128533B65820903826030"
@@ -10697,9 +10667,6 @@
     "HK_Wong_Tai_Sin_District": [
       "HK_ADM1_HKG-5160"
     ],
-    "HK_Kwun_Tong": [
-      "HK_ADM1_HKG-5161"
-    ],
     "HK_Sai_Kung": [
       "HK_ADM1_HKG-5162"
     ],
@@ -10745,14 +10712,8 @@
     "LI_Gamprin": [
       "LI_ADM1_LIE-4897"
     ],
-    "LI_Ruggell": [
-      "LI_ADM1_LIE-4898"
-    ],
     "LI_Schellenberg": [
       "LI_ADM1_LIE-4899"
-    ],
-    "LI_Mauren": [
-      "LI_ADM1_LIE-4900"
     ],
     "LI_Planken": [
       "LI_ADM1_LIE-4901"
@@ -11127,9 +11088,6 @@
     "SM_Faetano": [
       "SM_ADM1_SMR-4888"
     ],
-    "SM_Montegiardino": [
-      "SM_ADM1_SMR-4889"
-    ],
     "SM_Fiorentino": [
       "SM_ADM1_SMR-4890"
     ],
@@ -11303,9 +11261,6 @@
     ],
     "UY_R_o_Negro": [
       "UY_ADM1_URY-9"
-    ],
-    "VE_VEN_99": [
-      "VE_ADM1_VEN+99?"
     ],
     "VE_Falc_n": [
       "VE_ADM1_VEN-23"
@@ -11744,7 +11699,6 @@
     "IN_Delhi": "IN - Delhi",
     "IN_Rajasthan": "IN - Rajasthan",
     "IN_Karnataka": "IN - Karnataka",
-    "IN_Andaman_and_Nicobar_Islands": "IN - Andaman and Nicobar Islands",
     "IN_Assam": "IN - Assam",
     "IN_Arunachal_Pradesh": "IN - Arunachal Pradesh",
     "IN_Nagaland": "IN - Nagaland",
@@ -11755,7 +11709,6 @@
     "IN_Tamil_Nadu": "IN - Tamil Nadu",
     "IN_Kerala": "IN - Kerala",
     "IN_Telangana": "IN - Telangana",
-    "IN_Lakshadweep": "IN - Lakshadweep",
     "IN_Sikkim": "IN - Sikkim",
     "UA_Kherson": "Kherson",
     "UA_Zaporizhzhia": "Zaporizhzhia",
@@ -12718,7 +12671,6 @@
     "HK_Kowloon_City": "Kowloon City",
     "HK_Sham_Shui_Po": "Sham Shui Po",
     "HK_Wong_Tai_Sin_District": "Wong Tai Sin District",
-    "HK_Kwun_Tong": "Kwun Tong",
     "HK_Sai_Kung": "Sai Kung",
     "HK_Sha_Tin": "Sha Tin",
     "HK_Kwai_Tsing": "Kwai Tsing",
@@ -12734,9 +12686,7 @@
     "LI_Vaduz": "Vaduz",
     "LI_Schaan": "Schaan",
     "LI_Gamprin": "Gamprin",
-    "LI_Ruggell": "Ruggell",
     "LI_Schellenberg": "Schellenberg",
-    "LI_Mauren": "Mauren",
     "LI_Planken": "Planken",
     "LI_Eschen": "Eschen",
     "LU_Diekirch": "Diekirch",
@@ -12861,7 +12811,6 @@
     "SM_Serravalle": "Serravalle",
     "SM_Domagnano": "Domagnano",
     "SM_Faetano": "Faetano",
-    "SM_Montegiardino": "Montegiardino",
     "SM_Fiorentino": "Fiorentino",
     "SM_Chiesanuova": "Chiesanuova",
     "SR_Nickerie": "Nickerie",
@@ -12920,7 +12869,6 @@
     "UY_Flores": "Flores",
     "UY_Paysand": "Paysand\u00fa",
     "UY_R_o_Negro": "R\u00edo Negro",
-    "VE_VEN_99": "VEN+99?",
     "VE_Falc_n": "Falc\u00f3n",
     "VE_Apure": "Apure",
     "VE_Barinas": "Barinas",

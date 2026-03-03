@@ -6,6 +6,7 @@ import { applyCountryColor, resetCountryColors } from "../core/logic.js";
 import { FileManager } from "../core/file_manager.js";
 import { LegendManager } from "../core/legend_manager.js";
 import { t } from "./i18n.js";
+import { setFeatureOwnerCodes, ensureSovereigntyState } from "../core/sovereignty_manager.js";
 
 const COUNTRY_CODE_ALIASES = {
   UK: "GB",
@@ -297,11 +298,26 @@ function buildCountryColorTree(entries) {
 
 function applyHierarchyGroup(group, color, render) {
   if (!group || !group.children) return;
+  const targetIds = Array.isArray(group.children)
+    ? Array.from(new Set(group.children.map((id) => String(id || "").trim()).filter(Boolean)))
+    : [];
+  if (!targetIds.length) return;
+  if (String(state.paintMode || "visual") === "sovereignty") {
+    if (!state.activeSovereignCode) return;
+    const changed = setFeatureOwnerCodes(targetIds, state.activeSovereignCode);
+    mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+    if (changed) {
+      mapRenderer.scheduleDynamicBorderRecompute("sidebar-hierarchy-batch", 90);
+    }
+    if (render) render();
+    return;
+  }
   const colorToApply = color || state.selectedColor;
-  group.children.forEach((id) => {
+  targetIds.forEach((id) => {
+    state.visualOverrides[id] = colorToApply;
     state.featureOverrides[id] = colorToApply;
   });
-  mapRenderer.refreshColorState({ renderNow: false });
+  mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
   if (render) render();
   addRecentColor(colorToApply);
 }
@@ -327,12 +343,28 @@ function applyPreset(countryCode, presetIndex, color, render) {
 
   const preset = presets[presetIndex];
   const colorToApply = color || state.selectedColor;
+  const targetIds = Array.isArray(preset.ids)
+    ? Array.from(new Set(preset.ids.map((id) => String(id || "").trim()).filter(Boolean)))
+    : [];
+  if (!targetIds.length) return;
 
-  preset.ids.forEach((id) => {
+  if (String(state.paintMode || "visual") === "sovereignty") {
+    if (!state.activeSovereignCode) return;
+    const changed = setFeatureOwnerCodes(targetIds, state.activeSovereignCode);
+    mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+    if (changed) {
+      mapRenderer.scheduleDynamicBorderRecompute("sidebar-preset-batch", 90);
+    }
+    if (render) render();
+    return;
+  }
+
+  targetIds.forEach((id) => {
+    state.visualOverrides[id] = colorToApply;
     state.featureOverrides[id] = colorToApply;
   });
 
-  mapRenderer.refreshColorState({ renderNow: false });
+  mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
   if (render) render();
 
   if (!state.recentColors.includes(colorToApply)) {
@@ -617,6 +649,20 @@ function initSidebar({ render } = {}) {
     const controls = document.createElement("div");
     controls.className = "flex items-center gap-2";
 
+    const activeBtn = document.createElement("button");
+    activeBtn.type = "button";
+    activeBtn.className =
+      "rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-500 hover:bg-slate-100";
+    activeBtn.textContent = state.activeSovereignCode === code ? t("Active", "ui") : t("Set Active", "ui");
+    activeBtn.addEventListener("click", () => {
+      state.activeSovereignCode = code;
+      if (typeof state.updateActiveSovereignUIFn === "function") {
+        state.updateActiveSovereignUIFn();
+      }
+      renderList();
+    });
+    controls.appendChild(activeBtn);
+
     if (hasChildren) {
       const toggle = document.createElement("button");
       toggle.type = "button";
@@ -637,7 +683,7 @@ function initSidebar({ render } = {}) {
     const input = document.createElement("input");
     input.type = "color";
     const fallbackColor = ensureCountryPaletteColor(code, fallbackIndex);
-    input.value = state.countryBaseColors[code] || state.countryPalette[code] || fallbackColor;
+    input.value = state.sovereignBaseColors[code] || state.countryBaseColors[code] || state.countryPalette[code] || fallbackColor;
     input.className = "h-8 w-10 cursor-pointer rounded-md border border-slate-300 bg-white";
     input.addEventListener("change", (event) => {
       const value = event.target.value;
@@ -1077,8 +1123,17 @@ function initSidebar({ render } = {}) {
         projectFileName.textContent = file.name;
       }
       FileManager.importProject(file, (data) => {
-        state.countryBaseColors = data.countryBaseColors || {};
-        state.featureOverrides = data.featureOverrides || {};
+        state.sovereignBaseColors = data.sovereignBaseColors || data.countryBaseColors || {};
+        state.countryBaseColors = { ...state.sovereignBaseColors };
+        state.visualOverrides = data.visualOverrides || data.featureOverrides || {};
+        state.featureOverrides = { ...state.visualOverrides };
+        state.sovereigntyByFeatureId = data.sovereigntyByFeatureId || {};
+        state.sovereigntyInitialized = false;
+        state.paintMode = data.paintMode || "visual";
+        state.activeSovereignCode = data.activeSovereignCode || "";
+        state.dynamicBordersDirty = !!data.dynamicBordersDirty;
+        state.dynamicBordersDirtyReason = data.dynamicBordersDirtyReason || "";
+        ensureSovereigntyState({ force: true });
         state.specialZones = data.specialZones || {};
         state.manualSpecialZones =
           data.manualSpecialZones && data.manualSpecialZones.type === "FeatureCollection"
@@ -1149,6 +1204,15 @@ function initSidebar({ render } = {}) {
         }
         if (typeof state.updateSpecialZoneEditorUIFn === "function") {
           state.updateSpecialZoneEditorUIFn();
+        }
+        if (typeof state.updateActiveSovereignUIFn === "function") {
+          state.updateActiveSovereignUIFn();
+        }
+        if (typeof state.updatePaintModeUIFn === "function") {
+          state.updatePaintModeUIFn();
+        }
+        if (typeof state.updateDynamicBorderStatusUIFn === "function") {
+          state.updateDynamicBorderStatusUIFn();
         }
         mapRenderer.refreshColorState({ renderNow: false });
         if (render) render();

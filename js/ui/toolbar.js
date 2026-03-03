@@ -3,6 +3,8 @@ import { state, PALETTE_THEMES } from "../core/state.js";
 import {
   autoFillMap,
   refreshColorState,
+  recomputeDynamicBordersNow,
+  scheduleDynamicBorderRecompute,
   startSpecialZoneDraw,
   undoSpecialZoneVertex,
   finishSpecialZoneDraw,
@@ -11,6 +13,7 @@ import {
   selectSpecialZoneById,
 } from "../core/map_renderer.js";
 import { toggleLanguage, updateUIText, t } from "./i18n.js";
+import { resetAllFeatureOwnersToCanonical } from "../core/sovereignty_manager.js";
 
 function renderPalette(themeName) {
   console.log("Rendering palette:", themeName);
@@ -102,6 +105,10 @@ function initToolbar({ render } = {}) {
   const presetClear = document.getElementById("presetClear");
   const colorModeSelect = document.getElementById("colorModeSelect");
   const paintGranularitySelect = document.getElementById("paintGranularitySelect");
+  const paintModeSelect = document.getElementById("paintModeSelect");
+  const activeSovereignLabel = document.getElementById("activeSovereignLabel");
+  const recalculateBordersBtn = document.getElementById("recalculateBordersBtn");
+  const dynamicBorderStatus = document.getElementById("dynamicBorderStatus");
   const internalBorderColor = document.getElementById("internalBorderColor");
   const internalBorderOpacity = document.getElementById("internalBorderOpacity");
   const internalBorderWidth = document.getElementById("internalBorderWidth");
@@ -155,6 +162,37 @@ function initToolbar({ render } = {}) {
   const referenceOffsetYValue = document.getElementById("referenceOffsetYValue");
 
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const refreshActiveSovereignLabel = () => {
+    if (!activeSovereignLabel) return;
+    const code = String(state.activeSovereignCode || "").trim().toUpperCase();
+    activeSovereignLabel.textContent = code || t("None selected", "ui");
+  };
+  state.updateActiveSovereignUIFn = refreshActiveSovereignLabel;
+  const refreshDynamicBorderStatus = () => {
+    if (dynamicBorderStatus) {
+      if (!state.runtimePoliticalTopology?.objects?.political) {
+        dynamicBorderStatus.textContent = t("Dynamic borders disabled", "ui");
+      } else if (state.dynamicBordersDirty) {
+        dynamicBorderStatus.textContent = t("Borders need recalculation", "ui");
+      } else {
+        dynamicBorderStatus.textContent = t("Borders up to date", "ui");
+      }
+    }
+    if (recalculateBordersBtn) {
+      recalculateBordersBtn.disabled = !state.dynamicBordersDirty;
+    }
+  };
+  state.updateDynamicBorderStatusUIFn = refreshDynamicBorderStatus;
+  state.updatePaintModeUIFn = () => {
+    if (paintModeSelect) {
+      paintModeSelect.value = state.paintMode || "visual";
+    }
+    if (paintGranularitySelect) {
+      paintGranularitySelect.value = state.interactionGranularity || "subdivision";
+    }
+    refreshActiveSovereignLabel();
+    refreshDynamicBorderStatus();
+  };
   const normalizeOceanPreset = (value) => {
     const candidate = String(value || "flat").trim().toLowerCase();
     if (
@@ -986,15 +1024,51 @@ function initToolbar({ render } = {}) {
     paintGranularitySelect.value = state.interactionGranularity || "subdivision";
     paintGranularitySelect.addEventListener("change", (event) => {
       const value = String(event.target.value || "subdivision");
-      state.interactionGranularity = value === "country" ? "country" : "subdivision";
+      const requested = value === "country" ? "country" : "subdivision";
+      state.interactionGranularity =
+        state.paintMode === "sovereignty" ? "subdivision" : requested;
+      paintGranularitySelect.value = state.interactionGranularity;
+    });
+  }
+
+  if (paintModeSelect) {
+    paintModeSelect.value = state.paintMode || "visual";
+    paintModeSelect.addEventListener("change", (event) => {
+      const value = String(event.target.value || "visual");
+      state.paintMode = value === "sovereignty" ? "sovereignty" : "visual";
+      if (state.paintMode === "sovereignty") {
+        state.interactionGranularity = "subdivision";
+        if (paintGranularitySelect) {
+          paintGranularitySelect.value = "subdivision";
+        }
+      }
+      refreshActiveSovereignLabel();
+      refreshDynamicBorderStatus();
+      if (render) render();
+    });
+  }
+
+  if (recalculateBordersBtn) {
+    recalculateBordersBtn.addEventListener("click", () => {
+      recomputeDynamicBordersNow({ renderNow: true, reason: "manual-toolbar" });
     });
   }
 
   if (presetClear) {
     presetClear.addEventListener("click", () => {
-      state.countryBaseColors = {};
-      state.featureOverrides = {};
+      if (state.paintMode === "sovereignty") {
+        resetAllFeatureOwnersToCanonical();
+        scheduleDynamicBorderRecompute("clear-sovereignty", 90);
+      } else {
+        state.colors = {};
+        state.visualOverrides = {};
+        state.featureOverrides = {};
+        state.countryBaseColors = {};
+        state.sovereignBaseColors = {};
+      }
       refreshColorState({ renderNow: true });
+      refreshActiveSovereignLabel();
+      refreshDynamicBorderStatus();
     });
   }
 
@@ -1319,6 +1393,7 @@ function initToolbar({ render } = {}) {
   }
 
   renderPalette(state.currentPaletteTheme);
+  state.updatePaintModeUIFn();
   renderRecentColors();
   renderParentBorderCountryList();
   renderSpecialZoneEditorUI();

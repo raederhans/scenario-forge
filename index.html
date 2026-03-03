@@ -105,6 +105,15 @@
               <option id="optPaintSubdivision" value="subdivision">By Subdivision</option>
               <option id="optPaintCountry" value="country">By Country</option>
             </select>
+            <label id="lblPaintMeaning" class="section-header-block mt-3" for="paintModeSelect">Paint Meaning</label>
+            <select id="paintModeSelect" class="select-input mt-2">
+              <option id="optPaintMeaningVisual" value="visual">Visual</option>
+              <option id="optPaintMeaningSovereignty" value="sovereignty">Sovereignty</option>
+            </select>
+            <div id="labelActiveSovereign" class="section-header-block mt-3">Active Sovereign</div>
+            <div id="activeSovereignLabel" class="body-text mt-2">None selected</div>
+            <button id="recalculateBordersBtn" class="btn-secondary mt-3" type="button">Recalculate Borders</button>
+            <div id="dynamicBorderStatus" class="body-text mt-2">Borders up to date</div>
             <div class="space-y-2 mt-3">
               <div id="lblOcean" class="section-header-block">Ocean</div>
               <div class="flex items-center justify-between gap-3">

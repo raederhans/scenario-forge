@@ -126,6 +126,24 @@ def _normalize_country_code(props: dict, stable_id: str) -> str:
     return "UNK"
 
 
+def _repair_geometry(geom):
+    if geom is None or geom.is_empty:
+        return None
+    try:
+        if hasattr(geom, "make_valid"):
+            geom = geom.make_valid()
+        else:
+            geom = geom.buffer(0)
+    except Exception:
+        try:
+            geom = geom.buffer(0)
+        except Exception:
+            return None
+    if geom is None or geom.is_empty:
+        return None
+    return geom
+
+
 def build_topology(
     political: gpd.GeoDataFrame,
     ocean: gpd.GeoDataFrame,
@@ -233,11 +251,20 @@ def build_topology(
     def scrub_geometry(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         if gdf.empty:
             return gdf
-        gdf = gdf[gdf.geometry.notna()]
-        gdf = gdf[~gdf.geometry.is_empty]
-        if hasattr(gdf.geometry, "is_valid"):
-            gdf = gdf[gdf.geometry.is_valid]
-        return gdf
+        out = gdf.copy()
+        out["geometry"] = out.geometry.apply(_repair_geometry)
+        out = out[out.geometry.notna()]
+        out = out[~out.geometry.is_empty]
+        if hasattr(out.geometry, "is_valid"):
+            invalid_mask = ~out.geometry.is_valid
+            if invalid_mask.any():
+                out.loc[invalid_mask, "geometry"] = out.loc[invalid_mask, "geometry"].apply(
+                    _repair_geometry
+                )
+                out = out[out.geometry.notna()]
+                out = out[~out.geometry.is_empty]
+                out = out[out.geometry.is_valid]
+        return out
 
     def write_special_zones_geojson(gdf: gpd.GeoDataFrame | None) -> None:
         if gdf is None or gdf.empty:
@@ -430,3 +457,22 @@ def build_topology(
     print(f"  - Objects: {list(topo_dict.get('objects', {}).keys())}")
     print(f"  - Total arcs: {len(topo_dict.get('arcs', []))}")
     print(f"  - Political geometries: {len(geometries)}")
+
+
+def build_political_only_topology(
+    political: gpd.GeoDataFrame,
+    output_path,
+    quantization: int = cfg.TOPOLOGY_QUANTIZATION,
+) -> None:
+    empty = gpd.GeoDataFrame(columns=["geometry"], geometry="geometry", crs="EPSG:4326")
+    build_topology(
+        political=political,
+        ocean=empty,
+        land=empty,
+        urban=empty,
+        physical=empty,
+        rivers=empty,
+        output_path=output_path,
+        special_zones=None,
+        quantization=quantization,
+    )

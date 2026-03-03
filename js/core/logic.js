@@ -1,6 +1,6 @@
 // Shared map logic helpers (Phase 13)
 import { state, countryPalette, defaultCountryPalette } from "./state.js";
-import { refreshColorState } from "./map_renderer.js";
+import { refreshColorState, refreshResolvedColorsForOwners } from "./map_renderer.js";
 
 const COUNTRY_CODE_ALIASES = {
   UK: "GB",
@@ -26,8 +26,9 @@ function applyCountryColor(code, color) {
   if (!state.landData) return;
   const target = normalizeCountryCode(code);
   if (!target) return;
+  state.sovereignBaseColors[target] = color;
   state.countryBaseColors[target] = color;
-  refreshColorState({ renderNow: true });
+  refreshResolvedColorsForOwners([target], { renderNow: true });
 }
 
 function resetCountryColors() {
@@ -37,20 +38,25 @@ function resetCountryColors() {
   Object.keys(defaultCountryPalette).forEach((code) => {
     countryPalette[code] = defaultCountryPalette[code];
   });
+  state.sovereignBaseColors = {};
   state.countryBaseColors = {};
+  state.visualOverrides = {};
   refreshColorState({ renderNow: true });
 }
 
 function applyPaletteToMap() {
   if (!state.landData) return;
+  const touchedOwners = new Set();
   for (const feature of state.landData.features) {
     const code = getCountryCode(feature);
     const color = countryPalette[code];
     if (color) {
+      state.sovereignBaseColors[code] = color;
       state.countryBaseColors[code] = color;
+      touchedOwners.add(code);
     }
   }
-  refreshColorState({ renderNow: true });
+  refreshResolvedColorsForOwners([...touchedOwners], { renderNow: true });
 }
 
 function saveMapState() {
@@ -59,8 +65,8 @@ function saveMapState() {
       "map_colors",
       JSON.stringify({
         schemaVersion: 2,
-        countryBaseColors: state.countryBaseColors || {},
-        featureOverrides: state.featureOverrides || {},
+        countryBaseColors: state.sovereignBaseColors || state.countryBaseColors || {},
+        featureOverrides: state.visualOverrides || state.featureOverrides || {},
       })
     );
   } catch (error) {

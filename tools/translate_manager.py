@@ -1,4 +1,4 @@
-import argparse
+﻿import argparse
 import json
 import re
 import subprocess
@@ -83,6 +83,17 @@ MANUAL_UI_DICT = {
     "Unable to read the selected file.": "无法读取所选文件。",
     "Region": "区域",
     "Unknown Region": "未知区域",
+    "Paint Meaning": "上色含义",
+    "Visual": "视觉",
+    "Sovereignty": "主权",
+    "Active Sovereign": "当前主权国",
+    "None selected": "未选择",
+    "Set Active": "设为当前",
+    "Active": "已设为主权",
+    "Recalculate Borders": "重算边界",
+    "Borders up to date": "边界已更新",
+    "Borders need recalculation": "边界需要重算",
+    "Dynamic borders disabled": "动态边界已禁用",
 }
 
 MANUAL_GEO_OVERRIDES = {
@@ -837,3 +848,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
