@@ -64,6 +64,10 @@
       "en": "Brush On",
       "zh": "笔刷开启"
     },
+    "Brush On · Shift+Drag to pan": {
+      "en": "Brush On · Shift+Drag to pan",
+      "zh": "笔刷开启 · 按住 Shift 拖动画布"
+    },
     "Browse All Colors": {
       "en": "Browse All Colors",
       "zh": "浏览全部颜色"

@@ -608,6 +608,8 @@ export const state = {
   inspectorHighlightCountryCode: "",
   currentTool: "fill",
   brushModeEnabled: false,
+  brushPanModifierActive: false,
+  pendingMapClickAction: null,
   activeDockPopover: "",
   isDirty: false,
   dirtyRevision: 0,

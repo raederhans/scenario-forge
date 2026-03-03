@@ -344,9 +344,13 @@ function initToolbar({ render } = {}) {
 
   const setToolCursorClass = () => {
     if (!mapContainer) return;
-    mapContainer.classList.remove("tool-fill", "tool-eraser", "tool-eyedropper", "tool-special-zone");
+    mapContainer.classList.remove("tool-fill", "tool-eraser", "tool-eyedropper", "tool-special-zone", "tool-pan-override");
     if (state.specialZoneEditor?.active) {
       mapContainer.classList.add("tool-special-zone");
+      return;
+    }
+    if (state.brushModeEnabled && state.brushPanModifierActive) {
+      mapContainer.classList.add("tool-pan-override");
       return;
     }
     mapContainer.classList.add(`tool-${state.currentTool || "fill"}`);
@@ -1142,8 +1146,12 @@ function initToolbar({ render } = {}) {
       button.classList.toggle("is-active", isActive);
       button.setAttribute("aria-pressed", String(isActive));
     });
+    const disableBrush = state.currentTool === "eyedropper" || !!state.specialZoneEditor?.active;
+    if (disableBrush) {
+      state.brushModeEnabled = false;
+      state.brushPanModifierActive = false;
+    }
     if (brushModeBtn) {
-      const disableBrush = state.currentTool === "eyedropper" || !!state.specialZoneEditor?.active;
       brushModeBtn.disabled = disableBrush;
       brushModeBtn.classList.toggle("is-active", !!state.brushModeEnabled && !disableBrush);
       brushModeBtn.setAttribute("aria-pressed", String(!!state.brushModeEnabled && !disableBrush));
@@ -1236,7 +1244,10 @@ function initToolbar({ render } = {}) {
       state.brushModeEnabled = !state.brushModeEnabled;
       updateToolUI();
       dismissOnboardingHint();
-      showToolHud(t(state.brushModeEnabled ? "Brush On" : "Brush Off", "ui"));
+      showToolHud(t(
+        state.brushModeEnabled ? "Brush On · Shift+Drag to pan" : "Brush Off",
+        "ui"
+      ));
     });
     brushModeBtn.dataset.bound = "true";
   }

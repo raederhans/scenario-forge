@@ -14,6 +14,10 @@ function isEditableTarget(target) {
 
 function setCurrentTool(tool) {
   state.currentTool = tool;
+  if (tool === "eyedropper") {
+    state.brushModeEnabled = false;
+    state.brushPanModifierActive = false;
+  }
   if (typeof state.updateToolUIFn === "function") {
     state.updateToolUIFn();
   }
@@ -35,6 +39,15 @@ function initShortcuts() {
     const key = String(event.key || "");
     const lower = key.toLowerCase();
     const modifier = event.metaKey || event.ctrlKey;
+
+    if (key === "Shift") {
+      if (!state.brushPanModifierActive) {
+        state.brushPanModifierActive = true;
+        if (typeof state.updateToolUIFn === "function") {
+          state.updateToolUIFn();
+        }
+      }
+    }
 
     if (modifier && lower === "s") {
       event.preventDefault();
@@ -95,6 +108,23 @@ function initShortcuts() {
     if (!modifier && key === "0") {
       event.preventDefault();
       resetZoomToFit();
+    }
+  });
+
+  window.addEventListener("keyup", (event) => {
+    if (event.key !== "Shift") return;
+    if (!state.brushPanModifierActive) return;
+    state.brushPanModifierActive = false;
+    if (typeof state.updateToolUIFn === "function") {
+      state.updateToolUIFn();
+    }
+  });
+
+  window.addEventListener("blur", () => {
+    if (!state.brushPanModifierActive) return;
+    state.brushPanModifierActive = false;
+    if (typeof state.updateToolUIFn === "function") {
+      state.updateToolUIFn();
     }
   });
 

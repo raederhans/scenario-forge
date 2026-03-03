@@ -1580,6 +1580,14 @@ details.card[open] > summary::after {
   cursor: crosshair;
 }
 
+#mapContainer.tool-pan-override {
+  cursor: grab;
+}
+
+#mapContainer.tool-pan-override:active {
+  cursor: grabbing;
+}
+
 .map-overlay-controls {
   position: absolute;
   inset: 0;

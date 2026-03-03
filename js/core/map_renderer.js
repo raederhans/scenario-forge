@@ -39,6 +39,7 @@ let legendItemsGroup = null;
 let legendBackground = null;
 let lastLegendKey = null;
 let brushSession = null;
+let suppressNextClickAfterBrush = false;
 
 const PROJECTION_PRECISION = 0.1;
 const PATH_POINT_RADIUS = 2;
@@ -102,6 +103,7 @@ const DEFAULT_SPECIAL_ZONE_TYPE = "custom";
 const PHYSICAL_PATTERN_BASE_SIZE = 96;
 const PAPER_TEXTURE_BASE_TILE_SIZE = 512;
 const PAPER_NOISE_TILE_SIZE = 192;
+const PARENT_FILL_DOUBLE_CLICK_MS = 260;
 const TEXTURE_LABEL_SERIF_STACK = "\"Iowan Old Style\", \"Palatino Linotype\", Georgia, serif";
 const GRATICULE_SAMPLE_DEGREES = 2;
 const PAPER_TEXTURE_ASSET_URLS = {
@@ -4604,6 +4606,163 @@ function resolveInteractionTargetIds(feature, id) {
   return ids.length ? ids : [id];
 }
 
+function isBrushNavigationModifier(event) {
+  return !!(state.brushModeEnabled && event?.shiftKey);
+}
+
+function shouldAllowZoomEvent(event) {
+  const type = String(event?.type || "").toLowerCase();
+  if (type === "wheel") return true;
+  if (type.startsWith("touch")) return true;
+  if (event?.ctrlKey) return false;
+  if (typeof event?.button === "number" && event.button !== 0) return false;
+  if (state.specialZoneEditor?.active) return false;
+  if (state.brushModeEnabled) {
+    return isBrushNavigationModifier(event);
+  }
+  return true;
+}
+
+function resolveParentGroupKey(feature, featureId) {
+  const countryCode = getFeatureCountryCodeNormalized(feature);
+  if (!countryCode) return "";
+  const directGroup = getAdmin1Group(feature);
+  const fallbackGroup = state.parentGroupByFeatureId?.get(featureId);
+  const groupName = String(directGroup || fallbackGroup || "").trim();
+  if (!groupName) return "";
+  return `${countryCode}::${groupName}`;
+}
+
+function resolveParentGroupTargetIds(feature, featureId) {
+  if (!featureId || !state.landIndex?.has(featureId)) return [];
+  const countryCode = getFeatureCountryCodeNormalized(feature);
+  const parentGroupKey = resolveParentGroupKey(feature, featureId);
+  if (!countryCode || !parentGroupKey) return [];
+  const ids = Array.isArray(state.countryToFeatureIds?.get(countryCode))
+    ? state.countryToFeatureIds.get(countryCode)
+    : [];
+  if (!ids.length) return [];
+  const targetIds = ids.filter((candidateId) => {
+    const candidateFeature = state.landIndex.get(candidateId);
+    if (!candidateFeature) return false;
+    return resolveParentGroupKey(candidateFeature, candidateId) === parentGroupKey;
+  });
+  if (targetIds.length < 2) return [];
+  return Array.from(new Set(targetIds));
+}
+
+function isParentFillDoubleClickEligible(hit, feature) {
+  if (!hit?.id || !feature) return false;
+  if (state.currentTool !== "fill") return false;
+  if (isSovereigntyModeActive()) return false;
+  if (state.interactionGranularity !== "subdivision") return false;
+  if (state.brushModeEnabled) return false;
+  if (state.specialZoneEditor?.active) return false;
+  return resolveParentGroupTargetIds(feature, hit.id).length >= 2;
+}
+
+function applyVisualSubdivisionFill(targetIds, selectedColor, { kind = "fill-feature-color", dirtyReason = kind } = {}) {
+  const resolvedIds = Array.from(new Set((Array.isArray(targetIds) ? targetIds : [])
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)));
+  if (!resolvedIds.length) return false;
+  const color = getSafeCanvasColor(selectedColor, LAND_FILL_COLOR);
+  const historyBefore = captureHistoryState({
+    featureIds: resolvedIds,
+  });
+  resolvedIds.forEach((targetId) => {
+    state.visualOverrides[targetId] = color;
+    state.featureOverrides[targetId] = color;
+  });
+  refreshResolvedColorsForFeatures(resolvedIds, { renderNow: false });
+  markDirty(dirtyReason);
+  commitHistoryEntry({
+    kind,
+    before: historyBefore,
+    after: captureHistoryState({
+      featureIds: resolvedIds,
+    }),
+  });
+  addRecentColor(color);
+  if (context) {
+    render();
+  }
+  return true;
+}
+
+function executeSingleSubdivisionFill(action) {
+  if (!action) return false;
+  const targetIds = action.eventPayload?.targetIds || [action.featureId];
+  return applyVisualSubdivisionFill(targetIds, action.selectedColor, {
+    kind: "fill-feature-color",
+    dirtyReason: "fill-feature-color",
+  });
+}
+
+function executeParentGroupFill(action) {
+  if (!action) return false;
+  const targetIds = resolveParentGroupTargetIds(
+    action.eventPayload?.feature || state.landIndex.get(action.featureId),
+    action.featureId
+  );
+  if (!targetIds.length) {
+    return executeSingleSubdivisionFill(action);
+  }
+  return applyVisualSubdivisionFill(targetIds, action.selectedColor, {
+    kind: "fill-parent-group",
+    dirtyReason: "fill-parent-group",
+  });
+}
+
+function cancelPendingMapClickAction({ execute = false } = {}) {
+  const pending = state.pendingMapClickAction;
+  if (!pending) return null;
+  if (pending.timerId) {
+    globalThis.clearTimeout(pending.timerId);
+  }
+  state.pendingMapClickAction = null;
+  if (execute) {
+    executeSingleSubdivisionFill(pending);
+  }
+  return pending;
+}
+
+function scheduleSingleSubdivisionFill(action) {
+  cancelPendingMapClickAction({ execute: true });
+  const pending = {
+    ...action,
+    createdAt: Date.now(),
+  };
+  pending.timerId = globalThis.setTimeout(() => {
+    if (state.pendingMapClickAction !== pending) return;
+    state.pendingMapClickAction = null;
+    executeSingleSubdivisionFill(pending);
+  }, PARENT_FILL_DOUBLE_CLICK_MS);
+  state.pendingMapClickAction = pending;
+}
+
+function consumePendingParentFillClick(hit, feature) {
+  const pending = state.pendingMapClickAction;
+  if (!pending) return false;
+
+  const sameFeature = pending.featureId === hit?.id;
+  const sameParentGroup = pending.parentGroupKey && pending.parentGroupKey === resolveParentGroupKey(feature, hit?.id);
+  const sameSelectedColor = pending.selectedColor === getSafeCanvasColor(state.selectedColor, LAND_FILL_COLOR);
+  const sameTool = pending.tool === state.currentTool;
+  const samePaintMode = pending.paintMode === state.paintMode;
+  const sameGranularity = pending.interactionGranularity === state.interactionGranularity;
+  const withinWindow = (Date.now() - Number(pending.createdAt || 0)) <= PARENT_FILL_DOUBLE_CLICK_MS;
+
+  if (sameFeature && sameParentGroup && sameSelectedColor && sameTool && samePaintMode && sameGranularity && withinWindow) {
+    cancelPendingMapClickAction();
+    executeParentGroupFill(pending);
+    return true;
+  }
+
+  cancelPendingMapClickAction({ execute: true });
+  return false;
+}
+
 function mergeHistorySnapshot(target, snapshot) {
   if (!snapshot || typeof snapshot !== "object") return;
   Object.entries(snapshot).forEach(([section, patch]) => {
@@ -4727,6 +4886,9 @@ function flushBrushSession() {
   if (!brushSession) return;
   const current = brushSession;
   brushSession = null;
+  if (current.dragging) {
+    suppressNextClickAfterBrush = true;
+  }
   if (!current.dragging || !current.changed) return;
   const featureIds = Array.from(current.affectedFeatureIds);
   const ownerCodes = Array.from(current.affectedOwnerCodes);
@@ -4754,7 +4916,9 @@ function flushBrushSession() {
 
 function handleBrushPointerDown(event) {
   if (!state.brushModeEnabled || state.currentTool === "eyedropper" || state.specialZoneEditor?.active) return;
+  if (isBrushNavigationModifier(event)) return;
   if ((event.buttons & 1) !== 1) return;
+  if (event?.preventDefault) event.preventDefault();
   ensureBrushSession(event);
 }
 
@@ -4783,6 +4947,10 @@ function handleBrushPointerMove(event) {
 
 function handleClick(event) {
   if (!state.landData) return;
+  if (suppressNextClickAfterBrush) {
+    suppressNextClickAfterBrush = false;
+    return;
+  }
   if (typeof state.dismissOnboardingHintFn === "function") {
     state.dismissOnboardingHintFn();
   }
@@ -4802,6 +4970,10 @@ function handleClick(event) {
   if (!feature) return;
   const countryCode = hit.countryCode || getFeatureCountryCodeNormalized(feature);
   const targetIds = resolveInteractionTargetIds(feature, id);
+
+  if (state.pendingMapClickAction && consumePendingParentFillClick(hit, feature)) {
+    return;
+  }
 
   if (state.isEditingPreset) {
     if (typeof globalThis.togglePresetRegion === "function") {
@@ -4951,22 +5123,27 @@ function handleClick(event) {
       }),
     });
   } else {
-    const historyBefore = captureHistoryState({
-      featureIds: targetIds,
-    });
-    targetIds.forEach((targetId) => {
-      state.visualOverrides[targetId] = selectedColor;
-      state.featureOverrides[targetId] = selectedColor;
-    });
-    refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
-    markDirty("fill-feature-color");
-    commitHistoryEntry({
+    if (isParentFillDoubleClickEligible(hit, feature)) {
+      scheduleSingleSubdivisionFill({
+        featureId: id,
+        parentGroupKey: resolveParentGroupKey(feature, id),
+        countryCode,
+        selectedColor,
+        tool: "fill",
+        paintMode: state.paintMode,
+        interactionGranularity: state.interactionGranularity,
+        eventPayload: {
+          feature,
+          targetIds,
+        },
+      });
+      return;
+    }
+    applyVisualSubdivisionFill(targetIds, selectedColor, {
       kind: "fill-feature-color",
-      before: historyBefore,
-      after: captureHistoryState({
-        featureIds: targetIds,
-      }),
+      dirtyReason: "fill-feature-color",
     });
+    return;
   }
   addRecentColor(selectedColor);
   if (context) {
@@ -5115,6 +5292,7 @@ function initZoom() {
     .zoom()
     .scaleExtent([MIN_ZOOM_SCALE, MAX_ZOOM_SCALE])
     .extent([[0, 0], [state.width, state.height]])
+    .filter((event) => shouldAllowZoomEvent(event))
     .on("start", () => {
       clearRenderPhaseTimer();
       setRenderPhase(RENDER_PHASE_INTERACTING);
