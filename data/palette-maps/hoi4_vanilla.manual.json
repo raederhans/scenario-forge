@@ -1,6 +1,9 @@
 {
   "palette_id": "hoi4_vanilla",
   "mapping_policy": "conservative",
+  "inherit_verified_from_palette_id": "",
+  "inherit_exact_verified": false,
+  "inherit_alias_verified": false,
   "verified_exact_tag_to_iso2": {
     "AFG": "AF",
     "ALB": "AL",
@@ -257,5 +260,8 @@
     "RAJ",
     "YUG",
     "CZE"
-  ]
+  ],
+  "display_name_overrides": {},
+  "display_name_suffix_priority": [],
+  "ocean_fill": "#aadaff"
 }

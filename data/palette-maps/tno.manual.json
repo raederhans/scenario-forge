@@ -1,0 +1,103 @@
+{
+  "palette_id": "tno",
+  "mapping_policy": "conservative",
+  "inherit_verified_from_palette_id": "hoi4_vanilla",
+  "inherit_exact_verified": true,
+  "inherit_alias_verified": true,
+  "verified_exact_tag_to_iso2": {},
+  "verified_alias_tag_to_iso2": {},
+  "deny_tags": {
+    "BGR": {
+      "reason": "fictional_or_alt_history",
+      "suggested_iso2": "FR"
+    },
+    "SGR": {
+      "reason": "fictional_or_alt_history",
+      "suggested_iso2": "DE"
+    },
+    "GGR": {
+      "reason": "fictional_or_alt_history",
+      "suggested_iso2": "DE"
+    },
+    "HGR": {
+      "reason": "fictional_or_alt_history",
+      "suggested_iso2": "DE"
+    },
+    "OST": {
+      "reason": "split_state"
+    },
+    "FUK": {
+      "reason": "split_state"
+    },
+    "DST": {
+      "reason": "split_state"
+    },
+    "MST": {
+      "reason": "split_state"
+    }
+  },
+  "display_name_overrides": {
+    "GER": "Greater German Reich",
+    "USA": "United States",
+    "JAP": "Japan",
+    "ITA": "Italy",
+    "ENG": "United Kingdom",
+    "CHI": "China",
+    "BGR": "Burgundy",
+    "SGR": "Speer Germany",
+    "POL": "Poland",
+    "UKR": "Ukraine",
+    "AUS": "Austria",
+    "CAN": "Canada",
+    "HOL": "Netherlands",
+    "SWE": "Sweden",
+    "FIN": "Finland",
+    "ROM": "Romania",
+    "CZE": "Czechoslovakia",
+    "AST": "Australia",
+    "PER": "Iran",
+    "SAU": "Saudi Arabia",
+    "BRA": "Brazil",
+    "MEX": "Mexico",
+    "ARG": "Argentina",
+    "MAN": "Manchuria"
+  },
+  "display_name_suffix_priority": [
+    "democratic",
+    "liberalism",
+    "conservatism",
+    "progressivism",
+    "despotism",
+    "fascism",
+    "national_socialism",
+    "communist",
+    "socialist"
+  ],
+  "quick_tags": [
+    "GER",
+    "USA",
+    "JAP",
+    "ITA",
+    "ENG",
+    "CHI",
+    "BGR",
+    "SGR",
+    "POL",
+    "UKR",
+    "AUS",
+    "CAN",
+    "HOL",
+    "SWE",
+    "FIN",
+    "ROM",
+    "CZE",
+    "AST",
+    "PER",
+    "SAU",
+    "BRA",
+    "MEX",
+    "ARG",
+    "MAN"
+  ],
+  "ocean_fill": "#2d4769"
+}

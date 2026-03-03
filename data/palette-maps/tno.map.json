@@ -1,0 +1,1791 @@
+{
+  "version": 2,
+  "palette_id": "tno",
+  "canonical_key_type": "iso2",
+  "mapping_policy": "conservative",
+  "mapped": {
+    "AFG": {
+      "iso2": "AF",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "ALB": {
+      "iso2": "AL",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "ALG": {
+      "iso2": "DZ",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "ANG": {
+      "iso2": "AO",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "ARG": {
+      "iso2": "AR",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "ARM": {
+      "iso2": "AM",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "AST": {
+      "iso2": "AU",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "AUS": {
+      "iso2": "AT",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "AZR": {
+      "iso2": "AZ",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "BEL": {
+      "iso2": "BE",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "BHU": {
+      "iso2": "BT",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "BLR": {
+      "iso2": "BY",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "BLZ": {
+      "iso2": "BZ",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "BOL": {
+      "iso2": "BO",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "BRA": {
+      "iso2": "BR",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "BRD": {
+      "iso2": "BI",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "BRM": {
+      "iso2": "MM",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "BUL": {
+      "iso2": "BG",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "CAM": {
+      "iso2": "KH",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "CAN": {
+      "iso2": "CA",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "CHI": {
+      "iso2": "CN",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "CHL": {
+      "iso2": "CL",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "CMR": {
+      "iso2": "CM",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "COL": {
+      "iso2": "CO",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "COS": {
+      "iso2": "CR",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "CRO": {
+      "iso2": "HR",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "CUB": {
+      "iso2": "CU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "DEN": {
+      "iso2": "DK",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "DJI": {
+      "iso2": "DJ",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "DOM": {
+      "iso2": "DO",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "ECU": {
+      "iso2": "EC",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "EGY": {
+      "iso2": "EG",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "ELS": {
+      "iso2": "SV",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "ENG": {
+      "iso2": "GB",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "EQG": {
+      "iso2": "GQ",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "EST": {
+      "iso2": "EE",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "ETH": {
+      "iso2": "ET",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "FIN": {
+      "iso2": "FI",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "GAB": {
+      "iso2": "GA",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "GEO": {
+      "iso2": "GE",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "GER": {
+      "iso2": "DE",
+      "match_kind": "country_file_exact",
+      "decision_source": "manual_verified"
+    },
+    "GNB": {
+      "iso2": "GW",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "GRE": {
+      "iso2": "GR",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "GRN": {
+      "iso2": "GL",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "GUA": {
+      "iso2": "GT",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "HAI": {
+      "iso2": "HT",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "HOL": {
+      "iso2": "NL",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "HON": {
+      "iso2": "HN",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "HUN": {
+      "iso2": "HU",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "ICE": {
+      "iso2": "IS",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "INS": {
+      "iso2": "ID",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "IRE": {
+      "iso2": "IE",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "IRQ": {
+      "iso2": "IQ",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "ISR": {
+      "iso2": "IL",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "ITA": {
+      "iso2": "IT",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "IVO": {
+      "iso2": "CI",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "JAM": {
+      "iso2": "JM",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "JAP": {
+      "iso2": "JP",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "JOR": {
+      "iso2": "JO",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "KAZ": {
+      "iso2": "KZ",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "KEN": {
+      "iso2": "KE",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "KUW": {
+      "iso2": "KW",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "KYR": {
+      "iso2": "KG",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "LAO": {
+      "iso2": "LA",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "LAT": {
+      "iso2": "LV",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "LBA": {
+      "iso2": "LY",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "LEB": {
+      "iso2": "LB",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "LIB": {
+      "iso2": "LR",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "LIT": {
+      "iso2": "LT",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "MAD": {
+      "iso2": "MG",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "MAL": {
+      "iso2": "MY",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "MEX": {
+      "iso2": "MX",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "MLI": {
+      "iso2": "ML",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "MNT": {
+      "iso2": "ME",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "MOR": {
+      "iso2": "MA",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "MRT": {
+      "iso2": "MR",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "MZB": {
+      "iso2": "MZ",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "NEP": {
+      "iso2": "NP",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "NGA": {
+      "iso2": "NG",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "NGR": {
+      "iso2": "NE",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "NIC": {
+      "iso2": "NI",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "NOR": {
+      "iso2": "NO",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "NZL": {
+      "iso2": "NZ",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "OMA": {
+      "iso2": "OM",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "PAK": {
+      "iso2": "PK",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "PAL": {
+      "iso2": "PS",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "PAN": {
+      "iso2": "PA",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "PAR": {
+      "iso2": "PY",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "PER": {
+      "iso2": "IR",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "PHI": {
+      "iso2": "PH",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "POL": {
+      "iso2": "PL",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "POR": {
+      "iso2": "PT",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "PRU": {
+      "iso2": "PE",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "QAT": {
+      "iso2": "QA",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "ROM": {
+      "iso2": "RO",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "RWA": {
+      "iso2": "RW",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "SAF": {
+      "iso2": "ZA",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "SAU": {
+      "iso2": "SA",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "SLO": {
+      "iso2": "SK",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "SPR": {
+      "iso2": "ES",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "SUR": {
+      "iso2": "SR",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "SWE": {
+      "iso2": "SE",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "SWI": {
+      "iso2": "CH",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "SYR": {
+      "iso2": "SY",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "TAJ": {
+      "iso2": "TJ",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "TMS": {
+      "iso2": "TM",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "TRI": {
+      "iso2": "TT",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "TUN": {
+      "iso2": "TN",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "TUR": {
+      "iso2": "TR",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "UAE": {
+      "iso2": "AE",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "UKR": {
+      "iso2": "UA",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "URG": {
+      "iso2": "UY",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "USA": {
+      "iso2": "US",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "UZB": {
+      "iso2": "UZ",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "VEN": {
+      "iso2": "VE",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "YEM": {
+      "iso2": "YE",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "ZAM": {
+      "iso2": "ZM",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    },
+    "ZIM": {
+      "iso2": "ZW",
+      "match_kind": "manual_exact",
+      "decision_source": "manual_verified"
+    }
+  },
+  "unmapped": {
+    "AAA": {
+      "reason": "unreviewed"
+    },
+    "AAB": {
+      "reason": "unreviewed"
+    },
+    "AAC": {
+      "reason": "unreviewed"
+    },
+    "AAF": {
+      "reason": "unreviewed",
+      "suggested_iso2": "TF"
+    },
+    "AAG": {
+      "reason": "unreviewed"
+    },
+    "AAI": {
+      "reason": "unreviewed"
+    },
+    "AAJ": {
+      "reason": "unreviewed"
+    },
+    "AAN": {
+      "reason": "unreviewed"
+    },
+    "AAO": {
+      "reason": "unreviewed"
+    },
+    "AAR": {
+      "reason": "unreviewed"
+    },
+    "AAS": {
+      "reason": "unreviewed"
+    },
+    "AAU": {
+      "reason": "unreviewed"
+    },
+    "AAV": {
+      "reason": "unreviewed"
+    },
+    "AAZ": {
+      "reason": "unreviewed"
+    },
+    "ABD": {
+      "reason": "unreviewed"
+    },
+    "ADL": {
+      "reason": "unreviewed"
+    },
+    "ADN": {
+      "reason": "unreviewed"
+    },
+    "ADY": {
+      "reason": "unreviewed"
+    },
+    "AFR": {
+      "reason": "unreviewed"
+    },
+    "AGS": {
+      "reason": "unreviewed"
+    },
+    "ALT": {
+      "reason": "unreviewed"
+    },
+    "AMR": {
+      "reason": "unreviewed"
+    },
+    "ANC": {
+      "reason": "unreviewed"
+    },
+    "ANL": {
+      "reason": "unreviewed"
+    },
+    "ANT": {
+      "reason": "unreviewed"
+    },
+    "APF": {
+      "reason": "unreviewed"
+    },
+    "ARP": {
+      "reason": "unreviewed"
+    },
+    "ARS": {
+      "reason": "unreviewed"
+    },
+    "AWB": {
+      "reason": "unreviewed"
+    },
+    "AYA": {
+      "reason": "unreviewed"
+    },
+    "AYR": {
+      "reason": "unreviewed"
+    },
+    "AZA": {
+      "reason": "unreviewed"
+    },
+    "AZD": {
+      "reason": "unreviewed"
+    },
+    "AZH": {
+      "reason": "unreviewed"
+    },
+    "AZW": {
+      "reason": "unreviewed"
+    },
+    "BAH": {
+      "reason": "unreviewed"
+    },
+    "BFR": {
+      "reason": "unreviewed"
+    },
+    "BGR": {
+      "reason": "fictional_or_alt_history",
+      "suggested_iso2": "FR"
+    },
+    "BIR": {
+      "reason": "unreviewed"
+    },
+    "BKB": {
+      "reason": "unreviewed"
+    },
+    "BKF": {
+      "reason": "unreviewed"
+    },
+    "BKR": {
+      "reason": "unreviewed"
+    },
+    "BKU": {
+      "reason": "unreviewed"
+    },
+    "BKV": {
+      "reason": "unreviewed"
+    },
+    "BMB": {
+      "reason": "unreviewed"
+    },
+    "BOR": {
+      "reason": "unreviewed"
+    },
+    "BOS": {
+      "reason": "unreviewed"
+    },
+    "BOV": {
+      "reason": "unreviewed"
+    },
+    "BRB": {
+      "reason": "unreviewed"
+    },
+    "BRG": {
+      "reason": "unreviewed"
+    },
+    "BRP": {
+      "reason": "unreviewed"
+    },
+    "BRR": {
+      "reason": "unreviewed"
+    },
+    "BRS": {
+      "reason": "unreviewed"
+    },
+    "BRU": {
+      "reason": "unreviewed"
+    },
+    "BRY": {
+      "reason": "unreviewed"
+    },
+    "BSQ": {
+      "reason": "unreviewed"
+    },
+    "BTS": {
+      "reason": "unreviewed"
+    },
+    "BUR": {
+      "reason": "unreviewed"
+    },
+    "BZZ": {
+      "reason": "unreviewed"
+    },
+    "CAF": {
+      "reason": "unreviewed"
+    },
+    "CAL": {
+      "reason": "unreviewed"
+    },
+    "CAO": {
+      "reason": "unreviewed"
+    },
+    "CAS": {
+      "reason": "unreviewed"
+    },
+    "CAU": {
+      "reason": "unreviewed"
+    },
+    "CDL": {
+      "reason": "unreviewed"
+    },
+    "CFS": {
+      "reason": "unreviewed"
+    },
+    "CHD": {
+      "reason": "unreviewed"
+    },
+    "CHF": {
+      "reason": "unreviewed"
+    },
+    "CHT": {
+      "reason": "unreviewed"
+    },
+    "CLC": {
+      "reason": "unreviewed"
+    },
+    "CLD": {
+      "reason": "unreviewed"
+    },
+    "CLL": {
+      "reason": "unreviewed"
+    },
+    "CME": {
+      "reason": "unreviewed"
+    },
+    "CNT": {
+      "reason": "unreviewed"
+    },
+    "COG": {
+      "reason": "ambiguous_identity",
+      "suggested_iso2": "CG"
+    },
+    "COR": {
+      "reason": "unreviewed"
+    },
+    "CPP": {
+      "reason": "unreviewed"
+    },
+    "CPR": {
+      "reason": "unreviewed"
+    },
+    "CPV": {
+      "reason": "unreviewed"
+    },
+    "CRI": {
+      "reason": "unreviewed"
+    },
+    "CRN": {
+      "reason": "unreviewed"
+    },
+    "CTL": {
+      "reason": "unreviewed"
+    },
+    "CUR": {
+      "reason": "unreviewed"
+    },
+    "CYL": {
+      "reason": "unreviewed"
+    },
+    "CZE": {
+      "reason": "historical_union_or_predecessor"
+    },
+    "D01": {
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D02": {
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D03": {
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D04": {
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D05": {
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D06": {
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D07": {
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D08": {
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D09": {
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D10": {
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D11": {
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D12": {
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D13": {
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D14": {
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D15": {
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "DAG": {
+      "reason": "unreviewed"
+    },
+    "DFK": {
+      "reason": "unreviewed"
+    },
+    "DMI": {
+      "reason": "unreviewed"
+    },
+    "DMP": {
+      "reason": "unreviewed"
+    },
+    "DMS": {
+      "reason": "unreviewed"
+    },
+    "DRL": {
+      "reason": "unreviewed"
+    },
+    "DSG": {
+      "reason": "unreviewed"
+    },
+    "DSH": {
+      "reason": "unreviewed"
+    },
+    "DST": {
+      "reason": "split_state"
+    },
+    "EGB": {
+      "reason": "unreviewed"
+    },
+    "EGQ": {
+      "reason": "unreviewed"
+    },
+    "ERT": {
+      "reason": "unreviewed"
+    },
+    "ESM": {
+      "reason": "unreviewed"
+    },
+    "ETB": {
+      "reason": "unreviewed"
+    },
+    "ETR": {
+      "reason": "unreviewed"
+    },
+    "EWE": {
+      "reason": "unreviewed"
+    },
+    "FAR": {
+      "reason": "unreviewed"
+    },
+    "FAV": {
+      "reason": "unreviewed"
+    },
+    "FEN": {
+      "reason": "unreviewed"
+    },
+    "FFR": {
+      "reason": "unreviewed"
+    },
+    "FGB": {
+      "reason": "unreviewed"
+    },
+    "FGR": {
+      "reason": "unreviewed"
+    },
+    "FHH": {
+      "reason": "unreviewed"
+    },
+    "FIJ": {
+      "reason": "unreviewed"
+    },
+    "FIT": {
+      "reason": "unreviewed"
+    },
+    "FLR": {
+      "reason": "unreviewed"
+    },
+    "FMF": {
+      "reason": "unreviewed"
+    },
+    "FML": {
+      "reason": "unreviewed"
+    },
+    "FMM": {
+      "reason": "unreviewed"
+    },
+    "FPG": {
+      "reason": "unreviewed"
+    },
+    "FRD": {
+      "reason": "unreviewed"
+    },
+    "FRI": {
+      "reason": "unreviewed"
+    },
+    "FRM": {
+      "reason": "unreviewed"
+    },
+    "FRS": {
+      "reason": "unreviewed"
+    },
+    "FRV": {
+      "reason": "unreviewed"
+    },
+    "FSP": {
+      "reason": "unreviewed"
+    },
+    "FSR": {
+      "reason": "unreviewed"
+    },
+    "FTF": {
+      "reason": "unreviewed"
+    },
+    "FUK": {
+      "reason": "split_state"
+    },
+    "FZL": {
+      "reason": "unreviewed"
+    },
+    "GAL": {
+      "reason": "unreviewed"
+    },
+    "GAN": {
+      "reason": "unreviewed"
+    },
+    "GAX": {
+      "reason": "unreviewed"
+    },
+    "GAY": {
+      "reason": "unreviewed"
+    },
+    "GAZ": {
+      "reason": "unreviewed"
+    },
+    "GBE": {
+      "reason": "unreviewed"
+    },
+    "GGN": {
+      "reason": "unreviewed"
+    },
+    "GGR": {
+      "reason": "fictional_or_alt_history",
+      "suggested_iso2": "DE"
+    },
+    "GIB": {
+      "reason": "unreviewed"
+    },
+    "GLC": {
+      "reason": "unreviewed"
+    },
+    "GMS": {
+      "reason": "unreviewed"
+    },
+    "GND": {
+      "reason": "unreviewed"
+    },
+    "GNG": {
+      "reason": "unreviewed"
+    },
+    "GNS": {
+      "reason": "unreviewed"
+    },
+    "GOR": {
+      "reason": "unreviewed"
+    },
+    "GRO": {
+      "reason": "unreviewed"
+    },
+    "GUC": {
+      "reason": "unreviewed"
+    },
+    "GUD": {
+      "reason": "unreviewed"
+    },
+    "GUL": {
+      "reason": "unreviewed"
+    },
+    "GUN": {
+      "reason": "unreviewed"
+    },
+    "GUX": {
+      "reason": "unreviewed"
+    },
+    "GUY": {
+      "reason": "unreviewed",
+      "suggested_iso2": "GY"
+    },
+    "GUZ": {
+      "reason": "unreviewed"
+    },
+    "GZO": {
+      "reason": "unreviewed"
+    },
+    "GZS": {
+      "reason": "unreviewed"
+    },
+    "HAC": {
+      "reason": "unreviewed"
+    },
+    "HAU": {
+      "reason": "unreviewed"
+    },
+    "HGR": {
+      "reason": "fictional_or_alt_history",
+      "suggested_iso2": "DE"
+    },
+    "HIS": {
+      "reason": "unreviewed"
+    },
+    "HRR": {
+      "reason": "unreviewed"
+    },
+    "IBR": {
+      "reason": "unreviewed"
+    },
+    "IEA": {
+      "reason": "unreviewed"
+    },
+    "ILG": {
+      "reason": "unreviewed"
+    },
+    "IME": {
+      "reason": "unreviewed"
+    },
+    "IND": {
+      "reason": "unreviewed"
+    },
+    "IRA": {
+      "reason": "unreviewed"
+    },
+    "IRB": {
+      "reason": "unreviewed"
+    },
+    "IRC": {
+      "reason": "unreviewed"
+    },
+    "IRI": {
+      "reason": "unreviewed"
+    },
+    "IRK": {
+      "reason": "unreviewed"
+    },
+    "IRL": {
+      "reason": "unreviewed"
+    },
+    "IRP": {
+      "reason": "unreviewed"
+    },
+    "ISS": {
+      "reason": "unreviewed"
+    },
+    "JER": {
+      "reason": "unreviewed"
+    },
+    "JHR": {
+      "reason": "unreviewed"
+    },
+    "JJK": {
+      "reason": "unreviewed"
+    },
+    "JOL": {
+      "reason": "unreviewed"
+    },
+    "JST": {
+      "reason": "unreviewed"
+    },
+    "KAL": {
+      "reason": "unreviewed"
+    },
+    "KAY": {
+      "reason": "unreviewed"
+    },
+    "KBA": {
+      "reason": "unreviewed"
+    },
+    "KBY": {
+      "reason": "unreviewed"
+    },
+    "KEM": {
+      "reason": "unreviewed"
+    },
+    "KHP": {
+      "reason": "unreviewed"
+    },
+    "KLB": {
+      "reason": "unreviewed"
+    },
+    "KLT": {
+      "reason": "unreviewed"
+    },
+    "KMC": {
+      "reason": "unreviewed"
+    },
+    "KNM": {
+      "reason": "unreviewed"
+    },
+    "KOM": {
+      "reason": "unreviewed"
+    },
+    "KOR": {
+      "reason": "split_state"
+    },
+    "KRK": {
+      "reason": "unreviewed"
+    },
+    "KRL": {
+      "reason": "unreviewed"
+    },
+    "KRS": {
+      "reason": "unreviewed"
+    },
+    "KSI": {
+      "reason": "unreviewed"
+    },
+    "KSS": {
+      "reason": "unreviewed"
+    },
+    "KTG": {
+      "reason": "unreviewed"
+    },
+    "KUR": {
+      "reason": "unreviewed"
+    },
+    "KYK": {
+      "reason": "unreviewed"
+    },
+    "KZR": {
+      "reason": "unreviewed"
+    },
+    "LHH": {
+      "reason": "unreviewed"
+    },
+    "LTH": {
+      "reason": "unreviewed"
+    },
+    "LUO": {
+      "reason": "unreviewed"
+    },
+    "MAC": {
+      "reason": "unreviewed"
+    },
+    "MAG": {
+      "reason": "unreviewed"
+    },
+    "MAN": {
+      "reason": "split_state",
+      "suggested_iso2": "CN"
+    },
+    "MAU": {
+      "reason": "unreviewed"
+    },
+    "MCW": {
+      "reason": "unreviewed"
+    },
+    "MDG": {
+      "reason": "unreviewed"
+    },
+    "MDI": {
+      "reason": "unreviewed"
+    },
+    "MDM": {
+      "reason": "unreviewed"
+    },
+    "MEN": {
+      "reason": "historical_union_or_predecessor"
+    },
+    "MGN": {
+      "reason": "unreviewed"
+    },
+    "MKS": {
+      "reason": "unreviewed"
+    },
+    "MLY": {
+      "reason": "unreviewed"
+    },
+    "MOC": {
+      "reason": "unreviewed"
+    },
+    "MOM": {
+      "reason": "unreviewed"
+    },
+    "MPR": {
+      "reason": "unreviewed"
+    },
+    "MST": {
+      "reason": "split_state"
+    },
+    "NAM": {
+      "reason": "unreviewed"
+    },
+    "NCC": {
+      "reason": "unreviewed"
+    },
+    "NII": {
+      "reason": "unreviewed"
+    },
+    "NNG": {
+      "reason": "unreviewed"
+    },
+    "NOV": {
+      "reason": "unreviewed"
+    },
+    "NRB": {
+      "reason": "unreviewed"
+    },
+    "NRL": {
+      "reason": "unreviewed"
+    },
+    "NTG": {
+      "reason": "unreviewed"
+    },
+    "NYM": {
+      "reason": "unreviewed"
+    },
+    "OER": {
+      "reason": "unreviewed"
+    },
+    "OFN": {
+      "reason": "unreviewed"
+    },
+    "OKB": {
+      "reason": "unreviewed"
+    },
+    "OKL": {
+      "reason": "unreviewed"
+    },
+    "OMB": {
+      "reason": "unreviewed"
+    },
+    "OMI": {
+      "reason": "unreviewed"
+    },
+    "OMO": {
+      "reason": "unreviewed"
+    },
+    "OMS": {
+      "reason": "unreviewed"
+    },
+    "ONG": {
+      "reason": "unreviewed"
+    },
+    "ORE": {
+      "reason": "unreviewed"
+    },
+    "ORM": {
+      "reason": "unreviewed"
+    },
+    "OST": {
+      "reason": "split_state"
+    },
+    "OVB": {
+      "reason": "unreviewed"
+    },
+    "PAC": {
+      "reason": "unreviewed"
+    },
+    "PAD": {
+      "reason": "unreviewed"
+    },
+    "PAP": {
+      "reason": "unreviewed"
+    },
+    "PIC": {
+      "reason": "unreviewed"
+    },
+    "PKT": {
+      "reason": "unreviewed"
+    },
+    "PMT": {
+      "reason": "unreviewed"
+    },
+    "PPR": {
+      "reason": "unreviewed"
+    },
+    "PRC": {
+      "reason": "split_state",
+      "suggested_iso2": "CN"
+    },
+    "PRK": {
+      "reason": "unreviewed"
+    },
+    "PRM": {
+      "reason": "unreviewed"
+    },
+    "PUR": {
+      "reason": "unreviewed"
+    },
+    "QIN": {
+      "reason": "unreviewed"
+    },
+    "QUE": {
+      "reason": "unreviewed"
+    },
+    "RFI": {
+      "reason": "unreviewed"
+    },
+    "RIF": {
+      "reason": "unreviewed"
+    },
+    "RMB": {
+      "reason": "unreviewed"
+    },
+    "RMN": {
+      "reason": "unreviewed"
+    },
+    "RPP": {
+      "reason": "unreviewed"
+    },
+    "RPS": {
+      "reason": "unreviewed"
+    },
+    "RPY": {
+      "reason": "unreviewed"
+    },
+    "RSD": {
+      "reason": "unreviewed"
+    },
+    "RSL": {
+      "reason": "unreviewed"
+    },
+    "RSQ": {
+      "reason": "unreviewed"
+    },
+    "RSZ": {
+      "reason": "unreviewed"
+    },
+    "SAA": {
+      "reason": "unreviewed"
+    },
+    "SAB": {
+      "reason": "unreviewed"
+    },
+    "SAM": {
+      "reason": "unreviewed"
+    },
+    "SAO": {
+      "reason": "unreviewed"
+    },
+    "SBA": {
+      "reason": "unreviewed"
+    },
+    "SCO": {
+      "reason": "unreviewed"
+    },
+    "SDF": {
+      "reason": "unreviewed"
+    },
+    "SDS": {
+      "reason": "unreviewed"
+    },
+    "SER": {
+      "reason": "unreviewed"
+    },
+    "SFG": {
+      "reason": "unreviewed"
+    },
+    "SGR": {
+      "reason": "fictional_or_alt_history",
+      "suggested_iso2": "DE"
+    },
+    "SGV": {
+      "reason": "unreviewed"
+    },
+    "SHO": {
+      "reason": "unreviewed"
+    },
+    "SHX": {
+      "reason": "warlord_or_regional_tag",
+      "suggested_iso2": "CN"
+    },
+    "SIC": {
+      "reason": "unreviewed"
+    },
+    "SIK": {
+      "reason": "unsupported_runtime_country",
+      "suggested_iso2": "XJ"
+    },
+    "SKN": {
+      "reason": "unreviewed"
+    },
+    "SLB": {
+      "reason": "unreviewed"
+    },
+    "SLF": {
+      "reason": "unreviewed"
+    },
+    "SLG": {
+      "reason": "unreviewed"
+    },
+    "SLS": {
+      "reason": "unreviewed"
+    },
+    "SLU": {
+      "reason": "unreviewed"
+    },
+    "SML": {
+      "reason": "unreviewed"
+    },
+    "SNI": {
+      "reason": "unreviewed"
+    },
+    "SNM": {
+      "reason": "unreviewed"
+    },
+    "SNS": {
+      "reason": "unreviewed"
+    },
+    "SOR": {
+      "reason": "unreviewed"
+    },
+    "SPA": {
+      "reason": "unreviewed"
+    },
+    "SPH": {
+      "reason": "unreviewed"
+    },
+    "SPS": {
+      "reason": "unreviewed"
+    },
+    "SRB": {
+      "reason": "unreviewed"
+    },
+    "SRK": {
+      "reason": "unreviewed"
+    },
+    "SRT": {
+      "reason": "unreviewed"
+    },
+    "SSF": {
+      "reason": "unreviewed"
+    },
+    "SSL": {
+      "reason": "unreviewed"
+    },
+    "SSN": {
+      "reason": "unreviewed"
+    },
+    "SSW": {
+      "reason": "unreviewed"
+    },
+    "STC": {
+      "reason": "unreviewed"
+    },
+    "SUS": {
+      "reason": "unreviewed"
+    },
+    "SVI": {
+      "reason": "unreviewed"
+    },
+    "SVR": {
+      "reason": "unreviewed"
+    },
+    "SWB": {
+      "reason": "unreviewed"
+    },
+    "SWZ": {
+      "reason": "unreviewed"
+    },
+    "TAN": {
+      "reason": "unreviewed"
+    },
+    "TAR": {
+      "reason": "unreviewed"
+    },
+    "TBA": {
+      "reason": "unreviewed"
+    },
+    "THA": {
+      "reason": "unreviewed"
+    },
+    "TIB": {
+      "reason": "unsupported_runtime_country",
+      "suggested_iso2": "XZ"
+    },
+    "TMA": {
+      "reason": "unreviewed"
+    },
+    "TMB": {
+      "reason": "unreviewed"
+    },
+    "TMC": {
+      "reason": "unreviewed"
+    },
+    "TMD": {
+      "reason": "unreviewed"
+    },
+    "TME": {
+      "reason": "unreviewed"
+    },
+    "TMF": {
+      "reason": "unreviewed"
+    },
+    "TMG": {
+      "reason": "unreviewed"
+    },
+    "TMH": {
+      "reason": "unreviewed"
+    },
+    "TMI": {
+      "reason": "unreviewed"
+    },
+    "TMJ": {
+      "reason": "unreviewed"
+    },
+    "TMK": {
+      "reason": "unreviewed"
+    },
+    "TML": {
+      "reason": "unreviewed"
+    },
+    "TMM": {
+      "reason": "unreviewed"
+    },
+    "TMN": {
+      "reason": "unreviewed"
+    },
+    "TMO": {
+      "reason": "unreviewed"
+    },
+    "TMP": {
+      "reason": "unreviewed"
+    },
+    "TMQ": {
+      "reason": "unreviewed"
+    },
+    "TMR": {
+      "reason": "unreviewed"
+    },
+    "TMT": {
+      "reason": "unreviewed"
+    },
+    "TMU": {
+      "reason": "unreviewed"
+    },
+    "TMV": {
+      "reason": "unreviewed"
+    },
+    "TMW": {
+      "reason": "unreviewed"
+    },
+    "TMX": {
+      "reason": "unreviewed"
+    },
+    "TMY": {
+      "reason": "unreviewed"
+    },
+    "TND": {
+      "reason": "unreviewed"
+    },
+    "TNS": {
+      "reason": "unreviewed"
+    },
+    "TNZ": {
+      "reason": "unreviewed"
+    },
+    "TOM": {
+      "reason": "unreviewed"
+    },
+    "TOO": {
+      "reason": "unreviewed"
+    },
+    "TRK": {
+      "reason": "unreviewed"
+    },
+    "TRZ": {
+      "reason": "unreviewed"
+    },
+    "TYM": {
+      "reason": "unreviewed"
+    },
+    "UAR": {
+      "reason": "unreviewed"
+    },
+    "UFK": {
+      "reason": "unreviewed"
+    },
+    "UGD": {
+      "reason": "unreviewed"
+    },
+    "UKS": {
+      "reason": "unreviewed"
+    },
+    "ULS": {
+      "reason": "unreviewed"
+    },
+    "UPH": {
+      "reason": "unreviewed"
+    },
+    "UPO": {
+      "reason": "unreviewed"
+    },
+    "URL": {
+      "reason": "unreviewed"
+    },
+    "URP": {
+      "reason": "unreviewed"
+    },
+    "USC": {
+      "reason": "unreviewed"
+    },
+    "UTL": {
+      "reason": "unreviewed"
+    },
+    "UYG": {
+      "reason": "unreviewed"
+    },
+    "VAC": {
+      "reason": "unreviewed"
+    },
+    "VIC": {
+      "reason": "unreviewed"
+    },
+    "VIL": {
+      "reason": "unreviewed"
+    },
+    "VIN": {
+      "reason": "split_state"
+    },
+    "VOL": {
+      "reason": "unreviewed"
+    },
+    "VOR": {
+      "reason": "unreviewed"
+    },
+    "VYT": {
+      "reason": "unreviewed"
+    },
+    "WAL": {
+      "reason": "unreviewed"
+    },
+    "WIN": {
+      "reason": "unreviewed"
+    },
+    "WOL": {
+      "reason": "unreviewed"
+    },
+    "WRS": {
+      "reason": "unreviewed"
+    },
+    "WSM": {
+      "reason": "unreviewed"
+    },
+    "XIK": {
+      "reason": "unreviewed"
+    },
+    "XIN": {
+      "reason": "unreviewed"
+    },
+    "YAK": {
+      "reason": "unreviewed"
+    },
+    "YGR": {
+      "reason": "unreviewed"
+    },
+    "YOR": {
+      "reason": "unreviewed"
+    },
+    "YUN": {
+      "reason": "unreviewed"
+    },
+    "ZAR": {
+      "reason": "unreviewed"
+    },
+    "ZBO": {
+      "reason": "unreviewed"
+    },
+    "ZLT": {
+      "reason": "unreviewed"
+    },
+    "ZMO": {
+      "reason": "unreviewed"
+    },
+    "ZOM": {
+      "reason": "unreviewed"
+    },
+    "ZUL": {
+      "reason": "unreviewed"
+    },
+    "ZZB": {
+      "reason": "unreviewed"
+    },
+    "ZZS": {
+      "reason": "unreviewed"
+    },
+    "ZZZ": {
+      "reason": "unreviewed"
+    }
+  }
+}

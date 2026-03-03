@@ -1,0 +1,114 @@
+{
+  "palette_id": "red_flood",
+  "mapping_policy": "conservative",
+  "inherit_verified_from_palette_id": "hoi4_vanilla",
+  "inherit_exact_verified": true,
+  "inherit_alias_verified": true,
+  "verified_exact_tag_to_iso2": {},
+  "verified_alias_tag_to_iso2": {},
+  "deny_tags": {
+    "WLL": {
+      "reason": "fictional_or_alt_history"
+    },
+    "PRS": {
+      "reason": "fictional_or_alt_history"
+    },
+    "LEO": {
+      "reason": "fictional_or_alt_history"
+    },
+    "TRS": {
+      "reason": "fictional_or_alt_history"
+    },
+    "FMO": {
+      "reason": "fictional_or_alt_history"
+    },
+    "WRR": {
+      "reason": "fictional_or_alt_history"
+    },
+    "GOE": {
+      "reason": "fictional_or_alt_history"
+    },
+    "RUS": {
+      "reason": "fictional_or_alt_history",
+      "suggested_iso2": "RU"
+    },
+    "SOV": {
+      "reason": "historical_union_or_predecessor"
+    },
+    "YUG": {
+      "reason": "historical_union_or_predecessor"
+    },
+    "CZE": {
+      "reason": "historical_union_or_predecessor"
+    },
+    "KOR": {
+      "reason": "split_state"
+    }
+  },
+  "display_name_overrides": {
+    "GER": "Germany",
+    "RUS": "Russia",
+    "SOV": "Soviet Union",
+    "USA": "United States",
+    "ENG": "United Kingdom",
+    "FRA": "France",
+    "ITA": "Italy",
+    "JAP": "Japan",
+    "CHI": "China",
+    "POL": "Poland",
+    "TUR": "Turkey",
+    "CAN": "Canada",
+    "AST": "Australia",
+    "HOL": "Netherlands",
+    "SWE": "Sweden",
+    "FIN": "Finland",
+    "ROM": "Romania",
+    "YUG": "Yugoslavia",
+    "CZE": "Czechoslovakia",
+    "SPR": "Spain",
+    "UKR": "Ukraine",
+    "SAF": "South Africa",
+    "RAJ": "India",
+    "KOR": "Korea"
+  },
+  "display_name_suffix_priority": [
+    "progressivism",
+    "liberalism",
+    "conservatism",
+    "right_authoritarianism",
+    "despotism",
+    "revisionist_socialism",
+    "popular_socialism",
+    "vanguard_socialism",
+    "anarchism",
+    "reactionism",
+    "accelerationism"
+  ],
+  "quick_tags": [
+    "GER",
+    "RUS",
+    "SOV",
+    "USA",
+    "ENG",
+    "FRA",
+    "ITA",
+    "JAP",
+    "CHI",
+    "POL",
+    "TUR",
+    "CAN",
+    "AST",
+    "HOL",
+    "SWE",
+    "FIN",
+    "ROM",
+    "YUG",
+    "CZE",
+    "SPR",
+    "UKR",
+    "SAF",
+    "RAJ",
+    "KOR"
+  ],
+  "ocean_fill": "#373b42"
+}

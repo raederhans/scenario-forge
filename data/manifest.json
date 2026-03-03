@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-03T01:49:42Z",
+  "generated_at": "2026-03-03T02:44:37.340699+00:00",
   "outputs": {
     "europe_topology.json": {
       "role": "primary_topology",
@@ -98,28 +98,55 @@
     },
     "locales.json": {
       "role": "locales",
-      "size_bytes": 3347576,
-      "sha256": "db7888496f316d42e365005f7cdd11a1507ee023a077cb13a57732718012e7d6",
+      "size_bytes": 3347672,
+      "sha256": "2ce61499d5372ffecd690d0d550c3e83fe3b780b1e29124484111fbcf39bc399",
       "type": "locales",
       "geo_entry_count": 34892,
-      "ui_entry_count": 90
+      "ui_entry_count": 91
     },
     "palettes/index.json": {
       "role": "palette_registry",
-      "size_bytes": 289,
-      "sha256": "1f91e43952ef160afcf8ccbc4d0678b57d3df6e02415e923c7ebaf23996d6b68",
+      "size_bytes": 1374,
+      "sha256": "6eb3de3fa3549070d7d287c16c4f6389dc4755d7ab59c82d6038e3f37c63c4ff",
       "type": "palette_registry",
-      "palette_count": 1,
-      "default_palette_id": "hoi4_vanilla"
+      "default_palette_id": "hoi4_vanilla",
+      "palette_count": 4
     },
     "palettes/hoi4_vanilla.palette.json": {
       "role": "palette_pack",
-      "size_bytes": 165956,
-      "sha256": "7fd8fd4f347271832283daee0c938263021018c834ce59ab31c4dd503d6d5809",
+      "size_bytes": 203719,
+      "sha256": "b2aec788fe39dd54137a4b957a6ecf99de9dae8a95fc427305463b063164d410",
       "type": "palette_pack",
       "palette_id": "hoi4_vanilla",
       "entry_count": 427,
       "quick_tag_count": 24
+    },
+    "palettes/kaiserreich.palette.json": {
+      "role": "palette_pack",
+      "size_bytes": 149011,
+      "sha256": "d3f6fe0ac7ddfe1aaeb7a0240c95906b64d77aa165b46962cfff751829986e6b",
+      "type": "palette_pack",
+      "palette_id": "kaiserreich",
+      "entry_count": 331,
+      "quick_tag_count": 23
+    },
+    "palettes/tno.palette.json": {
+      "role": "palette_pack",
+      "size_bytes": 234896,
+      "sha256": "53be9a47d55f6c999c2e5b48e9fdf0a4218822ba40de85a9885e7207a2f20b0e",
+      "type": "palette_pack",
+      "palette_id": "tno",
+      "entry_count": 511,
+      "quick_tag_count": 24
+    },
+    "palettes/red_flood.palette.json": {
+      "role": "palette_pack",
+      "size_bytes": 140841,
+      "sha256": "41ac666be9ba6ed26a026968411ad5048bf3a6772667b3f7ff7ac632dab9215e",
+      "type": "palette_pack",
+      "palette_id": "red_flood",
+      "entry_count": 307,
+      "quick_tag_count": 23
     },
     "palette-maps/hoi4_vanilla.map.json": {
       "role": "palette_map",
@@ -130,15 +157,72 @@
       "mapped_count": 155,
       "unmapped_count": 272
     },
+    "palette-maps/kaiserreich.map.json": {
+      "role": "palette_map",
+      "size_bytes": 26822,
+      "sha256": "e230d3f51668baa87d1f12964ab4a4f3166be17dd63fb85b94814d5ed48b8971",
+      "type": "palette_map",
+      "palette_id": "kaiserreich",
+      "mapped_count": 127,
+      "unmapped_count": 204
+    },
+    "palette-maps/tno.map.json": {
+      "role": "palette_map",
+      "size_bytes": 34233,
+      "sha256": "eba9ae8ab9ee88540363ad15ec51aeb9536b9df45785ee5fdc7140d1162c87e1",
+      "type": "palette_map",
+      "palette_id": "tno",
+      "mapped_count": 118,
+      "unmapped_count": 393
+    },
+    "palette-maps/red_flood.map.json": {
+      "role": "palette_map",
+      "size_bytes": 23917,
+      "sha256": "110e78028a91dc4cbfbf0f4103c007b071ecf79e353b281dc844a7fa1e6c4d13",
+      "type": "palette_map",
+      "palette_id": "red_flood",
+      "mapped_count": 110,
+      "unmapped_count": 197
+    },
     "palette-maps/hoi4_vanilla.audit.json": {
       "role": "palette_audit",
-      "size_bytes": 102356,
-      "sha256": "7a1815090fa2abba3c018315738124417724fae9f71753ec7c91f41cda9d47d2",
+      "size_bytes": 140010,
+      "sha256": "0717fdafc5f11db3c695e03e1a7a341af70a021a1ac109df9aaa4a2afe23fdb2",
       "type": "palette_audit",
       "palette_id": "hoi4_vanilla",
       "entry_count": 427,
       "mapped_count": 155,
       "unmapped_count": 272
+    },
+    "palette-maps/kaiserreich.audit.json": {
+      "role": "palette_audit",
+      "size_bytes": 107146,
+      "sha256": "56a4fdbd0b06188bd20b63bd500ca7c2f60e7c3833f896d48e0fc895300ea7e5",
+      "type": "palette_audit",
+      "palette_id": "kaiserreich",
+      "entry_count": 331,
+      "mapped_count": 127,
+      "unmapped_count": 204
+    },
+    "palette-maps/tno.audit.json": {
+      "role": "palette_audit",
+      "size_bytes": 160744,
+      "sha256": "3d2f0421d307057989b6c7793dcd2c6647e9f64e65d3f01d32f75313c0020e4e",
+      "type": "palette_audit",
+      "palette_id": "tno",
+      "entry_count": 511,
+      "mapped_count": 118,
+      "unmapped_count": 393
+    },
+    "palette-maps/red_flood.audit.json": {
+      "role": "palette_audit",
+      "size_bytes": 101053,
+      "sha256": "000a3a2e6c8d631af985e838d45f9f189406835ea4ff7fc58b73f4556469277e",
+      "type": "palette_audit",
+      "palette_id": "red_flood",
+      "entry_count": 307,
+      "mapped_count": 110,
+      "unmapped_count": 197
     }
   }
 }

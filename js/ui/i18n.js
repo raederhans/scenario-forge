@@ -63,6 +63,7 @@ function updateUIText() {
     ["lblOceanOpacity", "Opacity"],
     ["lblOceanScale", "Scale"],
     ["lblOceanContourStrength", "Contour Strength"],
+    ["labelAutoFillStyle", "Auto-Fill Style"],
     ["lblParentBorders", "Parent Unit Borders"],
     ["lblParentBorderColor", "Color"],
     ["lblParentBorderOpacity", "Opacity"],

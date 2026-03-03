@@ -201,6 +201,15 @@ async function bootstrap() {
       || state.currentPaletteTheme
       || "HOI4 Vanilla"
     );
+    state.palettePackCacheById = state.palettePackCacheById || {};
+    state.paletteMapCacheById = state.paletteMapCacheById || {};
+    state.paletteLoadErrorById = state.paletteLoadErrorById || {};
+    if (state.activePaletteId && activePalettePack) {
+      state.palettePackCacheById[state.activePaletteId] = activePalettePack;
+    }
+    if (state.activePaletteId && activePaletteMap) {
+      state.paletteMapCacheById[state.activePaletteId] = activePaletteMap;
+    }
     applyActivePaletteState({ overwriteCountryPalette: true });
     processHierarchyData(hierarchy);
 

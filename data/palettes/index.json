@@ -1,12 +1,41 @@
 {
-  "version": 1,
+  "version": 2,
   "default_palette_id": "hoi4_vanilla",
   "palettes": [
     {
       "palette_id": "hoi4_vanilla",
       "display_name": "HOI4 Vanilla",
+      "source_type": "game",
       "palette_url": "data/palettes/hoi4_vanilla.palette.json",
-      "map_url": "data/palette-maps/hoi4_vanilla.map.json"
+      "map_url": "data/palette-maps/hoi4_vanilla.map.json",
+      "audit_url": "data/palette-maps/hoi4_vanilla.audit.json"
+    },
+    {
+      "palette_id": "kaiserreich",
+      "display_name": "Kaiserreich",
+      "source_type": "game_mod",
+      "palette_url": "data/palettes/kaiserreich.palette.json",
+      "map_url": "data/palette-maps/kaiserreich.map.json",
+      "audit_url": "data/palette-maps/kaiserreich.audit.json",
+      "source_workshop_id": "1521695605"
+    },
+    {
+      "palette_id": "tno",
+      "display_name": "The New Order",
+      "source_type": "game_mod",
+      "palette_url": "data/palettes/tno.palette.json",
+      "map_url": "data/palette-maps/tno.map.json",
+      "audit_url": "data/palette-maps/tno.audit.json",
+      "source_workshop_id": "2438003901"
+    },
+    {
+      "palette_id": "red_flood",
+      "display_name": "Red Flood",
+      "source_type": "game_mod",
+      "palette_url": "data/palettes/red_flood.palette.json",
+      "map_url": "data/palette-maps/red_flood.map.json",
+      "audit_url": "data/palette-maps/red_flood.audit.json",
+      "source_workshop_id": "2815832636"
     }
   ]
 }

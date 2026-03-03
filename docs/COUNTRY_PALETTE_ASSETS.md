@@ -23,24 +23,34 @@ This keeps the app portable:
 - `data/palette-maps/*.manual.json`
   - import-time rules, not consumed by the browser
 
-## Current Default Pack
+## Current Packs
 
 - `hoi4_vanilla`
+- `kaiserreich`
+- `tno`
+- `red_flood`
 
 Runtime canonical identity remains ISO-2 country code because the map data contract is already built around `cntr_code` and runtime owner identity.
 
 ## Import Workflow
 
-Run:
+Rebuild all bundled palette assets:
+
+```bash
+python3 init_map_data.py --mode palettes
+```
+
+Import a single source directly:
 
 ```bash
 python3 tools/import_country_palette.py
 ```
 
-Optional:
+Examples:
 
 ```bash
 python3 tools/import_country_palette.py --source-root "/mnt/c/Program Files (x86)/Steam/steamapps/common/Hearts of Iron IV"
+python3 tools/import_country_palette.py --source-root "/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/394360/1521695605" --palette-id kaiserreich --display-name Kaiserreich --source-variant kaiserreich --source-workshop-id 1521695605 --manual-map data/palette-maps/kaiserreich.manual.json
 ```
 
 The importer reads:
@@ -49,7 +59,7 @@ The importer reads:
 - `common/country_tags/zz_dynamic_countries.txt`
 - `common/countries/colors.txt`
 - `common/countries/*.txt`
-- `localisation/english/countries_l_english.yml`
+- `localisation/english/**/*.yml`
 
 Runtime color priority:
 
@@ -102,3 +112,16 @@ The left palette UI now uses:
 Quick swatches are a curated subset. The full pack remains available through the browser list.
 
 The quick palette is intentionally fixed to a HOI4 big-power-first order and does not reuse `Recent` colors.
+
+## Mod-Specific Notes
+
+- Runtime never reads local HOI4 or workshop folders directly.
+- Local game / mod folders are import-time sources only.
+- `Auto-Fill Countries` always uses political fill.
+- For mod sources only, auto-fill also applies bundled ocean fill metadata:
+  - `kaiserreich`: `#304d66`
+  - `tno`: `#2d4769`
+  - `red_flood`: `#373b42`
+- `hoi4_vanilla` restores the app default ocean fill `#aadaff`.
+- Conservative mapping still applies to mods.
+- Unmapped mod tags remain searchable and selectable in the color library, but they do not participate in fixed country auto-fill.

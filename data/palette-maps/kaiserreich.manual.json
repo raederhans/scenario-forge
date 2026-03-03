@@ -1,0 +1,104 @@
+{
+  "palette_id": "kaiserreich",
+  "mapping_policy": "conservative",
+  "inherit_verified_from_palette_id": "hoi4_vanilla",
+  "inherit_exact_verified": true,
+  "inherit_alias_verified": true,
+  "verified_exact_tag_to_iso2": {},
+  "verified_alias_tag_to_iso2": {},
+  "deny_tags": {
+    "IMP": {
+      "reason": "fictional_or_alt_history",
+      "suggested_iso2": "IN"
+    },
+    "NFA": {
+      "reason": "fictional_or_alt_history",
+      "suggested_iso2": "FR"
+    },
+    "QIE": {
+      "reason": "split_state",
+      "suggested_iso2": "CN"
+    },
+    "FNG": {
+      "reason": "warlord_or_regional_tag",
+      "suggested_iso2": "CN"
+    },
+    "LEP": {
+      "reason": "warlord_or_regional_tag",
+      "suggested_iso2": "CN"
+    },
+    "SZC": {
+      "reason": "warlord_or_regional_tag",
+      "suggested_iso2": "CN"
+    },
+    "RUS": {
+      "reason": "fictional_or_alt_history",
+      "suggested_iso2": "RU"
+    }
+  },
+  "display_name_overrides": {
+    "GER": "German Empire",
+    "ENG": "Union of Britain",
+    "USA": "United States",
+    "RUS": "Russia",
+    "JAP": "Japan",
+    "FRA": "Commune of France",
+    "NFA": "National France",
+    "IMP": "Princely Federation",
+    "ITA": "Italy",
+    "CHI": "China",
+    "POL": "Poland",
+    "TUR": "Ottoman Empire",
+    "AUS": "Austria",
+    "BRA": "Brazil",
+    "MEX": "Mexico",
+    "ARG": "Argentina",
+    "HOL": "Netherlands",
+    "SWE": "Sweden",
+    "FIN": "Finland",
+    "ROM": "Romania",
+    "RAJ": "Dominion of India",
+    "CZE": "Czechoslovakia",
+    "UKR": "Ukraine",
+    "SAF": "South Africa"
+  },
+  "display_name_suffix_priority": [
+    "social_democrat",
+    "social_liberal",
+    "market_liberal",
+    "social_conservative",
+    "authoritarian_democrat",
+    "paternal_autocrat",
+    "national_populist",
+    "radical_socialist",
+    "syndicalist",
+    "totalist"
+  ],
+  "quick_tags": [
+    "GER",
+    "ENG",
+    "USA",
+    "RUS",
+    "JAP",
+    "FRA",
+    "NFA",
+    "IMP",
+    "ITA",
+    "CHI",
+    "POL",
+    "TUR",
+    "AUS",
+    "BRA",
+    "MEX",
+    "ARG",
+    "HOL",
+    "SWE",
+    "FIN",
+    "ROM",
+    "RAJ",
+    "CZE",
+    "UKR",
+    "SAF"
+  ],
+  "ocean_fill": "#304d66"
+}

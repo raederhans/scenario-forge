@@ -1,7 +1,7 @@
 {
   "version": 1,
   "palette_id": "hoi4_vanilla",
-  "generated_at": "2026-03-03T01:45:39.954289+00:00",
+  "generated_at": "2026-03-03T02:44:10.937523+00:00",
   "summary": {
     "total_entries": 427,
     "mapped_count": 155,
@@ -11,6 +11,8 @@
     "ABK": {
       "localized_name": "Abkhazia",
       "country_file_label": "Abkhazia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#33cc33",
       "ui_hex": "#248f24",
       "status": "unmapped",
@@ -19,6 +21,8 @@
     "ADU": {
       "localized_name": "Andalusia",
       "country_file_label": "Andalusia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#f0e69b",
       "ui_hex": "",
       "status": "unmapped",
@@ -27,6 +31,8 @@
     "AFA": {
       "localized_name": "Afar",
       "country_file_label": "Afar",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#990033",
       "ui_hex": "#4d0019",
       "status": "unmapped",
@@ -35,6 +41,8 @@
     "AFG": {
       "localized_name": "Afghanistan",
       "country_file_label": "Afghanistan",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#40a0a7",
       "ui_hex": "#53d0d9",
       "status": "mapped",
@@ -45,6 +53,8 @@
     "ALB": {
       "localized_name": "Albania",
       "country_file_label": "Albania",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#952d66",
       "ui_hex": "#c23b85",
       "status": "mapped",
@@ -55,6 +65,8 @@
     "ALG": {
       "localized_name": "Algeria",
       "country_file_label": "Algeria",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#996633",
       "ui_hex": "",
       "status": "mapped",
@@ -65,6 +77,8 @@
     "ALT": {
       "localized_name": "Altay",
       "country_file_label": "Altay",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ccffff",
       "ui_hex": "#00e6e6",
       "status": "unmapped",
@@ -73,6 +87,8 @@
     "ANG": {
       "localized_name": "Angola",
       "country_file_label": "Angola",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#258c3d",
       "ui_hex": "#258c3d",
       "status": "mapped",
@@ -83,6 +99,8 @@
     "ANU": {
       "localized_name": "Ainu",
       "country_file_label": "Ainu",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#80bfff",
       "ui_hex": "#0066cc",
       "status": "unmapped",
@@ -91,6 +109,8 @@
     "AOI": {
       "localized_name": "Africa Orientale Italiana",
       "country_file_label": "Italian East Africa",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#009933",
       "ui_hex": "#004d1a",
       "status": "unmapped",
@@ -99,6 +119,8 @@
     "ARG": {
       "localized_name": "Argentina",
       "country_file_label": "Argentina",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#919dec",
       "ui_hex": "#bdccff",
       "status": "mapped",
@@ -109,6 +131,8 @@
     "ARM": {
       "localized_name": "Armenia",
       "country_file_label": "Armenia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#b066b4",
       "ui_hex": "#b066b4",
       "status": "mapped",
@@ -119,6 +143,8 @@
     "AST": {
       "localized_name": "Australia",
       "country_file_label": "Australia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#398f61",
       "ui_hex": "#4aba7e",
       "status": "mapped",
@@ -129,6 +155,8 @@
     "ASY": {
       "localized_name": "Assyria",
       "country_file_label": "Assyria",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#800060",
       "ui_hex": "#4d0039",
       "status": "unmapped",
@@ -137,6 +165,8 @@
     "AUS": {
       "localized_name": "Austria",
       "country_file_label": "Austria",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#c2c6d7",
       "ui_hex": "#ffffff",
       "status": "mapped",
@@ -147,6 +177,8 @@
     "AZR": {
       "localized_name": "Azerbaijan",
       "country_file_label": "Azerbaijan",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#459731",
       "ui_hex": "#459731",
       "status": "mapped",
@@ -157,6 +189,8 @@
     "BAH": {
       "localized_name": "Bahamas",
       "country_file_label": "Bahamas",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ccffcc",
       "ui_hex": "",
       "status": "unmapped",
@@ -165,6 +199,8 @@
     "BAN": {
       "localized_name": "Bangladesh",
       "country_file_label": "Bangladesh",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#cccc00",
       "ui_hex": "",
       "status": "mapped",
@@ -175,6 +211,8 @@
     "BAR": {
       "localized_name": "Barotseland",
       "country_file_label": "Barotseland",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff4d4d",
       "ui_hex": "#cc0000",
       "status": "unmapped",
@@ -183,6 +221,8 @@
     "BAS": {
       "localized_name": "Antilles",
       "country_file_label": "British Antilles",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff6666",
       "ui_hex": "",
       "status": "unmapped",
@@ -191,6 +231,8 @@
     "BAY": {
       "localized_name": "Bavaria",
       "country_file_label": "Bavaria",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#e9e7f6",
       "ui_hex": "#e9e7f6",
       "status": "unmapped",
@@ -199,6 +241,8 @@
     "BEG": {
       "localized_name": "Benishangul-Gumuz",
       "country_file_label": "Benishangul-Gumuz",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffd480",
       "ui_hex": "#ffd480",
       "status": "unmapped",
@@ -207,6 +251,8 @@
     "BEL": {
       "localized_name": "Belgium",
       "country_file_label": "Belgium",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#c1ab08",
       "ui_hex": "#fbde0a",
       "status": "mapped",
@@ -217,6 +263,8 @@
     "BHR": {
       "localized_name": "Bahrain",
       "country_file_label": "Bahrain",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#e60000",
       "ui_hex": "#800000",
       "status": "mapped",
@@ -227,6 +275,8 @@
     "BHU": {
       "localized_name": "Bhutan",
       "country_file_label": "Bhutan",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ac7a58",
       "ui_hex": "#ac7a58",
       "status": "mapped",
@@ -237,6 +287,8 @@
     "BIA": {
       "localized_name": "Biafra",
       "country_file_label": "Biafra",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#009933",
       "ui_hex": "#004d1a",
       "status": "unmapped",
@@ -245,6 +297,8 @@
     "BLC": {
       "localized_name": "Balochistan",
       "country_file_label": "Balochistan",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#4d9900",
       "ui_hex": "#264d00",
       "status": "unmapped",
@@ -253,6 +307,8 @@
     "BLR": {
       "localized_name": "Belarus",
       "country_file_label": "Belarus",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#b4dcbe",
       "ui_hex": "#b4dcbe",
       "status": "mapped",
@@ -263,6 +319,8 @@
     "BLZ": {
       "localized_name": "Belize",
       "country_file_label": "Belize",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#00cccc",
       "ui_hex": "",
       "status": "mapped",
@@ -273,6 +331,8 @@
     "BOL": {
       "localized_name": "Bolivia",
       "country_file_label": "Bolivia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#cca66c",
       "ui_hex": "#ffeab1",
       "status": "mapped",
@@ -283,6 +343,8 @@
     "BOS": {
       "localized_name": "Bosnia",
       "country_file_label": "Bosnia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#cc6600",
       "ui_hex": "",
       "status": "unmapped",
@@ -291,6 +353,8 @@
     "BOT": {
       "localized_name": "Botswana",
       "country_file_label": "Botswana",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#0b8470",
       "ui_hex": "#0b8470",
       "status": "mapped",
@@ -301,6 +365,8 @@
     "BRA": {
       "localized_name": "Brazil",
       "country_file_label": "Brazil",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#4c913f",
       "ui_hex": "#63bd52",
       "status": "mapped",
@@ -311,6 +377,8 @@
     "BRD": {
       "localized_name": "Burundi",
       "country_file_label": "Burundi",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#cc9900",
       "ui_hex": "",
       "status": "mapped",
@@ -321,6 +389,8 @@
     "BRI": {
       "localized_name": "Brittany",
       "country_file_label": "Brittany",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#766397",
       "ui_hex": "",
       "status": "unmapped",
@@ -329,6 +399,8 @@
     "BRM": {
       "localized_name": "Burma",
       "country_file_label": "Burma",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#4c9900",
       "ui_hex": "",
       "status": "mapped",
@@ -339,6 +411,8 @@
     "BRN": {
       "localized_name": "Brunei",
       "country_file_label": "Brunei",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#e6e600",
       "ui_hex": "#b3b300",
       "status": "mapped",
@@ -349,6 +423,8 @@
     "BSK": {
       "localized_name": "Bashkortostan",
       "country_file_label": "Bashkortostan",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#33cc33",
       "ui_hex": "#248f24",
       "status": "unmapped",
@@ -357,6 +433,8 @@
     "BUK": {
       "localized_name": "Bukharan Republic",
       "country_file_label": "Bukharan Republic",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#cc9966",
       "ui_hex": "#ac7339",
       "status": "unmapped",
@@ -365,6 +443,8 @@
     "BUL": {
       "localized_name": "Bulgaria",
       "country_file_label": "Bulgaria",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#339b00",
       "ui_hex": "#339b00",
       "status": "mapped",
@@ -375,6 +455,8 @@
     "BYA": {
       "localized_name": "Buryatia",
       "country_file_label": "Buryatia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#0040ff",
       "ui_hex": "#002db3",
       "status": "unmapped",
@@ -383,6 +465,8 @@
     "CAM": {
       "localized_name": "Cambodia",
       "country_file_label": "Cambodia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#644796",
       "ui_hex": "#644796",
       "status": "mapped",
@@ -393,6 +477,8 @@
     "CAN": {
       "localized_name": "Canada",
       "country_file_label": "Canada",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#e93b3b",
       "ui_hex": "#9b3e33",
       "status": "mapped",
@@ -403,6 +489,8 @@
     "CAR": {
       "localized_name": "Central African Republic",
       "country_file_label": "Central African Republic",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#990000",
       "ui_hex": "",
       "status": "mapped",
@@ -413,6 +501,8 @@
     "CAT": {
       "localized_name": "Catalonia",
       "country_file_label": "Catalonia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#d5844c",
       "ui_hex": "",
       "status": "unmapped",
@@ -421,6 +511,8 @@
     "CAY": {
       "localized_name": "Guiana",
       "country_file_label": "Cayenne",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#3399ff",
       "ui_hex": "",
       "status": "unmapped",
@@ -429,6 +521,8 @@
     "CBV": {
       "localized_name": "Cabo Verde",
       "country_file_label": "Cabo Verde",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#0066cc",
       "ui_hex": "#003366",
       "status": "mapped",
@@ -439,6 +533,8 @@
     "CHA": {
       "localized_name": "Chad",
       "country_file_label": "Chad",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ccffcc",
       "ui_hex": "",
       "status": "mapped",
@@ -449,6 +545,8 @@
     "CHI": {
       "localized_name": "China",
       "country_file_label": "China",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#28288c",
       "ui_hex": "#28288c",
       "status": "mapped",
@@ -459,6 +557,8 @@
     "CHL": {
       "localized_name": "Chile",
       "country_file_label": "Chile",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#9b656b",
       "ui_hex": "#ca838b",
       "status": "mapped",
@@ -469,6 +569,8 @@
     "CHM": {
       "localized_name": "Champa",
       "country_file_label": "Champa",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#2e2eb8",
       "ui_hex": "#1f1f7a",
       "status": "unmapped",
@@ -477,6 +579,8 @@
     "CHR": {
       "localized_name": "Charrua",
       "country_file_label": "Charrua",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#cc7a00",
       "ui_hex": "#4d2e00",
       "status": "unmapped",
@@ -485,6 +589,8 @@
     "CHU": {
       "localized_name": "Chuvashia",
       "country_file_label": "Chuvashia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#bf8040",
       "ui_hex": "#86592d",
       "status": "unmapped",
@@ -493,6 +599,8 @@
     "CIN": {
       "localized_name": "Chechnya Ingushetia",
       "country_file_label": "Chechnya Ingushetia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#00cc00",
       "ui_hex": "#009900",
       "status": "unmapped",
@@ -501,6 +609,8 @@
     "CIP": {
       "localized_name": "Central Indian Provinces",
       "country_file_label": "Central Indian Provinces",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#338d43",
       "ui_hex": "",
       "status": "unmapped",
@@ -509,6 +619,8 @@
     "CKK": {
       "localized_name": "Chukotka",
       "country_file_label": "Chukotka",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#b3b300",
       "ui_hex": "#808000",
       "status": "unmapped",
@@ -517,6 +629,8 @@
     "CMR": {
       "localized_name": "Cameroon",
       "country_file_label": "Cameroon",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff3300",
       "ui_hex": "",
       "status": "mapped",
@@ -527,6 +641,8 @@
     "COG": {
       "localized_name": "Congo",
       "country_file_label": "Congo",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#989fd1",
       "ui_hex": "#989fd1",
       "status": "unmapped",
@@ -536,6 +652,8 @@
     "COL": {
       "localized_name": "Colombia",
       "country_file_label": "Colombia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#debb5b",
       "ui_hex": "#fff376",
       "status": "mapped",
@@ -546,6 +664,8 @@
     "COR": {
       "localized_name": "Corsica",
       "country_file_label": "Corsica",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#6ab22e",
       "ui_hex": "",
       "status": "unmapped",
@@ -554,6 +674,8 @@
     "COS": {
       "localized_name": "Costa Rica",
       "country_file_label": "Costa Rica",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#98802b",
       "ui_hex": "#98802b",
       "status": "mapped",
@@ -564,6 +686,8 @@
     "CRC": {
       "localized_name": "Antilles",
       "country_file_label": "Curacao",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff6666",
       "ui_hex": "",
       "status": "unmapped",
@@ -572,6 +696,8 @@
     "CRI": {
       "localized_name": "Crimea",
       "country_file_label": "Crimea",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff5050",
       "ui_hex": "#cc0000",
       "status": "unmapped",
@@ -580,6 +706,8 @@
     "CRO": {
       "localized_name": "Croatia",
       "country_file_label": "Croatia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#e646b4",
       "ui_hex": "#e6ff7a",
       "status": "mapped",
@@ -590,6 +718,8 @@
     "CSA": {
       "localized_name": "Confederation of America",
       "country_file_label": "CSA",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#91a3b0",
       "ui_hex": "#bacddb",
       "status": "unmapped",
@@ -599,6 +729,8 @@
     "CUB": {
       "localized_name": "Cuba",
       "country_file_label": "Cuba",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#8c41a6",
       "ui_hex": "#8c41a6",
       "status": "mapped",
@@ -609,6 +741,8 @@
     "CYP": {
       "localized_name": "Cyprus",
       "country_file_label": "Cyprus",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffcc00",
       "ui_hex": "",
       "status": "mapped",
@@ -619,6 +753,8 @@
     "CZE": {
       "localized_name": "Czechoslovakia",
       "country_file_label": "Czechoslovakia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#36a79c",
       "ui_hex": "#46d9cb",
       "status": "unmapped",
@@ -627,6 +763,8 @@
     "D01": {
       "localized_name": "D01",
       "country_file_label": "D01",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#7ab361",
       "ui_hex": "#9fe97e",
       "status": "unmapped",
@@ -635,6 +773,8 @@
     "D02": {
       "localized_name": "D02",
       "country_file_label": "D02",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#c28c56",
       "ui_hex": "#fcb670",
       "status": "unmapped",
@@ -643,6 +783,8 @@
     "D03": {
       "localized_name": "D03",
       "country_file_label": "D03",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#c8641f",
       "ui_hex": "#f57b26",
       "status": "unmapped",
@@ -651,6 +793,8 @@
     "D04": {
       "localized_name": "D04",
       "country_file_label": "D04",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#5096b3",
       "ui_hex": "#59dbdc",
       "status": "unmapped",
@@ -659,6 +803,8 @@
     "D05": {
       "localized_name": "D05",
       "country_file_label": "D05",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#5c5cc5",
       "ui_hex": "#7474f7",
       "status": "unmapped",
@@ -667,6 +813,8 @@
     "D06": {
       "localized_name": "D06",
       "country_file_label": "D06",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#9a4574",
       "ui_hex": "#c85a97",
       "status": "unmapped",
@@ -675,6 +823,8 @@
     "D07": {
       "localized_name": "D07",
       "country_file_label": "D07",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#c3959b",
       "ui_hex": "#fec2ca",
       "status": "unmapped",
@@ -683,6 +833,8 @@
     "D08": {
       "localized_name": "D08",
       "country_file_label": "D08",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#d26a2f",
       "ui_hex": "#ff8a3d",
       "status": "unmapped",
@@ -691,6 +843,8 @@
     "D09": {
       "localized_name": "D09",
       "country_file_label": "D09",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#699356",
       "ui_hex": "#95d27b",
       "status": "unmapped",
@@ -699,6 +853,8 @@
     "D10": {
       "localized_name": "D10",
       "country_file_label": "D10",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#afa26c",
       "ui_hex": "#ddcb87",
       "status": "unmapped",
@@ -707,6 +863,8 @@
     "D11": {
       "localized_name": "D11",
       "country_file_label": "D11",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#7c8ca2",
       "ui_hex": "#a1b6d3",
       "status": "unmapped",
@@ -715,6 +873,8 @@
     "D12": {
       "localized_name": "D12",
       "country_file_label": "D12",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#bb4f56",
       "ui_hex": "#f36770",
       "status": "unmapped",
@@ -723,6 +883,8 @@
     "D13": {
       "localized_name": "D13",
       "country_file_label": "D13",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#459dd0",
       "ui_hex": "#5accff",
       "status": "unmapped",
@@ -731,6 +893,8 @@
     "D14": {
       "localized_name": "D14",
       "country_file_label": "D14",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#8e4fc8",
       "ui_hex": "#b062f9",
       "status": "unmapped",
@@ -739,286 +903,358 @@
     "D15": {
       "localized_name": "D15",
       "country_file_label": "D15",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#7ab361",
       "ui_hex": "#9fe97e",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D16": {
-      "localized_name": "D01",
+      "localized_name": "D16",
       "country_file_label": "D01",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#c28c56",
       "ui_hex": "#fcb670",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D17": {
-      "localized_name": "D02",
+      "localized_name": "D17",
       "country_file_label": "D02",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#c8641f",
       "ui_hex": "#f57b26",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D18": {
-      "localized_name": "D03",
+      "localized_name": "D18",
       "country_file_label": "D03",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#5096b3",
       "ui_hex": "#59dbdc",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D19": {
-      "localized_name": "D04",
+      "localized_name": "D19",
       "country_file_label": "D04",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#5c5cc5",
       "ui_hex": "#7474f7",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D20": {
-      "localized_name": "D05",
+      "localized_name": "D20",
       "country_file_label": "D05",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#9a4574",
       "ui_hex": "#c85a97",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D21": {
-      "localized_name": "D01",
+      "localized_name": "D21",
       "country_file_label": "D01",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#c3959b",
       "ui_hex": "#fec2ca",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D22": {
-      "localized_name": "D02",
+      "localized_name": "D22",
       "country_file_label": "D02",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#d26a2f",
       "ui_hex": "#ff8a3d",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D23": {
-      "localized_name": "D03",
+      "localized_name": "D23",
       "country_file_label": "D03",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#699356",
       "ui_hex": "#95d27b",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D24": {
-      "localized_name": "D04",
+      "localized_name": "D24",
       "country_file_label": "D04",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#afa26c",
       "ui_hex": "#ddcb87",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D25": {
-      "localized_name": "D05",
+      "localized_name": "D25",
       "country_file_label": "D05",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#7c8ca2",
       "ui_hex": "#a1b6d3",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D26": {
-      "localized_name": "D06",
+      "localized_name": "D26",
       "country_file_label": "D06",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#bb4f56",
       "ui_hex": "#f36770",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D27": {
-      "localized_name": "D07",
+      "localized_name": "D27",
       "country_file_label": "D07",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#459dd0",
       "ui_hex": "#5accff",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D28": {
-      "localized_name": "D08",
+      "localized_name": "D28",
       "country_file_label": "D08",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#8e4fc8",
       "ui_hex": "#b062f9",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D29": {
-      "localized_name": "D09",
+      "localized_name": "D29",
       "country_file_label": "D09",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#7ab361",
       "ui_hex": "#9fe97e",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D30": {
-      "localized_name": "D05",
+      "localized_name": "D30",
       "country_file_label": "D05",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#c28c56",
       "ui_hex": "#fcb670",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D31": {
-      "localized_name": "D01",
+      "localized_name": "D31",
       "country_file_label": "D01",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#c8641f",
       "ui_hex": "#f57b26",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D32": {
-      "localized_name": "D02",
+      "localized_name": "D32",
       "country_file_label": "D02",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#5096b3",
       "ui_hex": "#59dbdc",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D33": {
-      "localized_name": "D03",
+      "localized_name": "D33",
       "country_file_label": "D03",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#5c5cc5",
       "ui_hex": "#7474f7",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D34": {
-      "localized_name": "D04",
+      "localized_name": "D34",
       "country_file_label": "D04",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#9a4574",
       "ui_hex": "#c85a97",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D35": {
-      "localized_name": "D05",
+      "localized_name": "D35",
       "country_file_label": "D05",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#c3959b",
       "ui_hex": "#fec2ca",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D36": {
-      "localized_name": "D06",
+      "localized_name": "D36",
       "country_file_label": "D06",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#d26a2f",
       "ui_hex": "#ff8a3d",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D37": {
-      "localized_name": "D07",
+      "localized_name": "D37",
       "country_file_label": "D07",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#699356",
       "ui_hex": "#95d27b",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D38": {
-      "localized_name": "D08",
+      "localized_name": "D38",
       "country_file_label": "D08",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#afa26c",
       "ui_hex": "#ddcb87",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D39": {
-      "localized_name": "D09",
+      "localized_name": "D39",
       "country_file_label": "D09",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#7c8ca2",
       "ui_hex": "#a1b6d3",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D40": {
-      "localized_name": "D05",
+      "localized_name": "D40",
       "country_file_label": "D05",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#bb4f56",
       "ui_hex": "#f36770",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D41": {
-      "localized_name": "D01",
+      "localized_name": "D41",
       "country_file_label": "D01",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#459dd0",
       "ui_hex": "#5accff",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D42": {
-      "localized_name": "D02",
+      "localized_name": "D42",
       "country_file_label": "D02",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#8e4fc8",
       "ui_hex": "#b062f9",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D43": {
-      "localized_name": "D03",
+      "localized_name": "D43",
       "country_file_label": "D03",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#7ab361",
       "ui_hex": "#9fe97e",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D44": {
-      "localized_name": "D04",
+      "localized_name": "D44",
       "country_file_label": "D04",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#c28c56",
       "ui_hex": "#fcb670",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D45": {
-      "localized_name": "D05",
+      "localized_name": "D45",
       "country_file_label": "D05",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#c8641f",
       "ui_hex": "#f57b26",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D46": {
-      "localized_name": "D06",
+      "localized_name": "D46",
       "country_file_label": "D06",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#5096b3",
       "ui_hex": "#59dbdc",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D47": {
-      "localized_name": "D07",
+      "localized_name": "D47",
       "country_file_label": "D07",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#5c5cc5",
       "ui_hex": "#7474f7",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D48": {
-      "localized_name": "D08",
+      "localized_name": "D48",
       "country_file_label": "D08",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#9a4574",
       "ui_hex": "#c85a97",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D49": {
-      "localized_name": "D09",
+      "localized_name": "D49",
       "country_file_label": "D09",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#c3959b",
       "ui_hex": "#fec2ca",
       "status": "unmapped",
       "reason": "dynamic_tag_not_mapped"
     },
     "D50": {
-      "localized_name": "D09",
+      "localized_name": "D50",
       "country_file_label": "D09",
+      "name_source": "tag_fallback",
+      "country_file_is_shared_template": true,
       "map_hex": "#d26a2f",
       "ui_hex": "#ff8a3d",
       "status": "unmapped",
@@ -1027,6 +1263,8 @@
     "D51": {
       "localized_name": "D51",
       "country_file_label": "D51",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#96960c",
       "ui_hex": "",
       "status": "unmapped",
@@ -1035,6 +1273,8 @@
     "D52": {
       "localized_name": "D52",
       "country_file_label": "D52",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#01cd80",
       "ui_hex": "",
       "status": "unmapped",
@@ -1043,6 +1283,8 @@
     "D53": {
       "localized_name": "D53",
       "country_file_label": "D53",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#808080",
       "ui_hex": "",
       "status": "unmapped",
@@ -1051,6 +1293,8 @@
     "D54": {
       "localized_name": "D54",
       "country_file_label": "D54",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#6e6756",
       "ui_hex": "",
       "status": "unmapped",
@@ -1059,6 +1303,8 @@
     "D55": {
       "localized_name": "D55",
       "country_file_label": "D55",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#649642",
       "ui_hex": "",
       "status": "unmapped",
@@ -1067,6 +1313,8 @@
     "D56": {
       "localized_name": "D56",
       "country_file_label": "D56",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#cc2140",
       "ui_hex": "",
       "status": "unmapped",
@@ -1075,6 +1323,8 @@
     "D57": {
       "localized_name": "D57",
       "country_file_label": "D57",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#bb8aed",
       "ui_hex": "",
       "status": "unmapped",
@@ -1083,6 +1333,8 @@
     "D58": {
       "localized_name": "D58",
       "country_file_label": "D58",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#dded8a",
       "ui_hex": "",
       "status": "unmapped",
@@ -1091,6 +1343,8 @@
     "D59": {
       "localized_name": "D59",
       "country_file_label": "D59",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#8abaed",
       "ui_hex": "",
       "status": "unmapped",
@@ -1099,6 +1353,8 @@
     "D60": {
       "localized_name": "D60",
       "country_file_label": "D60",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ed948a",
       "ui_hex": "",
       "status": "unmapped",
@@ -1107,6 +1363,8 @@
     "D61": {
       "localized_name": "D61",
       "country_file_label": "D61",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#538067",
       "ui_hex": "",
       "status": "unmapped",
@@ -1115,6 +1373,8 @@
     "D62": {
       "localized_name": "D62",
       "country_file_label": "D62",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#168bf7",
       "ui_hex": "",
       "status": "unmapped",
@@ -1123,6 +1383,8 @@
     "D63": {
       "localized_name": "D63",
       "country_file_label": "D63",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#f7b016",
       "ui_hex": "",
       "status": "unmapped",
@@ -1131,6 +1393,8 @@
     "D64": {
       "localized_name": "D64",
       "country_file_label": "D64",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#dbd9d3",
       "ui_hex": "",
       "status": "unmapped",
@@ -1139,6 +1403,8 @@
     "D65": {
       "localized_name": "D65",
       "country_file_label": "D65",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#c1d3e0",
       "ui_hex": "",
       "status": "unmapped",
@@ -1147,6 +1413,8 @@
     "D66": {
       "localized_name": "D66",
       "country_file_label": "D66",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ce90d1",
       "ui_hex": "",
       "status": "unmapped",
@@ -1155,6 +1423,8 @@
     "D67": {
       "localized_name": "D67",
       "country_file_label": "D67",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#584a66",
       "ui_hex": "",
       "status": "unmapped",
@@ -1163,6 +1433,8 @@
     "D68": {
       "localized_name": "D68",
       "country_file_label": "D68",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#46caf2",
       "ui_hex": "",
       "status": "unmapped",
@@ -1171,6 +1443,8 @@
     "D69": {
       "localized_name": "D69",
       "country_file_label": "D69",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#4cbf22",
       "ui_hex": "",
       "status": "unmapped",
@@ -1179,6 +1453,8 @@
     "D70": {
       "localized_name": "D70",
       "country_file_label": "D70",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#611216",
       "ui_hex": "",
       "status": "unmapped",
@@ -1187,6 +1463,8 @@
     "D71": {
       "localized_name": "D71",
       "country_file_label": "D71",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#1b26f5",
       "ui_hex": "",
       "status": "unmapped",
@@ -1195,6 +1473,8 @@
     "D72": {
       "localized_name": "D72",
       "country_file_label": "D72",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#bd0698",
       "ui_hex": "",
       "status": "unmapped",
@@ -1203,6 +1483,8 @@
     "D73": {
       "localized_name": "D73",
       "country_file_label": "D73",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#545424",
       "ui_hex": "",
       "status": "unmapped",
@@ -1211,6 +1493,8 @@
     "D74": {
       "localized_name": "D74",
       "country_file_label": "D74",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#245437",
       "ui_hex": "",
       "status": "unmapped",
@@ -1219,6 +1503,8 @@
     "D75": {
       "localized_name": "D75",
       "country_file_label": "D75",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#e3f8fa",
       "ui_hex": "",
       "status": "unmapped",
@@ -1227,6 +1513,8 @@
     "DAG": {
       "localized_name": "Dagestan",
       "country_file_label": "Dagestan",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#00ccff",
       "ui_hex": "#00a3cc",
       "status": "unmapped",
@@ -1235,6 +1523,8 @@
     "DAH": {
       "localized_name": "Benin",
       "country_file_label": "Dahomey",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#0033cc",
       "ui_hex": "",
       "status": "mapped",
@@ -1245,6 +1535,8 @@
     "DDR": {
       "localized_name": "Germany",
       "country_file_label": "East Germany",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#6a645f",
       "ui_hex": "",
       "status": "unmapped",
@@ -1254,6 +1546,8 @@
     "DEN": {
       "localized_name": "Denmark",
       "country_file_label": "Denmark",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#99745d",
       "ui_hex": "#c79779",
       "status": "mapped",
@@ -1264,6 +1558,8 @@
     "DIP": {
       "localized_name": "Partisans",
       "country_file_label": "Partisans",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#7d2931",
       "ui_hex": "#7d2931",
       "status": "unmapped",
@@ -1272,6 +1568,8 @@
     "DJI": {
       "localized_name": "Djibouti",
       "country_file_label": "Djibouti",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#006699",
       "ui_hex": "",
       "status": "mapped",
@@ -1282,6 +1580,8 @@
     "DNZ": {
       "localized_name": "Danzig",
       "country_file_label": "Danzig",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#4e8197",
       "ui_hex": "",
       "status": "unmapped",
@@ -1290,6 +1590,8 @@
     "DOM": {
       "localized_name": "Dominican Republic",
       "country_file_label": "Dominican Republic",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#9882bf",
       "ui_hex": "#c6a9f8",
       "status": "mapped",
@@ -1300,6 +1602,8 @@
     "DON": {
       "localized_name": "Don Republic",
       "country_file_label": "Don Republic",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffaa00",
       "ui_hex": "#b37700",
       "status": "unmapped",
@@ -1308,6 +1612,8 @@
     "ECU": {
       "localized_name": "Ecuador",
       "country_file_label": "Ecuador",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#f99262",
       "ui_hex": "#ffbe7f",
       "status": "mapped",
@@ -1318,6 +1624,8 @@
     "EGY": {
       "localized_name": "Egypt",
       "country_file_label": "Egypt",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#e6e646",
       "ui_hex": "#e6e646",
       "status": "mapped",
@@ -1328,6 +1636,8 @@
     "ELS": {
       "localized_name": "El Salvador",
       "country_file_label": "El Salvador",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#9882bf",
       "ui_hex": "#c6a9f8",
       "status": "mapped",
@@ -1338,6 +1648,8 @@
     "ENG": {
       "localized_name": "Britain",
       "country_file_label": "United Kingdom",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#c9385d",
       "ui_hex": "#ff4979",
       "status": "mapped",
@@ -1348,6 +1660,8 @@
     "EQG": {
       "localized_name": "Equatorial Guinea",
       "country_file_label": "Equatorial Guinea",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffcc00",
       "ui_hex": "",
       "status": "mapped",
@@ -1358,6 +1672,8 @@
     "ERI": {
       "localized_name": "Eritrea",
       "country_file_label": "Eritrea",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#993300",
       "ui_hex": "",
       "status": "mapped",
@@ -1368,6 +1684,8 @@
     "EST": {
       "localized_name": "Estonia",
       "country_file_label": "Estonia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#3287af",
       "ui_hex": "#63ccfe",
       "status": "mapped",
@@ -1378,6 +1696,8 @@
     "ETH": {
       "localized_name": "Ethiopia",
       "country_file_label": "Ethiopia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#9882bf",
       "ui_hex": "#c6a9f8",
       "status": "mapped",
@@ -1388,6 +1708,8 @@
     "EVE": {
       "localized_name": "Evenkia",
       "country_file_label": "Evenkia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#99ddff",
       "ui_hex": "#0077b3",
       "status": "unmapped",
@@ -1396,6 +1718,8 @@
     "EZO": {
       "localized_name": "Ezo Republic",
       "country_file_label": "Ezo Republic",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#666699",
       "ui_hex": "#47476b",
       "status": "unmapped",
@@ -1404,6 +1728,8 @@
     "FER": {
       "localized_name": "Fareastern Republic",
       "country_file_label": "Fareastern Republic",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#b32d00",
       "ui_hex": "#802000",
       "status": "unmapped",
@@ -1412,6 +1738,8 @@
     "FIJ": {
       "localized_name": "Fiji",
       "country_file_label": "Fiji",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#00cccc",
       "ui_hex": "",
       "status": "unmapped",
@@ -1420,6 +1748,8 @@
     "FIN": {
       "localized_name": "Finland",
       "country_file_label": "Finland",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#cdd4e4",
       "ui_hex": "#ffffff",
       "status": "mapped",
@@ -1430,6 +1760,8 @@
     "FOR": {
       "localized_name": "Formosa",
       "country_file_label": "Formosa",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#008080",
       "ui_hex": "#004d4d",
       "status": "unmapped",
@@ -1438,6 +1770,8 @@
     "FRA": {
       "localized_name": "France",
       "country_file_label": "France",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#3971e4",
       "ui_hex": "#4a93ff",
       "status": "mapped",
@@ -1448,6 +1782,8 @@
     "FSA": {
       "localized_name": "Federation of South Arabia",
       "country_file_label": "Federation of South Arabia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#00b33c",
       "ui_hex": "#006622",
       "status": "unmapped",
@@ -1456,6 +1792,8 @@
     "FSM": {
       "localized_name": "Micronesia",
       "country_file_label": "Micronesia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#76b3de",
       "ui_hex": "",
       "status": "unmapped",
@@ -1464,6 +1802,8 @@
     "GAB": {
       "localized_name": "Gabon",
       "country_file_label": "Gabon",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#33cccc",
       "ui_hex": "",
       "status": "mapped",
@@ -1474,6 +1814,8 @@
     "GAM": {
       "localized_name": "The Gambia",
       "country_file_label": "Gambia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#990000",
       "ui_hex": "",
       "status": "mapped",
@@ -1484,6 +1826,8 @@
     "GAR": {
       "localized_name": "Guarani",
       "country_file_label": "Guarani",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#8080ff",
       "ui_hex": "#000080",
       "status": "unmapped",
@@ -1492,6 +1836,8 @@
     "GBA": {
       "localized_name": "Gambela",
       "country_file_label": "Gambela",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#009933",
       "ui_hex": "#009933",
       "status": "unmapped",
@@ -1500,6 +1846,8 @@
     "GDC": {
       "localized_name": "Guangdong",
       "country_file_label": "Guangdong",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#2d8659",
       "ui_hex": "#194d33",
       "status": "unmapped",
@@ -1508,6 +1856,8 @@
     "GDL": {
       "localized_name": "Guadeloupe",
       "country_file_label": "Guadeloupe",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#99ffff",
       "ui_hex": "",
       "status": "unmapped",
@@ -1516,6 +1866,8 @@
     "GEN": {
       "localized_name": "Generalgouvernement",
       "country_file_label": "Generalgouvernement",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -1524,6 +1876,8 @@
     "GEO": {
       "localized_name": "Georgia",
       "country_file_label": "Georgia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff9696",
       "ui_hex": "#ffcccc",
       "status": "mapped",
@@ -1534,6 +1888,8 @@
     "GER": {
       "localized_name": "Germany",
       "country_file_label": "Germany",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#666057",
       "ui_hex": "#8a9b74",
       "status": "mapped",
@@ -1544,6 +1900,8 @@
     "GHA": {
       "localized_name": "Ghana",
       "country_file_label": "Ghana",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#666633",
       "ui_hex": "",
       "status": "mapped",
@@ -1554,6 +1912,8 @@
     "GLC": {
       "localized_name": "Galicia",
       "country_file_label": "Galicia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#f0a782",
       "ui_hex": "",
       "status": "unmapped",
@@ -1562,6 +1922,8 @@
     "GNA": {
       "localized_name": "Guinea",
       "country_file_label": "Guinea",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#6699ff",
       "ui_hex": "",
       "status": "mapped",
@@ -1572,6 +1934,8 @@
     "GNB": {
       "localized_name": "Guinea-Bissau",
       "country_file_label": "Guinea-Bissau",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#996600",
       "ui_hex": "",
       "status": "mapped",
@@ -1582,6 +1946,8 @@
     "GRE": {
       "localized_name": "Greece",
       "country_file_label": "Greece",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#5db5e3",
       "ui_hex": "#79ebff",
       "status": "mapped",
@@ -1592,6 +1958,8 @@
     "GRN": {
       "localized_name": "Greenland",
       "country_file_label": "Greenland",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff5050",
       "ui_hex": "#b30000",
       "status": "mapped",
@@ -1602,6 +1970,8 @@
     "GSM": {
       "localized_name": "Gansu Ma",
       "country_file_label": "Gansu Ma",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#693c64",
       "ui_hex": "#0c1a27",
       "status": "unmapped",
@@ -1610,6 +1980,8 @@
     "GUA": {
       "localized_name": "Guatemala",
       "country_file_label": "Guatemla",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#483170",
       "ui_hex": "#483170",
       "status": "mapped",
@@ -1620,6 +1992,8 @@
     "GUM": {
       "localized_name": "Mariana Islands",
       "country_file_label": "Guam",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#3cf064",
       "ui_hex": "",
       "status": "unmapped",
@@ -1628,6 +2002,8 @@
     "GXC": {
       "localized_name": "Guangxi",
       "country_file_label": "Guangxi",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#477161",
       "ui_hex": "#477161",
       "status": "unmapped",
@@ -1637,6 +2013,8 @@
     "GYA": {
       "localized_name": "Guyana",
       "country_file_label": "Guyana",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffcc99",
       "ui_hex": "",
       "status": "mapped",
@@ -1647,6 +2025,8 @@
     "HAI": {
       "localized_name": "Haiti",
       "country_file_label": "Haiti",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ae7171",
       "ui_hex": "#ae7171",
       "status": "mapped",
@@ -1657,6 +2037,8 @@
     "HAN": {
       "localized_name": "Hannover",
       "country_file_label": "Hanover",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff0000",
       "ui_hex": "#ff0000",
       "status": "unmapped",
@@ -1665,6 +2047,8 @@
     "HAR": {
       "localized_name": "Harar",
       "country_file_label": "Harar",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#f2f2f2",
       "ui_hex": "#ffffff",
       "status": "unmapped",
@@ -1673,6 +2057,8 @@
     "HAW": {
       "localized_name": "Hawai'i",
       "country_file_label": "Hawaii",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#e7b50c",
       "ui_hex": "",
       "status": "unmapped",
@@ -1681,6 +2067,8 @@
     "HBC": {
       "localized_name": "Hebei-Chahar",
       "country_file_label": "Hebei-Chahar",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#9c1b16",
       "ui_hex": "#5e110e",
       "status": "unmapped",
@@ -1689,6 +2077,8 @@
     "HES": {
       "localized_name": "Hesse",
       "country_file_label": "Hesse",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffb3b3",
       "ui_hex": "#b30000",
       "status": "unmapped",
@@ -1697,6 +2087,8 @@
     "HOL": {
       "localized_name": "Netherlands",
       "country_file_label": "Holland",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#cb8a4a",
       "ui_hex": "#ffb360",
       "status": "mapped",
@@ -1707,6 +2099,8 @@
     "HON": {
       "localized_name": "Honduras",
       "country_file_label": "Honduras",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#809141",
       "ui_hex": "#809141",
       "status": "mapped",
@@ -1717,6 +2111,8 @@
     "HRZ": {
       "localized_name": "Herzegovina",
       "country_file_label": "Herzegovina",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#4871a0",
       "ui_hex": "",
       "status": "unmapped",
@@ -1725,6 +2121,8 @@
     "HUN": {
       "localized_name": "Hungary",
       "country_file_label": "Hungary",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#f97e62",
       "ui_hex": "#ffa47f",
       "status": "mapped",
@@ -1735,6 +2133,8 @@
     "HYD": {
       "localized_name": "Hyderabad",
       "country_file_label": "Hyderabad",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#f4b41a",
       "ui_hex": "",
       "status": "unmapped",
@@ -1743,6 +2143,8 @@
     "IAS": {
       "localized_name": "Isthmo Amerindia",
       "country_file_label": "Isthmo Amerindia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#009933",
       "ui_hex": "#003311",
       "status": "unmapped",
@@ -1751,6 +2153,8 @@
     "ICE": {
       "localized_name": "Iceland",
       "country_file_label": "Iceland",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#647daf",
       "ui_hex": "#647daf",
       "status": "mapped",
@@ -1761,6 +2165,8 @@
     "IMO": {
       "localized_name": "Omani Imamate",
       "country_file_label": "Omani Imamate",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#f2f2f2",
       "ui_hex": "#a6a6a6",
       "status": "unmapped",
@@ -1769,6 +2175,8 @@
     "INC": {
       "localized_name": "Inca",
       "country_file_label": "Inca",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffcc00",
       "ui_hex": "#806600",
       "status": "unmapped",
@@ -1777,6 +2185,8 @@
     "INS": {
       "localized_name": "Indonesia",
       "country_file_label": "Indonesia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#283278",
       "ui_hex": "#283278",
       "status": "mapped",
@@ -1787,6 +2197,8 @@
     "INU": {
       "localized_name": "Inuit",
       "country_file_label": "Inuit",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#33cccc",
       "ui_hex": "#0f3d3d",
       "status": "unmapped",
@@ -1795,6 +2207,8 @@
     "IRE": {
       "localized_name": "Ireland",
       "country_file_label": "Ireland",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#509f5a",
       "ui_hex": "#68cf75",
       "status": "mapped",
@@ -1805,6 +2219,8 @@
     "IRQ": {
       "localized_name": "Iraq",
       "country_file_label": "Iraq",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#b27263",
       "ui_hex": "#e79481",
       "status": "mapped",
@@ -1815,6 +2231,8 @@
     "ISR": {
       "localized_name": "Israel",
       "country_file_label": "Israel",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#9882bf",
       "ui_hex": "#9882bf",
       "status": "mapped",
@@ -1825,6 +2243,8 @@
     "ITA": {
       "localized_name": "Italy",
       "country_file_label": "Italy",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#437f3f",
       "ui_hex": "#57a552",
       "status": "mapped",
@@ -1835,6 +2255,8 @@
     "ITZ": {
       "localized_name": "Itza",
       "country_file_label": "Itza",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#cccc00",
       "ui_hex": "#666600",
       "status": "unmapped",
@@ -1843,6 +2265,8 @@
     "IVO": {
       "localized_name": "Côte d'Ivoire",
       "country_file_label": "Ivory Coast",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffffcc",
       "ui_hex": "",
       "status": "mapped",
@@ -1853,6 +2277,8 @@
     "JAM": {
       "localized_name": "Jamaica",
       "country_file_label": "Jamaica",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#666600",
       "ui_hex": "",
       "status": "mapped",
@@ -1863,6 +2289,8 @@
     "JAN": {
       "localized_name": "Jan Mayen",
       "country_file_label": "Jan Mayen",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffffff",
       "ui_hex": "",
       "status": "unmapped",
@@ -1871,6 +2299,8 @@
     "JAP": {
       "localized_name": "Japan",
       "country_file_label": "Japan",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffc9b2",
       "ui_hex": "#fffce5",
       "status": "mapped",
@@ -1881,6 +2311,8 @@
     "JOR": {
       "localized_name": "Jordan",
       "country_file_label": "Jordan",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#6f374e",
       "ui_hex": "#6f374e",
       "status": "mapped",
@@ -1891,6 +2323,8 @@
     "KAL": {
       "localized_name": "Kalmykia",
       "country_file_label": "Kalmykia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffcc00",
       "ui_hex": "#cca300",
       "status": "unmapped",
@@ -1899,6 +2333,8 @@
     "KAR": {
       "localized_name": "Karelia",
       "country_file_label": "Karelia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#009933",
       "ui_hex": "#00802b",
       "status": "unmapped",
@@ -1907,6 +2343,8 @@
     "KAS": {
       "localized_name": "Kashmir",
       "country_file_label": "Kashmir",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff5a5a",
       "ui_hex": "",
       "status": "unmapped",
@@ -1915,6 +2353,8 @@
     "KAT": {
       "localized_name": "Katanga",
       "country_file_label": "Katanga",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#cc2900",
       "ui_hex": "#801a00",
       "status": "unmapped",
@@ -1923,6 +2363,8 @@
     "KAZ": {
       "localized_name": "Kazakhstan",
       "country_file_label": "Kazakhstan",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#4bb8cb",
       "ui_hex": "",
       "status": "mapped",
@@ -1933,6 +2375,8 @@
     "KBK": {
       "localized_name": "Kabardino Balkaria",
       "country_file_label": "Kabardino Balkaria",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff471a",
       "ui_hex": "#801a00",
       "status": "unmapped",
@@ -1941,6 +2385,8 @@
     "KEN": {
       "localized_name": "Kenya",
       "country_file_label": "Kenya",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#91670e",
       "ui_hex": "#91670e",
       "status": "mapped",
@@ -1951,6 +2397,8 @@
     "KHA": {
       "localized_name": "Khakassia",
       "country_file_label": "Khakassia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#33cc33",
       "ui_hex": "#196619",
       "status": "unmapped",
@@ -1959,6 +2407,8 @@
     "KHI": {
       "localized_name": "Khiva",
       "country_file_label": "Khiva",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#33ccff",
       "ui_hex": "#0086b3",
       "status": "unmapped",
@@ -1967,6 +2417,8 @@
     "KHL": {
       "localized_name": "Khalistan",
       "country_file_label": "Khalistan",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#f3c304",
       "ui_hex": "",
       "status": "unmapped",
@@ -1975,6 +2427,8 @@
     "KHM": {
       "localized_name": "Khotan Ma",
       "country_file_label": "Khotan Ma",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#996633",
       "ui_hex": "#604020",
       "status": "unmapped",
@@ -1983,6 +2437,8 @@
     "KKP": {
       "localized_name": "Karakalpakstan",
       "country_file_label": "Karakalpakstan",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff8000",
       "ui_hex": "#cc6600",
       "status": "unmapped",
@@ -1991,6 +2447,8 @@
     "KLT": {
       "localized_name": "Kalat",
       "country_file_label": "Kalat",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#00ab00",
       "ui_hex": "#00ab00",
       "status": "unmapped",
@@ -1999,6 +2457,8 @@
     "KOL": {
       "localized_name": "Kolhapur and Deccan States",
       "country_file_label": "Kolhapur and Deccan States",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#2a127e",
       "ui_hex": "",
       "status": "unmapped",
@@ -2007,6 +2467,8 @@
     "KOM": {
       "localized_name": "Komi",
       "country_file_label": "Komi",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#00e6b8",
       "ui_hex": "#008066",
       "status": "unmapped",
@@ -2015,6 +2477,8 @@
     "KOR": {
       "localized_name": "Korea",
       "country_file_label": "Korea",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#fff0c3",
       "ui_hex": "#fff8e5",
       "status": "unmapped",
@@ -2023,6 +2487,8 @@
     "KOS": {
       "localized_name": "Kosovo",
       "country_file_label": "Kosovo",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#d0a650",
       "ui_hex": "",
       "status": "mapped",
@@ -2033,6 +2499,8 @@
     "KSH": {
       "localized_name": "Kashubia",
       "country_file_label": "Kashubia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffdc00",
       "ui_hex": "",
       "status": "unmapped",
@@ -2041,6 +2509,8 @@
     "KUB": {
       "localized_name": "Kuban Republic",
       "country_file_label": "Kuban Republic",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#666699",
       "ui_hex": "#3d3d5c",
       "status": "unmapped",
@@ -2049,6 +2519,8 @@
     "KUM": {
       "localized_name": "Kumul Khanate",
       "country_file_label": "Kumul Khanate",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffe680",
       "ui_hex": "#997a00",
       "status": "unmapped",
@@ -2057,6 +2529,8 @@
     "KUR": {
       "localized_name": "Kurdistan",
       "country_file_label": "Kurdistan",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#eab31e",
       "ui_hex": "#ff9900",
       "status": "unmapped",
@@ -2065,6 +2539,8 @@
     "KUW": {
       "localized_name": "Kuwait",
       "country_file_label": "Kuwait",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#994c00",
       "ui_hex": "",
       "status": "mapped",
@@ -2075,6 +2551,8 @@
     "KYR": {
       "localized_name": "Kyrgyzstan",
       "country_file_label": "Kyrgyzstan",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#994c00",
       "ui_hex": "",
       "status": "mapped",
@@ -2085,6 +2563,8 @@
     "LAO": {
       "localized_name": "Laos",
       "country_file_label": "Laos",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#b06688",
       "ui_hex": "#b06688",
       "status": "mapped",
@@ -2095,6 +2575,8 @@
     "LAT": {
       "localized_name": "Latvia",
       "country_file_label": "Latvia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#4b4dba",
       "ui_hex": "#7c7db8",
       "status": "mapped",
@@ -2105,6 +2587,8 @@
     "LBA": {
       "localized_name": "Libya",
       "country_file_label": "Libya",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#c8b45a",
       "ui_hex": "#c8b45a",
       "status": "mapped",
@@ -2115,6 +2599,8 @@
     "LBV": {
       "localized_name": "Kingdom of Lombardy-Venetia",
       "country_file_label": "Lombardy Venetia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#b30b00",
       "ui_hex": "#660000",
       "status": "unmapped",
@@ -2123,6 +2609,8 @@
     "LEB": {
       "localized_name": "Lebanon",
       "country_file_label": "Lebanon",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#82963c",
       "ui_hex": "#82963c",
       "status": "mapped",
@@ -2133,6 +2621,8 @@
     "LIB": {
       "localized_name": "Liberia",
       "country_file_label": "Liberia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#9882bf",
       "ui_hex": "#c6a9f8",
       "status": "mapped",
@@ -2143,6 +2633,8 @@
     "LIT": {
       "localized_name": "Lithuania",
       "country_file_label": "Lithuania",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#dbdb77",
       "ui_hex": "#ffff9b",
       "status": "mapped",
@@ -2153,6 +2645,8 @@
     "LUX": {
       "localized_name": "Luxembourg",
       "country_file_label": "Luxemburg",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#41afb3",
       "ui_hex": "#55e4e9",
       "status": "mapped",
@@ -2163,6 +2657,8 @@
     "MAC": {
       "localized_name": "Macedonia",
       "country_file_label": "Macedonia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff3333",
       "ui_hex": "",
       "status": "unmapped",
@@ -2171,6 +2667,8 @@
     "MAD": {
       "localized_name": "Madagascar",
       "country_file_label": "Madagascar",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffff99",
       "ui_hex": "",
       "status": "mapped",
@@ -2181,6 +2679,8 @@
     "MAL": {
       "localized_name": "Malaysia",
       "country_file_label": "Malaysia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#c56064",
       "ui_hex": "#d5a979",
       "status": "mapped",
@@ -2191,6 +2691,8 @@
     "MAN": {
       "localized_name": "China",
       "country_file_label": "Manchukou",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff7847",
       "ui_hex": "#ff7847",
       "status": "unmapped",
@@ -2200,6 +2702,8 @@
     "MAY": {
       "localized_name": "Maya",
       "country_file_label": "Maya",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff5050",
       "ui_hex": "#990000",
       "status": "unmapped",
@@ -2208,6 +2712,8 @@
     "MEK": {
       "localized_name": "Mecklenburg",
       "country_file_label": "Mecklenburg",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#baf556",
       "ui_hex": "#baf556",
       "status": "unmapped",
@@ -2216,6 +2722,8 @@
     "MEL": {
       "localized_name": "Mariel",
       "country_file_label": "Mariel",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffe6e6",
       "ui_hex": "#ff9999",
       "status": "unmapped",
@@ -2224,6 +2732,8 @@
     "MEN": {
       "localized_name": "Mengkukuo",
       "country_file_label": "Mengkukuo",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#b9ff98",
       "ui_hex": "#a5e684",
       "status": "unmapped",
@@ -2232,6 +2742,8 @@
     "MEX": {
       "localized_name": "Mexico",
       "country_file_label": "Mexico",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#689853",
       "ui_hex": "#87c66c",
       "status": "mapped",
@@ -2242,6 +2754,8 @@
     "MIS": {
       "localized_name": "Miskito",
       "country_file_label": "Miskito",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff3300",
       "ui_hex": "#991f00",
       "status": "unmapped",
@@ -2250,6 +2764,8 @@
     "MLD": {
       "localized_name": "Maldives",
       "country_file_label": "Maldives",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#b2ff66",
       "ui_hex": "",
       "status": "mapped",
@@ -2260,6 +2776,8 @@
     "MLI": {
       "localized_name": "Mali",
       "country_file_label": "Mali",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ccccff",
       "ui_hex": "",
       "status": "mapped",
@@ -2270,6 +2788,8 @@
     "MLT": {
       "localized_name": "Malta",
       "country_file_label": "Malta",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffff99",
       "ui_hex": "",
       "status": "mapped",
@@ -2280,6 +2800,8 @@
     "MLW": {
       "localized_name": "Malawi",
       "country_file_label": "Malawi",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#99cc00",
       "ui_hex": "",
       "status": "mapped",
@@ -2290,6 +2812,8 @@
     "MNT": {
       "localized_name": "Montenegro",
       "country_file_label": "Montenegro",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#4d5a69",
       "ui_hex": "#4d5a69",
       "status": "mapped",
@@ -2300,6 +2824,8 @@
     "MOL": {
       "localized_name": "Moldova",
       "country_file_label": "Moldova",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffcccc",
       "ui_hex": "",
       "status": "mapped",
@@ -2310,6 +2836,8 @@
     "MON": {
       "localized_name": "Mongolia",
       "country_file_label": "Mongolia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#666057",
       "ui_hex": "#d1f785",
       "status": "mapped",
@@ -2320,6 +2848,8 @@
     "MOR": {
       "localized_name": "Morocco",
       "country_file_label": "Morocco",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#663300",
       "ui_hex": "",
       "status": "mapped",
@@ -2330,6 +2860,8 @@
     "MPU": {
       "localized_name": "Manipur",
       "country_file_label": "Manipur",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#8e7d83",
       "ui_hex": "",
       "status": "unmapped",
@@ -2338,6 +2870,8 @@
     "MRT": {
       "localized_name": "Mauritania",
       "country_file_label": "Mauritania",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff9999",
       "ui_hex": "",
       "status": "mapped",
@@ -2348,6 +2882,8 @@
     "MYS": {
       "localized_name": "Mysore",
       "country_file_label": "Mysore",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#993333",
       "ui_hex": "",
       "status": "unmapped",
@@ -2356,6 +2892,8 @@
     "MZB": {
       "localized_name": "Mozambique",
       "country_file_label": "Mozambique",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#703e5a",
       "ui_hex": "#703e5a",
       "status": "mapped",
@@ -2366,6 +2904,8 @@
     "NAH": {
       "localized_name": "Nahua",
       "country_file_label": "Nahua",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#339966",
       "ui_hex": "#0d261a",
       "status": "unmapped",
@@ -2374,6 +2914,8 @@
     "NAV": {
       "localized_name": "Basque Country",
       "country_file_label": "Navarra",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#fce93a",
       "ui_hex": "",
       "status": "unmapped",
@@ -2382,6 +2924,8 @@
     "NEN": {
       "localized_name": "Nenetsia",
       "country_file_label": "Nenetsia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ccffcc",
       "ui_hex": "#66ff66",
       "status": "unmapped",
@@ -2390,6 +2934,8 @@
     "NEP": {
       "localized_name": "Nepal",
       "country_file_label": "Nepal",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#9882bf",
       "ui_hex": "#c6a9f8",
       "status": "mapped",
@@ -2400,6 +2946,8 @@
     "NGA": {
       "localized_name": "Nigeria",
       "country_file_label": "Nigeria",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffcc66",
       "ui_hex": "",
       "status": "mapped",
@@ -2410,6 +2958,8 @@
     "NGR": {
       "localized_name": "Niger",
       "country_file_label": "Niger",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff9966",
       "ui_hex": "",
       "status": "mapped",
@@ -2420,6 +2970,8 @@
     "NIC": {
       "localized_name": "Nicaragua",
       "country_file_label": "Nicaragua",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#92b3bf",
       "ui_hex": "#92b3bf",
       "status": "mapped",
@@ -2430,6 +2982,8 @@
     "NIR": {
       "localized_name": "Northern Ireland",
       "country_file_label": "Northern Ireland",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff9933",
       "ui_hex": "",
       "status": "unmapped",
@@ -2438,6 +2992,8 @@
     "NMB": {
       "localized_name": "Namibia",
       "country_file_label": "Namibia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#e5ccff",
       "ui_hex": "",
       "status": "mapped",
@@ -2448,6 +3004,8 @@
     "NOA": {
       "localized_name": "North Ossetia",
       "country_file_label": "North Ossetia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffaa00",
       "ui_hex": "#cc8800",
       "status": "unmapped",
@@ -2456,6 +3014,8 @@
     "NOR": {
       "localized_name": "Norway",
       "country_file_label": "Norway",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#6f4747",
       "ui_hex": "#905c5c",
       "status": "mapped",
@@ -2466,6 +3026,8 @@
     "NWF": {
       "localized_name": "North Western Frontier States",
       "country_file_label": "North Western Frontier States",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#2ac0c0",
       "ui_hex": "",
       "status": "unmapped",
@@ -2474,6 +3036,8 @@
     "NXM": {
       "localized_name": "Ningxia Ma",
       "country_file_label": "Ningxia Ma",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#697d96",
       "ui_hex": "#204060",
       "status": "unmapped",
@@ -2482,6 +3046,8 @@
     "NZL": {
       "localized_name": "New Zealand",
       "country_file_label": "New Zealand",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#9882bf",
       "ui_hex": "#c6a9f8",
       "status": "mapped",
@@ -2492,6 +3058,8 @@
     "OCC": {
       "localized_name": "Occitania",
       "country_file_label": "Occitania",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#69f0f0",
       "ui_hex": "",
       "status": "unmapped",
@@ -2500,6 +3068,8 @@
     "OKN": {
       "localized_name": "Okinawa",
       "country_file_label": "Okinawa",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff8c1a",
       "ui_hex": "#b35900",
       "status": "unmapped",
@@ -2508,6 +3078,8 @@
     "OMA": {
       "localized_name": "Oman",
       "country_file_label": "Oman",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#9b656b",
       "ui_hex": "#ca838b",
       "status": "mapped",
@@ -2518,6 +3090,8 @@
     "ORO": {
       "localized_name": "Oromo",
       "country_file_label": "Oromo",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff4d4d",
       "ui_hex": "#ff4d4d",
       "status": "unmapped",
@@ -2526,6 +3100,8 @@
     "OVO": {
       "localized_name": "Ostyak Vogulia",
       "country_file_label": "Ostyak Vogulia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#009933",
       "ui_hex": "#006622",
       "status": "unmapped",
@@ -2534,6 +3110,8 @@
     "PAK": {
       "localized_name": "Pakistan",
       "country_file_label": "Pakistan",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#006600",
       "ui_hex": "#006600",
       "status": "mapped",
@@ -2544,6 +3122,8 @@
     "PAL": {
       "localized_name": "Palestine",
       "country_file_label": "Palestine",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#aa7d50",
       "ui_hex": "#aa7d50",
       "status": "mapped",
@@ -2554,6 +3134,8 @@
     "PAN": {
       "localized_name": "Panama",
       "country_file_label": "Panama",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#9882bf",
       "ui_hex": "#c6a9f8",
       "status": "mapped",
@@ -2564,6 +3146,8 @@
     "PAP": {
       "localized_name": "Papal States",
       "country_file_label": "Papal States",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffffcc",
       "ui_hex": "#ffff1a",
       "status": "unmapped",
@@ -2572,6 +3156,8 @@
     "PAR": {
       "localized_name": "Paraguay",
       "country_file_label": "Paraguay",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#3971e4",
       "ui_hex": "#4a93ff",
       "status": "mapped",
@@ -2582,6 +3168,8 @@
     "PER": {
       "localized_name": "Iran",
       "country_file_label": "Persia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#477161",
       "ui_hex": "#5c937e",
       "status": "mapped",
@@ -2592,6 +3180,8 @@
     "PHI": {
       "localized_name": "Philippines",
       "country_file_label": "Philippines",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#0028c3",
       "ui_hex": "#0028c3",
       "status": "mapped",
@@ -2602,6 +3192,8 @@
     "PLU": {
       "localized_name": "Palau",
       "country_file_label": "Palau",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#3399ff",
       "ui_hex": "#004d99",
       "status": "unmapped",
@@ -2610,6 +3202,8 @@
     "PNG": {
       "localized_name": "Papua",
       "country_file_label": "Papua New Guinea",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#99004c",
       "ui_hex": "",
       "status": "mapped",
@@ -2620,6 +3214,8 @@
     "POL": {
       "localized_name": "Poland",
       "country_file_label": "Poland",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#d6668b",
       "ui_hex": "#ff788a",
       "status": "mapped",
@@ -2630,6 +3226,8 @@
     "POR": {
       "localized_name": "Portugal",
       "country_file_label": "Portugal",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#277446",
       "ui_hex": "#33975b",
       "status": "mapped",
@@ -2640,6 +3238,8 @@
     "PRC": {
       "localized_name": "China",
       "country_file_label": "ComChina",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#f50c37",
       "ui_hex": "#b2223c",
       "status": "unmapped",
@@ -2649,6 +3249,8 @@
     "PRE": {
       "localized_name": "Prussia",
       "country_file_label": "Prussia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#a0a0a0",
       "ui_hex": "#a0a0a0",
       "status": "unmapped",
@@ -2657,6 +3259,8 @@
     "PRU": {
       "localized_name": "Peru",
       "country_file_label": "Peru",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#c4bdcc",
       "ui_hex": "#fff6ff",
       "status": "mapped",
@@ -2667,6 +3271,8 @@
     "PSH": {
       "localized_name": "Pashtunistan",
       "country_file_label": "Pashtunistan",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#1f8a1f",
       "ui_hex": "#1f8a1f",
       "status": "unmapped",
@@ -2675,6 +3281,8 @@
     "PSR": {
       "localized_name": "Philippine Second Republic",
       "country_file_label": "Philippine Second Republic",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#1f1f7a",
       "ui_hex": "#10103d",
       "status": "unmapped",
@@ -2683,6 +3291,8 @@
     "PUE": {
       "localized_name": "Puerto Rico",
       "country_file_label": "Puerto Rico",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#9999ff",
       "ui_hex": "",
       "status": "mapped",
@@ -2693,6 +3303,8 @@
     "QAT": {
       "localized_name": "Qatar",
       "country_file_label": "Qatar",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#800000",
       "ui_hex": "",
       "status": "mapped",
@@ -2703,6 +3315,8 @@
     "QEM": {
       "localized_name": "Qemant",
       "country_file_label": "Qemant",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#336699",
       "ui_hex": "#336699",
       "status": "unmapped",
@@ -2711,6 +3325,8 @@
     "QUE": {
       "localized_name": "Quebec",
       "country_file_label": "Quebec",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#0066ff",
       "ui_hex": "#001f4d",
       "status": "unmapped",
@@ -2719,6 +3335,8 @@
     "RAA": {
       "localized_name": "Reichskommisariat Australasien",
       "country_file_label": "Reichskommisariat Australasien",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2727,6 +3345,8 @@
     "RAJ": {
       "localized_name": "India",
       "country_file_label": "British Raj",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#e28728",
       "ui_hex": "#e28728",
       "status": "unmapped",
@@ -2736,6 +3356,8 @@
     "RAN": {
       "localized_name": "Reichskommisariat Anden",
       "country_file_label": "Reichskommisariat Anden",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2744,6 +3366,8 @@
     "RAP": {
       "localized_name": "Rapa Nui",
       "country_file_label": "Rapa Nui",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#cc0000",
       "ui_hex": "#660000",
       "status": "unmapped",
@@ -2752,6 +3376,8 @@
     "RAR": {
       "localized_name": "Reichskommisariat Arabien",
       "country_file_label": "Reichskommisariat Arabien",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2760,6 +3386,8 @@
     "RAS": {
       "localized_name": "Madras States",
       "country_file_label": "Madras States",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#fb2968",
       "ui_hex": "",
       "status": "unmapped",
@@ -2768,6 +3396,8 @@
     "RCG": {
       "localized_name": "Congo",
       "country_file_label": "Republic of Congo",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#66ccff",
       "ui_hex": "",
       "status": "mapped",
@@ -2778,6 +3408,8 @@
     "RCO": {
       "localized_name": "Reichskommisariat Kolumbus",
       "country_file_label": "Reichskommisariat Kolumbus",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2786,6 +3418,8 @@
     "RGB": {
       "localized_name": "Reichskommisariat Grossbritannien",
       "country_file_label": "Reichskommisariat Grossbritannien",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2794,6 +3428,8 @@
     "RHD": {
       "localized_name": "Reichskommisariat Grosshindustan",
       "country_file_label": "Reichskommisariat Grosshindustan",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2802,6 +3438,8 @@
     "RHI": {
       "localized_name": "Rhineland",
       "country_file_label": "Rhineland",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#009933",
       "ui_hex": "#004d1a",
       "status": "unmapped",
@@ -2810,6 +3448,8 @@
     "RIF": {
       "localized_name": "Rif",
       "country_file_label": "Rif",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#8a0d0d",
       "ui_hex": "",
       "status": "unmapped",
@@ -2818,6 +3458,8 @@
     "RIG": {
       "localized_name": "Rio Grande",
       "country_file_label": "Rio Grande",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#000080",
       "ui_hex": "#000033",
       "status": "unmapped",
@@ -2826,6 +3468,8 @@
     "RJP": {
       "localized_name": "Rajputana",
       "country_file_label": "Rajputana",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#90030b",
       "ui_hex": "",
       "status": "unmapped",
@@ -2834,6 +3478,8 @@
     "RKA": {
       "localized_name": "Reichskommisariat Mittelafrika",
       "country_file_label": "Reichskommisariat Mittelafrika",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2842,6 +3488,8 @@
     "RKB": {
       "localized_name": "Reichskommisariat Belgien",
       "country_file_label": "Reichskommisariat Belgien",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2850,6 +3498,8 @@
     "RKC": {
       "localized_name": "Reichskommisariat Balkan",
       "country_file_label": "Reichskommisariat Balkan",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2858,6 +3508,8 @@
     "RKG": {
       "localized_name": "Reichskommisariat Norwegen",
       "country_file_label": "Reichskommisariat Norwegen",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2866,6 +3518,8 @@
     "RKH": {
       "localized_name": "Bohmen Mahren",
       "country_file_label": "Bohmen Mahren",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2874,6 +3528,8 @@
     "RKI": {
       "localized_name": "Reichskommisariat Iberien",
       "country_file_label": "Reichskommisariat Iberien",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2882,6 +3538,8 @@
     "RKK": {
       "localized_name": "Reichskommisariat Kaukasien",
       "country_file_label": "Reichskommisariat Kaukasien",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2890,6 +3548,8 @@
     "RKL": {
       "localized_name": "Reichskommisariat Urals",
       "country_file_label": "Reichskommisariat Urals",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2898,6 +3558,8 @@
     "RKM": {
       "localized_name": "Reichskommisariat Moskowien",
       "country_file_label": "Reichskommisariat Moskowien",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2906,6 +3568,8 @@
     "RKN": {
       "localized_name": "Reichskommisariat Niederlande",
       "country_file_label": "Reichskommisariat Niederlande",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2914,6 +3578,8 @@
     "RKO": {
       "localized_name": "Reichskommisariat Ostland",
       "country_file_label": "Reichskommisariat Ostland",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2922,6 +3588,8 @@
     "RKT": {
       "localized_name": "Reichskommisariat Turkestan",
       "country_file_label": "Reichskommisariat Turkestan",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2930,6 +3598,8 @@
     "RKU": {
       "localized_name": "Reichskommisariat Ukraine",
       "country_file_label": "Reichskommisariat Ukraine",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2938,6 +3608,8 @@
     "RKV": {
       "localized_name": "Reichskommisariat Klein Venedig",
       "country_file_label": "Reichskommisariat Klein Venedig",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2946,6 +3618,8 @@
     "RNA": {
       "localized_name": "Reichskommisariat Nordafrika",
       "country_file_label": "Reichskommisariat Nordafrika",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2954,6 +3628,8 @@
     "RNG": {
       "localized_name": "Reorganized National Government",
       "country_file_label": "Reorganized National Government",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffbf00",
       "ui_hex": "#cc9900",
       "status": "unmapped",
@@ -2962,6 +3638,8 @@
     "ROA": {
       "localized_name": "Reichskommisariat Ostasien",
       "country_file_label": "Reichskommisariat Ostasien",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2970,6 +3648,8 @@
     "ROM": {
       "localized_name": "Romania",
       "country_file_label": "Romania",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#d7c448",
       "ui_hex": "#ffff78",
       "status": "mapped",
@@ -2980,6 +3660,8 @@
     "RUS": {
       "localized_name": "Reichskommisariat Nordamerika",
       "country_file_label": "Reichskommisariat Nordamerika",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#737373",
       "ui_hex": "#7a915d",
       "status": "unmapped",
@@ -2988,6 +3670,8 @@
     "RWA": {
       "localized_name": "Rwanda",
       "country_file_label": "Rwanda",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffff66",
       "ui_hex": "",
       "status": "mapped",
@@ -2998,6 +3682,8 @@
     "SAB": {
       "localized_name": "Sabah",
       "country_file_label": "Sabah",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#00ace6",
       "ui_hex": "#006080",
       "status": "unmapped",
@@ -3006,6 +3692,8 @@
     "SAF": {
       "localized_name": "South Africa",
       "country_file_label": "South Africa",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#c36ba0",
       "ui_hex": "#c6a9f8",
       "status": "mapped",
@@ -3016,6 +3704,8 @@
     "SAM": {
       "localized_name": "Samoa",
       "country_file_label": "Samoa",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#cd145f",
       "ui_hex": "",
       "status": "unmapped",
@@ -3024,6 +3714,8 @@
     "SAR": {
       "localized_name": "Sarawak",
       "country_file_label": "Sarawak",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#e6b800",
       "ui_hex": "#997a00",
       "status": "unmapped",
@@ -3032,6 +3724,8 @@
     "SAU": {
       "localized_name": "Saudi Arabia",
       "country_file_label": "Saudi Arabia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#abbe98",
       "ui_hex": "#def7c6",
       "status": "mapped",
@@ -3042,6 +3736,8 @@
     "SAX": {
       "localized_name": "Saxony",
       "country_file_label": "Saxony",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#666600",
       "ui_hex": "#666600",
       "status": "unmapped",
@@ -3050,6 +3746,8 @@
     "SCO": {
       "localized_name": "Scotland",
       "country_file_label": "Scotland",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#e8e800",
       "ui_hex": "",
       "status": "unmapped",
@@ -3058,6 +3756,8 @@
     "SEN": {
       "localized_name": "Senegal",
       "country_file_label": "Senegal",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#cc3300",
       "ui_hex": "",
       "status": "mapped",
@@ -3068,6 +3768,8 @@
     "SER": {
       "localized_name": "Serbia",
       "country_file_label": "Serbia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#a06e6e",
       "ui_hex": "#a06e6e",
       "status": "unmapped",
@@ -3076,6 +3778,8 @@
     "SHL": {
       "localized_name": "Schleswig",
       "country_file_label": "Schleswig-Holstein",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#3333ff",
       "ui_hex": "#3333ff",
       "status": "unmapped",
@@ -3084,6 +3788,8 @@
     "SHX": {
       "localized_name": "Shanxi",
       "country_file_label": "Shanxi",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#52020f",
       "ui_hex": "#651e29",
       "status": "unmapped",
@@ -3093,6 +3799,8 @@
     "SIA": {
       "localized_name": "Siam",
       "country_file_label": "Siam",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#abbe98",
       "ui_hex": "#def7c6",
       "status": "mapped",
@@ -3103,6 +3811,8 @@
     "SIC": {
       "localized_name": "Sichuan",
       "country_file_label": "Sichuan",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#006080",
       "ui_hex": "#004d66",
       "status": "unmapped",
@@ -3111,6 +3821,8 @@
     "SID": {
       "localized_name": "Sidamo",
       "country_file_label": "Sidamo",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#6666ff",
       "ui_hex": "#6666ff",
       "status": "unmapped",
@@ -3119,6 +3831,8 @@
     "SIE": {
       "localized_name": "Sierra Leone",
       "country_file_label": "Sierra Leone",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#cc66ff",
       "ui_hex": "",
       "status": "mapped",
@@ -3129,6 +3843,8 @@
     "SIK": {
       "localized_name": "Sinkiang",
       "country_file_label": "Sinkiang",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#47be98",
       "ui_hex": "#def7c6",
       "status": "unmapped",
@@ -3138,6 +3854,8 @@
     "SIL": {
       "localized_name": "Silesia",
       "country_file_label": "Silesia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#54a65d",
       "ui_hex": "",
       "status": "unmapped",
@@ -3146,6 +3864,8 @@
     "SIN": {
       "localized_name": "Sindh",
       "country_file_label": "Sindh",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#2b0c36",
       "ui_hex": "",
       "status": "unmapped",
@@ -3154,6 +3874,8 @@
     "SKK": {
       "localized_name": "Sikkim",
       "country_file_label": "Sikkim",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#fff56b",
       "ui_hex": "",
       "status": "unmapped",
@@ -3162,6 +3884,8 @@
     "SLO": {
       "localized_name": "Slovakia",
       "country_file_label": "Slovakia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#9ea1bc",
       "ui_hex": "#ffffff",
       "status": "mapped",
@@ -3172,6 +3896,8 @@
     "SLV": {
       "localized_name": "Slovenia",
       "country_file_label": "Slovenia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#66b2ff",
       "ui_hex": "",
       "status": "mapped",
@@ -3182,6 +3908,8 @@
     "SMI": {
       "localized_name": "Sami",
       "country_file_label": "Sami",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#f2ec63",
       "ui_hex": "",
       "status": "unmapped",
@@ -3190,6 +3918,8 @@
     "SND": {
       "localized_name": "Shandong",
       "country_file_label": "Shandong",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#e65c00",
       "ui_hex": "#993d00",
       "status": "unmapped",
@@ -3198,6 +3928,8 @@
     "SNG": {
       "localized_name": "Singapore",
       "country_file_label": "Singapore",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#cc0000",
       "ui_hex": "#800000",
       "status": "mapped",
@@ -3208,6 +3940,8 @@
     "SOK": {
       "localized_name": "Sokoto",
       "country_file_label": "Sokoto",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#00802b",
       "ui_hex": "#004d1a",
       "status": "unmapped",
@@ -3216,6 +3950,8 @@
     "SOL": {
       "localized_name": "Solomon Islands",
       "country_file_label": "Solomon",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#14145a",
       "ui_hex": "",
       "status": "unmapped",
@@ -3224,6 +3960,8 @@
     "SOM": {
       "localized_name": "Somalia",
       "country_file_label": "Somalia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#336600",
       "ui_hex": "",
       "status": "mapped",
@@ -3234,6 +3972,8 @@
     "SOV": {
       "localized_name": "Russia",
       "country_file_label": "Soviet Union",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#7d0d18",
       "ui_hex": "#a3111f",
       "status": "unmapped",
@@ -3243,6 +3983,8 @@
     "SPM": {
       "localized_name": "Sardinia-Piedmont",
       "country_file_label": "Sardinia Piedmont",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#00ffff",
       "ui_hex": "#00b3b3",
       "status": "unmapped",
@@ -3251,6 +3993,8 @@
     "SPR": {
       "localized_name": "Spain",
       "country_file_label": "Spain",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#f2cd5e",
       "ui_hex": "#ffff7a",
       "status": "mapped",
@@ -3261,6 +4005,8 @@
     "SRL": {
       "localized_name": "Sri Lanka",
       "country_file_label": "Sri Lanka",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#cc0066",
       "ui_hex": "",
       "status": "mapped",
@@ -3271,6 +4017,8 @@
     "SUD": {
       "localized_name": "Sudan",
       "country_file_label": "Sudan",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#cc6600",
       "ui_hex": "",
       "status": "mapped",
@@ -3281,6 +4029,8 @@
     "SUR": {
       "localized_name": "Suriname",
       "country_file_label": "Suriname",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffb266",
       "ui_hex": "",
       "status": "mapped",
@@ -3291,6 +4041,8 @@
     "SWE": {
       "localized_name": "Sweden",
       "country_file_label": "Sweden",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#2484f7",
       "ui_hex": "#2facff",
       "status": "mapped",
@@ -3301,6 +4053,8 @@
     "SWI": {
       "localized_name": "Switzerland",
       "country_file_label": "Switzerland",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#e00505",
       "ui_hex": "#c15151",
       "status": "mapped",
@@ -3311,6 +4065,8 @@
     "SYR": {
       "localized_name": "Syria",
       "country_file_label": "Syria",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#646496",
       "ui_hex": "#646496",
       "status": "mapped",
@@ -3321,6 +4077,8 @@
     "TAH": {
       "localized_name": "Tahiti",
       "country_file_label": "Tahiti",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#4921f8",
       "ui_hex": "",
       "status": "unmapped",
@@ -3329,6 +4087,8 @@
     "TAJ": {
       "localized_name": "Tajikistan",
       "country_file_label": "Tajikistan",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#336600",
       "ui_hex": "",
       "status": "mapped",
@@ -3339,6 +4099,8 @@
     "TAN": {
       "localized_name": "Tannu Tuva",
       "country_file_label": "Tannu Tuva",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#9882bf",
       "ui_hex": "#c6a9f8",
       "status": "unmapped",
@@ -3347,6 +4109,8 @@
     "TAT": {
       "localized_name": "Tatarstan",
       "country_file_label": "Tatarstan",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff3300",
       "ui_hex": "#b32400",
       "status": "unmapped",
@@ -3355,6 +4119,8 @@
     "TAY": {
       "localized_name": "Taymyria",
       "country_file_label": "Taymyria",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#006699",
       "ui_hex": "#004466",
       "status": "unmapped",
@@ -3363,6 +4129,8 @@
     "THU": {
       "localized_name": "Thuringia",
       "country_file_label": "Thuringia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#6699ff",
       "ui_hex": "#003399",
       "status": "unmapped",
@@ -3371,6 +4139,8 @@
     "TIB": {
       "localized_name": "Tibet",
       "country_file_label": "Tibet",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#50642d",
       "ui_hex": "#def7c6",
       "status": "unmapped",
@@ -3380,6 +4150,8 @@
     "TIG": {
       "localized_name": "Tigray",
       "country_file_label": "Tigray",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff3300",
       "ui_hex": "#ff3300",
       "status": "unmapped",
@@ -3388,6 +4160,8 @@
     "TML": {
       "localized_name": "Timor Leste",
       "country_file_label": "Timor Leste",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#800000",
       "ui_hex": "#330000",
       "status": "unmapped",
@@ -3396,6 +4170,8 @@
     "TMS": {
       "localized_name": "Turkmenistan",
       "country_file_label": "Turkmenistan",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#004c99",
       "ui_hex": "",
       "status": "mapped",
@@ -3406,6 +4182,8 @@
     "TOG": {
       "localized_name": "Togo",
       "country_file_label": "Togo",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#006600",
       "ui_hex": "",
       "status": "mapped",
@@ -3416,6 +4194,8 @@
     "TOS": {
       "localized_name": "Grand Duchy of Tuscany",
       "country_file_label": "Tuscany",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff8080",
       "ui_hex": "#cc0000",
       "status": "unmapped",
@@ -3424,6 +4204,8 @@
     "TRA": {
       "localized_name": "Transylvania",
       "country_file_label": "Transylvania",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#d3cfad",
       "ui_hex": "",
       "status": "unmapped",
@@ -3432,6 +4214,8 @@
     "TRI": {
       "localized_name": "Trinidad and Tobago",
       "country_file_label": "Trinidad and Tobago",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#606060",
       "ui_hex": "",
       "status": "mapped",
@@ -3442,6 +4226,8 @@
     "TTS": {
       "localized_name": "Kingdom of the Two Sicilies",
       "country_file_label": "The Two Sicilies",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#e6e600",
       "ui_hex": "#b3b300",
       "status": "unmapped",
@@ -3450,6 +4236,8 @@
     "TUN": {
       "localized_name": "Tunisia",
       "country_file_label": "Tunisia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#999966",
       "ui_hex": "",
       "status": "mapped",
@@ -3460,6 +4248,8 @@
     "TUR": {
       "localized_name": "Turkey",
       "country_file_label": "Turkey",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#abbe98",
       "ui_hex": "#def7c6",
       "status": "mapped",
@@ -3470,6 +4260,8 @@
     "TZN": {
       "localized_name": "Tanzania",
       "country_file_label": "Tanzania",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffcc99",
       "ui_hex": "",
       "status": "unmapped",
@@ -3478,6 +4270,8 @@
     "UAE": {
       "localized_name": "Arab Emirates",
       "country_file_label": "United Arab Emirates",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#666600",
       "ui_hex": "",
       "status": "mapped",
@@ -3488,6 +4282,8 @@
     "UBD": {
       "localized_name": "United Baltic Duchy",
       "country_file_label": "United Baltic Duchy",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#5c5c8a",
       "ui_hex": "#33334d",
       "status": "unmapped",
@@ -3496,6 +4292,8 @@
     "UDM": {
       "localized_name": "Udmurtia",
       "country_file_label": "Udmurtia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#404040",
       "ui_hex": "#0d0d0d",
       "status": "unmapped",
@@ -3504,6 +4302,8 @@
     "UGA": {
       "localized_name": "Uganda",
       "country_file_label": "Uganda",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff5050",
       "ui_hex": "",
       "status": "mapped",
@@ -3514,6 +4314,8 @@
     "UKR": {
       "localized_name": "Ukraine",
       "country_file_label": "Ukraine",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#0050e6",
       "ui_hex": "#0050e6",
       "status": "mapped",
@@ -3524,6 +4326,8 @@
     "URG": {
       "localized_name": "Uruguay",
       "country_file_label": "Uruguay",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#abbe98",
       "ui_hex": "#def7c6",
       "status": "mapped",
@@ -3534,6 +4338,8 @@
     "USA": {
       "localized_name": "America",
       "country_file_label": "USA",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#1485ed",
       "ui_hex": "#57a0ff",
       "status": "mapped",
@@ -3544,6 +4350,8 @@
     "USB": {
       "localized_name": "Unaligned States of America",
       "country_file_label": "USB",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#a77bed",
       "ui_hex": "",
       "status": "unmapped",
@@ -3553,6 +4361,8 @@
     "UZB": {
       "localized_name": "Uzbekistan",
       "country_file_label": "Uzbekistan",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#006666",
       "ui_hex": "",
       "status": "mapped",
@@ -3563,6 +4373,8 @@
     "VEN": {
       "localized_name": "Venezuela",
       "country_file_label": "Venezula",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#abbe98",
       "ui_hex": "#def7c6",
       "status": "mapped",
@@ -3573,6 +4385,8 @@
     "VGE": {
       "localized_name": "Volga Germany",
       "country_file_label": "Volga Germany",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#999999",
       "ui_hex": "#595959",
       "status": "unmapped",
@@ -3581,6 +4395,8 @@
     "VIN": {
       "localized_name": "Vietnam",
       "country_file_label": "Vietnam",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#e6df32",
       "ui_hex": "#e6df32",
       "status": "unmapped",
@@ -3590,6 +4406,8 @@
     "VLA": {
       "localized_name": "Vladivostok",
       "country_file_label": "Vladivostok",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffcc00",
       "ui_hex": "#cca300",
       "status": "unmapped",
@@ -3598,6 +4416,8 @@
     "VOL": {
       "localized_name": "Upper Volta",
       "country_file_label": "Upper Volta",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#9999ff",
       "ui_hex": "",
       "status": "unmapped",
@@ -3606,6 +4426,8 @@
     "WES": {
       "localized_name": "Western Sahara",
       "country_file_label": "Western Sahara",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffb266",
       "ui_hex": "",
       "status": "mapped",
@@ -3616,6 +4438,8 @@
     "WGR": {
       "localized_name": "Germany",
       "country_file_label": "West Germany",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#786e59",
       "ui_hex": "",
       "status": "unmapped",
@@ -3625,6 +4449,8 @@
     "WIS": {
       "localized_name": "Western Indian States",
       "country_file_label": "Western Indian States",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#2ac0c0",
       "ui_hex": "",
       "status": "unmapped",
@@ -3633,6 +4459,8 @@
     "WLA": {
       "localized_name": "Welsh Argentina",
       "country_file_label": "Welsh Argentina",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#800020",
       "ui_hex": "",
       "status": "unmapped",
@@ -3641,6 +4469,8 @@
     "WLS": {
       "localized_name": "Wales",
       "country_file_label": "Wales",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff0000",
       "ui_hex": "",
       "status": "unmapped",
@@ -3649,6 +4479,8 @@
     "WPG": {
       "localized_name": "West Papua",
       "country_file_label": "West Papua",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ac3939",
       "ui_hex": "#732626",
       "status": "unmapped",
@@ -3657,6 +4489,8 @@
     "WUR": {
       "localized_name": "Wurtemberg",
       "country_file_label": "Wurtemberg",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ffcc99",
       "ui_hex": "#ffcc99",
       "status": "unmapped",
@@ -3665,6 +4499,8 @@
     "XIC": {
       "localized_name": "Xian",
       "country_file_label": "Xian",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#2b5cb5",
       "ui_hex": "#2d64be",
       "status": "unmapped",
@@ -3673,6 +4509,8 @@
     "XSM": {
       "localized_name": "Xibei San Ma",
       "country_file_label": "Xibei San Ma",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#695a84",
       "ui_hex": "#695a84",
       "status": "unmapped",
@@ -3682,6 +4520,8 @@
     "YAK": {
       "localized_name": "Yakutia",
       "country_file_label": "Yakutia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#00ffff",
       "ui_hex": "#00b3b3",
       "status": "unmapped",
@@ -3690,6 +4530,8 @@
     "YAM": {
       "localized_name": "Yamalia",
       "country_file_label": "Yamalia",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#cc9900",
       "ui_hex": "#997300",
       "status": "unmapped",
@@ -3698,6 +4540,8 @@
     "YEM": {
       "localized_name": "Yemen",
       "country_file_label": "Yeman",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#9b656b",
       "ui_hex": "#ca838b",
       "status": "mapped",
@@ -3708,6 +4552,8 @@
     "YUC": {
       "localized_name": "Yucatan",
       "country_file_label": "Yucatan",
+      "name_source": "unique_country_file",
+      "country_file_is_shared_template": false,
       "map_hex": "#ff1a1a",
       "ui_hex": "#660000",
       "status": "unmapped",
@@ -3716,6 +4562,8 @@
     "YUG": {
       "localized_name": "Yugoslavia",
       "country_file_label": "Yugoslavia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#48497e",
       "ui_hex": "#5e5fa4",
       "status": "unmapped",
@@ -3724,6 +4572,8 @@
     "YUN": {
       "localized_name": "Yunnan",
       "country_file_label": "Yunnan",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#729450",
       "ui_hex": "#def7c6",
       "status": "unmapped",
@@ -3732,6 +4582,8 @@
     "ZAM": {
       "localized_name": "Zambia",
       "country_file_label": "Zambia",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#6666ff",
       "ui_hex": "",
       "status": "mapped",
@@ -3742,6 +4594,8 @@
     "ZIM": {
       "localized_name": "Zimbabwe",
       "country_file_label": "Zimbabwe",
+      "name_source": "exact_tag_loc",
+      "country_file_is_shared_template": false,
       "map_hex": "#0707ef",
       "ui_hex": "#0707ef",
       "status": "mapped",

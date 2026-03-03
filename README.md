@@ -56,20 +56,38 @@ Map Creator 是一个面向历史/架空地图创作的网页制图工具。
 
 ## 🎨 国家色板
 
-- 默认 palette source 为 `HOI4 Vanilla`
-- 已能映射到项目 ISO-2 国家码的国家，会在 `Auto-Fill Countries` 和 `Reset Country Colors` 中优先使用 HOI4 地图色
+- 当前内置 4 套 palette source：
+  - `HOI4 Vanilla`
+  - `Kaiserreich`
+  - `The New Order`
+  - `Red Flood`
+- 左侧 `Palette Source` 与 `Map Style -> Auto-Fill Style` 同步联动
+- 已能映射到项目 ISO-2 国家码的国家，会在 `Auto-Fill Countries` 和 `Reset Country Colors` 中优先使用当前来源的地图色
 - 未映射国家继续使用现有稳定避色逻辑，不会退化成每次真随机
 - 左侧 `Browse All Colors` 可按国家名、ISO-2 或来源 tag 搜索完整色库
-- 左侧主色板固定优先展示 HOI4 大国颜色，不再与 `Recent` 混排
+- 左侧主色板会按当前来源切换为各自的 quick palette，不再与 `Recent` 混排
+- `Auto-Fill Countries` 固定走政治填色；若来源为 mod，还会同步应用该 mod 的海洋填色
 
 色板资产位于：
 
 - `data/palettes/index.json`
 - `data/palettes/hoi4_vanilla.palette.json`
+- `data/palettes/kaiserreich.palette.json`
+- `data/palettes/tno.palette.json`
+- `data/palettes/red_flood.palette.json`
 - `data/palette-maps/hoi4_vanilla.map.json`
 - `data/palette-maps/hoi4_vanilla.audit.json`
+- `data/palette-maps/kaiserreich.map.json`
+- `data/palette-maps/tno.map.json`
+- `data/palette-maps/red_flood.map.json`
 
-如需从本地 HOI4 文件重新导入：
+如需重建全部 palette 资产：
+
+```bash
+python3 init_map_data.py --mode palettes
+```
+
+如需单独从本地 HOI4 / mod 文件重新导入：
 
 ```bash
 python3 tools/import_country_palette.py

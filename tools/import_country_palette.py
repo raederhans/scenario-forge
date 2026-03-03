@@ -6,19 +6,50 @@ import colorsys
 import json
 import re
 import unicodedata
-from dataclasses import dataclass
+from collections import Counter, defaultdict
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from pathlib import Path
 
 
-DEFAULT_HOI4_ROOTS = [
+DEFAULT_SOURCE_ROOTS = [
     Path(r"/mnt/c/Program Files (x86)/Steam/steamapps/common/Hearts of Iron IV"),
     Path(r"C:\Program Files (x86)\Steam\steamapps\common\Hearts of Iron IV"),
 ]
 DEFAULT_OUTPUT_DIR = Path("data")
 DEFAULT_PRIMARY_TOPOLOGY = Path("data/europe_topology.json")
 DEFAULT_RUNTIME_TOPOLOGY = Path("data/europe_topology.runtime_political_v1.json")
-DEFAULT_LOCALISATION = Path("localisation/english/countries_l_english.yml")
+DEFAULT_LOCALISATION_ROOT = Path("localisation/english")
+
+DEFAULT_OCEAN_META = {
+    "hoi4_vanilla": {
+        "apply_on_autofill": False,
+        "fill_color": "#aadaff",
+        "source": "app_default",
+    },
+    "kaiserreich": {
+        "apply_on_autofill": True,
+        "fill_color": "#304d66",
+        "source": "map/terrain/colormap_water_0.dds:average",
+    },
+    "tno": {
+        "apply_on_autofill": True,
+        "fill_color": "#2d4769",
+        "source": "map/terrain/colormap_water_0.dds:average",
+    },
+    "red_flood": {
+        "apply_on_autofill": True,
+        "fill_color": "#373b42",
+        "source": "map/terrain/reflection.dds:average",
+    },
+}
+
+PALETTE_SORT_ORDER = {
+    "hoi4_vanilla": 0,
+    "kaiserreich": 1,
+    "tno": 2,
+    "red_flood": 3,
+}
 
 SUPPORTED_UNMAPPED_REASONS = {
     "dynamic_tag_not_mapped",
@@ -32,13 +63,28 @@ SUPPORTED_UNMAPPED_REASONS = {
     "unreviewed",
 }
 
+LOCALISATION_ENTRY_RE = re.compile(r'\s*([A-Z0-9]{3}(?:_[A-Za-z0-9_]+)?):0\s+"([^"]+)"')
+COLOR_SPEC_RE = re.compile(
+    r"""
+    (?P<kind>rgb|hsv)?\s*
+    \{\s*
+    (?P<a>-?\d+(?:\.\d+)?)\s+
+    (?P<b>-?\d+(?:\.\d+)?)\s+
+    (?P<c>-?\d+(?:\.\d+)?)
+    \s*\}
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
 
-@dataclass
+
+@dataclass(frozen=True)
 class PaletteEntry:
     tag: str
     localized_name: str
+    name_source: str
     country_file_label: str
     country_file: str
+    country_file_is_shared_template: bool
     map_hex: str
     map_source: str
     ui_hex: str
@@ -48,10 +94,19 @@ class PaletteEntry:
     dynamic: bool
 
 
-@dataclass
+@dataclass(frozen=True)
 class MatchCandidate:
     iso2: str
     match_kind: str
+
+
+def load_json(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def dump_json(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def normalize_text(value: str) -> str:
@@ -64,8 +119,8 @@ def clamp_channel(value: float) -> int:
     return max(0, min(255, int(round(value))))
 
 
-def rgb_to_hex(rgb: tuple[int, int, int]) -> str:
-    return "#{:02x}{:02x}{:02x}".format(*[clamp_channel(x) for x in rgb])
+def rgb_to_hex(rgb: tuple[float, float, float]) -> str:
+    return "#{:02x}{:02x}{:02x}".format(*[clamp_channel(channel) for channel in rgb])
 
 
 def hsv_to_hex(h: float, s: float, v: float) -> str:
@@ -74,19 +129,6 @@ def hsv_to_hex(h: float, s: float, v: float) -> str:
     val = max(0.0, v)
     red, green, blue = colorsys.hsv_to_rgb(hue, sat, val)
     return rgb_to_hex((red * 255, green * 255, blue * 255))
-
-
-COLOR_SPEC_RE = re.compile(
-    r"""
-    (?P<kind>rgb|hsv)?\s*
-    \{\s*
-    (?P<a>-?\d+(?:\.\d+)?)\s+
-    (?P<b>-?\d+(?:\.\d+)?)\s+
-    (?P<c>-?\d+(?:\.\d+)?)
-    \s*\}
-    """,
-    re.IGNORECASE | re.VERBOSE,
-)
 
 
 def parse_color_spec(text: str) -> str | None:
@@ -104,28 +146,28 @@ def parse_color_spec(text: str) -> str | None:
     return rgb_to_hex((a, b, c))
 
 
-def find_hoi4_root(explicit_root: str | None) -> Path:
+def resolve_relative_url(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(Path.cwd().resolve()).as_posix()
+    except Exception:
+        return path.as_posix()
+
+
+def find_source_root(explicit_root: str | None) -> Path:
     candidates = [Path(explicit_root)] if explicit_root else []
-    candidates.extend(DEFAULT_HOI4_ROOTS)
+    candidates.extend(DEFAULT_SOURCE_ROOTS)
     for candidate in candidates:
         if (candidate / "common/country_tags/00_countries.txt").exists():
             return candidate
     raise SystemExit(
-        "Unable to locate Hearts of Iron IV root. Pass --source-root with your installation path."
+        "Unable to locate HOI4/mod source root. Pass --source-root with the installation or workshop path."
     )
-
-
-def load_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
-
-
-def dump_json(path: Path, payload: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def parse_tag_file(path: Path, dynamic: bool) -> dict[str, tuple[str, bool]]:
     entries: dict[str, tuple[str, bool]] = {}
+    if not path.exists():
+        return entries
     for raw_line in path.read_text(encoding="utf-8-sig", errors="ignore").splitlines():
         line = raw_line.split("#", 1)[0].strip()
         if not line or line.startswith("dynamic_tags"):
@@ -214,20 +256,6 @@ def parse_country_file_color(path: Path) -> tuple[str | None, str | None]:
     return color, f"{path.name}:color"
 
 
-def parse_localized_country_names(path: Path) -> dict[str, str]:
-    localized_names: dict[str, str] = {}
-    if not path.exists():
-        return localized_names
-    for raw_line in path.read_text(encoding="utf-8-sig", errors="ignore").splitlines():
-        line = raw_line.rstrip()
-        match = re.match(r'\s*([A-Z0-9]{3}):0\s+"([^"]+)"', line)
-        if not match:
-            continue
-        tag = match.group(1).strip().upper()
-        localized_names[tag] = match.group(2).strip()
-    return localized_names
-
-
 def load_primary_country_names(path: Path) -> tuple[dict[str, str], dict[str, str]]:
     data = load_json(path)
     geometries = data.get("objects", {}).get("political", {}).get("geometries", [])
@@ -255,34 +283,156 @@ def load_runtime_country_codes(path: Path) -> set[str]:
     return results
 
 
+def normalize_verified_mapping(raw_mapping: dict | None) -> dict[str, str]:
+    normalized: dict[str, str] = {}
+    for tag, iso2 in (raw_mapping or {}).items():
+        norm_tag = str(tag).strip().upper()
+        norm_iso2 = str(iso2).strip().upper()
+        if norm_tag and norm_iso2:
+            normalized[norm_tag] = norm_iso2
+    return normalized
+
+
+def normalize_deny_tags(raw_deny_tags: dict | None) -> dict[str, dict[str, str]]:
+    deny_tags: dict[str, dict[str, str]] = {}
+    for raw_tag, raw_value in (raw_deny_tags or {}).items():
+        tag = str(raw_tag).strip().upper()
+        if isinstance(raw_value, str):
+            payload = {"reason": raw_value.strip()}
+        elif isinstance(raw_value, dict):
+            payload = {"reason": str(raw_value.get("reason") or "").strip()}
+            suggested_iso2 = str(raw_value.get("suggested_iso2") or "").strip().upper()
+            if suggested_iso2:
+                payload["suggested_iso2"] = suggested_iso2
+        else:
+            raise SystemExit(f"Invalid deny_tags entry for {tag}: expected string or object.")
+        reason = payload.get("reason", "")
+        if reason not in SUPPORTED_UNMAPPED_REASONS:
+            raise SystemExit(f"Unsupported unmapped reason for {tag}: {reason}")
+        deny_tags[tag] = payload
+    return deny_tags
+
+
+def normalize_display_name_overrides(raw_mapping: dict | None) -> dict[str, str]:
+    normalized: dict[str, str] = {}
+    for raw_tag, raw_name in (raw_mapping or {}).items():
+        tag = str(raw_tag).strip().upper()
+        name = str(raw_name or "").strip()
+        if tag and name:
+            normalized[tag] = name
+    return normalized
+
+
+def normalize_suffix_priority(raw_values: list | None) -> list[str]:
+    normalized: list[str] = []
+    for raw_value in raw_values or []:
+        value = str(raw_value or "").strip()
+        if value and value not in normalized:
+            normalized.append(value)
+    return normalized
+
+
+def build_country_file_usage(tag_map: dict[str, tuple[str, bool]]) -> Counter:
+    counter: Counter = Counter()
+    for country_file, _dynamic in tag_map.values():
+        counter[str(country_file).strip()] += 1
+    return counter
+
+
+def parse_localisation_catalog(
+    root: Path,
+    suffix_priority: list[str],
+) -> tuple[dict[str, str], dict[str, dict[str, str]]]:
+    exact_names: dict[str, str] = {}
+    suffix_names: dict[str, dict[str, str]] = defaultdict(dict)
+    suffix_allowlist = set(suffix_priority)
+    loc_root = root / DEFAULT_LOCALISATION_ROOT
+    if not loc_root.exists():
+        return exact_names, suffix_names
+
+    for path in sorted(loc_root.rglob("*.yml")):
+        for raw_line in path.read_text(encoding="utf-8-sig", errors="ignore").splitlines():
+            match = LOCALISATION_ENTRY_RE.match(raw_line.rstrip())
+            if not match:
+                continue
+            key = match.group(1).strip()
+            value = match.group(2).strip()
+            if not value:
+                continue
+            if "_" not in key:
+                if len(key) == 3:
+                    exact_names.setdefault(key.upper(), value)
+                continue
+            base_tag, suffix = key.split("_", 1)
+            base_tag = base_tag.upper()
+            if len(base_tag) != 3 or suffix not in suffix_allowlist:
+                continue
+            suffix_names[base_tag].setdefault(suffix, value)
+
+    return exact_names, suffix_names
+
+
+def resolve_display_name(
+    tag: str,
+    country_file_label: str,
+    country_file_is_shared_template: bool,
+    exact_names: dict[str, str],
+    suffix_names: dict[str, dict[str, str]],
+    display_name_overrides: dict[str, str],
+    suffix_priority: list[str],
+) -> tuple[str, str]:
+    if tag in display_name_overrides:
+        return display_name_overrides[tag], "manual_override"
+
+    exact = str(exact_names.get(tag) or "").strip()
+    if exact:
+        return exact, "exact_tag_loc"
+
+    suffix_map = suffix_names.get(tag, {})
+    for suffix in suffix_priority:
+        candidate = str(suffix_map.get(suffix) or "").strip()
+        if candidate:
+            return candidate, "ideology_loc"
+
+    if country_file_label and not country_file_is_shared_template:
+        return country_file_label, "unique_country_file"
+
+    return tag, "tag_fallback"
+
+
 def build_palette_entries(
     root: Path,
     tag_map: dict[str, tuple[str, bool]],
     colors_txt_data: dict[str, dict[str, str]],
-    localized_names: dict[str, str],
+    exact_names: dict[str, str],
+    suffix_names: dict[str, dict[str, str]],
+    manual: dict,
 ) -> dict[str, PaletteEntry]:
+    display_name_overrides = normalize_display_name_overrides(manual.get("display_name_overrides"))
+    suffix_priority = normalize_suffix_priority(manual.get("display_name_suffix_priority"))
+    country_file_usage = build_country_file_usage(tag_map)
+
     entries: dict[str, PaletteEntry] = {}
     for tag, (country_file, dynamic) in sorted(tag_map.items()):
         country_path = root / "common" / country_file
         country_file_label = country_path.stem
-        localized_name = localized_names.get(tag, country_file_label)
+        is_shared_template = country_file_usage[str(country_file)] > 1
+        localized_name, name_source = resolve_display_name(
+            tag=tag,
+            country_file_label=country_file_label,
+            country_file_is_shared_template=is_shared_template,
+            exact_names=exact_names,
+            suffix_names=suffix_names,
+            display_name_overrides=display_name_overrides,
+            suffix_priority=suffix_priority,
+        )
 
         colors_txt_entry = colors_txt_data.get(tag, {})
         country_file_hex, country_file_source = parse_country_file_color(country_path)
         ui_hex = colors_txt_entry.get("ui_hex", "")
         ui_source = colors_txt_entry.get("ui_source", "")
-        map_hex = (
-            colors_txt_entry.get("map_hex")
-            or country_file_hex
-            or ui_hex
-            or ""
-        )
-        map_source = (
-            colors_txt_entry.get("map_source")
-            or country_file_source
-            or ui_source
-            or ""
-        )
+        map_hex = colors_txt_entry.get("map_hex") or country_file_hex or ui_hex or ""
+        map_source = colors_txt_entry.get("map_source") or country_file_source or ui_source or ""
 
         if not map_hex:
             continue
@@ -290,8 +440,10 @@ def build_palette_entries(
         entries[tag] = PaletteEntry(
             tag=tag,
             localized_name=localized_name,
+            name_source=name_source,
             country_file_label=country_file_label,
             country_file=country_file,
+            country_file_is_shared_template=is_shared_template,
             map_hex=map_hex,
             map_source=map_source,
             ui_hex=ui_hex,
@@ -303,62 +455,60 @@ def build_palette_entries(
     return entries
 
 
-def normalize_verified_mapping(raw_mapping: dict | None) -> dict[str, str]:
-    normalized: dict[str, str] = {}
-    for tag, iso2 in (raw_mapping or {}).items():
-        normalized[str(tag).strip().upper()] = str(iso2).strip().upper()
-    return normalized
-
-
-def normalize_deny_tags(raw_deny_tags: dict | None) -> dict[str, dict[str, str]]:
-    deny_tags: dict[str, dict[str, str]] = {}
-    for raw_tag, raw_value in (raw_deny_tags or {}).items():
-        tag = str(raw_tag).strip().upper()
-        if isinstance(raw_value, str):
-            payload = {
-                "reason": raw_value.strip(),
-            }
-        elif isinstance(raw_value, dict):
-            payload = {
-                "reason": str(raw_value.get("reason") or "").strip(),
-            }
-            suggested_iso2 = str(raw_value.get("suggested_iso2") or "").strip().upper()
-            if suggested_iso2:
-                payload["suggested_iso2"] = suggested_iso2
-        else:
-            raise SystemExit(f"Invalid deny_tags entry for {tag}: expected string or object.")
-
-        reason = payload.get("reason", "")
-        if reason not in SUPPORTED_UNMAPPED_REASONS:
-            raise SystemExit(f"Unsupported unmapped reason for {tag}: {reason}")
-        deny_tags[tag] = payload
-    return deny_tags
-
-
-def find_exact_match_candidate(
-    entry: PaletteEntry,
-    primary_name_to_iso2: dict[str, str],
-) -> MatchCandidate | None:
+def find_exact_match_candidate(entry: PaletteEntry, primary_name_to_iso2: dict[str, str]) -> MatchCandidate | None:
     localized_match = primary_name_to_iso2.get(normalize_text(entry.localized_name))
     if localized_match:
         return MatchCandidate(iso2=localized_match, match_kind="localized_exact")
 
-    file_label_match = primary_name_to_iso2.get(normalize_text(entry.country_file_label))
-    if file_label_match:
-        return MatchCandidate(iso2=file_label_match, match_kind="country_file_exact")
+    if not entry.country_file_is_shared_template:
+        file_label_match = primary_name_to_iso2.get(normalize_text(entry.country_file_label))
+        if file_label_match:
+            return MatchCandidate(iso2=file_label_match, match_kind="country_file_exact")
 
     return None
+
+
+def load_inherited_manual(manual_path: Path, manual: dict) -> dict:
+    inherited_palette_id = str(manual.get("inherit_verified_from_palette_id") or "").strip()
+    if not inherited_palette_id:
+        return {}
+    inherited_path = manual_path.with_name(f"{inherited_palette_id}.manual.json")
+    if not inherited_path.exists():
+        raise SystemExit(
+            f"Inherited manual mapping file not found: {inherited_path} (from {manual_path.name})"
+        )
+    return load_json(inherited_path)
 
 
 def resolve_mapping_state(
     entries: dict[str, PaletteEntry],
     manual: dict,
+    manual_path: Path,
     runtime_country_codes: set[str],
     primary_name_to_iso2: dict[str, str],
 ) -> tuple[dict[str, dict], dict[str, dict], dict[str, dict]]:
-    verified_exact = normalize_verified_mapping(manual.get("verified_exact_tag_to_iso2"))
-    verified_alias = normalize_verified_mapping(manual.get("verified_alias_tag_to_iso2"))
-    deny_tags = normalize_deny_tags(manual.get("deny_tags"))
+    inherited_manual = load_inherited_manual(manual_path, manual)
+
+    verified_exact = {}
+    verified_alias = {}
+    deny_tags = {}
+
+    if manual.get("inherit_exact_verified"):
+        verified_exact.update(normalize_verified_mapping(inherited_manual.get("verified_exact_tag_to_iso2")))
+    if manual.get("inherit_alias_verified"):
+        verified_alias.update(normalize_verified_mapping(inherited_manual.get("verified_alias_tag_to_iso2")))
+    deny_tags.update(normalize_deny_tags(inherited_manual.get("deny_tags")))
+
+    verified_exact.update(normalize_verified_mapping(manual.get("verified_exact_tag_to_iso2")))
+    verified_alias.update(normalize_verified_mapping(manual.get("verified_alias_tag_to_iso2")))
+    deny_tags.update(normalize_deny_tags(manual.get("deny_tags")))
+
+    for tag in list(verified_exact):
+        if tag not in entries or tag in deny_tags:
+            verified_exact.pop(tag, None)
+    for tag in list(verified_alias):
+        if tag not in entries or tag in deny_tags:
+            verified_alias.pop(tag, None)
 
     for tag, iso2 in {**verified_exact, **verified_alias}.items():
         if iso2 not in runtime_country_codes:
@@ -377,10 +527,9 @@ def resolve_mapping_state(
         unmapped_payload = None
 
         if tag in verified_exact:
-            match_kind = exact_candidate.match_kind if exact_candidate else "manual_exact"
             mapped_payload = {
                 "iso2": verified_exact[tag],
-                "match_kind": match_kind,
+                "match_kind": exact_candidate.match_kind if exact_candidate else "manual_exact",
                 "decision_source": "manual_verified",
             }
         elif tag in verified_alias:
@@ -390,17 +539,14 @@ def resolve_mapping_state(
                 "decision_source": "manual_verified",
             }
         elif entry.dynamic:
-            unmapped_payload = {
-                "reason": "dynamic_tag_not_mapped",
-            }
+            unmapped_payload = {"reason": "dynamic_tag_not_mapped"}
         elif tag in deny_tags:
             deny_payload = dict(deny_tags[tag])
-            suggested_iso2 = deny_payload.get("suggested_iso2") or (exact_candidate.iso2 if exact_candidate else "")
-            unmapped_payload = {
-                "reason": deny_payload["reason"],
-            }
-            if suggested_iso2:
-                unmapped_payload["suggested_iso2"] = suggested_iso2
+            if not deny_payload.get("suggested_iso2") and exact_candidate:
+                deny_payload["suggested_iso2"] = exact_candidate.iso2
+            unmapped_payload = {"reason": deny_payload["reason"]}
+            if deny_payload.get("suggested_iso2"):
+                unmapped_payload["suggested_iso2"] = deny_payload["suggested_iso2"]
         elif exact_candidate and exact_candidate.iso2 not in runtime_country_codes:
             unmapped_payload = {
                 "reason": "unsupported_runtime_country",
@@ -412,15 +558,15 @@ def resolve_mapping_state(
                 "suggested_iso2": exact_candidate.iso2,
             }
         else:
-            unmapped_payload = {
-                "reason": "unreviewed",
-            }
+            unmapped_payload = {"reason": "unreviewed"}
 
         if mapped_payload:
             mapped[tag] = mapped_payload
             audit_entries[tag] = {
                 "localized_name": entry.localized_name,
                 "country_file_label": entry.country_file_label,
+                "name_source": entry.name_source,
+                "country_file_is_shared_template": entry.country_file_is_shared_template,
                 "map_hex": entry.map_hex,
                 "ui_hex": entry.ui_hex,
                 "status": "mapped",
@@ -433,6 +579,8 @@ def resolve_mapping_state(
             audit_entry = {
                 "localized_name": entry.localized_name,
                 "country_file_label": entry.country_file_label,
+                "name_source": entry.name_source,
+                "country_file_is_shared_template": entry.country_file_is_shared_template,
                 "map_hex": entry.map_hex,
                 "ui_hex": entry.ui_hex,
                 "status": "unmapped",
@@ -445,6 +593,41 @@ def resolve_mapping_state(
     return mapped, unmapped, audit_entries
 
 
+def apply_mapped_project_name_fallbacks(
+    entries: dict[str, PaletteEntry],
+    mapped: dict[str, dict],
+    primary_iso2_to_name: dict[str, str],
+) -> dict[str, PaletteEntry]:
+    updated: dict[str, PaletteEntry] = {}
+    for tag, entry in entries.items():
+        mapped_iso2 = str(mapped.get(tag, {}).get("iso2") or "").strip().upper()
+        if entry.name_source == "tag_fallback" and mapped_iso2 and primary_iso2_to_name.get(mapped_iso2):
+            updated[tag] = replace(
+                entry,
+                localized_name=primary_iso2_to_name[mapped_iso2],
+                name_source="mapped_project_name",
+            )
+        else:
+            updated[tag] = entry
+    return updated
+
+
+def rebuild_audit_names(
+    audit_entries: dict[str, dict],
+    entries: dict[str, PaletteEntry],
+) -> dict[str, dict]:
+    refreshed: dict[str, dict] = {}
+    for tag, payload in audit_entries.items():
+        entry = entries[tag]
+        next_payload = dict(payload)
+        next_payload["localized_name"] = entry.localized_name
+        next_payload["country_file_label"] = entry.country_file_label
+        next_payload["name_source"] = entry.name_source
+        next_payload["country_file_is_shared_template"] = entry.country_file_is_shared_template
+        refreshed[tag] = next_payload
+    return refreshed
+
+
 def build_quick_tags(entries: dict[str, PaletteEntry], manual: dict) -> list[str]:
     quick_tags: list[str] = []
     for raw_tag in manual.get("quick_tags") or []:
@@ -454,19 +637,31 @@ def build_quick_tags(entries: dict[str, PaletteEntry], manual: dict) -> list[str
     return quick_tags
 
 
+def build_ocean_meta(palette_id: str, manual: dict) -> dict:
+    default = DEFAULT_OCEAN_META.get(palette_id, DEFAULT_OCEAN_META["hoi4_vanilla"])
+    manual_fill = str(manual.get("ocean_fill") or default["fill_color"]).strip().lower()
+    return {
+        "apply_on_autofill": bool(default["apply_on_autofill"]),
+        "fill_color": manual_fill if re.fullmatch(r"#[0-9a-f]{6}", manual_fill) else default["fill_color"],
+        "source": default["source"],
+    }
+
+
 def build_palette_payload(
-    palette_id: str,
-    display_name: str,
+    args: argparse.Namespace,
     root: Path,
     entries: dict[str, PaletteEntry],
     quick_tags: list[str],
+    ocean_meta: dict,
 ) -> dict:
     serialized_entries = {}
     for tag, entry in sorted(entries.items()):
         serialized_entries[tag] = {
             "localized_name": entry.localized_name,
+            "name_source": entry.name_source,
             "country_file_label": entry.country_file_label,
             "country_file": entry.country_file,
+            "country_file_is_shared_template": entry.country_file_is_shared_template,
             "map_hex": entry.map_hex,
             "map_source": entry.map_source,
             "ui_hex": entry.ui_hex,
@@ -475,27 +670,29 @@ def build_palette_payload(
             "country_file_source": entry.country_file_source,
             "dynamic": entry.dynamic,
         }
-    return {
-        "version": 2,
-        "palette_id": palette_id,
-        "display_name": display_name,
-        "source_type": "game",
+
+    source_type = "game_mod" if str(args.source_workshop_id or "").strip() else "game"
+    payload = {
+        "version": 3,
+        "palette_id": args.palette_id,
+        "display_name": args.display_name,
+        "source_type": source_type,
         "source_game": "Hearts of Iron IV",
-        "source_variant": "vanilla",
+        "source_variant": args.source_variant,
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "hoi4_root": str(root),
+        "source_root": str(root),
         "preferred_runtime_color_field": "map_hex",
         "preferred_color_field": "color",
         "quick_tags": quick_tags,
+        "ocean": ocean_meta,
         "entries": serialized_entries,
     }
+    if source_type == "game_mod":
+        payload["source_workshop_id"] = str(args.source_workshop_id).strip()
+    return payload
 
 
-def build_map_payload(
-    palette_id: str,
-    mapped: dict[str, dict],
-    unmapped: dict[str, dict],
-) -> dict:
+def build_map_payload(palette_id: str, mapped: dict[str, dict], unmapped: dict[str, dict]) -> dict:
     return {
         "version": 2,
         "palette_id": palette_id,
@@ -525,31 +722,90 @@ def build_audit_payload(
     }
 
 
+def merge_registry_entry(
+    registry_path: Path,
+    palette_id: str,
+    display_name: str,
+    palette_url: str,
+    map_url: str,
+    audit_url: str,
+    source_type: str,
+    source_workshop_id: str,
+    registry_mode: str,
+) -> dict:
+    if registry_mode not in {"merge", "replace"}:
+        raise SystemExit(f"Unsupported registry mode: {registry_mode}")
+
+    registry_payload = {"version": 2, "default_palette_id": "hoi4_vanilla", "palettes": []}
+    if registry_mode == "merge" and registry_path.exists():
+        try:
+            existing = load_json(registry_path)
+            if isinstance(existing, dict):
+                registry_payload.update(existing)
+        except Exception:
+            pass
+
+    registry_payload["version"] = 2
+    registry_payload["default_palette_id"] = str(
+        registry_payload.get("default_palette_id") or "hoi4_vanilla"
+    ).strip() or "hoi4_vanilla"
+
+    palettes = registry_payload.get("palettes")
+    if not isinstance(palettes, list):
+        palettes = []
+    registry_payload["palettes"] = palettes
+
+    entry = {
+        "palette_id": palette_id,
+        "display_name": display_name,
+        "source_type": source_type,
+        "palette_url": palette_url,
+        "map_url": map_url,
+        "audit_url": audit_url,
+    }
+    if source_type == "game_mod" and source_workshop_id:
+        entry["source_workshop_id"] = source_workshop_id
+
+    replaced = False
+    for index, current in enumerate(palettes):
+        if str(current.get("palette_id") or "").strip() == palette_id:
+            palettes[index] = entry
+            replaced = True
+            break
+    if not replaced:
+        palettes.append(entry)
+
+    palettes.sort(
+        key=lambda item: (
+            PALETTE_SORT_ORDER.get(str(item.get("palette_id") or "").strip(), 999),
+            item.get("display_name", ""),
+        )
+    )
+    return registry_payload
+
+
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Import HOI4 country colors into project palette assets.")
-    parser.add_argument("--source-root", default=None, help="HOI4 installation root. Defaults to common Steam paths.")
+    parser = argparse.ArgumentParser(description="Import HOI4/mod country colors into project palette assets.")
+    parser.add_argument("--source-root", default=None, help="HOI4 or mod root directory.")
     parser.add_argument("--palette-id", default="hoi4_vanilla")
     parser.add_argument("--display-name", default="HOI4 Vanilla")
+    parser.add_argument("--source-variant", default="vanilla")
+    parser.add_argument("--source-workshop-id", default="")
     parser.add_argument("--manual-map", default="data/palette-maps/hoi4_vanilla.manual.json")
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
     parser.add_argument("--primary-topology", default=str(DEFAULT_PRIMARY_TOPOLOGY))
     parser.add_argument("--runtime-topology", default=str(DEFAULT_RUNTIME_TOPOLOGY))
-    parser.add_argument(
-        "--localisation-file",
-        default=str(DEFAULT_LOCALISATION),
-        help="Path relative to HOI4 root for English country names.",
-    )
+    parser.add_argument("--registry-mode", choices=["merge", "replace"], default="merge")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    root = find_hoi4_root(args.source_root)
+    root = find_source_root(args.source_root)
     output_dir = Path(args.output_dir)
     primary_topology = Path(args.primary_topology)
     runtime_topology = Path(args.runtime_topology)
     manual_path = Path(args.manual_map)
-    localisation_path = root / args.localisation_file
 
     if not primary_topology.exists():
         raise SystemExit(f"Primary topology not found: {primary_topology}")
@@ -559,38 +815,28 @@ def main() -> None:
         raise SystemExit(f"Manual map file not found: {manual_path}")
 
     manual = load_json(manual_path)
-    _primary_iso2_to_name, primary_name_to_iso2 = load_primary_country_names(primary_topology)
+    primary_iso2_to_name, primary_name_to_iso2 = load_primary_country_names(primary_topology)
     runtime_country_codes = load_runtime_country_codes(runtime_topology)
-    localized_names = parse_localized_country_names(localisation_path)
+    suffix_priority = normalize_suffix_priority(manual.get("display_name_suffix_priority"))
+    exact_names, suffix_names = parse_localisation_catalog(root, suffix_priority)
     tag_map = parse_country_tags(root)
     colors_txt_data = parse_colors_txt(root / "common/countries/colors.txt")
-    entries = build_palette_entries(root, tag_map, colors_txt_data, localized_names)
+    raw_entries = build_palette_entries(root, tag_map, colors_txt_data, exact_names, suffix_names, manual)
     mapped, unmapped, audit_entries = resolve_mapping_state(
-        entries,
+        raw_entries,
         manual,
+        manual_path,
         runtime_country_codes,
         primary_name_to_iso2,
     )
+    entries = apply_mapped_project_name_fallbacks(raw_entries, mapped, primary_iso2_to_name)
+    audit_entries = rebuild_audit_names(audit_entries, entries)
     quick_tags = build_quick_tags(entries, manual)
+    ocean_meta = build_ocean_meta(args.palette_id, manual)
 
-    palette_payload = build_palette_payload(
-        args.palette_id,
-        args.display_name,
-        root,
-        entries,
-        quick_tags,
-    )
-    map_payload = build_map_payload(
-        args.palette_id,
-        mapped,
-        unmapped,
-    )
-    audit_payload = build_audit_payload(
-        args.palette_id,
-        audit_entries,
-        mapped,
-        unmapped,
-    )
+    palette_payload = build_palette_payload(args, root, entries, quick_tags, ocean_meta)
+    map_payload = build_map_payload(args.palette_id, mapped, unmapped)
+    audit_payload = build_audit_payload(args.palette_id, audit_entries, mapped, unmapped)
 
     palette_path = output_dir / "palettes" / f"{args.palette_id}.palette.json"
     map_path = output_dir / "palette-maps" / f"{args.palette_id}.map.json"
@@ -601,28 +847,31 @@ def main() -> None:
     dump_json(map_path, map_payload)
     dump_json(audit_path, audit_payload)
 
-    registry_payload = {
-        "version": 1,
-        "default_palette_id": args.palette_id,
-        "palettes": [
-            {
-                "palette_id": args.palette_id,
-                "display_name": args.display_name,
-                "palette_url": str(palette_path).replace("\\", "/"),
-                "map_url": str(map_path).replace("\\", "/"),
-            }
-        ],
-    }
+    source_type = "game_mod" if str(args.source_workshop_id or "").strip() else "game"
+    registry_payload = merge_registry_entry(
+        registry_path=registry_path,
+        palette_id=args.palette_id,
+        display_name=args.display_name,
+        palette_url=resolve_relative_url(palette_path),
+        map_url=resolve_relative_url(map_path),
+        audit_url=resolve_relative_url(audit_path),
+        source_type=source_type,
+        source_workshop_id=str(args.source_workshop_id or "").strip(),
+        registry_mode=args.registry_mode,
+    )
     dump_json(registry_path, registry_payload)
 
     print(
-        f"[Palette Import] root={root}\n"
+        f"[Palette Import] palette={args.palette_id}\n"
+        f"  root={root}\n"
         f"  entries={len(entries)}\n"
         f"  mapped={len(mapped)}\n"
         f"  unmapped={len(unmapped)}\n"
+        f"  quick_tags={len(quick_tags)}\n"
         f"  palette={palette_path}\n"
         f"  map={map_path}\n"
-        f"  audit={audit_path}"
+        f"  audit={audit_path}\n"
+        f"  registry={registry_path}"
     )
 
 

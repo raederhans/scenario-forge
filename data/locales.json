@@ -36,6 +36,10 @@
       "en": "Auto-Fill Countries",
       "zh": "自动填充国家"
     },
+    "Auto-Fill Style": {
+      "en": "Auto-Fill Style",
+      "zh": "自动填充风格"
+    },
     "Borders need recalculation": {
       "en": "Borders need recalculation",
       "zh": "边界需要重算"

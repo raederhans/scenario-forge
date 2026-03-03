@@ -44,32 +44,74 @@ def ensure_packages(packages: Iterable[str]) -> None:
         raise SystemExit(exc.returncode) from exc
 
 
-ensure_packages(["geopandas", "matplotlib", "mapclassify", "requests", "shapely", "topojson"])
+def _peek_requested_mode(argv: list[str]) -> str:
+    for index, arg in enumerate(argv):
+        if arg == "--mode" and index + 1 < len(argv):
+            return str(argv[index + 1]).strip().lower()
+        if arg.startswith("--mode="):
+            return str(arg.split("=", 1)[1]).strip().lower()
+    return "all"
 
-import geopandas as gpd
-import pandas as pd
-import requests
-from shapely.geometry import box
+
+REQUESTED_MODE = _peek_requested_mode(sys.argv[1:])
+
+if REQUESTED_MODE != "palettes":
+    ensure_packages(["geopandas", "matplotlib", "mapclassify", "requests", "shapely", "topojson"])
+
+    import geopandas as gpd
+    import pandas as pd
+    import requests
+    from shapely.geometry import box
+else:  # pragma: no cover - palettes mode does not touch GIS stack
+    gpd = None
+    pd = None
+    requests = None
+    box = None
 
 from map_builder import config as cfg
-from map_builder.geo.topology import build_topology
-from map_builder.geo.utils import (
-    clip_to_map_bounds,
-    pick_column,
-    smart_island_cull,
-)
-from map_builder.io.fetch import fetch_ne_zip, fetch_or_load_geojson
-from map_builder.io.readers import load_physical, load_rivers, load_urban
-from map_builder.processors.admin1 import build_extension_admin1, extract_country_code
-from map_builder.processors.china import apply_china_replacement
-from map_builder.processors.france import apply_holistic_replacements
-from map_builder.processors.north_america import apply_north_america_replacement
-from map_builder.processors.poland import apply_poland_replacement
-from map_builder.processors.russia_ukraine import apply_russia_ukraine_replacement
-from map_builder.processors.south_asia import apply_south_asia_replacement
-from map_builder.processors.special_zones import build_special_zones
-from map_builder.outputs.save import save_outputs
-from tools import generate_hierarchy, geo_key_normalizer, translate_manager
+
+if REQUESTED_MODE != "palettes":
+    from map_builder.geo.topology import build_topology
+    from map_builder.geo.utils import (
+        clip_to_map_bounds,
+        pick_column,
+        smart_island_cull,
+    )
+    from map_builder.io.fetch import fetch_ne_zip, fetch_or_load_geojson
+    from map_builder.io.readers import load_physical, load_rivers, load_urban
+    from map_builder.processors.admin1 import build_extension_admin1, extract_country_code
+    from map_builder.processors.china import apply_china_replacement
+    from map_builder.processors.france import apply_holistic_replacements
+    from map_builder.processors.north_america import apply_north_america_replacement
+    from map_builder.processors.poland import apply_poland_replacement
+    from map_builder.processors.russia_ukraine import apply_russia_ukraine_replacement
+    from map_builder.processors.south_asia import apply_south_asia_replacement
+    from map_builder.processors.special_zones import build_special_zones
+    from map_builder.outputs.save import save_outputs
+    from tools import generate_hierarchy, geo_key_normalizer, translate_manager
+else:  # pragma: no cover - palettes mode avoids GIS/runtime build imports
+    build_topology = None
+    clip_to_map_bounds = None
+    pick_column = None
+    smart_island_cull = None
+    fetch_ne_zip = None
+    fetch_or_load_geojson = None
+    load_physical = None
+    load_rivers = None
+    load_urban = None
+    build_extension_admin1 = None
+    extract_country_code = None
+    apply_china_replacement = None
+    apply_holistic_replacements = None
+    apply_north_america_replacement = None
+    apply_poland_replacement = None
+    apply_russia_ukraine_replacement = None
+    apply_south_asia_replacement = None
+    build_special_zones = None
+    save_outputs = None
+    generate_hierarchy = None
+    geo_key_normalizer = None
+    translate_manager = None
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 D3_VENDOR_PATH = PROJECT_ROOT / 'vendor' / 'd3.v7.min.js'
@@ -779,9 +821,9 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build Map Creator data artifacts.")
     parser.add_argument(
         "--mode",
-        choices=["all", "primary", "detail", "i18n"],
+        choices=["all", "primary", "detail", "i18n", "palettes"],
         default="all",
-        help="Build scope. all=full pipeline, primary=coarse topology, detail=detail/runtime artifacts, i18n=hierarchy/aliases/locales.",
+        help="Build scope. all=full pipeline, primary=coarse topology, detail=detail/runtime artifacts, i18n=hierarchy/aliases/locales, palettes=palette assets only.",
     )
     parser.add_argument(
         "--strict",
@@ -993,8 +1035,17 @@ def write_data_manifest(output_dir: Path) -> Path:
         "locales.json": "locales",
         "palettes/index.json": "palette_registry",
         "palettes/hoi4_vanilla.palette.json": "palette_pack",
+        "palettes/kaiserreich.palette.json": "palette_pack",
+        "palettes/tno.palette.json": "palette_pack",
+        "palettes/red_flood.palette.json": "palette_pack",
         "palette-maps/hoi4_vanilla.map.json": "palette_map",
+        "palette-maps/kaiserreich.map.json": "palette_map",
+        "palette-maps/tno.map.json": "palette_map",
+        "palette-maps/red_flood.map.json": "palette_map",
         "palette-maps/hoi4_vanilla.audit.json": "palette_audit",
+        "palette-maps/kaiserreich.audit.json": "palette_audit",
+        "palette-maps/tno.audit.json": "palette_audit",
+        "palette-maps/red_flood.audit.json": "palette_audit",
     }
     outputs: dict[str, dict] = {}
     for file_name, role in roles.items():
@@ -1203,6 +1254,98 @@ def run_geo_alias_normalization(output_dir: Path) -> None:
     print(f"Saved geo aliases to: {output_path}")
 
 
+def _resolve_palette_source_root(candidates: list[Path]) -> Path | None:
+    for candidate in candidates:
+        if (candidate / "common/country_tags/00_countries.txt").exists():
+            return candidate
+    return None
+
+
+def run_palette_imports(output_dir: Path, strict: bool = False) -> None:
+    importer = PROJECT_ROOT / "tools" / "import_country_palette.py"
+    primary_topology = output_dir / "europe_topology.json"
+    runtime_topology = output_dir / "europe_topology.runtime_political_v1.json"
+    if not importer.exists():
+        raise SystemExit(f"Palette importer missing: {importer}")
+    if not primary_topology.exists():
+        raise SystemExit(f"Primary topology required for palette import: {primary_topology}")
+    if not runtime_topology.exists():
+        raise SystemExit(f"Runtime topology required for palette import: {runtime_topology}")
+
+    vanilla_root = _resolve_palette_source_root([
+        Path(r"/mnt/c/Program Files (x86)/Steam/steamapps/common/Hearts of Iron IV"),
+        Path(r"C:\Program Files (x86)\Steam\steamapps\common\Hearts of Iron IV"),
+    ])
+    palette_jobs = [
+        {
+            "palette_id": "hoi4_vanilla",
+            "display_name": "HOI4 Vanilla",
+            "source_variant": "vanilla",
+            "manual_map": PROJECT_ROOT / "data/palette-maps/hoi4_vanilla.manual.json",
+            "source_root": vanilla_root,
+            "source_workshop_id": "",
+        },
+        {
+            "palette_id": "kaiserreich",
+            "display_name": "Kaiserreich",
+            "source_variant": "kaiserreich",
+            "manual_map": PROJECT_ROOT / "data/palette-maps/kaiserreich.manual.json",
+            "source_root": Path(r"/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/394360/1521695605"),
+            "source_workshop_id": "1521695605",
+        },
+        {
+            "palette_id": "tno",
+            "display_name": "The New Order",
+            "source_variant": "tno",
+            "manual_map": PROJECT_ROOT / "data/palette-maps/tno.manual.json",
+            "source_root": Path(r"/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/394360/2438003901"),
+            "source_workshop_id": "2438003901",
+        },
+        {
+            "palette_id": "red_flood",
+            "display_name": "Red Flood",
+            "source_variant": "red_flood",
+            "manual_map": PROJECT_ROOT / "data/palette-maps/red_flood.manual.json",
+            "source_root": Path(r"/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/394360/2815832636"),
+            "source_workshop_id": "2815832636",
+        },
+    ]
+
+    for job in palette_jobs:
+        source_root = job["source_root"]
+        if source_root is None or not source_root.exists():
+            message = f"[Palette] Source root missing for {job['palette_id']}: {source_root}"
+            if strict:
+                raise SystemExit(message)
+            print(f"{message}. Skipping.")
+            continue
+        cmd = [
+            sys.executable,
+            str(importer),
+            "--source-root",
+            str(source_root),
+            "--palette-id",
+            str(job["palette_id"]),
+            "--display-name",
+            str(job["display_name"]),
+            "--source-variant",
+            str(job["source_variant"]),
+            "--manual-map",
+            str(job["manual_map"]),
+            "--output-dir",
+            str(output_dir),
+            "--primary-topology",
+            str(primary_topology),
+            "--runtime-topology",
+            str(runtime_topology),
+            "--registry-mode",
+            "merge",
+        ]
+        if job["source_workshop_id"]:
+            cmd.extend(["--source-workshop-id", str(job["source_workshop_id"])])
+        subprocess.run(cmd, cwd=PROJECT_ROOT, check=True)
+
+
 def main() -> None:
     args = parse_args()
     script_dir = Path(__file__).resolve().parent
@@ -1239,6 +1382,14 @@ def main() -> None:
             f"todo_markers={translation_result['geo_literal_todo_markers']}, "
             f"mt_requests={translation_result['mt_requests']}"
         )
+        write_data_manifest(output_dir)
+        validate_build_outputs(output_dir, strict=args.strict)
+        print("Done.")
+        return
+
+    if args.mode == "palettes":
+        print("[INFO] Rebuilding palette assets....")
+        run_palette_imports(output_dir, strict=args.strict)
         write_data_manifest(output_dir)
         validate_build_outputs(output_dir, strict=args.strict)
         print("Done.")

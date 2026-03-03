@@ -13,13 +13,13 @@ import {
   selectSpecialZoneById,
 } from "../core/map_renderer.js";
 import {
-  applyActivePaletteState,
   buildPaletteLibraryEntries,
   buildPaletteQuickSwatches,
   getPaletteSourceOptions,
   getSuggestedIso2,
   getUnmappedReason,
   normalizeHexColor,
+  setActivePaletteSource,
 } from "../core/palette_manager.js";
 import { toggleLanguage, updateUIText, t } from "./i18n.js";
 import { resetAllFeatureOwnersToCanonical } from "../core/sovereignty_manager.js";
@@ -149,6 +149,7 @@ function initToolbar({ render } = {}) {
   const paletteLibraryList = document.getElementById("paletteLibraryList");
   const presetPolitical = document.getElementById("presetPolitical");
   const presetClear = document.getElementById("presetClear");
+  const autoFillStyleSelect = document.getElementById("autoFillStyleSelect");
   const colorModeSelect = document.getElementById("colorModeSelect");
   const paintGranularitySelect = document.getElementById("paintGranularitySelect");
   const paintModeSelect = document.getElementById("paintModeSelect");
@@ -460,6 +461,44 @@ function initToolbar({ render } = {}) {
       });
       recentContainer.appendChild(btn);
     });
+  }
+
+  function syncPaletteSourceControls() {
+    const activeValue = String(state.activePaletteId || "");
+    [themeSelect, autoFillStyleSelect].forEach((select) => {
+      if (!select) return;
+      if (select.value !== activeValue) {
+        select.value = activeValue;
+      }
+    });
+  }
+  state.updatePaletteSourceUIFn = syncPaletteSourceControls;
+  state.renderPaletteFn = renderPalette;
+
+  async function handlePaletteSourceChange(nextPaletteId) {
+    const targetId = String(nextPaletteId || "").trim();
+    if (!targetId || targetId === state.activePaletteId) {
+      syncPaletteSourceControls();
+      return;
+    }
+    const didChange = await setActivePaletteSource(targetId, {
+      syncUI: true,
+      overwriteCountryPalette: false,
+    });
+    if (!didChange) {
+      syncPaletteSourceControls();
+    }
+  }
+
+  function applyAutoFillOceanColor() {
+    const oceanMeta = state.activePaletteOceanMeta || state.activePalettePack?.ocean || null;
+    const nextFillColor = normalizeOceanFillColor(
+      oceanMeta?.apply_on_autofill ? oceanMeta?.fill_color : "#aadaff"
+    );
+    state.styleConfig.ocean.fillColor = nextFillColor;
+    if (oceanFillColor) {
+      oceanFillColor.value = nextFillColor;
+    }
   }
   state.updateRecentUI = () => {
     renderRecentColors();
@@ -1187,7 +1226,9 @@ function initToolbar({ render } = {}) {
 
   if (presetPolitical) {
     presetPolitical.addEventListener("click", () => {
-      autoFillMap(state.colorMode);
+      autoFillMap("political");
+      applyAutoFillOceanColor();
+      if (render) render();
     });
   }
 
@@ -1253,25 +1294,25 @@ function initToolbar({ render } = {}) {
 
   if (themeSelect) {
     populatePaletteSourceOptions(themeSelect);
-    themeSelect.addEventListener("change", (event) => {
+    themeSelect.addEventListener("change", async (event) => {
       const sourceOptions = getPaletteSourceOptions();
-      if (sourceOptions.length > 0) {
-        state.activePaletteId = String(event.target.value || "").trim();
-        const nextMeta = state.paletteRegistry?.palettes?.find(
-          (entry) => String(entry?.palette_id || "").trim() === state.activePaletteId
-        ) || state.activePaletteMeta;
-        state.activePaletteMeta = nextMeta || null;
-        state.currentPaletteTheme = String(
-          nextMeta?.display_name || state.currentPaletteTheme || "HOI4 Vanilla"
-        );
-        applyActivePaletteState({ overwriteCountryPalette: false });
-        renderPalette(state.currentPaletteTheme);
+      if (!sourceOptions.length) {
+        renderPalette(event.target.value);
         renderPaletteLibrary();
         return;
       }
+      await handlePaletteSourceChange(event.target.value);
+    });
+  }
 
-      renderPalette(event.target.value);
-      renderPaletteLibrary();
+  if (autoFillStyleSelect) {
+    populatePaletteSourceOptions(autoFillStyleSelect);
+    autoFillStyleSelect.addEventListener("change", async (event) => {
+      if (!getPaletteSourceOptions().length) {
+        syncPaletteSourceControls();
+        return;
+      }
+      await handlePaletteSourceChange(event.target.value);
     });
   }
 
@@ -1613,6 +1654,7 @@ function initToolbar({ render } = {}) {
       ? t("Hide Color Library", "ui")
       : t("Browse All Colors", "ui");
   }
+  syncPaletteSourceControls();
   renderPalette(state.currentPaletteTheme);
   renderPaletteLibrary();
   state.updatePaintModeUIFn();
