@@ -90,6 +90,7 @@ const countryPalette = {
   LI: "#45b39d",
 };
 
+const legacyDefaultCountryPalette = { ...countryPalette };
 const defaultCountryPalette = { ...countryPalette };
 
 const countryNames = {
@@ -386,6 +387,7 @@ export {
   PALETTE_THEMES,
   countryPalette,
   defaultCountryPalette,
+  legacyDefaultCountryPalette,
   countryNames,
   countryPresets,
   PRESET_STORAGE_KEY,
@@ -452,8 +454,19 @@ export const state = {
   sovereignContrastWarnings: [],
   // Click/paint granularity: subdivision | country.
   interactionGranularity: "subdivision",
+  paletteRegistry: null,
+  activePaletteId: "hoi4_vanilla",
+  activePaletteMeta: null,
+  activePalettePack: null,
+  activePaletteMap: null,
+  fixedPaletteColorsByIso2: {},
+  resolvedDefaultCountryPalette: { ...defaultCountryPalette },
+  paletteLibraryOpen: false,
+  paletteLibrarySearch: "",
+  paletteLibraryEntries: [],
+  paletteQuickSwatches: [],
   currentPaletteTheme: "HOI4 Vanilla",
-  colorMode: "region",
+  colorMode: "political",
   selectedColor: PALETTE_THEMES["HOI4 Vanilla"][0],
   currentTool: "fill",
   hoveredId: null,
@@ -578,6 +591,7 @@ export const state = {
 
   countryPalette,
   defaultCountryPalette,
+  legacyDefaultCountryPalette,
   countryNames,
   countryPresets,
 

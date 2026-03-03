@@ -2,6 +2,7 @@
 import { state } from "./core/state.js";
 import { loadDeferredDetailBundle, loadMapData } from "./core/data_loader.js";
 import { initMap, setMapData, render } from "./core/map_renderer.js";
+import { applyActivePaletteState } from "./core/palette_manager.js";
 import { initSidebar, initPresetState } from "./ui/sidebar.js";
 import { initToolbar } from "./ui/toolbar.js";
 import { initTranslations } from "./ui/i18n.js";
@@ -166,6 +167,10 @@ async function bootstrap() {
       hierarchy,
       ruCityOverrides,
       specialZones,
+      paletteRegistry,
+      activePaletteMeta,
+      activePalettePack,
+      activePaletteMap,
     } = await loadMapData();
     state.topology = topology || topologyPrimary || topologyDetail;
     state.topologyPrimary = topologyPrimary || state.topology;
@@ -181,6 +186,22 @@ async function bootstrap() {
     state.geoAliasToStableKey = geoAliases?.alias_to_stable_key || {};
     state.ruCityOverrides = ruCityOverrides || null;
     state.specialZonesExternalData = specialZones || null;
+    state.paletteRegistry = paletteRegistry || null;
+    state.activePaletteMeta = activePaletteMeta || null;
+    state.activePalettePack = activePalettePack || null;
+    state.activePaletteMap = activePaletteMap || null;
+    state.activePaletteId = String(
+      activePaletteMeta?.palette_id
+      || paletteRegistry?.default_palette_id
+      || state.activePaletteId
+      || "hoi4_vanilla"
+    ).trim();
+    state.currentPaletteTheme = String(
+      activePaletteMeta?.display_name
+      || state.currentPaletteTheme
+      || "HOI4 Vanilla"
+    );
+    applyActivePaletteState({ overwriteCountryPalette: true });
     processHierarchyData(hierarchy);
 
     if (!state.topologyPrimary) {

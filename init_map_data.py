@@ -991,6 +991,10 @@ def write_data_manifest(output_dir: Path) -> Path:
         "hierarchy.json": "hierarchy",
         "geo_aliases.json": "geo_aliases",
         "locales.json": "locales",
+        "palettes/index.json": "palette_registry",
+        "palettes/hoi4_vanilla.palette.json": "palette_pack",
+        "palette-maps/hoi4_vanilla.map.json": "palette_map",
+        "palette-maps/hoi4_vanilla.audit.json": "palette_audit",
     }
     outputs: dict[str, dict] = {}
     for file_name, role in roles.items():
@@ -1035,6 +1039,51 @@ def write_data_manifest(output_dir: Path) -> Path:
                             "type": "locales",
                             "geo_entry_count": len(geo_entries) if isinstance(geo_entries, dict) else 0,
                             "ui_entry_count": len(ui_entries) if isinstance(ui_entries, dict) else 0,
+                        }
+                    )
+                elif file_name.endswith("palettes/index.json"):
+                    payload = _read_json(path)
+                    palettes = payload.get("palettes", []) if isinstance(payload, dict) else []
+                    item.update(
+                        {
+                            "type": "palette_registry",
+                            "default_palette_id": payload.get("default_palette_id") if isinstance(payload, dict) else "",
+                            "palette_count": len(palettes) if isinstance(palettes, list) else 0,
+                        }
+                    )
+                elif file_name.endswith(".palette.json"):
+                    payload = _read_json(path)
+                    entries = payload.get("entries", {}) if isinstance(payload, dict) else {}
+                    item.update(
+                        {
+                            "type": "palette_pack",
+                            "palette_id": payload.get("palette_id") if isinstance(payload, dict) else "",
+                            "entry_count": len(entries) if isinstance(entries, dict) else 0,
+                            "quick_tag_count": len(payload.get("quick_tags", [])) if isinstance(payload, dict) else 0,
+                        }
+                    )
+                elif file_name.endswith(".map.json"):
+                    payload = _read_json(path)
+                    mapped = payload.get("mapped", {}) if isinstance(payload, dict) else {}
+                    unmapped = payload.get("unmapped", {}) if isinstance(payload, dict) else {}
+                    item.update(
+                        {
+                            "type": "palette_map",
+                            "palette_id": payload.get("palette_id") if isinstance(payload, dict) else "",
+                            "mapped_count": len(mapped) if isinstance(mapped, dict) else 0,
+                            "unmapped_count": len(unmapped) if isinstance(unmapped, dict) else 0,
+                        }
+                    )
+                elif file_name.endswith(".audit.json"):
+                    payload = _read_json(path)
+                    summary = payload.get("summary", {}) if isinstance(payload, dict) else {}
+                    item.update(
+                        {
+                            "type": "palette_audit",
+                            "palette_id": payload.get("palette_id") if isinstance(payload, dict) else "",
+                            "entry_count": int(summary.get("total_entries", 0)),
+                            "mapped_count": int(summary.get("mapped_count", 0)),
+                            "unmapped_count": int(summary.get("unmapped_count", 0)),
                         }
                     )
             except Exception as exc:

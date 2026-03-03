@@ -3667,7 +3667,10 @@ function autoFillMap(mode = "region") {
         canonicalCountryByFeatureId: state.runtimeCanonicalCountryByFeatureId,
         neighborGraph: state.runtimeNeighborGraph,
       },
-      state.sovereigntyByFeatureId
+      state.sovereigntyByFeatureId,
+      {
+        fixedOwnerColors: state.fixedPaletteColorsByIso2,
+      }
     );
     const ownerColors = computed?.ownerColors || {};
     state.landData.features.forEach((feature, index) => {

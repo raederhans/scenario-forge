@@ -12,24 +12,40 @@ import {
   deleteSelectedManualSpecialZone,
   selectSpecialZoneById,
 } from "../core/map_renderer.js";
+import {
+  applyActivePaletteState,
+  buildPaletteLibraryEntries,
+  buildPaletteQuickSwatches,
+  getPaletteSourceOptions,
+  getSuggestedIso2,
+  getUnmappedReason,
+  normalizeHexColor,
+} from "../core/palette_manager.js";
 import { toggleLanguage, updateUIText, t } from "./i18n.js";
 import { resetAllFeatureOwnersToCanonical } from "../core/sovereignty_manager.js";
 
 function renderPalette(themeName) {
-  console.log("Rendering palette:", themeName);
-  const palette = PALETTE_THEMES[themeName];
   const paletteGrid = document.getElementById("paletteGrid");
-  if (!paletteGrid || !palette) return;
+  if (!paletteGrid) return;
   state.currentPaletteTheme = themeName;
   paletteGrid.replaceChildren();
 
-  palette.forEach((color) => {
+  let swatches = [];
+  if (state.activePalettePack?.entries) {
+    swatches = buildPaletteQuickSwatches(24).map((entry) => entry.color);
+  } else {
+    swatches = Array.isArray(PALETTE_THEMES[themeName]) ? PALETTE_THEMES[themeName] : [];
+  }
+
+  swatches.forEach((color) => {
+    const normalized = normalizeHexColor(color);
+    if (!normalized) return;
     const btn = document.createElement("button");
     btn.className = "color-swatch";
-    btn.dataset.color = color;
-    btn.style.backgroundColor = color;
+    btn.dataset.color = normalized;
+    btn.style.backgroundColor = normalized;
     btn.addEventListener("click", () => {
-      state.selectedColor = color;
+      state.selectedColor = normalized;
       if (typeof state.updateSwatchUIFn === "function") {
         state.updateSwatchUIFn();
       }
@@ -37,12 +53,37 @@ function renderPalette(themeName) {
     paletteGrid.appendChild(btn);
   });
 
-  if (!palette.includes(state.selectedColor) && palette.length > 0) {
-    state.selectedColor = palette[0];
+  if (!normalizeHexColor(state.selectedColor) && swatches.length > 0) {
+    state.selectedColor = swatches[0];
   }
   if (typeof state.updateSwatchUIFn === "function") {
     state.updateSwatchUIFn();
   }
+}
+
+function populatePaletteSourceOptions(select) {
+  if (!select) return;
+  const sourceOptions = getPaletteSourceOptions();
+  select.replaceChildren();
+
+  if (sourceOptions.length > 0) {
+    sourceOptions.forEach((optionData) => {
+      const option = document.createElement("option");
+      option.value = optionData.value;
+      option.textContent = optionData.label;
+      select.appendChild(option);
+    });
+    select.value = state.activePaletteId || sourceOptions[0]?.value || "";
+    return;
+  }
+
+  Object.keys(PALETTE_THEMES).forEach((themeName) => {
+    const option = document.createElement("option");
+    option.value = themeName;
+    option.textContent = themeName;
+    select.appendChild(option);
+  });
+  select.value = state.currentPaletteTheme;
 }
 
 
@@ -101,6 +142,11 @@ function initToolbar({ render } = {}) {
   const specialZoneDeleteBtn = document.getElementById("specialZoneDeleteBtn");
   const specialZoneEditorHint = document.getElementById("specialZoneEditorHint");
   const recentContainer = document.getElementById("recentColors");
+  const paletteLibraryToggle = document.getElementById("paletteLibraryToggle");
+  const paletteLibraryPanel = document.getElementById("paletteLibraryPanel");
+  const paletteLibrarySearch = document.getElementById("paletteLibrarySearch");
+  const paletteLibrarySummary = document.getElementById("paletteLibrarySummary");
+  const paletteLibraryList = document.getElementById("paletteLibraryList");
   const presetPolitical = document.getElementById("presetPolitical");
   const presetClear = document.getElementById("presetClear");
   const colorModeSelect = document.getElementById("colorModeSelect");
@@ -402,18 +448,147 @@ function initToolbar({ render } = {}) {
     if (!recentContainer) return;
     recentContainer.replaceChildren();
     state.recentColors.forEach((color) => {
+      const normalized = normalizeHexColor(color);
+      if (!normalized) return;
       const btn = document.createElement("button");
       btn.className = "color-swatch";
-      btn.dataset.color = color;
-      btn.style.backgroundColor = color;
+      btn.dataset.color = normalized;
+      btn.style.backgroundColor = normalized;
       btn.addEventListener("click", () => {
-        state.selectedColor = color;
+        state.selectedColor = normalized;
         updateSwatchUI();
       });
       recentContainer.appendChild(btn);
     });
   }
-  state.updateRecentUI = renderRecentColors;
+  state.updateRecentUI = () => {
+    renderRecentColors();
+    renderPalette(state.currentPaletteTheme);
+    renderPaletteLibrary();
+  };
+
+  function renderPaletteLibrary() {
+    if (!paletteLibraryList) return;
+
+    const searchTerm = String(state.paletteLibrarySearch || "").trim().toLowerCase();
+    const sourceLabel = state.activePaletteMeta?.display_name || state.currentPaletteTheme || "Palette";
+    const summarizeResults = (count) => (
+      state.currentLanguage === "zh"
+        ? `${count} 个颜色，来源 ${sourceLabel}`
+        : `${count} colors from ${sourceLabel}`
+    );
+    let entries = [];
+    if (state.activePalettePack?.entries) {
+      entries = buildPaletteLibraryEntries();
+    } else {
+      entries = (PALETTE_THEMES[state.currentPaletteTheme] || []).map((color, index) => ({
+        key: `legacy-${index}`,
+        sourceTag: `LEGACY-${index + 1}`,
+        iso2: "",
+        color,
+        label: `Palette Color ${index + 1}`,
+        sourceLabel,
+        mapped: false,
+        unmappedReason: "",
+        dynamic: false,
+      }));
+    }
+
+    const filtered = entries.filter((entry) => {
+      if (!searchTerm) return true;
+      return [
+        entry.label,
+        entry.localizedName,
+        entry.countryFileLabel,
+        entry.iso2,
+        entry.sourceTag,
+        entry.sourceLabel,
+        entry.mappingStatus,
+        entry.mappedIso2,
+        entry.unmappedReason,
+        entry.suggestedIso2,
+      ].some((value) => String(value || "").toLowerCase().includes(searchTerm));
+    });
+
+    paletteLibraryList.replaceChildren();
+    if (paletteLibrarySummary) {
+      paletteLibrarySummary.textContent = summarizeResults(filtered.length);
+    }
+
+    if (!filtered.length) {
+      const empty = document.createElement("div");
+      empty.className = "palette-library-empty";
+      empty.textContent = t("No palette colors match the current search.", "ui");
+      paletteLibraryList.appendChild(empty);
+      return;
+    }
+
+    filtered.forEach((entry) => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "palette-library-row";
+      row.dataset.color = entry.color;
+      row.dataset.tag = entry.sourceTag;
+      row.dataset.iso2 = entry.mappedIso2 || "";
+      if (entry.color === state.selectedColor) {
+        row.classList.add("is-selected");
+      }
+      row.addEventListener("click", () => {
+        state.selectedColor = entry.color;
+        updateSwatchUI();
+      });
+
+      const swatch = document.createElement("span");
+      swatch.className = "color-swatch";
+      swatch.dataset.color = entry.color;
+      swatch.style.backgroundColor = entry.color;
+
+      const meta = document.createElement("span");
+      meta.className = "palette-library-meta";
+
+      const title = document.createElement("span");
+      title.className = "palette-library-title";
+      title.textContent = entry.localizedName || entry.label;
+
+      const subtitle = document.createElement("span");
+      subtitle.className = "palette-library-subtitle";
+      const statusText = entry.mappedIso2
+        ? `${t("Mapped to", "ui")} ${entry.mappedIso2}`
+        : `${t("Unmapped", "ui")}: ${formatPaletteReason(entry)}`;
+      const subtitleParts = [entry.sourceTag];
+      if (entry.countryFileLabel && entry.countryFileLabel !== entry.localizedName) {
+        subtitleParts.push(entry.countryFileLabel);
+      }
+      subtitleParts.push(statusText);
+      subtitle.textContent = subtitleParts.filter(Boolean).join(" · ");
+
+      meta.appendChild(title);
+      meta.appendChild(subtitle);
+      row.appendChild(swatch);
+      row.appendChild(meta);
+      paletteLibraryList.appendChild(row);
+    });
+  }
+  state.updatePaletteLibraryUIFn = renderPaletteLibrary;
+
+  function formatPaletteReason(entry) {
+    const reason = getUnmappedReason(entry) || String(entry?.mappingReason || "").trim();
+    if (reason === "dynamic_tag_not_mapped") return t("Dynamic tag", "ui");
+    if (reason === "unsupported_runtime_country") {
+      const suggested = getSuggestedIso2(entry);
+      return suggested
+        ? `${t("Unsupported runtime country", "ui")} (${suggested})`
+        : t("Unsupported runtime country", "ui");
+    }
+    if (reason === "colonial_predecessor") return t("Colonial predecessor", "ui");
+    if (reason === "historical_union_or_predecessor") return t("Historical predecessor", "ui");
+    if (reason === "split_state") return t("Split state", "ui");
+    if (reason === "warlord_or_regional_tag") return t("Warlord / regional tag", "ui");
+    if (reason === "fictional_or_alt_history") return t("Fictional / alt-history", "ui");
+    if (reason === "ambiguous_identity") return t("Ambiguous identity", "ui");
+    if (reason === "unreviewed") return t("Unreviewed", "ui");
+    return reason || t("Unreviewed", "ui");
+  }
 
   function normalizeParentBorderEnabledMap() {
     const supported = Array.isArray(state.parentBorderSupportedCountries)
@@ -611,6 +786,10 @@ function initToolbar({ render } = {}) {
       } else {
         swatch.classList.remove("ring-2", "ring-slate-900");
       }
+    });
+    const libraryRows = document.querySelectorAll(".palette-library-row");
+    libraryRows.forEach((row) => {
+      row.classList.toggle("is-selected", row.dataset.color === state.selectedColor);
     });
     if (document.getElementById("customColor")) {
       customColor.value = state.selectedColor;
@@ -1073,9 +1252,45 @@ function initToolbar({ render } = {}) {
   }
 
   if (themeSelect) {
-    themeSelect.value = state.currentPaletteTheme;
+    populatePaletteSourceOptions(themeSelect);
     themeSelect.addEventListener("change", (event) => {
+      const sourceOptions = getPaletteSourceOptions();
+      if (sourceOptions.length > 0) {
+        state.activePaletteId = String(event.target.value || "").trim();
+        const nextMeta = state.paletteRegistry?.palettes?.find(
+          (entry) => String(entry?.palette_id || "").trim() === state.activePaletteId
+        ) || state.activePaletteMeta;
+        state.activePaletteMeta = nextMeta || null;
+        state.currentPaletteTheme = String(
+          nextMeta?.display_name || state.currentPaletteTheme || "HOI4 Vanilla"
+        );
+        applyActivePaletteState({ overwriteCountryPalette: false });
+        renderPalette(state.currentPaletteTheme);
+        renderPaletteLibrary();
+        return;
+      }
+
       renderPalette(event.target.value);
+      renderPaletteLibrary();
+    });
+  }
+
+  if (paletteLibraryToggle) {
+    paletteLibraryToggle.addEventListener("click", () => {
+      state.paletteLibraryOpen = !state.paletteLibraryOpen;
+      paletteLibraryPanel?.classList.toggle("hidden", !state.paletteLibraryOpen);
+      paletteLibraryToggle.textContent = state.paletteLibraryOpen
+        ? t("Hide Color Library", "ui")
+        : t("Browse All Colors", "ui");
+      renderPaletteLibrary();
+    });
+  }
+
+  if (paletteLibrarySearch) {
+    paletteLibrarySearch.value = state.paletteLibrarySearch || "";
+    paletteLibrarySearch.addEventListener("input", (event) => {
+      state.paletteLibrarySearch = String(event.target.value || "");
+      renderPaletteLibrary();
     });
   }
 
@@ -1392,7 +1607,14 @@ function initToolbar({ render } = {}) {
     });
   }
 
+  paletteLibraryPanel?.classList.toggle("hidden", !state.paletteLibraryOpen);
+  if (paletteLibraryToggle) {
+    paletteLibraryToggle.textContent = state.paletteLibraryOpen
+      ? t("Hide Color Library", "ui")
+      : t("Browse All Colors", "ui");
+  }
   renderPalette(state.currentPaletteTheme);
+  renderPaletteLibrary();
   state.updatePaintModeUIFn();
   renderRecentColors();
   renderParentBorderCountryList();

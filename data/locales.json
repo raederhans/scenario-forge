@@ -60,6 +60,10 @@
       "en": "By Subdivision",
       "zh": "按子区域"
     },
+    "Browse All Colors": {
+      "en": "Browse All Colors",
+      "zh": "浏览全部颜色"
+    },
     "Cancel": {
       "en": "Cancel",
       "zh": "取消"
@@ -156,6 +160,10 @@
       "en": "Internal Borders",
       "zh": "内部边界"
     },
+    "Hide Color Library": {
+      "en": "Hide Color Library",
+      "zh": "收起颜色库"
+    },
     "Invalid project file. Please select a valid map_project.json.": {
       "en": "Invalid project file. Please select a valid map_project.json.",
       "zh": "项目文件无效，请选择有效的 map_project.json。"
@@ -172,9 +180,17 @@
       "en": "Map Style",
       "zh": "地图样式"
     },
+    "Mapped to": {
+      "en": "Mapped to",
+      "zh": "映射到"
+    },
     "No file selected": {
       "en": "No file selected",
       "zh": "未选择文件"
+    },
+    "No palette colors match the current search.": {
+      "en": "No palette colors match the current search.",
+      "zh": "没有颜色与当前搜索匹配。"
     },
     "No manual zones": {
       "en": "No manual zones",
@@ -183,6 +199,10 @@
     "None selected": {
       "en": "None selected",
       "zh": "未选择"
+    },
+    "Dynamic tag": {
+      "en": "Dynamic tag",
+      "zh": "动态 tag"
     },
     "Normal View": {
       "en": "Normal View",
@@ -220,6 +240,10 @@
       "en": "Recent",
       "zh": "最近使用"
     },
+    "Unmapped": {
+      "en": "Unmapped",
+      "zh": "未映射"
+    },
     "Region": {
       "en": "Region",
       "zh": "区域"
@@ -244,13 +268,53 @@
       "en": "Search Countries",
       "zh": "搜索国家"
     },
+    "Search Colors": {
+      "en": "Search Colors",
+      "zh": "搜索颜色"
+    },
     "Search countries": {
       "en": "Search countries",
       "zh": "搜索国家"
     },
+    "Search country, ISO-2, or source tag...": {
+      "en": "Search country, ISO-2, or source tag...",
+      "zh": "搜索国家、ISO-2 或来源 tag..."
+    },
     "Search...": {
       "en": "Search...",
       "zh": "搜索..."
+    },
+    "Unsupported runtime country": {
+      "en": "Unsupported runtime country",
+      "zh": "运行时国家未收录"
+    },
+    "Historical predecessor": {
+      "en": "Historical predecessor",
+      "zh": "历史前身实体"
+    },
+    "Colonial predecessor": {
+      "en": "Colonial predecessor",
+      "zh": "殖民前身实体"
+    },
+    "Split state": {
+      "en": "Split state",
+      "zh": "分裂态国家"
+    },
+    "Warlord / regional tag": {
+      "en": "Warlord / regional tag",
+      "zh": "军阀或地区性 tag"
+    },
+    "Fictional / alt-history": {
+      "en": "Fictional / alt-history",
+      "zh": "虚构或架空历史"
+    },
+    "Ambiguous identity": {
+      "en": "Ambiguous identity",
+      "zh": "身份存在歧义"
+    },
+    "Unreviewed": {
+      "en": "Unreviewed",
+      "zh": "未审核"
     },
     "Selected File": {
       "en": "Selected File",

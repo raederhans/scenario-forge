@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-03T00:44:47.597379+00:00",
+  "generated_at": "2026-03-03T01:49:42Z",
   "outputs": {
     "europe_topology.json": {
       "role": "primary_topology",
@@ -98,11 +98,47 @@
     },
     "locales.json": {
       "role": "locales",
-      "size_bytes": 3345895,
-      "sha256": "95ba1bf4d5d5d7085710c8ea5b725c9134a425cd51c08880aadd27056e13f3fb",
+      "size_bytes": 3347576,
+      "sha256": "db7888496f316d42e365005f7cdd11a1507ee023a077cb13a57732718012e7d6",
       "type": "locales",
       "geo_entry_count": 34892,
-      "ui_entry_count": 74
+      "ui_entry_count": 90
+    },
+    "palettes/index.json": {
+      "role": "palette_registry",
+      "size_bytes": 289,
+      "sha256": "1f91e43952ef160afcf8ccbc4d0678b57d3df6e02415e923c7ebaf23996d6b68",
+      "type": "palette_registry",
+      "palette_count": 1,
+      "default_palette_id": "hoi4_vanilla"
+    },
+    "palettes/hoi4_vanilla.palette.json": {
+      "role": "palette_pack",
+      "size_bytes": 165956,
+      "sha256": "7fd8fd4f347271832283daee0c938263021018c834ce59ab31c4dd503d6d5809",
+      "type": "palette_pack",
+      "palette_id": "hoi4_vanilla",
+      "entry_count": 427,
+      "quick_tag_count": 24
+    },
+    "palette-maps/hoi4_vanilla.map.json": {
+      "role": "palette_map",
+      "size_bytes": 33953,
+      "sha256": "614ff7479d969df05fc6926fd5599850616e0af4dc867b36e133a53dd2aaaa7d",
+      "type": "palette_map",
+      "palette_id": "hoi4_vanilla",
+      "mapped_count": 155,
+      "unmapped_count": 272
+    },
+    "palette-maps/hoi4_vanilla.audit.json": {
+      "role": "palette_audit",
+      "size_bytes": 102356,
+      "sha256": "7a1815090fa2abba3c018315738124417724fae9f71753ec7c91f41cda9d47d2",
+      "type": "palette_audit",
+      "palette_id": "hoi4_vanilla",
+      "entry_count": 427,
+      "mapped_count": 155,
+      "unmapped_count": 272
     }
   }
 }

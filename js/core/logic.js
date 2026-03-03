@@ -1,5 +1,6 @@
 // Shared map logic helpers (Phase 13)
 import { state, countryPalette, defaultCountryPalette } from "./state.js";
+import { syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { refreshColorState, refreshResolvedColorsForOwners } from "./map_renderer.js";
 
 const COUNTRY_CODE_ALIASES = {
@@ -32,15 +33,18 @@ function applyCountryColor(code, color) {
 }
 
 function resetCountryColors() {
+  const resolvedDefaults = syncResolvedDefaultCountryPalette({ overwriteCountryPalette: true });
   Object.keys(countryPalette).forEach((code) => {
     delete countryPalette[code];
   });
   Object.keys(defaultCountryPalette).forEach((code) => {
     countryPalette[code] = defaultCountryPalette[code];
   });
-  state.sovereignBaseColors = {};
-  state.countryBaseColors = {};
+  state.sovereignBaseColors = { ...resolvedDefaults };
+  state.countryBaseColors = { ...resolvedDefaults };
+  state.colors = {};
   state.visualOverrides = {};
+  state.featureOverrides = {};
   refreshColorState({ renderNow: true });
 }
 

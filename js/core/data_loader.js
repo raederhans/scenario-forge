@@ -16,6 +16,7 @@ const DETAIL_SOURCES = {
 const RU_CITY_OVERRIDES_URL = "data/ru_city_overrides.geojson";
 const SPECIAL_ZONES_URL = "data/special_zones.geojson";
 const RUNTIME_POLITICAL_URL = "data/europe_topology.runtime_political_v1.json";
+const PALETTE_REGISTRY_URL = "data/palettes/index.json";
 const RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
 
 function getSearchParams() {
@@ -330,6 +331,7 @@ export async function loadMapData({
   ruCityOverridesUrl = RU_CITY_OVERRIDES_URL,
   specialZonesUrl = SPECIAL_ZONES_URL,
   runtimePoliticalUrl = RUNTIME_POLITICAL_URL,
+  paletteRegistryUrl = PALETTE_REGISTRY_URL,
   d3Client = globalThis.d3,
 } = {}) {
   if (!d3Client || typeof d3Client.json !== "function") {
@@ -345,6 +347,11 @@ export async function loadMapData({
       return null;
     });
 
+  const paletteRegistryPromise = d3Client.json(paletteRegistryUrl).catch((err) => {
+    console.warn("Palette registry missing or invalid, continuing with legacy palette fallback.", err);
+    return null;
+  });
+
   const [
     localeData,
     geoAliases,
@@ -352,6 +359,7 @@ export async function loadMapData({
     ruCityOverrides,
     specialZones,
     runtimePoliticalTopology,
+    paletteRegistry,
   ] = await Promise.all([
     d3Client.json(localesUrl).catch((err) => {
       console.warn("Locales file missing or invalid, using defaults.", err);
@@ -392,7 +400,37 @@ export async function loadMapData({
       return null;
     }),
     runtimePoliticalPromise,
+    paletteRegistryPromise,
   ]);
+
+  let activePaletteMeta = null;
+  let activePalettePack = null;
+  let activePaletteMap = null;
+  if (Array.isArray(paletteRegistry?.palettes) && paletteRegistry.palettes.length > 0) {
+    const defaultPaletteId = String(
+      paletteRegistry.default_palette_id || paletteRegistry.palettes[0]?.palette_id || ""
+    ).trim();
+    activePaletteMeta =
+      paletteRegistry.palettes.find((entry) => String(entry?.palette_id || "").trim() === defaultPaletteId)
+      || paletteRegistry.palettes[0]
+      || null;
+    const paletteUrl = String(activePaletteMeta?.palette_url || "").trim();
+    const mapUrl = String(activePaletteMeta?.map_url || "").trim();
+    [activePalettePack, activePaletteMap] = await Promise.all([
+      paletteUrl
+        ? d3Client.json(paletteUrl).catch((err) => {
+          console.warn(`Palette pack missing or invalid at ${paletteUrl}, continuing without asset palette.`, err);
+          return null;
+        })
+        : Promise.resolve(null),
+      mapUrl
+        ? d3Client.json(mapUrl).catch((err) => {
+          console.warn(`Palette map missing or invalid at ${mapUrl}, continuing without asset palette mapping.`, err);
+          return null;
+        })
+        : Promise.resolve(null),
+    ]);
+  }
 
   return {
     ...topologyBundle,
@@ -403,6 +441,10 @@ export async function loadMapData({
     ruCityOverrides,
     specialZones,
     runtimePoliticalTopology,
+    paletteRegistry,
+    activePaletteMeta,
+    activePalettePack,
+    activePaletteMap,
   };
 }
 

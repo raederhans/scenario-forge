@@ -531,9 +531,12 @@ class ColorManager {
     return { featureColors: result, countryColors };
   }
 
-  static computeOwnerColors(runtimeTopologyOrMeta, sovereigntyByFeatureId = {}) {
+  static computeOwnerColors(runtimeTopologyOrMeta, sovereigntyByFeatureId = {}, options = {}) {
     const result = {};
     const ownerColors = {};
+    const fixedOwnerColors = options?.fixedOwnerColors && typeof options.fixedOwnerColors === "object"
+      ? options.fixedOwnerColors
+      : {};
     const runtimeMeta =
       runtimeTopologyOrMeta?.featureIds && runtimeTopologyOrMeta?.neighborGraph
         ? runtimeTopologyOrMeta
@@ -602,6 +605,13 @@ class ColorManager {
     });
     const colorByOwner = new Map();
     ownerOrder.forEach((ownerCode) => {
+      const fixed = ColorManager.normalizeHexColor(fixedOwnerColors?.[ownerCode]);
+      if (fixed) {
+        colorByOwner.set(ownerCode, fixed);
+      }
+    });
+    ownerOrder.forEach((ownerCode) => {
+      if (colorByOwner.has(ownerCode)) return;
       const assignedNeighborColors = [];
       (ownerAdjacency.get(ownerCode) || new Set()).forEach((neighborCode) => {
         const color = colorByOwner.get(neighborCode);

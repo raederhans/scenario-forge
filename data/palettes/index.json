@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "default_palette_id": "hoi4_vanilla",
+  "palettes": [
+    {
+      "palette_id": "hoi4_vanilla",
+      "display_name": "HOI4 Vanilla",
+      "palette_url": "data/palettes/hoi4_vanilla.palette.json",
+      "map_url": "data/palette-maps/hoi4_vanilla.map.json"
+    }
+  ]
+}

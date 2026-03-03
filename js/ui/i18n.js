@@ -32,6 +32,7 @@ function updateUIText() {
     ["toolEyedropperBtn", "Eyedropper"],
     ["lblRecent", "Recent"],
     ["lblPalette", "Color Palette"],
+    ["lblPaletteSearch", "Search Colors"],
     ["lblCustom", "Custom"],
     ["lblExport", "Export Map"],
     ["lblExportFormat", "Format"],
@@ -152,6 +153,23 @@ function updateUIText() {
     searchInput.setAttribute("placeholder", t("Search...", "ui"));
   }
 
+  const paletteLibrarySearch = document.getElementById("paletteLibrarySearch");
+  if (paletteLibrarySearch) {
+    paletteLibrarySearch.setAttribute(
+      "placeholder",
+      t("Search country, ISO-2, or source tag...", "ui")
+    );
+  }
+
+  const paletteLibraryToggle = document.getElementById("paletteLibraryToggle");
+  if (paletteLibraryToggle) {
+    const paletteLibraryPanel = document.getElementById("paletteLibraryPanel");
+    const isOpen = paletteLibraryPanel ? !paletteLibraryPanel.classList.contains("hidden") : false;
+    paletteLibraryToggle.textContent = isOpen
+      ? t("Hide Color Library", "ui")
+      : t("Browse All Colors", "ui");
+  }
+
   const projectFileName = document.getElementById("projectFileName");
   if (projectFileName && !projectFileName.textContent.trim()) {
     projectFileName.textContent = t("No file selected", "ui");
@@ -159,6 +177,9 @@ function updateUIText() {
 
   if (typeof state.updateActiveSovereignUIFn === "function") {
     state.updateActiveSovereignUIFn();
+  }
+  if (typeof state.updatePaletteLibraryUIFn === "function") {
+    state.updatePaletteLibraryUIFn();
   }
 }
 

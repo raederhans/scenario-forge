@@ -461,6 +461,85 @@ input[type="checkbox"].checkbox-input {
   gap: 8px;
 }
 
+.palette-library {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 12px;
+}
+
+.palette-library-list {
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-btn);
+  background: var(--bg-input);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.palette-library-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-btn);
+  background: #ffffff;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.palette-library-row:hover {
+  border-color: rgba(0, 47, 167, 0.25);
+  transform: translateY(-1px);
+}
+
+.palette-library-row.is-selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px rgba(0, 47, 167, 0.15);
+}
+
+.palette-library-row .color-swatch {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.palette-library-meta {
+  min-width: 0;
+}
+
+.palette-library-title {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.palette-library-subtitle {
+  margin-top: 2px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.palette-library-empty {
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-btn);
+  background: rgba(255, 255, 255, 0.7);
+}
+
 /* ── Info Icon & Tooltip ───────────────────────────────── */
 .info-icon {
   width: 16px;

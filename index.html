@@ -39,11 +39,15 @@
             <div id="lblPalette" class="section-header">Color Palette</div>
             <select id="themeSelect" class="select-input mt-3">
               <option value="HOI4 Vanilla">HOI4 Vanilla</option>
-              <option value="TNO (The New Order)">TNO (The New Order)</option>
-              <option value="Kaiserreich">Kaiserreich</option>
-              <option value="Red Flood (Avant-Garde)">Red Flood (Avant-Garde)</option>
             </select>
             <div id="paletteGrid" class="color-grid mt-3"></div>
+            <button id="paletteLibraryToggle" class="btn-secondary mt-3" type="button">Browse All Colors</button>
+            <div id="paletteLibraryPanel" class="palette-library mt-3 hidden">
+              <label id="lblPaletteSearch" class="section-header-block" for="paletteLibrarySearch">Search Colors</label>
+              <input id="paletteLibrarySearch" type="text" placeholder="Search country, ISO-2, or source tag..." class="input mt-2" />
+              <div id="paletteLibrarySummary" class="body-text mt-2">0 colors</div>
+              <div id="paletteLibraryList" class="palette-library-list mt-3"></div>
+            </div>
             <div class="flex items-center gap-3 mt-3">
               <label id="lblCustom" class="section-header" for="customColor">Custom</label>
               <input id="customColor" type="color" value="#1f3a5f" class="color-input" />
@@ -98,7 +102,7 @@
             <label id="lblColorMode" class="section-header-block mt-3" for="colorModeSelect">Color Mode</label>
             <select id="colorModeSelect" class="select-input mt-2">
               <option id="optColorModeRegion" value="region">By Region</option>
-              <option id="optColorModePolitical" value="political">By Neighbor (Political)</option>
+              <option id="optColorModePolitical" value="political" selected>By Neighbor (Political)</option>
             </select>
             <label id="lblPaintGranularity" class="section-header-block mt-3" for="paintGranularitySelect">Paint Granularity</label>
             <select id="paintGranularitySelect" class="select-input mt-2">

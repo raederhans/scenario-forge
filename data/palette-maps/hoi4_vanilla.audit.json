@@ -1,0 +1,3753 @@
+{
+  "version": 1,
+  "palette_id": "hoi4_vanilla",
+  "generated_at": "2026-03-03T01:45:39.954289+00:00",
+  "summary": {
+    "total_entries": 427,
+    "mapped_count": 155,
+    "unmapped_count": 272
+  },
+  "entries": {
+    "ABK": {
+      "localized_name": "Abkhazia",
+      "country_file_label": "Abkhazia",
+      "map_hex": "#33cc33",
+      "ui_hex": "#248f24",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "ADU": {
+      "localized_name": "Andalusia",
+      "country_file_label": "Andalusia",
+      "map_hex": "#f0e69b",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "AFA": {
+      "localized_name": "Afar",
+      "country_file_label": "Afar",
+      "map_hex": "#990033",
+      "ui_hex": "#4d0019",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "AFG": {
+      "localized_name": "Afghanistan",
+      "country_file_label": "Afghanistan",
+      "map_hex": "#40a0a7",
+      "ui_hex": "#53d0d9",
+      "status": "mapped",
+      "mapped_iso2": "AF",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "ALB": {
+      "localized_name": "Albania",
+      "country_file_label": "Albania",
+      "map_hex": "#952d66",
+      "ui_hex": "#c23b85",
+      "status": "mapped",
+      "mapped_iso2": "AL",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "ALG": {
+      "localized_name": "Algeria",
+      "country_file_label": "Algeria",
+      "map_hex": "#996633",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "DZ",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "ALT": {
+      "localized_name": "Altay",
+      "country_file_label": "Altay",
+      "map_hex": "#ccffff",
+      "ui_hex": "#00e6e6",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "ANG": {
+      "localized_name": "Angola",
+      "country_file_label": "Angola",
+      "map_hex": "#258c3d",
+      "ui_hex": "#258c3d",
+      "status": "mapped",
+      "mapped_iso2": "AO",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "ANU": {
+      "localized_name": "Ainu",
+      "country_file_label": "Ainu",
+      "map_hex": "#80bfff",
+      "ui_hex": "#0066cc",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "AOI": {
+      "localized_name": "Africa Orientale Italiana",
+      "country_file_label": "Italian East Africa",
+      "map_hex": "#009933",
+      "ui_hex": "#004d1a",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "ARG": {
+      "localized_name": "Argentina",
+      "country_file_label": "Argentina",
+      "map_hex": "#919dec",
+      "ui_hex": "#bdccff",
+      "status": "mapped",
+      "mapped_iso2": "AR",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "ARM": {
+      "localized_name": "Armenia",
+      "country_file_label": "Armenia",
+      "map_hex": "#b066b4",
+      "ui_hex": "#b066b4",
+      "status": "mapped",
+      "mapped_iso2": "AM",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "AST": {
+      "localized_name": "Australia",
+      "country_file_label": "Australia",
+      "map_hex": "#398f61",
+      "ui_hex": "#4aba7e",
+      "status": "mapped",
+      "mapped_iso2": "AU",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "ASY": {
+      "localized_name": "Assyria",
+      "country_file_label": "Assyria",
+      "map_hex": "#800060",
+      "ui_hex": "#4d0039",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "AUS": {
+      "localized_name": "Austria",
+      "country_file_label": "Austria",
+      "map_hex": "#c2c6d7",
+      "ui_hex": "#ffffff",
+      "status": "mapped",
+      "mapped_iso2": "AT",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "AZR": {
+      "localized_name": "Azerbaijan",
+      "country_file_label": "Azerbaijan",
+      "map_hex": "#459731",
+      "ui_hex": "#459731",
+      "status": "mapped",
+      "mapped_iso2": "AZ",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "BAH": {
+      "localized_name": "Bahamas",
+      "country_file_label": "Bahamas",
+      "map_hex": "#ccffcc",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "BAN": {
+      "localized_name": "Bangladesh",
+      "country_file_label": "Bangladesh",
+      "map_hex": "#cccc00",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "BD",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "BAR": {
+      "localized_name": "Barotseland",
+      "country_file_label": "Barotseland",
+      "map_hex": "#ff4d4d",
+      "ui_hex": "#cc0000",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "BAS": {
+      "localized_name": "Antilles",
+      "country_file_label": "British Antilles",
+      "map_hex": "#ff6666",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "BAY": {
+      "localized_name": "Bavaria",
+      "country_file_label": "Bavaria",
+      "map_hex": "#e9e7f6",
+      "ui_hex": "#e9e7f6",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "BEG": {
+      "localized_name": "Benishangul-Gumuz",
+      "country_file_label": "Benishangul-Gumuz",
+      "map_hex": "#ffd480",
+      "ui_hex": "#ffd480",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "BEL": {
+      "localized_name": "Belgium",
+      "country_file_label": "Belgium",
+      "map_hex": "#c1ab08",
+      "ui_hex": "#fbde0a",
+      "status": "mapped",
+      "mapped_iso2": "BE",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "BHR": {
+      "localized_name": "Bahrain",
+      "country_file_label": "Bahrain",
+      "map_hex": "#e60000",
+      "ui_hex": "#800000",
+      "status": "mapped",
+      "mapped_iso2": "BH",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "BHU": {
+      "localized_name": "Bhutan",
+      "country_file_label": "Bhutan",
+      "map_hex": "#ac7a58",
+      "ui_hex": "#ac7a58",
+      "status": "mapped",
+      "mapped_iso2": "BT",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "BIA": {
+      "localized_name": "Biafra",
+      "country_file_label": "Biafra",
+      "map_hex": "#009933",
+      "ui_hex": "#004d1a",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "BLC": {
+      "localized_name": "Balochistan",
+      "country_file_label": "Balochistan",
+      "map_hex": "#4d9900",
+      "ui_hex": "#264d00",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "BLR": {
+      "localized_name": "Belarus",
+      "country_file_label": "Belarus",
+      "map_hex": "#b4dcbe",
+      "ui_hex": "#b4dcbe",
+      "status": "mapped",
+      "mapped_iso2": "BY",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "BLZ": {
+      "localized_name": "Belize",
+      "country_file_label": "Belize",
+      "map_hex": "#00cccc",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "BZ",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "BOL": {
+      "localized_name": "Bolivia",
+      "country_file_label": "Bolivia",
+      "map_hex": "#cca66c",
+      "ui_hex": "#ffeab1",
+      "status": "mapped",
+      "mapped_iso2": "BO",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "BOS": {
+      "localized_name": "Bosnia",
+      "country_file_label": "Bosnia",
+      "map_hex": "#cc6600",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "BOT": {
+      "localized_name": "Botswana",
+      "country_file_label": "Botswana",
+      "map_hex": "#0b8470",
+      "ui_hex": "#0b8470",
+      "status": "mapped",
+      "mapped_iso2": "BW",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "BRA": {
+      "localized_name": "Brazil",
+      "country_file_label": "Brazil",
+      "map_hex": "#4c913f",
+      "ui_hex": "#63bd52",
+      "status": "mapped",
+      "mapped_iso2": "BR",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "BRD": {
+      "localized_name": "Burundi",
+      "country_file_label": "Burundi",
+      "map_hex": "#cc9900",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "BI",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "BRI": {
+      "localized_name": "Brittany",
+      "country_file_label": "Brittany",
+      "map_hex": "#766397",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "BRM": {
+      "localized_name": "Burma",
+      "country_file_label": "Burma",
+      "map_hex": "#4c9900",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "MM",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "BRN": {
+      "localized_name": "Brunei",
+      "country_file_label": "Brunei",
+      "map_hex": "#e6e600",
+      "ui_hex": "#b3b300",
+      "status": "mapped",
+      "mapped_iso2": "BN",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "BSK": {
+      "localized_name": "Bashkortostan",
+      "country_file_label": "Bashkortostan",
+      "map_hex": "#33cc33",
+      "ui_hex": "#248f24",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "BUK": {
+      "localized_name": "Bukharan Republic",
+      "country_file_label": "Bukharan Republic",
+      "map_hex": "#cc9966",
+      "ui_hex": "#ac7339",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "BUL": {
+      "localized_name": "Bulgaria",
+      "country_file_label": "Bulgaria",
+      "map_hex": "#339b00",
+      "ui_hex": "#339b00",
+      "status": "mapped",
+      "mapped_iso2": "BG",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "BYA": {
+      "localized_name": "Buryatia",
+      "country_file_label": "Buryatia",
+      "map_hex": "#0040ff",
+      "ui_hex": "#002db3",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "CAM": {
+      "localized_name": "Cambodia",
+      "country_file_label": "Cambodia",
+      "map_hex": "#644796",
+      "ui_hex": "#644796",
+      "status": "mapped",
+      "mapped_iso2": "KH",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "CAN": {
+      "localized_name": "Canada",
+      "country_file_label": "Canada",
+      "map_hex": "#e93b3b",
+      "ui_hex": "#9b3e33",
+      "status": "mapped",
+      "mapped_iso2": "CA",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "CAR": {
+      "localized_name": "Central African Republic",
+      "country_file_label": "Central African Republic",
+      "map_hex": "#990000",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "CF",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "CAT": {
+      "localized_name": "Catalonia",
+      "country_file_label": "Catalonia",
+      "map_hex": "#d5844c",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "CAY": {
+      "localized_name": "Guiana",
+      "country_file_label": "Cayenne",
+      "map_hex": "#3399ff",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "CBV": {
+      "localized_name": "Cabo Verde",
+      "country_file_label": "Cabo Verde",
+      "map_hex": "#0066cc",
+      "ui_hex": "#003366",
+      "status": "mapped",
+      "mapped_iso2": "CV",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "CHA": {
+      "localized_name": "Chad",
+      "country_file_label": "Chad",
+      "map_hex": "#ccffcc",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "TD",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "CHI": {
+      "localized_name": "China",
+      "country_file_label": "China",
+      "map_hex": "#28288c",
+      "ui_hex": "#28288c",
+      "status": "mapped",
+      "mapped_iso2": "CN",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "CHL": {
+      "localized_name": "Chile",
+      "country_file_label": "Chile",
+      "map_hex": "#9b656b",
+      "ui_hex": "#ca838b",
+      "status": "mapped",
+      "mapped_iso2": "CL",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "CHM": {
+      "localized_name": "Champa",
+      "country_file_label": "Champa",
+      "map_hex": "#2e2eb8",
+      "ui_hex": "#1f1f7a",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "CHR": {
+      "localized_name": "Charrua",
+      "country_file_label": "Charrua",
+      "map_hex": "#cc7a00",
+      "ui_hex": "#4d2e00",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "CHU": {
+      "localized_name": "Chuvashia",
+      "country_file_label": "Chuvashia",
+      "map_hex": "#bf8040",
+      "ui_hex": "#86592d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "CIN": {
+      "localized_name": "Chechnya Ingushetia",
+      "country_file_label": "Chechnya Ingushetia",
+      "map_hex": "#00cc00",
+      "ui_hex": "#009900",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "CIP": {
+      "localized_name": "Central Indian Provinces",
+      "country_file_label": "Central Indian Provinces",
+      "map_hex": "#338d43",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "CKK": {
+      "localized_name": "Chukotka",
+      "country_file_label": "Chukotka",
+      "map_hex": "#b3b300",
+      "ui_hex": "#808000",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "CMR": {
+      "localized_name": "Cameroon",
+      "country_file_label": "Cameroon",
+      "map_hex": "#ff3300",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "CM",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "COG": {
+      "localized_name": "Congo",
+      "country_file_label": "Congo",
+      "map_hex": "#989fd1",
+      "ui_hex": "#989fd1",
+      "status": "unmapped",
+      "reason": "ambiguous_identity",
+      "suggested_iso2": "CG"
+    },
+    "COL": {
+      "localized_name": "Colombia",
+      "country_file_label": "Colombia",
+      "map_hex": "#debb5b",
+      "ui_hex": "#fff376",
+      "status": "mapped",
+      "mapped_iso2": "CO",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "COR": {
+      "localized_name": "Corsica",
+      "country_file_label": "Corsica",
+      "map_hex": "#6ab22e",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "COS": {
+      "localized_name": "Costa Rica",
+      "country_file_label": "Costa Rica",
+      "map_hex": "#98802b",
+      "ui_hex": "#98802b",
+      "status": "mapped",
+      "mapped_iso2": "CR",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "CRC": {
+      "localized_name": "Antilles",
+      "country_file_label": "Curacao",
+      "map_hex": "#ff6666",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "CRI": {
+      "localized_name": "Crimea",
+      "country_file_label": "Crimea",
+      "map_hex": "#ff5050",
+      "ui_hex": "#cc0000",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "CRO": {
+      "localized_name": "Croatia",
+      "country_file_label": "Croatia",
+      "map_hex": "#e646b4",
+      "ui_hex": "#e6ff7a",
+      "status": "mapped",
+      "mapped_iso2": "HR",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "CSA": {
+      "localized_name": "Confederation of America",
+      "country_file_label": "CSA",
+      "map_hex": "#91a3b0",
+      "ui_hex": "#bacddb",
+      "status": "unmapped",
+      "reason": "fictional_or_alt_history",
+      "suggested_iso2": "US"
+    },
+    "CUB": {
+      "localized_name": "Cuba",
+      "country_file_label": "Cuba",
+      "map_hex": "#8c41a6",
+      "ui_hex": "#8c41a6",
+      "status": "mapped",
+      "mapped_iso2": "CU",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "CYP": {
+      "localized_name": "Cyprus",
+      "country_file_label": "Cyprus",
+      "map_hex": "#ffcc00",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "CY",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "CZE": {
+      "localized_name": "Czechoslovakia",
+      "country_file_label": "Czechoslovakia",
+      "map_hex": "#36a79c",
+      "ui_hex": "#46d9cb",
+      "status": "unmapped",
+      "reason": "historical_union_or_predecessor"
+    },
+    "D01": {
+      "localized_name": "D01",
+      "country_file_label": "D01",
+      "map_hex": "#7ab361",
+      "ui_hex": "#9fe97e",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D02": {
+      "localized_name": "D02",
+      "country_file_label": "D02",
+      "map_hex": "#c28c56",
+      "ui_hex": "#fcb670",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D03": {
+      "localized_name": "D03",
+      "country_file_label": "D03",
+      "map_hex": "#c8641f",
+      "ui_hex": "#f57b26",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D04": {
+      "localized_name": "D04",
+      "country_file_label": "D04",
+      "map_hex": "#5096b3",
+      "ui_hex": "#59dbdc",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D05": {
+      "localized_name": "D05",
+      "country_file_label": "D05",
+      "map_hex": "#5c5cc5",
+      "ui_hex": "#7474f7",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D06": {
+      "localized_name": "D06",
+      "country_file_label": "D06",
+      "map_hex": "#9a4574",
+      "ui_hex": "#c85a97",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D07": {
+      "localized_name": "D07",
+      "country_file_label": "D07",
+      "map_hex": "#c3959b",
+      "ui_hex": "#fec2ca",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D08": {
+      "localized_name": "D08",
+      "country_file_label": "D08",
+      "map_hex": "#d26a2f",
+      "ui_hex": "#ff8a3d",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D09": {
+      "localized_name": "D09",
+      "country_file_label": "D09",
+      "map_hex": "#699356",
+      "ui_hex": "#95d27b",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D10": {
+      "localized_name": "D10",
+      "country_file_label": "D10",
+      "map_hex": "#afa26c",
+      "ui_hex": "#ddcb87",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D11": {
+      "localized_name": "D11",
+      "country_file_label": "D11",
+      "map_hex": "#7c8ca2",
+      "ui_hex": "#a1b6d3",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D12": {
+      "localized_name": "D12",
+      "country_file_label": "D12",
+      "map_hex": "#bb4f56",
+      "ui_hex": "#f36770",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D13": {
+      "localized_name": "D13",
+      "country_file_label": "D13",
+      "map_hex": "#459dd0",
+      "ui_hex": "#5accff",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D14": {
+      "localized_name": "D14",
+      "country_file_label": "D14",
+      "map_hex": "#8e4fc8",
+      "ui_hex": "#b062f9",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D15": {
+      "localized_name": "D15",
+      "country_file_label": "D15",
+      "map_hex": "#7ab361",
+      "ui_hex": "#9fe97e",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D16": {
+      "localized_name": "D01",
+      "country_file_label": "D01",
+      "map_hex": "#c28c56",
+      "ui_hex": "#fcb670",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D17": {
+      "localized_name": "D02",
+      "country_file_label": "D02",
+      "map_hex": "#c8641f",
+      "ui_hex": "#f57b26",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D18": {
+      "localized_name": "D03",
+      "country_file_label": "D03",
+      "map_hex": "#5096b3",
+      "ui_hex": "#59dbdc",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D19": {
+      "localized_name": "D04",
+      "country_file_label": "D04",
+      "map_hex": "#5c5cc5",
+      "ui_hex": "#7474f7",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D20": {
+      "localized_name": "D05",
+      "country_file_label": "D05",
+      "map_hex": "#9a4574",
+      "ui_hex": "#c85a97",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D21": {
+      "localized_name": "D01",
+      "country_file_label": "D01",
+      "map_hex": "#c3959b",
+      "ui_hex": "#fec2ca",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D22": {
+      "localized_name": "D02",
+      "country_file_label": "D02",
+      "map_hex": "#d26a2f",
+      "ui_hex": "#ff8a3d",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D23": {
+      "localized_name": "D03",
+      "country_file_label": "D03",
+      "map_hex": "#699356",
+      "ui_hex": "#95d27b",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D24": {
+      "localized_name": "D04",
+      "country_file_label": "D04",
+      "map_hex": "#afa26c",
+      "ui_hex": "#ddcb87",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D25": {
+      "localized_name": "D05",
+      "country_file_label": "D05",
+      "map_hex": "#7c8ca2",
+      "ui_hex": "#a1b6d3",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D26": {
+      "localized_name": "D06",
+      "country_file_label": "D06",
+      "map_hex": "#bb4f56",
+      "ui_hex": "#f36770",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D27": {
+      "localized_name": "D07",
+      "country_file_label": "D07",
+      "map_hex": "#459dd0",
+      "ui_hex": "#5accff",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D28": {
+      "localized_name": "D08",
+      "country_file_label": "D08",
+      "map_hex": "#8e4fc8",
+      "ui_hex": "#b062f9",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D29": {
+      "localized_name": "D09",
+      "country_file_label": "D09",
+      "map_hex": "#7ab361",
+      "ui_hex": "#9fe97e",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D30": {
+      "localized_name": "D05",
+      "country_file_label": "D05",
+      "map_hex": "#c28c56",
+      "ui_hex": "#fcb670",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D31": {
+      "localized_name": "D01",
+      "country_file_label": "D01",
+      "map_hex": "#c8641f",
+      "ui_hex": "#f57b26",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D32": {
+      "localized_name": "D02",
+      "country_file_label": "D02",
+      "map_hex": "#5096b3",
+      "ui_hex": "#59dbdc",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D33": {
+      "localized_name": "D03",
+      "country_file_label": "D03",
+      "map_hex": "#5c5cc5",
+      "ui_hex": "#7474f7",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D34": {
+      "localized_name": "D04",
+      "country_file_label": "D04",
+      "map_hex": "#9a4574",
+      "ui_hex": "#c85a97",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D35": {
+      "localized_name": "D05",
+      "country_file_label": "D05",
+      "map_hex": "#c3959b",
+      "ui_hex": "#fec2ca",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D36": {
+      "localized_name": "D06",
+      "country_file_label": "D06",
+      "map_hex": "#d26a2f",
+      "ui_hex": "#ff8a3d",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D37": {
+      "localized_name": "D07",
+      "country_file_label": "D07",
+      "map_hex": "#699356",
+      "ui_hex": "#95d27b",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D38": {
+      "localized_name": "D08",
+      "country_file_label": "D08",
+      "map_hex": "#afa26c",
+      "ui_hex": "#ddcb87",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D39": {
+      "localized_name": "D09",
+      "country_file_label": "D09",
+      "map_hex": "#7c8ca2",
+      "ui_hex": "#a1b6d3",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D40": {
+      "localized_name": "D05",
+      "country_file_label": "D05",
+      "map_hex": "#bb4f56",
+      "ui_hex": "#f36770",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D41": {
+      "localized_name": "D01",
+      "country_file_label": "D01",
+      "map_hex": "#459dd0",
+      "ui_hex": "#5accff",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D42": {
+      "localized_name": "D02",
+      "country_file_label": "D02",
+      "map_hex": "#8e4fc8",
+      "ui_hex": "#b062f9",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D43": {
+      "localized_name": "D03",
+      "country_file_label": "D03",
+      "map_hex": "#7ab361",
+      "ui_hex": "#9fe97e",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D44": {
+      "localized_name": "D04",
+      "country_file_label": "D04",
+      "map_hex": "#c28c56",
+      "ui_hex": "#fcb670",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D45": {
+      "localized_name": "D05",
+      "country_file_label": "D05",
+      "map_hex": "#c8641f",
+      "ui_hex": "#f57b26",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D46": {
+      "localized_name": "D06",
+      "country_file_label": "D06",
+      "map_hex": "#5096b3",
+      "ui_hex": "#59dbdc",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D47": {
+      "localized_name": "D07",
+      "country_file_label": "D07",
+      "map_hex": "#5c5cc5",
+      "ui_hex": "#7474f7",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D48": {
+      "localized_name": "D08",
+      "country_file_label": "D08",
+      "map_hex": "#9a4574",
+      "ui_hex": "#c85a97",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D49": {
+      "localized_name": "D09",
+      "country_file_label": "D09",
+      "map_hex": "#c3959b",
+      "ui_hex": "#fec2ca",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D50": {
+      "localized_name": "D09",
+      "country_file_label": "D09",
+      "map_hex": "#d26a2f",
+      "ui_hex": "#ff8a3d",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D51": {
+      "localized_name": "D51",
+      "country_file_label": "D51",
+      "map_hex": "#96960c",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D52": {
+      "localized_name": "D52",
+      "country_file_label": "D52",
+      "map_hex": "#01cd80",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D53": {
+      "localized_name": "D53",
+      "country_file_label": "D53",
+      "map_hex": "#808080",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D54": {
+      "localized_name": "D54",
+      "country_file_label": "D54",
+      "map_hex": "#6e6756",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D55": {
+      "localized_name": "D55",
+      "country_file_label": "D55",
+      "map_hex": "#649642",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D56": {
+      "localized_name": "D56",
+      "country_file_label": "D56",
+      "map_hex": "#cc2140",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D57": {
+      "localized_name": "D57",
+      "country_file_label": "D57",
+      "map_hex": "#bb8aed",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D58": {
+      "localized_name": "D58",
+      "country_file_label": "D58",
+      "map_hex": "#dded8a",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D59": {
+      "localized_name": "D59",
+      "country_file_label": "D59",
+      "map_hex": "#8abaed",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D60": {
+      "localized_name": "D60",
+      "country_file_label": "D60",
+      "map_hex": "#ed948a",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D61": {
+      "localized_name": "D61",
+      "country_file_label": "D61",
+      "map_hex": "#538067",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D62": {
+      "localized_name": "D62",
+      "country_file_label": "D62",
+      "map_hex": "#168bf7",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D63": {
+      "localized_name": "D63",
+      "country_file_label": "D63",
+      "map_hex": "#f7b016",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D64": {
+      "localized_name": "D64",
+      "country_file_label": "D64",
+      "map_hex": "#dbd9d3",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D65": {
+      "localized_name": "D65",
+      "country_file_label": "D65",
+      "map_hex": "#c1d3e0",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D66": {
+      "localized_name": "D66",
+      "country_file_label": "D66",
+      "map_hex": "#ce90d1",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D67": {
+      "localized_name": "D67",
+      "country_file_label": "D67",
+      "map_hex": "#584a66",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D68": {
+      "localized_name": "D68",
+      "country_file_label": "D68",
+      "map_hex": "#46caf2",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D69": {
+      "localized_name": "D69",
+      "country_file_label": "D69",
+      "map_hex": "#4cbf22",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D70": {
+      "localized_name": "D70",
+      "country_file_label": "D70",
+      "map_hex": "#611216",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D71": {
+      "localized_name": "D71",
+      "country_file_label": "D71",
+      "map_hex": "#1b26f5",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D72": {
+      "localized_name": "D72",
+      "country_file_label": "D72",
+      "map_hex": "#bd0698",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D73": {
+      "localized_name": "D73",
+      "country_file_label": "D73",
+      "map_hex": "#545424",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D74": {
+      "localized_name": "D74",
+      "country_file_label": "D74",
+      "map_hex": "#245437",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "D75": {
+      "localized_name": "D75",
+      "country_file_label": "D75",
+      "map_hex": "#e3f8fa",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "dynamic_tag_not_mapped"
+    },
+    "DAG": {
+      "localized_name": "Dagestan",
+      "country_file_label": "Dagestan",
+      "map_hex": "#00ccff",
+      "ui_hex": "#00a3cc",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "DAH": {
+      "localized_name": "Benin",
+      "country_file_label": "Dahomey",
+      "map_hex": "#0033cc",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "BJ",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "DDR": {
+      "localized_name": "Germany",
+      "country_file_label": "East Germany",
+      "map_hex": "#6a645f",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "split_state",
+      "suggested_iso2": "DE"
+    },
+    "DEN": {
+      "localized_name": "Denmark",
+      "country_file_label": "Denmark",
+      "map_hex": "#99745d",
+      "ui_hex": "#c79779",
+      "status": "mapped",
+      "mapped_iso2": "DK",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "DIP": {
+      "localized_name": "Partisans",
+      "country_file_label": "Partisans",
+      "map_hex": "#7d2931",
+      "ui_hex": "#7d2931",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "DJI": {
+      "localized_name": "Djibouti",
+      "country_file_label": "Djibouti",
+      "map_hex": "#006699",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "DJ",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "DNZ": {
+      "localized_name": "Danzig",
+      "country_file_label": "Danzig",
+      "map_hex": "#4e8197",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "DOM": {
+      "localized_name": "Dominican Republic",
+      "country_file_label": "Dominican Republic",
+      "map_hex": "#9882bf",
+      "ui_hex": "#c6a9f8",
+      "status": "mapped",
+      "mapped_iso2": "DO",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "DON": {
+      "localized_name": "Don Republic",
+      "country_file_label": "Don Republic",
+      "map_hex": "#ffaa00",
+      "ui_hex": "#b37700",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "ECU": {
+      "localized_name": "Ecuador",
+      "country_file_label": "Ecuador",
+      "map_hex": "#f99262",
+      "ui_hex": "#ffbe7f",
+      "status": "mapped",
+      "mapped_iso2": "EC",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "EGY": {
+      "localized_name": "Egypt",
+      "country_file_label": "Egypt",
+      "map_hex": "#e6e646",
+      "ui_hex": "#e6e646",
+      "status": "mapped",
+      "mapped_iso2": "EG",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "ELS": {
+      "localized_name": "El Salvador",
+      "country_file_label": "El Salvador",
+      "map_hex": "#9882bf",
+      "ui_hex": "#c6a9f8",
+      "status": "mapped",
+      "mapped_iso2": "SV",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "ENG": {
+      "localized_name": "Britain",
+      "country_file_label": "United Kingdom",
+      "map_hex": "#c9385d",
+      "ui_hex": "#ff4979",
+      "status": "mapped",
+      "mapped_iso2": "GB",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "EQG": {
+      "localized_name": "Equatorial Guinea",
+      "country_file_label": "Equatorial Guinea",
+      "map_hex": "#ffcc00",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "GQ",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "ERI": {
+      "localized_name": "Eritrea",
+      "country_file_label": "Eritrea",
+      "map_hex": "#993300",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "ER",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "EST": {
+      "localized_name": "Estonia",
+      "country_file_label": "Estonia",
+      "map_hex": "#3287af",
+      "ui_hex": "#63ccfe",
+      "status": "mapped",
+      "mapped_iso2": "EE",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "ETH": {
+      "localized_name": "Ethiopia",
+      "country_file_label": "Ethiopia",
+      "map_hex": "#9882bf",
+      "ui_hex": "#c6a9f8",
+      "status": "mapped",
+      "mapped_iso2": "ET",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "EVE": {
+      "localized_name": "Evenkia",
+      "country_file_label": "Evenkia",
+      "map_hex": "#99ddff",
+      "ui_hex": "#0077b3",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "EZO": {
+      "localized_name": "Ezo Republic",
+      "country_file_label": "Ezo Republic",
+      "map_hex": "#666699",
+      "ui_hex": "#47476b",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "FER": {
+      "localized_name": "Fareastern Republic",
+      "country_file_label": "Fareastern Republic",
+      "map_hex": "#b32d00",
+      "ui_hex": "#802000",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "FIJ": {
+      "localized_name": "Fiji",
+      "country_file_label": "Fiji",
+      "map_hex": "#00cccc",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "FIN": {
+      "localized_name": "Finland",
+      "country_file_label": "Finland",
+      "map_hex": "#cdd4e4",
+      "ui_hex": "#ffffff",
+      "status": "mapped",
+      "mapped_iso2": "FI",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "FOR": {
+      "localized_name": "Formosa",
+      "country_file_label": "Formosa",
+      "map_hex": "#008080",
+      "ui_hex": "#004d4d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "FRA": {
+      "localized_name": "France",
+      "country_file_label": "France",
+      "map_hex": "#3971e4",
+      "ui_hex": "#4a93ff",
+      "status": "mapped",
+      "mapped_iso2": "FR",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "FSA": {
+      "localized_name": "Federation of South Arabia",
+      "country_file_label": "Federation of South Arabia",
+      "map_hex": "#00b33c",
+      "ui_hex": "#006622",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "FSM": {
+      "localized_name": "Micronesia",
+      "country_file_label": "Micronesia",
+      "map_hex": "#76b3de",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "GAB": {
+      "localized_name": "Gabon",
+      "country_file_label": "Gabon",
+      "map_hex": "#33cccc",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "GA",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "GAM": {
+      "localized_name": "The Gambia",
+      "country_file_label": "Gambia",
+      "map_hex": "#990000",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "GM",
+      "match_kind": "country_file_exact",
+      "decision_source": "manual_verified"
+    },
+    "GAR": {
+      "localized_name": "Guarani",
+      "country_file_label": "Guarani",
+      "map_hex": "#8080ff",
+      "ui_hex": "#000080",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "GBA": {
+      "localized_name": "Gambela",
+      "country_file_label": "Gambela",
+      "map_hex": "#009933",
+      "ui_hex": "#009933",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "GDC": {
+      "localized_name": "Guangdong",
+      "country_file_label": "Guangdong",
+      "map_hex": "#2d8659",
+      "ui_hex": "#194d33",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "GDL": {
+      "localized_name": "Guadeloupe",
+      "country_file_label": "Guadeloupe",
+      "map_hex": "#99ffff",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "GEN": {
+      "localized_name": "Generalgouvernement",
+      "country_file_label": "Generalgouvernement",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "GEO": {
+      "localized_name": "Georgia",
+      "country_file_label": "Georgia",
+      "map_hex": "#ff9696",
+      "ui_hex": "#ffcccc",
+      "status": "mapped",
+      "mapped_iso2": "GE",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "GER": {
+      "localized_name": "Germany",
+      "country_file_label": "Germany",
+      "map_hex": "#666057",
+      "ui_hex": "#8a9b74",
+      "status": "mapped",
+      "mapped_iso2": "DE",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "GHA": {
+      "localized_name": "Ghana",
+      "country_file_label": "Ghana",
+      "map_hex": "#666633",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "GH",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "GLC": {
+      "localized_name": "Galicia",
+      "country_file_label": "Galicia",
+      "map_hex": "#f0a782",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "GNA": {
+      "localized_name": "Guinea",
+      "country_file_label": "Guinea",
+      "map_hex": "#6699ff",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "GN",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "GNB": {
+      "localized_name": "Guinea-Bissau",
+      "country_file_label": "Guinea-Bissau",
+      "map_hex": "#996600",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "GW",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "GRE": {
+      "localized_name": "Greece",
+      "country_file_label": "Greece",
+      "map_hex": "#5db5e3",
+      "ui_hex": "#79ebff",
+      "status": "mapped",
+      "mapped_iso2": "GR",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "GRN": {
+      "localized_name": "Greenland",
+      "country_file_label": "Greenland",
+      "map_hex": "#ff5050",
+      "ui_hex": "#b30000",
+      "status": "mapped",
+      "mapped_iso2": "GL",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "GSM": {
+      "localized_name": "Gansu Ma",
+      "country_file_label": "Gansu Ma",
+      "map_hex": "#693c64",
+      "ui_hex": "#0c1a27",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "GUA": {
+      "localized_name": "Guatemala",
+      "country_file_label": "Guatemla",
+      "map_hex": "#483170",
+      "ui_hex": "#483170",
+      "status": "mapped",
+      "mapped_iso2": "GT",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "GUM": {
+      "localized_name": "Mariana Islands",
+      "country_file_label": "Guam",
+      "map_hex": "#3cf064",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "GXC": {
+      "localized_name": "Guangxi",
+      "country_file_label": "Guangxi",
+      "map_hex": "#477161",
+      "ui_hex": "#477161",
+      "status": "unmapped",
+      "reason": "warlord_or_regional_tag",
+      "suggested_iso2": "CN"
+    },
+    "GYA": {
+      "localized_name": "Guyana",
+      "country_file_label": "Guyana",
+      "map_hex": "#ffcc99",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "GY",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "HAI": {
+      "localized_name": "Haiti",
+      "country_file_label": "Haiti",
+      "map_hex": "#ae7171",
+      "ui_hex": "#ae7171",
+      "status": "mapped",
+      "mapped_iso2": "HT",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "HAN": {
+      "localized_name": "Hannover",
+      "country_file_label": "Hanover",
+      "map_hex": "#ff0000",
+      "ui_hex": "#ff0000",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "HAR": {
+      "localized_name": "Harar",
+      "country_file_label": "Harar",
+      "map_hex": "#f2f2f2",
+      "ui_hex": "#ffffff",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "HAW": {
+      "localized_name": "Hawai'i",
+      "country_file_label": "Hawaii",
+      "map_hex": "#e7b50c",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "HBC": {
+      "localized_name": "Hebei-Chahar",
+      "country_file_label": "Hebei-Chahar",
+      "map_hex": "#9c1b16",
+      "ui_hex": "#5e110e",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "HES": {
+      "localized_name": "Hesse",
+      "country_file_label": "Hesse",
+      "map_hex": "#ffb3b3",
+      "ui_hex": "#b30000",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "HOL": {
+      "localized_name": "Netherlands",
+      "country_file_label": "Holland",
+      "map_hex": "#cb8a4a",
+      "ui_hex": "#ffb360",
+      "status": "mapped",
+      "mapped_iso2": "NL",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "HON": {
+      "localized_name": "Honduras",
+      "country_file_label": "Honduras",
+      "map_hex": "#809141",
+      "ui_hex": "#809141",
+      "status": "mapped",
+      "mapped_iso2": "HN",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "HRZ": {
+      "localized_name": "Herzegovina",
+      "country_file_label": "Herzegovina",
+      "map_hex": "#4871a0",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "HUN": {
+      "localized_name": "Hungary",
+      "country_file_label": "Hungary",
+      "map_hex": "#f97e62",
+      "ui_hex": "#ffa47f",
+      "status": "mapped",
+      "mapped_iso2": "HU",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "HYD": {
+      "localized_name": "Hyderabad",
+      "country_file_label": "Hyderabad",
+      "map_hex": "#f4b41a",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "IAS": {
+      "localized_name": "Isthmo Amerindia",
+      "country_file_label": "Isthmo Amerindia",
+      "map_hex": "#009933",
+      "ui_hex": "#003311",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "ICE": {
+      "localized_name": "Iceland",
+      "country_file_label": "Iceland",
+      "map_hex": "#647daf",
+      "ui_hex": "#647daf",
+      "status": "mapped",
+      "mapped_iso2": "IS",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "IMO": {
+      "localized_name": "Omani Imamate",
+      "country_file_label": "Omani Imamate",
+      "map_hex": "#f2f2f2",
+      "ui_hex": "#a6a6a6",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "INC": {
+      "localized_name": "Inca",
+      "country_file_label": "Inca",
+      "map_hex": "#ffcc00",
+      "ui_hex": "#806600",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "INS": {
+      "localized_name": "Indonesia",
+      "country_file_label": "Indonesia",
+      "map_hex": "#283278",
+      "ui_hex": "#283278",
+      "status": "mapped",
+      "mapped_iso2": "ID",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "INU": {
+      "localized_name": "Inuit",
+      "country_file_label": "Inuit",
+      "map_hex": "#33cccc",
+      "ui_hex": "#0f3d3d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "IRE": {
+      "localized_name": "Ireland",
+      "country_file_label": "Ireland",
+      "map_hex": "#509f5a",
+      "ui_hex": "#68cf75",
+      "status": "mapped",
+      "mapped_iso2": "IE",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "IRQ": {
+      "localized_name": "Iraq",
+      "country_file_label": "Iraq",
+      "map_hex": "#b27263",
+      "ui_hex": "#e79481",
+      "status": "mapped",
+      "mapped_iso2": "IQ",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "ISR": {
+      "localized_name": "Israel",
+      "country_file_label": "Israel",
+      "map_hex": "#9882bf",
+      "ui_hex": "#9882bf",
+      "status": "mapped",
+      "mapped_iso2": "IL",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "ITA": {
+      "localized_name": "Italy",
+      "country_file_label": "Italy",
+      "map_hex": "#437f3f",
+      "ui_hex": "#57a552",
+      "status": "mapped",
+      "mapped_iso2": "IT",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "ITZ": {
+      "localized_name": "Itza",
+      "country_file_label": "Itza",
+      "map_hex": "#cccc00",
+      "ui_hex": "#666600",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "IVO": {
+      "localized_name": "Côte d'Ivoire",
+      "country_file_label": "Ivory Coast",
+      "map_hex": "#ffffcc",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "CI",
+      "match_kind": "country_file_exact",
+      "decision_source": "manual_verified"
+    },
+    "JAM": {
+      "localized_name": "Jamaica",
+      "country_file_label": "Jamaica",
+      "map_hex": "#666600",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "JM",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "JAN": {
+      "localized_name": "Jan Mayen",
+      "country_file_label": "Jan Mayen",
+      "map_hex": "#ffffff",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "JAP": {
+      "localized_name": "Japan",
+      "country_file_label": "Japan",
+      "map_hex": "#ffc9b2",
+      "ui_hex": "#fffce5",
+      "status": "mapped",
+      "mapped_iso2": "JP",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "JOR": {
+      "localized_name": "Jordan",
+      "country_file_label": "Jordan",
+      "map_hex": "#6f374e",
+      "ui_hex": "#6f374e",
+      "status": "mapped",
+      "mapped_iso2": "JO",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "KAL": {
+      "localized_name": "Kalmykia",
+      "country_file_label": "Kalmykia",
+      "map_hex": "#ffcc00",
+      "ui_hex": "#cca300",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KAR": {
+      "localized_name": "Karelia",
+      "country_file_label": "Karelia",
+      "map_hex": "#009933",
+      "ui_hex": "#00802b",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KAS": {
+      "localized_name": "Kashmir",
+      "country_file_label": "Kashmir",
+      "map_hex": "#ff5a5a",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KAT": {
+      "localized_name": "Katanga",
+      "country_file_label": "Katanga",
+      "map_hex": "#cc2900",
+      "ui_hex": "#801a00",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KAZ": {
+      "localized_name": "Kazakhstan",
+      "country_file_label": "Kazakhstan",
+      "map_hex": "#4bb8cb",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "KZ",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "KBK": {
+      "localized_name": "Kabardino Balkaria",
+      "country_file_label": "Kabardino Balkaria",
+      "map_hex": "#ff471a",
+      "ui_hex": "#801a00",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KEN": {
+      "localized_name": "Kenya",
+      "country_file_label": "Kenya",
+      "map_hex": "#91670e",
+      "ui_hex": "#91670e",
+      "status": "mapped",
+      "mapped_iso2": "KE",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "KHA": {
+      "localized_name": "Khakassia",
+      "country_file_label": "Khakassia",
+      "map_hex": "#33cc33",
+      "ui_hex": "#196619",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KHI": {
+      "localized_name": "Khiva",
+      "country_file_label": "Khiva",
+      "map_hex": "#33ccff",
+      "ui_hex": "#0086b3",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KHL": {
+      "localized_name": "Khalistan",
+      "country_file_label": "Khalistan",
+      "map_hex": "#f3c304",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KHM": {
+      "localized_name": "Khotan Ma",
+      "country_file_label": "Khotan Ma",
+      "map_hex": "#996633",
+      "ui_hex": "#604020",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KKP": {
+      "localized_name": "Karakalpakstan",
+      "country_file_label": "Karakalpakstan",
+      "map_hex": "#ff8000",
+      "ui_hex": "#cc6600",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KLT": {
+      "localized_name": "Kalat",
+      "country_file_label": "Kalat",
+      "map_hex": "#00ab00",
+      "ui_hex": "#00ab00",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KOL": {
+      "localized_name": "Kolhapur and Deccan States",
+      "country_file_label": "Kolhapur and Deccan States",
+      "map_hex": "#2a127e",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KOM": {
+      "localized_name": "Komi",
+      "country_file_label": "Komi",
+      "map_hex": "#00e6b8",
+      "ui_hex": "#008066",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KOR": {
+      "localized_name": "Korea",
+      "country_file_label": "Korea",
+      "map_hex": "#fff0c3",
+      "ui_hex": "#fff8e5",
+      "status": "unmapped",
+      "reason": "split_state"
+    },
+    "KOS": {
+      "localized_name": "Kosovo",
+      "country_file_label": "Kosovo",
+      "map_hex": "#d0a650",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "XK",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "KSH": {
+      "localized_name": "Kashubia",
+      "country_file_label": "Kashubia",
+      "map_hex": "#ffdc00",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KUB": {
+      "localized_name": "Kuban Republic",
+      "country_file_label": "Kuban Republic",
+      "map_hex": "#666699",
+      "ui_hex": "#3d3d5c",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KUM": {
+      "localized_name": "Kumul Khanate",
+      "country_file_label": "Kumul Khanate",
+      "map_hex": "#ffe680",
+      "ui_hex": "#997a00",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KUR": {
+      "localized_name": "Kurdistan",
+      "country_file_label": "Kurdistan",
+      "map_hex": "#eab31e",
+      "ui_hex": "#ff9900",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "KUW": {
+      "localized_name": "Kuwait",
+      "country_file_label": "Kuwait",
+      "map_hex": "#994c00",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "KW",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "KYR": {
+      "localized_name": "Kyrgyzstan",
+      "country_file_label": "Kyrgyzstan",
+      "map_hex": "#994c00",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "KG",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "LAO": {
+      "localized_name": "Laos",
+      "country_file_label": "Laos",
+      "map_hex": "#b06688",
+      "ui_hex": "#b06688",
+      "status": "mapped",
+      "mapped_iso2": "LA",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "LAT": {
+      "localized_name": "Latvia",
+      "country_file_label": "Latvia",
+      "map_hex": "#4b4dba",
+      "ui_hex": "#7c7db8",
+      "status": "mapped",
+      "mapped_iso2": "LV",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "LBA": {
+      "localized_name": "Libya",
+      "country_file_label": "Libya",
+      "map_hex": "#c8b45a",
+      "ui_hex": "#c8b45a",
+      "status": "mapped",
+      "mapped_iso2": "LY",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "LBV": {
+      "localized_name": "Kingdom of Lombardy-Venetia",
+      "country_file_label": "Lombardy Venetia",
+      "map_hex": "#b30b00",
+      "ui_hex": "#660000",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "LEB": {
+      "localized_name": "Lebanon",
+      "country_file_label": "Lebanon",
+      "map_hex": "#82963c",
+      "ui_hex": "#82963c",
+      "status": "mapped",
+      "mapped_iso2": "LB",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "LIB": {
+      "localized_name": "Liberia",
+      "country_file_label": "Liberia",
+      "map_hex": "#9882bf",
+      "ui_hex": "#c6a9f8",
+      "status": "mapped",
+      "mapped_iso2": "LR",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "LIT": {
+      "localized_name": "Lithuania",
+      "country_file_label": "Lithuania",
+      "map_hex": "#dbdb77",
+      "ui_hex": "#ffff9b",
+      "status": "mapped",
+      "mapped_iso2": "LT",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "LUX": {
+      "localized_name": "Luxembourg",
+      "country_file_label": "Luxemburg",
+      "map_hex": "#41afb3",
+      "ui_hex": "#55e4e9",
+      "status": "mapped",
+      "mapped_iso2": "LU",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "MAC": {
+      "localized_name": "Macedonia",
+      "country_file_label": "Macedonia",
+      "map_hex": "#ff3333",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "MAD": {
+      "localized_name": "Madagascar",
+      "country_file_label": "Madagascar",
+      "map_hex": "#ffff99",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "MG",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "MAL": {
+      "localized_name": "Malaysia",
+      "country_file_label": "Malaysia",
+      "map_hex": "#c56064",
+      "ui_hex": "#d5a979",
+      "status": "mapped",
+      "mapped_iso2": "MY",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "MAN": {
+      "localized_name": "China",
+      "country_file_label": "Manchukou",
+      "map_hex": "#ff7847",
+      "ui_hex": "#ff7847",
+      "status": "unmapped",
+      "reason": "split_state",
+      "suggested_iso2": "CN"
+    },
+    "MAY": {
+      "localized_name": "Maya",
+      "country_file_label": "Maya",
+      "map_hex": "#ff5050",
+      "ui_hex": "#990000",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "MEK": {
+      "localized_name": "Mecklenburg",
+      "country_file_label": "Mecklenburg",
+      "map_hex": "#baf556",
+      "ui_hex": "#baf556",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "MEL": {
+      "localized_name": "Mariel",
+      "country_file_label": "Mariel",
+      "map_hex": "#ffe6e6",
+      "ui_hex": "#ff9999",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "MEN": {
+      "localized_name": "Mengkukuo",
+      "country_file_label": "Mengkukuo",
+      "map_hex": "#b9ff98",
+      "ui_hex": "#a5e684",
+      "status": "unmapped",
+      "reason": "historical_union_or_predecessor"
+    },
+    "MEX": {
+      "localized_name": "Mexico",
+      "country_file_label": "Mexico",
+      "map_hex": "#689853",
+      "ui_hex": "#87c66c",
+      "status": "mapped",
+      "mapped_iso2": "MX",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "MIS": {
+      "localized_name": "Miskito",
+      "country_file_label": "Miskito",
+      "map_hex": "#ff3300",
+      "ui_hex": "#991f00",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "MLD": {
+      "localized_name": "Maldives",
+      "country_file_label": "Maldives",
+      "map_hex": "#b2ff66",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "MV",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "MLI": {
+      "localized_name": "Mali",
+      "country_file_label": "Mali",
+      "map_hex": "#ccccff",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "ML",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "MLT": {
+      "localized_name": "Malta",
+      "country_file_label": "Malta",
+      "map_hex": "#ffff99",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "MT",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "MLW": {
+      "localized_name": "Malawi",
+      "country_file_label": "Malawi",
+      "map_hex": "#99cc00",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "MW",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "MNT": {
+      "localized_name": "Montenegro",
+      "country_file_label": "Montenegro",
+      "map_hex": "#4d5a69",
+      "ui_hex": "#4d5a69",
+      "status": "mapped",
+      "mapped_iso2": "ME",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "MOL": {
+      "localized_name": "Moldova",
+      "country_file_label": "Moldova",
+      "map_hex": "#ffcccc",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "MD",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "MON": {
+      "localized_name": "Mongolia",
+      "country_file_label": "Mongolia",
+      "map_hex": "#666057",
+      "ui_hex": "#d1f785",
+      "status": "mapped",
+      "mapped_iso2": "MN",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "MOR": {
+      "localized_name": "Morocco",
+      "country_file_label": "Morocco",
+      "map_hex": "#663300",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "MA",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "MPU": {
+      "localized_name": "Manipur",
+      "country_file_label": "Manipur",
+      "map_hex": "#8e7d83",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "MRT": {
+      "localized_name": "Mauritania",
+      "country_file_label": "Mauritania",
+      "map_hex": "#ff9999",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "MR",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "MYS": {
+      "localized_name": "Mysore",
+      "country_file_label": "Mysore",
+      "map_hex": "#993333",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "MZB": {
+      "localized_name": "Mozambique",
+      "country_file_label": "Mozambique",
+      "map_hex": "#703e5a",
+      "ui_hex": "#703e5a",
+      "status": "mapped",
+      "mapped_iso2": "MZ",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "NAH": {
+      "localized_name": "Nahua",
+      "country_file_label": "Nahua",
+      "map_hex": "#339966",
+      "ui_hex": "#0d261a",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "NAV": {
+      "localized_name": "Basque Country",
+      "country_file_label": "Navarra",
+      "map_hex": "#fce93a",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "NEN": {
+      "localized_name": "Nenetsia",
+      "country_file_label": "Nenetsia",
+      "map_hex": "#ccffcc",
+      "ui_hex": "#66ff66",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "NEP": {
+      "localized_name": "Nepal",
+      "country_file_label": "Nepal",
+      "map_hex": "#9882bf",
+      "ui_hex": "#c6a9f8",
+      "status": "mapped",
+      "mapped_iso2": "NP",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "NGA": {
+      "localized_name": "Nigeria",
+      "country_file_label": "Nigeria",
+      "map_hex": "#ffcc66",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "NG",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "NGR": {
+      "localized_name": "Niger",
+      "country_file_label": "Niger",
+      "map_hex": "#ff9966",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "NE",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "NIC": {
+      "localized_name": "Nicaragua",
+      "country_file_label": "Nicaragua",
+      "map_hex": "#92b3bf",
+      "ui_hex": "#92b3bf",
+      "status": "mapped",
+      "mapped_iso2": "NI",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "NIR": {
+      "localized_name": "Northern Ireland",
+      "country_file_label": "Northern Ireland",
+      "map_hex": "#ff9933",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "NMB": {
+      "localized_name": "Namibia",
+      "country_file_label": "Namibia",
+      "map_hex": "#e5ccff",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "NA",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "NOA": {
+      "localized_name": "North Ossetia",
+      "country_file_label": "North Ossetia",
+      "map_hex": "#ffaa00",
+      "ui_hex": "#cc8800",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "NOR": {
+      "localized_name": "Norway",
+      "country_file_label": "Norway",
+      "map_hex": "#6f4747",
+      "ui_hex": "#905c5c",
+      "status": "mapped",
+      "mapped_iso2": "NO",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "NWF": {
+      "localized_name": "North Western Frontier States",
+      "country_file_label": "North Western Frontier States",
+      "map_hex": "#2ac0c0",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "NXM": {
+      "localized_name": "Ningxia Ma",
+      "country_file_label": "Ningxia Ma",
+      "map_hex": "#697d96",
+      "ui_hex": "#204060",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "NZL": {
+      "localized_name": "New Zealand",
+      "country_file_label": "New Zealand",
+      "map_hex": "#9882bf",
+      "ui_hex": "#c6a9f8",
+      "status": "mapped",
+      "mapped_iso2": "NZ",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "OCC": {
+      "localized_name": "Occitania",
+      "country_file_label": "Occitania",
+      "map_hex": "#69f0f0",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "OKN": {
+      "localized_name": "Okinawa",
+      "country_file_label": "Okinawa",
+      "map_hex": "#ff8c1a",
+      "ui_hex": "#b35900",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "OMA": {
+      "localized_name": "Oman",
+      "country_file_label": "Oman",
+      "map_hex": "#9b656b",
+      "ui_hex": "#ca838b",
+      "status": "mapped",
+      "mapped_iso2": "OM",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "ORO": {
+      "localized_name": "Oromo",
+      "country_file_label": "Oromo",
+      "map_hex": "#ff4d4d",
+      "ui_hex": "#ff4d4d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "OVO": {
+      "localized_name": "Ostyak Vogulia",
+      "country_file_label": "Ostyak Vogulia",
+      "map_hex": "#009933",
+      "ui_hex": "#006622",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "PAK": {
+      "localized_name": "Pakistan",
+      "country_file_label": "Pakistan",
+      "map_hex": "#006600",
+      "ui_hex": "#006600",
+      "status": "mapped",
+      "mapped_iso2": "PK",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "PAL": {
+      "localized_name": "Palestine",
+      "country_file_label": "Palestine",
+      "map_hex": "#aa7d50",
+      "ui_hex": "#aa7d50",
+      "status": "mapped",
+      "mapped_iso2": "PS",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "PAN": {
+      "localized_name": "Panama",
+      "country_file_label": "Panama",
+      "map_hex": "#9882bf",
+      "ui_hex": "#c6a9f8",
+      "status": "mapped",
+      "mapped_iso2": "PA",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "PAP": {
+      "localized_name": "Papal States",
+      "country_file_label": "Papal States",
+      "map_hex": "#ffffcc",
+      "ui_hex": "#ffff1a",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "PAR": {
+      "localized_name": "Paraguay",
+      "country_file_label": "Paraguay",
+      "map_hex": "#3971e4",
+      "ui_hex": "#4a93ff",
+      "status": "mapped",
+      "mapped_iso2": "PY",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "PER": {
+      "localized_name": "Iran",
+      "country_file_label": "Persia",
+      "map_hex": "#477161",
+      "ui_hex": "#5c937e",
+      "status": "mapped",
+      "mapped_iso2": "IR",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "PHI": {
+      "localized_name": "Philippines",
+      "country_file_label": "Philippines",
+      "map_hex": "#0028c3",
+      "ui_hex": "#0028c3",
+      "status": "mapped",
+      "mapped_iso2": "PH",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "PLU": {
+      "localized_name": "Palau",
+      "country_file_label": "Palau",
+      "map_hex": "#3399ff",
+      "ui_hex": "#004d99",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "PNG": {
+      "localized_name": "Papua",
+      "country_file_label": "Papua New Guinea",
+      "map_hex": "#99004c",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "PG",
+      "match_kind": "country_file_exact",
+      "decision_source": "manual_verified"
+    },
+    "POL": {
+      "localized_name": "Poland",
+      "country_file_label": "Poland",
+      "map_hex": "#d6668b",
+      "ui_hex": "#ff788a",
+      "status": "mapped",
+      "mapped_iso2": "PL",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "POR": {
+      "localized_name": "Portugal",
+      "country_file_label": "Portugal",
+      "map_hex": "#277446",
+      "ui_hex": "#33975b",
+      "status": "mapped",
+      "mapped_iso2": "PT",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "PRC": {
+      "localized_name": "China",
+      "country_file_label": "ComChina",
+      "map_hex": "#f50c37",
+      "ui_hex": "#b2223c",
+      "status": "unmapped",
+      "reason": "split_state",
+      "suggested_iso2": "CN"
+    },
+    "PRE": {
+      "localized_name": "Prussia",
+      "country_file_label": "Prussia",
+      "map_hex": "#a0a0a0",
+      "ui_hex": "#a0a0a0",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "PRU": {
+      "localized_name": "Peru",
+      "country_file_label": "Peru",
+      "map_hex": "#c4bdcc",
+      "ui_hex": "#fff6ff",
+      "status": "mapped",
+      "mapped_iso2": "PE",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "PSH": {
+      "localized_name": "Pashtunistan",
+      "country_file_label": "Pashtunistan",
+      "map_hex": "#1f8a1f",
+      "ui_hex": "#1f8a1f",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "PSR": {
+      "localized_name": "Philippine Second Republic",
+      "country_file_label": "Philippine Second Republic",
+      "map_hex": "#1f1f7a",
+      "ui_hex": "#10103d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "PUE": {
+      "localized_name": "Puerto Rico",
+      "country_file_label": "Puerto Rico",
+      "map_hex": "#9999ff",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "PR",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "QAT": {
+      "localized_name": "Qatar",
+      "country_file_label": "Qatar",
+      "map_hex": "#800000",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "QA",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "QEM": {
+      "localized_name": "Qemant",
+      "country_file_label": "Qemant",
+      "map_hex": "#336699",
+      "ui_hex": "#336699",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "QUE": {
+      "localized_name": "Quebec",
+      "country_file_label": "Quebec",
+      "map_hex": "#0066ff",
+      "ui_hex": "#001f4d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RAA": {
+      "localized_name": "Reichskommisariat Australasien",
+      "country_file_label": "Reichskommisariat Australasien",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RAJ": {
+      "localized_name": "India",
+      "country_file_label": "British Raj",
+      "map_hex": "#e28728",
+      "ui_hex": "#e28728",
+      "status": "unmapped",
+      "reason": "colonial_predecessor",
+      "suggested_iso2": "IN"
+    },
+    "RAN": {
+      "localized_name": "Reichskommisariat Anden",
+      "country_file_label": "Reichskommisariat Anden",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RAP": {
+      "localized_name": "Rapa Nui",
+      "country_file_label": "Rapa Nui",
+      "map_hex": "#cc0000",
+      "ui_hex": "#660000",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RAR": {
+      "localized_name": "Reichskommisariat Arabien",
+      "country_file_label": "Reichskommisariat Arabien",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RAS": {
+      "localized_name": "Madras States",
+      "country_file_label": "Madras States",
+      "map_hex": "#fb2968",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RCG": {
+      "localized_name": "Congo",
+      "country_file_label": "Republic of Congo",
+      "map_hex": "#66ccff",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "CG",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "RCO": {
+      "localized_name": "Reichskommisariat Kolumbus",
+      "country_file_label": "Reichskommisariat Kolumbus",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RGB": {
+      "localized_name": "Reichskommisariat Grossbritannien",
+      "country_file_label": "Reichskommisariat Grossbritannien",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RHD": {
+      "localized_name": "Reichskommisariat Grosshindustan",
+      "country_file_label": "Reichskommisariat Grosshindustan",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RHI": {
+      "localized_name": "Rhineland",
+      "country_file_label": "Rhineland",
+      "map_hex": "#009933",
+      "ui_hex": "#004d1a",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RIF": {
+      "localized_name": "Rif",
+      "country_file_label": "Rif",
+      "map_hex": "#8a0d0d",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RIG": {
+      "localized_name": "Rio Grande",
+      "country_file_label": "Rio Grande",
+      "map_hex": "#000080",
+      "ui_hex": "#000033",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RJP": {
+      "localized_name": "Rajputana",
+      "country_file_label": "Rajputana",
+      "map_hex": "#90030b",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RKA": {
+      "localized_name": "Reichskommisariat Mittelafrika",
+      "country_file_label": "Reichskommisariat Mittelafrika",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RKB": {
+      "localized_name": "Reichskommisariat Belgien",
+      "country_file_label": "Reichskommisariat Belgien",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RKC": {
+      "localized_name": "Reichskommisariat Balkan",
+      "country_file_label": "Reichskommisariat Balkan",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RKG": {
+      "localized_name": "Reichskommisariat Norwegen",
+      "country_file_label": "Reichskommisariat Norwegen",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RKH": {
+      "localized_name": "Bohmen Mahren",
+      "country_file_label": "Bohmen Mahren",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RKI": {
+      "localized_name": "Reichskommisariat Iberien",
+      "country_file_label": "Reichskommisariat Iberien",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RKK": {
+      "localized_name": "Reichskommisariat Kaukasien",
+      "country_file_label": "Reichskommisariat Kaukasien",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RKL": {
+      "localized_name": "Reichskommisariat Urals",
+      "country_file_label": "Reichskommisariat Urals",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RKM": {
+      "localized_name": "Reichskommisariat Moskowien",
+      "country_file_label": "Reichskommisariat Moskowien",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RKN": {
+      "localized_name": "Reichskommisariat Niederlande",
+      "country_file_label": "Reichskommisariat Niederlande",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RKO": {
+      "localized_name": "Reichskommisariat Ostland",
+      "country_file_label": "Reichskommisariat Ostland",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RKT": {
+      "localized_name": "Reichskommisariat Turkestan",
+      "country_file_label": "Reichskommisariat Turkestan",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RKU": {
+      "localized_name": "Reichskommisariat Ukraine",
+      "country_file_label": "Reichskommisariat Ukraine",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RKV": {
+      "localized_name": "Reichskommisariat Klein Venedig",
+      "country_file_label": "Reichskommisariat Klein Venedig",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RNA": {
+      "localized_name": "Reichskommisariat Nordafrika",
+      "country_file_label": "Reichskommisariat Nordafrika",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RNG": {
+      "localized_name": "Reorganized National Government",
+      "country_file_label": "Reorganized National Government",
+      "map_hex": "#ffbf00",
+      "ui_hex": "#cc9900",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "ROA": {
+      "localized_name": "Reichskommisariat Ostasien",
+      "country_file_label": "Reichskommisariat Ostasien",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "ROM": {
+      "localized_name": "Romania",
+      "country_file_label": "Romania",
+      "map_hex": "#d7c448",
+      "ui_hex": "#ffff78",
+      "status": "mapped",
+      "mapped_iso2": "RO",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "RUS": {
+      "localized_name": "Reichskommisariat Nordamerika",
+      "country_file_label": "Reichskommisariat Nordamerika",
+      "map_hex": "#737373",
+      "ui_hex": "#7a915d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "RWA": {
+      "localized_name": "Rwanda",
+      "country_file_label": "Rwanda",
+      "map_hex": "#ffff66",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "RW",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "SAB": {
+      "localized_name": "Sabah",
+      "country_file_label": "Sabah",
+      "map_hex": "#00ace6",
+      "ui_hex": "#006080",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SAF": {
+      "localized_name": "South Africa",
+      "country_file_label": "South Africa",
+      "map_hex": "#c36ba0",
+      "ui_hex": "#c6a9f8",
+      "status": "mapped",
+      "mapped_iso2": "ZA",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "SAM": {
+      "localized_name": "Samoa",
+      "country_file_label": "Samoa",
+      "map_hex": "#cd145f",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SAR": {
+      "localized_name": "Sarawak",
+      "country_file_label": "Sarawak",
+      "map_hex": "#e6b800",
+      "ui_hex": "#997a00",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SAU": {
+      "localized_name": "Saudi Arabia",
+      "country_file_label": "Saudi Arabia",
+      "map_hex": "#abbe98",
+      "ui_hex": "#def7c6",
+      "status": "mapped",
+      "mapped_iso2": "SA",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "SAX": {
+      "localized_name": "Saxony",
+      "country_file_label": "Saxony",
+      "map_hex": "#666600",
+      "ui_hex": "#666600",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SCO": {
+      "localized_name": "Scotland",
+      "country_file_label": "Scotland",
+      "map_hex": "#e8e800",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SEN": {
+      "localized_name": "Senegal",
+      "country_file_label": "Senegal",
+      "map_hex": "#cc3300",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "SN",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "SER": {
+      "localized_name": "Serbia",
+      "country_file_label": "Serbia",
+      "map_hex": "#a06e6e",
+      "ui_hex": "#a06e6e",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SHL": {
+      "localized_name": "Schleswig",
+      "country_file_label": "Schleswig-Holstein",
+      "map_hex": "#3333ff",
+      "ui_hex": "#3333ff",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SHX": {
+      "localized_name": "Shanxi",
+      "country_file_label": "Shanxi",
+      "map_hex": "#52020f",
+      "ui_hex": "#651e29",
+      "status": "unmapped",
+      "reason": "warlord_or_regional_tag",
+      "suggested_iso2": "CN"
+    },
+    "SIA": {
+      "localized_name": "Siam",
+      "country_file_label": "Siam",
+      "map_hex": "#abbe98",
+      "ui_hex": "#def7c6",
+      "status": "mapped",
+      "mapped_iso2": "TH",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "SIC": {
+      "localized_name": "Sichuan",
+      "country_file_label": "Sichuan",
+      "map_hex": "#006080",
+      "ui_hex": "#004d66",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SID": {
+      "localized_name": "Sidamo",
+      "country_file_label": "Sidamo",
+      "map_hex": "#6666ff",
+      "ui_hex": "#6666ff",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SIE": {
+      "localized_name": "Sierra Leone",
+      "country_file_label": "Sierra Leone",
+      "map_hex": "#cc66ff",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "SL",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "SIK": {
+      "localized_name": "Sinkiang",
+      "country_file_label": "Sinkiang",
+      "map_hex": "#47be98",
+      "ui_hex": "#def7c6",
+      "status": "unmapped",
+      "reason": "unsupported_runtime_country",
+      "suggested_iso2": "XJ"
+    },
+    "SIL": {
+      "localized_name": "Silesia",
+      "country_file_label": "Silesia",
+      "map_hex": "#54a65d",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SIN": {
+      "localized_name": "Sindh",
+      "country_file_label": "Sindh",
+      "map_hex": "#2b0c36",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SKK": {
+      "localized_name": "Sikkim",
+      "country_file_label": "Sikkim",
+      "map_hex": "#fff56b",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SLO": {
+      "localized_name": "Slovakia",
+      "country_file_label": "Slovakia",
+      "map_hex": "#9ea1bc",
+      "ui_hex": "#ffffff",
+      "status": "mapped",
+      "mapped_iso2": "SK",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "SLV": {
+      "localized_name": "Slovenia",
+      "country_file_label": "Slovenia",
+      "map_hex": "#66b2ff",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "SI",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "SMI": {
+      "localized_name": "Sami",
+      "country_file_label": "Sami",
+      "map_hex": "#f2ec63",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SND": {
+      "localized_name": "Shandong",
+      "country_file_label": "Shandong",
+      "map_hex": "#e65c00",
+      "ui_hex": "#993d00",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SNG": {
+      "localized_name": "Singapore",
+      "country_file_label": "Singapore",
+      "map_hex": "#cc0000",
+      "ui_hex": "#800000",
+      "status": "mapped",
+      "mapped_iso2": "SG",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "SOK": {
+      "localized_name": "Sokoto",
+      "country_file_label": "Sokoto",
+      "map_hex": "#00802b",
+      "ui_hex": "#004d1a",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SOL": {
+      "localized_name": "Solomon Islands",
+      "country_file_label": "Solomon",
+      "map_hex": "#14145a",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SOM": {
+      "localized_name": "Somalia",
+      "country_file_label": "Somalia",
+      "map_hex": "#336600",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "SO",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "SOV": {
+      "localized_name": "Russia",
+      "country_file_label": "Soviet Union",
+      "map_hex": "#7d0d18",
+      "ui_hex": "#a3111f",
+      "status": "unmapped",
+      "reason": "historical_union_or_predecessor",
+      "suggested_iso2": "RU"
+    },
+    "SPM": {
+      "localized_name": "Sardinia-Piedmont",
+      "country_file_label": "Sardinia Piedmont",
+      "map_hex": "#00ffff",
+      "ui_hex": "#00b3b3",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "SPR": {
+      "localized_name": "Spain",
+      "country_file_label": "Spain",
+      "map_hex": "#f2cd5e",
+      "ui_hex": "#ffff7a",
+      "status": "mapped",
+      "mapped_iso2": "ES",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "SRL": {
+      "localized_name": "Sri Lanka",
+      "country_file_label": "Sri Lanka",
+      "map_hex": "#cc0066",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "LK",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "SUD": {
+      "localized_name": "Sudan",
+      "country_file_label": "Sudan",
+      "map_hex": "#cc6600",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "SD",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "SUR": {
+      "localized_name": "Suriname",
+      "country_file_label": "Suriname",
+      "map_hex": "#ffb266",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "SR",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "SWE": {
+      "localized_name": "Sweden",
+      "country_file_label": "Sweden",
+      "map_hex": "#2484f7",
+      "ui_hex": "#2facff",
+      "status": "mapped",
+      "mapped_iso2": "SE",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "SWI": {
+      "localized_name": "Switzerland",
+      "country_file_label": "Switzerland",
+      "map_hex": "#e00505",
+      "ui_hex": "#c15151",
+      "status": "mapped",
+      "mapped_iso2": "CH",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "SYR": {
+      "localized_name": "Syria",
+      "country_file_label": "Syria",
+      "map_hex": "#646496",
+      "ui_hex": "#646496",
+      "status": "mapped",
+      "mapped_iso2": "SY",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "TAH": {
+      "localized_name": "Tahiti",
+      "country_file_label": "Tahiti",
+      "map_hex": "#4921f8",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "TAJ": {
+      "localized_name": "Tajikistan",
+      "country_file_label": "Tajikistan",
+      "map_hex": "#336600",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "TJ",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "TAN": {
+      "localized_name": "Tannu Tuva",
+      "country_file_label": "Tannu Tuva",
+      "map_hex": "#9882bf",
+      "ui_hex": "#c6a9f8",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "TAT": {
+      "localized_name": "Tatarstan",
+      "country_file_label": "Tatarstan",
+      "map_hex": "#ff3300",
+      "ui_hex": "#b32400",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "TAY": {
+      "localized_name": "Taymyria",
+      "country_file_label": "Taymyria",
+      "map_hex": "#006699",
+      "ui_hex": "#004466",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "THU": {
+      "localized_name": "Thuringia",
+      "country_file_label": "Thuringia",
+      "map_hex": "#6699ff",
+      "ui_hex": "#003399",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "TIB": {
+      "localized_name": "Tibet",
+      "country_file_label": "Tibet",
+      "map_hex": "#50642d",
+      "ui_hex": "#def7c6",
+      "status": "unmapped",
+      "reason": "unsupported_runtime_country",
+      "suggested_iso2": "XZ"
+    },
+    "TIG": {
+      "localized_name": "Tigray",
+      "country_file_label": "Tigray",
+      "map_hex": "#ff3300",
+      "ui_hex": "#ff3300",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "TML": {
+      "localized_name": "Timor Leste",
+      "country_file_label": "Timor Leste",
+      "map_hex": "#800000",
+      "ui_hex": "#330000",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "TMS": {
+      "localized_name": "Turkmenistan",
+      "country_file_label": "Turkmenistan",
+      "map_hex": "#004c99",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "TM",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "TOG": {
+      "localized_name": "Togo",
+      "country_file_label": "Togo",
+      "map_hex": "#006600",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "TG",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "TOS": {
+      "localized_name": "Grand Duchy of Tuscany",
+      "country_file_label": "Tuscany",
+      "map_hex": "#ff8080",
+      "ui_hex": "#cc0000",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "TRA": {
+      "localized_name": "Transylvania",
+      "country_file_label": "Transylvania",
+      "map_hex": "#d3cfad",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "TRI": {
+      "localized_name": "Trinidad and Tobago",
+      "country_file_label": "Trinidad and Tobago",
+      "map_hex": "#606060",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "TT",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "TTS": {
+      "localized_name": "Kingdom of the Two Sicilies",
+      "country_file_label": "The Two Sicilies",
+      "map_hex": "#e6e600",
+      "ui_hex": "#b3b300",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "TUN": {
+      "localized_name": "Tunisia",
+      "country_file_label": "Tunisia",
+      "map_hex": "#999966",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "TN",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "TUR": {
+      "localized_name": "Turkey",
+      "country_file_label": "Turkey",
+      "map_hex": "#abbe98",
+      "ui_hex": "#def7c6",
+      "status": "mapped",
+      "mapped_iso2": "TR",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "TZN": {
+      "localized_name": "Tanzania",
+      "country_file_label": "Tanzania",
+      "map_hex": "#ffcc99",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "UAE": {
+      "localized_name": "Arab Emirates",
+      "country_file_label": "United Arab Emirates",
+      "map_hex": "#666600",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "AE",
+      "match_kind": "country_file_exact",
+      "decision_source": "manual_verified"
+    },
+    "UBD": {
+      "localized_name": "United Baltic Duchy",
+      "country_file_label": "United Baltic Duchy",
+      "map_hex": "#5c5c8a",
+      "ui_hex": "#33334d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "UDM": {
+      "localized_name": "Udmurtia",
+      "country_file_label": "Udmurtia",
+      "map_hex": "#404040",
+      "ui_hex": "#0d0d0d",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "UGA": {
+      "localized_name": "Uganda",
+      "country_file_label": "Uganda",
+      "map_hex": "#ff5050",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "UG",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "UKR": {
+      "localized_name": "Ukraine",
+      "country_file_label": "Ukraine",
+      "map_hex": "#0050e6",
+      "ui_hex": "#0050e6",
+      "status": "mapped",
+      "mapped_iso2": "UA",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "URG": {
+      "localized_name": "Uruguay",
+      "country_file_label": "Uruguay",
+      "map_hex": "#abbe98",
+      "ui_hex": "#def7c6",
+      "status": "mapped",
+      "mapped_iso2": "UY",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "USA": {
+      "localized_name": "America",
+      "country_file_label": "USA",
+      "map_hex": "#1485ed",
+      "ui_hex": "#57a0ff",
+      "status": "mapped",
+      "mapped_iso2": "US",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "USB": {
+      "localized_name": "Unaligned States of America",
+      "country_file_label": "USB",
+      "map_hex": "#a77bed",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "fictional_or_alt_history",
+      "suggested_iso2": "US"
+    },
+    "UZB": {
+      "localized_name": "Uzbekistan",
+      "country_file_label": "Uzbekistan",
+      "map_hex": "#006666",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "UZ",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "VEN": {
+      "localized_name": "Venezuela",
+      "country_file_label": "Venezula",
+      "map_hex": "#abbe98",
+      "ui_hex": "#def7c6",
+      "status": "mapped",
+      "mapped_iso2": "VE",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "VGE": {
+      "localized_name": "Volga Germany",
+      "country_file_label": "Volga Germany",
+      "map_hex": "#999999",
+      "ui_hex": "#595959",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "VIN": {
+      "localized_name": "Vietnam",
+      "country_file_label": "Vietnam",
+      "map_hex": "#e6df32",
+      "ui_hex": "#e6df32",
+      "status": "unmapped",
+      "reason": "split_state",
+      "suggested_iso2": "VN"
+    },
+    "VLA": {
+      "localized_name": "Vladivostok",
+      "country_file_label": "Vladivostok",
+      "map_hex": "#ffcc00",
+      "ui_hex": "#cca300",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "VOL": {
+      "localized_name": "Upper Volta",
+      "country_file_label": "Upper Volta",
+      "map_hex": "#9999ff",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "WES": {
+      "localized_name": "Western Sahara",
+      "country_file_label": "Western Sahara",
+      "map_hex": "#ffb266",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "EH",
+      "match_kind": "approved_alias",
+      "decision_source": "manual_verified"
+    },
+    "WGR": {
+      "localized_name": "Germany",
+      "country_file_label": "West Germany",
+      "map_hex": "#786e59",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "split_state",
+      "suggested_iso2": "DE"
+    },
+    "WIS": {
+      "localized_name": "Western Indian States",
+      "country_file_label": "Western Indian States",
+      "map_hex": "#2ac0c0",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "WLA": {
+      "localized_name": "Welsh Argentina",
+      "country_file_label": "Welsh Argentina",
+      "map_hex": "#800020",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "WLS": {
+      "localized_name": "Wales",
+      "country_file_label": "Wales",
+      "map_hex": "#ff0000",
+      "ui_hex": "",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "WPG": {
+      "localized_name": "West Papua",
+      "country_file_label": "West Papua",
+      "map_hex": "#ac3939",
+      "ui_hex": "#732626",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "WUR": {
+      "localized_name": "Wurtemberg",
+      "country_file_label": "Wurtemberg",
+      "map_hex": "#ffcc99",
+      "ui_hex": "#ffcc99",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "XIC": {
+      "localized_name": "Xian",
+      "country_file_label": "Xian",
+      "map_hex": "#2b5cb5",
+      "ui_hex": "#2d64be",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "XSM": {
+      "localized_name": "Xibei San Ma",
+      "country_file_label": "Xibei San Ma",
+      "map_hex": "#695a84",
+      "ui_hex": "#695a84",
+      "status": "unmapped",
+      "reason": "warlord_or_regional_tag",
+      "suggested_iso2": "CN"
+    },
+    "YAK": {
+      "localized_name": "Yakutia",
+      "country_file_label": "Yakutia",
+      "map_hex": "#00ffff",
+      "ui_hex": "#00b3b3",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "YAM": {
+      "localized_name": "Yamalia",
+      "country_file_label": "Yamalia",
+      "map_hex": "#cc9900",
+      "ui_hex": "#997300",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "YEM": {
+      "localized_name": "Yemen",
+      "country_file_label": "Yeman",
+      "map_hex": "#9b656b",
+      "ui_hex": "#ca838b",
+      "status": "mapped",
+      "mapped_iso2": "YE",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "YUC": {
+      "localized_name": "Yucatan",
+      "country_file_label": "Yucatan",
+      "map_hex": "#ff1a1a",
+      "ui_hex": "#660000",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "YUG": {
+      "localized_name": "Yugoslavia",
+      "country_file_label": "Yugoslavia",
+      "map_hex": "#48497e",
+      "ui_hex": "#5e5fa4",
+      "status": "unmapped",
+      "reason": "historical_union_or_predecessor"
+    },
+    "YUN": {
+      "localized_name": "Yunnan",
+      "country_file_label": "Yunnan",
+      "map_hex": "#729450",
+      "ui_hex": "#def7c6",
+      "status": "unmapped",
+      "reason": "unreviewed"
+    },
+    "ZAM": {
+      "localized_name": "Zambia",
+      "country_file_label": "Zambia",
+      "map_hex": "#6666ff",
+      "ui_hex": "",
+      "status": "mapped",
+      "mapped_iso2": "ZM",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    },
+    "ZIM": {
+      "localized_name": "Zimbabwe",
+      "country_file_label": "Zimbabwe",
+      "map_hex": "#0707ef",
+      "ui_hex": "#0707ef",
+      "status": "mapped",
+      "mapped_iso2": "ZW",
+      "match_kind": "localized_exact",
+      "decision_source": "manual_verified"
+    }
+  }
+}
