@@ -26,24 +26,25 @@ function t(key, type = "geo") {
 
 function updateUIText() {
   const uiMap = [
-    ["lblCurrentTool", "Current Tool"],
-    ["toolFillBtn", "Fill"],
-    ["toolEraserBtn", "Eraser"],
-    ["toolEyedropperBtn", "Eyedropper"],
-    ["lblRecent", "Recent"],
-    ["lblPalette", "Color Palette"],
+    ["lblCurrentTool", "Tools"],
+    ["lblHistory", "History"],
+    ["lblZoom", "Zoom"],
+    ["lblQuickPalette", "Quick Colors"],
+    ["lblColorLibrary", "Color Library"],
     ["lblPaletteSearch", "Search Colors"],
-    ["lblCustom", "Custom"],
     ["lblExport", "Export Map"],
     ["lblExportFormat", "Format"],
     ["exportBtn", "Download Snapshot"],
+    ["lblEditingRules", "Editing Rules"],
     ["lblTexture", "Texture"],
     ["lblOverlay", "Overlay"],
-    ["lblMapStyle", "Map Style"],
+    ["lblMapStyle", "Auto-Fill"],
+    ["labelMapStyle", "Appearance"],
     ["lblColorMode", "Color Mode"],
     ["optColorModeRegion", "By Region"],
     ["optColorModePolitical", "By Neighbor (Political)"],
     ["lblPaintGranularity", "Paint Granularity"],
+    ["lblReferenceImage", "Reference Image"],
     ["optPaintSubdivision", "By Subdivision"],
     ["optPaintCountry", "By Country"],
     ["lblPaintMeaning", "Paint Meaning"],
@@ -99,7 +100,12 @@ function updateUIText() {
     ["lblRiversDashStyle", "Dash"],
     ["labelPresetPolitical", "Auto-Fill Countries"],
     ["presetClear", "Clear Map"],
+    ["zoomResetBtn", "Fit"],
     ["lblCountrySearch", "Search Countries"],
+    ["lblPresetsHierarchy", "Presets & Hierarchy"],
+    ["lblCountryInspector", "Country Inspector"],
+    ["lblProjectLegend", "Project & Legend"],
+    ["lblDiagnostics", "Diagnostics"],
     ["lblCountryColors", "Country Colors"],
     ["resetCountryColors", "Reset Country Colors"],
     ["lblSpecialZones", "Special Zones"],
@@ -148,6 +154,15 @@ function updateUIText() {
   if (typeof state.updateToolUIFn === "function") {
     state.updateToolUIFn();
   }
+  if (typeof state.updateHistoryUIFn === "function") {
+    state.updateHistoryUIFn();
+  }
+  if (typeof state.updateZoomUIFn === "function") {
+    state.updateZoomUIFn();
+  }
+  if (typeof state.updatePaintModeUIFn === "function") {
+    state.updatePaintModeUIFn();
+  }
 
   const searchInput = document.getElementById("countrySearch");
   if (searchInput) {
@@ -171,9 +186,43 @@ function updateUIText() {
       : t("Browse All Colors", "ui");
   }
 
+  const iconButtonLabels = [
+    ["toolFillBtn", "Fill tool"],
+    ["toolEraserBtn", "Eraser tool"],
+    ["toolEyedropperBtn", "Eyedropper tool"],
+    ["undoBtn", "Undo"],
+    ["redoBtn", "Redo"],
+    ["zoomInBtn", "Zoom in"],
+    ["zoomOutBtn", "Zoom out"],
+    ["zoomResetBtn", "Fit"],
+  ];
+  iconButtonLabels.forEach(([id, label]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const translated = t(label, "ui");
+    el.setAttribute("aria-label", translated);
+    el.setAttribute("title", translated);
+  });
+
+  const zoomPercentInput = document.getElementById("zoomPercentInput");
+  if (zoomPercentInput) {
+    zoomPercentInput.setAttribute("aria-label", t("Zoom percentage", "ui"));
+    zoomPercentInput.setAttribute("title", t("Zoom percentage", "ui"));
+  }
+
   const projectFileName = document.getElementById("projectFileName");
   if (projectFileName && !projectFileName.textContent.trim()) {
     projectFileName.textContent = t("No file selected", "ui");
+  }
+
+  const leftPanelToggle = document.getElementById("leftPanelToggle");
+  if (leftPanelToggle) {
+    leftPanelToggle.textContent = t("Panels", "ui");
+  }
+
+  const rightPanelToggle = document.getElementById("rightPanelToggle");
+  if (rightPanelToggle) {
+    rightPanelToggle.textContent = t("Inspector", "ui");
   }
 
   if (typeof state.updateActiveSovereignUIFn === "function") {

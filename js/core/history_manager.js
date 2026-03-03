@@ -1,0 +1,250 @@
+import { state } from "./state.js";
+import { rebuildOwnerIndex } from "./sovereignty_manager.js";
+
+function uniqueKeys(values) {
+  return Array.from(new Set((Array.isArray(values) ? values : []).map((value) => String(value || "").trim()).filter(Boolean)));
+}
+
+function captureEntries(source, keys) {
+  const snapshot = {};
+  uniqueKeys(keys).forEach((key) => {
+    if (Object.prototype.hasOwnProperty.call(source || {}, key)) {
+      snapshot[key] = source[key];
+    } else {
+      snapshot[key] = null;
+    }
+  });
+  return snapshot;
+}
+
+function captureStylePaths(paths) {
+  const snapshot = {};
+  uniqueKeys(paths).forEach((path) => {
+    const segments = path.split(".").filter(Boolean);
+    let cursor = state.styleConfig;
+    for (const segment of segments) {
+      if (!cursor || typeof cursor !== "object") {
+        cursor = undefined;
+        break;
+      }
+      cursor = cursor[segment];
+    }
+    snapshot[path] = cursor === undefined ? null : cursor;
+  });
+  return snapshot;
+}
+
+function captureHistoryState({
+  featureIds = [],
+  ownerCodes = [],
+  sovereigntyFeatureIds = [],
+  stylePaths = [],
+} = {}) {
+  const snapshot = {};
+  const ids = uniqueKeys(featureIds);
+  const ownerKeys = uniqueKeys(ownerCodes);
+  const sovereigntyIds = uniqueKeys(sovereigntyFeatureIds);
+  const styleKeys = uniqueKeys(stylePaths);
+
+  if (ids.length) {
+    snapshot.visualOverrides = captureEntries(state.visualOverrides || {}, ids);
+    snapshot.featureOverrides = captureEntries(state.featureOverrides || {}, ids);
+  }
+
+  if (ownerKeys.length) {
+    snapshot.sovereignBaseColors = captureEntries(state.sovereignBaseColors || {}, ownerKeys);
+    snapshot.countryBaseColors = captureEntries(state.countryBaseColors || {}, ownerKeys);
+    snapshot.countryPalette = captureEntries(state.countryPalette || {}, ownerKeys);
+  }
+
+  if (sovereigntyIds.length) {
+    snapshot.sovereigntyByFeatureId = captureEntries(state.sovereigntyByFeatureId || {}, sovereigntyIds);
+  }
+
+  if (styleKeys.length) {
+    snapshot.styleConfig = captureStylePaths(styleKeys);
+  }
+
+  return snapshot;
+}
+
+function stableStringify(value) {
+  if (!value || typeof value !== "object") {
+    return JSON.stringify(value);
+  }
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => stableStringify(item)).join(",")}]`;
+  }
+  return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`).join(",")}}`;
+}
+
+function applyEntries(target, patch) {
+  if (!patch || typeof patch !== "object") return;
+  Object.entries(patch).forEach(([key, value]) => {
+    if (value === null || value === undefined) {
+      delete target[key];
+    } else {
+      target[key] = value;
+    }
+  });
+}
+
+function applyStyleSnapshot(stylePatch) {
+  if (!stylePatch || typeof stylePatch !== "object") return;
+  Object.entries(stylePatch).forEach(([path, value]) => {
+    const segments = String(path || "").split(".").filter(Boolean);
+    if (!segments.length) return;
+    let cursor = state.styleConfig;
+    for (let index = 0; index < segments.length - 1; index += 1) {
+      const segment = segments[index];
+      if (!cursor[segment] || typeof cursor[segment] !== "object") {
+        cursor[segment] = {};
+      }
+      cursor = cursor[segment];
+    }
+    const last = segments[segments.length - 1];
+    if (value === null || value === undefined) {
+      delete cursor[last];
+    } else {
+      cursor[last] = value;
+    }
+  });
+}
+
+function hasHistoryDelta(before, after) {
+  return stableStringify(before) !== stableStringify(after);
+}
+
+function pushHistoryEntry(entry) {
+  const nextEntry = entry && typeof entry === "object" ? entry : null;
+  if (!nextEntry || !hasHistoryDelta(nextEntry.before, nextEntry.after)) {
+    return false;
+  }
+
+  state.historyPast = Array.isArray(state.historyPast) ? state.historyPast : [];
+  state.historyFuture = [];
+  state.historyPast.push(nextEntry);
+
+  const max = Math.max(1, Number(state.historyMax) || 80);
+  if (state.historyPast.length > max) {
+    state.historyPast = state.historyPast.slice(state.historyPast.length - max);
+  }
+
+  if (typeof state.updateHistoryUIFn === "function") {
+    state.updateHistoryUIFn();
+  }
+  return true;
+}
+
+function refreshUiAfterHistory(direction, entry) {
+  if (entry?.before?.sovereigntyByFeatureId || entry?.after?.sovereigntyByFeatureId) {
+    state.sovereigntyInitialized = true;
+    rebuildOwnerIndex();
+  }
+  if (typeof state.refreshColorStateFn === "function") {
+    state.refreshColorStateFn({ renderNow: false });
+  }
+  if (entry?.meta?.affectsSovereignty && typeof state.recomputeDynamicBordersNowFn === "function") {
+    state.recomputeDynamicBordersNowFn({ renderNow: false, reason: `history-${direction}` });
+  }
+  if (typeof state.updateToolUIFn === "function") {
+    state.updateToolUIFn();
+  }
+  if (typeof state.updateSwatchUIFn === "function") {
+    state.updateSwatchUIFn();
+  }
+  if (typeof state.updatePaintModeUIFn === "function") {
+    state.updatePaintModeUIFn();
+  }
+  if (typeof state.updateToolbarInputsFn === "function") {
+    state.updateToolbarInputsFn();
+  }
+  if (typeof state.updateActiveSovereignUIFn === "function") {
+    state.updateActiveSovereignUIFn();
+  }
+  if (typeof state.renderCountryListFn === "function") {
+    state.renderCountryListFn();
+  }
+  if (typeof state.renderPresetTreeFn === "function") {
+    state.renderPresetTreeFn();
+  }
+  if (typeof state.updateLegendUI === "function") {
+    state.updateLegendUI();
+  }
+  if (typeof state.renderNowFn === "function") {
+    state.renderNowFn();
+  }
+}
+
+function applyHistorySnapshot(snapshot, direction, entry) {
+  if (!snapshot || typeof snapshot !== "object") return false;
+
+  state.visualOverrides = state.visualOverrides || {};
+  state.featureOverrides = state.featureOverrides || {};
+  state.sovereignBaseColors = state.sovereignBaseColors || {};
+  state.countryBaseColors = state.countryBaseColors || {};
+  state.countryPalette = state.countryPalette || {};
+  state.sovereigntyByFeatureId = state.sovereigntyByFeatureId || {};
+
+  applyEntries(state.visualOverrides, snapshot.visualOverrides);
+  applyEntries(state.featureOverrides, snapshot.featureOverrides);
+  applyEntries(state.sovereignBaseColors, snapshot.sovereignBaseColors);
+  applyEntries(state.countryBaseColors, snapshot.countryBaseColors);
+  applyEntries(state.countryPalette, snapshot.countryPalette);
+  applyEntries(state.sovereigntyByFeatureId, snapshot.sovereigntyByFeatureId);
+  applyStyleSnapshot(snapshot.styleConfig);
+
+  refreshUiAfterHistory(direction, entry);
+  return true;
+}
+
+function canUndoHistory() {
+  return Array.isArray(state.historyPast) && state.historyPast.length > 0;
+}
+
+function canRedoHistory() {
+  return Array.isArray(state.historyFuture) && state.historyFuture.length > 0;
+}
+
+function undoHistory() {
+  if (!canUndoHistory()) return false;
+  const entry = state.historyPast.pop();
+  state.historyFuture = Array.isArray(state.historyFuture) ? state.historyFuture : [];
+  state.historyFuture.push(entry);
+  applyHistorySnapshot(entry.before, "undo", entry);
+  if (typeof state.updateHistoryUIFn === "function") {
+    state.updateHistoryUIFn();
+  }
+  return true;
+}
+
+function redoHistory() {
+  if (!canRedoHistory()) return false;
+  const entry = state.historyFuture.pop();
+  state.historyPast = Array.isArray(state.historyPast) ? state.historyPast : [];
+  state.historyPast.push(entry);
+  applyHistorySnapshot(entry.after, "redo", entry);
+  if (typeof state.updateHistoryUIFn === "function") {
+    state.updateHistoryUIFn();
+  }
+  return true;
+}
+
+function clearHistory() {
+  state.historyPast = [];
+  state.historyFuture = [];
+  if (typeof state.updateHistoryUIFn === "function") {
+    state.updateHistoryUIFn();
+  }
+}
+
+export {
+  captureHistoryState,
+  clearHistory,
+  canRedoHistory,
+  canUndoHistory,
+  hasHistoryDelta,
+  pushHistoryEntry,
+  redoHistory,
+  undoHistory,
+};

@@ -8,39 +8,21 @@
   </head>
   <body>
     <div class="app-layout">
-      <aside class="sidebar">
+      <aside id="leftSidebar" class="sidebar sidebar-left">
         <div class="sidebar-sections">
-          <div>
+          <div class="sidebar-header-block">
             <div class="flex items-start justify-between gap-3">
               <h1 class="app-title">Map Creator</h1>
               <button id="btnToggleLang" class="btn-lang">EN / 中文</button>
             </div>
             <p class="body-text mt-2">
-              Click counties to paint. Use the palette below to set the active color.
+              Click counties to paint. Use the dock below the map for quick tools and the left panel for deeper controls.
             </p>
           </div>
 
-          <div class="card-flat">
-            <div id="lblCurrentTool" class="section-header">Current Tool</div>
-            <div id="currentTool" class="current-tool-value">Fill</div>
-            <div class="flex gap-2 mt-3">
-              <button id="toolFillBtn" class="btn-tool" data-tool="fill">Fill</button>
-              <button id="toolEraserBtn" class="btn-tool" data-tool="eraser">Eraser</button>
-              <button id="toolEyedropperBtn" class="btn-tool" data-tool="eyedropper">Eyedropper</button>
-            </div>
-          </div>
-
-          <div>
-            <div id="lblRecent" class="section-header">Recent</div>
-            <div id="recentColors" class="flex flex-wrap gap-2 mt-3"></div>
-          </div>
-
-          <div>
-            <div id="lblPalette" class="section-header">Color Palette</div>
-            <select id="themeSelect" class="select-input mt-3">
-              <option value="HOI4 Vanilla">HOI4 Vanilla</option>
-            </select>
-            <div id="paletteGrid" class="color-grid mt-3"></div>
+          <div class="card">
+            <div id="lblColorLibrary" class="section-header">Color Library</div>
+            <p class="body-text mt-2">Browse the full palette library for manual work and palette reference.</p>
             <button id="paletteLibraryToggle" class="btn-secondary mt-3" type="button">Browse All Colors</button>
             <div id="paletteLibraryPanel" class="palette-library mt-3 hidden">
               <label id="lblPaletteSearch" class="section-header-block" for="paletteLibrarySearch">Search Colors</label>
@@ -48,132 +30,51 @@
               <div id="paletteLibrarySummary" class="body-text mt-2">0 colors</div>
               <div id="paletteLibraryList" class="palette-library-list mt-3"></div>
             </div>
-            <div class="flex items-center gap-3 mt-3">
-              <label id="lblCustom" class="section-header" for="customColor">Custom</label>
-              <input id="customColor" type="color" value="#1f3a5f" class="color-input" />
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="flex items-center justify-between">
-              <div id="lblExport" class="section-header">Export Map</div>
-              <div class="relative info-trigger">
-                <svg class="info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                </svg>
-                <div class="info-tooltip">Export the visible map as a PNG or JPG snapshot.</div>
-              </div>
-            </div>
-            <label id="lblExportFormat" class="section-header-block mt-3" for="exportFormat">Format</label>
-            <select id="exportFormat" class="select-input mt-2">
-              <option value="png">PNG</option>
-              <option value="jpg">JPG</option>
-            </select>
-            <button id="exportBtn" class="btn-primary mt-4">Download Snapshot</button>
-          </div>
-
-          <div class="card-compact">
-            <p class="tip-text">Tip: Scroll to zoom and drag to pan. Hover highlights counties.</p>
-          </div>
-
-          <div class="card">
-            <div class="flex items-center justify-between">
-              <div id="lblTexture" class="section-header">Texture</div>
-              <div class="relative info-trigger">
-                <svg class="info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                </svg>
-                <div class="info-tooltip" style="width: 220px;">Apply a subtle overlay texture for a vintage map feel.</div>
-              </div>
-            </div>
-            <label id="lblOverlay" class="section-header-block mt-3" for="textureSelect">Overlay</label>
-            <select id="textureSelect" class="select-input mt-2">
-              <option value="none">Clean (None)</option>
-              <option value="paper" selected>Old Paper</option>
-              <option value="canvas">Canvas</option>
-              <option value="grid">Grid</option>
-            </select>
-          </div>
-
-          <div class="card">
-            <div id="lblMapStyle" class="section-header">Map Style</div>
-            <label id="lblColorMode" class="section-header-block mt-3" for="colorModeSelect">Color Mode</label>
-            <select id="colorModeSelect" class="select-input mt-2">
-              <option id="optColorModeRegion" value="region">By Region</option>
-              <option id="optColorModePolitical" value="political" selected>By Neighbor (Political)</option>
-            </select>
-            <label id="lblPaintGranularity" class="section-header-block mt-3" for="paintGranularitySelect">Paint Granularity</label>
-            <select id="paintGranularitySelect" class="select-input mt-2">
-              <option id="optPaintSubdivision" value="subdivision">By Subdivision</option>
-              <option id="optPaintCountry" value="country">By Country</option>
-            </select>
-            <label id="lblPaintMeaning" class="section-header-block mt-3" for="paintModeSelect">Paint Meaning</label>
-            <select id="paintModeSelect" class="select-input mt-2">
-              <option id="optPaintMeaningVisual" value="visual">Visual</option>
-              <option id="optPaintMeaningSovereignty" value="sovereignty">Sovereignty</option>
-            </select>
-            <div id="labelActiveSovereign" class="section-header-block mt-3">Active Sovereign</div>
-            <div id="activeSovereignLabel" class="body-text mt-2">None selected</div>
-            <button id="recalculateBordersBtn" class="btn-secondary mt-3" type="button">Recalculate Borders</button>
-            <div id="dynamicBorderStatus" class="body-text mt-2">Borders up to date</div>
-            <div class="space-y-2 mt-3">
-              <div id="lblOcean" class="section-header-block">Ocean</div>
-              <div class="flex items-center justify-between gap-3">
-                <label id="lblOceanFillColor" class="range-label" for="oceanFillColor">Fill Color</label>
-                <input id="oceanFillColor" type="color" value="#aadaff" class="color-input" />
-              </div>
-              <div>
-                <div class="range-row">
-                  <label id="lblOceanStyle" class="range-label" for="oceanStyleSelect">Style</label>
-                </div>
-                <select id="oceanStyleSelect" class="select-input mt-2">
-                  <option id="optOceanFlat" value="flat" selected>Flat Blue</option>
-                  <option id="optOceanBathymetrySoft" value="bathymetry_soft" disabled>Bathymetry Soft</option>
-                  <option id="optOceanBathymetryContours" value="bathymetry_contours" disabled>Bathymetry Contours</option>
-                  <option id="optOceanWaveHachure" value="wave_hachure" disabled>Wave Hachure</option>
-                </select>
-              </div>
-              <div>
-                <div class="range-row">
-                  <label id="lblOceanOpacity" class="range-label" for="oceanTextureOpacity">Opacity</label>
-                  <span id="oceanTextureOpacityValue" class="range-value">72%</span>
-                </div>
-                <input id="oceanTextureOpacity" type="range" min="0" max="100" value="72" class="range-input" />
-              </div>
-              <div>
-                <div class="range-row">
-                  <label id="lblOceanScale" class="range-label" for="oceanTextureScale">Scale</label>
-                  <span id="oceanTextureScaleValue" class="range-value">1.00x</span>
-                </div>
-                <input id="oceanTextureScale" type="range" min="60" max="240" step="1" value="100" class="range-input" />
-              </div>
-              <div>
-                <div class="range-row">
-                  <label id="lblOceanContourStrength" class="range-label" for="oceanContourStrength">Contour Strength</label>
-                  <span id="oceanContourStrengthValue" class="range-value">75%</span>
-                </div>
-                <input id="oceanContourStrength" type="range" min="0" max="100" value="75" class="range-input" />
-              </div>
-            </div>
-            <label id="labelAutoFillStyle" class="section-header-block mt-3" for="autoFillStyleSelect">Auto-Fill Style</label>
-            <select id="autoFillStyleSelect" class="select-input mt-2">
-              <option value="hoi4_vanilla">HOI4 Vanilla</option>
-            </select>
-            <button id="presetPolitical" class="btn-primary mt-3">
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M5 3h9l-1.5 2H5v6h7l-1.5 2H5v8H3V3h2z" />
-                <path d="M13.5 3H21l-2 3 2 3h-7.5l2-3-2-3z" />
-              </svg>
-              <span id="labelPresetPolitical">Auto-Fill Countries</span>
-            </button>
-            <button id="presetClear" class="btn-secondary mt-2">Clear Map</button>
           </div>
 
           <details class="card" open>
-            <summary id="labelMapStyle" class="section-header">Map Style</summary>
+            <summary id="labelMapStyle" class="section-header">Appearance</summary>
             <div class="space-y-4 mt-4">
+              <div class="space-y-2">
+                <div id="lblOcean" class="section-header">Ocean</div>
+                <div class="flex items-center justify-between gap-3">
+                  <label id="lblOceanFillColor" class="range-label" for="oceanFillColor">Fill Color</label>
+                  <input id="oceanFillColor" type="color" value="#aadaff" class="color-input" />
+                </div>
+                <div>
+                  <div class="range-row">
+                    <label id="lblOceanStyle" class="range-label" for="oceanStyleSelect">Style</label>
+                  </div>
+                  <select id="oceanStyleSelect" class="select-input mt-2">
+                    <option id="optOceanFlat" value="flat" selected>Flat Blue</option>
+                    <option id="optOceanBathymetrySoft" value="bathymetry_soft" disabled>Bathymetry Soft</option>
+                    <option id="optOceanBathymetryContours" value="bathymetry_contours" disabled>Bathymetry Contours</option>
+                    <option id="optOceanWaveHachure" value="wave_hachure" disabled>Wave Hachure</option>
+                  </select>
+                </div>
+                <div>
+                  <div class="range-row">
+                    <label id="lblOceanOpacity" class="range-label" for="oceanTextureOpacity">Opacity</label>
+                    <span id="oceanTextureOpacityValue" class="range-value">72%</span>
+                  </div>
+                  <input id="oceanTextureOpacity" type="range" min="0" max="100" value="72" class="range-input" />
+                </div>
+                <div>
+                  <div class="range-row">
+                    <label id="lblOceanScale" class="range-label" for="oceanTextureScale">Scale</label>
+                    <span id="oceanTextureScaleValue" class="range-value">1.00x</span>
+                  </div>
+                  <input id="oceanTextureScale" type="range" min="60" max="240" step="1" value="100" class="range-input" />
+                </div>
+                <div>
+                  <div class="range-row">
+                    <label id="lblOceanContourStrength" class="range-label" for="oceanContourStrength">Contour Strength</label>
+                    <span id="oceanContourStrengthValue" class="range-value">75%</span>
+                  </div>
+                  <input id="oceanContourStrength" type="range" min="0" max="100" value="75" class="range-input" />
+                </div>
+              </div>
+
               <div class="space-y-2">
                 <div class="section-header">Internal Borders</div>
                 <div class="flex items-center justify-between gap-3">
@@ -260,7 +161,7 @@
               <div class="space-y-2">
                 <div id="lblContextLayers" class="section-header">Context Layers</div>
                 <label class="toggle-label mt-2">
-                  <input id="togglePhysical" type="checkbox" class="checkbox-input" checked />
+                  <input id="togglePhysical" type="checkbox" class="checkbox-input" />
                   <span id="lblPhysicalLayer">Physical Regions</span>
                 </label>
                 <div class="ml-5 space-y-2">
@@ -322,7 +223,7 @@
                 </div>
 
                 <label class="toggle-label mt-2">
-                  <input id="toggleUrban" type="checkbox" class="checkbox-input" checked />
+                  <input id="toggleUrban" type="checkbox" class="checkbox-input" />
                   <span id="lblUrbanLayer">Urban Areas</span>
                 </label>
                 <div class="ml-5 space-y-2">
@@ -375,9 +276,9 @@
                   <div>
                     <div class="range-row">
                       <label id="lblRiversWidth" class="range-label" for="riversWidth">Width</label>
-                      <span id="riversWidthValue" class="range-value">1.10</span>
+                      <span id="riversWidthValue" class="range-value">0.50</span>
                     </div>
-                    <input id="riversWidth" type="range" min="0.2" max="4.0" step="0.05" value="1.10" class="range-input" />
+                    <input id="riversWidth" type="range" min="0.2" max="4.0" step="0.05" value="0.50" class="range-input" />
                   </div>
                   <div class="flex items-center justify-between gap-3">
                     <label id="lblRiversOutlineColor" class="range-label" for="riversOutlineColor">Outline Color</label>
@@ -386,9 +287,9 @@
                   <div>
                     <div class="range-row">
                       <label id="lblRiversOutlineWidth" class="range-label" for="riversOutlineWidth">Outline Width</label>
-                      <span id="riversOutlineWidthValue" class="range-value">0.90</span>
+                      <span id="riversOutlineWidthValue" class="range-value">0.25</span>
                     </div>
-                    <input id="riversOutlineWidth" type="range" min="0.0" max="3.0" step="0.05" value="0.90" class="range-input" />
+                    <input id="riversOutlineWidth" type="range" min="0.0" max="3.0" step="0.05" value="0.25" class="range-input" />
                   </div>
                   <div>
                     <div class="range-row">
@@ -403,7 +304,7 @@
                 </div>
 
                 <label class="toggle-label mt-2">
-                  <input id="toggleSpecialZones" type="checkbox" class="checkbox-input" checked />
+                  <input id="toggleSpecialZones" type="checkbox" class="checkbox-input" />
                   <span id="lblSpecialZones">Special Zones</span>
                 </label>
                 <div class="ml-5 space-y-2">
@@ -490,11 +391,48 @@
                 </div>
               </div>
 
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <div id="lblTexture" class="section-header">Texture</div>
+                  <div class="relative info-trigger">
+                    <svg class="info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
+                      <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                    </svg>
+                    <div class="info-tooltip" style="width: 220px;">Apply a subtle overlay texture for a vintage map feel.</div>
+                  </div>
+                </div>
+                <label id="lblOverlay" class="section-header-block mt-2" for="textureSelect">Overlay</label>
+                <select id="textureSelect" class="select-input mt-2">
+                  <option value="none">Clean (None)</option>
+                  <option value="paper" selected>Old Paper</option>
+                  <option value="canvas">Canvas</option>
+                  <option value="grid">Grid</option>
+                </select>
+              </div>
             </div>
           </details>
 
           <div class="card">
-            <div class="section-header">Reference Image</div>
+            <div id="lblEditingRules" class="section-header">Editing Rules</div>
+            <label id="lblPaintGranularity" class="section-header-block mt-3" for="paintGranularitySelect">Paint Granularity</label>
+            <select id="paintGranularitySelect" class="select-input mt-2">
+              <option id="optPaintSubdivision" value="subdivision">By Subdivision</option>
+              <option id="optPaintCountry" value="country">By Country</option>
+            </select>
+            <label id="lblPaintMeaning" class="section-header-block mt-3" for="paintModeSelect">Paint Meaning</label>
+            <select id="paintModeSelect" class="select-input mt-2">
+              <option id="optPaintMeaningVisual" value="visual">Visual</option>
+              <option id="optPaintMeaningSovereignty" value="sovereignty">Sovereignty</option>
+            </select>
+            <div id="labelActiveSovereign" class="section-header-block mt-3">Active Sovereign</div>
+            <div id="activeSovereignLabel" class="body-text mt-2">None selected</div>
+            <button id="recalculateBordersBtn" class="btn-secondary mt-3" type="button">Recalculate Borders</button>
+            <div id="dynamicBorderStatus" class="body-text mt-2">Borders up to date</div>
+          </div>
+
+          <div class="card">
+            <div id="lblReferenceImage" class="section-header">Reference Image</div>
             <input id="referenceImageInput" type="file" accept="image/*" class="file-input mt-3" />
             <div class="space-y-3 mt-4">
               <div>
@@ -527,37 +465,178 @@
               </div>
             </div>
           </div>
+
+          <div class="card">
+            <div class="flex items-center justify-between">
+              <div id="lblExport" class="section-header">Export Map</div>
+              <div class="relative info-trigger">
+                <svg class="info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
+                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                </svg>
+                <div class="info-tooltip">Export the visible map as a PNG or JPG snapshot.</div>
+              </div>
+            </div>
+            <label id="lblExportFormat" class="section-header-block mt-3" for="exportFormat">Format</label>
+            <select id="exportFormat" class="select-input mt-2">
+              <option value="png">PNG</option>
+              <option value="jpg">JPG</option>
+            </select>
+            <button id="exportBtn" class="btn-primary mt-4">Download Snapshot</button>
+          </div>
+
+          <div class="card-compact">
+            <p class="tip-text">Tip: Scroll to zoom and drag to pan. Hover highlights counties.</p>
+          </div>
         </div>
       </aside>
 
       <main class="map-main">
-        <div id="mapContainer">
-          <img id="referenceImage" class="reference-image" alt="" />
-          <canvas id="colorCanvas" class="map-layer"></canvas>
-          <canvas id="lineCanvas" class="map-layer map-layer-top"></canvas>
-          <div id="textureOverlay" class="texture-overlay decorative-layer"></div>
+        <div class="map-stage">
+          <div id="mapContainer">
+            <img id="referenceImage" class="reference-image" alt="" />
+            <canvas id="colorCanvas" class="map-layer"></canvas>
+            <canvas id="lineCanvas" class="map-layer map-layer-top"></canvas>
+            <div id="textureOverlay" class="texture-overlay decorative-layer"></div>
+          </div>
+
+          <div class="map-overlay-controls">
+            <button id="leftPanelToggle" class="panel-toggle panel-toggle-left" type="button" aria-controls="leftSidebar" aria-label="Toggle left panel">
+              Panels
+            </button>
+            <button id="rightPanelToggle" class="panel-toggle panel-toggle-right" type="button" aria-controls="rightSidebar" aria-label="Toggle right panel">
+              Inspector
+            </button>
+          </div>
+
+          <div id="toastViewport" class="toast-viewport" aria-live="polite" aria-atomic="false"></div>
+
+          <div id="zoomControls" class="zoom-controls" role="group" aria-label="Map zoom controls">
+            <button id="zoomOutBtn" type="button" class="zoom-btn" aria-label="Zoom out" title="Zoom out">-</button>
+            <input id="zoomPercentInput" type="text" inputmode="numeric" class="input dock-zoom-input" aria-label="Zoom percentage" value="100%" />
+            <button id="zoomInBtn" type="button" class="zoom-btn" aria-label="Zoom in" title="Zoom in">+</button>
+            <button id="zoomResetBtn" type="button" class="zoom-btn zoom-btn-reset" aria-label="Reset zoom" title="Fit">Fit</button>
+          </div>
+
+          <section id="bottomDock" class="bottom-dock" aria-label="Quick edit dock">
+            <div class="bottom-dock-primary">
+              <div class="dock-group dock-group-tools">
+                <div id="lblCurrentTool" class="dock-group-label">Tools</div>
+                <div class="dock-button-row dock-button-row-tools" role="toolbar" aria-label="Current tool">
+                  <button id="toolFillBtn" class="btn-tool dock-tool-btn" data-tool="fill" type="button" aria-label="Fill tool" title="Fill tool">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M14.5 4.5 19.5 9.5 10 19H5v-5l9.5-9.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
+                      <path d="m12.5 6.5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                    </svg>
+                  </button>
+                  <button id="toolEraserBtn" class="btn-tool dock-tool-btn" data-tool="eraser" type="button" aria-label="Eraser tool" title="Eraser tool">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="m8 16.5 7.8-7.8a2 2 0 0 1 2.8 0l.7.7a2 2 0 0 1 0 2.8L14 18H9.5L8 16.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
+                      <path d="M4.5 18h9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                    </svg>
+                  </button>
+                  <button id="toolEyedropperBtn" class="btn-tool dock-tool-btn" data-tool="eyedropper" type="button" aria-label="Eyedropper tool" title="Eyedropper tool">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="m14 6 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                      <path d="m8 16 8.5-8.5a2.12 2.12 0 0 0-3-3L5 13v3h3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="dock-group dock-group-history">
+                <div id="lblHistory" class="dock-group-label">History</div>
+                <div class="dock-icon-row">
+                  <button id="undoBtn" class="dock-icon-btn" type="button" aria-label="Undo" title="Undo">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M9 7 4 12l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                      <path d="M20 12H5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                    </svg>
+                  </button>
+                  <button id="redoBtn" class="dock-icon-btn" type="button" aria-label="Redo" title="Redo">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="m15 7 5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                      <path d="M4 12h15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="dock-group dock-group-colors">
+                <div id="lblQuickPalette" class="dock-group-label">Quick Colors</div>
+                <div class="dock-color-row">
+                  <button id="selectedColorPreview" class="selected-color-preview" type="button" aria-label="Selected color preview"></button>
+                  <input id="customColor" type="color" value="#1f3a5f" class="color-input dock-custom-color" aria-label="Custom color" />
+                  <select id="themeSelect" class="select-input dock-select">
+                    <option value="HOI4 Vanilla">HOI4 Vanilla</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="dock-group dock-group-autofill">
+                <div id="lblMapStyle" class="dock-group-label">Auto-Fill</div>
+                <div class="dock-autofill-row">
+                  <select id="colorModeSelect" class="select-input dock-select">
+                    <option id="optColorModeRegion" value="region">By Region</option>
+                    <option id="optColorModePolitical" value="political" selected>By Neighbor (Political)</option>
+                  </select>
+                  <button id="presetPolitical" class="btn-primary dock-action-btn" type="button">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M5 3h9l-1.5 2H5v6h7l-1.5 2H5v8H3V3h2z" />
+                      <path d="M13.5 3H21l-2 3 2 3h-7.5l2-3-2-3z" />
+                    </svg>
+                    <span id="labelPresetPolitical">Auto-Fill Countries</span>
+                  </button>
+                  <button id="presetClear" class="btn-secondary dock-clear-btn" type="button">Clear Map</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="bottom-dock-swatches">
+              <div id="paletteGrid" class="color-grid dock-inline-swatches"></div>
+              <div id="dockRecentDivider" class="dock-swatch-divider" aria-hidden="true"></div>
+              <div id="recentColors" class="dock-recent-swatches" aria-label="Recent colors"></div>
+            </div>
+          </section>
         </div>
       </main>
 
       <aside id="rightSidebar" class="sidebar-right">
-        <div class="sidebar-sections">
-          <div>
-            <label id="lblCountrySearch" class="section-header" for="countrySearch">Search Countries</label>
-            <input id="countrySearch" type="text" placeholder="Search..." class="input mt-2" />
+        <div class="sidebar-sections inspector-sidebar-sections">
+          <div class="inspector-search-shell">
+            <div class="card-flat inspector-search-block">
+              <label id="lblCountrySearch" class="section-header" for="countrySearch">Search Countries</label>
+              <input id="countrySearch" type="text" placeholder="Search..." class="input mt-2" />
+            </div>
           </div>
 
-          <div class="card-flat">
-            <div id="lblHistoricalPresets" class="section-header">Historical Presets</div>
-            <p class="tip-text mt-2">Click to fill regions with active color</p>
-            <div id="presetTree" class="space-y-2 mt-3"></div>
-          </div>
+          <details class="card inspector-section" open>
+            <summary id="lblPresetsHierarchy" class="section-header">Presets &amp; Hierarchy</summary>
+            <div class="inspector-panel-body">
+              <div class="section-header-block" id="lblHistoricalPresets">Historical Presets</div>
+              <p class="tip-text mt-2">Click to fill regions with active color</p>
+              <div id="presetTree" class="inspector-scroll preset-tree mt-3"></div>
+            </div>
+          </details>
 
-          <div>
-            <div id="lblCountryColors" class="section-header">Country Colors</div>
-            <div id="countryList" class="country-list space-y-2 mt-3"></div>
-          </div>
+          <details class="card inspector-section" open>
+            <summary id="lblCountryInspector" class="section-header">Country Inspector</summary>
+            <div class="inspector-panel-body">
+              <div id="lblCountryColors" class="section-header-block">Country Colors</div>
+              <div id="countryList" class="country-list inspector-scroll mt-3"></div>
+              <button id="resetCountryColors" class="btn-secondary mt-3">Reset Country Colors</button>
+            </div>
+          </details>
 
-          <button id="resetCountryColors" class="btn-secondary">Reset Country Colors</button>
+          <details class="card inspector-section">
+            <summary id="lblProjectLegend" class="section-header">Project &amp; Legend</summary>
+            <div id="projectLegendStack" class="inspector-panel-body inspector-stack"></div>
+          </details>
+
+          <details class="card inspector-section">
+            <summary id="lblDiagnostics" class="section-header">Diagnostics</summary>
+            <div id="diagnosticStack" class="inspector-panel-body inspector-stack"></div>
+          </details>
         </div>
       </aside>
     </div>

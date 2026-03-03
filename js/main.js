@@ -4,8 +4,10 @@ import { loadDeferredDetailBundle, loadMapData } from "./core/data_loader.js";
 import { initMap, setMapData, render } from "./core/map_renderer.js";
 import { applyActivePaletteState } from "./core/palette_manager.js";
 import { initSidebar, initPresetState } from "./ui/sidebar.js";
+import { initShortcuts } from "./ui/shortcuts.js";
 import { initToolbar } from "./ui/toolbar.js";
 import { initTranslations } from "./ui/i18n.js";
+import { initToast } from "./ui/toast.js";
 
 const COUNTRY_CODE_ALIASES = {
   UK: "GB",
@@ -271,10 +273,13 @@ async function bootstrap() {
     };
     globalThis.renderApp = renderApp;
     globalThis.renderNow = renderDispatcher.flush;
+    state.renderNowFn = renderDispatcher.flush;
 
+    initToast();
     initToolbar({ render: renderApp });
     initTranslations();
     initSidebar({ render: renderApp });
+    initShortcuts();
 
     renderDispatcher.flush();
     scheduleDeferredDetailPromotion(renderDispatcher);

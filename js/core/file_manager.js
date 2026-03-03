@@ -1,5 +1,6 @@
 // Project file manager (Phase 13)
 import { t } from "../ui/i18n.js";
+import { showToast } from "../ui/toast.js";
 import { migrateImportedProjectData } from "./sovereignty_manager.js";
 
 class FileManager {
@@ -47,6 +48,10 @@ class FileManager {
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 0);
+    showToast(t("Project file downloaded.", "ui"), {
+      title: t("Project saved", "ui"),
+      tone: "success",
+    });
   }
 
   static importProject(file, callback) {
@@ -134,15 +139,27 @@ class FileManager {
         if (typeof callback === "function") {
           callback(data);
         }
+        showToast(t("Project file loaded successfully.", "ui"), {
+          title: t("Project imported", "ui"),
+          tone: "success",
+        });
       } catch (error) {
         console.error("Failed to import project:", error);
-        alert(t("Invalid project file. Please select a valid map_project.json.", "ui"));
+        showToast(t("Invalid project file. Please select a valid map_project.json.", "ui"), {
+          title: t("Import failed", "ui"),
+          tone: "error",
+          duration: 4200,
+        });
       }
     };
 
     reader.onerror = () => {
       console.error("Failed to read project file:", reader.error);
-      alert(t("Unable to read the selected file.", "ui"));
+      showToast(t("Unable to read the selected file.", "ui"), {
+        title: t("Import failed", "ui"),
+        tone: "error",
+        duration: 4200,
+      });
     };
 
     reader.readAsText(file);

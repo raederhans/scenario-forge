@@ -4,8 +4,10 @@ import { ColorManager } from "../core/color_manager.js";
 import * as mapRenderer from "../core/map_renderer.js";
 import { applyCountryColor, resetCountryColors } from "../core/logic.js";
 import { FileManager } from "../core/file_manager.js";
+import { captureHistoryState, clearHistory, pushHistoryEntry } from "../core/history_manager.js";
 import { LegendManager } from "../core/legend_manager.js";
 import { t } from "./i18n.js";
+import { showToast } from "./toast.js";
 import { setFeatureOwnerCodes, ensureSovereigntyState } from "../core/sovereignty_manager.js";
 
 const COUNTRY_CODE_ALIASES = {
@@ -304,15 +306,31 @@ function applyHierarchyGroup(group, color, render) {
   if (!targetIds.length) return;
   if (String(state.paintMode || "visual") === "sovereignty") {
     if (!state.activeSovereignCode) return;
+    const before = captureHistoryState({
+      sovereigntyFeatureIds: targetIds,
+    });
     const changed = setFeatureOwnerCodes(targetIds, state.activeSovereignCode);
     mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
     if (changed) {
       mapRenderer.scheduleDynamicBorderRecompute("sidebar-hierarchy-batch", 90);
+      pushHistoryEntry({
+        kind: "hierarchy-apply-sovereignty",
+        before,
+        after: captureHistoryState({
+          sovereigntyFeatureIds: targetIds,
+        }),
+        meta: {
+          affectsSovereignty: true,
+        },
+      });
     }
     if (render) render();
     return;
   }
   const colorToApply = color || state.selectedColor;
+  const before = captureHistoryState({
+    featureIds: targetIds,
+  });
   targetIds.forEach((id) => {
     state.visualOverrides[id] = colorToApply;
     state.featureOverrides[id] = colorToApply;
@@ -320,14 +338,24 @@ function applyHierarchyGroup(group, color, render) {
   mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
   if (render) render();
   addRecentColor(colorToApply);
+  pushHistoryEntry({
+    kind: "hierarchy-apply-color",
+    before,
+    after: captureHistoryState({
+      featureIds: targetIds,
+    }),
+    meta: {
+      affectsSovereignty: false,
+    },
+  });
 }
 
 function addRecentColor(color) {
   if (!color) return;
   state.recentColors = state.recentColors.filter((value) => value !== color);
   state.recentColors.unshift(color);
-  if (state.recentColors.length > 5) {
-    state.recentColors = state.recentColors.slice(0, 5);
+  if (state.recentColors.length > 4) {
+    state.recentColors = state.recentColors.slice(0, 4);
   }
   if (typeof state.updateRecentUI === "function") {
     state.updateRecentUI();
@@ -350,15 +378,31 @@ function applyPreset(countryCode, presetIndex, color, render) {
 
   if (String(state.paintMode || "visual") === "sovereignty") {
     if (!state.activeSovereignCode) return;
+    const before = captureHistoryState({
+      sovereigntyFeatureIds: targetIds,
+    });
     const changed = setFeatureOwnerCodes(targetIds, state.activeSovereignCode);
     mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
     if (changed) {
       mapRenderer.scheduleDynamicBorderRecompute("sidebar-preset-batch", 90);
+      pushHistoryEntry({
+        kind: "preset-apply-sovereignty",
+        before,
+        after: captureHistoryState({
+          sovereigntyFeatureIds: targetIds,
+        }),
+        meta: {
+          affectsSovereignty: true,
+        },
+      });
     }
     if (render) render();
     return;
   }
 
+  const before = captureHistoryState({
+    featureIds: targetIds,
+  });
   targetIds.forEach((id) => {
     state.visualOverrides[id] = colorToApply;
     state.featureOverrides[id] = colorToApply;
@@ -369,9 +413,20 @@ function applyPreset(countryCode, presetIndex, color, render) {
 
   if (!state.recentColors.includes(colorToApply)) {
     state.recentColors.unshift(colorToApply);
-    if (state.recentColors.length > 8) state.recentColors.pop();
+    if (state.recentColors.length > 4) state.recentColors.pop();
     if (typeof state.updateRecentUI === "function") state.updateRecentUI();
   }
+
+  pushHistoryEntry({
+    kind: "preset-apply-color",
+    before,
+    after: captureHistoryState({
+      featureIds: targetIds,
+    }),
+    meta: {
+      affectsSovereignty: false,
+    },
+  });
 
   console.log(`Applied preset "${preset.name}" with ${preset.ids.length} regions`);
 }
@@ -420,9 +475,18 @@ async function copyPresetIds(ids) {
   try {
     await navigator.clipboard.writeText(payload);
     console.log("Preset IDs copied to clipboard.");
+    showToast(t("Preset IDs copied to clipboard.", "ui"), {
+      title: t("Copied", "ui"),
+      tone: "success",
+    });
   } catch (error) {
     console.warn("Clipboard unavailable, logging IDs instead.", error);
     console.log(payload);
+    showToast(t("Clipboard unavailable. Preset IDs were logged to the console.", "ui"), {
+      title: t("Clipboard unavailable", "ui"),
+      tone: "warning",
+      duration: 4200,
+    });
   }
 }
 
@@ -433,13 +497,14 @@ function initSidebar({ render } = {}) {
   const searchInput = document.getElementById("countrySearch");
   const resetBtn = document.getElementById("resetCountryColors");
   const sidebar = document.getElementById("rightSidebar");
-  const sidebarStack = sidebar?.querySelector(".sidebar-sections, .space-y-5") || sidebar;
+  const projectLegendStack = document.getElementById("projectLegendStack");
+  const diagnosticStack = document.getElementById("diagnosticStack");
 
   let projectSection = document.getElementById("projectManagement");
-  if (!projectSection && sidebarStack) {
+  if (!projectSection && projectLegendStack) {
     projectSection = document.createElement("div");
     projectSection.id = "projectManagement";
-    projectSection.className = "card sidebar-tool-card";
+    projectSection.className = "inspector-tool-card";
 
     const title = document.createElement("div");
     title.id = "lblProjectManagement";
@@ -497,14 +562,14 @@ function initSidebar({ render } = {}) {
     projectSection.appendChild(title);
     projectSection.appendChild(hint);
     projectSection.appendChild(actions);
-    sidebarStack.appendChild(projectSection);
+    projectLegendStack.appendChild(projectSection);
   }
 
   let legendSection = document.getElementById("legendEditor");
-  if (!legendSection && sidebarStack) {
+  if (!legendSection && projectLegendStack) {
     legendSection = document.createElement("div");
     legendSection.id = "legendEditor";
-    legendSection.className = "card sidebar-tool-card";
+    legendSection.className = "inspector-tool-card";
 
     const title = document.createElement("div");
     title.id = "lblLegendEditor";
@@ -518,19 +583,19 @@ function initSidebar({ render } = {}) {
 
     const list = document.createElement("div");
     list.id = "legendEditorList";
-    list.className = "mt-3 space-y-2";
+    list.className = "mt-3";
 
     legendSection.appendChild(title);
     legendSection.appendChild(hint);
     legendSection.appendChild(list);
-    sidebarStack.appendChild(legendSection);
+    projectLegendStack.appendChild(legendSection);
   }
 
   let debugViewSection = document.getElementById("debugViewControl");
-  if (!debugViewSection && sidebarStack) {
+  if (!debugViewSection && diagnosticStack) {
     debugViewSection = document.createElement("div");
     debugViewSection.id = "debugViewControl";
-    debugViewSection.className = "card sidebar-tool-card sidebar-tool-card-debug";
+    debugViewSection.className = "inspector-tool-card sidebar-tool-card-debug";
 
     const title = document.createElement("div");
     title.className = "section-header sidebar-tool-title";
@@ -570,7 +635,7 @@ function initSidebar({ render } = {}) {
     debugViewSection.appendChild(title);
     debugViewSection.appendChild(hint);
     debugViewSection.appendChild(group);
-    sidebarStack.appendChild(debugViewSection);
+    diagnosticStack.appendChild(debugViewSection);
   }
 
   const downloadProjectBtn = document.getElementById("downloadProjectBtn");
@@ -595,16 +660,15 @@ function initSidebar({ render } = {}) {
 
     if (hierarchyGroups.length > 0) {
       const child = document.createElement("div");
-      child.className = "ml-2 space-y-2 pb-2";
+      child.className = "country-children";
       const header = document.createElement("div");
-      header.className = "px-2 text-[10px] uppercase tracking-wide text-slate-400";
+      header.className = "inspector-mini-label";
       header.textContent = t("--- Provinces/Regions ---", "ui");
       child.appendChild(header);
       hierarchyGroups.forEach((group) => {
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className =
-          "w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-left text-xs text-slate-600 hover:bg-slate-100";
+        btn.className = "inspector-item-btn";
         btn.textContent = t(group.label, "geo") || group.label;
         btn.addEventListener("click", () => {
           applyHierarchyGroup(group, state.selectedColor, render);
@@ -616,16 +680,15 @@ function initSidebar({ render } = {}) {
 
     if (presets.length > 0) {
       const child = document.createElement("div");
-      child.className = "ml-2 space-y-2 pb-2";
+      child.className = "country-children";
       const header = document.createElement("div");
-      header.className = "px-2 text-[10px] uppercase tracking-wide text-slate-400";
+      header.className = "inspector-mini-label";
       header.textContent = t("--- Presets ---", "ui");
       child.appendChild(header);
       presets.forEach((preset, presetIndex) => {
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className =
-          "w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-left text-xs text-slate-600 hover:bg-slate-100";
+        btn.className = "inspector-item-btn";
         btn.textContent = `Apply ${preset.name}`;
         btn.addEventListener("click", () => {
           applyPreset(code, presetIndex, state.selectedColor, render);
@@ -639,21 +702,20 @@ function initSidebar({ render } = {}) {
   const renderCountryRow = (parent, countryState) => {
     const { code, displayName, fallbackIndex, hasChildren, isOpen } = countryState;
     const row = document.createElement("div");
-    row.className =
-      "flex items-center justify-between gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2";
+    row.className = "country-row";
 
     const label = document.createElement("div");
-    label.className = "text-sm font-medium text-slate-700";
+    label.className = "country-row-title";
     label.textContent = `${displayName} (${code})`;
 
     const controls = document.createElement("div");
-    controls.className = "flex items-center gap-2";
+    controls.className = "country-row-actions";
 
     const activeBtn = document.createElement("button");
     activeBtn.type = "button";
-    activeBtn.className =
-      "rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-500 hover:bg-slate-100";
+    activeBtn.className = "country-action-btn";
     activeBtn.textContent = state.activeSovereignCode === code ? t("Active", "ui") : t("Set Active", "ui");
+    activeBtn.classList.toggle("is-active", state.activeSovereignCode === code);
     activeBtn.addEventListener("click", () => {
       state.activeSovereignCode = code;
       if (typeof state.updateActiveSovereignUIFn === "function") {
@@ -666,8 +728,7 @@ function initSidebar({ render } = {}) {
     if (hasChildren) {
       const toggle = document.createElement("button");
       toggle.type = "button";
-      toggle.className =
-        "rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-500 hover:bg-slate-100";
+      toggle.className = "country-action-btn";
       toggle.textContent = isOpen ? "v" : ">";
       toggle.addEventListener("click", () => {
         if (expanded.has(code)) {
@@ -684,7 +745,7 @@ function initSidebar({ render } = {}) {
     input.type = "color";
     const fallbackColor = ensureCountryPaletteColor(code, fallbackIndex);
     input.value = state.sovereignBaseColors[code] || state.countryBaseColors[code] || state.countryPalette[code] || fallbackColor;
-    input.className = "h-8 w-10 cursor-pointer rounded-md border border-slate-300 bg-white";
+    input.className = "color-input";
     input.addEventListener("change", (event) => {
       const value = event.target.value;
       state.countryPalette[code] = value;
@@ -813,12 +874,11 @@ function initSidebar({ render } = {}) {
         : expandedContinents.has(continentKey);
 
       const continentWrapper = document.createElement("div");
-      continentWrapper.className = "space-y-2";
+      continentWrapper.className = "country-children";
 
       const continentToggle = document.createElement("button");
       continentToggle.type = "button";
-      continentToggle.className =
-        "flex w-full items-center justify-between rounded-md border border-slate-200 bg-slate-100 px-3 py-2 text-left hover:bg-slate-200";
+      continentToggle.className = "inspector-accordion-btn";
       continentToggle.addEventListener("click", () => {
         if (expandedContinents.has(continentKey)) {
           expandedContinents.delete(continentKey);
@@ -829,11 +889,11 @@ function initSidebar({ render } = {}) {
       });
 
       const continentTitle = document.createElement("div");
-      continentTitle.className = "text-sm font-semibold text-slate-700";
+      continentTitle.className = "country-row-title";
       continentTitle.textContent = `${continent.displayLabel} (${continent.subregions.reduce((sum, item) => sum + item.countries.length, 0)})`;
 
       const continentChevron = document.createElement("span");
-      continentChevron.className = "text-xs text-slate-500";
+      continentChevron.className = "inspector-mini-label";
       continentChevron.textContent = continentOpen ? "v" : ">";
 
       continentToggle.appendChild(continentTitle);
@@ -842,7 +902,7 @@ function initSidebar({ render } = {}) {
 
       if (continentOpen) {
         const continentChildren = document.createElement("div");
-        continentChildren.className = "ml-2 space-y-2";
+        continentChildren.className = "country-children";
 
         visibleSubregions.forEach((subregion) => {
           const subregionKey = `subregion::${continent.id}::${subregion.id}`;
@@ -851,12 +911,11 @@ function initSidebar({ render } = {}) {
             : expandedSubregions.has(subregionKey);
 
           const subregionWrapper = document.createElement("div");
-          subregionWrapper.className = "space-y-2";
+          subregionWrapper.className = "country-children";
 
           const subregionToggle = document.createElement("button");
           subregionToggle.type = "button";
-          subregionToggle.className =
-            "flex w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-left hover:bg-slate-50";
+          subregionToggle.className = "inspector-accordion-btn";
           subregionToggle.addEventListener("click", () => {
             if (expandedSubregions.has(subregionKey)) {
               expandedSubregions.delete(subregionKey);
@@ -867,11 +926,11 @@ function initSidebar({ render } = {}) {
           });
 
           const subregionTitle = document.createElement("div");
-          subregionTitle.className = "text-xs font-semibold uppercase tracking-wide text-slate-500";
+          subregionTitle.className = "inspector-mini-label";
           subregionTitle.textContent = `${subregion.displayLabel} (${subregion.countries.length})`;
 
           const subregionChevron = document.createElement("span");
-          subregionChevron.className = "text-xs text-slate-500";
+          subregionChevron.className = "inspector-mini-label";
           subregionChevron.textContent = subregionOpen ? "v" : ">";
 
           subregionToggle.appendChild(subregionTitle);
@@ -880,7 +939,7 @@ function initSidebar({ render } = {}) {
 
           if (subregionOpen) {
             const subregionChildren = document.createElement("div");
-            subregionChildren.className = "ml-3 space-y-2";
+            subregionChildren.className = "country-children";
             subregion.countries.forEach((countryState) => {
               const isOpen = expanded.has(countryState.code) || (term && countryState.autoExpandCountry);
               renderCountryRow(subregionChildren, {
@@ -930,7 +989,7 @@ function initSidebar({ render } = {}) {
       }
 
       const details = document.createElement("details");
-      details.className = "group";
+      details.className = "inspector-preset-details";
       details.open = state.expandedPresetCountries.has(code) || presetMatch;
       details.addEventListener("toggle", () => {
         if (details.open) {
@@ -941,32 +1000,32 @@ function initSidebar({ render } = {}) {
       });
 
       const summary = document.createElement("summary");
-      summary.className =
-        "cursor-pointer list-none flex items-center gap-2 rounded px-2 py-1 text-sm font-medium text-slate-700 hover:bg-slate-100";
-      summary.innerHTML =
-        '<svg class="h-4 w-4 text-slate-400 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>';
+      summary.className = "inspector-accordion-btn";
+      const chevron = document.createElement("span");
+      chevron.className = "inspector-mini-label";
+      chevron.textContent = details.open ? "v" : ">";
       const label = document.createElement("span");
       label.textContent = `${displayName} (${code})`;
+      summary.appendChild(chevron);
       summary.appendChild(label);
       details.appendChild(summary);
 
       const child = document.createElement("div");
-      child.className = "ml-6 mt-1 space-y-1";
+      child.className = "country-children";
       presets.forEach((preset, index) => {
         const row = document.createElement("div");
-        row.className =
-          "flex items-center justify-between gap-2 rounded px-2 py-1 text-xs text-slate-600 hover:bg-slate-100";
+        row.className = "preset-row";
 
         const nameBtn = document.createElement("button");
         nameBtn.type = "button";
-        nameBtn.className = "flex-1 text-left";
+        nameBtn.className = "inspector-item-btn";
         nameBtn.textContent = preset.name;
         nameBtn.addEventListener("click", () => {
           applyPreset(code, index, state.selectedColor, render);
         });
 
         const actions = document.createElement("div");
-        actions.className = "flex items-center gap-2";
+        actions.className = "country-row-actions";
 
         const isEditingThis =
           state.isEditingPreset &&
@@ -976,7 +1035,7 @@ function initSidebar({ render } = {}) {
 
         const editBtn = document.createElement("button");
         editBtn.type = "button";
-        editBtn.className = "text-[11px] text-slate-500 hover:text-slate-700";
+        editBtn.className = "preset-action-btn";
         editBtn.textContent = isEditingThis ? t("Cancel", "ui") : t("Edit", "ui");
         editBtn.addEventListener("click", () => {
           if (isEditingThis) {
@@ -988,7 +1047,7 @@ function initSidebar({ render } = {}) {
 
         const saveBtn = document.createElement("button");
         saveBtn.type = "button";
-        saveBtn.className = "text-[11px] text-slate-500 hover:text-slate-700";
+        saveBtn.className = "preset-action-btn";
         saveBtn.textContent = t("Save", "ui");
         if (!isEditingThis) {
           saveBtn.classList.add("hidden");
@@ -1006,7 +1065,7 @@ function initSidebar({ render } = {}) {
 
         const copyBtn = document.createElement("button");
         copyBtn.type = "button";
-        copyBtn.className = "text-[11px] text-slate-500 hover:text-slate-700";
+        copyBtn.className = "preset-action-btn";
         copyBtn.textContent = t("Copy", "ui");
         copyBtn.addEventListener("click", () => {
           const ids = isEditingThis ? Array.from(state.editingPresetIds) : preset.ids;
@@ -1022,6 +1081,9 @@ function initSidebar({ render } = {}) {
         child.appendChild(row);
       });
 
+      details.addEventListener("toggle", () => {
+        chevron.textContent = details.open ? "v" : ">";
+      });
       details.appendChild(child);
       presetTree.appendChild(details);
     });
@@ -1049,16 +1111,15 @@ function initSidebar({ render } = {}) {
 
     colors.forEach((color, index) => {
       const row = document.createElement("div");
-      row.className = "flex items-center gap-2";
+      row.className = "legend-row";
 
       const swatch = document.createElement("span");
-      swatch.className = "h-4 w-4 rounded border border-slate-300";
+      swatch.className = "legend-swatch";
       swatch.style.backgroundColor = color;
 
       const input = document.createElement("input");
       input.type = "text";
-      input.className =
-        "flex-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-700";
+      input.className = "legend-input";
       input.placeholder = `Category ${index + 1}`;
       input.value = LegendManager.getLabel(color);
       input.addEventListener("input", (event) => {
@@ -1123,6 +1184,7 @@ function initSidebar({ render } = {}) {
         projectFileName.textContent = file.name;
       }
       FileManager.importProject(file, (data) => {
+        clearHistory();
         state.sovereignBaseColors = data.sovereignBaseColors || data.countryBaseColors || {};
         state.countryBaseColors = { ...state.sovereignBaseColors };
         state.visualOverrides = data.visualOverrides || data.featureOverrides || {};

@@ -2,16 +2,21 @@
 import { state, PALETTE_THEMES } from "../core/state.js";
 import {
   autoFillMap,
+  getZoomPercent,
   refreshColorState,
+  resetZoomToFit,
   recomputeDynamicBordersNow,
   scheduleDynamicBorderRecompute,
   startSpecialZoneDraw,
   undoSpecialZoneVertex,
+  zoomByStep,
+  setZoomPercent,
   finishSpecialZoneDraw,
   cancelSpecialZoneDraw,
   deleteSelectedManualSpecialZone,
   selectSpecialZoneById,
 } from "../core/map_renderer.js";
+import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
 import {
   buildPaletteLibraryEntries,
   buildPaletteQuickSwatches,
@@ -23,6 +28,7 @@ import {
 } from "../core/palette_manager.js";
 import { toggleLanguage, updateUIText, t } from "./i18n.js";
 import { resetAllFeatureOwnersToCanonical } from "../core/sovereignty_manager.js";
+import { showToast } from "./toast.js";
 
 function renderPalette(themeName) {
   const paletteGrid = document.getElementById("paletteGrid");
@@ -32,18 +38,21 @@ function renderPalette(themeName) {
 
   let swatches = [];
   if (state.activePalettePack?.entries) {
-    swatches = buildPaletteQuickSwatches(24).map((entry) => entry.color);
+    swatches = buildPaletteQuickSwatches(6).map((entry) => entry.color);
   } else {
-    swatches = Array.isArray(PALETTE_THEMES[themeName]) ? PALETTE_THEMES[themeName] : [];
+    swatches = Array.isArray(PALETTE_THEMES[themeName]) ? PALETTE_THEMES[themeName].slice(0, 6) : [];
   }
 
   swatches.forEach((color) => {
     const normalized = normalizeHexColor(color);
     if (!normalized) return;
     const btn = document.createElement("button");
+    btn.type = "button";
     btn.className = "color-swatch";
     btn.dataset.color = normalized;
     btn.style.backgroundColor = normalized;
+    btn.setAttribute("aria-label", `${t("Quick Colors", "ui")}: ${normalized}`);
+    btn.title = normalized;
     btn.addEventListener("click", () => {
       state.selectedColor = normalized;
       if (typeof state.updateSwatchUIFn === "function") {
@@ -96,7 +105,6 @@ function initToolbar({ render } = {}) {
   ]);
   // Support both legacy and current button class names.
   const toolButtons = document.querySelectorAll(".tool-button, .btn-tool");
-  const currentToolLabel = document.getElementById("currentTool");
   const customColor = document.getElementById("customColor");
   const exportBtn = document.getElementById("exportBtn");
   const exportFormat = document.getElementById("exportFormat");
@@ -147,10 +155,20 @@ function initToolbar({ render } = {}) {
   const paletteLibrarySearch = document.getElementById("paletteLibrarySearch");
   const paletteLibrarySummary = document.getElementById("paletteLibrarySummary");
   const paletteLibraryList = document.getElementById("paletteLibraryList");
+  const dockRecentDivider = document.getElementById("dockRecentDivider");
   const presetPolitical = document.getElementById("presetPolitical");
   const presetClear = document.getElementById("presetClear");
-  const autoFillStyleSelect = document.getElementById("autoFillStyleSelect");
   const colorModeSelect = document.getElementById("colorModeSelect");
+  const bottomDock = document.getElementById("bottomDock");
+  const selectedColorPreview = document.getElementById("selectedColorPreview");
+  const undoBtn = document.getElementById("undoBtn");
+  const redoBtn = document.getElementById("redoBtn");
+  const zoomInBtn = document.getElementById("zoomInBtn");
+  const zoomOutBtn = document.getElementById("zoomOutBtn");
+  const zoomResetBtn = document.getElementById("zoomResetBtn");
+  const zoomPercentInput = document.getElementById("zoomPercentInput");
+  const leftPanelToggle = document.getElementById("leftPanelToggle");
+  const rightPanelToggle = document.getElementById("rightPanelToggle");
   const paintGranularitySelect = document.getElementById("paintGranularitySelect");
   const paintModeSelect = document.getElementById("paintModeSelect");
   const activeSovereignLabel = document.getElementById("activeSovereignLabel");
@@ -372,7 +390,7 @@ function initToolbar({ render } = {}) {
     1
   );
   state.styleConfig.rivers.width = clamp(
-    Number.isFinite(Number(state.styleConfig.rivers.width)) ? Number(state.styleConfig.rivers.width) : 1.1,
+    Number.isFinite(Number(state.styleConfig.rivers.width)) ? Number(state.styleConfig.rivers.width) : 0.5,
     0.2,
     4
   );
@@ -382,7 +400,7 @@ function initToolbar({ render } = {}) {
   state.styleConfig.rivers.outlineWidth = clamp(
     Number.isFinite(Number(state.styleConfig.rivers.outlineWidth))
       ? Number(state.styleConfig.rivers.outlineWidth)
-      : 0.9,
+      : 0.25,
     0,
     3
   );
@@ -448,13 +466,18 @@ function initToolbar({ render } = {}) {
   function renderRecentColors() {
     if (!recentContainer) return;
     recentContainer.replaceChildren();
-    state.recentColors.forEach((color) => {
+    const visibleRecentColors = state.recentColors.slice(0, 4);
+    dockRecentDivider?.classList.toggle("hidden", visibleRecentColors.length === 0);
+    visibleRecentColors.forEach((color) => {
       const normalized = normalizeHexColor(color);
       if (!normalized) return;
       const btn = document.createElement("button");
       btn.className = "color-swatch";
+      btn.type = "button";
       btn.dataset.color = normalized;
       btn.style.backgroundColor = normalized;
+      btn.title = normalized;
+      btn.setAttribute("aria-label", `${t("Recent", "ui")}: ${normalized}`);
       btn.addEventListener("click", () => {
         state.selectedColor = normalized;
         updateSwatchUI();
@@ -465,12 +488,9 @@ function initToolbar({ render } = {}) {
 
   function syncPaletteSourceControls() {
     const activeValue = String(state.activePaletteId || "");
-    [themeSelect, autoFillStyleSelect].forEach((select) => {
-      if (!select) return;
-      if (select.value !== activeValue) {
-        select.value = activeValue;
-      }
-    });
+    if (themeSelect && themeSelect.value !== activeValue) {
+      themeSelect.value = activeValue;
+    }
   }
   state.updatePaletteSourceUIFn = syncPaletteSourceControls;
   state.renderPaletteFn = renderPalette;
@@ -495,10 +515,10 @@ function initToolbar({ render } = {}) {
     const nextFillColor = normalizeOceanFillColor(
       oceanMeta?.apply_on_autofill ? oceanMeta?.fill_color : "#aadaff"
     );
-    state.styleConfig.ocean.fillColor = nextFillColor;
     if (oceanFillColor) {
       oceanFillColor.value = nextFillColor;
     }
+    return nextFillColor;
   }
   state.updateRecentUI = () => {
     renderRecentColors();
@@ -816,14 +836,12 @@ function initToolbar({ render } = {}) {
   state.updateSpecialZoneEditorUIFn = renderSpecialZoneEditorUI;
 
   function updateSwatchUI() {
-    let matched = false;
     const swatches = document.querySelectorAll(".color-swatch");
     swatches.forEach((swatch) => {
       if (swatch.dataset.color === state.selectedColor) {
-        swatch.classList.add("ring-2", "ring-slate-900");
-        matched = true;
+        swatch.classList.add("is-selected");
       } else {
-        swatch.classList.remove("ring-2", "ring-slate-900");
+        swatch.classList.remove("is-selected");
       }
     });
     const libraryRows = document.querySelectorAll(".palette-library-row");
@@ -832,34 +850,72 @@ function initToolbar({ render } = {}) {
     });
     if (document.getElementById("customColor")) {
       customColor.value = state.selectedColor;
-      customColor.classList.toggle("ring-2", !matched);
-      customColor.classList.toggle("ring-slate-900", !matched);
+    }
+    if (selectedColorPreview) {
+      selectedColorPreview.style.backgroundColor = state.selectedColor;
+      selectedColorPreview.setAttribute("aria-label", `${t("Selected color", "ui")}: ${state.selectedColor}`);
     }
   }
   state.updateSwatchUIFn = updateSwatchUI;
 
   function updateToolUI() {
-    if (state.isEditingPreset) {
-      currentToolLabel.textContent = t("Editing Preset", "ui");
-    } else if (state.currentTool === "eraser") {
-      currentToolLabel.textContent = t("Eraser", "ui");
-    } else if (state.currentTool === "eyedropper") {
-      currentToolLabel.textContent = t("Eyedropper", "ui");
-    } else {
-      currentToolLabel.textContent = t("Fill", "ui");
-    }
     toolButtons.forEach((button) => {
       const isActive = button.dataset.tool === state.currentTool;
       button.disabled = state.isEditingPreset;
-      button.classList.toggle("opacity-50", state.isEditingPreset);
-      button.classList.toggle("cursor-not-allowed", state.isEditingPreset);
-      button.classList.toggle("bg-slate-900", isActive);
-      button.classList.toggle("text-white", isActive);
-      button.classList.toggle("bg-white", !isActive);
-      button.classList.toggle("text-slate-700", !isActive);
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
     });
+    if (bottomDock) {
+      bottomDock.classList.toggle("is-editing-preset", !!state.isEditingPreset);
+    }
   }
   state.updateToolUIFn = updateToolUI;
+
+  function updateHistoryUi() {
+    if (undoBtn) undoBtn.disabled = !canUndoHistory();
+    if (redoBtn) redoBtn.disabled = !canRedoHistory();
+  }
+  state.updateHistoryUIFn = updateHistoryUi;
+
+  function updateZoomUi() {
+    const text = getZoomPercent();
+    if (zoomPercentInput && zoomPercentInput.dataset.editing !== "true") {
+      zoomPercentInput.value = text;
+    }
+  }
+  state.updateZoomUIFn = updateZoomUi;
+
+  function parseZoomInputValue(rawValue) {
+    const normalized = String(rawValue || "").trim().replace(/%/g, "");
+    if (!normalized) return null;
+    const percent = Number(normalized);
+    if (!Number.isFinite(percent)) return null;
+    return clamp(percent, 100, 5000);
+  }
+
+  function commitZoomInputValue() {
+    if (!zoomPercentInput) return;
+    const parsed = parseZoomInputValue(zoomPercentInput.value);
+    zoomPercentInput.dataset.editing = "false";
+    if (parsed === null) {
+      updateZoomUi();
+      return;
+    }
+    setZoomPercent(parsed);
+    updateZoomUi();
+  }
+
+  state.updateToolbarInputsFn = () => {
+    if (oceanFillColor) {
+      oceanFillColor.value = normalizeOceanFillColor(state.styleConfig.ocean.fillColor);
+    }
+    if (colorModeSelect) {
+      colorModeSelect.value = state.colorMode || "political";
+    }
+    if (themeSelect) {
+      themeSelect.value = String(state.activePaletteId || themeSelect.value || "");
+    }
+  };
 
   if (customColor) {
     customColor.addEventListener("input", (event) => {
@@ -875,6 +931,95 @@ function initToolbar({ render } = {}) {
     });
   });
 
+  if (selectedColorPreview && customColor && !selectedColorPreview.dataset.bound) {
+    selectedColorPreview.addEventListener("click", () => {
+      customColor.click();
+    });
+    selectedColorPreview.dataset.bound = "true";
+  }
+
+  if (undoBtn && !undoBtn.dataset.bound) {
+    undoBtn.addEventListener("click", () => {
+      undoHistory();
+    });
+    undoBtn.dataset.bound = "true";
+  }
+
+  if (redoBtn && !redoBtn.dataset.bound) {
+    redoBtn.addEventListener("click", () => {
+      redoHistory();
+    });
+    redoBtn.dataset.bound = "true";
+  }
+
+  if (zoomInBtn && !zoomInBtn.dataset.bound) {
+    zoomInBtn.addEventListener("click", () => {
+      zoomByStep(1);
+    });
+    zoomInBtn.dataset.bound = "true";
+  }
+
+  if (zoomOutBtn && !zoomOutBtn.dataset.bound) {
+    zoomOutBtn.addEventListener("click", () => {
+      zoomByStep(-1);
+    });
+    zoomOutBtn.dataset.bound = "true";
+  }
+
+  if (zoomResetBtn && !zoomResetBtn.dataset.bound) {
+    zoomResetBtn.addEventListener("click", () => {
+      resetZoomToFit();
+    });
+    zoomResetBtn.dataset.bound = "true";
+  }
+
+  if (zoomPercentInput && !zoomPercentInput.dataset.bound) {
+    zoomPercentInput.addEventListener("focus", () => {
+      zoomPercentInput.dataset.editing = "true";
+      zoomPercentInput.select();
+    });
+    zoomPercentInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        commitZoomInputValue();
+        zoomPercentInput.blur();
+        return;
+      }
+      if (event.key === "Escape") {
+        event.preventDefault();
+        zoomPercentInput.dataset.editing = "false";
+        updateZoomUi();
+        zoomPercentInput.blur();
+      }
+    });
+    zoomPercentInput.addEventListener("blur", () => {
+      commitZoomInputValue();
+    });
+    zoomPercentInput.dataset.bound = "true";
+  }
+
+  if (leftPanelToggle && !leftPanelToggle.dataset.bound) {
+    leftPanelToggle.addEventListener("click", () => {
+      const next = !document.body.classList.contains("left-drawer-open");
+      document.body.classList.toggle("left-drawer-open", next);
+      document.body.classList.remove("right-drawer-open");
+      leftPanelToggle.setAttribute("aria-expanded", String(next));
+      rightPanelToggle?.setAttribute("aria-expanded", "false");
+    });
+    leftPanelToggle.dataset.bound = "true";
+  }
+
+  if (rightPanelToggle && !rightPanelToggle.dataset.bound) {
+    rightPanelToggle.addEventListener("click", () => {
+      const next = !document.body.classList.contains("right-drawer-open");
+      document.body.classList.toggle("right-drawer-open", next);
+      document.body.classList.remove("left-drawer-open");
+      rightPanelToggle.setAttribute("aria-expanded", String(next));
+      leftPanelToggle?.setAttribute("aria-expanded", "false");
+    });
+    rightPanelToggle.dataset.bound = "true";
+  }
+
   if (toggleLang && !toggleLang.dataset.bound) {
     toggleLang.addEventListener("click", toggleLanguage);
     toggleLang.dataset.bound = "true";
@@ -882,21 +1027,37 @@ function initToolbar({ render } = {}) {
 
   if (exportBtn && exportFormat) {
     exportBtn.addEventListener("click", () => {
-      const format = exportFormat.value === "jpg" ? "image/jpeg" : "image/png";
-      const extension = exportFormat.value === "jpg" ? "jpg" : "png";
-      const exportCanvas = document.createElement("canvas");
-      exportCanvas.width = state.colorCanvas?.width || 0;
-      exportCanvas.height = state.colorCanvas?.height || 0;
-      const exportCtx = exportCanvas.getContext("2d");
-      if (state.colorCanvas) exportCtx.drawImage(state.colorCanvas, 0, 0);
-      if (state.lineCanvas) exportCtx.drawImage(state.lineCanvas, 0, 0);
-      const dataUrl = exportCanvas.toDataURL(format, 0.92);
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = `map_snapshot.${extension}`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      try {
+        const format = exportFormat.value === "jpg" ? "image/jpeg" : "image/png";
+        const extension = exportFormat.value === "jpg" ? "jpg" : "png";
+        const exportCanvas = document.createElement("canvas");
+        exportCanvas.width = state.colorCanvas?.width || 0;
+        exportCanvas.height = state.colorCanvas?.height || 0;
+        const exportCtx = exportCanvas.getContext("2d");
+        if (!exportCtx) {
+          throw new Error("Canvas export context unavailable.");
+        }
+        if (state.colorCanvas) exportCtx.drawImage(state.colorCanvas, 0, 0);
+        if (state.lineCanvas) exportCtx.drawImage(state.lineCanvas, 0, 0);
+        const dataUrl = exportCanvas.toDataURL(format, 0.92);
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = `map_snapshot.${extension}`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        showToast(t("Map snapshot downloaded.", "ui"), {
+          title: t("Snapshot exported", "ui"),
+          tone: "success",
+        });
+      } catch (error) {
+        console.error("Snapshot export failed:", error);
+        showToast(t("Unable to export the map snapshot.", "ui"), {
+          title: t("Snapshot failed", "ui"),
+          tone: "error",
+          duration: 4200,
+        });
+      }
     });
   }
 
@@ -1057,7 +1218,7 @@ function initToolbar({ render } = {}) {
   if (riversWidth) {
     riversWidth.addEventListener("input", (event) => {
       const value = Number(event.target.value);
-      state.styleConfig.rivers.width = clamp(Number.isFinite(value) ? value : 1.1, 0.2, 4);
+      state.styleConfig.rivers.width = clamp(Number.isFinite(value) ? value : 0.5, 0.2, 4);
       if (riversWidthValue) {
         riversWidthValue.textContent = Number(state.styleConfig.rivers.width).toFixed(2);
       }
@@ -1073,7 +1234,7 @@ function initToolbar({ render } = {}) {
   if (riversOutlineWidth) {
     riversOutlineWidth.addEventListener("input", (event) => {
       const value = Number(event.target.value);
-      state.styleConfig.rivers.outlineWidth = clamp(Number.isFinite(value) ? value : 0.9, 0, 3);
+      state.styleConfig.rivers.outlineWidth = clamp(Number.isFinite(value) ? value : 0.25, 0, 3);
       if (riversOutlineWidthValue) {
         riversOutlineWidthValue.textContent = Number(state.styleConfig.rivers.outlineWidth).toFixed(2);
       }
@@ -1226,8 +1387,12 @@ function initToolbar({ render } = {}) {
 
   if (presetPolitical) {
     presetPolitical.addEventListener("click", () => {
-      autoFillMap("political");
-      applyAutoFillOceanColor();
+      const nextOceanFill = applyAutoFillOceanColor();
+      autoFillMap(state.colorMode || "political", {
+        styleUpdates: {
+          "ocean.fillColor": nextOceanFill,
+        },
+      });
       if (render) render();
     });
   }
@@ -1248,6 +1413,9 @@ function initToolbar({ render } = {}) {
       state.interactionGranularity =
         state.paintMode === "sovereignty" ? "subdivision" : requested;
       paintGranularitySelect.value = state.interactionGranularity;
+      if (typeof state.updatePaintModeUIFn === "function") {
+        state.updatePaintModeUIFn();
+      }
     });
   }
 
@@ -1261,6 +1429,9 @@ function initToolbar({ render } = {}) {
         if (paintGranularitySelect) {
           paintGranularitySelect.value = "subdivision";
         }
+      }
+      if (typeof state.updatePaintModeUIFn === "function") {
+        state.updatePaintModeUIFn();
       }
       refreshActiveSovereignLabel();
       refreshDynamicBorderStatus();
@@ -1276,6 +1447,19 @@ function initToolbar({ render } = {}) {
 
   if (presetClear) {
     presetClear.addEventListener("click", () => {
+      const featureIds = Object.keys(state.visualOverrides || {});
+      const ownerCodes = Array.from(new Set([
+        ...Object.keys(state.sovereignBaseColors || {}),
+        ...Object.keys(state.countryBaseColors || {}),
+      ]));
+      const sovereigntyFeatureIds = String(state.paintMode || "visual") === "sovereignty"
+        ? Object.keys(state.sovereigntyByFeatureId || {})
+        : [];
+      const before = captureHistoryState({
+        featureIds,
+        ownerCodes,
+        sovereigntyFeatureIds,
+      });
       if (state.paintMode === "sovereignty") {
         resetAllFeatureOwnersToCanonical();
         scheduleDynamicBorderRecompute("clear-sovereignty", 90);
@@ -1289,6 +1473,18 @@ function initToolbar({ render } = {}) {
       refreshColorState({ renderNow: true });
       refreshActiveSovereignLabel();
       refreshDynamicBorderStatus();
+      pushHistoryEntry({
+        kind: "clear-map",
+        before,
+        after: captureHistoryState({
+          featureIds,
+          ownerCodes,
+          sovereigntyFeatureIds,
+        }),
+        meta: {
+          affectsSovereignty: state.paintMode === "sovereignty",
+        },
+      });
     });
   }
 
@@ -1299,17 +1495,6 @@ function initToolbar({ render } = {}) {
       if (!sourceOptions.length) {
         renderPalette(event.target.value);
         renderPaletteLibrary();
-        return;
-      }
-      await handlePaletteSourceChange(event.target.value);
-    });
-  }
-
-  if (autoFillStyleSelect) {
-    populatePaletteSourceOptions(autoFillStyleSelect);
-    autoFillStyleSelect.addEventListener("change", async (event) => {
-      if (!getPaletteSourceOptions().length) {
-        syncPaletteSourceControls();
         return;
       }
       await handlePaletteSourceChange(event.target.value);
@@ -1657,10 +1842,14 @@ function initToolbar({ render } = {}) {
   syncPaletteSourceControls();
   renderPalette(state.currentPaletteTheme);
   renderPaletteLibrary();
+  leftPanelToggle?.setAttribute("aria-expanded", "false");
+  rightPanelToggle?.setAttribute("aria-expanded", "false");
   state.updatePaintModeUIFn();
   renderRecentColors();
   renderParentBorderCountryList();
   renderSpecialZoneEditorUI();
+  updateHistoryUi();
+  updateZoomUi();
   updateSwatchUI();
   updateToolUI();
   updateUIText();
