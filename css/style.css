@@ -512,14 +512,6 @@ input[type="checkbox"].checkbox-input {
 .space-y-3 > * + * { margin-top: 12px; }
 .space-y-4 > * + * { margin-top: 16px; }
 
-/* ── Current Tool Display ──────────────────────────────── */
-.current-tool-value {
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: var(--text-primary);
-  margin-top: 8px;
-}
-
 /* ── Color Swatches ────────────────────────────────────── */
 .color-swatch {
   display: inline-block;

@@ -93,12 +93,11 @@ Observed:
 
 Artifacts:
 
-- `.mcp-artifacts/texture-mode-none.png`
-- `.mcp-artifacts/texture-mode-paper-v2.png`
-- `.mcp-artifacts/texture-mode-draft_grid.png`
-- `.mcp-artifacts/texture-mode-graticule.png`
+历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。
 
 ## Known Gaps
 
 - New texture control labels currently rely on English fallback unless localized UI strings are added to the locale data.
 - `Old Paper` is intentionally conservative enough to preserve map readability; future polish can push the texture further if a more stylized atlas look is desired.
+
+> 历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。

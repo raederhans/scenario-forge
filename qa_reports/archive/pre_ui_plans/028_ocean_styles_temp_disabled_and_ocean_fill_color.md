@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-24  
 **Decision Type:** Temporary product/performance safeguard  
-**Related:** `qa_reports/027_ocean_mask_fallback_and_visual_delta.md`
+**Related:** `./027_ocean_mask_fallback_and_visual_delta.md`
 
 ---
 

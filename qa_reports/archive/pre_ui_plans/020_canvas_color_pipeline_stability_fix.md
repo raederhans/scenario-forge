@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-12  
 **Primary File Modified:** `js/core/map_renderer.js`  
-**Related Context:** `qa_reports/018_autofill_color_fix.md`, `qa_reports/019_topology_pipeline_fix.md`
+**Related Context:** `./018_autofill_color_fix.md`, `./019_topology_pipeline_fix.md`
 
 ---
 
@@ -101,4 +101,3 @@ Validation rejects non-strings, empty values, and `var(...)` tokens for canvas u
 
 1. `sidebar.js` and `logic.js` can still write raw colors into `state.colors`. Renderer now sanitizes defensively, but upstream input validation could still be added for stricter guarantees.
 2. Browser runtime validation is still required to visually confirm final UX in-app (terminal cannot execute the browser rendering path).
-

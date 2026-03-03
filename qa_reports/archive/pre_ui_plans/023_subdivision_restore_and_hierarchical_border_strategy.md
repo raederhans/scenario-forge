@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-24  
 **Environment:** `http://localhost:8000/` (Playwright MCP Edge quick smoke + local code/runtime inspection)  
-**Related:** `qa_reports/021_projection_wrap_artifact_regression.md`, `qa_reports/022_projection_wrap_artifact_fix_and_sidebar_ui_alignment.md`
+**Related:** `./021_projection_wrap_artifact_regression.md`, `./022_projection_wrap_artifact_fix_and_sidebar_ui_alignment.md`
 
 ---
 
@@ -123,10 +123,8 @@
 - 与 QA-021 对比：不再出现默认路径 `europe_topology.highres.json` 的请求失败链路。
 
 ## Screenshots
-- `.mcp-artifacts/screenshots/route-home-quick-20260224-095322.png`
-- `.mcp-artifacts/screenshots/gesture-map_pan_zoom-quick-20260224-095322.png`
-- `.mcp-artifacts/screenshots/section-left_sidebar-quick-20260224-095322.png`
-- `.mcp-artifacts/screenshots/section-right_sidebar-quick-20260224-095322.png`
+
+历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。
 
 ## Repro
 1. 启动：`python3 tools/dev_server.py`
@@ -153,3 +151,5 @@
 1. `legacy_bak` 仅覆盖 91 国，若目标是“全球细分一致”，需要补充/重建 detail 数据源（pipeline 侧治理）。
 2. README 路由脚本告警与 favicon 404 为低优先级噪音，建议独立清理以减少巡检误报。
 3. 当前边界分层使用 `admin1_group` 作为省界判定主信号，后续可按国家扩展更稳的 admin 层级字段映射。
+
+> 历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。

@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-24  
 **Environment:** `http://localhost:8000/` (Playwright CLI + profile quick smoke)  
-**Related:** `qa_reports/024_hit_selection_consistency_and_country_pick_fix.md`, `qa_reports/025_border_completeness_and_coastline_render_fix.md`
+**Related:** `./024_hit_selection_consistency_and_country_pick_fix.md`, `./025_border_completeness_and_coastline_render_fix.md`
 
 ---
 
@@ -71,15 +71,8 @@
 - Quick smoke network summary：未发现首页关键地图资源 4xx/5xx。
 
 ## Screenshots
-- `.mcp-artifacts/screenshots/route-home-quick-20260224-161316.png`
-- `.mcp-artifacts/screenshots/section-left_sidebar-quick-20260224-161316.png`
-- `.mcp-artifacts/screenshots/section-right_sidebar-quick-20260224-161316.png`
-- `.mcp-artifacts/screenshots/qa026-ocean-flat.png`
-- `.mcp-artifacts/screenshots/qa026-ocean-soft.png`
-- `.mcp-artifacts/screenshots/qa026-ocean-contours.png`
-- `.mcp-artifacts/screenshots/qa026-ocean-wave.png`
-- `.mcp-artifacts/screenshots/qa026-coastline-low-zoom.png`
-- `.mcp-artifacts/screenshots/qa026-coastline-high-zoom.png`
+
+历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。
 
 ## Reproduction / Verification
 1. 启动服务：`python3 tools/dev_server.py`
@@ -119,3 +112,5 @@
 1. 当前 bathymetry 为视觉近似（程序化），非真实深度栅格；后续可接 GEBCO/NOAA 数据管线。
 2. coastline LOD 参数（epsilon/minLength）仍可按目标国家区域进一步精调。
 3. README/doc 路由的控制台噪音不影响地图主功能，可独立清理以降低巡检误报。
+
+> 历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。

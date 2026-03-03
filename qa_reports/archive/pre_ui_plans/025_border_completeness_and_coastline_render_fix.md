@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-24  
 **Environment:** `http://localhost:8000/` (Edge via Playwright MCP quick smoke)  
-**Related:** `qa_reports/024_hit_selection_consistency_and_country_pick_fix.md`
+**Related:** `./024_hit_selection_consistency_and_country_pick_fix.md`
 
 ---
 
@@ -57,10 +57,8 @@
 - quick smoke 未发现首页关键地图资源 4xx/5xx。
 
 ## Screenshots
-- `.mcp-artifacts/screenshots/route-home-quick-20260224-153957.png`
-- `.mcp-artifacts/screenshots/gesture-map_pan_zoom-quick-20260224-153957.png`
-- `.mcp-artifacts/screenshots/section-left_sidebar-quick-20260224-153957.png`
-- `.mcp-artifacts/screenshots/section-right_sidebar-quick-20260224-153957.png`
+
+历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。
 
 ## Repro
 1. 启动：`python3 tools/dev_server.py`
@@ -82,3 +80,5 @@
 
 1. primary 与 detail 的局部几何边缘可能存在轻微不贴合（视觉可接受，优先保证边界完整性）。
 2. quick smoke 不覆盖全部手工滑条交互路径；建议补一轮定向手测（coastline color/width 在多缩放等级下的视觉确认）。
+
+> 历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。

@@ -1,129 +1,157 @@
-﻿# 渲染与交互专项评估（2026-02-24）
+# 前 UI 已实现功能总账 B：渲染稳定化、边界修复、交互工具与编辑功能
 
-## 1. 渲染主链路拆解
+## 1. 文档定位
 
-### 1.1 触发源
+这份文档总结前 UI 阶段已经稳定落地的渲染、交互和编辑能力，时间范围覆盖 2026-02-06 到 2026-02-26 的关键修复与执行切片。它不是“未来要做什么”的路线图，而是“现在已经做成了什么”的总账。
 
-- 初始化：`initMap -> setMapData -> render`。
-- 缩放：`zoom` 事件内通过 rAF 调度 `updateMap -> drawCanvas`（`js/core/map_renderer.js:1669-1688`）。
-- 填色/擦除：`handleClick -> refreshColorState({renderNow:true}) -> render`（`js/core/map_renderer.js:1570-1618`）。
-- 自动填色：`autoFillMap -> refreshColorState({renderNow:true})`（`js/core/map_renderer.js:1493-1568`）。
+原始过程文档已移入归档：
+- [qa_reports/archive/pre_ui_plans](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans)
+- [qa/archive/pre_ui_execution](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa/archive/pre_ui_execution)
 
-### 1.2 每次 `drawCanvas()` 做的事
+## 2. 渲染架构演进中已经落地的部分
 
-1. 全画布清理和变换设置（`js/core/map_renderer.js:1293-1304`）。
-2. 绘制海洋（sphere + ocean layer）。
-3. 遍历所有政治 feature 填色（`js/core/map_renderer.js:1323-1358`）。
-4. 再绘制层级边界 mesh（`js/core/map_renderer.js:1238-1281`）。
+前 UI 阶段完成的不是一次单点修补，而是一次连续的渲染链路重构：
 
-这意味着：交互期每帧都有“全量 feature fill + 多层 border stroke”的固定成本。
+- 从静态 GeoJSON/固定线层，演进到以 TopoJSON 与 runtime mesh 为基础的渲染方式
+- 从单一政治层，演进到 `primary + detail` 的组合政治层
+- 从单一颜色映射，演进到 `feature -> country -> default` 的统一 resolved color 模型
+- 从“缩放/点击即全量无差别处理”，演进到有 phase、有 LOD、有边界缓存的运行链路
 
-## 2. 当前主要瓶颈
+## 3. 命中测试与点击一致性修复
 
-## 2.1 Feature 全量遍历
+已落地能力包括：
 
-- 当前 draw loop 以全量遍历为主。
-- `pathBoundsInScreen` 存在，但当前主绘制路径没有使用可见裁剪列表（`js/core/map_renderer.js:544` 仅定义）。
+- spatial grid 命中索引替代 quadtree 主路径
+- `strict land hit`，海洋不再吸附到国家
+- snap 半径、bboxArea、bboxDistance、detail 优先级统一进入候选排序
+- `getHitFromEvent()` 形成统一命中入口
+- 组合政治层下，detail 与 primary 的 pick 行为更加一致
 
-## 2.2 交互与全量重绘耦合
+这使得点击上色、吸管取色、国家命中与 hover 行为不再各走一套逻辑。
 
-- 点击一个区也会触发全图重绘。
-- 缩放期间每帧重绘全量要素。
+## 4. 边界、海岸线与投影相关修复
 
-## 2.3 命中测试在大数据下会放大抖动
+这部分是前 UI 阶段最集中的稳定化收益来源之一。
 
-- spatial grid 已经比 naive 检测好，但 `rankCandidates` 里会做 `geoContains`。
-- 高频 hover 情况下，CPU 占用会和 draw loop 竞争主线程预算。
+### 已落地项
 
-## 2.4 边界绘制成本不可忽视
+- 国界、海岸线、parent/province/local 边界从 source 分裂路径中拆开，改为更清晰的全局/分层 mesh 策略
+- `country / coastline` 改为以 primary 全局 mesh 为主，减少接缝断裂
+- `province / local` 保持 detail+primary 分源构建
+- 缩放联动下的 alpha/width 公式升级，线层层级更加清晰
+- coastline 新增 LOD 缓存与按缩放切换
+- 投影异常 geometry 过滤进入统一链路，避免 wrap artifact 拉坏 fit、绘制和命中
 
-- mesh 虽缓存，但 `pathCanvas(mesh)` 和 stroke 是每帧执行。
-- 在高缩放频率下，边界层是可感知负担。
+### 直接解决的问题
 
-## 3. 数据规模对渲染成本的影响
+- detail / primary 接缝处国界断裂
+- 海岸线被误当成陆地边界
+- projection wrap artifact 导致的白/蓝遮罩
+- 低缩放下 subdivision 看似“消失”
 
-本地核算（基于当前数据）：
+## 5. 上下文层、Ocean、Coastline、Parent Border 已实现能力
 
-- `single/admin0`：199 feature。
-- `composite`：预测 8415 feature。
-- 点量近似：
-  - detail：约 285,519 arc points
-  - primary fallback：约 47,835 arc points
-  - composite 合计约 **333,354 points**
+### Context Layers
 
-在“每次交互重画全量”的模型下，这个量级天然会把帧预算压满。
+以下上下文层已真正进入可切换、可绘制、可调样式的状态：
 
-## 4. 性能极限模型（推算）
+- Physical
+- Urban
+- Rivers
+- Special Zones
 
-## 4.1 预算定义
+已落地能力包括：
 
-- 60fps：每帧 16.7ms。
-- 30fps：每帧 33.3ms。
+- layer source coverage 诊断
+- primary/detail 按层选源
+- per-layer style config
+- 绘制顺序明确进入 `drawCanvas()`
 
-## 4.2 结合当前架构的可达区间
+### Ocean
 
-- `single/admin0`：较容易进入 50fps+ 区间。
-- `composite(8k+)`：更接近 18-35fps（高端机器，交互期间）。
-- 若继续上探到“多国家 ADM2 高密度”而不改渲染策略，通常会跌到不可接受区间（<15fps）。
+Ocean 相关已落地能力包括：
 
-> 说明：这是结构性推算，不是本机浏览器实测帧。实测流程见文末。
+- 全画布 base fill，避免背景/遮罩污染视觉
+- ocean mask quality 评估与自动 fallback
+- `topology_ocean` 与 `sphere_minus_land` 两种 mask 模式
+- 海洋视觉样式预设与后续临时 kill-switch
+- 可配置 ocean fill color
 
-## 5. 推荐优化路径（按收益/风险排序）
+### Parent Unit Borders
 
-### P0（先做）
+已落地能力包括：
 
-1. **交互期降级绘制**
-- 拖拽/缩放中只绘制简化层（如只画主轮廓/低细节），结束后补全高质量层。
+- 运行时自动发现支持国家
+- 按国家独立开关显示 parent border
+- DE / GB 专项分组质量门槛
+- parent border 缓存与绘制顺序整合
+- 项目文件持久化
 
-2. **可见集预计算**
-- 以 viewport + zoom band 维护 draw-list，替代每帧全量遍历 + runtime skip。
+## 6. subdivision 可见性与工具绑定修复
 
-3. **分层缓存**
-- 静态层（海洋/背景/部分边界）缓存到 offscreen，颜色层单独增量更新。
+在前 UI 阶段，地图“能不能看清细分地块”和“工具能不能真正切换”都已经被修正。
 
-### P1（随后）
+已落地项：
 
-1. **交互命中颜色拾取化（color picking）**
-- hover/click 优先 O(1) 像素读取，spatial grid 退为 fallback。
+- subdivision 内边界在低缩放下的最小 alpha / width 提升
+- low zoom declutter / width scale / internal boost 调整
+- 工具按钮 class 兼容修复，Eraser / Eyedropper 不再失效
+- D3 / topojson vendor 本地化，避免 CDN 阻断误伤运行判断
 
-2. **填色增量更新策略**
-- country 粒度填色时，按受影响 id 集合更新，不立即触发全量重画。
+## 7. Special Zone 手工编辑器已实现能力
 
-### P2（并行）
+前 UI 阶段已经完成第一版 project-local special zone editor：
 
-1. **边界层细分开关与 LOD**
-- 高缩放才开 local border，低缩放仅 country/province。
+- `Start / Undo / Finish / Cancel / Delete` 全流程
+- 地图双击完成绘制
+- 绘制过程的 SVG 预览线/面/顶点
+- `manualSpecialZones` 进入运行时 state
+- `effectiveSpecialZones = topology + manual`
+- 项目文件保存/加载 special zone 手工区域
 
-2. **统一渲染状态机**
-- 明确 `idle/interacting/settling` 三态，避免功能加法继续扩大每帧成本。
+这意味着 special zone 已经不只是后端静态数据层，而是运行时可编辑功能。
 
-## 6. 与你当前重构的冲突点
+## 8. 性能止血型改动中已落地部分
 
-- 显示/缩放/填色正在重构，正好命中性能主链路。
-- 若继续在“无预算约束”下叠功能，后续每个功能都要做性能返工。
+在更大规模架构治理前，前 UI 阶段已经落地一批低风险止血措施。
 
-建议：先锁性能约束，再推进功能重构细节。
+### 已实现
 
-## 7. 浏览器实测流程（你本机执行）
+- render phase：`idle | interacting | settling`
+- 交互阶段降级绘制
+  - 跳过部分内部边界
+  - legend 只在 idle 刷新
+  - hover 在非 idle 阶段降级
+- `projectedBoundsById` 缓存
+- 开发快速启动档位
+  - `start_dev_fast.bat`
+  - `detail_layer=off` 友好路径
 
-> 我这边 Playwright 环境存在外部 CDN 被拦截，不适合给你出可信帧率；下面是你本机可复现实测标准流程。
+这些改动没有改变数据 schema，但显著改善了缩放、平移和大图层下的交互稳定性。
 
-1. 打开 Chrome DevTools Performance。
-2. 分别测试两组 URL：
-- `http://127.0.0.1:8000/?detail_layer=off`
-- `http://127.0.0.1:8000/`（默认 composite）
-3. 每组做 3 轮，每轮 20 秒：
-- 10 秒连续平移+缩放
-- 5 秒连续填色（点击多区）
-- 5 秒 hover 扫描
-4. 记录指标：
-- FPS（平均/P95）
-- Main thread Long Task 次数
-- `drawCanvas` 热点占比
-- Interaction to Next Paint 延迟
+## 9. 当前遗留限制
 
-## 8. 验收阈值（建议）
+以下限制在前 UI 阶段仍然保留，应视为“已知现实”，不是遗漏：
 
-- 开发默认档（轻量）：交互期平均 FPS >= 50。
-- 重数据档（composite）：交互期平均 FPS >= 30，P95 帧耗时 <= 45ms。
-- 单次填色：P95 响应 <= 100ms。
+- 大规模 detail / ADM2 仍然会对每帧几何遍历施压
+- brush、HUD、utility popover 等更晚期 UI shell 能力不属于本阶段总结
+- ocean advanced presets 已临时关闭，不代表海洋样式架构被移除
+- hidden color map picking 在早期 roadmap 中已明确，但不是这一批总结的核心落地项
+- 某些 parent grouping / hierarchy 质量仍依赖数据侧覆盖率与字段质量
+
+## 10. 源文档映射表
+
+| 主题 | 主要原始文档 |
+| --- | --- |
+| 诊断与渲染链问题定位 | [017_hybrid_renderer_diagnostic.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/017_hybrid_renderer_diagnostic.md), [020_canvas_color_pipeline_stability_fix.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/020_canvas_color_pipeline_stability_fix.md) |
+| auto-fill / topology / picking 修复 | [018_autofill_color_fix.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/018_autofill_color_fix.md), [019_topology_pipeline_fix.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/019_topology_pipeline_fix.md), [024_hit_selection_consistency_and_country_pick_fix.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/024_hit_selection_consistency_and_country_pick_fix.md) |
+| projection / border / coastline / source alignment | [021_projection_wrap_artifact_regression.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/021_projection_wrap_artifact_regression.md), [022_projection_wrap_artifact_fix_and_sidebar_ui_alignment.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/022_projection_wrap_artifact_fix_and_sidebar_ui_alignment.md), [023_subdivision_restore_and_hierarchical_border_strategy.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/023_subdivision_restore_and_hierarchical_border_strategy.md), [025_border_completeness_and_coastline_render_fix.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/025_border_completeness_and_coastline_render_fix.md) |
+| ocean / context layers | [026_ocean_hit_and_ocean_style_upgrade.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/026_ocean_hit_and_ocean_style_upgrade.md), [027_ocean_mask_fallback_and_visual_delta.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/027_ocean_mask_fallback_and_visual_delta.md), [028_ocean_styles_temp_disabled_and_ocean_fill_color.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/028_ocean_styles_temp_disabled_and_ocean_fill_color.md), [QA-032_context_layers_toggle_and_styles_global_fix.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa/archive/pre_ui_execution/QA-032_context_layers_toggle_and_styles_global_fix.md) |
+| subdivision 可见性、工具绑定、本地 vendor | [QA-029_subdivision_visibility_and_tool_binding_fix_2026-02-25.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa/archive/pre_ui_execution/QA-029_subdivision_visibility_and_tool_binding_fix_2026-02-25.md) |
+| parent border 动态分组 | [QA-031_parent_border_country_toggle_de_gb_dynamic_2026-02-25.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa/archive/pre_ui_execution/QA-031_parent_border_country_toggle_de_gb_dynamic_2026-02-25.md) |
+| Special Zone 编辑器 | [015_special_zones_design.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/015_special_zones_design.md), [QA-033_special_zone_manual_editor_project_local.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa/archive/pre_ui_execution/QA-033_special_zone_manual_editor_project_local.md) |
+| 性能止血执行切片 | [011_performance_plan.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/011_performance_plan.md), [016_global_admin2_performance_roadmap.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/016_global_admin2_performance_roadmap.md), [PERF_PLAN_A_PROGRESS_2026-02-25.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa/archive/pre_ui_execution/PERF_PLAN_A_PROGRESS_2026-02-25.md) |
+
+## 11. 使用建议
+
+如果你关心的是“前 UI 阶段地图渲染和交互已经做成了什么”，优先读这份文档；如果你要追具体问题的诊断过程，再回看 archive。历史截图、临时证据与自动生成报表已经从主阅读路径中移除。

@@ -99,7 +99,7 @@ Only notable failure:
 
 ### Screenshot
 
-- `qa/artifacts/qa038_render_profile_auto.png`
+历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。
 
 ## Build Verification
 
@@ -204,3 +204,5 @@ All passed.
 - Compatibility posture for ordinary hardware is improved.
 - Architectural risk visibility is improved.
 - Full plan is not complete yet; strict-mode failures identify the next mandatory cleanup tranche.
+
+> 历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。

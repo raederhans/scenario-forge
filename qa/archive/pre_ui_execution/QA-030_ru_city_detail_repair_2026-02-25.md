@@ -80,4 +80,3 @@
 ## Notes
 1. `python tools/generate_hierarchy.py` 在直接脚本模式会触发 `sjoin_nearest` 的 CRS 警告（历史行为）；当前不影响本次 RU 城市注入结果。  
 2. 验收建议在前端进一步做一次交互回归（Subdivision 填色/擦除/hover）以覆盖 UI 侧可见性。
-

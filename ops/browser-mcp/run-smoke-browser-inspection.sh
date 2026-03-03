@@ -155,7 +155,7 @@ def defaults_map():
         "EVIDENCE_NETWORK_FAILED_ONLY": get_bool(evidence, "network_failed_only", True),
 
         "OUTPUT_ARTIFACT_DIR": get_str(outputs, "artifact_dir", ".mcp-artifacts"),
-        "OUTPUT_REPORT_PATH": get_str(outputs, "report_path", "docs/ai-browser-mcp-smoketest.md"),
+        "OUTPUT_REPORT_PATH": get_str(outputs, "report_path", "reports/generated/browser/ai-browser-mcp-smoketest.md"),
     }
     return data
 
@@ -251,6 +251,7 @@ SHOT_DIR="$ART_DIR/screenshots"
 LOG_DIR="$ART_DIR/logs"
 REPORT_OUT="$OUTPUT_REPORT_PATH"
 mkdir -p "$ART_DIR" "$SHOT_DIR" "$LOG_DIR"
+mkdir -p "$(dirname "$REPORT_OUT")"
 
 TS="$(date +%Y%m%d-%H%M%S)"
 RUN_LOG="$LOG_DIR/smoke-run-$TS.log"

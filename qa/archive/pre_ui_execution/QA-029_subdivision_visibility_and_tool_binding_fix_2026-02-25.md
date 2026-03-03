@@ -51,10 +51,8 @@
 - 世界视图与 zoom-in(约 k=3) 下，subdivision 边界可见性提升，hover 命中正常。
 
 ## Evidence Artifacts
-- `.mcp-artifacts/playwright_default_after_subdivision_visibility_tune.png`
-- `.mcp-artifacts/playwright_zoom3_after_tune.png`
-- `.mcp-artifacts/playwright_fr_bounds_clicks.png`
-- `.mcp-artifacts/playwright_granularity_regression.png`
+
+历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。
 
 ## Known Constraints
 - `detail` 数据覆盖仍是 “91 国细分 + 106 国国家级兜底”（数据覆盖边界，不是渲染删除）。
@@ -65,3 +63,5 @@
 - subdivision 数据与边界确实在渲染；
 - country/subdivision/eraser/eyedropper 交互链路可用；
 - 同时消除了 CDN 依赖导致的误判风险。
+
+> 历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。

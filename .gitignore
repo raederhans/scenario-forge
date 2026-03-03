@@ -34,3 +34,6 @@ http_server_*.log
 
 # Generated QA screenshot dumps
 qa/screenshots_qa*/
+
+# Generated reports and derived evidence
+reports/generated/

@@ -162,7 +162,6 @@ UA_RAIONS_PATH = "data/sources/ukraine_raions_gadm36.geojson"
 # Countries to fully replace (remove all NUTS features for these)
 FULL_REPLACE_COUNTRIES = {"FR", "UA"}
 
-
 def fetch_france_full() -> gpd.GeoDataFrame:
     """
     Download ALL France arrondissements to replace entire country.
@@ -183,7 +182,6 @@ def fetch_france_full() -> gpd.GeoDataFrame:
 
     print(f"Loaded {len(gdf)} French arrondissements")
     return gdf[["id", "name", "cntr_code", "geometry"]]
-
 
 def load_ukraine_raions() -> gpd.GeoDataFrame:
     """
@@ -207,7 +205,6 @@ def load_ukraine_raions() -> gpd.GeoDataFrame:
 
     print(f"Loaded {len(gdf)} Ukrainian raions")
     return gdf[["id", "name", "cntr_code", "geometry"]]
-
 
 def apply_full_replacements(base_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     """

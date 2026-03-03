@@ -8,7 +8,7 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const SCREENSHOT_DIR = join(__dirname, "..", "qa", "screenshots_qa044");
+const SCREENSHOT_DIR = join(__dirname, "..", "reports", "generated", "boundary_gap");
 const BASE_URL = "http://localhost:8000/?render_profile=auto";
 
 function delay(ms) {

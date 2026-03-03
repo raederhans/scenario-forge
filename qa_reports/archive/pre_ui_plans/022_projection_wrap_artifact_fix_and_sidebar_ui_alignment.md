@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-23  
 **Environment:** `http://127.0.0.1:8000/` (Edge via Playwright MCP)  
-**Related:** `qa_reports/021_projection_wrap_artifact_regression.md`
+**Related:** `./021_projection_wrap_artifact_regression.md`
 
 ---
 
@@ -101,16 +101,8 @@
 ## 4) 截图路径（before / after）
 
 ### Before（回归现象）
-- `.mcp-artifacts/screenshots/route-home-quick-20260222-203018.png`
-- `.mcp-artifacts/screenshots/manual-prod-after-autofill.png`
-- `.mcp-artifacts/screenshots/manual-artifacts-mode.png`
 
 ### After（修复后）
-- `.mcp-artifacts/screenshots/qa022-home-prod.png`
-- `.mcp-artifacts/screenshots/qa022-autofill-prod.png`
-- `.mcp-artifacts/screenshots/qa022-artifacts-debug.png`
-- `.mcp-artifacts/screenshots/qa022-rightbar-project-section.png`
-- `.mcp-artifacts/screenshots/qa022-rightbar-bottom.png`
 
 ---
 
@@ -119,3 +111,5 @@
 1. 当前默认规避了 `.bak` 路径风险，但 `legacy_bak` 显式开关依然保留，仅建议用于调试/对照，不建议生产默认。
 2. 异常几何 blocklist 目前为已知 3 个 RU ID；若后续数据源变动产生新异常，建议在 pipeline 侧做几何体质检并前置清洗。
 3. `favicon.ico 404` 仍存在，可补充静态资源或在服务层禁用该请求噪音。
+
+> 历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。

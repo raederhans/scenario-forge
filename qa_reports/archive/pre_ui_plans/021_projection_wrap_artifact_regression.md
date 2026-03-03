@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-23  
 **Environment:** `http://127.0.0.1:8000/` (Edge via Playwright MCP)  
-**Related Reports:** `qa_reports/017_hybrid_renderer_diagnostic.md`, `qa_reports/020_canvas_color_pipeline_stability_fix.md`
+**Related Reports:** `./017_hybrid_renderer_diagnostic.md`, `./020_canvas_color_pipeline_stability_fix.md`
 
 ---
 
@@ -38,14 +38,7 @@ This confirms the active render dataset is the fallback `.bak`.
 
 ## 3. Screenshot Evidence
 
-- Baseline white-mask symptom:  
-  `.mcp-artifacts/screenshots/route-home-quick-20260222-203018.png`
-- Debug `ARTIFACTS` mode (red giant overlays):  
-  `.mcp-artifacts/screenshots/manual-artifacts-mode.png`
-- After `Auto-Fill Countries` in `PROD` (blue giant mask):  
-  `.mcp-artifacts/screenshots/manual-prod-after-autofill.png`
-- After autofill while still in artifacts debug (for visibility):  
-  `.mcp-artifacts/screenshots/manual-after-autofill.png`
+历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。
 
 Visual behavior is consistent with user report:
 
@@ -124,3 +117,5 @@ So a stale/problematic detailed artifact path is automatically selected.
 
 This is a **render artifact regression caused by giant wrap-like RU subdivision geometries in fallback topology** plus permissive culling/allowlist logic.  
 Autofill logic itself is functioning; the visual layer is dominated by malformed giant features.
+
+> 历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。

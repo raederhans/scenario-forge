@@ -10,6 +10,10 @@ Capabilities include:
 - collect failed network request signals
 - save screenshots and evidence under `.mcp-artifacts/`
 
+Notes:
+- `.mcp-artifacts/` is a temporary runtime evidence directory, not a source-doc location.
+- Long-lived generated reports should go under `reports/generated/`.
+
 ## One-time setup and checks
 1. Verify MCP is configured:
 ```bash
@@ -91,7 +95,7 @@ This will:
 - otherwise start `python3 tools/dev_server.py`
 - run browser smoke flow via Playwright CLI MCP commands on Edge
 - auto-fallback to a Windows-local `http.server` when Edge cannot reach a WSL-bound localhost endpoint
-- write report to `docs/ai-browser-mcp-smoketest.md`
+- write report to `reports/generated/browser/ai-browser-mcp-smoketest.md`
 
 CLI contracts:
 - `--profile <path>` default `ops/browser-mcp/inspection-profile.toml`

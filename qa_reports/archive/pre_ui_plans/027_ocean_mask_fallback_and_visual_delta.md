@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-24  
 **Environment:** `http://localhost:8000/` (quick smoke + static checks)  
-**Related:** `qa_reports/026_ocean_hit_and_ocean_style_upgrade.md`
+**Related:** `./026_ocean_hit_and_ocean_style_upgrade.md`
 
 ---
 
@@ -58,18 +58,15 @@
 - 记录到已知噪音（文档页/README 路由）：
   - `GET /data/favicon.ico 404`
   - `TypeError: $(...).ready is not a function`
-- 来源：`.mcp-artifacts/logs/console-issues-20260224-165626.txt`
+
 - 拓扑抽样：当前 `objects.ocean` 合并 bbox 比例约 `0.064679`（明显低于 `0.35` 阈值），会触发 runtime fallback。
 
 ## Network
 - 地图主页相关检查未出现新增关键 4xx/5xx 失败。
-- 来源：`.mcp-artifacts/logs/network-route-*.log`
 
 ## Screenshots
-- `.mcp-artifacts/screenshots/route-home-quick-20260224-165626.png`
-- `.mcp-artifacts/screenshots/section-left_sidebar-quick-20260224-165626.png`
-- `.mcp-artifacts/screenshots/section-right_sidebar-quick-20260224-165626.png`
-- `.mcp-artifacts/screenshots/gesture-map_pan_zoom-quick-20260224-165626.png`
+
+历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。
 
 ## Reproduction / Verification
 1. 运行数据构建：`python3 init_map_data.py`
@@ -91,3 +88,5 @@
 1. `sphere_minus_land` 依赖 `evenodd` clip；在极旧 Canvas 实现上可能退化为普通 clip。
 2. 当前 bathymetry 仍是程序化视觉模拟，非真实海深数据。
 3. 若后续切回区域地图（非 global bounds），建议将 bbox 阈值改为配置化比例阈值。
+
+> 历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。

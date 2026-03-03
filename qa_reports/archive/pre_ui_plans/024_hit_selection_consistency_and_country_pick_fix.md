@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-24  
 **Environment:** `http://localhost:8000/` (Edge via Playwright MCP quick smoke)  
-**Related:** `qa_reports/023_subdivision_restore_and_hierarchical_border_strategy.md`
+**Related:** `./023_subdivision_restore_and_hierarchical_border_strategy.md`
 
 ---
 
@@ -73,10 +73,8 @@
 - 最新 quick smoke 的 network summary 未出现首页关键资源 4xx/5xx。
 
 ## Screenshots
-- `.mcp-artifacts/screenshots/route-home-quick-20260224-102307.png`
-- `.mcp-artifacts/screenshots/gesture-map_pan_zoom-quick-20260224-102307.png`
-- `.mcp-artifacts/screenshots/section-left_sidebar-quick-20260224-102307.png`
-- `.mcp-artifacts/screenshots/section-right_sidebar-quick-20260224-102307.png`
+
+历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。
 
 ## Repro
 1. 启动：`python3 tools/dev_server.py`
@@ -100,3 +98,5 @@
 1. `spatialIndex` 字段仍保留，但已退化为兼容占位（主命中不再使用）。
 2. 在极端稀疏海域，8px 吸附可能带来“边缘点选到近邻岛屿”的少量主观差异；当前通过 `geoContains` 优先排序与距离排序压制误选。
 3. 本次未启用 hidden hit-canvas 路径；如后续几何量继续上升，可再评估像素拾取架构。
+
+> 历史截图与临时证据文件已在文档清理阶段移除；结论以 canonical summary 为准。

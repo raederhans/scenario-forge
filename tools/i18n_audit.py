@@ -187,8 +187,14 @@ def main() -> None:
     repo_root = args.repo_root.resolve()
     locales_path = args.locales or (repo_root / "data" / "locales.json")
     topology_path = args.topology or resolve_default_topology(repo_root)
-    markdown_out = args.markdown_out or (repo_root / "docs" / "translation_coverage_report.md")
-    json_out = args.json_out or (repo_root / "qa_reports" / "translation_coverage_report.json")
+    markdown_out = (
+        args.markdown_out
+        or (repo_root / "reports" / "generated" / "translation" / "translation_coverage_report.md")
+    )
+    json_out = (
+        args.json_out
+        or (repo_root / "reports" / "generated" / "translation" / "translation_coverage_report.json")
+    )
 
     locales = load_locales(locales_path)
     code_strings = collect_code_strings(repo_root)

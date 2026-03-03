@@ -33,8 +33,8 @@ echo [i18n] Done.
 echo [i18n] Outputs:
 echo   - data\geo_aliases.json
 echo   - data\locales.json
-echo   - docs\translation_coverage_report.md
-echo   - qa_reports\translation_coverage_report.json
+echo   - reports\generated\translation\translation_coverage_report.md
+echo   - reports\generated\translation\translation_coverage_report.json
 echo.
 pause
 exit /b 0

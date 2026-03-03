@@ -1,161 +1,148 @@
-﻿# 数据与加载逻辑专项评估（2026-02-24）
+# 前 UI 已实现功能总账 A：数据构建、加载链路、区域扩展与输入资产
 
-## 1. 目标
+## 1. 文档定位
 
-本报告聚焦三件事：
+这份文档是前 UI 阶段的数据与构建链路总结，覆盖 2026-01-25 到 2026-02-26 之间已经确定落地的能力。它替代了早期散落在 `qa_reports/001-028` 与 `qa/QA-029..033` 里的阅读入口，用于回答两个问题：
 
-- 加载逻辑是否在默认路径上引入了不必要的运行成本。
-- 数据构建链路是否把“构建成本”错误地绑进“开发启动成本”。
-- 在不立即改代码前，如何先建立可执行的性能压测与预算体系。
+1. 数据侧到底已经实现了什么。
+2. 现有运行链路和构建产物是怎样形成的。
 
-## 2. 当前加载逻辑体检
+原始过程文档已移入归档：
+- [qa_reports/archive/pre_ui_plans](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans)
+- [qa/archive/pre_ui_execution](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa/archive/pre_ui_execution)
 
-## 2.1 运行时加载路径
+## 2. 已落地的数据资产与输入来源
 
-- 入口：`js/main.js:49-65` 调 `loadMapData()`。
-- `loadMapData()` 并行加载 topology + locales + aliases + hierarchy（`js/core/data_loader.js:186-200`）。
-- topology 默认策略：
-  - `topologyPrimary = data/europe_topology.json`
-  - `topologyDetail = data/europe_topology.json.bak`（默认 detail source）
-  - 未关闭 detail 时进入 composite（`js/core/data_loader.js:137-170`）。
+前 UI 阶段已经把单一欧洲底图推进到了“多源拼接、分层构建、可持续扩展”的数据链路。已确认接入或建立过稳定接入方案的输入资产包括：
 
-### 运行时主要问题
+- Natural Earth：
+  - `admin_0` / `admin_1`
+  - land / ocean / rivers / urban / physical
+- NUTS 系列欧洲细分数据
+- 法国 arrondissement 数据
+- 波兰 powiaty 数据
+- 中国 ADM2 替换数据
+- 俄罗斯城市级覆盖数据
+- 特殊区域手工/程序化生成数据
 
-1. **默认 detail 过重**
-- 对用户是“默认即高压档位”，不是“按需升级档位”。
+这些输入已经不再只是“下载后手工试验”，而是被纳入 `init_map_data.py` 与 `map_builder/` 处理器链路，最终汇总为 TopoJSON、层级信息、别名和本地化输出。
 
-2. **UI/状态数据覆盖不对称**
-- `countryNames` 只有约 60 个国家，而主拓扑覆盖约 197 国，导致 UI 对数据规模支撑不足。
+## 3. 区域扩展成果
 
-3. **可选层开关与绘制链路不一致**
-- 运行时加载了多层数据，但主渲染链路并未对所有层建立明确性能策略（是否绘制、何时绘制、何时降级）。
+### 3.1 从西欧到欧亚大区
 
-## 2.2 开发启动路径
+前 UI 阶段最重要的成果之一，是把地图范围从“西欧可用”推进到“欧洲 + 俄罗斯 + 中亚 + 东亚”的可运行状态。
 
-- `start_dev.bat`：先 `build_data.bat` 再 `run_server.bat`。
-- `build_data.bat`：每次执行 `python init_map_data.py`。
+已完成或已稳定接入的区域扩展包括：
 
-这会带来两个直接负担：
+- 俄罗斯与中亚扩展
+  - 去除乌拉尔以西硬截断
+  - 把 RU / KZ / UZ / TM / KG / TJ 纳入 admin-1 扩展链路
+- 高加索与蒙古扩展
+  - GE / AM / AZ / MN 加入扩展国家集合
+- 东亚扩展
+  - JP / KR / KP / TW 进入 admin-1 扩展路径
+  - 中国单独走 ADM2 替换路径，避免与 admin-1 重叠
+- 法国、波兰、乌克兰等高细节替换策略明确并在部分国家落地
 
-1. **开发冷启动成本被放大**
-- 你每次启动开发都可能触发完整数据构建。
+### 3.2 重点国家/地区专项
 
-2. **与功能重构节奏冲突**
-- 你正在做前端交互重构，数据层大构建并非每次都必要。
+- 法国：从 départements 进一步支持 arrondissement 级替换与历史边界方案。
+- 波兰：确认 NUTS-3 已能直接支撑 powiat 级分组。
+- 乌克兰：纳入混合替换与后续精细化路线图。
+- 俄罗斯：补上 Moscow / Saint Petersburg / Volgograd / Arkhangelsk 四个城市级稳定覆盖。
+- 波黑 / 科索沃：补齐 Balkan 数据缺口方案。
 
-## 3. 数据构建链路体检
+## 4. 层级、别名与本地化协同
 
-`init_map_data.py` 当前职责很重：
+前 UI 阶段不只是把 geometry 接进来，还建立了围绕运行时编辑所需的辅助数据链路。
 
-- 依赖检查/安装（`init_map_data.py:24-40`）
-- 多源抓取、裁剪、替换、融合
-- 拓扑输出（`init_map_data.py:799-809`）
-- 层级生成、geo key 归一化、翻译同步（`init_map_data.py:811-818`）
+### 4.1 hierarchy 分组能力
 
-### 关键问题
+已落地能力：
 
-1. **构建过程是“大一统脚本”**
-- 对生产可行，但对开发阶段不友好。
+- 法国可按 department 推导父级
+- 波兰可按 voivodeship 推导父级
+- 中国分组可行性审计完成，并形成外部 linkage / spatial join 路线
+- 俄罗斯城市级覆盖写入 hierarchy
+- DE / GB 等后续 parent border 分组依赖的数据基础已形成
 
-2. **增量构建策略弱**
-- 缺少按输入变更触发的最小重建。
+### 4.2 alias 与 locale
 
-3. **翻译/层级后处理总是串行追加**
-- 在只调前端交互时也可能被动承担构建链成本。
+已落地能力：
 
-## 4. 不必要性能负担清单（数据/加载维度）
+- `data/locales.json` 成为地理名称与 UI 文案的统一入口
+- `tools/translate_manager.py` 能从拓扑结果继续生成/补齐翻译
+- `geo alias -> stable key` 链路被纳入运行时
+- 运行时 country list、preset、search、hierarchy 不再完全依赖硬编码英文名
 
-### P0
+## 5. 数据构建链与运行加载链
 
-1. 默认进入 composite（8k+ features）。
-2. 开发启动默认先全量构建数据。
+### 5.1 构建链
 
-### P1
+前 UI 阶段已经形成这条主路径：
 
-1. 构建脚本职责过多，缺乏 profile 化（preview/full）。
-2. 运行期缺少“按档位加载策略”显式切换。
+1. 原始数据抓取 / 缓存
+2. 裁剪、清洗、简化、替换
+3. 政治层与上下文层汇总
+4. TopoJSON 构建
+5. hierarchy / locale / alias 生成或同步
+6. 输出到 `data/` 供前端运行时加载
 
-### P2
+核心文件与模块：
 
-1. UI country 元数据与拓扑覆盖范围不一致。
-2. 层开关与数据加载/渲染策略需要统一协议。
+- `init_map_data.py`
+- `map_builder/config.py`
+- `map_builder/geo/topology.py`
+- `map_builder/processors/*`
+- `tools/generate_hierarchy.py`
+- `tools/translate_manager.py`
 
-## 5. 建议的优化架构（不改代码版设计）
+### 5.2 运行时加载链
 
-## 5.1 运行档位策略
+已落地的运行时数据加载特征包括：
 
-建议至少定义 3 档：
+- 从单拓扑过渡到 `primary + detail` 的 bundle/composite 模式
+- `detail_layer=off` / `detail_source=...` 等显式参数控制
+- topology variant 显式选择，移除隐式 `.bak` 自动回退
+- 背景层与政治层来源分离，避免 composite 模式下底图缺层
+- hierarchy / locales / aliases 与 topology 一起进入运行时状态
 
-- `preview`：仅 primary（admin0），用于前端交互开发。
-- `balanced`：primary + 受控 detail（白名单国家或分块）。
-- `full`：完整 detail，主要用于发布前验收。
+## 6. 已解决的 pipeline 问题
 
-## 5.2 启动脚本策略
+前 UI 阶段已经实质解决或建立稳定修复路径的问题包括：
 
-- `start_dev_fast`：直接起服务，不跑数据构建。
-- `build_data_full`：手动触发全量构建。
-- `build_data_incremental`：基于输入哈希/时间戳做增量。
+- bounding box 只筛选不裁剪导致的“全球杂质露出”
+- 过度简化造成的拓扑破碎与边界撕裂
+- `cntr_code` 缺失或推导脆弱导致的 country-level 配色失效
+- geometry 顶层 `id` 为数字索引导致的运行时 lookup 不稳定
+- 邻接图仅依赖 shared arcs 导致的 country neighbor graph 缺边
+- auto-fill 与 topology / hierarchy / locale 不一致
+- 俄罗斯城市 detail 缺失与命名不稳定
+- China / France / Poland 等多源替换后的分组与标识协同问题
 
-## 5.3 数据产物策略
+## 7. 当前保留的运行方式与限制
 
-- 拆分“运行核心拓扑”和“可选上下文层”。
-- detail 可按国家或区域分片，按需加载。
+这些是前 UI 阶段总结后仍然保留的现实约束，不应被误读为“已经彻底解决”：
 
-## 6. 性能压测方案（你本机执行）
+- 构建链仍然较重，`init_map_data.py` 与 `map_builder/` 仍承载大量流程责任
+- 数据缓存与源站 schema 漂移仍有维护成本
+- 不同国家/地区的 granularity 仍是混合档位，不是全局一致 ADM2
+- 部分 hierarchy 能力依赖外部 linkage 或后处理，不是所有国家都天然具备
+- 运行时的 composite/detail 策略已经可控，但仍需要在性能与细节之间取舍
 
-## 6.1 目标
+## 8. 源文档映射表
 
-建立“同一套动作在不同数据档位下”的可比较结果。
+| 主题 | 主要原始文档 |
+| --- | --- |
+| 初始审计与修复范围 | [001_audit_and_repair_plan.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/001_audit_and_repair_plan.md), [002_feature_spec.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/002_feature_spec.md), [003_topojson_migration_plan.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/003_topojson_migration_plan.md) |
+| 法国/波兰/乌克兰/中国等替换策略 | [004_refinement_france.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/004_refinement_france.md), [005_holistic_replacement_strategy.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/005_holistic_replacement_strategy.md), [008_east_asia_plan.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/008_east_asia_plan.md), [010_russia_hybrid_plan.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/010_russia_hybrid_plan.md) |
+| 区域扩展 | [006_russia_expansion_plan.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/006_russia_expansion_plan.md), [007_caucasus_mongolia_plan.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/007_caucasus_mongolia_plan.md), [014_south_asia_survey.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/014_south_asia_survey.md) |
+| hierarchy / grouping | [009_hierarchy_plan.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/009_hierarchy_plan.md) |
+| 构建架构与性能路线 | [011_performance_plan.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/011_performance_plan.md), [012_architecture_audit.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/012_architecture_audit.md), [013_refactoring_blueprint.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/013_refactoring_blueprint.md), [016_global_admin2_performance_roadmap.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/016_global_admin2_performance_roadmap.md) |
+| auto-fill / topology / color pipeline 修复 | [018_autofill_color_fix.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/018_autofill_color_fix.md), [019_topology_pipeline_fix.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/019_topology_pipeline_fix.md), [020_canvas_color_pipeline_stability_fix.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans/020_canvas_color_pipeline_stability_fix.md) |
+| RU 城市覆盖执行 | [QA-030_ru_city_detail_repair_2026-02-25.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa/archive/pre_ui_execution/QA-030_ru_city_detail_repair_2026-02-25.md) |
 
-## 6.2 测试矩阵
+## 9. 使用建议
 
-### 维度A：运行模式
-
-1. `?detail_layer=off`
-2. 默认（composite）
-
-### 维度B：交互动作
-
-1. 连续缩放+平移（20s）
-2. 批量填色（100 次点击）
-3. 自动填色（5 次）
-4. hover 扫描（10s）
-
-### 维度C：指标
-
-1. 平均 FPS、P95 帧耗时
-2. Main thread long tasks
-3. 单次填色响应耗时（P50/P95）
-4. 内存峰值
-
-## 6.3 记录模板
-
-| 模式 | 场景 | Avg FPS | P95 帧耗时(ms) | Long Tasks | 填色P95(ms) | 结论 |
-|---|---|---:|---:|---:|---:|---|
-| detail_off | 缩放平移 |  |  |  |  |  |
-| composite | 缩放平移 |  |  |  |  |  |
-| detail_off | 批量填色 |  |  |  |  |  |
-| composite | 批量填色 |  |  |  |  |  |
-
-## 6.4 建议阈值
-
-- 开发默认档：Avg FPS >= 50，P95 帧耗时 <= 25ms。
-- composite 档：Avg FPS >= 30，P95 帧耗时 <= 45ms。
-- 批量填色：P95 <= 100ms。
-
-## 7. 对你当前重构的影响评估
-
-结论：**会影响，而且是正向约束影响**。
-
-- 如果不先建立“档位 + 预算 + 压测基线”，后续重构会在不同机型反复返工。
-- 如果先把运行模式和性能预算固定，显示/缩放/填色重构会更稳定。
-
-建议执行顺序：
-
-1. 先把压测基线跑出来（不改代码）。
-2. 再做渲染链路优化（可见集/缓存/交互降级）。
-3. 最后扩大 detail 覆盖或新增地块规模。
-
-## 8. 本轮结论
-
-当前“卡顿”不是单个 bug，而是默认加载档位与渲染复杂度错配。先收敛运行档位，再推进你正在做的重构，收益最大、返工最小。
+如果你要快速判断“数据侧现在已经有什么”，先读这份文档；如果你要追具体实现背景，再顺着映射表回 archive。原始截图、临时证据与自动生成报表已经在文档清理阶段移出主阅读路径。

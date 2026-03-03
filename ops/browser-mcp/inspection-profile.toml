@@ -48,7 +48,7 @@ network_failed_only = true
 
 [outputs]
 artifact_dir = ".mcp-artifacts"
-report_path = "docs/ai-browser-mcp-smoketest.md"
+report_path = "reports/generated/browser/ai-browser-mcp-smoketest.md"
 
 [[routes]]
 id = "home"
