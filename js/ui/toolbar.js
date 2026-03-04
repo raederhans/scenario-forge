@@ -514,10 +514,13 @@ function initToolbar({ render } = {}) {
     const code = String(state.activeSovereignCode || "").trim().toUpperCase();
     if (!code) {
       activeSovereignLabel.textContent = t("None selected", "ui");
-      return;
+    } else {
+      const label = String(state.countryNames?.[code] || code).trim() || code;
+      activeSovereignLabel.textContent = `${t(label, "geo") || label} (${code})`;
     }
-    const label = String(state.countryNames?.[code] || code).trim() || code;
-    activeSovereignLabel.textContent = `${t(label, "geo") || label} (${code})`;
+    if (typeof state.renderPresetTreeFn === "function") {
+      state.renderPresetTreeFn();
+    }
   };
   state.updateActiveSovereignUIFn = refreshActiveSovereignLabel;
   const refreshDynamicBorderStatus = () => {

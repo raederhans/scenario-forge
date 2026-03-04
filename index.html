@@ -802,19 +802,19 @@
             </div>
           </div>
 
-          <details class="card inspector-section" open>
+          <details id="countryInspectorSection" class="card inspector-section" open>
             <summary id="lblCountryInspector" class="section-header">Country Inspector</summary>
             <div class="inspector-panel-body">
               <div id="lblCountryColors" class="section-header-block">Country Colors</div>
               <p id="countryInspectorOrderingHint" class="sidebar-tool-hint inspector-ordering-hint mt-2">
-                Key countries first, then A-Z
+                Key scenario countries first. Releasables appear under parent countries.
               </p>
               <div id="countryList" class="country-list inspector-scroll mt-3"></div>
               <div id="countryInspectorDetail" class="inspector-detail-card mt-3">
                 <div id="countryInspectorEmpty" class="inspector-empty-state">
-                  <div id="countryInspectorEmptyTitle" class="section-header-block">Select a country to edit</div>
+                  <div id="countryInspectorEmptyTitle" class="section-header-block">Select a country to inspect</div>
                   <p id="countryInspectorEmptyHint" class="sidebar-tool-hint">
-                    Choose a country above to edit its color, active sovereign state, groups, and presets.
+                    Choose a country above to inspect its identity, territories, presets, and releasables.
                   </p>
                 </div>
                 <div id="countryInspectorSelected" class="hidden">
@@ -828,20 +828,11 @@
 
                   <div class="inspector-detail-actions mt-3">
                     <button id="countryInspectorSetActive" type="button" class="btn-secondary inspector-detail-primary-btn">Set Active</button>
+                    <button id="countryInspectorBackToParent" type="button" class="btn-secondary hidden">Back to Parent</button>
                     <label class="inspector-detail-color-field" for="countryInspectorColorInput">
                       <span id="lblCountryInspectorColor" class="inspector-mini-label">Current Color</span>
                       <input id="countryInspectorColorInput" type="color" class="color-input" aria-label="Current Color" />
                     </label>
-                  </div>
-
-                  <div class="inspector-detail-section mt-3">
-                    <div id="lblCountryInspectorGroups" class="section-header-block">Country Groups</div>
-                    <div id="countryInspectorGroups" class="inspector-action-list mt-2"></div>
-                  </div>
-
-                  <div class="inspector-detail-section mt-3">
-                    <div id="lblCountryInspectorPresets" class="section-header-block">Country Presets</div>
-                    <div id="countryInspectorPresets" class="inspector-action-list mt-2"></div>
                   </div>
                 </div>
               </div>
@@ -849,11 +840,11 @@
             </div>
           </details>
 
-          <details class="card inspector-section">
-            <summary id="lblPresetsHierarchy" class="section-header">All Presets &amp; Hierarchy</summary>
+          <details id="selectedCountryActionsSection" class="card inspector-section">
+            <summary id="lblPresetsHierarchy" class="section-header">Territories &amp; Presets</summary>
             <div class="inspector-panel-body">
-              <div class="section-header-block" id="lblHistoricalPresets">Historical Presets</div>
-              <p class="tip-text mt-2">Click to fill regions with active color</p>
+              <div class="section-header-block" id="lblHistoricalPresets">Selected Country Actions</div>
+              <p id="selectedCountryActionHint" class="tip-text mt-2">Choose a country above to inspect territories, presets, and releasables.</p>
               <div id="presetTree" class="inspector-scroll preset-tree mt-3"></div>
             </div>
           </details>

@@ -17,6 +17,7 @@ const RU_CITY_OVERRIDES_URL = "data/ru_city_overrides.geojson";
 const SPECIAL_ZONES_URL = "data/special_zones.geojson";
 const RUNTIME_POLITICAL_URL = "data/europe_topology.runtime_political_v1.json";
 const PALETTE_REGISTRY_URL = "data/palettes/index.json";
+const RELEASABLE_CATALOG_URL = "data/releasables/hoi4_vanilla.internal.phase1.catalog.json";
 const RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
 
 function getSearchParams() {
@@ -332,6 +333,7 @@ export async function loadMapData({
   specialZonesUrl = SPECIAL_ZONES_URL,
   runtimePoliticalUrl = RUNTIME_POLITICAL_URL,
   paletteRegistryUrl = PALETTE_REGISTRY_URL,
+  releasableCatalogUrl = RELEASABLE_CATALOG_URL,
   d3Client = globalThis.d3,
 } = {}) {
   if (!d3Client || typeof d3Client.json !== "function") {
@@ -351,6 +353,10 @@ export async function loadMapData({
     console.warn("Palette registry missing or invalid, continuing with legacy palette fallback.", err);
     return null;
   });
+  const releasableCatalogPromise = d3Client.json(releasableCatalogUrl).catch((err) => {
+    console.warn("Releasable catalog missing or invalid, continuing without releasable overlays.", err);
+    return null;
+  });
 
   const [
     localeData,
@@ -360,6 +366,7 @@ export async function loadMapData({
     specialZones,
     runtimePoliticalTopology,
     paletteRegistry,
+    releasableCatalog,
   ] = await Promise.all([
     d3Client.json(localesUrl).catch((err) => {
       console.warn("Locales file missing or invalid, using defaults.", err);
@@ -401,6 +408,7 @@ export async function loadMapData({
     }),
     runtimePoliticalPromise,
     paletteRegistryPromise,
+    releasableCatalogPromise,
   ]);
 
   let activePaletteMeta = null;
@@ -442,6 +450,7 @@ export async function loadMapData({
     specialZones,
     runtimePoliticalTopology,
     paletteRegistry,
+    releasableCatalog,
     activePaletteMeta,
     activePalettePack,
     activePaletteMap,

@@ -1,0 +1,584 @@
+{
+  "version": 1,
+  "catalog_id": "hoi4_vanilla.internal.phase1",
+  "generated_at": "2026-03-04T03:33:25.820704+00:00",
+  "scenario_ids": [
+    "hoi4_1936"
+  ],
+  "entries": [
+    {
+      "tag": "BAY",
+      "display_name": "Bavaria",
+      "color_hex": "#e9e7f6",
+      "capital_state_id": 52,
+      "parent_owner_tag": "GER",
+      "parent_owner_tags": [
+        "GER"
+      ],
+      "release_lookup_iso2": "DE",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "hoi4_1936"
+      ],
+      "scenario_only": true,
+      "preset_source": {
+        "type": "legacy_preset_name",
+        "name": "Bavaria",
+        "group_ids": [],
+        "feature_ids": []
+      },
+      "core_state_ids": [
+        52,
+        53,
+        54
+      ],
+      "resolved_feature_count_hint": null,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "German internal releasable. Runtime geometry reuses the existing Bavaria preset."
+    },
+    {
+      "tag": "SAX",
+      "display_name": "Saxony",
+      "color_hex": "#666600",
+      "capital_state_id": 65,
+      "parent_owner_tag": "GER",
+      "parent_owner_tags": [
+        "GER"
+      ],
+      "release_lookup_iso2": "DE",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "hoi4_1936"
+      ],
+      "scenario_only": true,
+      "preset_source": {
+        "type": "legacy_preset_name",
+        "name": "Saxony",
+        "group_ids": [],
+        "feature_ids": []
+      },
+      "core_state_ids": [
+        65
+      ],
+      "resolved_feature_count_hint": null,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "German internal releasable. Runtime geometry reuses the existing Saxony preset."
+    },
+    {
+      "tag": "SHL",
+      "display_name": "Schleswig",
+      "color_hex": "#3333ff",
+      "capital_state_id": 58,
+      "parent_owner_tag": "GER",
+      "parent_owner_tags": [
+        "GER"
+      ],
+      "release_lookup_iso2": "DE",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "hoi4_1936"
+      ],
+      "scenario_only": true,
+      "preset_source": {
+        "type": "legacy_preset_name",
+        "name": "Schleswig-Holstein",
+        "group_ids": [],
+        "feature_ids": []
+      },
+      "core_state_ids": [
+        58,
+        909
+      ],
+      "resolved_feature_count_hint": null,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "German internal releasable. Runtime geometry reuses the existing Schleswig-Holstein preset."
+    },
+    {
+      "tag": "SCO",
+      "display_name": "Scotland",
+      "color_hex": "#e8e800",
+      "capital_state_id": 121,
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "release_lookup_iso2": "GB",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "hoi4_1936"
+      ],
+      "scenario_only": true,
+      "preset_source": {
+        "type": "legacy_preset_name",
+        "name": "Scotland",
+        "group_ids": [],
+        "feature_ids": []
+      },
+      "core_state_ids": [
+        120,
+        121,
+        133,
+        136,
+        933
+      ],
+      "resolved_feature_count_hint": null,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "British internal releasable. Runtime geometry reuses the existing Scotland preset."
+    },
+    {
+      "tag": "WLS",
+      "display_name": "Wales",
+      "color_hex": "#ff0000",
+      "capital_state_id": 122,
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "release_lookup_iso2": "GB",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "hoi4_1936"
+      ],
+      "scenario_only": true,
+      "preset_source": {
+        "type": "legacy_preset_name",
+        "name": "Wales",
+        "group_ids": [],
+        "feature_ids": []
+      },
+      "core_state_ids": [
+        122
+      ],
+      "resolved_feature_count_hint": null,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "British internal releasable. Runtime geometry reuses the existing Wales preset."
+    },
+    {
+      "tag": "NIR",
+      "display_name": "Northern Ireland",
+      "color_hex": "#ff9933",
+      "capital_state_id": 119,
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "release_lookup_iso2": "GB",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "hoi4_1936"
+      ],
+      "scenario_only": true,
+      "preset_source": {
+        "type": "legacy_preset_name",
+        "name": "Northern Ireland",
+        "group_ids": [],
+        "feature_ids": []
+      },
+      "core_state_ids": [
+        119
+      ],
+      "resolved_feature_count_hint": null,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "British internal releasable. Runtime geometry reuses the existing Northern Ireland preset."
+    },
+    {
+      "tag": "BYA",
+      "display_name": "Buryatia",
+      "color_hex": "#0040ff",
+      "capital_state_id": 564,
+      "parent_owner_tag": "SOV",
+      "parent_owner_tags": [
+        "SOV"
+      ],
+      "release_lookup_iso2": "RU",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "hoi4_1936"
+      ],
+      "scenario_only": true,
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "name": "",
+        "group_ids": [
+          "RU_Republic_of_Buryatia"
+        ],
+        "feature_ids": []
+      },
+      "core_state_ids": [
+        564
+      ],
+      "resolved_feature_count_hint": 1,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "Soviet internal releasable mapped from the Republic of Buryatia hierarchy group."
+    },
+    {
+      "tag": "TAT",
+      "display_name": "Tatarstan",
+      "color_hex": "#ff3300",
+      "capital_state_id": 249,
+      "parent_owner_tag": "SOV",
+      "parent_owner_tags": [
+        "SOV"
+      ],
+      "release_lookup_iso2": "RU",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "hoi4_1936"
+      ],
+      "scenario_only": true,
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "name": "",
+        "group_ids": [
+          "RU_Republic_of_Tatarstan"
+        ],
+        "feature_ids": []
+      },
+      "core_state_ids": [
+        249
+      ],
+      "resolved_feature_count_hint": 45,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "Soviet internal releasable mapped from the Republic of Tatarstan hierarchy group."
+    },
+    {
+      "tag": "DAG",
+      "display_name": "Dagestan",
+      "color_hex": "#00ccff",
+      "capital_state_id": 232,
+      "parent_owner_tag": "SOV",
+      "parent_owner_tags": [
+        "SOV"
+      ],
+      "release_lookup_iso2": "RU",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "hoi4_1936"
+      ],
+      "scenario_only": true,
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "name": "",
+        "group_ids": [
+          "RU_Republic_of_Dagestan"
+        ],
+        "feature_ids": []
+      },
+      "core_state_ids": [
+        232
+      ],
+      "resolved_feature_count_hint": 50,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "Soviet internal releasable mapped from the Republic of Dagestan hierarchy group."
+    },
+    {
+      "tag": "KAL",
+      "display_name": "Kalmykia",
+      "color_hex": "#ffcc00",
+      "capital_state_id": 237,
+      "parent_owner_tag": "SOV",
+      "parent_owner_tags": [
+        "SOV"
+      ],
+      "release_lookup_iso2": "RU",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "hoi4_1936"
+      ],
+      "scenario_only": true,
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "name": "",
+        "group_ids": [
+          "RU_Republic_of_Kalmykia"
+        ],
+        "feature_ids": []
+      },
+      "core_state_ids": [
+        237
+      ],
+      "resolved_feature_count_hint": 15,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "Soviet internal releasable mapped from the Republic of Kalmykia hierarchy group."
+    },
+    {
+      "tag": "KOM",
+      "display_name": "Komi",
+      "color_hex": "#00e6b8",
+      "capital_state_id": 397,
+      "parent_owner_tag": "SOV",
+      "parent_owner_tags": [
+        "SOV"
+      ],
+      "release_lookup_iso2": "RU",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "hoi4_1936"
+      ],
+      "scenario_only": true,
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "name": "",
+        "group_ids": [
+          "RU_Komi_Republic"
+        ],
+        "feature_ids": []
+      },
+      "core_state_ids": [
+        262,
+        397,
+        581
+      ],
+      "resolved_feature_count_hint": 18,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "Soviet internal releasable mapped from the Komi Republic hierarchy group."
+    },
+    {
+      "tag": "NEN",
+      "display_name": "Nenetsia",
+      "color_hex": "#ccffcc",
+      "capital_state_id": 825,
+      "parent_owner_tag": "SOV",
+      "parent_owner_tags": [
+        "SOV"
+      ],
+      "release_lookup_iso2": "RU",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "hoi4_1936"
+      ],
+      "scenario_only": true,
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "name": "",
+        "group_ids": [
+          "RU_Nenets_Autonomous_Okrug"
+        ],
+        "feature_ids": []
+      },
+      "core_state_ids": [
+        825
+      ],
+      "resolved_feature_count_hint": 2,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "Soviet internal releasable mapped from the Nenets Autonomous Okrug hierarchy group."
+    },
+    {
+      "tag": "CKK",
+      "display_name": "Chukotka",
+      "color_hex": "#b3b300",
+      "capital_state_id": 822,
+      "parent_owner_tag": "SOV",
+      "parent_owner_tags": [
+        "SOV"
+      ],
+      "release_lookup_iso2": "RU",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "hoi4_1936"
+      ],
+      "scenario_only": true,
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "name": "",
+        "group_ids": [
+          "RU_Chukotka_Autonomous_Okrug"
+        ],
+        "feature_ids": []
+      },
+      "core_state_ids": [
+        822,
+        875
+      ],
+      "resolved_feature_count_hint": 1,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "Soviet internal releasable mapped from the Chukotka Autonomous Okrug hierarchy group."
+    },
+    {
+      "tag": "YAK",
+      "display_name": "Yakutia",
+      "color_hex": "#00ffff",
+      "capital_state_id": 574,
+      "parent_owner_tag": "SOV",
+      "parent_owner_tags": [
+        "SOV"
+      ],
+      "release_lookup_iso2": "RU",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "hoi4_1936"
+      ],
+      "scenario_only": true,
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "name": "",
+        "group_ids": [
+          "RU_Sakha_Republic"
+        ],
+        "feature_ids": []
+      },
+      "core_state_ids": [
+        574,
+        644,
+        876,
+        877
+      ],
+      "resolved_feature_count_hint": 1,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "Soviet internal releasable mapped from the Sakha Republic hierarchy group."
+    },
+    {
+      "tag": "YAM",
+      "display_name": "Yamalia",
+      "color_hex": "#cc9900",
+      "capital_state_id": 579,
+      "parent_owner_tag": "SOV",
+      "parent_owner_tags": [
+        "SOV"
+      ],
+      "release_lookup_iso2": "RU",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "hoi4_1936"
+      ],
+      "scenario_only": true,
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "name": "",
+        "group_ids": [
+          "RU_Yamalo_Nenets_Autonomous_Okrug"
+        ],
+        "feature_ids": []
+      },
+      "core_state_ids": [
+        579,
+        824
+      ],
+      "resolved_feature_count_hint": 1,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "Soviet internal releasable mapped from the Yamalo-Nenets Autonomous Okrug hierarchy group."
+    }
+  ],
+  "excluded": [
+    {
+      "tag": "HAN",
+      "reason": "missing_runtime_mapping",
+      "notes": "Hanover needs a dedicated Lower Saxony and Westphalia split instead of the current coarse preset set."
+    },
+    {
+      "tag": "RHI",
+      "reason": "missing_runtime_mapping",
+      "notes": "Rhineland requires a dedicated Rhine-West grouping that is not available as a clean runtime preset yet."
+    },
+    {
+      "tag": "WUR",
+      "reason": "missing_runtime_mapping",
+      "notes": "Wurttemberg needs a Baden/Wurttemberg split that does not exist as a stable runtime preset."
+    },
+    {
+      "tag": "PRE",
+      "reason": "ambiguous_existing_preset",
+      "notes": "The current Prussia preset is an eastern-core convenience preset, not a stable HOI4 releasable boundary."
+    },
+    {
+      "tag": "HES",
+      "reason": "missing_runtime_mapping",
+      "notes": "Hesse needs a dedicated central German grouping before it can be exposed safely."
+    },
+    {
+      "tag": "MEK",
+      "reason": "missing_runtime_mapping",
+      "notes": "Mecklenburg needs a dedicated coastal grouping instead of being folded into the current Prussia convenience preset."
+    },
+    {
+      "tag": "FER",
+      "reason": "missing_runtime_mapping",
+      "notes": "Far Eastern Republic needs multiple Russian Far East groups and a cleaner Primorsky split."
+    },
+    {
+      "tag": "VLA",
+      "reason": "missing_runtime_mapping",
+      "notes": "Vladivostok needs a narrower coastal split than the current Primorsky hierarchy group."
+    },
+    {
+      "tag": "ALT",
+      "reason": "missing_runtime_mapping",
+      "notes": "Altay needs a finer Siberian republic split than the current runtime hierarchy provides."
+    },
+    {
+      "tag": "CHU",
+      "reason": "missing_runtime_mapping",
+      "notes": "Chuvashia needs a dedicated Volga split before it can be exposed as a releasable."
+    },
+    {
+      "tag": "OVO",
+      "reason": "missing_runtime_mapping",
+      "notes": "Ostyak-Vogulia needs a dedicated Khanty-Mansi plus Tyumen split."
+    },
+    {
+      "tag": "TAY",
+      "reason": "missing_runtime_mapping",
+      "notes": "Taymyria needs a dedicated north-central Siberian split."
+    },
+    {
+      "tag": "CIN",
+      "reason": "missing_runtime_mapping",
+      "notes": "Chechnya-Ingushetia needs a dedicated North Caucasus split beyond Dagestan."
+    },
+    {
+      "tag": "UKR",
+      "reason": "multi_parent",
+      "notes": "Ukraine has 1936 cores across multiple parent owners and is intentionally deferred."
+    },
+    {
+      "tag": "BLR",
+      "reason": "multi_parent",
+      "notes": "Belarus has 1936 cores across multiple parent owners and is intentionally deferred."
+    },
+    {
+      "tag": "KUR",
+      "reason": "multi_parent",
+      "notes": "Kurdistan has 1936 cores across multiple parent owners and is intentionally deferred."
+    },
+    {
+      "tag": "KAR",
+      "reason": "multi_parent",
+      "notes": "Karelia has 1936 cores across both Finland and the Soviet Union."
+    },
+    {
+      "tag": "ANG",
+      "reason": "colonial_or_overseas",
+      "notes": "Colonial releasable intentionally left out of the internal-only Phase 1 scope."
+    },
+    {
+      "tag": "KEN",
+      "reason": "colonial_or_overseas",
+      "notes": "Colonial releasable intentionally left out of the internal-only Phase 1 scope."
+    },
+    {
+      "tag": "COG",
+      "reason": "colonial_or_overseas",
+      "notes": "Colonial releasable intentionally left out of the internal-only Phase 1 scope."
+    }
+  ],
+  "summary": {
+    "entry_count": 15,
+    "excluded_count": 20,
+    "validation_error_count": 0
+  }
+}

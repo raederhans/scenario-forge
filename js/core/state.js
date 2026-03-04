@@ -546,6 +546,14 @@ export const state = {
   activeScenarioManifest: null,
   scenarioCountriesByTag: {},
   scenarioFixedOwnerColors: {},
+  releasableCatalog: null,
+  scenarioReleasableIndex: {
+    byTag: {},
+    childTagsByParent: {},
+    consumedPresetNamesByParentLookup: {},
+  },
+  defaultReleasablePresetOverlays: {},
+  scenarioReleasablePresetOverlays: {},
   scenarioAudit: null,
   scenarioAuditUi: {
     loading: false,
@@ -770,6 +778,7 @@ export const state = {
   customPresets: {},
   presetsState: {},
   expandedInspectorContinents: new Set(),
+  expandedInspectorReleaseParents: new Set(),
   expandedPresetCountries: new Set(),
 
   countryPalette,

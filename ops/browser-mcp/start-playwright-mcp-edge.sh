@@ -7,7 +7,7 @@ cd "$ROOT_DIR"
 PORT="${PW_MCP_PORT:-8931}"
 mkdir -p .mcp-artifacts
 
-exec npx -y @playwright/mcp@latest \
+exec bash ops/browser-mcp/start-playwright-mcp-stdio.sh \
   --browser msedge \
   --caps vision,devtools \
   --console-level warning \

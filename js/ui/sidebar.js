@@ -1,5 +1,5 @@
 // Sidebar UI (Phase 13)
-import { state, countryNames, countryPresets, PRESET_STORAGE_KEY, defaultCountryPalette } from "../core/state.js";
+import { state, countryNames, PRESET_STORAGE_KEY, defaultCountryPalette } from "../core/state.js";
 import { ColorManager } from "../core/color_manager.js";
 import * as mapRenderer from "../core/map_renderer.js";
 import { applyCountryColor, resetCountryColors } from "../core/logic.js";
@@ -20,17 +20,11 @@ import {
   migrateFeatureScopedProjectDataToCurrentTopology,
 } from "../core/sovereignty_manager.js";
 import { markDirty } from "../core/dirty_state.js";
-
-const COUNTRY_CODE_ALIASES = {
-  UK: "GB",
-  EL: "GR",
-};
-
-function normalizeCountryCode(rawCode) {
-  const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
-  if (!code) return "";
-  return COUNTRY_CODE_ALIASES[code] || code;
-}
+import {
+  normalizeCountryCode,
+  normalizePresetName,
+  rebuildPresetState,
+} from "../core/releasable_manager.js";
 
 function extractCountryCodeFromId(value) {
   const text = String(value || "").trim().toUpperCase();
@@ -115,17 +109,39 @@ function getDynamicCountryEntries() {
           featureCount: Number(scenarioCountry?.feature_count || 0),
           quality: String(scenarioCountry?.quality || "").trim(),
           baseIso2: String(scenarioCountry?.base_iso2 || "").trim().toUpperCase(),
+          lookupIso2: String(
+            scenarioCountry?.lookup_iso2
+            || scenarioCountry?.release_lookup_iso2
+            || scenarioCountry?.base_iso2
+            || ""
+          ).trim().toUpperCase(),
+          releaseLookupIso2: String(scenarioCountry?.release_lookup_iso2 || "").trim().toUpperCase(),
           scenarioOnly: !!scenarioCountry?.scenario_only,
+          releasable: !!scenarioCountry?.releasable || String(scenarioCountry?.entry_kind || "").trim() === "releasable",
+          entryKind: String(scenarioCountry?.entry_kind || "").trim(),
+          presetLookupCode: String(scenarioCountry?.preset_lookup_code || "").trim().toUpperCase(),
+          parentOwnerTag: String(scenarioCountry?.parent_owner_tag || "").trim().toUpperCase(),
+          parentOwnerTags: Array.isArray(scenarioCountry?.parent_owner_tags)
+            ? scenarioCountry.parent_owner_tags.map((value) => String(value || "").trim().toUpperCase()).filter(Boolean)
+            : [],
           continentId: String(scenarioCountry?.continent_id || "").trim(),
           continentLabel: String(scenarioCountry?.continent_label || "").trim(),
           subregionId: String(scenarioCountry?.subregion_id || "").trim(),
           subregionLabel: String(scenarioCountry?.subregion_label || "").trim(),
           syntheticOwner: !!scenarioCountry?.synthetic_owner,
+          featured: !!scenarioCountry?.featured,
+          catalogOrder: Number(scenarioCountry?.catalog_order ?? Number.MAX_SAFE_INTEGER),
         };
       })
       .filter(Boolean);
     return scenarioEntries.sort((a, b) => {
-      if (!!a.scenarioOnly !== !!b.scenarioOnly) return a.scenarioOnly ? -1 : 1;
+      const getRank = (entry) => {
+        if (entry?.releasable) return 2;
+        if (entry?.scenarioOnly) return 1;
+        return 0;
+      };
+      const rankDelta = getRank(a) - getRank(b);
+      if (rankDelta !== 0) return rankDelta;
       if ((b.featureCount || 0) !== (a.featureCount || 0)) return (b.featureCount || 0) - (a.featureCount || 0);
       return a.displayName.localeCompare(b.displayName);
     });
@@ -162,6 +178,10 @@ function getDynamicCountryEntries() {
     .sort((a, b) => a.displayName.localeCompare(b.displayName));
 }
 
+function buildInspectorTopLevelCountryEntries(entries = []) {
+  return (Array.isArray(entries) ? entries : []).filter((entry) => !entry?.releasable);
+}
+
 function ensureCountryPaletteColor(code, fallbackIndex = 0) {
   const normalizedCode = normalizeCountryCode(code);
   if (!normalizedCode) return "#cccccc";
@@ -190,49 +210,6 @@ function loadCustomPresets() {
   }
 }
 
-function mergePresets(base, custom) {
-  const merged = {};
-  const mergeEntriesForCode = (rawCode, entries = []) => {
-    const code = normalizeCountryCode(rawCode);
-    if (!code) return;
-    if (!merged[code]) merged[code] = [];
-    (Array.isArray(entries) ? entries : []).forEach((preset) => {
-      if (!preset || !preset.name) return;
-      const idx = merged[code].findIndex((entry) => entry.name === preset.name);
-      const normalizedPreset = {
-        name: preset.name,
-        ids: Array.isArray(preset.ids) ? [...preset.ids] : [],
-      };
-      if (idx >= 0) {
-        merged[code][idx] = normalizedPreset;
-      } else {
-        merged[code].push(normalizedPreset);
-      }
-    });
-  };
-
-  Object.keys(base || {}).forEach((code) => {
-    mergeEntriesForCode(code, base[code]);
-  });
-  Object.keys(custom || {}).forEach((code) => {
-    const normalizedCode = normalizeCountryCode(code);
-    if (!normalizedCode) return;
-    if (!merged[normalizedCode]) merged[normalizedCode] = [];
-    const customEntries = Array.isArray(custom[code]) ? custom[code] : [];
-    customEntries.forEach((entry) => {
-      if (!entry || !entry.name) return;
-      const idx = merged[normalizedCode].findIndex((preset) => preset.name === entry.name);
-      const ids = Array.isArray(entry.ids) ? [...entry.ids] : [];
-      if (idx >= 0) {
-        merged[normalizedCode][idx] = { name: entry.name, ids };
-      } else {
-        merged[normalizedCode].push({ name: entry.name, ids });
-      }
-    });
-  });
-  return merged;
-}
-
 function saveCustomPresets() {
   try {
     localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(state.customPresets));
@@ -253,12 +230,12 @@ function upsertCustomPreset(code, name, ids) {
     state.customPresets[normalizedCode].push(entry);
   }
   saveCustomPresets();
-  state.presetsState = mergePresets(countryPresets, state.customPresets);
+  rebuildPresetState();
 }
 
 function initPresetState() {
   state.customPresets = loadCustomPresets();
-  state.presetsState = mergePresets(countryPresets, state.customPresets);
+  rebuildPresetState();
 }
 
 function getScenarioCountryMeta(entryOrCode) {
@@ -285,6 +262,10 @@ function resolveScenarioLookupCode(entryOrCode) {
   const scenarioMeta = getScenarioCountryMeta(entryOrCode);
   const entry = typeof entryOrCode === "object" && entryOrCode ? entryOrCode : null;
   const candidates = [
+    scenarioMeta?.preset_lookup_code,
+    scenarioMeta?.presetLookupCode,
+    entry?.preset_lookup_code,
+    entry?.presetLookupCode,
     scenarioMeta?.lookup_iso2,
     scenarioMeta?.lookupIso2,
     entry?.lookup_iso2,
@@ -307,11 +288,45 @@ function resolveScenarioLookupCode(entryOrCode) {
 }
 
 function resolveInspectorDataCode(entryOrCode) {
-  return resolveScenarioLookupCode(entryOrCode);
+  const fallbackCode = normalizeCountryCode(
+    typeof entryOrCode === "object" && entryOrCode
+      ? entryOrCode.code
+      : entryOrCode
+  );
+  if (!state.activeScenarioId) {
+    return fallbackCode;
+  }
+
+  const scenarioMeta = getScenarioCountryMeta(entryOrCode);
+  const entry = typeof entryOrCode === "object" && entryOrCode ? entryOrCode : null;
+  const candidates = [
+    scenarioMeta?.release_lookup_iso2,
+    scenarioMeta?.releaseLookupIso2,
+    entry?.release_lookup_iso2,
+    entry?.releaseLookupIso2,
+    scenarioMeta?.lookup_iso2,
+    scenarioMeta?.lookupIso2,
+    entry?.lookup_iso2,
+    entry?.lookupIso2,
+    scenarioMeta?.base_iso2,
+    scenarioMeta?.baseIso2,
+    entry?.base_iso2,
+    entry?.baseIso2,
+    fallbackCode,
+  ];
+
+  for (const candidate of candidates) {
+    const normalized = normalizeCountryCode(candidate);
+    if (normalized) {
+      return normalized;
+    }
+  }
+
+  return fallbackCode;
 }
 
 function resolveCountryGroupingCode(entryOrCode) {
-  return resolveScenarioLookupCode(entryOrCode);
+  return resolveInspectorDataCode(entryOrCode);
 }
 
 function getHierarchyGroupsForCode(code) {
@@ -372,13 +387,25 @@ function getCountryPriorityRank(countryState, priorityOrderMap = getPriorityCoun
   return continentOrder.get(priorityCode);
 }
 
+function compareInspectorCountries(a, b, priorityOrderMap = getPriorityCountryOrderMap()) {
+  const featuredDelta = Number(!!b?.featured) - Number(!!a?.featured);
+  if (featuredDelta !== 0) return featuredDelta;
+
+  const priorityDelta =
+    getCountryPriorityRank(a, priorityOrderMap) - getCountryPriorityRank(b, priorityOrderMap);
+  if (priorityDelta !== 0) return priorityDelta;
+
+  const featureDelta = Number(b?.featureCount || 0) - Number(a?.featureCount || 0);
+  if (featureDelta !== 0) return featureDelta;
+
+  const scenarioOnlyDelta = Number(!!a?.scenarioOnly) - Number(!!b?.scenarioOnly);
+  if (scenarioOnlyDelta !== 0) return scenarioOnlyDelta;
+
+  return String(a?.displayName || "").localeCompare(String(b?.displayName || ""));
+}
+
 function sortCountriesWithinContinent(entries, priorityOrderMap = getPriorityCountryOrderMap()) {
-  return [...entries].sort((a, b) => {
-    const priorityDelta =
-      getCountryPriorityRank(a, priorityOrderMap) - getCountryPriorityRank(b, priorityOrderMap);
-    if (priorityDelta !== 0) return priorityDelta;
-    return a.displayName.localeCompare(b.displayName);
-  });
+  return [...entries].sort((a, b) => compareInspectorCountries(a, b, priorityOrderMap));
 }
 
 function buildCountryColorTree(entries) {
@@ -396,7 +423,7 @@ function buildCountryColorTree(entries) {
   });
 
   entries.forEach((entry) => {
-    const meta = getCountryGroupingMeta(entry.code);
+    const meta = getCountryGroupingMeta(entry);
     const continentId = meta?.continentId || "continent_other";
     const continentLabel = meta?.continentLabel || "Other";
 
@@ -822,9 +849,54 @@ function initSidebar({ render } = {}) {
   const countryInspectorMeta = document.getElementById("countryInspectorMeta");
   const countryInspectorSwatch = document.getElementById("countryInspectorSwatch");
   const countryInspectorSetActive = document.getElementById("countryInspectorSetActive");
+  const countryInspectorBackToParent = document.getElementById("countryInspectorBackToParent");
   const countryInspectorColorInput = document.getElementById("countryInspectorColorInput");
-  const countryInspectorGroups = document.getElementById("countryInspectorGroups");
-  const countryInspectorPresets = document.getElementById("countryInspectorPresets");
+  const countryInspectorOrderingHint = document.getElementById("countryInspectorOrderingHint");
+  const countryInspectorSection = document.getElementById("countryInspectorSection");
+  const selectedCountryActionsSection = document.getElementById("selectedCountryActionsSection");
+  const selectedCountryActionsTitle = document.getElementById("lblHistoricalPresets");
+  const selectedCountryActionHint = document.getElementById("selectedCountryActionHint");
+
+  const updateScenarioInspectorLayout = () => {
+    const isScenarioMode = !!state.activeScenarioId;
+    if (countryInspectorOrderingHint) {
+      countryInspectorOrderingHint.classList.toggle("hidden", isScenarioMode);
+    }
+    if (selectedCountryActionsSection) {
+      selectedCountryActionsSection.classList.remove("hidden");
+      selectedCountryActionsSection.setAttribute("aria-hidden", "false");
+      if (isScenarioMode) {
+        selectedCountryActionsSection.open = true;
+      }
+    }
+    if (countryInspectorSection && isScenarioMode) {
+      countryInspectorSection.open = true;
+    }
+    if (selectedCountryActionsTitle) {
+      selectedCountryActionsTitle.textContent = isScenarioMode
+        ? t("Scenario Actions", "ui")
+        : t("Selected Country Actions", "ui");
+    }
+    if (selectedCountryActionHint) {
+      selectedCountryActionHint.classList.toggle("hidden", isScenarioMode);
+      selectedCountryActionHint.textContent = isScenarioMode
+        ? t(
+          "Review the current paint mode, then apply releasables, hierarchy groups, or regional presets.",
+          "ui"
+        )
+        : t("Choose a country above to inspect territories, presets, and releasables.", "ui");
+    }
+    const sidebarSections = countryInspectorSection?.parentElement || selectedCountryActionsSection?.parentElement;
+    if (sidebarSections && countryInspectorSection && selectedCountryActionsSection) {
+      if (isScenarioMode) {
+        if (selectedCountryActionsSection.nextElementSibling !== countryInspectorSection) {
+          sidebarSections.insertBefore(selectedCountryActionsSection, countryInspectorSection);
+        }
+      } else if (countryInspectorSection.nextElementSibling !== selectedCountryActionsSection) {
+        sidebarSections.insertBefore(countryInspectorSection, selectedCountryActionsSection);
+      }
+    }
+  };
 
   if (projectFileName && !projectFileName.textContent.trim()) {
     projectFileName.textContent = t("No file selected", "ui");
@@ -832,6 +904,9 @@ function initSidebar({ render } = {}) {
 
   if (!(state.expandedInspectorContinents instanceof Set)) {
     state.expandedInspectorContinents = new Set();
+  }
+  if (!(state.expandedInspectorReleaseParents instanceof Set)) {
+    state.expandedInspectorReleaseParents = new Set();
   }
   if (typeof state.selectedInspectorCountryCode !== "string") {
     state.selectedInspectorCountryCode = "";
@@ -843,6 +918,32 @@ function initSidebar({ render } = {}) {
   let latestCountryStatesByCode = new Map();
   const getSearchTerm = () => (searchInput?.value || "").trim().toLowerCase();
   const matchesTerm = (value, term) => String(value || "").toLowerCase().includes(term);
+
+  const getInspectorCountryDisplayName = (code) => {
+    const normalized = normalizeCountryCode(code);
+    if (!normalized) return "";
+    const inspectorState = latestCountryStatesByCode.get(normalized);
+    if (inspectorState?.displayName) {
+      return inspectorState.displayName;
+    }
+    const scenarioCountry = state.scenarioCountriesByTag?.[normalized];
+    const scenarioName = String(scenarioCountry?.display_name || "").trim();
+    if (scenarioName) {
+      return t(scenarioName, "geo") || scenarioName;
+    }
+    const fallbackName = String(state.countryNames?.[normalized] || countryNames[normalized] || normalized).trim();
+    return t(fallbackName, "geo") || fallbackName || normalized;
+  };
+
+  const formatReleasableParentLabel = (countryState) => {
+    const parentCodes = Array.isArray(countryState?.parentOwnerTags) && countryState.parentOwnerTags.length
+      ? countryState.parentOwnerTags
+      : (countryState?.parentOwnerTag ? [countryState.parentOwnerTag] : []);
+    const labels = parentCodes
+      .map((parentCode) => getInspectorCountryDisplayName(parentCode))
+      .filter(Boolean);
+    return labels.join(", ");
+  };
 
   const createCountryInspectorState = (entry, fallbackIndex = 0) => {
     const scenarioMeta = getScenarioCountryMeta(entry.code) || entry || {};
@@ -863,7 +964,7 @@ function initSidebar({ render } = {}) {
       presetLookupCode,
       groupingCode: groupLookupCode,
       presets: state.presetsState[presetLookupCode] || [],
-      hierarchyGroups: getHierarchyGroupsForCode(groupLookupCode),
+      hierarchyGroups: scenarioMeta.releasable ? [] : getHierarchyGroupsForCode(groupLookupCode),
       continentId:
         String(scenarioMeta.continent_id || scenarioMeta.continentId || groupingMeta.continentId || "continent_other"),
       continentLabel,
@@ -875,9 +976,44 @@ function initSidebar({ render } = {}) {
       quality: String(scenarioMeta.quality || entry.quality || "").trim(),
       featureCount: Number(scenarioMeta.feature_count || entry.featureCount || 0),
       baseIso2: String(scenarioMeta.base_iso2 || entry.baseIso2 || "").trim().toUpperCase(),
+      releaseLookupIso2: String(
+        scenarioMeta.release_lookup_iso2
+        || entry.releaseLookupIso2
+        || ""
+      ).trim().toUpperCase(),
       scenarioOnly: !!(scenarioMeta.scenario_only ?? entry.scenarioOnly),
+      releasable: !!(scenarioMeta.releasable ?? entry.releasable),
+      entryKind: String(scenarioMeta.entry_kind || entry.entryKind || "").trim(),
+      parentOwnerTag: String(scenarioMeta.parent_owner_tag || entry.parentOwnerTag || "").trim().toUpperCase(),
+      parentOwnerTags: Array.isArray(scenarioMeta.parent_owner_tags)
+        ? scenarioMeta.parent_owner_tags.map((value) => String(value || "").trim().toUpperCase()).filter(Boolean)
+        : Array.isArray(entry.parentOwnerTags)
+          ? entry.parentOwnerTags
+          : [],
       syntheticOwner: !!(scenarioMeta.synthetic_owner ?? entry.syntheticOwner),
+      featured: !!(scenarioMeta.featured ?? entry.featured),
+      catalogOrder: Number(scenarioMeta.catalog_order ?? entry.catalogOrder ?? Number.MAX_SAFE_INTEGER),
+      notes: String(scenarioMeta.notes || entry.notes || "").trim(),
     };
+  };
+
+  const getReleasableChildrenForParent = (parentTag) => {
+    const normalizedParent = normalizeCountryCode(parentTag);
+    if (!normalizedParent) return [];
+    const childTags = Array.isArray(state.scenarioReleasableIndex?.childTagsByParent?.[normalizedParent])
+      ? state.scenarioReleasableIndex.childTagsByParent[normalizedParent]
+      : [];
+    return childTags
+      .map((childTag) => latestCountryStatesByCode.get(normalizeCountryCode(childTag)))
+      .filter(Boolean)
+      .sort((a, b) => {
+        const catalogOrderDelta = Number(a?.catalogOrder ?? Number.MAX_SAFE_INTEGER)
+          - Number(b?.catalogOrder ?? Number.MAX_SAFE_INTEGER);
+        if (catalogOrderDelta !== 0) return catalogOrderDelta;
+        const featureDelta = Number(b?.featureCount || 0) - Number(a?.featureCount || 0);
+        if (featureDelta !== 0) return featureDelta;
+        return String(a?.displayName || "").localeCompare(String(b?.displayName || ""));
+      });
   };
 
   const getResolvedCountryColor = (countryState) => {
@@ -1286,12 +1422,63 @@ function initSidebar({ render } = {}) {
     if (countryState?.continentId) {
       state.expandedInspectorContinents.add(`continent::${countryState.continentId}`);
     }
+    if (countryState?.releasable && countryState.parentOwnerTag && state.expandedInspectorReleaseParents instanceof Set) {
+      state.expandedInspectorReleaseParents.add(countryState.parentOwnerTag);
+    }
     state.selectedInspectorCountryCode = normalized;
     state.inspectorHighlightCountryCode = normalized;
     if (typeof state.renderNowFn === "function") {
       state.renderNowFn();
     }
     renderList();
+  };
+
+  const getPrimaryReleasablePresetRef = (countryState) => {
+    const presetLookupCode = countryState?.presetLookupCode || countryState?.code;
+    const presets = Array.isArray(state.presetsState?.[presetLookupCode]) ? state.presetsState[presetLookupCode] : [];
+    const presetIndex = presets.findIndex((preset) => String(preset?.preset_kind || "").trim() === "releasable_core");
+    if (presetIndex < 0) {
+      console.warn("[scenario] Missing releasable core preset for selected country.", {
+        code: countryState?.code || "",
+        presetLookupCode,
+      });
+      return null;
+    }
+    return {
+      presetLookupCode,
+      presetIndex,
+      preset: presets[presetIndex],
+    };
+  };
+
+  const applyScenarioReleasableCoreTerritory = (
+    countryState,
+    { source = "scenario-actions" } = {}
+  ) => {
+    if (!countryState?.releasable) return false;
+
+    const presetRef = getPrimaryReleasablePresetRef(countryState);
+    if (!presetRef) {
+      console.warn("[scenario] Missing releasable core preset.", {
+        source,
+        code: countryState?.code || "",
+      });
+      return false;
+    }
+
+    if (String(state.paintMode || "visual") === "sovereignty") {
+      state.activeSovereignCode = countryState.code;
+      if (typeof state.updateActiveSovereignUIFn === "function") {
+        state.updateActiveSovereignUIFn();
+      }
+      applyPreset(presetRef.presetLookupCode, presetRef.presetIndex, null, render);
+    } else {
+      const resolvedColor = getResolvedCountryColor(latestCountryStatesByCode.get(countryState.code) || countryState);
+      applyPreset(presetRef.presetLookupCode, presetRef.presetIndex, resolvedColor, render);
+    }
+
+    renderList();
+    return true;
   };
 
   const getCountrySearchRank = (countryState, term, upperTerm) => {
@@ -1318,19 +1505,34 @@ function initSidebar({ render } = {}) {
     return 5;
   };
 
-  const renderCountrySelectRow = (parent, countryState) => {
-    const row = document.createElement("button");
-    row.type = "button";
+  const renderCountrySelectRow = (
+    parent,
+    countryState,
+    {
+      childStates = [],
+      forceExpanded = false,
+      hideExpandToggle = false,
+      showRelationMeta = false,
+    } = {}
+  ) => {
+    const hasChildren = Array.isArray(childStates) && childStates.length > 0;
+    const isExpanded = hasChildren && (
+      forceExpanded ||
+      state.expandedInspectorReleaseParents.has(countryState.code)
+    );
+
+    const row = document.createElement("div");
     row.className = "country-select-row";
     const isSelected = state.selectedInspectorCountryCode === countryState.code;
     row.classList.toggle("is-selected", isSelected);
-    row.setAttribute("aria-pressed", String(isSelected));
-    row.addEventListener("click", () => {
+
+    const main = document.createElement("button");
+    main.type = "button";
+    main.className = "country-select-main country-select-main-btn";
+    main.setAttribute("aria-pressed", String(isSelected));
+    main.addEventListener("click", () => {
       selectInspectorCountry(countryState.code);
     });
-
-    const main = document.createElement("div");
-    main.className = "country-select-main";
 
     const title = document.createElement("div");
     title.className = "country-select-title";
@@ -1338,7 +1540,16 @@ function initSidebar({ render } = {}) {
 
     const meta = document.createElement("div");
     meta.className = "country-select-meta";
-    meta.textContent = countryState.subregionDisplayLabel;
+    const metaBits = [countryState.subregionDisplayLabel];
+    if (countryState.releasable && showRelationMeta) {
+      const parentLabel = formatReleasableParentLabel(countryState);
+      metaBits.push(
+        parentLabel
+          ? `${t("Releasable from", "ui")} ${parentLabel}`
+          : t("Releasable", "ui")
+      );
+    }
+    meta.textContent = metaBits.filter(Boolean).join(" · ");
 
     const side = document.createElement("div");
     side.className = "country-select-side";
@@ -1350,27 +1561,135 @@ function initSidebar({ render } = {}) {
       side.appendChild(badge);
     }
 
-    if (countryState.scenarioOnly) {
-      const badge = document.createElement("span");
-      badge.className = "country-scenario-badge";
-      badge.textContent = t("Scenario", "ui");
-      side.appendChild(badge);
+    if (hasChildren && !hideExpandToggle) {
+      const countBadge = document.createElement("span");
+      countBadge.className = "country-children-count";
+      countBadge.textContent = String(childStates.length);
+      side.appendChild(countBadge);
     }
 
     const swatch = document.createElement("span");
     swatch.className = "country-select-swatch";
     swatch.style.backgroundColor = getResolvedCountryColor(countryState);
-    side.appendChild(swatch);
 
     main.appendChild(title);
     main.appendChild(meta);
     row.appendChild(main);
+
+    if (hasChildren && !hideExpandToggle) {
+      const toggleBtn = document.createElement("button");
+      toggleBtn.type = "button";
+      toggleBtn.className = "country-action-btn";
+      toggleBtn.textContent = isExpanded ? "v" : ">";
+      toggleBtn.setAttribute("aria-label", `${childStates.length} ${t("Releasable Countries", "ui")}`);
+      toggleBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (state.expandedInspectorReleaseParents.has(countryState.code)) {
+          state.expandedInspectorReleaseParents.delete(countryState.code);
+        } else {
+          state.expandedInspectorReleaseParents.add(countryState.code);
+        }
+        renderList();
+      });
+      side.appendChild(toggleBtn);
+    }
+
+    side.appendChild(swatch);
     row.appendChild(side);
-    parent.appendChild(row);
+
+    if (!hasChildren) {
+      parent.appendChild(row);
+      return;
+    }
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "country-explorer-group";
+    wrapper.appendChild(row);
+    if (isExpanded) {
+      const childList = document.createElement("div");
+      childList.className = "country-children";
+      childStates.forEach((childState) => {
+        renderCountrySelectRow(childList, childState, {
+          showRelationMeta: false,
+        });
+      });
+      wrapper.appendChild(childList);
+    }
+    parent.appendChild(wrapper);
+  };
+
+  const buildInspectorSearchGroups = (countryStates, term, priorityOrderMap) => {
+    const upperTerm = String(term || "").trim().toUpperCase();
+    const groupsByParentCode = new Map();
+
+    const ensureSearchGroup = (parentState) => {
+      const parentCode = normalizeCountryCode(parentState?.code);
+      if (!parentCode) return null;
+      if (!groupsByParentCode.has(parentCode)) {
+        groupsByParentCode.set(parentCode, {
+          parentState,
+          parentMatched: false,
+          parentSearchRank: null,
+          matchedChildCodes: new Set(),
+          bestRank: Number.MAX_SAFE_INTEGER,
+        });
+      }
+      return groupsByParentCode.get(parentCode);
+    };
+
+    countryStates.forEach((countryState) => {
+      const searchRank = getCountrySearchRank(countryState, term, upperTerm);
+      if (searchRank === null) return;
+
+      if (!countryState.releasable) {
+        const group = ensureSearchGroup(countryState);
+        if (!group) return;
+        group.parentMatched = true;
+        group.parentSearchRank = searchRank;
+        group.bestRank = Math.min(group.bestRank, searchRank);
+        return;
+      }
+
+      const parentState = countryState.parentOwnerTag
+        ? latestCountryStatesByCode.get(countryState.parentOwnerTag)
+        : null;
+      if (!parentState) {
+        const fallbackGroup = ensureSearchGroup(countryState);
+        if (!fallbackGroup) return;
+        fallbackGroup.parentMatched = true;
+        fallbackGroup.parentSearchRank = searchRank;
+        fallbackGroup.bestRank = Math.min(fallbackGroup.bestRank, searchRank);
+        return;
+      }
+
+      const group = ensureSearchGroup(parentState);
+      if (!group) return;
+      group.matchedChildCodes.add(countryState.code);
+      group.bestRank = Math.min(group.bestRank, searchRank);
+    });
+
+    return Array.from(groupsByParentCode.values())
+      .map((group) => ({
+        parentState: group.parentState,
+        parentMatched: group.parentMatched,
+        parentSearchRank: group.parentSearchRank,
+        childMatches: group.parentState?.releasable
+          ? []
+          : getReleasableChildrenForParent(group.parentState.code)
+            .filter((childState) => group.matchedChildCodes.has(childState.code)),
+        bestRank: Number.isFinite(group.bestRank) ? group.bestRank : Number.MAX_SAFE_INTEGER,
+      }))
+      .sort((a, b) => {
+        if (a.bestRank !== b.bestRank) return a.bestRank - b.bestRank;
+        return compareInspectorCountries(a.parentState, b.parentState, priorityOrderMap);
+      });
   };
 
   const renderCountryInspectorDetail = () => {
     if (!countryInspectorEmpty || !countryInspectorSelected) return;
+
+    updateScenarioInspectorLayout();
 
     const selectedCode = ensureSelectedInspectorCountry();
     const countryState = selectedCode ? latestCountryStatesByCode.get(selectedCode) : null;
@@ -1387,6 +1706,9 @@ function initSidebar({ render } = {}) {
         countryInspectorSetActive.disabled = true;
         countryInspectorSetActive.classList.remove("is-active");
       }
+      if (countryInspectorBackToParent) {
+        countryInspectorBackToParent.classList.add("hidden");
+      }
       return;
     }
 
@@ -1397,6 +1719,14 @@ function initSidebar({ render } = {}) {
     if (countryInspectorMeta) {
       const metaBits = [countryState.subregionDisplayLabel, countryState.continentDisplayLabel];
       if (state.activeScenarioId) {
+        if (countryState.releasable) {
+          const parentLabel = formatReleasableParentLabel(countryState);
+          metaBits.push(
+            parentLabel
+              ? `${t("Releasable from", "ui")} ${parentLabel}`
+              : t("Releasable", "ui")
+          );
+        }
         if (countryState.baseIso2) {
           metaBits.push(`${t("Base ISO", "ui")}: ${countryState.baseIso2}`);
         }
@@ -1423,60 +1753,37 @@ function initSidebar({ render } = {}) {
       countryInspectorSetActive.textContent = isActive ? t("Active", "ui") : t("Set Active", "ui");
       countryInspectorSetActive.setAttribute("aria-pressed", String(isActive));
     }
-
-    if (countryInspectorGroups) {
-      countryInspectorGroups.replaceChildren();
-      if (countryState.hierarchyGroups.length > 0) {
-        countryState.hierarchyGroups.forEach((group) => {
-          const button = createInspectorActionButton(
-            t(group.label, "geo") || group.label,
-            () => applyHierarchyGroup(group, state.selectedColor, render)
-          );
-          countryInspectorGroups.appendChild(button);
-        });
+    if (countryInspectorBackToParent) {
+      if (countryState.releasable && countryState.parentOwnerTag) {
+        countryInspectorBackToParent.classList.remove("hidden");
+        countryInspectorBackToParent.textContent = t("Back to Parent", "ui");
+        countryInspectorBackToParent.onclick = () => {
+          if (state.expandedInspectorReleaseParents instanceof Set) {
+            state.expandedInspectorReleaseParents.add(countryState.parentOwnerTag);
+          }
+          selectInspectorCountry(countryState.parentOwnerTag);
+        };
       } else {
-        countryInspectorGroups.appendChild(createEmptyNote(t("No country groups", "ui")));
-      }
-    }
-
-    if (countryInspectorPresets) {
-      countryInspectorPresets.replaceChildren();
-      if (countryState.presets.length > 0) {
-        countryState.presets.forEach((preset, presetIndex) => {
-          const button = createInspectorActionButton(preset.name, () => {
-            applyPreset(countryState.presetLookupCode || countryState.code, presetIndex, state.selectedColor, render);
-          });
-          countryInspectorPresets.appendChild(button);
-        });
-      } else {
-        countryInspectorPresets.appendChild(createEmptyNote(t("No country presets", "ui")));
+        countryInspectorBackToParent.classList.add("hidden");
+        countryInspectorBackToParent.onclick = null;
       }
     }
   };
 
   const renderCountrySearchResults = (countryStates, term, priorityOrderMap) => {
-    const upperTerm = String(term || "").trim().toUpperCase();
-    const matches = countryStates
-      .map((countryState) => ({
-        ...countryState,
-        searchRank: getCountrySearchRank(countryState, term, upperTerm),
-      }))
-      .filter((countryState) => countryState.searchRank !== null)
-      .sort((a, b) => {
-        if (a.searchRank !== b.searchRank) return a.searchRank - b.searchRank;
-        const priorityDelta =
-          getCountryPriorityRank(a, priorityOrderMap) - getCountryPriorityRank(b, priorityOrderMap);
-        if (priorityDelta !== 0) return priorityDelta;
-        return a.displayName.localeCompare(b.displayName);
-      });
-
-    if (!matches.length) {
+    const searchGroups = buildInspectorSearchGroups(countryStates, term, priorityOrderMap);
+    if (!searchGroups.length) {
       list.appendChild(createEmptyNote(t("No matching countries", "ui")));
       return;
     }
 
-    matches.forEach((countryState) => {
-      renderCountrySelectRow(list, countryState);
+    searchGroups.forEach((group) => {
+      renderCountrySelectRow(list, group.parentState, {
+        childStates: group.childMatches,
+        forceExpanded: group.childMatches.length > 0,
+        hideExpandToggle: group.childMatches.length > 0,
+        showRelationMeta: !!group.parentState?.releasable,
+      });
     });
   };
 
@@ -1487,7 +1794,9 @@ function initSidebar({ render } = {}) {
 
     if (!hasCountryGrouping) {
       countryStates.forEach((countryState) => {
-        renderCountrySelectRow(list, countryState);
+        renderCountrySelectRow(list, countryState, {
+          childStates: getReleasableChildrenForParent(countryState.code),
+        });
       });
       return;
     }
@@ -1542,7 +1851,9 @@ function initSidebar({ render } = {}) {
         const groupList = document.createElement("div");
         groupList.className = "country-explorer-list";
         countries.forEach((countryState) => {
-          renderCountrySelectRow(groupList, countryState);
+          renderCountrySelectRow(groupList, countryState, {
+            childStates: getReleasableChildrenForParent(countryState.code),
+          });
         });
         group.appendChild(groupList);
       }
@@ -1554,9 +1865,11 @@ function initSidebar({ render } = {}) {
   };
 
   const renderList = () => {
+    updateScenarioInspectorLayout();
     const term = getSearchTerm();
     const entries = getDynamicCountryEntries();
     const countryStates = entries.map((entry, entryIndex) => createCountryInspectorState(entry, entryIndex));
+    const topLevelCountryStates = buildInspectorTopLevelCountryEntries(countryStates);
     const priorityOrderMap = getPriorityCountryOrderMap();
     latestCountryStatesByCode = new Map(countryStates.map((countryState) => [countryState.code, countryState]));
     ensureSelectedInspectorCountry();
@@ -1571,16 +1884,20 @@ function initSidebar({ render } = {}) {
     if (term) {
       renderCountrySearchResults(countryStates, term, priorityOrderMap);
     } else {
-      renderGroupedCountryExplorer(countryStates);
+      renderGroupedCountryExplorer(topLevelCountryStates);
     }
 
     renderCountryInspectorDetail();
+    if (typeof state.renderPresetTreeFn === "function") {
+      state.renderPresetTreeFn();
+    }
   };
 
   if (countryInspectorSetActive && !countryInspectorSetActive.dataset.bound) {
     countryInspectorSetActive.addEventListener("click", () => {
       const selectedCode = ensureSelectedInspectorCountry();
       if (!selectedCode || state.activeSovereignCode === selectedCode) return;
+      const countryState = latestCountryStatesByCode.get(selectedCode);
       state.activeSovereignCode = selectedCode;
       markDirty("set-active-sovereign");
       if (typeof state.updateActiveSovereignUIFn === "function") {
@@ -1590,6 +1907,16 @@ function initSidebar({ render } = {}) {
         state.renderNowFn();
       }
       renderList();
+      if (countryState?.releasable) {
+        showToast(
+          t("Sovereignty painting will now assign regions to the selected releasable country.", "ui"),
+          {
+            title: t("Active sovereign updated", "ui"),
+            tone: "info",
+            duration: 3200,
+          }
+        );
+      }
     });
     countryInspectorSetActive.dataset.bound = "true";
   }
@@ -1599,7 +1926,6 @@ function initSidebar({ render } = {}) {
       const selectedCode = ensureSelectedInspectorCountry();
       if (!selectedCode) return;
       const value = event.target.value;
-      state.countryPalette[selectedCode] = value;
       applyCountryColor(selectedCode, value);
       markDirty("country-color-change");
       renderList();
@@ -1609,73 +1935,56 @@ function initSidebar({ render } = {}) {
 
   state.renderCountryListFn = renderList;
 
-  const renderPresetTree = () => {
-    if (!presetTree) return;
-    const term = getSearchTerm();
-    const entries = getDynamicCountryEntries();
-    presetTree.innerHTML = "";
-    let renderedCount = 0;
+  const appendActionSection = (container, titleText) => {
+    const section = document.createElement("div");
+    section.className = "inspector-detail-section mt-3";
+    const title = document.createElement("div");
+    title.className = "section-header-block";
+    title.textContent = titleText;
+    const body = document.createElement("div");
+    body.className = "inspector-action-list mt-2";
+    section.appendChild(title);
+    section.appendChild(body);
+    container.appendChild(section);
+    return body;
+  };
 
-    entries.forEach((entry) => {
-      const { code, name, displayName } = entry;
-      const presetLookupCode = resolveScenarioLookupCode(entry);
-      const presets = state.presetsState[presetLookupCode] || [];
-      if (!presets.length) return;
+  const buildPresetEntries = (presetLookupCode, predicate = null) => {
+    const presets = Array.isArray(state.presetsState?.[presetLookupCode]) ? state.presetsState[presetLookupCode] : [];
+    return presets
+      .map((preset, presetIndex) => ({ preset, presetIndex }))
+      .filter(({ preset }) => (typeof predicate === "function" ? predicate(preset) : true));
+  };
 
-      const countryMatch =
-        !term ||
-        name.toLowerCase().includes(term) ||
-        displayName.toLowerCase().includes(term) ||
-        code.toLowerCase().includes(term);
+  const renderPresetEntryRows = (container, presetLookupCode, presetEntries = [], emptyMessage) => {
+    if (!presetEntries.length) {
+      container.appendChild(createEmptyNote(emptyMessage));
+      return;
+    }
 
-      if (!countryMatch) return;
+    presetEntries.forEach(({ preset, presetIndex }) => {
+      const row = document.createElement("div");
+      row.className = "preset-row";
+      const isLockedPreset = !!preset.locked;
 
-      const expansionKey = state.activeScenarioId ? `${code}::${presetLookupCode}` : presetLookupCode;
-      const details = document.createElement("details");
-      details.className = "inspector-preset-details";
-      details.open = state.expandedPresetCountries.has(expansionKey);
-      details.addEventListener("toggle", () => {
-        if (details.open) {
-          state.expandedPresetCountries.add(expansionKey);
-        } else {
-          state.expandedPresetCountries.delete(expansionKey);
-        }
+      const nameBtn = document.createElement("button");
+      nameBtn.type = "button";
+      nameBtn.className = "inspector-item-btn";
+      nameBtn.textContent = preset.name;
+      nameBtn.addEventListener("click", () => {
+        applyPreset(presetLookupCode, presetIndex, state.selectedColor, render);
       });
 
-      const summary = document.createElement("summary");
-      summary.className = "inspector-accordion-btn";
-      const chevron = document.createElement("span");
-      chevron.className = "inspector-mini-label";
-      chevron.textContent = details.open ? "v" : ">";
-      const label = document.createElement("span");
-      label.textContent = `${displayName} (${code})`;
-      summary.appendChild(chevron);
-      summary.appendChild(label);
-      details.appendChild(summary);
+      const actions = document.createElement("div");
+      actions.className = "country-row-actions";
 
-      const child = document.createElement("div");
-      child.className = "preset-country-body";
-      presets.forEach((preset, index) => {
-        const row = document.createElement("div");
-        row.className = "preset-row";
+      const isEditingThis =
+        state.isEditingPreset &&
+        state.editingPresetRef &&
+        state.editingPresetRef.code === presetLookupCode &&
+        state.editingPresetRef.presetIndex === presetIndex;
 
-        const nameBtn = document.createElement("button");
-        nameBtn.type = "button";
-        nameBtn.className = "inspector-item-btn";
-        nameBtn.textContent = preset.name;
-        nameBtn.addEventListener("click", () => {
-          applyPreset(presetLookupCode, index, state.selectedColor, render);
-        });
-
-        const actions = document.createElement("div");
-        actions.className = "country-row-actions";
-
-        const isEditingThis =
-          state.isEditingPreset &&
-          state.editingPresetRef &&
-          state.editingPresetRef.code === presetLookupCode &&
-          state.editingPresetRef.presetIndex === index;
-
+      if (!isLockedPreset) {
         const editBtn = document.createElement("button");
         editBtn.type = "button";
         editBtn.className = "preset-action-btn";
@@ -1684,7 +1993,7 @@ function initSidebar({ render } = {}) {
           if (isEditingThis) {
             stopPresetEdit(render);
           } else {
-            startPresetEdit(presetLookupCode, index, render);
+            startPresetEdit(presetLookupCode, presetIndex, render);
           }
         });
 
@@ -1698,7 +2007,7 @@ function initSidebar({ render } = {}) {
         saveBtn.addEventListener("click", () => {
           if (!isEditingThis) return;
           const ids = Array.from(state.editingPresetIds);
-          const activePreset = state.presetsState[presetLookupCode]?.[index];
+          const activePreset = state.presetsState[presetLookupCode]?.[presetIndex];
           if (activePreset) {
             activePreset.ids = ids;
             upsertCustomPreset(presetLookupCode, activePreset.name, ids);
@@ -1706,39 +2015,312 @@ function initSidebar({ render } = {}) {
           stopPresetEdit(render);
         });
 
-        const copyBtn = document.createElement("button");
-        copyBtn.type = "button";
-        copyBtn.className = "preset-action-btn";
-        copyBtn.textContent = t("Copy", "ui");
-        copyBtn.addEventListener("click", () => {
-          const ids = isEditingThis ? Array.from(state.editingPresetIds) : preset.ids;
-          copyPresetIds(ids || []);
-        });
-
         actions.appendChild(editBtn);
         actions.appendChild(saveBtn);
-        actions.appendChild(copyBtn);
+      }
 
-        row.appendChild(nameBtn);
-        row.appendChild(actions);
-        child.appendChild(row);
+      const copyBtn = document.createElement("button");
+      copyBtn.type = "button";
+      copyBtn.className = "preset-action-btn";
+      copyBtn.textContent = t("Copy", "ui");
+      copyBtn.addEventListener("click", () => {
+        const ids = isEditingThis ? Array.from(state.editingPresetIds) : preset.ids;
+        copyPresetIds(ids || []);
       });
+      actions.appendChild(copyBtn);
 
-      details.addEventListener("toggle", () => {
-        chevron.textContent = details.open ? "v" : ">";
-      });
-      details.appendChild(child);
-      presetTree.appendChild(details);
-      renderedCount += 1;
+      row.appendChild(nameBtn);
+      row.appendChild(actions);
+      container.appendChild(row);
     });
+  };
 
-    if (renderedCount === 0) {
-      const empty = document.createElement("div");
-      empty.id = "presetTreeEmptyState";
-      empty.className = "legend-empty-state";
-      empty.textContent = t("No presets available.", "ui");
-      presetTree.appendChild(empty);
+  const getFilteredRegionalPresets = (countryState) => {
+    const presetLookupCode = countryState?.presetLookupCode || countryState?.code;
+    const consumedPresetNames = state.activeScenarioId
+      ? Array.isArray(state.scenarioReleasableIndex?.consumedPresetNamesByParentLookup?.[presetLookupCode])
+        ? state.scenarioReleasableIndex.consumedPresetNamesByParentLookup[presetLookupCode]
+        : []
+      : [];
+    return buildPresetEntries(presetLookupCode, (preset) => {
+      if (!state.activeScenarioId) return true;
+      return !consumedPresetNames.includes(normalizePresetName(preset?.name));
+    });
+  };
+
+  const renderParentCountryActions = (container, countryState) => {
+    const groupSection = appendActionSection(container, t("Hierarchy Groups", "ui"));
+    if (countryState.hierarchyGroups.length > 0) {
+      countryState.hierarchyGroups.forEach((group) => {
+        const button = createInspectorActionButton(
+          t(group.label, "geo") || group.label,
+          () => applyHierarchyGroup(group, state.selectedColor, render)
+        );
+        groupSection.appendChild(button);
+      });
+    } else {
+      groupSection.appendChild(createEmptyNote(t("No hierarchy groups", "ui")));
     }
+
+    const presetSection = appendActionSection(container, t("Regional Presets", "ui"));
+    const filteredPresetEntries = getFilteredRegionalPresets(countryState);
+    if (filteredPresetEntries.length > 0) {
+      renderPresetEntryRows(
+        presetSection,
+        countryState.presetLookupCode || countryState.code,
+        filteredPresetEntries,
+        t("No regional presets", "ui")
+      );
+    } else {
+      presetSection.appendChild(createEmptyNote(t("No regional presets", "ui")));
+    }
+  };
+
+  const renderScenarioActionStatus = (container) => {
+    const strip = document.createElement("div");
+    strip.className = "scenario-action-status";
+
+    const modeValue = String(state.paintMode || "visual") === "sovereignty"
+      ? t("Sovereignty", "ui")
+      : t("Visual", "ui");
+    const activeCode = normalizeCountryCode(state.activeSovereignCode);
+    const activeState = activeCode ? latestCountryStatesByCode.get(activeCode) : null;
+    const activeLabel = activeState?.displayName
+      || (activeCode ? (t(state.countryNames?.[activeCode] || activeCode, "geo") || state.countryNames?.[activeCode] || activeCode) : t("None", "ui"));
+
+    const modeChip = document.createElement("div");
+    modeChip.className = "scenario-action-status-chip";
+    modeChip.textContent = `${t("Mode", "ui")}: ${modeValue}`;
+
+    const activeChip = document.createElement("div");
+    activeChip.className = "scenario-action-status-chip";
+    activeChip.textContent = activeCode
+      ? `${t("Active", "ui")}: ${activeLabel} (${activeCode})`
+      : `${t("Active", "ui")}: ${t("None", "ui")}`;
+
+    strip.appendChild(modeChip);
+    strip.appendChild(activeChip);
+    container.appendChild(strip);
+
+    const hint = document.createElement("p");
+    hint.className = "scenario-action-hint";
+    hint.textContent = String(state.paintMode || "visual") === "sovereignty"
+      ? t("Preset actions assign regions to the active sovereign.", "ui")
+      : t("Preset actions fill regions using the current selected color.", "ui");
+    container.appendChild(hint);
+  };
+
+  const renderScenarioReleasableList = (container, parentState) => {
+    const children = getReleasableChildrenForParent(parentState?.code);
+    if (!children.length) return;
+
+    const section = appendActionSection(container, t("Releasable Countries", "ui"));
+    children.forEach((childState) => {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "scenario-action-card";
+      card.addEventListener("click", () => {
+        selectInspectorCountry(childState.code);
+      });
+
+      const copy = document.createElement("div");
+      copy.className = "scenario-action-card-copy";
+
+      const title = document.createElement("div");
+      title.className = "country-row-title";
+      title.textContent = childState.displayName;
+
+      const meta = document.createElement("div");
+      meta.className = "country-select-meta";
+      meta.textContent = `(${childState.code})`;
+
+      copy.appendChild(title);
+      copy.appendChild(meta);
+
+      const side = document.createElement("div");
+      side.className = "country-row-actions";
+      const swatch = document.createElement("span");
+      swatch.className = "country-select-swatch";
+      swatch.style.backgroundColor = getResolvedCountryColor(childState);
+      side.appendChild(swatch);
+
+      card.appendChild(copy);
+      card.appendChild(side);
+      section.appendChild(card);
+    });
+  };
+
+  const renderScenarioParentActions = (container, countryState) => {
+    renderScenarioReleasableList(container, countryState);
+
+    if (countryState.hierarchyGroups.length > 0) {
+      const groupSection = appendActionSection(container, t("Hierarchy Groups", "ui"));
+      countryState.hierarchyGroups.forEach((group) => {
+        const button = createInspectorActionButton(
+          t(group.label, "geo") || group.label,
+          () => applyHierarchyGroup(group, state.selectedColor, render)
+        );
+        groupSection.appendChild(button);
+      });
+    }
+
+    const filteredPresetEntries = getFilteredRegionalPresets(countryState);
+    if (filteredPresetEntries.length > 0) {
+      const presetSection = appendActionSection(container, t("Regional Presets", "ui"));
+      renderPresetEntryRows(
+        presetSection,
+        countryState.presetLookupCode || countryState.code,
+        filteredPresetEntries,
+        t("No regional presets", "ui")
+      );
+    }
+  };
+
+  const renderScenarioCoreTerritoryAction = (container, countryState) => {
+    const section = appendActionSection(container, t("Core Territory", "ui"));
+    const presetRef = getPrimaryReleasablePresetRef(countryState);
+    if (!presetRef) {
+      section.appendChild(createEmptyNote(t("No core territory defined", "ui")));
+      return;
+    }
+
+    const card = document.createElement("div");
+    card.className = "scenario-action-card scenario-core-action-card";
+
+    const copy = document.createElement("div");
+    copy.className = "scenario-action-card-copy";
+
+    const title = document.createElement("div");
+    title.className = "country-row-title";
+    title.textContent = presetRef.preset?.name || t("Core Territory", "ui");
+
+    const meta = document.createElement("div");
+    meta.className = "country-select-meta";
+    meta.textContent = `${presetRef.preset?.ids?.length || 0} ${t("features", "ui")}`;
+
+    copy.appendChild(title);
+    copy.appendChild(meta);
+
+    const actions = document.createElement("div");
+    actions.className = "country-row-actions scenario-core-action-row";
+
+    const applyBtn = document.createElement("button");
+    applyBtn.type = "button";
+    applyBtn.className = "btn-primary";
+    applyBtn.textContent = t("Apply Core Territory", "ui");
+    applyBtn.addEventListener("click", () => {
+      applyScenarioReleasableCoreTerritory(countryState, {
+        source: "scenario-actions",
+      });
+    });
+    actions.appendChild(applyBtn);
+
+    const isEditingThis =
+      state.isEditingPreset &&
+      state.editingPresetRef &&
+      state.editingPresetRef.code === presetRef.presetLookupCode &&
+      state.editingPresetRef.presetIndex === presetRef.presetIndex;
+
+    if (!presetRef.preset?.locked) {
+      const editBtn = document.createElement("button");
+      editBtn.type = "button";
+      editBtn.className = "preset-action-btn";
+      editBtn.textContent = isEditingThis ? t("Cancel", "ui") : t("Edit", "ui");
+      editBtn.addEventListener("click", () => {
+        if (isEditingThis) {
+          stopPresetEdit(render);
+        } else {
+          startPresetEdit(presetRef.presetLookupCode, presetRef.presetIndex, render);
+        }
+      });
+      actions.appendChild(editBtn);
+
+      const saveBtn = document.createElement("button");
+      saveBtn.type = "button";
+      saveBtn.className = "preset-action-btn";
+      saveBtn.textContent = t("Save", "ui");
+      if (!isEditingThis) {
+        saveBtn.classList.add("hidden");
+      }
+      saveBtn.addEventListener("click", () => {
+        if (!isEditingThis) return;
+        const ids = Array.from(state.editingPresetIds);
+        const activePreset = state.presetsState[presetRef.presetLookupCode]?.[presetRef.presetIndex];
+        if (activePreset) {
+          activePreset.ids = ids;
+          upsertCustomPreset(presetRef.presetLookupCode, activePreset.name, ids);
+        }
+        stopPresetEdit(render);
+      });
+      actions.appendChild(saveBtn);
+    }
+
+    const copyBtn = document.createElement("button");
+    copyBtn.type = "button";
+    copyBtn.className = "preset-action-btn";
+    copyBtn.textContent = t("Copy", "ui");
+    copyBtn.addEventListener("click", () => {
+      const ids = isEditingThis ? Array.from(state.editingPresetIds) : presetRef.preset.ids;
+      copyPresetIds(ids || []);
+    });
+    actions.appendChild(copyBtn);
+
+    card.appendChild(copy);
+    card.appendChild(actions);
+    section.appendChild(card);
+  };
+
+  const renderScenarioReleasableActions = (container, countryState) => {
+    renderScenarioCoreTerritoryAction(container, countryState);
+    if (countryState.notes) {
+      const notesSection = appendActionSection(container, t("Notes", "ui"));
+      const notes = document.createElement("div");
+      notes.className = "inspector-empty-note";
+      notes.textContent = countryState.notes;
+      notesSection.appendChild(notes);
+    }
+  };
+
+  const renderScenarioActionsPanel = (container, countryState) => {
+    container.replaceChildren();
+    renderScenarioActionStatus(container);
+
+    if (!countryState) {
+      container.appendChild(
+        createEmptyNote(t("Select a country to inspect territories, presets, and releasables.", "ui"))
+      );
+      return;
+    }
+
+    if (countryState.releasable) {
+      renderScenarioReleasableActions(container, countryState);
+      return;
+    }
+
+    renderScenarioParentActions(container, countryState);
+  };
+
+  const renderPresetTree = () => {
+    if (!presetTree) return;
+    updateScenarioInspectorLayout();
+    presetTree.innerHTML = "";
+
+    const selectedCode = ensureSelectedInspectorCountry();
+    const countryState = selectedCode ? latestCountryStatesByCode.get(selectedCode) : null;
+
+    if (state.activeScenarioId) {
+      renderScenarioActionsPanel(presetTree, countryState);
+      return;
+    }
+
+    if (!countryState) {
+      presetTree.appendChild(
+        createEmptyNote(t("Select a country to inspect territories, presets, and releasables.", "ui"))
+      );
+      return;
+    }
+
+    renderParentCountryActions(presetTree, countryState);
   };
 
   state.renderPresetTreeFn = renderPresetTree;
@@ -1913,6 +2495,9 @@ function initSidebar({ render } = {}) {
         state.inspectorExpansionInitialized = false;
         if (state.expandedInspectorContinents instanceof Set) {
           state.expandedInspectorContinents.clear();
+        }
+        if (state.expandedInspectorReleaseParents instanceof Set) {
+          state.expandedInspectorReleaseParents.clear();
         }
         state.dynamicBordersDirty = !!data.dynamicBordersDirty;
         state.dynamicBordersDirtyReason = data.dynamicBordersDirtyReason || "";

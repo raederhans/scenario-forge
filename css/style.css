@@ -1672,6 +1672,21 @@ details.card[open] > summary::after {
   flex: 1 1 auto;
 }
 
+.country-select-main-btn {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.country-select-main-btn:focus-visible {
+  outline: 2px solid rgba(0, 47, 167, 0.24);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
 .country-select-title {
   min-width: 0;
   font-size: 0.84rem;
@@ -1717,6 +1732,49 @@ details.card[open] > summary::after {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.country-children-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.45rem;
+  height: 1.45rem;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.scenario-action-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.scenario-action-status-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text-primary);
+  font-size: 0.73rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.scenario-action-hint {
+  margin: 0 0 8px;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
 }
 
 .country-scenario-badge {
@@ -1777,6 +1835,52 @@ details.card[open] > summary::after {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
+}
+
+.scenario-action-card {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 47, 167, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.84);
+  color: inherit;
+  text-align: left;
+  transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+}
+
+button.scenario-action-card {
+  cursor: pointer;
+}
+
+button.scenario-action-card:hover {
+  border-color: rgba(0, 47, 167, 0.22);
+  background: rgba(246, 248, 252, 0.96);
+  transform: translateY(-1px);
+}
+
+.scenario-action-card-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.scenario-core-action-card {
+  gap: 12px;
+}
+
+.scenario-core-action-row {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.scenario-core-action-row .btn-primary {
+  flex: 1 1 180px;
+  justify-content: center;
 }
 
 .preset-row .inspector-item-btn {

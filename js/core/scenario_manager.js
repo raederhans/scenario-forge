@@ -4,6 +4,11 @@ import { recomputeDynamicBordersNow, refreshColorState, setMapData } from "./map
 import { loadDeferredDetailBundle } from "./data_loader.js";
 import { setActivePaletteSource, syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { markDirty } from "./dirty_state.js";
+import {
+  buildScenarioReleasableIndex,
+  getScenarioReleasableCountries,
+  rebuildPresetState,
+} from "./releasable_manager.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
 
@@ -127,6 +132,9 @@ function syncScenarioInspectorSelection(countryCode = "") {
   state.inspectorExpansionInitialized = false;
   if (state.expandedInspectorContinents instanceof Set) {
     state.expandedInspectorContinents.clear();
+  }
+  if (state.expandedInspectorReleaseParents instanceof Set) {
+    state.expandedInspectorReleaseParents.clear();
   }
 }
 
@@ -387,15 +395,26 @@ async function applyScenarioBundle(
   }
 
   const scenarioId = normalizeScenarioId(bundle.manifest.scenario_id || bundle.meta?.scenario_id);
-  const countryMap = bundle.countriesPayload?.countries || {};
+  const baseCountryMap = bundle.countriesPayload?.countries || {};
   const owners = bundle.ownersPayload?.owners || {};
   const cores = bundle.coresPayload?.cores || {};
-  const scenarioNameMap = getScenarioNameMap(countryMap);
-  const scenarioColorMap = getScenarioFixedOwnerColors(countryMap);
-  const defaultCountryCode = getScenarioDefaultCountryCode(bundle.manifest, countryMap);
+  const defaultCountryCode = getScenarioDefaultCountryCode(bundle.manifest, baseCountryMap);
   disableScenarioParentBorders();
 
   state.activeScenarioId = scenarioId;
+  state.scenarioReleasableIndex = buildScenarioReleasableIndex(scenarioId);
+  const releasableCountries = getScenarioReleasableCountries(scenarioId);
+  Object.keys(releasableCountries).forEach((tag) => {
+    if (baseCountryMap[tag]) {
+      console.warn(`[scenario] Releasable tag conflict detected for "${tag}" while applying "${scenarioId}".`);
+    }
+  });
+  const countryMap = {
+    ...baseCountryMap,
+    ...releasableCountries,
+  };
+  const scenarioNameMap = getScenarioNameMap(countryMap);
+  const scenarioColorMap = getScenarioFixedOwnerColors(countryMap);
   state.scenarioBorderMode = "scenario_owner_only";
   state.activeScenarioManifest = bundle.manifest || null;
   state.scenarioCountriesByTag = countryMap;
@@ -422,6 +441,7 @@ async function applyScenarioBundle(
   state.countryBaseColors = { ...scenarioColorMap };
   state.activeSovereignCode = defaultCountryCode;
   syncScenarioInspectorSelection(defaultCountryCode);
+  rebuildPresetState();
 
   refreshColorState({ renderNow: false });
   recomputeDynamicBordersNow({ renderNow: false, reason: `scenario:${scenarioId}` });
@@ -465,6 +485,14 @@ function resetToScenarioBaseline(
   if (!state.activeScenarioId || !state.scenarioBaselineOwnersByFeatureId) {
     return false;
   }
+  const previousSelectedInspectorCountryCode = String(state.selectedInspectorCountryCode || "").trim().toUpperCase();
+  const previousExpandedInspectorContinents = state.expandedInspectorContinents instanceof Set
+    ? new Set(state.expandedInspectorContinents)
+    : new Set();
+  const previousExpandedInspectorReleaseParents = state.expandedInspectorReleaseParents instanceof Set
+    ? new Set(state.expandedInspectorReleaseParents)
+    : new Set();
+  const previousInspectorExpansionInitialized = !!state.inspectorExpansionInitialized;
   state.sovereigntyByFeatureId = { ...(state.scenarioBaselineOwnersByFeatureId || {}) };
   state.sovereigntyInitialized = false;
   ensureSovereigntyState({ force: true });
@@ -476,7 +504,16 @@ function resetToScenarioBaseline(
     state.activeScenarioManifest,
     state.scenarioCountriesByTag
   ) || String(state.activeSovereignCode || "").trim().toUpperCase();
-  syncScenarioInspectorSelection(state.activeSovereignCode);
+  const restoredInspectorCode =
+    previousSelectedInspectorCountryCode && state.scenarioCountriesByTag?.[previousSelectedInspectorCountryCode]
+      ? previousSelectedInspectorCountryCode
+      : state.activeSovereignCode;
+  state.selectedInspectorCountryCode = restoredInspectorCode;
+  state.inspectorHighlightCountryCode = restoredInspectorCode;
+  state.expandedInspectorContinents = previousExpandedInspectorContinents;
+  state.expandedInspectorReleaseParents = previousExpandedInspectorReleaseParents;
+  state.inspectorExpansionInitialized =
+    previousInspectorExpansionInitialized || previousExpandedInspectorContinents.size > 0;
   setScenarioAuditUiState({
     loading: false,
     errorMessage: "",
@@ -510,6 +547,11 @@ function clearActiveScenario(
   state.activeScenarioManifest = null;
   state.scenarioCountriesByTag = {};
   state.scenarioFixedOwnerColors = {};
+  state.scenarioReleasableIndex = {
+    byTag: {},
+    childTagsByParent: {},
+    consumedPresetNamesByParentLookup: {},
+  };
   state.scenarioAudit = null;
   setScenarioAuditUiState({
     loading: false,
@@ -529,6 +571,7 @@ function clearActiveScenario(
   state.activeSovereignCode = "";
   syncScenarioInspectorSelection("");
   restoreParentBordersAfterScenario();
+  rebuildPresetState();
   refreshColorState({ renderNow: false });
   recomputeDynamicBordersNow({ renderNow: false, reason: "scenario-clear" });
   if (markDirtyReason) {

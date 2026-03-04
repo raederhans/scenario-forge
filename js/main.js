@@ -173,6 +173,7 @@ async function bootstrap() {
       ruCityOverrides,
       specialZones,
       paletteRegistry,
+      releasableCatalog,
       activePaletteMeta,
       activePalettePack,
       activePaletteMap,
@@ -192,6 +193,7 @@ async function bootstrap() {
     state.ruCityOverrides = ruCityOverrides || null;
     state.specialZonesExternalData = specialZones || null;
     state.paletteRegistry = paletteRegistry || null;
+    state.releasableCatalog = releasableCatalog || null;
     state.activePaletteMeta = activePaletteMeta || null;
     state.activePalettePack = activePalettePack || null;
     state.activePaletteMap = activePaletteMap || null;

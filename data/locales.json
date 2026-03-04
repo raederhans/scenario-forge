@@ -160,6 +160,10 @@
       "en": "Country Presets",
       "zh": "国家预设"
     },
+    "Core Territory": {
+      "en": "Core Territory",
+      "zh": "核心领土"
+    },
     "Current Color": {
       "en": "Current Color",
       "zh": "当前颜色"
@@ -360,9 +364,21 @@
       "en": "No country presets",
       "zh": "No country presets"
     },
+    "No hierarchy groups": {
+      "en": "No hierarchy groups",
+      "zh": "没有可用层级分组"
+    },
     "No file selected": {
       "en": "No file selected",
       "zh": "未选择文件"
+    },
+    "No regional presets": {
+      "en": "No regional presets",
+      "zh": "没有可用区域预设"
+    },
+    "No releasable countries": {
+      "en": "No releasable countries",
+      "zh": "没有可释放国家"
     },
     "No scenario active": {
       "en": "No scenario active",
@@ -387,6 +403,10 @@
     "None selected": {
       "en": "None selected",
       "zh": "未选择"
+    },
+    "Notes": {
+      "en": "Notes",
+      "zh": "备注"
     },
     "None": {
       "en": "None",
@@ -504,6 +524,10 @@
       "en": "Select a country to edit",
       "zh": "选择一个国家开始编辑"
     },
+    "Select a country to inspect": {
+      "en": "Select a country to inspect",
+      "zh": "选择一个国家进行查看"
+    },
     "Synthetic": {
       "en": "Synthetic",
       "zh": "合成映射"
@@ -575,6 +599,106 @@
     "Choose a country above to edit its color, active sovereign state, groups, and presets.": {
       "en": "Choose a country above to edit its color, active sovereign state, groups, and presets.",
       "zh": "在上方选择一个国家，以编辑其颜色、当前主权状态、分组和预设。"
+    },
+    "Choose a country above to inspect its identity, territories, presets, and releasables.": {
+      "en": "Choose a country above to inspect its identity, territories, presets, and releasables.",
+      "zh": "在上方选择一个国家，以查看其身份、领土、预设和可释放国家。"
+    },
+    "Choose a country above to inspect territories, presets, and releasables.": {
+      "en": "Choose a country above to inspect territories, presets, and releasables.",
+      "zh": "在上方选择一个国家，以查看其领土、预设和可释放国家。"
+    },
+    "Back to Parent": {
+      "en": "Back to Parent",
+      "zh": "返回母国"
+    },
+    "Active sovereign updated": {
+      "en": "Active sovereign updated",
+      "zh": "当前主权已更新"
+    },
+    "Sovereignty painting will now assign regions to the selected releasable country.": {
+      "en": "Sovereignty painting will now assign regions to the selected releasable country.",
+      "zh": "后续主权绘制将把区域分配给当前选中的可释放国家。"
+    },
+    "Hierarchy Groups": {
+      "en": "Hierarchy Groups",
+      "zh": "层级分组"
+    },
+    "Parent Country": {
+      "en": "Parent Country",
+      "zh": "母国"
+    },
+    "Regional Presets": {
+      "en": "Regional Presets",
+      "zh": "区域预设"
+    },
+    "Releasable": {
+      "en": "Releasable",
+      "zh": "可释放"
+    },
+    "Releasable Countries": {
+      "en": "Releasable Countries",
+      "zh": "可释放国家"
+    },
+    "Releasable from": {
+      "en": "Releasable from",
+      "zh": "可自以下母国释放："
+    },
+    "Releasables": {
+      "en": "Releasables",
+      "zh": "可释放"
+    },
+    "Selected Country Actions": {
+      "en": "Selected Country Actions",
+      "zh": "当前国家动作"
+    },
+    "Select a country to inspect territories, presets, and releasables.": {
+      "en": "Select a country to inspect territories, presets, and releasables.",
+      "zh": "选择一个国家以查看其领土、预设和可释放国家。"
+    },
+    "presets moved to Releasable Countries.": {
+      "en": "presets moved to Releasable Countries.",
+      "zh": "个预设已移动到“可释放国家”中。"
+    },
+    "All matching presets moved to Releasable Countries.": {
+      "en": "All matching presets moved to Releasable Countries.",
+      "zh": "所有匹配预设都已移动到“可释放国家”中。"
+    },
+    "Apply Core Territory": {
+      "en": "Apply Core Territory",
+      "zh": "应用核心领土"
+    },
+    "Mode": {
+      "en": "Mode",
+      "zh": "模式"
+    },
+    "No core territory defined": {
+      "en": "No core territory defined",
+      "zh": "未定义核心领土"
+    },
+    "Preset actions assign regions to the active sovereign.": {
+      "en": "Preset actions assign regions to the active sovereign.",
+      "zh": "这些操作会将区域分配给当前激活的主权国家。"
+    },
+    "Preset actions fill regions using the current selected color.": {
+      "en": "Preset actions fill regions using the current selected color.",
+      "zh": "这些操作会使用当前选中的颜色填充区域。"
+    },
+    "Review the current paint mode, then apply releasables, hierarchy groups, or regional presets.": {
+      "en": "Review the current paint mode, then apply releasables, hierarchy groups, or regional presets.",
+      "zh": "先确认当前涂色模式，再应用可释放国家、层级分组或区域预设。"
+    },
+    "Scenario Actions": {
+      "en": "Scenario Actions",
+      "zh": "剧本动作"
+    },
+    "Territories & Presets": {
+      "en": "Territories & Presets",
+      "zh": "领土与预设"
+    },
+    "Key scenario countries first. Releasables appear under parent countries.": {
+      "en": "Key scenario countries first. Releasables appear under parent countries.",
+      "zh": "重要剧本国家优先，可释放国家显示在母国下方。"
     },
     "Click a region to start painting, or use Auto-Fill to color all countries": {
       "en": "Click a region to start painting, or use Auto-Fill to color all countries",

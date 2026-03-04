@@ -1,0 +1,279 @@
+{
+  "version": 1,
+  "catalog_id": "hoi4_vanilla.internal.phase1",
+  "scenario_ids": [
+    "hoi4_1936"
+  ],
+  "entries": [
+    {
+      "tag": "BAY",
+      "parent_owner_tag": "GER",
+      "release_lookup_iso2": "DE",
+      "preset_source": {
+        "type": "legacy_preset_name",
+        "name": "Bavaria"
+      },
+      "notes": "German internal releasable. Runtime geometry reuses the existing Bavaria preset."
+    },
+    {
+      "tag": "SAX",
+      "parent_owner_tag": "GER",
+      "release_lookup_iso2": "DE",
+      "preset_source": {
+        "type": "legacy_preset_name",
+        "name": "Saxony"
+      },
+      "notes": "German internal releasable. Runtime geometry reuses the existing Saxony preset."
+    },
+    {
+      "tag": "SHL",
+      "parent_owner_tag": "GER",
+      "release_lookup_iso2": "DE",
+      "preset_source": {
+        "type": "legacy_preset_name",
+        "name": "Schleswig-Holstein"
+      },
+      "notes": "German internal releasable. Runtime geometry reuses the existing Schleswig-Holstein preset."
+    },
+    {
+      "tag": "SCO",
+      "parent_owner_tag": "ENG",
+      "release_lookup_iso2": "GB",
+      "preset_source": {
+        "type": "legacy_preset_name",
+        "name": "Scotland"
+      },
+      "notes": "British internal releasable. Runtime geometry reuses the existing Scotland preset."
+    },
+    {
+      "tag": "WLS",
+      "parent_owner_tag": "ENG",
+      "release_lookup_iso2": "GB",
+      "preset_source": {
+        "type": "legacy_preset_name",
+        "name": "Wales"
+      },
+      "notes": "British internal releasable. Runtime geometry reuses the existing Wales preset."
+    },
+    {
+      "tag": "NIR",
+      "parent_owner_tag": "ENG",
+      "release_lookup_iso2": "GB",
+      "preset_source": {
+        "type": "legacy_preset_name",
+        "name": "Northern Ireland"
+      },
+      "notes": "British internal releasable. Runtime geometry reuses the existing Northern Ireland preset."
+    },
+    {
+      "tag": "BYA",
+      "parent_owner_tag": "SOV",
+      "release_lookup_iso2": "RU",
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "group_ids": [
+          "RU_Republic_of_Buryatia"
+        ]
+      },
+      "notes": "Soviet internal releasable mapped from the Republic of Buryatia hierarchy group."
+    },
+    {
+      "tag": "TAT",
+      "parent_owner_tag": "SOV",
+      "release_lookup_iso2": "RU",
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "group_ids": [
+          "RU_Republic_of_Tatarstan"
+        ]
+      },
+      "notes": "Soviet internal releasable mapped from the Republic of Tatarstan hierarchy group."
+    },
+    {
+      "tag": "DAG",
+      "parent_owner_tag": "SOV",
+      "release_lookup_iso2": "RU",
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "group_ids": [
+          "RU_Republic_of_Dagestan"
+        ]
+      },
+      "notes": "Soviet internal releasable mapped from the Republic of Dagestan hierarchy group."
+    },
+    {
+      "tag": "KAL",
+      "parent_owner_tag": "SOV",
+      "release_lookup_iso2": "RU",
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "group_ids": [
+          "RU_Republic_of_Kalmykia"
+        ]
+      },
+      "notes": "Soviet internal releasable mapped from the Republic of Kalmykia hierarchy group."
+    },
+    {
+      "tag": "KOM",
+      "parent_owner_tag": "SOV",
+      "release_lookup_iso2": "RU",
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "group_ids": [
+          "RU_Komi_Republic"
+        ]
+      },
+      "notes": "Soviet internal releasable mapped from the Komi Republic hierarchy group."
+    },
+    {
+      "tag": "NEN",
+      "parent_owner_tag": "SOV",
+      "release_lookup_iso2": "RU",
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "group_ids": [
+          "RU_Nenets_Autonomous_Okrug"
+        ]
+      },
+      "notes": "Soviet internal releasable mapped from the Nenets Autonomous Okrug hierarchy group."
+    },
+    {
+      "tag": "CKK",
+      "parent_owner_tag": "SOV",
+      "release_lookup_iso2": "RU",
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "group_ids": [
+          "RU_Chukotka_Autonomous_Okrug"
+        ]
+      },
+      "notes": "Soviet internal releasable mapped from the Chukotka Autonomous Okrug hierarchy group."
+    },
+    {
+      "tag": "YAK",
+      "parent_owner_tag": "SOV",
+      "release_lookup_iso2": "RU",
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "group_ids": [
+          "RU_Sakha_Republic"
+        ]
+      },
+      "notes": "Soviet internal releasable mapped from the Sakha Republic hierarchy group."
+    },
+    {
+      "tag": "YAM",
+      "parent_owner_tag": "SOV",
+      "release_lookup_iso2": "RU",
+      "preset_source": {
+        "type": "hierarchy_group_ids",
+        "group_ids": [
+          "RU_Yamalo_Nenets_Autonomous_Okrug"
+        ]
+      },
+      "notes": "Soviet internal releasable mapped from the Yamalo-Nenets Autonomous Okrug hierarchy group."
+    }
+  ],
+  "excluded": [
+    {
+      "tag": "HAN",
+      "reason": "missing_runtime_mapping",
+      "notes": "Hanover needs a dedicated Lower Saxony and Westphalia split instead of the current coarse preset set."
+    },
+    {
+      "tag": "RHI",
+      "reason": "missing_runtime_mapping",
+      "notes": "Rhineland requires a dedicated Rhine-West grouping that is not available as a clean runtime preset yet."
+    },
+    {
+      "tag": "WUR",
+      "reason": "missing_runtime_mapping",
+      "notes": "Wurttemberg needs a Baden/Wurttemberg split that does not exist as a stable runtime preset."
+    },
+    {
+      "tag": "PRE",
+      "reason": "ambiguous_existing_preset",
+      "notes": "The current Prussia preset is an eastern-core convenience preset, not a stable HOI4 releasable boundary."
+    },
+    {
+      "tag": "HES",
+      "reason": "missing_runtime_mapping",
+      "notes": "Hesse needs a dedicated central German grouping before it can be exposed safely."
+    },
+    {
+      "tag": "MEK",
+      "reason": "missing_runtime_mapping",
+      "notes": "Mecklenburg needs a dedicated coastal grouping instead of being folded into the current Prussia convenience preset."
+    },
+    {
+      "tag": "FER",
+      "reason": "missing_runtime_mapping",
+      "notes": "Far Eastern Republic needs multiple Russian Far East groups and a cleaner Primorsky split."
+    },
+    {
+      "tag": "VLA",
+      "reason": "missing_runtime_mapping",
+      "notes": "Vladivostok needs a narrower coastal split than the current Primorsky hierarchy group."
+    },
+    {
+      "tag": "ALT",
+      "reason": "missing_runtime_mapping",
+      "notes": "Altay needs a finer Siberian republic split than the current runtime hierarchy provides."
+    },
+    {
+      "tag": "CHU",
+      "reason": "missing_runtime_mapping",
+      "notes": "Chuvashia needs a dedicated Volga split before it can be exposed as a releasable."
+    },
+    {
+      "tag": "OVO",
+      "reason": "missing_runtime_mapping",
+      "notes": "Ostyak-Vogulia needs a dedicated Khanty-Mansi plus Tyumen split."
+    },
+    {
+      "tag": "TAY",
+      "reason": "missing_runtime_mapping",
+      "notes": "Taymyria needs a dedicated north-central Siberian split."
+    },
+    {
+      "tag": "CIN",
+      "reason": "missing_runtime_mapping",
+      "notes": "Chechnya-Ingushetia needs a dedicated North Caucasus split beyond Dagestan."
+    },
+    {
+      "tag": "UKR",
+      "reason": "multi_parent",
+      "notes": "Ukraine has 1936 cores across multiple parent owners and is intentionally deferred."
+    },
+    {
+      "tag": "BLR",
+      "reason": "multi_parent",
+      "notes": "Belarus has 1936 cores across multiple parent owners and is intentionally deferred."
+    },
+    {
+      "tag": "KUR",
+      "reason": "multi_parent",
+      "notes": "Kurdistan has 1936 cores across multiple parent owners and is intentionally deferred."
+    },
+    {
+      "tag": "KAR",
+      "reason": "multi_parent",
+      "notes": "Karelia has 1936 cores across both Finland and the Soviet Union."
+    },
+    {
+      "tag": "ANG",
+      "reason": "colonial_or_overseas",
+      "notes": "Colonial releasable intentionally left out of the internal-only Phase 1 scope."
+    },
+    {
+      "tag": "KEN",
+      "reason": "colonial_or_overseas",
+      "notes": "Colonial releasable intentionally left out of the internal-only Phase 1 scope."
+    },
+    {
+      "tag": "COG",
+      "reason": "colonial_or_overseas",
+      "notes": "Colonial releasable intentionally left out of the internal-only Phase 1 scope."
+    }
+  ]
+}
