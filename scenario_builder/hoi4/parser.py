@@ -273,6 +273,7 @@ def load_manual_rules(path: Path) -> list[ScenarioRule]:
                 exclude_hierarchy_group_ids=[str(value).strip() for value in raw.get("exclude_hierarchy_group_ids", [])],
                 exclude_feature_ids=[str(value).strip() for value in raw.get("exclude_feature_ids", [])],
                 base_iso2=normalize_iso2(raw.get("base_iso2")),
+                lookup_iso2=normalize_iso2(raw.get("lookup_iso2")),
                 display_name_override=str(raw.get("display_name_override") or "").strip(),
                 color_hex_override=normalize_hex(raw.get("color_hex_override")),
                 source_type=str(raw.get("source_type") or "hoi4_owner").strip() or "hoi4_owner",

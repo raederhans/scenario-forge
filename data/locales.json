@@ -164,6 +164,26 @@
       "en": "Current Color",
       "zh": "当前颜色"
     },
+    "Approximate": {
+      "en": "Approximate",
+      "zh": "近似映射"
+    },
+    "Belarus hybrid": {
+      "en": "Belarus hybrid",
+      "zh": "白俄罗斯混合拓扑"
+    },
+    "Blockers": {
+      "en": "Blockers",
+      "zh": "阻塞项"
+    },
+    "Border rayons kept": {
+      "en": "Border rayons kept",
+      "zh": "保留的边境区"
+    },
+    "Coverage report unavailable": {
+      "en": "Coverage report unavailable",
+      "zh": "覆盖报告不可用"
+    },
     "Custom": {
       "en": "Custom",
       "zh": "自定义"
@@ -224,6 +244,14 @@
       "en": "Export tools",
       "zh": "导出工具"
     },
+    "features": {
+      "en": "features",
+      "zh": "地块"
+    },
+    "Features": {
+      "en": "Features",
+      "zh": "地块数"
+    },
     "Eyedropper": {
       "en": "Eyedropper",
       "zh": "吸管"
@@ -260,13 +288,25 @@
       "en": "Historical predecessor",
       "zh": "历史前身实体"
     },
+    "Historical composites built": {
+      "en": "Historical composites built",
+      "zh": "构建的历史合并区"
+    },
     "Import failed": {
       "en": "Import failed",
       "zh": "Import failed"
     },
+    "Inspect critical checks, blockers, and source quality for the active scenario.": {
+      "en": "Inspect critical checks, blockers, and source quality for the active scenario.",
+      "zh": "查看当前剧本的关键检查、阻塞项与来源质量。"
+    },
     "Inspector": {
       "en": "Inspector",
       "zh": "Inspector"
+    },
+    "Interior groups built": {
+      "en": "Interior groups built",
+      "zh": "构建的内部组合"
     },
     "Internal Borders": {
       "en": "Internal Borders",
@@ -279,6 +319,14 @@
     "Legend Editor": {
       "en": "Legend Editor",
       "zh": "图例编辑器"
+    },
+    "Load Audit Details": {
+      "en": "Load Audit Details",
+      "zh": "加载审计详情"
+    },
+    "Loading audit details…": {
+      "en": "Loading audit details…",
+      "zh": "正在加载审计详情…"
     },
     "Load Project": {
       "en": "Load Project",
@@ -296,6 +344,10 @@
       "en": "Mapped to",
       "zh": "映射到"
     },
+    "Manual-reviewed": {
+      "en": "Manual-reviewed",
+      "zh": "人工校审"
+    },
     "No countries available": {
       "en": "No countries available",
       "zh": "No countries available"
@@ -311,6 +363,10 @@
     "No file selected": {
       "en": "No file selected",
       "zh": "未选择文件"
+    },
+    "No scenario active": {
+      "en": "No scenario active",
+      "zh": "当前没有激活剧本"
     },
     "No presets available.": {
       "en": "No presets available.",
@@ -332,6 +388,10 @@
       "en": "None selected",
       "zh": "未选择"
     },
+    "None": {
+      "en": "None",
+      "zh": "无"
+    },
     "Normal View": {
       "en": "Normal View",
       "zh": "正常视图"
@@ -343,6 +403,14 @@
     "Overlay": {
       "en": "Overlay",
       "zh": "覆盖层"
+    },
+    "owners": {
+      "en": "owners",
+      "zh": "主权实体"
+    },
+    "Owners": {
+      "en": "Owners",
+      "zh": "主权实体数"
     },
     "Paint Granularity": {
       "en": "Paint Granularity",
@@ -384,6 +452,10 @@
       "en": "Project saved",
       "zh": "Project saved"
     },
+    "Reload Audit": {
+      "en": "Reload Audit",
+      "zh": "重新加载审计"
+    },
     "Quick Colors": {
       "en": "Quick Colors",
       "zh": "Quick Colors"
@@ -416,6 +488,14 @@
       "en": "Reset Colors",
       "zh": "重置颜色"
     },
+    "Scenario Audit": {
+      "en": "Scenario Audit",
+      "zh": "剧本审计"
+    },
+    "Scenario rule blockers": {
+      "en": "Scenario rule blockers",
+      "zh": "剧本规则阻塞项"
+    },
     "Reset Country Colors": {
       "en": "Reset Country Colors",
       "zh": "重置国家配色"
@@ -423,6 +503,30 @@
     "Select a country to edit": {
       "en": "Select a country to edit",
       "zh": "选择一个国家开始编辑"
+    },
+    "Synthetic": {
+      "en": "Synthetic",
+      "zh": "合成映射"
+    },
+    "Critical checks": {
+      "en": "Critical checks",
+      "zh": "关键检查"
+    },
+    "Topology blockers": {
+      "en": "Topology blockers",
+      "zh": "拓扑阻塞项"
+    },
+    "Topology Summary": {
+      "en": "Topology Summary",
+      "zh": "拓扑摘要"
+    },
+    "Total features": {
+      "en": "Total features",
+      "zh": "总地块数"
+    },
+    "Unable to load audit details": {
+      "en": "Unable to load audit details",
+      "zh": "无法加载审计详情"
     },
     "Save": {
       "en": "Save",

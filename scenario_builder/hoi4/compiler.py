@@ -1049,9 +1049,9 @@ def compile_scenario_bundle(
     )
     diagnostics = {**diagnostics, **crosswalk_diagnostics}
 
-    rule_lookup_by_owner = {}
+    rule_lookup_by_owner: defaultdict[str, list] = defaultdict(list)
     for rule in rules:
-        rule_lookup_by_owner[rule.owner_tag] = rule
+        rule_lookup_by_owner[rule.owner_tag].append(rule)
 
     countries = build_country_registry(
         assignments=assignments,
@@ -1134,12 +1134,18 @@ def compile_scenario_bundle(
             "quality": record.quality,
             "quality_breakdown": dict(sorted(quality_by_owner[tag].items())),
             "base_iso2": record.base_iso2,
+            "lookup_iso2": record.lookup_iso2,
+            "provenance_iso2": record.provenance_iso2,
             "scenario_only": record.scenario_only,
             "synthetic_owner": record.synthetic_owner,
             "continent_label": record.continent_label,
             "subregion_label": record.subregion_label,
             "source_type": record.source_type,
             "historical_fidelity": record.historical_fidelity,
+            "primary_rule_source": record.primary_rule_source,
+            "rule_sources": record.rule_sources,
+            "source_types": record.source_types,
+            "historical_fidelity_summary": record.historical_fidelity_summary,
         }
 
     countries_payload = {
@@ -1156,6 +1162,8 @@ def compile_scenario_bundle(
                 "quality": record.quality,
                 "source": record.source,
                 "base_iso2": record.base_iso2,
+                "lookup_iso2": record.lookup_iso2,
+                "provenance_iso2": record.provenance_iso2,
                 "scenario_only": record.scenario_only,
                 "featured": record.featured,
                 "capital_state_id": record.capital_state_id,
@@ -1167,6 +1175,10 @@ def compile_scenario_bundle(
                 "synthetic_owner": record.synthetic_owner,
                 "source_type": record.source_type,
                 "historical_fidelity": record.historical_fidelity,
+                "primary_rule_source": record.primary_rule_source,
+                "rule_sources": record.rule_sources,
+                "source_types": record.source_types,
+                "historical_fidelity_summary": record.historical_fidelity_summary,
             }
             for tag, record in sorted(countries.items())
         },
@@ -1200,13 +1212,19 @@ def compile_scenario_bundle(
         "owner_count": len(owner_feature_counts),
         "quality_counts": dict(sorted(quality_counts.items())),
         "source_counts": dict(sorted(source_counts.items())),
+        "approximate_count": quality_counts.get("approx_existing_geometry", 0),
+        "manual_reviewed_feature_count": quality_counts.get("manual_reviewed", 0),
         "geometry_blocker_count": quality_counts.get("geometry_blocker", 0),
         "critical_unresolved_count": critical_unresolved_count,
         "synthetic_owner_feature_count": synthetic_owner_count,
+        "synthetic_count": synthetic_owner_count,
         "changed_feature_count": len(feature_changes),
         "failed_region_check_count": failed_region_check_count,
         "topology_blocker_count": len(topology_blockers),
         "scenario_rule_blocker_count": len(scenario_rule_blockers),
+        "blocker_count": quality_counts.get("geometry_blocker", 0) + len(topology_blockers) + len(scenario_rule_blockers),
+        "critical_region_check_count": len(region_checks),
+        "manual_reviewed_region_count": len(region_checks),
         "belarus_hybrid_feature_count": int(belarus_topology_summary.get("total_feature_count", 0)),
     }
 

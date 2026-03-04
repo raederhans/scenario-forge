@@ -21,6 +21,24 @@ def _fallback_color_hex(tag: str) -> str:
     return f"#{r:02x}{g:02x}{b:02x}"
 
 
+def _choose_primary_rule(rules: list[ScenarioRule]) -> ScenarioRule | None:
+    if not rules:
+        return None
+    return sorted(rules, key=lambda rule: (rule.priority, rule.rule_id))[0]
+
+
+def _dedupe_strings(values: list[str]) -> list[str]:
+    deduped: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        candidate = str(value or "").strip()
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+        deduped.append(candidate)
+    return deduped
+
+
 def build_iso2_to_mapped_tag(palette_map: dict) -> dict[str, str]:
     result: dict[str, str] = {}
     mapped = palette_map.get("mapped", {}) if isinstance(palette_map, dict) else {}
@@ -202,7 +220,7 @@ def build_country_registry(
     iso2_to_tag: dict[str, str],
     country_histories: dict[str, object],
     country_meta_by_iso2: dict[str, dict[str, str]],
-    rule_lookup: dict[str, ScenarioRule],
+    rule_lookup: dict[str, list[ScenarioRule]],
     runtime_country_names: dict[str, str],
     active_owner_tags: set[str],
 ) -> dict[str, ScenarioCountryRecord]:
@@ -249,27 +267,35 @@ def build_country_registry(
         if not display_name or display_name == tag:
             if base_iso2 and runtime_country_names.get(base_iso2):
                 display_name = runtime_country_names[base_iso2]
-        rule = rule_lookup.get(tag)
-        if rule and rule.display_name_override:
-            display_name = rule.display_name_override
-        if rule and rule.color_hex_override:
-            color_hex = rule.color_hex_override
+        owner_rules = sorted(rule_lookup.get(tag) or [], key=lambda rule: (rule.priority, rule.rule_id))
+        primary_rule = _choose_primary_rule(owner_rules)
+        if primary_rule and primary_rule.display_name_override:
+            display_name = primary_rule.display_name_override
+        if primary_rule and primary_rule.color_hex_override:
+            color_hex = primary_rule.color_hex_override
         history = country_histories.get(tag)
         primary_source = max(
             ((count, source) for (owner_tag, source), count in source_by_tag.items() if owner_tag == tag),
             default=(0, "manual_rule"),
         )[1]
-        meta = country_meta_by_iso2.get(base_iso2, {}) if base_iso2 else {}
+        lookup_iso2 = ""
+        if primary_rule and primary_rule.lookup_iso2:
+            lookup_iso2 = primary_rule.lookup_iso2
+        elif primary_rule and primary_rule.base_iso2:
+            lookup_iso2 = primary_rule.base_iso2
+        else:
+            lookup_iso2 = base_iso2
+        meta = country_meta_by_iso2.get(lookup_iso2, {}) if lookup_iso2 else {}
         source_type = (
-            rule.source_type
-            if rule and getattr(rule, "source_type", "")
+            primary_rule.source_type
+            if primary_rule and getattr(primary_rule, "source_type", "")
             else ("synthetic_fallback" if synthetic_owner_by_tag.get(tag, False) else "hoi4_owner")
         )
         if source_type == "hoi4_owner" and tag not in active_owner_tags:
             source_type = "scenario_extension"
         historical_fidelity = (
-            rule.historical_fidelity
-            if rule and getattr(rule, "historical_fidelity", "")
+            primary_rule.historical_fidelity
+            if primary_rule and getattr(primary_rule, "historical_fidelity", "")
             else ("extended" if source_type == "scenario_extension" else "vanilla")
         )
         scenario_only = (
@@ -277,6 +303,20 @@ def build_country_registry(
             or iso2_to_tag.get(base_iso2) != tag
             or synthetic_owner_by_tag.get(tag, False)
         )
+        rule_sources = _dedupe_strings([rule.rule_id for rule in owner_rules])
+        source_types = _dedupe_strings(
+            [
+                getattr(rule, "source_type", "") or ("synthetic_fallback" if synthetic_owner_by_tag.get(tag, False) else "hoi4_owner")
+                for rule in owner_rules
+            ]
+        )
+        if not source_types:
+            source_types = [source_type]
+        historical_fidelity_summary = _dedupe_strings(
+            [getattr(rule, "historical_fidelity", "") for rule in owner_rules]
+        )
+        if not historical_fidelity_summary:
+            historical_fidelity_summary = [historical_fidelity]
         country_registry[tag] = ScenarioCountryRecord(
             tag=tag,
             display_name=display_name,
@@ -285,6 +325,8 @@ def build_country_registry(
             quality=_worst_quality(quality_by_tag[tag]),
             source=primary_source,
             base_iso2=base_iso2,
+            lookup_iso2=lookup_iso2,
+            provenance_iso2=base_iso2,
             scenario_only=scenario_only,
             featured=tag in featured_tags,
             capital_state_id=getattr(history, "capital_state_id", None),
@@ -292,10 +334,14 @@ def build_country_registry(
             continent_label=str(meta.get("continent_label") or ""),
             subregion_id=str(meta.get("subregion_id") or ""),
             subregion_label=str(meta.get("subregion_label") or ""),
-            notes=(rule.notes if rule else ""),
+            notes=(primary_rule.notes if primary_rule else ""),
             synthetic_owner=synthetic_owner_by_tag.get(tag, False),
             source_type=source_type,
             historical_fidelity=historical_fidelity,
+            primary_rule_source=(primary_rule.rule_id if primary_rule else ""),
+            rule_sources=rule_sources,
+            source_types=source_types,
+            historical_fidelity_summary=historical_fidelity_summary,
         )
 
     return country_registry

@@ -38,17 +38,17 @@
           <div class="card">
             <div id="lblScenario" class="section-header">Scenario</div>
             <p id="lblScenarioHint" class="body-text mt-2">Load a bundled historical setup and reset to its baseline.</p>
+            <div id="scenarioStatus" class="body-text mt-3">No scenario active</div>
+            <div id="scenarioAuditHint" class="body-text mt-2">Coverage report unavailable</div>
             <label id="lblScenarioSelect" class="section-header-block mt-3" for="scenarioSelect">Scenario</label>
             <select id="scenarioSelect" class="select-input mt-2">
               <option value="">None</option>
             </select>
             <div class="parent-border-actions mt-3">
-              <button id="applyScenarioBtn" type="button" class="btn-secondary">Apply Scenario</button>
-              <button id="resetScenarioBtn" type="button" class="btn-secondary" disabled>Reset To Scenario</button>
+              <button id="applyScenarioBtn" type="button" class="btn-secondary">Apply</button>
+              <button id="resetScenarioBtn" type="button" class="btn-secondary hidden" disabled>Reset Changes To Baseline</button>
             </div>
-            <button id="clearScenarioBtn" type="button" class="btn-secondary mt-3" disabled>Clear Scenario</button>
-            <div id="scenarioStatus" class="body-text mt-3">No scenario active</div>
-            <div id="scenarioAuditHint" class="body-text mt-2">Coverage report unavailable</div>
+            <button id="clearScenarioBtn" type="button" class="btn-secondary mt-3 hidden" disabled>Exit Scenario</button>
           </div>
 
           <div class="card">

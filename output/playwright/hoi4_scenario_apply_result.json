@@ -1,0 +1,29 @@
+{
+  "consoleEvents": [
+    "error: Failed to load resource: the server responded with a status of 404 (File not found)"
+  ],
+  "failedRequests": [],
+  "data": {
+    "scenarioStatus": "HOI4 1936 · 98 owners · 11192 features",
+    "scenarioAuditHint": "Approximate: 976 · Critical checks: 13 · Synthetic: 18 · Blockers: 0",
+    "activeSovereignLabel": "Germany (GER)",
+    "inspectorTitle": "Germany (GER)",
+    "inspectorMeta": "Western Europe · Europe · Base ISO: DE · manual_reviewed · 521 features",
+    "inspectorGroups": "No country groups",
+    "inspectorPresets": "BavariaSaxonyPrussia (Eastern Core)Schleswig-Holstein",
+    "groupTitles": [
+      "Africa (5)",
+      "Asia (37)",
+      "Europe (30)",
+      "North America (14)",
+      "South America (10)",
+      "Oceania (2)"
+    ],
+    "legendDisplay": "none",
+    "legendTexts": [],
+    "applyHidden": true,
+    "resetHidden": false,
+    "clearHidden": false
+  },
+  "screenshotPath": "C:\\Users\\raede\\Desktop\\dev\\mapcreator\\output\\playwright\\hoi4_scenario_applied_postfix.png"
+}

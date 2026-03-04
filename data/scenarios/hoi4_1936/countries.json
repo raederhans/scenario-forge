@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1936",
-  "generated_at": "2026-03-04T00:28:54.547067+00:00",
+  "generated_at": "2026-03-04T02:05:14.879122+00:00",
   "default_country": "GER",
   "countries": {
     "AFA": {
@@ -12,6 +12,8 @@
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "ET",
+      "lookup_iso2": "ET",
+      "provenance_iso2": "ET",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": 908,
@@ -22,7 +24,17 @@
       "notes": "Approximate Afar with the current Ethiopian Afar group.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "afar",
+      "rule_sources": [
+        "afar"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "AFG": {
       "tag": "AFG",
@@ -32,6 +44,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "AF",
+      "lookup_iso2": "AF",
+      "provenance_iso2": "AF",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 267,
@@ -42,7 +56,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "ALB": {
       "tag": "ALB",
@@ -52,6 +74,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "AL",
+      "lookup_iso2": "AL",
+      "provenance_iso2": "AL",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 44,
@@ -62,7 +86,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "ARG": {
       "tag": "ARG",
@@ -72,6 +104,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "AR",
+      "lookup_iso2": "AR",
+      "provenance_iso2": "AR",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 278,
@@ -82,7 +116,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "AST": {
       "tag": "AST",
@@ -92,6 +134,8 @@
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "PG",
+      "lookup_iso2": "PG",
+      "provenance_iso2": "PG",
       "scenario_only": true,
       "featured": true,
       "capital_state_id": 285,
@@ -102,7 +146,17 @@
       "notes": "Australian dependencies approximation.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "australia_dependencies",
+      "rule_sources": [
+        "australia_dependencies"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "AUS": {
       "tag": "AUS",
@@ -112,6 +166,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "AT",
+      "lookup_iso2": "AT",
+      "provenance_iso2": "AT",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 4,
@@ -122,7 +178,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "BEL": {
       "tag": "BEL",
@@ -132,6 +196,8 @@
       "quality": "approx_existing_geometry",
       "source": "direct_active_owner",
       "base_iso2": "BE",
+      "lookup_iso2": "BE",
+      "provenance_iso2": "BE",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 6,
@@ -142,7 +208,17 @@
       "notes": "Belgian colonial approximation.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "belgian_colonies",
+      "rule_sources": [
+        "belgian_colonies"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "BHU": {
       "tag": "BHU",
@@ -152,6 +228,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "BT",
+      "lookup_iso2": "BT",
+      "provenance_iso2": "BT",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 324,
@@ -162,7 +240,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "BOL": {
       "tag": "BOL",
@@ -172,6 +258,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "BO",
+      "lookup_iso2": "BO",
+      "provenance_iso2": "BO",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 302,
@@ -182,7 +270,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "BOT": {
       "tag": "BOT",
@@ -192,6 +288,8 @@
       "quality": "approx_existing_geometry",
       "source": "fallback_mapped_tag",
       "base_iso2": "BW",
+      "lookup_iso2": "BW",
+      "provenance_iso2": "BW",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": 542,
@@ -202,7 +300,15 @@
       "notes": "",
       "synthetic_owner": true,
       "source_type": "synthetic_fallback",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "BRA": {
       "tag": "BRA",
@@ -212,6 +318,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "BR",
+      "lookup_iso2": "BR",
+      "provenance_iso2": "BR",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 500,
@@ -222,7 +330,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "BRM": {
       "tag": "BRM",
@@ -232,6 +348,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "MM",
+      "lookup_iso2": "MM",
+      "provenance_iso2": "MM",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 995,
@@ -242,7 +360,17 @@
       "notes": "Burma separation from British Raj at runtime-country level.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "burma",
+      "rule_sources": [
+        "burma"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "BUL": {
       "tag": "BUL",
@@ -252,6 +380,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "BG",
+      "lookup_iso2": "BG",
+      "provenance_iso2": "BG",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 48,
@@ -262,7 +392,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "CAN": {
       "tag": "CAN",
@@ -272,6 +410,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "CA",
+      "lookup_iso2": "CA",
+      "provenance_iso2": "CA",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 276,
@@ -282,7 +422,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "CHI": {
       "tag": "CHI",
@@ -292,6 +440,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "CN",
+      "lookup_iso2": "CN",
+      "provenance_iso2": "CN",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 1035,
@@ -302,7 +452,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "CHL": {
       "tag": "CHL",
@@ -312,6 +470,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "CL",
+      "lookup_iso2": "CL",
+      "provenance_iso2": "CL",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 279,
@@ -322,7 +482,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "CHU": {
       "tag": "CHU",
@@ -332,6 +500,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CN",
+      "lookup_iso2": "CN",
+      "provenance_iso2": "CN",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": 256,
@@ -342,7 +512,17 @@
       "notes": "Scenario extension: Chuan clique in Sichuan and Chongqing.",
       "synthetic_owner": false,
       "source_type": "scenario_extension",
-      "historical_fidelity": "extended"
+      "historical_fidelity": "extended",
+      "primary_rule_source": "chu_sichuan_clique",
+      "rule_sources": [
+        "chu_sichuan_clique"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "extended"
+      ]
     },
     "COL": {
       "tag": "COL",
@@ -352,6 +532,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "CO",
+      "lookup_iso2": "CO",
+      "provenance_iso2": "CO",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 306,
@@ -362,7 +544,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "COS": {
       "tag": "COS",
@@ -372,6 +562,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "CR",
+      "lookup_iso2": "CR",
+      "provenance_iso2": "CR",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 316,
@@ -382,7 +574,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "CUB": {
       "tag": "CUB",
@@ -392,6 +592,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "CU",
+      "lookup_iso2": "CU",
+      "provenance_iso2": "CU",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 315,
@@ -402,7 +604,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "CZE": {
       "tag": "CZE",
@@ -412,6 +622,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CZ",
+      "lookup_iso2": "CZ",
+      "provenance_iso2": "CZ",
       "scenario_only": true,
       "featured": true,
       "capital_state_id": 9,
@@ -419,10 +631,21 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_eastern_europe",
       "subregion_label": "Eastern Europe",
-      "notes": "Subcarpathian Ruthenia / Zakarpattia should belong to Czechoslovakia in 1936.",
+      "notes": "Czechoslovakia baseline override across Czechia and Slovakia.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "czechoslovakia_union",
+      "rule_sources": [
+        "czechoslovakia_union",
+        "czechoslovakia_ruthenia"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "DEN": {
       "tag": "DEN",
@@ -432,6 +655,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "DK",
+      "lookup_iso2": "DK",
+      "provenance_iso2": "DK",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 37,
@@ -442,7 +667,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "DOM": {
       "tag": "DOM",
@@ -452,6 +685,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "DO",
+      "lookup_iso2": "DO",
+      "provenance_iso2": "DO",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 319,
@@ -462,7 +697,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "ECU": {
       "tag": "ECU",
@@ -472,6 +715,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "EC",
+      "lookup_iso2": "EC",
+      "provenance_iso2": "EC",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 305,
@@ -482,7 +727,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "ELS": {
       "tag": "ELS",
@@ -492,6 +745,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "SV",
+      "lookup_iso2": "SV",
+      "provenance_iso2": "SV",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 314,
@@ -502,7 +757,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "ENG": {
       "tag": "ENG",
@@ -512,6 +775,8 @@
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "GB",
+      "lookup_iso2": "GB",
+      "provenance_iso2": "GB",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 126,
@@ -519,10 +784,21 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_northern_europe",
       "subregion_label": "Northern Europe",
-      "notes": "British Caribbean approximation.",
+      "notes": "British imperial approximation for protectorates, mandates, and colonies.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "british_colonies",
+      "rule_sources": [
+        "british_colonies",
+        "british_caribbean_guiana"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "EST": {
       "tag": "EST",
@@ -532,6 +808,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "EE",
+      "lookup_iso2": "EE",
+      "provenance_iso2": "EE",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 812,
@@ -542,7 +820,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "ETH": {
       "tag": "ETH",
@@ -552,6 +838,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "ET",
+      "lookup_iso2": "ET",
+      "provenance_iso2": "ET",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 271,
@@ -562,7 +850,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "FIN": {
       "tag": "FIN",
@@ -572,6 +868,8 @@
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "FI",
+      "lookup_iso2": "FI",
+      "provenance_iso2": "FI",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 111,
@@ -582,7 +880,17 @@
       "notes": "Aland Islands should follow Finland in 1936.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "finnish_aland",
+      "rule_sources": [
+        "finnish_aland"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "FRA": {
       "tag": "FRA",
@@ -592,6 +900,8 @@
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "FR",
+      "lookup_iso2": "FR",
+      "provenance_iso2": "FR",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 16,
@@ -599,10 +909,21 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_western_europe",
       "subregion_label": "Western Europe",
-      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "notes": "French colonial approximation across Indochina.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "french_indochina",
+      "rule_sources": [
+        "french_indochina",
+        "french_colonies"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "GER": {
       "tag": "GER",
@@ -612,6 +933,8 @@
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "DE",
+      "lookup_iso2": "DE",
+      "provenance_iso2": "DE",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 64,
@@ -622,7 +945,17 @@
       "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "germany_frontier_1936",
+      "rule_sources": [
+        "germany_frontier_1936"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "GMA": {
       "tag": "GMA",
@@ -632,6 +965,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CN",
+      "lookup_iso2": "CN",
+      "provenance_iso2": "CN",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": null,
@@ -642,7 +977,17 @@
       "notes": "Scenario extension: Gansu Ma clique split from the coarse XSM block.",
       "synthetic_owner": false,
       "source_type": "scenario_extension",
-      "historical_fidelity": "extended"
+      "historical_fidelity": "extended",
+      "primary_rule_source": "gansu_ma_clique",
+      "rule_sources": [
+        "gansu_ma_clique"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "extended"
+      ]
     },
     "GRE": {
       "tag": "GRE",
@@ -652,6 +997,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "GR",
+      "lookup_iso2": "GR",
+      "provenance_iso2": "GR",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 47,
@@ -662,7 +1009,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "GRN": {
       "tag": "GRN",
@@ -672,6 +1027,8 @@
       "quality": "approx_existing_geometry",
       "source": "fallback_mapped_tag",
       "base_iso2": "GL",
+      "lookup_iso2": "GL",
+      "provenance_iso2": "GL",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": 101,
@@ -682,7 +1039,15 @@
       "notes": "",
       "synthetic_owner": true,
       "source_type": "synthetic_fallback",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "GUA": {
       "tag": "GUA",
@@ -692,6 +1057,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "GT",
+      "lookup_iso2": "GT",
+      "provenance_iso2": "GT",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 313,
@@ -702,7 +1069,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "GXC": {
       "tag": "GXC",
@@ -712,6 +1087,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CN",
+      "lookup_iso2": "CN",
+      "provenance_iso2": "CN",
       "scenario_only": true,
       "featured": true,
       "capital_state_id": 594,
@@ -722,7 +1099,17 @@
       "notes": "Guangxi clique override.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "guangxi_clique",
+      "rule_sources": [
+        "guangxi_clique"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "HAI": {
       "tag": "HAI",
@@ -732,6 +1119,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "HT",
+      "lookup_iso2": "HT",
+      "provenance_iso2": "HT",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 318,
@@ -742,7 +1131,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "HOL": {
       "tag": "HOL",
@@ -752,6 +1149,8 @@
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "NL",
+      "lookup_iso2": "NL",
+      "provenance_iso2": "NL",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 7,
@@ -762,7 +1161,17 @@
       "notes": "Dutch colonial approximation for East Indies and Suriname.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "dutch_colonies",
+      "rule_sources": [
+        "dutch_colonies"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "HON": {
       "tag": "HON",
@@ -772,6 +1181,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "HN",
+      "lookup_iso2": "HN",
+      "provenance_iso2": "HN",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 312,
@@ -782,7 +1193,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "HUN": {
       "tag": "HUN",
@@ -792,6 +1211,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "HU",
+      "lookup_iso2": "HU",
+      "provenance_iso2": "HU",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 43,
@@ -802,7 +1223,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "ICE": {
       "tag": "ICE",
@@ -812,6 +1241,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "IS",
+      "lookup_iso2": "IS",
+      "provenance_iso2": "IS",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 100,
@@ -822,7 +1253,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "IRE": {
       "tag": "IRE",
@@ -832,6 +1271,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "IE",
+      "lookup_iso2": "IE",
+      "provenance_iso2": "IE",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 113,
@@ -842,7 +1283,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "IRQ": {
       "tag": "IRQ",
@@ -852,6 +1301,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "IQ",
+      "lookup_iso2": "IQ",
+      "provenance_iso2": "IQ",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 291,
@@ -862,7 +1313,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "ITA": {
       "tag": "ITA",
@@ -872,6 +1331,8 @@
       "quality": "approx_existing_geometry",
       "source": "direct_active_owner",
       "base_iso2": "IT",
+      "lookup_iso2": "IT",
+      "provenance_iso2": "IT",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 2,
@@ -882,7 +1343,17 @@
       "notes": "Italian colonial approximation in Libya, Eritrea, and Somalia, including Somaliland once base topology detail is present.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "italian_colonies",
+      "rule_sources": [
+        "italian_colonies"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "JAP": {
       "tag": "JAP",
@@ -892,6 +1363,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "JP",
+      "lookup_iso2": "JP",
+      "provenance_iso2": "JP",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 282,
@@ -902,7 +1375,17 @@
       "notes": "Japanese colonial holdings across Korea and Taiwan.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "japan_korea_taiwan",
+      "rule_sources": [
+        "japan_korea_taiwan"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "JOR": {
       "tag": "JOR",
@@ -912,6 +1395,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "JO",
+      "lookup_iso2": "JO",
+      "provenance_iso2": "JO",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 455,
@@ -922,7 +1407,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "KUW": {
       "tag": "KUW",
@@ -932,6 +1425,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "KW",
+      "lookup_iso2": "KW",
+      "provenance_iso2": "KW",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 656,
@@ -942,7 +1437,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "LAT": {
       "tag": "LAT",
@@ -952,6 +1455,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "LV",
+      "lookup_iso2": "LV",
+      "provenance_iso2": "LV",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 808,
@@ -962,7 +1467,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "LEB": {
       "tag": "LEB",
@@ -972,6 +1485,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "LB",
+      "lookup_iso2": "LB",
+      "provenance_iso2": "LB",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 553,
@@ -982,7 +1497,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "LIB": {
       "tag": "LIB",
@@ -992,6 +1515,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "LR",
+      "lookup_iso2": "LR",
+      "provenance_iso2": "LR",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 298,
@@ -1002,7 +1527,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "LIT": {
       "tag": "LIT",
@@ -1012,6 +1545,8 @@
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "LT",
+      "lookup_iso2": "LT",
+      "provenance_iso2": "LT",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 11,
@@ -1022,7 +1557,17 @@
       "notes": "Project-specific override: Vilnius remains with Lithuania in this scenario instead of strict vanilla HOI4 ownership.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "lithuania_vilnius_override",
+      "rule_sources": [
+        "lithuania_vilnius_override"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "LUQ": {
       "tag": "LUQ",
@@ -1032,6 +1577,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CN",
+      "lookup_iso2": "CN",
+      "provenance_iso2": "CN",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": null,
@@ -1042,7 +1589,17 @@
       "notes": "Scenario extension: Lu clique in Shandong.",
       "synthetic_owner": false,
       "source_type": "scenario_extension",
-      "historical_fidelity": "extended"
+      "historical_fidelity": "extended",
+      "primary_rule_source": "luq_shandong_clique",
+      "rule_sources": [
+        "luq_shandong_clique"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "extended"
+      ]
     },
     "LUX": {
       "tag": "LUX",
@@ -1052,6 +1609,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "LU",
+      "lookup_iso2": "LU",
+      "provenance_iso2": "LU",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 8,
@@ -1062,7 +1621,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "MAL": {
       "tag": "MAL",
@@ -1072,6 +1639,8 @@
       "quality": "approx_existing_geometry",
       "source": "direct_active_owner",
       "base_iso2": "MY",
+      "lookup_iso2": "MY",
+      "provenance_iso2": "MY",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 336,
@@ -1082,7 +1651,17 @@
       "notes": "Approximate Malaya and Borneo dependencies.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "malaya_singapore_brunei",
+      "rule_sources": [
+        "malaya_singapore_brunei"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "MAN": {
       "tag": "MAN",
@@ -1092,6 +1671,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CN",
+      "lookup_iso2": "CN",
+      "provenance_iso2": "CN",
       "scenario_only": true,
       "featured": true,
       "capital_state_id": 328,
@@ -1102,7 +1683,17 @@
       "notes": "Manchukuo using northeastern China groupings plus the eastern Inner Mongolian and Jehol/Rehe frontier that belonged to MAN in HOI4 1936.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "manchukuo",
+      "rule_sources": [
+        "manchukuo"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "MEN": {
       "tag": "MEN",
@@ -1112,6 +1703,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CN",
+      "lookup_iso2": "CN",
+      "provenance_iso2": "CN",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": 1043,
@@ -1122,7 +1715,17 @@
       "notes": "Mengjiang limited to the Chahar and Xilingol core plus the South Chahar corridor in northern Hebei.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "mengjiang",
+      "rule_sources": [
+        "mengjiang"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "MEX": {
       "tag": "MEX",
@@ -1132,6 +1735,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "MX",
+      "lookup_iso2": "MX",
+      "provenance_iso2": "MX",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 277,
@@ -1142,7 +1747,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "MLD": {
       "tag": "MLD",
@@ -1152,6 +1765,8 @@
       "quality": "approx_existing_geometry",
       "source": "fallback_mapped_tag",
       "base_iso2": "MV",
+      "lookup_iso2": "MV",
+      "provenance_iso2": "MV",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": 281,
@@ -1162,7 +1777,15 @@
       "notes": "",
       "synthetic_owner": true,
       "source_type": "synthetic_fallback",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "MON": {
       "tag": "MON",
@@ -1172,6 +1795,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "MN",
+      "lookup_iso2": "MN",
+      "provenance_iso2": "MN",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 330,
@@ -1182,7 +1807,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "NEP": {
       "tag": "NEP",
@@ -1192,6 +1825,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "NP",
+      "lookup_iso2": "NP",
+      "provenance_iso2": "NP",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 323,
@@ -1202,7 +1837,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "NIC": {
       "tag": "NIC",
@@ -1212,6 +1855,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "NI",
+      "lookup_iso2": "NI",
+      "provenance_iso2": "NI",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 317,
@@ -1222,7 +1867,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "NOR": {
       "tag": "NOR",
@@ -1232,6 +1885,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "NO",
+      "lookup_iso2": "NO",
+      "provenance_iso2": "NO",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 110,
@@ -1242,7 +1897,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "NZL": {
       "tag": "NZL",
@@ -1252,6 +1915,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "NZ",
+      "lookup_iso2": "NZ",
+      "provenance_iso2": "NZ",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 284,
@@ -1262,7 +1927,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "OMA": {
       "tag": "OMA",
@@ -1272,6 +1945,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "OM",
+      "lookup_iso2": "OM",
+      "provenance_iso2": "OM",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 294,
@@ -1282,7 +1957,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "PAL": {
       "tag": "PAL",
@@ -1292,6 +1975,8 @@
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "IL",
+      "lookup_iso2": "IL",
+      "provenance_iso2": "IL",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": 454,
@@ -1302,7 +1987,17 @@
       "notes": "Approximate Mandatory Palestine using current Israel runtime geography.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "palestine_mandate",
+      "rule_sources": [
+        "palestine_mandate"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "PAN": {
       "tag": "PAN",
@@ -1312,6 +2007,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "PA",
+      "lookup_iso2": "PA",
+      "provenance_iso2": "PA",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 304,
@@ -1322,7 +2019,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "PAR": {
       "tag": "PAR",
@@ -1332,6 +2037,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "PY",
+      "lookup_iso2": "PY",
+      "provenance_iso2": "PY",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 301,
@@ -1342,7 +2049,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "PER": {
       "tag": "PER",
@@ -1352,6 +2067,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "IR",
+      "lookup_iso2": "IR",
+      "provenance_iso2": "IR",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 266,
@@ -1362,7 +2079,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "PHI": {
       "tag": "PHI",
@@ -1372,6 +2097,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "PH",
+      "lookup_iso2": "PH",
+      "provenance_iso2": "PH",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 327,
@@ -1382,7 +2109,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "POL": {
       "tag": "POL",
@@ -1392,6 +2127,8 @@
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "PL",
+      "lookup_iso2": "PL",
+      "provenance_iso2": "PL",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 10,
@@ -1402,7 +2139,17 @@
       "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "poland_kresy_1936",
+      "rule_sources": [
+        "poland_kresy_1936"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "POR": {
       "tag": "POR",
@@ -1412,6 +2159,8 @@
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "PT",
+      "lookup_iso2": "PT",
+      "provenance_iso2": "PT",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 112,
@@ -1422,7 +2171,17 @@
       "notes": "Portuguese colonial approximation.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "portuguese_colonies",
+      "rule_sources": [
+        "portuguese_colonies"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "PRC": {
       "tag": "PRC",
@@ -1432,6 +2191,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CN",
+      "lookup_iso2": "CN",
+      "provenance_iso2": "CN",
       "scenario_only": true,
       "featured": true,
       "capital_state_id": null,
@@ -1442,7 +2203,17 @@
       "notes": "Communist China limited to the northern Shaanbei base area and excludes Xi'an and central Shaanxi.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "communist_china_shaanbei",
+      "rule_sources": [
+        "communist_china_shaanbei"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "PRU": {
       "tag": "PRU",
@@ -1452,6 +2223,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "PE",
+      "lookup_iso2": "PE",
+      "provenance_iso2": "PE",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 303,
@@ -1462,7 +2235,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "PUE": {
       "tag": "PUE",
@@ -1472,6 +2253,8 @@
       "quality": "approx_existing_geometry",
       "source": "fallback_mapped_tag",
       "base_iso2": "PR",
+      "lookup_iso2": "PR",
+      "provenance_iso2": "PR",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": 686,
@@ -1482,7 +2265,15 @@
       "notes": "",
       "synthetic_owner": true,
       "source_type": "synthetic_fallback",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "QMA": {
       "tag": "QMA",
@@ -1492,6 +2283,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CN",
+      "lookup_iso2": "CN",
+      "provenance_iso2": "CN",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": null,
@@ -1502,7 +2295,17 @@
       "notes": "Scenario extension: Qinghai Ma clique split from the coarse XSM block.",
       "synthetic_owner": false,
       "source_type": "scenario_extension",
-      "historical_fidelity": "extended"
+      "historical_fidelity": "extended",
+      "primary_rule_source": "qinghai_ma_clique",
+      "rule_sources": [
+        "qinghai_ma_clique"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "extended"
+      ]
     },
     "RAJ": {
       "tag": "RAJ",
@@ -1512,6 +2315,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "IN",
+      "lookup_iso2": "IN",
+      "provenance_iso2": "IN",
       "scenario_only": true,
       "featured": true,
       "capital_state_id": 439,
@@ -1522,7 +2327,17 @@
       "notes": "British Raj baseline override for India, Pakistan, and Bangladesh.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "british_raj",
+      "rule_sources": [
+        "british_raj"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "ROM": {
       "tag": "ROM",
@@ -1532,6 +2347,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "RO",
+      "lookup_iso2": "RO",
+      "provenance_iso2": "RO",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 46,
@@ -1542,7 +2359,17 @@
       "notes": "Greater Romania including Bessarabia and northern Bukovina.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "romania_bessarabia_1936",
+      "rule_sources": [
+        "romania_bessarabia_1936"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "SAF": {
       "tag": "SAF",
@@ -1552,6 +2379,8 @@
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "NA",
+      "lookup_iso2": "NA",
+      "provenance_iso2": "NA",
       "scenario_only": true,
       "featured": true,
       "capital_state_id": 275,
@@ -1562,7 +2391,17 @@
       "notes": "South West Africa approximation under South African control.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "south_africa_mandate",
+      "rule_sources": [
+        "south_africa_mandate"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "SAU": {
       "tag": "SAU",
@@ -1572,6 +2411,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "SA",
+      "lookup_iso2": "SA",
+      "provenance_iso2": "SA",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 292,
@@ -1582,7 +2423,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "SHX": {
       "tag": "SHX",
@@ -1592,6 +2441,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CN",
+      "lookup_iso2": "CN",
+      "provenance_iso2": "CN",
       "scenario_only": true,
       "featured": true,
       "capital_state_id": 615,
@@ -1602,7 +2453,17 @@
       "notes": "Shanxi warlord baseline override including the 1936 Suiyuan and Ordos extension.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "shanxi_warlord",
+      "rule_sources": [
+        "shanxi_warlord"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "SIA": {
       "tag": "SIA",
@@ -1612,6 +2473,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "TH",
+      "lookup_iso2": "TH",
+      "provenance_iso2": "TH",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 289,
@@ -1622,7 +2485,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "SIK": {
       "tag": "SIK",
@@ -1632,6 +2503,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CN",
+      "lookup_iso2": "CN",
+      "provenance_iso2": "CN",
       "scenario_only": true,
       "featured": true,
       "capital_state_id": 617,
@@ -1642,7 +2515,17 @@
       "notes": "Sinkiang override.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "sinkiang",
+      "rule_sources": [
+        "sinkiang"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "SOV": {
       "tag": "SOV",
@@ -1652,6 +2535,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "RU",
+      "lookup_iso2": "RU",
+      "provenance_iso2": "RU",
       "scenario_only": true,
       "featured": true,
       "capital_state_id": 219,
@@ -1662,7 +2547,17 @@
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "soviet_union",
+      "rule_sources": [
+        "soviet_union"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "SPR": {
       "tag": "SPR",
@@ -1672,6 +2567,8 @@
       "quality": "approx_existing_geometry",
       "source": "direct_active_owner",
       "base_iso2": "ES",
+      "lookup_iso2": "ES",
+      "provenance_iso2": "ES",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 41,
@@ -1682,7 +2579,17 @@
       "notes": "Approximate Spanish control for Andorra fallback only; Western Sahara is explicitly moved to France.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "spanish_andorra_only",
+      "rule_sources": [
+        "spanish_andorra_only"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "SWE": {
       "tag": "SWE",
@@ -1692,6 +2599,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "SE",
+      "lookup_iso2": "SE",
+      "provenance_iso2": "SE",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 141,
@@ -1702,7 +2611,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "SWI": {
       "tag": "SWI",
@@ -1712,6 +2629,8 @@
       "quality": "approx_existing_geometry",
       "source": "direct_active_owner",
       "base_iso2": "CH",
+      "lookup_iso2": "CH",
+      "provenance_iso2": "CH",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 3,
@@ -1722,7 +2641,17 @@
       "notes": "Liechtenstein approximation via Switzerland.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "swiss_liechtenstein",
+      "rule_sources": [
+        "swiss_liechtenstein"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "SYR": {
       "tag": "SYR",
@@ -1732,6 +2661,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "SY",
+      "lookup_iso2": "SY",
+      "provenance_iso2": "SY",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 554,
@@ -1742,7 +2673,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "TAN": {
       "tag": "TAN",
@@ -1752,6 +2691,8 @@
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "RU",
+      "lookup_iso2": "RU",
+      "provenance_iso2": "RU",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": 329,
@@ -1762,7 +2703,17 @@
       "notes": "Approximate Tannu Tuva using the current Tuva Republic group.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "tannu_tuva",
+      "rule_sources": [
+        "tannu_tuva"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "TIB": {
       "tag": "TIB",
@@ -1772,6 +2723,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CN",
+      "lookup_iso2": "CN",
+      "provenance_iso2": "CN",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": 757,
@@ -1782,7 +2735,17 @@
       "notes": "Tibet override.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "tibet",
+      "rule_sources": [
+        "tibet"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "TUR": {
       "tag": "TUR",
@@ -1792,6 +2755,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "TR",
+      "lookup_iso2": "TR",
+      "provenance_iso2": "TR",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 49,
@@ -1802,7 +2767,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "URG": {
       "tag": "URG",
@@ -1812,6 +2785,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "UY",
+      "lookup_iso2": "UY",
+      "provenance_iso2": "UY",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 300,
@@ -1822,7 +2797,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "USA": {
       "tag": "USA",
@@ -1832,6 +2815,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "US",
+      "lookup_iso2": "US",
+      "provenance_iso2": "US",
       "scenario_only": false,
       "featured": true,
       "capital_state_id": 361,
@@ -1842,7 +2827,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "VEN": {
       "tag": "VEN",
@@ -1852,6 +2845,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "VE",
+      "lookup_iso2": "VE",
+      "provenance_iso2": "VE",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 307,
@@ -1862,7 +2857,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "XSM": {
       "tag": "XSM",
@@ -1872,6 +2875,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CN",
+      "lookup_iso2": "CN",
+      "provenance_iso2": "CN",
       "scenario_only": true,
       "featured": true,
       "capital_state_id": 754,
@@ -1882,7 +2887,17 @@
       "notes": "Ningxia remains under Xibei San Ma and absorbs the far-western Alashan frontier that does not belong to Mengjiang.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "ningxia_ma_clique",
+      "rule_sources": [
+        "ningxia_ma_clique"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "YEM": {
       "tag": "YEM",
@@ -1892,6 +2907,8 @@
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "YE",
+      "lookup_iso2": "YE",
+      "provenance_iso2": "YE",
       "scenario_only": false,
       "featured": false,
       "capital_state_id": 293,
@@ -1902,7 +2919,15 @@
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "YUE": {
       "tag": "YUE",
@@ -1912,6 +2937,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CN",
+      "lookup_iso2": "CN",
+      "provenance_iso2": "CN",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": null,
@@ -1922,7 +2949,17 @@
       "notes": "Scenario extension: Yue clique in Guangdong.",
       "synthetic_owner": false,
       "source_type": "scenario_extension",
-      "historical_fidelity": "extended"
+      "historical_fidelity": "extended",
+      "primary_rule_source": "yue_guangdong_clique",
+      "rule_sources": [
+        "yue_guangdong_clique"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "extended"
+      ]
     },
     "YUG": {
       "tag": "YUG",
@@ -1932,6 +2969,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "RS",
+      "lookup_iso2": "RS",
+      "provenance_iso2": "RS",
       "scenario_only": true,
       "featured": true,
       "capital_state_id": 107,
@@ -1942,7 +2981,17 @@
       "notes": "Yugoslavia baseline override across current Balkan successor states.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "yugoslavia_union",
+      "rule_sources": [
+        "yugoslavia_union"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     },
     "YUN": {
       "tag": "YUN",
@@ -1952,6 +3001,8 @@
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CN",
+      "lookup_iso2": "CN",
+      "provenance_iso2": "CN",
       "scenario_only": true,
       "featured": true,
       "capital_state_id": 325,
@@ -1962,7 +3013,17 @@
       "notes": "Yunnan clique override.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla"
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "yunnan_warlord",
+      "rule_sources": [
+        "yunnan_warlord"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ]
     }
   }
 }

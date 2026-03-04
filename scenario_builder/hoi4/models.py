@@ -79,6 +79,7 @@ class ScenarioRule:
     exclude_hierarchy_group_ids: list[str] = field(default_factory=list)
     exclude_feature_ids: list[str] = field(default_factory=list)
     base_iso2: str = ""
+    lookup_iso2: str = ""
     display_name_override: str = ""
     color_hex_override: str = ""
     source_type: str = "hoi4_owner"
@@ -110,6 +111,8 @@ class ScenarioCountryRecord:
     quality: str
     source: str
     base_iso2: str = ""
+    lookup_iso2: str = ""
+    provenance_iso2: str = ""
     scenario_only: bool = False
     featured: bool = False
     capital_state_id: int | None = None
@@ -121,3 +124,7 @@ class ScenarioCountryRecord:
     synthetic_owner: bool = False
     source_type: str = "hoi4_owner"
     historical_fidelity: str = "vanilla"
+    primary_rule_source: str = ""
+    rule_sources: list[str] = field(default_factory=list)
+    source_types: list[str] = field(default_factory=list)
+    historical_fidelity_summary: list[str] = field(default_factory=list)

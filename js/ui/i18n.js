@@ -36,9 +36,9 @@ function updateUIText() {
     ["lblScenario", "Scenario"],
     ["lblScenarioHint", "Load a bundled historical setup and reset to its baseline."],
     ["lblScenarioSelect", "Scenario"],
-    ["applyScenarioBtn", "Apply Scenario"],
-    ["resetScenarioBtn", "Reset To Scenario"],
-    ["clearScenarioBtn", "Clear Scenario"],
+    ["applyScenarioBtn", "Apply"],
+    ["resetScenarioBtn", "Reset Changes To Baseline"],
+    ["clearScenarioBtn", "Exit Scenario"],
     ["scenarioStatus", "No scenario active"],
     ["scenarioAuditHint", "Coverage report unavailable"],
     ["lblExport", "Export Map"],
@@ -305,6 +305,9 @@ function updateUIText() {
   }
   if (typeof state.updateScenarioUIFn === "function") {
     state.updateScenarioUIFn();
+  }
+  if (typeof state.renderScenarioAuditPanelFn === "function") {
+    state.renderScenarioAuditPanelFn();
   }
 }
 

@@ -6,7 +6,12 @@ import { applyCountryColor, resetCountryColors } from "../core/logic.js";
 import { FileManager } from "../core/file_manager.js";
 import { captureHistoryState, clearHistory, pushHistoryEntry } from "../core/history_manager.js";
 import { LegendManager } from "../core/legend_manager.js";
-import { applyScenarioById, clearActiveScenario } from "../core/scenario_manager.js";
+import {
+  applyScenarioById,
+  clearActiveScenario,
+  loadScenarioAuditPayload,
+  validateImportedScenarioBaseline,
+} from "../core/scenario_manager.js";
 import { t } from "./i18n.js";
 import { showToast } from "./toast.js";
 import {
@@ -187,23 +192,41 @@ function loadCustomPresets() {
 
 function mergePresets(base, custom) {
   const merged = {};
+  const mergeEntriesForCode = (rawCode, entries = []) => {
+    const code = normalizeCountryCode(rawCode);
+    if (!code) return;
+    if (!merged[code]) merged[code] = [];
+    (Array.isArray(entries) ? entries : []).forEach((preset) => {
+      if (!preset || !preset.name) return;
+      const idx = merged[code].findIndex((entry) => entry.name === preset.name);
+      const normalizedPreset = {
+        name: preset.name,
+        ids: Array.isArray(preset.ids) ? [...preset.ids] : [],
+      };
+      if (idx >= 0) {
+        merged[code][idx] = normalizedPreset;
+      } else {
+        merged[code].push(normalizedPreset);
+      }
+    });
+  };
+
   Object.keys(base || {}).forEach((code) => {
-    merged[code] = (base[code] || []).map((preset) => ({
-      name: preset.name,
-      ids: Array.isArray(preset.ids) ? [...preset.ids] : [],
-    }));
+    mergeEntriesForCode(code, base[code]);
   });
   Object.keys(custom || {}).forEach((code) => {
-    if (!merged[code]) merged[code] = [];
+    const normalizedCode = normalizeCountryCode(code);
+    if (!normalizedCode) return;
+    if (!merged[normalizedCode]) merged[normalizedCode] = [];
     const customEntries = Array.isArray(custom[code]) ? custom[code] : [];
     customEntries.forEach((entry) => {
       if (!entry || !entry.name) return;
-      const idx = merged[code].findIndex((preset) => preset.name === entry.name);
+      const idx = merged[normalizedCode].findIndex((preset) => preset.name === entry.name);
       const ids = Array.isArray(entry.ids) ? [...entry.ids] : [];
       if (idx >= 0) {
-        merged[code][idx] = { name: entry.name, ids };
+        merged[normalizedCode][idx] = { name: entry.name, ids };
       } else {
-        merged[code].push({ name: entry.name, ids });
+        merged[normalizedCode].push({ name: entry.name, ids });
       }
     });
   });
@@ -219,13 +242,15 @@ function saveCustomPresets() {
 }
 
 function upsertCustomPreset(code, name, ids) {
-  if (!state.customPresets[code]) state.customPresets[code] = [];
-  const idx = state.customPresets[code].findIndex((preset) => preset.name === name);
+  const normalizedCode = normalizeCountryCode(code);
+  if (!normalizedCode) return;
+  if (!state.customPresets[normalizedCode]) state.customPresets[normalizedCode] = [];
+  const idx = state.customPresets[normalizedCode].findIndex((preset) => preset.name === name);
   const entry = { name, ids: [...ids] };
   if (idx >= 0) {
-    state.customPresets[code][idx] = entry;
+    state.customPresets[normalizedCode][idx] = entry;
   } else {
-    state.customPresets[code].push(entry);
+    state.customPresets[normalizedCode].push(entry);
   }
   saveCustomPresets();
   state.presetsState = mergePresets(countryPresets, state.customPresets);
@@ -236,25 +261,71 @@ function initPresetState() {
   state.presetsState = mergePresets(countryPresets, state.customPresets);
 }
 
-function getScenarioCountryMeta(code) {
-  const normalizedCode = normalizeCountryCode(code);
+function getScenarioCountryMeta(entryOrCode) {
+  const rawCode = typeof entryOrCode === "object" && entryOrCode
+    ? entryOrCode.code
+    : entryOrCode;
+  const normalizedCode = normalizeCountryCode(rawCode);
   if (!normalizedCode || !state.activeScenarioId) return null;
   const entry = state.scenarioCountriesByTag?.[normalizedCode];
   if (!entry || typeof entry !== "object") return null;
   return entry;
 }
 
+function resolveScenarioLookupCode(entryOrCode) {
+  const fallbackCode = normalizeCountryCode(
+    typeof entryOrCode === "object" && entryOrCode
+      ? entryOrCode.code
+      : entryOrCode
+  );
+  if (!state.activeScenarioId) {
+    return fallbackCode;
+  }
+
+  const scenarioMeta = getScenarioCountryMeta(entryOrCode);
+  const entry = typeof entryOrCode === "object" && entryOrCode ? entryOrCode : null;
+  const candidates = [
+    scenarioMeta?.lookup_iso2,
+    scenarioMeta?.lookupIso2,
+    entry?.lookup_iso2,
+    entry?.lookupIso2,
+    scenarioMeta?.base_iso2,
+    scenarioMeta?.baseIso2,
+    entry?.base_iso2,
+    entry?.baseIso2,
+    fallbackCode,
+  ];
+
+  for (const candidate of candidates) {
+    const normalized = normalizeCountryCode(candidate);
+    if (normalized) {
+      return normalized;
+    }
+  }
+
+  return fallbackCode;
+}
+
+function resolveInspectorDataCode(entryOrCode) {
+  return resolveScenarioLookupCode(entryOrCode);
+}
+
+function resolveCountryGroupingCode(entryOrCode) {
+  return resolveScenarioLookupCode(entryOrCode);
+}
+
 function getHierarchyGroupsForCode(code) {
-  if (!code) return [];
+  const normalizedCode = normalizeCountryCode(code);
+  if (!normalizedCode) return [];
   if (state.hierarchyGroupsByCode.size > 0) {
-    return state.hierarchyGroupsByCode.get(code) || [];
+    return state.hierarchyGroupsByCode.get(normalizedCode) || [];
   }
   if (!state.hierarchyData || !state.hierarchyData.groups) return [];
   const labels = state.hierarchyData.labels || {};
   const groups = [];
   Object.entries(state.hierarchyData.groups).forEach(([groupId, children]) => {
-    if (!groupId.startsWith(`${code}_`)) return;
-    const label = labels[groupId] || groupId.replace(`${code}_`, "").replace(/_/g, " ");
+    if (!groupId.startsWith(`${normalizedCode}_`)) return;
+    const label = labels[groupId] || groupId.replace(`${normalizedCode}_`, "").replace(/_/g, " ");
     groups.push({
       id: groupId,
       label,
@@ -265,8 +336,8 @@ function getHierarchyGroupsForCode(code) {
   return groups;
 }
 
-function getCountryGroupingMeta(code) {
-  const normalizedCode = normalizeCountryCode(code);
+function getCountryGroupingMeta(entryOrCode) {
+  const normalizedCode = resolveCountryGroupingCode(entryOrCode);
   if (!normalizedCode || !(state.countryGroupMetaByCode instanceof Map)) return null;
   return state.countryGroupMetaByCode.get(normalizedCode) || null;
 }
@@ -290,12 +361,15 @@ function getPriorityCountryOrderMap() {
 }
 
 function getCountryPriorityRank(countryState, priorityOrderMap = getPriorityCountryOrderMap()) {
-  if (!countryState?.continentId || !countryState?.code) return Number.MAX_SAFE_INTEGER;
+  const priorityCode = normalizeCountryCode(
+    countryState?.groupingCode || countryState?.lookupIso2 || countryState?.code
+  );
+  if (!countryState?.continentId || !priorityCode) return Number.MAX_SAFE_INTEGER;
   const continentOrder = priorityOrderMap.get(countryState.continentId);
-  if (!continentOrder || !continentOrder.has(countryState.code)) {
+  if (!continentOrder || !continentOrder.has(priorityCode)) {
     return Number.MAX_SAFE_INTEGER;
   }
-  return continentOrder.get(countryState.code);
+  return continentOrder.get(priorityCode);
 }
 
 function sortCountriesWithinContinent(entries, priorityOrderMap = getPriorityCountryOrderMap()) {
@@ -449,9 +523,10 @@ function addRecentColor(color) {
 }
 
 function applyPreset(countryCode, presetIndex, color, render) {
-  const presets = state.presetsState[countryCode];
+  const presetLookupCode = resolveScenarioLookupCode(countryCode);
+  const presets = state.presetsState[presetLookupCode];
   if (!presets || !presets[presetIndex]) {
-    console.warn(`Preset not found: ${countryCode}[${presetIndex}]`);
+    console.warn(`Preset not found: ${presetLookupCode}[${presetIndex}]`);
     return;
   }
 
@@ -520,11 +595,12 @@ function applyPreset(countryCode, presetIndex, color, render) {
 }
 
 function startPresetEdit(code, presetIndex, render) {
-  const presets = state.presetsState[code] || [];
+  const presetLookupCode = resolveScenarioLookupCode(code);
+  const presets = state.presetsState[presetLookupCode] || [];
   const preset = presets[presetIndex];
   if (!preset) return;
   state.isEditingPreset = true;
-  state.editingPresetRef = { code, presetIndex };
+  state.editingPresetRef = { code: presetLookupCode, presetIndex };
   state.editingPresetIds = new Set(preset.ids || []);
   if (typeof state.updateToolUIFn === "function") {
     state.updateToolUIFn();
@@ -679,6 +755,14 @@ function initSidebar({ render } = {}) {
     projectLegendStack.appendChild(legendSection);
   }
 
+  let scenarioAuditSection = document.getElementById("scenarioAuditPanel");
+  if (!scenarioAuditSection && diagnosticStack) {
+    scenarioAuditSection = document.createElement("div");
+    scenarioAuditSection.id = "scenarioAuditPanel";
+    scenarioAuditSection.className = "inspector-tool-card";
+    diagnosticStack.appendChild(scenarioAuditSection);
+  }
+
   let debugViewSection = document.getElementById("debugViewControl");
   if (!debugViewSection && diagnosticStack) {
     debugViewSection = document.createElement("div");
@@ -762,7 +846,11 @@ function initSidebar({ render } = {}) {
 
   const createCountryInspectorState = (entry, fallbackIndex = 0) => {
     const scenarioMeta = getScenarioCountryMeta(entry.code) || entry || {};
-    const groupingMeta = getCountryGroupingMeta(entry.code) || {};
+    const lookupIso2 = resolveScenarioLookupCode(entry);
+    const inspectorDataCode = resolveInspectorDataCode(entry);
+    const presetLookupCode = resolveScenarioLookupCode(entry);
+    const groupLookupCode = resolveCountryGroupingCode(entry);
+    const groupingMeta = getCountryGroupingMeta(entry) || {};
     const continentLabel =
       String(scenarioMeta.continent_label || scenarioMeta.continentLabel || groupingMeta.continentLabel || "Other");
     const subregionLabel =
@@ -770,8 +858,12 @@ function initSidebar({ render } = {}) {
     return {
       ...entry,
       fallbackIndex,
-      presets: state.presetsState[entry.code] || [],
-      hierarchyGroups: getHierarchyGroupsForCode(entry.code),
+      lookupIso2,
+      inspectorDataCode,
+      presetLookupCode,
+      groupingCode: groupLookupCode,
+      presets: state.presetsState[presetLookupCode] || [],
+      hierarchyGroups: getHierarchyGroupsForCode(groupLookupCode),
       continentId:
         String(scenarioMeta.continent_id || scenarioMeta.continentId || groupingMeta.continentId || "continent_other"),
       continentLabel,
@@ -813,6 +905,362 @@ function initSidebar({ render } = {}) {
     button.textContent = label;
     button.addEventListener("click", onClick);
     return button;
+  };
+
+  const resolveAuditNumber = (...values) => {
+    for (const value of values) {
+      const numeric = Number(value);
+      if (Number.isFinite(numeric)) {
+        return numeric;
+      }
+    }
+    return 0;
+  };
+
+  const getScenarioAuditSummary = (auditPayload) => (
+    auditPayload?.summary && typeof auditPayload.summary === "object" ? auditPayload.summary : {}
+  );
+
+  const getScenarioAuditBlockerCount = (summary = {}) => {
+    const flattened = Number(summary.blocker_count);
+    if (Number.isFinite(flattened)) {
+      return flattened;
+    }
+    return (
+      Number(summary.geometry_blocker_count || 0)
+      + Number(summary.topology_blocker_count || 0)
+      + Number(summary.scenario_rule_blocker_count || 0)
+    );
+  };
+
+  const createAuditValueRow = (label, value) => {
+    const row = document.createElement("div");
+    row.className = "flex items-center justify-between gap-3";
+
+    const left = document.createElement("span");
+    left.className = "inspector-mini-label";
+    left.textContent = label;
+
+    const right = document.createElement("span");
+    right.className = "country-row-title";
+    right.textContent = String(value);
+
+    row.appendChild(left);
+    row.appendChild(right);
+    return row;
+  };
+
+  const createAuditList = (items = [], renderItem) => {
+    const list = document.createElement("div");
+    list.className = "mt-2 flex flex-col gap-2";
+    if (!items.length) {
+      list.appendChild(createEmptyNote(t("None", "ui")));
+      return list;
+    }
+    items.forEach((item, index) => {
+      const node = renderItem(item, index);
+      if (node) {
+        list.appendChild(node);
+      }
+    });
+    return list;
+  };
+
+  const renderScenarioAuditSummary = (auditPayload, manifestSummary = {}) => {
+    const summary = getScenarioAuditSummary(auditPayload);
+    const container = document.createElement("div");
+    container.className = "mt-3 flex flex-col gap-2";
+    container.appendChild(createAuditValueRow(
+      t("Owners", "ui"),
+      resolveAuditNumber(summary.owner_count, manifestSummary.owner_count)
+    ));
+    container.appendChild(createAuditValueRow(
+      t("Features", "ui"),
+      resolveAuditNumber(summary.feature_count, manifestSummary.feature_count)
+    ));
+    container.appendChild(createAuditValueRow(
+      t("Approximate", "ui"),
+      resolveAuditNumber(
+        summary.approximate_count,
+        summary.quality_counts?.approx_existing_geometry,
+        manifestSummary.approximate_count,
+        manifestSummary.quality_counts?.approx_existing_geometry
+      )
+    ));
+    container.appendChild(createAuditValueRow(
+      t("Manual-reviewed", "ui"),
+      resolveAuditNumber(
+        summary.manual_reviewed_feature_count,
+        summary.quality_counts?.manual_reviewed,
+        manifestSummary.manual_reviewed_feature_count,
+        manifestSummary.quality_counts?.manual_reviewed
+      )
+    ));
+    container.appendChild(createAuditValueRow(
+      t("Synthetic", "ui"),
+      resolveAuditNumber(
+        summary.synthetic_count,
+        summary.synthetic_owner_feature_count,
+        manifestSummary.synthetic_count,
+        manifestSummary.synthetic_owner_feature_count
+      )
+    ));
+    container.appendChild(createAuditValueRow(
+      t("Blockers", "ui"),
+      getScenarioAuditBlockerCount(Object.keys(summary).length ? summary : manifestSummary)
+    ));
+    container.appendChild(createAuditValueRow(
+      t("Critical checks", "ui"),
+      resolveAuditNumber(
+        summary.critical_region_check_count,
+        summary.manual_reviewed_region_count,
+        manifestSummary.critical_region_check_count,
+        manifestSummary.manual_reviewed_region_count
+      )
+    ));
+    return container;
+  };
+
+  const renderScenarioCriticalChecks = (auditPayload) => {
+    const section = document.createElement("div");
+    section.className = "mt-4";
+
+    const title = document.createElement("div");
+    title.className = "section-header-block";
+    title.textContent = t("Critical checks", "ui");
+    section.appendChild(title);
+
+    const criticalRegions = Array.isArray(auditPayload?.critical_regions)
+      ? auditPayload.critical_regions
+      : [];
+    const regionChecks = auditPayload?.region_checks && typeof auditPayload.region_checks === "object"
+      ? auditPayload.region_checks
+      : {};
+
+    const items = criticalRegions.length
+      ? criticalRegions.map((item) => ({
+        regionId: String(item?.region_id || "").trim(),
+        status: String(item?.status || regionChecks?.[item?.region_id]?.status || "unknown").trim(),
+        notes: String(regionChecks?.[item?.region_id]?.notes || "").trim(),
+      }))
+      : Object.entries(regionChecks).map(([regionId, payload]) => ({
+        regionId: String(regionId || "").trim(),
+        status: String(payload?.status || "unknown").trim(),
+        notes: String(payload?.notes || "").trim(),
+      }));
+
+    section.appendChild(createAuditList(items, ({ regionId, status, notes }) => {
+      if (notes) {
+        const details = document.createElement("details");
+        details.className = "inspector-preset-details";
+
+        const summary = document.createElement("summary");
+        summary.className = "inspector-accordion-btn";
+        summary.textContent = `${regionId} · ${status}`;
+
+        const body = document.createElement("div");
+        body.className = "preset-country-body";
+        body.textContent = notes;
+
+        details.appendChild(summary);
+        details.appendChild(body);
+        return details;
+      }
+
+      const row = document.createElement("div");
+      row.className = "flex items-center justify-between gap-3";
+      row.appendChild(Object.assign(document.createElement("span"), {
+        className: "body-text",
+        textContent: regionId,
+      }));
+      row.appendChild(Object.assign(document.createElement("span"), {
+        className: "inspector-mini-label",
+        textContent: status,
+      }));
+      return row;
+    }));
+
+    return section;
+  };
+
+  const renderScenarioAuditBlockers = (auditPayload) => {
+    const section = document.createElement("div");
+    section.className = "mt-4 flex flex-col gap-4";
+
+    const topologyWrapper = document.createElement("div");
+    const topologyTitle = document.createElement("div");
+    topologyTitle.className = "section-header-block";
+    topologyTitle.textContent = t("Topology blockers", "ui");
+    topologyWrapper.appendChild(topologyTitle);
+    topologyWrapper.appendChild(createAuditList(
+      Array.isArray(auditPayload?.topology_blockers) ? auditPayload.topology_blockers : [],
+      (item) => {
+        const row = document.createElement("div");
+        row.className = "flex flex-col gap-1";
+        row.appendChild(Object.assign(document.createElement("span"), {
+          className: "body-text",
+          textContent: String(item?.blocker_id || item?.id || "unknown"),
+        }));
+        if (item?.notes) {
+          row.appendChild(Object.assign(document.createElement("span"), {
+            className: "inspector-mini-label",
+            textContent: String(item.notes),
+          }));
+        }
+        return row;
+      }
+    ));
+
+    const ruleWrapper = document.createElement("div");
+    const ruleTitle = document.createElement("div");
+    ruleTitle.className = "section-header-block";
+    ruleTitle.textContent = t("Scenario rule blockers", "ui");
+    ruleWrapper.appendChild(ruleTitle);
+    ruleWrapper.appendChild(createAuditList(
+      Array.isArray(auditPayload?.scenario_rule_blockers) ? auditPayload.scenario_rule_blockers : [],
+      (item) => {
+        const row = document.createElement("div");
+        row.className = "flex flex-col gap-1";
+        row.appendChild(Object.assign(document.createElement("span"), {
+          className: "body-text",
+          textContent: String(item?.rule_id || item?.blocker_id || "unknown"),
+        }));
+        if (item?.notes) {
+          row.appendChild(Object.assign(document.createElement("span"), {
+            className: "inspector-mini-label",
+            textContent: String(item.notes),
+          }));
+        }
+        return row;
+      }
+    ));
+
+    section.appendChild(topologyWrapper);
+    section.appendChild(ruleWrapper);
+    return section;
+  };
+
+  const renderScenarioAuditTopologySummary = (auditPayload) => {
+    const section = document.createElement("div");
+    section.className = "mt-4";
+
+    const title = document.createElement("div");
+    title.className = "section-header-block";
+    title.textContent = t("Topology Summary", "ui");
+    section.appendChild(title);
+
+    const belarusHybrid = auditPayload?.topology_summaries?.belarus_hybrid || {};
+    const rows = [
+      [t("Total features", "ui"), belarusHybrid.total_feature_count],
+      [t("Border rayons kept", "ui"), belarusHybrid.border_rayons_kept],
+      [t("Historical composites built", "ui"), belarusHybrid.historical_composites_built],
+      [t("Interior groups built", "ui"), belarusHybrid.interior_groups_built],
+    ].filter(([, value]) => Number.isFinite(Number(value)));
+
+    if (!rows.length) {
+      section.appendChild(createEmptyNote(t("None", "ui")));
+      return section;
+    }
+
+    const subtitle = document.createElement("div");
+    subtitle.className = "inspector-mini-label mt-2";
+    subtitle.textContent = t("Belarus hybrid", "ui");
+    section.appendChild(subtitle);
+
+    const list = document.createElement("div");
+    list.className = "mt-2 flex flex-col gap-2";
+    rows.forEach(([label, value]) => {
+      list.appendChild(createAuditValueRow(label, value));
+    });
+    section.appendChild(list);
+    return section;
+  };
+
+  const renderScenarioAuditPanel = () => {
+    if (!scenarioAuditSection) return;
+
+    const activeScenarioId = String(state.activeScenarioId || "").trim();
+    const auditUi = state.scenarioAuditUi || {};
+    const activeAuditLoaded =
+      !!activeScenarioId &&
+      auditUi.loadedForScenarioId === activeScenarioId &&
+      state.scenarioAudit &&
+      typeof state.scenarioAudit === "object";
+    const manifestSummary =
+      state.activeScenarioManifest?.summary && typeof state.activeScenarioManifest.summary === "object"
+        ? state.activeScenarioManifest.summary
+        : {};
+
+    scenarioAuditSection.replaceChildren();
+
+    const title = document.createElement("div");
+    title.className = "section-header sidebar-tool-title";
+    title.textContent = t("Scenario Audit", "ui");
+
+    const hint = document.createElement("p");
+    hint.className = "sidebar-tool-hint";
+    hint.textContent = t(
+      "Inspect critical checks, blockers, and source quality for the active scenario.",
+      "ui"
+    );
+
+    scenarioAuditSection.appendChild(title);
+    scenarioAuditSection.appendChild(hint);
+
+    if (!activeScenarioId) {
+      scenarioAuditSection.appendChild(createEmptyNote(t("No scenario active", "ui")));
+      return;
+    }
+
+    const actions = document.createElement("div");
+    actions.className = "mt-3 flex flex-col gap-2";
+
+    const loadButton = document.createElement("button");
+    loadButton.type = "button";
+    loadButton.className = activeAuditLoaded ? "btn-secondary" : "btn-primary";
+    loadButton.disabled = !!auditUi.loading;
+    loadButton.textContent = t(activeAuditLoaded ? "Reload Audit" : "Load Audit Details", "ui");
+    loadButton.addEventListener("click", async () => {
+      try {
+        await loadScenarioAuditPayload(activeScenarioId, {
+          forceReload: activeAuditLoaded,
+        });
+      } catch (error) {
+        console.error("Failed to load scenario audit:", error);
+      }
+    });
+    actions.appendChild(loadButton);
+
+    if (!activeAuditLoaded) {
+      if (auditUi.loading) {
+        scenarioAuditSection.appendChild(createEmptyNote(t("Loading audit details…", "ui")));
+      } else if (auditUi.errorMessage) {
+        const errorNote = createEmptyNote(t("Unable to load audit details", "ui"));
+        scenarioAuditSection.appendChild(errorNote);
+
+        const detail = document.createElement("div");
+        detail.className = "inspector-mini-label mt-2";
+        detail.textContent = auditUi.errorMessage;
+        scenarioAuditSection.appendChild(detail);
+      }
+      scenarioAuditSection.appendChild(actions);
+      return;
+    }
+
+    if (auditUi.loading) {
+      scenarioAuditSection.appendChild(createEmptyNote(t("Loading audit details…", "ui")));
+    } else if (auditUi.errorMessage) {
+      const errorDetail = document.createElement("div");
+      errorDetail.className = "inspector-mini-label mt-3";
+      errorDetail.textContent = `${t("Unable to load audit details", "ui")}: ${auditUi.errorMessage}`;
+      scenarioAuditSection.appendChild(errorDetail);
+    }
+
+    scenarioAuditSection.appendChild(renderScenarioAuditSummary(state.scenarioAudit, manifestSummary));
+    scenarioAuditSection.appendChild(renderScenarioCriticalChecks(state.scenarioAudit));
+    scenarioAuditSection.appendChild(renderScenarioAuditBlockers(state.scenarioAudit));
+    scenarioAuditSection.appendChild(renderScenarioAuditTopologySummary(state.scenarioAudit));
+    scenarioAuditSection.appendChild(actions);
   };
 
   const ensureSelectedInspectorCountry = () => {
@@ -996,7 +1444,7 @@ function initSidebar({ render } = {}) {
       if (countryState.presets.length > 0) {
         countryState.presets.forEach((preset, presetIndex) => {
           const button = createInspectorActionButton(preset.name, () => {
-            applyPreset(countryState.code, presetIndex, state.selectedColor, render);
+            applyPreset(countryState.presetLookupCode || countryState.code, presetIndex, state.selectedColor, render);
           });
           countryInspectorPresets.appendChild(button);
         });
@@ -1168,8 +1616,10 @@ function initSidebar({ render } = {}) {
     presetTree.innerHTML = "";
     let renderedCount = 0;
 
-    entries.forEach(({ code, name, displayName }) => {
-      const presets = state.presetsState[code] || [];
+    entries.forEach((entry) => {
+      const { code, name, displayName } = entry;
+      const presetLookupCode = resolveScenarioLookupCode(entry);
+      const presets = state.presetsState[presetLookupCode] || [];
       if (!presets.length) return;
 
       const countryMatch =
@@ -1180,14 +1630,15 @@ function initSidebar({ render } = {}) {
 
       if (!countryMatch) return;
 
+      const expansionKey = state.activeScenarioId ? `${code}::${presetLookupCode}` : presetLookupCode;
       const details = document.createElement("details");
       details.className = "inspector-preset-details";
-      details.open = state.expandedPresetCountries.has(code);
+      details.open = state.expandedPresetCountries.has(expansionKey);
       details.addEventListener("toggle", () => {
         if (details.open) {
-          state.expandedPresetCountries.add(code);
+          state.expandedPresetCountries.add(expansionKey);
         } else {
-          state.expandedPresetCountries.delete(code);
+          state.expandedPresetCountries.delete(expansionKey);
         }
       });
 
@@ -1213,7 +1664,7 @@ function initSidebar({ render } = {}) {
         nameBtn.className = "inspector-item-btn";
         nameBtn.textContent = preset.name;
         nameBtn.addEventListener("click", () => {
-          applyPreset(code, index, state.selectedColor, render);
+          applyPreset(presetLookupCode, index, state.selectedColor, render);
         });
 
         const actions = document.createElement("div");
@@ -1222,7 +1673,7 @@ function initSidebar({ render } = {}) {
         const isEditingThis =
           state.isEditingPreset &&
           state.editingPresetRef &&
-          state.editingPresetRef.code === code &&
+          state.editingPresetRef.code === presetLookupCode &&
           state.editingPresetRef.presetIndex === index;
 
         const editBtn = document.createElement("button");
@@ -1233,7 +1684,7 @@ function initSidebar({ render } = {}) {
           if (isEditingThis) {
             stopPresetEdit(render);
           } else {
-            startPresetEdit(code, index, render);
+            startPresetEdit(presetLookupCode, index, render);
           }
         });
 
@@ -1247,10 +1698,10 @@ function initSidebar({ render } = {}) {
         saveBtn.addEventListener("click", () => {
           if (!isEditingThis) return;
           const ids = Array.from(state.editingPresetIds);
-          const activePreset = state.presetsState[code]?.[index];
+          const activePreset = state.presetsState[presetLookupCode]?.[index];
           if (activePreset) {
             activePreset.ids = ids;
-            upsertCustomPreset(code, activePreset.name, ids);
+            upsertCustomPreset(presetLookupCode, activePreset.name, ids);
           }
           stopPresetEdit(render);
         });
@@ -1291,6 +1742,7 @@ function initSidebar({ render } = {}) {
   };
 
   state.renderPresetTreeFn = renderPresetTree;
+  state.renderScenarioAuditPanelFn = renderScenarioAuditPanel;
 
   let lastLegendKey = null;
   const refreshLegendEditor = () => {
@@ -1414,6 +1866,27 @@ function initSidebar({ render } = {}) {
       FileManager.importProject(file, async (data) => {
         clearHistory();
         if (data.scenario?.id) {
+          const validation = await validateImportedScenarioBaseline(data.scenario);
+          if (!validation.ok) {
+            const shouldContinue = validation.reason === "baseline_mismatch"
+              ? globalThis.confirm(
+                `${validation.message}\n\nContinue loading this project anyway?`
+              )
+              : false;
+            if (!shouldContinue) {
+              const error = new Error("Project import cancelled.");
+              error.code = "IMPORT_ABORTED";
+              error.toastTitle = t("Import cancelled", "ui");
+              error.toastTone = validation.reason === "baseline_mismatch" ? "warning" : "error";
+              error.userMessage = validation.reason === "missing_scenario"
+                ? validation.message
+                : t(
+                  "Project import cancelled because the saved scenario baseline does not match the current assets.",
+                  "ui"
+                );
+              throw error;
+            }
+          }
           await applyScenarioById(data.scenario.id, {
             renderNow: false,
             markDirtyReason: "",
@@ -1435,6 +1908,12 @@ function initSidebar({ render } = {}) {
         state.sovereigntyInitialized = false;
         state.paintMode = data.paintMode || "visual";
         state.activeSovereignCode = data.activeSovereignCode || "";
+        state.selectedInspectorCountryCode = data.activeSovereignCode || state.selectedInspectorCountryCode || "";
+        state.inspectorHighlightCountryCode = state.selectedInspectorCountryCode;
+        state.inspectorExpansionInitialized = false;
+        if (state.expandedInspectorContinents instanceof Set) {
+          state.expandedInspectorContinents.clear();
+        }
         state.dynamicBordersDirty = !!data.dynamicBordersDirty;
         state.dynamicBordersDirtyReason = data.dynamicBordersDirtyReason || "";
         ensureSovereigntyState({ force: true });
@@ -1550,6 +2029,9 @@ function initSidebar({ render } = {}) {
         if (typeof state.updateLegendUI === "function") {
           state.updateLegendUI();
         }
+        if (typeof state.renderScenarioAuditPanelFn === "function") {
+          state.renderScenarioAuditPanelFn();
+        }
       });
       projectFileInput.value = "";
     });
@@ -1567,6 +2049,7 @@ function initSidebar({ render } = {}) {
   renderList();
   renderPresetTree();
   refreshLegendEditor();
+  renderScenarioAuditPanel();
 
   globalThis.togglePresetRegion = (id) => togglePresetRegion(id, render);
 }

@@ -4203,6 +4203,16 @@ export function renderLegend(uniqueColors = null, labels = null) {
     ? uniqueColors
     : LegendManager.getUniqueColors(state);
   const labelMap = labels || LegendManager.getLabels();
+  const hasScenarioVisualEdits =
+    !!state.activeScenarioId &&
+    (
+      Object.keys(state.visualOverrides || {}).length > 0
+      || Object.keys(state.featureOverrides || {}).length > 0
+    );
+  const hasMeaningfulLabels = colors.some((color) => {
+    const key = String(color || "").toLowerCase();
+    return String(labelMap?.[key] || "").trim().length > 0;
+  });
   const colorKey = colors.join("|");
   const normalizedLabels = colors.map((color) => {
     const key = String(color || "").toLowerCase();
@@ -4214,6 +4224,12 @@ export function renderLegend(uniqueColors = null, labels = null) {
   if (!colors.length) {
     legendGroup.attr("display", "none");
     lastLegendKey = legendKey;
+    return;
+  }
+
+  if (state.activeScenarioId && !hasMeaningfulLabels && !hasScenarioVisualEdits) {
+    legendGroup.attr("display", "none");
+    lastLegendKey = `${legendKey}::scenario-hidden`;
     return;
   }
 

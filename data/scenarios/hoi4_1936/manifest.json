@@ -84,13 +84,19 @@
       "fallback_mapped_tag": 18,
       "manual_rule": 5819
     },
+    "approximate_count": 976,
+    "manual_reviewed_feature_count": 4861,
     "geometry_blocker_count": 0,
     "critical_unresolved_count": 0,
     "synthetic_owner_feature_count": 18,
+    "synthetic_count": 18,
     "changed_feature_count": 5837,
     "failed_region_check_count": 0,
     "topology_blocker_count": 0,
     "scenario_rule_blocker_count": 0,
+    "blocker_count": 0,
+    "critical_region_check_count": 13,
+    "manual_reviewed_region_count": 13,
     "belarus_hybrid_feature_count": 35
   }
 }

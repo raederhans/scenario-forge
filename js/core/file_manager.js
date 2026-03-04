@@ -170,9 +170,14 @@ class FileManager {
         });
       } catch (error) {
         console.error("Failed to import project:", error);
-        showToast(t("Invalid project file. Please select a valid map_project.json.", "ui"), {
-          title: t("Import failed", "ui"),
-          tone: "error",
+        const tone = String(error?.toastTone || "error");
+        const title = String(error?.toastTitle || t("Import failed", "ui"));
+        const message = String(
+          error?.userMessage || t("Invalid project file. Please select a valid map_project.json.", "ui")
+        );
+        showToast(message, {
+          title,
+          tone,
           duration: 4200,
         });
       }
