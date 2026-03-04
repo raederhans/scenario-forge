@@ -6,9 +6,14 @@ import { applyCountryColor, resetCountryColors } from "../core/logic.js";
 import { FileManager } from "../core/file_manager.js";
 import { captureHistoryState, clearHistory, pushHistoryEntry } from "../core/history_manager.js";
 import { LegendManager } from "../core/legend_manager.js";
+import { applyScenarioById, clearActiveScenario } from "../core/scenario_manager.js";
 import { t } from "./i18n.js";
 import { showToast } from "./toast.js";
-import { setFeatureOwnerCodes, ensureSovereigntyState } from "../core/sovereignty_manager.js";
+import {
+  setFeatureOwnerCodes,
+  ensureSovereigntyState,
+  migrateFeatureScopedProjectDataToCurrentTopology,
+} from "../core/sovereignty_manager.js";
 import { markDirty } from "../core/dirty_state.js";
 
 const COUNTRY_CODE_ALIASES = {
@@ -91,6 +96,36 @@ function collectCountryNameByCode() {
 }
 
 function getDynamicCountryEntries() {
+  if (state.activeScenarioId && state.scenarioCountriesByTag && typeof state.scenarioCountriesByTag === "object") {
+    const scenarioEntries = Object.entries(state.scenarioCountriesByTag)
+      .map(([rawCode, scenarioCountry]) => {
+        const code = normalizeCountryCode(rawCode);
+        if (!code) return null;
+        const name = String(scenarioCountry?.display_name || state.countryNames?.[code] || code).trim() || code;
+        const displayName = t(name, "geo") || name || code;
+        return {
+          code,
+          name,
+          displayName,
+          featureCount: Number(scenarioCountry?.feature_count || 0),
+          quality: String(scenarioCountry?.quality || "").trim(),
+          baseIso2: String(scenarioCountry?.base_iso2 || "").trim().toUpperCase(),
+          scenarioOnly: !!scenarioCountry?.scenario_only,
+          continentId: String(scenarioCountry?.continent_id || "").trim(),
+          continentLabel: String(scenarioCountry?.continent_label || "").trim(),
+          subregionId: String(scenarioCountry?.subregion_id || "").trim(),
+          subregionLabel: String(scenarioCountry?.subregion_label || "").trim(),
+          syntheticOwner: !!scenarioCountry?.synthetic_owner,
+        };
+      })
+      .filter(Boolean);
+    return scenarioEntries.sort((a, b) => {
+      if (!!a.scenarioOnly !== !!b.scenarioOnly) return a.scenarioOnly ? -1 : 1;
+      if ((b.featureCount || 0) !== (a.featureCount || 0)) return (b.featureCount || 0) - (a.featureCount || 0);
+      return a.displayName.localeCompare(b.displayName);
+    });
+  }
+
   const codes = new Set();
 
   if (state.countryToFeatureIds instanceof Map && state.countryToFeatureIds.size > 0) {
@@ -199,6 +234,14 @@ function upsertCustomPreset(code, name, ids) {
 function initPresetState() {
   state.customPresets = loadCustomPresets();
   state.presetsState = mergePresets(countryPresets, state.customPresets);
+}
+
+function getScenarioCountryMeta(code) {
+  const normalizedCode = normalizeCountryCode(code);
+  if (!normalizedCode || !state.activeScenarioId) return null;
+  const entry = state.scenarioCountriesByTag?.[normalizedCode];
+  if (!entry || typeof entry !== "object") return null;
+  return entry;
 }
 
 function getHierarchyGroupsForCode(code) {
@@ -718,20 +761,30 @@ function initSidebar({ render } = {}) {
   const matchesTerm = (value, term) => String(value || "").toLowerCase().includes(term);
 
   const createCountryInspectorState = (entry, fallbackIndex = 0) => {
+    const scenarioMeta = getScenarioCountryMeta(entry.code) || entry || {};
     const groupingMeta = getCountryGroupingMeta(entry.code) || {};
-    const continentLabel = groupingMeta.continentLabel || "Other";
-    const subregionLabel = groupingMeta.subregionLabel || "Unclassified";
+    const continentLabel =
+      String(scenarioMeta.continent_label || scenarioMeta.continentLabel || groupingMeta.continentLabel || "Other");
+    const subregionLabel =
+      String(scenarioMeta.subregion_label || scenarioMeta.subregionLabel || groupingMeta.subregionLabel || "Unclassified");
     return {
       ...entry,
       fallbackIndex,
       presets: state.presetsState[entry.code] || [],
       hierarchyGroups: getHierarchyGroupsForCode(entry.code),
-      continentId: groupingMeta.continentId || "continent_other",
+      continentId:
+        String(scenarioMeta.continent_id || scenarioMeta.continentId || groupingMeta.continentId || "continent_other"),
       continentLabel,
       continentDisplayLabel: t(continentLabel, "geo") || continentLabel,
-      subregionId: groupingMeta.subregionId || "subregion_unclassified",
+      subregionId:
+        String(scenarioMeta.subregion_id || scenarioMeta.subregionId || groupingMeta.subregionId || "subregion_unclassified"),
       subregionLabel,
       subregionDisplayLabel: t(subregionLabel, "geo") || subregionLabel,
+      quality: String(scenarioMeta.quality || entry.quality || "").trim(),
+      featureCount: Number(scenarioMeta.feature_count || entry.featureCount || 0),
+      baseIso2: String(scenarioMeta.base_iso2 || entry.baseIso2 || "").trim().toUpperCase(),
+      scenarioOnly: !!(scenarioMeta.scenario_only ?? entry.scenarioOnly),
+      syntheticOwner: !!(scenarioMeta.synthetic_owner ?? entry.syntheticOwner),
     };
   };
 
@@ -849,6 +902,13 @@ function initSidebar({ render } = {}) {
       side.appendChild(badge);
     }
 
+    if (countryState.scenarioOnly) {
+      const badge = document.createElement("span");
+      badge.className = "country-scenario-badge";
+      badge.textContent = t("Scenario", "ui");
+      side.appendChild(badge);
+    }
+
     const swatch = document.createElement("span");
     swatch.className = "country-select-swatch";
     swatch.style.backgroundColor = getResolvedCountryColor(countryState);
@@ -887,9 +947,19 @@ function initSidebar({ render } = {}) {
       countryInspectorTitle.textContent = `${countryState.displayName} (${countryState.code})`;
     }
     if (countryInspectorMeta) {
-      countryInspectorMeta.textContent = [countryState.subregionDisplayLabel, countryState.continentDisplayLabel]
-        .filter(Boolean)
-        .join(" · ");
+      const metaBits = [countryState.subregionDisplayLabel, countryState.continentDisplayLabel];
+      if (state.activeScenarioId) {
+        if (countryState.baseIso2) {
+          metaBits.push(`${t("Base ISO", "ui")}: ${countryState.baseIso2}`);
+        }
+        if (countryState.quality) {
+          metaBits.push(countryState.quality);
+        }
+        if (countryState.featureCount) {
+          metaBits.push(`${countryState.featureCount} ${t("features", "ui")}`);
+        }
+      }
+      countryInspectorMeta.textContent = metaBits.filter(Boolean).join(" · ");
     }
     if (countryInspectorSwatch) {
       countryInspectorSwatch.style.backgroundColor = resolvedColor;
@@ -1341,8 +1411,22 @@ function initSidebar({ render } = {}) {
       if (projectFileName) {
         projectFileName.textContent = file.name;
       }
-      FileManager.importProject(file, (data) => {
+      FileManager.importProject(file, async (data) => {
         clearHistory();
+        if (data.scenario?.id) {
+          await applyScenarioById(data.scenario.id, {
+            renderNow: false,
+            markDirtyReason: "",
+            showToastOnComplete: false,
+          });
+        } else if (state.activeScenarioId) {
+          clearActiveScenario({
+            renderNow: false,
+            markDirtyReason: "",
+            showToastOnComplete: false,
+          });
+        }
+        data = await migrateFeatureScopedProjectDataToCurrentTopology(data, state.landData);
         state.sovereignBaseColors = data.sovereignBaseColors || data.countryBaseColors || {};
         state.countryBaseColors = { ...state.sovereignBaseColors };
         state.visualOverrides = data.visualOverrides || data.featureOverrides || {};

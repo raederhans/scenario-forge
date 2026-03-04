@@ -9393,45 +9393,6 @@
     "SL_Eastern": [
       "SL_ADM1_SLE-790"
     ],
-    "SO_Bari": [
-      "SO_ADM1_SOM-1"
-    ],
-    "SO_Bakool": [
-      "SO_ADM1_SOM-2312"
-    ],
-    "SO_Bay": [
-      "SO_ADM1_SOM-2313"
-    ],
-    "SO_Gedo": [
-      "SO_ADM1_SOM-2314"
-    ],
-    "SO_Middle_Juba": [
-      "SO_ADM1_SOM-2315"
-    ],
-    "SO_Lower_Shebelle": [
-      "SO_ADM1_SOM-2316"
-    ],
-    "SO_Banaadir": [
-      "SO_ADM1_SOM-2407"
-    ],
-    "SO_Galguduud": [
-      "SO_ADM1_SOM-2408"
-    ],
-    "SO_Hiran": [
-      "SO_ADM1_SOM-2409"
-    ],
-    "SO_Middle_Shebelle": [
-      "SO_ADM1_SOM-2410"
-    ],
-    "SO_Mudug": [
-      "SO_ADM1_SOM-2412"
-    ],
-    "SO_Nugal": [
-      "SO_ADM1_SOM-2413"
-    ],
-    "SO_Lower_Juba": [
-      "SO_ADM1_SOM-2645"
-    ],
     "ZA_Northern_Cape": [
       "ZA_ADM1_ZAF-1188"
     ],
@@ -9854,6 +9815,60 @@
     ],
     "UG_Western_Region": [
       "UG_ADM1_17295835B91329899113986"
+    ],
+    "SO_Awdal": [
+      "SO_ADM1_83879307B11376444747055"
+    ],
+    "SO_Sanaag": [
+      "SO_ADM1_83879307B13610404434600"
+    ],
+    "SO_Bari": [
+      "SO_ADM1_83879307B19000204873860"
+    ],
+    "SO_Galgaduud": [
+      "SO_ADM1_83879307B20044253365087"
+    ],
+    "SO_Mudug": [
+      "SO_ADM1_83879307B26517451678825"
+    ],
+    "SO_Banadir": [
+      "SO_ADM1_83879307B32896531038690"
+    ],
+    "SO_Middle_Juba": [
+      "SO_ADM1_83879307B33420401553888"
+    ],
+    "SO_Gedo": [
+      "SO_ADM1_83879307B34714219035659"
+    ],
+    "SO_Lower_Shebelle": [
+      "SO_ADM1_83879307B35519599536274"
+    ],
+    "SO_Lower_Juba": [
+      "SO_ADM1_83879307B35818532110087"
+    ],
+    "SO_Woqooyi_Galbeed": [
+      "SO_ADM1_83879307B42572798770371"
+    ],
+    "SO_Middle_Shebelle": [
+      "SO_ADM1_83879307B5242146898757"
+    ],
+    "SO_Bakool": [
+      "SO_ADM1_83879307B58207540839705"
+    ],
+    "SO_Sool": [
+      "SO_ADM1_83879307B65026001570916"
+    ],
+    "SO_Nugaal": [
+      "SO_ADM1_83879307B66585548815331"
+    ],
+    "SO_Hiiraan": [
+      "SO_ADM1_83879307B66756469447496"
+    ],
+    "SO_Bay": [
+      "SO_ADM1_83879307B67196763494499"
+    ],
+    "SO_Togdheer": [
+      "SO_ADM1_83879307B67680758004346"
     ],
     "AD_Andorra_la_Vella": [
       "AD_ADM1_AND-4876"
@@ -11613,6 +11628,55 @@
     "ID_Banten": [
       "ID_ADM1_65028918B99918739720671"
     ],
+    "BY_City_of_Minsk": [
+      "BY_CITY_MINSK"
+    ],
+    "BY_Minsk": [
+      "BY_HIST_POL_MINSK_WEST",
+      "BY_INT_MINSK"
+    ],
+    "BY_Vitebsk": [
+      "BY_HIST_POL_VITEBSK_WEST",
+      "BY_RAY_67162791B1773631612848",
+      "BY_RAY_67162791B18102707107362",
+      "BY_RAY_67162791B19917337499758",
+      "BY_RAY_67162791B30546828632542",
+      "BY_RAY_67162791B41761210959552",
+      "BY_RAY_67162791B45929653886900",
+      "BY_RAY_67162791B65560195088656",
+      "BY_RAY_67162791B82603429459213",
+      "BY_RAY_67162791B85815486219336",
+      "BY_INT_VITEBSK"
+    ],
+    "BY_Mogilev": [
+      "BY_RAY_67162791B10713618148259",
+      "BY_RAY_67162791B11584975294724",
+      "BY_RAY_67162791B14569635979911",
+      "BY_RAY_67162791B4778855273895",
+      "BY_RAY_67162791B52564132020414",
+      "BY_RAY_67162791B58533541453403",
+      "BY_INT_MOGILEV"
+    ],
+    "BY_Grodno": [
+      "BY_RAY_67162791B13547290723272",
+      "BY_RAY_67162791B18933715013959",
+      "BY_RAY_67162791B43104058935452",
+      "BY_RAY_67162791B54270193950847",
+      "BY_RAY_67162791B66420794580046",
+      "BY_RAY_67162791B89656925241953",
+      "BY_INT_GRODNO"
+    ],
+    "BY_Gomel": [
+      "BY_RAY_67162791B17030122378697",
+      "BY_RAY_67162791B26710857863794",
+      "BY_RAY_67162791B72598168140482",
+      "BY_INT_GOMEL"
+    ],
+    "BY_Brest": [
+      "BY_RAY_67162791B30498032594927",
+      "BY_RAY_67162791B59963656038120",
+      "BY_INT_BREST"
+    ],
     "AU_Northern_Territory": [
       "AU_ADM1_AUS-2650"
     ],
@@ -12321,19 +12385,6 @@
     "SL_Western_Area": "Western Area",
     "SL_Northern": "Northern",
     "SL_Eastern": "Eastern",
-    "SO_Bari": "Bari",
-    "SO_Bakool": "Bakool",
-    "SO_Bay": "Bay",
-    "SO_Gedo": "Gedo",
-    "SO_Middle_Juba": "Middle Juba",
-    "SO_Lower_Shebelle": "Lower Shebelle",
-    "SO_Banaadir": "Banaadir",
-    "SO_Galguduud": "Galguduud",
-    "SO_Hiran": "Hiran",
-    "SO_Middle_Shebelle": "Middle Shebelle",
-    "SO_Mudug": "Mudug",
-    "SO_Nugal": "Nugal",
-    "SO_Lower_Juba": "Lower Juba",
     "ZA_Northern_Cape": "Northern Cape",
     "ZA_Western_Cape": "Western Cape",
     "ZA_North_West": "North West",
@@ -12475,6 +12526,24 @@
     "UG_Eastern_Region": "Eastern Region",
     "UG_Northern_Region": "Northern Region",
     "UG_Western_Region": "Western Region",
+    "SO_Awdal": "Awdal",
+    "SO_Sanaag": "Sanaag",
+    "SO_Bari": "Bari",
+    "SO_Galgaduud": "Galgaduud",
+    "SO_Mudug": "Mudug",
+    "SO_Banadir": "Banadir",
+    "SO_Middle_Juba": "Middle Juba",
+    "SO_Gedo": "Gedo",
+    "SO_Lower_Shebelle": "Lower Shebelle",
+    "SO_Lower_Juba": "Lower Juba",
+    "SO_Woqooyi_Galbeed": "Woqooyi Galbeed",
+    "SO_Middle_Shebelle": "Middle Shebelle",
+    "SO_Bakool": "Bakool",
+    "SO_Sool": "Sool",
+    "SO_Nugaal": "Nugaal",
+    "SO_Hiiraan": "Hiiraan",
+    "SO_Bay": "Bay",
+    "SO_Togdheer": "Togdheer",
     "AD_Andorra_la_Vella": "Andorra la Vella",
     "AD_La_Massana": "La Massana",
     "AD_Ordino": "Ordino",
@@ -13060,6 +13129,13 @@
     "ID_South_Sumatra": "South Sumatra",
     "ID_West_Nusa_Tenggara": "West Nusa Tenggara",
     "ID_Banten": "Banten",
+    "BY_City_of_Minsk": "City of Minsk",
+    "BY_Minsk": "Minsk",
+    "BY_Vitebsk": "Vitebsk",
+    "BY_Mogilev": "Mogilev",
+    "BY_Grodno": "Grodno",
+    "BY_Gomel": "Gomel",
+    "BY_Brest": "Brest",
     "AU_Northern_Territory": "Northern Territory",
     "AU_Western_Australia": "Western Australia",
     "AU_Australian_Capital_Territory": "Australian Capital Territory",
@@ -13456,71 +13532,6 @@
         ]
       }
     ],
-    "priority_by_continent": {
-      "continent_europe": [
-        "DE",
-        "FR",
-        "GB",
-        "IT",
-        "ES",
-        "PL",
-        "UA",
-        "NL",
-        "SE"
-      ],
-      "continent_asia": [
-        "CN",
-        "IN",
-        "JP",
-        "KR",
-        "ID",
-        "PK",
-        "IR",
-        "SA",
-        "TH",
-        "VN"
-      ],
-      "continent_africa": [
-        "NG",
-        "ZA",
-        "EG",
-        "ET",
-        "DZ",
-        "MA",
-        "KE",
-        "CD"
-      ],
-      "continent_north_america": [
-        "US",
-        "CA",
-        "MX",
-        "CU",
-        "GT",
-        "PA",
-        "DO",
-        "CR"
-      ],
-      "continent_south_america": [
-        "BR",
-        "AR",
-        "CO",
-        "CL",
-        "PE",
-        "VE",
-        "UY",
-        "BO"
-      ],
-      "continent_oceania": [
-        "AU",
-        "NZ",
-        "PG",
-        "FJ",
-        "SB"
-      ],
-      "continent_antarctica": [
-        "AQ"
-      ]
-    },
     "country_meta": {
       "AD": {
         "continent_id": "continent_europe",

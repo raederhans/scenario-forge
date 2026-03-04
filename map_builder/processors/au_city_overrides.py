@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import re
 
 import geopandas as gpd
+import pandas as pd
 from shapely.geometry import Point
 
 from map_builder import config as cfg

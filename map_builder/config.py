@@ -48,6 +48,14 @@ UKR_ADM2_FALLBACK_URLS = [
     "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/UKR/ADM2/"
     "geoBoundaries-UKR-ADM2.geojson",
 ]
+BLR_ADM2_URL = (
+    "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/BLR/ADM2/"
+    "geoBoundaries-BLR-ADM2.geojson"
+)
+BLR_ADM2_FALLBACK_URLS = [
+    "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/BLR/ADM2/"
+    "geoBoundaries-BLR-ADM2.geojson",
+]
 
 IND_ADM2_URL = (
     "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/IND/ADM2/"
@@ -116,6 +124,7 @@ PL_POWIATY_FILENAME = "poland_powiaty.geojson"
 CHINA_ADM2_FILENAME = "china_adm2.geojson"
 RUS_ADM2_FILENAME = "geoBoundaries-RUS-ADM2.geojson"
 UKR_ADM2_FILENAME = "geoBoundaries-UKR-ADM2.geojson"
+BLR_ADM2_FILENAME = "geoBoundaries-BLR-ADM2.geojson"
 IND_ADM2_FILENAME = "geoBoundaries-IND-ADM2.geojson"
 MEX_ADM2_FILENAME = "geoBoundaries-MEX-ADM2.geojson"
 CA_FED_2023_FILENAME = "FED_CA_2023_EN-SHP.zip"
@@ -269,7 +278,6 @@ AFRICA_BASIC_NE_COUNTRIES = {
     "RW": 5,
     "SN": 14,
     "SL": 4,
-    "SO": 13,
     "ZA": 9,
     "SS": 10,
     "SD": 17,
@@ -345,6 +353,19 @@ AFRICA_BASIC_GB_OVERRIDES = {
         ],
         "filename": "geoBoundaries-UGA-ADM1.geojson",
         "expected_count": 4,
+    },
+    "SO": {
+        "iso3": "SOM",
+        "url": (
+            "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/SOM/ADM1/"
+            "geoBoundaries-SOM-ADM1.geojson"
+        ),
+        "fallback_urls": [
+            "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/SOM/ADM1/"
+            "geoBoundaries-SOM-ADM1.geojson",
+        ],
+        "filename": "geoBoundaries-SOM-ADM1.geojson",
+        "expected_count": 18,
     },
 }
 AFRICA_BASIC_SKIP_COUNTRIES = {"EH"}
@@ -491,6 +512,7 @@ TOPOLOGY_ADMIN1_HIERARCHY_CODES = (
     | set(AFRICA_BASIC_GB_OVERRIDES.keys())
     | set(GLOBAL_BASIC_NE_COUNTRY_RULES.keys())
     | set(GLOBAL_BASIC_SPECIAL_SOURCES.keys())
+    | {"BY"}
 )
 
 PROJECTION = {
@@ -514,6 +536,7 @@ SIMPLIFY_URBAN = 0.01
 SIMPLIFY_PHYSICAL = 0.02
 SIMPLIFY_CHINA = 0.01
 SIMPLIFY_RU_UA = 0.025
+SIMPLIFY_BLR_HYBRID = 0.02
 SIMPLIFY_INDIA = 0.015
 SIMPLIFY_US_COUNTY = 0.01
 SIMPLIFY_CANADA_FED = 0.01

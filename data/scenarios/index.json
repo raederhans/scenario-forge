@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "default_scenario_id": "hoi4_1936",
+  "scenarios": [
+    {
+      "scenario_id": "hoi4_1936",
+      "display_name": "HOI4 1936",
+      "manifest_url": "data/scenarios/hoi4_1936/manifest.json",
+      "audit_url": "data/scenarios/hoi4_1936/audit.json"
+    }
+  ]
+}

@@ -31,6 +31,7 @@ import {
   normalizeHexColor,
   setActivePaletteSource,
 } from "../core/palette_manager.js";
+import { resetToScenarioBaseline } from "../core/scenario_manager.js";
 import { toggleLanguage, updateUIText, t } from "./i18n.js";
 import { resetAllFeatureOwnersToCanonical } from "../core/sovereignty_manager.js";
 import { showToast } from "./toast.js";
@@ -511,7 +512,12 @@ function initToolbar({ render } = {}) {
   const refreshActiveSovereignLabel = () => {
     if (!activeSovereignLabel) return;
     const code = String(state.activeSovereignCode || "").trim().toUpperCase();
-    activeSovereignLabel.textContent = code || t("None selected", "ui");
+    if (!code) {
+      activeSovereignLabel.textContent = t("None selected", "ui");
+      return;
+    }
+    const label = String(state.countryNames?.[code] || code).trim() || code;
+    activeSovereignLabel.textContent = `${t(label, "geo") || label} (${code})`;
   };
   state.updateActiveSovereignUIFn = refreshActiveSovereignLabel;
   const refreshDynamicBorderStatus = () => {
@@ -1924,7 +1930,15 @@ function initToolbar({ render } = {}) {
         sovereigntyFeatureIds,
       });
       if (state.paintMode === "sovereignty") {
-        resetAllFeatureOwnersToCanonical();
+        if (state.activeScenarioId) {
+          resetToScenarioBaseline({
+            renderNow: false,
+            markDirtyReason: "",
+            showToastOnComplete: false,
+          });
+        } else {
+          resetAllFeatureOwnersToCanonical();
+        }
         scheduleDynamicBorderRecompute("clear-sovereignty", 90);
       } else {
         state.colors = {};

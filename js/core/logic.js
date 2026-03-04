@@ -51,6 +51,7 @@ function resetCountryColors() {
   const ownerCodes = Array.from(new Set([
     ...Object.keys(state.sovereignBaseColors || {}),
     ...Object.keys(defaultCountryPalette || {}),
+    ...Object.keys(state.scenarioFixedOwnerColors || {}),
     ...Object.keys(state.countryPalette || {}),
   ]));
   const featureIds = Object.keys(state.visualOverrides || {});
@@ -65,8 +66,11 @@ function resetCountryColors() {
   Object.keys(defaultCountryPalette).forEach((code) => {
     countryPalette[code] = defaultCountryPalette[code];
   });
-  state.sovereignBaseColors = { ...resolvedDefaults };
-  state.countryBaseColors = { ...resolvedDefaults };
+  state.sovereignBaseColors = {
+    ...resolvedDefaults,
+    ...(state.activeScenarioId ? state.scenarioFixedOwnerColors || {} : {}),
+  };
+  state.countryBaseColors = { ...state.sovereignBaseColors };
   state.colors = {};
   state.visualOverrides = {};
   state.featureOverrides = {};

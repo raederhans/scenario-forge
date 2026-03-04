@@ -33,6 +33,14 @@ function updateUIText() {
     ["lblQuickPalette", "Quick Colors"],
     ["lblColorLibrary", "Color Library"],
     ["lblPaletteSearch", "Search Colors"],
+    ["lblScenario", "Scenario"],
+    ["lblScenarioHint", "Load a bundled historical setup and reset to its baseline."],
+    ["lblScenarioSelect", "Scenario"],
+    ["applyScenarioBtn", "Apply Scenario"],
+    ["resetScenarioBtn", "Reset To Scenario"],
+    ["clearScenarioBtn", "Clear Scenario"],
+    ["scenarioStatus", "No scenario active"],
+    ["scenarioAuditHint", "Coverage report unavailable"],
     ["lblExport", "Export Map"],
     ["lblExportFormat", "Format"],
     ["exportBtn", "Download Snapshot"],
@@ -294,6 +302,9 @@ function updateUIText() {
   }
   if (typeof state.updatePaletteLibraryUIFn === "function") {
     state.updatePaletteLibraryUIFn();
+  }
+  if (typeof state.updateScenarioUIFn === "function") {
+    state.updateScenarioUIFn();
   }
 }
 

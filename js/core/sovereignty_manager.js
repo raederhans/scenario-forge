@@ -4,6 +4,8 @@ const COUNTRY_CODE_ALIASES = {
   UK: "GB",
   EL: "GR",
 };
+const FEATURE_MIGRATION_URLS = ["data/feature-migrations/by_hybrid_v1.json"];
+let featureMigrationMapPromise = null;
 
 function normalizeOwnerCode(rawCode) {
   const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
@@ -243,6 +245,132 @@ function migrateImportedProjectData(data) {
   return payload;
 }
 
+async function loadFeatureMigrationMap({ fetchImpl = globalThis.fetch } = {}) {
+  if (featureMigrationMapPromise) {
+    return featureMigrationMapPromise;
+  }
+  featureMigrationMapPromise = (async () => {
+    if (typeof fetchImpl !== "function") {
+      return {};
+    }
+    const merged = {};
+    for (const url of FEATURE_MIGRATION_URLS) {
+      try {
+        const response = await fetchImpl(url, { cache: "no-store" });
+        if (!response?.ok) {
+          console.warn(`Unable to load feature migration asset: ${url} (${response?.status || "n/a"})`);
+          continue;
+        }
+        const payload = await response.json();
+        if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+          continue;
+        }
+        Object.entries(payload).forEach(([legacyId, successorIds]) => {
+          if (!legacyId || !Array.isArray(successorIds)) return;
+          merged[String(legacyId).trim()] = successorIds
+            .map((value) => String(value || "").trim())
+            .filter(Boolean);
+        });
+      } catch (error) {
+        console.warn(`Failed to load feature migration asset ${url}:`, error);
+      }
+    }
+    return merged;
+  })();
+  return featureMigrationMapPromise;
+}
+
+function remapFeatureScopedEntries(entries, validFeatureIds, migrationMap) {
+  const source = entries && typeof entries === "object" ? entries : {};
+  const remapped = {};
+  let droppedCount = 0;
+  let migratedSourceCount = 0;
+  let expandedEntryCount = 0;
+
+  Object.entries(source).forEach(([featureId, value]) => {
+    const id = String(featureId || "").trim();
+    if (!id || !validFeatureIds.has(id)) return;
+    remapped[id] = value;
+  });
+
+  Object.entries(source).forEach(([featureId, value]) => {
+    const id = String(featureId || "").trim();
+    if (!id || validFeatureIds.has(id)) return;
+    const successorIds = Array.isArray(migrationMap?.[id]) ? migrationMap[id] : [];
+    const validSuccessors = successorIds.filter((successorId) => validFeatureIds.has(successorId));
+    if (!validSuccessors.length) {
+      droppedCount += 1;
+      return;
+    }
+    migratedSourceCount += 1;
+    validSuccessors.forEach((successorId) => {
+      if (successorId in remapped) return;
+      remapped[successorId] = value;
+      expandedEntryCount += 1;
+    });
+  });
+
+  return {
+    remapped,
+    droppedCount,
+    migratedSourceCount,
+    expandedEntryCount,
+  };
+}
+
+async function migrateFeatureScopedProjectDataToCurrentTopology(
+  data,
+  landData,
+  { fetchImpl = globalThis.fetch } = {}
+) {
+  const payload = data && typeof data === "object" ? { ...data } : {};
+  const features = Array.isArray(landData?.features) ? landData.features : [];
+  if (!features.length) {
+    return payload;
+  }
+  const validFeatureIds = new Set(features.map((feature) => getFeatureId(feature)).filter(Boolean));
+  if (!validFeatureIds.size) {
+    return payload;
+  }
+
+  const migrationMap = await loadFeatureMigrationMap({ fetchImpl });
+  if (!migrationMap || typeof migrationMap !== "object") {
+    return payload;
+  }
+
+  const sovereigntyMigration = remapFeatureScopedEntries(
+    payload.sovereigntyByFeatureId,
+    validFeatureIds,
+    migrationMap
+  );
+  const visualMigration = remapFeatureScopedEntries(
+    payload.visualOverrides || payload.featureOverrides,
+    validFeatureIds,
+    migrationMap
+  );
+
+  payload.sovereigntyByFeatureId = sovereigntyMigration.remapped;
+  payload.visualOverrides = visualMigration.remapped;
+  payload.featureOverrides = { ...visualMigration.remapped };
+
+  const migratedTotal =
+    sovereigntyMigration.migratedSourceCount + visualMigration.migratedSourceCount;
+  const droppedTotal =
+    sovereigntyMigration.droppedCount + visualMigration.droppedCount;
+  if (migratedTotal || droppedTotal) {
+    console.info(
+      "[Project Import] Feature migration applied.",
+      {
+        migratedEntries: migratedTotal,
+        droppedEntries: droppedTotal,
+        sovereigntyExpanded: sovereigntyMigration.expandedEntryCount,
+        visualExpanded: visualMigration.expandedEntryCount,
+      }
+    );
+  }
+  return payload;
+}
+
 export {
   normalizeOwnerCode,
   getCanonicalCountryCodeForFeature,
@@ -259,4 +387,5 @@ export {
   getFeatureIdsForOwner,
   migrateLegacyColorState,
   migrateImportedProjectData,
+  migrateFeatureScopedProjectDataToCurrentTopology,
 };

@@ -9,7 +9,7 @@ class FileManager {
   static exportProject(appState) {
     if (!appState) return;
     const payload = {
-      schemaVersion: 6,
+      schemaVersion: 7,
       countryBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
       featureOverrides: appState.visualOverrides || appState.featureOverrides || {},
       sovereignBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
@@ -37,6 +37,13 @@ class FileManager {
         specialZones: appState.styleConfig?.specialZones || null,
         texture: normalizeTextureStyleConfig(appState.styleConfig?.texture),
       },
+      scenario: appState.activeScenarioId
+        ? {
+          id: appState.activeScenarioId,
+          version: appState.activeScenarioManifest?.version || 1,
+          baselineHash: appState.scenarioBaselineHash || "",
+        }
+        : null,
       timestamp: Date.now(),
     };
 
@@ -62,7 +69,7 @@ class FileManager {
     if (!file) return;
     const reader = new FileReader();
 
-    reader.onload = () => {
+    reader.onload = async () => {
       try {
         const text = typeof reader.result === "string" ? reader.result : "";
         let data = JSON.parse(text);
@@ -130,6 +137,18 @@ class FileManager {
         if (!data.layerVisibility || typeof data.layerVisibility !== "object") {
           data.layerVisibility = {};
         }
+        if (!data.scenario || typeof data.scenario !== "object") {
+          data.scenario = null;
+        } else {
+          data.scenario = {
+            id: String(data.scenario.id || "").trim(),
+            version: Number(data.scenario.version || 1) || 1,
+            baselineHash: String(data.scenario.baselineHash || "").trim(),
+          };
+          if (!data.scenario.id) {
+            data.scenario = null;
+          }
+        }
         data.layerVisibility.showUrban =
           data.layerVisibility.showUrban === undefined ? true : !!data.layerVisibility.showUrban;
         data.layerVisibility.showPhysical =
@@ -142,7 +161,7 @@ class FileManager {
             : !!data.layerVisibility.showSpecialZones;
 
         if (typeof callback === "function") {
-          callback(data);
+          await callback(data);
         }
         clearDirty("project-import");
         showToast(t("Project file loaded successfully.", "ui"), {

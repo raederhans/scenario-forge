@@ -2709,10 +2709,17 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
     0,
     1
   );
-  const empireMeshes =
-    isDynamicBordersEnabled() && isUsableMesh(state.cachedDynamicOwnerBorders)
-      ? [state.cachedDynamicOwnerBorders]
-      : state.cachedCountryBorders;
+  const scenarioOwnerOnlyBorders =
+    !!state.activeScenarioId && state.scenarioBorderMode === "scenario_owner_only";
+  const empireMeshes = scenarioOwnerOnlyBorders
+    ? (isDynamicBordersEnabled() && isUsableMesh(state.cachedDynamicOwnerBorders)
+        ? [state.cachedDynamicOwnerBorders]
+        : [])
+    : (
+      isDynamicBordersEnabled() && isUsableMesh(state.cachedDynamicOwnerBorders)
+        ? [state.cachedDynamicOwnerBorders]
+        : state.cachedCountryBorders
+    );
 
   if (interactive) {
     const countryWidth = (empireWidthBase * 0.95) / kDenom;
@@ -4301,7 +4308,10 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
       },
       state.sovereigntyByFeatureId,
       {
-        fixedOwnerColors: state.fixedPaletteColorsByIso2,
+        fixedOwnerColors: {
+          ...(state.fixedPaletteColorsByIso2 || {}),
+          ...(state.scenarioFixedOwnerColors || {}),
+        },
       }
     );
     const ownerColors = computed?.ownerColors || {};
