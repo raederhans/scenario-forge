@@ -94,6 +94,21 @@ MANUAL_UI_DICT = {
     "Borders up to date": "边界已更新",
     "Borders need recalculation": "边界需要重算",
     "Dynamic borders disabled": "动态边界已禁用",
+    "Apply": "应用",
+    "Delete Selected": "删除所选",
+    "Exit Scenario": "退出剧本",
+    "Import cancelled": "导入已取消",
+    "Project import cancelled because the saved scenario baseline does not match the current assets.": "由于保存的剧本基线与当前资源不匹配，项目导入已取消。",
+    "Reset Changes To Baseline": "重置更改到基线",
+    "Scenario": "剧本",
+    "Scenario cleared": "剧本已退出",
+    "Scenario cleared.": "剧本已退出。",
+    "Scenario failed": "剧本加载失败",
+    "Scenario loaded": "剧本已加载",
+    "Scenario reset": "剧本已重置",
+    "Scenario reset to baseline.": "剧本已重置为基线。",
+    "Unable to apply scenario.": "无法应用剧本。",
+    "Critical checks": "关键检查",
 }
 
 MANUAL_GEO_OVERRIDES = {
@@ -296,6 +311,54 @@ def load_hierarchy_geo_names(hierarchy_path: Path) -> list[str]:
             subregion_label = str(subregion.get("label", "")).strip()
             if subregion_label:
                 names.add(subregion_label)
+
+    return sorted(names)
+
+
+def load_scenario_geo_names(scenarios_root: Path) -> list[str]:
+    if not scenarios_root.exists() or not scenarios_root.is_dir():
+        return []
+
+    names = set()
+    for path in sorted(scenarios_root.rglob("*.json")):
+        if not path.is_file():
+            continue
+        try:
+            with path.open("r", encoding="utf-8") as file:
+                data = json.load(file)
+        except Exception:
+            continue
+
+        if not isinstance(data, dict):
+            continue
+
+        root_display_name = str(
+            data.get("display_name") or data.get("displayName") or ""
+        ).strip()
+        if root_display_name:
+            names.add(root_display_name)
+
+        countries = data.get("countries")
+        if isinstance(countries, dict):
+            for entry in countries.values():
+                if not isinstance(entry, dict):
+                    continue
+                display_name = str(
+                    entry.get("display_name") or entry.get("displayName") or ""
+                ).strip()
+                if display_name:
+                    names.add(display_name)
+
+        scenarios = data.get("scenarios")
+        if isinstance(scenarios, list):
+            for entry in scenarios:
+                if not isinstance(entry, dict):
+                    continue
+                display_name = str(
+                    entry.get("display_name") or entry.get("displayName") or ""
+                ).strip()
+                if display_name:
+                    names.add(display_name)
 
     return sorted(names)
 
@@ -551,6 +614,13 @@ def resolve_zh(
         stable_entry = existing.get(stable_key)
         if stable_entry and not is_missing_like(stable_entry["zh"], stable_entry["en"]):
             return strip_placeholder_prefix(stable_entry["zh"])
+        primary_name = stable_to_primary.get(stable_key, "")
+        if primary_name:
+            if primary_name in EUROPE_GEO_SEEDS:
+                return EUROPE_GEO_SEEDS[primary_name]
+            alias_entry = existing.get(primary_name)
+            if alias_entry and not is_missing_like(alias_entry["zh"], alias_entry["en"]):
+                return strip_placeholder_prefix(alias_entry["zh"])
 
     if key in stable_to_primary:
         primary_name = stable_to_primary[key]
@@ -659,6 +729,16 @@ def parse_args() -> argparse.Namespace:
         help="Path to hierarchy file for continent/subregion labels.",
     )
     parser.add_argument(
+        "--runtime-topology",
+        type=Path,
+        help="Optional runtime political topology path for additional geo names.",
+    )
+    parser.add_argument(
+        "--scenarios-root",
+        type=Path,
+        help="Optional scenarios directory for scenario country display names.",
+    )
+    parser.add_argument(
         "--machine-translate",
         action="store_true",
         help="Enable fallback machine translation for missing keys.",
@@ -712,11 +792,27 @@ def resolve_default_topology(base_dir: Path) -> Path:
     return candidates[-1]
 
 
+def resolve_default_runtime_topology(base_dir: Path) -> Path:
+    candidates = [
+        base_dir / "data" / "europe_topology.runtime_political_v1.json",
+        base_dir / "data" / "europe_topology.na_v2.json",
+        base_dir / "data" / "europe_topology.na_v1.json",
+        base_dir / "data" / "europe_topology.highres.json",
+        base_dir / "data" / "europe_topology.json",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[-1]
+
+
 def sync_translations(
     topology_path: Path,
     output_path: Path,
     geo_aliases_path: Path,
     hierarchy_path: Path,
+    runtime_topology_path: Path | None,
+    scenarios_root: Path | None,
     machine_translate: bool = False,
     translator_delay_seconds: float = 0.0,
     max_machine_translations: int = 0,
@@ -735,6 +831,11 @@ def sync_translations(
             topology_path,
             existing.get("geo", {}),
         )
+        if runtime_topology_path and runtime_topology_path.exists():
+            resolved_country_codes |= detect_visible_missing_country_codes(
+                runtime_topology_path,
+                existing.get("geo", {}),
+            )
 
     machine_translate_enabled = bool(machine_translate)
     machine_translate_available = False
@@ -749,11 +850,14 @@ def sync_translations(
     if machine_translate and network_mode == "auto" and not machine_translate_enabled:
         print("[i18n] Machine translation skipped: network/service unavailable.")
 
-    geo_names = sorted(
-        set(load_geo_names(topology_path, country_codes=resolved_country_codes or None))
-        | set(load_hierarchy_geo_names(hierarchy_path))
-        | set(EUROPE_GEO_SEEDS.keys())
-    )
+    geo_names = set(load_geo_names(topology_path, country_codes=resolved_country_codes or None))
+    if runtime_topology_path and runtime_topology_path.exists():
+        geo_names |= set(load_geo_names(runtime_topology_path, country_codes=resolved_country_codes or None))
+    geo_names |= set(load_hierarchy_geo_names(hierarchy_path))
+    if scenarios_root:
+        geo_names |= set(load_scenario_geo_names(scenarios_root))
+    geo_names |= set(EUROPE_GEO_SEEDS.keys())
+    geo_names = sorted(geo_names)
     alias_to_stable, stable_to_primary = load_geo_aliases(geo_aliases_path)
     discovered_ui_keys = collect_ui_keys(base_dir)
     translator = MachineTranslator(
@@ -792,11 +896,15 @@ def sync_translations(
         for entry in geo_payload.values()
         if has_literal_todo_marker(entry.get("zh", ""))
     )
+    scenario_geo_name_count = (
+        len(load_scenario_geo_names(scenarios_root)) if scenarios_root else 0
+    )
     return {
         "ui_keys": len(ui_payload),
         "geo_keys": len(geo_payload),
         "geo_missing_like": geo_missing_like,
         "geo_literal_todo_markers": geo_literal_todo_markers,
+        "scenario_geo_names": scenario_geo_name_count,
         "alias_map": len(alias_to_stable),
         "mt_requests": translator.requests_made,
         "machine_translate_enabled": machine_translate_enabled,
@@ -811,10 +919,13 @@ def main() -> None:
     base_dir = Path(__file__).resolve().parents[1]
 
     default_topology = resolve_default_topology(base_dir)
+    default_runtime_topology = resolve_default_runtime_topology(base_dir)
     topo_path = args.topology or default_topology
+    runtime_topology_path = args.runtime_topology or default_runtime_topology
     output_path = args.locales or (base_dir / "data" / "locales.json")
     geo_aliases_path = args.geo_aliases or (base_dir / "data" / "geo_aliases.json")
     hierarchy_path = args.hierarchy or (base_dir / "data" / "hierarchy.json")
+    scenarios_root = args.scenarios_root or (base_dir / "data" / "scenarios")
     country_codes = parse_country_codes(args.country_codes)
 
     result = sync_translations(
@@ -822,6 +933,8 @@ def main() -> None:
         output_path=output_path,
         geo_aliases_path=geo_aliases_path,
         hierarchy_path=hierarchy_path,
+        runtime_topology_path=runtime_topology_path,
+        scenarios_root=scenarios_root,
         machine_translate=args.machine_translate,
         translator_delay_seconds=args.translator_delay_seconds,
         max_machine_translations=args.max_machine_translations,
@@ -836,6 +949,7 @@ def main() -> None:
         f"ui_keys={result['ui_keys']}, geo_keys={result['geo_keys']}, "
         f"geo_missing_like={result['geo_missing_like']}, "
         f"todo_markers={result['geo_literal_todo_markers']}, "
+        f"scenario_geo_names={result['scenario_geo_names']}, "
         f"alias_map={result['alias_map']}, mt_requests={result['mt_requests']}"
     )
     if result["resolved_country_codes"]:

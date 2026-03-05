@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "generated_at": "2026-03-03T14:54:20.725890+00:00",
+  "generated_at": "2026-03-05T02:53:55.578451+00:00",
   "source": "C:\\Users\\raede\\Desktop\\dev\\mapcreator\\data\\europe_topology.na_v2.json",
-  "entry_count": 11133,
-  "alias_count": 23091,
+  "entry_count": 11166,
+  "alias_count": 23189,
   "conflict_count": 0,
   "conflicts": [],
   "ambiguous_alias_count": 621,
@@ -258,7 +258,7 @@
       "alias": "Bari",
       "stable_keys": [
         "id::ITF47",
-        "id::SO_ADM1_SOM-1"
+        "id::SO_ADM1_83879307B19000204873860"
       ]
     },
     {
@@ -278,7 +278,7 @@
     {
       "alias": "Bay",
       "stable_keys": [
-        "id::SO_ADM1_SOM-2313",
+        "id::SO_ADM1_83879307B67196763494499",
         "id::US_CNTY_12005"
       ]
     },
@@ -409,7 +409,7 @@
     {
       "alias": "Brest",
       "stable_keys": [
-        "id::BLR-2338",
+        "id::BY_RAY_67162791B30498032594927",
         "id::FR_ARR_29001"
       ]
     },
@@ -5354,76 +5354,6 @@
       ]
     },
     {
-      "stable_key": "id::BLR-2338",
-      "feature_id": "BLR-2338",
-      "country_code": "BY",
-      "primary_name": "Brest",
-      "aliases": [
-        "Brest",
-        "Brest (BY)"
-      ]
-    },
-    {
-      "stable_key": "id::BLR-2339",
-      "feature_id": "BLR-2339",
-      "country_code": "BY",
-      "primary_name": "Gomel",
-      "aliases": [
-        "Gomel",
-        "Gomel (BY)"
-      ]
-    },
-    {
-      "stable_key": "id::BLR-2340",
-      "feature_id": "BLR-2340",
-      "country_code": "BY",
-      "primary_name": "Mogilev",
-      "aliases": [
-        "Mogilev",
-        "Mogilev (BY)"
-      ]
-    },
-    {
-      "stable_key": "id::BLR-2341",
-      "feature_id": "BLR-2341",
-      "country_code": "BY",
-      "primary_name": "Vitebsk",
-      "aliases": [
-        "Vitebsk",
-        "Vitebsk (BY)"
-      ]
-    },
-    {
-      "stable_key": "id::BLR-2344",
-      "feature_id": "BLR-2344",
-      "country_code": "BY",
-      "primary_name": "Grodno",
-      "aliases": [
-        "Grodno",
-        "Grodno (BY)"
-      ]
-    },
-    {
-      "stable_key": "id::BLR-2345",
-      "feature_id": "BLR-2345",
-      "country_code": "BY",
-      "primary_name": "Minsk",
-      "aliases": [
-        "Minsk",
-        "Minsk (BY)"
-      ]
-    },
-    {
-      "stable_key": "id::BLR-4825",
-      "feature_id": "BLR-4825",
-      "country_code": "BY",
-      "primary_name": "City of Minsk",
-      "aliases": [
-        "City of Minsk",
-        "City of Minsk (BY)"
-      ]
-    },
-    {
       "stable_key": "id::BN_ADM1_BRN-1181",
       "feature_id": "BN_ADM1_BRN-1181",
       "country_code": "BN",
@@ -6171,6 +6101,388 @@
       "aliases": [
         "Jwaneng",
         "Jwaneng (BW)"
+      ]
+    },
+    {
+      "stable_key": "id::BY_CITY_MINSK",
+      "feature_id": "BY_CITY_MINSK",
+      "country_code": "BY",
+      "primary_name": "Minsk City",
+      "aliases": [
+        "Minsk City",
+        "Minsk City (BY)",
+        "Minsk City [City of Minsk]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_HIST_POL_MINSK_WEST",
+      "feature_id": "BY_HIST_POL_MINSK_WEST",
+      "country_code": "BY",
+      "primary_name": "Western Minsk Kresy",
+      "aliases": [
+        "Western Minsk Kresy",
+        "Western Minsk Kresy (BY)",
+        "Western Minsk Kresy [Minsk]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_HIST_POL_VITEBSK_WEST",
+      "feature_id": "BY_HIST_POL_VITEBSK_WEST",
+      "country_code": "BY",
+      "primary_name": "Western Vitebsk Kresy",
+      "aliases": [
+        "Western Vitebsk Kresy",
+        "Western Vitebsk Kresy (BY)",
+        "Western Vitebsk Kresy [Vitebsk]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_INT_BREST",
+      "feature_id": "BY_INT_BREST",
+      "country_code": "BY",
+      "primary_name": "Brest Interior",
+      "aliases": [
+        "Brest Interior",
+        "Brest Interior (BY)",
+        "Brest Interior [Brest]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_INT_GOMEL",
+      "feature_id": "BY_INT_GOMEL",
+      "country_code": "BY",
+      "primary_name": "Gomel Interior",
+      "aliases": [
+        "Gomel Interior",
+        "Gomel Interior (BY)",
+        "Gomel Interior [Gomel]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_INT_GRODNO",
+      "feature_id": "BY_INT_GRODNO",
+      "country_code": "BY",
+      "primary_name": "Grodno Interior",
+      "aliases": [
+        "Grodno Interior",
+        "Grodno Interior (BY)",
+        "Grodno Interior [Grodno]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_INT_MINSK",
+      "feature_id": "BY_INT_MINSK",
+      "country_code": "BY",
+      "primary_name": "Minsk Interior",
+      "aliases": [
+        "Minsk Interior",
+        "Minsk Interior (BY)",
+        "Minsk Interior [Minsk]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_INT_MOGILEV",
+      "feature_id": "BY_INT_MOGILEV",
+      "country_code": "BY",
+      "primary_name": "Mogilev Interior",
+      "aliases": [
+        "Mogilev Interior",
+        "Mogilev Interior (BY)",
+        "Mogilev Interior [Mogilev]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_INT_VITEBSK",
+      "feature_id": "BY_INT_VITEBSK",
+      "country_code": "BY",
+      "primary_name": "Vitebsk Interior",
+      "aliases": [
+        "Vitebsk Interior",
+        "Vitebsk Interior (BY)",
+        "Vitebsk Interior [Vitebsk]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B10713618148259",
+      "feature_id": "BY_RAY_67162791B10713618148259",
+      "country_code": "BY",
+      "primary_name": "Horki",
+      "aliases": [
+        "Horki",
+        "Horki (BY)",
+        "Horki [Mogilev]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B11584975294724",
+      "feature_id": "BY_RAY_67162791B11584975294724",
+      "country_code": "BY",
+      "primary_name": "Khotsimsk",
+      "aliases": [
+        "Khotsimsk",
+        "Khotsimsk (BY)",
+        "Khotsimsk [Mogilev]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B13547290723272",
+      "feature_id": "BY_RAY_67162791B13547290723272",
+      "country_code": "BY",
+      "primary_name": "Grodno",
+      "aliases": [
+        "Grodno",
+        "Grodno (BY)"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B14569635979911",
+      "feature_id": "BY_RAY_67162791B14569635979911",
+      "country_code": "BY",
+      "primary_name": "Kastsyukovichy",
+      "aliases": [
+        "Kastsyukovichy",
+        "Kastsyukovichy (BY)",
+        "Kastsyukovichy [Mogilev]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B17030122378697",
+      "feature_id": "BY_RAY_67162791B17030122378697",
+      "country_code": "BY",
+      "primary_name": "Dobrush",
+      "aliases": [
+        "Dobrush",
+        "Dobrush (BY)",
+        "Dobrush [Gomel]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B1773631612848",
+      "feature_id": "BY_RAY_67162791B1773631612848",
+      "country_code": "BY",
+      "primary_name": "Dubrowna",
+      "aliases": [
+        "Dubrowna",
+        "Dubrowna (BY)",
+        "Dubrowna [Vitebsk]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B18102707107362",
+      "feature_id": "BY_RAY_67162791B18102707107362",
+      "country_code": "BY",
+      "primary_name": "Braslaw",
+      "aliases": [
+        "Braslaw",
+        "Braslaw (BY)",
+        "Braslaw [Vitebsk]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B18933715013959",
+      "feature_id": "BY_RAY_67162791B18933715013959",
+      "country_code": "BY",
+      "primary_name": "Ashmyany",
+      "aliases": [
+        "Ashmyany",
+        "Ashmyany (BY)",
+        "Ashmyany [Grodno]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B19917337499758",
+      "feature_id": "BY_RAY_67162791B19917337499758",
+      "country_code": "BY",
+      "primary_name": "Liozna",
+      "aliases": [
+        "Liozna",
+        "Liozna (BY)",
+        "Liozna [Vitebsk]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B26710857863794",
+      "feature_id": "BY_RAY_67162791B26710857863794",
+      "country_code": "BY",
+      "primary_name": "Chachersk",
+      "aliases": [
+        "Chachersk",
+        "Chachersk (BY)",
+        "Chachersk [Gomel]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B30498032594927",
+      "feature_id": "BY_RAY_67162791B30498032594927",
+      "country_code": "BY",
+      "primary_name": "Brest",
+      "aliases": [
+        "Brest",
+        "Brest (BY)"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B30546828632542",
+      "feature_id": "BY_RAY_67162791B30546828632542",
+      "country_code": "BY",
+      "primary_name": "Haradok",
+      "aliases": [
+        "Haradok",
+        "Haradok (BY)",
+        "Haradok [Vitebsk]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B41761210959552",
+      "feature_id": "BY_RAY_67162791B41761210959552",
+      "country_code": "BY",
+      "primary_name": "Pastavy",
+      "aliases": [
+        "Pastavy",
+        "Pastavy (BY)",
+        "Pastavy [Vitebsk]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B43104058935452",
+      "feature_id": "BY_RAY_67162791B43104058935452",
+      "country_code": "BY",
+      "primary_name": "Voranava",
+      "aliases": [
+        "Voranava",
+        "Voranava (BY)",
+        "Voranava [Grodno]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B45929653886900",
+      "feature_id": "BY_RAY_67162791B45929653886900",
+      "country_code": "BY",
+      "primary_name": "Polotsk",
+      "aliases": [
+        "Polotsk",
+        "Polotsk (BY)",
+        "Polotsk [Vitebsk]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B4778855273895",
+      "feature_id": "BY_RAY_67162791B4778855273895",
+      "country_code": "BY",
+      "primary_name": "Mstsislaw",
+      "aliases": [
+        "Mstsislaw",
+        "Mstsislaw (BY)",
+        "Mstsislaw [Mogilev]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B52564132020414",
+      "feature_id": "BY_RAY_67162791B52564132020414",
+      "country_code": "BY",
+      "primary_name": "Krasnapolle",
+      "aliases": [
+        "Krasnapolle",
+        "Krasnapolle (BY)",
+        "Krasnapolle [Mogilev]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B54270193950847",
+      "feature_id": "BY_RAY_67162791B54270193950847",
+      "country_code": "BY",
+      "primary_name": "Astravyets",
+      "aliases": [
+        "Astravyets",
+        "Astravyets (BY)",
+        "Astravyets [Grodno]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B58533541453403",
+      "feature_id": "BY_RAY_67162791B58533541453403",
+      "country_code": "BY",
+      "primary_name": "Klimavichy",
+      "aliases": [
+        "Klimavichy",
+        "Klimavichy (BY)",
+        "Klimavichy [Mogilev]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B59963656038120",
+      "feature_id": "BY_RAY_67162791B59963656038120",
+      "country_code": "BY",
+      "primary_name": "Kamenets",
+      "aliases": [
+        "Kamenets",
+        "Kamenets (BY)",
+        "Kamenets [Brest]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B65560195088656",
+      "feature_id": "BY_RAY_67162791B65560195088656",
+      "country_code": "BY",
+      "primary_name": "Rasony",
+      "aliases": [
+        "Rasony",
+        "Rasony (BY)",
+        "Rasony [Vitebsk]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B66420794580046",
+      "feature_id": "BY_RAY_67162791B66420794580046",
+      "country_code": "BY",
+      "primary_name": "Shchuchyn",
+      "aliases": [
+        "Shchuchyn",
+        "Shchuchyn (BY)",
+        "Shchuchyn [Grodno]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B72598168140482",
+      "feature_id": "BY_RAY_67162791B72598168140482",
+      "country_code": "BY",
+      "primary_name": "Vietka",
+      "aliases": [
+        "Vietka",
+        "Vietka (BY)",
+        "Vietka [Gomel]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B82603429459213",
+      "feature_id": "BY_RAY_67162791B82603429459213",
+      "country_code": "BY",
+      "primary_name": "Verkhnyadzvinsk",
+      "aliases": [
+        "Verkhnyadzvinsk",
+        "Verkhnyadzvinsk (BY)",
+        "Verkhnyadzvinsk [Vitebsk]"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B85815486219336",
+      "feature_id": "BY_RAY_67162791B85815486219336",
+      "country_code": "BY",
+      "primary_name": "Vitebsk",
+      "aliases": [
+        "Vitebsk",
+        "Vitebsk (BY)"
+      ]
+    },
+    {
+      "stable_key": "id::BY_RAY_67162791B89656925241953",
+      "feature_id": "BY_RAY_67162791B89656925241953",
+      "country_code": "BY",
+      "primary_name": "Iwye",
+      "aliases": [
+        "Iwye",
+        "Iwye (BY)",
+        "Iwye [Grodno]"
       ]
     },
     {
@@ -93528,8 +93840,28 @@
       ]
     },
     {
-      "stable_key": "id::SO_ADM1_SOM-1",
-      "feature_id": "SO_ADM1_SOM-1",
+      "stable_key": "id::SO_ADM1_83879307B11376444747055",
+      "feature_id": "SO_ADM1_83879307B11376444747055",
+      "country_code": "SO",
+      "primary_name": "Awdal",
+      "aliases": [
+        "Awdal",
+        "Awdal (SO)"
+      ]
+    },
+    {
+      "stable_key": "id::SO_ADM1_83879307B13610404434600",
+      "feature_id": "SO_ADM1_83879307B13610404434600",
+      "country_code": "SO",
+      "primary_name": "Sanaag",
+      "aliases": [
+        "Sanaag",
+        "Sanaag (SO)"
+      ]
+    },
+    {
+      "stable_key": "id::SO_ADM1_83879307B19000204873860",
+      "feature_id": "SO_ADM1_83879307B19000204873860",
       "country_code": "SO",
       "primary_name": "Bari",
       "aliases": [
@@ -93538,98 +93870,18 @@
       ]
     },
     {
-      "stable_key": "id::SO_ADM1_SOM-2312",
-      "feature_id": "SO_ADM1_SOM-2312",
+      "stable_key": "id::SO_ADM1_83879307B20044253365087",
+      "feature_id": "SO_ADM1_83879307B20044253365087",
       "country_code": "SO",
-      "primary_name": "Bakool",
+      "primary_name": "Galgaduud",
       "aliases": [
-        "Bakool",
-        "Bakool (SO)"
+        "Galgaduud",
+        "Galgaduud (SO)"
       ]
     },
     {
-      "stable_key": "id::SO_ADM1_SOM-2313",
-      "feature_id": "SO_ADM1_SOM-2313",
-      "country_code": "SO",
-      "primary_name": "Bay",
-      "aliases": [
-        "Bay",
-        "Bay (SO)"
-      ]
-    },
-    {
-      "stable_key": "id::SO_ADM1_SOM-2314",
-      "feature_id": "SO_ADM1_SOM-2314",
-      "country_code": "SO",
-      "primary_name": "Gedo",
-      "aliases": [
-        "Gedo",
-        "Gedo (SO)"
-      ]
-    },
-    {
-      "stable_key": "id::SO_ADM1_SOM-2315",
-      "feature_id": "SO_ADM1_SOM-2315",
-      "country_code": "SO",
-      "primary_name": "Middle Juba",
-      "aliases": [
-        "Middle Juba",
-        "Middle Juba (SO)"
-      ]
-    },
-    {
-      "stable_key": "id::SO_ADM1_SOM-2316",
-      "feature_id": "SO_ADM1_SOM-2316",
-      "country_code": "SO",
-      "primary_name": "Lower Shebelle",
-      "aliases": [
-        "Lower Shebelle",
-        "Lower Shebelle (SO)"
-      ]
-    },
-    {
-      "stable_key": "id::SO_ADM1_SOM-2407",
-      "feature_id": "SO_ADM1_SOM-2407",
-      "country_code": "SO",
-      "primary_name": "Banaadir",
-      "aliases": [
-        "Banaadir",
-        "Banaadir (SO)"
-      ]
-    },
-    {
-      "stable_key": "id::SO_ADM1_SOM-2408",
-      "feature_id": "SO_ADM1_SOM-2408",
-      "country_code": "SO",
-      "primary_name": "Galguduud",
-      "aliases": [
-        "Galguduud",
-        "Galguduud (SO)"
-      ]
-    },
-    {
-      "stable_key": "id::SO_ADM1_SOM-2409",
-      "feature_id": "SO_ADM1_SOM-2409",
-      "country_code": "SO",
-      "primary_name": "Hiran",
-      "aliases": [
-        "Hiran",
-        "Hiran (SO)"
-      ]
-    },
-    {
-      "stable_key": "id::SO_ADM1_SOM-2410",
-      "feature_id": "SO_ADM1_SOM-2410",
-      "country_code": "SO",
-      "primary_name": "Middle Shebelle",
-      "aliases": [
-        "Middle Shebelle",
-        "Middle Shebelle (SO)"
-      ]
-    },
-    {
-      "stable_key": "id::SO_ADM1_SOM-2412",
-      "feature_id": "SO_ADM1_SOM-2412",
+      "stable_key": "id::SO_ADM1_83879307B26517451678825",
+      "feature_id": "SO_ADM1_83879307B26517451678825",
       "country_code": "SO",
       "primary_name": "Mudug",
       "aliases": [
@@ -93638,23 +93890,133 @@
       ]
     },
     {
-      "stable_key": "id::SO_ADM1_SOM-2413",
-      "feature_id": "SO_ADM1_SOM-2413",
+      "stable_key": "id::SO_ADM1_83879307B32896531038690",
+      "feature_id": "SO_ADM1_83879307B32896531038690",
       "country_code": "SO",
-      "primary_name": "Nugal",
+      "primary_name": "Banadir",
       "aliases": [
-        "Nugal",
-        "Nugal (SO)"
+        "Banadir",
+        "Banadir (SO)"
       ]
     },
     {
-      "stable_key": "id::SO_ADM1_SOM-2645",
-      "feature_id": "SO_ADM1_SOM-2645",
+      "stable_key": "id::SO_ADM1_83879307B33420401553888",
+      "feature_id": "SO_ADM1_83879307B33420401553888",
+      "country_code": "SO",
+      "primary_name": "Middle Juba",
+      "aliases": [
+        "Middle Juba",
+        "Middle Juba (SO)"
+      ]
+    },
+    {
+      "stable_key": "id::SO_ADM1_83879307B34714219035659",
+      "feature_id": "SO_ADM1_83879307B34714219035659",
+      "country_code": "SO",
+      "primary_name": "Gedo",
+      "aliases": [
+        "Gedo",
+        "Gedo (SO)"
+      ]
+    },
+    {
+      "stable_key": "id::SO_ADM1_83879307B35519599536274",
+      "feature_id": "SO_ADM1_83879307B35519599536274",
+      "country_code": "SO",
+      "primary_name": "Lower Shebelle",
+      "aliases": [
+        "Lower Shebelle",
+        "Lower Shebelle (SO)"
+      ]
+    },
+    {
+      "stable_key": "id::SO_ADM1_83879307B35818532110087",
+      "feature_id": "SO_ADM1_83879307B35818532110087",
       "country_code": "SO",
       "primary_name": "Lower Juba",
       "aliases": [
         "Lower Juba",
         "Lower Juba (SO)"
+      ]
+    },
+    {
+      "stable_key": "id::SO_ADM1_83879307B42572798770371",
+      "feature_id": "SO_ADM1_83879307B42572798770371",
+      "country_code": "SO",
+      "primary_name": "Woqooyi Galbeed",
+      "aliases": [
+        "Woqooyi Galbeed",
+        "Woqooyi Galbeed (SO)"
+      ]
+    },
+    {
+      "stable_key": "id::SO_ADM1_83879307B5242146898757",
+      "feature_id": "SO_ADM1_83879307B5242146898757",
+      "country_code": "SO",
+      "primary_name": "Middle Shebelle",
+      "aliases": [
+        "Middle Shebelle",
+        "Middle Shebelle (SO)"
+      ]
+    },
+    {
+      "stable_key": "id::SO_ADM1_83879307B58207540839705",
+      "feature_id": "SO_ADM1_83879307B58207540839705",
+      "country_code": "SO",
+      "primary_name": "Bakool",
+      "aliases": [
+        "Bakool",
+        "Bakool (SO)"
+      ]
+    },
+    {
+      "stable_key": "id::SO_ADM1_83879307B65026001570916",
+      "feature_id": "SO_ADM1_83879307B65026001570916",
+      "country_code": "SO",
+      "primary_name": "Sool",
+      "aliases": [
+        "Sool",
+        "Sool (SO)"
+      ]
+    },
+    {
+      "stable_key": "id::SO_ADM1_83879307B66585548815331",
+      "feature_id": "SO_ADM1_83879307B66585548815331",
+      "country_code": "SO",
+      "primary_name": "Nugaal",
+      "aliases": [
+        "Nugaal",
+        "Nugaal (SO)"
+      ]
+    },
+    {
+      "stable_key": "id::SO_ADM1_83879307B66756469447496",
+      "feature_id": "SO_ADM1_83879307B66756469447496",
+      "country_code": "SO",
+      "primary_name": "Hiiraan",
+      "aliases": [
+        "Hiiraan",
+        "Hiiraan (SO)"
+      ]
+    },
+    {
+      "stable_key": "id::SO_ADM1_83879307B67196763494499",
+      "feature_id": "SO_ADM1_83879307B67196763494499",
+      "country_code": "SO",
+      "primary_name": "Bay",
+      "aliases": [
+        "Bay",
+        "Bay (SO)"
+      ]
+    },
+    {
+      "stable_key": "id::SO_ADM1_83879307B67680758004346",
+      "feature_id": "SO_ADM1_83879307B67680758004346",
+      "country_code": "SO",
+      "primary_name": "Togdheer",
+      "aliases": [
+        "Togdheer",
+        "Togdheer (SO)"
       ]
     },
     {
@@ -116929,6 +117291,9 @@
     "Ashanti (GH)": "id::GH_ADM1_GHA-2158",
     "Ashinsky District": "id::RU_RAY_50074027B32469529603999",
     "Ashinsky District (RU)": "id::RU_RAY_50074027B32469529603999",
+    "Ashmyany": "id::BY_RAY_67162791B18933715013959",
+    "Ashmyany (BY)": "id::BY_RAY_67162791B18933715013959",
+    "Ashmyany [Grodno]": "id::BY_RAY_67162791B18933715013959",
     "Ashoknagar": "id::IN_ADM2_76128533B75548370501185",
     "Ashoknagar (IN)": "id::IN_ADM2_76128533B75548370501185",
     "Askinsky District": "id::RU_RAY_50074027B35153037199954",
@@ -116943,6 +117308,9 @@
     "Asti (IT)": "id::ITC17",
     "Astrakhan": "id::RU_RAY_50074027B71829249339229",
     "Astrakhan (RU)": "id::RU_RAY_50074027B71829249339229",
+    "Astravyets": "id::BY_RAY_67162791B54270193950847",
+    "Astravyets (BY)": "id::BY_RAY_67162791B54270193950847",
+    "Astravyets [Grodno]": "id::BY_RAY_67162791B54270193950847",
     "Asturias": "id::ES120",
     "Asturias (ES)": "id::ES120",
     "Asunción": "id::PY_ADM1_PRY-4837",
@@ -117042,6 +117410,8 @@
     "Avranches (FR)": "id::FR_ARR_50001",
     "Awatixian": "id::CN_CITY_17275852B12083798266563",
     "Awatixian (CN)": "id::CN_CITY_17275852B12083798266563",
+    "Awdal": "id::SO_ADM1_83879307B11376444747055",
+    "Awdal (SO)": "id::SO_ADM1_83879307B11376444747055",
     "Ayacucho": "id::PE_ADM1_PER-586",
     "Ayacucho (PE)": "id::PE_ADM1_PER-586",
     "Aydın": "id::TR321",
@@ -117207,8 +117577,8 @@
     "Bakhmach (UA)": "id::UA_RAY_74538382B54341051528669",
     "Bakhmut": "id::UA_RAY_74538382B24070697851653",
     "Bakhmut (UA)": "id::UA_RAY_74538382B24070697851653",
-    "Bakool": "id::SO_ADM1_SOM-2312",
-    "Bakool (SO)": "id::SO_ADM1_SOM-2312",
+    "Bakool": "id::SO_ADM1_83879307B58207540839705",
+    "Bakool (SO)": "id::SO_ADM1_83879307B58207540839705",
     "Baksa": "id::IN_ADM2_76128533B8221925175605",
     "Baksa (IN)": "id::IN_ADM2_76128533B8221925175605",
     "Baksansky District": "id::RU_RAY_50074027B61038404046548",
@@ -117290,8 +117660,8 @@
     "Bamingui-Bangoran Prefecture (CF)": "id::CF_ADM1_CAF-806",
     "Bamyan": "id::AFG-1743",
     "Bamyan (AF)": "id::AFG-1743",
-    "Banaadir": "id::SO_ADM1_SOM-2407",
-    "Banaadir (SO)": "id::SO_ADM1_SOM-2407",
+    "Banadir": "id::SO_ADM1_83879307B32896531038690",
+    "Banadir (SO)": "id::SO_ADM1_83879307B32896531038690",
     "Banas Kantha": "id::IN_ADM2_76128533B52902360321344",
     "Banas Kantha (IN)": "id::IN_ADM2_76128533B52902360321344",
     "Banda": "id::IN_ADM2_76128533B45099378029175",
@@ -117394,7 +117764,7 @@
     "Bargarh": "id::IN_ADM2_76128533B74482494441458",
     "Bargarh (IN)": "id::IN_ADM2_76128533B74482494441458",
     "Bari (IT)": "id::ITF47",
-    "Bari (SO)": "id::SO_ADM1_SOM-1",
+    "Bari (SO)": "id::SO_ADM1_83879307B19000204873860",
     "Barima-Waini": "id::GY_ADM1_GUY-675",
     "Barima-Waini (GY)": "id::GY_ADM1_GUY-675",
     "Barinas": "id::VE_ADM1_VEN-26",
@@ -117517,7 +117887,7 @@
     "Bautzen [Sachsen]": "id::DED2C",
     "Bavlinsky District": "id::RU_RAY_50074027B7558433719033",
     "Bavlinsky District (RU)": "id::RU_RAY_50074027B7558433719033",
-    "Bay (SO)": "id::SO_ADM1_SOM-2313",
+    "Bay (SO)": "id::SO_ADM1_83879307B67196763494499",
     "Bay (US)": "id::US_CNTY_12005",
     "Bay Islands": "id::HN_ADM1_HND-641",
     "Bay Islands (HN)": "id::HN_ADM1_HND-641",
@@ -118197,6 +118567,9 @@
     "Brantford—Brant South—Six Nations": "id::CA_FED_35015",
     "Brantford—Brant South—Six Nations (CA)": "id::CA_FED_35015",
     "Brantford—Brant South—Six Nations [Ontario]": "id::CA_FED_35015",
+    "Braslaw": "id::BY_RAY_67162791B18102707107362",
+    "Braslaw (BY)": "id::BY_RAY_67162791B18102707107362",
+    "Braslaw [Vitebsk]": "id::BY_RAY_67162791B18102707107362",
     "Brasovsky District": "id::RU_RAY_50074027B85288825972975",
     "Brasovsky District (RU)": "id::RU_RAY_50074027B85288825972975",
     "Bratislavský kraj": "id::SK010",
@@ -118237,8 +118610,11 @@
     "Brescia (IT)": "id::ITC47",
     "Bressuire": "id::FR_ARR_79001",
     "Bressuire (FR)": "id::FR_ARR_79001",
-    "Brest (BY)": "id::BLR-2338",
+    "Brest (BY)": "id::BY_RAY_67162791B30498032594927",
     "Brest (FR)": "id::FR_ARR_29001",
+    "Brest Interior": "id::BY_INT_BREST",
+    "Brest Interior (BY)": "id::BY_INT_BREST",
+    "Brest Interior [Brest]": "id::BY_INT_BREST",
     "Brevard": "id::US_CNTY_12009",
     "Brevard (US)": "id::US_CNTY_12009",
     "Brevard [Florida]": "id::US_CNTY_12009",
@@ -118816,6 +119192,9 @@
     "Ceuta (ES)": "id::ES630",
     "Chabuchaerxibozuzizhixian": "id::CN_CITY_17275852B35541552724196",
     "Chabuchaerxibozuzizhixian (CN)": "id::CN_CITY_17275852B35541552724196",
+    "Chachersk": "id::BY_RAY_67162791B26710857863794",
+    "Chachersk (BY)": "id::BY_RAY_67162791B26710857863794",
+    "Chachersk [Gomel]": "id::BY_RAY_67162791B26710857863794",
     "Chachoengsao": "id::THA-431",
     "Chachoengsao (TH)": "id::THA-431",
     "Chaco": "id::AR_ADM1_ARG-1306",
@@ -119369,8 +119748,6 @@
     "Citrus": "id::US_CNTY_12017",
     "Citrus (US)": "id::US_CNTY_12017",
     "Citrus [Florida]": "id::US_CNTY_12017",
-    "City of Minsk": "id::BLR-4825",
-    "City of Minsk (BY)": "id::BLR-4825",
     "Ciudad Real": "id::ES422",
     "Ciudad Real (ES)": "id::ES422",
     "Cixi": "id::CN_CITY_17275852B15154532755577",
@@ -120247,6 +120624,9 @@
     "Dobrovelychkivka (UA)": "id::UA_RAY_74538382B57034061820630",
     "Dobrovsky District": "id::RU_RAY_50074027B18889738151841",
     "Dobrovsky District (RU)": "id::RU_RAY_50074027B18889738151841",
+    "Dobrush": "id::BY_RAY_67162791B17030122378697",
+    "Dobrush (BY)": "id::BY_RAY_67162791B17030122378697",
+    "Dobrush [Gomel]": "id::BY_RAY_67162791B17030122378697",
     "Dobryansky District": "id::RU_RAY_50074027B64139934419655",
     "Dobryansky District (RU)": "id::RU_RAY_50074027B64139934419655",
     "Doda": "id::IN_ADM2_76128533B48708628358161",
@@ -120418,6 +120798,9 @@
     "Dubrovsky District (RU)": "id::RU_RAY_50074027B17649118936683",
     "Dubrovytsia": "id::UA_RAY_74538382B17610954663111",
     "Dubrovytsia (UA)": "id::UA_RAY_74538382B17610954663111",
+    "Dubrowna": "id::BY_RAY_67162791B1773631612848",
+    "Dubrowna (BY)": "id::BY_RAY_67162791B1773631612848",
+    "Dubrowna [Vitebsk]": "id::BY_RAY_67162791B1773631612848",
     "Dubyonsky District": "id::RU_RAY_50074027B50431075138194",
     "Dubyonsky District (RU)": "id::RU_RAY_50074027B50431075138194",
     "Duchangxian": "id::CN_CITY_17275852B18639822721943",
@@ -121316,8 +121699,8 @@
     "Gajapati (IN)": "id::IN_ADM2_76128533B73854359719990",
     "Galaţi": "id::RO224",
     "Galaţi (RO)": "id::RO224",
-    "Galguduud": "id::SO_ADM1_SOM-2408",
-    "Galguduud (SO)": "id::SO_ADM1_SOM-2408",
+    "Galgaduud": "id::SO_ADM1_83879307B20044253365087",
+    "Galgaduud (SO)": "id::SO_ADM1_83879307B20044253365087",
     "Galichsky District": "id::RU_RAY_50074027B30225382519639",
     "Galichsky District (RU)": "id::RU_RAY_50074027B30225382519639",
     "Galveston": "id::US_CNTY_48167",
@@ -121459,8 +121842,8 @@
     "Gdovsky District (RU)": "id::RU_RAY_50074027B91439993213773",
     "Gdynia": "id::PL_POW_2262",
     "Gdynia (PL)": "id::PL_POW_2262",
-    "Gedo": "id::SO_ADM1_SOM-2314",
-    "Gedo (SO)": "id::SO_ADM1_SOM-2314",
+    "Gedo": "id::SO_ADM1_83879307B34714219035659",
+    "Gedo (SO)": "id::SO_ADM1_83879307B34714219035659",
     "Geergunyouqi": "id::CN_CITY_17275852B65388914557323",
     "Geergunyouqi (CN)": "id::CN_CITY_17275852B65388914557323",
     "Geergunzuoqi": "id::CN_CITY_17275852B70108594636400",
@@ -121657,8 +122040,9 @@
     "Gomati (IN)": "id::IN_ADM2_76128533B94126463611805",
     "Gombe State": "id::NG_ADM1_NGA-2859",
     "Gombe State (NG)": "id::NG_ADM1_NGA-2859",
-    "Gomel": "id::BLR-2339",
-    "Gomel (BY)": "id::BLR-2339",
+    "Gomel Interior": "id::BY_INT_GOMEL",
+    "Gomel Interior (BY)": "id::BY_INT_GOMEL",
+    "Gomel Interior [Gomel]": "id::BY_INT_GOMEL",
     "Gonda": "id::IN_ADM2_76128533B67530641452031",
     "Gonda (IN)": "id::IN_ADM2_76128533B67530641452031",
     "Gondiya": "id::IN_ADM2_76128533B76286653784168",
@@ -121820,8 +122204,11 @@
     "Grimes": "id::US_CNTY_48185",
     "Grimes (US)": "id::US_CNTY_48185",
     "Grimes [Texas]": "id::US_CNTY_48185",
-    "Grodno": "id::BLR-2344",
-    "Grodno (BY)": "id::BLR-2344",
+    "Grodno": "id::BY_RAY_67162791B13547290723272",
+    "Grodno (BY)": "id::BY_RAY_67162791B13547290723272",
+    "Grodno Interior": "id::BY_INT_GRODNO",
+    "Grodno Interior (BY)": "id::BY_INT_GRODNO",
+    "Grodno Interior [Grodno]": "id::BY_INT_GRODNO",
     "Groot-Amsterdam": "id::NL329",
     "Groot-Amsterdam (NL)": "id::NL329",
     "Groot-Rijnmond": "id::NL33C",
@@ -122261,6 +122648,9 @@
     "Haora (IN)": "id::IN_ADM2_76128533B22077262393417",
     "Hapur": "id::IN_ADM2_76128533B87317961648652",
     "Hapur (IN)": "id::IN_ADM2_76128533B87317961648652",
+    "Haradok": "id::BY_RAY_67162791B30546828632542",
+    "Haradok (BY)": "id::BY_RAY_67162791B30546828632542",
+    "Haradok [Vitebsk]": "id::BY_RAY_67162791B30546828632542",
     "Harare": "id::ZW_ADM1_ZWE-525",
     "Harare (ZW)": "id::ZW_ADM1_ZWE-525",
     "Harari": "id::ET_ADM1_ETH-3136",
@@ -122554,6 +122944,8 @@
     "Highlands": "id::US_CNTY_12055",
     "Highlands (US)": "id::US_CNTY_12055",
     "Highlands [Florida]": "id::US_CNTY_12055",
+    "Hiiraan": "id::SO_ADM1_83879307B66756469447496",
+    "Hiiraan (SO)": "id::SO_ADM1_83879307B66756469447496",
     "Hildburghausen": "id::DEG0E",
     "Hildburghausen (DE)": "id::DEG0E",
     "Hildburghausen [Thüringen]": "id::DEG0E",
@@ -122570,8 +122962,6 @@
     "Hilmand (AF)": "id::AFG-1750",
     "Hingoli": "id::IN_ADM2_76128533B86424887513424",
     "Hingoli (IN)": "id::IN_ADM2_76128533B86424887513424",
-    "Hiran": "id::SO_ADM1_SOM-2409",
-    "Hiran (SO)": "id::SO_ADM1_SOM-2409",
     "Hirat": "id::AFG-1742",
     "Hirat (AF)": "id::AFG-1742",
     "Hiroshima": "id::JPN-1821",
@@ -122657,6 +123047,9 @@
     "Hopkins": "id::US_CNTY_48223",
     "Hopkins (US)": "id::US_CNTY_48223",
     "Hopkins [Texas]": "id::US_CNTY_48223",
+    "Horki": "id::BY_RAY_67162791B10713618148259",
+    "Horki (BY)": "id::BY_RAY_67162791B10713618148259",
+    "Horki [Mogilev]": "id::BY_RAY_67162791B10713618148259",
     "Hormozgan": "id::IRN-3228",
     "Hormozgan (IR)": "id::IRN-3228",
     "Hornostaivka": "id::UA_RAY_74538382B65177906747126",
@@ -123256,6 +123649,9 @@
     "Ivnyansky District (RU)": "id::RU_RAY_50074027B55259517636721",
     "Iwate": "id::JPN-1865",
     "Iwate (JP)": "id::JPN-1865",
+    "Iwye": "id::BY_RAY_67162791B89656925241953",
+    "Iwye (BY)": "id::BY_RAY_67162791B89656925241953",
+    "Iwye [Grodno]": "id::BY_RAY_67162791B89656925241953",
     "Izabal": "id::GT_ADM1_GTM-1959",
     "Izabal (GT)": "id::GT_ADM1_GTM-1959",
     "Izhemsky District": "id::RU_RAY_50074027B52153292155727",
@@ -123888,6 +124284,9 @@
     "Kambarsky District (RU)": "id::RU_RAY_50074027B76149607922366",
     "Kamchatka": "id::RUS-3468",
     "Kamchatka (RU)": "id::RUS-3468",
+    "Kamenets": "id::BY_RAY_67162791B59963656038120",
+    "Kamenets (BY)": "id::BY_RAY_67162791B59963656038120",
+    "Kamenets [Brest]": "id::BY_RAY_67162791B59963656038120",
     "Kameshkirsky District": "id::RU_RAY_50074027B13338811228915",
     "Kameshkirsky District (RU)": "id::RU_RAY_50074027B13338811228915",
     "Kameshkovsky District": "id::RU_RAY_50074027B14082807895399",
@@ -124136,6 +124535,9 @@
     "Kastamonu (TR)": "id::TR821",
     "Kastorensky District": "id::RU_RAY_50074027B20008990351917",
     "Kastorensky District (RU)": "id::RU_RAY_50074027B20008990351917",
+    "Kastsyukovichy": "id::BY_RAY_67162791B14569635979911",
+    "Kastsyukovichy (BY)": "id::BY_RAY_67162791B14569635979911",
+    "Kastsyukovichy [Mogilev]": "id::BY_RAY_67162791B14569635979911",
     "Katanga": "id::CD_ADM1_COD-1897",
     "Katanga (CD)": "id::CD_ADM1_COD-1897",
     "Katav-Ivanovsky District": "id::RU_RAY_50074027B6411812796557",
@@ -124408,6 +124810,9 @@
     "Khoroshiv (UA)": "id::UA_RAY_74538382B5063322332018",
     "Khost": "id::AFG-1758",
     "Khost (AF)": "id::AFG-1758",
+    "Khotsimsk": "id::BY_RAY_67162791B11584975294724",
+    "Khotsimsk (BY)": "id::BY_RAY_67162791B11584975294724",
+    "Khotsimsk [Mogilev]": "id::BY_RAY_67162791B11584975294724",
     "Khotyn": "id::UA_RAY_74538382B59394362470608",
     "Khotyn (UA)": "id::UA_RAY_74538382B59394362470608",
     "Khotynetsky District": "id::RU_RAY_50074027B35076866768597",
@@ -124586,6 +124991,9 @@
     "Kleve": "id::DEA1B",
     "Kleve (DE)": "id::DEA1B",
     "Kleve [Nordrhein-Westfalen]": "id::DEA1B",
+    "Klimavichy": "id::BY_RAY_67162791B58533541453403",
+    "Klimavichy (BY)": "id::BY_RAY_67162791B58533541453403",
+    "Klimavichy [Mogilev]": "id::BY_RAY_67162791B58533541453403",
     "Klimovsky District": "id::RU_RAY_50074027B12942583135720",
     "Klimovsky District (RU)": "id::RU_RAY_50074027B12942583135720",
     "Klina": "id::XK_ADM1_KOS-5888",
@@ -124843,6 +125251,9 @@
     "Kraków (PL)": "id::PL_POW_1261",
     "Krapinsko-zagorska županija": "id::HR064",
     "Krapinsko-zagorska županija (HR)": "id::HR064",
+    "Krasnapolle": "id::BY_RAY_67162791B52564132020414",
+    "Krasnapolle (BY)": "id::BY_RAY_67162791B52564132020414",
+    "Krasnapolle [Mogilev]": "id::BY_RAY_67162791B52564132020414",
     "Krasnensky District": "id::RU_RAY_50074027B43601558875101",
     "Krasnensky District (RU)": "id::RU_RAY_50074027B43601558875101",
     "Krasninsky District": "id::RU_RAY_50074027B11359862812061",
@@ -125729,6 +126140,9 @@
     "Linzhixian (CN)": "id::CN_CITY_17275852B36240840008028",
     "Linzhouxian": "id::CN_CITY_17275852B78826988472702",
     "Linzhouxian (CN)": "id::CN_CITY_17275852B78826988472702",
+    "Liozna": "id::BY_RAY_67162791B19917337499758",
+    "Liozna (BY)": "id::BY_RAY_67162791B19917337499758",
+    "Liozna [Vitebsk]": "id::BY_RAY_67162791B19917337499758",
     "Lipetsk": "id::RU_RAY_50074027B73956111205177",
     "Lipetsk (RU)": "id::RU_RAY_50074027B73956111205177",
     "Lipetsky District": "id::RU_RAY_50074027B4109205398278",
@@ -126024,12 +126438,12 @@
     "Lower Connecticut River Valley [Connecticut]": "id::US_CNTY_09130",
     "Lower Dibang Valley": "id::IN_ADM2_76128533B38784530776316",
     "Lower Dibang Valley (IN)": "id::IN_ADM2_76128533B38784530776316",
-    "Lower Juba": "id::SO_ADM1_SOM-2645",
-    "Lower Juba (SO)": "id::SO_ADM1_SOM-2645",
+    "Lower Juba": "id::SO_ADM1_83879307B35818532110087",
+    "Lower Juba (SO)": "id::SO_ADM1_83879307B35818532110087",
     "Lower River": "id::GM_ADM1_GMB-2154",
     "Lower River (GM)": "id::GM_ADM1_GMB-2154",
-    "Lower Shebelle": "id::SO_ADM1_SOM-2316",
-    "Lower Shebelle (SO)": "id::SO_ADM1_SOM-2316",
+    "Lower Shebelle": "id::SO_ADM1_83879307B35519599536274",
+    "Lower Shebelle (SO)": "id::SO_ADM1_83879307B35519599536274",
     "Lower Siang": "id::IN_ADM2_76128533B49993259380917",
     "Lower Siang (IN)": "id::IN_ADM2_76128533B49993259380917",
     "Lozova": "id::UA_RAY_74538382B56857399435570",
@@ -127055,10 +127469,10 @@
     "Midden-Limburg (NL)": "id::NL422",
     "Midden-Noord-Brabant": "id::NL412",
     "Midden-Noord-Brabant (NL)": "id::NL412",
-    "Middle Juba": "id::SO_ADM1_SOM-2315",
-    "Middle Juba (SO)": "id::SO_ADM1_SOM-2315",
-    "Middle Shebelle": "id::SO_ADM1_SOM-2410",
-    "Middle Shebelle (SO)": "id::SO_ADM1_SOM-2410",
+    "Middle Juba": "id::SO_ADM1_83879307B33420401553888",
+    "Middle Juba (SO)": "id::SO_ADM1_83879307B33420401553888",
+    "Middle Shebelle": "id::SO_ADM1_83879307B5242146898757",
+    "Middle Shebelle (SO)": "id::SO_ADM1_83879307B5242146898757",
     "Middlesex [Massachusetts]": "id::US_CNTY_25017",
     "Middlesex [New Jersey]": "id::US_CNTY_34023",
     "Middlesex—London": "id::CA_FED_35059",
@@ -127189,8 +127603,12 @@
     "Minqinxian (CN)": "id::CN_CITY_17275852B4224609825928",
     "Minquanxian": "id::CN_CITY_17275852B72971629177091",
     "Minquanxian (CN)": "id::CN_CITY_17275852B72971629177091",
-    "Minsk": "id::BLR-2345",
-    "Minsk (BY)": "id::BLR-2345",
+    "Minsk City": "id::BY_CITY_MINSK",
+    "Minsk City (BY)": "id::BY_CITY_MINSK",
+    "Minsk City [City of Minsk]": "id::BY_CITY_MINSK",
+    "Minsk Interior": "id::BY_INT_MINSK",
+    "Minsk Interior (BY)": "id::BY_INT_MINSK",
+    "Minsk Interior [Minsk]": "id::BY_INT_MINSK",
     "Minxian": "id::CN_CITY_17275852B98923243392304",
     "Minxian (CN)": "id::CN_CITY_17275852B98923243392304",
     "Miquan": "id::CN_CITY_17275852B96869681587114",
@@ -127342,8 +127760,9 @@
     "Modoc [California]": "id::US_CNTY_06049",
     "Moga": "id::IN_ADM2_76128533B18834172694083",
     "Moga (IN)": "id::IN_ADM2_76128533B18834172694083",
-    "Mogilev": "id::BLR-2340",
-    "Mogilev (BY)": "id::BLR-2340",
+    "Mogilev Interior": "id::BY_INT_MOGILEV",
+    "Mogilev Interior (BY)": "id::BY_INT_MOGILEV",
+    "Mogilev Interior [Mogilev]": "id::BY_INT_MOGILEV",
     "Mohale's Hoek": "id::LS_ADM1_LSO-1204",
     "Mohale's Hoek (LS)": "id::LS_ADM1_LSO-1204",
     "Mohave": "id::US_CNTY_04015",
@@ -127584,6 +128003,9 @@
     "Mozhugongkaxian (CN)": "id::CN_CITY_17275852B84422067355730",
     "Mpumalanga": "id::ZA_ADM1_ZAF-1209",
     "Mpumalanga (ZA)": "id::ZA_ADM1_ZAF-1209",
+    "Mstsislaw": "id::BY_RAY_67162791B4778855273895",
+    "Mstsislaw (BY)": "id::BY_RAY_67162791B4778855273895",
+    "Mstsislaw [Mogilev]": "id::BY_RAY_67162791B4778855273895",
     "Mtsensky District": "id::RU_RAY_50074027B25608767413280",
     "Mtsensky District (RU)": "id::RU_RAY_50074027B25608767413280",
     "Mtskheta-Mtianeti": "id::GEO-3034",
@@ -127598,8 +128020,8 @@
     "Muchuanxian (CN)": "id::CN_CITY_17275852B76307888558924",
     "Mudanjiang": "id::CN_CITY_17275852B86652780330995",
     "Mudanjiang (CN)": "id::CN_CITY_17275852B86652780330995",
-    "Mudug": "id::SO_ADM1_SOM-2412",
-    "Mudug (SO)": "id::SO_ADM1_SOM-2412",
+    "Mudug": "id::SO_ADM1_83879307B26517451678825",
+    "Mudug (SO)": "id::SO_ADM1_83879307B26517451678825",
     "Mujejärvi District": "id::RU_RAY_50074027B69838123012622",
     "Mujejärvi District (RU)": "id::RU_RAY_50074027B69838123012622",
     "Mukachevo": "id::UA_RAY_74538382B46145703776809",
@@ -128867,8 +129289,8 @@
     "Nuevo León Zone 7": "id::MX_ZN_18_007",
     "Nuevo León Zone 7 (MX)": "id::MX_ZN_18_007",
     "Nuevo León Zone 7 [Nuevo León]": "id::MX_ZN_18_007",
-    "Nugal": "id::SO_ADM1_SOM-2413",
-    "Nugal (SO)": "id::SO_ADM1_SOM-2413",
+    "Nugaal": "id::SO_ADM1_83879307B66585548815331",
+    "Nugaal (SO)": "id::SO_ADM1_83879307B66585548815331",
     "Nunavut": "id::CA_FED_62001",
     "Nunavut (CA)": "id::CA_FED_62001",
     "Nuoro": "id::ITG2E",
@@ -129732,6 +130154,9 @@
     "Passau, Landkreis": "id::DE228",
     "Passau, Landkreis (DE)": "id::DE228",
     "Passau, Landkreis [Bayern]": "id::DE228",
+    "Pastavy": "id::BY_RAY_67162791B41761210959552",
+    "Pastavy (BY)": "id::BY_RAY_67162791B41761210959552",
+    "Pastavy [Vitebsk]": "id::BY_RAY_67162791B41761210959552",
     "Pastaza": "id::EC_ADM1_ECU-1288",
     "Pastaza (EC)": "id::EC_ADM1_ECU-1288",
     "Patan": "id::IN_ADM2_76128533B42839853072341",
@@ -130220,6 +130645,9 @@
     "Polohy (UA)": "id::UA_RAY_74538382B66940770579939",
     "Polonne": "id::UA_RAY_74538382B39868472225272",
     "Polonne (UA)": "id::UA_RAY_74538382B39868472225272",
+    "Polotsk": "id::BY_RAY_67162791B45929653886900",
+    "Polotsk (BY)": "id::BY_RAY_67162791B45929653886900",
+    "Polotsk [Vitebsk]": "id::BY_RAY_67162791B45929653886900",
     "Poltava": "id::UA_RAY_74538382B39784518508744",
     "Poltava (UA)": "id::UA_RAY_74538382B39784518508744",
     "Polyarnye Zori Urban Okrug": "id::RU_RAY_50074027B57818128030911",
@@ -130920,6 +131348,9 @@
     "Rapti (NP)": "id::NPL-373",
     "Ras Al Khaymah": "id::ARE-338",
     "Ras Al Khaymah (AE)": "id::ARE-338",
+    "Rasony": "id::BY_RAY_67162791B65560195088656",
+    "Rasony (BY)": "id::BY_RAY_67162791B65560195088656",
+    "Rasony [Vitebsk]": "id::BY_RAY_67162791B65560195088656",
     "Rasskazovo": "id::RU_RAY_50074027B31598302726620",
     "Rasskazovo (RU)": "id::RU_RAY_50074027B31598302726620",
     "Rasskazovsky District": "id::RU_RAY_50074027B26754478076862",
@@ -132003,6 +132434,8 @@
     "San Vicente (SV)": "id::SV_ADM1_SLV-1353",
     "Sana'a": "id::YEM-3496",
     "Sana'a (YE)": "id::YEM-3496",
+    "Sanaag": "id::SO_ADM1_83879307B13610404434600",
+    "Sanaag (SO)": "id::SO_ADM1_83879307B13610404434600",
     "Sanchursky District": "id::RU_RAY_50074027B55167191655778",
     "Sanchursky District (RU)": "id::RU_RAY_50074027B55167191655778",
     "Sandaun": "id::PG_ADM1_PNG-1241",
@@ -132513,6 +132946,9 @@
     "Shchigrovsky District (RU)": "id::RU_RAY_50074027B18130432160638",
     "Shchigry": "id::RU_RAY_50074027B17176791055739",
     "Shchigry (RU)": "id::RU_RAY_50074027B17176791055739",
+    "Shchuchyn": "id::BY_RAY_67162791B66420794580046",
+    "Shchuchyn (BY)": "id::BY_RAY_67162791B66420794580046",
+    "Shchuchyn [Grodno]": "id::BY_RAY_67162791B66420794580046",
     "Shchyolkovsky District": "id::RU_RAY_50074027B51935162594441",
     "Shchyolkovsky District (RU)": "id::RU_RAY_50074027B51935162594441",
     "Shebekinsky District": "id::RU_RAY_50074027B26881426661864",
@@ -133071,6 +133507,8 @@
     "Sonora Zone 9 [Sonora]": "id::MX_ZN_25_009",
     "Sonsonate": "id::SV_ADM1_SLV-1348",
     "Sonsonate (SV)": "id::SV_ADM1_SLV-1348",
+    "Sool": "id::SO_ADM1_83879307B65026001570916",
+    "Sool (SO)": "id::SO_ADM1_83879307B65026001570916",
     "Sopot": "id::PL_POW_2264",
     "Sopot (PL)": "id::PL_POW_2264",
     "Soria": "id::ES417",
@@ -134401,6 +134839,8 @@
     "Tocantins (BR)": "id::BR_ADM1_BRA-596",
     "Tochigi": "id::JPN-1859",
     "Tochigi (JP)": "id::JPN-1859",
+    "Togdheer": "id::SO_ADM1_83879307B67680758004346",
+    "Togdheer (SO)": "id::SO_ADM1_83879307B67680758004346",
     "Tokaryovsky District": "id::RU_RAY_50074027B2368610201765",
     "Tokaryovsky District (RU)": "id::RU_RAY_50074027B2368610201765",
     "Tokat": "id::TR832",
@@ -135270,6 +135710,9 @@
     "Verkhniy Rohackyk (UA)": "id::UA_RAY_74538382B88832969225176",
     "Verkhnodniprovsk": "id::UA_RAY_74538382B32904543558628",
     "Verkhnodniprovsk (UA)": "id::UA_RAY_74538382B32904543558628",
+    "Verkhnyadzvinsk": "id::BY_RAY_67162791B82603429459213",
+    "Verkhnyadzvinsk (BY)": "id::BY_RAY_67162791B82603429459213",
+    "Verkhnyadzvinsk [Vitebsk]": "id::BY_RAY_67162791B82603429459213",
     "Verkhoshizhemsky District": "id::RU_RAY_50074027B96335759543697",
     "Verkhoshizhemsky District (RU)": "id::RU_RAY_50074027B96335759543697",
     "Verkhovazhsky District": "id::RU_RAY_50074027B34235942495173",
@@ -135359,6 +135802,9 @@
     "Viersen [Nordrhein-Westfalen]": "id::DEA1E",
     "Vierzon": "id::FR_ARR_18003",
     "Vierzon (FR)": "id::FR_ARR_18003",
+    "Vietka": "id::BY_RAY_67162791B72598168140482",
+    "Vietka (BY)": "id::BY_RAY_67162791B72598168140482",
+    "Vietka [Gomel]": "id::BY_RAY_67162791B72598168140482",
     "Vigan": "id::FR_ARR_30003",
     "Vigan (FR)": "id::FR_ARR_30003",
     "Vikarabad": "id::IN_ADM2_76128533B74887942950962",
@@ -135450,8 +135896,11 @@
     "Visakhapatnam (IN)": "id::IN_ADM2_76128533B71485440235524",
     "Viseu Dão Lafões": "id::PT16G",
     "Viseu Dão Lafões (PT)": "id::PT16G",
-    "Vitebsk": "id::BLR-2341",
-    "Vitebsk (BY)": "id::BLR-2341",
+    "Vitebsk": "id::BY_RAY_67162791B85815486219336",
+    "Vitebsk (BY)": "id::BY_RAY_67162791B85815486219336",
+    "Vitebsk Interior": "id::BY_INT_VITEBSK",
+    "Vitebsk Interior (BY)": "id::BY_INT_VITEBSK",
+    "Vitebsk Interior [Vitebsk]": "id::BY_INT_VITEBSK",
     "Viterbo": "id::ITI41",
     "Viterbo (IT)": "id::ITI41",
     "Viti/Vitina": "id::XK_ADM1_KOS-5905",
@@ -135519,6 +135968,9 @@
     "Volzhsk (RU)": "id::RU_RAY_50074027B13097997893227",
     "Volzhsky": "id::RU_RAY_50074027B12225471433206",
     "Volzhsky (RU)": "id::RU_RAY_50074027B12225471433206",
+    "Voranava": "id::BY_RAY_67162791B43104058935452",
+    "Voranava (BY)": "id::BY_RAY_67162791B43104058935452",
+    "Voranava [Grodno]": "id::BY_RAY_67162791B43104058935452",
     "Vorobyovsky District": "id::RU_RAY_50074027B97247580579079",
     "Vorobyovsky District (RU)": "id::RU_RAY_50074027B97247580579079",
     "Voronezh": "id::RU_RAY_50074027B21233041988666",
@@ -135988,10 +136440,16 @@
     "Western Equatoria (SS)": "id::SS_ADM1_SDS-864",
     "Western Highlands": "id::PG_ADM1_PNG-1247",
     "Western Highlands (PG)": "id::PG_ADM1_PNG-1247",
+    "Western Minsk Kresy": "id::BY_HIST_POL_MINSK_WEST",
+    "Western Minsk Kresy (BY)": "id::BY_HIST_POL_MINSK_WEST",
+    "Western Minsk Kresy [Minsk]": "id::BY_HIST_POL_MINSK_WEST",
     "Western Region": "id::UG_ADM1_17295835B91329899113986",
     "Western Region (UG)": "id::UG_ADM1_17295835B91329899113986",
     "Western Sahara": "id::EH_ADMIN0_PASSTHROUGH",
     "Western Sahara (EH)": "id::EH_ADMIN0_PASSTHROUGH",
+    "Western Vitebsk Kresy": "id::BY_HIST_POL_VITEBSK_WEST",
+    "Western Vitebsk Kresy (BY)": "id::BY_HIST_POL_VITEBSK_WEST",
+    "Western Vitebsk Kresy [Vitebsk]": "id::BY_HIST_POL_VITEBSK_WEST",
     "Westerwaldkreis": "id::DEB1B",
     "Westerwaldkreis (DE)": "id::DEB1B",
     "Westerwaldkreis [Rheinland-Pfalz]": "id::DEB1B",
@@ -136139,6 +136597,8 @@
     "Wood": "id::US_CNTY_48499",
     "Wood (US)": "id::US_CNTY_48499",
     "Wood [Texas]": "id::US_CNTY_48499",
+    "Woqooyi Galbeed": "id::SO_ADM1_83879307B42572798770371",
+    "Woqooyi Galbeed (SO)": "id::SO_ADM1_83879307B42572798770371",
     "Worcester": "id::US_CNTY_25027",
     "Worcester (US)": "id::US_CNTY_25027",
     "Worcester [Massachusetts]": "id::US_CNTY_25027",

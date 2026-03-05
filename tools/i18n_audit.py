@@ -57,6 +57,54 @@ def load_topology_names(topology_path: Path) -> list[str]:
     return sorted(names)
 
 
+def load_scenario_geo_names(scenarios_root: Path) -> list[str]:
+    if not scenarios_root.exists() or not scenarios_root.is_dir():
+        return []
+
+    names = set()
+    for path in sorted(scenarios_root.rglob("*.json")):
+        if not path.is_file():
+            continue
+        try:
+            with path.open("r", encoding="utf-8") as file:
+                data = json.load(file)
+        except Exception:
+            continue
+
+        if not isinstance(data, dict):
+            continue
+
+        root_display_name = str(
+            data.get("display_name") or data.get("displayName") or ""
+        ).strip()
+        if root_display_name:
+            names.add(root_display_name)
+
+        countries = data.get("countries")
+        if isinstance(countries, dict):
+            for entry in countries.values():
+                if not isinstance(entry, dict):
+                    continue
+                display_name = str(
+                    entry.get("display_name") or entry.get("displayName") or ""
+                ).strip()
+                if display_name:
+                    names.add(display_name)
+
+        scenarios = data.get("scenarios")
+        if isinstance(scenarios, list):
+            for entry in scenarios:
+                if not isinstance(entry, dict):
+                    continue
+                display_name = str(
+                    entry.get("display_name") or entry.get("displayName") or ""
+                ).strip()
+                if display_name:
+                    names.add(display_name)
+
+    return sorted(names)
+
+
 def collect_code_strings(repo_root: Path) -> dict:
     ui_t_keys = set()
     geo_t_keys = set()
@@ -126,8 +174,17 @@ def render_markdown(report: dict) -> str:
     lines.append(f"- GEO locale keys: {report['geo_locale_count']}")
     lines.append(f"- GEO missing-like entries: {report['geo_missing_like_count']}")
     lines.append(f"- Literal TODO markers: {report['geo_todo_marker_count']}")
-    lines.append(f"- Topology-derived geo names: {report['topology_geo_name_count']}")
+    lines.append(
+        "- Topology-derived geo names: "
+        f"{report['topology_geo_name_count']} "
+        f"(primary={report['primary_topology_geo_name_count']}, runtime={report['runtime_topology_geo_name_count']})"
+    )
     lines.append(f"- Topology names missing in locales.geo: {report['topology_geo_missing_count']}")
+    lines.append(f"- Scenario country display names: {report['scenario_geo_name_count']}")
+    lines.append(
+        "- Scenario names missing or untranslated in locales.geo: "
+        f"{report['scenario_geo_missing_count']}"
+    )
     lines.append("")
 
     lines.append("## Missing UI Locale Keys")
@@ -156,6 +213,16 @@ def render_markdown(report: dict) -> str:
         lines.append("- None")
     lines.append("")
 
+    lines.append("## Scenario Names Missing or Untranslated in locales.geo")
+    if report["scenario_geo_missing"]:
+        for key in report["scenario_geo_missing"][:200]:
+            lines.append(f"- {key}")
+        if len(report["scenario_geo_missing"]) > 200:
+            lines.append(f"- ... ({len(report['scenario_geo_missing']) - 200} more)")
+    else:
+        lines.append("- None")
+    lines.append("")
+
     return "\n".join(lines)
 
 
@@ -164,6 +231,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--repo-root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--locales", type=Path)
     parser.add_argument("--topology", type=Path)
+    parser.add_argument("--runtime-topology", type=Path)
+    parser.add_argument("--scenarios-root", type=Path)
     parser.add_argument("--markdown-out", type=Path)
     parser.add_argument("--json-out", type=Path)
     return parser.parse_args()
@@ -182,11 +251,27 @@ def resolve_default_topology(repo_root: Path) -> Path:
     return candidates[-1]
 
 
+def resolve_default_runtime_topology(repo_root: Path) -> Path:
+    candidates = [
+        repo_root / "data" / "europe_topology.runtime_political_v1.json",
+        repo_root / "data" / "europe_topology.na_v2.json",
+        repo_root / "data" / "europe_topology.na_v1.json",
+        repo_root / "data" / "europe_topology.highres.json",
+        repo_root / "data" / "europe_topology.json",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[-1]
+
+
 def main() -> None:
     args = parse_args()
     repo_root = args.repo_root.resolve()
     locales_path = args.locales or (repo_root / "data" / "locales.json")
     topology_path = args.topology or resolve_default_topology(repo_root)
+    runtime_topology_path = args.runtime_topology or resolve_default_runtime_topology(repo_root)
+    scenarios_root = args.scenarios_root or (repo_root / "data" / "scenarios")
     markdown_out = (
         args.markdown_out
         or (repo_root / "reports" / "generated" / "translation" / "translation_coverage_report.md")
@@ -219,13 +304,28 @@ def main() -> None:
     topology_names = []
     if topology_path.exists():
         topology_names = load_topology_names(topology_path)
-    topology_missing = sorted(name for name in topology_names if name not in geo_locale)
+    runtime_topology_names = []
+    if runtime_topology_path.exists():
+        runtime_topology_names = load_topology_names(runtime_topology_path)
+    combined_topology_names = sorted(set(topology_names) | set(runtime_topology_names))
+    topology_missing = sorted(name for name in combined_topology_names if name not in geo_locale)
+
+    scenario_geo_names = load_scenario_geo_names(scenarios_root)
+    scenario_geo_missing = []
+    for name in scenario_geo_names:
+        entry = geo_locale.get(name)
+        zh_value = entry.get("zh", "") if isinstance(entry, dict) else ""
+        en_value = entry.get("en", name) if isinstance(entry, dict) else name
+        if is_missing_like(zh_value, en_value):
+            scenario_geo_missing.append(name)
 
     report = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "repo_root": str(repo_root),
         "locales_path": str(locales_path),
         "topology_path": str(topology_path),
+        "runtime_topology_path": str(runtime_topology_path),
+        "scenarios_root": str(scenarios_root),
         "ui_locale_count": len(ui_locale_keys),
         "ui_used_count": len(ui_used),
         "ui_missing_count": len(ui_missing),
@@ -236,9 +336,14 @@ def main() -> None:
         "geo_todo_count": geo_missing_like_count,
         "geo_missing_like_count": geo_missing_like_count,
         "geo_todo_marker_count": geo_todo_marker_count,
-        "topology_geo_name_count": len(topology_names),
+        "primary_topology_geo_name_count": len(topology_names),
+        "runtime_topology_geo_name_count": len(runtime_topology_names),
+        "topology_geo_name_count": len(combined_topology_names),
         "topology_geo_missing_count": len(topology_missing),
         "topology_geo_missing": topology_missing,
+        "scenario_geo_name_count": len(scenario_geo_names),
+        "scenario_geo_missing_count": len(scenario_geo_missing),
+        "scenario_geo_missing": scenario_geo_missing,
     }
 
     markdown_out.parent.mkdir(parents=True, exist_ok=True)
@@ -252,6 +357,7 @@ def main() -> None:
         f"ui_missing={report['ui_missing_count']}, "
         f"hardcoded_ui={report['hardcoded_ui_count']}, "
         f"geo_missing_like={report['geo_missing_like_count']}, "
+        f"scenario_geo_missing={report['scenario_geo_missing_count']}, "
         f"todo_markers={report['geo_todo_marker_count']}"
     )
     print(f"Markdown report: {markdown_out}")

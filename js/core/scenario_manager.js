@@ -642,7 +642,7 @@ function formatScenarioAuditText() {
     || 0
   );
   if (criticalCheckCount > 0) {
-    hints.push(`Critical checks: ${criticalCheckCount}`);
+    hints.push(`${t("Critical checks", "ui")}: ${criticalCheckCount}`);
   }
   hints.push(`${t("Synthetic", "ui")}: ${
     Number(summary.synthetic_count)
