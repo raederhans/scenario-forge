@@ -306,7 +306,8 @@ def _evaluate_region_checks(
                     ],
                     include_feature_ids=[
                         "BY_HIST_POL_MINSK_WEST",
-                        "BY_HIST_POL_VITEBSK_WEST",
+                        "BY_RAY_67162791B18102707107362",
+                        "BY_RAY_67162791B41761210959552",
                     ],
                 ),
             },
@@ -356,7 +357,8 @@ def _evaluate_region_checks(
                     ],
                     include_feature_ids=[
                         "BY_HIST_POL_MINSK_WEST",
-                        "BY_HIST_POL_VITEBSK_WEST",
+                        "BY_RAY_67162791B18102707107362",
+                        "BY_RAY_67162791B41761210959552",
                     ],
                 ),
             },
@@ -369,7 +371,12 @@ def _evaluate_region_checks(
                     ids_by_group=ids_by_group,
                     name_index=name_index,
                     include_hierarchy_group_ids=["BY_Gomel", "BY_Mogilev"],
-                    include_feature_ids=["BY_INT_MINSK", "BY_INT_VITEBSK", "BY_CITY_MINSK"],
+                    include_feature_ids=[
+                        "BY_INT_MINSK",
+                        "BY_INT_VITEBSK",
+                        "BY_CITY_MINSK",
+                        "BY_HIST_POL_VITEBSK_WEST",
+                    ],
                 ),
             },
             {
@@ -702,6 +709,17 @@ def _evaluate_region_checks(
                         "CN_CITY_17275852B83634722552305",
                         "CN_CITY_17275852B20323770219280",
                     ],
+                ),
+            },
+            {
+                "label": "Jidong Japanese occupation corridor",
+                "expected_owner_tag": "JAP",
+                "resolved": _resolve_targets(
+                    feature_by_id=feature_by_id,
+                    ids_by_country=ids_by_country,
+                    ids_by_group=ids_by_group,
+                    name_index=name_index,
+                    include_feature_ids=["CN_CITY_17275852B82452317993245"],
                 ),
             },
         ],

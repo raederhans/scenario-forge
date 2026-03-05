@@ -1,8 +1,8 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1936",
-  "generated_at": "2026-03-04T02:05:14.866660+00:00",
-  "baseline_hash": "b776bf4c5458406db91414df32b7bdb4a97efdbb3053444c4b4e54ae76d220e7",
+  "generated_at": "2026-03-05T00:23:21.195892+00:00",
+  "baseline_hash": "0fb8fc96ed4ea8910555afe306ece7c29ed279da3ce3425b038c30e37da3d2ca",
   "cores": {
     "AFG-1741": [
       "AFG"
@@ -6536,7 +6536,7 @@
       "CHI"
     ],
     "CN_CITY_17275852B82452317993245": [
-      "MAN"
+      "JAP"
     ],
     "CN_CITY_17275852B82453745419321": [
       "CHI"
@@ -14219,22 +14219,22 @@
       "FRA"
     ],
     "LBN-3022": [
-      "LEB"
+      "FRA"
     ],
     "LBN-3023": [
-      "LEB"
+      "FRA"
     ],
     "LBN-3024": [
-      "LEB"
+      "FRA"
     ],
     "LBN-3025": [
-      "LEB"
+      "FRA"
     ],
     "LBN-3059": [
-      "LEB"
+      "FRA"
     ],
     "LBN-3060": [
-      "LEB"
+      "FRA"
     ],
     "LBY-2882": [
       "ITA"
@@ -21854,49 +21854,49 @@
       "CZE"
     ],
     "SYR-134": [
-      "SYR"
+      "FRA"
     ],
     "SYR-135": [
-      "SYR"
+      "FRA"
     ],
     "SYR-136": [
-      "SYR"
+      "FRA"
     ],
     "SYR-137": [
-      "SYR"
+      "FRA"
     ],
     "SYR-138": [
-      "SYR"
+      "FRA"
     ],
     "SYR-139": [
-      "SYR"
+      "FRA"
     ],
     "SYR-140": [
-      "SYR"
+      "FRA"
     ],
     "SYR-141": [
-      "SYR"
+      "FRA"
     ],
     "SYR-142": [
-      "SYR"
+      "FRA"
     ],
     "SYR-143": [
-      "SYR"
+      "FRA"
     ],
     "SYR-144": [
-      "SYR"
+      "FRA"
     ],
     "SYR-145": [
-      "SYR"
+      "FRA"
     ],
     "SYR-146": [
-      "SYR"
+      "FRA"
     ],
     "SYR-4843": [
-      "SYR"
+      "FRA"
     ],
     "SYR-5261": [
-      "SYR"
+      "FRA"
     ],
     "THA-374": [
       "SIA"
@@ -33371,7 +33371,7 @@
       "POL"
     ],
     "BY_HIST_POL_VITEBSK_WEST": [
-      "POL"
+      "SOV"
     ],
     "BY_RAY_67162791B10713618148259": [
       "SOV"
@@ -33392,7 +33392,7 @@
       "SOV"
     ],
     "BY_RAY_67162791B18102707107362": [
-      "SOV"
+      "POL"
     ],
     "BY_RAY_67162791B18933715013959": [
       "POL"
@@ -33410,7 +33410,7 @@
       "SOV"
     ],
     "BY_RAY_67162791B41761210959552": [
-      "SOV"
+      "POL"
     ],
     "BY_RAY_67162791B43104058935452": [
       "POL"

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1936",
-  "generated_at": "2026-03-04T02:05:14.879122+00:00",
+  "generated_at": "2026-03-05T01:09:58.604438+00:00",
   "default_country": "GER",
   "countries": {
     "AFA": {
@@ -436,7 +436,7 @@
       "tag": "CHI",
       "display_name": "China",
       "color_hex": "#28288c",
-      "feature_count": 1049,
+      "feature_count": 1031,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "CN",
@@ -896,7 +896,7 @@
       "tag": "FRA",
       "display_name": "France",
       "color_hex": "#3971e4",
-      "feature_count": 719,
+      "feature_count": 740,
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "FR",
@@ -1359,7 +1359,7 @@
       "tag": "JAP",
       "display_name": "Japan",
       "color_hex": "#ffc9b2",
-      "feature_count": 96,
+      "feature_count": 114,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "JP",
@@ -1378,7 +1378,8 @@
       "historical_fidelity": "vanilla",
       "primary_rule_source": "japan_korea_taiwan",
       "rule_sources": [
-        "japan_korea_taiwan"
+        "japan_korea_taiwan",
+        "jidong_japanese_occupation"
       ],
       "source_types": [
         "hoi4_owner"
@@ -1464,36 +1465,6 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_northern_europe",
       "subregion_label": "Northern Europe",
-      "notes": "",
-      "synthetic_owner": false,
-      "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla",
-      "primary_rule_source": "",
-      "rule_sources": [],
-      "source_types": [
-        "hoi4_owner"
-      ],
-      "historical_fidelity_summary": [
-        "vanilla"
-      ]
-    },
-    "LEB": {
-      "tag": "LEB",
-      "display_name": "Lebanon",
-      "color_hex": "#82963c",
-      "feature_count": 6,
-      "quality": "direct_country_copy",
-      "source": "direct_active_owner",
-      "base_iso2": "LB",
-      "lookup_iso2": "LB",
-      "provenance_iso2": "LB",
-      "scenario_only": false,
-      "featured": false,
-      "capital_state_id": 553,
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "subregion_id": "subregion_western_asia",
-      "subregion_label": "Western Asia",
       "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
@@ -2123,7 +2094,7 @@
       "tag": "POL",
       "display_name": "Poland",
       "color_hex": "#d6668b",
-      "feature_count": 377,
+      "feature_count": 378,
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "PL",
@@ -2531,7 +2502,7 @@
       "tag": "SOV",
       "display_name": "Soviet Union",
       "color_hex": "#7d0d18",
-      "feature_count": 2291,
+      "feature_count": 2290,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "RU",
@@ -2646,36 +2617,6 @@
       "rule_sources": [
         "swiss_liechtenstein"
       ],
-      "source_types": [
-        "hoi4_owner"
-      ],
-      "historical_fidelity_summary": [
-        "vanilla"
-      ]
-    },
-    "SYR": {
-      "tag": "SYR",
-      "display_name": "Syria",
-      "color_hex": "#646496",
-      "feature_count": 15,
-      "quality": "direct_country_copy",
-      "source": "direct_active_owner",
-      "base_iso2": "SY",
-      "lookup_iso2": "SY",
-      "provenance_iso2": "SY",
-      "scenario_only": false,
-      "featured": false,
-      "capital_state_id": 554,
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "subregion_id": "subregion_western_asia",
-      "subregion_label": "Western Asia",
-      "notes": "",
-      "synthetic_owner": false,
-      "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla",
-      "primary_rule_source": "",
-      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],

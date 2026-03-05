@@ -14,6 +14,12 @@ import { showToast } from "../ui/toast.js";
 
 const SCENARIO_REGISTRY_URL = "data/scenarios/index.json";
 
+function cacheBust(url) {
+  if (!url) return url;
+  const sep = String(url).includes("?") ? "&" : "?";
+  return `${url}${sep}_t=${Date.now()}`;
+}
+
 function normalizeScenarioId(value) {
   return String(value || "").trim();
 }
@@ -53,7 +59,7 @@ async function loadScenarioRegistry({ d3Client = globalThis.d3 } = {}) {
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available for scenario registry loading.");
   }
-  const registry = await d3Client.json(SCENARIO_REGISTRY_URL);
+  const registry = await d3Client.json(cacheBust(SCENARIO_REGISTRY_URL));
   state.scenarioRegistry = registry || { version: 1, default_scenario_id: "", scenarios: [] };
   return state.scenarioRegistry;
 }
@@ -138,12 +144,12 @@ function syncScenarioInspectorSelection(countryCode = "") {
   }
 }
 
-async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3 } = {}) {
+async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceReload = false } = {}) {
   const targetId = normalizeScenarioId(scenarioId);
   if (!targetId) {
     throw new Error("Scenario id is required.");
   }
-  if (state.scenarioBundleCacheById?.[targetId]) {
+  if (!forceReload && state.scenarioBundleCacheById?.[targetId]) {
     return state.scenarioBundleCacheById[targetId];
   }
   await loadScenarioRegistry({ d3Client });
@@ -154,11 +160,11 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3 } = {})
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available for scenario loading.");
   }
-  const manifest = await d3Client.json(meta.manifest_url);
+  const manifest = await d3Client.json(cacheBust(meta.manifest_url));
   const [countriesPayload, ownersPayload, coresPayload] = await Promise.all([
-    d3Client.json(manifest.countries_url),
-    d3Client.json(manifest.owners_url),
-    d3Client.json(manifest.cores_url),
+    d3Client.json(cacheBust(manifest.countries_url)),
+    d3Client.json(cacheBust(manifest.owners_url)),
+    d3Client.json(cacheBust(manifest.cores_url)),
   ]);
   const bundle = {
     meta,
@@ -168,6 +174,11 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3 } = {})
     coresPayload,
     auditPayload: null,
   };
+  const ownerCount = Object.keys(ownersPayload?.owners || {}).length;
+  const countryCount = Object.keys(countriesPayload?.countries || {}).length;
+  console.log(
+    `[scenario] Loaded bundle "${targetId}": ${ownerCount} owner entries, ${countryCount} countries, baseline=${String(manifest?.baseline_hash || "").slice(0, 12)}`
+  );
   state.scenarioBundleCacheById[targetId] = bundle;
   return bundle;
 }
@@ -213,7 +224,7 @@ async function loadScenarioAuditPayload(
   }
 
   try {
-    const auditPayload = await d3Client.json(bundle.manifest.audit_url);
+    const auditPayload = await d3Client.json(cacheBust(bundle.manifest.audit_url));
     bundle.auditPayload = auditPayload || null;
     if (requestedScenarioId && normalizeScenarioId(state.activeScenarioId) === requestedScenarioId) {
       state.scenarioAudit = bundle.auditPayload;
@@ -442,6 +453,16 @@ async function applyScenarioBundle(
   state.activeSovereignCode = defaultCountryCode;
   syncScenarioInspectorSelection(defaultCountryCode);
   rebuildPresetState();
+
+  // Diagnostic: verify key ownership assignments took effect
+  const spotChecks = ["SYR-134", "LBN-3022", "BY_HIST_POL_VITEBSK_WEST", "CN_CITY_17275852B32842590404417"];
+  spotChecks.forEach((fid) => {
+    const owner = state.sovereigntyByFeatureId[fid];
+    if (owner) {
+      const color = scenarioColorMap[owner] || "(no color)";
+      console.log(`[scenario] Spot-check: ${fid} → owner=${owner}, color=${color}`);
+    }
+  });
 
   refreshColorState({ renderNow: false });
   recomputeDynamicBordersNow({ renderNow: false, reason: `scenario:${scenarioId}` });

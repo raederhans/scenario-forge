@@ -1944,61 +1944,21 @@ button.scenario-action-card:hover {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-.inspector-detail-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.inspector-detail-header-copy {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.inspector-detail-meta {
-  min-width: 0;
-  font-size: 0.76rem;
-  line-height: 1.45;
-  color: var(--text-secondary);
-}
-
-.inspector-detail-swatch {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-}
-
 .inspector-detail-actions {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 10px;
   flex-wrap: wrap;
 }
 
 .inspector-detail-primary-btn {
-  flex: 1 1 150px;
+  flex: 1 1 100%;
 }
 
 .inspector-detail-primary-btn.is-active {
   border-color: rgba(0, 47, 167, 0.24);
   background: rgba(0, 47, 167, 0.08);
   color: var(--color-accent);
-}
-
-.inspector-detail-color-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 0 0 auto;
-}
-
-.inspector-detail-color-field .color-input {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
 }
 
 .inspector-detail-section {

@@ -1151,7 +1151,6 @@ function initToolbar({ render } = {}) {
   function updateToolUI() {
     toolButtons.forEach((button) => {
       const isActive = button.dataset.tool === state.currentTool;
-      button.disabled = state.isEditingPreset;
       button.classList.toggle("is-active", isActive);
       button.setAttribute("aria-pressed", String(isActive));
     });
@@ -1164,9 +1163,6 @@ function initToolbar({ render } = {}) {
       brushModeBtn.disabled = disableBrush;
       brushModeBtn.classList.toggle("is-active", !!state.brushModeEnabled && !disableBrush);
       brushModeBtn.setAttribute("aria-pressed", String(!!state.brushModeEnabled && !disableBrush));
-    }
-    if (bottomDock) {
-      bottomDock.classList.toggle("is-editing-preset", !!state.isEditingPreset);
     }
     setToolCursorClass();
     updateDirtyIndicator();

@@ -63,7 +63,11 @@
         "BY_Brest",
         "BY_Grodno"
       ],
-      "include_feature_ids": ["BY_HIST_POL_MINSK_WEST", "BY_HIST_POL_VITEBSK_WEST"],
+      "include_feature_ids": [
+        "BY_HIST_POL_MINSK_WEST",
+        "BY_RAY_67162791B18102707107362",
+        "BY_RAY_67162791B41761210959552"
+      ],
       "base_iso2": "PL",
       "display_name_override": "Poland"
     },
@@ -442,6 +446,35 @@
       "display_name_override": "Xibei San Ma"
     },
     {
+      "rule_id": "jidong_japanese_occupation",
+      "owner_tag": "JAP",
+      "priority": 164,
+      "quality": "manual_reviewed",
+      "critical": true,
+      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "include_feature_ids": [
+        "CN_CITY_17275852B84296108244083",
+        "CN_CITY_17275852B23021356422447",
+        "CN_CITY_17275852B71122715185286",
+        "CN_CITY_17275852B35450332359336",
+        "CN_CITY_17275852B62534367670886",
+        "CN_CITY_17275852B79805983057899",
+        "CN_CITY_17275852B84472681161194",
+        "CN_CITY_17275852B32842590404417",
+        "CN_CITY_17275852B94774630505431",
+        "CN_CITY_17275852B31900972836749",
+        "CN_CITY_17275852B88151757349593",
+        "CN_CITY_17275852B56182979447767",
+        "CN_CITY_17275852B69801287390069",
+        "CN_CITY_17275852B26763632681669",
+        "CN_CITY_17275852B4344290320214",
+        "CN_CITY_17275852B9681816955607",
+        "CN_CITY_17275852B36714320356801",
+        "CN_CITY_17275852B89036303488164"
+      ],
+      "base_iso2": "JP"
+    },
+    {
       "rule_id": "burma",
       "owner_tag": "BRM",
       "priority": 170,
@@ -501,7 +534,7 @@
       "quality": "approx_existing_geometry",
       "critical": false,
       "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
-      "include_country_codes": ["DZ", "TN", "MA", "CI", "BJ", "BF", "TD", "CF", "CG", "GA", "GQ", "DJ", "GN", "GW", "ML", "MR", "MG", "NE", "SN", "TG", "CM", "KM", "PM", "TF", "MC", "EH"]
+      "include_country_codes": ["DZ", "TN", "MA", "CI", "BJ", "BF", "TD", "CF", "CG", "GA", "GQ", "DJ", "GN", "GW", "ML", "MR", "MG", "NE", "SN", "TG", "CM", "KM", "PM", "TF", "MC", "EH", "SY", "LB"]
     },
     {
       "rule_id": "british_colonies",

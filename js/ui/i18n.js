@@ -136,8 +136,6 @@ function updateUIText() {
     ["countryInspectorOrderingHint", "Key scenario countries first. Releasables appear under parent countries."],
     ["countryInspectorEmptyTitle", "Select a country to inspect"],
     ["countryInspectorEmptyHint", "Choose a country above to inspect its identity, territories, presets, and releasables."],
-    ["lblCountryInspectorColor", "Current Color"],
-    ["countryInspectorBackToParent", "Back to Parent"],
     ["resetCountryColors", "Reset Country Colors"],
     ["lblHistoricalPresets", "Selected Country Actions"],
     ["selectedCountryActionHint", "Choose a country above to inspect territories, presets, and releasables."],

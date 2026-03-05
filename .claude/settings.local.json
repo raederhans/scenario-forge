@@ -3,5 +3,6 @@
     "allow": [
       "Bash(node:*)"
     ]
-  }
+  },
+  "outputStyle": "Explanatory"
 }

@@ -2,7 +2,7 @@
 import { state, countryNames, PRESET_STORAGE_KEY, defaultCountryPalette } from "../core/state.js";
 import { ColorManager } from "../core/color_manager.js";
 import * as mapRenderer from "../core/map_renderer.js";
-import { applyCountryColor, resetCountryColors } from "../core/logic.js";
+import { resetCountryColors } from "../core/logic.js";
 import { FileManager } from "../core/file_manager.js";
 import { captureHistoryState, clearHistory, pushHistoryEntry } from "../core/history_manager.js";
 import { LegendManager } from "../core/legend_manager.js";
@@ -208,29 +208,6 @@ function loadCustomPresets() {
     console.warn("Unable to load custom presets:", error);
     return {};
   }
-}
-
-function saveCustomPresets() {
-  try {
-    localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(state.customPresets));
-  } catch (error) {
-    console.warn("Unable to save custom presets:", error);
-  }
-}
-
-function upsertCustomPreset(code, name, ids) {
-  const normalizedCode = normalizeCountryCode(code);
-  if (!normalizedCode) return;
-  if (!state.customPresets[normalizedCode]) state.customPresets[normalizedCode] = [];
-  const idx = state.customPresets[normalizedCode].findIndex((preset) => preset.name === name);
-  const entry = { name, ids: [...ids] };
-  if (idx >= 0) {
-    state.customPresets[normalizedCode][idx] = entry;
-  } else {
-    state.customPresets[normalizedCode].push(entry);
-  }
-  saveCustomPresets();
-  rebuildPresetState();
 }
 
 function initPresetState() {
@@ -621,66 +598,6 @@ function applyPreset(countryCode, presetIndex, color, render) {
   console.log(`Applied preset "${preset.name}" with ${preset.ids.length} regions`);
 }
 
-function startPresetEdit(code, presetIndex, render) {
-  const presetLookupCode = resolveScenarioLookupCode(code);
-  const presets = state.presetsState[presetLookupCode] || [];
-  const preset = presets[presetIndex];
-  if (!preset) return;
-  state.isEditingPreset = true;
-  state.editingPresetRef = { code: presetLookupCode, presetIndex };
-  state.editingPresetIds = new Set(preset.ids || []);
-  if (typeof state.updateToolUIFn === "function") {
-    state.updateToolUIFn();
-  }
-  if (render) render();
-  if (typeof state.renderPresetTreeFn === "function") {
-    state.renderPresetTreeFn();
-  }
-}
-
-function stopPresetEdit(render) {
-  state.isEditingPreset = false;
-  state.editingPresetRef = null;
-  state.editingPresetIds = new Set();
-  if (typeof state.updateToolUIFn === "function") {
-    state.updateToolUIFn();
-  }
-  if (render) render();
-  if (typeof state.renderPresetTreeFn === "function") {
-    state.renderPresetTreeFn();
-  }
-}
-
-function togglePresetRegion(id, render) {
-  if (!state.isEditingPreset || !id) return;
-  if (state.editingPresetIds.has(id)) {
-    state.editingPresetIds.delete(id);
-  } else {
-    state.editingPresetIds.add(id);
-  }
-  if (render) render();
-}
-
-async function copyPresetIds(ids) {
-  const payload = JSON.stringify(ids || [], null, 2);
-  try {
-    await navigator.clipboard.writeText(payload);
-    console.log("Preset IDs copied to clipboard.");
-    showToast(t("Preset IDs copied to clipboard.", "ui"), {
-      title: t("Copied", "ui"),
-      tone: "success",
-    });
-  } catch (error) {
-    console.warn("Clipboard unavailable, logging IDs instead.", error);
-    console.log(payload);
-    showToast(t("Clipboard unavailable. Preset IDs were logged to the console.", "ui"), {
-      title: t("Clipboard unavailable", "ui"),
-      tone: "warning",
-      duration: 4200,
-    });
-  }
-}
-
 function initSidebar({ render } = {}) {
   const list = document.getElementById("countryList");
   if (!list) return;
@@ -845,12 +762,7 @@ function initSidebar({ render } = {}) {
   const debugModeSelect = document.getElementById("debug-mode-select");
   const countryInspectorEmpty = document.getElementById("countryInspectorEmpty");
   const countryInspectorSelected = document.getElementById("countryInspectorSelected");
-  const countryInspectorTitle = document.getElementById("countryInspectorTitle");
-  const countryInspectorMeta = document.getElementById("countryInspectorMeta");
-  const countryInspectorSwatch = document.getElementById("countryInspectorSwatch");
   const countryInspectorSetActive = document.getElementById("countryInspectorSetActive");
-  const countryInspectorBackToParent = document.getElementById("countryInspectorBackToParent");
-  const countryInspectorColorInput = document.getElementById("countryInspectorColorInput");
   const countryInspectorOrderingHint = document.getElementById("countryInspectorOrderingHint");
   const countryInspectorSection = document.getElementById("countryInspectorSection");
   const selectedCountryActionsSection = document.getElementById("selectedCountryActionsSection");
@@ -1699,74 +1611,21 @@ function initSidebar({ render } = {}) {
     countryInspectorSelected.classList.toggle("hidden", isEmpty);
 
     if (!countryState) {
-      if (countryInspectorColorInput) {
-        countryInspectorColorInput.disabled = true;
-      }
       if (countryInspectorSetActive) {
         countryInspectorSetActive.disabled = true;
         countryInspectorSetActive.classList.remove("is-active");
-      }
-      if (countryInspectorBackToParent) {
-        countryInspectorBackToParent.classList.add("hidden");
+        countryInspectorSetActive.textContent = t("Set Active", "ui");
+        countryInspectorSetActive.setAttribute("aria-pressed", "false");
       }
       return;
     }
 
-    const resolvedColor = getResolvedCountryColor(countryState);
-    if (countryInspectorTitle) {
-      countryInspectorTitle.textContent = `${countryState.displayName} (${countryState.code})`;
-    }
-    if (countryInspectorMeta) {
-      const metaBits = [countryState.subregionDisplayLabel, countryState.continentDisplayLabel];
-      if (state.activeScenarioId) {
-        if (countryState.releasable) {
-          const parentLabel = formatReleasableParentLabel(countryState);
-          metaBits.push(
-            parentLabel
-              ? `${t("Releasable from", "ui")} ${parentLabel}`
-              : t("Releasable", "ui")
-          );
-        }
-        if (countryState.baseIso2) {
-          metaBits.push(`${t("Base ISO", "ui")}: ${countryState.baseIso2}`);
-        }
-        if (countryState.quality) {
-          metaBits.push(countryState.quality);
-        }
-        if (countryState.featureCount) {
-          metaBits.push(`${countryState.featureCount} ${t("features", "ui")}`);
-        }
-      }
-      countryInspectorMeta.textContent = metaBits.filter(Boolean).join(" · ");
-    }
-    if (countryInspectorSwatch) {
-      countryInspectorSwatch.style.backgroundColor = resolvedColor;
-    }
-    if (countryInspectorColorInput) {
-      countryInspectorColorInput.disabled = false;
-      countryInspectorColorInput.value = resolvedColor;
-    }
     if (countryInspectorSetActive) {
       const isActive = state.activeSovereignCode === countryState.code;
-      countryInspectorSetActive.disabled = isActive;
+      countryInspectorSetActive.disabled = false;
       countryInspectorSetActive.classList.toggle("is-active", isActive);
-      countryInspectorSetActive.textContent = isActive ? t("Active", "ui") : t("Set Active", "ui");
+      countryInspectorSetActive.textContent = isActive ? t("Set Inactive", "ui") : t("Set Active", "ui");
       countryInspectorSetActive.setAttribute("aria-pressed", String(isActive));
-    }
-    if (countryInspectorBackToParent) {
-      if (countryState.releasable && countryState.parentOwnerTag) {
-        countryInspectorBackToParent.classList.remove("hidden");
-        countryInspectorBackToParent.textContent = t("Back to Parent", "ui");
-        countryInspectorBackToParent.onclick = () => {
-          if (state.expandedInspectorReleaseParents instanceof Set) {
-            state.expandedInspectorReleaseParents.add(countryState.parentOwnerTag);
-          }
-          selectInspectorCountry(countryState.parentOwnerTag);
-        };
-      } else {
-        countryInspectorBackToParent.classList.add("hidden");
-        countryInspectorBackToParent.onclick = null;
-      }
     }
   };
 
@@ -1896,10 +1755,11 @@ function initSidebar({ render } = {}) {
   if (countryInspectorSetActive && !countryInspectorSetActive.dataset.bound) {
     countryInspectorSetActive.addEventListener("click", () => {
       const selectedCode = ensureSelectedInspectorCountry();
-      if (!selectedCode || state.activeSovereignCode === selectedCode) return;
+      if (!selectedCode) return;
       const countryState = latestCountryStatesByCode.get(selectedCode);
-      state.activeSovereignCode = selectedCode;
-      markDirty("set-active-sovereign");
+      const isCurrentlyActive = state.activeSovereignCode === selectedCode;
+      state.activeSovereignCode = isCurrentlyActive ? "" : selectedCode;
+      markDirty(isCurrentlyActive ? "set-inactive-sovereign" : "set-active-sovereign");
       if (typeof state.updateActiveSovereignUIFn === "function") {
         state.updateActiveSovereignUIFn();
       }
@@ -1907,7 +1767,7 @@ function initSidebar({ render } = {}) {
         state.renderNowFn();
       }
       renderList();
-      if (countryState?.releasable) {
+      if (!isCurrentlyActive && countryState?.releasable) {
         showToast(
           t("Sovereignty painting will now assign regions to the selected releasable country.", "ui"),
           {
@@ -1919,18 +1779,6 @@ function initSidebar({ render } = {}) {
       }
     });
     countryInspectorSetActive.dataset.bound = "true";
-  }
-
-  if (countryInspectorColorInput && !countryInspectorColorInput.dataset.bound) {
-    countryInspectorColorInput.addEventListener("change", (event) => {
-      const selectedCode = ensureSelectedInspectorCountry();
-      if (!selectedCode) return;
-      const value = event.target.value;
-      applyCountryColor(selectedCode, value);
-      markDirty("country-color-change");
-      renderList();
-    });
-    countryInspectorColorInput.dataset.bound = "true";
   }
 
   state.renderCountryListFn = renderList;
@@ -1963,10 +1811,6 @@ function initSidebar({ render } = {}) {
     }
 
     presetEntries.forEach(({ preset, presetIndex }) => {
-      const row = document.createElement("div");
-      row.className = "preset-row";
-      const isLockedPreset = !!preset.locked;
-
       const nameBtn = document.createElement("button");
       nameBtn.type = "button";
       nameBtn.className = "inspector-item-btn";
@@ -1974,64 +1818,7 @@ function initSidebar({ render } = {}) {
       nameBtn.addEventListener("click", () => {
         applyPreset(presetLookupCode, presetIndex, state.selectedColor, render);
       });
-
-      const actions = document.createElement("div");
-      actions.className = "country-row-actions";
-
-      const isEditingThis =
-        state.isEditingPreset &&
-        state.editingPresetRef &&
-        state.editingPresetRef.code === presetLookupCode &&
-        state.editingPresetRef.presetIndex === presetIndex;
-
-      if (!isLockedPreset) {
-        const editBtn = document.createElement("button");
-        editBtn.type = "button";
-        editBtn.className = "preset-action-btn";
-        editBtn.textContent = isEditingThis ? t("Cancel", "ui") : t("Edit", "ui");
-        editBtn.addEventListener("click", () => {
-          if (isEditingThis) {
-            stopPresetEdit(render);
-          } else {
-            startPresetEdit(presetLookupCode, presetIndex, render);
-          }
-        });
-
-        const saveBtn = document.createElement("button");
-        saveBtn.type = "button";
-        saveBtn.className = "preset-action-btn";
-        saveBtn.textContent = t("Save", "ui");
-        if (!isEditingThis) {
-          saveBtn.classList.add("hidden");
-        }
-        saveBtn.addEventListener("click", () => {
-          if (!isEditingThis) return;
-          const ids = Array.from(state.editingPresetIds);
-          const activePreset = state.presetsState[presetLookupCode]?.[presetIndex];
-          if (activePreset) {
-            activePreset.ids = ids;
-            upsertCustomPreset(presetLookupCode, activePreset.name, ids);
-          }
-          stopPresetEdit(render);
-        });
-
-        actions.appendChild(editBtn);
-        actions.appendChild(saveBtn);
-      }
-
-      const copyBtn = document.createElement("button");
-      copyBtn.type = "button";
-      copyBtn.className = "preset-action-btn";
-      copyBtn.textContent = t("Copy", "ui");
-      copyBtn.addEventListener("click", () => {
-        const ids = isEditingThis ? Array.from(state.editingPresetIds) : preset.ids;
-        copyPresetIds(ids || []);
-      });
-      actions.appendChild(copyBtn);
-
-      row.appendChild(nameBtn);
-      row.appendChild(actions);
-      container.appendChild(row);
+      container.appendChild(nameBtn);
     });
   };
 
@@ -2214,56 +2001,6 @@ function initSidebar({ render } = {}) {
       });
     });
     actions.appendChild(applyBtn);
-
-    const isEditingThis =
-      state.isEditingPreset &&
-      state.editingPresetRef &&
-      state.editingPresetRef.code === presetRef.presetLookupCode &&
-      state.editingPresetRef.presetIndex === presetRef.presetIndex;
-
-    if (!presetRef.preset?.locked) {
-      const editBtn = document.createElement("button");
-      editBtn.type = "button";
-      editBtn.className = "preset-action-btn";
-      editBtn.textContent = isEditingThis ? t("Cancel", "ui") : t("Edit", "ui");
-      editBtn.addEventListener("click", () => {
-        if (isEditingThis) {
-          stopPresetEdit(render);
-        } else {
-          startPresetEdit(presetRef.presetLookupCode, presetRef.presetIndex, render);
-        }
-      });
-      actions.appendChild(editBtn);
-
-      const saveBtn = document.createElement("button");
-      saveBtn.type = "button";
-      saveBtn.className = "preset-action-btn";
-      saveBtn.textContent = t("Save", "ui");
-      if (!isEditingThis) {
-        saveBtn.classList.add("hidden");
-      }
-      saveBtn.addEventListener("click", () => {
-        if (!isEditingThis) return;
-        const ids = Array.from(state.editingPresetIds);
-        const activePreset = state.presetsState[presetRef.presetLookupCode]?.[presetRef.presetIndex];
-        if (activePreset) {
-          activePreset.ids = ids;
-          upsertCustomPreset(presetRef.presetLookupCode, activePreset.name, ids);
-        }
-        stopPresetEdit(render);
-      });
-      actions.appendChild(saveBtn);
-    }
-
-    const copyBtn = document.createElement("button");
-    copyBtn.type = "button";
-    copyBtn.className = "preset-action-btn";
-    copyBtn.textContent = t("Copy", "ui");
-    copyBtn.addEventListener("click", () => {
-      const ids = isEditingThis ? Array.from(state.editingPresetIds) : presetRef.preset.ids;
-      copyPresetIds(ids || []);
-    });
-    actions.appendChild(copyBtn);
 
     card.appendChild(copy);
     card.appendChild(actions);
@@ -2635,8 +2372,6 @@ function initSidebar({ render } = {}) {
   renderPresetTree();
   refreshLegendEditor();
   renderScenarioAuditPanel();
-
-  globalThis.togglePresetRegion = (id) => togglePresetRegion(id, render);
 }
 
 export { initSidebar, initPresetState };

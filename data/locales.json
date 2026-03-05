@@ -596,13 +596,17 @@
       "en": "Set Active",
       "zh": "设为当前"
     },
+    "Set Inactive": {
+      "en": "Set Inactive",
+      "zh": "取消当前"
+    },
     "Choose a country above to edit its color, active sovereign state, groups, and presets.": {
       "en": "Choose a country above to edit its color, active sovereign state, groups, and presets.",
       "zh": "在上方选择一个国家，以编辑其颜色、当前主权状态、分组和预设。"
     },
     "Choose a country above to inspect its identity, territories, presets, and releasables.": {
-      "en": "Choose a country above to inspect its identity, territories, presets, and releasables.",
-      "zh": "在上方选择一个国家，以查看其身份、领土、预设和可释放国家。"
+      "en": "Choose a country above to set or clear the active sovereign.",
+      "zh": "在上方选择一个国家，以设置或取消当前主权。"
     },
     "Choose a country above to inspect territories, presets, and releasables.": {
       "en": "Choose a country above to inspect territories, presets, and releasables.",

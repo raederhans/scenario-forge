@@ -1,27 +1,27 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1936",
-  "generated_at": "2026-03-04T02:05:14.905862+00:00",
+  "generated_at": "2026-03-05T00:23:21.239876+00:00",
   "summary": {
     "feature_count": 11192,
-    "owner_count": 98,
+    "owner_count": 96,
     "quality_counts": {
-      "approx_existing_geometry": 976,
-      "direct_country_copy": 5355,
+      "approx_existing_geometry": 997,
+      "direct_country_copy": 5334,
       "manual_reviewed": 4861
     },
     "source_counts": {
-      "direct_active_owner": 5355,
+      "direct_active_owner": 5334,
       "fallback_mapped_tag": 18,
-      "manual_rule": 5819
+      "manual_rule": 5840
     },
-    "approximate_count": 976,
+    "approximate_count": 997,
     "manual_reviewed_feature_count": 4861,
     "geometry_blocker_count": 0,
     "critical_unresolved_count": 0,
     "synthetic_owner_feature_count": 18,
     "synthetic_count": 18,
-    "changed_feature_count": 5837,
+    "changed_feature_count": 5858,
     "failed_region_check_count": 0,
     "topology_blocker_count": 0,
     "scenario_rule_blocker_count": 0,
@@ -39,7 +39,7 @@
     "state_count": 1046,
     "definition_entry_count": 13382,
     "runtime_feature_count": 11192,
-    "manual_rule_count": 42,
+    "manual_rule_count": 43,
     "state_owner_counts": {
       "SOV": 152,
       "ENG": 92,
@@ -190,19 +190,20 @@
   "region_checks": {
     "europe_germany_poland_1936": {
       "status": "pass",
-      "notes": "All 215 targeted features match the expected 1936 ownership.",
+      "notes": "All 216 targeted features match the expected 1936 ownership.",
       "affected_owner_tags": [
         "GER",
         "POL"
       ],
       "affected_feature_ids": [
         "BY_HIST_POL_MINSK_WEST",
-        "BY_HIST_POL_VITEBSK_WEST",
         "BY_INT_BREST",
         "BY_INT_GRODNO",
         "BY_RAY_67162791B13547290723272",
+        "BY_RAY_67162791B18102707107362",
         "BY_RAY_67162791B18933715013959",
         "BY_RAY_67162791B30498032594927",
+        "BY_RAY_67162791B41761210959552",
         "BY_RAY_67162791B43104058935452",
         "BY_RAY_67162791B54270193950847",
         "BY_RAY_67162791B59963656038120",
@@ -467,7 +468,7 @@
     },
     "europe_soviet_poland_1936": {
       "status": "pass",
-      "notes": "All 146 targeted features match the expected 1936 ownership.",
+      "notes": "All 148 targeted features match the expected 1936 ownership.",
       "affected_owner_tags": [
         "POL",
         "SOV"
@@ -487,9 +488,11 @@
         "BY_RAY_67162791B13547290723272",
         "BY_RAY_67162791B14569635979911",
         "BY_RAY_67162791B17030122378697",
+        "BY_RAY_67162791B18102707107362",
         "BY_RAY_67162791B18933715013959",
         "BY_RAY_67162791B26710857863794",
         "BY_RAY_67162791B30498032594927",
+        "BY_RAY_67162791B41761210959552",
         "BY_RAY_67162791B43104058935452",
         "BY_RAY_67162791B4778855273895",
         "BY_RAY_67162791B52564132020414",
@@ -840,8 +843,9 @@
     },
     "china_manchukuo_frontier": {
       "status": "pass",
-      "notes": "All 56 targeted features match the expected 1936 ownership.",
+      "notes": "All 57 targeted features match the expected 1936 ownership.",
       "affected_owner_tags": [
+        "JAP",
         "MAN"
       ],
       "affected_feature_ids": [
@@ -889,6 +893,7 @@
         "CN_CITY_17275852B77637740681005",
         "CN_CITY_17275852B78610390708344",
         "CN_CITY_17275852B82032886612970",
+        "CN_CITY_17275852B82452317993245",
         "CN_CITY_17275852B82709828135465",
         "CN_CITY_17275852B83272093468807",
         "CN_CITY_17275852B83634722552305",
@@ -1864,10 +1869,10 @@
     },
     "FRA": {
       "display_name": "France",
-      "feature_count": 719,
+      "feature_count": 740,
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 399,
+        "approx_existing_geometry": 420,
         "direct_country_copy": 320
       },
       "base_iso2": "FR",
@@ -2256,11 +2261,11 @@
     },
     "JAP": {
       "display_name": "Japan",
-      "feature_count": 96,
+      "feature_count": 97,
       "quality": "manual_reviewed",
       "quality_breakdown": {
         "direct_country_copy": 47,
-        "manual_reviewed": 49
+        "manual_reviewed": 50
       },
       "base_iso2": "JP",
       "lookup_iso2": "JP",
@@ -2273,7 +2278,8 @@
       "historical_fidelity": "vanilla",
       "primary_rule_source": "japan_korea_taiwan",
       "rule_sources": [
-        "japan_korea_taiwan"
+        "japan_korea_taiwan",
+        "jidong_japanese_occupation"
       ],
       "source_types": [
         "hoi4_owner"
@@ -2346,31 +2352,6 @@
       "synthetic_owner": false,
       "continent_label": "Europe",
       "subregion_label": "Northern Europe",
-      "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla",
-      "primary_rule_source": "",
-      "rule_sources": [],
-      "source_types": [
-        "hoi4_owner"
-      ],
-      "historical_fidelity_summary": [
-        "vanilla"
-      ]
-    },
-    "LEB": {
-      "display_name": "Lebanon",
-      "feature_count": 6,
-      "quality": "direct_country_copy",
-      "quality_breakdown": {
-        "direct_country_copy": 6
-      },
-      "base_iso2": "LB",
-      "lookup_iso2": "LB",
-      "provenance_iso2": "LB",
-      "scenario_only": false,
-      "synthetic_owner": false,
-      "continent_label": "Asia",
-      "subregion_label": "Western Asia",
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
       "primary_rule_source": "",
@@ -2517,10 +2498,10 @@
     },
     "MAN": {
       "display_name": "Manchukuo",
-      "feature_count": 235,
+      "feature_count": 234,
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 235
+        "manual_reviewed": 234
       },
       "base_iso2": "CN",
       "lookup_iso2": "CN",
@@ -2899,11 +2880,11 @@
     },
     "POL": {
       "display_name": "Poland",
-      "feature_count": 377,
+      "feature_count": 378,
       "quality": "manual_reviewed",
       "quality_breakdown": {
         "direct_country_copy": 282,
-        "manual_reviewed": 95
+        "manual_reviewed": 96
       },
       "base_iso2": "PL",
       "lookup_iso2": "PL",
@@ -3246,10 +3227,10 @@
     },
     "SOV": {
       "display_name": "Soviet Union",
-      "feature_count": 2291,
+      "feature_count": 2290,
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 2291
+        "manual_reviewed": 2290
       },
       "base_iso2": "RU",
       "lookup_iso2": "RU",
@@ -3345,31 +3326,6 @@
       "rule_sources": [
         "swiss_liechtenstein"
       ],
-      "source_types": [
-        "hoi4_owner"
-      ],
-      "historical_fidelity_summary": [
-        "vanilla"
-      ]
-    },
-    "SYR": {
-      "display_name": "Syria",
-      "feature_count": 15,
-      "quality": "direct_country_copy",
-      "quality_breakdown": {
-        "direct_country_copy": 15
-      },
-      "base_iso2": "SY",
-      "lookup_iso2": "SY",
-      "provenance_iso2": "SY",
-      "scenario_only": false,
-      "synthetic_owner": false,
-      "continent_label": "Asia",
-      "subregion_label": "Western Asia",
-      "source_type": "hoi4_owner",
-      "historical_fidelity": "vanilla",
-      "primary_rule_source": "",
-      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],
@@ -18582,12 +18538,12 @@
       "country_code": "CN",
       "feature_name": "Jidongxian",
       "from_tag": "CHI",
-      "to_tag": "MAN",
+      "to_tag": "JAP",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "manchukuo",
+      "rule_id": "jidong_japanese_occupation",
       "critical": true,
-      "notes": "Manchukuo using northeastern China groupings plus the eastern Inner Mongolian and Jehol/Rehe frontier that belonged to MAN in HOI4 1936.",
+      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
       "synthetic_owner": false
     },
     {
@@ -34578,6 +34534,84 @@
       "rule_id": "french_indochina",
       "critical": false,
       "notes": "French colonial approximation across Indochina.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "LBN-3022",
+      "country_code": "LB",
+      "feature_name": "Beqaa",
+      "from_tag": "LEB",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "LBN-3023",
+      "country_code": "LB",
+      "feature_name": "North Lebanon",
+      "from_tag": "LEB",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "LBN-3024",
+      "country_code": "LB",
+      "feature_name": "Beirut",
+      "from_tag": "LEB",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "LBN-3025",
+      "country_code": "LB",
+      "feature_name": "Mount Lebanon",
+      "from_tag": "LEB",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "LBN-3059",
+      "country_code": "LB",
+      "feature_name": "An Nabatiyah",
+      "from_tag": "LEB",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "LBN-3060",
+      "country_code": "LB",
+      "feature_name": "South Lebanon",
+      "from_tag": "LEB",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
       "synthetic_owner": false
     },
     {
@@ -59437,6 +59471,201 @@
       "synthetic_owner": false
     },
     {
+      "feature_id": "SYR-134",
+      "country_code": "SY",
+      "feature_name": "Lattakia",
+      "from_tag": "SYR",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SYR-135",
+      "country_code": "SY",
+      "feature_name": "Tartus",
+      "from_tag": "SYR",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SYR-136",
+      "country_code": "SY",
+      "feature_name": "Ar Raqqah",
+      "from_tag": "SYR",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SYR-137",
+      "country_code": "SY",
+      "feature_name": "Aleppo",
+      "from_tag": "SYR",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SYR-138",
+      "country_code": "SY",
+      "feature_name": "Hamah",
+      "from_tag": "SYR",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SYR-139",
+      "country_code": "SY",
+      "feature_name": "Homs (Hims)",
+      "from_tag": "SYR",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SYR-140",
+      "country_code": "SY",
+      "feature_name": "Idlib",
+      "from_tag": "SYR",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SYR-141",
+      "country_code": "SY",
+      "feature_name": "Hasaka (Al Haksa)",
+      "from_tag": "SYR",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SYR-142",
+      "country_code": "SY",
+      "feature_name": "Dayr Az Zawr",
+      "from_tag": "SYR",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SYR-143",
+      "country_code": "SY",
+      "feature_name": "As Suwayda'",
+      "from_tag": "SYR",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SYR-144",
+      "country_code": "SY",
+      "feature_name": "Rif Dimashq",
+      "from_tag": "SYR",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SYR-145",
+      "country_code": "SY",
+      "feature_name": "Quneitra",
+      "from_tag": "SYR",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SYR-146",
+      "country_code": "SY",
+      "feature_name": "Dar`a",
+      "from_tag": "SYR",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SYR-4843",
+      "country_code": "SY",
+      "feature_name": "Damascus",
+      "from_tag": "SYR",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SYR-5261",
+      "country_code": "SY",
+      "feature_name": "UNDOF",
+      "from_tag": "SYR",
+      "to_tag": "FRA",
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "rule_id": "french_colonies",
+      "critical": false,
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "synthetic_owner": false
+    },
+    {
       "feature_id": "TJK-366",
       "country_code": "TJ",
       "feature_name": "Gorno-Badakhshan",
@@ -78798,12 +79027,12 @@
       "country_code": "BY",
       "feature_name": "Western Vitebsk Kresy",
       "from_tag": "BLR",
-      "to_tag": "POL",
+      "to_tag": "SOV",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "poland_kresy_1936",
+      "rule_id": "soviet_union",
       "critical": true,
-      "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
+      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "synthetic_owner": false
     },
     {
@@ -78889,12 +79118,12 @@
       "country_code": "BY",
       "feature_name": "Braslaw",
       "from_tag": "BLR",
-      "to_tag": "SOV",
+      "to_tag": "POL",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "soviet_union",
+      "rule_id": "poland_kresy_1936",
       "critical": true,
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
+      "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
       "synthetic_owner": false
     },
     {
@@ -78967,12 +79196,12 @@
       "country_code": "BY",
       "feature_name": "Pastavy",
       "from_tag": "BLR",
-      "to_tag": "SOV",
+      "to_tag": "POL",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "soviet_union",
+      "rule_id": "poland_kresy_1936",
       "critical": true,
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
+      "notes": "Eastern Polish territories before 1939 partition, approximated with western Belarus and western Ukraine while leaving the Vilnius project override to Lithuania.",
       "synthetic_owner": false
     },
     {
