@@ -44,6 +44,11 @@
             <select id="scenarioSelect" class="select-input mt-2">
               <option value="">None</option>
             </select>
+            <label id="lblScenarioViewMode" class="section-header-block mt-3" for="scenarioViewModeSelect">View</label>
+            <select id="scenarioViewModeSelect" class="select-input mt-2 hidden" disabled>
+              <option value="ownership">Ownership</option>
+              <option value="frontline">Frontline</option>
+            </select>
             <div class="parent-border-actions mt-3">
               <button id="applyScenarioBtn" type="button" class="btn-secondary">Apply</button>
               <button id="resetScenarioBtn" type="button" class="btn-secondary hidden" disabled>Reset Changes To Baseline</button>

@@ -32,6 +32,7 @@ class StateRecord:
     state_id: int
     file_name: str
     owner_tag: str
+    controller_tag: str
     core_tags: list[str]
     province_ids: list[int]
     state_category: str

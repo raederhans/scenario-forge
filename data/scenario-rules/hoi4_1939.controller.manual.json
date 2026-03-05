@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "scenario_id": "hoi4_1939",
+  "palette_id": "hoi4_vanilla",
+  "rules": [
+    {
+      "rule_id": "1939_frontline_hebei_chahar_mengjiang_control",
+      "owner_tag": "MEN",
+      "priority": 1000,
+      "quality": "manual_reviewed",
+      "critical": true,
+      "notes": "1939 Hebei-Chahar frontline represented as Mengjiang field control over selected corridor features.",
+      "include_feature_ids": [
+        "CN_CITY_17275852B74586174185496",
+        "CN_CITY_17275852B28404307874661",
+        "CN_CITY_17275852B92392502748538",
+        "CN_CITY_17275852B15523465043405",
+        "CN_CITY_17275852B37803356904979",
+        "CN_CITY_17275852B22182624504514"
+      ],
+      "base_iso2": "CN"
+    },
+    {
+      "rule_id": "1939_frontline_hainan_japanese_control",
+      "owner_tag": "JAP",
+      "priority": 1001,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "Hainan represented as Japanese-controlled frontline zone in 1939 opening.",
+      "include_hierarchy_group_ids": ["CN_Hainan"],
+      "base_iso2": "JP"
+    },
+    {
+      "rule_id": "1939_frontline_jidong_bridgehead",
+      "owner_tag": "JAP",
+      "priority": 1002,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "Northern Hebei bridgehead around Jidong remains under Japanese operational control.",
+      "include_feature_ids": [
+        "CN_CITY_17275852B84296108244083",
+        "CN_CITY_17275852B23021356422447",
+        "CN_CITY_17275852B71122715185286",
+        "CN_CITY_17275852B35450332359336",
+        "CN_CITY_17275852B62534367670886",
+        "CN_CITY_17275852B79805983057899",
+        "CN_CITY_17275852B84472681161194",
+        "CN_CITY_17275852B32842590404417",
+        "CN_CITY_17275852B94774630505431",
+        "CN_CITY_17275852B31900972836749",
+        "CN_CITY_17275852B88151757349593",
+        "CN_CITY_17275852B56182979447767",
+        "CN_CITY_17275852B69801287390069",
+        "CN_CITY_17275852B26763632681669",
+        "CN_CITY_17275852B4344290320214",
+        "CN_CITY_17275852B9681816955607",
+        "CN_CITY_17275852B36714320356801",
+        "CN_CITY_17275852B89036303488164"
+      ],
+      "base_iso2": "JP"
+    }
+  ]
+}

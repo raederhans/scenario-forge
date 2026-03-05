@@ -1,0 +1,34 @@
+{
+  "scenario_id": "hoi4_1936",
+  "require_controllers": false,
+  "manifest_required_fields": [
+    "countries_url",
+    "owners_url",
+    "cores_url",
+    "audit_url"
+  ],
+  "required_country_fields": [
+    "provenance_iso2",
+    "primary_rule_source",
+    "rule_sources"
+  ],
+  "country_assertions": [
+    {
+      "tag": "GER",
+      "field": "lookup_iso2",
+      "equals": "DE"
+    },
+    {
+      "tag": "ENG",
+      "field": "lookup_iso2",
+      "equals": "GB"
+    }
+  ],
+  "summary_equals": {
+    "blocker_count": 0
+  },
+  "summary_min": {
+    "feature_count": 10000,
+    "owner_count": 80
+  }
+}

@@ -10,6 +10,7 @@ import {
   applyScenarioById,
   clearActiveScenario,
   loadScenarioAuditPayload,
+  setScenarioViewMode,
   validateImportedScenarioBaseline,
 } from "../core/scenario_manager.js";
 import { t } from "./i18n.js";
@@ -2247,6 +2248,10 @@ function initSidebar({ render } = {}) {
             renderNow: false,
             markDirtyReason: "",
             showToastOnComplete: false,
+          });
+          setScenarioViewMode(data.scenario.viewMode || "ownership", {
+            renderNow: false,
+            markDirtyReason: "",
           });
         } else if (state.activeScenarioId) {
           clearActiveScenario({

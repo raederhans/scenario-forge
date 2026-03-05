@@ -373,6 +373,9 @@ function initToolbar({ render } = {}) {
     const modeLabel = String(state.paintMode || "visual") === "sovereignty"
       ? t("Sovereignty", "ui")
       : t("Visual", "ui");
+    const scenarioViewLabel = String(state.scenarioViewMode || "ownership") === "frontline"
+      ? t("Frontline", "ui")
+      : t("Ownership", "ui");
     scenarioContextBar.classList.toggle("is-scenario", !!activeScenario);
     scenarioContextBar.classList.toggle("is-collapsed", !!state.ui.scenarioBarCollapsed);
     if (scenarioContextScenarioText) {
@@ -381,7 +384,9 @@ function initToolbar({ render } = {}) {
         : `${t("Scenario", "ui")}: ${t("None", "ui")}`;
     }
     if (scenarioContextModeText) {
-      scenarioContextModeText.textContent = `${t("Mode", "ui")}: ${modeLabel}`;
+      scenarioContextModeText.textContent = activeScenario
+        ? `${t("Mode", "ui")}: ${modeLabel} · ${t("View", "ui")}: ${scenarioViewLabel}`
+        : `${t("Mode", "ui")}: ${modeLabel}`;
     }
     if (scenarioContextActiveText) {
       scenarioContextActiveText.textContent = activeCode

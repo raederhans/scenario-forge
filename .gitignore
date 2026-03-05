@@ -28,6 +28,11 @@ data/geoBoundaries-*.geojson
 # Browser MCP runtime artifacts
 .mcp-artifacts/
 .playwright-cli/
+.agents/
+
+# Local Codex/runtime lock files
+skills-lock.json
+.tmp_*.js
 
 # Local server logs
 http_server_*.log

@@ -16,6 +16,7 @@ from .models import (
 
 
 TAG_RE = re.compile(r"[A-Z][A-Z0-9]{1,2}")
+DATE_BLOCK_RE = re.compile(r"\b(\d{1,4}(?:\.\d{1,2}){1,3})\s*=\s*\{")
 
 
 def normalize_tag(raw: object) -> str:
@@ -116,12 +117,108 @@ def _parse_int_list(raw: str) -> list[int]:
     return values
 
 
-def parse_state_file(path: Path) -> StateRecord | None:
+def _parse_date_key(raw: object) -> tuple[int, int, int, int] | None:
+    tokens = [token for token in str(raw or "").strip().split(".") if token]
+    if not tokens:
+        return None
+    parts: list[int] = []
+    for token in tokens[:4]:
+        if not token.isdigit():
+            return None
+        parts.append(int(token))
+    while len(parts) < 4:
+        parts.append(0)
+    # year, month, day, hour
+    year = max(parts[0], 0)
+    month = min(max(parts[1], 0), 12)
+    day = min(max(parts[2], 0), 31)
+    hour = min(max(parts[3], 0), 24)
+    return (year, month, day, hour)
+
+
+def _find_matching_brace(text: str, open_index: int) -> int:
+    if open_index < 0 or open_index >= len(text) or text[open_index] != "{":
+        return -1
+    depth = 0
+    for index in range(open_index, len(text)):
+        char = text[index]
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                return index
+    return -1
+
+
+def _extract_assignment_block(text: str, key: str) -> str:
+    match = re.search(rf"\b{re.escape(key)}\s*=\s*\{{", text)
+    if not match:
+        return ""
+    open_index = text.find("{", match.start())
+    if open_index < 0:
+        return ""
+    close_index = _find_matching_brace(text, open_index)
+    if close_index <= open_index:
+        return ""
+    return text[open_index + 1 : close_index]
+
+
+def _strip_dated_blocks(text: str) -> str:
+    stripped = text
+    cursor = 0
+    while True:
+        match = DATE_BLOCK_RE.search(stripped, cursor)
+        if not match:
+            break
+        open_index = stripped.find("{", match.start())
+        if open_index < 0:
+            break
+        close_index = _find_matching_brace(stripped, open_index)
+        if close_index < 0:
+            break
+        stripped = f"{stripped[:match.start()]} {stripped[close_index + 1:]}"
+        cursor = match.start()
+    return stripped
+
+
+def _iter_dated_blocks(text: str) -> list[tuple[tuple[int, int, int, int], str]]:
+    blocks: list[tuple[tuple[int, int, int, int], str]] = []
+    cursor = 0
+    while True:
+        match = DATE_BLOCK_RE.search(text, cursor)
+        if not match:
+            break
+        date_key = _parse_date_key(match.group(1))
+        open_index = text.find("{", match.start())
+        if date_key is None or open_index < 0:
+            cursor = match.end()
+            continue
+        close_index = _find_matching_brace(text, open_index)
+        if close_index < 0:
+            break
+        body = text[open_index + 1 : close_index]
+        blocks.append((date_key, body))
+        cursor = close_index + 1
+    return blocks
+
+
+def _extract_tag_assignments(text: str, key: str) -> list[str]:
+    pattern = re.compile(rf"\b{re.escape(key)}\s*=\s*([A-Z0-9_]+)")
+    return [normalized for normalized in (normalize_tag(match) for match in pattern.findall(text)) if normalized]
+
+
+def parse_state_file(
+    path: Path,
+    *,
+    as_of_date: tuple[int, int, int, int] | str | None = None,
+) -> StateRecord | None:
     text = path.read_text(encoding="utf-8-sig", errors="ignore")
     state_id_match = re.search(r"\bid\s*=\s*(\d+)", text)
-    owner_match = re.search(r"\bhistory\s*=\s*\{.*?\bowner\s*=\s*([A-Z0-9_]+)", text, re.S)
+    history_block = _extract_assignment_block(text, "history")
+    owner_match = re.search(r"\bowner\s*=\s*([A-Z0-9_]+)", history_block)
+    controller_match = re.search(r"\bcontroller\s*=\s*([A-Z0-9_]+)", history_block)
     provinces_match = re.search(r"\bprovinces\s*=\s*\{([^}]*)\}", text, re.S)
-    cores = re.findall(r"\badd_core_of\s*=\s*([A-Z0-9_]+)", text)
     state_category = re.search(r"\bstate_category\s*=\s*([a-zA-Z0-9_]+)", text)
     manpower_match = re.search(r"\bmanpower\s*=\s*(\d+)", text)
     vp_blocks = re.findall(r"\bvictory_points\s*=\s*\{([^}]*)\}", text, re.S)
@@ -130,11 +227,43 @@ def parse_state_file(path: Path) -> StateRecord | None:
         victory_points.extend(_parse_int_list(block))
     if not state_id_match or not owner_match:
         return None
+
+    resolved_as_of = (
+        _parse_date_key(as_of_date)
+        if isinstance(as_of_date, str)
+        else as_of_date
+    )
+
+    owner_tag = normalize_tag(owner_match.group(1))
+    controller_tag = normalize_tag(controller_match.group(1) if controller_match else "") or owner_tag
+    base_history = _strip_dated_blocks(history_block)
+    core_tags: set[str] = set(_extract_tag_assignments(base_history, "add_core_of"))
+    for removed_tag in _extract_tag_assignments(base_history, "remove_core_of"):
+        core_tags.discard(removed_tag)
+
+    if resolved_as_of is not None:
+        for block_date, block_body in _iter_dated_blocks(history_block):
+            if block_date > resolved_as_of:
+                continue
+            block_owner_match = re.search(r"\bowner\s*=\s*([A-Z0-9_]+)", block_body)
+            if block_owner_match:
+                owner_tag = normalize_tag(block_owner_match.group(1))
+            block_controller_match = re.search(r"\bcontroller\s*=\s*([A-Z0-9_]+)", block_body)
+            if block_controller_match:
+                controller_tag = normalize_tag(block_controller_match.group(1)) or owner_tag
+            for added_tag in _extract_tag_assignments(block_body, "add_core_of"):
+                core_tags.add(added_tag)
+            for removed_tag in _extract_tag_assignments(block_body, "remove_core_of"):
+                core_tags.discard(removed_tag)
+
+    controller_tag = controller_tag or owner_tag
+
     return StateRecord(
         state_id=int(state_id_match.group(1)),
         file_name=path.name,
-        owner_tag=normalize_tag(owner_match.group(1)),
-        core_tags=[normalize_tag(tag) for tag in cores if normalize_tag(tag)],
+        owner_tag=owner_tag,
+        controller_tag=controller_tag,
+        core_tags=sorted(core_tags),
         province_ids=_parse_int_list(provinces_match.group(1) if provinces_match else ""),
         state_category=state_category.group(1).strip() if state_category else "",
         manpower=int(manpower_match.group(1)) if manpower_match else None,
@@ -142,12 +271,17 @@ def parse_state_file(path: Path) -> StateRecord | None:
     )
 
 
-def parse_states(directory: Path) -> dict[int, StateRecord]:
+def parse_states(
+    directory: Path,
+    *,
+    as_of_date: tuple[int, int, int, int] | str | None = None,
+) -> dict[int, StateRecord]:
     records: dict[int, StateRecord] = {}
     if not directory.exists():
         return records
+    resolved_as_of = _parse_date_key(as_of_date) if isinstance(as_of_date, str) else as_of_date
     for path in sorted(directory.glob("*.txt")):
-        record = parse_state_file(path)
+        record = parse_state_file(path, as_of_date=resolved_as_of)
         if record:
             records[record.state_id] = record
     return records

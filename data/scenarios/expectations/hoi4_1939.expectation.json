@@ -1,0 +1,24 @@
+{
+  "scenario_id": "hoi4_1939",
+  "require_controllers": true,
+  "manifest_required_fields": [
+    "countries_url",
+    "owners_url",
+    "controllers_url",
+    "cores_url",
+    "audit_url"
+  ],
+  "required_country_fields": [
+    "provenance_iso2",
+    "primary_rule_source",
+    "rule_sources"
+  ],
+  "summary_equals": {
+    "blocker_count": 0
+  },
+  "summary_min": {
+    "feature_count": 10000,
+    "owner_count": 70,
+    "owner_controller_split_feature_count": 1
+  }
+}

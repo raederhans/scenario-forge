@@ -1,4 +1,4 @@
-import { countryNames, defaultCountryPalette, state } from "./state.js";
+﻿import { countryNames, defaultCountryPalette, state } from "./state.js";
 import { ensureSovereigntyState, resetAllFeatureOwnersToCanonical } from "./sovereignty_manager.js";
 import { recomputeDynamicBordersNow, refreshColorState, setMapData } from "./map_renderer.js";
 import { loadDeferredDetailBundle } from "./data_loader.js";
@@ -22,6 +22,25 @@ function cacheBust(url) {
 
 function normalizeScenarioId(value) {
   return String(value || "").trim();
+}
+
+function normalizeScenarioViewMode(value) {
+  return String(value || "").trim().toLowerCase() === "frontline" ? "frontline" : "ownership";
+}
+
+function getScenarioDisplayOwnerByFeatureId(featureId, { fallbackOwner = "" } = {}) {
+  const normalizedId = String(featureId || "").trim();
+  if (!normalizedId) return String(fallbackOwner || "").trim().toUpperCase();
+  const fallback = String(fallbackOwner || "").trim().toUpperCase();
+  if (!state.activeScenarioId || normalizeScenarioViewMode(state.scenarioViewMode) !== "frontline") {
+    return fallback;
+  }
+  return String(
+    state.scenarioControllersByFeatureId?.[normalizedId]
+    || fallback
+    || state.sovereigntyByFeatureId?.[normalizedId]
+    || ""
+  ).trim().toUpperCase();
 }
 
 function getScenarioRegistryEntries() {
@@ -161,9 +180,10 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     throw new Error("d3.json is not available for scenario loading.");
   }
   const manifest = await d3Client.json(cacheBust(meta.manifest_url));
-  const [countriesPayload, ownersPayload, coresPayload] = await Promise.all([
+  const [countriesPayload, ownersPayload, controllersPayload, coresPayload] = await Promise.all([
     d3Client.json(cacheBust(manifest.countries_url)),
     d3Client.json(cacheBust(manifest.owners_url)),
+    manifest.controllers_url ? d3Client.json(cacheBust(manifest.controllers_url)) : Promise.resolve(null),
     d3Client.json(cacheBust(manifest.cores_url)),
   ]);
   const bundle = {
@@ -171,13 +191,15 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     manifest,
     countriesPayload,
     ownersPayload,
+    controllersPayload,
     coresPayload,
     auditPayload: null,
   };
   const ownerCount = Object.keys(ownersPayload?.owners || {}).length;
+  const controllerCount = Object.keys(controllersPayload?.controllers || {}).length;
   const countryCount = Object.keys(countriesPayload?.countries || {}).length;
   console.log(
-    `[scenario] Loaded bundle "${targetId}": ${ownerCount} owner entries, ${countryCount} countries, baseline=${String(manifest?.baseline_hash || "").slice(0, 12)}`
+    `[scenario] Loaded bundle "${targetId}": ${ownerCount} owner entries, ${controllerCount} controller entries, ${countryCount} countries, baseline=${String(manifest?.baseline_hash || "").slice(0, 12)}`
   );
   state.scenarioBundleCacheById[targetId] = bundle;
   return bundle;
@@ -320,6 +342,31 @@ function syncCountryUi({ renderNow = false } = {}) {
   }
 }
 
+function setScenarioViewMode(
+  viewMode,
+  {
+    renderNow = true,
+    markDirtyReason = "",
+  } = {}
+) {
+  const nextMode = normalizeScenarioViewMode(viewMode);
+  if (!state.activeScenarioId) {
+    state.scenarioViewMode = "ownership";
+    return false;
+  }
+  if (state.scenarioViewMode === nextMode) {
+    return false;
+  }
+  state.scenarioViewMode = nextMode;
+  if (markDirtyReason) {
+    markDirty(markDirtyReason);
+  }
+  refreshColorState({ renderNow: false });
+  recomputeDynamicBordersNow({ renderNow: false, reason: `scenario-view:${nextMode}` });
+  syncCountryUi({ renderNow });
+  return true;
+}
+
 async function ensureScenarioDetailTopologyLoaded() {
   if (!state.detailDeferred || state.detailPromotionCompleted || state.detailPromotionInFlight) {
     return false;
@@ -408,6 +455,7 @@ async function applyScenarioBundle(
   const scenarioId = normalizeScenarioId(bundle.manifest.scenario_id || bundle.meta?.scenario_id);
   const baseCountryMap = bundle.countriesPayload?.countries || {};
   const owners = bundle.ownersPayload?.owners || {};
+  const controllers = bundle.controllersPayload?.controllers || owners;
   const cores = bundle.coresPayload?.cores || {};
   const defaultCountryCode = getScenarioDefaultCountryCode(bundle.manifest, baseCountryMap);
   disableScenarioParentBorders();
@@ -438,7 +486,11 @@ async function applyScenarioBundle(
   });
   state.scenarioBaselineHash = getScenarioBaselineHashFromBundle(bundle);
   state.scenarioBaselineOwnersByFeatureId = { ...owners };
+  state.scenarioControllersByFeatureId = { ...controllers };
+  state.scenarioBaselineControllersByFeatureId = { ...controllers };
   state.scenarioBaselineCoresByFeatureId = { ...cores };
+  state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
+  state.scenarioViewMode = "ownership";
   state.countryNames = {
     ...countryNames,
     ...scenarioNameMap,
@@ -458,9 +510,10 @@ async function applyScenarioBundle(
   const spotChecks = ["SYR-134", "LBN-3022", "BY_HIST_POL_VITEBSK_WEST", "CN_CITY_17275852B32842590404417"];
   spotChecks.forEach((fid) => {
     const owner = state.sovereigntyByFeatureId[fid];
+    const controller = state.scenarioControllersByFeatureId?.[fid] || owner;
     if (owner) {
       const color = scenarioColorMap[owner] || "(no color)";
-      console.log(`[scenario] Spot-check: ${fid} → owner=${owner}, color=${color}`);
+      console.log(`[scenario] Spot-check: ${fid} -> owner=${owner}, controller=${controller}, color=${color}`);
     }
   });
 
@@ -522,6 +575,9 @@ function resetToScenarioBaseline(
     : new Set();
   const previousInspectorExpansionInitialized = !!state.inspectorExpansionInitialized;
   state.sovereigntyByFeatureId = { ...(state.scenarioBaselineOwnersByFeatureId || {}) };
+  state.scenarioControllersByFeatureId = { ...(state.scenarioBaselineControllersByFeatureId || {}) };
+  state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
+  state.scenarioViewMode = "ownership";
   state.sovereigntyInitialized = false;
   ensureSovereigntyState({ force: true });
   state.visualOverrides = {};
@@ -588,7 +644,11 @@ function clearActiveScenario(
   });
   state.scenarioBaselineHash = "";
   state.scenarioBaselineOwnersByFeatureId = {};
+  state.scenarioControllersByFeatureId = {};
+  state.scenarioBaselineControllersByFeatureId = {};
   state.scenarioBaselineCoresByFeatureId = {};
+  state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
+  state.scenarioViewMode = "ownership";
   state.countryNames = { ...countryNames };
   resetAllFeatureOwnersToCanonical();
   state.visualOverrides = {};
@@ -621,7 +681,7 @@ function formatScenarioStatusText() {
   const summary = state.activeScenarioManifest.summary || {};
   const owners = Number(summary.owner_count || 0);
   const features = Number(summary.feature_count || 0);
-  return `${state.activeScenarioManifest.display_name || state.activeScenarioId} · ${owners} ${t("owners", "ui")} · ${features} ${t("features", "ui")}`;
+  return `${state.activeScenarioManifest.display_name || state.activeScenarioId} 路 ${owners} ${t("owners", "ui")} 路 ${features} ${t("features", "ui")}`;
 }
 
 function formatScenarioAuditText() {
@@ -649,8 +709,9 @@ function formatScenarioAuditText() {
     || Number(summary.synthetic_owner_feature_count)
     || 0
   }`);
+  hints.push(`${t("Split", "ui")}: ${Number(summary.owner_controller_split_feature_count || 0)}`);
   hints.push(`${t("Blockers", "ui")}: ${getScenarioBlockerCount(summary)}`);
-  return hints.join(" · ");
+  return hints.join(" 路 ");
 }
 
 function initScenarioManager({ render } = {}) {
@@ -660,6 +721,8 @@ function initScenarioManager({ render } = {}) {
   const clearScenarioBtn = document.getElementById("clearScenarioBtn");
   const scenarioStatus = document.getElementById("scenarioStatus");
   const scenarioAuditHint = document.getElementById("scenarioAuditHint");
+  const scenarioViewModeLabel = document.getElementById("lblScenarioViewMode");
+  const scenarioViewModeSelect = document.getElementById("scenarioViewModeSelect");
 
   const renderScenarioControls = () => {
     const entries = getScenarioRegistryEntries();
@@ -684,6 +747,18 @@ function initScenarioManager({ render } = {}) {
     }
     if (scenarioAuditHint) {
       scenarioAuditHint.textContent = formatScenarioAuditText();
+    }
+    if (scenarioViewModeSelect) {
+      const hasScenario = !!state.activeScenarioId;
+      const hasControllerData = Object.keys(state.scenarioControllersByFeatureId || {}).length > 0;
+      const hasSplit = Number(state.activeScenarioManifest?.summary?.owner_controller_split_feature_count || 0) > 0;
+      scenarioViewModeSelect.value = normalizeScenarioViewMode(state.scenarioViewMode);
+      scenarioViewModeSelect.disabled = !hasScenario || !hasControllerData;
+      scenarioViewModeSelect.classList.toggle("hidden", !hasScenario);
+      scenarioViewModeLabel?.classList.toggle("hidden", !hasScenario);
+      scenarioViewModeSelect.title = hasSplit
+        ? t("Toggle legal ownership vs frontline control.", "ui")
+        : t("No frontline control split in current scenario.", "ui");
     }
     if (resetScenarioBtn) {
       resetScenarioBtn.textContent = t("Reset Changes To Baseline", "ui");
@@ -711,6 +786,18 @@ function initScenarioManager({ render } = {}) {
       renderScenarioControls();
     });
     scenarioSelect.dataset.bound = "true";
+  }
+
+  if (scenarioViewModeSelect && !scenarioViewModeSelect.dataset.bound) {
+    scenarioViewModeSelect.addEventListener("change", (event) => {
+      const changed = setScenarioViewMode(event?.target?.value, {
+        renderNow: true,
+      });
+      if (changed) {
+        renderScenarioControls();
+      }
+    });
+    scenarioViewModeSelect.dataset.bound = "true";
   }
 
   if (applyScenarioBtn && !applyScenarioBtn.dataset.bound) {
@@ -785,10 +872,13 @@ export {
   applyScenarioBundle,
   applyScenarioById,
   clearActiveScenario,
+  getScenarioDisplayOwnerByFeatureId,
   initScenarioManager,
   loadScenarioAuditPayload,
   loadScenarioBundle,
   loadScenarioRegistry,
   resetToScenarioBaseline,
+  setScenarioViewMode,
   validateImportedScenarioBaseline,
 };
+

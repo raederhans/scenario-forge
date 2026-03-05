@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 
 from .crosswalk import (
     assign_feature_owners,
+    build_active_controller_tags,
     build_active_owner_tags,
     build_country_registry,
     build_feature_indexes,
@@ -949,6 +950,7 @@ def _build_scenario_rule_blockers(
     countries: dict[str, object],
     rules: list[object],
     critical_unresolved_count: int,
+    enforce_scenario_extensions: bool = True,
 ) -> list[dict[str, object]]:
     blockers: list[dict[str, object]] = []
 
@@ -992,37 +994,38 @@ def _build_scenario_rule_blockers(
             }
         )
 
-    scenario_extension_tags = {
-        str(rule.owner_tag).strip().upper()
-        for rule in rules
-        if getattr(rule, "source_type", "") == "scenario_extension"
-    }
-    for tag in sorted(scenario_extension_tags):
-        record = countries.get(tag)
-        if not record:
-            blockers.append(
-                {
-                    "blocker_id": f"missing_scenario_extension:{tag}",
-                    "kind": "missing_scenario_extension_country",
-                    "notes": f"Scenario extension `{tag}` does not appear in the final country registry.",
-                    "affected_owner_tags": [tag],
-                    "affected_feature_ids": [],
-                }
-            )
-            continue
-        if not record.display_name or not record.color_hex or record.feature_count <= 0:
-            blockers.append(
-                {
-                    "blocker_id": f"incomplete_scenario_extension:{tag}",
-                    "kind": "incomplete_scenario_extension_country",
-                    "notes": (
-                        f"Scenario extension `{tag}` is missing required metadata "
-                        f"(name/color/feature_count={record.feature_count})."
-                    ),
-                    "affected_owner_tags": [tag],
-                    "affected_feature_ids": [],
-                }
-            )
+    if enforce_scenario_extensions:
+        scenario_extension_tags = {
+            str(rule.owner_tag).strip().upper()
+            for rule in rules
+            if getattr(rule, "source_type", "") == "scenario_extension"
+        }
+        for tag in sorted(scenario_extension_tags):
+            record = countries.get(tag)
+            if not record:
+                blockers.append(
+                    {
+                        "blocker_id": f"missing_scenario_extension:{tag}",
+                        "kind": "missing_scenario_extension_country",
+                        "notes": f"Scenario extension `{tag}` does not appear in the final country registry.",
+                        "affected_owner_tags": [tag],
+                        "affected_feature_ids": [],
+                    }
+                )
+                continue
+            if not record.display_name or not record.color_hex or record.feature_count <= 0:
+                blockers.append(
+                    {
+                        "blocker_id": f"incomplete_scenario_extension:{tag}",
+                        "kind": "incomplete_scenario_extension_country",
+                        "notes": (
+                            f"Scenario extension `{tag}` is missing required metadata "
+                            f"(name/color/feature_count={record.feature_count})."
+                        ),
+                        "affected_owner_tags": [tag],
+                        "affected_feature_ids": [],
+                    }
+                )
 
     if critical_unresolved_count > 0:
         blockers.append(
@@ -1040,6 +1043,80 @@ def _build_scenario_rule_blockers(
     return blockers
 
 
+def _select_rule_target_ids(
+    *,
+    rule,
+    feature_by_id: dict[str, object],
+    ids_by_country: dict[str, set[str]],
+    ids_by_group: dict[str, set[str]],
+) -> set[str]:
+    selected: set[str] = set()
+    for code in getattr(rule, "include_country_codes", []) or []:
+        selected.update(ids_by_country.get(code, set()))
+    for group_id in getattr(rule, "include_hierarchy_group_ids", []) or []:
+        selected.update(ids_by_group.get(group_id, set()))
+    for feature_id in getattr(rule, "include_feature_ids", []) or []:
+        if feature_id in feature_by_id:
+            selected.add(feature_id)
+
+    excluded: set[str] = set()
+    for code in getattr(rule, "exclude_country_codes", []) or []:
+        excluded.update(ids_by_country.get(code, set()))
+    for group_id in getattr(rule, "exclude_hierarchy_group_ids", []) or []:
+        excluded.update(ids_by_group.get(group_id, set()))
+    for feature_id in getattr(rule, "exclude_feature_ids", []) or []:
+        if feature_id:
+            excluded.add(feature_id)
+
+    return {feature_id for feature_id in selected if feature_id in feature_by_id and feature_id not in excluded}
+
+
+def _build_controller_assignments(
+    *,
+    runtime_features: list[object],
+    hierarchy_groups: dict[str, list[str]],
+    owner_assignments: dict[str, str],
+    controller_rules: list[object],
+) -> tuple[dict[str, str], dict[str, list[str]]]:
+    controller_assignments = {feature.feature_id: owner_assignments.get(feature.feature_id, "") for feature in runtime_features}
+    feature_by_id, ids_by_country, ids_by_group = build_feature_indexes(runtime_features, hierarchy_groups)
+    diagnostics: dict[str, list[str]] = defaultdict(list)
+
+    for rule in sorted(controller_rules, key=lambda item: (item.priority, item.rule_id)):
+        missing_groups = [
+            group_id
+            for group_id in rule.include_hierarchy_group_ids + rule.exclude_hierarchy_group_ids
+            if group_id and group_id not in ids_by_group
+        ]
+        if missing_groups:
+            diagnostics["missing_rule_groups"].extend(
+                f"{rule.rule_id}:{group_id}" for group_id in sorted(set(missing_groups))
+            )
+        missing_feature_ids = [
+            feature_id
+            for feature_id in rule.include_feature_ids + rule.exclude_feature_ids
+            if feature_id and feature_id not in feature_by_id
+        ]
+        if missing_feature_ids:
+            diagnostics["missing_rule_feature_ids"].extend(
+                f"{rule.rule_id}:{feature_id}" for feature_id in sorted(set(missing_feature_ids))
+            )
+        target_ids = _select_rule_target_ids(
+            rule=rule,
+            feature_by_id=feature_by_id,
+            ids_by_country=ids_by_country,
+            ids_by_group=ids_by_group,
+        )
+        if not target_ids:
+            diagnostics["empty_rules"].append(rule.rule_id)
+            continue
+        for feature_id in target_ids:
+            controller_assignments[feature_id] = str(rule.owner_tag).strip().upper()
+
+    controller_assignments = {feature_id: owner_tag for feature_id, owner_tag in controller_assignments.items() if owner_tag}
+    return controller_assignments, diagnostics
+
+
 def compile_scenario_bundle(
     *,
     scenario_id: str,
@@ -1055,9 +1132,12 @@ def compile_scenario_bundle(
     palette_pack,
     palette_map,
     diagnostics,
+    controller_rules: list[object] | None = None,
 ) -> dict[str, object]:
     iso2_to_tag = build_iso2_to_mapped_tag(palette_map)
     active_owner_tags = build_active_owner_tags(states_by_id)
+    active_controller_tags = build_active_controller_tags(states_by_id)
+    controller_rules = list(controller_rules or [])
     assignments, crosswalk_diagnostics = assign_feature_owners(
         runtime_features=runtime_features,
         hierarchy_groups=hierarchy_groups,
@@ -1065,7 +1145,12 @@ def compile_scenario_bundle(
         iso2_to_tag=iso2_to_tag,
         active_owner_tags=active_owner_tags,
     )
-    diagnostics = {**diagnostics, **crosswalk_diagnostics}
+    diagnostics = {
+        **diagnostics,
+        **crosswalk_diagnostics,
+        "active_owner_tag_count": len(active_owner_tags),
+        "active_controller_tag_count": len(active_controller_tags),
+    }
 
     rule_lookup_by_owner: defaultdict[str, list] = defaultdict(list)
     for rule in rules:
@@ -1111,6 +1196,28 @@ def compile_scenario_bundle(
         },
     }
 
+    controllers_only, controller_rule_diagnostics = _build_controller_assignments(
+        runtime_features=runtime_features,
+        hierarchy_groups=hierarchy_groups,
+        owner_assignments=owners_only,
+        controller_rules=controller_rules,
+    )
+    diagnostics["controller_rule_diagnostics"] = controller_rule_diagnostics
+    controller_baseline_hash = _stable_json_hash(controllers_only)
+    controllers_payload = {
+        "version": 1,
+        "scenario_id": scenario_id,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "baseline_hash": controller_baseline_hash,
+        "owner_baseline_hash": baseline_hash,
+        "controllers": controllers_only,
+    }
+    owner_controller_split_feature_count = sum(
+        1
+        for feature_id, owner_tag in owners_only.items()
+        if controllers_only.get(feature_id, owner_tag) != owner_tag
+    )
+
     quality_counts = Counter(assignment.quality for assignment in assignments.values())
     source_counts = Counter(assignment.source for assignment in assignments.values())
     owner_feature_counts = Counter(assignment.owner_tag for assignment in assignments.values())
@@ -1137,6 +1244,22 @@ def compile_scenario_bundle(
                 "critical": assignment.critical,
                 "notes": assignment.notes,
                 "synthetic_owner": assignment.synthetic_owner,
+            }
+        )
+
+    controller_changes = []
+    for feature in runtime_features:
+        owner_tag = owners_only.get(feature.feature_id, "")
+        controller_tag = controllers_only.get(feature.feature_id, owner_tag)
+        if not owner_tag or controller_tag == owner_tag:
+            continue
+        controller_changes.append(
+            {
+                "feature_id": feature.feature_id,
+                "feature_name": feature.name,
+                "country_code": feature.country_code,
+                "owner_tag": owner_tag,
+                "controller_tag": controller_tag,
             }
         )
 
@@ -1202,13 +1325,19 @@ def compile_scenario_bundle(
         },
     }
 
-    region_checks, topology_blockers = _evaluate_region_checks(
-        runtime_features=runtime_features,
-        hierarchy_groups=hierarchy_groups,
-        assignments=assignments,
-    )
-    belarus_topology_summary = _build_belarus_topology_summary(runtime_features)
-    _append_belarus_topology_blockers(topology_blockers, belarus_topology_summary)
+    enable_region_checks = bool(diagnostics.get("enable_region_checks", scenario_id == "hoi4_1936"))
+    if enable_region_checks:
+        region_checks, topology_blockers = _evaluate_region_checks(
+            runtime_features=runtime_features,
+            hierarchy_groups=hierarchy_groups,
+            assignments=assignments,
+        )
+        belarus_topology_summary = _build_belarus_topology_summary(runtime_features)
+        _append_belarus_topology_blockers(topology_blockers, belarus_topology_summary)
+    else:
+        region_checks = {}
+        topology_blockers = []
+        belarus_topology_summary = {}
 
     critical_unresolved_count = sum(
         1
@@ -1220,6 +1349,9 @@ def compile_scenario_bundle(
         countries=countries,
         rules=rules,
         critical_unresolved_count=critical_unresolved_count,
+        enforce_scenario_extensions=bool(
+            diagnostics.get("enforce_scenario_extensions", scenario_id == "hoi4_1936")
+        ),
     )
     failed_region_check_count = sum(
         1 for check in region_checks.values() if str(check.get("status") or "") == "fail"
@@ -1228,6 +1360,7 @@ def compile_scenario_bundle(
     summary = {
         "feature_count": len(assignments),
         "owner_count": len(owner_feature_counts),
+        "controller_count": len({value for value in controllers_only.values() if value}),
         "quality_counts": dict(sorted(quality_counts.items())),
         "source_counts": dict(sorted(source_counts.items())),
         "approximate_count": quality_counts.get("approx_existing_geometry", 0),
@@ -1241,6 +1374,8 @@ def compile_scenario_bundle(
         "topology_blocker_count": len(topology_blockers),
         "scenario_rule_blocker_count": len(scenario_rule_blockers),
         "blocker_count": quality_counts.get("geometry_blocker", 0) + len(topology_blockers) + len(scenario_rule_blockers),
+        "owner_controller_split_feature_count": owner_controller_split_feature_count,
+        "controller_rule_count": len(controller_rules),
         "critical_region_check_count": len(region_checks),
         "manual_reviewed_region_count": len(region_checks),
         "belarus_hybrid_feature_count": int(belarus_topology_summary.get("total_feature_count", 0)),
@@ -1249,7 +1384,11 @@ def compile_scenario_bundle(
     critical_regions = [
         {
             "region_id": region_id,
-            "status": region_checks.get(region_id, {}).get("status", "fail"),
+            "status": (
+                "skipped"
+                if not enable_region_checks
+                else region_checks.get(region_id, {}).get("status", "fail")
+            ),
         }
         for region_id in CRITICAL_REGION_IDS
     ]
@@ -1269,6 +1408,7 @@ def compile_scenario_bundle(
         },
         "owner_stats": owner_stats,
         "feature_changes": feature_changes,
+        "controller_changes": controller_changes,
     }
 
     manifest_payload = {
@@ -1284,13 +1424,15 @@ def compile_scenario_bundle(
         "baseline_hash": baseline_hash,
         "countries_url": f"data/scenarios/{scenario_id}/countries.json",
         "owners_url": f"data/scenarios/{scenario_id}/owners.by_feature.json",
+        "controllers_url": f"data/scenarios/{scenario_id}/controllers.by_feature.json",
         "cores_url": f"data/scenarios/{scenario_id}/cores.by_feature.json",
         "audit_url": f"data/scenarios/{scenario_id}/audit.json",
         "summary": summary,
     }
 
     failure_reasons: list[str] = []
-    if failed_region_check_count > 0:
+    enforce_region_checks = bool(diagnostics.get("enforce_region_checks", scenario_id == "hoi4_1936"))
+    if failed_region_check_count > 0 and enforce_region_checks:
         failed_regions = [
             region_id
             for region_id, check in region_checks.items()
@@ -1317,6 +1459,7 @@ def compile_scenario_bundle(
         "manifest": manifest_payload,
         "countries": countries_payload,
         "owners": owners_payload,
+        "controllers": controllers_payload,
         "cores": cores_payload,
         "audit": audit_payload,
         "baseline_hash": baseline_hash,

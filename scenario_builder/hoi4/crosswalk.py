@@ -59,6 +59,19 @@ def build_active_owner_tags(states_by_id: dict[int, object]) -> set[str]:
     }
 
 
+def build_active_controller_tags(states_by_id: dict[int, object]) -> set[str]:
+    active_tags: set[str] = set()
+    for record in states_by_id.values():
+        controller_tag = str(getattr(record, "controller_tag", "") or "").strip().upper()
+        owner_tag = str(getattr(record, "owner_tag", "") or "").strip().upper()
+        if controller_tag:
+            active_tags.add(controller_tag)
+            continue
+        if owner_tag:
+            active_tags.add(owner_tag)
+    return active_tags
+
+
 def build_feature_indexes(
     runtime_features: list[RuntimeFeatureRecord],
     hierarchy_groups: dict[str, list[str]],

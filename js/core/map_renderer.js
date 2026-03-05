@@ -1043,13 +1043,26 @@ function scheduleRenderPhaseIdle() {
   }, RENDER_SETTLE_DURATION_MS);
 }
 
+function getDisplayOwnerCode(feature, id) {
+  const resolvedId = String(id || "").trim() || getFeatureId(feature);
+  const ownershipOwnerCode = getFeatureOwnerCode(resolvedId) || getFeatureCountryCodeNormalized(feature);
+  if (!state.activeScenarioId || String(state.scenarioViewMode || "ownership") !== "frontline") {
+    return ownershipOwnerCode;
+  }
+  return String(
+    state.scenarioControllersByFeatureId?.[resolvedId]
+    || ownershipOwnerCode
+    || ""
+  ).trim().toUpperCase();
+}
+
 function getResolvedFeatureColor(feature, id) {
   const direct =
     getSafeCanvasColor(state.visualOverrides?.[id], null) ||
     getSafeCanvasColor(state.featureOverrides?.[id], null);
   if (direct) return direct;
 
-  const ownerCode = getFeatureOwnerCode(id) || getFeatureCountryCodeNormalized(feature);
+  const ownerCode = getDisplayOwnerCode(feature, id);
   if (!ownerCode) return null;
 
   return (
@@ -1564,7 +1577,11 @@ function rebuildDynamicBorders() {
     return;
   }
   ensureSovereigntyState();
-  const nextHash = `rev:${Number(state.sovereigntyRevision) || 0}`;
+  const nextHash = [
+    `rev:${Number(state.sovereigntyRevision) || 0}`,
+    `mode:${state.activeScenarioId ? String(state.scenarioViewMode || "ownership") : "ownership"}`,
+    `ctrl:${Number(state.scenarioControllerRevision) || 0}`,
+  ].join("|");
   if (state.cachedDynamicBordersHash === nextHash && state.cachedDynamicOwnerBorders) {
     state.dynamicBordersDirty = false;
     state.dynamicBordersDirtyReason = "";
@@ -1573,7 +1590,12 @@ function rebuildDynamicBorders() {
   }
   state.cachedDynamicOwnerBorders = buildDynamicOwnerBorderMesh(
     state.runtimePoliticalTopology,
-    state.sovereigntyByFeatureId
+    {
+      ownershipByFeatureId: state.sovereigntyByFeatureId,
+      controllerByFeatureId: state.scenarioControllersByFeatureId,
+      scenarioActive: !!state.activeScenarioId,
+      viewMode: state.scenarioViewMode,
+    }
   );
   state.cachedDynamicBordersHash = nextHash;
   state.dynamicBordersDirty = false;
@@ -1639,19 +1661,33 @@ function getEntityCountryCode(entity) {
 function getEntityOwnerCode(entity) {
   const featureId = getEntityFeatureId(entity);
   if (!featureId) return "";
-  return getFeatureOwnerCode(featureId);
+  return getDisplayOwnerCode(asFeatureLike(entity), featureId);
 }
 
-function buildDynamicOwnerBorderMesh(runtimeTopology, sovereigntyByFeatureId) {
+function buildDynamicOwnerBorderMesh(runtimeTopology, ownershipContext) {
   const object = runtimeTopology?.objects?.political;
   if (!object || !globalThis.topojson) return null;
+  const ownershipByFeatureId = ownershipContext?.ownershipByFeatureId || {};
+  const controllerByFeatureId = ownershipContext?.controllerByFeatureId || {};
+  const scenarioActive = !!ownershipContext?.scenarioActive;
+  const useFrontline = scenarioActive && String(ownershipContext?.viewMode || "ownership") === "frontline";
   return globalThis.topojson.mesh(runtimeTopology, object, (a, b) => {
     if (!a || !b) return false;
     const idA = getEntityFeatureId(a);
     const idB = getEntityFeatureId(b);
     if (!idA || !idB) return false;
-    const ownerA = String(sovereigntyByFeatureId?.[idA] || getEntityCountryCode(a) || "").trim();
-    const ownerB = String(sovereigntyByFeatureId?.[idB] || getEntityCountryCode(b) || "").trim();
+    const ownerA = String(
+      (useFrontline ? controllerByFeatureId?.[idA] : "")
+      || ownershipByFeatureId?.[idA]
+      || getEntityCountryCode(a)
+      || ""
+    ).trim();
+    const ownerB = String(
+      (useFrontline ? controllerByFeatureId?.[idB] : "")
+      || ownershipByFeatureId?.[idB]
+      || getEntityCountryCode(b)
+      || ""
+    ).trim();
     return !!(ownerA && ownerB && ownerA !== ownerB);
   });
 }

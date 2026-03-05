@@ -1,0 +1,166 @@
+{
+  "version": 1,
+  "scenario_id": "hoi4_1939",
+  "palette_id": "hoi4_vanilla",
+  "state_delta_coverage": {
+    "baseline_as_of_date": "1936.1.1.12",
+    "target_as_of_date": "1939.8.14.12",
+    "enable_region_checks": false,
+    "enforce_region_checks": false,
+    "frontline_state_ids": [283, 591, 592, 593, 615, 621, 746, 753, 1033],
+    "covered_by_manual_rules": [4, 9, 44, 69, 70, 71, 72, 73, 74, 75, 152, 153, 188, 271, 664, 799, 805, 835, 836, 837, 838, 839, 840, 841, 842, 843, 848, 908, 934, 972, 975, 976, 992],
+    "covered_by_direct_mapping": []
+  },
+  "rules": [
+    {
+      "rule_id": "1939_germany_annexes_austria",
+      "owner_tag": "GER",
+      "priority": 900,
+      "quality": "manual_reviewed",
+      "critical": true,
+      "notes": "Anschluss: Austria and attached states are merged into Germany by 1939.",
+      "include_country_codes": ["AT"],
+      "base_iso2": "DE",
+      "display_name_override": "Germany"
+    },
+    {
+      "rule_id": "1939_germany_bohemia_moravia",
+      "owner_tag": "GER",
+      "priority": 901,
+      "quality": "manual_reviewed",
+      "critical": true,
+      "notes": "Bohemia and Moravia are represented as German-controlled Reich Protectorate space.",
+      "include_country_codes": ["CZ"],
+      "base_iso2": "DE",
+      "display_name_override": "Germany"
+    },
+    {
+      "rule_id": "1939_slovakia_puppet_state",
+      "owner_tag": "SLO",
+      "priority": 902,
+      "quality": "manual_reviewed",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "include_country_codes": ["SK"],
+      "base_iso2": "SK",
+      "display_name_override": "Slovakia"
+    },
+    {
+      "rule_id": "1939_hungary_southern_slovakia",
+      "owner_tag": "HUN",
+      "priority": 903,
+      "quality": "manual_reviewed",
+      "critical": true,
+      "notes": "Southern Slovak strip from the First Vienna Award.",
+      "include_feature_ids": ["SK021", "SK023"],
+      "base_iso2": "HU",
+      "display_name_override": "Hungary"
+    },
+    {
+      "rule_id": "1939_poland_zaolzie",
+      "owner_tag": "POL",
+      "priority": 904,
+      "quality": "manual_reviewed",
+      "critical": true,
+      "notes": "Zaolzie transfer to Poland before September 1939.",
+      "include_feature_ids": ["CZ080"],
+      "base_iso2": "PL",
+      "display_name_override": "Poland"
+    },
+    {
+      "rule_id": "1939_hungary_carpathian_ruthenia",
+      "owner_tag": "HUN",
+      "priority": 905,
+      "quality": "manual_reviewed",
+      "critical": true,
+      "notes": "Carpathian Ruthenia annexed by Hungary after Czechoslovakia breakup.",
+      "include_hierarchy_group_ids": ["UA_Zakarpattia"],
+      "base_iso2": "HU",
+      "display_name_override": "Hungary"
+    },
+    {
+      "rule_id": "1939_germany_memel",
+      "owner_tag": "GER",
+      "priority": 906,
+      "quality": "manual_reviewed",
+      "critical": true,
+      "notes": "Memel transfer to Germany in March 1939.",
+      "include_feature_ids": ["LT023"],
+      "base_iso2": "DE",
+      "display_name_override": "Germany"
+    },
+    {
+      "rule_id": "1939_italy_albania",
+      "owner_tag": "ITA",
+      "priority": 910,
+      "quality": "manual_reviewed",
+      "critical": true,
+      "notes": "Italian occupation and annexation of Albania by 1939.",
+      "include_country_codes": ["AL"],
+      "base_iso2": "IT",
+      "display_name_override": "Italy"
+    },
+    {
+      "rule_id": "1939_italy_ethiopia",
+      "owner_tag": "ITA",
+      "priority": 911,
+      "quality": "manual_reviewed",
+      "critical": true,
+      "notes": "Ethiopian theater outcome represented as Italian East Africa control baseline.",
+      "include_country_codes": ["ET"],
+      "base_iso2": "IT",
+      "display_name_override": "Italy"
+    },
+    {
+      "rule_id": "1939_turkey_hatay",
+      "owner_tag": "TUR",
+      "priority": 912,
+      "quality": "manual_reviewed",
+      "critical": true,
+      "notes": "Hatay transfer to Turkey shortly before scenario start.",
+      "include_feature_ids": ["SYR-134"],
+      "base_iso2": "TR",
+      "display_name_override": "Turkey"
+    },
+    {
+      "rule_id": "1939_britain_aden",
+      "owner_tag": "ENG",
+      "priority": 913,
+      "quality": "approx_existing_geometry",
+      "critical": false,
+      "notes": "Aden represented as British-controlled enclave in the 1939 setup.",
+      "include_feature_ids": ["YEM-3510"],
+      "base_iso2": "GB",
+      "display_name_override": "United Kingdom"
+    },
+    {
+      "rule_id": "1939_china_hainan_reintegration",
+      "owner_tag": "CHI",
+      "priority": 950,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "Hainan and Guangdong baseline moved back under Nationalist Chinese ownership.",
+      "include_hierarchy_group_ids": ["CN_Hainan", "CN_Guangdong"],
+      "base_iso2": "CN",
+      "display_name_override": "China"
+    },
+    {
+      "rule_id": "1939_hebei_chahar_owner_chi",
+      "owner_tag": "CHI",
+      "priority": 951,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "Hebei-Chahar legal ownership retained by Nationalist China while frontline controllers differ.",
+      "include_feature_ids": [
+        "CN_CITY_17275852B74586174185496",
+        "CN_CITY_17275852B28404307874661",
+        "CN_CITY_17275852B92392502748538",
+        "CN_CITY_17275852B15523465043405",
+        "CN_CITY_17275852B37803356904979",
+        "CN_CITY_17275852B22182624504514"
+      ],
+      "base_iso2": "CN",
+      "display_name_override": "China"
+    }
+  ]
+}

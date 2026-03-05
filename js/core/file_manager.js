@@ -42,6 +42,7 @@ class FileManager {
           id: appState.activeScenarioId,
           version: appState.activeScenarioManifest?.version || 1,
           baselineHash: appState.scenarioBaselineHash || "",
+          viewMode: String(appState.scenarioViewMode || "ownership"),
         }
         : null,
       timestamp: Date.now(),
@@ -144,6 +145,9 @@ class FileManager {
             id: String(data.scenario.id || "").trim(),
             version: Number(data.scenario.version || 1) || 1,
             baselineHash: String(data.scenario.baselineHash || "").trim(),
+            viewMode: String(data.scenario.viewMode || "ownership").trim().toLowerCase() === "frontline"
+              ? "frontline"
+              : "ownership",
           };
           if (!data.scenario.id) {
             data.scenario = null;

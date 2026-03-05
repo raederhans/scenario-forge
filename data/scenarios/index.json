@@ -7,6 +7,12 @@
       "display_name": "HOI4 1936",
       "manifest_url": "data/scenarios/hoi4_1936/manifest.json",
       "audit_url": "data/scenarios/hoi4_1936/audit.json"
+    },
+    {
+      "scenario_id": "hoi4_1939",
+      "display_name": "HOI4 1939",
+      "manifest_url": "data/scenarios/hoi4_1939/manifest.json",
+      "audit_url": "data/scenarios/hoi4_1939/audit.json"
     }
   ]
 }
