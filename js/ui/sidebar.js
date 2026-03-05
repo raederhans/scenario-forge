@@ -766,11 +766,15 @@ function initSidebar({ render } = {}) {
   const countryInspectorOrderingHint = document.getElementById("countryInspectorOrderingHint");
   const countryInspectorSection = document.getElementById("countryInspectorSection");
   const selectedCountryActionsSection = document.getElementById("selectedCountryActionsSection");
+  const projectLegendSection = document.getElementById("lblProjectLegend")?.closest("details");
+  const diagnosticsSection = document.getElementById("lblDiagnostics")?.closest("details");
   const selectedCountryActionsTitle = document.getElementById("lblHistoricalPresets");
   const selectedCountryActionHint = document.getElementById("selectedCountryActionHint");
 
   const updateScenarioInspectorLayout = () => {
     const isScenarioMode = !!state.activeScenarioId;
+    projectLegendSection?.classList.toggle("inspector-section-secondary", isScenarioMode);
+    diagnosticsSection?.classList.toggle("inspector-section-secondary", isScenarioMode);
     if (countryInspectorOrderingHint) {
       countryInspectorOrderingHint.classList.toggle("hidden", isScenarioMode);
     }
@@ -783,6 +787,10 @@ function initSidebar({ render } = {}) {
     }
     if (countryInspectorSection && isScenarioMode) {
       countryInspectorSection.open = true;
+    }
+    if (projectLegendSection && diagnosticsSection && isScenarioMode) {
+      projectLegendSection.open = false;
+      diagnosticsSection.open = false;
     }
     if (selectedCountryActionsTitle) {
       selectedCountryActionsTitle.textContent = isScenarioMode
@@ -797,16 +805,6 @@ function initSidebar({ render } = {}) {
           "ui"
         )
         : t("Choose a country above to inspect territories, presets, and releasables.", "ui");
-    }
-    const sidebarSections = countryInspectorSection?.parentElement || selectedCountryActionsSection?.parentElement;
-    if (sidebarSections && countryInspectorSection && selectedCountryActionsSection) {
-      if (isScenarioMode) {
-        if (selectedCountryActionsSection.nextElementSibling !== countryInspectorSection) {
-          sidebarSections.insertBefore(selectedCountryActionsSection, countryInspectorSection);
-        }
-      } else if (countryInspectorSection.nextElementSibling !== selectedCountryActionsSection) {
-        sidebarSections.insertBefore(countryInspectorSection, selectedCountryActionsSection);
-      }
     }
   };
 
@@ -1810,16 +1808,35 @@ function initSidebar({ render } = {}) {
       return;
     }
 
+    const disableForMissingActiveSovereign = (
+      String(state.paintMode || "visual") === "sovereignty" &&
+      !normalizeCountryCode(state.activeSovereignCode)
+    );
+
     presetEntries.forEach(({ preset, presetIndex }) => {
       const nameBtn = document.createElement("button");
       nameBtn.type = "button";
       nameBtn.className = "inspector-item-btn";
       nameBtn.textContent = preset.name;
+      nameBtn.disabled = disableForMissingActiveSovereign;
+      if (disableForMissingActiveSovereign) {
+        nameBtn.title = t("Set Active first to assign sovereignty.", "ui");
+      }
       nameBtn.addEventListener("click", () => {
         applyPreset(presetLookupCode, presetIndex, state.selectedColor, render);
       });
       container.appendChild(nameBtn);
     });
+  };
+
+  const renderNoActiveGuard = (container) => {
+    const needsGuard = (
+      String(state.paintMode || "visual") === "sovereignty" &&
+      !normalizeCountryCode(state.activeSovereignCode)
+    );
+    if (!needsGuard) return false;
+    container.appendChild(createEmptyNote(t("Set Active first to assign sovereignty.", "ui")));
+    return true;
   };
 
   const getFilteredRegionalPresets = (countryState) => {
@@ -1836,6 +1853,7 @@ function initSidebar({ render } = {}) {
   };
 
   const renderParentCountryActions = (container, countryState) => {
+    const actionGuarded = renderNoActiveGuard(container);
     const groupSection = appendActionSection(container, t("Hierarchy Groups", "ui"));
     if (countryState.hierarchyGroups.length > 0) {
       countryState.hierarchyGroups.forEach((group) => {
@@ -1843,6 +1861,10 @@ function initSidebar({ render } = {}) {
           t(group.label, "geo") || group.label,
           () => applyHierarchyGroup(group, state.selectedColor, render)
         );
+        button.disabled = actionGuarded;
+        if (actionGuarded) {
+          button.title = t("Set Active first to assign sovereignty.", "ui");
+        }
         groupSection.appendChild(button);
       });
     } else {
@@ -1940,6 +1962,8 @@ function initSidebar({ render } = {}) {
   const renderScenarioParentActions = (container, countryState) => {
     renderScenarioReleasableList(container, countryState);
 
+    const actionGuarded = renderNoActiveGuard(container);
+
     if (countryState.hierarchyGroups.length > 0) {
       const groupSection = appendActionSection(container, t("Hierarchy Groups", "ui"));
       countryState.hierarchyGroups.forEach((group) => {
@@ -1947,6 +1971,10 @@ function initSidebar({ render } = {}) {
           t(group.label, "geo") || group.label,
           () => applyHierarchyGroup(group, state.selectedColor, render)
         );
+        button.disabled = actionGuarded;
+        if (actionGuarded) {
+          button.title = t("Set Active first to assign sovereignty.", "ui");
+        }
         groupSection.appendChild(button);
       });
     }
@@ -1995,6 +2023,14 @@ function initSidebar({ render } = {}) {
     applyBtn.type = "button";
     applyBtn.className = "btn-primary";
     applyBtn.textContent = t("Apply Core Territory", "ui");
+    const actionGuarded = (
+      String(state.paintMode || "visual") === "sovereignty" &&
+      !normalizeCountryCode(state.activeSovereignCode)
+    );
+    applyBtn.disabled = actionGuarded;
+    if (actionGuarded) {
+      applyBtn.title = t("Set Active first to assign sovereignty.", "ui");
+    }
     applyBtn.addEventListener("click", () => {
       applyScenarioReleasableCoreTerritory(countryState, {
         source: "scenario-actions",
@@ -2008,6 +2044,7 @@ function initSidebar({ render } = {}) {
   };
 
   const renderScenarioReleasableActions = (container, countryState) => {
+    renderNoActiveGuard(container);
     renderScenarioCoreTerritoryAction(container, countryState);
     if (countryState.notes) {
       const notesSection = appendActionSection(container, t("Notes", "ui"));

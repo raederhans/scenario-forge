@@ -51,63 +51,99 @@
             <button id="clearScenarioBtn" type="button" class="btn-secondary mt-3 hidden" disabled>Exit Scenario</button>
           </div>
 
-          <div class="card">
-            <div id="lblEditingRules" class="section-header">Editing Rules</div>
-            <label id="lblPaintGranularity" class="section-header-block mt-3" for="paintGranularitySelect">Paint Granularity</label>
-            <select id="paintGranularitySelect" class="select-input mt-2">
-              <option id="optPaintSubdivision" value="subdivision">By Subdivision</option>
-              <option id="optPaintCountry" value="country">By Country</option>
-            </select>
-            <label id="lblPaintMeaning" class="section-header-block mt-3" for="paintModeSelect">Paint Meaning</label>
-            <select id="paintModeSelect" class="select-input mt-2">
-              <option id="optPaintMeaningVisual" value="visual">Visual</option>
-              <option id="optPaintMeaningSovereignty" value="sovereignty">Sovereignty</option>
-            </select>
-            <div id="labelActiveSovereign" class="section-header-block mt-3">Active Sovereign</div>
-            <div id="activeSovereignLabel" class="body-text mt-2">None selected</div>
-            <button id="recalculateBordersBtn" class="btn-secondary mt-3" type="button">Recalculate Borders</button>
-            <div id="dynamicBorderStatus" class="body-text mt-2">Borders up to date</div>
-          </div>
-
-          <details class="card">
-            <summary id="lblSpecialZoneEditor" class="section-header">Special Zone Editor</summary>
-            <div class="space-y-3 mt-4">
-              <div class="flex items-center justify-between gap-3">
-                <label id="lblSpecialZoneType" class="range-label" for="specialZoneTypeSelect">Type</label>
-                <select id="specialZoneTypeSelect" class="select-input">
-                  <option value="disputed">Disputed</option>
-                  <option value="wasteland">Wasteland</option>
-                  <option value="custom" selected>Custom</option>
-                </select>
+          <details class="card appearance-card" open>
+            <summary id="labelMapStyle" class="section-header">Appearance</summary>
+            <div class="appearance-toolbar mt-3">
+              <div class="appearance-tab-row" role="tablist" aria-label="Appearance sections">
+                <button
+                  id="appearanceTabOcean"
+                  type="button"
+                  class="appearance-tab-btn is-active"
+                  data-appearance-tab="ocean"
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="appearancePanelOcean"
+                >
+                  Ocean
+                </button>
+                <button
+                  id="appearanceTabBorders"
+                  type="button"
+                  class="appearance-tab-btn"
+                  data-appearance-tab="borders"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="appearancePanelBorders"
+                >
+                  Borders
+                </button>
+                <button
+                  id="appearanceTabLayers"
+                  type="button"
+                  class="appearance-tab-btn"
+                  data-appearance-tab="layers"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="appearancePanelLayers"
+                >
+                  Context Layers
+                </button>
+                <button
+                  id="appearanceTabTexture"
+                  type="button"
+                  class="appearance-tab-btn"
+                  data-appearance-tab="texture"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="appearancePanelTexture"
+                >
+                  Texture
+                </button>
               </div>
-              <div>
-                <label id="lblSpecialZoneLabel" class="range-label" for="specialZoneLabelInput">Label</label>
-                <input id="specialZoneLabelInput" type="text" class="input mt-2" placeholder="e.g. Buffer Zone A" />
-              </div>
-              <div class="parent-border-actions mt-2">
-                <button id="specialZoneStartBtn" type="button" class="btn-secondary">Start Draw</button>
-                <button id="specialZoneUndoBtn" type="button" class="btn-secondary">Undo Vertex</button>
-              </div>
-              <div class="parent-border-actions mt-2">
-                <button id="specialZoneFinishBtn" type="button" class="btn-secondary">Finish</button>
-                <button id="specialZoneCancelBtn" type="button" class="btn-secondary">Cancel</button>
-              </div>
-              <div>
-                <label id="lblSpecialZoneList" class="range-label" for="specialZoneFeatureList">Manual Zones</label>
-                <select id="specialZoneFeatureList" class="select-input mt-2"></select>
-              </div>
-              <button id="specialZoneDeleteBtn" type="button" class="btn-secondary mt-2">Delete Selected</button>
-              <div id="specialZoneEditorHint" class="parent-border-empty mt-2">
-                Click map to add vertices, double-click to finish.
+              <button id="appearanceSpecialZoneBtn" type="button" class="btn-secondary appearance-tool-btn">Special Zone Tool</button>
+            </div>
+            <div id="specialZonePopover" class="appearance-tool-popover hidden" role="dialog" aria-label="Special zone editor">
+              <div class="section-header" id="lblSpecialZoneEditor">Special Zone Editor</div>
+              <div class="space-y-3 mt-4">
+                <div class="flex items-center justify-between gap-3">
+                  <label id="lblSpecialZoneType" class="range-label" for="specialZoneTypeSelect">Type</label>
+                  <select id="specialZoneTypeSelect" class="select-input">
+                    <option value="disputed">Disputed</option>
+                    <option value="wasteland">Wasteland</option>
+                    <option value="custom" selected>Custom</option>
+                  </select>
+                </div>
+                <div>
+                  <label id="lblSpecialZoneLabel" class="range-label" for="specialZoneLabelInput">Label</label>
+                  <input id="specialZoneLabelInput" type="text" class="input mt-2" placeholder="e.g. Buffer Zone A" />
+                </div>
+                <div class="parent-border-actions mt-2">
+                  <button id="specialZoneStartBtn" type="button" class="btn-secondary">Start Draw</button>
+                  <button id="specialZoneUndoBtn" type="button" class="btn-secondary">Undo Vertex</button>
+                </div>
+                <div class="parent-border-actions mt-2">
+                  <button id="specialZoneFinishBtn" type="button" class="btn-secondary">Finish</button>
+                  <button id="specialZoneCancelBtn" type="button" class="btn-secondary">Cancel</button>
+                </div>
+                <div>
+                  <label id="lblSpecialZoneList" class="range-label" for="specialZoneFeatureList">Manual Zones</label>
+                  <select id="specialZoneFeatureList" class="select-input mt-2"></select>
+                </div>
+                <button id="specialZoneDeleteBtn" type="button" class="btn-secondary mt-2">Delete Selected</button>
+                <div id="specialZoneEditorHint" class="parent-border-empty mt-2">
+                  Click map to add vertices, double-click to finish.
+                </div>
               </div>
             </div>
-          </details>
-
-          <details class="card" open>
-            <summary id="labelMapStyle" class="section-header">Appearance</summary>
             <div class="appearance-stack mt-4">
-              <details class="card-flat appearance-subsection">
-                <summary id="lblOcean" class="section-header">Ocean</summary>
+              <section
+                id="appearancePanelOcean"
+                class="card-flat appearance-subsection appearance-tab-panel is-active"
+                data-appearance-panel="ocean"
+                role="tabpanel"
+                aria-labelledby="appearanceTabOcean"
+              >
+                <div id="lblOcean" class="section-header">Ocean</div>
                 <div class="space-y-3 mt-3">
                   <div class="flex items-center justify-between gap-3">
                     <label id="lblOceanFillColor" class="range-label" for="oceanFillColor">Fill Color</label>
@@ -146,10 +182,17 @@
                     <input id="oceanContourStrength" type="range" min="0" max="100" value="75" class="range-input" />
                   </div>
                 </div>
-              </details>
+              </section>
 
-              <details class="card-flat appearance-subsection">
-                <summary class="section-header">Borders</summary>
+              <section
+                id="appearancePanelBorders"
+                class="card-flat appearance-subsection appearance-tab-panel"
+                data-appearance-panel="borders"
+                role="tabpanel"
+                aria-labelledby="appearanceTabBorders"
+                hidden
+              >
+                <div class="section-header">Borders</div>
                 <div class="appearance-subsection-stack mt-3">
                   <details class="appearance-mini-section">
                     <summary class="section-header">Internal Borders</summary>
@@ -239,13 +282,22 @@
                         No supported countries in current dataset.
                       </div>
                       <div id="parentBorderCountryList" class="parent-border-country-list mt-2"></div>
+                      <button id="recalculateBordersBtn" class="btn-secondary mt-3" type="button">Recalculate Borders</button>
+                      <div id="dynamicBorderStatus" class="body-text mt-2">Borders up to date</div>
                     </div>
                   </details>
                 </div>
-              </details>
+              </section>
 
-              <details class="card-flat appearance-subsection">
-                <summary id="lblContextLayers" class="section-header">Context Layers</summary>
+              <section
+                id="appearancePanelLayers"
+                class="card-flat appearance-subsection appearance-tab-panel"
+                data-appearance-panel="layers"
+                role="tabpanel"
+                aria-labelledby="appearanceTabLayers"
+                hidden
+              >
+                <div id="lblContextLayers" class="section-header">Context Layers</div>
                 <div class="appearance-subsection-stack mt-3">
                   <details class="appearance-mini-section">
                     <summary class="section-header">Physical Regions</summary>
@@ -465,10 +517,17 @@
                     </div>
                   </details>
                 </div>
-              </details>
+              </section>
 
-              <details class="card-flat appearance-subsection">
-                <summary id="lblTexture" class="section-header">Texture</summary>
+              <section
+                id="appearancePanelTexture"
+                class="card-flat appearance-subsection appearance-tab-panel"
+                data-appearance-panel="texture"
+                role="tabpanel"
+                aria-labelledby="appearanceTabTexture"
+                hidden
+              >
+                <div id="lblTexture" class="section-header">Texture</div>
                 <div class="space-y-3 mt-3">
                   <div class="flex items-center justify-between">
                     <div id="lblTextureInfo" class="section-header">Texture Overlay</div>
@@ -585,7 +644,7 @@
                     </div>
                   </div>
                 </div>
-              </details>
+              </section>
             </div>
           </details>
 
@@ -616,6 +675,32 @@
           <div id="mapOnboardingHint" class="map-onboarding-hint">
             Click a region to start painting, or use Auto-Fill to color all countries
           </div>
+          <div id="scenarioContextBar" class="scenario-context-bar">
+            <button id="scenarioContextCollapseBtn" type="button" class="scenario-context-icon-btn" aria-label="Collapse scenario context">-</button>
+            <div class="scenario-context-item">
+              <span class="scenario-context-icon" aria-hidden="true">S</span>
+              <span id="scenarioContextScenarioText">Scenario: None</span>
+            </div>
+            <div class="scenario-context-item">
+              <span class="scenario-context-icon" aria-hidden="true">M</span>
+              <span id="scenarioContextModeText">Mode: Visual</span>
+            </div>
+            <div class="scenario-context-item">
+              <span class="scenario-context-icon" aria-hidden="true">A</span>
+              <span id="scenarioContextActiveText">Active: None</span>
+              <span id="activeSovereignLabel" class="hidden">None selected</span>
+            </div>
+            <button id="scenarioGuideBtn" type="button" class="scenario-context-icon-btn" aria-label="Show scenario guide">?</button>
+          </div>
+          <div id="scenarioGuidePopover" class="scenario-guide-popover hidden" role="dialog" aria-label="Scenario quick guide">
+            <div id="scenarioGuideTitle" class="section-header">Scenario Quick Start</div>
+            <ol class="scenario-guide-list mt-2">
+              <li id="scenarioGuideStepApply">Apply Scenario</li>
+              <li id="scenarioGuideStepSelect">Select a country in Inspector</li>
+              <li id="scenarioGuideStepActive">Set Active for sovereignty actions</li>
+              <li id="scenarioGuideStepApplyActions">Apply Core Territory or presets in Territories &amp; Presets</li>
+            </ol>
+          </div>
 
           <div id="toastViewport" class="toast-viewport" aria-live="polite" aria-atomic="false"></div>
 
@@ -627,6 +712,9 @@
           </div>
 
           <section id="bottomDock" class="bottom-dock" aria-label="Quick edit dock">
+            <div class="dock-header-row">
+              <button id="dockCollapseBtn" type="button" class="dock-collapse-btn" aria-label="Collapse quick dock">Collapse</button>
+            </div>
             <div class="bottom-dock-primary">
               <div class="dock-group dock-group-tools">
                 <div id="lblCurrentTool" class="dock-group-label">Tools</div>
@@ -655,6 +743,20 @@
                       <path d="m14 4 6 6-5.2 5.2a1.8 1.8 0 0 1-2.5 0l-3.5-3.5a1.8 1.8 0 0 1 0-2.5L14 4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
                     </svg>
                   </button>
+                </div>
+              </div>
+
+              <div class="dock-group dock-group-paint">
+                <div id="lblEditingRules" class="dock-group-label">Paint</div>
+                <div class="dock-paint-row">
+                  <select id="paintModeSelect" class="select-input dock-select">
+                    <option id="optPaintMeaningVisual" value="visual">Visual</option>
+                    <option id="optPaintMeaningSovereignty" value="sovereignty">Sovereignty</option>
+                  </select>
+                  <select id="paintGranularitySelect" class="select-input dock-select">
+                    <option id="optPaintSubdivision" value="subdivision">By Subdivision</option>
+                    <option id="optPaintCountry" value="country">By Country</option>
+                  </select>
                 </div>
               </div>
 
@@ -814,7 +916,7 @@
                 <div id="countryInspectorEmpty" class="inspector-empty-state">
                   <div id="countryInspectorEmptyTitle" class="section-header-block">Select a country to inspect</div>
                   <p id="countryInspectorEmptyHint" class="sidebar-tool-hint">
-                    Choose a country above to inspect its identity, territories, presets, and releasables.
+                    Choose a country above, then use Set Active and the Territories &amp; Presets panel.
                   </p>
                 </div>
                 <div id="countryInspectorSelected" class="hidden">

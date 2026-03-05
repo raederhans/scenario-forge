@@ -52,6 +52,10 @@
       "en": "Borders up to date",
       "zh": "边界已更新"
     },
+    "Choose a country above, then use Set Active and the Territories & Presets panel.": {
+      "en": "Choose a country above, then use Set Active and the Territories & Presets panel.",
+      "zh": "请先在上方选择国家，再使用“设为主权”和“领土与预设”面板。"
+    },
     "Brush": {
       "en": "Brush",
       "zh": "笔刷"
@@ -100,6 +104,10 @@
       "en": "Click map to add vertices, double-click to finish.",
       "zh": "单击地图添加顶点，双击完成。"
     },
+    "Collapse": {
+      "en": "Collapse",
+      "zh": "收起"
+    },
     "Clipboard unavailable": {
       "en": "Clipboard unavailable",
       "zh": "Clipboard unavailable"
@@ -111,6 +119,10 @@
     "Coastlines": {
       "en": "Coastlines",
       "zh": "海岸线"
+    },
+    "Expand": {
+      "en": "Expand",
+      "zh": "展开"
     },
     "Colonial predecessor": {
       "en": "Colonial predecessor",
@@ -735,6 +747,58 @@
     "Special Zone Editor": {
       "en": "Special Zone Editor",
       "zh": "特殊区域编辑器"
+    },
+    "Special Zone Tool": {
+      "en": "Special Zone Tool",
+      "zh": "特殊区域工具"
+    },
+    "Scenario: None": {
+      "en": "Scenario: None",
+      "zh": "剧本：无"
+    },
+    "Scenario loaded. 1) Select a country 2) Set Active 3) Apply Core/Presets.": {
+      "en": "Scenario loaded. 1) Select a country 2) Set Active 3) Apply Core/Presets.",
+      "zh": "剧本已加载：1）选国家 2）设为主权 3）应用核心领土/预设。"
+    },
+    "Mode: Visual": {
+      "en": "Mode: Visual",
+      "zh": "模式：视觉"
+    },
+    "Active: None": {
+      "en": "Active: None",
+      "zh": "主权：无"
+    },
+    "Set Active first to assign sovereignty.": {
+      "en": "Set Active first to assign sovereignty.",
+      "zh": "请先设置主权国，再执行主权分配。"
+    },
+    "Show guide": {
+      "en": "Show guide",
+      "zh": "显示引导"
+    },
+    "Hide guide": {
+      "en": "Hide guide",
+      "zh": "隐藏引导"
+    },
+    "Scenario Quick Start": {
+      "en": "Scenario Quick Start",
+      "zh": "剧本快速上手"
+    },
+    "Apply Scenario": {
+      "en": "Apply Scenario",
+      "zh": "应用剧本"
+    },
+    "Select a country in Inspector": {
+      "en": "Select a country in Inspector",
+      "zh": "在国家检查器中选择国家"
+    },
+    "Set Active for sovereignty actions": {
+      "en": "Set Active for sovereignty actions",
+      "zh": "主权操作前先设为主权国"
+    },
+    "Apply Core Territory or presets in Territories & Presets": {
+      "en": "Apply Core Territory or presets in Territories & Presets",
+      "zh": "在“领土与预设”中应用核心领土或预设"
     },
     "Split state": {
       "en": "Split state",

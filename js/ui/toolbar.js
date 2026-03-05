@@ -182,6 +182,7 @@ function initToolbar({ render } = {}) {
   const presetClear = document.getElementById("presetClear");
   const colorModeSelect = document.getElementById("colorModeSelect");
   const bottomDock = document.getElementById("bottomDock");
+  const dockCollapseBtn = document.getElementById("dockCollapseBtn");
   const mapContainer = document.getElementById("mapContainer");
   const selectedColorPreview = document.getElementById("selectedColorPreview");
   const undoBtn = document.getElementById("undoBtn");
@@ -193,6 +194,13 @@ function initToolbar({ render } = {}) {
   const zoomPercentInput = document.getElementById("zoomPercentInput");
   const toolHudChip = document.getElementById("toolHudChip");
   const mapOnboardingHint = document.getElementById("mapOnboardingHint");
+  const scenarioContextBar = document.getElementById("scenarioContextBar");
+  const scenarioContextCollapseBtn = document.getElementById("scenarioContextCollapseBtn");
+  const scenarioContextScenarioText = document.getElementById("scenarioContextScenarioText");
+  const scenarioContextModeText = document.getElementById("scenarioContextModeText");
+  const scenarioContextActiveText = document.getElementById("scenarioContextActiveText");
+  const scenarioGuideBtn = document.getElementById("scenarioGuideBtn");
+  const scenarioGuidePopover = document.getElementById("scenarioGuidePopover");
   const dockReferenceBtn = document.getElementById("dockReferenceBtn");
   const dockExportBtn = document.getElementById("dockExportBtn");
   const dockReferencePopover = document.getElementById("dockReferencePopover");
@@ -268,10 +276,143 @@ function initToolbar({ render } = {}) {
   const referenceScaleValue = document.getElementById("referenceScaleValue");
   const referenceOffsetXValue = document.getElementById("referenceOffsetXValue");
   const referenceOffsetYValue = document.getElementById("referenceOffsetYValue");
+  const appearanceTabButtons = Array.from(document.querySelectorAll("[data-appearance-tab]"));
+  const appearanceTabPanels = Array.from(document.querySelectorAll("[data-appearance-panel]"));
+  const appearanceSpecialZoneBtn = document.getElementById("appearanceSpecialZoneBtn");
+  const specialZonePopover = document.getElementById("specialZonePopover");
 
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
   let toolHudTimerId = null;
+  let scenarioGuideTimerId = null;
   let dockPopoverCloseBound = false;
+  if (!state.ui || typeof state.ui !== "object") {
+    state.ui = {};
+  }
+  state.ui.dockCollapsed = !!state.ui.dockCollapsed;
+  state.ui.scenarioBarCollapsed = !!state.ui.scenarioBarCollapsed;
+  state.ui.scenarioGuideDismissed = !!state.ui.scenarioGuideDismissed;
+
+  const updateDockCollapsedUi = () => {
+    if (!bottomDock) return;
+    bottomDock.classList.toggle("is-collapsed", !!state.ui.dockCollapsed);
+    if (dockCollapseBtn) {
+      dockCollapseBtn.textContent = state.ui.dockCollapsed ? t("Expand", "ui") : t("Collapse", "ui");
+      dockCollapseBtn.setAttribute("aria-pressed", state.ui.dockCollapsed ? "true" : "false");
+    }
+  };
+
+  const setAppearanceTab = (tabId) => {
+    const normalized = String(tabId || "").trim().toLowerCase();
+    const activeId = normalized || "ocean";
+    appearanceTabButtons.forEach((button) => {
+      const id = String(button.dataset.appearanceTab || "").trim().toLowerCase();
+      const isActive = id === activeId;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
+    appearanceTabPanels.forEach((panel) => {
+      const id = String(panel.dataset.appearancePanel || "").trim().toLowerCase();
+      const isActive = id === activeId;
+      panel.classList.toggle("is-active", isActive);
+      panel.hidden = !isActive;
+    });
+  };
+
+  const closeSpecialZonePopover = () => {
+    if (!specialZonePopover) return;
+    specialZonePopover.classList.add("hidden");
+    appearanceSpecialZoneBtn?.classList.remove("is-active");
+    appearanceSpecialZoneBtn?.setAttribute("aria-expanded", "false");
+  };
+
+  const openSpecialZonePopover = () => {
+    if (!specialZonePopover) return;
+    const willOpen = specialZonePopover.classList.contains("hidden");
+    if (!willOpen) {
+      closeSpecialZonePopover();
+      return;
+    }
+    specialZonePopover.classList.remove("hidden");
+    appearanceSpecialZoneBtn?.classList.add("is-active");
+    appearanceSpecialZoneBtn?.setAttribute("aria-expanded", "true");
+  };
+
+  const closeScenarioGuidePopover = () => {
+    scenarioGuidePopover?.classList.add("hidden");
+    scenarioGuideBtn?.classList.remove("is-active");
+    scenarioGuideBtn?.setAttribute("aria-expanded", "false");
+    if (scenarioGuideBtn) {
+      scenarioGuideBtn.textContent = "?";
+      scenarioGuideBtn.setAttribute("title", t("Show guide", "ui"));
+    }
+  };
+
+  const toggleScenarioGuidePopover = () => {
+    if (!scenarioGuidePopover) return;
+    const willOpen = scenarioGuidePopover.classList.contains("hidden");
+    if (!willOpen) {
+      closeScenarioGuidePopover();
+      return;
+    }
+    scenarioGuidePopover.classList.remove("hidden");
+    scenarioGuideBtn?.classList.add("is-active");
+    scenarioGuideBtn?.setAttribute("aria-expanded", "true");
+    if (scenarioGuideBtn) {
+      scenarioGuideBtn.textContent = "?";
+      scenarioGuideBtn.setAttribute("title", t("Hide guide", "ui"));
+    }
+  };
+
+  const refreshScenarioContextBar = () => {
+    if (!scenarioContextBar) return;
+    const activeScenario = String(state.activeScenarioManifest?.display_name || state.activeScenarioId || "").trim();
+    const activeCode = String(state.activeSovereignCode || "").trim().toUpperCase();
+    const activeLabel = activeCode
+      ? (t(state.countryNames?.[activeCode] || activeCode, "geo") || state.countryNames?.[activeCode] || activeCode)
+      : t("None", "ui");
+    const modeLabel = String(state.paintMode || "visual") === "sovereignty"
+      ? t("Sovereignty", "ui")
+      : t("Visual", "ui");
+    scenarioContextBar.classList.toggle("is-scenario", !!activeScenario);
+    scenarioContextBar.classList.toggle("is-collapsed", !!state.ui.scenarioBarCollapsed);
+    if (scenarioContextScenarioText) {
+      scenarioContextScenarioText.textContent = activeScenario
+        ? `${t("Scenario", "ui")}: ${activeScenario}`
+        : `${t("Scenario", "ui")}: ${t("None", "ui")}`;
+    }
+    if (scenarioContextModeText) {
+      scenarioContextModeText.textContent = `${t("Mode", "ui")}: ${modeLabel}`;
+    }
+    if (scenarioContextActiveText) {
+      scenarioContextActiveText.textContent = activeCode
+        ? `${t("Active", "ui")}: ${activeLabel} (${activeCode})`
+        : `${t("Active", "ui")}: ${t("None", "ui")}`;
+    }
+    if (scenarioContextCollapseBtn) {
+      scenarioContextCollapseBtn.textContent = state.ui.scenarioBarCollapsed ? "+" : "-";
+      scenarioContextCollapseBtn.setAttribute("aria-label", state.ui.scenarioBarCollapsed
+        ? t("Expand", "ui")
+        : t("Collapse", "ui"));
+    }
+    if (scenarioGuideBtn) {
+      scenarioGuideBtn.textContent = "?";
+      const isGuideOpen = !!(scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden"));
+      scenarioGuideBtn.setAttribute("title", isGuideOpen ? t("Hide guide", "ui") : t("Show guide", "ui"));
+    }
+  };
+
+  const triggerScenarioGuide = () => {
+    if (!scenarioContextBar) return;
+    scenarioContextBar.classList.add("is-highlight");
+    if (scenarioGuideTimerId) {
+      globalThis.clearTimeout(scenarioGuideTimerId);
+    }
+    scenarioGuideTimerId = globalThis.setTimeout(() => {
+      scenarioContextBar.classList.remove("is-highlight");
+    }, 3000);
+  };
+  state.updateScenarioContextBarFn = refreshScenarioContextBar;
+  state.triggerScenarioGuideFn = triggerScenarioGuide;
   const dismissOnboardingHint = () => {
     if (!mapOnboardingHint || state.onboardingDismissed) return;
     state.onboardingDismissed = true;
@@ -327,17 +468,28 @@ function initToolbar({ render } = {}) {
   const bindDockPopoverDismiss = () => {
     if (dockPopoverCloseBound) return;
     document.addEventListener("click", (event) => {
-      if (!state.activeDockPopover) return;
       const target = event.target;
       if (!(target instanceof Element)) return;
-      const insidePopover = target.closest("#dockReferencePopover, #dockExportPopover, #dockReferenceBtn, #dockExportBtn");
-      if (!insidePopover) {
+      const insideDockPopover = target.closest("#dockReferencePopover, #dockExportPopover, #dockReferenceBtn, #dockExportBtn");
+      if (state.activeDockPopover && !insideDockPopover) {
         closeDockPopover();
+      }
+      const insideSpecialZone = target.closest("#specialZonePopover, #appearanceSpecialZoneBtn");
+      if (specialZonePopover && !specialZonePopover.classList.contains("hidden") && !insideSpecialZone) {
+        closeSpecialZonePopover();
+      }
+      const insideScenarioGuide = target.closest("#scenarioGuidePopover, #scenarioGuideBtn");
+      if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden") && !insideScenarioGuide) {
+        closeScenarioGuidePopover();
       }
     });
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && state.activeDockPopover) {
-        closeDockPopover();
+      if (event.key === "Escape") {
+        if (state.activeDockPopover) {
+          closeDockPopover();
+        }
+        closeSpecialZonePopover();
+        closeScenarioGuidePopover();
       }
     });
     dockPopoverCloseBound = true;
@@ -510,14 +662,16 @@ function initToolbar({ render } = {}) {
   };
 
   const refreshActiveSovereignLabel = () => {
-    if (!activeSovereignLabel) return;
     const code = String(state.activeSovereignCode || "").trim().toUpperCase();
-    if (!code) {
-      activeSovereignLabel.textContent = t("None selected", "ui");
-    } else {
-      const label = String(state.countryNames?.[code] || code).trim() || code;
-      activeSovereignLabel.textContent = `${t(label, "geo") || label} (${code})`;
+    if (activeSovereignLabel) {
+      if (!code) {
+        activeSovereignLabel.textContent = t("None selected", "ui");
+      } else {
+        const label = String(state.countryNames?.[code] || code).trim() || code;
+        activeSovereignLabel.textContent = `${t(label, "geo") || label} (${code})`;
+      }
     }
+    refreshScenarioContextBar();
     if (typeof state.renderPresetTreeFn === "function") {
       state.renderPresetTreeFn();
     }
@@ -547,6 +701,7 @@ function initToolbar({ render } = {}) {
     }
     refreshActiveSovereignLabel();
     refreshDynamicBorderStatus();
+    updateDockCollapsedUi();
   };
   const normalizeOceanPreset = (value) => {
     const candidate = String(value || "flat").trim().toLowerCase();
@@ -1370,6 +1525,44 @@ function initToolbar({ render } = {}) {
     });
     dockExportBtn.dataset.bound = "true";
   }
+
+  if (dockCollapseBtn && !dockCollapseBtn.dataset.bound) {
+    dockCollapseBtn.addEventListener("click", () => {
+      state.ui.dockCollapsed = !state.ui.dockCollapsed;
+      updateDockCollapsedUi();
+    });
+    dockCollapseBtn.dataset.bound = "true";
+  }
+
+  if (scenarioContextCollapseBtn && !scenarioContextCollapseBtn.dataset.bound) {
+    scenarioContextCollapseBtn.addEventListener("click", () => {
+      state.ui.scenarioBarCollapsed = !state.ui.scenarioBarCollapsed;
+      refreshScenarioContextBar();
+    });
+    scenarioContextCollapseBtn.dataset.bound = "true";
+  }
+
+  if (scenarioGuideBtn && !scenarioGuideBtn.dataset.bound) {
+    scenarioGuideBtn.addEventListener("click", () => {
+      toggleScenarioGuidePopover();
+    });
+    scenarioGuideBtn.dataset.bound = "true";
+  }
+
+  if (appearanceSpecialZoneBtn && !appearanceSpecialZoneBtn.dataset.bound) {
+    appearanceSpecialZoneBtn.addEventListener("click", () => {
+      openSpecialZonePopover();
+    });
+    appearanceSpecialZoneBtn.dataset.bound = "true";
+  }
+
+  appearanceTabButtons.forEach((button) => {
+    if (button.dataset.bound === "true") return;
+    button.addEventListener("click", () => {
+      setAppearanceTab(button.dataset.appearanceTab || "ocean");
+    });
+    button.dataset.bound = "true";
+  });
 
   bindDockPopoverDismiss();
 
@@ -2328,6 +2521,9 @@ function initToolbar({ render } = {}) {
   leftPanelToggle?.setAttribute("aria-expanded", "false");
   rightPanelToggle?.setAttribute("aria-expanded", "false");
   state.updatePaintModeUIFn();
+  updateDockCollapsedUi();
+  setAppearanceTab("ocean");
+  refreshScenarioContextBar();
   renderRecentColors();
   renderParentBorderCountryList();
   renderSpecialZoneEditorUI();
@@ -2336,6 +2532,8 @@ function initToolbar({ render } = {}) {
   updateSwatchUI();
   updateToolUI();
   closeDockPopover();
+  closeSpecialZonePopover();
+  closeScenarioGuidePopover();
   if (mapContainer && !mapContainer.dataset.onboardingBound) {
     ["pointerdown", "wheel"].forEach((eventName) => {
       mapContainer.addEventListener(eventName, dismissOnboardingHint, { passive: true });

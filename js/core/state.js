@@ -765,6 +765,8 @@ export const state = {
   updateTextureUIFn: null,
   updateParentBorderCountryListFn: null,
   updateSpecialZoneEditorUIFn: null,
+  updateScenarioContextBarFn: null,
+  triggerScenarioGuideFn: null,
   renderCountryListFn: null,
   renderPresetTreeFn: null,
   renderScenarioAuditPanelFn: null,
@@ -780,6 +782,11 @@ export const state = {
   expandedInspectorContinents: new Set(),
   expandedInspectorReleaseParents: new Set(),
   expandedPresetCountries: new Set(),
+  ui: {
+    dockCollapsed: false,
+    scenarioBarCollapsed: false,
+    scenarioGuideDismissed: false,
+  },
 
   countryPalette,
   defaultCountryPalette,

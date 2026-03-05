@@ -470,12 +470,19 @@ async function applyScenarioBundle(
     markDirty(markDirtyReason);
   }
   syncCountryUi({ renderNow });
+  if (typeof state.triggerScenarioGuideFn === "function") {
+    state.triggerScenarioGuideFn();
+  }
 
   if (showToastOnComplete) {
-    showToast(t("Scenario applied.", "ui"), {
+    showToast(
+      t("Scenario loaded. 1) Select a country 2) Set Active 3) Apply Core/Presets.", "ui"),
+      {
       title: t("Scenario loaded", "ui"),
       tone: "success",
-    });
+      duration: 4200,
+      }
+    );
   }
 }
 
