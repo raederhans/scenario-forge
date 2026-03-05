@@ -360,6 +360,10 @@
       "en": "Format",
       "zh": "格式"
     },
+    "Frontline": {
+      "en": "Frontline",
+      "zh": "Frontline"
+    },
     "Hide Color Library": {
       "en": "Hide Color Library",
       "zh": "收起颜色库"
@@ -476,6 +480,10 @@
       "en": "No file selected",
       "zh": "未选择文件"
     },
+    "No frontline control split in current scenario.": {
+      "en": "No frontline control split in current scenario.",
+      "zh": "No frontline control split in current scenario."
+    },
     "No hierarchy groups": {
       "en": "No hierarchy groups",
       "zh": "没有可用层级分组"
@@ -535,6 +543,10 @@
     "Owners": {
       "en": "Owners",
       "zh": "主权实体数"
+    },
+    "Ownership": {
+      "en": "Ownership",
+      "zh": "Ownership"
     },
     "Paint Granularity": {
       "en": "Paint Granularity",
@@ -820,6 +832,10 @@
       "en": "Special Zones",
       "zh": "特殊区域"
     },
+    "Split": {
+      "en": "Split",
+      "zh": "Split"
+    },
     "Split state": {
       "en": "Split state",
       "zh": "分裂态国家"
@@ -835,6 +851,10 @@
     "Texture": {
       "en": "Texture",
       "zh": "纹理"
+    },
+    "Toggle legal ownership vs frontline control.": {
+      "en": "Toggle legal ownership vs frontline control.",
+      "zh": "Toggle legal ownership vs frontline control."
     },
     "Topology Summary": {
       "en": "Topology Summary",
@@ -11754,6 +11774,14 @@
       "en": "Bălţi (MD)",
       "zh": "巴蒂"
     },
+    "Břeclav": {
+      "en": "Břeclav",
+      "zh": "Břeclav"
+    },
+    "Břeclav (CZ)": {
+      "en": "Břeclav (CZ)",
+      "zh": "Břeclav (CZ)"
+    },
     "Bərdə": {
       "en": "Bərdə",
       "zh": "伯德"
@@ -13942,6 +13970,14 @@
       "en": "Chayuxian (CN)",
       "zh": "茶峪县"
     },
+    "Cheb": {
+      "en": "Cheb",
+      "zh": "Cheb"
+    },
+    "Cheb (CZ)": {
+      "en": "Cheb (CZ)",
+      "zh": "Cheb (CZ)"
+    },
     "Cheboksarsky District": {
       "en": "Cheboksarsky District",
       "zh": "切博克萨尔斯基区"
@@ -15017,6 +15053,14 @@
     "Choluteca (HN)": {
       "en": "Choluteca (HN)",
       "zh": "乔卢特卡"
+    },
+    "Chomutov": {
+      "en": "Chomutov",
+      "zh": "Chomutov"
+    },
+    "Chomutov (CZ)": {
+      "en": "Chomutov (CZ)",
+      "zh": "Chomutov (CZ)"
     },
     "Chon Buri": {
       "en": "Chon Buri",
@@ -18942,6 +18986,14 @@
       "en": "District Autonome De Yamoussoukro (CI)",
       "zh": "亚穆苏克罗自治区"
     },
+    "District of Bratislava V": {
+      "en": "District of Bratislava V",
+      "zh": "District of Bratislava V"
+    },
+    "District of Bratislava V (SK)": {
+      "en": "District of Bratislava V (SK)",
+      "zh": "District of Bratislava V (SK)"
+    },
     "District of Columbia": {
       "en": "District of Columbia",
       "zh": "哥伦比亚特区"
@@ -18949,6 +19001,94 @@
     "District of Columbia (US)": {
       "en": "District of Columbia (US)",
       "zh": "哥伦比亚特区"
+    },
+    "District of Dunajskn Streda": {
+      "en": "District of Dunajskn Streda",
+      "zh": "District of Dunajskn Streda"
+    },
+    "District of Dunajskn Streda (SK)": {
+      "en": "District of Dunajskn Streda (SK)",
+      "zh": "District of Dunajskn Streda (SK)"
+    },
+    "District of Komprno": {
+      "en": "District of Komprno",
+      "zh": "District of Komprno"
+    },
+    "District of Komprno (SK)": {
+      "en": "District of Komprno (SK)",
+      "zh": "District of Komprno (SK)"
+    },
+    "District of Kovice - okolie": {
+      "en": "District of Kovice - okolie",
+      "zh": "District of Kovice - okolie"
+    },
+    "District of Kovice - okolie (SK)": {
+      "en": "District of Kovice - okolie (SK)",
+      "zh": "District of Kovice - okolie (SK)"
+    },
+    "District of Levice": {
+      "en": "District of Levice",
+      "zh": "District of Levice"
+    },
+    "District of Levice (SK)": {
+      "en": "District of Levice (SK)",
+      "zh": "District of Levice (SK)"
+    },
+    "District of Lucenec": {
+      "en": "District of Lucenec",
+      "zh": "District of Lucenec"
+    },
+    "District of Lucenec (SK)": {
+      "en": "District of Lucenec (SK)",
+      "zh": "District of Lucenec (SK)"
+    },
+    "District of Nova Zkmky": {
+      "en": "District of Nova Zkmky",
+      "zh": "District of Nova Zkmky"
+    },
+    "District of Nova Zkmky (SK)": {
+      "en": "District of Nova Zkmky (SK)",
+      "zh": "District of Nova Zkmky (SK)"
+    },
+    "District of Revnca": {
+      "en": "District of Revnca",
+      "zh": "District of Revnca"
+    },
+    "District of Revnca (SK)": {
+      "en": "District of Revnca (SK)",
+      "zh": "District of Revnca (SK)"
+    },
+    "District of Rimavsk": {
+      "en": "District of Rimavsk",
+      "zh": "District of Rimavsk"
+    },
+    "District of Rimavsk (SK)": {
+      "en": "District of Rimavsk (SK)",
+      "zh": "District of Rimavsk (SK)"
+    },
+    "District of Ronnava": {
+      "en": "District of Ronnava",
+      "zh": "District of Ronnava"
+    },
+    "District of Ronnava (SK)": {
+      "en": "District of Ronnava (SK)",
+      "zh": "District of Ronnava (SK)"
+    },
+    "District of Trebi ov": {
+      "en": "District of Trebi ov",
+      "zh": "District of Trebi ov"
+    },
+    "District of Trebi ov (SK)": {
+      "en": "District of Trebi ov (SK)",
+      "zh": "District of Trebi ov (SK)"
+    },
+    "District of Velka Krta": {
+      "en": "District of Velka Krta",
+      "zh": "District of Velka Krta"
+    },
+    "District of Velka Krta (SK)": {
+      "en": "District of Velka Krta (SK)",
+      "zh": "District of Velka Krta (SK)"
     },
     "Dithmarschen": {
       "en": "Dithmarschen",
@@ -19209,6 +19349,14 @@
     "Domanivka (UA)": {
       "en": "Domanivka (UA)",
       "zh": "多马尼夫卡"
+    },
+    "Domažlice": {
+      "en": "Domažlice",
+      "zh": "Domažlice"
+    },
+    "Domažlice (CZ)": {
+      "en": "Domažlice (CZ)",
+      "zh": "Domažlice (CZ)"
     },
     "Dominican Republic": {
       "en": "Dominican Republic",
@@ -20297,6 +20445,14 @@
     "Dąbrowa Górnicza (PL)": {
       "en": "Dąbrowa Górnicza (PL)",
       "zh": "丹布罗瓦·戈尔尼察"
+    },
+    "Děčín": {
+      "en": "Děčín",
+      "zh": "Děčín"
+    },
+    "Děčín (CZ)": {
+      "en": "Děčín (CZ)",
+      "zh": "Děčín (CZ)"
     },
     "Dəvəçi": {
       "en": "Dəvəçi",
@@ -26846,6 +27002,10 @@
       "en": "HOI4 1936",
       "zh": "钢铁雄心4 1936"
     },
+    "HOI4 1939": {
+      "en": "HOI4 1939",
+      "zh": "HOI4 1939"
+    },
     "Ha": {
       "en": "Ha",
       "zh": "哈"
@@ -33094,6 +33254,14 @@
       "en": "Jind (IN)",
       "zh": "金德"
     },
+    "Jindřichův Hradec": {
+      "en": "Jindřichův Hradec",
+      "zh": "Jindřichův Hradec"
+    },
+    "Jindřichův Hradec (CZ)": {
+      "en": "Jindřichův Hradec (CZ)",
+      "zh": "Jindřichův Hradec (CZ)"
+    },
     "Jinganxian": {
       "en": "Jinganxian",
       "zh": "靖安县"
@@ -35150,6 +35318,14 @@
       "en": "Karlovačka županija (HR)",
       "zh": "卡尔洛瓦茨县"
     },
+    "Karlovy Vary": {
+      "en": "Karlovy Vary",
+      "zh": "Karlovy Vary"
+    },
+    "Karlovy Vary (CZ)": {
+      "en": "Karlovy Vary (CZ)",
+      "zh": "Karlovy Vary (CZ)"
+    },
     "Karlsruhe, Landkreis": {
       "en": "Karlsruhe, Landkreis",
       "zh": "卡尔斯鲁厄区"
@@ -37193,6 +37369,14 @@
     "Klaipėdos apskritis (LT)": {
       "en": "Klaipėdos apskritis (LT)",
       "zh": "克莱佩达县"
+    },
+    "Klatovy": {
+      "en": "Klatovy",
+      "zh": "Klatovy"
+    },
+    "Klatovy (CZ)": {
+      "en": "Klatovy (CZ)",
+      "zh": "Klatovy (CZ)"
     },
     "Kleberg": {
       "en": "Kleberg",
@@ -49574,6 +49758,14 @@
       "en": "Moshenskoy District (RU)",
       "zh": "莫申斯科伊区"
     },
+    "Most": {
+      "en": "Most",
+      "zh": "Most"
+    },
+    "Most (CZ)": {
+      "en": "Most (CZ)",
+      "zh": "Most (CZ)"
+    },
     "Mostaganem": {
       "en": "Mostaganem",
       "zh": "穆斯塔加尼"
@@ -61122,6 +61314,14 @@
       "en": "Požeško-slavonska županija (HR)",
       "zh": "波热加-斯拉沃尼亚县"
     },
+    "Prachatice": {
+      "en": "Prachatice",
+      "zh": "Prachatice"
+    },
+    "Prachatice (CZ)": {
+      "en": "Prachatice (CZ)",
+      "zh": "Prachatice (CZ)"
+    },
     "Prachin Buri": {
       "en": "Prachin Buri",
       "zh": "巴真府"
@@ -72134,6 +72334,14 @@
       "en": "Sokal (UA)",
       "zh": "索卡尔"
     },
+    "Sokolov": {
+      "en": "Sokolov",
+      "zh": "Sokolov"
+    },
+    "Sokolov (CZ)": {
+      "en": "Sokolov (CZ)",
+      "zh": "Sokolov (CZ)"
+    },
     "Sokolsky District": {
       "en": "Sokolsky District",
       "zh": "索科尔区"
@@ -75782,6 +75990,14 @@
       "en": "Tachira (VE)",
       "zh": "塔奇拉"
     },
+    "Tachov": {
+      "en": "Tachov",
+      "zh": "Tachov"
+    },
+    "Tachov (CZ)": {
+      "en": "Tachov (CZ)",
+      "zh": "Tachov (CZ)"
+    },
     "Tacloban": {
       "en": "Tacloban",
       "zh": "独鲁班"
@@ -77117,6 +77333,14 @@
     "Teofipol (UA)": {
       "en": "Teofipol (UA)",
       "zh": "特奥菲波尔"
+    },
+    "Teplice": {
+      "en": "Teplice",
+      "zh": "Teplice"
+    },
+    "Teplice (CZ)": {
+      "en": "Teplice (CZ)",
+      "zh": "Teplice (CZ)"
     },
     "Teplyk": {
       "en": "Teplyk",
@@ -91178,6 +91402,14 @@
       "en": "Znamianka (UA)",
       "zh": "兹纳米安卡"
     },
+    "Znojmo": {
+      "en": "Znojmo",
+      "zh": "Znojmo"
+    },
+    "Znojmo (CZ)": {
+      "en": "Znojmo (CZ)",
+      "zh": "Znojmo (CZ)"
+    },
     "Zollernalbkreis": {
       "en": "Zollernalbkreis",
       "zh": "佐勒纳尔布县"
@@ -105169,6 +105401,78 @@
     "id::CZ080": {
       "en": "Moravskoslezský kraj",
       "zh": "摩拉维亚-西里西亚地区"
+    },
+    "id::CZ_ADM2_57006924B20358302460191": {
+      "en": "Sokolov",
+      "zh": "Sokolov"
+    },
+    "id::CZ_ADM2_57006924B21154438881940": {
+      "en": "Český Krumlov",
+      "zh": "Český Krumlov"
+    },
+    "id::CZ_ADM2_57006924B26083217891381": {
+      "en": "Česká Lípa",
+      "zh": "Česká Lípa"
+    },
+    "id::CZ_ADM2_57006924B32669310027153": {
+      "en": "Chomutov",
+      "zh": "Chomutov"
+    },
+    "id::CZ_ADM2_57006924B34464963037986": {
+      "en": "Prachatice",
+      "zh": "Prachatice"
+    },
+    "id::CZ_ADM2_57006924B50757157558324": {
+      "en": "Karlovy Vary",
+      "zh": "Karlovy Vary"
+    },
+    "id::CZ_ADM2_57006924B55732331485961": {
+      "en": "Tachov",
+      "zh": "Tachov"
+    },
+    "id::CZ_ADM2_57006924B56764577868008": {
+      "en": "Břeclav",
+      "zh": "Břeclav"
+    },
+    "id::CZ_ADM2_57006924B57972685793284": {
+      "en": "Děčín",
+      "zh": "Děčín"
+    },
+    "id::CZ_ADM2_57006924B5960993849333": {
+      "en": "Ústí nad Labem",
+      "zh": "Ústí nad Labem"
+    },
+    "id::CZ_ADM2_57006924B6655388448820": {
+      "en": "Teplice",
+      "zh": "Teplice"
+    },
+    "id::CZ_ADM2_57006924B67285149942805": {
+      "en": "Jindřichův Hradec",
+      "zh": "Jindřichův Hradec"
+    },
+    "id::CZ_ADM2_57006924B71753966872420": {
+      "en": "Most",
+      "zh": "Most"
+    },
+    "id::CZ_ADM2_57006924B72008682408189": {
+      "en": "Klatovy",
+      "zh": "Klatovy"
+    },
+    "id::CZ_ADM2_57006924B73132069516203": {
+      "en": "České Budějovice",
+      "zh": "České Budějovice"
+    },
+    "id::CZ_ADM2_57006924B74936445485800": {
+      "en": "Cheb",
+      "zh": "Cheb"
+    },
+    "id::CZ_ADM2_57006924B92931687173289": {
+      "en": "Domažlice",
+      "zh": "Domažlice"
+    },
+    "id::CZ_ADM2_57006924B95695201424764": {
+      "en": "Znojmo",
+      "zh": "Znojmo"
     },
     "id::DE": {
       "en": "id::DE",
@@ -127722,6 +128026,54 @@
       "en": "Košický kraj",
       "zh": "科希策地区"
     },
+    "id::SK_ADM2_56367889B1447043738985": {
+      "en": "District of Kovice - okolie",
+      "zh": "District of Kovice - okolie"
+    },
+    "id::SK_ADM2_56367889B15205076567490": {
+      "en": "District of Rimavsk",
+      "zh": "District of Rimavsk"
+    },
+    "id::SK_ADM2_56367889B15407569919112": {
+      "en": "District of Levice",
+      "zh": "District of Levice"
+    },
+    "id::SK_ADM2_56367889B27848609458937": {
+      "en": "District of Komprno",
+      "zh": "District of Komprno"
+    },
+    "id::SK_ADM2_56367889B31823009041462": {
+      "en": "District of Revnca",
+      "zh": "District of Revnca"
+    },
+    "id::SK_ADM2_56367889B50490339994693": {
+      "en": "District of Ronnava",
+      "zh": "District of Ronnava"
+    },
+    "id::SK_ADM2_56367889B59585277732331": {
+      "en": "District of Lucenec",
+      "zh": "District of Lucenec"
+    },
+    "id::SK_ADM2_56367889B62553648042075": {
+      "en": "District of Nova Zkmky",
+      "zh": "District of Nova Zkmky"
+    },
+    "id::SK_ADM2_56367889B65708067786299": {
+      "en": "District of Trebi ov",
+      "zh": "District of Trebi ov"
+    },
+    "id::SK_ADM2_56367889B690835779632": {
+      "en": "District of Bratislava V",
+      "zh": "District of Bratislava V"
+    },
+    "id::SK_ADM2_56367889B78366861694162": {
+      "en": "District of Dunajskn Streda",
+      "zh": "District of Dunajskn Streda"
+    },
+    "id::SK_ADM2_56367889B96980961358907": {
+      "en": "District of Velka Krta",
+      "zh": "District of Velka Krta"
+    },
     "id::SL": {
       "en": "id::SL",
       "zh": "塞拉利昂"
@@ -138473,6 +138825,38 @@
     "Ústecký kraj (CZ)": {
       "en": "Ústecký kraj (CZ)",
       "zh": "乌斯蒂地区"
+    },
+    "Ústí nad Labem": {
+      "en": "Ústí nad Labem",
+      "zh": "Ústí nad Labem"
+    },
+    "Ústí nad Labem (CZ)": {
+      "en": "Ústí nad Labem (CZ)",
+      "zh": "Ústí nad Labem (CZ)"
+    },
+    "Česká Lípa": {
+      "en": "Česká Lípa",
+      "zh": "Česká Lípa"
+    },
+    "Česká Lípa (CZ)": {
+      "en": "Česká Lípa (CZ)",
+      "zh": "Česká Lípa (CZ)"
+    },
+    "České Budějovice": {
+      "en": "České Budějovice",
+      "zh": "České Budějovice"
+    },
+    "České Budějovice (CZ)": {
+      "en": "České Budějovice (CZ)",
+      "zh": "České Budějovice (CZ)"
+    },
+    "Český Krumlov": {
+      "en": "Český Krumlov",
+      "zh": "Český Krumlov"
+    },
+    "Český Krumlov (CZ)": {
+      "en": "Český Krumlov (CZ)",
+      "zh": "Český Krumlov (CZ)"
     },
     "Điện Biên": {
       "en": "Điện Biên",

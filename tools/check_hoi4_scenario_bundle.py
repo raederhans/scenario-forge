@@ -100,6 +100,130 @@ def apply_numeric_assertions(
             errors.append(f"{prefix}.{key} must be <= {expected_value}. Found {actual_value}.")
 
 
+def evaluate_owner_set_assertions(
+    *,
+    errors: list[str],
+    assertions: list[object],
+    owners_by_feature_id: dict[str, object],
+) -> None:
+    for index, raw in enumerate(assertions):
+        if not isinstance(raw, dict):
+            continue
+        name = str(raw.get("name") or f"owner_set_assertion_{index + 1}").strip()
+        expected_owner = str(raw.get("expected_owner_tag") or "").strip().upper()
+        if not expected_owner:
+            errors.append(f"{name}: expected_owner_tag is required.")
+            continue
+
+        selected_ids: set[str] = set()
+        for feature_id in raw.get("feature_ids", []) or []:
+            candidate = str(feature_id).strip()
+            if candidate:
+                selected_ids.add(candidate)
+
+        for prefix in raw.get("feature_id_prefixes", []) or []:
+            prefix_value = str(prefix).strip()
+            if not prefix_value:
+                continue
+            selected_ids.update(
+                feature_id
+                for feature_id in owners_by_feature_id.keys()
+                if feature_id.startswith(prefix_value)
+            )
+
+        excluded_ids = {
+            str(feature_id).strip()
+            for feature_id in raw.get("exclude_feature_ids", []) or []
+            if str(feature_id).strip()
+        }
+        selected_ids -= excluded_ids
+
+        if not selected_ids:
+            errors.append(f"{name}: assertion resolved zero feature IDs.")
+            continue
+
+        missing_ids = sorted(feature_id for feature_id in selected_ids if feature_id not in owners_by_feature_id)
+        if missing_ids:
+            errors.append(
+                f"{name}: {len(missing_ids)} selected feature IDs are missing from owners payload "
+                f"(sample: {missing_ids[:8]})."
+            )
+            continue
+
+        wrong_ids = sorted(
+            feature_id
+            for feature_id in selected_ids
+            if str(owners_by_feature_id.get(feature_id) or "").strip().upper() != expected_owner
+        )
+        if wrong_ids:
+            errors.append(
+                f"{name}: {len(wrong_ids)} / {len(selected_ids)} features do not match owner `{expected_owner}` "
+                f"(sample: {wrong_ids[:8]})."
+            )
+
+
+def evaluate_controller_set_assertions(
+    *,
+    errors: list[str],
+    assertions: list[object],
+    controllers_by_feature_id: dict[str, object],
+) -> None:
+    for index, raw in enumerate(assertions):
+        if not isinstance(raw, dict):
+            continue
+        name = str(raw.get("name") or f"controller_set_assertion_{index + 1}").strip()
+        expected_controller = str(raw.get("expected_controller_tag") or "").strip().upper()
+        if not expected_controller:
+            errors.append(f"{name}: expected_controller_tag is required.")
+            continue
+
+        selected_ids: set[str] = set()
+        for feature_id in raw.get("feature_ids", []) or []:
+            candidate = str(feature_id).strip()
+            if candidate:
+                selected_ids.add(candidate)
+
+        for prefix in raw.get("feature_id_prefixes", []) or []:
+            prefix_value = str(prefix).strip()
+            if not prefix_value:
+                continue
+            selected_ids.update(
+                feature_id
+                for feature_id in controllers_by_feature_id.keys()
+                if feature_id.startswith(prefix_value)
+            )
+
+        excluded_ids = {
+            str(feature_id).strip()
+            for feature_id in raw.get("exclude_feature_ids", []) or []
+            if str(feature_id).strip()
+        }
+        selected_ids -= excluded_ids
+
+        if not selected_ids:
+            errors.append(f"{name}: assertion resolved zero feature IDs.")
+            continue
+
+        missing_ids = sorted(feature_id for feature_id in selected_ids if feature_id not in controllers_by_feature_id)
+        if missing_ids:
+            errors.append(
+                f"{name}: {len(missing_ids)} selected feature IDs are missing from controllers payload "
+                f"(sample: {missing_ids[:8]})."
+            )
+            continue
+
+        wrong_ids = sorted(
+            feature_id
+            for feature_id in selected_ids
+            if str(controllers_by_feature_id.get(feature_id) or "").strip().upper() != expected_controller
+        )
+        if wrong_ids:
+            errors.append(
+                f"{name}: {len(wrong_ids)} / {len(selected_ids)} features do not match controller `{expected_controller}` "
+                f"(sample: {wrong_ids[:8]})."
+            )
+
+
 def main() -> int:
     args = parse_args()
     scenario_dir = Path(args.scenario_dir)
@@ -178,6 +302,25 @@ def main() -> int:
                 actual_value == expected_value,
                 f"country {tag}.{field} must be {expected_value}. Found {actual_value}.",
             )
+
+    owner_set_assertions = expectation.get("owner_set_assertions", [])
+    if isinstance(owner_set_assertions, list):
+        evaluate_owner_set_assertions(
+            errors=errors,
+            assertions=owner_set_assertions,
+            owners_by_feature_id=owners.get("owners", {}) if isinstance(owners.get("owners", {}), dict) else {},
+        )
+    controller_set_assertions = expectation.get("controller_set_assertions", [])
+    if isinstance(controller_set_assertions, list):
+        evaluate_controller_set_assertions(
+            errors=errors,
+            assertions=controller_set_assertions,
+            controllers_by_feature_id=(
+                controllers.get("controllers", {})
+                if isinstance(controllers.get("controllers", {}), dict)
+                else {}
+            ),
+        )
 
     apply_numeric_assertions(
         errors=errors,

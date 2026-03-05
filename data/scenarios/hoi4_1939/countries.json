@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1939",
-  "generated_at": "2026-03-05T03:38:19.965164+00:00",
+  "generated_at": "2026-03-05T17:55:54.908210+00:00",
   "default_country": "GER",
   "countries": {
     "AFG": {
@@ -186,6 +186,38 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
+      ]
+    },
+    "BOM": {
+      "tag": "BOM",
+      "display_name": "Bohemia-Moravia Protectorate",
+      "color_hex": "#6a4b3a",
+      "feature_count": 13,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "CZ",
+      "lookup_iso2": "CZ",
+      "provenance_iso2": "CZ",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended",
+      "primary_rule_source": "bohemia_moravia_protectorate_1939",
+      "rule_sources": [
+        "bohemia_moravia_protectorate_1939"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "extended"
       ]
     },
     "BOT": {
@@ -778,7 +810,7 @@
       "tag": "GER",
       "display_name": "Germany",
       "color_hex": "#666057",
-      "feature_count": 570,
+      "feature_count": 575,
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "DE",
@@ -799,7 +831,7 @@
       "rule_sources": [
         "germany_frontier_1936",
         "1939_germany_annexes_austria",
-        "1939_germany_bohemia_moravia",
+        "germany_sudetenland_1939",
         "1939_germany_memel"
       ],
       "source_types": [
@@ -1059,9 +1091,9 @@
       "tag": "HUN",
       "display_name": "Hungary",
       "color_hex": "#f97e62",
-      "feature_count": 35,
+      "feature_count": 45,
       "quality": "manual_reviewed",
-      "source": "direct_active_owner",
+      "source": "manual_rule",
       "base_iso2": "HU",
       "lookup_iso2": "HU",
       "provenance_iso2": "HU",
@@ -1072,13 +1104,13 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_eastern_europe",
       "subregion_label": "Eastern Europe",
-      "notes": "Southern Slovak strip from the First Vienna Award.",
+      "notes": "Southern Slovak strip from targeted SK ADM2 split features.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "1939_hungary_southern_slovakia",
+      "primary_rule_source": "hungary_south_slovakia_1939",
       "rule_sources": [
-        "1939_hungary_southern_slovakia",
+        "hungary_south_slovakia_1939",
         "1939_hungary_carpathian_ruthenia"
       ],
       "source_types": [
@@ -2360,7 +2392,7 @@
       "tag": "SLO",
       "display_name": "Slovakia",
       "color_hex": "#9ea1bc",
-      "feature_count": 6,
+      "feature_count": 8,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "SK",

@@ -140,6 +140,7 @@ def build_catalog_entry(
     hierarchy_groups: dict[str, list[str]],
     palette_entries: dict[str, dict[str, object]],
 ) -> dict[str, object]:
+    manual_overlay = bool(raw_entry.get("allow_manual_overlay"))
     tag = normalize_tag(raw_entry.get("tag"))
     parent_owner_tag = normalize_tag(raw_entry.get("parent_owner_tag"))
     release_lookup_iso2 = normalize_iso2(raw_entry.get("release_lookup_iso2"))
@@ -169,19 +170,19 @@ def build_catalog_entry(
 
     if not tag:
         validation_errors.append("missing_tag")
-    if tag and tag not in country_tags:
+    if tag and tag not in country_tags and not manual_overlay:
         validation_errors.append("unknown_country_tag")
     if tag in active_owner_tags:
         validation_errors.append("tag_is_active_owner")
     if not release_lookup_iso2:
         validation_errors.append("missing_release_lookup_iso2")
-    if not capital_state_id:
+    if not capital_state_id and not manual_overlay:
         validation_errors.append("missing_capital_state_id")
-    if not parent_owners:
+    if not parent_owners and not manual_overlay:
         validation_errors.append("missing_core_parent_owner")
-    if len(parent_owners) > 1:
+    if len(parent_owners) > 1 and not manual_overlay:
         validation_errors.append("multi_parent_core")
-    if parent_owner_tag and parent_owners and parent_owner_tag not in parent_owners:
+    if parent_owner_tag and parent_owners and parent_owner_tag not in parent_owners and not manual_overlay:
         validation_errors.append("parent_owner_mismatch")
     if not parent_owner_tag and len(parent_owners) == 1:
         parent_owner_tag = parent_owners[0]
@@ -203,6 +204,8 @@ def build_catalog_entry(
         validation_errors.append("empty_hierarchy_mapping")
     if source_type == "feature_ids" and feature_count_hint == 0:
         validation_errors.append("empty_feature_mapping")
+    if manual_overlay and source_type == "legacy_preset_name":
+        validation_errors.append("manual_overlay_unsupported_legacy_preset_name")
 
     return {
         "tag": tag,
@@ -215,6 +218,7 @@ def build_catalog_entry(
         "entry_kind": "releasable",
         "scenario_ids": scenario_ids,
         "scenario_only": True,
+        "allow_manual_overlay": manual_overlay,
         "preset_source": preset_source,
         "core_state_ids": sorted({state_id for state_id in core_state_ids.get(tag, []) if state_id}),
         "resolved_feature_count_hint": feature_count_hint,

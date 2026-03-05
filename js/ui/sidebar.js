@@ -527,23 +527,113 @@ function addRecentColor(color) {
   }
 }
 
+function filterToVisibleFeatureIds(featureIds = []) {
+  const requestedIds = Array.isArray(featureIds)
+    ? Array.from(new Set(featureIds.map((id) => String(id || "").trim()).filter(Boolean)))
+    : [];
+  if (!requestedIds.length) {
+    return {
+      requestedIds: [],
+      matchedIds: [],
+      missingIds: [],
+    };
+  }
+  const landIndex = state.landIndex instanceof Map ? state.landIndex : null;
+  if (!landIndex || landIndex.size === 0) {
+    return {
+      requestedIds,
+      matchedIds: requestedIds,
+      missingIds: [],
+    };
+  }
+  const matchedIds = [];
+  const missingIds = [];
+  requestedIds.forEach((id) => {
+    if (landIndex.has(id)) {
+      matchedIds.push(id);
+      return;
+    }
+    missingIds.push(id);
+  });
+  return {
+    requestedIds,
+    matchedIds,
+    missingIds,
+  };
+}
+
 function applyPreset(countryCode, presetIndex, color, render) {
   const presetLookupCode = resolveScenarioLookupCode(countryCode);
   const presets = state.presetsState[presetLookupCode];
   if (!presets || !presets[presetIndex]) {
     console.warn(`Preset not found: ${presetLookupCode}[${presetIndex}]`);
-    return;
+    return {
+      applied: false,
+      changed: 0,
+      matchedCount: 0,
+      requestedCount: 0,
+      missingCount: 0,
+      reason: "missing-preset",
+    };
   }
 
   const preset = presets[presetIndex];
   const colorToApply = color || state.selectedColor;
-  const targetIds = Array.isArray(preset.ids)
-    ? Array.from(new Set(preset.ids.map((id) => String(id || "").trim()).filter(Boolean)))
+  const requestedFeatureIds = Array.isArray(preset.ids)
+    ? preset.ids
     : [];
-  if (!targetIds.length) return;
+  const {
+    requestedIds,
+    matchedIds: targetIds,
+    missingIds,
+  } = filterToVisibleFeatureIds(requestedFeatureIds);
+  if (!requestedIds.length) {
+    return {
+      applied: false,
+      changed: 0,
+      matchedCount: 0,
+      requestedCount: 0,
+      missingCount: 0,
+      reason: "empty-preset",
+    };
+  }
+  if (!targetIds.length) {
+    showToast(
+      t("Current map does not include this preset's detail features. Load detail topology and try again.", "ui"),
+      {
+        title: t("Preset not applied", "ui"),
+        tone: "warning",
+        duration: 4200,
+      }
+    );
+    console.warn("[scenario] Preset apply skipped because no visible feature ids matched.", {
+      countryCode,
+      presetLookupCode,
+      presetName: preset.name,
+      requestedCount: requestedIds.length,
+      missingCount: missingIds.length,
+    });
+    return {
+      applied: false,
+      changed: 0,
+      matchedCount: 0,
+      requestedCount: requestedIds.length,
+      missingCount: missingIds.length,
+      reason: "no-visible-features",
+    };
+  }
 
   if (String(state.paintMode || "visual") === "sovereignty") {
-    if (!state.activeSovereignCode) return;
+    if (!state.activeSovereignCode) {
+      return {
+        applied: false,
+        changed: 0,
+        matchedCount: targetIds.length,
+        requestedCount: requestedIds.length,
+        missingCount: missingIds.length,
+        reason: "missing-active-sovereign",
+      };
+    }
     const before = captureHistoryState({
       sovereigntyFeatureIds: targetIds,
     });
@@ -564,7 +654,15 @@ function applyPreset(countryCode, presetIndex, color, render) {
       });
     }
     if (render) render();
-    return;
+    return {
+      applied: true,
+      changed,
+      matchedCount: targetIds.length,
+      requestedCount: requestedIds.length,
+      missingCount: missingIds.length,
+      reason: "",
+      mode: "sovereignty",
+    };
   }
 
   const before = captureHistoryState({
@@ -596,7 +694,16 @@ function applyPreset(countryCode, presetIndex, color, render) {
     },
   });
 
-  console.log(`Applied preset "${preset.name}" with ${preset.ids.length} regions`);
+  console.log(`Applied preset "${preset.name}" with ${targetIds.length} visible regions`);
+  return {
+    applied: true,
+    changed: targetIds.length,
+    matchedCount: targetIds.length,
+    requestedCount: requestedIds.length,
+    missingCount: missingIds.length,
+    reason: "",
+    mode: "visual",
+  };
 }
 
 function initSidebar({ render } = {}) {
@@ -1312,18 +1419,17 @@ function initSidebar({ render } = {}) {
 
   const ensureSelectedInspectorCountry = () => {
     const normalized = normalizeCountryCode(state.selectedInspectorCountryCode);
-    if (!normalized) {
-      state.selectedInspectorCountryCode = "";
-      state.inspectorHighlightCountryCode = "";
-      return "";
-    }
-    if (!latestCountryStatesByCode.has(normalized)) {
-      state.selectedInspectorCountryCode = "";
-      state.inspectorHighlightCountryCode = "";
-      return "";
-    }
-    state.selectedInspectorCountryCode = normalized;
-    return normalized;
+    const activeNormalized = normalizeCountryCode(state.activeSovereignCode);
+    const fallbackCode = activeNormalized && latestCountryStatesByCode.has(activeNormalized)
+      ? activeNormalized
+      : "";
+    const resolved = normalized && latestCountryStatesByCode.has(normalized)
+      ? normalized
+      : fallbackCode;
+
+    state.selectedInspectorCountryCode = resolved;
+    state.inspectorHighlightCountryCode = resolved;
+    return resolved;
   };
 
   const selectInspectorCountry = (code) => {
@@ -1382,10 +1488,56 @@ function initSidebar({ render } = {}) {
       if (typeof state.updateActiveSovereignUIFn === "function") {
         state.updateActiveSovereignUIFn();
       }
-      applyPreset(presetRef.presetLookupCode, presetRef.presetIndex, null, render);
+      const result = applyPreset(presetRef.presetLookupCode, presetRef.presetIndex, null, render);
+      if (!result?.applied) {
+        if (result?.reason !== "no-visible-features") {
+          showToast(t("Core territory was not applied.", "ui"), {
+            title: t("Apply failed", "ui"),
+            tone: "warning",
+            duration: 3200,
+          });
+        }
+        renderList();
+        return false;
+      }
+      if (result.changed > 0) {
+        showToast(
+          `${t("Applied", "ui")} ${result.changed}/${result.matchedCount} ${t("features", "ui")}`,
+          {
+            title: t("Core territory applied", "ui"),
+            tone: "success",
+            duration: 3200,
+          }
+        );
+      } else {
+        showToast(t("Core territory already matches current ownership.", "ui"), {
+          title: t("No changes", "ui"),
+          tone: "info",
+          duration: 2800,
+        });
+      }
     } else {
       const resolvedColor = getResolvedCountryColor(latestCountryStatesByCode.get(countryState.code) || countryState);
-      applyPreset(presetRef.presetLookupCode, presetRef.presetIndex, resolvedColor, render);
+      const result = applyPreset(presetRef.presetLookupCode, presetRef.presetIndex, resolvedColor, render);
+      if (!result?.applied) {
+        if (result?.reason !== "no-visible-features") {
+          showToast(t("Core territory was not applied.", "ui"), {
+            title: t("Apply failed", "ui"),
+            tone: "warning",
+            duration: 3200,
+          });
+        }
+        renderList();
+        return false;
+      }
+      showToast(
+        `${t("Applied", "ui")} ${result.matchedCount}/${result.requestedCount} ${t("features", "ui")}`,
+        {
+          title: t("Core territory applied", "ui"),
+          tone: "success",
+          duration: 3200,
+        }
+      );
     }
 
     renderList();
@@ -1992,6 +2144,34 @@ function initSidebar({ render } = {}) {
     }
   };
 
+  const renderScenarioParentReturnAction = (container, countryState) => {
+    const parentCode = normalizeCountryCode(
+      countryState?.parentOwnerTag
+      || (Array.isArray(countryState?.parentOwnerTags) ? countryState.parentOwnerTags[0] : "")
+    );
+    if (!parentCode) return;
+    const parentState = latestCountryStatesByCode.get(parentCode);
+    if (!parentState) return;
+
+    const section = appendActionSection(container, t("Navigation", "ui"));
+    const returnBtn = createInspectorActionButton(
+      `${t("Return to", "ui")} ${parentState.displayName} (${parentState.code})`,
+      () => {
+        const normalizedParentCode = normalizeCountryCode(parentState.code);
+        if (normalizedParentCode && state.activeSovereignCode !== normalizedParentCode) {
+          state.activeSovereignCode = normalizedParentCode;
+          markDirty("set-active-sovereign");
+          if (typeof state.updateActiveSovereignUIFn === "function") {
+            state.updateActiveSovereignUIFn();
+          }
+        }
+        selectInspectorCountry(parentState.code);
+      }
+    );
+    returnBtn.classList.add("scenario-parent-return-btn");
+    section.appendChild(returnBtn);
+  };
+
   const renderScenarioCoreTerritoryAction = (container, countryState) => {
     const section = appendActionSection(container, t("Core Territory", "ui"));
     const presetRef = getPrimaryReleasablePresetRef(countryState);
@@ -2046,6 +2226,7 @@ function initSidebar({ render } = {}) {
 
   const renderScenarioReleasableActions = (container, countryState) => {
     renderNoActiveGuard(container);
+    renderScenarioParentReturnAction(container, countryState);
     renderScenarioCoreTerritoryAction(container, countryState);
     if (countryState.notes) {
       const notesSection = appendActionSection(container, t("Notes", "ui"));

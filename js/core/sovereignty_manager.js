@@ -143,6 +143,11 @@ function setFeatureOwnerCode(featureId, ownerCode) {
   const id = getFeatureId(featureId);
   const code = normalizeOwnerCode(ownerCode);
   if (!id || !code) return false;
+  const landIndex = state.landIndex instanceof Map ? state.landIndex : null;
+  if (landIndex && landIndex.size > 0 && !landIndex.has(id)) {
+    // Ignore writes for features that are not currently present in the loaded map topology.
+    return false;
+  }
   ensureSovereigntyState();
   const prev = getFeatureOwnerCode(id, { skipEnsure: true });
   if (prev === code) return false;

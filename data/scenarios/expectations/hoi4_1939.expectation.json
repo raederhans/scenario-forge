@@ -19,6 +19,76 @@
   "summary_min": {
     "feature_count": 10000,
     "owner_count": 70,
-    "owner_controller_split_feature_count": 1
-  }
+    "owner_controller_split_feature_count": 250,
+    "controller_rule_count": 1
+  },
+  "controller_set_assertions": [
+    {
+      "name": "china_hebei_chahar_sample_controller_men",
+      "expected_controller_tag": "MEN",
+      "feature_ids": [
+        "CN_CITY_17275852B74586174185496"
+      ]
+    },
+    {
+      "name": "china_japanese_bridgehead_sample_controller_jap",
+      "expected_controller_tag": "JAP",
+      "feature_ids": [
+        "CN_CITY_17275852B2295538790743"
+      ]
+    }
+  ],
+  "owner_set_assertions": [
+    {
+      "name": "sudetenland_owner_ger",
+      "expected_owner_tag": "GER",
+      "feature_ids": [
+        "CZ_ADM2_57006924B56764577868008",
+        "CZ_ADM2_57006924B74936445485800",
+        "CZ_ADM2_57006924B32669310027153",
+        "CZ_ADM2_57006924B92931687173289",
+        "CZ_ADM2_57006924B57972685793284",
+        "CZ_ADM2_57006924B67285149942805",
+        "CZ_ADM2_57006924B50757157558324",
+        "CZ_ADM2_57006924B72008682408189",
+        "CZ_ADM2_57006924B71753966872420",
+        "CZ_ADM2_57006924B34464963037986",
+        "CZ_ADM2_57006924B20358302460191",
+        "CZ_ADM2_57006924B55732331485961",
+        "CZ_ADM2_57006924B6655388448820",
+        "CZ_ADM2_57006924B95695201424764",
+        "CZ_ADM2_57006924B5960993849333",
+        "CZ_ADM2_57006924B26083217891381",
+        "CZ_ADM2_57006924B73132069516203",
+        "CZ_ADM2_57006924B21154438881940"
+      ]
+    },
+    {
+      "name": "south_slovakia_owner_hun",
+      "expected_owner_tag": "HUN",
+      "feature_ids": [
+        "SK_ADM2_56367889B690835779632",
+        "SK_ADM2_56367889B78366861694162",
+        "SK_ADM2_56367889B27848609458937",
+        "SK_ADM2_56367889B1447043738985",
+        "SK_ADM2_56367889B15407569919112",
+        "SK_ADM2_56367889B59585277732331",
+        "SK_ADM2_56367889B62553648042075",
+        "SK_ADM2_56367889B31823009041462",
+        "SK_ADM2_56367889B15205076567490",
+        "SK_ADM2_56367889B50490339994693",
+        "SK_ADM2_56367889B65708067786299",
+        "SK_ADM2_56367889B96980961358907"
+      ]
+    },
+    {
+      "name": "bohemia_moravia_remainder_owner_bom",
+      "expected_owner_tag": "BOM",
+      "feature_ids": [
+        "CZ010",
+        "CZ020",
+        "CZ063"
+      ]
+    }
+  ]
 }

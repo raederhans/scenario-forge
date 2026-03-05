@@ -13,6 +13,9 @@ import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
 
 const SCENARIO_REGISTRY_URL = "data/scenarios/index.json";
+const DETAIL_POLITICAL_MIN_FEATURES = 1000;
+const SCENARIO_DETAIL_MIN_RATIO_STRICT = 0.7;
+const SCENARIO_DETAIL_ABSOLUTE_DROP_THRESHOLD = 1000;
 
 function cacheBust(url) {
   if (!url) return url;
@@ -26,6 +29,113 @@ function normalizeScenarioId(value) {
 
 function normalizeScenarioViewMode(value) {
   return String(value || "").trim().toLowerCase() === "frontline" ? "frontline" : "ownership";
+}
+
+function getPoliticalGeometryCount(topology) {
+  const geometries = topology?.objects?.political?.geometries;
+  return Array.isArray(geometries) ? geometries.length : 0;
+}
+
+function hasUsablePoliticalTopology(topology, { minFeatures = DETAIL_POLITICAL_MIN_FEATURES } = {}) {
+  return getPoliticalGeometryCount(topology) >= Math.max(1, Number(minFeatures) || 1);
+}
+
+function countOwnerControllerSplit({
+  ownersByFeatureId = state.sovereigntyByFeatureId || {},
+  controllersByFeatureId = state.scenarioControllersByFeatureId || {},
+} = {}) {
+  let split = 0;
+  const seen = new Set();
+  Object.entries(ownersByFeatureId || {}).forEach(([featureId, owner]) => {
+    const normalizedId = String(featureId || "").trim();
+    if (!normalizedId) return;
+    seen.add(normalizedId);
+    const ownerTag = String(owner || "").trim().toUpperCase();
+    const controllerTag = String(controllersByFeatureId?.[normalizedId] || ownerTag || "").trim().toUpperCase();
+    if (ownerTag && controllerTag && ownerTag !== controllerTag) {
+      split += 1;
+    }
+  });
+  Object.entries(controllersByFeatureId || {}).forEach(([featureId, controller]) => {
+    const normalizedId = String(featureId || "").trim();
+    if (!normalizedId || seen.has(normalizedId)) return;
+    const controllerTag = String(controller || "").trim().toUpperCase();
+    const ownerTag = String(ownersByFeatureId?.[normalizedId] || controllerTag || "").trim().toUpperCase();
+    if (ownerTag && controllerTag && ownerTag !== controllerTag) {
+      split += 1;
+    }
+  });
+  return split;
+}
+
+function recalculateScenarioOwnerControllerDiffCount() {
+  state.scenarioOwnerControllerDiffCount = state.activeScenarioId
+    ? countOwnerControllerSplit({
+      ownersByFeatureId: state.sovereigntyByFeatureId,
+      controllersByFeatureId: state.scenarioControllersByFeatureId,
+    })
+    : 0;
+  return state.scenarioOwnerControllerDiffCount;
+}
+
+function evaluateScenarioDataHealth(
+  manifest = state.activeScenarioManifest,
+  { minRatio = SCENARIO_DETAIL_MIN_RATIO_STRICT } = {}
+) {
+  const expectedFeatureCount = Number(manifest?.summary?.feature_count || 0);
+  const runtimeFeatureCount = Array.isArray(state.landData?.features) ? state.landData.features.length : 0;
+  const ratio = expectedFeatureCount > 0 ? runtimeFeatureCount / expectedFeatureCount : 1;
+  const normalizedMinRatio = Math.min(Math.max(Number(minRatio) || SCENARIO_DETAIL_MIN_RATIO_STRICT, 0.1), 1);
+  let warning = "";
+  let severity = "";
+  if (expectedFeatureCount >= DETAIL_POLITICAL_MIN_FEATURES) {
+    const severeDrop = runtimeFeatureCount > 0 && ratio < normalizedMinRatio;
+    const absoluteDrop = expectedFeatureCount - runtimeFeatureCount >= SCENARIO_DETAIL_ABSOLUTE_DROP_THRESHOLD;
+    if (severeDrop && absoluteDrop) {
+      warning = t("Detail topology not fully loaded; scenario is shown in coarse mode.", "ui");
+      severity = "error";
+    }
+  }
+  return {
+    expectedFeatureCount,
+    runtimeFeatureCount,
+    ratio,
+    minRatio: normalizedMinRatio,
+    warning,
+    severity,
+  };
+}
+
+function refreshScenarioDataHealth({
+  showWarningToast = false,
+  showErrorToast = false,
+  minRatio = SCENARIO_DETAIL_MIN_RATIO_STRICT,
+} = {}) {
+  if (!state.activeScenarioId || !state.activeScenarioManifest) {
+    state.scenarioDataHealth = {
+      expectedFeatureCount: 0,
+      runtimeFeatureCount: 0,
+      ratio: 1,
+      minRatio: SCENARIO_DETAIL_MIN_RATIO_STRICT,
+      warning: "",
+      severity: "",
+    };
+    return state.scenarioDataHealth;
+  }
+  const health = evaluateScenarioDataHealth(state.activeScenarioManifest, { minRatio });
+  state.scenarioDataHealth = health;
+  const shouldToast = health.warning && (showErrorToast || showWarningToast);
+  if (shouldToast) {
+    const errorLevel = showErrorToast || health.severity === "error";
+    showToast(health.warning, {
+      title: errorLevel
+        ? t("Scenario visibility error", "ui")
+        : t("Scenario visibility warning", "ui"),
+      tone: errorLevel ? "error" : "warning",
+      duration: errorLevel ? 6200 : 5200,
+    });
+  }
+  return health;
 }
 
 function getScenarioDisplayOwnerByFeatureId(featureId, { fallbackOwner = "" } = {}) {
@@ -336,6 +446,9 @@ function syncCountryUi({ renderNow = false } = {}) {
   if (typeof state.updateDynamicBorderStatusUIFn === "function") {
     state.updateDynamicBorderStatusUIFn();
   }
+  if (typeof state.updateScenarioContextBarFn === "function") {
+    state.updateScenarioContextBarFn();
+  }
   syncScenarioUi();
   if (renderNow && typeof state.renderNowFn === "function") {
     state.renderNowFn();
@@ -358,6 +471,7 @@ function setScenarioViewMode(
     return false;
   }
   state.scenarioViewMode = nextMode;
+  recalculateScenarioOwnerControllerDiffCount();
   if (markDirtyReason) {
     markDirty(markDirtyReason);
   }
@@ -368,31 +482,63 @@ function setScenarioViewMode(
 }
 
 async function ensureScenarioDetailTopologyLoaded() {
-  if (!state.detailDeferred || state.detailPromotionCompleted || state.detailPromotionInFlight) {
+  const hasDetailNow = hasUsablePoliticalTopology(state.topologyDetail);
+  if (hasDetailNow && state.topologyBundleMode !== "composite") {
+    state.topologyBundleMode = "composite";
+    setMapData({ refitProjection: false, resetZoom: false });
+    return true;
+  }
+  if (hasDetailNow && state.topologyBundleMode === "composite") {
+    return false;
+  }
+  if (state.detailPromotionInFlight) {
     return false;
   }
   state.detailPromotionInFlight = true;
   try {
-    const {
-      topologyDetail,
-      runtimePoliticalTopology,
-      topologyBundleMode,
-      detailSourceUsed,
-    } = await loadDeferredDetailBundle({
-      detailSourceKey: state.detailSourceRequested,
-    });
-    if (!topologyDetail) {
-      state.detailDeferred = false;
-      return false;
+    let lastError = null;
+    for (let attempt = 1; attempt <= 2; attempt += 1) {
+      try {
+        const {
+          topologyDetail,
+          runtimePoliticalTopology,
+          detailSourceUsed,
+        } = await loadDeferredDetailBundle({
+          detailSourceKey: state.detailSourceRequested,
+        });
+
+        const runtimeFallback = runtimePoliticalTopology || state.runtimePoliticalTopology || null;
+        const resolvedDetail = hasUsablePoliticalTopology(topologyDetail)
+          ? topologyDetail
+          : (hasUsablePoliticalTopology(runtimeFallback) ? runtimeFallback : null);
+        if (!resolvedDetail) {
+          console.warn(`[scenario] Detail promotion attempt ${attempt}/2 resolved no usable topology.`);
+          continue;
+        }
+        if (!hasUsablePoliticalTopology(topologyDetail) && hasUsablePoliticalTopology(runtimeFallback)) {
+          console.warn(`[scenario] Detail promotion attempt ${attempt}/2 using runtime political fallback.`);
+        }
+        state.topologyDetail = resolvedDetail;
+        state.runtimePoliticalTopology = runtimeFallback;
+        state.topologyBundleMode = "composite";
+        state.detailDeferred = false;
+        state.detailPromotionCompleted = true;
+        state.detailSourceRequested = detailSourceUsed || state.detailSourceRequested;
+        setMapData({ refitProjection: false, resetZoom: false });
+        return true;
+      } catch (error) {
+        lastError = error;
+        console.warn(`[scenario] Detail promotion attempt ${attempt}/2 failed.`, error);
+      }
     }
-    state.topologyDetail = topologyDetail;
-    state.runtimePoliticalTopology = runtimePoliticalTopology || state.runtimePoliticalTopology;
-    state.topologyBundleMode = topologyBundleMode || "composite";
+
     state.detailDeferred = false;
-    state.detailPromotionCompleted = true;
-    state.detailSourceRequested = detailSourceUsed || state.detailSourceRequested;
-    setMapData({ refitProjection: false, resetZoom: false });
-    return true;
+    if (lastError) {
+      console.warn("[scenario] Detail topology could not be promoted after retry. Staying on coarse map.", lastError);
+    } else {
+      console.warn("[scenario] Detail topology could not be promoted after retry. Staying on coarse map.");
+    }
+    return false;
   } catch (error) {
     console.warn("Unable to force-load detail topology before scenario apply:", error);
     return false;
@@ -429,6 +575,36 @@ function restoreParentBordersAfterScenario() {
   }
 }
 
+function applyScenarioPaintMode() {
+  if (!state.activeScenarioId && !state.scenarioPaintModeBeforeActivate) {
+    state.scenarioPaintModeBeforeActivate = {
+      paintMode: String(state.paintMode || "visual") === "sovereignty" ? "sovereignty" : "visual",
+      interactionGranularity: String(state.interactionGranularity || "subdivision") === "country"
+        ? "country"
+        : "subdivision",
+    };
+  }
+  state.paintMode = "sovereignty";
+  state.interactionGranularity = "subdivision";
+  if (typeof state.updatePaintModeUIFn === "function") {
+    state.updatePaintModeUIFn();
+  }
+}
+
+function restorePaintModeAfterScenario() {
+  const previous = state.scenarioPaintModeBeforeActivate;
+  if (previous && typeof previous === "object") {
+    state.paintMode = previous.paintMode === "sovereignty" ? "sovereignty" : "visual";
+    state.interactionGranularity = previous.interactionGranularity === "country"
+      ? "country"
+      : "subdivision";
+  }
+  state.scenarioPaintModeBeforeActivate = null;
+  if (typeof state.updatePaintModeUIFn === "function") {
+    state.updatePaintModeUIFn();
+  }
+}
+
 async function applyScenarioBundle(
   bundle,
   {
@@ -441,7 +617,10 @@ async function applyScenarioBundle(
   if (!bundle?.manifest) {
     throw new Error("Scenario bundle is missing a manifest.");
   }
-  await ensureScenarioDetailTopologyLoaded();
+  const detailPromoted = await ensureScenarioDetailTopologyLoaded();
+  if (!detailPromoted && state.topologyBundleMode !== "composite") {
+    console.warn("[scenario] Applying bundle without confirmed detail promotion; health gate will validate runtime topology.");
+  }
   if (syncPalette) {
     await setActivePaletteSource(
       normalizeScenarioId(bundle.manifest?.palette_id) || "hoi4_vanilla",
@@ -498,6 +677,7 @@ async function applyScenarioBundle(
   state.sovereigntyByFeatureId = { ...owners };
   state.sovereigntyInitialized = false;
   ensureSovereigntyState({ force: true });
+  recalculateScenarioOwnerControllerDiffCount();
   state.visualOverrides = {};
   state.featureOverrides = {};
   state.sovereignBaseColors = { ...scenarioColorMap };
@@ -505,9 +685,22 @@ async function applyScenarioBundle(
   state.activeSovereignCode = defaultCountryCode;
   syncScenarioInspectorSelection(defaultCountryCode);
   rebuildPresetState();
+  applyScenarioPaintMode();
+  if (typeof document !== "undefined") {
+    const presetSection = document.getElementById("selectedCountryActionsSection");
+    if (presetSection && "open" in presetSection) {
+      presetSection.open = true;
+    }
+  }
 
-  // Diagnostic: verify key ownership assignments took effect
-  const spotChecks = ["SYR-134", "LBN-3022", "BY_HIST_POL_VITEBSK_WEST", "CN_CITY_17275852B32842590404417"];
+  // Diagnostic: verify key ownership/frontline assignments took effect.
+  const spotChecks = [
+    "SYR-134",
+    "LBN-3022",
+    "BY_HIST_POL_VITEBSK_WEST",
+    "CN_CITY_17275852B74586174185496",
+    "CN_CITY_17275852B2295538790743",
+  ];
   spotChecks.forEach((fid) => {
     const owner = state.sovereigntyByFeatureId[fid];
     const controller = state.scenarioControllersByFeatureId?.[fid] || owner;
@@ -519,6 +712,16 @@ async function applyScenarioBundle(
 
   refreshColorState({ renderNow: false });
   recomputeDynamicBordersNow({ renderNow: false, reason: `scenario:${scenarioId}` });
+  const dataHealth = refreshScenarioDataHealth({
+    showWarningToast: true,
+    showErrorToast: true,
+    minRatio: SCENARIO_DETAIL_MIN_RATIO_STRICT,
+  });
+  if (dataHealth.warning) {
+    console.warn(
+      `[scenario] Detail visibility gate triggered for ${scenarioId}: runtime=${dataHealth.runtimeFeatureCount}, expected=${dataHealth.expectedFeatureCount}, ratio=${dataHealth.ratio.toFixed(3)} (min=${dataHealth.minRatio}).`
+    );
+  }
   if (markDirtyReason) {
     markDirty(markDirtyReason);
   }
@@ -580,6 +783,7 @@ function resetToScenarioBaseline(
   state.scenarioViewMode = "ownership";
   state.sovereigntyInitialized = false;
   ensureSovereigntyState({ force: true });
+  recalculateScenarioOwnerControllerDiffCount();
   state.visualOverrides = {};
   state.featureOverrides = {};
   state.sovereignBaseColors = { ...(state.scenarioFixedOwnerColors || {}) };
@@ -606,6 +810,7 @@ function resetToScenarioBaseline(
   disableScenarioParentBorders();
   refreshColorState({ renderNow: false });
   recomputeDynamicBordersNow({ renderNow: false, reason: `scenario-reset:${state.activeScenarioId}` });
+  refreshScenarioDataHealth({ showWarningToast: false });
   if (markDirtyReason) {
     markDirty(markDirtyReason);
   }
@@ -648,6 +853,15 @@ function clearActiveScenario(
   state.scenarioBaselineControllersByFeatureId = {};
   state.scenarioBaselineCoresByFeatureId = {};
   state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
+  state.scenarioOwnerControllerDiffCount = 0;
+  state.scenarioDataHealth = {
+    expectedFeatureCount: 0,
+    runtimeFeatureCount: 0,
+    ratio: 1,
+    minRatio: SCENARIO_DETAIL_MIN_RATIO_STRICT,
+    warning: "",
+    severity: "",
+  };
   state.scenarioViewMode = "ownership";
   state.countryNames = { ...countryNames };
   resetAllFeatureOwnersToCanonical();
@@ -659,6 +873,7 @@ function clearActiveScenario(
   state.activeSovereignCode = "";
   syncScenarioInspectorSelection("");
   restoreParentBordersAfterScenario();
+  restorePaintModeAfterScenario();
   rebuildPresetState();
   refreshColorState({ renderNow: false });
   recomputeDynamicBordersNow({ renderNow: false, reason: "scenario-clear" });
@@ -681,7 +896,9 @@ function formatScenarioStatusText() {
   const summary = state.activeScenarioManifest.summary || {};
   const owners = Number(summary.owner_count || 0);
   const features = Number(summary.feature_count || 0);
-  return `${state.activeScenarioManifest.display_name || state.activeScenarioId} 路 ${owners} ${t("owners", "ui")} 路 ${features} ${t("features", "ui")}`;
+  const warning = String(state.scenarioDataHealth?.warning || "").trim();
+  const base = `${state.activeScenarioManifest.display_name || state.activeScenarioId} 路 ${owners} ${t("owners", "ui")} 路 ${features} ${t("features", "ui")}`;
+  return warning ? `${base} 路 ${warning}` : base;
 }
 
 function formatScenarioAuditText() {
@@ -709,8 +926,12 @@ function formatScenarioAuditText() {
     || Number(summary.synthetic_owner_feature_count)
     || 0
   }`);
-  hints.push(`${t("Split", "ui")}: ${Number(summary.owner_controller_split_feature_count || 0)}`);
+  hints.push(`${t("Split", "ui")}: ${Number(state.scenarioOwnerControllerDiffCount || summary.owner_controller_split_feature_count || 0)}`);
   hints.push(`${t("Blockers", "ui")}: ${getScenarioBlockerCount(summary)}`);
+  const runtimeCount = Number(state.scenarioDataHealth?.runtimeFeatureCount || 0);
+  if (runtimeCount > 0) {
+    hints.push(`${t("Runtime", "ui")}: ${runtimeCount}`);
+  }
   return hints.join(" 路 ");
 }
 
@@ -753,7 +974,7 @@ function initScenarioManager({ render } = {}) {
       const hasControllerData = Object.keys(state.scenarioControllersByFeatureId || {}).length > 0;
       const hasSplit = Number(state.activeScenarioManifest?.summary?.owner_controller_split_feature_count || 0) > 0;
       scenarioViewModeSelect.value = normalizeScenarioViewMode(state.scenarioViewMode);
-      scenarioViewModeSelect.disabled = !hasScenario || !hasControllerData;
+      scenarioViewModeSelect.disabled = !hasScenario || !hasControllerData || !hasSplit;
       scenarioViewModeSelect.classList.toggle("hidden", !hasScenario);
       scenarioViewModeLabel?.classList.toggle("hidden", !hasScenario);
       scenarioViewModeSelect.title = hasSplit

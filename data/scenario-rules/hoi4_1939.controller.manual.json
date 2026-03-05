@@ -21,6 +21,22 @@
       "base_iso2": "CN"
     },
     {
+      "rule_id": "1939_frontline_north_china_shanghai_japanese_control",
+      "owner_tag": "JAP",
+      "priority": 900,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "Approximate 1939 Japanese field control across North China and Shanghai corridor (province-group coverage).",
+      "include_hierarchy_group_ids": [
+        "CN_Beijing",
+        "CN_Tianjin",
+        "CN_Hebei",
+        "CN_Shandong",
+        "CN_Shanghai"
+      ],
+      "base_iso2": "JP"
+    },
+    {
       "rule_id": "1939_frontline_hainan_japanese_control",
       "owner_tag": "JAP",
       "priority": 1001,

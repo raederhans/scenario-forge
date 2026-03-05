@@ -32,6 +32,26 @@ CHINA_CITY_FALLBACK_URLS = [
     "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/CHN/ADM2/"
     "geoBoundaries-CHN-ADM2.geojson",
 ]
+CZE_ADM2_URL = (
+    "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/main/releaseData/gbOpen/CZE/ADM2/"
+    "geoBoundaries-CZE-ADM2.geojson"
+)
+CZE_ADM2_FALLBACK_URLS = [
+    "https://raw.githubusercontent.com/wmgeolab/geoBoundaries/main/releaseData/gbOpen/CZE/ADM2/"
+    "geoBoundaries-CZE-ADM2.geojson",
+    "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/CZE/ADM2/"
+    "geoBoundaries-CZE-ADM2.geojson",
+]
+SVK_ADM2_URL = (
+    "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/main/releaseData/gbOpen/SVK/ADM2/"
+    "geoBoundaries-SVK-ADM2.geojson"
+)
+SVK_ADM2_FALLBACK_URLS = [
+    "https://raw.githubusercontent.com/wmgeolab/geoBoundaries/main/releaseData/gbOpen/SVK/ADM2/"
+    "geoBoundaries-SVK-ADM2.geojson",
+    "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/SVK/ADM2/"
+    "geoBoundaries-SVK-ADM2.geojson",
+]
 RUS_ADM2_URL = (
     "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/RUS/ADM2/"
     "geoBoundaries-RUS-ADM2.geojson"
@@ -122,6 +142,8 @@ ABS_SUA_2021_GDA94_FALLBACK_URLS: list[str] = []
 FR_ARR_FILENAME = "france_arrondissements.geojson"
 PL_POWIATY_FILENAME = "poland_powiaty.geojson"
 CHINA_ADM2_FILENAME = "china_adm2.geojson"
+CZE_ADM2_FILENAME = "geoBoundaries-CZE-ADM2.geojson"
+SVK_ADM2_FILENAME = "geoBoundaries-SVK-ADM2.geojson"
 RUS_ADM2_FILENAME = "geoBoundaries-RUS-ADM2.geojson"
 UKR_ADM2_FILENAME = "geoBoundaries-UKR-ADM2.geojson"
 BLR_ADM2_FILENAME = "geoBoundaries-BLR-ADM2.geojson"

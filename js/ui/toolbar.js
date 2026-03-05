@@ -367,6 +367,7 @@ function initToolbar({ render } = {}) {
     if (!scenarioContextBar) return;
     const activeScenario = String(state.activeScenarioManifest?.display_name || state.activeScenarioId || "").trim();
     const activeCode = String(state.activeSovereignCode || "").trim().toUpperCase();
+    const splitCount = Number(state.scenarioOwnerControllerDiffCount || 0);
     const activeLabel = activeCode
       ? (t(state.countryNames?.[activeCode] || activeCode, "geo") || state.countryNames?.[activeCode] || activeCode)
       : t("None", "ui");
@@ -385,7 +386,7 @@ function initToolbar({ render } = {}) {
     }
     if (scenarioContextModeText) {
       scenarioContextModeText.textContent = activeScenario
-        ? `${t("Mode", "ui")}: ${modeLabel} · ${t("View", "ui")}: ${scenarioViewLabel}`
+        ? `${t("Mode", "ui")}: ${modeLabel} · ${t("View", "ui")}: ${scenarioViewLabel} · ${t("Split", "ui")}: ${splitCount}`
         : `${t("Mode", "ui")}: ${modeLabel}`;
     }
     if (scenarioContextActiveText) {

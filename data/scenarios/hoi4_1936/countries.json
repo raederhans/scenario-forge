@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1936",
-  "generated_at": "2026-03-05T01:09:58.604438+00:00",
+  "generated_at": "2026-03-05T15:56:01.264851+00:00",
   "default_country": "GER",
   "countries": {
     "AFA": {
@@ -618,7 +618,7 @@
       "tag": "CZE",
       "display_name": "Czechoslovakia",
       "color_hex": "#36a79c",
-      "feature_count": 35,
+      "feature_count": 65,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CZ",

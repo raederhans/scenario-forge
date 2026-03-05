@@ -2086,17 +2086,30 @@ button.scenario-action-card:hover {
 }
 
 .scenario-core-action-card {
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  align-items: stretch;
 }
 
 .scenario-core-action-row {
+  width: 100%;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 8px;
 }
 
-.scenario-core-action-row .btn-primary {
+.scenario-core-action-row .btn-primary,
+.scenario-core-action-row .btn-secondary {
   flex: 1 1 180px;
+  min-height: 34px;
+  min-width: 0;
   justify-content: center;
+}
+
+.scenario-parent-return-btn {
+  white-space: normal;
+  line-height: 1.35;
 }
 
 .preset-row .inspector-item-btn {

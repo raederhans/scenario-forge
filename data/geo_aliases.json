@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "generated_at": "2026-03-05T02:53:55.578451+00:00",
+  "generated_at": "2026-03-05T15:33:05.169389+00:00",
   "source": "C:\\Users\\raede\\Desktop\\dev\\mapcreator\\data\\europe_topology.na_v2.json",
-  "entry_count": 11166,
-  "alias_count": 23189,
+  "entry_count": 11196,
+  "alias_count": 23249,
   "conflict_count": 0,
   "conflicts": [],
   "ambiguous_alias_count": 621,
@@ -36053,6 +36053,186 @@
       "aliases": [
         "Moravskoslezský kraj",
         "Moravskoslezský kraj (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B20358302460191",
+      "feature_id": "CZ_ADM2_57006924B20358302460191",
+      "country_code": "CZ",
+      "primary_name": "Sokolov",
+      "aliases": [
+        "Sokolov",
+        "Sokolov (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B21154438881940",
+      "feature_id": "CZ_ADM2_57006924B21154438881940",
+      "country_code": "CZ",
+      "primary_name": "Český Krumlov",
+      "aliases": [
+        "Český Krumlov",
+        "Český Krumlov (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B26083217891381",
+      "feature_id": "CZ_ADM2_57006924B26083217891381",
+      "country_code": "CZ",
+      "primary_name": "Česká Lípa",
+      "aliases": [
+        "Česká Lípa",
+        "Česká Lípa (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B32669310027153",
+      "feature_id": "CZ_ADM2_57006924B32669310027153",
+      "country_code": "CZ",
+      "primary_name": "Chomutov",
+      "aliases": [
+        "Chomutov",
+        "Chomutov (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B34464963037986",
+      "feature_id": "CZ_ADM2_57006924B34464963037986",
+      "country_code": "CZ",
+      "primary_name": "Prachatice",
+      "aliases": [
+        "Prachatice",
+        "Prachatice (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B50757157558324",
+      "feature_id": "CZ_ADM2_57006924B50757157558324",
+      "country_code": "CZ",
+      "primary_name": "Karlovy Vary",
+      "aliases": [
+        "Karlovy Vary",
+        "Karlovy Vary (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B55732331485961",
+      "feature_id": "CZ_ADM2_57006924B55732331485961",
+      "country_code": "CZ",
+      "primary_name": "Tachov",
+      "aliases": [
+        "Tachov",
+        "Tachov (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B56764577868008",
+      "feature_id": "CZ_ADM2_57006924B56764577868008",
+      "country_code": "CZ",
+      "primary_name": "Břeclav",
+      "aliases": [
+        "Břeclav",
+        "Břeclav (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B57972685793284",
+      "feature_id": "CZ_ADM2_57006924B57972685793284",
+      "country_code": "CZ",
+      "primary_name": "Děčín",
+      "aliases": [
+        "Děčín",
+        "Děčín (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B5960993849333",
+      "feature_id": "CZ_ADM2_57006924B5960993849333",
+      "country_code": "CZ",
+      "primary_name": "Ústí nad Labem",
+      "aliases": [
+        "Ústí nad Labem",
+        "Ústí nad Labem (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B6655388448820",
+      "feature_id": "CZ_ADM2_57006924B6655388448820",
+      "country_code": "CZ",
+      "primary_name": "Teplice",
+      "aliases": [
+        "Teplice",
+        "Teplice (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B67285149942805",
+      "feature_id": "CZ_ADM2_57006924B67285149942805",
+      "country_code": "CZ",
+      "primary_name": "Jindřichův Hradec",
+      "aliases": [
+        "Jindřichův Hradec",
+        "Jindřichův Hradec (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B71753966872420",
+      "feature_id": "CZ_ADM2_57006924B71753966872420",
+      "country_code": "CZ",
+      "primary_name": "Most",
+      "aliases": [
+        "Most",
+        "Most (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B72008682408189",
+      "feature_id": "CZ_ADM2_57006924B72008682408189",
+      "country_code": "CZ",
+      "primary_name": "Klatovy",
+      "aliases": [
+        "Klatovy",
+        "Klatovy (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B73132069516203",
+      "feature_id": "CZ_ADM2_57006924B73132069516203",
+      "country_code": "CZ",
+      "primary_name": "České Budějovice",
+      "aliases": [
+        "České Budějovice",
+        "České Budějovice (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B74936445485800",
+      "feature_id": "CZ_ADM2_57006924B74936445485800",
+      "country_code": "CZ",
+      "primary_name": "Cheb",
+      "aliases": [
+        "Cheb",
+        "Cheb (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B92931687173289",
+      "feature_id": "CZ_ADM2_57006924B92931687173289",
+      "country_code": "CZ",
+      "primary_name": "Domažlice",
+      "aliases": [
+        "Domažlice",
+        "Domažlice (CZ)"
+      ]
+    },
+    {
+      "stable_key": "id::CZ_ADM2_57006924B95695201424764",
+      "feature_id": "CZ_ADM2_57006924B95695201424764",
+      "country_code": "CZ",
+      "primary_name": "Znojmo",
+      "aliases": [
+        "Znojmo",
+        "Znojmo (CZ)"
       ]
     },
     {
@@ -93580,6 +93760,126 @@
       ]
     },
     {
+      "stable_key": "id::SK_ADM2_56367889B1447043738985",
+      "feature_id": "SK_ADM2_56367889B1447043738985",
+      "country_code": "SK",
+      "primary_name": "District of Kovice - okolie",
+      "aliases": [
+        "District of Kovice - okolie",
+        "District of Kovice - okolie (SK)"
+      ]
+    },
+    {
+      "stable_key": "id::SK_ADM2_56367889B15205076567490",
+      "feature_id": "SK_ADM2_56367889B15205076567490",
+      "country_code": "SK",
+      "primary_name": "District of Rimavsk",
+      "aliases": [
+        "District of Rimavsk",
+        "District of Rimavsk (SK)"
+      ]
+    },
+    {
+      "stable_key": "id::SK_ADM2_56367889B15407569919112",
+      "feature_id": "SK_ADM2_56367889B15407569919112",
+      "country_code": "SK",
+      "primary_name": "District of Levice",
+      "aliases": [
+        "District of Levice",
+        "District of Levice (SK)"
+      ]
+    },
+    {
+      "stable_key": "id::SK_ADM2_56367889B27848609458937",
+      "feature_id": "SK_ADM2_56367889B27848609458937",
+      "country_code": "SK",
+      "primary_name": "District of Komprno",
+      "aliases": [
+        "District of Komprno",
+        "District of Komprno (SK)"
+      ]
+    },
+    {
+      "stable_key": "id::SK_ADM2_56367889B31823009041462",
+      "feature_id": "SK_ADM2_56367889B31823009041462",
+      "country_code": "SK",
+      "primary_name": "District of Revnca",
+      "aliases": [
+        "District of Revnca",
+        "District of Revnca (SK)"
+      ]
+    },
+    {
+      "stable_key": "id::SK_ADM2_56367889B50490339994693",
+      "feature_id": "SK_ADM2_56367889B50490339994693",
+      "country_code": "SK",
+      "primary_name": "District of Ronnava",
+      "aliases": [
+        "District of Ronnava",
+        "District of Ronnava (SK)"
+      ]
+    },
+    {
+      "stable_key": "id::SK_ADM2_56367889B59585277732331",
+      "feature_id": "SK_ADM2_56367889B59585277732331",
+      "country_code": "SK",
+      "primary_name": "District of Lucenec",
+      "aliases": [
+        "District of Lucenec",
+        "District of Lucenec (SK)"
+      ]
+    },
+    {
+      "stable_key": "id::SK_ADM2_56367889B62553648042075",
+      "feature_id": "SK_ADM2_56367889B62553648042075",
+      "country_code": "SK",
+      "primary_name": "District of Nova Zkmky",
+      "aliases": [
+        "District of Nova Zkmky",
+        "District of Nova Zkmky (SK)"
+      ]
+    },
+    {
+      "stable_key": "id::SK_ADM2_56367889B65708067786299",
+      "feature_id": "SK_ADM2_56367889B65708067786299",
+      "country_code": "SK",
+      "primary_name": "District of Trebi ov",
+      "aliases": [
+        "District of Trebi ov",
+        "District of Trebi ov (SK)"
+      ]
+    },
+    {
+      "stable_key": "id::SK_ADM2_56367889B690835779632",
+      "feature_id": "SK_ADM2_56367889B690835779632",
+      "country_code": "SK",
+      "primary_name": "District of Bratislava V",
+      "aliases": [
+        "District of Bratislava V",
+        "District of Bratislava V (SK)"
+      ]
+    },
+    {
+      "stable_key": "id::SK_ADM2_56367889B78366861694162",
+      "feature_id": "SK_ADM2_56367889B78366861694162",
+      "country_code": "SK",
+      "primary_name": "District of Dunajskn Streda",
+      "aliases": [
+        "District of Dunajskn Streda",
+        "District of Dunajskn Streda (SK)"
+      ]
+    },
+    {
+      "stable_key": "id::SK_ADM2_56367889B96980961358907",
+      "feature_id": "SK_ADM2_56367889B96980961358907",
+      "country_code": "SK",
+      "primary_name": "District of Velka Krta",
+      "aliases": [
+        "District of Velka Krta",
+        "District of Velka Krta (SK)"
+      ]
+    },
+    {
       "stable_key": "id::SL_ADM1_SLE-760",
       "feature_id": "SL_ADM1_SLE-760",
       "country_code": "SL",
@@ -118867,6 +119167,8 @@
     "Börde [Sachsen-Anhalt]": "id::DEE07",
     "Bălţi": "id::MDA-1618",
     "Bălţi (MD)": "id::MDA-1618",
+    "Břeclav": "id::CZ_ADM2_57006924B56764577868008",
+    "Břeclav (CZ)": "id::CZ_ADM2_57006924B56764577868008",
     "Bərdə": "id::AZE-1696",
     "Bərdə (AZ)": "id::AZE-1696",
     "Bạc Liêu": "id::VNM-506",
@@ -119381,6 +119683,8 @@
     "Chayaxian (CN)": "id::CN_CITY_17275852B8009329380569",
     "Chayuxian": "id::CN_CITY_17275852B56802851821394",
     "Chayuxian (CN)": "id::CN_CITY_17275852B56802851821394",
+    "Cheb": "id::CZ_ADM2_57006924B74936445485800",
+    "Cheb (CZ)": "id::CZ_ADM2_57006924B74936445485800",
     "Cheboksarsky District": "id::RU_RAY_50074027B16961904381699",
     "Cheboksarsky District (RU)": "id::RU_RAY_50074027B16961904381699",
     "Chechelnyk": "id::UA_RAY_74538382B56756126132930",
@@ -119644,6 +119948,8 @@
     "Cholet (FR)": "id::FR_ARR_49002",
     "Choluteca": "id::HN_ADM1_HND-661",
     "Choluteca (HN)": "id::HN_ADM1_HND-661",
+    "Chomutov": "id::CZ_ADM2_57006924B32669310027153",
+    "Chomutov (CZ)": "id::CZ_ADM2_57006924B32669310027153",
     "Chon Buri": "id::THA-430",
     "Chon Buri (TH)": "id::THA-430",
     "Chonghua": "id::CN_CITY_17275852B54721890479732",
@@ -120588,8 +120894,32 @@
     "District Autonome D'Abidjan (CI)": "id::CI_ADM1_83157122B76853064397847",
     "District Autonome De Yamoussoukro": "id::CI_ADM1_83157122B30232425959699",
     "District Autonome De Yamoussoukro (CI)": "id::CI_ADM1_83157122B30232425959699",
+    "District of Bratislava V": "id::SK_ADM2_56367889B690835779632",
+    "District of Bratislava V (SK)": "id::SK_ADM2_56367889B690835779632",
     "District of Columbia": "id::US_CNTY_11001",
     "District of Columbia (US)": "id::US_CNTY_11001",
+    "District of Dunajskn Streda": "id::SK_ADM2_56367889B78366861694162",
+    "District of Dunajskn Streda (SK)": "id::SK_ADM2_56367889B78366861694162",
+    "District of Komprno": "id::SK_ADM2_56367889B27848609458937",
+    "District of Komprno (SK)": "id::SK_ADM2_56367889B27848609458937",
+    "District of Kovice - okolie": "id::SK_ADM2_56367889B1447043738985",
+    "District of Kovice - okolie (SK)": "id::SK_ADM2_56367889B1447043738985",
+    "District of Levice": "id::SK_ADM2_56367889B15407569919112",
+    "District of Levice (SK)": "id::SK_ADM2_56367889B15407569919112",
+    "District of Lucenec": "id::SK_ADM2_56367889B59585277732331",
+    "District of Lucenec (SK)": "id::SK_ADM2_56367889B59585277732331",
+    "District of Nova Zkmky": "id::SK_ADM2_56367889B62553648042075",
+    "District of Nova Zkmky (SK)": "id::SK_ADM2_56367889B62553648042075",
+    "District of Revnca": "id::SK_ADM2_56367889B31823009041462",
+    "District of Revnca (SK)": "id::SK_ADM2_56367889B31823009041462",
+    "District of Rimavsk": "id::SK_ADM2_56367889B15205076567490",
+    "District of Rimavsk (SK)": "id::SK_ADM2_56367889B15205076567490",
+    "District of Ronnava": "id::SK_ADM2_56367889B50490339994693",
+    "District of Ronnava (SK)": "id::SK_ADM2_56367889B50490339994693",
+    "District of Trebi ov": "id::SK_ADM2_56367889B65708067786299",
+    "District of Trebi ov (SK)": "id::SK_ADM2_56367889B65708067786299",
+    "District of Velka Krta": "id::SK_ADM2_56367889B96980961358907",
+    "District of Velka Krta (SK)": "id::SK_ADM2_56367889B96980961358907",
     "Dithmarschen": "id::DEF05",
     "Dithmarschen (DE)": "id::DEF05",
     "Dithmarschen [Schleswig-Holstein]": "id::DEF05",
@@ -120655,6 +120985,8 @@
     "Domagnano (SM)": "id::SM_ADM1_SMR-4887",
     "Domanivka": "id::UA_RAY_74538382B97324557643268",
     "Domanivka (UA)": "id::UA_RAY_74538382B97324557643268",
+    "Domažlice": "id::CZ_ADM2_57006924B92931687173289",
+    "Domažlice (CZ)": "id::CZ_ADM2_57006924B92931687173289",
     "Domodedovsky District": "id::RU_RAY_50074027B8228357618159",
     "Domodedovsky District (RU)": "id::RU_RAY_50074027B8228357618159",
     "Don Valley North": "id::CA_FED_35023",
@@ -120918,6 +121250,8 @@
     "Düzce (TR)": "id::TR423",
     "Dąbrowa Górnicza": "id::PL_POW_2465",
     "Dąbrowa Górnicza (PL)": "id::PL_POW_2465",
+    "Děčín": "id::CZ_ADM2_57006924B57972685793284",
+    "Děčín (CZ)": "id::CZ_ADM2_57006924B57972685793284",
     "Dəvəçi": "id::AZE-1701",
     "Dəvəçi (AZ)": "id::AZE-1701",
     "Ealing": "id::UKI73",
@@ -123975,6 +124309,8 @@
     "Jinchuanxian (CN)": "id::CN_CITY_17275852B96590770940609",
     "Jind": "id::IN_ADM2_76128533B45106682783501",
     "Jind (IN)": "id::IN_ADM2_76128533B45106682783501",
+    "Jindřichův Hradec": "id::CZ_ADM2_57006924B67285149942805",
+    "Jindřichův Hradec (CZ)": "id::CZ_ADM2_57006924B67285149942805",
     "Jinganxian": "id::CN_CITY_17275852B88707811573248",
     "Jinganxian (CN)": "id::CN_CITY_17275852B88707811573248",
     "Jingbeixian": "id::CN_CITY_17275852B97051310016142",
@@ -124480,6 +124816,8 @@
     "Karlovarský kraj (CZ)": "id::CZ041",
     "Karlovačka županija": "id::HR027",
     "Karlovačka županija (HR)": "id::HR027",
+    "Karlovy Vary": "id::CZ_ADM2_57006924B50757157558324",
+    "Karlovy Vary (CZ)": "id::CZ_ADM2_57006924B50757157558324",
     "Karlsruhe, Landkreis": "id::DE123",
     "Karlsruhe, Landkreis (DE)": "id::DE123",
     "Karlsruhe, Landkreis [Baden-Württemberg]": "id::DE123",
@@ -124979,6 +125317,8 @@
     "Klagenfurt-Villach (AT)": "id::AT211",
     "Klaipėdos apskritis": "id::LT023",
     "Klaipėdos apskritis (LT)": "id::LT023",
+    "Klatovy": "id::CZ_ADM2_57006924B72008682408189",
+    "Klatovy (CZ)": "id::CZ_ADM2_57006924B72008682408189",
     "Kleberg": "id::US_CNTY_48273",
     "Kleberg (US)": "id::US_CNTY_48273",
     "Kleberg [Texas]": "id::US_CNTY_48273",
@@ -127955,6 +128295,8 @@
     "Moscow (RU)": "id::RU_CITY_MOSCOW",
     "Moshenskoy District": "id::RU_RAY_50074027B86116341254332",
     "Moshenskoy District (RU)": "id::RU_RAY_50074027B86116341254332",
+    "Most": "id::CZ_ADM2_57006924B71753966872420",
+    "Most (CZ)": "id::CZ_ADM2_57006924B71753966872420",
     "Mostaganem": "id::DZA-2202",
     "Mostaganem (DZ)": "id::DZA-2202",
     "Mosteiros": "id::CV_ADM1_CPV-5043",
@@ -130736,6 +131078,8 @@
     "Poznań (PL)": "id::PL_POW_3064",
     "Požeško-slavonska županija": "id::HR023",
     "Požeško-slavonska županija (HR)": "id::HR023",
+    "Prachatice": "id::CZ_ADM2_57006924B34464963037986",
+    "Prachatice (CZ)": "id::CZ_ADM2_57006924B34464963037986",
     "Prachin Buri": "id::THA-410",
     "Prachin Buri (TH)": "id::THA-410",
     "Prachuap Khiri Khan": "id::THA-420",
@@ -133399,6 +133743,8 @@
     "Soissons (FR)": "id::FR_ARR_02004",
     "Sokal": "id::UA_RAY_74538382B97249439308301",
     "Sokal (UA)": "id::UA_RAY_74538382B97249439308301",
+    "Sokolov": "id::CZ_ADM2_57006924B20358302460191",
+    "Sokolov (CZ)": "id::CZ_ADM2_57006924B20358302460191",
     "Sokoto State": "id::NG_ADM1_NGA-2871",
     "Sokoto State (NG)": "id::NG_ADM1_NGA-2871",
     "Sokyriany": "id::UA_RAY_74538382B66987741978303",
@@ -134264,6 +134610,8 @@
     "Tacheng (CN)": "id::CN_CITY_17275852B20720560043260",
     "Tachira": "id::VE_ADM1_VEN-28",
     "Tachira (VE)": "id::VE_ADM1_VEN-28",
+    "Tachov": "id::CZ_ADM2_57006924B55732331485961",
+    "Tachov (CZ)": "id::CZ_ADM2_57006924B55732331485961",
     "Tacloban": "id::PHL-5535",
     "Tacloban (PH)": "id::PHL-5535",
     "Tacna": "id::PE_ADM1_PER-575",
@@ -134587,6 +134935,8 @@
     "Tennessee Zone 9 [Tennessee]": "id::US_ZN_47_009",
     "Teofipol": "id::UA_RAY_74538382B9733134987595",
     "Teofipol (UA)": "id::UA_RAY_74538382B9733134987595",
+    "Teplice": "id::CZ_ADM2_57006924B6655388448820",
+    "Teplice (CZ)": "id::CZ_ADM2_57006924B6655388448820",
     "Teplyk": "id::UA_RAY_74538382B75813986727772",
     "Teplyk (UA)": "id::UA_RAY_74538382B75813986727772",
     "Teramo": "id::ITF12",
@@ -137986,6 +138336,8 @@
     "Znamensk (RU)": "id::RU_RAY_50074027B81882539182238",
     "Znamianka": "id::UA_RAY_74538382B83616373915642",
     "Znamianka (UA)": "id::UA_RAY_74538382B83616373915642",
+    "Znojmo": "id::CZ_ADM2_57006924B95695201424764",
+    "Znojmo (CZ)": "id::CZ_ADM2_57006924B95695201424764",
     "Zollernalbkreis": "id::DE143",
     "Zollernalbkreis (DE)": "id::DE143",
     "Zollernalbkreis [Baden-Württemberg]": "id::DE143",
@@ -138679,6 +139031,14 @@
     "Østsjælland (DK)": "id::DK021",
     "Ústecký kraj": "id::CZ042",
     "Ústecký kraj (CZ)": "id::CZ042",
+    "Ústí nad Labem": "id::CZ_ADM2_57006924B5960993849333",
+    "Ústí nad Labem (CZ)": "id::CZ_ADM2_57006924B5960993849333",
+    "Česká Lípa": "id::CZ_ADM2_57006924B26083217891381",
+    "Česká Lípa (CZ)": "id::CZ_ADM2_57006924B26083217891381",
+    "České Budějovice": "id::CZ_ADM2_57006924B73132069516203",
+    "České Budějovice (CZ)": "id::CZ_ADM2_57006924B73132069516203",
+    "Český Krumlov": "id::CZ_ADM2_57006924B21154438881940",
+    "Český Krumlov (CZ)": "id::CZ_ADM2_57006924B21154438881940",
     "Điện Biên": "id::VNM-450",
     "Điện Biên (VN)": "id::VNM-450",
     "Đà Nẵng": "id::VNM-491",
