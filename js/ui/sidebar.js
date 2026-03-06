@@ -775,7 +775,7 @@ function getOwnedVisibleFeatureIds(ownerCode) {
   }
 
   if (!requestedIds.length && state.countryToFeatureIds instanceof Map) {
-    requestedIds = Array.isArray(state.countryToFeatureIds.get(normalizedOwnerCode))
+    requestedIds = Array.isArray(state.countryToFeatureIds?.get(normalizedOwnerCode))
       ? state.countryToFeatureIds.get(normalizedOwnerCode)
       : [];
   }

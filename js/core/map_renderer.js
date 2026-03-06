@@ -4699,6 +4699,12 @@ function commitHistoryEntry({ kind, before, after, affectsSovereignty = false } 
   });
 }
 
+function getCountryFeatureIds(countryCode) {
+  if (!countryCode || !(state.countryToFeatureIds instanceof Map)) return [];
+  const ids = state.countryToFeatureIds.get(countryCode);
+  return Array.isArray(ids) ? ids : [];
+}
+
 function resolveInteractionTargetIds(feature, id) {
   if (isSovereigntyModeActive()) {
     return [id];
@@ -4710,7 +4716,7 @@ function resolveInteractionTargetIds(feature, id) {
   if (!countryCode) {
     return [id];
   }
-  const ids = state.countryToFeatureIds.get(countryCode) || [];
+  const ids = getCountryFeatureIds(countryCode);
   return ids.length ? ids : [id];
 }
 
@@ -4746,9 +4752,7 @@ function resolveParentGroupTargetIds(feature, featureId) {
   const countryCode = getFeatureCountryCodeNormalized(feature);
   const parentGroupKey = resolveParentGroupKey(feature, featureId);
   if (!countryCode || !parentGroupKey) return [];
-  const ids = Array.isArray(state.countryToFeatureIds?.get(countryCode))
-    ? state.countryToFeatureIds.get(countryCode)
-    : [];
+  const ids = getCountryFeatureIds(countryCode);
   if (!ids.length) return [];
   const targetIds = ids.filter((candidateId) => {
     const candidateFeature = state.landIndex.get(candidateId);
@@ -4763,9 +4767,7 @@ function resolveCountryFillTargetIds(feature, featureId) {
   if (!featureId || !state.landIndex?.has(featureId)) return [];
   const countryCode = getFeatureCountryCodeNormalized(feature);
   if (!countryCode) return [];
-  const ids = Array.isArray(state.countryToFeatureIds?.get(countryCode))
-    ? state.countryToFeatureIds.get(countryCode)
-    : [];
+  const ids = getCountryFeatureIds(countryCode);
   if (ids.length < 2) return [];
 
   const hasParentGrouping = ids.some((candidateId) => {
@@ -4775,7 +4777,7 @@ function resolveCountryFillTargetIds(feature, featureId) {
   });
   if (hasParentGrouping) return [];
 
-  return Array.from(new Set(ids));
+  return ids;
 }
 
 function isBatchFillDoubleClickBaseEligible(hit, feature) {
@@ -4836,43 +4838,26 @@ function executeSingleSubdivisionFill(action) {
   });
 }
 
-function executeParentGroupFill(action) {
+function executeBatchFill(action, resolverFn, kind) {
   if (!action) return false;
-  const targetIds = resolveParentGroupTargetIds(
-    action.eventPayload?.feature || state.landIndex.get(action.featureId),
-    action.featureId
-  );
+  const feature = action.eventPayload?.feature || state.landIndex.get(action.featureId);
+  const targetIds = resolverFn(feature, action.featureId);
   if (!targetIds.length) {
     return executeSingleSubdivisionFill(action);
   }
   return applyVisualSubdivisionFill(targetIds, action.selectedColor, {
-    kind: "fill-parent-group",
-    dirtyReason: "fill-parent-group",
-  });
-}
-
-function executeCountryFill(action) {
-  if (!action) return false;
-  const targetIds = resolveCountryFillTargetIds(
-    action.eventPayload?.feature || state.landIndex.get(action.featureId),
-    action.featureId
-  );
-  if (!targetIds.length) {
-    return executeSingleSubdivisionFill(action);
-  }
-  return applyVisualSubdivisionFill(targetIds, action.selectedColor, {
-    kind: "fill-country-batch",
-    dirtyReason: "fill-country-batch",
+    kind,
+    dirtyReason: kind,
   });
 }
 
 function executePendingMapClickAction(action) {
   if (!action) return false;
   if (action.doubleClickBehavior === "country") {
-    return executeCountryFill(action);
+    return executeBatchFill(action, resolveCountryFillTargetIds, "fill-country-batch");
   }
   if (action.doubleClickBehavior === "parent-group") {
-    return executeParentGroupFill(action);
+    return executeBatchFill(action, resolveParentGroupTargetIds, "fill-parent-group");
   }
   return executeSingleSubdivisionFill(action);
 }
@@ -5290,37 +5275,28 @@ function handleClick(event) {
       }),
     });
   } else {
+    const baseAction = {
+      featureId: id,
+      countryCode,
+      selectedColor,
+      tool: "fill",
+      paintMode: state.paintMode,
+      interactionGranularity: state.interactionGranularity,
+      eventPayload: { feature, targetIds },
+    };
     if (isParentFillDoubleClickEligible(hit, feature)) {
       scheduleSingleSubdivisionFill({
-        featureId: id,
+        ...baseAction,
         parentGroupKey: resolveParentGroupKey(feature, id),
         doubleClickBehavior: "parent-group",
-        countryCode,
-        selectedColor,
-        tool: "fill",
-        paintMode: state.paintMode,
-        interactionGranularity: state.interactionGranularity,
-        eventPayload: {
-          feature,
-          targetIds,
-        },
       });
       return;
     }
     if (isCountryFillDoubleClickEligible(hit, feature)) {
       scheduleSingleSubdivisionFill({
-        featureId: id,
+        ...baseAction,
         parentGroupKey: "",
         doubleClickBehavior: "country",
-        countryCode,
-        selectedColor,
-        tool: "fill",
-        paintMode: state.paintMode,
-        interactionGranularity: state.interactionGranularity,
-        eventPayload: {
-          feature,
-          targetIds,
-        },
       });
       return;
     }
