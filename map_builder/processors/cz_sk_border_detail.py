@@ -1,4 +1,4 @@
-"""Targeted CZ/SK border-detail refinement for HOI4 1939 scenario overlays."""
+"""Full CZ/SK ADM2 replacement plus 1939 historical subset tagging."""
 from __future__ import annotations
 
 import json
@@ -22,6 +22,7 @@ TARGETS_PATH = (
 )
 
 MAX_AREA_DRIFT_KM2 = 25.0
+MAX_AREA_DRIFT_RATIO = 0.015
 
 
 def _make_valid_geom(geom):
@@ -57,24 +58,22 @@ def _as_feature_id(prefix: str, shape_id: str) -> str:
 
 
 def _load_targets() -> dict[str, set[str]]:
+    if not TARGETS_PATH.exists():
+        return {}
     payload = json.loads(TARGETS_PATH.read_text(encoding="utf-8"))
     targets = payload.get("targets", {}) if isinstance(payload, dict) else {}
-    sudeten = {
-        str(value).strip()
-        for value in (targets.get("sudetenland", {}) or {}).get("feature_ids", [])
-        if str(value).strip()
-    }
-    south_slovakia = {
-        str(value).strip()
-        for value in (targets.get("south_slovakia", {}) or {}).get("feature_ids", [])
-        if str(value).strip()
-    }
-    if not sudeten or not south_slovakia:
-        raise SystemExit("[CZ/SK] Target file is missing sudetenland/south_slovakia feature IDs.")
-    return {
-        "sudetenland": sudeten,
-        "south_slovakia": south_slovakia,
-    }
+    normalized: dict[str, set[str]] = {}
+    for key, raw_target in targets.items():
+        if not isinstance(raw_target, dict):
+            continue
+        feature_ids = {
+            str(value).strip()
+            for value in raw_target.get("feature_ids", [])
+            if str(value).strip()
+        }
+        if feature_ids:
+            normalized[str(key).strip()] = feature_ids
+    return normalized
 
 
 def _load_country_source(country_code: str) -> gpd.GeoDataFrame:
@@ -139,24 +138,22 @@ def _country_sym_diff_area_km2(before_geom, after_geom) -> float:
     return _feature_area_km2(sym)
 
 
-def _build_target_features(
+def _allowed_area_drift_km2(shell_geom) -> float:
+    shell_area_km2 = _feature_area_km2(shell_geom)
+    return max(MAX_AREA_DRIFT_KM2, shell_area_km2 * MAX_AREA_DRIFT_RATIO)
+
+
+def _build_adm2_features(
     source: gpd.GeoDataFrame,
     *,
     coarse_country: gpd.GeoDataFrame,
-    target_shape_ids: set[str],
     country_code: str,
     feature_prefix: str,
+    historical_targets: dict[str, set[str]],
 ) -> gpd.GeoDataFrame:
-    selected = source[source["shapeID"].isin(target_shape_ids)].copy()
-    missing = sorted(target_shape_ids - set(selected["shapeID"].tolist()))
-    if missing:
-        raise SystemExit(
-            f"[CZ/SK] Missing target shape IDs for {country_code}: {', '.join(missing[:20])}"
-        )
-
     coarse = coarse_country[["id", "name", "geometry"]].copy()
     coarse = _sanitize_polygon_layer(coarse)
-    coarse_points = selected.copy()
+    coarse_points = source.copy()
     coarse_points["geometry"] = coarse_points.geometry.representative_point()
     joined = gpd.sjoin(
         coarse_points,
@@ -171,37 +168,23 @@ def _build_target_features(
         if shape_id and parent_id and shape_id not in parent_by_shape_id:
             parent_by_shape_id[shape_id] = parent_id
 
-    selected["id"] = selected["shapeID"].apply(lambda value: _as_feature_id(feature_prefix, value))
-    selected["name"] = selected["shapeName"]
-    selected["cntr_code"] = country_code
-    selected["admin1_group"] = selected["shapeID"].apply(lambda value: parent_by_shape_id.get(value, ""))
-    selected["detail_tier"] = "adm2_hybrid_frontline_target"
+    def resolve_detail_tier(shape_id: str) -> str:
+        if any(shape_id in target_ids for target_ids in historical_targets.values()):
+            return "adm2_historical_target"
+        return "adm2_full_replacement"
 
-    out = selected[["id", "name", "cntr_code", "admin1_group", "detail_tier", "geometry"]].copy()
+    out = source.copy()
+    out["id"] = out["shapeID"].apply(lambda value: _as_feature_id(feature_prefix, value))
+    out["name"] = out["shapeName"]
+    out["cntr_code"] = country_code
+    out["admin1_group"] = out["shapeID"].apply(lambda value: parent_by_shape_id.get(value, ""))
+    out["detail_tier"] = out["shapeID"].apply(resolve_detail_tier)
+    out = out[["id", "name", "cntr_code", "admin1_group", "detail_tier", "geometry"]].copy()
     out = _sanitize_polygon_layer(out)
     if out.empty:
-        raise SystemExit(f"[CZ/SK] Target split for {country_code} produced no valid geometries.")
+        raise SystemExit(f"[CZ/SK] ADM2 rebuild for {country_code} produced no valid geometries.")
     if out["id"].duplicated().any():
         raise SystemExit(f"[CZ/SK] Duplicate generated feature IDs detected for {country_code}.")
-    return out
-
-
-def _subtract_target_union(
-    coarse_country: gpd.GeoDataFrame,
-    *,
-    target_union_geom,
-) -> gpd.GeoDataFrame:
-    if target_union_geom is None or target_union_geom.is_empty:
-        return coarse_country
-    out = coarse_country.copy()
-    out["geometry"] = out.geometry.apply(
-        lambda geom: _make_valid_geom(geom.difference(target_union_geom))
-        if geom is not None and not geom.is_empty
-        else None
-    )
-    out = _sanitize_polygon_layer(out)
-    if out.empty:
-        raise SystemExit("[CZ/SK] Country remainder became empty after target subtraction.")
     return out
 
 
@@ -209,9 +192,9 @@ def _build_country_refinement(
     main_gdf: gpd.GeoDataFrame,
     *,
     country_code: str,
-    target_shape_ids: set[str],
     feature_prefix: str,
-) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+    historical_targets: dict[str, set[str]],
+) -> gpd.GeoDataFrame:
     country_mask = main_gdf["cntr_code"].fillna("").astype(str).str.upper().str.strip() == country_code
     coarse_country = _sanitize_polygon_layer(main_gdf[country_mask].copy())
     if coarse_country.empty:
@@ -223,52 +206,61 @@ def _build_country_refinement(
 
     source = _load_country_source(country_code)
     source = _clip_source_to_shell(source, shell_geom)
-    targets = _build_target_features(
+    rebuilt_features = _build_adm2_features(
         source,
         coarse_country=coarse_country,
-        target_shape_ids=target_shape_ids,
         country_code=country_code,
         feature_prefix=feature_prefix,
+        historical_targets=historical_targets,
     )
-    target_union = _make_valid_geom(unary_union(targets.geometry.tolist()))
-    remainder = _subtract_target_union(coarse_country, target_union_geom=target_union)
 
-    rebuilt_union = _make_valid_geom(unary_union(pd.concat([remainder, targets], ignore_index=True).geometry.tolist()))
+    rebuilt_union = _make_valid_geom(unary_union(rebuilt_features.geometry.tolist()))
     drift_km2 = _country_sym_diff_area_km2(shell_geom, rebuilt_union)
-    if drift_km2 > MAX_AREA_DRIFT_KM2:
+    allowed_drift_km2 = _allowed_area_drift_km2(shell_geom)
+    if drift_km2 > allowed_drift_km2:
         raise SystemExit(
             f"[CZ/SK] Coverage drift too high for {country_code}: {drift_km2:.2f} km^2 "
-            f"(limit={MAX_AREA_DRIFT_KM2:.2f})."
+            f"(limit={allowed_drift_km2:.2f}; "
+            f"abs_limit={MAX_AREA_DRIFT_KM2:.2f}; "
+            f"ratio_limit={MAX_AREA_DRIFT_RATIO:.3%})."
         )
 
-    return remainder, targets
+    return rebuilt_features
 
 
 def apply_cz_sk_border_detail(main_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     if main_gdf.empty:
         return main_gdf
     if "cntr_code" not in main_gdf.columns:
-        print("[CZ/SK] cntr_code missing; skipping targeted border refinement.")
-        return main_gdf
-    if not TARGETS_PATH.exists():
-        print(f"[CZ/SK] Target config missing at {TARGETS_PATH}; skipping refinement.")
+        print("[CZ/SK] cntr_code missing; skipping ADM2 replacement.")
         return main_gdf
 
     normalized = ensure_crs(main_gdf.copy())
     normalized["cntr_code"] = normalized["cntr_code"].fillna("").astype(str).str.upper().str.strip()
     targets = _load_targets()
 
-    cz_remainder, sudeten_features = _build_country_refinement(
+    cz_targets = {
+        key: values
+        for key, values in targets.items()
+        if key in {"sudetenland", "zaolzie"}
+    }
+    sk_targets = {
+        key: values
+        for key, values in targets.items()
+        if key == "south_slovakia"
+    }
+
+    cz_features = _build_country_refinement(
         normalized,
         country_code="CZ",
-        target_shape_ids=targets["sudetenland"],
         feature_prefix="CZ_ADM2",
+        historical_targets=cz_targets,
     )
-    sk_remainder, south_slovakia_features = _build_country_refinement(
+    sk_features = _build_country_refinement(
         normalized,
         country_code="SK",
-        target_shape_ids=targets["south_slovakia"],
         feature_prefix="SK_ADM2",
+        historical_targets=sk_targets,
     )
 
     base = normalized[~normalized["cntr_code"].isin({"CZ", "SK"})].copy()
@@ -276,10 +268,8 @@ def apply_cz_sk_border_detail(main_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         pd.concat(
             [
                 base,
-                cz_remainder,
-                sk_remainder,
-                sudeten_features,
-                south_slovakia_features,
+                cz_features,
+                sk_features,
             ],
             ignore_index=True,
         ),
@@ -288,7 +278,7 @@ def apply_cz_sk_border_detail(main_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     combined = _sanitize_polygon_layer(combined)
     print(
         "[CZ/SK] Border-detail refinement complete: "
-        f"sudeten_features={len(sudeten_features)}, south_slovakia_features={len(south_slovakia_features)}."
+        f"cz_features={len(cz_features)}, sk_features={len(sk_features)}, "
+        f"historical_targets={sum(len(value) for value in targets.values())}."
     )
     return combined
-

@@ -1,34 +1,34 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1939",
-  "generated_at": "2026-03-05T17:55:54.908210+00:00",
+  "generated_at": "2026-03-06T00:49:15.191835+00:00",
   "summary": {
-    "feature_count": 11222,
+    "feature_count": 11326,
     "owner_count": 92,
-    "controller_count": 91,
+    "controller_count": 92,
     "quality_counts": {
       "approx_existing_geometry": 996,
       "direct_country_copy": 5239,
-      "manual_reviewed": 4987
+      "manual_reviewed": 5091
     },
     "source_counts": {
       "direct_active_owner": 5239,
       "fallback_mapped_tag": 18,
-      "manual_rule": 5965
+      "manual_rule": 6069
     },
     "approximate_count": 996,
-    "manual_reviewed_feature_count": 4987,
+    "manual_reviewed_feature_count": 5091,
     "geometry_blocker_count": 0,
     "critical_unresolved_count": 0,
     "synthetic_owner_feature_count": 18,
     "synthetic_count": 18,
-    "changed_feature_count": 5983,
+    "changed_feature_count": 6087,
     "failed_region_check_count": 0,
     "topology_blocker_count": 0,
     "scenario_rule_blocker_count": 0,
     "blocker_count": 0,
-    "owner_controller_split_feature_count": 285,
-    "controller_rule_count": 4,
+    "owner_controller_split_feature_count": 0,
+    "controller_rule_count": 0,
     "critical_region_check_count": 0,
     "manual_reviewed_region_count": 0,
     "belarus_hybrid_feature_count": 0
@@ -42,9 +42,9 @@
     "country_history_count": 352,
     "state_count": 1046,
     "definition_entry_count": 13382,
-    "runtime_feature_count": 11222,
+    "runtime_feature_count": 11326,
     "manual_rule_count": 57,
-    "controller_rule_count": 4,
+    "controller_rule_count": 0,
     "enable_region_checks": false,
     "enforce_region_checks": false,
     "enforce_scenario_extensions": false,
@@ -422,10 +422,10 @@
     },
     "BOM": {
       "display_name": "Bohemia-Moravia Protectorate",
-      "feature_count": 13,
+      "feature_count": 58,
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 13
+        "manual_reviewed": 58
       },
       "base_iso2": "CZ",
       "lookup_iso2": "CZ",
@@ -1317,11 +1317,11 @@
     },
     "JAP": {
       "display_name": "Japan",
-      "feature_count": 114,
+      "feature_count": 115,
       "quality": "manual_reviewed",
       "quality_breakdown": {
         "direct_country_copy": 47,
-        "manual_reviewed": 67
+        "manual_reviewed": 68
       },
       "base_iso2": "JP",
       "lookup_iso2": "JP",
@@ -1554,10 +1554,10 @@
     },
     "MAN": {
       "display_name": "Manchukuo",
-      "feature_count": 235,
+      "feature_count": 234,
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 235
+        "manual_reviewed": 234
       },
       "base_iso2": "CN",
       "lookup_iso2": "CN",
@@ -2284,10 +2284,10 @@
     },
     "SLO": {
       "display_name": "Slovakia",
-      "feature_count": 8,
+      "feature_count": 67,
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 8
+        "manual_reviewed": 67
       },
       "base_iso2": "SK",
       "lookup_iso2": "SK",
@@ -18508,12 +18508,12 @@
       "country_code": "CN",
       "feature_name": "Jidongxian",
       "from_tag": "CHI",
-      "to_tag": "MAN",
+      "to_tag": "JAP",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "manchukuo",
+      "rule_id": "jidong_japanese_occupation",
       "critical": true,
-      "notes": "Manchukuo using northeastern China groupings plus the eastern Inner Mongolian and Jehol/Rehe frontier that belonged to MAN in HOI4 1936.",
+      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
       "synthetic_owner": false
     },
     {
@@ -79006,9 +79006,9 @@
       "synthetic_owner": false
     },
     {
-      "feature_id": "CZ010",
+      "feature_id": "CZ_ADM2_57006924B81305487356227",
       "country_code": "CZ",
-      "feature_name": "Hlavní město Praha",
+      "feature_name": "Nový Jičín",
       "from_tag": "",
       "to_tag": "BOM",
       "quality": "manual_reviewed",
@@ -79016,279 +79016,6 @@
       "rule_id": "bohemia_moravia_protectorate_1939",
       "critical": true,
       "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "CZ020",
-      "country_code": "CZ",
-      "feature_name": "Středočeský kraj",
-      "from_tag": "",
-      "to_tag": "BOM",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "bohemia_moravia_protectorate_1939",
-      "critical": true,
-      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "CZ031",
-      "country_code": "CZ",
-      "feature_name": "Jihočeský kraj",
-      "from_tag": "",
-      "to_tag": "BOM",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "bohemia_moravia_protectorate_1939",
-      "critical": true,
-      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "CZ032",
-      "country_code": "CZ",
-      "feature_name": "Plzeňský kraj",
-      "from_tag": "",
-      "to_tag": "BOM",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "bohemia_moravia_protectorate_1939",
-      "critical": true,
-      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "CZ041",
-      "country_code": "CZ",
-      "feature_name": "Karlovarský kraj",
-      "from_tag": "",
-      "to_tag": "BOM",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "bohemia_moravia_protectorate_1939",
-      "critical": true,
-      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "CZ042",
-      "country_code": "CZ",
-      "feature_name": "Ústecký kraj",
-      "from_tag": "",
-      "to_tag": "BOM",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "bohemia_moravia_protectorate_1939",
-      "critical": true,
-      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "CZ051",
-      "country_code": "CZ",
-      "feature_name": "Liberecký kraj",
-      "from_tag": "",
-      "to_tag": "BOM",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "bohemia_moravia_protectorate_1939",
-      "critical": true,
-      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "CZ052",
-      "country_code": "CZ",
-      "feature_name": "Královéhradecký kraj",
-      "from_tag": "",
-      "to_tag": "BOM",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "bohemia_moravia_protectorate_1939",
-      "critical": true,
-      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "CZ053",
-      "country_code": "CZ",
-      "feature_name": "Pardubický kraj",
-      "from_tag": "",
-      "to_tag": "BOM",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "bohemia_moravia_protectorate_1939",
-      "critical": true,
-      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "CZ063",
-      "country_code": "CZ",
-      "feature_name": "Kraj Vysočina",
-      "from_tag": "",
-      "to_tag": "BOM",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "bohemia_moravia_protectorate_1939",
-      "critical": true,
-      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "CZ064",
-      "country_code": "CZ",
-      "feature_name": "Jihomoravský kraj",
-      "from_tag": "",
-      "to_tag": "BOM",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "bohemia_moravia_protectorate_1939",
-      "critical": true,
-      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "CZ071",
-      "country_code": "CZ",
-      "feature_name": "Olomoucký kraj",
-      "from_tag": "",
-      "to_tag": "BOM",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "bohemia_moravia_protectorate_1939",
-      "critical": true,
-      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "CZ072",
-      "country_code": "CZ",
-      "feature_name": "Zlínský kraj",
-      "from_tag": "",
-      "to_tag": "BOM",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "bohemia_moravia_protectorate_1939",
-      "critical": true,
-      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "CZ080",
-      "country_code": "CZ",
-      "feature_name": "Moravskoslezský kraj",
-      "from_tag": "",
-      "to_tag": "POL",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "1939_poland_zaolzie",
-      "critical": true,
-      "notes": "Zaolzie transfer to Poland before September 1939.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "SK010",
-      "country_code": "SK",
-      "feature_name": "Bratislavský kraj",
-      "from_tag": "SLO",
-      "to_tag": "SLO",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "1939_slovakia_puppet_state",
-      "critical": true,
-      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "SK021",
-      "country_code": "SK",
-      "feature_name": "Trnavský kraj",
-      "from_tag": "SLO",
-      "to_tag": "SLO",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "1939_slovakia_puppet_state",
-      "critical": true,
-      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "SK022",
-      "country_code": "SK",
-      "feature_name": "Trenčiansky kraj",
-      "from_tag": "SLO",
-      "to_tag": "SLO",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "1939_slovakia_puppet_state",
-      "critical": true,
-      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "SK023",
-      "country_code": "SK",
-      "feature_name": "Nitriansky kraj",
-      "from_tag": "SLO",
-      "to_tag": "SLO",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "1939_slovakia_puppet_state",
-      "critical": true,
-      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "SK031",
-      "country_code": "SK",
-      "feature_name": "Žilinský kraj",
-      "from_tag": "SLO",
-      "to_tag": "SLO",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "1939_slovakia_puppet_state",
-      "critical": true,
-      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "SK032",
-      "country_code": "SK",
-      "feature_name": "Banskobystrický kraj",
-      "from_tag": "SLO",
-      "to_tag": "SLO",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "1939_slovakia_puppet_state",
-      "critical": true,
-      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "SK041",
-      "country_code": "SK",
-      "feature_name": "Prešovský kraj",
-      "from_tag": "SLO",
-      "to_tag": "SLO",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "1939_slovakia_puppet_state",
-      "critical": true,
-      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
-      "synthetic_owner": false
-    },
-    {
-      "feature_id": "SK042",
-      "country_code": "SK",
-      "feature_name": "Košický kraj",
-      "from_tag": "SLO",
-      "to_tag": "SLO",
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "rule_id": "1939_slovakia_puppet_state",
-      "critical": true,
-      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
       "synthetic_owner": false
     },
     {
@@ -79396,6 +79123,32 @@
       "synthetic_owner": false
     },
     {
+      "feature_id": "CZ_ADM2_57006924B40654694205882",
+      "country_code": "CZ",
+      "feature_name": "Louny",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B28286346415780",
+      "country_code": "CZ",
+      "feature_name": "Litoměřice",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
       "feature_id": "CZ_ADM2_57006924B26083217891381",
       "country_code": "CZ",
       "feature_name": "Česká Lípa",
@@ -79406,6 +79159,71 @@
       "rule_id": "germany_sudetenland_1939",
       "critical": true,
       "notes": "Sudetenland belt based on targeted CZ ADM2 split features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B3568693077695",
+      "country_code": "CZ",
+      "feature_name": "Liberec",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B55772558323280",
+      "country_code": "CZ",
+      "feature_name": "Jablonec nad Nisou",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B26779967263881",
+      "country_code": "CZ",
+      "feature_name": "Semily",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B50363024387408",
+      "country_code": "CZ",
+      "feature_name": "Trutnov",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B40201864279221",
+      "country_code": "CZ",
+      "feature_name": "Náchod",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
       "synthetic_owner": false
     },
     {
@@ -79435,6 +79253,32 @@
       "synthetic_owner": false
     },
     {
+      "feature_id": "CZ_ADM2_57006924B24749184311211",
+      "country_code": "CZ",
+      "feature_name": "Plzeň-North",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B42074087272310",
+      "country_code": "CZ",
+      "feature_name": "Rakovnik",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
       "feature_id": "CZ_ADM2_57006924B72008682408189",
       "country_code": "CZ",
       "feature_name": "Klatovy",
@@ -79445,6 +79289,292 @@
       "rule_id": "germany_sudetenland_1939",
       "critical": true,
       "notes": "Sudetenland belt based on targeted CZ ADM2 split features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B26466431753540",
+      "country_code": "CZ",
+      "feature_name": "Plzeň-South",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B96542005161261",
+      "country_code": "CZ",
+      "feature_name": "Plzeň-City",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B76318940607058",
+      "country_code": "CZ",
+      "feature_name": "Rokycany",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B99788800999519",
+      "country_code": "CZ",
+      "feature_name": "Kladno",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B46613202139284",
+      "country_code": "CZ",
+      "feature_name": "Mělník",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B86980162402648",
+      "country_code": "CZ",
+      "feature_name": "Mladá Boleslav",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B61995402941039",
+      "country_code": "CZ",
+      "feature_name": "Jičín",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B98928131689088",
+      "country_code": "CZ",
+      "feature_name": "Hradec Králové",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B67004616478789",
+      "country_code": "CZ",
+      "feature_name": "Rychnov nad Kněžnou",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B32813693256962",
+      "country_code": "CZ",
+      "feature_name": "Pardubice",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B14129056192165",
+      "country_code": "CZ",
+      "feature_name": "Chrudim",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B30982913442521",
+      "country_code": "CZ",
+      "feature_name": "Ústí nad Orlicí",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B8762756005554",
+      "country_code": "CZ",
+      "feature_name": "Jeseník",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B9844142294582",
+      "country_code": "CZ",
+      "feature_name": "Nymburk",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B25962740711880",
+      "country_code": "CZ",
+      "feature_name": "Kolín",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B82146122340181",
+      "country_code": "CZ",
+      "feature_name": "Beroun",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B9167412778740",
+      "country_code": "CZ",
+      "feature_name": "Prague-East",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B6298598328883",
+      "country_code": "CZ",
+      "feature_name": "Prague",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B10827026185454",
+      "country_code": "CZ",
+      "feature_name": "Prague-West",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B72367242001240",
+      "country_code": "CZ",
+      "feature_name": "Benešov",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B48464151885273",
+      "country_code": "CZ",
+      "feature_name": "Příbram",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B23642111246292",
+      "country_code": "CZ",
+      "feature_name": "Kutná Hora",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
       "synthetic_owner": false
     },
     {
@@ -79461,6 +79591,19 @@
       "synthetic_owner": false
     },
     {
+      "feature_id": "CZ_ADM2_57006924B60448668577783",
+      "country_code": "CZ",
+      "feature_name": "Písek",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
       "feature_id": "CZ_ADM2_57006924B34464963037986",
       "country_code": "CZ",
       "feature_name": "Prachatice",
@@ -79471,6 +79614,19 @@
       "rule_id": "germany_sudetenland_1939",
       "critical": true,
       "notes": "Sudetenland belt based on targeted CZ ADM2 split features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B10100479283290",
+      "country_code": "CZ",
+      "feature_name": "Strakonice",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
       "synthetic_owner": false
     },
     {
@@ -79500,6 +79656,175 @@
       "synthetic_owner": false
     },
     {
+      "feature_id": "CZ_ADM2_57006924B74433439756021",
+      "country_code": "CZ",
+      "feature_name": "Tábor",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B42369994804969",
+      "country_code": "CZ",
+      "feature_name": "Třebíč",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B47389261447584",
+      "country_code": "CZ",
+      "feature_name": "Pelhřimov",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B85481167833175",
+      "country_code": "CZ",
+      "feature_name": "Havlíčkův Brod",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B48131365256783",
+      "country_code": "CZ",
+      "feature_name": "Žďár nad Sázavou",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B35034257273333",
+      "country_code": "CZ",
+      "feature_name": "Jihlava",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B65385651307074",
+      "country_code": "CZ",
+      "feature_name": "Vsetín",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B14436380449594",
+      "country_code": "CZ",
+      "feature_name": "Uherské Hradiště",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B59836523347755",
+      "country_code": "CZ",
+      "feature_name": "Kroměříž",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B65826634483108",
+      "country_code": "CZ",
+      "feature_name": "Zlín",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B88312395520389",
+      "country_code": "CZ",
+      "feature_name": "Brno-Country",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B8877246488305",
+      "country_code": "CZ",
+      "feature_name": "Svitavy",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B82111344983201",
+      "country_code": "CZ",
+      "feature_name": "Hodonín",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
       "feature_id": "CZ_ADM2_57006924B95695201424764",
       "country_code": "CZ",
       "feature_name": "Znojmo",
@@ -79526,6 +79851,188 @@
       "synthetic_owner": false
     },
     {
+      "feature_id": "CZ_ADM2_57006924B90019795994252",
+      "country_code": "CZ",
+      "feature_name": "Blansko",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B37669195364586",
+      "country_code": "CZ",
+      "feature_name": "Vyškov",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B6194040717331",
+      "country_code": "CZ",
+      "feature_name": "Brno-City",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B20341688327038",
+      "country_code": "CZ",
+      "feature_name": "Prostějov",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B17496332064462",
+      "country_code": "CZ",
+      "feature_name": "Přerov",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B62007249383837",
+      "country_code": "CZ",
+      "feature_name": "Olomouc",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B90452896246775",
+      "country_code": "CZ",
+      "feature_name": "Bruntál",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B61075462930500",
+      "country_code": "CZ",
+      "feature_name": "Šumperk",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B13474079400168",
+      "country_code": "CZ",
+      "feature_name": "Opava",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B63031935780571",
+      "country_code": "CZ",
+      "feature_name": "Karviná",
+      "from_tag": "",
+      "to_tag": "POL",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_poland_zaolzie",
+      "critical": true,
+      "notes": "Zaolzie transfer to Poland before September 1939, approximated with the Karvina district after full CZ ADM2 replacement.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B91865699855455",
+      "country_code": "CZ",
+      "feature_name": "Frýdek-Místek",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "CZ_ADM2_57006924B13920789422451",
+      "country_code": "CZ",
+      "feature_name": "Ostrava-City",
+      "from_tag": "",
+      "to_tag": "BOM",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "bohemia_moravia_protectorate_1939",
+      "critical": true,
+      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B18200948818921",
+      "country_code": "SK",
+      "feature_name": "District of Bardejov",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B88920022363437",
+      "country_code": "SK",
+      "feature_name": "District of Dolne Kub",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
       "feature_id": "SK_ADM2_56367889B65708067786299",
       "country_code": "SK",
       "feature_name": "District of Trebi ov",
@@ -79539,6 +80046,175 @@
       "synthetic_owner": false
     },
     {
+      "feature_id": "SK_ADM2_56367889B94951233476884",
+      "country_code": "SK",
+      "feature_name": "District of Galanta",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B61609274598716",
+      "country_code": "SK",
+      "feature_name": "District of Giar nad Hronom",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B38418286781664",
+      "country_code": "SK",
+      "feature_name": "District of Piertany",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B62817588919968",
+      "country_code": "SK",
+      "feature_name": "District of Cadca",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B67356758961124",
+      "country_code": "SK",
+      "feature_name": "District of Humennn",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B47622109691322",
+      "country_code": "SK",
+      "feature_name": "District of Spieskn Novo Ves",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B9717038533065",
+      "country_code": "SK",
+      "feature_name": "District of Hlohovec",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B50353875052402",
+      "country_code": "SK",
+      "feature_name": "District of Bytca",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B97606993013938",
+      "country_code": "SK",
+      "feature_name": "District of Sobrance",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B40145685208334",
+      "country_code": "SK",
+      "feature_name": "District of Martin",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B81133001321420",
+      "country_code": "SK",
+      "feature_name": "District of Zvolen",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B36066360363210",
+      "country_code": "SK",
+      "feature_name": "District of Liptovsk",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B65848289259275",
+      "country_code": "SK",
+      "feature_name": "District of Senica",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
       "feature_id": "SK_ADM2_56367889B50490339994693",
       "country_code": "SK",
       "feature_name": "District of Ronnava",
@@ -79549,6 +80225,71 @@
       "rule_id": "hungary_south_slovakia_1939",
       "critical": true,
       "notes": "Southern Slovak strip from targeted SK ADM2 split features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B62739535395269",
+      "country_code": "SK",
+      "feature_name": "District of Trnava",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B13739678014174",
+      "country_code": "SK",
+      "feature_name": "District of Tarnovica",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B52678955481324",
+      "country_code": "SK",
+      "feature_name": "District of Kysucki Novi Mesto",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B66923754975257",
+      "country_code": "SK",
+      "feature_name": "District of Michalovce",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B34538662559621",
+      "country_code": "SK",
+      "feature_name": "District of Skalica",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
       "synthetic_owner": false
     },
     {
@@ -79604,6 +80345,32 @@
       "synthetic_owner": false
     },
     {
+      "feature_id": "SK_ADM2_56367889B12595131960891",
+      "country_code": "SK",
+      "feature_name": "District of Pezinok",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B51514564384482",
+      "country_code": "SK",
+      "feature_name": "District of Nitra",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
       "feature_id": "SK_ADM2_56367889B96980961358907",
       "country_code": "SK",
       "feature_name": "District of Velka Krta",
@@ -79614,6 +80381,149 @@
       "rule_id": "hungary_south_slovakia_1939",
       "critical": true,
       "notes": "Southern Slovak strip from targeted SK ADM2 split features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B57985107422825",
+      "country_code": "SK",
+      "feature_name": "District of Kolice IV",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B7741755639355",
+      "country_code": "SK",
+      "feature_name": "District of Kolice III",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B46930466225258",
+      "country_code": "SK",
+      "feature_name": "District of Kolice II",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B42847558326348",
+      "country_code": "SK",
+      "feature_name": "District of Zlatc Moravce",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B9282010334294",
+      "country_code": "SK",
+      "feature_name": "District of Poltcr",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B58167623425022",
+      "country_code": "SK",
+      "feature_name": "District of Malacky",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B16879144707830",
+      "country_code": "SK",
+      "feature_name": "District of Kolice I",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B37832117679378",
+      "country_code": "SK",
+      "feature_name": "District of Gelnica",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B4918056975771",
+      "country_code": "SK",
+      "feature_name": "District of Gala",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B62094256812316",
+      "country_code": "SK",
+      "feature_name": "District of Senec",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B79782640664984",
+      "country_code": "SK",
+      "feature_name": "District of Topolcany",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
       "synthetic_owner": false
     },
     {
@@ -79630,6 +80540,32 @@
       "synthetic_owner": false
     },
     {
+      "feature_id": "SK_ADM2_56367889B97071895480744",
+      "country_code": "SK",
+      "feature_name": "District of Svidnsk",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B89309998682201",
+      "country_code": "SK",
+      "feature_name": "District of Vranov nad Toplou",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
       "feature_id": "SK_ADM2_56367889B31823009041462",
       "country_code": "SK",
       "feature_name": "District of Revnca",
@@ -79640,6 +80576,19 @@
       "rule_id": "hungary_south_slovakia_1939",
       "critical": true,
       "notes": "Southern Slovak strip from targeted SK ADM2 split features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B2947656286883",
+      "country_code": "SK",
+      "feature_name": "District of Povacskn Bystrica",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
       "synthetic_owner": false
     },
     {
@@ -79656,6 +80605,32 @@
       "synthetic_owner": false
     },
     {
+      "feature_id": "SK_ADM2_56367889B72151249658777",
+      "country_code": "SK",
+      "feature_name": "District of Detva",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B57285771161703",
+      "country_code": "SK",
+      "feature_name": "District of Krupina",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
       "feature_id": "SK_ADM2_56367889B27848609458937",
       "country_code": "SK",
       "feature_name": "District of Komprno",
@@ -79669,6 +80644,123 @@
       "synthetic_owner": false
     },
     {
+      "feature_id": "SK_ADM2_56367889B40480781512108",
+      "country_code": "SK",
+      "feature_name": "District of Bratislava I",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B15992044775212",
+      "country_code": "SK",
+      "feature_name": "District of Prievidza",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B68595341554064",
+      "country_code": "SK",
+      "feature_name": "District of Stropkov",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B87068302757109",
+      "country_code": "SK",
+      "feature_name": "District of Banskk vtiavnica",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B24002183790147",
+      "country_code": "SK",
+      "feature_name": "District of Stark Lubovna",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B61252856682831",
+      "country_code": "SK",
+      "feature_name": "District of Bratislava II",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B14109704827124",
+      "country_code": "SK",
+      "feature_name": "District of Bansks Bystrica",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B53553144532917",
+      "country_code": "SK",
+      "feature_name": "District of Brezno",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B76322005427385",
+      "country_code": "SK",
+      "feature_name": "District of Bratislava III",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
       "feature_id": "SK_ADM2_56367889B15407569919112",
       "country_code": "SK",
       "feature_name": "District of Levice",
@@ -79679,6 +80771,266 @@
       "rule_id": "hungary_south_slovakia_1939",
       "critical": true,
       "notes": "Southern Slovak strip from targeted SK ADM2 split features.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B14569056094647",
+      "country_code": "SK",
+      "feature_name": "District of Snina",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B51237059400968",
+      "country_code": "SK",
+      "feature_name": "District of Bratislava IV",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B81744173793240",
+      "country_code": "SK",
+      "feature_name": "District of Sabinov",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B17286119603144",
+      "country_code": "SK",
+      "feature_name": "District of Trencon",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B75362220391655",
+      "country_code": "SK",
+      "feature_name": "District of Prchov",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B99469568447767",
+      "country_code": "SK",
+      "feature_name": "District of Medzilaborce",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B94927774956455",
+      "country_code": "SK",
+      "feature_name": "District of Poprad",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B26614689162342",
+      "country_code": "SK",
+      "feature_name": "District of Bonovce nad Bebra*",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B11470427915377",
+      "country_code": "SK",
+      "feature_name": "District of Levoca",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B98399677297130",
+      "country_code": "SK",
+      "feature_name": "District of Ilava",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B83569782265262",
+      "country_code": "SK",
+      "feature_name": "District of Tvrdo",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B45513137004516",
+      "country_code": "SK",
+      "feature_name": "District of Predov",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B48474668858137",
+      "country_code": "SK",
+      "feature_name": "District of Pilina",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B91036256885729",
+      "country_code": "SK",
+      "feature_name": "District of Myjava",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B79509103276820",
+      "country_code": "SK",
+      "feature_name": "District of Nova Mesto nad Va*",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B31819457643233",
+      "country_code": "SK",
+      "feature_name": "District of Turcianske Teplice",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B25974753894430",
+      "country_code": "SK",
+      "feature_name": "District of Numestovo",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B98642751890096",
+      "country_code": "SK",
+      "feature_name": "District of Partizonske",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B77247555880458",
+      "country_code": "SK",
+      "feature_name": "District of Ruromberok",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
+      "synthetic_owner": false
+    },
+    {
+      "feature_id": "SK_ADM2_56367889B51496625279666",
+      "country_code": "SK",
+      "feature_name": "District of Kermarok",
+      "from_tag": "SLO",
+      "to_tag": "SLO",
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "rule_id": "1939_slovakia_puppet_state",
+      "critical": true,
+      "notes": "Slovakia appears as a separate axis-aligned puppet state in 1939.",
       "synthetic_owner": false
     },
     {
@@ -80462,2001 +81814,5 @@
       "synthetic_owner": false
     }
   ],
-  "controller_changes": [
-    {
-      "feature_id": "CN_CITY_17275852B10180385527417",
-      "feature_name": "Guchengxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B10208475755367",
-      "feature_name": "Laizhou",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B10280834953954",
-      "feature_name": "Haocheng",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B11008710047549",
-      "feature_name": "Zhoucheng",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B11809724506440",
-      "feature_name": "Dongying",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B12009758175917",
-      "feature_name": "Renqiu",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B1364012400924",
-      "feature_name": "Laixi",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B1408079528399",
-      "feature_name": "Nanhuixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B1426474864351",
-      "feature_name": "Changyi",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B15402619404646",
-      "feature_name": "Nanhexian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B15523465043405",
-      "feature_name": "Chonglixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "MEN"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B15976604032949",
-      "feature_name": "Luquan",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B16095129082560",
-      "feature_name": "Weixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B16258690311459",
-      "feature_name": "Neiqiuxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B16549058596986",
-      "feature_name": "Lingxixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B16614537297563",
-      "feature_name": "Feixiangxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B16970659563174",
-      "feature_name": "Zhaoxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B17867161339331",
-      "feature_name": "Shahe",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B17915990545621",
-      "feature_name": "Xushuixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B17983837223036",
-      "feature_name": "Hezhe",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B18322727061238",
-      "feature_name": "Weixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B18626458296265",
-      "feature_name": "Wuqiaoxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B18968160632662",
-      "feature_name": "Jiaozhou",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B19166416265469",
-      "feature_name": "Jinxiangxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B19397285057030",
-      "feature_name": "Zhengdingxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B19533355862824",
-      "feature_name": "Sishuixian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B19618376010244",
-      "feature_name": "Yanzhou",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B19731807948045",
-      "feature_name": "Wuqiangxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B20120152097084",
-      "feature_name": "Feixian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B20193660709957",
-      "feature_name": "Yutaixian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B20323770219280",
-      "feature_name": "Kuanchengmanzuzizhixian",
-      "country_code": "CN",
-      "owner_tag": "MAN",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B20688362661640",
-      "feature_name": "Anxinxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B21011904878760",
-      "feature_name": "Boyexian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B21512782047125",
-      "feature_name": "Zhuoluxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B21529969500985",
-      "feature_name": "Pingquanxian",
-      "country_code": "CN",
-      "owner_tag": "MAN",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B21539803830882",
-      "feature_name": "Fengningmanzuzizhixian",
-      "country_code": "CN",
-      "owner_tag": "MAN",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B21727756292013",
-      "feature_name": "Wenanxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B21786836503840",
-      "feature_name": "Zhaozhuang",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B21810019705519",
-      "feature_name": "Xuanhuaxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B22182624504514",
-      "feature_name": "Xinghexian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "MEN"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B22707504793071",
-      "feature_name": "Xingtai",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B22736277138860",
-      "feature_name": "Chengde",
-      "country_code": "CN",
-      "owner_tag": "MAN",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B2295538790743",
-      "feature_name": "Haikou",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B24042887765568",
-      "feature_name": "Liangshanxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B24439099777247",
-      "feature_name": "Chongmingxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B24643771294108",
-      "feature_name": "Shunyixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B24669990674383",
-      "feature_name": "Qufu",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B24882340673968",
-      "feature_name": "Quzhouxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B25717626841565",
-      "feature_name": "Xingtaixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B26261144110092",
-      "feature_name": "Dongpingxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B26908210835070",
-      "feature_name": "Huiminxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B27087882119733",
-      "feature_name": "Yantai",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B27372587859268",
-      "feature_name": "Caoxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B27963337647177",
-      "feature_name": "Penglaixian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B28043359135044",
-      "feature_name": "Fengxianxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B28404307874661",
-      "feature_name": "Kangbaoxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "MEN"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B28949074039582",
-      "feature_name": "Handan",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B29761342187520",
-      "feature_name": "Xintai",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B29896348675191",
-      "feature_name": "Lixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B30063446428877",
-      "feature_name": "Renxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B30373565857678",
-      "feature_name": "Changxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B30631409334147",
-      "feature_name": "Gaochengxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B30734228092100",
-      "feature_name": "Qingzhou",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B31393010637863",
-      "feature_name": "Jizhexian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B31491185089163",
-      "feature_name": "Baxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B32700744588338",
-      "feature_name": "Changqingxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B32989531796686",
-      "feature_name": "Wanxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B33561936369452",
-      "feature_name": "Rongcheng",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B33911143583251",
-      "feature_name": "Jiaxiangxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B33924966041101",
-      "feature_name": "Linqing",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B34459657062621",
-      "feature_name": "Wulianxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B34803324927086",
-      "feature_name": "Wenshangxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B34854699874075",
-      "feature_name": "Mupingxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B35191117841364",
-      "feature_name": "Baoding",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B35332790186482",
-      "feature_name": "Gaotangixan",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B35367898303515",
-      "feature_name": "Hengshui",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B35501076254176",
-      "feature_name": "Longhuaxian",
-      "country_code": "CN",
-      "owner_tag": "MAN",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B35674473625997",
-      "feature_name": "Handanxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B35904418947378",
-      "feature_name": "Nangong",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B36087518478347",
-      "feature_name": "Xiongxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B36539700725824",
-      "feature_name": "Qingdao",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B36689757932023",
-      "feature_name": "Danxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B36890628103019",
-      "feature_name": "Botou",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B3689978228404",
-      "feature_name": "Linshuxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B37350063092030",
-      "feature_name": "Zhanhuangxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B37388992508665",
-      "feature_name": "Xinchengxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B37549313533883",
-      "feature_name": "Chengwuxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B37600232739643",
-      "feature_name": "Mencunhuizuzizhixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B37803356904979",
-      "feature_name": "Wanquanxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "MEN"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B38150185010364",
-      "feature_name": "Xinxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B38375506939997",
-      "feature_name": "Dachanghuizuzizhixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B3853093148241",
-      "feature_name": "Ningjinxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B38709981190197",
-      "feature_name": "Tunchangxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B38939963469829",
-      "feature_name": "Chanzhou",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B39600332445203",
-      "feature_name": "Guyuanxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B39788170688741",
-      "feature_name": "Zhuozhou",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B40522342172572",
-      "feature_name": "Beijing",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B41032470199188",
-      "feature_name": "Handan",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B41153803332766",
-      "feature_name": "Jixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B41187046911697",
-      "feature_name": "Huailaixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B41190306193582",
-      "feature_name": "Wenchangxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B41312334217118",
-      "feature_name": "Junanxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B4143425265533",
-      "feature_name": "Qingyunxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B41676873149267",
-      "feature_name": "Xinhexian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B41788529093737",
-      "feature_name": "Daxingxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B42279115337630",
-      "feature_name": "Jinshanxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B42311251295370",
-      "feature_name": "Huanghua",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B42582924567207",
-      "feature_name": "Lingxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B42599245130625",
-      "feature_name": "Wanning",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B43165756519885",
-      "feature_name": "Qinglongmanzuzizhixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B431696373370",
-      "feature_name": "Yongqingxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B43390854487846",
-      "feature_name": "Yiyuanxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B43701500747082",
-      "feature_name": "Binzhou",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B43935412530745",
-      "feature_name": "Pingyinxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B44498698997305",
-      "feature_name": "Yangguxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B44568429811369",
-      "feature_name": "Kenlixian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B45286123916499",
-      "feature_name": "Jinzhou",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B453440967624",
-      "feature_name": "Jining",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B45390451107599",
-      "feature_name": "Weifang",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B45429218697197",
-      "feature_name": "Wuyixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B45820941167845",
-      "feature_name": "Xinji",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B45878553037763",
-      "feature_name": "Guangpingxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B45953294841051",
-      "feature_name": "Chengdexian",
-      "country_code": "CN",
-      "owner_tag": "MAN",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B4626184751480",
-      "feature_name": "Zhoupingxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B46736465172107",
-      "feature_name": "Fupingxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B4676676622807",
-      "feature_name": "Dongerxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B4692792810033",
-      "feature_name": "Yinanxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B47303764817199",
-      "feature_name": "Ningjinxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B48027257295245",
-      "feature_name": "Gaoyangxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B48136438053745",
-      "feature_name": "Haiyangxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B48628808884304",
-      "feature_name": "Manchengxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B48691500457709",
-      "feature_name": "Zhaoqianxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B48796108703718",
-      "feature_name": "Quyangxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B49525483016846",
-      "feature_name": "Shanghexian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B4963111392108",
-      "feature_name": "Dezhou",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B49878870319406",
-      "feature_name": "Changshangxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B50094796791007",
-      "feature_name": "Juxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B50589627480209",
-      "feature_name": "Ledonglizuzizhixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B50867388179464",
-      "feature_name": "Ningyangxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B51175072856676",
-      "feature_name": "Shuningxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B51290893529729",
-      "feature_name": "Longyaoxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B5131093529483",
-      "feature_name": "Haixingxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B52385226353354",
-      "feature_name": "Raoyangxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B52451636784299",
-      "feature_name": "Dingxingxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B53008264931106",
-      "feature_name": "Qiongzhonglizumiaozuzizhixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B53166682632414",
-      "feature_name": "Tianjin",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B53595443021236",
-      "feature_name": "Zhenchengxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B53922912898325",
-      "feature_name": "Yanqingxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B53933530490343",
-      "feature_name": "Guangzhongxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B54162792876952",
-      "feature_name": "Zhucheng",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B54543288924677",
-      "feature_name": "Huantanxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B54632216874023",
-      "feature_name": "Zhaoyuan",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B55229175832107",
-      "feature_name": "Dongmingxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B55754577664448",
-      "feature_name": "Guanxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B56050378995261",
-      "feature_name": "Boxingxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B56564088961928",
-      "feature_name": "Langfang",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B57492284435715",
-      "feature_name": "Qingxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B57791780751485",
-      "feature_name": "Juyexian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B57880389938199",
-      "feature_name": "Jinan",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B58371513472148",
-      "feature_name": "Xingtangxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B58372427564761",
-      "feature_name": "Rizhao",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B58391528789088",
-      "feature_name": "Pingyuanxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B58910105343507",
-      "feature_name": "Fuchengxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B59002516276853",
-      "feature_name": "Tangxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B59692497706789",
-      "feature_name": "Songjiangxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B60414806889849",
-      "feature_name": "Xianhaexian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B61726350757100",
-      "feature_name": "Shexian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B61994504860165",
-      "feature_name": "Tengzhou",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B620737032798",
-      "feature_name": "Qingdao",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B62496834928509",
-      "feature_name": "Weishanxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B62674344705560",
-      "feature_name": "Chongmingxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B63554143431725",
-      "feature_name": "Anyangxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B64081958226369",
-      "feature_name": "Qiuxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B64259844181582",
-      "feature_name": "Liaocheng",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B64416165210218",
-      "feature_name": "Guanxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B64442957752259",
-      "feature_name": "Guantaoxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B64817974651819",
-      "feature_name": "Weixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B64978204094712",
-      "feature_name": "Huaianxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B65840661251357",
-      "feature_name": "Wulixian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B66003162693266",
-      "feature_name": "Zhangjiakou",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B66013638365038",
-      "feature_name": "Yuanxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B6690326538160",
-      "feature_name": "Zhanhuaxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B66983384026241",
-      "feature_name": "Weichangxian",
-      "country_code": "CN",
-      "owner_tag": "MAN",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B67438977719884",
-      "feature_name": "Longkou",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B67564907021397",
-      "feature_name": "Linyi",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B68447300329810",
-      "feature_name": "Cichengxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B69453353693019",
-      "feature_name": "Jingxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B69472300438393",
-      "feature_name": "Wangduxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B69993211466305",
-      "feature_name": "Pingshanxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B70255924310381",
-      "feature_name": "Shezexian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B70320302334749",
-      "feature_name": "Baishalizuzizhixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B70455093500286",
-      "feature_name": "Qingyuanxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B7080321063595",
-      "feature_name": "Miyunxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B70843634097749",
-      "feature_name": "Dingzhou",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B71120154646141",
-      "feature_name": "Lijinxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B71216121267542",
-      "feature_name": "Xinle",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B71365124448130",
-      "feature_name": "Dongying",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B714584663018",
-      "feature_name": "Nanpixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B72792517073116",
-      "feature_name": "Tongxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B72819681774342",
-      "feature_name": "Lingshuilizumiaozuzizhixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B72922623961147",
-      "feature_name": "Pingguxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B73358438455895",
-      "feature_name": "Shouguang",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B74264051584102",
-      "feature_name": "Pingxiangxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B7444451912335",
-      "feature_name": "Anguo",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B74586174185496",
-      "feature_name": "Zhangbeixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "MEN"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B75890737929332",
-      "feature_name": "Shanhe",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B76152157086843",
-      "feature_name": "Juluxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B76479334373543",
-      "feature_name": "Luanchengxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B76829643653933",
-      "feature_name": "Taian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B77159644478443",
-      "feature_name": "Lening",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B77473010275224",
-      "feature_name": "Linchengxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B77518624384720",
-      "feature_name": "Jimo",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B77679479199341",
-      "feature_name": "Mengyinxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B78609951456513",
-      "feature_name": "Wuan",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B78610390708344",
-      "feature_name": "Luanpingxian",
-      "country_code": "CN",
-      "owner_tag": "MAN",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B78988614189372",
-      "feature_name": "Zibo",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B79149802712659",
-      "feature_name": "Jiaonan",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B7979903099841",
-      "feature_name": "Chengmaixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B80309702523612",
-      "feature_name": "Shanya",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B8103009054716",
-      "feature_name": "Yongnianxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B81072603241187",
-      "feature_name": "Laiyang",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B82114276452469",
-      "feature_name": "Qinghexian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B82150177084912",
-      "feature_name": "Dongguangxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B82708605205805",
-      "feature_name": "Shanghai",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B82960244806798",
-      "feature_name": "Dinganxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B83100874373445",
-      "feature_name": "Gaomi",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B83167737560066",
-      "feature_name": "Changlexian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B83523333785496",
-      "feature_name": "Feichengxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B83634722552305",
-      "feature_name": "Xinglongxian",
-      "country_code": "CN",
-      "owner_tag": "MAN",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B84131046176015",
-      "feature_name": "Guangraoxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B84580276321378",
-      "feature_name": "Changpingxin",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B84727014688033",
-      "feature_name": "Laishuixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B85544446441725",
-      "feature_name": "Weihai",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B85583949591367",
-      "feature_name": "Baotinglizumiaozuzizhixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B85844962073852",
-      "feature_name": "Chepingxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B86044803614271",
-      "feature_name": "Zhangqiu",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B86070890642714",
-      "feature_name": "Anpingxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B86114589403662",
-      "feature_name": "Jingjingxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B86260962826974",
-      "feature_name": "Rongchengxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B86431238150342",
-      "feature_name": "Qiongshan",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B86517244462494",
-      "feature_name": "Xiajinxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B8665149309175",
-      "feature_name": "Laiyuanxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B87149259927291",
-      "feature_name": "Xianxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B87496734512227",
-      "feature_name": "Yangxinxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B87782309196497",
-      "feature_name": "Qionghai",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B87913405117604",
-      "feature_name": "Tanchengxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B8795599021471",
-      "feature_name": "Pingdu",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B88042861362346",
-      "feature_name": "Changjianglizuzizhixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B88468623491072",
-      "feature_name": "Yunchengxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B88708837863828",
-      "feature_name": "Wendeng",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B88986717122862",
-      "feature_name": "Yuchengxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B89808828265438",
-      "feature_name": "Dingtaoxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B90274183162284",
-      "feature_name": "Shenzhou",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B90293274121417",
-      "feature_name": "Hejian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B90394685615550",
-      "feature_name": "Wuqingxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B9046707294983",
-      "feature_name": "Shijiazhuan",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B90661382406168",
-      "feature_name": "Gaoqingxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B91301275454086",
-      "feature_name": "Damingxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B92392502748538",
-      "feature_name": "Shangyixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "MEN"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B92506097004923",
-      "feature_name": "Linyixian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B92700741958693",
-      "feature_name": "Wujixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B9304528417696",
-      "feature_name": "Cixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B93565976694521",
-      "feature_name": "Yixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B93743910489906",
-      "feature_name": "Dongfanglizuzizhixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B9474953962086",
-      "feature_name": "Jinghaixian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B95240086472657",
-      "feature_name": "Yishuixian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B95269391851003",
-      "feature_name": "Chenganxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B95440277175473",
-      "feature_name": "Pingyixian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B95494794157710",
-      "feature_name": "Qihexian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B95574356023337",
-      "feature_name": "Huairouxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B95785410461796",
-      "feature_name": "Laiwu",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B95874414124304",
-      "feature_name": "Boxiangxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B95887002471957",
-      "feature_name": "Lingshouxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B95991838392275",
-      "feature_name": "Jiyangxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B96657206671737",
-      "feature_name": "Dachengxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B97070335713694",
-      "feature_name": "Yangyuanxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B97102685179742",
-      "feature_name": "Qingpuxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B97124400303792",
-      "feature_name": "Rushan",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B97535760935977",
-      "feature_name": "Anqiu",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B97923044022234",
-      "feature_name": "Changzhou",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B98384028469199",
-      "feature_name": "Linjuxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B98891327369808",
-      "feature_name": "Lingaoxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B99355884213700",
-      "feature_name": "Qixia",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B99732539673783",
-      "feature_name": "Wuchengxian",
-      "country_code": "CN",
-      "owner_tag": "LUQ",
-      "controller_tag": "JAP"
-    },
-    {
-      "feature_id": "CN_CITY_17275852B99838630509501",
-      "feature_name": "Yanshanxian",
-      "country_code": "CN",
-      "owner_tag": "CHI",
-      "controller_tag": "JAP"
-    }
-  ]
+  "controller_changes": []
 }

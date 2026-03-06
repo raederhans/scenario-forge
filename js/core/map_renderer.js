@@ -84,6 +84,10 @@ const INTERNAL_BORDER_PROVINCE_MIN_ALPHA = 0.30;
 const INTERNAL_BORDER_LOCAL_MIN_ALPHA = 0.22;
 const INTERNAL_BORDER_PROVINCE_MIN_WIDTH = 0.52;
 const INTERNAL_BORDER_LOCAL_MIN_WIDTH = 0.36;
+const DETAIL_ADM_BORDER_COLOR = "#888888";
+const DETAIL_ADM_BORDER_MIN_ALPHA = 0.24;
+const DETAIL_ADM_BORDER_MAX_ALPHA = 0.34;
+const DETAIL_ADM_BORDER_MIN_WIDTH = 0.30;
 const PARENT_BORDER_MIN_COVERAGE = 0.70;
 const PARENT_BORDER_MAX_DOMINANT_SHARE = 0.90;
 const PARENT_BORDER_MIN_RENDERABLE_GROUPS = 2;
@@ -1640,6 +1644,16 @@ function getAdmin1Group(entity) {
   return String(value).trim();
 }
 
+function getDetailTier(entity) {
+  const value = entity?.properties?.detail_tier;
+  if (value === null || value === undefined) return "";
+  return String(value).trim();
+}
+
+function isAdmDetailTier(entity) {
+  return getDetailTier(entity).toLowerCase().startsWith("adm2");
+}
+
 function asFeatureLike(entity) {
   if (!entity) return null;
   return {
@@ -1689,6 +1703,23 @@ function buildDynamicOwnerBorderMesh(runtimeTopology, ownershipContext) {
       || ""
     ).trim();
     return !!(ownerA && ownerB && ownerA !== ownerB);
+  });
+}
+
+function buildDetailAdmBorderMesh(topology, includedCountries) {
+  const object = topology?.objects?.political;
+  if (!object || !globalThis.topojson || !includedCountries?.size) {
+    return null;
+  }
+
+  return globalThis.topojson.mesh(topology, object, (a, b) => {
+    if (!a || !b) return false;
+    const codeA = getEntityCountryCode(a);
+    const codeB = getEntityCountryCode(b);
+    if (!codeA || !codeB || codeA !== codeB || !includedCountries.has(codeA)) {
+      return false;
+    }
+    return isAdmDetailTier(a) || isAdmDetailTier(b);
   });
 }
 
@@ -2161,6 +2192,7 @@ function rebuildStaticMeshes() {
   state.cachedCountryBorders = [];
   state.cachedProvinceBorders = [];
   state.cachedLocalBorders = [];
+  state.cachedDetailAdmBorders = [];
   state.cachedCoastlines = [];
   state.cachedCoastlinesHigh = [];
   state.cachedCoastlinesMid = [];
@@ -2196,6 +2228,12 @@ function rebuildStaticMeshes() {
     if (isUsableMesh(meshes.provinceMesh)) state.cachedProvinceBorders.push(meshes.provinceMesh);
     if (isUsableMesh(meshes.localMesh)) state.cachedLocalBorders.push(meshes.localMesh);
   });
+
+  const detailCountries = sourceCountries.detail || new Set();
+  const detailAdmMesh = buildDetailAdmBorderMesh(state.topologyDetail, detailCountries);
+  if (isUsableMesh(detailAdmMesh)) {
+    state.cachedDetailAdmBorders.push(detailAdmMesh);
+  }
 
   const unifiedBorderTopology =
     state.topologyBundleMode === "composite" && state.runtimePoliticalTopology?.objects?.political
@@ -2787,6 +2825,7 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
   );
   const parentAlpha = clamp(parentOpacity * (0.55 + 0.25 * t), 0.30, 0.90);
   const coastAlpha = clamp(0.74 + 0.12 * t, 0.74, 0.86);
+  const detailAdmAlpha = clamp(0.20 + 0.12 * t, DETAIL_ADM_BORDER_MIN_ALPHA, DETAIL_ADM_BORDER_MAX_ALPHA);
 
   const countryWidth = (empireWidthBase * (0.95 + 0.40 * t)) / kDenom;
   const provinceWidth = Math.max(
@@ -2799,6 +2838,10 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
   ) / kDenom;
   const parentWidth = (parentWidthBase * (0.90 + 0.35 * t)) / kDenom;
   const coastWidth = (coastWidthBase * (0.90 + 0.30 * t)) / kDenom;
+  const detailAdmWidth = Math.max(
+    DETAIL_ADM_BORDER_MIN_WIDTH,
+    internalWidthBase * 0.42 * (0.72 + 0.40 * t) * lowZoomWidthScale
+  ) / kDenom;
   const coastlineCollection = k < COASTLINE_LOD_LOW_ZOOM_MAX
     ? (state.cachedCoastlinesLow?.length ? state.cachedCoastlinesLow : state.cachedCoastlines)
     : k < COASTLINE_LOD_MID_ZOOM_MAX
@@ -2810,6 +2853,9 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
 
   context.globalAlpha = provinceAlpha;
   drawMeshCollection(state.cachedProvinceBorders, internalColor, provinceWidth);
+
+  context.globalAlpha = detailAdmAlpha;
+  drawMeshCollection(state.cachedDetailAdmBorders, DETAIL_ADM_BORDER_COLOR, detailAdmWidth);
 
   const enabledParentCountries = (state.parentBorderSupportedCountries || []).filter(
     (countryCode) => !!state.parentBorderEnabledByCountry?.[countryCode]

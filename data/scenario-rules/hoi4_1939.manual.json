@@ -79,7 +79,8 @@
         "CZ_ADM2_57006924B5960993849333",
         "CZ_ADM2_57006924B26083217891381",
         "CZ_ADM2_57006924B73132069516203",
-        "CZ_ADM2_57006924B21154438881940"
+        "CZ_ADM2_57006924B21154438881940",
+        "CZ_ADM2_57006924B63031935780571"
       ],
       "base_iso2": "CZ",
       "lookup_iso2": "CZ",
@@ -129,8 +130,8 @@
       "priority": 905,
       "quality": "manual_reviewed",
       "critical": true,
-      "notes": "Zaolzie transfer to Poland before September 1939.",
-      "include_feature_ids": ["CZ080"],
+      "notes": "Zaolzie transfer to Poland before September 1939, approximated with the Karvina district after full CZ ADM2 replacement.",
+      "include_feature_ids": ["CZ_ADM2_57006924B63031935780571"],
       "base_iso2": "PL",
       "display_name_override": "Poland"
     },

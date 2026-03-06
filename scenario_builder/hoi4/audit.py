@@ -175,8 +175,9 @@ def build_report_markdown(bundle: dict, report_json: dict) -> str:
     topology_summaries = report_json.get("topology_summaries", {}) or {}
     belarus_summary = topology_summaries.get("belarus_hybrid", {}) or {}
 
+    report_title = str(manifest.get("display_name") or manifest.get("scenario_id") or "HOI4 Scenario").strip()
     lines = [
-        "# HOI4 1936 Scenario Coverage Report",
+        f"# {report_title} Scenario Coverage Report",
         "",
         f"- Scenario: `{manifest['scenario_id']}`",
         f"- Display name: `{manifest['display_name']}`",

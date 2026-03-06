@@ -1470,7 +1470,7 @@ function initSidebar({ render } = {}) {
 
   const applyScenarioReleasableCoreTerritory = (
     countryState,
-    { source = "scenario-actions" } = {}
+    { source = "scenario-actions", forceSovereignty = false } = {}
   ) => {
     if (!countryState?.releasable) return false;
 
@@ -1481,6 +1481,14 @@ function initSidebar({ render } = {}) {
         code: countryState?.code || "",
       });
       return false;
+    }
+
+    if (forceSovereignty && String(state.paintMode || "visual") !== "sovereignty") {
+      state.paintMode = "sovereignty";
+      state.interactionGranularity = "subdivision";
+      if (typeof state.updatePaintModeUIFn === "function") {
+        state.updatePaintModeUIFn();
+      }
     }
 
     if (String(state.paintMode || "visual") === "sovereignty") {
@@ -1622,6 +1630,23 @@ function initSidebar({ render } = {}) {
       badge.className = "country-active-badge";
       badge.textContent = t("Active", "ui");
       side.appendChild(badge);
+    }
+
+    if (state.activeScenarioId && countryState.releasable && getPrimaryReleasablePresetRef(countryState)) {
+      const activateBtn = document.createElement("button");
+      activateBtn.type = "button";
+      activateBtn.className = "country-action-btn";
+      activateBtn.textContent = t("Activate", "ui");
+      activateBtn.title = t("Apply this releasable's territory and make it active.", "ui");
+      activateBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        applyScenarioReleasableCoreTerritory(countryState, {
+          source: "scenario-row-activate",
+          forceSovereignty: true,
+        });
+      });
+      side.appendChild(activateBtn);
     }
 
     if (hasChildren && !hideExpandToggle) {

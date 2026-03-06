@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1936",
-  "generated_at": "2026-03-05T15:56:01.264851+00:00",
+  "generated_at": "2026-03-06T00:49:15.166055+00:00",
   "default_country": "GER",
   "countries": {
     "AFA": {
@@ -618,7 +618,7 @@
       "tag": "CZE",
       "display_name": "Czechoslovakia",
       "color_hex": "#36a79c",
-      "feature_count": 65,
+      "feature_count": 169,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CZ",
@@ -1359,7 +1359,7 @@
       "tag": "JAP",
       "display_name": "Japan",
       "color_hex": "#ffc9b2",
-      "feature_count": 114,
+      "feature_count": 115,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "JP",
@@ -1638,7 +1638,7 @@
       "tag": "MAN",
       "display_name": "Manchukuo",
       "color_hex": "#ff7847",
-      "feature_count": 235,
+      "feature_count": 234,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CN",

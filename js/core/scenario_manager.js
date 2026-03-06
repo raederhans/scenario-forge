@@ -731,10 +731,10 @@ async function applyScenarioBundle(
   }
 
   if (showToastOnComplete) {
-    showToast(
-      t("Scenario loaded. 1) Select a country 2) Set Active 3) Apply Core/Presets.", "ui"),
-      {
-      title: t("Scenario loaded", "ui"),
+      showToast(
+        t("Scenario loaded. Expand the parent country and use Activate to apply releasable territory.", "ui"),
+        {
+          title: t("Scenario loaded", "ui"),
       tone: "success",
       duration: 4200,
       }

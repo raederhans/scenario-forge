@@ -52,7 +52,7 @@ if [[ ! -f "$PROFILE_PATH" ]]; then
   exit 1
 fi
 
-for dep in python3 rg curl; do
+for dep in python3 curl grep sed; do
   if ! command -v "$dep" >/dev/null 2>&1; then
     echo "[ERROR] Missing dependency: $dep"
     exit 1
@@ -62,6 +62,72 @@ done
 if ! command -v powershell.exe >/dev/null 2>&1; then
   echo "[WARN] powershell.exe not found. Windows-local fallback may be unavailable."
 fi
+
+resolve_wsl_rg() {
+  local candidate=""
+  for candidate in /usr/bin/rg /usr/local/bin/rg "$(command -v rg 2>/dev/null || true)"; do
+    [[ -n "$candidate" ]] || continue
+    [[ -x "$candidate" ]] || continue
+    if [[ "$candidate" == /mnt/* ]]; then
+      continue
+    fi
+    printf '%s\n' "$candidate"
+    return 0
+  done
+  return 1
+}
+
+RG_BIN="$(resolve_wsl_rg || true)"
+
+match_quiet() {
+  local pattern="$1"
+  shift
+  if [[ -n "$RG_BIN" ]]; then
+    "$RG_BIN" -q "$pattern" "$@" 2>/dev/null
+  else
+    grep -Eq -- "$pattern" "$@" 2>/dev/null
+  fi
+}
+
+match_quiet_i() {
+  local pattern="$1"
+  shift
+  if [[ -n "$RG_BIN" ]]; then
+    "$RG_BIN" -qi "$pattern" "$@" 2>/dev/null
+  else
+    grep -Eiq -- "$pattern" "$@" 2>/dev/null
+  fi
+}
+
+match_quiet_fixed() {
+  local pattern="$1"
+  shift
+  if [[ -n "$RG_BIN" ]]; then
+    "$RG_BIN" -q -F "$pattern" "$@" 2>/dev/null
+  else
+    grep -Fq -- "$pattern" "$@" 2>/dev/null
+  fi
+}
+
+extract_matches() {
+  local pattern="$1"
+  shift
+  if [[ -n "$RG_BIN" ]]; then
+    "$RG_BIN" --no-filename -o "$pattern" "$@" -S 2>/dev/null
+  else
+    grep -Eho -- "$pattern" "$@" 2>/dev/null
+  fi
+}
+
+extract_matches_n() {
+  local pattern="$1"
+  shift
+  if [[ -n "$RG_BIN" ]]; then
+    "$RG_BIN" -n "$pattern" "$@" -S 2>/dev/null
+  else
+    grep -En -- "$pattern" "$@" 2>/dev/null
+  fi
+}
 
 PARSE_DIR="$(mktemp -d)"
 python3 - "$PROFILE_PATH" "$PARSE_DIR" <<'PY'
@@ -390,7 +456,7 @@ register_anomaly() {
 extract_playwright_sources() {
   local pointer_log="$1"
   local out_file="$2"
-  rg --no-filename -o "\\.playwright-cli\\\\[^)]*\\.log" "$pointer_log" -S \
+  extract_matches "\\.playwright-cli\\\\[^)]*\\.log" "$pointer_log" \
     | sed 's#\\#/#g' \
     | sort -u > "$out_file" || true
 }
@@ -409,7 +475,7 @@ collect_console_issues() {
     while IFS= read -r line; do
       echo "[$mode][$context] $line" >> "$CONSOLE_ISSUES_FILE"
       had_issue=1
-    done < <(rg -n "\[ERROR\]|\[WARNING\]|TypeError|ReferenceError|ERR_" "$src" -S || true)
+    done < <(extract_matches_n "\[ERROR\]|\[WARNING\]|TypeError|ReferenceError|ERR_" "$src" || true)
   done < "$src_file"
 
   rm -f "$src_file"
@@ -441,7 +507,7 @@ collect_network_issues() {
     while IFS= read -r line; do
       echo "[$mode][$context] $line" >> "$NETWORK_ISSUES_FILE"
       had_issue=1
-    done < <(rg -n "$pattern" "$src" -S || true)
+    done < <(extract_matches_n "$pattern" "$src" || true)
   done < "$src_file"
 
   rm -f "$src_file"
@@ -493,7 +559,7 @@ find_wsl_server_port() {
   local end="$DEFAULT_PORT_END"
   for p in $(seq "$start" "$end"); do
     if curl -fsS "http://127.0.0.1:${p}/" > "/tmp/mapcreator-home-$p.html" 2>/dev/null; then
-      if rg -qi "$DEFAULT_SERVER_TITLE_PATTERN" "/tmp/mapcreator-home-$p.html"; then
+      if match_quiet_i "$DEFAULT_SERVER_TITLE_PATTERN" "/tmp/mapcreator-home-$p.html"; then
         echo "$p"
         return 0
       fi
@@ -508,18 +574,18 @@ parse_started_port_from_dev_log() {
   fi
 
   local line
-  line="$(rg -o "Server started at http://127\\.0\\.0\\.1:[0-9]+" "$DEV_LOG" -S | tail -n1 || true)"
+  line="$(extract_matches "Server started at http://127\\.0\\.0\\.1:[0-9]+" "$DEV_LOG" | tail -n1 || true)"
   if [[ -z "$line" ]]; then
     return 1
   fi
 
-  echo "$line" | rg -o "[0-9]+$" -S
+  printf '%s\n' "$line" | grep -Eo '[0-9]+$'
 }
 
 port_matches_expected_home() {
   local port="$1"
   if curl -fsS "http://127.0.0.1:${port}/" > "/tmp/mapcreator-home-$port.html" 2>/dev/null; then
-    if rg -qi "$DEFAULT_SERVER_TITLE_PATTERN" "/tmp/mapcreator-home-$port.html"; then
+    if match_quiet_i "$DEFAULT_SERVER_TITLE_PATTERN" "/tmp/mapcreator-home-$port.html"; then
       return 0
     fi
   fi
@@ -566,7 +632,7 @@ ensure_windows_server_for_edge() {
   bash "$PWCLI" close >/dev/null 2>&1 || true
   bash "$PWCLI" open "$test_url" --browser msedge > "$probe_log" 2>&1 || true
 
-  if ! rg -q "ERR_CONNECTION_REFUSED|### Error" "$probe_log"; then
+  if ! match_quiet "ERR_CONNECTION_REFUSED|### Error" "$probe_log"; then
     echo "[INFO] Edge can reach $test_url directly." | tee -a "$RUN_LOG"
     return 0
   fi
@@ -593,7 +659,7 @@ ensure_windows_server_for_edge() {
 
   bash "$PWCLI" close >/dev/null 2>&1 || true
   bash "$PWCLI" open "$test_url" --browser msedge > "$probe_log" 2>&1 || true
-  if rg -q "ERR_CONNECTION_REFUSED|### Error" "$probe_log"; then
+  if match_quiet "ERR_CONNECTION_REFUSED|### Error" "$probe_log"; then
     echo "[ERROR] Edge still cannot reach $test_url after Windows fallback." | tee -a "$RUN_LOG"
     exit 1
   fi
@@ -636,7 +702,7 @@ run_section() {
   selector_json="$(json_quote "$selector")"
 
   local locate_log="$LOG_DIR/pw-section-locate-${sid}-${mode}-$TS.log"
-  if ! bash "$PWCLI" run-code "const s=${selector_json}; const el = await page.\$(s); if (!el) { throw new Error('SECTION_NOT_FOUND ' + s); } await el.scrollIntoViewIfNeeded();" > "$locate_log" 2>&1; then
+  if ! bash "$PWCLI" run-code "await page.locator(${selector_json}).first().scrollIntoViewIfNeeded()" > "$locate_log" 2>&1; then
     echo "[$mode][$page] ${sid}: skipped (selector not found: ${selector})" >> "$SKIPPED_SECTIONS_FILE"
     return 0
   fi
@@ -650,7 +716,7 @@ run_section() {
 
   if [[ "$expand" == "click" || "$expand" == "toggle" ]]; then
     local expand_log="$LOG_DIR/pw-section-expand-${sid}-${mode}-$TS.log"
-    bash "$PWCLI" run-code "const s=${selector_json}; const el = await page.\$(s); if (el) { await el.click(); }" > "$expand_log" 2>&1 || true
+    bash "$PWCLI" run-code "await page.locator(${selector_json}).first().click()" > "$expand_log" 2>&1 || true
   fi
 
   if (( scroll > 0 )); then
@@ -710,7 +776,7 @@ run_gesture() {
   local selector_json
   selector_json="$(json_quote "$selector")"
   local locate_log="$LOG_DIR/pw-gesture-locate-${gid}-${mode}-$TS.log"
-  if ! bash "$PWCLI" run-code "const s=${selector_json}; const el = await page.\$(s); if (!el) { throw new Error('GESTURE_TARGET_NOT_FOUND ' + s); } await el.scrollIntoViewIfNeeded();" > "$locate_log" 2>&1; then
+  if ! bash "$PWCLI" run-code "await page.locator(${selector_json}).first().scrollIntoViewIfNeeded()" > "$locate_log" 2>&1; then
     echo "[$mode][$page] ${gid}: skipped (selector not found: ${selector})" >> "$SKIPPED_SECTIONS_FILE"
     return 0
   fi
@@ -970,13 +1036,13 @@ mapfile -t REPORT_PHASES < <(cat "$EXEC_PHASES_FILE" 2>/dev/null || true)
   fi
   echo
   echo "## Initial rendering diagnosis clues"
-  if rg -q "europe_topology\.highres\.json" "$CONSOLE_ISSUES_FILE" "$NETWORK_ISSUES_FILE" 2>/dev/null; then
+  if match_quiet "europe_topology\.highres\.json" "$CONSOLE_ISSUES_FILE" "$NETWORK_ISSUES_FILE"; then
     echo "- Home page attempts to load data/europe_topology.highres.json and falls back to data/europe_topology.json.bak."
   fi
-  if rg -q "favicon\.ico" "$CONSOLE_ISSUES_FILE" "$NETWORK_ISSUES_FILE" 2>/dev/null; then
+  if match_quiet "favicon\.ico" "$CONSOLE_ISSUES_FILE" "$NETWORK_ISSUES_FILE"; then
     echo "- Favicon requests include 404 responses (low severity noise)."
   fi
-  if rg -q -F '$(...).ready is not a function' "$CONSOLE_ISSUES_FILE" "$NETWORK_ISSUES_FILE" 2>/dev/null; then
+  if match_quiet_fixed '$(...).ready is not a function' "$CONSOLE_ISSUES_FILE" "$NETWORK_ISSUES_FILE"; then
     echo '- README third-party page logs jQuery compatibility error: $(...).ready is not a function.'
   fi
   echo "- Evidence order follows: console -> network -> screenshots -> repro steps -> patch hint."

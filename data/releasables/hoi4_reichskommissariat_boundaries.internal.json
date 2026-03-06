@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "runtime_topology": "data/europe_topology.runtime_political_v1.json",
+  "entries": [
+    {
+      "tag": "RKB",
+      "basis": "historical",
+      "precedence": "historical",
+      "notes": "Belgium plus Nord and Pas-de-Calais only.",
+      "include_country_codes": ["BE"],
+      "include_feature_id_prefixes": ["FR_ARR_59", "FR_ARR_62"]
+    },
+    {
+      "tag": "RKP",
+      "basis": "historical",
+      "precedence": "historical",
+      "notes": "1939 General Government proxy using Warsaw, Kielce, Lublin, Krakow, and Rzeszow-era districts mapped to modern powiats.",
+      "include_hierarchy_group_ids": [
+        "PL_Masovian",
+        "PL_Holy_Cross",
+        "PL_Lublin",
+        "PL_Lesser_Poland",
+        "PL_Subcarpathian"
+      ]
+    },
+    {
+      "tag": "RKO",
+      "basis": "hoi4_trigger",
+      "precedence": "hoi4_trigger",
+      "notes": "Baltics plus the western and central Belarus states referenced by GER_is_RKO_state.",
+      "include_country_codes": ["EE", "LV", "LT"],
+      "include_hierarchy_group_ids": [
+        "BY_Brest",
+        "BY_Grodno",
+        "BY_Minsk",
+        "BY_Vitebsk"
+      ]
+    },
+    {
+      "tag": "RKU",
+      "basis": "hoi4_trigger",
+      "precedence": "hoi4_trigger",
+      "notes": "Core Ukraine occupation zone from GER_is_RKU_state with named fringe districts materialized explicitly.",
+      "include_hierarchy_group_ids": [
+        "UA_Volyn",
+        "UA_Rivne",
+        "UA_Zhytomyr",
+        "UA_Khmelnytskyi",
+        "UA_Vinnytsia",
+        "UA_Kyiv",
+        "UA_Cherkasy",
+        "UA_Odessa",
+        "UA_Mykolaiv",
+        "UA_Kherson",
+        "UA_Dnipropetrovsk",
+        "UA_Kharkiv",
+        "UA_Donetsk",
+        "UA_Sumy"
+      ],
+      "include_feature_ids": [
+        "UA_RAY_74538382B90572707310825",
+        "UA_RAY_74538382B8704633300515",
+        "UA_RAY_74538382B34689599554445",
+        "UA_RAY_74538382B84040377374615",
+        "RU_RAY_50074027B21430544456221",
+        "RU_RAY_50074027B36141655472455"
+      ]
+    },
+    {
+      "tag": "RKK",
+      "basis": "hoi4_trigger",
+      "precedence": "hoi4_trigger",
+      "notes": "Transcaucasia plus the North Caucasus groups represented by GER_is_RKK_state.",
+      "include_country_codes": ["AM", "AZ", "GE"],
+      "include_hierarchy_group_ids": [
+        "RU_Chechen_Republic",
+        "RU_Republic_of_Ingushetia",
+        "RU_Republic_of_North_Ossetia_Alania",
+        "RU_Kabardino_Balkaria",
+        "RU_Karachay_Cherkess_Republic",
+        "RU_Republic_of_Adygea",
+        "RU_Krasnodar_Krai",
+        "RU_Stavropol_Krai",
+        "RU_Republic_of_Kalmykia",
+        "RU_Astrakhan"
+      ],
+      "include_feature_ids": [
+        "RU_RAY_50074027B75402656675224",
+        "RU_RAY_50074027B22946859849779"
+      ]
+    },
+    {
+      "tag": "RKM",
+      "basis": "hoi4_trigger",
+      "precedence": "hoi4_trigger_then_aa_line",
+      "notes": "Central and northwestern Russian zone from GER_is_RKM_state; eastern fringe is intentionally capped on the A-A side by limiting included modern admin groups.",
+      "include_hierarchy_group_ids": [
+        "BY_Grodno",
+        "BY_Vitebsk",
+        "RU_Arkhangelsk",
+        "RU_Vologda",
+        "RU_Leningrad",
+        "RU_Novgorod",
+        "RU_Pskov",
+        "RU_Tver",
+        "RU_Smolensk",
+        "RU_Bryansk",
+        "RU_Moscow",
+        "RU_Kaluga",
+        "RU_Tula",
+        "RU_Oryol",
+        "RU_Kursk",
+        "RU_Voronezh",
+        "RU_Lipetsk",
+        "RU_Volgograd",
+        "RU_Yaroslavl",
+        "RU_Ivanovo",
+        "RU_Ryazan",
+        "RU_Vladimir",
+        "RU_Nizhny_Novgorod",
+        "RU_Penza",
+        "RU_Saratov",
+        "RU_Ulyanovsk",
+        "RU_Rostov"
+      ],
+      "include_feature_ids": [
+        "RU_CITY_ARKHANGELSK",
+        "RU_RAY_50074027B17636475236668",
+        "RU_RAY_50074027B90519354478842",
+        "RU_RAY_50074027B14748896560246",
+        "RU_RAY_50074027B40605874483535",
+        "RU_RAY_50074027B38735593525636",
+        "RU_RAY_50074027B90540436425293"
+      ]
+    }
+  ]
+}

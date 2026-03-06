@@ -453,6 +453,7 @@
       "critical": true,
       "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
       "include_feature_ids": [
+        "CN_CITY_17275852B82452317993245",
         "CN_CITY_17275852B84296108244083",
         "CN_CITY_17275852B23021356422447",
         "CN_CITY_17275852B71122715185286",

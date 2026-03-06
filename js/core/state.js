@@ -676,6 +676,7 @@ export const state = {
   cachedDynamicOwnerBorders: null,
   cachedProvinceBorders: null,
   cachedLocalBorders: null,
+  cachedDetailAdmBorders: null,
   cachedColorsHash: null,
   cachedDynamicBordersHash: null,
   cachedCoastlines: null,

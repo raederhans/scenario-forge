@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1939",
-  "description": "Target ADM2 split list for 1939 Sudetenland and Southern Slovakia refinements.",
+  "description": "Historical 1939 ADM2 subset registry for Sudetenland, Zaolzie, and Southern Slovakia.",
   "targets": {
     "sudetenland": {
       "country_code": "CZ",
@@ -24,6 +24,12 @@
         "57006924B26083217891381",
         "57006924B73132069516203",
         "57006924B21154438881940"
+      ]
+    },
+    "zaolzie": {
+      "country_code": "CZ",
+      "feature_ids": [
+        "57006924B63031935780571"
       ]
     },
     "south_slovakia": {
