@@ -462,56 +462,251 @@ function ensureInitialInspectorExpansion(groupedEntries = []) {
   state.inspectorExpansionInitialized = true;
 }
 
-function applyHierarchyGroup(group, color, render) {
-  if (!group || !group.children) return;
-  const targetIds = Array.isArray(group.children)
-    ? Array.from(new Set(group.children.map((id) => String(id || "").trim()).filter(Boolean)))
-    : [];
-  if (!targetIds.length) return;
-  if (String(state.paintMode || "visual") === "sovereignty") {
-    if (!state.activeSovereignCode) return;
-    const before = captureHistoryState({
-      sovereigntyFeatureIds: targetIds,
-    });
-    const changed = setFeatureOwnerCodes(targetIds, state.activeSovereignCode);
-    mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
-    if (changed) {
-      mapRenderer.scheduleDynamicBorderRecompute("sidebar-hierarchy-batch", 90);
-      pushHistoryEntry({
-        kind: "hierarchy-apply-sovereignty",
-        before,
-        after: captureHistoryState({
-          sovereigntyFeatureIds: targetIds,
-        }),
-        meta: {
-          affectsSovereignty: true,
-        },
-      });
-    }
-    if (render) render();
-    return;
+function normalizeActionMode(mode = "auto") {
+  if (mode === "ownership" || mode === "visual") return mode;
+  return String(state.paintMode || "visual") === "sovereignty" ? "ownership" : "visual";
+}
+
+function applyVisualOverridesToFeatureIds(
+  targetIds = [],
+  color,
+  {
+    render,
+    historyKind = "feature-apply-color",
+    dirtyReason = "feature-apply-color",
+    addToRecent = true,
+  } = {}
+) {
+  const normalizedTargetIds = Array.from(new Set((targetIds || []).map((id) => String(id || "").trim()).filter(Boolean)));
+  if (!normalizedTargetIds.length) {
+    return {
+      applied: false,
+      changed: 0,
+      matchedCount: 0,
+      requestedCount: 0,
+      missingCount: 0,
+      reason: "empty-target",
+      mode: "visual",
+    };
   }
+
   const colorToApply = color || state.selectedColor;
   const before = captureHistoryState({
-    featureIds: targetIds,
+    featureIds: normalizedTargetIds,
   });
-  targetIds.forEach((id) => {
+  normalizedTargetIds.forEach((id) => {
     state.visualOverrides[id] = colorToApply;
     state.featureOverrides[id] = colorToApply;
   });
-  mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+  mapRenderer.refreshResolvedColorsForFeatures(normalizedTargetIds, { renderNow: false });
   if (render) render();
-  addRecentColor(colorToApply);
-  markDirty("hierarchy-apply-color");
+  if (addToRecent) {
+    addRecentColor(colorToApply);
+  }
+  markDirty(dirtyReason);
   pushHistoryEntry({
-    kind: "hierarchy-apply-color",
+    kind: historyKind,
     before,
     after: captureHistoryState({
-      featureIds: targetIds,
+      featureIds: normalizedTargetIds,
     }),
     meta: {
       affectsSovereignty: false,
     },
+  });
+  return {
+    applied: true,
+    changed: normalizedTargetIds.length,
+    matchedCount: normalizedTargetIds.length,
+    requestedCount: normalizedTargetIds.length,
+    missingCount: 0,
+    reason: "",
+    mode: "visual",
+  };
+}
+
+function clearVisualOverridesForFeatureIds(
+  targetIds = [],
+  {
+    render,
+    historyKind = "feature-clear-color",
+    dirtyReason = "feature-clear-color",
+  } = {}
+) {
+  const normalizedTargetIds = Array.from(new Set((targetIds || []).map((id) => String(id || "").trim()).filter(Boolean)));
+  if (!normalizedTargetIds.length) {
+    return {
+      applied: false,
+      changed: 0,
+      matchedCount: 0,
+      requestedCount: 0,
+      missingCount: 0,
+      reason: "empty-target",
+      mode: "visual",
+    };
+  }
+
+  const changedIds = normalizedTargetIds.filter((id) => (
+    Object.prototype.hasOwnProperty.call(state.visualOverrides || {}, id)
+    || Object.prototype.hasOwnProperty.call(state.featureOverrides || {}, id)
+  ));
+  if (!changedIds.length) {
+    return {
+      applied: true,
+      changed: 0,
+      matchedCount: normalizedTargetIds.length,
+      requestedCount: normalizedTargetIds.length,
+      missingCount: 0,
+      reason: "",
+      mode: "visual",
+    };
+  }
+
+  const before = captureHistoryState({
+    featureIds: changedIds,
+  });
+  changedIds.forEach((id) => {
+    delete state.visualOverrides[id];
+    delete state.featureOverrides[id];
+  });
+  mapRenderer.refreshResolvedColorsForFeatures(changedIds, { renderNow: false });
+  if (render) render();
+  markDirty(dirtyReason);
+  pushHistoryEntry({
+    kind: historyKind,
+    before,
+    after: captureHistoryState({
+      featureIds: changedIds,
+    }),
+    meta: {
+      affectsSovereignty: false,
+    },
+  });
+  return {
+    applied: true,
+    changed: changedIds.length,
+    matchedCount: normalizedTargetIds.length,
+    requestedCount: normalizedTargetIds.length,
+    missingCount: 0,
+    reason: "",
+    mode: "visual",
+  };
+}
+
+function applyOwnershipToFeatureIds(
+  targetIds = [],
+  ownerCode,
+  {
+    render,
+    historyKind = "feature-apply-ownership",
+    dirtyReason = "feature-apply-ownership",
+    recomputeReason = "sidebar-ownership-batch",
+  } = {}
+) {
+  const normalizedTargetIds = Array.from(new Set((targetIds || []).map((id) => String(id || "").trim()).filter(Boolean)));
+  const normalizedOwnerCode = normalizeCountryCode(ownerCode);
+  if (!normalizedTargetIds.length) {
+    return {
+      applied: false,
+      changed: 0,
+      matchedCount: 0,
+      requestedCount: 0,
+      missingCount: 0,
+      reason: "empty-target",
+      mode: "ownership",
+    };
+  }
+  if (!normalizedOwnerCode) {
+    return {
+      applied: false,
+      changed: 0,
+      matchedCount: normalizedTargetIds.length,
+      requestedCount: normalizedTargetIds.length,
+      missingCount: 0,
+      reason: "missing-active-owner",
+      mode: "ownership",
+    };
+  }
+
+  const before = captureHistoryState({
+    sovereigntyFeatureIds: normalizedTargetIds,
+  });
+  const changed = setFeatureOwnerCodes(normalizedTargetIds, normalizedOwnerCode);
+  mapRenderer.refreshResolvedColorsForFeatures(normalizedTargetIds, { renderNow: false });
+  if (changed > 0) {
+    mapRenderer.scheduleDynamicBorderRecompute(recomputeReason, 90);
+    markDirty(dirtyReason);
+    pushHistoryEntry({
+      kind: historyKind,
+      before,
+      after: captureHistoryState({
+        sovereigntyFeatureIds: normalizedTargetIds,
+      }),
+      meta: {
+        affectsSovereignty: true,
+      },
+    });
+  }
+  if (render) render();
+  return {
+    applied: true,
+    changed,
+    matchedCount: normalizedTargetIds.length,
+    requestedCount: normalizedTargetIds.length,
+    missingCount: 0,
+    reason: "",
+    mode: "ownership",
+  };
+}
+
+function applyHierarchyGroupWithMode(
+  group,
+  {
+    mode = "auto",
+    color,
+    ownerCode,
+    render,
+    ownershipHistoryKind = "hierarchy-apply-sovereignty",
+    ownershipDirtyReason = "hierarchy-apply-sovereignty",
+    visualHistoryKind = "hierarchy-apply-color",
+    visualDirtyReason = "hierarchy-apply-color",
+  } = {}
+) {
+  if (!group || !group.children) {
+    return {
+      applied: false,
+      changed: 0,
+      matchedCount: 0,
+      requestedCount: 0,
+      missingCount: 0,
+      reason: "missing-group",
+      mode: normalizeActionMode(mode),
+    };
+  }
+  const targetIds = Array.isArray(group.children)
+    ? Array.from(new Set(group.children.map((id) => String(id || "").trim()).filter(Boolean)))
+    : [];
+  const resolvedMode = normalizeActionMode(mode);
+  if (resolvedMode === "ownership") {
+    return applyOwnershipToFeatureIds(targetIds, ownerCode || state.activeSovereignCode, {
+      render,
+      historyKind: ownershipHistoryKind,
+      dirtyReason: ownershipDirtyReason,
+      recomputeReason: "sidebar-hierarchy-batch",
+    });
+  }
+  return applyVisualOverridesToFeatureIds(targetIds, color || state.selectedColor, {
+    render,
+    historyKind: visualHistoryKind,
+    dirtyReason: visualDirtyReason,
+  });
+}
+
+function applyHierarchyGroup(group, color, render) {
+  return applyHierarchyGroupWithMode(group, {
+    mode: "auto",
+    color,
+    render,
   });
 }
 
@@ -562,7 +757,46 @@ function filterToVisibleFeatureIds(featureIds = []) {
   };
 }
 
-function applyPreset(countryCode, presetIndex, color, render) {
+function getOwnedVisibleFeatureIds(ownerCode) {
+  const normalizedOwnerCode = normalizeCountryCode(ownerCode);
+  if (!normalizedOwnerCode) {
+    return {
+      requestedIds: [],
+      matchedIds: [],
+      missingIds: [],
+    };
+  }
+
+  let requestedIds = [];
+  if (state.sovereigntyByFeatureId && typeof state.sovereigntyByFeatureId === "object") {
+    requestedIds = Object.entries(state.sovereigntyByFeatureId)
+      .filter(([, rawOwnerCode]) => normalizeCountryCode(rawOwnerCode) === normalizedOwnerCode)
+      .map(([featureId]) => featureId);
+  }
+
+  if (!requestedIds.length && state.countryToFeatureIds instanceof Map) {
+    requestedIds = Array.isArray(state.countryToFeatureIds.get(normalizedOwnerCode))
+      ? state.countryToFeatureIds.get(normalizedOwnerCode)
+      : [];
+  }
+
+  return filterToVisibleFeatureIds(requestedIds);
+}
+
+function applyPresetWithMode(
+  countryCode,
+  presetIndex,
+  {
+    mode = "auto",
+    color,
+    ownerCode,
+    render,
+    ownershipHistoryKind = "preset-apply-sovereignty",
+    ownershipDirtyReason = "preset-apply-sovereignty",
+    visualHistoryKind = "preset-apply-color",
+    visualDirtyReason = "preset-apply-color",
+  } = {}
+) {
   const presetLookupCode = resolveScenarioLookupCode(countryCode);
   const presets = state.presetsState[presetLookupCode];
   if (!presets || !presets[presetIndex]) {
@@ -578,7 +812,6 @@ function applyPreset(countryCode, presetIndex, color, render) {
   }
 
   const preset = presets[presetIndex];
-  const colorToApply = color || state.selectedColor;
   const requestedFeatureIds = Array.isArray(preset.ids)
     ? preset.ids
     : [];
@@ -623,87 +856,42 @@ function applyPreset(countryCode, presetIndex, color, render) {
     };
   }
 
-  if (String(state.paintMode || "visual") === "sovereignty") {
-    if (!state.activeSovereignCode) {
-      return {
-        applied: false,
-        changed: 0,
-        matchedCount: targetIds.length,
-        requestedCount: requestedIds.length,
-        missingCount: missingIds.length,
-        reason: "missing-active-sovereign",
-      };
-    }
-    const before = captureHistoryState({
-      sovereigntyFeatureIds: targetIds,
+  const resolvedMode = normalizeActionMode(mode);
+  if (resolvedMode === "ownership") {
+    const result = applyOwnershipToFeatureIds(targetIds, ownerCode || state.activeSovereignCode, {
+      render,
+      historyKind: ownershipHistoryKind,
+      dirtyReason: ownershipDirtyReason,
+      recomputeReason: "sidebar-preset-batch",
     });
-    const changed = setFeatureOwnerCodes(targetIds, state.activeSovereignCode);
-    mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
-    if (changed) {
-      mapRenderer.scheduleDynamicBorderRecompute("sidebar-preset-batch", 90);
-      markDirty("preset-apply-sovereignty");
-      pushHistoryEntry({
-        kind: "preset-apply-sovereignty",
-        before,
-        after: captureHistoryState({
-          sovereigntyFeatureIds: targetIds,
-        }),
-        meta: {
-          affectsSovereignty: true,
-        },
-      });
-    }
-    if (render) render();
     return {
-      applied: true,
-      changed,
+      ...result,
       matchedCount: targetIds.length,
       requestedCount: requestedIds.length,
       missingCount: missingIds.length,
-      reason: "",
-      mode: "sovereignty",
     };
   }
 
-  const before = captureHistoryState({
-    featureIds: targetIds,
+  const result = applyVisualOverridesToFeatureIds(targetIds, color || state.selectedColor, {
+    render,
+    historyKind: visualHistoryKind,
+    dirtyReason: visualDirtyReason,
   });
-  targetIds.forEach((id) => {
-    state.visualOverrides[id] = colorToApply;
-    state.featureOverrides[id] = colorToApply;
-  });
-
-  mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
-  if (render) render();
-  markDirty("preset-apply-color");
-
-  if (!state.recentColors.includes(colorToApply)) {
-    state.recentColors.unshift(colorToApply);
-    if (state.recentColors.length > 10) state.recentColors.pop();
-    if (typeof state.updateRecentUI === "function") state.updateRecentUI();
-  }
-
-  pushHistoryEntry({
-    kind: "preset-apply-color",
-    before,
-    after: captureHistoryState({
-      featureIds: targetIds,
-    }),
-    meta: {
-      affectsSovereignty: false,
-    },
-  });
-
   console.log(`Applied preset "${preset.name}" with ${targetIds.length} visible regions`);
   return {
-    applied: true,
-    changed: targetIds.length,
+    ...result,
     matchedCount: targetIds.length,
     requestedCount: requestedIds.length,
     missingCount: missingIds.length,
-    reason: "",
-    mode: "visual",
   };
+}
+
+function applyPreset(countryCode, presetIndex, color, render) {
+  return applyPresetWithMode(countryCode, presetIndex, {
+    mode: "auto",
+    color,
+    render,
+  });
 }
 
 function initSidebar({ render } = {}) {
@@ -871,6 +1059,7 @@ function initSidebar({ render } = {}) {
   const countryInspectorEmpty = document.getElementById("countryInspectorEmpty");
   const countryInspectorSelected = document.getElementById("countryInspectorSelected");
   const countryInspectorSetActive = document.getElementById("countryInspectorSetActive");
+  const countryInspectorDetailHint = document.getElementById("countryInspectorDetailHint");
   const countryInspectorOrderingHint = document.getElementById("countryInspectorOrderingHint");
   const countryInspectorSection = document.getElementById("countryInspectorSection");
   const selectedCountryActionsSection = document.getElementById("selectedCountryActionsSection");
@@ -928,6 +1117,12 @@ function initSidebar({ render } = {}) {
   }
   if (typeof state.selectedInspectorCountryCode !== "string") {
     state.selectedInspectorCountryCode = "";
+  }
+  if (typeof state.ui?.scenarioVisualAdjustmentsOpen !== "boolean") {
+    state.ui.scenarioVisualAdjustmentsOpen = false;
+  }
+  if (typeof state.ui?.politicalEditingExpanded !== "boolean") {
+    state.ui.politicalEditingExpanded = false;
   }
   if (typeof state.inspectorExpansionInitialized !== "boolean") {
     state.inspectorExpansionInitialized = false;

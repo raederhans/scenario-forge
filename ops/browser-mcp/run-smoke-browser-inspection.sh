@@ -702,7 +702,7 @@ run_section() {
   selector_json="$(json_quote "$selector")"
 
   local locate_log="$LOG_DIR/pw-section-locate-${sid}-${mode}-$TS.log"
-  if ! bash "$PWCLI" run-code "await page.locator(${selector_json}).first().scrollIntoViewIfNeeded()" > "$locate_log" 2>&1; then
+  if ! bash "$PWCLI" run-code "async (page) => { await page.locator(${selector_json}).first().scrollIntoViewIfNeeded(); }" > "$locate_log" 2>&1; then
     echo "[$mode][$page] ${sid}: skipped (selector not found: ${selector})" >> "$SKIPPED_SECTIONS_FILE"
     return 0
   fi
@@ -716,7 +716,7 @@ run_section() {
 
   if [[ "$expand" == "click" || "$expand" == "toggle" ]]; then
     local expand_log="$LOG_DIR/pw-section-expand-${sid}-${mode}-$TS.log"
-    bash "$PWCLI" run-code "await page.locator(${selector_json}).first().click()" > "$expand_log" 2>&1 || true
+    bash "$PWCLI" run-code "async (page) => { await page.locator(${selector_json}).first().click(); }" > "$expand_log" 2>&1 || true
   fi
 
   if (( scroll > 0 )); then
@@ -776,7 +776,7 @@ run_gesture() {
   local selector_json
   selector_json="$(json_quote "$selector")"
   local locate_log="$LOG_DIR/pw-gesture-locate-${gid}-${mode}-$TS.log"
-  if ! bash "$PWCLI" run-code "await page.locator(${selector_json}).first().scrollIntoViewIfNeeded()" > "$locate_log" 2>&1; then
+  if ! bash "$PWCLI" run-code "async (page) => { await page.locator(${selector_json}).first().scrollIntoViewIfNeeded(); }" > "$locate_log" 2>&1; then
     echo "[$mode][$page] ${gid}: skipped (selector not found: ${selector})" >> "$SKIPPED_SECTIONS_FILE"
     return 0
   fi

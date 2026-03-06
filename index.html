@@ -690,11 +690,10 @@
               <span class="scenario-context-icon" aria-hidden="true">M</span>
               <span id="scenarioContextModeText">Mode: Visual</span>
             </div>
-            <div class="scenario-context-item">
-              <span class="scenario-context-icon" aria-hidden="true">A</span>
-              <span id="scenarioContextActiveText">Active: None</span>
-              <span id="activeSovereignLabel" class="hidden">None selected</span>
-            </div>
+              <div class="scenario-context-item">
+                <span class="scenario-context-icon" aria-hidden="true">A</span>
+                <span id="scenarioContextActiveText">Active: None</span>
+              </div>
             <button id="scenarioGuideBtn" type="button" class="scenario-context-icon-btn" aria-label="Show scenario guide">?</button>
           </div>
           <div id="scenarioGuidePopover" class="scenario-guide-popover hidden" role="dialog" aria-label="Scenario quick guide">
@@ -702,8 +701,8 @@
             <ol class="scenario-guide-list mt-2">
               <li id="scenarioGuideStepApply">Apply Scenario</li>
               <li id="scenarioGuideStepSelect">Select a country in Inspector</li>
-              <li id="scenarioGuideStepActive">Set Active for sovereignty actions</li>
-              <li id="scenarioGuideStepApplyActions">Apply Core Territory or presets in Territories &amp; Presets</li>
+                <li id="scenarioGuideStepActive">Use an active owner for political actions</li>
+                <li id="scenarioGuideStepApplyActions">Use Activate or Scenario Actions for ownership changes</li>
             </ol>
           </div>
 
@@ -753,15 +752,23 @@
 
               <div class="dock-group dock-group-paint">
                 <div id="lblEditingRules" class="dock-group-label">Paint</div>
-                <div class="dock-paint-row">
-                  <select id="paintModeSelect" class="select-input dock-select">
-                    <option id="optPaintMeaningVisual" value="visual">Visual</option>
-                    <option id="optPaintMeaningSovereignty" value="sovereignty">Sovereignty</option>
-                  </select>
+                <div id="dockPaintPrimaryRow" class="dock-paint-row">
+                  <div id="dockPaintSummary" class="dock-paint-summary">Visual Color brush</div>
                   <select id="paintGranularitySelect" class="select-input dock-select">
                     <option id="optPaintSubdivision" value="subdivision">By Subdivision</option>
                     <option id="optPaintCountry" value="country">By Country</option>
                   </select>
+                  <button id="politicalEditingToggleBtn" type="button" class="preset-action-btn">Political Editing</button>
+                  <button id="scenarioVisualAdjustmentsBtn" type="button" class="preset-action-btn hidden">Visual Adjustments</button>
+                </div>
+                <div id="dockPoliticalEditingPanel" class="dock-political-panel hidden">
+                  <div class="dock-paint-row">
+                    <select id="paintModeSelect" class="select-input dock-select">
+                      <option id="optPaintMeaningVisual" value="visual">Visual</option>
+                      <option id="optPaintMeaningSovereignty" value="sovereignty">Sovereignty</option>
+                    </select>
+                    <div id="activeSovereignLabel" class="dock-political-owner">None selected</div>
+                  </div>
                 </div>
               </div>
 
@@ -928,6 +935,7 @@
                   <div class="inspector-detail-actions mt-3">
                     <button id="countryInspectorSetActive" type="button" class="btn-secondary inspector-detail-primary-btn">Set Active</button>
                   </div>
+                  <p id="countryInspectorDetailHint" class="sidebar-tool-hint mt-2 hidden"></p>
                 </div>
               </div>
               <button id="resetCountryColors" class="btn-secondary mt-3">Reset Country Colors</button>
