@@ -5,6 +5,7 @@ cwd = "/mnt/c/Users/raede/Desktop/dev/mapcreator"
 args = [
   "ops/browser-mcp/start-playwright-mcp-stdio.sh",
   "--browser", "msedge",
+  "--no-sandbox",
   "--caps", "vision,devtools",
   "--console-level", "warning",
   "--output-dir", ".mcp-artifacts",

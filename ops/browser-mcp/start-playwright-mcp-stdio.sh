@@ -54,6 +54,15 @@ if [[ -z "${NPX_BIN}" ]]; then
 fi
 
 if [[ -n "${NPX_BIN}" && -x "${NPX_BIN}" ]]; then
+  if [[ "${EUID:-$(id -u)}" == "0" ]]; then
+    for arg in "$@"; do
+      if [[ "$arg" == "--no-sandbox" ]]; then
+        exec "${NPX_BIN}" -y @playwright/mcp@latest "$@"
+      fi
+    done
+    exec "${NPX_BIN}" -y @playwright/mcp@latest --no-sandbox "$@"
+  fi
+
   exec "${NPX_BIN}" -y @playwright/mcp@latest "$@"
 fi
 
