@@ -1,220 +1,397 @@
-# QA-057 — 全项目 UI 审计（地图填色主题一致性）
+# QA-057 — 全项目 UI 审计（主题一致性与主权优先改版复核）
 
 **日期**: 2026-03-06  
-**范围**: 全局 UI 风格与“地图填色创作”主题匹配度；信息层级、控件次序、色彩、字体、组件位置与交互流畅性  
-**审计方式**: 代码静态审计（`index.html` + `css/style.css`）+ 浏览器自动巡检尝试（Playwright MCP）
+**范围**: 基于最新 sovereignty-first UI 改动，复核既有 UI 修改建议是否仍有效，并更新已过时项  
+**基线版本**: `main` 分支最新主权相关提交 `9e4730e` / `911f13e`  
+**审计方式**: 代码静态审计（`index.html` + `css/style.css` + `js/ui/toolbar.js` + `js/ui/sidebar.js`）+ 本地浏览器实检（Playwright MCP, `http://127.0.0.1:8003/`）+ 最新 Web Interface Guidelines spot-check
 
 ---
 
 ## 0) 审计结论（Executive Summary）
 
-当前 UI 的完成度已经较高，具备明确的专业工具属性（左右功能栏 + 中央地图 + 底部快捷 dock），并且视觉语言整体统一。但从“主题契合度（地图填色）+ 操作流效率 + 信息负担”角度看，仍存在三类核心问题：
+最新这轮“主权优先”改版已经显著改变了 UI 重心，因此 **QA-057 原版中的一部分建议已经过时**。当前界面不再是单纯的“左栏堆控件 + 右栏看结果”，而是已经形成了更明确的三段式结构：
 
-1. **主题语义不够聚焦**：外框视觉偏“通用 SaaS 控制台”，而非“地图工作台”；地图舞台虽然有深色质感，但两侧面板与文本密度偏高，削弱了地图本体的主角地位。  
-2. **层级与任务流过深**：左侧连续多卡 + 多层 `<details>`，右侧再叠搜索与多节，导致新用户难形成“先做什么、后做什么”的路径。  
-3. **颜色/字体/交互节奏存在优化空间**：标题与标签全大写风格、面板与 map 的风格对比、dock 与角落浮层竞争注意力，影响“快节奏填色”体验。
+- **左栏**：Palette / Scenario / Appearance  
+- **中部地图 + Dock**：即时填色、主权模式切换、快速动作  
+- **右栏**：Country Inspector / Territories & Presets / Diagnostics
 
-> 建议采用“两阶段优化”：
-> - **Phase A（低风险，1~2 周）**：不改数据逻辑，仅做信息架构、视觉 token、默认状态和文案引导优化。  
-> - **Phase B（中风险，2~4 周）**：拆分工作流（新手/专家）、引入主题皮肤（Atlas / Blueprint / Paper）、强化地图优先模式。
+这意味着，旧版审计中最重的一条建议 “立即重构成 Start / Paint / Refine / Export 四段式 IA” 已经不再是当前第一优先级。现在更准确的判断是：
+
+1. **主权工作流已经落地，但入口仍然分散**：`Political Editing`、`Active Owner`、`Territories & Presets`、顶部 scenario context 已经建立起主权语义；问题不再是“缺少主权流程”，而是“流程存在，但还不够顺滑”。  
+2. **主题气质仍偏 SaaS 控制台**：主权语义更强了，但视觉外壳仍以白卡片 + 冷蓝强调 + 全大写标签为主，地图工作台氛围仍弱。  
+3. **浮层冲突比旧报告写得更具体**：本次实检确认顶部 scenario guide 按钮会被 zoom 控件实际遮挡，属于真实交互 bug，不再只是抽象的“注意力竞争”。  
+4. **若继续优化，优先级应从“大重排”调整为“精修主流程与可读性”**：先修布局冲突、文案可读性、色板列表表达、移动端高度挤压，再考虑主题皮肤和模式分层。
 
 ---
 
-## 1) 浏览器证据与限制说明（按证据优先级）
+## 0.1) 既有建议有效性复核
+
+### 已过时或需降级的建议
+
+1. **“Scenario 与 Editing Rules 关系不清晰”**  
+   这条已基本过时。当前主权相关动作已转移到 dock 与右侧 inspector：`Political Editing`、`Use as Active Owner`、`Territories & Presets`、顶部 `Scenario / Mode / Active` context 都在强化路径。
+
+2. **“Browse All Colors 展开后缺少关闭态文案”**  
+   已过时。当前按钮会在展开后切换为 `Hide Color Library`。
+
+3. **“需要立即重构成 Start / Paint / Refine / Export 四大区块”**  
+   需降级。当前结构已经部分实现类似分工，只是尚未通过默认折叠、摘要文案和视觉分组把这件事讲清楚；不需要把它作为 P0 级大改。
+
+### 仍然有效的建议
+
+1. **主题仍偏 SaaS，而非地图创作台**  
+2. **全大写 section label 过多，阅读感偏参数面板**  
+3. **dock、top bar、zoom、toast 的视觉竞争仍然存在**  
+4. **需要拆分系统强调色与地图语义色**
+
+### 新出现或旧文档未充分捕捉的问题
+
+1. **Scenario guide 按钮与 zoom controls 实际重叠，导致点击失败**  
+2. **Palette Library 条目文案可读性差，如 `GermanyDE`、`BritainGB`**  
+3. **移动端顶部浮层 + 底部 dock 共同压缩地图可视高度**  
+4. **Google Fonts 外链在受限环境下被拦截，暴露出字体依赖脆弱性**
+
+---
+
+## 1) 浏览器证据（按证据优先级）
 
 ### 1.1 Console
-- `error: Failed to load resource: the server responded with a status of 404 (Not Found)`
+
+- `Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector @ https://fonts.googleapis.com/css2?family=Inter...`
+
+说明：
+
+- 这不是业务逻辑错误，页面与数据加载均成功。  
+- 但它说明当前 UI 仍依赖外部字体请求；在受限环境、隐私插件或企业网络中，字体表现会退回系统 fallback，影响视觉稳定性。
 
 ### 1.2 Network
-- `404 GET http://localhost:8000/index.html`
-- `404 GET http://127.0.0.1:8000/`
 
-注：仓库根目录存在 `index.html`。从仓库根目录启动静态服务时，`/index.html` 与 `/` 应返回 HTTP 200；上述 404 只能说明浏览器容器命中了错误工作目录、错误端口转发，或错误的服务实例，不应视为应用本身的复现结果。
+成功加载：
+
+- `GET / => 200`
+- `GET /css/style.css => 200`
+- `GET /js/main.js => 200`
+- `GET /js/core/sovereignty_manager.js => 200`
+- `GET /js/core/releasable_manager.js => 200`
+- `GET /data/europe_topology.runtime_political_v1.json => 200`
+- `GET /data/releasables/hoi4_vanilla.internal.phase1.catalog.json => 200`
+- `GET /data/scenarios/index.json => 200`
+
+失败项：
+
+- `GET https://fonts.googleapis.com/css2?family=Inter... => FAILED`
+
+结论：
+
+- 原版 QA-057 中的 `404 localhost:8000` 证据已经失效，不能继续作为本报告依据。  
+- 当前本地实检显示，业务页面与主权相关数据均可正常加载，浏览器证据需要以本次 200/FAILED 结果为准。
 
 ### 1.3 Screenshot 产物
-本次通过 MCP 浏览器容器获得了截图 artifact 路径，但该次巡检命中了环境侧 404，页面未成功加载业务 UI。截图只说明巡检环境未对准仓库根目录服务，不具备应用审计价值，因此本报告以代码级审计为主。
+
+- `.mcp-artifacts/qa057-desktop.png`
+- `.mcp-artifacts/qa057-mobile.png`
 
 ### 1.4 复现步骤
-1. 在仓库根目录启动静态服务，例如于 `/workspace/mapcreator` 运行 `python3 -m http.server 8000`。  
-2. 先用 `curl` 或等效命令验证 `http://127.0.0.1:8000/index.html` 与 `http://127.0.0.1:8000/` 返回 HTTP 200。  
-3. 再让 Playwright MCP 访问 `http://localhost:8000/index.html` 或 `http://127.0.0.1:8000/`。  
-4. 若浏览器容器仍返回 404，应归类为审计环境误配置（错误 cwd、错误端口转发或错误服务实例），而不是应用预期结果。
 
-### 1.5 最小修复建议（针对审计环境）
-- 为浏览器巡检脚本提供一个显式健康检查 URL 与固定入口探测脚本（例如先 `curl` 验证 200，再调用浏览器）；若未通过应直接报环境错误并停止审计。
-- 将浏览器巡检产物路径统一落盘到仓库 `.mcp-artifacts/`，便于 QA 存档。
+1. 在仓库根目录启动 `py -3 tools/dev_server.py`。  
+2. 访问 `http://127.0.0.1:8003/`。  
+3. 等待 scenario、palette、country list 数据加载完成。  
+4. 打开 `Political Editing`、展开 `Color Library`、在右栏选择任一国家。  
+5. 观察顶部 scenario context 与右上 zoom 的相对位置，以及 Palette Library 条目可读性。  
+
+### 1.5 最小修复方向
+
+- 为顶部 scenario context 与 zoom controls 建立固定避让规则。  
+- 将关键 UI 字体改为本地托管或提供更稳健的 fallback。  
+- 继续将浏览器巡检产物统一落盘到仓库 `.mcp-artifacts/`。
+
+### 1.6 实测交互冲突
+
+在 `1600 x 1000` 视口下，`scenarioGuideBtn` 与 `zoomControls` 存在实际几何重叠：
+
+- guide button: `26 x 26`
+- overlap area: `541.125 px²`
+
+Playwright 实测点击失败，错误原因为：
+
+- `zoomControls intercepts pointer events`
+
+这意味着“浮层竞争”在当前版本中已经是**可复现 bug**，不是抽象审美问题。
 
 ---
 
-## 2) 主题契合度审计（地图填色工作台视角）
+## 2) 主题契合度审计（地图工作台 + 主权编辑视角）
 
 ## 2.1 正向项（当前做得好的）
 
-- **布局模型专业化**：`left tools + center map + right inspector + bottom quick dock` 的结构符合重度地图工具心智。  
-- **地图舞台质感较强**：`#mapContainer` 使用深色径向渐变、内阴影和边框，能凸显地图图层。  
-- **交互反馈较完整**：有 `toast`、工具状态 chip、缩放控制、dock 工具状态等，满足“快速操作 + 反馈闭环”。
+- **主权语义显著增强**：顶部 `Scenario / Mode / Active` context、dock 中的 `Political Editing`、右侧 `Use as Active Owner` 与 `Territories & Presets` 已经把“主权编辑”明确前置。  
+- **地图仍然是视觉主舞台**：`#mapContainer` 的深色框体与发光边框对中央地图有很强聚焦作用。  
+- **左右职责比旧版更清晰**：左侧负责资源与样式，中部负责即时操作，右侧负责国家与场景动作，比旧版“全塞左侧”更成熟。  
+- **移动端已具备抽屉化基础**：左右栏在中小屏会切换为 drawer，而非强行三栏并排。
 
-## 2.2 关键问题 A：视觉主题“像管理台”多于“像地图工作台”
+## 2.2 关键问题 A：主权核心已经成立，但外层视觉仍然像“白色后台”
 
 ### 现象
-- 全局背景与表单风格偏中性 SaaS（浅灰背景 + 白色卡片 + Inter），“地图创作氛围”较弱。  
-- 大量 section label 采用小字号大写字母，信息感强但创作感弱。
 
-### 为什么影响主题
-地图填色是“视觉创作 + 空间编辑”任务，用户应首先感知“地图舞台”，其次才是参数面板。当前面板语义偏“配置中心”，会分散对地图主体的注意力。
+- 中央地图是深色 Atlas 风格，但左右栏仍是典型浅灰底 + 白卡片 + 冷蓝强调。  
+- `section-header` / `section-header-block` 仍大量使用 `uppercase + 0.75rem + letter-spacing`，形成明显“参数面板气质”。  
+- 顶部与底部组件虽然功能正确，但风格仍偏“工具浮层堆叠”，未完全形成地图工作台的整体气场。
 
-### 修改方案（可直接落地）
-1. **建立双层主题 token（基础 + 地图语义）**  
-   - 现有 token 保留，新增：
-   - `--theme-surface-atlas`, `--theme-panel-tint`, `--theme-map-frame`, `--theme-ink-soft`, `--theme-highlight`。
-2. **将左/右侧栏背景从纯白改为轻微暖灰或纸感层**（低透明噪点/纹理可选），削弱“后台系统”既视感。  
-3. **减少标题全大写密度**：
-   - 一级分组保留强调；
-   - 二级标签改 sentence case，提高可读性与亲和度。  
-4. **增加“Map-first 模式”开关**：收窄左右栏、弱化阴影、放大地图可视面积，适合长时间填色。
+### 这条建议为什么仍有效
+
+主权相关交互已经建立，但**视觉主题没有同步升级**。现在的落差不是“功能不到位”，而是“功能已经像地图编辑器，外壳还像管理台”。
+
+### 更新后的修改方向
+
+1. **保留当前布局，不推翻，只强化地图工作台主题 token**  
+   建议新增：
+   - `--theme-panel-paper`
+   - `--theme-panel-tint`
+   - `--theme-map-accent`
+   - `--theme-sovereign-active`
+   - `--theme-sovereign-target`
+
+2. **降低左右栏的纯白感**  
+   改为轻微暖灰、纸感或 atlas tint，让左右栏不再和中央地图完全割裂。
+
+3. **把“主权态”做成视觉一级语义**  
+   例如 `Active Owner`、`Political Ownership`、场景关键动作使用独立语义色，而不是继续共用通用蓝色。
+
+4. **保留高层级标签强调，但缩小全大写覆盖范围**  
+   一级组可保留 uppercase；二级说明与辅助标题应改为 sentence case。
 
 ---
 
-## 3) 信息层级与控件次序审计
+## 3) 信息层级与任务流审计
 
-## 3.1 关键问题 B：左侧任务路径过长，认知切换频繁
+## 3.1 关键问题 B：不再是“左栏太长”，而是“主流程跨三处切换”
 
 ### 现象
-- 左侧连续堆叠 Color Library / Scenario / Editing Rules / Special Zone / Appearance / Context Layers 等，且内部含多层嵌套。  
-- 用户从“选色 -> 选择工具 -> 填色 -> 校验边界 -> 导出”会跨多个区域来回跳。
 
-### 修改方案
-**建议重构为“任务导向 IA（Information Architecture）”**：
+当前主权流程大致是：
 
-1. **Start（开始）**：Scenario、Palette Source、Paint Granularity（只保留高频）  
-2. **Paint（填色）**：工具、颜色、最近色、橡皮/吸管  
-3. **Refine（修饰）**：边界、海岸线、父级边界、图层开关  
-4. **Export（输出）**：快照、项目导入导出、图例
+1. 左栏选 scenario / palette / appearance  
+2. 中部 dock 切换 `Political Editing`
+3. 右栏选择国家并 `Use as Active Owner`
+4. 右栏 `Territories & Presets` 做主权动作
 
-并引入：
-- **“基础模式 / 高级模式”切换**：默认仅显示高频 20% 控件；高级模式展开全部。  
-- **每个大组默认摘要行**：例如“Borders: 1.1px / 85% / 32 countries enabled”。
+相比旧版，这条路径已经更合理；但新问题在于，**路径存在，却没有被 UI 明确讲出来**。
+
+### 与旧报告相比的更新判断
+
+- 旧判断 “需要立即把所有东西改成 Start / Paint / Refine / Export” 过重。  
+- 当前更准确的建议是：**保留现有三段结构，只补充流程提示、默认状态与摘要信息**。
+
+### 更新后的修改方案
+
+1. **为三段结构补一句角色定义**
+   - 左栏：Setup & Style
+   - Dock：Paint & Ownership
+   - 右栏：Inspect & Actions
+
+2. **给主权模式补一个 3 步提示**
+   - `1) Pick a country`
+   - `2) Use as Active Owner`
+   - `3) Apply Territories / Presets`
+
+3. **默认收起低频项，而不是大重构**
+   - 左侧 `Color Library` 可默认闭合
+   - 右侧 `Project & Legend`、`Diagnostics` 默认保持闭合
+   - `Political Editing` 展开时，应更清楚地强调与右侧 inspector 的联动
+
+4. **用摘要替代结构重排**
+   例如：
+   - `Scenario: HOI4 1939 / Ownership`
+   - `Active Owner: Germany`
+   - `Territories: 4 actions available`
 
 ---
 
-## 4) 色彩体系审计（与地图填色主题关系）
+## 4) 色彩体系审计
 
-## 4.1 关键问题 C：UI 主色与地图着色语义边界不清
+## 4.1 关键问题 C：系统蓝色仍然承担过多语义
 
 ### 现象
-- UI 强调色（深蓝）同时承担按钮、focus、激活等多角色，和地图本体颜色语义在视觉上容易竞争。  
-- 当地图选择高饱和 palette 时，UI 的蓝色强调可能产生“二次主角”。
 
-### 修改方案
-1. **拆分“系统强调色”与“地图强调色”**：
-   - 系统交互（按钮/聚焦）用低饱和冷色；
-   - 地图相关状态（active sovereign、selected country）用独立语义色。  
-2. **控制浮层对比度层级**：toast、zoom、dock、tool chip 的背景透明度和阴影统一分级（L1/L2/L3）。  
-3. **新增色盲友好预设**：为关键状态（active, warning, conflict）提供非纯色提示（描边/图案/图标）。
+- 当前蓝色同时承担按钮主动作、focus、激活态与部分徽标态。  
+- 右侧 active badge、顶部 scenario context、小图标徽点都仍围绕同一套蓝色展开。  
+- 当地图上使用高饱和 palette 或进入主权编辑时，UI 蓝色会与地图着色争抢主角。
+
+### 更新后的修改方案
+
+1. **拆分三类强调色**
+   - `UI action`: 普通交互、hover、focus
+   - `Sovereignty state`: active owner、selected target、ownership mode
+   - `Map content`: 国家填色与地图实体本身
+
+2. **把顶部 context 与右侧 active owner 绑定到同一语义色**
+   这样用户能直接感知“当前是主权工作流，而不是普通填色工作流”。
+
+3. **为 warning / conflict / locked 状态加入非纯色编码**
+   使用描边、图标、条纹或 badge 形状，而不是只靠颜色。
 
 ---
 
 ## 5) 字体与排版审计
 
-## 5.1 关键问题 D：Inter + 大写标签可读性偏“参数面板化”
+## 5.1 关键问题 D：旧问题仍在，但新的可读性问题已经从标签转移到列表内容
 
 ### 现象
-- 当前仅使用 Inter；section label 小字号 + uppercase + letter-spacing 更像“监控台参数标签”。  
-- 连续阅读时，中文与英文混排区域的视觉节奏不总是稳定。
 
-### 修改方案
-1. **保留 Inter 作为基础字体，但减少全大写范围**。  
-2. **层级规范建议**：
-   - H1（应用级） 28–32 / 700  
-   - Group title 14–16 / 600（不强制 uppercase）  
-   - Label 12–13 / 500  
-   - Hint 12 / 400  
-3. **中英混排优化**：中文文案行高略提高（如 1.55~1.65），避免信息块显挤。
+- `Inter + uppercase section labels` 的“后台参数感”仍然存在。  
+- Palette Library 实测出现 `GermanyDE`、`BritainGB`、`AmericaUS` 这样的连续文案，不够人类可读。  
+- 右栏国家组与动作卡片在信息多时也会快速变密。
+
+### 更新后的修改方案
+
+1. **继续减少 uppercase 覆盖面**
+   - 应用级主标题保留
+   - 一级组标题可保留
+   - 二级 label 与辅助说明改 sentence case
+
+2. **修正 Palette Library 的文本表达**
+   建议改为：
+   - 标题：`Germany`
+   - 副标题：`DE · HOI4 Vanilla`
+   或
+   - 标题：`Germany`
+   - 副标题：`ISO-2: DE`
+
+3. **把高频数据字段做成稳定的排版模式**
+   - badge
+   - secondary line
+   - fixed-width short code
+
+4. **处理字体依赖脆弱性**
+   若继续使用 Inter，建议自托管或补足更强系统 fallback，而不是只依赖 Google Fonts。
 
 ---
 
 ## 6) 组件位置与交互流畅性审计
 
-## 6.1 关键问题 E：底部 dock + 右上 zoom + 提示浮层存在注意力竞争
+## 6.1 关键问题 E：浮层冲突依然成立，而且已经具象化为点击拦截
 
 ### 现象
-- 地图区域内同时存在 dock（底部）、zoom（右上）、hint/chip（左上或中部）、toast（右上），多个浮层会在中小屏形成视觉拥挤。  
-- dock 功能密度高，用户初次接触时难以快速辨识“主按钮”。
 
-### 修改方案
-1. **将 dock 分成“核心行 + 扩展托盘”**：
-   - 核心行仅保留：工具切换、当前色、Undo/Redo、Auto-fill 主动作；
-   - 扩展托盘承载模式、来源、次级操作。  
-2. **浮层避让规则**：
-   - toast 出现时自动避开 zoom 区域；
-   - onboarding hint 在首次完成一次有效填色后自动永久降级为帮助入口。  
-3. **地图优先交互热区**：默认尽量避免控件占据地图中心 30% 区域。
+- 顶部 scenario context 与右上 zoom controls 在桌面端发生重叠。  
+- `scenarioGuideBtn` 被 `zoomControls` 拦截点击。  
+- 移动端截图显示顶部 context + zoom 与底部 dock 一起压缩了地图主体高度。
+
+### 更新后的修改方案
+
+1. **先修真实遮挡 bug**
+   - scenario context bar 与 zoom 之间建立最小安全间距  
+   - 让 guide 按钮永远不进入 zoom hit area
+
+2. **把顶部层分级**
+   - Level 1: zoom
+   - Level 2: scenario context
+   - Level 3: toast / transient hints  
+   并为不同层设置明确避让规则，而不是仅靠 `z-index`
+
+3. **移动端优先压缩顶部，而不是压缩地图**
+   - 默认折叠 scenario context
+   - zoom controls 减小宽度
+   - dock 在未交互时默认进入更紧凑态
+
+4. **让 onboarding hint 更早退场**
+   当前它在地图中部仍有存在感。主权与普通填色模式都建立后，应尽快转为轻量帮助入口。
 
 ---
 
-## 7) 发现的细节问题（可快速修复）
+## 7) 发现的细节问题（更新版）
 
-1. **文案 typo**：`Click counties to paint.`（应为 countries）。  
-2. **“Browse All Colors” 展开后缺少明显“关闭”状态文案**（建议切换为 `Close Library`）。  
-3. **Scenario 与 Editing Rules 在新手视角上关系不够清晰**（建议增加 1 行流程提示：`1) Load scenario -> 2) Pick palette -> 3) Paint`）。  
-4. **Special Zone Editor 与 Appearance 语义边界可再明确**（建议独立为 Editing 子组）。
+1. **文案 typo 仍然存在**：`Click counties to paint.` 应为 `Click countries to paint.`  
+2. **旧建议“Browse All Colors 缺少关闭态”已失效**：现已切换为 `Hide Color Library`。  
+3. **Palette Library 条目可读性差**：当前条目显示成 `GermanyDE`、`BritainGB` 等拼接式标签。  
+4. **Scenario guide 按钮不可点**：被 `zoomControls` 实际拦截。  
+5. **移动端地图高度被上下浮层共同挤压**：虽然结构可用，但“地图优先”不够。  
+6. **外部字体依赖脆弱**：受限环境下会直接回退，影响视觉一致性。  
+7. **基于最新 Web Interface Guidelines 的补充问题**：
+   - `css/style.css` 中仍存在多处 `transition: all`
+   - 页面缺少 skip link
+   - 表单输入普遍缺少 `name` / `autocomplete`
 
 ---
 
-## 8) 优先级改造清单（Roadmap）
+## 8) 优先级改造清单（更新版 Roadmap）
 
 ## P0（立即，1~3 天）
-- 修正文案 typo 与关键按钮状态文案（Open/Close）。
-- 新手流程提示条（顶部或左侧首卡）。
-- Dock 主次操作分层（视觉层面先实现，不改逻辑）。
+
+- 修正 `counties -> countries`
+- 修复 scenario guide 与 zoom controls 的遮挡冲突
+- 修正 Palette Library 文案结构（国家名 / ISO / source tag 分层显示）
+- 移动端压缩顶部浮层高度，优先还给地图更多空间
 
 ## P1（短期，1~2 周）
-- IA 重构为 Start / Paint / Refine / Export。
-- 颜色 token 拆分（系统交互色 vs 地图语义色）。
-- 减少全大写标签，统一排版层级。
-- 浮层避让与显示优先级机制。
+
+- 拆分系统交互色与主权语义色
+- 降低全大写标签密度，统一 sentence case 规则
+- 给现有三段式结构补“角色说明 + 主权流程提示”
+- 自托管字体或增强 fallback；顺带清理 `transition: all`
 
 ## P2（中期，2~4 周）
-- Map-first 模式。
-- Basic/Advanced 双模式。
-- 主题皮肤（Atlas / Blueprint / Paper）可配置。
-- 色盲友好状态编码（图案/形状增强）。
+
+- `Map-first` 模式
+- `Basic / Advanced` 双模式
+- 主题皮肤（Atlas / Blueprint / Paper）
+- 主权状态的色盲友好编码
 
 ---
 
 ## 9) 可执行实现草案（技术层）
 
-## 9.1 Token 扩展示例
+## 9.1 Overlay 避让建议
+
 ```css
 :root {
-  --theme-panel-bg: rgba(250, 250, 248, 0.92);
-  --theme-panel-border: rgba(64, 72, 85, 0.16);
-  --theme-ui-accent: #3f5f8f;
-  --theme-map-accent: #b84a00;
-  --theme-map-frame: rgba(12, 20, 34, 0.88);
+  --overlay-top-gap: 14px;
+  --overlay-safe-right: 24px;
+  --scenario-context-max-width: 52vw;
+}
+
+.scenario-context-bar {
+  max-width: var(--scenario-context-max-width);
+}
+
+.zoom-controls {
+  right: var(--overlay-safe-right);
 }
 ```
 
-## 9.2 IA 结构重排建议
-- 左侧仅保留四大分组（Start/Paint/Refine/Export），每组默认闭合 + 摘要。  
-- 右侧专注 Inspector（国家、图例、项目），弱化“配置项堆叠”。
+再配合运行时检测：
 
-## 9.3 Dock 精简策略
-- 第一层（常驻）: Tool / Active Color / Undo Redo / Auto Fill。  
-- 第二层（点击展开）: Palette Source / Paint Meaning / 其他高级操作。
+- 如果 `scenarioContextBar.right >= zoomControls.left - 8`
+- 则自动折叠 context，或把 guide 按钮移动到左侧
+
+## 9.2 Palette Library 文案重构建议
+
+- Title：人类可读国家名  
+- Subtitle：`ISO-2 · Source Tag · Mapping status`  
+- Tooltip：保留完整技术信息（country file、mapped/unmapped reason）
+
+## 9.3 现阶段 IA 建议
+
+不做大重排，只明确三段职责：
+
+- 左栏：Setup / Palette / Appearance  
+- Dock：Paint / Ownership / Quick Actions  
+- 右栏：Inspect / Territories / Diagnostics
 
 ---
 
-## 10) 验收标准（建议）
+## 10) 验收标准（更新版）
 
-1. **主题一致性**：首次进入页面 5 秒内，用户主视线优先落在地图区域（可用简化眼动观察或用户访谈验证）。  
-2. **操作路径**：新用户完成“加载场景→填色→导出”步骤时间下降 20%+。  
-3. **认知负担**：首次使用 10 分钟内的“找不到功能”反馈显著下降。  
-4. **视觉稳定性**：中小屏下 dock / zoom / toast 不发生遮挡冲突。
+1. **主权流程清晰度**：首次接触用户能在 10 秒内找到 `Pick Country -> Active Owner -> Territories` 路径。  
+2. **地图优先度**：桌面与移动端都不出现顶部控件遮挡关键按钮。  
+3. **可读性**：Palette Library 中的国家名、ISO 与来源能一眼分辨。  
+4. **视觉一致性**：在字体外链失败时，页面仍保持稳定排版与层级。  
+5. **交互稳定性**：dock / zoom / toast / scenario context 不再相互拦截点击。
 
 ---
 
 ## 11) 结语
 
-这个项目已经具备成熟工具原型的骨架。下一步不需要“推翻重做”，而是通过**主题语义聚焦 + 信息架构重排 + 浮层节奏治理**，把它从“功能完整的地图工具”推进到“风格鲜明、操作顺手的地图创作工作台”。
+这份 UI 在“主权优先”改版之后，已经不适合继续沿用旧版 QA-057 的核心结论。当前最重要的不是继续推动一次大规模 IA 推翻，而是承认一个新的现实：**主权工作流已经建立，下一步应转向修主流程细节、交互冲突与视觉语义统一。**
 
+换句话说，现阶段的目标不是“把它从普通地图工具变成主权编辑器”，而是“把已经成型的主权编辑器打磨得更顺手、更可读、更像它自己”。
