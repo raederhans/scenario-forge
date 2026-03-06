@@ -1028,16 +1028,6 @@ function collectCountryCoverageStats(features = []) {
   };
 }
 
-function collectCountryFeatureCounts(features = []) {
-  const counts = new Map();
-  features.forEach((feature) => {
-    const countryCode = getFeatureCountryCodeNormalized(feature);
-    if (!countryCode) return;
-    counts.set(countryCode, (counts.get(countryCode) || 0) + 1);
-  });
-  return counts;
-}
-
 function buildInteractiveLandData(fullCollection) {
   if (!Array.isArray(fullCollection?.features) || !fullCollection.features.length) {
     return fullCollection;
@@ -1110,22 +1100,12 @@ function rebuildPoliticalLandCollections() {
   state.landDataFull = fullCollection;
   state.landData = interactiveCollection;
 
-  const fullFeatures = Array.isArray(fullCollection?.features) ? fullCollection.features : [];
-  const interactiveFeatures = Array.isArray(interactiveCollection?.features) ? interactiveCollection.features : [];
-  if (interactiveFeatures.length < fullFeatures.length) {
-    const fullCounts = collectCountryFeatureCounts(fullFeatures);
-    const interactiveCounts = collectCountryFeatureCounts(interactiveFeatures);
-    const deltas = Array.from(fullCounts.entries())
-      .filter(([countryCode, count]) => (interactiveCounts.get(countryCode) || 0) !== count)
-      .map(([
-        countryCode,
-        count,
-      ]) => `${countryCode}:${count}->${interactiveCounts.get(countryCode) || 0}`);
-    if (deltas.length) {
-      console.info(
-        `[map_renderer] Interactive land filter removed aggregate support tiers: ${deltas.join(", ")}.`
-      );
-    }
+  const fullCount = Array.isArray(fullCollection?.features) ? fullCollection.features.length : 0;
+  const interactiveCount = Array.isArray(interactiveCollection?.features) ? interactiveCollection.features.length : 0;
+  if (interactiveCount < fullCount) {
+    console.info(
+      `[map_renderer] Interactive land filter removed ${fullCount - interactiveCount} aggregate support tier features.`
+    );
   }
 
   return { fullCollection, interactiveCollection };

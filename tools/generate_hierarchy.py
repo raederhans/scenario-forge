@@ -61,10 +61,6 @@ ADMIN1_ISO_COLS = ["iso_a2", "adm0_a2", "iso_3166_1_", "iso_3166_1_alpha_2"]
 ADMIN1_ADM0_COLS = ["admin", "adm0_name", "admin0_name"]
 ADMIN1_ID_COLS = ["adm1_code", "gn_id", "id"]
 URAL_LONGITUDE = 60.0
-COUNTRY_CODE_ALIASES = {
-    "UK": "GB",
-    "EL": "GR",
-}
 COUNTRY_GROUP_CONTINENT_ORDER = [
     "Africa",
     "Asia",
@@ -267,7 +263,7 @@ def normalize_country_code(raw):
     code = re.sub(r"[^A-Z]", "", str(raw or "").strip().upper())
     if not code or code == "ZZ":
         return ""
-    return COUNTRY_CODE_ALIASES.get(code, code)
+    return cfg.COUNTRY_CODE_ALIASES.get(code, code)
 
 
 def normalize_country_group_continent(continent, region_un):

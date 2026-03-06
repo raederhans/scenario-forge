@@ -73,7 +73,7 @@ else:  # pragma: no cover - palettes mode does not touch GIS stack
 from map_builder import config as cfg
 
 if REQUESTED_MODE != "palettes":
-    from map_builder.geo.topology import build_topology
+    from map_builder.geo.topology import build_topology, _repair_geometry, _extract_country_code_from_id
     from map_builder.geo.utils import (
         clip_to_map_bounds,
         pick_column,
@@ -127,10 +127,6 @@ ALLOWED_SENTINEL_FEATURE_IDS = {
     "RUS+99?",
     "CO_ADM1_COL+99?",
     "VE_ADM1_VEN+99?",
-}
-DETAIL_OVERLAY_COUNTRY_ALIASES = {
-    "UK": "GB",
-    "EL": "GR",
 }
 DETAIL_OVERLAY_WARN_THRESHOLD = 0.90
 
@@ -1040,42 +1036,14 @@ def _collect_hierarchy_child_ids(path: Path) -> set[str]:
     return child_ids
 
 
-def _extract_country_code_from_feature_id(value: object) -> str:
-    text = str(value or "").strip().upper()
-    if not text:
-        return ""
-
-    prefix = re.split(r"[-_]", text)[0]
-    if re.fullmatch(r"[A-Z]{2,3}", prefix):
-        return prefix
-
-    match = re.match(r"[A-Z]{2,3}", prefix)
-    return match.group(0) if match else ""
-
-
 def _normalize_detail_overlap_country_code(raw_code: object, feature_id: object = None) -> str:
     candidate = re.sub(r"[^A-Z]", "", str(raw_code or "").strip().upper())
     if not candidate:
-        candidate = _extract_country_code_from_feature_id(feature_id)
+        candidate = _extract_country_code_from_id(feature_id)
     if not candidate:
         return ""
-    return DETAIL_OVERLAY_COUNTRY_ALIASES.get(candidate, candidate)
+    return cfg.COUNTRY_CODE_ALIASES.get(candidate, candidate)
 
-
-def _make_valid_geom(geom):
-    if geom is None:
-        return None
-    try:
-        if hasattr(geom, "make_valid"):
-            geom = geom.make_valid()
-    except Exception:
-        pass
-    try:
-        if geom is not None and not geom.is_valid:
-            geom = geom.buffer(0)
-    except Exception:
-        pass
-    return geom
 
 
 def _scan_detail_overlay_overlap_risks(
@@ -1148,7 +1116,7 @@ def _scan_detail_overlay_overlap_risks(
     if gdf.empty:
         return []
 
-    gdf["geometry"] = gdf.geometry.apply(_make_valid_geom)
+    gdf["geometry"] = gdf.geometry.apply(_repair_geometry)
     gdf = gdf[gdf.geometry.notna() & ~gdf.geometry.is_empty].copy()
     if gdf.empty:
         return []
@@ -1165,14 +1133,14 @@ def _scan_detail_overlay_overlap_risks(
             if tier_df.empty:
                 continue
             geometries = [
-                _make_valid_geom(geom)
+                _repair_geometry(geom)
                 for geom in tier_df.geometry.tolist()
                 if geom is not None and not geom.is_empty
             ]
             geometries = [geom for geom in geometries if geom is not None and not geom.is_empty]
             if not geometries:
                 continue
-            merged_geom = _make_valid_geom(unary_union(geometries))
+            merged_geom = _repair_geometry(unary_union(geometries))
             if merged_geom is None or merged_geom.is_empty:
                 continue
             area = float(getattr(merged_geom, "area", 0.0) or 0.0)
@@ -1195,7 +1163,7 @@ def _scan_detail_overlay_overlap_risks(
             for later in tiers[earlier_index + 1 :]:
                 if int(later["min_draw_index"]) <= int(earlier["max_draw_index"]):
                     continue
-                intersection = _make_valid_geom(earlier["geometry"].intersection(later["geometry"]))
+                intersection = _repair_geometry(earlier["geometry"].intersection(later["geometry"]))
                 if intersection is None or intersection.is_empty:
                     continue
                 intersection_area = float(getattr(intersection, "area", 0.0) or 0.0)

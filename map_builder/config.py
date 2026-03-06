@@ -166,6 +166,10 @@ MAP_DESCRIPTION = (
 
 GLOBAL_BOUNDS = (-180.0, -90.0, 180.0, 90.0)
 
+COUNTRY_CODE_ALIASES = {
+    "UK": "GB",
+    "EL": "GR",
+}
 COUNTRY_CODES = {"DE", "PL", "IT", "FR", "NL", "BE", "LU", "AT", "CH"}
 SUBDIVISIONS = {"DE", "JP", "GB", "CZ"}
 DETAIL_PARENT_SUBDIVISIONS = {"US", "CA", "MX"}

@@ -20,12 +20,6 @@ from map_builder import config as cfg
 from map_builder.geo.topology import build_political_only_topology
 
 
-COUNTRY_CODE_ALIASES = {
-    "UK": "GB",
-    "EL": "GR",
-}
-
-
 def _empty_gdf() -> gpd.GeoDataFrame:
     return gpd.GeoDataFrame(columns=["geometry"], geometry="geometry", crs="EPSG:4326")
 
@@ -110,7 +104,7 @@ def _normalize_country_code(raw_code: object) -> str:
     code = re.sub(r"[^A-Z]", "", str(raw_code or "").strip().upper())
     if not code:
         return ""
-    return COUNTRY_CODE_ALIASES.get(code, code)
+    return cfg.COUNTRY_CODE_ALIASES.get(code, code)
 
 
 def _extract_country_code_from_id(value: object) -> str:
