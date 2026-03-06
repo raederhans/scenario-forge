@@ -4759,14 +4759,43 @@ function resolveParentGroupTargetIds(feature, featureId) {
   return Array.from(new Set(targetIds));
 }
 
-function isParentFillDoubleClickEligible(hit, feature) {
+function resolveCountryFillTargetIds(feature, featureId) {
+  if (!featureId || !state.landIndex?.has(featureId)) return [];
+  const countryCode = getFeatureCountryCodeNormalized(feature);
+  if (!countryCode) return [];
+  const ids = Array.isArray(state.countryToFeatureIds?.get(countryCode))
+    ? state.countryToFeatureIds.get(countryCode)
+    : [];
+  if (ids.length < 2) return [];
+
+  const hasParentGrouping = ids.some((candidateId) => {
+    const candidateFeature = state.landIndex.get(candidateId);
+    if (!candidateFeature) return false;
+    return !!resolveParentGroupKey(candidateFeature, candidateId);
+  });
+  if (hasParentGrouping) return [];
+
+  return Array.from(new Set(ids));
+}
+
+function isBatchFillDoubleClickBaseEligible(hit, feature) {
   if (!hit?.id || !feature) return false;
   if (state.currentTool !== "fill") return false;
   if (isSovereigntyModeActive()) return false;
   if (state.interactionGranularity !== "subdivision") return false;
   if (state.brushModeEnabled) return false;
   if (state.specialZoneEditor?.active) return false;
+  return true;
+}
+
+function isParentFillDoubleClickEligible(hit, feature) {
+  if (!isBatchFillDoubleClickBaseEligible(hit, feature)) return false;
   return resolveParentGroupTargetIds(feature, hit.id).length >= 2;
+}
+
+function isCountryFillDoubleClickEligible(hit, feature) {
+  if (!isBatchFillDoubleClickBaseEligible(hit, feature)) return false;
+  return resolveCountryFillTargetIds(feature, hit.id).length >= 2;
 }
 
 function applyVisualSubdivisionFill(targetIds, selectedColor, { kind = "fill-feature-color", dirtyReason = kind } = {}) {
@@ -4822,6 +4851,32 @@ function executeParentGroupFill(action) {
   });
 }
 
+function executeCountryFill(action) {
+  if (!action) return false;
+  const targetIds = resolveCountryFillTargetIds(
+    action.eventPayload?.feature || state.landIndex.get(action.featureId),
+    action.featureId
+  );
+  if (!targetIds.length) {
+    return executeSingleSubdivisionFill(action);
+  }
+  return applyVisualSubdivisionFill(targetIds, action.selectedColor, {
+    kind: "fill-country-batch",
+    dirtyReason: "fill-country-batch",
+  });
+}
+
+function executePendingMapClickAction(action) {
+  if (!action) return false;
+  if (action.doubleClickBehavior === "country") {
+    return executeCountryFill(action);
+  }
+  if (action.doubleClickBehavior === "parent-group") {
+    return executeParentGroupFill(action);
+  }
+  return executeSingleSubdivisionFill(action);
+}
+
 function cancelPendingMapClickAction({ execute = false } = {}) {
   const pending = state.pendingMapClickAction;
   if (!pending) return null;
@@ -4854,16 +4909,20 @@ function consumePendingParentFillClick(hit, feature) {
   if (!pending) return false;
 
   const sameFeature = pending.featureId === hit?.id;
-  const sameParentGroup = pending.parentGroupKey && pending.parentGroupKey === resolveParentGroupKey(feature, hit?.id);
+  const doubleClickBehavior = pending.doubleClickBehavior || "parent-group";
+  const sameBehaviorTarget =
+    doubleClickBehavior === "country"
+      ? pending.countryCode && pending.countryCode === getFeatureCountryCodeNormalized(feature)
+      : pending.parentGroupKey && pending.parentGroupKey === resolveParentGroupKey(feature, hit?.id);
   const sameSelectedColor = pending.selectedColor === getSafeCanvasColor(state.selectedColor, LAND_FILL_COLOR);
   const sameTool = pending.tool === state.currentTool;
   const samePaintMode = pending.paintMode === state.paintMode;
   const sameGranularity = pending.interactionGranularity === state.interactionGranularity;
   const withinWindow = (Date.now() - Number(pending.createdAt || 0)) <= PARENT_FILL_DOUBLE_CLICK_MS;
 
-  if (sameFeature && sameParentGroup && sameSelectedColor && sameTool && samePaintMode && sameGranularity && withinWindow) {
+  if (sameFeature && sameBehaviorTarget && sameSelectedColor && sameTool && samePaintMode && sameGranularity && withinWindow) {
     cancelPendingMapClickAction();
-    executeParentGroupFill(pending);
+    executePendingMapClickAction(pending);
     return true;
   }
 
@@ -5235,6 +5294,24 @@ function handleClick(event) {
       scheduleSingleSubdivisionFill({
         featureId: id,
         parentGroupKey: resolveParentGroupKey(feature, id),
+        doubleClickBehavior: "parent-group",
+        countryCode,
+        selectedColor,
+        tool: "fill",
+        paintMode: state.paintMode,
+        interactionGranularity: state.interactionGranularity,
+        eventPayload: {
+          feature,
+          targetIds,
+        },
+      });
+      return;
+    }
+    if (isCountryFillDoubleClickEligible(hit, feature)) {
+      scheduleSingleSubdivisionFill({
+        featureId: id,
+        parentGroupKey: "",
+        doubleClickBehavior: "country",
         countryCode,
         selectedColor,
         tool: "fill",
