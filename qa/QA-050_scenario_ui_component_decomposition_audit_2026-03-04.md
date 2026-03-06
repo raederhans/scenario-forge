@@ -1,8 +1,8 @@
-# QA-049 — 剧本模式 UI 组件职责分离、布局拥挤与主权操作逻辑审计
+# QA-050 — 剧本模式 UI 组件职责分离、布局拥挤与主权操作逻辑审计
 
 **Date:** 2026-03-04
 **Scope:** 剧本模式下 sidebar 组件职责重叠、布局空间利用、主权操作 UX 流、legacy 预设残留
-**Prerequisite:** QA-048 已修复 F-1（颜色修改）、F-3（导航位置保持）等交互性缺陷。本报告聚焦**结构层**问题
+**Prerequisite:** QA-049 已修复 F-1（颜色修改）、F-3（导航位置保持）等交互性缺陷。本报告聚焦**结构层**问题
 **Method:** 静态代码审计 + 布局走读：sidebar.js, scenario_manager.js, toolbar.js, index.html
 **Deliverable Type:** 只读型审计文档，不修改代码
 
@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-QA-048 修复后，剧本模式下的交互路径基本通畅。但 sidebar 的**组件职责边界**和**空间分配**问题仍然显著：
+QA-049 修复后，剧本模式下的交互路径基本通畅。但 sidebar 的**组件职责边界**和**空间分配**问题仍然显著：
 
 1. **Inspector 面板在剧本模式下承担了过多职责** — 颜色修改、国家元数据、主权设置、层级组、区域预设全部塞入同一个滚动区域，导致面板高度膨胀。
 2. **"Territories & Presets" 面板在剧本模式下被完全隐藏** — 原本用于预设和层级浏览的独立区域（`#presetTree`、`#selectedCountryActionsSection`）被整体移除，其功能全部压入 Inspector inline actions。
@@ -230,7 +230,7 @@ presetSection.appendChild(createEmptyNote(t("No regional presets", "ui")));
 
 没有区分 "本国确实没有预设" 与 "有预设但全被可释放国家消费了"。
 
-这也是 QA-048 F-9 的延续，但此处从更宏观的角度看：**如果这些预设已被消费，为什么 "Regional Presets" 区块还要显示？**
+这也是 QA-049 F-9 的延续，但此处从更宏观的角度看：**如果这些预设已被消费，为什么 "Regional Presets" 区块还要显示？**
 
 **Impact**
 - 对不熟悉系统内部的用户，"No regional presets" 是误导性信息
@@ -267,7 +267,7 @@ Saxony (SAX) · uses preset "Saxony"
 1. **Country List** 中：母国行的展开/折叠子列表 → 用于导航
 2. **Inspector inline actions** 中：没有显示（当前代码只渲染 Hierarchy Groups + Regional Presets）
 
-QA-048 F-7 指出 Inspector 中的 "Releasable Countries" 区块不标识选中状态。但审查当前代码后发现：**当前版本的 `renderScenarioParentCountryActions()` [sidebar.js:2093-2095](js/ui/sidebar.js#L2093-L2095) 实际上只是 `renderParentCountryActions()` 的直接调用，不包含 Releasable Countries 子国列表。**
+QA-049 F-7 指出 Inspector 中的 "Releasable Countries" 区块不标识选中状态。但审查当前代码后发现：**当前版本的 `renderScenarioParentCountryActions()` [sidebar.js:2093-2095](js/ui/sidebar.js#L2093-L2095) 实际上只是 `renderParentCountryActions()` 的直接调用，不包含 Releasable Countries 子国列表。**
 
 也就是说，母国 Inspector 中目前**没有**显示可释放子国导航。子国导航只在 Country List 的展开中存在。
 
@@ -516,9 +516,9 @@ main.addEventListener("click", () => {
 
 ---
 
-## 附录：QA-048 Finding 状态追踪
+## 附录：QA-049 Finding 状态追踪
 
-| QA-048 ID | 状态 | 备注 |
+| QA-049 ID | 状态 | 备注 |
 |---|---|---|
 | F-1 | 已修复 | 颜色修改现在写入正确的颜色源 |
 | F-2 | 已缓解 | Set Active 可释放国家时已增加 toast 提示 |

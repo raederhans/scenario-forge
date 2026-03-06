@@ -1098,7 +1098,7 @@ function initSidebar({ render } = {}) {
       selectedCountryActionHint.classList.toggle("hidden", isScenarioMode);
       selectedCountryActionHint.textContent = isScenarioMode
         ? t(
-          "Review the current paint mode, then apply releasables, hierarchy groups, or regional presets.",
+          "Scenario Actions below change political ownership first. Open Visual Adjustments only for color-only edits.",
           "ui"
         )
         : t("Choose a country above to inspect territories, presets, and releasables.", "ui");
@@ -1238,6 +1238,79 @@ function initSidebar({ render } = {}) {
       state.countryPalette?.[countryState.code] ||
       fallbackColor
     );
+  };
+
+  const setScenarioVisualAdjustmentsOpen = (nextOpen, { scrollIntoView = false } = {}) => {
+    state.ui.scenarioVisualAdjustmentsOpen = !!nextOpen;
+    if (selectedCountryActionsSection) {
+      selectedCountryActionsSection.open = true;
+      if (scrollIntoView) {
+        selectedCountryActionsSection.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      }
+    }
+    if (typeof state.renderPresetTreeFn === "function") {
+      state.renderPresetTreeFn();
+    }
+  };
+
+  state.openScenarioVisualAdjustmentsFn = ({ scrollIntoView = false } = {}) => {
+    setScenarioVisualAdjustmentsOpen(true, { scrollIntoView });
+  };
+
+  const setScenarioMapPaintMode = (nextMode) => {
+    const normalizedMode = nextMode === "ownership" ? "sovereignty" : "visual";
+    state.paintMode = normalizedMode;
+    if (normalizedMode === "sovereignty") {
+      state.interactionGranularity = "subdivision";
+    }
+    if (typeof state.updatePaintModeUIFn === "function") {
+      state.updatePaintModeUIFn();
+    }
+    if (typeof state.renderNowFn === "function") {
+      state.renderNowFn();
+    }
+  };
+
+  const applyVisualColorToOwnedRegions = (countryState, { renderNow = render, color = null } = {}) => {
+    const { requestedIds, matchedIds } = getOwnedVisibleFeatureIds(countryState?.code);
+    if (!requestedIds.length || !matchedIds.length) {
+      return {
+        applied: false,
+        changed: 0,
+        matchedCount: matchedIds.length,
+        requestedCount: requestedIds.length,
+        missingCount: 0,
+        reason: "no-owned-features",
+      };
+    }
+    return applyVisualOverridesToFeatureIds(
+      matchedIds,
+      color || getResolvedCountryColor(countryState),
+      {
+        render: renderNow,
+        historyKind: "scenario-country-visual-fill",
+        dirtyReason: "scenario-country-visual-fill",
+      }
+    );
+  };
+
+  const clearCountryVisualOverrides = (countryState, { renderNow = render } = {}) => {
+    const { requestedIds, matchedIds } = getOwnedVisibleFeatureIds(countryState?.code);
+    if (!requestedIds.length || !matchedIds.length) {
+      return {
+        applied: false,
+        changed: 0,
+        matchedCount: matchedIds.length,
+        requestedCount: requestedIds.length,
+        missingCount: 0,
+        reason: "no-owned-features",
+      };
+    }
+    return clearVisualOverridesForFeatureIds(matchedIds, {
+      render: renderNow,
+      historyKind: "scenario-country-visual-clear",
+      dirtyReason: "scenario-country-visual-clear",
+    });
   };
 
   const createEmptyNote = (text) => {
@@ -1665,7 +1738,7 @@ function initSidebar({ render } = {}) {
 
   const applyScenarioReleasableCoreTerritory = (
     countryState,
-    { source = "scenario-actions", forceSovereignty = false } = {}
+    { source = "scenario-actions", forceSovereignty = false, actionMode = "ownership" } = {}
   ) => {
     if (!countryState?.releasable) return false;
 
@@ -1678,20 +1751,21 @@ function initSidebar({ render } = {}) {
       return false;
     }
 
-    if (forceSovereignty && String(state.paintMode || "visual") !== "sovereignty") {
-      state.paintMode = "sovereignty";
-      state.interactionGranularity = "subdivision";
-      if (typeof state.updatePaintModeUIFn === "function") {
-        state.updatePaintModeUIFn();
+    if (actionMode === "ownership") {
+      if (forceSovereignty && String(state.paintMode || "visual") !== "sovereignty") {
+        setScenarioMapPaintMode("ownership");
       }
-    }
-
-    if (String(state.paintMode || "visual") === "sovereignty") {
       state.activeSovereignCode = countryState.code;
       if (typeof state.updateActiveSovereignUIFn === "function") {
         state.updateActiveSovereignUIFn();
       }
-      const result = applyPreset(presetRef.presetLookupCode, presetRef.presetIndex, null, render);
+      const result = applyPresetWithMode(presetRef.presetLookupCode, presetRef.presetIndex, {
+        mode: "ownership",
+        ownerCode: countryState.code,
+        render,
+        ownershipHistoryKind: "scenario-core-apply-ownership",
+        ownershipDirtyReason: "scenario-core-apply-ownership",
+      });
       if (!result?.applied) {
         if (result?.reason !== "no-visible-features") {
           showToast(t("Core territory was not applied.", "ui"), {
@@ -1707,7 +1781,7 @@ function initSidebar({ render } = {}) {
         showToast(
           `${t("Applied", "ui")} ${result.changed}/${result.matchedCount} ${t("features", "ui")}`,
           {
-            title: t("Core territory applied", "ui"),
+            title: t("Political ownership updated", "ui"),
             tone: "success",
             duration: 3200,
           }
@@ -1721,7 +1795,13 @@ function initSidebar({ render } = {}) {
       }
     } else {
       const resolvedColor = getResolvedCountryColor(latestCountryStatesByCode.get(countryState.code) || countryState);
-      const result = applyPreset(presetRef.presetLookupCode, presetRef.presetIndex, resolvedColor, render);
+      const result = applyPresetWithMode(presetRef.presetLookupCode, presetRef.presetIndex, {
+        mode: "visual",
+        color: resolvedColor,
+        render,
+        visualHistoryKind: "scenario-core-apply-visual",
+        visualDirtyReason: "scenario-core-apply-visual",
+      });
       if (!result?.applied) {
         if (result?.reason !== "no-visible-features") {
           showToast(t("Core territory was not applied.", "ui"), {
@@ -1736,7 +1816,7 @@ function initSidebar({ render } = {}) {
       showToast(
         `${t("Applied", "ui")} ${result.matchedCount}/${result.requestedCount} ${t("features", "ui")}`,
         {
-          title: t("Core territory applied", "ui"),
+          title: t("Visual color applied", "ui"),
           tone: "success",
           duration: 3200,
         }
@@ -1832,7 +1912,7 @@ function initSidebar({ render } = {}) {
       activateBtn.type = "button";
       activateBtn.className = "country-action-btn";
       activateBtn.textContent = t("Activate", "ui");
-      activateBtn.title = t("Apply this releasable's territory and make it active.", "ui");
+      activateBtn.title = t("Apply this releasable's political ownership and make it active.", "ui");
       activateBtn.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -1985,18 +2065,39 @@ function initSidebar({ render } = {}) {
       if (countryInspectorSetActive) {
         countryInspectorSetActive.disabled = true;
         countryInspectorSetActive.classList.remove("is-active");
-        countryInspectorSetActive.textContent = t("Set Active", "ui");
+        countryInspectorSetActive.classList.remove("hidden");
+        countryInspectorSetActive.textContent = t("Use as Active Owner", "ui");
         countryInspectorSetActive.setAttribute("aria-pressed", "false");
+      }
+      if (countryInspectorDetailHint) {
+        countryInspectorDetailHint.classList.add("hidden");
+        countryInspectorDetailHint.textContent = "";
       }
       return;
     }
 
+    const isScenarioReleasable = !!state.activeScenarioId && !!countryState.releasable;
     if (countryInspectorSetActive) {
       const isActive = state.activeSovereignCode === countryState.code;
       countryInspectorSetActive.disabled = false;
-      countryInspectorSetActive.classList.toggle("is-active", isActive);
-      countryInspectorSetActive.textContent = isActive ? t("Set Inactive", "ui") : t("Set Active", "ui");
-      countryInspectorSetActive.setAttribute("aria-pressed", String(isActive));
+      countryInspectorSetActive.classList.toggle("hidden", isScenarioReleasable);
+      countryInspectorSetActive.classList.toggle("is-active", !isScenarioReleasable && isActive);
+      countryInspectorSetActive.textContent = isActive
+        ? t("Stop Using as Active Owner", "ui")
+        : t("Use as Active Owner", "ui");
+      countryInspectorSetActive.setAttribute("aria-pressed", String(!isScenarioReleasable && isActive));
+    }
+    if (countryInspectorDetailHint) {
+      if (isScenarioReleasable) {
+        countryInspectorDetailHint.classList.remove("hidden");
+        countryInspectorDetailHint.textContent = t(
+          "Use Activate Releasable or Reapply Core Territory in Scenario Actions.",
+          "ui"
+        );
+      } else {
+        countryInspectorDetailHint.classList.add("hidden");
+        countryInspectorDetailHint.textContent = "";
+      }
     }
   };
 
@@ -2128,6 +2229,9 @@ function initSidebar({ render } = {}) {
       const selectedCode = ensureSelectedInspectorCountry();
       if (!selectedCode) return;
       const countryState = latestCountryStatesByCode.get(selectedCode);
+      if (state.activeScenarioId && countryState?.releasable) {
+        return;
+      }
       const isCurrentlyActive = state.activeSovereignCode === selectedCode;
       state.activeSovereignCode = isCurrentlyActive ? "" : selectedCode;
       markDirty(isCurrentlyActive ? "set-inactive-sovereign" : "set-active-sovereign");
@@ -2138,11 +2242,11 @@ function initSidebar({ render } = {}) {
         state.renderNowFn();
       }
       renderList();
-      if (!isCurrentlyActive && countryState?.releasable) {
+      if (!isCurrentlyActive) {
         showToast(
-          t("Sovereignty painting will now assign regions to the selected releasable country.", "ui"),
+          t("Political ownership editing now targets the selected country.", "ui"),
           {
-            title: t("Active sovereign updated", "ui"),
+            title: t("Active owner updated", "ui"),
             tone: "info",
             duration: 3200,
           }
@@ -2175,14 +2279,25 @@ function initSidebar({ render } = {}) {
       .filter(({ preset }) => (typeof predicate === "function" ? predicate(preset) : true));
   };
 
-  const renderPresetEntryRows = (container, presetLookupCode, presetEntries = [], emptyMessage) => {
+  const renderPresetEntryRows = (
+    container,
+    presetLookupCode,
+    presetEntries = [],
+    emptyMessage,
+    {
+      onApply = null,
+      disabled = false,
+      disabledTitle = "",
+      requireActiveOwner = normalizeActionMode() === "ownership",
+    } = {}
+  ) => {
     if (!presetEntries.length) {
       container.appendChild(createEmptyNote(emptyMessage));
       return;
     }
 
     const disableForMissingActiveSovereign = (
-      String(state.paintMode || "visual") === "sovereignty" &&
+      !!requireActiveOwner &&
       !normalizeCountryCode(state.activeSovereignCode)
     );
 
@@ -2191,11 +2306,17 @@ function initSidebar({ render } = {}) {
       nameBtn.type = "button";
       nameBtn.className = "inspector-item-btn";
       nameBtn.textContent = preset.name;
-      nameBtn.disabled = disableForMissingActiveSovereign;
-      if (disableForMissingActiveSovereign) {
-        nameBtn.title = t("Set Active first to assign sovereignty.", "ui");
+      nameBtn.disabled = disabled || disableForMissingActiveSovereign;
+      if (disabledTitle && (disabled || disableForMissingActiveSovereign)) {
+        nameBtn.title = disabledTitle;
+      } else if (disableForMissingActiveSovereign) {
+        nameBtn.title = t("Choose an active owner before changing political ownership or borders.", "ui");
       }
       nameBtn.addEventListener("click", () => {
+        if (typeof onApply === "function") {
+          onApply({ preset, presetIndex, presetLookupCode });
+          return;
+        }
         applyPreset(presetLookupCode, presetIndex, state.selectedColor, render);
       });
       container.appendChild(nameBtn);
@@ -2203,12 +2324,16 @@ function initSidebar({ render } = {}) {
   };
 
   const renderNoActiveGuard = (container) => {
-    const needsGuard = (
-      String(state.paintMode || "visual") === "sovereignty" &&
-      !normalizeCountryCode(state.activeSovereignCode)
-    );
+    const needsGuard = state.activeScenarioId
+      ? !normalizeCountryCode(state.activeSovereignCode)
+      : (
+        String(state.paintMode || "visual") === "sovereignty" &&
+        !normalizeCountryCode(state.activeSovereignCode)
+      );
     if (!needsGuard) return false;
-    container.appendChild(createEmptyNote(t("Set Active first to assign sovereignty.", "ui")));
+    container.appendChild(
+      createEmptyNote(t("Choose an active owner before changing political ownership or borders.", "ui"))
+    );
     return true;
   };
 
@@ -2236,7 +2361,7 @@ function initSidebar({ render } = {}) {
         );
         button.disabled = actionGuarded;
         if (actionGuarded) {
-          button.title = t("Set Active first to assign sovereignty.", "ui");
+          button.title = t("Choose an active owner before changing political ownership.", "ui");
         }
         groupSection.appendChild(button);
       });
@@ -2259,37 +2384,13 @@ function initSidebar({ render } = {}) {
   };
 
   const renderScenarioActionStatus = (container) => {
-    const strip = document.createElement("div");
-    strip.className = "scenario-action-status";
-
-    const modeValue = String(state.paintMode || "visual") === "sovereignty"
-      ? t("Sovereignty", "ui")
-      : t("Visual", "ui");
-    const activeCode = normalizeCountryCode(state.activeSovereignCode);
-    const activeState = activeCode ? latestCountryStatesByCode.get(activeCode) : null;
-    const activeLabel = activeState?.displayName
-      || (activeCode ? (t(state.countryNames?.[activeCode] || activeCode, "geo") || state.countryNames?.[activeCode] || activeCode) : t("None", "ui"));
-
-    const modeChip = document.createElement("div");
-    modeChip.className = "scenario-action-status-chip";
-    modeChip.textContent = `${t("Mode", "ui")}: ${modeValue}`;
-
-    const activeChip = document.createElement("div");
-    activeChip.className = "scenario-action-status-chip";
-    activeChip.textContent = activeCode
-      ? `${t("Active", "ui")}: ${activeLabel} (${activeCode})`
-      : `${t("Active", "ui")}: ${t("None", "ui")}`;
-
-    strip.appendChild(modeChip);
-    strip.appendChild(activeChip);
-    container.appendChild(strip);
-
-    const hint = document.createElement("p");
-    hint.className = "scenario-action-hint";
-    hint.textContent = String(state.paintMode || "visual") === "sovereignty"
-      ? t("Preset actions assign regions to the active sovereign.", "ui")
-      : t("Preset actions fill regions using the current selected color.", "ui");
-    container.appendChild(hint);
+    const intro = document.createElement("div");
+    intro.className = "scenario-action-intro";
+    intro.textContent = t(
+      "Scenario Actions change political ownership and dynamic borders. Use Visual Adjustments for color-only edits.",
+      "ui"
+    );
+    container.appendChild(intro);
   };
 
   const renderScenarioReleasableList = (container, parentState) => {
@@ -2342,26 +2443,47 @@ function initSidebar({ render } = {}) {
       countryState.hierarchyGroups.forEach((group) => {
         const button = createInspectorActionButton(
           t(group.label, "geo") || group.label,
-          () => applyHierarchyGroup(group, state.selectedColor, render)
+          () => applyHierarchyGroupWithMode(group, {
+            mode: "ownership",
+            ownerCode: state.activeSovereignCode,
+            render,
+            ownershipHistoryKind: "scenario-hierarchy-apply-ownership",
+            ownershipDirtyReason: "scenario-hierarchy-apply-ownership",
+          })
         );
         button.disabled = actionGuarded;
         if (actionGuarded) {
-          button.title = t("Set Active first to assign sovereignty.", "ui");
+          button.title = t("Choose an active owner before changing political ownership or borders.", "ui");
         }
         groupSection.appendChild(button);
       });
+    } else {
+      const groupSection = appendActionSection(container, t("Hierarchy Groups", "ui"));
+      groupSection.appendChild(createEmptyNote(t("No hierarchy groups", "ui")));
     }
 
     const filteredPresetEntries = getFilteredRegionalPresets(countryState);
-    if (filteredPresetEntries.length > 0) {
-      const presetSection = appendActionSection(container, t("Regional Presets", "ui"));
-      renderPresetEntryRows(
-        presetSection,
-        countryState.presetLookupCode || countryState.code,
-        filteredPresetEntries,
-        t("No regional presets", "ui")
-      );
-    }
+    const presetSection = appendActionSection(container, t("Regional Presets", "ui"));
+    renderPresetEntryRows(
+      presetSection,
+      countryState.presetLookupCode || countryState.code,
+      filteredPresetEntries,
+      t("No regional presets", "ui"),
+      {
+        onApply: ({ presetIndex, presetLookupCode }) => {
+          applyPresetWithMode(presetLookupCode, presetIndex, {
+            mode: "ownership",
+            ownerCode: state.activeSovereignCode,
+            render,
+            ownershipHistoryKind: "scenario-preset-apply-ownership",
+            ownershipDirtyReason: "scenario-preset-apply-ownership",
+          });
+        },
+        disabled: actionGuarded,
+        disabledTitle: t("Choose an active owner before changing political ownership or borders.", "ui"),
+        requireActiveOwner: true,
+      }
+    );
   };
 
   const renderScenarioParentReturnAction = (container, countryState) => {
@@ -2377,14 +2499,6 @@ function initSidebar({ render } = {}) {
     const returnBtn = createInspectorActionButton(
       `${t("Return to", "ui")} ${parentState.displayName} (${parentState.code})`,
       () => {
-        const normalizedParentCode = normalizeCountryCode(parentState.code);
-        if (normalizedParentCode && state.activeSovereignCode !== normalizedParentCode) {
-          state.activeSovereignCode = normalizedParentCode;
-          markDirty("set-active-sovereign");
-          if (typeof state.updateActiveSovereignUIFn === "function") {
-            state.updateActiveSovereignUIFn();
-          }
-        }
         selectInspectorCountry(parentState.code);
       }
     );
@@ -2420,21 +2534,48 @@ function initSidebar({ render } = {}) {
     const actions = document.createElement("div");
     actions.className = "country-row-actions scenario-core-action-row";
 
+    const activateBtn = document.createElement("button");
+    activateBtn.type = "button";
+    activateBtn.className = "btn-primary";
+    activateBtn.textContent = t("Activate Releasable", "ui");
+    activateBtn.addEventListener("click", () => {
+      const normalizedCountryCode = normalizeCountryCode(countryState.code);
+      const alreadyActive = normalizedCountryCode && normalizedCountryCode === normalizeCountryCode(state.activeSovereignCode);
+      if (normalizedCountryCode) {
+        state.activeSovereignCode = normalizedCountryCode;
+      }
+      setScenarioMapPaintMode("ownership");
+      if (!alreadyActive) {
+        markDirty("set-active-sovereign");
+      }
+      if (typeof state.updateActiveSovereignUIFn === "function") {
+        state.updateActiveSovereignUIFn();
+      }
+      renderList();
+      showToast(
+        t(
+          alreadyActive
+            ? "Political ownership editing already targets this releasable."
+            : "Political ownership editing now targets this releasable.",
+          "ui"
+        ),
+        {
+          title: t("Active owner updated", "ui"),
+          tone: alreadyActive ? "info" : "success",
+          duration: 2800,
+        }
+      );
+    });
+    actions.appendChild(activateBtn);
+
     const applyBtn = document.createElement("button");
     applyBtn.type = "button";
-    applyBtn.className = "btn-primary";
-    applyBtn.textContent = t("Apply Core Territory", "ui");
-    const actionGuarded = (
-      String(state.paintMode || "visual") === "sovereignty" &&
-      !normalizeCountryCode(state.activeSovereignCode)
-    );
-    applyBtn.disabled = actionGuarded;
-    if (actionGuarded) {
-      applyBtn.title = t("Set Active first to assign sovereignty.", "ui");
-    }
+    applyBtn.className = "btn-secondary";
+    applyBtn.textContent = t("Reapply Core Territory", "ui");
     applyBtn.addEventListener("click", () => {
       applyScenarioReleasableCoreTerritory(countryState, {
         source: "scenario-actions",
+        actionMode: "ownership",
       });
     });
     actions.appendChild(applyBtn);
@@ -2445,7 +2586,6 @@ function initSidebar({ render } = {}) {
   };
 
   const renderScenarioReleasableActions = (container, countryState) => {
-    renderNoActiveGuard(container);
     renderScenarioParentReturnAction(container, countryState);
     renderScenarioCoreTerritoryAction(container, countryState);
     if (countryState.notes) {
@@ -2457,6 +2597,210 @@ function initSidebar({ render } = {}) {
     }
   };
 
+  const renderScenarioVisualAdjustments = (container, countryState) => {
+    const details = document.createElement("details");
+    details.className = "scenario-visual-adjustments mt-3";
+    details.open = !!state.ui?.scenarioVisualAdjustmentsOpen;
+    details.addEventListener("toggle", () => {
+      if (!state.ui || typeof state.ui !== "object") {
+        state.ui = {};
+      }
+      state.ui.scenarioVisualAdjustmentsOpen = details.open;
+    });
+
+    const summary = document.createElement("summary");
+    summary.className = "section-header";
+    summary.textContent = t("Visual Adjustments", "ui");
+    details.appendChild(summary);
+
+    const body = document.createElement("div");
+    body.className = "scenario-visual-adjustments-body";
+
+    const note = document.createElement("p");
+    note.className = "scenario-action-hint";
+    note.textContent = t(
+      "These actions only change visual color. Ownership, controllers, and dynamic borders stay unchanged.",
+      "ui"
+    );
+    body.appendChild(note);
+
+    const brushSection = appendActionSection(body, t("Brush", "ui"));
+    const isVisualBrush = String(state.paintMode || "visual") !== "sovereignty";
+    const brushBtn = createInspectorActionButton(
+      isVisualBrush
+        ? t("Return to Political Ownership Brush", "ui")
+        : t("Use Visual Color Brush", "ui"),
+      () => {
+        if (!state.ui || typeof state.ui !== "object") {
+          state.ui = {};
+        }
+        state.ui.scenarioVisualAdjustmentsOpen = true;
+        setScenarioMapPaintMode(isVisualBrush ? "ownership" : "visual");
+      }
+    );
+    brushSection.appendChild(brushBtn);
+
+    if (!countryState) {
+      body.appendChild(
+        createEmptyNote(t("Select a country to inspect territories, presets, and releasables.", "ui"))
+      );
+      details.appendChild(body);
+      container.appendChild(details);
+      return;
+    }
+
+    if (countryState.releasable) {
+      const presetRef = getPrimaryReleasablePresetRef(countryState);
+      const coreSection = appendActionSection(body, t("Core Territory Visuals", "ui"));
+
+      const applyVisualBtn = createInspectorActionButton(
+        t("Apply Visual Color to Core Territory", "ui"),
+        () => {
+          applyScenarioReleasableCoreTerritory(countryState, {
+            source: "visual-adjustments",
+            actionMode: "visual",
+          });
+          setScenarioVisualAdjustmentsOpen(true);
+        }
+      );
+      applyVisualBtn.disabled = !presetRef;
+      coreSection.appendChild(applyVisualBtn);
+
+      const clearVisualBtn = createInspectorActionButton(
+        t("Clear Core Territory Visual Overrides", "ui"),
+        () => {
+          if (!presetRef) return;
+          const requestedFeatureIds = Array.isArray(presetRef.preset?.ids) ? presetRef.preset.ids : [];
+          const { matchedIds } = filterToVisibleFeatureIds(requestedFeatureIds);
+          const result = clearVisualOverridesForFeatureIds(matchedIds, {
+            render,
+            historyKind: "scenario-core-clear-visual",
+            dirtyReason: "scenario-core-clear-visual",
+          });
+          if (result.changed > 0) {
+            showToast(
+              `${t("Cleared", "ui")} ${result.changed} ${t("features", "ui")}`,
+              {
+                title: t("Visual overrides cleared", "ui"),
+                tone: "success",
+                duration: 2800,
+              }
+            );
+          } else {
+            showToast(t("No visual overrides to clear.", "ui"), {
+              title: t("No changes", "ui"),
+              tone: "info",
+              duration: 2600,
+            });
+          }
+          setScenarioVisualAdjustmentsOpen(true);
+        }
+      );
+      clearVisualBtn.disabled = !presetRef;
+      coreSection.appendChild(clearVisualBtn);
+
+      if (!presetRef) {
+        coreSection.appendChild(createEmptyNote(t("No core territory defined", "ui")));
+      }
+    } else {
+      const countrySection = appendActionSection(body, t("Country Visuals", "ui"));
+
+      countrySection.appendChild(createInspectorActionButton(
+        t("Paint Owned Regions With Country Color", "ui"),
+        () => {
+          const result = applyVisualColorToOwnedRegions(countryState);
+          if (result.changed > 0) {
+            showToast(
+              `${t("Applied", "ui")} ${result.changed}/${result.matchedCount} ${t("features", "ui")}`,
+              {
+                title: t("Visual color applied", "ui"),
+                tone: "success",
+                duration: 2800,
+              }
+            );
+          } else {
+            showToast(t("No owned regions were recolored.", "ui"), {
+              title: t("No changes", "ui"),
+              tone: "info",
+              duration: 2600,
+            });
+          }
+          setScenarioVisualAdjustmentsOpen(true);
+        }
+      ));
+
+      countrySection.appendChild(createInspectorActionButton(
+        t("Clear Owned Region Visual Overrides", "ui"),
+        () => {
+          const result = clearCountryVisualOverrides(countryState);
+          if (result.changed > 0) {
+            showToast(
+              `${t("Cleared", "ui")} ${result.changed} ${t("features", "ui")}`,
+              {
+                title: t("Visual overrides cleared", "ui"),
+                tone: "success",
+                duration: 2800,
+              }
+            );
+          } else {
+            showToast(t("No visual overrides to clear.", "ui"), {
+              title: t("No changes", "ui"),
+              tone: "info",
+              duration: 2600,
+            });
+          }
+          setScenarioVisualAdjustmentsOpen(true);
+        }
+      ));
+
+      if (countryState.hierarchyGroups.length > 0) {
+        const groupSection = appendActionSection(body, t("Hierarchy Groups (Visual Color)", "ui"));
+        countryState.hierarchyGroups.forEach((group) => {
+          groupSection.appendChild(createInspectorActionButton(
+            t(group.label, "geo") || group.label,
+            () => {
+              applyHierarchyGroupWithMode(group, {
+                mode: "visual",
+                color: state.selectedColor,
+                render,
+                visualHistoryKind: "scenario-hierarchy-apply-visual",
+                visualDirtyReason: "scenario-hierarchy-apply-visual",
+              });
+              setScenarioVisualAdjustmentsOpen(true);
+            }
+          ));
+        });
+      }
+
+      const filteredPresetEntries = getFilteredRegionalPresets(countryState);
+      if (filteredPresetEntries.length > 0) {
+        const presetSection = appendActionSection(body, t("Regional Presets (Visual Color)", "ui"));
+        renderPresetEntryRows(
+          presetSection,
+          countryState.presetLookupCode || countryState.code,
+          filteredPresetEntries,
+          t("No regional presets", "ui"),
+          {
+            onApply: ({ presetIndex, presetLookupCode }) => {
+              applyPresetWithMode(presetLookupCode, presetIndex, {
+                mode: "visual",
+                color: state.selectedColor,
+                render,
+                visualHistoryKind: "scenario-preset-apply-visual",
+                visualDirtyReason: "scenario-preset-apply-visual",
+              });
+              setScenarioVisualAdjustmentsOpen(true);
+            },
+            requireActiveOwner: false,
+          }
+        );
+      }
+    }
+
+    details.appendChild(body);
+    container.appendChild(details);
+  };
+
   const renderScenarioActionsPanel = (container, countryState) => {
     container.replaceChildren();
     renderScenarioActionStatus(container);
@@ -2465,15 +2809,16 @@ function initSidebar({ render } = {}) {
       container.appendChild(
         createEmptyNote(t("Select a country to inspect territories, presets, and releasables.", "ui"))
       );
+      renderScenarioVisualAdjustments(container, null);
       return;
     }
 
     if (countryState.releasable) {
       renderScenarioReleasableActions(container, countryState);
-      return;
+    } else {
+      renderScenarioParentActions(container, countryState);
     }
-
-    renderScenarioParentActions(container, countryState);
+    renderScenarioVisualAdjustments(container, countryState);
   };
 
   const renderPresetTree = () => {

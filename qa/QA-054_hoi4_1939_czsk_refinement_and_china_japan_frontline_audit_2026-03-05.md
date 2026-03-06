@@ -1,9 +1,9 @@
-# QA-053: HOI4 1939 CZ/SK Border Refinement & China-Japan Frontline Audit
+# QA-054: HOI4 1939 CZ/SK Border Refinement & China-Japan Frontline Audit
 
 **Date**: 2026-03-05
 **Severity**: High
 **Scope**: Scenario rendering (topology composition), data completeness
-**Related**: QA-051, QA-052
+**Related**: QA-052, QA-053
 
 ---
 

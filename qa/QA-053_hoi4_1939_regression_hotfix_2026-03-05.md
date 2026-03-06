@@ -1,4 +1,4 @@
-# QA-052 HOI4 1939 Regression Hotfix (2026-03-05)
+# QA-053 HOI4 1939 Regression Hotfix (2026-03-05)
 
 ## Incident
 - 1939 scenario regressed to modern-like fallback ownership in multiple regions (Germany/China/Africa).

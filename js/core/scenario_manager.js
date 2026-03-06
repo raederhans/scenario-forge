@@ -582,10 +582,15 @@ function applyScenarioPaintMode() {
       interactionGranularity: String(state.interactionGranularity || "subdivision") === "country"
         ? "country"
         : "subdivision",
+      politicalEditingExpanded: !!state.ui?.politicalEditingExpanded,
     };
   }
   state.paintMode = "sovereignty";
   state.interactionGranularity = "subdivision";
+  if (state.ui && typeof state.ui === "object") {
+    state.ui.politicalEditingExpanded = false;
+    state.ui.scenarioVisualAdjustmentsOpen = false;
+  }
   if (typeof state.updatePaintModeUIFn === "function") {
     state.updatePaintModeUIFn();
   }
@@ -598,6 +603,10 @@ function restorePaintModeAfterScenario() {
     state.interactionGranularity = previous.interactionGranularity === "country"
       ? "country"
       : "subdivision";
+    if (state.ui && typeof state.ui === "object") {
+      state.ui.politicalEditingExpanded = !!previous.politicalEditingExpanded;
+      state.ui.scenarioVisualAdjustmentsOpen = false;
+    }
   }
   state.scenarioPaintModeBeforeActivate = null;
   if (typeof state.updatePaintModeUIFn === "function") {
@@ -792,6 +801,9 @@ function resetToScenarioBaseline(
     state.activeScenarioManifest,
     state.scenarioCountriesByTag
   ) || String(state.activeSovereignCode || "").trim().toUpperCase();
+  if (state.ui && typeof state.ui === "object") {
+    state.ui.scenarioVisualAdjustmentsOpen = false;
+  }
   const restoredInspectorCode =
     previousSelectedInspectorCountryCode && state.scenarioCountriesByTag?.[previousSelectedInspectorCountryCode]
       ? previousSelectedInspectorCountryCode

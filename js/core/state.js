@@ -801,6 +801,8 @@ export const state = {
     dockCollapsed: false,
     scenarioBarCollapsed: false,
     scenarioGuideDismissed: false,
+    politicalEditingExpanded: false,
+    scenarioVisualAdjustmentsOpen: false,
   },
 
   countryPalette,

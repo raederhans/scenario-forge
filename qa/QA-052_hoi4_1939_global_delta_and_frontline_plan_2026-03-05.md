@@ -1,4 +1,4 @@
-# QA-051 HOI4 1939 Global Delta And Frontline Plan (2026-03-05)
+# QA-052 HOI4 1939 Global Delta And Frontline Plan (2026-03-05)
 
 ## Scope
 - Add a new HOI4 1939 bundled scenario anchored at `1939.8.14.12` (`blitzkrieg.txt`).

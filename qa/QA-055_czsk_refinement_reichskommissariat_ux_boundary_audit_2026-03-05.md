@@ -1,17 +1,17 @@
-# QA-054: CZ/SK Refinement Visibility, Reichskommissariat UX & Boundary Audit
+# QA-055: CZ/SK Refinement Visibility, Reichskommissariat UX & Boundary Audit
 
 **Date**: 2026-03-05
 **Severity**: Mixed (High / Medium / High)
 **Scope**: Detail topology rendering, scenario preset UX, releasable boundary accuracy
-**Related**: QA-053
+**Related**: QA-054
 
 ---
 
 ## Issue 1: CZ/SK ADM2 Features Not Visible Across All Scenarios
 
-### Updated Diagnosis (post QA-053)
+### Updated Diagnosis (post QA-054)
 
-Since the user CAN now see China-Japan (CN_CITY) changes, **composite topology mode IS working**. The detail topology (na_v2.json, 11,196 features) is loaded and composed with the primary topology (199 features). This rules out QA-053's hypothesis about composite mode failure.
+Since the user CAN now see China-Japan (CN_CITY) changes, **composite topology mode IS working**. The detail topology (na_v2.json, 11,196 features) is loaded and composed with the primary topology (199 features). This rules out QA-054's hypothesis about composite mode failure.
 
 ### Data Integrity Verified
 

@@ -1,4 +1,4 @@
-# QA-047 TNO 特殊区域实现研究：Atlantropa 盐碱地与 Congo Lake
+# QA-048 TNO 特殊区域实现研究：Atlantropa 盐碱地与 Congo Lake
 
 **Date:** 2026-03-04  
 **Scope:** TNO 优化 mod 中 Atlantropa / Adriatica 干涸区与 Congo Lake 的本地地图证据、世界观参考、对当前地图填色 app 的实现建议  

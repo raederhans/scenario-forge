@@ -1334,6 +1334,42 @@ details.card[open] > summary::after {
   min-width: 0;
 }
 
+.dock-paint-summary {
+  flex: 1 1 150px;
+  min-width: 120px;
+  padding: 7px 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.dock-political-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.dock-political-owner {
+  flex: 1 1 140px;
+  min-width: 120px;
+  padding: 7px 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.04);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
 .dock-button-row-tools,
 .dock-icon-row {
   flex-wrap: nowrap;
@@ -1965,25 +2001,15 @@ details.card[open] > summary::after {
   line-height: 1;
 }
 
-.scenario-action-status {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.scenario-action-intro {
   margin-bottom: 10px;
-}
-
-.scenario-action-status-chip {
-  display: inline-flex;
-  align-items: center;
-  min-height: 28px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(15, 23, 42, 0.1);
-  background: rgba(255, 255, 255, 0.72);
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 47, 167, 0.14);
+  border-radius: 12px;
+  background: rgba(0, 47, 167, 0.05);
   color: var(--text-primary);
-  font-size: 0.73rem;
-  font-weight: 600;
-  line-height: 1.2;
+  font-size: 0.78rem;
+  line-height: 1.5;
 }
 
 .scenario-action-hint {
@@ -1991,6 +2017,37 @@ details.card[open] > summary::after {
   font-size: 0.74rem;
   line-height: 1.45;
   color: var(--text-secondary);
+}
+
+.scenario-visual-adjustments {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.scenario-visual-adjustments > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 12px 14px;
+}
+
+.scenario-visual-adjustments > summary::-webkit-details-marker {
+  display: none;
+}
+
+.scenario-visual-adjustments > summary::after {
+  content: '▸';
+  float: right;
+  color: var(--text-secondary);
+  transition: transform var(--transition-fast);
+}
+
+.scenario-visual-adjustments[open] > summary::after {
+  transform: rotate(90deg);
+}
+
+.scenario-visual-adjustments-body {
+  padding: 0 14px 14px;
 }
 
 .country-scenario-badge {

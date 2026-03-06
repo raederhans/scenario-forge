@@ -207,8 +207,12 @@ function initToolbar({ render } = {}) {
   const dockExportPopover = document.getElementById("dockExportPopover");
   const leftPanelToggle = document.getElementById("leftPanelToggle");
   const rightPanelToggle = document.getElementById("rightPanelToggle");
+  const dockPaintSummary = document.getElementById("dockPaintSummary");
   const paintGranularitySelect = document.getElementById("paintGranularitySelect");
   const paintModeSelect = document.getElementById("paintModeSelect");
+  const politicalEditingToggleBtn = document.getElementById("politicalEditingToggleBtn");
+  const scenarioVisualAdjustmentsBtn = document.getElementById("scenarioVisualAdjustmentsBtn");
+  const dockPoliticalEditingPanel = document.getElementById("dockPoliticalEditingPanel");
   const activeSovereignLabel = document.getElementById("activeSovereignLabel");
   const recalculateBordersBtn = document.getElementById("recalculateBordersBtn");
   const dynamicBorderStatus = document.getElementById("dynamicBorderStatus");
@@ -291,6 +295,54 @@ function initToolbar({ render } = {}) {
   state.ui.dockCollapsed = !!state.ui.dockCollapsed;
   state.ui.scenarioBarCollapsed = !!state.ui.scenarioBarCollapsed;
   state.ui.scenarioGuideDismissed = !!state.ui.scenarioGuideDismissed;
+  state.ui.politicalEditingExpanded = !!state.ui.politicalEditingExpanded;
+  state.ui.scenarioVisualAdjustmentsOpen = !!state.ui.scenarioVisualAdjustmentsOpen;
+
+  const getPaintModeLabel = () => (
+    String(state.paintMode || "visual") === "sovereignty"
+      ? t("Political Ownership", "ui")
+      : t("Visual Color", "ui")
+  );
+
+  const refreshPaintControlsLayout = () => {
+    const isScenarioMode = !!state.activeScenarioId;
+    const isOwnershipMode = String(state.paintMode || "visual") === "sovereignty";
+    const showPoliticalPanel = !isScenarioMode && (state.ui.politicalEditingExpanded || isOwnershipMode);
+    const showBorderMaintenance = isScenarioMode || state.ui.politicalEditingExpanded || isOwnershipMode;
+
+    if (dockPaintSummary) {
+      dockPaintSummary.textContent = `${getPaintModeLabel()} ${t("Brush", "ui")}`;
+    }
+
+    if (paintGranularitySelect) {
+      paintGranularitySelect.classList.toggle("hidden", isScenarioMode);
+    }
+
+    if (politicalEditingToggleBtn) {
+      politicalEditingToggleBtn.classList.toggle("hidden", isScenarioMode);
+      politicalEditingToggleBtn.classList.toggle("is-active", showPoliticalPanel);
+      politicalEditingToggleBtn.textContent = t("Political Editing", "ui");
+      politicalEditingToggleBtn.setAttribute("aria-expanded", String(showPoliticalPanel));
+    }
+
+    if (scenarioVisualAdjustmentsBtn) {
+      scenarioVisualAdjustmentsBtn.classList.toggle("hidden", !isScenarioMode);
+      scenarioVisualAdjustmentsBtn.textContent = t("Visual Adjustments", "ui");
+    }
+
+    if (dockPoliticalEditingPanel) {
+      dockPoliticalEditingPanel.classList.toggle("hidden", !showPoliticalPanel);
+      dockPoliticalEditingPanel.setAttribute("aria-hidden", showPoliticalPanel ? "false" : "true");
+    }
+
+    if (recalculateBordersBtn) {
+      recalculateBordersBtn.classList.toggle("hidden", !showBorderMaintenance);
+    }
+
+    if (dynamicBorderStatus) {
+      dynamicBorderStatus.classList.toggle("hidden", !showBorderMaintenance);
+    }
+  };
 
   const updateDockCollapsedUi = () => {
     if (!bottomDock) return;
@@ -371,9 +423,7 @@ function initToolbar({ render } = {}) {
     const activeLabel = activeCode
       ? (t(state.countryNames?.[activeCode] || activeCode, "geo") || state.countryNames?.[activeCode] || activeCode)
       : t("None", "ui");
-    const modeLabel = String(state.paintMode || "visual") === "sovereignty"
-      ? t("Sovereignty", "ui")
-      : t("Visual", "ui");
+    const modeLabel = getPaintModeLabel();
     const scenarioViewLabel = String(state.scenarioViewMode || "ownership") === "frontline"
       ? t("Frontline", "ui")
       : t("Ownership", "ui");
@@ -705,6 +755,7 @@ function initToolbar({ render } = {}) {
     if (paintGranularitySelect) {
       paintGranularitySelect.value = state.interactionGranularity || "subdivision";
     }
+    refreshPaintControlsLayout();
     refreshActiveSovereignLabel();
     refreshDynamicBorderStatus();
     updateDockCollapsedUi();
@@ -1540,6 +1591,25 @@ function initToolbar({ render } = {}) {
     dockCollapseBtn.dataset.bound = "true";
   }
 
+  if (politicalEditingToggleBtn && !politicalEditingToggleBtn.dataset.bound) {
+    politicalEditingToggleBtn.addEventListener("click", () => {
+      state.ui.politicalEditingExpanded = !state.ui.politicalEditingExpanded;
+      if (typeof state.updatePaintModeUIFn === "function") {
+        state.updatePaintModeUIFn();
+      }
+    });
+    politicalEditingToggleBtn.dataset.bound = "true";
+  }
+
+  if (scenarioVisualAdjustmentsBtn && !scenarioVisualAdjustmentsBtn.dataset.bound) {
+    scenarioVisualAdjustmentsBtn.addEventListener("click", () => {
+      if (typeof state.openScenarioVisualAdjustmentsFn === "function") {
+        state.openScenarioVisualAdjustmentsFn({ scrollIntoView: true });
+      }
+    });
+    scenarioVisualAdjustmentsBtn.dataset.bound = "true";
+  }
+
   if (scenarioContextCollapseBtn && !scenarioContextCollapseBtn.dataset.bound) {
     scenarioContextCollapseBtn.addEventListener("click", () => {
       state.ui.scenarioBarCollapsed = !state.ui.scenarioBarCollapsed;
@@ -2090,6 +2160,7 @@ function initToolbar({ render } = {}) {
       state.paintMode = value === "sovereignty" ? "sovereignty" : "visual";
       if (state.paintMode === "sovereignty") {
         state.interactionGranularity = "subdivision";
+        state.ui.politicalEditingExpanded = true;
         if (paintGranularitySelect) {
           paintGranularitySelect.value = "subdivision";
         }
@@ -2097,8 +2168,6 @@ function initToolbar({ render } = {}) {
       if (typeof state.updatePaintModeUIFn === "function") {
         state.updatePaintModeUIFn();
       }
-      refreshActiveSovereignLabel();
-      refreshDynamicBorderStatus();
       if (render) render();
     });
   }

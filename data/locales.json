@@ -29,11 +29,11 @@
       "zh": "已设为主权"
     },
     "Active Sovereign": {
-      "en": "Active Sovereign",
-      "zh": "当前主权国"
+      "en": "Active Owner",
+      "zh": "当前激活所属"
     },
     "Active sovereign updated": {
-      "en": "Active sovereign updated",
+      "en": "Active owner updated",
       "zh": "当前主权已更新"
     },
     "Active: None": {
@@ -145,11 +145,11 @@
       "zh": "取消"
     },
     "Choose a country above to edit its color, active sovereign state, groups, and presets.": {
-      "en": "Choose a country above to edit its color, active sovereign state, groups, and presets.",
+      "en": "Choose a country above to edit its color, active owner state, groups, and presets.",
       "zh": "在上方选择一个国家，以编辑其颜色、当前主权状态、分组和预设。"
     },
     "Choose a country above to inspect its identity, territories, presets, and releasables.": {
-      "en": "Choose a country above to set or clear the active sovereign.",
+      "en": "Choose a country above to set or clear the active owner.",
       "zh": "在上方选择一个国家，以设置或取消当前主权。"
     },
     "Choose a country above to inspect territories, presets, and releasables.": {
@@ -573,7 +573,7 @@
       "zh": "预设 ID 已复制到剪贴板。"
     },
     "Preset actions assign regions to the active sovereign.": {
-      "en": "Preset actions assign regions to the active sovereign.",
+      "en": "Preset actions assign regions to the active owner.",
       "zh": "这些操作会将区域分配给当前激活的主权国家。"
     },
     "Preset actions fill regions using the current selected color.": {
@@ -669,8 +669,8 @@
       "zh": "重置国家配色"
     },
     "Review the current paint mode, then apply releasables, hierarchy groups, or regional presets.": {
-      "en": "Review the current paint mode, then apply releasables, hierarchy groups, or regional presets.",
-      "zh": "先确认当前涂色模式，再应用可释放国家、层级分组或区域预设。"
+      "en": "Scenario Actions below change political ownership first. Open Visual Adjustments only for color-only edits.",
+      "zh": "下方的场景操作会优先修改政治归属。只有在需要纯颜色调整时才打开视觉调整。"
     },
     "Save": {
       "en": "Save",
@@ -713,8 +713,8 @@
       "zh": "剧本已加载"
     },
     "Scenario loaded. 1) Select a country 2) Set Active 3) Apply Core/Presets.": {
-      "en": "Scenario loaded. 1) Select a country 2) Set Active 3) Apply Core/Presets.",
-      "zh": "剧本已加载：1）选国家 2）设为主权 3）应用核心领土/预设。"
+      "en": "Scenario loaded. 1) Select a country 2) Choose an active owner 3) Use Activate or Scenario Actions.",
+      "zh": "场景已加载。1）选择国家 2）选择激活所属 3）使用激活或场景操作。"
     },
     "Scenario reset": {
       "en": "Scenario reset",
@@ -785,16 +785,16 @@
       "zh": "选定的颜色"
     },
     "Set Active": {
-      "en": "Set Active",
-      "zh": "设为当前"
+      "en": "Use as Active Owner",
+      "zh": "用作激活所属"
     },
     "Set Active first to assign sovereignty.": {
-      "en": "Set Active first to assign sovereignty.",
-      "zh": "请先设置主权国，再执行主权分配。"
+      "en": "Choose an active owner before changing political ownership or borders.",
+      "zh": "更改政治归属或动态边界前，请先选择激活所属。"
     },
     "Set Active for sovereignty actions": {
-      "en": "Set Active for sovereignty actions",
-      "zh": "主权操作前先设为主权国"
+      "en": "Use an active owner for political actions",
+      "zh": "进行政治操作时使用激活所属"
     },
     "Set Inactive": {
       "en": "Set Inactive",
@@ -813,8 +813,8 @@
       "zh": "快照失败"
     },
     "Sovereignty": {
-      "en": "Sovereignty",
-      "zh": "主权"
+      "en": "Political Ownership",
+      "zh": "政治归属"
     },
     "Sovereignty painting will now assign regions to the selected releasable country.": {
       "en": "Sovereignty painting will now assign regions to the selected releasable country.",
@@ -913,8 +913,8 @@
       "zh": "视图"
     },
     "Visual": {
-      "en": "Visual",
-      "zh": "视觉"
+      "en": "Visual Color",
+      "zh": "视觉颜色"
     },
     "Warlord / regional tag": {
       "en": "Warlord / regional tag",
@@ -955,6 +955,158 @@
     "presets moved to Releasable Countries.": {
       "en": "presets moved to Releasable Countries.",
       "zh": "个预设已移动到“可释放国家”中。"
+    },
+    "Active owner updated": {
+      "en": "Active owner updated",
+      "zh": "激活所属已更新"
+    },
+    "Apply Visual Color to Core Territory": {
+      "en": "Apply Visual Color to Core Territory",
+      "zh": "将视觉颜色应用到核心领土"
+    },
+    "Apply this releasable's political ownership and make it active.": {
+      "en": "Apply this releasable's political ownership and make it active.",
+      "zh": "应用这个可释放国的政治归属并将其设为激活所属。"
+    },
+    "Activate Releasable": {
+      "en": "Activate Releasable",
+      "zh": "激活可释放国"
+    },
+    "Choose a country above, then use Active Owner and the Territories & Presets panel.": {
+      "en": "Choose a country above, then use Active Owner and the Territories & Presets panel.",
+      "zh": "先在上方选择一个国家，然后使用“激活所属”和“领土与预设”面板。"
+    },
+    "Choose an active owner before changing political ownership or borders.": {
+      "en": "Choose an active owner before changing political ownership or borders.",
+      "zh": "更改政治归属或动态边界前，请先选择激活所属。"
+    },
+    "Clear Core Territory Visual Overrides": {
+      "en": "Clear Core Territory Visual Overrides",
+      "zh": "清除核心领土视觉覆盖"
+    },
+    "Clear Owned Region Visual Overrides": {
+      "en": "Clear Owned Region Visual Overrides",
+      "zh": "清除已拥有区域的视觉覆盖"
+    },
+    "Core Territory Visuals": {
+      "en": "Core Territory Visuals",
+      "zh": "核心领土视觉"
+    },
+    "Country Visuals": {
+      "en": "Country Visuals",
+      "zh": "国家视觉"
+    },
+    "Hierarchy Groups (Visual Color)": {
+      "en": "Hierarchy Groups (Visual Color)",
+      "zh": "层级分组（视觉颜色）"
+    },
+    "Mode: Visual Color": {
+      "en": "Mode: Visual Color",
+      "zh": "模式：视觉颜色"
+    },
+    "No owned regions were recolored.": {
+      "en": "No owned regions were recolored.",
+      "zh": "没有已拥有区域被重新着色。"
+    },
+    "No visual overrides to clear.": {
+      "en": "No visual overrides to clear.",
+      "zh": "没有可清除的视觉覆盖。"
+    },
+    "Paint Owned Regions With Country Color": {
+      "en": "Paint Owned Regions With Country Color",
+      "zh": "用国家颜色重绘已拥有区域"
+    },
+    "Political Editing": {
+      "en": "Political Editing",
+      "zh": "政治编辑"
+    },
+    "Political Ownership": {
+      "en": "Political Ownership",
+      "zh": "政治归属"
+    },
+    "Political ownership editing already targets this releasable.": {
+      "en": "Political ownership editing already targets this releasable.",
+      "zh": "政治归属编辑已经指向这个可释放国。"
+    },
+    "Political ownership editing now targets the selected country.": {
+      "en": "Political ownership editing now targets the selected country.",
+      "zh": "政治归属编辑现在会作用于所选国家。"
+    },
+    "Political ownership editing now targets this releasable.": {
+      "en": "Political ownership editing now targets this releasable.",
+      "zh": "政治归属编辑现在会作用于这个可释放国。"
+    },
+    "Political ownership updated": {
+      "en": "Political ownership updated",
+      "zh": "政治归属已更新"
+    },
+    "Regional Presets (Visual Color)": {
+      "en": "Regional Presets (Visual Color)",
+      "zh": "区域预设（视觉颜色）"
+    },
+    "Reapply Core Territory": {
+      "en": "Reapply Core Territory",
+      "zh": "重新应用核心领土"
+    },
+    "Return to Political Ownership Brush": {
+      "en": "Return to Political Ownership Brush",
+      "zh": "返回政治归属画笔"
+    },
+    "Scenario Actions below change political ownership first. Open Visual Adjustments only for color-only edits.": {
+      "en": "Scenario Actions below change political ownership first. Open Visual Adjustments only for color-only edits.",
+      "zh": "下方的场景操作会优先修改政治归属。只有在需要纯颜色调整时才打开视觉调整。"
+    },
+    "Scenario Actions change political ownership and dynamic borders. Use Visual Adjustments for color-only edits.": {
+      "en": "Scenario Actions change political ownership and dynamic borders. Use Visual Adjustments for color-only edits.",
+      "zh": "场景操作会改变政治归属和动态边界。纯颜色调整请使用视觉调整。"
+    },
+    "Scenario loaded. Expand the parent country and use Activate to apply releasable territory.": {
+      "en": "Scenario loaded. Expand the parent country and use Activate to apply releasable territory.",
+      "zh": "场景已加载。展开母国并使用“激活”来应用可释放国领土。"
+    },
+    "Stop Using as Active Owner": {
+      "en": "Stop Using as Active Owner",
+      "zh": "停止用作激活所属"
+    },
+    "These actions only change visual color. Ownership, controllers, and dynamic borders stay unchanged.": {
+      "en": "These actions only change visual color. Ownership, controllers, and dynamic borders stay unchanged.",
+      "zh": "这些操作只会修改视觉颜色。归属、控制者和动态边界都不会改变。"
+    },
+    "Use Activate Releasable or Reapply Core Territory in Scenario Actions.": {
+      "en": "Use Activate Releasable or Reapply Core Territory in Scenario Actions.",
+      "zh": "请在 Scenario Actions 中使用“激活可释放国”或“重新应用核心领土”。"
+    },
+    "Use an active owner for political actions": {
+      "en": "Use an active owner for political actions",
+      "zh": "进行政治操作时使用激活所属"
+    },
+    "Use as Active Owner": {
+      "en": "Use as Active Owner",
+      "zh": "用作激活所属"
+    },
+    "Use Visual Color Brush": {
+      "en": "Use Visual Color Brush",
+      "zh": "使用视觉颜色画笔"
+    },
+    "Visual Adjustments": {
+      "en": "Visual Adjustments",
+      "zh": "视觉调整"
+    },
+    "Visual Color": {
+      "en": "Visual Color",
+      "zh": "视觉颜色"
+    },
+    "Visual color applied": {
+      "en": "Visual color applied",
+      "zh": "视觉颜色已应用"
+    },
+    "Visual overrides cleared": {
+      "en": "Visual overrides cleared",
+      "zh": "视觉覆盖已清除"
+    },
+    "Choose an active owner before changing political ownership.": {
+      "en": "Choose an active owner before changing political ownership.",
+      "zh": "更改政治归属前，请先选择激活所属。"
     }
   },
   "geo": {

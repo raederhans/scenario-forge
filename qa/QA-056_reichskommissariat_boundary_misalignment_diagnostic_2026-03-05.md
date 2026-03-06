@@ -1,9 +1,9 @@
-# QA-055: Reichskommissariat Boundary Misalignment Diagnostic
+# QA-056: Reichskommissariat Boundary Misalignment Diagnostic
 
 **Date**: 2026-03-05
 **Severity**: HIGH
 **Scope**: Reichskommissariat territory definitions — RKP, RKO, RKU, RKM
-**Related**: QA-054
+**Related**: QA-055
 **Reference images**: `qa/example image/example komminisariat.png` (intent), `qa/example image/current 1939.png` (current)
 
 ---
