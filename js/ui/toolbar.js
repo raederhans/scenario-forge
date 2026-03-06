@@ -192,6 +192,7 @@ function initToolbar({ render } = {}) {
   const zoomOutBtn = document.getElementById("zoomOutBtn");
   const zoomResetBtn = document.getElementById("zoomResetBtn");
   const zoomPercentInput = document.getElementById("zoomPercentInput");
+  const zoomControls = document.getElementById("zoomControls");
   const toolHudChip = document.getElementById("toolHudChip");
   const mapOnboardingHint = document.getElementById("mapOnboardingHint");
   const scenarioContextBar = document.getElementById("scenarioContextBar");
@@ -404,6 +405,7 @@ function initToolbar({ render } = {}) {
     const willOpen = scenarioGuidePopover.classList.contains("hidden");
     if (!willOpen) {
       closeScenarioGuidePopover();
+      applyScenarioOverlaySafeLayout();
       return;
     }
     scenarioGuidePopover.classList.remove("hidden");
@@ -412,6 +414,18 @@ function initToolbar({ render } = {}) {
     if (scenarioGuideBtn) {
       scenarioGuideBtn.textContent = "?";
       scenarioGuideBtn.setAttribute("title", t("Hide guide", "ui"));
+    }
+    applyScenarioOverlaySafeLayout();
+  };
+
+  const applyScenarioOverlaySafeLayout = () => {
+    if (!scenarioContextBar || !zoomControls) return;
+    const contextRect = scenarioContextBar.getBoundingClientRect();
+    const zoomRect = zoomControls.getBoundingClientRect();
+    const overlap = (contextRect.right + 8) >= zoomRect.left && contextRect.left <= zoomRect.right;
+    scenarioContextBar.classList.toggle("is-overlap-avoid", overlap);
+    if (overlap && scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
+      closeScenarioGuidePopover();
     }
   };
 
@@ -455,6 +469,7 @@ function initToolbar({ render } = {}) {
       const isGuideOpen = !!(scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden"));
       scenarioGuideBtn.setAttribute("title", isGuideOpen ? t("Hide guide", "ui") : t("Show guide", "ui"));
     }
+    applyScenarioOverlaySafeLayout();
   };
 
   const triggerScenarioGuide = () => {
@@ -1114,7 +1129,9 @@ function initToolbar({ render } = {}) {
 
       const subtitle = document.createElement("span");
       subtitle.className = "palette-library-subtitle";
-      subtitle.textContent = entry.mappedIso2 || entry.sourceTag || "";
+      const isoTag = entry.mappedIso2 || entry.iso2 || "--";
+      const sourceTag = entry.sourceLabel || entry.sourceTag || "Palette";
+      subtitle.textContent = `${isoTag} · ${sourceTag}`;
       row.title = [
         entry.localizedName || entry.label,
         entry.sourceTag,
@@ -2582,6 +2599,13 @@ function initToolbar({ render } = {}) {
       applyReferenceStyles();
       markDirty("reference-offset-y");
     });
+  }
+
+  if (!state.ui.overlayResizeBound) {
+    globalThis.addEventListener("resize", () => {
+      applyScenarioOverlaySafeLayout();
+    });
+    state.ui.overlayResizeBound = true;
   }
 
   paletteLibraryPanel?.classList.toggle("hidden", !state.paletteLibraryOpen);
