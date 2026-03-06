@@ -1,6 +1,7 @@
 [mcp_servers.playwright]
 command = "bash"
 startup_timeout_sec = 120
+cwd = "/mnt/c/Users/raede/Desktop/dev/mapcreator"
 args = [
   "ops/browser-mcp/start-playwright-mcp-stdio.sh",
   "--browser", "msedge",

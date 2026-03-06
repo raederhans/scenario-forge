@@ -29,6 +29,12 @@ except Exception:
     cfg = None
 
 try:
+    from map_builder.io.fetch import fetch_or_load_geojson, fetch_or_load_vector_archive
+except Exception:
+    fetch_or_load_geojson = None
+    fetch_or_load_vector_archive = None
+
+try:
     from map_builder.processors.ru_city_overrides import (
         RU_CITY_GROUP_BY_ID,
         build_ru_city_overrides,
@@ -292,7 +298,16 @@ def normalize_country_group_subregion(subregion):
 
 def load_admin0_countries(admin0_path: Path):
     if not admin0_path.exists():
-        raise FileNotFoundError(f"Missing admin0 countries source: {admin0_path}")
+        if cfg is None or fetch_or_load_vector_archive is None:
+            raise FileNotFoundError(f"Missing admin0 countries source: {admin0_path}")
+        print(
+            "[Hierarchy] Admin0 countries archive missing locally; "
+            f"downloading {admin0_path.name}..."
+        )
+        return fetch_or_load_vector_archive(
+            cfg.BORDERS_URL,
+            admin0_path.name,
+        )
     source = f"zip://{admin0_path}" if admin0_path.suffix.lower() == ".zip" else admin0_path
     return gpd.read_file(source)
 
@@ -432,6 +447,31 @@ def download_admin1_to_data(data_dir: Path):
         return None
 
     return find_ne_admin1(data_dir)
+
+
+def ensure_cached_geojson(
+    path: Path,
+    *,
+    label: str,
+    url: str | None,
+    fallback_urls: list[str] | None = None,
+) -> Path:
+    if path.exists():
+        return path
+    if not url or fetch_or_load_geojson is None:
+        raise SystemExit(f"Missing {path}")
+
+    print(f"[Hierarchy] {label} missing locally; downloading authoritative source...")
+    fetch_or_load_geojson(
+        url,
+        path.name,
+        fallback_urls=fallback_urls,
+    )
+    if not path.exists():
+        raise SystemExit(
+            f"[Hierarchy] Expected cached source missing after download: {path}"
+        )
+    return path
 
 
 def build_china_groups(adm2_path: Path, adm1_path: Path):
@@ -863,6 +903,52 @@ def main():
     ind_path = DEFAULT_IND_ADM2
     ru_path = DEFAULT_RUS_ADM2
     ua_path = DEFAULT_UKR_ADM2
+
+    remote_geojson_inputs = [
+        (
+            "China ADM2",
+            adm2_path,
+            getattr(cfg, "CHINA_CITY_URL", None),
+            getattr(cfg, "CHINA_CITY_FALLBACK_URLS", None),
+        ),
+        (
+            "France arrondissements",
+            fr_path,
+            getattr(cfg, "FR_ARR_URL", None),
+            getattr(cfg, "FR_ARR_FALLBACK_URLS", None),
+        ),
+        (
+            "Poland powiaty",
+            pl_path,
+            getattr(cfg, "PL_POWIATY_URL", None),
+            getattr(cfg, "PL_POWIATY_FALLBACK_URLS", None),
+        ),
+        (
+            "India ADM2",
+            ind_path,
+            getattr(cfg, "IND_ADM2_URL", None),
+            getattr(cfg, "IND_ADM2_FALLBACK_URLS", None),
+        ),
+        (
+            "Russia ADM2",
+            ru_path,
+            getattr(cfg, "RUS_ADM2_URL", None),
+            getattr(cfg, "RUS_ADM2_FALLBACK_URLS", None),
+        ),
+        (
+            "Ukraine ADM2",
+            ua_path,
+            getattr(cfg, "UKR_ADM2_URL", None),
+            getattr(cfg, "UKR_ADM2_FALLBACK_URLS", None),
+        ),
+    ]
+    for label, path, url, fallback_urls in remote_geojson_inputs:
+        ensure_cached_geojson(
+            path,
+            label=label,
+            url=url,
+            fallback_urls=fallback_urls,
+        )
 
     if not adm2_path.exists():
         raise SystemExit(f"Missing {adm2_path}")

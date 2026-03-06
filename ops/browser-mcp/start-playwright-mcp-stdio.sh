@@ -44,12 +44,21 @@ if [[ -z "${NODE_BIN}" || ! -x "${NODE_BIN}" ]]; then
 fi
 
 CLI_PATH="$(resolve_cli_path || true)"
-if [[ -z "${CLI_PATH}" || ! -f "${CLI_PATH}" ]]; then
-  cat >&2 <<'EOF'
-Could not locate @playwright/mcp in npm's _npx cache.
-Run `npx -y @playwright/mcp@latest --help` once from WSL, then retry.
-EOF
-  exit 1
+if [[ -n "${CLI_PATH}" && -f "${CLI_PATH}" ]]; then
+  exec "${NODE_BIN}" "${CLI_PATH}" "$@"
 fi
 
-exec "${NODE_BIN}" "${CLI_PATH}" "$@"
+NPX_BIN="${PLAYWRIGHT_MCP_NPX_BIN:-}"
+if [[ -z "${NPX_BIN}" ]]; then
+  NPX_BIN="$(command -v npx || true)"
+fi
+
+if [[ -n "${NPX_BIN}" && -x "${NPX_BIN}" ]]; then
+  exec "${NPX_BIN}" -y @playwright/mcp@latest "$@"
+fi
+
+cat >&2 <<'EOF'
+Could not locate @playwright/mcp in npm's _npx cache and no usable `npx` was found.
+Set PLAYWRIGHT_MCP_CLI to a local cli.js path or install Node/npm so `npx -y @playwright/mcp@latest --help` works.
+EOF
+exit 1
