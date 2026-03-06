@@ -62,11 +62,13 @@ if REQUESTED_MODE != "palettes":
     import pandas as pd
     import requests
     from shapely.geometry import box
+    from shapely.ops import unary_union
 else:  # pragma: no cover - palettes mode does not touch GIS stack
     gpd = None
     pd = None
     requests = None
     box = None
+    unary_union = None
 
 from map_builder import config as cfg
 
@@ -126,6 +128,11 @@ ALLOWED_SENTINEL_FEATURE_IDS = {
     "CO_ADM1_COL+99?",
     "VE_ADM1_VEN+99?",
 }
+DETAIL_OVERLAY_COUNTRY_ALIASES = {
+    "UK": "GB",
+    "EL": "GR",
+}
+DETAIL_OVERLAY_WARN_THRESHOLD = 0.90
 
 
 def cull_small_geometries(
@@ -506,6 +513,15 @@ def build_ru_city_detail_topology(script_dir: Path, output_dir: Path) -> None:
         print(f"[RU City Detail] Skipped: patch script missing at {patch_script}.")
         return
 
+    ru_adm2_path = output_dir / cfg.RUS_ADM2_FILENAME
+    if not ru_adm2_path.exists():
+        print("[RU City Detail] Downloading Russia ADM2 (geoBoundaries)...")
+        fetch_or_load_geojson(
+            cfg.RUS_ADM2_URL,
+            cfg.RUS_ADM2_FILENAME,
+            fallback_urls=cfg.RUS_ADM2_FALLBACK_URLS,
+        )
+
     cmd = [
         sys.executable,
         str(patch_script),
@@ -514,7 +530,7 @@ def build_ru_city_detail_topology(script_dir: Path, output_dir: Path) -> None:
         "--output-topology",
         str(output_dir / "europe_topology.highres.json"),
         "--ru-adm2",
-        str(output_dir / cfg.RUS_ADM2_FILENAME),
+        str(ru_adm2_path),
     ]
     print("[RU City Detail] Building patched detail topology...")
     try:
@@ -1024,6 +1040,194 @@ def _collect_hierarchy_child_ids(path: Path) -> set[str]:
     return child_ids
 
 
+def _extract_country_code_from_feature_id(value: object) -> str:
+    text = str(value or "").strip().upper()
+    if not text:
+        return ""
+
+    prefix = re.split(r"[-_]", text)[0]
+    if re.fullmatch(r"[A-Z]{2,3}", prefix):
+        return prefix
+
+    match = re.match(r"[A-Z]{2,3}", prefix)
+    return match.group(0) if match else ""
+
+
+def _normalize_detail_overlap_country_code(raw_code: object, feature_id: object = None) -> str:
+    candidate = re.sub(r"[^A-Z]", "", str(raw_code or "").strip().upper())
+    if not candidate:
+        candidate = _extract_country_code_from_feature_id(feature_id)
+    if not candidate:
+        return ""
+    return DETAIL_OVERLAY_COUNTRY_ALIASES.get(candidate, candidate)
+
+
+def _make_valid_geom(geom):
+    if geom is None:
+        return None
+    try:
+        if hasattr(geom, "make_valid"):
+            geom = geom.make_valid()
+    except Exception:
+        pass
+    try:
+        if geom is not None and not geom.is_valid:
+            geom = geom.buffer(0)
+    except Exception:
+        pass
+    return geom
+
+
+def _scan_detail_overlay_overlap_risks(
+    detail_path: Path,
+    overlap_threshold: float = DETAIL_OVERLAY_WARN_THRESHOLD,
+) -> list[dict[str, object]]:
+    if gpd is None or unary_union is None or not detail_path.exists():
+        return []
+
+    try:
+        from topojson.utils import serialize_as_geojson
+    except Exception as exc:
+        print(f"[Validate] detail overlap scan skipped: {exc}")
+        return []
+
+    topo_payload = _read_json(detail_path)
+    if not isinstance(topo_payload, dict):
+        return []
+
+    try:
+        feature_collection = serialize_as_geojson(topo_payload, objectname="political")
+    except Exception as exc:
+        print(f"[Validate] detail overlap scan skipped for {detail_path.name}: {exc}")
+        return []
+
+    raw_features = feature_collection.get("features", []) if isinstance(feature_collection, dict) else []
+    if not isinstance(raw_features, list) or not raw_features:
+        return []
+
+    enriched_features: list[dict[str, object]] = []
+    for draw_index, feature in enumerate(raw_features):
+        if not isinstance(feature, dict):
+            continue
+        props = dict(feature.get("properties", {}) or {})
+        feature_id = str(props.get("id") or feature.get("id") or "").strip()
+        country_code = _normalize_detail_overlap_country_code(
+            props.get("cntr_code")
+            or props.get("CNTR_CODE")
+            or props.get("iso_a2")
+            or props.get("ISO_A2")
+            or props.get("adm0_a2")
+            or props.get("ADM0_A2"),
+            feature_id=feature_id,
+        )
+        props["__draw_index"] = draw_index
+        props["__canonical_country"] = country_code
+        props["__detail_tier"] = str(props.get("detail_tier") or "").strip()
+        enriched_features.append(
+            {
+                "type": "Feature",
+                "id": feature.get("id"),
+                "properties": props,
+                "geometry": feature.get("geometry"),
+            }
+        )
+
+    if not enriched_features:
+        return []
+
+    try:
+        gdf = gpd.GeoDataFrame.from_features(enriched_features, crs="EPSG:4326")
+    except Exception as exc:
+        print(f"[Validate] detail overlap scan skipped for {detail_path.name}: {exc}")
+        return []
+
+    if gdf.empty or "geometry" not in gdf.columns:
+        return []
+
+    gdf = gdf[gdf["__canonical_country"].astype(str).str.len() > 0].copy()
+    if gdf.empty:
+        return []
+
+    gdf["geometry"] = gdf.geometry.apply(_make_valid_geom)
+    gdf = gdf[gdf.geometry.notna() & ~gdf.geometry.is_empty].copy()
+    if gdf.empty:
+        return []
+
+    try:
+        gdf = gdf.to_crs("EPSG:6933")
+    except Exception:
+        pass
+
+    risks: list[dict[str, object]] = []
+    for country_code, country_df in gdf.groupby("__canonical_country", sort=True):
+        tiers: list[dict[str, object]] = []
+        for detail_tier, tier_df in country_df.groupby("__detail_tier", sort=False, dropna=False):
+            if tier_df.empty:
+                continue
+            geometries = [
+                _make_valid_geom(geom)
+                for geom in tier_df.geometry.tolist()
+                if geom is not None and not geom.is_empty
+            ]
+            geometries = [geom for geom in geometries if geom is not None and not geom.is_empty]
+            if not geometries:
+                continue
+            merged_geom = _make_valid_geom(unary_union(geometries))
+            if merged_geom is None or merged_geom.is_empty:
+                continue
+            area = float(getattr(merged_geom, "area", 0.0) or 0.0)
+            if area <= 0:
+                continue
+            tiers.append(
+                {
+                    "country_code": str(country_code).strip(),
+                    "detail_tier": str(detail_tier or "").strip(),
+                    "feature_count": int(len(tier_df)),
+                    "min_draw_index": int(tier_df["__draw_index"].min()),
+                    "max_draw_index": int(tier_df["__draw_index"].max()),
+                    "geometry": merged_geom,
+                    "area": area,
+                }
+            )
+
+        tiers.sort(key=lambda item: (item["min_draw_index"], item["max_draw_index"], item["detail_tier"]))
+        for earlier_index, earlier in enumerate(tiers):
+            for later in tiers[earlier_index + 1 :]:
+                if int(later["min_draw_index"]) <= int(earlier["max_draw_index"]):
+                    continue
+                intersection = _make_valid_geom(earlier["geometry"].intersection(later["geometry"]))
+                if intersection is None or intersection.is_empty:
+                    continue
+                intersection_area = float(getattr(intersection, "area", 0.0) or 0.0)
+                if intersection_area <= 0:
+                    continue
+                share_earlier = intersection_area / max(float(earlier["area"]), 1e-9)
+                share_later = intersection_area / max(float(later["area"]), 1e-9)
+                if max(share_earlier, share_later) < overlap_threshold:
+                    continue
+                risks.append(
+                    {
+                        "country_code": str(country_code).strip(),
+                        "earlier_tier": str(earlier["detail_tier"] or "").strip(),
+                        "later_tier": str(later["detail_tier"] or "").strip(),
+                        "earlier_feature_count": int(earlier["feature_count"]),
+                        "later_feature_count": int(later["feature_count"]),
+                        "earlier_draw_range": (
+                            int(earlier["min_draw_index"]),
+                            int(earlier["max_draw_index"]),
+                        ),
+                        "later_draw_range": (
+                            int(later["min_draw_index"]),
+                            int(later["max_draw_index"]),
+                        ),
+                        "share_earlier": float(share_earlier),
+                        "share_later": float(share_later),
+                    }
+                )
+
+    return risks
+
+
 def write_data_manifest(output_dir: Path) -> Path:
     roles = {
         "europe_topology.json": "primary_topology",
@@ -1186,6 +1390,27 @@ def validate_build_outputs(output_dir: Path, strict: bool = False) -> None:
             f"illegal_ids={len(illegal_ids)}, world_bounds={world_bounds_count}, "
             f"raw_world_bounds={raw_world_bounds_count}"
         )
+
+        if topology_path == detail_path:
+            for risk in _scan_detail_overlay_overlap_risks(detail_path):
+                earlier_tier = risk["earlier_tier"] or "<leaf>"
+                later_tier = risk["later_tier"] or "<leaf>"
+                print(
+                    "[Validate] detail overlap risk: "
+                    f"country={risk['country_code']}, "
+                    f"earlier_tier={earlier_tier}, later_tier={later_tier}, "
+                    f"earlier_features={risk['earlier_feature_count']}, "
+                    f"later_features={risk['later_feature_count']}, "
+                    f"overlap_vs_earlier={risk['share_earlier']:.3f}, "
+                    f"overlap_vs_later={risk['share_later']:.3f}, "
+                    f"earlier_draw={risk['earlier_draw_range']}, "
+                    f"later_draw={risk['later_draw_range']}"
+                )
+                if strict:
+                    problems.append(
+                        f"{detail_path.name}: high-overlap tiers "
+                        f"{risk['country_code']} {earlier_tier}->{later_tier}"
+                    )
 
     if hierarchy_path.exists():
         hierarchy_child_ids = _collect_hierarchy_child_ids(hierarchy_path)
@@ -1373,6 +1598,8 @@ def main() -> None:
             output_path=output_dir / "locales.json",
             geo_aliases_path=output_dir / "geo_aliases.json",
             hierarchy_path=output_dir / "hierarchy.json",
+            runtime_topology_path=output_dir / "europe_topology.runtime_political_v1.json",
+            scenarios_root=output_dir / "scenarios",
             machine_translate=False,
             network_mode="off",
         )
@@ -1686,6 +1913,8 @@ def main() -> None:
         output_path=output_dir / "locales.json",
         geo_aliases_path=output_dir / "geo_aliases.json",
         hierarchy_path=output_dir / "hierarchy.json",
+        runtime_topology_path=output_dir / "europe_topology.runtime_political_v1.json",
+        scenarios_root=output_dir / "scenarios",
         machine_translate=False,
         network_mode="off",
     )
@@ -1704,6 +1933,8 @@ def main() -> None:
             output_path=output_dir / "locales.json",
             geo_aliases_path=output_dir / "geo_aliases.json",
             hierarchy_path=output_dir / "hierarchy.json",
+            runtime_topology_path=output_dir / "europe_topology.runtime_political_v1.json",
+            scenarios_root=output_dir / "scenarios",
             machine_translate=True,
             translator_delay_seconds=0.05,
             max_machine_translations=2500,

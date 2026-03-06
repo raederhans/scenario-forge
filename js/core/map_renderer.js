@@ -57,6 +57,10 @@ const COUNTRY_CODE_ALIASES = {
   UK: "GB",
   EL: "GR",
 };
+const INTERACTIVE_AGGREGATE_TIER_FILTERS = {
+  GB: new Set(["nuts1_basic"]),
+  GR: new Set(["adm1_basic"]),
+};
 const WRAP_ARTIFACT_WIDTH_RATIO = 0.9;
 const WRAP_ARTIFACT_HEIGHT_RATIO = 0.3;
 const WRAP_ARTIFACT_AREA_RATIO = 0.35;
@@ -107,7 +111,6 @@ const DEFAULT_SPECIAL_ZONE_TYPE = "custom";
 const PHYSICAL_PATTERN_BASE_SIZE = 96;
 const PAPER_TEXTURE_BASE_TILE_SIZE = 512;
 const PAPER_NOISE_TILE_SIZE = 192;
-const PARENT_FILL_DOUBLE_CLICK_MS = 260;
 const TEXTURE_LABEL_SERIF_STACK = "\"Iowan Old Style\", \"Palatino Linotype\", Georgia, serif";
 const GRATICULE_SAMPLE_DEGREES = 2;
 const PAPER_TEXTURE_ASSET_URLS = {
@@ -1025,6 +1028,109 @@ function collectCountryCoverageStats(features = []) {
   };
 }
 
+function collectCountryFeatureCounts(features = []) {
+  const counts = new Map();
+  features.forEach((feature) => {
+    const countryCode = getFeatureCountryCodeNormalized(feature);
+    if (!countryCode) return;
+    counts.set(countryCode, (counts.get(countryCode) || 0) + 1);
+  });
+  return counts;
+}
+
+function buildInteractiveLandData(fullCollection) {
+  if (!Array.isArray(fullCollection?.features) || !fullCollection.features.length) {
+    return fullCollection;
+  }
+
+  const filterStateByCountry = new Map();
+  fullCollection.features.forEach((feature) => {
+    const countryCode = getFeatureCountryCodeNormalized(feature);
+    const blockedTiers = INTERACTIVE_AGGREGATE_TIER_FILTERS[countryCode];
+    if (!countryCode || !blockedTiers?.size) return;
+
+    const tier = getDetailTier(feature).toLowerCase();
+    let entry = filterStateByCountry.get(countryCode);
+    if (!entry) {
+      entry = {
+        blockedTiers,
+        hasLeaf: false,
+        hasBlocked: false,
+      };
+      filterStateByCountry.set(countryCode, entry);
+    }
+
+    if (blockedTiers.has(tier)) {
+      entry.hasBlocked = true;
+      return;
+    }
+
+    if (String(feature?.properties?.__source || "primary") === "detail") {
+      entry.hasLeaf = true;
+    }
+  });
+
+  const activeFilters = new Map(
+    Array.from(filterStateByCountry.entries()).filter(([, entry]) => entry.hasLeaf && entry.hasBlocked)
+  );
+  if (!activeFilters.size) {
+    return fullCollection;
+  }
+
+  const filteredFeatures = fullCollection.features.filter((feature) => {
+    const countryCode = getFeatureCountryCodeNormalized(feature);
+    const entry = activeFilters.get(countryCode);
+    if (!entry) return true;
+    return !entry.blockedTiers.has(getDetailTier(feature).toLowerCase());
+  });
+
+  if (filteredFeatures.length === fullCollection.features.length) {
+    return fullCollection;
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: filteredFeatures,
+  };
+}
+
+function rebuildPoliticalLandCollections() {
+  const primaryTopology = state.topologyPrimary || state.topology;
+  const detailTopology = state.topologyBundleMode === "composite" ? state.topologyDetail : null;
+  const overrideCollection = state.topologyBundleMode === "composite" ? state.ruCityOverrides : null;
+
+  let fullCollection = state.landDataFull || state.landData || null;
+  if (primaryTopology?.objects?.political && globalThis.topojson) {
+    fullCollection = state.topologyBundleMode === "composite"
+      ? composePoliticalFeatures(primaryTopology, detailTopology, overrideCollection)
+      : getPoliticalFeatureCollection(primaryTopology, "primary");
+  }
+
+  const interactiveCollection = buildInteractiveLandData(fullCollection);
+  state.landDataFull = fullCollection;
+  state.landData = interactiveCollection;
+
+  const fullFeatures = Array.isArray(fullCollection?.features) ? fullCollection.features : [];
+  const interactiveFeatures = Array.isArray(interactiveCollection?.features) ? interactiveCollection.features : [];
+  if (interactiveFeatures.length < fullFeatures.length) {
+    const fullCounts = collectCountryFeatureCounts(fullFeatures);
+    const interactiveCounts = collectCountryFeatureCounts(interactiveFeatures);
+    const deltas = Array.from(fullCounts.entries())
+      .filter(([countryCode, count]) => (interactiveCounts.get(countryCode) || 0) !== count)
+      .map(([
+        countryCode,
+        count,
+      ]) => `${countryCode}:${count}->${interactiveCounts.get(countryCode) || 0}`);
+    if (deltas.length) {
+      console.info(
+        `[map_renderer] Interactive land filter removed aggregate support tiers: ${deltas.join(", ")}.`
+      );
+    }
+  }
+
+  return { fullCollection, interactiveCollection };
+}
+
 function clearRenderPhaseTimer() {
   if (state.renderPhaseTimerId) {
     globalThis.clearTimeout(state.renderPhaseTimerId);
@@ -1381,8 +1487,13 @@ function ensureLayerDataFromTopology() {
     const currentCount = Array.isArray(state.landData?.features)
       ? state.landData.features.length
       : 0;
-    if (currentCount !== expectedCount) {
-      state.landData = globalThis.topojson.feature(primaryTopology, primaryTopology.objects.political);
+    const fullCount = Array.isArray(state.landDataFull?.features)
+      ? state.landDataFull.features.length
+      : 0;
+    if (currentCount !== expectedCount || fullCount !== expectedCount) {
+      const primaryCollection = globalThis.topojson.feature(primaryTopology, primaryTopology.objects.political);
+      state.landDataFull = primaryCollection;
+      state.landData = primaryCollection;
     }
   }
 
@@ -1723,9 +1834,16 @@ function buildDetailAdmBorderMesh(topology, includedCountries) {
   });
 }
 
+function getFullLandDataFeatures() {
+  if (Array.isArray(state.landDataFull?.features) && state.landDataFull.features.length) {
+    return state.landDataFull.features;
+  }
+  return Array.isArray(state.landData?.features) ? state.landData.features : [];
+}
+
 function getCountryFeatureEntriesMap() {
   const byCountry = new Map();
-  const features = Array.isArray(state.landData?.features) ? state.landData.features : [];
+  const features = getFullLandDataFeatures();
   features.forEach((feature) => {
     const id = getFeatureId(feature);
     const countryCode = getFeatureCountryCodeNormalized(feature);
@@ -1842,6 +1960,19 @@ function isGermanStateLevelCandidate(candidate) {
   return Array.from(DE_CITY_STATES).every((name) => groups.has(name));
 }
 
+function isBritishConstituentGroupingCandidate(candidate) {
+  if (!candidate || candidate.source !== "hierarchy") return false;
+  if (candidate.coverage < PARENT_BORDER_MIN_COVERAGE) return false;
+  if (candidate.groupCount < 4) return false;
+  const groups = new Set(candidate.groupCounts ? Array.from(candidate.groupCounts.keys()) : []);
+  return (
+    groups.has("GB_England")
+    && groups.has("GB_Scotland")
+    && groups.has("GB_Wales")
+    && groups.has("GB_Northern_Ireland")
+  );
+}
+
 function resolveCountryParentGroupingCandidate(countryCode, featureEntries) {
   if (!countryCode || !featureEntries?.length) return null;
 
@@ -1862,6 +1993,13 @@ function resolveCountryParentGroupingCandidate(countryCode, featureEntries) {
   }
 
   if (countryCode === "GB") {
+    if (isBritishConstituentGroupingCandidate(hierarchyCandidate)) {
+      return {
+        ...hierarchyCandidate,
+        accepted: true,
+        forcedRule: "gb_constituent_countries",
+      };
+    }
     const hierarchyFineEnough =
       hierarchyCandidate?.accepted &&
       Math.max(hierarchyCandidate.groupCount, hierarchyCandidate.groupCountTotal) >= GB_PARENT_MIN_GROUPS;
@@ -1980,11 +2118,12 @@ function getSourceCountrySets() {
     detail: new Set(),
   };
 
-  if (!state.landData?.features?.length) {
+  const features = getFullLandDataFeatures();
+  if (!features.length) {
     return sets;
   }
 
-  state.landData.features.forEach((feature) => {
+  features.forEach((feature) => {
     const source = String(feature?.properties?.__source || "primary");
     const countryCode = getFeatureCountryCodeNormalized(feature);
     if (!countryCode) return;
@@ -4851,67 +4990,22 @@ function executeBatchFill(action, resolverFn, kind) {
   });
 }
 
-function executePendingMapClickAction(action) {
-  if (!action) return false;
-  if (action.doubleClickBehavior === "country") {
-    return executeBatchFill(action, resolveCountryFillTargetIds, "fill-country-batch");
+function executeDoubleClickBatchFill(feature, featureId) {
+  if (!feature || !featureId) return false;
+  const parentTargetIds = resolveParentGroupTargetIds(feature, featureId);
+  if (parentTargetIds.length) {
+    return applyVisualSubdivisionFill(parentTargetIds, state.selectedColor, {
+      kind: "fill-parent-group",
+      dirtyReason: "fill-parent-group",
+    });
   }
-  if (action.doubleClickBehavior === "parent-group") {
-    return executeBatchFill(action, resolveParentGroupTargetIds, "fill-parent-group");
+  const countryTargetIds = resolveCountryFillTargetIds(feature, featureId);
+  if (countryTargetIds.length) {
+    return applyVisualSubdivisionFill(countryTargetIds, state.selectedColor, {
+      kind: "fill-country-batch",
+      dirtyReason: "fill-country-batch",
+    });
   }
-  return executeSingleSubdivisionFill(action);
-}
-
-function cancelPendingMapClickAction({ execute = false } = {}) {
-  const pending = state.pendingMapClickAction;
-  if (!pending) return null;
-  if (pending.timerId) {
-    globalThis.clearTimeout(pending.timerId);
-  }
-  state.pendingMapClickAction = null;
-  if (execute) {
-    executeSingleSubdivisionFill(pending);
-  }
-  return pending;
-}
-
-function scheduleSingleSubdivisionFill(action) {
-  cancelPendingMapClickAction({ execute: true });
-  const pending = {
-    ...action,
-    createdAt: Date.now(),
-  };
-  pending.timerId = globalThis.setTimeout(() => {
-    if (state.pendingMapClickAction !== pending) return;
-    state.pendingMapClickAction = null;
-    executeSingleSubdivisionFill(pending);
-  }, PARENT_FILL_DOUBLE_CLICK_MS);
-  state.pendingMapClickAction = pending;
-}
-
-function consumePendingParentFillClick(hit, feature) {
-  const pending = state.pendingMapClickAction;
-  if (!pending) return false;
-
-  const sameFeature = pending.featureId === hit?.id;
-  const doubleClickBehavior = pending.doubleClickBehavior || "parent-group";
-  const sameBehaviorTarget =
-    doubleClickBehavior === "country"
-      ? pending.countryCode && pending.countryCode === getFeatureCountryCodeNormalized(feature)
-      : pending.parentGroupKey && pending.parentGroupKey === resolveParentGroupKey(feature, hit?.id);
-  const sameSelectedColor = pending.selectedColor === getSafeCanvasColor(state.selectedColor, LAND_FILL_COLOR);
-  const sameTool = pending.tool === state.currentTool;
-  const samePaintMode = pending.paintMode === state.paintMode;
-  const sameGranularity = pending.interactionGranularity === state.interactionGranularity;
-  const withinWindow = (Date.now() - Number(pending.createdAt || 0)) <= PARENT_FILL_DOUBLE_CLICK_MS;
-
-  if (sameFeature && sameBehaviorTarget && sameSelectedColor && sameTool && samePaintMode && sameGranularity && withinWindow) {
-    cancelPendingMapClickAction();
-    executePendingMapClickAction(pending);
-    return true;
-  }
-
-  cancelPendingMapClickAction({ execute: true });
   return false;
 }
 
@@ -5123,10 +5217,6 @@ function handleClick(event) {
   const countryCode = hit.countryCode || getFeatureCountryCodeNormalized(feature);
   const targetIds = resolveInteractionTargetIds(feature, id);
 
-  if (state.pendingMapClickAction && consumePendingParentFillClick(hit, feature)) {
-    return;
-  }
-
   if (state.isEditingPreset) {
     if (typeof globalThis.togglePresetRegion === "function") {
       globalThis.togglePresetRegion(id);
@@ -5275,29 +5365,11 @@ function handleClick(event) {
       }),
     });
   } else {
-    const baseAction = {
-      featureId: id,
-      countryCode,
-      selectedColor,
-      tool: "fill",
-      paintMode: state.paintMode,
-      interactionGranularity: state.interactionGranularity,
-      eventPayload: { feature, targetIds },
-    };
-    if (isParentFillDoubleClickEligible(hit, feature)) {
-      scheduleSingleSubdivisionFill({
-        ...baseAction,
-        parentGroupKey: resolveParentGroupKey(feature, id),
-        doubleClickBehavior: "parent-group",
-      });
-      return;
-    }
-    if (isCountryFillDoubleClickEligible(hit, feature)) {
-      scheduleSingleSubdivisionFill({
-        ...baseAction,
-        parentGroupKey: "",
-        doubleClickBehavior: "country",
-      });
+    const clickCount = Math.max(1, Number(event?.detail || 1));
+    if (
+      clickCount >= 2 &&
+      (isParentFillDoubleClickEligible(hit, feature) || isCountryFillDoubleClickEligible(hit, feature))
+    ) {
       return;
     }
     applyVisualSubdivisionFill(targetIds, selectedColor, {
@@ -5320,9 +5392,24 @@ function handleClick(event) {
 }
 
 function handleDoubleClick(event) {
-  if (!state.specialZoneEditor?.active) return;
+  if (state.specialZoneEditor?.active) {
+    if (event?.preventDefault) event.preventDefault();
+    finishSpecialZoneDraw();
+    return;
+  }
+  if (!state.landData) return;
   if (event?.preventDefault) event.preventDefault();
-  finishSpecialZoneDraw();
+
+  const hit = getHitFromEvent(event, {
+    enableSnap: true,
+    snapPx: HIT_SNAP_RADIUS_CLICK_PX,
+    eventType: "dblclick",
+  });
+  const id = hit.id;
+  if (!id) return;
+  const feature = state.landIndex.get(id);
+  if (!feature) return;
+  executeDoubleClickBatchFill(feature, id);
 }
 
 function calculatePanExtent() {
@@ -5543,6 +5630,7 @@ function initMap({ containerId = "mapContainer" } = {}) {
   layerResolverCache.detailRef = null;
   layerResolverCache.bundleMode = null;
   ensureLayerDataFromTopology();
+  rebuildPoliticalLandCollections();
 
   state.colorCanvas = mapCanvas;
   state.lineCanvas = null;
@@ -5588,19 +5676,16 @@ function setMapData({ refitProjection = true, resetZoom = true } = {}) {
   layerResolverCache.detailRef = null;
   layerResolverCache.bundleMode = null;
   ensureLayerDataFromTopology();
-  const primaryTopology = state.topologyPrimary || state.topology;
-  const detailTopology = state.topologyBundleMode === "composite" ? state.topologyDetail : null;
-  const overrideCollection = state.topologyBundleMode === "composite" ? state.ruCityOverrides : null;
-  if (primaryTopology?.objects?.political && globalThis.topojson) {
-    state.landData = state.topologyBundleMode === "composite"
-      ? composePoliticalFeatures(primaryTopology, detailTopology, overrideCollection)
-      : getPoliticalFeatureCollection(primaryTopology, "primary");
-  }
+  const { fullCollection, interactiveCollection } = rebuildPoliticalLandCollections();
 
-  if (state.topologyBundleMode === "composite" && Array.isArray(state.landData?.features)) {
-    const coverage = collectCountryCoverageStats(state.landData.features);
+  if (state.topologyBundleMode === "composite" && Array.isArray(fullCollection?.features)) {
+    const coverage = collectCountryCoverageStats(fullCollection.features);
+    const interactiveFeatureCount = Array.isArray(interactiveCollection?.features)
+      ? interactiveCollection.features.length
+      : 0;
     console.info(
       `[map_renderer] Composite coverage: countries detail=${coverage.detailCountries}, primaryFallback=${coverage.primaryCountries}, total=${coverage.totalCountries}; features detail=${coverage.detailFeatures}, primary=${coverage.primaryFeatures}, total=${coverage.totalFeatures}.`
+      + ` interactive=${interactiveFeatureCount}.`
     );
   }
 

@@ -24,6 +24,14 @@
       "en": "4. ID Stability",
       "zh": "4. ID 稳定性"
     },
+    "Activate": {
+      "en": "Activate",
+      "zh": "激活"
+    },
+    "Activate Releasable": {
+      "en": "Activate Releasable",
+      "zh": "激活可释放国"
+    },
     "Active": {
       "en": "Active",
       "zh": "已设为主权"
@@ -31,6 +39,10 @@
     "Active Sovereign": {
       "en": "Active Owner",
       "zh": "当前激活所属"
+    },
+    "Active owner updated": {
+      "en": "Active owner updated",
+      "zh": "激活所属已更新"
     },
     "Active sovereign updated": {
       "en": "Active owner updated",
@@ -52,6 +64,10 @@
       "en": "Ambiguous identity",
       "zh": "身份存在歧义"
     },
+    "Applied": {
+      "en": "Applied",
+      "zh": "应用"
+    },
     "Apply": {
       "en": "Apply",
       "zh": "应用"
@@ -67,6 +83,18 @@
     "Apply Scenario": {
       "en": "Apply Scenario",
       "zh": "应用剧本"
+    },
+    "Apply Visual Color to Core Territory": {
+      "en": "Apply Visual Color to Core Territory",
+      "zh": "将视觉颜色应用到核心领土"
+    },
+    "Apply failed": {
+      "en": "Apply failed",
+      "zh": "申请失败"
+    },
+    "Apply this releasable's political ownership and make it active.": {
+      "en": "Apply this releasable's political ownership and make it active.",
+      "zh": "应用这个可释放国的政治归属并将其设为激活所属。"
     },
     "Approximate": {
       "en": "Approximate",
@@ -156,13 +184,37 @@
       "en": "Choose a country above to inspect territories, presets, and releasables.",
       "zh": "在上方选择一个国家，以查看其领土、预设和可释放国家。"
     },
+    "Choose a country above, then use Active Owner and the Territories & Presets panel.": {
+      "en": "Choose a country above, then use Active Owner and the Territories & Presets panel.",
+      "zh": "先在上方选择一个国家，然后使用“激活所属”和“领土与预设”面板。"
+    },
     "Choose a country above, then use Set Active and the Territories & Presets panel.": {
       "en": "Choose a country above, then use Set Active and the Territories & Presets panel.",
       "zh": "请先在上方选择国家，再使用“设为主权”和“领土与预设”面板。"
     },
+    "Choose an active owner before changing political ownership or borders.": {
+      "en": "Choose an active owner before changing political ownership or borders.",
+      "zh": "更改政治归属或动态边界前，请先选择激活所属。"
+    },
+    "Choose an active owner before changing political ownership.": {
+      "en": "Choose an active owner before changing political ownership.",
+      "zh": "更改政治归属前，请先选择激活所属。"
+    },
+    "Clear Core Territory Visual Overrides": {
+      "en": "Clear Core Territory Visual Overrides",
+      "zh": "清除核心领土视觉覆盖"
+    },
     "Clear Map": {
       "en": "Clear Map",
       "zh": "清空地图"
+    },
+    "Clear Owned Region Visual Overrides": {
+      "en": "Clear Owned Region Visual Overrides",
+      "zh": "清除已拥有区域的视觉覆盖"
+    },
+    "Cleared": {
+      "en": "Cleared",
+      "zh": "已清除"
     },
     "Click a region to start painting, or use Auto-Fill to color all countries": {
       "en": "Click a region to start painting, or use Auto-Fill to color all countries",
@@ -224,6 +276,18 @@
       "en": "Core Territory",
       "zh": "核心领土"
     },
+    "Core Territory Visuals": {
+      "en": "Core Territory Visuals",
+      "zh": "核心领土视觉"
+    },
+    "Core territory already matches current ownership.": {
+      "en": "Core territory already matches current ownership.",
+      "zh": "核心领土已经与当前所有权相匹配。"
+    },
+    "Core territory was not applied.": {
+      "en": "Core territory was not applied.",
+      "zh": "核心领土未适用。"
+    },
     "Country Colors": {
       "en": "Country Colors",
       "zh": "国家配色"
@@ -239,6 +303,10 @@
     "Country Presets": {
       "en": "Country Presets",
       "zh": "国家预设"
+    },
+    "Country Visuals": {
+      "en": "Country Visuals",
+      "zh": "国家视觉"
     },
     "Coverage report unavailable": {
       "en": "Coverage report unavailable",
@@ -256,6 +324,10 @@
       "en": "Current Tool",
       "zh": "当前工具"
     },
+    "Current map does not include this preset's detail features. Load detail topology and try again.": {
+      "en": "Current map does not include this preset's detail features. Load detail topology and try again.",
+      "zh": "当前地图不包括该预设的详细功能。加载详细拓扑并重试。"
+    },
     "Custom": {
       "en": "Custom",
       "zh": "自定义"
@@ -267,6 +339,10 @@
     "Delete Selected": {
       "en": "Delete Selected",
       "zh": "删除所选"
+    },
+    "Detail topology not fully loaded; scenario is shown in coarse mode.": {
+      "en": "Detail topology not fully loaded; scenario is shown in coarse mode.",
+      "zh": "详细拓扑未完全加载；场景以粗略模式显示。"
     },
     "Download Project": {
       "en": "Download Project",
@@ -362,7 +438,7 @@
     },
     "Frontline": {
       "en": "Frontline",
-      "zh": "Frontline"
+      "zh": "前线"
     },
     "Hide Color Library": {
       "en": "Hide Color Library",
@@ -375,6 +451,10 @@
     "Hierarchy Groups": {
       "en": "Hierarchy Groups",
       "zh": "层级分组"
+    },
+    "Hierarchy Groups (Visual Color)": {
+      "en": "Hierarchy Groups (Visual Color)",
+      "zh": "层级分组（视觉颜色）"
     },
     "Historical composites built": {
       "en": "Historical composites built",
@@ -460,6 +540,18 @@
       "en": "Mode: Visual",
       "zh": "模式：视觉"
     },
+    "Mode: Visual Color": {
+      "en": "Mode: Visual Color",
+      "zh": "模式：视觉颜色"
+    },
+    "Navigation": {
+      "en": "Navigation",
+      "zh": "导航"
+    },
+    "No changes": {
+      "en": "No changes",
+      "zh": "没有变化"
+    },
     "No core territory defined": {
       "en": "No core territory defined",
       "zh": "未定义核心领土"
@@ -482,7 +574,7 @@
     },
     "No frontline control split in current scenario.": {
       "en": "No frontline control split in current scenario.",
-      "zh": "No frontline control split in current scenario."
+      "zh": "当前情况下没有前线控制分裂。"
     },
     "No hierarchy groups": {
       "en": "No hierarchy groups",
@@ -495,6 +587,10 @@
     "No matching countries": {
       "en": "No matching countries",
       "zh": "没有匹配的国家/地区"
+    },
+    "No owned regions were recolored.": {
+      "en": "No owned regions were recolored.",
+      "zh": "没有已拥有区域被重新着色。"
     },
     "No palette colors match the current search.": {
       "en": "No palette colors match the current search.",
@@ -515,6 +611,10 @@
     "No scenario active": {
       "en": "No scenario active",
       "zh": "当前没有激活剧本"
+    },
+    "No visual overrides to clear.": {
+      "en": "No visual overrides to clear.",
+      "zh": "没有可清除的视觉覆盖。"
     },
     "None": {
       "en": "None",
@@ -546,7 +646,7 @@
     },
     "Ownership": {
       "en": "Ownership",
-      "zh": "Ownership"
+      "zh": "所有权"
     },
     "Paint Granularity": {
       "en": "Paint Granularity",
@@ -555,6 +655,10 @@
     "Paint Meaning": {
       "en": "Paint Meaning",
       "zh": "上色含义"
+    },
+    "Paint Owned Regions With Country Color": {
+      "en": "Paint Owned Regions With Country Color",
+      "zh": "用国家颜色重绘已拥有区域"
     },
     "Paint regions to generate a legend.": {
       "en": "Paint regions to generate a legend.",
@@ -568,6 +672,30 @@
       "en": "Parent Country",
       "zh": "母国"
     },
+    "Political Editing": {
+      "en": "Political Editing",
+      "zh": "政治编辑"
+    },
+    "Political Ownership": {
+      "en": "Political Ownership",
+      "zh": "政治归属"
+    },
+    "Political ownership editing already targets this releasable.": {
+      "en": "Political ownership editing already targets this releasable.",
+      "zh": "政治归属编辑已经指向这个可释放国。"
+    },
+    "Political ownership editing now targets the selected country.": {
+      "en": "Political ownership editing now targets the selected country.",
+      "zh": "政治归属编辑现在会作用于所选国家。"
+    },
+    "Political ownership editing now targets this releasable.": {
+      "en": "Political ownership editing now targets this releasable.",
+      "zh": "政治归属编辑现在会作用于这个可释放国。"
+    },
+    "Political ownership updated": {
+      "en": "Political ownership updated",
+      "zh": "政治归属已更新"
+    },
     "Preset IDs copied to clipboard.": {
       "en": "Preset IDs copied to clipboard.",
       "zh": "预设 ID 已复制到剪贴板。"
@@ -579,6 +707,10 @@
     "Preset actions fill regions using the current selected color.": {
       "en": "Preset actions fill regions using the current selected color.",
       "zh": "这些操作会使用当前选中的颜色填充区域。"
+    },
+    "Preset not applied": {
+      "en": "Preset not applied",
+      "zh": "未应用预设"
     },
     "Project Management": {
       "en": "Project Management",
@@ -608,6 +740,10 @@
       "en": "Quick Colors",
       "zh": "快速颜色"
     },
+    "Reapply Core Territory": {
+      "en": "Reapply Core Territory",
+      "zh": "重新应用核心领土"
+    },
     "Recalculate Borders": {
       "en": "Recalculate Borders",
       "zh": "重算边界"
@@ -635,6 +771,10 @@
     "Regional Presets": {
       "en": "Regional Presets",
       "zh": "区域预设"
+    },
+    "Regional Presets (Visual Color)": {
+      "en": "Regional Presets (Visual Color)",
+      "zh": "区域预设（视觉颜色）"
     },
     "Releasable": {
       "en": "Releasable",
@@ -668,9 +808,21 @@
       "en": "Reset Country Colors",
       "zh": "重置国家配色"
     },
+    "Return to": {
+      "en": "Return to",
+      "zh": "返回"
+    },
+    "Return to Political Ownership Brush": {
+      "en": "Return to Political Ownership Brush",
+      "zh": "返回政治归属画笔"
+    },
     "Review the current paint mode, then apply releasables, hierarchy groups, or regional presets.": {
       "en": "Scenario Actions below change political ownership first. Open Visual Adjustments only for color-only edits.",
       "zh": "下方的场景操作会优先修改政治归属。只有在需要纯颜色调整时才打开视觉调整。"
+    },
+    "Runtime": {
+      "en": "Runtime",
+      "zh": "运行时"
     },
     "Save": {
       "en": "Save",
@@ -687,6 +839,14 @@
     "Scenario Actions": {
       "en": "Scenario Actions",
       "zh": "剧本动作"
+    },
+    "Scenario Actions below change political ownership first. Open Visual Adjustments only for color-only edits.": {
+      "en": "Scenario Actions below change political ownership first. Open Visual Adjustments only for color-only edits.",
+      "zh": "下方的场景操作会优先修改政治归属。只有在需要纯颜色调整时才打开视觉调整。"
+    },
+    "Scenario Actions change political ownership and dynamic borders. Use Visual Adjustments for color-only edits.": {
+      "en": "Scenario Actions change political ownership and dynamic borders. Use Visual Adjustments for color-only edits.",
+      "zh": "场景操作会改变政治归属和动态边界。纯颜色调整请使用视觉调整。"
     },
     "Scenario Audit": {
       "en": "Scenario Audit",
@@ -716,6 +876,10 @@
       "en": "Scenario loaded. 1) Select a country 2) Choose an active owner 3) Use Activate or Scenario Actions.",
       "zh": "场景已加载。1）选择国家 2）选择激活所属 3）使用激活或场景操作。"
     },
+    "Scenario loaded. Expand the parent country and use Activate to apply releasable territory.": {
+      "en": "Scenario loaded. Expand the parent country and use Activate to apply releasable territory.",
+      "zh": "场景已加载。展开母国并使用“激活”来应用可释放国领土。"
+    },
     "Scenario reset": {
       "en": "Scenario reset",
       "zh": "剧本已重置"
@@ -727,6 +891,14 @@
     "Scenario rule blockers": {
       "en": "Scenario rule blockers",
       "zh": "剧本规则阻塞项"
+    },
+    "Scenario visibility error": {
+      "en": "Scenario visibility error",
+      "zh": "场景可见性错误"
+    },
+    "Scenario visibility warning": {
+      "en": "Scenario visibility warning",
+      "zh": "场景能见度警告"
     },
     "Scenario: None": {
       "en": "Scenario: None",
@@ -834,11 +1006,15 @@
     },
     "Split": {
       "en": "Split",
-      "zh": "Split"
+      "zh": "分裂"
     },
     "Split state": {
       "en": "Split state",
       "zh": "分裂态国家"
+    },
+    "Stop Using as Active Owner": {
+      "en": "Stop Using as Active Owner",
+      "zh": "停止用作激活所属"
     },
     "Synthetic": {
       "en": "Synthetic",
@@ -852,9 +1028,13 @@
       "en": "Texture",
       "zh": "纹理"
     },
+    "These actions only change visual color. Ownership, controllers, and dynamic borders stay unchanged.": {
+      "en": "These actions only change visual color. Ownership, controllers, and dynamic borders stay unchanged.",
+      "zh": "这些操作只会修改视觉颜色。归属、控制者和动态边界都不会改变。"
+    },
     "Toggle legal ownership vs frontline control.": {
       "en": "Toggle legal ownership vs frontline control.",
-      "zh": "Toggle legal ownership vs frontline control."
+      "zh": "切换合法所有权与一线控制权。"
     },
     "Topology Summary": {
       "en": "Topology Summary",
@@ -904,6 +1084,22 @@
       "en": "Unsupported runtime country",
       "zh": "运行时国家未收录"
     },
+    "Use Activate Releasable or Reapply Core Territory in Scenario Actions.": {
+      "en": "Use Activate Releasable or Reapply Core Territory in Scenario Actions.",
+      "zh": "请在 Scenario Actions 中使用“激活可释放国”或“重新应用核心领土”。"
+    },
+    "Use Visual Color Brush": {
+      "en": "Use Visual Color Brush",
+      "zh": "使用视觉颜色画笔"
+    },
+    "Use an active owner for political actions": {
+      "en": "Use an active owner for political actions",
+      "zh": "进行政治操作时使用激活所属"
+    },
+    "Use as Active Owner": {
+      "en": "Use as Active Owner",
+      "zh": "用作激活所属"
+    },
     "Use diagnostics to inspect geometry and artifact behavior.": {
       "en": "Use diagnostics to inspect geometry and artifact behavior.",
       "zh": "使用诊断视图检查几何与异常行为。"
@@ -915,6 +1111,22 @@
     "Visual": {
       "en": "Visual Color",
       "zh": "视觉颜色"
+    },
+    "Visual Adjustments": {
+      "en": "Visual Adjustments",
+      "zh": "视觉调整"
+    },
+    "Visual Color": {
+      "en": "Visual Color",
+      "zh": "视觉颜色"
+    },
+    "Visual color applied": {
+      "en": "Visual color applied",
+      "zh": "视觉颜色已应用"
+    },
+    "Visual overrides cleared": {
+      "en": "Visual overrides cleared",
+      "zh": "视觉覆盖已清除"
     },
     "Warlord / regional tag": {
       "en": "Warlord / regional tag",
@@ -955,158 +1167,6 @@
     "presets moved to Releasable Countries.": {
       "en": "presets moved to Releasable Countries.",
       "zh": "个预设已移动到“可释放国家”中。"
-    },
-    "Active owner updated": {
-      "en": "Active owner updated",
-      "zh": "激活所属已更新"
-    },
-    "Apply Visual Color to Core Territory": {
-      "en": "Apply Visual Color to Core Territory",
-      "zh": "将视觉颜色应用到核心领土"
-    },
-    "Apply this releasable's political ownership and make it active.": {
-      "en": "Apply this releasable's political ownership and make it active.",
-      "zh": "应用这个可释放国的政治归属并将其设为激活所属。"
-    },
-    "Activate Releasable": {
-      "en": "Activate Releasable",
-      "zh": "激活可释放国"
-    },
-    "Choose a country above, then use Active Owner and the Territories & Presets panel.": {
-      "en": "Choose a country above, then use Active Owner and the Territories & Presets panel.",
-      "zh": "先在上方选择一个国家，然后使用“激活所属”和“领土与预设”面板。"
-    },
-    "Choose an active owner before changing political ownership or borders.": {
-      "en": "Choose an active owner before changing political ownership or borders.",
-      "zh": "更改政治归属或动态边界前，请先选择激活所属。"
-    },
-    "Clear Core Territory Visual Overrides": {
-      "en": "Clear Core Territory Visual Overrides",
-      "zh": "清除核心领土视觉覆盖"
-    },
-    "Clear Owned Region Visual Overrides": {
-      "en": "Clear Owned Region Visual Overrides",
-      "zh": "清除已拥有区域的视觉覆盖"
-    },
-    "Core Territory Visuals": {
-      "en": "Core Territory Visuals",
-      "zh": "核心领土视觉"
-    },
-    "Country Visuals": {
-      "en": "Country Visuals",
-      "zh": "国家视觉"
-    },
-    "Hierarchy Groups (Visual Color)": {
-      "en": "Hierarchy Groups (Visual Color)",
-      "zh": "层级分组（视觉颜色）"
-    },
-    "Mode: Visual Color": {
-      "en": "Mode: Visual Color",
-      "zh": "模式：视觉颜色"
-    },
-    "No owned regions were recolored.": {
-      "en": "No owned regions were recolored.",
-      "zh": "没有已拥有区域被重新着色。"
-    },
-    "No visual overrides to clear.": {
-      "en": "No visual overrides to clear.",
-      "zh": "没有可清除的视觉覆盖。"
-    },
-    "Paint Owned Regions With Country Color": {
-      "en": "Paint Owned Regions With Country Color",
-      "zh": "用国家颜色重绘已拥有区域"
-    },
-    "Political Editing": {
-      "en": "Political Editing",
-      "zh": "政治编辑"
-    },
-    "Political Ownership": {
-      "en": "Political Ownership",
-      "zh": "政治归属"
-    },
-    "Political ownership editing already targets this releasable.": {
-      "en": "Political ownership editing already targets this releasable.",
-      "zh": "政治归属编辑已经指向这个可释放国。"
-    },
-    "Political ownership editing now targets the selected country.": {
-      "en": "Political ownership editing now targets the selected country.",
-      "zh": "政治归属编辑现在会作用于所选国家。"
-    },
-    "Political ownership editing now targets this releasable.": {
-      "en": "Political ownership editing now targets this releasable.",
-      "zh": "政治归属编辑现在会作用于这个可释放国。"
-    },
-    "Political ownership updated": {
-      "en": "Political ownership updated",
-      "zh": "政治归属已更新"
-    },
-    "Regional Presets (Visual Color)": {
-      "en": "Regional Presets (Visual Color)",
-      "zh": "区域预设（视觉颜色）"
-    },
-    "Reapply Core Territory": {
-      "en": "Reapply Core Territory",
-      "zh": "重新应用核心领土"
-    },
-    "Return to Political Ownership Brush": {
-      "en": "Return to Political Ownership Brush",
-      "zh": "返回政治归属画笔"
-    },
-    "Scenario Actions below change political ownership first. Open Visual Adjustments only for color-only edits.": {
-      "en": "Scenario Actions below change political ownership first. Open Visual Adjustments only for color-only edits.",
-      "zh": "下方的场景操作会优先修改政治归属。只有在需要纯颜色调整时才打开视觉调整。"
-    },
-    "Scenario Actions change political ownership and dynamic borders. Use Visual Adjustments for color-only edits.": {
-      "en": "Scenario Actions change political ownership and dynamic borders. Use Visual Adjustments for color-only edits.",
-      "zh": "场景操作会改变政治归属和动态边界。纯颜色调整请使用视觉调整。"
-    },
-    "Scenario loaded. Expand the parent country and use Activate to apply releasable territory.": {
-      "en": "Scenario loaded. Expand the parent country and use Activate to apply releasable territory.",
-      "zh": "场景已加载。展开母国并使用“激活”来应用可释放国领土。"
-    },
-    "Stop Using as Active Owner": {
-      "en": "Stop Using as Active Owner",
-      "zh": "停止用作激活所属"
-    },
-    "These actions only change visual color. Ownership, controllers, and dynamic borders stay unchanged.": {
-      "en": "These actions only change visual color. Ownership, controllers, and dynamic borders stay unchanged.",
-      "zh": "这些操作只会修改视觉颜色。归属、控制者和动态边界都不会改变。"
-    },
-    "Use Activate Releasable or Reapply Core Territory in Scenario Actions.": {
-      "en": "Use Activate Releasable or Reapply Core Territory in Scenario Actions.",
-      "zh": "请在 Scenario Actions 中使用“激活可释放国”或“重新应用核心领土”。"
-    },
-    "Use an active owner for political actions": {
-      "en": "Use an active owner for political actions",
-      "zh": "进行政治操作时使用激活所属"
-    },
-    "Use as Active Owner": {
-      "en": "Use as Active Owner",
-      "zh": "用作激活所属"
-    },
-    "Use Visual Color Brush": {
-      "en": "Use Visual Color Brush",
-      "zh": "使用视觉颜色画笔"
-    },
-    "Visual Adjustments": {
-      "en": "Visual Adjustments",
-      "zh": "视觉调整"
-    },
-    "Visual Color": {
-      "en": "Visual Color",
-      "zh": "视觉颜色"
-    },
-    "Visual color applied": {
-      "en": "Visual color applied",
-      "zh": "视觉颜色已应用"
-    },
-    "Visual overrides cleared": {
-      "en": "Visual overrides cleared",
-      "zh": "视觉覆盖已清除"
-    },
-    "Choose an active owner before changing political ownership.": {
-      "en": "Choose an active owner before changing political ownership.",
-      "zh": "更改政治归属前，请先选择激活所属。"
     }
   },
   "geo": {
@@ -8462,6 +8522,14 @@
       "en": "Benevento (IT)",
       "zh": "贝内文托"
     },
+    "Benešov": {
+      "en": "Benešov",
+      "zh": "贝内绍夫"
+    },
+    "Benešov (CZ)": {
+      "en": "Benešov (CZ)",
+      "zh": "Benešov (CZ)"
+    },
     "Benghazi": {
       "en": "Benghazi",
       "zh": "班加西"
@@ -8757,6 +8825,14 @@
     "Bernkastel-Wittlich [Rheinland-Pfalz]": {
       "en": "Bernkastel-Wittlich [Rheinland-Pfalz]",
       "zh": "贝恩卡斯特尔-维特利希"
+    },
+    "Beroun": {
+      "en": "Beroun",
+      "zh": "贝龙"
+    },
+    "Beroun (CZ)": {
+      "en": "Beroun (CZ)",
+      "zh": "Beroun (CZ)"
     },
     "Bershad": {
       "en": "Bershad",
@@ -9566,6 +9642,14 @@
       "en": "Blanco [Texas]",
       "zh": "布兰科"
     },
+    "Blansko": {
+      "en": "Blansko",
+      "zh": "布兰斯科"
+    },
+    "Blansko (CZ)": {
+      "en": "Blansko (CZ)",
+      "zh": "Blansko (CZ)"
+    },
     "Blaye": {
       "en": "Blaye",
       "zh": "布莱耶"
@@ -9761,6 +9845,10 @@
     "Bogucharsky District (RU)": {
       "en": "Bogucharsky District (RU)",
       "zh": "博古恰尔斯基区"
+    },
+    "Bohemia-Moravia Protectorate": {
+      "en": "Bohemia-Moravia Protectorate",
+      "zh": "波西米亚-摩拉维亚保护国"
     },
     "Bohodukhiv": {
       "en": "Bohodukhiv",
@@ -11018,6 +11106,22 @@
       "en": "Brive-la-Gaillarde (FR)",
       "zh": "布里夫拉盖亚尔德"
     },
+    "Brno-City": {
+      "en": "Brno-City",
+      "zh": "布尔诺市"
+    },
+    "Brno-City (CZ)": {
+      "en": "Brno-City (CZ)",
+      "zh": "Brno-City (CZ)"
+    },
+    "Brno-Country": {
+      "en": "Brno-Country",
+      "zh": "布尔诺乡村"
+    },
+    "Brno-Country (CZ)": {
+      "en": "Brno-Country (CZ)",
+      "zh": "Brno-Country (CZ)"
+    },
     "Brodsko-posavska županija": {
       "en": "Brodsko-posavska županija",
       "zh": "布罗茨科波萨夫斯卡县"
@@ -11165,6 +11269,14 @@
     "Brunei-Muara (BN)": {
       "en": "Brunei-Muara (BN)",
       "zh": "文莱-摩拉"
+    },
+    "Bruntál": {
+      "en": "Bruntál",
+      "zh": "布伦塔尔"
+    },
+    "Bruntál (CZ)": {
+      "en": "Bruntál (CZ)",
+      "zh": "Bruntál (CZ)"
     },
     "Brussels": {
       "en": "Brussels",
@@ -11928,7 +12040,7 @@
     },
     "Břeclav": {
       "en": "Břeclav",
-      "zh": "Břeclav"
+      "zh": "布热茨拉夫"
     },
     "Břeclav (CZ)": {
       "en": "Břeclav (CZ)",
@@ -14124,7 +14236,7 @@
     },
     "Cheb": {
       "en": "Cheb",
-      "zh": "Cheb"
+      "zh": "切布"
     },
     "Cheb (CZ)": {
       "en": "Cheb (CZ)",
@@ -15208,7 +15320,7 @@
     },
     "Chomutov": {
       "en": "Chomutov",
-      "zh": "Chomutov"
+      "zh": "霍穆托夫"
     },
     "Chomutov (CZ)": {
       "en": "Chomutov (CZ)",
@@ -15349,6 +15461,14 @@
     "Chorzów (PL)": {
       "en": "Chorzów (PL)",
       "zh": "霍茹夫"
+    },
+    "Chrudim": {
+      "en": "Chrudim",
+      "zh": "赫鲁丁"
+    },
+    "Chrudim (CZ)": {
+      "en": "Chrudim (CZ)",
+      "zh": "Chrudim (CZ)"
     },
     "Chuan Clique": {
       "en": "Chuan Clique",
@@ -19138,13 +19258,101 @@
       "en": "District Autonome De Yamoussoukro (CI)",
       "zh": "亚穆苏克罗自治区"
     },
+    "District of Banskk vtiavnica": {
+      "en": "District of Banskk vtiavnica",
+      "zh": "伏季亚夫尼察班斯克区"
+    },
+    "District of Banskk vtiavnica (SK)": {
+      "en": "District of Banskk vtiavnica (SK)",
+      "zh": "District of Banskk vtiavnica (SK)"
+    },
+    "District of Bansks Bystrica": {
+      "en": "District of Bansks Bystrica",
+      "zh": "班克斯区 比斯特里察"
+    },
+    "District of Bansks Bystrica (SK)": {
+      "en": "District of Bansks Bystrica (SK)",
+      "zh": "District of Bansks Bystrica (SK)"
+    },
+    "District of Bardejov": {
+      "en": "District of Bardejov",
+      "zh": "巴尔代约夫区"
+    },
+    "District of Bardejov (SK)": {
+      "en": "District of Bardejov (SK)",
+      "zh": "District of Bardejov (SK)"
+    },
+    "District of Bonovce nad Bebra*": {
+      "en": "District of Bonovce nad Bebra*",
+      "zh": "贝布拉河畔博诺夫采区*"
+    },
+    "District of Bonovce nad Bebra* (SK)": {
+      "en": "District of Bonovce nad Bebra* (SK)",
+      "zh": "District of Bonovce nad Bebra* (SK)"
+    },
+    "District of Bratislava I": {
+      "en": "District of Bratislava I",
+      "zh": "布拉迪斯拉发第一区"
+    },
+    "District of Bratislava I (SK)": {
+      "en": "District of Bratislava I (SK)",
+      "zh": "District of Bratislava I (SK)"
+    },
+    "District of Bratislava II": {
+      "en": "District of Bratislava II",
+      "zh": "布拉迪斯拉发第二区"
+    },
+    "District of Bratislava II (SK)": {
+      "en": "District of Bratislava II (SK)",
+      "zh": "District of Bratislava II (SK)"
+    },
+    "District of Bratislava III": {
+      "en": "District of Bratislava III",
+      "zh": "布拉迪斯拉发第三区"
+    },
+    "District of Bratislava III (SK)": {
+      "en": "District of Bratislava III (SK)",
+      "zh": "District of Bratislava III (SK)"
+    },
+    "District of Bratislava IV": {
+      "en": "District of Bratislava IV",
+      "zh": "布拉迪斯拉发四区"
+    },
+    "District of Bratislava IV (SK)": {
+      "en": "District of Bratislava IV (SK)",
+      "zh": "District of Bratislava IV (SK)"
+    },
     "District of Bratislava V": {
       "en": "District of Bratislava V",
-      "zh": "District of Bratislava V"
+      "zh": "布拉迪斯拉发五区"
     },
     "District of Bratislava V (SK)": {
       "en": "District of Bratislava V (SK)",
       "zh": "District of Bratislava V (SK)"
+    },
+    "District of Brezno": {
+      "en": "District of Brezno",
+      "zh": "布雷兹诺区"
+    },
+    "District of Brezno (SK)": {
+      "en": "District of Brezno (SK)",
+      "zh": "District of Brezno (SK)"
+    },
+    "District of Bytca": {
+      "en": "District of Bytca",
+      "zh": "比特卡区"
+    },
+    "District of Bytca (SK)": {
+      "en": "District of Bytca (SK)",
+      "zh": "District of Bytca (SK)"
+    },
+    "District of Cadca": {
+      "en": "District of Cadca",
+      "zh": "卡德卡区"
+    },
+    "District of Cadca (SK)": {
+      "en": "District of Cadca (SK)",
+      "zh": "District of Cadca (SK)"
     },
     "District of Columbia": {
       "en": "District of Columbia",
@@ -19154,17 +19362,129 @@
       "en": "District of Columbia (US)",
       "zh": "哥伦比亚特区"
     },
+    "District of Detva": {
+      "en": "District of Detva",
+      "zh": "德特瓦区"
+    },
+    "District of Detva (SK)": {
+      "en": "District of Detva (SK)",
+      "zh": "District of Detva (SK)"
+    },
+    "District of Dolne Kub": {
+      "en": "District of Dolne Kub",
+      "zh": "下库布区"
+    },
+    "District of Dolne Kub (SK)": {
+      "en": "District of Dolne Kub (SK)",
+      "zh": "District of Dolne Kub (SK)"
+    },
     "District of Dunajskn Streda": {
       "en": "District of Dunajskn Streda",
-      "zh": "District of Dunajskn Streda"
+      "zh": "多瑙斯特雷达区"
     },
     "District of Dunajskn Streda (SK)": {
       "en": "District of Dunajskn Streda (SK)",
       "zh": "District of Dunajskn Streda (SK)"
     },
+    "District of Gala": {
+      "en": "District of Gala",
+      "zh": "加拉区"
+    },
+    "District of Gala (SK)": {
+      "en": "District of Gala (SK)",
+      "zh": "District of Gala (SK)"
+    },
+    "District of Galanta": {
+      "en": "District of Galanta",
+      "zh": "加兰塔区"
+    },
+    "District of Galanta (SK)": {
+      "en": "District of Galanta (SK)",
+      "zh": "District of Galanta (SK)"
+    },
+    "District of Gelnica": {
+      "en": "District of Gelnica",
+      "zh": "格尔尼察区"
+    },
+    "District of Gelnica (SK)": {
+      "en": "District of Gelnica (SK)",
+      "zh": "District of Gelnica (SK)"
+    },
+    "District of Giar nad Hronom": {
+      "en": "District of Giar nad Hronom",
+      "zh": "赫罗农河畔贾尔区"
+    },
+    "District of Giar nad Hronom (SK)": {
+      "en": "District of Giar nad Hronom (SK)",
+      "zh": "District of Giar nad Hronom (SK)"
+    },
+    "District of Hlohovec": {
+      "en": "District of Hlohovec",
+      "zh": "赫洛霍韦茨区"
+    },
+    "District of Hlohovec (SK)": {
+      "en": "District of Hlohovec (SK)",
+      "zh": "District of Hlohovec (SK)"
+    },
+    "District of Humennn": {
+      "en": "District of Humennn",
+      "zh": "胡门区"
+    },
+    "District of Humennn (SK)": {
+      "en": "District of Humennn (SK)",
+      "zh": "District of Humennn (SK)"
+    },
+    "District of Ilava": {
+      "en": "District of Ilava",
+      "zh": "伊拉瓦区"
+    },
+    "District of Ilava (SK)": {
+      "en": "District of Ilava (SK)",
+      "zh": "District of Ilava (SK)"
+    },
+    "District of Kermarok": {
+      "en": "District of Kermarok",
+      "zh": "克马洛克区"
+    },
+    "District of Kermarok (SK)": {
+      "en": "District of Kermarok (SK)",
+      "zh": "District of Kermarok (SK)"
+    },
+    "District of Kolice I": {
+      "en": "District of Kolice I",
+      "zh": "科利策一区"
+    },
+    "District of Kolice I (SK)": {
+      "en": "District of Kolice I (SK)",
+      "zh": "District of Kolice I (SK)"
+    },
+    "District of Kolice II": {
+      "en": "District of Kolice II",
+      "zh": "科利采二区"
+    },
+    "District of Kolice II (SK)": {
+      "en": "District of Kolice II (SK)",
+      "zh": "District of Kolice II (SK)"
+    },
+    "District of Kolice III": {
+      "en": "District of Kolice III",
+      "zh": "科利采三区"
+    },
+    "District of Kolice III (SK)": {
+      "en": "District of Kolice III (SK)",
+      "zh": "District of Kolice III (SK)"
+    },
+    "District of Kolice IV": {
+      "en": "District of Kolice IV",
+      "zh": "科利采四区"
+    },
+    "District of Kolice IV (SK)": {
+      "en": "District of Kolice IV (SK)",
+      "zh": "District of Kolice IV (SK)"
+    },
     "District of Komprno": {
       "en": "District of Komprno",
-      "zh": "District of Komprno"
+      "zh": "科普诺区"
     },
     "District of Komprno (SK)": {
       "en": "District of Komprno (SK)",
@@ -19172,39 +19492,215 @@
     },
     "District of Kovice - okolie": {
       "en": "District of Kovice - okolie",
-      "zh": "District of Kovice - okolie"
+      "zh": "科维采区 - 奥科列"
     },
     "District of Kovice - okolie (SK)": {
       "en": "District of Kovice - okolie (SK)",
       "zh": "District of Kovice - okolie (SK)"
     },
+    "District of Krupina": {
+      "en": "District of Krupina",
+      "zh": "克鲁皮纳区"
+    },
+    "District of Krupina (SK)": {
+      "en": "District of Krupina (SK)",
+      "zh": "District of Krupina (SK)"
+    },
+    "District of Kysucki Novi Mesto": {
+      "en": "District of Kysucki Novi Mesto",
+      "zh": "基苏基新梅斯托区"
+    },
+    "District of Kysucki Novi Mesto (SK)": {
+      "en": "District of Kysucki Novi Mesto (SK)",
+      "zh": "District of Kysucki Novi Mesto (SK)"
+    },
     "District of Levice": {
       "en": "District of Levice",
-      "zh": "District of Levice"
+      "zh": "莱维采区"
     },
     "District of Levice (SK)": {
       "en": "District of Levice (SK)",
       "zh": "District of Levice (SK)"
     },
+    "District of Levoca": {
+      "en": "District of Levoca",
+      "zh": "莱沃卡区"
+    },
+    "District of Levoca (SK)": {
+      "en": "District of Levoca (SK)",
+      "zh": "District of Levoca (SK)"
+    },
+    "District of Liptovsk": {
+      "en": "District of Liptovsk",
+      "zh": "利托夫斯克区"
+    },
+    "District of Liptovsk (SK)": {
+      "en": "District of Liptovsk (SK)",
+      "zh": "District of Liptovsk (SK)"
+    },
     "District of Lucenec": {
       "en": "District of Lucenec",
-      "zh": "District of Lucenec"
+      "zh": "卢塞内茨区"
     },
     "District of Lucenec (SK)": {
       "en": "District of Lucenec (SK)",
       "zh": "District of Lucenec (SK)"
     },
+    "District of Malacky": {
+      "en": "District of Malacky",
+      "zh": "马拉茨基区"
+    },
+    "District of Malacky (SK)": {
+      "en": "District of Malacky (SK)",
+      "zh": "District of Malacky (SK)"
+    },
+    "District of Martin": {
+      "en": "District of Martin",
+      "zh": "马丁区"
+    },
+    "District of Martin (SK)": {
+      "en": "District of Martin (SK)",
+      "zh": "District of Martin (SK)"
+    },
+    "District of Medzilaborce": {
+      "en": "District of Medzilaborce",
+      "zh": "梅济拉博塞区"
+    },
+    "District of Medzilaborce (SK)": {
+      "en": "District of Medzilaborce (SK)",
+      "zh": "District of Medzilaborce (SK)"
+    },
+    "District of Michalovce": {
+      "en": "District of Michalovce",
+      "zh": "米哈洛夫采区"
+    },
+    "District of Michalovce (SK)": {
+      "en": "District of Michalovce (SK)",
+      "zh": "District of Michalovce (SK)"
+    },
+    "District of Myjava": {
+      "en": "District of Myjava",
+      "zh": "米亚瓦区"
+    },
+    "District of Myjava (SK)": {
+      "en": "District of Myjava (SK)",
+      "zh": "District of Myjava (SK)"
+    },
+    "District of Nitra": {
+      "en": "District of Nitra",
+      "zh": "尼特拉区"
+    },
+    "District of Nitra (SK)": {
+      "en": "District of Nitra (SK)",
+      "zh": "District of Nitra (SK)"
+    },
+    "District of Nova Mesto nad Va*": {
+      "en": "District of Nova Mesto nad Va*",
+      "zh": "弗吉尼亚州新梅斯托区*"
+    },
+    "District of Nova Mesto nad Va* (SK)": {
+      "en": "District of Nova Mesto nad Va* (SK)",
+      "zh": "District of Nova Mesto nad Va* (SK)"
+    },
     "District of Nova Zkmky": {
       "en": "District of Nova Zkmky",
-      "zh": "District of Nova Zkmky"
+      "zh": "新兹克姆基区"
     },
     "District of Nova Zkmky (SK)": {
       "en": "District of Nova Zkmky (SK)",
       "zh": "District of Nova Zkmky (SK)"
     },
+    "District of Numestovo": {
+      "en": "District of Numestovo",
+      "zh": "努梅斯托沃区"
+    },
+    "District of Numestovo (SK)": {
+      "en": "District of Numestovo (SK)",
+      "zh": "District of Numestovo (SK)"
+    },
+    "District of Partizonske": {
+      "en": "District of Partizonske",
+      "zh": "分区分区"
+    },
+    "District of Partizonske (SK)": {
+      "en": "District of Partizonske (SK)",
+      "zh": "District of Partizonske (SK)"
+    },
+    "District of Pezinok": {
+      "en": "District of Pezinok",
+      "zh": "佩济诺克区"
+    },
+    "District of Pezinok (SK)": {
+      "en": "District of Pezinok (SK)",
+      "zh": "District of Pezinok (SK)"
+    },
+    "District of Piertany": {
+      "en": "District of Piertany",
+      "zh": "皮尔塔尼区"
+    },
+    "District of Piertany (SK)": {
+      "en": "District of Piertany (SK)",
+      "zh": "District of Piertany (SK)"
+    },
+    "District of Pilina": {
+      "en": "District of Pilina",
+      "zh": "皮利纳区"
+    },
+    "District of Pilina (SK)": {
+      "en": "District of Pilina (SK)",
+      "zh": "District of Pilina (SK)"
+    },
+    "District of Poltcr": {
+      "en": "District of Poltcr",
+      "zh": "波尔特地区"
+    },
+    "District of Poltcr (SK)": {
+      "en": "District of Poltcr (SK)",
+      "zh": "District of Poltcr (SK)"
+    },
+    "District of Poprad": {
+      "en": "District of Poprad",
+      "zh": "波普拉德区"
+    },
+    "District of Poprad (SK)": {
+      "en": "District of Poprad (SK)",
+      "zh": "District of Poprad (SK)"
+    },
+    "District of Povacskn Bystrica": {
+      "en": "District of Povacskn Bystrica",
+      "zh": "波瓦茨肯区 比斯特里察"
+    },
+    "District of Povacskn Bystrica (SK)": {
+      "en": "District of Povacskn Bystrica (SK)",
+      "zh": "District of Povacskn Bystrica (SK)"
+    },
+    "District of Prchov": {
+      "en": "District of Prchov",
+      "zh": "普尔霍夫区"
+    },
+    "District of Prchov (SK)": {
+      "en": "District of Prchov (SK)",
+      "zh": "District of Prchov (SK)"
+    },
+    "District of Predov": {
+      "en": "District of Predov",
+      "zh": "普雷多夫区"
+    },
+    "District of Predov (SK)": {
+      "en": "District of Predov (SK)",
+      "zh": "District of Predov (SK)"
+    },
+    "District of Prievidza": {
+      "en": "District of Prievidza",
+      "zh": "普列维扎区"
+    },
+    "District of Prievidza (SK)": {
+      "en": "District of Prievidza (SK)",
+      "zh": "District of Prievidza (SK)"
+    },
     "District of Revnca": {
       "en": "District of Revnca",
-      "zh": "District of Revnca"
+      "zh": "雷文卡区"
     },
     "District of Revnca (SK)": {
       "en": "District of Revnca (SK)",
@@ -19212,7 +19708,7 @@
     },
     "District of Rimavsk": {
       "en": "District of Rimavsk",
-      "zh": "District of Rimavsk"
+      "zh": "里马夫斯克区"
     },
     "District of Rimavsk (SK)": {
       "en": "District of Rimavsk (SK)",
@@ -19220,27 +19716,187 @@
     },
     "District of Ronnava": {
       "en": "District of Ronnava",
-      "zh": "District of Ronnava"
+      "zh": "龙纳瓦区"
     },
     "District of Ronnava (SK)": {
       "en": "District of Ronnava (SK)",
       "zh": "District of Ronnava (SK)"
     },
+    "District of Ruromberok": {
+      "en": "District of Ruromberok",
+      "zh": "鲁龙贝洛克区"
+    },
+    "District of Ruromberok (SK)": {
+      "en": "District of Ruromberok (SK)",
+      "zh": "District of Ruromberok (SK)"
+    },
+    "District of Sabinov": {
+      "en": "District of Sabinov",
+      "zh": "萨比诺夫区"
+    },
+    "District of Sabinov (SK)": {
+      "en": "District of Sabinov (SK)",
+      "zh": "District of Sabinov (SK)"
+    },
+    "District of Senec": {
+      "en": "District of Senec",
+      "zh": "塞内茨区"
+    },
+    "District of Senec (SK)": {
+      "en": "District of Senec (SK)",
+      "zh": "District of Senec (SK)"
+    },
+    "District of Senica": {
+      "en": "District of Senica",
+      "zh": "塞尼察区"
+    },
+    "District of Senica (SK)": {
+      "en": "District of Senica (SK)",
+      "zh": "District of Senica (SK)"
+    },
+    "District of Skalica": {
+      "en": "District of Skalica",
+      "zh": "斯卡利察区"
+    },
+    "District of Skalica (SK)": {
+      "en": "District of Skalica (SK)",
+      "zh": "District of Skalica (SK)"
+    },
+    "District of Snina": {
+      "en": "District of Snina",
+      "zh": "斯尼纳区"
+    },
+    "District of Snina (SK)": {
+      "en": "District of Snina (SK)",
+      "zh": "District of Snina (SK)"
+    },
+    "District of Sobrance": {
+      "en": "District of Sobrance",
+      "zh": "索布兰斯区"
+    },
+    "District of Sobrance (SK)": {
+      "en": "District of Sobrance (SK)",
+      "zh": "District of Sobrance (SK)"
+    },
+    "District of Spieskn Novo Ves": {
+      "en": "District of Spieskn Novo Ves",
+      "zh": "新斯皮斯克恩区"
+    },
+    "District of Spieskn Novo Ves (SK)": {
+      "en": "District of Spieskn Novo Ves (SK)",
+      "zh": "District of Spieskn Novo Ves (SK)"
+    },
+    "District of Stark Lubovna": {
+      "en": "District of Stark Lubovna",
+      "zh": "斯塔克卢博夫纳区"
+    },
+    "District of Stark Lubovna (SK)": {
+      "en": "District of Stark Lubovna (SK)",
+      "zh": "District of Stark Lubovna (SK)"
+    },
+    "District of Stropkov": {
+      "en": "District of Stropkov",
+      "zh": "斯特罗普科夫区"
+    },
+    "District of Stropkov (SK)": {
+      "en": "District of Stropkov (SK)",
+      "zh": "District of Stropkov (SK)"
+    },
+    "District of Svidnsk": {
+      "en": "District of Svidnsk",
+      "zh": "斯维金斯克区"
+    },
+    "District of Svidnsk (SK)": {
+      "en": "District of Svidnsk (SK)",
+      "zh": "District of Svidnsk (SK)"
+    },
+    "District of Tarnovica": {
+      "en": "District of Tarnovica",
+      "zh": "特尔诺维察区"
+    },
+    "District of Tarnovica (SK)": {
+      "en": "District of Tarnovica (SK)",
+      "zh": "District of Tarnovica (SK)"
+    },
+    "District of Topolcany": {
+      "en": "District of Topolcany",
+      "zh": "托波尔恰尼区"
+    },
+    "District of Topolcany (SK)": {
+      "en": "District of Topolcany (SK)",
+      "zh": "District of Topolcany (SK)"
+    },
     "District of Trebi ov": {
       "en": "District of Trebi ov",
-      "zh": "District of Trebi ov"
+      "zh": "特雷比奥夫区"
     },
     "District of Trebi ov (SK)": {
       "en": "District of Trebi ov (SK)",
       "zh": "District of Trebi ov (SK)"
     },
+    "District of Trencon": {
+      "en": "District of Trencon",
+      "zh": "特伦孔区"
+    },
+    "District of Trencon (SK)": {
+      "en": "District of Trencon (SK)",
+      "zh": "District of Trencon (SK)"
+    },
+    "District of Trnava": {
+      "en": "District of Trnava",
+      "zh": "特尔纳瓦区"
+    },
+    "District of Trnava (SK)": {
+      "en": "District of Trnava (SK)",
+      "zh": "District of Trnava (SK)"
+    },
+    "District of Turcianske Teplice": {
+      "en": "District of Turcianske Teplice",
+      "zh": "图尔西安斯克特普利采区"
+    },
+    "District of Turcianske Teplice (SK)": {
+      "en": "District of Turcianske Teplice (SK)",
+      "zh": "District of Turcianske Teplice (SK)"
+    },
+    "District of Tvrdo": {
+      "en": "District of Tvrdo",
+      "zh": "特夫尔多区"
+    },
+    "District of Tvrdo (SK)": {
+      "en": "District of Tvrdo (SK)",
+      "zh": "District of Tvrdo (SK)"
+    },
     "District of Velka Krta": {
       "en": "District of Velka Krta",
-      "zh": "District of Velka Krta"
+      "zh": "大克尔塔区"
     },
     "District of Velka Krta (SK)": {
       "en": "District of Velka Krta (SK)",
       "zh": "District of Velka Krta (SK)"
+    },
+    "District of Vranov nad Toplou": {
+      "en": "District of Vranov nad Toplou",
+      "zh": "托普卢河畔弗拉诺夫区"
+    },
+    "District of Vranov nad Toplou (SK)": {
+      "en": "District of Vranov nad Toplou (SK)",
+      "zh": "District of Vranov nad Toplou (SK)"
+    },
+    "District of Zlatc Moravce": {
+      "en": "District of Zlatc Moravce",
+      "zh": "兹拉茨莫拉夫采区"
+    },
+    "District of Zlatc Moravce (SK)": {
+      "en": "District of Zlatc Moravce (SK)",
+      "zh": "District of Zlatc Moravce (SK)"
+    },
+    "District of Zvolen": {
+      "en": "District of Zvolen",
+      "zh": "兹沃伦区"
+    },
+    "District of Zvolen (SK)": {
+      "en": "District of Zvolen (SK)",
+      "zh": "District of Zvolen (SK)"
     },
     "Dithmarschen": {
       "en": "Dithmarschen",
@@ -19504,7 +20160,7 @@
     },
     "Domažlice": {
       "en": "Domažlice",
-      "zh": "Domažlice"
+      "zh": "多马日利采"
     },
     "Domažlice (CZ)": {
       "en": "Domažlice (CZ)",
@@ -20600,7 +21256,7 @@
     },
     "Děčín": {
       "en": "Děčín",
-      "zh": "Děčín"
+      "zh": "杰钦"
     },
     "Děčín (CZ)": {
       "en": "Děčín (CZ)",
@@ -23413,6 +24069,14 @@
     "Frosinone (IT)": {
       "en": "Frosinone (IT)",
       "zh": "弗罗西诺内"
+    },
+    "Frýdek-Místek": {
+      "en": "Frýdek-Místek",
+      "zh": "弗里德克-米斯泰克"
+    },
+    "Frýdek-Místek (CZ)": {
+      "en": "Frýdek-Místek (CZ)",
+      "zh": "Frýdek-Místek (CZ)"
     },
     "Fuan": {
       "en": "Fuan",
@@ -27156,7 +27820,7 @@
     },
     "HOI4 1939": {
       "en": "HOI4 1939",
-      "zh": "HOI4 1939"
+      "zh": "钢铁雄心4 1939"
     },
     "Ha": {
       "en": "Ha",
@@ -28225,6 +28889,14 @@
     "Havering": {
       "en": "Havering",
       "zh": "花园环"
+    },
+    "Havlíčkův Brod": {
+      "en": "Havlíčkův Brod",
+      "zh": "哈夫利库夫·布罗德"
+    },
+    "Havlíčkův Brod (CZ)": {
+      "en": "Havlíčkův Brod (CZ)",
+      "zh": "Havlíčkův Brod (CZ)"
     },
     "Havre": {
       "en": "Havre",
@@ -29330,6 +30002,14 @@
       "en": "Hodh El Gharbi (MR)",
       "zh": "霍德·埃尔·加尔比"
     },
+    "Hodonín": {
+      "en": "Hodonín",
+      "zh": "霍多宁"
+    },
+    "Hodonín (CZ)": {
+      "en": "Hodonín (CZ)",
+      "zh": "Hodonín (CZ)"
+    },
     "Hof, Kreisfreie Stadt": {
       "en": "Hof, Kreisfreie Stadt",
       "zh": "霍夫，无区市"
@@ -29701,6 +30381,14 @@
     "Howard [Texas]": {
       "en": "Howard [Texas]",
       "zh": "霍华德"
+    },
+    "Hradec Králové": {
+      "en": "Hradec Králové",
+      "zh": "赫拉德茨·克拉洛韦"
+    },
+    "Hradec Králové (CZ)": {
+      "en": "Hradec Králové (CZ)",
+      "zh": "Hradec Králové (CZ)"
     },
     "Hrebinka": {
       "en": "Hrebinka",
@@ -32154,6 +32842,14 @@
       "en": "Jabalpur (IN)",
       "zh": "贾巴尔普尔"
     },
+    "Jablonec nad Nisou": {
+      "en": "Jablonec nad Nisou",
+      "zh": "尼苏河畔亚布洛内茨"
+    },
+    "Jablonec nad Nisou (CZ)": {
+      "en": "Jablonec nad Nisou (CZ)",
+      "zh": "Jablonec nad Nisou (CZ)"
+    },
     "Jack": {
       "en": "Jack",
       "zh": "杰克"
@@ -32742,6 +33438,14 @@
       "en": "Jerusalem (IL)",
       "zh": "耶路撒冷"
     },
+    "Jeseník": {
+      "en": "Jeseník",
+      "zh": "耶塞尼克"
+    },
+    "Jeseník (CZ)": {
+      "en": "Jeseník (CZ)",
+      "zh": "Jeseník (CZ)"
+    },
     "Jhabua": {
       "en": "Jhabua",
       "zh": "贾布阿"
@@ -33262,6 +33966,14 @@
       "en": "Jigawa State (NG)",
       "zh": "吉加瓦州"
     },
+    "Jihlava": {
+      "en": "Jihlava",
+      "zh": "伊赫拉瓦"
+    },
+    "Jihlava (CZ)": {
+      "en": "Jihlava (CZ)",
+      "zh": "Jihlava (CZ)"
+    },
     "Jihomoravský kraj": {
       "en": "Jihomoravský kraj",
       "zh": "南摩拉维亚地区"
@@ -33408,7 +34120,7 @@
     },
     "Jindřichův Hradec": {
       "en": "Jindřichův Hradec",
-      "zh": "Jindřichův Hradec"
+      "zh": "因德日赫赫拉德茨"
     },
     "Jindřichův Hradec (CZ)": {
       "en": "Jindřichův Hradec (CZ)",
@@ -33953,6 +34665,14 @@
     "Jizzakh (UZ)": {
       "en": "Jizzakh (UZ)",
       "zh": "吉扎克"
+    },
+    "Jičín": {
+      "en": "Jičín",
+      "zh": "伊钦"
+    },
+    "Jičín (CZ)": {
+      "en": "Jičín (CZ)",
+      "zh": "Jičín (CZ)"
     },
     "Jodhpur": {
       "en": "Jodhpur",
@@ -35472,7 +36192,7 @@
     },
     "Karlovy Vary": {
       "en": "Karlovy Vary",
-      "zh": "Karlovy Vary"
+      "zh": "卡罗维发利"
     },
     "Karlovy Vary (CZ)": {
       "en": "Karlovy Vary (CZ)",
@@ -35573,6 +36293,14 @@
     "Karuzi (BI)": {
       "en": "Karuzi (BI)",
       "zh": "卡鲁兹"
+    },
+    "Karviná": {
+      "en": "Karviná",
+      "zh": "卡尔维纳"
+    },
+    "Karviná (CZ)": {
+      "en": "Karviná (CZ)",
+      "zh": "Karviná (CZ)"
     },
     "Kasaragod": {
       "en": "Kasaragod",
@@ -37506,6 +38234,14 @@
       "en": "Kiên Giang (VN)",
       "zh": "坚江省"
     },
+    "Kladno": {
+      "en": "Kladno",
+      "zh": "克拉德诺"
+    },
+    "Kladno (CZ)": {
+      "en": "Kladno (CZ)",
+      "zh": "Kladno (CZ)"
+    },
     "Klagenfurt-Villach": {
       "en": "Klagenfurt-Villach",
       "zh": "克拉根福-菲拉赫"
@@ -37524,7 +38260,7 @@
     },
     "Klatovy": {
       "en": "Klatovy",
-      "zh": "Klatovy"
+      "zh": "克拉托维"
     },
     "Klatovy (CZ)": {
       "en": "Klatovy (CZ)",
@@ -37905,6 +38641,14 @@
     "Kolyshleysky District (RU)": {
       "en": "Kolyshleysky District (RU)",
       "zh": "科雷什莱斯基区"
+    },
+    "Kolín": {
+      "en": "Kolín",
+      "zh": "科林"
+    },
+    "Kolín (CZ)": {
+      "en": "Kolín (CZ)",
+      "zh": "Kolín (CZ)"
     },
     "Komaram Bheem": {
       "en": "Komaram Bheem",
@@ -38958,6 +39702,14 @@
       "en": "Krolevets (UA)",
       "zh": "克罗莱维特"
     },
+    "Kroměříž": {
+      "en": "Kroměříž",
+      "zh": "克罗梅日什"
+    },
+    "Kroměříž (CZ)": {
+      "en": "Kroměříž (CZ)",
+      "zh": "Kroměříž (CZ)"
+    },
     "Kronach": {
       "en": "Kronach",
       "zh": "克罗纳赫"
@@ -39501,6 +40253,14 @@
     "Kusinsky District (RU)": {
       "en": "Kusinsky District (RU)",
       "zh": "库辛斯基区"
+    },
+    "Kutná Hora": {
+      "en": "Kutná Hora",
+      "zh": "库特纳霍拉"
+    },
+    "Kutná Hora (CZ)": {
+      "en": "Kutná Hora (CZ)",
+      "zh": "Kutná Hora (CZ)"
     },
     "Kuvandyksky District": {
       "en": "Kuvandyksky District",
@@ -41734,6 +42494,14 @@
       "en": "Liaozhongxian (CN)",
       "zh": "辽中县"
     },
+    "Liberec": {
+      "en": "Liberec",
+      "zh": "利贝雷茨"
+    },
+    "Liberec (CZ)": {
+      "en": "Liberec (CZ)",
+      "zh": "Liberec (CZ)"
+    },
     "Liberecký kraj": {
       "en": "Liberecký kraj",
       "zh": "利贝雷茨地区"
@@ -42517,6 +43285,14 @@
     "Lithuania": {
       "en": "Lithuania",
       "zh": "立陶宛"
+    },
+    "Litoměřice": {
+      "en": "Litoměřice",
+      "zh": "利托梅日采"
+    },
+    "Litoměřice (CZ)": {
+      "en": "Litoměřice (CZ)",
+      "zh": "Litoměřice (CZ)"
     },
     "Litoral": {
       "en": "Litoral",
@@ -43549,6 +44325,14 @@
     "Louisiana Zone 9 [Louisiana]": {
       "en": "Louisiana Zone 9 [Louisiana]",
       "zh": "路易斯安那州 9 区"
+    },
+    "Louny": {
+      "en": "Louny",
+      "zh": "卢尼"
+    },
+    "Louny (CZ)": {
+      "en": "Louny (CZ)",
+      "zh": "Louny (CZ)"
     },
     "Loving": {
       "en": "Loving",
@@ -49034,6 +49818,14 @@
       "en": "Mjini Magharibi (TZ)",
       "zh": "姆吉尼·马加里比"
     },
+    "Mladá Boleslav": {
+      "en": "Mladá Boleslav",
+      "zh": "姆拉达·博莱斯拉夫"
+    },
+    "Mladá Boleslav (CZ)": {
+      "en": "Mladá Boleslav (CZ)",
+      "zh": "Mladá Boleslav (CZ)"
+    },
     "Mlyniv": {
       "en": "Mlyniv",
       "zh": "姆利尼夫"
@@ -49912,7 +50704,7 @@
     },
     "Most": {
       "en": "Most",
-      "zh": "Most"
+      "zh": "最多"
     },
     "Most (CZ)": {
       "en": "Most (CZ)",
@@ -50765,6 +51557,14 @@
     "Mātara (LK)": {
       "en": "Mātara (LK)",
       "zh": "马塔拉"
+    },
+    "Mělník": {
+      "en": "Mělník",
+      "zh": "梅尔尼克"
+    },
+    "Mělník (CZ)": {
+      "en": "Mělník (CZ)",
+      "zh": "Mělník (CZ)"
     },
     "Mŏṇarāgala": {
       "en": "Mŏṇarāgala",
@@ -55334,6 +56134,14 @@
       "en": "Novyi Buh (UA)",
       "zh": "诺维·布赫"
     },
+    "Nový Jičín": {
+      "en": "Nový Jičín",
+      "zh": "新伊钦"
+    },
+    "Nový Jičín (CZ)": {
+      "en": "Nový Jičín (CZ)",
+      "zh": "Nový Jičín (CZ)"
+    },
     "Nowy Sącz": {
       "en": "Nowy Sącz",
       "zh": "新松奇"
@@ -55582,6 +56390,14 @@
       "en": "Nyazepetrovsky District (RU)",
       "zh": "尼亚泽彼得罗夫斯基区"
     },
+    "Nymburk": {
+      "en": "Nymburk",
+      "zh": "宁布尔克"
+    },
+    "Nymburk (CZ)": {
+      "en": "Nymburk (CZ)",
+      "zh": "Nymburk (CZ)"
+    },
     "Nyons": {
       "en": "Nyons",
       "zh": "尼永斯"
@@ -55629,6 +56445,14 @@
     "Nzerekore (GN)": {
       "en": "Nzerekore (GN)",
       "zh": "恩泽雷科雷"
+    },
+    "Náchod": {
+      "en": "Náchod",
+      "zh": "纳霍德"
+    },
+    "Náchod (CZ)": {
+      "en": "Náchod (CZ)",
+      "zh": "Náchod (CZ)"
     },
     "Nérac": {
       "en": "Nérac",
@@ -57290,6 +58114,14 @@
       "en": "Olkhovsky District (RU)",
       "zh": "奥尔霍夫斯基区"
     },
+    "Olomouc": {
+      "en": "Olomouc",
+      "zh": "奥洛穆茨"
+    },
+    "Olomouc (CZ)": {
+      "en": "Olomouc (CZ)",
+      "zh": "Olomouc (CZ)"
+    },
     "Olomoucký kraj": {
       "en": "Olomoucký kraj",
       "zh": "奥洛穆茨地区"
@@ -57437,6 +58269,14 @@
     "Oparinsky District (RU)": {
       "en": "Oparinsky District (RU)",
       "zh": "奥帕林斯基区"
+    },
+    "Opava": {
+      "en": "Opava",
+      "zh": "奥帕瓦"
+    },
+    "Opava (CZ)": {
+      "en": "Opava (CZ)",
+      "zh": "Opava (CZ)"
     },
     "Opochetsky District": {
       "en": "Opochetsky District",
@@ -58037,6 +58877,14 @@
     "Ostprignitz-Ruppin [Brandenburg]": {
       "en": "Ostprignitz-Ruppin [Brandenburg]",
       "zh": "奥斯特普里尼茨-鲁平"
+    },
+    "Ostrava-City": {
+      "en": "Ostrava-City",
+      "zh": "俄斯特拉发市"
+    },
+    "Ostrava-City (CZ)": {
+      "en": "Ostrava-City (CZ)",
+      "zh": "Ostrava-City (CZ)"
     },
     "Ostrogozhsky District": {
       "en": "Ostrogozhsky District",
@@ -58834,6 +59682,14 @@
       "en": "Parbhani (IN)",
       "zh": "帕尔巴尼"
     },
+    "Pardubice": {
+      "en": "Pardubice",
+      "zh": "帕尔杜比采"
+    },
+    "Pardubice (CZ)": {
+      "en": "Pardubice (CZ)",
+      "zh": "Pardubice (CZ)"
+    },
     "Pardubický kraj": {
       "en": "Pardubický kraj",
       "zh": "帕尔杜比采地区"
@@ -59273,6 +60129,14 @@
     "Peja (XK)": {
       "en": "Peja (XK)",
       "zh": "佩贾"
+    },
+    "Pelhřimov": {
+      "en": "Pelhřimov",
+      "zh": "佩尔赫日莫夫"
+    },
+    "Pelhřimov (CZ)": {
+      "en": "Pelhřimov (CZ)",
+      "zh": "Pelhřimov (CZ)"
     },
     "Peloponnese": {
       "en": "Peloponnese",
@@ -60866,6 +61730,30 @@
       "en": "Plyussky District (RU)",
       "zh": "普柳斯基区"
     },
+    "Plzeň-City": {
+      "en": "Plzeň-City",
+      "zh": "比尔森市"
+    },
+    "Plzeň-City (CZ)": {
+      "en": "Plzeň-City (CZ)",
+      "zh": "Plzeň-City (CZ)"
+    },
+    "Plzeň-North": {
+      "en": "Plzeň-North",
+      "zh": "比尔森北"
+    },
+    "Plzeň-North (CZ)": {
+      "en": "Plzeň-North (CZ)",
+      "zh": "Plzeň-North (CZ)"
+    },
+    "Plzeň-South": {
+      "en": "Plzeň-South",
+      "zh": "比尔森南"
+    },
+    "Plzeň-South (CZ)": {
+      "en": "Plzeň-South (CZ)",
+      "zh": "Plzeň-South (CZ)"
+    },
     "Plzeňský kraj": {
       "en": "Plzeňský kraj",
       "zh": "比尔森地区"
@@ -61468,7 +62356,7 @@
     },
     "Prachatice": {
       "en": "Prachatice",
-      "zh": "Prachatice"
+      "zh": "普拉查蒂采"
     },
     "Prachatice (CZ)": {
       "en": "Prachatice (CZ)",
@@ -61497,6 +62385,30 @@
     "Prades (FR)": {
       "en": "Prades (FR)",
       "zh": "梅多斯"
+    },
+    "Prague": {
+      "en": "Prague",
+      "zh": "布拉格"
+    },
+    "Prague (CZ)": {
+      "en": "Prague (CZ)",
+      "zh": "Prague (CZ)"
+    },
+    "Prague-East": {
+      "en": "Prague-East",
+      "zh": "布拉格东区"
+    },
+    "Prague-East (CZ)": {
+      "en": "Prague-East (CZ)",
+      "zh": "Prague-East (CZ)"
+    },
+    "Prague-West": {
+      "en": "Prague-West",
+      "zh": "布拉格西部"
+    },
+    "Prague-West (CZ)": {
+      "en": "Prague-West (CZ)",
+      "zh": "Prague-West (CZ)"
     },
     "Prahova": {
       "en": "Prahova",
@@ -61777,6 +62689,14 @@
     "Pronsky District (RU)": {
       "en": "Pronsky District (RU)",
       "zh": "普龙斯基区"
+    },
+    "Prostějov": {
+      "en": "Prostějov",
+      "zh": "普罗斯捷约夫"
+    },
+    "Prostějov (CZ)": {
+      "en": "Prostějov (CZ)",
+      "zh": "Prostějov (CZ)"
     },
     "Protvino urban okrug": {
       "en": "Protvino urban okrug",
@@ -62650,6 +63570,14 @@
       "en": "Péronne (FR)",
       "zh": "佩罗内"
     },
+    "Písek": {
+      "en": "Písek",
+      "zh": "皮塞克"
+    },
+    "Písek (CZ)": {
+      "en": "Písek (CZ)",
+      "zh": "Písek (CZ)"
+    },
     "Põhja-Eesti": {
       "en": "Põhja-Eesti",
       "zh": "爱沙尼亚北部"
@@ -62673,6 +63601,22 @@
     "Pŏḷŏnnaruva (LK)": {
       "en": "Pŏḷŏnnaruva (LK)",
       "zh": "普什纳鲁瓦"
+    },
+    "Přerov": {
+      "en": "Přerov",
+      "zh": "普热罗夫"
+    },
+    "Přerov (CZ)": {
+      "en": "Přerov (CZ)",
+      "zh": "Přerov (CZ)"
+    },
+    "Příbram": {
+      "en": "Příbram",
+      "zh": "普日布拉姆"
+    },
+    "Příbram (CZ)": {
+      "en": "Příbram (CZ)",
+      "zh": "Příbram (CZ)"
     },
     "Qacha's Nek": {
       "en": "Qacha's Nek",
@@ -63833,6 +64777,14 @@
     "Rakityansky District (RU)": {
       "en": "Rakityansky District (RU)",
       "zh": "拉基延斯基区"
+    },
+    "Rakovnik": {
+      "en": "Rakovnik",
+      "zh": "拉科夫尼克"
+    },
+    "Rakovnik (CZ)": {
+      "en": "Rakovnik (CZ)",
+      "zh": "Rakovnik (CZ)"
     },
     "Ramanagara": {
       "en": "Ramanagara",
@@ -65281,6 +66233,14 @@
     "Roi Et (TH)": {
       "en": "Roi Et (TH)",
       "zh": "国王和"
+    },
+    "Rokycany": {
+      "en": "Rokycany",
+      "zh": "罗基卡尼"
+    },
+    "Rokycany (CZ)": {
+      "en": "Rokycany (CZ)",
+      "zh": "Rokycany (CZ)"
     },
     "Rokytne": {
       "en": "Rokytne",
@@ -67113,6 +68073,14 @@
     "Rybnovsky District (RU)": {
       "en": "Rybnovsky District (RU)",
       "zh": "雷布诺夫斯基区"
+    },
+    "Rychnov nad Kněžnou": {
+      "en": "Rychnov nad Kněžnou",
+      "zh": "克涅兹努河畔里赫诺夫"
+    },
+    "Rychnov nad Kněžnou (CZ)": {
+      "en": "Rychnov nad Kněžnou (CZ)",
+      "zh": "Rychnov nad Kněžnou (CZ)"
     },
     "Rylsky District": {
       "en": "Rylsky District",
@@ -69733,6 +70701,14 @@
     "Semiluksky District (RU)": {
       "en": "Semiluksky District (RU)",
       "zh": "塞米卢克斯区"
+    },
+    "Semily": {
+      "en": "Semily",
+      "zh": "塞米利"
+    },
+    "Semily (CZ)": {
+      "en": "Semily (CZ)",
+      "zh": "Semily (CZ)"
     },
     "Seminole": {
       "en": "Seminole",
@@ -72488,7 +73464,7 @@
     },
     "Sokolov": {
       "en": "Sokolov",
-      "zh": "Sokolov"
+      "zh": "索科洛夫"
     },
     "Sokolov (CZ)": {
       "en": "Sokolov (CZ)",
@@ -74746,6 +75722,14 @@
       "en": "Strabane",
       "zh": "斯特拉巴内"
     },
+    "Strakonice": {
+      "en": "Strakonice",
+      "zh": "斯特拉科尼采"
+    },
+    "Strakonice (CZ)": {
+      "en": "Strakonice (CZ)",
+      "zh": "Strakonice (CZ)"
+    },
     "Strasbourg": {
       "en": "Strasbourg",
       "zh": "斯特拉斯堡"
@@ -75626,6 +76610,14 @@
       "en": "Svetly (RU)",
       "zh": "斯维特利"
     },
+    "Svitavy": {
+      "en": "Svitavy",
+      "zh": "斯维塔维"
+    },
+    "Svitavy (CZ)": {
+      "en": "Svitavy (CZ)",
+      "zh": "Svitavy (CZ)"
+    },
     "Svitlovodsk": {
       "en": "Svitlovodsk",
       "zh": "斯维特洛沃茨克"
@@ -76144,7 +77136,7 @@
     },
     "Tachov": {
       "en": "Tachov",
-      "zh": "Tachov"
+      "zh": "塔霍夫"
     },
     "Tachov (CZ)": {
       "en": "Tachov (CZ)",
@@ -77488,7 +78480,7 @@
     },
     "Teplice": {
       "en": "Teplice",
-      "zh": "Teplice"
+      "zh": "特普利采"
     },
     "Teplice (CZ)": {
       "en": "Teplice (CZ)",
@@ -79426,6 +80418,14 @@
       "en": "Trunovsky District (RU)",
       "zh": "特鲁诺夫斯基区"
     },
+    "Trutnov": {
+      "en": "Trutnov",
+      "zh": "特鲁特诺夫"
+    },
+    "Trutnov (CZ)": {
+      "en": "Trutnov (CZ)",
+      "zh": "Trutnov (CZ)"
+    },
     "Trà Vinh": {
       "en": "Trà Vinh",
       "zh": "茶荣"
@@ -79966,6 +80966,14 @@
       "en": "Tyvriv (UA)",
       "zh": "特夫里夫"
     },
+    "Tábor": {
+      "en": "Tábor",
+      "zh": "塔博尔"
+    },
+    "Tábor (CZ)": {
+      "en": "Tábor (CZ)",
+      "zh": "Tábor (CZ)"
+    },
     "Tâmega e Sousa": {
       "en": "Tâmega e Sousa",
       "zh": "塔梅加和索萨"
@@ -80009,6 +81017,14 @@
     "Tübingen, Landkreis [Baden-Württemberg]": {
       "en": "Tübingen, Landkreis [Baden-Württemberg]",
       "zh": "蒂宾根区"
+    },
+    "Třebíč": {
+      "en": "Třebíč",
+      "zh": "特热比奇"
+    },
+    "Třebíč (CZ)": {
+      "en": "Třebíč (CZ)",
+      "zh": "Třebíč (CZ)"
     },
     "Tərtər": {
       "en": "Tərtər",
@@ -80173,6 +81189,14 @@
     "Ugransky District (RU)": {
       "en": "Ugransky District (RU)",
       "zh": "乌格兰斯基区"
+    },
+    "Uherské Hradiště": {
+      "en": "Uherské Hradiště",
+      "zh": "乌赫尔堡"
+    },
+    "Uherské Hradiště (CZ)": {
+      "en": "Uherské Hradiště (CZ)",
+      "zh": "Uherské Hradiště (CZ)"
     },
     "Uinsky District": {
       "en": "Uinsky District",
@@ -83342,6 +84366,14 @@
       "en": "Vrancea (RO)",
       "zh": "弗朗恰"
     },
+    "Vsetín": {
+      "en": "Vsetín",
+      "zh": "弗塞廷"
+    },
+    "Vsetín (CZ)": {
+      "en": "Vsetín (CZ)",
+      "zh": "Vsetín (CZ)"
+    },
     "Vsevolozhsky District": {
       "en": "Vsevolozhsky District",
       "zh": "弗谢沃洛日斯基区"
@@ -83513,6 +84545,14 @@
     "Vyzhnytsia (UA)": {
       "en": "Vyzhnytsia (UA)",
       "zh": "维日尼察"
+    },
+    "Vyškov": {
+      "en": "Vyškov",
+      "zh": "维什科夫"
+    },
+    "Vyškov (CZ)": {
+      "en": "Vyškov (CZ)",
+      "zh": "Vyškov (CZ)"
     },
     "Vâlcea": {
       "en": "Vâlcea",
@@ -91518,6 +92558,14 @@
       "en": "Zlynkovsky District (RU)",
       "zh": "兹林科夫斯基区"
     },
+    "Zlín": {
+      "en": "Zlín",
+      "zh": "兹林"
+    },
+    "Zlín (CZ)": {
+      "en": "Zlín (CZ)",
+      "zh": "Zlín (CZ)"
+    },
     "Zlínský kraj": {
       "en": "Zlínský kraj",
       "zh": "兹林地区"
@@ -91556,7 +92604,7 @@
     },
     "Znojmo": {
       "en": "Znojmo",
-      "zh": "Znojmo"
+      "zh": "兹诺伊莫"
     },
     "Znojmo (CZ)": {
       "en": "Znojmo (CZ)",
@@ -105554,77 +106602,313 @@
       "en": "Moravskoslezský kraj",
       "zh": "摩拉维亚-西里西亚地区"
     },
+    "id::CZ_ADM2_57006924B10100479283290": {
+      "en": "Strakonice",
+      "zh": "斯特拉科尼采"
+    },
+    "id::CZ_ADM2_57006924B10827026185454": {
+      "en": "Prague-West",
+      "zh": "布拉格西部"
+    },
+    "id::CZ_ADM2_57006924B13474079400168": {
+      "en": "Opava",
+      "zh": "奥帕瓦"
+    },
+    "id::CZ_ADM2_57006924B13920789422451": {
+      "en": "Ostrava-City",
+      "zh": "俄斯特拉发市"
+    },
+    "id::CZ_ADM2_57006924B14129056192165": {
+      "en": "Chrudim",
+      "zh": "赫鲁丁"
+    },
+    "id::CZ_ADM2_57006924B14436380449594": {
+      "en": "Uherské Hradiště",
+      "zh": "乌赫尔堡"
+    },
+    "id::CZ_ADM2_57006924B17496332064462": {
+      "en": "Přerov",
+      "zh": "普热罗夫"
+    },
+    "id::CZ_ADM2_57006924B20341688327038": {
+      "en": "Prostějov",
+      "zh": "普罗斯捷约夫"
+    },
     "id::CZ_ADM2_57006924B20358302460191": {
       "en": "Sokolov",
-      "zh": "Sokolov"
+      "zh": "索科洛夫"
     },
     "id::CZ_ADM2_57006924B21154438881940": {
       "en": "Český Krumlov",
-      "zh": "Český Krumlov"
+      "zh": "捷克克鲁姆洛夫"
+    },
+    "id::CZ_ADM2_57006924B23642111246292": {
+      "en": "Kutná Hora",
+      "zh": "库特纳霍拉"
+    },
+    "id::CZ_ADM2_57006924B24749184311211": {
+      "en": "Plzeň-North",
+      "zh": "比尔森北"
+    },
+    "id::CZ_ADM2_57006924B25962740711880": {
+      "en": "Kolín",
+      "zh": "科林"
     },
     "id::CZ_ADM2_57006924B26083217891381": {
       "en": "Česká Lípa",
-      "zh": "Česká Lípa"
+      "zh": "捷克利帕"
+    },
+    "id::CZ_ADM2_57006924B26466431753540": {
+      "en": "Plzeň-South",
+      "zh": "比尔森南"
+    },
+    "id::CZ_ADM2_57006924B26779967263881": {
+      "en": "Semily",
+      "zh": "塞米利"
+    },
+    "id::CZ_ADM2_57006924B28286346415780": {
+      "en": "Litoměřice",
+      "zh": "利托梅日采"
+    },
+    "id::CZ_ADM2_57006924B30982913442521": {
+      "en": "Ústí nad Orlicí",
+      "zh": "奥尔利西河畔乌斯季"
     },
     "id::CZ_ADM2_57006924B32669310027153": {
       "en": "Chomutov",
-      "zh": "Chomutov"
+      "zh": "霍穆托夫"
+    },
+    "id::CZ_ADM2_57006924B32813693256962": {
+      "en": "Pardubice",
+      "zh": "帕尔杜比采"
     },
     "id::CZ_ADM2_57006924B34464963037986": {
       "en": "Prachatice",
-      "zh": "Prachatice"
+      "zh": "普拉查蒂采"
+    },
+    "id::CZ_ADM2_57006924B35034257273333": {
+      "en": "Jihlava",
+      "zh": "伊赫拉瓦"
+    },
+    "id::CZ_ADM2_57006924B3568693077695": {
+      "en": "Liberec",
+      "zh": "利贝雷茨"
+    },
+    "id::CZ_ADM2_57006924B37669195364586": {
+      "en": "Vyškov",
+      "zh": "维什科夫"
+    },
+    "id::CZ_ADM2_57006924B40201864279221": {
+      "en": "Náchod",
+      "zh": "纳霍德"
+    },
+    "id::CZ_ADM2_57006924B40654694205882": {
+      "en": "Louny",
+      "zh": "卢尼"
+    },
+    "id::CZ_ADM2_57006924B42074087272310": {
+      "en": "Rakovnik",
+      "zh": "拉科夫尼克"
+    },
+    "id::CZ_ADM2_57006924B42369994804969": {
+      "en": "Třebíč",
+      "zh": "特热比奇"
+    },
+    "id::CZ_ADM2_57006924B46613202139284": {
+      "en": "Mělník",
+      "zh": "梅尔尼克"
+    },
+    "id::CZ_ADM2_57006924B47389261447584": {
+      "en": "Pelhřimov",
+      "zh": "佩尔赫日莫夫"
+    },
+    "id::CZ_ADM2_57006924B48131365256783": {
+      "en": "Žďár nad Sázavou",
+      "zh": "萨扎瓦河畔扎尔"
+    },
+    "id::CZ_ADM2_57006924B48464151885273": {
+      "en": "Příbram",
+      "zh": "普日布拉姆"
+    },
+    "id::CZ_ADM2_57006924B50363024387408": {
+      "en": "Trutnov",
+      "zh": "特鲁特诺夫"
     },
     "id::CZ_ADM2_57006924B50757157558324": {
       "en": "Karlovy Vary",
-      "zh": "Karlovy Vary"
+      "zh": "卡罗维发利"
     },
     "id::CZ_ADM2_57006924B55732331485961": {
       "en": "Tachov",
-      "zh": "Tachov"
+      "zh": "塔霍夫"
+    },
+    "id::CZ_ADM2_57006924B55772558323280": {
+      "en": "Jablonec nad Nisou",
+      "zh": "尼苏河畔亚布洛内茨"
     },
     "id::CZ_ADM2_57006924B56764577868008": {
       "en": "Břeclav",
-      "zh": "Břeclav"
+      "zh": "布热茨拉夫"
     },
     "id::CZ_ADM2_57006924B57972685793284": {
       "en": "Děčín",
-      "zh": "Děčín"
+      "zh": "杰钦"
     },
     "id::CZ_ADM2_57006924B5960993849333": {
       "en": "Ústí nad Labem",
-      "zh": "Ústí nad Labem"
+      "zh": "拉贝河畔乌斯季"
+    },
+    "id::CZ_ADM2_57006924B59836523347755": {
+      "en": "Kroměříž",
+      "zh": "克罗梅日什"
+    },
+    "id::CZ_ADM2_57006924B60448668577783": {
+      "en": "Písek",
+      "zh": "皮塞克"
+    },
+    "id::CZ_ADM2_57006924B61075462930500": {
+      "en": "Šumperk",
+      "zh": "顺佩尔克"
+    },
+    "id::CZ_ADM2_57006924B6194040717331": {
+      "en": "Brno-City",
+      "zh": "布尔诺市"
+    },
+    "id::CZ_ADM2_57006924B61995402941039": {
+      "en": "Jičín",
+      "zh": "伊钦"
+    },
+    "id::CZ_ADM2_57006924B62007249383837": {
+      "en": "Olomouc",
+      "zh": "奥洛穆茨"
+    },
+    "id::CZ_ADM2_57006924B6298598328883": {
+      "en": "Prague",
+      "zh": "布拉格"
+    },
+    "id::CZ_ADM2_57006924B63031935780571": {
+      "en": "Karviná",
+      "zh": "卡尔维纳"
+    },
+    "id::CZ_ADM2_57006924B65385651307074": {
+      "en": "Vsetín",
+      "zh": "弗塞廷"
+    },
+    "id::CZ_ADM2_57006924B65826634483108": {
+      "en": "Zlín",
+      "zh": "兹林"
     },
     "id::CZ_ADM2_57006924B6655388448820": {
       "en": "Teplice",
-      "zh": "Teplice"
+      "zh": "特普利采"
+    },
+    "id::CZ_ADM2_57006924B67004616478789": {
+      "en": "Rychnov nad Kněžnou",
+      "zh": "克涅兹努河畔里赫诺夫"
     },
     "id::CZ_ADM2_57006924B67285149942805": {
       "en": "Jindřichův Hradec",
-      "zh": "Jindřichův Hradec"
+      "zh": "因德日赫赫拉德茨"
     },
     "id::CZ_ADM2_57006924B71753966872420": {
       "en": "Most",
-      "zh": "Most"
+      "zh": "最多"
     },
     "id::CZ_ADM2_57006924B72008682408189": {
       "en": "Klatovy",
-      "zh": "Klatovy"
+      "zh": "克拉托维"
+    },
+    "id::CZ_ADM2_57006924B72367242001240": {
+      "en": "Benešov",
+      "zh": "贝内绍夫"
     },
     "id::CZ_ADM2_57006924B73132069516203": {
       "en": "České Budějovice",
-      "zh": "České Budějovice"
+      "zh": "捷克布杰约维采"
+    },
+    "id::CZ_ADM2_57006924B74433439756021": {
+      "en": "Tábor",
+      "zh": "塔博尔"
     },
     "id::CZ_ADM2_57006924B74936445485800": {
       "en": "Cheb",
-      "zh": "Cheb"
+      "zh": "切布"
+    },
+    "id::CZ_ADM2_57006924B76318940607058": {
+      "en": "Rokycany",
+      "zh": "罗基卡尼"
+    },
+    "id::CZ_ADM2_57006924B81305487356227": {
+      "en": "Nový Jičín",
+      "zh": "新伊钦"
+    },
+    "id::CZ_ADM2_57006924B82111344983201": {
+      "en": "Hodonín",
+      "zh": "霍多宁"
+    },
+    "id::CZ_ADM2_57006924B82146122340181": {
+      "en": "Beroun",
+      "zh": "贝龙"
+    },
+    "id::CZ_ADM2_57006924B85481167833175": {
+      "en": "Havlíčkův Brod",
+      "zh": "哈夫利库夫·布罗德"
+    },
+    "id::CZ_ADM2_57006924B86980162402648": {
+      "en": "Mladá Boleslav",
+      "zh": "姆拉达·博莱斯拉夫"
+    },
+    "id::CZ_ADM2_57006924B8762756005554": {
+      "en": "Jeseník",
+      "zh": "耶塞尼克"
+    },
+    "id::CZ_ADM2_57006924B88312395520389": {
+      "en": "Brno-Country",
+      "zh": "布尔诺乡村"
+    },
+    "id::CZ_ADM2_57006924B8877246488305": {
+      "en": "Svitavy",
+      "zh": "斯维塔维"
+    },
+    "id::CZ_ADM2_57006924B90019795994252": {
+      "en": "Blansko",
+      "zh": "布兰斯科"
+    },
+    "id::CZ_ADM2_57006924B90452896246775": {
+      "en": "Bruntál",
+      "zh": "布伦塔尔"
+    },
+    "id::CZ_ADM2_57006924B9167412778740": {
+      "en": "Prague-East",
+      "zh": "布拉格东区"
+    },
+    "id::CZ_ADM2_57006924B91865699855455": {
+      "en": "Frýdek-Místek",
+      "zh": "弗里德克-米斯泰克"
     },
     "id::CZ_ADM2_57006924B92931687173289": {
       "en": "Domažlice",
-      "zh": "Domažlice"
+      "zh": "多马日利采"
     },
     "id::CZ_ADM2_57006924B95695201424764": {
       "en": "Znojmo",
-      "zh": "Znojmo"
+      "zh": "兹诺伊莫"
+    },
+    "id::CZ_ADM2_57006924B96542005161261": {
+      "en": "Plzeň-City",
+      "zh": "比尔森市"
+    },
+    "id::CZ_ADM2_57006924B9844142294582": {
+      "en": "Nymburk",
+      "zh": "宁布尔克"
+    },
+    "id::CZ_ADM2_57006924B98928131689088": {
+      "en": "Hradec Králové",
+      "zh": "赫拉德茨·克拉洛韦"
+    },
+    "id::CZ_ADM2_57006924B99788800999519": {
+      "en": "Kladno",
+      "zh": "克拉德诺"
     },
     "id::DE": {
       "en": "id::DE",
@@ -128178,53 +129462,321 @@
       "en": "Košický kraj",
       "zh": "科希策地区"
     },
+    "id::SK_ADM2_56367889B11470427915377": {
+      "en": "District of Levoca",
+      "zh": "莱沃卡区"
+    },
+    "id::SK_ADM2_56367889B12595131960891": {
+      "en": "District of Pezinok",
+      "zh": "佩济诺克区"
+    },
+    "id::SK_ADM2_56367889B13739678014174": {
+      "en": "District of Tarnovica",
+      "zh": "特尔诺维察区"
+    },
+    "id::SK_ADM2_56367889B14109704827124": {
+      "en": "District of Bansks Bystrica",
+      "zh": "班克斯区 比斯特里察"
+    },
     "id::SK_ADM2_56367889B1447043738985": {
       "en": "District of Kovice - okolie",
-      "zh": "District of Kovice - okolie"
+      "zh": "科维采区 - 奥科列"
+    },
+    "id::SK_ADM2_56367889B14569056094647": {
+      "en": "District of Snina",
+      "zh": "斯尼纳区"
     },
     "id::SK_ADM2_56367889B15205076567490": {
       "en": "District of Rimavsk",
-      "zh": "District of Rimavsk"
+      "zh": "里马夫斯克区"
     },
     "id::SK_ADM2_56367889B15407569919112": {
       "en": "District of Levice",
-      "zh": "District of Levice"
+      "zh": "莱维采区"
+    },
+    "id::SK_ADM2_56367889B15992044775212": {
+      "en": "District of Prievidza",
+      "zh": "普列维扎区"
+    },
+    "id::SK_ADM2_56367889B16879144707830": {
+      "en": "District of Kolice I",
+      "zh": "科利策一区"
+    },
+    "id::SK_ADM2_56367889B17286119603144": {
+      "en": "District of Trencon",
+      "zh": "特伦孔区"
+    },
+    "id::SK_ADM2_56367889B18200948818921": {
+      "en": "District of Bardejov",
+      "zh": "巴尔代约夫区"
+    },
+    "id::SK_ADM2_56367889B24002183790147": {
+      "en": "District of Stark Lubovna",
+      "zh": "斯塔克卢博夫纳区"
+    },
+    "id::SK_ADM2_56367889B25974753894430": {
+      "en": "District of Numestovo",
+      "zh": "努梅斯托沃区"
+    },
+    "id::SK_ADM2_56367889B26614689162342": {
+      "en": "District of Bonovce nad Bebra*",
+      "zh": "贝布拉河畔博诺夫采区*"
     },
     "id::SK_ADM2_56367889B27848609458937": {
       "en": "District of Komprno",
-      "zh": "District of Komprno"
+      "zh": "科普诺区"
+    },
+    "id::SK_ADM2_56367889B2947656286883": {
+      "en": "District of Povacskn Bystrica",
+      "zh": "波瓦茨肯区 比斯特里察"
+    },
+    "id::SK_ADM2_56367889B31819457643233": {
+      "en": "District of Turcianske Teplice",
+      "zh": "图尔西安斯克特普利采区"
     },
     "id::SK_ADM2_56367889B31823009041462": {
       "en": "District of Revnca",
-      "zh": "District of Revnca"
+      "zh": "雷文卡区"
+    },
+    "id::SK_ADM2_56367889B34538662559621": {
+      "en": "District of Skalica",
+      "zh": "斯卡利察区"
+    },
+    "id::SK_ADM2_56367889B36066360363210": {
+      "en": "District of Liptovsk",
+      "zh": "利托夫斯克区"
+    },
+    "id::SK_ADM2_56367889B37832117679378": {
+      "en": "District of Gelnica",
+      "zh": "格尔尼察区"
+    },
+    "id::SK_ADM2_56367889B38418286781664": {
+      "en": "District of Piertany",
+      "zh": "皮尔塔尼区"
+    },
+    "id::SK_ADM2_56367889B40145685208334": {
+      "en": "District of Martin",
+      "zh": "马丁区"
+    },
+    "id::SK_ADM2_56367889B40480781512108": {
+      "en": "District of Bratislava I",
+      "zh": "布拉迪斯拉发第一区"
+    },
+    "id::SK_ADM2_56367889B42847558326348": {
+      "en": "District of Zlatc Moravce",
+      "zh": "兹拉茨莫拉夫采区"
+    },
+    "id::SK_ADM2_56367889B45513137004516": {
+      "en": "District of Predov",
+      "zh": "普雷多夫区"
+    },
+    "id::SK_ADM2_56367889B46930466225258": {
+      "en": "District of Kolice II",
+      "zh": "科利采二区"
+    },
+    "id::SK_ADM2_56367889B47622109691322": {
+      "en": "District of Spieskn Novo Ves",
+      "zh": "新斯皮斯克恩区"
+    },
+    "id::SK_ADM2_56367889B48474668858137": {
+      "en": "District of Pilina",
+      "zh": "皮利纳区"
+    },
+    "id::SK_ADM2_56367889B4918056975771": {
+      "en": "District of Gala",
+      "zh": "加拉区"
+    },
+    "id::SK_ADM2_56367889B50353875052402": {
+      "en": "District of Bytca",
+      "zh": "比特卡区"
     },
     "id::SK_ADM2_56367889B50490339994693": {
       "en": "District of Ronnava",
-      "zh": "District of Ronnava"
+      "zh": "龙纳瓦区"
+    },
+    "id::SK_ADM2_56367889B51237059400968": {
+      "en": "District of Bratislava IV",
+      "zh": "布拉迪斯拉发四区"
+    },
+    "id::SK_ADM2_56367889B51496625279666": {
+      "en": "District of Kermarok",
+      "zh": "克马洛克区"
+    },
+    "id::SK_ADM2_56367889B51514564384482": {
+      "en": "District of Nitra",
+      "zh": "尼特拉区"
+    },
+    "id::SK_ADM2_56367889B52678955481324": {
+      "en": "District of Kysucki Novi Mesto",
+      "zh": "基苏基新梅斯托区"
+    },
+    "id::SK_ADM2_56367889B53553144532917": {
+      "en": "District of Brezno",
+      "zh": "布雷兹诺区"
+    },
+    "id::SK_ADM2_56367889B57285771161703": {
+      "en": "District of Krupina",
+      "zh": "克鲁皮纳区"
+    },
+    "id::SK_ADM2_56367889B57985107422825": {
+      "en": "District of Kolice IV",
+      "zh": "科利采四区"
+    },
+    "id::SK_ADM2_56367889B58167623425022": {
+      "en": "District of Malacky",
+      "zh": "马拉茨基区"
     },
     "id::SK_ADM2_56367889B59585277732331": {
       "en": "District of Lucenec",
-      "zh": "District of Lucenec"
+      "zh": "卢塞内茨区"
+    },
+    "id::SK_ADM2_56367889B61252856682831": {
+      "en": "District of Bratislava II",
+      "zh": "布拉迪斯拉发第二区"
+    },
+    "id::SK_ADM2_56367889B61609274598716": {
+      "en": "District of Giar nad Hronom",
+      "zh": "赫罗农河畔贾尔区"
+    },
+    "id::SK_ADM2_56367889B62094256812316": {
+      "en": "District of Senec",
+      "zh": "塞内茨区"
     },
     "id::SK_ADM2_56367889B62553648042075": {
       "en": "District of Nova Zkmky",
-      "zh": "District of Nova Zkmky"
+      "zh": "新兹克姆基区"
+    },
+    "id::SK_ADM2_56367889B62739535395269": {
+      "en": "District of Trnava",
+      "zh": "特尔纳瓦区"
+    },
+    "id::SK_ADM2_56367889B62817588919968": {
+      "en": "District of Cadca",
+      "zh": "卡德卡区"
     },
     "id::SK_ADM2_56367889B65708067786299": {
       "en": "District of Trebi ov",
-      "zh": "District of Trebi ov"
+      "zh": "特雷比奥夫区"
+    },
+    "id::SK_ADM2_56367889B65848289259275": {
+      "en": "District of Senica",
+      "zh": "塞尼察区"
+    },
+    "id::SK_ADM2_56367889B66923754975257": {
+      "en": "District of Michalovce",
+      "zh": "米哈洛夫采区"
+    },
+    "id::SK_ADM2_56367889B67356758961124": {
+      "en": "District of Humennn",
+      "zh": "胡门区"
+    },
+    "id::SK_ADM2_56367889B68595341554064": {
+      "en": "District of Stropkov",
+      "zh": "斯特罗普科夫区"
     },
     "id::SK_ADM2_56367889B690835779632": {
       "en": "District of Bratislava V",
-      "zh": "District of Bratislava V"
+      "zh": "布拉迪斯拉发五区"
+    },
+    "id::SK_ADM2_56367889B72151249658777": {
+      "en": "District of Detva",
+      "zh": "德特瓦区"
+    },
+    "id::SK_ADM2_56367889B75362220391655": {
+      "en": "District of Prchov",
+      "zh": "普尔霍夫区"
+    },
+    "id::SK_ADM2_56367889B76322005427385": {
+      "en": "District of Bratislava III",
+      "zh": "布拉迪斯拉发第三区"
+    },
+    "id::SK_ADM2_56367889B77247555880458": {
+      "en": "District of Ruromberok",
+      "zh": "鲁龙贝洛克区"
+    },
+    "id::SK_ADM2_56367889B7741755639355": {
+      "en": "District of Kolice III",
+      "zh": "科利采三区"
     },
     "id::SK_ADM2_56367889B78366861694162": {
       "en": "District of Dunajskn Streda",
-      "zh": "District of Dunajskn Streda"
+      "zh": "多瑙斯特雷达区"
+    },
+    "id::SK_ADM2_56367889B79509103276820": {
+      "en": "District of Nova Mesto nad Va*",
+      "zh": "弗吉尼亚州新梅斯托区*"
+    },
+    "id::SK_ADM2_56367889B79782640664984": {
+      "en": "District of Topolcany",
+      "zh": "托波尔恰尼区"
+    },
+    "id::SK_ADM2_56367889B81133001321420": {
+      "en": "District of Zvolen",
+      "zh": "兹沃伦区"
+    },
+    "id::SK_ADM2_56367889B81744173793240": {
+      "en": "District of Sabinov",
+      "zh": "萨比诺夫区"
+    },
+    "id::SK_ADM2_56367889B83569782265262": {
+      "en": "District of Tvrdo",
+      "zh": "特夫尔多区"
+    },
+    "id::SK_ADM2_56367889B87068302757109": {
+      "en": "District of Banskk vtiavnica",
+      "zh": "伏季亚夫尼察班斯克区"
+    },
+    "id::SK_ADM2_56367889B88920022363437": {
+      "en": "District of Dolne Kub",
+      "zh": "下库布区"
+    },
+    "id::SK_ADM2_56367889B89309998682201": {
+      "en": "District of Vranov nad Toplou",
+      "zh": "托普卢河畔弗拉诺夫区"
+    },
+    "id::SK_ADM2_56367889B91036256885729": {
+      "en": "District of Myjava",
+      "zh": "米亚瓦区"
+    },
+    "id::SK_ADM2_56367889B9282010334294": {
+      "en": "District of Poltcr",
+      "zh": "波尔特地区"
+    },
+    "id::SK_ADM2_56367889B94927774956455": {
+      "en": "District of Poprad",
+      "zh": "波普拉德区"
+    },
+    "id::SK_ADM2_56367889B94951233476884": {
+      "en": "District of Galanta",
+      "zh": "加兰塔区"
     },
     "id::SK_ADM2_56367889B96980961358907": {
       "en": "District of Velka Krta",
-      "zh": "District of Velka Krta"
+      "zh": "大克尔塔区"
+    },
+    "id::SK_ADM2_56367889B97071895480744": {
+      "en": "District of Svidnsk",
+      "zh": "斯维金斯克区"
+    },
+    "id::SK_ADM2_56367889B9717038533065": {
+      "en": "District of Hlohovec",
+      "zh": "赫洛霍韦茨区"
+    },
+    "id::SK_ADM2_56367889B97606993013938": {
+      "en": "District of Sobrance",
+      "zh": "索布兰斯区"
+    },
+    "id::SK_ADM2_56367889B98399677297130": {
+      "en": "District of Ilava",
+      "zh": "伊拉瓦区"
+    },
+    "id::SK_ADM2_56367889B98642751890096": {
+      "en": "District of Partizonske",
+      "zh": "分区分区"
+    },
+    "id::SK_ADM2_56367889B99469568447767": {
+      "en": "District of Medzilaborce",
+      "zh": "梅济拉博塞区"
     },
     "id::SL": {
       "en": "id::SL",
@@ -138980,15 +140532,23 @@
     },
     "Ústí nad Labem": {
       "en": "Ústí nad Labem",
-      "zh": "Ústí nad Labem"
+      "zh": "拉贝河畔乌斯季"
     },
     "Ústí nad Labem (CZ)": {
       "en": "Ústí nad Labem (CZ)",
       "zh": "Ústí nad Labem (CZ)"
     },
+    "Ústí nad Orlicí": {
+      "en": "Ústí nad Orlicí",
+      "zh": "奥尔利西河畔乌斯季"
+    },
+    "Ústí nad Orlicí (CZ)": {
+      "en": "Ústí nad Orlicí (CZ)",
+      "zh": "Ústí nad Orlicí (CZ)"
+    },
     "Česká Lípa": {
       "en": "Česká Lípa",
-      "zh": "Česká Lípa"
+      "zh": "捷克利帕"
     },
     "Česká Lípa (CZ)": {
       "en": "Česká Lípa (CZ)",
@@ -138996,7 +140556,7 @@
     },
     "České Budějovice": {
       "en": "České Budějovice",
-      "zh": "České Budějovice"
+      "zh": "捷克布杰约维采"
     },
     "České Budějovice (CZ)": {
       "en": "České Budějovice (CZ)",
@@ -139004,7 +140564,7 @@
     },
     "Český Krumlov": {
       "en": "Český Krumlov",
-      "zh": "Český Krumlov"
+      "zh": "捷克克鲁姆洛夫"
     },
     "Český Krumlov (CZ)": {
       "en": "Český Krumlov (CZ)",
@@ -139370,6 +140930,14 @@
       "en": "Štrpce (XK)",
       "zh": "什特尔普采"
     },
+    "Šumperk": {
+      "en": "Šumperk",
+      "zh": "顺佩尔克"
+    },
+    "Šumperk (CZ)": {
+      "en": "Šumperk (CZ)",
+      "zh": "Šumperk (CZ)"
+    },
     "Żory": {
       "en": "Żory",
       "zh": "若雷"
@@ -139441,6 +141009,14 @@
     "Žilinský kraj (SK)": {
       "en": "Žilinský kraj (SK)",
       "zh": "日利纳地区"
+    },
+    "Žďár nad Sázavou": {
+      "en": "Žďár nad Sázavou",
+      "zh": "萨扎瓦河畔扎尔"
+    },
+    "Žďár nad Sázavou (CZ)": {
+      "en": "Žďár nad Sázavou (CZ)",
+      "zh": "Žďár nad Sázavou (CZ)"
     },
     "Ștefan Vodă": {
       "en": "Ștefan Vodă",

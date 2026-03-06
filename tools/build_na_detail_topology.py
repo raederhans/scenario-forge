@@ -24,6 +24,7 @@ from map_builder.processors.belarus import apply_belarus_replacement
 from map_builder.processors.cz_sk_border_detail import apply_cz_sk_border_detail
 from map_builder.processors.global_basic_admin1 import apply_global_basic_admin1_replacement
 from map_builder.processors.north_america import apply_north_america_replacement
+from init_map_data import apply_config_subdivisions
 
 LAYER_NAMES = ("political", "special_zones", "ocean", "land", "urban", "physical", "rivers")
 SPECIAL_NAME_FALLBACKS = {
@@ -296,6 +297,8 @@ def main() -> None:
     patched_political = apply_cz_sk_border_detail(patched_political)
     patched_political = apply_belarus_replacement(patched_political)
     patched_political = apply_au_city_overrides(patched_political)
+    if getattr(cfg, "ENABLE_SUBDIVISION_ENRICHMENT", False):
+        patched_political = apply_config_subdivisions(patched_political)
     patched_political = _repair_political_metadata(patched_political)
     patched_political = _repair_political_geometries(patched_political)
     layers["political"] = patched_political

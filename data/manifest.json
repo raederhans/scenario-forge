@@ -1,25 +1,24 @@
 {
   "version": 1,
-  "generated_at": "2026-03-03T14:54:28.561248+00:00",
+  "generated_at": "2026-03-06T14:48:19.199336+00:00",
   "outputs": {
     "europe_topology.json": {
       "role": "primary_topology",
-      "size_bytes": 3791577,
-      "sha256": "0f5b8dea5e24ea629a508ab06ba76eb68b3aee36508b1d15b7fc469e32b2145d",
+      "size_bytes": 2900863,
+      "sha256": "183f549f6bed39da63b49c0309c4089874fdf9fbad367c3599793e731322ee0e",
       "type": "topology",
       "object_names": [
         "land",
         "ocean",
         "physical",
         "political",
-        "rivers",
         "special_zones",
         "urban"
       ],
       "political_geometries": 199,
       "has_computed_neighbors": true,
-      "arc_count": 36503,
-      "arc_point_count": 354851,
+      "arc_count": 38787,
+      "arc_point_count": 240012,
       "world_bounds_geometries": 0,
       "raw_world_bounds_geometries": 0
     },
@@ -46,8 +45,8 @@
     },
     "europe_topology.na_v2.json": {
       "role": "detail_topology_na_v2",
-      "size_bytes": 8322223,
-      "sha256": "352fe545003ffe663e4852495cf32b66e98dac3c6439427fab7a0fdce774c531",
+      "size_bytes": 8458016,
+      "sha256": "ed40fe91891dbde4dfb35285fefc84852b5fc2e233ebba6824c7388cb7227a47",
       "type": "topology",
       "object_names": [
         "land",
@@ -57,52 +56,52 @@
         "special_zones",
         "urban"
       ],
-      "political_geometries": 11133,
+      "political_geometries": 11300,
       "has_computed_neighbors": true,
-      "arc_count": 112859,
-      "arc_point_count": 481405,
+      "arc_count": 114623,
+      "arc_point_count": 488713,
       "world_bounds_geometries": 0,
-      "raw_world_bounds_geometries": 46
+      "raw_world_bounds_geometries": 47
     },
     "europe_topology.runtime_political_v1.json": {
       "role": "runtime_political_topology",
-      "size_bytes": 6485729,
-      "sha256": "4bba72fca423c9fb7fe9c9f7bb51e4b45129576364d6fdc0dd55b2a17a514341",
+      "size_bytes": 6602743,
+      "sha256": "cc24b9cce0f6046e4bd8e967e32dac84f15c521d4aca986085a7205647f8cf99",
       "type": "topology",
       "object_names": [
         "political"
       ],
-      "political_geometries": 11159,
+      "political_geometries": 11326,
       "has_computed_neighbors": true,
-      "arc_count": 90182,
-      "arc_point_count": 392779,
+      "arc_count": 91812,
+      "arc_point_count": 399401,
       "world_bounds_geometries": 0,
-      "raw_world_bounds_geometries": 48
+      "raw_world_bounds_geometries": 49
     },
     "hierarchy.json": {
       "role": "hierarchy",
-      "size_bytes": 447034,
-      "sha256": "9fd45cc0419b488e6de3595c8f772f7cb72df3796363e3d95cdfd22681c1bd45",
+      "size_bytes": 449448,
+      "sha256": "77f94016d323caf4b4dfad650f7794e5dc35c1962a14b5782269a1cf19a723cb",
       "type": "hierarchy",
-      "group_count": 1427,
-      "child_count": 8785
+      "group_count": 1439,
+      "child_count": 8825
     },
     "geo_aliases.json": {
       "role": "geo_aliases",
-      "size_bytes": 4268198,
-      "sha256": "946090ee6a8f2b3cbf46290ba104d52bd445cc3e976c7e8e110d9f59a70eed2d",
+      "size_bytes": 4344140,
+      "sha256": "b169638cce5d31ed80fbdf6c876bc615766d3d152fc15fb965768a5909b9c33b",
       "type": "geo_aliases",
-      "entry_count": 11133,
-      "alias_count": 23091,
+      "entry_count": 11300,
+      "alias_count": 23457,
       "conflict_count": 0
     },
     "locales.json": {
       "role": "locales",
-      "size_bytes": 3357577,
-      "sha256": "1d7cc009caa6e1158f72fb237a5af0cbb1161b448293a799b1cf333756c36f85",
+      "size_bytes": 3448374,
+      "sha256": "ae31a46e609346ae357ee2917676794b103377b0532d6a470b44413fe0297584",
       "type": "locales",
-      "geo_entry_count": 34975,
-      "ui_entry_count": 113
+      "geo_entry_count": 35636,
+      "ui_entry_count": 292
     },
     "palettes/index.json": {
       "role": "palette_registry",

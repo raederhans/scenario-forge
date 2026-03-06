@@ -152,6 +152,7 @@ def _build_adm2_features(
     historical_targets: dict[str, set[str]],
 ) -> gpd.GeoDataFrame:
     coarse = coarse_country[["id", "name", "geometry"]].copy()
+    coarse = coarse.rename(columns={"id": "__parent_id", "name": "__parent_name"})
     coarse = _sanitize_polygon_layer(coarse)
     coarse_points = source.copy()
     coarse_points["geometry"] = coarse_points.geometry.representative_point()
@@ -161,12 +162,12 @@ def _build_adm2_features(
         how="left",
         predicate="within",
     )
-    parent_by_shape_id: dict[str, str] = {}
+    parent_name_by_shape_id: dict[str, str] = {}
     for _, row in joined.iterrows():
         shape_id = str(row.get("shapeID", "")).strip()
-        parent_id = str(row.get("id_right", "")).strip()
-        if shape_id and parent_id and shape_id not in parent_by_shape_id:
-            parent_by_shape_id[shape_id] = parent_id
+        parent_name = str(row.get("__parent_name", "")).strip()
+        if shape_id and parent_name and shape_id not in parent_name_by_shape_id:
+            parent_name_by_shape_id[shape_id] = parent_name
 
     def resolve_detail_tier(shape_id: str) -> str:
         if any(shape_id in target_ids for target_ids in historical_targets.values()):
@@ -177,9 +178,10 @@ def _build_adm2_features(
     out["id"] = out["shapeID"].apply(lambda value: _as_feature_id(feature_prefix, value))
     out["name"] = out["shapeName"]
     out["cntr_code"] = country_code
-    out["admin1_group"] = out["shapeID"].apply(lambda value: parent_by_shape_id.get(value, ""))
+    out["admin1_group"] = out["shapeID"].apply(lambda value: parent_name_by_shape_id.get(value, ""))
+    out["adm1_name"] = out["admin1_group"]
     out["detail_tier"] = out["shapeID"].apply(resolve_detail_tier)
-    out = out[["id", "name", "cntr_code", "admin1_group", "detail_tier", "geometry"]].copy()
+    out = out[["id", "name", "cntr_code", "admin1_group", "adm1_name", "detail_tier", "geometry"]].copy()
     out = _sanitize_polygon_layer(out)
     if out.empty:
         raise SystemExit(f"[CZ/SK] ADM2 rebuild for {country_code} produced no valid geometries.")
