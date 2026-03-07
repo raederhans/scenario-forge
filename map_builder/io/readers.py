@@ -31,14 +31,7 @@ def load_physical() -> gpd.GeoDataFrame:
     gdf = fetch_ne_zip(cfg.PHYSICAL_URL, "physical")
     feature_col = pick_column(gdf, ["featurecla", "FEATURECLA", "feature_cla"])
     if feature_col:
-        keep_types = {
-            "Range/Mountain",
-            "Plateau",
-            "Delta",
-            "Plain",
-            "Tundra",
-            "Desert",
-        }
+        keep_types = set(cfg.PHYSICAL_CONTEXT_FEATURE_TYPES)
         gdf = gdf[gdf[feature_col].isin(keep_types)].copy()
         if feature_col != "featurecla":
             gdf = gdf.rename(columns={feature_col: "featurecla"})

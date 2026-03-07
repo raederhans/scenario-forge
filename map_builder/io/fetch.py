@@ -1,7 +1,9 @@
 """Network fetch + cache helpers for map pipeline."""
 from __future__ import annotations
 
+import concurrent.futures
 import json
+import shutil
 import tempfile
 import zipfile
 from pathlib import Path
@@ -194,6 +196,180 @@ def _validate_vector_archive_bytes(content: bytes) -> str | None:
     if gdf.empty:
         return "archive contains zero features"
     return None
+
+
+def _probe_binary_source(source: str) -> tuple[int, bool]:
+    headers = get_headers()
+    headers["Range"] = "bytes=0-0"
+    with requests.get(source, timeout=(20, 60), headers=headers, stream=True) as response:
+        response.raise_for_status()
+        supports_range = response.status_code == 206
+        total_size = 0
+        if supports_range:
+            content_range = str(response.headers.get("Content-Range", "")).strip()
+            if "/" in content_range:
+                tail = content_range.rsplit("/", 1)[-1]
+                total_size = int(tail) if tail.isdigit() else 0
+        if total_size <= 0:
+            length_header = str(response.headers.get("Content-Length", "")).strip()
+            total_size = int(length_header) if length_header.isdigit() else 0
+        for _ in response.iter_content(chunk_size=16):
+            break
+    return total_size, supports_range
+
+
+def _download_binary_ranges(
+    *,
+    source: str,
+    cache_path: Path,
+    total_size: int,
+    parallelism: int = 8,
+    segment_size_bytes: int = 64 * 1024 * 1024,
+) -> Path:
+    parts_dir = cache_path.with_name(f"{cache_path.name}.parts")
+    parts_dir.mkdir(parents=True, exist_ok=True)
+    partial_path = cache_path.with_name(f"{cache_path.name}.part")
+
+    ranges: list[tuple[int, int, Path]] = []
+    start = 0
+    part_index = 0
+    while start < total_size:
+        end = min(start + segment_size_bytes - 1, total_size - 1)
+        ranges.append((start, end, parts_dir / f"part-{part_index:03d}.bin"))
+        start = end + 1
+        part_index += 1
+
+    def _fetch_range(start_byte: int, end_byte: int, part_path: Path) -> Path:
+        headers = get_headers()
+        headers["Range"] = f"bytes={start_byte}-{end_byte}"
+        with requests.get(source, timeout=(20, 300), headers=headers, stream=True) as response:
+            response.raise_for_status()
+            if response.status_code != 206:
+                raise requests.RequestException(
+                    f"Expected 206 Partial Content for range {start_byte}-{end_byte}, got {response.status_code}"
+                )
+            with open(part_path, "wb") as handle:
+                for chunk in response.iter_content(chunk_size=1024 * 1024):
+                    if not chunk:
+                        continue
+                    handle.write(chunk)
+        expected_size = end_byte - start_byte + 1
+        actual_size = part_path.stat().st_size
+        if actual_size != expected_size:
+            raise OSError(
+                f"Range download size mismatch for {part_path.name}: expected {expected_size}, got {actual_size}"
+            )
+        return part_path
+
+    try:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(parallelism, len(ranges))) as executor:
+            futures = [executor.submit(_fetch_range, start_byte, end_byte, part_path) for start_byte, end_byte, part_path in ranges]
+            completed = 0
+            for future in concurrent.futures.as_completed(futures):
+                future.result()
+                completed += 1
+                if completed == len(ranges) or completed % 4 == 0:
+                    print(f"   [Download] {cache_path.name}: {completed}/{len(ranges)} range segments received...")
+
+        with open(partial_path, "wb") as output_handle:
+            for _, _, part_path in ranges:
+                with open(part_path, "rb") as input_handle:
+                    shutil.copyfileobj(input_handle, output_handle, length=1024 * 1024)
+
+        if partial_path.stat().st_size != total_size:
+            raise OSError(
+                f"Combined payload size mismatch for {cache_path.name}: expected {total_size}, got {partial_path.stat().st_size}"
+            )
+
+        partial_path.replace(cache_path)
+        return cache_path
+    finally:
+        shutil.rmtree(parts_dir, ignore_errors=True)
+
+
+def fetch_or_cache_binary(
+    url: str,
+    filename: str,
+    *,
+    fallback_urls: list[str] | None = None,
+    min_size_bytes: int = 1024,
+) -> Path:
+    cache_path = _cache_path(filename)
+    if cache_path.exists() and cache_path.stat().st_size >= min_size_bytes:
+        return cache_path
+    partial_path = cache_path.with_name(f"{cache_path.name}.part")
+
+    print(f"   [Download] Fetching binary asset {filename}...")
+    unique_sources = _build_download_sources(url, fallback_urls)
+
+    for source in unique_sources:
+        try:
+            resume_size = partial_path.stat().st_size if partial_path.exists() else 0
+            if resume_size <= 0:
+                total_size, supports_range = _probe_binary_source(source)
+                if supports_range and total_size >= max(min_size_bytes, 256 * 1024 * 1024):
+                    print(
+                        f"   [Download] {filename}: server supports range requests; using parallel download "
+                        f"for {total_size / (1024 * 1024):.0f} MiB payload."
+                    )
+                    return _download_binary_ranges(
+                        source=source,
+                        cache_path=cache_path,
+                        total_size=total_size,
+                    )
+            request_headers = get_headers()
+            if resume_size > 0:
+                request_headers["Range"] = f"bytes={resume_size}-"
+            with requests.get(
+                source,
+                timeout=(20, 300),
+                headers=request_headers,
+                stream=True,
+            ) as response:
+                if resume_size > 0 and response.status_code == 416:
+                    partial_path.replace(cache_path)
+                    if cache_path.stat().st_size >= min_size_bytes:
+                        return cache_path
+                    cache_path.unlink(missing_ok=True)
+                    resume_size = 0
+                response.raise_for_status()
+                append_mode = resume_size > 0 and response.status_code == 206
+                if resume_size > 0 and not append_mode:
+                    print(
+                        f"   [Download] {source} did not honor resume for {filename}; restarting from byte 0."
+                    )
+                    partial_path.unlink(missing_ok=True)
+                    resume_size = 0
+                temp_path = partial_path
+                with open(temp_path, "ab" if append_mode else "wb") as tmp_handle:
+                    bytes_written = resume_size
+                    next_progress_marker = ((bytes_written // (256 * 1024 * 1024)) + 1) * (256 * 1024 * 1024)
+                    for chunk in response.iter_content(chunk_size=1024 * 1024):
+                        if not chunk:
+                            continue
+                        tmp_handle.write(chunk)
+                        bytes_written += len(chunk)
+                        if bytes_written >= next_progress_marker:
+                            print(
+                                f"   [Download] {filename}: {bytes_written / (1024 * 1024):.0f} MiB received..."
+                            )
+                            next_progress_marker += 256 * 1024 * 1024
+            size_bytes = temp_path.stat().st_size
+            if size_bytes < min_size_bytes:
+                print(
+                    f"   [Download] {source} produced undersized payload for {filename} "
+                    f"({size_bytes} bytes)."
+                )
+                continue
+            temp_path.replace(cache_path)
+            return cache_path
+        except requests.RequestException as exc:
+            print(f"   [Download] {source} failed for {filename}: {exc}")
+        except OSError as exc:
+            print(f"   [Download] Unable to store {filename} from {source}: {exc}")
+
+    print(f"Failed to download binary asset {filename} from all sources.")
+    raise SystemExit(1)
 
 
 def fetch_or_load_geojson(url: str, filename: str, fallback_urls: list[str] | None = None) -> gpd.GeoDataFrame:

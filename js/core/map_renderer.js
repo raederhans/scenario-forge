@@ -1,5 +1,10 @@
 // Hybrid canvas + SVG rendering engine.
-import { normalizeTextureStyleConfig, state } from "./state.js";
+import {
+  normalizePhysicalStyleConfig,
+  normalizeTextureStyleConfig,
+  PHYSICAL_ATLAS_PALETTE,
+  state,
+} from "./state.js";
 import { ColorManager } from "./color_manager.js";
 import { LegendManager } from "./legend_manager.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
@@ -96,6 +101,8 @@ const PARENT_BORDER_MIN_COVERAGE = 0.70;
 const PARENT_BORDER_MAX_DOMINANT_SHARE = 0.90;
 const PARENT_BORDER_MIN_RENDERABLE_GROUPS = 2;
 const GB_PARENT_MIN_GROUPS = 20;
+const GB_NUTS1_GROUP_MIN = 10;
+const GB_NUTS1_PREFIX_LENGTH = 3;
 const GB_ID_PATTERN_RE = /^[A-Z]{2}[A-Z0-9]{3}$/;
 const DE_STATE_GROUP_MIN = 12;
 const DE_STATE_GROUP_MAX = 20;
@@ -108,7 +115,6 @@ const OCEAN_MASK_MIN_QUALITY = 0.35;
 const CONTEXT_LAYER_MIN_SCORE = 0.08;
 const LAYER_DIAG_PREFIX = "[layer-resolver]";
 const DEFAULT_SPECIAL_ZONE_TYPE = "custom";
-const PHYSICAL_PATTERN_BASE_SIZE = 96;
 const PAPER_TEXTURE_BASE_TILE_SIZE = 512;
 const PAPER_NOISE_TILE_SIZE = 192;
 const TEXTURE_LABEL_SERIF_STACK = "\"Iowan Old Style\", \"Palatino Linotype\", Georgia, serif";
@@ -131,7 +137,6 @@ let islandNeighborsCache = {
   neighbors: [],
 };
 const oceanPatternCache = new Map();
-const physicalPatternCache = new Map();
 const textureAssetCache = new Map();
 const texturePatternCache = new Map();
 const textureGeometryCache = new Map();
@@ -145,6 +150,11 @@ let admin0MergedCache = {
   topologyRef: null,
   featureCount: 0,
   entries: [],
+};
+const missingPhysicalContextWarnings = new Set();
+const physicalAtlasFallbackCache = {
+  sourceRef: null,
+  collection: null,
 };
 const renderDiag = {
   enabled: false,
@@ -1376,6 +1386,7 @@ function pickBestLayerSource(primaryCollection, detailCollection, policy = {}) {
 }
 
 function resolveContextLayerData(layerName) {
+  const externalContextCollection = state.contextLayerExternalDataByName?.[layerName];
   if (
     layerName === "special_zones" &&
     Array.isArray(state.specialZonesExternalData?.features)
@@ -1421,6 +1432,18 @@ function resolveContextLayerData(layerName) {
     primaryScore: Number(pick.primaryScore.toFixed(3)),
     detailScore: Number(pick.detailScore.toFixed(3)),
   };
+
+  if (pick.source === "none" && Array.isArray(externalContextCollection?.features)) {
+    state.contextLayerSourceByName[layerName] = "external";
+    state.layerDataDiagnostics[layerName] = {
+      source: "external",
+      primaryCount: pick.primaryCount,
+      detailCount: externalContextCollection.features.length,
+      primaryScore: Number(pick.primaryScore.toFixed(3)),
+      detailScore: 1,
+    };
+    return externalContextCollection;
+  }
 
   return pick.collection;
 }
@@ -1953,6 +1976,13 @@ function isBritishConstituentGroupingCandidate(candidate) {
   );
 }
 
+function isBritishNuts1GroupingCandidate(candidate) {
+  if (!candidate || candidate.source !== "id_prefix") return false;
+  if (candidate.prefixLength !== GB_NUTS1_PREFIX_LENGTH) return false;
+  if (candidate.coverage < PARENT_BORDER_MIN_COVERAGE) return false;
+  return candidate.groupCountTotal >= GB_NUTS1_GROUP_MIN;
+}
+
 function resolveCountryParentGroupingCandidate(countryCode, featureEntries) {
   if (!countryCode || !featureEntries?.length) return null;
 
@@ -1973,6 +2003,21 @@ function resolveCountryParentGroupingCandidate(countryCode, featureEntries) {
   }
 
   if (countryCode === "GB") {
+    const britishLeafEntries = featureEntries.filter(({ id }) =>
+      GB_ID_PATTERN_RE.test(String(id || "").trim().toUpperCase())
+    );
+    const nuts1Candidate = buildIdPrefixGroupingCandidate(
+      countryCode,
+      britishLeafEntries,
+      GB_NUTS1_PREFIX_LENGTH
+    );
+    if (isBritishNuts1GroupingCandidate(nuts1Candidate)) {
+      return {
+        ...nuts1Candidate,
+        accepted: true,
+        forcedRule: "gb_nuts1",
+      };
+    }
     if (isBritishConstituentGroupingCandidate(hierarchyCandidate)) {
       return {
         ...hierarchyCandidate,
@@ -1986,8 +2031,7 @@ function resolveCountryParentGroupingCandidate(countryCode, featureEntries) {
     if (hierarchyFineEnough) return hierarchyCandidate;
 
     const idPrefixCandidate = [
-      buildIdPrefixGroupingCandidate(countryCode, featureEntries, 4),
-      buildIdPrefixGroupingCandidate(countryCode, featureEntries, 3),
+      buildIdPrefixGroupingCandidate(countryCode, britishLeafEntries, 4),
     ].find(
       (candidate) =>
         candidate?.accepted &&
@@ -3273,108 +3317,263 @@ function estimateProjectedAreaPx(feature, zoomScale) {
   return area * scale * scale;
 }
 
-function getPhysicalPattern(config) {
-  const spacing = clamp(Number(config.contourSpacing) || 18, 8, 36);
-  const width = clamp(Number(config.contourWidth) || 0.7, 0.2, 2.5);
-  const color = getSafeCanvasColor(config.contourColor, "#6f4e37");
-  const key = `${spacing}|${width.toFixed(2)}|${color}`;
-  const cached = physicalPatternCache.get(key);
-  if (cached) return cached;
-
-  const size = PHYSICAL_PATTERN_BASE_SIZE;
-  const tile = document.createElement("canvas");
-  tile.width = size;
-  tile.height = size;
-  const tileCtx = tile.getContext("2d");
-  if (!tileCtx) return null;
-
-  tileCtx.clearRect(0, 0, size, size);
-  tileCtx.strokeStyle = color;
-  tileCtx.lineWidth = width;
-
-  for (let y = -size; y <= size * 2; y += spacing) {
-    tileCtx.beginPath();
-    tileCtx.moveTo(-8, y);
-    tileCtx.lineTo(size + 8, y - size * 0.25);
-    tileCtx.stroke();
-  }
-
-  const pattern = context?.createPattern(tile, "repeat") || null;
-  if (pattern) {
-    physicalPatternCache.set(key, pattern);
-  }
-  return pattern;
+function warnMissingPhysicalContextOnce(key, message) {
+  if (missingPhysicalContextWarnings.has(key)) return;
+  missingPhysicalContextWarnings.add(key);
+  console.warn(message);
 }
 
-function drawPhysicalLayer(k, { interactive = false } = {}) {
-  if (!state.showPhysical || !state.physicalData?.features?.length) return;
-  const cfg = state.styleConfig?.physical || {};
-  const preset = String(cfg.preset || "atlas_soft").trim().toLowerCase();
-  const blendMode = getSafeBlendMode(cfg.blendMode, "multiply");
-  const tintColor = getSafeCanvasColor(cfg.tintColor, "#8f6b4e");
-  const tintOpacity = clamp(Number.isFinite(Number(cfg.opacity)) ? Number(cfg.opacity) : 0.24, 0, 1);
-  const contourOpacity = clamp(
-    Number.isFinite(Number(cfg.contourOpacity)) ? Number(cfg.contourOpacity) : 0.30,
+function getPhysicalAtlasClass(feature) {
+  const props = feature?.properties || {};
+  return String(props.atlas_class || props.atlasClass || "").trim();
+}
+
+function getPhysicalAtlasLayer(feature) {
+  const props = feature?.properties || {};
+  return String(props.atlas_layer || props.atlasLayer || "relief_base").trim().toLowerCase();
+}
+
+function buildPhysicalAtlasFallbackCollection() {
+  const sourceCollection = state.physicalData;
+  if (!Array.isArray(sourceCollection?.features)) return null;
+  if (physicalAtlasFallbackCache.sourceRef === sourceCollection) {
+    return physicalAtlasFallbackCache.collection;
+  }
+
+  const classifyFeature = (featureClassRaw) => {
+    const featureClass = String(featureClassRaw || "").trim().toLowerCase();
+    switch (featureClass) {
+      case "range/mountain":
+      case "range/mtn":
+        return { atlasClass: "mountain_high_relief", atlasLayer: "relief_base" };
+      case "foothills":
+      case "plateau":
+        return { atlasClass: "upland_plateau", atlasLayer: "relief_base" };
+      case "plain":
+      case "lowland":
+        return { atlasClass: "plains_lowlands", atlasLayer: "relief_base" };
+      case "delta":
+      case "wetlands":
+        return { atlasClass: "wetlands_delta", atlasLayer: "relief_base" };
+      case "desert":
+        return { atlasClass: "desert_bare", atlasLayer: "semantic_overlay" };
+      case "tundra":
+        return { atlasClass: "tundra_ice", atlasLayer: "semantic_overlay" };
+      default:
+        return null;
+    }
+  };
+  const features = sourceCollection.features
+    .map((feature, index) => {
+      const props = feature?.properties || {};
+      const featureClass = String(props.featurecla || props.FEATURECLA || "").trim();
+      const semantic = classifyFeature(featureClass);
+      if (!semantic?.atlasClass) return null;
+      return {
+        type: "Feature",
+        id: props.id || `physical_fallback_${index}`,
+        properties: {
+          ...props,
+          atlas_class: semantic.atlasClass,
+          atlas_layer: semantic.atlasLayer,
+          source: "topology_physical_fallback",
+        },
+        geometry: feature.geometry,
+      };
+    })
+    .filter(Boolean);
+
+  physicalAtlasFallbackCache.sourceRef = sourceCollection;
+  physicalAtlasFallbackCache.collection = {
+    type: "FeatureCollection",
+    features,
+  };
+  return physicalAtlasFallbackCache.collection;
+}
+
+function getResolvedPhysicalAtlasCollection() {
+  if (Array.isArray(state.physicalSemanticsData?.features) && state.physicalSemanticsData.features.length > 0) {
+    return state.physicalSemanticsData;
+  }
+  const fallback = buildPhysicalAtlasFallbackCollection();
+  if (Array.isArray(fallback?.features) && fallback.features.length > 0) {
+    warnMissingPhysicalContextOnce(
+      "physical-semantics-fallback",
+      "[physical] global_physical_semantics.topo.json missing; using relief-only atlas fallback."
+    );
+    return fallback;
+  }
+  return null;
+}
+
+function getAtlasFeatureAlphaMultiplier(atlasClass, cfg) {
+  if (atlasClass === "rainforest") {
+    return clamp(0.72 + cfg.rainforestEmphasis * 0.38, 0.2, 1.2);
+  }
+  if (atlasClass === "plains_lowlands") return 0.88;
+  if (atlasClass === "wetlands_delta") return 0.92;
+  return 1;
+}
+
+function getPhysicalLandMask() {
+  if (Array.isArray(state.landBgData?.features) && state.landBgData.features.length) {
+    return state.landBgData;
+  }
+  if (Array.isArray(state.landDataFull?.features) && state.landDataFull.features.length) {
+    return state.landDataFull;
+  }
+  if (Array.isArray(state.landData?.features) && state.landData.features.length) {
+    return state.landData;
+  }
+  return null;
+}
+
+function applyPhysicalLandClipMask() {
+  const landMask = getPhysicalLandMask();
+  if (!landMask) return false;
+  context.beginPath();
+  pathCanvas(landMask);
+  context.clip();
+  return true;
+}
+
+function drawPhysicalAtlasLayer(k, { interactive = false } = {}) {
+  const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
+  if (!state.showPhysical || cfg.mode === "contours_only") return;
+
+  const atlasCollection = getResolvedPhysicalAtlasCollection();
+  if (!Array.isArray(atlasCollection?.features) || atlasCollection.features.length === 0) {
+    warnMissingPhysicalContextOnce(
+      "physical-atlas-missing",
+      "[physical] Atlas semantics unavailable; skipping physical atlas fill."
+    );
+    return;
+  }
+
+  const blendMode = getSafeBlendMode(cfg.blendMode, "source-over");
+  const baseOpacity = clamp(
+    cfg.opacity * cfg.atlasOpacity * (interactive ? 0.7 : 1) * cfg.atlasIntensity,
     0,
     1
   );
-  const contourColor = getSafeCanvasColor(cfg.contourColor, "#6f4e37");
-  const contourWidth = clamp(Number.isFinite(Number(cfg.contourWidth)) ? Number(cfg.contourWidth) : 0.7, 0.2, 2.5);
 
   context.save();
+  applyPhysicalLandClipMask();
   context.globalCompositeOperation = blendMode;
 
-  if (preset !== "contour_only" && tintOpacity > 0) {
-    context.globalAlpha = interactive ? Math.min(tintOpacity, 0.18) : tintOpacity;
-    context.fillStyle = tintColor;
-    state.physicalData.features.forEach((feature) => {
+  ["relief_base", "semantic_overlay"].forEach((layerName) => {
+    atlasCollection.features.forEach((feature) => {
+      const atlasClass = getPhysicalAtlasClass(feature);
+      if (!atlasClass || cfg.atlasClassVisibility?.[atlasClass] === false) return;
+      if (getPhysicalAtlasLayer(feature) !== layerName) return;
       if (!pathBoundsInScreen(feature)) return;
+      const fillColor = getSafeCanvasColor(PHYSICAL_ATLAS_PALETTE[atlasClass], null);
+      if (!fillColor) return;
+      context.globalAlpha = clamp(baseOpacity * getAtlasFeatureAlphaMultiplier(atlasClass, cfg), 0, 1);
+      context.fillStyle = fillColor;
       context.beginPath();
       pathCanvas(feature);
       context.fill();
     });
+  });
+
+  context.restore();
+}
+
+function drawContourCollection(
+  collection,
+  {
+    color,
+    opacity,
+    width,
+    k,
+    interactive = false,
+    lowReliefCutoff = 0,
+    intervalM = 0,
+    excludeIntervalM = 0,
+  } = {}
+) {
+  if (!Array.isArray(collection?.features) || collection.features.length === 0) return false;
+  const scale = Math.max(0.0001, k);
+  context.globalAlpha = interactive ? Math.min(opacity, 0.22) : opacity;
+  context.strokeStyle = color;
+  context.lineWidth = width / scale;
+  context.lineJoin = "round";
+  context.lineCap = "round";
+
+  let drewAny = false;
+  collection.features.forEach((feature) => {
+    const elevation = Number(feature?.properties?.elevation_m);
+    if (Number.isFinite(elevation) && elevation < lowReliefCutoff) return;
+    if (intervalM > 0 && Number.isFinite(elevation) && elevation % intervalM !== 0) return;
+    if (excludeIntervalM > 0 && Number.isFinite(elevation) && elevation % excludeIntervalM === 0) return;
+    if (!pathBoundsInScreen(feature)) return;
+    context.beginPath();
+    pathCanvas(feature);
+    context.stroke();
+    drewAny = true;
+  });
+  return drewAny;
+}
+
+function drawPhysicalContourLayer(k, { interactive = false } = {}) {
+  const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
+  if (!state.showPhysical || cfg.mode === "atlas_only") return;
+
+  if (!Array.isArray(state.physicalContourMajorData?.features) || state.physicalContourMajorData.features.length === 0) {
+    warnMissingPhysicalContextOnce(
+      "physical-contours-major-missing",
+      "[physical] global_contours.major.topo.json missing; skipping terrain contours."
+    );
+    return;
   }
 
-  if (preset !== "tint_only") {
-    if (interactive) {
-      context.globalAlpha = Math.min(contourOpacity, 0.2);
-      context.strokeStyle = contourColor;
-      context.lineWidth = contourWidth / Math.max(0.0001, k);
-      state.physicalData.features.forEach((feature) => {
-        if (!pathBoundsInScreen(feature)) return;
-        context.beginPath();
-        pathCanvas(feature);
-        context.stroke();
+  const blendMode = getSafeBlendMode(cfg.blendMode, "source-over");
+  const contourColor = getSafeCanvasColor(cfg.contourColor, "#6b5947");
+  const lowReliefCutoff = clamp(Number(cfg.contourLowReliefCutoffM) || 0, 0, 2000);
+  const majorOpacity = clamp(cfg.opacity * cfg.contourOpacity, 0, 1);
+  const minorOpacity = clamp(majorOpacity * 0.68, 0, 1);
+
+  context.save();
+  applyPhysicalLandClipMask();
+  context.globalCompositeOperation = blendMode;
+
+  drawContourCollection(state.physicalContourMajorData, {
+    color: contourColor,
+    opacity: majorOpacity,
+    width: clamp(Number(cfg.contourMajorWidth) || 0.8, 0.2, 3),
+    k,
+    interactive,
+    lowReliefCutoff,
+    intervalM: clamp(Number(cfg.contourMajorIntervalM) || 500, 500, 2000),
+  });
+
+  if (cfg.contourMinorVisible && k >= 2) {
+    if (Array.isArray(state.physicalContourMinorData?.features) && state.physicalContourMinorData.features.length > 0) {
+      drawContourCollection(state.physicalContourMinorData, {
+        color: contourColor,
+        opacity: minorOpacity,
+        width: clamp(Number(cfg.contourMinorWidth) || 0.45, 0.1, 2),
+        k,
+        interactive,
+        lowReliefCutoff,
+        intervalM: clamp(Number(cfg.contourMinorIntervalM) || 100, 100, 1000),
+        excludeIntervalM: clamp(Number(cfg.contourMajorIntervalM) || 500, 500, 2000),
       });
     } else {
-      const pattern = getPhysicalPattern(cfg);
-      if (pattern) {
-        context.save();
-        context.beginPath();
-        state.physicalData.features.forEach((feature) => {
-          if (!pathBoundsInScreen(feature)) return;
-          pathCanvas(feature);
-        });
-        context.clip();
-        context.globalAlpha = contourOpacity;
-        context.fillStyle = pattern;
-        context.fillRect(-4096, -4096, 8192, 8192);
-        context.restore();
-      } else {
-        context.globalAlpha = contourOpacity;
-        context.strokeStyle = contourColor;
-        context.lineWidth = contourWidth / Math.max(0.0001, k);
-        state.physicalData.features.forEach((feature) => {
-          if (!pathBoundsInScreen(feature)) return;
-          context.beginPath();
-          pathCanvas(feature);
-          context.stroke();
-        });
-      }
+      warnMissingPhysicalContextOnce(
+        "physical-contours-minor-missing",
+        "[physical] global_contours.minor.topo.json missing; skipping minor contours."
+      );
     }
   }
 
   context.restore();
+}
+
+function drawPhysicalLayer(k, { interactive = false } = {}) {
+  drawPhysicalAtlasLayer(k, { interactive });
+  drawPhysicalContourLayer(k, { interactive });
 }
 
 function drawUrbanLayer(k, { interactive = false } = {}) {
@@ -4859,9 +5058,9 @@ function shouldAllowZoomEvent(event) {
 function resolveParentGroupKey(feature, featureId) {
   const countryCode = getFeatureCountryCodeNormalized(feature);
   if (!countryCode) return "";
-  const directGroup = getAdmin1Group(feature);
   const fallbackGroup = state.parentGroupByFeatureId?.get(featureId);
-  const groupName = String(directGroup || fallbackGroup || "").trim();
+  const directGroup = getAdmin1Group(feature);
+  const groupName = String(fallbackGroup || directGroup || "").trim();
   if (!groupName) return "";
   return `${countryCode}::${groupName}`;
 }

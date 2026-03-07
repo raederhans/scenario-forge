@@ -4,6 +4,9 @@ const COUNTRY_CODE_ALIASES = {
   UK: "GB",
   EL: "GR",
 };
+const BOUNDARY_VARIANT_ID_ALIASES = {
+  legacy_approx: "historical_reference",
+};
 
 function normalizeCountryCode(rawCode) {
   const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
@@ -24,6 +27,81 @@ function clonePreset(preset = {}) {
 
 function normalizePresetName(value) {
   return String(value || "").trim().toLowerCase();
+}
+
+function normalizeRuleId(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function normalizeBoundaryVariantId(value) {
+  const normalized = normalizeRuleId(value);
+  return BOUNDARY_VARIANT_ID_ALIASES[normalized] || normalized;
+}
+
+function normalizePresetSource(payload = {}) {
+  const source = payload && typeof payload === "object" ? payload : {};
+  return {
+    type: String(source.type || "").trim(),
+    name: String(source.name || "").trim(),
+    group_ids: Array.isArray(source.group_ids)
+      ? Array.from(new Set(source.group_ids.map((item) => String(item || "").trim()).filter(Boolean)))
+      : [],
+    feature_ids: Array.isArray(source.feature_ids)
+      ? Array.from(new Set(source.feature_ids.map((item) => String(item || "").trim()).filter(Boolean)))
+      : [],
+  };
+}
+
+function normalizeBoundaryVariants(entry = {}) {
+  const rawVariants = Array.isArray(entry?.boundary_variants) ? entry.boundary_variants : [];
+  return rawVariants
+    .map((variant) => {
+      const normalizedId = normalizeBoundaryVariantId(variant?.id);
+      if (!normalizedId) return null;
+      const featureCountHint = Number(variant?.resolved_feature_count_hint);
+      return {
+        id: normalizedId,
+        label: String(variant?.label || normalizedId).trim(),
+        description: String(variant?.description || "").trim(),
+        basis: String(variant?.basis || "").trim(),
+        preset_source: normalizePresetSource(variant?.preset_source),
+        resolved_feature_count_hint: Number.isFinite(featureCountHint) ? featureCountHint : null,
+      };
+    })
+    .filter(Boolean);
+}
+
+function normalizeCompanionActions(entry = {}) {
+  const rawActions = Array.isArray(entry?.companion_actions) ? entry.companion_actions : [];
+  return rawActions
+    .map((action) => {
+      const normalizedId = normalizeRuleId(action?.id);
+      if (!normalizedId) return null;
+      const featureCountHint = Number(action?.resolved_feature_count_hint);
+      return {
+        id: normalizedId,
+        label: String(action?.label || normalizedId).trim(),
+        description: String(action?.description || "").trim(),
+        basis: String(action?.basis || "").trim(),
+        action_type: String(action?.action_type || "").trim(),
+        target_owner_tag: normalizeCountryCode(action?.target_owner_tag),
+        auto_apply_on_core_territory: !!action?.auto_apply_on_core_territory,
+        hidden_in_ui: !!action?.hidden_in_ui,
+        preset_source: normalizePresetSource(action?.preset_source),
+        resolved_feature_count_hint: Number.isFinite(featureCountHint) ? featureCountHint : null,
+      };
+    })
+    .filter(Boolean);
+}
+
+function getDefaultBoundaryVariantId(entry = {}) {
+  const variants = normalizeBoundaryVariants(entry);
+  if (!variants.length) return "";
+  const requestedDefault = normalizeBoundaryVariantId(entry?.default_boundary_variant_id);
+  if (requestedDefault && variants.some((variant) => variant.id === requestedDefault)) {
+    return requestedDefault;
+  }
+  return variants[0].id;
 }
 
 function getStaticPresetsForCode(code) {
@@ -52,11 +130,9 @@ function resolveCatalogEntriesForScenario(scenarioId = state.activeScenarioId) {
   });
 }
 
-function resolvePresetFeatureIds(entry = {}) {
-  const presetSource = entry?.preset_source && typeof entry.preset_source === "object"
-    ? entry.preset_source
-    : {};
-  const sourceType = String(presetSource.type || "").trim();
+function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
+  const normalizedPresetSource = normalizePresetSource(presetSource);
+  const sourceType = String(normalizedPresetSource.type || "").trim();
   const tag = normalizeCountryCode(entry.tag);
 
   const warnEmptyResolution = (details = {}) => {
@@ -68,7 +144,7 @@ function resolvePresetFeatureIds(entry = {}) {
   };
 
   if (sourceType === "legacy_preset_name") {
-    const presetName = String(presetSource.name || "").trim();
+    const presetName = String(normalizedPresetSource.name || "").trim();
     const lookupCode = normalizeCountryCode(entry.release_lookup_iso2 || entry.lookup_iso2 || entry.base_iso2);
     const presets = getStaticPresetsForCode(lookupCode);
     const match = presets.find((preset) => String(preset?.name || "").trim() === presetName);
@@ -89,7 +165,7 @@ function resolvePresetFeatureIds(entry = {}) {
       ? state.hierarchyData.groups
       : {};
     const featureIds = new Set();
-    (Array.isArray(presetSource.group_ids) ? presetSource.group_ids : []).forEach((groupId) => {
+    normalizedPresetSource.group_ids.forEach((groupId) => {
       const ids = Array.isArray(groups[groupId]) ? groups[groupId] : [];
       ids.forEach((featureId) => {
         const normalized = String(featureId || "").trim();
@@ -101,27 +177,133 @@ function resolvePresetFeatureIds(entry = {}) {
     const ids = Array.from(featureIds);
     if (!ids.length) {
       warnEmptyResolution({
-        groupIds: Array.isArray(presetSource.group_ids) ? presetSource.group_ids : [],
+        groupIds: normalizedPresetSource.group_ids,
       });
     }
     return ids;
   }
 
   if (sourceType === "feature_ids") {
-    const ids = Array.from(
-      new Set((Array.isArray(presetSource.feature_ids) ? presetSource.feature_ids : [])
-        .map((featureId) => String(featureId || "").trim())
-        .filter(Boolean))
-    );
+    const ids = Array.from(new Set(normalizedPresetSource.feature_ids));
     if (!ids.length) {
       warnEmptyResolution({
-        featureIds: Array.isArray(presetSource.feature_ids) ? presetSource.feature_ids : [],
+        featureIds: normalizedPresetSource.feature_ids,
       });
     }
     return ids;
   }
 
   return [];
+}
+
+function getSelectedBoundaryVariantId(entry = {}) {
+  const tag = normalizeCountryCode(entry?.tag);
+  const variants = normalizeBoundaryVariants(entry);
+  if (!tag || !variants.length) return "";
+  const selectedId = normalizeBoundaryVariantId(state.releasableBoundaryVariantByTag?.[tag]);
+  if (
+    selectedId
+    && state.releasableBoundaryVariantByTag?.[tag]
+    && normalizeRuleId(state.releasableBoundaryVariantByTag[tag]) !== selectedId
+  ) {
+    state.releasableBoundaryVariantByTag = {
+      ...state.releasableBoundaryVariantByTag,
+      [tag]: selectedId,
+    };
+  }
+  if (selectedId && variants.some((variant) => variant.id === selectedId)) {
+    return selectedId;
+  }
+  const defaultId = getDefaultBoundaryVariantId(entry);
+  if (!state.releasableBoundaryVariantByTag || typeof state.releasableBoundaryVariantByTag !== "object") {
+    state.releasableBoundaryVariantByTag = {};
+  }
+  if (defaultId && state.releasableBoundaryVariantByTag[tag] !== defaultId) {
+    state.releasableBoundaryVariantByTag = {
+      ...state.releasableBoundaryVariantByTag,
+      [tag]: defaultId,
+    };
+  }
+  return defaultId;
+}
+
+function getResolvedReleasableBoundaryVariant(entry = {}) {
+  const variants = normalizeBoundaryVariants(entry);
+  if (!variants.length) return null;
+  const selectedId = getSelectedBoundaryVariantId(entry);
+  return variants.find((variant) => variant.id === selectedId) || variants[0];
+}
+
+function resolvePresetFeatureIds(entry = {}) {
+  const selectedVariant = getResolvedReleasableBoundaryVariant(entry);
+  const presetSource = selectedVariant?.preset_source && typeof selectedVariant.preset_source === "object"
+    ? selectedVariant.preset_source
+    : entry?.preset_source;
+  return resolveFeatureIdsFromPresetSource(presetSource, entry);
+}
+
+function resolveCompanionActionFeatureIds(action = {}, entry = {}) {
+  return resolveFeatureIdsFromPresetSource(action?.preset_source, entry);
+}
+
+function resolveCatalogEntryForTag(tag, scenarioId = state.activeScenarioId) {
+  const normalizedTag = normalizeCountryCode(tag);
+  if (!normalizedTag) return null;
+  const scenarioEntry = getScenarioReleasableIndex(scenarioId)?.byTag?.[normalizedTag];
+  if (scenarioEntry && typeof scenarioEntry === "object") {
+    return scenarioEntry;
+  }
+  return resolveCatalogEntriesForScenario(scenarioId).find(
+    (entry) => normalizeCountryCode(entry?.tag) === normalizedTag
+  ) || null;
+}
+
+function setReleasableBoundaryVariant(tag, variantId) {
+  const normalizedTag = normalizeCountryCode(tag);
+  if (!normalizedTag) return null;
+  const entry = resolveCatalogEntryForTag(normalizedTag);
+  if (!entry) return null;
+  const variants = normalizeBoundaryVariants(entry);
+  if (!variants.length) return null;
+
+  const requestedId = normalizeBoundaryVariantId(variantId);
+  const resolvedVariant = variants.find((variant) => variant.id === requestedId)
+    || variants.find((variant) => variant.id === getDefaultBoundaryVariantId(entry))
+    || variants[0];
+  if (!resolvedVariant) return null;
+
+  if (!state.releasableBoundaryVariantByTag || typeof state.releasableBoundaryVariantByTag !== "object") {
+    state.releasableBoundaryVariantByTag = {};
+  }
+  state.releasableBoundaryVariantByTag = {
+    ...state.releasableBoundaryVariantByTag,
+    [normalizedTag]: resolvedVariant.id,
+  };
+
+  const featureIds = resolvePresetFeatureIds(entry);
+  if (state.scenarioCountriesByTag?.[normalizedTag]) {
+    state.scenarioCountriesByTag = {
+      ...state.scenarioCountriesByTag,
+      [normalizedTag]: {
+        ...state.scenarioCountriesByTag[normalizedTag],
+        feature_count: featureIds.length,
+        default_boundary_variant_id: getDefaultBoundaryVariantId(entry),
+        selected_boundary_variant_id: resolvedVariant.id,
+        selected_boundary_variant_label: resolvedVariant.label,
+        selected_boundary_variant_description: resolvedVariant.description,
+        boundary_variants: variants,
+        companion_actions: normalizeCompanionActions(entry),
+      },
+    };
+  }
+
+  rebuildPresetState();
+  return {
+    tag: normalizedTag,
+    variantId: resolvedVariant.id,
+    featureCount: featureIds.length,
+    variant: resolvedVariant,
+  };
 }
 
 function getReleasableGroupingMeta(entry = {}) {
@@ -179,6 +361,9 @@ function buildScenarioReleasableIndex(scenarioId = state.activeScenarioId) {
       parent_owner_tags: parentTags.length ? parentTags : (parentOwnerTag ? [parentOwnerTag] : []),
       release_lookup_iso2: lookupCode,
       lookup_iso2: lookupCode,
+      default_boundary_variant_id: getDefaultBoundaryVariantId(entry),
+      boundary_variants: normalizeBoundaryVariants(entry),
+      companion_actions: normalizeCompanionActions(entry),
     };
 
     index.byTag[tag] = normalizedEntry;
@@ -244,6 +429,7 @@ function buildReleasablePresetOverlays() {
       preset_kind: "releasable_release",
       releasable_tag: tag,
       parent_owner_tag: String(entry.parent_owner_tag || "").trim().toUpperCase(),
+      boundary_variant_id: getSelectedBoundaryVariantId(entry),
     });
   });
 
@@ -261,6 +447,7 @@ function buildReleasablePresetOverlays() {
         preset_kind: "releasable_core",
         releasable_tag: tag,
         parent_owner_tag: String(entry.parent_owner_tag || "").trim().toUpperCase(),
+        boundary_variant_id: getSelectedBoundaryVariantId(entry),
       },
     ];
   });
@@ -318,6 +505,7 @@ function getScenarioReleasableCountries(scenarioId = state.activeScenarioId) {
     const tag = normalizeCountryCode(entry.tag);
     const featureIds = resolvePresetFeatureIds(entry);
     if (!tag || !featureIds.length) return;
+    const selectedBoundaryVariant = getResolvedReleasableBoundaryVariant(entry);
 
     const colorHex = String(entry.color_hex || "").trim().toLowerCase();
     const displayName = String(entry.display_name || tag).trim() || tag;
@@ -348,6 +536,12 @@ function getScenarioReleasableCountries(scenarioId = state.activeScenarioId) {
       catalog_order: catalogOrder,
       capital_state_id: Number(entry.capital_state_id || 0) || 0,
       core_state_ids: Array.isArray(entry.core_state_ids) ? [...entry.core_state_ids] : [],
+      default_boundary_variant_id: getDefaultBoundaryVariantId(entry),
+      selected_boundary_variant_id: selectedBoundaryVariant?.id || "",
+      selected_boundary_variant_label: String(selectedBoundaryVariant?.label || "").trim(),
+      selected_boundary_variant_description: String(selectedBoundaryVariant?.description || "").trim(),
+      boundary_variants: normalizeBoundaryVariants(entry),
+      companion_actions: normalizeCompanionActions(entry),
       notes: String(entry.notes || "").trim(),
       continent_id: groupingMeta.continentId,
       continent_label: groupingMeta.continentLabel,
@@ -363,8 +557,11 @@ export {
   buildScenarioReleasableIndex,
   getScenarioReleasableIndex,
   getScenarioReleasableCountries,
+  getResolvedReleasableBoundaryVariant,
   mergePresetLayers,
   normalizeCountryCode,
   normalizePresetName,
+  resolveCompanionActionFeatureIds,
   rebuildPresetState,
+  setReleasableBoundaryVariant,
 };

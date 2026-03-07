@@ -13,6 +13,18 @@ LAND_BG_URL = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_land.zi
 URBAN_URL = "https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_urban_areas.zip"
 PHYSICAL_URL = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip"
 ADMIN1_URL = "https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_admin_1_states_provinces.zip"
+ETOPO_2022_SURFACE_URL = (
+    "https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO2022/data/60s/60s_surface_elev_gtif/"
+    "ETOPO_2022_v1_60s_N90W180_surface.tif"
+)
+CGLS_LC100_2019_DISCRETE_URL = (
+    "https://zenodo.org/api/records/3939050/files/"
+    "PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif/content"
+)
+CGLS_LC100_2019_FOREST_TYPE_URL = (
+    "https://zenodo.org/api/records/3939050/files/"
+    "PROBAV_LC100_global_v3.0.1_2019-nrt_Forest-Type-layer_EPSG-4326.tif/content"
+)
 
 FR_ARR_URL = "https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/arrondissements.geojson"
 FR_ARR_FALLBACK_URLS = [
@@ -157,6 +169,13 @@ GB_NUTS1_2021_FILENAME = "gisco_nuts_2021_level1.geojson"
 BIH_ADM1_FILENAME = "geoBoundaries-BIH-ADM1.geojson"
 IDN_ADM1_FILENAME = "geoBoundaries-IDN-ADM1.geojson"
 ABS_SUA_2021_GDA94_FILENAME = "abs_sua_2021_aust_gda94_shp.zip"
+ETOPO_2022_SURFACE_FILENAME = "ETOPO_2022_v1_60s_N90W180_surface.tif"
+CGLS_LC100_2019_DISCRETE_FILENAME = "PROBAV_LC100_global_v3.0.1_2019_discrete.tif"
+CGLS_LC100_2019_FOREST_TYPE_FILENAME = "PROBAV_LC100_global_v3.0.1_2019_forest_type.tif"
+
+PHYSICAL_SEMANTICS_TOPO_FILENAME = "global_physical_semantics.topo.json"
+PHYSICAL_CONTOUR_MAJOR_TOPO_FILENAME = "global_contours.major.topo.json"
+PHYSICAL_CONTOUR_MINOR_TOPO_FILENAME = "global_contours.minor.topo.json"
 
 # Geography configuration
 MAP_NAME = "Global Admin-0 Skeleton"
@@ -226,6 +245,47 @@ EXTENSION_COUNTRIES = {
 }
 EXCLUDED_NUTS_PREFIXES = ("FRY", "PT2", "PT3", "ES7")
 MAP_BOUNDS = GLOBAL_BOUNDS
+
+PHYSICAL_RELIEF_BASE_TYPES = {
+    "Range/Mountain": "mountain_high_relief",
+    "Range/mtn": "mountain_high_relief",
+    "Foothills": "upland_plateau",
+    "Plateau": "upland_plateau",
+    "Plain": "plains_lowlands",
+    "Lowland": "plains_lowlands",
+    "Delta": "wetlands_delta",
+    "Wetlands": "wetlands_delta",
+}
+
+PHYSICAL_NATURAL_EARTH_OVERLAY_TYPES = {
+    "Desert": "desert_bare",
+    "Tundra": "tundra_ice",
+}
+
+PHYSICAL_CONTEXT_FEATURE_TYPES = set(PHYSICAL_RELIEF_BASE_TYPES) | set(PHYSICAL_NATURAL_EARTH_OVERLAY_TYPES)
+
+CGLS_FOREST_CLASS_CODES = {
+    111, 112, 113, 114, 115, 116,
+    121, 122, 123, 124, 125, 126,
+}
+CGLS_RAINFOREST_CLASS_CODES = {112, 122}
+CGLS_DESERT_CLASS_CODES = {60}
+CGLS_TUNDRA_ICE_CLASS_CODES = {70, 100}
+CGLS_FOREST_TYPE_CODES = {0, 1, 2, 3, 4, 5}
+CGLS_RAINFOREST_FOREST_TYPE_CODES = {1}
+
+PHYSICAL_SEMANTIC_CELL_SIZE_DEGREES = 0.5
+PHYSICAL_SEMANTIC_SIMPLIFY_DEGREES = 0.10
+PHYSICAL_RAINFOREST_MAX_ABS_LAT = 25.0
+PHYSICAL_RAINFOREST_MIN_AREA_KM2 = 2500.0
+
+CONTOUR_MAJOR_INTERVAL_M = 500
+CONTOUR_MINOR_INTERVAL_M = 100
+CONTOUR_LOW_RELIEF_CUTOFF_M = 300
+CONTOUR_PROCESSING_STEP_DEGREES = 0.125
+CONTOUR_MAJOR_SIMPLIFY_DEGREES = 0.06
+CONTOUR_MINOR_SIMPLIFY_DEGREES = 0.04
+CONTOUR_MIN_LENGTH_DEGREES = 0.15
 
 MICRO_ISLAND_BLACKLIST = {
     # Pacific

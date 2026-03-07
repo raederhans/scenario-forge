@@ -1,4 +1,4 @@
-import { normalizeTextureMode, state } from "./state.js";
+import { normalizePhysicalStyleConfig, normalizeTextureMode, state } from "./state.js";
 
 const COUNTRY_CODE_ALIASES = {
   UK: "GB",
@@ -247,6 +247,7 @@ function migrateImportedProjectData(data) {
       mode: normalizeTextureMode(payload.styleConfig.texture.mode),
     };
   }
+  payload.styleConfig.physical = normalizePhysicalStyleConfig(payload.styleConfig.physical);
   return payload;
 }
 

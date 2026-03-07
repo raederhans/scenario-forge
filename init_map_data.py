@@ -56,7 +56,16 @@ def _peek_requested_mode(argv: list[str]) -> str:
 REQUESTED_MODE = _peek_requested_mode(sys.argv[1:])
 
 if REQUESTED_MODE != "palettes":
-    ensure_packages(["geopandas", "matplotlib", "mapclassify", "requests", "shapely", "topojson"])
+    ensure_packages([
+        "contourpy",
+        "geopandas",
+        "matplotlib",
+        "mapclassify",
+        "rasterio",
+        "requests",
+        "shapely",
+        "topojson",
+    ])
 
     import geopandas as gpd
     import pandas as pd
@@ -85,6 +94,7 @@ if REQUESTED_MODE != "palettes":
     from map_builder.processors.china import apply_china_replacement
     from map_builder.processors.france import apply_holistic_replacements
     from map_builder.processors.north_america import apply_north_america_replacement
+    from map_builder.processors.physical_context import build_and_save_physical_context_layers
     from map_builder.processors.poland import apply_poland_replacement
     from map_builder.processors.russia_ukraine import apply_russia_ukraine_replacement
     from map_builder.processors.south_asia import apply_south_asia_replacement
@@ -106,6 +116,7 @@ else:  # pragma: no cover - palettes mode avoids GIS/runtime build imports
     apply_china_replacement = None
     apply_holistic_replacements = None
     apply_north_america_replacement = None
+    build_and_save_physical_context_layers = None
     apply_poland_replacement = None
     apply_russia_ukraine_replacement = None
     apply_south_asia_replacement = None
@@ -1202,6 +1213,9 @@ def write_data_manifest(output_dir: Path) -> Path:
         "europe_topology.na_v1.json": "detail_topology_na_v1",
         "europe_topology.na_v2.json": "detail_topology_na_v2",
         "europe_topology.runtime_political_v1.json": "runtime_political_topology",
+        "global_physical_semantics.topo.json": "physical_semantics_topology",
+        "global_contours.major.topo.json": "terrain_contours_major_topology",
+        "global_contours.minor.topo.json": "terrain_contours_minor_topology",
         "hierarchy.json": "hierarchy",
         "geo_aliases.json": "geo_aliases",
         "locales.json": "locales",
@@ -1231,7 +1245,7 @@ def write_data_manifest(output_dir: Path) -> Path:
         }
         if path.suffix == ".json":
             try:
-                if "topology" in file_name:
+                if "topology" in file_name or file_name.endswith(".topo.json"):
                     item.update(_topology_summary(path))
                 elif file_name == "hierarchy.json":
                     payload = _read_json(path)
@@ -1805,6 +1819,15 @@ def main() -> None:
     log_layer_coverage("physical", physical_filtered, target_bounds)
     log_layer_coverage("rivers", rivers_clipped, target_bounds)
     log_layer_coverage("special_zones", special_zones, target_bounds)
+
+    print("[INFO] Building derived physical atlas semantics and contour assets....")
+    physical_semantics, contour_major, contour_minor = build_and_save_physical_context_layers(
+        physical_filtered,
+        output_dir,
+    )
+    log_layer_coverage("physical_semantics", physical_semantics, target_bounds)
+    log_layer_coverage("contours_major", contour_major, target_bounds)
+    log_layer_coverage("contours_minor", contour_minor, target_bounds)
 
     # ── Validate and stabilize feature IDs ──────────────────────
     if "id" in final_hybrid.columns:

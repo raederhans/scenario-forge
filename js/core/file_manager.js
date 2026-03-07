@@ -1,15 +1,33 @@
 // Project file manager (Phase 13)
-import { normalizeTextureStyleConfig } from "./state.js";
+import { normalizePhysicalStyleConfig, normalizeTextureStyleConfig } from "./state.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
 import { migrateImportedProjectData } from "./sovereignty_manager.js";
 import { clearDirty } from "./dirty_state.js";
 
+const LEGACY_BOUNDARY_VARIANT_ALIASES = {
+  legacy_approx: "historical_reference",
+};
+
+function normalizeBoundaryVariantSelectionMap(rawMap) {
+  if (!rawMap || typeof rawMap !== "object") return {};
+  return Object.fromEntries(
+    Object.entries(rawMap)
+      .map(([rawTag, rawVariantId]) => {
+        const tag = String(rawTag || "").trim().toUpperCase();
+        const variantId = String(rawVariantId || "").trim().toLowerCase();
+        if (!tag) return null;
+        return [tag, LEGACY_BOUNDARY_VARIANT_ALIASES[variantId] || variantId || "hoi4"];
+      })
+      .filter(Boolean)
+  );
+}
+
 class FileManager {
   static exportProject(appState) {
     if (!appState) return;
     const payload = {
-      schemaVersion: 7,
+      schemaVersion: 9,
       countryBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
       featureOverrides: appState.visualOverrides || appState.featureOverrides || {},
       sovereignBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
@@ -32,7 +50,7 @@ class FileManager {
         parentBorders: appState.styleConfig?.parentBorders || null,
         ocean: appState.styleConfig?.ocean || null,
         urban: appState.styleConfig?.urban || null,
-        physical: appState.styleConfig?.physical || null,
+        physical: normalizePhysicalStyleConfig(appState.styleConfig?.physical),
         rivers: appState.styleConfig?.rivers || null,
         specialZones: appState.styleConfig?.specialZones || null,
         texture: normalizeTextureStyleConfig(appState.styleConfig?.texture),
@@ -45,6 +63,7 @@ class FileManager {
           viewMode: String(appState.scenarioViewMode || "ownership"),
         }
         : null,
+      releasableBoundaryVariantByTag: normalizeBoundaryVariantSelectionMap(appState.releasableBoundaryVariantByTag),
       timestamp: Date.now(),
     };
 
@@ -117,9 +136,7 @@ class FileManager {
         if (!data.styleConfig.urban || typeof data.styleConfig.urban !== "object") {
           data.styleConfig.urban = null;
         }
-        if (!data.styleConfig.physical || typeof data.styleConfig.physical !== "object") {
-          data.styleConfig.physical = null;
-        }
+        data.styleConfig.physical = normalizePhysicalStyleConfig(data.styleConfig.physical);
         if (!data.styleConfig.rivers || typeof data.styleConfig.rivers !== "object") {
           data.styleConfig.rivers = null;
         }
@@ -153,6 +170,7 @@ class FileManager {
             data.scenario = null;
           }
         }
+        data.releasableBoundaryVariantByTag = normalizeBoundaryVariantSelectionMap(data.releasableBoundaryVariantByTag);
         data.layerVisibility.showUrban =
           data.layerVisibility.showUrban === undefined ? true : !!data.layerVisibility.showUrban;
         data.layerVisibility.showPhysical =

@@ -1,5 +1,8 @@
 # QA-056: Reichskommissariat Boundary Misalignment Diagnostic
 
+> Superseded on 2026-03-06 by `QA-059_hoi4_reichskommissariat_boundary_revalidation_and_historical_transfers_2026-03-06.md`.
+> QA-056 captured the initial mismatch symptoms, but several conclusions here are no longer the current source of truth after HOI4 trigger revalidation and the new boundary-variant / historical-transfer implementation.
+
 **Date**: 2026-03-05
 **Severity**: HIGH
 **Scope**: Reichskommissariat territory definitions — RKP, RKO, RKU, RKM

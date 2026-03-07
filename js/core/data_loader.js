@@ -16,9 +16,96 @@ const DETAIL_SOURCES = {
 const RU_CITY_OVERRIDES_URL = "data/ru_city_overrides.geojson";
 const SPECIAL_ZONES_URL = "data/special_zones.geojson";
 const RUNTIME_POLITICAL_URL = "data/europe_topology.runtime_political_v1.json";
+const GLOBAL_RIVERS_CONTEXT_PACK_URL = "data/global_rivers.geojson";
+const CONTEXT_LAYER_PACKS = {
+  physical: { url: "data/europe_physical.geojson", format: "geojson" },
+  urban: { url: "data/europe_urban.geojson", format: "geojson" },
+  physical_semantics: {
+    url: "data/global_physical_semantics.topo.json",
+    format: "topology",
+    objectName: "physical_semantics",
+  },
+  physical_contours_major: {
+    url: "data/global_contours.major.topo.json",
+    format: "topology",
+    objectName: "contours",
+  },
+  physical_contours_minor: {
+    url: "data/global_contours.minor.topo.json",
+    format: "topology",
+    objectName: "contours",
+  },
+};
 const PALETTE_REGISTRY_URL = "data/palettes/index.json";
 const RELEASABLE_CATALOG_URL = "data/releasables/hoi4_vanilla.internal.phase1.catalog.json";
 const RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
+
+async function loadRiversFallbackCollection(d3Client) {
+  try {
+    const payload = await d3Client.json(GLOBAL_RIVERS_CONTEXT_PACK_URL);
+    if (!Array.isArray(payload?.features)) {
+      console.warn(
+        `[data_loader] Rivers fallback pack invalid at ${GLOBAL_RIVERS_CONTEXT_PACK_URL}.`
+      );
+      return null;
+    }
+    return {
+      type: "FeatureCollection",
+      features: payload.features,
+    };
+  } catch (err) {
+    console.warn(
+      `[data_loader] Rivers fallback pack missing or invalid at ${GLOBAL_RIVERS_CONTEXT_PACK_URL}.`,
+      err
+    );
+    return null;
+  }
+}
+
+async function loadOptionalContextLayerPacks(d3Client) {
+  const riversCollection = await loadRiversFallbackCollection(d3Client);
+  const entries = await Promise.all(
+    Object.entries(CONTEXT_LAYER_PACKS).map(async ([layerName, descriptor]) => {
+      const { url, format = "geojson", objectName = "" } = descriptor || {};
+      try {
+        const payload = await d3Client.json(url);
+        if (format === "topology") {
+          const object = payload?.objects?.[objectName];
+          const collection = object && globalThis.topojson
+            ? globalThis.topojson.feature(payload, object)
+            : null;
+          if (!Array.isArray(collection?.features)) {
+            console.warn(`[data_loader] Context topology pack invalid at ${url}. Ignoring ${layerName}.`);
+            return [layerName, null];
+          }
+          return [layerName, collection];
+        }
+        if (!Array.isArray(payload?.features)) {
+          console.warn(`[data_loader] Context layer pack invalid at ${url}. Ignoring ${layerName}.`);
+          return [layerName, null];
+        }
+        return [
+          layerName,
+          {
+            type: "FeatureCollection",
+            features: payload.features,
+          },
+        ];
+      } catch (err) {
+        console.warn(`[data_loader] Context layer pack missing or invalid at ${url}. Ignoring ${layerName}.`, err);
+        return [layerName, null];
+      }
+    })
+  );
+
+  const contextCollections = Object.fromEntries(
+    entries.filter(([, collection]) => Array.isArray(collection?.features))
+  );
+  if (Array.isArray(riversCollection?.features)) {
+    contextCollections.rivers = riversCollection;
+  }
+  return contextCollections;
+}
 
 function getSearchParams() {
   const search = globalThis?.location?.search || "";
@@ -357,6 +444,7 @@ export async function loadMapData({
     console.warn("Releasable catalog missing or invalid, continuing without releasable overlays.", err);
     return null;
   });
+  const contextLayerPackPromise = loadOptionalContextLayerPacks(d3Client);
 
   const [
     localeData,
@@ -367,6 +455,7 @@ export async function loadMapData({
     runtimePoliticalTopology,
     paletteRegistry,
     releasableCatalog,
+    contextLayerExternal,
   ] = await Promise.all([
     d3Client.json(localesUrl).catch((err) => {
       console.warn("Locales file missing or invalid, using defaults.", err);
@@ -409,6 +498,7 @@ export async function loadMapData({
     runtimePoliticalPromise,
     paletteRegistryPromise,
     releasableCatalogPromise,
+    contextLayerPackPromise,
   ]);
 
   let activePaletteMeta = null;
@@ -451,6 +541,7 @@ export async function loadMapData({
     runtimePoliticalTopology,
     paletteRegistry,
     releasableCatalog,
+    contextLayerExternal,
     activePaletteMeta,
     activePalettePack,
     activePaletteMap,

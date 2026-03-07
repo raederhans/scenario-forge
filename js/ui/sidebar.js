@@ -1,5 +1,11 @@
 // Sidebar UI (Phase 13)
-import { state, countryNames, PRESET_STORAGE_KEY, defaultCountryPalette } from "../core/state.js";
+import {
+  state,
+  countryNames,
+  PRESET_STORAGE_KEY,
+  defaultCountryPalette,
+  normalizePhysicalStyleConfig,
+} from "../core/state.js";
 import { ColorManager } from "../core/color_manager.js";
 import * as mapRenderer from "../core/map_renderer.js";
 import { resetCountryColors } from "../core/logic.js";
@@ -22,9 +28,14 @@ import {
 } from "../core/sovereignty_manager.js";
 import { markDirty } from "../core/dirty_state.js";
 import {
+  buildScenarioReleasableIndex,
+  getScenarioReleasableCountries,
+  getResolvedReleasableBoundaryVariant,
   normalizeCountryCode,
   normalizePresetName,
+  resolveCompanionActionFeatureIds,
   rebuildPresetState,
+  setReleasableBoundaryVariant,
 } from "../core/releasable_manager.js";
 
 function extractCountryCodeFromId(value) {
@@ -894,6 +905,65 @@ function applyPreset(countryCode, presetIndex, color, render) {
   });
 }
 
+function applyExplicitOwnershipTransfer(
+  requestedFeatureIds,
+  targetOwnerCode,
+  {
+    render,
+    historyKind = "scenario-companion-transfer",
+    dirtyReason = "scenario-companion-transfer",
+    recomputeReason = "sidebar-companion-transfer",
+  } = {}
+) {
+  const {
+    requestedIds,
+    matchedIds: targetIds,
+    missingIds,
+  } = filterToVisibleFeatureIds(requestedFeatureIds);
+  if (!requestedIds.length) {
+    return {
+      applied: false,
+      changed: 0,
+      matchedCount: 0,
+      requestedCount: 0,
+      missingCount: 0,
+      reason: "empty-target",
+      mode: "ownership",
+    };
+  }
+  if (!targetIds.length) {
+    showToast(
+      t("Current map does not include this action's detail features. Load detail topology and try again.", "ui"),
+      {
+        title: t("Transfer not applied", "ui"),
+        tone: "warning",
+        duration: 4200,
+      }
+    );
+    return {
+      applied: false,
+      changed: 0,
+      matchedCount: 0,
+      requestedCount: requestedIds.length,
+      missingCount: missingIds.length,
+      reason: "no-visible-features",
+      mode: "ownership",
+    };
+  }
+  const result = applyOwnershipToFeatureIds(targetIds, targetOwnerCode, {
+    render,
+    historyKind,
+    dirtyReason,
+    recomputeReason,
+  });
+  return {
+    ...result,
+    matchedCount: targetIds.length,
+    requestedCount: requestedIds.length,
+    missingCount: missingIds.length,
+  };
+}
+
 function initSidebar({ render } = {}) {
   const list = document.getElementById("countryList");
   if (!list) return;
@@ -1207,6 +1277,36 @@ function initSidebar({ render } = {}) {
       featured: !!(scenarioMeta.featured ?? entry.featured),
       catalogOrder: Number(scenarioMeta.catalog_order ?? entry.catalogOrder ?? Number.MAX_SAFE_INTEGER),
       notes: String(scenarioMeta.notes || entry.notes || "").trim(),
+      defaultBoundaryVariantId: String(
+        scenarioMeta.default_boundary_variant_id
+        || entry.defaultBoundaryVariantId
+        || ""
+      ).trim().toLowerCase(),
+      selectedBoundaryVariantId: String(
+        scenarioMeta.selected_boundary_variant_id
+        || entry.selectedBoundaryVariantId
+        || ""
+      ).trim().toLowerCase(),
+      selectedBoundaryVariantLabel: String(
+        scenarioMeta.selected_boundary_variant_label
+        || entry.selectedBoundaryVariantLabel
+        || ""
+      ).trim(),
+      selectedBoundaryVariantDescription: String(
+        scenarioMeta.selected_boundary_variant_description
+        || entry.selectedBoundaryVariantDescription
+        || ""
+      ).trim(),
+      boundaryVariants: Array.isArray(scenarioMeta.boundary_variants)
+        ? scenarioMeta.boundary_variants
+        : Array.isArray(entry.boundaryVariants)
+          ? entry.boundaryVariants
+          : [],
+      companionActions: Array.isArray(scenarioMeta.companion_actions)
+        ? scenarioMeta.companion_actions
+        : Array.isArray(entry.companionActions)
+          ? entry.companionActions
+          : [],
     };
   };
 
@@ -1793,6 +1893,7 @@ function initSidebar({ render } = {}) {
           duration: 2800,
         });
       }
+      applyScenarioAutoCompanionActions(countryState);
     } else {
       const resolvedColor = getResolvedCountryColor(latestCountryStatesByCode.get(countryState.code) || countryState);
       const result = applyPresetWithMode(presetRef.presetLookupCode, presetRef.presetIndex, {
@@ -1824,6 +1925,99 @@ function initSidebar({ render } = {}) {
     }
 
     renderList();
+    return true;
+  };
+
+  const applyScenarioCompanionAction = (
+    countryState,
+    action,
+    { silent = false, suppressRenderList = false } = {}
+  ) => {
+    if (!countryState?.releasable || !action) return false;
+    const targetOwnerCode = normalizeCountryCode(action.target_owner_tag);
+    if (!targetOwnerCode) {
+      if (!silent) {
+        showToast(t("Historical transfer target is missing.", "ui"), {
+          title: t("Transfer not applied", "ui"),
+          tone: "warning",
+          duration: 3200,
+        });
+      }
+      return false;
+    }
+    const featureIds = resolveCompanionActionFeatureIds(action, getScenarioCountryMeta(countryState.code) || countryState);
+    const result = applyExplicitOwnershipTransfer(featureIds, targetOwnerCode, {
+      render,
+      historyKind: `scenario-companion-transfer:${countryState.code}:${action.id || "action"}`,
+      dirtyReason: "scenario-companion-transfer",
+      recomputeReason: "sidebar-companion-transfer",
+    });
+    if (!result?.applied) {
+      if (!silent && result?.reason !== "no-visible-features") {
+        showToast(t("Historical transfer was not applied.", "ui"), {
+          title: t("Transfer not applied", "ui"),
+          tone: "warning",
+          duration: 3200,
+        });
+      }
+      if (!suppressRenderList) {
+        renderList();
+      }
+      return false;
+    }
+    if (!silent && result.changed > 0) {
+      showToast(
+        `${t("Applied", "ui")} ${result.changed}/${result.matchedCount} ${t("features", "ui")}`,
+        {
+          title: action.label || t("Historical transfer applied", "ui"),
+          tone: "success",
+          duration: 3200,
+        }
+      );
+    } else if (!silent) {
+      showToast(t("Historical transfer already matches current ownership.", "ui"), {
+        title: t("No changes", "ui"),
+        tone: "info",
+        duration: 2800,
+      });
+    }
+    if (!suppressRenderList) {
+      renderList();
+    }
+    return true;
+  };
+
+  const applyScenarioAutoCompanionActions = (countryState) => {
+    const actions = Array.isArray(countryState?.companionActions) ? countryState.companionActions : [];
+    let appliedAny = false;
+    actions.forEach((action) => {
+      if (!action?.auto_apply_on_core_territory) return;
+      const applied = applyScenarioCompanionAction(countryState, action, {
+        silent: true,
+        suppressRenderList: true,
+      });
+      appliedAny = applied || appliedAny;
+    });
+    return appliedAny;
+  };
+
+  const applyReleasableBoundaryVariantSelection = (countryState, variant) => {
+    if (!countryState?.releasable || !variant?.id) return false;
+    const result = setReleasableBoundaryVariant(countryState.code, variant.id);
+    if (!result) {
+      showToast(t("Boundary variant could not be selected.", "ui"), {
+        title: t("Variant not applied", "ui"),
+        tone: "warning",
+        duration: 3200,
+      });
+      return false;
+    }
+
+    const refreshedCountryState = latestCountryStatesByCode.get(countryState.code) || countryState;
+    applyScenarioReleasableCoreTerritory(refreshedCountryState, {
+      source: "scenario-boundary-variant",
+      actionMode: "ownership",
+    });
     return true;
   };
 
@@ -2506,6 +2700,32 @@ function initSidebar({ render } = {}) {
     section.appendChild(returnBtn);
   };
 
+  const renderScenarioBoundaryVariantActions = (container, countryState) => {
+    const variants = Array.isArray(countryState?.boundaryVariants) ? countryState.boundaryVariants : [];
+    if (variants.length <= 1) return;
+
+    const section = appendActionSection(container, t("Boundary Variants", "ui"));
+    const activeVariant = getResolvedReleasableBoundaryVariant(getScenarioCountryMeta(countryState.code) || countryState);
+    if (activeVariant?.description) {
+      const note = document.createElement("div");
+      note.className = "inspector-empty-note";
+      note.textContent = activeVariant.description;
+      section.appendChild(note);
+    }
+
+    variants.forEach((variant) => {
+      const button = createInspectorActionButton(variant.label || variant.id, () => {
+        applyReleasableBoundaryVariantSelection(countryState, variant);
+      });
+      const isActive = String(activeVariant?.id || "").trim().toLowerCase() === String(variant?.id || "").trim().toLowerCase();
+      button.disabled = isActive;
+      if (isActive) {
+        button.title = t("Already using this boundary variant.", "ui");
+      }
+      section.appendChild(button);
+    });
+  };
+
   const renderScenarioCoreTerritoryAction = (container, countryState) => {
     const section = appendActionSection(container, t("Core Territory", "ui"));
     const presetRef = getPrimaryReleasablePresetRef(countryState);
@@ -2526,7 +2746,12 @@ function initSidebar({ render } = {}) {
 
     const meta = document.createElement("div");
     meta.className = "country-select-meta";
-    meta.textContent = `${presetRef.preset?.ids?.length || 0} ${t("features", "ui")}`;
+    const metaBits = [`${presetRef.preset?.ids?.length || 0} ${t("features", "ui")}`];
+    const selectedVariantLabel = String(countryState?.selectedBoundaryVariantLabel || "").trim();
+    if (selectedVariantLabel && Array.isArray(countryState?.boundaryVariants) && countryState.boundaryVariants.length > 1) {
+      metaBits.push(selectedVariantLabel);
+    }
+    meta.textContent = metaBits.join(" · ");
 
     copy.appendChild(title);
     copy.appendChild(meta);
@@ -2585,15 +2810,48 @@ function initSidebar({ render } = {}) {
     section.appendChild(card);
   };
 
+  const renderScenarioHistoricalTransfers = (container, countryState) => {
+    const actions = Array.isArray(countryState?.companionActions)
+      ? countryState.companionActions.filter((action) => !action?.hidden_in_ui)
+      : [];
+    if (!actions.length) return;
+
+    const section = appendActionSection(container, t("Historical Transfers", "ui"));
+    actions.forEach((action) => {
+      const button = createInspectorActionButton(action.label || action.id, () => {
+        applyScenarioCompanionAction(countryState, action);
+      });
+      section.appendChild(button);
+      if (action.description) {
+        const note = document.createElement("div");
+        note.className = "inspector-mini-label";
+        note.textContent = action.description;
+        section.appendChild(note);
+      }
+    });
+  };
+
   const renderScenarioReleasableActions = (container, countryState) => {
     renderScenarioParentReturnAction(container, countryState);
+    renderScenarioBoundaryVariantActions(container, countryState);
     renderScenarioCoreTerritoryAction(container, countryState);
+    renderScenarioHistoricalTransfers(container, countryState);
     if (countryState.notes) {
       const notesSection = appendActionSection(container, t("Notes", "ui"));
       const notes = document.createElement("div");
       notes.className = "inspector-empty-note";
       notes.textContent = countryState.notes;
       notesSection.appendChild(notes);
+      if (
+        countryState.selectedBoundaryVariantDescription
+        && Array.isArray(countryState?.boundaryVariants)
+        && countryState.boundaryVariants.length > 1
+      ) {
+        const variantNote = document.createElement("div");
+        variantNote.className = "inspector-mini-label mt-2";
+        variantNote.textContent = countryState.selectedBoundaryVariantDescription;
+        notesSection.appendChild(variantNote);
+      }
     }
   };
 
@@ -3017,6 +3275,17 @@ function initSidebar({ render } = {}) {
         state.activeSovereignCode = data.activeSovereignCode || "";
         state.selectedInspectorCountryCode = data.activeSovereignCode || state.selectedInspectorCountryCode || "";
         state.inspectorHighlightCountryCode = state.selectedInspectorCountryCode;
+        state.releasableBoundaryVariantByTag =
+          data.releasableBoundaryVariantByTag && typeof data.releasableBoundaryVariantByTag === "object"
+            ? { ...data.releasableBoundaryVariantByTag }
+            : {};
+        if (state.activeScenarioId) {
+          state.scenarioReleasableIndex = buildScenarioReleasableIndex(state.activeScenarioId);
+          state.scenarioCountriesByTag = {
+            ...(state.scenarioCountriesByTag || {}),
+            ...getScenarioReleasableCountries(state.activeScenarioId),
+          };
+        }
         state.inspectorExpansionInitialized = false;
         if (state.expandedInspectorContinents instanceof Set) {
           state.expandedInspectorContinents.clear();
@@ -3066,10 +3335,10 @@ function initSidebar({ render } = {}) {
           };
         }
         if (data.styleConfig?.physical && typeof data.styleConfig.physical === "object") {
-          state.styleConfig.physical = {
+          state.styleConfig.physical = normalizePhysicalStyleConfig({
             ...(state.styleConfig.physical || {}),
             ...data.styleConfig.physical,
-          };
+          });
         }
         if (data.styleConfig?.rivers && typeof data.styleConfig.rivers === "object") {
           state.styleConfig.rivers = {
@@ -3128,6 +3397,7 @@ function initSidebar({ render } = {}) {
         if (typeof state.updateToolbarInputsFn === "function") {
           state.updateToolbarInputsFn();
         }
+        rebuildPresetState();
         mapRenderer.refreshColorState({ renderNow: false });
         if (render) render();
         if (typeof state.renderCountryListFn === "function") {

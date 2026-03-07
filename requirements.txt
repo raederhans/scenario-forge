@@ -6,3 +6,4 @@ shapely
 topojson
 pandas
 scipy
+rasterio

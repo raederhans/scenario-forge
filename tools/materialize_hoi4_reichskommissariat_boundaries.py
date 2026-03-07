@@ -17,6 +17,14 @@ DEFAULT_SPEC_PATH = PROJECT_ROOT / "data/releasables/hoi4_reichskommissariat_bou
 DEFAULT_SOURCE_PATH = PROJECT_ROOT / "data/releasables/hoi4_vanilla.internal.phase1.source.json"
 DEFAULT_REPORT_JSON = PROJECT_ROOT / "reports/generated/releasables/hoi4_reichskommissariat_boundaries.audit.json"
 DEFAULT_REPORT_MD = PROJECT_ROOT / "reports/generated/releasables/hoi4_reichskommissariat_boundaries.audit.md"
+EXPLICIT_ONLY_TAGS = {"RKP", "RKO", "RKU", "RKM"}
+EXPLICIT_ONLY_VARIANT_IDS = {"hoi4", "historical_reference"}
+EXPLICIT_ONLY_ACTION_IDS = {
+    "RKP": {"annexed_poland_to_ger"},
+    "RKO": set(),
+    "RKU": set(),
+    "RKM": {"greater_finland_to_fin"},
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -53,24 +61,89 @@ def normalize_country(raw: object) -> str:
     return "".join(char for char in str(raw or "").strip().upper() if char.isalpha())
 
 
-def build_indexes(runtime_features: list[object]) -> tuple[set[str], dict[str, set[str]], dict[str, str]]:
+def build_indexes(runtime_features: list[object]) -> tuple[set[str], dict[str, set[str]], dict[str, str], dict[str, str]]:
     all_ids: set[str] = set()
     ids_by_country: dict[str, set[str]] = {}
     country_by_id: dict[str, str] = {}
+    name_by_id: dict[str, str] = {}
     for feature in runtime_features:
         feature_id = str(getattr(feature, "feature_id", "") or "").strip()
         country_code = normalize_country(getattr(feature, "country_code", ""))
+        feature_name = str(getattr(feature, "name", "") or "").strip()
         if not feature_id:
             continue
         all_ids.add(feature_id)
         country_by_id[feature_id] = country_code
+        name_by_id[feature_id] = feature_name
         if country_code:
             ids_by_country.setdefault(country_code, set()).add(feature_id)
-    return all_ids, ids_by_country, country_by_id
+    return all_ids, ids_by_country, country_by_id, name_by_id
 
 
 def sorted_unique(values: set[str] | list[str]) -> list[str]:
     return sorted({str(value).strip() for value in values if str(value).strip()})
+
+
+def build_feature_preset_source(feature_ids: list[str]) -> dict[str, object]:
+    return {
+        "type": "feature_ids",
+        "feature_ids": feature_ids,
+    }
+
+
+def normalize_rule_id(raw: object) -> str:
+    return str(raw or "").strip().lower()
+
+
+def rule_uses_non_explicit_inputs(raw_entry: dict[str, object]) -> list[str]:
+    offenders: list[str] = []
+    for key in [
+        "include_country_codes",
+        "include_hierarchy_group_ids",
+        "include_feature_id_prefixes",
+        "exclude_country_codes",
+        "exclude_hierarchy_group_ids",
+        "exclude_feature_id_prefixes",
+        "exclude_feature_ids",
+    ]:
+        if list(raw_entry.get(key, []) or []):
+            offenders.append(key)
+    return offenders
+
+
+def requires_explicit_feature_ids(tag: str, kind: str, rule_id: str) -> bool:
+    if tag not in EXPLICIT_ONLY_TAGS:
+        return False
+    if kind == "boundary_variant":
+        return True
+    if kind == "companion_action":
+        return rule_id in EXPLICIT_ONLY_ACTION_IDS.get(tag, set())
+    return False
+
+
+def extract_existing_feature_ids(source_entry: dict[str, object], *, kind: str, rule_id: str) -> list[str]:
+    if kind == "boundary_variant":
+        for variant in source_entry.get("boundary_variants", []) or []:
+            if normalize_rule_id(variant.get("id")) != rule_id:
+                continue
+            preset_source = variant.get("preset_source", {}) if isinstance(variant, dict) else {}
+            if str(preset_source.get("type") or "").strip() != "feature_ids":
+                return []
+            return sorted_unique(preset_source.get("feature_ids", []) or [])
+        return []
+    if kind == "companion_action":
+        for action in source_entry.get("companion_actions", []) or []:
+            if normalize_rule_id(action.get("id")) != rule_id:
+                continue
+            preset_source = action.get("preset_source", {}) if isinstance(action, dict) else {}
+            if str(preset_source.get("type") or "").strip() != "feature_ids":
+                return []
+            return sorted_unique(preset_source.get("feature_ids", []) or [])
+        return []
+    preset_source = source_entry.get("preset_source", {}) if isinstance(source_entry, dict) else {}
+    if str(preset_source.get("type") or "").strip() != "feature_ids":
+        return []
+    return sorted_unique(preset_source.get("feature_ids", []) or [])
 
 
 def resolve_entry_feature_ids(
@@ -139,8 +212,8 @@ def render_markdown(audit_rows: list[dict[str, object]]) -> str:
     lines = [
         "# HOI4 Reichskommissariat Boundary Audit",
         "",
-        "| Tag | Basis | Feature Count | Whole-group Inputs | Explicit Fringe IDs | Diagnostics |",
-        "| --- | --- | ---: | --- | ---: | --- |",
+        "| Tag | Kind | ID | Basis | Feature Count | Added | Removed | Non-explicit Inputs | Diagnostics |",
+        "| --- | --- | --- | --- | ---: | ---: | ---: | --- | --- |",
     ]
     for row in audit_rows:
         diagnostics = row.get("diagnostics", {})
@@ -150,20 +223,30 @@ def render_markdown(audit_rows: list[dict[str, object]]) -> str:
             if values:
                 problems.append(f"{key}={len(values)}")
         lines.append(
-            f"| `{row['tag']}` | `{row.get('basis', '')}` | {row.get('feature_count', 0)} | "
-            f"{', '.join(row.get('whole_group_inputs', [])) or '-'} | "
-            f"{len(row.get('explicit_fringe_ids', []))} | "
+            f"| `{row['tag']}` | `{row.get('kind', '')}` | `{row.get('rule_id', '')}` | `{row.get('basis', '')}` | "
+            f"{row.get('feature_count', 0)} | "
+            f"{row.get('added_count', 0)} | "
+            f"{row.get('removed_count', 0)} | "
+            f"{', '.join(row.get('non_explicit_inputs', [])) or '-'} | "
             f"{', '.join(problems) or 'ok'} |"
         )
 
-    lines.extend(["", "## Explicit Fringe IDs", ""])
+    lines.extend(["", "## Rule Details", ""])
     for row in audit_rows:
-        lines.append(f"### {row['tag']}")
-        explicit_ids = row.get("explicit_fringe_ids", [])
-        if explicit_ids:
-            lines.extend([f"- `{feature_id}`" for feature_id in explicit_ids])
-        else:
-            lines.append("- None")
+        lines.append(f"### {row['tag']} · {row.get('kind', '')} · {row.get('rule_id', '')}")
+        lines.append(f"- Feature count: `{row.get('feature_count', 0)}`")
+        lines.append(f"- Added vs previous source: `{row.get('added_count', 0)}`")
+        lines.append(f"- Removed vs previous source: `{row.get('removed_count', 0)}`")
+        lines.append(f"- Non-explicit inputs: `{', '.join(row.get('non_explicit_inputs', [])) or '-'}`")
+        feature_names = row.get("feature_names", []) or []
+        added_names = row.get("added_feature_names", []) or []
+        removed_names = row.get("removed_feature_names", []) or []
+        lines.append("- Feature names:")
+        lines.append(f"  {', '.join(feature_names) if feature_names else 'None'}")
+        lines.append("- Added feature names:")
+        lines.append(f"  {', '.join(added_names) if added_names else 'None'}")
+        lines.append("- Removed feature names:")
+        lines.append(f"  {', '.join(removed_names) if removed_names else 'None'}")
         lines.append("")
     return "\n".join(lines)
 
@@ -178,7 +261,7 @@ def main() -> int:
 
     runtime_features = load_runtime_features(runtime_topology)
     hierarchy_groups, _country_meta = load_hierarchy_groups(Path(args.hierarchy))
-    all_feature_ids, ids_by_country, _country_by_id = build_indexes(runtime_features)
+    all_feature_ids, ids_by_country, _country_by_id, name_by_id = build_indexes(runtime_features)
     ids_by_group = {
         group_id: {feature_id for feature_id in feature_ids if feature_id in all_feature_ids}
         for group_id, feature_ids in hierarchy_groups.items()
@@ -192,6 +275,7 @@ def main() -> int:
     }
 
     audit_rows: list[dict[str, object]] = []
+    default_variant_feature_ids_by_tag: dict[str, set[str]] = {}
     for spec_entry in spec_payload.get("entries", []) or []:
         if not isinstance(spec_entry, dict):
             continue
@@ -199,6 +283,160 @@ def main() -> int:
         source_entry = entries_by_tag.get(tag)
         if not source_entry:
             raise SystemExit(f"[rk-boundaries] Missing source entry for tag {tag}.")
+
+        source_entry["notes"] = str(spec_entry.get("notes") or source_entry.get("notes") or "").strip()
+
+        boundary_variant_specs = spec_entry.get("boundary_variants")
+        companion_action_specs = spec_entry.get("companion_actions")
+        if isinstance(boundary_variant_specs, list) and boundary_variant_specs:
+            resolved_boundary_variants: list[dict[str, object]] = []
+            default_variant_id = normalize_rule_id(spec_entry.get("default_boundary_variant_id"))
+
+            for raw_variant in boundary_variant_specs:
+                if not isinstance(raw_variant, dict):
+                    continue
+                variant_id = normalize_rule_id(raw_variant.get("id"))
+                if not variant_id:
+                    raise SystemExit(f"[rk-boundaries] Boundary variant for {tag} is missing an id.")
+                non_explicit_inputs = rule_uses_non_explicit_inputs(raw_variant)
+                if requires_explicit_feature_ids(tag, "boundary_variant", variant_id) and non_explicit_inputs:
+                    raise SystemExit(
+                        f"[rk-boundaries] Boundary variant {tag}:{variant_id} must use explicit include_feature_ids only; "
+                        f"found {', '.join(non_explicit_inputs)}."
+                    )
+                feature_ids, diagnostics = resolve_entry_feature_ids(
+                    raw_variant,
+                    all_feature_ids=all_feature_ids,
+                    ids_by_country=ids_by_country,
+                    ids_by_group=ids_by_group,
+                )
+                if not feature_ids:
+                    raise SystemExit(f"[rk-boundaries] Boundary variant {tag}:{variant_id} resolved zero feature IDs.")
+                previous_feature_ids = extract_existing_feature_ids(
+                    source_entry,
+                    kind="boundary_variant",
+                    rule_id=variant_id,
+                )
+                added_feature_ids = sorted(set(feature_ids) - set(previous_feature_ids))
+                removed_feature_ids = sorted(set(previous_feature_ids) - set(feature_ids))
+                preset_source = build_feature_preset_source(feature_ids)
+                resolved_boundary_variants.append(
+                    {
+                        "id": variant_id,
+                        "label": str(raw_variant.get("label") or variant_id).strip(),
+                        "description": str(raw_variant.get("description") or "").strip(),
+                        "basis": str(raw_variant.get("basis") or spec_entry.get("basis") or "").strip(),
+                        "preset_source": preset_source,
+                        "resolved_feature_count_hint": len(feature_ids),
+                    }
+                )
+                audit_rows.append(
+                    {
+                        "tag": tag,
+                        "kind": "boundary_variant",
+                        "rule_id": variant_id,
+                        "basis": str(raw_variant.get("basis") or spec_entry.get("basis") or "").strip(),
+                        "precedence": str(raw_variant.get("precedence") or spec_entry.get("precedence") or "").strip(),
+                        "notes": str(raw_variant.get("description") or spec_entry.get("notes") or "").strip(),
+                        "feature_count": len(feature_ids),
+                        "non_explicit_inputs": non_explicit_inputs,
+                        "feature_ids": feature_ids,
+                        "feature_names": [name_by_id.get(feature_id, feature_id) for feature_id in feature_ids],
+                        "added_count": len(added_feature_ids),
+                        "removed_count": len(removed_feature_ids),
+                        "added_feature_ids": added_feature_ids,
+                        "removed_feature_ids": removed_feature_ids,
+                        "added_feature_names": [name_by_id.get(feature_id, feature_id) for feature_id in added_feature_ids],
+                        "removed_feature_names": [name_by_id.get(feature_id, feature_id) for feature_id in removed_feature_ids],
+                        "diagnostics": diagnostics,
+                    }
+                )
+
+            if not resolved_boundary_variants:
+                raise SystemExit(f"[rk-boundaries] Spec for {tag} produced no boundary variants.")
+            resolved_variant_ids = {str(item.get("id") or "").strip() for item in resolved_boundary_variants}
+            if not default_variant_id:
+                default_variant_id = str(resolved_boundary_variants[0].get("id") or "").strip()
+            if default_variant_id not in resolved_variant_ids:
+                raise SystemExit(f"[rk-boundaries] Default boundary variant {default_variant_id} missing for {tag}.")
+
+            resolved_companion_actions: list[dict[str, object]] = []
+            for raw_action in companion_action_specs or []:
+                if not isinstance(raw_action, dict):
+                    continue
+                action_id = normalize_rule_id(raw_action.get("id"))
+                if not action_id:
+                    raise SystemExit(f"[rk-boundaries] Companion action for {tag} is missing an id.")
+                non_explicit_inputs = rule_uses_non_explicit_inputs(raw_action)
+                if requires_explicit_feature_ids(tag, "companion_action", action_id) and non_explicit_inputs:
+                    raise SystemExit(
+                        f"[rk-boundaries] Companion action {tag}:{action_id} must use explicit include_feature_ids only; "
+                        f"found {', '.join(non_explicit_inputs)}."
+                    )
+                feature_ids, diagnostics = resolve_entry_feature_ids(
+                    raw_action,
+                    all_feature_ids=all_feature_ids,
+                    ids_by_country=ids_by_country,
+                    ids_by_group=ids_by_group,
+                )
+                if not feature_ids:
+                    raise SystemExit(f"[rk-boundaries] Companion action {tag}:{action_id} resolved zero feature IDs.")
+                previous_feature_ids = extract_existing_feature_ids(
+                    source_entry,
+                    kind="companion_action",
+                    rule_id=action_id,
+                )
+                added_feature_ids = sorted(set(feature_ids) - set(previous_feature_ids))
+                removed_feature_ids = sorted(set(previous_feature_ids) - set(feature_ids))
+                target_owner_tag = normalize_tag(raw_action.get("target_owner_tag"))
+                if not target_owner_tag:
+                    raise SystemExit(f"[rk-boundaries] Companion action {tag}:{action_id} is missing target_owner_tag.")
+                resolved_companion_actions.append(
+                    {
+                        "id": action_id,
+                        "label": str(raw_action.get("label") or action_id).strip(),
+                        "description": str(raw_action.get("description") or "").strip(),
+                        "basis": str(raw_action.get("basis") or "").strip(),
+                        "action_type": str(raw_action.get("action_type") or "ownership_transfer").strip(),
+                        "target_owner_tag": target_owner_tag,
+                        "auto_apply_on_core_territory": bool(raw_action.get("auto_apply_on_core_territory")),
+                        "hidden_in_ui": bool(raw_action.get("hidden_in_ui")),
+                        "preset_source": build_feature_preset_source(feature_ids),
+                        "resolved_feature_count_hint": len(feature_ids),
+                    }
+                )
+                audit_rows.append(
+                    {
+                        "tag": tag,
+                        "kind": "companion_action",
+                        "rule_id": action_id,
+                        "basis": str(raw_action.get("basis") or "").strip(),
+                        "precedence": "",
+                        "notes": str(raw_action.get("description") or "").strip(),
+                        "feature_count": len(feature_ids),
+                        "non_explicit_inputs": non_explicit_inputs,
+                        "feature_ids": feature_ids,
+                        "feature_names": [name_by_id.get(feature_id, feature_id) for feature_id in feature_ids],
+                        "added_count": len(added_feature_ids),
+                        "removed_count": len(removed_feature_ids),
+                        "added_feature_ids": added_feature_ids,
+                        "removed_feature_ids": removed_feature_ids,
+                        "added_feature_names": [name_by_id.get(feature_id, feature_id) for feature_id in added_feature_ids],
+                        "removed_feature_names": [name_by_id.get(feature_id, feature_id) for feature_id in removed_feature_ids],
+                        "diagnostics": diagnostics,
+                    }
+                )
+
+            default_variant = next(
+                (item for item in resolved_boundary_variants if str(item.get("id") or "").strip() == default_variant_id),
+                resolved_boundary_variants[0],
+            )
+            source_entry["default_boundary_variant_id"] = default_variant_id
+            source_entry["boundary_variants"] = resolved_boundary_variants
+            source_entry["companion_actions"] = resolved_companion_actions
+            source_entry["preset_source"] = default_variant.get("preset_source", build_feature_preset_source([]))
+            default_variant_feature_ids_by_tag[tag] = set(default_variant["preset_source"].get("feature_ids", []))
+            continue
 
         feature_ids, diagnostics = resolve_entry_feature_ids(
             spec_entry,
@@ -209,44 +447,74 @@ def main() -> int:
         if not feature_ids:
             raise SystemExit(f"[rk-boundaries] Spec for {tag} resolved zero feature IDs.")
 
-        whole_group_inputs = sorted_unique(
-            list(spec_entry.get("include_country_codes", []) or [])
-            + list(spec_entry.get("include_hierarchy_group_ids", []) or [])
-            + list(spec_entry.get("include_feature_id_prefixes", []) or [])
-        )
-        explicit_fringe_ids = sorted_unique(spec_entry.get("include_feature_ids", []) or [])
-        previous_ids = sorted_unique(
-            ((source_entry.get("preset_source") or {}).get("feature_ids", []))
-            if isinstance(source_entry.get("preset_source"), dict)
-            else []
-        )
-        source_entry["preset_source"] = {
-            "type": "feature_ids",
-            "feature_ids": feature_ids,
-        }
+        source_entry.pop("default_boundary_variant_id", None)
+        source_entry.pop("boundary_variants", None)
+        source_entry.pop("companion_actions", None)
+        source_entry["preset_source"] = build_feature_preset_source(feature_ids)
         audit_rows.append(
             {
                 "tag": tag,
+                "kind": "preset_source",
+                "rule_id": "default",
                 "basis": str(spec_entry.get("basis") or "").strip(),
                 "precedence": str(spec_entry.get("precedence") or "").strip(),
                 "notes": str(spec_entry.get("notes") or "").strip(),
                 "feature_count": len(feature_ids),
-                "whole_group_inputs": whole_group_inputs,
-                "explicit_fringe_ids": explicit_fringe_ids,
-                "added_count": len(sorted(set(feature_ids) - set(previous_ids))),
-                "removed_count": len(sorted(set(previous_ids) - set(feature_ids))),
+                "non_explicit_inputs": rule_uses_non_explicit_inputs(spec_entry),
+                "feature_ids": feature_ids,
+                "feature_names": [name_by_id.get(feature_id, feature_id) for feature_id in feature_ids],
+                "added_count": 0,
+                "removed_count": 0,
+                "added_feature_ids": [],
+                "removed_feature_ids": [],
+                "added_feature_names": [],
+                "removed_feature_names": [],
                 "diagnostics": diagnostics,
             }
         )
+
+    overlap_rows: list[dict[str, object]] = []
+    overlap_tags = sorted(default_variant_feature_ids_by_tag)
+    for index, left_tag in enumerate(overlap_tags):
+        left_ids = default_variant_feature_ids_by_tag.get(left_tag, set())
+        if not left_ids:
+            continue
+        for right_tag in overlap_tags[index + 1:]:
+            right_ids = default_variant_feature_ids_by_tag.get(right_tag, set())
+            overlap_ids = sorted(left_ids & right_ids)
+            if not overlap_ids:
+                continue
+            overlap_rows.append(
+                {
+                    "left_tag": left_tag,
+                    "right_tag": right_tag,
+                    "count": len(overlap_ids),
+                    "feature_ids": overlap_ids,
+                }
+            )
 
     audit_payload = {
         "version": 1,
         "spec_path": str(spec_path),
         "runtime_topology": str(runtime_topology),
         "entries": audit_rows,
+        "default_variant_overlaps": overlap_rows,
     }
     write_json(Path(args.report_json), audit_payload)
-    write_text(Path(args.report_md), render_markdown(audit_rows))
+    markdown = render_markdown(audit_rows)
+    if overlap_rows:
+        overlap_lines = ["", "## Default HOI4 Variant Overlaps", ""]
+        for row in overlap_rows:
+            overlap_lines.append(
+                f"- `{row['left_tag']}` vs `{row['right_tag']}`: {row['count']} overlaps"
+            )
+        markdown += "\n" + "\n".join(overlap_lines)
+    write_text(Path(args.report_md), markdown)
+    if overlap_rows:
+        raise SystemExit(
+            "[rk-boundaries] Default boundary variant overlaps remain: "
+            + ", ".join(f"{row['left_tag']}:{row['right_tag']}={row['count']}" for row in overlap_rows)
+        )
 
     if args.check_only:
         return 0

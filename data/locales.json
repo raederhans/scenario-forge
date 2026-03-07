@@ -60,6 +60,10 @@
       "en": "All matching presets moved to Releasable Countries.",
       "zh": "所有匹配预设都已移动到“可释放国家”中。"
     },
+    "Already using this boundary variant.": {
+      "en": "Already using this boundary variant.",
+      "zh": "Already using this boundary variant."
+    },
     "Ambiguous identity": {
       "en": "Ambiguous identity",
       "zh": "身份存在歧义"
@@ -100,6 +104,18 @@
       "en": "Approximate",
       "zh": "近似映射"
     },
+    "Atlas + Contours": {
+      "en": "Atlas + Contours",
+      "zh": "图集 + 等高线"
+    },
+    "Atlas Intensity": {
+      "en": "Atlas Intensity",
+      "zh": "图集强度"
+    },
+    "Atlas Only": {
+      "en": "Atlas Only",
+      "zh": "仅图集"
+    },
     "Auto-Fill Countries": {
       "en": "Auto-Fill Countries",
       "zh": "自动填充国家"
@@ -131,6 +147,14 @@
     "Borders up to date": {
       "en": "Borders up to date",
       "zh": "边界已更新"
+    },
+    "Boundary Variants": {
+      "en": "Boundary Variants",
+      "zh": "Boundary Variants"
+    },
+    "Boundary variant could not be selected.": {
+      "en": "Boundary variant could not be selected.",
+      "zh": "Boundary variant could not be selected."
     },
     "Browse All Colors": {
       "en": "Browse All Colors",
@@ -264,6 +288,18 @@
       "en": "Confirm Reset",
       "zh": "确认重置"
     },
+    "Contour Color": {
+      "en": "Contour Color",
+      "zh": "等高线颜色"
+    },
+    "Contour Opacity": {
+      "en": "Contour Opacity",
+      "zh": "等高线不透明度"
+    },
+    "Contours Only": {
+      "en": "Contours Only",
+      "zh": "仅等高线"
+    },
     "Copied": {
       "en": "Copied",
       "zh": "已复制"
@@ -324,6 +360,10 @@
       "en": "Current Tool",
       "zh": "当前工具"
     },
+    "Current map does not include this action's detail features. Load detail topology and try again.": {
+      "en": "Current map does not include this action's detail features. Load detail topology and try again.",
+      "zh": "Current map does not include this action's detail features. Load detail topology and try again."
+    },
     "Current map does not include this preset's detail features. Load detail topology and try again.": {
       "en": "Current map does not include this preset's detail features. Load detail topology and try again.",
       "zh": "当前地图不包括该预设的详细功能。加载详细拓扑并重试。"
@@ -339,6 +379,10 @@
     "Delete Selected": {
       "en": "Delete Selected",
       "zh": "删除所选"
+    },
+    "Desert & Bare": {
+      "en": "Desert & Bare",
+      "zh": "荒漠与裸地"
     },
     "Detail topology not fully loaded; scenario is shown in coarse mode.": {
       "en": "Detail topology not fully loaded; scenario is shown in coarse mode.",
@@ -432,6 +476,10 @@
       "en": "Fit",
       "zh": "适应"
     },
+    "Forest": {
+      "en": "Forest",
+      "zh": "森林"
+    },
     "Format": {
       "en": "Format",
       "zh": "格式"
@@ -456,6 +504,10 @@
       "en": "Hierarchy Groups (Visual Color)",
       "zh": "层级分组（视觉颜色）"
     },
+    "Historical Transfers": {
+      "en": "Historical Transfers",
+      "zh": "Historical Transfers"
+    },
     "Historical composites built": {
       "en": "Historical composites built",
       "zh": "构建的历史合并区"
@@ -463,6 +515,22 @@
     "Historical predecessor": {
       "en": "Historical predecessor",
       "zh": "历史前身实体"
+    },
+    "Historical transfer already matches current ownership.": {
+      "en": "Historical transfer already matches current ownership.",
+      "zh": "Historical transfer already matches current ownership."
+    },
+    "Historical transfer applied": {
+      "en": "Historical transfer applied",
+      "zh": "Historical transfer applied"
+    },
+    "Historical transfer target is missing.": {
+      "en": "Historical transfer target is missing.",
+      "zh": "Historical transfer target is missing."
+    },
+    "Historical transfer was not applied.": {
+      "en": "Historical transfer was not applied.",
+      "zh": "Historical transfer was not applied."
     },
     "Import cancelled": {
       "en": "Import cancelled",
@@ -516,6 +584,18 @@
       "en": "Loading audit details…",
       "zh": "正在加载审计详情…"
     },
+    "Low-Relief Cutoff (m)": {
+      "en": "Low-Relief Cutoff (m)",
+      "zh": "低起伏截止高度（米）"
+    },
+    "Major Interval (m)": {
+      "en": "Major Interval (m)",
+      "zh": "主等高距（米）"
+    },
+    "Major Width": {
+      "en": "Major Width",
+      "zh": "主等高线宽度"
+    },
     "Manual-reviewed": {
       "en": "Manual-reviewed",
       "zh": "人工校审"
@@ -532,6 +612,14 @@
       "en": "Mapped to",
       "zh": "映射到"
     },
+    "Minor Interval (m)": {
+      "en": "Minor Interval (m)",
+      "zh": "次等高距（米）"
+    },
+    "Minor Width": {
+      "en": "Minor Width",
+      "zh": "次等高线宽度"
+    },
     "Mode": {
       "en": "Mode",
       "zh": "模式"
@@ -543,6 +631,10 @@
     "Mode: Visual Color": {
       "en": "Mode: Visual Color",
       "zh": "模式：视觉颜色"
+    },
+    "Mountains": {
+      "en": "Mountains",
+      "zh": "山地"
     },
     "Navigation": {
       "en": "Navigation",
@@ -672,6 +764,18 @@
       "en": "Parent Country",
       "zh": "母国"
     },
+    "Physical Regions": {
+      "en": "Physical Regions",
+      "zh": "地貌区域"
+    },
+    "Plains": {
+      "en": "Plains",
+      "zh": "平原"
+    },
+    "Plateaus": {
+      "en": "Plateaus",
+      "zh": "高原"
+    },
     "Political Editing": {
       "en": "Political Editing",
       "zh": "政治编辑"
@@ -739,6 +843,14 @@
     "Quick Colors": {
       "en": "Quick Colors",
       "zh": "快速颜色"
+    },
+    "Rainforest": {
+      "en": "Rainforest",
+      "zh": "雨林"
+    },
+    "Rainforest Emphasis": {
+      "en": "Rainforest Emphasis",
+      "zh": "雨林强调"
     },
     "Reapply Core Territory": {
       "en": "Reapply Core Territory",
@@ -972,6 +1084,10 @@
       "en": "Set Inactive",
       "zh": "取消当前"
     },
+    "Show Minor Contours": {
+      "en": "Show Minor Contours",
+      "zh": "显示次级等高线"
+    },
     "Show guide": {
       "en": "Show guide",
       "zh": "显示引导"
@@ -1020,6 +1136,14 @@
       "en": "Synthetic",
       "zh": "合成映射"
     },
+    "Terrain Atlas": {
+      "en": "Terrain Atlas",
+      "zh": "地貌图集"
+    },
+    "Terrain Contours": {
+      "en": "Terrain Contours",
+      "zh": "地形等高线"
+    },
     "Territories & Presets": {
       "en": "Territories & Presets",
       "zh": "领土与预设"
@@ -1047,6 +1171,14 @@
     "Total features": {
       "en": "Total features",
       "zh": "总地块数"
+    },
+    "Transfer not applied": {
+      "en": "Transfer not applied",
+      "zh": "Transfer not applied"
+    },
+    "Tundra & Ice": {
+      "en": "Tundra & Ice",
+      "zh": "苔原与冰雪"
     },
     "Unable to apply scenario.": {
       "en": "Unable to apply scenario.",
@@ -1104,6 +1236,10 @@
       "en": "Use diagnostics to inspect geometry and artifact behavior.",
       "zh": "使用诊断视图检查几何与异常行为。"
     },
+    "Variant not applied": {
+      "en": "Variant not applied",
+      "zh": "Variant not applied"
+    },
     "View": {
       "en": "View",
       "zh": "视图"
@@ -1131,6 +1267,10 @@
     "Warlord / regional tag": {
       "en": "Warlord / regional tag",
       "zh": "军阀或地区性 tag"
+    },
+    "Wetlands & Delta": {
+      "en": "Wetlands & Delta",
+      "zh": "湿地与三角洲"
     },
     "Width": {
       "en": "Width",

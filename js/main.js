@@ -172,6 +172,7 @@ async function bootstrap() {
       hierarchy,
       ruCityOverrides,
       specialZones,
+      contextLayerExternal,
       paletteRegistry,
       releasableCatalog,
       activePaletteMeta,
@@ -192,6 +193,10 @@ async function bootstrap() {
     state.geoAliasToStableKey = geoAliases?.alias_to_stable_key || {};
     state.ruCityOverrides = ruCityOverrides || null;
     state.specialZonesExternalData = specialZones || null;
+    state.contextLayerExternalDataByName = contextLayerExternal || {};
+    state.physicalSemanticsData = state.contextLayerExternalDataByName?.physical_semantics || null;
+    state.physicalContourMajorData = state.contextLayerExternalDataByName?.physical_contours_major || null;
+    state.physicalContourMinorData = state.contextLayerExternalDataByName?.physical_contours_minor || null;
     state.paletteRegistry = paletteRegistry || null;
     state.releasableCatalog = releasableCatalog || null;
     state.activePaletteMeta = activePaletteMeta || null;
@@ -254,6 +259,8 @@ async function bootstrap() {
     }
     if (objects.rivers) {
       state.riversData = globalThis.topojson.feature(state.topologyPrimary, objects.rivers);
+    } else if (Array.isArray(state.contextLayerExternalDataByName?.rivers?.features)) {
+      state.riversData = state.contextLayerExternalDataByName.rivers;
     }
     if (objects.ocean) {
       state.oceanData = globalThis.topojson.feature(state.topologyPrimary, objects.ocean);
@@ -263,10 +270,17 @@ async function bootstrap() {
     }
     if (objects.urban) {
       state.urbanData = globalThis.topojson.feature(state.topologyPrimary, objects.urban);
+    } else if (Array.isArray(state.contextLayerExternalDataByName?.urban?.features)) {
+      state.urbanData = state.contextLayerExternalDataByName.urban;
     }
     if (objects.physical) {
       state.physicalData = globalThis.topojson.feature(state.topologyPrimary, objects.physical);
+    } else if (Array.isArray(state.contextLayerExternalDataByName?.physical?.features)) {
+      state.physicalData = state.contextLayerExternalDataByName.physical;
     }
+    state.physicalSemanticsData = state.contextLayerExternalDataByName?.physical_semantics || null;
+    state.physicalContourMajorData = state.contextLayerExternalDataByName?.physical_contours_major || null;
+    state.physicalContourMinorData = state.contextLayerExternalDataByName?.physical_contours_minor || null;
 
     initPresetState();
     initMap();

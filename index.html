@@ -39,7 +39,6 @@
             <div id="lblScenario" class="section-header">Scenario</div>
             <p id="lblScenarioHint" class="body-text mt-2">Load a bundled historical setup and reset to its baseline.</p>
             <div id="scenarioStatus" class="body-text mt-3">No scenario active</div>
-            <div id="scenarioAuditHint" class="body-text mt-2">Coverage report unavailable</div>
             <label id="lblScenarioSelect" class="section-header-block mt-3" for="scenarioSelect">Scenario</label>
             <select id="scenarioSelect" class="select-input mt-2">
               <option value="">None</option>
@@ -104,40 +103,6 @@
                 >
                   Texture
                 </button>
-              </div>
-              <button id="appearanceSpecialZoneBtn" type="button" class="btn-secondary appearance-tool-btn">Special Zone Tool</button>
-            </div>
-            <div id="specialZonePopover" class="appearance-tool-popover hidden" role="dialog" aria-label="Special zone editor">
-              <div class="section-header" id="lblSpecialZoneEditor">Special Zone Editor</div>
-              <div class="space-y-3 mt-4">
-                <div class="flex items-center justify-between gap-3">
-                  <label id="lblSpecialZoneType" class="range-label" for="specialZoneTypeSelect">Type</label>
-                  <select id="specialZoneTypeSelect" class="select-input">
-                    <option value="disputed">Disputed</option>
-                    <option value="wasteland">Wasteland</option>
-                    <option value="custom" selected>Custom</option>
-                  </select>
-                </div>
-                <div>
-                  <label id="lblSpecialZoneLabel" class="range-label" for="specialZoneLabelInput">Label</label>
-                  <input id="specialZoneLabelInput" type="text" class="input mt-2" placeholder="e.g. Buffer Zone A" />
-                </div>
-                <div class="parent-border-actions mt-2">
-                  <button id="specialZoneStartBtn" type="button" class="btn-secondary">Start Draw</button>
-                  <button id="specialZoneUndoBtn" type="button" class="btn-secondary">Undo Vertex</button>
-                </div>
-                <div class="parent-border-actions mt-2">
-                  <button id="specialZoneFinishBtn" type="button" class="btn-secondary">Finish</button>
-                  <button id="specialZoneCancelBtn" type="button" class="btn-secondary">Cancel</button>
-                </div>
-                <div>
-                  <label id="lblSpecialZoneList" class="range-label" for="specialZoneFeatureList">Manual Zones</label>
-                  <select id="specialZoneFeatureList" class="select-input mt-2"></select>
-                </div>
-                <button id="specialZoneDeleteBtn" type="button" class="btn-secondary mt-2">Delete Selected</button>
-                <div id="specialZoneEditorHint" class="parent-border-empty mt-2">
-                  Click map to add vertices, double-click to finish.
-                </div>
               </div>
             </div>
             <div class="appearance-stack mt-4">
@@ -305,7 +270,7 @@
                 <div id="lblContextLayers" class="section-header">Context Layers</div>
                 <div class="appearance-subsection-stack mt-3">
                   <details class="appearance-mini-section">
-                    <summary class="section-header">Physical Regions</summary>
+                    <summary id="lblPhysicalPanel" class="section-header">Physical Regions</summary>
                     <div class="mt-3">
                       <label class="toggle-label mt-2">
                         <input id="togglePhysical" type="checkbox" class="checkbox-input" />
@@ -313,60 +278,141 @@
                       </label>
                       <div class="ml-5 space-y-2">
                         <div class="flex items-center justify-between gap-3">
-                          <label id="lblPhysicalPreset" class="range-label" for="physicalPreset">Preset</label>
-                          <select id="physicalPreset" class="select-input">
-                            <option id="optPhysicalAtlasSoft" value="atlas_soft" selected>Atlas Soft</option>
-                            <option id="optPhysicalContourOnly" value="contour_only">Contour Only</option>
-                            <option id="optPhysicalTintOnly" value="tint_only">Tint Only</option>
+                          <label id="lblPhysicalMode" class="range-label" for="physicalMode">Mode</label>
+                          <select id="physicalMode" class="select-input">
+                            <option id="optPhysicalModeAtlasContours" value="atlas_and_contours" selected>Atlas + Contours</option>
+                            <option id="optPhysicalModeAtlasOnly" value="atlas_only">Atlas Only</option>
+                            <option id="optPhysicalModeContoursOnly" value="contours_only">Contours Only</option>
                           </select>
-                        </div>
-                        <div class="flex items-center justify-between gap-3">
-                          <label id="lblPhysicalTintColor" class="range-label" for="physicalTintColor">Tint Color</label>
-                          <input id="physicalTintColor" type="color" value="#8f6b4e" class="color-input" />
                         </div>
                         <div>
                           <div class="range-row">
                             <label id="lblPhysicalOpacity" class="range-label" for="physicalOpacity">Opacity</label>
-                            <span id="physicalOpacityValue" class="range-value">24%</span>
+                            <span id="physicalOpacityValue" class="range-value">100%</span>
                           </div>
-                          <input id="physicalOpacity" type="range" min="0" max="100" value="24" class="range-input" />
-                        </div>
-                        <div class="flex items-center justify-between gap-3">
-                          <label id="lblPhysicalContourColor" class="range-label" for="physicalContourColor">Contour Color</label>
-                          <input id="physicalContourColor" type="color" value="#6f4e37" class="color-input" />
-                        </div>
-                        <div>
-                          <div class="range-row">
-                            <label id="lblPhysicalContourOpacity" class="range-label" for="physicalContourOpacity">Contour Opacity</label>
-                            <span id="physicalContourOpacityValue" class="range-value">30%</span>
-                          </div>
-                          <input id="physicalContourOpacity" type="range" min="0" max="100" value="30" class="range-input" />
-                        </div>
-                        <div>
-                          <div class="range-row">
-                            <label id="lblPhysicalContourWidth" class="range-label" for="physicalContourWidth">Contour Width</label>
-                            <span id="physicalContourWidthValue" class="range-value">0.70</span>
-                          </div>
-                          <input id="physicalContourWidth" type="range" min="0.2" max="2.5" step="0.05" value="0.70" class="range-input" />
-                        </div>
-                        <div>
-                          <div class="range-row">
-                            <label id="lblPhysicalContourSpacing" class="range-label" for="physicalContourSpacing">Contour Spacing</label>
-                            <span id="physicalContourSpacingValue" class="range-value">18</span>
-                          </div>
-                          <input id="physicalContourSpacing" type="range" min="8" max="36" step="1" value="18" class="range-input" />
+                          <input id="physicalOpacity" type="range" min="0" max="100" value="100" class="range-input" />
                         </div>
                         <div>
                           <div class="range-row">
                             <label id="lblPhysicalBlendMode" class="range-label" for="physicalBlendMode">Blend Mode</label>
                           </div>
                           <select id="physicalBlendMode" class="select-input mt-2">
-                            <option value="multiply" selected>Multiply</option>
+                            <option value="multiply">Multiply</option>
                             <option value="soft-light">Soft Light</option>
                             <option value="overlay">Overlay</option>
-                            <option value="source-over">Normal</option>
+                            <option value="source-over" selected>Normal</option>
                           </select>
                         </div>
+                      </div>
+                    </div>
+                  </details>
+
+                  <details class="appearance-mini-section">
+                    <summary id="lblTerrainAtlasPanel" class="section-header">Terrain Atlas</summary>
+                    <div class="mt-3 ml-5 space-y-2">
+                      <div>
+                        <div class="range-row">
+                          <label id="lblPhysicalAtlasIntensity" class="range-label" for="physicalAtlasIntensity">Atlas Intensity</label>
+                          <span id="physicalAtlasIntensityValue" class="range-value">90%</span>
+                        </div>
+                        <input id="physicalAtlasIntensity" type="range" min="20" max="140" value="90" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblPhysicalRainforestEmphasis" class="range-label" for="physicalRainforestEmphasis">Rainforest Emphasis</label>
+                          <span id="physicalRainforestEmphasisValue" class="range-value">72%</span>
+                        </div>
+                        <input id="physicalRainforestEmphasis" type="range" min="0" max="100" value="72" class="range-input" />
+                      </div>
+                      <div class="space-y-2 pt-1">
+                        <label class="toggle-label">
+                          <input id="physicalClassMountain" type="checkbox" class="checkbox-input" checked />
+                          <span id="lblPhysicalClassMountain">Mountains</span>
+                        </label>
+                        <label class="toggle-label">
+                          <input id="physicalClassPlateau" type="checkbox" class="checkbox-input" checked />
+                          <span id="lblPhysicalClassPlateau">Plateaus</span>
+                        </label>
+                        <label class="toggle-label">
+                          <input id="physicalClassPlains" type="checkbox" class="checkbox-input" checked />
+                          <span id="lblPhysicalClassPlains">Plains</span>
+                        </label>
+                        <label class="toggle-label">
+                          <input id="physicalClassWetlands" type="checkbox" class="checkbox-input" checked />
+                          <span id="lblPhysicalClassWetlands">Wetlands & Delta</span>
+                        </label>
+                        <label class="toggle-label">
+                          <input id="physicalClassForest" type="checkbox" class="checkbox-input" checked />
+                          <span id="lblPhysicalClassForest">Forest</span>
+                        </label>
+                        <label class="toggle-label">
+                          <input id="physicalClassRainforest" type="checkbox" class="checkbox-input" checked />
+                          <span id="lblPhysicalClassRainforest">Rainforest</span>
+                        </label>
+                        <label class="toggle-label">
+                          <input id="physicalClassDesert" type="checkbox" class="checkbox-input" checked />
+                          <span id="lblPhysicalClassDesert">Desert & Bare</span>
+                        </label>
+                        <label class="toggle-label">
+                          <input id="physicalClassTundra" type="checkbox" class="checkbox-input" checked />
+                          <span id="lblPhysicalClassTundra">Tundra & Ice</span>
+                        </label>
+                      </div>
+                    </div>
+                  </details>
+
+                  <details class="appearance-mini-section">
+                    <summary id="lblTerrainContoursPanel" class="section-header">Terrain Contours</summary>
+                    <div class="mt-3 ml-5 space-y-2">
+                      <label class="toggle-label mt-1">
+                        <input id="physicalMinorContours" type="checkbox" class="checkbox-input" checked />
+                        <span id="lblPhysicalMinorContours">Show Minor Contours</span>
+                      </label>
+                      <div class="flex items-center justify-between gap-3">
+                        <label id="lblPhysicalContourColor" class="range-label" for="physicalContourColor">Contour Color</label>
+                        <input id="physicalContourColor" type="color" value="#6b5947" class="color-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblPhysicalContourOpacity" class="range-label" for="physicalContourOpacity">Contour Opacity</label>
+                          <span id="physicalContourOpacityValue" class="range-value">34%</span>
+                        </div>
+                        <input id="physicalContourOpacity" type="range" min="0" max="100" value="34" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblPhysicalContourMajorWidth" class="range-label" for="physicalContourMajorWidth">Major Width</label>
+                          <span id="physicalContourMajorWidthValue" class="range-value">0.80</span>
+                        </div>
+                        <input id="physicalContourMajorWidth" type="range" min="0.2" max="3.0" step="0.05" value="0.80" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblPhysicalContourMinorWidth" class="range-label" for="physicalContourMinorWidth">Minor Width</label>
+                          <span id="physicalContourMinorWidthValue" class="range-value">0.45</span>
+                        </div>
+                        <input id="physicalContourMinorWidth" type="range" min="0.1" max="2.0" step="0.05" value="0.45" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblPhysicalContourMajorInterval" class="range-label" for="physicalContourMajorInterval">Major Interval (m)</label>
+                          <span id="physicalContourMajorIntervalValue" class="range-value">500</span>
+                        </div>
+                        <input id="physicalContourMajorInterval" type="range" min="500" max="2000" step="500" value="500" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblPhysicalContourMinorInterval" class="range-label" for="physicalContourMinorInterval">Minor Interval (m)</label>
+                          <span id="physicalContourMinorIntervalValue" class="range-value">100</span>
+                        </div>
+                        <input id="physicalContourMinorInterval" type="range" min="100" max="1000" step="100" value="100" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblPhysicalContourLowReliefCutoff" class="range-label" for="physicalContourLowReliefCutoff">Low-Relief Cutoff (m)</label>
+                          <span id="physicalContourLowReliefCutoffValue" class="range-value">300</span>
+                        </div>
+                        <input id="physicalContourLowReliefCutoff" type="range" min="0" max="2000" step="50" value="300" class="range-input" />
                       </div>
                     </div>
                   </details>
@@ -653,9 +699,39 @@
             </div>
           </details>
 
-          <div class="card-compact">
-            <p class="tip-text">Tip: Scroll to zoom and drag to pan. Hover highlights countries.</p>
-          </div>
+          <section id="specialZonePopover" class="card special-zone-editor-card" data-inline-editor="true" aria-label="Special zone editor">
+            <div class="section-header" id="lblSpecialZoneEditor">Special Zone Editor</div>
+            <div class="space-y-3 mt-4">
+              <div class="flex items-center justify-between gap-3">
+                <label id="lblSpecialZoneType" class="range-label" for="specialZoneTypeSelect">Type</label>
+                <select id="specialZoneTypeSelect" class="select-input">
+                  <option value="disputed">Disputed</option>
+                  <option value="wasteland">Wasteland</option>
+                  <option value="custom" selected>Custom</option>
+                </select>
+              </div>
+              <div>
+                <label id="lblSpecialZoneLabel" class="range-label" for="specialZoneLabelInput">Label</label>
+                <input id="specialZoneLabelInput" type="text" class="input mt-2" placeholder="e.g. Buffer Zone A" />
+              </div>
+              <div class="parent-border-actions mt-2">
+                <button id="specialZoneStartBtn" type="button" class="btn-secondary">Start Draw</button>
+                <button id="specialZoneUndoBtn" type="button" class="btn-secondary">Undo Vertex</button>
+              </div>
+              <div class="parent-border-actions mt-2">
+                <button id="specialZoneFinishBtn" type="button" class="btn-secondary">Finish</button>
+                <button id="specialZoneCancelBtn" type="button" class="btn-secondary">Cancel</button>
+              </div>
+              <div>
+                <label id="lblSpecialZoneList" class="range-label" for="specialZoneFeatureList">Manual Zones</label>
+                <select id="specialZoneFeatureList" class="select-input mt-2"></select>
+              </div>
+              <button id="specialZoneDeleteBtn" type="button" class="btn-secondary mt-2">Delete Selected</button>
+              <div id="specialZoneEditorHint" class="parent-border-empty mt-2">
+                Click map to add vertices, double-click to finish.
+              </div>
+            </div>
+          </section>
         </div>
       </aside>
 

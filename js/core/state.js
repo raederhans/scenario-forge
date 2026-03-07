@@ -390,6 +390,34 @@ const TEXTURE_MODE_ALIASES = {
   grid: "graticule",
   graticule: "graticule",
 };
+const PHYSICAL_MODE_ALIASES = {
+  atlas_soft: "atlas_and_contours",
+  atlas_and_contours: "atlas_and_contours",
+  contour_only: "contours_only",
+  contours_only: "contours_only",
+  tint_only: "atlas_only",
+  atlas_only: "atlas_only",
+};
+const PHYSICAL_ATLAS_CLASS_KEYS = [
+  "mountain_high_relief",
+  "upland_plateau",
+  "plains_lowlands",
+  "wetlands_delta",
+  "forest",
+  "rainforest",
+  "desert_bare",
+  "tundra_ice",
+];
+const PHYSICAL_ATLAS_PALETTE = {
+  mountain_high_relief: "#8b5e3c",
+  upland_plateau: "#a1764f",
+  plains_lowlands: "#7d8f69",
+  wetlands_delta: "#4f8f8b",
+  forest: "#5f7d3a",
+  rainforest: "#2f6f4f",
+  desert_bare: "#c6a269",
+  tundra_ice: "#a8b6c8",
+};
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
@@ -403,6 +431,101 @@ function toFiniteNumber(value, fallback) {
 function normalizeTextureMode(value) {
   const raw = String(value || "").trim().toLowerCase();
   return TEXTURE_MODE_ALIASES[raw] || "none";
+}
+
+function normalizePhysicalMode(value) {
+  const raw = String(value || "").trim().toLowerCase();
+  return PHYSICAL_MODE_ALIASES[raw] || "atlas_and_contours";
+}
+
+function createDefaultPhysicalAtlasVisibility() {
+  return Object.fromEntries(PHYSICAL_ATLAS_CLASS_KEYS.map((key) => [key, true]));
+}
+
+function createDefaultPhysicalStyleConfig() {
+  return {
+    mode: "atlas_and_contours",
+    opacity: 1,
+    atlasOpacity: 0.34,
+    atlasIntensity: 0.9,
+    atlasClassVisibility: createDefaultPhysicalAtlasVisibility(),
+    rainforestEmphasis: 0.72,
+    contourColor: "#6b5947",
+    contourOpacity: 0.28,
+    contourMajorWidth: 0.8,
+    contourMinorWidth: 0.45,
+    contourMajorIntervalM: 500,
+    contourMinorIntervalM: 100,
+    contourMinorVisible: true,
+    contourLowReliefCutoffM: 300,
+    blendMode: "source-over",
+  };
+}
+
+function normalizePhysicalStyleConfig(rawConfig) {
+  const defaults = createDefaultPhysicalStyleConfig();
+  const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
+  const legacyPreset = raw.preset;
+  const hasNewPhysicalSchema = [
+    "mode",
+    "atlasOpacity",
+    "atlasIntensity",
+    "atlasClassVisibility",
+    "rainforestEmphasis",
+    "contourMajorWidth",
+    "contourMinorWidth",
+    "contourMajorIntervalM",
+    "contourMinorIntervalM",
+    "contourMinorVisible",
+    "contourLowReliefCutoffM",
+    "layerOpacity",
+  ].some((key) => Object.prototype.hasOwnProperty.call(raw, key));
+  const legacyOpacity = toFiniteNumber(raw.opacity, defaults.atlasOpacity);
+  const legacyContourWidth = toFiniteNumber(raw.contourWidth, defaults.contourMajorWidth);
+  const rawVisibility =
+    raw.atlasClassVisibility && typeof raw.atlasClassVisibility === "object"
+      ? raw.atlasClassVisibility
+      : {};
+
+  return {
+    mode: normalizePhysicalMode(raw.mode || legacyPreset),
+    opacity: clamp(
+      toFiniteNumber(hasNewPhysicalSchema ? (raw.opacity ?? raw.layerOpacity) : raw.layerOpacity, defaults.opacity),
+      0,
+      1
+    ),
+    atlasOpacity: clamp(toFiniteNumber(raw.atlasOpacity, legacyOpacity), 0, 1),
+    atlasIntensity: clamp(toFiniteNumber(raw.atlasIntensity, defaults.atlasIntensity), 0.2, 1.4),
+    atlasClassVisibility: Object.fromEntries(
+      PHYSICAL_ATLAS_CLASS_KEYS.map((key) => [key, rawVisibility[key] === undefined ? true : !!rawVisibility[key]])
+    ),
+    rainforestEmphasis: clamp(toFiniteNumber(raw.rainforestEmphasis, defaults.rainforestEmphasis), 0, 1),
+    contourColor: String(raw.contourColor || defaults.contourColor).trim() || defaults.contourColor,
+    contourOpacity: clamp(toFiniteNumber(raw.contourOpacity, defaults.contourOpacity), 0, 1),
+    contourMajorWidth: clamp(toFiniteNumber(raw.contourMajorWidth, legacyContourWidth), 0.2, 3),
+    contourMinorWidth: clamp(
+      toFiniteNumber(raw.contourMinorWidth, Math.max(0.2, legacyContourWidth * 0.65)),
+      0.1,
+      2
+    ),
+    contourMajorIntervalM: clamp(
+      Math.round(toFiniteNumber(raw.contourMajorIntervalM, defaults.contourMajorIntervalM) / 500) * 500,
+      500,
+      2000
+    ),
+    contourMinorIntervalM: clamp(
+      Math.round(toFiniteNumber(raw.contourMinorIntervalM, defaults.contourMinorIntervalM) / 100) * 100,
+      100,
+      1000
+    ),
+    contourMinorVisible: raw.contourMinorVisible === undefined ? defaults.contourMinorVisible : !!raw.contourMinorVisible,
+    contourLowReliefCutoffM: clamp(
+      Math.round(toFiniteNumber(raw.contourLowReliefCutoffM, defaults.contourLowReliefCutoffM)),
+      0,
+      2000
+    ),
+    blendMode: String(raw.blendMode || defaults.blendMode).trim() || defaults.blendMode,
+  };
 }
 
 function createDefaultTextureStyleConfig() {
@@ -518,6 +641,12 @@ export {
   legacyDefaultCountryPalette,
   countryNames,
   countryPresets,
+  PHYSICAL_ATLAS_CLASS_KEYS,
+  PHYSICAL_ATLAS_PALETTE,
+  createDefaultPhysicalStyleConfig,
+  createDefaultPhysicalAtlasVisibility,
+  normalizePhysicalMode,
+  normalizePhysicalStyleConfig,
   PRESET_STORAGE_KEY,
   createDefaultTextureStyleConfig,
   normalizeTextureMode,
@@ -555,6 +684,7 @@ export const state = {
   },
   defaultReleasablePresetOverlays: {},
   scenarioReleasablePresetOverlays: {},
+  releasableBoundaryVariantByTag: {},
   scenarioAudit: null,
   scenarioAuditUi: {
     loading: false,
@@ -582,6 +712,7 @@ export const state = {
   landDataFull: null,
   specialZonesData: null,
   specialZonesExternalData: null,
+  contextLayerExternalDataByName: {},
   specialZones: {},
   riversData: null,
   oceanData: null,
@@ -590,6 +721,9 @@ export const state = {
   landBgData: null,
   urbanData: null,
   physicalData: null,
+  physicalSemanticsData: null,
+  physicalContourMajorData: null,
+  physicalContourMinorData: null,
   hierarchyData: null,
   hierarchyGroupsByCode: new Map(),
   countryGroupsData: null,
@@ -655,8 +789,8 @@ export const state = {
   onboardingDismissed: false,
   hoveredId: null,
   zoomTransform: defaultZoom,
-  showUrban: false,
-  showPhysical: false,
+  showUrban: true,
+  showPhysical: true,
   showRivers: true,
   showSpecialZones: false,
   manualSpecialZones: {
@@ -729,14 +863,7 @@ export const state = {
       minAreaPx: 8,
     },
     physical: {
-      preset: "atlas_soft",
-      tintColor: "#8f6b4e",
-      opacity: 0.24,
-      contourColor: "#6f4e37",
-      contourOpacity: 0.30,
-      contourWidth: 0.7,
-      contourSpacing: 18,
-      blendMode: "multiply",
+      ...createDefaultPhysicalStyleConfig(),
     },
     rivers: {
       color: "#3b82f6",

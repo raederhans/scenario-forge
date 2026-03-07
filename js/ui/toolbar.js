@@ -2,6 +2,7 @@
 import {
   state,
   PALETTE_THEMES,
+  normalizePhysicalStyleConfig,
   normalizeTextureMode,
   normalizeTextureStyleConfig,
 } from "../core/state.js";
@@ -139,14 +140,27 @@ function initToolbar({ render } = {}) {
   const urbanOpacity = document.getElementById("urbanOpacity");
   const urbanBlendMode = document.getElementById("urbanBlendMode");
   const urbanMinArea = document.getElementById("urbanMinArea");
-  const physicalPreset = document.getElementById("physicalPreset");
-  const physicalTintColor = document.getElementById("physicalTintColor");
+  const physicalMode = document.getElementById("physicalMode");
   const physicalOpacity = document.getElementById("physicalOpacity");
+  const physicalAtlasIntensity = document.getElementById("physicalAtlasIntensity");
+  const physicalRainforestEmphasis = document.getElementById("physicalRainforestEmphasis");
   const physicalContourColor = document.getElementById("physicalContourColor");
   const physicalContourOpacity = document.getElementById("physicalContourOpacity");
-  const physicalContourWidth = document.getElementById("physicalContourWidth");
-  const physicalContourSpacing = document.getElementById("physicalContourSpacing");
+  const physicalMinorContours = document.getElementById("physicalMinorContours");
+  const physicalContourMajorWidth = document.getElementById("physicalContourMajorWidth");
+  const physicalContourMinorWidth = document.getElementById("physicalContourMinorWidth");
+  const physicalContourMajorInterval = document.getElementById("physicalContourMajorInterval");
+  const physicalContourMinorInterval = document.getElementById("physicalContourMinorInterval");
+  const physicalContourLowReliefCutoff = document.getElementById("physicalContourLowReliefCutoff");
   const physicalBlendMode = document.getElementById("physicalBlendMode");
+  const physicalClassMountain = document.getElementById("physicalClassMountain");
+  const physicalClassPlateau = document.getElementById("physicalClassPlateau");
+  const physicalClassPlains = document.getElementById("physicalClassPlains");
+  const physicalClassWetlands = document.getElementById("physicalClassWetlands");
+  const physicalClassForest = document.getElementById("physicalClassForest");
+  const physicalClassRainforest = document.getElementById("physicalClassRainforest");
+  const physicalClassDesert = document.getElementById("physicalClassDesert");
+  const physicalClassTundra = document.getElementById("physicalClassTundra");
   const riversColor = document.getElementById("riversColor");
   const riversOpacity = document.getElementById("riversOpacity");
   const riversWidth = document.getElementById("riversWidth");
@@ -253,9 +267,14 @@ function initToolbar({ render } = {}) {
   const urbanOpacityValue = document.getElementById("urbanOpacityValue");
   const urbanMinAreaValue = document.getElementById("urbanMinAreaValue");
   const physicalOpacityValue = document.getElementById("physicalOpacityValue");
+  const physicalAtlasIntensityValue = document.getElementById("physicalAtlasIntensityValue");
+  const physicalRainforestEmphasisValue = document.getElementById("physicalRainforestEmphasisValue");
   const physicalContourOpacityValue = document.getElementById("physicalContourOpacityValue");
-  const physicalContourWidthValue = document.getElementById("physicalContourWidthValue");
-  const physicalContourSpacingValue = document.getElementById("physicalContourSpacingValue");
+  const physicalContourMajorWidthValue = document.getElementById("physicalContourMajorWidthValue");
+  const physicalContourMinorWidthValue = document.getElementById("physicalContourMinorWidthValue");
+  const physicalContourMajorIntervalValue = document.getElementById("physicalContourMajorIntervalValue");
+  const physicalContourMinorIntervalValue = document.getElementById("physicalContourMinorIntervalValue");
+  const physicalContourLowReliefCutoffValue = document.getElementById("physicalContourLowReliefCutoffValue");
   const riversOpacityValue = document.getElementById("riversOpacityValue");
   const riversWidthValue = document.getElementById("riversWidthValue");
   const riversOutlineWidthValue = document.getElementById("riversOutlineWidthValue");
@@ -285,8 +304,19 @@ function initToolbar({ render } = {}) {
   const appearanceTabPanels = Array.from(document.querySelectorAll("[data-appearance-panel]"));
   const appearanceSpecialZoneBtn = document.getElementById("appearanceSpecialZoneBtn");
   const specialZonePopover = document.getElementById("specialZonePopover");
+  const specialZoneEditorInline = specialZonePopover?.dataset.inlineEditor === "true";
 
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const physicalClassToggleMap = {
+    mountain_high_relief: physicalClassMountain,
+    upland_plateau: physicalClassPlateau,
+    plains_lowlands: physicalClassPlains,
+    wetlands_delta: physicalClassWetlands,
+    forest: physicalClassForest,
+    rainforest: physicalClassRainforest,
+    desert_bare: physicalClassDesert,
+    tundra_ice: physicalClassTundra,
+  };
   let toolHudTimerId = null;
   let scenarioGuideTimerId = null;
   let dockPopoverCloseBound = false;
@@ -372,14 +402,14 @@ function initToolbar({ render } = {}) {
   };
 
   const closeSpecialZonePopover = () => {
-    if (!specialZonePopover) return;
+    if (!specialZonePopover || specialZoneEditorInline) return;
     specialZonePopover.classList.add("hidden");
     appearanceSpecialZoneBtn?.classList.remove("is-active");
     appearanceSpecialZoneBtn?.setAttribute("aria-expanded", "false");
   };
 
   const openSpecialZonePopover = () => {
-    if (!specialZonePopover) return;
+    if (!specialZonePopover || specialZoneEditorInline) return;
     const willOpen = specialZonePopover.classList.contains("hidden");
     if (!willOpen) {
       closeSpecialZonePopover();
@@ -546,7 +576,7 @@ function initToolbar({ render } = {}) {
         closeDockPopover();
       }
       const insideSpecialZone = target.closest("#specialZonePopover, #appearanceSpecialZoneBtn");
-      if (specialZonePopover && !specialZonePopover.classList.contains("hidden") && !insideSpecialZone) {
+      if (!specialZoneEditorInline && specialZonePopover && !specialZonePopover.classList.contains("hidden") && !insideSpecialZone) {
         closeSpecialZonePopover();
       }
       const insideScenarioGuide = target.closest("#scenarioGuidePopover, #scenarioGuideBtn");
@@ -559,7 +589,9 @@ function initToolbar({ render } = {}) {
         if (state.activeDockPopover) {
           closeDockPopover();
         }
-        closeSpecialZonePopover();
+        if (!specialZoneEditorInline) {
+          closeSpecialZonePopover();
+        }
         closeScenarioGuidePopover();
       }
     });
@@ -660,6 +692,14 @@ function initToolbar({ render } = {}) {
   const syncTextureConfig = () => {
     state.styleConfig.texture = normalizeTextureStyleConfig(state.styleConfig.texture);
     return state.styleConfig.texture;
+  };
+
+  const syncPhysicalConfig = () => {
+    state.styleConfig.physical = normalizePhysicalStyleConfig(state.styleConfig.physical);
+    state.styleConfig.physical.contourColor = normalizeOceanFillColor(
+      state.styleConfig.physical.contourColor || "#6b5947"
+    );
+    return state.styleConfig.physical;
   };
 
   const updateTextureValueLabel = (element, text) => {
@@ -859,43 +899,10 @@ function initToolbar({ render } = {}) {
     80
   );
 
-  if (!state.styleConfig.physical || typeof state.styleConfig.physical !== "object") {
-    state.styleConfig.physical = {};
-  }
-  state.styleConfig.physical.preset = String(state.styleConfig.physical.preset || "atlas_soft");
-  state.styleConfig.physical.tintColor = normalizeOceanFillColor(
-    state.styleConfig.physical.tintColor || "#8f6b4e"
-  );
-  state.styleConfig.physical.opacity = clamp(
-    Number.isFinite(Number(state.styleConfig.physical.opacity)) ? Number(state.styleConfig.physical.opacity) : 0.24,
-    0,
-    1
-  );
+  state.styleConfig.physical = normalizePhysicalStyleConfig(state.styleConfig.physical);
   state.styleConfig.physical.contourColor = normalizeOceanFillColor(
-    state.styleConfig.physical.contourColor || "#6f4e37"
+    state.styleConfig.physical.contourColor || "#6b5947"
   );
-  state.styleConfig.physical.contourOpacity = clamp(
-    Number.isFinite(Number(state.styleConfig.physical.contourOpacity))
-      ? Number(state.styleConfig.physical.contourOpacity)
-      : 0.30,
-    0,
-    1
-  );
-  state.styleConfig.physical.contourWidth = clamp(
-    Number.isFinite(Number(state.styleConfig.physical.contourWidth))
-      ? Number(state.styleConfig.physical.contourWidth)
-      : 0.7,
-    0.2,
-    2.5
-  );
-  state.styleConfig.physical.contourSpacing = clamp(
-    Number.isFinite(Number(state.styleConfig.physical.contourSpacing))
-      ? Number(state.styleConfig.physical.contourSpacing)
-      : 18,
-    8,
-    36
-  );
-  state.styleConfig.physical.blendMode = String(state.styleConfig.physical.blendMode || "multiply");
 
   if (!state.styleConfig.rivers || typeof state.styleConfig.rivers !== "object") {
     state.styleConfig.rivers = {};
@@ -1245,11 +1252,23 @@ function initToolbar({ render } = {}) {
     if (urbanMinArea) urbanMinArea.value = String(Math.round(state.styleConfig.urban.minAreaPx));
     if (urbanMinAreaValue) urbanMinAreaValue.textContent = `${Math.round(state.styleConfig.urban.minAreaPx)}`;
 
-    if (physicalPreset) physicalPreset.value = state.styleConfig.physical.preset;
-    if (physicalTintColor) physicalTintColor.value = state.styleConfig.physical.tintColor;
+    state.styleConfig.physical = normalizePhysicalStyleConfig(state.styleConfig.physical);
+    if (physicalMode) physicalMode.value = state.styleConfig.physical.mode;
     if (physicalOpacity) physicalOpacity.value = String(Math.round(state.styleConfig.physical.opacity * 100));
     if (physicalOpacityValue) {
       physicalOpacityValue.textContent = `${Math.round(state.styleConfig.physical.opacity * 100)}%`;
+    }
+    if (physicalAtlasIntensity) {
+      physicalAtlasIntensity.value = String(Math.round(state.styleConfig.physical.atlasIntensity * 100));
+    }
+    if (physicalAtlasIntensityValue) {
+      physicalAtlasIntensityValue.textContent = `${Math.round(state.styleConfig.physical.atlasIntensity * 100)}%`;
+    }
+    if (physicalRainforestEmphasis) {
+      physicalRainforestEmphasis.value = String(Math.round(state.styleConfig.physical.rainforestEmphasis * 100));
+    }
+    if (physicalRainforestEmphasisValue) {
+      physicalRainforestEmphasisValue.textContent = `${Math.round(state.styleConfig.physical.rainforestEmphasis * 100)}%`;
     }
     if (physicalContourColor) physicalContourColor.value = state.styleConfig.physical.contourColor;
     if (physicalContourOpacity) {
@@ -1258,19 +1277,41 @@ function initToolbar({ render } = {}) {
     if (physicalContourOpacityValue) {
       physicalContourOpacityValue.textContent = `${Math.round(state.styleConfig.physical.contourOpacity * 100)}%`;
     }
-    if (physicalContourWidth) {
-      physicalContourWidth.value = String(Number(state.styleConfig.physical.contourWidth).toFixed(2));
+    if (physicalMinorContours) physicalMinorContours.checked = !!state.styleConfig.physical.contourMinorVisible;
+    if (physicalContourMajorWidth) {
+      physicalContourMajorWidth.value = String(Number(state.styleConfig.physical.contourMajorWidth).toFixed(2));
     }
-    if (physicalContourWidthValue) {
-      physicalContourWidthValue.textContent = Number(state.styleConfig.physical.contourWidth).toFixed(2);
+    if (physicalContourMajorWidthValue) {
+      physicalContourMajorWidthValue.textContent = Number(state.styleConfig.physical.contourMajorWidth).toFixed(2);
     }
-    if (physicalContourSpacing) {
-      physicalContourSpacing.value = String(Math.round(state.styleConfig.physical.contourSpacing));
+    if (physicalContourMinorWidth) {
+      physicalContourMinorWidth.value = String(Number(state.styleConfig.physical.contourMinorWidth).toFixed(2));
     }
-    if (physicalContourSpacingValue) {
-      physicalContourSpacingValue.textContent = `${Math.round(state.styleConfig.physical.contourSpacing)}`;
+    if (physicalContourMinorWidthValue) {
+      physicalContourMinorWidthValue.textContent = Number(state.styleConfig.physical.contourMinorWidth).toFixed(2);
+    }
+    if (physicalContourMajorInterval) {
+      physicalContourMajorInterval.value = String(Math.round(state.styleConfig.physical.contourMajorIntervalM));
+    }
+    if (physicalContourMajorIntervalValue) {
+      physicalContourMajorIntervalValue.textContent = `${Math.round(state.styleConfig.physical.contourMajorIntervalM)}`;
+    }
+    if (physicalContourMinorInterval) {
+      physicalContourMinorInterval.value = String(Math.round(state.styleConfig.physical.contourMinorIntervalM));
+    }
+    if (physicalContourMinorIntervalValue) {
+      physicalContourMinorIntervalValue.textContent = `${Math.round(state.styleConfig.physical.contourMinorIntervalM)}`;
+    }
+    if (physicalContourLowReliefCutoff) {
+      physicalContourLowReliefCutoff.value = String(Math.round(state.styleConfig.physical.contourLowReliefCutoffM));
+    }
+    if (physicalContourLowReliefCutoffValue) {
+      physicalContourLowReliefCutoffValue.textContent = `${Math.round(state.styleConfig.physical.contourLowReliefCutoffM)}`;
     }
     if (physicalBlendMode) physicalBlendMode.value = state.styleConfig.physical.blendMode;
+    Object.entries(physicalClassToggleMap).forEach(([key, element]) => {
+      if (element) element.checked = state.styleConfig.physical.atlasClassVisibility?.[key] !== false;
+    });
 
     if (riversColor) riversColor.value = state.styleConfig.rivers.color;
     if (riversOpacity) riversOpacity.value = String(Math.round(state.styleConfig.rivers.opacity * 100));
@@ -1443,6 +1484,7 @@ function initToolbar({ render } = {}) {
       themeSelect.value = String(state.activePaletteId || themeSelect.value || "");
     }
     renderTextureUI();
+    renderSpecialZoneEditorUI();
   };
   state.updateTextureUIFn = renderTextureUI;
 
@@ -1860,70 +1902,152 @@ function initToolbar({ render } = {}) {
     });
   }
 
-  if (physicalPreset) {
-    physicalPreset.addEventListener("change", (event) => {
-      state.styleConfig.physical.preset = String(event.target.value || "atlas_soft");
-      renderDirty("physical-preset");
-    });
-  }
-  if (physicalTintColor) {
-    physicalTintColor.addEventListener("input", (event) => {
-      state.styleConfig.physical.tintColor = normalizeOceanFillColor(event.target.value);
-      renderDirty("physical-tint");
+  if (physicalMode) {
+    physicalMode.addEventListener("change", (event) => {
+      const cfg = syncPhysicalConfig();
+      cfg.mode = String(event.target.value || "atlas_and_contours");
+      renderDirty("physical-mode");
     });
   }
   if (physicalOpacity) {
     physicalOpacity.addEventListener("input", (event) => {
+      const cfg = syncPhysicalConfig();
       const value = Number(event.target.value);
-      state.styleConfig.physical.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.24, 0, 1);
+      cfg.opacity = clamp(Number.isFinite(value) ? value / 100 : 1, 0, 1);
       if (physicalOpacityValue) {
-        physicalOpacityValue.textContent = `${Math.round(state.styleConfig.physical.opacity * 100)}%`;
+        physicalOpacityValue.textContent = `${Math.round(cfg.opacity * 100)}%`;
       }
       renderDirty("physical-opacity");
     });
   }
+  if (physicalAtlasIntensity) {
+    physicalAtlasIntensity.addEventListener("input", (event) => {
+      const cfg = syncPhysicalConfig();
+      const value = Number(event.target.value);
+      cfg.atlasIntensity = clamp(Number.isFinite(value) ? value / 100 : 0.9, 0.2, 1.4);
+      if (physicalAtlasIntensityValue) {
+        physicalAtlasIntensityValue.textContent = `${Math.round(cfg.atlasIntensity * 100)}%`;
+      }
+      renderDirty("physical-atlas-intensity");
+    });
+  }
+  if (physicalRainforestEmphasis) {
+    physicalRainforestEmphasis.addEventListener("input", (event) => {
+      const cfg = syncPhysicalConfig();
+      const value = Number(event.target.value);
+      cfg.rainforestEmphasis = clamp(Number.isFinite(value) ? value / 100 : 0.72, 0, 1);
+      if (physicalRainforestEmphasisValue) {
+        physicalRainforestEmphasisValue.textContent = `${Math.round(cfg.rainforestEmphasis * 100)}%`;
+      }
+      renderDirty("physical-rainforest-emphasis");
+    });
+  }
   if (physicalContourColor) {
     physicalContourColor.addEventListener("input", (event) => {
-      state.styleConfig.physical.contourColor = normalizeOceanFillColor(event.target.value);
+      const cfg = syncPhysicalConfig();
+      cfg.contourColor = normalizeOceanFillColor(event.target.value);
       renderDirty("physical-contour-color");
     });
   }
   if (physicalContourOpacity) {
     physicalContourOpacity.addEventListener("input", (event) => {
+      const cfg = syncPhysicalConfig();
       const value = Number(event.target.value);
-      state.styleConfig.physical.contourOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.30, 0, 1);
+      cfg.contourOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.34, 0, 1);
       if (physicalContourOpacityValue) {
-        physicalContourOpacityValue.textContent = `${Math.round(state.styleConfig.physical.contourOpacity * 100)}%`;
+        physicalContourOpacityValue.textContent = `${Math.round(cfg.contourOpacity * 100)}%`;
       }
       renderDirty("physical-contour-opacity");
     });
   }
-  if (physicalContourWidth) {
-    physicalContourWidth.addEventListener("input", (event) => {
-      const value = Number(event.target.value);
-      state.styleConfig.physical.contourWidth = clamp(Number.isFinite(value) ? value : 0.7, 0.2, 2.5);
-      if (physicalContourWidthValue) {
-        physicalContourWidthValue.textContent = Number(state.styleConfig.physical.contourWidth).toFixed(2);
-      }
-      renderDirty("physical-contour-width");
+  if (physicalMinorContours) {
+    physicalMinorContours.addEventListener("change", (event) => {
+      const cfg = syncPhysicalConfig();
+      cfg.contourMinorVisible = !!event.target.checked;
+      renderDirty("physical-contour-minor-toggle");
     });
   }
-  if (physicalContourSpacing) {
-    physicalContourSpacing.addEventListener("input", (event) => {
+  if (physicalContourMajorWidth) {
+    physicalContourMajorWidth.addEventListener("input", (event) => {
+      const cfg = syncPhysicalConfig();
       const value = Number(event.target.value);
-      state.styleConfig.physical.contourSpacing = clamp(Number.isFinite(value) ? value : 18, 8, 36);
-      if (physicalContourSpacingValue) {
-        physicalContourSpacingValue.textContent = `${Math.round(state.styleConfig.physical.contourSpacing)}`;
+      cfg.contourMajorWidth = clamp(Number.isFinite(value) ? value : 0.8, 0.2, 3);
+      if (physicalContourMajorWidthValue) {
+        physicalContourMajorWidthValue.textContent = Number(cfg.contourMajorWidth).toFixed(2);
       }
-      renderDirty("physical-contour-spacing");
+      renderDirty("physical-contour-major-width");
+    });
+  }
+  if (physicalContourMinorWidth) {
+    physicalContourMinorWidth.addEventListener("input", (event) => {
+      const cfg = syncPhysicalConfig();
+      const value = Number(event.target.value);
+      cfg.contourMinorWidth = clamp(Number.isFinite(value) ? value : 0.45, 0.1, 2);
+      if (physicalContourMinorWidthValue) {
+        physicalContourMinorWidthValue.textContent = Number(cfg.contourMinorWidth).toFixed(2);
+      }
+      renderDirty("physical-contour-minor-width");
+    });
+  }
+  if (physicalContourMajorInterval) {
+    physicalContourMajorInterval.addEventListener("input", (event) => {
+      const cfg = syncPhysicalConfig();
+      const value = Number(event.target.value);
+      cfg.contourMajorIntervalM = clamp(
+        Number.isFinite(value) ? Math.round(value / 500) * 500 : 500,
+        500,
+        2000
+      );
+      if (physicalContourMajorIntervalValue) {
+        physicalContourMajorIntervalValue.textContent = `${Math.round(cfg.contourMajorIntervalM)}`;
+      }
+      renderDirty("physical-contour-major-interval");
+    });
+  }
+  if (physicalContourMinorInterval) {
+    physicalContourMinorInterval.addEventListener("input", (event) => {
+      const cfg = syncPhysicalConfig();
+      const value = Number(event.target.value);
+      cfg.contourMinorIntervalM = clamp(
+        Number.isFinite(value) ? Math.round(value / 100) * 100 : 100,
+        100,
+        1000
+      );
+      if (physicalContourMinorIntervalValue) {
+        physicalContourMinorIntervalValue.textContent = `${Math.round(cfg.contourMinorIntervalM)}`;
+      }
+      renderDirty("physical-contour-minor-interval");
+    });
+  }
+  if (physicalContourLowReliefCutoff) {
+    physicalContourLowReliefCutoff.addEventListener("input", (event) => {
+      const cfg = syncPhysicalConfig();
+      const value = Number(event.target.value);
+      cfg.contourLowReliefCutoffM = clamp(Number.isFinite(value) ? Math.round(value) : 300, 0, 2000);
+      if (physicalContourLowReliefCutoffValue) {
+        physicalContourLowReliefCutoffValue.textContent = `${Math.round(cfg.contourLowReliefCutoffM)}`;
+      }
+      renderDirty("physical-contour-low-relief-cutoff");
     });
   }
   if (physicalBlendMode) {
     physicalBlendMode.addEventListener("change", (event) => {
-      state.styleConfig.physical.blendMode = String(event.target.value || "multiply");
+      const cfg = syncPhysicalConfig();
+      cfg.blendMode = String(event.target.value || "multiply");
       renderDirty("physical-blend");
     });
   }
+  Object.entries(physicalClassToggleMap).forEach(([key, element]) => {
+    if (!element) return;
+    element.addEventListener("change", (event) => {
+      const cfg = syncPhysicalConfig();
+      cfg.atlasClassVisibility = {
+        ...(cfg.atlasClassVisibility || {}),
+        [key]: !!event.target.checked,
+      };
+      renderDirty(`physical-class-${key}`);
+    });
+  });
 
   if (riversColor) {
     riversColor.addEventListener("input", (event) => {

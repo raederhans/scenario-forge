@@ -130,6 +130,11 @@ def _repair_geometry(geom):
     if geom is None or geom.is_empty:
         return None
     try:
+        if geom.is_valid:
+            return geom
+    except Exception:
+        pass
+    try:
         if hasattr(geom, "make_valid"):
             geom = geom.make_valid()
         else:
@@ -457,6 +462,68 @@ def build_topology(
     print(f"  - Objects: {list(topo_dict.get('objects', {}).keys())}")
     print(f"  - Total arcs: {len(topo_dict.get('arcs', []))}")
     print(f"  - Political geometries: {len(geometries)}")
+
+
+def build_named_layer_topology(
+    gdf: gpd.GeoDataFrame,
+    output_path,
+    *,
+    object_name: str,
+    quantization: int = cfg.TOPOLOGY_QUANTIZATION,
+) -> None:
+    print(f"Building context TopoJSON layer: {object_name}")
+    output_path = output_path
+
+    if gdf is None or gdf.empty:
+        topo_dict = {
+            "type": "Topology",
+            "objects": {
+                object_name: {
+                    "type": "GeometryCollection",
+                    "geometries": [],
+                },
+            },
+            "arcs": [],
+        }
+        output_path.write_text(json.dumps(topo_dict, separators=(",", ":")), encoding="utf-8")
+        print(f"Context TopoJSON saved to {output_path} (empty layer).")
+        return
+
+    out = gdf.to_crs("EPSG:4326").copy()
+    out["geometry"] = out.geometry.apply(_repair_geometry)
+    out = out[out.geometry.notna() & ~out.geometry.is_empty].copy()
+    if out.empty:
+        return build_named_layer_topology(
+            gpd.GeoDataFrame(columns=["geometry"], geometry="geometry", crs="EPSG:4326"),
+            output_path,
+            object_name=object_name,
+            quantization=quantization,
+        )
+
+    non_geometry_cols = [column for column in out.columns if column != "geometry"]
+    out = out[non_geometry_cols + ["geometry"]].fillna("")
+    out = round_geometries(out)
+    out["geometry"] = out.geometry.apply(_repair_geometry)
+    out = out[out.geometry.notna() & ~out.geometry.is_empty].copy()
+    if out.empty:
+        return build_named_layer_topology(
+            gpd.GeoDataFrame(columns=["geometry"], geometry="geometry", crs="EPSG:4326"),
+            output_path,
+            object_name=object_name,
+            quantization=quantization,
+        )
+
+    topo = tp.Topology(
+        [out],
+        object_name=[object_name],
+        prequantize=quantization,
+        topology=True,
+        presimplify=False,
+        toposimplify=False,
+        shared_coords=True,
+    ).to_json()
+    output_path.write_text(topo, encoding="utf-8")
+    print(f"Context TopoJSON saved to {output_path}")
 
 
 def build_political_only_topology(

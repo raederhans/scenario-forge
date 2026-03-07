@@ -21,6 +21,26 @@ from scenario_builder.hoi4.parser import (  # noqa: E402
     parse_states,
 )
 
+EXPLICIT_ONLY_TAGS = {"RKP", "RKO", "RKU", "RKM"}
+EXPECTED_BOUNDARY_VARIANT_IDS_BY_TAG = {
+    "RKP": {"historical_reference"},
+    "RKO": {"hoi4", "historical_reference"},
+    "RKU": {"historical_reference"},
+    "RKM": {"hoi4", "historical_reference"},
+}
+EXPECTED_DEFAULT_BOUNDARY_VARIANT_ID_BY_TAG = {
+    "RKP": "historical_reference",
+    "RKO": "hoi4",
+    "RKU": "historical_reference",
+    "RKM": "hoi4",
+}
+EXPECTED_COMPANION_ACTION_IDS = {
+    "RKP": {"annexed_poland_to_ger"},
+    "RKO": {"ostland_marijampole_to_ger"},
+    "RKU": {"transnistria_to_rom", "crimea_to_ger"},
+    "RKM": {"greater_finland_to_fin"},
+}
+
 
 def normalize_tag(raw: object) -> str:
     return "".join(char for char in str(raw or "").strip().upper() if char.isalnum())
@@ -95,6 +115,34 @@ def normalize_preset_source(raw: object) -> dict[str, object]:
     }
 
 
+def normalize_boundary_variant(raw: object) -> dict[str, object]:
+    payload = raw if isinstance(raw, dict) else {}
+    return {
+        "id": str(payload.get("id") or "").strip().lower(),
+        "label": str(payload.get("label") or "").strip(),
+        "description": str(payload.get("description") or "").strip(),
+        "basis": str(payload.get("basis") or "").strip(),
+        "preset_source": normalize_preset_source(payload.get("preset_source")),
+        "resolved_feature_count_hint": payload.get("resolved_feature_count_hint"),
+    }
+
+
+def normalize_companion_action(raw: object) -> dict[str, object]:
+    payload = raw if isinstance(raw, dict) else {}
+    return {
+        "id": str(payload.get("id") or "").strip().lower(),
+        "label": str(payload.get("label") or "").strip(),
+        "description": str(payload.get("description") or "").strip(),
+        "basis": str(payload.get("basis") or "").strip(),
+        "action_type": str(payload.get("action_type") or "").strip(),
+        "target_owner_tag": normalize_tag(payload.get("target_owner_tag")),
+        "auto_apply_on_core_territory": bool(payload.get("auto_apply_on_core_territory")),
+        "hidden_in_ui": bool(payload.get("hidden_in_ui")),
+        "preset_source": normalize_preset_source(payload.get("preset_source")),
+        "resolved_feature_count_hint": payload.get("resolved_feature_count_hint"),
+    }
+
+
 def resolve_feature_count_hint(preset_source: dict[str, object], hierarchy_groups: dict[str, list[str]]) -> int | None:
     source_type = str(preset_source.get("type") or "").strip()
     if source_type == "feature_ids":
@@ -150,6 +198,17 @@ def build_catalog_entry(
         if str(value).strip()
     ]
     preset_source = normalize_preset_source(raw_entry.get("preset_source"))
+    default_boundary_variant_id = str(raw_entry.get("default_boundary_variant_id") or "").strip().lower()
+    boundary_variants = [
+        normalize_boundary_variant(item)
+        for item in raw_entry.get("boundary_variants", [])
+        if isinstance(item, dict)
+    ]
+    companion_actions = [
+        normalize_companion_action(item)
+        for item in raw_entry.get("companion_actions", [])
+        if isinstance(item, dict)
+    ]
     notes = str(raw_entry.get("notes") or "").strip()
     palette_entry = palette_entries.get(tag, {}) if isinstance(palette_entries, dict) else {}
     display_name = (
@@ -207,6 +266,103 @@ def build_catalog_entry(
     if manual_overlay and source_type == "legacy_preset_name":
         validation_errors.append("manual_overlay_unsupported_legacy_preset_name")
 
+    boundary_variant_ids = {variant.get("id") for variant in boundary_variants if variant.get("id")}
+    if boundary_variants and not default_boundary_variant_id:
+        validation_errors.append("missing_default_boundary_variant_id")
+    if default_boundary_variant_id and default_boundary_variant_id not in boundary_variant_ids:
+        validation_errors.append("default_boundary_variant_missing")
+
+    normalized_boundary_variants: list[dict[str, object]] = []
+    for variant in boundary_variants:
+        variant_errors: list[str] = []
+        variant_id = str(variant.get("id") or "").strip()
+        variant_source = normalize_preset_source(variant.get("preset_source"))
+        variant_source_type = str(variant_source.get("type") or "").strip()
+        variant_hint = resolve_feature_count_hint(variant_source, hierarchy_groups)
+        if not variant_id:
+            variant_errors.append("missing_id")
+        if variant_source_type not in {"legacy_preset_name", "hierarchy_group_ids", "feature_ids"}:
+            variant_errors.append("invalid_preset_source_type")
+        if variant_source_type == "legacy_preset_name" and not str(variant_source.get("name") or "").strip():
+            variant_errors.append("missing_legacy_preset_name")
+        if variant_source_type == "hierarchy_group_ids" and not list(variant_source.get("group_ids", [])):
+            variant_errors.append("missing_hierarchy_group_ids")
+        if variant_source_type == "feature_ids" and not list(variant_source.get("feature_ids", [])):
+            variant_errors.append("missing_feature_ids")
+        if variant_source_type == "hierarchy_group_ids" and not variant_hint:
+            variant_errors.append("empty_hierarchy_mapping")
+        if variant_source_type == "feature_ids" and variant_hint == 0:
+            variant_errors.append("empty_feature_mapping")
+        if variant_errors:
+            validation_errors.append(f"boundary_variant:{variant_id or 'unknown'}:{','.join(variant_errors)}")
+        normalized_boundary_variants.append(
+            {
+                **variant,
+                "preset_source": variant_source,
+                "resolved_feature_count_hint": variant_hint,
+            }
+        )
+
+    if tag in EXPLICIT_ONLY_TAGS:
+        resolved_variant_ids = {str(variant.get("id") or "").strip() for variant in normalized_boundary_variants if variant.get("id")}
+        if resolved_variant_ids != EXPECTED_BOUNDARY_VARIANT_IDS_BY_TAG.get(tag, set()):
+            validation_errors.append("boundary_variant_ids_mismatch")
+        if default_boundary_variant_id != EXPECTED_DEFAULT_BOUNDARY_VARIANT_ID_BY_TAG.get(tag, ""):
+            validation_errors.append("default_boundary_variant_unexpected")
+        for variant in normalized_boundary_variants:
+            if str(variant.get("preset_source", {}).get("type") or "").strip() != "feature_ids":
+                validation_errors.append(f"boundary_variant:{variant.get('id') or 'unknown'}:non_explicit_source")
+
+    normalized_companion_actions: list[dict[str, object]] = []
+    for action in companion_actions:
+        action_errors: list[str] = []
+        action_id = str(action.get("id") or "").strip()
+        action_type = str(action.get("action_type") or "").strip()
+        target_owner_tag = normalize_tag(action.get("target_owner_tag"))
+        action_source = normalize_preset_source(action.get("preset_source"))
+        action_source_type = str(action_source.get("type") or "").strip()
+        action_hint = resolve_feature_count_hint(action_source, hierarchy_groups)
+        if not action_id:
+            action_errors.append("missing_id")
+        if action_type != "ownership_transfer":
+            action_errors.append("invalid_action_type")
+        if not target_owner_tag:
+            action_errors.append("missing_target_owner_tag")
+        elif target_owner_tag not in country_tags and target_owner_tag not in active_owner_tags:
+            action_errors.append("unknown_target_owner_tag")
+        if action_source_type not in {"legacy_preset_name", "hierarchy_group_ids", "feature_ids"}:
+            action_errors.append("invalid_preset_source_type")
+        if action_source_type == "legacy_preset_name" and not str(action_source.get("name") or "").strip():
+            action_errors.append("missing_legacy_preset_name")
+        if action_source_type == "hierarchy_group_ids" and not list(action_source.get("group_ids", [])):
+            action_errors.append("missing_hierarchy_group_ids")
+        if action_source_type == "feature_ids" and not list(action_source.get("feature_ids", [])):
+            action_errors.append("missing_feature_ids")
+        if action_source_type == "hierarchy_group_ids" and not action_hint:
+            action_errors.append("empty_hierarchy_mapping")
+        if action_source_type == "feature_ids" and action_hint == 0:
+            action_errors.append("empty_feature_mapping")
+        if action_errors:
+            validation_errors.append(f"companion_action:{action_id or 'unknown'}:{','.join(action_errors)}")
+        normalized_companion_actions.append(
+            {
+                **action,
+                "target_owner_tag": target_owner_tag,
+                "auto_apply_on_core_territory": bool(action.get("auto_apply_on_core_territory")),
+                "hidden_in_ui": bool(action.get("hidden_in_ui")),
+                "preset_source": action_source,
+                "resolved_feature_count_hint": action_hint,
+            }
+        )
+
+    if tag in EXPLICIT_ONLY_TAGS:
+        resolved_action_ids = {str(action.get("id") or "").strip() for action in normalized_companion_actions if action.get("id")}
+        if resolved_action_ids != EXPECTED_COMPANION_ACTION_IDS.get(tag, set()):
+            validation_errors.append("companion_action_ids_mismatch")
+        for action in normalized_companion_actions:
+            if str(action.get("preset_source", {}).get("type") or "").strip() != "feature_ids":
+                validation_errors.append(f"companion_action:{action.get('id') or 'unknown'}:non_explicit_source")
+
     return {
         "tag": tag,
         "display_name": display_name,
@@ -220,6 +376,9 @@ def build_catalog_entry(
         "scenario_only": True,
         "allow_manual_overlay": manual_overlay,
         "preset_source": preset_source,
+        "default_boundary_variant_id": default_boundary_variant_id,
+        "boundary_variants": normalized_boundary_variants,
+        "companion_actions": normalized_companion_actions,
         "core_state_ids": sorted({state_id for state_id in core_state_ids.get(tag, []) if state_id}),
         "resolved_feature_count_hint": feature_count_hint,
         "validation_status": "ok" if not validation_errors else "error",
@@ -241,8 +400,8 @@ def render_markdown_report(catalog_payload: dict[str, object]) -> str:
         "",
         "## Selected Entries",
         "",
-        "| Tag | Name | Parent | Lookup ISO2 | Source | Feature Hint | Validation |",
-        "| --- | --- | --- | --- | --- | ---: | --- |",
+        "| Tag | Name | Parent | Lookup ISO2 | Source | Feature Hint | Variants / Actions | Validation |",
+        "| --- | --- | --- | --- | --- | ---: | --- | --- |",
     ]
 
     for entry in catalog_payload.get("entries", []):
@@ -258,7 +417,9 @@ def render_markdown_report(catalog_payload: dict[str, object]) -> str:
         feature_text = "" if feature_hint is None else str(feature_hint)
         lines.append(
             f"| `{entry['tag']}` | {entry['display_name']} | `{entry['parent_owner_tag']}` | "
-            f"`{entry['release_lookup_iso2']}` | `{source_label}` | {feature_text} | `{entry['validation_status']}` |"
+            f"`{entry['release_lookup_iso2']}` | `{source_label}` | {feature_text} | "
+            f"`{entry.get('default_boundary_variant_id', '') or '-'}` / `{len(entry.get('companion_actions', []))}` | "
+            f"`{entry['validation_status']}` |"
         )
 
     lines.extend(

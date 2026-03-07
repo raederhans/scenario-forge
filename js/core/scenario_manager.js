@@ -905,46 +905,13 @@ function formatScenarioStatusText() {
   if (!state.activeScenarioId || !state.activeScenarioManifest) {
     return t("No scenario active", "ui");
   }
-  const summary = state.activeScenarioManifest.summary || {};
-  const owners = Number(summary.owner_count || 0);
-  const features = Number(summary.feature_count || 0);
+  const displayName = String(state.activeScenarioManifest.display_name || state.activeScenarioId || "").trim();
   const warning = String(state.scenarioDataHealth?.warning || "").trim();
-  const base = `${state.activeScenarioManifest.display_name || state.activeScenarioId} 路 ${owners} ${t("owners", "ui")} 路 ${features} ${t("features", "ui")}`;
-  return warning ? `${base} 路 ${warning}` : base;
+  return warning ? `${displayName} · ${warning}` : displayName;
 }
 
 function formatScenarioAuditText() {
-  const summary = getScenarioManifestSummary();
-  if (!state.activeScenarioId || !Object.keys(summary).length) {
-    return t("Coverage report unavailable", "ui");
-  }
-  const hints = [
-    `${t("Approximate", "ui")}: ${
-      Number(summary.approximate_count)
-      || Number(summary.quality_counts?.approx_existing_geometry)
-      || 0
-    }`,
-  ];
-  const criticalCheckCount = Number(
-    summary.critical_region_check_count
-    || summary.manual_reviewed_region_count
-    || 0
-  );
-  if (criticalCheckCount > 0) {
-    hints.push(`${t("Critical checks", "ui")}: ${criticalCheckCount}`);
-  }
-  hints.push(`${t("Synthetic", "ui")}: ${
-    Number(summary.synthetic_count)
-    || Number(summary.synthetic_owner_feature_count)
-    || 0
-  }`);
-  hints.push(`${t("Split", "ui")}: ${Number(state.scenarioOwnerControllerDiffCount || summary.owner_controller_split_feature_count || 0)}`);
-  hints.push(`${t("Blockers", "ui")}: ${getScenarioBlockerCount(summary)}`);
-  const runtimeCount = Number(state.scenarioDataHealth?.runtimeFeatureCount || 0);
-  if (runtimeCount > 0) {
-    hints.push(`${t("Runtime", "ui")}: ${runtimeCount}`);
-  }
-  return hints.join(" 路 ");
+  return "";
 }
 
 function initScenarioManager({ render } = {}) {
@@ -979,7 +946,9 @@ function initScenarioManager({ render } = {}) {
       scenarioStatus.textContent = formatScenarioStatusText();
     }
     if (scenarioAuditHint) {
-      scenarioAuditHint.textContent = formatScenarioAuditText();
+      const auditText = formatScenarioAuditText();
+      scenarioAuditHint.textContent = auditText;
+      scenarioAuditHint.classList.toggle("hidden", !auditText);
     }
     if (scenarioViewModeSelect) {
       const hasScenario = !!state.activeScenarioId;
