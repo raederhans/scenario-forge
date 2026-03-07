@@ -244,6 +244,7 @@ def build_topology(
                 "constituent_country",
                 "adm1_name",
                 "detail_tier",
+                "__source",
                 "geometry",
             ]
         existing = [col for col in keep_cols if col in gdf.columns]

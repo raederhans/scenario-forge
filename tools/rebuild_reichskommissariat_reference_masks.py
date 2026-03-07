@@ -302,7 +302,16 @@ def build_target_masks(universe: FeatureUniverse) -> dict[str, dict[str, object]
         "BY_Gomel",
         "BY_Mogilev",
     )
-    rko_hoi4 = (universe.by_country("EE", "LV", "LT") - {"LT024"}) | all_belarus_ids
+    ostland_to_moskowien_belarus_ids = {
+        "BY_RAY_67162791B11584975294724",  # Khotsimsk
+        "BY_RAY_67162791B52564132020414",  # Krasnapolle
+        "BY_RAY_67162791B58533541453403",  # Klimavichy
+    }
+    rko_hoi4 = (
+        (universe.by_country("EE", "LV", "LT") - {"LT024"})
+        | universe.expand_groups("RU_Pskov")
+        | (all_belarus_ids - ostland_to_moskowien_belarus_ids)
+    )
     rko_historical = rko_hoi4
 
     rku_historical = universe.expand_groups(
@@ -324,6 +333,7 @@ def build_target_masks(universe: FeatureUniverse) -> dict[str, dict[str, object]
         "UA_Zaporizhzhia",
         "UA_Sumy",
         "UA_Poltava",
+        "RU_Belgorod",
     )
     transnistria_to_rom = universe.expand_groups("UA_Odessa")
     crimea_to_ger = {
@@ -346,14 +356,17 @@ def build_target_masks(universe: FeatureUniverse) -> dict[str, dict[str, object]
         "UA_RAY_74538382B85800934600856",  # Kirovske
         "UA_RAY_74538382B91806639169097",  # Lenine
     }
+    saint_petersburg_to_ger = {
+        "RU_CITY_SAINT_PETERSBURG",
+    }
 
     rkm_hoi4 = (
         universe.expand_groups(
             "RU_Arkhangelsk",
             "RU_Vologda",
             "RU_Leningrad",
+            "RU_Saint_Petersburg",
             "RU_Novgorod",
-            "RU_Pskov",
             "RU_Tver",
             "RU_Smolensk",
             "RU_Bryansk",
@@ -371,10 +384,18 @@ def build_target_masks(universe: FeatureUniverse) -> dict[str, dict[str, object]
             "RU_Vladimir",
             "RU_Nizhny_Novgorod",
             "RU_Penza",
+            "RU_Tambov",
+            "RU_Kostroma",
+            "RU_Republic_of_Mordovia",
+            "RU_Chuvash_Republic",
+            "RU_Samara",
+            "RU_Astrakhan",
             "RU_Saratov",
             "RU_Ulyanovsk",
             "RU_Rostov",
         )
+        | saint_petersburg_to_ger
+        | ostland_to_moskowien_belarus_ids
     ) - {
         "RU_RAY_50074027B21430544456221",  # Taganrog
     }
@@ -497,7 +518,8 @@ def build_target_masks(universe: FeatureUniverse) -> dict[str, dict[str, object]
         "RKM": {
             "notes": (
                 "Feature-first Moskowien masks. HOI4 stays the default, Historical follows the reference"
-                " planning map more closely, and Greater Finland remains a separate ownership transfer."
+                " planning map more closely, Saint Petersburg, Astrakhan, and the middle-Volga additions are included,"
+                " and Greater Finland remains a separate ownership transfer."
             ),
             "default_boundary_variant_id": "hoi4",
             "boundary_variants": [
@@ -517,6 +539,15 @@ def build_target_masks(universe: FeatureUniverse) -> dict[str, dict[str, object]
                 },
             ],
             "companion_actions": [
+                {
+                    "id": "saint_petersburg_to_ger",
+                    "label": "Transfer Saint Petersburg To Germany",
+                    "description": "Transfers Saint Petersburg from Moskowien to Germany using explicit feature masks.",
+                    "basis": "historical_reference",
+                    "action_type": "ownership_transfer",
+                    "target_owner_tag": "GER",
+                    "include_feature_ids": sorted_ids(saint_petersburg_to_ger),
+                },
                 {
                     "id": "greater_finland_to_fin",
                     "label": "Transfer West Karelia / West Kola To Finland",

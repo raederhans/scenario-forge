@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1939",
-  "generated_at": "2026-03-07T04:40:20.810313+00:00",
+  "generated_at": "2026-03-07T16:30:57.201496+00:00",
   "default_country": "GER",
   "countries": {
     "AFG": {
@@ -376,7 +376,7 @@
       "tag": "CHI",
       "display_name": "China",
       "color_hex": "#28288c",
-      "feature_count": 1151,
+      "feature_count": 1445,
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "CN",
@@ -397,7 +397,9 @@
       "rule_sources": [
         "1939_china_hainan_reintegration",
         "1939_hebei_chahar_owner_chi",
-        "1939_jidong_owner_chi"
+        "1939_jidong_owner_chi",
+        "1939_shandong_owner_chi",
+        "1939_sichuan_chongqing_owner_chi"
       ],
       "source_types": [
         "hoi4_owner"
@@ -434,38 +436,6 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
-    },
-    "CHU": {
-      "tag": "CHU",
-      "display_name": "Chuan Clique",
-      "color_hex": "#8d5f3f",
-      "feature_count": 191,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "CN",
-      "lookup_iso2": "CN",
-      "provenance_iso2": "CN",
-      "scenario_only": true,
-      "featured": false,
-      "capital_state_id": 256,
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "subregion_id": "subregion_eastern_asia",
-      "subregion_label": "Eastern Asia",
-      "notes": "Scenario extension: Chuan clique in Sichuan and Chongqing.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
-      "historical_fidelity": "extended",
-      "primary_rule_source": "chu_sichuan_clique",
-      "rule_sources": [
-        "chu_sichuan_clique"
-      ],
-      "source_types": [
-        "scenario_extension"
-      ],
-      "historical_fidelity_summary": [
-        "extended"
       ]
     },
     "COL": {
@@ -1430,38 +1400,6 @@
         "vanilla"
       ]
     },
-    "LUQ": {
-      "tag": "LUQ",
-      "display_name": "Lu Clique",
-      "color_hex": "#c08a3b",
-      "feature_count": 111,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "CN",
-      "lookup_iso2": "CN",
-      "provenance_iso2": "CN",
-      "scenario_only": true,
-      "featured": false,
-      "capital_state_id": null,
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "subregion_id": "subregion_eastern_asia",
-      "subregion_label": "Eastern Asia",
-      "notes": "Scenario extension: Lu clique in Shandong.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
-      "historical_fidelity": "extended",
-      "primary_rule_source": "luq_shandong_clique",
-      "rule_sources": [
-        "luq_shandong_clique"
-      ],
-      "source_types": [
-        "scenario_extension"
-      ],
-      "historical_fidelity_summary": [
-        "extended"
-      ]
-    },
     "LUX": {
       "tag": "LUX",
       "display_name": "Luxembourg",
@@ -2357,6 +2295,38 @@
         "vanilla"
       ]
     },
+    "SIC": {
+      "tag": "SIC",
+      "display_name": "Xikang Clique",
+      "color_hex": "#006080",
+      "feature_count": 8,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "CN",
+      "lookup_iso2": "CN",
+      "provenance_iso2": "CN",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 1037,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "notes": "Project extension: 1939 Xikang clique owner layer limited to Liu Wenhui's eastern Kham and western Sichuan base without absorbing Chamdo.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended",
+      "primary_rule_source": "1939_xikang_clique_owner_sic",
+      "rule_sources": [
+        "1939_xikang_clique_owner_sic"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "extended"
+      ]
+    },
     "SIK": {
       "tag": "SIK",
       "display_name": "Sinkiang",
@@ -2425,7 +2395,7 @@
       "tag": "SOV",
       "display_name": "Soviet Union",
       "color_hex": "#7d0d18",
-      "feature_count": 2290,
+      "feature_count": 2548,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "RU",

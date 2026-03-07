@@ -32,6 +32,7 @@ function updateUIText() {
     ["lblSpecialZoneEditor", "Special Zone Editor"],
     ["lblQuickPalette", "Quick Colors"],
     ["lblColorLibrary", "Color Library"],
+    ["lblColorLibraryHint", "Browse the full palette library for manual work and palette reference."],
     ["lblPaletteSearch", "Search Colors"],
     ["lblScenario", "Scenario"],
     ["lblScenarioHint", "Load a bundled historical setup and reset to its baseline."],

@@ -1,8 +1,8 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1936",
-  "generated_at": "2026-03-06T00:49:15.146765+00:00",
-  "baseline_hash": "448a7964aca10ca933aeee7f31ed75b199ec6968a031322d3db68f9e10aa4aa7",
+  "generated_at": "2026-03-07T16:30:34.648364+00:00",
+  "baseline_hash": "cac51e5aa0b4cbf0d8961c553128e4b9da5033e0b86f958f1f437ee3e42a547b",
   "cores": {
     "AFG-1741": [
       "AFG"
@@ -24787,459 +24787,6 @@
     "YEM-3511": [
       "YEM"
     ],
-    "RU_CITY_MOSCOW": [
-      "SOV"
-    ],
-    "RU_CITY_SAINT_PETERSBURG": [
-      "SOV"
-    ],
-    "RU_CITY_VOLGOGRAD": [
-      "SOV"
-    ],
-    "RU_CITY_ARKHANGELSK": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_001": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_002": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_003": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_004": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_005": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_006": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_007": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_008": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_009": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_010": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_011": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_012": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_013": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_014": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_015": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_016": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_017": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_018": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_019": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_020": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_021": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_022": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_023": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_024": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_025": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_026": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_027": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_028": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_029": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_030": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_031": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_032": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_033": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_034": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_035": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_036": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_037": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_038": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_039": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_040": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_041": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_042": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_043": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_044": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_045": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_046": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_047": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_048": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_049": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_050": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_051": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_052": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_053": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_054": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_055": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_056": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_057": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_058": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_059": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_060": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_061": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_062": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_063": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_064": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_065": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_066": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_067": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_068": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_069": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_070": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_071": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_072": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_073": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_074": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_075": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_076": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_077": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_078": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_079": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_080": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_081": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_082": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_083": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_084": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_085": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_086": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_087": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_088": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_089": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_090": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_091": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_092": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_093": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_094": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_095": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_096": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_097": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_098": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_099": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_100": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_101": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_102": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_103": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_104": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_105": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_106": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_107": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_108": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_109": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_110": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_111": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_112": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_113": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_114": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_115": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_116": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_117": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_118": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_119": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_120": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_121": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_122": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_123": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_124": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_125": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_126": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_127": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_128": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_129": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_130": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_131": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_132": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_133": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_134": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_135": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_136": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_137": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_138": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_139": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_140": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_141": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_142": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_143": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_144": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_145": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_146": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_147": [
-      "SOV"
-    ],
     "CA_FED_10001": [
       "CAN"
     ],
@@ -33970,16 +33517,1243 @@
     "TT": [
       "ENG"
     ],
-    "RU_CITY_MOSCOW__dup1": [
+    "RU_CITY_MOSCOW": [
       "SOV"
     ],
-    "RU_CITY_SAINT_PETERSBURG__dup1": [
+    "RU_CITY_SAINT_PETERSBURG": [
       "SOV"
     ],
-    "RU_CITY_VOLGOGRAD__dup1": [
+    "RU_CITY_VOLGOGRAD": [
       "SOV"
     ],
-    "RU_CITY_ARKHANGELSK__dup1": [
+    "RU_CITY_ARKHANGELSK": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_001": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_002": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_003": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_004": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_005": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_006": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_007": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_008": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_009": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_010": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_011": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_012": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_013": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_014": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_015": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_016": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_017": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_018": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_019": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_020": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_021": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_022": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_023": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_024": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_025": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_026": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_027": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_028": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_029": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_030": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_031": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_032": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_033": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_034": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_035": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_036": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_037": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_038": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_039": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_040": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_041": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_042": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_043": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_044": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_045": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_046": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_047": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_048": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_049": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_050": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_051": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_052": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_053": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_054": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_055": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_056": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_057": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_058": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_059": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_060": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_061": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_062": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_063": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_064": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_065": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_066": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_067": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_068": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_069": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_070": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_071": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_072": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_073": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_074": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_075": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_076": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_077": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_078": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_079": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_080": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_081": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_082": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_083": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_084": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_085": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_086": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_087": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_088": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_089": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_090": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_091": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_092": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_093": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_094": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_095": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_096": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_097": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_098": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_099": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_100": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_101": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_102": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_103": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_104": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_105": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_106": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_107": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_108": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_109": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_110": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_111": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_112": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_113": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_114": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_115": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_116": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_117": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_118": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_119": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_120": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_121": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_122": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_123": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_124": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_125": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_126": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_127": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_128": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_129": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_130": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_131": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_132": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_133": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_134": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_135": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_136": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_137": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_138": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_139": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_140": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_141": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_142": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_143": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_144": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_145": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_146": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_147": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_148": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_149": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_150": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_151": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_152": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_153": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_154": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_155": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_156": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_157": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_158": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_159": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_160": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_161": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_162": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_163": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_164": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_165": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_166": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_167": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_168": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_169": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_170": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_171": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_172": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_173": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_174": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_175": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_176": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_177": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_178": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_179": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_180": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_181": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_182": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_183": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_184": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_185": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_186": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_187": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_188": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_189": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_190": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_191": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_192": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_193": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_194": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_195": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_196": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_197": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_198": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_199": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_200": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_201": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_202": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_203": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_204": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_205": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_206": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_207": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_208": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_209": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_210": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_211": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_212": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_213": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_214": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_215": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_216": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_217": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_218": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_219": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_220": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_221": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_222": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_223": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_224": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_225": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_226": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_227": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_228": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_229": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_230": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_231": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_232": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_233": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_234": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_235": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_236": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_237": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_238": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_239": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_240": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_241": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_242": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_243": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_244": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_245": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_246": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_247": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_248": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_249": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_250": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_251": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_252": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_253": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_254": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_255": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_256": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_257": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_258": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_259": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_260": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_261": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_262": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_263": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_264": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_265": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_266": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_267": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_268": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_269": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_270": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_271": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_272": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_273": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_274": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_275": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_276": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_277": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_278": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_279": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_280": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_281": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_282": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_283": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_284": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_285": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_286": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_287": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_288": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_289": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_290": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_291": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_292": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_293": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_294": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_295": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_296": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_297": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_298": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_299": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_300": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_301": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_302": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_303": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_304": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_305": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_306": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_307": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_308": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_309": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_310": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_311": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_312": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_313": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_314": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_315": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_316": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_317": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_318": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_319": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_320": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_321": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_322": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_323": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_324": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_325": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_326": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_327": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_328": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_329": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_330": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_331": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_332": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_333": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_334": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_335": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_336": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_337": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_338": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_339": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_340": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_341": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_342": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_343": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_344": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_345": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_346": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_347": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_348": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_349": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_350": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_351": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_352": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_353": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_354": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_355": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_356": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_357": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_358": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_359": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_360": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_361": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_362": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_363": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_364": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_365": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_366": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_367": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_368": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_369": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_370": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_371": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_372": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_373": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_374": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_375": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_376": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_377": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_378": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_379": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_380": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_381": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_382": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_383": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_384": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_385": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_386": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_387": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_388": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_389": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_390": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_391": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_392": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_393": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_394": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_395": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_396": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_397": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_398": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_399": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_400": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_401": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_402": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_403": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_404": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_405": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_406": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_407": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_408": [
+      "SOV"
+    ],
+    "RU_ARCTIC_FB_409": [
       "SOV"
     ]
   }

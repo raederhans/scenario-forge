@@ -18,6 +18,11 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from map_builder import config as cfg
 from map_builder.geo.topology import build_political_only_topology
+from map_builder.processors.detail_shell_coverage import (
+    append_shell_coverage_gap_fragments,
+    collect_shell_coverage_gaps,
+    repair_shell_coverage,
+)
 
 
 def _empty_gdf() -> gpd.GeoDataFrame:
@@ -152,6 +157,7 @@ def _prune_political_columns(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         "cntr_code",
         "admin1_group",
         "detail_tier",
+        "__source",
         "geometry",
     ]
     present = [col for col in keep_cols if col in gdf.columns]
@@ -275,6 +281,18 @@ def _merge_override_features(
     return [feature_by_id[fid] for fid in ordered_ids if fid in feature_by_id]
 
 
+def _assign_source(features: list[dict], source_name: str) -> list[dict]:
+    normalized: list[dict] = []
+    for feature in features:
+        properties = dict(feature.get("properties") or {})
+        properties["__source"] = source_name
+        normalized.append({
+            **feature,
+            "properties": properties,
+        })
+    return normalized
+
+
 def _compose_political_features(
     primary_topology: dict,
     detail_topology: dict | None,
@@ -288,11 +306,11 @@ def _compose_political_features(
     primary_features = primary_fc.get("features", [])
 
     if detail_topology is None:
-        base_features = primary_features
+        base_features = _assign_source(primary_features, "primary")
     else:
         detail_gdf = _topology_object_to_gdf(detail_topology, "political")
         detail_fc = json.loads(detail_gdf.to_json(drop_id=True))
-        detail_features = detail_fc.get("features", [])
+        detail_features = _assign_source(detail_fc.get("features", []), "detail")
         detail_countries = {
             _get_feature_country_code(feature.get("properties") or {})
             for feature in detail_features
@@ -306,7 +324,7 @@ def _compose_political_features(
                 continue
             seen_ids.add(feature_id)
             base_features.append(feature)
-        for feature in primary_features:
+        for feature in _assign_source(primary_features, "primary"):
             props = feature.get("properties") or {}
             feature_id = _get_feature_id(props, len(base_features))
             country_code = _get_feature_country_code(props)
@@ -348,15 +366,34 @@ def _compose_political_features(
         runtime_gdf["admin1_group"] = ""
     if "detail_tier" not in runtime_gdf.columns:
         runtime_gdf["detail_tier"] = ""
+    if "__source" not in runtime_gdf.columns:
+        runtime_gdf["__source"] = "primary"
 
     runtime_gdf = runtime_gdf[runtime_gdf.geometry.notna() & ~runtime_gdf.geometry.is_empty].copy()
     runtime_gdf = _repair_geometries(runtime_gdf)
+    runtime_gdf = repair_shell_coverage(
+        runtime_gdf,
+        primary_gdf,
+        log_prefix="[Runtime Political]",
+    )
     runtime_gdf = _prune_political_columns(runtime_gdf)
     runtime_gdf = runtime_gdf.reset_index(drop=True)
     runtime_gdf = _dedupe_feature_ids(runtime_gdf)
     if runtime_gdf["id"].duplicated().any():
         raise ValueError("Runtime political topology still contains duplicate feature ids.")
     return runtime_gdf
+
+
+def _write_output_topology(
+    *,
+    output_path: Path,
+    political: gpd.GeoDataFrame,
+) -> None:
+    build_political_only_topology(
+        political,
+        output_path,
+        quantization=cfg.TOPOLOGY_QUANTIZATION,
+    )
 
 
 def parse_args() -> argparse.Namespace:
@@ -391,6 +428,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     primary_topology = _load_topology(args.primary_topology)
+    primary_political = _topology_object_to_gdf(primary_topology, "political")
     detail_topology = _load_topology(args.detail_topology) if args.detail_topology.exists() else None
     override_collection = (
         json.loads(args.ru_overrides.read_text(encoding="utf-8"))
@@ -404,11 +442,34 @@ def main() -> None:
         override_collection=override_collection,
     )
     args.output_topology.parent.mkdir(parents=True, exist_ok=True)
-    build_political_only_topology(
-        runtime_political,
-        args.output_topology,
-        quantization=cfg.TOPOLOGY_QUANTIZATION,
+    _write_output_topology(
+        output_path=args.output_topology,
+        political=runtime_political,
     )
+    for repair_pass in range(1, 4):
+        output_topology = _load_topology(args.output_topology)
+        output_political = _topology_object_to_gdf(output_topology, "political")
+        gaps = collect_shell_coverage_gaps(output_political, primary_political)
+        if not gaps:
+            break
+        gap = gaps[0]
+        print(
+            f"[Runtime Political] Post-build shell coverage repair pass {repair_pass}: "
+            f"{gap['country_code']} fragments={gap['fragment_count']}, "
+            f"total_area_km2={gap['total_area_km2']:.1f}"
+        )
+        runtime_political = append_shell_coverage_gap_fragments(
+            runtime_political,
+            primary_political,
+            gap_source_gdf=output_political,
+            log_prefix=f"[Runtime Political pass {repair_pass}]",
+        )
+        runtime_political = _prune_political_columns(runtime_political)
+        runtime_political = _dedupe_feature_ids(runtime_political)
+        _write_output_topology(
+            output_path=args.output_topology,
+            political=runtime_political,
+        )
     print(
         f"[Runtime Political] OK: wrote {args.output_topology} "
         f"({len(runtime_political)} features)"

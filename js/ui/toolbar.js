@@ -188,6 +188,7 @@ function initToolbar({ render } = {}) {
   const recentContainer = document.getElementById("recentColors");
   const paletteLibraryToggle = document.getElementById("paletteLibraryToggle");
   const paletteLibraryPanel = document.getElementById("paletteLibraryPanel");
+  const paletteLibrarySources = document.getElementById("paletteLibrarySources");
   const paletteLibrarySearch = document.getElementById("paletteLibrarySearch");
   const paletteLibrarySummary = document.getElementById("paletteLibrarySummary");
   const paletteLibraryList = document.getElementById("paletteLibraryList");
@@ -211,11 +212,16 @@ function initToolbar({ render } = {}) {
   const mapOnboardingHint = document.getElementById("mapOnboardingHint");
   const scenarioContextBar = document.getElementById("scenarioContextBar");
   const scenarioContextCollapseBtn = document.getElementById("scenarioContextCollapseBtn");
+  const scenarioContextScenarioItem = document.getElementById("scenarioContextScenarioItem");
+  const scenarioContextModeItem = document.getElementById("scenarioContextModeItem");
+  const scenarioContextActiveItem = document.getElementById("scenarioContextActiveItem");
   const scenarioContextScenarioText = document.getElementById("scenarioContextScenarioText");
   const scenarioContextModeText = document.getElementById("scenarioContextModeText");
   const scenarioContextActiveText = document.getElementById("scenarioContextActiveText");
   const scenarioGuideBtn = document.getElementById("scenarioGuideBtn");
   const scenarioGuidePopover = document.getElementById("scenarioGuidePopover");
+  const scenarioGuideStatus = document.getElementById("scenarioGuideStatus");
+  const scenarioGuideStatusChips = document.getElementById("scenarioGuideStatusChips");
   const dockReferenceBtn = document.getElementById("dockReferenceBtn");
   const dockExportBtn = document.getElementById("dockExportBtn");
   const dockReferencePopover = document.getElementById("dockReferencePopover");
@@ -320,6 +326,17 @@ function initToolbar({ render } = {}) {
   let toolHudTimerId = null;
   let scenarioGuideTimerId = null;
   let dockPopoverCloseBound = false;
+  const PALETTE_LIBRARY_GROUPS = [
+    { key: "essentials", label: () => t("Essentials", "ui"), defaultOpen: true },
+    { key: "dynamic", label: () => t("Dynamic / Runtime", "ui"), defaultOpen: false },
+    { key: "countries", label: () => t("Countries", "ui"), defaultOpen: false },
+    { key: "extra", label: () => t("Extra", "ui"), defaultOpen: false },
+  ];
+  const SCENARIO_BAR_LEFT_OFFSET = 18;
+  const SCENARIO_BAR_MOBILE_LEFT_OFFSET = 12;
+  const SCENARIO_BAR_SAFE_GAP = 16;
+  const SCENARIO_BAR_MIN_WIDTH = 172;
+  const SCENARIO_GUIDE_MAX_WIDTH = 360;
   if (!state.ui || typeof state.ui !== "object") {
     state.ui = {};
   }
@@ -328,6 +345,9 @@ function initToolbar({ render } = {}) {
   state.ui.scenarioGuideDismissed = !!state.ui.scenarioGuideDismissed;
   state.ui.politicalEditingExpanded = !!state.ui.politicalEditingExpanded;
   state.ui.scenarioVisualAdjustmentsOpen = !!state.ui.scenarioVisualAdjustmentsOpen;
+  if (!state.ui.paletteLibrarySections || typeof state.ui.paletteLibrarySections !== "object") {
+    state.ui.paletteLibrarySections = {};
+  }
 
   const getPaintModeLabel = () => (
     String(state.paintMode || "visual") === "sovereignty"
@@ -448,14 +468,72 @@ function initToolbar({ render } = {}) {
     applyScenarioOverlaySafeLayout();
   };
 
+  const getScenarioOverlayLeftInset = () => (
+    globalThis.innerWidth <= 767 ? SCENARIO_BAR_MOBILE_LEFT_OFFSET : SCENARIO_BAR_LEFT_OFFSET
+  );
+
+  const renderScenarioGuideStatus = ({
+    activeScenario = "",
+    modeLabel = "",
+    scenarioViewLabel = "",
+    splitCount = 0,
+  } = {}) => {
+    if (!scenarioGuideStatusChips) return;
+    const statusChips = [
+      { label: t("Mode", "ui"), value: modeLabel },
+    ];
+    if (activeScenario) {
+      statusChips.push(
+        { label: t("View", "ui"), value: scenarioViewLabel },
+        { label: t("Split", "ui"), value: String(splitCount) }
+      );
+    }
+    scenarioGuideStatusChips.replaceChildren();
+    statusChips
+      .filter((chip) => String(chip.value || "").trim())
+      .forEach((chip) => {
+        const pill = document.createElement("span");
+        pill.className = "scenario-guide-status-pill";
+
+        const label = document.createElement("span");
+        label.className = "scenario-guide-status-pill-label";
+        label.textContent = `${chip.label}:`;
+
+        const value = document.createElement("span");
+        value.textContent = chip.value;
+
+        pill.appendChild(label);
+        pill.appendChild(value);
+        scenarioGuideStatusChips.appendChild(pill);
+      });
+    scenarioGuideStatus?.classList.toggle("hidden", !scenarioGuideStatusChips.childElementCount);
+  };
+
   const applyScenarioOverlaySafeLayout = () => {
     if (!scenarioContextBar || !zoomControls) return;
-    const contextRect = scenarioContextBar.getBoundingClientRect();
+    const overlayRect =
+      scenarioContextBar.offsetParent?.getBoundingClientRect()
+      || mapContainer?.closest(".map-stage")?.getBoundingClientRect()
+      || mapContainer?.getBoundingClientRect()
+      || { left: 0, right: globalThis.innerWidth || 0 };
     const zoomRect = zoomControls.getBoundingClientRect();
-    const overlap = (contextRect.right + 8) >= zoomRect.left && contextRect.left <= zoomRect.right;
-    scenarioContextBar.classList.toggle("is-overlap-avoid", overlap);
-    if (overlap && scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
-      closeScenarioGuidePopover();
+    const leftInset = getScenarioOverlayLeftInset();
+    const fallbackWidth = Math.round((overlayRect.right - overlayRect.left) - (leftInset * 2));
+    const rawAvailableWidth = Math.round(
+      zoomRect.left - overlayRect.left - leftInset - SCENARIO_BAR_SAFE_GAP
+    );
+    const availableWidth = Math.max(
+      SCENARIO_BAR_MIN_WIDTH,
+      Math.min(fallbackWidth, rawAvailableWidth > 0 ? rawAvailableWidth : fallbackWidth)
+    );
+    scenarioContextBar.classList.remove("is-overlap-avoid");
+    scenarioContextBar.style.maxWidth = `${availableWidth}px`;
+    if (scenarioGuidePopover) {
+      const guideWidth = Math.max(
+        SCENARIO_BAR_MIN_WIDTH,
+        Math.min(SCENARIO_GUIDE_MAX_WIDTH, availableWidth)
+      );
+      scenarioGuidePopover.style.maxWidth = `${guideWidth}px`;
     }
   };
 
@@ -471,22 +549,29 @@ function initToolbar({ render } = {}) {
     const scenarioViewLabel = String(state.scenarioViewMode || "ownership") === "frontline"
       ? t("Frontline", "ui")
       : t("Ownership", "ui");
-    scenarioContextBar.classList.toggle("is-scenario", !!activeScenario);
+    const showScenarioState = !!activeScenario;
+    const activeValue = activeCode ? `${activeLabel} (${activeCode})` : t("None", "ui");
+    scenarioContextBar.classList.toggle("is-scenario", showScenarioState);
     scenarioContextBar.classList.toggle("is-collapsed", !!state.ui.scenarioBarCollapsed);
+    scenarioContextScenarioItem?.classList.toggle("hidden", !showScenarioState);
+    scenarioContextModeItem?.classList.toggle("hidden", showScenarioState);
+    scenarioContextActiveItem?.classList.toggle("hidden", !showScenarioState);
     if (scenarioContextScenarioText) {
-      scenarioContextScenarioText.textContent = activeScenario
-        ? `${t("Scenario", "ui")}: ${activeScenario}`
-        : `${t("Scenario", "ui")}: ${t("None", "ui")}`;
+      scenarioContextScenarioText.textContent = activeScenario || t("None", "ui");
+      scenarioContextScenarioText.setAttribute("title", `${t("Scenario", "ui")}: ${activeScenario || t("None", "ui")}`);
     }
     if (scenarioContextModeText) {
-      scenarioContextModeText.textContent = activeScenario
-        ? `${t("Mode", "ui")}: ${modeLabel} · ${t("View", "ui")}: ${scenarioViewLabel} · ${t("Split", "ui")}: ${splitCount}`
-        : `${t("Mode", "ui")}: ${modeLabel}`;
+      scenarioContextModeText.textContent = modeLabel;
+      scenarioContextModeText.setAttribute(
+        "title",
+        showScenarioState
+          ? `${t("Mode", "ui")}: ${modeLabel} · ${t("View", "ui")}: ${scenarioViewLabel} · ${t("Split", "ui")}: ${splitCount}`
+          : `${t("Mode", "ui")}: ${modeLabel}`
+      );
     }
     if (scenarioContextActiveText) {
-      scenarioContextActiveText.textContent = activeCode
-        ? `${t("Active", "ui")}: ${activeLabel} (${activeCode})`
-        : `${t("Active", "ui")}: ${t("None", "ui")}`;
+      scenarioContextActiveText.textContent = activeValue;
+      scenarioContextActiveText.setAttribute("title", `${t("Active", "ui")}: ${activeValue}`);
     }
     if (scenarioContextCollapseBtn) {
       scenarioContextCollapseBtn.textContent = state.ui.scenarioBarCollapsed ? "+" : "-";
@@ -499,6 +584,12 @@ function initToolbar({ render } = {}) {
       const isGuideOpen = !!(scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden"));
       scenarioGuideBtn.setAttribute("title", isGuideOpen ? t("Hide guide", "ui") : t("Show guide", "ui"));
     }
+    renderScenarioGuideStatus({
+      activeScenario,
+      modeLabel,
+      scenarioViewLabel,
+      splitCount,
+    });
     applyScenarioOverlaySafeLayout();
   };
 
@@ -1020,6 +1111,143 @@ function initToolbar({ render } = {}) {
   state.updatePaletteSourceUIFn = syncPaletteSourceControls;
   state.renderPaletteFn = renderPalette;
 
+  const ensurePaletteLibrarySectionState = (sourceId) => {
+    const key = String(sourceId || "legacy").trim() || "legacy";
+    if (!state.ui.paletteLibrarySections[key] || typeof state.ui.paletteLibrarySections[key] !== "object") {
+      state.ui.paletteLibrarySections[key] = {};
+    }
+    return state.ui.paletteLibrarySections[key];
+  };
+
+  const buildPaletteLibraryGroups = (entries) => {
+    const groups = {
+      essentials: [],
+      dynamic: [],
+      countries: [],
+      extra: [],
+    };
+    entries.forEach((entry) => {
+      if (Number.isFinite(entry.quickIndex)) {
+        groups.essentials.push(entry);
+        return;
+      }
+      if (entry.dynamic) {
+        groups.dynamic.push(entry);
+        return;
+      }
+      if (entry.mapped) {
+        groups.countries.push(entry);
+        return;
+      }
+      groups.extra.push(entry);
+    });
+    return PALETTE_LIBRARY_GROUPS.map((group) => ({
+      ...group,
+      entries: groups[group.key] || [],
+    })).filter((group) => group.entries.length > 0);
+  };
+
+  const createPaletteLibraryRow = (entry) => {
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "palette-library-row";
+    row.dataset.color = entry.color;
+    row.dataset.tag = entry.sourceTag;
+    row.dataset.iso2 = entry.mappedIso2 || "";
+    if (entry.color === state.selectedColor) {
+      row.classList.add("is-selected");
+    }
+    row.addEventListener("click", () => {
+      state.selectedColor = entry.color;
+      updateSwatchUI();
+    });
+
+    const swatch = document.createElement("span");
+    swatch.className = "color-swatch";
+    swatch.dataset.color = entry.color;
+    swatch.style.backgroundColor = entry.color;
+
+    const meta = document.createElement("span");
+    meta.className = "palette-library-meta";
+
+    const title = document.createElement("span");
+    title.className = "palette-library-title";
+    title.textContent = entry.localizedName || entry.label;
+
+    const subtitle = document.createElement("span");
+    subtitle.className = "palette-library-subtitle";
+    const isoTag = entry.mappedIso2 || entry.iso2 || "--";
+    const sourceTag = entry.sourceLabel || entry.sourceTag || "Palette";
+    subtitle.textContent = `${isoTag} · ${sourceTag}`;
+    row.title = [
+      entry.localizedName || entry.label,
+      entry.sourceTag,
+      entry.countryFileLabel,
+      entry.mappedIso2
+        ? `${t("Mapped to", "ui")} ${entry.mappedIso2}`
+        : `${t("Unmapped", "ui")}: ${formatPaletteReason(entry)}`,
+    ].filter(Boolean).join(" · ");
+
+    meta.appendChild(title);
+    meta.appendChild(subtitle);
+    row.appendChild(swatch);
+    row.appendChild(meta);
+    return row;
+  };
+
+  const renderPaletteLibrarySourceTabs = (sourceOptions) => {
+    if (!paletteLibrarySources) return;
+    paletteLibrarySources.replaceChildren();
+    if (!sourceOptions.length) {
+      paletteLibrarySources.classList.add("hidden");
+      return;
+    }
+    paletteLibrarySources.classList.remove("hidden");
+    sourceOptions.forEach((optionData) => {
+      const button = document.createElement("button");
+      const isActive = optionData.value === state.activePaletteId;
+      button.type = "button";
+      button.className = "palette-library-source-btn";
+      button.setAttribute("role", "tab");
+      button.setAttribute("aria-selected", String(isActive));
+      button.classList.toggle("is-active", isActive);
+      button.textContent = optionData.label;
+      button.addEventListener("click", async () => {
+        if (isActive) return;
+        await handlePaletteSourceChange(optionData.value);
+      });
+      paletteLibrarySources.appendChild(button);
+    });
+  };
+
+  const PALETTE_LIBRARY_HEIGHT = {
+    base: 240,
+    cap: 480,
+  };
+  let adaptivePaletteLibraryHeightFrame = 0;
+
+  const clampPaletteLibraryHeight = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
+
+  const syncAdaptivePaletteLibraryHeight = () => {
+    adaptivePaletteLibraryHeightFrame = 0;
+    if (!paletteLibraryList || !state.paletteLibraryOpen) return;
+    const scrollHeight = Number(paletteLibraryList.scrollHeight || 0);
+    const nextHeight = clampPaletteLibraryHeight(
+      scrollHeight,
+      PALETTE_LIBRARY_HEIGHT.base,
+      PALETTE_LIBRARY_HEIGHT.cap
+    );
+    paletteLibraryList.style.height = `${Math.round(nextHeight)}px`;
+    paletteLibraryList.style.maxHeight = `${Math.round(nextHeight)}px`;
+  };
+
+  const scheduleAdaptivePaletteLibraryHeight = () => {
+    if (adaptivePaletteLibraryHeightFrame) {
+      globalThis.cancelAnimationFrame(adaptivePaletteLibraryHeightFrame);
+    }
+    adaptivePaletteLibraryHeightFrame = globalThis.requestAnimationFrame(syncAdaptivePaletteLibraryHeight);
+  };
+
   async function handlePaletteSourceChange(nextPaletteId) {
     const targetId = String(nextPaletteId || "").trim();
     if (!targetId || targetId === state.activePaletteId) {
@@ -1055,6 +1283,8 @@ function initToolbar({ render } = {}) {
     if (!paletteLibraryList) return;
 
     const searchTerm = String(state.paletteLibrarySearch || "").trim().toLowerCase();
+    const sourceOptions = getPaletteSourceOptions();
+    renderPaletteLibrarySourceTabs(sourceOptions);
     const sourceLabel = state.activePaletteMeta?.display_name || state.currentPaletteTheme || "Palette";
     const summarizeResults = (count) => (
       state.currentLanguage === "zh"
@@ -1093,6 +1323,9 @@ function initToolbar({ render } = {}) {
         entry.suggestedIso2,
       ].some((value) => String(value || "").toLowerCase().includes(searchTerm));
     });
+    const groupedEntries = buildPaletteLibraryGroups(filtered);
+    const activeSourceId = String(state.activePaletteId || state.currentPaletteTheme || "legacy").trim() || "legacy";
+    const sectionState = ensurePaletteLibrarySectionState(activeSourceId);
 
     paletteLibraryList.replaceChildren();
     if (paletteLibrarySummary) {
@@ -1104,54 +1337,50 @@ function initToolbar({ render } = {}) {
       empty.className = "palette-library-empty";
       empty.textContent = t("No palette colors match the current search.", "ui");
       paletteLibraryList.appendChild(empty);
+      scheduleAdaptivePaletteLibraryHeight();
       return;
     }
 
-    filtered.forEach((entry) => {
-      const row = document.createElement("button");
-      row.type = "button";
-      row.className = "palette-library-row";
-      row.dataset.color = entry.color;
-      row.dataset.tag = entry.sourceTag;
-      row.dataset.iso2 = entry.mappedIso2 || "";
-      if (entry.color === state.selectedColor) {
-        row.classList.add("is-selected");
-      }
-      row.addEventListener("click", () => {
-        state.selectedColor = entry.color;
-        updateSwatchUI();
+    groupedEntries.forEach((group) => {
+      const section = document.createElement("details");
+      section.className = "palette-library-section";
+      const isOpen = searchTerm
+        ? group.entries.length > 0
+        : (typeof sectionState[group.key] === "boolean" ? sectionState[group.key] : group.defaultOpen);
+      section.open = isOpen;
+      section.addEventListener("toggle", () => {
+        if (searchTerm) return;
+        sectionState[group.key] = section.open;
+        scheduleAdaptivePaletteLibraryHeight();
       });
 
-      const swatch = document.createElement("span");
-      swatch.className = "color-swatch";
-      swatch.dataset.color = entry.color;
-      swatch.style.backgroundColor = entry.color;
+      const summary = document.createElement("summary");
 
-      const meta = document.createElement("span");
-      meta.className = "palette-library-meta";
+      const heading = document.createElement("div");
+      heading.className = "palette-library-section-heading";
 
-      const title = document.createElement("span");
-      title.className = "palette-library-title";
-      title.textContent = entry.localizedName || entry.label;
+      const title = document.createElement("div");
+      title.className = "palette-library-section-title";
+      title.textContent = group.label();
 
-      const subtitle = document.createElement("span");
-      subtitle.className = "palette-library-subtitle";
-      const isoTag = entry.mappedIso2 || entry.iso2 || "--";
-      const sourceTag = entry.sourceLabel || entry.sourceTag || "Palette";
-      subtitle.textContent = `${isoTag} · ${sourceTag}`;
-      row.title = [
-        entry.localizedName || entry.label,
-        entry.sourceTag,
-        entry.countryFileLabel,
-        entry.mappedIso2 ? `${t("Mapped to", "ui")} ${entry.mappedIso2}` : `${t("Unmapped", "ui")}: ${formatPaletteReason(entry)}`,
-      ].filter(Boolean).join(" · ");
+      const count = document.createElement("div");
+      count.className = "palette-library-section-count";
+      count.textContent = String(group.entries.length);
 
-      meta.appendChild(title);
-      meta.appendChild(subtitle);
-      row.appendChild(swatch);
-      row.appendChild(meta);
-      paletteLibraryList.appendChild(row);
+      heading.appendChild(title);
+      heading.appendChild(count);
+      summary.appendChild(heading);
+      section.appendChild(summary);
+
+      const list = document.createElement("div");
+      list.className = "palette-library-section-list";
+      group.entries.forEach((entry) => {
+        list.appendChild(createPaletteLibraryRow(entry));
+      });
+      section.appendChild(list);
+      paletteLibraryList.appendChild(section);
     });
+    scheduleAdaptivePaletteLibraryHeight();
   }
   state.updatePaletteLibraryUIFn = renderPaletteLibrary;
 
@@ -1607,6 +1836,7 @@ function initToolbar({ render } = {}) {
       document.body.classList.remove("right-drawer-open");
       leftPanelToggle.setAttribute("aria-expanded", String(next));
       rightPanelToggle?.setAttribute("aria-expanded", "false");
+      refreshScenarioContextBar();
     });
     leftPanelToggle.dataset.bound = "true";
   }
@@ -1619,6 +1849,7 @@ function initToolbar({ render } = {}) {
       document.body.classList.remove("left-drawer-open");
       rightPanelToggle.setAttribute("aria-expanded", String(next));
       leftPanelToggle?.setAttribute("aria-expanded", "false");
+      refreshScenarioContextBar();
     });
     rightPanelToggle.dataset.bound = "true";
   }
@@ -2727,7 +2958,8 @@ function initToolbar({ render } = {}) {
 
   if (!state.ui.overlayResizeBound) {
     globalThis.addEventListener("resize", () => {
-      applyScenarioOverlaySafeLayout();
+      refreshScenarioContextBar();
+      scheduleAdaptivePaletteLibraryHeight();
     });
     state.ui.overlayResizeBound = true;
   }

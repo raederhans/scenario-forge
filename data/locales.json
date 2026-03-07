@@ -160,6 +160,10 @@
       "en": "Browse All Colors",
       "zh": "浏览全部颜色"
     },
+    "Browse the full palette library for manual work and palette reference.": {
+      "en": "Browse the full palette library for manual work and palette reference.",
+      "zh": "浏览完整颜色库，用于手动取色和调色参考。"
+    },
     "Brush": {
       "en": "Brush",
       "zh": "笔刷"
@@ -324,6 +328,10 @@
       "en": "Core territory was not applied.",
       "zh": "核心领土未适用。"
     },
+    "Countries": {
+      "en": "Countries",
+      "zh": "国家"
+    },
     "Country Colors": {
       "en": "Country Colors",
       "zh": "国家配色"
@@ -404,6 +412,10 @@
       "en": "Dynamic borders disabled",
       "zh": "动态边界已禁用"
     },
+    "Dynamic / Runtime": {
+      "en": "Dynamic / Runtime",
+      "zh": "动态 / 运行时"
+    },
     "Dynamic tag": {
       "en": "Dynamic tag",
       "zh": "动态 tag"
@@ -420,6 +432,10 @@
       "en": "Empire Borders",
       "zh": "帝国边界"
     },
+    "Essentials": {
+      "en": "Essentials",
+      "zh": "常用"
+    },
     "Eraser": {
       "en": "Eraser",
       "zh": "橡皮擦"
@@ -435,6 +451,10 @@
     "Expand": {
       "en": "Expand",
       "zh": "展开"
+    },
+    "Extra": {
+      "en": "Extra",
+      "zh": "额外"
     },
     "Export": {
       "en": "Export",

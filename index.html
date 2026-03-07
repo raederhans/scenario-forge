@@ -25,9 +25,10 @@
 
           <div class="card">
             <div id="lblColorLibrary" class="section-header">Color Library</div>
-            <p class="body-text mt-2">Browse the full palette library for manual work and palette reference.</p>
+            <p id="lblColorLibraryHint" class="body-text mt-2">Browse the full palette library for manual work and palette reference.</p>
             <button id="paletteLibraryToggle" class="btn-secondary mt-3" type="button">Browse All Colors</button>
             <div id="paletteLibraryPanel" class="palette-library mt-3 hidden">
+              <div id="paletteLibrarySources" class="palette-library-sources" role="tablist" aria-label="Palette sources"></div>
               <label id="lblPaletteSearch" class="section-header-block" for="paletteLibrarySearch">Search Colors</label>
               <input id="paletteLibrarySearch" type="text" placeholder="Search country, ISO-2, or source tag..." class="input mt-2" />
               <div id="paletteLibrarySummary" class="body-text mt-2">0 colors</div>
@@ -760,22 +761,25 @@
           </div>
           <div id="scenarioContextBar" class="scenario-context-bar">
             <button id="scenarioContextCollapseBtn" type="button" class="scenario-context-icon-btn" aria-label="Collapse scenario context">-</button>
-            <div class="scenario-context-item">
+            <div id="scenarioContextScenarioItem" class="scenario-context-item">
               <span class="scenario-context-icon" aria-hidden="true">S</span>
               <span id="scenarioContextScenarioText">Scenario: None</span>
             </div>
-            <div class="scenario-context-item">
+            <div id="scenarioContextModeItem" class="scenario-context-item">
               <span class="scenario-context-icon" aria-hidden="true">M</span>
               <span id="scenarioContextModeText">Mode: Visual Color</span>
             </div>
-              <div class="scenario-context-item">
-                <span class="scenario-context-icon" aria-hidden="true">A</span>
-                <span id="scenarioContextActiveText">Active: None</span>
-              </div>
+            <div id="scenarioContextActiveItem" class="scenario-context-item">
+              <span class="scenario-context-icon" aria-hidden="true">A</span>
+              <span id="scenarioContextActiveText">Active: None</span>
+            </div>
             <button id="scenarioGuideBtn" type="button" class="scenario-context-icon-btn" aria-label="Show scenario guide">?</button>
           </div>
           <div id="scenarioGuidePopover" class="scenario-guide-popover hidden" role="dialog" aria-label="Scenario quick guide">
             <div id="scenarioGuideTitle" class="section-header">Scenario Quick Start</div>
+            <div id="scenarioGuideStatus" class="scenario-guide-status mt-2">
+              <div id="scenarioGuideStatusChips" class="scenario-guide-status-chips"></div>
+            </div>
             <ol class="scenario-guide-list mt-2">
               <li id="scenarioGuideStepApply">Apply Scenario</li>
               <li id="scenarioGuideStepSelect">Select a country in Inspector</li>

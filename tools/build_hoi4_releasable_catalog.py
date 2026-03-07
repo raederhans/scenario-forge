@@ -38,7 +38,7 @@ EXPECTED_COMPANION_ACTION_IDS = {
     "RKP": {"annexed_poland_to_ger"},
     "RKO": {"ostland_marijampole_to_ger"},
     "RKU": {"transnistria_to_rom", "crimea_to_ger"},
-    "RKM": {"greater_finland_to_fin"},
+    "RKM": {"greater_finland_to_fin", "saint_petersburg_to_ger"},
 }
 
 

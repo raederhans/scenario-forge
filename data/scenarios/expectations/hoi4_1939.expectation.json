@@ -13,12 +13,59 @@
     "primary_rule_source",
     "rule_sources"
   ],
+  "country_assertions": [
+    {
+      "tag": "CHI",
+      "field": "feature_count",
+      "equals": 1445
+    },
+    {
+      "tag": "GXC",
+      "field": "feature_count",
+      "equals": 87
+    },
+    {
+      "tag": "YUN",
+      "field": "feature_count",
+      "equals": 126
+    },
+    {
+      "tag": "SHX",
+      "field": "feature_count",
+      "equals": 136
+    },
+    {
+      "tag": "QMA",
+      "field": "feature_count",
+      "equals": 41
+    },
+    {
+      "tag": "GMA",
+      "field": "feature_count",
+      "equals": 83
+    },
+    {
+      "tag": "XSM",
+      "field": "feature_count",
+      "equals": 24
+    },
+    {
+      "tag": "PRC",
+      "field": "feature_count",
+      "equals": 25
+    },
+    {
+      "tag": "SIC",
+      "field": "feature_count",
+      "equals": 8
+    }
+  ],
   "summary_equals": {
     "blocker_count": 0
   },
   "summary_min": {
     "feature_count": 10000,
-    "owner_count": 70,
+    "owner_count": 91,
     "owner_controller_split_feature_count": 383,
     "controller_rule_count": 6
   },
@@ -156,6 +203,90 @@
       "expected_owner_tag": "CHI",
       "feature_ids": [
         "CN_CITY_17275852B84296108244083"
+      ]
+    },
+    {
+      "name": "china_shandong_owner_chi",
+      "expected_owner_tag": "CHI",
+      "feature_ids": [
+        "CN_CITY_17275852B85544446441725"
+      ]
+    },
+    {
+      "name": "china_sichuan_owner_chi",
+      "expected_owner_tag": "CHI",
+      "feature_ids": [
+        "CN_CITY_17275852B36174894779493"
+      ]
+    },
+    {
+      "name": "china_chongqing_owner_chi",
+      "expected_owner_tag": "CHI",
+      "feature_ids": [
+        "CN_CITY_17275852B2280889616396"
+      ]
+    },
+    {
+      "name": "china_guangxi_owner_gxc",
+      "expected_owner_tag": "GXC",
+      "feature_ids": [
+        "CN_CITY_17275852B77313722911095"
+      ]
+    },
+    {
+      "name": "china_yunnan_owner_yun",
+      "expected_owner_tag": "YUN",
+      "feature_ids": [
+        "CN_CITY_17275852B46040402463359"
+      ]
+    },
+    {
+      "name": "china_qinghai_owner_qma",
+      "expected_owner_tag": "QMA",
+      "feature_ids": [
+        "CN_CITY_17275852B98939713320160"
+      ]
+    },
+    {
+      "name": "china_gansu_owner_gma",
+      "expected_owner_tag": "GMA",
+      "feature_ids": [
+        "CN_CITY_17275852B85468107399147"
+      ]
+    },
+    {
+      "name": "china_ningxia_owner_xsm",
+      "expected_owner_tag": "XSM",
+      "feature_ids": [
+        "CN_CITY_17275852B92852559512567"
+      ]
+    },
+    {
+      "name": "china_xikang_owner_sic_kangding",
+      "expected_owner_tag": "SIC",
+      "feature_ids": [
+        "CN_CITY_17275852B47950992751133"
+      ]
+    },
+    {
+      "name": "china_xikang_owner_sic_xichang",
+      "expected_owner_tag": "SIC",
+      "feature_ids": [
+        "CN_CITY_17275852B35342422356290"
+      ]
+    },
+    {
+      "name": "china_xikang_owner_sic_batang",
+      "expected_owner_tag": "SIC",
+      "feature_ids": [
+        "CN_CITY_17275852B93800386737284"
+      ]
+    },
+    {
+      "name": "china_chamdo_owner_tib",
+      "expected_owner_tag": "TIB",
+      "feature_ids": [
+        "CN_CITY_17275852B88896253540800"
       ]
     }
   ]

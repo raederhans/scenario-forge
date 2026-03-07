@@ -743,11 +743,12 @@ function getPoliticalFeatureCollection(topology, sourceName) {
     type: "FeatureCollection",
     features: features.map((feature) => {
       const normalizedFeature = normalizeFeatureGeometry(feature, { sourceLabel: sourceName });
+      const existingSource = String(normalizedFeature?.properties?.__source || "").trim();
       return {
         ...normalizedFeature,
         properties: {
           ...(normalizedFeature?.properties || {}),
-          __source: sourceName,
+          __source: existingSource || sourceName,
         },
       };
     }),
@@ -1098,9 +1099,12 @@ function rebuildPoliticalLandCollections() {
   const primaryTopology = state.topologyPrimary || state.topology;
   const detailTopology = state.topologyBundleMode === "composite" ? state.topologyDetail : null;
   const overrideCollection = state.topologyBundleMode === "composite" ? state.ruCityOverrides : null;
+  const runtimeTopology = state.topologyBundleMode === "composite" ? state.runtimePoliticalTopology : null;
 
   let fullCollection = state.landDataFull || state.landData || null;
-  if (primaryTopology?.objects?.political && globalThis.topojson) {
+  if (runtimeTopology?.objects?.political && globalThis.topojson) {
+    fullCollection = getPoliticalFeatureCollection(runtimeTopology, "runtime");
+  } else if (primaryTopology?.objects?.political && globalThis.topojson) {
     fullCollection = state.topologyBundleMode === "composite"
       ? composePoliticalFeatures(primaryTopology, detailTopology, overrideCollection)
       : getPoliticalFeatureCollection(primaryTopology, "primary");

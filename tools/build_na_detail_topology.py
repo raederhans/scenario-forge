@@ -18,6 +18,11 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from map_builder import config as cfg
 from map_builder.geo.topology import build_topology, compute_neighbor_graph
+from map_builder.processors.detail_shell_coverage import (
+    append_shell_coverage_gap_fragments,
+    collect_shell_coverage_gaps,
+    repair_shell_coverage,
+)
 from map_builder.processors.africa_admin1 import apply_africa_admin1_replacement
 from map_builder.processors.au_city_overrides import apply_au_city_overrides
 from map_builder.processors.belarus import apply_belarus_replacement
@@ -264,6 +269,25 @@ def _inject_computed_neighbors(topology_dict: dict, political_gdf: gpd.GeoDataFr
     political["computed_neighbors"] = compute_neighbor_graph(clean)
 
 
+def _write_output_topology(
+    *,
+    output_path: Path,
+    political: gpd.GeoDataFrame,
+    layers: dict[str, gpd.GeoDataFrame],
+) -> None:
+    build_topology(
+        political=political,
+        ocean=layers.get("ocean", _empty_gdf()),
+        land=layers.get("land", _empty_gdf()),
+        urban=layers.get("urban", _empty_gdf()),
+        physical=layers.get("physical", _empty_gdf()),
+        rivers=layers.get("rivers", _empty_gdf()),
+        special_zones=layers.get("special_zones"),
+        output_path=output_path,
+        quantization=cfg.TOPOLOGY_QUANTIZATION,
+    )
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build the enriched detail topology bundle.")
     parser.add_argument(
@@ -290,6 +314,11 @@ def main() -> None:
     topology_dict = _load_topology(source_path)
     layers = _load_layers_from_topology(topology_dict)
     print(f"[Detail patch] Source political features: {len(layers['political'])}")
+    primary_topology_path = source_path.with_name("europe_topology.json")
+    primary_layers = None
+    if primary_topology_path.exists():
+        print(f"[Detail patch] Loading primary topology shell: {primary_topology_path}")
+        primary_layers = _load_layers_from_topology(_load_topology(primary_topology_path))
 
     patched_political = apply_north_america_replacement(layers["political"])
     patched_political = apply_africa_admin1_replacement(patched_political)
@@ -319,19 +348,46 @@ def main() -> None:
             "[Detail patch] Round-trip topology repair adjusted political feature count: "
             f"before={len(patched_political)}, after={len(roundtrip_political)}"
         )
+    if primary_layers is not None:
+        roundtrip_political = repair_shell_coverage(
+            roundtrip_political,
+            primary_layers["political"],
+            log_prefix="[Detail patch]",
+        )
     layers["political"] = roundtrip_political
 
-    build_topology(
-        political=roundtrip_political,
-        ocean=layers.get("ocean", _empty_gdf()),
-        land=layers.get("land", _empty_gdf()),
-        urban=layers.get("urban", _empty_gdf()),
-        physical=layers.get("physical", _empty_gdf()),
-        rivers=layers.get("rivers", _empty_gdf()),
-        special_zones=layers.get("special_zones"),
+    _write_output_topology(
         output_path=output_path,
-        quantization=cfg.TOPOLOGY_QUANTIZATION,
+        political=roundtrip_political,
+        layers=layers,
     )
+    if primary_layers is not None:
+        for repair_pass in range(1, 4):
+            output_dict = _load_topology(output_path)
+            output_political = _topology_object_to_gdf(output_dict, "political")
+            gaps = collect_shell_coverage_gaps(
+                output_political,
+                primary_layers["political"],
+            )
+            if not gaps:
+                break
+            gap = gaps[0]
+            print(
+                f"[Detail patch] Post-build shell coverage repair pass {repair_pass}: "
+                f"{gap['country_code']} fragments={gap['fragment_count']}, "
+                f"total_area_km2={gap['total_area_km2']:.1f}"
+            )
+            roundtrip_political = append_shell_coverage_gap_fragments(
+                output_political,
+                primary_layers["political"],
+                log_prefix=f"[Detail patch pass {repair_pass}]",
+            )
+            layers["political"] = roundtrip_political
+            _write_output_topology(
+                output_path=output_path,
+                political=roundtrip_political,
+                layers=layers,
+            )
     output_dict = _load_topology(output_path)
     count = len(output_dict.get("objects", {}).get("political", {}).get("geometries", []))
     print(f"[Detail patch] Output political features: {count}")

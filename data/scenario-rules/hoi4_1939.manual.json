@@ -260,6 +260,50 @@
       ],
       "base_iso2": "CN",
       "display_name_override": "China"
+    },
+    {
+      "rule_id": "1939_shandong_owner_chi",
+      "owner_tag": "CHI",
+      "priority": 953,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "Shandong returns to Nationalist Chinese legal ownership in 1939 after the Lu clique ceases to be a plausible owner-layer polity.",
+      "include_hierarchy_group_ids": ["CN_Shandong"],
+      "base_iso2": "CN",
+      "display_name_override": "China"
+    },
+    {
+      "rule_id": "1939_sichuan_chongqing_owner_chi",
+      "owner_tag": "CHI",
+      "priority": 954,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "Sichuan and Chongqing are folded back into Nationalist Chinese legal ownership for the wartime 1939 setup.",
+      "include_hierarchy_group_ids": ["CN_Sichuan", "CN_Chongqing"],
+      "base_iso2": "CN",
+      "display_name_override": "China"
+    },
+    {
+      "rule_id": "1939_xikang_clique_owner_sic",
+      "owner_tag": "SIC",
+      "priority": 955,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "Project extension: 1939 Xikang clique owner layer limited to Liu Wenhui's eastern Kham and western Sichuan base without absorbing Chamdo.",
+      "include_feature_ids": [
+        "CN_CITY_17275852B47950992751133",
+        "CN_CITY_17275852B35342422356290",
+        "CN_CITY_17275852B92159102315867",
+        "CN_CITY_17275852B93800386737284",
+        "CN_CITY_17275852B74822957782790",
+        "CN_CITY_17275852B77624704817132",
+        "CN_CITY_17275852B47014980073641",
+        "CN_CITY_17275852B43185565483198"
+      ],
+      "base_iso2": "CN",
+      "display_name_override": "Xikang Clique",
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended"
     }
   ]
 }

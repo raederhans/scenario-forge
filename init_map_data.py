@@ -10,6 +10,7 @@ import re
 import sys
 import subprocess
 import shutil
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
@@ -92,6 +93,10 @@ if REQUESTED_MODE != "palettes":
     from map_builder.io.readers import load_physical, load_rivers, load_urban
     from map_builder.processors.admin1 import build_extension_admin1, extract_country_code
     from map_builder.processors.china import apply_china_replacement
+    from map_builder.processors.detail_shell_coverage import (
+        DEFAULT_SHELL_COVERAGE_SPECS,
+        collect_shell_coverage_gaps,
+    )
     from map_builder.processors.france import apply_holistic_replacements
     from map_builder.processors.north_america import apply_north_america_replacement
     from map_builder.processors.physical_context import build_and_save_physical_context_layers
@@ -114,6 +119,8 @@ else:  # pragma: no cover - palettes mode avoids GIS/runtime build imports
     build_extension_admin1 = None
     extract_country_code = None
     apply_china_replacement = None
+    DEFAULT_SHELL_COVERAGE_SPECS = {}
+    collect_shell_coverage_gaps = None
     apply_holistic_replacements = None
     apply_north_america_replacement = None
     build_and_save_physical_context_layers = None
@@ -140,6 +147,10 @@ ALLOWED_SENTINEL_FEATURE_IDS = {
     "VE_ADM1_VEN+99?",
 }
 DETAIL_OVERLAY_WARN_THRESHOLD = 0.90
+ALLOWED_DETAIL_OVERLAY_SUPPORT_TIERS = {
+    "GB": {"nuts1_basic"},
+    "GR": {"adm1_basic"},
+}
 
 
 def cull_small_geometries(
@@ -1056,6 +1067,20 @@ def _normalize_detail_overlap_country_code(raw_code: object, feature_id: object 
     return cfg.COUNTRY_CODE_ALIASES.get(candidate, candidate)
 
 
+def _is_allowed_detail_overlay_support_overlap(
+    country_code: object,
+    earlier_tier: object,
+    later_tier: object,
+) -> bool:
+    code = str(country_code or "").strip().upper()
+    allowed_tiers = ALLOWED_DETAIL_OVERLAY_SUPPORT_TIERS.get(code)
+    if not allowed_tiers:
+        return False
+    earlier = str(earlier_tier or "").strip()
+    later = str(later_tier or "").strip()
+    return not earlier and later in allowed_tiers
+
+
 
 def _scan_detail_overlay_overlap_risks(
     detail_path: Path,
@@ -1184,6 +1209,12 @@ def _scan_detail_overlay_overlap_risks(
                 share_later = intersection_area / max(float(later["area"]), 1e-9)
                 if max(share_earlier, share_later) < overlap_threshold:
                     continue
+                if _is_allowed_detail_overlay_support_overlap(
+                    country_code,
+                    earlier["detail_tier"],
+                    later["detail_tier"],
+                ):
+                    continue
                 risks.append(
                     {
                         "country_code": str(country_code).strip(),
@@ -1205,6 +1236,225 @@ def _scan_detail_overlay_overlap_risks(
                 )
 
     return risks
+
+
+def _load_political_gdf_from_topology(path: Path) -> gpd.GeoDataFrame:
+    if gpd is None or not path.exists():
+        return gpd.GeoDataFrame(columns=["geometry"], geometry="geometry", crs="EPSG:4326")
+
+    from topojson.utils import serialize_as_geojson
+
+    topo_payload = _read_json(path)
+    feature_collection = serialize_as_geojson(topo_payload, objectname="political")
+    raw_features = feature_collection.get("features", []) if isinstance(feature_collection, dict) else []
+    if not isinstance(raw_features, list) or not raw_features:
+        return gpd.GeoDataFrame(columns=["geometry"], geometry="geometry", crs="EPSG:4326")
+
+    gdf = gpd.GeoDataFrame.from_features(raw_features, crs="EPSG:4326")
+    if gdf.empty:
+        return gdf
+    if "id" not in gdf.columns:
+        gdf["id"] = ""
+    if "cntr_code" not in gdf.columns:
+        gdf["cntr_code"] = ""
+    gdf["id"] = gdf["id"].fillna("").astype(str).str.strip()
+    gdf["cntr_code"] = gdf["cntr_code"].fillna("").astype(str).str.upper().str.strip()
+    gdf["geometry"] = gdf.geometry.apply(_repair_geometry)
+    gdf = gdf[gdf.geometry.notna() & ~gdf.geometry.is_empty].copy()
+    if not gdf.empty and hasattr(gdf.geometry, "is_valid"):
+        gdf = gdf[gdf.geometry.is_valid].copy()
+    return gdf
+
+
+def _validate_shell_coverage(
+    *,
+    primary_path: Path,
+    target_path: Path,
+    target_label: str,
+    problems: list[str],
+    strict: bool,
+) -> None:
+    if collect_shell_coverage_gaps is None or not primary_path.exists() or not target_path.exists():
+        return
+
+    shell_gdf = _load_political_gdf_from_topology(primary_path)
+    target_gdf = _load_political_gdf_from_topology(target_path)
+    if shell_gdf.empty or target_gdf.empty:
+        return
+
+    gaps = collect_shell_coverage_gaps(
+        target_gdf,
+        shell_gdf,
+        DEFAULT_SHELL_COVERAGE_SPECS,
+        exclude_managed_fragments=False,
+    )
+    if not gaps:
+        print(f"[Validate] {target_label}: managed shell coverage OK")
+        return
+
+    for gap in gaps:
+        message = (
+            f"{target_label}: shell coverage gaps for {gap['country_code']} "
+            f"fragments={gap['fragment_count']}, total_area_km2={gap['total_area_km2']:.1f}, "
+            f"max_fragment_area_km2={gap['max_fragment_area_km2']:.1f}, "
+            f"samples={gap['sample_centroids']}"
+        )
+        print(f"[Validate] {message}")
+        if strict:
+            problems.append(message)
+
+
+def _is_managed_shell_coverage_id(feature_id: object) -> bool:
+    text = str(feature_id or "").strip()
+    if not text:
+        return False
+    for spec in DEFAULT_SHELL_COVERAGE_SPECS.values():
+        prefix = f"{spec.id_prefix}_"
+        if text.startswith(prefix):
+            return True
+    return False
+
+
+def _collect_nested_string_lists(node: object, key: str) -> set[str]:
+    values: set[str] = set()
+    if isinstance(node, dict):
+        for node_key, node_value in node.items():
+            if node_key == key and isinstance(node_value, list):
+                values.update(str(item).strip() for item in node_value if str(item).strip())
+            else:
+                values.update(_collect_nested_string_lists(node_value, key))
+    elif isinstance(node, list):
+        for item in node:
+            values.update(_collect_nested_string_lists(item, key))
+    return values
+
+
+def _validate_releasable_catalog(
+    *,
+    output_dir: Path,
+    runtime_ids: set[str],
+    hierarchy_path: Path,
+    problems: list[str],
+    strict: bool,
+) -> None:
+    catalog_path = output_dir / "releasables" / "hoi4_vanilla.internal.phase1.catalog.json"
+    if not catalog_path.exists():
+        return
+
+    payload = _read_json(catalog_path)
+    summary = payload.get("summary", {}) if isinstance(payload, dict) else {}
+    validation_error_count = int(summary.get("validation_error_count", 0) or 0)
+    feature_ids = _collect_nested_string_lists(payload, "feature_ids")
+    missing_feature_ids = sorted(feature_ids - runtime_ids)
+    hierarchy_payload = _read_json(hierarchy_path) if hierarchy_path.exists() else {}
+    hierarchy_groups = hierarchy_payload.get("groups", {}) if isinstance(hierarchy_payload, dict) else {}
+    group_ids = _collect_nested_string_lists(payload, "group_ids")
+    missing_group_ids = sorted(group_ids - set(hierarchy_groups.keys()))
+
+    print(
+        f"[Validate] releasable catalog: entries={summary.get('entry_count')}, "
+        f"validation_errors={validation_error_count}, "
+        f"missing_feature_ids={len(missing_feature_ids)}, missing_group_ids={len(missing_group_ids)}"
+    )
+    if strict and validation_error_count > 0:
+        problems.append(f"releasable catalog: validation_error_count={validation_error_count}")
+    if strict and missing_feature_ids:
+        problems.append(f"releasable catalog: missing runtime feature ids={len(missing_feature_ids)}")
+    if strict and missing_group_ids:
+        problems.append(f"releasable catalog: missing hierarchy groups={len(missing_group_ids)}")
+
+
+def _run_validation_command(
+    cmd: list[str],
+    *,
+    label: str,
+    problems: list[str],
+    strict: bool,
+) -> None:
+    try:
+        completed = subprocess.run(
+            cmd,
+            cwd=PROJECT_ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except Exception as exc:
+        problems.append(f"{label}: unable to run validation ({exc})")
+        return
+
+    stdout = str(completed.stdout or "").strip()
+    stderr = str(completed.stderr or "").strip()
+    if stdout:
+        print(stdout)
+    if stderr:
+        print(stderr)
+    if strict and completed.returncode != 0:
+        problems.append(f"{label}: exit_code={completed.returncode}")
+
+
+def _validate_dependent_hoi4_assets(
+    *,
+    output_dir: Path,
+    runtime_ids: set[str],
+    hierarchy_path: Path,
+    problems: list[str],
+    strict: bool,
+) -> None:
+    scenarios_root = output_dir / "scenarios"
+    if scenarios_root.exists():
+        for scenario_dir in sorted(path for path in scenarios_root.iterdir() if path.is_dir() and path.name.startswith("hoi4_")):
+            report_dir = PROJECT_ROOT / "reports" / "generated" / "scenarios" / scenario_dir.name
+            _run_validation_command(
+                [
+                    sys.executable,
+                    str(PROJECT_ROOT / "tools" / "check_hoi4_scenario_bundle.py"),
+                    "--scenario-dir",
+                    str(scenario_dir),
+                    "--report-dir",
+                    str(report_dir),
+                ],
+                label=f"scenario bundle check ({scenario_dir.name})",
+                problems=problems,
+                strict=strict,
+            )
+
+    _validate_releasable_catalog(
+        output_dir=output_dir,
+        runtime_ids=runtime_ids,
+        hierarchy_path=hierarchy_path,
+        problems=problems,
+        strict=strict,
+    )
+
+    with tempfile.TemporaryDirectory(prefix="mapcreator-rk-validate-") as tmp_dir:
+        temp_root = Path(tmp_dir)
+        _run_validation_command(
+            [
+                sys.executable,
+                str(PROJECT_ROOT / "tools" / "rebuild_reichskommissariat_reference_masks.py"),
+                "--check-only",
+                "--reports-dir",
+                str(temp_root / "reference-masks"),
+            ],
+            label="reichskommissariat reference mask check",
+            problems=problems,
+            strict=strict,
+        )
+        _run_validation_command(
+            [
+                sys.executable,
+                str(PROJECT_ROOT / "tools" / "materialize_hoi4_reichskommissariat_boundaries.py"),
+                "--check-only",
+                "--report-json",
+                str(temp_root / "rk-boundaries.audit.json"),
+                "--report-md",
+                str(temp_root / "rk-boundaries.audit.md"),
+            ],
+            label="reichskommissariat boundary materialization check",
+            problems=problems,
+            strict=strict,
+        )
 
 
 def write_data_manifest(output_dir: Path) -> Path:
@@ -1338,7 +1588,11 @@ def write_data_manifest(output_dir: Path) -> Path:
     return manifest_path
 
 
-def validate_build_outputs(output_dir: Path, strict: bool = False) -> None:
+def validate_build_outputs(
+    output_dir: Path,
+    strict: bool = False,
+    include_dependent_asset_checks: bool = False,
+) -> None:
     problems: list[str] = []
 
     primary_path = output_dir / "europe_topology.json"
@@ -1346,6 +1600,7 @@ def validate_build_outputs(output_dir: Path, strict: bool = False) -> None:
     runtime_path = output_dir / "europe_topology.runtime_political_v1.json"
     hierarchy_path = output_dir / "hierarchy.json"
     aliases_path = output_dir / "geo_aliases.json"
+    runtime_ids: set[str] = set()
 
     for topology_path in [primary_path, detail_path, runtime_path]:
         if not topology_path.exists():
@@ -1372,6 +1627,8 @@ def validate_build_outputs(output_dir: Path, strict: bool = False) -> None:
             f"illegal_ids={len(illegal_ids)}, world_bounds={world_bounds_count}, "
             f"raw_world_bounds={raw_world_bounds_count}"
         )
+        if topology_path == runtime_path:
+            runtime_ids = set(ids)
 
         if topology_path == detail_path:
             for risk in _scan_detail_overlay_overlap_risks(detail_path):
@@ -1393,6 +1650,21 @@ def validate_build_outputs(output_dir: Path, strict: bool = False) -> None:
                         f"{detail_path.name}: high-overlap tiers "
                         f"{risk['country_code']} {earlier_tier}->{later_tier}"
                     )
+            _validate_shell_coverage(
+                primary_path=primary_path,
+                target_path=detail_path,
+                target_label=detail_path.name,
+                problems=problems,
+                strict=strict,
+            )
+        elif topology_path == runtime_path:
+            _validate_shell_coverage(
+                primary_path=primary_path,
+                target_path=runtime_path,
+                target_label=runtime_path.name,
+                problems=problems,
+                strict=strict,
+            )
 
     if hierarchy_path.exists():
         hierarchy_child_ids = _collect_hierarchy_child_ids(hierarchy_path)
@@ -1433,14 +1705,36 @@ def validate_build_outputs(output_dir: Path, strict: bool = False) -> None:
                 if str(feature_id).strip()
             }
             runtime_ids, _duplicates, _missing_names, _illegal_ids = _extract_political_topology_ids(runtime_path)
-            if expected_ids != runtime_ids:
+            missing_runtime_ids = expected_ids - runtime_ids
+            extra_runtime_ids = runtime_ids - expected_ids
+            unexpected_extra_ids = {
+                feature_id
+                for feature_id in extra_runtime_ids
+                if not _is_managed_shell_coverage_id(feature_id)
+            }
+            if missing_runtime_ids or unexpected_extra_ids:
                 problems.append(
                     "runtime political ids drift: "
                     f"expected={len(expected_ids)}, actual={len(runtime_ids)}, "
-                    f"missing={len(expected_ids - runtime_ids)}, extra={len(runtime_ids - expected_ids)}"
+                    f"missing={len(missing_runtime_ids)}, extra={len(extra_runtime_ids)}, "
+                    f"unexpected_extra={len(unexpected_extra_ids)}"
+                )
+            elif extra_runtime_ids:
+                print(
+                    "[Validate] runtime political ids drift accepted: "
+                    f"managed_shell_residuals={len(extra_runtime_ids)}"
                 )
         except Exception as exc:
             problems.append(f"runtime political validation failed: {exc}")
+
+    if strict and include_dependent_asset_checks and runtime_ids:
+        _validate_dependent_hoi4_assets(
+            output_dir=output_dir,
+            runtime_ids=runtime_ids,
+            hierarchy_path=hierarchy_path,
+            problems=problems,
+            strict=strict,
+        )
 
     if problems:
         for problem in problems:
@@ -1551,6 +1845,108 @@ def run_palette_imports(output_dir: Path, strict: bool = False) -> None:
         if job["source_workshop_id"]:
             cmd.extend(["--source-workshop-id", str(job["source_workshop_id"])])
         subprocess.run(cmd, cwd=PROJECT_ROOT, check=True)
+
+
+def rebuild_derived_hoi4_assets(output_dir: Path, strict: bool = False) -> bool:
+    try:
+        from scenario_builder.hoi4.parser import discover_hoi4_source_root
+    except Exception as exc:
+        message = f"[HOI4 Assets] Unable to import scenario builder: {exc}"
+        if strict:
+            raise SystemExit(message)
+        print(message)
+        return False
+
+    try:
+        source_root = discover_hoi4_source_root(None)
+    except Exception as exc:
+        message = f"[HOI4 Assets] Unable to locate HOI4 source root: {exc}"
+        if strict:
+            raise SystemExit(message)
+        print(message)
+        return False
+
+    scenario_jobs = [
+        {
+            "scenario_id": "hoi4_1936",
+            "display_name": "HOI4 1936",
+            "bookmark_file": "common/bookmarks/the_gathering_storm.txt",
+            "manual_rules": ["data/scenario-rules/hoi4_1936.manual.json"],
+            "controller_rules": [],
+            "scenario_output_dir": "data/scenarios/hoi4_1936",
+            "report_dir": "reports/generated/scenarios/hoi4_1936",
+        },
+        {
+            "scenario_id": "hoi4_1939",
+            "display_name": "HOI4 1939",
+            "bookmark_file": "common/bookmarks/blitzkrieg.txt",
+            "as_of_date": "1939.8.14.12",
+            "manual_rules": [
+                "data/scenario-rules/hoi4_1936.manual.json",
+                "data/scenario-rules/hoi4_1939.manual.json",
+            ],
+            "controller_rules": ["data/scenario-rules/hoi4_1939.controller.manual.json"],
+            "scenario_output_dir": "data/scenarios/hoi4_1939",
+            "report_dir": "reports/generated/scenarios/hoi4_1939",
+        },
+    ]
+
+    for job in scenario_jobs:
+        cmd = [
+            sys.executable,
+            str(PROJECT_ROOT / "tools" / "build_hoi4_scenario.py"),
+            "--scenario-id",
+            str(job["scenario_id"]),
+            "--display-name",
+            str(job["display_name"]),
+            "--source-root",
+            str(source_root),
+            "--bookmark-file",
+            str(job["bookmark_file"]),
+            "--manual-rules",
+            ",".join(job["manual_rules"]),
+            "--scenario-output-dir",
+            str(PROJECT_ROOT / str(job["scenario_output_dir"])),
+            "--report-dir",
+            str(PROJECT_ROOT / str(job["report_dir"])),
+        ]
+        if job.get("as_of_date"):
+            cmd.extend(["--as-of-date", str(job["as_of_date"])])
+        if job.get("controller_rules"):
+            cmd.extend(["--controller-rules", ",".join(job["controller_rules"])])
+        print(f"[HOI4 Assets] Rebuilding scenario bundle: {job['scenario_id']}")
+        subprocess.run(cmd, cwd=PROJECT_ROOT, check=True)
+
+    print("[HOI4 Assets] Rebuilding releasable catalog")
+    subprocess.run(
+        [
+            sys.executable,
+            str(PROJECT_ROOT / "tools" / "build_hoi4_releasable_catalog.py"),
+            "--source-root",
+            str(source_root),
+        ],
+        cwd=PROJECT_ROOT,
+        check=True,
+    )
+
+    print("[HOI4 Assets] Rebuilding Reichskommissariat reference masks")
+    subprocess.run(
+        [
+            sys.executable,
+            str(PROJECT_ROOT / "tools" / "rebuild_reichskommissariat_reference_masks.py"),
+        ],
+        cwd=PROJECT_ROOT,
+        check=True,
+    )
+    subprocess.run(
+        [
+            sys.executable,
+            str(PROJECT_ROOT / "tools" / "materialize_hoi4_reichskommissariat_boundaries.py"),
+        ],
+        cwd=PROJECT_ROOT,
+        check=True,
+    )
+    return True
 
 
 def main() -> None:
@@ -1939,8 +2335,14 @@ def main() -> None:
             f"mt_requests={translation_result['mt_requests']}"
         )
 
+    rebuild_derived_hoi4_assets(output_dir, strict=args.strict)
+
     write_data_manifest(output_dir)
-    validate_build_outputs(output_dir, strict=args.strict)
+    validate_build_outputs(
+        output_dir,
+        strict=args.strict,
+        include_dependent_asset_checks=True,
+    )
     print(f"Features with missing CNTR_CODE: {final_hybrid['cntr_code'].isnull().sum()}")
     print("Done.")
 

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-07T02:41:47.632181+00:00",
+  "generated_at": "2026-03-07T16:24:16.287389+00:00",
   "outputs": {
     "europe_topology.json": {
       "role": "primary_topology",
@@ -45,36 +45,37 @@
     },
     "europe_topology.na_v2.json": {
       "role": "detail_topology_na_v2",
-      "size_bytes": 8465173,
-      "sha256": "1431ce7dd4d7d522f5e511171dedc4bc90e60087e2f07f896f22869fac13260c",
+      "size_bytes": 9267229,
+      "sha256": "3ab9e364f122ce4644e7d70495fa6e093fc4a1c28423d607d2e48e22a4702c38",
       "type": "topology",
       "object_names": [
         "land",
         "ocean",
         "physical",
         "political",
+        "rivers",
         "special_zones",
         "urban"
       ],
-      "political_geometries": 11300,
+      "political_geometries": 11515,
       "has_computed_neighbors": true,
-      "arc_count": 114623,
-      "arc_point_count": 488713,
+      "arc_count": 125724,
+      "arc_point_count": 564309,
       "world_bounds_geometries": 0,
-      "raw_world_bounds_geometries": 47
+      "raw_world_bounds_geometries": 50
     },
     "europe_topology.runtime_political_v1.json": {
       "role": "runtime_political_topology",
-      "size_bytes": 6606318,
-      "sha256": "44067d0fb170a1e18fd6bb8a78fe6c75f398472c3bf81159b167c9a23fdadd40",
+      "size_bytes": 6921743,
+      "sha256": "8e3aa0d8d6b1167f63c51085dd1d5ef4b91a9233bfa17473bb6a06bdbff48b9b",
       "type": "topology",
       "object_names": [
         "political"
       ],
-      "political_geometries": 11326,
+      "political_geometries": 11584,
       "has_computed_neighbors": true,
-      "arc_count": 91812,
-      "arc_point_count": 399401,
+      "arc_count": 92683,
+      "arc_point_count": 401705,
       "world_bounds_geometries": 0,
       "raw_world_bounds_geometries": 49
     },
@@ -142,11 +143,11 @@
     },
     "locales.json": {
       "role": "locales",
-      "size_bytes": 3472368,
-      "sha256": "6cca34052edc6a3805bd1df9475aca386b670933c0555311a7f9e59156dc078d",
+      "size_bytes": 3472926,
+      "sha256": "fe7c08aec73cee85cd489b0e4704201bd8cb9b4f7fb8f114b803478ad9e47010",
       "type": "locales",
       "geo_entry_count": 35792,
-      "ui_entry_count": 327
+      "ui_entry_count": 332
     },
     "palettes/index.json": {
       "role": "palette_registry",

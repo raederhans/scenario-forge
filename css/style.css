@@ -561,15 +561,132 @@ input[type="checkbox"].checkbox-input {
   border-radius: var(--radius-card);
   background: rgba(255, 255, 255, 0.72);
   padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.palette-library-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.palette-library-source-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+}
+
+.palette-library-source-btn:hover {
+  border-color: rgba(0, 47, 167, 0.2);
+  color: var(--color-accent);
+}
+
+.palette-library-source-btn.is-active {
+  border-color: rgba(0, 47, 167, 0.22);
+  background: rgba(0, 47, 167, 0.08);
+  color: var(--color-accent);
 }
 
 .palette-library-list {
-  max-height: 240px;
+  min-height: 240px;
+  height: 240px;
+  max-height: 480px;
   overflow-y: auto;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-btn);
-  background: var(--bg-input);
-  padding: 6px;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  padding: 0 4px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.palette-library-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.palette-library-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.palette-library-list::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.16);
+  border-radius: 999px;
+}
+
+.palette-library-section {
+  flex: 0 0 auto;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  overflow: hidden;
+}
+
+.palette-library-section > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.palette-library-section > summary::-webkit-details-marker {
+  display: none;
+}
+
+.palette-library-section > summary::after {
+  content: "▸";
+  color: var(--text-secondary);
+  transition: transform var(--transition-fast);
+}
+
+.palette-library-section[open] > summary::after {
+  transform: rotate(90deg);
+}
+
+.palette-library-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.palette-library-section-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.palette-library-section-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.palette-library-section-list {
+  padding: 0 6px 6px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -627,6 +744,7 @@ input[type="checkbox"].checkbox-input {
 }
 
 .palette-library-empty {
+  flex: 0 0 auto;
   padding: 10px 12px;
   font-size: 0.78rem;
   color: var(--text-secondary);
@@ -1571,15 +1689,15 @@ details.card[open] > summary::after {
 
 .scenario-context-bar {
   position: absolute;
-  left: 50%;
+  left: 18px;
   top: 18px;
-  transform: translateX(-50%);
   z-index: 26;
-  width: min(860px, calc(100% - 244px));
-  max-width: calc(100% - 244px);
+  width: max-content;
+  max-width: min(620px, calc(100% - 160px));
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  min-width: 0;
   padding: 7px 10px;
   border-radius: 999px;
   border: 1px solid rgba(15, 23, 42, 0.1);
@@ -1591,8 +1709,7 @@ details.card[open] > summary::after {
   border-color: rgba(0, 47, 167, 0.22);
 }
 
-.scenario-context-bar.is-collapsed .scenario-context-item,
-.scenario-context-bar.is-overlap-avoid .scenario-context-item {
+.scenario-context-bar.is-collapsed .scenario-context-item {
   display: none;
 }
 
@@ -1604,11 +1721,22 @@ details.card[open] > summary::after {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
   padding: 4px 8px;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.04);
   font-size: 0.72rem;
   color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.scenario-context-item > span:last-child {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -1647,15 +1775,48 @@ details.card[open] > summary::after {
 .scenario-guide-popover {
   position: absolute;
   top: 56px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 18px;
   z-index: 26;
-  width: min(360px, calc(100% - 32px));
+  width: min(360px, calc(100% - 36px));
   padding: 12px 14px;
   border-radius: 14px;
   border: 1px solid rgba(15, 23, 42, 0.1);
   background: rgba(255, 255, 255, 0.96);
   box-shadow: var(--shadow-soft);
+}
+
+.scenario-guide-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.03);
+}
+
+.scenario-guide-status-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.scenario-guide-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+
+.scenario-guide-status-pill-label {
+  color: var(--text-primary);
+  font-weight: 700;
 }
 
 .scenario-guide-list {
@@ -2657,10 +2818,9 @@ body.right-drawer-open::after {
 
   .scenario-context-bar {
     top: 14px;
-    width: calc(100% - 118px);
+    max-width: calc(100% - 118px);
     justify-content: flex-start;
     overflow-x: auto;
-    transform: none;
     left: 12px;
   }
 
