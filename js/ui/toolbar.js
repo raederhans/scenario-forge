@@ -888,7 +888,7 @@ function initToolbar({ render } = {}) {
   }
   state.styleConfig.urban.color = normalizeOceanFillColor(state.styleConfig.urban.color || "#4b5563");
   state.styleConfig.urban.opacity = clamp(
-    Number.isFinite(Number(state.styleConfig.urban.opacity)) ? Number(state.styleConfig.urban.opacity) : 0.22,
+    Number.isFinite(Number(state.styleConfig.urban.opacity)) ? Number(state.styleConfig.urban.opacity) : 0.4,
     0,
     1
   );
@@ -1882,7 +1882,7 @@ function initToolbar({ render } = {}) {
   if (urbanOpacity) {
     urbanOpacity.addEventListener("input", (event) => {
       const value = Number(event.target.value);
-      state.styleConfig.urban.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.22, 0, 1);
+      state.styleConfig.urban.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.4, 0, 1);
       if (urbanOpacityValue) urbanOpacityValue.textContent = `${Math.round(state.styleConfig.urban.opacity * 100)}%`;
       renderDirty("urban-opacity");
     });
@@ -1913,7 +1913,7 @@ function initToolbar({ render } = {}) {
     physicalOpacity.addEventListener("input", (event) => {
       const cfg = syncPhysicalConfig();
       const value = Number(event.target.value);
-      cfg.opacity = clamp(Number.isFinite(value) ? value / 100 : 1, 0, 1);
+      cfg.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.5, 0, 1);
       if (physicalOpacityValue) {
         physicalOpacityValue.textContent = `${Math.round(cfg.opacity * 100)}%`;
       }

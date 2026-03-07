@@ -1,11 +1,11 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1939",
-  "generated_at": "2026-03-06T00:49:15.191835+00:00",
+  "generated_at": "2026-03-07T04:40:20.810942+00:00",
   "summary": {
     "feature_count": 11326,
     "owner_count": 92,
-    "controller_count": 92,
+    "controller_count": 93,
     "quality_counts": {
       "approx_existing_geometry": 996,
       "direct_country_copy": 5239,
@@ -27,14 +27,14 @@
     "topology_blocker_count": 0,
     "scenario_rule_blocker_count": 0,
     "blocker_count": 0,
-    "owner_controller_split_feature_count": 0,
-    "controller_rule_count": 0,
+    "owner_controller_split_feature_count": 606,
+    "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "manual_reviewed_region_count": 0,
     "belarus_hybrid_feature_count": 0
   },
   "diagnostics": {
-    "source_root": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV",
+    "source_root": "/mnt/c/Program Files (x86)/Steam/steamapps/common/Hearts of Iron IV",
     "bookmark_file": "common/bookmarks/blitzkrieg.txt",
     "bookmark_featured_count": 49,
     "as_of_date": "1939.8.14.12",
@@ -43,17 +43,17 @@
     "state_count": 1046,
     "definition_entry_count": 13382,
     "runtime_feature_count": 11326,
-    "manual_rule_count": 57,
-    "controller_rule_count": 0,
+    "manual_rule_count": 58,
+    "controller_rule_count": 8,
     "enable_region_checks": false,
     "enforce_region_checks": false,
     "enforce_scenario_extensions": false,
     "owner_rule_paths": [
-      "data\\scenario-rules\\hoi4_1936.manual.json",
-      "data\\scenario-rules\\hoi4_1939.manual.json"
+      "data/scenario-rules/hoi4_1936.manual.json",
+      "data/scenario-rules/hoi4_1939.manual.json"
     ],
     "controller_rule_paths": [
-      "data\\scenario-rules\\hoi4_1939.controller.manual.json"
+      "data/scenario-rules/hoi4_1939.controller.manual.json"
     ],
     "state_owner_counts": {
       "SOV": 152,
@@ -576,11 +576,11 @@
     },
     "CHI": {
       "display_name": "China",
-      "feature_count": 1132,
+      "feature_count": 1151,
       "quality": "manual_reviewed",
       "quality_breakdown": {
         "direct_country_copy": 1013,
-        "manual_reviewed": 119
+        "manual_reviewed": 138
       },
       "base_iso2": "CN",
       "lookup_iso2": "CN",
@@ -594,7 +594,8 @@
       "primary_rule_source": "1939_china_hainan_reintegration",
       "rule_sources": [
         "1939_china_hainan_reintegration",
-        "1939_hebei_chahar_owner_chi"
+        "1939_hebei_chahar_owner_chi",
+        "1939_jidong_owner_chi"
       ],
       "source_types": [
         "hoi4_owner"
@@ -1317,11 +1318,11 @@
     },
     "JAP": {
       "display_name": "Japan",
-      "feature_count": 115,
+      "feature_count": 96,
       "quality": "manual_reviewed",
       "quality_breakdown": {
         "direct_country_copy": 47,
-        "manual_reviewed": 68
+        "manual_reviewed": 49
       },
       "base_iso2": "JP",
       "lookup_iso2": "JP",
@@ -7146,12 +7147,12 @@
       "country_code": "CN",
       "feature_name": "Baodixian",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -7783,12 +7784,12 @@
       "country_code": "CN",
       "feature_name": "Letingxian",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -8810,12 +8811,12 @@
       "country_code": "CN",
       "feature_name": "Qianxixian",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -8992,12 +8993,12 @@
       "country_code": "CN",
       "feature_name": "Tangshan",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -9577,12 +9578,12 @@
       "country_code": "CN",
       "feature_name": "Ninghexian",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -9915,12 +9916,12 @@
       "country_code": "CN",
       "feature_name": "Funingxian",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -11124,12 +11125,12 @@
       "country_code": "CN",
       "feature_name": "Lulongxian",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -13750,12 +13751,12 @@
       "country_code": "CN",
       "feature_name": "Luannanxian",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -14816,12 +14817,12 @@
       "country_code": "CN",
       "feature_name": "Zhunhua",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -16168,12 +16169,12 @@
       "country_code": "CN",
       "feature_name": "Qianan",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -16350,12 +16351,12 @@
       "country_code": "CN",
       "feature_name": "Yutianxian",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -18092,12 +18093,12 @@
       "country_code": "CN",
       "feature_name": "Fengruanxian",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -18508,12 +18509,12 @@
       "country_code": "CN",
       "feature_name": "Jidongxian",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -18976,12 +18977,12 @@
       "country_code": "CN",
       "feature_name": "Jixian",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -19028,12 +19029,12 @@
       "country_code": "CN",
       "feature_name": "Fengnanxian",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -20042,12 +20043,12 @@
       "country_code": "CN",
       "feature_name": "Luanxian",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -20276,12 +20277,12 @@
       "country_code": "CN",
       "feature_name": "Qinhuangdao",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -21381,12 +21382,12 @@
       "country_code": "CN",
       "feature_name": "Luannanxian",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -21862,12 +21863,12 @@
       "country_code": "CN",
       "feature_name": "Changlixian",
       "from_tag": "CHI",
-      "to_tag": "JAP",
+      "to_tag": "CHI",
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "rule_id": "jidong_japanese_occupation",
-      "critical": true,
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "rule_id": "1939_jidong_owner_chi",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
       "synthetic_owner": false
     },
     {
@@ -81814,5 +81815,4248 @@
       "synthetic_owner": false
     }
   ],
-  "controller_changes": []
+  "controller_changes": [
+    {
+      "feature_id": "CN_CITY_17275852B10013747765987",
+      "feature_name": "Huiyang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B10180385527417",
+      "feature_name": "Guchengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B10208475755367",
+      "feature_name": "Laizhou",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B10267820559553",
+      "feature_name": "Nanping",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B10280834953954",
+      "feature_name": "Haocheng",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B10417226533704",
+      "feature_name": "Xinxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B1065790622928",
+      "feature_name": "Shi",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B11008710047549",
+      "feature_name": "Zhoucheng",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B11062842353292",
+      "feature_name": "Xihuaxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B11168745431905",
+      "feature_name": "Gutianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B11407259911678",
+      "feature_name": "Jintan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B11809724506440",
+      "feature_name": "Dongying",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B12009758175917",
+      "feature_name": "Renqiu",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B12316325556277",
+      "feature_name": "Guxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B12908503886054",
+      "feature_name": "Zhumadian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B13001476141541",
+      "feature_name": "Minhouxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B13333769593378",
+      "feature_name": "Zhoushan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B1364012400924",
+      "feature_name": "Laixi",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B1379721554141",
+      "feature_name": "Puxi",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B1408079528399",
+      "feature_name": "Nanhuixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B14220584679784",
+      "feature_name": "Haimen",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B1426474864351",
+      "feature_name": "Changyi",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B1464685470526",
+      "feature_name": "Shuzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B14815638988431",
+      "feature_name": "Datianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B15154532755577",
+      "feature_name": "Cixi",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B15402619404646",
+      "feature_name": "Nanhexian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B15408627611583",
+      "feature_name": "Tonganxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B15523465043405",
+      "feature_name": "Chonglixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "MEN"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B15976604032949",
+      "feature_name": "Luquan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B16095129082560",
+      "feature_name": "Weixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B16097591965971",
+      "feature_name": "Jixixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B16105050053503",
+      "feature_name": "Putianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B16258690311459",
+      "feature_name": "Neiqiuxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B16277870573564",
+      "feature_name": "Fenghua",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B16549058596986",
+      "feature_name": "Lingxixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B16614537297563",
+      "feature_name": "Feixiangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B16970659563174",
+      "feature_name": "Zhaoxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B17278626690982",
+      "feature_name": "Pingyuxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B17765750844334",
+      "feature_name": "Wujiang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B17867161339331",
+      "feature_name": "Shahe",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B17915990545621",
+      "feature_name": "Xushuixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B17983837223036",
+      "feature_name": "Hezhe",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B18068640448414",
+      "feature_name": "Gaochunxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B18196453405091",
+      "feature_name": "Xuanzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B18322727061238",
+      "feature_name": "Weixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B18626458296265",
+      "feature_name": "Wuqiaoxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B18639822721943",
+      "feature_name": "Duchangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B18660143588191",
+      "feature_name": "Xixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B18968160632662",
+      "feature_name": "Jiaozhou",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B19166416265469",
+      "feature_name": "Jinxiangxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B19397285057030",
+      "feature_name": "Zhengdingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B19533355862824",
+      "feature_name": "Sishuixian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B19618376010244",
+      "feature_name": "Yanzhou",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B19731807948045",
+      "feature_name": "Wuqiangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B19798754149723",
+      "feature_name": "Jiashanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B19859477737164",
+      "feature_name": "Zhenjiang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B20120152097084",
+      "feature_name": "Feixian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B20193660709957",
+      "feature_name": "Yutaixian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B20195210179330",
+      "feature_name": "Liuyangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B20209791950793",
+      "feature_name": "Dawuxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B20365978295850",
+      "feature_name": "Hanchuanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B2047862171292",
+      "feature_name": "Anjixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B2067645637252",
+      "feature_name": "Chenghai",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B20688362661640",
+      "feature_name": "Anxinxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B21011904878760",
+      "feature_name": "Boyexian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B21512782047125",
+      "feature_name": "Zhuoluxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B21727756292013",
+      "feature_name": "Wenanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B21750823884811",
+      "feature_name": "Shaxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B21786836503840",
+      "feature_name": "Zhaozhuang",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B21810019705519",
+      "feature_name": "Xuanhuaxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B21842931785294",
+      "feature_name": "Zhuhai",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B22182624504514",
+      "feature_name": "Xinghexian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "MEN"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B2228474136637",
+      "feature_name": "Yanlingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B22707504793071",
+      "feature_name": "Xingtai",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B2295538790743",
+      "feature_name": "Haikou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B23021356422447",
+      "feature_name": "Baodixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B23039937395207",
+      "feature_name": "Wuweixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B23676912924817",
+      "feature_name": "Dingyuanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B23708909449715",
+      "feature_name": "Wannianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B24042887765568",
+      "feature_name": "Liangshanxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B24333220567136",
+      "feature_name": "Yongxiuxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B2433692358799",
+      "feature_name": "Changxingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B24439099777247",
+      "feature_name": "Chongmingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B24643771294108",
+      "feature_name": "Shunyixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B24669990674383",
+      "feature_name": "Qufu",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B24844793518389",
+      "feature_name": "Qidong",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B24882340673968",
+      "feature_name": "Quzhouxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B25101176936396",
+      "feature_name": "Yuganxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B25230716975612",
+      "feature_name": "Xiangcheng",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B25527504348841",
+      "feature_name": "Yingtan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B25584448604265",
+      "feature_name": "Huangshan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B25648013684247",
+      "feature_name": "Quanjiaoxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B25717626841565",
+      "feature_name": "Xingtaixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B26184442721162",
+      "feature_name": "Kunshan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B26261144110092",
+      "feature_name": "Dongpingxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B26356208960650",
+      "feature_name": "Yangxinxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B26545854509310",
+      "feature_name": "Zhuji",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B26763632681669",
+      "feature_name": "Letingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B26908210835070",
+      "feature_name": "Huiminxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B27087882119733",
+      "feature_name": "Yantai",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B27372587859268",
+      "feature_name": "Caoxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B27387408000676",
+      "feature_name": "Zhoukou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B27436635474795",
+      "feature_name": "Qingyangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B27557602684751",
+      "feature_name": "Pujiangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B27877276340012",
+      "feature_name": "Zhongshan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B27899236857957",
+      "feature_name": "Shangqiu",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B27963337647177",
+      "feature_name": "Penglaixian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B28001364673929",
+      "feature_name": "Yingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B28043359135044",
+      "feature_name": "Fengxianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B28404307874661",
+      "feature_name": "Kangbaoxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "MEN"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B28949074039582",
+      "feature_name": "Handan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B29180806171493",
+      "feature_name": "Kaifengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B29212741984798",
+      "feature_name": "Jiujiangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B29734823992587",
+      "feature_name": "Yunmengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B29761342187520",
+      "feature_name": "Xintai",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B29896348675191",
+      "feature_name": "Lixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B29905847665822",
+      "feature_name": "Dangtuxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B30063446428877",
+      "feature_name": "Renxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B30120943168727",
+      "feature_name": "Dongxiangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B30171028833385",
+      "feature_name": "Zhangjiagang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B30212147371030",
+      "feature_name": "Taizhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B30373565857678",
+      "feature_name": "Changxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B30631409334147",
+      "feature_name": "Gaochengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B30734228092100",
+      "feature_name": "Qingzhou",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B30839777764393",
+      "feature_name": "Fugouxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B30892899597118",
+      "feature_name": "Dazhi",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B31377284290570",
+      "feature_name": "Shitaixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B31393010637863",
+      "feature_name": "Jizhexian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B31429968474935",
+      "feature_name": "Deqingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B31491185089163",
+      "feature_name": "Baxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B31573882035564",
+      "feature_name": "Yushanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B31711539663260",
+      "feature_name": "Shenzhen",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B31757639036873",
+      "feature_name": "Xiuningxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B31900972836749",
+      "feature_name": "Qianxixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B32700744588338",
+      "feature_name": "Changqingxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B32842590404417",
+      "feature_name": "Tangshan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B32983558612198",
+      "feature_name": "Jiayuxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B32989531796686",
+      "feature_name": "Wanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B33382458843189",
+      "feature_name": "Dongguan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B3344696552320",
+      "feature_name": "Changshu",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B33561936369452",
+      "feature_name": "Rongcheng",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B33652089915736",
+      "feature_name": "Huangmeixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B33911143583251",
+      "feature_name": "Jiaxiangxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B33924966041101",
+      "feature_name": "Linqing",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B34420574294401",
+      "feature_name": "Youxixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B34459657062621",
+      "feature_name": "Wulianxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B34803324927086",
+      "feature_name": "Wenshangxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B34854699874075",
+      "feature_name": "Mupingxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B34909453536373",
+      "feature_name": "Guangfengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B34914005005648",
+      "feature_name": "Wuhuaxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B34966799109471",
+      "feature_name": "CN ADM2 17275852B34966799109471",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B35191117841364",
+      "feature_name": "Baoding",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B35332790186482",
+      "feature_name": "Gaotangixan",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B35367898303515",
+      "feature_name": "Hengshui",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B35450332359336",
+      "feature_name": "Ninghexian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B35674473625997",
+      "feature_name": "Handanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B35691129963558",
+      "feature_name": "Xiamen",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B35904418947378",
+      "feature_name": "Nangong",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B36087518478347",
+      "feature_name": "Xiongxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B36103206667165",
+      "feature_name": "Jiangyin",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B36427803126994",
+      "feature_name": "Puning",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B36456254412660",
+      "feature_name": "Huizhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B36539700725824",
+      "feature_name": "Qingdao",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B36551936006551",
+      "feature_name": "Xianning",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B36689757932023",
+      "feature_name": "Danxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B36714320356801",
+      "feature_name": "Funingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B36737936197596",
+      "feature_name": "Wuhu",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B36890628103019",
+      "feature_name": "Botou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B3689978228404",
+      "feature_name": "Linshuxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B3726458161276",
+      "feature_name": "Tongxiang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B37350063092030",
+      "feature_name": "Zhanhuangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B37388992508665",
+      "feature_name": "Xinchengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B37419515135684",
+      "feature_name": "Fengshunxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B37549313533883",
+      "feature_name": "Chengwuxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B37590867813392",
+      "feature_name": "Ningde",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B37600232739643",
+      "feature_name": "Mencunhuizuzizhixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B37803356904979",
+      "feature_name": "Wanquanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "MEN"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B37857453943231",
+      "feature_name": "Yongtaixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B37962942142742",
+      "feature_name": "Ningguo",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B38150185010364",
+      "feature_name": "Xinxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B38331625545684",
+      "feature_name": "Longmenxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B38338809131920",
+      "feature_name": "Haifengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B38375506939997",
+      "feature_name": "Dachanghuizuzizhixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B3853093148241",
+      "feature_name": "Ningjinxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B38667129164520",
+      "feature_name": "Pananxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B38709981190197",
+      "feature_name": "Tunchangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B38939963469829",
+      "feature_name": "Chanzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B38988280096574",
+      "feature_name": "Guangzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B39422876200918",
+      "feature_name": "Deanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B39600332445203",
+      "feature_name": "Guyuanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B39788170688741",
+      "feature_name": "Zhuozhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B40414648244388",
+      "feature_name": "Xiangshanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B40485497211548",
+      "feature_name": "Zhijinxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B40522342172572",
+      "feature_name": "Beijing",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B40888287647604",
+      "feature_name": "Yangzhong",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B41032470199188",
+      "feature_name": "Handan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B41153803332766",
+      "feature_name": "Jixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B41187046911697",
+      "feature_name": "Huailaixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B41190306193582",
+      "feature_name": "Wenchangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B41312334217118",
+      "feature_name": "Junanxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B41425356149959",
+      "feature_name": "Lanxi",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B4143425265533",
+      "feature_name": "Qingyunxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B41676374519260",
+      "feature_name": "Zengcheng",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B41676873149267",
+      "feature_name": "Xinhexian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B41719367338221",
+      "feature_name": "Changshaxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B41756501926338",
+      "feature_name": "Lujiangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B41788529093737",
+      "feature_name": "Daxingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B42041968712265",
+      "feature_name": "Xinzhouxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B42065564755438",
+      "feature_name": "Shuzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B42183204213930",
+      "feature_name": "Linxiang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B42230140857746",
+      "feature_name": "Lianjiangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B42279115337630",
+      "feature_name": "Jinshanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B42311251295370",
+      "feature_name": "Huanghua",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B42323417187142",
+      "feature_name": "Tianchang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B42582924567207",
+      "feature_name": "Lingxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B42599245130625",
+      "feature_name": "Wanning",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B42704411692482",
+      "feature_name": "Huilaixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B42869172782924",
+      "feature_name": "Cunanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B42898496791559",
+      "feature_name": "Zongyangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B43099606090633",
+      "feature_name": "Wuhuxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B43126330817922",
+      "feature_name": "Wujinxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B43165756519885",
+      "feature_name": "Qinglongmanzuzizhixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B431696373370",
+      "feature_name": "Yongqingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B43191682084250",
+      "feature_name": "Chuzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B43390854487846",
+      "feature_name": "Yiyuanxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B4344290320214",
+      "feature_name": "Lulongxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B43701500747082",
+      "feature_name": "Binzhou",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B43935412530745",
+      "feature_name": "Pingyinxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B44457791224784",
+      "feature_name": "Tongzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B44498698997305",
+      "feature_name": "Yangguxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B44568429811369",
+      "feature_name": "Kenlixian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B44768888593389",
+      "feature_name": "Yueyangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B44953136813001",
+      "feature_name": "Shantou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B45020271947314",
+      "feature_name": "Kaifeng",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B45149819427590",
+      "feature_name": "Nanjing",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B45286123916499",
+      "feature_name": "Jinzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B453440967624",
+      "feature_name": "Jining",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B45390451107599",
+      "feature_name": "Weifang",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B45429218697197",
+      "feature_name": "Wuyixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B45530821909299",
+      "feature_name": "Huaiyangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B45678856262825",
+      "feature_name": "Anlu",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B45820941167845",
+      "feature_name": "Xinji",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B45878553037763",
+      "feature_name": "Guangpingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B45958961660036",
+      "feature_name": "Pengzexian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B46074982775581",
+      "feature_name": "Changzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B46208020456835",
+      "feature_name": "Yongchunxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B4626184751480",
+      "feature_name": "Zhoupingxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B46346395801730",
+      "feature_name": "Shangrao",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B46380594187155",
+      "feature_name": "Tongxu",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B46393920630539",
+      "feature_name": "Hefei",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B46601481369620",
+      "feature_name": "Guangshanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B46685961195230",
+      "feature_name": "Yingshanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B46736465172107",
+      "feature_name": "Fupingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B4676676622807",
+      "feature_name": "Dongerxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B4692792810033",
+      "feature_name": "Yinanxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B46998996515844",
+      "feature_name": "Shengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B47214038820512",
+      "feature_name": "Fuqing",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B47303764817199",
+      "feature_name": "Ningjinxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B47532353262214",
+      "feature_name": "Ningbo",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B47635697455490",
+      "feature_name": "Wuxi",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B47701832659247",
+      "feature_name": "Huangzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B47804746725670",
+      "feature_name": "Dongyang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B47839165615513",
+      "feature_name": "Nanaoxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B48027257295245",
+      "feature_name": "Gaoyangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B48136438053745",
+      "feature_name": "Haiyangxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B48217934131504",
+      "feature_name": "Yujiangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B48501556095420",
+      "feature_name": "Changtaixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B48557917794925",
+      "feature_name": "Nantong",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B48628808884304",
+      "feature_name": "Manchengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B48691500457709",
+      "feature_name": "Zhaoqianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B48796108703718",
+      "feature_name": "Quyangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B49525483016846",
+      "feature_name": "Shanghexian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B4963111392108",
+      "feature_name": "Dezhou",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B49737651735743",
+      "feature_name": "Jurongxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B49878870319406",
+      "feature_name": "Changshangxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B50034294804845",
+      "feature_name": "Nanan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B50043505500678",
+      "feature_name": "Guangshui",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B50094796791007",
+      "feature_name": "Juxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B50191422864704",
+      "feature_name": "Leping",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B50342463051977",
+      "feature_name": "Honghu",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B50589627480209",
+      "feature_name": "Ledonglizuzizhixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B50867388179464",
+      "feature_name": "Ningyangxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B50974554768856",
+      "feature_name": "Xinchangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B51131115925400",
+      "feature_name": "Wuxixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B51175072856676",
+      "feature_name": "Shuningxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B51230036148684",
+      "feature_name": "Longhai",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B51290893529729",
+      "feature_name": "Longyaoxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B5131093529483",
+      "feature_name": "Haixingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B51390796967225",
+      "feature_name": "Yiyangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B51477400341578",
+      "feature_name": "Miluo",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B52033797991024",
+      "feature_name": "Dehuaxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B52250123531455",
+      "feature_name": "Wuhan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B52385226353354",
+      "feature_name": "Raoyangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B52451636784299",
+      "feature_name": "Dingxingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B52729797795226",
+      "feature_name": "Shenqiuxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B53008264931106",
+      "feature_name": "Qiongzhonglizumiaozuzizhixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B53025585862768",
+      "feature_name": "Pingtanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B53059710714494",
+      "feature_name": "Fuyang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B53073904970373",
+      "feature_name": "Rudongxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B53166682632414",
+      "feature_name": "Tianjin",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B5353146374567",
+      "feature_name": "Wuyuanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B53595443021236",
+      "feature_name": "Zhenchengxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B53672972261894",
+      "feature_name": "Jiangpuxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B5377550731757",
+      "feature_name": "Yizheng",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B53922912898325",
+      "feature_name": "Yanqingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B53933530490343",
+      "feature_name": "Guangzhongxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B54162792876952",
+      "feature_name": "Zhucheng",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B54478662483461",
+      "feature_name": "Huaibinxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B54543288924677",
+      "feature_name": "Huantanxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B54632216874023",
+      "feature_name": "Zhaoyuan",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B54720396840939",
+      "feature_name": "Xincaixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B54721890479732",
+      "feature_name": "Chonghua",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B55229175832107",
+      "feature_name": "Dongmingxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B55507691146729",
+      "feature_name": "Zhengyangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B55570185736143",
+      "feature_name": "Langxixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B55754577664448",
+      "feature_name": "Guanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B55776769429507",
+      "feature_name": "Fanchangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B56023235126255",
+      "feature_name": "Jingdexian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B56050378995261",
+      "feature_name": "Boxingxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B56182979447767",
+      "feature_name": "Luannanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B56190437260016",
+      "feature_name": "Huang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B56334810083917",
+      "feature_name": "Linanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B56364962136156",
+      "feature_name": "Shenzhenxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B56383642585283",
+      "feature_name": "Dantuxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B56564088961928",
+      "feature_name": "Langfang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B5674127157826",
+      "feature_name": "Weixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B57257006426226",
+      "feature_name": "Jiangdu",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B57342214487499",
+      "feature_name": "Lishuixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B57492284435715",
+      "feature_name": "Qingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B57618783853866",
+      "feature_name": "Haining",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B57791780751485",
+      "feature_name": "Juyexian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B57880389938199",
+      "feature_name": "Jinan",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B57882995260260",
+      "feature_name": "Qianshanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B57977089110027",
+      "feature_name": "Shangchengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B58036174254783",
+      "feature_name": "Liling",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B58186217435722",
+      "feature_name": "Chaoyangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B58371513472148",
+      "feature_name": "Xingtangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B58372427564761",
+      "feature_name": "Rizhao",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B58391528789088",
+      "feature_name": "Pingyuanxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B58903134773136",
+      "feature_name": "Feidongxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B58910105343507",
+      "feature_name": "Fuchengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B59002516276853",
+      "feature_name": "Tangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B59245154361238",
+      "feature_name": "Liyang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B59261423659404",
+      "feature_name": "Xianyouxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B59333965008283",
+      "feature_name": "Liuhexian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B59579726815916",
+      "feature_name": "Luyixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B59616994343756",
+      "feature_name": "Anyixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B59692497706789",
+      "feature_name": "Songjiangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B59735937562693",
+      "feature_name": "Jingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B59895952694093",
+      "feature_name": "Luotianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B60010150977543",
+      "feature_name": "Fuzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B60036374298215",
+      "feature_name": "Boyangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B60076511840527",
+      "feature_name": "Chaohu",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B60182527489554",
+      "feature_name": "Doumenxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B60218719915669",
+      "feature_name": "Anqing",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B60414806889849",
+      "feature_name": "Xianhaexian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B60612190497835",
+      "feature_name": "Changle",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B60758311941437",
+      "feature_name": "Heyuan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B6082279520202",
+      "feature_name": "Runanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B60855200621799",
+      "feature_name": "Xiantao",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B61165424028511",
+      "feature_name": "Laianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B61177414411617",
+      "feature_name": "Guichi",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B61616021978467",
+      "feature_name": "Huangshan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B61726350757100",
+      "feature_name": "Shexian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B61994504860165",
+      "feature_name": "Tengzhou",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B620737032798",
+      "feature_name": "Qingdao",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B62337056358666",
+      "feature_name": "Fogangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B62466362466217",
+      "feature_name": "Kaihuaxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B62496834928509",
+      "feature_name": "Weishanxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B62534367670886",
+      "feature_name": "Zhunhua",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B62617200555443",
+      "feature_name": "Shangcaixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B62674344705560",
+      "feature_name": "Chongmingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B63077243364371",
+      "feature_name": "Taichangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B63554143431725",
+      "feature_name": "Anyangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B63889031221729",
+      "feature_name": "Anxixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B64081958226369",
+      "feature_name": "Qiuxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B64259844181582",
+      "feature_name": "Liaocheng",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B64416165210218",
+      "feature_name": "Guanxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B64442957752259",
+      "feature_name": "Guantaoxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B64817974651819",
+      "feature_name": "Weixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B64917628631335",
+      "feature_name": "Zhuzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B64934349609422",
+      "feature_name": "Wuxue",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B64978204094712",
+      "feature_name": "Huaianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B65550927062733",
+      "feature_name": "Tuochengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B65840661251357",
+      "feature_name": "Wulixian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B66003162693266",
+      "feature_name": "Zhangjiakou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B66013638365038",
+      "feature_name": "Yuanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B66204891178522",
+      "feature_name": "Xianggang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B66252943806207",
+      "feature_name": "Lufengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B66356980534214",
+      "feature_name": "Jiexixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B6690326538160",
+      "feature_name": "Zhanhuaxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B66962615782513",
+      "feature_name": "Xiaoshan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B67197169551607",
+      "feature_name": "Wuxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B67315226354305",
+      "feature_name": "Shangqiu",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B67338721103818",
+      "feature_name": "Xiangyinxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B67438977719884",
+      "feature_name": "Longkou",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B67564907021397",
+      "feature_name": "Linyi",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B67574078001488",
+      "feature_name": "Shanchengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B67769801833376",
+      "feature_name": "Hengfengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B68084346150299",
+      "feature_name": "Shuixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B68183819260445",
+      "feature_name": "Changsha",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B68447300329810",
+      "feature_name": "Cichengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B68532057450373",
+      "feature_name": "Ezhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B68627257397845",
+      "feature_name": "Maanshan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B68795699662733",
+      "feature_name": "Huangpixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B69224732604429",
+      "feature_name": "Xingzixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B69310239774277",
+      "feature_name": "Jiujianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B69453353693019",
+      "feature_name": "Jingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B69472300438393",
+      "feature_name": "Wangduxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B69618555412569",
+      "feature_name": "Nanchangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B69801287390069",
+      "feature_name": "Qianan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B69911371168899",
+      "feature_name": "Qichunxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B69993211466305",
+      "feature_name": "Pingshanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B70255924310381",
+      "feature_name": "Shezexian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B70258266780305",
+      "feature_name": "Zhangpuxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B70320302334749",
+      "feature_name": "Baishalizuzizhixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B70455093500286",
+      "feature_name": "Qingyuanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B7080321063595",
+      "feature_name": "Miyunxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B70843634097749",
+      "feature_name": "Dingzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B70958466386582",
+      "feature_name": "Yuchengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B71120154646141",
+      "feature_name": "Lijinxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B71122715185286",
+      "feature_name": "Yutianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B71216121267542",
+      "feature_name": "Xinle",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B71290929913135",
+      "feature_name": "Haiyanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B71352476597079",
+      "feature_name": "Rugao",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B71365124448130",
+      "feature_name": "Dongying",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B71369345081906",
+      "feature_name": "Jinhua",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B71370953459893",
+      "feature_name": "Hangzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B714584663018",
+      "feature_name": "Nanpixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B71820490263286",
+      "feature_name": "Yiwu",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B71871830431018",
+      "feature_name": "Tongling",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B72504910889821",
+      "feature_name": "Jiangningxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B72633077913274",
+      "feature_name": "Guangdexian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B72769683371533",
+      "feature_name": "Shangraoxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B72792517073116",
+      "feature_name": "Tongxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B72819681774342",
+      "feature_name": "Lingshuilizumiaozuzizhixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B72922623961147",
+      "feature_name": "Pingguxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B7296923051238",
+      "feature_name": "Panyu",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B72971629177091",
+      "feature_name": "Minquanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B73358438455895",
+      "feature_name": "Shouguang",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B73453477463881",
+      "feature_name": "Hexian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B7350972527003",
+      "feature_name": "Jingjiang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B74264051584102",
+      "feature_name": "Pingxiangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B7444451912335",
+      "feature_name": "Anguo",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B74586174185496",
+      "feature_name": "Zhangbeixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "MEN"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B7483411794752",
+      "feature_name": "Qixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B75086699702795",
+      "feature_name": "Quanzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B75225788854161",
+      "feature_name": "Yingcheng",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B75685650180995",
+      "feature_name": "Yuyao",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B75890737929332",
+      "feature_name": "Shanhe",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B75995678778305",
+      "feature_name": "Chaozhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B76152157086843",
+      "feature_name": "Juluxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B76479334373543",
+      "feature_name": "Luanchengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B76570182530435",
+      "feature_name": "Hanshanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B76829643653933",
+      "feature_name": "Taian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B77159644478443",
+      "feature_name": "Lening",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B77342375778801",
+      "feature_name": "Chaohu",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B7735540978639",
+      "feature_name": "Nanlingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B77473010275224",
+      "feature_name": "Linchengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B77518624384720",
+      "feature_name": "Jimo",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B77679479199341",
+      "feature_name": "Mengyinxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B7795452989931",
+      "feature_name": "Shangyu",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B77997232386177",
+      "feature_name": "Luoshanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B78001466735071",
+      "feature_name": "Raopingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B78492057192398",
+      "feature_name": "Tongluxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B78567156775151",
+      "feature_name": "Nanchang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B78609951456513",
+      "feature_name": "Wuan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B78816749784203",
+      "feature_name": "Jiaxing",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B78831071059765",
+      "feature_name": "Jiashanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B78988614189372",
+      "feature_name": "Zibo",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B79149802712659",
+      "feature_name": "Jiaonan",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B7979903099841",
+      "feature_name": "Chengmaixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B79805983057899",
+      "feature_name": "Fengruanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B80030259653535",
+      "feature_name": "Xiangtan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B80148882172064",
+      "feature_name": "Yuhangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B80309702523612",
+      "feature_name": "Shanya",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B8103009054716",
+      "feature_name": "Yongnianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B81051002573718",
+      "feature_name": "Jinxianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B81072603241187",
+      "feature_name": "Laiyang",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B8123763353211",
+      "feature_name": "Wangchengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B81259275775371",
+      "feature_name": "Jieyang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B81372791356325",
+      "feature_name": "Luohe",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B81539652141986",
+      "feature_name": "Jinmenxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B81783797021346",
+      "feature_name": "Xinjianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B82067370611519",
+      "feature_name": "Jiujiang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B82114276452469",
+      "feature_name": "Qinghexian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B82150177084912",
+      "feature_name": "Dongguangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B82708605205805",
+      "feature_name": "Shanghai",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B82772378373798",
+      "feature_name": "Yanchengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B82960244806798",
+      "feature_name": "Dinganxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B83100874373445",
+      "feature_name": "Gaomi",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B83167737560066",
+      "feature_name": "Changlexian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B83523333785496",
+      "feature_name": "Feichengxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B84131046176015",
+      "feature_name": "Guangraoxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B84296108244083",
+      "feature_name": "Jixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B84464275078917",
+      "feature_name": "Ninglingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B84472681161194",
+      "feature_name": "Fengnanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B84580276321378",
+      "feature_name": "Changpingxin",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B84727014688033",
+      "feature_name": "Laishuixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B8527290020627",
+      "feature_name": "Lankaoxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B85544446441725",
+      "feature_name": "Weihai",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B85583949591367",
+      "feature_name": "Baotinglizumiaozuzizhixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B85613239075245",
+      "feature_name": "Macheng",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B85657114133770",
+      "feature_name": "Dongtai",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B8583677209878",
+      "feature_name": "Huidongxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B85844962073852",
+      "feature_name": "Chepingxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B85976102347819",
+      "feature_name": "Qimenxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B86044803614271",
+      "feature_name": "Zhangqiu",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B86070890642714",
+      "feature_name": "Anpingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B86114589403662",
+      "feature_name": "Jingjingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B86260962826974",
+      "feature_name": "Rongchengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B86431238150342",
+      "feature_name": "Qiongshan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B86517244462494",
+      "feature_name": "Xiajinxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B8665149309175",
+      "feature_name": "Laiyuanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B86900087147794",
+      "feature_name": "Xiangtanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B86987062890699",
+      "feature_name": "Fengcheng",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B87114256965843",
+      "feature_name": "Putian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B87149259927291",
+      "feature_name": "Xianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B87496734512227",
+      "feature_name": "Yangxinxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B87718878820627",
+      "feature_name": "Ruichang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B87782309196497",
+      "feature_name": "Qionghai",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B87913405117604",
+      "feature_name": "Tanchengxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B8795599021471",
+      "feature_name": "Pingdu",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B88042861362346",
+      "feature_name": "Changjianglizuzizhixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B88105539550678",
+      "feature_name": "Haianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B88151757349593",
+      "feature_name": "Luanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B8841096687907",
+      "feature_name": "Fengyangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B88468623491072",
+      "feature_name": "Yunchengxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B88564558630562",
+      "feature_name": "Luoyuanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B88708837863828",
+      "feature_name": "Wendeng",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B88884426413746",
+      "feature_name": "Boluoxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B88901633924246",
+      "feature_name": "Jiangyan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B88986717122862",
+      "feature_name": "Yuchengxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B89036303488164",
+      "feature_name": "Qinhuangdao",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B89166552502762",
+      "feature_name": "Yongchengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B89175859589967",
+      "feature_name": "Changfengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B89230401808313",
+      "feature_name": "Yangzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B89533026423026",
+      "feature_name": "Guixixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B89808828265438",
+      "feature_name": "Dingtaoxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B89895303460623",
+      "feature_name": "Xiayixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B90238227594233",
+      "feature_name": "Dexing",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B90270417137698",
+      "feature_name": "Shaoxing",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B90271468854707",
+      "feature_name": "Xiaogan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B90274183162284",
+      "feature_name": "Shenzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B90293274121417",
+      "feature_name": "Hejian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B90394685615550",
+      "feature_name": "Wuqingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B90429058486395",
+      "feature_name": "Huianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B9046707294983",
+      "feature_name": "Shijiazhuan",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B90661382406168",
+      "feature_name": "Gaoqingxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B90910208115389",
+      "feature_name": "Huangchuanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B90965759328567",
+      "feature_name": "Pingjiangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B90975196028640",
+      "feature_name": "Ninghaixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B91247151282545",
+      "feature_name": "Yixing",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B91286509256855",
+      "feature_name": "Tonglingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B91301275454086",
+      "feature_name": "Damingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B91393118840601",
+      "feature_name": "Taixingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B91399175623236",
+      "feature_name": "Daishanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B92006637325800",
+      "feature_name": "Huzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B92071256808581",
+      "feature_name": "Yueyang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B92392502748538",
+      "feature_name": "Shangyixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "MEN"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B92506097004923",
+      "feature_name": "Linyixian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B92675490846952",
+      "feature_name": "Minqingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B92700741958693",
+      "feature_name": "Wujixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B9304528417696",
+      "feature_name": "Cixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B93231482572641",
+      "feature_name": "Shexian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B93565976694521",
+      "feature_name": "Yixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B93743910489906",
+      "feature_name": "Dongfanglizuzizhixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B94560918292835",
+      "feature_name": "Fengqiuxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B94592901594717",
+      "feature_name": "Danyang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B94641558554685",
+      "feature_name": "Hukouxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B9474953962086",
+      "feature_name": "Jinghaixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B94774630505431",
+      "feature_name": "Luannanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B95102809901298",
+      "feature_name": "Jingdezhe",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B95109993079714",
+      "feature_name": "Jiande",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B95240086472657",
+      "feature_name": "Yishuixian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B95269391851003",
+      "feature_name": "Chenganxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B9529097178729",
+      "feature_name": "Honganxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B95440277175473",
+      "feature_name": "Pingyixian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B95494794157710",
+      "feature_name": "Qihexian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B95574356023337",
+      "feature_name": "Huairouxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B95785410461796",
+      "feature_name": "Laiwu",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B95874414124304",
+      "feature_name": "Boxiangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B95887002471957",
+      "feature_name": "Lingshouxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B95991838392275",
+      "feature_name": "Jiyangxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B96094758616716",
+      "feature_name": "Shangshuixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B96228664587587",
+      "feature_name": "Xinjianxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B96657206671737",
+      "feature_name": "Dachengxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B96665943782542",
+      "feature_name": "Taikangxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B9681816955607",
+      "feature_name": "Changlixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B96835160268267",
+      "feature_name": "Xishuixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B97070335713694",
+      "feature_name": "Yangyuanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B97102685179742",
+      "feature_name": "Qingpuxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B97124400303792",
+      "feature_name": "Rushan",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B97535760935977",
+      "feature_name": "Anqiu",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B97923044022234",
+      "feature_name": "Changzhou",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B97964298438185",
+      "feature_name": "Pinghu",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B98150019256975",
+      "feature_name": "Yixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B98379602519550",
+      "feature_name": "Shaoxingxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B98384028469199",
+      "feature_name": "Linjuxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B98717202018932",
+      "feature_name": "Tiantaixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B98852550499473",
+      "feature_name": "Shengsixian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B98891327369808",
+      "feature_name": "Lingaoxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "JAP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B99355884213700",
+      "feature_name": "Qixia",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B99732539673783",
+      "feature_name": "Wuchengxian",
+      "country_code": "CN",
+      "owner_tag": "LUQ",
+      "controller_tag": "NCP"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B99819709984445",
+      "feature_name": "Jinjiang",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "RGC"
+    },
+    {
+      "feature_id": "CN_CITY_17275852B99838630509501",
+      "feature_name": "Yanshanxian",
+      "country_code": "CN",
+      "owner_tag": "CHI",
+      "controller_tag": "NCP"
+    }
+  ]
 }

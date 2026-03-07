@@ -229,6 +229,37 @@
       ],
       "base_iso2": "CN",
       "display_name_override": "China"
+    },
+    {
+      "rule_id": "1939_jidong_owner_chi",
+      "owner_tag": "CHI",
+      "priority": 952,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
+      "include_feature_ids": [
+        "CN_CITY_17275852B23021356422447",
+        "CN_CITY_17275852B26763632681669",
+        "CN_CITY_17275852B31900972836749",
+        "CN_CITY_17275852B32842590404417",
+        "CN_CITY_17275852B35450332359336",
+        "CN_CITY_17275852B36714320356801",
+        "CN_CITY_17275852B4344290320214",
+        "CN_CITY_17275852B56182979447767",
+        "CN_CITY_17275852B62534367670886",
+        "CN_CITY_17275852B69801287390069",
+        "CN_CITY_17275852B71122715185286",
+        "CN_CITY_17275852B79805983057899",
+        "CN_CITY_17275852B82452317993245",
+        "CN_CITY_17275852B84296108244083",
+        "CN_CITY_17275852B84472681161194",
+        "CN_CITY_17275852B88151757349593",
+        "CN_CITY_17275852B89036303488164",
+        "CN_CITY_17275852B94774630505431",
+        "CN_CITY_17275852B9681816955607"
+      ],
+      "base_iso2": "CN",
+      "display_name_override": "China"
     }
   ]
 }

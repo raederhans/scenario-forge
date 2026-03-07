@@ -66,6 +66,11 @@
     "KHM"
   ],
   "palette_id": "hoi4_vanilla",
+  "style_defaults": {
+    "ocean": {
+      "fillColor": "#86b8e5"
+    }
+  },
   "baseline_hash": "448a7964aca10ca933aeee7f31ed75b199ec6968a031322d3db68f9e10aa4aa7",
   "countries_url": "data/scenarios/hoi4_1936/countries.json",
   "owners_url": "data/scenarios/hoi4_1936/owners.by_feature.json",

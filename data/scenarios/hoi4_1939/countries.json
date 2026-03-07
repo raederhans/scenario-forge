@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1939",
-  "generated_at": "2026-03-06T00:49:15.191835+00:00",
+  "generated_at": "2026-03-07T04:40:20.810313+00:00",
   "default_country": "GER",
   "countries": {
     "AFG": {
@@ -376,7 +376,7 @@
       "tag": "CHI",
       "display_name": "China",
       "color_hex": "#28288c",
-      "feature_count": 1132,
+      "feature_count": 1151,
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "CN",
@@ -396,7 +396,8 @@
       "primary_rule_source": "1939_china_hainan_reintegration",
       "rule_sources": [
         "1939_china_hainan_reintegration",
-        "1939_hebei_chahar_owner_chi"
+        "1939_hebei_chahar_owner_chi",
+        "1939_jidong_owner_chi"
       ],
       "source_types": [
         "hoi4_owner"
@@ -1248,7 +1249,7 @@
       "tag": "JAP",
       "display_name": "Japan",
       "color_hex": "#ffc9b2",
-      "feature_count": 115,
+      "feature_count": 96,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "JP",

@@ -445,7 +445,7 @@ function createDefaultPhysicalAtlasVisibility() {
 function createDefaultPhysicalStyleConfig() {
   return {
     mode: "atlas_and_contours",
-    opacity: 1,
+    opacity: 0.5,
     atlasOpacity: 0.34,
     atlasIntensity: 0.9,
     atlasClassVisibility: createDefaultPhysicalAtlasVisibility(),
@@ -708,6 +708,7 @@ export const state = {
   },
   scenarioParentBorderEnabledBeforeActivate: null,
   scenarioPaintModeBeforeActivate: null,
+  scenarioOceanFillBeforeActivate: null,
   landData: null,
   landDataFull: null,
   specialZonesData: null,
@@ -858,7 +859,7 @@ export const state = {
     },
     urban: {
       color: "#4b5563",
-      opacity: 0.22,
+      opacity: 0.4,
       blendMode: "multiply",
       minAreaPx: 8,
     },

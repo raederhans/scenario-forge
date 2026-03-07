@@ -14,15 +14,44 @@
     "rule_sources"
   ],
   "summary_equals": {
-    "blocker_count": 0,
-    "owner_controller_split_feature_count": 0,
-    "controller_rule_count": 0
+    "blocker_count": 0
   },
   "summary_min": {
     "feature_count": 10000,
-    "owner_count": 70
+    "owner_count": 70,
+    "owner_controller_split_feature_count": 383,
+    "controller_rule_count": 6
   },
-  "controller_set_assertions": [],
+  "controller_set_assertions": [
+    {
+      "name": "china_hebei_chahar_sample_controller_men",
+      "expected_controller_tag": "MEN",
+      "feature_ids": [
+        "CN_CITY_17275852B74586174185496"
+      ]
+    },
+    {
+      "name": "china_shandong_sample_controller_ncp",
+      "expected_controller_tag": "NCP",
+      "feature_ids": [
+        "CN_CITY_17275852B85544446441725"
+      ]
+    },
+    {
+      "name": "china_shanghai_sample_controller_rgc",
+      "expected_controller_tag": "RGC",
+      "feature_ids": [
+        "CN_CITY_17275852B82708605205805"
+      ]
+    },
+    {
+      "name": "china_hainan_sample_controller_jap",
+      "expected_controller_tag": "JAP",
+      "feature_ids": [
+        "CN_CITY_17275852B2295538790743"
+      ]
+    }
+  ],
   "owner_set_assertions": [
     {
       "name": "sudetenland_owner_ger",
@@ -120,6 +149,13 @@
         "SK_ADM2_56367889B50490339994693",
         "SK_ADM2_56367889B65708067786299",
         "SK_ADM2_56367889B96980961358907"
+      ]
+    },
+    {
+      "name": "jidong_sample_owner_chi",
+      "expected_owner_tag": "CHI",
+      "feature_ids": [
+        "CN_CITY_17275852B84296108244083"
       ]
     }
   ]

@@ -58,7 +58,7 @@
     "PHI"
   ],
   "palette_id": "hoi4_vanilla",
-  "baseline_hash": "0f31ab1352d24df07a111bccd321f585385aa0586957a0b19e64d12b59dc27cf",
+  "baseline_hash": "d53b79bb844e423d73e54372b86b06e1cd02d12c2f21d651e59487d6b4415936",
   "countries_url": "data/scenarios/hoi4_1939/countries.json",
   "owners_url": "data/scenarios/hoi4_1939/owners.by_feature.json",
   "controllers_url": "data/scenarios/hoi4_1939/controllers.by_feature.json",
@@ -67,7 +67,7 @@
   "summary": {
     "feature_count": 11326,
     "owner_count": 92,
-    "controller_count": 92,
+    "controller_count": 93,
     "quality_counts": {
       "approx_existing_geometry": 996,
       "direct_country_copy": 5239,
@@ -89,8 +89,8 @@
     "topology_blocker_count": 0,
     "scenario_rule_blocker_count": 0,
     "blocker_count": 0,
-    "owner_controller_split_feature_count": 0,
-    "controller_rule_count": 0,
+    "owner_controller_split_feature_count": 606,
+    "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "manual_reviewed_region_count": 0,
     "belarus_hybrid_feature_count": 0

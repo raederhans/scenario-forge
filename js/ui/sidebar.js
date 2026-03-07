@@ -8,7 +8,7 @@ import {
 } from "../core/state.js";
 import { ColorManager } from "../core/color_manager.js";
 import * as mapRenderer from "../core/map_renderer.js";
-import { resetCountryColors } from "../core/logic.js";
+import { applyCountryColor, resetCountryColors } from "../core/logic.js";
 import { FileManager } from "../core/file_manager.js";
 import { captureHistoryState, clearHistory, pushHistoryEntry } from "../core/history_manager.js";
 import { LegendManager } from "../core/legend_manager.js";
@@ -1130,6 +1130,11 @@ function initSidebar({ render } = {}) {
   const countryInspectorSelected = document.getElementById("countryInspectorSelected");
   const countryInspectorSetActive = document.getElementById("countryInspectorSetActive");
   const countryInspectorDetailHint = document.getElementById("countryInspectorDetailHint");
+  const countryInspectorColorRow = document.getElementById("countryInspectorColorRow");
+  const countryInspectorColorLabel = document.getElementById("countryInspectorColorLabel");
+  const countryInspectorColorSwatch = document.getElementById("countryInspectorColorSwatch");
+  const countryInspectorColorValue = document.getElementById("countryInspectorColorValue");
+  const countryInspectorColorInput = document.getElementById("countryInspectorColorInput");
   const countryInspectorOrderingHint = document.getElementById("countryInspectorOrderingHint");
   const countryInspectorSection = document.getElementById("countryInspectorSection");
   const selectedCountryActionsSection = document.getElementById("selectedCountryActionsSection");
@@ -1173,6 +1178,80 @@ function initSidebar({ render } = {}) {
         )
         : t("Choose a country above to inspect territories, presets, and releasables.", "ui");
     }
+  };
+
+  const INSPECTOR_VH_BASELINE = {
+    countryList: 26,
+    presetTree: 28,
+    countryListCap: 52,
+    presetTreeCap: 56,
+  };
+  const INSPECTOR_PX_BASELINE = {
+    actionList: 120,
+    actionListCap: 240,
+    presetBody: 216,
+    presetBodyCap: 432,
+  };
+  let adaptiveInspectorHeightFrame = 0;
+  let countryInspectorColorPickerOpen = false;
+
+  const clampInspectorHeight = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
+  const toViewportPixels = (vh) => (window.innerHeight * vh) / 100;
+
+  const applyAdaptiveInspectorHeight = (element, minimum, maximum) => {
+    if (!element) return;
+    const scrollHeight = Number(element.scrollHeight || 0);
+    const nextHeight = clampInspectorHeight(scrollHeight, minimum, maximum);
+    element.style.height = `${Math.round(nextHeight)}px`;
+    element.style.maxHeight = `${Math.round(nextHeight)}px`;
+  };
+
+  const syncAdaptiveInspectorHeights = () => {
+    adaptiveInspectorHeightFrame = 0;
+    applyAdaptiveInspectorHeight(
+      list,
+      toViewportPixels(INSPECTOR_VH_BASELINE.countryList),
+      toViewportPixels(INSPECTOR_VH_BASELINE.countryListCap)
+    );
+    applyAdaptiveInspectorHeight(
+      presetTree,
+      toViewportPixels(INSPECTOR_VH_BASELINE.presetTree),
+      toViewportPixels(INSPECTOR_VH_BASELINE.presetTreeCap)
+    );
+    sidebar?.querySelectorAll(".inspector-action-list").forEach((element) => {
+      applyAdaptiveInspectorHeight(
+        element,
+        INSPECTOR_PX_BASELINE.actionList,
+        INSPECTOR_PX_BASELINE.actionListCap
+      );
+    });
+    sidebar?.querySelectorAll(".preset-country-body").forEach((element) => {
+      applyAdaptiveInspectorHeight(
+        element,
+        INSPECTOR_PX_BASELINE.presetBody,
+        INSPECTOR_PX_BASELINE.presetBodyCap
+      );
+    });
+  };
+
+  const scheduleAdaptiveInspectorHeights = () => {
+    if (adaptiveInspectorHeightFrame) {
+      globalThis.cancelAnimationFrame(adaptiveInspectorHeightFrame);
+    }
+    adaptiveInspectorHeightFrame = globalThis.requestAnimationFrame(syncAdaptiveInspectorHeights);
+  };
+
+  const positionCountryInspectorColorAnchor = () => {
+    if (!countryInspectorColorInput || !countryInspectorColorSwatch) return;
+    const rect = countryInspectorColorSwatch.getBoundingClientRect();
+    countryInspectorColorInput.style.left = `${Math.round(rect.left + rect.width / 2)}px`;
+    countryInspectorColorInput.style.top = `${Math.round(rect.top + rect.height / 2)}px`;
+  };
+
+  const closeCountryInspectorColorPicker = () => {
+    if (!countryInspectorColorInput) return;
+    countryInspectorColorPickerOpen = false;
+    countryInspectorColorInput.blur();
   };
 
   if (projectFileName && !projectFileName.textContent.trim()) {
@@ -1338,6 +1417,17 @@ function initSidebar({ render } = {}) {
       state.countryPalette?.[countryState.code] ||
       fallbackColor
     );
+  };
+
+  const getDisplayCountryColor = (countryState) =>
+    ColorManager.normalizeHexColor(getResolvedCountryColor(countryState)) || "#cccccc";
+
+  const syncSelectedColorFromCountry = (countryState) => {
+    const resolvedColor = getDisplayCountryColor(countryState);
+    state.selectedColor = resolvedColor;
+    if (typeof state.updateSwatchUIFn === "function") {
+      state.updateSwatchUIFn();
+    }
   };
 
   const setScenarioVisualAdjustmentsOpen = (nextOpen, { scrollIntoView = false } = {}) => {
@@ -2056,6 +2146,12 @@ function initSidebar({ render } = {}) {
     } = {}
   ) => {
     const hasChildren = Array.isArray(childStates) && childStates.length > 0;
+    const isActiveOwner = state.activeSovereignCode === countryState.code;
+    const hasReleasableActivateAction = !!(
+      state.activeScenarioId &&
+      countryState.releasable &&
+      getPrimaryReleasablePresetRef(countryState)
+    );
     const isExpanded = hasChildren && (
       forceExpanded ||
       state.expandedInspectorReleaseParents.has(countryState.code)
@@ -2065,6 +2161,7 @@ function initSidebar({ render } = {}) {
     row.className = "country-select-row";
     const isSelected = state.selectedInspectorCountryCode === countryState.code;
     row.classList.toggle("is-selected", isSelected);
+    row.classList.toggle("is-active-owner", isActiveOwner);
 
     const main = document.createElement("button");
     main.type = "button";
@@ -2093,30 +2190,6 @@ function initSidebar({ render } = {}) {
 
     const side = document.createElement("div");
     side.className = "country-select-side";
-
-    if (state.activeSovereignCode === countryState.code) {
-      const badge = document.createElement("span");
-      badge.className = "country-active-badge";
-      badge.textContent = t("Active", "ui");
-      side.appendChild(badge);
-    }
-
-    if (state.activeScenarioId && countryState.releasable && getPrimaryReleasablePresetRef(countryState)) {
-      const activateBtn = document.createElement("button");
-      activateBtn.type = "button";
-      activateBtn.className = "country-action-btn";
-      activateBtn.textContent = t("Activate", "ui");
-      activateBtn.title = t("Apply this releasable's political ownership and make it active.", "ui");
-      activateBtn.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        applyScenarioReleasableCoreTerritory(countryState, {
-          source: "scenario-row-activate",
-          forceSovereignty: true,
-        });
-      });
-      side.appendChild(activateBtn);
-    }
 
     if (hasChildren && !hideExpandToggle) {
       const countBadge = document.createElement("span");
@@ -2155,14 +2228,37 @@ function initSidebar({ render } = {}) {
     side.appendChild(swatch);
     row.appendChild(side);
 
-    if (!hasChildren) {
+    if (!hasChildren && !hasReleasableActivateAction) {
       parent.appendChild(row);
       return;
     }
 
     const wrapper = document.createElement("div");
-    wrapper.className = "country-explorer-group";
+    wrapper.className = "country-explorer-group country-select-card";
+    if (hasReleasableActivateAction) {
+      wrapper.classList.add("has-subaction");
+    }
+    wrapper.classList.toggle("is-active-owner", isActiveOwner);
+    wrapper.classList.toggle("is-selected", isSelected);
     wrapper.appendChild(row);
+
+    if (hasReleasableActivateAction) {
+      const activateStrip = document.createElement("button");
+      activateStrip.type = "button";
+      activateStrip.className = "country-select-subaction";
+      activateStrip.textContent = t("Activate Releasable", "ui");
+      activateStrip.title = t("Apply this releasable's political ownership and make it active.", "ui");
+      activateStrip.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        applyScenarioReleasableCoreTerritory(countryState, {
+          source: "scenario-row-activate",
+          forceSovereignty: true,
+        });
+      });
+      wrapper.appendChild(activateStrip);
+    }
+
     if (isExpanded) {
       const childList = document.createElement("div");
       childList.className = "country-children";
@@ -2267,6 +2363,16 @@ function initSidebar({ render } = {}) {
         countryInspectorDetailHint.classList.add("hidden");
         countryInspectorDetailHint.textContent = "";
       }
+      if (countryInspectorColorRow) {
+        countryInspectorColorRow.classList.add("hidden");
+      }
+      if (countryInspectorColorInput) {
+        countryInspectorColorInput.disabled = true;
+        countryInspectorColorInput.style.removeProperty("left");
+        countryInspectorColorInput.style.removeProperty("top");
+      }
+      countryInspectorColorPickerOpen = false;
+      scheduleAdaptiveInspectorHeights();
       return;
     }
 
@@ -2293,6 +2399,31 @@ function initSidebar({ render } = {}) {
         countryInspectorDetailHint.textContent = "";
       }
     }
+
+    if (countryInspectorColorRow) {
+      const resolvedColor = getDisplayCountryColor(countryState);
+      countryInspectorColorRow.classList.remove("hidden");
+      if (countryInspectorColorLabel) {
+        countryInspectorColorLabel.textContent = t("Country Color", "ui");
+      }
+      if (countryInspectorColorSwatch) {
+        countryInspectorColorSwatch.style.backgroundColor = resolvedColor;
+        countryInspectorColorSwatch.title = `${t("Edit country color", "ui")}: ${countryState.displayName} (${resolvedColor.toUpperCase()})`;
+        countryInspectorColorSwatch.setAttribute(
+          "aria-label",
+          `${t("Edit country color", "ui")}: ${countryState.displayName} (${resolvedColor.toUpperCase()})`
+        );
+      }
+      if (countryInspectorColorValue) {
+        countryInspectorColorValue.textContent = resolvedColor.toUpperCase();
+      }
+      if (countryInspectorColorInput) {
+        countryInspectorColorInput.disabled = false;
+        countryInspectorColorInput.value = resolvedColor;
+        positionCountryInspectorColorAnchor();
+      }
+    }
+    scheduleAdaptiveInspectorHeights();
   };
 
   const renderCountrySearchResults = (countryStates, term, priorityOrderMap) => {
@@ -2403,6 +2534,7 @@ function initSidebar({ render } = {}) {
     if (!countryStates.length) {
       list.appendChild(createEmptyNote(t("No countries available", "ui")));
       renderCountryInspectorDetail();
+      scheduleAdaptiveInspectorHeights();
       return;
     }
 
@@ -2416,6 +2548,7 @@ function initSidebar({ render } = {}) {
     if (typeof state.renderPresetTreeFn === "function") {
       state.renderPresetTreeFn();
     }
+    scheduleAdaptiveInspectorHeights();
   };
 
   if (countryInspectorSetActive && !countryInspectorSetActive.dataset.bound) {
@@ -2448,6 +2581,44 @@ function initSidebar({ render } = {}) {
       }
     });
     countryInspectorSetActive.dataset.bound = "true";
+  }
+
+  if (countryInspectorColorSwatch && countryInspectorColorInput && !countryInspectorColorSwatch.dataset.bound) {
+    countryInspectorColorSwatch.addEventListener("click", () => {
+      positionCountryInspectorColorAnchor();
+      countryInspectorColorInput.focus({ preventScroll: true });
+      countryInspectorColorPickerOpen = true;
+      if (typeof countryInspectorColorInput.showPicker === "function") {
+        countryInspectorColorInput.showPicker();
+      } else {
+        countryInspectorColorInput.click();
+      }
+    });
+    countryInspectorColorSwatch.dataset.bound = "true";
+  }
+
+  if (countryInspectorColorInput && !countryInspectorColorInput.dataset.bound) {
+    countryInspectorColorInput.addEventListener("change", (event) => {
+      const selectedCode = ensureSelectedInspectorCountry();
+      if (!selectedCode) return;
+      const countryState = latestCountryStatesByCode.get(selectedCode);
+      if (!countryState) return;
+      const nextColor = ColorManager.normalizeHexColor(event.target.value);
+      const currentColor = getDisplayCountryColor(countryState);
+      if (!nextColor || nextColor === currentColor) {
+        closeCountryInspectorColorPicker();
+        renderCountryInspectorDetail();
+        return;
+      }
+      applyCountryColor(selectedCode, nextColor);
+      closeCountryInspectorColorPicker();
+      markDirty("inspector-country-color");
+      renderList();
+    });
+    countryInspectorColorInput.addEventListener("blur", () => {
+      countryInspectorColorPickerOpen = false;
+    });
+    countryInspectorColorInput.dataset.bound = "true";
   }
 
   state.renderCountryListFn = renderList;
@@ -2544,7 +2715,51 @@ function initSidebar({ render } = {}) {
     });
   };
 
+  const renderCountryColorSyncAffordance = (container, countryState) => {
+    if (!container || !countryState) return;
+
+    const resolvedColor = getDisplayCountryColor(countryState);
+    const row = document.createElement("div");
+    row.className = "inspector-color-sync-row";
+
+    const copy = document.createElement("div");
+    copy.className = "inspector-color-sync-copy";
+
+    const swatch = document.createElement("span");
+    swatch.className = "country-select-swatch inspector-color-sync-swatch";
+    swatch.style.backgroundColor = resolvedColor;
+
+    const textWrap = document.createElement("div");
+    textWrap.className = "inspector-color-sync-text";
+
+    const title = document.createElement("div");
+    title.className = "section-header-block";
+    title.textContent = t("Country Color", "ui");
+
+    const note = document.createElement("div");
+    note.className = "inspector-color-sync-note";
+    note.textContent = `${countryState.displayName} · ${resolvedColor.toUpperCase()}`;
+
+    textWrap.appendChild(title);
+    textWrap.appendChild(note);
+    copy.appendChild(swatch);
+    copy.appendChild(textWrap);
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn-secondary";
+    button.textContent = t("Use Country Color for Visual Actions", "ui");
+    button.addEventListener("click", () => {
+      syncSelectedColorFromCountry(countryState);
+    });
+
+    row.appendChild(copy);
+    row.appendChild(button);
+    container.appendChild(row);
+  };
+
   const renderParentCountryActions = (container, countryState) => {
+    renderCountryColorSyncAffordance(container, countryState);
     const actionGuarded = renderNoActiveGuard(container);
     const groupSection = appendActionSection(container, t("Hierarchy Groups", "ui"));
     if (countryState.hierarchyGroups.length > 0) {
@@ -2864,6 +3079,7 @@ function initSidebar({ render } = {}) {
         state.ui = {};
       }
       state.ui.scenarioVisualAdjustmentsOpen = details.open;
+      scheduleAdaptiveInspectorHeights();
     });
 
     const summary = document.createElement("summary");
@@ -3062,6 +3278,9 @@ function initSidebar({ render } = {}) {
   const renderScenarioActionsPanel = (container, countryState) => {
     container.replaceChildren();
     renderScenarioActionStatus(container);
+    if (countryState) {
+      renderCountryColorSyncAffordance(container, countryState);
+    }
 
     if (!countryState) {
       container.appendChild(
@@ -3089,6 +3308,7 @@ function initSidebar({ render } = {}) {
 
     if (state.activeScenarioId) {
       renderScenarioActionsPanel(presetTree, countryState);
+      scheduleAdaptiveInspectorHeights();
       return;
     }
 
@@ -3096,10 +3316,12 @@ function initSidebar({ render } = {}) {
       presetTree.appendChild(
         createEmptyNote(t("Select a country to inspect territories, presets, and releasables.", "ui"))
       );
+      scheduleAdaptiveInspectorHeights();
       return;
     }
 
     renderParentCountryActions(presetTree, countryState);
+    scheduleAdaptiveInspectorHeights();
   };
 
   state.renderPresetTreeFn = renderPresetTree;
@@ -3149,6 +3371,23 @@ function initSidebar({ render } = {}) {
 
   state.updateLegendUI = refreshLegendEditor;
 
+  if (sidebar && !sidebar.dataset.adaptiveInspectorBound) {
+    globalThis.addEventListener("resize", scheduleAdaptiveInspectorHeights);
+    countryInspectorSection?.addEventListener("toggle", scheduleAdaptiveInspectorHeights);
+    selectedCountryActionsSection?.addEventListener("toggle", scheduleAdaptiveInspectorHeights);
+    sidebar.addEventListener("scroll", () => {
+      if (countryInspectorColorPickerOpen) {
+        closeCountryInspectorColorPicker();
+      }
+    }, { passive: true });
+    sidebar.addEventListener("wheel", () => {
+      if (countryInspectorColorPickerOpen) {
+        closeCountryInspectorColorPicker();
+      }
+    }, { passive: true });
+    sidebar.dataset.adaptiveInspectorBound = "true";
+  }
+
   if (searchInput && !searchInput.dataset.bound) {
     searchInput.addEventListener("input", () => {
       if (typeof state.renderCountryListFn === "function") {
@@ -3157,6 +3396,7 @@ function initSidebar({ render } = {}) {
       if (typeof state.renderPresetTreeFn === "function") {
         state.renderPresetTreeFn();
       }
+      scheduleAdaptiveInspectorHeights();
     });
     searchInput.dataset.bound = "true";
   }
@@ -3188,6 +3428,7 @@ function initSidebar({ render } = {}) {
       if (typeof state.renderNowFn === "function") {
         state.renderNowFn();
       }
+      scheduleAdaptiveInspectorHeights();
     });
     resetBtn.dataset.bound = "true";
   }
@@ -3430,6 +3671,7 @@ function initSidebar({ render } = {}) {
   renderPresetTree();
   refreshLegendEditor();
   renderScenarioAuditPanel();
+  scheduleAdaptiveInspectorHeights();
 }
 
 export { initSidebar, initPresetState };

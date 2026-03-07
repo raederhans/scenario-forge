@@ -16,6 +16,7 @@ const SCENARIO_REGISTRY_URL = "data/scenarios/index.json";
 const DETAIL_POLITICAL_MIN_FEATURES = 1000;
 const SCENARIO_DETAIL_MIN_RATIO_STRICT = 0.7;
 const SCENARIO_DETAIL_ABSOLUTE_DROP_THRESHOLD = 1000;
+const DEFAULT_OCEAN_FILL_COLOR = "#aadaff";
 
 function cacheBust(url) {
   if (!url) return url;
@@ -29,6 +30,53 @@ function normalizeScenarioId(value) {
 
 function normalizeScenarioViewMode(value) {
   return String(value || "").trim().toLowerCase() === "frontline" ? "frontline" : "ownership";
+}
+
+function normalizeScenarioOceanFillColor(value, fallback = DEFAULT_OCEAN_FILL_COLOR) {
+  const candidate = String(value || "").trim();
+  if (/^#(?:[0-9a-f]{6})$/i.test(candidate)) return candidate.toLowerCase();
+  if (/^#(?:[0-9a-f]{3})$/i.test(candidate)) {
+    return `#${candidate[1]}${candidate[1]}${candidate[2]}${candidate[2]}${candidate[3]}${candidate[3]}`.toLowerCase();
+  }
+  return fallback;
+}
+
+function getScenarioOceanFillOverride(manifest) {
+  const rawValue = String(manifest?.style_defaults?.ocean?.fillColor || "").trim();
+  return rawValue ? normalizeScenarioOceanFillColor(rawValue, "") : "";
+}
+
+function syncScenarioOceanFillForActivation(manifest) {
+  const nextOverride = getScenarioOceanFillOverride(manifest);
+  const previousOverride = getScenarioOceanFillOverride(state.activeScenarioManifest);
+  if (!state.styleConfig.ocean || typeof state.styleConfig.ocean !== "object") {
+    state.styleConfig.ocean = {};
+  }
+  if (!state.activeScenarioId && state.scenarioOceanFillBeforeActivate === null) {
+    state.scenarioOceanFillBeforeActivate = normalizeScenarioOceanFillColor(state.styleConfig.ocean.fillColor);
+  }
+  if (nextOverride) {
+    state.styleConfig.ocean.fillColor = nextOverride;
+  } else if (previousOverride && state.scenarioOceanFillBeforeActivate !== null) {
+    state.styleConfig.ocean.fillColor = normalizeScenarioOceanFillColor(state.scenarioOceanFillBeforeActivate);
+  }
+  if (typeof state.updateToolbarInputsFn === "function") {
+    state.updateToolbarInputsFn();
+  }
+}
+
+function restoreScenarioOceanFillAfterExit() {
+  if (state.scenarioOceanFillBeforeActivate === null) {
+    return;
+  }
+  if (!state.styleConfig.ocean || typeof state.styleConfig.ocean !== "object") {
+    state.styleConfig.ocean = {};
+  }
+  state.styleConfig.ocean.fillColor = normalizeScenarioOceanFillColor(state.scenarioOceanFillBeforeActivate);
+  state.scenarioOceanFillBeforeActivate = null;
+  if (typeof state.updateToolbarInputsFn === "function") {
+    state.updateToolbarInputsFn();
+  }
 }
 
 function getPoliticalGeometryCount(topology) {
@@ -104,6 +152,10 @@ function evaluateScenarioDataHealth(
     warning,
     severity,
   };
+}
+
+function scenarioNeedsDetailTopology(manifest = state.activeScenarioManifest) {
+  return Number(manifest?.summary?.feature_count || 0) >= DETAIL_POLITICAL_MIN_FEATURES;
 }
 
 function refreshScenarioDataHealth({
@@ -627,7 +679,17 @@ async function applyScenarioBundle(
     throw new Error("Scenario bundle is missing a manifest.");
   }
   const detailPromoted = await ensureScenarioDetailTopologyLoaded();
-  if (!detailPromoted && state.topologyBundleMode !== "composite") {
+  const detailReady = (
+    state.topologyBundleMode === "composite"
+    && hasUsablePoliticalTopology(state.topologyDetail)
+  ) || !!detailPromoted;
+  if (!detailReady && scenarioNeedsDetailTopology(bundle.manifest)) {
+    const scenarioLabel = String(bundle.manifest?.display_name || bundle.manifest?.scenario_id || "Scenario").trim();
+    const message = `Detailed political topology could not be loaded. ${scenarioLabel} cannot be applied in coarse mode.`;
+    console.error(`[scenario] ${message}`);
+    throw new Error(message);
+  }
+  if (!detailReady && state.topologyBundleMode !== "composite") {
     console.warn("[scenario] Applying bundle without confirmed detail promotion; health gate will validate runtime topology.");
   }
   if (syncPalette) {
@@ -695,6 +757,7 @@ async function applyScenarioBundle(
   syncScenarioInspectorSelection(defaultCountryCode);
   rebuildPresetState();
   applyScenarioPaintMode();
+  syncScenarioOceanFillForActivation(bundle.manifest);
   if (typeof document !== "undefined") {
     const presetSection = document.getElementById("selectedCountryActionsSection");
     if (presetSection && "open" in presetSection) {
@@ -886,6 +949,7 @@ function clearActiveScenario(
   syncScenarioInspectorSelection("");
   restoreParentBordersAfterScenario();
   restorePaintModeAfterScenario();
+  restoreScenarioOceanFillAfterExit();
   rebuildPresetState();
   refreshColorState({ renderNow: false });
   recomputeDynamicBordersNow({ renderNow: false, reason: "scenario-clear" });
@@ -911,7 +975,14 @@ function formatScenarioStatusText() {
 }
 
 function formatScenarioAuditText() {
-  return "";
+  if (!state.activeScenarioId || !state.activeScenarioManifest) {
+    return "";
+  }
+  const splitCount = Number(state.activeScenarioManifest?.summary?.owner_controller_split_feature_count || 0);
+  if (splitCount > 0) {
+    return `${t("Frontline", "ui")}: ${splitCount} split features.`;
+  }
+  return t("No frontline control split in current scenario.", "ui");
 }
 
 function initScenarioManager({ render } = {}) {
@@ -1018,10 +1089,11 @@ function initScenarioManager({ render } = {}) {
         }
       } catch (error) {
         console.error("Failed to apply scenario:", error);
-        showToast(t("Unable to apply scenario.", "ui"), {
+        const message = String(error?.message || "").trim() || t("Unable to apply scenario.", "ui");
+        showToast(message, {
           title: t("Scenario failed", "ui"),
           tone: "error",
-          duration: 4200,
+          duration: 5200,
         });
       }
     });

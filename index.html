@@ -39,6 +39,7 @@
             <div id="lblScenario" class="section-header">Scenario</div>
             <p id="lblScenarioHint" class="body-text mt-2">Load a bundled historical setup and reset to its baseline.</p>
             <div id="scenarioStatus" class="body-text mt-3">No scenario active</div>
+            <div id="scenarioAuditHint" class="body-text mt-2 hidden">Coverage report unavailable</div>
             <label id="lblScenarioSelect" class="section-header-block mt-3" for="scenarioSelect">Scenario</label>
             <select id="scenarioSelect" class="select-input mt-2">
               <option value="">None</option>
@@ -288,9 +289,9 @@
                         <div>
                           <div class="range-row">
                             <label id="lblPhysicalOpacity" class="range-label" for="physicalOpacity">Opacity</label>
-                            <span id="physicalOpacityValue" class="range-value">100%</span>
+                            <span id="physicalOpacityValue" class="range-value">50%</span>
                           </div>
-                          <input id="physicalOpacity" type="range" min="0" max="100" value="100" class="range-input" />
+                          <input id="physicalOpacity" type="range" min="0" max="100" value="50" class="range-input" />
                         </div>
                         <div>
                           <div class="range-row">
@@ -432,9 +433,9 @@
                         <div>
                           <div class="range-row">
                             <label id="lblUrbanOpacity" class="range-label" for="urbanOpacity">Opacity</label>
-                            <span id="urbanOpacityValue" class="range-value">22%</span>
+                            <span id="urbanOpacityValue" class="range-value">40%</span>
                           </div>
-                          <input id="urbanOpacity" type="range" min="0" max="100" value="22" class="range-input" />
+                          <input id="urbanOpacity" type="range" min="0" max="100" value="40" class="range-input" />
                         </div>
                         <div>
                           <div class="range-row">
@@ -1013,6 +1014,26 @@
                     <button id="countryInspectorSetActive" type="button" class="btn-secondary inspector-detail-primary-btn">Use as Active Owner</button>
                   </div>
                   <p id="countryInspectorDetailHint" class="sidebar-tool-hint mt-2 hidden"></p>
+                  <div id="countryInspectorColorRow" class="inspector-color-row mt-3 hidden">
+                    <div id="countryInspectorColorLabel" class="section-header-block">Country Color</div>
+                    <div class="inspector-color-row-main mt-2">
+                      <button
+                        id="countryInspectorColorSwatch"
+                        type="button"
+                        class="inspector-color-swatch-btn"
+                        aria-label="Edit country color"
+                      ></button>
+                      <div id="countryInspectorColorValue" class="inspector-color-value">#cccccc</div>
+                      <input
+                        id="countryInspectorColorInput"
+                        type="color"
+                        value="#cccccc"
+                        class="inspector-color-native-input"
+                        tabindex="-1"
+                        aria-hidden="true"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
               <button id="resetCountryColors" class="btn-secondary mt-3">Reset Country Colors</button>
