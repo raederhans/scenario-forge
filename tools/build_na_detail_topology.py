@@ -5,6 +5,7 @@ import argparse
 import json
 from pathlib import Path
 import sys
+import time
 
 import geopandas as gpd
 import topojson as tp
@@ -31,10 +32,43 @@ from map_builder.processors.global_basic_admin1 import apply_global_basic_admin1
 from map_builder.processors.north_america import apply_north_america_replacement
 from init_map_data import apply_config_subdivisions
 
+try:
+    import resource
+except Exception:  # pragma: no cover - unavailable on some platforms
+    resource = None
+
 LAYER_NAMES = ("political", "special_zones", "ocean", "land", "urban", "physical", "rivers")
 SPECIAL_NAME_FALLBACKS = {
     "RUS+99?": "Russia Special Region",
 }
+
+
+def _get_peak_memory_mb() -> float | None:
+    if resource is None:
+        return None
+    try:
+        usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    except Exception:
+        return None
+    if sys.platform == "darwin":
+        return round(float(usage) / (1024 * 1024), 2)
+    return round(float(usage) / 1024, 2)
+
+
+def _record_timing(timings: dict[str, dict], stage_name: str, start_time: float, **extra: object) -> None:
+    payload = {
+        "wall_time_sec": round(time.perf_counter() - start_time, 3),
+        "peak_memory_mb": _get_peak_memory_mb(),
+    }
+    payload.update(extra)
+    timings[stage_name] = payload
+
+
+def _write_timings_json(path: Path | None, timings: dict[str, dict]) -> None:
+    if path is None:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(timings, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
 def _empty_gdf() -> gpd.GeoDataFrame:
@@ -302,14 +336,23 @@ def parse_args() -> argparse.Namespace:
         default=Path("data") / "europe_topology.na_v2.json",
         help="Patched topology output path.",
     )
+    parser.add_argument(
+        "--timings-json",
+        type=Path,
+        default=None,
+        help="Optional path to write per-stage wall time and peak memory stats as JSON.",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
+    stage_timings: dict[str, dict] = {}
+    main_start = time.perf_counter()
     source_path = args.source_topology
     output_path = args.output_topology
 
+    load_start = time.perf_counter()
     print(f"[Detail patch] Loading source topology: {source_path}")
     topology_dict = _load_topology(source_path)
     layers = _load_layers_from_topology(topology_dict)
@@ -319,7 +362,14 @@ def main() -> None:
     if primary_topology_path.exists():
         print(f"[Detail patch] Loading primary topology shell: {primary_topology_path}")
         primary_layers = _load_layers_from_topology(_load_topology(primary_topology_path))
+    _record_timing(
+        stage_timings,
+        "load_inputs",
+        load_start,
+        primary_shell_exists=primary_layers is not None,
+    )
 
+    patch_start = time.perf_counter()
     patched_political = apply_north_america_replacement(layers["political"])
     patched_political = apply_africa_admin1_replacement(patched_political)
     patched_political = apply_global_basic_admin1_replacement(patched_political)
@@ -332,9 +382,16 @@ def main() -> None:
     patched_political = _repair_political_geometries(patched_political)
     layers["political"] = patched_political
     print(f"[Detail patch] Patched political features: {len(patched_political)}")
+    _record_timing(
+        stage_timings,
+        "apply_political_patches",
+        patch_start,
+        feature_count=len(patched_political),
+    )
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
+    staging_start = time.perf_counter()
     staging_dict = _build_topology_dict_from_layers(layers)
     _promote_geometry_ids(staging_dict)
     _inject_computed_neighbors(staging_dict, patched_political)
@@ -355,13 +412,28 @@ def main() -> None:
             log_prefix="[Detail patch]",
         )
     layers["political"] = roundtrip_political
+    _record_timing(
+        stage_timings,
+        "topology_roundtrip_prepare",
+        staging_start,
+        roundtrip_feature_count=len(roundtrip_political),
+    )
 
+    write_start = time.perf_counter()
     _write_output_topology(
         output_path=output_path,
         political=roundtrip_political,
         layers=layers,
     )
+    _record_timing(
+        stage_timings,
+        "initial_write",
+        write_start,
+        output_path=str(output_path),
+    )
     if primary_layers is not None:
+        repair_start = time.perf_counter()
+        repair_passes = 0
         for repair_pass in range(1, 4):
             output_dict = _load_topology(output_path)
             output_political = _topology_object_to_gdf(output_dict, "political")
@@ -371,6 +443,7 @@ def main() -> None:
             )
             if not gaps:
                 break
+            repair_passes += 1
             gap = gaps[0]
             print(
                 f"[Detail patch] Post-build shell coverage repair pass {repair_pass}: "
@@ -388,10 +461,23 @@ def main() -> None:
                 political=roundtrip_political,
                 layers=layers,
             )
+        _record_timing(
+            stage_timings,
+            "shell_coverage_repairs",
+            repair_start,
+            passes=repair_passes,
+        )
     output_dict = _load_topology(output_path)
     count = len(output_dict.get("objects", {}).get("political", {}).get("geometries", []))
     print(f"[Detail patch] Output political features: {count}")
     print(f"[Detail patch] OK: wrote {output_path}")
+    _record_timing(
+        stage_timings,
+        "total",
+        main_start,
+        output_features=count,
+    )
+    _write_timings_json(args.timings_json, stage_timings)
 
 
 if __name__ == "__main__":

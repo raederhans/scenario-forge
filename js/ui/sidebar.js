@@ -1278,8 +1278,25 @@ function initSidebar({ render } = {}) {
   }
 
   let latestCountryStatesByCode = new Map();
+  const countryRowRefsByCode = new Map();
   const getSearchTerm = () => (searchInput?.value || "").trim().toLowerCase();
   const matchesTerm = (value, term) => String(value || "").toLowerCase().includes(term);
+  const incrementSidebarCounter = (counterName, amount = 1) => {
+    if (!state.sidebarPerf || typeof state.sidebarPerf !== "object") {
+      state.sidebarPerf = {};
+    }
+    if (!state.sidebarPerf.counters || typeof state.sidebarPerf.counters !== "object") {
+      state.sidebarPerf.counters = {};
+    }
+    state.sidebarPerf.counters[counterName] = (Number(state.sidebarPerf.counters[counterName]) || 0) + Number(amount || 0);
+  };
+  const registerCountryRowRef = (countryCode, ref) => {
+    const normalized = normalizeCountryCode(countryCode);
+    if (!normalized || !ref) return;
+    const refs = countryRowRefsByCode.get(normalized) || [];
+    refs.push(ref);
+    countryRowRefsByCode.set(normalized, refs);
+  };
 
   const getInspectorCountryDisplayName = (code) => {
     const normalized = normalizeCountryCode(code);
@@ -1305,6 +1322,43 @@ function initSidebar({ render } = {}) {
       .map((parentCode) => getInspectorCountryDisplayName(parentCode))
       .filter(Boolean);
     return labels.join(", ");
+  };
+
+  const buildCountryRowMetaText = (countryState, { showRelationMeta = false } = {}) => {
+    const metaBits = [countryState?.subregionDisplayLabel].filter(Boolean);
+    if (countryState?.releasable && showRelationMeta) {
+      const parentLabel = formatReleasableParentLabel(countryState);
+      metaBits.push(
+        parentLabel
+          ? `${t("Releasable from", "ui")} ${parentLabel}`
+          : t("Releasable", "ui")
+      );
+    }
+    return metaBits.join(" · ");
+  };
+
+  const syncCountryRowVisuals = (ref, countryState) => {
+    if (!ref || !countryState) return;
+    const isSelected = state.selectedInspectorCountryCode === countryState.code;
+    const isActiveOwner = state.activeSovereignCode === countryState.code;
+    ref.row?.classList.toggle("is-selected", isSelected);
+    ref.row?.classList.toggle("is-active-owner", isActiveOwner);
+    ref.wrapper?.classList.toggle("is-selected", isSelected);
+    ref.wrapper?.classList.toggle("is-active-owner", isActiveOwner);
+    if (ref.main) {
+      ref.main.setAttribute("aria-pressed", String(isSelected));
+    }
+    if (ref.swatch) {
+      ref.swatch.style.backgroundColor = getResolvedCountryColor(countryState);
+    }
+    if (ref.title) {
+      ref.title.textContent = `${countryState.displayName} (${countryState.code})`;
+    }
+    if (ref.meta) {
+      ref.meta.textContent = buildCountryRowMetaText(countryState, {
+        showRelationMeta: !!ref.showRelationMeta,
+      });
+    }
   };
 
   const createCountryInspectorState = (entry, fallbackIndex = 0) => {
@@ -2159,6 +2213,7 @@ function initSidebar({ render } = {}) {
 
     const row = document.createElement("div");
     row.className = "country-select-row";
+    row.dataset.countryCode = countryState.code;
     const isSelected = state.selectedInspectorCountryCode === countryState.code;
     row.classList.toggle("is-selected", isSelected);
     row.classList.toggle("is-active-owner", isActiveOwner);
@@ -2177,16 +2232,7 @@ function initSidebar({ render } = {}) {
 
     const meta = document.createElement("div");
     meta.className = "country-select-meta";
-    const metaBits = [countryState.subregionDisplayLabel];
-    if (countryState.releasable && showRelationMeta) {
-      const parentLabel = formatReleasableParentLabel(countryState);
-      metaBits.push(
-        parentLabel
-          ? `${t("Releasable from", "ui")} ${parentLabel}`
-          : t("Releasable", "ui")
-      );
-    }
-    meta.textContent = metaBits.filter(Boolean).join(" · ");
+    meta.textContent = buildCountryRowMetaText(countryState, { showRelationMeta });
 
     const side = document.createElement("div");
     side.className = "country-select-side";
@@ -2229,12 +2275,22 @@ function initSidebar({ render } = {}) {
     row.appendChild(side);
 
     if (!hasChildren && !hasReleasableActivateAction) {
+      registerCountryRowRef(countryState.code, {
+        row,
+        wrapper: null,
+        main,
+        swatch,
+        title,
+        meta,
+        showRelationMeta,
+      });
       parent.appendChild(row);
       return;
     }
 
     const wrapper = document.createElement("div");
     wrapper.className = "country-explorer-group country-select-card";
+    wrapper.dataset.countryCode = countryState.code;
     if (hasReleasableActivateAction) {
       wrapper.classList.add("has-subaction");
     }
@@ -2269,6 +2325,15 @@ function initSidebar({ render } = {}) {
       });
       wrapper.appendChild(childList);
     }
+    registerCountryRowRef(countryState.code, {
+      row,
+      wrapper,
+      main,
+      swatch,
+      title,
+      meta,
+      showRelationMeta,
+    });
     parent.appendChild(wrapper);
   };
 
@@ -2341,6 +2406,7 @@ function initSidebar({ render } = {}) {
 
   const renderCountryInspectorDetail = () => {
     if (!countryInspectorEmpty || !countryInspectorSelected) return;
+    incrementSidebarCounter("inspectorRenders");
 
     updateScenarioInspectorLayout();
 
@@ -2521,6 +2587,7 @@ function initSidebar({ render } = {}) {
   };
 
   const renderList = () => {
+    incrementSidebarCounter("fullListRenders");
     updateScenarioInspectorLayout();
     const term = getSearchTerm();
     const entries = getDynamicCountryEntries();
@@ -2528,6 +2595,7 @@ function initSidebar({ render } = {}) {
     const topLevelCountryStates = buildInspectorTopLevelCountryEntries(countryStates);
     const priorityOrderMap = getPriorityCountryOrderMap();
     latestCountryStatesByCode = new Map(countryStates.map((countryState) => [countryState.code, countryState]));
+    countryRowRefsByCode.clear();
     ensureSelectedInspectorCountry();
     list.replaceChildren();
 
@@ -2551,6 +2619,42 @@ function initSidebar({ render } = {}) {
     scheduleAdaptiveInspectorHeights();
   };
 
+  const refreshCountryRows = ({
+    countryCodes = [],
+    refreshInspector = true,
+    refreshPresetTree = false,
+    forceAll = false,
+  } = {}) => {
+    const normalizedCodes = Array.from(new Set(
+      (Array.isArray(countryCodes) ? countryCodes : [])
+        .map((code) => normalizeCountryCode(code))
+        .filter(Boolean)
+    ));
+    const selectedCode = normalizeCountryCode(state.selectedInspectorCountryCode);
+    const activeCode = normalizeCountryCode(state.activeSovereignCode);
+    if (selectedCode) normalizedCodes.push(selectedCode);
+    if (activeCode) normalizedCodes.push(activeCode);
+    const targetCodes = forceAll || !normalizedCodes.length
+      ? Array.from(countryRowRefsByCode.keys())
+      : Array.from(new Set(normalizedCodes));
+
+    targetCodes.forEach((countryCode) => {
+      const refs = countryRowRefsByCode.get(countryCode) || [];
+      const countryState = latestCountryStatesByCode.get(countryCode);
+      if (!countryState || !refs.length) return;
+      refs.forEach((ref) => syncCountryRowVisuals(ref, countryState));
+    });
+
+    incrementSidebarCounter("rowRefreshes", targetCodes.length || 1);
+    if (refreshInspector) {
+      renderCountryInspectorDetail();
+    }
+    if (refreshPresetTree && typeof state.renderPresetTreeFn === "function") {
+      state.renderPresetTreeFn();
+    }
+    scheduleAdaptiveInspectorHeights();
+  };
+
   if (countryInspectorSetActive && !countryInspectorSetActive.dataset.bound) {
     countryInspectorSetActive.addEventListener("click", () => {
       const selectedCode = ensureSelectedInspectorCountry();
@@ -2560,6 +2664,7 @@ function initSidebar({ render } = {}) {
         return;
       }
       const isCurrentlyActive = state.activeSovereignCode === selectedCode;
+      const previousActiveCode = state.activeSovereignCode;
       state.activeSovereignCode = isCurrentlyActive ? "" : selectedCode;
       markDirty(isCurrentlyActive ? "set-inactive-sovereign" : "set-active-sovereign");
       if (typeof state.updateActiveSovereignUIFn === "function") {
@@ -2568,7 +2673,10 @@ function initSidebar({ render } = {}) {
       if (typeof state.renderNowFn === "function") {
         state.renderNowFn();
       }
-      renderList();
+      refreshCountryRows({
+        countryCodes: [previousActiveCode, selectedCode],
+        refreshInspector: true,
+      });
       if (!isCurrentlyActive) {
         showToast(
           t("Political ownership editing now targets the selected country.", "ui"),
@@ -3300,6 +3408,7 @@ function initSidebar({ render } = {}) {
 
   const renderPresetTree = () => {
     if (!presetTree) return;
+    incrementSidebarCounter("presetTreeRenders");
     updateScenarioInspectorLayout();
     presetTree.innerHTML = "";
 
@@ -3330,6 +3439,7 @@ function initSidebar({ render } = {}) {
   let lastLegendKey = null;
   const refreshLegendEditor = () => {
     if (!legendList) return;
+    incrementSidebarCounter("legendRenders");
     const colors = LegendManager.getUniqueColors(state);
     const key = colors.join("|");
     if (key === lastLegendKey && legendList.dataset.ready === "true") return;
@@ -3370,6 +3480,8 @@ function initSidebar({ render } = {}) {
   };
 
   state.updateLegendUI = refreshLegendEditor;
+  state.refreshCountryListRowsFn = refreshCountryRows;
+  state.refreshCountryInspectorDetailFn = renderCountryInspectorDetail;
 
   if (sidebar && !sidebar.dataset.adaptiveInspectorBound) {
     globalThis.addEventListener("resize", scheduleAdaptiveInspectorHeights);

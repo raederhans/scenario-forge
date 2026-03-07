@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import re
 import sys
+import time
 
 import geopandas as gpd
 from shapely.geometry import GeometryCollection, MultiPolygon, Polygon
@@ -23,6 +24,39 @@ from map_builder.processors.detail_shell_coverage import (
     collect_shell_coverage_gaps,
     repair_shell_coverage,
 )
+
+try:
+    import resource
+except Exception:  # pragma: no cover - unavailable on some platforms
+    resource = None
+
+
+def _get_peak_memory_mb() -> float | None:
+    if resource is None:
+        return None
+    try:
+        usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    except Exception:
+        return None
+    if sys.platform == "darwin":
+        return round(float(usage) / (1024 * 1024), 2)
+    return round(float(usage) / 1024, 2)
+
+
+def _record_timing(timings: dict[str, dict], stage_name: str, start_time: float, **extra: object) -> None:
+    payload = {
+        "wall_time_sec": round(time.perf_counter() - start_time, 3),
+        "peak_memory_mb": _get_peak_memory_mb(),
+    }
+    payload.update(extra)
+    timings[stage_name] = payload
+
+
+def _write_timings_json(path: Path | None, timings: dict[str, dict]) -> None:
+    if path is None:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(timings, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
 def _empty_gdf() -> gpd.GeoDataFrame:
@@ -422,11 +456,21 @@ def parse_args() -> argparse.Namespace:
         default=Path("data") / "europe_topology.runtime_political_v1.json",
         help="Output runtime political topology path.",
     )
+    parser.add_argument(
+        "--timings-json",
+        type=Path,
+        default=None,
+        help="Optional path to write per-stage wall time and peak memory stats as JSON.",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
+    stage_timings: dict[str, dict] = {}
+    main_start = time.perf_counter()
+
+    load_start = time.perf_counter()
     primary_topology = _load_topology(args.primary_topology)
     primary_political = _topology_object_to_gdf(primary_topology, "political")
     detail_topology = _load_topology(args.detail_topology) if args.detail_topology.exists() else None
@@ -435,23 +479,49 @@ def main() -> None:
         if args.ru_overrides.exists()
         else None
     )
+    _record_timing(
+        stage_timings,
+        "load_inputs",
+        load_start,
+        detail_topology_exists=detail_topology is not None,
+        overrides_exists=override_collection is not None,
+    )
 
+    compose_start = time.perf_counter()
     runtime_political = _compose_political_features(
         primary_topology=primary_topology,
         detail_topology=detail_topology,
         override_collection=override_collection,
     )
+    _record_timing(
+        stage_timings,
+        "compose_runtime_political",
+        compose_start,
+        feature_count=len(runtime_political),
+    )
     args.output_topology.parent.mkdir(parents=True, exist_ok=True)
+
+    write_start = time.perf_counter()
     _write_output_topology(
         output_path=args.output_topology,
         political=runtime_political,
     )
+    _record_timing(
+        stage_timings,
+        "initial_write",
+        write_start,
+        output_path=str(args.output_topology),
+    )
+
+    repair_start = time.perf_counter()
+    repair_passes = 0
     for repair_pass in range(1, 4):
         output_topology = _load_topology(args.output_topology)
         output_political = _topology_object_to_gdf(output_topology, "political")
         gaps = collect_shell_coverage_gaps(output_political, primary_political)
         if not gaps:
             break
+        repair_passes += 1
         gap = gaps[0]
         print(
             f"[Runtime Political] Post-build shell coverage repair pass {repair_pass}: "
@@ -470,10 +540,23 @@ def main() -> None:
             output_path=args.output_topology,
             political=runtime_political,
         )
+    _record_timing(
+        stage_timings,
+        "shell_coverage_repairs",
+        repair_start,
+        passes=repair_passes,
+    )
     print(
         f"[Runtime Political] OK: wrote {args.output_topology} "
         f"({len(runtime_political)} features)"
     )
+    _record_timing(
+        stage_timings,
+        "total",
+        main_start,
+        output_features=len(runtime_political),
+    )
+    _write_timings_json(args.timings_json, stage_timings)
 
 
 if __name__ == "__main__":

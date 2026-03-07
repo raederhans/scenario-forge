@@ -11,6 +11,7 @@ import sys
 import subprocess
 import shutil
 import tempfile
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
@@ -29,20 +30,18 @@ else:
         return importlib_util.find_spec(name)
 
 
-def ensure_packages(packages: Iterable[str]) -> None:
+def require_packages(packages: Iterable[str]) -> None:
     missing = []
     for name in packages:
         if find_spec(name) is None:
             missing.append(name)
     if not missing:
         return
-
-    print(f"Installing missing packages: {', '.join(missing)}")
-    try:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", *missing])
-    except subprocess.CalledProcessError as exc:
-        print("Failed to install required packages.")
-        raise SystemExit(exc.returncode) from exc
+    missing_list = ", ".join(sorted(missing))
+    raise SystemExit(
+        "Missing required Python packages. Install them before running init_map_data.py: "
+        f"{missing_list}"
+    )
 
 
 def _peek_requested_mode(argv: list[str]) -> str:
@@ -57,7 +56,7 @@ def _peek_requested_mode(argv: list[str]) -> str:
 REQUESTED_MODE = _peek_requested_mode(sys.argv[1:])
 
 if REQUESTED_MODE != "palettes":
-    ensure_packages([
+    require_packages([
         "contourpy",
         "geopandas",
         "matplotlib",
@@ -136,6 +135,7 @@ else:  # pragma: no cover - palettes mode avoids GIS/runtime build imports
 PROJECT_ROOT = Path(__file__).resolve().parent
 D3_VENDOR_PATH = PROJECT_ROOT / 'vendor' / 'd3.v7.min.js'
 TOPOJSON_VENDOR_PATH = PROJECT_ROOT / 'vendor' / 'topojson-client.min.js'
+BUILD_STAGE_CACHE_FILENAME = ".build_stage_cache.json"
 
 GLOBAL_OCEAN_MIN_BBOX_WIDTH = 220.0
 GLOBAL_OCEAN_MIN_BBOX_HEIGHT = 90.0
@@ -151,6 +151,124 @@ ALLOWED_DETAIL_OVERLAY_SUPPORT_TIERS = {
     "GB": {"nuts1_basic"},
     "GR": {"adm1_basic"},
 }
+
+try:
+    import resource
+except Exception:  # pragma: no cover - unavailable on some platforms
+    resource = None
+
+
+def _get_peak_memory_mb() -> float | None:
+    if resource is None:
+        return None
+    try:
+        usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    except Exception:
+        return None
+    if sys.platform == "darwin":
+        return round(float(usage) / (1024 * 1024), 2)
+    return round(float(usage) / 1024, 2)
+
+
+def _record_stage_timing(timings: dict[str, dict], stage_name: str, start_time: float, **extra: object) -> None:
+    payload = {
+        "wall_time_sec": round(time.perf_counter() - start_time, 3),
+        "peak_memory_mb": _get_peak_memory_mb(),
+    }
+    payload.update(extra)
+    timings[stage_name] = payload
+
+
+def _write_timings_json(path: Path | None, timings: dict[str, dict]) -> None:
+    if path is None:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(timings, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def _read_optional_json(path: Path | None) -> dict | None:
+    if path is None or not path.exists():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def _describe_path_state(path: Path) -> dict[str, object]:
+    if not path.exists():
+        return {
+            "path": str(path),
+            "exists": False,
+        }
+    stat = path.stat()
+    return {
+        "path": str(path),
+        "exists": True,
+        "size": int(stat.st_size),
+        "mtime_ns": int(stat.st_mtime_ns),
+    }
+
+
+def _load_build_stage_cache(output_dir: Path) -> dict[str, dict]:
+    cache_path = output_dir / BUILD_STAGE_CACHE_FILENAME
+    if not cache_path.exists():
+        return {}
+    try:
+        payload = json.loads(cache_path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def _write_build_stage_cache(output_dir: Path, cache_payload: dict[str, dict]) -> None:
+    cache_path = output_dir / BUILD_STAGE_CACHE_FILENAME
+    cache_path.write_text(json.dumps(cache_payload, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def _compute_stage_signature(
+    *,
+    stage_name: str,
+    inputs: Iterable[Path] = (),
+    extra: dict[str, object] | None = None,
+) -> str:
+    payload = {
+        "stage": stage_name,
+        "inputs": [_describe_path_state(Path(path)) for path in inputs],
+        "extra": extra or {},
+    }
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8")
+    ).hexdigest()
+
+
+def _should_skip_stage(
+    *,
+    cache_payload: dict[str, dict],
+    stage_name: str,
+    signature: str,
+    outputs: Iterable[Path],
+) -> bool:
+    record = cache_payload.get(stage_name)
+    output_paths = [Path(path) for path in outputs]
+    if not output_paths or any(not path.exists() for path in output_paths):
+        return False
+    return isinstance(record, dict) and record.get("signature") == signature
+
+
+def _update_stage_cache(
+    *,
+    cache_payload: dict[str, dict],
+    stage_name: str,
+    signature: str,
+    outputs: Iterable[Path],
+) -> None:
+    cache_payload[stage_name] = {
+        "signature": signature,
+        "outputs": [_describe_path_state(Path(path)) for path in outputs],
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
 
 
 def cull_small_geometries(
@@ -517,18 +635,31 @@ def clip_borders(gdf: gpd.GeoDataFrame, land: gpd.GeoDataFrame) -> gpd.GeoDataFr
     return clip_to_land_bounds(gdf, land, "borders")
 
 
-def build_ru_city_detail_topology(script_dir: Path, output_dir: Path) -> None:
+def build_ru_city_detail_topology(
+    script_dir: Path,
+    output_dir: Path,
+    *,
+    stage_timings: dict[str, dict] | None = None,
+    build_stage_cache: dict[str, dict] | None = None,
+    timings_root: Path | None = None,
+) -> None:
+    stage_name = "ru_city_detail_topology"
+    stage_start = time.perf_counter()
     source_topology = output_dir / "europe_topology.json.bak"
     if not source_topology.exists():
         print(
             "[RU City Detail] Skipped: source detail topology not found at "
             f"{source_topology}."
         )
+        if stage_timings is not None:
+            _record_stage_timing(stage_timings, stage_name, stage_start, skipped=True, reason="missing-source")
         return
 
     patch_script = script_dir / "tools" / "patch_ru_city_detail.py"
     if not patch_script.exists():
         print(f"[RU City Detail] Skipped: patch script missing at {patch_script}.")
+        if stage_timings is not None:
+            _record_stage_timing(stage_timings, stage_name, stage_start, skipped=True, reason="missing-script")
         return
 
     ru_adm2_path = output_dir / cfg.RUS_ADM2_FILENAME
@@ -540,63 +671,204 @@ def build_ru_city_detail_topology(script_dir: Path, output_dir: Path) -> None:
             fallback_urls=cfg.RUS_ADM2_FALLBACK_URLS,
         )
 
+    output_path = output_dir / "europe_topology.highres.json"
+    signature = _compute_stage_signature(
+        stage_name=stage_name,
+        inputs=[
+            Path(__file__),
+            patch_script,
+            source_topology,
+            ru_adm2_path,
+            PROJECT_ROOT / "map_builder" / "config.py",
+        ],
+        extra={"output": str(output_path)},
+    )
+    if build_stage_cache is not None and _should_skip_stage(
+        cache_payload=build_stage_cache,
+        stage_name=stage_name,
+        signature=signature,
+        outputs=[output_path],
+    ):
+        print("[RU City Detail] Skipped: cache hit.")
+        if stage_timings is not None:
+            _record_stage_timing(stage_timings, stage_name, stage_start, skipped=True, cache_hit=True)
+        return
+
+    child_timings_path = timings_root / f"{stage_name}.json" if timings_root is not None else None
     cmd = [
         sys.executable,
         str(patch_script),
         "--source-topology",
         str(source_topology),
         "--output-topology",
-        str(output_dir / "europe_topology.highres.json"),
+        str(output_path),
         "--ru-adm2",
         str(ru_adm2_path),
     ]
+    if child_timings_path is not None:
+        child_timings_path.parent.mkdir(parents=True, exist_ok=True)
+        cmd.extend(["--timings-json", str(child_timings_path)])
     print("[RU City Detail] Building patched detail topology...")
     try:
         subprocess.check_call(cmd, cwd=script_dir)
     except subprocess.CalledProcessError as exc:
         print(f"[RU City Detail] Failed to patch detail topology: {exc}")
+        if stage_timings is not None:
+            _record_stage_timing(stage_timings, stage_name, stage_start, failed=True)
+        return
+    if build_stage_cache is not None:
+        _update_stage_cache(
+            cache_payload=build_stage_cache,
+            stage_name=stage_name,
+            signature=signature,
+            outputs=[output_path],
+        )
+    if stage_timings is not None:
+        _record_stage_timing(
+            stage_timings,
+            stage_name,
+            stage_start,
+            skipped=False,
+            child_timings=_read_optional_json(child_timings_path),
+        )
 
 
-def build_na_detail_topology(script_dir: Path, output_dir: Path) -> None:
+def build_na_detail_topology(
+    script_dir: Path,
+    output_dir: Path,
+    *,
+    stage_timings: dict[str, dict] | None = None,
+    build_stage_cache: dict[str, dict] | None = None,
+    timings_root: Path | None = None,
+) -> None:
+    stage_name = "detail_topology"
+    stage_start = time.perf_counter()
     source_topology = output_dir / "europe_topology.highres.json"
     if not source_topology.exists():
         source_topology = output_dir / "europe_topology.json.bak"
     if not source_topology.exists():
         print("[Detail Bundle] Skipped: no source detail topology found.")
+        if stage_timings is not None:
+            _record_stage_timing(stage_timings, stage_name, stage_start, skipped=True, reason="missing-source")
         return
 
     patch_script = script_dir / "tools" / "build_na_detail_topology.py"
     if not patch_script.exists():
         print(f"[Detail Bundle] Skipped: patch script missing at {patch_script}.")
+        if stage_timings is not None:
+            _record_stage_timing(stage_timings, stage_name, stage_start, skipped=True, reason="missing-script")
         return
 
+    output_path = output_dir / "europe_topology.na_v2.json"
+    signature = _compute_stage_signature(
+        stage_name=stage_name,
+        inputs=[
+            Path(__file__),
+            patch_script,
+            source_topology,
+            PROJECT_ROOT / "map_builder" / "config.py",
+        ],
+        extra={"output": str(output_path)},
+    )
+    if build_stage_cache is not None and _should_skip_stage(
+        cache_payload=build_stage_cache,
+        stage_name=stage_name,
+        signature=signature,
+        outputs=[output_path],
+    ):
+        print("[Detail Bundle] Skipped: cache hit.")
+        if stage_timings is not None:
+            _record_stage_timing(stage_timings, stage_name, stage_start, skipped=True, cache_hit=True)
+        return
+
+    child_timings_path = timings_root / f"{stage_name}.json" if timings_root is not None else None
     cmd = [
         sys.executable,
         str(patch_script),
         "--source-topology",
         str(source_topology),
         "--output-topology",
-        str(output_dir / "europe_topology.na_v2.json"),
+        str(output_path),
     ]
+    if child_timings_path is not None:
+        child_timings_path.parent.mkdir(parents=True, exist_ok=True)
+        cmd.extend(["--timings-json", str(child_timings_path)])
     print("[Detail Bundle] Building enriched detail topology...")
     try:
         subprocess.check_call(cmd, cwd=script_dir)
     except subprocess.CalledProcessError as exc:
         print(f"[Detail Bundle] Failed to build enriched detail topology: {exc}")
+        if stage_timings is not None:
+            _record_stage_timing(stage_timings, stage_name, stage_start, failed=True)
+        return
+    if build_stage_cache is not None:
+        _update_stage_cache(
+            cache_payload=build_stage_cache,
+            stage_name=stage_name,
+            signature=signature,
+            outputs=[output_path],
+        )
+    if stage_timings is not None:
+        _record_stage_timing(
+            stage_timings,
+            stage_name,
+            stage_start,
+            skipped=False,
+            child_timings=_read_optional_json(child_timings_path),
+        )
 
 
-def build_runtime_political_topology(script_dir: Path, output_dir: Path) -> None:
+def build_runtime_political_topology(
+    script_dir: Path,
+    output_dir: Path,
+    *,
+    stage_timings: dict[str, dict] | None = None,
+    build_stage_cache: dict[str, dict] | None = None,
+    timings_root: Path | None = None,
+) -> None:
+    stage_name = "runtime_political_topology"
+    stage_start = time.perf_counter()
     primary_topology = output_dir / "europe_topology.json"
     detail_topology = output_dir / "europe_topology.na_v2.json"
     runtime_script = script_dir / "tools" / "build_runtime_political_topology.py"
 
     if not primary_topology.exists():
         print("[Runtime Political] Skipped: primary topology not found.")
+        if stage_timings is not None:
+            _record_stage_timing(stage_timings, stage_name, stage_start, skipped=True, reason="missing-primary")
         return
     if not runtime_script.exists():
         print(f"[Runtime Political] Skipped: script missing at {runtime_script}.")
+        if stage_timings is not None:
+            _record_stage_timing(stage_timings, stage_name, stage_start, skipped=True, reason="missing-script")
         return
 
+    output_path = output_dir / "europe_topology.runtime_political_v1.json"
+    ru_overrides_path = output_dir / "ru_city_overrides.geojson"
+    signature = _compute_stage_signature(
+        stage_name=stage_name,
+        inputs=[
+            Path(__file__),
+            runtime_script,
+            primary_topology,
+            detail_topology,
+            ru_overrides_path,
+            PROJECT_ROOT / "map_builder" / "config.py",
+        ],
+        extra={"output": str(output_path)},
+    )
+    if build_stage_cache is not None and _should_skip_stage(
+        cache_payload=build_stage_cache,
+        stage_name=stage_name,
+        signature=signature,
+        outputs=[output_path],
+    ):
+        print("[Runtime Political] Skipped: cache hit.")
+        if stage_timings is not None:
+            _record_stage_timing(stage_timings, stage_name, stage_start, skipped=True, cache_hit=True)
+        return
+
+    child_timings_path = timings_root / f"{stage_name}.json" if timings_root is not None else None
     cmd = [
         sys.executable,
         str(runtime_script),
@@ -605,15 +877,103 @@ def build_runtime_political_topology(script_dir: Path, output_dir: Path) -> None
         "--detail-topology",
         str(detail_topology),
         "--ru-overrides",
-        str(output_dir / "ru_city_overrides.geojson"),
+        str(ru_overrides_path),
         "--output-topology",
-        str(output_dir / "europe_topology.runtime_political_v1.json"),
+        str(output_path),
     ]
+    if child_timings_path is not None:
+        child_timings_path.parent.mkdir(parents=True, exist_ok=True)
+        cmd.extend(["--timings-json", str(child_timings_path)])
     print("[Runtime Political] Building unified runtime political topology...")
     try:
         subprocess.check_call(cmd, cwd=script_dir)
     except subprocess.CalledProcessError as exc:
         print(f"[Runtime Political] Failed to build unified runtime topology: {exc}")
+        if stage_timings is not None:
+            _record_stage_timing(stage_timings, stage_name, stage_start, failed=True)
+        return
+    if build_stage_cache is not None:
+        _update_stage_cache(
+            cache_payload=build_stage_cache,
+            stage_name=stage_name,
+            signature=signature,
+            outputs=[output_path],
+        )
+    if stage_timings is not None:
+        _record_stage_timing(
+            stage_timings,
+            stage_name,
+            stage_start,
+            skipped=False,
+            child_timings=_read_optional_json(child_timings_path),
+        )
+
+
+def run_hierarchy_locale_stage(
+    output_dir: Path,
+    *,
+    stage_timings: dict[str, dict] | None = None,
+    build_stage_cache: dict[str, dict] | None = None,
+) -> dict[str, object] | None:
+    stage_name = "hierarchy_locales"
+    stage_start = time.perf_counter()
+    topology_path = output_dir / "europe_topology.na_v2.json"
+    runtime_topology_path = output_dir / "europe_topology.runtime_political_v1.json"
+    outputs = [
+        output_dir / "hierarchy.json",
+        output_dir / "geo_aliases.json",
+        output_dir / "locales.json",
+    ]
+    signature = _compute_stage_signature(
+        stage_name=stage_name,
+        inputs=[
+            Path(__file__),
+            PROJECT_ROOT / "tools" / "generate_hierarchy.py",
+            PROJECT_ROOT / "tools" / "geo_key_normalizer.py",
+            PROJECT_ROOT / "tools" / "translate_manager.py",
+            topology_path,
+            runtime_topology_path,
+        ],
+        extra={"scenario_root": str(output_dir / "scenarios")},
+    )
+    if build_stage_cache is not None and _should_skip_stage(
+        cache_payload=build_stage_cache,
+        stage_name=stage_name,
+        signature=signature,
+        outputs=outputs,
+    ):
+        print("[INFO] Hierarchy/locales stage skipped: cache hit.")
+        if stage_timings is not None:
+            _record_stage_timing(stage_timings, stage_name, stage_start, skipped=True, cache_hit=True)
+        return None
+
+    print("[INFO] Generating Hierarchy Data....")
+    generate_hierarchy.main()
+
+    print("[INFO] Normalizing GEO keys....")
+    run_geo_alias_normalization(output_dir)
+
+    print("[INFO] Syncing Translations....")
+    translation_result = translate_manager.sync_translations(
+        topology_path=topology_path,
+        output_path=output_dir / "locales.json",
+        geo_aliases_path=output_dir / "geo_aliases.json",
+        hierarchy_path=output_dir / "hierarchy.json",
+        runtime_topology_path=runtime_topology_path,
+        scenarios_root=output_dir / "scenarios",
+        machine_translate=False,
+        network_mode="off",
+    )
+    if build_stage_cache is not None:
+        _update_stage_cache(
+            cache_payload=build_stage_cache,
+            stage_name=stage_name,
+            signature=signature,
+            outputs=outputs,
+        )
+    if stage_timings is not None:
+        _record_stage_timing(stage_timings, stage_name, stage_start, skipped=False)
+    return translation_result
 
 
 def build_balkan_fallback(
@@ -863,6 +1223,12 @@ def parse_args() -> argparse.Namespace:
         "--strict",
         action="store_true",
         help="Fail when validation detects contract drift or schema issues.",
+    )
+    parser.add_argument(
+        "--timings-json",
+        type=Path,
+        default=None,
+        help="Optional path to write per-stage wall time and peak memory stats as JSON.",
     )
     return parser.parse_args()
 
@@ -1953,55 +2319,93 @@ def main() -> None:
     args = parse_args()
     script_dir = Path(__file__).resolve().parent
     output_dir = script_dir / "data"
+    build_stage_cache = _load_build_stage_cache(output_dir)
+    stage_timings: dict[str, dict] = {}
+    timings_root = (
+        args.timings_json.parent / f"{args.timings_json.stem}.stages"
+        if args.timings_json is not None
+        else None
+    )
+    main_start = time.perf_counter()
+
+    def finalize_build() -> None:
+        _record_stage_timing(stage_timings, "total", main_start, mode=args.mode)
+        _write_build_stage_cache(output_dir, build_stage_cache)
+        _write_timings_json(args.timings_json, stage_timings)
 
     if args.mode == "detail":
-        build_ru_city_detail_topology(script_dir, output_dir)
-        build_na_detail_topology(script_dir, output_dir)
-        build_runtime_political_topology(script_dir, output_dir)
+        build_ru_city_detail_topology(
+            script_dir,
+            output_dir,
+            stage_timings=stage_timings,
+            build_stage_cache=build_stage_cache,
+            timings_root=timings_root,
+        )
+        build_na_detail_topology(
+            script_dir,
+            output_dir,
+            stage_timings=stage_timings,
+            build_stage_cache=build_stage_cache,
+            timings_root=timings_root,
+        )
+        build_runtime_political_topology(
+            script_dir,
+            output_dir,
+            stage_timings=stage_timings,
+            build_stage_cache=build_stage_cache,
+            timings_root=timings_root,
+        )
+        manifest_start = time.perf_counter()
         write_data_manifest(output_dir)
+        _record_stage_timing(stage_timings, "manifest", manifest_start)
+        validation_start = time.perf_counter()
         validate_build_outputs(output_dir, strict=args.strict)
+        _record_stage_timing(stage_timings, "validation", validation_start)
         print("Done.")
+        finalize_build()
         return
 
     if args.mode == "i18n":
-        print("[INFO] Generating Hierarchy Data....")
-        generate_hierarchy.main()
-
-        print("[INFO] Normalizing GEO keys....")
-        run_geo_alias_normalization(output_dir)
-
-        print("[INFO] Syncing Translations....")
-        translation_result = translate_manager.sync_translations(
-            topology_path=output_dir / "europe_topology.na_v2.json",
-            output_path=output_dir / "locales.json",
-            geo_aliases_path=output_dir / "geo_aliases.json",
-            hierarchy_path=output_dir / "hierarchy.json",
-            runtime_topology_path=output_dir / "europe_topology.runtime_political_v1.json",
-            scenarios_root=output_dir / "scenarios",
-            machine_translate=False,
-            network_mode="off",
+        translation_result = run_hierarchy_locale_stage(
+            output_dir,
+            stage_timings=stage_timings,
+            build_stage_cache=build_stage_cache,
         )
-        print(
-            "[INFO] Translation sync result: "
-            f"geo_missing_like={translation_result['geo_missing_like']}, "
-            f"todo_markers={translation_result['geo_literal_todo_markers']}, "
-            f"mt_requests={translation_result['mt_requests']}"
-        )
+        if translation_result:
+            print(
+                "[INFO] Translation sync result: "
+                f"geo_missing_like={translation_result['geo_missing_like']}, "
+                f"todo_markers={translation_result['geo_literal_todo_markers']}, "
+                f"mt_requests={translation_result['mt_requests']}"
+            )
+        manifest_start = time.perf_counter()
         write_data_manifest(output_dir)
+        _record_stage_timing(stage_timings, "manifest", manifest_start)
+        validation_start = time.perf_counter()
         validate_build_outputs(output_dir, strict=args.strict)
+        _record_stage_timing(stage_timings, "validation", validation_start)
         print("Done.")
+        finalize_build()
         return
 
     if args.mode == "palettes":
         print("[INFO] Rebuilding palette assets....")
+        palette_start = time.perf_counter()
         run_palette_imports(output_dir, strict=args.strict)
+        _record_stage_timing(stage_timings, "palette_assets", palette_start)
+        manifest_start = time.perf_counter()
         write_data_manifest(output_dir)
+        _record_stage_timing(stage_timings, "manifest", manifest_start)
+        validation_start = time.perf_counter()
         validate_build_outputs(output_dir, strict=args.strict)
+        _record_stage_timing(stage_timings, "validation", validation_start)
         print("Done.")
+        finalize_build()
         return
 
     borders = fetch_ne_zip(cfg.BORDERS_URL, "borders")
     borders = clip_to_map_bounds(borders, "borders")
+    primary_pipeline_start = time.perf_counter()
 
     if getattr(cfg, "GLOBAL_SKELETON_MODE", False):
         filtered = filter_countries(borders)
@@ -2277,44 +2681,58 @@ def main() -> None:
         output_path=topology_path,
         quantization=cfg.TOPOLOGY_QUANTIZATION,
     )
+    _record_stage_timing(stage_timings, "primary_topology_bundle", primary_pipeline_start)
     if args.mode == "primary":
+        manifest_start = time.perf_counter()
         write_data_manifest(output_dir)
+        _record_stage_timing(stage_timings, "manifest", manifest_start)
+        validation_start = time.perf_counter()
         validate_build_outputs(output_dir, strict=args.strict)
+        _record_stage_timing(stage_timings, "validation", validation_start)
         print(f"Features with missing CNTR_CODE: {final_hybrid['cntr_code'].isnull().sum()}")
         print("Done.")
+        finalize_build()
         return
 
-    build_ru_city_detail_topology(script_dir, output_dir)
-    build_na_detail_topology(script_dir, output_dir)
-    build_runtime_political_topology(script_dir, output_dir)
-
-    print("[INFO] Generating Hierarchy Data....")
-    generate_hierarchy.main()
-
-    print("[INFO] Normalizing GEO keys....")
-    run_geo_alias_normalization(output_dir)
-
-    print("[INFO] Syncing Translations....")
-    translation_result = translate_manager.sync_translations(
-        topology_path=output_dir / "europe_topology.na_v2.json",
-        output_path=output_dir / "locales.json",
-        geo_aliases_path=output_dir / "geo_aliases.json",
-        hierarchy_path=output_dir / "hierarchy.json",
-        runtime_topology_path=output_dir / "europe_topology.runtime_political_v1.json",
-        scenarios_root=output_dir / "scenarios",
-        machine_translate=False,
-        network_mode="off",
+    build_ru_city_detail_topology(
+        script_dir,
+        output_dir,
+        stage_timings=stage_timings,
+        build_stage_cache=build_stage_cache,
+        timings_root=timings_root,
     )
-    print(
-        "[INFO] Translation sync result: "
-        f"geo_missing_like={translation_result['geo_missing_like']}, "
-        f"todo_markers={translation_result['geo_literal_todo_markers']}, "
-        f"mt_requests={translation_result['mt_requests']}"
+    build_na_detail_topology(
+        script_dir,
+        output_dir,
+        stage_timings=stage_timings,
+        build_stage_cache=build_stage_cache,
+        timings_root=timings_root,
     )
+    build_runtime_political_topology(
+        script_dir,
+        output_dir,
+        stage_timings=stage_timings,
+        build_stage_cache=build_stage_cache,
+        timings_root=timings_root,
+    )
+
+    translation_result = run_hierarchy_locale_stage(
+        output_dir,
+        stage_timings=stage_timings,
+        build_stage_cache=build_stage_cache,
+    )
+    if translation_result:
+        print(
+            "[INFO] Translation sync result: "
+            f"geo_missing_like={translation_result['geo_missing_like']}, "
+            f"todo_markers={translation_result['geo_literal_todo_markers']}, "
+            f"mt_requests={translation_result['mt_requests']}"
+        )
 
     build_mt_mode = str(os.environ.get("MAPCREATOR_BUILD_MT", "off")).strip().lower()
     if build_mt_mode in {"auto", "on"}:
         print(f"[INFO] Running optional machine translation pass (mode={build_mt_mode})....")
+        machine_translation_start = time.perf_counter()
         translation_result = translate_manager.sync_translations(
             topology_path=output_dir / "europe_topology.na_v2.json",
             output_path=output_dir / "locales.json",
@@ -2334,17 +2752,31 @@ def main() -> None:
             f"todo_markers={translation_result['geo_literal_todo_markers']}, "
             f"mt_requests={translation_result['mt_requests']}"
         )
+        _record_stage_timing(
+            stage_timings,
+            "machine_translation",
+            machine_translation_start,
+            mode=build_mt_mode,
+            mt_requests=translation_result.get("mt_requests"),
+        )
 
+    derived_assets_start = time.perf_counter()
     rebuild_derived_hoi4_assets(output_dir, strict=args.strict)
+    _record_stage_timing(stage_timings, "derived_hoi4_assets", derived_assets_start)
 
+    manifest_start = time.perf_counter()
     write_data_manifest(output_dir)
+    _record_stage_timing(stage_timings, "manifest", manifest_start)
+    validation_start = time.perf_counter()
     validate_build_outputs(
         output_dir,
         strict=args.strict,
         include_dependent_asset_checks=True,
     )
+    _record_stage_timing(stage_timings, "validation", validation_start)
     print(f"Features with missing CNTR_CODE: {final_hybrid['cntr_code'].isnull().sum()}")
     print("Done.")
+    finalize_build()
 
 
 if __name__ == "__main__":

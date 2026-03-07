@@ -1,5 +1,8 @@
 # Roadmap
 
+Related product strategy:
+- `docs/PRODUCT_AUDIT_AND_GROWTH_ROADMAP_2026-03-07.md` defines product positioning and growth direction for the alternate-history scenario platform path.
+
 ## Vision
 Evolve Map Creator from a stable Europe/Eurasia hybrid renderer into a scalable global map platform with predictable performance, maintainable architecture, and clean project governance.
 

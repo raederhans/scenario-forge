@@ -94,13 +94,25 @@ function getDeferredPromotionDelay(profile) {
   return 0;
 }
 
+let deferredPromotionHandle = null;
+
 function scheduleDeferredDetailPromotion(renderDispatcher) {
-  if (!state.detailDeferred || state.detailPromotionCompleted || state.detailPromotionInFlight) {
+  if (
+    !state.detailDeferred ||
+    state.detailPromotionCompleted ||
+    state.detailPromotionInFlight ||
+    deferredPromotionHandle !== null
+  ) {
     return;
   }
 
   const runPromotion = async () => {
+    deferredPromotionHandle = null;
     if (!state.detailDeferred || state.detailPromotionCompleted || state.detailPromotionInFlight) {
+      return;
+    }
+    if (state.isInteracting || state.renderPhase !== "idle") {
+      scheduleDeferredDetailPromotion(renderDispatcher);
       return;
     }
 
@@ -142,9 +154,13 @@ function scheduleDeferredDetailPromotion(renderDispatcher) {
 
   const delayMs = getDeferredPromotionDelay(state.renderProfile);
   if (typeof globalThis.requestIdleCallback === "function") {
-    globalThis.requestIdleCallback(runPromotion, { timeout: Math.max(600, delayMs) });
+    deferredPromotionHandle = globalThis.requestIdleCallback(() => {
+      void runPromotion();
+    }, { timeout: Math.max(600, delayMs) });
   } else {
-    globalThis.setTimeout(runPromotion, delayMs);
+    deferredPromotionHandle = globalThis.setTimeout(() => {
+      void runPromotion();
+    }, delayMs);
   }
 }
 

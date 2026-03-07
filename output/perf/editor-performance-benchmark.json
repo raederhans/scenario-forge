@@ -1,0 +1,252 @@
+{
+  "createdAt": "2026-03-07T13:31:18-05:00",
+  "url": "http://127.0.0.1:18080/?perf_overlay=1",
+  "metrics": {
+    "defaultForcedFullRedraw": {
+      "visibility": {
+        "showPhysical": true,
+        "showUrban": true,
+        "showRivers": true
+      },
+      "counterDelta": {
+        "drawCanvas": 1,
+        "frames": 1
+      },
+      "lastFrame": {
+        "phase": "idle",
+        "totalMs": 1199.800000011921,
+        "timings": {
+          "background": 424.69999998807907,
+          "political": 172.19999998807907,
+          "effects": 0,
+          "context": 449.60000002384186,
+          "borders": 59.10000002384186
+        },
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "k": 1
+        }
+      },
+      "overlay": "phase=idle total=1199.8ms\naction=- 0.0ms\ntransform=0.000|0.000|1.0000|628|688|1.00\npasses background=424.7ms, political=172.2ms, effects=0.0ms, context=449.6ms, borders=59.1ms\ninvalidations background:benchmark-default | political:benchmark-default | effects:benchmark-default | context:benchmark-default | borders:benchmark-default\nrender draw=12 frame=12 hit=2 dynBorder=3\nsidebar list=2 rows=0 detail=2 preset=4 legend=5"
+    },
+    "cachedRenderNow": {
+      "samples": [
+        0.8,
+        0.6,
+        0.7,
+        0.5,
+        0.6,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "averageMs": 0.57
+    },
+    "detailLayerOffForcedFullRedraw": {
+      "visibility": {
+        "showPhysical": true,
+        "showUrban": true,
+        "showRivers": true
+      },
+      "counterDelta": {
+        "drawCanvas": 1,
+        "frames": 1
+      },
+      "lastFrame": {
+        "phase": "idle",
+        "totalMs": 798.6000000238419,
+        "timings": {
+          "background": 322,
+          "political": 41.10000002384186,
+          "effects": 0,
+          "context": 423.9000000357628,
+          "borders": 8.800000011920929
+        },
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "k": 1
+        }
+      },
+      "overlay": "phase=idle total=798.6ms\naction=- 0.0ms\ntransform=0.000|0.000|1.0000|628|688|1.00\npasses background=322.0ms, political=41.1ms, effects=0.0ms, context=423.9ms, borders=8.8ms\ninvalidations background:benchmark-detail-off | political:benchmark-detail-off | effects:benchmark-detail-off | context:benchmark-detail-off | borders:benchmark-detail-off\nrender draw=10 frame=10 hit=1 dynBorder=2\nsidebar list=1 rows=0 detail=1 preset=2 legend=3"
+    },
+    "contextLayersDisabledForcedFullRedraw": {
+      "visibility": {
+        "showPhysical": false,
+        "showUrban": false,
+        "showRivers": false
+      },
+      "counterDelta": {
+        "drawCanvas": 1,
+        "frames": 1
+      },
+      "lastFrame": {
+        "phase": "idle",
+        "totalMs": 519.1000000238419,
+        "timings": {
+          "background": 314.10000002384186,
+          "political": 155.89999997615814,
+          "effects": 0,
+          "context": 0,
+          "borders": 48
+        },
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "k": 1
+        }
+      },
+      "overlay": "phase=idle total=519.1ms\naction=- 0.0ms\ntransform=0.000|0.000|1.0000|628|688|1.00\npasses background=314.1ms, political=155.9ms, effects=0.0ms, context=0.0ms, borders=48.0ms\ninvalidations background:benchmark-context-off | political:benchmark-context-off | effects:benchmark-context-off | context:benchmark-context-off | borders:benchmark-context-off\nrender draw=12 frame=12 hit=2 dynBorder=3\nsidebar list=2 rows=0 detail=2 preset=4 legend=5"
+    },
+    "interactivePanFrame": {
+      "interactiveFrame": {
+        "phase": "interacting",
+        "totalMs": 1.399999976158142,
+        "timings": {
+          "interactiveComposite": 1.300000011920929
+        },
+        "transform": {
+          "x": 42,
+          "y": 24,
+          "k": 1.08
+        }
+      },
+      "deltas": {
+        "drawCanvas": 1,
+        "frames": 1,
+        "transformedFrames": 1
+      },
+      "restoredFrame": {
+        "phase": "idle",
+        "totalMs": 0,
+        "timings": {},
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "k": 1
+        }
+      }
+    },
+    "singleClickFill": {
+      "target": {
+        "id": "RUS-2612",
+        "name": "Sakha (Yakutia)",
+        "code": "RU",
+        "area": 0.07352540125627756,
+        "point": [
+          478.2651803088833,
+          202.74936364144833
+        ],
+        "screenX": 815.2651803088834,
+        "screenY": 219.74936364144833
+      },
+      "lastAction": "fill-feature-color",
+      "lastActionDurationMs": 228,
+      "lastActionFrame": {
+        "phase": "settling",
+        "totalMs": 222.30000001192093,
+        "timings": {
+          "political": 170,
+          "borders": 51
+        },
+        "transform": {
+          "x": 0,
+          "y": 1.4210854715202004e-14,
+          "k": 1
+        }
+      },
+      "lastFrame": {
+        "phase": "idle",
+        "totalMs": 0.10000002384185791,
+        "timings": {},
+        "transform": {
+          "x": 0,
+          "y": 1.4210854715202004e-14,
+          "k": 1
+        }
+      },
+      "counterDelta": {
+        "drawCanvas": 3,
+        "frames": 3,
+        "transformedFrames": 0
+      },
+      "sidebarDelta": {
+        "fullListRenders": 0,
+        "rowRefreshes": 1,
+        "inspectorRenders": 1,
+        "presetTreeRenders": 0,
+        "legendRenders": 1
+      },
+      "longTaskCountDelta": 3
+    },
+    "doubleClickFill": {
+      "target": {
+        "id": "CN_CITY_17275852B47937532060975",
+        "name": "Ruoqiangxian",
+        "code": "CN",
+        "area": 0.004854343027736007,
+        "countryFeatureCount": 2391,
+        "point": [
+          455.6860678720675,
+          251.1485883072753
+        ],
+        "screenX": 792.6860678720675,
+        "screenY": 268.1485883072753
+      },
+      "colorMatchCount": 87,
+      "lastAction": "double-click-fill",
+      "lastActionDurationMs": 341.10000002384186,
+      "lastActionFrame": {
+        "phase": "settling",
+        "totalMs": 333.19999998807907,
+        "timings": {
+          "political": 287.80000001192093,
+          "borders": 44.30000001192093
+        },
+        "transform": {
+          "x": 0,
+          "y": 1.4210854715202004e-14,
+          "k": 1
+        }
+      },
+      "lastFrame": {
+        "phase": "idle",
+        "totalMs": 0.6000000238418579,
+        "timings": {},
+        "transform": {
+          "x": 0,
+          "y": 1.4210854715202004e-14,
+          "k": 1
+        }
+      },
+      "counterDelta": {
+        "drawCanvas": 5,
+        "frames": 5,
+        "transformedFrames": 0
+      },
+      "sidebarDelta": {
+        "fullListRenders": 0,
+        "rowRefreshes": 2,
+        "inspectorRenders": 2,
+        "presetTreeRenders": 0,
+        "legendRenders": 1
+      },
+      "longTaskCountDelta": 4
+    }
+  },
+  "consoleIssues": [
+    "### Result",
+    "- [Console](.playwright-cli\\console-2026-03-07T18-31-13-283Z.log)"
+  ],
+  "networkIssues": [
+    "### Result",
+    "- [Network](.playwright-cli\\network-2026-03-07T18-31-14-429Z.log)"
+  ],
+  "screenshots": {
+    "home": "/mnt/c/Users/raede/Desktop/dev/mapcreator/.mcp-artifacts/perf/editor-home.png",
+    "interacting": "/mnt/c/Users/raede/Desktop/dev/mapcreator/.mcp-artifacts/perf/editor-interacting.png"
+  }
+}
