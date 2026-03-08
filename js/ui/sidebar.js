@@ -1142,6 +1142,8 @@ function initSidebar({ render } = {}) {
   const countryInspectorOrderingHint = document.getElementById("countryInspectorOrderingHint");
   const countryInspectorSection = document.getElementById("countryInspectorSection");
   const waterInspectorSection = document.getElementById("waterInspectorSection");
+  const waterInspectorOpenOceanToggle = document.getElementById("waterInspectorOpenOceanToggle");
+  const waterInspectorOpenOceanHint = document.getElementById("waterInspectorOpenOceanHint");
   const waterSearchInput = document.getElementById("waterRegionSearch");
   const waterRegionList = document.getElementById("waterRegionList");
   const waterLegendList = document.getElementById("waterLegendList");
@@ -2684,6 +2686,17 @@ function initSidebar({ render } = {}) {
       .filter((feature) => isWaterFeatureVisibleInInspector(feature))
       .sort((a, b) => getWaterFeatureDisplayName(a).localeCompare(getWaterFeatureDisplayName(b)));
 
+  const renderWaterInteractionUi = () => {
+    if (waterInspectorOpenOceanToggle) {
+      waterInspectorOpenOceanToggle.checked = !!state.showOpenOceanRegions;
+    }
+    if (waterInspectorOpenOceanHint) {
+      waterInspectorOpenOceanHint.textContent = state.showOpenOceanRegions
+        ? t("waterInspectorOpenOceanHintEnabled", "ui")
+        : t("waterInspectorOpenOceanHint", "ui");
+    }
+  };
+
   const renderWaterLegend = () => {
     if (!waterLegendList) return;
     waterLegendList.replaceChildren();
@@ -3103,6 +3116,24 @@ function initSidebar({ render } = {}) {
 
   state.renderCountryListFn = renderList;
   state.renderWaterRegionListFn = renderWaterRegionList;
+  state.updateWaterInteractionUIFn = renderWaterInteractionUi;
+
+  if (waterInspectorOpenOceanToggle && !waterInspectorOpenOceanToggle.dataset.bound) {
+    waterInspectorOpenOceanToggle.addEventListener("change", (event) => {
+      state.showOpenOceanRegions = !!event.target.checked;
+      if (!state.showOpenOceanRegions) {
+        state.hoveredWaterRegionId = null;
+      }
+      markDirty("toggle-open-ocean-regions");
+      renderWaterInteractionUi();
+      renderWaterRegionList();
+      if (typeof state.updateSpecialZoneEditorUIFn === "function") {
+        state.updateSpecialZoneEditorUIFn();
+      }
+      if (render) render();
+    });
+    waterInspectorOpenOceanToggle.dataset.bound = "true";
+  }
 
   if (waterInspectorColorSwatch && waterInspectorColorInput && !waterInspectorColorSwatch.dataset.bound) {
     waterInspectorColorSwatch.addEventListener("click", () => {
@@ -4216,6 +4247,9 @@ function initSidebar({ render } = {}) {
         if (typeof state.updateSpecialZoneEditorUIFn === "function") {
           state.updateSpecialZoneEditorUIFn();
         }
+        if (typeof state.updateWaterInteractionUIFn === "function") {
+          state.updateWaterInteractionUIFn();
+        }
         if (typeof state.updateActiveSovereignUIFn === "function") {
           state.updateActiveSovereignUIFn();
         }
@@ -4261,6 +4295,7 @@ function initSidebar({ render } = {}) {
   }
 
   renderList();
+  renderWaterInteractionUi();
   renderWaterRegionList();
   renderPresetTree();
   refreshLegendEditor();

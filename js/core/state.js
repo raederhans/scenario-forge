@@ -994,6 +994,7 @@ export const state = {
   updateDynamicBorderStatusUIFn: null,
   updateZoomUIFn: null,
   updateTextureUIFn: null,
+  updateWaterInteractionUIFn: null,
   updateParentBorderCountryListFn: null,
   updateSpecialZoneEditorUIFn: null,
   updateScenarioContextBarFn: null,

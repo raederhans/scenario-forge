@@ -2357,6 +2357,9 @@ function initToolbar({ render } = {}) {
       if (!state.showOpenOceanRegions) {
         state.hoveredWaterRegionId = null;
       }
+      if (typeof state.updateWaterInteractionUIFn === "function") {
+        state.updateWaterInteractionUIFn();
+      }
       if (typeof state.renderWaterRegionListFn === "function") {
         state.renderWaterRegionListFn();
       }

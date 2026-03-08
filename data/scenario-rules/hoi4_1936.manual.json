@@ -777,7 +777,6 @@
       "base_iso2": "SN",
       "lookup_iso2": "SN",
       "display_name_override": "French West Africa",
-      "color_hex_override": "#6f8ecf",
       "parent_owner_tag": "FRA",
       "subject_kind": "colonial_federation",
       "entry_kind": "scenario_subject"
@@ -793,7 +792,6 @@
       "base_iso2": "TD",
       "lookup_iso2": "TD",
       "display_name_override": "French Equatorial Africa",
-      "color_hex_override": "#5478b8",
       "parent_owner_tag": "FRA",
       "subject_kind": "colonial_federation",
       "entry_kind": "scenario_subject"

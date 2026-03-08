@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import colorsys
 from collections import Counter, defaultdict
 
 from .models import FeatureAssignment, RuntimeFeatureRecord, ScenarioCountryRecord, ScenarioRule
@@ -19,6 +20,67 @@ def _fallback_color_hex(tag: str) -> str:
     g = 72 + ((seed // 7) % 104)
     b = 72 + ((seed // 13) % 104)
     return f"#{r:02x}{g:02x}{b:02x}"
+
+
+def _clamp(value: float, minimum: float, maximum: float) -> float:
+    return max(minimum, min(maximum, value))
+
+
+def _get_palette_color_hex(tag: str, palette_entries: dict[str, dict] | None = None) -> str:
+    palette_entry = palette_entries.get(tag, {}) if isinstance(palette_entries, dict) else {}
+    return (
+        str(palette_entry.get("map_hex") or "").strip().lower()
+        or str(palette_entry.get("country_file_hex") or "").strip().lower()
+        or _fallback_color_hex(tag)
+    )
+
+
+def _derive_subject_color_hex(parent_color_hex: str, child_tag: str, subject_kind: str = "") -> str:
+    normalized_parent = str(parent_color_hex or "").strip().lower()
+    if not normalized_parent.startswith("#") or len(normalized_parent) != 7:
+        return normalized_parent or _fallback_color_hex(child_tag)
+
+    try:
+        red = int(normalized_parent[1:3], 16) / 255.0
+        green = int(normalized_parent[3:5], 16) / 255.0
+        blue = int(normalized_parent[5:7], 16) / 255.0
+    except ValueError:
+        return normalized_parent or _fallback_color_hex(child_tag)
+
+    subject_profiles: dict[str, tuple[float, float]] = {
+        "dominion": (0.14, -0.05),
+        "commonwealth": (0.12, -0.04),
+        "raj": (0.10, 0.00),
+        "mandate": (0.04, -0.12),
+        "protectorate": (0.02, -0.14),
+        "colony": (-0.08, 0.04),
+        "colonial_government": (0.08, -0.02),
+        "colonial_federation": (-0.02, -0.10),
+    }
+    base_lightness_delta, base_saturation_delta = subject_profiles.get(subject_kind, (0.0, 0.0))
+    seed = sum(
+        ord(char) * (index + 1)
+        for index, char in enumerate(f"{str(child_tag or '').upper()}:{str(subject_kind or '').lower()}")
+    )
+
+    hue, lightness, saturation = colorsys.rgb_to_hls(red, green, blue)
+    hue_jitter = ((seed % 13) - 6) / 360.0
+    lightness_jitter = (((seed // 7) % 7) - 3) * 0.018
+    saturation_jitter = (((seed // 11) % 7) - 3) * 0.018
+
+    adjusted_hue = (hue + hue_jitter) % 1.0
+    adjusted_lightness = _clamp(lightness + base_lightness_delta + lightness_jitter, 0.22, 0.82)
+    adjusted_saturation = _clamp(saturation + base_saturation_delta + saturation_jitter, 0.18, 0.90)
+    derived_red, derived_green, derived_blue = colorsys.hls_to_rgb(
+        adjusted_hue,
+        adjusted_lightness,
+        adjusted_saturation,
+    )
+    return "#{:02x}{:02x}{:02x}".format(
+        round(_clamp(derived_red, 0.0, 1.0) * 255),
+        round(_clamp(derived_green, 0.0, 1.0) * 255),
+        round(_clamp(derived_blue, 0.0, 1.0) * 255),
+    )
 
 
 def _choose_primary_rule(rules: list[ScenarioRule]) -> ScenarioRule | None:
@@ -264,11 +326,7 @@ def build_country_registry(
         file_label = str(palette_entry.get("country_file_label") or "").strip()
         localized_name = str(palette_entry.get("localized_name") or "").strip()
         display_name = localized_name or file_label or tag
-        color_hex = (
-            str(palette_entry.get("map_hex") or "").strip().lower()
-            or str(palette_entry.get("country_file_hex") or "").strip().lower()
-            or _fallback_color_hex(tag)
-        )
+        color_hex = _get_palette_color_hex(tag, palette_entries)
         base_iso2 = ""
         if base_iso2_votes.get(tag):
             base_iso2 = base_iso2_votes[tag].most_common(1)[0][0]
@@ -284,8 +342,6 @@ def build_country_registry(
         primary_rule = _choose_primary_rule(owner_rules)
         if primary_rule and primary_rule.display_name_override:
             display_name = primary_rule.display_name_override
-        if primary_rule and primary_rule.color_hex_override:
-            color_hex = primary_rule.color_hex_override
         history = country_histories.get(tag)
         primary_source = max(
             ((count, source) for (owner_tag, source), count in source_by_tag.items() if owner_tag == tag),
@@ -357,6 +413,11 @@ def build_country_registry(
         )
         if not entry_kind and (primary_parent_owner_tag or parent_owner_tags or subject_kind):
             entry_kind = "scenario_subject"
+        if entry_kind == "scenario_subject" and primary_parent_owner_tag:
+            parent_color_hex = _get_palette_color_hex(primary_parent_owner_tag, palette_entries)
+            color_hex = _derive_subject_color_hex(parent_color_hex, tag, subject_kind)
+        if primary_rule and primary_rule.color_hex_override:
+            color_hex = primary_rule.color_hex_override
         country_registry[tag] = ScenarioCountryRecord(
             tag=tag,
             display_name=display_name,

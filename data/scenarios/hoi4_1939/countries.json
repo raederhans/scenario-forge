@@ -1,13 +1,13 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1939",
-  "generated_at": "2026-03-08T00:21:24.064767+00:00",
+  "generated_at": "2026-03-08T00:34:57.726266+00:00",
   "default_country": "GER",
   "countries": {
     "AEF": {
       "tag": "AEF",
       "display_name": "French Equatorial Africa",
-      "color_hex": "#5478b8",
+      "color_hex": "#4066d3",
       "feature_count": 70,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -79,7 +79,7 @@
     "ALG": {
       "tag": "ALG",
       "display_name": "French Algeria",
-      "color_hex": "#996633",
+      "color_hex": "#1746e6",
       "feature_count": 48,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -117,7 +117,7 @@
     "ANG": {
       "tag": "ANG",
       "display_name": "Angola",
-      "color_hex": "#258c3d",
+      "color_hex": "#1e6737",
       "feature_count": 18,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -155,7 +155,7 @@
     "AOF": {
       "tag": "AOF",
       "display_name": "French West Africa",
-      "color_hex": "#6f8ecf",
+      "color_hex": "#5384dc",
       "feature_count": 96,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -193,7 +193,7 @@
     "AOI": {
       "tag": "AOI",
       "display_name": "Italian East Africa",
-      "color_hex": "#009933",
+      "color_hex": "#4e8a4a",
       "feature_count": 43,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -265,7 +265,7 @@
     "AST": {
       "tag": "AST",
       "display_name": "Australia",
-      "color_hex": "#398f61",
+      "color_hex": "#d97993",
       "feature_count": 32,
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
@@ -473,7 +473,7 @@
     "BRM": {
       "tag": "BRM",
       "display_name": "Burma",
-      "color_hex": "#4c9900",
+      "color_hex": "#a12e4f",
       "feature_count": 14,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -857,7 +857,7 @@
     "EGY": {
       "tag": "EGY",
       "display_name": "Kingdom of Egypt",
-      "color_hex": "#e6e646",
+      "color_hex": "#ac4457",
       "feature_count": 26,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -1462,7 +1462,7 @@
     "INS": {
       "tag": "INS",
       "display_name": "Dutch East Indies",
-      "color_hex": "#283278",
+      "color_hex": "#bf7f36",
       "feature_count": 34,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -1675,7 +1675,7 @@
     "KOR": {
       "tag": "KOR",
       "display_name": "Korea",
-      "color_hex": "#fff0c3",
+      "color_hex": "#faba98",
       "feature_count": 28,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -1781,7 +1781,7 @@
     "LBA": {
       "tag": "LBA",
       "display_name": "Libya",
-      "color_hex": "#c8b45a",
+      "color_hex": "#285229",
       "feature_count": 22,
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
@@ -1923,7 +1923,7 @@
     "MAL": {
       "tag": "MAL",
       "display_name": "Malaysia",
-      "color_hex": "#c56064",
+      "color_hex": "#bf2b56",
       "feature_count": 25,
       "quality": "approx_existing_geometry",
       "source": "direct_active_owner",
@@ -2135,7 +2135,7 @@
     "MOR": {
       "tag": "MOR",
       "display_name": "French Morocco",
-      "color_hex": "#663300",
+      "color_hex": "#4280d3",
       "feature_count": 16,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -2173,7 +2173,7 @@
     "MZB": {
       "tag": "MZB",
       "display_name": "Mozambique",
-      "color_hex": "#703e5a",
+      "color_hex": "#175937",
       "feature_count": 11,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -2381,7 +2381,7 @@
     "PAL": {
       "tag": "PAL",
       "display_name": "Palestine",
-      "color_hex": "#aa7d50",
+      "color_hex": "#c76a7a",
       "feature_count": 8,
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
@@ -2521,7 +2521,7 @@
     "PHI": {
       "tag": "PHI",
       "display_name": "Philippines",
-      "color_hex": "#0028c3",
+      "color_hex": "#4297ea",
       "feature_count": 117,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -2772,7 +2772,7 @@
     "RAJ": {
       "tag": "RAJ",
       "display_name": "British Raj",
-      "color_hex": "#e28728",
+      "color_hex": "#cc5668",
       "feature_count": 732,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -2810,7 +2810,7 @@
     "RCG": {
       "tag": "RCG",
       "display_name": "Belgian Congo",
-      "color_hex": "#66ccff",
+      "color_hex": "#edd421",
       "feature_count": 33,
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
@@ -2884,7 +2884,7 @@
     "SAF": {
       "tag": "SAF",
       "display_name": "South Africa",
-      "color_hex": "#c36ba0",
+      "color_hex": "#d7697d",
       "feature_count": 22,
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
@@ -3348,7 +3348,7 @@
     "TUN": {
       "tag": "TUN",
       "display_name": "French Tunisia",
-      "color_hex": "#999966",
+      "color_hex": "#4874d6",
       "feature_count": 23,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -3524,7 +3524,7 @@
     "VIN": {
       "tag": "VIN",
       "display_name": "French Indochina",
-      "color_hex": "#e6df32",
+      "color_hex": "#6595ea",
       "feature_count": 104,
       "quality": "approx_existing_geometry",
       "source": "manual_rule",

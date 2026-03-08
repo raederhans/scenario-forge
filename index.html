@@ -531,7 +531,7 @@
                       <div class="ml-5">
                         <label class="toggle-label mt-2">
                           <input id="toggleOpenOceanRegions" type="checkbox" class="checkbox-input" />
-                          <span id="lblOpenOceanRegions">Open Ocean Regions</span>
+                          <span id="lblOpenOceanRegions">Allow Open-Ocean Interaction</span>
                         </label>
                       </div>
                     </div>
@@ -1239,9 +1239,19 @@
             </div>
           </details>
 
-          <details id="waterInspectorSection" class="card inspector-section">
+          <details id="waterInspectorSection" class="card inspector-section" open>
             <summary id="lblWaterInspector" class="section-header">Water Regions</summary>
             <div class="inspector-panel-body">
+              <div class="card-flat inspector-detail-section">
+                <div id="lblWaterInteraction" class="section-header-block">Interaction</div>
+                <label class="toggle-label mt-2">
+                  <input id="waterInspectorOpenOceanToggle" type="checkbox" class="checkbox-input" />
+                  <span id="lblWaterInspectorOpenOceanToggle">Allow Open-Ocean Interaction</span>
+                </label>
+                <p id="waterInspectorOpenOceanHint" class="sidebar-tool-hint mt-2">
+                  When off, macro ocean regions are ignored for hover, click, and paint.
+                </p>
+              </div>
               <div class="card-flat inspector-search-block">
                 <label id="lblWaterSearch" class="visually-hidden" for="waterRegionSearch">Search Water Regions</label>
                 <div class="inspector-search-input-row">
