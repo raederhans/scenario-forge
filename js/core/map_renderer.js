@@ -66,6 +66,18 @@ const MAX_ZOOM_SCALE = 50;
 const OCEAN_FILL_COLOR = "#aadaff";
 const LAND_FILL_COLOR = "#f0f0f0";
 const BORDER_FALLBACK_COLOR = "rgba(0, 0, 0, 0.2)";
+const SPECIAL_REGION_FALLBACK_FILL = "#d6c19a";
+const SPECIAL_REGION_FALLBACK_STROKE = "#8d6f47";
+const SCENARIO_LAKE_FILL_COLOR = "#72a4c7";
+const SCENARIO_LAKE_STROKE_COLOR = "rgba(47, 78, 112, 0.82)";
+const RELIEF_SALT_FILL_COLOR = "rgba(222, 203, 170, 0.22)";
+const RELIEF_SALT_STROKE_COLOR = "rgba(128, 100, 63, 0.55)";
+const RELIEF_SHORELINE_COLOR = "rgba(109, 84, 50, 0.78)";
+const RELIEF_CONTOUR_COLOR = "rgba(176, 148, 103, 0.6)";
+const RELIEF_SWAMP_FILL_COLOR = "rgba(128, 150, 114, 0.18)";
+const RELIEF_SWAMP_STROKE_COLOR = "rgba(88, 108, 76, 0.52)";
+const RELIEF_LAKE_SHORELINE_COLOR = "rgba(214, 232, 244, 0.92)";
+const RELIEF_DAM_APPROACH_COLOR = "rgba(102, 86, 62, 0.8)";
 const GIANT_FEATURE_CULL_RATIO = 0.95;
 const GIANT_FEATURE_ALLOWLIST = new Set(["RU", "CA", "CN", "US", "AQ", "ATA"]);
 const COUNTRY_CODE_ALIASES = {
@@ -378,6 +390,10 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
     return [
       transformSignature,
       state.topologyRevision || 0,
+      state.activeScenarioId || "",
+      state.scenarioReliefOverlayRevision || 0,
+      state.showWaterRegions ? "scenario-water:on" : "scenario-water:off",
+      state.showScenarioSpecialRegions ? "scenario-special:on" : "scenario-special:off",
       state.showPhysical ? "physical:on" : "physical:off",
       state.showUrban ? "urban:on" : "urban:off",
       state.showRivers ? "rivers:on" : "rivers:off",
@@ -554,24 +570,320 @@ function getWaterRegionType(feature) {
   return String(feature?.properties?.water_type || "water_region").trim().toLowerCase();
 }
 
+function isBaseGeographyScenarioFeature(feature) {
+  return feature?.properties?.render_as_base_geography === true;
+}
+
 function isOpenOceanWaterRegion(feature) {
   return getWaterRegionType(feature) === "ocean";
 }
 
 function isWaterRegionEnabled(feature) {
   if (!feature) return false;
+  if (isBaseGeographyScenarioFeature(feature)) {
+    return true;
+  }
   if (isOpenOceanWaterRegion(feature)) {
     return !!state.showOpenOceanRegions;
   }
   return feature?.properties?.interactive !== false;
 }
 
+function getWaterRegionDefaultStyle(feature) {
+  const waterType = getWaterRegionType(feature);
+  if (waterType === "lake") {
+    return {
+      fill: SCENARIO_LAKE_FILL_COLOR,
+      stroke: SCENARIO_LAKE_STROKE_COLOR,
+      opacity: 0.92,
+    };
+  }
+  return {
+    fill: getOceanBaseFillColor(),
+    stroke: "rgba(62, 96, 138, 0.45)",
+    opacity: 1,
+  };
+}
+
 function getWaterRegionColor(id) {
   const resolvedId = String(id || "").trim();
   return (
     getSafeCanvasColor(state.waterRegionOverrides?.[resolvedId], null) ||
-    getOceanBaseFillColor()
+    getWaterRegionDefaultStyle(state.waterRegionsById?.get(resolvedId)).fill
   );
+}
+
+function isScenarioWaterRegion(feature) {
+  return !!String(feature?.properties?.scenario_id || "").trim();
+}
+
+function getScenarioExcludedWaterRegionIds() {
+  const ids = state.activeScenarioManifest?.excluded_water_region_ids;
+  if (!Array.isArray(ids) || !ids.length) return new Set();
+  return new Set(
+    ids
+      .map((value) => String(value || "").trim())
+      .filter(Boolean)
+  );
+}
+
+function getScenarioExcludedWaterRegionGroups() {
+  const groups = state.activeScenarioManifest?.excluded_water_region_groups;
+  if (!Array.isArray(groups) || !groups.length) return new Set();
+  return new Set(
+    groups
+      .map((value) => String(value || "").trim().toLowerCase())
+      .filter(Boolean)
+  );
+}
+
+function isWaterRegionExcludedByScenario(feature) {
+  if (!feature || isScenarioWaterRegion(feature)) return false;
+  const excludedIds = getScenarioExcludedWaterRegionIds();
+  const featureId = String(feature?.properties?.id || "").trim();
+  if (featureId && excludedIds.has(featureId)) {
+    return true;
+  }
+  const excludedGroups = getScenarioExcludedWaterRegionGroups();
+  const regionGroup = String(feature?.properties?.region_group || "").trim().toLowerCase();
+  return !!(regionGroup && excludedGroups.has(regionGroup));
+}
+
+function getEffectiveWaterRegionFeatures() {
+  return [
+    ...(Array.isArray(state.waterRegionsData?.features) ? state.waterRegionsData.features : []),
+    ...(Array.isArray(state.scenarioWaterRegionsData?.features) ? state.scenarioWaterRegionsData.features : []),
+  ].filter((feature) => !isWaterRegionExcludedByScenario(feature));
+}
+
+function getSpecialRegionName(feature) {
+  const rawName =
+    feature?.properties?.label ||
+    feature?.properties?.name ||
+    feature?.properties?.name_en ||
+    feature?.properties?.NAME ||
+    "Special Region";
+  return String(rawName || "").trim() || "Special Region";
+}
+
+function getSpecialRegionType(feature) {
+  return String(feature?.properties?.special_type || "special_region").trim().toLowerCase();
+}
+
+function isSpecialRegionEnabled(feature) {
+  if (!feature) return false;
+  if (!state.activeScenarioId) return false;
+  if (!state.showScenarioSpecialRegions && !isBaseGeographyScenarioFeature(feature)) return false;
+  return feature?.properties?.interactive !== false;
+}
+
+function getSpecialRegionDefaultStyle(feature) {
+  const specialType = getSpecialRegionType(feature);
+  if (specialType === "salt_flat") {
+    return {
+      fill: "#d7c6a3",
+      stroke: "#8b6f49",
+      opacity: 0.9,
+    };
+  }
+  if (specialType === "wasteland") {
+    return {
+      fill: "#bf8f74",
+      stroke: "#7d4e3d",
+      opacity: 0.9,
+    };
+  }
+  return {
+    fill: SPECIAL_REGION_FALLBACK_FILL,
+    stroke: SPECIAL_REGION_FALLBACK_STROKE,
+    opacity: 0.88,
+  };
+}
+
+function getSpecialRegionColor(id, feature = null) {
+  const resolvedId = String(id || "").trim();
+  const override = getSafeCanvasColor(state.specialRegionOverrides?.[resolvedId], null);
+  if (override) return override;
+  return getSpecialRegionDefaultStyle(feature || state.specialRegionsById?.get(resolvedId)).fill;
+}
+
+function getSpecialRegionStrokeColor(feature) {
+  return getSpecialRegionDefaultStyle(feature).stroke;
+}
+
+function getSpecialRegionOpacity(feature, id) {
+  const resolvedId = String(id || "").trim();
+  if (Object.prototype.hasOwnProperty.call(state.specialRegionOverrides || {}, resolvedId)) {
+    return 1;
+  }
+  return getSpecialRegionDefaultStyle(feature).opacity;
+}
+
+function getEffectiveSpecialRegionFeatures() {
+  return Array.isArray(state.scenarioSpecialRegionsData?.features)
+    ? state.scenarioSpecialRegionsData.features
+    : [];
+}
+
+function getEffectiveScenarioReliefOverlayFeatures() {
+  return Array.isArray(state.scenarioReliefOverlaysData?.features)
+    ? state.scenarioReliefOverlaysData.features
+    : [];
+}
+
+function getReliefOverlayKind(feature) {
+  return String(feature?.properties?.overlay_kind || "").trim().toLowerCase();
+}
+
+function isReliefOverlayEnabled(feature) {
+  if (!feature) return false;
+  if (!state.activeScenarioId) return false;
+  if (isBaseGeographyScenarioFeature(feature)) {
+    return true;
+  }
+  const kind = getReliefOverlayKind(feature);
+  if (kind === "lake_shoreline" || kind === "swamp_margin" || kind === "dam_approach") {
+    return !!state.showWaterRegions;
+  }
+  return !!state.showScenarioSpecialRegions;
+}
+
+function getReliefOverlayStyle(feature) {
+  const kind = getReliefOverlayKind(feature);
+  switch (kind) {
+    case "salt_flat_texture":
+      return {
+        fill: RELIEF_SALT_FILL_COLOR,
+        stroke: RELIEF_SALT_STROKE_COLOR,
+        lineWidth: 0.7,
+        fillAlpha: 1,
+      };
+    case "new_shoreline":
+      return {
+        fill: null,
+        stroke: RELIEF_SHORELINE_COLOR,
+        lineWidth: 1.35,
+      };
+    case "drained_basin_contour":
+      return {
+        fill: null,
+        stroke: RELIEF_CONTOUR_COLOR,
+        lineWidth: 1,
+      };
+    case "swamp_margin":
+      return {
+        fill: RELIEF_SWAMP_FILL_COLOR,
+        stroke: RELIEF_SWAMP_STROKE_COLOR,
+        lineWidth: 0.8,
+        fillAlpha: 1,
+      };
+    case "lake_shoreline":
+      return {
+        fill: null,
+        stroke: RELIEF_LAKE_SHORELINE_COLOR,
+        lineWidth: 1.4,
+      };
+    case "dam_approach":
+      return {
+        fill: null,
+        stroke: RELIEF_DAM_APPROACH_COLOR,
+        lineWidth: 1.1,
+      };
+    default:
+      return {
+        fill: null,
+        stroke: RELIEF_SALT_STROKE_COLOR,
+        lineWidth: 1,
+      };
+  }
+}
+
+function drawPolygonLinePattern(bounds, {
+  color = RELIEF_SALT_STROKE_COLOR,
+  spacing = 10,
+  angleDeg = -18,
+  lineWidth = 0.6,
+  alpha = 0.45,
+} = {}) {
+  if (!bounds) return;
+  const width = bounds.maxX - bounds.minX;
+  const height = bounds.maxY - bounds.minY;
+  if (!(width > 0 && height > 0)) return;
+  const diagonal = Math.sqrt(width * width + height * height);
+  const radians = angleDeg * (Math.PI / 180);
+  const dx = Math.cos(radians);
+  const dy = Math.sin(radians);
+  const nx = -dy;
+  const ny = dx;
+  const centerX = (bounds.minX + bounds.maxX) * 0.5;
+  const centerY = (bounds.minY + bounds.maxY) * 0.5;
+  const extent = diagonal * 0.9;
+  context.save();
+  context.globalAlpha = alpha;
+  context.strokeStyle = color;
+  context.lineWidth = lineWidth;
+  for (let offset = -extent; offset <= extent; offset += Math.max(4, spacing)) {
+    const startX = centerX + nx * offset - dx * diagonal;
+    const startY = centerY + ny * offset - dy * diagonal;
+    const endX = centerX + nx * offset + dx * diagonal;
+    const endY = centerY + ny * offset + dy * diagonal;
+    context.beginPath();
+    context.moveTo(startX, startY);
+    context.lineTo(endX, endY);
+    context.stroke();
+  }
+  context.restore();
+}
+
+function drawScenarioReliefOverlaysLayer(k) {
+  const overlays = getEffectiveScenarioReliefOverlayFeatures();
+  if (!overlays.length) return;
+  overlays.forEach((feature) => {
+    if (!isReliefOverlayEnabled(feature)) return;
+    if (!pathBoundsInScreen(feature)) return;
+    const style = getReliefOverlayStyle(feature);
+    const bounds = getPathBounds(feature);
+    if (!bounds) return;
+    const geometryType = String(feature?.geometry?.type || "").trim();
+    if ((geometryType === "Polygon" || geometryType === "MultiPolygon") && style.fill) {
+      context.beginPath();
+      pathCanvas(feature);
+      context.save();
+      context.globalAlpha = style.fillAlpha ?? 1;
+      context.fillStyle = style.fill;
+      context.fill();
+      context.clip();
+      if (getReliefOverlayKind(feature) === "salt_flat_texture") {
+        drawPolygonLinePattern(bounds, {
+          color: style.stroke,
+          spacing: 11 / Math.max(0.3, Math.min(4, k)),
+          angleDeg: -16,
+          lineWidth: (style.lineWidth || 0.7) / Math.max(0.0001, k),
+          alpha: 0.55,
+        });
+        drawPolygonLinePattern(bounds, {
+          color: style.stroke,
+          spacing: 19 / Math.max(0.3, Math.min(4, k)),
+          angleDeg: 12,
+          lineWidth: 0.45 / Math.max(0.0001, k),
+          alpha: 0.25,
+        });
+      }
+      context.restore();
+    }
+    context.beginPath();
+    pathCanvas(feature);
+    context.save();
+    if (getReliefOverlayKind(feature) === "dam_approach") {
+      context.setLineDash([3 / Math.max(0.0001, k), 2 / Math.max(0.0001, k)]);
+    }
+    context.strokeStyle = style.stroke;
+    context.lineWidth = (style.lineWidth || 1) / Math.max(0.0001, k);
+    context.lineJoin = "round";
+    context.lineCap = "round";
+    context.stroke();
+    context.restore();
+  });
 }
 
 function extractCountryCodeFromId(value) {
@@ -614,6 +926,15 @@ function getFeatureCountryCodeNormalized(feature) {
 
 function getFeatureCountryCode(feature) {
   return getFeatureCountryCodeNormalized(feature);
+}
+
+function getAtlantropaSurfaceKind(feature) {
+  return String(feature?.properties?.atl_surface_kind || "").trim().toLowerCase();
+}
+
+function isAtlantropaSeaFeature(feature) {
+  return getFeatureCountryCodeNormalized(feature) === "ATL"
+    && getAtlantropaSurfaceKind(feature) === "sea";
 }
 
 function getFeatureRegionTag(feature) {
@@ -1492,6 +1813,9 @@ function getDisplayOwnerCode(feature, id) {
 }
 
 function getResolvedFeatureColor(feature, id) {
+  if (isAtlantropaSeaFeature(feature)) {
+    return getOceanBaseFillColor();
+  }
   const direct =
     getSafeCanvasColor(state.visualOverrides?.[id], null) ||
     getSafeCanvasColor(state.featureOverrides?.[id], null);
@@ -1512,6 +1836,7 @@ function rebuildResolvedColors() {
   state.sovereignBaseColors = sanitizeCountryColorMap(state.sovereignBaseColors);
   state.visualOverrides = sanitizeColorMap(state.visualOverrides);
   state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
+  state.specialRegionOverrides = sanitizeColorMap(state.specialRegionOverrides);
   state.countryBaseColors = { ...state.sovereignBaseColors };
   state.featureOverrides = { ...state.visualOverrides };
 
@@ -1544,6 +1869,7 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false } = {}
   state.sovereignBaseColors = sanitizeCountryColorMap(state.sovereignBaseColors);
   state.visualOverrides = sanitizeColorMap(state.visualOverrides);
   state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
+  state.specialRegionOverrides = sanitizeColorMap(state.specialRegionOverrides);
   state.countryBaseColors = { ...state.sovereignBaseColors };
   state.featureOverrides = { ...state.visualOverrides };
 
@@ -1583,6 +1909,7 @@ function refreshResolvedColorsForOwners(ownerCodes, { renderNow = false } = {}) 
 
 function refreshColorState({ renderNow = true } = {}) {
   state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
+  state.specialRegionOverrides = sanitizeColorMap(state.specialRegionOverrides);
   rebuildResolvedColors();
   if (renderNow && context) {
     render();
@@ -2586,6 +2913,9 @@ function buildGlobalCountryBorderMesh(primaryTopology) {
 
 function buildGlobalCoastlineMesh(primaryTopology) {
   if (!primaryTopology?.objects || !globalThis.topojson) return null;
+  if (primaryTopology.objects.land_mask) {
+    return globalThis.topojson.mesh(primaryTopology, primaryTopology.objects.land_mask);
+  }
   if (primaryTopology.objects.land) {
     return globalThis.topojson.mesh(primaryTopology, primaryTopology.objects.land);
   }
@@ -3097,6 +3427,58 @@ function collectWaterGridCandidates(px, py, radiusProj = 0) {
   return candidates;
 }
 
+function collectSpecialGridCandidates(px, py, radiusProj = 0) {
+  const meta = state.specialSpatialGridMeta;
+  const grid = state.specialSpatialGrid;
+  if (!meta || !grid) return [];
+  const { cellSize, cols, rows, globals } = meta;
+  if (!cellSize || cols <= 0 || rows <= 0) return [];
+
+  const radius = Math.max(0, radiusProj || 0);
+  const minX = px - radius;
+  const maxX = px + radius;
+  const minY = py - radius;
+  const maxY = py + radius;
+  const c0 = clamp(Math.floor(minX / cellSize), 0, cols - 1);
+  const c1 = clamp(Math.floor(maxX / cellSize), 0, cols - 1);
+  const r0 = clamp(Math.floor(minY / cellSize), 0, rows - 1);
+  const r1 = clamp(Math.floor(maxY / cellSize), 0, rows - 1);
+
+  const buckets = [];
+  for (let row = r0; row <= r1; row += 1) {
+    for (let col = c0; col <= c1; col += 1) {
+      const key = getSpatialBucketKey(col, row);
+      const bucket = grid.get(key);
+      if (bucket?.length) {
+        buckets.push(bucket);
+      }
+    }
+  }
+
+  const seen = new Set();
+  const candidates = [];
+  const strict = radius <= 0;
+
+  const maybePush = (item) => {
+    if (!item?.id || seen.has(item.id) || !isSpecialRegionEnabled(item.feature)) return;
+    seen.add(item.id);
+    const distanceProj = getBBoxDistanceToPoint(item, px, py);
+    if (strict) {
+      if (distanceProj > 0) return;
+    } else if (distanceProj > radius) {
+      return;
+    }
+    candidates.push({ item, distanceProj });
+  };
+
+  buckets.forEach((bucket) => {
+    bucket.forEach(maybePush);
+  });
+  globals?.forEach(maybePush);
+
+  return candidates;
+}
+
 function rankCandidates(candidates, lonLat) {
   if (!Array.isArray(candidates) || !candidates.length) return [];
 
@@ -3276,20 +3658,63 @@ function getWaterHitFromPointer(
   });
 }
 
+function getSpecialHitFromPointer(
+  pointer,
+  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX } = {}
+) {
+  if (!state.showScenarioSpecialRegions || !state.specialSpatialItems?.length) return createHitResult();
+
+  const strictCandidates = collectSpecialGridCandidates(pointer.px, pointer.py, 0);
+  const strictRanked = rankCandidates(strictCandidates, pointer.lonLat);
+  const strictHit = strictRanked.find((candidate) => candidate.containsGeo);
+  if (strictHit) {
+    return toHitResult(strictHit, {
+      viaSnap: false,
+      strict: true,
+      zoomK: pointer.zoomK,
+      targetType: "special",
+    });
+  }
+
+  if (!enableSnap) return createHitResult();
+
+  const snapRadiusPx = Number.isFinite(Number(snapPx))
+    ? Math.max(0, Number(snapPx))
+    : HIT_SNAP_RADIUS_PX;
+  const radiusProj = snapRadiusPx / pointer.zoomK;
+  if (radiusProj <= 0) return createHitResult();
+
+  const snapCandidates = collectSpecialGridCandidates(pointer.px, pointer.py, radiusProj);
+  const snapRanked = rankCandidates(snapCandidates, pointer.lonLat);
+  const chosen = snapRanked.find((candidate) => candidate.containsGeo);
+  if (!chosen) return createHitResult();
+  return toHitResult(chosen, {
+    viaSnap: true,
+    strict: false,
+    zoomK: pointer.zoomK,
+    targetType: "special",
+  });
+}
+
 function buildIndex() {
   state.landIndex.clear();
   state.countryToFeatureIds.clear();
   state.idToKey.clear();
   state.keyToId.clear();
   state.waterRegionsById = new Map();
+  state.specialRegionsById = new Map();
 
-  if (Array.isArray(state.waterRegionsData?.features)) {
-    state.waterRegionsData.features.forEach((feature) => {
-      const id = getFeatureId(feature);
-      if (!id) return;
-      state.waterRegionsById.set(id, feature);
-    });
-  }
+  getEffectiveWaterRegionFeatures().forEach((feature) => {
+    const id = getFeatureId(feature);
+    if (!id) return;
+    state.waterRegionsById.set(id, feature);
+  });
+
+  getEffectiveSpecialRegionFeatures().forEach((feature) => {
+    const id = getFeatureId(feature);
+    if (!id) return;
+    state.specialRegionsById.set(id, feature);
+  });
 
   if (state.selectedWaterRegionId && !state.waterRegionsById.has(state.selectedWaterRegionId)) {
     state.selectedWaterRegionId = "";
@@ -3300,9 +3725,21 @@ function buildIndex() {
     }
   }
 
+  if (state.selectedSpecialRegionId && !state.specialRegionsById.has(state.selectedSpecialRegionId)) {
+    state.selectedSpecialRegionId = "";
+  } else if (state.selectedSpecialRegionId) {
+    const selectedFeature = state.specialRegionsById.get(state.selectedSpecialRegionId);
+    if (!isSpecialRegionEnabled(selectedFeature)) {
+      state.selectedSpecialRegionId = "";
+    }
+  }
+
   if (!state.landData || !state.landData.features) {
     if (typeof state.renderWaterRegionListFn === "function") {
       state.renderWaterRegionListFn();
+    }
+    if (typeof state.renderSpecialRegionListFn === "function") {
+      state.renderSpecialRegionListFn();
     }
     return;
   }
@@ -3325,6 +3762,9 @@ function buildIndex() {
   }
   if (typeof state.renderWaterRegionListFn === "function") {
     state.renderWaterRegionListFn();
+  }
+  if (typeof state.renderSpecialRegionListFn === "function") {
+    state.renderSpecialRegionListFn();
   }
   if (typeof state.renderPresetTreeFn === "function") {
     state.renderPresetTreeFn();
@@ -3369,6 +3809,11 @@ function buildSpatialIndex() {
   state.waterSpatialGrid = new Map();
   state.waterSpatialGridMeta = null;
   state.waterSpatialItemsById = new Map();
+  state.specialSpatialItems = [];
+  state.specialSpatialIndex = null;
+  state.specialSpatialGrid = new Map();
+  state.specialSpatialGridMeta = null;
+  state.specialSpatialItemsById = new Map();
   if (!state.landData || !state.landData.features || !pathSVG) return;
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
 
@@ -3395,36 +3840,64 @@ function buildSpatialIndex() {
 
   buildSpatialGrid(state.spatialItems, canvasWidth, canvasHeight);
   state.spatialIndex = null;
-  if (Array.isArray(state.waterRegionsData?.features)) {
-    for (const feature of state.waterRegionsData.features) {
-      const id = getFeatureId(feature);
-      if (!id) continue;
-      const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: false })
-        || getProjectedFeatureBounds(feature, { featureId: id });
-      if (!bounds) continue;
-      state.waterSpatialItems.push({
-        id,
-        feature,
-        countryCode: "",
-        source: String(feature?.properties?.__source || "primary"),
-        minX: bounds.minX,
-        minY: bounds.minY,
-        maxX: bounds.maxX,
-        maxY: bounds.maxY,
-        bboxArea: bounds.area,
-      });
-    }
+  const buildSecondarySpatialGrid = (items, assign) => {
     const previousGrid = state.spatialGrid;
     const previousMeta = state.spatialGridMeta;
     const previousItemsById = state.spatialItemsById;
-    buildSpatialGrid(state.waterSpatialItems, canvasWidth, canvasHeight);
-    state.waterSpatialGrid = state.spatialGrid;
-    state.waterSpatialGridMeta = state.spatialGridMeta;
-    state.waterSpatialItemsById = state.spatialItemsById;
+    buildSpatialGrid(items, canvasWidth, canvasHeight);
+    assign();
     state.spatialGrid = previousGrid;
     state.spatialGridMeta = previousMeta;
     state.spatialItemsById = previousItemsById;
-  }
+  };
+
+  getEffectiveWaterRegionFeatures().forEach((feature) => {
+    const id = getFeatureId(feature);
+    if (!id) return;
+    const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: false })
+      || getProjectedFeatureBounds(feature, { featureId: id });
+    if (!bounds) return;
+    state.waterSpatialItems.push({
+      id,
+      feature,
+      countryCode: "",
+      source: String(feature?.properties?.__source || "primary"),
+      minX: bounds.minX,
+      minY: bounds.minY,
+      maxX: bounds.maxX,
+      maxY: bounds.maxY,
+      bboxArea: bounds.area,
+    });
+  });
+  buildSecondarySpatialGrid(state.waterSpatialItems, () => {
+    state.waterSpatialGrid = state.spatialGrid;
+    state.waterSpatialGridMeta = state.spatialGridMeta;
+    state.waterSpatialItemsById = state.spatialItemsById;
+  });
+
+  getEffectiveSpecialRegionFeatures().forEach((feature) => {
+    const id = getFeatureId(feature);
+    if (!id) return;
+    const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: false })
+      || getProjectedFeatureBounds(feature, { featureId: id });
+    if (!bounds) return;
+    state.specialSpatialItems.push({
+      id,
+      feature,
+      countryCode: "",
+      source: String(feature?.properties?.__source || "scenario"),
+      minX: bounds.minX,
+      minY: bounds.minY,
+      maxX: bounds.maxX,
+      maxY: bounds.maxY,
+      bboxArea: bounds.area,
+    });
+  });
+  buildSecondarySpatialGrid(state.specialSpatialItems, () => {
+    state.specialSpatialGrid = state.spatialGrid;
+    state.specialSpatialGridMeta = state.spatialGridMeta;
+    state.specialSpatialItemsById = state.spatialItemsById;
+  });
   state.hitCanvasDirty = true;
 }
 
@@ -3432,11 +3905,18 @@ function getHitFromEvent(
   event,
   { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown" } = {}
 ) {
-  if ((!state.landData || !state.spatialItems?.length) && !state.waterSpatialItems?.length) {
+  if ((!state.landData || !state.spatialItems?.length) && !state.waterSpatialItems?.length && !state.specialSpatialItems?.length) {
     return createHitResult();
   }
   const pointer = getPointerProjectionPosition(event);
   if (!pointer) return createHitResult();
+  const specialHit = getSpecialHitFromPointer(pointer, {
+    enableSnap,
+    snapPx,
+  });
+  if (specialHit.id) {
+    return specialHit;
+  }
   const landHit = getLandHitFromPointer(event, pointer, {
     enableSnap,
     snapPx,
@@ -3446,6 +3926,9 @@ function getHitFromEvent(
     enableSnap,
     snapPx,
   });
+  if (waterHit.id && isScenarioWaterRegion(waterHit.feature)) {
+    return waterHit;
+  }
   if (shouldPreferWaterHit(landHit, waterHit)) {
     return waterHit;
   }
@@ -3694,9 +4177,11 @@ function applyOceanClipMask(maskMode) {
   }
 
   pathCanvas({ type: "Sphere" });
-  const landMask = Array.isArray(state.landData?.features) && state.landData.features.length
-    ? state.landData
-    : (Array.isArray(state.landBgData?.features) && state.landBgData.features.length ? state.landBgData : null);
+  const landMask = Array.isArray(state.scenarioLandMaskData?.features) && state.scenarioLandMaskData.features.length
+    ? state.scenarioLandMaskData
+    : Array.isArray(state.landData?.features) && state.landData.features.length
+      ? state.landData
+      : (Array.isArray(state.landBgData?.features) && state.landBgData.features.length ? state.landBgData : null);
 
   if (landMask) {
     pathCanvas(landMask);
@@ -3976,6 +4461,9 @@ function getAtlasFeatureAlphaMultiplier(atlasClass, cfg) {
 }
 
 function getPhysicalLandMask() {
+  if (Array.isArray(state.scenarioLandMaskData?.features) && state.scenarioLandMaskData.features.length) {
+    return state.scenarioLandMaskData;
+  }
   if (Array.isArray(state.landBgData?.features) && state.landBgData.features.length) {
     return state.landBgData;
   }
@@ -5345,6 +5833,7 @@ function drawAdmin0BackgroundFills() {
   if (!entries.length) return;
 
   entries.forEach(({ code, mergedShape }) => {
+    if (code === "ATL") return;
     const color =
       (state.sovereignBaseColors && state.sovereignBaseColors[code]) ||
       (state.countryBaseColors && state.countryBaseColors[code]) ||
@@ -5415,22 +5904,39 @@ function drawPoliticalPass(k) {
     context.fill();
 
     if (debugMode === "PROD") {
-      context.strokeStyle = fillColor;
-      context.lineWidth = 0.5 / k;
+      context.strokeStyle = isAtlantropaSeaFeature(feature)
+        ? "rgba(62, 96, 138, 0.45)"
+        : fillColor;
+      context.lineWidth = isAtlantropaSeaFeature(feature)
+        ? (0.65 / k)
+        : (0.5 / k);
       context.lineJoin = "round";
       context.stroke();
     }
   });
+}
 
-if (state.showWaterRegions && Array.isArray(state.waterRegionsData?.features)) {
-    state.waterRegionsData.features.forEach((feature, index) => {
+function drawScenarioRegionOverlaysPass(k) {
+  const showWater = !!state.showWaterRegions;
+  const showSpecial = !!state.showScenarioSpecialRegions;
+  if (!showWater && !showSpecial && !state.scenarioRuntimeTopologyData) {
+    return;
+  }
+
+  if (showWater || state.scenarioRuntimeTopologyData) {
+    getEffectiveWaterRegionFeatures().forEach((feature, index) => {
       const id = getFeatureId(feature) || `water-${index}`;
+      const renderAsBase = isBaseGeographyScenarioFeature(feature);
+      if (!renderAsBase && !showWater) return;
       if (!isWaterRegionEnabled(feature)) return;
       if (!pathBoundsInScreen(feature)) return;
       const waterType = getWaterRegionType(feature);
       const hasOverride = Object.prototype.hasOwnProperty.call(state.waterRegionOverrides || {}, id);
       const opaqueFillTypes = new Set(["lake", "inland_sea", "strait", "chokepoint"]);
-      const fillOpacity = hasOverride || opaqueFillTypes.has(waterType) ? 1 : 0.18;
+      const defaultStyle = getWaterRegionDefaultStyle(feature);
+      const fillOpacity = renderAsBase
+        ? Math.max(defaultStyle.opacity, 0.94)
+        : (hasOverride || opaqueFillTypes.has(waterType) ? defaultStyle.opacity : 0.18);
       context.beginPath();
       pathCanvas(feature);
       context.save();
@@ -5438,8 +5944,31 @@ if (state.showWaterRegions && Array.isArray(state.waterRegionsData?.features)) {
       context.fillStyle = getWaterRegionColor(id);
       context.fill();
       context.restore();
-      context.strokeStyle = "rgba(62, 96, 138, 0.45)";
+      context.strokeStyle = defaultStyle.stroke;
       context.lineWidth = 0.65 / Math.max(0.0001, k);
+      context.lineJoin = "round";
+      context.stroke();
+    });
+  }
+
+  if (showSpecial || state.scenarioRuntimeTopologyData) {
+    getEffectiveSpecialRegionFeatures().forEach((feature, index) => {
+      const id = getFeatureId(feature) || `special-${index}`;
+      const renderAsBase = isBaseGeographyScenarioFeature(feature);
+      if (!renderAsBase && !showSpecial) return;
+      if (!isSpecialRegionEnabled(feature)) return;
+      if (!pathBoundsInScreen(feature)) return;
+      context.beginPath();
+      pathCanvas(feature);
+      context.save();
+      context.globalAlpha = renderAsBase
+        ? Math.max(getSpecialRegionOpacity(feature, id), 0.94)
+        : getSpecialRegionOpacity(feature, id);
+      context.fillStyle = getSpecialRegionColor(id, feature);
+      context.fill();
+      context.restore();
+      context.strokeStyle = getSpecialRegionStrokeColor(feature);
+      context.lineWidth = 1 / Math.max(0.0001, k);
       context.lineJoin = "round";
       context.stroke();
     });
@@ -5454,6 +5983,8 @@ function drawContextPass(k, { interactive = false } = {}) {
   drawPhysicalLayer(k, { interactive });
   drawUrbanLayer(k, { interactive });
   drawRiversLayer(k, { interactive });
+  drawScenarioRegionOverlaysPass(k);
+  drawScenarioReliefOverlaysLayer(k);
 }
 
 function drawDayNightPass(k, { interactive = false } = {}) {
@@ -5823,10 +6354,15 @@ function renderHoverOverlay() {
     return;
   }
 
-  const feature = state.hoveredWaterRegionId
-    ? state.waterRegionsById.get(state.hoveredWaterRegionId)
-    : (state.hoveredId ? state.landIndex.get(state.hoveredId) : null);
-  const data = feature && (!state.hoveredWaterRegionId || isWaterRegionEnabled(feature)) ? [feature] : [];
+  const feature = state.hoveredSpecialRegionId
+    ? state.specialRegionsById.get(state.hoveredSpecialRegionId)
+    : state.hoveredWaterRegionId
+      ? state.waterRegionsById.get(state.hoveredWaterRegionId)
+      : (state.hoveredId ? state.landIndex.get(state.hoveredId) : null);
+  const data = feature && (
+    (!state.hoveredSpecialRegionId || isSpecialRegionEnabled(feature))
+    && (!state.hoveredWaterRegionId || isWaterRegionEnabled(feature))
+  ) ? [feature] : [];
 
   const selection = hoverGroup
     .selectAll("path.hovered-feature")
@@ -6306,10 +6842,11 @@ function handleMouseMove(event) {
   const now = performance.now();
   if (now - state.lastMouseMoveTime < state.MOUSE_THROTTLE_MS) return;
   state.lastMouseMoveTime = now;
-  if (!state.landData && !state.waterRegionsData) return;
+  if (!state.landData && !state.waterRegionsData && !state.scenarioSpecialRegionsData) return;
   if (state.specialZoneEditor?.active) {
     state.hoveredId = null;
     state.hoveredWaterRegionId = null;
+    state.hoveredSpecialRegionId = null;
     renderHoverOverlay();
     if (tooltip) {
       tooltip.textContent = "";
@@ -6325,19 +6862,29 @@ function handleMouseMove(event) {
     eventType: "hover",
   });
   const id = hit.id;
+  const nextHoveredSpecialId = hit.targetType === "special" ? id : null;
   const nextHoveredLandId = hit.targetType === "land" ? id : null;
   const nextHoveredWaterId = hit.targetType === "water" ? id : null;
-  if (nextHoveredLandId !== state.hoveredId || nextHoveredWaterId !== state.hoveredWaterRegionId) {
+  if (
+    nextHoveredLandId !== state.hoveredId
+    || nextHoveredWaterId !== state.hoveredWaterRegionId
+    || nextHoveredSpecialId !== state.hoveredSpecialRegionId
+  ) {
     state.hoveredId = nextHoveredLandId;
     state.hoveredWaterRegionId = nextHoveredWaterId;
+    state.hoveredSpecialRegionId = nextHoveredSpecialId;
     if (!reducedHoverPhase) {
       renderHoverOverlay();
     }
   }
 
   if (!tooltip) return;
-  if (id && (state.landIndex.has(id) || state.waterRegionsById.has(id))) {
-    const feature = hit.targetType === "water" ? state.waterRegionsById.get(id) : state.landIndex.get(id);
+  if (id && (state.landIndex.has(id) || state.waterRegionsById.has(id) || state.specialRegionsById.has(id))) {
+    const feature = hit.targetType === "special"
+      ? state.specialRegionsById.get(id)
+      : hit.targetType === "water"
+        ? state.waterRegionsById.get(id)
+        : state.landIndex.get(id);
     tooltip.textContent = getTooltipText(feature);
     tooltip.style.left = `${event.clientX + 12}px`;
     tooltip.style.top = `${event.clientY + 12}px`;
@@ -6392,6 +6939,7 @@ function collectCountryCodesForFeatureIds(featureIds) {
 function refreshSidebarAfterPaint({
   featureIds = [],
   waterRegionIds = [],
+  specialRegionIds = [],
   ownerCodes = [],
   refreshPresetTree = false,
 } = {}) {
@@ -6403,6 +6951,9 @@ function refreshSidebarAfterPaint({
   );
   if (typeof state.renderWaterRegionListFn === "function" && Array.isArray(waterRegionIds)) {
     state.renderWaterRegionListFn();
+  }
+  if (typeof state.renderSpecialRegionListFn === "function" && Array.isArray(specialRegionIds)) {
+    state.renderSpecialRegionListFn();
   }
   if (typeof state.refreshCountryListRowsFn === "function") {
     state.refreshCountryListRowsFn({
@@ -6640,9 +7191,11 @@ function ensureBrushSession(event) {
     startY: Number(event?.clientY || 0),
     visitedFeatureIds: new Set(),
     visitedWaterRegionIds: new Set(),
+    visitedSpecialRegionIds: new Set(),
     visitedOwnerCodes: new Set(),
     affectedFeatureIds: new Set(),
     affectedWaterRegionIds: new Set(),
+    affectedSpecialRegionIds: new Set(),
     affectedOwnerCodes: new Set(),
     affectedSovereigntyIds: new Set(),
     before: {},
@@ -6653,6 +7206,25 @@ function ensureBrushSession(event) {
 
 function applyBrushHit(hit) {
   if (!hit?.id) return false;
+  if (hit.targetType === "special") {
+    const specialId = String(hit.id || "").trim();
+    if (!specialId || brushSession.visitedSpecialRegionIds.has(specialId)) return false;
+    if (state.currentTool === "eyedropper") return false;
+    mergeHistorySnapshot(brushSession.before, captureHistoryState({ specialRegionIds: [specialId] }));
+    brushSession.visitedSpecialRegionIds.add(specialId);
+    brushSession.affectedSpecialRegionIds.add(specialId);
+    if (state.currentTool === "eraser") {
+      delete state.specialRegionOverrides[specialId];
+    } else {
+      state.specialRegionOverrides[specialId] = getSafeCanvasColor(
+        state.selectedColor,
+        getSpecialRegionColor(specialId)
+      );
+    }
+    state.selectedSpecialRegionId = specialId;
+    brushSession.changed = true;
+    return true;
+  }
   if (hit.targetType === "water") {
     const waterId = String(hit.id || "").trim();
     if (!waterId || brushSession.visitedWaterRegionIds.has(waterId)) return false;
@@ -6770,9 +7342,10 @@ function flushBrushSession() {
   if (!current.dragging || !current.changed) return;
   const featureIds = Array.from(current.affectedFeatureIds);
   const waterRegionIds = Array.from(current.affectedWaterRegionIds);
+  const specialRegionIds = Array.from(current.affectedSpecialRegionIds);
   const ownerCodes = Array.from(current.affectedOwnerCodes);
   const sovereigntyFeatureIds = Array.from(current.affectedSovereigntyIds);
-  const after = captureHistoryState({ featureIds, waterRegionIds, ownerCodes, sovereigntyFeatureIds });
+  const after = captureHistoryState({ featureIds, waterRegionIds, specialRegionIds, ownerCodes, sovereigntyFeatureIds });
   pushHistoryEntry({
     kind: state.currentTool === "eraser" ? "brush-erase" : "brush-fill",
     before: current.before,
@@ -6788,6 +7361,7 @@ function flushBrushSession() {
   refreshSidebarAfterPaint({
     featureIds,
     waterRegionIds,
+    specialRegionIds,
     ownerCodes,
   });
   if (typeof state.renderNowFn === "function") {
@@ -6829,7 +7403,7 @@ function handleBrushPointerMove(event) {
 
 function handleClick(event) {
   const actionStart = nowMs();
-  if (!state.landData && !state.waterRegionsData) return;
+  if (!state.landData && !state.waterRegionsData && !state.scenarioSpecialRegionsData) return;
   if (suppressNextClickAfterBrush) {
     suppressNextClickAfterBrush = false;
     return;
@@ -6849,9 +7423,71 @@ function handleClick(event) {
   });
   const id = hit.id;
   if (!id) return;
+  if (hit.targetType === "special") {
+    const specialFeature = state.specialRegionsById.get(id);
+    if (!specialFeature) return;
+    state.selectedWaterRegionId = "";
+    if (typeof state.renderWaterRegionListFn === "function") {
+      state.renderWaterRegionListFn();
+    }
+    state.selectedSpecialRegionId = id;
+    if (typeof state.renderSpecialRegionListFn === "function") {
+      state.renderSpecialRegionListFn();
+    }
+    if (state.currentTool === "eraser") {
+      const historyBefore = captureHistoryState({ specialRegionIds: [id] });
+      delete state.specialRegionOverrides[id];
+      markDirty("erase-special-region-color");
+      commitHistoryEntry({
+        kind: "erase-special-region-color",
+        before: historyBefore,
+        after: captureHistoryState({ specialRegionIds: [id] }),
+      });
+      if (context) {
+        render();
+      }
+      refreshSidebarAfterPaint({ specialRegionIds: [id] });
+      noteRenderAction("click-erase-special", actionStart);
+      return;
+    }
+    if (state.currentTool === "eyedropper") {
+      const picked = getSpecialRegionColor(id, specialFeature);
+      if (picked) {
+        state.selectedColor = picked;
+        if (typeof state.updateSwatchUIFn === "function") {
+          state.updateSwatchUIFn();
+        }
+      }
+      noteRenderAction("eyedropper-special", actionStart);
+      return;
+    }
+    const currentColor = getSpecialRegionColor(id, specialFeature);
+    const nextColor = getSafeCanvasColor(state.selectedColor, currentColor);
+    if (nextColor !== currentColor) {
+      const historyBefore = captureHistoryState({ specialRegionIds: [id] });
+      state.specialRegionOverrides[id] = nextColor;
+      markDirty("fill-special-region-color");
+      commitHistoryEntry({
+        kind: "fill-special-region-color",
+        before: historyBefore,
+        after: captureHistoryState({ specialRegionIds: [id] }),
+      });
+      addRecentColor(nextColor);
+      if (context) {
+        render();
+      }
+      refreshSidebarAfterPaint({ specialRegionIds: [id] });
+    }
+    noteRenderAction("click-fill-special", actionStart);
+    return;
+  }
   if (hit.targetType === "water") {
     const waterFeature = state.waterRegionsById.get(id);
     if (!waterFeature) return;
+    state.selectedSpecialRegionId = "";
+    if (typeof state.renderSpecialRegionListFn === "function") {
+      state.renderSpecialRegionListFn();
+    }
     state.selectedWaterRegionId = id;
     if (typeof state.renderWaterRegionListFn === "function") {
       state.renderWaterRegionListFn();
@@ -6893,6 +7529,12 @@ function handleClick(event) {
     state.selectedWaterRegionId = "";
     if (typeof state.renderWaterRegionListFn === "function") {
       state.renderWaterRegionListFn();
+    }
+  }
+  if (state.selectedSpecialRegionId) {
+    state.selectedSpecialRegionId = "";
+    if (typeof state.renderSpecialRegionListFn === "function") {
+      state.renderSpecialRegionListFn();
     }
   }
   const feature = state.landIndex.get(id);
@@ -7339,6 +7981,7 @@ function initMap({ containerId = "mapContainer" } = {}) {
   state.sovereignBaseColors = sanitizeCountryColorMap(state.sovereignBaseColors);
   state.visualOverrides = sanitizeColorMap(state.visualOverrides);
   state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
+  state.specialRegionOverrides = sanitizeColorMap(state.specialRegionOverrides);
   state.colors = sanitizeColorMap(state.colors);
   state.debugMode = debugMode;
   resetRenderDiagnostics();
@@ -7394,6 +8037,7 @@ function setMapData({ refitProjection = true, resetZoom = true } = {}) {
   state.countryBaseColors = sanitizeCountryColorMap(state.countryBaseColors);
   state.featureOverrides = sanitizeColorMap(state.featureOverrides);
   state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
+  state.specialRegionOverrides = sanitizeColorMap(state.specialRegionOverrides);
   migrateLegacyColorState();
   buildRuntimePoliticalMeta();
   state.sovereigntyInitialized = false;

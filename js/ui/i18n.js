@@ -172,6 +172,7 @@ function updateUIText() {
     ["zoomResetBtn", "Fit"],
     ["lblCountrySearch", "Search Countries"],
     ["lblWaterSearch", "Search Water Regions"],
+    ["lblSpecialRegionSearch", "Search Special Regions"],
     ["lblPresetsHierarchy", "Territories & Presets"],
     ["lblCountryInspector", "Country Inspector"],
     ["lblWaterInspector", "Water Regions"],
@@ -179,17 +180,26 @@ function updateUIText() {
     ["lblWaterInspectorOpenOceanToggle", "Allow Open-Ocean Interaction"],
     ["waterInspectorOpenOceanHint", "When off, macro ocean regions are ignored for hover, click, and paint."],
     ["waterInspectorOpenOceanHintEnabled", "Macro ocean regions are currently included in hover, click, and paint."],
+    ["lblSpecialRegionInspector", "Special Regions"],
+    ["lblScenarioSpecialRegionVisibility", "Visibility"],
+    ["lblScenarioSpecialRegionVisibilityToggle", "Show Scenario Special Regions"],
+    ["scenarioSpecialRegionVisibilityHint", "When off, scenario special regions are hidden and ignore hover, click, and paint."],
+    ["scenarioSpecialRegionVisibilityHintEnabled", "Scenario special regions are currently visible and interactive."],
     ["lblProjectLegend", "Project & Legend"],
     ["lblDiagnostics", "Diagnostics"],
     ["lblCountryColors", "Country Colors"],
     ["lblWaterLegend", "Water Overrides"],
+    ["lblSpecialRegionLegend", "Special Region Overrides"],
     ["countryInspectorOrderingHint", "Key scenario countries first. Releasables appear under parent countries."],
     ["countryInspectorEmptyTitle", "Select a country to inspect"],
     ["countryInspectorEmptyHint", "Choose a country above, then use Active Owner and the Territories & Presets panel."],
     ["waterInspectorEmptyTitle", "Select a water region to inspect"],
     ["waterInspectorEmptyHint", "Click a sea, lake, or strait on the map, or choose one from the list."],
+    ["specialRegionInspectorEmptyTitle", "Select a special region to inspect"],
+    ["specialRegionInspectorEmptyHint", "Click a drained basin or exposure zone on the map, or choose one from the list."],
     ["resetCountryColors", "Reset Country Colors"],
     ["clearWaterRegionColorBtn", "Clear Water Override"],
+    ["clearSpecialRegionColorBtn", "Clear Special Region Override"],
     ["lblHistoricalPresets", "Selected Country Actions"],
     ["selectedCountryActionHint", "Choose a country above to inspect territories, presets, and releasables."],
     ["lblSpecialZones", "Special Zones"],
@@ -260,6 +270,16 @@ function updateUIText() {
   const searchInput = document.getElementById("countrySearch");
   if (searchInput) {
     searchInput.setAttribute("placeholder", t("Search country or code...", "ui"));
+  }
+
+  const waterSearchInput = document.getElementById("waterRegionSearch");
+  if (waterSearchInput) {
+    waterSearchInput.setAttribute("placeholder", t("Search sea, lake, or strait...", "ui"));
+  }
+
+  const specialRegionSearchInput = document.getElementById("specialRegionSearch");
+  if (specialRegionSearchInput) {
+    specialRegionSearchInput.setAttribute("placeholder", t("Search basin, shelf, or exposure...", "ui"));
   }
 
   const paletteLibrarySearch = document.getElementById("paletteLibrarySearch");

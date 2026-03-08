@@ -418,6 +418,48 @@ function getScenarioDefaultCountryCode(manifest, countryMap = {}) {
   ).trim().toUpperCase();
 }
 
+function normalizeScenarioFeatureCollection(payload) {
+  if (!Array.isArray(payload?.features)) {
+    return null;
+  }
+  return {
+    type: "FeatureCollection",
+    features: payload.features,
+  };
+}
+
+function normalizeScenarioRuntimeTopologyPayload(payload) {
+  if (!payload || typeof payload !== "object") {
+    return null;
+  }
+  if (!payload.objects || typeof payload.objects !== "object") {
+    return null;
+  }
+  if (
+    !payload.objects.political
+    && !payload.objects.scenario_water
+    && !payload.objects.scenario_special_land
+    && !payload.objects.land_mask
+    && !payload.objects.land
+  ) {
+    return null;
+  }
+  return payload;
+}
+
+function getScenarioTopologyFeatureCollection(topologyPayload, objectName) {
+  const object = topologyPayload?.objects?.[objectName];
+  if (!object || typeof globalThis.topojson?.feature !== "function") {
+    return null;
+  }
+  try {
+    return normalizeScenarioFeatureCollection(globalThis.topojson.feature(topologyPayload, object));
+  } catch (error) {
+    console.warn(`[scenario] Failed to decode scenario topology object "${objectName}".`, error);
+    return null;
+  }
+}
+
 function ensureScenarioAuditUiState() {
   if (!state.scenarioAuditUi || typeof state.scenarioAuditUi !== "object") {
     state.scenarioAuditUi = {
@@ -474,12 +516,46 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     throw new Error("d3.json is not available for scenario loading.");
   }
   const manifest = await d3Client.json(cacheBust(meta.manifest_url));
-  const [countriesPayload, ownersPayload, controllersPayload, coresPayload] = await Promise.all([
+  const [
+    countriesPayload,
+    ownersPayload,
+    controllersPayload,
+    coresPayload,
+    waterRegionsPayload,
+    specialRegionsPayload,
+    reliefOverlaysPayload,
+    runtimeTopologyPayload,
+  ] =
+    await Promise.all([
     d3Client.json(cacheBust(manifest.countries_url)),
     d3Client.json(cacheBust(manifest.owners_url)),
     manifest.controllers_url ? d3Client.json(cacheBust(manifest.controllers_url)) : Promise.resolve(null),
     d3Client.json(cacheBust(manifest.cores_url)),
-  ]);
+    manifest.water_regions_url
+      ? d3Client.json(cacheBust(manifest.water_regions_url)).catch((error) => {
+        console.warn(`[scenario] Failed to load scenario water regions for "${targetId}".`, error);
+        return null;
+      })
+      : Promise.resolve(null),
+    manifest.special_regions_url
+      ? d3Client.json(cacheBust(manifest.special_regions_url)).catch((error) => {
+        console.warn(`[scenario] Failed to load scenario special regions for "${targetId}".`, error);
+        return null;
+      })
+      : Promise.resolve(null),
+    manifest.relief_overlays_url
+      ? d3Client.json(cacheBust(manifest.relief_overlays_url)).catch((error) => {
+        console.warn(`[scenario] Failed to load scenario relief overlays for "${targetId}".`, error);
+        return null;
+      })
+      : Promise.resolve(null),
+    manifest.runtime_topology_url
+      ? d3Client.json(cacheBust(manifest.runtime_topology_url)).catch((error) => {
+        console.warn(`[scenario] Failed to load scenario runtime topology for "${targetId}".`, error);
+        return null;
+      })
+      : Promise.resolve(null),
+    ]);
   const bundle = {
     meta,
     manifest,
@@ -487,6 +563,10 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     ownersPayload,
     controllersPayload,
     coresPayload,
+    waterRegionsPayload: normalizeScenarioFeatureCollection(waterRegionsPayload),
+    specialRegionsPayload: normalizeScenarioFeatureCollection(specialRegionsPayload),
+    reliefOverlaysPayload: normalizeScenarioFeatureCollection(reliefOverlaysPayload),
+    runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(runtimeTopologyPayload),
     auditPayload: null,
   };
   const ownerCount = Object.keys(ownersPayload?.owners || {}).length;
@@ -836,6 +916,7 @@ async function applyScenarioBundle(
 
   const scenarioId = normalizeScenarioId(bundle.manifest.scenario_id || bundle.meta?.scenario_id);
   const baseCountryMap = bundle.countriesPayload?.countries || {};
+  const baseCountryTags = Object.keys(baseCountryMap || {});
   const owners = bundle.ownersPayload?.owners || {};
   const controllers = bundle.controllersPayload?.controllers || owners;
   const cores = bundle.coresPayload?.cores || {};
@@ -843,8 +924,12 @@ async function applyScenarioBundle(
   disableScenarioParentBorders();
 
   state.activeScenarioId = scenarioId;
-  state.scenarioReleasableIndex = buildScenarioReleasableIndex(scenarioId);
-  const releasableCountries = getScenarioReleasableCountries(scenarioId);
+  state.scenarioReleasableIndex = buildScenarioReleasableIndex(scenarioId, {
+    excludeTags: baseCountryTags,
+  });
+  const releasableCountries = getScenarioReleasableCountries(scenarioId, {
+    excludeTags: baseCountryTags,
+  });
   Object.keys(releasableCountries).forEach((tag) => {
     if (baseCountryMap[tag]) {
       console.warn(`[scenario] Releasable tag conflict detected for "${tag}" while applying "${scenarioId}".`);
@@ -854,12 +939,28 @@ async function applyScenarioBundle(
     ...baseCountryMap,
     ...releasableCountries,
   };
+  const runtimeTopologyPayload = bundle.runtimeTopologyPayload || null;
+  const scenarioWaterRegionsFromTopology = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water");
+  const scenarioSpecialRegionsFromTopology = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land");
+  const scenarioLandMaskFromTopology =
+    getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land_mask")
+    || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land");
   const scenarioNameMap = getScenarioNameMap(countryMap);
   const scenarioColorMap = getScenarioFixedOwnerColors(countryMap);
   state.scenarioBorderMode = "scenario_owner_only";
   state.activeScenarioManifest = bundle.manifest || null;
   state.scenarioCountriesByTag = countryMap;
   state.scenarioFixedOwnerColors = scenarioColorMap;
+  state.defaultRuntimePoliticalTopology = state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null;
+  state.scenarioRuntimeTopologyData = runtimeTopologyPayload;
+  state.runtimePoliticalTopology = runtimeTopologyPayload?.objects?.political
+    ? runtimeTopologyPayload
+    : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null);
+  state.scenarioLandMaskData = scenarioLandMaskFromTopology || null;
+  state.scenarioWaterRegionsData = scenarioWaterRegionsFromTopology || bundle.waterRegionsPayload || null;
+  state.scenarioSpecialRegionsData = scenarioSpecialRegionsFromTopology || bundle.specialRegionsPayload || null;
+  state.scenarioReliefOverlaysData = bundle.reliefOverlaysPayload || null;
+  state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;
   state.scenarioAudit = bundle.auditPayload || null;
   setScenarioAuditUiState({
     loading: false,
@@ -889,10 +990,15 @@ async function applyScenarioBundle(
   state.sovereignBaseColors = { ...scenarioColorMap };
   state.countryBaseColors = { ...scenarioColorMap };
   state.activeSovereignCode = defaultCountryCode;
+  state.selectedWaterRegionId = "";
+  state.selectedSpecialRegionId = "";
+  state.hoveredWaterRegionId = null;
+  state.hoveredSpecialRegionId = null;
   syncScenarioInspectorSelection(defaultCountryCode);
   rebuildPresetState();
   applyScenarioPaintMode();
   syncScenarioOceanFillForActivation(bundle.manifest);
+  setMapData({ refitProjection: false, resetZoom: false });
   if (typeof document !== "undefined") {
     const presetSection = document.getElementById("selectedCountryActionsSection");
     if (presetSection && "open" in presetSection) {
@@ -1047,6 +1153,13 @@ function clearActiveScenario(
   state.activeScenarioManifest = null;
   state.scenarioCountriesByTag = {};
   state.scenarioFixedOwnerColors = {};
+  state.scenarioRuntimeTopologyData = null;
+  state.scenarioLandMaskData = null;
+  state.runtimePoliticalTopology = state.defaultRuntimePoliticalTopology || null;
+  state.scenarioWaterRegionsData = null;
+  state.scenarioSpecialRegionsData = null;
+  state.scenarioReliefOverlaysData = null;
+  state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;
   state.scenarioReleasableIndex = {
     byTag: {},
     childTagsByParent: {},
@@ -1078,6 +1191,10 @@ function clearActiveScenario(
   };
   state.scenarioViewMode = "ownership";
   state.countryNames = { ...countryNames };
+  state.selectedWaterRegionId = "";
+  state.selectedSpecialRegionId = "";
+  state.hoveredWaterRegionId = null;
+  state.hoveredSpecialRegionId = null;
   resetAllFeatureOwnersToCanonical();
   state.visualOverrides = {};
   state.featureOverrides = {};
@@ -1089,6 +1206,7 @@ function clearActiveScenario(
   restoreParentBordersAfterScenario();
   restorePaintModeAfterScenario();
   restoreScenarioOceanFillAfterExit();
+  setMapData({ refitProjection: false, resetZoom: false });
   rebuildPresetState();
   refreshScenarioShellOverlays({ renderNow: false, borderReason: "scenario-clear" });
   if (markDirtyReason) {
@@ -1136,7 +1254,9 @@ function initScenarioManager({ render } = {}) {
   const renderScenarioControls = () => {
     const entries = getScenarioRegistryEntries();
     if (scenarioSelect) {
-      const currentValue = normalizeScenarioId(state.activeScenarioId || scenarioSelect.value);
+      const pendingValue = normalizeScenarioId(scenarioSelect.value);
+      const activeValue = normalizeScenarioId(state.activeScenarioId);
+      const currentValue = pendingValue || activeValue;
       scenarioSelect.replaceChildren();
       const emptyOption = document.createElement("option");
       emptyOption.value = "";
@@ -1289,6 +1409,7 @@ export {
   loadScenarioAuditPayload,
   loadScenarioBundle,
   loadScenarioRegistry,
+  recalculateScenarioOwnerControllerDiffCount,
   refreshScenarioShellOverlays,
   resetToScenarioBaseline,
   setScenarioViewMode,

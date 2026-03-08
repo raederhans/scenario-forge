@@ -1,8 +1,8 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1936",
-  "generated_at": "2026-03-08T00:34:57.712995+00:00",
-  "baseline_hash": "b4689a20e69196ae67c8897e62d81b96d1948bbf3e2ed528ad809826b63b0778",
+  "generated_at": "2026-03-08T03:23:06.186262+00:00",
+  "baseline_hash": "282ccf50c789733361766ea6bed925f231faaa29331fed00c9252f3f278f4214",
   "cores": {
     "AFG-1741": [
       "AFG"
@@ -14171,22 +14171,22 @@
       "VIN"
     ],
     "LBN-3022": [
-      "FRA"
+      "LEB"
     ],
     "LBN-3023": [
-      "FRA"
+      "LEB"
     ],
     "LBN-3024": [
-      "FRA"
+      "LEB"
     ],
     "LBN-3025": [
-      "FRA"
+      "LEB"
     ],
     "LBN-3059": [
-      "FRA"
+      "LEB"
     ],
     "LBN-3060": [
-      "FRA"
+      "LEB"
     ],
     "LBY-2882": [
       "LBA"
@@ -14255,79 +14255,79 @@
       "LBA"
     ],
     "LKA-2448": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2449": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2450": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2451": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2452": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2453": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2454": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2455": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2456": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2457": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2458": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2459": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2460": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2461": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2462": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2463": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2464": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2465": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2466": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2467": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2468": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2469": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2470": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2471": [
-      "ENG"
+      "CEY"
     ],
     "LKA-2472": [
-      "ENG"
+      "CEY"
     ],
     "LT011": [
       "LIT"
@@ -14378,13 +14378,13 @@
       "LAT"
     ],
     "MAR-1445": [
-      "MOR"
+      "SMR"
     ],
     "MAR-1446": [
       "MOR"
     ],
     "MAR-1447": [
-      "MOR"
+      "SMR"
     ],
     "MAR-1448": [
       "MOR"
@@ -14417,13 +14417,13 @@
       "MOR"
     ],
     "MAR-3456": [
-      "MOR"
+      "SSH"
     ],
     "MAR-3457": [
-      "MOR"
+      "SMR"
     ],
     "MAR-3469": [
-      "MOR"
+      "SSH"
     ],
     "MDA-1613": [
       "ROM"
@@ -21785,49 +21785,49 @@
       "YUG"
     ],
     "SYR-134": [
-      "FRA"
+      "SYR"
     ],
     "SYR-135": [
-      "FRA"
+      "SYR"
     ],
     "SYR-136": [
-      "FRA"
+      "SYR"
     ],
     "SYR-137": [
-      "FRA"
+      "SYR"
     ],
     "SYR-138": [
-      "FRA"
+      "SYR"
     ],
     "SYR-139": [
-      "FRA"
+      "SYR"
     ],
     "SYR-140": [
-      "FRA"
+      "SYR"
     ],
     "SYR-141": [
-      "FRA"
+      "SYR"
     ],
     "SYR-142": [
-      "FRA"
+      "SYR"
     ],
     "SYR-143": [
-      "FRA"
+      "SYR"
     ],
     "SYR-144": [
-      "FRA"
+      "SYR"
     ],
     "SYR-145": [
-      "FRA"
+      "SYR"
     ],
     "SYR-146": [
-      "FRA"
+      "SYR"
     ],
     "SYR-4843": [
-      "FRA"
+      "SYR"
     ],
     "SYR-5261": [
-      "FRA"
+      "SYR"
     ],
     "THA-374": [
       "SIA"
@@ -22403,67 +22403,67 @@
       "TUN"
     ],
     "TWN-1156": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1158": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1160": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1161": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1162": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1163": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1164": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1165": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1166": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1167": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1168": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1169": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1170": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1171": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1172": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1173": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1174": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1176": [
-      "JAP"
+      "TAI"
     ],
     "TWN-1177": [
-      "JAP"
+      "TAI"
     ],
     "TWN-3414": [
-      "JAP"
+      "TAI"
     ],
     "TWN-3415": [
-      "JAP"
+      "TAI"
     ],
     "UA_RAY_74538382B10043952621964": [
       "POL"
@@ -29873,25 +29873,25 @@
       "FRA"
     ],
     "GQ_ADM1_GNQ-1467": [
-      "FRA"
+      "SGN"
     ],
     "GQ_ADM1_GNQ-1468": [
-      "FRA"
+      "SGN"
     ],
     "GQ_ADM1_GNQ-1469": [
-      "FRA"
+      "SGN"
     ],
     "GQ_ADM1_GNQ-1470": [
-      "FRA"
+      "SGN"
     ],
     "GQ_ADM1_GNQ-1471": [
-      "FRA"
+      "SGN"
     ],
     "GQ_ADM1_GNQ-1478": [
-      "FRA"
+      "SGN"
     ],
     "GQ_ADM1_GNQ-1479": [
-      "FRA"
+      "SGN"
     ],
     "ER_ADM1_ERI-1560": [
       "ERI"
@@ -29984,34 +29984,34 @@
       "AEF"
     ],
     "GH_ADM1_GHA-2155": [
-      "ENG"
+      "BWA"
     ],
     "GH_ADM1_GHA-2156": [
-      "ENG"
+      "BWA"
     ],
     "GH_ADM1_GHA-2157": [
-      "ENG"
+      "BWA"
     ],
     "GH_ADM1_GHA-2158": [
-      "ENG"
+      "BWA"
     ],
     "GH_ADM1_GHA-2159": [
-      "ENG"
+      "BWA"
     ],
     "GH_ADM1_GHA-2160": [
-      "ENG"
+      "BWA"
     ],
     "GH_ADM1_GHA-2161": [
-      "ENG"
+      "BWA"
     ],
     "GH_ADM1_GHA-2162": [
-      "ENG"
+      "BWA"
     ],
     "GH_ADM1_GHA-2172": [
-      "ENG"
+      "BWA"
     ],
     "GH_ADM1_GHA-2173": [
-      "ENG"
+      "BWA"
     ],
     "GW_ADM1_GNB-5500": [
       "POR"
@@ -30041,28 +30041,28 @@
       "POR"
     ],
     "KE_ADM1_KEN-1193": [
-      "ENG"
+      "BEA"
     ],
     "KE_ADM1_KEN-1195": [
-      "ENG"
+      "BEA"
     ],
     "KE_ADM1_KEN-1196": [
-      "ENG"
+      "BEA"
     ],
     "KE_ADM1_KEN-1197": [
-      "ENG"
+      "BEA"
     ],
     "KE_ADM1_KEN-889": [
-      "ENG"
+      "BEA"
     ],
     "KE_ADM1_KEN-890": [
-      "ENG"
+      "BEA"
     ],
     "KE_ADM1_KEN-891": [
-      "ENG"
+      "BEA"
     ],
     "KE_ADM1_KEN-893": [
-      "ENG"
+      "BEA"
     ],
     "LS_ADM1_LSO-1202": [
       "ENG"
@@ -30140,70 +30140,70 @@
       "LIB"
     ],
     "MG_ADM1_MDG-5860": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5861": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5862": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5863": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5864": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5865": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5866": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5867": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5868": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5869": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5870": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5871": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5872": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5873": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5874": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5875": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5876": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5878": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5879": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5880": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5881": [
-      "FRA"
+      "MAD"
     ],
     "MG_ADM1_MDG-5882": [
-      "FRA"
+      "MAD"
     ],
     "ML_ADM1_MLI-2688": [
       "AOF"
@@ -30368,115 +30368,115 @@
       "AOF"
     ],
     "NG_ADM1_NGA-2839": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2841": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2842": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2843": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2844": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2845": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2846": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2847": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2848": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2849": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2850": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2851": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2852": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2853": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2854": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2855": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2856": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2857": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2858": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2859": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2860": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2861": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2862": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2863": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2864": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2865": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2866": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2867": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2868": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2869": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2870": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2871": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2872": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2873": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2879": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-2881": [
-      "ENG"
+      "BWA"
     ],
     "NG_ADM1_NGA-3470": [
-      "ENG"
+      "BWA"
     ],
     "CG_ADM1_COG-2185": [
       "AEF"
@@ -30572,16 +30572,16 @@
       "AOF"
     ],
     "SL_ADM1_SLE-760": [
-      "ENG"
+      "BWA"
     ],
     "SL_ADM1_SLE-761": [
-      "ENG"
+      "BWA"
     ],
     "SL_ADM1_SLE-762": [
-      "ENG"
+      "BWA"
     ],
     "SL_ADM1_SLE-790": [
-      "ENG"
+      "BWA"
     ],
     "ZA_ADM1_ZAF-1188": [
       "SAF"
@@ -30611,85 +30611,85 @@
       "SAF"
     ],
     "SS_ADM1_SDS-147": [
-      "ENG"
+      "SUD"
     ],
     "SS_ADM1_SDS-863": [
-      "ENG"
+      "SUD"
     ],
     "SS_ADM1_SDS-864": [
-      "ENG"
+      "SUD"
     ],
     "SS_ADM1_SDS-865": [
-      "ENG"
+      "SUD"
     ],
     "SS_ADM1_SDS-869": [
-      "ENG"
+      "SUD"
     ],
     "SS_ADM1_SDS-870": [
-      "ENG"
+      "SUD"
     ],
     "SS_ADM1_SDS-871": [
-      "ENG"
+      "SUD"
     ],
     "SS_ADM1_SDS-872": [
-      "ENG"
+      "SUD"
     ],
     "SS_ADM1_SDS-873": [
-      "ENG"
+      "SUD"
     ],
     "SS_ADM1_SDS-892": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-148": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-149": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-5856": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-5857": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-5858": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-5859": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-874": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-875": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-876": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-877": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-878": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-879": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-880": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-881": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-882": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-883": [
-      "ENG"
+      "SUD"
     ],
     "SD_ADM1_SDN-884": [
-      "ENG"
+      "SUD"
     ],
     "ST_ADM1_STP-4861": [
       "POR"
@@ -30698,112 +30698,112 @@
       "POR"
     ],
     "TZ_ADM1_TZA-3335": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3336": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3337": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3357": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3358": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3359": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3360": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3363": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3378": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3379": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3380": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3381": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3382": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3383": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3384": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3385": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3386": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3387": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3388": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3389": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3390": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3391": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3392": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3393": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3394": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-3395": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-5584": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-5585": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-5586": [
-      "ENG"
+      "BEA"
     ],
     "TZ_ADM1_TZA-5587": [
-      "ENG"
+      "BEA"
     ],
     "GM_ADM1_GMB-2151": [
-      "ENG"
+      "BWA"
     ],
     "GM_ADM1_GMB-2152": [
-      "ENG"
+      "BWA"
     ],
     "GM_ADM1_GMB-2153": [
-      "ENG"
+      "BWA"
     ],
     "GM_ADM1_GMB-2154": [
-      "ENG"
+      "BWA"
     ],
     "GM_ADM1_GMB-5512": [
-      "ENG"
+      "BWA"
     ],
     "GM_ADM1_GMB-5513": [
-      "ENG"
+      "BWA"
     ],
     "TG_ADM1_TGO-86": [
       "AOF"
@@ -30995,16 +30995,16 @@
       "ENG"
     ],
     "UG_ADM1_17295835B48340970483027": [
-      "ENG"
+      "BEA"
     ],
     "UG_ADM1_17295835B57878138064711": [
-      "ENG"
+      "BEA"
     ],
     "UG_ADM1_17295835B80141219017784": [
-      "ENG"
+      "BEA"
     ],
     "UG_ADM1_17295835B91329899113986": [
-      "ENG"
+      "BEA"
     ],
     "SO_ADM1_83879307B11376444747055": [
       "SOM"
@@ -32840,7 +32840,7 @@
       "INS"
     ],
     "EH_ADMIN0_PASSTHROUGH": [
-      "FRA"
+      "SSH"
     ],
     "MC_ADMIN0_PASSTHROUGH": [
       "FRA"

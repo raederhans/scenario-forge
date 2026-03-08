@@ -8,6 +8,7 @@ import os
 import re
 import subprocess
 from pathlib import Path
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
@@ -95,7 +96,11 @@ async (page) => {{
     }} catch (_error) {{}}
   }}).catch(() => {{}});
   await page.goto({json.dumps(url)}, {{ waitUntil: 'domcontentloaded', timeout: 60000 }});
-  await page.waitForFunction(() => typeof window.renderNow === 'function' && !!document.getElementById('map-canvas') && !!document.querySelector('#map-svg rect.interaction-layer'));
+  await page.waitForFunction(
+    () => typeof window.renderNow === 'function' && !!document.getElementById('map-canvas') && !!document.querySelector('#map-svg rect.interaction-layer'),
+    undefined,
+    {{ timeout: 30000 }}
+  );
   await page.waitForTimeout(750);
   await page.evaluate(() => {{
     window.__perfBench = window.__perfBench || {{}};
@@ -129,6 +134,14 @@ def open_page(url: str) -> None:
         run_pw("open", "about:blank", "--browser", "msedge")
         BROWSER_OPENED = True
     navigate(url)
+
+
+def with_query_overrides(url: str, **overrides: str) -> str:
+    parts = urlsplit(url)
+    query = dict(parse_qsl(parts.query, keep_blank_values=True))
+    for key, value in overrides.items():
+        query[key] = value
+    return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
 
 
 def force_full_redraw(label: str, context_off: bool = False) -> dict:
@@ -551,10 +564,10 @@ def main() -> None:
         single_click_fill = measure_single_click_fill()
         double_click_fill = measure_double_click_fill()
 
-        open_page("http://127.0.0.1:18080/?detail_layer=off&perf_overlay=1")
+        open_page(with_query_overrides(args.url, detail_layer="off", perf_overlay="1"))
         detail_layer_off_forced_full_redraw = force_full_redraw("benchmark-detail-off", context_off=False)
 
-        open_page("http://127.0.0.1:18080/?perf_overlay=1")
+        open_page(with_query_overrides(args.url, perf_overlay="1"))
         context_layers_disabled_forced_full_redraw = force_full_redraw("benchmark-context-off", context_off=True)
 
         open_page(args.url)

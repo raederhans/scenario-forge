@@ -53,6 +53,7 @@ def _derive_subject_color_hex(parent_color_hex: str, child_tag: str, subject_kin
         "raj": (0.10, 0.00),
         "mandate": (0.04, -0.12),
         "protectorate": (0.02, -0.14),
+        "condominium": (0.06, -0.08),
         "colony": (-0.08, 0.04),
         "colonial_government": (0.08, -0.02),
         "colonial_federation": (-0.02, -0.10),

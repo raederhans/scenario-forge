@@ -753,7 +753,7 @@ def _evaluate_region_checks(
         batches=[
             {
                 "label": "Western Sahara",
-                "expected_owner_tag": "FRA",
+                "expected_owner_tag": "SSH",
                 "resolved": _resolve_targets(
                     feature_by_id=feature_by_id,
                     ids_by_country=ids_by_country,

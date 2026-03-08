@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-08T00:11:31.014831+00:00",
+  "generated_at": "2026-03-08T15:46:06.943053+00:00",
   "outputs": {
     "europe_topology.json": {
       "role": "primary_topology",
@@ -47,8 +47,8 @@
     },
     "europe_topology.na_v2.json": {
       "role": "detail_topology_na_v2",
-      "size_bytes": 9489676,
-      "sha256": "3de7357688d88f99ec359b076a22d2f8ba128eb2d8375b010e28725309592513",
+      "size_bytes": 11027326,
+      "sha256": "fe121afe7fd9c692d08179eef18aa3a0748c1337b714545b3849d1e77c8264ea",
       "type": "topology",
       "object_names": [
         "land",
@@ -60,27 +60,27 @@
         "urban",
         "water_regions"
       ],
-      "political_geometries": 11538,
+      "political_geometries": 11724,
       "has_computed_neighbors": true,
-      "arc_count": 132259,
-      "arc_point_count": 577642,
+      "arc_count": 129291,
+      "arc_point_count": 662766,
       "world_bounds_geometries": 0,
-      "raw_world_bounds_geometries": 42
+      "raw_world_bounds_geometries": 35
     },
     "europe_topology.runtime_political_v1.json": {
       "role": "runtime_political_topology",
-      "size_bytes": 6931050,
-      "sha256": "33d02765f9f19493de60c615f601f4a5d6ad70315c75a0f8e6884b5fdd1059d8",
+      "size_bytes": 8398008,
+      "sha256": "476bb6b95fc658314660bc6995f0aff39cd3974d3a3f35334b38807cf5001e9a",
       "type": "topology",
       "object_names": [
         "political"
       ],
-      "political_geometries": 11590,
+      "political_geometries": 11762,
       "has_computed_neighbors": true,
-      "arc_count": 92173,
-      "arc_point_count": 404393,
-      "world_bounds_geometries": 1,
-      "raw_world_bounds_geometries": 51
+      "arc_count": 101225,
+      "arc_point_count": 490639,
+      "world_bounds_geometries": 0,
+      "raw_world_bounds_geometries": 39
     },
     "global_physical_semantics.topo.json": {
       "role": "physical_semantics_topology",
@@ -129,28 +129,28 @@
     },
     "hierarchy.json": {
       "role": "hierarchy",
-      "size_bytes": 449766,
-      "sha256": "a07c994bbfed3a2db3c17eb12fe098fcbb930808d4884104e56d88ee69ddae20",
+      "size_bytes": 453994,
+      "sha256": "d8dd2f904d0c3e55fb037480872882eb46b877cc41958eb5237dfc44badc6a19",
       "type": "hierarchy",
-      "group_count": 1518,
-      "child_count": 9351
+      "group_count": 1522,
+      "child_count": 9448
     },
     "geo_aliases.json": {
       "role": "geo_aliases",
-      "size_bytes": 4323437,
-      "sha256": "f20bf5e5907ba704cd392d854a5da1c0903b6f3ca5a059e930672cdc060bd601",
+      "size_bytes": 4401231,
+      "sha256": "9e454d52b343a473c6efbf02edc149ff161221881b5cfad7194c16b3ade8f382",
       "type": "geo_aliases",
-      "entry_count": 11538,
-      "alias_count": 24092,
+      "entry_count": 11724,
+      "alias_count": 24416,
       "conflict_count": 0
     },
     "locales.json": {
       "role": "locales",
-      "size_bytes": 3607467,
-      "sha256": "5239a73aeb2b3a7b2c0901a18ea3296523cd9496bc909cdc91159024cb6de019",
+      "size_bytes": 3683981,
+      "sha256": "b89a7d839595ebc02f8d50cfe0794c119f463b60964dabe31dce4a44da28e8ba",
       "type": "locales",
-      "geo_entry_count": 36852,
-      "ui_entry_count": 339
+      "geo_entry_count": 37423,
+      "ui_entry_count": 380
     },
     "palettes/index.json": {
       "role": "palette_registry",
@@ -163,7 +163,7 @@
     "palettes/hoi4_vanilla.palette.json": {
       "role": "palette_pack",
       "size_bytes": 203719,
-      "sha256": "b2aec788fe39dd54137a4b957a6ecf99de9dae8a95fc427305463b063164d410",
+      "sha256": "a1c6e52e3c87de2399f2c9cfaeecf889fa3a1603414dcacc0b9c448b418f5578",
       "type": "palette_pack",
       "palette_id": "hoi4_vanilla",
       "entry_count": 427,
@@ -235,7 +235,7 @@
     "palette-maps/hoi4_vanilla.audit.json": {
       "role": "palette_audit",
       "size_bytes": 140010,
-      "sha256": "0717fdafc5f11db3c695e03e1a7a341af70a021a1ac109df9aaa4a2afe23fdb2",
+      "sha256": "eb41535d7ddfb4399219e1df97d3b0d0855dab98d680399fee9ed111aa2e0e24",
       "type": "palette_audit",
       "palette_id": "hoi4_vanilla",
       "entry_count": 427,

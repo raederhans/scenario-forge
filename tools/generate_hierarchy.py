@@ -44,6 +44,7 @@ except Exception:
     build_ru_city_overrides = None
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
+FEATURE_MIGRATION_PATH = DATA_DIR / "feature-migrations" / "by_hybrid_v1.json"
 DEFAULT_CHINA_ADM2 = DATA_DIR / "china_adm2.geojson"
 DEFAULT_FR_ARR = DATA_DIR / "france_arrondissements.geojson"
 DEFAULT_PL_POW = DATA_DIR / "poland_powiaty.geojson"
@@ -67,6 +68,22 @@ ADMIN1_ISO_COLS = ["iso_a2", "adm0_a2", "iso_3166_1_", "iso_3166_1_alpha_2"]
 ADMIN1_ADM0_COLS = ["admin", "adm0_name", "admin0_name"]
 ADMIN1_ID_COLS = ["adm1_code", "gn_id", "id"]
 URAL_LONGITUDE = 60.0
+RUSSIA_COASTAL_FAR_EAST_DETAIL_PARENT_IDS = set(
+    getattr(
+        cfg,
+        "RUSSIA_COASTAL_FAR_EAST_DETAIL_PARENT_IDS",
+        (
+            "RUS-2609",
+            "RUS-2613",
+            "RUS-2614",
+            "RUS-2611",
+            "RUS-2616",
+            "RUS-2615",
+            "RUS-3468",
+            "RUS-2321",
+        ),
+    )
+)
 COUNTRY_GROUP_CONTINENT_ORDER = [
     "Africa",
     "Asia",
@@ -258,6 +275,39 @@ def representative_longitudes(gdf):
     gdf = ensure_crs(gdf)
     reps = gdf.geometry.representative_point()
     return reps.x
+
+
+def load_feature_migration_map(path: Path = FEATURE_MIGRATION_PATH) -> dict[str, list[str]]:
+    if not path.exists():
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    if not isinstance(payload, dict):
+        return {}
+    out: dict[str, list[str]] = {}
+    for parent_id, child_ids in payload.items():
+        parent_key = str(parent_id or "").strip()
+        if not parent_key or not isinstance(child_ids, list):
+            continue
+        normalized = [str(child_id).strip() for child_id in child_ids if str(child_id).strip()]
+        if normalized:
+            out[parent_key] = normalized
+    return out
+
+
+def should_refine_ru_parent(feature_id, rep_lon) -> bool:
+    value = str(feature_id or "").strip()
+    if not value:
+        return False
+    if value in RUSSIA_COASTAL_FAR_EAST_DETAIL_PARENT_IDS:
+        return True
+    try:
+        rep_lon_value = float(rep_lon)
+    except (TypeError, ValueError):
+        return False
+    return value.startswith("RUS-") and rep_lon_value < URAL_LONGITUDE
 
 
 def slugify(text):
@@ -641,12 +691,6 @@ def build_russia_groups_hybrid(adm2_path: Path, adm1_path: Path):
         raise ValueError("RU ADM2 missing shapeID column.")
     adm2 = ensure_crs(adm2)
 
-    try:
-        rep_lon = representative_longitudes(adm2)
-        adm2_west = adm2.loc[rep_lon < URAL_LONGITUDE].copy()
-    except Exception:
-        adm2_west = adm2.copy()
-
     adm1 = gpd.read_file(adm1_path)
     adm1 = ensure_crs(adm1)
     adm1_country = filter_admin1_by_iso(adm1, "RU", fallback_names=["Russia"])
@@ -655,63 +699,100 @@ def build_russia_groups_hybrid(adm2_path: Path, adm1_path: Path):
     if not name_col:
         raise ValueError("RU ADM1 missing name columns.")
 
+    id_col = pick_column(adm1_country.columns, ADMIN1_ID_COLS)
+    if not id_col:
+        iso_col = pick_column(adm1_country.columns, ADMIN1_ISO_COLS)
+        adm1_country = adm1_country.copy()
+        if iso_col:
+            adm1_country["adm1_code"] = (
+                adm1_country[iso_col].astype(str)
+                + "_"
+                + adm1_country[name_col].astype(str)
+            )
+        else:
+            adm1_country["adm1_code"] = "RU_" + adm1_country[name_col].astype(str)
+        id_col = "adm1_code"
+
+    adm1_country = adm1_country.copy()
+    adm1_country["__coarse_feature_id"] = adm1_country[id_col].fillna("").astype(str).str.strip()
+    rep_lon_adm1 = representative_longitudes(adm1_country)
+    adm1_country["__rep_lon"] = rep_lon_adm1
+    adm1_country["__should_refine"] = [
+        should_refine_ru_parent(feature_id, rep_lon)
+        for feature_id, rep_lon in zip(adm1_country["__coarse_feature_id"], adm1_country["__rep_lon"])
+    ]
+    feature_migration_map = load_feature_migration_map()
+    explicit_far_east_parents = {
+        feature_id
+        for feature_id in RUSSIA_COASTAL_FAR_EAST_DETAIL_PARENT_IDS
+        if feature_migration_map.get(feature_id)
+    }
+    explicit_far_east_child_ids = {
+        child_id
+        for feature_id in explicit_far_east_parents
+        for child_id in feature_migration_map.get(feature_id, [])
+    }
+
     groups = defaultdict(list)
     labels = {}
 
-    if not adm2_west.empty:
-        centroids = centroid_points(adm2_west)
-        adm1_join = adm1_country[[name_col, "geometry"]].copy()
+    for _, row in adm1_country.iterrows():
+        feature_id = str(row.get("__coarse_feature_id", "")).strip()
+        if feature_id not in explicit_far_east_parents:
+            continue
+        region = row.get(name_col)
+        if not region or str(region).strip() == "":
+            continue
+        group_id = f"RU_{slugify(region)}"
+        for child_id in feature_migration_map.get(feature_id, []):
+            if child_id not in groups[group_id]:
+                groups[group_id].append(child_id)
+        if group_id not in labels:
+            labels[group_id] = str(region)
+
+    if not adm2.empty:
+        centroids = centroid_points(adm2)
+        adm1_join = adm1_country[[name_col, "__coarse_feature_id", "__should_refine", "geometry"]].copy()
         joined = gpd.sjoin(centroids, adm1_join, how="left", predicate="within")
 
-        if joined[name_col].isna().any():
+        if joined[name_col].isna().any() or joined["__coarse_feature_id"].isna().any():
             try:
-                missing = joined[name_col].isna()
+                missing = joined[name_col].isna() | joined["__coarse_feature_id"].isna()
                 nearest = nearest_join_projected(
                     centroids.loc[missing].copy(),
                     adm1_join,
                     distance_col="distance",
                 )
-                joined.loc[missing, name_col] = nearest[name_col].values
+                for column in (name_col, "__coarse_feature_id", "__should_refine"):
+                    joined.loc[missing, column] = nearest[column].values
             except Exception:
                 pass
 
         for _, row in joined.iterrows():
+            if not bool(row.get("__should_refine")):
+                continue
+            if str(row.get("__coarse_feature_id", "")).strip() in explicit_far_east_parents:
+                continue
             region = row.get(name_col)
             if not region or str(region).strip() == "":
                 continue
             group_id = f"RU_{slugify(region)}"
             child_id = f"RU_RAY_{row['shapeID']}"
+            if child_id in explicit_far_east_child_ids:
+                continue
             if child_id not in groups[group_id]:
                 groups[group_id].append(child_id)
             if group_id not in labels:
                 labels[group_id] = str(region)
 
-    try:
-        rep_lon_adm1 = representative_longitudes(adm1_country)
-        adm1_east = adm1_country.loc[rep_lon_adm1 >= URAL_LONGITUDE].copy()
-    except Exception:
-        adm1_east = adm1_country.copy()
+    adm1_coarse = adm1_country.loc[~adm1_country["__should_refine"]].copy()
 
-    if not adm1_east.empty:
-        id_col = pick_column(adm1_east.columns, ADMIN1_ID_COLS)
-        if not id_col:
-            iso_col = pick_column(adm1_east.columns, ADMIN1_ISO_COLS)
-            adm1_east = adm1_east.copy()
-            if iso_col:
-                adm1_east["adm1_code"] = (
-                    adm1_east[iso_col].astype(str)
-                    + "_"
-                    + adm1_east[name_col].astype(str)
-                )
-            else:
-                adm1_east["adm1_code"] = "RU_" + adm1_east[name_col].astype(str)
-            id_col = "adm1_code"
-
-        for _, row in adm1_east.iterrows():
+    if not adm1_coarse.empty:
+        for _, row in adm1_coarse.iterrows():
             region = row.get(name_col)
             if not region or str(region).strip() == "":
                 continue
-            child_id = str(row.get(id_col, "")).strip()
+            child_id = str(row.get("__coarse_feature_id", "")).strip()
             if not child_id:
                 continue
             group_id = f"RU_{slugify(region)}"

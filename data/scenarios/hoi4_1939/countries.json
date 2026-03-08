@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1939",
-  "generated_at": "2026-03-08T00:34:57.726266+00:00",
+  "generated_at": "2026-03-08T03:23:06.199311+00:00",
   "default_country": "GER",
   "countries": {
     "AEF": {
@@ -300,6 +300,44 @@
       "subject_kind": "dominion",
       "entry_kind": "scenario_subject"
     },
+    "BEA": {
+      "tag": "BEA",
+      "display_name": "British East Africa",
+      "color_hex": "#d24f79",
+      "feature_count": 42,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "KE",
+      "lookup_iso2": "KE",
+      "provenance_iso2": "KE",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "British East Africa macro government covering Kenya, Uganda, and Tanganyika.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "british_east_africa",
+      "rule_sources": [
+        "british_east_africa"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "subject_kind": "colonial_government",
+      "entry_kind": "scenario_subject"
+    },
     "BEL": {
       "tag": "BEL",
       "display_name": "Belgium",
@@ -542,6 +580,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "BWA": {
+      "tag": "BWA",
+      "display_name": "British West Africa",
+      "color_hex": "#c5495c",
+      "feature_count": 57,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "NG",
+      "lookup_iso2": "NG",
+      "provenance_iso2": "NG",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "british_west_africa",
+      "rule_sources": [
+        "british_west_africa"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "subject_kind": "colonial_government",
+      "entry_kind": "scenario_subject"
+    },
     "CAN": {
       "tag": "CAN",
       "display_name": "Canada",
@@ -575,6 +651,44 @@
       "parent_owner_tags": [],
       "subject_kind": "",
       "entry_kind": ""
+    },
+    "CEY": {
+      "tag": "CEY",
+      "display_name": "Ceylon",
+      "color_hex": "#aa2e56",
+      "feature_count": 25,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "LK",
+      "lookup_iso2": "LK",
+      "provenance_iso2": "LK",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "notes": "Ceylon represented as a distinct British colony.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "ceylon",
+      "rule_sources": [
+        "ceylon"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
     },
     "CHI": {
       "tag": "CHI",
@@ -930,9 +1044,9 @@
       "tag": "ENG",
       "display_name": "Britain",
       "color_hex": "#c9385d",
-      "feature_count": 461,
+      "feature_count": 310,
       "quality": "approx_existing_geometry",
-      "source": "manual_rule",
+      "source": "direct_active_owner",
       "base_iso2": "GB",
       "lookup_iso2": "GB",
       "provenance_iso2": "GB",
@@ -943,7 +1057,7 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_northern_europe",
       "subregion_label": "Northern Europe",
-      "notes": "British imperial approximation for protectorates, mandates, and colonies.",
+      "notes": "British imperial approximation for protectorates, mandates, and colonies outside the dedicated subject governments.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
@@ -1038,7 +1152,7 @@
       "tag": "FRA",
       "display_name": "France",
       "color_hex": "#3971e4",
-      "feature_count": 382,
+      "feature_count": 332,
       "quality": "approx_existing_geometry",
       "source": "direct_active_owner",
       "base_iso2": "FR",
@@ -1051,7 +1165,7 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_western_europe",
       "subregion_label": "Western Europe",
-      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
+      "notes": "French colonial approximation for remaining African and overseas possessions outside the dedicated subject governments.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
@@ -1073,7 +1187,7 @@
     "GER": {
       "tag": "GER",
       "display_name": "Germany",
-      "color_hex": "#666057",
+      "color_hex": "#3c3c3c",
       "feature_count": 633,
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
@@ -1605,8 +1719,8 @@
       "tag": "JAP",
       "display_name": "Japan",
       "color_hex": "#ffc9b2",
-      "feature_count": 68,
-      "quality": "manual_reviewed",
+      "feature_count": 47,
+      "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "JP",
       "lookup_iso2": "JP",
@@ -1618,13 +1732,12 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
-      "notes": "Japanese direct rule in Taiwan.",
+      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "japan_korea_taiwan",
+      "primary_rule_source": "jidong_japanese_occupation",
       "rule_sources": [
-        "japan_korea_taiwan",
         "jidong_japanese_occupation"
       ],
       "source_types": [
@@ -1816,6 +1929,44 @@
       "subject_kind": "colony",
       "entry_kind": "scenario_subject"
     },
+    "LEB": {
+      "tag": "LEB",
+      "display_name": "French Mandate for Lebanon",
+      "color_hex": "#5473d5",
+      "feature_count": 6,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "LB",
+      "lookup_iso2": "LB",
+      "provenance_iso2": "LB",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": 553,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "notes": "French Mandate for Lebanon represented as a separate mandate government.",
+      "synthetic_owner": false,
+      "source_type": "hoi4_owner",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "french_mandate_lebanon",
+      "rule_sources": [
+        "french_mandate_lebanon"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "subject_kind": "mandate",
+      "entry_kind": "scenario_subject"
+    },
     "LIB": {
       "tag": "LIB",
       "display_name": "Liberia",
@@ -1919,6 +2070,44 @@
       "parent_owner_tags": [],
       "subject_kind": "",
       "entry_kind": ""
+    },
+    "MAD": {
+      "tag": "MAD",
+      "display_name": "Madagascar",
+      "color_hex": "#1952c9",
+      "feature_count": 22,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "MG",
+      "lookup_iso2": "MG",
+      "provenance_iso2": "MG",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 543,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "Madagascar represented as a separate French colony.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "madagascar_colony",
+      "rule_sources": [
+        "madagascar_colony"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
     },
     "MAL": {
       "tag": "MAL",
@@ -2136,7 +2325,7 @@
       "tag": "MOR",
       "display_name": "French Morocco",
       "color_hex": "#4280d3",
-      "feature_count": 16,
+      "feature_count": 11,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "MA",
@@ -2149,7 +2338,7 @@
       "continent_label": "Africa",
       "subregion_id": "subregion_northern_africa",
       "subregion_label": "Northern Africa",
-      "notes": "French Morocco represented as a protectorate distinct from metropolitan France.",
+      "notes": "French Morocco represented as the remaining protectorate area after Spanish Morocco and Spanish Sahara are split out.",
       "synthetic_owner": false,
       "source_type": "scenario_extension",
       "historical_fidelity": "vanilla",
@@ -2953,6 +3142,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "SGN": {
+      "tag": "SGN",
+      "display_name": "Spanish Guinea",
+      "color_hex": "#f3b121",
+      "feature_count": 7,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "GQ",
+      "lookup_iso2": "GQ",
+      "provenance_iso2": "GQ",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "notes": "Spanish Guinea represented as a separate colonial administration.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "spanish_guinea",
+      "rule_sources": [
+        "spanish_guinea"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "SPR",
+      "parent_owner_tags": [
+        "SPR"
+      ],
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
+    },
     "SHX": {
       "tag": "SHX",
       "display_name": "Shanxi",
@@ -3131,6 +3358,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "SMR": {
+      "tag": "SMR",
+      "display_name": "Spanish Morocco",
+      "color_hex": "#e6bc62",
+      "feature_count": 3,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "MA",
+      "lookup_iso2": "MA",
+      "provenance_iso2": "MA",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "notes": "Spanish Morocco represented using the current northern Morocco approximation, with Ifni folded into the same protectorate block.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "spanish_morocco",
+      "rule_sources": [
+        "spanish_morocco"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "SPR",
+      "parent_owner_tags": [
+        "SPR"
+      ],
+      "subject_kind": "protectorate",
+      "entry_kind": "scenario_subject"
+    },
     "SOV": {
       "tag": "SOV",
       "display_name": "Soviet Union",
@@ -3184,7 +3449,7 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_southern_europe",
       "subregion_label": "Southern Europe",
-      "notes": "Approximate Spanish control for Andorra fallback only; Western Sahara is explicitly moved to France.",
+      "notes": "Approximate Spanish fallback for Andorra only; colonial holdings are handled by dedicated subject rules.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
@@ -3202,6 +3467,83 @@
       "parent_owner_tags": [],
       "subject_kind": "",
       "entry_kind": ""
+    },
+    "SSH": {
+      "tag": "SSH",
+      "display_name": "Spanish Sahara",
+      "color_hex": "#edc431",
+      "feature_count": 3,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "EH",
+      "lookup_iso2": "EH",
+      "provenance_iso2": "EH",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "notes": "Spanish Sahara represented using the current Western Sahara approximation blocks.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "spanish_sahara",
+      "rule_sources": [
+        "spanish_sahara"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "SPR",
+      "parent_owner_tags": [
+        "SPR"
+      ],
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
+    },
+    "SUD": {
+      "tag": "SUD",
+      "display_name": "Anglo-Egyptian Sudan",
+      "color_hex": "#cf5a6c",
+      "feature_count": 27,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "SD",
+      "lookup_iso2": "SD",
+      "provenance_iso2": "SD",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 551,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "notes": "Anglo-Egyptian Sudan represented as a condominium under British primacy with Egyptian linkage retained in metadata.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "anglo_egyptian_sudan",
+      "rule_sources": [
+        "anglo_egyptian_sudan"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG",
+        "EGY"
+      ],
+      "subject_kind": "condominium",
+      "entry_kind": "scenario_subject"
     },
     "SWE": {
       "tag": "SWE",
@@ -3272,6 +3614,82 @@
       "parent_owner_tags": [],
       "subject_kind": "",
       "entry_kind": ""
+    },
+    "SYR": {
+      "tag": "SYR",
+      "display_name": "French Mandate for Syria",
+      "color_hex": "#5086d9",
+      "feature_count": 14,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "SY",
+      "lookup_iso2": "SY",
+      "provenance_iso2": "SY",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": 554,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "notes": "French Mandate for Syria represented as a separate mandate government.",
+      "synthetic_owner": false,
+      "source_type": "hoi4_owner",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "french_mandate_syria",
+      "rule_sources": [
+        "french_mandate_syria"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "subject_kind": "mandate",
+      "entry_kind": "scenario_subject"
+    },
+    "TAI": {
+      "tag": "TAI",
+      "display_name": "Taiwan",
+      "color_hex": "#fab5a1",
+      "feature_count": 21,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "TW",
+      "lookup_iso2": "TW",
+      "provenance_iso2": "TW",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "notes": "Japanese colonial rule in Taiwan represented as a distinct subject government.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "japanese_taiwan",
+      "rule_sources": [
+        "japanese_taiwan"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
     },
     "TAN": {
       "tag": "TAN",

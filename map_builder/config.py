@@ -625,6 +625,10 @@ PROJECTION = {
 AREA_CRS = "EPSG:6933"
 MIN_VISIBLE_AREA_KM2 = 50.0
 TOPOLOGY_QUANTIZATION = 10_000
+# Managed-detail political outputs need finer quantization to keep narrow RU shell
+# fallback fragments stable through TopoJSON round-trips.
+DETAIL_OUTPUT_TOPOLOGY_QUANTIZATION = 100_000
+RUNTIME_POLITICAL_TOPOLOGY_QUANTIZATION = 100_000
 
 # Simplification tolerances (WGS84 degrees)
 SIMPLIFY_NUTS3 = 0.002
@@ -645,6 +649,16 @@ SIMPLIFY_AFRICA_ADMIN1 = 0.02
 SIMPLIFY_GLOBAL_BASIC_ADMIN1 = 0.02
 SIMPLIFY_GB_NUTS1 = 0.01
 URAL_LONGITUDE = 60.0
+RUSSIA_COASTAL_FAR_EAST_DETAIL_PARENT_IDS = (
+    "RUS-2609",  # Amur
+    "RUS-2613",  # Jewish Autonomous Oblast
+    "RUS-2614",  # Khabarovsk
+    "RUS-2611",  # Primorsky
+    "RUS-2616",  # Sakhalin
+    "RUS-2615",  # Magadan
+    "RUS-3468",  # Kamchatka
+    "RUS-2321",  # Chukotka
+)
 
 VIP_POINTS = [
     ("Malta", (14.3754, 35.9375)),

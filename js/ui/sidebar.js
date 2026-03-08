@@ -17,6 +17,7 @@ import {
   applyScenarioById,
   clearActiveScenario,
   loadScenarioAuditPayload,
+  recalculateScenarioOwnerControllerDiffCount,
   refreshScenarioShellOverlays,
   setScenarioViewMode,
   validateImportedScenarioBaseline,
@@ -36,6 +37,7 @@ import {
   normalizeCountryCode,
   normalizePresetName,
   resolveCompanionActionFeatureIds,
+  resolveFeatureIdsFromPresetSource,
   rebuildPresetState,
   setReleasableBoundaryVariant,
 } from "../core/releasable_manager.js";
@@ -145,6 +147,7 @@ function getDynamicCountryEntries() {
           subregionId: String(scenarioCountry?.subregion_id || "").trim(),
           subregionLabel: String(scenarioCountry?.subregion_label || "").trim(),
           syntheticOwner: !!scenarioCountry?.synthetic_owner,
+          hiddenFromCountryList: !!scenarioCountry?.hidden_from_country_list,
           featured: !!scenarioCountry?.featured,
           catalogOrder: Number(scenarioCountry?.catalog_order ?? Number.MAX_SAFE_INTEGER),
         };
@@ -195,7 +198,9 @@ function getDynamicCountryEntries() {
 }
 
 function buildInspectorTopLevelCountryEntries(entries = []) {
-  return (Array.isArray(entries) ? entries : []).filter((entry) => !entry?.releasable && !entry?.scenarioSubject);
+  return (Array.isArray(entries) ? entries : []).filter(
+    (entry) => !entry?.releasable && !entry?.scenarioSubject && !entry?.hiddenFromCountryList
+  );
 }
 
 function ensureCountryPaletteColor(code, fallbackIndex = 0) {
@@ -674,6 +679,143 @@ function applyOwnershipToFeatureIds(
   };
 }
 
+function applyScenarioOwnerControllerAssignments(
+  assignmentsByFeatureId = {},
+  {
+    render,
+    historyKind = "scenario-owner-controller-apply",
+    dirtyReason = "scenario-owner-controller-apply",
+    recomputeReason = "scenario-owner-controller-apply",
+  } = {}
+) {
+  const entries = Object.entries(assignmentsByFeatureId || {})
+    .map(([featureId, assignment]) => {
+      const normalizedId = String(featureId || "").trim();
+      if (!normalizedId || !assignment || typeof assignment !== "object") return null;
+      const ownerCode = normalizeCountryCode(assignment.ownerCode);
+      const controllerCode = normalizeCountryCode(assignment.controllerCode || assignment.ownerCode);
+      if (!ownerCode || !controllerCode) return null;
+      return {
+        featureId: normalizedId,
+        ownerCode,
+        controllerCode,
+      };
+    })
+    .filter(Boolean);
+
+  if (!entries.length) {
+    return {
+      applied: false,
+      changed: 0,
+      matchedCount: 0,
+      requestedCount: 0,
+      missingCount: 0,
+      reason: "empty-target",
+      mode: "ownership",
+    };
+  }
+
+  const targetIds = entries.map((entry) => entry.featureId);
+  const before = captureHistoryState({
+    sovereigntyFeatureIds: targetIds,
+    scenarioControllerFeatureIds: targetIds,
+  });
+
+  state.scenarioControllersByFeatureId = state.scenarioControllersByFeatureId || {};
+  const ownerFeatureIdsByCode = new Map();
+  const changedFeatureIds = new Set();
+
+  entries.forEach(({ featureId, ownerCode, controllerCode }) => {
+    const currentOwnerCode = normalizeCountryCode(state.sovereigntyByFeatureId?.[featureId]);
+    const currentControllerCode = normalizeCountryCode(
+      state.scenarioControllersByFeatureId?.[featureId] || currentOwnerCode
+    );
+    if (currentOwnerCode !== ownerCode) {
+      if (!ownerFeatureIdsByCode.has(ownerCode)) {
+        ownerFeatureIdsByCode.set(ownerCode, []);
+      }
+      ownerFeatureIdsByCode.get(ownerCode).push(featureId);
+      changedFeatureIds.add(featureId);
+    }
+    if (currentControllerCode !== controllerCode) {
+      state.scenarioControllersByFeatureId[featureId] = controllerCode;
+      changedFeatureIds.add(featureId);
+    }
+  });
+
+  let ownerChanged = 0;
+  ownerFeatureIdsByCode.forEach((featureIds, ownerCode) => {
+    ownerChanged += setFeatureOwnerCodes(featureIds, ownerCode);
+  });
+  if (changedFeatureIds.size) {
+    state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
+    recalculateScenarioOwnerControllerDiffCount();
+    mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
+    mapRenderer.scheduleDynamicBorderRecompute(recomputeReason, 90);
+    markDirty(dirtyReason);
+    pushHistoryEntry({
+      kind: historyKind,
+      before,
+      after: captureHistoryState({
+        sovereigntyFeatureIds: targetIds,
+        scenarioControllerFeatureIds: targetIds,
+      }),
+      meta: {
+        affectsSovereignty: true,
+      },
+    });
+  }
+  if (render) render();
+  return {
+    applied: true,
+    changed: changedFeatureIds.size,
+    matchedCount: targetIds.length,
+    requestedCount: targetIds.length,
+    missingCount: 0,
+    reason: "",
+    mode: "ownership",
+  };
+}
+
+function getScenarioBoundaryVariantUnionFeatureIds(countryState, targetIds = []) {
+  const scenarioMeta = getScenarioCountryMeta(countryState?.code) || countryState || {};
+  const lookupEntry = {
+    tag: scenarioMeta?.code || countryState?.code || "",
+    release_lookup_iso2:
+      scenarioMeta?.release_lookup_iso2
+      || scenarioMeta?.releaseLookupIso2
+      || scenarioMeta?.lookup_iso2
+      || scenarioMeta?.lookupIso2
+      || scenarioMeta?.base_iso2
+      || scenarioMeta?.baseIso2
+      || "",
+    lookup_iso2:
+      scenarioMeta?.lookup_iso2
+      || scenarioMeta?.lookupIso2
+      || scenarioMeta?.release_lookup_iso2
+      || scenarioMeta?.releaseLookupIso2
+      || scenarioMeta?.base_iso2
+      || scenarioMeta?.baseIso2
+      || "",
+    base_iso2: scenarioMeta?.base_iso2 || scenarioMeta?.baseIso2 || scenarioMeta?.lookup_iso2 || scenarioMeta?.lookupIso2 || "",
+  };
+  const featureIds = new Set((targetIds || []).map((id) => String(id || "").trim()).filter(Boolean));
+  const variants = Array.isArray(scenarioMeta?.boundary_variants)
+    ? scenarioMeta.boundary_variants
+    : Array.isArray(scenarioMeta?.boundaryVariants)
+      ? scenarioMeta.boundaryVariants
+      : [];
+  variants.forEach((variant) => {
+    resolveFeatureIdsFromPresetSource(variant?.preset_source, lookupEntry).forEach((featureId) => {
+      const normalizedId = String(featureId || "").trim();
+      if (normalizedId) {
+        featureIds.add(normalizedId);
+      }
+    });
+  });
+  return Array.from(featureIds);
+}
+
 function applyHierarchyGroupWithMode(
   group,
   {
@@ -954,7 +1096,16 @@ function applyExplicitOwnershipTransfer(
       mode: "ownership",
     };
   }
-  const result = applyOwnershipToFeatureIds(targetIds, targetOwnerCode, {
+  const assignmentsByFeatureId = Object.fromEntries(
+    targetIds.map((featureId) => [
+      featureId,
+      {
+        ownerCode: targetOwnerCode,
+        controllerCode: targetOwnerCode,
+      },
+    ])
+  );
+  const result = applyScenarioOwnerControllerAssignments(assignmentsByFeatureId, {
     render,
     historyKind,
     dirtyReason,
@@ -1156,6 +1307,21 @@ function initSidebar({ render } = {}) {
   const waterInspectorColorValue = document.getElementById("waterInspectorColorValue");
   const waterInspectorColorInput = document.getElementById("waterInspectorColorInput");
   const clearWaterRegionColorBtn = document.getElementById("clearWaterRegionColorBtn");
+  const specialRegionInspectorSection = document.getElementById("specialRegionInspectorSection");
+  const scenarioSpecialRegionVisibilityToggle = document.getElementById("scenarioSpecialRegionVisibilityToggle");
+  const scenarioSpecialRegionVisibilityHint = document.getElementById("scenarioSpecialRegionVisibilityHint");
+  const specialRegionSearchInput = document.getElementById("specialRegionSearch");
+  const specialRegionList = document.getElementById("specialRegionList");
+  const specialRegionLegendList = document.getElementById("specialRegionLegendList");
+  const specialRegionInspectorEmpty = document.getElementById("specialRegionInspectorEmpty");
+  const specialRegionInspectorSelected = document.getElementById("specialRegionInspectorSelected");
+  const specialRegionInspectorDetailHint = document.getElementById("specialRegionInspectorDetailHint");
+  const specialRegionColorRow = document.getElementById("specialRegionColorRow");
+  const specialRegionColorLabel = document.getElementById("specialRegionColorLabel");
+  const specialRegionColorSwatch = document.getElementById("specialRegionColorSwatch");
+  const specialRegionColorValue = document.getElementById("specialRegionColorValue");
+  const specialRegionColorInput = document.getElementById("specialRegionColorInput");
+  const clearSpecialRegionColorBtn = document.getElementById("clearSpecialRegionColorBtn");
   const selectedCountryActionsSection = document.getElementById("selectedCountryActionsSection");
   const projectLegendSection = document.getElementById("lblProjectLegend")?.closest("details");
   const diagnosticsSection = document.getElementById("lblDiagnostics")?.closest("details");
@@ -1214,6 +1380,7 @@ function initSidebar({ render } = {}) {
   let adaptiveInspectorHeightFrame = 0;
   let countryInspectorColorPickerOpen = false;
   let waterInspectorColorPickerOpen = false;
+  let specialRegionColorPickerOpen = false;
 
   const clampInspectorHeight = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
   const toViewportPixels = (vh) => (window.innerHeight * vh) / 100;
@@ -1240,6 +1407,16 @@ function initSidebar({ render } = {}) {
     );
     applyAdaptiveInspectorHeight(
       waterLegendList,
+      96,
+      220
+    );
+    applyAdaptiveInspectorHeight(
+      specialRegionList,
+      toViewportPixels(16),
+      toViewportPixels(30)
+    );
+    applyAdaptiveInspectorHeight(
+      specialRegionLegendList,
       96,
       220
     );
@@ -1290,6 +1467,12 @@ function initSidebar({ render } = {}) {
     waterInspectorColorInput.blur();
   };
 
+  const closeSpecialRegionColorPicker = () => {
+    if (!specialRegionColorInput) return;
+    specialRegionColorPickerOpen = false;
+    specialRegionColorInput.blur();
+  };
+
   if (projectFileName && !projectFileName.textContent.trim()) {
     projectFileName.textContent = t("No file selected", "ui");
   }
@@ -1315,6 +1498,7 @@ function initSidebar({ render } = {}) {
 
   let latestCountryStatesByCode = new Map();
   const waterRowRefsById = new Map();
+  const specialRegionRowRefsById = new Map();
   const countryRowRefsByCode = new Map();
   const getSearchTerm = () => (searchInput?.value || "").trim().toLowerCase();
   const matchesTerm = (value, term) => String(value || "").toLowerCase().includes(term);
@@ -1351,14 +1535,20 @@ function initSidebar({ render } = {}) {
     return t(fallbackName, "geo") || fallbackName || normalized;
   };
 
-  const formatReleasableParentLabel = (countryState) => {
+  const formatReleasableParentLabel = (countryState, { conjunction = false } = {}) => {
     const parentCodes = Array.isArray(countryState?.parentOwnerTags) && countryState.parentOwnerTags.length
       ? countryState.parentOwnerTags
       : (countryState?.parentOwnerTag ? [countryState.parentOwnerTag] : []);
     const labels = parentCodes
       .map((parentCode) => getInspectorCountryDisplayName(parentCode))
       .filter(Boolean);
-    return labels.join(", ");
+    if (!conjunction || labels.length <= 1) {
+      return labels.join(", ");
+    }
+    if (labels.length === 2) {
+      return `${labels[0]} ${t("and", "ui")} ${labels[1]}`;
+    }
+    return `${labels.slice(0, -1).join(", ")} ${t("and", "ui")} ${labels[labels.length - 1]}`;
   };
 
   const getScenarioSubjectKindLabel = (countryState) => {
@@ -1369,6 +1559,8 @@ function initSidebar({ render } = {}) {
       dominion: t("Dominion", "ui"),
       mandate: t("Mandate", "ui"),
       protectorate: t("Protectorate", "ui"),
+      client_state: t("Client State", "ui"),
+      condominium: t("Condominium", "ui"),
       colony: t("Colony", "ui"),
       commonwealth: t("Commonwealth", "ui"),
       colonial_government: t("Colonial Government", "ui"),
@@ -1387,7 +1579,8 @@ function initSidebar({ render } = {}) {
           : t("Releasable", "ui")
       );
     } else if (countryState?.scenarioSubject && showRelationMeta) {
-      const parentLabel = formatReleasableParentLabel(countryState);
+      const isCondominium = String(countryState?.subjectKind || countryState?.subject_kind || "").trim().toLowerCase() === "condominium";
+      const parentLabel = formatReleasableParentLabel(countryState, { conjunction: isCondominium });
       const subjectLabel = getScenarioSubjectKindLabel(countryState);
       metaBits.push(
         parentLabel
@@ -1423,7 +1616,10 @@ function initSidebar({ render } = {}) {
   };
 
   const createCountryInspectorState = (entry, fallbackIndex = 0) => {
-    const scenarioMeta = getScenarioCountryMeta(entry.code) || entry || {};
+    const inlineReleasableMeta = !!(entry?.releasable || String(entry?.entry_kind || entry?.entryKind || "").trim() === "releasable");
+    const scenarioMeta = inlineReleasableMeta
+      ? (entry || getScenarioCountryMeta(entry.code) || {})
+      : (getScenarioCountryMeta(entry.code) || entry || {});
     const lookupIso2 = resolveScenarioLookupCode(entry);
     const inspectorDataCode = resolveInspectorDataCode(entry);
     const presetLookupCode = resolveScenarioLookupCode(entry);
@@ -1469,7 +1665,22 @@ function initSidebar({ render } = {}) {
         : Array.isArray(entry.parentOwnerTags)
           ? entry.parentOwnerTags
           : [],
+      disabledRegionalPresetNames: (
+        Array.isArray(scenarioMeta.disabled_regional_preset_names)
+          ? scenarioMeta.disabled_regional_preset_names
+          : Array.isArray(entry.disabledRegionalPresetNames)
+            ? entry.disabledRegionalPresetNames
+            : []
+      )
+        .map((value) => normalizePresetName(value))
+        .filter(Boolean),
+      disabledRegionalPresetReason: String(
+        scenarioMeta.disabled_regional_preset_reason
+        || entry.disabledRegionalPresetReason
+        || ""
+      ).trim(),
       syntheticOwner: !!(scenarioMeta.synthetic_owner ?? entry.syntheticOwner),
+      hiddenFromCountryList: !!(scenarioMeta.hidden_from_country_list ?? entry.hiddenFromCountryList),
       featured: !!(scenarioMeta.featured ?? entry.featured),
       catalogOrder: Number(scenarioMeta.catalog_order ?? entry.catalogOrder ?? Number.MAX_SAFE_INTEGER),
       notes: String(scenarioMeta.notes || entry.notes || "").trim(),
@@ -1536,7 +1747,51 @@ function initSidebar({ render } = {}) {
       ? state.scenarioReleasableIndex.childTagsByParent[normalizedParent]
       : [];
     return childTags
-      .map((childTag) => latestCountryStatesByCode.get(normalizeCountryCode(childTag)))
+      .map((childTag, childIndex) => {
+        const normalizedChild = normalizeCountryCode(childTag);
+        const existingState = latestCountryStatesByCode.get(normalizedChild);
+        const existingParentTags = Array.isArray(existingState?.parentOwnerTags) && existingState.parentOwnerTags.length
+          ? existingState.parentOwnerTags
+          : (existingState?.parentOwnerTag ? [existingState.parentOwnerTag] : []);
+        if (existingState?.scenarioSubject && existingParentTags.includes(normalizedParent)) {
+          return null;
+        }
+        const releasableEntry = state.scenarioReleasableIndex?.byTag?.[normalizedChild];
+        if (releasableEntry && typeof releasableEntry === "object") {
+          return createCountryInspectorState({
+            code: normalizedChild,
+            display_name: releasableEntry.display_name,
+            color_hex: releasableEntry.color_hex,
+            feature_count: Number(releasableEntry.resolved_feature_count_hint || 0),
+            release_lookup_iso2: releasableEntry.release_lookup_iso2,
+            releasable: true,
+            entry_kind: "releasable",
+            scenario_only: true,
+            parent_owner_tag: releasableEntry.parent_owner_tag,
+            parent_owner_tags: Array.isArray(releasableEntry.parent_owner_tags)
+              ? releasableEntry.parent_owner_tags
+              : [],
+            capital_state_id: Number(releasableEntry.capital_state_id || 0) || 0,
+            core_state_ids: Array.isArray(releasableEntry.core_state_ids)
+              ? releasableEntry.core_state_ids
+              : [],
+            default_boundary_variant_id: releasableEntry.default_boundary_variant_id,
+            boundary_variants: Array.isArray(releasableEntry.boundary_variants)
+              ? releasableEntry.boundary_variants
+              : [],
+            companion_actions: Array.isArray(releasableEntry.companion_actions)
+              ? releasableEntry.companion_actions
+              : [],
+            notes: String(releasableEntry.notes || "").trim(),
+            continent_id: releasableEntry.continent_id,
+            continent_label: releasableEntry.continent_label,
+            subregion_id: releasableEntry.subregion_id,
+            subregion_label: releasableEntry.subregion_label,
+            catalog_order: Number(releasableEntry.catalog_order ?? childIndex),
+          }, childIndex);
+        }
+        return latestCountryStatesByCode.get(normalizedChild);
+      })
       .filter(Boolean)
       .sort(compareRelatedCountryStates);
   };
@@ -2090,8 +2345,6 @@ function initSidebar({ render } = {}) {
     countryState,
     { source = "scenario-actions", forceSovereignty = false, actionMode = "ownership" } = {}
   ) => {
-    if (!countryState?.releasable) return false;
-
     const presetRef = getPrimaryReleasablePresetRef(countryState);
     if (!presetRef) {
       console.warn("[scenario] Missing releasable core preset.", {
@@ -2109,12 +2362,69 @@ function initSidebar({ render } = {}) {
       if (typeof state.updateActiveSovereignUIFn === "function") {
         state.updateActiveSovereignUIFn();
       }
-      const result = applyPresetWithMode(presetRef.presetLookupCode, presetRef.presetIndex, {
-        mode: "ownership",
-        ownerCode: countryState.code,
+      const requestedTargetIds = Array.isArray(presetRef.preset?.ids) ? presetRef.preset.ids : [];
+      const {
+        requestedIds,
+        matchedIds: targetIds,
+        missingIds,
+      } = filterToVisibleFeatureIds(requestedTargetIds);
+      if (!requestedIds.length) {
+        renderList();
+        return false;
+      }
+      if (!targetIds.length) {
+        showToast(
+          t("Current map does not include this preset's detail features. Load detail topology and try again.", "ui"),
+          {
+            title: t("Core territory was not applied.", "ui"),
+            tone: "warning",
+            duration: 4200,
+          }
+        );
+        console.warn("[scenario] Core territory apply skipped because no visible feature ids matched.", {
+          source,
+          code: countryState?.code || "",
+          requestedCount: requestedIds.length,
+          missingCount: missingIds.length,
+        });
+        renderList();
+        return false;
+      }
+      const unionRequestedIds = getScenarioBoundaryVariantUnionFeatureIds(countryState, targetIds);
+      const { matchedIds: variantUnionIds } = filterToVisibleFeatureIds(unionRequestedIds);
+      const assignmentsByFeatureId = {};
+      const targetIdSet = new Set(targetIds.map((featureId) => String(featureId || "").trim()).filter(Boolean));
+      variantUnionIds.forEach((featureId) => {
+        const normalizedId = String(featureId || "").trim();
+        if (!normalizedId) return;
+        if (targetIdSet.has(normalizedId)) {
+          assignmentsByFeatureId[normalizedId] = {
+            ownerCode: countryState.code,
+            controllerCode: countryState.code,
+          };
+          return;
+        }
+        const baselineOwnerCode = normalizeCountryCode(
+          state.scenarioBaselineOwnersByFeatureId?.[normalizedId]
+            || state.runtimeCanonicalCountryByFeatureId?.[normalizedId]
+            || ""
+        );
+        const baselineControllerCode = normalizeCountryCode(
+          state.scenarioBaselineControllersByFeatureId?.[normalizedId]
+            || baselineOwnerCode
+            || ""
+        );
+        if (!baselineOwnerCode || !baselineControllerCode) return;
+        assignmentsByFeatureId[normalizedId] = {
+          ownerCode: baselineOwnerCode,
+          controllerCode: baselineControllerCode,
+        };
+      });
+      const result = applyScenarioOwnerControllerAssignments(assignmentsByFeatureId, {
         render,
-        ownershipHistoryKind: "scenario-core-apply-ownership",
-        ownershipDirtyReason: "scenario-core-apply-ownership",
+        historyKind: "scenario-core-apply-ownership",
+        dirtyReason: "scenario-core-apply-ownership",
+        recomputeReason: "scenario-core-apply-ownership",
       });
       if (!result?.applied) {
         if (result?.reason !== "no-visible-features") {
@@ -2187,7 +2497,7 @@ function initSidebar({ render } = {}) {
     action,
     { silent = false, suppressRenderList = false, recomputeShells = true } = {}
   ) => {
-    if (!countryState?.releasable || !action) return false;
+    if (!countryState || !action) return false;
     const targetOwnerCode = normalizeCountryCode(action.target_owner_tag);
     if (!targetOwnerCode) {
       if (!silent) {
@@ -2263,7 +2573,7 @@ function initSidebar({ render } = {}) {
   };
 
   const applyReleasableBoundaryVariantSelection = (countryState, variant) => {
-    if (!countryState?.releasable || !variant?.id) return false;
+    if (!countryState?.code || !variant?.id) return false;
     const result = setReleasableBoundaryVariant(countryState.code, variant.id);
     if (!result) {
       showToast(t("Boundary variant could not be selected.", "ui"), {
@@ -2692,8 +3002,8 @@ function initSidebar({ render } = {}) {
     }
     if (waterInspectorOpenOceanHint) {
       waterInspectorOpenOceanHint.textContent = state.showOpenOceanRegions
-        ? t("waterInspectorOpenOceanHintEnabled", "ui")
-        : t("waterInspectorOpenOceanHint", "ui");
+        ? t("Macro ocean regions are currently included in hover, click, and paint.", "ui")
+        : t("When off, macro ocean regions are ignored for hover, click, and paint.", "ui");
     }
   };
 
@@ -2877,6 +3187,266 @@ function initSidebar({ render } = {}) {
     scheduleAdaptiveInspectorHeights();
   };
 
+  const getSpecialFeatureDisplayName = (feature) => {
+    const rawName =
+      feature?.properties?.label ||
+      feature?.properties?.name ||
+      feature?.properties?.name_en ||
+      feature?.properties?.NAME ||
+      feature?.id ||
+      "Special Region";
+    return t(rawName, "geo") || String(rawName || "").trim() || "Special Region";
+  };
+
+  const getSpecialFeatureMeta = (feature) => {
+    const specialType = String(feature?.properties?.special_type || "special_region")
+      .replace(/_/g, " ")
+      .trim();
+    const regionGroup = String(feature?.properties?.region_group || "").replace(/_/g, " ").trim();
+    return [specialType, regionGroup].filter(Boolean).join(" · ");
+  };
+
+  const getSpecialFeatureFallbackColor = (feature) => {
+    const specialType = String(feature?.properties?.special_type || "").trim().toLowerCase();
+    if (specialType === "salt_flat") return "#d7c6a3";
+    if (specialType === "wasteland") return "#bf8f74";
+    return "#d6c19a";
+  };
+
+  const isSpecialFeatureVisibleInInspector = (feature) =>
+    !!feature && !!state.activeScenarioId && !!state.showScenarioSpecialRegions && feature?.properties?.interactive !== false;
+
+  const getSpecialFeatureColor = (featureId, feature = null) => {
+    const resolvedId = String(featureId || "").trim();
+    return (
+      ColorManager.normalizeHexColor(state.specialRegionOverrides?.[resolvedId]) ||
+      getSpecialFeatureFallbackColor(feature || state.specialRegionsById?.get(resolvedId))
+    );
+  };
+
+  const ensureSelectedSpecialRegion = () => {
+    const current = String(state.selectedSpecialRegionId || "").trim();
+    if (current && state.specialRegionsById?.has(current)) {
+      const feature = state.specialRegionsById.get(current);
+      if (isSpecialFeatureVisibleInInspector(feature)) {
+        return current;
+      }
+    }
+    state.selectedSpecialRegionId = "";
+    return "";
+  };
+
+  const getVisibleSpecialFeatures = () =>
+    Array.from(state.specialRegionsById?.values() || [])
+      .filter((feature) => isSpecialFeatureVisibleInInspector(feature))
+      .sort((a, b) => getSpecialFeatureDisplayName(a).localeCompare(getSpecialFeatureDisplayName(b)));
+
+  const renderSpecialRegionInspectorUi = () => {
+    const hasScenarioSpecialRegions = !!state.activeScenarioId && (state.specialRegionsById?.size || 0) > 0;
+    if (specialRegionInspectorSection) {
+      specialRegionInspectorSection.classList.toggle("hidden", !hasScenarioSpecialRegions);
+      if (hasScenarioSpecialRegions) {
+        specialRegionInspectorSection.open = true;
+      }
+    }
+    if (scenarioSpecialRegionVisibilityToggle) {
+      scenarioSpecialRegionVisibilityToggle.checked = !!state.showScenarioSpecialRegions;
+    }
+    if (scenarioSpecialRegionVisibilityHint) {
+      scenarioSpecialRegionVisibilityHint.textContent = state.showScenarioSpecialRegions
+        ? t("Scenario special regions are currently visible and interactive.", "ui")
+        : t("When off, scenario special regions are hidden and ignore hover, click, and paint.", "ui");
+    }
+  };
+
+  const renderSpecialRegionLegend = () => {
+    if (!specialRegionLegendList) return;
+    specialRegionLegendList.replaceChildren();
+    const overrideEntries = Object.entries(state.specialRegionOverrides || {})
+      .map(([featureId, color]) => {
+        const feature = state.specialRegionsById?.get(featureId);
+        if (!feature || !isSpecialFeatureVisibleInInspector(feature)) return null;
+        return {
+          featureId,
+          feature,
+          color: ColorManager.normalizeHexColor(color) || getSpecialFeatureColor(featureId, feature),
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => getSpecialFeatureDisplayName(a.feature).localeCompare(getSpecialFeatureDisplayName(b.feature)));
+
+    if (!overrideEntries.length) {
+      specialRegionLegendList.appendChild(
+        createEmptyNote(t("Paint special regions to create an override list.", "ui"))
+      );
+      return;
+    }
+
+    overrideEntries.forEach(({ featureId, feature, color }) => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "scenario-action-card";
+      row.addEventListener("click", () => {
+        state.selectedSpecialRegionId = featureId;
+        renderSpecialRegionList();
+      });
+
+      const copy = document.createElement("div");
+      copy.className = "scenario-action-card-copy";
+
+      const title = document.createElement("div");
+      title.className = "country-row-title";
+      title.textContent = getSpecialFeatureDisplayName(feature);
+
+      const meta = document.createElement("div");
+      meta.className = "country-select-meta";
+      meta.textContent = color.toUpperCase();
+
+      copy.appendChild(title);
+      copy.appendChild(meta);
+
+      const actions = document.createElement("div");
+      actions.className = "country-row-actions";
+
+      const swatch = document.createElement("span");
+      swatch.className = "country-select-swatch";
+      swatch.style.backgroundColor = color;
+      actions.appendChild(swatch);
+
+      row.appendChild(copy);
+      row.appendChild(actions);
+      specialRegionLegendList.appendChild(row);
+    });
+  };
+
+  const renderSpecialRegionInspectorDetail = () => {
+    if (!specialRegionInspectorEmpty || !specialRegionInspectorSelected) return;
+    const selectedId = ensureSelectedSpecialRegion();
+    const feature = selectedId ? state.specialRegionsById?.get(selectedId) : null;
+    const isEmpty = !feature;
+
+    specialRegionInspectorEmpty.classList.toggle("hidden", !isEmpty);
+    specialRegionInspectorSelected.classList.toggle("hidden", isEmpty);
+
+    if (!feature) {
+      if (specialRegionColorRow) specialRegionColorRow.classList.add("hidden");
+      if (specialRegionInspectorDetailHint) {
+        specialRegionInspectorDetailHint.classList.add("hidden");
+        specialRegionInspectorDetailHint.textContent = "";
+      }
+      if (specialRegionColorInput) {
+        specialRegionColorInput.disabled = true;
+      }
+      specialRegionColorPickerOpen = false;
+      scheduleAdaptiveInspectorHeights();
+      return;
+    }
+
+    const featureColor = getSpecialFeatureColor(selectedId, feature);
+    if (specialRegionInspectorDetailHint) {
+      const meta = getSpecialFeatureMeta(feature);
+      specialRegionInspectorDetailHint.classList.toggle("hidden", !meta);
+      specialRegionInspectorDetailHint.textContent = meta;
+    }
+    if (specialRegionColorRow) {
+      specialRegionColorRow.classList.remove("hidden");
+    }
+    if (specialRegionColorLabel) {
+      specialRegionColorLabel.textContent = t("Special Region Color", "ui");
+    }
+    if (specialRegionColorSwatch) {
+      specialRegionColorSwatch.style.backgroundColor = featureColor;
+      specialRegionColorSwatch.title =
+        `${t("Edit special region color", "ui")}: ${getSpecialFeatureDisplayName(feature)} (${featureColor.toUpperCase()})`;
+    }
+    if (specialRegionColorValue) {
+      specialRegionColorValue.textContent = featureColor.toUpperCase();
+    }
+    if (specialRegionColorInput) {
+      specialRegionColorInput.disabled = false;
+      specialRegionColorInput.value = featureColor;
+    }
+    scheduleAdaptiveInspectorHeights();
+  };
+
+  const renderSpecialRegionList = () => {
+    if (!specialRegionList) return;
+    renderSpecialRegionInspectorUi();
+    specialRegionRowRefsById.clear();
+    specialRegionList.replaceChildren();
+
+    const term = (specialRegionSearchInput?.value || "").trim().toLowerCase();
+    const features = getVisibleSpecialFeatures();
+
+    if (!features.length) {
+      specialRegionList.appendChild(createEmptyNote(t("No special regions available", "ui")));
+      renderSpecialRegionInspectorDetail();
+      renderSpecialRegionLegend();
+      scheduleAdaptiveInspectorHeights();
+      return;
+    }
+
+    const filteredFeatures = term
+      ? features.filter((feature) => {
+        const name = getSpecialFeatureDisplayName(feature).toLowerCase();
+        const rawId = String(feature?.properties?.id || feature?.id || "").toLowerCase();
+        const meta = getSpecialFeatureMeta(feature).toLowerCase();
+        return name.includes(term) || rawId.includes(term) || meta.includes(term);
+      })
+      : features;
+
+    if (!filteredFeatures.length) {
+      specialRegionList.appendChild(createEmptyNote(t("No matching special regions", "ui")));
+      renderSpecialRegionInspectorDetail();
+      renderSpecialRegionLegend();
+      scheduleAdaptiveInspectorHeights();
+      return;
+    }
+
+    filteredFeatures.forEach((feature) => {
+      const featureId = String(feature?.properties?.id || feature?.id || "").trim();
+      if (!featureId) return;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "inspector-item-btn";
+      button.classList.toggle("is-active", featureId === state.selectedSpecialRegionId);
+      button.addEventListener("click", () => {
+        state.selectedSpecialRegionId = featureId;
+        renderSpecialRegionList();
+      });
+
+      const name = document.createElement("div");
+      name.className = "country-row-title";
+      name.textContent = getSpecialFeatureDisplayName(feature);
+
+      const meta = document.createElement("div");
+      meta.className = "country-select-meta";
+      meta.textContent = getSpecialFeatureMeta(feature);
+
+      const swatch = document.createElement("span");
+      swatch.className = "country-select-swatch";
+      swatch.style.backgroundColor = getSpecialFeatureColor(featureId, feature);
+
+      const actions = document.createElement("div");
+      actions.className = "country-row-actions";
+      actions.appendChild(swatch);
+
+      const copy = document.createElement("div");
+      copy.className = "scenario-action-card-copy";
+      copy.appendChild(name);
+      copy.appendChild(meta);
+
+      button.appendChild(copy);
+      button.appendChild(actions);
+      specialRegionList.appendChild(button);
+      specialRegionRowRefsById.set(featureId, button);
+    });
+
+    renderSpecialRegionInspectorDetail();
+    renderSpecialRegionLegend();
+    scheduleAdaptiveInspectorHeights();
+  };
+
   const renderCountrySearchResults = (countryStates, term, priorityOrderMap) => {
     const searchGroups = buildInspectorSearchGroups(countryStates, term, priorityOrderMap);
     if (!searchGroups.length) {
@@ -2977,14 +3547,15 @@ function initSidebar({ render } = {}) {
     const term = getSearchTerm();
     const entries = getDynamicCountryEntries();
     const countryStates = entries.map((entry, entryIndex) => createCountryInspectorState(entry, entryIndex));
-    const topLevelCountryStates = buildInspectorTopLevelCountryEntries(countryStates);
+    const visibleCountryStates = countryStates.filter((countryState) => !countryState?.hiddenFromCountryList);
+    const topLevelCountryStates = buildInspectorTopLevelCountryEntries(visibleCountryStates);
     const priorityOrderMap = getPriorityCountryOrderMap();
     latestCountryStatesByCode = new Map(countryStates.map((countryState) => [countryState.code, countryState]));
     countryRowRefsByCode.clear();
     ensureSelectedInspectorCountry();
     list.replaceChildren();
 
-    if (!countryStates.length) {
+    if (!visibleCountryStates.length) {
       list.appendChild(createEmptyNote(t("No countries available", "ui")));
       renderCountryInspectorDetail();
       scheduleAdaptiveInspectorHeights();
@@ -2992,7 +3563,7 @@ function initSidebar({ render } = {}) {
     }
 
     if (term) {
-      renderCountrySearchResults(countryStates, term, priorityOrderMap);
+      renderCountrySearchResults(visibleCountryStates, term, priorityOrderMap);
     } else {
       renderGroupedCountryExplorer(topLevelCountryStates);
     }
@@ -3117,6 +3688,8 @@ function initSidebar({ render } = {}) {
   state.renderCountryListFn = renderList;
   state.renderWaterRegionListFn = renderWaterRegionList;
   state.updateWaterInteractionUIFn = renderWaterInteractionUi;
+  state.renderSpecialRegionListFn = renderSpecialRegionList;
+  state.updateScenarioSpecialRegionUIFn = renderSpecialRegionInspectorUi;
 
   if (waterInspectorOpenOceanToggle && !waterInspectorOpenOceanToggle.dataset.bound) {
     waterInspectorOpenOceanToggle.addEventListener("change", (event) => {
@@ -3133,6 +3706,20 @@ function initSidebar({ render } = {}) {
       if (render) render();
     });
     waterInspectorOpenOceanToggle.dataset.bound = "true";
+  }
+
+  if (scenarioSpecialRegionVisibilityToggle && !scenarioSpecialRegionVisibilityToggle.dataset.bound) {
+    scenarioSpecialRegionVisibilityToggle.addEventListener("change", (event) => {
+      state.showScenarioSpecialRegions = !!event.target.checked;
+      if (!state.showScenarioSpecialRegions) {
+        state.hoveredSpecialRegionId = null;
+      }
+      markDirty("toggle-scenario-special-regions");
+      renderSpecialRegionInspectorUi();
+      renderSpecialRegionList();
+      if (render) render();
+    });
+    scenarioSpecialRegionVisibilityToggle.dataset.bound = "true";
   }
 
   if (waterInspectorColorSwatch && waterInspectorColorInput && !waterInspectorColorSwatch.dataset.bound) {
@@ -3198,6 +3785,76 @@ function initSidebar({ render } = {}) {
     clearWaterRegionColorBtn.dataset.bound = "true";
   }
 
+  if (specialRegionSearchInput && !specialRegionSearchInput.dataset.bound) {
+    specialRegionSearchInput.addEventListener("input", () => {
+      renderSpecialRegionList();
+    });
+    specialRegionSearchInput.dataset.bound = "true";
+  }
+
+  if (specialRegionColorSwatch && specialRegionColorInput && !specialRegionColorSwatch.dataset.bound) {
+    specialRegionColorSwatch.addEventListener("click", () => {
+      specialRegionColorPickerOpen = true;
+      specialRegionColorInput.focus({ preventScroll: true });
+      if (typeof specialRegionColorInput.showPicker === "function") {
+        specialRegionColorInput.showPicker();
+      } else {
+        specialRegionColorInput.click();
+      }
+    });
+    specialRegionColorSwatch.dataset.bound = "true";
+  }
+
+  if (specialRegionColorInput && !specialRegionColorInput.dataset.bound) {
+    specialRegionColorInput.addEventListener("change", (event) => {
+      const selectedId = ensureSelectedSpecialRegion();
+      if (!selectedId) return;
+      const nextColor = ColorManager.normalizeHexColor(event.target.value);
+      const currentColor = getSpecialFeatureColor(selectedId);
+      if (!nextColor || nextColor === currentColor) {
+        closeSpecialRegionColorPicker();
+        renderSpecialRegionList();
+        return;
+      }
+      const historyBefore = captureHistoryState({ specialRegionIds: [selectedId] });
+      state.specialRegionOverrides[selectedId] = nextColor;
+      pushHistoryEntry({
+        kind: "inspector-special-region-color",
+        before: historyBefore,
+        after: captureHistoryState({ specialRegionIds: [selectedId] }),
+      });
+      markDirty("inspector-special-region-color");
+      if (render) render();
+      closeSpecialRegionColorPicker();
+      renderSpecialRegionList();
+    });
+    specialRegionColorInput.addEventListener("blur", () => {
+      specialRegionColorPickerOpen = false;
+    });
+    specialRegionColorInput.dataset.bound = "true";
+  }
+
+  if (clearSpecialRegionColorBtn && !clearSpecialRegionColorBtn.dataset.bound) {
+    clearSpecialRegionColorBtn.addEventListener("click", () => {
+      const selectedId = ensureSelectedSpecialRegion();
+      if (!selectedId) return;
+      if (!Object.prototype.hasOwnProperty.call(state.specialRegionOverrides || {}, selectedId)) {
+        return;
+      }
+      const historyBefore = captureHistoryState({ specialRegionIds: [selectedId] });
+      delete state.specialRegionOverrides[selectedId];
+      pushHistoryEntry({
+        kind: "clear-special-region-color",
+        before: historyBefore,
+        after: captureHistoryState({ specialRegionIds: [selectedId] }),
+      });
+      markDirty("clear-special-region-color");
+      if (render) render();
+      renderSpecialRegionList();
+    });
+    clearSpecialRegionColorBtn.dataset.bound = "true";
+  }
+
   const appendActionSection = (container, titleText) => {
     const section = document.createElement("div");
     section.className = "inspector-detail-section mt-3";
@@ -3228,6 +3885,7 @@ function initSidebar({ render } = {}) {
       onApply = null,
       disabled = false,
       disabledTitle = "",
+      getDisabledInfo = null,
       requireActiveOwner = normalizeActionMode() === "ownership",
     } = {}
   ) => {
@@ -3242,12 +3900,19 @@ function initSidebar({ render } = {}) {
     );
 
     presetEntries.forEach(({ preset, presetIndex }) => {
+      const rowDisabledInfo = typeof getDisabledInfo === "function"
+        ? getDisabledInfo({ preset, presetIndex, presetLookupCode })
+        : null;
+      const rowDisabled = !!rowDisabledInfo?.disabled;
+      const rowDisabledTitle = String(rowDisabledInfo?.title || "").trim();
       const nameBtn = document.createElement("button");
       nameBtn.type = "button";
       nameBtn.className = "inspector-item-btn";
       nameBtn.textContent = preset.name;
-      nameBtn.disabled = disabled || disableForMissingActiveSovereign;
-      if (disabledTitle && (disabled || disableForMissingActiveSovereign)) {
+      nameBtn.disabled = disabled || rowDisabled || disableForMissingActiveSovereign;
+      if (rowDisabledTitle && rowDisabled) {
+        nameBtn.title = rowDisabledTitle;
+      } else if (disabledTitle && (disabled || disableForMissingActiveSovereign)) {
         nameBtn.title = disabledTitle;
       } else if (disableForMissingActiveSovereign) {
         nameBtn.title = t("Choose an active owner before changing political ownership or borders.", "ui");
@@ -3261,6 +3926,20 @@ function initSidebar({ render } = {}) {
       });
       container.appendChild(nameBtn);
     });
+  };
+
+  const getCountryPresetDisabledInfo = (countryState, preset) => {
+    if (!countryState || !preset) return null;
+    const disabledNames = Array.isArray(countryState.disabledRegionalPresetNames)
+      ? countryState.disabledRegionalPresetNames
+      : [];
+    if (!disabledNames.length) return null;
+    const normalizedName = normalizePresetName(preset?.name);
+    if (!normalizedName || !disabledNames.includes(normalizedName)) return null;
+    return {
+      disabled: true,
+      title: countryState.disabledRegionalPresetReason || t("Already applied in scenario baseline", "ui"),
+    };
   };
 
   const renderNoActiveGuard = (container) => {
@@ -3360,7 +4039,10 @@ function initSidebar({ render } = {}) {
         presetSection,
         countryState.presetLookupCode || countryState.code,
         filteredPresetEntries,
-        t("No regional presets", "ui")
+        t("No regional presets", "ui"),
+        {
+          getDisabledInfo: ({ preset }) => getCountryPresetDisabledInfo(countryState, preset),
+        }
       );
     } else {
       presetSection.appendChild(createEmptyNote(t("No regional presets", "ui")));
@@ -3433,8 +4115,6 @@ function initSidebar({ render } = {}) {
       childStates: getReleasableChildrenForParent(countryState?.code),
     });
 
-    const actionGuarded = renderNoActiveGuard(container);
-
     if (countryState.hierarchyGroups.length > 0) {
       const groupSection = appendActionSection(container, t("Hierarchy Groups", "ui"));
       countryState.hierarchyGroups.forEach((group) => {
@@ -3442,16 +4122,12 @@ function initSidebar({ render } = {}) {
           t(group.label, "geo") || group.label,
           () => applyHierarchyGroupWithMode(group, {
             mode: "ownership",
-            ownerCode: state.activeSovereignCode,
+            ownerCode: countryState.code,
             render,
             ownershipHistoryKind: "scenario-hierarchy-apply-ownership",
             ownershipDirtyReason: "scenario-hierarchy-apply-ownership",
           })
         );
-        button.disabled = actionGuarded;
-        if (actionGuarded) {
-          button.title = t("Choose an active owner before changing political ownership or borders.", "ui");
-        }
         groupSection.appendChild(button);
       });
     } else {
@@ -3470,15 +4146,14 @@ function initSidebar({ render } = {}) {
         onApply: ({ presetIndex, presetLookupCode }) => {
           applyPresetWithMode(presetLookupCode, presetIndex, {
             mode: "ownership",
-            ownerCode: state.activeSovereignCode,
+            ownerCode: countryState.code,
             render,
             ownershipHistoryKind: "scenario-preset-apply-ownership",
             ownershipDirtyReason: "scenario-preset-apply-ownership",
           });
         },
-        disabled: actionGuarded,
-        disabledTitle: t("Choose an active owner before changing political ownership or borders.", "ui"),
-        requireActiveOwner: true,
+        getDisabledInfo: ({ preset }) => getCountryPresetDisabledInfo(countryState, preset),
+        requireActiveOwner: false,
       }
     );
   };
@@ -3561,11 +4236,12 @@ function initSidebar({ render } = {}) {
 
     const actions = document.createElement("div");
     actions.className = "country-row-actions scenario-core-action-row";
+    const isReleasable = !!countryState?.releasable;
 
     const activateBtn = document.createElement("button");
     activateBtn.type = "button";
     activateBtn.className = "btn-primary";
-    activateBtn.textContent = t("Activate Releasable", "ui");
+    activateBtn.textContent = isReleasable ? t("Activate Releasable", "ui") : t("Target This Country", "ui");
     activateBtn.addEventListener("click", () => {
       const normalizedCountryCode = normalizeCountryCode(countryState.code);
       const alreadyActive = normalizedCountryCode && normalizedCountryCode === normalizeCountryCode(state.activeSovereignCode);
@@ -3583,8 +4259,12 @@ function initSidebar({ render } = {}) {
       showToast(
         t(
           alreadyActive
-            ? "Political ownership editing already targets this releasable."
-            : "Political ownership editing now targets this releasable.",
+            ? (isReleasable
+              ? "Political ownership editing already targets this releasable."
+              : "Political ownership editing already targets this country.")
+            : (isReleasable
+              ? "Political ownership editing now targets this releasable."
+              : "Political ownership editing now targets this country."),
           "ui"
         ),
         {
@@ -3853,6 +4533,7 @@ function initSidebar({ render } = {}) {
               });
               setScenarioVisualAdjustmentsOpen(true);
             },
+            getDisabledInfo: ({ preset }) => getCountryPresetDisabledInfo(countryState, preset),
             requireActiveOwner: false,
           }
         );
@@ -3967,6 +4648,7 @@ function initSidebar({ render } = {}) {
     globalThis.addEventListener("resize", scheduleAdaptiveInspectorHeights);
     countryInspectorSection?.addEventListener("toggle", scheduleAdaptiveInspectorHeights);
     waterInspectorSection?.addEventListener("toggle", scheduleAdaptiveInspectorHeights);
+    specialRegionInspectorSection?.addEventListener("toggle", scheduleAdaptiveInspectorHeights);
     selectedCountryActionsSection?.addEventListener("toggle", scheduleAdaptiveInspectorHeights);
     sidebar.addEventListener("scroll", () => {
       if (countryInspectorColorPickerOpen) {
@@ -3975,6 +4657,9 @@ function initSidebar({ render } = {}) {
       if (waterInspectorColorPickerOpen) {
         closeWaterInspectorColorPicker();
       }
+      if (specialRegionColorPickerOpen) {
+        closeSpecialRegionColorPicker();
+      }
     }, { passive: true });
     sidebar.addEventListener("wheel", () => {
       if (countryInspectorColorPickerOpen) {
@@ -3982,6 +4667,9 @@ function initSidebar({ render } = {}) {
       }
       if (waterInspectorColorPickerOpen) {
         closeWaterInspectorColorPicker();
+      }
+      if (specialRegionColorPickerOpen) {
+        closeSpecialRegionColorPicker();
       }
     }, { passive: true });
     sidebar.dataset.adaptiveInspectorBound = "true";
@@ -4117,6 +4805,7 @@ function initSidebar({ render } = {}) {
         state.visualOverrides = data.visualOverrides || data.featureOverrides || {};
         state.featureOverrides = { ...state.visualOverrides };
         state.waterRegionOverrides = data.waterRegionOverrides || {};
+        state.specialRegionOverrides = data.specialRegionOverrides || {};
         state.sovereigntyByFeatureId = data.sovereigntyByFeatureId || {};
         state.sovereigntyInitialized = false;
         state.paintMode = data.paintMode || "visual";
@@ -4128,10 +4817,13 @@ function initSidebar({ render } = {}) {
             ? { ...data.releasableBoundaryVariantByTag }
             : {};
         if (state.activeScenarioId) {
+          const existingTags = Object.keys(state.scenarioCountriesByTag || {});
           state.scenarioReleasableIndex = buildScenarioReleasableIndex(state.activeScenarioId);
           state.scenarioCountriesByTag = {
             ...(state.scenarioCountriesByTag || {}),
-            ...getScenarioReleasableCountries(state.activeScenarioId),
+            ...getScenarioReleasableCountries(state.activeScenarioId, {
+              excludeTags: existingTags,
+            }),
           };
         }
         state.inspectorExpansionInitialized = false;
@@ -4233,6 +4925,10 @@ function initSidebar({ render } = {}) {
             data.layerVisibility.showOpenOceanRegions === undefined
               ? false
               : !!data.layerVisibility.showOpenOceanRegions;
+          state.showScenarioSpecialRegions =
+            data.layerVisibility.showScenarioSpecialRegions === undefined
+              ? true
+              : !!data.layerVisibility.showScenarioSpecialRegions;
           state.showUrban = !!data.layerVisibility.showUrban;
           state.showPhysical = !!data.layerVisibility.showPhysical;
           state.showRivers = !!data.layerVisibility.showRivers;
@@ -4249,6 +4945,9 @@ function initSidebar({ render } = {}) {
         }
         if (typeof state.updateWaterInteractionUIFn === "function") {
           state.updateWaterInteractionUIFn();
+        }
+        if (typeof state.updateScenarioSpecialRegionUIFn === "function") {
+          state.updateScenarioSpecialRegionUIFn();
         }
         if (typeof state.updateActiveSovereignUIFn === "function") {
           state.updateActiveSovereignUIFn();
@@ -4270,6 +4969,9 @@ function initSidebar({ render } = {}) {
         }
         if (typeof state.renderWaterRegionListFn === "function") {
           state.renderWaterRegionListFn();
+        }
+        if (typeof state.renderSpecialRegionListFn === "function") {
+          state.renderSpecialRegionListFn();
         }
         if (typeof state.renderPresetTreeFn === "function") {
           state.renderPresetTreeFn();
@@ -4297,6 +4999,8 @@ function initSidebar({ render } = {}) {
   renderList();
   renderWaterInteractionUi();
   renderWaterRegionList();
+  renderSpecialRegionInspectorUi();
+  renderSpecialRegionList();
   renderPresetTree();
   refreshLegendEditor();
   renderScenarioAuditPanel();

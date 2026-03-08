@@ -426,7 +426,7 @@ def _write_output_topology(
     build_political_only_topology(
         political,
         output_path,
-        quantization=cfg.TOPOLOGY_QUANTIZATION,
+        quantization=cfg.RUNTIME_POLITICAL_TOPOLOGY_QUANTIZATION,
     )
 
 

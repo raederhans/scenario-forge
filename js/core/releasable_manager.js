@@ -49,6 +49,12 @@ function normalizePresetSource(payload = {}) {
     feature_ids: Array.isArray(source.feature_ids)
       ? Array.from(new Set(source.feature_ids.map((item) => String(item || "").trim()).filter(Boolean)))
       : [],
+    exclude_group_ids: Array.isArray(source.exclude_group_ids)
+      ? Array.from(new Set(source.exclude_group_ids.map((item) => String(item || "").trim()).filter(Boolean)))
+      : [],
+    exclude_feature_ids: Array.isArray(source.exclude_feature_ids)
+      ? Array.from(new Set(source.exclude_feature_ids.map((item) => String(item || "").trim()).filter(Boolean)))
+      : [],
   };
 }
 
@@ -160,11 +166,17 @@ function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
     return ids;
   }
 
-  if (sourceType === "hierarchy_group_ids") {
+  if (sourceType === "hierarchy_group_ids" || sourceType === "feature_selection") {
     const groups = state.hierarchyData?.groups && typeof state.hierarchyData.groups === "object"
       ? state.hierarchyData.groups
       : {};
     const featureIds = new Set();
+    normalizedPresetSource.feature_ids.forEach((featureId) => {
+      const normalized = String(featureId || "").trim();
+      if (normalized) {
+        featureIds.add(normalized);
+      }
+    });
     normalizedPresetSource.group_ids.forEach((groupId) => {
       const ids = Array.isArray(groups[groupId]) ? groups[groupId] : [];
       ids.forEach((featureId) => {
@@ -173,6 +185,15 @@ function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
           featureIds.add(normalized);
         }
       });
+    });
+    normalizedPresetSource.exclude_group_ids.forEach((groupId) => {
+      const ids = Array.isArray(groups[groupId]) ? groups[groupId] : [];
+      ids.forEach((featureId) => {
+        featureIds.delete(String(featureId || "").trim());
+      });
+    });
+    normalizedPresetSource.exclude_feature_ids.forEach((featureId) => {
+      featureIds.delete(String(featureId || "").trim());
     });
     const ids = Array.from(featureIds);
     if (!ids.length) {
@@ -185,6 +206,24 @@ function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
 
   if (sourceType === "feature_ids") {
     const ids = Array.from(new Set(normalizedPresetSource.feature_ids));
+    normalizedPresetSource.group_ids.forEach((groupId) => {
+      const idsForGroup = Array.isArray(state.hierarchyData?.groups?.[groupId])
+        ? state.hierarchyData.groups[groupId]
+        : [];
+      idsForGroup.forEach((featureId) => {
+        const normalized = String(featureId || "").trim();
+        if (normalized && !ids.includes(normalized)) {
+          ids.push(normalized);
+        }
+      });
+    });
+    normalizedPresetSource.exclude_feature_ids.forEach((featureId) => {
+      const normalized = String(featureId || "").trim();
+      const index = ids.indexOf(normalized);
+      if (index >= 0) {
+        ids.splice(index, 1);
+      }
+    });
     if (!ids.length) {
       warnEmptyResolution({
         featureIds: normalizedPresetSource.feature_ids,
@@ -335,16 +374,25 @@ function createEmptyReleasableIndex() {
   };
 }
 
-function buildScenarioReleasableIndex(scenarioId = state.activeScenarioId) {
+function normalizeExcludedTags(values = []) {
+  return new Set(
+    (Array.isArray(values) ? values : [])
+      .map((value) => normalizeCountryCode(value))
+      .filter(Boolean)
+  );
+}
+
+function buildScenarioReleasableIndex(scenarioId = state.activeScenarioId, { excludeTags = [] } = {}) {
   const normalizedScenarioId = String(scenarioId || "").trim();
   if (!normalizedScenarioId) {
     return createEmptyReleasableIndex();
   }
 
   const index = createEmptyReleasableIndex();
+  const excludedTags = normalizeExcludedTags(excludeTags);
   resolveCatalogEntriesForScenario(normalizedScenarioId).forEach((entry, catalogOrder) => {
     const tag = normalizeCountryCode(entry.tag);
-    if (!tag) return;
+    if (!tag || excludedTags.has(tag)) return;
 
     const parentTags = Array.isArray(entry.parent_owner_tags)
       ? entry.parent_owner_tags
@@ -392,19 +440,20 @@ function buildScenarioReleasableIndex(scenarioId = state.activeScenarioId) {
   return index;
 }
 
-function getScenarioReleasableIndex(scenarioId = state.activeScenarioId) {
+function getScenarioReleasableIndex(scenarioId = state.activeScenarioId, { excludeTags = [] } = {}) {
   const normalizedScenarioId = String(scenarioId || "").trim();
   if (!normalizedScenarioId) {
     return createEmptyReleasableIndex();
   }
   if (
+    !(Array.isArray(excludeTags) && excludeTags.length) &&
     normalizedScenarioId === String(state.activeScenarioId || "").trim()
     && state.scenarioReleasableIndex
     && typeof state.scenarioReleasableIndex === "object"
   ) {
     return state.scenarioReleasableIndex;
   }
-  return buildScenarioReleasableIndex(normalizedScenarioId);
+  return buildScenarioReleasableIndex(normalizedScenarioId, { excludeTags });
 }
 
 function buildReleasablePresetOverlays() {
@@ -496,13 +545,15 @@ function rebuildPresetState() {
   return state.presetsState;
 }
 
-function getScenarioReleasableCountries(scenarioId = state.activeScenarioId) {
+function getScenarioReleasableCountries(scenarioId = state.activeScenarioId, { excludeTags = [] } = {}) {
   const normalizedScenarioId = String(scenarioId || "").trim();
   if (!normalizedScenarioId) return {};
 
   const releasables = {};
+  const excludedTags = normalizeExcludedTags(excludeTags);
   resolveCatalogEntriesForScenario(normalizedScenarioId).forEach((entry, catalogOrder) => {
     const tag = normalizeCountryCode(entry.tag);
+    if (excludedTags.has(tag)) return;
     const featureIds = resolvePresetFeatureIds(entry);
     if (!tag || !featureIds.length) return;
     const selectedBoundaryVariant = getResolvedReleasableBoundaryVariant(entry);
@@ -562,6 +613,7 @@ export {
   normalizeCountryCode,
   normalizePresetName,
   resolveCompanionActionFeatureIds,
+  resolveFeatureIdsFromPresetSource,
   rebuildPresetState,
   setReleasableBoundaryVariant,
 };

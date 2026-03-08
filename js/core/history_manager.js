@@ -1,5 +1,6 @@
 import { state } from "./state.js";
 import { rebuildOwnerIndex } from "./sovereignty_manager.js";
+import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_manager.js";
 
 function uniqueKeys(values) {
   return Array.from(new Set((Array.isArray(values) ? values : []).map((value) => String(value || "").trim()).filter(Boolean)));
@@ -37,15 +38,19 @@ function captureStylePaths(paths) {
 function captureHistoryState({
   featureIds = [],
   waterRegionIds = [],
+  specialRegionIds = [],
   ownerCodes = [],
   sovereigntyFeatureIds = [],
+  scenarioControllerFeatureIds = [],
   stylePaths = [],
 } = {}) {
   const snapshot = {};
   const ids = uniqueKeys(featureIds);
   const waterIds = uniqueKeys(waterRegionIds);
+  const specialIds = uniqueKeys(specialRegionIds);
   const ownerKeys = uniqueKeys(ownerCodes);
   const sovereigntyIds = uniqueKeys(sovereigntyFeatureIds);
+  const scenarioControllerIds = uniqueKeys(scenarioControllerFeatureIds);
   const styleKeys = uniqueKeys(stylePaths);
 
   if (ids.length) {
@@ -57,6 +62,10 @@ function captureHistoryState({
     snapshot.waterRegionOverrides = captureEntries(state.waterRegionOverrides || {}, waterIds);
   }
 
+  if (specialIds.length) {
+    snapshot.specialRegionOverrides = captureEntries(state.specialRegionOverrides || {}, specialIds);
+  }
+
   if (ownerKeys.length) {
     snapshot.sovereignBaseColors = captureEntries(state.sovereignBaseColors || {}, ownerKeys);
     snapshot.countryBaseColors = captureEntries(state.countryBaseColors || {}, ownerKeys);
@@ -65,6 +74,13 @@ function captureHistoryState({
 
   if (sovereigntyIds.length) {
     snapshot.sovereigntyByFeatureId = captureEntries(state.sovereigntyByFeatureId || {}, sovereigntyIds);
+  }
+
+  if (scenarioControllerIds.length) {
+    snapshot.scenarioControllersByFeatureId = captureEntries(
+      state.scenarioControllersByFeatureId || {},
+      scenarioControllerIds
+    );
   }
 
   if (styleKeys.length) {
@@ -143,14 +159,22 @@ function pushHistoryEntry(entry) {
 }
 
 function refreshUiAfterHistory(direction, entry) {
+  const affectsScenarioControllers = !!(
+    entry?.before?.scenarioControllersByFeatureId
+    || entry?.after?.scenarioControllersByFeatureId
+  );
   if (entry?.before?.sovereigntyByFeatureId || entry?.after?.sovereigntyByFeatureId) {
     state.sovereigntyInitialized = true;
     rebuildOwnerIndex();
   }
+  if (affectsScenarioControllers) {
+    state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
+    recalculateScenarioOwnerControllerDiffCount();
+  }
   if (typeof state.refreshColorStateFn === "function") {
     state.refreshColorStateFn({ renderNow: false });
   }
-  if (entry?.meta?.affectsSovereignty && typeof state.recomputeDynamicBordersNowFn === "function") {
+  if ((entry?.meta?.affectsSovereignty || affectsScenarioControllers) && typeof state.recomputeDynamicBordersNowFn === "function") {
     state.recomputeDynamicBordersNowFn({ renderNow: false, reason: `history-${direction}` });
   }
   if (typeof state.updateToolUIFn === "function") {
@@ -174,6 +198,9 @@ function refreshUiAfterHistory(direction, entry) {
   if (typeof state.renderWaterRegionListFn === "function") {
     state.renderWaterRegionListFn();
   }
+  if (typeof state.renderSpecialRegionListFn === "function") {
+    state.renderSpecialRegionListFn();
+  }
   if (typeof state.renderPresetTreeFn === "function") {
     state.renderPresetTreeFn();
   }
@@ -191,18 +218,22 @@ function applyHistorySnapshot(snapshot, direction, entry) {
   state.visualOverrides = state.visualOverrides || {};
   state.featureOverrides = state.featureOverrides || {};
   state.waterRegionOverrides = state.waterRegionOverrides || {};
+  state.specialRegionOverrides = state.specialRegionOverrides || {};
   state.sovereignBaseColors = state.sovereignBaseColors || {};
   state.countryBaseColors = state.countryBaseColors || {};
   state.countryPalette = state.countryPalette || {};
   state.sovereigntyByFeatureId = state.sovereigntyByFeatureId || {};
+  state.scenarioControllersByFeatureId = state.scenarioControllersByFeatureId || {};
 
   applyEntries(state.visualOverrides, snapshot.visualOverrides);
   applyEntries(state.featureOverrides, snapshot.featureOverrides);
   applyEntries(state.waterRegionOverrides, snapshot.waterRegionOverrides);
+  applyEntries(state.specialRegionOverrides, snapshot.specialRegionOverrides);
   applyEntries(state.sovereignBaseColors, snapshot.sovereignBaseColors);
   applyEntries(state.countryBaseColors, snapshot.countryBaseColors);
   applyEntries(state.countryPalette, snapshot.countryPalette);
   applyEntries(state.sovereigntyByFeatureId, snapshot.sovereigntyByFeatureId);
+  applyEntries(state.scenarioControllersByFeatureId, snapshot.scenarioControllersByFeatureId);
   applyStyleSnapshot(snapshot.styleConfig);
 
   refreshUiAfterHistory(direction, entry);

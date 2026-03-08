@@ -1307,6 +1307,74 @@
             </div>
           </details>
 
+          <details id="specialRegionInspectorSection" class="card inspector-section hidden">
+            <summary id="lblSpecialRegionInspector" class="section-header">Special Regions</summary>
+            <div class="inspector-panel-body">
+              <div class="card-flat inspector-detail-section">
+                <div id="lblScenarioSpecialRegionVisibility" class="section-header-block">Visibility</div>
+                <label class="toggle-label mt-2">
+                  <input id="scenarioSpecialRegionVisibilityToggle" type="checkbox" class="checkbox-input" checked />
+                  <span id="lblScenarioSpecialRegionVisibilityToggle">Show Scenario Special Regions</span>
+                </label>
+                <p id="scenarioSpecialRegionVisibilityHint" class="sidebar-tool-hint mt-2">
+                  Toggle Atlantropa-style scenario regions without affecting the base map.
+                </p>
+              </div>
+              <div class="card-flat inspector-search-block">
+                <label id="lblSpecialRegionSearch" class="visually-hidden" for="specialRegionSearch">Search Special Regions</label>
+                <div class="inspector-search-input-row">
+                  <svg class="inspector-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
+                    <path d="M16 16 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                  </svg>
+                  <input
+                    id="specialRegionSearch"
+                    type="text"
+                    placeholder="Search basin, shelf, or exposure..."
+                    class="input inspector-search-input"
+                  />
+                </div>
+              </div>
+              <div id="specialRegionList" class="country-list inspector-scroll mt-3"></div>
+              <div id="specialRegionInspectorDetail" class="inspector-detail-card mt-3">
+                <div id="specialRegionInspectorEmpty" class="inspector-empty-state">
+                  <div id="specialRegionInspectorEmptyTitle" class="section-header-block">Select a special region to inspect</div>
+                  <p id="specialRegionInspectorEmptyHint" class="sidebar-tool-hint">
+                    Click a drained basin or exposure zone on the map, or choose one from the list.
+                  </p>
+                </div>
+                <div id="specialRegionInspectorSelected" class="hidden">
+                  <p id="specialRegionInspectorDetailHint" class="sidebar-tool-hint mt-2 hidden"></p>
+                  <div id="specialRegionColorRow" class="inspector-color-row mt-3 hidden">
+                    <div id="specialRegionColorLabel" class="section-header-block">Special Region Color</div>
+                    <div class="inspector-color-row-main mt-2">
+                      <button
+                        id="specialRegionColorSwatch"
+                        type="button"
+                        class="inspector-color-swatch-btn"
+                        aria-label="Edit special region color"
+                      ></button>
+                      <div id="specialRegionColorValue" class="inspector-color-value">#d6c19a</div>
+                      <input
+                        id="specialRegionColorInput"
+                        type="color"
+                        value="#d6c19a"
+                        class="inspector-color-native-input"
+                        tabindex="-1"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <button id="clearSpecialRegionColorBtn" type="button" class="btn-secondary mt-3">Clear Special Region Override</button>
+                  </div>
+                </div>
+              </div>
+              <div class="inspector-detail-section mt-3">
+                <div id="lblSpecialRegionLegend" class="section-header-block">Special Region Overrides</div>
+                <div id="specialRegionLegendList" class="inspector-scroll mt-3"></div>
+              </div>
+            </div>
+          </details>
+
           <details id="selectedCountryActionsSection" class="card inspector-section">
             <summary id="lblPresetsHierarchy" class="section-header">Territories &amp; Presets</summary>
             <div class="inspector-panel-body">

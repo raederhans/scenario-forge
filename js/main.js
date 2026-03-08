@@ -135,6 +135,9 @@ function scheduleDeferredDetailPromotion(renderDispatcher) {
 
       state.topologyDetail = topologyDetail;
       state.runtimePoliticalTopology = runtimePoliticalTopology || state.runtimePoliticalTopology;
+      if (!state.activeScenarioId) {
+        state.defaultRuntimePoliticalTopology = state.runtimePoliticalTopology || null;
+      }
       state.topologyBundleMode = topologyBundleMode || "composite";
       state.detailDeferred = false;
       state.detailPromotionCompleted = true;
@@ -199,6 +202,7 @@ async function bootstrap() {
     state.topologyPrimary = topologyPrimary || state.topology;
     state.topologyDetail = topologyDetail || null;
     state.runtimePoliticalTopology = runtimePoliticalTopology || null;
+    state.defaultRuntimePoliticalTopology = state.runtimePoliticalTopology || null;
     state.topologyBundleMode = topologyBundleMode || "single";
     state.renderProfile = renderProfile || "auto";
     state.detailDeferred = !!detailDeferred;

@@ -37,9 +37,12 @@ EXPECTED_DEFAULT_BOUNDARY_VARIANT_ID_BY_TAG = {
 EXPECTED_COMPANION_ACTION_IDS = {
     "RKP": {"annexed_poland_to_ger"},
     "RKO": {"ostland_marijampole_to_ger"},
-    "RKU": {"transnistria_to_rom", "crimea_to_ger"},
+    "RKU": {"transnistria_to_rom"},
     "RKM": {"greater_finland_to_fin", "arctic_islands_to_ger"},
 }
+DEFAULT_OVERLAY_JSON_PATHS = [
+    PROJECT_ROOT / "data/releasables/hoi4_japan_victory.internal.phase1.overlay.json",
+]
 
 
 def normalize_tag(raw: object) -> str:
@@ -105,6 +108,54 @@ def write_text(path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
+def merge_source_payloads(base_payload: dict[str, object], overlay_payloads: list[dict[str, object]]) -> dict[str, object]:
+    merged = dict(base_payload)
+    merged_scenario_ids = [
+        str(value).strip()
+        for value in base_payload.get("scenario_ids", [])
+        if str(value).strip()
+    ]
+    entries_by_tag: dict[str, dict[str, object]] = {}
+    ordered_tags: list[str] = []
+    excluded_by_tag: dict[str, dict[str, object]] = {}
+
+    def upsert_entries(payload: dict[str, object]) -> None:
+        for raw_entry in payload.get("entries", []):
+            if not isinstance(raw_entry, dict):
+                continue
+            tag = normalize_tag(raw_entry.get("tag"))
+            if not tag:
+                continue
+            if tag not in ordered_tags:
+                ordered_tags.append(tag)
+            entries_by_tag[tag] = raw_entry
+
+    def upsert_excluded(payload: dict[str, object]) -> None:
+        for raw_entry in payload.get("excluded", []):
+            if not isinstance(raw_entry, dict):
+                continue
+            tag = normalize_tag(raw_entry.get("tag"))
+            if not tag:
+                continue
+            excluded_by_tag[tag] = raw_entry
+
+    upsert_entries(base_payload)
+    upsert_excluded(base_payload)
+
+    for overlay_payload in overlay_payloads:
+        for scenario_id in overlay_payload.get("scenario_ids", []):
+            normalized = str(scenario_id).strip()
+            if normalized and normalized not in merged_scenario_ids:
+                merged_scenario_ids.append(normalized)
+        upsert_entries(overlay_payload)
+        upsert_excluded(overlay_payload)
+
+    merged["scenario_ids"] = merged_scenario_ids
+    merged["entries"] = [entries_by_tag[tag] for tag in ordered_tags if tag in entries_by_tag]
+    merged["excluded"] = list(excluded_by_tag.values())
+    return merged
+
+
 def normalize_preset_source(raw: object) -> dict[str, object]:
     payload = raw if isinstance(raw, dict) else {}
     return {
@@ -112,6 +163,16 @@ def normalize_preset_source(raw: object) -> dict[str, object]:
         "name": str(payload.get("name") or "").strip(),
         "group_ids": [str(item).strip() for item in payload.get("group_ids", []) if str(item).strip()],
         "feature_ids": [str(item).strip() for item in payload.get("feature_ids", []) if str(item).strip()],
+        "exclude_group_ids": [
+            str(item).strip()
+            for item in payload.get("exclude_group_ids", [])
+            if str(item).strip()
+        ],
+        "exclude_feature_ids": [
+            str(item).strip()
+            for item in payload.get("exclude_feature_ids", [])
+            if str(item).strip()
+        ],
     }
 
 
@@ -145,14 +206,24 @@ def normalize_companion_action(raw: object) -> dict[str, object]:
 
 def resolve_feature_count_hint(preset_source: dict[str, object], hierarchy_groups: dict[str, list[str]]) -> int | None:
     source_type = str(preset_source.get("type") or "").strip()
-    if source_type == "feature_ids":
-        return len({feature_id for feature_id in preset_source.get("feature_ids", []) if feature_id})
-    if source_type != "hierarchy_group_ids":
+    if source_type == "legacy_preset_name":
         return None
 
     feature_ids: set[str] = set()
+    feature_ids.update(
+        str(feature_id).strip()
+        for feature_id in preset_source.get("feature_ids", [])
+        if str(feature_id).strip()
+    )
     for group_id in preset_source.get("group_ids", []):
         feature_ids.update(str(item).strip() for item in hierarchy_groups.get(group_id, []) if str(item).strip())
+    for group_id in preset_source.get("exclude_group_ids", []):
+        feature_ids.difference_update(
+            str(item).strip() for item in hierarchy_groups.get(group_id, []) if str(item).strip()
+        )
+    feature_ids.difference_update(
+        str(item).strip() for item in preset_source.get("exclude_feature_ids", []) if str(item).strip()
+    )
     return len(feature_ids)
 
 
@@ -231,7 +302,7 @@ def build_catalog_entry(
         validation_errors.append("missing_tag")
     if tag and tag not in country_tags and not manual_overlay:
         validation_errors.append("unknown_country_tag")
-    if tag in active_owner_tags:
+    if tag in active_owner_tags and not manual_overlay:
         validation_errors.append("tag_is_active_owner")
     if not release_lookup_iso2:
         validation_errors.append("missing_release_lookup_iso2")
@@ -249,14 +320,22 @@ def build_catalog_entry(
         validation_errors.append("missing_parent_owner_tag")
 
     source_type = str(preset_source.get("type") or "").strip()
-    if source_type not in {"legacy_preset_name", "hierarchy_group_ids", "feature_ids"}:
+    if source_type not in {"legacy_preset_name", "hierarchy_group_ids", "feature_ids", "feature_selection"}:
         validation_errors.append("invalid_preset_source_type")
     if source_type == "legacy_preset_name" and not str(preset_source.get("name") or "").strip():
         validation_errors.append("missing_legacy_preset_name")
-    if source_type == "hierarchy_group_ids" and not list(preset_source.get("group_ids", [])):
+    if source_type == "hierarchy_group_ids" and not (
+        list(preset_source.get("group_ids", [])) or list(preset_source.get("feature_ids", []))
+    ):
         validation_errors.append("missing_hierarchy_group_ids")
-    if source_type == "feature_ids" and not list(preset_source.get("feature_ids", [])):
+    if source_type == "feature_ids" and not (
+        list(preset_source.get("feature_ids", [])) or list(preset_source.get("group_ids", []))
+    ):
         validation_errors.append("missing_feature_ids")
+    if source_type == "feature_selection" and not (
+        list(preset_source.get("feature_ids", [])) or list(preset_source.get("group_ids", []))
+    ):
+        validation_errors.append("missing_feature_selection")
 
     feature_count_hint = resolve_feature_count_hint(preset_source, hierarchy_groups)
     if source_type == "hierarchy_group_ids" and not feature_count_hint:
@@ -413,6 +492,11 @@ def render_markdown_report(catalog_payload: dict[str, object]) -> str:
             source_label = f"groups:{len(preset_source.get('group_ids', []))}"
         elif source_label == "feature_ids":
             source_label = f"features:{len(preset_source.get('feature_ids', []))}"
+        elif source_label == "feature_selection":
+            source_label = (
+                f"selection:{len(preset_source.get('group_ids', []))}"
+                f"+{len(preset_source.get('feature_ids', []))}"
+            )
         feature_hint = entry.get("resolved_feature_count_hint")
         feature_text = "" if feature_hint is None else str(feature_hint)
         lines.append(
@@ -458,6 +542,13 @@ def main() -> int:
     source_root = discover_hoi4_source_root(args.source_root or None)
 
     source_payload = load_json(source_json_path)
+    overlay_payloads = [
+        load_json(path)
+        for path in DEFAULT_OVERLAY_JSON_PATHS
+        if path.exists()
+    ]
+    if overlay_payloads:
+        source_payload = merge_source_payloads(source_payload, overlay_payloads)
     hierarchy_groups, _country_meta = load_hierarchy_groups(Path(args.hierarchy))
     palette_pack = load_palette_pack(Path(args.palette_pack))
     country_tags = parse_country_tags(source_root / "common/country_tags/00_countries.txt")

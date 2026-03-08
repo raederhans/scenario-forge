@@ -266,25 +266,6 @@ const countryPresets = {
         "FR_ARR_74001", "FR_ARR_74002", "FR_ARR_74003", "FR_ARR_74004",
       ],
     },
-    {
-      name: "TNO Burgundy (SS State)",
-      ids: [
-        // Alsace-Lorraine regions
-        "FR_ARR_57003", "FR_ARR_57005", "FR_ARR_57006", "FR_ARR_57007", "FR_ARR_57009",
-        "FR_ARR_67002", "FR_ARR_67003", "FR_ARR_67004", "FR_ARR_67005", "FR_ARR_67008",
-        "FR_ARR_68001", "FR_ARR_68002", "FR_ARR_68004", "FR_ARR_68006",
-        // Franche-Comté (25, 39, 70, 90)
-        "FR_ARR_25001", "FR_ARR_25002", "FR_ARR_25003",
-        "FR_ARR_39001", "FR_ARR_39002", "FR_ARR_39003",
-        "FR_ARR_70001", "FR_ARR_70002",
-        "FR_ARR_90001",
-        // Bourgogne (21, 58, 71, 89)
-        "FR_ARR_21001", "FR_ARR_21002", "FR_ARR_21003",
-        "FR_ARR_58001", "FR_ARR_58002", "FR_ARR_58003", "FR_ARR_58004",
-        "FR_ARR_71001", "FR_ARR_71002", "FR_ARR_71003", "FR_ARR_71004", "FR_ARR_71005",
-        "FR_ARR_89001", "FR_ARR_89002", "FR_ARR_89003",
-      ],
-    },
   ],
 
   // ITALY - Historical
@@ -341,6 +322,67 @@ const countryPresets = {
       name: "Grand Duchy of Tuscany",
       ids: [
         "ITI11", "ITI12", "ITI13", "ITI14", "ITI15", "ITI16", "ITI17", "ITI18", "ITI19", "ITI1A",
+      ],
+    },
+    {
+      name: "French Occupation Strip (1940, Approx.)",
+      ids: [
+        "FR_ARR_06002",
+      ],
+    },
+    {
+      name: "Nice + Savoy",
+      ids: [
+        "FR_ARR_06002",
+        "FR_ARR_73001", "FR_ARR_73002", "FR_ARR_73003",
+        "FR_ARR_74001", "FR_ARR_74002", "FR_ARR_74003", "FR_ARR_74004",
+      ],
+    },
+    {
+      name: "Corsica",
+      ids: [
+        "FR_ARR_2A001", "FR_ARR_2A004", "FR_ARR_2B002", "FR_ARR_2B003", "FR_ARR_2B005",
+      ],
+    },
+    {
+      name: "Southeast France Expansion",
+      ids: [
+        "MC_ADMIN0_PASSTHROUGH",
+        "FR_ARR_06001",
+        "FR_ARR_04001", "FR_ARR_04002", "FR_ARR_04003", "FR_ARR_04004",
+        "FR_ARR_05001", "FR_ARR_05002",
+      ],
+    },
+    {
+      name: "Albania",
+      ids: [
+        "AL011", "AL012", "AL013", "AL014", "AL015", "AL021",
+        "AL022", "AL031", "AL032", "AL033", "AL034", "AL035",
+      ],
+    },
+    {
+      name: "Malta",
+      ids: [
+        "MT001", "MT002",
+      ],
+    },
+    {
+      name: "Cyprus",
+      ids: [
+        "CY000",
+      ],
+    },
+    {
+      name: "Dalmatia + Kotor Bay",
+      ids: [
+        "HR033", "HR034", "HR035", "HR037",
+        "ME_ADM1_MNE-1506", "ME_ADM1_MNE-1507", "ME_ADM1_MNE-1518",
+      ],
+    },
+    {
+      name: "Italian Greek Islands",
+      ids: [
+        "GR_ADM1_GRC-2883", "GR_ADM1_GRC-2990", "GR_ADM1_GRC-3013",
       ],
     },
   ],
@@ -739,6 +781,7 @@ export const state = {
   topologyPrimary: null,
   topologyDetail: null,
   runtimePoliticalTopology: null,
+  defaultRuntimePoliticalTopology: null,
   ruCityOverrides: null,
   topologyBundleMode: "single",
   renderProfile: "auto",
@@ -778,6 +821,7 @@ export const state = {
   scenarioBaselineControllersByFeatureId: {},
   scenarioBaselineCoresByFeatureId: {},
   scenarioControllerRevision: 0,
+  scenarioReliefOverlayRevision: 0,
   scenarioOwnerControllerDiffCount: 0,
   scenarioDataHealth: {
     expectedFeatureCount: 0,
@@ -797,6 +841,11 @@ export const state = {
   contextLayerExternalDataByName: {},
   specialZones: {},
   waterRegionsData: null,
+  scenarioWaterRegionsData: null,
+  scenarioSpecialRegionsData: null,
+  scenarioRuntimeTopologyData: null,
+  scenarioLandMaskData: null,
+  scenarioReliefOverlaysData: null,
   riversData: null,
   oceanData: null,
   oceanMaskMode: "topology_ocean",
@@ -827,6 +876,7 @@ export const state = {
   featureOverrides: {},
   visualOverrides: {},
   waterRegionOverrides: {},
+  specialRegionOverrides: {},
   sovereigntyByFeatureId: {},
   sovereigntyInitialized: false,
   sovereigntyRevision: 0,
@@ -873,10 +923,13 @@ export const state = {
   onboardingDismissed: false,
   hoveredId: null,
   hoveredWaterRegionId: null,
+  hoveredSpecialRegionId: null,
   selectedWaterRegionId: "",
+  selectedSpecialRegionId: "",
   zoomTransform: defaultZoom,
   showWaterRegions: true,
   showOpenOceanRegions: false,
+  showScenarioSpecialRegions: true,
   showUrban: true,
   showPhysical: true,
   showRivers: true,
@@ -995,6 +1048,7 @@ export const state = {
   updateZoomUIFn: null,
   updateTextureUIFn: null,
   updateWaterInteractionUIFn: null,
+  updateScenarioSpecialRegionUIFn: null,
   updateParentBorderCountryListFn: null,
   updateSpecialZoneEditorUIFn: null,
   updateScenarioContextBarFn: null,
@@ -1003,6 +1057,7 @@ export const state = {
   refreshCountryListRowsFn: null,
   refreshCountryInspectorDetailFn: null,
   renderWaterRegionListFn: null,
+  renderSpecialRegionListFn: null,
   renderPresetTreeFn: null,
   renderScenarioAuditPanelFn: null,
   refreshColorStateFn: null,
@@ -1041,11 +1096,17 @@ export const state = {
   spatialGridMeta: null,
   spatialItemsById: new Map(),
   waterRegionsById: new Map(),
+  specialRegionsById: new Map(),
   waterSpatialIndex: null,
   waterSpatialItems: [],
   waterSpatialGrid: new Map(),
   waterSpatialGridMeta: null,
   waterSpatialItemsById: new Map(),
+  specialSpatialIndex: null,
+  specialSpatialItems: [],
+  specialSpatialGrid: new Map(),
+  specialSpatialGridMeta: null,
+  specialSpatialItemsById: new Map(),
 
   TINY_AREA: 6,
   MOUSE_THROTTLE_MS: 16,

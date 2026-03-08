@@ -31,6 +31,7 @@ from map_builder.processors.cz_sk_border_detail import apply_cz_sk_border_detail
 from map_builder.processors.denmark_border_detail import apply_denmark_border_detail
 from map_builder.processors.global_basic_admin1 import apply_global_basic_admin1_replacement
 from map_builder.processors.north_america import apply_north_america_replacement
+from map_builder.processors.russia_ukraine import apply_russia_ukraine_replacement
 from init_map_data import apply_config_subdivisions
 
 try:
@@ -181,7 +182,7 @@ def _build_topology_dict_from_layers(layers: dict[str, gpd.GeoDataFrame]) -> dic
     topology = tp.Topology(
         object_layers,
         object_name=object_names,
-        prequantize=cfg.TOPOLOGY_QUANTIZATION,
+        prequantize=cfg.DETAIL_OUTPUT_TOPOLOGY_QUANTIZATION,
         topology=True,
         presimplify=False,
         toposimplify=False,
@@ -320,7 +321,7 @@ def _write_output_topology(
         special_zones=layers.get("special_zones"),
         water_regions=layers.get("water_regions"),
         output_path=output_path,
-        quantization=cfg.TOPOLOGY_QUANTIZATION,
+        quantization=cfg.DETAIL_OUTPUT_TOPOLOGY_QUANTIZATION,
     )
 
 
@@ -385,6 +386,7 @@ def main() -> None:
     patched_political = apply_denmark_border_detail(patched_political)
     patched_political = apply_cz_sk_border_detail(patched_political)
     patched_political = apply_belarus_replacement(patched_political)
+    patched_political = apply_russia_ukraine_replacement(patched_political)
     patched_political = apply_au_city_overrides(patched_political)
     if getattr(cfg, "ENABLE_SUBDIVISION_ENRICHMENT", False):
         patched_political = apply_config_subdivisions(patched_political)

@@ -66,7 +66,7 @@
     "KHM"
   ],
   "palette_id": "hoi4_vanilla",
-  "baseline_hash": "b4689a20e69196ae67c8897e62d81b96d1948bbf3e2ed528ad809826b63b0778",
+  "baseline_hash": "282ccf50c789733361766ea6bed925f231faaa29331fed00c9252f3f278f4214",
   "countries_url": "data/scenarios/hoi4_1936/countries.json",
   "owners_url": "data/scenarios/hoi4_1936/owners.by_feature.json",
   "controllers_url": "data/scenarios/hoi4_1936/controllers.by_feature.json",
@@ -74,20 +74,20 @@
   "audit_url": "data/scenarios/hoi4_1936/audit.json",
   "summary": {
     "feature_count": 11607,
-    "owner_count": 111,
-    "controller_count": 111,
+    "owner_count": 122,
+    "controller_count": 122,
     "quality_counts": {
-      "approx_existing_geometry": 634,
+      "approx_existing_geometry": 432,
       "direct_country_copy": 5202,
-      "manual_reviewed": 5771
+      "manual_reviewed": 5973
     },
     "source_counts": {
       "direct_active_owner": 5202,
       "fallback_mapped_tag": 18,
       "manual_rule": 6387
     },
-    "approximate_count": 634,
-    "manual_reviewed_feature_count": 5771,
+    "approximate_count": 432,
+    "manual_reviewed_feature_count": 5973,
     "geometry_blocker_count": 0,
     "critical_unresolved_count": 0,
     "synthetic_owner_feature_count": 18,

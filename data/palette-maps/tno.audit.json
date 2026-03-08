@@ -697,8 +697,8 @@
       "country_file_label": "Germany - Proper",
       "name_source": "exact_tag_loc",
       "country_file_is_shared_template": true,
-      "map_hex": "#442849",
-      "ui_hex": "#442849",
+      "map_hex": "#1a1a1a",
+      "ui_hex": "#2a2a2a",
       "status": "unmapped",
       "reason": "unreviewed"
     },

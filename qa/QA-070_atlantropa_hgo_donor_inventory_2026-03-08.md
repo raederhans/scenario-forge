@@ -1,0 +1,158 @@
+# QA-070 Atlantropa HGO Donor Inventory
+
+## Summary
+
+This inventory captures the major HGO donor clusters that can support future Atlantropa expansion in `tno_1962`.
+It is a planning artifact only. No new AOIs from this list are enabled in the current implementation pass.
+
+## Enabled in current pass
+
+- Adriatica
+  - `8491 Venezia Alantropa Zone`
+  - `8492 Istria Alantropa Zone`
+  - `8493 Fiume Alantropa Zone`
+  - `8494 Pago Alantropa Zone`
+  - `8495 Zara Alantropa Zone`
+  - `8496 Adriatic Alantropa Zone`
+  - `8497 Pelagosa Alantropa Zone`
+  - `8501 Metcovico Alantropa Zone`
+  - `8502 Solta Alantropa Zone`
+  - `8503 Lagosta Alantropa Zone`
+  - `8504 Plauno Alantropa Zone`
+  - `8505 Montenegro Alantropa Zone`
+  - `8506 Saseno Alantropa Zone`
+  - `8507 Albania Alantropa Zone`
+  - `8508 North Epirus Alantropa Zone`
+  - `8509 Corfu Alantropa Zone`
+  - `8487 Puglia Alantropa Zone`
+  - `8488 Marche Alantropa Zone`
+  - `8489 Goro Alantropa Zone`
+  - `10340 Zara Atlantropa Zone`
+  - `10458 Romagna Atlantropa Zone`
+  - `10459 Bellariva Atlantropa Zone`
+  - `10460 Abruzzo Atlantropa Zone`
+  - `10461 Duino Atlantropa Zone`
+  - `10462 Trieste Atlantropa Zone`
+- Sicily-Tunis
+  - `8486 Sicilian Alantropa Canal Site`
+  - `8557 North Sicily Alantropa Zone`
+  - `8558 South Sicily Alantropa Zone`
+  - `8559 East Sicily Alantropa Zone`
+  - `8560 Malta Alantropa Zone`
+  - `8561 New Sicily Alantropa Zone`
+  - `8562 Tunis Alantropa Zone`
+  - `9036 Tunisian Islands Atlantropa Zone`
+  - `9037 Pantelleria Atlantropa Zone`
+- Gabes
+  - `10202 West Gabes`
+  - `9079 New Sharqi Atlantropa Zone`
+- Levant
+  - `8544 Mersin Alantropa Zone`
+  - `8546 Latakia Alantropa Zone`
+  - `8547 Lebanon Alantropa Zone`
+  - `8548 Palestine Alantropa Zone`
+  - `8549 Gaza Alantropa Zone`
+  - `8550 Sinai Alantropa Zone`
+  - `8551 Akrotiri Alantropa Zone`
+  - `8552 Dhekelia Alantropa Zone`
+  - `8553 North Cyprus Alantropa Zone`
+  - `8554 Erenkoy Alantropa Zone`
+  - `8555 Cyprus Alantropa Zone`
+  - `8556 Nicosia Alantropa Zone`
+  - `9035 Hatay Atlantropa Zone`
+
+## Candidate expansion clusters
+
+- West Mediterranean and Iberia-Algeria
+  - `8450 Alboran Alantropa Zone`
+  - `8451 New Alboran Alantropa Zone`
+  - `8452 Tetuan Alantropa Zone`
+  - `8453 Melilla Alantropa Zone`
+  - `8454 Algeria Alantropa Zone`
+  - `8455 Murcia Alantropa Zone`
+  - `8456 South Valencia Alantropa Zone`
+  - `8457 Valencia Alantropa Zone`
+  - `8458 Catalonia Alantropa Zone`
+  - `8459 Ibiza Alantropa Zone`
+  - `8460 Mallorca Alantropa Zone`
+  - `8461 Menorca Alantropa Zone`
+  - `8462 Roussilon Alantropa Zone`
+  - `8463 Occitania Alantropa Zone`
+  - `8464 Provence Alantropa Zone`
+  - `8465 East Algeria Alantropa Zone`
+  - `8446 Ceuta Alantropa Zone`
+  - `8447 Gibraltar Alantropa Zone`
+  - `8448 Granada Alantropa Zone`
+  - `8449 Gibraltar Dam Site`
+- Tyrrhenian and west Italian coast
+  - `8466 Savoy Alantropa Zone`
+  - `8467 Monaco Alantropa Zone`
+  - `8468 Genoa Alantropa Zone`
+  - `8469 Tuscany Alantropa Zone`
+  - `8470 Corsica Alantropa Zone`
+  - `8471 Asinara Alantropa Zone`
+  - `8472 Sardinia Alantropa Zone`
+  - `8473 Olbia Alantropa Zone`
+  - `8474 Tavolara Alantropa Zone`
+  - `8475 East Sardinia Alantropa Zone`
+  - `8476 Elba Alantropa Zone`
+  - `8477 Orbetello Alantropa Zone`
+  - `8478 Lazio Alantropa Zone`
+  - `8479 Napoli Alantropa Zone`
+  - `8480 Cosenza Alantropa Zone`
+  - `8481 New Campania Alantropa Zone`
+  - `8482 Eolie Alantropa Zone`
+  - `8483 Calabria Alantropa Zone`
+  - `8484 Bari Alantropa Zone`
+  - `8485 Taranto Alantropa Zone`
+- Aegean and Greek islands
+  - `8510 Ionic Alantropa Zone`
+  - `8512 Pyrgos Alantropa Zone`
+  - `8515 Patras Alantropa Site`
+  - `8516 Peloponnese Alantropa Zone`
+  - `8517 Kythira Alantropa Zone`
+  - `8518 East Peloponnese Alantropa Zone`
+  - `8519 Poros Alantropa Zone`
+  - `8520 Attica Alantropa Zone`
+  - `8521 Euboea Alantropa Zone`
+  - `8522 Crete Alantropa Zone`
+  - `8523 Thessaly Alantropa Zone`
+  - `8524 Skiros Alantropa Zone`
+  - `8525 Gavdos Alantropa Zone`
+  - `8526 Naxos Alantropa Zone`
+  - `8527 Milos Alantropa Zone`
+  - `8528 New Eustratius Alantropa Site`
+  - `8529 Katerini Alantropa Zone`
+  - `8530 Chalkidiki Alantropa Zone`
+  - `8531 Thrace Alantropa Zone`
+  - `8532 Samothraki Alantropa Zone`
+  - `8533 Gelibolu Alantropa Zone`
+  - `8534 Imbros Alantropa Zone`
+  - `8535 Limnos Alantropa Zone`
+  - `8536 Lesvos Alantropa Zone`
+  - `8537 Izmir Alantropa Zone`
+  - `8538 Chios Alantropa Zone`
+  - `8539 Stampalia Alantropa Zone`
+  - `8540 Bodrum Alantropa Zone`
+  - `8541 Rodi Alantropa Zone`
+  - `8542 Scarpanto Alantropa Zone`
+  - `8653 Astipalea Alantropa Zone`
+- Libya, Cyrenaica, Alexandria, Suez and Qattara
+  - `8563 Sharqi Alantropa Zone`
+  - `8564 Tripoli Alantropa Zone`
+  - `8565 Benghasi Alantropa Zone`
+  - `8566 Sicilian Dam Site`
+  - `8567 Shahat Alantropa Zone`
+  - `8568 Derna Alantropa Zone`
+  - `8569 Sidi Barrani Alantropa Zone`
+  - `8570 Alexandria Alantropa Zone`
+  - `8572 Qattara Canal Site`
+  - `8574 Qattara Alantropa Canal Site`
+  - `8575 West Suez Alantropa Canal Site`
+  - `8576 East Suez Alantropa Canal Site`
+
+## Notes
+
+- Donor naming uses both `Atlantropa` and `Alantropa`; any future extraction pass must match both spellings.
+- HGO donor water is province-based, not implicit ocean. Mediterranean donor water states can support future `ATL sea` expansion without inventing new geometry.
+- This inventory is intentionally grouped by implementation clusters rather than copied verbatim from donor state order.

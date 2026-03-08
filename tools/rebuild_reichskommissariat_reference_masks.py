@@ -374,6 +374,7 @@ def build_target_masks(universe: FeatureUniverse, *, topology_gdf: gpd.GeoDataFr
     )
     transnistria_to_rom = universe.expand_groups("UA_Odessa")
     crimea_to_ger = {
+        "RU_ARCTIC_FB_043",  # Crimea shell fallback covering most of the peninsula
         "UA_RAY_74538382B10810755627981",  # Sovietsky
         "UA_RAY_74538382B12626856106214",  # Krasnoperekopsk
         "UA_RAY_74538382B17328028725822",  # Chornomorske

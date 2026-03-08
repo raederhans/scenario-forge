@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "scenario_id": "tno_1962",
+  "notes": "Southern Asia scenario ownership extensions for the 1962 TNO-derived bundle. This file currently introduces Azad Hind as a Japanese-aligned Co-Prosperity Sphere state without altering frontline/controller logic.",
+  "retired_tags": [],
+  "country_rules": [
+    {
+      "rule_id": "japan_azad_hind_client_1962",
+      "tag": "FRI",
+      "display_name": "Azad Hind",
+      "color_hex": "#867F53",
+      "base_iso2": "IN",
+      "lookup_iso2": "IN",
+      "provenance_iso2": "IN",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "featured": true,
+      "parent_owner_tag": "JAP",
+      "subject_kind": "client_state",
+      "entry_kind": "scenario_subject",
+      "include_hierarchy_group_ids": [
+        "IN_Bihar",
+        "IN_Jharkhand",
+        "IN_Sikkim",
+        "IN_Assam",
+        "IN_Arunachal_Pradesh",
+        "IN_Meghalaya",
+        "IN_Manipur",
+        "IN_Mizoram",
+        "IN_Nagaland",
+        "IN_Tripura"
+      ],
+      "include_feature_prefixes": ["BGD-"],
+      "notes": "Azad Hind in the Japanese Co-Prosperity Sphere, spanning eastern India, Bangladesh, and the northeastern frontier while remaining grouped under Southern Asia."
+    }
+  ]
+}

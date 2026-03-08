@@ -1,5 +1,6 @@
 # Python Virtual Environment
 .venv/
+.venv-tno-build/
 venv/
 env/
 .env
@@ -7,6 +8,9 @@ env/
 # Python Cache
 __pycache__/
 *.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
 # IDE Settings
 .vscode/
@@ -34,6 +38,14 @@ data/geoBoundaries-*.geojson
 skills-lock.json
 .tmp_*.js
 .tmp/
+
+# Local scratch workspaces and evidence dumps
+/historic geographic overhaul/
+/current-tno-1962-overview.png
+/tno-1962-*.txt
+/output/tno_preview/
+/output/playwright/*.png
+/test-results/
 
 # Local server logs
 http_server_*.log

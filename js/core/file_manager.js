@@ -31,12 +31,13 @@ class FileManager {
   static exportProject(appState) {
     if (!appState) return;
     const payload = {
-      schemaVersion: 11,
+      schemaVersion: 12,
       countryBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
       featureOverrides: appState.visualOverrides || appState.featureOverrides || {},
       sovereignBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
       visualOverrides: appState.visualOverrides || appState.featureOverrides || {},
       waterRegionOverrides: appState.waterRegionOverrides || {},
+      specialRegionOverrides: appState.specialRegionOverrides || {},
       sovereigntyByFeatureId: appState.sovereigntyByFeatureId || {},
       paintMode: appState.paintMode || "visual",
       activeSovereignCode: appState.activeSovereignCode || "",
@@ -48,6 +49,8 @@ class FileManager {
       layerVisibility: {
         showWaterRegions: appState.showWaterRegions === undefined ? true : !!appState.showWaterRegions,
         showOpenOceanRegions: !!appState.showOpenOceanRegions,
+        showScenarioSpecialRegions:
+          appState.showScenarioSpecialRegions === undefined ? true : !!appState.showScenarioSpecialRegions,
         showUrban: !!appState.showUrban,
         showPhysical: !!appState.showPhysical,
         showRivers: !!appState.showRivers,
@@ -124,6 +127,9 @@ class FileManager {
         if (!data.waterRegionOverrides || typeof data.waterRegionOverrides !== "object") {
           data.waterRegionOverrides = {};
         }
+        if (!data.specialRegionOverrides || typeof data.specialRegionOverrides !== "object") {
+          data.specialRegionOverrides = {};
+        }
         if (!data.sovereignBaseColors || typeof data.sovereignBaseColors !== "object") {
           data.sovereignBaseColors = data.countryBaseColors;
         }
@@ -187,6 +193,10 @@ class FileManager {
           data.layerVisibility.showWaterRegions === undefined ? true : !!data.layerVisibility.showWaterRegions;
         data.layerVisibility.showOpenOceanRegions =
           data.layerVisibility.showOpenOceanRegions === undefined ? false : !!data.layerVisibility.showOpenOceanRegions;
+        data.layerVisibility.showScenarioSpecialRegions =
+          data.layerVisibility.showScenarioSpecialRegions === undefined
+            ? true
+            : !!data.layerVisibility.showScenarioSpecialRegions;
         data.layerVisibility.showUrban =
           data.layerVisibility.showUrban === undefined ? true : !!data.layerVisibility.showUrban;
         data.layerVisibility.showPhysical =

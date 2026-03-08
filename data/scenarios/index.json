@@ -13,6 +13,12 @@
       "display_name": "HOI4 1939",
       "manifest_url": "data/scenarios/hoi4_1939/manifest.json",
       "audit_url": "data/scenarios/hoi4_1939/audit.json"
+    },
+    {
+      "scenario_id": "tno_1962",
+      "display_name": "TNO 1962",
+      "manifest_url": "data/scenarios/tno_1962/manifest.json",
+      "audit_url": "data/scenarios/tno_1962/audit.json"
     }
   ]
 }

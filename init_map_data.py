@@ -3107,6 +3107,16 @@ def rebuild_derived_hoi4_assets(output_dir: Path, strict: bool = False) -> bool:
         cwd=PROJECT_ROOT,
         check=True,
     )
+
+    print("[HOI4 Assets] Patching tno_1962 bundle")
+    subprocess.run(
+        [
+            sys.executable,
+            str(PROJECT_ROOT / "tools" / "patch_tno_1962_bundle.py"),
+        ],
+        cwd=PROJECT_ROOT,
+        check=True,
+    )
     return True
 
 
