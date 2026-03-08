@@ -132,7 +132,10 @@
       "notes": "British Raj baseline override for India, Pakistan, and Bangladesh.",
       "include_country_codes": ["IN", "PK", "BD"],
       "base_iso2": "IN",
-      "display_name_override": "British Raj"
+      "display_name_override": "British Raj",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "raj",
+      "entry_kind": "scenario_subject"
     },
     {
       "rule_id": "japan_korea_taiwan",
@@ -140,9 +143,23 @@
       "priority": 108,
       "quality": "manual_reviewed",
       "critical": true,
-      "notes": "Japanese colonial holdings across Korea and Taiwan.",
-      "include_country_codes": ["KR", "KP", "TW"],
+      "notes": "Japanese direct rule in Taiwan.",
+      "include_country_codes": ["TW"],
       "base_iso2": "JP"
+    },
+    {
+      "rule_id": "japanese_korea",
+      "owner_tag": "KOR",
+      "priority": 109,
+      "quality": "manual_reviewed",
+      "critical": true,
+      "notes": "Japanese colonial rule across Korea.",
+      "include_country_codes": ["KR", "KP"],
+      "base_iso2": "KR",
+      "display_name_override": "Korea",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
     },
     {
       "rule_id": "manchukuo",
@@ -476,6 +493,20 @@
       "base_iso2": "JP"
     },
     {
+      "rule_id": "philippines_commonwealth",
+      "owner_tag": "PHI",
+      "priority": 169,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "Philippines retained as a United States-associated commonwealth government.",
+      "include_country_codes": ["PH"],
+      "base_iso2": "PH",
+      "display_name_override": "Philippines",
+      "parent_owner_tag": "USA",
+      "subject_kind": "commonwealth",
+      "entry_kind": "scenario_subject"
+    },
+    {
       "rule_id": "burma",
       "owner_tag": "BRM",
       "priority": 170,
@@ -484,7 +515,10 @@
       "notes": "Burma separation from British Raj at runtime-country level.",
       "include_country_codes": ["MM"],
       "base_iso2": "MM",
-      "display_name_override": "Burma"
+      "display_name_override": "Burma",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
     },
     {
       "rule_id": "palestine_mandate",
@@ -495,7 +529,10 @@
       "notes": "Approximate Mandatory Palestine using current Israel runtime geography.",
       "include_country_codes": ["IL"],
       "base_iso2": "IL",
-      "display_name_override": "Palestine"
+      "display_name_override": "Palestine",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "mandate",
+      "entry_kind": "scenario_subject"
     },
     {
       "rule_id": "tannu_tuva",
@@ -520,13 +557,32 @@
       "display_name_override": "Afar"
     },
     {
+      "rule_id": "egypt_kingdom",
+      "owner_tag": "EGY",
+      "priority": 174,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "Egypt represented as a British-associated kingdom rather than direct metropolitan rule.",
+      "include_country_codes": ["EG"],
+      "base_iso2": "EG",
+      "display_name_override": "Kingdom of Egypt",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "entry_kind": "scenario_subject"
+    },
+    {
       "rule_id": "french_indochina",
-      "owner_tag": "FRA",
+      "owner_tag": "VIN",
       "priority": 200,
       "quality": "approx_existing_geometry",
       "critical": false,
-      "notes": "French colonial approximation across Indochina.",
-      "include_country_codes": ["VN", "KH", "LA"]
+      "notes": "French Indochina represented as a unified colonial administration.",
+      "include_country_codes": ["VN", "KH", "LA"],
+      "base_iso2": "VN",
+      "display_name_override": "French Indochina",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colonial_government",
+      "entry_kind": "scenario_subject"
     },
     {
       "rule_id": "french_colonies",
@@ -535,7 +591,7 @@
       "quality": "approx_existing_geometry",
       "critical": false,
       "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
-      "include_country_codes": ["DZ", "TN", "MA", "CI", "BJ", "BF", "TD", "CF", "CG", "GA", "GQ", "DJ", "GN", "GW", "ML", "MR", "MG", "NE", "SN", "TG", "CM", "KM", "PM", "TF", "MC", "EH", "SY", "LB"]
+      "include_country_codes": ["GQ", "DJ", "GW", "MG", "KM", "PM", "TF", "MC", "EH", "SY", "LB"]
     },
     {
       "rule_id": "british_colonies",
@@ -544,7 +600,7 @@
       "quality": "approx_existing_geometry",
       "critical": false,
       "notes": "British imperial approximation for protectorates, mandates, and colonies.",
-      "include_country_codes": ["AE", "BH", "BS", "BZ", "CY", "EG", "FK", "FO", "GG", "GH", "GM", "GS", "HK", "IM", "IO", "JE", "JM", "KE", "LK", "LS", "MT", "MU", "MW", "NG", "QA", "SC", "SD", "SH", "SL", "SS", "SZ", "TZ", "UG", "ZM", "ZW", "AQ"]
+      "include_country_codes": ["AE", "BH", "BS", "BZ", "CY", "FK", "FO", "GG", "GH", "GM", "GS", "HK", "IM", "IO", "JE", "JM", "KE", "LK", "LS", "MT", "MU", "MW", "NG", "QA", "SC", "SD", "SH", "SL", "SS", "SZ", "TZ", "UG", "ZM", "ZW", "AQ"]
     },
     {
       "rule_id": "british_caribbean_guiana",
@@ -557,12 +613,17 @@
     },
     {
       "rule_id": "belgian_colonies",
-      "owner_tag": "BEL",
+      "owner_tag": "RCG",
       "priority": 204,
       "quality": "approx_existing_geometry",
       "critical": false,
-      "notes": "Belgian colonial approximation.",
-      "include_country_codes": ["CD", "RW", "BI"]
+      "notes": "Belgian Congo and Ruanda-Urundi represented as a single Belgian colonial government.",
+      "include_country_codes": ["CD", "RW", "BI"],
+      "base_iso2": "CD",
+      "display_name_override": "Belgian Congo",
+      "parent_owner_tag": "BEL",
+      "subject_kind": "colonial_government",
+      "entry_kind": "scenario_subject"
     },
     {
       "rule_id": "portuguese_colonies",
@@ -571,7 +632,7 @@
       "quality": "approx_existing_geometry",
       "critical": false,
       "notes": "Portuguese colonial approximation.",
-      "include_country_codes": ["AO", "CV", "GW", "MZ", "ST", "TL", "MO"]
+      "include_country_codes": ["CV", "GW", "ST", "TL", "MO"]
     },
     {
       "rule_id": "dutch_colonies",
@@ -579,17 +640,22 @@
       "priority": 206,
       "quality": "approx_existing_geometry",
       "critical": false,
-      "notes": "Dutch colonial approximation for East Indies and Suriname.",
-      "include_country_codes": ["ID", "SR"]
+      "notes": "Dutch Suriname approximation outside the East Indies.",
+      "include_country_codes": ["SR"]
     },
     {
       "rule_id": "italian_colonies",
-      "owner_tag": "ITA",
+      "owner_tag": "LBA",
       "priority": 207,
       "quality": "approx_existing_geometry",
       "critical": false,
-      "notes": "Italian colonial approximation in Libya, Eritrea, and Somalia, including Somaliland once base topology detail is present.",
-      "include_country_codes": ["ER", "LY", "SO", "SM"]
+      "notes": "Italian Libya represented as a distinct colonial administration.",
+      "include_country_codes": ["LY"],
+      "base_iso2": "LY",
+      "display_name_override": "Libya",
+      "parent_owner_tag": "ITA",
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
     },
     {
       "rule_id": "south_africa_mandate",
@@ -598,7 +664,10 @@
       "quality": "approx_existing_geometry",
       "critical": false,
       "notes": "South West Africa approximation under South African control.",
-      "include_country_codes": ["NA"]
+      "include_country_codes": ["NA"],
+      "parent_owner_tag": "ENG",
+      "subject_kind": "dominion",
+      "entry_kind": "scenario_subject"
     },
     {
       "rule_id": "australia_dependencies",
@@ -607,7 +676,10 @@
       "quality": "approx_existing_geometry",
       "critical": false,
       "notes": "Australian dependencies approximation.",
-      "include_country_codes": ["PG", "HM"]
+      "include_country_codes": ["PG", "HM"],
+      "parent_owner_tag": "ENG",
+      "subject_kind": "dominion",
+      "entry_kind": "scenario_subject"
     },
     {
       "rule_id": "finnish_aland",
@@ -647,6 +719,154 @@
       "notes": "Approximate Malaya and Borneo dependencies.",
       "include_country_codes": ["SG", "BN"],
       "base_iso2": "MY"
+      ,
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
+    },
+    {
+      "rule_id": "french_algeria",
+      "owner_tag": "ALG",
+      "priority": 214,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "French Algeria represented as a separate colonial administration.",
+      "include_country_codes": ["DZ"],
+      "base_iso2": "DZ",
+      "display_name_override": "French Algeria",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
+    },
+    {
+      "rule_id": "french_morocco",
+      "owner_tag": "MOR",
+      "priority": 215,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "French Morocco represented as a protectorate distinct from metropolitan France.",
+      "include_country_codes": ["MA"],
+      "base_iso2": "MA",
+      "display_name_override": "French Morocco",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "protectorate",
+      "entry_kind": "scenario_subject"
+    },
+    {
+      "rule_id": "french_tunisia",
+      "owner_tag": "TUN",
+      "priority": 216,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "French Tunisia represented as a protectorate distinct from metropolitan France.",
+      "include_country_codes": ["TN"],
+      "base_iso2": "TN",
+      "display_name_override": "French Tunisia",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "protectorate",
+      "entry_kind": "scenario_subject"
+    },
+    {
+      "rule_id": "french_west_africa",
+      "owner_tag": "AOF",
+      "priority": 217,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "French West Africa represented as a macro-level colonial federation.",
+      "include_country_codes": ["CI", "BJ", "BF", "GN", "ML", "MR", "NE", "SN", "TG"],
+      "base_iso2": "SN",
+      "lookup_iso2": "SN",
+      "display_name_override": "French West Africa",
+      "color_hex_override": "#6f8ecf",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colonial_federation",
+      "entry_kind": "scenario_subject"
+    },
+    {
+      "rule_id": "french_equatorial_africa",
+      "owner_tag": "AEF",
+      "priority": 218,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "French Equatorial Africa represented as a macro-level colonial federation.",
+      "include_country_codes": ["TD", "CF", "CG", "GA", "CM"],
+      "base_iso2": "TD",
+      "lookup_iso2": "TD",
+      "display_name_override": "French Equatorial Africa",
+      "color_hex_override": "#5478b8",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colonial_federation",
+      "entry_kind": "scenario_subject"
+    },
+    {
+      "rule_id": "italian_eritrea",
+      "owner_tag": "ERI",
+      "priority": 219,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "Italian Eritrea represented as a separate colonial administration in 1936.",
+      "include_country_codes": ["ER"],
+      "base_iso2": "ER",
+      "display_name_override": "Eritrea",
+      "parent_owner_tag": "ITA",
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
+    },
+    {
+      "rule_id": "italian_somaliland",
+      "owner_tag": "SOM",
+      "priority": 220,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "Italian Somaliland represented separately before the creation of Italian East Africa.",
+      "include_country_codes": ["SO", "SM"],
+      "base_iso2": "SO",
+      "display_name_override": "Italian Somaliland",
+      "parent_owner_tag": "ITA",
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
+    },
+    {
+      "rule_id": "dutch_east_indies",
+      "owner_tag": "INS",
+      "priority": 221,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "Dutch East Indies represented separately from the Netherlands proper.",
+      "include_country_codes": ["ID"],
+      "base_iso2": "ID",
+      "display_name_override": "Dutch East Indies",
+      "parent_owner_tag": "HOL",
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
+    },
+    {
+      "rule_id": "portuguese_angola",
+      "owner_tag": "ANG",
+      "priority": 222,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "Portuguese Angola represented as a separate colonial administration.",
+      "include_country_codes": ["AO"],
+      "base_iso2": "AO",
+      "display_name_override": "Angola",
+      "parent_owner_tag": "POR",
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
+    },
+    {
+      "rule_id": "portuguese_mozambique",
+      "owner_tag": "MZB",
+      "priority": 223,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "Portuguese Mozambique represented as a separate colonial administration.",
+      "include_country_codes": ["MZ"],
+      "base_iso2": "MZ",
+      "display_name_override": "Mozambique",
+      "parent_owner_tag": "POR",
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
     }
   ]
 }

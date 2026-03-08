@@ -85,6 +85,10 @@ class ScenarioRule:
     color_hex_override: str = ""
     source_type: str = "hoi4_owner"
     historical_fidelity: str = "vanilla"
+    parent_owner_tag: str = ""
+    parent_owner_tags: list[str] = field(default_factory=list)
+    subject_kind: str = ""
+    entry_kind: str = ""
 
     def __post_init__(self) -> None:
         if self.quality not in SCENARIO_RULE_QUALITIES:
@@ -129,3 +133,7 @@ class ScenarioCountryRecord:
     rule_sources: list[str] = field(default_factory=list)
     source_types: list[str] = field(default_factory=list)
     historical_fidelity_summary: list[str] = field(default_factory=list)
+    parent_owner_tag: str = ""
+    parent_owner_tags: list[str] = field(default_factory=list)
+    subject_kind: str = ""
+    entry_kind: str = ""

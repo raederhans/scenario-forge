@@ -70,12 +70,13 @@ if REQUESTED_MODE != "palettes":
     import geopandas as gpd
     import pandas as pd
     import requests
-    from shapely.geometry import box
+    from shapely.geometry import Polygon, box
     from shapely.ops import unary_union
 else:  # pragma: no cover - palettes mode does not touch GIS stack
     gpd = None
     pd = None
     requests = None
+    Polygon = None
     box = None
     unary_union = None
 
@@ -96,6 +97,7 @@ if REQUESTED_MODE != "palettes":
         DEFAULT_SHELL_COVERAGE_SPECS,
         collect_shell_coverage_gaps,
     )
+    from map_builder.processors.denmark_border_detail import apply_denmark_border_detail
     from map_builder.processors.france import apply_holistic_replacements
     from map_builder.processors.north_america import apply_north_america_replacement
     from map_builder.processors.physical_context import build_and_save_physical_context_layers
@@ -120,6 +122,7 @@ else:  # pragma: no cover - palettes mode avoids GIS/runtime build imports
     apply_china_replacement = None
     DEFAULT_SHELL_COVERAGE_SPECS = {}
     collect_shell_coverage_gaps = None
+    apply_denmark_border_detail = None
     apply_holistic_replacements = None
     apply_north_america_replacement = None
     build_and_save_physical_context_layers = None
@@ -151,6 +154,505 @@ ALLOWED_DETAIL_OVERLAY_SUPPORT_TIERS = {
     "GB": {"nuts1_basic"},
     "GR": {"adm1_basic"},
 }
+
+MAJOR_MARINE_WATER_NAMES = {
+    "Arctic Ocean",
+    "SOUTHERN OCEAN",
+    "North Atlantic Ocean",
+    "South Atlantic Ocean",
+    "North Pacific Ocean",
+    "South Pacific Ocean",
+    "INDIAN OCEAN",
+    "Black Sea",
+    "Philippine Sea",
+    "Tasman Sea",
+    "Bay of Bengal",
+    "South China Sea",
+    "Arabian Sea",
+    "Beaufort Sea",
+    "Caribbean Sea",
+    "Gulf of Mexico",
+    "Labrador Sea",
+    "Hudson Bay",
+    "Caspian Sea",
+    "Baffin Bay",
+    "Gulf of Alaska",
+    "Red Sea",
+    "Ross Sea",
+    "Weddell Sea",
+    "Persian Gulf",
+    "Celebes Sea",
+    "Sulu Sea",
+    "Norwegian Sea",
+    "Greenland Sea",
+    "Banda Sea",
+    "Bay of Biscay",
+    "Mozambique Channel",
+    "Gulf of Guinea",
+    "Scotia Sea",
+    "Baltic Sea",
+    "Barents Sea",
+    "North Sea",
+    "Irish Sea",
+    "Java Sea",
+    "Andaman Sea",
+    "Yellow Sea",
+    "East China Sea",
+    "Sea of Okhotsk",
+    "Gulf of Aden",
+    "Gulf of Oman",
+    "Great Australian Bight",
+    "Gulf of Carpentaria",
+    "Sea of Azov",
+    "Sea of Marmara",
+    "Salish Sea",
+}
+
+MEDITERRANEAN_COMPONENT_NAMES = {
+    "Mediterranean Sea",
+    "Alboran Sea",
+    "Tyrrhenian Sea",
+    "Ligurian Sea",
+    "Adriatic Sea",
+    "Ionian Sea",
+    "Aegean Sea",
+    "Gulf of Sidra",
+    "Strait of Gibraltar",
+    "Dardanelles",
+    "Sea of Marmara",
+    "Gulf of Suez",
+}
+
+SEEDED_LAKE_REGION_SPECS = [
+    {
+        "id": "lake_superior",
+        "name": "Lake Superior",
+        "label": "Superior",
+        "match_names": ["Lake Superior"],
+        "water_type": "lake",
+        "region_group": "great_lakes",
+    },
+    {
+        "id": "lake_michigan",
+        "name": "Lake Michigan",
+        "label": "Michigan",
+        "match_names": ["Lake Michigan"],
+        "water_type": "lake",
+        "region_group": "great_lakes",
+    },
+    {
+        "id": "lake_huron",
+        "name": "Lake Huron",
+        "label": "Huron",
+        "match_names": ["Lake Huron"],
+        "water_type": "lake",
+        "region_group": "great_lakes",
+    },
+    {
+        "id": "lake_erie",
+        "name": "Lake Erie",
+        "label": "Erie",
+        "match_names": ["Lake Erie"],
+        "water_type": "lake",
+        "region_group": "great_lakes",
+    },
+    {
+        "id": "lake_ontario",
+        "name": "Lake Ontario",
+        "label": "Ontario",
+        "match_names": ["Lake Ontario"],
+        "water_type": "lake",
+        "region_group": "great_lakes",
+    },
+    {
+        "id": "lake_baikal",
+        "name": "Lake Baikal",
+        "label": "Baikal",
+        "match_names": ["Lake Baikal"],
+        "water_type": "lake",
+        "region_group": "eurasia_lakes",
+    },
+    {
+        "id": "caspian_sea",
+        "name": "Caspian Sea",
+        "label": "Caspian",
+        "match_names": ["Caspian Sea"],
+        "water_type": "inland_sea",
+        "region_group": "eurasia_lakes",
+        "source_layer": "marine",
+    },
+    {
+        "id": "aral_sea",
+        "name": "Aral Sea",
+        "label": "Aral Sea",
+        "match_names": ["North Aral Sea", "South Aral Sea"],
+        "water_type": "inland_sea",
+        "region_group": "eurasia_lakes",
+    },
+    {
+        "id": "lake_victoria",
+        "name": "Lake Victoria",
+        "label": "Victoria",
+        "match_names": ["Lake Victoria"],
+        "water_type": "lake",
+        "region_group": "african_great_lakes",
+    },
+    {
+        "id": "lake_tanganyika",
+        "name": "Lake Tanganyika",
+        "label": "Tanganyika",
+        "match_names": ["Lake Tanganyika"],
+        "water_type": "lake",
+        "region_group": "african_great_lakes",
+    },
+    {
+        "id": "lake_malawi_nyasa",
+        "name": "Lake Malawi / Nyasa",
+        "label": "Malawi / Nyasa",
+        "match_names": ["Lake Malawi"],
+        "water_type": "lake",
+        "region_group": "african_great_lakes",
+    },
+    {
+        "id": "lake_ladoga",
+        "name": "Lake Ladoga",
+        "label": "Ladoga",
+        "match_names": ["Lake Ladoga"],
+        "water_type": "lake",
+        "region_group": "eurasia_lakes",
+    },
+    {
+        "id": "lake_onega",
+        "name": "Lake Onega",
+        "label": "Onega",
+        "match_names": ["Lake Onega"],
+        "water_type": "lake",
+        "region_group": "eurasia_lakes",
+    },
+    {
+        "id": "lake_balkhash",
+        "name": "Lake Balkhash",
+        "label": "Balkhash",
+        "match_names": ["Lake Balkhash"],
+        "water_type": "lake",
+        "region_group": "eurasia_lakes",
+    },
+    {
+        "id": "lake_titicaca",
+        "name": "Lake Titicaca",
+        "label": "Titicaca",
+        "match_names": ["Lago Titicaca", "Lake Titicaca"],
+        "water_type": "lake",
+        "region_group": "andes_lakes",
+    },
+]
+
+MEDITERRANEAN_REGION_SPECS = [
+    {
+        "id": "med_gibraltar",
+        "name": "Gibraltar Chokepoint",
+        "label": "Gibraltar",
+        "water_type": "strait",
+        "bbox": (-6.25, 35.0, -4.75, 36.4),
+        "is_chokepoint": True,
+    },
+    {
+        "id": "med_bosporus_dardanelles",
+        "name": "Bosporus-Dardanelles Chokepoint",
+        "label": "Bosporus-Dardanelles",
+        "water_type": "chokepoint",
+        "bbox": (25.4, 39.7, 30.4, 41.5),
+        "is_chokepoint": True,
+    },
+    {
+        "id": "med_suez_approach",
+        "name": "Suez Approach",
+        "label": "Suez",
+        "water_type": "chokepoint",
+        "bbox": (29.6, 30.2, 34.9, 32.8),
+        "is_chokepoint": True,
+    },
+    {
+        "id": "med_adriatic",
+        "name": "Adriatic Basin",
+        "label": "Adriatic",
+        "water_type": "sea",
+        "bbox": (12.0, 39.0, 20.7, 45.9),
+        "is_chokepoint": False,
+    },
+    {
+        "id": "med_aegean",
+        "name": "Aegean Sea",
+        "label": "Aegean",
+        "water_type": "sea",
+        "bbox": (22.0, 34.5, 28.8, 41.4),
+        "is_chokepoint": False,
+    },
+    {
+        "id": "med_ionian",
+        "name": "Ionian Sea",
+        "label": "Ionian",
+        "water_type": "sea",
+        "bbox": (13.5, 34.0, 22.4, 40.4),
+        "is_chokepoint": False,
+    },
+    {
+        "id": "med_tyrr_lig",
+        "name": "Tyrrhenian-Ligurian Sea",
+        "label": "Tyrrhenian-Ligurian",
+        "water_type": "sea",
+        "bbox": (6.0, 37.4, 16.6, 45.6),
+        "is_chokepoint": False,
+    },
+    {
+        "id": "med_levantine",
+        "name": "Levantine Basin",
+        "label": "Levantine",
+        "water_type": "sea",
+        "bbox": (25.0, 30.4, 37.6, 36.9),
+        "is_chokepoint": False,
+    },
+    {
+        "id": "med_central_corridor",
+        "name": "Central Mediterranean Corridor",
+        "label": "Central Mediterranean",
+        "water_type": "sea",
+        "bbox": (8.0, 32.4, 18.1, 39.6),
+        "is_chokepoint": False,
+    },
+]
+
+ANTARCTIC_POLAR_CRS = "EPSG:3031"
+ANTARCTIC_PARTITION_SCHEME = "claim_meridians_v1"
+ANTARCTIC_VALIDATION_TOLERANCE_KM2 = 5.0
+ANTARCTIC_POLE_CAP_RADIUS_M = 1_000.0
+ANTARCTIC_SECTOR_SPECS = [
+    {
+        "id": "AQ_QML",
+        "name": "20W-45E Sector",
+        "sector_start_lon": -20.0,
+        "sector_end_lon": 45.0,
+        "claimants": ["NO"],
+    },
+    {
+        "id": "AQ_AAT_WEST",
+        "name": "45E-136E Sector",
+        "sector_start_lon": 45.0,
+        "sector_end_lon": 136.0,
+        "claimants": ["AU"],
+    },
+    {
+        "id": "AQ_ADELIE",
+        "name": "136E-142E Sector",
+        "sector_start_lon": 136.0,
+        "sector_end_lon": 142.0,
+        "claimants": ["FR"],
+    },
+    {
+        "id": "AQ_AAT_EAST",
+        "name": "142E-160E Sector",
+        "sector_start_lon": 142.0,
+        "sector_end_lon": 160.0,
+        "claimants": ["AU"],
+    },
+    {
+        "id": "AQ_ROSS",
+        "name": "160E-150W Sector",
+        "sector_start_lon": 160.0,
+        "sector_end_lon": -150.0,
+        "claimants": ["NZ"],
+    },
+    {
+        "id": "AQ_MARIE_BYRD",
+        "name": "150W-90W Sector",
+        "sector_start_lon": -150.0,
+        "sector_end_lon": -90.0,
+        "claimants": [],
+        "claim_status": "unclaimed",
+    },
+    {
+        "id": "AQ_PEN_WEST",
+        "name": "Peninsula 90W-80W Sector",
+        "sector_start_lon": -90.0,
+        "sector_end_lon": -80.0,
+        "claimants": ["CL"],
+    },
+    {
+        "id": "AQ_PEN_OVERLAP_WEST",
+        "name": "Peninsula 80W-74W Overlap Sector",
+        "sector_start_lon": -80.0,
+        "sector_end_lon": -74.0,
+        "claimants": ["GB", "CL"],
+    },
+    {
+        "id": "AQ_PEN_OVERLAP_CORE",
+        "name": "Peninsula 74W-53W Overlap Sector",
+        "sector_start_lon": -74.0,
+        "sector_end_lon": -53.0,
+        "claimants": ["GB", "AR", "CL"],
+    },
+    {
+        "id": "AQ_PEN_OVERLAP_EAST",
+        "name": "Peninsula 53W-25W Overlap Sector",
+        "sector_start_lon": -53.0,
+        "sector_end_lon": -25.0,
+        "claimants": ["GB", "AR"],
+    },
+    {
+        "id": "AQ_PEN_EAST",
+        "name": "Peninsula 25W-20W Sector",
+        "sector_start_lon": -25.0,
+        "sector_end_lon": -20.0,
+        "claimants": ["GB"],
+    },
+]
+
+
+def _normalize_antarctic_claim_status(claimants: list[str]) -> str:
+    if not claimants:
+        return "unclaimed"
+    if len(claimants) > 1:
+        return "overlapping_claims"
+    return "claimed"
+
+
+def _to_unwrapped_east_longitude(lon: float) -> float:
+    east_lon = float(lon)
+    if east_lon < 0:
+        east_lon += 360.0
+    return east_lon
+
+
+def _compute_antarctic_sector_radius(projected_geom) -> float:
+    minx, miny, maxx, maxy = projected_geom.bounds
+    return max(4_500_000.0, max(abs(minx), abs(miny), abs(maxx), abs(maxy)) * 1.2)
+
+
+def _build_antarctic_sector_wedge(
+    sector_start_lon: float,
+    sector_end_lon: float,
+    radius_m: float,
+) -> Polygon:
+    start_east = _to_unwrapped_east_longitude(sector_start_lon)
+    end_east = _to_unwrapped_east_longitude(sector_end_lon)
+    if end_east <= start_east:
+        end_east += 360.0
+
+    start_angle = math.radians(90.0 - start_east)
+    end_angle = math.radians(90.0 - end_east)
+    step_count = max(16, int(abs(end_angle - start_angle) / math.radians(1.0)))
+    inner_radius_m = max(1.0, float(ANTARCTIC_POLE_CAP_RADIUS_M))
+    points: list[tuple[float, float]] = []
+    for step_index in range(step_count + 1):
+        angle = start_angle + ((end_angle - start_angle) * step_index / step_count)
+        points.append((radius_m * math.cos(angle), radius_m * math.sin(angle)))
+    # Avoid an exact South Pole apex in WGS84 output. A tiny inner polar arc keeps
+    # the sector partition valid while preventing every sector from collapsing to
+    # the same 0° / -90° vertex after reprojection.
+    for step_index in range(step_count, -1, -1):
+        angle = start_angle + ((end_angle - start_angle) * step_index / step_count)
+        points.append((inner_radius_m * math.cos(angle), inner_radius_m * math.sin(angle)))
+    return Polygon(points)
+
+
+def _validate_antarctic_sector_partition(
+    antarctica_proj,
+    sector_geoms_proj: list,
+) -> None:
+    if not sector_geoms_proj:
+        raise SystemExit("[Antarctica] Sectorization failed: no sector geometries were produced.")
+
+    union_geom = _repair_geometry(unary_union(sector_geoms_proj))
+    if union_geom is None or union_geom.is_empty:
+        raise SystemExit("[Antarctica] Sectorization failed: union geometry is empty.")
+
+    missing_geom = _repair_geometry(antarctica_proj.difference(union_geom))
+    extra_geom = _repair_geometry(union_geom.difference(antarctica_proj))
+    missing_area_km2 = 0.0 if missing_geom is None or missing_geom.is_empty else missing_geom.area / 1_000_000.0
+    extra_area_km2 = 0.0 if extra_geom is None or extra_geom.is_empty else extra_geom.area / 1_000_000.0
+    if (
+        missing_area_km2 > ANTARCTIC_VALIDATION_TOLERANCE_KM2
+        or extra_area_km2 > ANTARCTIC_VALIDATION_TOLERANCE_KM2
+    ):
+        raise SystemExit(
+            "[Antarctica] Sectorization coverage check failed: "
+            f"missing={missing_area_km2:.3f} km^2, extra={extra_area_km2:.3f} km^2"
+        )
+    print(
+        "[Antarctica] Sector coverage validated: "
+        f"missing={missing_area_km2:.3f} km^2, extra={extra_area_km2:.3f} km^2."
+    )
+
+
+def build_antarctic_sectors(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    if gdf is None or gdf.empty or "cntr_code" not in gdf.columns or "geometry" not in gdf.columns:
+        return gdf
+
+    normalized_codes = gdf["cntr_code"].fillna("").astype(str).str.strip().str.upper()
+    aq_rows = gdf.loc[normalized_codes == "AQ"].copy()
+    if aq_rows.empty:
+        return gdf
+
+    antarctica_ll = aq_rows.to_crs("EPSG:4326").copy()
+    antarctica_geom_ll = _repair_geometry(unary_union(antarctica_ll.geometry.tolist()))
+    if antarctica_geom_ll is None or antarctica_geom_ll.is_empty:
+        print("[Antarctica] AQ geometry is empty after union; keeping original feature.")
+        return gdf
+
+    antarctica_proj = gpd.GeoSeries([antarctica_geom_ll], crs="EPSG:4326").to_crs(ANTARCTIC_POLAR_CRS).iloc[0]
+    radius_m = _compute_antarctic_sector_radius(antarctica_proj)
+    sector_records: list[dict] = []
+    sector_geoms_proj: list = []
+    base_row = aq_rows.iloc[0].to_dict()
+
+    for spec in ANTARCTIC_SECTOR_SPECS:
+        wedge = _build_antarctic_sector_wedge(
+            sector_start_lon=float(spec["sector_start_lon"]),
+            sector_end_lon=float(spec["sector_end_lon"]),
+            radius_m=radius_m,
+        )
+        sector_geom_proj = _repair_geometry(antarctica_proj.intersection(wedge))
+        if sector_geom_proj is None or sector_geom_proj.is_empty:
+            raise SystemExit(f"[Antarctica] Sector {spec['id']} produced empty geometry.")
+        sector_geoms_proj.append(sector_geom_proj)
+        sector_geom_ll = gpd.GeoSeries([sector_geom_proj], crs=ANTARCTIC_POLAR_CRS).to_crs("EPSG:4326").iloc[0]
+        claimants = list(spec.get("claimants", []))
+        record = dict(base_row)
+        record.update(
+            {
+                "id": str(spec["id"]).strip(),
+                "name": f"Antarctica / {str(spec['name']).strip()}",
+                "cntr_code": "AQ",
+                "detail_tier": "antarctic_sector",
+                "claim_status": str(spec.get("claim_status") or _normalize_antarctic_claim_status(claimants)),
+                "claimants": claimants,
+                "partition_scheme": ANTARCTIC_PARTITION_SCHEME,
+                "sector_start_lon": float(spec["sector_start_lon"]),
+                "sector_end_lon": float(spec["sector_end_lon"]),
+                "geometry": sector_geom_ll,
+            }
+        )
+        sector_records.append(record)
+
+    _validate_antarctic_sector_partition(antarctica_proj, sector_geoms_proj)
+
+    sector_gdf = gpd.GeoDataFrame(sector_records, geometry="geometry", crs="EPSG:4326")
+    sector_gdf["geometry"] = sector_gdf.geometry.apply(_repair_geometry)
+    sector_gdf = sector_gdf[sector_gdf.geometry.notna() & ~sector_gdf.geometry.is_empty].copy()
+    if len(sector_gdf) != len(ANTARCTIC_SECTOR_SPECS):
+        raise SystemExit(
+            "[Antarctica] Sectorization output count mismatch: "
+            f"expected {len(ANTARCTIC_SECTOR_SPECS)}, got {len(sector_gdf)}"
+        )
+
+    base = gdf.loc[normalized_codes != "AQ"].copy()
+    combined = pd.concat([base, sector_gdf], ignore_index=True)
+    combined = gpd.GeoDataFrame(combined, geometry="geometry", crs="EPSG:4326")
+    print(
+        "[Antarctica] Replaced AQ shell with "
+        f"{len(sector_gdf)} claim-informed sectors ({ANTARCTIC_PARTITION_SCHEME})."
+    )
+    return combined
 
 try:
     import resource
@@ -392,6 +894,299 @@ def ensure_ocean_coverage(
         f"height={f_height:.2f}°, coverage={f_ratio:.3f}"
     )
     return fallback
+
+
+def _clean_water_text(value: object) -> str:
+    if value is None:
+        return ""
+    text = re.sub(r"\s+", " ", str(value)).strip()
+    return text.casefold()
+
+
+def _resolve_feature_name(row: pd.Series) -> str:
+    for column in ("name_en", "NAME_EN", "name", "NAME"):
+        if column not in row.index:
+            continue
+        value = str(row[column] or "").strip()
+        if value:
+            return value
+    return ""
+
+
+def _infer_water_type(name: str) -> str:
+    normalized = _clean_water_text(name)
+    if "ocean" in normalized:
+        return "ocean"
+    if "sea" in normalized:
+        return "sea"
+    if "gulf" in normalized:
+        return "gulf"
+    if "bay" in normalized:
+        return "bay"
+    if "strait" in normalized:
+        return "strait"
+    if "channel" in normalized:
+        return "channel"
+    if "bight" in normalized:
+        return "bight"
+    return "marine_region"
+
+
+def _slugify_water_id(prefix: str, name: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "_", _clean_water_text(name)).strip("_")
+    return f"{prefix}_{slug or 'region'}"
+
+
+def _select_named_water_features(
+    gdf: gpd.GeoDataFrame,
+    names: Iterable[str],
+) -> gpd.GeoDataFrame:
+    if gdf is None or gdf.empty:
+        return gpd.GeoDataFrame(columns=getattr(gdf, "columns", []), crs="EPSG:4326")
+    normalized_targets = {_clean_water_text(name) for name in names if _clean_water_text(name)}
+    if not normalized_targets:
+        return gdf.iloc[0:0].copy()
+    name_columns = [column for column in ("name_en", "NAME_EN", "name", "NAME") if column in gdf.columns]
+    if not name_columns:
+        return gdf.iloc[0:0].copy()
+    mask = pd.Series(False, index=gdf.index)
+    for column in name_columns:
+        mask = mask | gdf[column].fillna("").astype(str).map(_clean_water_text).isin(normalized_targets)
+    return gdf.loc[mask].copy()
+
+
+def _union_named_water_geometries(
+    gdf: gpd.GeoDataFrame,
+    match_names: Iterable[str],
+):
+    selected = _select_named_water_features(gdf, match_names)
+    if selected.empty:
+        return None
+    selected = selected[selected.geometry.notna() & ~selected.geometry.is_empty].copy()
+    if selected.empty:
+        return None
+    selected["geometry"] = selected.geometry.apply(_repair_geometry)
+    selected = selected[selected.geometry.notna() & ~selected.geometry.is_empty].copy()
+    if selected.empty:
+        return None
+    geom = unary_union(selected.geometry.tolist())
+    geom = _repair_geometry(geom)
+    if geom is None or geom.is_empty:
+        return None
+    return geom
+
+
+def _build_water_region_records_gdf(records: list[dict]) -> gpd.GeoDataFrame:
+    columns = [
+        "id",
+        "name",
+        "label",
+        "water_type",
+        "region_group",
+        "parent_id",
+        "neighbors",
+        "is_chokepoint",
+        "interactive",
+        "source_standard",
+        "geometry",
+    ]
+    if not records:
+        return gpd.GeoDataFrame(columns=columns, geometry="geometry", crs="EPSG:4326")
+
+    frame = pd.DataFrame.from_records(records)
+    for column in columns:
+        if column not in frame.columns:
+            if column == "geometry":
+                frame[column] = None
+            elif column in {"is_chokepoint", "interactive"}:
+                frame[column] = False
+            else:
+                frame[column] = ""
+    gdf = gpd.GeoDataFrame(frame[columns], geometry="geometry", crs="EPSG:4326")
+    gdf["geometry"] = gdf.geometry.apply(_repair_geometry)
+    gdf = gdf[gdf.geometry.notna() & ~gdf.geometry.is_empty].copy()
+    if gdf.empty:
+        return gpd.GeoDataFrame(columns=columns, geometry="geometry", crs="EPSG:4326")
+    gdf["id"] = gdf["id"].fillna("").astype(str).str.strip()
+    gdf = gdf[gdf["id"] != ""].copy()
+    gdf["name"] = gdf["name"].fillna("").astype(str).str.strip()
+    gdf["label"] = gdf["label"].fillna(gdf["name"]).astype(str).str.strip()
+    gdf["water_type"] = gdf["water_type"].fillna("marine_region").astype(str).str.strip()
+    gdf["region_group"] = gdf["region_group"].fillna("").astype(str).str.strip()
+    gdf["parent_id"] = gdf["parent_id"].fillna("").astype(str).str.strip()
+    gdf["neighbors"] = gdf["neighbors"].fillna("").astype(str).str.strip()
+    gdf["is_chokepoint"] = gdf["is_chokepoint"].fillna(False).astype(bool)
+    gdf["interactive"] = gdf["interactive"].fillna(True).astype(bool)
+    gdf["source_standard"] = gdf["source_standard"].fillna("natural_earth").astype(str).str.strip()
+    gdf = gdf.sort_values(["region_group", "name", "id"], kind="stable").reset_index(drop=True)
+    return gdf
+
+
+def _compute_water_region_neighbors(water_regions: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    if water_regions is None or water_regions.empty:
+        return water_regions
+    indexed = list(water_regions[["id", "geometry"]].itertuples(index=False, name=None))
+    neighbors_by_id: dict[str, set[str]] = {feature_id: set() for feature_id, _ in indexed}
+    for left_index, (left_id, left_geom) in enumerate(indexed):
+        if left_geom is None or left_geom.is_empty:
+            continue
+        left_bounds = left_geom.bounds
+        for right_id, right_geom in indexed[left_index + 1 :]:
+            if right_geom is None or right_geom.is_empty:
+                continue
+            right_bounds = right_geom.bounds
+            if (
+                left_bounds[2] < right_bounds[0]
+                or right_bounds[2] < left_bounds[0]
+                or left_bounds[3] < right_bounds[1]
+                or right_bounds[3] < left_bounds[1]
+            ):
+                continue
+            if not (left_geom.touches(right_geom) or left_geom.intersects(right_geom)):
+                continue
+            neighbors_by_id[left_id].add(right_id)
+            neighbors_by_id[right_id].add(left_id)
+    out = water_regions.copy()
+    out["neighbors"] = out["id"].map(
+        lambda feature_id: ",".join(sorted(neighbors_by_id.get(feature_id, set())))
+    )
+    return out
+
+
+def _build_mediterranean_water_regions(marine_polys: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    base_geom = _union_named_water_geometries(marine_polys, MEDITERRANEAN_COMPONENT_NAMES)
+    if base_geom is None or base_geom.is_empty:
+        return _build_water_region_records_gdf([])
+
+    records: list[dict] = []
+    remaining_geom = base_geom
+    for spec in MEDITERRANEAN_REGION_SPECS:
+        candidate_geom = remaining_geom.intersection(box(*spec["bbox"]))
+        candidate_geom = _repair_geometry(candidate_geom)
+        if candidate_geom is None or candidate_geom.is_empty:
+            continue
+        remaining_geom = _repair_geometry(remaining_geom.difference(candidate_geom)) or remaining_geom
+        records.append(
+            {
+                "id": spec["id"],
+                "name": spec["name"],
+                "label": spec["label"],
+                "water_type": spec["water_type"],
+                "region_group": "mediterranean",
+                "parent_id": "mediterranean_basin",
+                "neighbors": "",
+                "is_chokepoint": bool(spec["is_chokepoint"]),
+                "interactive": True,
+                "source_standard": "natural_earth+v1_bbox_partition",
+                "geometry": candidate_geom,
+            }
+        )
+
+    remaining_geom = _repair_geometry(remaining_geom)
+    if remaining_geom is not None and not remaining_geom.is_empty:
+        records.append(
+            {
+                "id": "med_open_basin",
+                "name": "Mediterranean Open Basin",
+                "label": "Mediterranean",
+                "water_type": "sea",
+                "region_group": "mediterranean",
+                "parent_id": "mediterranean_basin",
+                "neighbors": "",
+                "is_chokepoint": False,
+                "interactive": True,
+                "source_standard": "natural_earth+v1_bbox_partition",
+                "geometry": remaining_geom,
+            }
+        )
+
+    return _build_water_region_records_gdf(records)
+
+
+def build_water_regions(
+    marine_polys: gpd.GeoDataFrame,
+    lakes: gpd.GeoDataFrame,
+) -> gpd.GeoDataFrame:
+    records: list[dict] = []
+    mediterranean_targets = {_clean_water_text(name) for name in MEDITERRANEAN_COMPONENT_NAMES}
+    inland_marine_targets = {
+        _clean_water_text(name)
+        for spec in SEEDED_LAKE_REGION_SPECS
+        if str(spec.get("source_layer", "lakes")).strip().lower() == "marine"
+        for name in spec.get("match_names", [])
+    }
+    excluded_marine_targets = mediterranean_targets | inland_marine_targets
+
+    selected_marine = _select_named_water_features(marine_polys, MAJOR_MARINE_WATER_NAMES)
+    seen_ids: set[str] = set()
+    for row in selected_marine.itertuples(index=False):
+        row_series = pd.Series(row._asdict())
+        name = _resolve_feature_name(row_series)
+        if not name:
+            continue
+        normalized_name = _clean_water_text(name)
+        if normalized_name in excluded_marine_targets:
+            continue
+        geometry = _repair_geometry(getattr(row, "geometry", None))
+        if geometry is None or geometry.is_empty:
+            continue
+        feature_id = _slugify_water_id("marine", name)
+        if feature_id in seen_ids:
+            continue
+        seen_ids.add(feature_id)
+        water_type = _infer_water_type(name)
+        is_open_ocean = water_type == "ocean"
+        records.append(
+            {
+                "id": feature_id,
+                "name": name,
+                "label": name,
+                "water_type": water_type,
+                "region_group": "ocean_macro" if is_open_ocean else "marine_macro",
+                "parent_id": "",
+                "neighbors": "",
+                "is_chokepoint": False,
+                "interactive": not is_open_ocean,
+                "source_standard": "natural_earth",
+                "geometry": geometry,
+            }
+        )
+
+    for spec in SEEDED_LAKE_REGION_SPECS:
+        source_layer = str(spec.get("source_layer", "lakes")).strip().lower()
+        source_gdf = marine_polys if source_layer == "marine" else lakes
+        geometry = _union_named_water_geometries(source_gdf, spec["match_names"])
+        if geometry is None or geometry.is_empty:
+            print(f"[Water Regions] WARNING: could not resolve {spec['name']} from {source_layer}.")
+            continue
+        records.append(
+            {
+                "id": spec["id"],
+                "name": spec["name"],
+                "label": spec["label"],
+                "water_type": spec["water_type"],
+                "region_group": spec["region_group"],
+                "parent_id": "",
+                "neighbors": "",
+                "is_chokepoint": False,
+                "interactive": True,
+                "source_standard": f"natural_earth_{source_layer}",
+                "geometry": geometry,
+            }
+        )
+
+    mediterranean_regions = _build_mediterranean_water_regions(marine_polys)
+    water_regions = _build_water_region_records_gdf(records)
+    if mediterranean_regions is not None and not mediterranean_regions.empty:
+        water_regions = gpd.GeoDataFrame(
+            pd.concat([water_regions, mediterranean_regions], ignore_index=True),
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+        water_regions = _build_water_region_records_gdf(water_regions.to_dict("records"))
+    water_regions = _compute_water_region_neighbors(water_regions)
+    print(f"[Water Regions] Built {len(water_regions)} named water regions.")
+    return water_regions
 
 
 def log_layer_coverage(layer_name: str, gdf: gpd.GeoDataFrame, bounds: Iterable[float]) -> None:
@@ -2422,12 +3217,17 @@ def main() -> None:
         filtered["geometry"] = filtered.geometry.simplify(
             tolerance=cfg.SIMPLIFY_NUTS3, preserve_topology=True
         )
+    filtered = build_antarctic_sectors(filtered)
     validate_political_schema(filtered, "Political Filter")
 
     rivers_clipped = load_rivers()
     border_lines = build_border_lines()
     ocean = fetch_ne_zip(cfg.OCEAN_URL, "ocean")
     ocean = clip_to_map_bounds(ocean, "ocean")
+    marine_polys = fetch_ne_zip(cfg.MARINE_POLYS_URL, "marine polygons")
+    marine_polys = clip_to_map_bounds(marine_polys, "marine polygons")
+    lakes = fetch_ne_zip(cfg.LAKES_URL, "lakes")
+    lakes = clip_to_map_bounds(lakes, "lakes")
     land_bg = fetch_ne_zip(cfg.LAND_BG_URL, "land")
     land_bg = clip_to_map_bounds(land_bg, "land background")
     ocean = ensure_ocean_coverage(
@@ -2446,6 +3246,10 @@ def main() -> None:
     # Keep raw land background geometry until political bounds are finalized.
     land_bg_clipped = land_bg.copy()
     land_bg_clipped["geometry"] = land_bg_clipped.geometry.simplify(
+        tolerance=cfg.SIMPLIFY_BACKGROUND, preserve_topology=True
+    )
+    water_regions = build_water_regions(marine_polys, lakes)
+    water_regions["geometry"] = water_regions.geometry.simplify(
         tolerance=cfg.SIMPLIFY_BACKGROUND, preserve_topology=True
     )
     urban_clipped = load_urban()
@@ -2477,7 +3281,7 @@ def main() -> None:
     physical_filtered = physical_filtered[[col for col in keep_cols if col in physical_filtered.columns]]
 
     # Build hybrid interactive layer.
-    nuts_hybrid = filtered[["id", "name", "cntr_code", "geometry"]].copy()
+    nuts_hybrid = filtered.copy()
 
     special_zones = gpd.GeoDataFrame(
         columns=["id", "name", "type", "label", "claimants", "cntr_code", "geometry"],
@@ -2498,6 +3302,7 @@ def main() -> None:
                 crs="EPSG:4326",
             )
         hybrid = apply_holistic_replacements(hybrid)
+        hybrid = apply_denmark_border_detail(hybrid)
         hybrid = apply_russia_ukraine_replacement(hybrid)
         hybrid = apply_poland_replacement(hybrid)
         hybrid = apply_china_replacement(hybrid)
@@ -2590,6 +3395,7 @@ def main() -> None:
         ):
             ocean_clipped = clip_to_bounds(ocean_clipped, hybrid_bounds, "ocean")
             land_bg_clipped = clip_to_bounds(land_bg_clipped, hybrid_bounds, "land background")
+            water_regions = clip_to_bounds(water_regions, hybrid_bounds, "water regions")
     except Exception as exc:
         print(f"Background layer clip-to-political-bounds skipped: {exc}")
 
@@ -2605,6 +3411,7 @@ def main() -> None:
     filtered = cull_small_geometries(filtered, "land", group_col=filtered_group_col)
     ocean_clipped = cull_small_geometries(ocean_clipped, "ocean")
     land_bg_clipped = cull_small_geometries(land_bg_clipped, "land background")
+    water_regions = cull_small_geometries(water_regions, "water regions", group_col="id")
     urban_clipped = cull_small_geometries(urban_clipped, "urban")
     physical_filtered = cull_small_geometries(physical_filtered, "physical")
     hybrid = cull_small_geometries(hybrid, "hybrid", group_col="id")
@@ -2615,6 +3422,7 @@ def main() -> None:
     log_layer_coverage("political", final_hybrid, target_bounds)
     log_layer_coverage("ocean", ocean_clipped, target_bounds)
     log_layer_coverage("land", land_bg_clipped, target_bounds)
+    log_layer_coverage("water_regions", water_regions, target_bounds)
     log_layer_coverage("urban", urban_clipped, target_bounds)
     log_layer_coverage("physical", physical_filtered, target_bounds)
     log_layer_coverage("rivers", rivers_clipped, target_bounds)
@@ -2661,6 +3469,7 @@ def main() -> None:
         rivers_clipped,
         border_lines,
         ocean_clipped,
+        water_regions,
         land_bg_clipped,
         urban_clipped,
         physical_filtered,
@@ -2678,6 +3487,7 @@ def main() -> None:
         physical=physical_filtered,
         rivers=rivers_clipped,
         special_zones=special_zones,
+        water_regions=water_regions,
         output_path=topology_path,
         quantization=cfg.TOPOLOGY_QUANTIZATION,
     )

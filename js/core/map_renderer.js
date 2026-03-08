@@ -1,10 +1,20 @@
 // Hybrid canvas + SVG rendering engine.
 import {
+  normalizeDayNightStyleConfig,
   normalizePhysicalStyleConfig,
   normalizeTextureStyleConfig,
   PHYSICAL_ATLAS_PALETTE,
   state,
 } from "./state.js";
+import {
+  MODERN_CITY_LIGHTS_BASE_THRESHOLD,
+  MODERN_CITY_LIGHTS_CORRIDOR_THRESHOLD,
+  MODERN_CITY_LIGHTS_GRID,
+  MODERN_CITY_LIGHTS_GRID_HEIGHT,
+  MODERN_CITY_LIGHTS_GRID_WIDTH,
+  MODERN_CITY_LIGHTS_STEP_LAT_DEG,
+  MODERN_CITY_LIGHTS_STEP_LON_DEG,
+} from "./city_lights_modern_asset.js";
 import { ColorManager } from "./color_manager.js";
 import { LegendManager } from "./legend_manager.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
@@ -130,7 +140,8 @@ const COLOR_FUNC_RE = /^(?:rgb|rgba|hsl|hsla)\([^)]*\)$/i;
 const COLOR_NAME_RE = /^[a-z]+$/i;
 const RENDER_DIAG_PARAM = "render_diag";
 const PERF_OVERLAY_PARAM = "perf_overlay";
-const RENDER_PASS_NAMES = ["background", "political", "effects", "context", "borders"];
+const DAY_NIGHT_CLOCK_INTERVAL_MS = 15_000;
+const RENDER_PASS_NAMES = ["background", "political", "effects", "context", "dayNight", "borders"];
 let debugMode = "PROD";
 let islandNeighborsCache = {
   topologyRef: null,
@@ -143,6 +154,11 @@ const textureAssetCache = new Map();
 const texturePatternCache = new Map();
 const textureGeometryCache = new Map();
 const textureNoiseTileCache = new Map();
+const modernCityLightsGeometryCache = {
+  projectionKey: "",
+  baseEntries: [],
+  corridorEntries: [],
+};
 const layerResolverCache = {
   primaryRef: null,
   detailRef: null,
@@ -166,6 +182,9 @@ const renderDiag = {
   sampleByReason: new Map(),
 };
 const rewoundFeatureLogKeys = new Set();
+const urbanGeoCentroidCache = new WeakMap();
+let dayNightClockTimerId = null;
+let lastDayNightClockToken = "";
 
 function readSearchParam(name) {
   const search = globalThis?.location?.search || "";
@@ -204,6 +223,25 @@ function getRenderPassCacheState() {
     }
     if (!(passName in cache.reasons)) {
       cache.reasons[passName] = "init";
+    }
+  });
+  const counterDefaults = {
+    frames: 0,
+    composites: 0,
+    transformedFrames: 0,
+    drawCanvas: 0,
+    backgroundPassRenders: 0,
+    politicalPassRenders: 0,
+    effectsPassRenders: 0,
+    contextPassRenders: 0,
+    dayNightPassRenders: 0,
+    borderPassRenders: 0,
+    hitCanvasRenders: 0,
+    dynamicBorderRebuilds: 0,
+  };
+  Object.entries(counterDefaults).forEach(([counterName, initialValue]) => {
+    if (!Number.isFinite(Number(cache.counters[counterName]))) {
+      cache.counters[counterName] = initialValue;
     }
   });
   return cache;
@@ -346,6 +384,15 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       stableJson(normalizePhysicalStyleConfig(state.styleConfig?.physical || {})),
       stableJson(state.styleConfig?.urban || {}),
       stableJson(state.styleConfig?.rivers || {}),
+    ].join("::");
+  }
+  if (passName === "dayNight") {
+    const dayNightConfig = getDayNightStyleConfig();
+    return [
+      transformSignature,
+      state.topologyRevision || 0,
+      stableJson(dayNightConfig),
+      getDayNightSignatureClockToken(dayNightConfig),
     ].join("::");
   }
   if (passName === "borders") {
@@ -493,6 +540,40 @@ function getFeatureId(feature) {
   return text.length > 0 ? text : null;
 }
 
+function getWaterRegionName(feature) {
+  const rawName =
+    feature?.properties?.label ||
+    feature?.properties?.name ||
+    feature?.properties?.name_en ||
+    feature?.properties?.NAME ||
+    "Water Region";
+  return String(rawName || "").trim() || "Water Region";
+}
+
+function getWaterRegionType(feature) {
+  return String(feature?.properties?.water_type || "water_region").trim().toLowerCase();
+}
+
+function isOpenOceanWaterRegion(feature) {
+  return getWaterRegionType(feature) === "ocean";
+}
+
+function isWaterRegionEnabled(feature) {
+  if (!feature) return false;
+  if (isOpenOceanWaterRegion(feature)) {
+    return !!state.showOpenOceanRegions;
+  }
+  return feature?.properties?.interactive !== false;
+}
+
+function getWaterRegionColor(id) {
+  const resolvedId = String(id || "").trim();
+  return (
+    getSafeCanvasColor(state.waterRegionOverrides?.[resolvedId], null) ||
+    getOceanBaseFillColor()
+  );
+}
+
 function extractCountryCodeFromId(value) {
   const text = String(value || "").trim().toUpperCase();
   if (!text) return "";
@@ -561,9 +642,17 @@ function getFeatureRegionTag(feature) {
 function getColorsHash() {
   const sovereignEntries = Object.entries(state.sovereignBaseColors || {}).sort((a, b) => a[0].localeCompare(b[0]));
   const visualEntries = Object.entries(state.visualOverrides || {}).sort((a, b) => a[0].localeCompare(b[0]));
+  const waterEntries = Object.entries(state.waterRegionOverrides || {}).sort((a, b) => a[0].localeCompare(b[0]));
   const legacyCountryEntries = Object.entries(state.countryBaseColors || {}).sort((a, b) => a[0].localeCompare(b[0]));
   const legacyFeatureEntries = Object.entries(state.featureOverrides || {}).sort((a, b) => a[0].localeCompare(b[0]));
-  return JSON.stringify([sovereignEntries, visualEntries, legacyCountryEntries, legacyFeatureEntries, state.paintMode || "visual"]);
+  return JSON.stringify([
+    sovereignEntries,
+    visualEntries,
+    waterEntries,
+    legacyCountryEntries,
+    legacyFeatureEntries,
+    state.paintMode || "visual",
+  ]);
 }
 
 function isProbablyCanvasColor(value) {
@@ -731,6 +820,7 @@ function getPassCounterName(passName) {
   if (passName === "political") return "politicalPassRenders";
   if (passName === "effects") return "effectsPassRenders";
   if (passName === "context") return "contextPassRenders";
+  if (passName === "dayNight") return "dayNightPassRenders";
   if (passName === "borders") return "borderPassRenders";
   return "";
 }
@@ -840,7 +930,12 @@ function isAdmin0ShellFeature(feature, featureId) {
   const candidate = String(
     feature?.properties?.id ?? featureId ?? feature?.id ?? ""
   ).trim().toUpperCase();
-  return /^[A-Z]{2,3}$/.test(candidate);
+  if (/^[A-Z]{2,3}$/.test(candidate)) {
+    return true;
+  }
+  const countryCode = getFeatureCountryCodeNormalized(feature);
+  const detailTier = String(feature?.properties?.detail_tier || "").trim().toLowerCase();
+  return countryCode === "AQ" && detailTier === "antarctic_sector" && candidate.startsWith("AQ_");
 }
 
 function isGiantFeature(feature, canvasWidth, canvasHeight, boundsOverride = null) {
@@ -1383,12 +1478,14 @@ function scheduleRenderPhaseIdle() {
 
 function getDisplayOwnerCode(feature, id) {
   const resolvedId = String(id || "").trim() || getFeatureId(feature);
-  const ownershipOwnerCode = getFeatureOwnerCode(resolvedId) || getFeatureCountryCodeNormalized(feature);
+  const shellOwnerCode = String(state.scenarioAutoShellOwnerByFeatureId?.[resolvedId] || "").trim().toUpperCase();
+  const ownershipOwnerCode = shellOwnerCode || getFeatureOwnerCode(resolvedId) || getFeatureCountryCodeNormalized(feature);
   if (!state.activeScenarioId || String(state.scenarioViewMode || "ownership") !== "frontline") {
     return ownershipOwnerCode;
   }
   return String(
-    state.scenarioControllersByFeatureId?.[resolvedId]
+    state.scenarioAutoShellControllerByFeatureId?.[resolvedId]
+    || state.scenarioControllersByFeatureId?.[resolvedId]
     || ownershipOwnerCode
     || ""
   ).trim().toUpperCase();
@@ -1414,6 +1511,7 @@ function rebuildResolvedColors() {
   ensureSovereigntyState();
   state.sovereignBaseColors = sanitizeCountryColorMap(state.sovereignBaseColors);
   state.visualOverrides = sanitizeColorMap(state.visualOverrides);
+  state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
   state.countryBaseColors = { ...state.sovereignBaseColors };
   state.featureOverrides = { ...state.visualOverrides };
 
@@ -1445,6 +1543,7 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false } = {}
   ensureSovereigntyState();
   state.sovereignBaseColors = sanitizeCountryColorMap(state.sovereignBaseColors);
   state.visualOverrides = sanitizeColorMap(state.visualOverrides);
+  state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
   state.countryBaseColors = { ...state.sovereignBaseColors };
   state.featureOverrides = { ...state.visualOverrides };
 
@@ -1483,6 +1582,7 @@ function refreshResolvedColorsForOwners(ownerCodes, { renderNow = false } = {}) 
 }
 
 function refreshColorState({ renderNow = true } = {}) {
+  state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
   rebuildResolvedColors();
   if (renderNow && context) {
     render();
@@ -1712,6 +1812,7 @@ function ensureLayerDataFromTopology() {
 
   state.oceanData = resolveContextLayerData("ocean");
   state.landBgData = resolveContextLayerData("land");
+  state.waterRegionsData = resolveContextLayerData("water_regions");
   state.riversData = resolveContextLayerData("rivers");
   state.urbanData = resolveContextLayerData("urban");
   state.physicalData = resolveContextLayerData("physical");
@@ -1720,7 +1821,8 @@ function ensureLayerDataFromTopology() {
   const diag = state.layerDataDiagnostics || {};
   console.info(
     `${LAYER_DIAG_PREFIX} sources: ocean=${diag.ocean?.source || "none"}, `
-      + `land=${diag.land?.source || "none"}, rivers=${diag.rivers?.source || "none"}, `
+      + `land=${diag.land?.source || "none"}, water_regions=${diag.water_regions?.source || "none"}, `
+      + `rivers=${diag.rivers?.source || "none"}, `
       + `urban=${diag.urban?.source || "none"}, physical=${diag.physical?.source || "none"}, `
       + `special_zones=${diag.special_zones?.source || "none"}`
   );
@@ -1945,6 +2047,7 @@ function rebuildDynamicBorders() {
     `rev:${Number(state.sovereigntyRevision) || 0}`,
     `mode:${state.activeScenarioId ? String(state.scenarioViewMode || "ownership") : "ownership"}`,
     `ctrl:${Number(state.scenarioControllerRevision) || 0}`,
+    `shell:${state.activeScenarioId ? Number(state.scenarioShellOverlayRevision) || 0 : 0}`,
   ].join("|");
   if (state.cachedDynamicBordersHash === nextHash && state.cachedDynamicOwnerBorders) {
     state.dynamicBordersDirty = false;
@@ -1957,6 +2060,8 @@ function rebuildDynamicBorders() {
     {
       ownershipByFeatureId: state.sovereigntyByFeatureId,
       controllerByFeatureId: state.scenarioControllersByFeatureId,
+      shellOwnerByFeatureId: state.scenarioAutoShellOwnerByFeatureId,
+      shellControllerByFeatureId: state.scenarioAutoShellControllerByFeatureId,
       scenarioActive: !!state.activeScenarioId,
       viewMode: state.scenarioViewMode,
     }
@@ -2044,6 +2149,8 @@ function buildDynamicOwnerBorderMesh(runtimeTopology, ownershipContext) {
   if (!object || !globalThis.topojson) return null;
   const ownershipByFeatureId = ownershipContext?.ownershipByFeatureId || {};
   const controllerByFeatureId = ownershipContext?.controllerByFeatureId || {};
+  const shellOwnerByFeatureId = ownershipContext?.shellOwnerByFeatureId || {};
+  const shellControllerByFeatureId = ownershipContext?.shellControllerByFeatureId || {};
   const scenarioActive = !!ownershipContext?.scenarioActive;
   const useFrontline = scenarioActive && String(ownershipContext?.viewMode || "ownership") === "frontline";
   return globalThis.topojson.mesh(runtimeTopology, object, (a, b) => {
@@ -2052,13 +2159,17 @@ function buildDynamicOwnerBorderMesh(runtimeTopology, ownershipContext) {
     const idB = getEntityFeatureId(b);
     if (!idA || !idB) return false;
     const ownerA = String(
-      (useFrontline ? controllerByFeatureId?.[idA] : "")
+      (useFrontline ? shellControllerByFeatureId?.[idA] : "")
+      || (useFrontline ? controllerByFeatureId?.[idA] : "")
+      || shellOwnerByFeatureId?.[idA]
       || ownershipByFeatureId?.[idA]
       || getEntityCountryCode(a)
       || ""
     ).trim();
     const ownerB = String(
-      (useFrontline ? controllerByFeatureId?.[idB] : "")
+      (useFrontline ? shellControllerByFeatureId?.[idB] : "")
+      || (useFrontline ? controllerByFeatureId?.[idB] : "")
+      || shellOwnerByFeatureId?.[idB]
       || ownershipByFeatureId?.[idB]
       || getEntityCountryCode(b)
       || ""
@@ -2695,6 +2806,9 @@ function createHitResult(overrides = {}) {
   return {
     id: null,
     countryCode: null,
+    targetType: null,
+    feature: null,
+    bboxArea: Infinity,
     viaSnap: false,
     strict: false,
     distancePx: Infinity,
@@ -2795,6 +2909,9 @@ function getHitResultFromCanvas(event) {
   return createHitResult({
     id,
     countryCode: getFeatureCountryCodeNormalized(feature),
+    targetType: "land",
+    feature,
+    bboxArea: Number(state.spatialItemsById?.get(id)?.bboxArea || Infinity),
     viaSnap: false,
     strict: true,
     distancePx: 0,
@@ -2909,6 +3026,59 @@ function collectGridCandidates(px, py, radiusProj = 0) {
 
   const maybePush = (item) => {
     if (!item?.id || seen.has(item.id)) return;
+    if (!isWaterRegionEnabled(item.feature)) return;
+    seen.add(item.id);
+    const distanceProj = getBBoxDistanceToPoint(item, px, py);
+    if (strict) {
+      if (distanceProj > 0) return;
+    } else if (distanceProj > radius) {
+      return;
+    }
+    candidates.push({ item, distanceProj });
+  };
+
+  buckets.forEach((bucket) => {
+    bucket.forEach(maybePush);
+  });
+  globals?.forEach(maybePush);
+
+  return candidates;
+}
+
+function collectWaterGridCandidates(px, py, radiusProj = 0) {
+  const meta = state.waterSpatialGridMeta;
+  const grid = state.waterSpatialGrid;
+  if (!meta || !grid) return [];
+  const { cellSize, cols, rows, globals } = meta;
+  if (!cellSize || cols <= 0 || rows <= 0) return [];
+
+  const radius = Math.max(0, radiusProj || 0);
+  const minX = px - radius;
+  const maxX = px + radius;
+  const minY = py - radius;
+  const maxY = py + radius;
+  const c0 = clamp(Math.floor(minX / cellSize), 0, cols - 1);
+  const c1 = clamp(Math.floor(maxX / cellSize), 0, cols - 1);
+  const r0 = clamp(Math.floor(minY / cellSize), 0, rows - 1);
+  const r1 = clamp(Math.floor(maxY / cellSize), 0, rows - 1);
+
+  const buckets = [];
+  for (let row = r0; row <= r1; row += 1) {
+    for (let col = c0; col <= c1; col += 1) {
+      const key = getSpatialBucketKey(col, row);
+      const bucket = grid.get(key);
+      if (bucket?.length) {
+        buckets.push(bucket);
+      }
+    }
+  }
+
+  const seen = new Set();
+  const candidates = [];
+  const strict = radius <= 0;
+
+  const maybePush = (item) => {
+    if (!item?.id || seen.has(item.id)) return;
     seen.add(item.id);
     const distanceProj = getBBoxDistanceToPoint(item, px, py);
     if (strict) {
@@ -2982,14 +3152,127 @@ function getPointerProjectionPosition(event) {
   };
 }
 
-function toHitResult(candidate, { viaSnap = false, strict = false, zoomK = 1 } = {}) {
+function toHitResult(candidate, { viaSnap = false, strict = false, zoomK = 1, targetType = "land" } = {}) {
   if (!candidate?.item?.id) return createHitResult();
   return createHitResult({
     id: candidate.item.id,
     countryCode: candidate.item.countryCode || getFeatureCountryCodeNormalized(candidate.item.feature),
+    targetType,
+    feature: candidate.item.feature || null,
+    bboxArea: Number(candidate.bboxArea || candidate.item.bboxArea || Infinity),
     viaSnap,
     strict,
     distancePx: candidate.distanceProj * zoomK,
+  });
+}
+
+function shouldPreferWaterHit(landHit, waterHit) {
+  if (!waterHit?.id) return false;
+  if (!landHit?.id) return true;
+  const waterType = getWaterRegionType(waterHit.feature);
+  if (["lake", "inland_sea", "strait", "chokepoint"].includes(waterType)) {
+    return true;
+  }
+  const landArea = Number(landHit.bboxArea || Infinity);
+  const waterArea = Number(waterHit.bboxArea || Infinity);
+  if (waterHit.strict && Number.isFinite(waterArea) && Number.isFinite(landArea) && waterArea < landArea * 0.2) {
+    return true;
+  }
+  return false;
+}
+
+function getLandHitFromPointer(
+  event,
+  pointer,
+  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown" } = {}
+) {
+  if (!state.landData || !state.spatialItems?.length) return createHitResult();
+  const hitMode = resolveHitMode();
+  if (hitMode === "canvas" && eventType !== "compat") {
+    const hitFromCanvas = getValidatedCanvasHit(event);
+    if (hitFromCanvas.id) {
+      return hitFromCanvas;
+    }
+  }
+
+  const strictCandidates = collectGridCandidates(pointer.px, pointer.py, 0);
+  const strictRanked = rankCandidates(strictCandidates, pointer.lonLat);
+  if (strictRanked.length > 0) {
+    const strictContainsGeo = strictRanked.find((candidate) => candidate.containsGeo);
+    if (strictContainsGeo) {
+      if (hitMode === "auto" && eventType !== "compat") {
+        const strictIds = new Set(strictRanked.map((candidate) => candidate.item.id));
+        const hitFromCanvas = getValidatedCanvasHit(event, strictIds);
+        if (hitFromCanvas.id === strictContainsGeo.item.id) {
+          return hitFromCanvas;
+        }
+      }
+      return toHitResult(strictContainsGeo, {
+        viaSnap: false,
+        strict: true,
+        zoomK: pointer.zoomK,
+        targetType: "land",
+      });
+    }
+  }
+
+  if (!enableSnap) return createHitResult();
+
+  const snapRadiusPx = Number.isFinite(Number(snapPx))
+    ? Math.max(0, Number(snapPx))
+    : HIT_SNAP_RADIUS_PX;
+  const radiusProj = snapRadiusPx / pointer.zoomK;
+  if (radiusProj <= 0) return createHitResult();
+
+  const snapCandidates = collectGridCandidates(pointer.px, pointer.py, radiusProj);
+  const snapRanked = rankCandidates(snapCandidates, pointer.lonLat);
+  if (!snapRanked.length) return createHitResult();
+
+  const chosen = snapRanked.find((candidate) => candidate.containsGeo);
+  if (!chosen) return createHitResult();
+  return toHitResult(chosen, {
+    viaSnap: true,
+    strict: false,
+    zoomK: pointer.zoomK,
+    targetType: "land",
+  });
+}
+
+function getWaterHitFromPointer(
+  pointer,
+  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX } = {}
+) {
+  if (!state.showWaterRegions || !state.waterSpatialItems?.length) return createHitResult();
+
+  const strictCandidates = collectWaterGridCandidates(pointer.px, pointer.py, 0);
+  const strictRanked = rankCandidates(strictCandidates, pointer.lonLat);
+  const strictHit = strictRanked.find((candidate) => candidate.containsGeo);
+  if (strictHit) {
+    return toHitResult(strictHit, {
+      viaSnap: false,
+      strict: true,
+      zoomK: pointer.zoomK,
+      targetType: "water",
+    });
+  }
+
+  if (!enableSnap) return createHitResult();
+
+  const snapRadiusPx = Number.isFinite(Number(snapPx))
+    ? Math.max(0, Number(snapPx))
+    : HIT_SNAP_RADIUS_PX;
+  const radiusProj = snapRadiusPx / pointer.zoomK;
+  if (radiusProj <= 0) return createHitResult();
+
+  const snapCandidates = collectWaterGridCandidates(pointer.px, pointer.py, radiusProj);
+  const snapRanked = rankCandidates(snapCandidates, pointer.lonLat);
+  const chosen = snapRanked.find((candidate) => candidate.containsGeo);
+  if (!chosen) return createHitResult();
+  return toHitResult(chosen, {
+    viaSnap: true,
+    strict: false,
+    zoomK: pointer.zoomK,
+    targetType: "water",
   });
 }
 
@@ -2998,8 +3281,31 @@ function buildIndex() {
   state.countryToFeatureIds.clear();
   state.idToKey.clear();
   state.keyToId.clear();
+  state.waterRegionsById = new Map();
 
-  if (!state.landData || !state.landData.features) return;
+  if (Array.isArray(state.waterRegionsData?.features)) {
+    state.waterRegionsData.features.forEach((feature) => {
+      const id = getFeatureId(feature);
+      if (!id) return;
+      state.waterRegionsById.set(id, feature);
+    });
+  }
+
+  if (state.selectedWaterRegionId && !state.waterRegionsById.has(state.selectedWaterRegionId)) {
+    state.selectedWaterRegionId = "";
+  } else if (state.selectedWaterRegionId) {
+    const selectedFeature = state.waterRegionsById.get(state.selectedWaterRegionId);
+    if (!isWaterRegionEnabled(selectedFeature)) {
+      state.selectedWaterRegionId = "";
+    }
+  }
+
+  if (!state.landData || !state.landData.features) {
+    if (typeof state.renderWaterRegionListFn === "function") {
+      state.renderWaterRegionListFn();
+    }
+    return;
+  }
   state.landData.features.forEach((feature, index) => {
     const id = getFeatureId(feature) || `feature-${index}`;
     state.landIndex.set(id, feature);
@@ -3016,6 +3322,9 @@ function buildIndex() {
 
   if (typeof state.renderCountryListFn === "function") {
     state.renderCountryListFn();
+  }
+  if (typeof state.renderWaterRegionListFn === "function") {
+    state.renderWaterRegionListFn();
   }
   if (typeof state.renderPresetTreeFn === "function") {
     state.renderPresetTreeFn();
@@ -3055,6 +3364,11 @@ function buildSpatialIndex() {
   state.spatialGrid = new Map();
   state.spatialGridMeta = null;
   state.spatialItemsById = new Map();
+  state.waterSpatialItems = [];
+  state.waterSpatialIndex = null;
+  state.waterSpatialGrid = new Map();
+  state.waterSpatialGridMeta = null;
+  state.waterSpatialItemsById = new Map();
   if (!state.landData || !state.landData.features || !pathSVG) return;
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
 
@@ -3081,6 +3395,36 @@ function buildSpatialIndex() {
 
   buildSpatialGrid(state.spatialItems, canvasWidth, canvasHeight);
   state.spatialIndex = null;
+  if (Array.isArray(state.waterRegionsData?.features)) {
+    for (const feature of state.waterRegionsData.features) {
+      const id = getFeatureId(feature);
+      if (!id) continue;
+      const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: false })
+        || getProjectedFeatureBounds(feature, { featureId: id });
+      if (!bounds) continue;
+      state.waterSpatialItems.push({
+        id,
+        feature,
+        countryCode: "",
+        source: String(feature?.properties?.__source || "primary"),
+        minX: bounds.minX,
+        minY: bounds.minY,
+        maxX: bounds.maxX,
+        maxY: bounds.maxY,
+        bboxArea: bounds.area,
+      });
+    }
+    const previousGrid = state.spatialGrid;
+    const previousMeta = state.spatialGridMeta;
+    const previousItemsById = state.spatialItemsById;
+    buildSpatialGrid(state.waterSpatialItems, canvasWidth, canvasHeight);
+    state.waterSpatialGrid = state.spatialGrid;
+    state.waterSpatialGridMeta = state.spatialGridMeta;
+    state.waterSpatialItemsById = state.spatialItemsById;
+    state.spatialGrid = previousGrid;
+    state.spatialGridMeta = previousMeta;
+    state.spatialItemsById = previousItemsById;
+  }
   state.hitCanvasDirty = true;
 }
 
@@ -3088,59 +3432,26 @@ function getHitFromEvent(
   event,
   { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown" } = {}
 ) {
-  if (!state.landData || !state.spatialItems?.length) return createHitResult();
-  const hitMode = resolveHitMode();
-  if (hitMode === "canvas" && eventType !== "compat") {
-    const hitFromCanvas = getValidatedCanvasHit(event);
-    if (hitFromCanvas.id) {
-      return hitFromCanvas;
-    }
+  if ((!state.landData || !state.spatialItems?.length) && !state.waterSpatialItems?.length) {
+    return createHitResult();
   }
   const pointer = getPointerProjectionPosition(event);
   if (!pointer) return createHitResult();
-
-  const strictCandidates = collectGridCandidates(pointer.px, pointer.py, 0);
-  const strictRanked = rankCandidates(strictCandidates, pointer.lonLat);
-  if (strictRanked.length > 0) {
-    const strictContainsGeo = strictRanked.find((candidate) => candidate.containsGeo);
-    if (!strictContainsGeo) return createHitResult();
-    if (hitMode === "auto" && eventType !== "compat") {
-      const strictIds = new Set(strictRanked.map((candidate) => candidate.item.id));
-      const hitFromCanvas = getValidatedCanvasHit(event, strictIds);
-      if (hitFromCanvas.id === strictContainsGeo.item.id) {
-        return hitFromCanvas;
-      }
-    }
-    return toHitResult(strictContainsGeo, {
-      viaSnap: false,
-      strict: true,
-      zoomK: pointer.zoomK,
-    });
-  }
-
-  if (!enableSnap) return createHitResult();
-
-  const snapRadiusPx = Number.isFinite(Number(snapPx))
-    ? Math.max(0, Number(snapPx))
-    : HIT_SNAP_RADIUS_PX;
-  const radiusProj = snapRadiusPx / pointer.zoomK;
-  if (radiusProj <= 0) return createHitResult();
-
-  const snapCandidates = collectGridCandidates(pointer.px, pointer.py, radiusProj);
-  const snapRanked = rankCandidates(snapCandidates, pointer.lonLat);
-  if (!snapRanked.length) return createHitResult();
-
-  const chosen = snapRanked.find((candidate) => candidate.containsGeo);
-  if (!chosen) return createHitResult();
-  const hit = toHitResult(chosen, {
-    viaSnap: true,
-    strict: false,
-    zoomK: pointer.zoomK,
+  const landHit = getLandHitFromPointer(event, pointer, {
+    enableSnap,
+    snapPx,
+    eventType,
   });
-  if (eventType === "click" && hit.id) {
-    return hit;
+  const waterHit = getWaterHitFromPointer(pointer, {
+    enableSnap,
+    snapPx,
+  });
+  if (shouldPreferWaterHit(landHit, waterHit)) {
+    return waterHit;
   }
-  return hit;
+  if (landHit.id) return landHit;
+  if (waterHit.id) return waterHit;
+  return createHitResult();
 }
 
 function getFeatureIdFromEvent(event) {
@@ -3912,6 +4223,601 @@ function requestTextureRerender() {
   }
 }
 
+function getDayNightStyleConfig() {
+  if (!state.styleConfig || typeof state.styleConfig !== "object") {
+    state.styleConfig = {};
+  }
+  state.styleConfig.dayNight = normalizeDayNightStyleConfig(state.styleConfig.dayNight);
+  return state.styleConfig.dayNight;
+}
+
+function normalizeLongitude(value) {
+  let normalized = Number.isFinite(Number(value)) ? Number(value) : 0;
+  while (normalized > 180) normalized -= 360;
+  while (normalized <= -180) normalized += 360;
+  return normalized;
+}
+
+function getUtcDateKey(date = new Date()) {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getUtcDayOfYear(date = new Date()) {
+  const yearStart = Date.UTC(date.getUTCFullYear(), 0, 1);
+  const todayUtc = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+  return Math.max(1, Math.floor((todayUtc - yearStart) / 86_400_000) + 1);
+}
+
+function getCurrentUtcMinutesFromDate(date = new Date()) {
+  return date.getUTCHours() * 60 + date.getUTCMinutes();
+}
+
+function getCurrentUtcMinutes() {
+  return getCurrentUtcMinutesFromDate(new Date());
+}
+
+function getDayNightSignatureClockToken(config = getDayNightStyleConfig(), now = new Date()) {
+  const dayKey = getUtcDateKey(now);
+  if (config.mode === "utc") {
+    return `${dayKey}|utc:${getCurrentUtcMinutesFromDate(now)}`;
+  }
+  return `${dayKey}|manual:${config.manualUtcMinutes}`;
+}
+
+function getDayNightLiveClockToken(config = getDayNightStyleConfig(), now = new Date()) {
+  const dayKey = getUtcDateKey(now);
+  if (config.mode === "utc") {
+    return `${dayKey}|utc:${getCurrentUtcMinutesFromDate(now)}`;
+  }
+  return `${dayKey}|manual-day`;
+}
+
+function getSolarDeclinationRadians(date = new Date(), utcMinutes = getCurrentUtcMinutesFromDate(date)) {
+  const dayOfYear = getUtcDayOfYear(date);
+  const gamma = (2 * Math.PI / 365) * (dayOfYear - 1 + ((utcMinutes / 60) - 12) / 24);
+  return (
+    0.006918
+    - 0.399912 * Math.cos(gamma)
+    + 0.070257 * Math.sin(gamma)
+    - 0.006758 * Math.cos(2 * gamma)
+    + 0.000907 * Math.sin(2 * gamma)
+    - 0.002697 * Math.cos(3 * gamma)
+    + 0.00148 * Math.sin(3 * gamma)
+  );
+}
+
+function getCurrentSolarState(config = getDayNightStyleConfig()) {
+  const now = new Date();
+  const utcMinutes = config.mode === "utc"
+    ? getCurrentUtcMinutesFromDate(now)
+    : clamp(Math.round(Number(config.manualUtcMinutes) || 0), 0, 24 * 60 - 1);
+  const declinationDeg = getSolarDeclinationRadians(now, utcMinutes) * (180 / Math.PI);
+  const subsolarLongitude = normalizeLongitude(180 - (utcMinutes / 4));
+  return {
+    now,
+    utcMinutes,
+    declinationDeg,
+    subsolarLongitude,
+    antisolarLongitude: normalizeLongitude(subsolarLongitude + 180),
+    antisolarLatitude: clamp(-declinationDeg, -89.5, 89.5),
+  };
+}
+
+function buildNightHemisphereFeature(solarState, radiusDeg = 90) {
+  if (!solarState || !globalThis.d3?.geoCircle) return null;
+  return globalThis.d3.geoCircle()
+    .center([solarState.antisolarLongitude, solarState.antisolarLatitude])
+    .radius(clamp(Number(radiusDeg) || 90, 1, 90))
+    .precision(2)();
+}
+
+function getNightLightPalette(styleVariant = "modern") {
+  if (styleVariant === "historical_1930s") {
+    return {
+      halo: "#f4c972",
+      core: "#ffd88b",
+      glint: "#fff4c1",
+    };
+  }
+  return {
+    texture: "#526a8c",
+    corridor: "#d7e6ff",
+    halo: "#96b5da",
+    core: "#fff1cf",
+    glint: "#f8fbff",
+  };
+}
+
+function getUrbanLightWeight(feature, styleVariant = "modern") {
+  const props = feature?.properties || {};
+  const areaSqKm = Math.max(0, Number(props.area_sqkm ?? props.AREA_SQKM ?? 0));
+  const scalerank = clamp(
+    Math.round(Number(props.scalerank ?? props.SCALERANK ?? 8)) || 8,
+    1,
+    10
+  );
+  const areaScore = clamp(Math.log10(areaSqKm + 1) / 3.45, 0, 1.1);
+  const rankScore = clamp((9 - scalerank) / 7, 0, 1.12);
+  const metroBoost = areaSqKm >= 1500 ? 0.18 : areaSqKm >= 700 ? 0.08 : 0;
+
+  if (styleVariant === "historical_1930s") {
+    const keep = scalerank <= 5 || areaSqKm >= 220;
+    if (!keep) return 0;
+    return clamp((areaScore * 0.55) + (rankScore * 0.72) + metroBoost, 0.12, 0.92);
+  }
+
+  return clamp((areaScore * 0.62) + (rankScore * 0.78) + metroBoost, 0.08, 1.18);
+}
+
+function getModernCityLightsProjectionKey() {
+  if (!projection) return "";
+  const scale = Number(projection.scale?.() || 0).toFixed(4);
+  const translate = projection.translate?.() || [0, 0];
+  const center = projection.center?.() || [0, 0];
+  const rotate = projection.rotate?.() || [0, 0, 0];
+  return [
+    state.width || 0,
+    state.height || 0,
+    scale,
+    ...translate.map((value) => Number(value || 0).toFixed(2)),
+    ...center.map((value) => Number(value || 0).toFixed(2)),
+    ...rotate.map((value) => Number(value || 0).toFixed(2)),
+  ].join("|");
+}
+
+function getModernCityLightsGridValue(x, y) {
+  const wrappedX = ((Math.round(x) % MODERN_CITY_LIGHTS_GRID_WIDTH) + MODERN_CITY_LIGHTS_GRID_WIDTH)
+    % MODERN_CITY_LIGHTS_GRID_WIDTH;
+  const clampedY = clamp(Math.round(y), 0, MODERN_CITY_LIGHTS_GRID_HEIGHT - 1);
+  return MODERN_CITY_LIGHTS_GRID[(clampedY * MODERN_CITY_LIGHTS_GRID_WIDTH) + wrappedX] || 0;
+}
+
+function sampleModernCityLightsGridNormalized(lon, lat) {
+  if (!MODERN_CITY_LIGHTS_GRID?.length) return 0;
+  const normalizedLon = (
+    (normalizeLongitude(lon) + 180) / Math.max(MODERN_CITY_LIGHTS_STEP_LON_DEG, 0.0001)
+  ) - 0.5;
+  const normalizedLat = clamp(
+    ((90 - clamp(lat, -89.999, 89.999)) / Math.max(MODERN_CITY_LIGHTS_STEP_LAT_DEG, 0.0001)) - 0.5,
+    0,
+    MODERN_CITY_LIGHTS_GRID_HEIGHT - 1
+  );
+  const x0 = Math.floor(normalizedLon);
+  const y0 = Math.floor(normalizedLat);
+  const tx = normalizedLon - x0;
+  const ty = normalizedLat - y0;
+  const y1 = Math.min(MODERN_CITY_LIGHTS_GRID_HEIGHT - 1, y0 + 1);
+  const v00 = getModernCityLightsGridValue(x0, y0);
+  const v10 = getModernCityLightsGridValue(x0 + 1, y0);
+  const v01 = getModernCityLightsGridValue(x0, y1);
+  const v11 = getModernCityLightsGridValue(x0 + 1, y1);
+  const top = v00 + ((v10 - v00) * tx);
+  const bottom = v01 + ((v11 - v01) * tx);
+  return clamp((top + ((bottom - top) * ty)) / 255, 0, 1);
+}
+
+function getFeatureGeoCentroid(feature) {
+  if (!feature || !globalThis.d3?.geoCentroid) return null;
+  const cached = urbanGeoCentroidCache.get(feature);
+  if (cached) return cached;
+  const centroid = globalThis.d3.geoCentroid(feature);
+  const longitude = Number(centroid?.[0]);
+  const latitude = Number(centroid?.[1]);
+  if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) {
+    return null;
+  }
+  const normalized = [normalizeLongitude(longitude), clamp(latitude, -89.999, 89.999)];
+  urbanGeoCentroidCache.set(feature, normalized);
+  return normalized;
+}
+
+function getModernCityLightsGeometry() {
+  const projectionKey = getModernCityLightsProjectionKey();
+  if (
+    modernCityLightsGeometryCache.projectionKey === projectionKey &&
+    Array.isArray(modernCityLightsGeometryCache.baseEntries) &&
+    modernCityLightsGeometryCache.baseEntries.length
+  ) {
+    return modernCityLightsGeometryCache;
+  }
+
+  const baseEntries = [];
+  const corridorEntries = [];
+  const halfLon = MODERN_CITY_LIGHTS_STEP_LON_DEG * 0.5;
+  const halfLat = MODERN_CITY_LIGHTS_STEP_LAT_DEG * 0.5;
+
+  for (let y = 0; y < MODERN_CITY_LIGHTS_GRID_HEIGHT; y += 1) {
+    const lat = 90 - ((y + 0.5) * MODERN_CITY_LIGHTS_STEP_LAT_DEG);
+    for (let x = 0; x < MODERN_CITY_LIGHTS_GRID_WIDTH; x += 1) {
+      const value = MODERN_CITY_LIGHTS_GRID[(y * MODERN_CITY_LIGHTS_GRID_WIDTH) + x] || 0;
+      if (value < MODERN_CITY_LIGHTS_BASE_THRESHOLD) continue;
+
+      const lon = -180 + ((x + 0.5) * MODERN_CITY_LIGHTS_STEP_LON_DEG);
+      const center = projection ? projection([lon, lat]) : null;
+      const east = projection ? projection([normalizeLongitude(lon + halfLon), lat]) : null;
+      const west = projection ? projection([normalizeLongitude(lon - halfLon), lat]) : null;
+      const north = projection ? projection([lon, clamp(lat + halfLat, -89.999, 89.999)]) : null;
+      const south = projection ? projection([lon, clamp(lat - halfLat, -89.999, 89.999)]) : null;
+      if (
+        !Array.isArray(center) ||
+        !Array.isArray(east) ||
+        !Array.isArray(west) ||
+        !Array.isArray(north) ||
+        !Array.isArray(south)
+      ) {
+        continue;
+      }
+      const values = [...center, ...east, ...west, ...north, ...south];
+      if (!values.every((entry) => Number.isFinite(Number(entry)))) continue;
+
+      const ewDx = east[0] - west[0];
+      const ewDy = east[1] - west[1];
+      const nsDx = north[0] - south[0];
+      const nsDy = north[1] - south[1];
+      const rx = Math.hypot(ewDx, ewDy) * 0.5;
+      const ry = Math.hypot(nsDx, nsDy) * 0.5;
+      if (!Number.isFinite(rx) || !Number.isFinite(ry) || rx <= 0.02 || ry <= 0.02 || rx > 12 || ry > 12) {
+        continue;
+      }
+
+      const entry = {
+        x: center[0],
+        y: center[1],
+        rx,
+        ry,
+        rotation: Math.atan2(ewDy, ewDx),
+        value,
+      };
+      baseEntries.push(entry);
+      if (value >= MODERN_CITY_LIGHTS_CORRIDOR_THRESHOLD) {
+        corridorEntries.push(entry);
+      }
+    }
+  }
+
+  modernCityLightsGeometryCache.projectionKey = projectionKey;
+  modernCityLightsGeometryCache.baseEntries = baseEntries;
+  modernCityLightsGeometryCache.corridorEntries = corridorEntries;
+  return modernCityLightsGeometryCache;
+}
+
+function shouldCullModernLightEntry(entry, overscan = 48) {
+  const transform = state.zoomTransform || globalThis.d3?.zoomIdentity || { x: 0, y: 0, k: 1 };
+  const screenX = (entry.x * transform.k) + transform.x;
+  const screenY = (entry.y * transform.k) + transform.y;
+  return (
+    screenX < -overscan ||
+    screenX > state.width + overscan ||
+    screenY < -overscan ||
+    screenY > state.height + overscan
+  );
+}
+
+function drawLightEllipse(x, y, rx, ry, rotation = 0) {
+  if (typeof context.ellipse === "function") {
+    context.beginPath();
+    context.ellipse(x, y, rx, ry, rotation, 0, Math.PI * 2);
+    context.fill();
+    return;
+  }
+  context.save();
+  context.translate(x, y);
+  context.rotate(rotation);
+  context.scale(Math.max(rx, 0.0001), Math.max(ry, 0.0001));
+  context.beginPath();
+  context.arc(0, 0, 1, 0, Math.PI * 2);
+  context.fill();
+  context.restore();
+}
+
+function drawModernCityLightsTexture(config, intensity) {
+  const textureOpacity = clamp(Number(config.cityLightsTextureOpacity) || 0, 0, 1);
+  if (textureOpacity <= 0) return;
+  const palette = getNightLightPalette("modern");
+  const geometry = getModernCityLightsGeometry();
+  const overscan = Math.max(32, Math.min(state.width, state.height) * 0.06);
+  context.fillStyle = palette.texture;
+
+  geometry.baseEntries.forEach((entry) => {
+    if (shouldCullModernLightEntry(entry, overscan)) return;
+    const normalized = clamp(entry.value / 255, 0, 1);
+    const lumaWeight = Math.pow(normalized, 0.66);
+    const alpha = clamp(intensity * textureOpacity * (0.01 + (lumaWeight * 0.2)), 0, 0.2);
+    if (alpha <= 0.002) return;
+    context.globalAlpha = alpha;
+    drawLightEllipse(
+      entry.x,
+      entry.y,
+      entry.rx * (1.02 + (lumaWeight * 0.72)),
+      entry.ry * (1.02 + (lumaWeight * 0.72)),
+      0
+    );
+  });
+}
+
+function drawModernCityLightsCorridors(config, intensity) {
+  const corridorStrength = clamp(Number(config.cityLightsCorridorStrength) || 0, 0, 1);
+  if (corridorStrength <= 0) return;
+  const palette = getNightLightPalette("modern");
+  const geometry = getModernCityLightsGeometry();
+  const overscan = Math.max(40, Math.min(state.width, state.height) * 0.08);
+  context.fillStyle = palette.corridor;
+
+  geometry.corridorEntries.forEach((entry) => {
+    if (shouldCullModernLightEntry(entry, overscan)) return;
+    const normalized = clamp(entry.value / 255, 0, 1);
+    const corridorWeight = Math.pow(normalized, 0.82);
+    const alpha = clamp(intensity * corridorStrength * (0.008 + (corridorWeight * 0.1)), 0, 0.14);
+    if (alpha <= 0.003) return;
+    context.globalAlpha = alpha;
+    drawLightEllipse(
+      entry.x,
+      entry.y,
+      entry.rx * (0.94 + (corridorStrength * 0.26) + (corridorWeight * 0.22)),
+      entry.ry * (0.72 + (corridorStrength * 0.12)),
+      0
+    );
+  });
+}
+
+function drawModernCityLightsCores(k, config, intensity) {
+  if (!Array.isArray(state.urbanData?.features) || !state.urbanData.features.length) return;
+  const palette = getNightLightPalette("modern");
+  const textureOpacity = clamp(Number(config.cityLightsTextureOpacity) || 0, 0, 1);
+  const coreSharpness = clamp(Number(config.cityLightsCoreSharpness) || 0, 0, 1);
+  const zoomScale = Math.max(0.0001, Number(state.zoomTransform?.k || 1));
+  const minProjectedAreaPx = zoomScale <= 1.15 ? 4.6 : zoomScale <= 1.7 ? 3.2 : 2.2;
+  const overscan = Math.max(32, Math.min(state.width, state.height) * 0.06);
+
+  state.urbanData.features.forEach((feature) => {
+    if (!pathBoundsInScreen(feature)) return;
+    if (estimateProjectedAreaPx(feature, k) < minProjectedAreaPx) return;
+
+    const heuristicWeight = getUrbanLightWeight(feature, "modern");
+    if (heuristicWeight <= 0) return;
+    if (zoomScale <= 1.15 && heuristicWeight < 0.72) return;
+
+    const geographicCentroid = getFeatureGeoCentroid(feature);
+    const sample = geographicCentroid
+      ? sampleModernCityLightsGridNormalized(geographicCentroid[0], geographicCentroid[1])
+      : 0;
+    const sampledBoost = clamp(0.28 + (Math.pow(sample, 0.58) * 1.45), 0.22, 1.6);
+    const weight = clamp(heuristicWeight * sampledBoost, 0.04, 1.22);
+    if (sample <= 0.01 && heuristicWeight < 0.34) return;
+    if (weight < 0.16) return;
+    if (zoomScale <= 1.35 && weight < 0.44) return;
+
+    const centroid = pathCanvas.centroid(feature);
+    const cx = Number(centroid?.[0]);
+    const cy = Number(centroid?.[1]);
+    if (!Number.isFinite(cx) || !Number.isFinite(cy)) return;
+
+    const screenX = (cx * state.zoomTransform.k) + state.zoomTransform.x;
+    const screenY = (cy * state.zoomTransform.k) + state.zoomTransform.y;
+    if (
+      screenX < -overscan ||
+      screenX > state.width + overscan ||
+      screenY < -overscan ||
+      screenY > state.height + overscan
+    ) {
+      return;
+    }
+
+    const orientation = (stringHash(
+      feature?.properties?.nameascii ||
+      feature?.properties?.name ||
+      feature?.properties?.NAME ||
+      feature?.id ||
+      `${cx}:${cy}`
+    ) % 180) * (Math.PI / 180);
+    const baseRadiusPx = 0.48 + (weight * (0.74 + (coreSharpness * 0.74)));
+    const stretch = 1.08 + (coreSharpness * 0.52) + (sample * 0.36);
+    const haloAlpha = clamp(intensity * weight * (0.03 + (textureOpacity * 0.05) + (sample * 0.06)), 0, 0.18);
+    const coreAlpha = clamp(intensity * weight * (0.12 + (coreSharpness * 0.18) + (sample * 0.18)), 0, 0.48);
+    const glintAlpha = zoomScale < 1.45
+      ? 0
+      : clamp(intensity * weight * (0.03 + (sample * 0.08)), 0, 0.16);
+    const offsetPx = baseRadiusPx * (0.22 + (sample * 0.28));
+    const offsetX = (Math.cos(orientation) * offsetPx) / Math.max(0.0001, k);
+    const offsetY = (Math.sin(orientation) * offsetPx) / Math.max(0.0001, k);
+
+    context.fillStyle = palette.halo;
+    context.globalAlpha = haloAlpha;
+    drawLightEllipse(
+      cx,
+      cy,
+      (baseRadiusPx * stretch * 1.45) / Math.max(0.0001, k),
+      (baseRadiusPx * 0.74) / Math.max(0.0001, k),
+      orientation
+    );
+
+    context.fillStyle = palette.core;
+    context.globalAlpha = coreAlpha;
+    drawLightEllipse(
+      cx,
+      cy,
+      (baseRadiusPx * stretch) / Math.max(0.0001, k),
+      (baseRadiusPx * 0.5) / Math.max(0.0001, k),
+      orientation
+    );
+
+    context.fillStyle = palette.glint;
+    context.globalAlpha = glintAlpha;
+    drawLightEllipse(
+      cx + offsetX,
+      cy + offsetY,
+      (baseRadiusPx * 0.6) / Math.max(0.0001, k),
+      (baseRadiusPx * 0.24) / Math.max(0.0001, k),
+      orientation
+    );
+  });
+}
+
+function drawModernNightLightsLayer(k, config, solarState) {
+  const nightHemisphere = buildNightHemisphereFeature(solarState, 90);
+  if (!nightHemisphere) return;
+  const intensity = clamp(Number(config.cityLightsIntensity) || 0, 0, 1.2);
+  if (intensity <= 0) return;
+
+  context.save();
+  context.beginPath();
+  pathCanvas(nightHemisphere);
+  context.clip();
+  context.globalCompositeOperation = getSafeBlendMode("screen", "lighter");
+  drawModernCityLightsTexture(config, intensity);
+  drawModernCityLightsCorridors(config, intensity);
+  drawModernCityLightsCores(k, config, intensity);
+  context.restore();
+}
+
+function drawHistoricalNightLightsLayer(k, config, solarState) {
+  if (!Array.isArray(state.urbanData?.features) || !state.urbanData.features.length) {
+    return;
+  }
+  const nightHemisphere = buildNightHemisphereFeature(solarState, 90);
+  if (!nightHemisphere) return;
+
+  const variant = "historical_1930s";
+  const intensity = clamp(Number(config.cityLightsIntensity) || 0, 0, 1.2);
+  if (intensity <= 0) return;
+  const palette = getNightLightPalette(variant);
+  const minProjectedAreaPx = 2.8;
+  const overscan = Math.max(24, Math.min(state.width, state.height) * 0.05);
+
+  context.save();
+  context.beginPath();
+  pathCanvas(nightHemisphere);
+  context.clip();
+  context.globalCompositeOperation = getSafeBlendMode("screen", "lighter");
+
+  state.urbanData.features.forEach((feature) => {
+    if (!pathBoundsInScreen(feature)) return;
+    if (estimateProjectedAreaPx(feature, k) < minProjectedAreaPx) return;
+
+    const weight = getUrbanLightWeight(feature, variant);
+    if (weight <= 0) return;
+
+    const centroid = pathCanvas.centroid(feature);
+    const cx = Number(centroid?.[0]);
+    const cy = Number(centroid?.[1]);
+    if (!Number.isFinite(cx) || !Number.isFinite(cy)) return;
+
+    const screenX = (cx * state.zoomTransform.k) + state.zoomTransform.x;
+    const screenY = (cy * state.zoomTransform.k) + state.zoomTransform.y;
+    if (
+      screenX < -overscan ||
+      screenX > state.width + overscan ||
+      screenY < -overscan ||
+      screenY > state.height + overscan
+    ) {
+      return;
+    }
+
+    const baseRadiusPx = 0.76 + (weight * 1.55);
+    const haloRadiusPx = baseRadiusPx * 1.44;
+    const haloAlpha = clamp(intensity * weight * 0.14, 0, 0.24);
+    const coreAlpha = clamp(intensity * weight * 0.28, 0, 0.52);
+    const orientation = (stringHash(
+      feature?.properties?.nameascii ||
+      feature?.properties?.name ||
+      feature?.properties?.NAME ||
+      feature?.id ||
+      `${cx}:${cy}`
+    ) % 180) * (Math.PI / 180);
+
+    context.fillStyle = palette.halo;
+    context.globalAlpha = haloAlpha;
+    drawLightEllipse(
+      cx,
+      cy,
+      (haloRadiusPx * 1.12) / Math.max(0.0001, k),
+      (haloRadiusPx * 0.74) / Math.max(0.0001, k),
+      orientation
+    );
+
+    context.fillStyle = palette.core;
+    context.globalAlpha = coreAlpha;
+    drawLightEllipse(
+      cx,
+      cy,
+      baseRadiusPx / Math.max(0.0001, k),
+      (baseRadiusPx * 0.58) / Math.max(0.0001, k),
+      orientation
+    );
+  });
+
+  context.restore();
+}
+
+function drawDayNightShadowLayer(_k, config, solarState) {
+  const twilightBand = buildNightHemisphereFeature(solarState, 90);
+  if (!twilightBand) return;
+  const coreRadius = clamp(90 - Number(config.twilightWidthDeg || 10), 56, 89);
+  const nightCore = buildNightHemisphereFeature(solarState, coreRadius);
+
+  context.save();
+  context.globalCompositeOperation = "source-over";
+
+  context.fillStyle = "#24374c";
+  context.globalAlpha = clamp(config.shadowOpacity * 0.5, 0, 0.5);
+  context.beginPath();
+  pathCanvas(twilightBand);
+  context.fill();
+
+  if (nightCore) {
+    context.fillStyle = "#081423";
+    context.globalAlpha = clamp(config.shadowOpacity, 0, 0.85);
+    context.beginPath();
+    pathCanvas(nightCore);
+    context.fill();
+  }
+
+  context.strokeStyle = "#8aa1ba";
+  context.globalAlpha = clamp(config.shadowOpacity * 0.28, 0, 0.24);
+  context.lineWidth = 1.1 / Math.max(0.0001, Number(state.zoomTransform?.k || 1));
+  context.beginPath();
+  pathCanvas(twilightBand);
+  context.stroke();
+
+  context.restore();
+}
+
+function drawNightLightsLayer(k, config, solarState) {
+  if (!config.cityLightsEnabled) {
+    return;
+  }
+  const variant = String(config.cityLightsStyle || "modern").trim().toLowerCase();
+  if (variant === "modern") {
+    drawModernNightLightsLayer(k, config, solarState);
+    return;
+  }
+  drawHistoricalNightLightsLayer(k, config, solarState);
+}
+
+function ensureDayNightClockTimer() {
+  if (dayNightClockTimerId) return;
+  lastDayNightClockToken = getDayNightLiveClockToken();
+  dayNightClockTimerId = globalThis.setInterval(() => {
+    const config = getDayNightStyleConfig();
+    const nextToken = getDayNightLiveClockToken(config);
+    if (nextToken === lastDayNightClockToken) return;
+    lastDayNightClockToken = nextToken;
+    if (typeof state.updateToolbarInputsFn === "function") {
+      state.updateToolbarInputsFn();
+    }
+    if (!config.enabled) return;
+    invalidateRenderPasses("dayNight", "day-night-clock");
+    if (typeof state.renderNowFn === "function") {
+      state.renderNowFn();
+    } else if (context) {
+      render();
+    }
+  }, DAY_NIGHT_CLOCK_INTERVAL_MS);
+}
+
 function resolvePaperTextureAssetUrl(assetId) {
   return PAPER_TEXTURE_ASSET_URLS[String(assetId || "").trim()] || null;
 }
@@ -4515,6 +5421,29 @@ function drawPoliticalPass(k) {
       context.stroke();
     }
   });
+
+if (state.showWaterRegions && Array.isArray(state.waterRegionsData?.features)) {
+    state.waterRegionsData.features.forEach((feature, index) => {
+      const id = getFeatureId(feature) || `water-${index}`;
+      if (!isWaterRegionEnabled(feature)) return;
+      if (!pathBoundsInScreen(feature)) return;
+      const waterType = getWaterRegionType(feature);
+      const hasOverride = Object.prototype.hasOwnProperty.call(state.waterRegionOverrides || {}, id);
+      const opaqueFillTypes = new Set(["lake", "inland_sea", "strait", "chokepoint"]);
+      const fillOpacity = hasOverride || opaqueFillTypes.has(waterType) ? 1 : 0.18;
+      context.beginPath();
+      pathCanvas(feature);
+      context.save();
+      context.globalAlpha = fillOpacity;
+      context.fillStyle = getWaterRegionColor(id);
+      context.fill();
+      context.restore();
+      context.strokeStyle = "rgba(62, 96, 138, 0.45)";
+      context.lineWidth = 0.65 / Math.max(0.0001, k);
+      context.lineJoin = "round";
+      context.stroke();
+    });
+  }
 }
 
 function drawEffectsPass(k, { interactive = false } = {}) {
@@ -4525,6 +5454,16 @@ function drawContextPass(k, { interactive = false } = {}) {
   drawPhysicalLayer(k, { interactive });
   drawUrbanLayer(k, { interactive });
   drawRiversLayer(k, { interactive });
+}
+
+function drawDayNightPass(k, { interactive = false } = {}) {
+  const config = getDayNightStyleConfig();
+  if (!config.enabled) return;
+  const solarState = getCurrentSolarState(config);
+  drawDayNightShadowLayer(k, config, solarState);
+  if (!interactive) {
+    drawNightLightsLayer(k, config, solarState);
+  }
 }
 
 function drawBordersPass(k, { interactive = false } = {}) {
@@ -4559,6 +5498,7 @@ function ensureIdleRenderPasses(timings) {
     ["political", (k) => drawPoliticalPass(k)],
     ["effects", (k) => drawEffectsPass(k)],
     ["context", (k) => drawContextPass(k)],
+    ["dayNight", (k) => drawDayNightPass(k)],
     ["borders", (k) => drawBordersPass(k)],
   ];
   passDefinitions.forEach(([passName, drawFn]) => {
@@ -4623,7 +5563,7 @@ function drawInteractiveFrameFromCaches(timings) {
 
   const interactiveStart = nowMs();
   resetMainCanvas();
-  const transformedPasses = ["background", "political", "effects"];
+  const transformedPasses = ["background", "political", "effects", "context", "dayNight"];
   const drewAll = transformedPasses.every((passName) =>
     drawTransformedPass(passName, currentTransform, referenceTransform)
   );
@@ -4883,8 +5823,10 @@ function renderHoverOverlay() {
     return;
   }
 
-  const feature = state.hoveredId ? state.landIndex.get(state.hoveredId) : null;
-  const data = feature ? [feature] : [];
+  const feature = state.hoveredWaterRegionId
+    ? state.waterRegionsById.get(state.hoveredWaterRegionId)
+    : (state.hoveredId ? state.landIndex.get(state.hoveredId) : null);
+  const data = feature && (!state.hoveredWaterRegionId || isWaterRegionEnabled(feature)) ? [feature] : [];
 
   const selection = hoverGroup
     .selectAll("path.hovered-feature")
@@ -5090,7 +6032,7 @@ function updatePerfOverlay() {
     `transform=${getTransformSignature(frame.transform || state.zoomTransform)}`,
     `passes ${timingEntries || "none"}`,
     `invalidations ${invalidations}`,
-    `render draw=${cache.counters.drawCanvas || 0} frame=${cache.counters.frames || 0} hit=${cache.counters.hitCanvasRenders || 0} dynBorder=${cache.counters.dynamicBorderRebuilds || 0}`,
+    `render draw=${cache.counters.drawCanvas || 0} frame=${cache.counters.frames || 0} dayNight=${cache.counters.dayNightPassRenders || 0} hit=${cache.counters.hitCanvasRenders || 0} dynBorder=${cache.counters.dynamicBorderRebuilds || 0}`,
     `sidebar list=${sidebarPerf.counters.fullListRenders || 0} rows=${sidebarPerf.counters.rowRefreshes || 0} detail=${sidebarPerf.counters.inspectorRenders || 0} preset=${sidebarPerf.counters.presetTreeRenders || 0} legend=${sidebarPerf.counters.legendRenders || 0}`,
   ].join("\n");
 }
@@ -5364,9 +6306,10 @@ function handleMouseMove(event) {
   const now = performance.now();
   if (now - state.lastMouseMoveTime < state.MOUSE_THROTTLE_MS) return;
   state.lastMouseMoveTime = now;
-  if (!state.landData) return;
+  if (!state.landData && !state.waterRegionsData) return;
   if (state.specialZoneEditor?.active) {
     state.hoveredId = null;
+    state.hoveredWaterRegionId = null;
     renderHoverOverlay();
     if (tooltip) {
       tooltip.textContent = "";
@@ -5382,16 +6325,19 @@ function handleMouseMove(event) {
     eventType: "hover",
   });
   const id = hit.id;
-  if (id !== state.hoveredId) {
-    state.hoveredId = id;
+  const nextHoveredLandId = hit.targetType === "land" ? id : null;
+  const nextHoveredWaterId = hit.targetType === "water" ? id : null;
+  if (nextHoveredLandId !== state.hoveredId || nextHoveredWaterId !== state.hoveredWaterRegionId) {
+    state.hoveredId = nextHoveredLandId;
+    state.hoveredWaterRegionId = nextHoveredWaterId;
     if (!reducedHoverPhase) {
       renderHoverOverlay();
     }
   }
 
   if (!tooltip) return;
-  if (id && state.landIndex.has(id)) {
-    const feature = state.landIndex.get(id);
+  if (id && (state.landIndex.has(id) || state.waterRegionsById.has(id))) {
+    const feature = hit.targetType === "water" ? state.waterRegionsById.get(id) : state.landIndex.get(id);
     tooltip.textContent = getTooltipText(feature);
     tooltip.style.left = `${event.clientX + 12}px`;
     tooltip.style.top = `${event.clientY + 12}px`;
@@ -5443,13 +6389,21 @@ function collectCountryCodesForFeatureIds(featureIds) {
   return Array.from(codes);
 }
 
-function refreshSidebarAfterPaint({ featureIds = [], ownerCodes = [], refreshPresetTree = false } = {}) {
+function refreshSidebarAfterPaint({
+  featureIds = [],
+  waterRegionIds = [],
+  ownerCodes = [],
+  refreshPresetTree = false,
+} = {}) {
   const countryCodes = Array.from(
     new Set([
       ...collectCountryCodesForFeatureIds(featureIds),
       ...(Array.isArray(ownerCodes) ? ownerCodes.map((code) => canonicalCountryCode(code)).filter(Boolean) : []),
     ])
   );
+  if (typeof state.renderWaterRegionListFn === "function" && Array.isArray(waterRegionIds)) {
+    state.renderWaterRegionListFn();
+  }
   if (typeof state.refreshCountryListRowsFn === "function") {
     state.refreshCountryListRowsFn({
       countryCodes,
@@ -5593,6 +6547,40 @@ function applyVisualSubdivisionFill(targetIds, selectedColor, { kind = "fill-fea
   return true;
 }
 
+function applyWaterRegionFill(targetId, selectedColor, { kind = "fill-water-region-color", dirtyReason = kind } = {}) {
+  const actionStart = nowMs();
+  const resolvedId = String(targetId || "").trim();
+  if (!resolvedId) return false;
+  const color = getSafeCanvasColor(selectedColor, getOceanBaseFillColor());
+  const currentColor = getSafeCanvasColor(state.waterRegionOverrides?.[resolvedId], null) || getOceanBaseFillColor();
+  state.selectedWaterRegionId = resolvedId;
+  if (currentColor === color) {
+    if (typeof state.renderWaterRegionListFn === "function") {
+      state.renderWaterRegionListFn();
+    }
+    return false;
+  }
+  const historyBefore = captureHistoryState({
+    waterRegionIds: [resolvedId],
+  });
+  state.waterRegionOverrides[resolvedId] = color;
+  markDirty(dirtyReason);
+  commitHistoryEntry({
+    kind,
+    before: historyBefore,
+    after: captureHistoryState({
+      waterRegionIds: [resolvedId],
+    }),
+  });
+  addRecentColor(color);
+  if (context) {
+    render();
+  }
+  refreshSidebarAfterPaint({ waterRegionIds: [resolvedId] });
+  noteRenderAction(kind, actionStart);
+  return true;
+}
+
 function executeSingleSubdivisionFill(action) {
   if (!action) return false;
   const targetIds = action.eventPayload?.targetIds || [action.featureId];
@@ -5651,8 +6639,10 @@ function ensureBrushSession(event) {
     startX: Number(event?.clientX || 0),
     startY: Number(event?.clientY || 0),
     visitedFeatureIds: new Set(),
+    visitedWaterRegionIds: new Set(),
     visitedOwnerCodes: new Set(),
     affectedFeatureIds: new Set(),
+    affectedWaterRegionIds: new Set(),
     affectedOwnerCodes: new Set(),
     affectedSovereigntyIds: new Set(),
     before: {},
@@ -5663,6 +6653,22 @@ function ensureBrushSession(event) {
 
 function applyBrushHit(hit) {
   if (!hit?.id) return false;
+  if (hit.targetType === "water") {
+    const waterId = String(hit.id || "").trim();
+    if (!waterId || brushSession.visitedWaterRegionIds.has(waterId)) return false;
+    if (state.currentTool === "eyedropper") return false;
+    mergeHistorySnapshot(brushSession.before, captureHistoryState({ waterRegionIds: [waterId] }));
+    brushSession.visitedWaterRegionIds.add(waterId);
+    brushSession.affectedWaterRegionIds.add(waterId);
+    if (state.currentTool === "eraser") {
+      delete state.waterRegionOverrides[waterId];
+    } else {
+      state.waterRegionOverrides[waterId] = getSafeCanvasColor(state.selectedColor, getOceanBaseFillColor());
+    }
+    state.selectedWaterRegionId = waterId;
+    brushSession.changed = true;
+    return true;
+  }
   const feature = state.landIndex.get(hit.id);
   if (!feature) return false;
   const id = hit.id;
@@ -5763,9 +6769,10 @@ function flushBrushSession() {
   }
   if (!current.dragging || !current.changed) return;
   const featureIds = Array.from(current.affectedFeatureIds);
+  const waterRegionIds = Array.from(current.affectedWaterRegionIds);
   const ownerCodes = Array.from(current.affectedOwnerCodes);
   const sovereigntyFeatureIds = Array.from(current.affectedSovereigntyIds);
-  const after = captureHistoryState({ featureIds, ownerCodes, sovereigntyFeatureIds });
+  const after = captureHistoryState({ featureIds, waterRegionIds, ownerCodes, sovereigntyFeatureIds });
   pushHistoryEntry({
     kind: state.currentTool === "eraser" ? "brush-erase" : "brush-fill",
     before: current.before,
@@ -5780,6 +6787,7 @@ function flushBrushSession() {
   markDirty("brush-stroke");
   refreshSidebarAfterPaint({
     featureIds,
+    waterRegionIds,
     ownerCodes,
   });
   if (typeof state.renderNowFn === "function") {
@@ -5821,7 +6829,7 @@ function handleBrushPointerMove(event) {
 
 function handleClick(event) {
   const actionStart = nowMs();
-  if (!state.landData) return;
+  if (!state.landData && !state.waterRegionsData) return;
   if (suppressNextClickAfterBrush) {
     suppressNextClickAfterBrush = false;
     return;
@@ -5841,6 +6849,52 @@ function handleClick(event) {
   });
   const id = hit.id;
   if (!id) return;
+  if (hit.targetType === "water") {
+    const waterFeature = state.waterRegionsById.get(id);
+    if (!waterFeature) return;
+    state.selectedWaterRegionId = id;
+    if (typeof state.renderWaterRegionListFn === "function") {
+      state.renderWaterRegionListFn();
+    }
+    if (state.currentTool === "eraser") {
+      const historyBefore = captureHistoryState({ waterRegionIds: [id] });
+      delete state.waterRegionOverrides[id];
+      markDirty("erase-water-region-color");
+      commitHistoryEntry({
+        kind: "erase-water-region-color",
+        before: historyBefore,
+        after: captureHistoryState({ waterRegionIds: [id] }),
+      });
+      if (context) {
+        render();
+      }
+      refreshSidebarAfterPaint({ waterRegionIds: [id] });
+      noteRenderAction("click-erase-water", actionStart);
+      return;
+    }
+    if (state.currentTool === "eyedropper") {
+      const picked = getWaterRegionColor(id);
+      if (picked) {
+        state.selectedColor = picked;
+        if (typeof state.updateSwatchUIFn === "function") {
+          state.updateSwatchUIFn();
+        }
+      }
+      noteRenderAction("eyedropper-water", actionStart);
+      return;
+    }
+    applyWaterRegionFill(id, state.selectedColor, {
+      kind: "fill-water-region-color",
+      dirtyReason: "fill-water-region-color",
+    });
+    return;
+  }
+  if (state.selectedWaterRegionId) {
+    state.selectedWaterRegionId = "";
+    if (typeof state.renderWaterRegionListFn === "function") {
+      state.renderWaterRegionListFn();
+    }
+  }
   const feature = state.landIndex.get(id);
   if (!feature) return;
   const countryCode = hit.countryCode || getFeatureCountryCodeNormalized(feature);
@@ -6213,6 +7267,7 @@ function bindEvents() {
   interactionRect.on("mousemove.brush", handleBrushPointerMove);
   interactionRect.on("mouseleave", () => {
     state.hoveredId = null;
+    state.hoveredWaterRegionId = null;
     renderHoverOverlay();
     if (tooltip) {
       tooltip.textContent = "";
@@ -6283,6 +7338,7 @@ function initMap({ containerId = "mapContainer" } = {}) {
   state.featureOverrides = sanitizeColorMap(state.featureOverrides);
   state.sovereignBaseColors = sanitizeCountryColorMap(state.sovereignBaseColors);
   state.visualOverrides = sanitizeColorMap(state.visualOverrides);
+  state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
   state.colors = sanitizeColorMap(state.colors);
   state.debugMode = debugMode;
   resetRenderDiagnostics();
@@ -6293,6 +7349,7 @@ function initMap({ containerId = "mapContainer" } = {}) {
   state.projectedBoundsById = new Map();
   state.sphericalFeatureDiagnosticsById = new Map();
   invalidateAllRenderPasses("init-map");
+  ensureDayNightClockTimer();
 
   mapCanvas.style.pointerEvents = "none";
   mapCanvas.style.touchAction = "none";
@@ -6336,6 +7393,7 @@ function setMapData({ refitProjection = true, resetZoom = true } = {}) {
 
   state.countryBaseColors = sanitizeCountryColorMap(state.countryBaseColors);
   state.featureOverrides = sanitizeColorMap(state.featureOverrides);
+  state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
   migrateLegacyColorState();
   buildRuntimePoliticalMeta();
   state.sovereigntyInitialized = false;

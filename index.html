@@ -95,6 +95,17 @@
                   Context Layers
                 </button>
                 <button
+                  id="appearanceTabDayNight"
+                  type="button"
+                  class="appearance-tab-btn"
+                  data-appearance-tab="daynight"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="appearancePanelDayNight"
+                >
+                  Day / Night
+                </button>
+                <button
                   id="appearanceTabTexture"
                   type="button"
                   class="appearance-tab-btn"
@@ -511,6 +522,22 @@
                   </details>
 
                   <details class="appearance-mini-section">
+                    <summary class="section-header">Water Regions</summary>
+                    <div class="mt-3">
+                      <label class="toggle-label mt-2">
+                        <input id="toggleWaterRegions" type="checkbox" class="checkbox-input" checked />
+                        <span id="lblWaterRegions">Water Regions</span>
+                      </label>
+                      <div class="ml-5">
+                        <label class="toggle-label mt-2">
+                          <input id="toggleOpenOceanRegions" type="checkbox" class="checkbox-input" />
+                          <span id="lblOpenOceanRegions">Open Ocean Regions</span>
+                        </label>
+                      </div>
+                    </div>
+                  </details>
+
+                  <details class="appearance-mini-section">
                     <summary class="section-header">Special Zones Style</summary>
                     <div class="mt-3">
                       <label class="toggle-label mt-2">
@@ -566,6 +593,174 @@
                             <option value="dotted">Dotted</option>
                           </select>
                         </div>
+                      </div>
+                    </div>
+                  </details>
+                </div>
+              </section>
+
+              <section
+                id="appearancePanelDayNight"
+                class="card-flat appearance-subsection appearance-tab-panel"
+                data-appearance-panel="daynight"
+                role="tabpanel"
+                aria-labelledby="appearanceTabDayNight"
+                hidden
+              >
+                <div id="lblDayNightPanel" class="section-header">Day / Night</div>
+                <div class="space-y-3 mt-3">
+                  <label class="toggle-label">
+                    <input id="dayNightEnabled" type="checkbox" class="checkbox-input" />
+                    <span id="lblDayNightEnabled">Enable Day / Night Cycle</span>
+                  </label>
+
+                  <div class="mode-toggle-row" role="group" aria-label="Day and night mode">
+                    <button
+                      id="dayNightModeManualBtn"
+                      type="button"
+                      class="mode-toggle-btn is-active"
+                      data-day-night-mode="manual"
+                      aria-pressed="true"
+                    >
+                      Manual
+                    </button>
+                    <button
+                      id="dayNightModeUtcBtn"
+                      type="button"
+                      class="mode-toggle-btn"
+                      data-day-night-mode="utc"
+                      aria-pressed="false"
+                    >
+                      UTC Sync
+                    </button>
+                  </div>
+
+                  <div id="dayNightManualControls">
+                    <div class="range-row">
+                      <label id="lblDayNightTime" class="range-label" for="dayNightManualTime">UTC Time</label>
+                      <span id="dayNightManualTimeValue" class="range-value">12:00 UTC</span>
+                    </div>
+                    <input
+                      id="dayNightManualTime"
+                      type="range"
+                      min="0"
+                      max="1439"
+                      step="1"
+                      value="720"
+                      class="range-input"
+                    />
+                  </div>
+
+                  <div id="dayNightUtcStatus" class="day-night-status hidden" aria-live="polite">
+                    <div id="dayNightCurrentTime" class="day-night-status-value">12:00 UTC</div>
+                    <div id="dayNightModeHint" class="parent-border-empty mt-2">
+                      Live UTC sync updates once per minute.
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="toggle-label mt-2">
+                      <input id="dayNightCityLightsEnabled" type="checkbox" class="checkbox-input" checked />
+                      <span id="lblDayNightCityLights">City Lights</span>
+                    </label>
+                    <div class="ml-5 space-y-2">
+                      <div>
+                        <div class="range-row">
+                          <label id="lblDayNightCityLightsStyle" class="range-label" for="dayNightCityLightsStyle">Style</label>
+                        </div>
+                        <select id="dayNightCityLightsStyle" class="select-input mt-2">
+                          <option id="optDayNightCityLightsModern" value="modern" selected>Modern</option>
+                          <option id="optDayNightCityLightsHistorical1930s" value="historical_1930s">
+                            1930s Sparse Electrification
+                          </option>
+                        </select>
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblDayNightCityLightsIntensity" class="range-label" for="dayNightCityLightsIntensity">Intensity</label>
+                          <span id="dayNightCityLightsIntensityValue" class="range-value">72%</span>
+                        </div>
+                        <input id="dayNightCityLightsIntensity" type="range" min="0" max="100" value="72" class="range-input" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <details class="appearance-mini-section">
+                    <summary id="lblDayNightAdvanced" class="section-header">Advanced</summary>
+                    <div class="space-y-2 mt-3">
+                      <div>
+                        <div class="range-row">
+                          <label
+                            id="lblDayNightTextureOpacity"
+                            class="range-label"
+                            for="dayNightCityLightsTextureOpacity"
+                          >
+                            Texture Opacity
+                          </label>
+                          <span id="dayNightCityLightsTextureOpacityValue" class="range-value">54%</span>
+                        </div>
+                        <input
+                          id="dayNightCityLightsTextureOpacity"
+                          type="range"
+                          min="0"
+                          max="100"
+                          value="54"
+                          class="range-input"
+                        />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label
+                            id="lblDayNightCorridorStrength"
+                            class="range-label"
+                            for="dayNightCityLightsCorridorStrength"
+                          >
+                            Corridor Strength
+                          </label>
+                          <span id="dayNightCityLightsCorridorStrengthValue" class="range-value">58%</span>
+                        </div>
+                        <input
+                          id="dayNightCityLightsCorridorStrength"
+                          type="range"
+                          min="0"
+                          max="100"
+                          value="58"
+                          class="range-input"
+                        />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label
+                            id="lblDayNightCoreSharpness"
+                            class="range-label"
+                            for="dayNightCityLightsCoreSharpness"
+                          >
+                            Core Sharpness
+                          </label>
+                          <span id="dayNightCityLightsCoreSharpnessValue" class="range-value">62%</span>
+                        </div>
+                        <input
+                          id="dayNightCityLightsCoreSharpness"
+                          type="range"
+                          min="0"
+                          max="100"
+                          value="62"
+                          class="range-input"
+                        />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblDayNightShadowOpacity" class="range-label" for="dayNightShadowOpacity">Shadow Opacity</label>
+                          <span id="dayNightShadowOpacityValue" class="range-value">28%</span>
+                        </div>
+                        <input id="dayNightShadowOpacity" type="range" min="0" max="85" value="28" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblDayNightTwilightWidth" class="range-label" for="dayNightTwilightWidth">Twilight Width</label>
+                          <span id="dayNightTwilightWidthValue" class="range-value">10°</span>
+                        </div>
+                        <input id="dayNightTwilightWidth" type="range" min="2" max="28" value="10" class="range-input" />
                       </div>
                     </div>
                   </details>
@@ -1041,6 +1236,64 @@
                 </div>
               </div>
               <button id="resetCountryColors" class="btn-secondary mt-3">Reset Country Colors</button>
+            </div>
+          </details>
+
+          <details id="waterInspectorSection" class="card inspector-section">
+            <summary id="lblWaterInspector" class="section-header">Water Regions</summary>
+            <div class="inspector-panel-body">
+              <div class="card-flat inspector-search-block">
+                <label id="lblWaterSearch" class="visually-hidden" for="waterRegionSearch">Search Water Regions</label>
+                <div class="inspector-search-input-row">
+                  <svg class="inspector-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
+                    <path d="M16 16 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                  </svg>
+                  <input
+                    id="waterRegionSearch"
+                    type="text"
+                    placeholder="Search sea, lake, or strait..."
+                    class="input inspector-search-input"
+                  />
+                </div>
+              </div>
+              <div id="waterRegionList" class="country-list inspector-scroll mt-3"></div>
+              <div id="waterInspectorDetail" class="inspector-detail-card mt-3">
+                <div id="waterInspectorEmpty" class="inspector-empty-state">
+                  <div id="waterInspectorEmptyTitle" class="section-header-block">Select a water region to inspect</div>
+                  <p id="waterInspectorEmptyHint" class="sidebar-tool-hint">
+                    Click a sea, lake, or strait on the map, or choose one from the list.
+                  </p>
+                </div>
+                <div id="waterInspectorSelected" class="hidden">
+                  <p id="waterInspectorDetailHint" class="sidebar-tool-hint mt-2 hidden"></p>
+                  <div id="waterInspectorColorRow" class="inspector-color-row mt-3 hidden">
+                    <div id="waterInspectorColorLabel" class="section-header-block">Water Color</div>
+                    <div class="inspector-color-row-main mt-2">
+                      <button
+                        id="waterInspectorColorSwatch"
+                        type="button"
+                        class="inspector-color-swatch-btn"
+                        aria-label="Edit water region color"
+                      ></button>
+                      <div id="waterInspectorColorValue" class="inspector-color-value">#aadaff</div>
+                      <input
+                        id="waterInspectorColorInput"
+                        type="color"
+                        value="#aadaff"
+                        class="inspector-color-native-input"
+                        tabindex="-1"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <button id="clearWaterRegionColorBtn" type="button" class="btn-secondary mt-3">Clear Water Override</button>
+                  </div>
+                </div>
+              </div>
+              <div class="inspector-detail-section mt-3">
+                <div id="lblWaterLegend" class="section-header-block">Water Overrides</div>
+                <div id="waterLegendList" class="inspector-scroll mt-3"></div>
+              </div>
             </div>
           </details>
 

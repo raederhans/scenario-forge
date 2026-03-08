@@ -1,9 +1,47 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1936",
-  "generated_at": "2026-03-07T16:30:34.669020+00:00",
+  "generated_at": "2026-03-08T00:20:25.135787+00:00",
   "default_country": "GER",
   "countries": {
+    "AEF": {
+      "tag": "AEF",
+      "display_name": "French Equatorial Africa",
+      "color_hex": "#5478b8",
+      "feature_count": 70,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "TD",
+      "lookup_iso2": "TD",
+      "provenance_iso2": "TD",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "notes": "French Equatorial Africa represented as a macro-level colonial federation.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "french_equatorial_africa",
+      "rule_sources": [
+        "french_equatorial_africa"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "subject_kind": "colonial_federation",
+      "entry_kind": "scenario_subject"
+    },
     "AFA": {
       "tag": "AFA",
       "display_name": "Afar",
@@ -34,7 +72,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "AFG": {
       "tag": "AFG",
@@ -64,7 +106,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "ALB": {
       "tag": "ALB",
@@ -94,7 +140,125 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "ALG": {
+      "tag": "ALG",
+      "display_name": "French Algeria",
+      "color_hex": "#996633",
+      "feature_count": 48,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "DZ",
+      "lookup_iso2": "DZ",
+      "provenance_iso2": "DZ",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 459,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "notes": "French Algeria represented as a separate colonial administration.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "french_algeria",
+      "rule_sources": [
+        "french_algeria"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
+    },
+    "ANG": {
+      "tag": "ANG",
+      "display_name": "Angola",
+      "color_hex": "#258c3d",
+      "feature_count": 18,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "AO",
+      "lookup_iso2": "AO",
+      "provenance_iso2": "AO",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 540,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "notes": "Portuguese Angola represented as a separate colonial administration.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "portuguese_angola",
+      "rule_sources": [
+        "portuguese_angola"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "POR",
+      "parent_owner_tags": [
+        "POR"
+      ],
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
+    },
+    "AOF": {
+      "tag": "AOF",
+      "display_name": "French West Africa",
+      "color_hex": "#6f8ecf",
+      "feature_count": 96,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "SN",
+      "lookup_iso2": "SN",
+      "provenance_iso2": "SN",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "French West Africa represented as a macro-level colonial federation.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "french_west_africa",
+      "rule_sources": [
+        "french_west_africa"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "subject_kind": "colonial_federation",
+      "entry_kind": "scenario_subject"
     },
     "ARG": {
       "tag": "ARG",
@@ -124,7 +288,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "AST": {
       "tag": "AST",
@@ -156,7 +324,13 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "subject_kind": "dominion",
+      "entry_kind": "scenario_subject"
     },
     "AUS": {
       "tag": "AUS",
@@ -186,14 +360,18 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "BEL": {
       "tag": "BEL",
       "display_name": "Belgium",
       "color_hex": "#c1ab08",
-      "feature_count": 77,
-      "quality": "approx_existing_geometry",
+      "feature_count": 44,
+      "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "BE",
       "lookup_iso2": "BE",
@@ -205,20 +383,22 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_western_europe",
       "subregion_label": "Western Europe",
-      "notes": "Belgian colonial approximation.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "belgian_colonies",
-      "rule_sources": [
-        "belgian_colonies"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "BHU": {
       "tag": "BHU",
@@ -248,7 +428,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "BOL": {
       "tag": "BOL",
@@ -278,7 +462,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "BOT": {
       "tag": "BOT",
@@ -308,7 +496,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "BRA": {
       "tag": "BRA",
@@ -338,7 +530,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "BRM": {
       "tag": "BRM",
@@ -370,7 +566,13 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
     },
     "BUL": {
       "tag": "BUL",
@@ -400,7 +602,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "CAN": {
       "tag": "CAN",
@@ -430,7 +636,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "CHI": {
       "tag": "CHI",
@@ -460,7 +670,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "CHL": {
       "tag": "CHL",
@@ -490,7 +704,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "CHU": {
       "tag": "CHU",
@@ -522,13 +740,17 @@
       ],
       "historical_fidelity_summary": [
         "extended"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "COL": {
       "tag": "COL",
       "display_name": "Colombia",
       "color_hex": "#debb5b",
-      "feature_count": 33,
+      "feature_count": 34,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "CO",
@@ -552,7 +774,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "COS": {
       "tag": "COS",
@@ -582,7 +808,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "CUB": {
       "tag": "CUB",
@@ -612,7 +842,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "CZE": {
       "tag": "CZE",
@@ -645,13 +879,17 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "DEN": {
       "tag": "DEN",
       "display_name": "Denmark",
       "color_hex": "#99745d",
-      "feature_count": 11,
+      "feature_count": 12,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "DK",
@@ -675,7 +913,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "DOM": {
       "tag": "DOM",
@@ -705,7 +947,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "ECU": {
       "tag": "ECU",
@@ -735,7 +981,49 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "EGY": {
+      "tag": "EGY",
+      "display_name": "Kingdom of Egypt",
+      "color_hex": "#e6e646",
+      "feature_count": 26,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "EG",
+      "lookup_iso2": "EG",
+      "provenance_iso2": "EG",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 907,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "notes": "Egypt represented as a British-associated kingdom rather than direct metropolitan rule.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "egypt_kingdom",
+      "rule_sources": [
+        "egypt_kingdom"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "subject_kind": "protectorate",
+      "entry_kind": "scenario_subject"
     },
     "ELS": {
       "tag": "ELS",
@@ -765,13 +1053,17 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "ENG": {
       "tag": "ENG",
       "display_name": "Britain",
       "color_hex": "#c9385d",
-      "feature_count": 476,
+      "feature_count": 460,
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "GB",
@@ -798,7 +1090,49 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "ERI": {
+      "tag": "ERI",
+      "display_name": "Eritrea",
+      "color_hex": "#993300",
+      "feature_count": 6,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "ER",
+      "lookup_iso2": "ER",
+      "provenance_iso2": "ER",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 550,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "Italian Eritrea represented as a separate colonial administration in 1936.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "italian_eritrea",
+      "rule_sources": [
+        "italian_eritrea"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "ITA"
+      ],
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
     },
     "EST": {
       "tag": "EST",
@@ -828,7 +1162,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "ETH": {
       "tag": "ETH",
@@ -858,7 +1196,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "FIN": {
       "tag": "FIN",
@@ -890,15 +1232,19 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "FRA": {
       "tag": "FRA",
       "display_name": "France",
       "color_hex": "#3971e4",
-      "feature_count": 740,
+      "feature_count": 383,
       "quality": "approx_existing_geometry",
-      "source": "manual_rule",
+      "source": "direct_active_owner",
       "base_iso2": "FR",
       "lookup_iso2": "FR",
       "provenance_iso2": "FR",
@@ -909,13 +1255,12 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_western_europe",
       "subregion_label": "Western Europe",
-      "notes": "French colonial approximation across Indochina.",
+      "notes": "French colonial approximation for major African and overseas possessions, including Western Sahara in this scenario.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "french_indochina",
+      "primary_rule_source": "french_colonies",
       "rule_sources": [
-        "french_indochina",
         "french_colonies"
       ],
       "source_types": [
@@ -923,7 +1268,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "GER": {
       "tag": "GER",
@@ -955,7 +1304,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "GMA": {
       "tag": "GMA",
@@ -987,7 +1340,11 @@
       ],
       "historical_fidelity_summary": [
         "extended"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "GRE": {
       "tag": "GRE",
@@ -1017,7 +1374,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "GRN": {
       "tag": "GRN",
@@ -1047,7 +1408,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "GUA": {
       "tag": "GUA",
@@ -1077,7 +1442,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "GXC": {
       "tag": "GXC",
@@ -1109,7 +1478,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "HAI": {
       "tag": "HAI",
@@ -1139,15 +1512,19 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "HOL": {
       "tag": "HOL",
       "display_name": "Netherlands",
       "color_hex": "#cb8a4a",
-      "feature_count": 84,
+      "feature_count": 50,
       "quality": "approx_existing_geometry",
-      "source": "manual_rule",
+      "source": "direct_active_owner",
       "base_iso2": "NL",
       "lookup_iso2": "NL",
       "provenance_iso2": "NL",
@@ -1158,7 +1535,7 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_western_europe",
       "subregion_label": "Western Europe",
-      "notes": "Dutch colonial approximation for East Indies and Suriname.",
+      "notes": "Dutch Suriname approximation outside the East Indies.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
@@ -1171,7 +1548,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "HON": {
       "tag": "HON",
@@ -1201,7 +1582,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "HUN": {
       "tag": "HUN",
@@ -1231,7 +1616,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "ICE": {
       "tag": "ICE",
@@ -1261,7 +1650,49 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "INS": {
+      "tag": "INS",
+      "display_name": "Dutch East Indies",
+      "color_hex": "#283278",
+      "feature_count": 34,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "ID",
+      "lookup_iso2": "ID",
+      "provenance_iso2": "ID",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": 335,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "notes": "Dutch East Indies represented separately from the Netherlands proper.",
+      "synthetic_owner": false,
+      "source_type": "hoi4_owner",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "dutch_east_indies",
+      "rule_sources": [
+        "dutch_east_indies"
+      ],
+      "source_types": [
+        "hoi4_owner"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "HOL",
+      "parent_owner_tags": [
+        "HOL"
+      ],
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
     },
     "IRE": {
       "tag": "IRE",
@@ -1291,7 +1722,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "IRQ": {
       "tag": "IRQ",
@@ -1321,14 +1756,18 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "ITA": {
       "tag": "ITA",
       "display_name": "Italy",
       "color_hex": "#437f3f",
-      "feature_count": 161,
-      "quality": "approx_existing_geometry",
+      "feature_count": 107,
+      "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "IT",
       "lookup_iso2": "IT",
@@ -1340,28 +1779,30 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_southern_europe",
       "subregion_label": "Southern Europe",
-      "notes": "Italian colonial approximation in Libya, Eritrea, and Somalia, including Somaliland once base topology detail is present.",
+      "notes": "",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "italian_colonies",
-      "rule_sources": [
-        "italian_colonies"
-      ],
+      "primary_rule_source": "",
+      "rule_sources": [],
       "source_types": [
         "hoi4_owner"
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "JAP": {
       "tag": "JAP",
       "display_name": "Japan",
       "color_hex": "#ffc9b2",
-      "feature_count": 115,
+      "feature_count": 87,
       "quality": "manual_reviewed",
-      "source": "manual_rule",
+      "source": "direct_active_owner",
       "base_iso2": "JP",
       "lookup_iso2": "JP",
       "provenance_iso2": "JP",
@@ -1372,7 +1813,7 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
-      "notes": "Japanese colonial holdings across Korea and Taiwan.",
+      "notes": "Japanese direct rule in Taiwan.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
@@ -1386,7 +1827,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "JOR": {
       "tag": "JOR",
@@ -1416,7 +1861,49 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "KOR": {
+      "tag": "KOR",
+      "display_name": "Korea",
+      "color_hex": "#fff0c3",
+      "feature_count": 28,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "KR",
+      "lookup_iso2": "KR",
+      "provenance_iso2": "KR",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 525,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "notes": "Japanese colonial rule across Korea.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "japanese_korea",
+      "rule_sources": [
+        "japanese_korea"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
     },
     "KUW": {
       "tag": "KUW",
@@ -1446,7 +1933,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "LAT": {
       "tag": "LAT",
@@ -1476,7 +1967,49 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "LBA": {
+      "tag": "LBA",
+      "display_name": "Libya",
+      "color_hex": "#c8b45a",
+      "feature_count": 22,
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "base_iso2": "LY",
+      "lookup_iso2": "LY",
+      "provenance_iso2": "LY",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 448,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "notes": "Italian Libya represented as a distinct colonial administration.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "italian_colonies",
+      "rule_sources": [
+        "italian_colonies"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "ITA"
+      ],
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
     },
     "LIB": {
       "tag": "LIB",
@@ -1506,7 +2039,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "LIT": {
       "tag": "LIT",
@@ -1538,7 +2075,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "LUQ": {
       "tag": "LUQ",
@@ -1570,7 +2111,11 @@
       ],
       "historical_fidelity_summary": [
         "extended"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "LUX": {
       "tag": "LUX",
@@ -1600,7 +2145,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "MAL": {
       "tag": "MAL",
@@ -1632,7 +2181,13 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
     },
     "MAN": {
       "tag": "MAN",
@@ -1664,7 +2219,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "MEN": {
       "tag": "MEN",
@@ -1696,7 +2255,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "MEX": {
       "tag": "MEX",
@@ -1726,7 +2289,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "MLD": {
       "tag": "MLD",
@@ -1756,7 +2323,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "MON": {
       "tag": "MON",
@@ -1786,7 +2357,87 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "MOR": {
+      "tag": "MOR",
+      "display_name": "French Morocco",
+      "color_hex": "#663300",
+      "feature_count": 16,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "MA",
+      "lookup_iso2": "MA",
+      "provenance_iso2": "MA",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 461,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "notes": "French Morocco represented as a protectorate distinct from metropolitan France.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "french_morocco",
+      "rule_sources": [
+        "french_morocco"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "subject_kind": "protectorate",
+      "entry_kind": "scenario_subject"
+    },
+    "MZB": {
+      "tag": "MZB",
+      "display_name": "Mozambique",
+      "color_hex": "#703e5a",
+      "feature_count": 11,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "MZ",
+      "lookup_iso2": "MZ",
+      "provenance_iso2": "MZ",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 544,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "Portuguese Mozambique represented as a separate colonial administration.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "portuguese_mozambique",
+      "rule_sources": [
+        "portuguese_mozambique"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "POR",
+      "parent_owner_tags": [
+        "POR"
+      ],
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
     },
     "NEP": {
       "tag": "NEP",
@@ -1816,7 +2467,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "NIC": {
       "tag": "NIC",
@@ -1846,7 +2501,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "NOR": {
       "tag": "NOR",
@@ -1876,7 +2535,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "NZL": {
       "tag": "NZL",
@@ -1906,7 +2569,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "OMA": {
       "tag": "OMA",
@@ -1936,7 +2603,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "PAL": {
       "tag": "PAL",
@@ -1968,7 +2639,13 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "subject_kind": "mandate",
+      "entry_kind": "scenario_subject"
     },
     "PAN": {
       "tag": "PAN",
@@ -1998,7 +2675,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "PAR": {
       "tag": "PAR",
@@ -2028,7 +2709,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "PER": {
       "tag": "PER",
@@ -2058,15 +2743,19 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "PHI": {
       "tag": "PHI",
       "display_name": "Philippines",
       "color_hex": "#0028c3",
-      "feature_count": 116,
-      "quality": "direct_country_copy",
-      "source": "direct_active_owner",
+      "feature_count": 117,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
       "base_iso2": "PH",
       "lookup_iso2": "PH",
       "provenance_iso2": "PH",
@@ -2077,18 +2766,26 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_south_eastern_asia",
       "subregion_label": "South-Eastern Asia",
-      "notes": "",
+      "notes": "Philippines retained as a United States-associated commonwealth government.",
       "synthetic_owner": false,
       "source_type": "hoi4_owner",
       "historical_fidelity": "vanilla",
-      "primary_rule_source": "",
-      "rule_sources": [],
+      "primary_rule_source": "philippines_commonwealth",
+      "rule_sources": [
+        "philippines_commonwealth"
+      ],
       "source_types": [
         "hoi4_owner"
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "subject_kind": "commonwealth",
+      "entry_kind": "scenario_subject"
     },
     "POL": {
       "tag": "POL",
@@ -2120,13 +2817,17 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "POR": {
       "tag": "POR",
       "display_name": "Portugal",
       "color_hex": "#277446",
-      "feature_count": 99,
+      "feature_count": 70,
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "PT",
@@ -2152,7 +2853,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "PRC": {
       "tag": "PRC",
@@ -2184,7 +2889,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "PRU": {
       "tag": "PRU",
@@ -2214,7 +2923,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "PUE": {
       "tag": "PUE",
@@ -2244,7 +2957,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "QMA": {
       "tag": "QMA",
@@ -2276,13 +2993,17 @@
       ],
       "historical_fidelity_summary": [
         "extended"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "RAJ": {
       "tag": "RAJ",
       "display_name": "British Raj",
       "color_hex": "#e28728",
-      "feature_count": 733,
+      "feature_count": 732,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "IN",
@@ -2308,7 +3029,51 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "subject_kind": "raj",
+      "entry_kind": "scenario_subject"
+    },
+    "RCG": {
+      "tag": "RCG",
+      "display_name": "Belgian Congo",
+      "color_hex": "#66ccff",
+      "feature_count": 33,
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "base_iso2": "CD",
+      "lookup_iso2": "CD",
+      "provenance_iso2": "CD",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 772,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "notes": "Belgian Congo and Ruanda-Urundi represented as a single Belgian colonial government.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "belgian_colonies",
+      "rule_sources": [
+        "belgian_colonies"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "BEL",
+      "parent_owner_tags": [
+        "BEL"
+      ],
+      "subject_kind": "colonial_government",
+      "entry_kind": "scenario_subject"
     },
     "ROM": {
       "tag": "ROM",
@@ -2340,7 +3105,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "SAF": {
       "tag": "SAF",
@@ -2372,7 +3141,13 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "subject_kind": "dominion",
+      "entry_kind": "scenario_subject"
     },
     "SAU": {
       "tag": "SAU",
@@ -2402,7 +3177,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "SHX": {
       "tag": "SHX",
@@ -2434,7 +3213,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "SIA": {
       "tag": "SIA",
@@ -2464,7 +3247,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "SIK": {
       "tag": "SIK",
@@ -2496,13 +3283,55 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "SOM": {
+      "tag": "SOM",
+      "display_name": "Italian Somaliland",
+      "color_hex": "#336600",
+      "feature_count": 26,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "SO",
+      "lookup_iso2": "SO",
+      "provenance_iso2": "SO",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 559,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "Italian Somaliland represented separately before the creation of Italian East Africa.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "italian_somaliland",
+      "rule_sources": [
+        "italian_somaliland"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "ITA"
+      ],
+      "subject_kind": "colony",
+      "entry_kind": "scenario_subject"
     },
     "SOV": {
       "tag": "SOV",
       "display_name": "Soviet Union",
       "color_hex": "#7d0d18",
-      "feature_count": 2548,
+      "feature_count": 2558,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "RU",
@@ -2528,7 +3357,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "SPR": {
       "tag": "SPR",
@@ -2560,7 +3393,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "SWE": {
       "tag": "SWE",
@@ -2590,13 +3427,17 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "SWI": {
       "tag": "SWI",
       "display_name": "Switzerland",
       "color_hex": "#e00505",
-      "feature_count": 35,
+      "feature_count": 36,
       "quality": "approx_existing_geometry",
       "source": "direct_active_owner",
       "base_iso2": "CH",
@@ -2622,7 +3463,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "TAN": {
       "tag": "TAN",
@@ -2654,7 +3499,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "TIB": {
       "tag": "TIB",
@@ -2686,7 +3535,49 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "TUN": {
+      "tag": "TUN",
+      "display_name": "French Tunisia",
+      "color_hex": "#999966",
+      "feature_count": 23,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "TN",
+      "lookup_iso2": "TN",
+      "provenance_iso2": "TN",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 458,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "notes": "French Tunisia represented as a protectorate distinct from metropolitan France.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "french_tunisia",
+      "rule_sources": [
+        "french_tunisia"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "subject_kind": "protectorate",
+      "entry_kind": "scenario_subject"
     },
     "TUR": {
       "tag": "TUR",
@@ -2716,7 +3607,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "URG": {
       "tag": "URG",
@@ -2746,7 +3641,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "USA": {
       "tag": "USA",
@@ -2776,7 +3675,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "VEN": {
       "tag": "VEN",
@@ -2806,7 +3709,49 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "VIN": {
+      "tag": "VIN",
+      "display_name": "French Indochina",
+      "color_hex": "#e6df32",
+      "feature_count": 104,
+      "quality": "approx_existing_geometry",
+      "source": "manual_rule",
+      "base_iso2": "VN",
+      "lookup_iso2": "VN",
+      "provenance_iso2": "VN",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": 671,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "notes": "French Indochina represented as a unified colonial administration.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "vanilla",
+      "primary_rule_source": "french_indochina",
+      "rule_sources": [
+        "french_indochina"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "subject_kind": "colonial_government",
+      "entry_kind": "scenario_subject"
     },
     "XSM": {
       "tag": "XSM",
@@ -2838,7 +3783,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "YEM": {
       "tag": "YEM",
@@ -2868,7 +3817,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "YUE": {
       "tag": "YUE",
@@ -2900,7 +3853,11 @@
       ],
       "historical_fidelity_summary": [
         "extended"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "YUG": {
       "tag": "YUG",
@@ -2932,7 +3889,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     },
     "YUN": {
       "tag": "YUN",
@@ -2964,7 +3925,11 @@
       ],
       "historical_fidelity_summary": [
         "vanilla"
-      ]
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
     }
   }
 }

@@ -892,6 +892,47 @@ input[type="checkbox"].checkbox-input {
   gap: 10px;
 }
 
+.mode-toggle-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mode-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+}
+
+.mode-toggle-btn.is-active {
+  color: var(--color-accent);
+  border-color: rgba(0, 47, 167, 0.24);
+  background: rgba(0, 47, 167, 0.08);
+}
+
+.day-night-status {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-btn);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 10px 12px;
+}
+
+.day-night-status-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
 /* ── Details / Accordion ───────────────────────────────── */
 details.card > summary {
   cursor: pointer;

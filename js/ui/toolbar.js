@@ -2,6 +2,7 @@
 import {
   state,
   PALETTE_THEMES,
+  normalizeDayNightStyleConfig,
   normalizePhysicalStyleConfig,
   normalizeTextureMode,
   normalizeTextureStyleConfig,
@@ -132,9 +133,26 @@ function initToolbar({ render } = {}) {
   const textureDraftLonOffset = document.getElementById("textureDraftLonOffset");
   const textureDraftLatOffset = document.getElementById("textureDraftLatOffset");
   const textureDraftRoll = document.getElementById("textureDraftRoll");
+  const dayNightEnabled = document.getElementById("dayNightEnabled");
+  const dayNightModeManualBtn = document.getElementById("dayNightModeManualBtn");
+  const dayNightModeUtcBtn = document.getElementById("dayNightModeUtcBtn");
+  const dayNightManualControls = document.getElementById("dayNightManualControls");
+  const dayNightManualTime = document.getElementById("dayNightManualTime");
+  const dayNightUtcStatus = document.getElementById("dayNightUtcStatus");
+  const dayNightCurrentTime = document.getElementById("dayNightCurrentTime");
+  const dayNightCityLightsEnabled = document.getElementById("dayNightCityLightsEnabled");
+  const dayNightCityLightsStyle = document.getElementById("dayNightCityLightsStyle");
+  const dayNightCityLightsIntensity = document.getElementById("dayNightCityLightsIntensity");
+  const dayNightCityLightsTextureOpacity = document.getElementById("dayNightCityLightsTextureOpacity");
+  const dayNightCityLightsCorridorStrength = document.getElementById("dayNightCityLightsCorridorStrength");
+  const dayNightCityLightsCoreSharpness = document.getElementById("dayNightCityLightsCoreSharpness");
+  const dayNightShadowOpacity = document.getElementById("dayNightShadowOpacity");
+  const dayNightTwilightWidth = document.getElementById("dayNightTwilightWidth");
   const toggleUrban = document.getElementById("toggleUrban");
   const togglePhysical = document.getElementById("togglePhysical");
   const toggleRivers = document.getElementById("toggleRivers");
+  const toggleWaterRegions = document.getElementById("toggleWaterRegions");
+  const toggleOpenOceanRegions = document.getElementById("toggleOpenOceanRegions");
   const toggleSpecialZones = document.getElementById("toggleSpecialZones");
   const urbanColor = document.getElementById("urbanColor");
   const urbanOpacity = document.getElementById("urbanOpacity");
@@ -299,6 +317,13 @@ function initToolbar({ render } = {}) {
   const textureDraftLonOffsetValue = document.getElementById("textureDraftLonOffsetValue");
   const textureDraftLatOffsetValue = document.getElementById("textureDraftLatOffsetValue");
   const textureDraftRollValue = document.getElementById("textureDraftRollValue");
+  const dayNightManualTimeValue = document.getElementById("dayNightManualTimeValue");
+  const dayNightCityLightsIntensityValue = document.getElementById("dayNightCityLightsIntensityValue");
+  const dayNightCityLightsTextureOpacityValue = document.getElementById("dayNightCityLightsTextureOpacityValue");
+  const dayNightCityLightsCorridorStrengthValue = document.getElementById("dayNightCityLightsCorridorStrengthValue");
+  const dayNightCityLightsCoreSharpnessValue = document.getElementById("dayNightCityLightsCoreSharpnessValue");
+  const dayNightShadowOpacityValue = document.getElementById("dayNightShadowOpacityValue");
+  const dayNightTwilightWidthValue = document.getElementById("dayNightTwilightWidthValue");
   const oceanTextureOpacityValue = document.getElementById("oceanTextureOpacityValue");
   const oceanTextureScaleValue = document.getElementById("oceanTextureScaleValue");
   const oceanContourStrengthValue = document.getElementById("oceanContourStrengthValue");
@@ -793,6 +818,18 @@ function initToolbar({ render } = {}) {
     return state.styleConfig.physical;
   };
 
+  const syncDayNightConfig = () => {
+    state.styleConfig.dayNight = normalizeDayNightStyleConfig(state.styleConfig.dayNight);
+    return state.styleConfig.dayNight;
+  };
+
+  const formatUtcMinutes = (rawValue) => {
+    const totalMinutes = clamp(Math.round(Number(rawValue) || 0), 0, 24 * 60 - 1);
+    const hours = String(Math.floor(totalMinutes / 60)).padStart(2, "0");
+    const minutes = String(totalMinutes % 60).padStart(2, "0");
+    return `${hours}:${minutes} UTC`;
+  };
+
   const updateTextureValueLabel = (element, text) => {
     if (element) element.textContent = text;
   };
@@ -838,6 +875,88 @@ function initToolbar({ render } = {}) {
     updateTextureValueLabel(textureDraftRollValue, `${Math.round(texture.draftGrid.roll)}°`);
 
     renderTextureModePanels(mode);
+  };
+
+  const renderDayNightUI = () => {
+    const dayNight = syncDayNightConfig();
+    if (dayNightEnabled) dayNightEnabled.checked = !!dayNight.enabled;
+    if (dayNightManualTime) dayNightManualTime.value = String(dayNight.manualUtcMinutes);
+    updateTextureValueLabel(dayNightManualTimeValue, formatUtcMinutes(dayNight.manualUtcMinutes));
+
+    const utcNow = new Date();
+    const currentUtcMinutes = (utcNow.getUTCHours() * 60) + utcNow.getUTCMinutes();
+    if (dayNightCurrentTime) {
+      dayNightCurrentTime.textContent = formatUtcMinutes(
+        dayNight.mode === "utc" ? currentUtcMinutes : dayNight.manualUtcMinutes
+      );
+    }
+
+    const modeButtons = [
+      [dayNightModeManualBtn, "manual"],
+      [dayNightModeUtcBtn, "utc"],
+    ];
+    modeButtons.forEach(([button, modeValue]) => {
+      if (!button) return;
+      const isActive = dayNight.mode === modeValue;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+
+    if (dayNightManualControls) {
+      dayNightManualControls.classList.toggle("hidden", dayNight.mode !== "manual");
+    }
+    if (dayNightUtcStatus) {
+      dayNightUtcStatus.classList.toggle("hidden", dayNight.mode !== "utc");
+    }
+
+    if (dayNightCityLightsEnabled) dayNightCityLightsEnabled.checked = !!dayNight.cityLightsEnabled;
+    if (dayNightCityLightsStyle) {
+      dayNightCityLightsStyle.value = dayNight.cityLightsStyle;
+      dayNightCityLightsStyle.disabled = !dayNight.cityLightsEnabled;
+    }
+    const modernLightsControlsEnabled = dayNight.cityLightsEnabled && dayNight.cityLightsStyle === "modern";
+    if (dayNightCityLightsIntensity) {
+      dayNightCityLightsIntensity.value = String(Math.round(dayNight.cityLightsIntensity * 100));
+      dayNightCityLightsIntensity.disabled = !dayNight.cityLightsEnabled;
+    }
+    updateTextureValueLabel(
+      dayNightCityLightsIntensityValue,
+      `${Math.round(dayNight.cityLightsIntensity * 100)}%`
+    );
+    if (dayNightCityLightsTextureOpacity) {
+      dayNightCityLightsTextureOpacity.value = String(Math.round(dayNight.cityLightsTextureOpacity * 100));
+      dayNightCityLightsTextureOpacity.disabled = !modernLightsControlsEnabled;
+    }
+    updateTextureValueLabel(
+      dayNightCityLightsTextureOpacityValue,
+      `${Math.round(dayNight.cityLightsTextureOpacity * 100)}%`
+    );
+    if (dayNightCityLightsCorridorStrength) {
+      dayNightCityLightsCorridorStrength.value = String(Math.round(dayNight.cityLightsCorridorStrength * 100));
+      dayNightCityLightsCorridorStrength.disabled = !modernLightsControlsEnabled;
+    }
+    updateTextureValueLabel(
+      dayNightCityLightsCorridorStrengthValue,
+      `${Math.round(dayNight.cityLightsCorridorStrength * 100)}%`
+    );
+    if (dayNightCityLightsCoreSharpness) {
+      dayNightCityLightsCoreSharpness.value = String(Math.round(dayNight.cityLightsCoreSharpness * 100));
+      dayNightCityLightsCoreSharpness.disabled = !modernLightsControlsEnabled;
+    }
+    updateTextureValueLabel(
+      dayNightCityLightsCoreSharpnessValue,
+      `${Math.round(dayNight.cityLightsCoreSharpness * 100)}%`
+    );
+
+    if (dayNightShadowOpacity) {
+      dayNightShadowOpacity.value = String(Math.round(dayNight.shadowOpacity * 100));
+    }
+    updateTextureValueLabel(dayNightShadowOpacityValue, `${Math.round(dayNight.shadowOpacity * 100)}%`);
+
+    if (dayNightTwilightWidth) {
+      dayNightTwilightWidth.value = String(Math.round(dayNight.twilightWidthDeg));
+    }
+    updateTextureValueLabel(dayNightTwilightWidthValue, `${Math.round(dayNight.twilightWidthDeg)}°`);
   };
 
   const updateTextureStyle = (mutate, { historyKind = "texture-style", commitHistory = false } = {}) => {
@@ -1469,6 +1588,8 @@ function initToolbar({ render } = {}) {
   state.updateParentBorderCountryListFn = renderParentBorderCountryList;
 
   function renderSpecialZoneEditorUI() {
+    if (toggleWaterRegions) toggleWaterRegions.checked = !!state.showWaterRegions;
+    if (toggleOpenOceanRegions) toggleOpenOceanRegions.checked = !!state.showOpenOceanRegions;
     if (toggleUrban) toggleUrban.checked = !!state.showUrban;
     if (togglePhysical) togglePhysical.checked = !!state.showPhysical;
     if (toggleRivers) toggleRivers.checked = !!state.showRivers;
@@ -1713,6 +1834,7 @@ function initToolbar({ render } = {}) {
       themeSelect.value = String(state.activePaletteId || themeSelect.value || "");
     }
     renderTextureUI();
+    renderDayNightUI();
     renderSpecialZoneEditorUI();
   };
   state.updateTextureUIFn = renderTextureUI;
@@ -1969,6 +2091,7 @@ function initToolbar({ render } = {}) {
   }
 
   renderTextureUI();
+  renderDayNightUI();
 
   if (textureSelect && !textureSelect.dataset.bound) {
     textureSelect.addEventListener("change", (event) => {
@@ -2073,6 +2196,128 @@ function initToolbar({ render } = {}) {
     }, { historyKind: "texture-draft-roll", commitHistory: commit });
   });
 
+  if (dayNightEnabled && !dayNightEnabled.dataset.bound) {
+    dayNightEnabled.addEventListener("change", (event) => {
+      const dayNight = syncDayNightConfig();
+      dayNight.enabled = !!event.target.checked;
+      renderDayNightUI();
+      renderDirty("day-night-enabled");
+    });
+    dayNightEnabled.dataset.bound = "true";
+  }
+
+  [
+    [dayNightModeManualBtn, "manual"],
+    [dayNightModeUtcBtn, "utc"],
+  ].forEach(([button, modeValue]) => {
+    if (!button || button.dataset.bound === "true") return;
+    button.addEventListener("click", () => {
+      const dayNight = syncDayNightConfig();
+      if (dayNight.mode === modeValue) return;
+      dayNight.mode = modeValue;
+      renderDayNightUI();
+      renderDirty("day-night-mode");
+    });
+    button.dataset.bound = "true";
+  });
+
+  if (dayNightManualTime && !dayNightManualTime.dataset.bound) {
+    dayNightManualTime.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      const dayNight = syncDayNightConfig();
+      dayNight.manualUtcMinutes = clamp(Number.isFinite(value) ? value : 12 * 60, 0, 24 * 60 - 1);
+      renderDayNightUI();
+      renderDirty("day-night-time");
+    });
+    dayNightManualTime.dataset.bound = "true";
+  }
+
+  if (dayNightCityLightsEnabled && !dayNightCityLightsEnabled.dataset.bound) {
+    dayNightCityLightsEnabled.addEventListener("change", (event) => {
+      const dayNight = syncDayNightConfig();
+      dayNight.cityLightsEnabled = !!event.target.checked;
+      renderDayNightUI();
+      renderDirty("day-night-city-lights-enabled");
+    });
+    dayNightCityLightsEnabled.dataset.bound = "true";
+  }
+
+  if (dayNightCityLightsStyle && !dayNightCityLightsStyle.dataset.bound) {
+    dayNightCityLightsStyle.addEventListener("change", (event) => {
+      const dayNight = syncDayNightConfig();
+      dayNight.cityLightsStyle = String(event.target.value || "modern");
+      renderDayNightUI();
+      renderDirty("day-night-city-lights-style");
+    });
+    dayNightCityLightsStyle.dataset.bound = "true";
+  }
+
+  if (dayNightCityLightsIntensity && !dayNightCityLightsIntensity.dataset.bound) {
+    dayNightCityLightsIntensity.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      const dayNight = syncDayNightConfig();
+      dayNight.cityLightsIntensity = clamp(Number.isFinite(value) ? value / 100 : 0.72, 0, 1.2);
+      renderDayNightUI();
+      renderDirty("day-night-city-lights-intensity");
+    });
+    dayNightCityLightsIntensity.dataset.bound = "true";
+  }
+
+  if (dayNightCityLightsTextureOpacity && !dayNightCityLightsTextureOpacity.dataset.bound) {
+    dayNightCityLightsTextureOpacity.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      const dayNight = syncDayNightConfig();
+      dayNight.cityLightsTextureOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.54, 0, 1);
+      renderDayNightUI();
+      renderDirty("day-night-city-lights-texture-opacity");
+    });
+    dayNightCityLightsTextureOpacity.dataset.bound = "true";
+  }
+
+  if (dayNightCityLightsCorridorStrength && !dayNightCityLightsCorridorStrength.dataset.bound) {
+    dayNightCityLightsCorridorStrength.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      const dayNight = syncDayNightConfig();
+      dayNight.cityLightsCorridorStrength = clamp(Number.isFinite(value) ? value / 100 : 0.58, 0, 1);
+      renderDayNightUI();
+      renderDirty("day-night-city-lights-corridor-strength");
+    });
+    dayNightCityLightsCorridorStrength.dataset.bound = "true";
+  }
+
+  if (dayNightCityLightsCoreSharpness && !dayNightCityLightsCoreSharpness.dataset.bound) {
+    dayNightCityLightsCoreSharpness.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      const dayNight = syncDayNightConfig();
+      dayNight.cityLightsCoreSharpness = clamp(Number.isFinite(value) ? value / 100 : 0.62, 0, 1);
+      renderDayNightUI();
+      renderDirty("day-night-city-lights-core-sharpness");
+    });
+    dayNightCityLightsCoreSharpness.dataset.bound = "true";
+  }
+
+  if (dayNightShadowOpacity && !dayNightShadowOpacity.dataset.bound) {
+    dayNightShadowOpacity.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      const dayNight = syncDayNightConfig();
+      dayNight.shadowOpacity = clamp(Number.isFinite(value) ? value / 100 : 0.28, 0, 0.85);
+      renderDayNightUI();
+      renderDirty("day-night-shadow-opacity");
+    });
+    dayNightShadowOpacity.dataset.bound = "true";
+  }
+
+  if (dayNightTwilightWidth && !dayNightTwilightWidth.dataset.bound) {
+    dayNightTwilightWidth.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      const dayNight = syncDayNightConfig();
+      dayNight.twilightWidthDeg = clamp(Number.isFinite(value) ? value : 10, 2, 28);
+      renderDayNightUI();
+      renderDirty("day-night-twilight-width");
+    });
+    dayNightTwilightWidth.dataset.bound = "true";
+  }
+
   if (toggleUrban) {
     toggleUrban.checked = !!state.showUrban;
     toggleUrban.addEventListener("change", (event) => {
@@ -2094,6 +2339,28 @@ function initToolbar({ render } = {}) {
     toggleRivers.addEventListener("change", (event) => {
       state.showRivers = event.target.checked;
       renderDirty("toggle-rivers");
+    });
+  }
+
+  if (toggleWaterRegions) {
+    toggleWaterRegions.checked = !!state.showWaterRegions;
+    toggleWaterRegions.addEventListener("change", (event) => {
+      state.showWaterRegions = event.target.checked;
+      renderDirty("toggle-water-regions");
+    });
+  }
+
+  if (toggleOpenOceanRegions) {
+    toggleOpenOceanRegions.checked = !!state.showOpenOceanRegions;
+    toggleOpenOceanRegions.addEventListener("change", (event) => {
+      state.showOpenOceanRegions = !!event.target.checked;
+      if (!state.showOpenOceanRegions) {
+        state.hoveredWaterRegionId = null;
+      }
+      if (typeof state.renderWaterRegionListFn === "function") {
+        state.renderWaterRegionListFn();
+      }
+      renderDirty("toggle-open-ocean-regions");
     });
   }
 

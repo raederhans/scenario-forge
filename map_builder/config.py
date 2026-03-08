@@ -9,6 +9,8 @@ RIVERS_URL = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_rivers_l
 BORDERS_URL = "https://naturalearth.s3.amazonaws.com/50m_cultural/ne_50m_admin_0_countries.zip"
 BORDER_LINES_URL = "https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_admin_0_boundary_lines_land.zip"
 OCEAN_URL = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_ocean.zip"
+MARINE_POLYS_URL = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_marine_polys.zip"
+LAKES_URL = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_lakes.zip"
 LAND_BG_URL = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_land.zip"
 URBAN_URL = "https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_urban_areas.zip"
 PHYSICAL_URL = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip"
@@ -53,6 +55,16 @@ CZE_ADM2_FALLBACK_URLS = [
     "geoBoundaries-CZE-ADM2.geojson",
     "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/CZE/ADM2/"
     "geoBoundaries-CZE-ADM2.geojson",
+]
+DNK_ADM2_URL = (
+    "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/main/releaseData/gbOpen/DNK/ADM2/"
+    "geoBoundaries-DNK-ADM2.geojson"
+)
+DNK_ADM2_FALLBACK_URLS = [
+    "https://raw.githubusercontent.com/wmgeolab/geoBoundaries/main/releaseData/gbOpen/DNK/ADM2/"
+    "geoBoundaries-DNK-ADM2.geojson",
+    "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/DNK/ADM2/"
+    "geoBoundaries-DNK-ADM2.geojson",
 ]
 SVK_ADM2_URL = (
     "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/main/releaseData/gbOpen/SVK/ADM2/"
@@ -155,6 +167,7 @@ FR_ARR_FILENAME = "france_arrondissements.geojson"
 PL_POWIATY_FILENAME = "poland_powiaty.geojson"
 CHINA_ADM2_FILENAME = "china_adm2.geojson"
 CZE_ADM2_FILENAME = "geoBoundaries-CZE-ADM2.geojson"
+DNK_ADM2_FILENAME = "geoBoundaries-DNK-ADM2.geojson"
 SVK_ADM2_FILENAME = "geoBoundaries-SVK-ADM2.geojson"
 RUS_ADM2_FILENAME = "geoBoundaries-RUS-ADM2.geojson"
 UKR_ADM2_FILENAME = "geoBoundaries-UKR-ADM2.geojson"

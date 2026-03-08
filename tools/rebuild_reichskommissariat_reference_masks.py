@@ -5,6 +5,7 @@ import argparse
 import json
 from pathlib import Path
 import sys
+import warnings
 
 import geopandas as gpd
 import pandas as pd
@@ -216,7 +217,42 @@ class FeatureUniverse:
         }
 
 
-def build_target_masks(universe: FeatureUniverse) -> dict[str, dict[str, object]]:
+def select_ru_arctic_island_ids(topology_gdf: gpd.GeoDataFrame) -> set[str]:
+    if topology_gdf.empty:
+        return set()
+
+    ru = topology_gdf[topology_gdf["cntr_code"].astype(str) == "RU"].copy()
+    if ru.empty:
+        return set()
+
+    ru["id"] = ru["id"].astype(str)
+    ru["name"] = ru["name"].astype(str)
+    ru["is_shell"] = ru["id"].str.contains("_FB_", na=False) | ru["name"].str.contains("shell fallback", case=False, na=False)
+    bounds = ru.geometry.bounds
+    ru["miny"] = bounds["miny"]
+    ru["maxy"] = bounds["maxy"]
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        ru["area"] = ru.geometry.area
+
+    selected: set[str] = set()
+    shell_candidates = ru[(ru["is_shell"]) & (ru["maxy"] >= 70.0) & (ru["miny"] >= 69.9)]
+    selected.update(shell_candidates["id"].tolist())
+
+    non_shell = ru[~ru["is_shell"]].copy()
+    isolated_candidates = non_shell[(non_shell["maxy"] >= 66.5) & (non_shell["area"] <= 20.0)]
+    for _, row in isolated_candidates.iterrows():
+        others = non_shell[non_shell["id"] != row["id"]]
+        if others.empty:
+            continue
+        if others.geometry.intersects(row.geometry.buffer(1e-6)).any():
+            continue
+        selected.add(str(row["id"]))
+
+    return selected
+
+
+def build_target_masks(universe: FeatureUniverse, *, topology_gdf: gpd.GeoDataFrame) -> dict[str, dict[str, object]]:
     annexed_masovian_ids = {
         "PL_POW_1402",  # ciechanowski
         "PL_POW_1404",  # gostyniński
@@ -304,6 +340,7 @@ def build_target_masks(universe: FeatureUniverse) -> dict[str, dict[str, object]
     )
     ostland_to_moskowien_belarus_ids = {
         "BY_RAY_67162791B11584975294724",  # Khotsimsk
+        "BY_RAY_67162791B14569635979911",  # Kastsyukovichy
         "BY_RAY_67162791B52564132020414",  # Krasnapolle
         "BY_RAY_67162791B58533541453403",  # Klimavichy
     }
@@ -356,11 +393,25 @@ def build_target_masks(universe: FeatureUniverse) -> dict[str, dict[str, object]
         "UA_RAY_74538382B85800934600856",  # Kirovske
         "UA_RAY_74538382B91806639169097",  # Lenine
     }
-    saint_petersburg_to_ger = {
-        "RU_CITY_SAINT_PETERSBURG",
+
+    rkm_explicit_extension_ids = {
+        "RU_RAY_50074027B76249175703521",  # Udorsky District
+        "RU_RAY_50074027B85030315682895",  # Yurinsky District
+        "RU_RAY_50074027B54726203316693",  # Gornomariysky District
+        "RU_RAY_50074027B31803957515687",  # Kilemarsky District
+        "RU_RAY_50074027B36238165021619",  # Shabalinsky District
+        "RU_RAY_50074027B45607076105456",  # Drozhzhanovsky District
+        "RU_RAY_50074027B24067170808668",  # Buinsky District
+        "RU_RAY_50074027B72528113691224",  # Kaybitsky District
+        "RU_RAY_50074027B96608863545801",  # Apastovsky District
+        "RU_RAY_50074027B47970821426630",  # Tetyushsky District
+        "RU_RAY_50074027B23450993160232",  # Spassky District
+        "RU_RAY_50074027B24015802345746",  # Spassky District
+        "RU_RAY_50074027B87542455562769",  # Spassky District
+        "RU_RAY_50074027B91359365494051",  # Spassky District
     }
 
-    rkm_hoi4 = (
+    rkm_historical = (
         universe.expand_groups(
             "RU_Arkhangelsk",
             "RU_Vologda",
@@ -389,25 +440,22 @@ def build_target_masks(universe: FeatureUniverse) -> dict[str, dict[str, object]
             "RU_Republic_of_Mordovia",
             "RU_Chuvash_Republic",
             "RU_Samara",
+            "RU_Republic_of_Kalmykia",
             "RU_Astrakhan",
             "RU_Saratov",
             "RU_Ulyanovsk",
             "RU_Rostov",
         )
-        | saint_petersburg_to_ger
         | ostland_to_moskowien_belarus_ids
+        | rkm_explicit_extension_ids
     ) - {
         "RU_RAY_50074027B21430544456221",  # Taganrog
     }
-    rkm_historical = rkm_hoi4
     greater_finland_to_fin = (
-        universe.expand_groups("RU_Karelia")
-        | universe.pick_names(
-            "RU_Murmansk",
-            {"Petsamo District", "Kuola District", "Koutero District", "Kantalahti District", "Luujärvi District"},
-        )
+        universe.expand_groups("RU_Karelia", "RU_Murmansk")
         | universe.pick_names("RU_Leningrad", {"Vyborgsky District", "Käkisalmi District"})
     )
+    arctic_islands_to_ger = select_ru_arctic_island_ids(topology_gdf)
 
     return {
         "RKP": {
@@ -433,6 +481,8 @@ def build_target_masks(universe: FeatureUniverse) -> dict[str, dict[str, object]
                     "basis": "historical_reference",
                     "action_type": "ownership_transfer",
                     "target_owner_tag": "GER",
+                    "auto_apply_on_core_territory": True,
+                    "hidden_in_ui": True,
                     "include_feature_ids": sorted_ids(annexed_poland_to_ger),
                 }
             ],
@@ -517,19 +567,13 @@ def build_target_masks(universe: FeatureUniverse) -> dict[str, dict[str, object]
         },
         "RKM": {
             "notes": (
-                "Feature-first Moskowien masks. HOI4 stays the default, Historical follows the reference"
-                " planning map more closely, Saint Petersburg, Astrakhan, and the middle-Volga additions are included,"
-                " and Greater Finland remains a separate ownership transfer."
+                "Feature-first Moskowien mask. The exposed boundary is a single historical-reference footprint,"
+                " including Saint Petersburg, Astrakhan, Kalmykia, the requested middle-Volga / Mari El / Komi"
+                " districts, and the Belarus districts reassigned from Ostland. Greater Finland and the Russian"
+                " Arctic islands are auto-transferred when Moskowien core territory is applied."
             ),
-            "default_boundary_variant_id": "hoi4",
+            "default_boundary_variant_id": "historical_reference",
             "boundary_variants": [
-                {
-                    "id": "hoi4",
-                    "label": "HOI4",
-                    "description": "HOI4-first Moskowien proxy using explicit feature masks.",
-                    "basis": "hoi4_trigger",
-                    "include_feature_ids": sorted_ids(rkm_hoi4),
-                },
                 {
                     "id": "historical_reference",
                     "label": "Historical",
@@ -540,15 +584,6 @@ def build_target_masks(universe: FeatureUniverse) -> dict[str, dict[str, object]
             ],
             "companion_actions": [
                 {
-                    "id": "saint_petersburg_to_ger",
-                    "label": "Transfer Saint Petersburg To Germany",
-                    "description": "Transfers Saint Petersburg from Moskowien to Germany using explicit feature masks.",
-                    "basis": "historical_reference",
-                    "action_type": "ownership_transfer",
-                    "target_owner_tag": "GER",
-                    "include_feature_ids": sorted_ids(saint_petersburg_to_ger),
-                },
-                {
                     "id": "greater_finland_to_fin",
                     "label": "Transfer West Karelia / West Kola To Finland",
                     "description": (
@@ -558,9 +593,46 @@ def build_target_masks(universe: FeatureUniverse) -> dict[str, dict[str, object]
                     "basis": "historical_reference",
                     "action_type": "ownership_transfer",
                     "target_owner_tag": "FIN",
+                    "auto_apply_on_core_territory": True,
+                    "hidden_in_ui": True,
                     "include_feature_ids": sorted_ids(greater_finland_to_fin),
+                },
+                {
+                    "id": "arctic_islands_to_ger",
+                    "label": "Transfer Russian Arctic Islands To Germany",
+                    "description": (
+                        "Auto-transfers the Russian Arctic island districts and high-Arctic shell fragments"
+                        " to Germany when Moskowien core territory is applied."
+                    ),
+                    "basis": "historical_reference",
+                    "action_type": "ownership_transfer",
+                    "target_owner_tag": "GER",
+                    "auto_apply_on_core_territory": True,
+                    "hidden_in_ui": True,
+                    "include_feature_ids": sorted_ids(arctic_islands_to_ger),
                 }
             ],
+        },
+        "RKK": {
+            "notes": (
+                "Transcaucasia plus the North Caucasus groups represented by GER_is_RKK_state, including Dagestan"
+                " but excluding Astrakhan and Kalmykia/Elista."
+            ),
+            "basis": "hoi4_trigger",
+            "precedence": "hoi4_trigger",
+            "include_country_codes": ["AM", "AZ", "GE"],
+            "include_hierarchy_group_ids": [
+                "RU_Chechen_Republic",
+                "RU_Republic_of_Ingushetia",
+                "RU_Republic_of_North_Ossetia_Alania",
+                "RU_Kabardino_Balkaria",
+                "RU_Karachay_Cherkess_Republic",
+                "RU_Republic_of_Adygea",
+                "RU_Krasnodar_Krai",
+                "RU_Stavropol_Krai",
+                "RU_Republic_of_Dagestan",
+            ],
+            "include_feature_ids": ["RU_RAY_50074027B22946859849779"],
         },
     }
 
@@ -578,9 +650,29 @@ def rewrite_spec(spec_payload: dict[str, object], target_masks: dict[str, dict[s
         if not replacement:
             continue
         entry["notes"] = replacement["notes"]
-        entry["default_boundary_variant_id"] = replacement["default_boundary_variant_id"]
-        entry["boundary_variants"] = replacement["boundary_variants"]
-        entry["companion_actions"] = replacement["companion_actions"]
+        if "boundary_variants" in replacement:
+            entry["default_boundary_variant_id"] = replacement["default_boundary_variant_id"]
+            entry["boundary_variants"] = replacement["boundary_variants"]
+            entry["companion_actions"] = replacement["companion_actions"]
+            entry.pop("basis", None)
+            entry.pop("precedence", None)
+            entry.pop("include_country_codes", None)
+            entry.pop("include_hierarchy_group_ids", None)
+            entry.pop("include_feature_ids", None)
+            continue
+        if "basis" in replacement:
+            entry["basis"] = replacement["basis"]
+        if "precedence" in replacement:
+            entry["precedence"] = replacement["precedence"]
+        if "include_country_codes" in replacement:
+            entry["include_country_codes"] = replacement["include_country_codes"]
+        if "include_hierarchy_group_ids" in replacement:
+            entry["include_hierarchy_group_ids"] = replacement["include_hierarchy_group_ids"]
+        if "include_feature_ids" in replacement:
+            entry["include_feature_ids"] = replacement["include_feature_ids"]
+        entry.pop("default_boundary_variant_id", None)
+        entry.pop("boundary_variants", None)
+        entry.pop("companion_actions", None)
 
     return spec_payload
 
@@ -665,14 +757,14 @@ def main() -> int:
     if not isinstance(spec_payload, dict):
         raise SystemExit("Spec payload must be a JSON object.")
 
+    topology_gdf = topology_to_gdf(args.runtime_topology)
     runtime_features = load_runtime_features(args.runtime_topology)
     hierarchy_groups, _country_meta = load_hierarchy_groups(args.hierarchy)
     indexes = build_indexes(runtime_features, hierarchy_groups)
     universe = FeatureUniverse(hierarchy_groups, indexes)
-    target_masks = build_target_masks(universe)
+    target_masks = build_target_masks(universe, topology_gdf=topology_gdf)
 
     spec_payload = rewrite_spec(spec_payload, target_masks)
-    topology_gdf = topology_to_gdf(args.runtime_topology)
     export_rule_review_artifacts(
         reports_dir=args.reports_dir,
         topology_gdf=topology_gdf,

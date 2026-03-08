@@ -190,15 +190,147 @@ function refreshScenarioDataHealth({
   return health;
 }
 
+function getRuntimeGeometryFeatureId(geometry) {
+  const props = geometry?.properties || {};
+  return String(props.id || geometry?.id || "").trim();
+}
+
+function getRuntimeGeometryFeatureName(geometry) {
+  const props = geometry?.properties || {};
+  return String(props.name || props.NAME || "").trim();
+}
+
+function isScenarioShellCandidate(featureId, featureName = "") {
+  const normalizedId = String(featureId || "").trim();
+  if (!normalizedId) return false;
+  if (normalizedId.includes("_FB_")) return true;
+  return String(featureName || "").toLowerCase().includes("shell fallback");
+}
+
+function getScenarioEffectiveOwnerCodeByFeatureId(featureId) {
+  const normalizedId = String(featureId || "").trim();
+  if (!normalizedId) return "";
+  return String(
+    state.sovereigntyByFeatureId?.[normalizedId]
+    || state.runtimeCanonicalCountryByFeatureId?.[normalizedId]
+    || ""
+  ).trim().toUpperCase();
+}
+
+function getScenarioEffectiveControllerCodeByFeatureId(featureId) {
+  const normalizedId = String(featureId || "").trim();
+  if (!normalizedId) return "";
+  return String(
+    state.scenarioControllersByFeatureId?.[normalizedId]
+    || getScenarioEffectiveOwnerCodeByFeatureId(normalizedId)
+    || ""
+  ).trim().toUpperCase();
+}
+
+function getScenarioRuntimeNeighborGraph(geometries) {
+  const runtimeGraph = Array.isArray(state.runtimeNeighborGraph) ? state.runtimeNeighborGraph : [];
+  const hasPopulatedNeighbors = runtimeGraph.some((neighbors) => Array.isArray(neighbors) && neighbors.length > 0);
+  if (runtimeGraph.length === geometries.length && hasPopulatedNeighbors) {
+    return runtimeGraph.map((neighbors) => (Array.isArray(neighbors) ? neighbors : []));
+  }
+  if (typeof globalThis.topojson?.neighbors === "function") {
+    try {
+      const fallback = globalThis.topojson.neighbors(geometries);
+      if (Array.isArray(fallback) && fallback.length === geometries.length) {
+        return fallback.map((neighbors) => (Array.isArray(neighbors) ? neighbors : []));
+      }
+    } catch (error) {
+      console.warn("[scenario] Failed to derive fallback runtime neighbors for shell overlays:", error);
+    }
+  }
+  return new Array(geometries.length).fill(null).map(() => []);
+}
+
+function haveSameScenarioShellMapping(previousMap, nextMap) {
+  const previousKeys = Object.keys(previousMap || {});
+  const nextKeys = Object.keys(nextMap || {});
+  if (previousKeys.length !== nextKeys.length) return false;
+  for (const key of previousKeys) {
+    if (String(previousMap?.[key] || "") !== String(nextMap?.[key] || "")) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function refreshScenarioShellOverlays({ renderNow = false, borderReason = "scenario-shell-overlay" } = {}) {
+  const previousOwnerMap = state.scenarioAutoShellOwnerByFeatureId || {};
+  const previousControllerMap = state.scenarioAutoShellControllerByFeatureId || {};
+  let nextOwnerMap = {};
+  let nextControllerMap = {};
+
+  if (state.activeScenarioId) {
+    const geometries = state.runtimePoliticalTopology?.objects?.political?.geometries || [];
+    if (Array.isArray(geometries) && geometries.length) {
+      const neighborGraph = getScenarioRuntimeNeighborGraph(geometries);
+      geometries.forEach((geometry, index) => {
+        const featureId = getRuntimeGeometryFeatureId(geometry);
+        const featureName = getRuntimeGeometryFeatureName(geometry);
+        if (!isScenarioShellCandidate(featureId, featureName)) return;
+        const neighborIndexes = Array.isArray(neighborGraph[index]) ? neighborGraph[index] : [];
+        if (!neighborIndexes.length) return;
+        const ownerCodes = new Set();
+        const controllerCodes = new Set();
+        neighborIndexes.forEach((neighborIndex) => {
+          const neighborGeometry = geometries[neighborIndex];
+          const neighborId = getRuntimeGeometryFeatureId(neighborGeometry);
+          const neighborName = getRuntimeGeometryFeatureName(neighborGeometry);
+          if (!neighborId || isScenarioShellCandidate(neighborId, neighborName)) {
+            return;
+          }
+          const ownerCode = getScenarioEffectiveOwnerCodeByFeatureId(neighborId);
+          const controllerCode = getScenarioEffectiveControllerCodeByFeatureId(neighborId);
+          if (ownerCode) ownerCodes.add(ownerCode);
+          if (controllerCode) controllerCodes.add(controllerCode);
+        });
+        if (ownerCodes.size === 1) {
+          nextOwnerMap[featureId] = [...ownerCodes][0];
+        }
+        if (controllerCodes.size === 1) {
+          nextControllerMap[featureId] = [...controllerCodes][0];
+        }
+      });
+    }
+  }
+
+  const changed =
+    !haveSameScenarioShellMapping(previousOwnerMap, nextOwnerMap)
+    || !haveSameScenarioShellMapping(previousControllerMap, nextControllerMap);
+
+  state.scenarioAutoShellOwnerByFeatureId = nextOwnerMap;
+  state.scenarioAutoShellControllerByFeatureId = nextControllerMap;
+  if (changed) {
+    state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
+  }
+  refreshColorState({ renderNow: false });
+  recomputeDynamicBordersNow({ renderNow: false, reason: borderReason });
+  if (renderNow && typeof state.renderNowFn === "function") {
+    state.renderNowFn();
+  }
+  return {
+    changed,
+    ownerCount: Object.keys(nextOwnerMap).length,
+    controllerCount: Object.keys(nextControllerMap).length,
+  };
+}
+
 function getScenarioDisplayOwnerByFeatureId(featureId, { fallbackOwner = "" } = {}) {
   const normalizedId = String(featureId || "").trim();
   if (!normalizedId) return String(fallbackOwner || "").trim().toUpperCase();
   const fallback = String(fallbackOwner || "").trim().toUpperCase();
+  const shellOwner = String(state.scenarioAutoShellOwnerByFeatureId?.[normalizedId] || "").trim().toUpperCase();
   if (!state.activeScenarioId || normalizeScenarioViewMode(state.scenarioViewMode) !== "frontline") {
-    return fallback;
+    return shellOwner || fallback;
   }
   return String(
-    state.scenarioControllersByFeatureId?.[normalizedId]
+    state.scenarioAutoShellControllerByFeatureId?.[normalizedId]
+    || state.scenarioControllersByFeatureId?.[normalizedId]
+    || shellOwner
     || fallback
     || state.sovereigntyByFeatureId?.[normalizedId]
     || ""
@@ -737,6 +869,9 @@ async function applyScenarioBundle(
   state.scenarioBaselineHash = getScenarioBaselineHashFromBundle(bundle);
   state.scenarioBaselineOwnersByFeatureId = { ...owners };
   state.scenarioControllersByFeatureId = { ...controllers };
+  state.scenarioAutoShellOwnerByFeatureId = {};
+  state.scenarioAutoShellControllerByFeatureId = {};
+  state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
   state.scenarioBaselineControllersByFeatureId = { ...controllers };
   state.scenarioBaselineCoresByFeatureId = { ...cores };
   state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
@@ -782,8 +917,7 @@ async function applyScenarioBundle(
     }
   });
 
-  refreshColorState({ renderNow: false });
-  recomputeDynamicBordersNow({ renderNow: false, reason: `scenario:${scenarioId}` });
+  refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario:${scenarioId}` });
   const dataHealth = refreshScenarioDataHealth({
     showWarningToast: true,
     showErrorToast: true,
@@ -851,6 +985,9 @@ function resetToScenarioBaseline(
   const previousInspectorExpansionInitialized = !!state.inspectorExpansionInitialized;
   state.sovereigntyByFeatureId = { ...(state.scenarioBaselineOwnersByFeatureId || {}) };
   state.scenarioControllersByFeatureId = { ...(state.scenarioBaselineControllersByFeatureId || {}) };
+  state.scenarioAutoShellOwnerByFeatureId = {};
+  state.scenarioAutoShellControllerByFeatureId = {};
+  state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
   state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
   state.scenarioViewMode = "ownership";
   state.sovereigntyInitialized = false;
@@ -883,8 +1020,7 @@ function resetToScenarioBaseline(
   });
   state.scenarioBorderMode = "scenario_owner_only";
   disableScenarioParentBorders();
-  refreshColorState({ renderNow: false });
-  recomputeDynamicBordersNow({ renderNow: false, reason: `scenario-reset:${state.activeScenarioId}` });
+  refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario-reset:${state.activeScenarioId}` });
   refreshScenarioDataHealth({ showWarningToast: false });
   if (markDirtyReason) {
     markDirty(markDirtyReason);
@@ -925,8 +1061,11 @@ function clearActiveScenario(
   state.scenarioBaselineHash = "";
   state.scenarioBaselineOwnersByFeatureId = {};
   state.scenarioControllersByFeatureId = {};
+  state.scenarioAutoShellOwnerByFeatureId = {};
+  state.scenarioAutoShellControllerByFeatureId = {};
   state.scenarioBaselineControllersByFeatureId = {};
   state.scenarioBaselineCoresByFeatureId = {};
+  state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
   state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
   state.scenarioOwnerControllerDiffCount = 0;
   state.scenarioDataHealth = {
@@ -951,8 +1090,7 @@ function clearActiveScenario(
   restorePaintModeAfterScenario();
   restoreScenarioOceanFillAfterExit();
   rebuildPresetState();
-  refreshColorState({ renderNow: false });
-  recomputeDynamicBordersNow({ renderNow: false, reason: "scenario-clear" });
+  refreshScenarioShellOverlays({ renderNow: false, borderReason: "scenario-clear" });
   if (markDirtyReason) {
     markDirty(markDirtyReason);
   }
@@ -1151,6 +1289,7 @@ export {
   loadScenarioAuditPayload,
   loadScenarioBundle,
   loadScenarioRegistry,
+  refreshScenarioShellOverlays,
   resetToScenarioBaseline,
   setScenarioViewMode,
   validateImportedScenarioBaseline,

@@ -28,6 +28,7 @@ from map_builder.processors.africa_admin1 import apply_africa_admin1_replacement
 from map_builder.processors.au_city_overrides import apply_au_city_overrides
 from map_builder.processors.belarus import apply_belarus_replacement
 from map_builder.processors.cz_sk_border_detail import apply_cz_sk_border_detail
+from map_builder.processors.denmark_border_detail import apply_denmark_border_detail
 from map_builder.processors.global_basic_admin1 import apply_global_basic_admin1_replacement
 from map_builder.processors.north_america import apply_north_america_replacement
 from init_map_data import apply_config_subdivisions
@@ -37,7 +38,7 @@ try:
 except Exception:  # pragma: no cover - unavailable on some platforms
     resource = None
 
-LAYER_NAMES = ("political", "special_zones", "ocean", "land", "urban", "physical", "rivers")
+LAYER_NAMES = ("political", "special_zones", "water_regions", "ocean", "land", "urban", "physical", "rivers")
 SPECIAL_NAME_FALLBACKS = {
     "RUS+99?": "Russia Special Region",
 }
@@ -317,6 +318,7 @@ def _write_output_topology(
         physical=layers.get("physical", _empty_gdf()),
         rivers=layers.get("rivers", _empty_gdf()),
         special_zones=layers.get("special_zones"),
+        water_regions=layers.get("water_regions"),
         output_path=output_path,
         quantization=cfg.TOPOLOGY_QUANTIZATION,
     )
@@ -362,6 +364,13 @@ def main() -> None:
     if primary_topology_path.exists():
         print(f"[Detail patch] Loading primary topology shell: {primary_topology_path}")
         primary_layers = _load_layers_from_topology(_load_topology(primary_topology_path))
+        for layer_name in LAYER_NAMES:
+            if layer_name == "political":
+                continue
+            if layers.get(layer_name) is None or layers[layer_name].empty:
+                primary_layer = primary_layers.get(layer_name)
+                if primary_layer is not None and not primary_layer.empty:
+                    layers[layer_name] = primary_layer.copy()
     _record_timing(
         stage_timings,
         "load_inputs",
@@ -373,6 +382,7 @@ def main() -> None:
     patched_political = apply_north_america_replacement(layers["political"])
     patched_political = apply_africa_admin1_replacement(patched_political)
     patched_political = apply_global_basic_admin1_replacement(patched_political)
+    patched_political = apply_denmark_border_detail(patched_political)
     patched_political = apply_cz_sk_border_detail(patched_political)
     patched_political = apply_belarus_replacement(patched_political)
     patched_political = apply_au_city_overrides(patched_political)

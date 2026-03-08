@@ -733,7 +733,7 @@ def _evaluate_region_checks(
         batches=[
             {
                 "label": "Somaliland northern features",
-                "expected_owner_tag": "ITA",
+                "expected_owner_tag": "SOM",
                 "resolved": _resolve_targets(
                     feature_by_id=feature_by_id,
                     ids_by_country=ids_by_country,
@@ -1287,6 +1287,10 @@ def compile_scenario_bundle(
             "rule_sources": record.rule_sources,
             "source_types": record.source_types,
             "historical_fidelity_summary": record.historical_fidelity_summary,
+            "parent_owner_tag": record.parent_owner_tag,
+            "parent_owner_tags": record.parent_owner_tags,
+            "subject_kind": record.subject_kind,
+            "entry_kind": record.entry_kind,
         }
 
     countries_payload = {
@@ -1320,6 +1324,10 @@ def compile_scenario_bundle(
                 "rule_sources": record.rule_sources,
                 "source_types": record.source_types,
                 "historical_fidelity_summary": record.historical_fidelity_summary,
+                "parent_owner_tag": record.parent_owner_tag,
+                "parent_owner_tags": record.parent_owner_tags,
+                "subject_kind": record.subject_kind,
+                "entry_kind": record.entry_kind,
             }
             for tag, record in sorted(countries.items())
         },

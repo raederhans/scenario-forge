@@ -332,6 +332,10 @@
       "en": "Countries",
       "zh": "国家"
     },
+    "Country Color": {
+      "en": "Country Color",
+      "zh": "Country Color"
+    },
     "Country Colors": {
       "en": "Country Colors",
       "zh": "国家配色"
@@ -408,13 +412,13 @@
       "en": "Drawing in progress: click map to add vertices, double-click to finish.",
       "zh": "绘图进行中：点击地图添加顶点，双击完成。"
     },
-    "Dynamic borders disabled": {
-      "en": "Dynamic borders disabled",
-      "zh": "动态边界已禁用"
-    },
     "Dynamic / Runtime": {
       "en": "Dynamic / Runtime",
       "zh": "动态 / 运行时"
+    },
+    "Dynamic borders disabled": {
+      "en": "Dynamic borders disabled",
+      "zh": "动态边界已禁用"
     },
     "Dynamic tag": {
       "en": "Dynamic tag",
@@ -424,6 +428,14 @@
       "en": "Edit",
       "zh": "编辑"
     },
+    "Edit country color": {
+      "en": "Edit country color",
+      "zh": "Edit country color"
+    },
+    "Edit water region color": {
+      "en": "Edit water region color",
+      "zh": "Edit water region color"
+    },
     "Editing Preset": {
       "en": "Editing Preset",
       "zh": "正在编辑预设"
@@ -431,10 +443,6 @@
     "Empire Borders": {
       "en": "Empire Borders",
       "zh": "帝国边界"
-    },
-    "Essentials": {
-      "en": "Essentials",
-      "zh": "常用"
     },
     "Eraser": {
       "en": "Eraser",
@@ -444,6 +452,10 @@
       "en": "Eraser tool",
       "zh": "橡皮擦工具"
     },
+    "Essentials": {
+      "en": "Essentials",
+      "zh": "常用"
+    },
     "Exit Scenario": {
       "en": "Exit Scenario",
       "zh": "退出剧本"
@@ -451,10 +463,6 @@
     "Expand": {
       "en": "Expand",
       "zh": "展开"
-    },
-    "Extra": {
-      "en": "Extra",
-      "zh": "额外"
     },
     "Export": {
       "en": "Export",
@@ -467,6 +475,10 @@
     "Export tools": {
       "en": "Export tools",
       "zh": "导出工具"
+    },
+    "Extra": {
+      "en": "Extra",
+      "zh": "额外"
     },
     "Eyedropper": {
       "en": "Eyedropper",
@@ -700,6 +712,10 @@
       "en": "No matching countries",
       "zh": "没有匹配的国家/地区"
     },
+    "No matching water regions": {
+      "en": "No matching water regions",
+      "zh": "No matching water regions"
+    },
     "No owned regions were recolored.": {
       "en": "No owned regions were recolored.",
       "zh": "没有已拥有区域被重新着色。"
@@ -775,6 +791,10 @@
     "Paint regions to generate a legend.": {
       "en": "Paint regions to generate a legend.",
       "zh": "为区域上色以生成图例。"
+    },
+    "Paint water regions to create an override list.": {
+      "en": "Paint water regions to create an override list.",
+      "zh": "Paint water regions to create an override list."
     },
     "Panels": {
       "en": "Panels",
@@ -1240,6 +1260,10 @@
       "en": "Use Activate Releasable or Reapply Core Territory in Scenario Actions.",
       "zh": "请在 Scenario Actions 中使用“激活可释放国”或“重新应用核心领土”。"
     },
+    "Use Country Color for Visual Actions": {
+      "en": "Use Country Color for Visual Actions",
+      "zh": "Use Country Color for Visual Actions"
+    },
     "Use Visual Color Brush": {
       "en": "Use Visual Color Brush",
       "zh": "使用视觉颜色画笔"
@@ -1287,6 +1311,10 @@
     "Warlord / regional tag": {
       "en": "Warlord / regional tag",
       "zh": "军阀或地区性 tag"
+    },
+    "Water Color": {
+      "en": "Water Color",
+      "zh": "Water Color"
     },
     "Wetlands & Delta": {
       "en": "Wetlands & Delta",
@@ -4169,6 +4197,50 @@
     "Antarctica": {
       "en": "Antarctica",
       "zh": "南极洲"
+    },
+    "Antarctica / 136E-142E Sector": {
+      "en": "Antarctica / 136E-142E Sector",
+      "zh": "Antarctica / 136E-142E Sector"
+    },
+    "Antarctica / 142E-160E Sector": {
+      "en": "Antarctica / 142E-160E Sector",
+      "zh": "Antarctica / 142E-160E Sector"
+    },
+    "Antarctica / 150W-90W Sector": {
+      "en": "Antarctica / 150W-90W Sector",
+      "zh": "Antarctica / 150W-90W Sector"
+    },
+    "Antarctica / 160E-150W Sector": {
+      "en": "Antarctica / 160E-150W Sector",
+      "zh": "Antarctica / 160E-150W Sector"
+    },
+    "Antarctica / 20W-45E Sector": {
+      "en": "Antarctica / 20W-45E Sector",
+      "zh": "Antarctica / 20W-45E Sector"
+    },
+    "Antarctica / 45E-136E Sector": {
+      "en": "Antarctica / 45E-136E Sector",
+      "zh": "Antarctica / 45E-136E Sector"
+    },
+    "Antarctica / Peninsula 25W-20W Sector": {
+      "en": "Antarctica / Peninsula 25W-20W Sector",
+      "zh": "Antarctica / Peninsula 25W-20W Sector"
+    },
+    "Antarctica / Peninsula 53W-25W Overlap Sector": {
+      "en": "Antarctica / Peninsula 53W-25W Overlap Sector",
+      "zh": "Antarctica / Peninsula 53W-25W Overlap Sector"
+    },
+    "Antarctica / Peninsula 74W-53W Overlap Sector": {
+      "en": "Antarctica / Peninsula 74W-53W Overlap Sector",
+      "zh": "Antarctica / Peninsula 74W-53W Overlap Sector"
+    },
+    "Antarctica / Peninsula 80W-74W Overlap Sector": {
+      "en": "Antarctica / Peninsula 80W-74W Overlap Sector",
+      "zh": "Antarctica / Peninsula 80W-74W Overlap Sector"
+    },
+    "Antarctica / Peninsula 90W-80W Sector": {
+      "en": "Antarctica / Peninsula 90W-80W Sector",
+      "zh": "Antarctica / Peninsula 90W-80W Sector"
     },
     "Antioquia": {
       "en": "Antioquia",
@@ -55978,6 +56050,18 @@
       "en": "North Rhine-Westphalia",
       "zh": "北莱茵-威斯特法伦"
     },
+    "North Schleswig": {
+      "en": "North Schleswig",
+      "zh": "North Schleswig"
+    },
+    "North Schleswig (DK)": {
+      "en": "North Schleswig (DK)",
+      "zh": "North Schleswig (DK)"
+    },
+    "North Schleswig [Sydjylland]": {
+      "en": "North Schleswig [Sydjylland]",
+      "zh": "North Schleswig [Sydjylland]"
+    },
     "North Somerset": {
       "en": "North Somerset",
       "zh": "北萨默塞特"
@@ -68626,6 +68710,3198 @@
       "en": "Russia Arctic Fallback 99 (RU)",
       "zh": "俄罗斯北极后备99"
     },
+    "Russia Shell Fallback 1": {
+      "en": "Russia Shell Fallback 1",
+      "zh": "俄罗斯北极后备 1"
+    },
+    "Russia Shell Fallback 1 (RU)": {
+      "en": "Russia Shell Fallback 1 (RU)",
+      "zh": "俄罗斯北极后备 1"
+    },
+    "Russia Shell Fallback 10": {
+      "en": "Russia Shell Fallback 10",
+      "zh": "俄罗斯北极后备 10"
+    },
+    "Russia Shell Fallback 10 (RU)": {
+      "en": "Russia Shell Fallback 10 (RU)",
+      "zh": "俄罗斯北极后备 10"
+    },
+    "Russia Shell Fallback 100": {
+      "en": "Russia Shell Fallback 100",
+      "zh": "俄罗斯北极后备 100"
+    },
+    "Russia Shell Fallback 100 (RU)": {
+      "en": "Russia Shell Fallback 100 (RU)",
+      "zh": "俄罗斯北极后备 100"
+    },
+    "Russia Shell Fallback 101": {
+      "en": "Russia Shell Fallback 101",
+      "zh": "俄罗斯北极后备101"
+    },
+    "Russia Shell Fallback 101 (RU)": {
+      "en": "Russia Shell Fallback 101 (RU)",
+      "zh": "俄罗斯北极后备101"
+    },
+    "Russia Shell Fallback 102": {
+      "en": "Russia Shell Fallback 102",
+      "zh": "俄罗斯北极后备102"
+    },
+    "Russia Shell Fallback 102 (RU)": {
+      "en": "Russia Shell Fallback 102 (RU)",
+      "zh": "俄罗斯北极后备102"
+    },
+    "Russia Shell Fallback 103": {
+      "en": "Russia Shell Fallback 103",
+      "zh": "俄罗斯北极后备103"
+    },
+    "Russia Shell Fallback 103 (RU)": {
+      "en": "Russia Shell Fallback 103 (RU)",
+      "zh": "俄罗斯北极后备103"
+    },
+    "Russia Shell Fallback 104": {
+      "en": "Russia Shell Fallback 104",
+      "zh": "俄罗斯北极后备104"
+    },
+    "Russia Shell Fallback 104 (RU)": {
+      "en": "Russia Shell Fallback 104 (RU)",
+      "zh": "俄罗斯北极后备104"
+    },
+    "Russia Shell Fallback 105": {
+      "en": "Russia Shell Fallback 105",
+      "zh": "俄罗斯北极后备105"
+    },
+    "Russia Shell Fallback 105 (RU)": {
+      "en": "Russia Shell Fallback 105 (RU)",
+      "zh": "俄罗斯北极后备105"
+    },
+    "Russia Shell Fallback 106": {
+      "en": "Russia Shell Fallback 106",
+      "zh": "俄罗斯北极后备106"
+    },
+    "Russia Shell Fallback 106 (RU)": {
+      "en": "Russia Shell Fallback 106 (RU)",
+      "zh": "俄罗斯北极后备106"
+    },
+    "Russia Shell Fallback 107": {
+      "en": "Russia Shell Fallback 107",
+      "zh": "俄罗斯北极后备107"
+    },
+    "Russia Shell Fallback 107 (RU)": {
+      "en": "Russia Shell Fallback 107 (RU)",
+      "zh": "俄罗斯北极后备107"
+    },
+    "Russia Shell Fallback 108": {
+      "en": "Russia Shell Fallback 108",
+      "zh": "俄罗斯北极后备108"
+    },
+    "Russia Shell Fallback 108 (RU)": {
+      "en": "Russia Shell Fallback 108 (RU)",
+      "zh": "俄罗斯北极后备108"
+    },
+    "Russia Shell Fallback 109": {
+      "en": "Russia Shell Fallback 109",
+      "zh": "俄罗斯北极后备109"
+    },
+    "Russia Shell Fallback 109 (RU)": {
+      "en": "Russia Shell Fallback 109 (RU)",
+      "zh": "俄罗斯北极后备109"
+    },
+    "Russia Shell Fallback 11": {
+      "en": "Russia Shell Fallback 11",
+      "zh": "俄罗斯北极后备 11"
+    },
+    "Russia Shell Fallback 11 (RU)": {
+      "en": "Russia Shell Fallback 11 (RU)",
+      "zh": "俄罗斯北极后备 11"
+    },
+    "Russia Shell Fallback 110": {
+      "en": "Russia Shell Fallback 110",
+      "zh": "俄罗斯北极后备110"
+    },
+    "Russia Shell Fallback 110 (RU)": {
+      "en": "Russia Shell Fallback 110 (RU)",
+      "zh": "俄罗斯北极后备110"
+    },
+    "Russia Shell Fallback 111": {
+      "en": "Russia Shell Fallback 111",
+      "zh": "俄罗斯北极后备111"
+    },
+    "Russia Shell Fallback 111 (RU)": {
+      "en": "Russia Shell Fallback 111 (RU)",
+      "zh": "俄罗斯北极后备111"
+    },
+    "Russia Shell Fallback 112": {
+      "en": "Russia Shell Fallback 112",
+      "zh": "俄罗斯北极后备112"
+    },
+    "Russia Shell Fallback 112 (RU)": {
+      "en": "Russia Shell Fallback 112 (RU)",
+      "zh": "俄罗斯北极后备112"
+    },
+    "Russia Shell Fallback 113": {
+      "en": "Russia Shell Fallback 113",
+      "zh": "俄罗斯北极后备 113"
+    },
+    "Russia Shell Fallback 113 (RU)": {
+      "en": "Russia Shell Fallback 113 (RU)",
+      "zh": "俄罗斯北极后备 113"
+    },
+    "Russia Shell Fallback 114": {
+      "en": "Russia Shell Fallback 114",
+      "zh": "俄罗斯北极后备114"
+    },
+    "Russia Shell Fallback 114 (RU)": {
+      "en": "Russia Shell Fallback 114 (RU)",
+      "zh": "俄罗斯北极后备114"
+    },
+    "Russia Shell Fallback 115": {
+      "en": "Russia Shell Fallback 115",
+      "zh": "俄罗斯北极后备115"
+    },
+    "Russia Shell Fallback 115 (RU)": {
+      "en": "Russia Shell Fallback 115 (RU)",
+      "zh": "俄罗斯北极后备115"
+    },
+    "Russia Shell Fallback 116": {
+      "en": "Russia Shell Fallback 116",
+      "zh": "俄罗斯北极后备116"
+    },
+    "Russia Shell Fallback 116 (RU)": {
+      "en": "Russia Shell Fallback 116 (RU)",
+      "zh": "俄罗斯北极后备116"
+    },
+    "Russia Shell Fallback 117": {
+      "en": "Russia Shell Fallback 117",
+      "zh": "俄罗斯北极后备 117"
+    },
+    "Russia Shell Fallback 117 (RU)": {
+      "en": "Russia Shell Fallback 117 (RU)",
+      "zh": "俄罗斯北极后备 117"
+    },
+    "Russia Shell Fallback 118": {
+      "en": "Russia Shell Fallback 118",
+      "zh": "俄罗斯北极后备 118"
+    },
+    "Russia Shell Fallback 118 (RU)": {
+      "en": "Russia Shell Fallback 118 (RU)",
+      "zh": "俄罗斯北极后备 118"
+    },
+    "Russia Shell Fallback 119": {
+      "en": "Russia Shell Fallback 119",
+      "zh": "俄罗斯北极后备119"
+    },
+    "Russia Shell Fallback 119 (RU)": {
+      "en": "Russia Shell Fallback 119 (RU)",
+      "zh": "俄罗斯北极后备119"
+    },
+    "Russia Shell Fallback 12": {
+      "en": "Russia Shell Fallback 12",
+      "zh": "俄罗斯北极后备 12"
+    },
+    "Russia Shell Fallback 12 (RU)": {
+      "en": "Russia Shell Fallback 12 (RU)",
+      "zh": "俄罗斯北极后备 12"
+    },
+    "Russia Shell Fallback 120": {
+      "en": "Russia Shell Fallback 120",
+      "zh": "俄罗斯北极后备 120"
+    },
+    "Russia Shell Fallback 120 (RU)": {
+      "en": "Russia Shell Fallback 120 (RU)",
+      "zh": "俄罗斯北极后备 120"
+    },
+    "Russia Shell Fallback 121": {
+      "en": "Russia Shell Fallback 121",
+      "zh": "俄罗斯北极后备121"
+    },
+    "Russia Shell Fallback 121 (RU)": {
+      "en": "Russia Shell Fallback 121 (RU)",
+      "zh": "俄罗斯北极后备121"
+    },
+    "Russia Shell Fallback 122": {
+      "en": "Russia Shell Fallback 122",
+      "zh": "俄罗斯北极后备 122"
+    },
+    "Russia Shell Fallback 122 (RU)": {
+      "en": "Russia Shell Fallback 122 (RU)",
+      "zh": "俄罗斯北极后备 122"
+    },
+    "Russia Shell Fallback 123": {
+      "en": "Russia Shell Fallback 123",
+      "zh": "俄罗斯北极后备 123"
+    },
+    "Russia Shell Fallback 123 (RU)": {
+      "en": "Russia Shell Fallback 123 (RU)",
+      "zh": "俄罗斯北极后备 123"
+    },
+    "Russia Shell Fallback 124": {
+      "en": "Russia Shell Fallback 124",
+      "zh": "俄罗斯北极后备 124"
+    },
+    "Russia Shell Fallback 124 (RU)": {
+      "en": "Russia Shell Fallback 124 (RU)",
+      "zh": "俄罗斯北极后备 124"
+    },
+    "Russia Shell Fallback 125": {
+      "en": "Russia Shell Fallback 125",
+      "zh": "俄罗斯北极后备 125"
+    },
+    "Russia Shell Fallback 125 (RU)": {
+      "en": "Russia Shell Fallback 125 (RU)",
+      "zh": "俄罗斯北极后备 125"
+    },
+    "Russia Shell Fallback 126": {
+      "en": "Russia Shell Fallback 126",
+      "zh": "俄罗斯北极后备 126"
+    },
+    "Russia Shell Fallback 126 (RU)": {
+      "en": "Russia Shell Fallback 126 (RU)",
+      "zh": "俄罗斯北极后备 126"
+    },
+    "Russia Shell Fallback 127": {
+      "en": "Russia Shell Fallback 127",
+      "zh": "俄罗斯北极后备 127"
+    },
+    "Russia Shell Fallback 127 (RU)": {
+      "en": "Russia Shell Fallback 127 (RU)",
+      "zh": "俄罗斯北极后备 127"
+    },
+    "Russia Shell Fallback 128": {
+      "en": "Russia Shell Fallback 128",
+      "zh": "俄罗斯北极后备 128"
+    },
+    "Russia Shell Fallback 128 (RU)": {
+      "en": "Russia Shell Fallback 128 (RU)",
+      "zh": "俄罗斯北极后备 128"
+    },
+    "Russia Shell Fallback 129": {
+      "en": "Russia Shell Fallback 129",
+      "zh": "俄罗斯北极后备 129"
+    },
+    "Russia Shell Fallback 129 (RU)": {
+      "en": "Russia Shell Fallback 129 (RU)",
+      "zh": "俄罗斯北极后备 129"
+    },
+    "Russia Shell Fallback 13": {
+      "en": "Russia Shell Fallback 13",
+      "zh": "俄罗斯北极后备 13"
+    },
+    "Russia Shell Fallback 13 (RU)": {
+      "en": "Russia Shell Fallback 13 (RU)",
+      "zh": "俄罗斯北极后备 13"
+    },
+    "Russia Shell Fallback 130": {
+      "en": "Russia Shell Fallback 130",
+      "zh": "俄罗斯北极后备 130"
+    },
+    "Russia Shell Fallback 130 (RU)": {
+      "en": "Russia Shell Fallback 130 (RU)",
+      "zh": "俄罗斯北极后备 130"
+    },
+    "Russia Shell Fallback 131": {
+      "en": "Russia Shell Fallback 131",
+      "zh": "俄罗斯北极后备 131"
+    },
+    "Russia Shell Fallback 131 (RU)": {
+      "en": "Russia Shell Fallback 131 (RU)",
+      "zh": "俄罗斯北极后备 131"
+    },
+    "Russia Shell Fallback 132": {
+      "en": "Russia Shell Fallback 132",
+      "zh": "俄罗斯北极后备 132"
+    },
+    "Russia Shell Fallback 132 (RU)": {
+      "en": "Russia Shell Fallback 132 (RU)",
+      "zh": "俄罗斯北极后备 132"
+    },
+    "Russia Shell Fallback 133": {
+      "en": "Russia Shell Fallback 133",
+      "zh": "俄罗斯北极后备 133"
+    },
+    "Russia Shell Fallback 133 (RU)": {
+      "en": "Russia Shell Fallback 133 (RU)",
+      "zh": "俄罗斯北极后备 133"
+    },
+    "Russia Shell Fallback 134": {
+      "en": "Russia Shell Fallback 134",
+      "zh": "俄罗斯北极后备 134"
+    },
+    "Russia Shell Fallback 134 (RU)": {
+      "en": "Russia Shell Fallback 134 (RU)",
+      "zh": "俄罗斯北极后备 134"
+    },
+    "Russia Shell Fallback 135": {
+      "en": "Russia Shell Fallback 135",
+      "zh": "俄罗斯北极后备 135"
+    },
+    "Russia Shell Fallback 135 (RU)": {
+      "en": "Russia Shell Fallback 135 (RU)",
+      "zh": "俄罗斯北极后备 135"
+    },
+    "Russia Shell Fallback 136": {
+      "en": "Russia Shell Fallback 136",
+      "zh": "俄罗斯北极后备 136"
+    },
+    "Russia Shell Fallback 136 (RU)": {
+      "en": "Russia Shell Fallback 136 (RU)",
+      "zh": "俄罗斯北极后备 136"
+    },
+    "Russia Shell Fallback 137": {
+      "en": "Russia Shell Fallback 137",
+      "zh": "俄罗斯北极后备 137"
+    },
+    "Russia Shell Fallback 137 (RU)": {
+      "en": "Russia Shell Fallback 137 (RU)",
+      "zh": "俄罗斯北极后备 137"
+    },
+    "Russia Shell Fallback 138": {
+      "en": "Russia Shell Fallback 138",
+      "zh": "俄罗斯北极后备 138"
+    },
+    "Russia Shell Fallback 138 (RU)": {
+      "en": "Russia Shell Fallback 138 (RU)",
+      "zh": "俄罗斯北极后备 138"
+    },
+    "Russia Shell Fallback 139": {
+      "en": "Russia Shell Fallback 139",
+      "zh": "俄罗斯北极后备 139"
+    },
+    "Russia Shell Fallback 139 (RU)": {
+      "en": "Russia Shell Fallback 139 (RU)",
+      "zh": "俄罗斯北极后备 139"
+    },
+    "Russia Shell Fallback 14": {
+      "en": "Russia Shell Fallback 14",
+      "zh": "俄罗斯北极后备 14"
+    },
+    "Russia Shell Fallback 14 (RU)": {
+      "en": "Russia Shell Fallback 14 (RU)",
+      "zh": "俄罗斯北极后备 14"
+    },
+    "Russia Shell Fallback 140": {
+      "en": "Russia Shell Fallback 140",
+      "zh": "俄罗斯北极后备 140"
+    },
+    "Russia Shell Fallback 140 (RU)": {
+      "en": "Russia Shell Fallback 140 (RU)",
+      "zh": "俄罗斯北极后备 140"
+    },
+    "Russia Shell Fallback 141": {
+      "en": "Russia Shell Fallback 141",
+      "zh": "俄罗斯北极后备 141"
+    },
+    "Russia Shell Fallback 141 (RU)": {
+      "en": "Russia Shell Fallback 141 (RU)",
+      "zh": "俄罗斯北极后备 141"
+    },
+    "Russia Shell Fallback 142": {
+      "en": "Russia Shell Fallback 142",
+      "zh": "俄罗斯北极后备 142"
+    },
+    "Russia Shell Fallback 142 (RU)": {
+      "en": "Russia Shell Fallback 142 (RU)",
+      "zh": "俄罗斯北极后备 142"
+    },
+    "Russia Shell Fallback 143": {
+      "en": "Russia Shell Fallback 143",
+      "zh": "俄罗斯北极后备 143"
+    },
+    "Russia Shell Fallback 143 (RU)": {
+      "en": "Russia Shell Fallback 143 (RU)",
+      "zh": "俄罗斯北极后备 143"
+    },
+    "Russia Shell Fallback 144": {
+      "en": "Russia Shell Fallback 144",
+      "zh": "俄罗斯北极后备 144"
+    },
+    "Russia Shell Fallback 144 (RU)": {
+      "en": "Russia Shell Fallback 144 (RU)",
+      "zh": "俄罗斯北极后备 144"
+    },
+    "Russia Shell Fallback 145": {
+      "en": "Russia Shell Fallback 145",
+      "zh": "俄罗斯北极后备 145"
+    },
+    "Russia Shell Fallback 145 (RU)": {
+      "en": "Russia Shell Fallback 145 (RU)",
+      "zh": "俄罗斯北极后备 145"
+    },
+    "Russia Shell Fallback 146": {
+      "en": "Russia Shell Fallback 146",
+      "zh": "俄罗斯北极后备 146"
+    },
+    "Russia Shell Fallback 146 (RU)": {
+      "en": "Russia Shell Fallback 146 (RU)",
+      "zh": "俄罗斯北极后备 146"
+    },
+    "Russia Shell Fallback 147": {
+      "en": "Russia Shell Fallback 147",
+      "zh": "俄罗斯北极后备 147"
+    },
+    "Russia Shell Fallback 147 (RU)": {
+      "en": "Russia Shell Fallback 147 (RU)",
+      "zh": "俄罗斯北极后备 147"
+    },
+    "Russia Shell Fallback 148": {
+      "en": "Russia Shell Fallback 148",
+      "zh": "Russia Shell Fallback 148"
+    },
+    "Russia Shell Fallback 148 (RU)": {
+      "en": "Russia Shell Fallback 148 (RU)",
+      "zh": "Russia Shell Fallback 148 (RU)"
+    },
+    "Russia Shell Fallback 149": {
+      "en": "Russia Shell Fallback 149",
+      "zh": "Russia Shell Fallback 149"
+    },
+    "Russia Shell Fallback 149 (RU)": {
+      "en": "Russia Shell Fallback 149 (RU)",
+      "zh": "Russia Shell Fallback 149 (RU)"
+    },
+    "Russia Shell Fallback 15": {
+      "en": "Russia Shell Fallback 15",
+      "zh": "俄罗斯北极后备 15"
+    },
+    "Russia Shell Fallback 15 (RU)": {
+      "en": "Russia Shell Fallback 15 (RU)",
+      "zh": "俄罗斯北极后备 15"
+    },
+    "Russia Shell Fallback 150": {
+      "en": "Russia Shell Fallback 150",
+      "zh": "Russia Shell Fallback 150"
+    },
+    "Russia Shell Fallback 150 (RU)": {
+      "en": "Russia Shell Fallback 150 (RU)",
+      "zh": "Russia Shell Fallback 150 (RU)"
+    },
+    "Russia Shell Fallback 151": {
+      "en": "Russia Shell Fallback 151",
+      "zh": "Russia Shell Fallback 151"
+    },
+    "Russia Shell Fallback 151 (RU)": {
+      "en": "Russia Shell Fallback 151 (RU)",
+      "zh": "Russia Shell Fallback 151 (RU)"
+    },
+    "Russia Shell Fallback 152": {
+      "en": "Russia Shell Fallback 152",
+      "zh": "Russia Shell Fallback 152"
+    },
+    "Russia Shell Fallback 152 (RU)": {
+      "en": "Russia Shell Fallback 152 (RU)",
+      "zh": "Russia Shell Fallback 152 (RU)"
+    },
+    "Russia Shell Fallback 153": {
+      "en": "Russia Shell Fallback 153",
+      "zh": "Russia Shell Fallback 153"
+    },
+    "Russia Shell Fallback 153 (RU)": {
+      "en": "Russia Shell Fallback 153 (RU)",
+      "zh": "Russia Shell Fallback 153 (RU)"
+    },
+    "Russia Shell Fallback 154": {
+      "en": "Russia Shell Fallback 154",
+      "zh": "Russia Shell Fallback 154"
+    },
+    "Russia Shell Fallback 154 (RU)": {
+      "en": "Russia Shell Fallback 154 (RU)",
+      "zh": "Russia Shell Fallback 154 (RU)"
+    },
+    "Russia Shell Fallback 155": {
+      "en": "Russia Shell Fallback 155",
+      "zh": "Russia Shell Fallback 155"
+    },
+    "Russia Shell Fallback 155 (RU)": {
+      "en": "Russia Shell Fallback 155 (RU)",
+      "zh": "Russia Shell Fallback 155 (RU)"
+    },
+    "Russia Shell Fallback 156": {
+      "en": "Russia Shell Fallback 156",
+      "zh": "Russia Shell Fallback 156"
+    },
+    "Russia Shell Fallback 156 (RU)": {
+      "en": "Russia Shell Fallback 156 (RU)",
+      "zh": "Russia Shell Fallback 156 (RU)"
+    },
+    "Russia Shell Fallback 157": {
+      "en": "Russia Shell Fallback 157",
+      "zh": "Russia Shell Fallback 157"
+    },
+    "Russia Shell Fallback 157 (RU)": {
+      "en": "Russia Shell Fallback 157 (RU)",
+      "zh": "Russia Shell Fallback 157 (RU)"
+    },
+    "Russia Shell Fallback 158": {
+      "en": "Russia Shell Fallback 158",
+      "zh": "Russia Shell Fallback 158"
+    },
+    "Russia Shell Fallback 158 (RU)": {
+      "en": "Russia Shell Fallback 158 (RU)",
+      "zh": "Russia Shell Fallback 158 (RU)"
+    },
+    "Russia Shell Fallback 159": {
+      "en": "Russia Shell Fallback 159",
+      "zh": "Russia Shell Fallback 159"
+    },
+    "Russia Shell Fallback 159 (RU)": {
+      "en": "Russia Shell Fallback 159 (RU)",
+      "zh": "Russia Shell Fallback 159 (RU)"
+    },
+    "Russia Shell Fallback 16": {
+      "en": "Russia Shell Fallback 16",
+      "zh": "俄罗斯北极后备 16"
+    },
+    "Russia Shell Fallback 16 (RU)": {
+      "en": "Russia Shell Fallback 16 (RU)",
+      "zh": "俄罗斯北极后备 16"
+    },
+    "Russia Shell Fallback 160": {
+      "en": "Russia Shell Fallback 160",
+      "zh": "Russia Shell Fallback 160"
+    },
+    "Russia Shell Fallback 160 (RU)": {
+      "en": "Russia Shell Fallback 160 (RU)",
+      "zh": "Russia Shell Fallback 160 (RU)"
+    },
+    "Russia Shell Fallback 161": {
+      "en": "Russia Shell Fallback 161",
+      "zh": "Russia Shell Fallback 161"
+    },
+    "Russia Shell Fallback 161 (RU)": {
+      "en": "Russia Shell Fallback 161 (RU)",
+      "zh": "Russia Shell Fallback 161 (RU)"
+    },
+    "Russia Shell Fallback 162": {
+      "en": "Russia Shell Fallback 162",
+      "zh": "Russia Shell Fallback 162"
+    },
+    "Russia Shell Fallback 162 (RU)": {
+      "en": "Russia Shell Fallback 162 (RU)",
+      "zh": "Russia Shell Fallback 162 (RU)"
+    },
+    "Russia Shell Fallback 163": {
+      "en": "Russia Shell Fallback 163",
+      "zh": "Russia Shell Fallback 163"
+    },
+    "Russia Shell Fallback 163 (RU)": {
+      "en": "Russia Shell Fallback 163 (RU)",
+      "zh": "Russia Shell Fallback 163 (RU)"
+    },
+    "Russia Shell Fallback 164": {
+      "en": "Russia Shell Fallback 164",
+      "zh": "Russia Shell Fallback 164"
+    },
+    "Russia Shell Fallback 164 (RU)": {
+      "en": "Russia Shell Fallback 164 (RU)",
+      "zh": "Russia Shell Fallback 164 (RU)"
+    },
+    "Russia Shell Fallback 165": {
+      "en": "Russia Shell Fallback 165",
+      "zh": "Russia Shell Fallback 165"
+    },
+    "Russia Shell Fallback 165 (RU)": {
+      "en": "Russia Shell Fallback 165 (RU)",
+      "zh": "Russia Shell Fallback 165 (RU)"
+    },
+    "Russia Shell Fallback 166": {
+      "en": "Russia Shell Fallback 166",
+      "zh": "Russia Shell Fallback 166"
+    },
+    "Russia Shell Fallback 166 (RU)": {
+      "en": "Russia Shell Fallback 166 (RU)",
+      "zh": "Russia Shell Fallback 166 (RU)"
+    },
+    "Russia Shell Fallback 167": {
+      "en": "Russia Shell Fallback 167",
+      "zh": "Russia Shell Fallback 167"
+    },
+    "Russia Shell Fallback 167 (RU)": {
+      "en": "Russia Shell Fallback 167 (RU)",
+      "zh": "Russia Shell Fallback 167 (RU)"
+    },
+    "Russia Shell Fallback 168": {
+      "en": "Russia Shell Fallback 168",
+      "zh": "Russia Shell Fallback 168"
+    },
+    "Russia Shell Fallback 168 (RU)": {
+      "en": "Russia Shell Fallback 168 (RU)",
+      "zh": "Russia Shell Fallback 168 (RU)"
+    },
+    "Russia Shell Fallback 169": {
+      "en": "Russia Shell Fallback 169",
+      "zh": "Russia Shell Fallback 169"
+    },
+    "Russia Shell Fallback 169 (RU)": {
+      "en": "Russia Shell Fallback 169 (RU)",
+      "zh": "Russia Shell Fallback 169 (RU)"
+    },
+    "Russia Shell Fallback 17": {
+      "en": "Russia Shell Fallback 17",
+      "zh": "俄罗斯北极后备 17"
+    },
+    "Russia Shell Fallback 17 (RU)": {
+      "en": "Russia Shell Fallback 17 (RU)",
+      "zh": "俄罗斯北极后备 17"
+    },
+    "Russia Shell Fallback 170": {
+      "en": "Russia Shell Fallback 170",
+      "zh": "Russia Shell Fallback 170"
+    },
+    "Russia Shell Fallback 170 (RU)": {
+      "en": "Russia Shell Fallback 170 (RU)",
+      "zh": "Russia Shell Fallback 170 (RU)"
+    },
+    "Russia Shell Fallback 171": {
+      "en": "Russia Shell Fallback 171",
+      "zh": "Russia Shell Fallback 171"
+    },
+    "Russia Shell Fallback 171 (RU)": {
+      "en": "Russia Shell Fallback 171 (RU)",
+      "zh": "Russia Shell Fallback 171 (RU)"
+    },
+    "Russia Shell Fallback 172": {
+      "en": "Russia Shell Fallback 172",
+      "zh": "Russia Shell Fallback 172"
+    },
+    "Russia Shell Fallback 172 (RU)": {
+      "en": "Russia Shell Fallback 172 (RU)",
+      "zh": "Russia Shell Fallback 172 (RU)"
+    },
+    "Russia Shell Fallback 173": {
+      "en": "Russia Shell Fallback 173",
+      "zh": "Russia Shell Fallback 173"
+    },
+    "Russia Shell Fallback 173 (RU)": {
+      "en": "Russia Shell Fallback 173 (RU)",
+      "zh": "Russia Shell Fallback 173 (RU)"
+    },
+    "Russia Shell Fallback 174": {
+      "en": "Russia Shell Fallback 174",
+      "zh": "Russia Shell Fallback 174"
+    },
+    "Russia Shell Fallback 174 (RU)": {
+      "en": "Russia Shell Fallback 174 (RU)",
+      "zh": "Russia Shell Fallback 174 (RU)"
+    },
+    "Russia Shell Fallback 175": {
+      "en": "Russia Shell Fallback 175",
+      "zh": "Russia Shell Fallback 175"
+    },
+    "Russia Shell Fallback 175 (RU)": {
+      "en": "Russia Shell Fallback 175 (RU)",
+      "zh": "Russia Shell Fallback 175 (RU)"
+    },
+    "Russia Shell Fallback 176": {
+      "en": "Russia Shell Fallback 176",
+      "zh": "Russia Shell Fallback 176"
+    },
+    "Russia Shell Fallback 176 (RU)": {
+      "en": "Russia Shell Fallback 176 (RU)",
+      "zh": "Russia Shell Fallback 176 (RU)"
+    },
+    "Russia Shell Fallback 177": {
+      "en": "Russia Shell Fallback 177",
+      "zh": "Russia Shell Fallback 177"
+    },
+    "Russia Shell Fallback 177 (RU)": {
+      "en": "Russia Shell Fallback 177 (RU)",
+      "zh": "Russia Shell Fallback 177 (RU)"
+    },
+    "Russia Shell Fallback 178": {
+      "en": "Russia Shell Fallback 178",
+      "zh": "Russia Shell Fallback 178"
+    },
+    "Russia Shell Fallback 178 (RU)": {
+      "en": "Russia Shell Fallback 178 (RU)",
+      "zh": "Russia Shell Fallback 178 (RU)"
+    },
+    "Russia Shell Fallback 179": {
+      "en": "Russia Shell Fallback 179",
+      "zh": "Russia Shell Fallback 179"
+    },
+    "Russia Shell Fallback 179 (RU)": {
+      "en": "Russia Shell Fallback 179 (RU)",
+      "zh": "Russia Shell Fallback 179 (RU)"
+    },
+    "Russia Shell Fallback 18": {
+      "en": "Russia Shell Fallback 18",
+      "zh": "俄罗斯北极后备 18"
+    },
+    "Russia Shell Fallback 18 (RU)": {
+      "en": "Russia Shell Fallback 18 (RU)",
+      "zh": "俄罗斯北极后备 18"
+    },
+    "Russia Shell Fallback 180": {
+      "en": "Russia Shell Fallback 180",
+      "zh": "Russia Shell Fallback 180"
+    },
+    "Russia Shell Fallback 180 (RU)": {
+      "en": "Russia Shell Fallback 180 (RU)",
+      "zh": "Russia Shell Fallback 180 (RU)"
+    },
+    "Russia Shell Fallback 181": {
+      "en": "Russia Shell Fallback 181",
+      "zh": "Russia Shell Fallback 181"
+    },
+    "Russia Shell Fallback 181 (RU)": {
+      "en": "Russia Shell Fallback 181 (RU)",
+      "zh": "Russia Shell Fallback 181 (RU)"
+    },
+    "Russia Shell Fallback 182": {
+      "en": "Russia Shell Fallback 182",
+      "zh": "Russia Shell Fallback 182"
+    },
+    "Russia Shell Fallback 182 (RU)": {
+      "en": "Russia Shell Fallback 182 (RU)",
+      "zh": "Russia Shell Fallback 182 (RU)"
+    },
+    "Russia Shell Fallback 183": {
+      "en": "Russia Shell Fallback 183",
+      "zh": "Russia Shell Fallback 183"
+    },
+    "Russia Shell Fallback 183 (RU)": {
+      "en": "Russia Shell Fallback 183 (RU)",
+      "zh": "Russia Shell Fallback 183 (RU)"
+    },
+    "Russia Shell Fallback 184": {
+      "en": "Russia Shell Fallback 184",
+      "zh": "Russia Shell Fallback 184"
+    },
+    "Russia Shell Fallback 184 (RU)": {
+      "en": "Russia Shell Fallback 184 (RU)",
+      "zh": "Russia Shell Fallback 184 (RU)"
+    },
+    "Russia Shell Fallback 185": {
+      "en": "Russia Shell Fallback 185",
+      "zh": "Russia Shell Fallback 185"
+    },
+    "Russia Shell Fallback 185 (RU)": {
+      "en": "Russia Shell Fallback 185 (RU)",
+      "zh": "Russia Shell Fallback 185 (RU)"
+    },
+    "Russia Shell Fallback 186": {
+      "en": "Russia Shell Fallback 186",
+      "zh": "Russia Shell Fallback 186"
+    },
+    "Russia Shell Fallback 186 (RU)": {
+      "en": "Russia Shell Fallback 186 (RU)",
+      "zh": "Russia Shell Fallback 186 (RU)"
+    },
+    "Russia Shell Fallback 187": {
+      "en": "Russia Shell Fallback 187",
+      "zh": "Russia Shell Fallback 187"
+    },
+    "Russia Shell Fallback 187 (RU)": {
+      "en": "Russia Shell Fallback 187 (RU)",
+      "zh": "Russia Shell Fallback 187 (RU)"
+    },
+    "Russia Shell Fallback 188": {
+      "en": "Russia Shell Fallback 188",
+      "zh": "Russia Shell Fallback 188"
+    },
+    "Russia Shell Fallback 188 (RU)": {
+      "en": "Russia Shell Fallback 188 (RU)",
+      "zh": "Russia Shell Fallback 188 (RU)"
+    },
+    "Russia Shell Fallback 189": {
+      "en": "Russia Shell Fallback 189",
+      "zh": "Russia Shell Fallback 189"
+    },
+    "Russia Shell Fallback 189 (RU)": {
+      "en": "Russia Shell Fallback 189 (RU)",
+      "zh": "Russia Shell Fallback 189 (RU)"
+    },
+    "Russia Shell Fallback 19": {
+      "en": "Russia Shell Fallback 19",
+      "zh": "俄罗斯北极后备 19"
+    },
+    "Russia Shell Fallback 19 (RU)": {
+      "en": "Russia Shell Fallback 19 (RU)",
+      "zh": "俄罗斯北极后备 19"
+    },
+    "Russia Shell Fallback 190": {
+      "en": "Russia Shell Fallback 190",
+      "zh": "Russia Shell Fallback 190"
+    },
+    "Russia Shell Fallback 190 (RU)": {
+      "en": "Russia Shell Fallback 190 (RU)",
+      "zh": "Russia Shell Fallback 190 (RU)"
+    },
+    "Russia Shell Fallback 191": {
+      "en": "Russia Shell Fallback 191",
+      "zh": "Russia Shell Fallback 191"
+    },
+    "Russia Shell Fallback 191 (RU)": {
+      "en": "Russia Shell Fallback 191 (RU)",
+      "zh": "Russia Shell Fallback 191 (RU)"
+    },
+    "Russia Shell Fallback 192": {
+      "en": "Russia Shell Fallback 192",
+      "zh": "Russia Shell Fallback 192"
+    },
+    "Russia Shell Fallback 192 (RU)": {
+      "en": "Russia Shell Fallback 192 (RU)",
+      "zh": "Russia Shell Fallback 192 (RU)"
+    },
+    "Russia Shell Fallback 193": {
+      "en": "Russia Shell Fallback 193",
+      "zh": "Russia Shell Fallback 193"
+    },
+    "Russia Shell Fallback 193 (RU)": {
+      "en": "Russia Shell Fallback 193 (RU)",
+      "zh": "Russia Shell Fallback 193 (RU)"
+    },
+    "Russia Shell Fallback 194": {
+      "en": "Russia Shell Fallback 194",
+      "zh": "Russia Shell Fallback 194"
+    },
+    "Russia Shell Fallback 194 (RU)": {
+      "en": "Russia Shell Fallback 194 (RU)",
+      "zh": "Russia Shell Fallback 194 (RU)"
+    },
+    "Russia Shell Fallback 195": {
+      "en": "Russia Shell Fallback 195",
+      "zh": "Russia Shell Fallback 195"
+    },
+    "Russia Shell Fallback 195 (RU)": {
+      "en": "Russia Shell Fallback 195 (RU)",
+      "zh": "Russia Shell Fallback 195 (RU)"
+    },
+    "Russia Shell Fallback 196": {
+      "en": "Russia Shell Fallback 196",
+      "zh": "Russia Shell Fallback 196"
+    },
+    "Russia Shell Fallback 196 (RU)": {
+      "en": "Russia Shell Fallback 196 (RU)",
+      "zh": "Russia Shell Fallback 196 (RU)"
+    },
+    "Russia Shell Fallback 197": {
+      "en": "Russia Shell Fallback 197",
+      "zh": "Russia Shell Fallback 197"
+    },
+    "Russia Shell Fallback 197 (RU)": {
+      "en": "Russia Shell Fallback 197 (RU)",
+      "zh": "Russia Shell Fallback 197 (RU)"
+    },
+    "Russia Shell Fallback 198": {
+      "en": "Russia Shell Fallback 198",
+      "zh": "Russia Shell Fallback 198"
+    },
+    "Russia Shell Fallback 198 (RU)": {
+      "en": "Russia Shell Fallback 198 (RU)",
+      "zh": "Russia Shell Fallback 198 (RU)"
+    },
+    "Russia Shell Fallback 199": {
+      "en": "Russia Shell Fallback 199",
+      "zh": "Russia Shell Fallback 199"
+    },
+    "Russia Shell Fallback 199 (RU)": {
+      "en": "Russia Shell Fallback 199 (RU)",
+      "zh": "Russia Shell Fallback 199 (RU)"
+    },
+    "Russia Shell Fallback 2": {
+      "en": "Russia Shell Fallback 2",
+      "zh": "俄罗斯北极后备2"
+    },
+    "Russia Shell Fallback 2 (RU)": {
+      "en": "Russia Shell Fallback 2 (RU)",
+      "zh": "俄罗斯北极后备2"
+    },
+    "Russia Shell Fallback 20": {
+      "en": "Russia Shell Fallback 20",
+      "zh": "俄罗斯北极后备 20"
+    },
+    "Russia Shell Fallback 20 (RU)": {
+      "en": "Russia Shell Fallback 20 (RU)",
+      "zh": "俄罗斯北极后备 20"
+    },
+    "Russia Shell Fallback 200": {
+      "en": "Russia Shell Fallback 200",
+      "zh": "Russia Shell Fallback 200"
+    },
+    "Russia Shell Fallback 200 (RU)": {
+      "en": "Russia Shell Fallback 200 (RU)",
+      "zh": "Russia Shell Fallback 200 (RU)"
+    },
+    "Russia Shell Fallback 201": {
+      "en": "Russia Shell Fallback 201",
+      "zh": "Russia Shell Fallback 201"
+    },
+    "Russia Shell Fallback 201 (RU)": {
+      "en": "Russia Shell Fallback 201 (RU)",
+      "zh": "Russia Shell Fallback 201 (RU)"
+    },
+    "Russia Shell Fallback 202": {
+      "en": "Russia Shell Fallback 202",
+      "zh": "Russia Shell Fallback 202"
+    },
+    "Russia Shell Fallback 202 (RU)": {
+      "en": "Russia Shell Fallback 202 (RU)",
+      "zh": "Russia Shell Fallback 202 (RU)"
+    },
+    "Russia Shell Fallback 203": {
+      "en": "Russia Shell Fallback 203",
+      "zh": "Russia Shell Fallback 203"
+    },
+    "Russia Shell Fallback 203 (RU)": {
+      "en": "Russia Shell Fallback 203 (RU)",
+      "zh": "Russia Shell Fallback 203 (RU)"
+    },
+    "Russia Shell Fallback 204": {
+      "en": "Russia Shell Fallback 204",
+      "zh": "Russia Shell Fallback 204"
+    },
+    "Russia Shell Fallback 204 (RU)": {
+      "en": "Russia Shell Fallback 204 (RU)",
+      "zh": "Russia Shell Fallback 204 (RU)"
+    },
+    "Russia Shell Fallback 205": {
+      "en": "Russia Shell Fallback 205",
+      "zh": "Russia Shell Fallback 205"
+    },
+    "Russia Shell Fallback 205 (RU)": {
+      "en": "Russia Shell Fallback 205 (RU)",
+      "zh": "Russia Shell Fallback 205 (RU)"
+    },
+    "Russia Shell Fallback 206": {
+      "en": "Russia Shell Fallback 206",
+      "zh": "Russia Shell Fallback 206"
+    },
+    "Russia Shell Fallback 206 (RU)": {
+      "en": "Russia Shell Fallback 206 (RU)",
+      "zh": "Russia Shell Fallback 206 (RU)"
+    },
+    "Russia Shell Fallback 207": {
+      "en": "Russia Shell Fallback 207",
+      "zh": "Russia Shell Fallback 207"
+    },
+    "Russia Shell Fallback 207 (RU)": {
+      "en": "Russia Shell Fallback 207 (RU)",
+      "zh": "Russia Shell Fallback 207 (RU)"
+    },
+    "Russia Shell Fallback 208": {
+      "en": "Russia Shell Fallback 208",
+      "zh": "Russia Shell Fallback 208"
+    },
+    "Russia Shell Fallback 208 (RU)": {
+      "en": "Russia Shell Fallback 208 (RU)",
+      "zh": "Russia Shell Fallback 208 (RU)"
+    },
+    "Russia Shell Fallback 209": {
+      "en": "Russia Shell Fallback 209",
+      "zh": "Russia Shell Fallback 209"
+    },
+    "Russia Shell Fallback 209 (RU)": {
+      "en": "Russia Shell Fallback 209 (RU)",
+      "zh": "Russia Shell Fallback 209 (RU)"
+    },
+    "Russia Shell Fallback 21": {
+      "en": "Russia Shell Fallback 21",
+      "zh": "俄罗斯北极后备 21"
+    },
+    "Russia Shell Fallback 21 (RU)": {
+      "en": "Russia Shell Fallback 21 (RU)",
+      "zh": "俄罗斯北极后备 21"
+    },
+    "Russia Shell Fallback 210": {
+      "en": "Russia Shell Fallback 210",
+      "zh": "Russia Shell Fallback 210"
+    },
+    "Russia Shell Fallback 210 (RU)": {
+      "en": "Russia Shell Fallback 210 (RU)",
+      "zh": "Russia Shell Fallback 210 (RU)"
+    },
+    "Russia Shell Fallback 211": {
+      "en": "Russia Shell Fallback 211",
+      "zh": "Russia Shell Fallback 211"
+    },
+    "Russia Shell Fallback 211 (RU)": {
+      "en": "Russia Shell Fallback 211 (RU)",
+      "zh": "Russia Shell Fallback 211 (RU)"
+    },
+    "Russia Shell Fallback 212": {
+      "en": "Russia Shell Fallback 212",
+      "zh": "Russia Shell Fallback 212"
+    },
+    "Russia Shell Fallback 212 (RU)": {
+      "en": "Russia Shell Fallback 212 (RU)",
+      "zh": "Russia Shell Fallback 212 (RU)"
+    },
+    "Russia Shell Fallback 213": {
+      "en": "Russia Shell Fallback 213",
+      "zh": "Russia Shell Fallback 213"
+    },
+    "Russia Shell Fallback 213 (RU)": {
+      "en": "Russia Shell Fallback 213 (RU)",
+      "zh": "Russia Shell Fallback 213 (RU)"
+    },
+    "Russia Shell Fallback 214": {
+      "en": "Russia Shell Fallback 214",
+      "zh": "Russia Shell Fallback 214"
+    },
+    "Russia Shell Fallback 214 (RU)": {
+      "en": "Russia Shell Fallback 214 (RU)",
+      "zh": "Russia Shell Fallback 214 (RU)"
+    },
+    "Russia Shell Fallback 215": {
+      "en": "Russia Shell Fallback 215",
+      "zh": "Russia Shell Fallback 215"
+    },
+    "Russia Shell Fallback 215 (RU)": {
+      "en": "Russia Shell Fallback 215 (RU)",
+      "zh": "Russia Shell Fallback 215 (RU)"
+    },
+    "Russia Shell Fallback 216": {
+      "en": "Russia Shell Fallback 216",
+      "zh": "Russia Shell Fallback 216"
+    },
+    "Russia Shell Fallback 216 (RU)": {
+      "en": "Russia Shell Fallback 216 (RU)",
+      "zh": "Russia Shell Fallback 216 (RU)"
+    },
+    "Russia Shell Fallback 217": {
+      "en": "Russia Shell Fallback 217",
+      "zh": "Russia Shell Fallback 217"
+    },
+    "Russia Shell Fallback 217 (RU)": {
+      "en": "Russia Shell Fallback 217 (RU)",
+      "zh": "Russia Shell Fallback 217 (RU)"
+    },
+    "Russia Shell Fallback 218": {
+      "en": "Russia Shell Fallback 218",
+      "zh": "Russia Shell Fallback 218"
+    },
+    "Russia Shell Fallback 218 (RU)": {
+      "en": "Russia Shell Fallback 218 (RU)",
+      "zh": "Russia Shell Fallback 218 (RU)"
+    },
+    "Russia Shell Fallback 219": {
+      "en": "Russia Shell Fallback 219",
+      "zh": "Russia Shell Fallback 219"
+    },
+    "Russia Shell Fallback 219 (RU)": {
+      "en": "Russia Shell Fallback 219 (RU)",
+      "zh": "Russia Shell Fallback 219 (RU)"
+    },
+    "Russia Shell Fallback 22": {
+      "en": "Russia Shell Fallback 22",
+      "zh": "俄罗斯北极后备 22"
+    },
+    "Russia Shell Fallback 22 (RU)": {
+      "en": "Russia Shell Fallback 22 (RU)",
+      "zh": "俄罗斯北极后备 22"
+    },
+    "Russia Shell Fallback 220": {
+      "en": "Russia Shell Fallback 220",
+      "zh": "Russia Shell Fallback 220"
+    },
+    "Russia Shell Fallback 220 (RU)": {
+      "en": "Russia Shell Fallback 220 (RU)",
+      "zh": "Russia Shell Fallback 220 (RU)"
+    },
+    "Russia Shell Fallback 221": {
+      "en": "Russia Shell Fallback 221",
+      "zh": "Russia Shell Fallback 221"
+    },
+    "Russia Shell Fallback 221 (RU)": {
+      "en": "Russia Shell Fallback 221 (RU)",
+      "zh": "Russia Shell Fallback 221 (RU)"
+    },
+    "Russia Shell Fallback 222": {
+      "en": "Russia Shell Fallback 222",
+      "zh": "Russia Shell Fallback 222"
+    },
+    "Russia Shell Fallback 222 (RU)": {
+      "en": "Russia Shell Fallback 222 (RU)",
+      "zh": "Russia Shell Fallback 222 (RU)"
+    },
+    "Russia Shell Fallback 223": {
+      "en": "Russia Shell Fallback 223",
+      "zh": "Russia Shell Fallback 223"
+    },
+    "Russia Shell Fallback 223 (RU)": {
+      "en": "Russia Shell Fallback 223 (RU)",
+      "zh": "Russia Shell Fallback 223 (RU)"
+    },
+    "Russia Shell Fallback 224": {
+      "en": "Russia Shell Fallback 224",
+      "zh": "Russia Shell Fallback 224"
+    },
+    "Russia Shell Fallback 224 (RU)": {
+      "en": "Russia Shell Fallback 224 (RU)",
+      "zh": "Russia Shell Fallback 224 (RU)"
+    },
+    "Russia Shell Fallback 225": {
+      "en": "Russia Shell Fallback 225",
+      "zh": "Russia Shell Fallback 225"
+    },
+    "Russia Shell Fallback 225 (RU)": {
+      "en": "Russia Shell Fallback 225 (RU)",
+      "zh": "Russia Shell Fallback 225 (RU)"
+    },
+    "Russia Shell Fallback 226": {
+      "en": "Russia Shell Fallback 226",
+      "zh": "Russia Shell Fallback 226"
+    },
+    "Russia Shell Fallback 226 (RU)": {
+      "en": "Russia Shell Fallback 226 (RU)",
+      "zh": "Russia Shell Fallback 226 (RU)"
+    },
+    "Russia Shell Fallback 227": {
+      "en": "Russia Shell Fallback 227",
+      "zh": "Russia Shell Fallback 227"
+    },
+    "Russia Shell Fallback 227 (RU)": {
+      "en": "Russia Shell Fallback 227 (RU)",
+      "zh": "Russia Shell Fallback 227 (RU)"
+    },
+    "Russia Shell Fallback 228": {
+      "en": "Russia Shell Fallback 228",
+      "zh": "Russia Shell Fallback 228"
+    },
+    "Russia Shell Fallback 228 (RU)": {
+      "en": "Russia Shell Fallback 228 (RU)",
+      "zh": "Russia Shell Fallback 228 (RU)"
+    },
+    "Russia Shell Fallback 229": {
+      "en": "Russia Shell Fallback 229",
+      "zh": "Russia Shell Fallback 229"
+    },
+    "Russia Shell Fallback 229 (RU)": {
+      "en": "Russia Shell Fallback 229 (RU)",
+      "zh": "Russia Shell Fallback 229 (RU)"
+    },
+    "Russia Shell Fallback 23": {
+      "en": "Russia Shell Fallback 23",
+      "zh": "俄罗斯北极后备 23"
+    },
+    "Russia Shell Fallback 23 (RU)": {
+      "en": "Russia Shell Fallback 23 (RU)",
+      "zh": "俄罗斯北极后备 23"
+    },
+    "Russia Shell Fallback 230": {
+      "en": "Russia Shell Fallback 230",
+      "zh": "Russia Shell Fallback 230"
+    },
+    "Russia Shell Fallback 230 (RU)": {
+      "en": "Russia Shell Fallback 230 (RU)",
+      "zh": "Russia Shell Fallback 230 (RU)"
+    },
+    "Russia Shell Fallback 231": {
+      "en": "Russia Shell Fallback 231",
+      "zh": "Russia Shell Fallback 231"
+    },
+    "Russia Shell Fallback 231 (RU)": {
+      "en": "Russia Shell Fallback 231 (RU)",
+      "zh": "Russia Shell Fallback 231 (RU)"
+    },
+    "Russia Shell Fallback 232": {
+      "en": "Russia Shell Fallback 232",
+      "zh": "Russia Shell Fallback 232"
+    },
+    "Russia Shell Fallback 232 (RU)": {
+      "en": "Russia Shell Fallback 232 (RU)",
+      "zh": "Russia Shell Fallback 232 (RU)"
+    },
+    "Russia Shell Fallback 233": {
+      "en": "Russia Shell Fallback 233",
+      "zh": "Russia Shell Fallback 233"
+    },
+    "Russia Shell Fallback 233 (RU)": {
+      "en": "Russia Shell Fallback 233 (RU)",
+      "zh": "Russia Shell Fallback 233 (RU)"
+    },
+    "Russia Shell Fallback 234": {
+      "en": "Russia Shell Fallback 234",
+      "zh": "Russia Shell Fallback 234"
+    },
+    "Russia Shell Fallback 234 (RU)": {
+      "en": "Russia Shell Fallback 234 (RU)",
+      "zh": "Russia Shell Fallback 234 (RU)"
+    },
+    "Russia Shell Fallback 235": {
+      "en": "Russia Shell Fallback 235",
+      "zh": "Russia Shell Fallback 235"
+    },
+    "Russia Shell Fallback 235 (RU)": {
+      "en": "Russia Shell Fallback 235 (RU)",
+      "zh": "Russia Shell Fallback 235 (RU)"
+    },
+    "Russia Shell Fallback 236": {
+      "en": "Russia Shell Fallback 236",
+      "zh": "Russia Shell Fallback 236"
+    },
+    "Russia Shell Fallback 236 (RU)": {
+      "en": "Russia Shell Fallback 236 (RU)",
+      "zh": "Russia Shell Fallback 236 (RU)"
+    },
+    "Russia Shell Fallback 237": {
+      "en": "Russia Shell Fallback 237",
+      "zh": "Russia Shell Fallback 237"
+    },
+    "Russia Shell Fallback 237 (RU)": {
+      "en": "Russia Shell Fallback 237 (RU)",
+      "zh": "Russia Shell Fallback 237 (RU)"
+    },
+    "Russia Shell Fallback 238": {
+      "en": "Russia Shell Fallback 238",
+      "zh": "Russia Shell Fallback 238"
+    },
+    "Russia Shell Fallback 238 (RU)": {
+      "en": "Russia Shell Fallback 238 (RU)",
+      "zh": "Russia Shell Fallback 238 (RU)"
+    },
+    "Russia Shell Fallback 239": {
+      "en": "Russia Shell Fallback 239",
+      "zh": "Russia Shell Fallback 239"
+    },
+    "Russia Shell Fallback 239 (RU)": {
+      "en": "Russia Shell Fallback 239 (RU)",
+      "zh": "Russia Shell Fallback 239 (RU)"
+    },
+    "Russia Shell Fallback 24": {
+      "en": "Russia Shell Fallback 24",
+      "zh": "俄罗斯北极后备 24"
+    },
+    "Russia Shell Fallback 24 (RU)": {
+      "en": "Russia Shell Fallback 24 (RU)",
+      "zh": "俄罗斯北极后备 24"
+    },
+    "Russia Shell Fallback 240": {
+      "en": "Russia Shell Fallback 240",
+      "zh": "Russia Shell Fallback 240"
+    },
+    "Russia Shell Fallback 240 (RU)": {
+      "en": "Russia Shell Fallback 240 (RU)",
+      "zh": "Russia Shell Fallback 240 (RU)"
+    },
+    "Russia Shell Fallback 241": {
+      "en": "Russia Shell Fallback 241",
+      "zh": "Russia Shell Fallback 241"
+    },
+    "Russia Shell Fallback 241 (RU)": {
+      "en": "Russia Shell Fallback 241 (RU)",
+      "zh": "Russia Shell Fallback 241 (RU)"
+    },
+    "Russia Shell Fallback 242": {
+      "en": "Russia Shell Fallback 242",
+      "zh": "Russia Shell Fallback 242"
+    },
+    "Russia Shell Fallback 242 (RU)": {
+      "en": "Russia Shell Fallback 242 (RU)",
+      "zh": "Russia Shell Fallback 242 (RU)"
+    },
+    "Russia Shell Fallback 243": {
+      "en": "Russia Shell Fallback 243",
+      "zh": "Russia Shell Fallback 243"
+    },
+    "Russia Shell Fallback 243 (RU)": {
+      "en": "Russia Shell Fallback 243 (RU)",
+      "zh": "Russia Shell Fallback 243 (RU)"
+    },
+    "Russia Shell Fallback 244": {
+      "en": "Russia Shell Fallback 244",
+      "zh": "Russia Shell Fallback 244"
+    },
+    "Russia Shell Fallback 244 (RU)": {
+      "en": "Russia Shell Fallback 244 (RU)",
+      "zh": "Russia Shell Fallback 244 (RU)"
+    },
+    "Russia Shell Fallback 245": {
+      "en": "Russia Shell Fallback 245",
+      "zh": "Russia Shell Fallback 245"
+    },
+    "Russia Shell Fallback 245 (RU)": {
+      "en": "Russia Shell Fallback 245 (RU)",
+      "zh": "Russia Shell Fallback 245 (RU)"
+    },
+    "Russia Shell Fallback 246": {
+      "en": "Russia Shell Fallback 246",
+      "zh": "Russia Shell Fallback 246"
+    },
+    "Russia Shell Fallback 246 (RU)": {
+      "en": "Russia Shell Fallback 246 (RU)",
+      "zh": "Russia Shell Fallback 246 (RU)"
+    },
+    "Russia Shell Fallback 247": {
+      "en": "Russia Shell Fallback 247",
+      "zh": "Russia Shell Fallback 247"
+    },
+    "Russia Shell Fallback 247 (RU)": {
+      "en": "Russia Shell Fallback 247 (RU)",
+      "zh": "Russia Shell Fallback 247 (RU)"
+    },
+    "Russia Shell Fallback 248": {
+      "en": "Russia Shell Fallback 248",
+      "zh": "Russia Shell Fallback 248"
+    },
+    "Russia Shell Fallback 248 (RU)": {
+      "en": "Russia Shell Fallback 248 (RU)",
+      "zh": "Russia Shell Fallback 248 (RU)"
+    },
+    "Russia Shell Fallback 249": {
+      "en": "Russia Shell Fallback 249",
+      "zh": "Russia Shell Fallback 249"
+    },
+    "Russia Shell Fallback 249 (RU)": {
+      "en": "Russia Shell Fallback 249 (RU)",
+      "zh": "Russia Shell Fallback 249 (RU)"
+    },
+    "Russia Shell Fallback 25": {
+      "en": "Russia Shell Fallback 25",
+      "zh": "俄罗斯北极后备 25"
+    },
+    "Russia Shell Fallback 25 (RU)": {
+      "en": "Russia Shell Fallback 25 (RU)",
+      "zh": "俄罗斯北极后备 25"
+    },
+    "Russia Shell Fallback 250": {
+      "en": "Russia Shell Fallback 250",
+      "zh": "Russia Shell Fallback 250"
+    },
+    "Russia Shell Fallback 250 (RU)": {
+      "en": "Russia Shell Fallback 250 (RU)",
+      "zh": "Russia Shell Fallback 250 (RU)"
+    },
+    "Russia Shell Fallback 251": {
+      "en": "Russia Shell Fallback 251",
+      "zh": "Russia Shell Fallback 251"
+    },
+    "Russia Shell Fallback 251 (RU)": {
+      "en": "Russia Shell Fallback 251 (RU)",
+      "zh": "Russia Shell Fallback 251 (RU)"
+    },
+    "Russia Shell Fallback 252": {
+      "en": "Russia Shell Fallback 252",
+      "zh": "Russia Shell Fallback 252"
+    },
+    "Russia Shell Fallback 252 (RU)": {
+      "en": "Russia Shell Fallback 252 (RU)",
+      "zh": "Russia Shell Fallback 252 (RU)"
+    },
+    "Russia Shell Fallback 253": {
+      "en": "Russia Shell Fallback 253",
+      "zh": "Russia Shell Fallback 253"
+    },
+    "Russia Shell Fallback 253 (RU)": {
+      "en": "Russia Shell Fallback 253 (RU)",
+      "zh": "Russia Shell Fallback 253 (RU)"
+    },
+    "Russia Shell Fallback 254": {
+      "en": "Russia Shell Fallback 254",
+      "zh": "Russia Shell Fallback 254"
+    },
+    "Russia Shell Fallback 254 (RU)": {
+      "en": "Russia Shell Fallback 254 (RU)",
+      "zh": "Russia Shell Fallback 254 (RU)"
+    },
+    "Russia Shell Fallback 255": {
+      "en": "Russia Shell Fallback 255",
+      "zh": "Russia Shell Fallback 255"
+    },
+    "Russia Shell Fallback 255 (RU)": {
+      "en": "Russia Shell Fallback 255 (RU)",
+      "zh": "Russia Shell Fallback 255 (RU)"
+    },
+    "Russia Shell Fallback 256": {
+      "en": "Russia Shell Fallback 256",
+      "zh": "Russia Shell Fallback 256"
+    },
+    "Russia Shell Fallback 256 (RU)": {
+      "en": "Russia Shell Fallback 256 (RU)",
+      "zh": "Russia Shell Fallback 256 (RU)"
+    },
+    "Russia Shell Fallback 257": {
+      "en": "Russia Shell Fallback 257",
+      "zh": "Russia Shell Fallback 257"
+    },
+    "Russia Shell Fallback 257 (RU)": {
+      "en": "Russia Shell Fallback 257 (RU)",
+      "zh": "Russia Shell Fallback 257 (RU)"
+    },
+    "Russia Shell Fallback 258": {
+      "en": "Russia Shell Fallback 258",
+      "zh": "Russia Shell Fallback 258"
+    },
+    "Russia Shell Fallback 258 (RU)": {
+      "en": "Russia Shell Fallback 258 (RU)",
+      "zh": "Russia Shell Fallback 258 (RU)"
+    },
+    "Russia Shell Fallback 259": {
+      "en": "Russia Shell Fallback 259",
+      "zh": "Russia Shell Fallback 259"
+    },
+    "Russia Shell Fallback 259 (RU)": {
+      "en": "Russia Shell Fallback 259 (RU)",
+      "zh": "Russia Shell Fallback 259 (RU)"
+    },
+    "Russia Shell Fallback 26": {
+      "en": "Russia Shell Fallback 26",
+      "zh": "俄罗斯北极后备 26"
+    },
+    "Russia Shell Fallback 26 (RU)": {
+      "en": "Russia Shell Fallback 26 (RU)",
+      "zh": "俄罗斯北极后备 26"
+    },
+    "Russia Shell Fallback 260": {
+      "en": "Russia Shell Fallback 260",
+      "zh": "Russia Shell Fallback 260"
+    },
+    "Russia Shell Fallback 260 (RU)": {
+      "en": "Russia Shell Fallback 260 (RU)",
+      "zh": "Russia Shell Fallback 260 (RU)"
+    },
+    "Russia Shell Fallback 261": {
+      "en": "Russia Shell Fallback 261",
+      "zh": "Russia Shell Fallback 261"
+    },
+    "Russia Shell Fallback 261 (RU)": {
+      "en": "Russia Shell Fallback 261 (RU)",
+      "zh": "Russia Shell Fallback 261 (RU)"
+    },
+    "Russia Shell Fallback 262": {
+      "en": "Russia Shell Fallback 262",
+      "zh": "Russia Shell Fallback 262"
+    },
+    "Russia Shell Fallback 262 (RU)": {
+      "en": "Russia Shell Fallback 262 (RU)",
+      "zh": "Russia Shell Fallback 262 (RU)"
+    },
+    "Russia Shell Fallback 263": {
+      "en": "Russia Shell Fallback 263",
+      "zh": "Russia Shell Fallback 263"
+    },
+    "Russia Shell Fallback 263 (RU)": {
+      "en": "Russia Shell Fallback 263 (RU)",
+      "zh": "Russia Shell Fallback 263 (RU)"
+    },
+    "Russia Shell Fallback 264": {
+      "en": "Russia Shell Fallback 264",
+      "zh": "Russia Shell Fallback 264"
+    },
+    "Russia Shell Fallback 264 (RU)": {
+      "en": "Russia Shell Fallback 264 (RU)",
+      "zh": "Russia Shell Fallback 264 (RU)"
+    },
+    "Russia Shell Fallback 265": {
+      "en": "Russia Shell Fallback 265",
+      "zh": "Russia Shell Fallback 265"
+    },
+    "Russia Shell Fallback 265 (RU)": {
+      "en": "Russia Shell Fallback 265 (RU)",
+      "zh": "Russia Shell Fallback 265 (RU)"
+    },
+    "Russia Shell Fallback 266": {
+      "en": "Russia Shell Fallback 266",
+      "zh": "Russia Shell Fallback 266"
+    },
+    "Russia Shell Fallback 266 (RU)": {
+      "en": "Russia Shell Fallback 266 (RU)",
+      "zh": "Russia Shell Fallback 266 (RU)"
+    },
+    "Russia Shell Fallback 267": {
+      "en": "Russia Shell Fallback 267",
+      "zh": "Russia Shell Fallback 267"
+    },
+    "Russia Shell Fallback 267 (RU)": {
+      "en": "Russia Shell Fallback 267 (RU)",
+      "zh": "Russia Shell Fallback 267 (RU)"
+    },
+    "Russia Shell Fallback 268": {
+      "en": "Russia Shell Fallback 268",
+      "zh": "Russia Shell Fallback 268"
+    },
+    "Russia Shell Fallback 268 (RU)": {
+      "en": "Russia Shell Fallback 268 (RU)",
+      "zh": "Russia Shell Fallback 268 (RU)"
+    },
+    "Russia Shell Fallback 269": {
+      "en": "Russia Shell Fallback 269",
+      "zh": "Russia Shell Fallback 269"
+    },
+    "Russia Shell Fallback 269 (RU)": {
+      "en": "Russia Shell Fallback 269 (RU)",
+      "zh": "Russia Shell Fallback 269 (RU)"
+    },
+    "Russia Shell Fallback 27": {
+      "en": "Russia Shell Fallback 27",
+      "zh": "俄罗斯北极后备 27"
+    },
+    "Russia Shell Fallback 27 (RU)": {
+      "en": "Russia Shell Fallback 27 (RU)",
+      "zh": "俄罗斯北极后备 27"
+    },
+    "Russia Shell Fallback 270": {
+      "en": "Russia Shell Fallback 270",
+      "zh": "Russia Shell Fallback 270"
+    },
+    "Russia Shell Fallback 270 (RU)": {
+      "en": "Russia Shell Fallback 270 (RU)",
+      "zh": "Russia Shell Fallback 270 (RU)"
+    },
+    "Russia Shell Fallback 271": {
+      "en": "Russia Shell Fallback 271",
+      "zh": "Russia Shell Fallback 271"
+    },
+    "Russia Shell Fallback 271 (RU)": {
+      "en": "Russia Shell Fallback 271 (RU)",
+      "zh": "Russia Shell Fallback 271 (RU)"
+    },
+    "Russia Shell Fallback 272": {
+      "en": "Russia Shell Fallback 272",
+      "zh": "Russia Shell Fallback 272"
+    },
+    "Russia Shell Fallback 272 (RU)": {
+      "en": "Russia Shell Fallback 272 (RU)",
+      "zh": "Russia Shell Fallback 272 (RU)"
+    },
+    "Russia Shell Fallback 273": {
+      "en": "Russia Shell Fallback 273",
+      "zh": "Russia Shell Fallback 273"
+    },
+    "Russia Shell Fallback 273 (RU)": {
+      "en": "Russia Shell Fallback 273 (RU)",
+      "zh": "Russia Shell Fallback 273 (RU)"
+    },
+    "Russia Shell Fallback 274": {
+      "en": "Russia Shell Fallback 274",
+      "zh": "Russia Shell Fallback 274"
+    },
+    "Russia Shell Fallback 274 (RU)": {
+      "en": "Russia Shell Fallback 274 (RU)",
+      "zh": "Russia Shell Fallback 274 (RU)"
+    },
+    "Russia Shell Fallback 275": {
+      "en": "Russia Shell Fallback 275",
+      "zh": "Russia Shell Fallback 275"
+    },
+    "Russia Shell Fallback 275 (RU)": {
+      "en": "Russia Shell Fallback 275 (RU)",
+      "zh": "Russia Shell Fallback 275 (RU)"
+    },
+    "Russia Shell Fallback 276": {
+      "en": "Russia Shell Fallback 276",
+      "zh": "Russia Shell Fallback 276"
+    },
+    "Russia Shell Fallback 276 (RU)": {
+      "en": "Russia Shell Fallback 276 (RU)",
+      "zh": "Russia Shell Fallback 276 (RU)"
+    },
+    "Russia Shell Fallback 277": {
+      "en": "Russia Shell Fallback 277",
+      "zh": "Russia Shell Fallback 277"
+    },
+    "Russia Shell Fallback 277 (RU)": {
+      "en": "Russia Shell Fallback 277 (RU)",
+      "zh": "Russia Shell Fallback 277 (RU)"
+    },
+    "Russia Shell Fallback 278": {
+      "en": "Russia Shell Fallback 278",
+      "zh": "Russia Shell Fallback 278"
+    },
+    "Russia Shell Fallback 278 (RU)": {
+      "en": "Russia Shell Fallback 278 (RU)",
+      "zh": "Russia Shell Fallback 278 (RU)"
+    },
+    "Russia Shell Fallback 279": {
+      "en": "Russia Shell Fallback 279",
+      "zh": "Russia Shell Fallback 279"
+    },
+    "Russia Shell Fallback 279 (RU)": {
+      "en": "Russia Shell Fallback 279 (RU)",
+      "zh": "Russia Shell Fallback 279 (RU)"
+    },
+    "Russia Shell Fallback 28": {
+      "en": "Russia Shell Fallback 28",
+      "zh": "俄罗斯北极后备 28"
+    },
+    "Russia Shell Fallback 28 (RU)": {
+      "en": "Russia Shell Fallback 28 (RU)",
+      "zh": "俄罗斯北极后备 28"
+    },
+    "Russia Shell Fallback 280": {
+      "en": "Russia Shell Fallback 280",
+      "zh": "Russia Shell Fallback 280"
+    },
+    "Russia Shell Fallback 280 (RU)": {
+      "en": "Russia Shell Fallback 280 (RU)",
+      "zh": "Russia Shell Fallback 280 (RU)"
+    },
+    "Russia Shell Fallback 281": {
+      "en": "Russia Shell Fallback 281",
+      "zh": "Russia Shell Fallback 281"
+    },
+    "Russia Shell Fallback 281 (RU)": {
+      "en": "Russia Shell Fallback 281 (RU)",
+      "zh": "Russia Shell Fallback 281 (RU)"
+    },
+    "Russia Shell Fallback 282": {
+      "en": "Russia Shell Fallback 282",
+      "zh": "Russia Shell Fallback 282"
+    },
+    "Russia Shell Fallback 282 (RU)": {
+      "en": "Russia Shell Fallback 282 (RU)",
+      "zh": "Russia Shell Fallback 282 (RU)"
+    },
+    "Russia Shell Fallback 283": {
+      "en": "Russia Shell Fallback 283",
+      "zh": "Russia Shell Fallback 283"
+    },
+    "Russia Shell Fallback 283 (RU)": {
+      "en": "Russia Shell Fallback 283 (RU)",
+      "zh": "Russia Shell Fallback 283 (RU)"
+    },
+    "Russia Shell Fallback 284": {
+      "en": "Russia Shell Fallback 284",
+      "zh": "Russia Shell Fallback 284"
+    },
+    "Russia Shell Fallback 284 (RU)": {
+      "en": "Russia Shell Fallback 284 (RU)",
+      "zh": "Russia Shell Fallback 284 (RU)"
+    },
+    "Russia Shell Fallback 285": {
+      "en": "Russia Shell Fallback 285",
+      "zh": "Russia Shell Fallback 285"
+    },
+    "Russia Shell Fallback 285 (RU)": {
+      "en": "Russia Shell Fallback 285 (RU)",
+      "zh": "Russia Shell Fallback 285 (RU)"
+    },
+    "Russia Shell Fallback 286": {
+      "en": "Russia Shell Fallback 286",
+      "zh": "Russia Shell Fallback 286"
+    },
+    "Russia Shell Fallback 286 (RU)": {
+      "en": "Russia Shell Fallback 286 (RU)",
+      "zh": "Russia Shell Fallback 286 (RU)"
+    },
+    "Russia Shell Fallback 287": {
+      "en": "Russia Shell Fallback 287",
+      "zh": "Russia Shell Fallback 287"
+    },
+    "Russia Shell Fallback 287 (RU)": {
+      "en": "Russia Shell Fallback 287 (RU)",
+      "zh": "Russia Shell Fallback 287 (RU)"
+    },
+    "Russia Shell Fallback 288": {
+      "en": "Russia Shell Fallback 288",
+      "zh": "Russia Shell Fallback 288"
+    },
+    "Russia Shell Fallback 288 (RU)": {
+      "en": "Russia Shell Fallback 288 (RU)",
+      "zh": "Russia Shell Fallback 288 (RU)"
+    },
+    "Russia Shell Fallback 289": {
+      "en": "Russia Shell Fallback 289",
+      "zh": "Russia Shell Fallback 289"
+    },
+    "Russia Shell Fallback 289 (RU)": {
+      "en": "Russia Shell Fallback 289 (RU)",
+      "zh": "Russia Shell Fallback 289 (RU)"
+    },
+    "Russia Shell Fallback 29": {
+      "en": "Russia Shell Fallback 29",
+      "zh": "俄罗斯北极后备 29"
+    },
+    "Russia Shell Fallback 29 (RU)": {
+      "en": "Russia Shell Fallback 29 (RU)",
+      "zh": "俄罗斯北极后备 29"
+    },
+    "Russia Shell Fallback 290": {
+      "en": "Russia Shell Fallback 290",
+      "zh": "Russia Shell Fallback 290"
+    },
+    "Russia Shell Fallback 290 (RU)": {
+      "en": "Russia Shell Fallback 290 (RU)",
+      "zh": "Russia Shell Fallback 290 (RU)"
+    },
+    "Russia Shell Fallback 291": {
+      "en": "Russia Shell Fallback 291",
+      "zh": "Russia Shell Fallback 291"
+    },
+    "Russia Shell Fallback 291 (RU)": {
+      "en": "Russia Shell Fallback 291 (RU)",
+      "zh": "Russia Shell Fallback 291 (RU)"
+    },
+    "Russia Shell Fallback 292": {
+      "en": "Russia Shell Fallback 292",
+      "zh": "Russia Shell Fallback 292"
+    },
+    "Russia Shell Fallback 292 (RU)": {
+      "en": "Russia Shell Fallback 292 (RU)",
+      "zh": "Russia Shell Fallback 292 (RU)"
+    },
+    "Russia Shell Fallback 293": {
+      "en": "Russia Shell Fallback 293",
+      "zh": "Russia Shell Fallback 293"
+    },
+    "Russia Shell Fallback 293 (RU)": {
+      "en": "Russia Shell Fallback 293 (RU)",
+      "zh": "Russia Shell Fallback 293 (RU)"
+    },
+    "Russia Shell Fallback 294": {
+      "en": "Russia Shell Fallback 294",
+      "zh": "Russia Shell Fallback 294"
+    },
+    "Russia Shell Fallback 294 (RU)": {
+      "en": "Russia Shell Fallback 294 (RU)",
+      "zh": "Russia Shell Fallback 294 (RU)"
+    },
+    "Russia Shell Fallback 295": {
+      "en": "Russia Shell Fallback 295",
+      "zh": "Russia Shell Fallback 295"
+    },
+    "Russia Shell Fallback 295 (RU)": {
+      "en": "Russia Shell Fallback 295 (RU)",
+      "zh": "Russia Shell Fallback 295 (RU)"
+    },
+    "Russia Shell Fallback 296": {
+      "en": "Russia Shell Fallback 296",
+      "zh": "Russia Shell Fallback 296"
+    },
+    "Russia Shell Fallback 296 (RU)": {
+      "en": "Russia Shell Fallback 296 (RU)",
+      "zh": "Russia Shell Fallback 296 (RU)"
+    },
+    "Russia Shell Fallback 297": {
+      "en": "Russia Shell Fallback 297",
+      "zh": "Russia Shell Fallback 297"
+    },
+    "Russia Shell Fallback 297 (RU)": {
+      "en": "Russia Shell Fallback 297 (RU)",
+      "zh": "Russia Shell Fallback 297 (RU)"
+    },
+    "Russia Shell Fallback 298": {
+      "en": "Russia Shell Fallback 298",
+      "zh": "Russia Shell Fallback 298"
+    },
+    "Russia Shell Fallback 298 (RU)": {
+      "en": "Russia Shell Fallback 298 (RU)",
+      "zh": "Russia Shell Fallback 298 (RU)"
+    },
+    "Russia Shell Fallback 299": {
+      "en": "Russia Shell Fallback 299",
+      "zh": "Russia Shell Fallback 299"
+    },
+    "Russia Shell Fallback 299 (RU)": {
+      "en": "Russia Shell Fallback 299 (RU)",
+      "zh": "Russia Shell Fallback 299 (RU)"
+    },
+    "Russia Shell Fallback 3": {
+      "en": "Russia Shell Fallback 3",
+      "zh": "俄罗斯北极后备3"
+    },
+    "Russia Shell Fallback 3 (RU)": {
+      "en": "Russia Shell Fallback 3 (RU)",
+      "zh": "俄罗斯北极后备3"
+    },
+    "Russia Shell Fallback 30": {
+      "en": "Russia Shell Fallback 30",
+      "zh": "俄罗斯北极后备 30"
+    },
+    "Russia Shell Fallback 30 (RU)": {
+      "en": "Russia Shell Fallback 30 (RU)",
+      "zh": "俄罗斯北极后备 30"
+    },
+    "Russia Shell Fallback 300": {
+      "en": "Russia Shell Fallback 300",
+      "zh": "Russia Shell Fallback 300"
+    },
+    "Russia Shell Fallback 300 (RU)": {
+      "en": "Russia Shell Fallback 300 (RU)",
+      "zh": "Russia Shell Fallback 300 (RU)"
+    },
+    "Russia Shell Fallback 301": {
+      "en": "Russia Shell Fallback 301",
+      "zh": "Russia Shell Fallback 301"
+    },
+    "Russia Shell Fallback 301 (RU)": {
+      "en": "Russia Shell Fallback 301 (RU)",
+      "zh": "Russia Shell Fallback 301 (RU)"
+    },
+    "Russia Shell Fallback 302": {
+      "en": "Russia Shell Fallback 302",
+      "zh": "Russia Shell Fallback 302"
+    },
+    "Russia Shell Fallback 302 (RU)": {
+      "en": "Russia Shell Fallback 302 (RU)",
+      "zh": "Russia Shell Fallback 302 (RU)"
+    },
+    "Russia Shell Fallback 303": {
+      "en": "Russia Shell Fallback 303",
+      "zh": "Russia Shell Fallback 303"
+    },
+    "Russia Shell Fallback 303 (RU)": {
+      "en": "Russia Shell Fallback 303 (RU)",
+      "zh": "Russia Shell Fallback 303 (RU)"
+    },
+    "Russia Shell Fallback 304": {
+      "en": "Russia Shell Fallback 304",
+      "zh": "Russia Shell Fallback 304"
+    },
+    "Russia Shell Fallback 304 (RU)": {
+      "en": "Russia Shell Fallback 304 (RU)",
+      "zh": "Russia Shell Fallback 304 (RU)"
+    },
+    "Russia Shell Fallback 305": {
+      "en": "Russia Shell Fallback 305",
+      "zh": "Russia Shell Fallback 305"
+    },
+    "Russia Shell Fallback 305 (RU)": {
+      "en": "Russia Shell Fallback 305 (RU)",
+      "zh": "Russia Shell Fallback 305 (RU)"
+    },
+    "Russia Shell Fallback 306": {
+      "en": "Russia Shell Fallback 306",
+      "zh": "Russia Shell Fallback 306"
+    },
+    "Russia Shell Fallback 306 (RU)": {
+      "en": "Russia Shell Fallback 306 (RU)",
+      "zh": "Russia Shell Fallback 306 (RU)"
+    },
+    "Russia Shell Fallback 307": {
+      "en": "Russia Shell Fallback 307",
+      "zh": "Russia Shell Fallback 307"
+    },
+    "Russia Shell Fallback 307 (RU)": {
+      "en": "Russia Shell Fallback 307 (RU)",
+      "zh": "Russia Shell Fallback 307 (RU)"
+    },
+    "Russia Shell Fallback 308": {
+      "en": "Russia Shell Fallback 308",
+      "zh": "Russia Shell Fallback 308"
+    },
+    "Russia Shell Fallback 308 (RU)": {
+      "en": "Russia Shell Fallback 308 (RU)",
+      "zh": "Russia Shell Fallback 308 (RU)"
+    },
+    "Russia Shell Fallback 309": {
+      "en": "Russia Shell Fallback 309",
+      "zh": "Russia Shell Fallback 309"
+    },
+    "Russia Shell Fallback 309 (RU)": {
+      "en": "Russia Shell Fallback 309 (RU)",
+      "zh": "Russia Shell Fallback 309 (RU)"
+    },
+    "Russia Shell Fallback 31": {
+      "en": "Russia Shell Fallback 31",
+      "zh": "俄罗斯北极后备 31"
+    },
+    "Russia Shell Fallback 31 (RU)": {
+      "en": "Russia Shell Fallback 31 (RU)",
+      "zh": "俄罗斯北极后备 31"
+    },
+    "Russia Shell Fallback 310": {
+      "en": "Russia Shell Fallback 310",
+      "zh": "Russia Shell Fallback 310"
+    },
+    "Russia Shell Fallback 310 (RU)": {
+      "en": "Russia Shell Fallback 310 (RU)",
+      "zh": "Russia Shell Fallback 310 (RU)"
+    },
+    "Russia Shell Fallback 311": {
+      "en": "Russia Shell Fallback 311",
+      "zh": "Russia Shell Fallback 311"
+    },
+    "Russia Shell Fallback 311 (RU)": {
+      "en": "Russia Shell Fallback 311 (RU)",
+      "zh": "Russia Shell Fallback 311 (RU)"
+    },
+    "Russia Shell Fallback 312": {
+      "en": "Russia Shell Fallback 312",
+      "zh": "Russia Shell Fallback 312"
+    },
+    "Russia Shell Fallback 312 (RU)": {
+      "en": "Russia Shell Fallback 312 (RU)",
+      "zh": "Russia Shell Fallback 312 (RU)"
+    },
+    "Russia Shell Fallback 313": {
+      "en": "Russia Shell Fallback 313",
+      "zh": "Russia Shell Fallback 313"
+    },
+    "Russia Shell Fallback 313 (RU)": {
+      "en": "Russia Shell Fallback 313 (RU)",
+      "zh": "Russia Shell Fallback 313 (RU)"
+    },
+    "Russia Shell Fallback 314": {
+      "en": "Russia Shell Fallback 314",
+      "zh": "Russia Shell Fallback 314"
+    },
+    "Russia Shell Fallback 314 (RU)": {
+      "en": "Russia Shell Fallback 314 (RU)",
+      "zh": "Russia Shell Fallback 314 (RU)"
+    },
+    "Russia Shell Fallback 315": {
+      "en": "Russia Shell Fallback 315",
+      "zh": "Russia Shell Fallback 315"
+    },
+    "Russia Shell Fallback 315 (RU)": {
+      "en": "Russia Shell Fallback 315 (RU)",
+      "zh": "Russia Shell Fallback 315 (RU)"
+    },
+    "Russia Shell Fallback 316": {
+      "en": "Russia Shell Fallback 316",
+      "zh": "Russia Shell Fallback 316"
+    },
+    "Russia Shell Fallback 316 (RU)": {
+      "en": "Russia Shell Fallback 316 (RU)",
+      "zh": "Russia Shell Fallback 316 (RU)"
+    },
+    "Russia Shell Fallback 317": {
+      "en": "Russia Shell Fallback 317",
+      "zh": "Russia Shell Fallback 317"
+    },
+    "Russia Shell Fallback 317 (RU)": {
+      "en": "Russia Shell Fallback 317 (RU)",
+      "zh": "Russia Shell Fallback 317 (RU)"
+    },
+    "Russia Shell Fallback 318": {
+      "en": "Russia Shell Fallback 318",
+      "zh": "Russia Shell Fallback 318"
+    },
+    "Russia Shell Fallback 318 (RU)": {
+      "en": "Russia Shell Fallback 318 (RU)",
+      "zh": "Russia Shell Fallback 318 (RU)"
+    },
+    "Russia Shell Fallback 319": {
+      "en": "Russia Shell Fallback 319",
+      "zh": "Russia Shell Fallback 319"
+    },
+    "Russia Shell Fallback 319 (RU)": {
+      "en": "Russia Shell Fallback 319 (RU)",
+      "zh": "Russia Shell Fallback 319 (RU)"
+    },
+    "Russia Shell Fallback 32": {
+      "en": "Russia Shell Fallback 32",
+      "zh": "俄罗斯北极后备 32"
+    },
+    "Russia Shell Fallback 32 (RU)": {
+      "en": "Russia Shell Fallback 32 (RU)",
+      "zh": "俄罗斯北极后备 32"
+    },
+    "Russia Shell Fallback 320": {
+      "en": "Russia Shell Fallback 320",
+      "zh": "Russia Shell Fallback 320"
+    },
+    "Russia Shell Fallback 320 (RU)": {
+      "en": "Russia Shell Fallback 320 (RU)",
+      "zh": "Russia Shell Fallback 320 (RU)"
+    },
+    "Russia Shell Fallback 321": {
+      "en": "Russia Shell Fallback 321",
+      "zh": "Russia Shell Fallback 321"
+    },
+    "Russia Shell Fallback 321 (RU)": {
+      "en": "Russia Shell Fallback 321 (RU)",
+      "zh": "Russia Shell Fallback 321 (RU)"
+    },
+    "Russia Shell Fallback 322": {
+      "en": "Russia Shell Fallback 322",
+      "zh": "Russia Shell Fallback 322"
+    },
+    "Russia Shell Fallback 322 (RU)": {
+      "en": "Russia Shell Fallback 322 (RU)",
+      "zh": "Russia Shell Fallback 322 (RU)"
+    },
+    "Russia Shell Fallback 323": {
+      "en": "Russia Shell Fallback 323",
+      "zh": "Russia Shell Fallback 323"
+    },
+    "Russia Shell Fallback 323 (RU)": {
+      "en": "Russia Shell Fallback 323 (RU)",
+      "zh": "Russia Shell Fallback 323 (RU)"
+    },
+    "Russia Shell Fallback 324": {
+      "en": "Russia Shell Fallback 324",
+      "zh": "Russia Shell Fallback 324"
+    },
+    "Russia Shell Fallback 324 (RU)": {
+      "en": "Russia Shell Fallback 324 (RU)",
+      "zh": "Russia Shell Fallback 324 (RU)"
+    },
+    "Russia Shell Fallback 325": {
+      "en": "Russia Shell Fallback 325",
+      "zh": "Russia Shell Fallback 325"
+    },
+    "Russia Shell Fallback 325 (RU)": {
+      "en": "Russia Shell Fallback 325 (RU)",
+      "zh": "Russia Shell Fallback 325 (RU)"
+    },
+    "Russia Shell Fallback 326": {
+      "en": "Russia Shell Fallback 326",
+      "zh": "Russia Shell Fallback 326"
+    },
+    "Russia Shell Fallback 326 (RU)": {
+      "en": "Russia Shell Fallback 326 (RU)",
+      "zh": "Russia Shell Fallback 326 (RU)"
+    },
+    "Russia Shell Fallback 327": {
+      "en": "Russia Shell Fallback 327",
+      "zh": "Russia Shell Fallback 327"
+    },
+    "Russia Shell Fallback 327 (RU)": {
+      "en": "Russia Shell Fallback 327 (RU)",
+      "zh": "Russia Shell Fallback 327 (RU)"
+    },
+    "Russia Shell Fallback 328": {
+      "en": "Russia Shell Fallback 328",
+      "zh": "Russia Shell Fallback 328"
+    },
+    "Russia Shell Fallback 328 (RU)": {
+      "en": "Russia Shell Fallback 328 (RU)",
+      "zh": "Russia Shell Fallback 328 (RU)"
+    },
+    "Russia Shell Fallback 329": {
+      "en": "Russia Shell Fallback 329",
+      "zh": "Russia Shell Fallback 329"
+    },
+    "Russia Shell Fallback 329 (RU)": {
+      "en": "Russia Shell Fallback 329 (RU)",
+      "zh": "Russia Shell Fallback 329 (RU)"
+    },
+    "Russia Shell Fallback 33": {
+      "en": "Russia Shell Fallback 33",
+      "zh": "俄罗斯北极后备 33"
+    },
+    "Russia Shell Fallback 33 (RU)": {
+      "en": "Russia Shell Fallback 33 (RU)",
+      "zh": "俄罗斯北极后备 33"
+    },
+    "Russia Shell Fallback 330": {
+      "en": "Russia Shell Fallback 330",
+      "zh": "Russia Shell Fallback 330"
+    },
+    "Russia Shell Fallback 330 (RU)": {
+      "en": "Russia Shell Fallback 330 (RU)",
+      "zh": "Russia Shell Fallback 330 (RU)"
+    },
+    "Russia Shell Fallback 331": {
+      "en": "Russia Shell Fallback 331",
+      "zh": "Russia Shell Fallback 331"
+    },
+    "Russia Shell Fallback 331 (RU)": {
+      "en": "Russia Shell Fallback 331 (RU)",
+      "zh": "Russia Shell Fallback 331 (RU)"
+    },
+    "Russia Shell Fallback 332": {
+      "en": "Russia Shell Fallback 332",
+      "zh": "Russia Shell Fallback 332"
+    },
+    "Russia Shell Fallback 332 (RU)": {
+      "en": "Russia Shell Fallback 332 (RU)",
+      "zh": "Russia Shell Fallback 332 (RU)"
+    },
+    "Russia Shell Fallback 333": {
+      "en": "Russia Shell Fallback 333",
+      "zh": "Russia Shell Fallback 333"
+    },
+    "Russia Shell Fallback 333 (RU)": {
+      "en": "Russia Shell Fallback 333 (RU)",
+      "zh": "Russia Shell Fallback 333 (RU)"
+    },
+    "Russia Shell Fallback 334": {
+      "en": "Russia Shell Fallback 334",
+      "zh": "Russia Shell Fallback 334"
+    },
+    "Russia Shell Fallback 334 (RU)": {
+      "en": "Russia Shell Fallback 334 (RU)",
+      "zh": "Russia Shell Fallback 334 (RU)"
+    },
+    "Russia Shell Fallback 335": {
+      "en": "Russia Shell Fallback 335",
+      "zh": "Russia Shell Fallback 335"
+    },
+    "Russia Shell Fallback 335 (RU)": {
+      "en": "Russia Shell Fallback 335 (RU)",
+      "zh": "Russia Shell Fallback 335 (RU)"
+    },
+    "Russia Shell Fallback 336": {
+      "en": "Russia Shell Fallback 336",
+      "zh": "Russia Shell Fallback 336"
+    },
+    "Russia Shell Fallback 336 (RU)": {
+      "en": "Russia Shell Fallback 336 (RU)",
+      "zh": "Russia Shell Fallback 336 (RU)"
+    },
+    "Russia Shell Fallback 337": {
+      "en": "Russia Shell Fallback 337",
+      "zh": "Russia Shell Fallback 337"
+    },
+    "Russia Shell Fallback 337 (RU)": {
+      "en": "Russia Shell Fallback 337 (RU)",
+      "zh": "Russia Shell Fallback 337 (RU)"
+    },
+    "Russia Shell Fallback 338": {
+      "en": "Russia Shell Fallback 338",
+      "zh": "Russia Shell Fallback 338"
+    },
+    "Russia Shell Fallback 338 (RU)": {
+      "en": "Russia Shell Fallback 338 (RU)",
+      "zh": "Russia Shell Fallback 338 (RU)"
+    },
+    "Russia Shell Fallback 339": {
+      "en": "Russia Shell Fallback 339",
+      "zh": "Russia Shell Fallback 339"
+    },
+    "Russia Shell Fallback 339 (RU)": {
+      "en": "Russia Shell Fallback 339 (RU)",
+      "zh": "Russia Shell Fallback 339 (RU)"
+    },
+    "Russia Shell Fallback 34": {
+      "en": "Russia Shell Fallback 34",
+      "zh": "俄罗斯北极后备 34"
+    },
+    "Russia Shell Fallback 34 (RU)": {
+      "en": "Russia Shell Fallback 34 (RU)",
+      "zh": "俄罗斯北极后备 34"
+    },
+    "Russia Shell Fallback 340": {
+      "en": "Russia Shell Fallback 340",
+      "zh": "Russia Shell Fallback 340"
+    },
+    "Russia Shell Fallback 340 (RU)": {
+      "en": "Russia Shell Fallback 340 (RU)",
+      "zh": "Russia Shell Fallback 340 (RU)"
+    },
+    "Russia Shell Fallback 341": {
+      "en": "Russia Shell Fallback 341",
+      "zh": "Russia Shell Fallback 341"
+    },
+    "Russia Shell Fallback 341 (RU)": {
+      "en": "Russia Shell Fallback 341 (RU)",
+      "zh": "Russia Shell Fallback 341 (RU)"
+    },
+    "Russia Shell Fallback 342": {
+      "en": "Russia Shell Fallback 342",
+      "zh": "Russia Shell Fallback 342"
+    },
+    "Russia Shell Fallback 342 (RU)": {
+      "en": "Russia Shell Fallback 342 (RU)",
+      "zh": "Russia Shell Fallback 342 (RU)"
+    },
+    "Russia Shell Fallback 343": {
+      "en": "Russia Shell Fallback 343",
+      "zh": "Russia Shell Fallback 343"
+    },
+    "Russia Shell Fallback 343 (RU)": {
+      "en": "Russia Shell Fallback 343 (RU)",
+      "zh": "Russia Shell Fallback 343 (RU)"
+    },
+    "Russia Shell Fallback 344": {
+      "en": "Russia Shell Fallback 344",
+      "zh": "Russia Shell Fallback 344"
+    },
+    "Russia Shell Fallback 344 (RU)": {
+      "en": "Russia Shell Fallback 344 (RU)",
+      "zh": "Russia Shell Fallback 344 (RU)"
+    },
+    "Russia Shell Fallback 345": {
+      "en": "Russia Shell Fallback 345",
+      "zh": "Russia Shell Fallback 345"
+    },
+    "Russia Shell Fallback 345 (RU)": {
+      "en": "Russia Shell Fallback 345 (RU)",
+      "zh": "Russia Shell Fallback 345 (RU)"
+    },
+    "Russia Shell Fallback 346": {
+      "en": "Russia Shell Fallback 346",
+      "zh": "Russia Shell Fallback 346"
+    },
+    "Russia Shell Fallback 346 (RU)": {
+      "en": "Russia Shell Fallback 346 (RU)",
+      "zh": "Russia Shell Fallback 346 (RU)"
+    },
+    "Russia Shell Fallback 347": {
+      "en": "Russia Shell Fallback 347",
+      "zh": "Russia Shell Fallback 347"
+    },
+    "Russia Shell Fallback 347 (RU)": {
+      "en": "Russia Shell Fallback 347 (RU)",
+      "zh": "Russia Shell Fallback 347 (RU)"
+    },
+    "Russia Shell Fallback 348": {
+      "en": "Russia Shell Fallback 348",
+      "zh": "Russia Shell Fallback 348"
+    },
+    "Russia Shell Fallback 348 (RU)": {
+      "en": "Russia Shell Fallback 348 (RU)",
+      "zh": "Russia Shell Fallback 348 (RU)"
+    },
+    "Russia Shell Fallback 349": {
+      "en": "Russia Shell Fallback 349",
+      "zh": "Russia Shell Fallback 349"
+    },
+    "Russia Shell Fallback 349 (RU)": {
+      "en": "Russia Shell Fallback 349 (RU)",
+      "zh": "Russia Shell Fallback 349 (RU)"
+    },
+    "Russia Shell Fallback 35": {
+      "en": "Russia Shell Fallback 35",
+      "zh": "俄罗斯北极后备 35"
+    },
+    "Russia Shell Fallback 35 (RU)": {
+      "en": "Russia Shell Fallback 35 (RU)",
+      "zh": "俄罗斯北极后备 35"
+    },
+    "Russia Shell Fallback 350": {
+      "en": "Russia Shell Fallback 350",
+      "zh": "Russia Shell Fallback 350"
+    },
+    "Russia Shell Fallback 350 (RU)": {
+      "en": "Russia Shell Fallback 350 (RU)",
+      "zh": "Russia Shell Fallback 350 (RU)"
+    },
+    "Russia Shell Fallback 351": {
+      "en": "Russia Shell Fallback 351",
+      "zh": "Russia Shell Fallback 351"
+    },
+    "Russia Shell Fallback 351 (RU)": {
+      "en": "Russia Shell Fallback 351 (RU)",
+      "zh": "Russia Shell Fallback 351 (RU)"
+    },
+    "Russia Shell Fallback 352": {
+      "en": "Russia Shell Fallback 352",
+      "zh": "Russia Shell Fallback 352"
+    },
+    "Russia Shell Fallback 352 (RU)": {
+      "en": "Russia Shell Fallback 352 (RU)",
+      "zh": "Russia Shell Fallback 352 (RU)"
+    },
+    "Russia Shell Fallback 353": {
+      "en": "Russia Shell Fallback 353",
+      "zh": "Russia Shell Fallback 353"
+    },
+    "Russia Shell Fallback 353 (RU)": {
+      "en": "Russia Shell Fallback 353 (RU)",
+      "zh": "Russia Shell Fallback 353 (RU)"
+    },
+    "Russia Shell Fallback 354": {
+      "en": "Russia Shell Fallback 354",
+      "zh": "Russia Shell Fallback 354"
+    },
+    "Russia Shell Fallback 354 (RU)": {
+      "en": "Russia Shell Fallback 354 (RU)",
+      "zh": "Russia Shell Fallback 354 (RU)"
+    },
+    "Russia Shell Fallback 355": {
+      "en": "Russia Shell Fallback 355",
+      "zh": "Russia Shell Fallback 355"
+    },
+    "Russia Shell Fallback 355 (RU)": {
+      "en": "Russia Shell Fallback 355 (RU)",
+      "zh": "Russia Shell Fallback 355 (RU)"
+    },
+    "Russia Shell Fallback 356": {
+      "en": "Russia Shell Fallback 356",
+      "zh": "Russia Shell Fallback 356"
+    },
+    "Russia Shell Fallback 356 (RU)": {
+      "en": "Russia Shell Fallback 356 (RU)",
+      "zh": "Russia Shell Fallback 356 (RU)"
+    },
+    "Russia Shell Fallback 357": {
+      "en": "Russia Shell Fallback 357",
+      "zh": "Russia Shell Fallback 357"
+    },
+    "Russia Shell Fallback 357 (RU)": {
+      "en": "Russia Shell Fallback 357 (RU)",
+      "zh": "Russia Shell Fallback 357 (RU)"
+    },
+    "Russia Shell Fallback 358": {
+      "en": "Russia Shell Fallback 358",
+      "zh": "Russia Shell Fallback 358"
+    },
+    "Russia Shell Fallback 358 (RU)": {
+      "en": "Russia Shell Fallback 358 (RU)",
+      "zh": "Russia Shell Fallback 358 (RU)"
+    },
+    "Russia Shell Fallback 359": {
+      "en": "Russia Shell Fallback 359",
+      "zh": "Russia Shell Fallback 359"
+    },
+    "Russia Shell Fallback 359 (RU)": {
+      "en": "Russia Shell Fallback 359 (RU)",
+      "zh": "Russia Shell Fallback 359 (RU)"
+    },
+    "Russia Shell Fallback 36": {
+      "en": "Russia Shell Fallback 36",
+      "zh": "俄罗斯北极后备 36"
+    },
+    "Russia Shell Fallback 36 (RU)": {
+      "en": "Russia Shell Fallback 36 (RU)",
+      "zh": "俄罗斯北极后备 36"
+    },
+    "Russia Shell Fallback 360": {
+      "en": "Russia Shell Fallback 360",
+      "zh": "Russia Shell Fallback 360"
+    },
+    "Russia Shell Fallback 360 (RU)": {
+      "en": "Russia Shell Fallback 360 (RU)",
+      "zh": "Russia Shell Fallback 360 (RU)"
+    },
+    "Russia Shell Fallback 361": {
+      "en": "Russia Shell Fallback 361",
+      "zh": "Russia Shell Fallback 361"
+    },
+    "Russia Shell Fallback 361 (RU)": {
+      "en": "Russia Shell Fallback 361 (RU)",
+      "zh": "Russia Shell Fallback 361 (RU)"
+    },
+    "Russia Shell Fallback 362": {
+      "en": "Russia Shell Fallback 362",
+      "zh": "Russia Shell Fallback 362"
+    },
+    "Russia Shell Fallback 362 (RU)": {
+      "en": "Russia Shell Fallback 362 (RU)",
+      "zh": "Russia Shell Fallback 362 (RU)"
+    },
+    "Russia Shell Fallback 363": {
+      "en": "Russia Shell Fallback 363",
+      "zh": "Russia Shell Fallback 363"
+    },
+    "Russia Shell Fallback 363 (RU)": {
+      "en": "Russia Shell Fallback 363 (RU)",
+      "zh": "Russia Shell Fallback 363 (RU)"
+    },
+    "Russia Shell Fallback 364": {
+      "en": "Russia Shell Fallback 364",
+      "zh": "Russia Shell Fallback 364"
+    },
+    "Russia Shell Fallback 364 (RU)": {
+      "en": "Russia Shell Fallback 364 (RU)",
+      "zh": "Russia Shell Fallback 364 (RU)"
+    },
+    "Russia Shell Fallback 365": {
+      "en": "Russia Shell Fallback 365",
+      "zh": "Russia Shell Fallback 365"
+    },
+    "Russia Shell Fallback 365 (RU)": {
+      "en": "Russia Shell Fallback 365 (RU)",
+      "zh": "Russia Shell Fallback 365 (RU)"
+    },
+    "Russia Shell Fallback 366": {
+      "en": "Russia Shell Fallback 366",
+      "zh": "Russia Shell Fallback 366"
+    },
+    "Russia Shell Fallback 366 (RU)": {
+      "en": "Russia Shell Fallback 366 (RU)",
+      "zh": "Russia Shell Fallback 366 (RU)"
+    },
+    "Russia Shell Fallback 367": {
+      "en": "Russia Shell Fallback 367",
+      "zh": "Russia Shell Fallback 367"
+    },
+    "Russia Shell Fallback 367 (RU)": {
+      "en": "Russia Shell Fallback 367 (RU)",
+      "zh": "Russia Shell Fallback 367 (RU)"
+    },
+    "Russia Shell Fallback 368": {
+      "en": "Russia Shell Fallback 368",
+      "zh": "Russia Shell Fallback 368"
+    },
+    "Russia Shell Fallback 368 (RU)": {
+      "en": "Russia Shell Fallback 368 (RU)",
+      "zh": "Russia Shell Fallback 368 (RU)"
+    },
+    "Russia Shell Fallback 369": {
+      "en": "Russia Shell Fallback 369",
+      "zh": "Russia Shell Fallback 369"
+    },
+    "Russia Shell Fallback 369 (RU)": {
+      "en": "Russia Shell Fallback 369 (RU)",
+      "zh": "Russia Shell Fallback 369 (RU)"
+    },
+    "Russia Shell Fallback 37": {
+      "en": "Russia Shell Fallback 37",
+      "zh": "俄罗斯北极后备 37"
+    },
+    "Russia Shell Fallback 37 (RU)": {
+      "en": "Russia Shell Fallback 37 (RU)",
+      "zh": "俄罗斯北极后备 37"
+    },
+    "Russia Shell Fallback 370": {
+      "en": "Russia Shell Fallback 370",
+      "zh": "Russia Shell Fallback 370"
+    },
+    "Russia Shell Fallback 370 (RU)": {
+      "en": "Russia Shell Fallback 370 (RU)",
+      "zh": "Russia Shell Fallback 370 (RU)"
+    },
+    "Russia Shell Fallback 371": {
+      "en": "Russia Shell Fallback 371",
+      "zh": "Russia Shell Fallback 371"
+    },
+    "Russia Shell Fallback 371 (RU)": {
+      "en": "Russia Shell Fallback 371 (RU)",
+      "zh": "Russia Shell Fallback 371 (RU)"
+    },
+    "Russia Shell Fallback 372": {
+      "en": "Russia Shell Fallback 372",
+      "zh": "Russia Shell Fallback 372"
+    },
+    "Russia Shell Fallback 372 (RU)": {
+      "en": "Russia Shell Fallback 372 (RU)",
+      "zh": "Russia Shell Fallback 372 (RU)"
+    },
+    "Russia Shell Fallback 373": {
+      "en": "Russia Shell Fallback 373",
+      "zh": "Russia Shell Fallback 373"
+    },
+    "Russia Shell Fallback 373 (RU)": {
+      "en": "Russia Shell Fallback 373 (RU)",
+      "zh": "Russia Shell Fallback 373 (RU)"
+    },
+    "Russia Shell Fallback 374": {
+      "en": "Russia Shell Fallback 374",
+      "zh": "Russia Shell Fallback 374"
+    },
+    "Russia Shell Fallback 374 (RU)": {
+      "en": "Russia Shell Fallback 374 (RU)",
+      "zh": "Russia Shell Fallback 374 (RU)"
+    },
+    "Russia Shell Fallback 375": {
+      "en": "Russia Shell Fallback 375",
+      "zh": "Russia Shell Fallback 375"
+    },
+    "Russia Shell Fallback 375 (RU)": {
+      "en": "Russia Shell Fallback 375 (RU)",
+      "zh": "Russia Shell Fallback 375 (RU)"
+    },
+    "Russia Shell Fallback 376": {
+      "en": "Russia Shell Fallback 376",
+      "zh": "Russia Shell Fallback 376"
+    },
+    "Russia Shell Fallback 376 (RU)": {
+      "en": "Russia Shell Fallback 376 (RU)",
+      "zh": "Russia Shell Fallback 376 (RU)"
+    },
+    "Russia Shell Fallback 377": {
+      "en": "Russia Shell Fallback 377",
+      "zh": "Russia Shell Fallback 377"
+    },
+    "Russia Shell Fallback 377 (RU)": {
+      "en": "Russia Shell Fallback 377 (RU)",
+      "zh": "Russia Shell Fallback 377 (RU)"
+    },
+    "Russia Shell Fallback 378": {
+      "en": "Russia Shell Fallback 378",
+      "zh": "Russia Shell Fallback 378"
+    },
+    "Russia Shell Fallback 378 (RU)": {
+      "en": "Russia Shell Fallback 378 (RU)",
+      "zh": "Russia Shell Fallback 378 (RU)"
+    },
+    "Russia Shell Fallback 379": {
+      "en": "Russia Shell Fallback 379",
+      "zh": "Russia Shell Fallback 379"
+    },
+    "Russia Shell Fallback 379 (RU)": {
+      "en": "Russia Shell Fallback 379 (RU)",
+      "zh": "Russia Shell Fallback 379 (RU)"
+    },
+    "Russia Shell Fallback 38": {
+      "en": "Russia Shell Fallback 38",
+      "zh": "俄罗斯北极后备 38"
+    },
+    "Russia Shell Fallback 38 (RU)": {
+      "en": "Russia Shell Fallback 38 (RU)",
+      "zh": "俄罗斯北极后备 38"
+    },
+    "Russia Shell Fallback 380": {
+      "en": "Russia Shell Fallback 380",
+      "zh": "Russia Shell Fallback 380"
+    },
+    "Russia Shell Fallback 380 (RU)": {
+      "en": "Russia Shell Fallback 380 (RU)",
+      "zh": "Russia Shell Fallback 380 (RU)"
+    },
+    "Russia Shell Fallback 381": {
+      "en": "Russia Shell Fallback 381",
+      "zh": "Russia Shell Fallback 381"
+    },
+    "Russia Shell Fallback 382": {
+      "en": "Russia Shell Fallback 382",
+      "zh": "Russia Shell Fallback 382"
+    },
+    "Russia Shell Fallback 383": {
+      "en": "Russia Shell Fallback 383",
+      "zh": "Russia Shell Fallback 383"
+    },
+    "Russia Shell Fallback 383 (RU)": {
+      "en": "Russia Shell Fallback 383 (RU)",
+      "zh": "Russia Shell Fallback 383 (RU)"
+    },
+    "Russia Shell Fallback 384": {
+      "en": "Russia Shell Fallback 384",
+      "zh": "Russia Shell Fallback 384"
+    },
+    "Russia Shell Fallback 384 (RU)": {
+      "en": "Russia Shell Fallback 384 (RU)",
+      "zh": "Russia Shell Fallback 384 (RU)"
+    },
+    "Russia Shell Fallback 385": {
+      "en": "Russia Shell Fallback 385",
+      "zh": "Russia Shell Fallback 385"
+    },
+    "Russia Shell Fallback 385 (RU)": {
+      "en": "Russia Shell Fallback 385 (RU)",
+      "zh": "Russia Shell Fallback 385 (RU)"
+    },
+    "Russia Shell Fallback 386": {
+      "en": "Russia Shell Fallback 386",
+      "zh": "Russia Shell Fallback 386"
+    },
+    "Russia Shell Fallback 386 (RU)": {
+      "en": "Russia Shell Fallback 386 (RU)",
+      "zh": "Russia Shell Fallback 386 (RU)"
+    },
+    "Russia Shell Fallback 387": {
+      "en": "Russia Shell Fallback 387",
+      "zh": "Russia Shell Fallback 387"
+    },
+    "Russia Shell Fallback 387 (RU)": {
+      "en": "Russia Shell Fallback 387 (RU)",
+      "zh": "Russia Shell Fallback 387 (RU)"
+    },
+    "Russia Shell Fallback 388": {
+      "en": "Russia Shell Fallback 388",
+      "zh": "Russia Shell Fallback 388"
+    },
+    "Russia Shell Fallback 388 (RU)": {
+      "en": "Russia Shell Fallback 388 (RU)",
+      "zh": "Russia Shell Fallback 388 (RU)"
+    },
+    "Russia Shell Fallback 389": {
+      "en": "Russia Shell Fallback 389",
+      "zh": "Russia Shell Fallback 389"
+    },
+    "Russia Shell Fallback 389 (RU)": {
+      "en": "Russia Shell Fallback 389 (RU)",
+      "zh": "Russia Shell Fallback 389 (RU)"
+    },
+    "Russia Shell Fallback 39": {
+      "en": "Russia Shell Fallback 39",
+      "zh": "俄罗斯北极后备 39"
+    },
+    "Russia Shell Fallback 39 (RU)": {
+      "en": "Russia Shell Fallback 39 (RU)",
+      "zh": "俄罗斯北极后备 39"
+    },
+    "Russia Shell Fallback 390": {
+      "en": "Russia Shell Fallback 390",
+      "zh": "Russia Shell Fallback 390"
+    },
+    "Russia Shell Fallback 390 (RU)": {
+      "en": "Russia Shell Fallback 390 (RU)",
+      "zh": "Russia Shell Fallback 390 (RU)"
+    },
+    "Russia Shell Fallback 391": {
+      "en": "Russia Shell Fallback 391",
+      "zh": "Russia Shell Fallback 391"
+    },
+    "Russia Shell Fallback 391 (RU)": {
+      "en": "Russia Shell Fallback 391 (RU)",
+      "zh": "Russia Shell Fallback 391 (RU)"
+    },
+    "Russia Shell Fallback 392": {
+      "en": "Russia Shell Fallback 392",
+      "zh": "Russia Shell Fallback 392"
+    },
+    "Russia Shell Fallback 393": {
+      "en": "Russia Shell Fallback 393",
+      "zh": "Russia Shell Fallback 393"
+    },
+    "Russia Shell Fallback 394": {
+      "en": "Russia Shell Fallback 394",
+      "zh": "Russia Shell Fallback 394"
+    },
+    "Russia Shell Fallback 395": {
+      "en": "Russia Shell Fallback 395",
+      "zh": "Russia Shell Fallback 395"
+    },
+    "Russia Shell Fallback 396": {
+      "en": "Russia Shell Fallback 396",
+      "zh": "Russia Shell Fallback 396"
+    },
+    "Russia Shell Fallback 397": {
+      "en": "Russia Shell Fallback 397",
+      "zh": "Russia Shell Fallback 397"
+    },
+    "Russia Shell Fallback 398": {
+      "en": "Russia Shell Fallback 398",
+      "zh": "Russia Shell Fallback 398"
+    },
+    "Russia Shell Fallback 399": {
+      "en": "Russia Shell Fallback 399",
+      "zh": "Russia Shell Fallback 399"
+    },
+    "Russia Shell Fallback 4": {
+      "en": "Russia Shell Fallback 4",
+      "zh": "俄罗斯北极后备4"
+    },
+    "Russia Shell Fallback 4 (RU)": {
+      "en": "Russia Shell Fallback 4 (RU)",
+      "zh": "俄罗斯北极后备4"
+    },
+    "Russia Shell Fallback 40": {
+      "en": "Russia Shell Fallback 40",
+      "zh": "俄罗斯北极后备 40"
+    },
+    "Russia Shell Fallback 40 (RU)": {
+      "en": "Russia Shell Fallback 40 (RU)",
+      "zh": "俄罗斯北极后备 40"
+    },
+    "Russia Shell Fallback 400": {
+      "en": "Russia Shell Fallback 400",
+      "zh": "Russia Shell Fallback 400"
+    },
+    "Russia Shell Fallback 401": {
+      "en": "Russia Shell Fallback 401",
+      "zh": "Russia Shell Fallback 401"
+    },
+    "Russia Shell Fallback 402": {
+      "en": "Russia Shell Fallback 402",
+      "zh": "Russia Shell Fallback 402"
+    },
+    "Russia Shell Fallback 403": {
+      "en": "Russia Shell Fallback 403",
+      "zh": "Russia Shell Fallback 403"
+    },
+    "Russia Shell Fallback 404": {
+      "en": "Russia Shell Fallback 404",
+      "zh": "Russia Shell Fallback 404"
+    },
+    "Russia Shell Fallback 405": {
+      "en": "Russia Shell Fallback 405",
+      "zh": "Russia Shell Fallback 405"
+    },
+    "Russia Shell Fallback 406": {
+      "en": "Russia Shell Fallback 406",
+      "zh": "Russia Shell Fallback 406"
+    },
+    "Russia Shell Fallback 407": {
+      "en": "Russia Shell Fallback 407",
+      "zh": "Russia Shell Fallback 407"
+    },
+    "Russia Shell Fallback 408": {
+      "en": "Russia Shell Fallback 408",
+      "zh": "Russia Shell Fallback 408"
+    },
+    "Russia Shell Fallback 409": {
+      "en": "Russia Shell Fallback 409",
+      "zh": "Russia Shell Fallback 409"
+    },
+    "Russia Shell Fallback 41": {
+      "en": "Russia Shell Fallback 41",
+      "zh": "俄罗斯北极后备 41"
+    },
+    "Russia Shell Fallback 41 (RU)": {
+      "en": "Russia Shell Fallback 41 (RU)",
+      "zh": "俄罗斯北极后备 41"
+    },
+    "Russia Shell Fallback 42": {
+      "en": "Russia Shell Fallback 42",
+      "zh": "俄罗斯北极后备 42"
+    },
+    "Russia Shell Fallback 42 (RU)": {
+      "en": "Russia Shell Fallback 42 (RU)",
+      "zh": "俄罗斯北极后备 42"
+    },
+    "Russia Shell Fallback 43": {
+      "en": "Russia Shell Fallback 43",
+      "zh": "俄罗斯北极后备 43"
+    },
+    "Russia Shell Fallback 43 (RU)": {
+      "en": "Russia Shell Fallback 43 (RU)",
+      "zh": "俄罗斯北极后备 43"
+    },
+    "Russia Shell Fallback 44": {
+      "en": "Russia Shell Fallback 44",
+      "zh": "俄罗斯北极后备 44"
+    },
+    "Russia Shell Fallback 44 (RU)": {
+      "en": "Russia Shell Fallback 44 (RU)",
+      "zh": "俄罗斯北极后备 44"
+    },
+    "Russia Shell Fallback 45": {
+      "en": "Russia Shell Fallback 45",
+      "zh": "俄罗斯北极后备 45"
+    },
+    "Russia Shell Fallback 45 (RU)": {
+      "en": "Russia Shell Fallback 45 (RU)",
+      "zh": "俄罗斯北极后备 45"
+    },
+    "Russia Shell Fallback 46": {
+      "en": "Russia Shell Fallback 46",
+      "zh": "俄罗斯北极后备 46"
+    },
+    "Russia Shell Fallback 46 (RU)": {
+      "en": "Russia Shell Fallback 46 (RU)",
+      "zh": "俄罗斯北极后备 46"
+    },
+    "Russia Shell Fallback 47": {
+      "en": "Russia Shell Fallback 47",
+      "zh": "俄罗斯北极后备 47"
+    },
+    "Russia Shell Fallback 47 (RU)": {
+      "en": "Russia Shell Fallback 47 (RU)",
+      "zh": "俄罗斯北极后备 47"
+    },
+    "Russia Shell Fallback 48": {
+      "en": "Russia Shell Fallback 48",
+      "zh": "俄罗斯北极后备 48"
+    },
+    "Russia Shell Fallback 48 (RU)": {
+      "en": "Russia Shell Fallback 48 (RU)",
+      "zh": "俄罗斯北极后备 48"
+    },
+    "Russia Shell Fallback 49": {
+      "en": "Russia Shell Fallback 49",
+      "zh": "俄罗斯北极后备 49"
+    },
+    "Russia Shell Fallback 49 (RU)": {
+      "en": "Russia Shell Fallback 49 (RU)",
+      "zh": "俄罗斯北极后备 49"
+    },
+    "Russia Shell Fallback 5": {
+      "en": "Russia Shell Fallback 5",
+      "zh": "俄罗斯北极后备 5"
+    },
+    "Russia Shell Fallback 5 (RU)": {
+      "en": "Russia Shell Fallback 5 (RU)",
+      "zh": "俄罗斯北极后备 5"
+    },
+    "Russia Shell Fallback 50": {
+      "en": "Russia Shell Fallback 50",
+      "zh": "俄罗斯北极后备 50"
+    },
+    "Russia Shell Fallback 50 (RU)": {
+      "en": "Russia Shell Fallback 50 (RU)",
+      "zh": "俄罗斯北极后备 50"
+    },
+    "Russia Shell Fallback 51": {
+      "en": "Russia Shell Fallback 51",
+      "zh": "俄罗斯北极后备 51"
+    },
+    "Russia Shell Fallback 51 (RU)": {
+      "en": "Russia Shell Fallback 51 (RU)",
+      "zh": "俄罗斯北极后备 51"
+    },
+    "Russia Shell Fallback 52": {
+      "en": "Russia Shell Fallback 52",
+      "zh": "俄罗斯北极后备 52"
+    },
+    "Russia Shell Fallback 52 (RU)": {
+      "en": "Russia Shell Fallback 52 (RU)",
+      "zh": "俄罗斯北极后备 52"
+    },
+    "Russia Shell Fallback 53": {
+      "en": "Russia Shell Fallback 53",
+      "zh": "俄罗斯北极后备 53"
+    },
+    "Russia Shell Fallback 53 (RU)": {
+      "en": "Russia Shell Fallback 53 (RU)",
+      "zh": "俄罗斯北极后备 53"
+    },
+    "Russia Shell Fallback 54": {
+      "en": "Russia Shell Fallback 54",
+      "zh": "俄罗斯北极后备 54"
+    },
+    "Russia Shell Fallback 54 (RU)": {
+      "en": "Russia Shell Fallback 54 (RU)",
+      "zh": "俄罗斯北极后备 54"
+    },
+    "Russia Shell Fallback 55": {
+      "en": "Russia Shell Fallback 55",
+      "zh": "俄罗斯北极后备 55"
+    },
+    "Russia Shell Fallback 55 (RU)": {
+      "en": "Russia Shell Fallback 55 (RU)",
+      "zh": "俄罗斯北极后备 55"
+    },
+    "Russia Shell Fallback 56": {
+      "en": "Russia Shell Fallback 56",
+      "zh": "俄罗斯北极后备 56"
+    },
+    "Russia Shell Fallback 56 (RU)": {
+      "en": "Russia Shell Fallback 56 (RU)",
+      "zh": "俄罗斯北极后备 56"
+    },
+    "Russia Shell Fallback 57": {
+      "en": "Russia Shell Fallback 57",
+      "zh": "俄罗斯北极后备 57"
+    },
+    "Russia Shell Fallback 57 (RU)": {
+      "en": "Russia Shell Fallback 57 (RU)",
+      "zh": "俄罗斯北极后备 57"
+    },
+    "Russia Shell Fallback 58": {
+      "en": "Russia Shell Fallback 58",
+      "zh": "俄罗斯北极后备 58"
+    },
+    "Russia Shell Fallback 58 (RU)": {
+      "en": "Russia Shell Fallback 58 (RU)",
+      "zh": "俄罗斯北极后备 58"
+    },
+    "Russia Shell Fallback 59": {
+      "en": "Russia Shell Fallback 59",
+      "zh": "俄罗斯北极后备 59"
+    },
+    "Russia Shell Fallback 59 (RU)": {
+      "en": "Russia Shell Fallback 59 (RU)",
+      "zh": "俄罗斯北极后备 59"
+    },
+    "Russia Shell Fallback 6": {
+      "en": "Russia Shell Fallback 6",
+      "zh": "俄罗斯北极后备 6"
+    },
+    "Russia Shell Fallback 6 (RU)": {
+      "en": "Russia Shell Fallback 6 (RU)",
+      "zh": "俄罗斯北极后备 6"
+    },
+    "Russia Shell Fallback 60": {
+      "en": "Russia Shell Fallback 60",
+      "zh": "俄罗斯北极后备 60"
+    },
+    "Russia Shell Fallback 60 (RU)": {
+      "en": "Russia Shell Fallback 60 (RU)",
+      "zh": "俄罗斯北极后备 60"
+    },
+    "Russia Shell Fallback 61": {
+      "en": "Russia Shell Fallback 61",
+      "zh": "俄罗斯北极后备 61"
+    },
+    "Russia Shell Fallback 61 (RU)": {
+      "en": "Russia Shell Fallback 61 (RU)",
+      "zh": "俄罗斯北极后备 61"
+    },
+    "Russia Shell Fallback 62": {
+      "en": "Russia Shell Fallback 62",
+      "zh": "俄罗斯北极后备 62"
+    },
+    "Russia Shell Fallback 62 (RU)": {
+      "en": "Russia Shell Fallback 62 (RU)",
+      "zh": "俄罗斯北极后备 62"
+    },
+    "Russia Shell Fallback 63": {
+      "en": "Russia Shell Fallback 63",
+      "zh": "俄罗斯北极后备 63"
+    },
+    "Russia Shell Fallback 63 (RU)": {
+      "en": "Russia Shell Fallback 63 (RU)",
+      "zh": "俄罗斯北极后备 63"
+    },
+    "Russia Shell Fallback 64": {
+      "en": "Russia Shell Fallback 64",
+      "zh": "俄罗斯北极后备 64"
+    },
+    "Russia Shell Fallback 64 (RU)": {
+      "en": "Russia Shell Fallback 64 (RU)",
+      "zh": "俄罗斯北极后备 64"
+    },
+    "Russia Shell Fallback 65": {
+      "en": "Russia Shell Fallback 65",
+      "zh": "俄罗斯北极后备 65"
+    },
+    "Russia Shell Fallback 65 (RU)": {
+      "en": "Russia Shell Fallback 65 (RU)",
+      "zh": "俄罗斯北极后备 65"
+    },
+    "Russia Shell Fallback 66": {
+      "en": "Russia Shell Fallback 66",
+      "zh": "俄罗斯北极后备 66"
+    },
+    "Russia Shell Fallback 66 (RU)": {
+      "en": "Russia Shell Fallback 66 (RU)",
+      "zh": "俄罗斯北极后备 66"
+    },
+    "Russia Shell Fallback 67": {
+      "en": "Russia Shell Fallback 67",
+      "zh": "俄罗斯北极后备 67"
+    },
+    "Russia Shell Fallback 67 (RU)": {
+      "en": "Russia Shell Fallback 67 (RU)",
+      "zh": "俄罗斯北极后备 67"
+    },
+    "Russia Shell Fallback 68": {
+      "en": "Russia Shell Fallback 68",
+      "zh": "俄罗斯北极后备 68"
+    },
+    "Russia Shell Fallback 68 (RU)": {
+      "en": "Russia Shell Fallback 68 (RU)",
+      "zh": "俄罗斯北极后备 68"
+    },
+    "Russia Shell Fallback 69": {
+      "en": "Russia Shell Fallback 69",
+      "zh": "俄罗斯北极后备 69"
+    },
+    "Russia Shell Fallback 69 (RU)": {
+      "en": "Russia Shell Fallback 69 (RU)",
+      "zh": "俄罗斯北极后备 69"
+    },
+    "Russia Shell Fallback 7": {
+      "en": "Russia Shell Fallback 7",
+      "zh": "俄罗斯北极后备 7"
+    },
+    "Russia Shell Fallback 7 (RU)": {
+      "en": "Russia Shell Fallback 7 (RU)",
+      "zh": "俄罗斯北极后备 7"
+    },
+    "Russia Shell Fallback 70": {
+      "en": "Russia Shell Fallback 70",
+      "zh": "俄罗斯北极后备 70"
+    },
+    "Russia Shell Fallback 70 (RU)": {
+      "en": "Russia Shell Fallback 70 (RU)",
+      "zh": "俄罗斯北极后备 70"
+    },
+    "Russia Shell Fallback 71": {
+      "en": "Russia Shell Fallback 71",
+      "zh": "俄罗斯北极后备 71"
+    },
+    "Russia Shell Fallback 71 (RU)": {
+      "en": "Russia Shell Fallback 71 (RU)",
+      "zh": "俄罗斯北极后备 71"
+    },
+    "Russia Shell Fallback 72": {
+      "en": "Russia Shell Fallback 72",
+      "zh": "俄罗斯北极后备72"
+    },
+    "Russia Shell Fallback 72 (RU)": {
+      "en": "Russia Shell Fallback 72 (RU)",
+      "zh": "俄罗斯北极后备72"
+    },
+    "Russia Shell Fallback 73": {
+      "en": "Russia Shell Fallback 73",
+      "zh": "俄罗斯北极后备 73"
+    },
+    "Russia Shell Fallback 73 (RU)": {
+      "en": "Russia Shell Fallback 73 (RU)",
+      "zh": "俄罗斯北极后备 73"
+    },
+    "Russia Shell Fallback 74": {
+      "en": "Russia Shell Fallback 74",
+      "zh": "俄罗斯北极后备 74"
+    },
+    "Russia Shell Fallback 74 (RU)": {
+      "en": "Russia Shell Fallback 74 (RU)",
+      "zh": "俄罗斯北极后备 74"
+    },
+    "Russia Shell Fallback 75": {
+      "en": "Russia Shell Fallback 75",
+      "zh": "俄罗斯北极后备75"
+    },
+    "Russia Shell Fallback 75 (RU)": {
+      "en": "Russia Shell Fallback 75 (RU)",
+      "zh": "俄罗斯北极后备75"
+    },
+    "Russia Shell Fallback 76": {
+      "en": "Russia Shell Fallback 76",
+      "zh": "俄罗斯北极后备76"
+    },
+    "Russia Shell Fallback 76 (RU)": {
+      "en": "Russia Shell Fallback 76 (RU)",
+      "zh": "俄罗斯北极后备76"
+    },
+    "Russia Shell Fallback 77": {
+      "en": "Russia Shell Fallback 77",
+      "zh": "俄罗斯北极后备77"
+    },
+    "Russia Shell Fallback 77 (RU)": {
+      "en": "Russia Shell Fallback 77 (RU)",
+      "zh": "俄罗斯北极后备77"
+    },
+    "Russia Shell Fallback 78": {
+      "en": "Russia Shell Fallback 78",
+      "zh": "俄罗斯北极后备78"
+    },
+    "Russia Shell Fallback 78 (RU)": {
+      "en": "Russia Shell Fallback 78 (RU)",
+      "zh": "俄罗斯北极后备78"
+    },
+    "Russia Shell Fallback 79": {
+      "en": "Russia Shell Fallback 79",
+      "zh": "俄罗斯北极后备79"
+    },
+    "Russia Shell Fallback 79 (RU)": {
+      "en": "Russia Shell Fallback 79 (RU)",
+      "zh": "俄罗斯北极后备79"
+    },
+    "Russia Shell Fallback 8": {
+      "en": "Russia Shell Fallback 8",
+      "zh": "俄罗斯北极后备 8"
+    },
+    "Russia Shell Fallback 8 (RU)": {
+      "en": "Russia Shell Fallback 8 (RU)",
+      "zh": "俄罗斯北极后备 8"
+    },
+    "Russia Shell Fallback 80": {
+      "en": "Russia Shell Fallback 80",
+      "zh": "俄罗斯北极后备 80"
+    },
+    "Russia Shell Fallback 80 (RU)": {
+      "en": "Russia Shell Fallback 80 (RU)",
+      "zh": "俄罗斯北极后备 80"
+    },
+    "Russia Shell Fallback 81": {
+      "en": "Russia Shell Fallback 81",
+      "zh": "俄罗斯北极后备 81"
+    },
+    "Russia Shell Fallback 81 (RU)": {
+      "en": "Russia Shell Fallback 81 (RU)",
+      "zh": "俄罗斯北极后备 81"
+    },
+    "Russia Shell Fallback 82": {
+      "en": "Russia Shell Fallback 82",
+      "zh": "俄罗斯北极后备 82"
+    },
+    "Russia Shell Fallback 82 (RU)": {
+      "en": "Russia Shell Fallback 82 (RU)",
+      "zh": "俄罗斯北极后备 82"
+    },
+    "Russia Shell Fallback 83": {
+      "en": "Russia Shell Fallback 83",
+      "zh": "俄罗斯北极后备 83"
+    },
+    "Russia Shell Fallback 83 (RU)": {
+      "en": "Russia Shell Fallback 83 (RU)",
+      "zh": "俄罗斯北极后备 83"
+    },
+    "Russia Shell Fallback 84": {
+      "en": "Russia Shell Fallback 84",
+      "zh": "俄罗斯北极后备 84"
+    },
+    "Russia Shell Fallback 84 (RU)": {
+      "en": "Russia Shell Fallback 84 (RU)",
+      "zh": "俄罗斯北极后备 84"
+    },
+    "Russia Shell Fallback 85": {
+      "en": "Russia Shell Fallback 85",
+      "zh": "俄罗斯北极后备 85"
+    },
+    "Russia Shell Fallback 85 (RU)": {
+      "en": "Russia Shell Fallback 85 (RU)",
+      "zh": "俄罗斯北极后备 85"
+    },
+    "Russia Shell Fallback 86": {
+      "en": "Russia Shell Fallback 86",
+      "zh": "俄罗斯北极后备86"
+    },
+    "Russia Shell Fallback 86 (RU)": {
+      "en": "Russia Shell Fallback 86 (RU)",
+      "zh": "俄罗斯北极后备86"
+    },
+    "Russia Shell Fallback 87": {
+      "en": "Russia Shell Fallback 87",
+      "zh": "俄罗斯北极后备 87"
+    },
+    "Russia Shell Fallback 87 (RU)": {
+      "en": "Russia Shell Fallback 87 (RU)",
+      "zh": "俄罗斯北极后备 87"
+    },
+    "Russia Shell Fallback 88": {
+      "en": "Russia Shell Fallback 88",
+      "zh": "俄罗斯北极后备88"
+    },
+    "Russia Shell Fallback 88 (RU)": {
+      "en": "Russia Shell Fallback 88 (RU)",
+      "zh": "俄罗斯北极后备88"
+    },
+    "Russia Shell Fallback 89": {
+      "en": "Russia Shell Fallback 89",
+      "zh": "俄罗斯北极后备89"
+    },
+    "Russia Shell Fallback 89 (RU)": {
+      "en": "Russia Shell Fallback 89 (RU)",
+      "zh": "俄罗斯北极后备89"
+    },
+    "Russia Shell Fallback 9": {
+      "en": "Russia Shell Fallback 9",
+      "zh": "俄罗斯北极后备 9"
+    },
+    "Russia Shell Fallback 9 (RU)": {
+      "en": "Russia Shell Fallback 9 (RU)",
+      "zh": "俄罗斯北极后备 9"
+    },
+    "Russia Shell Fallback 90": {
+      "en": "Russia Shell Fallback 90",
+      "zh": "俄罗斯北极后备 90"
+    },
+    "Russia Shell Fallback 90 (RU)": {
+      "en": "Russia Shell Fallback 90 (RU)",
+      "zh": "俄罗斯北极后备 90"
+    },
+    "Russia Shell Fallback 91": {
+      "en": "Russia Shell Fallback 91",
+      "zh": "俄罗斯北极后备 91"
+    },
+    "Russia Shell Fallback 91 (RU)": {
+      "en": "Russia Shell Fallback 91 (RU)",
+      "zh": "俄罗斯北极后备 91"
+    },
+    "Russia Shell Fallback 92": {
+      "en": "Russia Shell Fallback 92",
+      "zh": "俄罗斯北极后备 92"
+    },
+    "Russia Shell Fallback 92 (RU)": {
+      "en": "Russia Shell Fallback 92 (RU)",
+      "zh": "俄罗斯北极后备 92"
+    },
+    "Russia Shell Fallback 93": {
+      "en": "Russia Shell Fallback 93",
+      "zh": "俄罗斯北极后备 93"
+    },
+    "Russia Shell Fallback 93 (RU)": {
+      "en": "Russia Shell Fallback 93 (RU)",
+      "zh": "俄罗斯北极后备 93"
+    },
+    "Russia Shell Fallback 94": {
+      "en": "Russia Shell Fallback 94",
+      "zh": "俄罗斯北极后备 94"
+    },
+    "Russia Shell Fallback 94 (RU)": {
+      "en": "Russia Shell Fallback 94 (RU)",
+      "zh": "俄罗斯北极后备 94"
+    },
+    "Russia Shell Fallback 95": {
+      "en": "Russia Shell Fallback 95",
+      "zh": "俄罗斯北极后备 95"
+    },
+    "Russia Shell Fallback 95 (RU)": {
+      "en": "Russia Shell Fallback 95 (RU)",
+      "zh": "俄罗斯北极后备 95"
+    },
+    "Russia Shell Fallback 96": {
+      "en": "Russia Shell Fallback 96",
+      "zh": "俄罗斯北极后备 96"
+    },
+    "Russia Shell Fallback 96 (RU)": {
+      "en": "Russia Shell Fallback 96 (RU)",
+      "zh": "俄罗斯北极后备 96"
+    },
+    "Russia Shell Fallback 97": {
+      "en": "Russia Shell Fallback 97",
+      "zh": "俄罗斯北极后备 97"
+    },
+    "Russia Shell Fallback 97 (RU)": {
+      "en": "Russia Shell Fallback 97 (RU)",
+      "zh": "俄罗斯北极后备 97"
+    },
+    "Russia Shell Fallback 98": {
+      "en": "Russia Shell Fallback 98",
+      "zh": "俄罗斯北极后备 98"
+    },
+    "Russia Shell Fallback 98 (RU)": {
+      "en": "Russia Shell Fallback 98 (RU)",
+      "zh": "俄罗斯北极后备 98"
+    },
+    "Russia Shell Fallback 99": {
+      "en": "Russia Shell Fallback 99",
+      "zh": "俄罗斯北极后备99"
+    },
+    "Russia Shell Fallback 99 (RU)": {
+      "en": "Russia Shell Fallback 99 (RU)",
+      "zh": "俄罗斯北极后备99"
+    },
     "Russia Special Region": {
       "en": "Russia Special Region",
       "zh": "俄罗斯特区"
@@ -75157,6 +78433,18 @@
     "South Jeolla (KR)": {
       "en": "South Jeolla (KR)",
       "zh": "全罗南道"
+    },
+    "South Jutland (Remainder)": {
+      "en": "South Jutland (Remainder)",
+      "zh": "South Jutland (Remainder)"
+    },
+    "South Jutland (Remainder) (DK)": {
+      "en": "South Jutland (Remainder) (DK)",
+      "zh": "South Jutland (Remainder) (DK)"
+    },
+    "South Jutland (Remainder) [Sydjylland]": {
+      "en": "South Jutland (Remainder) [Sydjylland]",
+      "zh": "South Jutland (Remainder) [Sydjylland]"
     },
     "South Kalimantan": {
       "en": "South Kalimantan",
@@ -88645,6 +91933,10 @@
     "Xijixian (CN)": {
       "en": "Xijixian (CN)",
       "zh": "西吉县"
+    },
+    "Xikang Clique": {
+      "en": "Xikang Clique",
+      "zh": "Xikang Clique"
     },
     "Xilinhaote": {
       "en": "Xilinhaote",
@@ -109350,6 +112642,14 @@
       "en": "Nordjylland",
       "zh": "北日德兰半岛"
     },
+    "id::DK_HIST_NORTH_SCHLESWIG": {
+      "en": "North Schleswig",
+      "zh": "North Schleswig"
+    },
+    "id::DK_SJY_REMAINDER": {
+      "en": "South Jutland (Remainder)",
+      "zh": "South Jutland (Remainder)"
+    },
     "id::DO": {
       "en": "id::DO",
       "zh": "多明尼加共和国"
@@ -123199,592 +126499,1560 @@
       "zh": "堪察加半岛"
     },
     "id::RU_ARCTIC_FB_001": {
-      "en": "Russia Arctic Fallback 1",
+      "en": "Russia Shell Fallback 1",
       "zh": "俄罗斯北极后备 1"
     },
     "id::RU_ARCTIC_FB_002": {
-      "en": "Russia Arctic Fallback 2",
+      "en": "Russia Shell Fallback 2",
       "zh": "俄罗斯北极后备2"
     },
     "id::RU_ARCTIC_FB_003": {
-      "en": "Russia Arctic Fallback 3",
+      "en": "Russia Shell Fallback 3",
       "zh": "俄罗斯北极后备3"
     },
     "id::RU_ARCTIC_FB_004": {
-      "en": "Russia Arctic Fallback 4",
+      "en": "Russia Shell Fallback 4",
       "zh": "俄罗斯北极后备4"
     },
     "id::RU_ARCTIC_FB_005": {
-      "en": "Russia Arctic Fallback 5",
+      "en": "Russia Shell Fallback 5",
       "zh": "俄罗斯北极后备 5"
     },
     "id::RU_ARCTIC_FB_006": {
-      "en": "Russia Arctic Fallback 6",
+      "en": "Russia Shell Fallback 6",
       "zh": "俄罗斯北极后备 6"
     },
     "id::RU_ARCTIC_FB_007": {
-      "en": "Russia Arctic Fallback 7",
+      "en": "Russia Shell Fallback 7",
       "zh": "俄罗斯北极后备 7"
     },
     "id::RU_ARCTIC_FB_008": {
-      "en": "Russia Arctic Fallback 8",
+      "en": "Russia Shell Fallback 8",
       "zh": "俄罗斯北极后备 8"
     },
     "id::RU_ARCTIC_FB_009": {
-      "en": "Russia Arctic Fallback 9",
+      "en": "Russia Shell Fallback 9",
       "zh": "俄罗斯北极后备 9"
     },
     "id::RU_ARCTIC_FB_010": {
-      "en": "Russia Arctic Fallback 10",
+      "en": "Russia Shell Fallback 10",
       "zh": "俄罗斯北极后备 10"
     },
     "id::RU_ARCTIC_FB_011": {
-      "en": "Russia Arctic Fallback 11",
+      "en": "Russia Shell Fallback 11",
       "zh": "俄罗斯北极后备 11"
     },
     "id::RU_ARCTIC_FB_012": {
-      "en": "Russia Arctic Fallback 12",
+      "en": "Russia Shell Fallback 12",
       "zh": "俄罗斯北极后备 12"
     },
     "id::RU_ARCTIC_FB_013": {
-      "en": "Russia Arctic Fallback 13",
+      "en": "Russia Shell Fallback 13",
       "zh": "俄罗斯北极后备 13"
     },
     "id::RU_ARCTIC_FB_014": {
-      "en": "Russia Arctic Fallback 14",
+      "en": "Russia Shell Fallback 14",
       "zh": "俄罗斯北极后备 14"
     },
     "id::RU_ARCTIC_FB_015": {
-      "en": "Russia Arctic Fallback 15",
+      "en": "Russia Shell Fallback 15",
       "zh": "俄罗斯北极后备 15"
     },
     "id::RU_ARCTIC_FB_016": {
-      "en": "Russia Arctic Fallback 16",
+      "en": "Russia Shell Fallback 16",
       "zh": "俄罗斯北极后备 16"
     },
     "id::RU_ARCTIC_FB_017": {
-      "en": "Russia Arctic Fallback 17",
+      "en": "Russia Shell Fallback 17",
       "zh": "俄罗斯北极后备 17"
     },
     "id::RU_ARCTIC_FB_018": {
-      "en": "Russia Arctic Fallback 18",
+      "en": "Russia Shell Fallback 18",
       "zh": "俄罗斯北极后备 18"
     },
     "id::RU_ARCTIC_FB_019": {
-      "en": "Russia Arctic Fallback 19",
+      "en": "Russia Shell Fallback 19",
       "zh": "俄罗斯北极后备 19"
     },
     "id::RU_ARCTIC_FB_020": {
-      "en": "Russia Arctic Fallback 20",
+      "en": "Russia Shell Fallback 20",
       "zh": "俄罗斯北极后备 20"
     },
     "id::RU_ARCTIC_FB_021": {
-      "en": "Russia Arctic Fallback 21",
+      "en": "Russia Shell Fallback 21",
       "zh": "俄罗斯北极后备 21"
     },
     "id::RU_ARCTIC_FB_022": {
-      "en": "Russia Arctic Fallback 22",
+      "en": "Russia Shell Fallback 22",
       "zh": "俄罗斯北极后备 22"
     },
     "id::RU_ARCTIC_FB_023": {
-      "en": "Russia Arctic Fallback 23",
+      "en": "Russia Shell Fallback 23",
       "zh": "俄罗斯北极后备 23"
     },
     "id::RU_ARCTIC_FB_024": {
-      "en": "Russia Arctic Fallback 24",
+      "en": "Russia Shell Fallback 24",
       "zh": "俄罗斯北极后备 24"
     },
     "id::RU_ARCTIC_FB_025": {
-      "en": "Russia Arctic Fallback 25",
+      "en": "Russia Shell Fallback 25",
       "zh": "俄罗斯北极后备 25"
     },
     "id::RU_ARCTIC_FB_026": {
-      "en": "Russia Arctic Fallback 26",
+      "en": "Russia Shell Fallback 26",
       "zh": "俄罗斯北极后备 26"
     },
     "id::RU_ARCTIC_FB_027": {
-      "en": "Russia Arctic Fallback 27",
+      "en": "Russia Shell Fallback 27",
       "zh": "俄罗斯北极后备 27"
     },
     "id::RU_ARCTIC_FB_028": {
-      "en": "Russia Arctic Fallback 28",
+      "en": "Russia Shell Fallback 28",
       "zh": "俄罗斯北极后备 28"
     },
     "id::RU_ARCTIC_FB_029": {
-      "en": "Russia Arctic Fallback 29",
+      "en": "Russia Shell Fallback 29",
       "zh": "俄罗斯北极后备 29"
     },
     "id::RU_ARCTIC_FB_030": {
-      "en": "Russia Arctic Fallback 30",
+      "en": "Russia Shell Fallback 30",
       "zh": "俄罗斯北极后备 30"
     },
     "id::RU_ARCTIC_FB_031": {
-      "en": "Russia Arctic Fallback 31",
+      "en": "Russia Shell Fallback 31",
       "zh": "俄罗斯北极后备 31"
     },
     "id::RU_ARCTIC_FB_032": {
-      "en": "Russia Arctic Fallback 32",
+      "en": "Russia Shell Fallback 32",
       "zh": "俄罗斯北极后备 32"
     },
     "id::RU_ARCTIC_FB_033": {
-      "en": "Russia Arctic Fallback 33",
+      "en": "Russia Shell Fallback 33",
       "zh": "俄罗斯北极后备 33"
     },
     "id::RU_ARCTIC_FB_034": {
-      "en": "Russia Arctic Fallback 34",
+      "en": "Russia Shell Fallback 34",
       "zh": "俄罗斯北极后备 34"
     },
     "id::RU_ARCTIC_FB_035": {
-      "en": "Russia Arctic Fallback 35",
+      "en": "Russia Shell Fallback 35",
       "zh": "俄罗斯北极后备 35"
     },
     "id::RU_ARCTIC_FB_036": {
-      "en": "Russia Arctic Fallback 36",
+      "en": "Russia Shell Fallback 36",
       "zh": "俄罗斯北极后备 36"
     },
     "id::RU_ARCTIC_FB_037": {
-      "en": "Russia Arctic Fallback 37",
+      "en": "Russia Shell Fallback 37",
       "zh": "俄罗斯北极后备 37"
     },
     "id::RU_ARCTIC_FB_038": {
-      "en": "Russia Arctic Fallback 38",
+      "en": "Russia Shell Fallback 38",
       "zh": "俄罗斯北极后备 38"
     },
     "id::RU_ARCTIC_FB_039": {
-      "en": "Russia Arctic Fallback 39",
+      "en": "Russia Shell Fallback 39",
       "zh": "俄罗斯北极后备 39"
     },
     "id::RU_ARCTIC_FB_040": {
-      "en": "Russia Arctic Fallback 40",
+      "en": "Russia Shell Fallback 40",
       "zh": "俄罗斯北极后备 40"
     },
     "id::RU_ARCTIC_FB_041": {
-      "en": "Russia Arctic Fallback 41",
+      "en": "Russia Shell Fallback 41",
       "zh": "俄罗斯北极后备 41"
     },
     "id::RU_ARCTIC_FB_042": {
-      "en": "Russia Arctic Fallback 42",
+      "en": "Russia Shell Fallback 42",
       "zh": "俄罗斯北极后备 42"
     },
     "id::RU_ARCTIC_FB_043": {
-      "en": "Russia Arctic Fallback 43",
+      "en": "Russia Shell Fallback 43",
       "zh": "俄罗斯北极后备 43"
     },
     "id::RU_ARCTIC_FB_044": {
-      "en": "Russia Arctic Fallback 44",
+      "en": "Russia Shell Fallback 44",
       "zh": "俄罗斯北极后备 44"
     },
     "id::RU_ARCTIC_FB_045": {
-      "en": "Russia Arctic Fallback 45",
+      "en": "Russia Shell Fallback 45",
       "zh": "俄罗斯北极后备 45"
     },
     "id::RU_ARCTIC_FB_046": {
-      "en": "Russia Arctic Fallback 46",
+      "en": "Russia Shell Fallback 46",
       "zh": "俄罗斯北极后备 46"
     },
     "id::RU_ARCTIC_FB_047": {
-      "en": "Russia Arctic Fallback 47",
+      "en": "Russia Shell Fallback 47",
       "zh": "俄罗斯北极后备 47"
     },
     "id::RU_ARCTIC_FB_048": {
-      "en": "Russia Arctic Fallback 48",
+      "en": "Russia Shell Fallback 48",
       "zh": "俄罗斯北极后备 48"
     },
     "id::RU_ARCTIC_FB_049": {
-      "en": "Russia Arctic Fallback 49",
+      "en": "Russia Shell Fallback 49",
       "zh": "俄罗斯北极后备 49"
     },
     "id::RU_ARCTIC_FB_050": {
-      "en": "Russia Arctic Fallback 50",
+      "en": "Russia Shell Fallback 50",
       "zh": "俄罗斯北极后备 50"
     },
     "id::RU_ARCTIC_FB_051": {
-      "en": "Russia Arctic Fallback 51",
+      "en": "Russia Shell Fallback 51",
       "zh": "俄罗斯北极后备 51"
     },
     "id::RU_ARCTIC_FB_052": {
-      "en": "Russia Arctic Fallback 52",
+      "en": "Russia Shell Fallback 52",
       "zh": "俄罗斯北极后备 52"
     },
     "id::RU_ARCTIC_FB_053": {
-      "en": "Russia Arctic Fallback 53",
+      "en": "Russia Shell Fallback 53",
       "zh": "俄罗斯北极后备 53"
     },
     "id::RU_ARCTIC_FB_054": {
-      "en": "Russia Arctic Fallback 54",
+      "en": "Russia Shell Fallback 54",
       "zh": "俄罗斯北极后备 54"
     },
     "id::RU_ARCTIC_FB_055": {
-      "en": "Russia Arctic Fallback 55",
+      "en": "Russia Shell Fallback 55",
       "zh": "俄罗斯北极后备 55"
     },
     "id::RU_ARCTIC_FB_056": {
-      "en": "Russia Arctic Fallback 56",
+      "en": "Russia Shell Fallback 56",
       "zh": "俄罗斯北极后备 56"
     },
     "id::RU_ARCTIC_FB_057": {
-      "en": "Russia Arctic Fallback 57",
+      "en": "Russia Shell Fallback 57",
       "zh": "俄罗斯北极后备 57"
     },
     "id::RU_ARCTIC_FB_058": {
-      "en": "Russia Arctic Fallback 58",
+      "en": "Russia Shell Fallback 58",
       "zh": "俄罗斯北极后备 58"
     },
     "id::RU_ARCTIC_FB_059": {
-      "en": "Russia Arctic Fallback 59",
+      "en": "Russia Shell Fallback 59",
       "zh": "俄罗斯北极后备 59"
     },
     "id::RU_ARCTIC_FB_060": {
-      "en": "Russia Arctic Fallback 60",
+      "en": "Russia Shell Fallback 60",
       "zh": "俄罗斯北极后备 60"
     },
     "id::RU_ARCTIC_FB_061": {
-      "en": "Russia Arctic Fallback 61",
+      "en": "Russia Shell Fallback 61",
       "zh": "俄罗斯北极后备 61"
     },
     "id::RU_ARCTIC_FB_062": {
-      "en": "Russia Arctic Fallback 62",
+      "en": "Russia Shell Fallback 62",
       "zh": "俄罗斯北极后备 62"
     },
     "id::RU_ARCTIC_FB_063": {
-      "en": "Russia Arctic Fallback 63",
+      "en": "Russia Shell Fallback 63",
       "zh": "俄罗斯北极后备 63"
     },
     "id::RU_ARCTIC_FB_064": {
-      "en": "Russia Arctic Fallback 64",
+      "en": "Russia Shell Fallback 64",
       "zh": "俄罗斯北极后备 64"
     },
     "id::RU_ARCTIC_FB_065": {
-      "en": "Russia Arctic Fallback 65",
+      "en": "Russia Shell Fallback 65",
       "zh": "俄罗斯北极后备 65"
     },
     "id::RU_ARCTIC_FB_066": {
-      "en": "Russia Arctic Fallback 66",
+      "en": "Russia Shell Fallback 66",
       "zh": "俄罗斯北极后备 66"
     },
     "id::RU_ARCTIC_FB_067": {
-      "en": "Russia Arctic Fallback 67",
+      "en": "Russia Shell Fallback 67",
       "zh": "俄罗斯北极后备 67"
     },
     "id::RU_ARCTIC_FB_068": {
-      "en": "Russia Arctic Fallback 68",
+      "en": "Russia Shell Fallback 68",
       "zh": "俄罗斯北极后备 68"
     },
     "id::RU_ARCTIC_FB_069": {
-      "en": "Russia Arctic Fallback 69",
+      "en": "Russia Shell Fallback 69",
       "zh": "俄罗斯北极后备 69"
     },
     "id::RU_ARCTIC_FB_070": {
-      "en": "Russia Arctic Fallback 70",
+      "en": "Russia Shell Fallback 70",
       "zh": "俄罗斯北极后备 70"
     },
     "id::RU_ARCTIC_FB_071": {
-      "en": "Russia Arctic Fallback 71",
+      "en": "Russia Shell Fallback 71",
       "zh": "俄罗斯北极后备 71"
     },
     "id::RU_ARCTIC_FB_072": {
-      "en": "Russia Arctic Fallback 72",
+      "en": "Russia Shell Fallback 72",
       "zh": "俄罗斯北极后备72"
     },
     "id::RU_ARCTIC_FB_073": {
-      "en": "Russia Arctic Fallback 73",
+      "en": "Russia Shell Fallback 73",
       "zh": "俄罗斯北极后备 73"
     },
     "id::RU_ARCTIC_FB_074": {
-      "en": "Russia Arctic Fallback 74",
+      "en": "Russia Shell Fallback 74",
       "zh": "俄罗斯北极后备 74"
     },
     "id::RU_ARCTIC_FB_075": {
-      "en": "Russia Arctic Fallback 75",
+      "en": "Russia Shell Fallback 75",
       "zh": "俄罗斯北极后备75"
     },
     "id::RU_ARCTIC_FB_076": {
-      "en": "Russia Arctic Fallback 76",
+      "en": "Russia Shell Fallback 76",
       "zh": "俄罗斯北极后备76"
     },
     "id::RU_ARCTIC_FB_077": {
-      "en": "Russia Arctic Fallback 77",
+      "en": "Russia Shell Fallback 77",
       "zh": "俄罗斯北极后备77"
     },
     "id::RU_ARCTIC_FB_078": {
-      "en": "Russia Arctic Fallback 78",
+      "en": "Russia Shell Fallback 78",
       "zh": "俄罗斯北极后备78"
     },
     "id::RU_ARCTIC_FB_079": {
-      "en": "Russia Arctic Fallback 79",
+      "en": "Russia Shell Fallback 79",
       "zh": "俄罗斯北极后备79"
     },
     "id::RU_ARCTIC_FB_080": {
-      "en": "Russia Arctic Fallback 80",
+      "en": "Russia Shell Fallback 80",
       "zh": "俄罗斯北极后备 80"
     },
     "id::RU_ARCTIC_FB_081": {
-      "en": "Russia Arctic Fallback 81",
+      "en": "Russia Shell Fallback 81",
       "zh": "俄罗斯北极后备 81"
     },
     "id::RU_ARCTIC_FB_082": {
-      "en": "Russia Arctic Fallback 82",
+      "en": "Russia Shell Fallback 82",
       "zh": "俄罗斯北极后备 82"
     },
     "id::RU_ARCTIC_FB_083": {
-      "en": "Russia Arctic Fallback 83",
+      "en": "Russia Shell Fallback 83",
       "zh": "俄罗斯北极后备 83"
     },
     "id::RU_ARCTIC_FB_084": {
-      "en": "Russia Arctic Fallback 84",
+      "en": "Russia Shell Fallback 84",
       "zh": "俄罗斯北极后备 84"
     },
     "id::RU_ARCTIC_FB_085": {
-      "en": "Russia Arctic Fallback 85",
+      "en": "Russia Shell Fallback 85",
       "zh": "俄罗斯北极后备 85"
     },
     "id::RU_ARCTIC_FB_086": {
-      "en": "Russia Arctic Fallback 86",
+      "en": "Russia Shell Fallback 86",
       "zh": "俄罗斯北极后备86"
     },
     "id::RU_ARCTIC_FB_087": {
-      "en": "Russia Arctic Fallback 87",
+      "en": "Russia Shell Fallback 87",
       "zh": "俄罗斯北极后备 87"
     },
     "id::RU_ARCTIC_FB_088": {
-      "en": "Russia Arctic Fallback 88",
+      "en": "Russia Shell Fallback 88",
       "zh": "俄罗斯北极后备88"
     },
     "id::RU_ARCTIC_FB_089": {
-      "en": "Russia Arctic Fallback 89",
+      "en": "Russia Shell Fallback 89",
       "zh": "俄罗斯北极后备89"
     },
     "id::RU_ARCTIC_FB_090": {
-      "en": "Russia Arctic Fallback 90",
+      "en": "Russia Shell Fallback 90",
       "zh": "俄罗斯北极后备 90"
     },
     "id::RU_ARCTIC_FB_091": {
-      "en": "Russia Arctic Fallback 91",
+      "en": "Russia Shell Fallback 91",
       "zh": "俄罗斯北极后备 91"
     },
     "id::RU_ARCTIC_FB_092": {
-      "en": "Russia Arctic Fallback 92",
+      "en": "Russia Shell Fallback 92",
       "zh": "俄罗斯北极后备 92"
     },
     "id::RU_ARCTIC_FB_093": {
-      "en": "Russia Arctic Fallback 93",
+      "en": "Russia Shell Fallback 93",
       "zh": "俄罗斯北极后备 93"
     },
     "id::RU_ARCTIC_FB_094": {
-      "en": "Russia Arctic Fallback 94",
+      "en": "Russia Shell Fallback 94",
       "zh": "俄罗斯北极后备 94"
     },
     "id::RU_ARCTIC_FB_095": {
-      "en": "Russia Arctic Fallback 95",
+      "en": "Russia Shell Fallback 95",
       "zh": "俄罗斯北极后备 95"
     },
     "id::RU_ARCTIC_FB_096": {
-      "en": "Russia Arctic Fallback 96",
+      "en": "Russia Shell Fallback 96",
       "zh": "俄罗斯北极后备 96"
     },
     "id::RU_ARCTIC_FB_097": {
-      "en": "Russia Arctic Fallback 97",
+      "en": "Russia Shell Fallback 97",
       "zh": "俄罗斯北极后备 97"
     },
     "id::RU_ARCTIC_FB_098": {
-      "en": "Russia Arctic Fallback 98",
+      "en": "Russia Shell Fallback 98",
       "zh": "俄罗斯北极后备 98"
     },
     "id::RU_ARCTIC_FB_099": {
-      "en": "Russia Arctic Fallback 99",
+      "en": "Russia Shell Fallback 99",
       "zh": "俄罗斯北极后备99"
     },
     "id::RU_ARCTIC_FB_100": {
-      "en": "Russia Arctic Fallback 100",
+      "en": "Russia Shell Fallback 100",
       "zh": "俄罗斯北极后备 100"
     },
     "id::RU_ARCTIC_FB_101": {
-      "en": "Russia Arctic Fallback 101",
+      "en": "Russia Shell Fallback 101",
       "zh": "俄罗斯北极后备101"
     },
     "id::RU_ARCTIC_FB_102": {
-      "en": "Russia Arctic Fallback 102",
+      "en": "Russia Shell Fallback 102",
       "zh": "俄罗斯北极后备102"
     },
     "id::RU_ARCTIC_FB_103": {
-      "en": "Russia Arctic Fallback 103",
+      "en": "Russia Shell Fallback 103",
       "zh": "俄罗斯北极后备103"
     },
     "id::RU_ARCTIC_FB_104": {
-      "en": "Russia Arctic Fallback 104",
+      "en": "Russia Shell Fallback 104",
       "zh": "俄罗斯北极后备104"
     },
     "id::RU_ARCTIC_FB_105": {
-      "en": "Russia Arctic Fallback 105",
+      "en": "Russia Shell Fallback 105",
       "zh": "俄罗斯北极后备105"
     },
     "id::RU_ARCTIC_FB_106": {
-      "en": "Russia Arctic Fallback 106",
+      "en": "Russia Shell Fallback 106",
       "zh": "俄罗斯北极后备106"
     },
     "id::RU_ARCTIC_FB_107": {
-      "en": "Russia Arctic Fallback 107",
+      "en": "Russia Shell Fallback 107",
       "zh": "俄罗斯北极后备107"
     },
     "id::RU_ARCTIC_FB_108": {
-      "en": "Russia Arctic Fallback 108",
+      "en": "Russia Shell Fallback 108",
       "zh": "俄罗斯北极后备108"
     },
     "id::RU_ARCTIC_FB_109": {
-      "en": "Russia Arctic Fallback 109",
+      "en": "Russia Shell Fallback 109",
       "zh": "俄罗斯北极后备109"
     },
     "id::RU_ARCTIC_FB_110": {
-      "en": "Russia Arctic Fallback 110",
+      "en": "Russia Shell Fallback 110",
       "zh": "俄罗斯北极后备110"
     },
     "id::RU_ARCTIC_FB_111": {
-      "en": "Russia Arctic Fallback 111",
+      "en": "Russia Shell Fallback 111",
       "zh": "俄罗斯北极后备111"
     },
     "id::RU_ARCTIC_FB_112": {
-      "en": "Russia Arctic Fallback 112",
+      "en": "Russia Shell Fallback 112",
       "zh": "俄罗斯北极后备112"
     },
     "id::RU_ARCTIC_FB_113": {
-      "en": "Russia Arctic Fallback 113",
+      "en": "Russia Shell Fallback 113",
       "zh": "俄罗斯北极后备 113"
     },
     "id::RU_ARCTIC_FB_114": {
-      "en": "Russia Arctic Fallback 114",
+      "en": "Russia Shell Fallback 114",
       "zh": "俄罗斯北极后备114"
     },
     "id::RU_ARCTIC_FB_115": {
-      "en": "Russia Arctic Fallback 115",
+      "en": "Russia Shell Fallback 115",
       "zh": "俄罗斯北极后备115"
     },
     "id::RU_ARCTIC_FB_116": {
-      "en": "Russia Arctic Fallback 116",
+      "en": "Russia Shell Fallback 116",
       "zh": "俄罗斯北极后备116"
     },
     "id::RU_ARCTIC_FB_117": {
-      "en": "Russia Arctic Fallback 117",
+      "en": "Russia Shell Fallback 117",
       "zh": "俄罗斯北极后备 117"
     },
     "id::RU_ARCTIC_FB_118": {
-      "en": "Russia Arctic Fallback 118",
+      "en": "Russia Shell Fallback 118",
       "zh": "俄罗斯北极后备 118"
     },
     "id::RU_ARCTIC_FB_119": {
-      "en": "Russia Arctic Fallback 119",
+      "en": "Russia Shell Fallback 119",
       "zh": "俄罗斯北极后备119"
     },
     "id::RU_ARCTIC_FB_120": {
-      "en": "Russia Arctic Fallback 120",
+      "en": "Russia Shell Fallback 120",
       "zh": "俄罗斯北极后备 120"
     },
     "id::RU_ARCTIC_FB_121": {
-      "en": "Russia Arctic Fallback 121",
+      "en": "Russia Shell Fallback 121",
       "zh": "俄罗斯北极后备121"
     },
     "id::RU_ARCTIC_FB_122": {
-      "en": "Russia Arctic Fallback 122",
+      "en": "Russia Shell Fallback 122",
       "zh": "俄罗斯北极后备 122"
     },
     "id::RU_ARCTIC_FB_123": {
-      "en": "Russia Arctic Fallback 123",
+      "en": "Russia Shell Fallback 123",
       "zh": "俄罗斯北极后备 123"
     },
     "id::RU_ARCTIC_FB_124": {
-      "en": "Russia Arctic Fallback 124",
+      "en": "Russia Shell Fallback 124",
       "zh": "俄罗斯北极后备 124"
     },
     "id::RU_ARCTIC_FB_125": {
-      "en": "Russia Arctic Fallback 125",
+      "en": "Russia Shell Fallback 125",
       "zh": "俄罗斯北极后备 125"
     },
     "id::RU_ARCTIC_FB_126": {
-      "en": "Russia Arctic Fallback 126",
+      "en": "Russia Shell Fallback 126",
       "zh": "俄罗斯北极后备 126"
     },
     "id::RU_ARCTIC_FB_127": {
-      "en": "Russia Arctic Fallback 127",
+      "en": "Russia Shell Fallback 127",
       "zh": "俄罗斯北极后备 127"
     },
     "id::RU_ARCTIC_FB_128": {
-      "en": "Russia Arctic Fallback 128",
+      "en": "Russia Shell Fallback 128",
       "zh": "俄罗斯北极后备 128"
     },
     "id::RU_ARCTIC_FB_129": {
-      "en": "Russia Arctic Fallback 129",
+      "en": "Russia Shell Fallback 129",
       "zh": "俄罗斯北极后备 129"
     },
     "id::RU_ARCTIC_FB_130": {
-      "en": "Russia Arctic Fallback 130",
+      "en": "Russia Shell Fallback 130",
       "zh": "俄罗斯北极后备 130"
     },
     "id::RU_ARCTIC_FB_131": {
-      "en": "Russia Arctic Fallback 131",
+      "en": "Russia Shell Fallback 131",
       "zh": "俄罗斯北极后备 131"
     },
     "id::RU_ARCTIC_FB_132": {
-      "en": "Russia Arctic Fallback 132",
+      "en": "Russia Shell Fallback 132",
       "zh": "俄罗斯北极后备 132"
     },
     "id::RU_ARCTIC_FB_133": {
-      "en": "Russia Arctic Fallback 133",
+      "en": "Russia Shell Fallback 133",
       "zh": "俄罗斯北极后备 133"
     },
     "id::RU_ARCTIC_FB_134": {
-      "en": "Russia Arctic Fallback 134",
+      "en": "Russia Shell Fallback 134",
       "zh": "俄罗斯北极后备 134"
     },
     "id::RU_ARCTIC_FB_135": {
-      "en": "Russia Arctic Fallback 135",
+      "en": "Russia Shell Fallback 135",
       "zh": "俄罗斯北极后备 135"
     },
     "id::RU_ARCTIC_FB_136": {
-      "en": "Russia Arctic Fallback 136",
+      "en": "Russia Shell Fallback 136",
       "zh": "俄罗斯北极后备 136"
     },
     "id::RU_ARCTIC_FB_137": {
-      "en": "Russia Arctic Fallback 137",
+      "en": "Russia Shell Fallback 137",
       "zh": "俄罗斯北极后备 137"
     },
     "id::RU_ARCTIC_FB_138": {
-      "en": "Russia Arctic Fallback 138",
+      "en": "Russia Shell Fallback 138",
       "zh": "俄罗斯北极后备 138"
     },
     "id::RU_ARCTIC_FB_139": {
-      "en": "Russia Arctic Fallback 139",
+      "en": "Russia Shell Fallback 139",
       "zh": "俄罗斯北极后备 139"
     },
     "id::RU_ARCTIC_FB_140": {
-      "en": "Russia Arctic Fallback 140",
+      "en": "Russia Shell Fallback 140",
       "zh": "俄罗斯北极后备 140"
     },
     "id::RU_ARCTIC_FB_141": {
-      "en": "Russia Arctic Fallback 141",
+      "en": "Russia Shell Fallback 141",
       "zh": "俄罗斯北极后备 141"
     },
     "id::RU_ARCTIC_FB_142": {
-      "en": "Russia Arctic Fallback 142",
+      "en": "Russia Shell Fallback 142",
       "zh": "俄罗斯北极后备 142"
     },
     "id::RU_ARCTIC_FB_143": {
-      "en": "Russia Arctic Fallback 143",
+      "en": "Russia Shell Fallback 143",
       "zh": "俄罗斯北极后备 143"
     },
     "id::RU_ARCTIC_FB_144": {
-      "en": "Russia Arctic Fallback 144",
+      "en": "Russia Shell Fallback 144",
       "zh": "俄罗斯北极后备 144"
     },
     "id::RU_ARCTIC_FB_145": {
-      "en": "Russia Arctic Fallback 145",
+      "en": "Russia Shell Fallback 145",
       "zh": "俄罗斯北极后备 145"
     },
     "id::RU_ARCTIC_FB_146": {
-      "en": "Russia Arctic Fallback 146",
+      "en": "Russia Shell Fallback 146",
       "zh": "俄罗斯北极后备 146"
     },
     "id::RU_ARCTIC_FB_147": {
-      "en": "Russia Arctic Fallback 147",
+      "en": "Russia Shell Fallback 147",
       "zh": "俄罗斯北极后备 147"
+    },
+    "id::RU_ARCTIC_FB_148": {
+      "en": "Russia Shell Fallback 148",
+      "zh": "Russia Shell Fallback 148"
+    },
+    "id::RU_ARCTIC_FB_149": {
+      "en": "Russia Shell Fallback 149",
+      "zh": "Russia Shell Fallback 149"
+    },
+    "id::RU_ARCTIC_FB_150": {
+      "en": "Russia Shell Fallback 150",
+      "zh": "Russia Shell Fallback 150"
+    },
+    "id::RU_ARCTIC_FB_151": {
+      "en": "Russia Shell Fallback 151",
+      "zh": "Russia Shell Fallback 151"
+    },
+    "id::RU_ARCTIC_FB_152": {
+      "en": "Russia Shell Fallback 152",
+      "zh": "Russia Shell Fallback 152"
+    },
+    "id::RU_ARCTIC_FB_153": {
+      "en": "Russia Shell Fallback 153",
+      "zh": "Russia Shell Fallback 153"
+    },
+    "id::RU_ARCTIC_FB_154": {
+      "en": "Russia Shell Fallback 154",
+      "zh": "Russia Shell Fallback 154"
+    },
+    "id::RU_ARCTIC_FB_155": {
+      "en": "Russia Shell Fallback 155",
+      "zh": "Russia Shell Fallback 155"
+    },
+    "id::RU_ARCTIC_FB_156": {
+      "en": "Russia Shell Fallback 156",
+      "zh": "Russia Shell Fallback 156"
+    },
+    "id::RU_ARCTIC_FB_157": {
+      "en": "Russia Shell Fallback 157",
+      "zh": "Russia Shell Fallback 157"
+    },
+    "id::RU_ARCTIC_FB_158": {
+      "en": "Russia Shell Fallback 158",
+      "zh": "Russia Shell Fallback 158"
+    },
+    "id::RU_ARCTIC_FB_159": {
+      "en": "Russia Shell Fallback 159",
+      "zh": "Russia Shell Fallback 159"
+    },
+    "id::RU_ARCTIC_FB_160": {
+      "en": "Russia Shell Fallback 160",
+      "zh": "Russia Shell Fallback 160"
+    },
+    "id::RU_ARCTIC_FB_161": {
+      "en": "Russia Shell Fallback 161",
+      "zh": "Russia Shell Fallback 161"
+    },
+    "id::RU_ARCTIC_FB_162": {
+      "en": "Russia Shell Fallback 162",
+      "zh": "Russia Shell Fallback 162"
+    },
+    "id::RU_ARCTIC_FB_163": {
+      "en": "Russia Shell Fallback 163",
+      "zh": "Russia Shell Fallback 163"
+    },
+    "id::RU_ARCTIC_FB_164": {
+      "en": "Russia Shell Fallback 164",
+      "zh": "Russia Shell Fallback 164"
+    },
+    "id::RU_ARCTIC_FB_165": {
+      "en": "Russia Shell Fallback 165",
+      "zh": "Russia Shell Fallback 165"
+    },
+    "id::RU_ARCTIC_FB_166": {
+      "en": "Russia Shell Fallback 166",
+      "zh": "Russia Shell Fallback 166"
+    },
+    "id::RU_ARCTIC_FB_167": {
+      "en": "Russia Shell Fallback 167",
+      "zh": "Russia Shell Fallback 167"
+    },
+    "id::RU_ARCTIC_FB_168": {
+      "en": "Russia Shell Fallback 168",
+      "zh": "Russia Shell Fallback 168"
+    },
+    "id::RU_ARCTIC_FB_169": {
+      "en": "Russia Shell Fallback 169",
+      "zh": "Russia Shell Fallback 169"
+    },
+    "id::RU_ARCTIC_FB_170": {
+      "en": "Russia Shell Fallback 170",
+      "zh": "Russia Shell Fallback 170"
+    },
+    "id::RU_ARCTIC_FB_171": {
+      "en": "Russia Shell Fallback 171",
+      "zh": "Russia Shell Fallback 171"
+    },
+    "id::RU_ARCTIC_FB_172": {
+      "en": "Russia Shell Fallback 172",
+      "zh": "Russia Shell Fallback 172"
+    },
+    "id::RU_ARCTIC_FB_173": {
+      "en": "Russia Shell Fallback 173",
+      "zh": "Russia Shell Fallback 173"
+    },
+    "id::RU_ARCTIC_FB_174": {
+      "en": "Russia Shell Fallback 174",
+      "zh": "Russia Shell Fallback 174"
+    },
+    "id::RU_ARCTIC_FB_175": {
+      "en": "Russia Shell Fallback 175",
+      "zh": "Russia Shell Fallback 175"
+    },
+    "id::RU_ARCTIC_FB_176": {
+      "en": "Russia Shell Fallback 176",
+      "zh": "Russia Shell Fallback 176"
+    },
+    "id::RU_ARCTIC_FB_177": {
+      "en": "Russia Shell Fallback 177",
+      "zh": "Russia Shell Fallback 177"
+    },
+    "id::RU_ARCTIC_FB_178": {
+      "en": "Russia Shell Fallback 178",
+      "zh": "Russia Shell Fallback 178"
+    },
+    "id::RU_ARCTIC_FB_179": {
+      "en": "Russia Shell Fallback 179",
+      "zh": "Russia Shell Fallback 179"
+    },
+    "id::RU_ARCTIC_FB_180": {
+      "en": "Russia Shell Fallback 180",
+      "zh": "Russia Shell Fallback 180"
+    },
+    "id::RU_ARCTIC_FB_181": {
+      "en": "Russia Shell Fallback 181",
+      "zh": "Russia Shell Fallback 181"
+    },
+    "id::RU_ARCTIC_FB_182": {
+      "en": "Russia Shell Fallback 182",
+      "zh": "Russia Shell Fallback 182"
+    },
+    "id::RU_ARCTIC_FB_183": {
+      "en": "Russia Shell Fallback 183",
+      "zh": "Russia Shell Fallback 183"
+    },
+    "id::RU_ARCTIC_FB_184": {
+      "en": "Russia Shell Fallback 184",
+      "zh": "Russia Shell Fallback 184"
+    },
+    "id::RU_ARCTIC_FB_185": {
+      "en": "Russia Shell Fallback 185",
+      "zh": "Russia Shell Fallback 185"
+    },
+    "id::RU_ARCTIC_FB_186": {
+      "en": "Russia Shell Fallback 186",
+      "zh": "Russia Shell Fallback 186"
+    },
+    "id::RU_ARCTIC_FB_187": {
+      "en": "Russia Shell Fallback 187",
+      "zh": "Russia Shell Fallback 187"
+    },
+    "id::RU_ARCTIC_FB_188": {
+      "en": "Russia Shell Fallback 188",
+      "zh": "Russia Shell Fallback 188"
+    },
+    "id::RU_ARCTIC_FB_189": {
+      "en": "Russia Shell Fallback 189",
+      "zh": "Russia Shell Fallback 189"
+    },
+    "id::RU_ARCTIC_FB_190": {
+      "en": "Russia Shell Fallback 190",
+      "zh": "Russia Shell Fallback 190"
+    },
+    "id::RU_ARCTIC_FB_191": {
+      "en": "Russia Shell Fallback 191",
+      "zh": "Russia Shell Fallback 191"
+    },
+    "id::RU_ARCTIC_FB_192": {
+      "en": "Russia Shell Fallback 192",
+      "zh": "Russia Shell Fallback 192"
+    },
+    "id::RU_ARCTIC_FB_193": {
+      "en": "Russia Shell Fallback 193",
+      "zh": "Russia Shell Fallback 193"
+    },
+    "id::RU_ARCTIC_FB_194": {
+      "en": "Russia Shell Fallback 194",
+      "zh": "Russia Shell Fallback 194"
+    },
+    "id::RU_ARCTIC_FB_195": {
+      "en": "Russia Shell Fallback 195",
+      "zh": "Russia Shell Fallback 195"
+    },
+    "id::RU_ARCTIC_FB_196": {
+      "en": "Russia Shell Fallback 196",
+      "zh": "Russia Shell Fallback 196"
+    },
+    "id::RU_ARCTIC_FB_197": {
+      "en": "Russia Shell Fallback 197",
+      "zh": "Russia Shell Fallback 197"
+    },
+    "id::RU_ARCTIC_FB_198": {
+      "en": "Russia Shell Fallback 198",
+      "zh": "Russia Shell Fallback 198"
+    },
+    "id::RU_ARCTIC_FB_199": {
+      "en": "Russia Shell Fallback 199",
+      "zh": "Russia Shell Fallback 199"
+    },
+    "id::RU_ARCTIC_FB_200": {
+      "en": "Russia Shell Fallback 200",
+      "zh": "Russia Shell Fallback 200"
+    },
+    "id::RU_ARCTIC_FB_201": {
+      "en": "Russia Shell Fallback 201",
+      "zh": "Russia Shell Fallback 201"
+    },
+    "id::RU_ARCTIC_FB_202": {
+      "en": "Russia Shell Fallback 202",
+      "zh": "Russia Shell Fallback 202"
+    },
+    "id::RU_ARCTIC_FB_203": {
+      "en": "Russia Shell Fallback 203",
+      "zh": "Russia Shell Fallback 203"
+    },
+    "id::RU_ARCTIC_FB_204": {
+      "en": "Russia Shell Fallback 204",
+      "zh": "Russia Shell Fallback 204"
+    },
+    "id::RU_ARCTIC_FB_205": {
+      "en": "Russia Shell Fallback 205",
+      "zh": "Russia Shell Fallback 205"
+    },
+    "id::RU_ARCTIC_FB_206": {
+      "en": "Russia Shell Fallback 206",
+      "zh": "Russia Shell Fallback 206"
+    },
+    "id::RU_ARCTIC_FB_207": {
+      "en": "Russia Shell Fallback 207",
+      "zh": "Russia Shell Fallback 207"
+    },
+    "id::RU_ARCTIC_FB_208": {
+      "en": "Russia Shell Fallback 208",
+      "zh": "Russia Shell Fallback 208"
+    },
+    "id::RU_ARCTIC_FB_209": {
+      "en": "Russia Shell Fallback 209",
+      "zh": "Russia Shell Fallback 209"
+    },
+    "id::RU_ARCTIC_FB_210": {
+      "en": "Russia Shell Fallback 210",
+      "zh": "Russia Shell Fallback 210"
+    },
+    "id::RU_ARCTIC_FB_211": {
+      "en": "Russia Shell Fallback 211",
+      "zh": "Russia Shell Fallback 211"
+    },
+    "id::RU_ARCTIC_FB_212": {
+      "en": "Russia Shell Fallback 212",
+      "zh": "Russia Shell Fallback 212"
+    },
+    "id::RU_ARCTIC_FB_213": {
+      "en": "Russia Shell Fallback 213",
+      "zh": "Russia Shell Fallback 213"
+    },
+    "id::RU_ARCTIC_FB_214": {
+      "en": "Russia Shell Fallback 214",
+      "zh": "Russia Shell Fallback 214"
+    },
+    "id::RU_ARCTIC_FB_215": {
+      "en": "Russia Shell Fallback 215",
+      "zh": "Russia Shell Fallback 215"
+    },
+    "id::RU_ARCTIC_FB_216": {
+      "en": "Russia Shell Fallback 216",
+      "zh": "Russia Shell Fallback 216"
+    },
+    "id::RU_ARCTIC_FB_217": {
+      "en": "Russia Shell Fallback 217",
+      "zh": "Russia Shell Fallback 217"
+    },
+    "id::RU_ARCTIC_FB_218": {
+      "en": "Russia Shell Fallback 218",
+      "zh": "Russia Shell Fallback 218"
+    },
+    "id::RU_ARCTIC_FB_219": {
+      "en": "Russia Shell Fallback 219",
+      "zh": "Russia Shell Fallback 219"
+    },
+    "id::RU_ARCTIC_FB_220": {
+      "en": "Russia Shell Fallback 220",
+      "zh": "Russia Shell Fallback 220"
+    },
+    "id::RU_ARCTIC_FB_221": {
+      "en": "Russia Shell Fallback 221",
+      "zh": "Russia Shell Fallback 221"
+    },
+    "id::RU_ARCTIC_FB_222": {
+      "en": "Russia Shell Fallback 222",
+      "zh": "Russia Shell Fallback 222"
+    },
+    "id::RU_ARCTIC_FB_223": {
+      "en": "Russia Shell Fallback 223",
+      "zh": "Russia Shell Fallback 223"
+    },
+    "id::RU_ARCTIC_FB_224": {
+      "en": "Russia Shell Fallback 224",
+      "zh": "Russia Shell Fallback 224"
+    },
+    "id::RU_ARCTIC_FB_225": {
+      "en": "Russia Shell Fallback 225",
+      "zh": "Russia Shell Fallback 225"
+    },
+    "id::RU_ARCTIC_FB_226": {
+      "en": "Russia Shell Fallback 226",
+      "zh": "Russia Shell Fallback 226"
+    },
+    "id::RU_ARCTIC_FB_227": {
+      "en": "Russia Shell Fallback 227",
+      "zh": "Russia Shell Fallback 227"
+    },
+    "id::RU_ARCTIC_FB_228": {
+      "en": "Russia Shell Fallback 228",
+      "zh": "Russia Shell Fallback 228"
+    },
+    "id::RU_ARCTIC_FB_229": {
+      "en": "Russia Shell Fallback 229",
+      "zh": "Russia Shell Fallback 229"
+    },
+    "id::RU_ARCTIC_FB_230": {
+      "en": "Russia Shell Fallback 230",
+      "zh": "Russia Shell Fallback 230"
+    },
+    "id::RU_ARCTIC_FB_231": {
+      "en": "Russia Shell Fallback 231",
+      "zh": "Russia Shell Fallback 231"
+    },
+    "id::RU_ARCTIC_FB_232": {
+      "en": "Russia Shell Fallback 232",
+      "zh": "Russia Shell Fallback 232"
+    },
+    "id::RU_ARCTIC_FB_233": {
+      "en": "Russia Shell Fallback 233",
+      "zh": "Russia Shell Fallback 233"
+    },
+    "id::RU_ARCTIC_FB_234": {
+      "en": "Russia Shell Fallback 234",
+      "zh": "Russia Shell Fallback 234"
+    },
+    "id::RU_ARCTIC_FB_235": {
+      "en": "Russia Shell Fallback 235",
+      "zh": "Russia Shell Fallback 235"
+    },
+    "id::RU_ARCTIC_FB_236": {
+      "en": "Russia Shell Fallback 236",
+      "zh": "Russia Shell Fallback 236"
+    },
+    "id::RU_ARCTIC_FB_237": {
+      "en": "Russia Shell Fallback 237",
+      "zh": "Russia Shell Fallback 237"
+    },
+    "id::RU_ARCTIC_FB_238": {
+      "en": "Russia Shell Fallback 238",
+      "zh": "Russia Shell Fallback 238"
+    },
+    "id::RU_ARCTIC_FB_239": {
+      "en": "Russia Shell Fallback 239",
+      "zh": "Russia Shell Fallback 239"
+    },
+    "id::RU_ARCTIC_FB_240": {
+      "en": "Russia Shell Fallback 240",
+      "zh": "Russia Shell Fallback 240"
+    },
+    "id::RU_ARCTIC_FB_241": {
+      "en": "Russia Shell Fallback 241",
+      "zh": "Russia Shell Fallback 241"
+    },
+    "id::RU_ARCTIC_FB_242": {
+      "en": "Russia Shell Fallback 242",
+      "zh": "Russia Shell Fallback 242"
+    },
+    "id::RU_ARCTIC_FB_243": {
+      "en": "Russia Shell Fallback 243",
+      "zh": "Russia Shell Fallback 243"
+    },
+    "id::RU_ARCTIC_FB_244": {
+      "en": "Russia Shell Fallback 244",
+      "zh": "Russia Shell Fallback 244"
+    },
+    "id::RU_ARCTIC_FB_245": {
+      "en": "Russia Shell Fallback 245",
+      "zh": "Russia Shell Fallback 245"
+    },
+    "id::RU_ARCTIC_FB_246": {
+      "en": "Russia Shell Fallback 246",
+      "zh": "Russia Shell Fallback 246"
+    },
+    "id::RU_ARCTIC_FB_247": {
+      "en": "Russia Shell Fallback 247",
+      "zh": "Russia Shell Fallback 247"
+    },
+    "id::RU_ARCTIC_FB_248": {
+      "en": "Russia Shell Fallback 248",
+      "zh": "Russia Shell Fallback 248"
+    },
+    "id::RU_ARCTIC_FB_249": {
+      "en": "Russia Shell Fallback 249",
+      "zh": "Russia Shell Fallback 249"
+    },
+    "id::RU_ARCTIC_FB_250": {
+      "en": "Russia Shell Fallback 250",
+      "zh": "Russia Shell Fallback 250"
+    },
+    "id::RU_ARCTIC_FB_251": {
+      "en": "Russia Shell Fallback 251",
+      "zh": "Russia Shell Fallback 251"
+    },
+    "id::RU_ARCTIC_FB_252": {
+      "en": "Russia Shell Fallback 252",
+      "zh": "Russia Shell Fallback 252"
+    },
+    "id::RU_ARCTIC_FB_253": {
+      "en": "Russia Shell Fallback 253",
+      "zh": "Russia Shell Fallback 253"
+    },
+    "id::RU_ARCTIC_FB_254": {
+      "en": "Russia Shell Fallback 254",
+      "zh": "Russia Shell Fallback 254"
+    },
+    "id::RU_ARCTIC_FB_255": {
+      "en": "Russia Shell Fallback 255",
+      "zh": "Russia Shell Fallback 255"
+    },
+    "id::RU_ARCTIC_FB_256": {
+      "en": "Russia Shell Fallback 256",
+      "zh": "Russia Shell Fallback 256"
+    },
+    "id::RU_ARCTIC_FB_257": {
+      "en": "Russia Shell Fallback 257",
+      "zh": "Russia Shell Fallback 257"
+    },
+    "id::RU_ARCTIC_FB_258": {
+      "en": "Russia Shell Fallback 258",
+      "zh": "Russia Shell Fallback 258"
+    },
+    "id::RU_ARCTIC_FB_259": {
+      "en": "Russia Shell Fallback 259",
+      "zh": "Russia Shell Fallback 259"
+    },
+    "id::RU_ARCTIC_FB_260": {
+      "en": "Russia Shell Fallback 260",
+      "zh": "Russia Shell Fallback 260"
+    },
+    "id::RU_ARCTIC_FB_261": {
+      "en": "Russia Shell Fallback 261",
+      "zh": "Russia Shell Fallback 261"
+    },
+    "id::RU_ARCTIC_FB_262": {
+      "en": "Russia Shell Fallback 262",
+      "zh": "Russia Shell Fallback 262"
+    },
+    "id::RU_ARCTIC_FB_263": {
+      "en": "Russia Shell Fallback 263",
+      "zh": "Russia Shell Fallback 263"
+    },
+    "id::RU_ARCTIC_FB_264": {
+      "en": "Russia Shell Fallback 264",
+      "zh": "Russia Shell Fallback 264"
+    },
+    "id::RU_ARCTIC_FB_265": {
+      "en": "Russia Shell Fallback 265",
+      "zh": "Russia Shell Fallback 265"
+    },
+    "id::RU_ARCTIC_FB_266": {
+      "en": "Russia Shell Fallback 266",
+      "zh": "Russia Shell Fallback 266"
+    },
+    "id::RU_ARCTIC_FB_267": {
+      "en": "Russia Shell Fallback 267",
+      "zh": "Russia Shell Fallback 267"
+    },
+    "id::RU_ARCTIC_FB_268": {
+      "en": "Russia Shell Fallback 268",
+      "zh": "Russia Shell Fallback 268"
+    },
+    "id::RU_ARCTIC_FB_269": {
+      "en": "Russia Shell Fallback 269",
+      "zh": "Russia Shell Fallback 269"
+    },
+    "id::RU_ARCTIC_FB_270": {
+      "en": "Russia Shell Fallback 270",
+      "zh": "Russia Shell Fallback 270"
+    },
+    "id::RU_ARCTIC_FB_271": {
+      "en": "Russia Shell Fallback 271",
+      "zh": "Russia Shell Fallback 271"
+    },
+    "id::RU_ARCTIC_FB_272": {
+      "en": "Russia Shell Fallback 272",
+      "zh": "Russia Shell Fallback 272"
+    },
+    "id::RU_ARCTIC_FB_273": {
+      "en": "Russia Shell Fallback 273",
+      "zh": "Russia Shell Fallback 273"
+    },
+    "id::RU_ARCTIC_FB_274": {
+      "en": "Russia Shell Fallback 274",
+      "zh": "Russia Shell Fallback 274"
+    },
+    "id::RU_ARCTIC_FB_275": {
+      "en": "Russia Shell Fallback 275",
+      "zh": "Russia Shell Fallback 275"
+    },
+    "id::RU_ARCTIC_FB_276": {
+      "en": "Russia Shell Fallback 276",
+      "zh": "Russia Shell Fallback 276"
+    },
+    "id::RU_ARCTIC_FB_277": {
+      "en": "Russia Shell Fallback 277",
+      "zh": "Russia Shell Fallback 277"
+    },
+    "id::RU_ARCTIC_FB_278": {
+      "en": "Russia Shell Fallback 278",
+      "zh": "Russia Shell Fallback 278"
+    },
+    "id::RU_ARCTIC_FB_279": {
+      "en": "Russia Shell Fallback 279",
+      "zh": "Russia Shell Fallback 279"
+    },
+    "id::RU_ARCTIC_FB_280": {
+      "en": "Russia Shell Fallback 280",
+      "zh": "Russia Shell Fallback 280"
+    },
+    "id::RU_ARCTIC_FB_281": {
+      "en": "Russia Shell Fallback 281",
+      "zh": "Russia Shell Fallback 281"
+    },
+    "id::RU_ARCTIC_FB_282": {
+      "en": "Russia Shell Fallback 282",
+      "zh": "Russia Shell Fallback 282"
+    },
+    "id::RU_ARCTIC_FB_283": {
+      "en": "Russia Shell Fallback 283",
+      "zh": "Russia Shell Fallback 283"
+    },
+    "id::RU_ARCTIC_FB_284": {
+      "en": "Russia Shell Fallback 284",
+      "zh": "Russia Shell Fallback 284"
+    },
+    "id::RU_ARCTIC_FB_285": {
+      "en": "Russia Shell Fallback 285",
+      "zh": "Russia Shell Fallback 285"
+    },
+    "id::RU_ARCTIC_FB_286": {
+      "en": "Russia Shell Fallback 286",
+      "zh": "Russia Shell Fallback 286"
+    },
+    "id::RU_ARCTIC_FB_287": {
+      "en": "Russia Shell Fallback 287",
+      "zh": "Russia Shell Fallback 287"
+    },
+    "id::RU_ARCTIC_FB_288": {
+      "en": "Russia Shell Fallback 288",
+      "zh": "Russia Shell Fallback 288"
+    },
+    "id::RU_ARCTIC_FB_289": {
+      "en": "Russia Shell Fallback 289",
+      "zh": "Russia Shell Fallback 289"
+    },
+    "id::RU_ARCTIC_FB_290": {
+      "en": "Russia Shell Fallback 290",
+      "zh": "Russia Shell Fallback 290"
+    },
+    "id::RU_ARCTIC_FB_291": {
+      "en": "Russia Shell Fallback 291",
+      "zh": "Russia Shell Fallback 291"
+    },
+    "id::RU_ARCTIC_FB_292": {
+      "en": "Russia Shell Fallback 292",
+      "zh": "Russia Shell Fallback 292"
+    },
+    "id::RU_ARCTIC_FB_293": {
+      "en": "Russia Shell Fallback 293",
+      "zh": "Russia Shell Fallback 293"
+    },
+    "id::RU_ARCTIC_FB_294": {
+      "en": "Russia Shell Fallback 294",
+      "zh": "Russia Shell Fallback 294"
+    },
+    "id::RU_ARCTIC_FB_295": {
+      "en": "Russia Shell Fallback 295",
+      "zh": "Russia Shell Fallback 295"
+    },
+    "id::RU_ARCTIC_FB_296": {
+      "en": "Russia Shell Fallback 296",
+      "zh": "Russia Shell Fallback 296"
+    },
+    "id::RU_ARCTIC_FB_297": {
+      "en": "Russia Shell Fallback 297",
+      "zh": "Russia Shell Fallback 297"
+    },
+    "id::RU_ARCTIC_FB_298": {
+      "en": "Russia Shell Fallback 298",
+      "zh": "Russia Shell Fallback 298"
+    },
+    "id::RU_ARCTIC_FB_299": {
+      "en": "Russia Shell Fallback 299",
+      "zh": "Russia Shell Fallback 299"
+    },
+    "id::RU_ARCTIC_FB_300": {
+      "en": "Russia Shell Fallback 300",
+      "zh": "Russia Shell Fallback 300"
+    },
+    "id::RU_ARCTIC_FB_301": {
+      "en": "Russia Shell Fallback 301",
+      "zh": "Russia Shell Fallback 301"
+    },
+    "id::RU_ARCTIC_FB_302": {
+      "en": "Russia Shell Fallback 302",
+      "zh": "Russia Shell Fallback 302"
+    },
+    "id::RU_ARCTIC_FB_303": {
+      "en": "Russia Shell Fallback 303",
+      "zh": "Russia Shell Fallback 303"
+    },
+    "id::RU_ARCTIC_FB_304": {
+      "en": "Russia Shell Fallback 304",
+      "zh": "Russia Shell Fallback 304"
+    },
+    "id::RU_ARCTIC_FB_305": {
+      "en": "Russia Shell Fallback 305",
+      "zh": "Russia Shell Fallback 305"
+    },
+    "id::RU_ARCTIC_FB_306": {
+      "en": "Russia Shell Fallback 306",
+      "zh": "Russia Shell Fallback 306"
+    },
+    "id::RU_ARCTIC_FB_307": {
+      "en": "Russia Shell Fallback 307",
+      "zh": "Russia Shell Fallback 307"
+    },
+    "id::RU_ARCTIC_FB_308": {
+      "en": "Russia Shell Fallback 308",
+      "zh": "Russia Shell Fallback 308"
+    },
+    "id::RU_ARCTIC_FB_309": {
+      "en": "Russia Shell Fallback 309",
+      "zh": "Russia Shell Fallback 309"
+    },
+    "id::RU_ARCTIC_FB_310": {
+      "en": "Russia Shell Fallback 310",
+      "zh": "Russia Shell Fallback 310"
+    },
+    "id::RU_ARCTIC_FB_311": {
+      "en": "Russia Shell Fallback 311",
+      "zh": "Russia Shell Fallback 311"
+    },
+    "id::RU_ARCTIC_FB_312": {
+      "en": "Russia Shell Fallback 312",
+      "zh": "Russia Shell Fallback 312"
+    },
+    "id::RU_ARCTIC_FB_313": {
+      "en": "Russia Shell Fallback 313",
+      "zh": "Russia Shell Fallback 313"
+    },
+    "id::RU_ARCTIC_FB_314": {
+      "en": "Russia Shell Fallback 314",
+      "zh": "Russia Shell Fallback 314"
+    },
+    "id::RU_ARCTIC_FB_315": {
+      "en": "Russia Shell Fallback 315",
+      "zh": "Russia Shell Fallback 315"
+    },
+    "id::RU_ARCTIC_FB_316": {
+      "en": "Russia Shell Fallback 316",
+      "zh": "Russia Shell Fallback 316"
+    },
+    "id::RU_ARCTIC_FB_317": {
+      "en": "Russia Shell Fallback 317",
+      "zh": "Russia Shell Fallback 317"
+    },
+    "id::RU_ARCTIC_FB_318": {
+      "en": "Russia Shell Fallback 318",
+      "zh": "Russia Shell Fallback 318"
+    },
+    "id::RU_ARCTIC_FB_319": {
+      "en": "Russia Shell Fallback 319",
+      "zh": "Russia Shell Fallback 319"
+    },
+    "id::RU_ARCTIC_FB_320": {
+      "en": "Russia Shell Fallback 320",
+      "zh": "Russia Shell Fallback 320"
+    },
+    "id::RU_ARCTIC_FB_321": {
+      "en": "Russia Shell Fallback 321",
+      "zh": "Russia Shell Fallback 321"
+    },
+    "id::RU_ARCTIC_FB_322": {
+      "en": "Russia Shell Fallback 322",
+      "zh": "Russia Shell Fallback 322"
+    },
+    "id::RU_ARCTIC_FB_323": {
+      "en": "Russia Shell Fallback 323",
+      "zh": "Russia Shell Fallback 323"
+    },
+    "id::RU_ARCTIC_FB_324": {
+      "en": "Russia Shell Fallback 324",
+      "zh": "Russia Shell Fallback 324"
+    },
+    "id::RU_ARCTIC_FB_325": {
+      "en": "Russia Shell Fallback 325",
+      "zh": "Russia Shell Fallback 325"
+    },
+    "id::RU_ARCTIC_FB_326": {
+      "en": "Russia Shell Fallback 326",
+      "zh": "Russia Shell Fallback 326"
+    },
+    "id::RU_ARCTIC_FB_327": {
+      "en": "Russia Shell Fallback 327",
+      "zh": "Russia Shell Fallback 327"
+    },
+    "id::RU_ARCTIC_FB_328": {
+      "en": "Russia Shell Fallback 328",
+      "zh": "Russia Shell Fallback 328"
+    },
+    "id::RU_ARCTIC_FB_329": {
+      "en": "Russia Shell Fallback 329",
+      "zh": "Russia Shell Fallback 329"
+    },
+    "id::RU_ARCTIC_FB_330": {
+      "en": "Russia Shell Fallback 330",
+      "zh": "Russia Shell Fallback 330"
+    },
+    "id::RU_ARCTIC_FB_331": {
+      "en": "Russia Shell Fallback 331",
+      "zh": "Russia Shell Fallback 331"
+    },
+    "id::RU_ARCTIC_FB_332": {
+      "en": "Russia Shell Fallback 332",
+      "zh": "Russia Shell Fallback 332"
+    },
+    "id::RU_ARCTIC_FB_333": {
+      "en": "Russia Shell Fallback 333",
+      "zh": "Russia Shell Fallback 333"
+    },
+    "id::RU_ARCTIC_FB_334": {
+      "en": "Russia Shell Fallback 334",
+      "zh": "Russia Shell Fallback 334"
+    },
+    "id::RU_ARCTIC_FB_335": {
+      "en": "Russia Shell Fallback 335",
+      "zh": "Russia Shell Fallback 335"
+    },
+    "id::RU_ARCTIC_FB_336": {
+      "en": "Russia Shell Fallback 336",
+      "zh": "Russia Shell Fallback 336"
+    },
+    "id::RU_ARCTIC_FB_337": {
+      "en": "Russia Shell Fallback 337",
+      "zh": "Russia Shell Fallback 337"
+    },
+    "id::RU_ARCTIC_FB_338": {
+      "en": "Russia Shell Fallback 338",
+      "zh": "Russia Shell Fallback 338"
+    },
+    "id::RU_ARCTIC_FB_339": {
+      "en": "Russia Shell Fallback 339",
+      "zh": "Russia Shell Fallback 339"
+    },
+    "id::RU_ARCTIC_FB_340": {
+      "en": "Russia Shell Fallback 340",
+      "zh": "Russia Shell Fallback 340"
+    },
+    "id::RU_ARCTIC_FB_341": {
+      "en": "Russia Shell Fallback 341",
+      "zh": "Russia Shell Fallback 341"
+    },
+    "id::RU_ARCTIC_FB_342": {
+      "en": "Russia Shell Fallback 342",
+      "zh": "Russia Shell Fallback 342"
+    },
+    "id::RU_ARCTIC_FB_343": {
+      "en": "Russia Shell Fallback 343",
+      "zh": "Russia Shell Fallback 343"
+    },
+    "id::RU_ARCTIC_FB_344": {
+      "en": "Russia Shell Fallback 344",
+      "zh": "Russia Shell Fallback 344"
+    },
+    "id::RU_ARCTIC_FB_345": {
+      "en": "Russia Shell Fallback 345",
+      "zh": "Russia Shell Fallback 345"
+    },
+    "id::RU_ARCTIC_FB_346": {
+      "en": "Russia Shell Fallback 346",
+      "zh": "Russia Shell Fallback 346"
+    },
+    "id::RU_ARCTIC_FB_347": {
+      "en": "Russia Shell Fallback 347",
+      "zh": "Russia Shell Fallback 347"
+    },
+    "id::RU_ARCTIC_FB_348": {
+      "en": "Russia Shell Fallback 348",
+      "zh": "Russia Shell Fallback 348"
+    },
+    "id::RU_ARCTIC_FB_349": {
+      "en": "Russia Shell Fallback 349",
+      "zh": "Russia Shell Fallback 349"
+    },
+    "id::RU_ARCTIC_FB_350": {
+      "en": "Russia Shell Fallback 350",
+      "zh": "Russia Shell Fallback 350"
+    },
+    "id::RU_ARCTIC_FB_351": {
+      "en": "Russia Shell Fallback 351",
+      "zh": "Russia Shell Fallback 351"
+    },
+    "id::RU_ARCTIC_FB_352": {
+      "en": "Russia Shell Fallback 352",
+      "zh": "Russia Shell Fallback 352"
+    },
+    "id::RU_ARCTIC_FB_353": {
+      "en": "Russia Shell Fallback 353",
+      "zh": "Russia Shell Fallback 353"
+    },
+    "id::RU_ARCTIC_FB_354": {
+      "en": "Russia Shell Fallback 354",
+      "zh": "Russia Shell Fallback 354"
+    },
+    "id::RU_ARCTIC_FB_355": {
+      "en": "Russia Shell Fallback 355",
+      "zh": "Russia Shell Fallback 355"
+    },
+    "id::RU_ARCTIC_FB_356": {
+      "en": "Russia Shell Fallback 356",
+      "zh": "Russia Shell Fallback 356"
+    },
+    "id::RU_ARCTIC_FB_357": {
+      "en": "Russia Shell Fallback 357",
+      "zh": "Russia Shell Fallback 357"
+    },
+    "id::RU_ARCTIC_FB_358": {
+      "en": "Russia Shell Fallback 358",
+      "zh": "Russia Shell Fallback 358"
+    },
+    "id::RU_ARCTIC_FB_359": {
+      "en": "Russia Shell Fallback 359",
+      "zh": "Russia Shell Fallback 359"
+    },
+    "id::RU_ARCTIC_FB_360": {
+      "en": "Russia Shell Fallback 360",
+      "zh": "Russia Shell Fallback 360"
+    },
+    "id::RU_ARCTIC_FB_361": {
+      "en": "Russia Shell Fallback 361",
+      "zh": "Russia Shell Fallback 361"
+    },
+    "id::RU_ARCTIC_FB_362": {
+      "en": "Russia Shell Fallback 362",
+      "zh": "Russia Shell Fallback 362"
+    },
+    "id::RU_ARCTIC_FB_363": {
+      "en": "Russia Shell Fallback 363",
+      "zh": "Russia Shell Fallback 363"
+    },
+    "id::RU_ARCTIC_FB_364": {
+      "en": "Russia Shell Fallback 364",
+      "zh": "Russia Shell Fallback 364"
+    },
+    "id::RU_ARCTIC_FB_365": {
+      "en": "Russia Shell Fallback 365",
+      "zh": "Russia Shell Fallback 365"
+    },
+    "id::RU_ARCTIC_FB_366": {
+      "en": "Russia Shell Fallback 366",
+      "zh": "Russia Shell Fallback 366"
+    },
+    "id::RU_ARCTIC_FB_367": {
+      "en": "Russia Shell Fallback 367",
+      "zh": "Russia Shell Fallback 367"
+    },
+    "id::RU_ARCTIC_FB_368": {
+      "en": "Russia Shell Fallback 368",
+      "zh": "Russia Shell Fallback 368"
+    },
+    "id::RU_ARCTIC_FB_369": {
+      "en": "Russia Shell Fallback 369",
+      "zh": "Russia Shell Fallback 369"
+    },
+    "id::RU_ARCTIC_FB_370": {
+      "en": "Russia Shell Fallback 370",
+      "zh": "Russia Shell Fallback 370"
+    },
+    "id::RU_ARCTIC_FB_371": {
+      "en": "Russia Shell Fallback 371",
+      "zh": "Russia Shell Fallback 371"
+    },
+    "id::RU_ARCTIC_FB_372": {
+      "en": "Russia Shell Fallback 372",
+      "zh": "Russia Shell Fallback 372"
+    },
+    "id::RU_ARCTIC_FB_373": {
+      "en": "Russia Shell Fallback 373",
+      "zh": "Russia Shell Fallback 373"
+    },
+    "id::RU_ARCTIC_FB_374": {
+      "en": "Russia Shell Fallback 374",
+      "zh": "Russia Shell Fallback 374"
+    },
+    "id::RU_ARCTIC_FB_375": {
+      "en": "Russia Shell Fallback 375",
+      "zh": "Russia Shell Fallback 375"
+    },
+    "id::RU_ARCTIC_FB_376": {
+      "en": "Russia Shell Fallback 376",
+      "zh": "Russia Shell Fallback 376"
+    },
+    "id::RU_ARCTIC_FB_377": {
+      "en": "Russia Shell Fallback 377",
+      "zh": "Russia Shell Fallback 377"
+    },
+    "id::RU_ARCTIC_FB_378": {
+      "en": "Russia Shell Fallback 378",
+      "zh": "Russia Shell Fallback 378"
+    },
+    "id::RU_ARCTIC_FB_379": {
+      "en": "Russia Shell Fallback 379",
+      "zh": "Russia Shell Fallback 379"
+    },
+    "id::RU_ARCTIC_FB_380": {
+      "en": "Russia Shell Fallback 380",
+      "zh": "Russia Shell Fallback 380"
+    },
+    "id::RU_ARCTIC_FB_383": {
+      "en": "Russia Shell Fallback 383",
+      "zh": "Russia Shell Fallback 383"
+    },
+    "id::RU_ARCTIC_FB_384": {
+      "en": "Russia Shell Fallback 384",
+      "zh": "Russia Shell Fallback 384"
+    },
+    "id::RU_ARCTIC_FB_385": {
+      "en": "Russia Shell Fallback 385",
+      "zh": "Russia Shell Fallback 385"
+    },
+    "id::RU_ARCTIC_FB_386": {
+      "en": "Russia Shell Fallback 386",
+      "zh": "Russia Shell Fallback 386"
+    },
+    "id::RU_ARCTIC_FB_387": {
+      "en": "Russia Shell Fallback 387",
+      "zh": "Russia Shell Fallback 387"
+    },
+    "id::RU_ARCTIC_FB_388": {
+      "en": "Russia Shell Fallback 388",
+      "zh": "Russia Shell Fallback 388"
+    },
+    "id::RU_ARCTIC_FB_389": {
+      "en": "Russia Shell Fallback 389",
+      "zh": "Russia Shell Fallback 389"
+    },
+    "id::RU_ARCTIC_FB_390": {
+      "en": "Russia Shell Fallback 390",
+      "zh": "Russia Shell Fallback 390"
+    },
+    "id::RU_ARCTIC_FB_391": {
+      "en": "Russia Shell Fallback 391",
+      "zh": "Russia Shell Fallback 391"
     },
     "id::RU_CITY_ARKHANGELSK": {
       "en": "Arkhangelsk",

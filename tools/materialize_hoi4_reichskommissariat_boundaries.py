@@ -23,7 +23,7 @@ EXPLICIT_ONLY_ACTION_IDS = {
     "RKP": {"annexed_poland_to_ger"},
     "RKO": set(),
     "RKU": set(),
-    "RKM": {"greater_finland_to_fin"},
+    "RKM": {"greater_finland_to_fin", "arctic_islands_to_ger"},
 }
 
 

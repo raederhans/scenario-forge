@@ -4,6 +4,7 @@ import {
   countryNames,
   PRESET_STORAGE_KEY,
   defaultCountryPalette,
+  normalizeDayNightStyleConfig,
   normalizePhysicalStyleConfig,
 } from "../core/state.js";
 import { ColorManager } from "../core/color_manager.js";
@@ -16,6 +17,7 @@ import {
   applyScenarioById,
   clearActiveScenario,
   loadScenarioAuditPayload,
+  refreshScenarioShellOverlays,
   setScenarioViewMode,
   validateImportedScenarioBaseline,
 } from "../core/scenario_manager.js";
@@ -130,7 +132,9 @@ function getDynamicCountryEntries() {
           releaseLookupIso2: String(scenarioCountry?.release_lookup_iso2 || "").trim().toUpperCase(),
           scenarioOnly: !!scenarioCountry?.scenario_only,
           releasable: !!scenarioCountry?.releasable || String(scenarioCountry?.entry_kind || "").trim() === "releasable",
+          scenarioSubject: String(scenarioCountry?.entry_kind || "").trim() === "scenario_subject",
           entryKind: String(scenarioCountry?.entry_kind || "").trim(),
+          subjectKind: String(scenarioCountry?.subject_kind || "").trim().toLowerCase(),
           presetLookupCode: String(scenarioCountry?.preset_lookup_code || "").trim().toUpperCase(),
           parentOwnerTag: String(scenarioCountry?.parent_owner_tag || "").trim().toUpperCase(),
           parentOwnerTags: Array.isArray(scenarioCountry?.parent_owner_tags)
@@ -191,7 +195,7 @@ function getDynamicCountryEntries() {
 }
 
 function buildInspectorTopLevelCountryEntries(entries = []) {
-  return (Array.isArray(entries) ? entries : []).filter((entry) => !entry?.releasable);
+  return (Array.isArray(entries) ? entries : []).filter((entry) => !entry?.releasable && !entry?.scenarioSubject);
 }
 
 function ensureCountryPaletteColor(code, fallbackIndex = 0) {
@@ -1137,6 +1141,19 @@ function initSidebar({ render } = {}) {
   const countryInspectorColorInput = document.getElementById("countryInspectorColorInput");
   const countryInspectorOrderingHint = document.getElementById("countryInspectorOrderingHint");
   const countryInspectorSection = document.getElementById("countryInspectorSection");
+  const waterInspectorSection = document.getElementById("waterInspectorSection");
+  const waterSearchInput = document.getElementById("waterRegionSearch");
+  const waterRegionList = document.getElementById("waterRegionList");
+  const waterLegendList = document.getElementById("waterLegendList");
+  const waterInspectorEmpty = document.getElementById("waterInspectorEmpty");
+  const waterInspectorSelected = document.getElementById("waterInspectorSelected");
+  const waterInspectorDetailHint = document.getElementById("waterInspectorDetailHint");
+  const waterInspectorColorRow = document.getElementById("waterInspectorColorRow");
+  const waterInspectorColorLabel = document.getElementById("waterInspectorColorLabel");
+  const waterInspectorColorSwatch = document.getElementById("waterInspectorColorSwatch");
+  const waterInspectorColorValue = document.getElementById("waterInspectorColorValue");
+  const waterInspectorColorInput = document.getElementById("waterInspectorColorInput");
+  const clearWaterRegionColorBtn = document.getElementById("clearWaterRegionColorBtn");
   const selectedCountryActionsSection = document.getElementById("selectedCountryActionsSection");
   const projectLegendSection = document.getElementById("lblProjectLegend")?.closest("details");
   const diagnosticsSection = document.getElementById("lblDiagnostics")?.closest("details");
@@ -1194,6 +1211,7 @@ function initSidebar({ render } = {}) {
   };
   let adaptiveInspectorHeightFrame = 0;
   let countryInspectorColorPickerOpen = false;
+  let waterInspectorColorPickerOpen = false;
 
   const clampInspectorHeight = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
   const toViewportPixels = (vh) => (window.innerHeight * vh) / 100;
@@ -1212,6 +1230,16 @@ function initSidebar({ render } = {}) {
       list,
       toViewportPixels(INSPECTOR_VH_BASELINE.countryList),
       toViewportPixels(INSPECTOR_VH_BASELINE.countryListCap)
+    );
+    applyAdaptiveInspectorHeight(
+      waterRegionList,
+      toViewportPixels(18),
+      toViewportPixels(34)
+    );
+    applyAdaptiveInspectorHeight(
+      waterLegendList,
+      96,
+      220
     );
     applyAdaptiveInspectorHeight(
       presetTree,
@@ -1254,6 +1282,12 @@ function initSidebar({ render } = {}) {
     countryInspectorColorInput.blur();
   };
 
+  const closeWaterInspectorColorPicker = () => {
+    if (!waterInspectorColorInput) return;
+    waterInspectorColorPickerOpen = false;
+    waterInspectorColorInput.blur();
+  };
+
   if (projectFileName && !projectFileName.textContent.trim()) {
     projectFileName.textContent = t("No file selected", "ui");
   }
@@ -1278,6 +1312,7 @@ function initSidebar({ render } = {}) {
   }
 
   let latestCountryStatesByCode = new Map();
+  const waterRowRefsById = new Map();
   const countryRowRefsByCode = new Map();
   const getSearchTerm = () => (searchInput?.value || "").trim().toLowerCase();
   const matchesTerm = (value, term) => String(value || "").toLowerCase().includes(term);
@@ -1324,6 +1359,22 @@ function initSidebar({ render } = {}) {
     return labels.join(", ");
   };
 
+  const getScenarioSubjectKindLabel = (countryState) => {
+    const normalizedKind = String(countryState?.subjectKind || countryState?.subject_kind || "").trim().toLowerCase();
+    if (!normalizedKind) return "";
+    const labels = {
+      raj: t("Raj", "ui"),
+      dominion: t("Dominion", "ui"),
+      mandate: t("Mandate", "ui"),
+      protectorate: t("Protectorate", "ui"),
+      colony: t("Colony", "ui"),
+      commonwealth: t("Commonwealth", "ui"),
+      colonial_government: t("Colonial Government", "ui"),
+      colonial_federation: t("Colonial Federation", "ui"),
+    };
+    return labels[normalizedKind] || normalizedKind.replace(/_/g, " ");
+  };
+
   const buildCountryRowMetaText = (countryState, { showRelationMeta = false } = {}) => {
     const metaBits = [countryState?.subregionDisplayLabel].filter(Boolean);
     if (countryState?.releasable && showRelationMeta) {
@@ -1332,6 +1383,14 @@ function initSidebar({ render } = {}) {
         parentLabel
           ? `${t("Releasable from", "ui")} ${parentLabel}`
           : t("Releasable", "ui")
+      );
+    } else if (countryState?.scenarioSubject && showRelationMeta) {
+      const parentLabel = formatReleasableParentLabel(countryState);
+      const subjectLabel = getScenarioSubjectKindLabel(countryState);
+      metaBits.push(
+        parentLabel
+          ? `${subjectLabel || t("Subject", "ui")} ${t("of", "ui")} ${parentLabel}`
+          : (subjectLabel || t("Subject", "ui"))
       );
     }
     return metaBits.join(" · ");
@@ -1399,7 +1458,9 @@ function initSidebar({ render } = {}) {
       ).trim().toUpperCase(),
       scenarioOnly: !!(scenarioMeta.scenario_only ?? entry.scenarioOnly),
       releasable: !!(scenarioMeta.releasable ?? entry.releasable),
+      scenarioSubject: String(scenarioMeta.entry_kind || entry.entryKind || "").trim() === "scenario_subject",
       entryKind: String(scenarioMeta.entry_kind || entry.entryKind || "").trim(),
+      subjectKind: String(scenarioMeta.subject_kind || entry.subjectKind || "").trim().toLowerCase(),
       parentOwnerTag: String(scenarioMeta.parent_owner_tag || entry.parentOwnerTag || "").trim().toUpperCase(),
       parentOwnerTags: Array.isArray(scenarioMeta.parent_owner_tags)
         ? scenarioMeta.parent_owner_tags.map((value) => String(value || "").trim().toUpperCase()).filter(Boolean)
@@ -1443,6 +1504,29 @@ function initSidebar({ render } = {}) {
     };
   };
 
+  const compareRelatedCountryStates = (a, b) => {
+    const catalogOrderDelta = Number(a?.catalogOrder ?? Number.MAX_SAFE_INTEGER)
+      - Number(b?.catalogOrder ?? Number.MAX_SAFE_INTEGER);
+    if (catalogOrderDelta !== 0) return catalogOrderDelta;
+    const featureDelta = Number(b?.featureCount || 0) - Number(a?.featureCount || 0);
+    if (featureDelta !== 0) return featureDelta;
+    return String(a?.displayName || "").localeCompare(String(b?.displayName || ""));
+  };
+
+  const getScenarioSubjectChildrenForParent = (parentTag) => {
+    const normalizedParent = normalizeCountryCode(parentTag);
+    if (!normalizedParent) return [];
+    return Array.from(latestCountryStatesByCode.values())
+      .filter((countryState) => {
+        if (!countryState?.scenarioSubject || countryState?.releasable) return false;
+        const parentTags = Array.isArray(countryState.parentOwnerTags) && countryState.parentOwnerTags.length
+          ? countryState.parentOwnerTags
+          : (countryState.parentOwnerTag ? [countryState.parentOwnerTag] : []);
+        return parentTags.includes(normalizedParent);
+      })
+      .sort(compareRelatedCountryStates);
+  };
+
   const getReleasableChildrenForParent = (parentTag) => {
     const normalizedParent = normalizeCountryCode(parentTag);
     if (!normalizedParent) return [];
@@ -1452,14 +1536,34 @@ function initSidebar({ render } = {}) {
     return childTags
       .map((childTag) => latestCountryStatesByCode.get(normalizeCountryCode(childTag)))
       .filter(Boolean)
-      .sort((a, b) => {
-        const catalogOrderDelta = Number(a?.catalogOrder ?? Number.MAX_SAFE_INTEGER)
-          - Number(b?.catalogOrder ?? Number.MAX_SAFE_INTEGER);
-        if (catalogOrderDelta !== 0) return catalogOrderDelta;
-        const featureDelta = Number(b?.featureCount || 0) - Number(a?.featureCount || 0);
-        if (featureDelta !== 0) return featureDelta;
-        return String(a?.displayName || "").localeCompare(String(b?.displayName || ""));
+      .sort(compareRelatedCountryStates);
+  };
+
+  const getCountryChildSectionsForParent = (parentTag, { matchedChildCodes = null } = {}) => {
+    const matchSet = matchedChildCodes instanceof Set ? matchedChildCodes : null;
+    const filterMatched = (states) => (
+      matchSet
+        ? states.filter((countryState) => matchSet.has(countryState.code))
+        : states
+    );
+    const sections = [];
+    const scenarioSubjects = filterMatched(getScenarioSubjectChildrenForParent(parentTag));
+    if (scenarioSubjects.length) {
+      sections.push({
+        id: "scenario-subjects",
+        label: t("Subject Governments", "ui"),
+        states: scenarioSubjects,
       });
+    }
+    const releasables = filterMatched(getReleasableChildrenForParent(parentTag));
+    if (releasables.length) {
+      sections.push({
+        id: "releasables",
+        label: t("Releasable Countries", "ui"),
+        states: releasables,
+      });
+    }
+    return sections;
   };
 
   const getResolvedCountryColor = (countryState) => {
@@ -2038,6 +2142,10 @@ function initSidebar({ render } = {}) {
         });
       }
       applyScenarioAutoCompanionActions(countryState);
+      refreshScenarioShellOverlays({
+        renderNow: false,
+        borderReason: `scenario-shells:core-apply:${countryState.code}`,
+      });
     } else {
       const resolvedColor = getResolvedCountryColor(latestCountryStatesByCode.get(countryState.code) || countryState);
       const result = applyPresetWithMode(presetRef.presetLookupCode, presetRef.presetIndex, {
@@ -2075,7 +2183,7 @@ function initSidebar({ render } = {}) {
   const applyScenarioCompanionAction = (
     countryState,
     action,
-    { silent = false, suppressRenderList = false } = {}
+    { silent = false, suppressRenderList = false, recomputeShells = true } = {}
   ) => {
     if (!countryState?.releasable || !action) return false;
     const targetOwnerCode = normalizeCountryCode(action.target_owner_tag);
@@ -2125,6 +2233,12 @@ function initSidebar({ render } = {}) {
         duration: 2800,
       });
     }
+    if (recomputeShells) {
+      refreshScenarioShellOverlays({
+        renderNow: false,
+        borderReason: `scenario-shells:companion-action:${countryState.code}:${action.id || "action"}`,
+      });
+    }
     if (!suppressRenderList) {
       renderList();
     }
@@ -2139,6 +2253,7 @@ function initSidebar({ render } = {}) {
       const applied = applyScenarioCompanionAction(countryState, action, {
         silent: true,
         suppressRenderList: true,
+        recomputeShells: false,
       });
       appliedAny = applied || appliedAny;
     });
@@ -2194,12 +2309,22 @@ function initSidebar({ render } = {}) {
     countryState,
     {
       childStates = [],
+      childSections = null,
       forceExpanded = false,
       hideExpandToggle = false,
       showRelationMeta = false,
     } = {}
   ) => {
-    const hasChildren = Array.isArray(childStates) && childStates.length > 0;
+    const normalizedChildSections = Array.isArray(childSections)
+      ? childSections
+      : (Array.isArray(childStates) && childStates.length
+        ? [{ id: "children", label: "", states: childStates }]
+        : []);
+    const childCount = normalizedChildSections.reduce(
+      (sum, section) => sum + (Array.isArray(section?.states) ? section.states.length : 0),
+      0
+    );
+    const hasChildren = childCount > 0;
     const isActiveOwner = state.activeSovereignCode === countryState.code;
     const hasReleasableActivateAction = !!(
       state.activeScenarioId &&
@@ -2240,7 +2365,7 @@ function initSidebar({ render } = {}) {
     if (hasChildren && !hideExpandToggle) {
       const countBadge = document.createElement("span");
       countBadge.className = "country-children-count";
-      countBadge.textContent = String(childStates.length);
+      countBadge.textContent = String(childCount);
       side.appendChild(countBadge);
     }
 
@@ -2257,7 +2382,7 @@ function initSidebar({ render } = {}) {
       toggleBtn.type = "button";
       toggleBtn.className = "country-action-btn";
       toggleBtn.textContent = isExpanded ? "v" : ">";
-      toggleBtn.setAttribute("aria-label", `${childStates.length} ${t("Releasable Countries", "ui")}`);
+      toggleBtn.setAttribute("aria-label", `${childCount} ${t("Related Countries", "ui")}`);
       toggleBtn.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -2318,9 +2443,17 @@ function initSidebar({ render } = {}) {
     if (isExpanded) {
       const childList = document.createElement("div");
       childList.className = "country-children";
-      childStates.forEach((childState) => {
-        renderCountrySelectRow(childList, childState, {
-          showRelationMeta: false,
+      normalizedChildSections.forEach((section) => {
+        if (section?.label) {
+          const sectionLabel = document.createElement("div");
+          sectionLabel.className = "inspector-mini-label";
+          sectionLabel.textContent = section.label;
+          childList.appendChild(sectionLabel);
+        }
+        (Array.isArray(section?.states) ? section.states : []).forEach((childState) => {
+          renderCountrySelectRow(childList, childState, {
+            showRelationMeta: true,
+          });
         });
       });
       wrapper.appendChild(childList);
@@ -2369,7 +2502,7 @@ function initSidebar({ render } = {}) {
         return;
       }
 
-      const parentState = countryState.parentOwnerTag
+      const parentState = (countryState.releasable || countryState.scenarioSubject) && countryState.parentOwnerTag
         ? latestCountryStatesByCode.get(countryState.parentOwnerTag)
         : null;
       if (!parentState) {
@@ -2392,10 +2525,11 @@ function initSidebar({ render } = {}) {
         parentState: group.parentState,
         parentMatched: group.parentMatched,
         parentSearchRank: group.parentSearchRank,
-        childMatches: group.parentState?.releasable
+        childSections: group.parentState?.releasable
           ? []
-          : getReleasableChildrenForParent(group.parentState.code)
-            .filter((childState) => group.matchedChildCodes.has(childState.code)),
+          : getCountryChildSectionsForParent(group.parentState.code, {
+            matchedChildCodes: group.matchedChildCodes,
+          }),
         bestRank: Number.isFinite(group.bestRank) ? group.bestRank : Number.MAX_SAFE_INTEGER,
       }))
       .sort((a, b) => {
@@ -2492,6 +2626,244 @@ function initSidebar({ render } = {}) {
     scheduleAdaptiveInspectorHeights();
   };
 
+  const getWaterSearchTerm = () => (waterSearchInput?.value || "").trim().toLowerCase();
+
+  const getWaterFeatureDisplayName = (feature) => {
+    const rawName =
+      feature?.properties?.label ||
+      feature?.properties?.name ||
+      feature?.properties?.name_en ||
+      feature?.properties?.NAME ||
+      feature?.id ||
+      "Water Region";
+    return t(rawName, "geo") || String(rawName || "").trim() || "Water Region";
+  };
+
+  const getWaterFeatureMeta = (feature) => {
+    const waterType = String(feature?.properties?.water_type || "water_region")
+      .replace(/_/g, " ")
+      .trim();
+    const regionGroup = String(feature?.properties?.region_group || "").replace(/_/g, " ").trim();
+    return [waterType, regionGroup].filter(Boolean).join(" · ");
+  };
+
+  const isOpenOceanWaterFeature = (feature) =>
+    String(feature?.properties?.water_type || "").trim().toLowerCase() === "ocean";
+
+  const isWaterFeatureVisibleInInspector = (feature) => {
+    if (!feature) return false;
+    if (isOpenOceanWaterFeature(feature)) {
+      return !!state.showOpenOceanRegions;
+    }
+    return feature?.properties?.interactive !== false;
+  };
+
+  const getWaterFeatureColor = (featureId) => {
+    const resolvedId = String(featureId || "").trim();
+    return (
+      ColorManager.normalizeHexColor(state.waterRegionOverrides?.[resolvedId]) ||
+      ColorManager.normalizeHexColor(state.styleConfig?.ocean?.fillColor) ||
+      "#aadaff"
+    );
+  };
+
+  const ensureSelectedWaterRegion = () => {
+    const current = String(state.selectedWaterRegionId || "").trim();
+    if (current && state.waterRegionsById?.has(current)) {
+      const feature = state.waterRegionsById.get(current);
+      if (isWaterFeatureVisibleInInspector(feature)) {
+        return current;
+      }
+    }
+    state.selectedWaterRegionId = "";
+    return "";
+  };
+
+  const getVisibleWaterFeatures = () =>
+    Array.from(state.waterRegionsById?.values() || [])
+      .filter((feature) => isWaterFeatureVisibleInInspector(feature))
+      .sort((a, b) => getWaterFeatureDisplayName(a).localeCompare(getWaterFeatureDisplayName(b)));
+
+  const renderWaterLegend = () => {
+    if (!waterLegendList) return;
+    waterLegendList.replaceChildren();
+    const overrideEntries = Object.entries(state.waterRegionOverrides || {})
+      .map(([featureId, color]) => {
+        const feature = state.waterRegionsById?.get(featureId);
+        if (!feature || !isWaterFeatureVisibleInInspector(feature)) return null;
+        return {
+          featureId,
+          feature,
+          color: ColorManager.normalizeHexColor(color) || getWaterFeatureColor(featureId),
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => getWaterFeatureDisplayName(a.feature).localeCompare(getWaterFeatureDisplayName(b.feature)));
+
+    if (!overrideEntries.length) {
+      waterLegendList.appendChild(createEmptyNote(t("Paint water regions to create an override list.", "ui")));
+      return;
+    }
+
+    overrideEntries.forEach(({ featureId, feature, color }) => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "scenario-action-card";
+      row.addEventListener("click", () => {
+        state.selectedWaterRegionId = featureId;
+        if (typeof state.renderWaterRegionListFn === "function") {
+          state.renderWaterRegionListFn();
+        }
+      });
+
+      const copy = document.createElement("div");
+      copy.className = "scenario-action-card-copy";
+
+      const title = document.createElement("div");
+      title.className = "country-row-title";
+      title.textContent = getWaterFeatureDisplayName(feature);
+
+      const meta = document.createElement("div");
+      meta.className = "country-select-meta";
+      meta.textContent = color.toUpperCase();
+
+      copy.appendChild(title);
+      copy.appendChild(meta);
+
+      const actions = document.createElement("div");
+      actions.className = "country-row-actions";
+
+      const swatch = document.createElement("span");
+      swatch.className = "country-select-swatch";
+      swatch.style.backgroundColor = color;
+      actions.appendChild(swatch);
+
+      row.appendChild(copy);
+      row.appendChild(actions);
+      waterLegendList.appendChild(row);
+    });
+  };
+
+  const renderWaterInspectorDetail = () => {
+    if (!waterInspectorEmpty || !waterInspectorSelected) return;
+    const selectedId = ensureSelectedWaterRegion();
+    const feature = selectedId ? state.waterRegionsById?.get(selectedId) : null;
+    const isEmpty = !feature;
+
+    waterInspectorEmpty.classList.toggle("hidden", !isEmpty);
+    waterInspectorSelected.classList.toggle("hidden", isEmpty);
+
+    if (!feature) {
+      if (waterInspectorColorRow) {
+        waterInspectorColorRow.classList.add("hidden");
+      }
+      if (waterInspectorDetailHint) {
+        waterInspectorDetailHint.classList.add("hidden");
+        waterInspectorDetailHint.textContent = "";
+      }
+      if (waterInspectorColorInput) {
+        waterInspectorColorInput.disabled = true;
+      }
+      waterInspectorColorPickerOpen = false;
+      scheduleAdaptiveInspectorHeights();
+      return;
+    }
+
+    const featureColor = getWaterFeatureColor(selectedId);
+    if (waterInspectorDetailHint) {
+      const meta = getWaterFeatureMeta(feature);
+      waterInspectorDetailHint.classList.toggle("hidden", !meta);
+      waterInspectorDetailHint.textContent = meta;
+    }
+    if (waterInspectorColorRow) {
+      waterInspectorColorRow.classList.remove("hidden");
+    }
+    if (waterInspectorColorLabel) {
+      waterInspectorColorLabel.textContent = t("Water Color", "ui");
+    }
+    if (waterInspectorColorSwatch) {
+      waterInspectorColorSwatch.style.backgroundColor = featureColor;
+      waterInspectorColorSwatch.title = `${t("Edit water region color", "ui")}: ${getWaterFeatureDisplayName(feature)} (${featureColor.toUpperCase()})`;
+    }
+    if (waterInspectorColorValue) {
+      waterInspectorColorValue.textContent = featureColor.toUpperCase();
+    }
+    if (waterInspectorColorInput) {
+      waterInspectorColorInput.disabled = false;
+      waterInspectorColorInput.value = featureColor;
+    }
+    scheduleAdaptiveInspectorHeights();
+  };
+
+  const renderWaterRegionList = () => {
+    if (!waterRegionList) return;
+    const term = getWaterSearchTerm();
+    const features = getVisibleWaterFeatures();
+
+    waterRowRefsById.clear();
+    waterRegionList.replaceChildren();
+
+    const filteredFeatures = term
+      ? features.filter((feature) => {
+        const name = getWaterFeatureDisplayName(feature).toLowerCase();
+        const rawId = String(feature?.properties?.id || feature?.id || "").toLowerCase();
+        const meta = getWaterFeatureMeta(feature).toLowerCase();
+        return name.includes(term) || rawId.includes(term) || meta.includes(term);
+      })
+      : features;
+
+    if (!filteredFeatures.length) {
+      waterRegionList.appendChild(createEmptyNote(t("No matching water regions", "ui")));
+      renderWaterInspectorDetail();
+      renderWaterLegend();
+      scheduleAdaptiveInspectorHeights();
+      return;
+    }
+
+    filteredFeatures.forEach((feature) => {
+      const featureId = String(feature?.properties?.id || feature?.id || "").trim();
+      if (!featureId) return;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "inspector-item-btn";
+      button.classList.toggle("is-active", featureId === state.selectedWaterRegionId);
+      button.addEventListener("click", () => {
+        state.selectedWaterRegionId = featureId;
+        renderWaterRegionList();
+      });
+
+      const name = document.createElement("div");
+      name.className = "country-row-title";
+      name.textContent = getWaterFeatureDisplayName(feature);
+
+      const meta = document.createElement("div");
+      meta.className = "country-select-meta";
+      meta.textContent = getWaterFeatureMeta(feature);
+
+      const swatch = document.createElement("span");
+      swatch.className = "country-select-swatch";
+      swatch.style.backgroundColor = getWaterFeatureColor(featureId);
+
+      const actions = document.createElement("div");
+      actions.className = "country-row-actions";
+      actions.appendChild(swatch);
+
+      const copy = document.createElement("div");
+      copy.className = "scenario-action-card-copy";
+      copy.appendChild(name);
+      copy.appendChild(meta);
+
+      button.appendChild(copy);
+      button.appendChild(actions);
+      waterRegionList.appendChild(button);
+      waterRowRefsById.set(featureId, button);
+    });
+
+    renderWaterInspectorDetail();
+    renderWaterLegend();
+    scheduleAdaptiveInspectorHeights();
+  };
+
   const renderCountrySearchResults = (countryStates, term, priorityOrderMap) => {
     const searchGroups = buildInspectorSearchGroups(countryStates, term, priorityOrderMap);
     if (!searchGroups.length) {
@@ -2501,9 +2873,9 @@ function initSidebar({ render } = {}) {
 
     searchGroups.forEach((group) => {
       renderCountrySelectRow(list, group.parentState, {
-        childStates: group.childMatches,
-        forceExpanded: group.childMatches.length > 0,
-        hideExpandToggle: group.childMatches.length > 0,
+        childSections: group.childSections,
+        forceExpanded: group.childSections.some((section) => Array.isArray(section?.states) && section.states.length > 0),
+        hideExpandToggle: group.childSections.some((section) => Array.isArray(section?.states) && section.states.length > 0),
         showRelationMeta: !!group.parentState?.releasable,
       });
     });
@@ -2517,7 +2889,7 @@ function initSidebar({ render } = {}) {
     if (!hasCountryGrouping) {
       countryStates.forEach((countryState) => {
         renderCountrySelectRow(list, countryState, {
-          childStates: getReleasableChildrenForParent(countryState.code),
+          childSections: getCountryChildSectionsForParent(countryState.code),
         });
       });
       return;
@@ -2574,7 +2946,7 @@ function initSidebar({ render } = {}) {
         groupList.className = "country-explorer-list";
         countries.forEach((countryState) => {
           renderCountrySelectRow(groupList, countryState, {
-            childStates: getReleasableChildrenForParent(countryState.code),
+            childSections: getCountryChildSectionsForParent(countryState.code),
           });
         });
         group.appendChild(groupList);
@@ -2730,6 +3102,70 @@ function initSidebar({ render } = {}) {
   }
 
   state.renderCountryListFn = renderList;
+  state.renderWaterRegionListFn = renderWaterRegionList;
+
+  if (waterInspectorColorSwatch && waterInspectorColorInput && !waterInspectorColorSwatch.dataset.bound) {
+    waterInspectorColorSwatch.addEventListener("click", () => {
+      waterInspectorColorPickerOpen = true;
+      waterInspectorColorInput.focus({ preventScroll: true });
+      if (typeof waterInspectorColorInput.showPicker === "function") {
+        waterInspectorColorInput.showPicker();
+      } else {
+        waterInspectorColorInput.click();
+      }
+    });
+    waterInspectorColorSwatch.dataset.bound = "true";
+  }
+
+  if (waterInspectorColorInput && !waterInspectorColorInput.dataset.bound) {
+    waterInspectorColorInput.addEventListener("change", (event) => {
+      const selectedId = ensureSelectedWaterRegion();
+      if (!selectedId) return;
+      const nextColor = ColorManager.normalizeHexColor(event.target.value);
+      const currentColor = getWaterFeatureColor(selectedId);
+      if (!nextColor || nextColor === currentColor) {
+        closeWaterInspectorColorPicker();
+        renderWaterRegionList();
+        return;
+      }
+      const historyBefore = captureHistoryState({ waterRegionIds: [selectedId] });
+      state.waterRegionOverrides[selectedId] = nextColor;
+      pushHistoryEntry({
+        kind: "inspector-water-region-color",
+        before: historyBefore,
+        after: captureHistoryState({ waterRegionIds: [selectedId] }),
+      });
+      markDirty("inspector-water-region-color");
+      if (render) render();
+      closeWaterInspectorColorPicker();
+      renderWaterRegionList();
+    });
+    waterInspectorColorInput.addEventListener("blur", () => {
+      waterInspectorColorPickerOpen = false;
+    });
+    waterInspectorColorInput.dataset.bound = "true";
+  }
+
+  if (clearWaterRegionColorBtn && !clearWaterRegionColorBtn.dataset.bound) {
+    clearWaterRegionColorBtn.addEventListener("click", () => {
+      const selectedId = ensureSelectedWaterRegion();
+      if (!selectedId) return;
+      if (!Object.prototype.hasOwnProperty.call(state.waterRegionOverrides || {}, selectedId)) {
+        return;
+      }
+      const historyBefore = captureHistoryState({ waterRegionIds: [selectedId] });
+      delete state.waterRegionOverrides[selectedId];
+      pushHistoryEntry({
+        kind: "clear-water-region-color",
+        before: historyBefore,
+        after: captureHistoryState({ waterRegionIds: [selectedId] }),
+      });
+      markDirty("clear-water-region-color");
+      if (render) render();
+      renderWaterRegionList();
+    });
+    clearWaterRegionColorBtn.dataset.bound = "true";
+  }
 
   const appendActionSection = (container, titleText) => {
     const section = document.createElement("div");
@@ -2910,11 +3346,11 @@ function initSidebar({ render } = {}) {
     container.appendChild(intro);
   };
 
-  const renderScenarioReleasableList = (container, parentState) => {
-    const children = getReleasableChildrenForParent(parentState?.code);
+  const renderScenarioChildCountryList = (container, parentState, { title, childStates = [] } = {}) => {
+    const children = Array.isArray(childStates) ? childStates : [];
     if (!children.length) return;
 
-    const section = appendActionSection(container, t("Releasable Countries", "ui"));
+    const section = appendActionSection(container, title || t("Related Countries", "ui"));
     children.forEach((childState) => {
       const card = document.createElement("button");
       card.type = "button";
@@ -2932,7 +3368,10 @@ function initSidebar({ render } = {}) {
 
       const meta = document.createElement("div");
       meta.className = "country-select-meta";
-      meta.textContent = `(${childState.code})`;
+      const subjectLabel = childState.scenarioSubject ? getScenarioSubjectKindLabel(childState) : "";
+      meta.textContent = subjectLabel
+        ? `(${childState.code}) · ${subjectLabel}`
+        : `(${childState.code})`;
 
       copy.appendChild(title);
       copy.appendChild(meta);
@@ -2951,7 +3390,17 @@ function initSidebar({ render } = {}) {
   };
 
   const renderScenarioParentActions = (container, countryState) => {
-    renderScenarioReleasableList(container, countryState);
+    if (countryState?.scenarioSubject) {
+      renderScenarioParentReturnAction(container, countryState);
+    }
+    renderScenarioChildCountryList(container, countryState, {
+      title: t("Subject Governments", "ui"),
+      childStates: getScenarioSubjectChildrenForParent(countryState?.code),
+    });
+    renderScenarioChildCountryList(container, countryState, {
+      title: t("Releasable Countries", "ui"),
+      childStates: getReleasableChildrenForParent(countryState?.code),
+    });
 
     const actionGuarded = renderNoActiveGuard(container);
 
@@ -3486,15 +3935,22 @@ function initSidebar({ render } = {}) {
   if (sidebar && !sidebar.dataset.adaptiveInspectorBound) {
     globalThis.addEventListener("resize", scheduleAdaptiveInspectorHeights);
     countryInspectorSection?.addEventListener("toggle", scheduleAdaptiveInspectorHeights);
+    waterInspectorSection?.addEventListener("toggle", scheduleAdaptiveInspectorHeights);
     selectedCountryActionsSection?.addEventListener("toggle", scheduleAdaptiveInspectorHeights);
     sidebar.addEventListener("scroll", () => {
       if (countryInspectorColorPickerOpen) {
         closeCountryInspectorColorPicker();
       }
+      if (waterInspectorColorPickerOpen) {
+        closeWaterInspectorColorPicker();
+      }
     }, { passive: true });
     sidebar.addEventListener("wheel", () => {
       if (countryInspectorColorPickerOpen) {
         closeCountryInspectorColorPicker();
+      }
+      if (waterInspectorColorPickerOpen) {
+        closeWaterInspectorColorPicker();
       }
     }, { passive: true });
     sidebar.dataset.adaptiveInspectorBound = "true";
@@ -3511,6 +3967,13 @@ function initSidebar({ render } = {}) {
       scheduleAdaptiveInspectorHeights();
     });
     searchInput.dataset.bound = "true";
+  }
+
+  if (waterSearchInput && !waterSearchInput.dataset.bound) {
+    waterSearchInput.addEventListener("input", () => {
+      renderWaterRegionList();
+    });
+    waterSearchInput.dataset.bound = "true";
   }
 
   if (resetBtn && !resetBtn.dataset.bound) {
@@ -3622,6 +4085,7 @@ function initSidebar({ render } = {}) {
         state.countryBaseColors = { ...state.sovereignBaseColors };
         state.visualOverrides = data.visualOverrides || data.featureOverrides || {};
         state.featureOverrides = { ...state.visualOverrides };
+        state.waterRegionOverrides = data.waterRegionOverrides || {};
         state.sovereigntyByFeatureId = data.sovereigntyByFeatureId || {};
         state.sovereigntyInitialized = false;
         state.paintMode = data.paintMode || "visual";
@@ -3723,7 +4187,21 @@ function initSidebar({ render } = {}) {
             },
           };
         }
+        if (data.styleConfig?.dayNight && typeof data.styleConfig.dayNight === "object") {
+          state.styleConfig.dayNight = normalizeDayNightStyleConfig({
+            ...(state.styleConfig.dayNight || {}),
+            ...data.styleConfig.dayNight,
+          });
+        }
         if (data.layerVisibility && typeof data.layerVisibility === "object") {
+          state.showWaterRegions =
+            data.layerVisibility.showWaterRegions === undefined
+              ? true
+              : !!data.layerVisibility.showWaterRegions;
+          state.showOpenOceanRegions =
+            data.layerVisibility.showOpenOceanRegions === undefined
+              ? false
+              : !!data.layerVisibility.showOpenOceanRegions;
           state.showUrban = !!data.layerVisibility.showUrban;
           state.showPhysical = !!data.layerVisibility.showPhysical;
           state.showRivers = !!data.layerVisibility.showRivers;
@@ -3756,6 +4234,9 @@ function initSidebar({ render } = {}) {
         if (typeof state.renderCountryListFn === "function") {
           state.renderCountryListFn();
         }
+        if (typeof state.renderWaterRegionListFn === "function") {
+          state.renderWaterRegionListFn();
+        }
         if (typeof state.renderPresetTreeFn === "function") {
           state.renderPresetTreeFn();
         }
@@ -3780,6 +4261,7 @@ function initSidebar({ render } = {}) {
   }
 
   renderList();
+  renderWaterRegionList();
   renderPresetTree();
   refreshLegendEditor();
   renderScenarioAuditPanel();

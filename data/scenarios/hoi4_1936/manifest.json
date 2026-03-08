@@ -66,33 +66,33 @@
     "KHM"
   ],
   "palette_id": "hoi4_vanilla",
-  "baseline_hash": "cac51e5aa0b4cbf0d8961c553128e4b9da5033e0b86f958f1f437ee3e42a547b",
+  "baseline_hash": "b4689a20e69196ae67c8897e62d81b96d1948bbf3e2ed528ad809826b63b0778",
   "countries_url": "data/scenarios/hoi4_1936/countries.json",
   "owners_url": "data/scenarios/hoi4_1936/owners.by_feature.json",
   "controllers_url": "data/scenarios/hoi4_1936/controllers.by_feature.json",
   "cores_url": "data/scenarios/hoi4_1936/cores.by_feature.json",
   "audit_url": "data/scenarios/hoi4_1936/audit.json",
   "summary": {
-    "feature_count": 11584,
-    "owner_count": 96,
-    "controller_count": 96,
+    "feature_count": 11607,
+    "owner_count": 111,
+    "controller_count": 111,
     "quality_counts": {
-      "approx_existing_geometry": 997,
-      "direct_country_copy": 5316,
-      "manual_reviewed": 5271
+      "approx_existing_geometry": 634,
+      "direct_country_copy": 5202,
+      "manual_reviewed": 5771
     },
     "source_counts": {
-      "direct_active_owner": 5316,
+      "direct_active_owner": 5202,
       "fallback_mapped_tag": 18,
-      "manual_rule": 6250
+      "manual_rule": 6387
     },
-    "approximate_count": 997,
-    "manual_reviewed_feature_count": 5271,
+    "approximate_count": 634,
+    "manual_reviewed_feature_count": 5771,
     "geometry_blocker_count": 0,
     "critical_unresolved_count": 0,
     "synthetic_owner_feature_count": 18,
     "synthetic_count": 18,
-    "changed_feature_count": 6268,
+    "changed_feature_count": 6405,
     "failed_region_check_count": 0,
     "topology_blocker_count": 0,
     "scenario_rule_blocker_count": 0,

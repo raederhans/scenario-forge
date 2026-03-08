@@ -158,6 +158,7 @@ def build_topology(
     rivers: gpd.GeoDataFrame,
     output_path,
     special_zones: gpd.GeoDataFrame | None = None,
+    water_regions: gpd.GeoDataFrame | None = None,
     quantization: int = cfg.TOPOLOGY_QUANTIZATION,
 ) -> None:
     print("Building TopoJSON topology...")
@@ -179,6 +180,20 @@ def build_topology(
     def prune_columns(gdf: gpd.GeoDataFrame, layer_name: str) -> gpd.GeoDataFrame:
         if layer_name == "special_zones":
             keep_cols = ["id", "name", "label", "type", "claimants", "cntr_code", "geometry"]
+        elif layer_name == "water_regions":
+            keep_cols = [
+                "id",
+                "name",
+                "label",
+                "water_type",
+                "region_group",
+                "parent_id",
+                "neighbors",
+                "is_chokepoint",
+                "interactive",
+                "source_standard",
+                "geometry",
+            ]
         elif layer_name == "urban":
             keep_cols = [
                 "id",
@@ -244,6 +259,11 @@ def build_topology(
                 "constituent_country",
                 "adm1_name",
                 "detail_tier",
+                "claim_status",
+                "claimants",
+                "partition_scheme",
+                "sector_start_lon",
+                "sector_end_lon",
                 "__source",
                 "geometry",
             ]
@@ -272,22 +292,25 @@ def build_topology(
                 out = out[out.geometry.is_valid]
         return out
 
-    def write_special_zones_geojson(gdf: gpd.GeoDataFrame | None) -> None:
+    def write_layer_geojson(gdf: gpd.GeoDataFrame | None, layer_name: str) -> None:
         if gdf is None or gdf.empty:
             return
         try:
             out_gdf = gdf.to_crs("EPSG:4326").copy()
-            out_gdf = prune_columns(out_gdf, "special_zones")
-            geojson_path = output_path.with_name("special_zones.geojson")
+            out_gdf = prune_columns(out_gdf, layer_name)
+            geojson_path = output_path.with_name(f"{layer_name}.geojson")
             geojson_path.write_text(out_gdf.to_json(drop_id=True), encoding="utf-8")
-            print(f"Special zones GeoJSON saved to {geojson_path}")
+            print(f"{layer_name} GeoJSON saved to {geojson_path}")
         except Exception as exc:
-            print(f"Special zones GeoJSON export skipped: {exc}")
+            print(f"{layer_name} GeoJSON export skipped: {exc}")
 
     candidates = [("political", political)]
     if special_zones is not None:
-        write_special_zones_geojson(special_zones)
+        write_layer_geojson(special_zones, "special_zones")
         candidates.append(("special_zones", special_zones))
+    if water_regions is not None:
+        write_layer_geojson(water_regions, "water_regions")
+        candidates.append(("water_regions", water_regions))
     candidates.extend(
         [
             ("ocean", ocean),

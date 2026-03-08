@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-07T13:31:18-05:00",
+  "createdAt": "2026-03-07T14:30:31-05:00",
   "url": "http://127.0.0.1:18080/?perf_overlay=1",
   "metrics": {
     "defaultForcedFullRedraw": {
@@ -14,13 +14,13 @@
       },
       "lastFrame": {
         "phase": "idle",
-        "totalMs": 1199.800000011921,
+        "totalMs": 1145.300000011921,
         "timings": {
-          "background": 424.69999998807907,
-          "political": 172.19999998807907,
-          "effects": 0,
-          "context": 449.60000002384186,
-          "borders": 59.10000002384186
+          "background": 364.5,
+          "political": 165.0999999642372,
+          "effects": 0.10000002384185791,
+          "context": 455.0999999642372,
+          "borders": 71
         },
         "transform": {
           "x": 0,
@@ -28,22 +28,22 @@
           "k": 1
         }
       },
-      "overlay": "phase=idle total=1199.8ms\naction=- 0.0ms\ntransform=0.000|0.000|1.0000|628|688|1.00\npasses background=424.7ms, political=172.2ms, effects=0.0ms, context=449.6ms, borders=59.1ms\ninvalidations background:benchmark-default | political:benchmark-default | effects:benchmark-default | context:benchmark-default | borders:benchmark-default\nrender draw=12 frame=12 hit=2 dynBorder=3\nsidebar list=2 rows=0 detail=2 preset=4 legend=5"
+      "overlay": "phase=idle total=1145.3ms\naction=- 0.0ms\ntransform=0.000|0.000|1.0000|628|688|1.00\npasses background=364.5ms, political=165.1ms, effects=0.1ms, context=455.1ms, borders=71.0ms\ninvalidations background:benchmark-default | political:benchmark-default | effects:benchmark-default | context:benchmark-default | dayNight:set-map-data | borders:benchmark-default\nrender draw=12 frame=12 dayNight=3 hit=2 dynBorder=3\nsidebar list=2 rows=0 detail=2 preset=4 legend=5"
     },
     "cachedRenderNow": {
       "samples": [
-        0.8,
-        0.6,
-        0.7,
-        0.5,
-        0.6,
-        0.5,
-        0.5,
-        0.5,
-        0.5,
-        0.5
+        1.9,
+        1.5,
+        1.8,
+        1.6,
+        1.9,
+        1.7,
+        1.7,
+        1.6,
+        1.4,
+        0.9
       ],
-      "averageMs": 0.57
+      "averageMs": 1.6
     },
     "detailLayerOffForcedFullRedraw": {
       "visibility": {
@@ -57,13 +57,13 @@
       },
       "lastFrame": {
         "phase": "idle",
-        "totalMs": 798.6000000238419,
+        "totalMs": 788.2999999523163,
         "timings": {
-          "background": 322,
-          "political": 41.10000002384186,
+          "background": 314,
+          "political": 43.69999998807907,
           "effects": 0,
-          "context": 423.9000000357628,
-          "borders": 8.800000011920929
+          "context": 418,
+          "borders": 9.099999964237213
         },
         "transform": {
           "x": 0,
@@ -71,7 +71,7 @@
           "k": 1
         }
       },
-      "overlay": "phase=idle total=798.6ms\naction=- 0.0ms\ntransform=0.000|0.000|1.0000|628|688|1.00\npasses background=322.0ms, political=41.1ms, effects=0.0ms, context=423.9ms, borders=8.8ms\ninvalidations background:benchmark-detail-off | political:benchmark-detail-off | effects:benchmark-detail-off | context:benchmark-detail-off | borders:benchmark-detail-off\nrender draw=10 frame=10 hit=1 dynBorder=2\nsidebar list=1 rows=0 detail=1 preset=2 legend=3"
+      "overlay": "phase=idle total=788.3ms\naction=- 0.0ms\ntransform=0.000|0.000|1.0000|628|688|1.00\npasses background=314.0ms, political=43.7ms, effects=0.0ms, context=418.0ms, borders=9.1ms\ninvalidations background:benchmark-detail-off | political:benchmark-detail-off | effects:benchmark-detail-off | context:benchmark-detail-off | dayNight:set-map-data | borders:benchmark-detail-off\nrender draw=10 frame=10 dayNight=2 hit=1 dynBorder=2\nsidebar list=1 rows=0 detail=1 preset=2 legend=3"
     },
     "contextLayersDisabledForcedFullRedraw": {
       "visibility": {
@@ -85,13 +85,14 @@
       },
       "lastFrame": {
         "phase": "idle",
-        "totalMs": 519.1000000238419,
+        "totalMs": 503.39999997615814,
         "timings": {
-          "background": 314.10000002384186,
-          "political": 155.89999997615814,
+          "background": 306.7999999523163,
+          "political": 150.10000002384186,
           "effects": 0,
           "context": 0,
-          "borders": 48
+          "dayNight": 0.10000002384185791,
+          "borders": 45
         },
         "transform": {
           "x": 0,
@@ -99,12 +100,12 @@
           "k": 1
         }
       },
-      "overlay": "phase=idle total=519.1ms\naction=- 0.0ms\ntransform=0.000|0.000|1.0000|628|688|1.00\npasses background=314.1ms, political=155.9ms, effects=0.0ms, context=0.0ms, borders=48.0ms\ninvalidations background:benchmark-context-off | political:benchmark-context-off | effects:benchmark-context-off | context:benchmark-context-off | borders:benchmark-context-off\nrender draw=12 frame=12 hit=2 dynBorder=3\nsidebar list=2 rows=0 detail=2 preset=4 legend=5"
+      "overlay": "phase=idle total=503.4ms\naction=- 0.0ms\ntransform=0.000|0.000|1.0000|628|688|1.00\npasses background=306.8ms, political=150.1ms, effects=0.0ms, context=0.0ms, dayNight=0.1ms, borders=45.0ms\ninvalidations background:benchmark-context-off | political:benchmark-context-off | effects:benchmark-context-off | context:benchmark-context-off | dayNight:set-map-data | borders:benchmark-context-off\nrender draw=12 frame=12 dayNight=4 hit=2 dynBorder=3\nsidebar list=2 rows=0 detail=2 preset=4 legend=5"
     },
     "interactivePanFrame": {
       "interactiveFrame": {
         "phase": "interacting",
-        "totalMs": 1.399999976158142,
+        "totalMs": 1.4000000357627869,
         "timings": {
           "interactiveComposite": 1.300000011920929
         },
@@ -121,7 +122,7 @@
       },
       "restoredFrame": {
         "phase": "idle",
-        "totalMs": 0,
+        "totalMs": 0.10000002384185791,
         "timings": {},
         "transform": {
           "x": 0,
@@ -144,13 +145,13 @@
         "screenY": 219.74936364144833
       },
       "lastAction": "fill-feature-color",
-      "lastActionDurationMs": 228,
+      "lastActionDurationMs": 235.89999997615814,
       "lastActionFrame": {
         "phase": "settling",
-        "totalMs": 222.30000001192093,
+        "totalMs": 229.80000001192093,
         "timings": {
-          "political": 170,
-          "borders": 51
+          "political": 173.39999997615814,
+          "borders": 54.80000001192093
         },
         "transform": {
           "x": 0,
@@ -160,7 +161,7 @@
       },
       "lastFrame": {
         "phase": "idle",
-        "totalMs": 0.10000002384185791,
+        "totalMs": 0.09999996423721313,
         "timings": {},
         "transform": {
           "x": 0,
@@ -198,13 +199,13 @@
       },
       "colorMatchCount": 87,
       "lastAction": "double-click-fill",
-      "lastActionDurationMs": 341.10000002384186,
+      "lastActionDurationMs": 396.9000000357628,
       "lastActionFrame": {
         "phase": "settling",
-        "totalMs": 333.19999998807907,
+        "totalMs": 390.19999998807907,
         "timings": {
-          "political": 287.80000001192093,
-          "borders": 44.30000001192093
+          "political": 334.69999998807907,
+          "borders": 54.09999996423721
         },
         "transform": {
           "x": 0,
@@ -214,7 +215,7 @@
       },
       "lastFrame": {
         "phase": "idle",
-        "totalMs": 0.6000000238418579,
+        "totalMs": 0.699999988079071,
         "timings": {},
         "transform": {
           "x": 0,
@@ -239,11 +240,11 @@
   },
   "consoleIssues": [
     "### Result",
-    "- [Console](.playwright-cli\\console-2026-03-07T18-31-13-283Z.log)"
+    "- [Console](.playwright-cli\\console-2026-03-07T19-30-27-069Z.log)"
   ],
   "networkIssues": [
     "### Result",
-    "- [Network](.playwright-cli\\network-2026-03-07T18-31-14-429Z.log)"
+    "- [Network](.playwright-cli\\network-2026-03-07T19-30-28-264Z.log)"
   ],
   "screenshots": {
     "home": "/mnt/c/Users/raede/Desktop/dev/mapcreator/.mcp-artifacts/perf/editor-home.png",

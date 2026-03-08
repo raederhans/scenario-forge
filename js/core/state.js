@@ -204,6 +204,29 @@ const countryPresets = {
         "DEF0A", "DEF0B", "DEF0C", "DEF0D", "DEF0E", "DEF0F",
       ],
     },
+    {
+      name: "Alsace-Lorraine + Luxembourg",
+      ids: [
+        "FR_ARR_57003", "FR_ARR_57005", "FR_ARR_57006", "FR_ARR_57007", "FR_ARR_57009",
+        "FR_ARR_67002", "FR_ARR_67003", "FR_ARR_67004", "FR_ARR_67005", "FR_ARR_67008",
+        "FR_ARR_68001", "FR_ARR_68002", "FR_ARR_68004", "FR_ARR_68006",
+        "LU_ADM1_LUX-906", "LU_ADM1_LUX-907", "LU_ADM1_LUX-908",
+      ],
+    },
+    {
+      name: "North Schleswig + Bornholm",
+      ids: [
+        "DK_HIST_NORTH_SCHLESWIG",
+        "DK014",
+      ],
+    },
+    {
+      name: "Slovenia",
+      ids: [
+        "SI031", "SI032", "SI033", "SI034", "SI035", "SI036",
+        "SI037", "SI038", "SI041", "SI042", "SI043", "SI044",
+      ],
+    },
   ],
 
   // FRANCE - Historical & HOI4
@@ -634,6 +657,59 @@ function normalizeTextureStyleConfig(rawConfig) {
   };
 }
 
+function createDefaultDayNightStyleConfig() {
+  return {
+    enabled: false,
+    mode: "manual",
+    manualUtcMinutes: 12 * 60,
+    shadowOpacity: 0.28,
+    twilightWidthDeg: 10,
+    cityLightsEnabled: true,
+    cityLightsStyle: "modern",
+    cityLightsIntensity: 0.72,
+    cityLightsTextureOpacity: 0.54,
+    cityLightsCorridorStrength: 0.58,
+    cityLightsCoreSharpness: 0.62,
+  };
+}
+
+function normalizeDayNightStyleConfig(rawConfig) {
+  const defaults = createDefaultDayNightStyleConfig();
+  const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
+  const mode = String(raw.mode || defaults.mode).trim().toLowerCase();
+  const cityLightsStyle = String(raw.cityLightsStyle || defaults.cityLightsStyle).trim().toLowerCase();
+
+  return {
+    enabled: raw.enabled === undefined ? defaults.enabled : !!raw.enabled,
+    mode: mode === "utc" ? "utc" : "manual",
+    manualUtcMinutes: clamp(
+      Math.round(toFiniteNumber(raw.manualUtcMinutes, defaults.manualUtcMinutes)),
+      0,
+      24 * 60 - 1
+    ),
+    shadowOpacity: clamp(toFiniteNumber(raw.shadowOpacity, defaults.shadowOpacity), 0, 0.85),
+    twilightWidthDeg: clamp(Math.round(toFiniteNumber(raw.twilightWidthDeg, defaults.twilightWidthDeg)), 2, 28),
+    cityLightsEnabled: raw.cityLightsEnabled === undefined ? defaults.cityLightsEnabled : !!raw.cityLightsEnabled,
+    cityLightsStyle: cityLightsStyle === "historical_1930s" ? "historical_1930s" : "modern",
+    cityLightsIntensity: clamp(toFiniteNumber(raw.cityLightsIntensity, defaults.cityLightsIntensity), 0, 1.2),
+    cityLightsTextureOpacity: clamp(
+      toFiniteNumber(raw.cityLightsTextureOpacity, defaults.cityLightsTextureOpacity),
+      0,
+      1
+    ),
+    cityLightsCorridorStrength: clamp(
+      toFiniteNumber(raw.cityLightsCorridorStrength, defaults.cityLightsCorridorStrength),
+      0,
+      1
+    ),
+    cityLightsCoreSharpness: clamp(
+      toFiniteNumber(raw.cityLightsCoreSharpness, defaults.cityLightsCoreSharpness),
+      0,
+      1
+    ),
+  };
+}
+
 export {
   PALETTE_THEMES,
   countryPalette,
@@ -651,6 +727,8 @@ export {
   createDefaultTextureStyleConfig,
   normalizeTextureMode,
   normalizeTextureStyleConfig,
+  createDefaultDayNightStyleConfig,
+  normalizeDayNightStyleConfig,
 };
 
 export const state = {
@@ -694,6 +772,9 @@ export const state = {
   scenarioBaselineHash: "",
   scenarioBaselineOwnersByFeatureId: {},
   scenarioControllersByFeatureId: {},
+  scenarioAutoShellOwnerByFeatureId: {},
+  scenarioAutoShellControllerByFeatureId: {},
+  scenarioShellOverlayRevision: 0,
   scenarioBaselineControllersByFeatureId: {},
   scenarioBaselineCoresByFeatureId: {},
   scenarioControllerRevision: 0,
@@ -715,6 +796,7 @@ export const state = {
   specialZonesExternalData: null,
   contextLayerExternalDataByName: {},
   specialZones: {},
+  waterRegionsData: null,
   riversData: null,
   oceanData: null,
   oceanMaskMode: "topology_ocean",
@@ -744,6 +826,7 @@ export const state = {
   // Subdivision-level explicit color overrides keyed by feature ID.
   featureOverrides: {},
   visualOverrides: {},
+  waterRegionOverrides: {},
   sovereigntyByFeatureId: {},
   sovereigntyInitialized: false,
   sovereigntyRevision: 0,
@@ -789,7 +872,11 @@ export const state = {
   dirtyRevision: 0,
   onboardingDismissed: false,
   hoveredId: null,
+  hoveredWaterRegionId: null,
+  selectedWaterRegionId: "",
   zoomTransform: defaultZoom,
+  showWaterRegions: true,
+  showOpenOceanRegions: false,
   showUrban: true,
   showPhysical: true,
   showRivers: true,
@@ -886,6 +973,7 @@ export const state = {
       dashStyle: "dashed",
     },
     texture: createDefaultTextureStyleConfig(),
+    dayNight: createDefaultDayNightStyleConfig(),
   },
   recentColors: [],
   historyPast: [],
@@ -913,6 +1001,7 @@ export const state = {
   renderCountryListFn: null,
   refreshCountryListRowsFn: null,
   refreshCountryInspectorDetailFn: null,
+  renderWaterRegionListFn: null,
   renderPresetTreeFn: null,
   renderScenarioAuditPanelFn: null,
   refreshColorStateFn: null,
@@ -950,6 +1039,12 @@ export const state = {
   spatialGrid: new Map(),
   spatialGridMeta: null,
   spatialItemsById: new Map(),
+  waterRegionsById: new Map(),
+  waterSpatialIndex: null,
+  waterSpatialItems: [],
+  waterSpatialGrid: new Map(),
+  waterSpatialGridMeta: null,
+  waterSpatialItemsById: new Map(),
 
   TINY_AREA: 6,
   MOUSE_THROTTLE_MS: 16,
@@ -971,6 +1066,7 @@ export const state = {
       political: true,
       effects: true,
       context: true,
+      dayNight: true,
       borders: true,
     },
     reasons: {
@@ -978,6 +1074,7 @@ export const state = {
       political: "init",
       effects: "init",
       context: "init",
+      dayNight: "init",
       borders: "init",
     },
     counters: {
@@ -989,6 +1086,7 @@ export const state = {
       politicalPassRenders: 0,
       effectsPassRenders: 0,
       contextPassRenders: 0,
+      dayNightPassRenders: 0,
       borderPassRenders: 0,
       hitCanvasRenders: 0,
       dynamicBorderRebuilds: 0,

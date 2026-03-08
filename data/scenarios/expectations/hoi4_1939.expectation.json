@@ -143,8 +143,8 @@
       ]
     },
     {
-      "name": "bohemia_moravia_remainder_owner_bom",
-      "expected_owner_tag": "BOM",
+      "name": "bohemia_moravia_remainder_owner_ger",
+      "expected_owner_tag": "GER",
       "feature_id_prefixes": [
         "CZ_ADM2_"
       ],

@@ -392,6 +392,14 @@ def load_manual_rules(path: Path) -> list[ScenarioRule]:
         if not isinstance(raw, dict):
             continue
         rule_id = str(raw.get("rule_id") or f"rule_{index + 1:03d}").strip()
+        parent_owner_tags = [
+            normalize_tag(value)
+            for value in raw.get("parent_owner_tags", [])
+        ]
+        parent_owner_tags = [value for value in parent_owner_tags if value]
+        parent_owner_tag = normalize_tag(raw.get("parent_owner_tag"))
+        if parent_owner_tag and parent_owner_tag not in parent_owner_tags:
+            parent_owner_tags.insert(0, parent_owner_tag)
         rules.append(
             ScenarioRule(
                 rule_id=rule_id,
@@ -412,6 +420,10 @@ def load_manual_rules(path: Path) -> list[ScenarioRule]:
                 color_hex_override=normalize_hex(raw.get("color_hex_override")),
                 source_type=str(raw.get("source_type") or "hoi4_owner").strip() or "hoi4_owner",
                 historical_fidelity=str(raw.get("historical_fidelity") or "vanilla").strip() or "vanilla",
+                parent_owner_tag=parent_owner_tag or (parent_owner_tags[0] if parent_owner_tags else ""),
+                parent_owner_tags=parent_owner_tags,
+                subject_kind=str(raw.get("subject_kind") or "").strip().lower(),
+                entry_kind=str(raw.get("entry_kind") or "").strip().lower(),
             )
         )
     return sorted(rules, key=lambda item: (item.priority, item.rule_id))

@@ -26,19 +26,19 @@ EXPECTED_BOUNDARY_VARIANT_IDS_BY_TAG = {
     "RKP": {"historical_reference"},
     "RKO": {"hoi4", "historical_reference"},
     "RKU": {"historical_reference"},
-    "RKM": {"hoi4", "historical_reference"},
+    "RKM": {"historical_reference"},
 }
 EXPECTED_DEFAULT_BOUNDARY_VARIANT_ID_BY_TAG = {
     "RKP": "historical_reference",
     "RKO": "hoi4",
     "RKU": "historical_reference",
-    "RKM": "hoi4",
+    "RKM": "historical_reference",
 }
 EXPECTED_COMPANION_ACTION_IDS = {
     "RKP": {"annexed_poland_to_ger"},
     "RKO": {"ostland_marijampole_to_ger"},
     "RKU": {"transnistria_to_rom", "crimea_to_ger"},
-    "RKM": {"greater_finland_to_fin", "saint_petersburg_to_ger"},
+    "RKM": {"greater_finland_to_fin", "arctic_islands_to_ger"},
 }
 
 

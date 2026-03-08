@@ -17,13 +17,16 @@ def save_outputs(
     rivers: gpd.GeoDataFrame,
     border_lines: gpd.GeoDataFrame,
     ocean: gpd.GeoDataFrame,
+    water_regions: gpd.GeoDataFrame | None,
     land_bg: gpd.GeoDataFrame,
     urban: gpd.GeoDataFrame,
     physical: gpd.GeoDataFrame,
     hybrid: gpd.GeoDataFrame,
     final: gpd.GeoDataFrame,
-    output_dir: Path,
+    output_dir: Path | None = None,
 ) -> None:
+    if output_dir is None:
+        output_dir = Path(__file__).resolve().parents[2] / "data"
     output_dir.mkdir(parents=True, exist_ok=True)
     preview_path = output_dir / "preview.png"
 
@@ -31,6 +34,7 @@ def save_outputs(
     rivers_out = round_geometries(rivers)
     borders_out = round_geometries(border_lines)
     ocean_out = round_geometries(ocean)
+    water_regions_out = round_geometries(water_regions) if water_regions is not None else None
     land_bg_out = round_geometries(land_bg)
     urban_out = round_geometries(urban)
     physical_out = round_geometries(physical)
@@ -39,6 +43,8 @@ def save_outputs(
     fig, ax = plt.subplots(figsize=(8, 8))
     ocean_out.plot(ax=ax, color="#b3d9ff")
     land_bg_out.plot(ax=ax, linewidth=0, color="#e0e0e0")
+    if water_regions_out is not None and not water_regions_out.empty:
+        water_regions_out.plot(ax=ax, linewidth=0.3, edgecolor="#5f7797", color="#8bc7ff")
     physical_out.plot(ax=ax, linewidth=0.6, edgecolor="#5c4033", facecolor="none")
     urban_out.plot(ax=ax, linewidth=0, color="#333333", alpha=0.2)
     land_out.plot(ax=ax, linewidth=0.3, edgecolor="#999999", color="#d0d0d0")

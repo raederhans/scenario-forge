@@ -71,6 +71,7 @@ function updateUIText() {
     ["appearanceTabOcean", "Ocean"],
     ["appearanceTabBorders", "Borders"],
     ["appearanceTabLayers", "Context Layers"],
+    ["appearanceTabDayNight", "Day / Night"],
     ["appearanceTabTexture", "Texture"],
     ["appearanceSpecialZoneBtn", "Special Zone Tool"],
     ["lblColorMode", "Color Mode"],
@@ -140,6 +141,23 @@ function updateUIText() {
     ["lblUrbanOpacity", "Opacity"],
     ["lblUrbanBlendMode", "Blend Mode"],
     ["lblUrbanMinArea", "Min Area (px)"],
+    ["lblDayNightPanel", "Day / Night"],
+    ["lblDayNightEnabled", "Enable Day / Night Cycle"],
+    ["dayNightModeManualBtn", "Manual"],
+    ["dayNightModeUtcBtn", "UTC Sync"],
+    ["lblDayNightTime", "UTC Time"],
+    ["dayNightModeHint", "Live UTC sync updates once per minute."],
+    ["lblDayNightCityLights", "City Lights"],
+    ["lblDayNightCityLightsStyle", "Style"],
+    ["optDayNightCityLightsModern", "Modern"],
+    ["optDayNightCityLightsHistorical1930s", "1930s Sparse Electrification"],
+    ["lblDayNightCityLightsIntensity", "Intensity"],
+    ["lblDayNightAdvanced", "Advanced"],
+    ["lblDayNightTextureOpacity", "Texture Opacity"],
+    ["lblDayNightCorridorStrength", "Corridor Strength"],
+    ["lblDayNightCoreSharpness", "Core Sharpness"],
+    ["lblDayNightShadowOpacity", "Shadow Opacity"],
+    ["lblDayNightTwilightWidth", "Twilight Width"],
     ["lblRiversLayer", "Rivers"],
     ["lblRiversColor", "Color"],
     ["lblRiversOpacity", "Opacity"],
@@ -147,19 +165,27 @@ function updateUIText() {
     ["lblRiversOutlineColor", "Outline Color"],
     ["lblRiversOutlineWidth", "Outline Width"],
     ["lblRiversDashStyle", "Dash"],
+    ["lblWaterRegions", "Water Regions"],
+    ["lblOpenOceanRegions", "Open Ocean Regions"],
     ["labelPresetPolitical", "Auto-Fill Countries"],
     ["presetClear", "Clear Map"],
     ["zoomResetBtn", "Fit"],
     ["lblCountrySearch", "Search Countries"],
+    ["lblWaterSearch", "Search Water Regions"],
     ["lblPresetsHierarchy", "Territories & Presets"],
     ["lblCountryInspector", "Country Inspector"],
+    ["lblWaterInspector", "Water Regions"],
     ["lblProjectLegend", "Project & Legend"],
     ["lblDiagnostics", "Diagnostics"],
     ["lblCountryColors", "Country Colors"],
+    ["lblWaterLegend", "Water Overrides"],
     ["countryInspectorOrderingHint", "Key scenario countries first. Releasables appear under parent countries."],
     ["countryInspectorEmptyTitle", "Select a country to inspect"],
     ["countryInspectorEmptyHint", "Choose a country above, then use Active Owner and the Territories & Presets panel."],
+    ["waterInspectorEmptyTitle", "Select a water region to inspect"],
+    ["waterInspectorEmptyHint", "Click a sea, lake, or strait on the map, or choose one from the list."],
     ["resetCountryColors", "Reset Country Colors"],
+    ["clearWaterRegionColorBtn", "Clear Water Override"],
     ["lblHistoricalPresets", "Selected Country Actions"],
     ["selectedCountryActionHint", "Choose a country above to inspect territories, presets, and releasables."],
     ["lblSpecialZones", "Special Zones"],
@@ -371,15 +397,20 @@ function initTranslations() {
 
 function getTooltipText(feature) {
   if (!feature) return "";
+  const isWaterRegion = !!feature?.properties?.water_type;
   const rawName =
+    feature?.properties?.label ||
     feature?.properties?.name ||
     feature?.properties?.name_en ||
     feature?.properties?.NAME ||
-    "Unknown Region";
+    (isWaterRegion ? "Unknown Water Region" : "Unknown Region");
   const name = t(rawName, "geo");
   const code = (feature?.properties?.cntr_code || "").toUpperCase();
-  const label = state.currentLanguage === "zh" ? t("Region", "ui") : "Region";
+  const labelKey = isWaterRegion ? "Water Region" : "Region";
+  const label = state.currentLanguage === "zh" ? t(labelKey, "ui") : labelKey;
+  const waterType = isWaterRegion ? String(feature?.properties?.water_type || "").trim() : "";
   if (!name && !code) return label;
+  if (waterType) return `${label}: ${name} (${waterType})`;
   if (code) return `${label}: ${name} (${code})`;
   return `${label}: ${name}`;
 }

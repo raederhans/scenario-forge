@@ -55,11 +55,11 @@
     },
     {
       "rule_id": "bohemia_moravia_protectorate_1939",
-      "owner_tag": "BOM",
+      "owner_tag": "GER",
       "priority": 902,
       "quality": "manual_reviewed",
       "critical": true,
-      "notes": "Bohemia-Moravia protectorate uses Czech runtime geometry excluding targeted Sudetenland features.",
+      "notes": "Germany directly annexes the Bohemia-Moravia remainder in the simplified 1939 baseline; the protectorate is available as a releasable instead of an active start country.",
       "include_country_codes": ["CZ"],
       "exclude_feature_ids": [
         "CZ_ADM2_57006924B56764577868008",
@@ -82,12 +82,8 @@
         "CZ_ADM2_57006924B21154438881940",
         "CZ_ADM2_57006924B63031935780571"
       ],
-      "base_iso2": "CZ",
-      "lookup_iso2": "CZ",
-      "display_name_override": "Bohemia-Moravia Protectorate",
-      "color_hex_override": "#6a4b3a",
-      "source_type": "scenario_extension",
-      "historical_fidelity": "extended"
+      "base_iso2": "DE",
+      "display_name_override": "Germany"
     },
     {
       "rule_id": "1939_slovakia_puppet_state",
@@ -170,14 +166,17 @@
     },
     {
       "rule_id": "1939_italy_ethiopia",
-      "owner_tag": "ITA",
+      "owner_tag": "AOI",
       "priority": 911,
       "quality": "manual_reviewed",
       "critical": true,
-      "notes": "Ethiopian theater outcome represented as Italian East Africa control baseline.",
-      "include_country_codes": ["ET"],
-      "base_iso2": "IT",
-      "display_name_override": "Italy"
+      "notes": "Italian East Africa replaces the separate Eritrean and Somali colonial administrations in the 1939 setup.",
+      "include_country_codes": ["ET", "ER", "SO", "SM"],
+      "base_iso2": "ET",
+      "display_name_override": "Italian East Africa",
+      "parent_owner_tag": "ITA",
+      "subject_kind": "colonial_government",
+      "entry_kind": "scenario_subject"
     },
     {
       "rule_id": "1939_turkey_hatay",

@@ -4831,7 +4831,6 @@
       "IN_ADM2_76128533B49993259380917"
     ],
     "IN_Arunachal_Pradesh": [
-      "IN_ADM2_76128533B84689409020934",
       "IN_ADM2_76128533B55878637000592",
       "IN_ADM2_76128533B11651252780045",
       "IN_ADM2_76128533B18668117085772"
@@ -10742,6 +10741,9 @@
     "CO_La_Guajira": [
       "CO_ADM1_COL-1318"
     ],
+    "CO_Archipelago_of_Saint_Andr_ws": [
+      "CO_ADM1_COL-1342"
+    ],
     "CO_Caldas": [
       "CO_ADM1_COL-1397"
     ],
@@ -11300,6 +11302,9 @@
     ],
     "LI_Schellenberg": [
       "LI_ADM1_LIE-4899"
+    ],
+    "LI_Mauren": [
+      "LI_ADM1_LIE-4900"
     ],
     "LI_Planken": [
       "LI_ADM1_LIE-4901"
@@ -13385,6 +13390,7 @@
     "CO_C_rdoba": "C\u00f3rdoba",
     "CO_Santander": "Santander",
     "CO_La_Guajira": "La Guajira",
+    "CO_Archipelago_of_Saint_Andr_ws": "Archipelago of Saint Andr\u00e9ws",
     "CO_Caldas": "Caldas",
     "CO_Cundinamarca": "Cundinamarca",
     "CO_Bogot": "Bogot\u00e1",
@@ -13571,6 +13577,7 @@
     "LI_Schaan": "Schaan",
     "LI_Gamprin": "Gamprin",
     "LI_Schellenberg": "Schellenberg",
+    "LI_Mauren": "Mauren",
     "LI_Planken": "Planken",
     "LI_Eschen": "Eschen",
     "LU_Diekirch": "Diekirch",

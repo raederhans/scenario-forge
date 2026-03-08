@@ -323,13 +323,40 @@ def build_country_registry(
                 for rule in owner_rules
             ]
         )
-        if not source_types:
+        if not source_types or (source_type != "hoi4_owner" and source_types == ["hoi4_owner"]):
             source_types = [source_type]
         historical_fidelity_summary = _dedupe_strings(
             [getattr(rule, "historical_fidelity", "") for rule in owner_rules]
         )
         if not historical_fidelity_summary:
             historical_fidelity_summary = [historical_fidelity]
+        parent_owner_tags = _dedupe_strings(
+            [getattr(rule, "parent_owner_tag", "") for rule in owner_rules]
+            + [
+                parent_tag
+                for rule in owner_rules
+                for parent_tag in (getattr(rule, "parent_owner_tags", []) or [])
+            ]
+        )
+        primary_parent_owner_tag = (
+            getattr(primary_rule, "parent_owner_tag", "")
+            if primary_rule and getattr(primary_rule, "parent_owner_tag", "")
+            else (parent_owner_tags[0] if parent_owner_tags else "")
+        )
+        if primary_parent_owner_tag and primary_parent_owner_tag not in parent_owner_tags:
+            parent_owner_tags.insert(0, primary_parent_owner_tag)
+        subject_kind = (
+            str(getattr(primary_rule, "subject_kind", "") or "").strip().lower()
+            if primary_rule
+            else ""
+        )
+        entry_kind = (
+            str(getattr(primary_rule, "entry_kind", "") or "").strip().lower()
+            if primary_rule
+            else ""
+        )
+        if not entry_kind and (primary_parent_owner_tag or parent_owner_tags or subject_kind):
+            entry_kind = "scenario_subject"
         country_registry[tag] = ScenarioCountryRecord(
             tag=tag,
             display_name=display_name,
@@ -355,6 +382,10 @@ def build_country_registry(
             rule_sources=rule_sources,
             source_types=source_types,
             historical_fidelity_summary=historical_fidelity_summary,
+            parent_owner_tag=primary_parent_owner_tag,
+            parent_owner_tags=parent_owner_tags,
+            subject_kind=subject_kind,
+            entry_kind=entry_kind,
         )
 
     return country_registry

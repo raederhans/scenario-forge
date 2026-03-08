@@ -1,5 +1,9 @@
 // Project file manager (Phase 13)
-import { normalizePhysicalStyleConfig, normalizeTextureStyleConfig } from "./state.js";
+import {
+  normalizeDayNightStyleConfig,
+  normalizePhysicalStyleConfig,
+  normalizeTextureStyleConfig,
+} from "./state.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
 import { migrateImportedProjectData } from "./sovereignty_manager.js";
@@ -27,11 +31,12 @@ class FileManager {
   static exportProject(appState) {
     if (!appState) return;
     const payload = {
-      schemaVersion: 9,
+      schemaVersion: 11,
       countryBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
       featureOverrides: appState.visualOverrides || appState.featureOverrides || {},
       sovereignBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
       visualOverrides: appState.visualOverrides || appState.featureOverrides || {},
+      waterRegionOverrides: appState.waterRegionOverrides || {},
       sovereigntyByFeatureId: appState.sovereigntyByFeatureId || {},
       paintMode: appState.paintMode || "visual",
       activeSovereignCode: appState.activeSovereignCode || "",
@@ -41,6 +46,8 @@ class FileManager {
       parentBorderEnabledByCountry: appState.parentBorderEnabledByCountry || {},
       manualSpecialZones: appState.manualSpecialZones || { type: "FeatureCollection", features: [] },
       layerVisibility: {
+        showWaterRegions: appState.showWaterRegions === undefined ? true : !!appState.showWaterRegions,
+        showOpenOceanRegions: !!appState.showOpenOceanRegions,
         showUrban: !!appState.showUrban,
         showPhysical: !!appState.showPhysical,
         showRivers: !!appState.showRivers,
@@ -54,6 +61,7 @@ class FileManager {
         rivers: appState.styleConfig?.rivers || null,
         specialZones: appState.styleConfig?.specialZones || null,
         texture: normalizeTextureStyleConfig(appState.styleConfig?.texture),
+        dayNight: normalizeDayNightStyleConfig(appState.styleConfig?.dayNight),
       },
       scenario: appState.activeScenarioId
         ? {
@@ -113,6 +121,9 @@ class FileManager {
         if (!data.visualOverrides || typeof data.visualOverrides !== "object") {
           data.visualOverrides = data.featureOverrides;
         }
+        if (!data.waterRegionOverrides || typeof data.waterRegionOverrides !== "object") {
+          data.waterRegionOverrides = {};
+        }
         if (!data.sovereignBaseColors || typeof data.sovereignBaseColors !== "object") {
           data.sovereignBaseColors = data.countryBaseColors;
         }
@@ -144,6 +155,7 @@ class FileManager {
           data.styleConfig.specialZones = null;
         }
         data.styleConfig.texture = normalizeTextureStyleConfig(data.styleConfig.texture);
+        data.styleConfig.dayNight = normalizeDayNightStyleConfig(data.styleConfig.dayNight);
         if (
           !data.manualSpecialZones ||
           typeof data.manualSpecialZones !== "object" ||
@@ -171,6 +183,10 @@ class FileManager {
           }
         }
         data.releasableBoundaryVariantByTag = normalizeBoundaryVariantSelectionMap(data.releasableBoundaryVariantByTag);
+        data.layerVisibility.showWaterRegions =
+          data.layerVisibility.showWaterRegions === undefined ? true : !!data.layerVisibility.showWaterRegions;
+        data.layerVisibility.showOpenOceanRegions =
+          data.layerVisibility.showOpenOceanRegions === undefined ? false : !!data.layerVisibility.showOpenOceanRegions;
         data.layerVisibility.showUrban =
           data.layerVisibility.showUrban === undefined ? true : !!data.layerVisibility.showUrban;
         data.layerVisibility.showPhysical =

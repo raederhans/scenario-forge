@@ -36,12 +36,14 @@ function captureStylePaths(paths) {
 
 function captureHistoryState({
   featureIds = [],
+  waterRegionIds = [],
   ownerCodes = [],
   sovereigntyFeatureIds = [],
   stylePaths = [],
 } = {}) {
   const snapshot = {};
   const ids = uniqueKeys(featureIds);
+  const waterIds = uniqueKeys(waterRegionIds);
   const ownerKeys = uniqueKeys(ownerCodes);
   const sovereigntyIds = uniqueKeys(sovereigntyFeatureIds);
   const styleKeys = uniqueKeys(stylePaths);
@@ -49,6 +51,10 @@ function captureHistoryState({
   if (ids.length) {
     snapshot.visualOverrides = captureEntries(state.visualOverrides || {}, ids);
     snapshot.featureOverrides = captureEntries(state.featureOverrides || {}, ids);
+  }
+
+  if (waterIds.length) {
+    snapshot.waterRegionOverrides = captureEntries(state.waterRegionOverrides || {}, waterIds);
   }
 
   if (ownerKeys.length) {
@@ -165,6 +171,9 @@ function refreshUiAfterHistory(direction, entry) {
   if (typeof state.renderCountryListFn === "function") {
     state.renderCountryListFn();
   }
+  if (typeof state.renderWaterRegionListFn === "function") {
+    state.renderWaterRegionListFn();
+  }
   if (typeof state.renderPresetTreeFn === "function") {
     state.renderPresetTreeFn();
   }
@@ -181,6 +190,7 @@ function applyHistorySnapshot(snapshot, direction, entry) {
 
   state.visualOverrides = state.visualOverrides || {};
   state.featureOverrides = state.featureOverrides || {};
+  state.waterRegionOverrides = state.waterRegionOverrides || {};
   state.sovereignBaseColors = state.sovereignBaseColors || {};
   state.countryBaseColors = state.countryBaseColors || {};
   state.countryPalette = state.countryPalette || {};
@@ -188,6 +198,7 @@ function applyHistorySnapshot(snapshot, direction, entry) {
 
   applyEntries(state.visualOverrides, snapshot.visualOverrides);
   applyEntries(state.featureOverrides, snapshot.featureOverrides);
+  applyEntries(state.waterRegionOverrides, snapshot.waterRegionOverrides);
   applyEntries(state.sovereignBaseColors, snapshot.sovereignBaseColors);
   applyEntries(state.countryBaseColors, snapshot.countryBaseColors);
   applyEntries(state.countryPalette, snapshot.countryPalette);
