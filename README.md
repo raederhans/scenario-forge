@@ -107,6 +107,17 @@ python3 tools/import_country_palette.py
 
 详细规则见 `docs/COUNTRY_PALETTE_ASSETS.md`。
 
+## Raw Raster Cache
+
+- `data/ETOPO_2022_v1_60s_N90W180_surface.tif`
+- `data/PROBAV_LC100_global_v3.0.1_2019_forest_type.tif`
+- `data/PROBAV_LC100_global_v3.0.1_2019_discrete.tif`
+
+这些 `.tif` 文件只用于 `init_map_data.py` 的离线物理语义/等高线构建，不属于网站运行时必需资产。
+前端页面实际依赖的是仓库中已经生成好的 JSON / TopoJSON 结果，因此仓库默认将这些原始栅格当作本地缓存处理，不再纳入 Git 版本管理。
+
+当你在本地重新跑数据构建时，如果这些文件不存在，构建脚本会按需下载并缓存到 `data/` 目录。
+
 ## 🌍 数据来源
 
 本项目数据由公开地理数据源抓取、清洗并生成前端可用拓扑数据，主要包括：

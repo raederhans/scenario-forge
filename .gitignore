@@ -33,6 +33,7 @@ data/geoBoundaries-*.geojson
 # Local Codex/runtime lock files
 skills-lock.json
 .tmp_*.js
+.tmp/
 
 # Local server logs
 http_server_*.log
@@ -42,3 +43,13 @@ qa/screenshots_qa*/
 
 # Generated reports and derived evidence
 reports/generated/
+
+# Offline raster caches used by the data-build pipeline only.
+# The website runtime consumes the derived JSON/TopoJSON outputs instead.
+data/ETOPO_2022_v1_60s_N90W180_surface.tif
+data/PROBAV_LC100_global_v3.0.1_2019_forest_type.tif
+data/PROBAV_LC100_global_v3.0.1_2019_discrete.tif
+data/.build_stage_cache.json
+data/*.tif.part
+data/*.tif.parts/
+data/.tmp_*
