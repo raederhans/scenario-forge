@@ -1,0 +1,120 @@
+{
+  "hoi4_1936": {
+    "scenarioId": "hoi4_1936",
+    "missingBefore": 163,
+    "missingBeforeRu": 157,
+    "missingAfter": 6,
+    "missingAfterRu": 0,
+    "ruFallbackSamples": [
+      "RU_RAY_50074027B3226583010199",
+      "RU_RAY_50074027B46643568009996",
+      "RU_RAY_50074027B15761543307374",
+      "RU_RAY_50074027B53689487296267",
+      "RU_RAY_50074027B58297077135629",
+      "RU_RAY_50074027B10504727773087",
+      "RU_RAY_50074027B41108131456102",
+      "RU_RAY_50074027B87569969608847",
+      "RU_RAY_50074027B95296004893180",
+      "RU_RAY_50074027B1667365379281",
+      "RU_RAY_50074027B2294674519719",
+      "RU_RAY_50074027B23574651489264"
+    ],
+    "suspicious": [
+      {
+        "displayCode": "SOV",
+        "fillColor": "#7d0d18",
+        "groupSize": 2707,
+        "area": 13.104600718309891
+      }
+    ]
+  },
+  "hoi4_1939": {
+    "scenarioId": "hoi4_1939",
+    "missingBefore": 163,
+    "missingBeforeRu": 157,
+    "missingAfter": 6,
+    "missingAfterRu": 0,
+    "ruFallbackSamples": [
+      "RU_RAY_50074027B3226583010199",
+      "RU_RAY_50074027B46643568009996",
+      "RU_RAY_50074027B15761543307374",
+      "RU_RAY_50074027B53689487296267",
+      "RU_RAY_50074027B58297077135629",
+      "RU_RAY_50074027B10504727773087",
+      "RU_RAY_50074027B41108131456102",
+      "RU_RAY_50074027B87569969608847",
+      "RU_RAY_50074027B95296004893180",
+      "RU_RAY_50074027B1667365379281",
+      "RU_RAY_50074027B2294674519719",
+      "RU_RAY_50074027B23574651489264"
+    ],
+    "suspicious": [
+      {
+        "displayCode": "HUN",
+        "fillColor": "#f97e62",
+        "groupSize": 45,
+        "area": 25.135666806565332
+      },
+      {
+        "displayCode": "SLO",
+        "fillColor": "#9ea1bc",
+        "groupSize": 67,
+        "area": 25.13362264462293
+      },
+      {
+        "displayCode": "SOV",
+        "fillColor": "#7d0d18",
+        "groupSize": 2707,
+        "area": 13.104600718309891
+      }
+    ]
+  },
+  "tno_1962_reference_only": {
+    "suspiciousCount": 7,
+    "suspicious": [
+      {
+        "owner": "RKM",
+        "fillColor": "#665b6c",
+        "groupSize": 952,
+        "area": 125.7116181173012
+      },
+      {
+        "owner": "SPR",
+        "fillColor": "#dd99ef",
+        "groupSize": 108,
+        "area": 37.7121437005707
+      },
+      {
+        "owner": "FIN",
+        "fillColor": "#a2a2a2",
+        "groupSize": 57,
+        "area": 25.14858756209178
+      },
+      {
+        "owner": "HUN",
+        "fillColor": "#f97e62",
+        "groupSize": 45,
+        "area": 25.13566674211866
+      },
+      {
+        "owner": "SLO",
+        "fillColor": "#9ea1bc",
+        "groupSize": 67,
+        "area": 25.13362263311737
+      },
+      {
+        "owner": "FRA",
+        "fillColor": "#0f0f65",
+        "groupSize": 311,
+        "area": 12.577584568572096
+      },
+      {
+        "owner": "RKK",
+        "fillColor": "#6b5d57",
+        "groupSize": 285,
+        "area": 12.575397869694966
+      }
+    ],
+    "note": "Reference-only scan; renderer guard is intentionally scoped to hoi4_1936/hoi4_1939 so QA-071 behavior is unchanged."
+  }
+}

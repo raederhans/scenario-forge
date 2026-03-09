@@ -115,6 +115,11 @@ const RENDER_PHASE_IDLE = "idle";
 const RENDER_PHASE_INTERACTING = "interacting";
 const RENDER_PHASE_SETTLING = "settling";
 const RENDER_SETTLE_DURATION_MS = 200;
+const EXACT_AFTER_SETTLE_QUIET_WINDOW_MS = 450;
+const CONTEXT_BASE_REUSE_MIN_SCALE_RATIO = 0.88;
+const CONTEXT_BASE_REUSE_MAX_SCALE_RATIO = 1.14;
+const CONTEXT_BASE_REUSE_MAX_DISTANCE_PX = 192;
+const CONTEXT_BASE_MINOR_CONTOUR_THRESHOLD = 2;
 const INTERNAL_BORDER_PROVINCE_MIN_ALPHA = 0.30;
 const INTERNAL_BORDER_LOCAL_MIN_ALPHA = 0.22;
 const INTERNAL_BORDER_PROVINCE_MIN_WIDTH = 0.52;
@@ -165,7 +170,10 @@ const COLOR_NAME_RE = /^[a-z]+$/i;
 const RENDER_DIAG_PARAM = "render_diag";
 const PERF_OVERLAY_PARAM = "perf_overlay";
 const DAY_NIGHT_CLOCK_INTERVAL_MS = 15_000;
-const RENDER_PASS_NAMES = ["background", "political", "effects", "context", "dayNight", "borders"];
+const RENDER_PASS_NAMES = ["background", "political", "effects", "contextBase", "contextScenario", "dayNight", "borders"];
+const HEAVY_SCENARIO_STAGED_APPLY_FEATURE_THRESHOLD = 12000;
+const STAGED_CONTEXT_BASE_TIMEOUT_MS = 180;
+const STAGED_HIT_CANVAS_TIMEOUT_MS = 260;
 let debugMode = "PROD";
 let islandNeighborsCache = {
   topologyRef: null,
@@ -209,6 +217,8 @@ let scenarioPoliticalBackgroundCache = {
   featureCount: 0,
   entries: [],
 };
+const SCENARIO_BACKGROUND_MERGE_MAX_AREA = Math.PI * 2;
+const suspiciousScenarioBackgroundMergeWarnings = new Set();
 const missingPhysicalContextWarnings = new Set();
 const physicalAtlasFallbackCache = {
   sourceRef: null,
@@ -254,6 +264,9 @@ function getRenderPassCacheState() {
   const cache = state.renderPassCache;
   cache.canvases = cache.canvases && typeof cache.canvases === "object" ? cache.canvases : {};
   cache.signatures = cache.signatures && typeof cache.signatures === "object" ? cache.signatures : {};
+  cache.referenceTransforms = cache.referenceTransforms && typeof cache.referenceTransforms === "object"
+    ? cache.referenceTransforms
+    : {};
   cache.dirty = cache.dirty && typeof cache.dirty === "object" ? cache.dirty : {};
   cache.reasons = cache.reasons && typeof cache.reasons === "object" ? cache.reasons : {};
   cache.counters = cache.counters && typeof cache.counters === "object" ? cache.counters : {};
@@ -274,6 +287,8 @@ function getRenderPassCacheState() {
     politicalPassRenders: 0,
     effectsPassRenders: 0,
     contextPassRenders: 0,
+    contextBasePassRenders: 0,
+    contextScenarioPassRenders: 0,
     dayNightPassRenders: 0,
     borderPassRenders: 0,
     hitCanvasRenders: 0,
@@ -357,7 +372,9 @@ function endContextMetricSession() {
   const session = activeContextMetricSession;
   activeContextMetricSession = null;
   const metrics = ensureRenderPerfMetrics();
-  const breakdown = {};
+  const breakdown = metrics.contextBreakdown && typeof metrics.contextBreakdown === "object"
+    ? { ...metrics.contextBreakdown }
+    : {};
   const sessionMetrics = session?.metrics && typeof session.metrics === "object" ? session.metrics : {};
   Object.entries(sessionMetrics).forEach(([name, entry]) => {
     if (!entry || typeof entry !== "object") return;
@@ -425,7 +442,13 @@ function noteRenderAction(label, startedAt = null) {
 
 function invalidateRenderPasses(passNames, reason = "unspecified") {
   const cache = getRenderPassCacheState();
-  const targetPassNames = Array.isArray(passNames) ? passNames : [passNames];
+  const rawTargetPassNames = Array.isArray(passNames) ? passNames : [passNames];
+  const targetPassNames = rawTargetPassNames.flatMap((passName) => {
+    if (passName === "context") {
+      return ["contextBase", "contextScenario"];
+    }
+    return [passName];
+  });
   targetPassNames.forEach((passName) => {
     if (!passName || !RENDER_PASS_NAMES.includes(passName)) return;
     cache.dirty[passName] = true;
@@ -461,6 +484,26 @@ function ensureRenderPassCanvas(passName) {
   return cache.canvases[passName];
 }
 
+function getScenarioRuntimeTopologySignatureToken() {
+  const runtimeTopology = state.scenarioRuntimeTopologyData || state.runtimePoliticalTopology || null;
+  return [
+    estimateTopologyObjectArcRefs(runtimeTopology, "political") ?? "na",
+    estimateTopologyObjectArcRefs(runtimeTopology, "land_mask") ?? "na",
+    estimateTopologyObjectArcRefs(runtimeTopology, "context_land_mask") ?? "na",
+    estimateTopologyObjectArcRefs(runtimeTopology, "scenario_water") ?? "na",
+    estimateTopologyObjectArcRefs(runtimeTopology, "scenario_special_land") ?? "na",
+  ].join("|");
+}
+
+function getScenarioOverlaySignatureToken() {
+  return [
+    Number(state.scenarioReliefOverlayRevision || 0),
+    getFeatureCollectionFeatureCount(state.scenarioWaterRegionsData),
+    getFeatureCollectionFeatureCount(state.scenarioSpecialRegionsData),
+    getFeatureCollectionFeatureCount(state.scenarioReliefOverlaysData),
+  ].join("|");
+}
+
 function getRenderPassSignature(passName, transform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
   const transformSignature = getTransformSignature(transform);
   if (passName === "background") {
@@ -489,21 +532,45 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       stableJson(normalizeTextureStyleConfig(state.styleConfig?.texture || {})),
     ].join("::");
   }
-  if (passName === "context") {
+  if (passName === "contextBase") {
+    const maskInfo = getPhysicalLandMaskInfo();
+    const baseSignatureParts = [
+      state.topologyRevision || 0,
+      state.activeScenarioId || "",
+      state.deferContextBasePass ? "context-base:deferred" : "context-base:ready",
+      state.showPhysical ? "physical:on" : "physical:off",
+      state.showUrban ? "urban:on" : "urban:off",
+      state.showRivers ? "rivers:on" : "rivers:off",
+      `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}`,
+      `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
+      String(state.renderProfile || "auto"),
+      stableJson(normalizePhysicalStyleConfig(state.styleConfig?.physical || {})),
+      stableJson(state.styleConfig?.urban || {}),
+      stableJson(state.styleConfig?.rivers || {}),
+    ];
+    if (shouldEnableContextBaseTransformReuse()) {
+      return [
+        getViewportRenderSignature(),
+        "context-base-transform-reuse",
+        ...baseSignatureParts,
+      ].join("::");
+    }
+    return [
+      transformSignature,
+      ...baseSignatureParts,
+    ].join("::");
+  }
+  if (passName === "contextScenario") {
     return [
       transformSignature,
       state.topologyRevision || 0,
       state.activeScenarioId || "",
       state.scenarioReliefOverlayRevision || 0,
+      `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
+      `scenario-overlays:${getScenarioOverlaySignatureToken()}`,
       state.showWaterRegions ? "scenario-water:on" : "scenario-water:off",
       state.showScenarioSpecialRegions ? "scenario-special:on" : "scenario-special:off",
       state.showScenarioReliefOverlays ? "scenario-relief:on" : "scenario-relief:off",
-      state.showPhysical ? "physical:on" : "physical:off",
-      state.showUrban ? "urban:on" : "urban:off",
-      state.showRivers ? "rivers:on" : "rivers:off",
-      stableJson(normalizePhysicalStyleConfig(state.styleConfig?.physical || {})),
-      stableJson(state.styleConfig?.urban || {}),
-      stableJson(state.styleConfig?.rivers || {}),
     ].join("::");
   }
   if (passName === "dayNight") {
@@ -1072,16 +1139,65 @@ function isAtlantropaSeaFeature(feature) {
 }
 
 function getAtlantropaSeaPoliticalFillColor() {
-  const oceanFillColor = getOceanBaseFillColor();
-  const oceanRgb = globalThis.ColorManager?.hexToRgb?.(oceanFillColor);
-  if (oceanRgb) {
-    return `rgba(${oceanRgb.r}, ${oceanRgb.g}, ${oceanRgb.b}, 0.92)`;
-  }
-  return oceanFillColor;
+  return getOceanBaseFillColor();
 }
 
 function getAtlantropaSeaPoliticalStrokeColor() {
-  return "rgba(48, 84, 126, 0.14)";
+  const oceanFillColor = getOceanBaseFillColor();
+  const oceanRgb = globalThis.ColorManager?.hexToRgb?.(oceanFillColor);
+  if (oceanRgb) {
+    return `rgba(${oceanRgb.r}, ${oceanRgb.g}, ${oceanRgb.b}, 0.12)`;
+  }
+  return "rgba(48, 84, 126, 0.12)";
+}
+
+function getMediterraneanAtlantropaBounds() {
+  if (String(state.activeScenarioId || "").trim().toLowerCase() !== "tno_1962") return null;
+  const cache = state.mediterraneanAtlantropaBoundsCache || {};
+  const featureCount = Array.isArray(state.landData?.features) ? state.landData.features.length : 0;
+  if (
+    cache.scenarioId === state.activeScenarioId &&
+    cache.topologyRevision === Number(state.topologyRevision || 0) &&
+    cache.featureCount === featureCount &&
+    Array.isArray(cache.bounds)
+  ) {
+    return cache.bounds;
+  }
+  if (!Array.isArray(state.landData?.features) || !state.landData.features.length || !globalThis.d3?.geoBounds) {
+    return null;
+  }
+  const atlFeatures = state.landData.features.filter((feature) => getFeatureCountryCodeNormalized(feature) === "ATL");
+  if (!atlFeatures.length) return null;
+  try {
+    const bounds = globalThis.d3.geoBounds({
+      type: "FeatureCollection",
+      features: atlFeatures,
+    });
+    state.mediterraneanAtlantropaBoundsCache = {
+      scenarioId: state.activeScenarioId || "",
+      topologyRevision: Number(state.topologyRevision || 0),
+      featureCount,
+      bounds,
+    };
+    return bounds;
+  } catch (_error) {
+    return null;
+  }
+}
+
+function isPointerInsideMediterraneanAtlantropaBounds(pointer) {
+  const bounds = getMediterraneanAtlantropaBounds();
+  if (!bounds || !Array.isArray(bounds) || bounds.length !== 2) return false;
+  const lon = Number(pointer?.lonLat?.[0]);
+  const lat = Number(pointer?.lonLat?.[1]);
+  if (!Number.isFinite(lon) || !Number.isFinite(lat)) return false;
+  const [[minLon, minLat], [maxLon, maxLat]] = bounds;
+  return lon >= minLon && lon <= maxLon && lat >= minLat && lat <= maxLat;
+}
+
+function shouldSuppressOpenOceanHit(candidate, pointer) {
+  if (!candidate?.item?.feature || !isOpenOceanWaterRegion(candidate.item.feature)) return false;
+  return isPointerInsideMediterraneanAtlantropaBounds(pointer);
 }
 
 function getFeatureRegionTag(feature) {
@@ -1283,14 +1399,15 @@ function withRenderTarget(targetContext, callback) {
   }
 }
 
-function getPassCounterName(passName) {
-  if (passName === "background") return "backgroundPassRenders";
-  if (passName === "political") return "politicalPassRenders";
-  if (passName === "effects") return "effectsPassRenders";
-  if (passName === "context") return "contextPassRenders";
-  if (passName === "dayNight") return "dayNightPassRenders";
-  if (passName === "borders") return "borderPassRenders";
-  return "";
+function getPassCounterNames(passName) {
+  if (passName === "background") return ["backgroundPassRenders"];
+  if (passName === "political") return ["politicalPassRenders"];
+  if (passName === "effects") return ["effectsPassRenders"];
+  if (passName === "contextBase") return ["contextPassRenders", "contextBasePassRenders"];
+  if (passName === "contextScenario") return ["contextPassRenders", "contextScenarioPassRenders"];
+  if (passName === "dayNight") return ["dayNightPassRenders"];
+  if (passName === "borders") return ["borderPassRenders"];
+  return [];
 }
 
 function recordPassTiming(timings, passName, startedAt) {
@@ -1312,6 +1429,163 @@ function nowMs() {
     return globalThis.performance.now();
   }
   return Date.now();
+}
+
+function scheduleDeferredWork(callback, { timeout = 0 } = {}) {
+  if (typeof callback !== "function") return null;
+  if (typeof globalThis.requestIdleCallback === "function") {
+    return {
+      type: "idle",
+      id: globalThis.requestIdleCallback(callback, {
+        timeout: Math.max(0, Number(timeout) || 0),
+      }),
+    };
+  }
+  return {
+    type: "timeout",
+    id: globalThis.setTimeout(callback, Math.max(0, Number(timeout) || 0)),
+  };
+}
+
+function cancelDeferredWork(handle) {
+  if (!handle || typeof handle !== "object") return;
+  if (handle.type === "idle" && typeof globalThis.cancelIdleCallback === "function") {
+    globalThis.cancelIdleCallback(handle.id);
+    return;
+  }
+  if (typeof globalThis.clearTimeout === "function") {
+    globalThis.clearTimeout(handle.id);
+  }
+}
+
+function clearStagedMapDataTasks() {
+  cancelDeferredWork(state.stagedContextBaseHandle);
+  cancelDeferredWork(state.stagedHitCanvasHandle);
+  state.stagedContextBaseHandle = null;
+  state.stagedHitCanvasHandle = null;
+}
+
+function cancelExactAfterSettleRefresh({ clearDefer = true } = {}) {
+  cancelDeferredWork(state.exactAfterSettleHandle);
+  state.exactAfterSettleHandle = null;
+  if (clearDefer) {
+    state.deferExactAfterSettle = false;
+  }
+}
+
+function isHeavyScenarioStagedApplyCandidate() {
+  const landCount = Array.isArray(state.landData?.features) ? state.landData.features.length : 0;
+  return !!state.activeScenarioId && landCount >= HEAVY_SCENARIO_STAGED_APPLY_FEATURE_THRESHOLD;
+}
+
+function getViewportRenderSignature() {
+  return [
+    Math.round(Number(state.width || 0)),
+    Math.round(Number(state.height || 0)),
+    Number(Number(state.dpr || 1).toFixed(2)),
+  ].join("|");
+}
+
+function shouldEnableContextBaseTransformReuse() {
+  return (
+    String(state.renderProfile || "auto") === "balanced"
+    && isHeavyScenarioStagedApplyCandidate()
+    && !!state.activeScenarioId
+  );
+}
+
+function getPassReferenceTransform(passName) {
+  const cache = getRenderPassCacheState();
+  if (cache.referenceTransforms?.[passName]) {
+    return cloneZoomTransform(cache.referenceTransforms[passName]);
+  }
+  return cache.referenceTransform ? cloneZoomTransform(cache.referenceTransform) : null;
+}
+
+function setPassReferenceTransform(passName, transform) {
+  const cache = getRenderPassCacheState();
+  cache.referenceTransforms[passName] = cloneZoomTransform(transform);
+  cache.referenceTransform = cloneZoomTransform(transform);
+}
+
+function getTransformReuseDelta(currentTransform, referenceTransform) {
+  const current = cloneZoomTransform(currentTransform);
+  const reference = cloneZoomTransform(referenceTransform);
+  const scaleRatio = current.k / Math.max(reference.k, 0.0001);
+  const dx = current.x - (reference.x * scaleRatio);
+  const dy = current.y - (reference.y * scaleRatio);
+  const distancePx = Math.hypot(dx, dy);
+  return {
+    current,
+    reference,
+    scaleRatio,
+    dx,
+    dy,
+    distancePx,
+  };
+}
+
+function getContextBaseReuseDecision(transform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
+  const referenceTransform = getPassReferenceTransform("contextBase");
+  if (!shouldEnableContextBaseTransformReuse()) {
+    return {
+      enabled: false,
+      shouldExactRefresh: true,
+      reason: "reuse-disabled",
+      scaleRatio: 1,
+      distancePx: 0,
+      crossesMinorContourThreshold: false,
+      referenceTransform,
+    };
+  }
+  if (!referenceTransform) {
+    return {
+      enabled: true,
+      shouldExactRefresh: true,
+      reason: "no-reference-transform",
+      scaleRatio: 1,
+      distancePx: 0,
+      crossesMinorContourThreshold: false,
+      referenceTransform: null,
+    };
+  }
+  const delta = getTransformReuseDelta(transform, referenceTransform);
+  const crossesMinorContourThreshold =
+    (delta.reference.k < CONTEXT_BASE_MINOR_CONTOUR_THRESHOLD && delta.current.k >= CONTEXT_BASE_MINOR_CONTOUR_THRESHOLD)
+    || (delta.reference.k >= CONTEXT_BASE_MINOR_CONTOUR_THRESHOLD && delta.current.k < CONTEXT_BASE_MINOR_CONTOUR_THRESHOLD);
+  const shouldExactRefresh =
+    delta.scaleRatio < CONTEXT_BASE_REUSE_MIN_SCALE_RATIO
+    || delta.scaleRatio > CONTEXT_BASE_REUSE_MAX_SCALE_RATIO
+    || delta.distancePx > CONTEXT_BASE_REUSE_MAX_DISTANCE_PX
+    || crossesMinorContourThreshold;
+  let reason = "transform-reuse";
+  if (delta.scaleRatio < CONTEXT_BASE_REUSE_MIN_SCALE_RATIO || delta.scaleRatio > CONTEXT_BASE_REUSE_MAX_SCALE_RATIO) {
+    reason = "scale-threshold";
+  } else if (delta.distancePx > CONTEXT_BASE_REUSE_MAX_DISTANCE_PX) {
+    reason = "distance-threshold";
+  } else if (crossesMinorContourThreshold) {
+    reason = "minor-contour-threshold";
+  }
+  return {
+    enabled: true,
+    shouldExactRefresh,
+    reason,
+    scaleRatio: Number(delta.scaleRatio.toFixed(4)),
+    distancePx: Number(delta.distancePx.toFixed(2)),
+    crossesMinorContourThreshold,
+    referenceTransform,
+    currentTransform: delta.current,
+  };
+}
+
+function shouldStartExactAfterSettleFastPath() {
+  if (!shouldEnableContextBaseTransformReuse()) return false;
+  if (state.deferContextBasePass) return false;
+  const requiredPasses = ["background", "political", "effects", "contextBase", "contextScenario", "dayNight"];
+  return requiredPasses.every((passName) => {
+    const cache = getRenderPassCacheState();
+    return !!cache.canvases?.[passName] && !!getPassReferenceTransform(passName);
+  });
 }
 
 function ensureProjectedBoundsCache() {
@@ -1940,6 +2214,12 @@ function scheduleRenderPhaseIdle() {
   state.renderPhaseTimerId = globalThis.setTimeout(() => {
     state.renderPhaseTimerId = null;
     setRenderPhase(RENDER_PHASE_IDLE);
+    if (shouldStartExactAfterSettleFastPath()) {
+      state.deferExactAfterSettle = true;
+      render();
+      scheduleExactAfterSettleRefresh();
+      return;
+    }
     render();
   }, RENDER_SETTLE_DURATION_MS);
 }
@@ -1947,16 +2227,15 @@ function scheduleRenderPhaseIdle() {
 function getDisplayOwnerCode(feature, id) {
   const resolvedId = String(id || "").trim() || getFeatureId(feature);
   const shellOwnerCode = String(state.scenarioAutoShellOwnerByFeatureId?.[resolvedId] || "").trim().toUpperCase();
-  const ownershipOwnerCode = shellOwnerCode || getFeatureOwnerCode(resolvedId) || getFeatureCountryCodeNormalized(feature);
+  const directOwnerCode = canonicalCountryCode(state.sovereigntyByFeatureId?.[resolvedId] || "");
+  const fallbackOwnerCode = getFeatureCountryCodeNormalized(feature);
+  const ownershipOwnerCode = shellOwnerCode || directOwnerCode || fallbackOwnerCode;
   if (!state.activeScenarioId || String(state.scenarioViewMode || "ownership") !== "frontline") {
     return ownershipOwnerCode;
   }
-  return String(
-    state.scenarioAutoShellControllerByFeatureId?.[resolvedId]
-    || state.scenarioControllersByFeatureId?.[resolvedId]
-    || ownershipOwnerCode
-    || ""
-  ).trim().toUpperCase();
+  const shellControllerCode = String(state.scenarioAutoShellControllerByFeatureId?.[resolvedId] || "").trim().toUpperCase();
+  const directControllerCode = canonicalCountryCode(state.scenarioControllersByFeatureId?.[resolvedId] || "");
+  return shellControllerCode || directControllerCode || ownershipOwnerCode || "";
 }
 
 function getResolvedFeatureColor(feature, id) {
@@ -3384,10 +3663,54 @@ function drawHitCanvas() {
   return true;
 }
 
+function drawHitCanvasWithMetric(details = {}) {
+  const startedAt = nowMs();
+  const built = drawHitCanvas();
+  recordRenderPerfMetric("buildHitCanvas", nowMs() - startedAt, {
+    built: !!built,
+    dirtyBefore: true,
+    ...details,
+  });
+  return built;
+}
+
+function scheduleHitCanvasBuildIfNeeded({ reason = "idle-render" } = {}) {
+  if (!hitContext || !pathHitCanvas || !state.hitCanvasDirty) return false;
+  if (state.deferHitCanvasBuild || state.renderPhase !== RENDER_PHASE_IDLE) {
+    return false;
+  }
+  if (state.hitCanvasBuildScheduled) {
+    return false;
+  }
+  state.hitCanvasBuildScheduled = scheduleDeferredWork(() => {
+    state.hitCanvasBuildScheduled = null;
+    if (!hitContext || !pathHitCanvas || !state.hitCanvasDirty) return;
+    if (state.deferHitCanvasBuild || state.renderPhase !== RENDER_PHASE_IDLE) return;
+    drawHitCanvasWithMetric({
+      mode: "deferred",
+      reason,
+      activeScenarioId: String(state.activeScenarioId || ""),
+    });
+  }, {
+    timeout: STAGED_HIT_CANVAS_TIMEOUT_MS,
+  });
+  return false;
+}
+
 function ensureHitCanvasUpToDate({ force = false } = {}) {
   if (!hitContext || !pathHitCanvas) return false;
   if (!force && !state.hitCanvasDirty) return true;
-  return drawHitCanvas();
+  if (!force) {
+    scheduleHitCanvasBuildIfNeeded({ reason: "lazy-hit-validation" });
+    return false;
+  }
+  cancelDeferredWork(state.hitCanvasBuildScheduled);
+  state.hitCanvasBuildScheduled = null;
+  return drawHitCanvasWithMetric({
+    mode: "forced",
+    reason: "strict-validation",
+    activeScenarioId: String(state.activeScenarioId || ""),
+  });
 }
 
 function getHitResultFromCanvas(event) {
@@ -3427,8 +3750,8 @@ function getHitResultFromCanvas(event) {
   });
 }
 
-function getValidatedCanvasHit(event, strictIds = null) {
-  if (state.renderPhase !== RENDER_PHASE_IDLE || !ensureHitCanvasUpToDate()) {
+function getValidatedCanvasHit(event, strictIds = null, { forceBuild = false } = {}) {
+  if (state.renderPhase !== RENDER_PHASE_IDLE || !ensureHitCanvasUpToDate({ force: !!forceBuild })) {
     return createHitResult();
   }
   const hit = getHitResultFromCanvas(event);
@@ -3750,7 +4073,9 @@ function getLandHitFromPointer(
   if (!state.landData || !state.spatialItems?.length) return createHitResult();
   const hitMode = resolveHitMode();
   if (hitMode === "canvas" && eventType !== "compat") {
-    const hitFromCanvas = getValidatedCanvasHit(event);
+    const hitFromCanvas = getValidatedCanvasHit(event, null, {
+      forceBuild: eventType === "click" || eventType === "dblclick",
+    });
     if (hitFromCanvas.id) {
       return hitFromCanvas;
     }
@@ -3763,7 +4088,12 @@ function getLandHitFromPointer(
     if (strictContainsGeo) {
       if (hitMode === "auto" && eventType !== "compat") {
         const strictIds = new Set(strictRanked.map((candidate) => candidate.item.id));
-        const hitFromCanvas = getValidatedCanvasHit(event, strictIds);
+        const strictMatchCount = strictRanked.filter((candidate) => candidate.containsGeo).length;
+        const hitFromCanvas = getValidatedCanvasHit(event, strictIds, {
+          forceBuild:
+            strictMatchCount > 1
+            && (eventType === "click" || eventType === "dblclick" || eventType === "compat"),
+        });
         if (hitFromCanvas.id === strictContainsGeo.item.id) {
           return hitFromCanvas;
         }
@@ -3809,6 +4139,9 @@ function getWaterHitFromPointer(
   const strictRanked = rankCandidates(strictCandidates, pointer.lonLat);
   const strictHit = strictRanked.find((candidate) => candidate.containsGeo);
   if (strictHit) {
+    if (shouldSuppressOpenOceanHit(strictHit, pointer)) {
+      return createHitResult();
+    }
     return toHitResult(strictHit, {
       viaSnap: false,
       strict: true,
@@ -3829,6 +4162,9 @@ function getWaterHitFromPointer(
   const snapRanked = rankCandidates(snapCandidates, pointer.lonLat);
   const chosen = snapRanked.find((candidate) => candidate.containsGeo);
   if (!chosen) return createHitResult();
+  if (shouldSuppressOpenOceanHit(chosen, pointer)) {
+    return createHitResult();
+  }
   return toHitResult(chosen, {
     viaSnap: true,
     strict: false,
@@ -4703,6 +5039,16 @@ function getPhysicalLandMaskInfo() {
   const primaryTopology = state.topologyPrimary || state.topology;
   const detailTopology = state.topologyDetail;
   const landSource = String(state.contextLayerSourceByName?.land || "").trim().toLowerCase();
+  if (Array.isArray(state.scenarioContextLandMaskData?.features) && state.scenarioContextLandMaskData.features.length) {
+    return {
+      collection: state.scenarioContextLandMaskData,
+      maskSource: "scenarioContextLandMask",
+      maskFeatureCount: getFeatureCollectionFeatureCount(state.scenarioContextLandMaskData),
+      maskArcRefEstimate: estimateTopologyObjectArcRefs(state.scenarioRuntimeTopologyData, "context_land_mask")
+        ?? estimateTopologyObjectArcRefs(state.scenarioRuntimeTopologyData, "land_mask")
+        ?? estimateTopologyObjectArcRefs(state.scenarioRuntimeTopologyData, "land"),
+    };
+  }
   if (Array.isArray(state.scenarioLandMaskData?.features) && state.scenarioLandMaskData.features.length) {
     return {
       collection: state.scenarioLandMaskData,
@@ -4782,7 +5128,7 @@ function applyPhysicalLandClipMask() {
   return true;
 }
 
-function drawPhysicalAtlasLayer(k, { interactive = false } = {}) {
+function drawPhysicalAtlasLayer(k, { interactive = false, clipAlreadyApplied = false } = {}) {
   const startedAt = nowMs();
   const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
   const maskInfo = getPhysicalLandMaskInfo();
@@ -4825,7 +5171,9 @@ function drawPhysicalAtlasLayer(k, { interactive = false } = {}) {
   );
 
   context.save();
-  applyPhysicalLandClipMask();
+  if (!clipAlreadyApplied) {
+    applyPhysicalLandClipMask();
+  }
   context.globalCompositeOperation = blendMode;
 
   ["relief_base", "semantic_overlay"].forEach((layerName) => {
@@ -4891,7 +5239,7 @@ function drawContourCollection(
   return drewAny;
 }
 
-function drawPhysicalContourLayer(k, { interactive = false } = {}) {
+function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied = false } = {}) {
   const startedAt = nowMs();
   const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
   const maskInfo = getPhysicalLandMaskInfo();
@@ -4934,7 +5282,9 @@ function drawPhysicalContourLayer(k, { interactive = false } = {}) {
   const minorOpacity = clamp(majorOpacity * 0.68, 0, 1);
 
   context.save();
-  applyPhysicalLandClipMask();
+  if (!clipAlreadyApplied) {
+    applyPhysicalLandClipMask();
+  }
   context.globalCompositeOperation = blendMode;
 
   drawContourCollection(state.physicalContourMajorData, {
@@ -4983,8 +5333,18 @@ function drawPhysicalContourLayer(k, { interactive = false } = {}) {
 }
 
 function drawPhysicalLayer(k, { interactive = false } = {}) {
-  drawPhysicalAtlasLayer(k, { interactive });
-  drawPhysicalContourLayer(k, { interactive });
+  const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
+  const shouldShareClip = !!state.showPhysical && cfg.mode !== "disabled";
+  if (!shouldShareClip) {
+    drawPhysicalAtlasLayer(k, { interactive });
+    drawPhysicalContourLayer(k, { interactive });
+    return;
+  }
+  context.save();
+  applyPhysicalLandClipMask();
+  drawPhysicalAtlasLayer(k, { interactive, clipAlreadyApplied: true });
+  drawPhysicalContourLayer(k, { interactive, clipAlreadyApplied: true });
+  context.restore();
 }
 
 function drawUrbanLayer(k, { interactive = false } = {}) {
@@ -6192,6 +6552,40 @@ function shouldUseScenarioPoliticalBackgroundMerge() {
   );
 }
 
+function shouldSkipScenarioPoliticalBackgroundMergeShape(
+  mergedShape,
+  { displayCode = "", fillColor = "", groupSize = 0 } = {}
+) {
+  const scenarioId = String(state.activeScenarioId || "").trim();
+  if (scenarioId !== "hoi4_1936" && scenarioId !== "hoi4_1939") {
+    return false;
+  }
+  const geoAreaFn = globalThis.d3?.geoArea;
+  if (typeof geoAreaFn !== "function") {
+    return false;
+  }
+  let area = Number.NaN;
+  try {
+    area = geoAreaFn(mergedShape);
+  } catch (_error) {
+    area = Number.NaN;
+  }
+  const suspicious = !Number.isFinite(area) || area > SCENARIO_BACKGROUND_MERGE_MAX_AREA;
+  if (!suspicious) {
+    return false;
+  }
+  const viewMode = String(state.scenarioViewMode || "ownership");
+  const logKey = `${scenarioId}::${viewMode}::${displayCode}::${fillColor}`;
+  if (!suspiciousScenarioBackgroundMergeWarnings.has(logKey)) {
+    suspiciousScenarioBackgroundMergeWarnings.add(logKey);
+    const areaText = Number.isFinite(area) ? area.toFixed(5) : "non-finite";
+    console.warn(
+      `[map_renderer] Skipping suspicious scenario political background merge: scenario=${scenarioId || "(none)"} view=${viewMode} owner=${displayCode || "(unknown)"} fill=${fillColor || "(none)"} group=${groupSize} area=${areaText}`
+    );
+  }
+  return true;
+}
+
 function buildScenarioPoliticalBackgroundEntries() {
   const startedAt = nowMs();
   if (!shouldUseScenarioPoliticalBackgroundMerge()) {
@@ -6282,16 +6676,25 @@ function buildScenarioPoliticalBackgroundEntries() {
       LAND_FILL_COLOR;
     const groupKey = `${displayCode}::${fillColor}`;
     if (!groupedGeometries.has(groupKey)) {
-      groupedGeometries.set(groupKey, { fillColor, geometries: [] });
+      groupedGeometries.set(groupKey, { displayCode, fillColor, geometries: [] });
     }
     groupedGeometries.get(groupKey).geometries.push(geometry);
   });
 
   const entries = [];
-  groupedGeometries.forEach(({ fillColor, geometries: group }) => {
+  let skippedSuspiciousCount = 0;
+  groupedGeometries.forEach(({ displayCode, fillColor, geometries: group }) => {
     if (!Array.isArray(group) || !group.length) return;
     try {
       const mergedShape = globalThis.topojson.merge(topology, group);
+      if (shouldSkipScenarioPoliticalBackgroundMergeShape(mergedShape, {
+        displayCode,
+        fillColor,
+        groupSize: group.length,
+      })) {
+        skippedSuspiciousCount += 1;
+        return;
+      }
       entries.push({ fillColor, mergedShape });
     } catch (_error) {
       // Skip groups that fail to merge and fall back to per-feature fills below.
@@ -6318,6 +6721,7 @@ function buildScenarioPoliticalBackgroundEntries() {
     cacheHit: false,
     entryCount: entries.length,
     featureCount,
+    skippedSuspiciousCount,
   });
   return entries;
 }
@@ -6559,18 +6963,72 @@ function drawEffectsPass(k, { interactive = false } = {}) {
   drawTextureLayer(k, { interactive });
 }
 
-function drawContextPass(k, { interactive = false } = {}) {
+function drawContextBasePass(k, { interactive = false } = {}) {
+  const startedAt = nowMs();
+  let deferred = false;
   beginContextMetricSession();
   try {
-    drawPhysicalAtlasLayer(k, { interactive });
-    drawPhysicalContourLayer(k, { interactive });
-    drawUrbanLayer(k, { interactive });
-    drawRiversLayer(k, { interactive });
+    if (state.deferContextBasePass && !interactive) {
+      deferred = true;
+      const maskInfo = getPhysicalLandMaskInfo();
+      collectContextMetric("drawPhysicalAtlasLayer", 0, {
+        featureCount: 0,
+        interactive: false,
+        skipped: true,
+        reason: "staged-apply",
+        maskSource: maskInfo.maskSource,
+        maskFeatureCount: maskInfo.maskFeatureCount,
+        maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+      });
+      collectContextMetric("drawPhysicalContourLayer", 0, {
+        featureCount: 0,
+        majorFeatureCount: 0,
+        minorFeatureCount: 0,
+        interactive: false,
+        skipped: true,
+        reason: "staged-apply",
+        maskSource: maskInfo.maskSource,
+        maskFeatureCount: maskInfo.maskFeatureCount,
+        maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+      });
+      collectContextMetric("drawUrbanLayer", 0, {
+        featureCount: getFeatureCollectionFeatureCount(state.urbanData),
+        interactive: false,
+        skipped: true,
+        reason: "staged-apply",
+      });
+      collectContextMetric("drawRiversLayer", 0, {
+        featureCount: getFeatureCollectionFeatureCount(state.riversData),
+        interactive: false,
+        skipped: true,
+        reason: "staged-apply",
+      });
+    } else {
+      drawPhysicalLayer(k, { interactive });
+      drawUrbanLayer(k, { interactive });
+      drawRiversLayer(k, { interactive });
+    }
+  } finally {
+    endContextMetricSession();
+  }
+  recordRenderPerfMetric("drawContextBasePass", nowMs() - startedAt, {
+    interactive: !!interactive,
+    deferred,
+  });
+}
+
+function drawContextScenarioPass(k, { interactive = false } = {}) {
+  const startedAt = nowMs();
+  beginContextMetricSession();
+  try {
     drawScenarioRegionOverlaysPass(k);
     drawScenarioReliefOverlaysLayer(k);
   } finally {
     endContextMetricSession();
   }
+  recordRenderPerfMetric("drawContextScenarioPass", nowMs() - startedAt, {
+    interactive: !!interactive,
+  });
 }
 
 function drawDayNightPass(k, { interactive = false } = {}) {
@@ -6597,14 +7055,11 @@ function renderPassToCache(passName, drawFn, transform, timings) {
     const k = prepareTargetContext(passContext, transform);
     drawFn(k);
   });
-  getRenderPassCacheState().referenceTransform = cloneZoomTransform(transform);
+  setPassReferenceTransform(passName, transform);
   getRenderPassCacheState().signatures[passName] = getRenderPassSignature(passName, transform);
   getRenderPassCacheState().dirty[passName] = false;
   recordPassTiming(timings, passName, passStart);
-  const counterName = getPassCounterName(passName);
-  if (counterName) {
-    incrementPerfCounter(counterName);
-  }
+  getPassCounterNames(passName).forEach((counterName) => incrementPerfCounter(counterName));
 }
 
 function ensureIdleRenderPasses(timings) {
@@ -6614,7 +7069,8 @@ function ensureIdleRenderPasses(timings) {
     ["background", (k) => drawBackgroundPass(k)],
     ["political", (k) => drawPoliticalPass(k)],
     ["effects", (k) => drawEffectsPass(k)],
-    ["context", (k) => drawContextPass(k)],
+    ["contextBase", (k) => drawContextBasePass(k)],
+    ["contextScenario", (k) => drawContextScenarioPass(k)],
     ["dayNight", (k) => drawDayNightPass(k)],
     ["borders", (k) => drawBordersPass(k)],
   ];
@@ -6626,9 +7082,26 @@ function ensureIdleRenderPasses(timings) {
         cache.reasons[passName] = "signature";
       }
     }
+    if (
+      passName === "contextBase"
+      && shouldEnableContextBaseTransformReuse()
+      && !state.deferExactAfterSettle
+      && shouldStartExactAfterSettleFastPath()
+    ) {
+      const reuseDecision = getContextBaseReuseDecision(transform);
+      if (reuseDecision.enabled && reuseDecision.shouldExactRefresh) {
+        cache.dirty[passName] = true;
+        cache.reasons[passName] = reuseDecision.reason || "context-base-threshold";
+      }
+    }
     if (!cache.dirty[passName]) return;
     renderPassToCache(passName, drawFn, transform, timings);
   });
+  if (Number.isFinite(timings.contextBase) || Number.isFinite(timings.contextScenario)) {
+    timings.context =
+      Math.max(0, Number(timings.contextBase || 0))
+      + Math.max(0, Number(timings.contextScenario || 0));
+  }
 }
 
 function resetMainCanvas() {
@@ -6654,12 +7127,14 @@ function composeCachedPasses(passNames) {
   incrementPerfCounter("composites");
 }
 
-function drawTransformedPass(passName, currentTransform, referenceTransform) {
+function drawTransformedPass(passName, currentTransform, referenceTransform = null) {
   const cache = getRenderPassCacheState();
   const passCanvas = cache.canvases?.[passName];
   if (!passCanvas) return false;
+  const resolvedReferenceTransform = referenceTransform || getPassReferenceTransform(passName);
+  if (!resolvedReferenceTransform) return false;
   const current = cloneZoomTransform(currentTransform);
-  const reference = cloneZoomTransform(referenceTransform);
+  const reference = cloneZoomTransform(resolvedReferenceTransform);
   const scaleRatio = current.k / Math.max(reference.k, 0.0001);
   const dx = current.x - (reference.x * scaleRatio);
   const dy = current.y - (reference.y * scaleRatio);
@@ -6672,17 +7147,13 @@ function drawTransformedPass(passName, currentTransform, referenceTransform) {
   return true;
 }
 
-function drawInteractiveFrameFromCaches(timings) {
-  const cache = getRenderPassCacheState();
+function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } = {}) {
   const currentTransform = state.zoomTransform || globalThis.d3.zoomIdentity;
-  const referenceTransform = cache.referenceTransform;
-  if (!referenceTransform) return false;
-
-  const interactiveStart = nowMs();
+  const compositeStart = nowMs();
   resetMainCanvas();
-  const transformedPasses = ["background", "political", "effects", "context", "dayNight"];
+  const transformedPasses = ["background", "political", "effects", "contextBase", "contextScenario", "dayNight"];
   const drewAll = transformedPasses.every((passName) =>
-    drawTransformedPass(passName, currentTransform, referenceTransform)
+    drawTransformedPass(passName, currentTransform)
   );
   if (!drewAll) return false;
 
@@ -6690,10 +7161,23 @@ function drawInteractiveFrameFromCaches(timings) {
   context.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
   context.translate(currentTransform.x, currentTransform.y);
   context.scale(k, k);
-  drawBordersPass(k, { interactive: true });
+  drawBordersPass(k, { interactive: !!interactiveBorders });
   context.setTransform(1, 0, 0, 1, 0, 0);
-  recordPassTiming(timings, "interactiveComposite", interactiveStart);
+  const timingLabel = interactiveBorders ? "interactiveComposite" : "transformedComposite";
+  recordPassTiming(timings, timingLabel, compositeStart);
+  if (Number.isFinite(timings.contextBase) || Number.isFinite(timings.contextScenario)) {
+    timings.context =
+      Math.max(0, Number(timings.contextBase || 0))
+      + Math.max(0, Number(timings.contextScenario || 0));
+  }
   incrementPerfCounter("transformedFrames");
+  if (state.renderPhase === RENDER_PHASE_SETTLING || (state.renderPhase === RENDER_PHASE_IDLE && state.deferExactAfterSettle)) {
+    recordRenderPerfMetric("settleFastFrame", Math.max(0, nowMs() - compositeStart), {
+      phase: state.renderPhase,
+      interactiveBorders: !!interactiveBorders,
+      activeScenarioId: String(state.activeScenarioId || ""),
+    });
+  }
   return true;
 }
 
@@ -6703,9 +7187,14 @@ function drawCanvas() {
   incrementPerfCounter("drawCanvas");
   const frameStart = nowMs();
   const frameTimings = {};
-  const isInteractingFrame = state.renderPhase === RENDER_PHASE_INTERACTING;
+  const useTransformedFrame =
+    state.renderPhase === RENDER_PHASE_INTERACTING
+    || state.renderPhase === RENDER_PHASE_SETTLING
+    || (state.renderPhase === RENDER_PHASE_IDLE && state.deferExactAfterSettle);
 
-  if (!isInteractingFrame || !drawInteractiveFrameFromCaches(frameTimings)) {
+  if (!useTransformedFrame || !drawTransformedFrameFromCaches(frameTimings, {
+    interactiveBorders: state.renderPhase !== RENDER_PHASE_IDLE || state.deferExactAfterSettle,
+  })) {
     ensureIdleRenderPasses(frameTimings);
     composeCachedPasses(RENDER_PASS_NAMES);
   }
@@ -6718,6 +7207,117 @@ function drawCanvas() {
     transform: cloneZoomTransform(state.zoomTransform),
   };
   incrementPerfCounter("frames");
+}
+
+function scheduleExactAfterSettleRefresh() {
+  cancelExactAfterSettleRefresh({ clearDefer: false });
+  state.exactAfterSettleHandle = {
+    type: "timeout",
+    id: globalThis.setTimeout(() => {
+    state.exactAfterSettleHandle = null;
+    if (state.renderPhase !== RENDER_PHASE_IDLE || !state.deferExactAfterSettle) return;
+    const reuseDecision = getContextBaseReuseDecision();
+    const startedAt = nowMs();
+    state.deferExactAfterSettle = false;
+    if (reuseDecision.enabled) {
+      recordRenderPerfMetric("contextBaseReuseScaleRatio", 0, {
+        activeScenarioId: String(state.activeScenarioId || ""),
+        scaleRatio: reuseDecision.scaleRatio,
+      });
+      recordRenderPerfMetric("contextBaseReuseDistancePx", 0, {
+        activeScenarioId: String(state.activeScenarioId || ""),
+        distancePx: reuseDecision.distancePx,
+      });
+      if (reuseDecision.shouldExactRefresh) {
+        invalidateRenderPasses("contextBase", reuseDecision.reason || "context-base-exact");
+      } else {
+        recordRenderPerfMetric("contextBaseReuseSkipped", 0, {
+          activeScenarioId: String(state.activeScenarioId || ""),
+          reason: reuseDecision.reason,
+          scaleRatio: reuseDecision.scaleRatio,
+          distancePx: reuseDecision.distancePx,
+          crossesMinorContourThreshold: !!reuseDecision.crossesMinorContourThreshold,
+        });
+      }
+    }
+    render();
+    const durationMs = Math.max(0, nowMs() - startedAt);
+    recordRenderPerfMetric("settleExactRefresh", durationMs, {
+      activeScenarioId: String(state.activeScenarioId || ""),
+      contextBaseRefreshed: !!reuseDecision.shouldExactRefresh,
+      reason: reuseDecision.reason,
+      scaleRatio: reuseDecision.scaleRatio,
+      distancePx: reuseDecision.distancePx,
+      crossesMinorContourThreshold: !!reuseDecision.crossesMinorContourThreshold,
+    });
+    if (reuseDecision.enabled && reuseDecision.shouldExactRefresh) {
+      recordRenderPerfMetric("contextBaseExactRefresh", Number(state.renderPerfMetrics?.drawContextBasePass?.durationMs || durationMs), {
+        activeScenarioId: String(state.activeScenarioId || ""),
+        reason: reuseDecision.reason,
+        scaleRatio: reuseDecision.scaleRatio,
+        distancePx: reuseDecision.distancePx,
+        crossesMinorContourThreshold: !!reuseDecision.crossesMinorContourThreshold,
+      });
+    }
+    }, EXACT_AFTER_SETTLE_QUIET_WINDOW_MS),
+  };
+}
+
+function scheduleStagedHitCanvasWarmup(startedAt, token) {
+  cancelDeferredWork(state.stagedHitCanvasHandle);
+  state.stagedHitCanvasHandle = scheduleDeferredWork(() => {
+    state.stagedHitCanvasHandle = null;
+    if (token !== Number(state.stagedMapDataToken || 0)) return;
+    if (state.renderPhase !== RENDER_PHASE_IDLE) {
+      scheduleStagedHitCanvasWarmup(startedAt, token);
+      return;
+    }
+    state.deferHitCanvasBuild = false;
+    if (state.hitCanvasDirty) {
+      ensureHitCanvasUpToDate({ force: true });
+    }
+    recordRenderPerfMetric("setMapDataHitCanvasReady", nowMs() - startedAt, {
+      staged: true,
+      activeScenarioId: String(state.activeScenarioId || ""),
+    });
+  }, {
+    timeout: STAGED_HIT_CANVAS_TIMEOUT_MS,
+  });
+}
+
+function scheduleStagedContextBaseWarmup(startedAt, token) {
+  cancelDeferredWork(state.stagedContextBaseHandle);
+  state.stagedContextBaseHandle = scheduleDeferredWork(() => {
+    state.stagedContextBaseHandle = null;
+    if (token !== Number(state.stagedMapDataToken || 0)) return;
+    if (state.renderPhase !== RENDER_PHASE_IDLE) {
+      scheduleStagedContextBaseWarmup(startedAt, token);
+      return;
+    }
+    state.deferContextBasePass = false;
+    invalidateRenderPasses("contextBase", "staged-context-base");
+    render();
+    recordRenderPerfMetric("setMapDataContextBaseReady", nowMs() - startedAt, {
+      staged: true,
+      activeScenarioId: String(state.activeScenarioId || ""),
+    });
+    scheduleStagedHitCanvasWarmup(startedAt, token);
+  }, {
+    timeout: STAGED_CONTEXT_BASE_TIMEOUT_MS,
+  });
+}
+
+function beginStagedMapDataWarmup(startedAt) {
+  clearStagedMapDataTasks();
+  const token = Number(state.stagedMapDataToken || 0) + 1;
+  state.stagedMapDataToken = token;
+  const shouldStage = isHeavyScenarioStagedApplyCandidate();
+  state.deferContextBasePass = shouldStage;
+  state.deferHitCanvasBuild = shouldStage;
+  if (shouldStage) {
+    scheduleStagedContextBaseWarmup(startedAt, token);
+  }
+  return shouldStage;
 }
 
 function ensureSpecialZoneEditorState() {
@@ -7152,11 +7752,20 @@ function updatePerfOverlay() {
   const scenarioPerf = state.scenarioPerfMetrics || {};
   const opEntries = [
     ["setMapData", renderPerf.setMapData?.durationMs],
+    ["firstPaint", renderPerf.setMapDataFirstPaint?.durationMs],
+    ["contextBaseReady", renderPerf.setMapDataContextBaseReady?.durationMs],
+    ["hitReady", renderPerf.setMapDataHitCanvasReady?.durationMs],
+    ["settleFast", renderPerf.settleFastFrame?.durationMs],
+    ["settleExact", renderPerf.settleExactRefresh?.durationMs],
+    ["ctxBaseExact", renderPerf.contextBaseExactRefresh?.durationMs],
     ["buildSpatialIndex", renderPerf.buildSpatialIndex?.durationMs],
     ["rebuildStaticMeshes", renderPerf.rebuildStaticMeshes?.durationMs],
     ["rebuildDynamicBorders", renderPerf.rebuildDynamicBorders?.durationMs],
     ["physicalClip", renderPerf.applyPhysicalLandClipMask?.durationMs],
     ["oceanClip", renderPerf.applyOceanClipMask?.durationMs],
+    ["contextBase", renderPerf.drawContextBasePass?.durationMs],
+    ["contextScenario", renderPerf.drawContextScenarioPass?.durationMs],
+    ["hitCanvas", renderPerf.buildHitCanvas?.durationMs],
     ["bgMerge", renderPerf.drawScenarioPoliticalBackgroundEntries?.durationMs],
     ["relief", renderPerf.drawScenarioReliefOverlaysLayer?.durationMs],
     ["scenarioLoad", scenarioPerf.loadScenarioBundle?.durationMs],
@@ -7166,7 +7775,11 @@ function updatePerfOverlay() {
     .map(([name, value]) => `${name}=${Number(value || 0).toFixed(1)}ms`)
     .join(", ");
   const contextBreakdownEntries = Object.entries(renderPerf.contextBreakdown || {})
-    .map(([name, value]) => `${name}=${Number(value?.durationMs || 0).toFixed(1)}ms`)
+    .map(([name, value]) => {
+      const duration = Number(value?.durationMs || 0).toFixed(1);
+      const callCount = Number(value?.callCount || 0);
+      return `${name}=${duration}ms${callCount > 1 ? `#${callCount}` : ""}`;
+    })
     .join(", ");
   overlay.textContent = [
     `phase=${frame.phase || state.renderPhase} total=${Number(frame.totalMs || 0).toFixed(1)}ms`,
@@ -7175,8 +7788,9 @@ function updatePerfOverlay() {
     `passes ${timingEntries || "none"}`,
     `contextBreakdown ${contextBreakdownEntries || "none"}`,
     `ops ${opEntries || "none"}`,
+    `ctxReuse skip=${renderPerf.contextBaseReuseSkipped ? "yes" : "no"} scale=${Number(renderPerf.contextBaseReuseScaleRatio?.scaleRatio || 0).toFixed(4)} dist=${Number(renderPerf.contextBaseReuseDistancePx?.distancePx || 0).toFixed(2)}px`,
     `invalidations ${invalidations}`,
-    `render draw=${cache.counters.drawCanvas || 0} frame=${cache.counters.frames || 0} dayNight=${cache.counters.dayNightPassRenders || 0} hit=${cache.counters.hitCanvasRenders || 0} dynBorder=${cache.counters.dynamicBorderRebuilds || 0}`,
+    `render draw=${cache.counters.drawCanvas || 0} frame=${cache.counters.frames || 0} ctxBase=${cache.counters.contextBasePassRenders || 0} ctxScenario=${cache.counters.contextScenarioPassRenders || 0} dayNight=${cache.counters.dayNightPassRenders || 0} hit=${cache.counters.hitCanvasRenders || 0} dynBorder=${cache.counters.dynamicBorderRebuilds || 0}`,
     `sidebar list=${sidebarPerf.counters.fullListRenders || 0} rows=${sidebarPerf.counters.rowRefreshes || 0} detail=${sidebarPerf.counters.inspectorRenders || 0} preset=${sidebarPerf.counters.presetTreeRenders || 0} legend=${sidebarPerf.counters.legendRenders || 0}`,
   ].join("\n");
 }
@@ -7184,7 +7798,7 @@ function updatePerfOverlay() {
 function render() {
   drawCanvas();
   if (state.renderPhase === RENDER_PHASE_IDLE) {
-    ensureHitCanvasUpToDate();
+    scheduleHitCanvasBuildIfNeeded();
   }
   renderSpecialZones();
   renderInspectorHighlightOverlay();
@@ -8628,6 +9242,7 @@ function initZoom() {
     .filter((event) => shouldAllowZoomEvent(event))
     .on("start", () => {
       clearRenderPhaseTimer();
+      cancelExactAfterSettleRefresh();
       setRenderPhase(RENDER_PHASE_INTERACTING);
       renderHoverOverlay();
     })
@@ -8718,6 +9333,7 @@ function initMap({ containerId = "mapContainer" } = {}) {
   state.topologyRevision = Number(state.topologyRevision || 0) + 1;
   const renderPassCache = getRenderPassCacheState();
   renderPassCache.referenceTransform = null;
+  renderPassCache.referenceTransforms = {};
   renderPassCache.perfOverlayEnabled = isPerfOverlayEnabled();
   ensureLayerDataFromTopology();
   rebuildPoliticalLandCollections();
@@ -8741,6 +9357,12 @@ function initMap({ containerId = "mapContainer" } = {}) {
   state.renderPhase = RENDER_PHASE_IDLE;
   state.phaseEnteredAt = nowMs();
   state.renderPhaseTimerId = null;
+  clearStagedMapDataTasks();
+  cancelExactAfterSettleRefresh();
+  state.deferContextBasePass = false;
+  state.deferHitCanvasBuild = false;
+  state.deferExactAfterSettle = false;
+  state.hitCanvasBuildScheduled = null;
   state.projectedBoundsById = new Map();
   state.sphericalFeatureDiagnosticsById = new Map();
   invalidateAllRenderPasses("init-map");
@@ -8767,11 +9389,19 @@ function setMapData({ refitProjection = true, resetZoom = true } = {}) {
   clearRenderPhaseTimer();
   setRenderPhase(RENDER_PHASE_IDLE);
   resetRenderDiagnostics();
+  clearStagedMapDataTasks();
+  cancelExactAfterSettleRefresh();
+  cancelDeferredWork(state.hitCanvasBuildScheduled);
+  state.hitCanvasBuildScheduled = null;
+  state.deferContextBasePass = false;
+  state.deferHitCanvasBuild = false;
+  state.deferExactAfterSettle = false;
   layerResolverCache.primaryRef = null;
   layerResolverCache.detailRef = null;
   layerResolverCache.bundleMode = null;
   state.topologyRevision = Number(state.topologyRevision || 0) + 1;
   getRenderPassCacheState().referenceTransform = null;
+  getRenderPassCacheState().referenceTransforms = {};
   invalidateAllRenderPasses("set-map-data");
   ensureLayerDataFromTopology();
   const { fullCollection, interactiveCollection } = rebuildPoliticalLandCollections();
@@ -8823,12 +9453,18 @@ function setMapData({ refitProjection = true, resetZoom = true } = {}) {
   } else {
     state.hitCanvasDirty = true;
   }
+  const stagedApply = beginStagedMapDataWarmup(startedAt);
   render();
+  recordRenderPerfMetric("setMapDataFirstPaint", nowMs() - startedAt, {
+    staged: stagedApply,
+    activeScenarioId: String(state.activeScenarioId || ""),
+  });
   recordRenderPerfMetric("setMapData", nowMs() - startedAt, {
     refitProjection: !!refitProjection,
     resetZoom: !!resetZoom,
     landCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
     renderProfile: String(state.renderProfile || "auto"),
+    staged: stagedApply,
   });
 }
 
@@ -8856,4 +9492,5 @@ export {
   resetZoomToFit,
   setZoomPercent,
   zoomByStep,
+  scheduleRenderPhaseIdle,
 };

@@ -1,0 +1,8 @@
+200 http://127.0.0.1:8000/
+200 http://127.0.0.1:8000/data/scenarios/hoi4_1936/manifest.json
+200 http://127.0.0.1:8000/data/scenarios/hoi4_1936/countries.json
+200 http://127.0.0.1:8000/data/scenarios/hoi4_1936/owners.by_feature.json
+200 http://127.0.0.1:8000/data/scenarios/hoi4_1939/manifest.json
+200 http://127.0.0.1:8000/data/scenarios/hoi4_1939/countries.json
+200 http://127.0.0.1:8000/data/scenarios/hoi4_1939/owners.by_feature.json
+200 http://127.0.0.1:8000/data/scenarios/tno_1962/runtime_topology.topo.json

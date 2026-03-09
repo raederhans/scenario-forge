@@ -18,6 +18,10 @@ const SCENARIO_DETAIL_MIN_RATIO_STRICT = 0.7;
 const SCENARIO_DETAIL_ABSOLUTE_DROP_THRESHOLD = 1000;
 const DEFAULT_OCEAN_FILL_COLOR = "#aadaff";
 const SCENARIO_RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
+const COUNTRY_CODE_ALIASES = {
+  UK: "GB",
+  EL: "GR",
+};
 
 function cacheBust(url) {
   if (!url) return url;
@@ -27,6 +31,93 @@ function cacheBust(url) {
 
 function normalizeScenarioId(value) {
   return String(value || "").trim();
+}
+
+function canonicalScenarioCountryCode(rawCode) {
+  const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
+  if (!code) return "";
+  return COUNTRY_CODE_ALIASES[code] || code;
+}
+
+function extractScenarioCountryCodeFromId(value) {
+  const text = String(value || "").trim().toUpperCase();
+  if (!text) return "";
+  const prefix = text.split(/[-_]/)[0];
+  if (/^[A-Z]{2,3}$/.test(prefix)) {
+    return prefix;
+  }
+  const alphaPrefix = prefix.match(/^[A-Z]{2,3}/);
+  return alphaPrefix ? alphaPrefix[0] : "";
+}
+
+function getScenarioRuntimeGeometryCountryCode(geometry) {
+  const props = geometry?.properties || {};
+  const direct = (
+    props.cntr_code ||
+    props.CNTR_CODE ||
+    props.iso_a2 ||
+    props.ISO_A2 ||
+    props.iso_a2_eh ||
+    props.ISO_A2_EH ||
+    props.adm0_a2 ||
+    props.ADM0_A2 ||
+    ""
+  );
+  const normalizedDirect = canonicalScenarioCountryCode(direct);
+  if (/^[A-Z]{2,3}$/.test(normalizedDirect) && normalizedDirect !== "ZZ" && normalizedDirect !== "XX") {
+    return normalizedDirect;
+  }
+  return canonicalScenarioCountryCode(
+    extractScenarioCountryCodeFromId(props.id) ||
+    extractScenarioCountryCodeFromId(props.NUTS_ID) ||
+    extractScenarioCountryCodeFromId(geometry?.id)
+  );
+}
+
+function shouldApplyHoi4FarEastSovietBackfill(scenarioId) {
+  const normalizedId = normalizeScenarioId(scenarioId);
+  return normalizedId === "hoi4_1936" || normalizedId === "hoi4_1939";
+}
+
+function hasExplicitScenarioAssignment(featureMap, featureId) {
+  return !!(
+    featureMap &&
+    typeof featureMap === "object" &&
+    Object.prototype.hasOwnProperty.call(featureMap, featureId)
+  );
+}
+
+function buildHoi4FarEastSovietOwnerBackfill(
+  scenarioId,
+  {
+    runtimeTopology = null,
+    ownersByFeatureId = {},
+    controllersByFeatureId = {},
+  } = {}
+) {
+  if (!shouldApplyHoi4FarEastSovietBackfill(scenarioId)) {
+    return {};
+  }
+  const geometries = runtimeTopology?.objects?.political?.geometries;
+  if (!Array.isArray(geometries) || !geometries.length) {
+    return {};
+  }
+  const next = {};
+  geometries.forEach((geometry) => {
+    const featureId = getRuntimeGeometryFeatureId(geometry);
+    if (!featureId) return;
+    if (
+      hasExplicitScenarioAssignment(ownersByFeatureId, featureId) ||
+      hasExplicitScenarioAssignment(controllersByFeatureId, featureId)
+    ) {
+      return;
+    }
+    if (getScenarioRuntimeGeometryCountryCode(geometry) !== "RU") {
+      return;
+    }
+    next[featureId] = "SOV";
+  });
+  return next;
 }
 
 function normalizeScenarioViewMode(value) {
@@ -1089,11 +1180,26 @@ async function applyScenarioBundle(
   const runtimeTopologyPayload = bundle.runtimeTopologyPayload || null;
   const scenarioWaterRegionsFromTopology = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water");
   const scenarioSpecialRegionsFromTopology = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land");
+  const scenarioContextLandMaskFromTopology =
+    getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "context_land_mask");
   const scenarioLandMaskFromTopology =
     getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land_mask")
     || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land");
   const scenarioNameMap = getScenarioNameMap(countryMap);
   const scenarioColorMap = getScenarioFixedOwnerColors(countryMap);
+  const scenarioOwnerBackfill = buildHoi4FarEastSovietOwnerBackfill(scenarioId, {
+    runtimeTopology: runtimeTopologyPayload?.objects?.political
+      ? runtimeTopologyPayload
+      : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null),
+    ownersByFeatureId: owners,
+    controllersByFeatureId: controllers,
+  });
+  const resolvedOwners = Object.keys(scenarioOwnerBackfill).length
+    ? {
+      ...owners,
+      ...scenarioOwnerBackfill,
+    }
+    : { ...owners };
   state.scenarioBorderMode = "scenario_owner_only";
   state.activeScenarioManifest = bundle.manifest || null;
   state.scenarioCountriesByTag = countryMap;
@@ -1104,6 +1210,7 @@ async function applyScenarioBundle(
     ? runtimeTopologyPayload
     : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null);
   state.scenarioLandMaskData = scenarioLandMaskFromTopology || null;
+  state.scenarioContextLandMaskData = scenarioContextLandMaskFromTopology || null;
   state.scenarioWaterRegionsData = scenarioWaterRegionsFromTopology || bundle.waterRegionsPayload || null;
   state.scenarioSpecialRegionsData = scenarioSpecialRegionsFromTopology || bundle.specialRegionsPayload || null;
   state.scenarioReliefOverlaysData = bundle.reliefOverlaysPayload || null;
@@ -1115,7 +1222,7 @@ async function applyScenarioBundle(
     errorMessage: "",
   });
   state.scenarioBaselineHash = getScenarioBaselineHashFromBundle(bundle);
-  state.scenarioBaselineOwnersByFeatureId = { ...owners };
+  state.scenarioBaselineOwnersByFeatureId = { ...resolvedOwners };
   state.scenarioControllersByFeatureId = { ...controllers };
   state.scenarioAutoShellOwnerByFeatureId = {};
   state.scenarioAutoShellControllerByFeatureId = {};
@@ -1128,9 +1235,14 @@ async function applyScenarioBundle(
     ...countryNames,
     ...scenarioNameMap,
   };
-  state.sovereigntyByFeatureId = { ...owners };
+  state.sovereigntyByFeatureId = { ...resolvedOwners };
   state.sovereigntyInitialized = false;
   ensureSovereigntyState({ force: true });
+  if (Object.keys(scenarioOwnerBackfill).length) {
+    console.info(
+      `[scenario] Applied HOI4 Far East owner backfill for "${scenarioId}": ${Object.keys(scenarioOwnerBackfill).length} missing RU runtime features -> SOV.`
+    );
+  }
   recalculateScenarioOwnerControllerDiffCount();
   state.visualOverrides = {};
   state.featureOverrides = {};
@@ -1308,6 +1420,7 @@ function clearActiveScenario(
   state.scenarioFixedOwnerColors = {};
   state.scenarioRuntimeTopologyData = null;
   state.scenarioLandMaskData = null;
+  state.scenarioContextLandMaskData = null;
   state.runtimePoliticalTopology = state.defaultRuntimePoliticalTopology || null;
   state.scenarioWaterRegionsData = null;
   state.scenarioSpecialRegionsData = null;
@@ -1569,4 +1682,3 @@ export {
   setScenarioViewMode,
   validateImportedScenarioBaseline,
 };
-

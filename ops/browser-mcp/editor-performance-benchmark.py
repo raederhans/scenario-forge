@@ -16,6 +16,7 @@ PWCLI = Path(os.environ.get("CODEX_HOME", str(Path.home() / ".codex"))) / "skill
 SESSION_ID = "editor-perf-benchmark"
 BROWSER_OPENED = False
 SCENARIO_IDS = ["none", "hoi4_1939", "tno_1962"]
+RENDER_PASS_NAMES = ["background", "political", "effects", "contextBase", "contextScenario", "dayNight", "borders"]
 CONTEXT_PROBE_CASES = [
     ("baseline", {}),
     ("physical_off", {"showPhysical": False}),
@@ -28,7 +29,7 @@ CONTEXT_PROBE_CASES = [
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Benchmark Map Creator editor performance via Playwright CLI.")
-    parser.add_argument("--url", default="http://127.0.0.1:18080/?perf_overlay=1", help="Benchmark target URL.")
+    parser.add_argument("--url", default="http://127.0.0.1:8000/?perf_overlay=1", help="Benchmark target URL.")
     parser.add_argument(
         "--out",
         default=".mcp-artifacts/perf/editor-performance-benchmark.json",
@@ -274,7 +275,7 @@ async (page) => {{
       frames: Number(state.renderPassCache?.counters?.frames || 0),
     }};
     state.renderPhase = 'idle';
-    for (const passName of ['background', 'political', 'effects', 'context', 'dayNight', 'borders']) {{
+    for (const passName of {json.dumps(RENDER_PASS_NAMES)}) {{
       state.renderPassCache.dirty[passName] = true;
       state.renderPassCache.reasons[passName] = {json.dumps(label)};
     }}
@@ -319,7 +320,7 @@ async (page) => {{
       state[key] = value;
     }});
     state.renderPhase = 'idle';
-    for (const passName of ['background', 'political', 'effects', 'context', 'dayNight', 'borders']) {{
+    for (const passName of {json.dumps(RENDER_PASS_NAMES)}) {{
       state.renderPassCache.dirty[passName] = true;
       state.renderPassCache.reasons[passName] = `context-probe:${{probeLabel}}`;
     }}
@@ -338,7 +339,7 @@ async (page) => {{
     Object.entries(snapshot).forEach(([key, value]) => {{
       state[key] = value;
     }});
-    for (const passName of ['background', 'political', 'effects', 'context', 'dayNight', 'borders']) {{
+    for (const passName of {json.dumps(RENDER_PASS_NAMES)}) {{
       state.renderPassCache.dirty[passName] = true;
       state.renderPassCache.reasons[passName] = `context-probe-restore:${{probeLabel}}`;
     }}
@@ -365,12 +366,13 @@ def measure_zoom_settle_redraw() -> dict:
 async (page) => {{
   return await page.evaluate(async () => {{
     const {{ state }} = await import('/js/core/state.js');
-    const {{ render }} = await import('/js/core/map_renderer.js');
+    const {{ render, scheduleRenderPhaseIdle }} = await import('/js/core/map_renderer.js');
     const before = {{
       drawCanvas: Number(state.renderPassCache?.counters?.drawCanvas || 0),
       frames: Number(state.renderPassCache?.counters?.frames || 0),
       transformedFrames: Number(state.renderPassCache?.counters?.transformedFrames || 0),
     }};
+    const previousExactRefreshRecordedAt = Number(state.renderPerfMetrics?.settleExactRefresh?.recordedAt || 0);
     const originalTransform = {{ ...(state.zoomTransform || {{ x: 0, y: 0, k: 1 }}) }};
     state.zoomTransform = {{
       x: originalTransform.x + 54,
@@ -378,10 +380,43 @@ async (page) => {{
       k: Number((originalTransform.k * 1.12).toFixed(4)),
     }};
     state.renderPhase = 'settling';
+    state.phaseEnteredAt = performance.now();
+    state.isInteracting = false;
     render();
     const settleFrame = {clone_frame_js("state.renderPassCache?.lastFrame || null")};
+    scheduleRenderPhaseIdle();
+    const idleFastStartedAt = performance.now();
+    while (state.renderPhase !== 'idle' && (performance.now() - idleFastStartedAt) < 4000) {{
+      await new Promise((resolve) => setTimeout(resolve, 25));
+    }}
+    const idleFastFrame = {clone_frame_js("state.renderPassCache?.lastFrame || null")};
+    const exactRefreshStartedAt = performance.now();
+    while (
+      Number(state.renderPerfMetrics?.settleExactRefresh?.recordedAt || 0) <= previousExactRefreshRecordedAt
+      && (performance.now() - exactRefreshStartedAt) < 8000
+    ) {{
+      await new Promise((resolve) => setTimeout(resolve, 25));
+    }}
+    const exactRefreshObserved = Number(state.renderPerfMetrics?.settleExactRefresh?.recordedAt || 0) > previousExactRefreshRecordedAt;
+    const exactRefreshFrame = {clone_frame_js("state.renderPassCache?.lastFrame || null")};
+    const settleMetrics = {clone_metrics_js("state.renderPerfMetrics")};
+    if (state.exactAfterSettleHandle) {{
+      if (state.exactAfterSettleHandle.type === 'idle' && typeof cancelIdleCallback === 'function') {{
+        cancelIdleCallback(state.exactAfterSettleHandle.id);
+      }} else {{
+        clearTimeout(state.exactAfterSettleHandle.id);
+      }}
+      state.exactAfterSettleHandle = null;
+    }}
+    state.deferExactAfterSettle = false;
     state.zoomTransform = originalTransform;
     state.renderPhase = 'idle';
+    state.phaseEnteredAt = performance.now();
+    state.isInteracting = false;
+    for (const passName of {json.dumps(RENDER_PASS_NAMES)}) {{
+      state.renderPassCache.dirty[passName] = true;
+      state.renderPassCache.reasons[passName] = 'zoom-settle-bench-restore';
+    }}
     render();
     return {{
       counterDelta: {{
@@ -390,8 +425,11 @@ async (page) => {{
         transformedFrames: Number(state.renderPassCache?.counters?.transformedFrames || 0) - before.transformedFrames,
       }},
       settleFrame,
+      idleFastFrame,
+      exactRefreshObserved,
+      exactRefreshFrame,
       restoredFrame: {clone_frame_js("state.renderPassCache?.lastFrame || null")},
-      renderMetrics: {clone_metrics_js("state.renderPerfMetrics")},
+      renderMetrics: settleMetrics,
       overlay: document.getElementById('perf-overlay')?.textContent || '',
     }};
   }});
@@ -406,7 +444,7 @@ async (page) => {{
   return await page.evaluate(async () => {{
     const {{ state }} = await import('/js/core/state.js');
     const {{ render }} = await import('/js/core/map_renderer.js');
-    for (const passName of ['background', 'political', 'effects', 'context', 'dayNight', 'borders']) {{
+    for (const passName of {json.dumps(RENDER_PASS_NAMES)}) {{
       state.renderPassCache.dirty[passName] = true;
       state.renderPassCache.reasons[passName] = 'interactive-bench-prime';
     }}

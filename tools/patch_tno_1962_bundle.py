@@ -38,6 +38,7 @@ RELEASABLE_SOURCE_PATH = ROOT / "data/releasables/hoi4_vanilla.internal.phase1.s
 HIERARCHY_PATH = ROOT / "data/hierarchy.json"
 PALETTE_PATH = ROOT / "data/palettes/hoi4_vanilla.palette.json"
 TNO_PALETTE_PATH = ROOT / "data/palettes/tno.palette.json"
+WATER_REGIONS_PATH = ROOT / "data/water_regions.geojson"
 REGIONAL_RULE_PACKS: list[tuple[str, Path]] = [
     ("east_asia", ROOT / "data/scenario-rules/tno_1962.east_asia_ownership.manual.json"),
     ("south_asia", ROOT / "data/scenario-rules/tno_1962.south_asia_ownership.manual.json"),
@@ -60,6 +61,7 @@ ATL_GEOMETRY_ROLE_DONOR_LAND = "donor_land"
 ATL_GEOMETRY_ROLE_DONOR_ISLAND = "donor_island"
 ATL_GEOMETRY_ROLE_SHORE_SEAL = "shore_seal"
 ATL_GEOMETRY_ROLE_DONOR_SEA = "donor_sea"
+ATL_GEOMETRY_ROLE_SEA_COMPLETION = "sea_completion"
 ATL_GEOMETRY_ROLE_CAUSEWAY = "causeway"
 
 ATL_JOIN_MODE_NONE = "none"
@@ -102,6 +104,8 @@ DONOR_CAUSEWAY_NAME_HINTS = (
     "canal site",
     "landbridge site",
 )
+
+MEDITERRANEAN_WATER_REGION_GROUP = "mediterranean"
 
 GER_PRESET_FEATURE_IDS = {
     "Alsace-Lorraine + Luxembourg": [
@@ -237,6 +241,7 @@ ATLANTROPA_REGION_CONFIGS = {
         "feature_group_id": "atlantropa_adriatica_salt_basin",
         "group_label": "Adriatica Salt Basin",
         "aoi_bbox": (11.3, 39.0, 21.4, 46.2),
+        "sea_completion_bbox": (10.9, 38.8, 21.8, 46.4),
         "land_state_ids": [
             8487, 8488, 8489,
             8491, 8492, 8493, 8494, 8495, 8496, 8497,
@@ -285,20 +290,22 @@ ATLANTROPA_REGION_CONFIGS = {
         "preserve_margin": 0.03,
         "sea_preserve_margin": 0.03,
         "snap_tolerance": 0.14,
-        "simplify_tolerance": 0.012,
+        "simplify_tolerance": 0.009,
+        "precision_simplify_tolerance": 0.0075,
+        "pixel_fragment_area_threshold": 0.0032,
         "island_replacement": True,
-        "island_merge_distance": 0.028,
+        "island_merge_distance": 0.03,
         "mainland_component_min_area": 2.8,
         "mainland_touch_tolerance": 0.035,
-        "gap_fill_width": 0.078,
+        "gap_fill_width": 0.086,
         "gap_fill_min_area": 0.00006,
-        "gap_fill_max_area": 0.095,
-        "boolean_weld_width": 0.027,
+        "gap_fill_max_area": 0.11,
+        "boolean_weld_width": 0.034,
         "boolean_weld_min_area": 0.00001,
-        "boolean_weld_max_area": 0.072,
-        "shore_seal_width": 0.078,
+        "boolean_weld_max_area": 0.085,
+        "shore_seal_width": 0.086,
         "shore_seal_min_area": 0.00006,
-        "shore_seal_max_area": 0.1,
+        "shore_seal_max_area": 0.115,
         "causeway_keep_state_ids": [9072, 9073, 9077],
         "nearshore_island_join_state_ids": [8492, 8493, 8494, 8495, 8497, 8501, 8502, 8503, 8504, 8505, 8506, 8508, 9076, 10340],
         "major_island_groups": [
@@ -319,6 +326,7 @@ ATLANTROPA_REGION_CONFIGS = {
         "feature_group_id": "atlantropa_sicily_tunis_salt_shelf",
         "group_label": "Sicily-Tunis Salt Shelf",
         "aoi_bbox": (7.4, 34.6, 16.2, 39.2),
+        "sea_completion_bbox": (7.0, 34.2, 16.5, 39.5),
         "land_state_ids": [
             8486, 8557, 8558, 8559, 8560, 8561, 8562, 8566,
             9036, 9037, 9078, 9080, 9081, 9083,
@@ -351,6 +359,8 @@ ATLANTROPA_REGION_CONFIGS = {
         "sea_preserve_margin": 0.03,
         "snap_tolerance": 0.14,
         "simplify_tolerance": 0.012,
+        "precision_simplify_tolerance": 0.0105,
+        "pixel_fragment_area_threshold": 0.0028,
         "island_replacement": True,
         "island_merge_distance": 0.03,
         "mainland_component_min_area": 2.8,
@@ -394,6 +404,7 @@ ATLANTROPA_REGION_CONFIGS = {
         "feature_group_id": "atlantropa_gulf_of_gabes_exposure",
         "group_label": "Gulf of Gabes Exposure",
         "aoi_bbox": (9.6, 32.9, 11.8, 34.8),
+        "sea_completion_bbox": (9.4, 32.7, 12.1, 35.0),
         "land_state_ids": [10202, 9079],
         "water_state_ids": [8592, 8598, 8606],
         "state_owner_overrides": {
@@ -409,6 +420,8 @@ ATLANTROPA_REGION_CONFIGS = {
         "sea_preserve_margin": 0.025,
         "snap_tolerance": 0.1,
         "simplify_tolerance": 0.01,
+        "precision_simplify_tolerance": 0.009,
+        "pixel_fragment_area_threshold": 0.002,
         "island_replacement": False,
         "mainland_component_min_area": 2.2,
         "mainland_touch_tolerance": 0.03,
@@ -420,6 +433,7 @@ ATLANTROPA_REGION_CONFIGS = {
         "feature_group_id": "atlantropa_levantine_retreat_margin",
         "group_label": "Levantine Retreat Margin",
         "aoi_bbox": (31.2, 30.5, 36.7, 37.5),
+        "sea_completion_bbox": (30.8, 30.2, 37.1, 37.8),
         "land_state_ids": [
             8544, 8545, 9035, 8546, 8547, 8548, 8549, 8550,
             8551, 8552, 8553, 8554, 8555, 8556,
@@ -453,19 +467,21 @@ ATLANTROPA_REGION_CONFIGS = {
         "sea_preserve_margin": 0.03,
         "snap_tolerance": 0.12,
         "simplify_tolerance": 0.012,
+        "precision_simplify_tolerance": 0.0105,
+        "pixel_fragment_area_threshold": 0.0026,
         "island_replacement": True,
         "island_merge_distance": 0.024,
         "mainland_component_min_area": 3.0,
         "mainland_touch_tolerance": 0.035,
-        "gap_fill_width": 0.082,
+        "gap_fill_width": 0.094,
         "gap_fill_min_area": 0.00005,
-        "gap_fill_max_area": 0.095,
-        "boolean_weld_width": 0.021,
+        "gap_fill_max_area": 0.11,
+        "boolean_weld_width": 0.027,
         "boolean_weld_min_area": 0.00001,
-        "boolean_weld_max_area": 0.058,
-        "shore_seal_width": 0.072,
+        "boolean_weld_max_area": 0.07,
+        "shore_seal_width": 0.082,
         "shore_seal_min_area": 0.00005,
-        "shore_seal_max_area": 0.085,
+        "shore_seal_max_area": 0.1,
         "major_island_groups": [
             {
                 "id": "cyprus",
@@ -484,6 +500,7 @@ ATLANTROPA_REGION_CONFIGS = {
         "feature_group_id": "atlantropa_tyrrhenian_and_west_italy",
         "group_label": "Tyrrhenian and West Italian Coast",
         "aoi_bbox": (5.7, 37.4, 18.8, 45.6),
+        "sea_completion_bbox": (5.0, 37.0, 19.2, 46.0),
         "land_state_ids": [
             8466, 8467, 8468, 8469, 8470, 8471, 8472, 8473, 8474, 8475,
             8476, 8477, 8478, 8479, 8480, 8481, 8482, 8483, 8484, 8485,
@@ -524,19 +541,21 @@ ATLANTROPA_REGION_CONFIGS = {
         "sea_preserve_margin": 0.03,
         "snap_tolerance": 0.12,
         "simplify_tolerance": 0.012,
+        "precision_simplify_tolerance": 0.0105,
+        "pixel_fragment_area_threshold": 0.0028,
         "island_replacement": True,
         "island_merge_distance": 0.03,
         "mainland_component_min_area": 3.2,
         "mainland_touch_tolerance": 0.035,
-        "gap_fill_width": 0.095,
+        "gap_fill_width": 0.11,
         "gap_fill_min_area": 0.00006,
-        "gap_fill_max_area": 0.145,
-        "boolean_weld_width": 0.031,
+        "gap_fill_max_area": 0.16,
+        "boolean_weld_width": 0.038,
         "boolean_weld_min_area": 0.00001,
-        "boolean_weld_max_area": 0.085,
-        "shore_seal_width": 0.08,
+        "boolean_weld_max_area": 0.095,
+        "shore_seal_width": 0.09,
         "shore_seal_min_area": 0.00006,
-        "shore_seal_max_area": 0.115,
+        "shore_seal_max_area": 0.13,
         "major_island_groups": [
             {
                 "id": "corsica",
@@ -566,6 +585,7 @@ ATLANTROPA_REGION_CONFIGS = {
         "feature_group_id": "atlantropa_west_mediterranean_margin",
         "group_label": "West Mediterranean and Iberia-Algeria",
         "aoi_bbox": (-6.2, 34.0, 11.6, 44.7),
+        "sea_completion_bbox": (-6.6, 33.6, 12.0, 45.0),
         "land_state_ids": [
             8446, 8447, 8448, 8449, 8450, 8451, 8452, 8453, 8454, 8455,
             8456, 8457, 8458, 8459, 8460, 8461, 8462, 8463, 8464, 8465,
@@ -603,19 +623,21 @@ ATLANTROPA_REGION_CONFIGS = {
         "sea_preserve_margin": 0.03,
         "snap_tolerance": 0.12,
         "simplify_tolerance": 0.012,
+        "precision_simplify_tolerance": 0.0105,
+        "pixel_fragment_area_threshold": 0.0028,
         "island_replacement": True,
-        "island_merge_distance": 0.03,
+        "island_merge_distance": 0.032,
         "mainland_component_min_area": 3.5,
         "mainland_touch_tolerance": 0.035,
-        "gap_fill_width": 0.09,
+        "gap_fill_width": 0.102,
         "gap_fill_min_area": 0.00006,
-        "gap_fill_max_area": 0.145,
-        "boolean_weld_width": 0.03,
+        "gap_fill_max_area": 0.16,
+        "boolean_weld_width": 0.037,
         "boolean_weld_min_area": 0.00001,
-        "boolean_weld_max_area": 0.085,
-        "shore_seal_width": 0.08,
+        "boolean_weld_max_area": 0.095,
+        "shore_seal_width": 0.09,
         "shore_seal_min_area": 0.00006,
-        "shore_seal_max_area": 0.115,
+        "shore_seal_max_area": 0.13,
         "causeway_keep_state_ids": [8449],
         "major_island_groups": [
             {
@@ -635,6 +657,7 @@ ATLANTROPA_REGION_CONFIGS = {
         "feature_group_id": "atlantropa_aegean_and_islands",
         "group_label": "Aegean and Greek Islands",
         "aoi_bbox": (18.5, 33.4, 30.8, 41.9),
+        "sea_completion_bbox": (18.1, 33.1, 31.2, 42.1),
         "land_state_ids": [
             8510, 8512, 8515, 8516, 8517, 8518, 8519, 8520, 8521, 8522,
             8523, 8524, 8525, 8526, 8527, 8528, 8529, 8530, 8531, 8532,
@@ -690,19 +713,21 @@ ATLANTROPA_REGION_CONFIGS = {
         "sea_preserve_margin": 0.03,
         "snap_tolerance": 0.12,
         "simplify_tolerance": 0.012,
+        "precision_simplify_tolerance": 0.0105,
+        "pixel_fragment_area_threshold": 0.0024,
         "island_replacement": True,
-        "island_merge_distance": 0.026,
+        "island_merge_distance": 0.028,
         "mainland_component_min_area": 2.5,
         "mainland_touch_tolerance": 0.035,
-        "gap_fill_width": 0.082,
+        "gap_fill_width": 0.092,
         "gap_fill_min_area": 0.00005,
-        "gap_fill_max_area": 0.095,
-        "boolean_weld_width": 0.024,
+        "gap_fill_max_area": 0.11,
+        "boolean_weld_width": 0.028,
         "boolean_weld_min_area": 0.00001,
-        "boolean_weld_max_area": 0.068,
-        "shore_seal_width": 0.072,
+        "boolean_weld_max_area": 0.08,
+        "shore_seal_width": 0.08,
         "shore_seal_min_area": 0.00005,
-        "shore_seal_max_area": 0.09,
+        "shore_seal_max_area": 0.1,
         "major_island_groups": [
             {
                 "id": "crete",
@@ -765,6 +790,7 @@ ATLANTROPA_REGION_CONFIGS = {
         "feature_group_id": "atlantropa_libya_suez_and_qattara",
         "group_label": "Libya, Cyrenaica and Suez Chain",
         "aoi_bbox": (12.5, 28.0, 35.2, 34.2),
+        "sea_completion_bbox": (12.1, 27.8, 35.6, 34.4),
         "land_state_ids": [8563, 8564, 8565, 8567, 8568, 8569, 8570, 8572, 8574, 8575, 8576],
         "water_state_ids": [8599, 8605, 8613, 8614, 8615, 8616, 8617, 8618],
         "state_owner_overrides": {
@@ -790,18 +816,20 @@ ATLANTROPA_REGION_CONFIGS = {
         "sea_preserve_margin": 0.03,
         "snap_tolerance": 0.12,
         "simplify_tolerance": 0.012,
+        "precision_simplify_tolerance": 0.0105,
+        "pixel_fragment_area_threshold": 0.0028,
         "island_replacement": False,
         "mainland_component_min_area": 3.5,
         "mainland_touch_tolerance": 0.035,
-        "gap_fill_width": 0.095,
+        "gap_fill_width": 0.108,
         "gap_fill_min_area": 0.00006,
-        "gap_fill_max_area": 0.11,
-        "boolean_weld_width": 0.025,
+        "gap_fill_max_area": 0.13,
+        "boolean_weld_width": 0.03,
         "boolean_weld_min_area": 0.00001,
-        "boolean_weld_max_area": 0.07,
-        "shore_seal_width": 0.075,
+        "boolean_weld_max_area": 0.085,
+        "shore_seal_width": 0.085,
         "shore_seal_min_area": 0.00006,
-        "shore_seal_max_area": 0.1,
+        "shore_seal_max_area": 0.11,
         "causeway_keep_state_ids": [8575, 8576],
         "causeway_trim_state_ids": [8575, 8576],
         "causeway_drop_state_ids": [8572, 8574],
@@ -872,6 +900,25 @@ def utc_timestamp() -> str:
 
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+_mediterranean_template_water_gdf: gpd.GeoDataFrame | None = None
+
+
+def load_mediterranean_template_water_gdf() -> gpd.GeoDataFrame:
+    global _mediterranean_template_water_gdf
+    if _mediterranean_template_water_gdf is not None:
+        return _mediterranean_template_water_gdf.copy()
+    payload = load_json(WATER_REGIONS_PATH)
+    features = [
+        feature
+        for feature in payload.get("features", [])
+        if str(feature.get("properties", {}).get("region_group") or "").strip().lower()
+        == MEDITERRANEAN_WATER_REGION_GROUP
+    ]
+    gdf = geopandas_from_features(features).reset_index(drop=True)
+    _mediterranean_template_water_gdf = gdf.copy()
+    return gdf
 
 
 def sanitize_jsonable(value):
@@ -1569,6 +1616,38 @@ def smooth_polygonal(geom, *, buffer_radius: float = 0.0, simplify_tolerance: fl
     return candidate
 
 
+def estimate_equal_area_value(geom) -> float:
+    candidate = normalize_polygonal(geom)
+    if candidate is None:
+        return 0.0
+    try:
+        series = gpd.GeoSeries([candidate], crs="EPSG:4326").to_crs("EPSG:6933")
+        return float(series.area.iloc[0])
+    except Exception:
+        return float(candidate.area)
+
+
+def build_context_land_mask_geometry(
+    land_mask_geom,
+    *,
+    tolerances: tuple[float, ...] = (0.02, 0.01, 0.005),
+    max_area_delta_ratio: float = 0.005,
+):
+    precise_geom = normalize_polygonal(land_mask_geom)
+    if precise_geom is None:
+        raise ValueError("Expected precise land mask geometry.")
+    base_area = max(estimate_equal_area_value(precise_geom), 1e-9)
+    for tolerance in tolerances:
+        candidate = normalize_polygonal(precise_geom.simplify(tolerance, preserve_topology=True))
+        if candidate is None:
+            continue
+        candidate_area = estimate_equal_area_value(candidate)
+        area_delta_ratio = abs(candidate_area - base_area) / base_area
+        if area_delta_ratio <= max_area_delta_ratio:
+            return candidate, float(tolerance), float(area_delta_ratio), False
+    return precise_geom, None, 0.0, True
+
+
 def make_feature(geom, properties: dict) -> dict:
     return {
         "type": "Feature",
@@ -2177,6 +2256,103 @@ def build_boolean_weld_rows(region_id: str, config: dict, donor_rows: list[dict]
             join_mode=ATL_JOIN_MODE_BOOLEAN_WELD,
         ))
     return weld_rows
+
+
+def count_small_polygon_parts(geoms: list[object], *, max_area: float) -> int:
+    threshold = max(0.0, float(max_area))
+    if threshold <= 0:
+        return 0
+    count = 0
+    for geom in geoms:
+        for part in iter_polygon_parts(geom):
+            if float(part.area) <= threshold:
+                count += 1
+    return count
+
+
+def build_atl_sea_completion_rows(
+    region_id: str,
+    config: dict,
+    *,
+    expected_sea_geom,
+    existing_sea_geom,
+    occupied_sea_geom,
+) -> tuple[list[dict], object | None, dict]:
+    completion_rows: list[dict] = []
+    expected = normalize_polygonal(expected_sea_geom)
+    if expected is None:
+        return completion_rows, None, {
+            "completion_feature_count": 0,
+            "remaining_hole_count": 0,
+            "remaining_hole_area": 0.0,
+        }
+    occupied = normalize_polygonal(occupied_sea_geom)
+    completion_candidate = expected if occupied is None else normalize_polygonal(expected.difference(occupied.buffer(0.0004)))
+    completion_union = None
+    if completion_candidate is not None:
+        min_area = max(
+            float(config.get("pixel_fragment_area_threshold", 0.0025)) * 0.08,
+            0.00002,
+        )
+        simplify_tolerance = float(
+            config.get("precision_simplify_tolerance", config.get("simplify_tolerance", 0.01))
+        )
+        completion_parts: list[Polygon] = []
+        for part in iter_polygon_parts(completion_candidate):
+            if float(part.area) < min_area:
+                continue
+            try:
+                smoothed = smooth_polygonal(part, buffer_radius=0.0015, simplify_tolerance=simplify_tolerance)
+            except ValueError:
+                smoothed = normalize_polygonal(part)
+            if smoothed is None:
+                continue
+            completion_parts.extend(iter_polygon_parts(smoothed))
+        completion_union = safe_unary_union(completion_parts)
+        for index, part in enumerate(completion_parts, start=1):
+            completion_rows.append(make_feature(part, {
+                "id": f"ATLSEA_FILL_{region_id}_{index}",
+                "name": f"{config['group_label']} Sea Completion {index}",
+                "cntr_code": ATL_TAG,
+                "admin1_group": f"{config['feature_group_id']}_sea",
+                "detail_tier": "scenario_atlantropa",
+                "__source": ATL_SOURCE_TAG,
+                "scenario_id": SCENARIO_ID,
+                "region_id": region_id,
+                "region_group": f"{config['feature_group_id']}_sea",
+                "atl_surface_kind": ATL_SURFACE_SEA,
+                "atl_region_group": f"mediterranean_remaining_{region_id}",
+                "atl_geometry_role": ATL_GEOMETRY_ROLE_SEA_COMPLETION,
+                "atl_join_mode": ATL_JOIN_MODE_GAP_FILL,
+                "atl_subbasin_id": f"{region_id}_fill_{index}",
+                "interactive": True,
+                "render_as_base_geography": False,
+                "owner_tag": ATL_TAG,
+                "synthetic_owner": True,
+                "source_standard": "mediterranean_template_sea_completion",
+            }))
+    final_union = expected if completion_union is None and existing_sea_geom is None else safe_unary_union([
+        geom for geom in [normalize_polygonal(existing_sea_geom), completion_union] if geom is not None
+    ])
+    remaining_holes = None
+    if final_union is not None:
+        remaining_holes = normalize_polygonal(expected.difference(final_union.buffer(0.00025)))
+    significant_remaining_holes = []
+    if remaining_holes is not None:
+        significant_remaining_holes = [
+            part for part in iter_polygon_parts(remaining_holes)
+            if float(part.area) >= min_area
+        ]
+    diagnostics = {
+        "completion_feature_count": len(completion_rows),
+        "completion_area": round(float(completion_union.area), 6) if completion_union is not None else 0.0,
+        "remaining_hole_count": len(significant_remaining_holes),
+        "remaining_hole_area": round(
+            sum(float(part.area) for part in significant_remaining_holes),
+            6,
+        ),
+    }
+    return completion_rows, completion_union, diagnostics
 
 
 def collect_baseline_island_drop_ids(
@@ -2838,6 +3014,10 @@ def build_atlantropa_from_hgo(
 
     for region_id, config in ATLANTROPA_REGION_CONFIGS.items():
         aoi = box(*config["aoi_bbox"])
+        precision_simplify_tolerance = float(
+            config.get("precision_simplify_tolerance", config.get("simplify_tolerance", 0.01))
+        )
+        pixel_fragment_area_threshold = float(config.get("pixel_fragment_area_threshold", 0.0025))
         local_land = local_land_union(baseline_land_full_gdf, config["aoi_bbox"], padding=2.5)
         if local_land is None:
             raise ValueError(f"Unable to compute local shoreline context for Atlantropa region {region_id}.")
@@ -2882,7 +3062,7 @@ def build_atlantropa_from_hgo(
                     fitted = normalize_polygonal(fitted.intersection(aoi).intersection(local_land.buffer(trim_width)))
                     if fitted is None:
                         continue
-                fitted = smooth_polygonal(fitted, simplify_tolerance=float(config.get("simplify_tolerance", 0.01)))
+                fitted = smooth_polygonal(fitted, simplify_tolerance=precision_simplify_tolerance)
                 if fitted is None:
                     continue
                 geometry_role = classify_atl_geometry_role(
@@ -2972,6 +3152,7 @@ def build_atlantropa_from_hgo(
             "feature_group_id": config["feature_group_id"],
             "group_label": config["group_label"],
             "aoi_bbox": list(config["aoi_bbox"]),
+            "sea_completion_bbox": list(config.get("sea_completion_bbox") or config["aoi_bbox"]),
             "centroid": [round(region_geom.centroid.x, 6), round(region_geom.centroid.y, 6)],
             "bounds": [round(value, 6) for value in region_geom.bounds],
             "province_feature_count": len(region_feature_rows),
@@ -2990,6 +3171,11 @@ def build_atlantropa_from_hgo(
             ).items())),
             "overlap_with_baseline_land_area": round(overlap_area, 6),
             "post_clip_area": round(float(region_geom.area), 6),
+            "pixel_fragment_area_threshold": round(pixel_fragment_area_threshold, 6),
+            "pixel_fragment_count": count_small_polygon_parts(
+                [row["geometry"] for row in region_feature_rows],
+                max_area=pixel_fragment_area_threshold,
+            ),
             "control_points": control_diagnostics,
             "affine_coeffs": [round(value, 9) for value in coeffs],
         }
@@ -3035,13 +3221,19 @@ def build_atl_sea_from_hgo(
     sea_geoms: list[object] = []
     diagnostics: dict[str, dict] = {}
     atlantropa_union = safe_unary_union(list(atlantropa_region_unions.values()))
+    mediterranean_template_gdf = load_mediterranean_template_water_gdf()
+    accumulated_sea_union = None
 
     for region_id, config in ATLANTROPA_REGION_CONFIGS.items():
-        aoi = box(*config["aoi_bbox"])
-        local_land = local_land_union(baseline_land_full_gdf, config["aoi_bbox"], padding=2.5)
+        completion_bbox = tuple(config.get("sea_completion_bbox") or config["aoi_bbox"])
+        aoi = box(*completion_bbox)
+        local_land = local_land_union(baseline_land_full_gdf, completion_bbox, padding=2.5)
         if local_land is None:
             continue
         coeffs, _control = build_region_affine_coeffs(config, donor_context)
+        precision_simplify_tolerance = float(
+            config.get("precision_simplify_tolerance", config.get("simplify_tolerance", 0.01))
+        )
         water_parts: list[tuple[int, int, int, object]] = []
         state_feature_counts: Counter[int] = Counter()
         for state_id in [int(value) for value in config.get("water_state_ids", [])]:
@@ -3063,9 +3255,13 @@ def build_atl_sea_from_hgo(
                     fitted = normalize_polygonal(fitted.difference(atlantropa_union.buffer(0.002)))
                 if fitted is None:
                     continue
+                if accumulated_sea_union is not None:
+                    fitted = normalize_polygonal(fitted.difference(accumulated_sea_union.buffer(0.0004)))
+                if fitted is None:
+                    continue
                 fitted = smooth_polygonal(
                     fitted,
-                    simplify_tolerance=float(config.get("simplify_tolerance", 0.01)),
+                    simplify_tolerance=precision_simplify_tolerance,
                 )
                 if fitted is None:
                     continue
@@ -3077,10 +3273,8 @@ def build_atl_sea_from_hgo(
                     water_parts.append((state_id, province_id, component_index, normalized_part))
                     component_index += 1
                     state_feature_counts[state_id] += 1
-        if not water_parts:
-            continue
         enclosed_max_area = float(config.get("sea_drop_enclosed_max_area", 0.0))
-        if enclosed_max_area > 0:
+        if enclosed_max_area > 0 and water_parts:
             boundary_buffer = aoi.boundary.buffer(0.03)
             pruned_water_parts: list[tuple[int, int, int, object]] = []
             for state_id, province_id, component_index, fitted in water_parts:
@@ -3088,12 +3282,49 @@ def build_atl_sea_from_hgo(
                     continue
                 pruned_water_parts.append((state_id, province_id, component_index, fitted))
             water_parts = pruned_water_parts
-        if not water_parts:
-            continue
-        region_water = safe_unary_union([geom for *_meta, geom in water_parts])
+        donor_water_union = safe_unary_union([geom for *_meta, geom in water_parts]) if water_parts else None
+
+        local_template = mediterranean_template_gdf.loc[mediterranean_template_gdf.intersects(aoi)].copy().reset_index(drop=True)
+        template_union = safe_unary_union(local_template.geometry.tolist()) if not local_template.empty else None
+        expected_sea = None
+        if template_union is not None:
+            expected_sea = normalize_polygonal(template_union.intersection(aoi))
+            if expected_sea is not None:
+                expected_sea = normalize_polygonal(
+                    expected_sea.difference(local_land.buffer(float(config.get("sea_preserve_margin", 0.03))))
+                )
+            if expected_sea is not None and atlantropa_union is not None:
+                expected_sea = normalize_polygonal(expected_sea.difference(atlantropa_union.buffer(0.002)))
+
+        covered_sea_union = safe_unary_union([
+            geom for geom in [donor_water_union, accumulated_sea_union] if geom is not None
+        ])
+        completion_rows, completion_union, completion_diagnostics = build_atl_sea_completion_rows(
+            region_id,
+            config,
+            expected_sea_geom=expected_sea,
+            existing_sea_geom=covered_sea_union,
+            occupied_sea_geom=covered_sea_union,
+        )
+
+        region_water = safe_unary_union([geom for geom in [donor_water_union, completion_union] if geom is not None])
         if region_water is None:
+            diagnostics[region_id] = {
+                "group_label": config["group_label"],
+                "water_state_ids": [int(value) for value in config.get("water_state_ids", [])],
+                "bounds": [],
+                "centroid": [],
+                "area": 0.0,
+                "feature_count": 0,
+                "water_state_feature_counts": {},
+                "template_feature_count": int(len(local_template)),
+                "expected_completion_area": round(float(expected_sea.area), 6) if expected_sea is not None else 0.0,
+                **completion_diagnostics,
+            }
             continue
+
         sea_geoms.append(region_water)
+        accumulated_sea_union = safe_unary_union([geom for geom in [accumulated_sea_union, region_water] if geom is not None])
         for state_id, province_id, component_index, fitted in water_parts:
             sea_features.append(make_feature(fitted, {
                 "id": f"ATLSEA_{region_id}_{state_id}_{province_id}_{component_index}",
@@ -3119,17 +3350,21 @@ def build_atl_sea_from_hgo(
                 "donor_province_id": province_id,
                 "source_standard": "hgo_donor_water_georef",
             }))
+        sea_features.extend(completion_rows)
         diagnostics[region_id] = {
             "group_label": config["group_label"],
             "water_state_ids": [int(value) for value in config.get("water_state_ids", [])],
             "bounds": [round(value, 6) for value in region_water.bounds],
             "centroid": [round(region_water.centroid.x, 6), round(region_water.centroid.y, 6)],
             "area": round(float(region_water.area), 6),
-            "feature_count": len(water_parts),
+            "feature_count": len(water_parts) + len(completion_rows),
             "water_state_feature_counts": {
                 str(state_id): int(count)
                 for state_id, count in sorted(state_feature_counts.items())
             },
+            "template_feature_count": int(len(local_template)),
+            "expected_completion_area": round(float(expected_sea.area), 6) if expected_sea is not None else 0.0,
+            **completion_diagnostics,
         }
 
     if not sea_features:
@@ -3265,6 +3500,7 @@ def build_runtime_topology_payload(
     political_gdf: gpd.GeoDataFrame,
     water_gdf: gpd.GeoDataFrame,
     land_mask_gdf: gpd.GeoDataFrame,
+    context_land_mask_gdf: gpd.GeoDataFrame,
 ) -> dict:
     keep_columns = [
         "id",
@@ -3274,8 +3510,15 @@ def build_runtime_topology_payload(
         "detail_tier",
         "__source",
         "scenario_id",
+        "region_id",
         "region_group",
         "atl_surface_kind",
+        "atl_region_group",
+        "atl_geometry_role",
+        "atl_join_mode",
+        "atl_subbasin_id",
+        "owner_tag",
+        "synthetic_owner",
         "interactive",
         "render_as_base_geography",
         "geometry",
@@ -3283,8 +3526,8 @@ def build_runtime_topology_payload(
     available_columns = [column for column in keep_columns if column in political_gdf.columns]
     runtime_political_gdf = political_gdf.loc[:, available_columns].copy()
     topo = Topology(
-        [runtime_political_gdf, water_gdf, land_mask_gdf],
-        object_name=["political", "scenario_water", "land_mask"],
+        [runtime_political_gdf, water_gdf, land_mask_gdf, context_land_mask_gdf],
+        object_name=["political", "scenario_water", "land_mask", "context_land_mask"],
         topology=True,
         prequantize=1_000_000,
         topoquantize=False,
@@ -3482,11 +3725,20 @@ def main() -> None:
         "name": "TNO 1962 Land Mask",
         "geometry": land_mask_geom,
     }], geometry="geometry", crs="EPSG:4326")
+    context_land_mask_geom, context_land_mask_tolerance, context_land_mask_area_delta_ratio, context_land_mask_fallback_used = (
+        build_context_land_mask_geometry(land_mask_geom)
+    )
+    context_land_mask_gdf = gpd.GeoDataFrame([{
+        "id": "tno_1962_context_land_mask",
+        "name": "TNO 1962 Context Land Mask",
+        "geometry": context_land_mask_geom,
+    }], geometry="geometry", crs="EPSG:4326")
 
     runtime_topology_payload = build_runtime_topology_payload(
         scenario_political_gdf,
         water_gdf,
         land_mask_gdf,
+        context_land_mask_gdf,
     )
     runtime_water_regions = topology_object_to_feature_collection(runtime_topology_payload, "scenario_water")
     runtime_special_regions = feature_collection_from_features([])
@@ -3504,10 +3756,7 @@ def main() -> None:
     controller_baseline_hash = stable_json_hash(controllers_payload["controllers"])
     core_baseline_hash = stable_json_hash(cores_payload["cores"])
 
-    countries_payload["generated_at"] = generated_at
-    owners_payload["generated_at"] = generated_at
-    controllers_payload["generated_at"] = generated_at
-    cores_payload["generated_at"] = generated_at
+    manifest_payload["generated_at"] = generated_at
     audit_payload["generated_at"] = generated_at
 
     owners_payload["baseline_hash"] = owner_baseline_hash
@@ -3536,9 +3785,24 @@ def main() -> None:
         summary["tno_special_region_count"] = 0
         summary["tno_water_region_count"] = len(runtime_water_regions.get("features", []))
         summary["tno_relief_overlay_count"] = len(relief_overlays_payload["features"])
-        summary["scenario_runtime_topology_object_count"] = 4
+        summary["scenario_runtime_topology_object_count"] = 5
+        summary["context_land_mask_tolerance"] = context_land_mask_tolerance
+        summary["context_land_mask_area_delta_ratio"] = context_land_mask_area_delta_ratio
+        summary["context_land_mask_fallback_used"] = context_land_mask_fallback_used
 
     diagnostics = audit_payload.setdefault("diagnostics", {})
+    sea_coverage_hole_count_by_cluster = {
+        region_id: int((med_water_diagnostics.get(region_id) or {}).get("remaining_hole_count") or 0)
+        for region_id in ATLANTROPA_REGION_CONFIGS
+    }
+    fallback_ocean_hit_count_by_cluster = {
+        region_id: 0
+        for region_id in ATLANTROPA_REGION_CONFIGS
+    }
+    pixel_fragment_count_by_cluster = {
+        region_id: int((atlantropa_diagnostics.get(region_id) or {}).get("pixel_fragment_count") or 0)
+        for region_id in ATLANTROPA_REGION_CONFIGS
+    }
     diagnostics.pop("derived_from_scenario_id", None)
     diagnostics.update({
         "source_root": str(tno_root),
@@ -3572,11 +3836,23 @@ def main() -> None:
         "congo_lake_topology_mode": "true_water_preserved",
         "atlantropa_topology_mode": "atl_land_and_sea_tiles",
         "runtime_topology_path": "data/scenarios/tno_1962/runtime_topology.topo.json",
-        "runtime_topology_objects": ["political", "scenario_water", "scenario_special_land", "land_mask"],
+        "runtime_topology_objects": [
+            "political",
+            "scenario_water",
+            "scenario_special_land",
+            "land_mask",
+            "context_land_mask",
+        ],
+        "context_land_mask_tolerance": context_land_mask_tolerance,
+        "context_land_mask_area_delta_ratio": context_land_mask_area_delta_ratio,
+        "context_land_mask_fallback_used": context_land_mask_fallback_used,
         "action_feature_counts": {key: len(value) for key, value in applied_annex_maps.items()},
         "atlantropa_region_stats": atlantropa_diagnostics,
         "atlantropa_island_replacement_stats": island_replacement_diagnostics,
         "mediterranean_water_region_stats": med_water_diagnostics,
+        "sea_coverage_hole_count_by_cluster": sea_coverage_hole_count_by_cluster,
+        "fallback_ocean_hit_count_by_cluster": fallback_ocean_hit_count_by_cluster,
+        "pixel_fragment_count_by_cluster": pixel_fragment_count_by_cluster,
         "atl_feature_count": len(atl_feature_ids),
         "atl_sea_feature_count": len(atl_sea_feature_ids),
         "coastal_restore_stats": restore_diagnostics,
@@ -3599,6 +3875,14 @@ def main() -> None:
     print(f"ATL land features: {len(atl_feature_ids)}")
     print(f"ATL sea features: {len(atl_sea_feature_ids)}")
     print(f"Water regions: {len(runtime_water_regions['features'])}")
+    print(
+        "Context land mask:",
+        {
+            "tolerance": context_land_mask_tolerance,
+            "area_delta_ratio": context_land_mask_area_delta_ratio,
+            "fallback_used": context_land_mask_fallback_used,
+        },
+    )
 
 
 def pd_concat_geodataframes(gdfs: list[gpd.GeoDataFrame]) -> gpd.GeoDataFrame:
