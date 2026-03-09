@@ -17,6 +17,7 @@ from rasterio import features as raster_features
 from rasterio.transform import Affine
 from shapely import affinity
 from shapely.geometry import GeometryCollection, LineString, MultiPolygon, Polygon, box, mapping, shape
+from shapely.geometry.polygon import orient
 from shapely.ops import snap, unary_union
 from topojson import Topology
 from topojson.utils import serialize_as_geodataframe, serialize_as_geojson
@@ -585,7 +586,7 @@ ATLANTROPA_REGION_CONFIGS = {
         "feature_group_id": "atlantropa_west_mediterranean_margin",
         "group_label": "West Mediterranean and Iberia-Algeria",
         "aoi_bbox": (-6.2, 34.0, 11.6, 44.7),
-        "sea_completion_bbox": (-6.6, 33.6, 12.0, 45.0),
+        "sea_completion_bbox": (-6.8, 33.3, 12.3, 45.1),
         "land_state_ids": [
             8446, 8447, 8448, 8449, 8450, 8451, 8452, 8453, 8454, 8455,
             8456, 8457, 8458, 8459, 8460, 8461, 8462, 8463, 8464, 8465,
@@ -611,7 +612,9 @@ ATLANTROPA_REGION_CONFIGS = {
             8465: "ALG",
         },
         "control_points": {
+            8447: (-5.55, 36.05),
             8452: (-5.35, 35.55),
+            8454: (0.15, 36.8),
             8458: (1.75, 40.75),
             8460: (3.05, 39.7),
             8462: (2.8, 42.55),
@@ -620,7 +623,7 @@ ATLANTROPA_REGION_CONFIGS = {
             8465: (6.95, 36.85),
         },
         "preserve_margin": 0.03,
-        "sea_preserve_margin": 0.03,
+        "sea_preserve_margin": 0.024,
         "snap_tolerance": 0.12,
         "simplify_tolerance": 0.012,
         "precision_simplify_tolerance": 0.0105,
@@ -629,14 +632,14 @@ ATLANTROPA_REGION_CONFIGS = {
         "island_merge_distance": 0.032,
         "mainland_component_min_area": 3.5,
         "mainland_touch_tolerance": 0.035,
-        "gap_fill_width": 0.102,
-        "gap_fill_min_area": 0.00006,
+        "gap_fill_width": 0.094,
+        "gap_fill_min_area": 0.00008,
         "gap_fill_max_area": 0.16,
-        "boolean_weld_width": 0.037,
-        "boolean_weld_min_area": 0.00001,
+        "boolean_weld_width": 0.032,
+        "boolean_weld_min_area": 0.00002,
         "boolean_weld_max_area": 0.095,
-        "shore_seal_width": 0.09,
-        "shore_seal_min_area": 0.00006,
+        "shore_seal_width": 0.084,
+        "shore_seal_min_area": 0.00008,
         "shore_seal_max_area": 0.13,
         "causeway_keep_state_ids": [8449],
         "major_island_groups": [
@@ -656,8 +659,8 @@ ATLANTROPA_REGION_CONFIGS = {
     "aegean": {
         "feature_group_id": "atlantropa_aegean_and_islands",
         "group_label": "Aegean and Greek Islands",
-        "aoi_bbox": (18.5, 33.4, 30.8, 41.9),
-        "sea_completion_bbox": (18.1, 33.1, 31.2, 42.1),
+        "aoi_bbox": (18.5, 33.4, 31.3, 42.35),
+        "sea_completion_bbox": (22.0, 34.4, 31.7, 42.55),
         "land_state_ids": [
             8510, 8512, 8515, 8516, 8517, 8518, 8519, 8520, 8521, 8522,
             8523, 8524, 8525, 8526, 8527, 8528, 8529, 8530, 8531, 8532,
@@ -704,19 +707,21 @@ ATLANTROPA_REGION_CONFIGS = {
             8516: (22.1, 37.35),
             8520: (23.75, 37.95),
             8522: (24.8, 35.15),
+            8531: (26.95, 40.85),
+            8533: (26.2, 40.2),
             8537: (27.15, 38.45),
             8540: (27.45, 37.1),
             8541: (28.0, 36.15),
             8543: (30.55, 36.75),
         },
         "preserve_margin": 0.03,
-        "sea_preserve_margin": 0.03,
+        "sea_preserve_margin": 0.024,
         "snap_tolerance": 0.12,
         "simplify_tolerance": 0.012,
         "precision_simplify_tolerance": 0.0105,
         "pixel_fragment_area_threshold": 0.0024,
         "island_replacement": True,
-        "island_merge_distance": 0.028,
+        "island_merge_distance": 0.036,
         "mainland_component_min_area": 2.5,
         "mainland_touch_tolerance": 0.035,
         "gap_fill_width": 0.092,
@@ -784,13 +789,46 @@ ATLANTROPA_REGION_CONFIGS = {
                 "boolean_weld_distance": 0.11,
                 "boolean_weld_width": 0.02,
             },
+            {
+                "id": "limnos",
+                "label": "Limnos",
+                "owner_tag": "GRE",
+                "donor_state_ids": [8535],
+                "group_bbox": (25.0, 39.55, 25.7, 40.2),
+                "search_margin": 0.14,
+                "gap_fill_buffer": 0.05,
+                "boolean_weld_distance": 0.08,
+                "boolean_weld_width": 0.016,
+            },
+            {
+                "id": "samothraki",
+                "label": "Samothraki",
+                "owner_tag": "GRE",
+                "donor_state_ids": [8532],
+                "group_bbox": (25.3, 40.3, 26.05, 41.0),
+                "search_margin": 0.14,
+                "gap_fill_buffer": 0.05,
+                "boolean_weld_distance": 0.08,
+                "boolean_weld_width": 0.016,
+            },
+            {
+                "id": "imbros",
+                "label": "Imbros",
+                "owner_tag": "TUR",
+                "donor_state_ids": [8534],
+                "group_bbox": (25.75, 39.65, 26.55, 40.4),
+                "search_margin": 0.14,
+                "gap_fill_buffer": 0.05,
+                "boolean_weld_distance": 0.08,
+                "boolean_weld_width": 0.016,
+            },
         ],
     },
     "libya_suez": {
         "feature_group_id": "atlantropa_libya_suez_and_qattara",
         "group_label": "Libya, Cyrenaica and Suez Chain",
         "aoi_bbox": (12.5, 28.0, 35.2, 34.2),
-        "sea_completion_bbox": (12.1, 27.8, 35.6, 34.4),
+        "sea_completion_bbox": (11.8, 27.8, 35.9, 34.8),
         "land_state_ids": [8563, 8564, 8565, 8567, 8568, 8569, 8570, 8572, 8574, 8575, 8576],
         "water_state_ids": [8599, 8605, 8613, 8614, 8615, 8616, 8617, 8618],
         "state_owner_overrides": {
@@ -805,15 +843,18 @@ ATLANTROPA_REGION_CONFIGS = {
             8576: "EGY",
         },
         "control_points": {
+            8563: (12.45, 31.95),
             8564: (13.2, 32.85),
             8565: (20.1, 32.05),
+            8567: (21.15, 32.55),
+            8568: (22.7, 32.7),
             8569: (25.2, 31.55),
-            8570: (29.7, 31.0),
-            8575: (32.5, 30.55),
-            8576: (32.95, 30.4),
+            8570: (29.9, 31.05),
+            8575: (32.45, 30.7),
+            8576: (33.15, 30.55),
         },
         "preserve_margin": 0.03,
-        "sea_preserve_margin": 0.03,
+        "sea_preserve_margin": 0.022,
         "snap_tolerance": 0.12,
         "simplify_tolerance": 0.012,
         "precision_simplify_tolerance": 0.0105,
@@ -833,8 +874,8 @@ ATLANTROPA_REGION_CONFIGS = {
         "causeway_keep_state_ids": [8575, 8576],
         "causeway_trim_state_ids": [8575, 8576],
         "causeway_drop_state_ids": [8572, 8574],
-        "causeway_trim_width": 0.12,
-        "sea_drop_enclosed_max_area": 0.18,
+        "causeway_trim_width": 0.16,
+        "sea_drop_enclosed_max_area": 0.045,
     },
 }
 
@@ -881,11 +922,15 @@ COASTAL_RESTORE_AOI_CONFIGS = {
     },
     "aegean": {
         "label": "Aegean and Greek island shoreline",
-        "bbox": (18.5, 33.2, 30.8, 41.8),
+        "bbox": (18.5, 33.2, 31.4, 42.2),
+    },
+    "bosphorus_black_sea_mouth": {
+        "label": "Bosphorus and Black Sea mouth shoreline",
+        "bbox": (28.0, 40.55, 31.8, 42.35),
     },
     "libya_suez": {
         "label": "Libya, Alexandria and Suez shoreline",
-        "bbox": (12.5, 28.0, 34.8, 33.8),
+        "bbox": (12.1, 28.0, 35.6, 34.1),
     },
     "congo": {
         "label": "Congo Lake shoreline recovery ring",
@@ -1570,7 +1615,11 @@ def normalize_polygonal(geom):
             candidate = geom.buffer(0)
         except Exception:
             candidate = geom
-    parts = [part for part in iter_polygon_parts(candidate) if not part.is_empty and part.area > 1e-9]
+    parts = []
+    for part in iter_polygon_parts(candidate):
+        if part.is_empty or part.area <= 1e-9:
+            continue
+        parts.append(orient(part, sign=-1.0))
     if not parts:
         return None
     return parts[0] if len(parts) == 1 else MultiPolygon(parts)

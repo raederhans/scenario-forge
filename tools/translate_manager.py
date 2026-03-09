@@ -133,6 +133,9 @@ MANUAL_UI_DICT = {
     "Scenario reset to baseline.": "剧本已重置为基线。",
     "Unable to apply scenario.": "无法应用剧本。",
     "Critical checks": "关键检查",
+    "Target This Country": "将此国家设为目标",
+    "When off, shoreline, basin contour, and texture overlays are hidden for the active scenario.": "关闭后，当前剧本的海岸线、盆地等高线和纹理覆盖层将被隐藏。",
+    "Scenario relief overlays are currently visible. During pan and zoom they redraw only after the view settles.": "当前剧本的地形覆盖层处于可见状态。平移和缩放期间会在视图稳定后重绘。",
 }
 
 MANUAL_GEO_OVERRIDES = {
@@ -163,6 +166,65 @@ MANUAL_GEO_OVERRIDES = {
     "Omaheke": "\u5965\u9a6c\u8d6b\u51ef",
     "VEN+99?": "\u59d4\u5185\u745e\u62c9\u7279\u6b8a\u533a\u57df",
     "VEN+99\uff1f": "\u59d4\u5185\u745e\u62c9\u7279\u6b8a\u533a\u57df",
+    "HOI4 1936": "钢铁雄心4 1936",
+    "HOI4 1939": "钢铁雄心4 1939",
+    "TNO 1962": "TNO 1962（新秩序）",
+    "Blank Base": "空白基线",
+    "Modern World": "现代世界",
+    "Canonical ownership baseline without scenario-only overlays.": "不含剧本专属覆盖层的规范主权基线。",
+    "Canonical modern-world baseline with vanilla palette colors.": "使用原版调色板颜色的现代世界规范基线。",
+    "Anglo-Egyptian Sudan": "英埃苏丹",
+    "Atlantropa Reclamation Zone": "亚特兰托帕垦殖区",
+    "Azad Hind": "自由印度",
+    "Belgian Congo": "比属刚果",
+    "British East Africa": "英属东非",
+    "British West Africa": "英属西非",
+    "Ceylon": "锡兰",
+    "Dutch East Indies": "荷属东印度",
+    "French Algeria": "法属阿尔及利亚",
+    "French Equatorial Africa": "法属赤道非洲",
+    "French Indochina": "法属印度支那",
+    "French Mandate for Lebanon": "法属黎巴嫩托管地",
+    "French Mandate for Syria": "法属叙利亚托管地",
+    "French Morocco": "法属摩洛哥",
+    "French Tunisia": "法属突尼斯",
+    "French West Africa": "法属西非",
+    "Greek Protectorate": "希腊保护国",
+    "Guangdong National Government": "广东国民政府",
+    "Guizhou Clique": "贵州军阀",
+    "Independent State of Croatia": "克罗地亚独立国",
+    "Italian East Africa": "意属东非",
+    "Italian Egypt": "意属埃及",
+    "Italian Palestine": "意属巴勒斯坦",
+    "Italian Somaliland": "意属索马里兰",
+    "Italian Transjordan": "意属外约旦",
+    "Kingdom of Egypt": "埃及王国",
+    "Korea": "朝鲜",
+    "Lebanese Protectorate": "黎巴嫩保护国",
+    "Malaya": "马来亚",
+    "Nanjing China": "南京中国",
+    "North China Political Council": "华北政务委员会",
+    "Ordensstaat Burgund": "勃艮第骑士团国",
+    "Reformed Government of China": "中华民国维新政府",
+    "Reichskommissariat Kaukasien": "高加索专员辖区",
+    "Reichskommissariat Moskowien": "莫斯科专员辖区",
+    "Reichskommissariat Niederlande": "荷兰专员辖区",
+    "Reichskommissariat Norwegen": "挪威专员辖区",
+    "Reichskommissariat Ostland": "东方专员辖区",
+    "Reichskommissariat Polen": "波兰专员辖区",
+    "Reichskommissariat Ukraine": "乌克兰专员辖区",
+    "Serbian Administration": "塞尔维亚行政当局",
+    "Spanish Guinea": "西属几内亚",
+    "Spanish Morocco": "西属摩洛哥",
+    "Spanish Sahara": "西属撒哈拉",
+    "Syrian Protectorate": "叙利亚保护国",
+    "Tunisian Protectorate": "突尼斯保护国",
+    "Xikang-Tibet Administration": "西康-西藏行政区",
+    "Xikang Clique": "西康军阀",
+    "Xinjiang": "新疆",
+    "South Jutland (Remainder)": "南日德兰（剩余部分）",
+    "South Jutland (Remainder) (DK)": "南日德兰（剩余部分）",
+    "South Jutland (Remainder) [Sydjylland]": "南日德兰（剩余部分）",
 }
 
 UI_CALL_RE = re.compile(r"""t\(\s*(['\"])(?P<text>.*?)\1\s*,\s*(['\"])ui\3\s*\)""")
@@ -174,6 +236,13 @@ PLACEHOLDER_PREFIX_RE = re.compile(
 )
 ORPHAN_STABLE_KEY_RE = re.compile(r"^id::\d+$")
 CJK_RE = re.compile(r"[\u4e00-\u9fff]")
+PRIVATE_USE_RE = re.compile(r"[\ue000-\uf8ff]")
+MOJIBAKE_RE = re.compile(r"[\ufffd]|鈥|锟|€")
+SHELL_FALLBACK_NAME_RE = re.compile(r"^Russia Shell Fallback(?: \d+)?(?: \(RU\))?$", re.IGNORECASE)
+SHELL_FALLBACK_STABLE_KEY_RE = re.compile(r"^id::[A-Za-z0-9_]+_FB_[A-Za-z0-9_]+$")
+SCENARIO_DISPLAY_FIELDS = ("display_name", "displayName")
+SCENARIO_METADATA_FIELDS = ("bookmark_name", "bookmarkName", "bookmark_description", "bookmarkDescription")
+TOOLTIP_ADMIN_FIELDS = ("admin1_group", "constituent_country")
 
 
 
@@ -198,11 +267,59 @@ def normalize_comparable_text(text: str) -> str:
     return unicodedata.normalize("NFKC", (text or "").strip())
 
 
+def is_user_visible_candidate(value: str) -> bool:
+    text = (value or "").strip()
+    if len(text) < 3:
+        return False
+    if text.startswith("#"):
+        return False
+    if text.startswith("[") and text.endswith("]"):
+        return False
+    if re.fullmatch(r"[A-Z0-9_\-]+", text):
+        return False
+    if re.fullmatch(r"[{}()<>:=;,.\-_/\\]+", text):
+        return False
+    return bool(re.search(r"[A-Za-z]", text))
+
+
 def has_literal_todo_marker(text: str) -> bool:
     value = (text or "").strip()
     if not value:
         return False
     return value != strip_placeholder_prefix(value)
+
+
+def is_corrupted_translation(text: str) -> bool:
+    value = strip_placeholder_prefix(text or "")
+    if not value:
+        return False
+    if PRIVATE_USE_RE.search(value):
+        return True
+    if MOJIBAKE_RE.search(value):
+        return True
+    return False
+
+
+def is_corrupted_source_name(text: str) -> bool:
+    value = strip_placeholder_prefix(text or "")
+    if not value:
+        return False
+    if PRIVATE_USE_RE.search(value):
+        return True
+    if MOJIBAKE_RE.search(value):
+        return True
+    return False
+
+
+def is_shell_fallback_name(text: str) -> bool:
+    value = strip_placeholder_prefix(text or "")
+    if not value:
+        return False
+    if SHELL_FALLBACK_NAME_RE.fullmatch(value):
+        return True
+    if SHELL_FALLBACK_STABLE_KEY_RE.fullmatch(value):
+        return True
+    return "shell fallback" in value.lower()
 
 
 def is_missing_like(text: str, en: str = "") -> bool:
@@ -212,9 +329,39 @@ def is_missing_like(text: str, en: str = "") -> bool:
     stripped = strip_placeholder_prefix(value)
     if not stripped:
         return True
+    if is_corrupted_translation(stripped):
+        return True
     if bool(en) and normalize_comparable_text(stripped) == normalize_comparable_text(en or ""):
         return not bool(CJK_RE.search(stripped))
     return False
+
+
+def should_track_geo_missing_like(key: str, en_value: str = "") -> bool:
+    return (
+        not is_shell_fallback_name(key)
+        and not is_shell_fallback_name(en_value)
+        and not is_corrupted_source_name(key)
+        and not is_corrupted_source_name(en_value)
+    )
+
+
+def get_geo_primary_name(key: str, alias_to_stable: dict, stable_to_primary: dict) -> str:
+    stable_key = alias_to_stable.get(key)
+    if stable_key:
+        return stable_to_primary.get(stable_key, "")
+    return stable_to_primary.get(key, "")
+
+
+def get_existing_usable_zh(existing: dict, key: str, fallback_en: str = "") -> str | None:
+    entry = existing.get(key)
+    if not isinstance(entry, dict):
+        return None
+    zh_value = entry.get("zh", "")
+    en_value = entry.get("en", fallback_en or key)
+    if is_missing_like(zh_value, en_value):
+        return None
+    return strip_placeholder_prefix(zh_value)
+
 
 def should_drop_geo_entry(
     key: str,
@@ -269,14 +416,14 @@ def parse_country_codes(raw_value: str | None) -> set[str]:
     }
 
 
-def load_geo_names(topo_path: Path, country_codes: set[str] | None = None) -> list[str]:
+def iter_topology_properties(topo_path: Path, country_codes: set[str] | None = None) -> list[dict]:
     if not topo_path.exists():
         raise FileNotFoundError(f"Missing topology file: {topo_path}")
 
     with topo_path.open("r", encoding="utf-8") as file:
         data = json.load(file)
 
-    names = set()
+    properties_list = []
     if isinstance(data, dict) and data.get("type") == "Topology":
         political = data.get("objects", {}).get("political")
         if political and isinstance(political, dict):
@@ -285,18 +432,35 @@ def load_geo_names(topo_path: Path, country_codes: set[str] | None = None) -> li
                 code = str(props.get("cntr_code", "")).strip().upper()
                 if country_codes and code not in country_codes:
                     continue
-                for key, value in props.items():
-                    if "name" in key.lower() and isinstance(value, str) and value.strip():
-                        names.add(value.strip())
+                properties_list.append(props)
     elif isinstance(data, dict) and "features" in data:
         for feat in data.get("features", []):
             props = feat.get("properties") or {}
             code = str(props.get("cntr_code", "")).strip().upper()
             if country_codes and code not in country_codes:
                 continue
-            for key, value in props.items():
-                if "name" in key.lower() and isinstance(value, str) and value.strip():
-                    names.add(value.strip())
+            properties_list.append(props)
+    return properties_list
+
+
+def load_geo_names(topo_path: Path, country_codes: set[str] | None = None) -> list[str]:
+    names = set()
+    for props in iter_topology_properties(topo_path, country_codes=country_codes):
+        for key, value in props.items():
+            if not isinstance(value, str) or not value.strip():
+                continue
+            if "name" in key.lower() or key in TOOLTIP_ADMIN_FIELDS:
+                names.add(value.strip())
+    return sorted(names)
+
+
+def load_tooltip_admin_names(topo_path: Path, country_codes: set[str] | None = None) -> list[str]:
+    names = set()
+    for props in iter_topology_properties(topo_path, country_codes=country_codes):
+        for key in TOOLTIP_ADMIN_FIELDS:
+            value = props.get(key)
+            if isinstance(value, str) and value.strip():
+                names.add(value.strip())
     return sorted(names)
 
 
@@ -339,11 +503,22 @@ def load_hierarchy_geo_names(hierarchy_path: Path) -> list[str]:
     return sorted(names)
 
 
-def load_scenario_geo_names(scenarios_root: Path) -> list[str]:
+def load_scenario_localizable_strings(scenarios_root: Path) -> dict[str, list[str]]:
+    display_names = set()
+    metadata_names = set()
     if not scenarios_root.exists() or not scenarios_root.is_dir():
-        return []
+        return {
+            "display_names": [],
+            "metadata_names": [],
+            "all_names": [],
+        }
 
-    names = set()
+    def collect_values(entry: dict, fields: tuple[str, ...], bucket: set[str]) -> None:
+        for field in fields:
+            value = str(entry.get(field) or "").strip()
+            if value and is_user_visible_candidate(value):
+                bucket.add(value)
+
     for path in sorted(scenarios_root.rglob("*.json")):
         if not path.is_file():
             continue
@@ -356,35 +531,33 @@ def load_scenario_geo_names(scenarios_root: Path) -> list[str]:
         if not isinstance(data, dict):
             continue
 
-        root_display_name = str(
-            data.get("display_name") or data.get("displayName") or ""
-        ).strip()
-        if root_display_name:
-            names.add(root_display_name)
+        collect_values(data, SCENARIO_DISPLAY_FIELDS, display_names)
+        collect_values(data, SCENARIO_METADATA_FIELDS, metadata_names)
 
         countries = data.get("countries")
         if isinstance(countries, dict):
             for entry in countries.values():
                 if not isinstance(entry, dict):
                     continue
-                display_name = str(
-                    entry.get("display_name") or entry.get("displayName") or ""
-                ).strip()
-                if display_name:
-                    names.add(display_name)
+                collect_values(entry, SCENARIO_DISPLAY_FIELDS, display_names)
+                collect_values(entry, SCENARIO_METADATA_FIELDS, metadata_names)
 
         scenarios = data.get("scenarios")
         if isinstance(scenarios, list):
             for entry in scenarios:
                 if not isinstance(entry, dict):
                     continue
-                display_name = str(
-                    entry.get("display_name") or entry.get("displayName") or ""
-                ).strip()
-                if display_name:
-                    names.add(display_name)
+                collect_values(entry, SCENARIO_DISPLAY_FIELDS, display_names)
+                collect_values(entry, SCENARIO_METADATA_FIELDS, metadata_names)
+    return {
+        "display_names": sorted(display_names),
+        "metadata_names": sorted(metadata_names),
+        "all_names": sorted(display_names | metadata_names),
+    }
 
-    return sorted(names)
+
+def load_scenario_geo_names(scenarios_root: Path) -> list[str]:
+    return load_scenario_localizable_strings(scenarios_root)["all_names"]
 
 
 def detect_visible_missing_country_codes(
@@ -506,9 +679,20 @@ def contains_cjk(text: str) -> bool:
     return bool(re.search(r"[\u4e00-\u9fff]", text or ""))
 
 
+def detect_translation_source_language(text: str) -> str:
+    value = strip_placeholder_prefix(text or "")
+    if not value:
+        return "en"
+    if re.fullmatch(r"[A-Za-z0-9\s\-'(),./:&+\[\]?]+", value):
+        return "en"
+    return "auto"
+
+
 def is_usable_zh(text: str, en: str = "") -> bool:
     value = strip_placeholder_prefix(text or "")
     if is_missing_like(value, en):
+        return False
+    if is_corrupted_translation(value):
         return False
     return contains_cjk(value)
 
@@ -580,10 +764,11 @@ class MachineTranslator:
         if self.max_requests is not None and self.requests_made >= self.max_requests:
             return None
 
+        source_language = detect_translation_source_language(value)
         query = urllib.parse.urlencode(
             {
                 "client": "gtx",
-                "sl": "en",
+                "sl": source_language,
                 "tl": "zh-CN",
                 "dt": "t",
                 "q": value,
@@ -615,10 +800,11 @@ def resolve_zh(
     translator: MachineTranslator,
     alias_to_stable: dict,
     stable_to_primary: dict,
+    resolved_primary_zh: dict | None = None,
 ) -> str:
-    existing_entry = existing.get(key)
-    if existing_entry and not is_missing_like(existing_entry["zh"], existing_entry["en"]):
-        return strip_placeholder_prefix(existing_entry["zh"])
+    existing_zh = get_existing_usable_zh(existing, key, en_value)
+    if existing_zh:
+        return existing_zh
 
     if key in MANUAL_UI_DICT:
         return MANUAL_UI_DICT[key]
@@ -633,26 +819,29 @@ def resolve_zh(
     if en_value in MANUAL_GEO_OVERRIDES:
         return MANUAL_GEO_OVERRIDES[en_value]
 
+    primary_name = get_geo_primary_name(key, alias_to_stable, stable_to_primary)
+    if resolved_primary_zh and primary_name:
+        primary_zh = resolved_primary_zh.get(primary_name)
+        if primary_zh and not is_missing_like(primary_zh, primary_name):
+            return primary_zh
+
     stable_key = alias_to_stable.get(key)
     if stable_key:
-        stable_entry = existing.get(stable_key)
-        if stable_entry and not is_missing_like(stable_entry["zh"], stable_entry["en"]):
-            return strip_placeholder_prefix(stable_entry["zh"])
-        primary_name = stable_to_primary.get(stable_key, "")
-        if primary_name:
-            if primary_name in EUROPE_GEO_SEEDS:
-                return EUROPE_GEO_SEEDS[primary_name]
-            alias_entry = existing.get(primary_name)
-            if alias_entry and not is_missing_like(alias_entry["zh"], alias_entry["en"]):
-                return strip_placeholder_prefix(alias_entry["zh"])
+        stable_zh = get_existing_usable_zh(existing, stable_key, stable_to_primary.get(stable_key, stable_key))
+        if stable_zh:
+            return stable_zh
 
-    if key in stable_to_primary:
-        primary_name = stable_to_primary[key]
+    if primary_name:
         if primary_name in EUROPE_GEO_SEEDS:
             return EUROPE_GEO_SEEDS[primary_name]
-        alias_entry = existing.get(primary_name)
-        if alias_entry and not is_missing_like(alias_entry["zh"], alias_entry["en"]):
-            return strip_placeholder_prefix(alias_entry["zh"])
+        primary_existing_zh = get_existing_usable_zh(existing, primary_name, primary_name)
+        if primary_existing_zh:
+            return primary_existing_zh
+
+    if is_shell_fallback_name(key) or is_shell_fallback_name(en_value):
+        return en_value
+    if is_corrupted_source_name(key) or is_corrupted_source_name(en_value):
+        return en_value
 
     translated = normalize_translation_candidate(translator.translate(en_value), en_value)
     if translated:
@@ -674,6 +863,7 @@ def merge_ui(existing_ui: dict, discovered_ui_keys: list[str], translator: Machi
             translator=translator,
             alias_to_stable={},
             stable_to_primary={},
+            resolved_primary_zh={},
         )
         merged[key] = {"en": existing.get("en", key), "zh": zh}
     return merged
@@ -704,6 +894,24 @@ def merge_geo(
             keys.update(alias_to_stable.values())
         merged = {}
 
+    primary_names = {
+        primary_name
+        for key in keys
+        if (primary_name := get_geo_primary_name(key, alias_to_stable, stable_to_primary))
+    }
+    resolved_primary_zh = {}
+    for primary_name in sorted(primary_names):
+        existing_primary = normalized.get(primary_name, {"en": primary_name, "zh": primary_name})
+        resolved_primary_zh[primary_name] = resolve_zh(
+            key=primary_name,
+            en_value=existing_primary.get("en", primary_name),
+            existing=normalized,
+            translator=translator,
+            alias_to_stable=alias_to_stable,
+            stable_to_primary=stable_to_primary,
+            resolved_primary_zh={},
+        )
+
     for key in sorted(keys):
         stable_key = alias_to_stable.get(key)
         en_value = key
@@ -721,6 +929,7 @@ def merge_geo(
             translator=translator,
             alias_to_stable=alias_to_stable,
             stable_to_primary=stable_to_primary,
+            resolved_primary_zh=resolved_primary_zh,
         )
         merged[key] = {"en": en_value, "zh": zh}
     return {
@@ -912,13 +1121,37 @@ def sync_translations(
 
     geo_missing_like = sum(
         1
-        for entry in geo_payload.values()
-        if is_missing_like(entry.get("zh", ""), entry.get("en", ""))
+        for key, entry in geo_payload.items()
+        if should_track_geo_missing_like(key, entry.get("en", ""))
+        and is_missing_like(entry.get("zh", ""), entry.get("en", ""))
+    )
+    shell_fallback_missing_like = sum(
+        1
+        for key, entry in geo_payload.items()
+        if is_shell_fallback_name(key)
+        and is_missing_like(entry.get("zh", ""), entry.get("en", ""))
+    )
+    source_name_corrupted_count = sum(
+        1
+        for key, entry in geo_payload.items()
+        if is_corrupted_source_name(key) or is_corrupted_source_name(entry.get("en", key))
     )
     geo_literal_todo_markers = sum(
         1
         for entry in geo_payload.values()
         if has_literal_todo_marker(entry.get("zh", ""))
+    )
+    corrupted_translation_count = (
+        sum(
+            1
+            for entry in ui_payload.values()
+            if is_corrupted_translation(entry.get("zh", ""))
+        )
+        + sum(
+            1
+            for entry in geo_payload.values()
+            if is_corrupted_translation(entry.get("zh", ""))
+        )
     )
     scenario_geo_name_count = (
         len(load_scenario_geo_names(scenarios_root)) if scenarios_root else 0
@@ -927,10 +1160,13 @@ def sync_translations(
         "ui_keys": len(ui_payload),
         "geo_keys": len(geo_payload),
         "geo_missing_like": geo_missing_like,
+        "shell_fallback_missing_like": shell_fallback_missing_like,
         "geo_literal_todo_markers": geo_literal_todo_markers,
+        "source_name_corrupted_count": source_name_corrupted_count,
         "scenario_geo_names": scenario_geo_name_count,
         "alias_map": len(alias_to_stable),
         "mt_requests": translator.requests_made,
+        "corrupted_translation_count": corrupted_translation_count,
         "machine_translate_enabled": machine_translate_enabled,
         "machine_translate_available": machine_translate_available,
         "resolved_country_codes": sorted(resolved_country_codes),
@@ -972,7 +1208,10 @@ def main() -> None:
         "OK: synced translations. "
         f"ui_keys={result['ui_keys']}, geo_keys={result['geo_keys']}, "
         f"geo_missing_like={result['geo_missing_like']}, "
+        f"shell_fallback_missing_like={result['shell_fallback_missing_like']}, "
         f"todo_markers={result['geo_literal_todo_markers']}, "
+        f"source_name_corrupted={result['source_name_corrupted_count']}, "
+        f"corrupted_translations={result['corrupted_translation_count']}, "
         f"scenario_geo_names={result['scenario_geo_names']}, "
         f"alias_map={result['alias_map']}, mt_requests={result['mt_requests']}"
     )

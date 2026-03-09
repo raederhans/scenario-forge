@@ -3,6 +3,7 @@ import {
   state,
   PALETTE_THEMES,
   normalizeDayNightStyleConfig,
+  normalizeLakeStyleConfig,
   normalizePhysicalStyleConfig,
   normalizeTextureMode,
   normalizeTextureStyleConfig,
@@ -274,6 +275,8 @@ function initToolbar({ render } = {}) {
   const parentBorderDisableAll = document.getElementById("parentBorderDisableAll");
   const parentBorderEmpty = document.getElementById("parentBorderEmpty");
   const oceanFillColor = document.getElementById("oceanFillColor");
+  const lakeLinkToOcean = document.getElementById("lakeLinkToOcean");
+  const lakeFillColor = document.getElementById("lakeFillColor");
   const oceanStyleSelect = document.getElementById("oceanStyleSelect");
   const oceanTextureOpacity = document.getElementById("oceanTextureOpacity");
   const oceanTextureScale = document.getElementById("oceanTextureScale");
@@ -858,7 +861,12 @@ function initToolbar({ render } = {}) {
     "styleConfig.texture.draftGrid.minorOpacity",
     "styleConfig.texture.draftGrid.dash",
   ];
+  const lakeStylePaths = [
+    "styleConfig.lakes.linkedToOcean",
+    "styleConfig.lakes.fillColor",
+  ];
   let textureHistoryBefore = null;
+  let lakeHistoryBefore = null;
 
   const beginTextureHistoryCapture = () => {
     if (textureHistoryBefore) return;
@@ -879,9 +887,33 @@ function initToolbar({ render } = {}) {
     textureHistoryBefore = null;
   };
 
+  const beginLakeHistoryCapture = () => {
+    if (lakeHistoryBefore) return;
+    lakeHistoryBefore = captureHistoryState({
+      stylePaths: lakeStylePaths,
+    });
+  };
+
+  const commitLakeHistory = (kind = "lake-style") => {
+    if (!lakeHistoryBefore) return;
+    pushHistoryEntry({
+      kind,
+      before: lakeHistoryBefore,
+      after: captureHistoryState({
+        stylePaths: lakeStylePaths,
+      }),
+    });
+    lakeHistoryBefore = null;
+  };
+
   const syncTextureConfig = () => {
     state.styleConfig.texture = normalizeTextureStyleConfig(state.styleConfig.texture);
     return state.styleConfig.texture;
+  };
+
+  const syncLakeConfig = () => {
+    state.styleConfig.lakes = normalizeLakeStyleConfig(state.styleConfig.lakes);
+    return state.styleConfig.lakes;
   };
 
   const syncPhysicalConfig = () => {
@@ -1144,6 +1176,7 @@ function initToolbar({ render } = {}) {
     0,
     1
   );
+  state.styleConfig.lakes = normalizeLakeStyleConfig(state.styleConfig.lakes);
   if (!state.styleConfig.parentBorders || typeof state.styleConfig.parentBorders !== "object") {
     state.styleConfig.parentBorders = {};
   }
@@ -1268,9 +1301,28 @@ function initToolbar({ render } = {}) {
     oceanFillColor.value = state.styleConfig.ocean.fillColor;
     oceanFillColor.addEventListener("input", (event) => {
       state.styleConfig.ocean.fillColor = normalizeOceanFillColor(event.target.value);
+      renderLakeUi();
       renderDirty("ocean-fill");
     });
   }
+
+  const renderLakeUi = () => {
+    const lakeConfig = syncLakeConfig();
+    const resolvedLakeColor = lakeConfig.linkedToOcean
+      ? normalizeOceanFillColor(state.styleConfig.ocean.fillColor)
+      : normalizeOceanFillColor(lakeConfig.fillColor || state.styleConfig.ocean.fillColor);
+    if (lakeLinkToOcean) {
+      lakeLinkToOcean.checked = lakeConfig.linkedToOcean;
+    }
+    if (lakeFillColor) {
+      lakeFillColor.value = resolvedLakeColor;
+      lakeFillColor.disabled = lakeConfig.linkedToOcean;
+      lakeFillColor.title = lakeConfig.linkedToOcean
+        ? "Linked to the current ocean fill color."
+        : "";
+    }
+  };
+  renderLakeUi();
 
   function renderRecentColors() {
     if (!recentContainer) return;
@@ -1901,6 +1953,7 @@ function initToolbar({ render } = {}) {
     if (oceanFillColor) {
       oceanFillColor.value = normalizeOceanFillColor(state.styleConfig.ocean.fillColor);
     }
+    renderLakeUi();
     if (colorModeSelect) {
       colorModeSelect.value = state.colorMode || "political";
     }
@@ -3221,6 +3274,39 @@ function initToolbar({ render } = {}) {
       oceanContourStrength.disabled = true;
       oceanContourStrength.title = "Temporarily disabled while advanced ocean styles are off.";
     }
+  }
+
+  if (lakeLinkToOcean && !lakeLinkToOcean.dataset.bound) {
+    lakeLinkToOcean.checked = !!syncLakeConfig().linkedToOcean;
+    lakeLinkToOcean.addEventListener("change", (event) => {
+      beginLakeHistoryCapture();
+      const lakeConfig = syncLakeConfig();
+      lakeConfig.linkedToOcean = !!event.target.checked;
+      renderLakeUi();
+      renderDirty("lake-link");
+      commitLakeHistory("lake-link");
+    });
+    lakeLinkToOcean.dataset.bound = "true";
+  }
+
+  if (lakeFillColor && !lakeFillColor.dataset.bound) {
+    lakeFillColor.addEventListener("input", (event) => {
+      const lakeConfig = syncLakeConfig();
+      if (lakeConfig.linkedToOcean) {
+        renderLakeUi();
+        return;
+      }
+      beginLakeHistoryCapture();
+      lakeConfig.fillColor = normalizeOceanFillColor(event.target.value);
+      renderLakeUi();
+      renderDirty("lake-fill");
+    });
+    lakeFillColor.addEventListener("change", () => {
+      const lakeConfig = syncLakeConfig();
+      if (lakeConfig.linkedToOcean) return;
+      commitLakeHistory("lake-fill");
+    });
+    lakeFillColor.dataset.bound = "true";
   }
 
   const referenceImage = document.getElementById("referenceImage");

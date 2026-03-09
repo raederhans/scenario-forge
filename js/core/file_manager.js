@@ -1,6 +1,7 @@
 // Project file manager (Phase 13)
 import {
   normalizeDayNightStyleConfig,
+  normalizeLakeStyleConfig,
   normalizePhysicalStyleConfig,
   normalizeTextureStyleConfig,
 } from "./state.js";
@@ -61,6 +62,7 @@ class FileManager {
       styleConfig: {
         parentBorders: appState.styleConfig?.parentBorders || null,
         ocean: appState.styleConfig?.ocean || null,
+        lakes: normalizeLakeStyleConfig(appState.styleConfig?.lakes),
         urban: appState.styleConfig?.urban || null,
         physical: normalizePhysicalStyleConfig(appState.styleConfig?.physical),
         rivers: appState.styleConfig?.rivers || null,
@@ -152,6 +154,7 @@ class FileManager {
         if (!data.styleConfig.ocean || typeof data.styleConfig.ocean !== "object") {
           data.styleConfig.ocean = null;
         }
+        data.styleConfig.lakes = normalizeLakeStyleConfig(data.styleConfig.lakes);
         if (!data.styleConfig.urban || typeof data.styleConfig.urban !== "object") {
           data.styleConfig.urban = null;
         }

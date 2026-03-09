@@ -426,24 +426,201 @@ function initTranslations() {
   updateUIText();
 }
 
-function getTooltipText(feature) {
-  if (!feature) return "";
-  const isWaterRegion = !!feature?.properties?.water_type;
+const TOOLTIP_COUNTRY_CODE_ALIASES = {
+  UK: "GB",
+  EL: "GR",
+};
+
+function getTooltipFeatureId(feature) {
+  const raw =
+    feature?.properties?.id ??
+    feature?.properties?.NUTS_ID ??
+    feature?.id;
+  if (raw === null || raw === undefined) return "";
+  return String(raw).trim();
+}
+
+function normalizeTooltipCountryCode(rawCode) {
+  const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
+  if (!code) return "";
+  return TOOLTIP_COUNTRY_CODE_ALIASES[code] || code;
+}
+
+function extractTooltipCountryCodeFromId(value) {
+  const text = String(value || "").trim().toUpperCase();
+  if (!text) return "";
+  const prefix = text.split(/[-_]/)[0];
+  if (/^[A-Z]{2,3}$/.test(prefix)) {
+    return prefix;
+  }
+  const alphaPrefix = prefix.match(/^[A-Z]{2,3}/);
+  return alphaPrefix ? alphaPrefix[0] : "";
+}
+
+function getTooltipFeatureCountryCode(feature) {
+  const props = feature?.properties || {};
+  const direct = (
+    props.cntr_code ||
+    props.CNTR_CODE ||
+    props.iso_a2 ||
+    props.ISO_A2 ||
+    props.iso_a2_eh ||
+    props.ISO_A2_EH ||
+    props.adm0_a2 ||
+    props.ADM0_A2 ||
+    ""
+  );
+  const normalizedDirect = normalizeTooltipCountryCode(direct);
+  if (/^[A-Z]{2,3}$/.test(normalizedDirect) && normalizedDirect !== "ZZ" && normalizedDirect !== "XX") {
+    return normalizedDirect;
+  }
+
+  return normalizeTooltipCountryCode(
+    extractTooltipCountryCodeFromId(props.id) ||
+    extractTooltipCountryCodeFromId(props.NUTS_ID) ||
+    extractTooltipCountryCodeFromId(feature?.id)
+  );
+}
+
+function getTooltipRegionName(feature, fallback) {
   const rawName =
     feature?.properties?.label ||
     feature?.properties?.name ||
     feature?.properties?.name_en ||
     feature?.properties?.NAME ||
-    (isWaterRegion ? "Unknown Water Region" : "Unknown Region");
-  const name = t(rawName, "geo");
-  const code = (feature?.properties?.cntr_code || "").toUpperCase();
+    fallback;
+  return t(rawName, "geo") || rawName || fallback;
+}
+
+function normalizeTooltipComparisonValue(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function getTooltipCountryContext(feature) {
+  const featureId = getTooltipFeatureId(feature);
+  const scenarioBaselineCode = state.activeScenarioId
+    ? normalizeTooltipCountryCode(state.scenarioBaselineOwnersByFeatureId?.[featureId] || "")
+    : "";
+  const countryCode = scenarioBaselineCode || getTooltipFeatureCountryCode(feature);
+  const rawCountryName =
+    state.scenarioCountriesByTag?.[countryCode]?.display_name ||
+    state.countryNames?.[countryCode] ||
+    countryCode;
+  const countryDisplayName = t(rawCountryName, "geo") || rawCountryName || countryCode;
+  return {
+    countryCode,
+    countryDisplayName,
+  };
+}
+
+function getTooltipAdmin1Name(feature, { regionName = "", countryDisplayName = "" } = {}) {
+  const candidates = [
+    feature?.properties?.admin1_group,
+    feature?.properties?.constituent_country,
+  ];
+  const regionKey = normalizeTooltipComparisonValue(regionName);
+  const countryKey = normalizeTooltipComparisonValue(countryDisplayName);
+
+  for (const candidate of candidates) {
+    const rawValue = String(candidate || "").trim();
+    if (!rawValue) continue;
+    const displayValue = t(rawValue, "geo") || rawValue;
+    const comparisonValue = normalizeTooltipComparisonValue(displayValue);
+    if (!comparisonValue) continue;
+    if (comparisonValue === regionKey || comparisonValue === countryKey) continue;
+    return displayValue;
+  }
+
+  return "";
+}
+
+function buildLegacyTooltipModel(feature, { isWaterRegion = false, isSpecialRegion = false } = {}) {
+  const fallback = isWaterRegion ? "Unknown Water Region" : "Unknown Region";
+  const name = getTooltipRegionName(feature, fallback);
+  const code = getTooltipFeatureCountryCode(feature);
   const labelKey = isWaterRegion ? "Water Region" : "Region";
   const label = state.currentLanguage === "zh" ? t(labelKey, "ui") : labelKey;
   const waterType = isWaterRegion ? String(feature?.properties?.water_type || "").trim() : "";
-  if (!name && !code) return label;
-  if (waterType) return `${label}: ${name} (${waterType})`;
-  if (code) return `${label}: ${name} (${code})`;
-  return `${label}: ${name}`;
+  const specialType = isSpecialRegion ? String(feature?.properties?.special_type || "").trim() : "";
+  const lines = [];
+
+  if (!name && !code) {
+    lines.push(label);
+  } else if (waterType) {
+    lines.push(`${label}: ${name} (${waterType})`);
+  } else if (specialType) {
+    lines.push(`${label}: ${name} (${specialType})`);
+  } else if (code) {
+    lines.push(`${label}: ${name} (${code})`);
+  } else {
+    lines.push(`${label}: ${name}`);
+  }
+
+  return {
+    regionName: name,
+    admin1Name: "",
+    countryCode: code,
+    countryDisplayName: "",
+    lines,
+  };
 }
 
-export { t, initTranslations, toggleLanguage, updateUIText, getTooltipText };
+function buildTooltipModel(feature) {
+  if (!feature) {
+    return {
+      regionName: "",
+      admin1Name: "",
+      countryCode: "",
+      countryDisplayName: "",
+      lines: [],
+    };
+  }
+
+  const isWaterRegion = !!feature?.properties?.water_type;
+  const isSpecialRegion = !!feature?.properties?.special_type;
+  if (isWaterRegion || isSpecialRegion) {
+    return buildLegacyTooltipModel(feature, { isWaterRegion, isSpecialRegion });
+  }
+
+  const regionName = getTooltipRegionName(feature, "Unknown Region");
+  const { countryCode, countryDisplayName } = getTooltipCountryContext(feature);
+  const admin1Name = getTooltipAdmin1Name(feature, {
+    regionName,
+    countryDisplayName,
+  });
+  const lines = [regionName];
+  if (admin1Name) {
+    lines.push(admin1Name);
+  }
+  if (countryDisplayName) {
+    lines.push(countryCode ? `${countryDisplayName} (${countryCode})` : countryDisplayName);
+  }
+
+  return {
+    regionName,
+    admin1Name,
+    countryCode,
+    countryDisplayName,
+    lines: lines.filter(Boolean),
+  };
+}
+
+function renderTooltipText(model) {
+  const lines = Array.isArray(model?.lines) ? model.lines.filter(Boolean) : [];
+  return lines.join("\n");
+}
+
+function getTooltipText(feature) {
+  return renderTooltipText(buildTooltipModel(feature));
+}
+
+export {
+  t,
+  initTranslations,
+  toggleLanguage,
+  updateUIText,
+  getTooltipCountryContext,
+  buildTooltipModel,
+  renderTooltipText,
+  getTooltipText,
+};

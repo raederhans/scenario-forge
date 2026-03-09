@@ -1,7 +1,25 @@
 {
   "version": 1,
-  "default_scenario_id": "hoi4_1936",
+  "default_scenario_id": "tno_1962",
   "scenarios": [
+    {
+      "scenario_id": "tno_1962",
+      "display_name": "TNO 1962",
+      "manifest_url": "data/scenarios/tno_1962/manifest.json",
+      "audit_url": "data/scenarios/tno_1962/audit.json"
+    },
+    {
+      "scenario_id": "blank_base",
+      "display_name": "Blank Base",
+      "manifest_url": "data/scenarios/blank_base/manifest.json",
+      "audit_url": "data/scenarios/blank_base/audit.json"
+    },
+    {
+      "scenario_id": "modern_world",
+      "display_name": "Modern World",
+      "manifest_url": "data/scenarios/modern_world/manifest.json",
+      "audit_url": "data/scenarios/modern_world/audit.json"
+    },
     {
       "scenario_id": "hoi4_1936",
       "display_name": "HOI4 1936",
@@ -13,12 +31,6 @@
       "display_name": "HOI4 1939",
       "manifest_url": "data/scenarios/hoi4_1939/manifest.json",
       "audit_url": "data/scenarios/hoi4_1939/audit.json"
-    },
-    {
-      "scenario_id": "tno_1962",
-      "display_name": "TNO 1962",
-      "manifest_url": "data/scenarios/tno_1962/manifest.json",
-      "audit_url": "data/scenarios/tno_1962/audit.json"
     }
   ]
 }

@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "scenario_id": "blank_base",
+  "generated_at": "2026-03-09T14:09:29.123Z",
+  "summary": {
+    "feature_count": 11724,
+    "owner_count": 174,
+    "controller_count": 174,
+    "quality_counts": {
+      "direct_country_copy": 11724
+    },
+    "source_counts": {
+      "canonical_baseline": 11724
+    },
+    "blocker_count": 0,
+    "owner_controller_split_feature_count": 0
+  },
+  "diagnostics": {
+    "source": "generated_from_canonical_baseline",
+    "note": "Canonical ownership baseline without scenario-only overlays.",
+    "detail_topology_feature_count": 11724,
+    "primary_country_count": 209,
+    "canonical_country_count": 174,
+    "palette_id": "hoi4_vanilla",
+    "baseline_hash": "a73e75303316cfc765d79e953be2d64eea2ebdcc3f8ffca27a12d2136d02120b"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "scenario_id": "blank_base",
+  "display_name": "Blank Base",
+  "bookmark_name": "Blank Base",
+  "bookmark_description": "Canonical ownership baseline without scenario-only overlays.",
+  "bookmark_date": "2026.1.1.12",
+  "default_country": "US",
+  "featured_tags": [
+    "US",
+    "CN",
+    "RU",
+    "DE",
+    "GB",
+    "FR"
+  ],
+  "palette_id": "hoi4_vanilla",
+  "baseline_hash": "a73e75303316cfc765d79e953be2d64eea2ebdcc3f8ffca27a12d2136d02120b",
+  "countries_url": "data/scenarios/blank_base/countries.json",
+  "owners_url": "data/scenarios/blank_base/owners.by_feature.json",
+  "controllers_url": "data/scenarios/blank_base/controllers.by_feature.json",
+  "cores_url": "data/scenarios/blank_base/cores.by_feature.json",
+  "audit_url": "data/scenarios/blank_base/audit.json",
+  "summary": {
+    "feature_count": 11724,
+    "owner_count": 174,
+    "controller_count": 174,
+    "quality_counts": {
+      "direct_country_copy": 11724
+    },
+    "source_counts": {
+      "canonical_baseline": 11724
+    },
+    "approximate_count": 0,
+    "manual_reviewed_feature_count": 0,
+    "geometry_blocker_count": 0,
+    "critical_unresolved_count": 0,
+    "synthetic_owner_feature_count": 0,
+    "synthetic_count": 0,
+    "changed_feature_count": 0,
+    "failed_region_check_count": 0,
+    "topology_blocker_count": 0,
+    "scenario_rule_blocker_count": 0,
+    "blocker_count": 0,
+    "owner_controller_split_feature_count": 0,
+    "controller_rule_count": 0,
+    "critical_region_check_count": 0,
+    "manual_reviewed_region_count": 0
+  },
+  "generated_at": "2026-03-09T14:09:29.123Z"
+}

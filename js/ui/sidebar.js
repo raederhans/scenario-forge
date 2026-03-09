@@ -5,6 +5,7 @@ import {
   PRESET_STORAGE_KEY,
   defaultCountryPalette,
   normalizeDayNightStyleConfig,
+  normalizeLakeStyleConfig,
   normalizePhysicalStyleConfig,
 } from "../core/state.js";
 import { ColorManager } from "../core/color_manager.js";
@@ -3055,11 +3056,7 @@ function initSidebar({ render } = {}) {
 
   const getWaterFeatureColor = (featureId) => {
     const resolvedId = String(featureId || "").trim();
-    return (
-      ColorManager.normalizeHexColor(state.waterRegionOverrides?.[resolvedId]) ||
-      ColorManager.normalizeHexColor(state.styleConfig?.ocean?.fillColor) ||
-      "#aadaff"
-    );
+    return ColorManager.normalizeHexColor(mapRenderer.getWaterRegionColor(resolvedId)) || "#aadaff";
   };
 
   const ensureSelectedWaterRegion = () => {
@@ -4981,6 +4978,7 @@ function initSidebar({ render } = {}) {
             ...data.styleConfig.ocean,
           };
         }
+        state.styleConfig.lakes = normalizeLakeStyleConfig(data.styleConfig?.lakes);
         if (data.styleConfig?.urban && typeof data.styleConfig.urban === "object") {
           state.styleConfig.urban = {
             ...(state.styleConfig.urban || {}),

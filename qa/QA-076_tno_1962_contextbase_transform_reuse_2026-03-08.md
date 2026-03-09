@@ -200,3 +200,16 @@ Conclusion:
 - `ops/browser-mcp/editor-performance-benchmark.py`
   - benchmark split between settle fast frame and exact-after-settle refresh
 
+## Follow-up Note (2026-03-09)
+- After the initial patch, a new intermittent symptom was reported during drag:
+  - the cached bitmap-like `contextBase` could appear to stay near an older map position and leave a ghosted impression
+- Static code review found a real risk in the exact idle composition path:
+  - `composeCachedPasses()` used raw `drawImage(passCanvas, 0, 0)` for every pass
+  - after an exact-after-settle refresh that skipped `contextBase` exact redraw, different passes could legally have different reference transforms
+  - that meant `contextBase` could still be cached in an older transform space while other passes had already been refreshed to the current transform
+- Fix applied in `js/core/map_renderer.js`:
+  - `composeCachedPasses()` now checks each pass against the current transform
+  - if a pass reference transform differs, it is composed through `drawTransformedPass()` instead of raw `drawImage`
+- Expected effect:
+  - exact idle composition no longer assumes all cached passes share one transform
+  - this should remove the intermittent “old basemap stays in place” ghost path without forcing a full `contextBase` redraw

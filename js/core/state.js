@@ -593,6 +593,23 @@ function normalizePhysicalStyleConfig(rawConfig) {
   };
 }
 
+function createDefaultLakeStyleConfig() {
+  return {
+    linkedToOcean: true,
+    fillColor: null,
+  };
+}
+
+function normalizeLakeStyleConfig(rawConfig) {
+  const defaults = createDefaultLakeStyleConfig();
+  const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
+  const fillColor = typeof raw.fillColor === "string" ? raw.fillColor.trim() : "";
+  return {
+    linkedToOcean: raw.linkedToOcean === undefined ? defaults.linkedToOcean : !!raw.linkedToOcean,
+    fillColor: fillColor || null,
+  };
+}
+
 function createDefaultTextureStyleConfig() {
   return {
     mode: "none",
@@ -765,6 +782,8 @@ export {
   createDefaultPhysicalAtlasVisibility,
   normalizePhysicalMode,
   normalizePhysicalStyleConfig,
+  createDefaultLakeStyleConfig,
+  normalizeLakeStyleConfig,
   PRESET_STORAGE_KEY,
   createDefaultTextureStyleConfig,
   normalizeTextureMode,
@@ -957,6 +976,7 @@ export const state = {
   cachedBorders: null,
   cachedCountryBorders: null,
   cachedDynamicOwnerBorders: null,
+  cachedScenarioOpeningOwnerBorders: null,
   cachedProvinceBorders: null,
   cachedLocalBorders: null,
   cachedDetailAdmBorders: null,
@@ -1005,6 +1025,7 @@ export const state = {
       scale: 1,
       contourStrength: 0.75,
     },
+    lakes: createDefaultLakeStyleConfig(),
     urban: {
       color: "#4b5563",
       opacity: 0.4,

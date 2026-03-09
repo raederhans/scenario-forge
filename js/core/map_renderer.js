@@ -1,6 +1,7 @@
 // Hybrid canvas + SVG rendering engine.
 import {
   normalizeDayNightStyleConfig,
+  normalizeLakeStyleConfig,
   normalizePhysicalStyleConfig,
   normalizeTextureStyleConfig,
   PHYSICAL_ATLAS_PALETTE,
@@ -72,7 +73,6 @@ const LAND_FILL_COLOR = "#f0f0f0";
 const BORDER_FALLBACK_COLOR = "rgba(0, 0, 0, 0.2)";
 const SPECIAL_REGION_FALLBACK_FILL = "#d6c19a";
 const SPECIAL_REGION_FALLBACK_STROKE = "#8d6f47";
-const SCENARIO_LAKE_FILL_COLOR = "#72a4c7";
 const SCENARIO_LAKE_STROKE_COLOR = "rgba(47, 78, 112, 0.82)";
 const RELIEF_SALT_FILL_COLOR = "rgba(222, 203, 170, 0.22)";
 const RELIEF_SALT_STROKE_COLOR = "rgba(128, 100, 63, 0.55)";
@@ -571,6 +571,9 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       state.showWaterRegions ? "scenario-water:on" : "scenario-water:off",
       state.showScenarioSpecialRegions ? "scenario-special:on" : "scenario-special:off",
       state.showScenarioReliefOverlays ? "scenario-relief:on" : "scenario-relief:off",
+      `ocean-fill:${getOceanBaseFillColor()}`,
+      `lake-fill:${getLakeBaseFillColor()}`,
+      `lake-style:${stableJson(getLakeStyleConfig())}`,
     ].join("::");
   }
   if (passName === "dayNight") {
@@ -741,6 +744,11 @@ function getWaterRegionType(feature) {
   return String(feature?.properties?.water_type || "water_region").trim().toLowerCase();
 }
 
+function isAtlantropaOceanMergedWaterRegion(feature) {
+  if (String(state.activeScenarioId || "").trim().toLowerCase() !== "tno_1962") return false;
+  return String(feature?.properties?.region_group || "").trim().toLowerCase() === "mediterranean";
+}
+
 function isBaseGeographyScenarioFeature(feature) {
   return feature?.properties?.render_as_base_geography === true;
 }
@@ -764,7 +772,7 @@ function getWaterRegionDefaultStyle(feature) {
   const waterType = getWaterRegionType(feature);
   if (waterType === "lake") {
     return {
-      fill: SCENARIO_LAKE_FILL_COLOR,
+      fill: getLakeBaseFillColor(),
       stroke: SCENARIO_LAKE_STROKE_COLOR,
       opacity: 0.92,
     };
@@ -810,6 +818,7 @@ function getScenarioExcludedWaterRegionGroups() {
 
 function isWaterRegionExcludedByScenario(feature) {
   if (!feature || isScenarioWaterRegion(feature)) return false;
+  if (isAtlantropaOceanMergedWaterRegion(feature)) return true;
   const excludedIds = getScenarioExcludedWaterRegionIds();
   const featureId = String(feature?.properties?.id || "").trim();
   if (featureId && excludedIds.has(featureId)) {
@@ -1140,15 +1149,6 @@ function isAtlantropaSeaFeature(feature) {
 
 function getAtlantropaSeaPoliticalFillColor() {
   return getOceanBaseFillColor();
-}
-
-function getAtlantropaSeaPoliticalStrokeColor() {
-  const oceanFillColor = getOceanBaseFillColor();
-  const oceanRgb = globalThis.ColorManager?.hexToRgb?.(oceanFillColor);
-  if (oceanRgb) {
-    return `rgba(${oceanRgb.r}, ${oceanRgb.g}, ${oceanRgb.b}, 0.12)`;
-  }
-  return "rgba(48, 84, 126, 0.12)";
 }
 
 function getMediterraneanAtlantropaBounds() {
@@ -2863,6 +2863,40 @@ function recomputeDynamicBordersNow({ renderNow = true, reason = "" } = {}) {
   return true;
 }
 
+function refreshScenarioOpeningOwnerBorders({ renderNow = false, reason = "" } = {}) {
+  const startedAt = nowMs();
+  const shouldBuild =
+    !!state.activeScenarioId
+    && state.scenarioBorderMode === "scenario_owner_only"
+    && String(state.scenarioViewMode || "ownership") === "ownership"
+    && !!state.runtimePoliticalTopology?.objects?.political
+    && Object.keys(state.scenarioBaselineOwnersByFeatureId || {}).length > 0;
+
+  state.cachedScenarioOpeningOwnerBorders = shouldBuild
+    ? buildOwnerBorderMesh(
+      state.runtimePoliticalTopology,
+      {
+        ownershipByFeatureId: state.scenarioBaselineOwnersByFeatureId,
+        scenarioActive: false,
+        viewMode: "ownership",
+      },
+      { excludeSea: true }
+    )
+    : null;
+
+  invalidateRenderPasses("borders", reason || "scenario-opening-borders");
+  recordRenderPerfMetric("refreshScenarioOpeningOwnerBorders", nowMs() - startedAt, {
+    enabled: shouldBuild,
+    segmentCount: Array.isArray(state.cachedScenarioOpeningOwnerBorders?.coordinates)
+      ? state.cachedScenarioOpeningOwnerBorders.coordinates.length
+      : 0,
+  });
+  if (renderNow && context) {
+    render();
+  }
+  return !!state.cachedScenarioOpeningOwnerBorders;
+}
+
 function scheduleDynamicBorderRecompute(reason = "", delayMs = 150) {
   markDynamicBordersDirty(reason);
   clearPendingDynamicBorderTimer();
@@ -2916,38 +2950,49 @@ function getEntityOwnerCode(entity) {
   return getDisplayOwnerCode(asFeatureLike(entity), featureId);
 }
 
-function buildDynamicOwnerBorderMesh(runtimeTopology, ownershipContext) {
-  const object = runtimeTopology?.objects?.political;
-  if (!object || !globalThis.topojson) return null;
+function shouldExcludeOwnerBorderEntity(entity, { excludeSea = false } = {}) {
+  if (!entity || !excludeSea) return false;
+  return isAtlantropaSeaFeature(asFeatureLike(entity));
+}
+
+function resolveOwnerBorderCode(entity, ownershipContext = {}) {
+  const featureId = getEntityFeatureId(entity);
+  const fallbackCode = getEntityCountryCode(entity) || "";
   const ownershipByFeatureId = ownershipContext?.ownershipByFeatureId || {};
   const controllerByFeatureId = ownershipContext?.controllerByFeatureId || {};
   const shellOwnerByFeatureId = ownershipContext?.shellOwnerByFeatureId || {};
   const shellControllerByFeatureId = ownershipContext?.shellControllerByFeatureId || {};
   const scenarioActive = !!ownershipContext?.scenarioActive;
   const useFrontline = scenarioActive && String(ownershipContext?.viewMode || "ownership") === "frontline";
+  if (!featureId) {
+    return canonicalCountryCode(fallbackCode);
+  }
+  return canonicalCountryCode(
+    (useFrontline ? shellControllerByFeatureId?.[featureId] : "")
+    || (useFrontline ? controllerByFeatureId?.[featureId] : "")
+    || shellOwnerByFeatureId?.[featureId]
+    || ownershipByFeatureId?.[featureId]
+    || fallbackCode
+    || ""
+  );
+}
+
+function buildOwnerBorderMesh(runtimeTopology, ownershipContext = {}, { excludeSea = false } = {}) {
+  const object = runtimeTopology?.objects?.political;
+  if (!object || !globalThis.topojson) return null;
   return globalThis.topojson.mesh(runtimeTopology, object, (a, b) => {
     if (!a || !b) return false;
-    const idA = getEntityFeatureId(a);
-    const idB = getEntityFeatureId(b);
-    if (!idA || !idB) return false;
-    const ownerA = String(
-      (useFrontline ? shellControllerByFeatureId?.[idA] : "")
-      || (useFrontline ? controllerByFeatureId?.[idA] : "")
-      || shellOwnerByFeatureId?.[idA]
-      || ownershipByFeatureId?.[idA]
-      || getEntityCountryCode(a)
-      || ""
-    ).trim();
-    const ownerB = String(
-      (useFrontline ? shellControllerByFeatureId?.[idB] : "")
-      || (useFrontline ? controllerByFeatureId?.[idB] : "")
-      || shellOwnerByFeatureId?.[idB]
-      || ownershipByFeatureId?.[idB]
-      || getEntityCountryCode(b)
-      || ""
-    ).trim();
+    if (shouldExcludeOwnerBorderEntity(a, { excludeSea }) || shouldExcludeOwnerBorderEntity(b, { excludeSea })) {
+      return false;
+    }
+    const ownerA = resolveOwnerBorderCode(a, ownershipContext);
+    const ownerB = resolveOwnerBorderCode(b, ownershipContext);
     return !!(ownerA && ownerB && ownerA !== ownerB);
   });
+}
+
+function buildDynamicOwnerBorderMesh(runtimeTopology, ownershipContext) {
+  return buildOwnerBorderMesh(runtimeTopology, ownershipContext, { excludeSea: true });
 }
 
 function buildDetailAdmBorderMesh(topology, includedCountries) {
@@ -4523,15 +4568,20 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
   );
   const scenarioOwnerOnlyBorders =
     !!state.activeScenarioId && state.scenarioBorderMode === "scenario_owner_only";
+  const dynamicOwnerMeshes =
+    isDynamicBordersEnabled() && isUsableMesh(state.cachedDynamicOwnerBorders)
+      ? [state.cachedDynamicOwnerBorders]
+      : null;
+  const openingOwnerMeshes =
+    scenarioOwnerOnlyBorders
+    && String(state.scenarioViewMode || "ownership") === "ownership"
+    && !isDynamicBordersEnabled()
+    && isUsableMesh(state.cachedScenarioOpeningOwnerBorders)
+      ? [state.cachedScenarioOpeningOwnerBorders]
+      : null;
   const empireMeshes = scenarioOwnerOnlyBorders
-    ? (isDynamicBordersEnabled() && isUsableMesh(state.cachedDynamicOwnerBorders)
-        ? [state.cachedDynamicOwnerBorders]
-        : [])
-    : (
-      isDynamicBordersEnabled() && isUsableMesh(state.cachedDynamicOwnerBorders)
-        ? [state.cachedDynamicOwnerBorders]
-        : state.cachedCountryBorders
-    );
+    ? (dynamicOwnerMeshes || openingOwnerMeshes || state.cachedCountryBorders)
+    : (dynamicOwnerMeshes || state.cachedCountryBorders);
 
   if (interactive) {
     const countryWidth = (empireWidthBase * 0.95) / kDenom;
@@ -4650,6 +4700,24 @@ function getOceanStyleConfig() {
 
 function getOceanBaseFillColor() {
   return getSafeCanvasColor(state.styleConfig?.ocean?.fillColor, OCEAN_FILL_COLOR) || OCEAN_FILL_COLOR;
+}
+
+function getLakeStyleConfig() {
+  state.styleConfig = state.styleConfig && typeof state.styleConfig === "object" ? state.styleConfig : {};
+  state.styleConfig.lakes = normalizeLakeStyleConfig(state.styleConfig.lakes);
+  return state.styleConfig.lakes;
+}
+
+function getLakeBaseFillColor() {
+  const lakeStyle = getLakeStyleConfig();
+  if (lakeStyle.linkedToOcean) {
+    return getOceanBaseFillColor();
+  }
+  return getSafeCanvasColor(lakeStyle.fillColor, getOceanBaseFillColor()) || getOceanBaseFillColor();
+}
+
+function getWaterRegionDefaultFillColorById(id) {
+  return getWaterRegionDefaultStyle(state.waterRegionsById?.get(String(id || "").trim())).fill;
 }
 
 function getPathBounds(shape) {
@@ -6860,15 +6928,11 @@ function drawPoliticalPass(k) {
 
     if (debugMode === "PROD") {
       if (!useScenarioBackgroundMerge || isAtlantropaSea) {
-        if (useScenarioBackgroundMerge && isAtlantropaSea) {
+        if (isAtlantropaSea) {
           return;
         }
-        context.strokeStyle = isAtlantropaSea
-          ? getAtlantropaSeaPoliticalStrokeColor()
-          : fillColor;
-        context.lineWidth = isAtlantropaSea
-          ? (0.45 / k)
-          : (0.5 / k);
+        context.strokeStyle = fillColor;
+        context.lineWidth = 0.5 / k;
         context.lineJoin = "round";
         context.stroke();
       }
@@ -7116,12 +7180,27 @@ function resetMainCanvas() {
   context.filter = "none";
 }
 
-function composeCachedPasses(passNames) {
+function areZoomTransformsEquivalent(a, b, epsilon = 0.01) {
+  if (!a && !b) return true;
+  if (!a || !b) return false;
+  return (
+    Math.abs(Number(a.k || 1) - Number(b.k || 1)) <= epsilon
+    && Math.abs(Number(a.x || 0) - Number(b.x || 0)) <= epsilon
+    && Math.abs(Number(a.y || 0) - Number(b.y || 0)) <= epsilon
+  );
+}
+
+function composeCachedPasses(passNames, currentTransform = state.zoomTransform || globalThis.d3.zoomIdentity) {
   const cache = getRenderPassCacheState();
   resetMainCanvas();
   (Array.isArray(passNames) ? passNames : RENDER_PASS_NAMES).forEach((passName) => {
     const passCanvas = cache.canvases?.[passName];
     if (!passCanvas) return;
+    const referenceTransform = getPassReferenceTransform(passName);
+    if (referenceTransform && !areZoomTransformsEquivalent(referenceTransform, currentTransform)) {
+      drawTransformedPass(passName, currentTransform, referenceTransform);
+      return;
+    }
     context.drawImage(passCanvas, 0, 0);
   });
   incrementPerfCounter("composites");
@@ -8431,8 +8510,9 @@ function applyWaterRegionFill(targetId, selectedColor, { kind = "fill-water-regi
   const actionStart = nowMs();
   const resolvedId = String(targetId || "").trim();
   if (!resolvedId) return false;
-  const color = getSafeCanvasColor(selectedColor, getOceanBaseFillColor());
-  const currentColor = getSafeCanvasColor(state.waterRegionOverrides?.[resolvedId], null) || getOceanBaseFillColor();
+  const defaultColor = getWaterRegionDefaultFillColorById(resolvedId);
+  const color = getSafeCanvasColor(selectedColor, defaultColor);
+  const currentColor = getWaterRegionColor(resolvedId);
   state.selectedWaterRegionId = resolvedId;
   if (currentColor === color) {
     if (typeof state.renderWaterRegionListFn === "function") {
@@ -8562,7 +8642,10 @@ function applyBrushHit(hit) {
     if (state.currentTool === "eraser") {
       delete state.waterRegionOverrides[waterId];
     } else {
-      state.waterRegionOverrides[waterId] = getSafeCanvasColor(state.selectedColor, getOceanBaseFillColor());
+      state.waterRegionOverrides[waterId] = getSafeCanvasColor(
+        state.selectedColor,
+        getWaterRegionDefaultFillColorById(waterId)
+      );
     }
     state.selectedWaterRegionId = waterId;
     brushSession.changed = true;
@@ -9484,10 +9567,12 @@ export {
   refreshColorState,
   refreshResolvedColorsForFeatures,
   refreshResolvedColorsForOwners,
+  refreshScenarioOpeningOwnerBorders,
   markDynamicBordersDirty,
   recomputeDynamicBordersNow,
   scheduleDynamicBorderRecompute,
   setDebugMode,
+  getWaterRegionColor,
   getZoomPercent,
   resetZoomToFit,
   setZoomPercent,

@@ -5,9 +5,27 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 try:
-    from tools.translate_manager import has_literal_todo_marker, is_missing_like
+    from tools.translate_manager import (
+        has_literal_todo_marker,
+        is_corrupted_translation,
+        is_corrupted_source_name,
+        is_missing_like,
+        is_shell_fallback_name,
+        load_tooltip_admin_names,
+        load_scenario_localizable_strings,
+        should_track_geo_missing_like,
+    )
 except ImportError:
-    from translate_manager import has_literal_todo_marker, is_missing_like
+    from translate_manager import (
+        has_literal_todo_marker,
+        is_corrupted_translation,
+        is_corrupted_source_name,
+        is_missing_like,
+        is_shell_fallback_name,
+        load_tooltip_admin_names,
+        load_scenario_localizable_strings,
+        should_track_geo_missing_like,
+    )
 
 UI_T_CALL_RE = re.compile(r"""t\(\s*(['\"])(?P<text>.*?)\1\s*,\s*(['\"])ui\3\s*\)""")
 GEO_T_CALL_RE = re.compile(r"""t\(\s*(['\"])(?P<text>.*?)\1\s*,\s*(['\"])geo\3\s*\)""")
@@ -55,55 +73,6 @@ def load_topology_names(topology_path: Path) -> list[str]:
             if "name" in str(key).lower() and isinstance(value, str) and value.strip():
                 names.add(value.strip())
     return sorted(names)
-
-
-def load_scenario_geo_names(scenarios_root: Path) -> list[str]:
-    if not scenarios_root.exists() or not scenarios_root.is_dir():
-        return []
-
-    names = set()
-    for path in sorted(scenarios_root.rglob("*.json")):
-        if not path.is_file():
-            continue
-        try:
-            with path.open("r", encoding="utf-8") as file:
-                data = json.load(file)
-        except Exception:
-            continue
-
-        if not isinstance(data, dict):
-            continue
-
-        root_display_name = str(
-            data.get("display_name") or data.get("displayName") or ""
-        ).strip()
-        if root_display_name:
-            names.add(root_display_name)
-
-        countries = data.get("countries")
-        if isinstance(countries, dict):
-            for entry in countries.values():
-                if not isinstance(entry, dict):
-                    continue
-                display_name = str(
-                    entry.get("display_name") or entry.get("displayName") or ""
-                ).strip()
-                if display_name:
-                    names.add(display_name)
-
-        scenarios = data.get("scenarios")
-        if isinstance(scenarios, list):
-            for entry in scenarios:
-                if not isinstance(entry, dict):
-                    continue
-                display_name = str(
-                    entry.get("display_name") or entry.get("displayName") or ""
-                ).strip()
-                if display_name:
-                    names.add(display_name)
-
-    return sorted(names)
-
 
 def collect_code_strings(repo_root: Path) -> dict:
     ui_t_keys = set()
@@ -173,17 +142,28 @@ def render_markdown(report: dict) -> str:
     lines.append(f"- Hardcoded visible UI string candidates (not wrapped in t): {report['hardcoded_ui_count']}")
     lines.append(f"- GEO locale keys: {report['geo_locale_count']}")
     lines.append(f"- GEO missing-like entries: {report['geo_missing_like_count']}")
+    lines.append(f"- Shell fallback GEO entries: {report['shell_fallback_geo_count']}")
+    lines.append(f"- Shell fallback missing-like entries: {report['shell_fallback_missing_like_count']}")
     lines.append(f"- Literal TODO markers: {report['geo_todo_marker_count']}")
+    lines.append(f"- Corrupted translations: {report['corrupted_translation_count']}")
+    lines.append(f"- Corrupted source names: {report['source_name_corrupted_count']}")
     lines.append(
         "- Topology-derived geo names: "
         f"{report['topology_geo_name_count']} "
         f"(primary={report['primary_topology_geo_name_count']}, runtime={report['runtime_topology_geo_name_count']})"
     )
     lines.append(f"- Topology names missing in locales.geo: {report['topology_geo_missing_count']}")
+    lines.append(f"- Tooltip admin names: {report['tooltip_admin_name_count']}")
+    lines.append(f"- Tooltip admin names missing or untranslated in locales.geo: {report['tooltip_admin_missing_count']}")
     lines.append(f"- Scenario country display names: {report['scenario_geo_name_count']}")
     lines.append(
         "- Scenario names missing or untranslated in locales.geo: "
         f"{report['scenario_geo_missing_count']}"
+    )
+    lines.append(f"- Scenario metadata strings: {report['scenario_metadata_name_count']}")
+    lines.append(
+        "- Scenario metadata missing or untranslated in locales.geo: "
+        f"{report['scenario_metadata_missing_count']}"
     )
     lines.append("")
 
@@ -199,6 +179,46 @@ def render_markdown(report: dict) -> str:
     if report["hardcoded_ui_candidates"]:
         for key in report["hardcoded_ui_candidates"]:
             lines.append(f"- {key}")
+    else:
+        lines.append("- None")
+    lines.append("")
+
+    lines.append("## Corrupted Translation Entries")
+    if report["corrupted_translation_examples"]:
+        for entry in report["corrupted_translation_examples"][:200]:
+            lines.append(f"- [{entry['section']}] {entry['key']}")
+        if len(report["corrupted_translation_examples"]) > 200:
+            lines.append(f"- ... ({len(report['corrupted_translation_examples']) - 200} more)")
+    else:
+        lines.append("- None")
+    lines.append("")
+
+    lines.append("## Shell Fallback Missing-Like Entries")
+    if report["shell_fallback_missing_like_examples"]:
+        for key in report["shell_fallback_missing_like_examples"][:200]:
+            lines.append(f"- {key}")
+        if len(report["shell_fallback_missing_like_examples"]) > 200:
+            lines.append(f"- ... ({len(report['shell_fallback_missing_like_examples']) - 200} more)")
+    else:
+        lines.append("- None")
+    lines.append("")
+
+    lines.append("## Corrupted Source Names")
+    if report["source_name_corrupted_examples"]:
+        for key in report["source_name_corrupted_examples"][:200]:
+            lines.append(f"- {key}")
+        if len(report["source_name_corrupted_examples"]) > 200:
+            lines.append(f"- ... ({len(report['source_name_corrupted_examples']) - 200} more)")
+    else:
+        lines.append("- None")
+    lines.append("")
+
+    lines.append("## Tooltip Admin Names Missing or Untranslated in locales.geo")
+    if report["tooltip_admin_missing_examples"]:
+        for key in report["tooltip_admin_missing_examples"][:200]:
+            lines.append(f"- {key}")
+        if len(report["tooltip_admin_missing_examples"]) > 200:
+            lines.append(f"- ... ({len(report['tooltip_admin_missing_examples']) - 200} more)")
     else:
         lines.append("- None")
     lines.append("")
@@ -219,6 +239,16 @@ def render_markdown(report: dict) -> str:
             lines.append(f"- {key}")
         if len(report["scenario_geo_missing"]) > 200:
             lines.append(f"- ... ({len(report['scenario_geo_missing']) - 200} more)")
+    else:
+        lines.append("- None")
+    lines.append("")
+
+    lines.append("## Scenario Metadata Missing or Untranslated in locales.geo")
+    if report["scenario_metadata_missing"]:
+        for key in report["scenario_metadata_missing"][:200]:
+            lines.append(f"- {key}")
+        if len(report["scenario_metadata_missing"]) > 200:
+            lines.append(f"- ... ({len(report['scenario_metadata_missing']) - 200} more)")
     else:
         lines.append("- None")
     lines.append("")
@@ -290,16 +320,38 @@ def main() -> None:
     ui_used = set(code_strings["ui_t_keys"]) | set(code_strings["modal_keys"])
     ui_missing = sorted(key for key in ui_used if key not in ui_locale_keys)
 
+    shell_fallback_geo = sorted(key for key in geo_locale if is_shell_fallback_name(key))
+    shell_fallback_missing_like = sorted(
+        key
+        for key, value in geo_locale.items()
+        if is_shell_fallback_name(key)
+        and is_missing_like((value or {}).get("zh", ""), (value or {}).get("en", key))
+    )
+    source_name_corrupted = sorted(
+        key
+        for key, value in geo_locale.items()
+        if is_corrupted_source_name(key) or is_corrupted_source_name((value or {}).get("en", key))
+    )
     geo_missing_like_count = sum(
         1
         for key, value in geo_locale.items()
-        if is_missing_like((value or {}).get("zh", ""), (value or {}).get("en", key))
+        if should_track_geo_missing_like(key, (value or {}).get("en", key))
+        and is_missing_like((value or {}).get("zh", ""), (value or {}).get("en", key))
     )
     geo_todo_marker_count = sum(
         1
         for value in geo_locale.values()
         if has_literal_todo_marker((value or {}).get("zh", ""))
     )
+    corrupted_translation_examples = []
+    for section_name, section_payload in (("ui", locales.get("ui") or {}), ("geo", geo_locale)):
+        for key, value in section_payload.items():
+            zh_value = (value or {}).get("zh", "") if isinstance(value, dict) else str(value or "")
+            if is_corrupted_translation(zh_value):
+                corrupted_translation_examples.append({
+                    "section": section_name,
+                    "key": key,
+                })
 
     topology_names = []
     if topology_path.exists():
@@ -309,8 +361,22 @@ def main() -> None:
         runtime_topology_names = load_topology_names(runtime_topology_path)
     combined_topology_names = sorted(set(topology_names) | set(runtime_topology_names))
     topology_missing = sorted(name for name in combined_topology_names if name not in geo_locale)
+    tooltip_admin_names = []
+    if topology_path.exists():
+        tooltip_admin_names.extend(load_tooltip_admin_names(topology_path))
+    if runtime_topology_path.exists():
+        tooltip_admin_names.extend(load_tooltip_admin_names(runtime_topology_path))
+    tooltip_admin_names = sorted(set(tooltip_admin_names))
+    tooltip_admin_missing = []
+    for name in tooltip_admin_names:
+        entry = geo_locale.get(name)
+        zh_value = entry.get("zh", "") if isinstance(entry, dict) else ""
+        en_value = entry.get("en", name) if isinstance(entry, dict) else name
+        if is_missing_like(zh_value, en_value):
+            tooltip_admin_missing.append(name)
 
-    scenario_geo_names = load_scenario_geo_names(scenarios_root)
+    scenario_strings = load_scenario_localizable_strings(scenarios_root)
+    scenario_geo_names = scenario_strings["display_names"]
     scenario_geo_missing = []
     for name in scenario_geo_names:
         entry = geo_locale.get(name)
@@ -318,6 +384,14 @@ def main() -> None:
         en_value = entry.get("en", name) if isinstance(entry, dict) else name
         if is_missing_like(zh_value, en_value):
             scenario_geo_missing.append(name)
+    scenario_metadata_names = scenario_strings["metadata_names"]
+    scenario_metadata_missing = []
+    for name in scenario_metadata_names:
+        entry = geo_locale.get(name)
+        zh_value = entry.get("zh", "") if isinstance(entry, dict) else ""
+        en_value = entry.get("en", name) if isinstance(entry, dict) else name
+        if is_missing_like(zh_value, en_value):
+            scenario_metadata_missing.append(name)
 
     report = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -335,15 +409,28 @@ def main() -> None:
         "geo_locale_count": len(geo_locale),
         "geo_todo_count": geo_missing_like_count,
         "geo_missing_like_count": geo_missing_like_count,
+        "shell_fallback_geo_count": len(shell_fallback_geo),
+        "shell_fallback_missing_like_count": len(shell_fallback_missing_like),
+        "shell_fallback_missing_like_examples": shell_fallback_missing_like[:500],
         "geo_todo_marker_count": geo_todo_marker_count,
+        "corrupted_translation_count": len(corrupted_translation_examples),
+        "corrupted_translation_examples": corrupted_translation_examples,
+        "source_name_corrupted_count": len(source_name_corrupted),
+        "source_name_corrupted_examples": source_name_corrupted[:500],
         "primary_topology_geo_name_count": len(topology_names),
         "runtime_topology_geo_name_count": len(runtime_topology_names),
         "topology_geo_name_count": len(combined_topology_names),
         "topology_geo_missing_count": len(topology_missing),
         "topology_geo_missing": topology_missing,
+        "tooltip_admin_name_count": len(tooltip_admin_names),
+        "tooltip_admin_missing_count": len(tooltip_admin_missing),
+        "tooltip_admin_missing_examples": tooltip_admin_missing[:500],
         "scenario_geo_name_count": len(scenario_geo_names),
         "scenario_geo_missing_count": len(scenario_geo_missing),
         "scenario_geo_missing": scenario_geo_missing,
+        "scenario_metadata_name_count": len(scenario_metadata_names),
+        "scenario_metadata_missing_count": len(scenario_metadata_missing),
+        "scenario_metadata_missing": scenario_metadata_missing,
     }
 
     markdown_out.parent.mkdir(parents=True, exist_ok=True)
@@ -357,7 +444,11 @@ def main() -> None:
         f"ui_missing={report['ui_missing_count']}, "
         f"hardcoded_ui={report['hardcoded_ui_count']}, "
         f"geo_missing_like={report['geo_missing_like_count']}, "
+        f"shell_fallback_missing_like={report['shell_fallback_missing_like_count']}, "
         f"scenario_geo_missing={report['scenario_geo_missing_count']}, "
+        f"scenario_metadata_missing={report['scenario_metadata_missing_count']}, "
+        f"source_name_corrupted={report['source_name_corrupted_count']}, "
+        f"corrupted_translations={report['corrupted_translation_count']}, "
         f"todo_markers={report['geo_todo_marker_count']}"
     )
     print(f"Markdown report: {markdown_out}")

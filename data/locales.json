@@ -70,7 +70,7 @@
     },
     "Already using this boundary variant.": {
       "en": "Already using this boundary variant.",
-      "zh": "Already using this boundary variant."
+      "zh": "已经在使用这个边界变体。"
     },
     "Ambiguous identity": {
       "en": "Ambiguous identity",
@@ -158,11 +158,11 @@
     },
     "Boundary Variants": {
       "en": "Boundary Variants",
-      "zh": "Boundary Variants"
+      "zh": "边界变体"
     },
     "Boundary variant could not be selected.": {
       "en": "Boundary variant could not be selected.",
-      "zh": "Boundary variant could not be selected."
+      "zh": "无法选择边界变体。"
     },
     "Browse All Colors": {
       "en": "Browse All Colors",
@@ -192,6 +192,10 @@
       "en": "By Country",
       "zh": "按国家"
     },
+    "By Neighbor (Political)": {
+      "en": "By Neighbor (Political)",
+      "zh": "按邻接（政治）"
+    },
     "By Parent": {
       "en": "By Parent",
       "zh": "按上一级"
@@ -199,10 +203,6 @@
     "By Province": {
       "en": "By Province",
       "zh": "按省级"
-    },
-    "By Neighbor (Political)": {
-      "en": "By Neighbor (Political)",
-      "zh": "按邻接（政治）"
     },
     "By Region": {
       "en": "By Region",
@@ -282,7 +282,7 @@
     },
     "Client State": {
       "en": "Client State",
-      "zh": "Client State"
+      "zh": "客户状态"
     },
     "Clipboard unavailable": {
       "en": "Clipboard unavailable",
@@ -302,11 +302,11 @@
     },
     "Colonial Federation": {
       "en": "Colonial Federation",
-      "zh": "Colonial Federation"
+      "zh": "殖民地联邦"
     },
     "Colonial Government": {
       "en": "Colonial Government",
-      "zh": "Colonial Government"
+      "zh": "殖民政府"
     },
     "Colonial predecessor": {
       "en": "Colonial predecessor",
@@ -314,7 +314,7 @@
     },
     "Colony": {
       "en": "Colony",
-      "zh": "Colony"
+      "zh": "殖民地"
     },
     "Color Mode": {
       "en": "Color Mode",
@@ -326,11 +326,11 @@
     },
     "Commonwealth": {
       "en": "Commonwealth",
-      "zh": "Commonwealth"
+      "zh": "联邦"
     },
     "Condominium": {
       "en": "Condominium",
-      "zh": "Condominium"
+      "zh": "公寓"
     },
     "Confirm Clear": {
       "en": "Confirm Clear",
@@ -386,7 +386,7 @@
     },
     "Country Color": {
       "en": "Country Color",
-      "zh": "Country Color"
+      "zh": "乡村色彩"
     },
     "Country Colors": {
       "en": "Country Colors",
@@ -426,7 +426,7 @@
     },
     "Current map does not include this action's detail features. Load detail topology and try again.": {
       "en": "Current map does not include this action's detail features. Load detail topology and try again.",
-      "zh": "Current map does not include this action's detail features. Load detail topology and try again."
+      "zh": "当前地图不包含此操作的详细特征。加载详细拓扑并重试。"
     },
     "Current map does not include this preset's detail features. Load detail topology and try again.": {
       "en": "Current map does not include this preset's detail features. Load detail topology and try again.",
@@ -454,7 +454,11 @@
     },
     "Dominion": {
       "en": "Dominion",
-      "zh": "Dominion"
+      "zh": "统治"
+    },
+    "Double-Click Quick Fill": {
+      "en": "Double-Click Quick Fill",
+      "zh": "双击快速填色"
     },
     "Download Project": {
       "en": "Download Project",
@@ -472,10 +476,6 @@
       "en": "Dynamic / Runtime",
       "zh": "动态 / 运行时"
     },
-    "Double-Click Quick Fill": {
-      "en": "Double-Click Quick Fill",
-      "zh": "双击快速填色"
-    },
     "Dynamic borders disabled": {
       "en": "Dynamic borders disabled",
       "zh": "动态边界已禁用"
@@ -490,15 +490,15 @@
     },
     "Edit country color": {
       "en": "Edit country color",
-      "zh": "Edit country color"
+      "zh": "编辑国家颜色"
     },
     "Edit special region color": {
       "en": "Edit special region color",
-      "zh": "Edit special region color"
+      "zh": "编辑特殊区域颜色"
     },
     "Edit water region color": {
       "en": "Edit water region color",
-      "zh": "Edit water region color"
+      "zh": "编辑水域颜色"
     },
     "Editing Preset": {
       "en": "Editing Preset",
@@ -602,7 +602,7 @@
     },
     "Historical Transfers": {
       "en": "Historical Transfers",
-      "zh": "Historical Transfers"
+      "zh": "历史转会"
     },
     "Historical composites built": {
       "en": "Historical composites built",
@@ -614,19 +614,19 @@
     },
     "Historical transfer already matches current ownership.": {
       "en": "Historical transfer already matches current ownership.",
-      "zh": "Historical transfer already matches current ownership."
+      "zh": "历史转让已经与当前所有权相匹配。"
     },
     "Historical transfer applied": {
       "en": "Historical transfer applied",
-      "zh": "Historical transfer applied"
+      "zh": "应用历史转移"
     },
     "Historical transfer target is missing.": {
       "en": "Historical transfer target is missing.",
-      "zh": "Historical transfer target is missing."
+      "zh": "历史转移目标缺失。"
     },
     "Historical transfer was not applied.": {
       "en": "Historical transfer was not applied.",
-      "zh": "Historical transfer was not applied."
+      "zh": "未应用历史转移。"
     },
     "Import cancelled": {
       "en": "Import cancelled",
@@ -702,7 +702,7 @@
     },
     "Mandate": {
       "en": "Mandate",
-      "zh": "Mandate"
+      "zh": "授权"
     },
     "Manual-reviewed": {
       "en": "Manual-reviewed",
@@ -794,7 +794,7 @@
     },
     "No matching water regions": {
       "en": "No matching water regions",
-      "zh": "No matching water regions"
+      "zh": "没有匹配的水域"
     },
     "No owned regions were recolored.": {
       "en": "No owned regions were recolored.",
@@ -882,7 +882,7 @@
     },
     "Paint water regions to create an override list.": {
       "en": "Paint water regions to create an override list.",
-      "zh": "Paint water regions to create an override list."
+      "zh": "绘制水域以创建覆盖列表。"
     },
     "Panels": {
       "en": "Panels",
@@ -970,7 +970,7 @@
     },
     "Protectorate": {
       "en": "Protectorate",
-      "zh": "Protectorate"
+      "zh": "保护国"
     },
     "Quick Colors": {
       "en": "Quick Colors",
@@ -986,7 +986,7 @@
     },
     "Raj": {
       "en": "Raj",
-      "zh": "Raj"
+      "zh": "拉吉"
     },
     "Reapply Core Territory": {
       "en": "Reapply Core Territory",
@@ -1026,7 +1026,7 @@
     },
     "Related Countries": {
       "en": "Related Countries",
-      "zh": "Related Countries"
+      "zh": "相关国家"
     },
     "Releasable": {
       "en": "Releasable",
@@ -1131,6 +1131,10 @@
     "Scenario loaded. Expand the parent country and use Activate to apply releasable territory.": {
       "en": "Scenario loaded. Expand the parent country and use Activate to apply releasable territory.",
       "zh": "场景已加载。展开母国并使用“激活”来应用可释放国领土。"
+    },
+    "Scenario relief overlays are currently visible. During pan and zoom they redraw only after the view settles.": {
+      "en": "Scenario relief overlays are currently visible. During pan and zoom they redraw only after the view settles.",
+      "zh": "当前剧本的地形覆盖层处于可见状态。平移和缩放期间会在视图稳定后重绘。"
     },
     "Scenario reset": {
       "en": "Scenario reset",
@@ -1260,6 +1264,18 @@
       "en": "Show guide",
       "zh": "显示引导"
     },
+    "Single-click: one subdivision | Double-click: country batch": {
+      "en": "Single-click: one subdivision | Double-click: country batch",
+      "zh": "单击：单个地块 | 双击：按国家批量"
+    },
+    "Single-click: one subdivision | Double-click: parent batch": {
+      "en": "Single-click: one subdivision | Double-click: parent batch",
+      "zh": "单击：单个地块 | 双击：按上一级批量"
+    },
+    "Single-click: one subdivision | Double-click: province batch": {
+      "en": "Single-click: one subdivision | Double-click: province batch",
+      "zh": "单击：单个地块 | 双击：按省级批量"
+    },
     "Snapshot exported": {
       "en": "Snapshot exported",
       "zh": "快照已导出"
@@ -1314,27 +1330,19 @@
     },
     "Subject": {
       "en": "Subject",
-      "zh": "Subject"
+      "zh": "主题"
     },
     "Subject Governments": {
       "en": "Subject Governments",
-      "zh": "Subject Governments"
-    },
-    "Single-click: one subdivision | Double-click: country batch": {
-      "en": "Single-click: one subdivision | Double-click: country batch",
-      "zh": "单击：单个地块 | 双击：按国家批量"
-    },
-    "Single-click: one subdivision | Double-click: parent batch": {
-      "en": "Single-click: one subdivision | Double-click: parent batch",
-      "zh": "单击：单个地块 | 双击：按上一级批量"
-    },
-    "Single-click: one subdivision | Double-click: province batch": {
-      "en": "Single-click: one subdivision | Double-click: province batch",
-      "zh": "单击：单个地块 | 双击：按省级批量"
+      "zh": "附属政府"
     },
     "Synthetic": {
       "en": "Synthetic",
       "zh": "合成映射"
+    },
+    "Target This Country": {
+      "en": "Target This Country",
+      "zh": "将此国家设为目标"
     },
     "Terrain Atlas": {
       "en": "Terrain Atlas",
@@ -1374,7 +1382,7 @@
     },
     "Transfer not applied": {
       "en": "Transfer not applied",
-      "zh": "Transfer not applied"
+      "zh": "未申请转移"
     },
     "Tundra & Ice": {
       "en": "Tundra & Ice",
@@ -1422,7 +1430,7 @@
     },
     "Use Country Color for Visual Actions": {
       "en": "Use Country Color for Visual Actions",
-      "zh": "Use Country Color for Visual Actions"
+      "zh": "使用国家颜色进行视觉操作"
     },
     "Use Visual Color Brush": {
       "en": "Use Visual Color Brush",
@@ -1442,7 +1450,7 @@
     },
     "Variant not applied": {
       "en": "Variant not applied",
-      "zh": "Variant not applied"
+      "zh": "未应用变体"
     },
     "View": {
       "en": "View",
@@ -1478,7 +1486,7 @@
     },
     "Water Color": {
       "en": "Water Color",
-      "zh": "Water Color"
+      "zh": "水彩"
     },
     "Water Overrides": {
       "en": "Water Overrides",
@@ -1499,6 +1507,10 @@
     "When off, scenario special regions are hidden and ignore hover, click, and paint.": {
       "en": "When off, scenario special regions are hidden and ignore hover, click, and paint.",
       "zh": "关闭后，剧本特殊区域会被隐藏，并忽略悬停、点击和涂色。"
+    },
+    "When off, shoreline, basin contour, and texture overlays are hidden for the active scenario.": {
+      "en": "When off, shoreline, basin contour, and texture overlays are hidden for the active scenario.",
+      "zh": "关闭后，当前剧本的海岸线、盆地等高线和纹理覆盖层将被隐藏。"
     },
     "Width": {
       "en": "Width",
@@ -1526,7 +1538,7 @@
     },
     "and": {
       "en": "and",
-      "zh": "and"
+      "zh": "和"
     },
     "features": {
       "en": "features",
@@ -1534,7 +1546,7 @@
     },
     "of": {
       "en": "of",
-      "zh": "of"
+      "zh": "的"
     },
     "owners": {
       "en": "owners",
@@ -2025,6 +2037,10 @@
     "Agryzsky District (RU)": {
       "en": "Agryzsky District (RU)",
       "zh": "阿格里斯基区"
+    },
+    "Aguascalientes": {
+      "en": "Aguascalientes",
+      "zh": "阿瓜斯卡连特斯"
     },
     "Aguascalientes Zone 1": {
       "en": "Aguascalientes Zone 1",
@@ -2802,6 +2818,10 @@
       "en": "Al-Qādisiyyah (IQ)",
       "zh": "卡迪西亚"
     },
+    "Alabama": {
+      "en": "Alabama",
+      "zh": "阿拉巴马州"
+    },
     "Alabama Zone 1": {
       "en": "Alabama Zone 1",
       "zh": "阿拉巴马州 1 区"
@@ -3022,6 +3042,10 @@
       "en": "Alashanzuoqi (CN)",
       "zh": "阿拉善左旗"
     },
+    "Alaska": {
+      "en": "Alaska",
+      "zh": "阿拉斯加州"
+    },
     "Alaska Zone 1": {
       "en": "Alaska Zone 1",
       "zh": "阿拉斯加一区"
@@ -3138,6 +3162,10 @@
       "en": "Albay (PH)",
       "zh": "阿尔拜"
     },
+    "Alberta": {
+      "en": "Alberta",
+      "zh": "艾伯塔省"
+    },
     "Albertville": {
       "en": "Albertville",
       "zh": "阿尔贝维尔"
@@ -3220,11 +3248,11 @@
     },
     "Aleutsky District": {
       "en": "Aleutsky District",
-      "zh": "Aleutsky District"
+      "zh": "阿留申斯基区"
     },
     "Aleutsky District (RU)": {
       "en": "Aleutsky District (RU)",
-      "zh": "Aleutsky District (RU)"
+      "zh": "阿留申斯基区（俄罗斯）"
     },
     "Alexandrovo-Gaysky District": {
       "en": "Alexandrovo-Gaysky District",
@@ -3844,11 +3872,11 @@
     },
     "Amursky Rayon": {
       "en": "Amursky Rayon",
-      "zh": "Amursky Rayon"
+      "zh": "阿穆尔斯基人造丝"
     },
     "Amursky Rayon (RU)": {
       "en": "Amursky Rayon (RU)",
-      "zh": "Amursky Rayon (RU)"
+      "zh": "阿穆尔斯基人造丝 (RU)"
     },
     "Amvrosiivka": {
       "en": "Amvrosiivka",
@@ -3892,19 +3920,19 @@
     },
     "Anadyr Urban Okrug": {
       "en": "Anadyr Urban Okrug",
-      "zh": "Anadyr Urban Okrug"
+      "zh": "阿纳德尔市区"
     },
     "Anadyr Urban Okrug (RU)": {
       "en": "Anadyr Urban Okrug (RU)",
-      "zh": "Anadyr Urban Okrug (RU)"
+      "zh": "阿纳德尔市区 (RU)"
     },
     "Anadyrsky District": {
       "en": "Anadyrsky District",
-      "zh": "Anadyrsky District"
+      "zh": "阿纳德尔斯基区"
     },
     "Anadyrsky District (RU)": {
       "en": "Anadyrsky District (RU)",
-      "zh": "Anadyrsky District (RU)"
+      "zh": "阿纳德尔斯基区（俄罗斯）"
     },
     "Anambra State": {
       "en": "Anambra State",
@@ -4144,7 +4172,7 @@
     },
     "Anglo-Egyptian Sudan": {
       "en": "Anglo-Egyptian Sudan",
-      "zh": "Anglo-Egyptian Sudan"
+      "zh": "英埃苏丹"
     },
     "Angola": {
       "en": "Angola",
@@ -4212,11 +4240,11 @@
     },
     "Anivsky District": {
       "en": "Anivsky District",
-      "zh": "Anivsky District"
+      "zh": "阿尼夫斯基区"
     },
     "Anivsky District (RU)": {
       "en": "Anivsky District (RU)",
-      "zh": "Anivsky District (RU)"
+      "zh": "阿尼夫斯基区（俄罗斯）"
     },
     "Anjaw": {
       "en": "Anjaw",
@@ -4436,47 +4464,47 @@
     },
     "Antarctica / 136E-142E Sector": {
       "en": "Antarctica / 136E-142E Sector",
-      "zh": "Antarctica / 136E-142E Sector"
+      "zh": "南极洲 / 136E-142E 扇区"
     },
     "Antarctica / 142E-160E Sector": {
       "en": "Antarctica / 142E-160E Sector",
-      "zh": "Antarctica / 142E-160E Sector"
+      "zh": "南极洲 / 142E-160E 扇区"
     },
     "Antarctica / 150W-90W Sector": {
       "en": "Antarctica / 150W-90W Sector",
-      "zh": "Antarctica / 150W-90W Sector"
+      "zh": "南极/150W-90W扇区"
     },
     "Antarctica / 160E-150W Sector": {
       "en": "Antarctica / 160E-150W Sector",
-      "zh": "Antarctica / 160E-150W Sector"
+      "zh": "南极洲 / 160E-150W 扇区"
     },
     "Antarctica / 20W-45E Sector": {
       "en": "Antarctica / 20W-45E Sector",
-      "zh": "Antarctica / 20W-45E Sector"
+      "zh": "南极洲 / 20W-45E 扇区"
     },
     "Antarctica / 45E-136E Sector": {
       "en": "Antarctica / 45E-136E Sector",
-      "zh": "Antarctica / 45E-136E Sector"
+      "zh": "南极洲 / 45E-136E 扇区"
     },
     "Antarctica / Peninsula 25W-20W Sector": {
       "en": "Antarctica / Peninsula 25W-20W Sector",
-      "zh": "Antarctica / Peninsula 25W-20W Sector"
+      "zh": "南极洲/半岛25W-20W扇区"
     },
     "Antarctica / Peninsula 53W-25W Overlap Sector": {
       "en": "Antarctica / Peninsula 53W-25W Overlap Sector",
-      "zh": "Antarctica / Peninsula 53W-25W Overlap Sector"
+      "zh": "南极洲/半岛53W-25W重叠扇区"
     },
     "Antarctica / Peninsula 74W-53W Overlap Sector": {
       "en": "Antarctica / Peninsula 74W-53W Overlap Sector",
-      "zh": "Antarctica / Peninsula 74W-53W Overlap Sector"
+      "zh": "南极洲/半岛74W-53W重叠扇区"
     },
     "Antarctica / Peninsula 80W-74W Overlap Sector": {
       "en": "Antarctica / Peninsula 80W-74W Overlap Sector",
-      "zh": "Antarctica / Peninsula 80W-74W Overlap Sector"
+      "zh": "南极洲/半岛 80W-74W 重叠扇区"
     },
     "Antarctica / Peninsula 90W-80W Sector": {
       "en": "Antarctica / Peninsula 90W-80W Sector",
-      "zh": "Antarctica / Peninsula 90W-80W Sector"
+      "zh": "南极洲/半岛90W-80W扇区"
     },
     "Antioquia": {
       "en": "Antioquia",
@@ -4552,11 +4580,11 @@
     },
     "Anuchinsky District": {
       "en": "Anuchinsky District",
-      "zh": "Anuchinsky District"
+      "zh": "阿努钦斯基区"
     },
     "Anuchinsky District (RU)": {
       "en": "Anuchinsky District (RU)",
-      "zh": "Anuchinsky District (RU)"
+      "zh": "阿努钦斯基区（俄罗斯）"
     },
     "Anugul": {
       "en": "Anugul",
@@ -5106,6 +5134,10 @@
       "en": "Ariyalur (IN)",
       "zh": "阿里亚鲁尔"
     },
+    "Arizona": {
+      "en": "Arizona",
+      "zh": "亚利桑那"
+    },
     "Arkadaksky District": {
       "en": "Arkadaksky District",
       "zh": "阿尔卡达克斯区"
@@ -5113,6 +5145,10 @@
     "Arkadaksky District (RU)": {
       "en": "Arkadaksky District (RU)",
       "zh": "阿尔卡达克斯区"
+    },
+    "Arkansas": {
+      "en": "Arkansas",
+      "zh": "阿肯色州"
     },
     "Arkansas Zone 1": {
       "en": "Arkansas Zone 1",
@@ -5240,11 +5276,11 @@
     },
     "Arkharinsky District": {
       "en": "Arkharinsky District",
-      "zh": "Arkharinsky District"
+      "zh": "阿哈林斯基区"
     },
     "Arkharinsky District (RU)": {
       "en": "Arkharinsky District (RU)",
-      "zh": "Arkharinsky District (RU)"
+      "zh": "阿哈林斯基区 (RU)"
     },
     "Arles": {
       "en": "Arles",
@@ -6076,7 +6112,7 @@
     },
     "Atlantropa Reclamation Zone": {
       "en": "Atlantropa Reclamation Zone",
-      "zh": "Atlantropa Reclamation Zone"
+      "zh": "亚特兰托帕垦殖区"
     },
     "Atlántico": {
       "en": "Atlántico",
@@ -6424,11 +6460,11 @@
     },
     "Ayano-Maysky Rayon": {
       "en": "Ayano-Maysky Rayon",
-      "zh": "Ayano-Maysky Rayon"
+      "zh": "绫野美斯基人造丝"
     },
     "Ayano-Maysky Rayon (RU)": {
       "en": "Ayano-Maysky Rayon (RU)",
-      "zh": "Ayano-Maysky Rayon (RU)"
+      "zh": "绫野美斯基人造丝 (RU)"
     },
     "Aydın": {
       "en": "Aydın",
@@ -6461,6 +6497,10 @@
     "Az Zawiyah (LY)": {
       "en": "Az Zawiyah (LY)",
       "zh": "阿兹·扎维亚"
+    },
+    "Azad Hind": {
+      "en": "Azad Hind",
+      "zh": "自由印度"
     },
     "Azad Kashmir": {
       "en": "Azad Kashmir",
@@ -6993,6 +7033,14 @@
     "Baiyuxian (CN)": {
       "en": "Baiyuxian (CN)",
       "zh": "白玉县"
+    },
+    "Baja California": {
+      "en": "Baja California",
+      "zh": "下加利福尼亚州"
+    },
+    "Baja California Sur": {
+      "en": "Baja California Sur",
+      "zh": "南下加利福尼亚州"
     },
     "Baja California Sur Zone 1": {
       "en": "Baja California Sur Zone 1",
@@ -8816,7 +8864,7 @@
     },
     "Belgian Congo": {
       "en": "Belgian Congo",
-      "zh": "Belgian Congo"
+      "zh": "比属刚果"
     },
     "Belgium": {
       "en": "Belgium",
@@ -8924,11 +8972,11 @@
     },
     "Belogorsky District": {
       "en": "Belogorsky District",
-      "zh": "Belogorsky District"
+      "zh": "别洛戈尔斯基区"
     },
     "Belogorsky District (RU)": {
       "en": "Belogorsky District (RU)",
-      "zh": "Belogorsky District (RU)"
+      "zh": "别洛戈尔斯基区（俄罗斯）"
     },
     "Belokalitvinsky District": {
       "en": "Belokalitvinsky District",
@@ -9732,11 +9780,11 @@
     },
     "Bikinsky Rayon": {
       "en": "Bikinsky Rayon",
-      "zh": "Bikinsky Rayon"
+      "zh": "比金斯基人造丝"
     },
     "Bikinsky Rayon (RU)": {
       "en": "Bikinsky Rayon (RU)",
-      "zh": "Bikinsky Rayon (RU)"
+      "zh": "比金斯基人造丝 (RU)"
     },
     "Bila Tserkva": {
       "en": "Bila Tserkva",
@@ -9776,11 +9824,11 @@
     },
     "Bilibinsky District": {
       "en": "Bilibinsky District",
-      "zh": "Bilibinsky District"
+      "zh": "比利宾斯基区"
     },
     "Bilibinsky District (RU)": {
       "en": "Bilibinsky District (RU)",
-      "zh": "Bilibinsky District (RU)"
+      "zh": "比利宾斯基区（俄罗斯）"
     },
     "Biliran": {
       "en": "Biliran",
@@ -9964,19 +10012,19 @@
     },
     "Birobidzhan": {
       "en": "Birobidzhan",
-      "zh": "Birobidzhan"
+      "zh": "比罗比詹"
     },
     "Birobidzhan (RU)": {
       "en": "Birobidzhan (RU)",
-      "zh": "Birobidzhan (RU)"
+      "zh": "比罗比詹（俄罗斯）"
     },
     "Birobidzhansky District": {
       "en": "Birobidzhansky District",
-      "zh": "Birobidzhansky District"
+      "zh": "比罗比詹斯基区"
     },
     "Birobidzhansky District (RU)": {
       "en": "Birobidzhansky District (RU)",
-      "zh": "Birobidzhansky District (RU)"
+      "zh": "比罗比詹斯基区（俄罗斯）"
     },
     "Birsky District": {
       "en": "Birsky District",
@@ -10193,6 +10241,10 @@
     "Blanco [Texas]": {
       "en": "Blanco [Texas]",
       "zh": "布兰科"
+    },
+    "Blank Base": {
+      "en": "Blank Base",
+      "zh": "空白基线"
     },
     "Blansko": {
       "en": "Blansko",
@@ -11642,9 +11694,13 @@
       "en": "Britain",
       "zh": "英国"
     },
+    "British Columbia": {
+      "en": "British Columbia",
+      "zh": "不列颠哥伦比亚省"
+    },
     "British East Africa": {
       "en": "British East Africa",
-      "zh": "British East Africa"
+      "zh": "英属东非"
     },
     "British Indian Ocean Territory": {
       "en": "British Indian Ocean Territory",
@@ -11656,7 +11712,7 @@
     },
     "British West Africa": {
       "en": "British West Africa",
-      "zh": "British West Africa"
+      "zh": "英属西非"
     },
     "Brittany": {
       "en": "Brittany",
@@ -12148,11 +12204,11 @@
     },
     "Bureysky District": {
       "en": "Bureysky District",
-      "zh": "Bureysky District"
+      "zh": "布列斯基区"
     },
     "Bureysky District (RU)": {
       "en": "Bureysky District (RU)",
-      "zh": "Bureysky District (RU)"
+      "zh": "布列斯基区（俄罗斯）"
     },
     "Burgenlandkreis": {
       "en": "Burgenlandkreis",
@@ -12468,11 +12524,11 @@
     },
     "Bystrinsky District": {
       "en": "Bystrinsky District",
-      "zh": "Bystrinsky District"
+      "zh": "比斯特林斯基区"
     },
     "Bystrinsky District (RU)": {
       "en": "Bystrinsky District (RU)",
-      "zh": "Bystrinsky District (RU)"
+      "zh": "比斯特林斯基区（俄罗斯）"
     },
     "Bytom": {
       "en": "Bytom",
@@ -13030,6 +13086,10 @@
       "en": "Calhoun [Texas]",
       "zh": "卡尔霍恩"
     },
+    "California": {
+      "en": "California",
+      "zh": "加利福尼亚州"
+    },
     "Callahan": {
       "en": "Callahan",
       "zh": "卡拉汉"
@@ -13206,6 +13266,10 @@
       "en": "Campania",
       "zh": "坎帕尼亚"
     },
+    "Campeche": {
+      "en": "Campeche",
+      "zh": "坎佩切"
+    },
     "Campeche Zone 1": {
       "en": "Campeche Zone 1",
       "zh": "坎佩切一区"
@@ -13281,6 +13345,14 @@
     "Cankuzo (BI)": {
       "en": "Cankuzo (BI)",
       "zh": "坎库佐"
+    },
+    "Canonical modern-world baseline with vanilla palette colors.": {
+      "en": "Canonical modern-world baseline with vanilla palette colors.",
+      "zh": "使用原版调色板颜色的现代世界规范基线。"
+    },
+    "Canonical ownership baseline without scenario-only overlays.": {
+      "en": "Canonical ownership baseline without scenario-only overlays.",
+      "zh": "不含剧本专属覆盖层的规范主权基线。"
     },
     "Cantabria": {
       "en": "Cantabria",
@@ -14040,7 +14112,7 @@
     },
     "Ceylon": {
       "en": "Ceylon",
-      "zh": "Ceylon"
+      "zh": "锡兰"
     },
     "Chabuchaerxibozuzizhixian": {
       "en": "Chabuchaerxibozuzizhixian",
@@ -15180,11 +15252,11 @@
     },
     "Chernigovsky District": {
       "en": "Chernigovsky District",
-      "zh": "Chernigovsky District"
+      "zh": "切尔尼戈夫斯基区"
     },
     "Chernigovsky District (RU)": {
       "en": "Chernigovsky District (RU)",
-      "zh": "Chernigovsky District (RU)"
+      "zh": "切尔尼戈夫斯基区（俄罗斯）"
     },
     "Chernihiv": {
       "en": "Chernihiv",
@@ -15361,6 +15433,10 @@
     "Chiang Rai (TH)": {
       "en": "Chiang Rai (TH)",
       "zh": "清莱"
+    },
+    "Chiapas": {
+      "en": "Chiapas",
+      "zh": "恰帕斯州"
     },
     "Chiapas Zone 1": {
       "en": "Chiapas Zone 1",
@@ -15581,6 +15657,10 @@
     "Chieti (IT)": {
       "en": "Chieti (IT)",
       "zh": "基耶蒂"
+    },
+    "Chihuahua": {
+      "en": "Chihuahua",
+      "zh": "奇瓦瓦州"
     },
     "Chihuahua Zone 1": {
       "en": "Chihuahua Zone 1",
@@ -16128,11 +16208,11 @@
     },
     "Chuguyevsky District": {
       "en": "Chuguyevsky District",
-      "zh": "Chuguyevsky District"
+      "zh": "楚古耶夫斯基区"
     },
     "Chuguyevsky District (RU)": {
       "en": "Chuguyevsky District (RU)",
-      "zh": "Chuguyevsky District (RU)"
+      "zh": "楚古耶夫斯基区 (俄罗斯)"
     },
     "Chuhuiv": {
       "en": "Chuhuiv",
@@ -16518,6 +16598,10 @@
       "en": "Cluj (RO)",
       "zh": "克卢日"
     },
+    "Coahuila": {
+      "en": "Coahuila",
+      "zh": "科阿韦拉州"
+    },
     "Coahuila Zone 1": {
       "en": "Coahuila Zone 1",
       "zh": "科阿韦拉州 1 区"
@@ -16749,6 +16833,10 @@
     "Coleraine": {
       "en": "Coleraine",
       "zh": "科尔雷恩"
+    },
+    "Colima": {
+      "en": "Colima",
+      "zh": "科利马"
     },
     "Colima Zone 1": {
       "en": "Colima Zone 1",
@@ -17201,6 +17289,10 @@
     "Congqing (CN)": {
       "en": "Congqing (CN)",
       "zh": "重庆"
+    },
+    "Connecticut": {
+      "en": "Connecticut",
+      "zh": "康涅狄格州"
     },
     "Constantine": {
       "en": "Constantine",
@@ -18280,11 +18372,11 @@
     },
     "Dalnerechensky District": {
       "en": "Dalnerechensky District",
-      "zh": "Dalnerechensky District"
+      "zh": "达利涅列琴斯基区"
     },
     "Dalnerechensky District (RU)": {
       "en": "Dalnerechensky District (RU)",
-      "zh": "Dalnerechensky District (RU)"
+      "zh": "达尔涅列琴斯基区（俄罗斯）"
     },
     "Daman": {
       "en": "Daman",
@@ -19025,6 +19117,10 @@
     "Del Norte [California]": {
       "en": "Del Norte [California]",
       "zh": "德尔诺特"
+    },
+    "Delaware": {
+      "en": "Delaware",
+      "zh": "特拉华州"
     },
     "Delft en Westland": {
       "en": "Delft en Westland",
@@ -21068,11 +21164,11 @@
     },
     "Dolinsky District": {
       "en": "Dolinsky District",
-      "zh": "Dolinsky District"
+      "zh": "多林斯基区"
     },
     "Dolinsky District (RU)": {
       "en": "Dolinsky District (RU)",
-      "zh": "Dolinsky District (RU)"
+      "zh": "多林斯基区（俄罗斯）"
     },
     "Dolj": {
       "en": "Dolj",
@@ -21950,6 +22046,10 @@
       "en": "Duolunxian (CN)",
       "zh": "多伦县"
     },
+    "Durango": {
+      "en": "Durango",
+      "zh": "杜兰戈"
+    },
     "Durango Zone 1": {
       "en": "Durango Zone 1",
       "zh": "杜兰戈 1 区"
@@ -22068,7 +22168,7 @@
     },
     "Dutch East Indies": {
       "en": "Dutch East Indies",
-      "zh": "Dutch East Indies"
+      "zh": "荷属东印度"
     },
     "Duval": {
       "en": "Duval",
@@ -24956,27 +25056,27 @@
     },
     "French Algeria": {
       "en": "French Algeria",
-      "zh": "French Algeria"
+      "zh": "法属阿尔及利亚"
     },
     "French Equatorial Africa": {
       "en": "French Equatorial Africa",
-      "zh": "French Equatorial Africa"
+      "zh": "法属赤道非洲"
     },
     "French Indochina": {
       "en": "French Indochina",
-      "zh": "French Indochina"
+      "zh": "法属印度支那"
     },
     "French Mandate for Lebanon": {
       "en": "French Mandate for Lebanon",
-      "zh": "French Mandate for Lebanon"
+      "zh": "法属黎巴嫩托管地"
     },
     "French Mandate for Syria": {
       "en": "French Mandate for Syria",
-      "zh": "French Mandate for Syria"
+      "zh": "法属叙利亚托管地"
     },
     "French Morocco": {
       "en": "French Morocco",
-      "zh": "French Morocco"
+      "zh": "法属摩洛哥"
     },
     "French Southern and Antarctic Lands": {
       "en": "French Southern and Antarctic Lands",
@@ -24984,11 +25084,11 @@
     },
     "French Tunisia": {
       "en": "French Tunisia",
-      "zh": "French Tunisia"
+      "zh": "法属突尼斯"
     },
     "French West Africa": {
       "en": "French West Africa",
-      "zh": "French West Africa"
+      "zh": "法属西非"
     },
     "Fresno": {
       "en": "Fresno",
@@ -27612,7 +27712,7 @@
     },
     "Greek Protectorate": {
       "en": "Greek Protectorate",
-      "zh": "Greek Protectorate"
+      "zh": "希腊保护国"
     },
     "Greenland": {
       "en": "Greenland",
@@ -27842,6 +27942,10 @@
       "en": "Guanacaste (CR)",
       "zh": "瓜纳卡斯特"
     },
+    "Guanajuato": {
+      "en": "Guanajuato",
+      "zh": "瓜纳华托"
+    },
     "Guanajuato Zone 1": {
       "en": "Guanajuato Zone 1",
       "zh": "瓜纳华托 1 区"
@@ -27940,7 +28044,7 @@
     },
     "Guangdong National Government": {
       "en": "Guangdong National Government",
-      "zh": "Guangdong National Government"
+      "zh": "广东国民政府"
     },
     "Guangfengxian": {
       "en": "Guangfengxian",
@@ -28177,6 +28281,10 @@
     "Guernsey": {
       "en": "Guernsey",
       "zh": "根西岛"
+    },
+    "Guerrero": {
+      "en": "Guerrero",
+      "zh": "格雷罗"
     },
     "Guerrero Zone 1": {
       "en": "Guerrero Zone 1",
@@ -28420,7 +28528,7 @@
     },
     "Guizhou Clique": {
       "en": "Guizhou Clique",
-      "zh": "Guizhou Clique"
+      "zh": "贵州军阀"
     },
     "Gujarat": {
       "en": "Gujarat",
@@ -32494,6 +32602,10 @@
       "en": "Ichnia (UA)",
       "zh": "伊奇尼亚"
     },
+    "Idaho": {
+      "en": "Idaho",
+      "zh": "爱达荷州"
+    },
     "Idaho Zone 1": {
       "en": "Idaho Zone 1",
       "zh": "爱达荷州 1 区"
@@ -32685,6 +32797,10 @@
     "Ilishevsky District (RU)": {
       "en": "Ilishevsky District (RU)",
       "zh": "伊利舍夫斯基区"
+    },
+    "Illinois": {
+      "en": "Illinois",
+      "zh": "伊利诺伊州"
     },
     "Illinois Zone 1": {
       "en": "Illinois Zone 1",
@@ -33040,7 +33156,7 @@
     },
     "Independent State of Croatia": {
       "en": "Independent State of Croatia",
-      "zh": "Independent State of Croatia"
+      "zh": "克罗地亚独立国"
     },
     "India": {
       "en": "India",
@@ -33065,6 +33181,10 @@
     "Indian River [Florida]": {
       "en": "Indian River [Florida]",
       "zh": "印度河"
+    },
+    "Indiana": {
+      "en": "Indiana",
+      "zh": "印第安纳州"
     },
     "Indiana Zone 1": {
       "en": "Indiana Zone 1",
@@ -33357,6 +33477,10 @@
     "Ionian Islands (GR)": {
       "en": "Ionian Islands (GR)",
       "zh": "爱奥尼亚群岛"
+    },
+    "Iowa": {
+      "en": "Iowa",
+      "zh": "爱荷华州"
     },
     "Iowa Zone 1": {
       "en": "Iowa Zone 1",
@@ -33696,23 +33820,23 @@
     },
     "Italian East Africa": {
       "en": "Italian East Africa",
-      "zh": "Italian East Africa"
+      "zh": "意属东非"
     },
     "Italian Egypt": {
       "en": "Italian Egypt",
-      "zh": "Italian Egypt"
+      "zh": "意属埃及"
     },
     "Italian Palestine": {
       "en": "Italian Palestine",
-      "zh": "Italian Palestine"
+      "zh": "意属巴勒斯坦"
     },
     "Italian Somaliland": {
       "en": "Italian Somaliland",
-      "zh": "Italian Somaliland"
+      "zh": "意属索马里兰"
     },
     "Italian Transjordan": {
       "en": "Italian Transjordan",
-      "zh": "Italian Transjordan"
+      "zh": "意属外约旦"
     },
     "Italy": {
       "en": "Italy",
@@ -33736,11 +33860,11 @@
     },
     "Iultinsky District‎": {
       "en": "Iultinsky District‎",
-      "zh": "Iultinsky District‎"
+      "zh": "伊尔廷斯基区‎"
     },
     "Iultinsky District‎ (RU)": {
       "en": "Iultinsky District‎ (RU)",
-      "zh": "Iultinsky District‎ (RU)"
+      "zh": "伊尔廷斯基区‎ (RU)"
     },
     "Ivanivka": {
       "en": "Ivanivka",
@@ -34045,6 +34169,10 @@
     "Jalgaon (IN)": {
       "en": "Jalgaon (IN)",
       "zh": "贾尔冈"
+    },
+    "Jalisco": {
+      "en": "Jalisco",
+      "zh": "哈利斯科州"
     },
     "Jalisco Zone 1": {
       "en": "Jalisco Zone 1",
@@ -36898,6 +37026,10 @@
       "en": "Kanpur Nagar (IN)",
       "zh": "坎普尔纳加尔"
     },
+    "Kansas": {
+      "en": "Kansas",
+      "zh": "堪萨斯州"
+    },
     "Kansas Zone 1": {
       "en": "Kansas Zone 1",
       "zh": "堪萨斯 1 区"
@@ -37140,11 +37272,11 @@
     },
     "Karaginsky District": {
       "en": "Karaginsky District",
-      "zh": "Karaginsky District"
+      "zh": "卡拉金斯基区"
     },
     "Karaginsky District (RU)": {
       "en": "Karaginsky District (RU)",
-      "zh": "Karaginsky District (RU)"
+      "zh": "卡拉金斯基区（俄罗斯）"
     },
     "Karaidelsky District": {
       "en": "Karaidelsky District",
@@ -37676,11 +37808,11 @@
     },
     "Kavalerovsky District": {
       "en": "Kavalerovsky District",
-      "zh": "Kavalerovsky District"
+      "zh": "卡瓦列罗夫斯基区"
     },
     "Kavalerovsky District (RU)": {
       "en": "Kavalerovsky District (RU)",
-      "zh": "Kavalerovsky District (RU)"
+      "zh": "卡瓦列罗夫斯基区（俄罗斯）"
     },
     "Kavango": {
       "en": "Kavango",
@@ -38098,6 +38230,10 @@
       "en": "Kent [Texas]",
       "zh": "肯特"
     },
+    "Kentucky": {
+      "en": "Kentucky",
+      "zh": "肯塔基州"
+    },
     "Kentucky Zone 1": {
       "en": "Kentucky Zone 1",
       "zh": "肯塔基州 1 区"
@@ -38372,11 +38508,11 @@
     },
     "Khabarovsky Rayon": {
       "en": "Khabarovsky Rayon",
-      "zh": "Khabarovsky Rayon"
+      "zh": "哈巴罗夫斯克人造丝"
     },
     "Khabarovsky Rayon (RU)": {
       "en": "Khabarovsky Rayon (RU)",
-      "zh": "Khabarovsky Rayon (RU)"
+      "zh": "哈巴罗夫斯克人造丝 (RU)"
     },
     "Khabezsky District": {
       "en": "Khabezsky District",
@@ -38428,11 +38564,11 @@
     },
     "Khankaysky District": {
       "en": "Khankaysky District",
-      "zh": "Khankaysky District"
+      "zh": "汉凯区"
     },
     "Khankaysky District (RU)": {
       "en": "Khankaysky District (RU)",
-      "zh": "Khankaysky District (RU)"
+      "zh": "汉凯区（俄罗斯）"
     },
     "Khanty-Mansiy": {
       "en": "Khanty-Mansiy",
@@ -38484,11 +38620,11 @@
     },
     "Khasansky District": {
       "en": "Khasansky District",
-      "zh": "Khasansky District"
+      "zh": "哈桑区"
     },
     "Khasansky District (RU)": {
       "en": "Khasansky District (RU)",
-      "zh": "Khasansky District (RU)"
+      "zh": "哈桑斯基区（俄罗斯）"
     },
     "Khasavyurtovsky District": {
       "en": "Khasavyurtovsky District",
@@ -38500,11 +38636,11 @@
     },
     "Khasynsky Urban District": {
       "en": "Khasynsky Urban District",
-      "zh": "Khasynsky Urban District"
+      "zh": "哈辛斯基市区"
     },
     "Khasynsky Urban District (RU)": {
       "en": "Khasynsky Urban District (RU)",
-      "zh": "Khasynsky Urban District (RU)"
+      "zh": "哈辛斯基市区 (RU)"
     },
     "Khatlon": {
       "en": "Khatlon",
@@ -38684,11 +38820,11 @@
     },
     "Khorolsky District": {
       "en": "Khorolsky District",
-      "zh": "Khorolsky District"
+      "zh": "霍罗尔斯基区"
     },
     "Khorolsky District (RU)": {
       "en": "Khorolsky District (RU)",
-      "zh": "Khorolsky District (RU)"
+      "zh": "霍罗尔斯基区（俄罗斯）"
     },
     "Khoroshiv": {
       "en": "Khoroshiv",
@@ -39048,7 +39184,7 @@
     },
     "Kingdom of Egypt": {
       "en": "Kingdom of Egypt",
-      "zh": "Kingdom of Egypt"
+      "zh": "埃及王国"
     },
     "Kings": {
       "en": "Kings",
@@ -39856,19 +39992,19 @@
     },
     "Komsomolsk-on-Amur": {
       "en": "Komsomolsk-on-Amur",
-      "zh": "Komsomolsk-on-Amur"
+      "zh": "阿穆尔河畔共青城"
     },
     "Komsomolsk-on-Amur (RU)": {
       "en": "Komsomolsk-on-Amur (RU)",
-      "zh": "Komsomolsk-on-Amur (RU)"
+      "zh": "阿穆尔河畔共青城 (俄罗斯)"
     },
     "Komsomolsky": {
       "en": "Komsomolsky",
-      "zh": "Komsomolsky"
+      "zh": "共青团"
     },
     "Komsomolsky (RU)": {
       "en": "Komsomolsky (RU)",
-      "zh": "Komsomolsky (RU)"
+      "zh": "共青城 (俄罗斯)"
     },
     "Komsomolsky District": {
       "en": "Komsomolsky District",
@@ -40048,7 +40184,7 @@
     },
     "Korea": {
       "en": "Korea",
-      "zh": "Korea"
+      "zh": "朝鲜"
     },
     "Korenevsky District": {
       "en": "Korenevsky District",
@@ -40148,11 +40284,11 @@
     },
     "Korsakovsky District": {
       "en": "Korsakovsky District",
-      "zh": "Korsakovsky District"
+      "zh": "科萨科夫斯基区"
     },
     "Korsakovsky District (RU)": {
       "en": "Korsakovsky District (RU)",
-      "zh": "Korsakovsky District (RU)"
+      "zh": "科萨科夫斯基区（俄罗斯）"
     },
     "Korsun-Shevchenkivskyi": {
       "en": "Korsun-Shevchenkivskyi",
@@ -41356,11 +41492,11 @@
     },
     "Kurilsky District": {
       "en": "Kurilsky District",
-      "zh": "Kurilsky District"
+      "zh": "库里尔斯基区"
     },
     "Kurilsky District (RU)": {
       "en": "Kurilsky District (RU)",
-      "zh": "Kurilsky District (RU)"
+      "zh": "库里尔斯基区（俄罗斯）"
     },
     "Kurkinsky District": {
       "en": "Kurkinsky District",
@@ -42916,11 +43052,11 @@
     },
     "Lazovsky District": {
       "en": "Lazovsky District",
-      "zh": "Lazovsky District"
+      "zh": "拉佐夫斯基区"
     },
     "Lazovsky District (RU)": {
       "en": "Lazovsky District (RU)",
-      "zh": "Lazovsky District (RU)"
+      "zh": "拉佐夫斯基区（俄罗斯）"
     },
     "Laâyoune - Boujdour - Sakia El Hamra": {
       "en": "Laâyoune - Boujdour - Sakia El Hamra",
@@ -42948,7 +43084,7 @@
     },
     "Lebanese Protectorate": {
       "en": "Lebanese Protectorate",
-      "zh": "Lebanese Protectorate"
+      "zh": "黎巴嫩保护国"
     },
     "Lebanon": {
       "en": "Lebanon",
@@ -45434,6 +45570,10 @@
       "en": "Louis-Saint-Laurent—Akiawenhrahk [Quebec]",
       "zh": "路易·圣洛朗—阿基亚文拉克"
     },
+    "Louisiana": {
+      "en": "Louisiana",
+      "zh": "路易斯安那州"
+    },
     "Louisiana Zone 1": {
       "en": "Louisiana Zone 1",
       "zh": "路易斯安那州 1 区"
@@ -46760,11 +46900,11 @@
     },
     "Magadan Urban District": {
       "en": "Magadan Urban District",
-      "zh": "Magadan Urban District"
+      "zh": "马加丹市区"
     },
     "Magadan Urban District (RU)": {
       "en": "Magadan Urban District (RU)",
-      "zh": "Magadan Urban District (RU)"
+      "zh": "马加丹市区 (RU)"
     },
     "Magaramkentsky District": {
       "en": "Magaramkentsky District",
@@ -46776,11 +46916,11 @@
     },
     "Magdagachinsky District": {
       "en": "Magdagachinsky District",
-      "zh": "Magdagachinsky District"
+      "zh": "马格达加钦斯基区"
     },
     "Magdagachinsky District (RU)": {
       "en": "Magdagachinsky District (RU)",
-      "zh": "Magdagachinsky District (RU)"
+      "zh": "马格达加钦斯基区（俄罗斯）"
     },
     "Magdalena": {
       "en": "Magdalena",
@@ -47030,6 +47170,10 @@
       "en": "Main-Taunus-Kreis [Hessen]",
       "zh": "美因-陶努斯-县"
     },
+    "Maine": {
+      "en": "Maine",
+      "zh": "缅因州"
+    },
     "Maine Zone 1": {
       "en": "Maine Zone 1",
       "zh": "缅因州 1 区"
@@ -47176,11 +47320,11 @@
     },
     "Makarovsky District": {
       "en": "Makarovsky District",
-      "zh": "Makarovsky District"
+      "zh": "马卡罗夫斯基区"
     },
     "Makarovsky District (RU)": {
       "en": "Makarovsky District (RU)",
-      "zh": "Makarovsky District (RU)"
+      "zh": "马卡洛夫斯基区（俄罗斯）"
     },
     "Makaryevsky District": {
       "en": "Makaryevsky District",
@@ -47268,7 +47412,7 @@
     },
     "Malaya": {
       "en": "Malaya",
-      "zh": "Malaya"
+      "zh": "马来亚"
     },
     "Malaysia": {
       "en": "Malaysia",
@@ -47709,6 +47853,10 @@
     "Manisa (TR)": {
       "en": "Manisa (TR)",
       "zh": "马尼萨"
+    },
+    "Manitoba": {
+      "en": "Manitoba",
+      "zh": "马尼托巴省"
     },
     "Mankivka": {
       "en": "Mankivka",
@@ -48426,6 +48574,10 @@
       "en": "Massa-Carrara (IT)",
       "zh": "马萨-卡拉拉"
     },
+    "Massachusetts": {
+      "en": "Massachusetts",
+      "zh": "马萨诸塞州"
+    },
     "Masvingo": {
       "en": "Masvingo",
       "zh": "马斯温戈"
@@ -48700,11 +48852,11 @@
     },
     "Mazanovsky District": {
       "en": "Mazanovsky District",
-      "zh": "Mazanovsky District"
+      "zh": "马扎诺夫斯基区"
     },
     "Mazanovsky District (RU)": {
       "en": "Mazanovsky District (RU)",
-      "zh": "Mazanovsky District (RU)"
+      "zh": "马扎诺夫斯基区（俄罗斯）"
     },
     "Maḍakalapuva": {
       "en": "Maḍakalapuva",
@@ -49510,6 +49662,10 @@
       "en": "Miaolixian (CN)",
       "zh": "庙里贤"
     },
+    "Michigan": {
+      "en": "Michigan",
+      "zh": "密歇根州"
+    },
     "Michigan Zone 1": {
       "en": "Michigan Zone 1",
       "zh": "密歇根1区"
@@ -49677,6 +49833,10 @@
     "Michigan Zone 9 [Michigan]": {
       "en": "Michigan Zone 9 [Michigan]",
       "zh": "密歇根9区"
+    },
+    "Michoacán": {
+      "en": "Michoacán",
+      "zh": "米却肯州"
     },
     "Michoacán Zone 1": {
       "en": "Michoacán Zone 1",
@@ -50100,11 +50260,11 @@
     },
     "Milkovsky District": {
       "en": "Milkovsky District",
-      "zh": "Milkovsky District"
+      "zh": "米尔科夫斯基区"
     },
     "Milkovsky District (RU)": {
       "en": "Milkovsky District (RU)",
-      "zh": "Milkovsky District (RU)"
+      "zh": "米尔科夫斯基区（俄罗斯）"
     },
     "Millau": {
       "en": "Millau",
@@ -50329,6 +50489,10 @@
     "Minlexian (CN)": {
       "en": "Minlexian (CN)",
       "zh": "民勒贤"
+    },
+    "Minnesota": {
+      "en": "Minnesota",
+      "zh": "明尼苏达州"
     },
     "Minnesota Zone 1": {
       "en": "Minnesota Zone 1",
@@ -50730,6 +50894,10 @@
       "en": "Mississauga—Streetsville [Ontario]",
       "zh": "密西沙加—斯特里茨维尔"
     },
+    "Mississippi": {
+      "en": "Mississippi",
+      "zh": "密西西比州"
+    },
     "Mississippi Zone 1": {
       "en": "Mississippi Zone 1",
       "zh": "密西西比州 1 区"
@@ -50837,6 +51005,10 @@
     "Mississippi Zone 9 [Mississippi]": {
       "en": "Mississippi Zone 9 [Mississippi]",
       "zh": "密西西比州 9 区"
+    },
+    "Missouri": {
+      "en": "Missouri",
+      "zh": "密苏里州"
     },
     "Missouri Zone 1": {
       "en": "Missouri Zone 1",
@@ -51133,6 +51305,10 @@
     "Modena (IT)": {
       "en": "Modena (IT)",
       "zh": "摩德纳"
+    },
+    "Modern World": {
+      "en": "Modern World",
+      "zh": "现代世界"
     },
     "Modoc": {
       "en": "Modoc",
@@ -51461,6 +51637,10 @@
     "Montague [Texas]": {
       "en": "Montague [Texas]",
       "zh": "蒙塔古"
+    },
+    "Montana": {
+      "en": "Montana",
+      "zh": "蒙大拿"
     },
     "Montana Zone 1": {
       "en": "Montana Zone 1",
@@ -51801,6 +51981,10 @@
     "Mordovsky District (RU)": {
       "en": "Mordovsky District (RU)",
       "zh": "莫尔多夫斯基区"
+    },
+    "Morelos": {
+      "en": "Morelos",
+      "zh": "莫雷洛斯州"
     },
     "Morelos Zone 1": {
       "en": "Morelos Zone 1",
@@ -52940,11 +53124,11 @@
     },
     "Nadezhdinsky District": {
       "en": "Nadezhdinsky District",
-      "zh": "Nadezhdinsky District"
+      "zh": "纳德日金斯基区"
     },
     "Nadezhdinsky District (RU)": {
       "en": "Nadezhdinsky District (RU)",
-      "zh": "Nadezhdinsky District (RU)"
+      "zh": "纳德日丁斯基区（俄罗斯）"
     },
     "Nadia": {
       "en": "Nadia",
@@ -53276,11 +53460,11 @@
     },
     "Nanaysky Rayon": {
       "en": "Nanaysky Rayon",
-      "zh": "Nanaysky Rayon"
+      "zh": "纳奈斯基人造丝"
     },
     "Nanaysky Rayon (RU)": {
       "en": "Nanaysky Rayon (RU)",
-      "zh": "Nanaysky Rayon (RU)"
+      "zh": "纳奈斯基人造丝 (RU)"
     },
     "Nanbuxian": {
       "en": "Nanbuxian",
@@ -53452,7 +53636,7 @@
     },
     "Nanjing China": {
       "en": "Nanjing China",
-      "zh": "Nanjing China"
+      "zh": "南京中国"
     },
     "Nanjingxian": {
       "en": "Nanjingxian",
@@ -53966,6 +54150,10 @@
       "en": "Nayagarh (IN)",
       "zh": "纳亚加尔"
     },
+    "Nayarit": {
+      "en": "Nayarit",
+      "zh": "纳亚里特语"
+    },
     "Nayarit Zone 1": {
       "en": "Nayarit Zone 1",
       "zh": "纳亚里特区 1"
@@ -54037,6 +54225,10 @@
     "Neath Port Talbot": {
       "en": "Neath Port Talbot",
       "zh": "塔尔伯特港"
+    },
+    "Nebraska": {
+      "en": "Nebraska",
+      "zh": "内布拉斯加州"
     },
     "Nebraska Zone 1": {
       "en": "Nebraska Zone 1",
@@ -54646,6 +54838,10 @@
       "en": "Nevşehir (TR)",
       "zh": "内夫谢希尔"
     },
+    "New Brunswick": {
+      "en": "New Brunswick",
+      "zh": "新不伦瑞克省"
+    },
     "New Castle": {
       "en": "New Castle",
       "zh": "纽卡斯尔"
@@ -54665,6 +54861,10 @@
     "New Delhi (IN)": {
       "en": "New Delhi (IN)",
       "zh": "新德里"
+    },
+    "New Hampshire": {
+      "en": "New Hampshire",
+      "zh": "新罕布什尔"
     },
     "New Hampshire Zone 1": {
       "en": "New Hampshire Zone 1",
@@ -54745,6 +54945,10 @@
     "New Ireland (PG)": {
       "en": "New Ireland (PG)",
       "zh": "新爱尔兰"
+    },
+    "New Jersey": {
+      "en": "New Jersey",
+      "zh": "新泽西州"
     },
     "New Jersey Zone 1": {
       "en": "New Jersey Zone 1",
@@ -54889,6 +55093,10 @@
     "New Jersey Zone 9 [New Jersey]": {
       "en": "New Jersey Zone 9 [New Jersey]",
       "zh": "新泽西州9区"
+    },
+    "New Mexico": {
+      "en": "New Mexico",
+      "zh": "新墨西哥州"
     },
     "New Mexico Zone 1": {
       "en": "New Mexico Zone 1",
@@ -55221,6 +55429,10 @@
     "Newcastle upon Tyne": {
       "en": "Newcastle upon Tyne",
       "zh": "泰恩河畔纽卡斯尔"
+    },
+    "Newfoundland and Labrador": {
+      "en": "Newfoundland and Labrador",
+      "zh": "纽芬兰和拉布拉多"
     },
     "Newham": {
       "en": "Newham",
@@ -55904,11 +56116,11 @@
     },
     "Nogliksky District": {
       "en": "Nogliksky District",
-      "zh": "Nogliksky District"
+      "zh": "诺格利斯基区"
     },
     "Nogliksky District (RU)": {
       "en": "Nogliksky District (RU)",
-      "zh": "Nogliksky District (RU)"
+      "zh": "诺格利斯基区（俄罗斯）"
     },
     "Nolan": {
       "en": "Nolan",
@@ -56202,6 +56414,10 @@
       "en": "North Caribbean Coast (NI)",
       "zh": "北加勒比海岸"
     },
+    "North Carolina": {
+      "en": "North Carolina",
+      "zh": "北卡罗来纳州"
+    },
     "North Carolina Zone 1": {
       "en": "North Carolina Zone 1",
       "zh": "北卡罗来纳州 1 区"
@@ -56396,7 +56612,7 @@
     },
     "North China Political Council": {
       "en": "North China Political Council",
-      "zh": "North China Political Council"
+      "zh": "华北政务委员会"
     },
     "North Chungcheong": {
       "en": "North Chungcheong",
@@ -56405,6 +56621,10 @@
     "North Chungcheong (KR)": {
       "en": "North Chungcheong (KR)",
       "zh": "忠清北道"
+    },
+    "North Dakota": {
+      "en": "North Dakota",
+      "zh": "北达科他州"
     },
     "North Dakota Zone 1": {
       "en": "North Dakota Zone 1",
@@ -56700,15 +56920,15 @@
     },
     "North Schleswig": {
       "en": "North Schleswig",
-      "zh": "North Schleswig"
+      "zh": "北石勒苏益格"
     },
     "North Schleswig (DK)": {
       "en": "North Schleswig (DK)",
-      "zh": "North Schleswig (DK)"
+      "zh": "北石勒苏益格 (DK)"
     },
     "North Schleswig [Sydjylland]": {
       "en": "North Schleswig [Sydjylland]",
-      "zh": "North Schleswig [Sydjylland]"
+      "zh": "北石勒苏益格 [西日德兰]"
     },
     "North Somerset": {
       "en": "North Somerset",
@@ -57109,6 +57329,10 @@
     "Nova Odesa (UA)": {
       "en": "Nova Odesa (UA)",
       "zh": "新敖德萨"
+    },
+    "Nova Scotia": {
+      "en": "Nova Scotia",
+      "zh": "新斯科舍省"
     },
     "Nova Ushytsia": {
       "en": "Nova Ushytsia",
@@ -57558,6 +57782,10 @@
       "en": "Nueva Vizcaya (PH)",
       "zh": "新比斯开"
     },
+    "Nuevo León": {
+      "en": "Nuevo León",
+      "zh": "新莱昂州"
+    },
     "Nuevo León Zone 1": {
       "en": "Nuevo León Zone 1",
       "zh": "新莱昂州 1 区"
@@ -57901,6 +58129,10 @@
     "Oakville West [Ontario]": {
       "en": "Oakville West [Ontario]",
       "zh": "奥克维尔西"
+    },
+    "Oaxaca": {
+      "en": "Oaxaca",
+      "zh": "瓦哈卡州"
     },
     "Oaxaca Zone 1": {
       "en": "Oaxaca Zone 1",
@@ -58740,11 +58972,11 @@
     },
     "Obluchensky District": {
       "en": "Obluchensky District",
-      "zh": "Obluchensky District"
+      "zh": "奥布卢琴斯基区"
     },
     "Obluchensky District (RU)": {
       "en": "Obluchensky District (RU)",
-      "zh": "Obluchensky District (RU)"
+      "zh": "奥布卢琴斯基区（俄罗斯）"
     },
     "Obninsk": {
       "en": "Obninsk",
@@ -58953,6 +59185,10 @@
     "Ohangwena (NA)": {
       "en": "Ohangwena (NA)",
       "zh": "奥汉格纳"
+    },
+    "Ohio": {
+      "en": "Ohio",
+      "zh": "俄亥俄州"
     },
     "Ohio Zone 1": {
       "en": "Ohio Zone 1",
@@ -59196,19 +59432,19 @@
     },
     "Okhinsky District": {
       "en": "Okhinsky District",
-      "zh": "Okhinsky District"
+      "zh": "奥欣斯基区"
     },
     "Okhinsky District (RU)": {
       "en": "Okhinsky District (RU)",
-      "zh": "Okhinsky District (RU)"
+      "zh": "奥欣斯基区（俄罗斯）"
     },
     "Okhotsky Rayon": {
       "en": "Okhotsky Rayon",
-      "zh": "Okhotsky Rayon"
+      "zh": "鄂霍次基人造丝"
     },
     "Okhotsky Rayon (RU)": {
       "en": "Okhotsky Rayon (RU)",
-      "zh": "Okhotsky Rayon (RU)"
+      "zh": "鄂霍次基人造丝 (RU)"
     },
     "Okhtyrka": {
       "en": "Okhtyrka",
@@ -59472,11 +59708,11 @@
     },
     "Olginsky District": {
       "en": "Olginsky District",
-      "zh": "Olginsky District"
+      "zh": "奥尔金斯基区"
     },
     "Olginsky District (RU)": {
       "en": "Olginsky District (RU)",
-      "zh": "Olginsky District (RU)"
+      "zh": "奥尔金斯基区（俄罗斯）"
     },
     "Olhava District": {
       "en": "Olhava District",
@@ -59552,11 +59788,11 @@
     },
     "Olsky Urban District": {
       "en": "Olsky Urban District",
-      "zh": "Olsky Urban District"
+      "zh": "奥尔斯基市区"
     },
     "Olsky Urban District (RU)": {
       "en": "Olsky Urban District (RU)",
-      "zh": "Olsky Urban District (RU)"
+      "zh": "奥尔斯基市区（俄罗斯）"
     },
     "Olsztyn": {
       "en": "Olsztyn",
@@ -59576,11 +59812,11 @@
     },
     "Olyutorsky District": {
       "en": "Olyutorsky District",
-      "zh": "Olyutorsky District"
+      "zh": "奥柳托斯基区"
     },
     "Olyutorsky District (RU)": {
       "en": "Olyutorsky District (RU)",
-      "zh": "Olyutorsky District (RU)"
+      "zh": "奥柳托斯基区（俄罗斯）"
     },
     "Omagh": {
       "en": "Omagh",
@@ -59616,11 +59852,11 @@
     },
     "Omsukchansky Urban District": {
       "en": "Omsukchansky Urban District",
-      "zh": "Omsukchansky Urban District"
+      "zh": "鄂木克昌斯基市区"
     },
     "Omsukchansky Urban District (RU)": {
       "en": "Omsukchansky Urban District (RU)",
-      "zh": "Omsukchansky Urban District (RU)"
+      "zh": "奥姆苏克昌斯基市区（俄罗斯）"
     },
     "Omusati": {
       "en": "Omusati",
@@ -59653,6 +59889,10 @@
     "Onezhsky District (RU)": {
       "en": "Onezhsky District (RU)",
       "zh": "奥涅日斯基区"
+    },
+    "Ontario": {
+      "en": "Ontario",
+      "zh": "安大略省"
     },
     "Onufriivka": {
       "en": "Onufriivka",
@@ -59762,6 +60002,10 @@
       "en": "Orativ (UA)",
       "zh": "扬声器"
     },
+    "Ordensstaat Burgund": {
+      "en": "Ordensstaat Burgund",
+      "zh": "勃艮第骑士团国"
+    },
     "Ordino": {
       "en": "Ordino",
       "zh": "奥尔迪诺"
@@ -59793,6 +60037,10 @@
     "Ordubad (AZ)": {
       "en": "Ordubad (AZ)",
       "zh": "奥尔杜巴德"
+    },
+    "Oregon": {
+      "en": "Oregon",
+      "zh": "俄勒冈州"
     },
     "Oregon Zone 1": {
       "en": "Oregon Zone 1",
@@ -61224,19 +61472,19 @@
     },
     "Partizansk": {
       "en": "Partizansk",
-      "zh": "Partizansk"
+      "zh": "游击队"
     },
     "Partizansk (RU)": {
       "en": "Partizansk (RU)",
-      "zh": "Partizansk (RU)"
+      "zh": "游击队 (俄罗斯)"
     },
     "Partizansky District": {
       "en": "Partizansky District",
-      "zh": "Partizansky District"
+      "zh": "游击队区"
     },
     "Partizansky District (RU)": {
       "en": "Partizansky District (RU)",
-      "zh": "Partizansky District (RU)"
+      "zh": "游击区（俄罗斯）"
     },
     "Parwan": {
       "en": "Parwan",
@@ -61678,6 +61926,10 @@
       "en": "Pengzhou (CN)",
       "zh": "彭州"
     },
+    "Pennsylvania": {
+      "en": "Pennsylvania",
+      "zh": "宾夕法尼亚州"
+    },
     "Pennsylvania Zone 1": {
       "en": "Pennsylvania Zone 1",
       "zh": "宾夕法尼亚州 1 区"
@@ -61896,11 +62148,11 @@
     },
     "Penzhinsky District": {
       "en": "Penzhinsky District",
-      "zh": "Penzhinsky District"
+      "zh": "彭任斯基区"
     },
     "Penzhinsky District (RU)": {
       "en": "Penzhinsky District (RU)",
-      "zh": "Penzhinsky District (RU)"
+      "zh": "彭任斯基区（俄罗斯）"
     },
     "Perak": {
       "en": "Perak",
@@ -62220,11 +62472,11 @@
     },
     "Petropavlovsk-Kamchatsky": {
       "en": "Petropavlovsk-Kamchatsky",
-      "zh": "Petropavlovsk-Kamchatsky"
+      "zh": "堪察加彼得巴甫洛夫斯克"
     },
     "Petropavlovsk-Kamchatsky (RU)": {
       "en": "Petropavlovsk-Kamchatsky (RU)",
-      "zh": "Petropavlovsk-Kamchatsky (RU)"
+      "zh": "堪察加彼得巴甫洛夫斯克 (RU)"
     },
     "Petropavlovsky District": {
       "en": "Petropavlovsky District",
@@ -62288,11 +62540,11 @@
     },
     "Pevek urban district": {
       "en": "Pevek urban district",
-      "zh": "Pevek urban district"
+      "zh": "佩韦克市区"
     },
     "Pevek urban district (RU)": {
       "en": "Pevek urban district (RU)",
-      "zh": "Pevek urban district (RU)"
+      "zh": "佩韦克市区 (RU)"
     },
     "Pfaffenhofen a. d. Ilm": {
       "en": "Pfaffenhofen a. d. Ilm",
@@ -63652,11 +63904,11 @@
     },
     "Poronaysky District": {
       "en": "Poronaysky District",
-      "zh": "Poronaysky District"
+      "zh": "波罗奈斯基区"
     },
     "Poronaysky District (RU)": {
       "en": "Poronaysky District (RU)",
-      "zh": "Poronaysky District (RU)"
+      "zh": "波罗奈斯基区（俄罗斯）"
     },
     "Port Moody—Coquitlam": {
       "en": "Port Moody—Coquitlam",
@@ -63832,11 +64084,11 @@
     },
     "Pozharsky District": {
       "en": "Pozharsky District",
-      "zh": "Pozharsky District"
+      "zh": "波扎尔斯基区"
     },
     "Pozharsky District (RU)": {
       "en": "Pozharsky District (RU)",
-      "zh": "Pozharsky District (RU)"
+      "zh": "波扎尔斯基区（俄罗斯）"
     },
     "Poznań": {
       "en": "Poznań",
@@ -64122,6 +64374,10 @@
       "en": "Prince Albert [Saskatchewan]",
       "zh": "阿尔伯特王子城"
     },
+    "Prince Edward Island": {
+      "en": "Prince Edward Island",
+      "zh": "爱德华王子岛"
+    },
     "Prince George's": {
       "en": "Prince George's",
       "zh": "乔治王子城"
@@ -64377,6 +64633,10 @@
     "Pudukkottai (IN)": {
       "en": "Pudukkottai (IN)",
       "zh": "普杜科泰"
+    },
+    "Puebla": {
+      "en": "Puebla",
+      "zh": "普埃布拉"
     },
     "Puebla Zone 1": {
       "en": "Puebla Zone 1",
@@ -65770,6 +66030,10 @@
       "en": "Qubadli (AZ)",
       "zh": "古巴德利"
     },
+    "Quebec": {
+      "en": "Quebec",
+      "zh": "魁北克"
+    },
     "Queens": {
       "en": "Queens",
       "zh": "皇后区"
@@ -65789,6 +66053,10 @@
     "Queensland (AU)": {
       "en": "Queensland (AU)",
       "zh": "昆士兰州"
+    },
+    "Querétaro": {
+      "en": "Querétaro",
+      "zh": "克雷塔罗"
     },
     "Querétaro Zone 1": {
       "en": "Querétaro Zone 1",
@@ -65897,6 +66165,10 @@
     "Quindío (CO)": {
       "en": "Quindío (CO)",
       "zh": "金迪奥"
+    },
+    "Quintana Roo": {
+      "en": "Quintana Roo",
+      "zh": "金塔纳罗奥州"
     },
     "Quintana Roo Zone 1": {
       "en": "Quintana Roo Zone 1",
@@ -66612,11 +66884,11 @@
     },
     "Raychikhinsk": {
       "en": "Raychikhinsk",
-      "zh": "Raychikhinsk"
+      "zh": "雷奇欣斯克"
     },
     "Raychikhinsk (RU)": {
       "en": "Raychikhinsk (RU)",
-      "zh": "Raychikhinsk (RU)"
+      "zh": "雷奇欣斯克 (俄罗斯)"
     },
     "Raymah": {
       "en": "Raymah",
@@ -66764,7 +67036,7 @@
     },
     "Reformed Government of China": {
       "en": "Reformed Government of China",
-      "zh": "Reformed Government of China"
+      "zh": "中华民国维新政府"
     },
     "Refugio": {
       "en": "Refugio",
@@ -66916,35 +67188,35 @@
     },
     "Reichskommissariat Belgien-Nordfrankreich": {
       "en": "Reichskommissariat Belgien-Nordfrankreich",
-      "zh": "Reichskommissariat Belgien-Nordfrankreich"
+      "zh": "比利时北法兰克帝国总督府"
     },
     "Reichskommissariat Kaukasien": {
       "en": "Reichskommissariat Kaukasien",
-      "zh": "Reichskommissariat Kaukasien"
+      "zh": "高加索专员辖区"
     },
     "Reichskommissariat Moskowien": {
       "en": "Reichskommissariat Moskowien",
-      "zh": "Reichskommissariat Moskowien"
+      "zh": "莫斯科专员辖区"
     },
     "Reichskommissariat Niederlande": {
       "en": "Reichskommissariat Niederlande",
-      "zh": "Reichskommissariat Niederlande"
+      "zh": "荷兰专员辖区"
     },
     "Reichskommissariat Norwegen": {
       "en": "Reichskommissariat Norwegen",
-      "zh": "Reichskommissariat Norwegen"
+      "zh": "挪威专员辖区"
     },
     "Reichskommissariat Ostland": {
       "en": "Reichskommissariat Ostland",
-      "zh": "Reichskommissariat Ostland"
+      "zh": "东方专员辖区"
     },
     "Reichskommissariat Polen": {
       "en": "Reichskommissariat Polen",
-      "zh": "Reichskommissariat Polen"
+      "zh": "波兰专员辖区"
     },
     "Reichskommissariat Ukraine": {
       "en": "Reichskommissariat Ukraine",
-      "zh": "Reichskommissariat Ukraine"
+      "zh": "乌克兰专员辖区"
     },
     "Reims": {
       "en": "Reims",
@@ -67301,6 +67573,10 @@
     "Rheintal-Bodenseegebiet (AT)": {
       "en": "Rheintal-Bodenseegebiet (AT)",
       "zh": "莱茵河谷-博登湖地区"
+    },
+    "Rhode Island": {
+      "en": "Rhode Island",
+      "zh": "罗德岛州"
     },
     "Rhondda, Cynon, Taff": {
       "en": "Rhondda, Cynon, Taff",
@@ -67868,11 +68144,11 @@
     },
     "Romnensky District": {
       "en": "Romnensky District",
-      "zh": "Romnensky District"
+      "zh": "罗姆年斯基区"
     },
     "Romnensky District (RU)": {
       "en": "Romnensky District (RU)",
-      "zh": "Romnensky District (RU)"
+      "zh": "罗姆年斯基区（俄罗斯）"
     },
     "Romny": {
       "en": "Romny",
@@ -69956,19 +70232,19 @@
     },
     "Russia Shell Fallback 148": {
       "en": "Russia Shell Fallback 148",
-      "zh": "Russia Shell Fallback 148"
+      "zh": "俄罗斯壳牌后备 148"
     },
     "Russia Shell Fallback 148 (RU)": {
       "en": "Russia Shell Fallback 148 (RU)",
-      "zh": "Russia Shell Fallback 148 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 148 (RU)"
     },
     "Russia Shell Fallback 149": {
       "en": "Russia Shell Fallback 149",
-      "zh": "Russia Shell Fallback 149"
+      "zh": "俄罗斯壳牌后备 149"
     },
     "Russia Shell Fallback 149 (RU)": {
       "en": "Russia Shell Fallback 149 (RU)",
-      "zh": "Russia Shell Fallback 149 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 149 (RU)"
     },
     "Russia Shell Fallback 15": {
       "en": "Russia Shell Fallback 15",
@@ -69980,83 +70256,83 @@
     },
     "Russia Shell Fallback 150": {
       "en": "Russia Shell Fallback 150",
-      "zh": "Russia Shell Fallback 150"
+      "zh": "俄罗斯壳牌后备 150"
     },
     "Russia Shell Fallback 150 (RU)": {
       "en": "Russia Shell Fallback 150 (RU)",
-      "zh": "Russia Shell Fallback 150 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 150 (RU)"
     },
     "Russia Shell Fallback 151": {
       "en": "Russia Shell Fallback 151",
-      "zh": "Russia Shell Fallback 151"
+      "zh": "俄罗斯壳牌后备 151"
     },
     "Russia Shell Fallback 151 (RU)": {
       "en": "Russia Shell Fallback 151 (RU)",
-      "zh": "Russia Shell Fallback 151 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 151 (RU)"
     },
     "Russia Shell Fallback 152": {
       "en": "Russia Shell Fallback 152",
-      "zh": "Russia Shell Fallback 152"
+      "zh": "俄罗斯壳牌后备 152"
     },
     "Russia Shell Fallback 152 (RU)": {
       "en": "Russia Shell Fallback 152 (RU)",
-      "zh": "Russia Shell Fallback 152 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 152 (RU)"
     },
     "Russia Shell Fallback 153": {
       "en": "Russia Shell Fallback 153",
-      "zh": "Russia Shell Fallback 153"
+      "zh": "俄罗斯壳牌后备 153"
     },
     "Russia Shell Fallback 153 (RU)": {
       "en": "Russia Shell Fallback 153 (RU)",
-      "zh": "Russia Shell Fallback 153 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 153 (RU)"
     },
     "Russia Shell Fallback 154": {
       "en": "Russia Shell Fallback 154",
-      "zh": "Russia Shell Fallback 154"
+      "zh": "俄罗斯壳牌后备 154"
     },
     "Russia Shell Fallback 154 (RU)": {
       "en": "Russia Shell Fallback 154 (RU)",
-      "zh": "Russia Shell Fallback 154 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 154 (RU)"
     },
     "Russia Shell Fallback 155": {
       "en": "Russia Shell Fallback 155",
-      "zh": "Russia Shell Fallback 155"
+      "zh": "俄罗斯壳牌后备 155"
     },
     "Russia Shell Fallback 155 (RU)": {
       "en": "Russia Shell Fallback 155 (RU)",
-      "zh": "Russia Shell Fallback 155 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 155 (RU)"
     },
     "Russia Shell Fallback 156": {
       "en": "Russia Shell Fallback 156",
-      "zh": "Russia Shell Fallback 156"
+      "zh": "俄罗斯壳牌后备 156"
     },
     "Russia Shell Fallback 156 (RU)": {
       "en": "Russia Shell Fallback 156 (RU)",
-      "zh": "Russia Shell Fallback 156 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 156 (RU)"
     },
     "Russia Shell Fallback 157": {
       "en": "Russia Shell Fallback 157",
-      "zh": "Russia Shell Fallback 157"
+      "zh": "俄罗斯壳牌后备 157"
     },
     "Russia Shell Fallback 157 (RU)": {
       "en": "Russia Shell Fallback 157 (RU)",
-      "zh": "Russia Shell Fallback 157 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 157 (RU)"
     },
     "Russia Shell Fallback 158": {
       "en": "Russia Shell Fallback 158",
-      "zh": "Russia Shell Fallback 158"
+      "zh": "俄罗斯壳牌后备 158"
     },
     "Russia Shell Fallback 158 (RU)": {
       "en": "Russia Shell Fallback 158 (RU)",
-      "zh": "Russia Shell Fallback 158 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 158 (RU)"
     },
     "Russia Shell Fallback 159": {
       "en": "Russia Shell Fallback 159",
-      "zh": "Russia Shell Fallback 159"
+      "zh": "俄罗斯壳牌后备 159"
     },
     "Russia Shell Fallback 159 (RU)": {
       "en": "Russia Shell Fallback 159 (RU)",
-      "zh": "Russia Shell Fallback 159 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 159 (RU)"
     },
     "Russia Shell Fallback 16": {
       "en": "Russia Shell Fallback 16",
@@ -70068,83 +70344,83 @@
     },
     "Russia Shell Fallback 160": {
       "en": "Russia Shell Fallback 160",
-      "zh": "Russia Shell Fallback 160"
+      "zh": "俄罗斯壳牌 Fallback 160"
     },
     "Russia Shell Fallback 160 (RU)": {
       "en": "Russia Shell Fallback 160 (RU)",
-      "zh": "Russia Shell Fallback 160 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 160 (RU)"
     },
     "Russia Shell Fallback 161": {
       "en": "Russia Shell Fallback 161",
-      "zh": "Russia Shell Fallback 161"
+      "zh": "俄罗斯壳牌后备 161"
     },
     "Russia Shell Fallback 161 (RU)": {
       "en": "Russia Shell Fallback 161 (RU)",
-      "zh": "Russia Shell Fallback 161 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 161 (RU)"
     },
     "Russia Shell Fallback 162": {
       "en": "Russia Shell Fallback 162",
-      "zh": "Russia Shell Fallback 162"
+      "zh": "俄罗斯壳牌后备 162"
     },
     "Russia Shell Fallback 162 (RU)": {
       "en": "Russia Shell Fallback 162 (RU)",
-      "zh": "Russia Shell Fallback 162 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 162 (RU)"
     },
     "Russia Shell Fallback 163": {
       "en": "Russia Shell Fallback 163",
-      "zh": "Russia Shell Fallback 163"
+      "zh": "俄罗斯壳牌后备 163"
     },
     "Russia Shell Fallback 163 (RU)": {
       "en": "Russia Shell Fallback 163 (RU)",
-      "zh": "Russia Shell Fallback 163 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 163 (RU)"
     },
     "Russia Shell Fallback 164": {
       "en": "Russia Shell Fallback 164",
-      "zh": "Russia Shell Fallback 164"
+      "zh": "俄罗斯壳牌后备 164"
     },
     "Russia Shell Fallback 164 (RU)": {
       "en": "Russia Shell Fallback 164 (RU)",
-      "zh": "Russia Shell Fallback 164 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 164 (RU)"
     },
     "Russia Shell Fallback 165": {
       "en": "Russia Shell Fallback 165",
-      "zh": "Russia Shell Fallback 165"
+      "zh": "俄罗斯壳牌后备 165"
     },
     "Russia Shell Fallback 165 (RU)": {
       "en": "Russia Shell Fallback 165 (RU)",
-      "zh": "Russia Shell Fallback 165 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 165 (RU)"
     },
     "Russia Shell Fallback 166": {
       "en": "Russia Shell Fallback 166",
-      "zh": "Russia Shell Fallback 166"
+      "zh": "俄罗斯壳牌后备 166"
     },
     "Russia Shell Fallback 166 (RU)": {
       "en": "Russia Shell Fallback 166 (RU)",
-      "zh": "Russia Shell Fallback 166 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 166 (RU)"
     },
     "Russia Shell Fallback 167": {
       "en": "Russia Shell Fallback 167",
-      "zh": "Russia Shell Fallback 167"
+      "zh": "俄罗斯壳牌后备 167"
     },
     "Russia Shell Fallback 167 (RU)": {
       "en": "Russia Shell Fallback 167 (RU)",
-      "zh": "Russia Shell Fallback 167 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 167 (RU)"
     },
     "Russia Shell Fallback 168": {
       "en": "Russia Shell Fallback 168",
-      "zh": "Russia Shell Fallback 168"
+      "zh": "俄罗斯壳牌后备 168"
     },
     "Russia Shell Fallback 168 (RU)": {
       "en": "Russia Shell Fallback 168 (RU)",
-      "zh": "Russia Shell Fallback 168 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 168 (RU)"
     },
     "Russia Shell Fallback 169": {
       "en": "Russia Shell Fallback 169",
-      "zh": "Russia Shell Fallback 169"
+      "zh": "俄罗斯壳牌后备 169"
     },
     "Russia Shell Fallback 169 (RU)": {
       "en": "Russia Shell Fallback 169 (RU)",
-      "zh": "Russia Shell Fallback 169 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 169 (RU)"
     },
     "Russia Shell Fallback 17": {
       "en": "Russia Shell Fallback 17",
@@ -70156,83 +70432,83 @@
     },
     "Russia Shell Fallback 170": {
       "en": "Russia Shell Fallback 170",
-      "zh": "Russia Shell Fallback 170"
+      "zh": "俄罗斯壳牌后备 170"
     },
     "Russia Shell Fallback 170 (RU)": {
       "en": "Russia Shell Fallback 170 (RU)",
-      "zh": "Russia Shell Fallback 170 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 170 (RU)"
     },
     "Russia Shell Fallback 171": {
       "en": "Russia Shell Fallback 171",
-      "zh": "Russia Shell Fallback 171"
+      "zh": "俄罗斯壳牌后备 171"
     },
     "Russia Shell Fallback 171 (RU)": {
       "en": "Russia Shell Fallback 171 (RU)",
-      "zh": "Russia Shell Fallback 171 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 171 (RU)"
     },
     "Russia Shell Fallback 172": {
       "en": "Russia Shell Fallback 172",
-      "zh": "Russia Shell Fallback 172"
+      "zh": "俄罗斯壳牌后备 172"
     },
     "Russia Shell Fallback 172 (RU)": {
       "en": "Russia Shell Fallback 172 (RU)",
-      "zh": "Russia Shell Fallback 172 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 172 (RU)"
     },
     "Russia Shell Fallback 173": {
       "en": "Russia Shell Fallback 173",
-      "zh": "Russia Shell Fallback 173"
+      "zh": "俄罗斯壳牌后备 173"
     },
     "Russia Shell Fallback 173 (RU)": {
       "en": "Russia Shell Fallback 173 (RU)",
-      "zh": "Russia Shell Fallback 173 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 173 (RU)"
     },
     "Russia Shell Fallback 174": {
       "en": "Russia Shell Fallback 174",
-      "zh": "Russia Shell Fallback 174"
+      "zh": "俄罗斯壳牌后备 174"
     },
     "Russia Shell Fallback 174 (RU)": {
       "en": "Russia Shell Fallback 174 (RU)",
-      "zh": "Russia Shell Fallback 174 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 174 (RU)"
     },
     "Russia Shell Fallback 175": {
       "en": "Russia Shell Fallback 175",
-      "zh": "Russia Shell Fallback 175"
+      "zh": "俄罗斯壳牌后备 175"
     },
     "Russia Shell Fallback 175 (RU)": {
       "en": "Russia Shell Fallback 175 (RU)",
-      "zh": "Russia Shell Fallback 175 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 175 (RU)"
     },
     "Russia Shell Fallback 176": {
       "en": "Russia Shell Fallback 176",
-      "zh": "Russia Shell Fallback 176"
+      "zh": "俄罗斯壳牌后备 176"
     },
     "Russia Shell Fallback 176 (RU)": {
       "en": "Russia Shell Fallback 176 (RU)",
-      "zh": "Russia Shell Fallback 176 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 176 (RU)"
     },
     "Russia Shell Fallback 177": {
       "en": "Russia Shell Fallback 177",
-      "zh": "Russia Shell Fallback 177"
+      "zh": "俄罗斯壳牌后备 177"
     },
     "Russia Shell Fallback 177 (RU)": {
       "en": "Russia Shell Fallback 177 (RU)",
-      "zh": "Russia Shell Fallback 177 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 177 (RU)"
     },
     "Russia Shell Fallback 178": {
       "en": "Russia Shell Fallback 178",
-      "zh": "Russia Shell Fallback 178"
+      "zh": "俄罗斯壳牌后备 178"
     },
     "Russia Shell Fallback 178 (RU)": {
       "en": "Russia Shell Fallback 178 (RU)",
-      "zh": "Russia Shell Fallback 178 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 178 (RU)"
     },
     "Russia Shell Fallback 179": {
       "en": "Russia Shell Fallback 179",
-      "zh": "Russia Shell Fallback 179"
+      "zh": "俄罗斯壳牌后备 179"
     },
     "Russia Shell Fallback 179 (RU)": {
       "en": "Russia Shell Fallback 179 (RU)",
-      "zh": "Russia Shell Fallback 179 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 179 (RU)"
     },
     "Russia Shell Fallback 18": {
       "en": "Russia Shell Fallback 18",
@@ -70244,83 +70520,83 @@
     },
     "Russia Shell Fallback 180": {
       "en": "Russia Shell Fallback 180",
-      "zh": "Russia Shell Fallback 180"
+      "zh": "俄罗斯壳牌 Fallback 180"
     },
     "Russia Shell Fallback 180 (RU)": {
       "en": "Russia Shell Fallback 180 (RU)",
-      "zh": "Russia Shell Fallback 180 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 180 (RU)"
     },
     "Russia Shell Fallback 181": {
       "en": "Russia Shell Fallback 181",
-      "zh": "Russia Shell Fallback 181"
+      "zh": "俄罗斯壳牌后备 181"
     },
     "Russia Shell Fallback 181 (RU)": {
       "en": "Russia Shell Fallback 181 (RU)",
-      "zh": "Russia Shell Fallback 181 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 181 (RU)"
     },
     "Russia Shell Fallback 182": {
       "en": "Russia Shell Fallback 182",
-      "zh": "Russia Shell Fallback 182"
+      "zh": "俄罗斯壳牌后备 182"
     },
     "Russia Shell Fallback 182 (RU)": {
       "en": "Russia Shell Fallback 182 (RU)",
-      "zh": "Russia Shell Fallback 182 (RU)"
+      "zh": "俄罗斯壳牌后备 182"
     },
     "Russia Shell Fallback 183": {
       "en": "Russia Shell Fallback 183",
-      "zh": "Russia Shell Fallback 183"
+      "zh": "俄罗斯壳牌后备 183"
     },
     "Russia Shell Fallback 183 (RU)": {
       "en": "Russia Shell Fallback 183 (RU)",
-      "zh": "Russia Shell Fallback 183 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 183 (RU)"
     },
     "Russia Shell Fallback 184": {
       "en": "Russia Shell Fallback 184",
-      "zh": "Russia Shell Fallback 184"
+      "zh": "俄罗斯壳牌后备 184"
     },
     "Russia Shell Fallback 184 (RU)": {
       "en": "Russia Shell Fallback 184 (RU)",
-      "zh": "Russia Shell Fallback 184 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 184 (RU)"
     },
     "Russia Shell Fallback 185": {
       "en": "Russia Shell Fallback 185",
-      "zh": "Russia Shell Fallback 185"
+      "zh": "俄罗斯壳牌后备 185"
     },
     "Russia Shell Fallback 185 (RU)": {
       "en": "Russia Shell Fallback 185 (RU)",
-      "zh": "Russia Shell Fallback 185 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 185 (RU)"
     },
     "Russia Shell Fallback 186": {
       "en": "Russia Shell Fallback 186",
-      "zh": "Russia Shell Fallback 186"
+      "zh": "俄罗斯壳牌后备 186"
     },
     "Russia Shell Fallback 186 (RU)": {
       "en": "Russia Shell Fallback 186 (RU)",
-      "zh": "Russia Shell Fallback 186 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 186 (RU)"
     },
     "Russia Shell Fallback 187": {
       "en": "Russia Shell Fallback 187",
-      "zh": "Russia Shell Fallback 187"
+      "zh": "俄罗斯壳牌后备 187"
     },
     "Russia Shell Fallback 187 (RU)": {
       "en": "Russia Shell Fallback 187 (RU)",
-      "zh": "Russia Shell Fallback 187 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 187 (RU)"
     },
     "Russia Shell Fallback 188": {
       "en": "Russia Shell Fallback 188",
-      "zh": "Russia Shell Fallback 188"
+      "zh": "俄罗斯壳牌后备 188"
     },
     "Russia Shell Fallback 188 (RU)": {
       "en": "Russia Shell Fallback 188 (RU)",
-      "zh": "Russia Shell Fallback 188 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 188 (RU)"
     },
     "Russia Shell Fallback 189": {
       "en": "Russia Shell Fallback 189",
-      "zh": "Russia Shell Fallback 189"
+      "zh": "俄罗斯壳牌后备 189"
     },
     "Russia Shell Fallback 189 (RU)": {
       "en": "Russia Shell Fallback 189 (RU)",
-      "zh": "Russia Shell Fallback 189 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 189 (RU)"
     },
     "Russia Shell Fallback 19": {
       "en": "Russia Shell Fallback 19",
@@ -70332,83 +70608,83 @@
     },
     "Russia Shell Fallback 190": {
       "en": "Russia Shell Fallback 190",
-      "zh": "Russia Shell Fallback 190"
+      "zh": "俄罗斯壳牌后备 190"
     },
     "Russia Shell Fallback 190 (RU)": {
       "en": "Russia Shell Fallback 190 (RU)",
-      "zh": "Russia Shell Fallback 190 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 190 (RU)"
     },
     "Russia Shell Fallback 191": {
       "en": "Russia Shell Fallback 191",
-      "zh": "Russia Shell Fallback 191"
+      "zh": "俄罗斯壳牌后备 191"
     },
     "Russia Shell Fallback 191 (RU)": {
       "en": "Russia Shell Fallback 191 (RU)",
-      "zh": "Russia Shell Fallback 191 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 191 (RU)"
     },
     "Russia Shell Fallback 192": {
       "en": "Russia Shell Fallback 192",
-      "zh": "Russia Shell Fallback 192"
+      "zh": "俄罗斯壳牌后备 192"
     },
     "Russia Shell Fallback 192 (RU)": {
       "en": "Russia Shell Fallback 192 (RU)",
-      "zh": "Russia Shell Fallback 192 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 192 (RU)"
     },
     "Russia Shell Fallback 193": {
       "en": "Russia Shell Fallback 193",
-      "zh": "Russia Shell Fallback 193"
+      "zh": "俄罗斯壳牌后备 193"
     },
     "Russia Shell Fallback 193 (RU)": {
       "en": "Russia Shell Fallback 193 (RU)",
-      "zh": "Russia Shell Fallback 193 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 193 (RU)"
     },
     "Russia Shell Fallback 194": {
       "en": "Russia Shell Fallback 194",
-      "zh": "Russia Shell Fallback 194"
+      "zh": "俄罗斯壳牌后备 194"
     },
     "Russia Shell Fallback 194 (RU)": {
       "en": "Russia Shell Fallback 194 (RU)",
-      "zh": "Russia Shell Fallback 194 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 194 (RU)"
     },
     "Russia Shell Fallback 195": {
       "en": "Russia Shell Fallback 195",
-      "zh": "Russia Shell Fallback 195"
+      "zh": "俄罗斯壳牌后备 195"
     },
     "Russia Shell Fallback 195 (RU)": {
       "en": "Russia Shell Fallback 195 (RU)",
-      "zh": "Russia Shell Fallback 195 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 195 (RU)"
     },
     "Russia Shell Fallback 196": {
       "en": "Russia Shell Fallback 196",
-      "zh": "Russia Shell Fallback 196"
+      "zh": "俄罗斯壳牌后备 196"
     },
     "Russia Shell Fallback 196 (RU)": {
       "en": "Russia Shell Fallback 196 (RU)",
-      "zh": "Russia Shell Fallback 196 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 196 (RU)"
     },
     "Russia Shell Fallback 197": {
       "en": "Russia Shell Fallback 197",
-      "zh": "Russia Shell Fallback 197"
+      "zh": "俄罗斯壳牌后备 197"
     },
     "Russia Shell Fallback 197 (RU)": {
       "en": "Russia Shell Fallback 197 (RU)",
-      "zh": "Russia Shell Fallback 197 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 197 (RU)"
     },
     "Russia Shell Fallback 198": {
       "en": "Russia Shell Fallback 198",
-      "zh": "Russia Shell Fallback 198"
+      "zh": "俄罗斯壳牌后备 198"
     },
     "Russia Shell Fallback 198 (RU)": {
       "en": "Russia Shell Fallback 198 (RU)",
-      "zh": "Russia Shell Fallback 198 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 198 (RU)"
     },
     "Russia Shell Fallback 199": {
       "en": "Russia Shell Fallback 199",
-      "zh": "Russia Shell Fallback 199"
+      "zh": "俄罗斯壳牌后备 199"
     },
     "Russia Shell Fallback 199 (RU)": {
       "en": "Russia Shell Fallback 199 (RU)",
-      "zh": "Russia Shell Fallback 199 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 199 (RU)"
     },
     "Russia Shell Fallback 2": {
       "en": "Russia Shell Fallback 2",
@@ -70428,83 +70704,83 @@
     },
     "Russia Shell Fallback 200": {
       "en": "Russia Shell Fallback 200",
-      "zh": "Russia Shell Fallback 200"
+      "zh": "俄罗斯壳牌 Fallback 200"
     },
     "Russia Shell Fallback 200 (RU)": {
       "en": "Russia Shell Fallback 200 (RU)",
-      "zh": "Russia Shell Fallback 200 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 200 (RU)"
     },
     "Russia Shell Fallback 201": {
       "en": "Russia Shell Fallback 201",
-      "zh": "Russia Shell Fallback 201"
+      "zh": "俄罗斯壳牌后备 201"
     },
     "Russia Shell Fallback 201 (RU)": {
       "en": "Russia Shell Fallback 201 (RU)",
-      "zh": "Russia Shell Fallback 201 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 201 (RU)"
     },
     "Russia Shell Fallback 202": {
       "en": "Russia Shell Fallback 202",
-      "zh": "Russia Shell Fallback 202"
+      "zh": "俄罗斯壳牌后备 202"
     },
     "Russia Shell Fallback 202 (RU)": {
       "en": "Russia Shell Fallback 202 (RU)",
-      "zh": "Russia Shell Fallback 202 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 202 (RU)"
     },
     "Russia Shell Fallback 203": {
       "en": "Russia Shell Fallback 203",
-      "zh": "Russia Shell Fallback 203"
+      "zh": "俄罗斯壳牌后备 203"
     },
     "Russia Shell Fallback 203 (RU)": {
       "en": "Russia Shell Fallback 203 (RU)",
-      "zh": "Russia Shell Fallback 203 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 203 (RU)"
     },
     "Russia Shell Fallback 204": {
       "en": "Russia Shell Fallback 204",
-      "zh": "Russia Shell Fallback 204"
+      "zh": "俄罗斯壳牌后备 204"
     },
     "Russia Shell Fallback 204 (RU)": {
       "en": "Russia Shell Fallback 204 (RU)",
-      "zh": "Russia Shell Fallback 204 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 204 (RU)"
     },
     "Russia Shell Fallback 205": {
       "en": "Russia Shell Fallback 205",
-      "zh": "Russia Shell Fallback 205"
+      "zh": "俄罗斯壳牌后备 205"
     },
     "Russia Shell Fallback 205 (RU)": {
       "en": "Russia Shell Fallback 205 (RU)",
-      "zh": "Russia Shell Fallback 205 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 205 (RU)"
     },
     "Russia Shell Fallback 206": {
       "en": "Russia Shell Fallback 206",
-      "zh": "Russia Shell Fallback 206"
+      "zh": "俄罗斯壳牌后备 206"
     },
     "Russia Shell Fallback 206 (RU)": {
       "en": "Russia Shell Fallback 206 (RU)",
-      "zh": "Russia Shell Fallback 206 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 206 (RU)"
     },
     "Russia Shell Fallback 207": {
       "en": "Russia Shell Fallback 207",
-      "zh": "Russia Shell Fallback 207"
+      "zh": "俄罗斯壳牌后备 207"
     },
     "Russia Shell Fallback 207 (RU)": {
       "en": "Russia Shell Fallback 207 (RU)",
-      "zh": "Russia Shell Fallback 207 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 207 (RU)"
     },
     "Russia Shell Fallback 208": {
       "en": "Russia Shell Fallback 208",
-      "zh": "Russia Shell Fallback 208"
+      "zh": "俄罗斯壳牌后备 208"
     },
     "Russia Shell Fallback 208 (RU)": {
       "en": "Russia Shell Fallback 208 (RU)",
-      "zh": "Russia Shell Fallback 208 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 208 (RU)"
     },
     "Russia Shell Fallback 209": {
       "en": "Russia Shell Fallback 209",
-      "zh": "Russia Shell Fallback 209"
+      "zh": "俄罗斯壳牌后备 209"
     },
     "Russia Shell Fallback 209 (RU)": {
       "en": "Russia Shell Fallback 209 (RU)",
-      "zh": "Russia Shell Fallback 209 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 209 (RU)"
     },
     "Russia Shell Fallback 21": {
       "en": "Russia Shell Fallback 21",
@@ -70516,83 +70792,83 @@
     },
     "Russia Shell Fallback 210": {
       "en": "Russia Shell Fallback 210",
-      "zh": "Russia Shell Fallback 210"
+      "zh": "俄罗斯壳牌 Fallback 210"
     },
     "Russia Shell Fallback 210 (RU)": {
       "en": "Russia Shell Fallback 210 (RU)",
-      "zh": "Russia Shell Fallback 210 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 210 (RU)"
     },
     "Russia Shell Fallback 211": {
       "en": "Russia Shell Fallback 211",
-      "zh": "Russia Shell Fallback 211"
+      "zh": "俄罗斯壳牌后备 211"
     },
     "Russia Shell Fallback 211 (RU)": {
       "en": "Russia Shell Fallback 211 (RU)",
-      "zh": "Russia Shell Fallback 211 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 211 (RU)"
     },
     "Russia Shell Fallback 212": {
       "en": "Russia Shell Fallback 212",
-      "zh": "Russia Shell Fallback 212"
+      "zh": "俄罗斯壳牌后备 212"
     },
     "Russia Shell Fallback 212 (RU)": {
       "en": "Russia Shell Fallback 212 (RU)",
-      "zh": "Russia Shell Fallback 212 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 212 (RU)"
     },
     "Russia Shell Fallback 213": {
       "en": "Russia Shell Fallback 213",
-      "zh": "Russia Shell Fallback 213"
+      "zh": "俄罗斯壳牌后备 213"
     },
     "Russia Shell Fallback 213 (RU)": {
       "en": "Russia Shell Fallback 213 (RU)",
-      "zh": "Russia Shell Fallback 213 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 213 (RU)"
     },
     "Russia Shell Fallback 214": {
       "en": "Russia Shell Fallback 214",
-      "zh": "Russia Shell Fallback 214"
+      "zh": "俄罗斯壳牌后备 214"
     },
     "Russia Shell Fallback 214 (RU)": {
       "en": "Russia Shell Fallback 214 (RU)",
-      "zh": "Russia Shell Fallback 214 (RU)"
+      "zh": "俄罗斯壳牌后备 214 (RU)"
     },
     "Russia Shell Fallback 215": {
       "en": "Russia Shell Fallback 215",
-      "zh": "Russia Shell Fallback 215"
+      "zh": "俄罗斯壳牌后备 215"
     },
     "Russia Shell Fallback 215 (RU)": {
       "en": "Russia Shell Fallback 215 (RU)",
-      "zh": "Russia Shell Fallback 215 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 215 (RU)"
     },
     "Russia Shell Fallback 216": {
       "en": "Russia Shell Fallback 216",
-      "zh": "Russia Shell Fallback 216"
+      "zh": "俄罗斯壳牌后备 216"
     },
     "Russia Shell Fallback 216 (RU)": {
       "en": "Russia Shell Fallback 216 (RU)",
-      "zh": "Russia Shell Fallback 216 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 216 (RU)"
     },
     "Russia Shell Fallback 217": {
       "en": "Russia Shell Fallback 217",
-      "zh": "Russia Shell Fallback 217"
+      "zh": "俄罗斯壳牌后备 217"
     },
     "Russia Shell Fallback 217 (RU)": {
       "en": "Russia Shell Fallback 217 (RU)",
-      "zh": "Russia Shell Fallback 217 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 217 (RU)"
     },
     "Russia Shell Fallback 218": {
       "en": "Russia Shell Fallback 218",
-      "zh": "Russia Shell Fallback 218"
+      "zh": "俄罗斯壳牌后备 218"
     },
     "Russia Shell Fallback 218 (RU)": {
       "en": "Russia Shell Fallback 218 (RU)",
-      "zh": "Russia Shell Fallback 218 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 218 (RU)"
     },
     "Russia Shell Fallback 219": {
       "en": "Russia Shell Fallback 219",
-      "zh": "Russia Shell Fallback 219"
+      "zh": "俄罗斯壳牌后备 219"
     },
     "Russia Shell Fallback 219 (RU)": {
       "en": "Russia Shell Fallback 219 (RU)",
-      "zh": "Russia Shell Fallback 219 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 219 (RU)"
     },
     "Russia Shell Fallback 22": {
       "en": "Russia Shell Fallback 22",
@@ -70604,83 +70880,83 @@
     },
     "Russia Shell Fallback 220": {
       "en": "Russia Shell Fallback 220",
-      "zh": "Russia Shell Fallback 220"
+      "zh": "俄罗斯壳牌 Fallback 220"
     },
     "Russia Shell Fallback 220 (RU)": {
       "en": "Russia Shell Fallback 220 (RU)",
-      "zh": "Russia Shell Fallback 220 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 220 (RU)"
     },
     "Russia Shell Fallback 221": {
       "en": "Russia Shell Fallback 221",
-      "zh": "Russia Shell Fallback 221"
+      "zh": "俄罗斯壳牌后备 221"
     },
     "Russia Shell Fallback 221 (RU)": {
       "en": "Russia Shell Fallback 221 (RU)",
-      "zh": "Russia Shell Fallback 221 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 221 (RU)"
     },
     "Russia Shell Fallback 222": {
       "en": "Russia Shell Fallback 222",
-      "zh": "Russia Shell Fallback 222"
+      "zh": "俄罗斯壳牌后备 222"
     },
     "Russia Shell Fallback 222 (RU)": {
       "en": "Russia Shell Fallback 222 (RU)",
-      "zh": "Russia Shell Fallback 222 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 222 (RU)"
     },
     "Russia Shell Fallback 223": {
       "en": "Russia Shell Fallback 223",
-      "zh": "Russia Shell Fallback 223"
+      "zh": "俄罗斯壳牌后备 223"
     },
     "Russia Shell Fallback 223 (RU)": {
       "en": "Russia Shell Fallback 223 (RU)",
-      "zh": "Russia Shell Fallback 223 (RU)"
+      "zh": "俄罗斯壳牌后备 223 (RU)"
     },
     "Russia Shell Fallback 224": {
       "en": "Russia Shell Fallback 224",
-      "zh": "Russia Shell Fallback 224"
+      "zh": "俄罗斯壳牌后备 224"
     },
     "Russia Shell Fallback 224 (RU)": {
       "en": "Russia Shell Fallback 224 (RU)",
-      "zh": "Russia Shell Fallback 224 (RU)"
+      "zh": "俄罗斯壳牌后备 224 (RU)"
     },
     "Russia Shell Fallback 225": {
       "en": "Russia Shell Fallback 225",
-      "zh": "Russia Shell Fallback 225"
+      "zh": "俄罗斯壳牌后备 225"
     },
     "Russia Shell Fallback 225 (RU)": {
       "en": "Russia Shell Fallback 225 (RU)",
-      "zh": "Russia Shell Fallback 225 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 225 (RU)"
     },
     "Russia Shell Fallback 226": {
       "en": "Russia Shell Fallback 226",
-      "zh": "Russia Shell Fallback 226"
+      "zh": "俄罗斯壳牌后备 226"
     },
     "Russia Shell Fallback 226 (RU)": {
       "en": "Russia Shell Fallback 226 (RU)",
-      "zh": "Russia Shell Fallback 226 (RU)"
+      "zh": "俄罗斯壳牌后备 226 (RU)"
     },
     "Russia Shell Fallback 227": {
       "en": "Russia Shell Fallback 227",
-      "zh": "Russia Shell Fallback 227"
+      "zh": "俄罗斯壳牌后备 227"
     },
     "Russia Shell Fallback 227 (RU)": {
       "en": "Russia Shell Fallback 227 (RU)",
-      "zh": "Russia Shell Fallback 227 (RU)"
+      "zh": "俄罗斯壳牌后备 227 (RU)"
     },
     "Russia Shell Fallback 228": {
       "en": "Russia Shell Fallback 228",
-      "zh": "Russia Shell Fallback 228"
+      "zh": "俄罗斯壳牌后备 228"
     },
     "Russia Shell Fallback 228 (RU)": {
       "en": "Russia Shell Fallback 228 (RU)",
-      "zh": "Russia Shell Fallback 228 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 228 (RU)"
     },
     "Russia Shell Fallback 229": {
       "en": "Russia Shell Fallback 229",
-      "zh": "Russia Shell Fallback 229"
+      "zh": "俄罗斯壳牌后备 229"
     },
     "Russia Shell Fallback 229 (RU)": {
       "en": "Russia Shell Fallback 229 (RU)",
-      "zh": "Russia Shell Fallback 229 (RU)"
+      "zh": "俄罗斯壳牌后备 229 (RU)"
     },
     "Russia Shell Fallback 23": {
       "en": "Russia Shell Fallback 23",
@@ -70692,83 +70968,83 @@
     },
     "Russia Shell Fallback 230": {
       "en": "Russia Shell Fallback 230",
-      "zh": "Russia Shell Fallback 230"
+      "zh": "俄罗斯壳牌后备 230"
     },
     "Russia Shell Fallback 230 (RU)": {
       "en": "Russia Shell Fallback 230 (RU)",
-      "zh": "Russia Shell Fallback 230 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 230 (RU)"
     },
     "Russia Shell Fallback 231": {
       "en": "Russia Shell Fallback 231",
-      "zh": "Russia Shell Fallback 231"
+      "zh": "俄罗斯壳牌后备 231"
     },
     "Russia Shell Fallback 231 (RU)": {
       "en": "Russia Shell Fallback 231 (RU)",
-      "zh": "Russia Shell Fallback 231 (RU)"
+      "zh": "俄罗斯壳牌后备 231 (RU)"
     },
     "Russia Shell Fallback 232": {
       "en": "Russia Shell Fallback 232",
-      "zh": "Russia Shell Fallback 232"
+      "zh": "俄罗斯壳牌后备 232"
     },
     "Russia Shell Fallback 232 (RU)": {
       "en": "Russia Shell Fallback 232 (RU)",
-      "zh": "Russia Shell Fallback 232 (RU)"
+      "zh": "俄罗斯壳牌后备 232 (RU)"
     },
     "Russia Shell Fallback 233": {
       "en": "Russia Shell Fallback 233",
-      "zh": "Russia Shell Fallback 233"
+      "zh": "俄罗斯壳牌后备 233"
     },
     "Russia Shell Fallback 233 (RU)": {
       "en": "Russia Shell Fallback 233 (RU)",
-      "zh": "Russia Shell Fallback 233 (RU)"
+      "zh": "俄罗斯壳牌后备 233 (RU)"
     },
     "Russia Shell Fallback 234": {
       "en": "Russia Shell Fallback 234",
-      "zh": "Russia Shell Fallback 234"
+      "zh": "俄罗斯壳牌后备 234"
     },
     "Russia Shell Fallback 234 (RU)": {
       "en": "Russia Shell Fallback 234 (RU)",
-      "zh": "Russia Shell Fallback 234 (RU)"
+      "zh": "俄罗斯壳牌后备 234 (RU)"
     },
     "Russia Shell Fallback 235": {
       "en": "Russia Shell Fallback 235",
-      "zh": "Russia Shell Fallback 235"
+      "zh": "俄罗斯壳牌后备 235"
     },
     "Russia Shell Fallback 235 (RU)": {
       "en": "Russia Shell Fallback 235 (RU)",
-      "zh": "Russia Shell Fallback 235 (RU)"
+      "zh": "俄罗斯壳牌后备 235 (RU)"
     },
     "Russia Shell Fallback 236": {
       "en": "Russia Shell Fallback 236",
-      "zh": "Russia Shell Fallback 236"
+      "zh": "俄罗斯壳牌后备 236"
     },
     "Russia Shell Fallback 236 (RU)": {
       "en": "Russia Shell Fallback 236 (RU)",
-      "zh": "Russia Shell Fallback 236 (RU)"
+      "zh": "俄罗斯壳牌后备 236 (RU)"
     },
     "Russia Shell Fallback 237": {
       "en": "Russia Shell Fallback 237",
-      "zh": "Russia Shell Fallback 237"
+      "zh": "俄罗斯壳牌后备 237"
     },
     "Russia Shell Fallback 237 (RU)": {
       "en": "Russia Shell Fallback 237 (RU)",
-      "zh": "Russia Shell Fallback 237 (RU)"
+      "zh": "俄罗斯壳牌后备 237 (RU)"
     },
     "Russia Shell Fallback 238": {
       "en": "Russia Shell Fallback 238",
-      "zh": "Russia Shell Fallback 238"
+      "zh": "俄罗斯壳牌后备 238"
     },
     "Russia Shell Fallback 238 (RU)": {
       "en": "Russia Shell Fallback 238 (RU)",
-      "zh": "Russia Shell Fallback 238 (RU)"
+      "zh": "俄罗斯壳牌后备 238 (RU)"
     },
     "Russia Shell Fallback 239": {
       "en": "Russia Shell Fallback 239",
-      "zh": "Russia Shell Fallback 239"
+      "zh": "俄罗斯壳牌后备 239"
     },
     "Russia Shell Fallback 239 (RU)": {
       "en": "Russia Shell Fallback 239 (RU)",
-      "zh": "Russia Shell Fallback 239 (RU)"
+      "zh": "俄罗斯壳牌后备 239 (RU)"
     },
     "Russia Shell Fallback 24": {
       "en": "Russia Shell Fallback 24",
@@ -70780,83 +71056,83 @@
     },
     "Russia Shell Fallback 240": {
       "en": "Russia Shell Fallback 240",
-      "zh": "Russia Shell Fallback 240"
+      "zh": "俄罗斯壳牌后备 240"
     },
     "Russia Shell Fallback 240 (RU)": {
       "en": "Russia Shell Fallback 240 (RU)",
-      "zh": "Russia Shell Fallback 240 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 240 (RU)"
     },
     "Russia Shell Fallback 241": {
       "en": "Russia Shell Fallback 241",
-      "zh": "Russia Shell Fallback 241"
+      "zh": "俄罗斯壳牌后备 241"
     },
     "Russia Shell Fallback 241 (RU)": {
       "en": "Russia Shell Fallback 241 (RU)",
-      "zh": "Russia Shell Fallback 241 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 241 (RU)"
     },
     "Russia Shell Fallback 242": {
       "en": "Russia Shell Fallback 242",
-      "zh": "Russia Shell Fallback 242"
+      "zh": "俄罗斯壳牌后备 242"
     },
     "Russia Shell Fallback 242 (RU)": {
       "en": "Russia Shell Fallback 242 (RU)",
-      "zh": "Russia Shell Fallback 242 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 242 (RU)"
     },
     "Russia Shell Fallback 243": {
       "en": "Russia Shell Fallback 243",
-      "zh": "Russia Shell Fallback 243"
+      "zh": "俄罗斯壳牌后备 243"
     },
     "Russia Shell Fallback 243 (RU)": {
       "en": "Russia Shell Fallback 243 (RU)",
-      "zh": "Russia Shell Fallback 243 (RU)"
+      "zh": "俄罗斯壳牌后备 243 (RU)"
     },
     "Russia Shell Fallback 244": {
       "en": "Russia Shell Fallback 244",
-      "zh": "Russia Shell Fallback 244"
+      "zh": "俄罗斯壳牌后备 244"
     },
     "Russia Shell Fallback 244 (RU)": {
       "en": "Russia Shell Fallback 244 (RU)",
-      "zh": "Russia Shell Fallback 244 (RU)"
+      "zh": "俄罗斯壳牌后备 244 (RU)"
     },
     "Russia Shell Fallback 245": {
       "en": "Russia Shell Fallback 245",
-      "zh": "Russia Shell Fallback 245"
+      "zh": "俄罗斯壳牌后备 245"
     },
     "Russia Shell Fallback 245 (RU)": {
       "en": "Russia Shell Fallback 245 (RU)",
-      "zh": "Russia Shell Fallback 245 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 245 (RU)"
     },
     "Russia Shell Fallback 246": {
       "en": "Russia Shell Fallback 246",
-      "zh": "Russia Shell Fallback 246"
+      "zh": "俄罗斯壳牌后备 246"
     },
     "Russia Shell Fallback 246 (RU)": {
       "en": "Russia Shell Fallback 246 (RU)",
-      "zh": "Russia Shell Fallback 246 (RU)"
+      "zh": "俄罗斯壳牌后备 246 (RU)"
     },
     "Russia Shell Fallback 247": {
       "en": "Russia Shell Fallback 247",
-      "zh": "Russia Shell Fallback 247"
+      "zh": "俄罗斯壳牌后备 247"
     },
     "Russia Shell Fallback 247 (RU)": {
       "en": "Russia Shell Fallback 247 (RU)",
-      "zh": "Russia Shell Fallback 247 (RU)"
+      "zh": "俄罗斯壳牌后备 247 (RU)"
     },
     "Russia Shell Fallback 248": {
       "en": "Russia Shell Fallback 248",
-      "zh": "Russia Shell Fallback 248"
+      "zh": "俄罗斯壳牌后备 248"
     },
     "Russia Shell Fallback 248 (RU)": {
       "en": "Russia Shell Fallback 248 (RU)",
-      "zh": "Russia Shell Fallback 248 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 248 (RU)"
     },
     "Russia Shell Fallback 249": {
       "en": "Russia Shell Fallback 249",
-      "zh": "Russia Shell Fallback 249"
+      "zh": "俄罗斯壳牌后备 249"
     },
     "Russia Shell Fallback 249 (RU)": {
       "en": "Russia Shell Fallback 249 (RU)",
-      "zh": "Russia Shell Fallback 249 (RU)"
+      "zh": "俄罗斯壳牌后备 249 (RU)"
     },
     "Russia Shell Fallback 25": {
       "en": "Russia Shell Fallback 25",
@@ -70868,83 +71144,83 @@
     },
     "Russia Shell Fallback 250": {
       "en": "Russia Shell Fallback 250",
-      "zh": "Russia Shell Fallback 250"
+      "zh": "俄罗斯壳牌 Fallback 250"
     },
     "Russia Shell Fallback 250 (RU)": {
       "en": "Russia Shell Fallback 250 (RU)",
-      "zh": "Russia Shell Fallback 250 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 250 (RU)"
     },
     "Russia Shell Fallback 251": {
       "en": "Russia Shell Fallback 251",
-      "zh": "Russia Shell Fallback 251"
+      "zh": "俄罗斯壳牌后备 251"
     },
     "Russia Shell Fallback 251 (RU)": {
       "en": "Russia Shell Fallback 251 (RU)",
-      "zh": "Russia Shell Fallback 251 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 251 (RU)"
     },
     "Russia Shell Fallback 252": {
       "en": "Russia Shell Fallback 252",
-      "zh": "Russia Shell Fallback 252"
+      "zh": "俄罗斯壳牌后备 252"
     },
     "Russia Shell Fallback 252 (RU)": {
       "en": "Russia Shell Fallback 252 (RU)",
-      "zh": "Russia Shell Fallback 252 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 252 (RU)"
     },
     "Russia Shell Fallback 253": {
       "en": "Russia Shell Fallback 253",
-      "zh": "Russia Shell Fallback 253"
+      "zh": "俄罗斯壳牌后备 253"
     },
     "Russia Shell Fallback 253 (RU)": {
       "en": "Russia Shell Fallback 253 (RU)",
-      "zh": "Russia Shell Fallback 253 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 253 (RU)"
     },
     "Russia Shell Fallback 254": {
       "en": "Russia Shell Fallback 254",
-      "zh": "Russia Shell Fallback 254"
+      "zh": "俄罗斯壳牌后备 254"
     },
     "Russia Shell Fallback 254 (RU)": {
       "en": "Russia Shell Fallback 254 (RU)",
-      "zh": "Russia Shell Fallback 254 (RU)"
+      "zh": "俄罗斯壳牌后备 254 (RU)"
     },
     "Russia Shell Fallback 255": {
       "en": "Russia Shell Fallback 255",
-      "zh": "Russia Shell Fallback 255"
+      "zh": "俄罗斯壳牌后备 255"
     },
     "Russia Shell Fallback 255 (RU)": {
       "en": "Russia Shell Fallback 255 (RU)",
-      "zh": "Russia Shell Fallback 255 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 255 (RU)"
     },
     "Russia Shell Fallback 256": {
       "en": "Russia Shell Fallback 256",
-      "zh": "Russia Shell Fallback 256"
+      "zh": "俄罗斯壳牌后备 256"
     },
     "Russia Shell Fallback 256 (RU)": {
       "en": "Russia Shell Fallback 256 (RU)",
-      "zh": "Russia Shell Fallback 256 (RU)"
+      "zh": "俄罗斯壳牌后备 256 (RU)"
     },
     "Russia Shell Fallback 257": {
       "en": "Russia Shell Fallback 257",
-      "zh": "Russia Shell Fallback 257"
+      "zh": "俄罗斯壳牌后备 257"
     },
     "Russia Shell Fallback 257 (RU)": {
       "en": "Russia Shell Fallback 257 (RU)",
-      "zh": "Russia Shell Fallback 257 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 257 (RU)"
     },
     "Russia Shell Fallback 258": {
       "en": "Russia Shell Fallback 258",
-      "zh": "Russia Shell Fallback 258"
+      "zh": "俄罗斯壳牌后备 258"
     },
     "Russia Shell Fallback 258 (RU)": {
       "en": "Russia Shell Fallback 258 (RU)",
-      "zh": "Russia Shell Fallback 258 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 258 (RU)"
     },
     "Russia Shell Fallback 259": {
       "en": "Russia Shell Fallback 259",
-      "zh": "Russia Shell Fallback 259"
+      "zh": "俄罗斯壳牌后备 259"
     },
     "Russia Shell Fallback 259 (RU)": {
       "en": "Russia Shell Fallback 259 (RU)",
-      "zh": "Russia Shell Fallback 259 (RU)"
+      "zh": "俄罗斯壳牌后备 259 (RU)"
     },
     "Russia Shell Fallback 26": {
       "en": "Russia Shell Fallback 26",
@@ -70956,67 +71232,67 @@
     },
     "Russia Shell Fallback 260": {
       "en": "Russia Shell Fallback 260",
-      "zh": "Russia Shell Fallback 260"
+      "zh": "俄罗斯壳牌 Fallback 260"
     },
     "Russia Shell Fallback 260 (RU)": {
       "en": "Russia Shell Fallback 260 (RU)",
-      "zh": "Russia Shell Fallback 260 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 260 (RU)"
     },
     "Russia Shell Fallback 261": {
       "en": "Russia Shell Fallback 261",
-      "zh": "Russia Shell Fallback 261"
+      "zh": "俄罗斯壳牌后备 261"
     },
     "Russia Shell Fallback 261 (RU)": {
       "en": "Russia Shell Fallback 261 (RU)",
-      "zh": "Russia Shell Fallback 261 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 261 (RU)"
     },
     "Russia Shell Fallback 262": {
       "en": "Russia Shell Fallback 262",
-      "zh": "Russia Shell Fallback 262"
+      "zh": "俄罗斯壳牌后备 262"
     },
     "Russia Shell Fallback 262 (RU)": {
       "en": "Russia Shell Fallback 262 (RU)",
-      "zh": "Russia Shell Fallback 262 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 262 (RU)"
     },
     "Russia Shell Fallback 263": {
       "en": "Russia Shell Fallback 263",
-      "zh": "Russia Shell Fallback 263"
+      "zh": "俄罗斯壳牌后备 263"
     },
     "Russia Shell Fallback 263 (RU)": {
       "en": "Russia Shell Fallback 263 (RU)",
-      "zh": "Russia Shell Fallback 263 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 263 (RU)"
     },
     "Russia Shell Fallback 264": {
       "en": "Russia Shell Fallback 264",
-      "zh": "Russia Shell Fallback 264"
+      "zh": "俄罗斯壳牌后备 264"
     },
     "Russia Shell Fallback 264 (RU)": {
       "en": "Russia Shell Fallback 264 (RU)",
-      "zh": "Russia Shell Fallback 264 (RU)"
+      "zh": "俄罗斯壳牌后备 264 (RU)"
     },
     "Russia Shell Fallback 265": {
       "en": "Russia Shell Fallback 265",
-      "zh": "Russia Shell Fallback 265"
+      "zh": "俄罗斯壳牌后备 265"
     },
     "Russia Shell Fallback 265 (RU)": {
       "en": "Russia Shell Fallback 265 (RU)",
-      "zh": "Russia Shell Fallback 265 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 265 (RU)"
     },
     "Russia Shell Fallback 266": {
       "en": "Russia Shell Fallback 266",
-      "zh": "Russia Shell Fallback 266"
+      "zh": "俄罗斯壳牌后备 266"
     },
     "Russia Shell Fallback 266 (RU)": {
       "en": "Russia Shell Fallback 266 (RU)",
-      "zh": "Russia Shell Fallback 266 (RU)"
+      "zh": "俄罗斯壳牌 Fallback 266 (RU)"
     },
     "Russia Shell Fallback 267": {
       "en": "Russia Shell Fallback 267",
-      "zh": "Russia Shell Fallback 267"
+      "zh": "俄罗斯壳牌后备 267"
     },
     "Russia Shell Fallback 267 (RU)": {
       "en": "Russia Shell Fallback 267 (RU)",
-      "zh": "Russia Shell Fallback 267 (RU)"
+      "zh": "俄罗斯壳牌后备 267"
     },
     "Russia Shell Fallback 268": {
       "en": "Russia Shell Fallback 268",
@@ -74518,6 +74794,10 @@
       "en": "San Luis Obispo [California]",
       "zh": "圣路易斯奥比斯波"
     },
+    "San Luis Potosí": {
+      "en": "San Luis Potosí",
+      "zh": "圣路易斯波托西"
+    },
     "San Luis Potosí Zone 1": {
       "en": "San Luis Potosí Zone 1",
       "zh": "圣路易斯波托西 1 区"
@@ -75274,6 +75554,10 @@
       "en": "Sartène (FR)",
       "zh": "平底锅"
     },
+    "Saskatchewan": {
+      "en": "Saskatchewan",
+      "zh": "萨斯喀彻温省"
+    },
     "Saskatoon South": {
       "en": "Saskatoon South",
       "zh": "南萨斯卡通"
@@ -75900,11 +76184,11 @@
     },
     "Selemdzhinsky District": {
       "en": "Selemdzhinsky District",
-      "zh": "Selemdzhinsky District"
+      "zh": "谢列姆任斯基区"
     },
     "Selemdzhinsky District (RU)": {
       "en": "Selemdzhinsky District (RU)",
-      "zh": "Selemdzhinsky District (RU)"
+      "zh": "谢列姆任斯基区"
     },
     "Selenge": {
       "en": "Selenge",
@@ -76072,7 +76356,7 @@
     },
     "Serbian Administration": {
       "en": "Serbian Administration",
-      "zh": "Serbian Administration"
+      "zh": "塞尔维亚行政当局"
     },
     "Serchhip": {
       "en": "Serchhip",
@@ -76164,11 +76448,11 @@
     },
     "Seryshevsky District": {
       "en": "Seryshevsky District",
-      "zh": "Seryshevsky District"
+      "zh": "谢里雪夫斯基区"
     },
     "Seryshevsky District (RU)": {
       "en": "Seryshevsky District (RU)",
-      "zh": "Seryshevsky District (RU)"
+      "zh": "谢里雪夫斯基区"
     },
     "Seti": {
       "en": "Seti",
@@ -76192,19 +76476,19 @@
     },
     "Severo-Evensky Urban District": {
       "en": "Severo-Evensky Urban District",
-      "zh": "Severo-Evensky Urban District"
+      "zh": "北埃文斯基市区"
     },
     "Severo-Evensky Urban District (RU)": {
       "en": "Severo-Evensky Urban District (RU)",
-      "zh": "Severo-Evensky Urban District (RU)"
+      "zh": "北埃文斯基市区"
     },
     "Severo-Kurilsky District": {
       "en": "Severo-Kurilsky District",
-      "zh": "Severo-Kurilsky District"
+      "zh": "北库里尔斯基地区"
     },
     "Severo-Kurilsky District (RU)": {
       "en": "Severo-Kurilsky District (RU)",
-      "zh": "Severo-Kurilsky District (RU)"
+      "zh": "北库里尔斯基地区"
     },
     "Seversky District": {
       "en": "Seversky District",
@@ -77344,19 +77628,19 @@
     },
     "Shimanovsk": {
       "en": "Shimanovsk",
-      "zh": "Shimanovsk"
+      "zh": "希马诺夫斯克"
     },
     "Shimanovsk (RU)": {
       "en": "Shimanovsk (RU)",
-      "zh": "Shimanovsk (RU)"
+      "zh": "希马诺夫斯克"
     },
     "Shimanovsky District": {
       "en": "Shimanovsky District",
-      "zh": "Shimanovsky District"
+      "zh": "希马诺夫斯基区"
     },
     "Shimanovsky District (RU)": {
       "en": "Shimanovsky District (RU)",
-      "zh": "Shimanovsky District (RU)"
+      "zh": "希马诺夫斯基区"
     },
     "Shimenxian": {
       "en": "Shimenxian",
@@ -77544,11 +77828,11 @@
     },
     "Shkotovsky District": {
       "en": "Shkotovsky District",
-      "zh": "Shkotovsky District"
+      "zh": "什科托夫斯基区"
     },
     "Shkotovsky District (RU)": {
       "en": "Shkotovsky District (RU)",
-      "zh": "Shkotovsky District (RU)"
+      "zh": "什科托夫斯基区"
     },
     "Shongpanxian": {
       "en": "Shongpanxian",
@@ -78202,6 +78486,10 @@
       "en": "Simiyu (TZ)",
       "zh": "西米尤"
     },
+    "Sinaloa": {
+      "en": "Sinaloa",
+      "zh": "锡那罗亚州"
+    },
     "Sinaloa Zone 1": {
       "en": "Sinaloa Zone 1",
       "zh": "锡那罗亚州 1 区"
@@ -78568,11 +78856,11 @@
     },
     "Skovorodinsky District": {
       "en": "Skovorodinsky District",
-      "zh": "Skovorodinsky District"
+      "zh": "斯科沃罗金斯基区"
     },
     "Skovorodinsky District (RU)": {
       "en": "Skovorodinsky District (RU)",
-      "zh": "Skovorodinsky District (RU)"
+      "zh": "斯科沃罗金斯基区"
     },
     "Skvyra": {
       "en": "Skvyra",
@@ -78668,11 +78956,11 @@
     },
     "Smidovichsky District": {
       "en": "Smidovichsky District",
-      "zh": "Smidovichsky District"
+      "zh": "斯米多维奇区"
     },
     "Smidovichsky District (RU)": {
       "en": "Smidovichsky District (RU)",
-      "zh": "Smidovichsky District (RU)"
+      "zh": "斯米多维奇区"
     },
     "Smila": {
       "en": "Smila",
@@ -78684,11 +78972,11 @@
     },
     "Smirnykhovsky District": {
       "en": "Smirnykhovsky District",
-      "zh": "Smirnykhovsky District"
+      "zh": "斯米尔尼霍夫斯基区"
     },
     "Smirnykhovsky District (RU)": {
       "en": "Smirnykhovsky District (RU)",
-      "zh": "Smirnykhovsky District (RU)"
+      "zh": "斯米尔尼霍夫斯基区"
     },
     "Smith": {
       "en": "Smith",
@@ -78764,11 +79052,11 @@
     },
     "Sobolevsky District": {
       "en": "Sobolevsky District",
-      "zh": "Sobolevsky District"
+      "zh": "索博列夫斯基区"
     },
     "Sobolevsky District (RU)": {
       "en": "Sobolevsky District (RU)",
-      "zh": "Sobolevsky District (RU)"
+      "zh": "索博列夫斯基区"
     },
     "Soest": {
       "en": "Soest",
@@ -78956,11 +79244,11 @@
     },
     "Solnechny Rayon": {
       "en": "Solnechny Rayon",
-      "zh": "Solnechny Rayon"
+      "zh": "索尔内奇尼人造丝"
     },
     "Solnechny Rayon (RU)": {
       "en": "Solnechny Rayon (RU)",
-      "zh": "Solnechny Rayon (RU)"
+      "zh": "索尔内奇尼人造丝"
     },
     "Solntsevsky District": {
       "en": "Solntsevsky District",
@@ -79165,6 +79453,10 @@
     "Sonoma [California]": {
       "en": "Sonoma [California]",
       "zh": "索诺玛"
+    },
+    "Sonora": {
+      "en": "Sonora",
+      "zh": "索诺拉"
     },
     "Sonora Zone 1": {
       "en": "Sonora Zone 1",
@@ -79498,6 +79790,10 @@
       "en": "South Caribbean Coast (NI)",
       "zh": "南加勒比海岸"
     },
+    "South Carolina": {
+      "en": "South Carolina",
+      "zh": "南卡罗来纳州"
+    },
     "South Carolina Zone 1": {
       "en": "South Carolina Zone 1",
       "zh": "南卡罗来纳州 1 区"
@@ -79670,6 +79966,10 @@
       "en": "South Cotabato (PH)",
       "zh": "南哥打巴托省"
     },
+    "South Dakota": {
+      "en": "South Dakota",
+      "zh": "南达科他州"
+    },
     "South Dakota Zone 1": {
       "en": "South Dakota Zone 1",
       "zh": "南达科他州 1 区"
@@ -79824,15 +80124,15 @@
     },
     "South Jutland (Remainder)": {
       "en": "South Jutland (Remainder)",
-      "zh": "South Jutland (Remainder)"
+      "zh": "南日德兰（剩余部分）"
     },
     "South Jutland (Remainder) (DK)": {
       "en": "South Jutland (Remainder) (DK)",
-      "zh": "South Jutland (Remainder) (DK)"
+      "zh": "南日德兰（剩余部分）"
     },
     "South Jutland (Remainder) [Sydjylland]": {
       "en": "South Jutland (Remainder) [Sydjylland]",
-      "zh": "South Jutland (Remainder) [Sydjylland]"
+      "zh": "南日德兰（剩余部分）"
     },
     "South Kalimantan": {
       "en": "South Kalimantan",
@@ -80232,11 +80532,11 @@
     },
     "Sovetsko-Gavansky Rayon": {
       "en": "Sovetsko-Gavansky Rayon",
-      "zh": "Sovetsko-Gavansky Rayon"
+      "zh": "苏维埃-加万斯基人造丝"
     },
     "Sovetsko-Gavansky Rayon (RU)": {
       "en": "Sovetsko-Gavansky Rayon (RU)",
-      "zh": "Sovetsko-Gavansky Rayon (RU)"
+      "zh": "苏维埃-加万斯基人造丝"
     },
     "Sovetsky District": {
       "en": "Sovetsky District",
@@ -80280,15 +80580,15 @@
     },
     "Spanish Guinea": {
       "en": "Spanish Guinea",
-      "zh": "Spanish Guinea"
+      "zh": "西属几内亚"
     },
     "Spanish Morocco": {
       "en": "Spanish Morocco",
-      "zh": "Spanish Morocco"
+      "zh": "西属摩洛哥"
     },
     "Spanish Sahara": {
       "en": "Spanish Sahara",
-      "zh": "Spanish Sahara"
+      "zh": "西属撒哈拉"
     },
     "Spas-Demensky District": {
       "en": "Spas-Demensky District",
@@ -80300,11 +80600,11 @@
     },
     "Spassk-Dalny": {
       "en": "Spassk-Dalny",
-      "zh": "Spassk-Dalny"
+      "zh": "斯帕斯克-达尔尼"
     },
     "Spassk-Dalny (RU)": {
       "en": "Spassk-Dalny (RU)",
-      "zh": "Spassk-Dalny (RU)"
+      "zh": "斯帕斯克-达尔尼"
     },
     "Spassky District": {
       "en": "Spassky District",
@@ -80368,11 +80668,11 @@
     },
     "Srednekansky Urban District": {
       "en": "Srednekansky Urban District",
-      "zh": "Srednekansky Urban District"
+      "zh": "中堪斯基市区"
     },
     "Srednekansky Urban District (RU)": {
       "en": "Srednekansky Urban District (RU)",
-      "zh": "Srednekansky Urban District (RU)"
+      "zh": "中堪斯基市区"
     },
     "Sri Lanka": {
       "en": "Sri Lanka",
@@ -80753,6 +81053,10 @@
     "Staryi Sambir (UA)": {
       "en": "Staryi Sambir (UA)",
       "zh": "斯塔伊桑比尔"
+    },
+    "State of Mexico": {
+      "en": "State of Mexico",
+      "zh": "墨西哥州"
     },
     "State of Mexico Zone 1": {
       "en": "State of Mexico Zone 1",
@@ -81888,11 +82192,11 @@
     },
     "Susumansky Urban District": {
       "en": "Susumansky Urban District",
-      "zh": "Susumansky Urban District"
+      "zh": "苏苏曼斯基市区"
     },
     "Susumansky Urban District (RU)": {
       "en": "Susumansky Urban District (RU)",
-      "zh": "Susumansky Urban District (RU)"
+      "zh": "苏苏曼斯基市区"
     },
     "Sutter": {
       "en": "Sutter",
@@ -82064,11 +82368,11 @@
     },
     "Svobodnensky District": {
       "en": "Svobodnensky District",
-      "zh": "Svobodnensky District"
+      "zh": "斯沃博德年斯基区"
     },
     "Svobodnensky District (RU)": {
       "en": "Svobodnensky District (RU)",
-      "zh": "Svobodnensky District (RU)"
+      "zh": "斯沃博德年斯基区"
     },
     "Swansea": {
       "en": "Swansea",
@@ -82212,7 +82516,7 @@
     },
     "Syrian Protectorate": {
       "en": "Syrian Protectorate",
-      "zh": "Syrian Protectorate"
+      "zh": "叙利亚保护国"
     },
     "Sysolsky District": {
       "en": "Sysolsky District",
@@ -82500,7 +82804,7 @@
     },
     "TNO 1962": {
       "en": "TNO 1962",
-      "zh": "TNO 1962"
+      "zh": "TNO 1962（新秩序）"
     },
     "Ta`izz": {
       "en": "Ta`izz",
@@ -82517,6 +82821,10 @@
     "Tabasaransky District (RU)": {
       "en": "Tabasaransky District (RU)",
       "zh": "塔巴萨兰斯基区"
+    },
+    "Tabasco": {
+      "en": "Tabasco",
+      "zh": "塔巴斯科州"
     },
     "Tabasco Zone 1": {
       "en": "Tabasco Zone 1",
@@ -83033,6 +83341,10 @@
     "Tamanghasset (DZ)": {
       "en": "Tamanghasset (DZ)",
       "zh": "塔曼哈塞特"
+    },
+    "Tamaulipas": {
+      "en": "Tamaulipas",
+      "zh": "塔毛利帕斯州"
     },
     "Tamaulipas Zone 1": {
       "en": "Tamaulipas Zone 1",
@@ -83784,11 +84096,15 @@
     },
     "Tenkinsky Urban District": {
       "en": "Tenkinsky Urban District",
-      "zh": "Tenkinsky Urban District"
+      "zh": "滕金斯基市区"
     },
     "Tenkinsky Urban District (RU)": {
       "en": "Tenkinsky Urban District (RU)",
-      "zh": "Tenkinsky Urban District (RU)"
+      "zh": "滕金斯基市区"
+    },
+    "Tennessee": {
+      "en": "Tennessee",
+      "zh": "田纳西州"
     },
     "Tennessee Zone 1": {
       "en": "Tennessee Zone 1",
@@ -84004,11 +84320,11 @@
     },
     "Terneysky District": {
       "en": "Terneysky District",
-      "zh": "Terneysky District"
+      "zh": "特尔涅斯基区"
     },
     "Terneysky District (RU)": {
       "en": "Terneysky District (RU)",
-      "zh": "Terneysky District (RU)"
+      "zh": "特尔涅斯基区"
     },
     "Terni": {
       "en": "Terni",
@@ -84137,6 +84453,10 @@
     "Teuchezhsky District (RU)": {
       "en": "Teuchezhsky District (RU)",
       "zh": "特乌切日斯基区"
+    },
+    "Texas": {
+      "en": "Texas",
+      "zh": "德克萨斯州"
     },
     "Teykovo": {
       "en": "Teykovo",
@@ -84632,11 +84952,11 @@
     },
     "Tigilsky District": {
       "en": "Tigilsky District",
-      "zh": "Tigilsky District"
+      "zh": "蒂吉尔斯基区"
     },
     "Tigilsky District (RU)": {
       "en": "Tigilsky District (RU)",
-      "zh": "Tigilsky District (RU)"
+      "zh": "蒂吉尔斯基区"
     },
     "Tigray": {
       "en": "Tigray",
@@ -84861,6 +85181,10 @@
     "Tiền Giang (VN)": {
       "en": "Tiền Giang (VN)",
       "zh": "前江"
+    },
+    "Tlaxcala": {
+      "en": "Tlaxcala",
+      "zh": "特拉斯卡拉"
     },
     "Tlaxcala Zone 1": {
       "en": "Tlaxcala Zone 1",
@@ -85112,11 +85436,11 @@
     },
     "Tomarinsky District": {
       "en": "Tomarinsky District",
-      "zh": "Tomarinsky District"
+      "zh": "托马林斯基区"
     },
     "Tomarinsky District (RU)": {
       "en": "Tomarinsky District (RU)",
-      "zh": "Tomarinsky District (RU)"
+      "zh": "托马林斯基区"
     },
     "Tomashpil": {
       "en": "Tomashpil",
@@ -85972,11 +86296,11 @@
     },
     "Tsiolkovsky": {
       "en": "Tsiolkovsky",
-      "zh": "Tsiolkovsky"
+      "zh": "齐奥尔科夫斯基"
     },
     "Tsiolkovsky (RU)": {
       "en": "Tsiolkovsky (RU)",
-      "zh": "Tsiolkovsky (RU)"
+      "zh": "齐奥尔科夫斯基"
     },
     "Tsivilsky District": {
       "en": "Tsivilsky District",
@@ -86044,11 +86368,11 @@
     },
     "Tuguro-Chumikansky Rayon": {
       "en": "Tuguro-Chumikansky Rayon",
-      "zh": "Tuguro-Chumikansky Rayon"
+      "zh": "图古罗-丘米坎斯基人造丝"
     },
     "Tuguro-Chumikansky Rayon (RU)": {
       "en": "Tuguro-Chumikansky Rayon (RU)",
-      "zh": "Tuguro-Chumikansky Rayon (RU)"
+      "zh": "图古罗-丘米坎斯基人造丝"
     },
     "Tukayevsky District": {
       "en": "Tukayevsky District",
@@ -86180,7 +86504,7 @@
     },
     "Tunisian Protectorate": {
       "en": "Tunisian Protectorate",
-      "zh": "Tunisian Protectorate"
+      "zh": "突尼斯保护国"
     },
     "Tunliuxian": {
       "en": "Tunliuxian",
@@ -86416,19 +86740,19 @@
     },
     "Tymovsky District": {
       "en": "Tymovsky District",
-      "zh": "Tymovsky District"
+      "zh": "季莫夫斯基区"
     },
     "Tymovsky District (RU)": {
       "en": "Tymovsky District (RU)",
-      "zh": "Tymovsky District (RU)"
+      "zh": "季莫夫斯基区"
     },
     "Tyndinsky District": {
       "en": "Tyndinsky District",
-      "zh": "Tyndinsky District"
+      "zh": "廷丁斯基区"
     },
     "Tyndinsky District (RU)": {
       "en": "Tyndinsky District (RU)",
-      "zh": "Tyndinsky District (RU)"
+      "zh": "廷丁斯基区"
     },
     "Tyneside": {
       "en": "Tyneside",
@@ -86716,11 +87040,11 @@
     },
     "Uglegorsky District": {
       "en": "Uglegorsky District",
-      "zh": "Uglegorsky District"
+      "zh": "乌格列戈尔斯基区"
     },
     "Uglegorsky District (RU)": {
       "en": "Uglegorsky District (RU)",
-      "zh": "Uglegorsky District (RU)"
+      "zh": "乌格列戈尔斯基区"
     },
     "Uglichsky District": {
       "en": "Uglichsky District",
@@ -86804,11 +87128,11 @@
     },
     "Ulchsky Rayon": {
       "en": "Ulchsky Rayon",
-      "zh": "Ulchsky Rayon"
+      "zh": "乌尔奇斯基人造丝"
     },
     "Ulchsky Rayon (RU)": {
       "en": "Ulchsky Rayon (RU)",
-      "zh": "Ulchsky Rayon (RU)"
+      "zh": "乌尔奇斯基人造丝"
     },
     "Ulcinj": {
       "en": "Ulcinj",
@@ -87272,11 +87596,11 @@
     },
     "Ust-Bolsheretsky District": {
       "en": "Ust-Bolsheretsky District",
-      "zh": "Ust-Bolsheretsky District"
+      "zh": "乌斯季-博舍列茨基区"
     },
     "Ust-Bolsheretsky District (RU)": {
       "en": "Ust-Bolsheretsky District (RU)",
-      "zh": "Ust-Bolsheretsky District (RU)"
+      "zh": "乌斯季-博舍列茨基区"
     },
     "Ust-Dzhegutinsky District": {
       "en": "Ust-Dzhegutinsky District",
@@ -87288,11 +87612,11 @@
     },
     "Ust-Kamchatsky District": {
       "en": "Ust-Kamchatsky District",
-      "zh": "Ust-Kamchatsky District"
+      "zh": "乌斯季堪察加地区"
     },
     "Ust-Kamchatsky District (RU)": {
       "en": "Ust-Kamchatsky District (RU)",
-      "zh": "Ust-Kamchatsky District (RU)"
+      "zh": "乌斯季堪察加地区"
     },
     "Ust-Katav": {
       "en": "Ust-Katav",
@@ -87944,11 +88268,11 @@
     },
     "Vaninsky Rayon": {
       "en": "Vaninsky Rayon",
-      "zh": "Vaninsky Rayon"
+      "zh": "瓦宁斯基人造丝"
     },
     "Vaninsky Rayon (RU)": {
       "en": "Vaninsky Rayon (RU)",
-      "zh": "Vaninsky Rayon (RU)"
+      "zh": "瓦宁斯基人造丝"
     },
     "Vannes": {
       "en": "Vannes",
@@ -88338,6 +88662,10 @@
       "en": "Venyovsky District (RU)",
       "zh": "维尼奥夫斯基区"
     },
+    "Veracruz": {
+      "en": "Veracruz",
+      "zh": "韦拉克鲁斯"
+    },
     "Veracruz Zone 1": {
       "en": "Veracruz Zone 1",
       "zh": "韦拉克鲁斯 1 区"
@@ -88680,11 +89008,11 @@
     },
     "Verkhnebureinsky District": {
       "en": "Verkhnebureinsky District",
-      "zh": "Verkhnebureinsky District"
+      "zh": "上布伦斯基区"
     },
     "Verkhnebureinsky District (RU)": {
       "en": "Verkhnebureinsky District (RU)",
-      "zh": "Verkhnebureinsky District (RU)"
+      "zh": "上布伦斯基区"
     },
     "Verkhnedonskoy District": {
       "en": "Verkhnedonskoy District",
@@ -88809,6 +89137,10 @@
     "Verkhovyna (UA)": {
       "en": "Verkhovyna (UA)",
       "zh": "韦尔霍维纳"
+    },
+    "Vermont": {
+      "en": "Vermont",
+      "zh": "佛蒙特"
     },
     "Vermont Zone 1": {
       "en": "Vermont Zone 1",
@@ -89256,11 +89588,11 @@
     },
     "Vilyuchinsk": {
       "en": "Vilyuchinsk",
-      "zh": "Vilyuchinsk"
+      "zh": "维柳钦斯克"
     },
     "Vilyuchinsk (RU)": {
       "en": "Vilyuchinsk (RU)",
-      "zh": "Vilyuchinsk (RU)"
+      "zh": "维柳钦斯克"
     },
     "Vimy": {
       "en": "Vimy",
@@ -89313,6 +89645,10 @@
     "Vire (FR)": {
       "en": "Vire (FR)",
       "zh": "转动"
+    },
+    "Virginia": {
+      "en": "Virginia",
+      "zh": "弗吉尼亚州"
     },
     "Virginia Zone 1": {
       "en": "Virginia Zone 1",
@@ -90056,11 +90392,11 @@
     },
     "Vyazemsky Rayon": {
       "en": "Vyazemsky Rayon",
-      "zh": "Vyazemsky Rayon"
+      "zh": "维亚泽姆斯基人造丝"
     },
     "Vyazemsky Rayon (RU)": {
       "en": "Vyazemsky Rayon (RU)",
-      "zh": "Vyazemsky Rayon (RU)"
+      "zh": "维亚泽姆斯基人造丝"
     },
     "Vyaznikovsky District": {
       "en": "Vyaznikovsky District",
@@ -91606,6 +91942,10 @@
       "en": "West Vancouver—Sunshine Coast—Sea to Sky Country [British Columbia]",
       "zh": "西温哥华—阳光海岸—海天国度"
     },
+    "West Virginia": {
+      "en": "West Virginia",
+      "zh": "西弗吉尼亚州"
+    },
     "West Virginia Zone 1": {
       "en": "West Virginia Zone 1",
       "zh": "西弗吉尼亚州 1 区"
@@ -92189,6 +92529,10 @@
     "Wirral [England]": {
       "en": "Wirral [England]",
       "zh": "威勒尔"
+    },
+    "Wisconsin": {
+      "en": "Wisconsin",
+      "zh": "威斯康星州"
     },
     "Wisconsin Zone 1": {
       "en": "Wisconsin Zone 1",
@@ -93014,6 +93358,10 @@
       "en": "Wuzhou (CN)",
       "zh": "梧州"
     },
+    "Wyoming": {
+      "en": "Wyoming",
+      "zh": "怀俄明州"
+    },
     "Wyoming Zone 1": {
       "en": "Wyoming Zone 1",
       "zh": "怀俄明州 1 区"
@@ -93516,11 +93864,11 @@
     },
     "Xikang Clique": {
       "en": "Xikang Clique",
-      "zh": "Xikang Clique"
+      "zh": "西康军阀"
     },
     "Xikang-Tibet Administration": {
       "en": "Xikang-Tibet Administration",
-      "zh": "Xikang-Tibet Administration"
+      "zh": "西康-西藏行政区"
     },
     "Xilinhaote": {
       "en": "Xilinhaote",
@@ -93804,7 +94152,7 @@
     },
     "Xinjiang": {
       "en": "Xinjiang",
-      "zh": "Xinjiang"
+      "zh": "新疆"
     },
     "Xinjiangxian": {
       "en": "Xinjiangxian",
@@ -94312,11 +94660,11 @@
     },
     "Yagodninsky Urban District": {
       "en": "Yagodninsky Urban District",
-      "zh": "Yagodninsky Urban District"
+      "zh": "亚戈德宁斯基市区"
     },
     "Yagodninsky Urban District (RU)": {
       "en": "Yagodninsky Urban District (RU)",
-      "zh": "Yagodninsky Urban District (RU)"
+      "zh": "亚戈德宁斯基市区"
     },
     "Yahotyn": {
       "en": "Yahotyn",
@@ -94996,11 +95344,11 @@
     },
     "Yelizovsky District": {
       "en": "Yelizovsky District",
-      "zh": "Yelizovsky District"
+      "zh": "叶利佐夫斯基区"
     },
     "Yelizovsky District (RU)": {
       "en": "Yelizovsky District (RU)",
-      "zh": "Yelizovsky District (RU)"
+      "zh": "叶利佐夫斯基区"
     },
     "Yelkhovsky District": {
       "en": "Yelkhovsky District",
@@ -95982,6 +96330,10 @@
       "en": "Yuba [California]",
       "zh": "腐竹"
     },
+    "Yucatán": {
+      "en": "Yucatán",
+      "zh": "尤卡坦半岛"
+    },
     "Yucatán Zone 1": {
       "en": "Yucatán Zone 1",
       "zh": "尤卡坦州 1 区"
@@ -96548,11 +96900,11 @@
     },
     "Yuzhno-Kurilsky District": {
       "en": "Yuzhno-Kurilsky District",
-      "zh": "Yuzhno-Kurilsky District"
+      "zh": "南库里尔斯基地区"
     },
     "Yuzhno-Kurilsky District (RU)": {
       "en": "Yuzhno-Kurilsky District (RU)",
-      "zh": "Yuzhno-Kurilsky District (RU)"
+      "zh": "南库里尔斯基地区"
     },
     "Yuzhongxian": {
       "en": "Yuzhongxian",
@@ -96625,6 +96977,10 @@
     "Zacapa (GT)": {
       "en": "Zacapa (GT)",
       "zh": "萨卡帕"
+    },
+    "Zacatecas": {
+      "en": "Zacatecas",
+      "zh": "萨卡特卡斯"
     },
     "Zacatecas Zone 1": {
       "en": "Zacatecas Zone 1",
@@ -97052,11 +97408,11 @@
     },
     "Zavitinsky District": {
       "en": "Zavitinsky District",
-      "zh": "Zavitinsky District"
+      "zh": "扎维廷斯基区"
     },
     "Zavitinsky District (RU)": {
       "en": "Zavitinsky District (RU)",
-      "zh": "Zavitinsky District (RU)"
+      "zh": "扎维廷斯基区"
     },
     "Zavolzhsky District": {
       "en": "Zavolzhsky District",
@@ -97180,11 +97536,11 @@
     },
     "Zeysky District": {
       "en": "Zeysky District",
-      "zh": "Zeysky District"
+      "zh": "泽斯基区"
     },
     "Zeysky District (RU)": {
       "en": "Zeysky District (RU)",
-      "zh": "Zeysky District (RU)"
+      "zh": "泽斯基区"
     },
     "Zghurivka": {
       "en": "Zghurivka",
@@ -114276,11 +114632,11 @@
     },
     "id::DK_HIST_NORTH_SCHLESWIG": {
       "en": "North Schleswig",
-      "zh": "North Schleswig"
+      "zh": "北石勒苏益格"
     },
     "id::DK_SJY_REMAINDER": {
       "en": "South Jutland (Remainder)",
-      "zh": "South Jutland (Remainder)"
+      "zh": "南日德兰（剩余部分）"
     },
     "id::DO": {
       "en": "id::DO",
@@ -128720,483 +129076,483 @@
     },
     "id::RU_ARCTIC_FB_148": {
       "en": "Russia Shell Fallback 148",
-      "zh": "Russia Shell Fallback 148"
+      "zh": "俄罗斯壳牌后备 148"
     },
     "id::RU_ARCTIC_FB_149": {
       "en": "Russia Shell Fallback 149",
-      "zh": "Russia Shell Fallback 149"
+      "zh": "俄罗斯壳牌后备 149"
     },
     "id::RU_ARCTIC_FB_150": {
       "en": "Russia Shell Fallback 150",
-      "zh": "Russia Shell Fallback 150"
+      "zh": "俄罗斯壳牌后备 150"
     },
     "id::RU_ARCTIC_FB_151": {
       "en": "Russia Shell Fallback 151",
-      "zh": "Russia Shell Fallback 151"
+      "zh": "俄罗斯壳牌后备 151"
     },
     "id::RU_ARCTIC_FB_152": {
       "en": "Russia Shell Fallback 152",
-      "zh": "Russia Shell Fallback 152"
+      "zh": "俄罗斯壳牌后备 152"
     },
     "id::RU_ARCTIC_FB_153": {
       "en": "Russia Shell Fallback 153",
-      "zh": "Russia Shell Fallback 153"
+      "zh": "俄罗斯壳牌后备 153"
     },
     "id::RU_ARCTIC_FB_154": {
       "en": "Russia Shell Fallback 154",
-      "zh": "Russia Shell Fallback 154"
+      "zh": "俄罗斯壳牌后备 154"
     },
     "id::RU_ARCTIC_FB_155": {
       "en": "Russia Shell Fallback 155",
-      "zh": "Russia Shell Fallback 155"
+      "zh": "俄罗斯壳牌后备 155"
     },
     "id::RU_ARCTIC_FB_156": {
       "en": "Russia Shell Fallback 156",
-      "zh": "Russia Shell Fallback 156"
+      "zh": "俄罗斯壳牌后备 156"
     },
     "id::RU_ARCTIC_FB_157": {
       "en": "Russia Shell Fallback 157",
-      "zh": "Russia Shell Fallback 157"
+      "zh": "俄罗斯壳牌后备 157"
     },
     "id::RU_ARCTIC_FB_158": {
       "en": "Russia Shell Fallback 158",
-      "zh": "Russia Shell Fallback 158"
+      "zh": "俄罗斯壳牌后备 158"
     },
     "id::RU_ARCTIC_FB_159": {
       "en": "Russia Shell Fallback 159",
-      "zh": "Russia Shell Fallback 159"
+      "zh": "俄罗斯壳牌后备 159"
     },
     "id::RU_ARCTIC_FB_160": {
       "en": "Russia Shell Fallback 160",
-      "zh": "Russia Shell Fallback 160"
+      "zh": "俄罗斯壳牌 Fallback 160"
     },
     "id::RU_ARCTIC_FB_161": {
       "en": "Russia Shell Fallback 161",
-      "zh": "Russia Shell Fallback 161"
+      "zh": "俄罗斯壳牌后备 161"
     },
     "id::RU_ARCTIC_FB_162": {
       "en": "Russia Shell Fallback 162",
-      "zh": "Russia Shell Fallback 162"
+      "zh": "俄罗斯壳牌后备 162"
     },
     "id::RU_ARCTIC_FB_163": {
       "en": "Russia Shell Fallback 163",
-      "zh": "Russia Shell Fallback 163"
+      "zh": "俄罗斯壳牌后备 163"
     },
     "id::RU_ARCTIC_FB_164": {
       "en": "Russia Shell Fallback 164",
-      "zh": "Russia Shell Fallback 164"
+      "zh": "俄罗斯壳牌后备 164"
     },
     "id::RU_ARCTIC_FB_165": {
       "en": "Russia Shell Fallback 165",
-      "zh": "Russia Shell Fallback 165"
+      "zh": "俄罗斯壳牌后备 165"
     },
     "id::RU_ARCTIC_FB_166": {
       "en": "Russia Shell Fallback 166",
-      "zh": "Russia Shell Fallback 166"
+      "zh": "俄罗斯壳牌后备 166"
     },
     "id::RU_ARCTIC_FB_167": {
       "en": "Russia Shell Fallback 167",
-      "zh": "Russia Shell Fallback 167"
+      "zh": "俄罗斯壳牌后备 167"
     },
     "id::RU_ARCTIC_FB_168": {
       "en": "Russia Shell Fallback 168",
-      "zh": "Russia Shell Fallback 168"
+      "zh": "俄罗斯壳牌后备 168"
     },
     "id::RU_ARCTIC_FB_169": {
       "en": "Russia Shell Fallback 169",
-      "zh": "Russia Shell Fallback 169"
+      "zh": "俄罗斯壳牌后备 169"
     },
     "id::RU_ARCTIC_FB_170": {
       "en": "Russia Shell Fallback 170",
-      "zh": "Russia Shell Fallback 170"
+      "zh": "俄罗斯壳牌后备 170"
     },
     "id::RU_ARCTIC_FB_171": {
       "en": "Russia Shell Fallback 171",
-      "zh": "Russia Shell Fallback 171"
+      "zh": "俄罗斯壳牌后备 171"
     },
     "id::RU_ARCTIC_FB_172": {
       "en": "Russia Shell Fallback 172",
-      "zh": "Russia Shell Fallback 172"
+      "zh": "俄罗斯壳牌后备 172"
     },
     "id::RU_ARCTIC_FB_173": {
       "en": "Russia Shell Fallback 173",
-      "zh": "Russia Shell Fallback 173"
+      "zh": "俄罗斯壳牌后备 173"
     },
     "id::RU_ARCTIC_FB_174": {
       "en": "Russia Shell Fallback 174",
-      "zh": "Russia Shell Fallback 174"
+      "zh": "俄罗斯壳牌后备 174"
     },
     "id::RU_ARCTIC_FB_175": {
       "en": "Russia Shell Fallback 175",
-      "zh": "Russia Shell Fallback 175"
+      "zh": "俄罗斯壳牌后备 175"
     },
     "id::RU_ARCTIC_FB_176": {
       "en": "Russia Shell Fallback 176",
-      "zh": "Russia Shell Fallback 176"
+      "zh": "俄罗斯壳牌后备 176"
     },
     "id::RU_ARCTIC_FB_177": {
       "en": "Russia Shell Fallback 177",
-      "zh": "Russia Shell Fallback 177"
+      "zh": "俄罗斯壳牌后备 177"
     },
     "id::RU_ARCTIC_FB_178": {
       "en": "Russia Shell Fallback 178",
-      "zh": "Russia Shell Fallback 178"
+      "zh": "俄罗斯壳牌后备 178"
     },
     "id::RU_ARCTIC_FB_179": {
       "en": "Russia Shell Fallback 179",
-      "zh": "Russia Shell Fallback 179"
+      "zh": "俄罗斯壳牌后备 179"
     },
     "id::RU_ARCTIC_FB_180": {
       "en": "Russia Shell Fallback 180",
-      "zh": "Russia Shell Fallback 180"
+      "zh": "俄罗斯壳牌 Fallback 180"
     },
     "id::RU_ARCTIC_FB_181": {
       "en": "Russia Shell Fallback 181",
-      "zh": "Russia Shell Fallback 181"
+      "zh": "俄罗斯壳牌后备 181"
     },
     "id::RU_ARCTIC_FB_182": {
       "en": "Russia Shell Fallback 182",
-      "zh": "Russia Shell Fallback 182"
+      "zh": "俄罗斯壳牌后备 182"
     },
     "id::RU_ARCTIC_FB_183": {
       "en": "Russia Shell Fallback 183",
-      "zh": "Russia Shell Fallback 183"
+      "zh": "俄罗斯壳牌后备 183"
     },
     "id::RU_ARCTIC_FB_184": {
       "en": "Russia Shell Fallback 184",
-      "zh": "Russia Shell Fallback 184"
+      "zh": "俄罗斯壳牌后备 184"
     },
     "id::RU_ARCTIC_FB_185": {
       "en": "Russia Shell Fallback 185",
-      "zh": "Russia Shell Fallback 185"
+      "zh": "俄罗斯壳牌后备 185"
     },
     "id::RU_ARCTIC_FB_186": {
       "en": "Russia Shell Fallback 186",
-      "zh": "Russia Shell Fallback 186"
+      "zh": "俄罗斯壳牌后备 186"
     },
     "id::RU_ARCTIC_FB_187": {
       "en": "Russia Shell Fallback 187",
-      "zh": "Russia Shell Fallback 187"
+      "zh": "俄罗斯壳牌后备 187"
     },
     "id::RU_ARCTIC_FB_188": {
       "en": "Russia Shell Fallback 188",
-      "zh": "Russia Shell Fallback 188"
+      "zh": "俄罗斯壳牌后备 188"
     },
     "id::RU_ARCTIC_FB_189": {
       "en": "Russia Shell Fallback 189",
-      "zh": "Russia Shell Fallback 189"
+      "zh": "俄罗斯壳牌后备 189"
     },
     "id::RU_ARCTIC_FB_190": {
       "en": "Russia Shell Fallback 190",
-      "zh": "Russia Shell Fallback 190"
+      "zh": "俄罗斯壳牌后备 190"
     },
     "id::RU_ARCTIC_FB_191": {
       "en": "Russia Shell Fallback 191",
-      "zh": "Russia Shell Fallback 191"
+      "zh": "俄罗斯壳牌后备 191"
     },
     "id::RU_ARCTIC_FB_192": {
       "en": "Russia Shell Fallback 192",
-      "zh": "Russia Shell Fallback 192"
+      "zh": "俄罗斯壳牌后备 192"
     },
     "id::RU_ARCTIC_FB_193": {
       "en": "Russia Shell Fallback 193",
-      "zh": "Russia Shell Fallback 193"
+      "zh": "俄罗斯壳牌后备 193"
     },
     "id::RU_ARCTIC_FB_194": {
       "en": "Russia Shell Fallback 194",
-      "zh": "Russia Shell Fallback 194"
+      "zh": "俄罗斯壳牌后备 194"
     },
     "id::RU_ARCTIC_FB_195": {
       "en": "Russia Shell Fallback 195",
-      "zh": "Russia Shell Fallback 195"
+      "zh": "俄罗斯壳牌后备 195"
     },
     "id::RU_ARCTIC_FB_196": {
       "en": "Russia Shell Fallback 196",
-      "zh": "Russia Shell Fallback 196"
+      "zh": "俄罗斯壳牌后备 196"
     },
     "id::RU_ARCTIC_FB_197": {
       "en": "Russia Shell Fallback 197",
-      "zh": "Russia Shell Fallback 197"
+      "zh": "俄罗斯壳牌后备 197"
     },
     "id::RU_ARCTIC_FB_198": {
       "en": "Russia Shell Fallback 198",
-      "zh": "Russia Shell Fallback 198"
+      "zh": "俄罗斯壳牌后备 198"
     },
     "id::RU_ARCTIC_FB_199": {
       "en": "Russia Shell Fallback 199",
-      "zh": "Russia Shell Fallback 199"
+      "zh": "俄罗斯壳牌后备 199"
     },
     "id::RU_ARCTIC_FB_200": {
       "en": "Russia Shell Fallback 200",
-      "zh": "Russia Shell Fallback 200"
+      "zh": "俄罗斯壳牌 Fallback 200"
     },
     "id::RU_ARCTIC_FB_201": {
       "en": "Russia Shell Fallback 201",
-      "zh": "Russia Shell Fallback 201"
+      "zh": "俄罗斯壳牌后备 201"
     },
     "id::RU_ARCTIC_FB_202": {
       "en": "Russia Shell Fallback 202",
-      "zh": "Russia Shell Fallback 202"
+      "zh": "俄罗斯壳牌后备 202"
     },
     "id::RU_ARCTIC_FB_203": {
       "en": "Russia Shell Fallback 203",
-      "zh": "Russia Shell Fallback 203"
+      "zh": "俄罗斯壳牌后备 203"
     },
     "id::RU_ARCTIC_FB_204": {
       "en": "Russia Shell Fallback 204",
-      "zh": "Russia Shell Fallback 204"
+      "zh": "俄罗斯壳牌后备 204"
     },
     "id::RU_ARCTIC_FB_205": {
       "en": "Russia Shell Fallback 205",
-      "zh": "Russia Shell Fallback 205"
+      "zh": "俄罗斯壳牌后备 205"
     },
     "id::RU_ARCTIC_FB_206": {
       "en": "Russia Shell Fallback 206",
-      "zh": "Russia Shell Fallback 206"
+      "zh": "俄罗斯壳牌后备 206"
     },
     "id::RU_ARCTIC_FB_207": {
       "en": "Russia Shell Fallback 207",
-      "zh": "Russia Shell Fallback 207"
+      "zh": "俄罗斯壳牌后备 207"
     },
     "id::RU_ARCTIC_FB_208": {
       "en": "Russia Shell Fallback 208",
-      "zh": "Russia Shell Fallback 208"
+      "zh": "俄罗斯壳牌后备 208"
     },
     "id::RU_ARCTIC_FB_209": {
       "en": "Russia Shell Fallback 209",
-      "zh": "Russia Shell Fallback 209"
+      "zh": "俄罗斯壳牌后备 209"
     },
     "id::RU_ARCTIC_FB_210": {
       "en": "Russia Shell Fallback 210",
-      "zh": "Russia Shell Fallback 210"
+      "zh": "俄罗斯壳牌 Fallback 210"
     },
     "id::RU_ARCTIC_FB_211": {
       "en": "Russia Shell Fallback 211",
-      "zh": "Russia Shell Fallback 211"
+      "zh": "俄罗斯壳牌后备 211"
     },
     "id::RU_ARCTIC_FB_212": {
       "en": "Russia Shell Fallback 212",
-      "zh": "Russia Shell Fallback 212"
+      "zh": "俄罗斯壳牌后备 212"
     },
     "id::RU_ARCTIC_FB_213": {
       "en": "Russia Shell Fallback 213",
-      "zh": "Russia Shell Fallback 213"
+      "zh": "俄罗斯壳牌后备 213"
     },
     "id::RU_ARCTIC_FB_214": {
       "en": "Russia Shell Fallback 214",
-      "zh": "Russia Shell Fallback 214"
+      "zh": "俄罗斯壳牌后备 214"
     },
     "id::RU_ARCTIC_FB_215": {
       "en": "Russia Shell Fallback 215",
-      "zh": "Russia Shell Fallback 215"
+      "zh": "俄罗斯壳牌后备 215"
     },
     "id::RU_ARCTIC_FB_216": {
       "en": "Russia Shell Fallback 216",
-      "zh": "Russia Shell Fallback 216"
+      "zh": "俄罗斯壳牌后备 216"
     },
     "id::RU_ARCTIC_FB_217": {
       "en": "Russia Shell Fallback 217",
-      "zh": "Russia Shell Fallback 217"
+      "zh": "俄罗斯壳牌后备 217"
     },
     "id::RU_ARCTIC_FB_218": {
       "en": "Russia Shell Fallback 218",
-      "zh": "Russia Shell Fallback 218"
+      "zh": "俄罗斯壳牌后备 218"
     },
     "id::RU_ARCTIC_FB_219": {
       "en": "Russia Shell Fallback 219",
-      "zh": "Russia Shell Fallback 219"
+      "zh": "俄罗斯壳牌后备 219"
     },
     "id::RU_ARCTIC_FB_220": {
       "en": "Russia Shell Fallback 220",
-      "zh": "Russia Shell Fallback 220"
+      "zh": "俄罗斯壳牌 Fallback 220"
     },
     "id::RU_ARCTIC_FB_221": {
       "en": "Russia Shell Fallback 221",
-      "zh": "Russia Shell Fallback 221"
+      "zh": "俄罗斯壳牌后备 221"
     },
     "id::RU_ARCTIC_FB_222": {
       "en": "Russia Shell Fallback 222",
-      "zh": "Russia Shell Fallback 222"
+      "zh": "俄罗斯壳牌后备 222"
     },
     "id::RU_ARCTIC_FB_223": {
       "en": "Russia Shell Fallback 223",
-      "zh": "Russia Shell Fallback 223"
+      "zh": "俄罗斯壳牌后备 223"
     },
     "id::RU_ARCTIC_FB_224": {
       "en": "Russia Shell Fallback 224",
-      "zh": "Russia Shell Fallback 224"
+      "zh": "俄罗斯壳牌后备 224"
     },
     "id::RU_ARCTIC_FB_225": {
       "en": "Russia Shell Fallback 225",
-      "zh": "Russia Shell Fallback 225"
+      "zh": "俄罗斯壳牌后备 225"
     },
     "id::RU_ARCTIC_FB_226": {
       "en": "Russia Shell Fallback 226",
-      "zh": "Russia Shell Fallback 226"
+      "zh": "俄罗斯壳牌后备 226"
     },
     "id::RU_ARCTIC_FB_227": {
       "en": "Russia Shell Fallback 227",
-      "zh": "Russia Shell Fallback 227"
+      "zh": "俄罗斯壳牌后备 227"
     },
     "id::RU_ARCTIC_FB_228": {
       "en": "Russia Shell Fallback 228",
-      "zh": "Russia Shell Fallback 228"
+      "zh": "俄罗斯壳牌后备 228"
     },
     "id::RU_ARCTIC_FB_229": {
       "en": "Russia Shell Fallback 229",
-      "zh": "Russia Shell Fallback 229"
+      "zh": "俄罗斯壳牌后备 229"
     },
     "id::RU_ARCTIC_FB_230": {
       "en": "Russia Shell Fallback 230",
-      "zh": "Russia Shell Fallback 230"
+      "zh": "俄罗斯壳牌后备 230"
     },
     "id::RU_ARCTIC_FB_231": {
       "en": "Russia Shell Fallback 231",
-      "zh": "Russia Shell Fallback 231"
+      "zh": "俄罗斯壳牌后备 231"
     },
     "id::RU_ARCTIC_FB_232": {
       "en": "Russia Shell Fallback 232",
-      "zh": "Russia Shell Fallback 232"
+      "zh": "俄罗斯壳牌后备 232"
     },
     "id::RU_ARCTIC_FB_233": {
       "en": "Russia Shell Fallback 233",
-      "zh": "Russia Shell Fallback 233"
+      "zh": "俄罗斯壳牌后备 233"
     },
     "id::RU_ARCTIC_FB_234": {
       "en": "Russia Shell Fallback 234",
-      "zh": "Russia Shell Fallback 234"
+      "zh": "俄罗斯壳牌后备 234"
     },
     "id::RU_ARCTIC_FB_235": {
       "en": "Russia Shell Fallback 235",
-      "zh": "Russia Shell Fallback 235"
+      "zh": "俄罗斯壳牌后备 235"
     },
     "id::RU_ARCTIC_FB_236": {
       "en": "Russia Shell Fallback 236",
-      "zh": "Russia Shell Fallback 236"
+      "zh": "俄罗斯壳牌后备 236"
     },
     "id::RU_ARCTIC_FB_237": {
       "en": "Russia Shell Fallback 237",
-      "zh": "Russia Shell Fallback 237"
+      "zh": "俄罗斯壳牌后备 237"
     },
     "id::RU_ARCTIC_FB_238": {
       "en": "Russia Shell Fallback 238",
-      "zh": "Russia Shell Fallback 238"
+      "zh": "俄罗斯壳牌后备 238"
     },
     "id::RU_ARCTIC_FB_239": {
       "en": "Russia Shell Fallback 239",
-      "zh": "Russia Shell Fallback 239"
+      "zh": "俄罗斯壳牌后备 239"
     },
     "id::RU_ARCTIC_FB_240": {
       "en": "Russia Shell Fallback 240",
-      "zh": "Russia Shell Fallback 240"
+      "zh": "俄罗斯壳牌后备 240"
     },
     "id::RU_ARCTIC_FB_241": {
       "en": "Russia Shell Fallback 241",
-      "zh": "Russia Shell Fallback 241"
+      "zh": "俄罗斯壳牌后备 241"
     },
     "id::RU_ARCTIC_FB_242": {
       "en": "Russia Shell Fallback 242",
-      "zh": "Russia Shell Fallback 242"
+      "zh": "俄罗斯壳牌后备 242"
     },
     "id::RU_ARCTIC_FB_243": {
       "en": "Russia Shell Fallback 243",
-      "zh": "Russia Shell Fallback 243"
+      "zh": "俄罗斯壳牌后备 243"
     },
     "id::RU_ARCTIC_FB_244": {
       "en": "Russia Shell Fallback 244",
-      "zh": "Russia Shell Fallback 244"
+      "zh": "俄罗斯壳牌后备 244"
     },
     "id::RU_ARCTIC_FB_245": {
       "en": "Russia Shell Fallback 245",
-      "zh": "Russia Shell Fallback 245"
+      "zh": "俄罗斯壳牌后备 245"
     },
     "id::RU_ARCTIC_FB_246": {
       "en": "Russia Shell Fallback 246",
-      "zh": "Russia Shell Fallback 246"
+      "zh": "俄罗斯壳牌后备 246"
     },
     "id::RU_ARCTIC_FB_247": {
       "en": "Russia Shell Fallback 247",
-      "zh": "Russia Shell Fallback 247"
+      "zh": "俄罗斯壳牌后备 247"
     },
     "id::RU_ARCTIC_FB_248": {
       "en": "Russia Shell Fallback 248",
-      "zh": "Russia Shell Fallback 248"
+      "zh": "俄罗斯壳牌后备 248"
     },
     "id::RU_ARCTIC_FB_249": {
       "en": "Russia Shell Fallback 249",
-      "zh": "Russia Shell Fallback 249"
+      "zh": "俄罗斯壳牌后备 249"
     },
     "id::RU_ARCTIC_FB_250": {
       "en": "Russia Shell Fallback 250",
-      "zh": "Russia Shell Fallback 250"
+      "zh": "俄罗斯壳牌 Fallback 250"
     },
     "id::RU_ARCTIC_FB_251": {
       "en": "Russia Shell Fallback 251",
-      "zh": "Russia Shell Fallback 251"
+      "zh": "俄罗斯壳牌后备 251"
     },
     "id::RU_ARCTIC_FB_252": {
       "en": "Russia Shell Fallback 252",
-      "zh": "Russia Shell Fallback 252"
+      "zh": "俄罗斯壳牌后备 252"
     },
     "id::RU_ARCTIC_FB_253": {
       "en": "Russia Shell Fallback 253",
-      "zh": "Russia Shell Fallback 253"
+      "zh": "俄罗斯壳牌后备 253"
     },
     "id::RU_ARCTIC_FB_254": {
       "en": "Russia Shell Fallback 254",
-      "zh": "Russia Shell Fallback 254"
+      "zh": "俄罗斯壳牌后备 254"
     },
     "id::RU_ARCTIC_FB_255": {
       "en": "Russia Shell Fallback 255",
-      "zh": "Russia Shell Fallback 255"
+      "zh": "俄罗斯壳牌后备 255"
     },
     "id::RU_ARCTIC_FB_256": {
       "en": "Russia Shell Fallback 256",
-      "zh": "Russia Shell Fallback 256"
+      "zh": "俄罗斯壳牌后备 256"
     },
     "id::RU_ARCTIC_FB_257": {
       "en": "Russia Shell Fallback 257",
-      "zh": "Russia Shell Fallback 257"
+      "zh": "俄罗斯壳牌后备 257"
     },
     "id::RU_ARCTIC_FB_258": {
       "en": "Russia Shell Fallback 258",
-      "zh": "Russia Shell Fallback 258"
+      "zh": "俄罗斯壳牌后备 258"
     },
     "id::RU_ARCTIC_FB_259": {
       "en": "Russia Shell Fallback 259",
-      "zh": "Russia Shell Fallback 259"
+      "zh": "俄罗斯壳牌后备 259"
     },
     "id::RU_ARCTIC_FB_260": {
       "en": "Russia Shell Fallback 260",
-      "zh": "Russia Shell Fallback 260"
+      "zh": "俄罗斯壳牌 Fallback 260"
     },
     "id::RU_ARCTIC_FB_261": {
       "en": "Russia Shell Fallback 261",
-      "zh": "Russia Shell Fallback 261"
+      "zh": "俄罗斯壳牌后备 261"
     },
     "id::RU_ARCTIC_FB_262": {
       "en": "Russia Shell Fallback 262",
-      "zh": "Russia Shell Fallback 262"
+      "zh": "俄罗斯壳牌后备 262"
     },
     "id::RU_ARCTIC_FB_263": {
       "en": "Russia Shell Fallback 263",
-      "zh": "Russia Shell Fallback 263"
+      "zh": "俄罗斯壳牌后备 263"
     },
     "id::RU_ARCTIC_FB_264": {
       "en": "Russia Shell Fallback 264",
-      "zh": "Russia Shell Fallback 264"
+      "zh": "俄罗斯壳牌后备 264"
     },
     "id::RU_ARCTIC_FB_265": {
       "en": "Russia Shell Fallback 265",
-      "zh": "Russia Shell Fallback 265"
+      "zh": "俄罗斯壳牌后备 265"
     },
     "id::RU_ARCTIC_FB_266": {
       "en": "Russia Shell Fallback 266",
-      "zh": "Russia Shell Fallback 266"
+      "zh": "俄罗斯壳牌后备 266"
     },
     "id::RU_ARCTIC_FB_267": {
       "en": "Russia Shell Fallback 267",
-      "zh": "Russia Shell Fallback 267"
+      "zh": "俄罗斯壳牌后备 267"
     },
     "id::RU_ARCTIC_FB_268": {
       "en": "Russia Shell Fallback 268",
@@ -129912,7 +130268,7 @@
     },
     "id::RU_RAY_50074027B10407770782637": {
       "en": "Ayano-Maysky Rayon",
-      "zh": "Ayano-Maysky Rayon"
+      "zh": "绫野美斯基人造丝"
     },
     "id::RU_RAY_50074027B1043871686505": {
       "en": "Shovgenovsky District",
@@ -129920,7 +130276,7 @@
     },
     "id::RU_RAY_50074027B10504727773087": {
       "en": "городской округ Большой Ка",
-      "zh": "городской округ Большой Ка"
+      "zh": "大卡市区"
     },
     "id::RU_RAY_50074027B10506947859679": {
       "en": "Voskresensky District",
@@ -129940,7 +130296,7 @@
     },
     "id::RU_RAY_50074027B10653527260039": {
       "en": "Uglegorsky District",
-      "zh": "Uglegorsky District"
+      "zh": "乌格列戈尔斯基区"
     },
     "id::RU_RAY_50074027B10676086284699": {
       "en": "Alsheyevsky District",
@@ -130016,7 +130372,7 @@
     },
     "id::RU_RAY_50074027B11624788894191": {
       "en": "Nanaysky Rayon",
-      "zh": "Nanaysky Rayon"
+      "zh": "纳奈斯基人造丝"
     },
     "id::RU_RAY_50074027B11673707761487": {
       "en": "Laukaa District",
@@ -130032,7 +130388,7 @@
     },
     "id::RU_RAY_50074027B11922039467664": {
       "en": "Bystrinsky District",
-      "zh": "Bystrinsky District"
+      "zh": "比斯特林斯基区"
     },
     "id::RU_RAY_50074027B11949553415975": {
       "en": "Alikovsky District",
@@ -130044,7 +130400,7 @@
     },
     "id::RU_RAY_50074027B12038472396790": {
       "en": "Milkovsky District",
-      "zh": "Milkovsky District"
+      "zh": "米尔科夫斯基区"
     },
     "id::RU_RAY_50074027B12057415827309": {
       "en": "Bolshesoldatsky District",
@@ -130072,11 +130428,11 @@
     },
     "id::RU_RAY_50074027B12241106743918": {
       "en": "Verkhnebureinsky District",
-      "zh": "Verkhnebureinsky District"
+      "zh": "上布伦斯基区"
     },
     "id::RU_RAY_50074027B12392919053035": {
       "en": "Mazanovsky District",
-      "zh": "Mazanovsky District"
+      "zh": "马扎诺夫斯基区"
     },
     "id::RU_RAY_50074027B12453420469278": {
       "en": "Мартыновский район",
@@ -130112,7 +130468,7 @@
     },
     "id::RU_RAY_50074027B13065478587985": {
       "en": "Yelizovsky District",
-      "zh": "Yelizovsky District"
+      "zh": "叶利佐夫斯基区"
     },
     "id::RU_RAY_50074027B13097997893227": {
       "en": "Volzhsk",
@@ -130128,7 +130484,7 @@
     },
     "id::RU_RAY_50074027B13114681801765": {
       "en": "Skovorodinsky District",
-      "zh": "Skovorodinsky District"
+      "zh": "斯科沃罗金斯基区"
     },
     "id::RU_RAY_50074027B13118277330678": {
       "en": "Chkalovsky District",
@@ -130240,7 +130596,7 @@
     },
     "id::RU_RAY_50074027B1484336690213": {
       "en": "Anivsky District",
-      "zh": "Anivsky District"
+      "zh": "阿尼夫斯基区"
     },
     "id::RU_RAY_50074027B14866236496224": {
       "en": "Kuyurgazinsky District",
@@ -130284,7 +130640,7 @@
     },
     "id::RU_RAY_50074027B15761543307374": {
       "en": "Khasansky District",
-      "zh": "Khasansky District"
+      "zh": "哈桑区"
     },
     "id::RU_RAY_50074027B1576720764455": {
       "en": "Yartsevsky District",
@@ -130364,7 +130720,7 @@
     },
     "id::RU_RAY_50074027B1667365379281": {
       "en": "Shkotovsky District",
-      "zh": "Shkotovsky District"
+      "zh": "什科托夫斯基区"
     },
     "id::RU_RAY_50074027B16688854937405": {
       "en": "Yurlinsky District",
@@ -130372,7 +130728,7 @@
     },
     "id::RU_RAY_50074027B16795795282951": {
       "en": "Makarovsky District",
-      "zh": "Makarovsky District"
+      "zh": "马卡罗夫斯基区"
     },
     "id::RU_RAY_50074027B16822435870965": {
       "en": "Alexeyevsky District",
@@ -130400,7 +130756,7 @@
     },
     "id::RU_RAY_50074027B16974547320790": {
       "en": "Kurilsky District",
-      "zh": "Kurilsky District"
+      "zh": "库里尔斯基区"
     },
     "id::RU_RAY_50074027B17004521954389": {
       "en": "Pachelmsky District",
@@ -130488,7 +130844,7 @@
     },
     "id::RU_RAY_50074027B18064199701976": {
       "en": "Birobidzhansky District",
-      "zh": "Birobidzhansky District"
+      "zh": "比罗比詹斯基区"
     },
     "id::RU_RAY_50074027B18113841305478": {
       "en": "Dorogobuzhsky District",
@@ -130548,7 +130904,7 @@
     },
     "id::RU_RAY_50074027B18749905524628": {
       "en": "Shimanovsk",
-      "zh": "Shimanovsk"
+      "zh": "希马诺夫斯克"
     },
     "id::RU_RAY_50074027B18775873271761": {
       "en": "Pravdinsky District",
@@ -130588,11 +130944,11 @@
     },
     "id::RU_RAY_50074027B19177714198501": {
       "en": "Penzhinsky District",
-      "zh": "Penzhinsky District"
+      "zh": "彭任斯基区"
     },
     "id::RU_RAY_50074027B19185058252844": {
       "en": "imeni Lazo Rayon",
-      "zh": "imeni Lazo Rayon"
+      "zh": "伊梅尼·拉佐·雷永"
     },
     "id::RU_RAY_50074027B19237962816289": {
       "en": "городской округ Урюпинск",
@@ -130616,7 +130972,7 @@
     },
     "id::RU_RAY_50074027B195011387686": {
       "en": "Anuchinsky District",
-      "zh": "Anuchinsky District"
+      "zh": "阿努钦斯基区"
     },
     "id::RU_RAY_50074027B19510763976720": {
       "en": "Nizhnedevitsky District",
@@ -130644,7 +131000,7 @@
     },
     "id::RU_RAY_50074027B19676517709313": {
       "en": "Zavitinsky District",
-      "zh": "Zavitinsky District"
+      "zh": "扎维廷斯基区"
     },
     "id::RU_RAY_50074027B19694965074272": {
       "en": "Khomutovsky District",
@@ -130816,7 +131172,7 @@
     },
     "id::RU_RAY_50074027B22004389566857": {
       "en": "Khankaysky District",
-      "zh": "Khankaysky District"
+      "zh": "汉凯区"
     },
     "id::RU_RAY_50074027B22082895013138": {
       "en": "Istrinsky District",
@@ -130836,7 +131192,7 @@
     },
     "id::RU_RAY_50074027B22497972741045": {
       "en": "Лесозаводский городской ок",
-      "zh": "Лесозаводский городской ок"
+      "zh": "莱索扎沃茨基市"
     },
     "id::RU_RAY_50074027B22498534109926": {
       "en": "Ikryaninsky District",
@@ -130880,7 +131236,7 @@
     },
     "id::RU_RAY_50074027B2294674519719": {
       "en": "Артёмовский городской окру",
-      "zh": "Артёмовский городской окру"
+      "zh": "阿尔乔莫夫斯基城区"
     },
     "id::RU_RAY_50074027B22946859849779": {
       "en": "Grozny",
@@ -130888,7 +131244,7 @@
     },
     "id::RU_RAY_50074027B23038757283566": {
       "en": "Seryshevsky District",
-      "zh": "Seryshevsky District"
+      "zh": "谢里雪夫斯基区"
     },
     "id::RU_RAY_50074027B23040761518375": {
       "en": "Andropovsky District",
@@ -130948,7 +131304,7 @@
     },
     "id::RU_RAY_50074027B23574651489264": {
       "en": "Nadezhdinsky District",
-      "zh": "Nadezhdinsky District"
+      "zh": "纳德日金斯基区"
     },
     "id::RU_RAY_50074027B23577268238968": {
       "en": "Malmyzhsky District",
@@ -131056,7 +131412,7 @@
     },
     "id::RU_RAY_50074027B24833845285067": {
       "en": "Komsomolsky",
-      "zh": "Komsomolsky"
+      "zh": "共青团"
     },
     "id::RU_RAY_50074027B24884281398381": {
       "en": "Nelidovsky District",
@@ -131104,7 +131460,7 @@
     },
     "id::RU_RAY_50074027B25459948908783": {
       "en": "Terneysky District",
-      "zh": "Terneysky District"
+      "zh": "特尔涅斯基区"
     },
     "id::RU_RAY_50074027B25483853572662": {
       "en": "Dzerzhinsky",
@@ -131264,7 +131620,7 @@
     },
     "id::RU_RAY_50074027B28144113624552": {
       "en": "Tenkinsky Urban District",
-      "zh": "Tenkinsky Urban District"
+      "zh": "滕金斯基市区"
     },
     "id::RU_RAY_50074027B28156856549850": {
       "en": "Iznoskovsky District",
@@ -131416,7 +131772,7 @@
     },
     "id::RU_RAY_50074027B30359858923795": {
       "en": "Solnechny Rayon",
-      "zh": "Solnechny Rayon"
+      "zh": "索尔内奇尼人造丝"
     },
     "id::RU_RAY_50074027B30425971595491": {
       "en": "Nekhayevsky District",
@@ -131432,7 +131788,7 @@
     },
     "id::RU_RAY_50074027B30510351041396": {
       "en": "Dolinsky District",
-      "zh": "Dolinsky District"
+      "zh": "多林斯基区"
     },
     "id::RU_RAY_50074027B3057027535626": {
       "en": "Teykovo",
@@ -131532,7 +131888,7 @@
     },
     "id::RU_RAY_50074027B32170687572128": {
       "en": "Korsakovsky District",
-      "zh": "Korsakovsky District"
+      "zh": "科萨科夫斯基区"
     },
     "id::RU_RAY_50074027B32182342803093": {
       "en": "Balezinsky District",
@@ -131552,7 +131908,7 @@
     },
     "id::RU_RAY_50074027B32360932940824": {
       "en": "Khorolsky District",
-      "zh": "Khorolsky District"
+      "zh": "霍罗尔斯基区"
     },
     "id::RU_RAY_50074027B32449678742282": {
       "en": "Oboyansky District",
@@ -131616,7 +131972,7 @@
     },
     "id::RU_RAY_50074027B33126296618922": {
       "en": "Pozharsky District",
-      "zh": "Pozharsky District"
+      "zh": "波扎尔斯基区"
     },
     "id::RU_RAY_50074027B33311431944008": {
       "en": "Tarumovsky District",
@@ -131624,7 +131980,7 @@
     },
     "id::RU_RAY_50074027B33340525070478": {
       "en": "Srednekansky Urban District",
-      "zh": "Srednekansky Urban District"
+      "zh": "中堪斯基市区"
     },
     "id::RU_RAY_50074027B33360577835690": {
       "en": "Leninogorsky District",
@@ -131644,7 +132000,7 @@
     },
     "id::RU_RAY_50074027B33751760148683": {
       "en": "Smirnykhovsky District",
-      "zh": "Smirnykhovsky District"
+      "zh": "斯米尔尼霍夫斯基区"
     },
     "id::RU_RAY_50074027B33840805886085": {
       "en": "Tlyaratinsky District",
@@ -131656,7 +132012,7 @@
     },
     "id::RU_RAY_50074027B33926607160791": {
       "en": "Уссурийский городской окру",
-      "zh": "Уссурийский городской окру"
+      "zh": "乌苏里城区"
     },
     "id::RU_RAY_50074027B33955098057066": {
       "en": "Bekovsky District",
@@ -131680,7 +132036,7 @@
     },
     "id::RU_RAY_50074027B34244221839846": {
       "en": "Romnensky District",
-      "zh": "Romnensky District"
+      "zh": "罗姆年斯基区"
     },
     "id::RU_RAY_50074027B34253954513186": {
       "en": "Krasnokholmsky District",
@@ -131736,7 +132092,7 @@
     },
     "id::RU_RAY_50074027B34733261690727": {
       "en": "Пограничный район",
-      "zh": "Пограничный район"
+      "zh": "边区"
     },
     "id::RU_RAY_50074027B34758270921269": {
       "en": "Koskenala District",
@@ -131796,7 +132152,7 @@
     },
     "id::RU_RAY_50074027B35514912815018": {
       "en": "Chernigovsky District",
-      "zh": "Chernigovsky District"
+      "zh": "切尔尼戈夫斯基区"
     },
     "id::RU_RAY_50074027B35606429719645": {
       "en": "Kostamus City District",
@@ -131840,7 +132196,7 @@
     },
     "id::RU_RAY_50074027B3624981658238": {
       "en": "Tyndinsky District",
-      "zh": "Tyndinsky District"
+      "zh": "廷丁斯基区"
     },
     "id::RU_RAY_50074027B36318854676634": {
       "en": "городской округ Гуково",
@@ -131860,7 +132216,7 @@
     },
     "id::RU_RAY_50074027B3666508019566": {
       "en": "Obluchensky District",
-      "zh": "Obluchensky District"
+      "zh": "奥布卢琴斯基区"
     },
     "id::RU_RAY_50074027B36797886891217": {
       "en": "Троснянский район",
@@ -131948,11 +132304,11 @@
     },
     "id::RU_RAY_50074027B37999402407739": {
       "en": "Арсеньевский городской окр",
-      "zh": "Арсеньевский городской окр"
+      "zh": "阿尔谢尼耶夫斯基市区"
     },
     "id::RU_RAY_50074027B38107602783596": {
       "en": "Olginsky District",
-      "zh": "Olginsky District"
+      "zh": "奥尔金斯基区"
     },
     "id::RU_RAY_50074027B38115328423974": {
       "en": "Syumsinsky District",
@@ -131984,7 +132340,7 @@
     },
     "id::RU_RAY_50074027B38279427309518": {
       "en": "Vyazemsky Rayon",
-      "zh": "Vyazemsky Rayon"
+      "zh": "维亚泽姆斯基人造丝"
     },
     "id::RU_RAY_50074027B38320991393060": {
       "en": "Zheleznogorsky District",
@@ -132012,7 +132368,7 @@
     },
     "id::RU_RAY_50074027B38604187853765": {
       "en": "Александровск-Сахалинский",
-      "zh": "Александровск-Сахалинский"
+      "zh": "Калександровск-Сахалинский"
     },
     "id::RU_RAY_50074027B38701103870150": {
       "en": "urban okrug of Derbent",
@@ -132112,7 +132468,7 @@
     },
     "id::RU_RAY_50074027B39972680453550": {
       "en": "Ulchsky Rayon",
-      "zh": "Ulchsky Rayon"
+      "zh": "乌尔奇斯基人造丝"
     },
     "id::RU_RAY_50074027B39997532554417": {
       "en": "Uglichsky District",
@@ -132208,11 +132564,11 @@
     },
     "id::RU_RAY_50074027B41108131456102": {
       "en": "Lazovsky District",
-      "zh": "Lazovsky District"
+      "zh": "拉佐夫斯基区"
     },
     "id::RU_RAY_50074027B41109917238619": {
       "en": "Sobolevsky District",
-      "zh": "Sobolevsky District"
+      "zh": "索博列夫斯基区"
     },
     "id::RU_RAY_50074027B41156818689431": {
       "en": "Tbilissky District",
@@ -132296,7 +132652,7 @@
     },
     "id::RU_RAY_50074027B42112936923183": {
       "en": "Ust-Kamchatsky District",
-      "zh": "Ust-Kamchatsky District"
+      "zh": "乌斯季堪察加地区"
     },
     "id::RU_RAY_50074027B42300326185831": {
       "en": "Otradnensky District",
@@ -132400,7 +132756,7 @@
     },
     "id::RU_RAY_50074027B43754658654229": {
       "en": "Tymovsky District",
-      "zh": "Tymovsky District"
+      "zh": "季莫夫斯基区"
     },
     "id::RU_RAY_50074027B43802326383166": {
       "en": "Sursky District",
@@ -132468,7 +132824,7 @@
     },
     "id::RU_RAY_50074027B44541218090779": {
       "en": "Vaninsky Rayon",
-      "zh": "Vaninsky Rayon"
+      "zh": "瓦宁斯基人造丝"
     },
     "id::RU_RAY_50074027B44553427618842": {
       "en": "Balakhninsky District",
@@ -132576,7 +132932,7 @@
     },
     "id::RU_RAY_50074027B46082532996443": {
       "en": "Arkharinsky District",
-      "zh": "Arkharinsky District"
+      "zh": "阿哈林斯基区"
     },
     "id::RU_RAY_50074027B46163167376002": {
       "en": "Dolgoprudny",
@@ -132588,7 +132944,7 @@
     },
     "id::RU_RAY_50074027B46260605120744": {
       "en": "Okhotsky Rayon",
-      "zh": "Okhotsky Rayon"
+      "zh": "鄂霍次基人造丝"
     },
     "id::RU_RAY_50074027B46350199135430": {
       "en": "Chukhlomsky District",
@@ -132616,7 +132972,7 @@
     },
     "id::RU_RAY_50074027B46545737215195": {
       "en": "Olyutorsky District",
-      "zh": "Olyutorsky District"
+      "zh": "奥柳托斯基区"
     },
     "id::RU_RAY_50074027B46564733683630": {
       "en": "Vichuga",
@@ -132624,7 +132980,7 @@
     },
     "id::RU_RAY_50074027B46643568009996": {
       "en": "Находкинский городской окр",
-      "zh": "Находкинский городской окр"
+      "zh": "纳霍德卡市区"
     },
     "id::RU_RAY_50074027B46800142178650": {
       "en": "Usolsky District",
@@ -132712,7 +133068,7 @@
     },
     "id::RU_RAY_50074027B48263627343832": {
       "en": "Кировский район",
-      "zh": "Кировский район"
+      "zh": "基洛夫斯基区"
     },
     "id::RU_RAY_50074027B48349289288581": {
       "en": "Gudermessky District",
@@ -132748,7 +133104,7 @@
     },
     "id::RU_RAY_50074027B48805255710473": {
       "en": "Kavalerovsky District",
-      "zh": "Kavalerovsky District"
+      "zh": "卡瓦列罗夫斯基区"
     },
     "id::RU_RAY_50074027B4882309977182": {
       "en": "Kotelnikovsky District",
@@ -132804,7 +133160,7 @@
     },
     "id::RU_RAY_50074027B49864748885643": {
       "en": "городской округ Благовещен",
-      "zh": "городской округ Благовещен"
+      "zh": "Благовещен Благовещен"
     },
     "id::RU_RAY_50074027B49919622206387": {
       "en": "Sterlitamaksky District",
@@ -132836,7 +133192,7 @@
     },
     "id::RU_RAY_50074027B50212076410442": {
       "en": "Pevek urban district",
-      "zh": "Pevek urban district"
+      "zh": "佩韦克市区"
     },
     "id::RU_RAY_50074027B50222515317782": {
       "en": "Rybno-Slobodsky District",
@@ -132880,7 +133236,7 @@
     },
     "id::RU_RAY_50074027B51031481762719": {
       "en": "Komsomolsk-on-Amur",
-      "zh": "Komsomolsk-on-Amur"
+      "zh": "阿穆尔河畔共青城"
     },
     "id::RU_RAY_50074027B51055674062633": {
       "en": "Strugo-Krasnensky District",
@@ -132928,7 +133284,7 @@
     },
     "id::RU_RAY_50074027B51591038721699": {
       "en": "городской округ Южно-Сахал",
-      "zh": "городской округ Южно-Сахал"
+      "zh": "南萨哈尔城区"
     },
     "id::RU_RAY_50074027B51628846179321": {
       "en": "ЗАТО Североморск",
@@ -133012,7 +133368,7 @@
     },
     "id::RU_RAY_50074027B52585131638206": {
       "en": "Magdagachinsky District",
-      "zh": "Magdagachinsky District"
+      "zh": "马格达加钦斯基区"
     },
     "id::RU_RAY_50074027B52619887233676": {
       "en": "Свердловский район",
@@ -133084,7 +133440,7 @@
     },
     "id::RU_RAY_50074027B53689487296267": {
       "en": "ЗАТО Фокино",
-      "zh": "ЗАТО Фокино"
+      "zh": "这就是为什么福奇诺"
     },
     "id::RU_RAY_50074027B53939252162264": {
       "en": "Rostov-on-Don",
@@ -133408,7 +133764,7 @@
     },
     "id::RU_RAY_50074027B57985783040710": {
       "en": "Yagodninsky Urban District",
-      "zh": "Yagodninsky Urban District"
+      "zh": "亚戈德宁斯基市区"
     },
     "id::RU_RAY_50074027B58076034090645": {
       "en": "Soletsky District",
@@ -133432,7 +133788,7 @@
     },
     "id::RU_RAY_50074027B58237762818486": {
       "en": "Svobodnensky District",
-      "zh": "Svobodnensky District"
+      "zh": "斯沃博德年斯基区"
     },
     "id::RU_RAY_50074027B58259564251603": {
       "en": "городской округ Лесной",
@@ -133440,7 +133796,7 @@
     },
     "id::RU_RAY_50074027B58297077135629": {
       "en": "Владивостокский городской",
-      "zh": "Владивостокский городской"
+      "zh": "海参崴市"
     },
     "id::RU_RAY_50074027B583940631310": {
       "en": "Lukhsky District",
@@ -133540,7 +133896,7 @@
     },
     "id::RU_RAY_50074027B59835640460134": {
       "en": "городской округ Зея",
-      "zh": "городской округ Зея"
+      "zh": "泽雅市区"
     },
     "id::RU_RAY_50074027B59910785690021": {
       "en": "Shemurshinsky District",
@@ -133772,7 +134128,7 @@
     },
     "id::RU_RAY_50074027B63397808648693": {
       "en": "Sovetsko-Gavansky Rayon",
-      "zh": "Sovetsko-Gavansky Rayon"
+      "zh": "苏维埃-加万斯基人造丝"
     },
     "id::RU_RAY_50074027B6339965141747": {
       "en": "Новоуральский городской ок",
@@ -133788,7 +134144,7 @@
     },
     "id::RU_RAY_50074027B63762585695828": {
       "en": "Poronaysky District",
-      "zh": "Poronaysky District"
+      "zh": "波罗奈斯基区"
     },
     "id::RU_RAY_50074027B63773787473749": {
       "en": "Kholm-Zhirkovsky",
@@ -133796,7 +134152,7 @@
     },
     "id::RU_RAY_50074027B63792180900852": {
       "en": "Raychikhinsk",
-      "zh": "Raychikhinsk"
+      "zh": "雷奇欣斯克"
     },
     "id::RU_RAY_50074027B63833693822647": {
       "en": "Buynaksky District",
@@ -133928,7 +134284,7 @@
     },
     "id::RU_RAY_50074027B65484756117313": {
       "en": "imeni Poliny Osipenko Rayon",
-      "zh": "imeni Poliny Osipenko Rayon"
+      "zh": "伊米尼·波利尼·奥西彭科·雷永"
     },
     "id::RU_RAY_50074027B65544968176864": {
       "en": "городской округ Рыбинск",
@@ -133980,7 +134336,7 @@
     },
     "id::RU_RAY_50074027B6589051982906": {
       "en": "Khabarovsky Rayon",
-      "zh": "Khabarovsky Rayon"
+      "zh": "哈巴罗夫斯克人造丝"
     },
     "id::RU_RAY_50074027B65899398094025": {
       "en": "Kiyasovsky District",
@@ -133988,7 +134344,7 @@
     },
     "id::RU_RAY_50074027B66038221919497": {
       "en": "Susumansky Urban District",
-      "zh": "Susumansky Urban District"
+      "zh": "苏苏曼斯基市区"
     },
     "id::RU_RAY_50074027B66059213577212": {
       "en": "Arbazhsky District",
@@ -134116,7 +134472,7 @@
     },
     "id::RU_RAY_50074027B679557218720": {
       "en": "Anadyr Urban Okrug",
-      "zh": "Anadyr Urban Okrug"
+      "zh": "阿纳德尔市区"
     },
     "id::RU_RAY_50074027B67988371503022": {
       "en": "Cherdynsky District",
@@ -134176,7 +134532,7 @@
     },
     "id::RU_RAY_50074027B68901726590521": {
       "en": "Ust-Bolsheretsky District",
-      "zh": "Ust-Bolsheretsky District"
+      "zh": "乌斯季-博舍列茨基区"
     },
     "id::RU_RAY_50074027B68994215866919": {
       "en": "Kurchatovsky District",
@@ -134200,7 +134556,7 @@
     },
     "id::RU_RAY_50074027B69125687542481": {
       "en": "Bikinsky Rayon",
-      "zh": "Bikinsky Rayon"
+      "zh": "比金斯基人造丝"
     },
     "id::RU_RAY_50074027B69153114446918": {
       "en": "Mendeleyevsky District",
@@ -134232,7 +134588,7 @@
     },
     "id::RU_RAY_50074027B69870482204976": {
       "en": "Petropavlovsk-Kamchatsky",
-      "zh": "Petropavlovsk-Kamchatsky"
+      "zh": "堪察加彼得巴甫洛夫斯克"
     },
     "id::RU_RAY_50074027B69883291623230": {
       "en": "Kardymovsky District",
@@ -134252,7 +134608,7 @@
     },
     "id::RU_RAY_50074027B70283628073032": {
       "en": "Vilyuchinsk",
-      "zh": "Vilyuchinsk"
+      "zh": "维柳钦斯克"
     },
     "id::RU_RAY_50074027B7029470838345": {
       "en": "Oleninsky District",
@@ -134512,7 +134868,7 @@
     },
     "id::RU_RAY_50074027B73469804180060": {
       "en": "Amursky Rayon",
-      "zh": "Amursky Rayon"
+      "zh": "阿穆尔斯基人造丝"
     },
     "id::RU_RAY_50074027B73484037944339": {
       "en": "городской округ Железновод",
@@ -134584,7 +134940,7 @@
     },
     "id::RU_RAY_50074027B74375992228315": {
       "en": "Anadyrsky District",
-      "zh": "Anadyrsky District"
+      "zh": "阿纳德尔斯基区"
     },
     "id::RU_RAY_50074027B74380853885106": {
       "en": "Кашарский район",
@@ -134600,7 +134956,7 @@
     },
     "id::RU_RAY_50074027B74690038503000": {
       "en": "Spassk-Dalny",
-      "zh": "Spassk-Dalny"
+      "zh": "斯帕斯克-达尔尼"
     },
     "id::RU_RAY_50074027B74756274305659": {
       "en": "Ramonsky District",
@@ -134608,7 +134964,7 @@
     },
     "id::RU_RAY_50074027B74787590931103": {
       "en": "Дальнегорский городской ок",
-      "zh": "Дальнегорский городской ок"
+      "zh": "达尔内戈尔斯基市还可以"
     },
     "id::RU_RAY_50074027B74911120269056": {
       "en": "Kirzhachsky District",
@@ -134644,7 +135000,7 @@
     },
     "id::RU_RAY_50074027B75363734949682": {
       "en": "городской округ Прогресс",
-      "zh": "городской округ Прогресс"
+      "zh": "进步市区"
     },
     "id::RU_RAY_50074027B75388563802215": {
       "en": "Kadomsky District",
@@ -134700,7 +135056,7 @@
     },
     "id::RU_RAY_50074027B75924608914452": {
       "en": "Yuzhno-Kurilsky District",
-      "zh": "Yuzhno-Kurilsky District"
+      "zh": "南库里尔斯基地区"
     },
     "id::RU_RAY_50074027B75950164154064": {
       "en": "Шолоховский район",
@@ -134716,7 +135072,7 @@
     },
     "id::RU_RAY_50074027B76144209526439": {
       "en": "Iultinsky District‎",
-      "zh": "Iultinsky District‎"
+      "zh": "伊尔廷斯基区‎"
     },
     "id::RU_RAY_50074027B76149607922366": {
       "en": "Kambarsky District",
@@ -134760,7 +135116,7 @@
     },
     "id::RU_RAY_50074027B76781633158797": {
       "en": "Dalnerechensky District",
-      "zh": "Dalnerechensky District"
+      "zh": "达利涅列琴斯基区"
     },
     "id::RU_RAY_50074027B76808795442710": {
       "en": "Kovrovsky District",
@@ -134788,7 +135144,7 @@
     },
     "id::RU_RAY_50074027B77123826131271": {
       "en": "Khasynsky Urban District",
-      "zh": "Khasynsky Urban District"
+      "zh": "哈辛斯基市区"
     },
     "id::RU_RAY_50074027B77142948304680": {
       "en": "Pervomaysky",
@@ -134824,7 +135180,7 @@
     },
     "id::RU_RAY_50074027B77893052282022": {
       "en": "Smidovichsky District",
-      "zh": "Smidovichsky District"
+      "zh": "斯米多维奇区"
     },
     "id::RU_RAY_50074027B78017463980316": {
       "en": "Dzerzhinsky District",
@@ -134924,7 +135280,7 @@
     },
     "id::RU_RAY_50074027B79809707576514": {
       "en": "Belogorsky District",
-      "zh": "Belogorsky District"
+      "zh": "别洛戈尔斯基区"
     },
     "id::RU_RAY_50074027B79943879791576": {
       "en": "Levashinsky District",
@@ -134932,7 +135288,7 @@
     },
     "id::RU_RAY_50074027B80044850298489": {
       "en": "Severo-Kurilsky District",
-      "zh": "Severo-Kurilsky District"
+      "zh": "北库里尔斯基地区"
     },
     "id::RU_RAY_50074027B80046840644847": {
       "en": "Obninsk",
@@ -134952,7 +135308,7 @@
     },
     "id::RU_RAY_50074027B80170554575176": {
       "en": "Tsiolkovsky",
-      "zh": "Tsiolkovsky"
+      "zh": "齐奥尔科夫斯基"
     },
     "id::RU_RAY_50074027B8026791979770": {
       "en": "Olhava District",
@@ -134984,7 +135340,7 @@
     },
     "id::RU_RAY_50074027B80692714160847": {
       "en": "Nogliksky District",
-      "zh": "Nogliksky District"
+      "zh": "诺格利斯基区"
     },
     "id::RU_RAY_50074027B80694875443279": {
       "en": "Miyakinsky District",
@@ -135060,7 +135416,7 @@
     },
     "id::RU_RAY_50074027B81556625456237": {
       "en": "городской округ Белогорск",
-      "zh": "городской округ Белогорск"
+      "zh": "Белогорск Белогорск"
     },
     "id::RU_RAY_50074027B81570356192981": {
       "en": "Novosokolnichesky District",
@@ -135160,7 +135516,7 @@
     },
     "id::RU_RAY_50074027B8247596248333": {
       "en": "Olsky Urban District",
-      "zh": "Olsky Urban District"
+      "zh": "奥尔斯基市区"
     },
     "id::RU_RAY_50074027B82541686322498": {
       "en": "Aksaysky District",
@@ -135356,7 +135712,7 @@
     },
     "id::RU_RAY_50074027B8567553383469": {
       "en": "городской округ Свободный",
-      "zh": "городской округ Свободный"
+      "zh": "斯沃博德内市区"
     },
     "id::RU_RAY_50074027B85690776295658": {
       "en": "Perelyubsky District",
@@ -135368,7 +135724,7 @@
     },
     "id::RU_RAY_50074027B85754260597476": {
       "en": "Omsukchansky Urban District",
-      "zh": "Omsukchansky Urban District"
+      "zh": "鄂木克昌斯基市区"
     },
     "id::RU_RAY_50074027B85792653210823": {
       "en": "Andreapolsky District",
@@ -135476,7 +135832,7 @@
     },
     "id::RU_RAY_50074027B86870758219567": {
       "en": "городской округ Тында",
-      "zh": "городской округ Тында"
+      "zh": "市区这里"
     },
     "id::RU_RAY_50074027B86894343094602": {
       "en": "Kushnarenkovsky District",
@@ -135492,7 +135848,7 @@
     },
     "id::RU_RAY_50074027B87273501478717": {
       "en": "Magadan Urban District",
-      "zh": "Magadan Urban District"
+      "zh": "马加丹市区"
     },
     "id::RU_RAY_50074027B8728314086153": {
       "en": "Ibresinsky District",
@@ -135512,7 +135868,7 @@
     },
     "id::RU_RAY_50074027B8751485821395": {
       "en": "Bilibinsky District",
-      "zh": "Bilibinsky District"
+      "zh": "比利宾斯基区"
     },
     "id::RU_RAY_50074027B87517330580168": {
       "en": "Kosinsky District",
@@ -135520,7 +135876,7 @@
     },
     "id::RU_RAY_50074027B87569969608847": {
       "en": "Partizansk",
-      "zh": "Partizansk"
+      "zh": "游击队"
     },
     "id::RU_RAY_50074027B87627181065564": {
       "en": "Batetsky District",
@@ -135540,7 +135896,7 @@
     },
     "id::RU_RAY_50074027B87755515311585": {
       "en": "Karaginsky District",
-      "zh": "Karaginsky District"
+      "zh": "卡拉金斯基区"
     },
     "id::RU_RAY_50074027B87884382763880": {
       "en": "Ustyansky District",
@@ -135572,7 +135928,7 @@
     },
     "id::RU_RAY_50074027B88266732999715": {
       "en": "Дальнереченский городской",
-      "zh": "Дальнереченский городской"
+      "zh": "达利涅列琴斯基市"
     },
     "id::RU_RAY_50074027B88274438285408": {
       "en": "Pytalovsky District",
@@ -135608,7 +135964,7 @@
     },
     "id::RU_RAY_50074027B88547261644185": {
       "en": "Birobidzhan",
-      "zh": "Birobidzhan"
+      "zh": "比罗比詹"
     },
     "id::RU_RAY_50074027B88649718835128": {
       "en": "Bondarsky District",
@@ -135616,7 +135972,7 @@
     },
     "id::RU_RAY_50074027B88724749460683": {
       "en": "Shimanovsky District",
-      "zh": "Shimanovsky District"
+      "zh": "希马诺夫斯基区"
     },
     "id::RU_RAY_50074027B88833009922563": {
       "en": "Nizhneserginsky District",
@@ -135676,7 +136032,7 @@
     },
     "id::RU_RAY_50074027B8978578155052": {
       "en": "Tigilsky District",
-      "zh": "Tigilsky District"
+      "zh": "蒂吉尔斯基区"
     },
     "id::RU_RAY_50074027B89871819113429": {
       "en": "Urus-Martanovsky District",
@@ -135704,7 +136060,7 @@
     },
     "id::RU_RAY_50074027B90244452662579": {
       "en": "Zeysky District",
-      "zh": "Zeysky District"
+      "zh": "泽斯基区"
     },
     "id::RU_RAY_50074027B90256927178975": {
       "en": "Качканарский городской окр",
@@ -135796,11 +136152,11 @@
     },
     "id::RU_RAY_50074027B91367283057981": {
       "en": "Bureysky District",
-      "zh": "Bureysky District"
+      "zh": "布列斯基区"
     },
     "id::RU_RAY_50074027B91375405563028": {
       "en": "Severo-Evensky Urban District",
-      "zh": "Severo-Evensky Urban District"
+      "zh": "北埃文斯基市区"
     },
     "id::RU_RAY_50074027B91439993213773": {
       "en": "Gdovsky District",
@@ -135828,7 +136184,7 @@
     },
     "id::RU_RAY_50074027B91760241420643": {
       "en": "Selemdzhinsky District",
-      "zh": "Selemdzhinsky District"
+      "zh": "谢列姆任斯基区"
     },
     "id::RU_RAY_50074027B91802635760870": {
       "en": "Konakovsky District",
@@ -135860,7 +136216,7 @@
     },
     "id::RU_RAY_50074027B92242127524285": {
       "en": "Chuguyevsky District",
-      "zh": "Chuguyevsky District"
+      "zh": "楚古耶夫斯基区"
     },
     "id::RU_RAY_50074027B92291653034411": {
       "en": "Votkinsky District",
@@ -135928,7 +136284,7 @@
     },
     "id::RU_RAY_50074027B9338747963556": {
       "en": "городской округ Палана",
-      "zh": "городской округ Палана"
+      "zh": "帕拉纳市区"
     },
     "id::RU_RAY_50074027B93416420904070": {
       "en": "Krasnoborsky District",
@@ -136036,7 +136392,7 @@
     },
     "id::RU_RAY_50074027B94588175534962": {
       "en": "Okhinsky District",
-      "zh": "Okhinsky District"
+      "zh": "奥欣斯基区"
     },
     "id::RU_RAY_50074027B94648571764089": {
       "en": "Sosnogorsk Municipal District",
@@ -136064,7 +136420,7 @@
     },
     "id::RU_RAY_50074027B94989951930639": {
       "en": "Tomarinsky District",
-      "zh": "Tomarinsky District"
+      "zh": "托马林斯基区"
     },
     "id::RU_RAY_50074027B95056184148415": {
       "en": "Vilegodsky District",
@@ -136100,11 +136456,11 @@
     },
     "id::RU_RAY_50074027B95296004893180": {
       "en": "Partizansky District",
-      "zh": "Partizansky District"
+      "zh": "游击队区"
     },
     "id::RU_RAY_50074027B95321834439264": {
       "en": "Aleutsky District",
-      "zh": "Aleutsky District"
+      "zh": "阿留申斯基区"
     },
     "id::RU_RAY_50074027B95345501761420": {
       "en": "Sosnovoborsky District",
@@ -136112,7 +136468,7 @@
     },
     "id::RU_RAY_50074027B95387741431040": {
       "en": "Tuguro-Chumikansky Rayon",
-      "zh": "Tuguro-Chumikansky Rayon"
+      "zh": "图古罗-丘米坎斯基人造丝"
     },
     "id::RU_RAY_50074027B95465717022961": {
       "en": "Bolshesosnovsky District",
@@ -145896,19 +146252,19 @@
     },
     "imeni Lazo Rayon": {
       "en": "imeni Lazo Rayon",
-      "zh": "imeni Lazo Rayon"
+      "zh": "伊梅尼·拉佐·雷永"
     },
     "imeni Lazo Rayon (RU)": {
       "en": "imeni Lazo Rayon (RU)",
-      "zh": "imeni Lazo Rayon (RU)"
+      "zh": "伊梅尼·拉佐·雷永"
     },
     "imeni Poliny Osipenko Rayon": {
       "en": "imeni Poliny Osipenko Rayon",
-      "zh": "imeni Poliny Osipenko Rayon"
+      "zh": "伊米尼·波利尼·奥西彭科·雷永"
     },
     "imeni Poliny Osipenko Rayon (RU)": {
       "en": "imeni Poliny Osipenko Rayon (RU)",
-      "zh": "imeni Poliny Osipenko Rayon (RU)"
+      "zh": "伊米尼·波利尼·奥西彭科·雷永"
     },
     "inowrocławski": {
       "en": "inowrocławski",
@@ -148856,11 +149212,11 @@
     },
     "Александровск-Сахалинский": {
       "en": "Александровск-Сахалинский",
-      "zh": "Александровск-Сахалинский"
+      "zh": "Калександровск-Сахалинский"
     },
     "Александровск-Сахалинский (RU)": {
       "en": "Александровск-Сахалинский (RU)",
-      "zh": "Александровск-Сахалинский (RU)"
+      "zh": "Калександровск-Сахалинский"
     },
     "Александровский район": {
       "en": "Александровский район",
@@ -148880,19 +149236,19 @@
     },
     "Арсеньевский городской окр": {
       "en": "Арсеньевский городской окр",
-      "zh": "Арсеньевский городской окр"
+      "zh": "阿尔谢尼耶夫斯基市区"
     },
     "Арсеньевский городской окр (RU)": {
       "en": "Арсеньевский городской окр (RU)",
-      "zh": "Арсеньевский городской окр (RU)"
+      "zh": "阿尔谢尼耶夫斯基市区"
     },
     "Артёмовский городской окру": {
       "en": "Артёмовский городской окру",
-      "zh": "Артёмовский городской окру"
+      "zh": "阿尔乔莫夫斯基城区"
     },
     "Артёмовский городской окру (RU)": {
       "en": "Артёмовский городской окру (RU)",
-      "zh": "Артёмовский городской окру (RU)"
+      "zh": "阿尔乔莫夫斯基城区"
     },
     "Бельский район": {
       "en": "Бельский район",
@@ -149000,11 +149356,11 @@
     },
     "Владивостокский городской": {
       "en": "Владивостокский городской",
-      "zh": "Владивостокский городской"
+      "zh": "海参崴市"
     },
     "Владивостокский городской (RU)": {
       "en": "Владивостокский городской (RU)",
-      "zh": "Владивостокский городской (RU)"
+      "zh": "海参崴市"
     },
     "Волгодонской район": {
       "en": "Волгодонской район",
@@ -149056,19 +149412,19 @@
     },
     "Дальнегорский городской ок": {
       "en": "Дальнегорский городской ок",
-      "zh": "Дальнегорский городской ок"
+      "zh": "达尔内戈尔斯基市还可以"
     },
     "Дальнегорский городской ок (RU)": {
       "en": "Дальнегорский городской ок (RU)",
-      "zh": "Дальнегорский городской ок (RU)"
+      "zh": "达尔内戈尔斯基市还可以"
     },
     "Дальнереченский городской": {
       "en": "Дальнереченский городской",
-      "zh": "Дальнереченский городской"
+      "zh": "达利涅列琴斯基市"
     },
     "Дальнереченский городской (RU)": {
       "en": "Дальнереченский городской (RU)",
-      "zh": "Дальнереченский городской (RU)"
+      "zh": "达利涅列琴斯基市"
     },
     "Даровской район": {
       "en": "Даровской район",
@@ -149192,11 +149548,11 @@
     },
     "ЗАТО Фокино": {
       "en": "ЗАТО Фокино",
-      "zh": "ЗАТО Фокино"
+      "zh": "这就是为什么福奇诺"
     },
     "ЗАТО Фокино (RU)": {
       "en": "ЗАТО Фокино (RU)",
-      "zh": "ЗАТО Фокино (RU)"
+      "zh": "这就是为什么福奇诺"
     },
     "Залегощенский район": {
       "en": "Залегощенский район",
@@ -149312,11 +149668,11 @@
     },
     "Кировский район": {
       "en": "Кировский район",
-      "zh": "Кировский район"
+      "zh": "基洛夫斯基区"
     },
     "Кировский район (RU)": {
       "en": "Кировский район (RU)",
-      "zh": "Кировский район (RU)"
+      "zh": "基洛夫斯基区"
     },
     "Колубарска област": {
       "en": "Колубарска област",
@@ -149392,11 +149748,11 @@
     },
     "Лесозаводский городской ок": {
       "en": "Лесозаводский городской ок",
-      "zh": "Лесозаводский городской ок"
+      "zh": "莱索扎沃茨基市"
     },
     "Лесозаводский городской ок (RU)": {
       "en": "Лесозаводский городской ок (RU)",
-      "zh": "Лесозаводский городской ок (RU)"
+      "zh": "莱索扎沃茨基市"
     },
     "Ловеч": {
       "en": "Ловеч",
@@ -149496,11 +149852,11 @@
     },
     "Находкинский городской окр": {
       "en": "Находкинский городской окр",
-      "zh": "Находкинский городской окр"
+      "zh": "纳霍德卡市区"
     },
     "Находкинский городской окр (RU)": {
       "en": "Находкинский городской окр (RU)",
-      "zh": "Находкинский городской окр (RU)"
+      "zh": "纳霍德卡市区"
     },
     "Некоузский район": {
       "en": "Некоузский район",
@@ -149660,11 +150016,11 @@
     },
     "Пограничный район": {
       "en": "Пограничный район",
-      "zh": "Пограничный район"
+      "zh": "边区"
     },
     "Пограничный район (RU)": {
       "en": "Пограничный район (RU)",
-      "zh": "Пограничный район (RU)"
+      "zh": "罗马尼亚语 (RU)"
     },
     "Подгоренский район": {
       "en": "Подгоренский район",
@@ -149980,11 +150336,11 @@
     },
     "Уссурийский городской окру": {
       "en": "Уссурийский городской окру",
-      "zh": "Уссурийский городской окру"
+      "zh": "乌苏里城区"
     },
     "Уссурийский городской окру (RU)": {
       "en": "Уссурийский городской окру (RU)",
-      "zh": "Уссурийский городской окру (RU)"
+      "zh": "乌苏里城区"
     },
     "Усть-Донецкий район": {
       "en": "Усть-Донецкий район",
@@ -150160,27 +150516,27 @@
     },
     "городской округ Белогорск": {
       "en": "городской округ Белогорск",
-      "zh": "городской округ Белогорск"
+      "zh": "Белогорск Белогорск"
     },
     "городской округ Белогорск (RU)": {
       "en": "городской округ Белогорск (RU)",
-      "zh": "городской округ Белогорск (RU)"
+      "zh": "Белогорск Белогорск"
     },
     "городской округ Благовещен": {
       "en": "городской округ Благовещен",
-      "zh": "городской округ Благовещен"
+      "zh": "Благовещен Благовещен"
     },
     "городской округ Благовещен (RU)": {
       "en": "городской округ Благовещен (RU)",
-      "zh": "городской округ Благовещен (RU)"
+      "zh": "Благовещен Благовещен"
     },
     "городской округ Большой Ка": {
       "en": "городской округ Большой Ка",
-      "zh": "городской округ Большой Ка"
+      "zh": "大卡市区"
     },
     "городской округ Большой Ка (RU)": {
       "en": "городской округ Большой Ка (RU)",
-      "zh": "городской округ Большой Ка (RU)"
+      "zh": "大卡市区"
     },
     "городской округ Бор": {
       "en": "городской округ Бор",
@@ -150376,11 +150732,11 @@
     },
     "городской округ Зея": {
       "en": "городской округ Зея",
-      "zh": "городской округ Зея"
+      "zh": "泽雅市区"
     },
     "городской округ Зея (RU)": {
       "en": "городской округ Зея (RU)",
-      "zh": "городской округ Зея (RU)"
+      "zh": "泽雅市区"
     },
     "городской округ Ижевск": {
       "en": "городской округ Ижевск",
@@ -150772,11 +151128,11 @@
     },
     "городской округ Палана": {
       "en": "городской округ Палана",
-      "zh": "городской округ Палана"
+      "zh": "帕拉纳市区"
     },
     "городской округ Палана (RU)": {
       "en": "городской округ Палана (RU)",
-      "zh": "городской округ Палана (RU)"
+      "zh": "帕拉纳市区"
     },
     "городской округ Первоураль": {
       "en": "городской округ Первоураль",
@@ -150804,11 +151160,11 @@
     },
     "городской округ Прогресс": {
       "en": "городской округ Прогресс",
-      "zh": "городской округ Прогресс"
+      "zh": "进步市区"
     },
     "городской округ Прогресс (RU)": {
       "en": "городской округ Прогресс (RU)",
-      "zh": "городской округ Прогресс (RU)"
+      "zh": "городской округ Прогресс (俄罗斯)"
     },
     "городской округ Ревда": {
       "en": "городской округ Ревда",
@@ -150852,11 +151208,11 @@
     },
     "городской округ Свободный": {
       "en": "городской округ Свободный",
-      "zh": "городской округ Свободный"
+      "zh": "斯沃博德内市区"
     },
     "городской округ Свободный (RU)": {
       "en": "городской округ Свободный (RU)",
-      "zh": "городской округ Свободный (RU)"
+      "zh": "斯沃博德内市区"
     },
     "городской округ Северодвин": {
       "en": "городской округ Северодвин",
@@ -150948,11 +151304,11 @@
     },
     "городской округ Тында": {
       "en": "городской округ Тында",
-      "zh": "городской округ Тында"
+      "zh": "市区这里"
     },
     "городской округ Тында (RU)": {
       "en": "городской округ Тында (RU)",
-      "zh": "городской округ Тында (RU)"
+      "zh": "市区这里"
     },
     "городской округ Ульяновск": {
       "en": "городской округ Ульяновск",
@@ -151028,11 +151384,11 @@
     },
     "городской округ Южно-Сахал": {
       "en": "городской округ Южно-Сахал",
-      "zh": "городской округ Южно-Сахал"
+      "zh": "南萨哈尔城区"
     },
     "городской округ Южно-Сахал (RU)": {
       "en": "городской округ Южно-Сахал (RU)",
-      "zh": "городской округ Южно-Сахал (RU)"
+      "zh": "南萨哈尔城区"
     },
     "городской округ Южно-Сухок": {
       "en": "городской округ Южно-Сухок",

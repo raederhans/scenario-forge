@@ -1,6 +1,11 @@
 ﻿import { countryNames, defaultCountryPalette, state } from "./state.js";
 import { ensureSovereigntyState, resetAllFeatureOwnersToCanonical } from "./sovereignty_manager.js";
-import { recomputeDynamicBordersNow, refreshColorState, setMapData } from "./map_renderer.js";
+import {
+  recomputeDynamicBordersNow,
+  refreshColorState,
+  refreshScenarioOpeningOwnerBorders,
+  setMapData,
+} from "./map_renderer.js";
 import { loadDeferredDetailBundle } from "./data_loader.js";
 import { setActivePaletteSource, syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { markDirty } from "./dirty_state.js";
@@ -559,6 +564,21 @@ function getScenarioRegistryEntries() {
   return Array.isArray(state.scenarioRegistry?.scenarios) ? state.scenarioRegistry.scenarios : [];
 }
 
+function getScenarioDisplayName(source, fallbackId = "") {
+  const entry = source && typeof source === "object" ? source : null;
+  const rawDisplayName = String(
+    entry?.display_name
+    || entry?.displayName
+    || fallbackId
+    || (!entry ? source : "")
+    || ""
+  ).trim();
+  if (!rawDisplayName) {
+    return "";
+  }
+  return t(rawDisplayName, "geo") || rawDisplayName;
+}
+
 function getScenarioNameMap(countryMap = {}) {
   const next = {};
   Object.entries(countryMap || {}).forEach(([tag, entry]) => {
@@ -600,6 +620,10 @@ function getScenarioMetaById(scenarioId) {
   return getScenarioRegistryEntries().find(
     (entry) => normalizeScenarioId(entry?.scenario_id) === targetId
   ) || null;
+}
+
+function getDefaultScenarioId() {
+  return normalizeScenarioId(state.scenarioRegistry?.default_scenario_id);
 }
 
 function getScenarioManifestVersion(manifest) {
@@ -1133,7 +1157,10 @@ async function applyScenarioBundle(
     && hasUsablePoliticalTopology(state.topologyDetail)
   ) || !!detailPromoted;
   if (!detailReady && scenarioNeedsDetailTopology(bundle.manifest)) {
-    const scenarioLabel = String(bundle.manifest?.display_name || bundle.manifest?.scenario_id || "Scenario").trim();
+    const scenarioLabel = getScenarioDisplayName(
+      bundle.manifest,
+      String(bundle.manifest?.scenario_id || "Scenario").trim()
+    );
     const message = `Detailed political topology could not be loaded. ${scenarioLabel} cannot be applied in coarse mode.`;
     console.error(`[scenario] ${message}`);
     throw new Error(message);
@@ -1258,6 +1285,7 @@ async function applyScenarioBundle(
   applyScenarioPaintMode();
   syncScenarioOceanFillForActivation(bundle.manifest);
   applyScenarioPerformanceHints(bundle.manifest);
+  refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: `scenario-opening:${scenarioId}` });
   setMapData({ refitProjection: false, resetZoom: false });
   if (typeof document !== "undefined") {
     const presetSection = document.getElementById("selectedCountryActionsSection");
@@ -1336,6 +1364,32 @@ async function applyScenarioById(
   return bundle;
 }
 
+async function applyDefaultScenarioOnStartup(
+  {
+    renderNow = true,
+    d3Client = globalThis.d3,
+  } = {}
+) {
+  if (state.activeScenarioId) {
+    return null;
+  }
+  const registry = await loadScenarioRegistry({ d3Client });
+  const defaultScenarioId = normalizeScenarioId(registry?.default_scenario_id);
+  if (!defaultScenarioId) {
+    return null;
+  }
+  const meta = getScenarioMetaById(defaultScenarioId);
+  if (!meta?.manifest_url) {
+    console.warn(`[scenario] Default scenario "${defaultScenarioId}" is not registered.`);
+    return null;
+  }
+  return applyScenarioById(defaultScenarioId, {
+    renderNow,
+    markDirtyReason: "",
+    showToastOnComplete: false,
+  });
+}
+
 function resetToScenarioBaseline(
   {
     renderNow = true,
@@ -1390,6 +1444,7 @@ function resetToScenarioBaseline(
     errorMessage: "",
   });
   state.scenarioBorderMode = "scenario_owner_only";
+  refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: `scenario-reset-opening:${state.activeScenarioId}` });
   disableScenarioParentBorders();
   refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario-reset:${state.activeScenarioId}` });
   refreshScenarioDataHealth({ showWarningToast: false });
@@ -1473,6 +1528,7 @@ function clearActiveScenario(
   restorePaintModeAfterScenario();
   restoreScenarioOceanFillAfterExit();
   restoreScenarioDisplaySettingsAfterExit();
+  refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: "scenario-clear-opening" });
   setMapData({ refitProjection: false, resetZoom: false });
   rebuildPresetState();
   refreshScenarioShellOverlays({ renderNow: false, borderReason: "scenario-clear" });
@@ -1492,7 +1548,7 @@ function formatScenarioStatusText() {
   if (!state.activeScenarioId || !state.activeScenarioManifest) {
     return t("No scenario active", "ui");
   }
-  const displayName = String(state.activeScenarioManifest.display_name || state.activeScenarioId || "").trim();
+  const displayName = getScenarioDisplayName(state.activeScenarioManifest, state.activeScenarioId);
   const warning = String(state.scenarioDataHealth?.warning || "").trim();
   return warning ? `${displayName} · ${warning}` : displayName;
 }
@@ -1532,7 +1588,7 @@ function initScenarioManager({ render } = {}) {
       entries.forEach((entry) => {
         const option = document.createElement("option");
         option.value = normalizeScenarioId(entry.scenario_id);
-        option.textContent = String(entry.display_name || entry.scenario_id || "").trim();
+        option.textContent = getScenarioDisplayName(entry, entry.scenario_id);
         scenarioSelect.appendChild(option);
       });
       scenarioSelect.value = currentValue || "";
@@ -1669,8 +1725,10 @@ function initScenarioManager({ render } = {}) {
 
 export {
   applyScenarioBundle,
+  applyDefaultScenarioOnStartup,
   applyScenarioById,
   clearActiveScenario,
+  getDefaultScenarioId,
   getScenarioDisplayOwnerByFeatureId,
   initScenarioManager,
   loadScenarioAuditPayload,

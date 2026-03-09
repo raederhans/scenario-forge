@@ -1263,10 +1263,14 @@ details.card[open] > summary::after {
   font-size: 0.75rem;
   font-weight: 500;
   padding: 6px 12px;
+  max-width: 280px;
   border-radius: var(--radius-btn);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
+  white-space: pre-line;
+  line-height: 1.35;
+  word-break: break-word;
   pointer-events: none;
   opacity: 0;
   transition: opacity 75ms ease;

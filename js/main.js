@@ -3,7 +3,7 @@ import { state } from "./core/state.js";
 import { loadDeferredDetailBundle, loadMapData } from "./core/data_loader.js";
 import { initMap, setMapData, render } from "./core/map_renderer.js";
 import { applyActivePaletteState } from "./core/palette_manager.js";
-import { initScenarioManager } from "./core/scenario_manager.js";
+import { applyDefaultScenarioOnStartup, initScenarioManager } from "./core/scenario_manager.js";
 import { initSidebar, initPresetState } from "./ui/sidebar.js";
 import { initShortcuts } from "./ui/shortcuts.js";
 import { initToolbar } from "./ui/toolbar.js";
@@ -384,6 +384,11 @@ async function bootstrap() {
     initSidebar({ render: renderApp });
     initScenarioManager({ render: renderApp });
     initShortcuts();
+    try {
+      await applyDefaultScenarioOnStartup({ renderNow: false });
+    } catch (error) {
+      console.warn("Failed to apply default startup scenario:", error);
+    }
 
     renderDispatcher.flush();
     scheduleDeferredDetailPromotion(renderDispatcher);
