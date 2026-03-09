@@ -21,7 +21,7 @@
 
 历史原始文档已归档到：
 
-- [qa_reports/archive/pre_ui_plans](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/archive/pre_ui_plans)
+- [qa/archive/pre_ui_plans](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa/archive/pre_ui_plans)
 - [qa/archive/pre_ui_execution](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa/archive/pre_ui_execution)
 
 这些归档文件保留原编号与过程上下文，但不再作为默认阅读入口。

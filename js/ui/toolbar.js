@@ -34,7 +34,7 @@ import {
   normalizeHexColor,
   setActivePaletteSource,
 } from "../core/palette_manager.js";
-import { resetToScenarioBaseline } from "../core/scenario_manager.js";
+import { ensureActiveScenarioOptionalLayerLoaded, resetToScenarioBaseline } from "../core/scenario_manager.js";
 import { toggleLanguage, updateUIText, t } from "./i18n.js";
 import { resetAllFeatureOwnersToCanonical } from "../core/sovereignty_manager.js";
 import { showToast } from "./toast.js";
@@ -2473,6 +2473,9 @@ function initToolbar({ render } = {}) {
     toggleWaterRegions.checked = !!state.showWaterRegions;
     toggleWaterRegions.addEventListener("change", (event) => {
       state.showWaterRegions = event.target.checked;
+      if (state.showWaterRegions) {
+        void ensureActiveScenarioOptionalLayerLoaded("water", { renderNow: true });
+      }
       renderDirty("toggle-water-regions");
     });
   }

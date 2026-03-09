@@ -17,6 +17,7 @@ import { LegendManager } from "../core/legend_manager.js";
 import {
   applyScenarioById,
   clearActiveScenario,
+  ensureActiveScenarioOptionalLayerLoaded,
   loadScenarioAuditPayload,
   recalculateScenarioOwnerControllerDiffCount,
   refreshScenarioShellOverlays,
@@ -3810,6 +3811,9 @@ function initSidebar({ render } = {}) {
       if (!state.showScenarioSpecialRegions) {
         state.hoveredSpecialRegionId = null;
       }
+      if (state.showScenarioSpecialRegions) {
+        void ensureActiveScenarioOptionalLayerLoaded("special", { renderNow: true });
+      }
       markDirty("toggle-scenario-special-regions");
       renderSpecialRegionInspectorUi();
       renderSpecialRegionList();
@@ -3821,6 +3825,9 @@ function initSidebar({ render } = {}) {
   if (scenarioReliefOverlayVisibilityToggle && !scenarioReliefOverlayVisibilityToggle.dataset.bound) {
     scenarioReliefOverlayVisibilityToggle.addEventListener("change", (event) => {
       state.showScenarioReliefOverlays = !!event.target.checked;
+      if (state.showScenarioReliefOverlays) {
+        void ensureActiveScenarioOptionalLayerLoaded("relief", { renderNow: true });
+      }
       markDirty("toggle-scenario-relief-overlays");
       renderSpecialRegionInspectorUi();
       if (render) render();

@@ -27,6 +27,30 @@ const COUNTRY_CODE_ALIASES = {
   UK: "GB",
   EL: "GR",
 };
+const SCENARIO_OPTIONAL_LAYER_CONFIGS = {
+  water: {
+    bundleField: "waterRegionsPayload",
+    stateField: "scenarioWaterRegionsData",
+    urlField: "water_regions_url",
+    objectName: "scenario_water",
+    visibilityField: "showWaterRegions",
+  },
+  special: {
+    bundleField: "specialRegionsPayload",
+    stateField: "scenarioSpecialRegionsData",
+    urlField: "special_regions_url",
+    objectName: "scenario_special_land",
+    visibilityField: "showScenarioSpecialRegions",
+  },
+  relief: {
+    bundleField: "reliefOverlaysPayload",
+    stateField: "scenarioReliefOverlaysData",
+    urlField: "relief_overlays_url",
+    objectName: "",
+    visibilityField: "showScenarioReliefOverlays",
+    revisionField: "scenarioReliefOverlayRevision",
+  },
+};
 
 function cacheBust(url) {
   if (!url) return url;
@@ -670,6 +694,16 @@ function normalizeScenarioFeatureCollection(payload) {
   };
 }
 
+function normalizeScenarioOptionalLayerKey(value) {
+  const key = String(value || "").trim().toLowerCase();
+  return Object.prototype.hasOwnProperty.call(SCENARIO_OPTIONAL_LAYER_CONFIGS, key) ? key : "";
+}
+
+function getScenarioOptionalLayerConfig(layerKey) {
+  const normalizedKey = normalizeScenarioOptionalLayerKey(layerKey);
+  return normalizedKey ? SCENARIO_OPTIONAL_LAYER_CONFIGS[normalizedKey] : null;
+}
+
 function normalizeScenarioRuntimeTopologyPayload(payload) {
   if (!payload || typeof payload !== "object") {
     return null;
@@ -700,6 +734,165 @@ function getScenarioTopologyFeatureCollection(topologyPayload, objectName) {
     console.warn(`[scenario] Failed to decode scenario topology object "${objectName}".`, error);
     return null;
   }
+}
+
+function shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, runtimeTopologyPayload, hints = normalizeScenarioPerformanceHints(manifest)) {
+  const config = getScenarioOptionalLayerConfig(layerKey);
+  if (!config) return false;
+  const visibleByDefault = config.visibilityField === "showWaterRegions"
+    ? hints.waterRegionsDefault !== false
+    : config.visibilityField === "showScenarioSpecialRegions"
+      ? hints.specialRegionsDefault !== false
+      : hints.scenarioReliefOverlaysDefault === true;
+  if (!visibleByDefault) {
+    return false;
+  }
+  if (config.objectName && getScenarioTopologyFeatureCollection(runtimeTopologyPayload, config.objectName)) {
+    return false;
+  }
+  return !!manifest?.[config.urlField];
+}
+
+function getScenarioBundleId(bundle) {
+  return normalizeScenarioId(bundle?.manifest?.scenario_id || bundle?.meta?.scenario_id);
+}
+
+function assignOptionalLayerPayloadToActiveScenario(bundle, layerKey, payload) {
+  const config = getScenarioOptionalLayerConfig(layerKey);
+  if (!config) return false;
+  const bundleScenarioId = getScenarioBundleId(bundle);
+  if (!bundleScenarioId || bundleScenarioId !== normalizeScenarioId(state.activeScenarioId)) {
+    return false;
+  }
+  state[config.stateField] = payload || null;
+  if (config.revisionField) {
+    state[config.revisionField] = (Number(state[config.revisionField]) || 0) + 1;
+  }
+  syncScenarioUi();
+  return true;
+}
+
+async function loadScenarioOptionalLayerPayload(
+  bundle,
+  layerKey,
+  {
+    d3Client = globalThis.d3,
+    forceReload = false,
+    applyToActiveScenario = false,
+  } = {}
+) {
+  const config = getScenarioOptionalLayerConfig(layerKey);
+  if (!bundle || !config) return null;
+  bundle.optionalLayerPromises = bundle.optionalLayerPromises && typeof bundle.optionalLayerPromises === "object"
+    ? bundle.optionalLayerPromises
+    : {};
+  if (!forceReload && Object.prototype.hasOwnProperty.call(bundle, config.bundleField) && bundle[config.bundleField]) {
+    if (applyToActiveScenario) {
+      assignOptionalLayerPayloadToActiveScenario(bundle, layerKey, bundle[config.bundleField]);
+    }
+    return bundle[config.bundleField];
+  }
+  if (!forceReload && bundle.optionalLayerPromises[layerKey]) {
+    const payload = await bundle.optionalLayerPromises[layerKey];
+    if (applyToActiveScenario) {
+      assignOptionalLayerPayloadToActiveScenario(bundle, layerKey, payload);
+    }
+    return payload;
+  }
+  const runtimeTopologyPayload = bundle.runtimeTopologyPayload || null;
+  const startedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+  const promise = (async () => {
+    if (config.objectName) {
+      const payload = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, config.objectName);
+      if (payload) {
+        bundle[config.bundleField] = payload;
+        return payload;
+      }
+    }
+    const requestUrl = bundle.manifest?.[config.urlField];
+    if (!requestUrl || !d3Client || typeof d3Client.json !== "function") {
+      bundle[config.bundleField] = null;
+      return null;
+    }
+    try {
+      const rawPayload = await d3Client.json(cacheBust(requestUrl));
+      const payload = normalizeScenarioFeatureCollection(rawPayload);
+      bundle[config.bundleField] = payload;
+      return payload;
+    } catch (error) {
+      console.warn(`[scenario] Failed to load scenario ${layerKey} layer for "${getScenarioBundleId(bundle)}".`, error);
+      bundle[config.bundleField] = null;
+      return null;
+    }
+  })();
+  bundle.optionalLayerPromises[layerKey] = promise;
+  try {
+    const payload = await promise;
+    recordScenarioPerfMetric("loadScenarioOptionalLayer", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - startedAt, {
+      scenarioId: getScenarioBundleId(bundle),
+      layerKey,
+      loaded: !!payload,
+      cacheHit: false,
+    });
+    if (applyToActiveScenario) {
+      assignOptionalLayerPayloadToActiveScenario(bundle, layerKey, payload);
+    }
+    return payload;
+  } finally {
+    delete bundle.optionalLayerPromises[layerKey];
+  }
+}
+
+async function ensureActiveScenarioOptionalLayerLoaded(
+  layerKey,
+  {
+    d3Client = globalThis.d3,
+    renderNow = true,
+    forceReload = false,
+  } = {}
+) {
+  const normalizedKey = normalizeScenarioOptionalLayerKey(layerKey);
+  if (!normalizedKey || !state.activeScenarioId) return null;
+  const bundle = state.scenarioBundleCacheById?.[normalizeScenarioId(state.activeScenarioId)];
+  if (!bundle) return null;
+  const payload = await loadScenarioOptionalLayerPayload(bundle, normalizedKey, {
+    d3Client,
+    forceReload,
+    applyToActiveScenario: true,
+  });
+  if (renderNow && typeof state.renderNowFn === "function") {
+    state.renderNowFn();
+  }
+  return payload;
+}
+
+async function ensureActiveScenarioOptionalLayersForVisibility(
+  {
+    bundle = null,
+    d3Client = globalThis.d3,
+    renderNow = true,
+  } = {}
+) {
+  const activeScenarioId = normalizeScenarioId(state.activeScenarioId);
+  const activeBundle = bundle || state.scenarioBundleCacheById?.[activeScenarioId] || null;
+  if (!activeScenarioId || !activeBundle) return [];
+  const requestedLayers = Object.entries(SCENARIO_OPTIONAL_LAYER_CONFIGS)
+    .filter(([, config]) => state[config.visibilityField])
+    .filter(([layerKey, config]) => !activeBundle[config.bundleField] && !state[config.stateField])
+    .map(([layerKey]) => layerKey);
+  if (!requestedLayers.length) return [];
+  const payloads = await Promise.all(
+    requestedLayers.map((layerKey) =>
+      loadScenarioOptionalLayerPayload(activeBundle, layerKey, {
+        d3Client,
+        applyToActiveScenario: true,
+      })
+    )
+  );
+  if (renderNow && typeof state.renderNowFn === "function") {
+    state.renderNowFn();
+  }
+  return payloads;
 }
 
 function ensureScenarioAuditUiState() {
@@ -763,14 +956,12 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     throw new Error("d3.json is not available for scenario loading.");
   }
   const manifest = await d3Client.json(cacheBust(meta.manifest_url));
+  const hints = normalizeScenarioPerformanceHints(manifest);
   const [
     countriesPayload,
     ownersPayload,
     controllersPayload,
     coresPayload,
-    waterRegionsPayload,
-    specialRegionsPayload,
-    reliefOverlaysPayload,
     runtimeTopologyPayload,
   ] =
     await Promise.all([
@@ -778,24 +969,6 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     d3Client.json(cacheBust(manifest.owners_url)),
     manifest.controllers_url ? d3Client.json(cacheBust(manifest.controllers_url)) : Promise.resolve(null),
     d3Client.json(cacheBust(manifest.cores_url)),
-    manifest.water_regions_url
-      ? d3Client.json(cacheBust(manifest.water_regions_url)).catch((error) => {
-        console.warn(`[scenario] Failed to load scenario water regions for "${targetId}".`, error);
-        return null;
-      })
-      : Promise.resolve(null),
-    manifest.special_regions_url
-      ? d3Client.json(cacheBust(manifest.special_regions_url)).catch((error) => {
-        console.warn(`[scenario] Failed to load scenario special regions for "${targetId}".`, error);
-        return null;
-      })
-      : Promise.resolve(null),
-    manifest.relief_overlays_url
-      ? d3Client.json(cacheBust(manifest.relief_overlays_url)).catch((error) => {
-        console.warn(`[scenario] Failed to load scenario relief overlays for "${targetId}".`, error);
-        return null;
-      })
-      : Promise.resolve(null),
     manifest.runtime_topology_url
       ? d3Client.json(cacheBust(manifest.runtime_topology_url)).catch((error) => {
         console.warn(`[scenario] Failed to load scenario runtime topology for "${targetId}".`, error);
@@ -810,12 +983,20 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     ownersPayload,
     controllersPayload,
     coresPayload,
-    waterRegionsPayload: normalizeScenarioFeatureCollection(waterRegionsPayload),
-    specialRegionsPayload: normalizeScenarioFeatureCollection(specialRegionsPayload),
-    reliefOverlaysPayload: normalizeScenarioFeatureCollection(reliefOverlaysPayload),
+    waterRegionsPayload: null,
+    specialRegionsPayload: null,
+    reliefOverlaysPayload: null,
     runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(runtimeTopologyPayload),
     auditPayload: null,
+    optionalLayerPromises: {},
   };
+  const eagerOptionalLayers = Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
+    .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, bundle.runtimeTopologyPayload, hints));
+  if (eagerOptionalLayers.length) {
+    await Promise.all(
+      eagerOptionalLayers.map((layerKey) => loadScenarioOptionalLayerPayload(bundle, layerKey, { d3Client }))
+    );
+  }
   const ownerCount = Object.keys(ownersPayload?.owners || {}).length;
   const controllerCount = Object.keys(controllersPayload?.controllers || {}).length;
   const countryCount = Object.keys(countriesPayload?.countries || {}).length;
@@ -1312,6 +1493,7 @@ async function applyScenarioBundle(
   });
 
   refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario:${scenarioId}` });
+  void ensureActiveScenarioOptionalLayersForVisibility({ bundle, renderNow });
   const dataHealth = refreshScenarioDataHealth({
     showWarningToast: true,
     showErrorToast: true,
@@ -1728,6 +1910,8 @@ export {
   applyDefaultScenarioOnStartup,
   applyScenarioById,
   clearActiveScenario,
+  ensureActiveScenarioOptionalLayerLoaded,
+  ensureActiveScenarioOptionalLayersForVisibility,
   getDefaultScenarioId,
   getScenarioDisplayOwnerByFeatureId,
   initScenarioManager,

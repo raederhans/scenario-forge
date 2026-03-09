@@ -17,7 +17,7 @@
 - 手工重放 Console: [console-2026-03-04T00-43-34-287Z.log](/mnt/c/Users/raede/Desktop/dev/mapcreator/.playwright-cli/console-2026-03-04T00-43-34-287Z.log)
 - 手工重放 Network: [network-2026-03-04T00-43-35-516Z.log](/mnt/c/Users/raede/Desktop/dev/mapcreator/.playwright-cli/network-2026-03-04T00-43-35-516Z.log)
 - 场景生成覆盖报告: [coverage_report.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/reports/generated/scenarios/hoi4_1936/coverage_report.md)
-- 东亚边界专项报告: [029_east_asia_boundary_deviation_analysis.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/029_east_asia_boundary_deviation_analysis.md)
+- 东亚边界专项报告: [029_east_asia_boundary_deviation_analysis.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa/archive/pre_ui_plans/029_east_asia_boundary_deviation_analysis.md)
 
 ## Audit Inputs
 
@@ -199,7 +199,7 @@ Scenario 卡片当前具备最小必需功能：
 - `owners.by_feature.json` baseline 结构天然支持 reset。
 - `critical_regions` 与 `region_checks` 已形成制度化输出，而不是只靠人工比对截图。
 - 浏览器手工重放中，scenario 所需静态资源与 JSON 资源全部 `200 OK`，链路可重复。
-- 东亚正确性问题已经有单独的深挖文档 [029_east_asia_boundary_deviation_analysis.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa_reports/029_east_asia_boundary_deviation_analysis.md)，说明“视觉/UI 审计”和“历史边界正确性审计”已经可以拆题处理。
+- 东亚正确性问题已经有单独的深挖文档 [029_east_asia_boundary_deviation_analysis.md](/mnt/c/Users/raede/Desktop/dev/mapcreator/qa/archive/pre_ui_plans/029_east_asia_boundary_deviation_analysis.md)，说明“视觉/UI 审计”和“历史边界正确性审计”已经可以拆题处理。
 
 ## Findings
 

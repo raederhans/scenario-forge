@@ -938,6 +938,15 @@ COASTAL_RESTORE_AOI_CONFIGS = {
     },
 }
 
+CONTEXT_LAND_MASK_PROTECTED_AOI_KEYS = (
+    "west_mediterranean",
+    "aegean",
+    "bosphorus_black_sea_mouth",
+    "libya_suez",
+    "congo",
+)
+CONTEXT_LAND_MASK_PROTECTED_AOI_MARGIN_DEG = 0.35
+
 
 def utc_timestamp() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
@@ -978,7 +987,10 @@ def sanitize_jsonable(value):
 
 def write_json(path: Path, payload: dict) -> None:
     sanitized = sanitize_jsonable(payload)
-    path.write_text(json.dumps(sanitized, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(sanitized, ensure_ascii=False, separators=(",", ":"), allow_nan=False),
+        encoding="utf-8",
+    )
 
 
 def load_feature_migration_map() -> dict[str, list[str]]:
@@ -1676,25 +1688,85 @@ def estimate_equal_area_value(geom) -> float:
         return float(candidate.area)
 
 
+def estimate_geometry_arc_refs(geom) -> int:
+    candidate = normalize_polygonal(geom)
+    if candidate is None:
+        return 0
+    total = 0
+    for polygon in iter_polygon_parts(candidate):
+        total += len(list(polygon.exterior.coords))
+        total += sum(len(list(interior.coords)) for interior in polygon.interiors)
+    return int(total)
+
+
+def estimate_topology_object_arc_refs(topology_payload: dict, object_name: str) -> int:
+    obj = (topology_payload or {}).get("objects", {}).get(object_name, {})
+
+    def count_arc_refs(value) -> int:
+        if isinstance(value, int):
+            return 1
+        if isinstance(value, list):
+            return sum(count_arc_refs(item) for item in value)
+        if isinstance(value, dict):
+            return count_arc_refs(value.get("arcs"))
+        return 0
+
+    return int(count_arc_refs(obj.get("geometries", [])))
+
+
 def build_context_land_mask_geometry(
     land_mask_geom,
     *,
-    tolerances: tuple[float, ...] = (0.02, 0.01, 0.005),
+    tolerances: tuple[float, ...] = (0.25, 0.35, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0),
     max_area_delta_ratio: float = 0.005,
+    max_component_increase: int = 96,
+    target_arc_refs_min: int = 12_000,
+    target_arc_refs_max: int = 20_000,
 ):
     precise_geom = normalize_polygonal(land_mask_geom)
     if precise_geom is None:
         raise ValueError("Expected precise land mask geometry.")
     base_area = max(estimate_equal_area_value(precise_geom), 1e-9)
+    base_component_count = len(iter_polygon_parts(precise_geom))
+    protected_aois = [
+        box(*expand_bbox(COASTAL_RESTORE_AOI_CONFIGS[key]["bbox"], CONTEXT_LAND_MASK_PROTECTED_AOI_MARGIN_DEG))
+        for key in CONTEXT_LAND_MASK_PROTECTED_AOI_KEYS
+        if key in COASTAL_RESTORE_AOI_CONFIGS
+    ]
+    protected_aoi_union = safe_unary_union(protected_aois)
+    protected_geom = normalize_polygonal(precise_geom.intersection(protected_aoi_union)) if protected_aoi_union is not None else None
+    coarse_geom = normalize_polygonal(precise_geom.difference(protected_aoi_union)) if protected_aoi_union is not None else precise_geom
+    best_candidate = None
+    best_tolerance = None
+    best_area_delta_ratio = None
+    best_arc_refs = None
     for tolerance in tolerances:
-        candidate = normalize_polygonal(precise_geom.simplify(tolerance, preserve_topology=True))
+        simplified_coarse = normalize_polygonal(coarse_geom.simplify(tolerance, preserve_topology=True)) if coarse_geom is not None else None
+        candidate_polygons = []
+        candidate_polygons.extend(iter_polygon_parts(simplified_coarse))
+        candidate_polygons.extend(iter_polygon_parts(protected_geom))
+        if not candidate_polygons:
+            continue
+        candidate = normalize_polygonal(candidate_polygons[0] if len(candidate_polygons) == 1 else MultiPolygon(candidate_polygons))
         if candidate is None:
+            continue
+        if len(iter_polygon_parts(candidate)) > (base_component_count + max_component_increase):
             continue
         candidate_area = estimate_equal_area_value(candidate)
         area_delta_ratio = abs(candidate_area - base_area) / base_area
-        if area_delta_ratio <= max_area_delta_ratio:
-            return candidate, float(tolerance), float(area_delta_ratio), False
-    return precise_geom, None, 0.0, True
+        if area_delta_ratio > max_area_delta_ratio:
+            continue
+        candidate_arc_refs = estimate_geometry_arc_refs(candidate)
+        if target_arc_refs_min <= candidate_arc_refs <= target_arc_refs_max:
+            return candidate, float(tolerance), float(area_delta_ratio), False, int(candidate_arc_refs)
+        if best_candidate is None or candidate_arc_refs < best_arc_refs:
+            best_candidate = candidate
+            best_tolerance = float(tolerance)
+            best_area_delta_ratio = float(area_delta_ratio)
+            best_arc_refs = int(candidate_arc_refs)
+    if best_candidate is not None:
+        return best_candidate, best_tolerance, best_area_delta_ratio, False, best_arc_refs
+    return precise_geom, None, 0.0, True, int(estimate_geometry_arc_refs(precise_geom))
 
 
 def make_feature(geom, properties: dict) -> dict:
@@ -3559,15 +3631,8 @@ def build_runtime_topology_payload(
         "detail_tier",
         "__source",
         "scenario_id",
-        "region_id",
         "region_group",
         "atl_surface_kind",
-        "atl_region_group",
-        "atl_geometry_role",
-        "atl_join_mode",
-        "atl_subbasin_id",
-        "owner_tag",
-        "synthetic_owner",
         "interactive",
         "render_as_base_geography",
         "geometry",
@@ -3774,7 +3839,13 @@ def main() -> None:
         "name": "TNO 1962 Land Mask",
         "geometry": land_mask_geom,
     }], geometry="geometry", crs="EPSG:4326")
-    context_land_mask_geom, context_land_mask_tolerance, context_land_mask_area_delta_ratio, context_land_mask_fallback_used = (
+    (
+        context_land_mask_geom,
+        context_land_mask_tolerance,
+        context_land_mask_area_delta_ratio,
+        context_land_mask_fallback_used,
+        context_land_mask_arc_refs,
+    ) = (
         build_context_land_mask_geometry(land_mask_geom)
     )
     context_land_mask_gdf = gpd.GeoDataFrame([{
@@ -3789,6 +3860,7 @@ def main() -> None:
         land_mask_gdf,
         context_land_mask_gdf,
     )
+    context_land_mask_arc_refs = estimate_topology_object_arc_refs(runtime_topology_payload, "context_land_mask")
     runtime_water_regions = topology_object_to_feature_collection(runtime_topology_payload, "scenario_water")
     runtime_special_regions = feature_collection_from_features([])
     relief_overlays_payload = build_relief_overlays(atlantropa_region_unions, lake_geom)
@@ -3838,6 +3910,7 @@ def main() -> None:
         summary["context_land_mask_tolerance"] = context_land_mask_tolerance
         summary["context_land_mask_area_delta_ratio"] = context_land_mask_area_delta_ratio
         summary["context_land_mask_fallback_used"] = context_land_mask_fallback_used
+        summary["context_land_mask_arc_refs"] = context_land_mask_arc_refs
 
     diagnostics = audit_payload.setdefault("diagnostics", {})
     sea_coverage_hole_count_by_cluster = {
@@ -3895,6 +3968,7 @@ def main() -> None:
         "context_land_mask_tolerance": context_land_mask_tolerance,
         "context_land_mask_area_delta_ratio": context_land_mask_area_delta_ratio,
         "context_land_mask_fallback_used": context_land_mask_fallback_used,
+        "context_land_mask_arc_refs": context_land_mask_arc_refs,
         "action_feature_counts": {key: len(value) for key, value in applied_annex_maps.items()},
         "atlantropa_region_stats": atlantropa_diagnostics,
         "atlantropa_island_replacement_stats": island_replacement_diagnostics,
@@ -3930,6 +4004,7 @@ def main() -> None:
             "tolerance": context_land_mask_tolerance,
             "area_delta_ratio": context_land_mask_area_delta_ratio,
             "fallback_used": context_land_mask_fallback_used,
+            "arc_refs": context_land_mask_arc_refs,
         },
     )
 

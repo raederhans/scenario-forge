@@ -116,10 +116,12 @@ const RENDER_PHASE_INTERACTING = "interacting";
 const RENDER_PHASE_SETTLING = "settling";
 const RENDER_SETTLE_DURATION_MS = 200;
 const EXACT_AFTER_SETTLE_QUIET_WINDOW_MS = 450;
-const CONTEXT_BASE_REUSE_MIN_SCALE_RATIO = 0.88;
-const CONTEXT_BASE_REUSE_MAX_SCALE_RATIO = 1.14;
-const CONTEXT_BASE_REUSE_MAX_DISTANCE_PX = 192;
+const CONTEXT_BASE_REUSE_MIN_DISTANCE_PX = 320;
+const CONTEXT_BASE_REUSE_MAX_DISTANCE_PX = 640;
+const CONTEXT_BASE_REUSE_MAX_DISTANCE_VIEWPORT_RATIO = 0.35;
 const CONTEXT_BASE_MINOR_CONTOUR_THRESHOLD = 2;
+const CONTEXT_BASE_BUCKET_LOW_MAX = 1.4;
+const CONTEXT_BASE_BUCKET_MID_MAX = 2.5;
 const INTERNAL_BORDER_PROVINCE_MIN_ALPHA = 0.30;
 const INTERNAL_BORDER_LOCAL_MIN_ALPHA = 0.22;
 const INTERNAL_BORDER_PROVINCE_MIN_WIDTH = 0.52;
@@ -216,6 +218,10 @@ let scenarioPoliticalBackgroundCache = {
   canvasHeight: 0,
   featureCount: 0,
   entries: [],
+};
+let physicalLandClipPathCache = {
+  key: "",
+  path: null,
 };
 const SCENARIO_BACKGROUND_MERGE_MAX_AREA = Math.PI * 2;
 const suspiciousScenarioBackgroundMergeWarnings = new Set();
@@ -534,10 +540,12 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
   }
   if (passName === "contextBase") {
     const maskInfo = getPhysicalLandMaskInfo();
+    const zoomBucket = getContextBaseZoomBucketId(transform?.k || state.zoomTransform?.k || 1);
     const baseSignatureParts = [
       state.topologyRevision || 0,
       state.activeScenarioId || "",
       state.deferContextBasePass ? "context-base:deferred" : "context-base:ready",
+      `bucket:${zoomBucket}`,
       state.showPhysical ? "physical:on" : "physical:off",
       state.showUrban ? "urban:on" : "urban:off",
       state.showRivers ? "rivers:on" : "rivers:off",
@@ -1486,6 +1494,39 @@ function getViewportRenderSignature() {
   ].join("|");
 }
 
+function getProjectionRenderSignature() {
+  if (!projection || typeof projection.scale !== "function" || typeof projection.translate !== "function") {
+    return "projection:na";
+  }
+  const translate = projection.translate() || [0, 0];
+  return [
+    Number(Number(projection.scale() || 0).toFixed(3)),
+    Number(Number(translate[0] || 0).toFixed(3)),
+    Number(Number(translate[1] || 0).toFixed(3)),
+  ].join("|");
+}
+
+function getContextBaseZoomBucketId(k = state.zoomTransform?.k || 1) {
+  const normalized = Math.max(0.0001, Number(k || 1));
+  if (normalized < CONTEXT_BASE_BUCKET_LOW_MAX) return "low";
+  if (normalized < CONTEXT_BASE_BUCKET_MID_MAX) return "mid";
+  return "high";
+}
+
+function getContextBaseReuseMaxDistancePx() {
+  const viewportMin = Math.max(1, Math.min(Number(state.width || 0), Number(state.height || 0)));
+  const scaled = viewportMin * CONTEXT_BASE_REUSE_MAX_DISTANCE_VIEWPORT_RATIO;
+  return Math.max(
+    CONTEXT_BASE_REUSE_MIN_DISTANCE_PX,
+    Math.min(CONTEXT_BASE_REUSE_MAX_DISTANCE_PX, scaled)
+  );
+}
+
+function resetPhysicalLandClipPathCache() {
+  physicalLandClipPathCache.key = "";
+  physicalLandClipPathCache.path = null;
+}
+
 function shouldEnableContextBaseTransformReuse() {
   return (
     String(state.renderProfile || "auto") === "balanced"
@@ -1527,6 +1568,7 @@ function getTransformReuseDelta(currentTransform, referenceTransform) {
 
 function getContextBaseReuseDecision(transform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
   const referenceTransform = getPassReferenceTransform("contextBase");
+  const currentBucket = getContextBaseZoomBucketId(transform?.k || state.zoomTransform?.k || 1);
   if (!shouldEnableContextBaseTransformReuse()) {
     return {
       enabled: false,
@@ -1534,6 +1576,8 @@ function getContextBaseReuseDecision(transform = state.zoomTransform || globalTh
       reason: "reuse-disabled",
       scaleRatio: 1,
       distancePx: 0,
+      zoomBucket: currentBucket,
+      referenceZoomBucket: currentBucket,
       crossesMinorContourThreshold: false,
       referenceTransform,
     };
@@ -1545,23 +1589,27 @@ function getContextBaseReuseDecision(transform = state.zoomTransform || globalTh
       reason: "no-reference-transform",
       scaleRatio: 1,
       distancePx: 0,
+      zoomBucket: currentBucket,
+      referenceZoomBucket: "",
       crossesMinorContourThreshold: false,
       referenceTransform: null,
     };
   }
   const delta = getTransformReuseDelta(transform, referenceTransform);
+  const referenceBucket = getContextBaseZoomBucketId(referenceTransform?.k || 1);
   const crossesMinorContourThreshold =
     (delta.reference.k < CONTEXT_BASE_MINOR_CONTOUR_THRESHOLD && delta.current.k >= CONTEXT_BASE_MINOR_CONTOUR_THRESHOLD)
     || (delta.reference.k >= CONTEXT_BASE_MINOR_CONTOUR_THRESHOLD && delta.current.k < CONTEXT_BASE_MINOR_CONTOUR_THRESHOLD);
+  const crossesZoomBucket = currentBucket !== referenceBucket;
+  const maxDistancePx = getContextBaseReuseMaxDistancePx();
   const shouldExactRefresh =
-    delta.scaleRatio < CONTEXT_BASE_REUSE_MIN_SCALE_RATIO
-    || delta.scaleRatio > CONTEXT_BASE_REUSE_MAX_SCALE_RATIO
-    || delta.distancePx > CONTEXT_BASE_REUSE_MAX_DISTANCE_PX
+    crossesZoomBucket
+    || delta.distancePx > maxDistancePx
     || crossesMinorContourThreshold;
   let reason = "transform-reuse";
-  if (delta.scaleRatio < CONTEXT_BASE_REUSE_MIN_SCALE_RATIO || delta.scaleRatio > CONTEXT_BASE_REUSE_MAX_SCALE_RATIO) {
-    reason = "scale-threshold";
-  } else if (delta.distancePx > CONTEXT_BASE_REUSE_MAX_DISTANCE_PX) {
+  if (crossesZoomBucket) {
+    reason = "zoom-bucket-change";
+  } else if (delta.distancePx > maxDistancePx) {
     reason = "distance-threshold";
   } else if (crossesMinorContourThreshold) {
     reason = "minor-contour-threshold";
@@ -1572,6 +1620,10 @@ function getContextBaseReuseDecision(transform = state.zoomTransform || globalTh
     reason,
     scaleRatio: Number(delta.scaleRatio.toFixed(4)),
     distancePx: Number(delta.distancePx.toFixed(2)),
+    maxDistancePx: Number(maxDistancePx.toFixed(2)),
+    zoomBucket: currentBucket,
+    referenceZoomBucket: referenceBucket,
+    crossesZoomBucket,
     crossesMinorContourThreshold,
     referenceTransform,
     currentTransform: delta.current,
@@ -5170,6 +5222,50 @@ function getPhysicalLandMask() {
   return getPhysicalLandMaskInfo().collection;
 }
 
+function getPhysicalLandClipCacheKey(maskInfo) {
+  return [
+    String(state.activeScenarioId || ""),
+    String(state.renderProfile || "auto"),
+    getViewportRenderSignature(),
+    getProjectionRenderSignature(),
+    getContextBaseZoomBucketId(),
+    `mask:${maskInfo?.maskSource || "none"}:${maskInfo?.maskFeatureCount || 0}:${maskInfo?.maskArcRefEstimate ?? "na"}`,
+    `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
+  ].join("::");
+}
+
+function getPhysicalLandClipPath(maskInfo, landMask) {
+  if (!globalThis.Path2D || !globalThis.d3 || typeof globalThis.d3.geoPath !== "function") {
+    return { path: null, cacheHit: false, cacheKey: "", pathType: "canvas-path" };
+  }
+  const cacheKey = getPhysicalLandClipCacheKey(maskInfo);
+  if (physicalLandClipPathCache.key === cacheKey && physicalLandClipPathCache.path) {
+    return {
+      path: physicalLandClipPathCache.path,
+      cacheHit: true,
+      cacheKey,
+      pathType: "path2d-cache",
+    };
+  }
+  try {
+    const pathString = globalThis.d3.geoPath(projection).pointRadius(PATH_POINT_RADIUS)(landMask);
+    if (!pathString) {
+      return { path: null, cacheHit: false, cacheKey, pathType: "canvas-path" };
+    }
+    const path = new globalThis.Path2D(pathString);
+    physicalLandClipPathCache.key = cacheKey;
+    physicalLandClipPathCache.path = path;
+    return {
+      path,
+      cacheHit: false,
+      cacheKey,
+      pathType: "path2d-cache",
+    };
+  } catch (_error) {
+    return { path: null, cacheHit: false, cacheKey, pathType: "canvas-path" };
+  }
+}
+
 function applyPhysicalLandClipMask() {
   const startedAt = nowMs();
   const maskInfo = getPhysicalLandMaskInfo();
@@ -5184,14 +5280,21 @@ function applyPhysicalLandClipMask() {
     });
     return false;
   }
-  context.beginPath();
-  pathCanvas(landMask);
-  context.clip();
+  const clipPath = getPhysicalLandClipPath(maskInfo, landMask);
+  if (clipPath.path) {
+    context.clip(clipPath.path);
+  } else {
+    context.beginPath();
+    pathCanvas(landMask);
+    context.clip();
+  }
   collectContextMetric("applyPhysicalLandClipMask", nowMs() - startedAt, {
     applied: true,
     maskSource: maskInfo.maskSource,
     maskFeatureCount: maskInfo.maskFeatureCount,
     maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+    cacheHit: !!clipPath.cacheHit,
+    pathType: clipPath.pathType,
   });
   return true;
 }
@@ -7302,10 +7405,13 @@ function scheduleExactAfterSettleRefresh() {
       recordRenderPerfMetric("contextBaseReuseScaleRatio", 0, {
         activeScenarioId: String(state.activeScenarioId || ""),
         scaleRatio: reuseDecision.scaleRatio,
+        zoomBucket: reuseDecision.zoomBucket,
+        referenceZoomBucket: reuseDecision.referenceZoomBucket,
       });
       recordRenderPerfMetric("contextBaseReuseDistancePx", 0, {
         activeScenarioId: String(state.activeScenarioId || ""),
         distancePx: reuseDecision.distancePx,
+        maxDistancePx: reuseDecision.maxDistancePx,
       });
       if (reuseDecision.shouldExactRefresh) {
         invalidateRenderPasses("contextBase", reuseDecision.reason || "context-base-exact");
@@ -7315,6 +7421,10 @@ function scheduleExactAfterSettleRefresh() {
           reason: reuseDecision.reason,
           scaleRatio: reuseDecision.scaleRatio,
           distancePx: reuseDecision.distancePx,
+          maxDistancePx: reuseDecision.maxDistancePx,
+          zoomBucket: reuseDecision.zoomBucket,
+          referenceZoomBucket: reuseDecision.referenceZoomBucket,
+          crossesZoomBucket: !!reuseDecision.crossesZoomBucket,
           crossesMinorContourThreshold: !!reuseDecision.crossesMinorContourThreshold,
         });
       }
@@ -7327,6 +7437,10 @@ function scheduleExactAfterSettleRefresh() {
       reason: reuseDecision.reason,
       scaleRatio: reuseDecision.scaleRatio,
       distancePx: reuseDecision.distancePx,
+      maxDistancePx: reuseDecision.maxDistancePx,
+      zoomBucket: reuseDecision.zoomBucket,
+      referenceZoomBucket: reuseDecision.referenceZoomBucket,
+      crossesZoomBucket: !!reuseDecision.crossesZoomBucket,
       crossesMinorContourThreshold: !!reuseDecision.crossesMinorContourThreshold,
     });
     if (reuseDecision.enabled && reuseDecision.shouldExactRefresh) {
@@ -7335,6 +7449,10 @@ function scheduleExactAfterSettleRefresh() {
         reason: reuseDecision.reason,
         scaleRatio: reuseDecision.scaleRatio,
         distancePx: reuseDecision.distancePx,
+        maxDistancePx: reuseDecision.maxDistancePx,
+        zoomBucket: reuseDecision.zoomBucket,
+        referenceZoomBucket: reuseDecision.referenceZoomBucket,
+        crossesZoomBucket: !!reuseDecision.crossesZoomBucket,
         crossesMinorContourThreshold: !!reuseDecision.crossesMinorContourThreshold,
       });
     }
@@ -9413,6 +9531,7 @@ function initMap({ containerId = "mapContainer" } = {}) {
   layerResolverCache.primaryRef = null;
   layerResolverCache.detailRef = null;
   layerResolverCache.bundleMode = null;
+  resetPhysicalLandClipPathCache();
   state.topologyRevision = Number(state.topologyRevision || 0) + 1;
   const renderPassCache = getRenderPassCacheState();
   renderPassCache.referenceTransform = null;
@@ -9482,6 +9601,7 @@ function setMapData({ refitProjection = true, resetZoom = true } = {}) {
   layerResolverCache.primaryRef = null;
   layerResolverCache.detailRef = null;
   layerResolverCache.bundleMode = null;
+  resetPhysicalLandClipPathCache();
   state.topologyRevision = Number(state.topologyRevision || 0) + 1;
   getRenderPassCacheState().referenceTransform = null;
   getRenderPassCacheState().referenceTransforms = {};

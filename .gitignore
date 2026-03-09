@@ -43,7 +43,11 @@ skills-lock.json
 /historic geographic overhaul/
 /current-tno-1962-overview.png
 /tno-1962-*.txt
+/tmp_pw/
 /output/tno_preview/
+/output/perf/
+/output/playwright/
+/output/puppeteer/
 /output/playwright/*.png
 /test-results/
 
