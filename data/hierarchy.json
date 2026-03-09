@@ -14017,6 +14017,19 @@
     "AU_Queensland": "Queensland",
     "AU_Tasmania": "Tasmania"
   },
+  "interaction_policies": {
+    "CN": {
+      "leaf_source": "detail",
+      "leaf_kind": "adm2",
+      "parent_source": "hierarchy",
+      "parent_scope_label": "Province",
+      "requires_composite": true,
+      "quick_fill_scopes": [
+        "parent",
+        "country"
+      ]
+    }
+  },
   "country_groups": {
     "version": 1,
     "continents": [

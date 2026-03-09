@@ -248,6 +248,10 @@ function initToolbar({ render } = {}) {
   const rightPanelToggle = document.getElementById("rightPanelToggle");
   const dockPaintSummary = document.getElementById("dockPaintSummary");
   const paintGranularitySelect = document.getElementById("paintGranularitySelect");
+  const dockQuickFillRow = document.getElementById("dockQuickFillRow");
+  const quickFillParentBtn = document.getElementById("quickFillParentBtn");
+  const quickFillCountryBtn = document.getElementById("quickFillCountryBtn");
+  const dockQuickFillHint = document.getElementById("dockQuickFillHint");
   const paintModeSelect = document.getElementById("paintModeSelect");
   const politicalEditingToggleBtn = document.getElementById("politicalEditingToggleBtn");
   const scenarioVisualAdjustmentsBtn = document.getElementById("scenarioVisualAdjustmentsBtn");
@@ -380,6 +384,74 @@ function initToolbar({ render } = {}) {
       : t("Visual Color", "ui")
   );
 
+  const normalizeCountryCode = (rawCode) =>
+    String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
+
+  const getActiveQuickFillPolicy = () => {
+    const selectedCode = normalizeCountryCode(
+      state.selectedInspectorCountryCode || state.inspectorHighlightCountryCode
+    );
+    if (!selectedCode || !(state.countryInteractionPoliciesByCode instanceof Map)) {
+      return null;
+    }
+    return state.countryInteractionPoliciesByCode.get(selectedCode) || null;
+  };
+
+  const getQuickFillParentLabel = (policy) => {
+    if (policy?.parentScopeLabel === "Province") {
+      return t("By Province", "ui");
+    }
+    return t("By Parent", "ui");
+  };
+
+  const getQuickFillHint = (policy) => {
+    const requestedScope = String(state.batchFillScope || "parent") === "country" ? "country" : "parent";
+    if (requestedScope === "country") {
+      return t("Single-click: one subdivision | Double-click: country batch", "ui");
+    }
+    if (policy?.parentScopeLabel === "Province") {
+      return t("Single-click: one subdivision | Double-click: province batch", "ui");
+    }
+    return t("Single-click: one subdivision | Double-click: parent batch", "ui");
+  };
+
+  const refreshQuickFillControls = () => {
+    const isScenarioMode = !!state.activeScenarioId;
+    const isOwnershipMode = String(state.paintMode || "visual") === "sovereignty";
+    const isSubdivisionMode = String(state.interactionGranularity || "subdivision") !== "country";
+    const activePolicy = getActiveQuickFillPolicy();
+    const parentEnabled = !activePolicy
+      || !Array.isArray(activePolicy.quickFillScopes)
+      || activePolicy.quickFillScopes.includes("parent");
+    const countryEnabled = !activePolicy
+      || !Array.isArray(activePolicy.quickFillScopes)
+      || activePolicy.quickFillScopes.includes("country");
+    const isVisible = !isScenarioMode && !isOwnershipMode && isSubdivisionMode;
+
+    if (dockQuickFillRow) {
+      dockQuickFillRow.classList.toggle("hidden", !isVisible);
+    }
+    if (quickFillParentBtn) {
+      quickFillParentBtn.textContent = getQuickFillParentLabel(activePolicy);
+      quickFillParentBtn.disabled = !parentEnabled;
+      quickFillParentBtn.classList.toggle(
+        "is-active",
+        parentEnabled && String(state.batchFillScope || "parent") !== "country"
+      );
+    }
+    if (quickFillCountryBtn) {
+      quickFillCountryBtn.textContent = t("By Country", "ui");
+      quickFillCountryBtn.disabled = !countryEnabled;
+      quickFillCountryBtn.classList.toggle(
+        "is-active",
+        countryEnabled && String(state.batchFillScope || "parent") === "country"
+      );
+    }
+    if (dockQuickFillHint) {
+      dockQuickFillHint.textContent = getQuickFillHint(activePolicy);
+    }
+  };
+
   const refreshPaintControlsLayout = () => {
     const isScenarioMode = !!state.activeScenarioId;
     const isOwnershipMode = String(state.paintMode || "visual") === "sovereignty";
@@ -418,6 +490,8 @@ function initToolbar({ render } = {}) {
     if (dynamicBorderStatus) {
       dynamicBorderStatus.classList.toggle("hidden", !showBorderMaintenance);
     }
+
+    refreshQuickFillControls();
   };
 
   const updateDockCollapsedUi = () => {
@@ -2789,6 +2863,24 @@ function initToolbar({ render } = {}) {
       state.interactionGranularity =
         state.paintMode === "sovereignty" ? "subdivision" : requested;
       paintGranularitySelect.value = state.interactionGranularity;
+      if (typeof state.updatePaintModeUIFn === "function") {
+        state.updatePaintModeUIFn();
+      }
+    });
+  }
+
+  if (quickFillParentBtn) {
+    quickFillParentBtn.addEventListener("click", () => {
+      state.batchFillScope = "parent";
+      if (typeof state.updatePaintModeUIFn === "function") {
+        state.updatePaintModeUIFn();
+      }
+    });
+  }
+
+  if (quickFillCountryBtn) {
+    quickFillCountryBtn.addEventListener("click", () => {
+      state.batchFillScope = "country";
       if (typeof state.updatePaintModeUIFn === "function") {
         state.updatePaintModeUIFn();
       }

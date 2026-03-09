@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "tno_1962",
-  "generated_at": "2026-03-08T16:24:52Z",
+  "generated_at": "2026-03-08T19:50:32Z",
   "default_country": "GER",
   "countries": {
     "AEF": {
@@ -80,7 +80,7 @@
       "tag": "ALG",
       "display_name": "French Algeria",
       "color_hex": "#1746e6",
-      "feature_count": 50,
+      "feature_count": 63,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "DZ",
@@ -231,7 +231,7 @@
     "ARG": {
       "tag": "ARG",
       "display_name": "Argentina",
-      "color_hex": "#919dec",
+      "color_hex": "#8ca7aa",
       "feature_count": 24,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -409,7 +409,7 @@
     "BOL": {
       "tag": "BOL",
       "display_name": "Bolivia",
-      "color_hex": "#cca66c",
+      "color_hex": "#977a67",
       "feature_count": 9,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -477,7 +477,7 @@
     "BRA": {
       "tag": "BRA",
       "display_name": "Brazil",
-      "color_hex": "#4c913f",
+      "color_hex": "#869d37",
       "feature_count": 27,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -621,7 +621,7 @@
     "CAN": {
       "tag": "CAN",
       "display_name": "Canada",
-      "color_hex": "#e93b3b",
+      "color_hex": "#9e454c",
       "feature_count": 343,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -731,7 +731,7 @@
     "CHL": {
       "tag": "CHL",
       "display_name": "Chile",
-      "color_hex": "#9b656b",
+      "color_hex": "#af6233",
       "feature_count": 16,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -765,7 +765,7 @@
     "COL": {
       "tag": "COL",
       "display_name": "Colombia",
-      "color_hex": "#debb5b",
+      "color_hex": "#d7ce93",
       "feature_count": 34,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -799,7 +799,7 @@
     "COS": {
       "tag": "COS",
       "display_name": "Costa Rica",
-      "color_hex": "#98802b",
+      "color_hex": "#824d60",
       "feature_count": 7,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -833,7 +833,7 @@
     "CUB": {
       "tag": "CUB",
       "display_name": "Cuba",
-      "color_hex": "#8c41a6",
+      "color_hex": "#724d7f",
       "feature_count": 1,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -901,7 +901,7 @@
     "DOM": {
       "tag": "DOM",
       "display_name": "Dominican Republic",
-      "color_hex": "#9882bf",
+      "color_hex": "#d67d53",
       "feature_count": 32,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -935,7 +935,7 @@
     "ECU": {
       "tag": "ECU",
       "display_name": "Ecuador",
-      "color_hex": "#f99262",
+      "color_hex": "#6c8ce1",
       "feature_count": 24,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -970,7 +970,7 @@
       "tag": "EGY",
       "display_name": "Italian Egypt",
       "color_hex": "#7a9e66",
-      "feature_count": 26,
+      "feature_count": 35,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "EG",
@@ -1007,7 +1007,7 @@
     "ELS": {
       "tag": "ELS",
       "display_name": "El Salvador",
-      "color_hex": "#9882bf",
+      "color_hex": "#8c8b7e",
       "feature_count": 14,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -1041,7 +1041,7 @@
     "ENG": {
       "tag": "ENG",
       "display_name": "Britain",
-      "color_hex": "#c9385d",
+      "color_hex": "#7d2020",
       "feature_count": 239,
       "quality": "approx_existing_geometry",
       "source": "direct_active_owner",
@@ -1113,7 +1113,7 @@
     "FIN": {
       "tag": "FIN",
       "display_name": "Finland",
-      "color_hex": "#cdd4e4",
+      "color_hex": "#a2a2a2",
       "feature_count": 57,
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
@@ -1149,8 +1149,8 @@
     "FRA": {
       "tag": "FRA",
       "display_name": "France",
-      "color_hex": "#3971e4",
-      "feature_count": 279,
+      "color_hex": "#0f0f65",
+      "feature_count": 311,
       "quality": "approx_existing_geometry",
       "source": "direct_active_owner",
       "base_iso2": "FR",
@@ -1270,7 +1270,7 @@
       "tag": "GRE",
       "display_name": "Greek Protectorate",
       "color_hex": "#6a965f",
-      "feature_count": 94,
+      "feature_count": 202,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "GR",
@@ -1307,7 +1307,7 @@
     "GRN": {
       "tag": "GRN",
       "display_name": "Greenland",
-      "color_hex": "#ff5050",
+      "color_hex": "#a3bfb4",
       "feature_count": 1,
       "quality": "approx_existing_geometry",
       "source": "fallback_mapped_tag",
@@ -1341,7 +1341,7 @@
     "GUA": {
       "tag": "GUA",
       "display_name": "Guatemala",
-      "color_hex": "#483170",
+      "color_hex": "#9198a8",
       "feature_count": 22,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -1413,7 +1413,7 @@
     "HAI": {
       "tag": "HAI",
       "display_name": "Haiti",
-      "color_hex": "#ae7171",
+      "color_hex": "#4e408c",
       "feature_count": 10,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -1483,7 +1483,7 @@
     "HON": {
       "tag": "HON",
       "display_name": "Honduras",
-      "color_hex": "#809141",
+      "color_hex": "#748c80",
       "feature_count": 18,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -1626,7 +1626,7 @@
     "IRE": {
       "tag": "IRE",
       "display_name": "Ireland",
-      "color_hex": "#509f5a",
+      "color_hex": "#3c5a50",
       "feature_count": 19,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -1694,8 +1694,8 @@
     "ITA": {
       "tag": "ITA",
       "display_name": "Italy",
-      "color_hex": "#437f3f",
-      "feature_count": 182,
+      "color_hex": "#6d8e60",
+      "feature_count": 222,
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "IT",
@@ -1921,7 +1921,7 @@
       "tag": "LBA",
       "display_name": "Libya",
       "color_hex": "#285229",
-      "feature_count": 25,
+      "feature_count": 36,
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "LY",
@@ -1959,7 +1959,7 @@
       "tag": "LEB",
       "display_name": "Lebanese Protectorate",
       "color_hex": "#739766",
-      "feature_count": 7,
+      "feature_count": 10,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "LB",
@@ -2252,7 +2252,7 @@
     "MEX": {
       "tag": "MEX",
       "display_name": "Mexico",
-      "color_hex": "#689853",
+      "color_hex": "#55765b",
       "feature_count": 300,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -2464,7 +2464,7 @@
     "NIC": {
       "tag": "NIC",
       "display_name": "Nicaragua",
-      "color_hex": "#92b3bf",
+      "color_hex": "#605d6e",
       "feature_count": 17,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -2601,7 +2601,7 @@
       "tag": "PAL",
       "display_name": "Italian Palestine",
       "color_hex": "#557d47",
-      "feature_count": 10,
+      "feature_count": 15,
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "IL",
@@ -2638,7 +2638,7 @@
     "PAN": {
       "tag": "PAN",
       "display_name": "Panama",
-      "color_hex": "#9882bf",
+      "color_hex": "#7d77a3",
       "feature_count": 12,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -2672,7 +2672,7 @@
     "PAR": {
       "tag": "PAR",
       "display_name": "Paraguay",
-      "color_hex": "#3971e4",
+      "color_hex": "#14238d",
       "feature_count": 18,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -2815,7 +2815,7 @@
     "POR": {
       "tag": "POR",
       "display_name": "Portugal",
-      "color_hex": "#277446",
+      "color_hex": "#4c664c",
       "feature_count": 69,
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
@@ -2851,7 +2851,7 @@
     "PRU": {
       "tag": "PRU",
       "display_name": "Peru",
-      "color_hex": "#c4bdcc",
+      "color_hex": "#a53d3d",
       "feature_count": 26,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -2885,7 +2885,7 @@
     "PUE": {
       "tag": "PUE",
       "display_name": "Puerto Rico",
-      "color_hex": "#9999ff",
+      "color_hex": "#648abe",
       "feature_count": 1,
       "quality": "approx_existing_geometry",
       "source": "fallback_mapped_tag",
@@ -3363,8 +3363,8 @@
     "SPR": {
       "tag": "SPR",
       "display_name": "Spain",
-      "color_hex": "#f2cd5e",
-      "feature_count": 71,
+      "color_hex": "#dd99ef",
+      "feature_count": 108,
       "quality": "approx_existing_geometry",
       "source": "direct_active_owner",
       "base_iso2": "ES",
@@ -3476,7 +3476,7 @@
     "SWE": {
       "tag": "SWE",
       "display_name": "Sweden",
-      "color_hex": "#2484f7",
+      "color_hex": "#414b9f",
       "feature_count": 21,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -3547,7 +3547,7 @@
       "tag": "SYR",
       "display_name": "Syrian Protectorate",
       "color_hex": "#58724b",
-      "feature_count": 15,
+      "feature_count": 19,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "SY",
@@ -3659,7 +3659,7 @@
       "tag": "TUN",
       "display_name": "Tunisian Protectorate",
       "color_hex": "#638853",
-      "feature_count": 34,
+      "feature_count": 49,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "TN",
@@ -3697,7 +3697,7 @@
       "tag": "TUR",
       "display_name": "Turkey",
       "color_hex": "#abbe98",
-      "feature_count": 95,
+      "feature_count": 124,
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "TR",
@@ -3732,7 +3732,7 @@
     "URG": {
       "tag": "URG",
       "display_name": "Uruguay",
-      "color_hex": "#abbe98",
+      "color_hex": "#0f7e90",
       "feature_count": 19,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -3766,7 +3766,7 @@
     "USA": {
       "tag": "USA",
       "display_name": "America",
-      "color_hex": "#1485ed",
+      "color_hex": "#648abe",
       "feature_count": 900,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -3800,7 +3800,7 @@
     "VEN": {
       "tag": "VEN",
       "display_name": "Venezuela",
-      "color_hex": "#abbe98",
+      "color_hex": "#ca6e6e",
       "feature_count": 25,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
@@ -4464,7 +4464,7 @@
       ],
       "subject_kind": "client_state",
       "entry_kind": "scenario_subject",
-      "feature_count": 32
+      "feature_count": 70
     },
     "SER": {
       "tag": "SER",
@@ -4502,13 +4502,13 @@
       ],
       "subject_kind": "client_state",
       "entry_kind": "scenario_subject",
-      "feature_count": 79
+      "feature_count": 81
     },
     "ATL": {
       "tag": "ATL",
       "display_name": "Atlantropa Reclamation Zone",
       "color_hex": "#d8c7a6",
-      "feature_count": 82,
+      "feature_count": 73,
       "quality": "manual_reviewed",
       "source": "scenario_generated",
       "base_iso2": "ZZ",
@@ -4544,7 +4544,7 @@
     "SCO": {
       "tag": "SCO",
       "display_name": "Scotland",
-      "color_hex": "#e8e800",
+      "color_hex": "#606a9c",
       "feature_count": 22,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -4581,7 +4581,7 @@
     "WLS": {
       "tag": "WLS",
       "display_name": "Wales",
-      "color_hex": "#ff0000",
+      "color_hex": "#ada05d",
       "feature_count": 12,
       "quality": "manual_reviewed",
       "source": "manual_rule",

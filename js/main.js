@@ -15,6 +15,7 @@ const COUNTRY_CODE_ALIASES = {
   UK: "GB",
   EL: "GR",
 };
+const VALID_BATCH_FILL_SCOPES = new Set(["parent", "country"]);
 
 function normalizeCountryCode(rawCode) {
   const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
@@ -22,11 +23,20 @@ function normalizeCountryCode(rawCode) {
   return COUNTRY_CODE_ALIASES[code] || code;
 }
 
+function normalizeBatchFillScopes(rawScopes) {
+  const scopes = Array.isArray(rawScopes) ? rawScopes : [];
+  const normalized = scopes
+    .map((scope) => String(scope || "").trim().toLowerCase())
+    .filter((scope) => VALID_BATCH_FILL_SCOPES.has(scope));
+  return normalized.length ? Array.from(new Set(normalized)) : ["parent", "country"];
+}
+
 function processHierarchyData(data) {
   state.hierarchyData = data || null;
   state.hierarchyGroupsByCode = new Map();
   state.countryGroupsData = state.hierarchyData?.country_groups || null;
   state.countryGroupMetaByCode = new Map();
+  state.countryInteractionPoliciesByCode = new Map();
 
   if (state.hierarchyData?.groups) {
     const labels = state.hierarchyData.labels || {};
@@ -56,6 +66,20 @@ function processHierarchyData(data) {
       continentLabel: String(meta.continent_label || "").trim(),
       subregionId: String(meta.subregion_id || "").trim(),
       subregionLabel: String(meta.subregion_label || "").trim(),
+    });
+  });
+
+  const interactionPolicies = state.hierarchyData?.interaction_policies || {};
+  Object.entries(interactionPolicies).forEach(([rawCode, policy]) => {
+    const code = normalizeCountryCode(rawCode);
+    if (!code || !policy || typeof policy !== "object") return;
+    state.countryInteractionPoliciesByCode.set(code, {
+      leafSource: String(policy.leaf_source || "").trim().toLowerCase(),
+      leafKind: String(policy.leaf_kind || "").trim().toLowerCase(),
+      parentSource: String(policy.parent_source || "").trim().toLowerCase(),
+      parentScopeLabel: String(policy.parent_scope_label || "").trim(),
+      requiresComposite: !!policy.requires_composite,
+      quickFillScopes: normalizeBatchFillScopes(policy.quick_fill_scopes),
     });
   });
 }
@@ -96,6 +120,76 @@ function getDeferredPromotionDelay(profile) {
 
 let deferredPromotionHandle = null;
 
+function hasDetailTopologyLoaded() {
+  return !!state.topologyDetail?.objects?.political;
+}
+
+async function ensureDetailTopologyReady({ renderDispatcher = null, requireIdle = false } = {}) {
+  if (hasDetailTopologyLoaded()) {
+    if (state.topologyBundleMode !== "composite") {
+      state.topologyBundleMode = "composite";
+      setMapData({ refitProjection: false, resetZoom: false });
+      if (renderDispatcher?.schedule) {
+        renderDispatcher.schedule();
+      } else if (typeof state.renderNowFn === "function") {
+        state.renderNowFn();
+      }
+    }
+    state.detailDeferred = false;
+    state.detailPromotionCompleted = true;
+    return true;
+  }
+
+  if (state.detailPromotionInFlight) return false;
+  if (requireIdle && (state.isInteracting || state.renderPhase !== "idle")) {
+    return false;
+  }
+
+  state.detailPromotionInFlight = true;
+  try {
+    const {
+      topologyDetail,
+      runtimePoliticalTopology,
+      topologyBundleMode,
+      detailSourceUsed,
+    } = await loadDeferredDetailBundle({
+      detailSourceKey: state.detailSourceRequested,
+    });
+
+    if (!topologyDetail) {
+      state.detailDeferred = false;
+      console.warn("[main] Detail promotion skipped: no detail topology was loaded.");
+      return false;
+    }
+
+    state.topologyDetail = topologyDetail;
+    state.runtimePoliticalTopology = runtimePoliticalTopology || state.runtimePoliticalTopology;
+    if (!state.activeScenarioId) {
+      state.defaultRuntimePoliticalTopology = state.runtimePoliticalTopology || null;
+    }
+    state.topologyBundleMode = topologyBundleMode || "composite";
+    state.detailDeferred = false;
+    state.detailPromotionCompleted = true;
+    state.detailSourceRequested = detailSourceUsed || state.detailSourceRequested;
+
+    console.info(
+      `[main] Detail promotion applied. source=${state.detailSourceRequested}, mode=${state.topologyBundleMode}.`
+    );
+    setMapData({ refitProjection: false, resetZoom: false });
+    if (renderDispatcher?.schedule) {
+      renderDispatcher.schedule();
+    } else if (typeof state.renderNowFn === "function") {
+      state.renderNowFn();
+    }
+    return true;
+  } catch (error) {
+    console.warn("[main] Detail promotion failed:", error);
+    return false;
+  } finally {
+    state.detailPromotionInFlight = false;
+  }
+}
+
 function scheduleDeferredDetailPromotion(renderDispatcher) {
   if (
     !state.detailDeferred ||
@@ -111,47 +205,12 @@ function scheduleDeferredDetailPromotion(renderDispatcher) {
     if (!state.detailDeferred || state.detailPromotionCompleted || state.detailPromotionInFlight) {
       return;
     }
-    if (state.isInteracting || state.renderPhase !== "idle") {
+    const promoted = await ensureDetailTopologyReady({
+      renderDispatcher,
+      requireIdle: true,
+    });
+    if (!promoted && (state.isInteracting || state.renderPhase !== "idle")) {
       scheduleDeferredDetailPromotion(renderDispatcher);
-      return;
-    }
-
-    state.detailPromotionInFlight = true;
-    try {
-      const {
-        topologyDetail,
-        runtimePoliticalTopology,
-        topologyBundleMode,
-        detailSourceUsed,
-      } = await loadDeferredDetailBundle({
-        detailSourceKey: state.detailSourceRequested,
-      });
-
-      if (!topologyDetail) {
-        state.detailDeferred = false;
-        console.warn("[main] Deferred detail promotion skipped: no detail topology was loaded.");
-        return;
-      }
-
-      state.topologyDetail = topologyDetail;
-      state.runtimePoliticalTopology = runtimePoliticalTopology || state.runtimePoliticalTopology;
-      if (!state.activeScenarioId) {
-        state.defaultRuntimePoliticalTopology = state.runtimePoliticalTopology || null;
-      }
-      state.topologyBundleMode = topologyBundleMode || "composite";
-      state.detailDeferred = false;
-      state.detailPromotionCompleted = true;
-      state.detailSourceRequested = detailSourceUsed || state.detailSourceRequested;
-
-      console.info(
-        `[main] Deferred detail promotion applied. source=${state.detailSourceRequested}, mode=${state.topologyBundleMode}.`
-      );
-      setMapData({ refitProjection: false, resetZoom: false });
-      renderDispatcher.schedule();
-    } catch (error) {
-      console.warn("[main] Deferred detail promotion failed:", error);
-    } finally {
-      state.detailPromotionInFlight = false;
     }
   };
 
@@ -313,6 +372,11 @@ async function bootstrap() {
     globalThis.renderApp = renderApp;
     globalThis.renderNow = renderDispatcher.flush;
     state.renderNowFn = renderDispatcher.flush;
+    state.ensureDetailTopologyFn = (options = {}) =>
+      ensureDetailTopologyReady({
+        renderDispatcher,
+        ...options,
+      });
 
     initToast();
     initToolbar({ render: renderApp });

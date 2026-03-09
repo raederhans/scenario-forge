@@ -65,15 +65,15 @@
     "PER",
     "PHI"
   ],
-  "palette_id": "hoi4_vanilla",
-  "baseline_hash": "abd3b7f8f3876e8f6fba7278102acbf3107fded6f0ec53004e101be6e82ef4c8",
+  "palette_id": "tno",
+  "baseline_hash": "0bf46730e013c91c7acec756a6c58aab61fb8e28181c4897a09493432638ce44",
   "countries_url": "data/scenarios/tno_1962/countries.json",
   "owners_url": "data/scenarios/tno_1962/owners.by_feature.json",
   "controllers_url": "data/scenarios/tno_1962/controllers.by_feature.json",
   "cores_url": "data/scenarios/tno_1962/cores.by_feature.json",
   "audit_url": "data/scenarios/tno_1962/audit.json",
   "summary": {
-    "feature_count": 11967,
+    "feature_count": 12304,
     "owner_count": 126,
     "controller_count": 125,
     "quality_counts": {
@@ -86,12 +86,12 @@
       "fallback_mapped_tag": 18,
       "manual_rule": 6464
     },
-    "approximate_count": 865,
+    "approximate_count": 950,
     "manual_reviewed_feature_count": 6050,
     "geometry_blocker_count": 0,
     "critical_unresolved_count": 0,
-    "synthetic_owner_feature_count": 100,
-    "synthetic_count": 100,
+    "synthetic_owner_feature_count": 91,
+    "synthetic_count": 91,
     "changed_feature_count": 2032,
     "failed_region_check_count": 0,
     "topology_blocker_count": 0,
@@ -112,7 +112,19 @@
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
   "relief_overlays_url": "data/scenarios/tno_1962/relief_overlays.geojson",
   "runtime_topology_url": "data/scenarios/tno_1962/runtime_topology.topo.json",
+  "performance_hints": {
+    "render_profile_default": "balanced",
+    "dynamic_borders_default": false,
+    "scenario_relief_overlays_default": false,
+    "water_regions_default": true,
+    "special_regions_default": true
+  },
   "excluded_water_region_groups": [
     "mediterranean"
-  ]
+  ],
+  "style_defaults": {
+    "ocean": {
+      "fillColor": "#2d4769"
+    }
+  }
 }

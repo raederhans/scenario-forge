@@ -37,6 +37,7 @@ REICHSKOMMISSARIAT_ACTIONS_PATH = ROOT / "data/releasables/hoi4_reichskommissari
 RELEASABLE_SOURCE_PATH = ROOT / "data/releasables/hoi4_vanilla.internal.phase1.source.json"
 HIERARCHY_PATH = ROOT / "data/hierarchy.json"
 PALETTE_PATH = ROOT / "data/palettes/hoi4_vanilla.palette.json"
+TNO_PALETTE_PATH = ROOT / "data/palettes/tno.palette.json"
 REGIONAL_RULE_PACKS: list[tuple[str, Path]] = [
     ("east_asia", ROOT / "data/scenario-rules/tno_1962.east_asia_ownership.manual.json"),
     ("south_asia", ROOT / "data/scenario-rules/tno_1962.south_asia_ownership.manual.json"),
@@ -54,6 +55,53 @@ ATL_SOURCE_TAG = "hgo_donor"
 ATL_SEA_COLOR_HEX = "#9ec4e6"
 ATL_SURFACE_LAND = "salt_flat_land"
 ATL_SURFACE_SEA = "sea"
+
+ATL_GEOMETRY_ROLE_DONOR_LAND = "donor_land"
+ATL_GEOMETRY_ROLE_DONOR_ISLAND = "donor_island"
+ATL_GEOMETRY_ROLE_SHORE_SEAL = "shore_seal"
+ATL_GEOMETRY_ROLE_DONOR_SEA = "donor_sea"
+ATL_GEOMETRY_ROLE_CAUSEWAY = "causeway"
+
+ATL_JOIN_MODE_NONE = "none"
+ATL_JOIN_MODE_GAP_FILL = "gap_fill"
+ATL_JOIN_MODE_BOOLEAN_WELD = "boolean_weld"
+
+DONOR_ISLAND_NAME_HINTS = (
+    "island",
+    "islands",
+    "sicily",
+    "mallorca",
+    "menorca",
+    "ibiza",
+    "corsica",
+    "sardinia",
+    "olbia",
+    "tavolara",
+    "elba",
+    "pantelleria",
+    "egadi",
+    "malta",
+    "corfu",
+    "crete",
+    "naxos",
+    "lesvos",
+    "rodi",
+    "astipalea",
+    "cyprus",
+    "pago",
+    "pelagosa",
+    "metcovico",
+    "solta",
+    "lagosta",
+    "plauno",
+    "saseno",
+)
+
+DONOR_CAUSEWAY_NAME_HINTS = (
+    "dam site",
+    "canal site",
+    "landbridge site",
+)
 
 GER_PRESET_FEATURE_IDS = {
     "Alsace-Lorraine + Luxembourg": [
@@ -152,6 +200,28 @@ TNO_1962_ITALY_REMOVED_FRENCH_BASELINE_TARGETS = {
     "FR_ARR_06001": "FRA",
 }
 
+TNO_1962_DIRECT_TNO_COLOR_TAGS = {
+    "ENG",
+    "SCO",
+    "IRE",
+    "SWE",
+    "FIN",
+    "ITA",
+    "SPR",
+    "POR",
+}
+
+TNO_1962_AMERICA_CONTINENT_IDS = {
+    "continent_north_america",
+    "continent_south_america",
+}
+
+TNO_1962_TNO_COLOR_PROXY_TAGS = {
+    "FRA": "FRM",
+    "WLS": "WAL",
+    "PUE": "USA",
+}
+
 UNAPPLIED_ACTION_IDS = (
     "arctic_islands_to_ger",
 )
@@ -216,13 +286,41 @@ ATLANTROPA_REGION_CONFIGS = {
         "sea_preserve_margin": 0.03,
         "snap_tolerance": 0.14,
         "simplify_tolerance": 0.012,
+        "island_replacement": True,
+        "island_merge_distance": 0.028,
+        "mainland_component_min_area": 2.8,
+        "mainland_touch_tolerance": 0.035,
+        "gap_fill_width": 0.078,
+        "gap_fill_min_area": 0.00006,
+        "gap_fill_max_area": 0.095,
+        "boolean_weld_width": 0.027,
+        "boolean_weld_min_area": 0.00001,
+        "boolean_weld_max_area": 0.072,
+        "shore_seal_width": 0.078,
+        "shore_seal_min_area": 0.00006,
+        "shore_seal_max_area": 0.1,
+        "causeway_keep_state_ids": [9072, 9073, 9077],
+        "nearshore_island_join_state_ids": [8492, 8493, 8494, 8495, 8497, 8501, 8502, 8503, 8504, 8505, 8506, 8508, 9076, 10340],
+        "major_island_groups": [
+            {
+                "id": "corfu",
+                "label": "Corfu",
+                "owner_tag": "GRE",
+                "donor_state_ids": [8509, 9074],
+                "baseline_feature_ids": ["EL622"],
+                "search_margin": 0.18,
+                "gap_fill_buffer": 0.08,
+                "boolean_weld_distance": 0.1,
+                "boolean_weld_width": 0.02,
+            },
+        ],
     },
     "sicily_tunis": {
         "feature_group_id": "atlantropa_sicily_tunis_salt_shelf",
         "group_label": "Sicily-Tunis Salt Shelf",
         "aoi_bbox": (7.4, 34.6, 16.2, 39.2),
         "land_state_ids": [
-            8486, 8557, 8558, 8559, 8560, 8561, 8562,
+            8486, 8557, 8558, 8559, 8560, 8561, 8562, 8566,
             9036, 9037, 9078, 9080, 9081, 9083,
         ],
         "water_state_ids": [8591, 8592, 8598, 8600, 8603, 8606],
@@ -234,6 +332,7 @@ ATLANTROPA_REGION_CONFIGS = {
             8560: "ITA",
             8561: "ITA",
             8562: "TUN",
+            8566: "ITA",
             9036: "TUN",
             9037: "ITA",
             9078: "ITA",
@@ -252,6 +351,44 @@ ATLANTROPA_REGION_CONFIGS = {
         "sea_preserve_margin": 0.03,
         "snap_tolerance": 0.14,
         "simplify_tolerance": 0.012,
+        "island_replacement": True,
+        "island_merge_distance": 0.03,
+        "mainland_component_min_area": 2.8,
+        "mainland_touch_tolerance": 0.035,
+        "gap_fill_width": 0.075,
+        "gap_fill_min_area": 0.00006,
+        "gap_fill_max_area": 0.095,
+        "boolean_weld_width": 0.02,
+        "boolean_weld_min_area": 0.00001,
+        "boolean_weld_max_area": 0.055,
+        "shore_seal_width": 0.07,
+        "shore_seal_min_area": 0.00006,
+        "shore_seal_max_area": 0.09,
+        "causeway_keep_state_ids": [8486, 8566, 9078, 9080],
+        "major_island_groups": [
+            {
+                "id": "sicily",
+                "label": "Sicily",
+                "owner_tag": "ITA",
+                "donor_state_ids": [8557, 8558, 8559, 8561],
+                "baseline_feature_ids": ["ITG11", "ITG12", "ITG13", "ITG14", "ITG15", "ITG17", "ITG18", "ITG19"],
+                "search_margin": 0.35,
+                "gap_fill_buffer": 0.12,
+                "boolean_weld_distance": 0.18,
+                "boolean_weld_width": 0.035,
+            },
+            {
+                "id": "malta",
+                "label": "Malta",
+                "owner_tag": "ITA",
+                "donor_state_ids": [8560],
+                "baseline_feature_ids": ["MT001", "MT002"],
+                "search_margin": 0.18,
+                "gap_fill_buffer": 0.08,
+                "boolean_weld_distance": 0.1,
+                "boolean_weld_width": 0.02,
+            },
+        ],
     },
     "gabes": {
         "feature_group_id": "atlantropa_gulf_of_gabes_exposure",
@@ -272,18 +409,25 @@ ATLANTROPA_REGION_CONFIGS = {
         "sea_preserve_margin": 0.025,
         "snap_tolerance": 0.1,
         "simplify_tolerance": 0.01,
+        "island_replacement": False,
+        "mainland_component_min_area": 2.2,
+        "mainland_touch_tolerance": 0.03,
+        "shore_seal_width": 0.06,
+        "shore_seal_min_area": 0.00004,
+        "shore_seal_max_area": 0.055,
     },
     "levant": {
         "feature_group_id": "atlantropa_levantine_retreat_margin",
         "group_label": "Levantine Retreat Margin",
         "aoi_bbox": (31.2, 30.5, 36.7, 37.5),
         "land_state_ids": [
-            8544, 9035, 8546, 8547, 8548, 8549, 8550,
+            8544, 8545, 9035, 8546, 8547, 8548, 8549, 8550,
             8551, 8552, 8553, 8554, 8555, 8556,
         ],
         "water_state_ids": [8609, 8611, 8612, 8613, 8614, 8615],
         "state_owner_overrides": {
             8544: "TUR",
+            8545: "TUR",
             8546: "SYR",
             8547: "LEB",
             8548: "PAL",
@@ -299,6 +443,7 @@ ATLANTROPA_REGION_CONFIGS = {
         },
         "control_points": {
             9035: (36.10, 36.20),
+            8545: (36.25, 35.95),
             8547: (35.45, 33.95),
             8548: (34.65, 32.25),
             8550: (33.45, 31.25),
@@ -308,11 +453,37 @@ ATLANTROPA_REGION_CONFIGS = {
         "sea_preserve_margin": 0.03,
         "snap_tolerance": 0.12,
         "simplify_tolerance": 0.012,
+        "island_replacement": True,
+        "island_merge_distance": 0.024,
+        "mainland_component_min_area": 3.0,
+        "mainland_touch_tolerance": 0.035,
+        "gap_fill_width": 0.082,
+        "gap_fill_min_area": 0.00005,
+        "gap_fill_max_area": 0.095,
+        "boolean_weld_width": 0.021,
+        "boolean_weld_min_area": 0.00001,
+        "boolean_weld_max_area": 0.058,
+        "shore_seal_width": 0.072,
+        "shore_seal_min_area": 0.00005,
+        "shore_seal_max_area": 0.085,
+        "major_island_groups": [
+            {
+                "id": "cyprus",
+                "label": "Cyprus",
+                "owner_tag": "TUR",
+                "donor_state_ids": [8551, 8552, 8553, 8554, 8555, 8556],
+                "baseline_feature_ids": ["CY000"],
+                "search_margin": 0.26,
+                "gap_fill_buffer": 0.12,
+                "boolean_weld_distance": 0.16,
+                "boolean_weld_width": 0.03,
+            },
+        ],
     },
     "tyrrhenian": {
         "feature_group_id": "atlantropa_tyrrhenian_and_west_italy",
         "group_label": "Tyrrhenian and West Italian Coast",
-        "aoi_bbox": (6.4, 37.4, 18.8, 45.3),
+        "aoi_bbox": (5.7, 37.4, 18.8, 45.6),
         "land_state_ids": [
             8466, 8467, 8468, 8469, 8470, 8471, 8472, 8473, 8474, 8475,
             8476, 8477, 8478, 8479, 8480, 8481, 8482, 8483, 8484, 8485,
@@ -323,7 +494,7 @@ ATLANTROPA_REGION_CONFIGS = {
             8467: "FRA",
             8468: "ITA",
             8469: "ITA",
-            8470: "FRA",
+            8470: "ITA",
             8471: "ITA",
             8472: "ITA",
             8473: "ITA",
@@ -341,6 +512,8 @@ ATLANTROPA_REGION_CONFIGS = {
             8485: "ITA",
         },
         "control_points": {
+            8466: (6.60, 43.75),
+            8468: (8.95, 44.15),
             8470: (9.15, 42.15),
             8472: (8.85, 40.0),
             8475: (9.55, 40.15),
@@ -351,6 +524,43 @@ ATLANTROPA_REGION_CONFIGS = {
         "sea_preserve_margin": 0.03,
         "snap_tolerance": 0.12,
         "simplify_tolerance": 0.012,
+        "island_replacement": True,
+        "island_merge_distance": 0.03,
+        "mainland_component_min_area": 3.2,
+        "mainland_touch_tolerance": 0.035,
+        "gap_fill_width": 0.095,
+        "gap_fill_min_area": 0.00006,
+        "gap_fill_max_area": 0.145,
+        "boolean_weld_width": 0.031,
+        "boolean_weld_min_area": 0.00001,
+        "boolean_weld_max_area": 0.085,
+        "shore_seal_width": 0.08,
+        "shore_seal_min_area": 0.00006,
+        "shore_seal_max_area": 0.115,
+        "major_island_groups": [
+            {
+                "id": "corsica",
+                "label": "Corsica",
+                "owner_tag": "ITA",
+                "donor_state_ids": [8470],
+                "baseline_feature_ids": ["FR_ARR_2A001", "FR_ARR_2A004", "FR_ARR_2B002", "FR_ARR_2B003"],
+                "search_margin": 0.28,
+                "gap_fill_buffer": 0.12,
+                "boolean_weld_distance": 0.14,
+                "boolean_weld_width": 0.03,
+            },
+            {
+                "id": "sardinia",
+                "label": "Sardinia",
+                "owner_tag": "ITA",
+                "donor_state_ids": [8471, 8472, 8473, 8474, 8475],
+                "baseline_feature_ids": ["ITG2D", "ITG2E", "ITG2F", "ITG2G", "ITG2H"],
+                "search_margin": 0.34,
+                "gap_fill_buffer": 0.14,
+                "boolean_weld_distance": 0.18,
+                "boolean_weld_width": 0.04,
+            },
+        ],
     },
     "west_med": {
         "feature_group_id": "atlantropa_west_mediterranean_margin",
@@ -385,6 +595,7 @@ ATLANTROPA_REGION_CONFIGS = {
             8458: (1.75, 40.75),
             8460: (3.05, 39.7),
             8462: (2.8, 42.55),
+            8463: (1.65, 43.35),
             8464: (5.4, 43.2),
             8465: (6.95, 36.85),
         },
@@ -392,6 +603,33 @@ ATLANTROPA_REGION_CONFIGS = {
         "sea_preserve_margin": 0.03,
         "snap_tolerance": 0.12,
         "simplify_tolerance": 0.012,
+        "island_replacement": True,
+        "island_merge_distance": 0.03,
+        "mainland_component_min_area": 3.5,
+        "mainland_touch_tolerance": 0.035,
+        "gap_fill_width": 0.09,
+        "gap_fill_min_area": 0.00006,
+        "gap_fill_max_area": 0.145,
+        "boolean_weld_width": 0.03,
+        "boolean_weld_min_area": 0.00001,
+        "boolean_weld_max_area": 0.085,
+        "shore_seal_width": 0.08,
+        "shore_seal_min_area": 0.00006,
+        "shore_seal_max_area": 0.115,
+        "causeway_keep_state_ids": [8449],
+        "major_island_groups": [
+            {
+                "id": "balearics",
+                "label": "Balearics",
+                "owner_tag": "SPR",
+                "donor_state_ids": [8459, 8460, 8461],
+                "baseline_feature_ids": ["ES531", "ES532", "ES533"],
+                "search_margin": 0.3,
+                "gap_fill_buffer": 0.12,
+                "boolean_weld_distance": 0.16,
+                "boolean_weld_width": 0.03,
+            },
+        ],
     },
     "aegean": {
         "feature_group_id": "atlantropa_aegean_and_islands",
@@ -401,6 +639,7 @@ ATLANTROPA_REGION_CONFIGS = {
             8510, 8512, 8515, 8516, 8517, 8518, 8519, 8520, 8521, 8522,
             8523, 8524, 8525, 8526, 8527, 8528, 8529, 8530, 8531, 8532,
             8533, 8534, 8535, 8536, 8537, 8538, 8539, 8540, 8541, 8542,
+            8543,
             8653,
         ],
         "water_state_ids": [8445, 8607, 8608, 8610, 8619, 8620, 8621, 8622],
@@ -435,6 +674,7 @@ ATLANTROPA_REGION_CONFIGS = {
             8540: "TUR",
             8541: "GRE",
             8542: "GRE",
+            8543: "TUR",
             8653: "GRE",
         },
         "control_points": {
@@ -444,17 +684,88 @@ ATLANTROPA_REGION_CONFIGS = {
             8537: (27.15, 38.45),
             8540: (27.45, 37.1),
             8541: (28.0, 36.15),
+            8543: (30.55, 36.75),
         },
         "preserve_margin": 0.03,
         "sea_preserve_margin": 0.03,
         "snap_tolerance": 0.12,
         "simplify_tolerance": 0.012,
+        "island_replacement": True,
+        "island_merge_distance": 0.026,
+        "mainland_component_min_area": 2.5,
+        "mainland_touch_tolerance": 0.035,
+        "gap_fill_width": 0.082,
+        "gap_fill_min_area": 0.00005,
+        "gap_fill_max_area": 0.095,
+        "boolean_weld_width": 0.024,
+        "boolean_weld_min_area": 0.00001,
+        "boolean_weld_max_area": 0.068,
+        "shore_seal_width": 0.072,
+        "shore_seal_min_area": 0.00005,
+        "shore_seal_max_area": 0.09,
+        "major_island_groups": [
+            {
+                "id": "crete",
+                "label": "Crete",
+                "owner_tag": "GRE",
+                "donor_state_ids": [8522, 8525],
+                "group_bbox": (22.8, 34.2, 26.8, 35.9),
+                "search_margin": 0.28,
+                "gap_fill_buffer": 0.11,
+                "boolean_weld_distance": 0.14,
+                "boolean_weld_width": 0.028,
+            },
+            {
+                "id": "euboea",
+                "label": "Euboea",
+                "owner_tag": "GRE",
+                "donor_state_ids": [8521],
+                "group_bbox": (23.15, 38.1, 24.8, 39.7),
+                "search_margin": 0.16,
+                "gap_fill_buffer": 0.06,
+                "boolean_weld_distance": 0.1,
+                "boolean_weld_width": 0.018,
+            },
+            {
+                "id": "lesvos",
+                "label": "Lesvos",
+                "owner_tag": "GRE",
+                "donor_state_ids": [8536],
+                "group_bbox": (25.75, 38.8, 26.7, 39.55),
+                "search_margin": 0.16,
+                "gap_fill_buffer": 0.06,
+                "boolean_weld_distance": 0.1,
+                "boolean_weld_width": 0.018,
+            },
+            {
+                "id": "chios",
+                "label": "Chios",
+                "owner_tag": "GRE",
+                "donor_state_ids": [8538],
+                "group_bbox": (25.85, 38.15, 26.7, 38.8),
+                "search_margin": 0.16,
+                "gap_fill_buffer": 0.06,
+                "boolean_weld_distance": 0.1,
+                "boolean_weld_width": 0.018,
+            },
+            {
+                "id": "rhodes",
+                "label": "Rhodes",
+                "owner_tag": "GRE",
+                "donor_state_ids": [8541],
+                "group_bbox": (27.35, 35.8, 28.35, 36.45),
+                "search_margin": 0.18,
+                "gap_fill_buffer": 0.08,
+                "boolean_weld_distance": 0.11,
+                "boolean_weld_width": 0.02,
+            },
+        ],
     },
     "libya_suez": {
         "feature_group_id": "atlantropa_libya_suez_and_qattara",
         "group_label": "Libya, Cyrenaica and Suez Chain",
-        "aoi_bbox": (12.5, 28.0, 34.8, 33.8),
-        "land_state_ids": [8563, 8564, 8565, 8566, 8567, 8568, 8569, 8570, 8572, 8574, 8575, 8576],
+        "aoi_bbox": (12.5, 28.0, 35.2, 34.2),
+        "land_state_ids": [8563, 8564, 8565, 8567, 8568, 8569, 8570, 8572, 8574, 8575, 8576],
         "water_state_ids": [8599, 8605, 8613, 8614, 8615, 8616, 8617, 8618],
         "state_owner_overrides": {
             8563: "LBA",
@@ -479,6 +790,23 @@ ATLANTROPA_REGION_CONFIGS = {
         "sea_preserve_margin": 0.03,
         "snap_tolerance": 0.12,
         "simplify_tolerance": 0.012,
+        "island_replacement": False,
+        "mainland_component_min_area": 3.5,
+        "mainland_touch_tolerance": 0.035,
+        "gap_fill_width": 0.095,
+        "gap_fill_min_area": 0.00006,
+        "gap_fill_max_area": 0.11,
+        "boolean_weld_width": 0.025,
+        "boolean_weld_min_area": 0.00001,
+        "boolean_weld_max_area": 0.07,
+        "shore_seal_width": 0.075,
+        "shore_seal_min_area": 0.00006,
+        "shore_seal_max_area": 0.1,
+        "causeway_keep_state_ids": [8575, 8576],
+        "causeway_trim_state_ids": [8575, 8576],
+        "causeway_drop_state_ids": [8572, 8574],
+        "causeway_trim_width": 0.12,
+        "sea_drop_enclosed_max_area": 0.18,
     },
 }
 
@@ -503,6 +831,10 @@ COASTAL_RESTORE_AOI_CONFIGS = {
         "label": "South-west Anatolia and eastern Aegean coast",
         "bbox": (26.0, 35.0, 37.5, 38.8),
     },
+    "french_riviera_liguria": {
+        "label": "French Riviera, Liguria and north Tyrrhenian seam",
+        "bbox": (5.0, 42.0, 10.8, 45.1),
+    },
     "sardinia_tyrrhenian": {
         "label": "Sardinia, Corsica and Tyrrhenian coast",
         "bbox": (6.5, 37.2, 18.8, 44.6),
@@ -510,6 +842,10 @@ COASTAL_RESTORE_AOI_CONFIGS = {
     "west_mediterranean": {
         "label": "West Mediterranean and Iberia-Algeria coast",
         "bbox": (-6.5, 33.8, 11.8, 44.8),
+    },
+    "levant_focus": {
+        "label": "Levant and Palestine shoreline seam focus",
+        "bbox": (33.0, 31.0, 36.8, 35.2),
     },
     "levant_north": {
         "label": "Lebanon, Palestine and northern Levant coast",
@@ -661,14 +997,63 @@ def load_hierarchy_groups() -> dict[str, list[str]]:
     }
 
 
-def load_palette_entries() -> dict[str, dict]:
-    payload = load_json(PALETTE_PATH)
+def load_palette_entries(path: Path = PALETTE_PATH) -> dict[str, dict]:
+    payload = load_json(path)
     entries = payload.get("entries", {}) if isinstance(payload, dict) else {}
     return {
         str(tag).strip().upper(): value
         for tag, value in entries.items()
         if str(tag).strip()
     }
+
+
+def load_tno_ocean_fill_color() -> str:
+    payload = load_json(TNO_PALETTE_PATH)
+    ocean = payload.get("ocean", {}) if isinstance(payload, dict) else {}
+    return normalize_hex(ocean.get("fill_color")) or "#2d4769"
+
+
+def resolve_tno_palette_color(tag: str, palette_entries: dict[str, dict]) -> str:
+    normalized_tag = normalize_tag(tag)
+    if not normalized_tag:
+        return ""
+    direct_entry = palette_entries.get(normalized_tag, {})
+    direct_color = normalize_hex(direct_entry.get("map_hex"))
+    if direct_color:
+        return direct_color
+    proxy_tag = normalize_tag(TNO_1962_TNO_COLOR_PROXY_TAGS.get(normalized_tag))
+    if not proxy_tag:
+        return ""
+    proxy_entry = palette_entries.get(proxy_tag, {})
+    return normalize_hex(proxy_entry.get("map_hex")) or ""
+
+
+def patch_tno_palette_defaults(countries_payload: dict, manifest_payload: dict) -> None:
+    countries = countries_payload.setdefault("countries", {})
+    tno_palette_entries = load_palette_entries(TNO_PALETTE_PATH)
+
+    target_tags = set(TNO_1962_DIRECT_TNO_COLOR_TAGS) | set(TNO_1962_TNO_COLOR_PROXY_TAGS.keys())
+    for tag, country_entry in countries.items():
+        normalized_tag = normalize_tag(tag)
+        continent_id = str(country_entry.get("continent_id") or "").strip()
+        should_patch = normalized_tag in target_tags or continent_id in TNO_1962_AMERICA_CONTINENT_IDS
+        if not should_patch:
+            continue
+        color_hex = resolve_tno_palette_color(normalized_tag, tno_palette_entries)
+        if not color_hex:
+            continue
+        country_entry["color_hex"] = color_hex
+
+    manifest_payload["palette_id"] = "tno"
+    style_defaults = manifest_payload.get("style_defaults")
+    if not isinstance(style_defaults, dict):
+        style_defaults = {}
+    ocean_defaults = style_defaults.get("ocean")
+    if not isinstance(ocean_defaults, dict):
+        ocean_defaults = {}
+    ocean_defaults["fillColor"] = load_tno_ocean_fill_color()
+    style_defaults["ocean"] = ocean_defaults
+    manifest_payload["style_defaults"] = style_defaults
 
 
 def infer_region_meta(tag: str) -> tuple[str, str, str, str]:
@@ -1365,6 +1750,473 @@ def local_land_boundary(full_land_gdf: gpd.GeoDataFrame, target_bbox: tuple[floa
     return union.boundary
 
 
+def build_mainland_reference_union(
+    local_land,
+    target_bbox: tuple[float, float, float, float],
+    *,
+    min_area: float = 3.0,
+) -> object | None:
+    aoi = box(*target_bbox)
+    boundary_band = aoi.boundary.buffer(0.02)
+    keep_parts: list[Polygon] = []
+    ranked_parts = sorted(iter_polygon_parts(local_land), key=lambda part: float(part.area), reverse=True)
+    for part in ranked_parts:
+        if float(part.area) >= float(min_area) and part.intersects(boundary_band):
+            keep_parts.append(part)
+    if not keep_parts:
+        keep_parts = ranked_parts[: max(1, min(3, len(ranked_parts)))]
+    return safe_unary_union(keep_parts)
+
+
+def donor_state_name_has_hint(state_name: str, hints: tuple[str, ...]) -> bool:
+    text = str(state_name or "").strip().lower()
+    if not text:
+        return False
+    return any(hint in text for hint in hints)
+
+
+def classify_atl_geometry_role(
+    *,
+    state_id: int,
+    state_name: str,
+    geom,
+    mainland_union,
+    config: dict,
+) -> str:
+    causeway_keep_ids = {int(value) for value in config.get("causeway_keep_state_ids", [])}
+    causeway_trim_ids = {int(value) for value in config.get("causeway_trim_state_ids", [])}
+    causeway_drop_ids = {int(value) for value in config.get("causeway_drop_state_ids", [])}
+    if int(state_id) in causeway_drop_ids:
+        return "skip"
+    if (
+        int(state_id) in causeway_keep_ids
+        or int(state_id) in causeway_trim_ids
+        or donor_state_name_has_hint(state_name, DONOR_CAUSEWAY_NAME_HINTS)
+    ):
+        return ATL_GEOMETRY_ROLE_CAUSEWAY
+    if not config.get("island_replacement"):
+        return ATL_GEOMETRY_ROLE_DONOR_LAND
+    if donor_state_name_has_hint(state_name, DONOR_ISLAND_NAME_HINTS):
+        return ATL_GEOMETRY_ROLE_DONOR_ISLAND
+    touch_tolerance = float(config.get("mainland_touch_tolerance", 0.035))
+    if mainland_union is None:
+        return ATL_GEOMETRY_ROLE_DONOR_LAND
+    if geom.intersects(mainland_union.buffer(touch_tolerance)):
+        return ATL_GEOMETRY_ROLE_DONOR_LAND
+    return ATL_GEOMETRY_ROLE_DONOR_ISLAND
+
+
+def assign_owner_from_nearest_rows(target_geom, candidate_rows: list[dict]) -> str:
+    owner_tag = score_assignment_candidates(target_geom, candidate_rows, field_name="assigned_owner_tag")
+    return normalize_tag(owner_tag) or ATL_TAG
+
+
+def expand_bbox(bounds: tuple[float, float, float, float], margin: float) -> tuple[float, float, float, float]:
+    min_x, min_y, max_x, max_y = bounds
+    pad = max(0.0, float(margin))
+    return (min_x - pad, min_y - pad, max_x + pad, max_y + pad)
+
+
+def row_matches_donor_state_ids(row: dict, state_ids: set[int]) -> bool:
+    if not state_ids:
+        return False
+    donor_ids = {int(value) for value in row.get("donor_state_ids", [])}
+    return bool(donor_ids.intersection(state_ids))
+
+
+def make_atl_row(
+    *,
+    feature_id: str,
+    name: str,
+    geometry,
+    region_id: str,
+    config: dict,
+    assigned_owner_tag: str,
+    geometry_role: str,
+    donor_state_ids: list[int],
+    donor_state_names: list[str],
+    donor_province_ids: list[int],
+    join_mode: str = ATL_JOIN_MODE_NONE,
+) -> dict:
+    return {
+        "id": feature_id,
+        "name": name,
+        "cntr_code": ATL_TAG,
+        "admin1_group": config["feature_group_id"],
+        "detail_tier": "scenario_atlantropa",
+        "__source": ATL_SOURCE_TAG,
+        "geometry": geometry,
+        "region_id": region_id,
+        "assigned_owner_tag": normalize_tag(assigned_owner_tag) or ATL_TAG,
+        "atl_geometry_role": geometry_role,
+        "atl_join_mode": str(join_mode or ATL_JOIN_MODE_NONE).strip() or ATL_JOIN_MODE_NONE,
+        "donor_state_ids": [int(value) for value in donor_state_ids],
+        "donor_state_names": [str(value).strip() for value in donor_state_names if str(value).strip()],
+        "donor_province_ids": [int(value) for value in donor_province_ids],
+    }
+
+
+def build_major_island_rows(
+    region_id: str,
+    config: dict,
+    island_rows: list[dict],
+    baseline_land_full_gdf: gpd.GeoDataFrame,
+    mainland_union,
+) -> tuple[list[dict], list[dict]]:
+    groups = list(config.get("major_island_groups", []) or [])
+    if not groups or not island_rows:
+        return [], island_rows
+
+    used_row_ids: set[str] = set()
+    rebuilt_rows: list[dict] = []
+    touch_tolerance = float(config.get("mainland_touch_tolerance", 0.035))
+    simplify_tolerance = float(config.get("simplify_tolerance", 0.01))
+    region_aoi = box(*config["aoi_bbox"])
+
+    for group in groups:
+        donor_state_ids = {int(value) for value in group.get("donor_state_ids", [])}
+        if not donor_state_ids:
+            continue
+        matched_rows = [
+            row for row in island_rows
+            if row.get("id") not in used_row_ids
+            and donor_state_ids.intersection({int(value) for value in row.get("donor_state_ids", [])})
+        ]
+        if not matched_rows:
+            continue
+
+        donor_union = safe_unary_union([row["geometry"] for row in matched_rows])
+        if donor_union is None:
+            continue
+
+        explicit_baseline_ids = {
+            str(feature_id).strip()
+            for feature_id in group.get("baseline_feature_ids", [])
+            if str(feature_id).strip()
+        }
+        search_margin = float(group.get("search_margin", 0.3))
+        group_bbox = tuple(group.get("group_bbox") or expand_bbox(donor_union.bounds, search_margin))
+        group_aoi = box(*group_bbox).intersection(region_aoi)
+        if group_aoi.is_empty:
+            group_aoi = region_aoi
+
+        local_baseline = baseline_land_full_gdf.loc[baseline_land_full_gdf.intersects(group_aoi)].copy().reset_index(drop=True)
+        baseline_parts: list[Polygon] = []
+        for baseline_row in local_baseline.to_dict("records"):
+            baseline_id = str(baseline_row.get("id") or "").strip()
+            geom = normalize_polygonal(baseline_row.get("geometry"))
+            if geom is None:
+                continue
+            if explicit_baseline_ids and baseline_id not in explicit_baseline_ids:
+                continue
+            if mainland_union is not None and geom.intersects(mainland_union.buffer(touch_tolerance)):
+                continue
+            if not explicit_baseline_ids and not geom.intersects(donor_union.buffer(search_margin)):
+                continue
+            baseline_parts.extend(iter_polygon_parts(geom))
+
+        baseline_union = safe_unary_union(baseline_parts)
+        combined = donor_union
+        join_mode = ATL_JOIN_MODE_NONE
+
+        if baseline_union is not None:
+            gap_fill_buffer = float(group.get("gap_fill_buffer", config.get("gap_fill_width", config.get("shore_seal_width", 0.07))))
+            proximity_band = donor_union.buffer(gap_fill_buffer)
+            baseline_gap = normalize_polygonal(
+                baseline_union.intersection(proximity_band).difference(donor_union.buffer(gap_fill_buffer * 0.45))
+            )
+            gap_parts: list[Polygon] = []
+            if baseline_gap is not None:
+                max_gap_area = float(group.get("gap_fill_max_area", config.get("gap_fill_max_area", 0.25)))
+                min_gap_area = float(group.get("gap_fill_min_area", config.get("gap_fill_min_area", 0.00004)))
+                for part in iter_polygon_parts(baseline_gap):
+                    if float(part.area) < min_gap_area or float(part.area) > max_gap_area:
+                        continue
+                    gap_parts.append(part)
+            if gap_parts:
+                combined = safe_unary_union([combined, *gap_parts]) or combined
+                join_mode = ATL_JOIN_MODE_GAP_FILL
+
+            boolean_weld_distance = float(group.get("boolean_weld_distance", config.get("mainland_touch_tolerance", 0.035)))
+            boolean_weld_width = float(group.get("boolean_weld_width", config.get("boolean_weld_width", 0.018)))
+            if donor_union.distance(baseline_union) <= boolean_weld_distance:
+                try:
+                    welded = smooth_polygonal(
+                        safe_unary_union([combined, baseline_union]).buffer(boolean_weld_width).buffer(-boolean_weld_width),
+                        simplify_tolerance=simplify_tolerance,
+                    )
+                except ValueError:
+                    welded = normalize_polygonal(safe_unary_union([combined, baseline_union]))
+                if welded is not None:
+                    combined = welded
+                    join_mode = ATL_JOIN_MODE_BOOLEAN_WELD
+
+        combined = normalize_polygonal(combined.intersection(group_aoi))
+        if combined is None:
+            continue
+        try:
+            combined = smooth_polygonal(combined, simplify_tolerance=simplify_tolerance)
+        except ValueError:
+            combined = normalize_polygonal(combined)
+        if combined is None:
+            continue
+
+        owner_tag = normalize_tag(group.get("owner_tag")) or assign_owner_from_nearest_rows(combined, matched_rows)
+        donor_state_name_set = sorted({
+            str(value).strip()
+            for row in matched_rows
+            for value in row.get("donor_state_names", [])
+            if str(value).strip()
+        })
+        donor_province_ids = sorted({
+            int(value)
+            for row in matched_rows
+            for value in row.get("donor_province_ids", [])
+        })
+        rebuilt_rows.append(make_atl_row(
+            feature_id=f"ATLISL_{region_id}_{str(group.get('id') or 'island').strip().lower()}",
+            name=f"{str(group.get('label') or config['group_label']).strip()} Rebuilt Island",
+            geometry=combined,
+            region_id=region_id,
+            config=config,
+            assigned_owner_tag=owner_tag,
+            geometry_role=ATL_GEOMETRY_ROLE_DONOR_ISLAND,
+            donor_state_ids=sorted(donor_state_ids),
+            donor_state_names=donor_state_name_set,
+            donor_province_ids=donor_province_ids,
+            join_mode=join_mode,
+        ))
+        used_row_ids.update(str(row.get("id") or "").strip() for row in matched_rows)
+
+    remaining_rows = [row for row in island_rows if str(row.get("id") or "").strip() not in used_row_ids]
+    return rebuilt_rows, remaining_rows
+
+
+def merge_island_rows(region_id: str, config: dict, island_rows: list[dict]) -> list[dict]:
+    if not island_rows:
+        return []
+    merge_distance = float(config.get("island_merge_distance", 0.0))
+    if merge_distance <= 0:
+        return island_rows
+
+    merged_rows: list[dict] = []
+    rows_by_owner: dict[str, list[dict]] = {}
+    for row in island_rows:
+        rows_by_owner.setdefault(normalize_tag(row.get("assigned_owner_tag")) or ATL_TAG, []).append(row)
+
+    for owner_tag in sorted(rows_by_owner):
+        owner_rows = rows_by_owner[owner_tag]
+        buffered = safe_unary_union([row["geometry"].buffer(merge_distance / 2.0) for row in owner_rows])
+        if buffered is None:
+            continue
+        debuffered = normalize_polygonal(buffered.buffer(-(merge_distance / 2.0)))
+        candidate_geom = debuffered or safe_unary_union([row["geometry"] for row in owner_rows])
+        if candidate_geom is None:
+            continue
+        parts = sorted(
+            iter_polygon_parts(candidate_geom),
+            key=lambda part: (round(part.centroid.x, 6), round(part.centroid.y, 6)),
+        )
+        for index, part in enumerate(parts, start=1):
+            matched_rows = [
+                row
+                for row in owner_rows
+                if normalize_polygonal(row["geometry"]) is not None
+                and row["geometry"].intersects(part.buffer(merge_distance))
+            ]
+            donor_state_ids = sorted({int(value) for row in matched_rows for value in row.get("donor_state_ids", [])})
+            donor_province_ids = sorted({int(value) for row in matched_rows for value in row.get("donor_province_ids", [])})
+            donor_state_names = sorted({str(value).strip() for row in matched_rows for value in row.get("donor_state_names", []) if str(value).strip()})
+            merged_rows.append(make_atl_row(
+                feature_id=f"ATLISL_{region_id}_{owner_tag}_{index}",
+                name=f"{config['group_label']} Island Cluster {index}",
+                geometry=part,
+                region_id=region_id,
+                config=config,
+                assigned_owner_tag=owner_tag,
+                geometry_role=ATL_GEOMETRY_ROLE_DONOR_ISLAND,
+                donor_state_ids=donor_state_ids,
+                donor_state_names=donor_state_names,
+                donor_province_ids=donor_province_ids,
+                join_mode=ATL_JOIN_MODE_NONE,
+            ))
+    return merged_rows
+
+
+def build_shore_seal_rows(region_id: str, config: dict, donor_rows: list[dict], mainland_union) -> list[dict]:
+    seal_width = float(config.get("gap_fill_width", config.get("shore_seal_width", 0.0)))
+    if seal_width <= 0 or mainland_union is None:
+        return []
+    joinable_island_state_ids = {int(value) for value in config.get("nearshore_island_join_state_ids", [])}
+    seal_source_rows = [
+        row
+        for row in donor_rows
+        if (
+            row.get("atl_geometry_role") in {ATL_GEOMETRY_ROLE_DONOR_LAND, ATL_GEOMETRY_ROLE_CAUSEWAY}
+            or (
+                row.get("atl_geometry_role") == ATL_GEOMETRY_ROLE_DONOR_ISLAND
+                and row_matches_donor_state_ids(row, joinable_island_state_ids)
+            )
+        )
+    ]
+    if not seal_source_rows:
+        return []
+    donor_union = safe_unary_union([row["geometry"] for row in seal_source_rows])
+    if donor_union is None:
+        return []
+    aoi = box(*config["aoi_bbox"])
+    seal_candidate = normalize_polygonal(
+        donor_union.buffer(seal_width).intersection(mainland_union.buffer(seal_width))
+    )
+    if seal_candidate is None:
+        return []
+    seal_candidate = normalize_polygonal(
+        seal_candidate.intersection(aoi).difference(donor_union).difference(mainland_union)
+    )
+    if seal_candidate is None:
+        return []
+
+    min_area = float(config.get("gap_fill_min_area", config.get("shore_seal_min_area", 0.0)))
+    max_area = float(config.get("gap_fill_max_area", config.get("shore_seal_max_area", 0.12)))
+    seal_rows: list[dict] = []
+    for index, part in enumerate(iter_polygon_parts(seal_candidate), start=1):
+        if float(part.area) < min_area or float(part.area) > max_area:
+            continue
+        try:
+            smoothed = smooth_polygonal(part, buffer_radius=0.0035, simplify_tolerance=float(config.get("simplify_tolerance", 0.01)))
+        except ValueError:
+            smoothed = normalize_polygonal(part)
+        if smoothed is None:
+            continue
+        owner_tag = assign_owner_from_nearest_rows(smoothed, seal_source_rows)
+        donor_state_ids = sorted({int(value) for row in seal_source_rows if row["geometry"].distance(smoothed) < seal_width * 1.5 for value in row.get("donor_state_ids", [])})
+        donor_province_ids = sorted({int(value) for row in seal_source_rows if row["geometry"].distance(smoothed) < seal_width * 1.5 for value in row.get("donor_province_ids", [])})
+        donor_state_names = sorted({str(value).strip() for row in seal_source_rows if row["geometry"].distance(smoothed) < seal_width * 1.5 for value in row.get("donor_state_names", []) if str(value).strip()})
+        seal_rows.append(make_atl_row(
+            feature_id=f"ATLSHL_{region_id}_{index}",
+            name=f"{config['group_label']} Shore Seal {index}",
+            geometry=smoothed,
+            region_id=region_id,
+            config=config,
+            assigned_owner_tag=owner_tag,
+            geometry_role=ATL_GEOMETRY_ROLE_SHORE_SEAL,
+            donor_state_ids=donor_state_ids,
+            donor_state_names=donor_state_names,
+            donor_province_ids=donor_province_ids,
+            join_mode=ATL_JOIN_MODE_GAP_FILL,
+        ))
+    return seal_rows
+
+
+def build_boolean_weld_rows(region_id: str, config: dict, donor_rows: list[dict], mainland_union) -> list[dict]:
+    weld_width = float(config.get("boolean_weld_width", 0.0))
+    if weld_width <= 0 or mainland_union is None:
+        return []
+    joinable_island_state_ids = {int(value) for value in config.get("nearshore_island_join_state_ids", [])}
+    weld_source_rows = [
+        row
+        for row in donor_rows
+        if (
+            row.get("atl_geometry_role") in {ATL_GEOMETRY_ROLE_DONOR_LAND, ATL_GEOMETRY_ROLE_SHORE_SEAL}
+            or (
+                row.get("atl_geometry_role") == ATL_GEOMETRY_ROLE_DONOR_ISLAND
+                and row_matches_donor_state_ids(row, joinable_island_state_ids)
+            )
+        )
+    ]
+    if not weld_source_rows:
+        return []
+    donor_union = safe_unary_union([row["geometry"] for row in weld_source_rows])
+    if donor_union is None:
+        return []
+    aoi = box(*config["aoi_bbox"])
+    try:
+        closed = smooth_polygonal(
+            safe_unary_union([donor_union, mainland_union]).buffer(weld_width).buffer(-weld_width),
+            simplify_tolerance=float(config.get("simplify_tolerance", 0.01)),
+        )
+    except ValueError:
+        closed = normalize_polygonal(safe_unary_union([donor_union, mainland_union]))
+    if closed is None:
+        return []
+    weld_candidate = normalize_polygonal(
+        closed.intersection(aoi).difference(donor_union).difference(mainland_union)
+    )
+    if weld_candidate is None:
+        return []
+
+    min_area = float(config.get("boolean_weld_min_area", 0.0))
+    max_area = float(config.get("boolean_weld_max_area", 0.08))
+    weld_rows: list[dict] = []
+    for index, part in enumerate(iter_polygon_parts(weld_candidate), start=1):
+        if float(part.area) < min_area or float(part.area) > max_area:
+            continue
+        if not part.intersects(donor_union.buffer(weld_width)) or not part.intersects(mainland_union.buffer(weld_width)):
+            continue
+        try:
+            smoothed = smooth_polygonal(part, buffer_radius=0.0025, simplify_tolerance=float(config.get("simplify_tolerance", 0.01)))
+        except ValueError:
+            smoothed = normalize_polygonal(part)
+        if smoothed is None:
+            continue
+        owner_tag = assign_owner_from_nearest_rows(smoothed, weld_source_rows)
+        donor_state_ids = sorted({int(value) for row in weld_source_rows if row["geometry"].distance(smoothed) < weld_width * 2.0 for value in row.get("donor_state_ids", [])})
+        donor_province_ids = sorted({int(value) for row in weld_source_rows if row["geometry"].distance(smoothed) < weld_width * 2.0 for value in row.get("donor_province_ids", [])})
+        donor_state_names = sorted({str(value).strip() for row in weld_source_rows if row["geometry"].distance(smoothed) < weld_width * 2.0 for value in row.get("donor_state_names", []) if str(value).strip()})
+        weld_rows.append(make_atl_row(
+            feature_id=f"ATLWLD_{region_id}_{index}",
+            name=f"{config['group_label']} Boolean Weld {index}",
+            geometry=smoothed,
+            region_id=region_id,
+            config=config,
+            assigned_owner_tag=owner_tag,
+            geometry_role=ATL_GEOMETRY_ROLE_SHORE_SEAL,
+            donor_state_ids=donor_state_ids,
+            donor_state_names=donor_state_names,
+            donor_province_ids=donor_province_ids,
+            join_mode=ATL_JOIN_MODE_BOOLEAN_WELD,
+        ))
+    return weld_rows
+
+
+def collect_baseline_island_drop_ids(
+    political_gdf: gpd.GeoDataFrame,
+    replacement_specs: dict[str, dict],
+) -> tuple[set[str], dict[str, dict]]:
+    drop_ids: set[str] = set()
+    diagnostics: dict[str, dict] = {}
+    for region_id, spec in replacement_specs.items():
+        donor_island_union = spec.get("donor_island_union")
+        mainland_union = spec.get("mainland_union")
+        if donor_island_union is None or mainland_union is None:
+            diagnostics[region_id] = {
+                "dropped_feature_count": 0,
+                "dropped_feature_ids": [],
+            }
+            continue
+        aoi = box(*spec["aoi_bbox"])
+        local = political_gdf.loc[political_gdf.intersects(aoi)].copy().reset_index(drop=True)
+        replace_buffer = float(spec.get("replace_buffer", 0.03))
+        touch_tolerance = float(spec.get("touch_tolerance", 0.035))
+        region_drop_ids: list[str] = []
+        for row in local.to_dict("records"):
+            feature_id = str(row.get("id") or "").strip()
+            geom = normalize_polygonal(row.get("geometry"))
+            if not feature_id or geom is None:
+                continue
+            if not geom.intersects(donor_island_union.buffer(replace_buffer)):
+                continue
+            if geom.intersects(mainland_union.buffer(touch_tolerance)):
+                continue
+            drop_ids.add(feature_id)
+            region_drop_ids.append(feature_id)
+        diagnostics[region_id] = {
+            "dropped_feature_count": len(region_drop_ids),
+            "dropped_feature_ids": sorted(region_drop_ids)[:200],
+        }
+    return drop_ids, diagnostics
+
+
 def build_congo_lake_geometry(key_image: np.ndarray, province_type_by_id: dict[int, str], rgb_key_to_id: dict[int, int]):
     min_x, min_y, max_x, max_y = CONGO_LAKE_SEARCH_BBOX
     province_ids = np.vectorize(lambda value: rgb_key_to_id.get(int(value), -1), otypes=[np.int32])(
@@ -1976,10 +2828,11 @@ def build_region_affine_coeffs(config: dict, donor_context: dict) -> tuple[tuple
 def build_atlantropa_from_hgo(
     donor_context: dict,
     baseline_land_full_gdf: gpd.GeoDataFrame,
-) -> tuple[list[dict], dict[str, object], dict]:
+) -> tuple[list[dict], dict[str, object], dict, dict[str, dict]]:
     atl_features: list[dict] = []
     region_unions: dict[str, object] = {}
     diagnostics: dict[str, dict] = {}
+    replacement_specs: dict[str, dict] = {}
 
     seen_province_ids: set[int] = set()
 
@@ -1989,6 +2842,11 @@ def build_atlantropa_from_hgo(
         if local_land is None:
             raise ValueError(f"Unable to compute local shoreline context for Atlantropa region {region_id}.")
         local_boundary = local_land.boundary
+        mainland_union = build_mainland_reference_union(
+            local_land,
+            config["aoi_bbox"],
+            min_area=float(config.get("mainland_component_min_area", 3.0)),
+        )
         coeffs, control_diagnostics = build_region_affine_coeffs(config, donor_context)
 
         region_feature_rows: list[dict] = []
@@ -1999,6 +2857,8 @@ def build_atlantropa_from_hgo(
             if normalize_tag(tag)
         }
         for state_id in donor_land_state_ids:
+            state_name = get_state_name(donor_context, state_id)
+            causeway_trim_ids = {int(value) for value in config.get("causeway_trim_state_ids", [])}
             province_ids = get_state_province_ids(donor_context, state_id)
             for province_id in province_ids:
                 if province_id in seen_province_ids:
@@ -2017,34 +2877,95 @@ def build_atlantropa_from_hgo(
                 fitted = normalize_polygonal(fitted.difference(local_land.buffer(float(config.get("preserve_margin", 0.03)))))
                 if fitted is None:
                     continue
+                if int(state_id) in causeway_trim_ids:
+                    trim_width = float(config.get("causeway_trim_width", 0.12))
+                    fitted = normalize_polygonal(fitted.intersection(aoi).intersection(local_land.buffer(trim_width)))
+                    if fitted is None:
+                        continue
                 fitted = smooth_polygonal(fitted, simplify_tolerance=float(config.get("simplify_tolerance", 0.01)))
                 if fitted is None:
                     continue
+                geometry_role = classify_atl_geometry_role(
+                    state_id=state_id,
+                    state_name=state_name,
+                    geom=fitted,
+                    mainland_union=mainland_union,
+                    config=config,
+                )
+                if geometry_role == "skip":
+                    continue
                 assigned_owner_tag = state_owner_overrides.get(int(state_id)) or ATL_TAG
-                feature_id = f"ATLPRV_{province_id}"
-                region_feature_rows.append({
-                    "id": feature_id,
-                    "name": f"{config['group_label']} Province {province_id}",
-                    "cntr_code": ATL_TAG,
-                    "admin1_group": config["feature_group_id"],
-                    "detail_tier": "scenario_atlantropa",
-                    "__source": ATL_SOURCE_TAG,
-                    "geometry": fitted,
-                    "donor_state_id": state_id,
-                    "donor_state_name": get_state_name(donor_context, state_id),
-                    "donor_province_id": province_id,
-                    "region_id": region_id,
-                    "assigned_owner_tag": assigned_owner_tag,
-                })
+                feature_prefix = "ATLISRC" if geometry_role == ATL_GEOMETRY_ROLE_DONOR_ISLAND else "ATLPRV"
+                region_feature_rows.append(make_atl_row(
+                    feature_id=f"{feature_prefix}_{province_id}",
+                    name=f"{config['group_label']} Province {province_id}",
+                    geometry=fitted,
+                    region_id=region_id,
+                    config=config,
+                    assigned_owner_tag=assigned_owner_tag,
+                    geometry_role=geometry_role,
+                    donor_state_ids=[state_id],
+                    donor_state_names=[state_name],
+                    donor_province_ids=[province_id],
+                ))
                 seen_province_ids.add(province_id)
 
         if not region_feature_rows:
             raise ValueError(f"Atlantropa donor extraction for region `{region_id}` produced zero land features.")
 
+        major_island_state_ids = {
+            int(value)
+            for group in (config.get("major_island_groups", []) or [])
+            for value in group.get("donor_state_ids", [])
+        }
+        donor_island_rows = [
+            row
+            for row in region_feature_rows
+            if row.get("atl_geometry_role") == ATL_GEOMETRY_ROLE_DONOR_ISLAND
+            or row_matches_donor_state_ids(row, major_island_state_ids)
+        ]
+        donor_island_row_ids = {
+            str(row.get("id") or "").strip()
+            for row in donor_island_rows
+            if str(row.get("id") or "").strip()
+        }
+        non_island_rows = [
+            row
+            for row in region_feature_rows
+            if str(row.get("id") or "").strip() not in donor_island_row_ids
+        ]
+        rebuilt_island_rows, residual_island_rows = build_major_island_rows(
+            region_id,
+            config,
+            donor_island_rows,
+            baseline_land_full_gdf,
+            mainland_union,
+        )
+        merged_island_rows = merge_island_rows(region_id, config, residual_island_rows)
+        region_feature_rows = [*non_island_rows, *rebuilt_island_rows, *merged_island_rows]
+
+        shore_seal_rows = build_shore_seal_rows(region_id, config, region_feature_rows, mainland_union)
+        region_feature_rows = [*region_feature_rows, *shore_seal_rows]
+        boolean_weld_rows = build_boolean_weld_rows(region_id, config, region_feature_rows, mainland_union)
+        region_feature_rows = [*region_feature_rows, *boolean_weld_rows]
+
         region_geom = safe_unary_union([row["geometry"] for row in region_feature_rows])
         if region_geom is None:
             raise ValueError(f"Atlantropa donor extraction for region `{region_id}` collapsed to empty geometry.")
         region_unions[region_id] = region_geom
+
+        donor_island_union = safe_unary_union([
+            row["geometry"]
+            for row in region_feature_rows
+            if row.get("atl_geometry_role") == ATL_GEOMETRY_ROLE_DONOR_ISLAND
+        ])
+        replacement_specs[region_id] = {
+            "aoi_bbox": config["aoi_bbox"],
+            "donor_island_union": donor_island_union,
+            "mainland_union": mainland_union,
+            "replace_buffer": float(config.get("mainland_touch_tolerance", 0.035)),
+            "touch_tolerance": float(config.get("mainland_touch_tolerance", 0.035)),
+        }
 
         overlap_area = float(region_geom.intersection(local_land).area) if local_land is not None else 0.0
         diagnostics[region_id] = {
@@ -2056,6 +2977,16 @@ def build_atlantropa_from_hgo(
             "province_feature_count": len(region_feature_rows),
             "assigned_owner_counts": dict(sorted(Counter(
                 str(row["assigned_owner_tag"]).strip().upper() for row in region_feature_rows
+            ).items())),
+            "geometry_role_counts": dict(sorted(Counter(
+                str(row.get("atl_geometry_role") or "").strip()
+                for row in region_feature_rows
+                if str(row.get("atl_geometry_role") or "").strip()
+            ).items())),
+            "join_mode_counts": dict(sorted(Counter(
+                str(row.get("atl_join_mode") or "").strip()
+                for row in region_feature_rows
+                if str(row.get("atl_join_mode") or "").strip()
             ).items())),
             "overlap_with_baseline_land_area": round(overlap_area, 6),
             "post_clip_area": round(float(region_geom.area), 6),
@@ -2076,18 +3007,23 @@ def build_atlantropa_from_hgo(
                 "region_group": config["feature_group_id"],
                 "atl_surface_kind": ATL_SURFACE_LAND,
                 "atl_region_group": row["region_id"],
+                "atl_geometry_role": row["atl_geometry_role"],
+                "atl_join_mode": row.get("atl_join_mode", ATL_JOIN_MODE_NONE),
                 "interactive": True,
                 "render_as_base_geography": False,
                 "owner_tag": row["assigned_owner_tag"],
                 "synthetic_owner": row["assigned_owner_tag"] == ATL_TAG,
-                "donor_state_id": row["donor_state_id"],
-                "donor_state_name": row["donor_state_name"],
-                "donor_province_id": row["donor_province_id"],
+                "donor_state_ids": row["donor_state_ids"],
+                "donor_state_names": row["donor_state_names"],
+                "donor_province_ids": row["donor_province_ids"],
+                "donor_state_id": row["donor_state_ids"][0] if row["donor_state_ids"] else None,
+                "donor_state_name": row["donor_state_names"][0] if row["donor_state_names"] else "",
+                "donor_province_id": row["donor_province_ids"][0] if row["donor_province_ids"] else None,
                 "assignment_source": "state_owner_override" if row["assigned_owner_tag"] != ATL_TAG else "atl_default",
                 "source_standard": "hgo_donor_province_georef",
             }))
 
-    return atl_features, region_unions, diagnostics
+    return atl_features, region_unions, diagnostics, replacement_specs
 
 
 def build_atl_sea_from_hgo(
@@ -2143,6 +3079,17 @@ def build_atl_sea_from_hgo(
                     state_feature_counts[state_id] += 1
         if not water_parts:
             continue
+        enclosed_max_area = float(config.get("sea_drop_enclosed_max_area", 0.0))
+        if enclosed_max_area > 0:
+            boundary_buffer = aoi.boundary.buffer(0.03)
+            pruned_water_parts: list[tuple[int, int, int, object]] = []
+            for state_id, province_id, component_index, fitted in water_parts:
+                if float(fitted.area) <= enclosed_max_area and not fitted.intersects(boundary_buffer):
+                    continue
+                pruned_water_parts.append((state_id, province_id, component_index, fitted))
+            water_parts = pruned_water_parts
+        if not water_parts:
+            continue
         region_water = safe_unary_union([geom for *_meta, geom in water_parts])
         if region_water is None:
             continue
@@ -2160,6 +3107,8 @@ def build_atl_sea_from_hgo(
                 "region_group": f"{config['feature_group_id']}_sea",
                 "atl_surface_kind": ATL_SURFACE_SEA,
                 "atl_region_group": f"mediterranean_remaining_{region_id}",
+                "atl_geometry_role": ATL_GEOMETRY_ROLE_DONOR_SEA,
+                "atl_join_mode": ATL_JOIN_MODE_NONE,
                 "atl_subbasin_id": f"{region_id}_{state_id}_{province_id}_{component_index}",
                 "interactive": True,
                 "render_as_base_geography": False,
@@ -2317,8 +3266,24 @@ def build_runtime_topology_payload(
     water_gdf: gpd.GeoDataFrame,
     land_mask_gdf: gpd.GeoDataFrame,
 ) -> dict:
+    keep_columns = [
+        "id",
+        "name",
+        "cntr_code",
+        "admin1_group",
+        "detail_tier",
+        "__source",
+        "scenario_id",
+        "region_group",
+        "atl_surface_kind",
+        "interactive",
+        "render_as_base_geography",
+        "geometry",
+    ]
+    available_columns = [column for column in keep_columns if column in political_gdf.columns]
+    runtime_political_gdf = political_gdf.loc[:, available_columns].copy()
     topo = Topology(
-        [political_gdf, water_gdf, land_mask_gdf],
+        [runtime_political_gdf, water_gdf, land_mask_gdf],
         object_name=["political", "scenario_water", "land_mask"],
         topology=True,
         prequantize=1_000_000,
@@ -2382,6 +3347,7 @@ def main() -> None:
         rule_pack_name: apply_regional_rules(rule_pack_name, rule_path, countries_payload, owners_payload, audit_payload)
         for rule_pack_name, rule_path in REGIONAL_RULE_PACKS
     }
+    patch_tno_palette_defaults(countries_payload, manifest_payload)
     touched_east_asia_tags = touched_regional_rule_tags.get("east_asia", [])
     touched_south_asia_tags = touched_regional_rule_tags.get("south_asia", [])
 
@@ -2409,7 +3375,7 @@ def main() -> None:
     _, province_type_by_id, rgb_key_to_id = load_definition_entries(tno_root)
     lake_geom, lake_component_ids = build_congo_lake_geometry(tno_key_image, province_type_by_id, rgb_key_to_id)
 
-    atl_feature_collection, atlantropa_region_unions, atlantropa_diagnostics = build_atlantropa_from_hgo(
+    atl_feature_collection, atlantropa_region_unions, atlantropa_diagnostics, atl_replacement_specs = build_atlantropa_from_hgo(
         donor_context,
         runtime_political_full_gdf,
     )
@@ -2417,6 +3383,15 @@ def main() -> None:
     atl_political_gdf = geopandas_from_features(atl_feature_collection)
     if atl_political_gdf.empty:
         raise ValueError("Atlantropa donor build returned zero political features.")
+
+    island_drop_ids, island_replacement_diagnostics = collect_baseline_island_drop_ids(
+        runtime_owned_political_gdf,
+        atl_replacement_specs,
+    )
+    if island_drop_ids:
+        runtime_owned_political_gdf = runtime_owned_political_gdf.loc[
+            ~runtime_owned_political_gdf["id"].isin(island_drop_ids)
+        ].copy().reset_index(drop=True)
 
     atl_sea_collection, atl_sea_union, med_water_diagnostics = build_atl_sea_from_hgo(
         donor_context,
@@ -2544,6 +3519,13 @@ def main() -> None:
     manifest_payload["water_regions_url"] = "data/scenarios/tno_1962/water_regions.geojson"
     manifest_payload["relief_overlays_url"] = "data/scenarios/tno_1962/relief_overlays.geojson"
     manifest_payload["runtime_topology_url"] = "data/scenarios/tno_1962/runtime_topology.topo.json"
+    manifest_payload["performance_hints"] = {
+        "render_profile_default": "balanced",
+        "dynamic_borders_default": False,
+        "scenario_relief_overlays_default": False,
+        "water_regions_default": True,
+        "special_regions_default": True,
+    }
     manifest_payload["excluded_water_region_groups"] = ["mediterranean"]
 
     for summary in (
@@ -2593,6 +3575,7 @@ def main() -> None:
         "runtime_topology_objects": ["political", "scenario_water", "scenario_special_land", "land_mask"],
         "action_feature_counts": {key: len(value) for key, value in applied_annex_maps.items()},
         "atlantropa_region_stats": atlantropa_diagnostics,
+        "atlantropa_island_replacement_stats": island_replacement_diagnostics,
         "mediterranean_water_region_stats": med_water_diagnostics,
         "atl_feature_count": len(atl_feature_ids),
         "atl_sea_feature_count": len(atl_sea_feature_ids),

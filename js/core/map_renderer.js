@@ -19,6 +19,7 @@ import { ColorManager } from "./color_manager.js";
 import { LegendManager } from "./legend_manager.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import { getTooltipText } from "../ui/i18n.js";
+import { showToast } from "../ui/toast.js";
 import { markDirty } from "./dirty_state.js";
 import {
   ensureSovereigntyState,
@@ -43,6 +44,7 @@ let pathSVG = null;
 let pathCanvas = null;
 let pathHitCanvas = null;
 let zoomBehavior = null;
+let activeContextMetricSession = null;
 
 let viewportGroup = null;
 let specialZonesGroup = null;
@@ -55,6 +57,8 @@ let legendBackground = null;
 let lastLegendKey = null;
 let brushSession = null;
 let suppressNextClickAfterBrush = false;
+let lastDetailToastToken = "";
+let lastDetailToastAt = 0;
 
 const PROJECTION_PRECISION = 0.1;
 const PATH_POINT_RADIUS = 2;
@@ -135,6 +139,14 @@ const OCEAN_MASK_MODE_TOPOLOGY = "topology_ocean";
 const OCEAN_MASK_MODE_SPHERE_MINUS_LAND = "sphere_minus_land";
 const OCEAN_MASK_MIN_QUALITY = 0.35;
 const CONTEXT_LAYER_MIN_SCORE = 0.08;
+const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
+  "drawPhysicalAtlasLayer",
+  "drawPhysicalContourLayer",
+  "drawUrbanLayer",
+  "drawRiversLayer",
+  "drawScenarioRegionOverlaysPass",
+  "drawScenarioReliefOverlaysLayer",
+]);
 const LAYER_DIAG_PREFIX = "[layer-resolver]";
 const DEFAULT_SPECIAL_ZONE_TYPE = "custom";
 const PAPER_TEXTURE_BASE_TILE_SIZE = 512;
@@ -178,6 +190,22 @@ const layerResolverCache = {
 };
 let admin0MergedCache = {
   topologyRef: null,
+  featureCount: 0,
+  entries: [],
+};
+let scenarioPoliticalBackgroundCache = {
+  topologyRef: null,
+  landCollectionRef: null,
+  scenarioId: "",
+  viewMode: "ownership",
+  oceanFillColor: "",
+  topologyRevision: 0,
+  colorRevision: 0,
+  sovereigntyRevision: 0,
+  controllerRevision: 0,
+  shellRevision: 0,
+  canvasWidth: 0,
+  canvasHeight: 0,
   featureCount: 0,
   entries: [],
 };
@@ -267,6 +295,81 @@ function getSidebarPerfState() {
     state.sidebarPerf.counters = {};
   }
   return state.sidebarPerf;
+}
+
+function ensureRenderPerfMetrics() {
+  if (!state.renderPerfMetrics || typeof state.renderPerfMetrics !== "object") {
+    state.renderPerfMetrics = {};
+  }
+  return state.renderPerfMetrics;
+}
+
+function recordRenderPerfMetric(name, durationMs, details = {}) {
+  const metrics = ensureRenderPerfMetrics();
+  const normalizedName = String(name || "").trim();
+  if (!normalizedName) return null;
+  const nextEntry = {
+    durationMs: Math.max(0, Number(durationMs) || 0),
+    recordedAt: Date.now(),
+    ...details,
+  };
+  metrics[normalizedName] = nextEntry;
+  globalThis.__renderPerfMetrics = metrics;
+  return nextEntry;
+}
+
+function beginContextMetricSession() {
+  activeContextMetricSession = {
+    metrics: {},
+  };
+}
+
+function collectContextMetric(name, durationMs, details = {}) {
+  const normalizedName = String(name || "").trim();
+  if (!normalizedName) return null;
+  const nextEntry = {
+    durationMs: Math.max(0, Number(durationMs) || 0),
+    recordedAt: Date.now(),
+    ...details,
+  };
+  if (!activeContextMetricSession?.metrics) {
+    return recordRenderPerfMetric(normalizedName, nextEntry.durationMs, details);
+  }
+  const existingEntry = activeContextMetricSession.metrics[normalizedName];
+  if (!existingEntry) {
+    activeContextMetricSession.metrics[normalizedName] = {
+      ...nextEntry,
+      callCount: 1,
+    };
+    return activeContextMetricSession.metrics[normalizedName];
+  }
+  activeContextMetricSession.metrics[normalizedName] = {
+    ...existingEntry,
+    ...details,
+    durationMs: Math.max(0, Number(existingEntry.durationMs || 0) + nextEntry.durationMs),
+    recordedAt: nextEntry.recordedAt,
+    callCount: Math.max(1, Number(existingEntry.callCount || 1) + 1),
+  };
+  return activeContextMetricSession.metrics[normalizedName];
+}
+
+function endContextMetricSession() {
+  const session = activeContextMetricSession;
+  activeContextMetricSession = null;
+  const metrics = ensureRenderPerfMetrics();
+  const breakdown = {};
+  const sessionMetrics = session?.metrics && typeof session.metrics === "object" ? session.metrics : {};
+  Object.entries(sessionMetrics).forEach(([name, entry]) => {
+    if (!entry || typeof entry !== "object") return;
+    const { durationMs, ...details } = entry;
+    const recordedEntry = recordRenderPerfMetric(name, durationMs, details);
+    if (CONTEXT_BREAKDOWN_METRIC_NAMES.has(name) && recordedEntry) {
+      breakdown[name] = { ...recordedEntry };
+    }
+  });
+  metrics.contextBreakdown = breakdown;
+  globalThis.__renderPerfMetrics = metrics;
+  return breakdown;
 }
 
 function incrementPerfCounter(counterName, amount = 1) {
@@ -394,6 +497,7 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       state.scenarioReliefOverlayRevision || 0,
       state.showWaterRegions ? "scenario-water:on" : "scenario-water:off",
       state.showScenarioSpecialRegions ? "scenario-special:on" : "scenario-special:off",
+      state.showScenarioReliefOverlays ? "scenario-relief:on" : "scenario-relief:off",
       state.showPhysical ? "physical:on" : "physical:off",
       state.showUrban ? "urban:on" : "urban:off",
       state.showRivers ? "rivers:on" : "rivers:off",
@@ -444,7 +548,7 @@ function isDynamicBordersEnabled() {
     return false;
   }
   const raw = readSearchParam("dynamic_borders");
-  if (!raw) return true;
+  if (!raw) return state.dynamicBordersEnabled !== false;
   return !["0", "false", "off", "no"].includes(raw);
 }
 
@@ -738,14 +842,9 @@ function getReliefOverlayKind(feature) {
 function isReliefOverlayEnabled(feature) {
   if (!feature) return false;
   if (!state.activeScenarioId) return false;
-  if (isBaseGeographyScenarioFeature(feature)) {
-    return true;
-  }
-  const kind = getReliefOverlayKind(feature);
-  if (kind === "lake_shoreline" || kind === "swamp_margin" || kind === "dam_approach") {
-    return !!state.showWaterRegions;
-  }
-  return !!state.showScenarioSpecialRegions;
+  if (!state.showScenarioReliefOverlays) return false;
+  if (isBaseGeographyScenarioFeature(feature)) return true;
+  return feature?.properties?.interactive !== false;
 }
 
 function getReliefOverlayStyle(feature) {
@@ -836,8 +935,36 @@ function drawPolygonLinePattern(bounds, {
 }
 
 function drawScenarioReliefOverlaysLayer(k) {
+  const startedAt = nowMs();
   const overlays = getEffectiveScenarioReliefOverlayFeatures();
-  if (!overlays.length) return;
+  if (!overlays.length) {
+    collectContextMetric("drawScenarioReliefOverlaysLayer", nowMs() - startedAt, {
+      featureCount: 0,
+      renderedCount: 0,
+      skipped: true,
+      reason: "no-overlays",
+    });
+    return;
+  }
+  if (!state.showScenarioReliefOverlays) {
+    collectContextMetric("drawScenarioReliefOverlaysLayer", nowMs() - startedAt, {
+      featureCount: overlays.length,
+      renderedCount: 0,
+      skipped: true,
+      reason: "disabled",
+    });
+    return;
+  }
+  if (state.renderPhase === RENDER_PHASE_INTERACTING || state.renderPhase === RENDER_PHASE_SETTLING) {
+    collectContextMetric("drawScenarioReliefOverlaysLayer", nowMs() - startedAt, {
+      featureCount: overlays.length,
+      renderedCount: 0,
+      skipped: true,
+      reason: state.renderPhase,
+    });
+    return;
+  }
+  let renderedCount = 0;
   overlays.forEach((feature) => {
     if (!isReliefOverlayEnabled(feature)) return;
     if (!pathBoundsInScreen(feature)) return;
@@ -883,6 +1010,13 @@ function drawScenarioReliefOverlaysLayer(k) {
     context.lineCap = "round";
     context.stroke();
     context.restore();
+    renderedCount += 1;
+  });
+  collectContextMetric("drawScenarioReliefOverlaysLayer", nowMs() - startedAt, {
+    featureCount: overlays.length,
+    renderedCount,
+    skipped: false,
+    phase: state.renderPhase,
   });
 }
 
@@ -935,6 +1069,19 @@ function getAtlantropaSurfaceKind(feature) {
 function isAtlantropaSeaFeature(feature) {
   return getFeatureCountryCodeNormalized(feature) === "ATL"
     && getAtlantropaSurfaceKind(feature) === "sea";
+}
+
+function getAtlantropaSeaPoliticalFillColor() {
+  const oceanFillColor = getOceanBaseFillColor();
+  const oceanRgb = globalThis.ColorManager?.hexToRgb?.(oceanFillColor);
+  if (oceanRgb) {
+    return `rgba(${oceanRgb.r}, ${oceanRgb.g}, ${oceanRgb.b}, 0.92)`;
+  }
+  return oceanFillColor;
+}
+
+function getAtlantropaSeaPoliticalStrokeColor() {
+  return "rgba(48, 84, 126, 0.14)";
 }
 
 function getFeatureRegionTag(feature) {
@@ -2357,6 +2504,7 @@ function setCanvasSize() {
 }
 
 function rebuildDynamicBorders() {
+  const startedAt = nowMs();
   incrementPerfCounter("dynamicBorderRebuilds");
   state.cachedBorders = null;
   state.cachedColorsHash = getColorsHash();
@@ -2367,6 +2515,10 @@ function rebuildDynamicBorders() {
     state.dynamicBordersDirtyReason = "";
     clearPendingDynamicBorderTimer();
     updateDynamicBorderStatusUI();
+    recordRenderPerfMetric("rebuildDynamicBorders", nowMs() - startedAt, {
+      enabled: false,
+      segmentCount: 0,
+    });
     return;
   }
   ensureSovereigntyState();
@@ -2380,6 +2532,13 @@ function rebuildDynamicBorders() {
     state.dynamicBordersDirty = false;
     state.dynamicBordersDirtyReason = "";
     updateDynamicBorderStatusUI();
+    recordRenderPerfMetric("rebuildDynamicBorders", nowMs() - startedAt, {
+      enabled: true,
+      cacheHit: true,
+      segmentCount: Array.isArray(state.cachedDynamicOwnerBorders?.coordinates)
+        ? state.cachedDynamicOwnerBorders.coordinates.length
+        : 0,
+    });
     return;
   }
   state.cachedDynamicOwnerBorders = buildDynamicOwnerBorderMesh(
@@ -2398,6 +2557,13 @@ function rebuildDynamicBorders() {
   state.dynamicBordersDirtyReason = "";
   updateDynamicBorderStatusUI();
   invalidateRenderPasses("borders", "dynamic-borders");
+  recordRenderPerfMetric("rebuildDynamicBorders", nowMs() - startedAt, {
+    enabled: true,
+    cacheHit: false,
+    segmentCount: Array.isArray(state.cachedDynamicOwnerBorders?.coordinates)
+      ? state.cachedDynamicOwnerBorders.coordinates.length
+      : 0,
+  });
 }
 
 function recomputeDynamicBordersNow({ renderNow = true, reason = "" } = {}) {
@@ -3040,6 +3206,7 @@ function simplifyCoastlineMesh(mesh, { epsilon = 0, minLength = 0 } = {}) {
 }
 
 function rebuildStaticMeshes() {
+  const startedAt = nowMs();
   state.cachedCountryBorders = [];
   state.cachedProvinceBorders = [];
   state.cachedLocalBorders = [];
@@ -3058,6 +3225,11 @@ function rebuildStaticMeshes() {
     if (typeof state.updateParentBorderCountryListFn === "function") {
       state.updateParentBorderCountryListFn();
     }
+    recordRenderPerfMetric("rebuildStaticMeshes", nowMs() - startedAt, {
+      hasTopojson: false,
+      countryMeshes: 0,
+      coastlineMeshes: 0,
+    });
     return;
   }
 
@@ -3125,6 +3297,13 @@ function rebuildStaticMeshes() {
 
   // Backward compatibility: expose local boundaries as "grid lines".
   state.cachedGridLines = [...(state.cachedLocalBorders || [])];
+  recordRenderPerfMetric("rebuildStaticMeshes", nowMs() - startedAt, {
+    hasTopojson: true,
+    countryMeshes: state.cachedCountryBorders.length,
+    provinceMeshes: state.cachedProvinceBorders.length,
+    localMeshes: state.cachedLocalBorders.length,
+    coastlineMeshes: state.cachedCoastlines.length,
+  });
 }
 
 function invalidateBorderCache() {
@@ -3799,6 +3978,7 @@ function buildRuntimePoliticalMeta() {
 }
 
 function buildSpatialIndex() {
+  const startedAt = nowMs();
   state.spatialItems = [];
   state.spatialIndex = null;
   state.spatialGrid = new Map();
@@ -3814,7 +3994,16 @@ function buildSpatialIndex() {
   state.specialSpatialGrid = new Map();
   state.specialSpatialGridMeta = null;
   state.specialSpatialItemsById = new Map();
-  if (!state.landData || !state.landData.features || !pathSVG) return;
+  if (!state.landData || !state.landData.features || !pathSVG) {
+    recordRenderPerfMetric("buildSpatialIndex", nowMs() - startedAt, {
+      landCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
+      spatialItems: 0,
+      waterItems: 0,
+      specialItems: 0,
+      skipped: true,
+    });
+    return;
+  }
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
 
   for (const feature of state.landData.features) {
@@ -3899,6 +4088,13 @@ function buildSpatialIndex() {
     state.specialSpatialItemsById = state.spatialItemsById;
   });
   state.hitCanvasDirty = true;
+  recordRenderPerfMetric("buildSpatialIndex", nowMs() - startedAt, {
+    landCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
+    spatialItems: state.spatialItems.length,
+    waterItems: state.waterSpatialItems.length,
+    specialItems: state.specialSpatialItems.length,
+    skipped: false,
+  });
 }
 
 function getHitFromEvent(
@@ -4169,19 +4365,24 @@ function resolveOceanMask() {
 }
 
 function applyOceanClipMask(maskMode) {
+  const startedAt = nowMs();
   context.beginPath();
   if (maskMode === OCEAN_MASK_MODE_TOPOLOGY && state.oceanData) {
     pathCanvas(state.oceanData);
     context.clip();
+    recordRenderPerfMetric("applyOceanClipMask", nowMs() - startedAt, {
+      applied: true,
+      maskMode,
+      maskSource: "oceanData",
+      maskFeatureCount: getFeatureCollectionFeatureCount(state.oceanData),
+      maskArcRefEstimate: estimateTopologyObjectArcRefs(state.topologyPrimary || state.topology, "ocean"),
+    });
     return;
   }
 
   pathCanvas({ type: "Sphere" });
-  const landMask = Array.isArray(state.scenarioLandMaskData?.features) && state.scenarioLandMaskData.features.length
-    ? state.scenarioLandMaskData
-    : Array.isArray(state.landData?.features) && state.landData.features.length
-      ? state.landData
-      : (Array.isArray(state.landBgData?.features) && state.landBgData.features.length ? state.landBgData : null);
+  const maskInfo = getPhysicalLandMaskInfo();
+  const landMask = maskInfo.collection;
 
   if (landMask) {
     pathCanvas(landMask);
@@ -4190,10 +4391,24 @@ function applyOceanClipMask(maskMode) {
     } catch (error) {
       context.clip();
     }
+    recordRenderPerfMetric("applyOceanClipMask", nowMs() - startedAt, {
+      applied: true,
+      maskMode,
+      maskSource: maskInfo.maskSource,
+      maskFeatureCount: maskInfo.maskFeatureCount,
+      maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+    });
     return;
   }
 
   context.clip();
+  recordRenderPerfMetric("applyOceanClipMask", nowMs() - startedAt, {
+    applied: true,
+    maskMode,
+    maskSource: "sphere-only",
+    maskFeatureCount: 0,
+    maskArcRefEstimate: null,
+  });
 }
 
 function createOceanPatternTile(preset, size, contourStrength) {
@@ -4460,34 +4675,129 @@ function getAtlasFeatureAlphaMultiplier(atlasClass, cfg) {
   return 1;
 }
 
-function getPhysicalLandMask() {
+function countTopologyArcRefs(arcs) {
+  if (Number.isInteger(arcs)) return 1;
+  if (!Array.isArray(arcs)) return 0;
+  return arcs.reduce((sum, entry) => sum + countTopologyArcRefs(entry), 0);
+}
+
+function estimateTopologyObjectArcRefs(topology, objectName) {
+  const object = topology?.objects?.[objectName];
+  if (!object || typeof object !== "object") return null;
+  if (Array.isArray(object.geometries)) {
+    const total = object.geometries.reduce(
+      (sum, geometry) => sum + countTopologyArcRefs(geometry?.arcs),
+      0
+    );
+    return total > 0 ? total : null;
+  }
+  const total = countTopologyArcRefs(object.arcs);
+  return total > 0 ? total : null;
+}
+
+function getFeatureCollectionFeatureCount(collection) {
+  return Array.isArray(collection?.features) ? collection.features.length : 0;
+}
+
+function getPhysicalLandMaskInfo() {
+  const primaryTopology = state.topologyPrimary || state.topology;
+  const detailTopology = state.topologyDetail;
+  const landSource = String(state.contextLayerSourceByName?.land || "").trim().toLowerCase();
   if (Array.isArray(state.scenarioLandMaskData?.features) && state.scenarioLandMaskData.features.length) {
-    return state.scenarioLandMaskData;
+    return {
+      collection: state.scenarioLandMaskData,
+      maskSource: "scenarioLandMask",
+      maskFeatureCount: getFeatureCollectionFeatureCount(state.scenarioLandMaskData),
+      maskArcRefEstimate:
+        estimateTopologyObjectArcRefs(state.scenarioRuntimeTopologyData, "land_mask")
+        ?? estimateTopologyObjectArcRefs(state.scenarioRuntimeTopologyData, "land"),
+    };
   }
   if (Array.isArray(state.landBgData?.features) && state.landBgData.features.length) {
-    return state.landBgData;
+    const topology = landSource === "detail" ? detailTopology : primaryTopology;
+    return {
+      collection: state.landBgData,
+      maskSource: "landBgData",
+      maskFeatureCount: getFeatureCollectionFeatureCount(state.landBgData),
+      maskArcRefEstimate: estimateTopologyObjectArcRefs(topology, "land"),
+    };
   }
   if (Array.isArray(state.landDataFull?.features) && state.landDataFull.features.length) {
-    return state.landDataFull;
+    const topology = state.runtimePoliticalTopology?.objects?.political
+      ? state.runtimePoliticalTopology
+      : (primaryTopology || null);
+    return {
+      collection: state.landDataFull,
+      maskSource: "landDataFull",
+      maskFeatureCount: getFeatureCollectionFeatureCount(state.landDataFull),
+      maskArcRefEstimate: estimateTopologyObjectArcRefs(topology, "political"),
+    };
   }
   if (Array.isArray(state.landData?.features) && state.landData.features.length) {
-    return state.landData;
+    const topology = state.runtimePoliticalTopology?.objects?.political
+      ? state.runtimePoliticalTopology
+      : (primaryTopology || null);
+    return {
+      collection: state.landData,
+      maskSource: "landData",
+      maskFeatureCount: getFeatureCollectionFeatureCount(state.landData),
+      maskArcRefEstimate: estimateTopologyObjectArcRefs(topology, "political"),
+    };
   }
-  return null;
+  return {
+    collection: null,
+    maskSource: "none",
+    maskFeatureCount: 0,
+    maskArcRefEstimate: null,
+  };
+}
+
+function getPhysicalLandMask() {
+  return getPhysicalLandMaskInfo().collection;
 }
 
 function applyPhysicalLandClipMask() {
-  const landMask = getPhysicalLandMask();
-  if (!landMask) return false;
+  const startedAt = nowMs();
+  const maskInfo = getPhysicalLandMaskInfo();
+  const landMask = maskInfo.collection;
+  if (!landMask) {
+    collectContextMetric("applyPhysicalLandClipMask", nowMs() - startedAt, {
+      applied: false,
+      maskSource: maskInfo.maskSource,
+      maskFeatureCount: maskInfo.maskFeatureCount,
+      maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+      reason: "no-mask",
+    });
+    return false;
+  }
   context.beginPath();
   pathCanvas(landMask);
   context.clip();
+  collectContextMetric("applyPhysicalLandClipMask", nowMs() - startedAt, {
+    applied: true,
+    maskSource: maskInfo.maskSource,
+    maskFeatureCount: maskInfo.maskFeatureCount,
+    maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+  });
   return true;
 }
 
 function drawPhysicalAtlasLayer(k, { interactive = false } = {}) {
+  const startedAt = nowMs();
   const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
-  if (!state.showPhysical || cfg.mode === "contours_only") return;
+  const maskInfo = getPhysicalLandMaskInfo();
+  if (!state.showPhysical || cfg.mode === "contours_only") {
+    collectContextMetric("drawPhysicalAtlasLayer", nowMs() - startedAt, {
+      featureCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: !state.showPhysical ? "hidden" : "contours-only",
+      maskSource: maskInfo.maskSource,
+      maskFeatureCount: maskInfo.maskFeatureCount,
+      maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+    });
+    return;
+  }
 
   const atlasCollection = getResolvedPhysicalAtlasCollection();
   if (!Array.isArray(atlasCollection?.features) || atlasCollection.features.length === 0) {
@@ -4495,6 +4805,15 @@ function drawPhysicalAtlasLayer(k, { interactive = false } = {}) {
       "physical-atlas-missing",
       "[physical] Atlas semantics unavailable; skipping physical atlas fill."
     );
+    collectContextMetric("drawPhysicalAtlasLayer", nowMs() - startedAt, {
+      featureCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: "no-data",
+      maskSource: maskInfo.maskSource,
+      maskFeatureCount: maskInfo.maskFeatureCount,
+      maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+    });
     return;
   }
 
@@ -4526,6 +4845,14 @@ function drawPhysicalAtlasLayer(k, { interactive = false } = {}) {
   });
 
   context.restore();
+  collectContextMetric("drawPhysicalAtlasLayer", nowMs() - startedAt, {
+    featureCount: atlasCollection.features.length,
+    interactive: !!interactive,
+    skipped: false,
+    maskSource: maskInfo.maskSource,
+    maskFeatureCount: maskInfo.maskFeatureCount,
+    maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+  });
 }
 
 function drawContourCollection(
@@ -4565,14 +4892,38 @@ function drawContourCollection(
 }
 
 function drawPhysicalContourLayer(k, { interactive = false } = {}) {
+  const startedAt = nowMs();
   const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
-  if (!state.showPhysical || cfg.mode === "atlas_only") return;
+  const maskInfo = getPhysicalLandMaskInfo();
+  if (!state.showPhysical || cfg.mode === "atlas_only") {
+    collectContextMetric("drawPhysicalContourLayer", nowMs() - startedAt, {
+      featureCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: !state.showPhysical ? "hidden" : "atlas-only",
+      maskSource: maskInfo.maskSource,
+      maskFeatureCount: maskInfo.maskFeatureCount,
+      maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+    });
+    return;
+  }
 
   if (!Array.isArray(state.physicalContourMajorData?.features) || state.physicalContourMajorData.features.length === 0) {
     warnMissingPhysicalContextOnce(
       "physical-contours-major-missing",
       "[physical] global_contours.major.topo.json missing; skipping terrain contours."
     );
+    collectContextMetric("drawPhysicalContourLayer", nowMs() - startedAt, {
+      featureCount: 0,
+      majorFeatureCount: 0,
+      minorFeatureCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: "no-data",
+      maskSource: maskInfo.maskSource,
+      maskFeatureCount: maskInfo.maskFeatureCount,
+      maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+    });
     return;
   }
 
@@ -4617,6 +4968,18 @@ function drawPhysicalContourLayer(k, { interactive = false } = {}) {
   }
 
   context.restore();
+  collectContextMetric("drawPhysicalContourLayer", nowMs() - startedAt, {
+    featureCount:
+      getFeatureCollectionFeatureCount(state.physicalContourMajorData)
+      + getFeatureCollectionFeatureCount(state.physicalContourMinorData),
+    majorFeatureCount: getFeatureCollectionFeatureCount(state.physicalContourMajorData),
+    minorFeatureCount: getFeatureCollectionFeatureCount(state.physicalContourMinorData),
+    interactive: !!interactive,
+    skipped: false,
+    maskSource: maskInfo.maskSource,
+    maskFeatureCount: maskInfo.maskFeatureCount,
+    maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+  });
 }
 
 function drawPhysicalLayer(k, { interactive = false } = {}) {
@@ -4625,7 +4988,16 @@ function drawPhysicalLayer(k, { interactive = false } = {}) {
 }
 
 function drawUrbanLayer(k, { interactive = false } = {}) {
-  if (!state.showUrban || !state.urbanData?.features?.length) return;
+  const startedAt = nowMs();
+  if (!state.showUrban || !state.urbanData?.features?.length) {
+    collectContextMetric("drawUrbanLayer", nowMs() - startedAt, {
+      featureCount: getFeatureCollectionFeatureCount(state.urbanData),
+      interactive: !!interactive,
+      skipped: true,
+      reason: !state.showUrban ? "hidden" : "no-data",
+    });
+    return;
+  }
   const cfg = state.styleConfig?.urban || {};
   const color = getSafeCanvasColor(cfg.color, "#4b5563");
   const opacity = clamp(Number.isFinite(Number(cfg.opacity)) ? Number(cfg.opacity) : 0.22, 0, 1);
@@ -4646,10 +5018,24 @@ function drawUrbanLayer(k, { interactive = false } = {}) {
   });
 
   context.restore();
+  collectContextMetric("drawUrbanLayer", nowMs() - startedAt, {
+    featureCount: getFeatureCollectionFeatureCount(state.urbanData),
+    interactive: !!interactive,
+    skipped: false,
+  });
 }
 
 function drawRiversLayer(k, { interactive = false } = {}) {
-  if (!state.showRivers || !state.riversData?.features?.length) return;
+  const startedAt = nowMs();
+  if (!state.showRivers || !state.riversData?.features?.length) {
+    collectContextMetric("drawRiversLayer", nowMs() - startedAt, {
+      featureCount: getFeatureCollectionFeatureCount(state.riversData),
+      interactive: !!interactive,
+      skipped: true,
+      reason: !state.showRivers ? "hidden" : "no-data",
+    });
+    return;
+  }
   const cfg = state.styleConfig?.rivers || {};
   const color = getSafeCanvasColor(cfg.color, "#3b82f6");
   const opacity = clamp(Number.isFinite(Number(cfg.opacity)) ? Number(cfg.opacity) : 0.88, 0, 1);
@@ -4691,6 +5077,11 @@ function drawRiversLayer(k, { interactive = false } = {}) {
   context.setLineDash([]);
 
   context.restore();
+  collectContextMetric("drawRiversLayer", nowMs() - startedAt, {
+    featureCount: getFeatureCollectionFeatureCount(state.riversData),
+    interactive: !!interactive,
+    skipped: false,
+  });
 }
 
 function getTextureStyleConfig() {
@@ -5792,6 +6183,157 @@ function drawTextureLayer(k, { interactive = false } = {}) {
   }
 }
 
+function shouldUseScenarioPoliticalBackgroundMerge() {
+  return Boolean(
+    debugMode === "PROD" &&
+    state.activeScenarioId &&
+    state.runtimePoliticalTopology?.objects?.political &&
+    globalThis.topojson?.merge
+  );
+}
+
+function buildScenarioPoliticalBackgroundEntries() {
+  const startedAt = nowMs();
+  if (!shouldUseScenarioPoliticalBackgroundMerge()) {
+    recordRenderPerfMetric("drawScenarioPoliticalBackgroundEntries", nowMs() - startedAt, {
+      cacheHit: false,
+      entryCount: 0,
+      featureCount: 0,
+      skipped: true,
+    });
+    return [];
+  }
+
+  const topology = state.runtimePoliticalTopology;
+  const landCollection = state.landData;
+  const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
+  const featureCount = Array.isArray(landCollection?.features) ? landCollection.features.length : 0;
+  const cacheMatches =
+    scenarioPoliticalBackgroundCache.topologyRef === topology &&
+    scenarioPoliticalBackgroundCache.landCollectionRef === landCollection &&
+    scenarioPoliticalBackgroundCache.scenarioId === state.activeScenarioId &&
+    scenarioPoliticalBackgroundCache.viewMode === String(state.scenarioViewMode || "ownership") &&
+    scenarioPoliticalBackgroundCache.oceanFillColor === getAtlantropaSeaPoliticalFillColor() &&
+    scenarioPoliticalBackgroundCache.topologyRevision === Number(state.topologyRevision || 0) &&
+    scenarioPoliticalBackgroundCache.colorRevision === Number(state.colorRevision || 0) &&
+    scenarioPoliticalBackgroundCache.sovereigntyRevision === Number(state.sovereigntyRevision || 0) &&
+    scenarioPoliticalBackgroundCache.controllerRevision === Number(state.scenarioControllerRevision || 0) &&
+    scenarioPoliticalBackgroundCache.shellRevision === Number(state.scenarioShellOverlayRevision || 0) &&
+    scenarioPoliticalBackgroundCache.canvasWidth === canvasWidth &&
+    scenarioPoliticalBackgroundCache.canvasHeight === canvasHeight &&
+    scenarioPoliticalBackgroundCache.featureCount === featureCount;
+  if (cacheMatches) {
+    recordRenderPerfMetric("drawScenarioPoliticalBackgroundEntries", nowMs() - startedAt, {
+      cacheHit: true,
+      entryCount: scenarioPoliticalBackgroundCache.entries.length,
+      featureCount,
+    });
+    return scenarioPoliticalBackgroundCache.entries;
+  }
+
+  const includedFeatureIds = new Set(
+    getRenderableLandFeatures(canvasWidth, canvasHeight, { forceProd: true })
+      .map((feature) => getFeatureId(feature))
+      .filter(Boolean)
+  );
+  if (!includedFeatureIds.size) {
+    scenarioPoliticalBackgroundCache = {
+      topologyRef: topology,
+      landCollectionRef: landCollection,
+      scenarioId: state.activeScenarioId || "",
+      viewMode: String(state.scenarioViewMode || "ownership"),
+      oceanFillColor: getAtlantropaSeaPoliticalFillColor(),
+      topologyRevision: Number(state.topologyRevision || 0),
+      colorRevision: Number(state.colorRevision || 0),
+      sovereigntyRevision: Number(state.sovereigntyRevision || 0),
+      controllerRevision: Number(state.scenarioControllerRevision || 0),
+      shellRevision: Number(state.scenarioShellOverlayRevision || 0),
+      canvasWidth,
+      canvasHeight,
+      featureCount,
+      entries: [],
+    };
+    recordRenderPerfMetric("drawScenarioPoliticalBackgroundEntries", nowMs() - startedAt, {
+      cacheHit: false,
+      entryCount: 0,
+      featureCount,
+    });
+    return scenarioPoliticalBackgroundCache.entries;
+  }
+
+  const groupedGeometries = new Map();
+  const geometries = Array.isArray(topology?.objects?.political?.geometries)
+    ? topology.objects.political.geometries
+    : [];
+  geometries.forEach((geometry, index) => {
+    const id = getFeatureId(geometry) || `feature-${index}`;
+    if (!includedFeatureIds.has(id)) return;
+
+    const displayCode =
+      getDisplayOwnerCode(geometry, id) ||
+      getFeatureCountryCodeNormalized(geometry) ||
+      "__NONE__";
+    const fillColor =
+      (isAtlantropaSeaFeature(geometry)
+        ? getAtlantropaSeaPoliticalFillColor()
+        : null) ||
+      getSafeCanvasColor(state.colors?.[id], null) ||
+      getSafeCanvasColor(getResolvedFeatureColor(geometry, id), null) ||
+      LAND_FILL_COLOR;
+    const groupKey = `${displayCode}::${fillColor}`;
+    if (!groupedGeometries.has(groupKey)) {
+      groupedGeometries.set(groupKey, { fillColor, geometries: [] });
+    }
+    groupedGeometries.get(groupKey).geometries.push(geometry);
+  });
+
+  const entries = [];
+  groupedGeometries.forEach(({ fillColor, geometries: group }) => {
+    if (!Array.isArray(group) || !group.length) return;
+    try {
+      const mergedShape = globalThis.topojson.merge(topology, group);
+      entries.push({ fillColor, mergedShape });
+    } catch (_error) {
+      // Skip groups that fail to merge and fall back to per-feature fills below.
+    }
+  });
+
+  scenarioPoliticalBackgroundCache = {
+    topologyRef: topology,
+    landCollectionRef: landCollection,
+    scenarioId: state.activeScenarioId || "",
+    viewMode: String(state.scenarioViewMode || "ownership"),
+    oceanFillColor: getAtlantropaSeaPoliticalFillColor(),
+    topologyRevision: Number(state.topologyRevision || 0),
+    colorRevision: Number(state.colorRevision || 0),
+    sovereigntyRevision: Number(state.sovereigntyRevision || 0),
+    controllerRevision: Number(state.scenarioControllerRevision || 0),
+    shellRevision: Number(state.scenarioShellOverlayRevision || 0),
+    canvasWidth,
+    canvasHeight,
+    featureCount,
+    entries,
+  };
+  recordRenderPerfMetric("drawScenarioPoliticalBackgroundEntries", nowMs() - startedAt, {
+    cacheHit: false,
+    entryCount: entries.length,
+    featureCount,
+  });
+  return entries;
+}
+
+function drawScenarioPoliticalBackgroundFills() {
+  const entries = buildScenarioPoliticalBackgroundEntries();
+  if (!entries.length) return;
+
+  entries.forEach(({ fillColor, mergedShape }) => {
+    context.beginPath();
+    pathCanvas(mergedShape);
+    context.fillStyle = fillColor;
+    context.fill();
+  });
+}
+
 function buildAdmin0MergedShapes() {
   const topology = state.topologyPrimary || state.topology;
   if (!topology?.objects?.political || !globalThis.topojson?.merge) return [];
@@ -5865,8 +6407,14 @@ function drawBackgroundPass() {
 
 function drawPoliticalPass(k) {
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
+  const useScenarioBackgroundMerge = shouldUseScenarioPoliticalBackgroundMerge();
   if (debugMode === "PROD") {
-    drawAdmin0BackgroundFills();
+    if (useScenarioBackgroundMerge) {
+      // Merged background fills keep same-color runtime fragments from exposing anti-aliased seams.
+      drawScenarioPoliticalBackgroundFills();
+    } else {
+      drawAdmin0BackgroundFills();
+    }
   }
   if (!state.landData?.features?.length) return;
   const islandNeighbors = debugMode === "ISLANDS" ? getIslandNeighborGraph() : null;
@@ -5874,10 +6422,13 @@ function drawPoliticalPass(k) {
     const id = getFeatureId(feature) || `feature-${index}`;
     if (shouldSkipFeature(feature, canvasWidth, canvasHeight)) return;
     if (!pathBoundsInScreen(feature)) return;
+    const isAtlantropaSea = debugMode === "PROD" && isAtlantropaSeaFeature(feature);
 
     let fillColor = LAND_FILL_COLOR;
     if (debugMode === "PROD") {
-      fillColor = getSafeCanvasColor(state.colors[id], null) || LAND_FILL_COLOR;
+      fillColor = isAtlantropaSea
+        ? getAtlantropaSeaPoliticalFillColor()
+        : (getSafeCanvasColor(state.colors[id], null) || LAND_FILL_COLOR);
     } else if (debugMode === "GEOMETRY") {
       fillColor = index % 2 === 0 ? "pink" : "lightgreen";
     } else if (debugMode === "ARTIFACTS") {
@@ -5904,27 +6455,46 @@ function drawPoliticalPass(k) {
     context.fill();
 
     if (debugMode === "PROD") {
-      context.strokeStyle = isAtlantropaSeaFeature(feature)
-        ? "rgba(62, 96, 138, 0.45)"
-        : fillColor;
-      context.lineWidth = isAtlantropaSeaFeature(feature)
-        ? (0.65 / k)
-        : (0.5 / k);
-      context.lineJoin = "round";
-      context.stroke();
+      if (!useScenarioBackgroundMerge || isAtlantropaSea) {
+        if (useScenarioBackgroundMerge && isAtlantropaSea) {
+          return;
+        }
+        context.strokeStyle = isAtlantropaSea
+          ? getAtlantropaSeaPoliticalStrokeColor()
+          : fillColor;
+        context.lineWidth = isAtlantropaSea
+          ? (0.45 / k)
+          : (0.5 / k);
+        context.lineJoin = "round";
+        context.stroke();
+      }
     }
   });
 }
 
 function drawScenarioRegionOverlaysPass(k) {
+  const startedAt = nowMs();
   const showWater = !!state.showWaterRegions;
   const showSpecial = !!state.showScenarioSpecialRegions;
-  if (!showWater && !showSpecial && !state.scenarioRuntimeTopologyData) {
+  const waterFeatures = showWater ? getEffectiveWaterRegionFeatures() : [];
+  const specialFeatures = showSpecial ? getEffectiveSpecialRegionFeatures() : [];
+  let renderedWaterCount = 0;
+  let renderedSpecialCount = 0;
+  if (!showWater && !showSpecial) {
+    collectContextMetric("drawScenarioRegionOverlaysPass", nowMs() - startedAt, {
+      featureCount: 0,
+      waterFeatureCount: 0,
+      specialFeatureCount: 0,
+      renderedWaterCount: 0,
+      renderedSpecialCount: 0,
+      skipped: true,
+      reason: "disabled",
+    });
     return;
   }
 
-  if (showWater || state.scenarioRuntimeTopologyData) {
-    getEffectiveWaterRegionFeatures().forEach((feature, index) => {
+  if (showWater) {
+    waterFeatures.forEach((feature, index) => {
       const id = getFeatureId(feature) || `water-${index}`;
       const renderAsBase = isBaseGeographyScenarioFeature(feature);
       if (!renderAsBase && !showWater) return;
@@ -5948,11 +6518,12 @@ function drawScenarioRegionOverlaysPass(k) {
       context.lineWidth = 0.65 / Math.max(0.0001, k);
       context.lineJoin = "round";
       context.stroke();
+      renderedWaterCount += 1;
     });
   }
 
-  if (showSpecial || state.scenarioRuntimeTopologyData) {
-    getEffectiveSpecialRegionFeatures().forEach((feature, index) => {
+  if (showSpecial) {
+    specialFeatures.forEach((feature, index) => {
       const id = getFeatureId(feature) || `special-${index}`;
       const renderAsBase = isBaseGeographyScenarioFeature(feature);
       if (!renderAsBase && !showSpecial) return;
@@ -5971,8 +6542,17 @@ function drawScenarioRegionOverlaysPass(k) {
       context.lineWidth = 1 / Math.max(0.0001, k);
       context.lineJoin = "round";
       context.stroke();
+      renderedSpecialCount += 1;
     });
   }
+  collectContextMetric("drawScenarioRegionOverlaysPass", nowMs() - startedAt, {
+    featureCount: waterFeatures.length + specialFeatures.length,
+    waterFeatureCount: waterFeatures.length,
+    specialFeatureCount: specialFeatures.length,
+    renderedWaterCount,
+    renderedSpecialCount,
+    skipped: false,
+  });
 }
 
 function drawEffectsPass(k, { interactive = false } = {}) {
@@ -5980,11 +6560,17 @@ function drawEffectsPass(k, { interactive = false } = {}) {
 }
 
 function drawContextPass(k, { interactive = false } = {}) {
-  drawPhysicalLayer(k, { interactive });
-  drawUrbanLayer(k, { interactive });
-  drawRiversLayer(k, { interactive });
-  drawScenarioRegionOverlaysPass(k);
-  drawScenarioReliefOverlaysLayer(k);
+  beginContextMetricSession();
+  try {
+    drawPhysicalAtlasLayer(k, { interactive });
+    drawPhysicalContourLayer(k, { interactive });
+    drawUrbanLayer(k, { interactive });
+    drawRiversLayer(k, { interactive });
+    drawScenarioRegionOverlaysPass(k);
+    drawScenarioReliefOverlaysLayer(k);
+  } finally {
+    endContextMetricSession();
+  }
 }
 
 function drawDayNightPass(k, { interactive = false } = {}) {
@@ -6562,11 +7148,33 @@ function updatePerfOverlay() {
   const timingEntries = Object.entries(frame.timings || {})
     .map(([name, value]) => `${name}=${Number(value || 0).toFixed(1)}ms`)
     .join(", ");
+  const renderPerf = state.renderPerfMetrics || {};
+  const scenarioPerf = state.scenarioPerfMetrics || {};
+  const opEntries = [
+    ["setMapData", renderPerf.setMapData?.durationMs],
+    ["buildSpatialIndex", renderPerf.buildSpatialIndex?.durationMs],
+    ["rebuildStaticMeshes", renderPerf.rebuildStaticMeshes?.durationMs],
+    ["rebuildDynamicBorders", renderPerf.rebuildDynamicBorders?.durationMs],
+    ["physicalClip", renderPerf.applyPhysicalLandClipMask?.durationMs],
+    ["oceanClip", renderPerf.applyOceanClipMask?.durationMs],
+    ["bgMerge", renderPerf.drawScenarioPoliticalBackgroundEntries?.durationMs],
+    ["relief", renderPerf.drawScenarioReliefOverlaysLayer?.durationMs],
+    ["scenarioLoad", scenarioPerf.loadScenarioBundle?.durationMs],
+    ["scenarioApply", scenarioPerf.applyScenarioBundle?.durationMs],
+  ]
+    .filter(([, value]) => Number.isFinite(Number(value)))
+    .map(([name, value]) => `${name}=${Number(value || 0).toFixed(1)}ms`)
+    .join(", ");
+  const contextBreakdownEntries = Object.entries(renderPerf.contextBreakdown || {})
+    .map(([name, value]) => `${name}=${Number(value?.durationMs || 0).toFixed(1)}ms`)
+    .join(", ");
   overlay.textContent = [
     `phase=${frame.phase || state.renderPhase} total=${Number(frame.totalMs || 0).toFixed(1)}ms`,
     `action=${cache.lastAction || "-"} ${Number(cache.lastActionDurationMs || 0).toFixed(1)}ms`,
     `transform=${getTransformSignature(frame.transform || state.zoomTransform)}`,
     `passes ${timingEntries || "none"}`,
+    `contextBreakdown ${contextBreakdownEntries || "none"}`,
+    `ops ${opEntries || "none"}`,
     `invalidations ${invalidations}`,
     `render draw=${cache.counters.drawCanvas || 0} frame=${cache.counters.frames || 0} dayNight=${cache.counters.dayNightPassRenders || 0} hit=${cache.counters.hitCanvasRenders || 0} dynBorder=${cache.counters.dynamicBorderRebuilds || 0}`,
     `sidebar list=${sidebarPerf.counters.fullListRenders || 0} rows=${sidebarPerf.counters.rowRefreshes || 0} detail=${sidebarPerf.counters.inspectorRenders || 0} preset=${sidebarPerf.counters.presetTreeRenders || 0} legend=${sidebarPerf.counters.legendRenders || 0}`,
@@ -6924,6 +7532,87 @@ function getCountryFeatureIds(countryCode) {
   return Array.isArray(ids) ? ids : [];
 }
 
+function getCountryInteractionPolicy(countryCode) {
+  if (!countryCode || !(state.countryInteractionPoliciesByCode instanceof Map)) return null;
+  return state.countryInteractionPoliciesByCode.get(countryCode) || null;
+}
+
+function shouldRequireLeafDetail(countryCode) {
+  const policy = getCountryInteractionPolicy(countryCode);
+  if (!policy?.requiresComposite) return false;
+  if (isSovereigntyModeActive()) return false;
+  return state.interactionGranularity !== "country";
+}
+
+function hasLeafDetailReady(countryCode) {
+  if (!shouldRequireLeafDetail(countryCode)) return true;
+  if (state.topologyBundleMode !== "composite") return false;
+  return getCountryFeatureIds(countryCode).length > 1;
+}
+
+function showDetailPromotionToast(message, { title = "", tone = "info", duration = 2600 } = {}) {
+  const nextMessage = String(message || "").trim();
+  if (!nextMessage) return;
+  const now = Date.now();
+  const token = `${tone}::${title}::${nextMessage}`;
+  if (token === lastDetailToastToken && now - lastDetailToastAt < 1400) {
+    return;
+  }
+  lastDetailToastToken = token;
+  lastDetailToastAt = now;
+  showToast(nextMessage, { title, tone, duration });
+}
+
+function requestLeafDetailPromotion(countryCode, { announce = false } = {}) {
+  if (!shouldRequireLeafDetail(countryCode)) return true;
+  if (hasLeafDetailReady(countryCode)) return true;
+
+  if (announce) {
+    showDetailPromotionToast("Loading detailed subdivisions for this country…", {
+      title: "Detail layer",
+      tone: "info",
+    });
+  }
+
+  if (!state.detailPromotionInFlight && typeof state.ensureDetailTopologyFn === "function") {
+    void state.ensureDetailTopologyFn();
+  }
+  return false;
+}
+
+async function ensureLeafDetailReady(countryCode, { announce = false } = {}) {
+  if (!shouldRequireLeafDetail(countryCode)) return true;
+  if (hasLeafDetailReady(countryCode)) return true;
+
+  if (announce) {
+    showDetailPromotionToast("Loading detailed subdivisions for this country…", {
+      title: "Detail layer",
+      tone: "info",
+      duration: 2200,
+    });
+  }
+
+  if (typeof state.ensureDetailTopologyFn !== "function") {
+    showDetailPromotionToast("Detailed subdivisions are unavailable in the current session.", {
+      title: "Detail layer unavailable",
+      tone: "warning",
+      duration: 3200,
+    });
+    return false;
+  }
+
+  const promoted = await state.ensureDetailTopologyFn();
+  if (!promoted || !hasLeafDetailReady(countryCode)) {
+    showDetailPromotionToast("Detailed subdivisions could not be loaded. Keep the detail layer enabled and try again.", {
+      title: "Detail layer unavailable",
+      tone: "warning",
+      duration: 3600,
+    });
+    return false;
+  }
+  return true;
+}
+
 function collectCountryCodesForFeatureIds(featureIds) {
   const codes = new Set();
   (Array.isArray(featureIds) ? featureIds : []).forEach((featureId) => {
@@ -7029,19 +7718,21 @@ function resolveParentGroupTargetIds(feature, featureId) {
   return Array.from(new Set(targetIds));
 }
 
-function resolveCountryFillTargetIds(feature, featureId) {
+function resolveCountryFillTargetIds(feature, featureId, { allowWhenParentGrouping = false } = {}) {
   if (!featureId || !state.landIndex?.has(featureId)) return [];
   const countryCode = getFeatureCountryCodeNormalized(feature);
   if (!countryCode) return [];
   const ids = getCountryFeatureIds(countryCode);
   if (ids.length < 2) return [];
 
-  const hasParentGrouping = ids.some((candidateId) => {
-    const candidateFeature = state.landIndex.get(candidateId);
-    if (!candidateFeature) return false;
-    return !!resolveParentGroupKey(candidateFeature, candidateId);
-  });
-  if (hasParentGrouping) return [];
+  if (!allowWhenParentGrouping) {
+    const hasParentGrouping = ids.some((candidateId) => {
+      const candidateFeature = state.landIndex.get(candidateId);
+      if (!candidateFeature) return false;
+      return !!resolveParentGroupKey(candidateFeature, candidateId);
+    });
+    if (hasParentGrouping) return [];
+  }
 
   return ids;
 }
@@ -7056,14 +7747,38 @@ function isBatchFillDoubleClickBaseEligible(hit, feature) {
   return true;
 }
 
-function isParentFillDoubleClickEligible(hit, feature) {
-  if (!isBatchFillDoubleClickBaseEligible(hit, feature)) return false;
-  return resolveParentGroupTargetIds(feature, hit.id).length >= 2;
+function buildDoubleClickBatchPlan(feature, featureId) {
+  if (!feature || !featureId) return null;
+  const requestedScope = String(state.batchFillScope || "parent") === "country" ? "country" : "parent";
+  if (requestedScope === "parent") {
+    const parentTargetIds = resolveParentGroupTargetIds(feature, featureId);
+    if (parentTargetIds.length >= 2) {
+      return {
+        targetIds: parentTargetIds,
+        kind: "fill-parent-group",
+        dirtyReason: "fill-parent-group",
+        fallbackToCountry: false,
+      };
+    }
+  }
+
+  const countryTargetIds = resolveCountryFillTargetIds(feature, featureId, {
+    allowWhenParentGrouping: true,
+  });
+  if (countryTargetIds.length >= 2) {
+    return {
+      targetIds: countryTargetIds,
+      kind: "fill-country-batch",
+      dirtyReason: "fill-country-batch",
+      fallbackToCountry: requestedScope === "parent",
+    };
+  }
+  return null;
 }
 
-function isCountryFillDoubleClickEligible(hit, feature) {
+function isDoubleClickBatchEligible(hit, feature) {
   if (!isBatchFillDoubleClickBaseEligible(hit, feature)) return false;
-  return resolveCountryFillTargetIds(feature, hit.id).length >= 2;
+  return !!buildDoubleClickBatchPlan(feature, hit.id);
 }
 
 function applyVisualSubdivisionFill(targetIds, selectedColor, { kind = "fill-feature-color", dirtyReason = kind } = {}) {
@@ -7156,21 +7871,19 @@ function executeBatchFill(action, resolverFn, kind) {
 
 function executeDoubleClickBatchFill(feature, featureId) {
   if (!feature || !featureId) return false;
-  const parentTargetIds = resolveParentGroupTargetIds(feature, featureId);
-  if (parentTargetIds.length) {
-    return applyVisualSubdivisionFill(parentTargetIds, state.selectedColor, {
-      kind: "fill-parent-group",
-      dirtyReason: "fill-parent-group",
+  const plan = buildDoubleClickBatchPlan(feature, featureId);
+  if (!plan?.targetIds?.length) return false;
+  if (plan.fallbackToCountry) {
+    showDetailPromotionToast("No parent group was available here. Double-click fell back to country fill.", {
+      title: "Quick fill scope",
+      tone: "info",
+      duration: 2400,
     });
   }
-  const countryTargetIds = resolveCountryFillTargetIds(feature, featureId);
-  if (countryTargetIds.length) {
-    return applyVisualSubdivisionFill(countryTargetIds, state.selectedColor, {
-      kind: "fill-country-batch",
-      dirtyReason: "fill-country-batch",
-    });
-  }
-  return false;
+  return applyVisualSubdivisionFill(plan.targetIds, state.selectedColor, {
+    kind: plan.kind,
+    dirtyReason: plan.dirtyReason,
+  });
 }
 
 function mergeHistorySnapshot(target, snapshot) {
@@ -7245,6 +7958,9 @@ function applyBrushHit(hit) {
   if (!feature) return false;
   const id = hit.id;
   const countryCode = hit.countryCode || getFeatureCountryCodeNormalized(feature);
+  if (!requestLeafDetailPromotion(countryCode, { announce: true })) {
+    return false;
+  }
   const targetIds = resolveInteractionTargetIds(feature, id);
   const selectedColor = getSafeCanvasColor(state.selectedColor, LAND_FILL_COLOR);
 
@@ -7401,7 +8117,7 @@ function handleBrushPointerMove(event) {
   }
 }
 
-function handleClick(event) {
+async function handleClick(event) {
   const actionStart = nowMs();
   if (!state.landData && !state.waterRegionsData && !state.scenarioSpecialRegionsData) return;
   if (suppressNextClickAfterBrush) {
@@ -7537,14 +8253,34 @@ function handleClick(event) {
       state.renderSpecialRegionListFn();
     }
   }
-  const feature = state.landIndex.get(id);
+  let landHit = hit;
+  let landId = id;
+  let feature = state.landIndex.get(landId);
   if (!feature) return;
-  const countryCode = hit.countryCode || getFeatureCountryCodeNormalized(feature);
-  const targetIds = resolveInteractionTargetIds(feature, id);
+  let countryCode = landHit.countryCode || getFeatureCountryCodeNormalized(feature);
+  if (!(await ensureLeafDetailReady(countryCode, { announce: true }))) {
+    return;
+  }
+  if (shouldRequireLeafDetail(countryCode)) {
+    const refreshedHit = getHitFromEvent(event, {
+      enableSnap: true,
+      snapPx: HIT_SNAP_RADIUS_CLICK_PX,
+      eventType: "click",
+    });
+    const refreshedId = refreshedHit.id;
+    const refreshedFeature = refreshedId ? state.landIndex.get(refreshedId) : null;
+    if (refreshedHit.targetType === "land" && refreshedId && refreshedFeature) {
+      landHit = refreshedHit;
+      landId = refreshedId;
+      feature = refreshedFeature;
+      countryCode = landHit.countryCode || getFeatureCountryCodeNormalized(feature);
+    }
+  }
+  const targetIds = resolveInteractionTargetIds(feature, landId);
 
   if (state.isEditingPreset) {
     if (typeof globalThis.togglePresetRegion === "function") {
-      globalThis.togglePresetRegion(id);
+      globalThis.togglePresetRegion(landId);
     }
     return;
   }
@@ -7622,7 +8358,7 @@ function handleClick(event) {
 
   if (state.currentTool === "eyedropper") {
     if (isSovereigntyModeActive()) {
-      const ownerCode = getFeatureOwnerCode(id) || countryCode;
+      const ownerCode = getFeatureOwnerCode(landId) || countryCode;
       if (ownerCode) {
         const previousActiveOwner = state.activeSovereignCode;
         state.activeSovereignCode = ownerCode;
@@ -7638,7 +8374,7 @@ function handleClick(event) {
         (state.interactionGranularity === "country" && countryCode
           ? getSafeCanvasColor(state.sovereignBaseColors?.[countryCode] || state.countryBaseColors?.[countryCode], null)
           : null) ||
-        getSafeCanvasColor(state.colors[id], null);
+        getSafeCanvasColor(state.colors[landId], null);
       if (picked) {
         state.selectedColor = picked;
         if (typeof state.updateSwatchUIFn === "function") {
@@ -7697,10 +8433,7 @@ function handleClick(event) {
     });
   } else {
     const clickCount = Math.max(1, Number(event?.detail || 1));
-    if (
-      clickCount >= 2 &&
-      (isParentFillDoubleClickEligible(hit, feature) || isCountryFillDoubleClickEligible(hit, feature))
-    ) {
+    if (clickCount >= 2 && isDoubleClickBatchEligible(landHit, feature)) {
       return;
     }
     applyVisualSubdivisionFill(targetIds, selectedColor, {
@@ -7722,7 +8455,7 @@ function handleClick(event) {
   noteRenderAction("click-fill", actionStart);
 }
 
-function handleDoubleClick(event) {
+async function handleDoubleClick(event) {
   const actionStart = nowMs();
   if (state.specialZoneEditor?.active) {
     if (event?.preventDefault) event.preventDefault();
@@ -7739,9 +8472,28 @@ function handleDoubleClick(event) {
   });
   const id = hit.id;
   if (!id) return;
-  const feature = state.landIndex.get(id);
+  let feature = state.landIndex.get(id);
   if (!feature) return;
-  executeDoubleClickBatchFill(feature, id);
+  let featureId = id;
+  let countryCode = hit.countryCode || getFeatureCountryCodeNormalized(feature);
+  if (!(await ensureLeafDetailReady(countryCode, { announce: true }))) {
+    return;
+  }
+  if (shouldRequireLeafDetail(countryCode)) {
+    const refreshedHit = getHitFromEvent(event, {
+      enableSnap: true,
+      snapPx: HIT_SNAP_RADIUS_CLICK_PX,
+      eventType: "dblclick",
+    });
+    const refreshedId = refreshedHit.id;
+    const refreshedFeature = refreshedId ? state.landIndex.get(refreshedId) : null;
+    if (refreshedHit.targetType === "land" && refreshedId && refreshedFeature) {
+      feature = refreshedFeature;
+      featureId = refreshedId;
+      countryCode = refreshedHit.countryCode || getFeatureCountryCodeNormalized(feature);
+    }
+  }
+  executeDoubleClickBatchFill(feature, featureId);
   noteRenderAction("double-click-fill", actionStart);
 }
 
@@ -8011,6 +8763,7 @@ function initMap({ containerId = "mapContainer" } = {}) {
 }
 
 function setMapData({ refitProjection = true, resetZoom = true } = {}) {
+  const startedAt = nowMs();
   clearRenderPhaseTimer();
   setRenderPhase(RENDER_PHASE_IDLE);
   resetRenderDiagnostics();
@@ -8039,6 +8792,7 @@ function setMapData({ refitProjection = true, resetZoom = true } = {}) {
   state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
   state.specialRegionOverrides = sanitizeColorMap(state.specialRegionOverrides);
   migrateLegacyColorState();
+  setCanvasSize();
   buildRuntimePoliticalMeta();
   state.sovereigntyInitialized = false;
   islandNeighborsCache = {
@@ -8070,6 +8824,12 @@ function setMapData({ refitProjection = true, resetZoom = true } = {}) {
     state.hitCanvasDirty = true;
   }
   render();
+  recordRenderPerfMetric("setMapData", nowMs() - startedAt, {
+    refitProjection: !!refitProjection,
+    resetZoom: !!resetZoom,
+    landCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
+    renderProfile: String(state.renderProfile || "auto"),
+  });
 }
 
 export {

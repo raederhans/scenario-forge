@@ -78,6 +78,7 @@ function updateUIText() {
     ["optColorModeRegion", "By Region"],
     ["optColorModePolitical", "By Neighbor (Political)"],
     ["lblPaintGranularity", "Paint Granularity"],
+    ["dockQuickFillLabel", "Double-Click Quick Fill"],
     ["lblReferenceImage", "Reference Image"],
     ["optPaintSubdivision", "By Subdivision"],
     ["optPaintCountry", "By Country"],
@@ -185,6 +186,9 @@ function updateUIText() {
     ["lblScenarioSpecialRegionVisibilityToggle", "Show Scenario Special Regions"],
     ["scenarioSpecialRegionVisibilityHint", "When off, scenario special regions are hidden and ignore hover, click, and paint."],
     ["scenarioSpecialRegionVisibilityHintEnabled", "Scenario special regions are currently visible and interactive."],
+    ["lblScenarioReliefOverlayVisibilityToggle", "Show Scenario Relief Overlays"],
+    ["scenarioReliefOverlayVisibilityHint", "When off, shoreline, basin contour, and texture overlays are hidden for the active scenario."],
+    ["scenarioReliefOverlayVisibilityHintEnabled", "Scenario relief overlays are currently visible. During pan and zoom they redraw only after the view settles."],
     ["lblProjectLegend", "Project & Legend"],
     ["lblDiagnostics", "Diagnostics"],
     ["lblCountryColors", "Country Colors"],
@@ -409,6 +413,9 @@ function toggleLanguage() {
   }
   if (typeof state.updateParentBorderCountryListFn === "function") {
     state.updateParentBorderCountryListFn();
+  }
+  if (typeof state.updatePaintModeUIFn === "function") {
+    state.updatePaintModeUIFn();
   }
   if (typeof state.updateSpecialZoneEditorUIFn === "function") {
     state.updateSpecialZoneEditorUIFn();

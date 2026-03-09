@@ -1310,6 +1310,8 @@ function initSidebar({ render } = {}) {
   const specialRegionInspectorSection = document.getElementById("specialRegionInspectorSection");
   const scenarioSpecialRegionVisibilityToggle = document.getElementById("scenarioSpecialRegionVisibilityToggle");
   const scenarioSpecialRegionVisibilityHint = document.getElementById("scenarioSpecialRegionVisibilityHint");
+  const scenarioReliefOverlayVisibilityToggle = document.getElementById("scenarioReliefOverlayVisibilityToggle");
+  const scenarioReliefOverlayVisibilityHint = document.getElementById("scenarioReliefOverlayVisibilityHint");
   const specialRegionSearchInput = document.getElementById("specialRegionSearch");
   const specialRegionList = document.getElementById("specialRegionList");
   const specialRegionLegendList = document.getElementById("specialRegionLegendList");
@@ -2317,28 +2319,109 @@ function initSidebar({ render } = {}) {
     }
     state.selectedInspectorCountryCode = normalized;
     state.inspectorHighlightCountryCode = normalized;
+    if (typeof state.updatePaintModeUIFn === "function") {
+      state.updatePaintModeUIFn();
+    }
     if (typeof state.renderNowFn === "function") {
       state.renderNowFn();
     }
     renderList();
   };
 
-  const getPrimaryReleasablePresetRef = (countryState) => {
+  const getPrimaryReleasablePresetRef = (countryState, { warnOnMissing = true } = {}) => {
     const presetLookupCode = countryState?.presetLookupCode || countryState?.code;
     const presets = Array.isArray(state.presetsState?.[presetLookupCode]) ? state.presetsState[presetLookupCode] : [];
     const presetIndex = presets.findIndex((preset) => String(preset?.preset_kind || "").trim() === "releasable_core");
-    if (presetIndex < 0) {
-      console.warn("[scenario] Missing releasable core preset for selected country.", {
-        code: countryState?.code || "",
+    if (presetIndex >= 0) {
+      return {
         presetLookupCode,
-      });
+        presetIndex,
+        preset: presets[presetIndex],
+      };
+    }
+
+    const scenarioMeta = getScenarioCountryMeta(countryState?.code) || countryState || {};
+    const boundaryVariants = Array.isArray(scenarioMeta?.boundary_variants)
+      ? scenarioMeta.boundary_variants
+      : Array.isArray(countryState?.boundaryVariants)
+        ? countryState.boundaryVariants
+        : [];
+    if (!boundaryVariants.length) {
+      if (warnOnMissing) {
+        console.warn("[scenario] Missing releasable core preset for selected country.", {
+          code: countryState?.code || "",
+          presetLookupCode,
+        });
+      }
+      return null;
+    }
+
+    const selectedVariantId = String(
+      scenarioMeta?.selected_boundary_variant_id
+      || countryState?.selectedBoundaryVariantId
+      || scenarioMeta?.default_boundary_variant_id
+      || countryState?.defaultBoundaryVariantId
+      || ""
+    ).trim().toLowerCase();
+    const selectedVariant = boundaryVariants.find(
+      (variant) => String(variant?.id || "").trim().toLowerCase() === selectedVariantId
+    ) || boundaryVariants[0];
+    const presetSourceLookup = {
+      tag: scenarioMeta?.tag || countryState?.code || "",
+      release_lookup_iso2:
+        scenarioMeta?.release_lookup_iso2
+        || scenarioMeta?.releaseLookupIso2
+        || scenarioMeta?.lookup_iso2
+        || scenarioMeta?.lookupIso2
+        || scenarioMeta?.base_iso2
+        || scenarioMeta?.baseIso2
+        || "",
+      lookup_iso2:
+        scenarioMeta?.lookup_iso2
+        || scenarioMeta?.lookupIso2
+        || scenarioMeta?.release_lookup_iso2
+        || scenarioMeta?.releaseLookupIso2
+        || scenarioMeta?.base_iso2
+        || scenarioMeta?.baseIso2
+        || "",
+      base_iso2:
+        scenarioMeta?.base_iso2
+        || scenarioMeta?.baseIso2
+        || "",
+    };
+    const featureIds = resolveFeatureIdsFromPresetSource(selectedVariant?.preset_source, presetSourceLookup);
+    if (!featureIds.length) {
+      if (warnOnMissing) {
+        console.warn("[scenario] Boundary variant exists but resolved zero feature ids.", {
+          code: countryState?.code || "",
+          presetLookupCode,
+          variantId: selectedVariant?.id || "",
+        });
+      }
       return null;
     }
     return {
       presetLookupCode,
-      presetIndex,
-      preset: presets[presetIndex],
+      presetIndex: -1,
+      preset: {
+        name: t("Core Territory", "ui"),
+        ids: featureIds,
+        generated: true,
+        locked: true,
+        preset_kind: "releasable_core",
+        releasable_tag: countryState?.code || "",
+        boundary_variant_id: String(selectedVariant?.id || "").trim(),
+      },
     };
+  };
+
+  const hasScenarioCoreTerritoryActions = (countryState) => {
+    if (!countryState) return false;
+    if (countryState.releasable) return true;
+    if (Array.isArray(countryState?.boundaryVariants) && countryState.boundaryVariants.length > 1) {
+      return true;
+    }
+    return !!getPrimaryReleasablePresetRef(countryState, { warnOnMissing: false });
   };
 
   const applyScenarioReleasableCoreTerritory = (
@@ -3243,9 +3326,13 @@ function initSidebar({ render } = {}) {
 
   const renderSpecialRegionInspectorUi = () => {
     const hasScenarioSpecialRegions = !!state.activeScenarioId && (state.specialRegionsById?.size || 0) > 0;
+    const hasScenarioReliefOverlays =
+      !!state.activeScenarioId &&
+      (Array.isArray(state.scenarioReliefOverlaysData?.features) ? state.scenarioReliefOverlaysData.features.length : 0) > 0;
+    const hasScenarioInspectorContent = hasScenarioSpecialRegions || hasScenarioReliefOverlays;
     if (specialRegionInspectorSection) {
-      specialRegionInspectorSection.classList.toggle("hidden", !hasScenarioSpecialRegions);
-      if (hasScenarioSpecialRegions) {
+      specialRegionInspectorSection.classList.toggle("hidden", !hasScenarioInspectorContent);
+      if (hasScenarioInspectorContent) {
         specialRegionInspectorSection.open = true;
       }
     }
@@ -3256,6 +3343,17 @@ function initSidebar({ render } = {}) {
       scenarioSpecialRegionVisibilityHint.textContent = state.showScenarioSpecialRegions
         ? t("Scenario special regions are currently visible and interactive.", "ui")
         : t("When off, scenario special regions are hidden and ignore hover, click, and paint.", "ui");
+    }
+    if (scenarioReliefOverlayVisibilityToggle) {
+      scenarioReliefOverlayVisibilityToggle.checked = !!state.showScenarioReliefOverlays;
+    }
+    if (scenarioReliefOverlayVisibilityHint) {
+      scenarioReliefOverlayVisibilityHint.textContent = state.showScenarioReliefOverlays
+        ? t(
+          "Scenario relief overlays are currently visible. During pan and zoom they redraw only after the view settles.",
+          "ui"
+        )
+        : t("When off, shoreline, basin contour, and texture overlays are hidden for the active scenario.", "ui");
     }
   };
 
@@ -3690,6 +3788,7 @@ function initSidebar({ render } = {}) {
   state.updateWaterInteractionUIFn = renderWaterInteractionUi;
   state.renderSpecialRegionListFn = renderSpecialRegionList;
   state.updateScenarioSpecialRegionUIFn = renderSpecialRegionInspectorUi;
+  state.updateScenarioReliefOverlayUIFn = renderSpecialRegionInspectorUi;
 
   if (waterInspectorOpenOceanToggle && !waterInspectorOpenOceanToggle.dataset.bound) {
     waterInspectorOpenOceanToggle.addEventListener("change", (event) => {
@@ -3720,6 +3819,16 @@ function initSidebar({ render } = {}) {
       if (render) render();
     });
     scenarioSpecialRegionVisibilityToggle.dataset.bound = "true";
+  }
+
+  if (scenarioReliefOverlayVisibilityToggle && !scenarioReliefOverlayVisibilityToggle.dataset.bound) {
+    scenarioReliefOverlayVisibilityToggle.addEventListener("change", (event) => {
+      state.showScenarioReliefOverlays = !!event.target.checked;
+      markDirty("toggle-scenario-relief-overlays");
+      renderSpecialRegionInspectorUi();
+      if (render) render();
+    });
+    scenarioReliefOverlayVisibilityToggle.dataset.bound = "true";
   }
 
   if (waterInspectorColorSwatch && waterInspectorColorInput && !waterInspectorColorSwatch.dataset.bound) {
@@ -4030,6 +4139,10 @@ function initSidebar({ render } = {}) {
       });
     } else {
       groupSection.appendChild(createEmptyNote(t("No hierarchy groups", "ui")));
+    }
+
+    if (String(state.activeScenarioId || "").trim() === "tno_1962" && normalizeCountryCode(countryState?.code) === "GER") {
+      return;
     }
 
     const presetSection = appendActionSection(container, t("Regional Presets", "ui"));
@@ -4559,7 +4672,7 @@ function initSidebar({ render } = {}) {
       return;
     }
 
-    if (countryState.releasable) {
+    if (hasScenarioCoreTerritoryActions(countryState)) {
       renderScenarioReleasableActions(container, countryState);
     } else {
       renderScenarioParentActions(container, countryState);
@@ -4929,6 +5042,10 @@ function initSidebar({ render } = {}) {
             data.layerVisibility.showScenarioSpecialRegions === undefined
               ? true
               : !!data.layerVisibility.showScenarioSpecialRegions;
+          state.showScenarioReliefOverlays =
+            data.layerVisibility.showScenarioReliefOverlays === undefined
+              ? true
+              : !!data.layerVisibility.showScenarioReliefOverlays;
           state.showUrban = !!data.layerVisibility.showUrban;
           state.showPhysical = !!data.layerVisibility.showPhysical;
           state.showRivers = !!data.layerVisibility.showRivers;

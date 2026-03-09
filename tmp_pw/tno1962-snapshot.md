@@ -1,0 +1,620 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - generic [ref=e7]:
+            - heading "Map Creator" [level=1] [ref=e8]
+            - generic [ref=e947]: "*"
+          - button "EN / 中文" [ref=e9] [cursor=pointer]
+        - paragraph [ref=e10]: Click countries to paint. Use the dock below the map for quick tools and the left panel for deeper controls.
+      - generic [ref=e11]:
+        - generic [ref=e12]: Color Library
+        - paragraph [ref=e13]: Browse the full palette library for manual work and palette reference.
+        - button "Browse All Colors" [ref=e14] [cursor=pointer]
+        - text: ▸ ▸ ▸ ▸
+      - generic [ref=e15]:
+        - generic [ref=e16]: Scenario
+        - paragraph [ref=e17]: Load a bundled historical setup and reset to its baseline.
+        - generic [ref=e18]: TNO 1962
+        - generic [ref=e948]: "Frontline: 606 split features."
+        - generic [ref=e19]: Scenario
+        - combobox "Scenario" [ref=e20]:
+          - option "None"
+          - option "HOI4 1936"
+          - option "HOI4 1939"
+          - option "TNO 1962" [selected]
+        - generic [ref=e21]: View
+        - combobox "View" [ref=e949]:
+          - option "Ownership" [selected]
+          - option "Frontline"
+        - button "Reset Changes To Baseline" [ref=e950] [cursor=pointer]
+        - button "Exit Scenario" [ref=e951] [cursor=pointer]
+      - group [ref=e24]:
+        - generic "Appearance ▸" [ref=e25] [cursor=pointer]
+        - tablist "Appearance sections" [ref=e27]:
+          - tab "Ocean" [selected] [ref=e28] [cursor=pointer]
+          - tab "Borders" [ref=e29] [cursor=pointer]
+          - tab "Context Layers" [ref=e30] [cursor=pointer]
+          - tab "Day / Night" [ref=e31] [cursor=pointer]
+          - tab "Texture" [ref=e32] [cursor=pointer]
+        - generic [ref=e33]:
+          - tabpanel "Ocean" [ref=e34]:
+            - generic [ref=e35]: Ocean
+            - generic [ref=e36]:
+              - generic [ref=e37]:
+                - generic [ref=e38]: Fill Color
+                - textbox "Fill Color" [ref=e39] [cursor=pointer]: "#2d4769"
+              - generic [ref=e40]:
+                - generic [ref=e42]: Style
+                - combobox "Style" [ref=e43]:
+                  - option "Flat Blue" [selected]
+                  - option "Bathymetry Soft" [disabled]
+                  - option "Bathymetry Contours" [disabled]
+                  - option "Wave Hachure" [disabled]
+              - generic [ref=e44]:
+                - generic [ref=e45]:
+                  - generic [ref=e46]: Opacity
+                  - generic [ref=e47]: 72%
+                - slider "Opacity" [disabled] [ref=e48]: "72"
+              - generic [ref=e49]:
+                - generic [ref=e50]:
+                  - generic [ref=e51]: Scale
+                  - generic [ref=e52]: 1.00x
+                - slider "Scale" [disabled] [ref=e53]: "100"
+              - generic [ref=e54]:
+                - generic [ref=e55]:
+                  - generic [ref=e56]: Contour Strength
+                  - generic [ref=e57]: 75%
+                - slider "Contour Strength" [disabled] [ref=e58]: "75"
+          - text: ▸ ▸ ▸ ▸ ▸ ▸ ▸ ▸ ▸ ▸ ▸ ▸
+      - region "Special zone editor" [ref=e59]:
+        - generic [ref=e60]: Special Zone Editor
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - generic [ref=e63]: Type
+            - combobox "Type" [ref=e64]:
+              - option "Disputed"
+              - option "Wasteland"
+              - option "Custom" [selected]
+          - generic [ref=e65]:
+            - text: Label
+            - textbox "Label" [ref=e66]:
+              - /placeholder: e.g. Buffer Zone A
+          - generic [ref=e67]:
+            - button "Start Draw" [ref=e68] [cursor=pointer]
+            - button "Undo Vertex" [disabled] [ref=e69]
+          - generic [ref=e70]:
+            - button "Finish" [disabled] [ref=e71]
+            - button "Cancel" [disabled] [ref=e72]
+          - generic [ref=e73]:
+            - text: Manual Zones
+            - combobox "Manual Zones" [ref=e74]:
+              - option "No manual zones" [selected]
+          - button "Delete Selected" [disabled] [ref=e75]
+          - generic [ref=e76]: Click map to add vertices, double-click to finish.
+  - link "Skip to map workspace" [ref=e77] [cursor=pointer]:
+    - /url: "#mapContainer"
+  - main [ref=e78]:
+    - generic [ref=e79]:
+      - generic [ref=e80]:
+        - img
+      - generic: Click a region to start painting, or use Auto-Fill to color all countries
+      - generic [ref=e85]:
+        - button "Collapse" [ref=e209] [cursor=pointer]: "-"
+        - generic [ref=e87]:
+          - generic [ref=e88]: S
+          - 'generic "Scenario: TNO 1962" [ref=e952]': TNO 1962
+        - generic [ref=e93]:
+          - generic [ref=e94]: A
+          - 'generic "Active: Germany (GER)" [ref=e953]': Germany (GER)
+        - button "Show scenario guide" [ref=e96] [cursor=pointer]: "?"
+      - group "Map zoom controls" [ref=e97]:
+        - button "Zoom out" [ref=e98] [cursor=pointer]: "-"
+        - textbox "Zoom percentage" [ref=e99]: 606%
+        - button "Zoom in" [ref=e100] [cursor=pointer]: +
+        - button "Fit" [ref=e211] [cursor=pointer]
+      - region "Quick edit dock" [ref=e102]:
+        - button "Collapse quick dock" [pressed] [ref=e104] [cursor=pointer]: Expand
+        - generic [ref=e105]:
+          - toolbar "Current tool" [ref=e107]:
+            - button "Fill tool" [pressed] [ref=e108] [cursor=pointer]:
+              - img [ref=e109]
+            - button "Eraser tool" [ref=e112] [cursor=pointer]:
+              - img [ref=e113]
+            - button "Eyedropper tool" [ref=e115] [cursor=pointer]:
+              - img [ref=e116]
+            - button "Brush" [ref=e119] [cursor=pointer]:
+              - img [ref=e120]
+          - generic [ref=e137]:
+            - 'button "Selected color: #871818" [ref=e212] [cursor=pointer]'
+            - textbox "Custom color" [ref=e139] [cursor=pointer]: "#871818"
+            - combobox [ref=e140]:
+              - option "HOI4 Vanilla"
+              - option "Kaiserreich"
+              - option "The New Order" [selected]
+              - option "Red Flood"
+          - generic [ref=e142]:
+            - combobox [ref=e143]:
+              - option "By Region"
+              - option "By Neighbor (Political)" [selected]
+            - button "Auto-Fill Countries" [ref=e144] [cursor=pointer]:
+              - img [ref=e1617]
+              - generic [ref=e147]: Auto-Fill Countries
+            - button "Clear Map" [ref=e148] [cursor=pointer]
+  - complementary [ref=e160]:
+    - generic [ref=e161]:
+      - generic [ref=e163]:
+        - generic [ref=e164]: Search Countries
+        - generic [ref=e165]:
+          - img [ref=e166]
+          - textbox "Search Countries" [ref=e169]:
+            - /placeholder: Search country or code...
+      - group [ref=e170]:
+        - generic "Country Inspector ▸" [ref=e171] [cursor=pointer]
+        - generic [ref=e172]:
+          - generic [ref=e173]: Country Colors
+          - generic [ref=e220]:
+            - button "Africa (2) >" [ref=e966] [cursor=pointer]:
+              - generic [ref=e968]: Africa (2)
+              - text: ">"
+            - button "Asia (16) >" [ref=e970] [cursor=pointer]:
+              - generic [ref=e972]: Asia (16)
+              - text: ">"
+            - generic [ref=e973]:
+              - button "Europe (36) v" [expanded] [ref=e974] [cursor=pointer]:
+                - generic [ref=e976]: Europe (36)
+                - text: v
+              - generic [ref=e977]:
+                - button "Reichskommissariat Moskowien (RKM) Eastern Europe" [ref=e979] [cursor=pointer]:
+                  - generic [ref=e980]: Reichskommissariat Moskowien (RKM)
+                  - generic [ref=e981]: Eastern Europe
+                - button "Soviet Union (SOV) Eastern Europe" [ref=e985] [cursor=pointer]:
+                  - generic [ref=e986]: Soviet Union (SOV)
+                  - generic [ref=e987]: Eastern Europe
+                - button "Germany (GER) Western Europe" [pressed] [ref=e991] [cursor=pointer]:
+                  - generic [ref=e992]: Germany (GER)
+                  - generic [ref=e993]: Western Europe
+                - button "Reichskommissariat Ukraine (RKU) Eastern Europe" [ref=e997] [cursor=pointer]:
+                  - generic [ref=e998]: Reichskommissariat Ukraine (RKU)
+                  - generic [ref=e999]: Eastern Europe
+                - generic [ref=e1003] [cursor=pointer]:
+                  - button "France (FRA) Western Europe" [ref=e1004]:
+                    - generic [ref=e1005]: France (FRA)
+                    - generic [ref=e1006]: Western Europe
+                  - generic [ref=e1007]:
+                    - generic [ref=e1008]: "5"
+                    - button "5 Related Countries" [ref=e1009]: ">"
+                - generic [ref=e1012] [cursor=pointer]:
+                  - button "Britain (ENG) Northern Europe" [ref=e1013]:
+                    - generic [ref=e1014]: Britain (ENG)
+                    - generic [ref=e1015]: Northern Europe
+                  - generic [ref=e1016]:
+                    - generic [ref=e1017]: "7"
+                    - button "7 Related Countries" [ref=e1018]: ">"
+                - generic [ref=e1021] [cursor=pointer]:
+                  - button "Italy (ITA) Southern Europe" [ref=e1022]:
+                    - generic [ref=e1023]: Italy (ITA)
+                    - generic [ref=e1024]: Southern Europe
+                  - generic [ref=e1025]:
+                    - generic [ref=e1026]: "11"
+                    - button "11 Related Countries" [ref=e1027]: ">"
+                - button "Reichskommissariat Polen (RKP) Eastern Europe" [ref=e1030] [cursor=pointer]:
+                  - generic [ref=e1031]: Reichskommissariat Polen (RKP)
+                  - generic [ref=e1032]: Eastern Europe
+                - button "Romania (ROM) Eastern Europe" [ref=e1036] [cursor=pointer]:
+                  - generic [ref=e1037]: Romania (ROM)
+                  - generic [ref=e1038]: Eastern Europe
+                - generic [ref=e1042] [cursor=pointer]:
+                  - button "Spain (SPR) Southern Europe" [ref=e1043]:
+                    - generic [ref=e1044]: Spain (SPR)
+                    - generic [ref=e1045]: Southern Europe
+                  - generic [ref=e1046]:
+                    - generic [ref=e1047]: "3"
+                    - button "3 Related Countries" [ref=e1048]: ">"
+                - button "Reichskommissariat Ostland (RKO) Northern Europe" [ref=e1051] [cursor=pointer]:
+                  - generic [ref=e1052]: Reichskommissariat Ostland (RKO)
+                  - generic [ref=e1053]: Northern Europe
+                - generic [ref=e1057] [cursor=pointer]:
+                  - button "Portugal (POR) Southern Europe" [ref=e1058]:
+                    - generic [ref=e1059]: Portugal (POR)
+                    - generic [ref=e1060]: Southern Europe
+                  - generic [ref=e1061]:
+                    - generic [ref=e1062]: "2"
+                    - button "2 Related Countries" [ref=e1063]: ">"
+                - button "Ordensstaat Burgund (BRG) Western Europe" [ref=e1066] [cursor=pointer]:
+                  - generic [ref=e1067]: Ordensstaat Burgund (BRG)
+                  - generic [ref=e1068]: Western Europe
+                - button "Finland (FIN) Northern Europe" [ref=e1072] [cursor=pointer]:
+                  - generic [ref=e1073]: Finland (FIN)
+                  - generic [ref=e1074]: Northern Europe
+                - button "Hungary (HUN) Eastern Europe" [ref=e1078] [cursor=pointer]:
+                  - generic [ref=e1079]: Hungary (HUN)
+                  - generic [ref=e1080]: Eastern Europe
+                - button "Reichskommissariat Niederlande (RKN) Western Europe" [ref=e1084] [cursor=pointer]:
+                  - generic [ref=e1085]: Reichskommissariat Niederlande (RKN)
+                  - generic [ref=e1086]: Western Europe
+                - button "Switzerland (SWI) Western Europe" [ref=e1090] [cursor=pointer]:
+                  - generic [ref=e1091]: Switzerland (SWI)
+                  - generic [ref=e1092]: Western Europe
+                - button "Bulgaria (BUL) Eastern Europe" [ref=e1096] [cursor=pointer]:
+                  - generic [ref=e1097]: Bulgaria (BUL)
+                  - generic [ref=e1098]: Eastern Europe
+                - button "Sweden (SWE) Northern Europe" [ref=e1102] [cursor=pointer]:
+                  - generic [ref=e1103]: Sweden (SWE)
+                  - generic [ref=e1104]: Northern Europe
+                - button "Reichskommissariat Norwegen (RKNO) Northern Europe" [ref=e1108] [cursor=pointer]:
+                  - generic [ref=e1109]: Reichskommissariat Norwegen (RKNO)
+                  - generic [ref=e1110]: Northern Europe
+                - button "Denmark (DEN) Northern Europe" [ref=e1114] [cursor=pointer]:
+                  - generic [ref=e1115]: Denmark (DEN)
+                  - generic [ref=e1116]: Northern Europe
+                - button "Netherlands (HOL) Western Europe" [ref=e1120] [cursor=pointer]:
+                  - generic [ref=e1121]: Netherlands (HOL)
+                  - generic [ref=e1122]: Western Europe
+                - button "Iceland (ICE) Northern Europe" [ref=e1126] [cursor=pointer]:
+                  - generic [ref=e1127]: Iceland (ICE)
+                  - generic [ref=e1128]: Northern Europe
+                - generic [ref=e1132] [cursor=pointer]:
+                  - button "Belgium (BEL) Western Europe" [ref=e1133]:
+                    - generic [ref=e1134]: Belgium (BEL)
+                    - generic [ref=e1135]: Western Europe
+                  - generic [ref=e1136]:
+                    - generic [ref=e1137]: "1"
+                    - button "1 Related Countries" [ref=e1138]: ">"
+                - button "Estonia (EST) Northern Europe" [ref=e1141] [cursor=pointer]:
+                  - generic [ref=e1142]: Estonia (EST)
+                  - generic [ref=e1143]: Northern Europe
+                - button "Latvia (LAT) Northern Europe" [ref=e1147] [cursor=pointer]:
+                  - generic [ref=e1148]: Latvia (LAT)
+                  - generic [ref=e1149]: Northern Europe
+                - button "Lithuania (LIT) Northern Europe" [ref=e1153] [cursor=pointer]:
+                  - generic [ref=e1154]: Lithuania (LIT)
+                  - generic [ref=e1155]: Northern Europe
+                - button "Norway (NOR) Northern Europe" [ref=e1159] [cursor=pointer]:
+                  - generic [ref=e1160]: Norway (NOR)
+                  - generic [ref=e1161]: Northern Europe
+                - button "Poland (POL) Eastern Europe" [ref=e1165] [cursor=pointer]:
+                  - generic [ref=e1166]: Poland (POL)
+                  - generic [ref=e1167]: Eastern Europe
+                - button "Slovakia (SLO) Eastern Europe" [ref=e1171] [cursor=pointer]:
+                  - generic [ref=e1172]: Slovakia (SLO)
+                  - generic [ref=e1173]: Eastern Europe
+                - button "Scotland (SCO) Northern Europe" [ref=e1177] [cursor=pointer]:
+                  - generic [ref=e1178]: Scotland (SCO)
+                  - generic [ref=e1179]: Northern Europe
+                - button "Ireland (IRE) Northern Europe" [ref=e1183] [cursor=pointer]:
+                  - generic [ref=e1184]: Ireland (IRE)
+                  - generic [ref=e1185]: Northern Europe
+                - button "Brittany (BRI) Western Europe" [ref=e1189] [cursor=pointer]:
+                  - generic [ref=e1190]: Brittany (BRI)
+                  - generic [ref=e1191]: Western Europe
+                - button "Wales (WLS) Northern Europe" [ref=e1195] [cursor=pointer]:
+                  - generic [ref=e1196]: Wales (WLS)
+                  - generic [ref=e1197]: Northern Europe
+                - button "Tannu Tuva (TAN) Eastern Europe" [ref=e1201] [cursor=pointer]:
+                  - generic [ref=e1202]: Tannu Tuva (TAN)
+                  - generic [ref=e1203]: Eastern Europe
+                - button "Luxembourg (LUX) Western Europe" [ref=e1207] [cursor=pointer]:
+                  - generic [ref=e1208]: Luxembourg (LUX)
+                  - generic [ref=e1209]: Western Europe
+            - button "North America (14) >" [ref=e1213] [cursor=pointer]:
+              - generic [ref=e1215]: North America (14)
+              - text: ">"
+            - button "South America (10) >" [ref=e1217] [cursor=pointer]:
+              - generic [ref=e1219]: South America (10)
+              - text: ">"
+            - button "Oceania (1) >" [ref=e1221] [cursor=pointer]:
+              - generic [ref=e1223]: Oceania (1)
+              - text: ">"
+          - generic [ref=e1224]:
+            - button "Stop Using as Active Owner" [pressed] [ref=e1226] [cursor=pointer]
+            - generic [ref=e1227]:
+              - generic [ref=e1228]: Country Color
+              - generic [ref=e1229]:
+                - 'button "Edit country color: Germany (#3C3C3C)" [ref=e1230] [cursor=pointer]'
+                - generic [ref=e1231]: "#3C3C3C"
+                - textbox: "#3c3c3c"
+          - button "Reset Country Colors" [ref=e179] [cursor=pointer]
+      - group [ref=e180]:
+        - generic "Water Regions ▸" [ref=e181] [cursor=pointer]
+        - generic [ref=e182]:
+          - generic [ref=e183]:
+            - generic [ref=e184]: Interaction
+            - generic [ref=e185] [cursor=pointer]:
+              - checkbox "Allow Open-Ocean Interaction" [ref=e186]
+              - generic [ref=e187]: Allow Open-Ocean Interaction
+            - paragraph [ref=e188]: When off, macro ocean regions are ignored for hover, click, and paint.
+          - generic [ref=e189]:
+            - generic [ref=e190]: Search Water Regions
+            - generic [ref=e191]:
+              - img [ref=e192]
+              - textbox "Search Water Regions" [ref=e195]:
+                - /placeholder: Search sea, lake, or strait...
+          - generic [ref=e548]:
+            - button "Andaman Sea sea · marine macro" [ref=e1232] [cursor=pointer]:
+              - generic [ref=e1233]:
+                - generic [ref=e1234]: Andaman Sea
+                - generic [ref=e1235]: sea · marine macro
+            - button "Arabian Sea sea · marine macro" [ref=e1238] [cursor=pointer]:
+              - generic [ref=e1239]:
+                - generic [ref=e1240]: Arabian Sea
+                - generic [ref=e1241]: sea · marine macro
+            - button "Aral Sea inland sea · eurasia lakes" [ref=e1244] [cursor=pointer]:
+              - generic [ref=e1245]:
+                - generic [ref=e1246]: Aral Sea
+                - generic [ref=e1247]: inland sea · eurasia lakes
+            - button "Baffin Bay bay · marine macro" [ref=e1250] [cursor=pointer]:
+              - generic [ref=e1251]:
+                - generic [ref=e1252]: Baffin Bay
+                - generic [ref=e1253]: bay · marine macro
+            - button "Baikal lake · eurasia lakes" [ref=e1256] [cursor=pointer]:
+              - generic [ref=e1257]:
+                - generic [ref=e1258]: Baikal
+                - generic [ref=e1259]: lake · eurasia lakes
+            - button "Balkhash lake · eurasia lakes" [ref=e1262] [cursor=pointer]:
+              - generic [ref=e1263]:
+                - generic [ref=e1264]: Balkhash
+                - generic [ref=e1265]: lake · eurasia lakes
+            - button "Baltic Sea sea · marine macro" [ref=e1268] [cursor=pointer]:
+              - generic [ref=e1269]:
+                - generic [ref=e1270]: Baltic Sea
+                - generic [ref=e1271]: sea · marine macro
+            - button "Banda Sea sea · marine macro" [ref=e1274] [cursor=pointer]:
+              - generic [ref=e1275]:
+                - generic [ref=e1276]: Banda Sea
+                - generic [ref=e1277]: sea · marine macro
+            - button "Barents Sea sea · marine macro" [ref=e1280] [cursor=pointer]:
+              - generic [ref=e1281]:
+                - generic [ref=e1282]: Barents Sea
+                - generic [ref=e1283]: sea · marine macro
+            - button "Bay of Bengal bay · marine macro" [ref=e1286] [cursor=pointer]:
+              - generic [ref=e1287]:
+                - generic [ref=e1288]: Bay of Bengal
+                - generic [ref=e1289]: bay · marine macro
+            - button "Bay of Biscay bay · marine macro" [ref=e1292] [cursor=pointer]:
+              - generic [ref=e1293]:
+                - generic [ref=e1294]: Bay of Biscay
+                - generic [ref=e1295]: bay · marine macro
+            - button "Beaufort Sea sea · marine macro" [ref=e1298] [cursor=pointer]:
+              - generic [ref=e1299]:
+                - generic [ref=e1300]: Beaufort Sea
+                - generic [ref=e1301]: sea · marine macro
+            - button "Black Sea sea · marine macro" [ref=e1304] [cursor=pointer]:
+              - generic [ref=e1305]:
+                - generic [ref=e1306]: Black Sea
+                - generic [ref=e1307]: sea · marine macro
+            - button "Caribbean Sea sea · marine macro" [ref=e1310] [cursor=pointer]:
+              - generic [ref=e1311]:
+                - generic [ref=e1312]: Caribbean Sea
+                - generic [ref=e1313]: sea · marine macro
+            - button "Caspian inland sea · eurasia lakes" [ref=e1316] [cursor=pointer]:
+              - generic [ref=e1317]:
+                - generic [ref=e1318]: Caspian
+                - generic [ref=e1319]: inland sea · eurasia lakes
+            - button "Celebes Sea sea · marine macro" [ref=e1322] [cursor=pointer]:
+              - generic [ref=e1323]:
+                - generic [ref=e1324]: Celebes Sea
+                - generic [ref=e1325]: sea · marine macro
+            - button "Congo Lake lake · tno congo basin" [ref=e1328] [cursor=pointer]:
+              - generic [ref=e1329]:
+                - generic [ref=e1330]: Congo Lake
+                - generic [ref=e1331]: lake · tno congo basin
+            - button "East China Sea sea · marine macro" [ref=e1334] [cursor=pointer]:
+              - generic [ref=e1335]:
+                - generic [ref=e1336]: East China Sea
+                - generic [ref=e1337]: sea · marine macro
+            - button "Erie lake · great lakes" [ref=e1340] [cursor=pointer]:
+              - generic [ref=e1341]:
+                - generic [ref=e1342]: Erie
+                - generic [ref=e1343]: lake · great lakes
+            - button "Great Australian Bight bight · marine macro" [ref=e1346] [cursor=pointer]:
+              - generic [ref=e1347]:
+                - generic [ref=e1348]: Great Australian Bight
+                - generic [ref=e1349]: bight · marine macro
+            - button "Greenland Sea sea · marine macro" [ref=e1352] [cursor=pointer]:
+              - generic [ref=e1353]:
+                - generic [ref=e1354]: Greenland Sea
+                - generic [ref=e1355]: sea · marine macro
+            - button "Gulf of Aden gulf · marine macro" [ref=e1358] [cursor=pointer]:
+              - generic [ref=e1359]:
+                - generic [ref=e1360]: Gulf of Aden
+                - generic [ref=e1361]: gulf · marine macro
+            - button "Gulf of Alaska gulf · marine macro" [ref=e1364] [cursor=pointer]:
+              - generic [ref=e1365]:
+                - generic [ref=e1366]: Gulf of Alaska
+                - generic [ref=e1367]: gulf · marine macro
+            - button "Gulf of Carpentaria gulf · marine macro" [ref=e1370] [cursor=pointer]:
+              - generic [ref=e1371]:
+                - generic [ref=e1372]: Gulf of Carpentaria
+                - generic [ref=e1373]: gulf · marine macro
+            - button "Gulf of Guinea gulf · marine macro" [ref=e1376] [cursor=pointer]:
+              - generic [ref=e1377]:
+                - generic [ref=e1378]: Gulf of Guinea
+                - generic [ref=e1379]: gulf · marine macro
+            - button "Gulf of Mexico gulf · marine macro" [ref=e1382] [cursor=pointer]:
+              - generic [ref=e1383]:
+                - generic [ref=e1384]: Gulf of Mexico
+                - generic [ref=e1385]: gulf · marine macro
+            - button "Gulf of Oman gulf · marine macro" [ref=e1388] [cursor=pointer]:
+              - generic [ref=e1389]:
+                - generic [ref=e1390]: Gulf of Oman
+                - generic [ref=e1391]: gulf · marine macro
+            - button "Hudson Bay bay · marine macro" [ref=e1394] [cursor=pointer]:
+              - generic [ref=e1395]:
+                - generic [ref=e1396]: Hudson Bay
+                - generic [ref=e1397]: bay · marine macro
+            - button "Huron lake · great lakes" [ref=e1400] [cursor=pointer]:
+              - generic [ref=e1401]:
+                - generic [ref=e1402]: Huron
+                - generic [ref=e1403]: lake · great lakes
+            - button "Irish Sea sea · marine macro" [ref=e1406] [cursor=pointer]:
+              - generic [ref=e1407]:
+                - generic [ref=e1408]: Irish Sea
+                - generic [ref=e1409]: sea · marine macro
+            - button "Java Sea sea · marine macro" [ref=e1412] [cursor=pointer]:
+              - generic [ref=e1413]:
+                - generic [ref=e1414]: Java Sea
+                - generic [ref=e1415]: sea · marine macro
+            - button "Labrador Sea sea · marine macro" [ref=e1418] [cursor=pointer]:
+              - generic [ref=e1419]:
+                - generic [ref=e1420]: Labrador Sea
+                - generic [ref=e1421]: sea · marine macro
+            - button "Ladoga lake · eurasia lakes" [ref=e1424] [cursor=pointer]:
+              - generic [ref=e1425]:
+                - generic [ref=e1426]: Ladoga
+                - generic [ref=e1427]: lake · eurasia lakes
+            - button "Malawi / Nyasa lake · african great lakes" [ref=e1430] [cursor=pointer]:
+              - generic [ref=e1431]:
+                - generic [ref=e1432]: Malawi / Nyasa
+                - generic [ref=e1433]: lake · african great lakes
+            - button "Michigan lake · great lakes" [ref=e1436] [cursor=pointer]:
+              - generic [ref=e1437]:
+                - generic [ref=e1438]: Michigan
+                - generic [ref=e1439]: lake · great lakes
+            - button "Mozambique Channel channel · marine macro" [ref=e1442] [cursor=pointer]:
+              - generic [ref=e1443]:
+                - generic [ref=e1444]: Mozambique Channel
+                - generic [ref=e1445]: channel · marine macro
+            - button "North Sea sea · marine macro" [ref=e1448] [cursor=pointer]:
+              - generic [ref=e1449]:
+                - generic [ref=e1450]: North Sea
+                - generic [ref=e1451]: sea · marine macro
+            - button "Norwegian Sea sea · marine macro" [ref=e1454] [cursor=pointer]:
+              - generic [ref=e1455]:
+                - generic [ref=e1456]: Norwegian Sea
+                - generic [ref=e1457]: sea · marine macro
+            - button "Onega lake · eurasia lakes" [ref=e1460] [cursor=pointer]:
+              - generic [ref=e1461]:
+                - generic [ref=e1462]: Onega
+                - generic [ref=e1463]: lake · eurasia lakes
+            - button "Ontario lake · great lakes" [ref=e1466] [cursor=pointer]:
+              - generic [ref=e1467]:
+                - generic [ref=e1468]: Ontario
+                - generic [ref=e1469]: lake · great lakes
+            - button "Persian Gulf gulf · marine macro" [ref=e1472] [cursor=pointer]:
+              - generic [ref=e1473]:
+                - generic [ref=e1474]: Persian Gulf
+                - generic [ref=e1475]: gulf · marine macro
+            - button "Philippine Sea sea · marine macro" [ref=e1478] [cursor=pointer]:
+              - generic [ref=e1479]:
+                - generic [ref=e1480]: Philippine Sea
+                - generic [ref=e1481]: sea · marine macro
+            - button "Red Sea sea · marine macro" [ref=e1484] [cursor=pointer]:
+              - generic [ref=e1485]:
+                - generic [ref=e1486]: Red Sea
+                - generic [ref=e1487]: sea · marine macro
+            - button "Ross Sea sea · marine macro" [ref=e1490] [cursor=pointer]:
+              - generic [ref=e1491]:
+                - generic [ref=e1492]: Ross Sea
+                - generic [ref=e1493]: sea · marine macro
+            - button "Salish Sea sea · marine macro" [ref=e1496] [cursor=pointer]:
+              - generic [ref=e1497]:
+                - generic [ref=e1498]: Salish Sea
+                - generic [ref=e1499]: sea · marine macro
+            - button "Scotia Sea sea · marine macro" [ref=e1502] [cursor=pointer]:
+              - generic [ref=e1503]:
+                - generic [ref=e1504]: Scotia Sea
+                - generic [ref=e1505]: sea · marine macro
+            - button "Sea of Azov sea · marine macro" [ref=e1508] [cursor=pointer]:
+              - generic [ref=e1509]:
+                - generic [ref=e1510]: Sea of Azov
+                - generic [ref=e1511]: sea · marine macro
+            - button "Sea of Okhotsk sea · marine macro" [ref=e1514] [cursor=pointer]:
+              - generic [ref=e1515]:
+                - generic [ref=e1516]: Sea of Okhotsk
+                - generic [ref=e1517]: sea · marine macro
+            - button "South China Sea sea · marine macro" [ref=e1520] [cursor=pointer]:
+              - generic [ref=e1521]:
+                - generic [ref=e1522]: South China Sea
+                - generic [ref=e1523]: sea · marine macro
+            - button "Sulu Sea sea · marine macro" [ref=e1526] [cursor=pointer]:
+              - generic [ref=e1527]:
+                - generic [ref=e1528]: Sulu Sea
+                - generic [ref=e1529]: sea · marine macro
+            - button "Superior lake · great lakes" [ref=e1532] [cursor=pointer]:
+              - generic [ref=e1533]:
+                - generic [ref=e1534]: Superior
+                - generic [ref=e1535]: lake · great lakes
+            - button "Tanganyika lake · african great lakes" [ref=e1538] [cursor=pointer]:
+              - generic [ref=e1539]:
+                - generic [ref=e1540]: Tanganyika
+                - generic [ref=e1541]: lake · african great lakes
+            - button "Tasman Sea sea · marine macro" [ref=e1544] [cursor=pointer]:
+              - generic [ref=e1545]:
+                - generic [ref=e1546]: Tasman Sea
+                - generic [ref=e1547]: sea · marine macro
+            - button "Titicaca lake · andes lakes" [ref=e1550] [cursor=pointer]:
+              - generic [ref=e1551]:
+                - generic [ref=e1552]: Titicaca
+                - generic [ref=e1553]: lake · andes lakes
+            - button "Victoria lake · african great lakes" [ref=e1556] [cursor=pointer]:
+              - generic [ref=e1557]:
+                - generic [ref=e1558]: Victoria
+                - generic [ref=e1559]: lake · african great lakes
+            - button "Weddell Sea sea · marine macro" [ref=e1562] [cursor=pointer]:
+              - generic [ref=e1563]:
+                - generic [ref=e1564]: Weddell Sea
+                - generic [ref=e1565]: sea · marine macro
+            - button "Yellow Sea sea · marine macro" [ref=e1568] [cursor=pointer]:
+              - generic [ref=e1569]:
+                - generic [ref=e1570]: Yellow Sea
+                - generic [ref=e1571]: sea · marine macro
+          - generic [ref=e197]:
+            - generic [ref=e198]: Select a water region to inspect
+            - paragraph [ref=e199]: Click a sea, lake, or strait on the map, or choose one from the list.
+          - generic [ref=e200]:
+            - generic [ref=e201]: Water Overrides
+            - generic [ref=e1574]: Paint water regions to create an override list.
+      - text: ▸
+      - group [ref=e202]:
+        - generic "Territories & Presets ▸" [ref=e203] [cursor=pointer]
+        - generic [ref=e1575]:
+          - generic [ref=e1576]: Scenario Actions
+          - generic [ref=e1577]:
+            - generic [ref=e1578]: Scenario Actions change political ownership and dynamic borders. Use Visual Adjustments for color-only edits.
+            - generic [ref=e1579]:
+              - generic [ref=e1582]:
+                - generic [ref=e1583]: Country Color
+                - generic [ref=e1584]: "Germany · #3C3C3C"
+              - button "Use Country Color for Visual Actions" [ref=e1585] [cursor=pointer]
+            - generic [ref=e1586]:
+              - generic [ref=e1587]: Hierarchy Groups
+              - generic [ref=e1588]:
+                - button "Baden-Württemberg" [ref=e1589] [cursor=pointer]
+                - button "Bayern" [ref=e1590] [cursor=pointer]
+                - button "Berlin" [ref=e1591] [cursor=pointer]
+                - button "Brandenburg" [ref=e1592] [cursor=pointer]
+                - button "Bremen" [ref=e1593] [cursor=pointer]
+                - button "Hamburg" [ref=e1594] [cursor=pointer]
+                - button "Hessen" [ref=e1595] [cursor=pointer]
+                - button "Mecklenburg-Vorpommern" [ref=e1596] [cursor=pointer]
+                - button "Niedersachsen" [ref=e1597] [cursor=pointer]
+                - button "Nordrhein-Westfalen" [ref=e1598] [cursor=pointer]
+                - button "Rheinland-Pfalz" [ref=e1599] [cursor=pointer]
+                - button "Saarland" [ref=e1600] [cursor=pointer]
+                - button "Sachsen" [ref=e1601] [cursor=pointer]
+                - button "Sachsen-Anhalt" [ref=e1602] [cursor=pointer]
+                - button "Schleswig-Holstein" [ref=e1603] [cursor=pointer]
+                - button "Thüringen" [ref=e1604] [cursor=pointer]
+            - generic [ref=e1605]:
+              - generic [ref=e1606]: Regional Presets
+              - generic [ref=e1607]:
+                - button "Bavaria" [ref=e1608] [cursor=pointer]
+                - button "Saxony" [ref=e1609] [cursor=pointer]
+                - button "Prussia (Eastern Core)" [ref=e1610] [cursor=pointer]
+                - button "Schleswig-Holstein" [ref=e1611] [cursor=pointer]
+                - button "Alsace-Lorraine + Luxembourg" [disabled] [ref=e1612] [cursor=pointer]
+                - button "North Schleswig + Bornholm" [disabled] [ref=e1613] [cursor=pointer]
+                - button "Slovenia" [disabled] [ref=e1614] [cursor=pointer]
+            - group [ref=e1615]:
+              - generic "Visual Adjustments ▸" [ref=e1616] [cursor=pointer]
+      - group [ref=e204]:
+        - generic "Project & Legend ▸" [ref=e205] [cursor=pointer]
+      - group [ref=e206]:
+        - generic "Diagnostics ▸" [ref=e207] [cursor=pointer]
+        - option "Normal View" [selected]
+        - option "1. Geometry Check (Pink/Green)"
+        - option "2. Artifact Hunter (Red Giants)"
+        - option "3. Island Detector (Orange)"
+        - option "4. ID Stability"

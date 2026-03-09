@@ -1,29 +1,29 @@
 {
   "version": 1,
   "scenario_id": "tno_1962",
-  "generated_at": "2026-03-08T16:24:52Z",
+  "generated_at": "2026-03-08T19:50:32Z",
   "summary": {
-    "feature_count": 11967,
+    "feature_count": 12304,
     "owner_count": 126,
     "controller_count": 125,
     "quality_counts": {
-      "approx_existing_geometry": 865,
-      "direct_country_copy": 2355,
-      "manual_reviewed": 8747
+      "approx_existing_geometry": 950,
+      "direct_country_copy": 2463,
+      "manual_reviewed": 8891
     },
     "source_counts": {
-      "direct_active_owner": 4166,
+      "direct_active_owner": 4412,
       "fallback_mapped_tag": 18,
-      "manual_rule": 5757,
-      "scenario_generated": 82,
+      "manual_rule": 5857,
+      "scenario_generated": 73,
       "tno_reichskommissariat_baseline": 1944
     },
-    "approximate_count": 865,
-    "manual_reviewed_feature_count": 8747,
+    "approximate_count": 950,
+    "manual_reviewed_feature_count": 8891,
     "geometry_blocker_count": 0,
     "critical_unresolved_count": 0,
-    "synthetic_owner_feature_count": 100,
-    "synthetic_count": 100,
+    "synthetic_owner_feature_count": 91,
+    "synthetic_count": 91,
     "changed_feature_count": 2032,
     "failed_region_check_count": 0,
     "topology_blocker_count": 0,
@@ -327,25 +327,36 @@
           46.2
         ],
         "centroid": [
-          15.420123,
-          43.1812
+          15.547365,
+          43.133936
         ],
         "bounds": [
           12.18223,
-          38.861758,
-          21.116323,
+          39.0,
+          21.102299,
           45.753713
         ],
-        "province_feature_count": 30,
+        "province_feature_count": 86,
         "assigned_owner_counts": {
           "ATL": 3,
-          "CRO": 11,
-          "GRE": 3,
-          "ITA": 12,
-          "SER": 1
+          "CRO": 49,
+          "GRE": 2,
+          "ITA": 29,
+          "SER": 3
         },
-        "overlap_with_baseline_land_area": 0.0,
-        "post_clip_area": 8.718579,
+        "geometry_role_counts": {
+          "causeway": 3,
+          "donor_island": 15,
+          "donor_land": 18,
+          "shore_seal": 50
+        },
+        "join_mode_counts": {
+          "boolean_weld": 35,
+          "gap_fill": 16,
+          "none": 35
+        },
+        "overlap_with_baseline_land_area": 0.089918,
+        "post_clip_area": 9.464313,
         "control_points": [
           {
             "state_id": 8491,
@@ -427,22 +438,33 @@
           39.2
         ],
         "centroid": [
-          12.627377,
-          36.922529
+          13.299107,
+          37.270702
         ],
         "bounds": [
-          8.496751,
-          35.167657,
-          15.613956,
-          38.223099
+          8.231191,
+          35.167704,
+          15.931957,
+          38.617099
         ],
-        "province_feature_count": 20,
+        "province_feature_count": 35,
         "assigned_owner_counts": {
-          "ITA": 13,
-          "TUN": 7
+          "ITA": 16,
+          "TUN": 19
         },
-        "overlap_with_baseline_land_area": 0.0,
-        "post_clip_area": 2.047374,
+        "geometry_role_counts": {
+          "causeway": 4,
+          "donor_island": 9,
+          "donor_land": 4,
+          "shore_seal": 18
+        },
+        "join_mode_counts": {
+          "boolean_weld": 15,
+          "gap_fill": 4,
+          "none": 16
+        },
+        "overlap_with_baseline_land_area": 2.357758,
+        "post_clip_area": 4.815244,
         "control_points": [
           {
             "state_id": 8557,
@@ -524,21 +546,29 @@
           34.8
         ],
         "centroid": [
-          11.175471,
-          33.789345
+          11.028274,
+          33.73877
         ],
         "bounds": [
-          10.00497,
-          33.2217,
-          11.487931,
+          9.946321,
+          33.172052,
+          11.547641,
           34.305175
         ],
-        "province_feature_count": 4,
+        "province_feature_count": 7,
         "assigned_owner_counts": {
-          "TUN": 4
+          "TUN": 7
         },
-        "overlap_with_baseline_land_area": 0.0,
-        "post_clip_area": 0.075616,
+        "geometry_role_counts": {
+          "donor_land": 4,
+          "shore_seal": 3
+        },
+        "join_mode_counts": {
+          "gap_fill": 3,
+          "none": 4
+        },
+        "overlap_with_baseline_land_area": 0.000623,
+        "post_clip_area": 0.113962,
         "control_points": [
           {
             "state_id": 10202,
@@ -596,25 +626,35 @@
           37.5
         ],
         "centroid": [
-          34.53054,
-          34.855321
+          34.260489,
+          34.748535
         ],
         "bounds": [
-          32.913855,
-          31.106971,
-          35.949047,
-          36.738143
+          32.282607,
+          31.040154,
+          36.020141,
+          36.801373
         ],
-        "province_feature_count": 13,
+        "province_feature_count": 42,
         "assigned_owner_counts": {
-          "EGY": 1,
-          "LEB": 1,
-          "PAL": 2,
-          "SYR": 1,
-          "TUR": 8
+          "EGY": 8,
+          "LEB": 4,
+          "PAL": 7,
+          "SYR": 5,
+          "TUR": 18
         },
-        "overlap_with_baseline_land_area": 0.0,
-        "post_clip_area": 1.589044,
+        "geometry_role_counts": {
+          "donor_island": 1,
+          "donor_land": 8,
+          "shore_seal": 33
+        },
+        "join_mode_counts": {
+          "boolean_weld": 26,
+          "gap_fill": 8,
+          "none": 8
+        },
+        "overlap_with_baseline_land_area": 0.5974,
+        "post_clip_area": 2.508383,
         "control_points": [
           {
             "state_id": 9035,
@@ -626,6 +666,18 @@
             "target_coord": [
               36.1,
               36.2
+            ]
+          },
+          {
+            "state_id": 8545,
+            "state_name": "Hatay Alantropa Zone",
+            "raw_centroid": [
+              34.883552,
+              16.615604
+            ],
+            "target_coord": [
+              36.25,
+              35.95
             ]
           },
           {
@@ -678,41 +730,75 @@
           }
         ],
         "affine_coeffs": [
-          0.723403573,
-          0.121365565,
-          8.717449276,
-          -0.116956533,
-          0.827336344,
-          26.850105863
+          0.735214699,
+          0.141605178,
+          8.088629764,
+          -0.140777696,
+          0.786516262,
+          28.118334828
         ]
       },
       "tyrrhenian": {
         "feature_group_id": "atlantropa_tyrrhenian_and_west_italy",
         "group_label": "Tyrrhenian and West Italian Coast",
         "aoi_bbox": [
-          6.4,
+          5.7,
           37.4,
           18.8,
-          45.3
+          45.6
         ],
         "centroid": [
-          11.536129,
-          41.30673
+          10.699381,
+          40.891292
         ],
         "bounds": [
-          6.886062,
-          38.285642,
-          18.8,
-          43.908304
+          4.463715,
+          38.043287,
+          18.587781,
+          44.392582
         ],
-        "province_feature_count": 20,
+        "province_feature_count": 70,
         "assigned_owner_counts": {
-          "FRA": 3,
-          "ITA": 17
+          "FRA": 11,
+          "ITA": 59
         },
-        "overlap_with_baseline_land_area": 0.0,
-        "post_clip_area": 4.472613,
+        "geometry_role_counts": {
+          "donor_island": 4,
+          "donor_land": 12,
+          "shore_seal": 54
+        },
+        "join_mode_counts": {
+          "boolean_weld": 36,
+          "gap_fill": 20,
+          "none": 14
+        },
+        "overlap_with_baseline_land_area": 3.335661,
+        "post_clip_area": 8.550308,
         "control_points": [
+          {
+            "state_id": 8466,
+            "state_name": "Savoy Alantropa Zone",
+            "raw_centroid": [
+              6.492804,
+              25.728824
+            ],
+            "target_coord": [
+              6.6,
+              43.75
+            ]
+          },
+          {
+            "state_id": 8468,
+            "state_name": "Genoa Alantropa Zone",
+            "raw_centroid": [
+              8.050781,
+              26.431875
+            ],
+            "target_coord": [
+              8.95,
+              44.15
+            ]
+          },
           {
             "state_id": 8470,
             "state_name": "Corsica Alantropa Zone",
@@ -775,12 +861,12 @@
           }
         ],
         "affine_coeffs": [
-          1.08977441,
-          0.015793451,
-          -0.337755585,
-          -0.024521337,
-          0.61893984,
-          27.437000941
+          1.112816038,
+          0.006501127,
+          -0.408653332,
+          -0.02405263,
+          0.692920728,
+          25.899376867
         ]
       },
       "west_med": {
@@ -793,24 +879,35 @@
           44.7
         ],
         "centroid": [
-          1.886588,
-          39.684513
+          1.542079,
+          39.161873
         ],
         "bounds": [
-          -6.163403,
-          35.124548,
-          7.405731,
-          43.525545
+          -6.199997,
+          35.075978,
+          7.792023,
+          43.555542
         ],
-        "province_feature_count": 20,
+        "province_feature_count": 97,
         "assigned_owner_counts": {
-          "ALG": 2,
+          "ALG": 15,
           "ATL": 3,
-          "FRA": 3,
-          "SPR": 12
+          "FRA": 27,
+          "SPR": 52
         },
-        "overlap_with_baseline_land_area": 0.0,
-        "post_clip_area": 5.434805,
+        "geometry_role_counts": {
+          "causeway": 1,
+          "donor_island": 3,
+          "donor_land": 13,
+          "shore_seal": 80
+        },
+        "join_mode_counts": {
+          "boolean_weld": 58,
+          "gap_fill": 23,
+          "none": 16
+        },
+        "overlap_with_baseline_land_area": 0.521551,
+        "post_clip_area": 5.854519,
         "control_points": [
           {
             "state_id": 8452,
@@ -861,6 +958,18 @@
             ]
           },
           {
+            "state_id": 8463,
+            "state_name": "Occitania Alantropa Zone",
+            "raw_centroid": [
+              3.719001,
+              25.118946
+            ],
+            "target_coord": [
+              1.65,
+              43.35
+            ]
+          },
+          {
             "state_id": 8464,
             "state_name": "Provence Alantropa Zone",
             "raw_centroid": [
@@ -886,12 +995,12 @@
           }
         ],
         "affine_coeffs": [
-          1.128017779,
-          -0.149629416,
-          3.193911555,
-          -0.009677778,
-          0.758255943,
-          23.968837978
+          1.149623552,
+          -0.235628331,
+          4.707092805,
+          -0.013720397,
+          0.774347052,
+          23.685709236
         ]
       },
       "aegean": {
@@ -904,22 +1013,32 @@
           41.9
         ],
         "centroid": [
-          24.752143,
-          37.96599
+          24.610215,
+          37.794731
         ],
         "bounds": [
-          19.829492,
-          34.867016,
-          28.544105,
-          40.91968
+          19.555658,
+          34.893964,
+          30.8,
+          41.009067
         ],
-        "province_feature_count": 30,
+        "province_feature_count": 171,
         "assigned_owner_counts": {
-          "GRE": 26,
-          "TUR": 4
+          "GRE": 147,
+          "TUR": 24
         },
-        "overlap_with_baseline_land_area": 0.0,
-        "post_clip_area": 6.829068,
+        "geometry_role_counts": {
+          "donor_island": 44,
+          "donor_land": 18,
+          "shore_seal": 109
+        },
+        "join_mode_counts": {
+          "boolean_weld": 84,
+          "gap_fill": 29,
+          "none": 58
+        },
+        "overlap_with_baseline_land_area": 1.320136,
+        "post_clip_area": 9.320324,
         "control_points": [
           {
             "state_id": 8516,
@@ -992,15 +1111,27 @@
               28.0,
               36.15
             ]
+          },
+          {
+            "state_id": 8543,
+            "state_name": "Antalya Alantropa Zone",
+            "raw_centroid": [
+              28.976786,
+              16.271317
+            ],
+            "target_coord": [
+              30.55,
+              36.75
+            ]
           }
         ],
         "affine_coeffs": [
-          1.097922615,
-          0.110253908,
-          -3.670299736,
-          -0.069777468,
-          0.760860552,
-          25.811000684
+          1.154215489,
+          0.092963295,
+          -4.724742819,
+          -0.016366334,
+          0.744455079,
+          24.810536566
         ]
       },
       "libya_suez": {
@@ -1009,27 +1140,35 @@
         "aoi_bbox": [
           12.5,
           28.0,
-          34.8,
-          33.8
+          35.2,
+          34.2
         ],
         "centroid": [
-          17.724416,
-          32.342348
+          16.69906,
+          32.455479
         ],
         "bounds": [
           12.5,
-          30.94397,
-          29.401941,
+          30.826645,
+          29.598421,
           32.976895
         ],
-        "province_feature_count": 5,
+        "province_feature_count": 17,
         "assigned_owner_counts": {
-          "ATL": 1,
-          "EGY": 1,
-          "LBA": 3
+          "EGY": 3,
+          "LBA": 14
         },
-        "overlap_with_baseline_land_area": 0.0,
-        "post_clip_area": 0.020401,
+        "geometry_role_counts": {
+          "donor_land": 4,
+          "shore_seal": 13
+        },
+        "join_mode_counts": {
+          "boolean_weld": 8,
+          "gap_fill": 5,
+          "none": 4
+        },
+        "overlap_with_baseline_land_area": 0.002485,
+        "post_clip_area": 0.183191,
         "control_points": [
           {
             "state_id": 8564,
@@ -1126,14 +1265,14 @@
         "bounds": [
           13.824119,
           39.0,
-          20.10208,
-          42.572308
+          20.099124,
+          42.567131
         ],
         "centroid": [
-          17.82597,
-          40.441892
+          17.815675,
+          40.452983
         ],
-        "area": 5.213667,
+        "area": 5.082137,
         "feature_count": 11,
         "water_state_feature_counts": {
           "8597": 1,
@@ -1159,16 +1298,16 @@
           39.2
         ],
         "centroid": [
-          12.473503,
-          37.201947
+          12.476279,
+          37.204516
         ],
-        "area": 10.912155,
-        "feature_count": 9,
+        "area": 10.824319,
+        "feature_count": 10,
         "water_state_feature_counts": {
-          "8591": 3,
+          "8591": 2,
           "8592": 1,
           "8598": 1,
-          "8600": 3,
+          "8600": 5,
           "8603": 1
         }
       },
@@ -1186,10 +1325,10 @@
           34.8
         ],
         "centroid": [
-          11.367253,
-          33.788195
+          11.366295,
+          33.794068
         ],
-        "area": 0.377512,
+        "area": 0.373317,
         "feature_count": 1,
         "water_state_feature_counts": {
           "8598": 1
@@ -1207,15 +1346,15 @@
         ],
         "bounds": [
           31.2,
-          31.152334,
-          35.574413,
+          31.17504,
+          35.594156,
           36.793217
         ],
         "centroid": [
-          33.422535,
-          33.278633
+          33.423591,
+          33.282704
         ],
-        "area": 8.59055,
+        "area": 8.324427,
         "feature_count": 5,
         "water_state_feature_counts": {
           "8609": 1,
@@ -1236,22 +1375,22 @@
           8593
         ],
         "bounds": [
-          6.4,
-          38.561859,
+          5.7,
+          38.398434,
           16.189962,
-          43.772253
+          44.21513
         ],
         "centroid": [
-          10.919998,
-          40.864145
+          10.468744,
+          40.995184
         ],
-        "area": 16.028141,
-        "feature_count": 10,
+        "area": 19.373378,
+        "feature_count": 7,
         "water_state_feature_counts": {
           "8578": 1,
-          "8579": 3,
+          "8579": 1,
           "8588": 1,
-          "8589": 3,
+          "8589": 2,
           "8590": 1,
           "8593": 1
         }
@@ -1274,31 +1413,31 @@
           9040
         ],
         "bounds": [
-          -6.004009,
-          35.243453,
-          9.494598,
-          43.468262
+          -5.933829,
+          35.209568,
+          9.6365,
+          43.163347
         ],
         "centroid": [
-          3.085461,
-          38.771869
+          2.972611,
+          38.716963
         ],
-        "area": 41.206057,
-        "feature_count": 18,
+        "area": 41.104731,
+        "feature_count": 19,
         "water_state_feature_counts": {
-          "8577": 1,
+          "8577": 2,
           "8580": 1,
-          "8581": 4,
-          "8582": 2,
+          "8581": 1,
+          "8582": 3,
           "8583": 1,
           "8584": 1,
           "8585": 1,
           "8586": 1,
           "8587": 1,
           "8594": 1,
-          "8595": 2,
+          "8595": 3,
           "8596": 1,
-          "9040": 1
+          "9040": 2
         }
       },
       "aegean": {
@@ -1314,24 +1453,25 @@
           8622
         ],
         "bounds": [
-          21.062708,
+          20.948896,
           33.4,
           30.8,
-          41.019036
+          41.252903
         ],
         "centroid": [
-          26.082027,
-          34.830137
+          26.085287,
+          34.903841
         ],
-        "area": 13.779834,
-        "feature_count": 11,
+        "area": 13.780609,
+        "feature_count": 13,
         "water_state_feature_counts": {
+          "8445": 1,
           "8608": 1,
           "8610": 2,
           "8619": 2,
           "8620": 1,
           "8621": 3,
-          "8622": 2
+          "8622": 3
         }
       },
       "libya_suez": {
@@ -1348,29 +1488,29 @@
         ],
         "bounds": [
           12.5,
-          30.945084,
-          29.413892,
+          32.931557,
+          12.926037,
           32.989723
         ],
         "centroid": [
-          16.121429,
-          32.547113
+          12.772022,
+          32.953404
         ],
-        "area": 0.069656,
-        "feature_count": 10,
+        "area": 0.002356,
+        "feature_count": 1,
         "water_state_feature_counts": {
-          "8605": 1,
+          "8605": 3,
           "8613": 1,
           "8614": 1,
-          "8615": 2,
+          "8615": 1,
           "8616": 1,
-          "8617": 3,
+          "8617": 6,
           "8618": 1
         }
       }
     },
-    "atl_feature_count": 142,
-    "atl_sea_feature_count": 75,
+    "atl_feature_count": 525,
+    "atl_sea_feature_count": 67,
     "coastal_restore_stats": {
       "south_italy": {
         "label": "South Italy and lower Adriatic coast",
@@ -1380,9 +1520,11 @@
           19.5,
           42.5
         ],
-        "missing_feature_count": 0,
-        "restored_feature_count": 0,
-        "assigned_owner_counts": {},
+        "missing_feature_count": 10,
+        "restored_feature_count": 10,
+        "assigned_owner_counts": {
+          "ITA": 10
+        },
         "unresolved_feature_ids": []
       },
       "north_yugo": {
@@ -1406,7 +1548,7 @@
           12.5,
           37.8
         ],
-        "missing_feature_count": 0,
+        "missing_feature_count": 1,
         "restored_feature_count": 0,
         "assigned_owner_counts": {},
         "unresolved_feature_ids": []
@@ -1432,9 +1574,27 @@
           37.5,
           38.8
         ],
-        "missing_feature_count": 0,
-        "restored_feature_count": 0,
-        "assigned_owner_counts": {},
+        "missing_feature_count": 8,
+        "restored_feature_count": 8,
+        "assigned_owner_counts": {
+          "GRE": 7,
+          "TUR": 1
+        },
+        "unresolved_feature_ids": []
+      },
+      "french_riviera_liguria": {
+        "label": "French Riviera, Liguria and north Tyrrhenian seam",
+        "bbox": [
+          5.0,
+          42.0,
+          10.8,
+          45.1
+        ],
+        "missing_feature_count": 4,
+        "restored_feature_count": 4,
+        "assigned_owner_counts": {
+          "FRA": 4
+        },
         "unresolved_feature_ids": []
       },
       "sardinia_tyrrhenian": {
@@ -1445,9 +1605,12 @@
           18.8,
           44.6
         ],
-        "missing_feature_count": 0,
-        "restored_feature_count": 0,
-        "assigned_owner_counts": {},
+        "missing_feature_count": 18,
+        "restored_feature_count": 6,
+        "assigned_owner_counts": {
+          "FRA": 1,
+          "ITA": 5
+        },
         "unresolved_feature_ids": []
       },
       "west_mediterranean": {
@@ -1458,7 +1621,22 @@
           11.8,
           44.8
         ],
-        "missing_feature_count": 0,
+        "missing_feature_count": 13,
+        "restored_feature_count": 3,
+        "assigned_owner_counts": {
+          "SPR": 3
+        },
+        "unresolved_feature_ids": []
+      },
+      "levant_focus": {
+        "label": "Levant and Palestine shoreline seam focus",
+        "bbox": [
+          33.0,
+          31.0,
+          36.8,
+          35.2
+        ],
+        "missing_feature_count": 1,
         "restored_feature_count": 0,
         "assigned_owner_counts": {},
         "unresolved_feature_ids": []
@@ -1471,7 +1649,7 @@
           36.9,
           35.9
         ],
-        "missing_feature_count": 0,
+        "missing_feature_count": 1,
         "restored_feature_count": 0,
         "assigned_owner_counts": {},
         "unresolved_feature_ids": []
@@ -1484,9 +1662,11 @@
           30.8,
           41.8
         ],
-        "missing_feature_count": 0,
-        "restored_feature_count": 0,
-        "assigned_owner_counts": {},
+        "missing_feature_count": 12,
+        "restored_feature_count": 5,
+        "assigned_owner_counts": {
+          "GRE": 5
+        },
         "unresolved_feature_ids": []
       },
       "libya_suez": {
@@ -1553,6 +1733,83 @@
       "south_asia": [
         "FRI"
       ]
+    },
+    "atlantropa_island_replacement_stats": {
+      "adriatica": {
+        "dropped_feature_count": 1,
+        "dropped_feature_ids": [
+          "EL622"
+        ]
+      },
+      "sicily_tunis": {
+        "dropped_feature_count": 10,
+        "dropped_feature_ids": [
+          "ITG11",
+          "ITG12",
+          "ITG13",
+          "ITG14",
+          "ITG15",
+          "ITG16",
+          "ITG17",
+          "ITG18",
+          "ITG19",
+          "MT002"
+        ]
+      },
+      "gabes": {
+        "dropped_feature_count": 0,
+        "dropped_feature_ids": []
+      },
+      "levant": {
+        "dropped_feature_count": 1,
+        "dropped_feature_ids": [
+          "CY000"
+        ]
+      },
+      "tyrrhenian": {
+        "dropped_feature_count": 10,
+        "dropped_feature_ids": [
+          "FR_ARR_2A001",
+          "FR_ARR_2A004",
+          "FR_ARR_2B002",
+          "FR_ARR_2B003",
+          "FR_ARR_2B005",
+          "ITG2D",
+          "ITG2E",
+          "ITG2F",
+          "ITG2G",
+          "ITG2H"
+        ]
+      },
+      "west_med": {
+        "dropped_feature_count": 3,
+        "dropped_feature_ids": [
+          "ES531",
+          "ES532",
+          "ES533"
+        ]
+      },
+      "aegean": {
+        "dropped_feature_count": 12,
+        "dropped_feature_ids": [
+          "EL411",
+          "EL413",
+          "EL421",
+          "EL422",
+          "EL431",
+          "EL432",
+          "EL433",
+          "EL434",
+          "EL623",
+          "GR_ADM1_GRC-2988",
+          "GR_ADM1_GRC-2990",
+          "GR_ADM1_GRC-3013"
+        ]
+      },
+      "libya_suez": {
+        "dropped_feature_count": 0,
+        "dropped_feature_ids": []
+      }
     }
   },
   "critical_regions": [
@@ -1682,10 +1939,10 @@
     },
     "ALG": {
       "display_name": "French Algeria",
-      "feature_count": 50,
+      "feature_count": 63,
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 50
+        "manual_reviewed": 63
       },
       "base_iso2": "DZ",
       "lookup_iso2": "DZ",
@@ -2470,10 +2727,10 @@
     },
     "EGY": {
       "display_name": "Italian Egypt",
-      "feature_count": 26,
+      "feature_count": 35,
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 26
+        "manual_reviewed": 35
       },
       "base_iso2": "EG",
       "lookup_iso2": "EG",
@@ -2628,10 +2885,10 @@
     },
     "FRA": {
       "display_name": "France",
-      "feature_count": 279,
+      "feature_count": 311,
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 279
+        "approx_existing_geometry": 311
       },
       "base_iso2": "FR",
       "lookup_iso2": "FR",
@@ -2730,10 +2987,10 @@
     },
     "GRE": {
       "display_name": "Greek Protectorate",
-      "feature_count": 94,
+      "feature_count": 202,
       "quality": "direct_country_copy",
       "quality_breakdown": {
-        "direct_country_copy": 94
+        "direct_country_copy": 202
       },
       "base_iso2": "GR",
       "lookup_iso2": "GR",
@@ -3107,10 +3364,10 @@
     },
     "ITA": {
       "display_name": "Italy",
-      "feature_count": 182,
+      "feature_count": 222,
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 182
+        "manual_reviewed": 222
       },
       "base_iso2": "IT",
       "lookup_iso2": "IT",
@@ -3297,10 +3554,10 @@
     },
     "LBA": {
       "display_name": "Libya",
-      "feature_count": 25,
+      "feature_count": 36,
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 25
+        "approx_existing_geometry": 36
       },
       "base_iso2": "LY",
       "lookup_iso2": "LY",
@@ -3331,10 +3588,10 @@
     },
     "LEB": {
       "display_name": "Lebanese Protectorate",
-      "feature_count": 7,
+      "feature_count": 10,
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 7
+        "manual_reviewed": 10
       },
       "base_iso2": "LB",
       "lookup_iso2": "LB",
@@ -3895,10 +4152,10 @@
     },
     "PAL": {
       "display_name": "Italian Palestine",
-      "feature_count": 10,
+      "feature_count": 15,
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 10
+        "approx_existing_geometry": 15
       },
       "base_iso2": "IL",
       "lookup_iso2": "IL",
@@ -4572,10 +4829,10 @@
     },
     "SPR": {
       "display_name": "Spain",
-      "feature_count": 71,
+      "feature_count": 108,
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 71
+        "approx_existing_geometry": 108
       },
       "base_iso2": "ES",
       "lookup_iso2": "ES",
@@ -4735,10 +4992,10 @@
     },
     "SYR": {
       "display_name": "Syrian Protectorate",
-      "feature_count": 15,
+      "feature_count": 19,
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 15
+        "manual_reviewed": 19
       },
       "base_iso2": "SY",
       "lookup_iso2": "SY",
@@ -4835,10 +5092,10 @@
     },
     "TUN": {
       "display_name": "Tunisian Protectorate",
-      "feature_count": 34,
+      "feature_count": 49,
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 34
+        "manual_reviewed": 49
       },
       "base_iso2": "TN",
       "lookup_iso2": "TN",
@@ -4869,10 +5126,10 @@
     },
     "TUR": {
       "display_name": "Turkey",
-      "feature_count": 95,
+      "feature_count": 124,
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 95
+        "manual_reviewed": 124
       },
       "base_iso2": "TR",
       "lookup_iso2": "TR",
@@ -5531,10 +5788,10 @@
     },
     "CRO": {
       "display_name": "Independent State of Croatia",
-      "feature_count": 32,
+      "feature_count": 70,
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 32
+        "manual_reviewed": 70
       },
       "base_iso2": "HR",
       "lookup_iso2": "HR",
@@ -5565,10 +5822,10 @@
     },
     "SER": {
       "display_name": "Serbian Administration",
-      "feature_count": 79,
+      "feature_count": 81,
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 79
+        "manual_reviewed": 81
       },
       "base_iso2": "RS",
       "lookup_iso2": "RS",
@@ -5599,10 +5856,10 @@
     },
     "ATL": {
       "display_name": "Atlantropa Reclamation Zone",
-      "feature_count": 82,
+      "feature_count": 73,
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 82
+        "manual_reviewed": 73
       },
       "base_iso2": "ZZ",
       "lookup_iso2": "ZZ",

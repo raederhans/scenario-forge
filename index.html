@@ -1038,6 +1038,14 @@
                   <button id="politicalEditingToggleBtn" type="button" class="preset-action-btn">Political Editing</button>
                   <button id="scenarioVisualAdjustmentsBtn" type="button" class="preset-action-btn hidden">Visual Adjustments</button>
                 </div>
+                <div id="dockQuickFillRow" class="dock-paint-secondary hidden">
+                  <div id="dockQuickFillLabel" class="dock-paint-mini-label">Double-Click Quick Fill</div>
+                  <div class="mode-toggle-row dock-paint-toggle-row" role="group" aria-label="Double-click quick fill scope">
+                    <button id="quickFillParentBtn" type="button" class="mode-toggle-btn">By Parent</button>
+                    <button id="quickFillCountryBtn" type="button" class="mode-toggle-btn">By Country</button>
+                  </div>
+                  <div id="dockQuickFillHint" class="dock-paint-hint">Single-click: one subdivision | Double-click: parent</div>
+                </div>
                 <div id="dockPoliticalEditingPanel" class="dock-political-panel hidden">
                   <div class="dock-paint-row">
                     <select id="paintModeSelect" class="select-input dock-select">
@@ -1318,6 +1326,13 @@
                 </label>
                 <p id="scenarioSpecialRegionVisibilityHint" class="sidebar-tool-hint mt-2">
                   Toggle Atlantropa-style scenario regions without affecting the base map.
+                </p>
+                <label class="toggle-label mt-3">
+                  <input id="scenarioReliefOverlayVisibilityToggle" type="checkbox" class="checkbox-input" checked />
+                  <span id="lblScenarioReliefOverlayVisibilityToggle">Show Scenario Relief Overlays</span>
+                </label>
+                <p id="scenarioReliefOverlayVisibilityHint" class="sidebar-tool-hint mt-2">
+                  Toggle shoreline, basin contour, and texture overlays for the active scenario.
                 </p>
               </div>
               <div class="card-flat inspector-search-block">

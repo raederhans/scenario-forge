@@ -192,6 +192,14 @@
       "en": "By Country",
       "zh": "按国家"
     },
+    "By Parent": {
+      "en": "By Parent",
+      "zh": "按上一级"
+    },
+    "By Province": {
+      "en": "By Province",
+      "zh": "按省级"
+    },
     "By Neighbor (Political)": {
       "en": "By Neighbor (Political)",
       "zh": "按邻接（政治）"
@@ -463,6 +471,10 @@
     "Dynamic / Runtime": {
       "en": "Dynamic / Runtime",
       "zh": "动态 / 运行时"
+    },
+    "Double-Click Quick Fill": {
+      "en": "Double-Click Quick Fill",
+      "zh": "双击快速填色"
     },
     "Dynamic borders disabled": {
       "en": "Dynamic borders disabled",
@@ -1307,6 +1319,18 @@
     "Subject Governments": {
       "en": "Subject Governments",
       "zh": "Subject Governments"
+    },
+    "Single-click: one subdivision | Double-click: country batch": {
+      "en": "Single-click: one subdivision | Double-click: country batch",
+      "zh": "单击：单个地块 | 双击：按国家批量"
+    },
+    "Single-click: one subdivision | Double-click: parent batch": {
+      "en": "Single-click: one subdivision | Double-click: parent batch",
+      "zh": "单击：单个地块 | 双击：按上一级批量"
+    },
+    "Single-click: one subdivision | Double-click: province batch": {
+      "en": "Single-click: one subdivision | Double-click: province batch",
+      "zh": "单击：单个地块 | 双击：按省级批量"
     },
     "Synthetic": {
       "en": "Synthetic",

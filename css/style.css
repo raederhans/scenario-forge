@@ -1526,6 +1526,41 @@ details.card[open] > summary::after {
   background: rgba(255, 255, 255, 0.74);
 }
 
+.dock-paint-secondary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.dock-paint-mini-label {
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dock-paint-toggle-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.dock-paint-hint {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.mode-toggle-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+  transform: none;
+}
+
 .dock-political-owner {
   flex: 1 1 140px;
   min-width: 120px;

@@ -31,7 +31,7 @@ class FileManager {
   static exportProject(appState) {
     if (!appState) return;
     const payload = {
-      schemaVersion: 12,
+      schemaVersion: 13,
       countryBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
       featureOverrides: appState.visualOverrides || appState.featureOverrides || {},
       sovereignBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
@@ -51,6 +51,8 @@ class FileManager {
         showOpenOceanRegions: !!appState.showOpenOceanRegions,
         showScenarioSpecialRegions:
           appState.showScenarioSpecialRegions === undefined ? true : !!appState.showScenarioSpecialRegions,
+        showScenarioReliefOverlays:
+          appState.showScenarioReliefOverlays === undefined ? true : !!appState.showScenarioReliefOverlays,
         showUrban: !!appState.showUrban,
         showPhysical: !!appState.showPhysical,
         showRivers: !!appState.showRivers,
@@ -197,6 +199,10 @@ class FileManager {
           data.layerVisibility.showScenarioSpecialRegions === undefined
             ? true
             : !!data.layerVisibility.showScenarioSpecialRegions;
+        data.layerVisibility.showScenarioReliefOverlays =
+          data.layerVisibility.showScenarioReliefOverlays === undefined
+            ? true
+            : !!data.layerVisibility.showScenarioReliefOverlays;
         data.layerVisibility.showUrban =
           data.layerVisibility.showUrban === undefined ? true : !!data.layerVisibility.showUrban;
         data.layerVisibility.showPhysical =

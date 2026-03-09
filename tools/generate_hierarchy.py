@@ -974,6 +974,59 @@ def filter_groups_to_authoritative_ids(groups: dict, labels: dict, valid_ids: se
     return filtered_groups, filtered_labels, dropped_children
 
 
+def validate_country_leaf_group_coverage(
+    groups: dict,
+    authoritative_ids: set[str],
+    *,
+    group_prefix: str,
+    leaf_prefix: str,
+) -> None:
+    expected_ids = {
+        feature_id
+        for feature_id in authoritative_ids
+        if str(feature_id or "").startswith(leaf_prefix)
+    }
+    if not expected_ids:
+        return
+
+    grouped_ids = set()
+    duplicate_ids = set()
+    for group_id, children in groups.items():
+        if not str(group_id or "").startswith(group_prefix):
+            continue
+        for child in children or []:
+            child_id = str(child or "").strip()
+            if not child_id.startswith(leaf_prefix):
+                continue
+            if child_id in grouped_ids:
+                duplicate_ids.add(child_id)
+            grouped_ids.add(child_id)
+
+    missing_ids = sorted(expected_ids - grouped_ids)
+    if duplicate_ids or missing_ids:
+        problems = []
+        if missing_ids:
+            problems.append(f"missing={len(missing_ids)}")
+        if duplicate_ids:
+            problems.append(f"duplicates={len(duplicate_ids)}")
+        raise ValueError(
+            f"{group_prefix} leaf grouping coverage invalid ({', '.join(problems)})."
+        )
+
+
+def build_interaction_policies() -> dict:
+    return {
+        "CN": {
+            "leaf_source": "detail",
+            "leaf_kind": "adm2",
+            "parent_source": "hierarchy",
+            "parent_scope_label": "Province",
+            "requires_composite": True,
+            "quick_fill_scopes": ["parent", "country"],
+        }
+    }
+
+
 def main():
     adm2_path = DEFAULT_CHINA_ADM2
     adm1_path = find_ne_admin1(DATA_DIR)
@@ -1120,6 +1173,12 @@ def main():
             "[Hierarchy] Authority filter: "
             f"source={authoritative_path.name}, groups={len(groups)}, dropped_children={dropped_children}"
         )
+    validate_country_leaf_group_coverage(
+        groups,
+        authoritative_ids,
+        group_prefix="CN_",
+        leaf_prefix="CN_CITY_",
+    )
 
     primary_topology_path = DATA_DIR / "europe_topology.json"
     active_country_codes = collect_active_country_codes(primary_topology_path)
@@ -1127,10 +1186,12 @@ def main():
         DEFAULT_ADMIN0_COUNTRIES,
         active_country_codes,
     )
+    interaction_policies = build_interaction_policies()
 
     output = {
         "groups": groups,
         "labels": labels,
+        "interaction_policies": interaction_policies,
         "country_groups": country_groups,
     }
     output_path = DATA_DIR / "hierarchy.json"
