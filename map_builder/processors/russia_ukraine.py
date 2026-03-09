@@ -1,8 +1,6 @@
 """Russia/Ukraine hybrid replacement processor."""
 from __future__ import annotations
 
-import math
-
 import geopandas as gpd
 import pandas as pd
 from shapely.geometry import box
@@ -138,67 +136,6 @@ def _restore_missing_shell_fragments(
     return merged
 
 
-def _rep_longitudes(gdf: gpd.GeoDataFrame) -> pd.Series:
-    gdf_ll = _ensure_epsg4326(gdf)
-    reps = gdf_ll.geometry.representative_point()
-    return reps.x
-
-
-def _is_ru_managed_detail_id(feature_id: object) -> bool:
-    value = str(feature_id or "").strip()
-    return value.startswith(("RU_RAY_", "RU_ARCTIC_FB_", "RU_CITY_"))
-
-
-def _should_refine_ru_parent(feature_id: object, rep_lon: object) -> bool:
-    value = str(feature_id or "").strip()
-    if not value:
-        return False
-    if value in set(getattr(cfg, "RUSSIA_COASTAL_FAR_EAST_DETAIL_PARENT_IDS", ())):
-        return True
-    try:
-        rep_lon_value = float(rep_lon)
-    except (TypeError, ValueError):
-        return False
-    return value.startswith("RUS-") and math.isfinite(rep_lon_value) and rep_lon_value < cfg.URAL_LONGITUDE
-
-
-def _assign_ru_parent_ids(
-    detail_gdf: gpd.GeoDataFrame,
-    parent_gdf: gpd.GeoDataFrame,
-) -> pd.Series:
-    if detail_gdf.empty or parent_gdf.empty:
-        return pd.Series([""] * len(detail_gdf), index=detail_gdf.index, dtype="object")
-
-    detail = _ensure_epsg4326(detail_gdf.copy())
-    parents = _ensure_epsg4326(parent_gdf.copy())
-    parent_cols = [col for col in ("id", "geometry") if col in parents.columns]
-    if "id" not in parent_cols:
-        return pd.Series([""] * len(detail_gdf), index=detail_gdf.index, dtype="object")
-
-    points = detail[["geometry"]].copy()
-    points["geometry"] = detail.geometry.representative_point()
-    joined = gpd.sjoin(
-        points,
-        parents[parent_cols],
-        how="left",
-        predicate="within",
-    )
-
-    assigned = joined["id"].reindex(points.index)
-    missing = assigned.isna() | (assigned.astype(str).str.strip() == "")
-    if missing.any():
-        metric_crs = getattr(cfg, "AREA_CRS", "EPSG:6933")
-        nearest = gpd.sjoin_nearest(
-            points.loc[missing].to_crs(metric_crs),
-            parents[parent_cols].to_crs(metric_crs),
-            how="left",
-        )
-        assigned.loc[missing] = nearest["id"].values
-
-    assigned = assigned.fillna("").astype(str).str.strip()
-    return assigned.reindex(detail_gdf.index, fill_value="")
-
-
 def apply_russia_ukraine_replacement(main_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     if main_gdf.empty:
         return main_gdf
@@ -210,38 +147,14 @@ def apply_russia_ukraine_replacement(main_gdf: gpd.GeoDataFrame) -> gpd.GeoDataF
         ~main_gdf["cntr_code"].astype(str).str.upper().isin({"RU", "UA"})
     ].copy()
 
-    # Russia: preserve existing mixed detail and only refine selected coarse parents.
+    # Russia: replace the country with full ADM2 coverage, then re-apply city overrides.
     ru_all = main_gdf[main_gdf["cntr_code"].astype(str).str.upper() == "RU"].copy()
     ru_shell = ru_all.copy()
     if "id" not in ru_all.columns:
         ru_all["id"] = ""
     ru_all["id"] = ru_all["id"].fillna("").astype(str).str.strip()
-    managed_mask = ru_all["id"].apply(_is_ru_managed_detail_id)
     city_mask = ru_all["id"].str.startswith("RU_CITY_")
-    existing_detail = ru_all[ru_all["id"].str.startswith("RU_RAY_")].copy()
     ru_city_overrides = ru_all[city_mask].copy()
-    ru_coarse = ru_all[~managed_mask].copy()
-    refined_parent_ids: set[str] = set()
-    if not ru_coarse.empty:
-        ru_coarse["__rep_lon"] = _rep_longitudes(ru_coarse)
-        ru_coarse["__refine_parent"] = [
-            _should_refine_ru_parent(feature_id, rep_lon)
-            for feature_id, rep_lon in zip(ru_coarse["id"], ru_coarse["__rep_lon"])
-        ]
-        refined_parent_ids = {
-            str(feature_id).strip()
-            for feature_id in ru_coarse.loc[ru_coarse["__refine_parent"], "id"].tolist()
-            if str(feature_id).strip()
-        }
-        ru_retained_coarse = ru_coarse.loc[~ru_coarse["__refine_parent"]].copy()
-        ru_retained_coarse = ru_retained_coarse.drop(columns=["__rep_lon", "__refine_parent"], errors="ignore")
-    else:
-        ru_retained_coarse = ru_coarse
-
-    ru_preserved_detail = existing_detail.copy()
-    if not existing_detail.empty and not ru_coarse.empty and refined_parent_ids:
-        existing_parent_ids = _assign_ru_parent_ids(existing_detail, ru_coarse[["id", "geometry"]])
-        ru_preserved_detail = existing_detail.loc[~existing_parent_ids.isin(refined_parent_ids)].copy()
 
     print("Downloading Russia ADM2 (geoBoundaries)...")
     ru_gdf = fetch_or_load_geojson(
@@ -268,12 +181,6 @@ def apply_russia_ukraine_replacement(main_gdf: gpd.GeoDataFrame) -> gpd.GeoDataF
             f"Available: {ru_gdf.columns.tolist()}"
         )
     ru_gdf = ru_gdf.copy()
-    if refined_parent_ids and not ru_coarse.empty:
-        ru_gdf["__parent_id"] = _assign_ru_parent_ids(ru_gdf, ru_coarse[["id", "geometry"]])
-        ru_gdf = ru_gdf[ru_gdf["__parent_id"].isin(refined_parent_ids)].copy()
-        ru_gdf = ru_gdf.drop(columns=["__parent_id"], errors="ignore")
-    else:
-        ru_gdf = ru_gdf.iloc[0:0].copy()
     ru_gdf["id"] = "RU_RAY_" + ru_gdf["shapeID"].astype(str)
     ru_gdf["name"] = ru_gdf["shapeName"].astype(str)
     ru_gdf["cntr_code"] = "RU"
@@ -282,7 +189,7 @@ def apply_russia_ukraine_replacement(main_gdf: gpd.GeoDataFrame) -> gpd.GeoDataF
         tolerance=cfg.SIMPLIFY_RU_UA, preserve_topology=True
     )
     ru_combined = gpd.GeoDataFrame(
-        pd.concat([ru_retained_coarse, ru_preserved_detail, ru_gdf, ru_city_overrides], ignore_index=True),
+        pd.concat([ru_gdf, ru_city_overrides], ignore_index=True),
         crs=main_gdf.crs,
     )
     ru_combined = _clip_features_to_shell(ru_combined, ru_shell, label="Russia")
@@ -325,8 +232,7 @@ def apply_russia_ukraine_replacement(main_gdf: gpd.GeoDataFrame) -> gpd.GeoDataF
 
     combined = pd.concat([base, ru_combined, ua_gdf], ignore_index=True)
     print(
-        f"[RU/UA] Replacement: RU refreshed ADM2 {len(ru_gdf)}, RU retained coarse {len(ru_retained_coarse)}, "
-        f"RU preserved detail {len(ru_preserved_detail)}, RU cities {len(ru_city_overrides)}, "
+        f"[RU/UA] Replacement: RU full ADM2 {len(ru_gdf)}, RU cities {len(ru_city_overrides)}, "
         f"RU final {len(ru_combined)}, UA ADM2 {len(ua_gdf)}."
     )
     return gpd.GeoDataFrame(combined, crs=main_gdf.crs)

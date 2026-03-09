@@ -118,12 +118,32 @@ def _iter_specs(
     ]
 
 
+def _resolve_allowed_area_geometry(
+    allowed_area_gdf: gpd.GeoDataFrame | None,
+    country_code: str,
+):
+    if allowed_area_gdf is None:
+        return None
+    allowed = _prepare_country_layer(allowed_area_gdf)
+    if allowed.empty:
+        return None
+    if "cntr_code" in allowed.columns:
+        country_allowed = allowed[allowed["cntr_code"] == country_code].copy()
+        if not country_allowed.empty:
+            allowed = country_allowed
+    allowed_union = _make_valid(unary_union(allowed.geometry.tolist()))
+    if allowed_union is None or allowed_union.is_empty:
+        return None
+    return allowed_union
+
+
 def collect_shell_coverage_gaps(
     detail_gdf: gpd.GeoDataFrame,
     shell_gdf: gpd.GeoDataFrame,
     coverage_specs: dict[str, ManagedShellCoverageSpec] | None = None,
     *,
     exclude_managed_fragments: bool = False,
+    allowed_area_gdf: gpd.GeoDataFrame | None = None,
     min_area_km2: float | None = None,
 ) -> list[dict[str, object]]:
     detail = _prepare_country_layer(detail_gdf)
@@ -149,6 +169,9 @@ def collect_shell_coverage_gaps(
         if shell_union is None or shell_union.is_empty:
             continue
         missing = shell_union if detail_union is None else _make_valid(shell_union.difference(detail_union))
+        allowed_area = _resolve_allowed_area_geometry(allowed_area_gdf, country_code)
+        if allowed_area is not None:
+            missing = _make_valid(missing.intersection(allowed_area)) if missing is not None else None
         fragments = _explode_gap_geometry(missing)
         if fragments.empty:
             continue
@@ -185,6 +208,7 @@ def repair_shell_coverage(
     shell_gdf: gpd.GeoDataFrame,
     coverage_specs: dict[str, ManagedShellCoverageSpec] | None = None,
     *,
+    allowed_area_gdf: gpd.GeoDataFrame | None = None,
     log_prefix: str = "[Coverage]",
 ) -> gpd.GeoDataFrame:
     base = _prepare_country_layer(detail_gdf)
@@ -204,6 +228,7 @@ def repair_shell_coverage(
             shell_gdf,
             {spec.country_code: spec},
             exclude_managed_fragments=False,
+            allowed_area_gdf=allowed_area_gdf,
         )
         if not gaps:
             continue
@@ -250,6 +275,7 @@ def append_shell_coverage_gap_fragments(
     coverage_specs: dict[str, ManagedShellCoverageSpec] | None = None,
     *,
     gap_source_gdf: gpd.GeoDataFrame | None = None,
+    allowed_area_gdf: gpd.GeoDataFrame | None = None,
     log_prefix: str = "[Coverage]",
 ) -> gpd.GeoDataFrame:
     result = _prepare_country_layer(detail_gdf)
@@ -267,6 +293,7 @@ def append_shell_coverage_gap_fragments(
             shell_gdf,
             {spec.country_code: spec},
             exclude_managed_fragments=False,
+            allowed_area_gdf=allowed_area_gdf,
         )
         if not gaps:
             continue

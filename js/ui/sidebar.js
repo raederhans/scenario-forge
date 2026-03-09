@@ -69,6 +69,26 @@ function getCountryCodeFromProps(props = {}, fallbackId = "") {
   );
 }
 
+function isScenarioShellLikeFeature(feature, featureId = "") {
+  const candidate = String(feature?.properties?.id || feature?.id || featureId || "").trim().toUpperCase();
+  if (!candidate) return false;
+  if (candidate.includes("_FB_")) return true;
+  return String(feature?.properties?.name || "").toLowerCase().includes("shell fallback");
+}
+
+function isAntarcticSectorLikeFeature(feature, featureId = "") {
+  const candidate = String(feature?.properties?.id || feature?.id || featureId || "").trim().toUpperCase();
+  if (!candidate) return false;
+  const detailTier = String(feature?.properties?.detail_tier || "").trim().toLowerCase();
+  if (detailTier !== "antarctic_sector") return false;
+  const countryCode = getCountryCodeFromProps(feature?.properties || {}, candidate);
+  return countryCode === "AQ" || candidate.startsWith("AQ_");
+}
+
+function shouldExcludeScenarioPoliticalFeature(feature, featureId = "") {
+  return isScenarioShellLikeFeature(feature, featureId) || isAntarcticSectorLikeFeature(feature, featureId);
+}
+
 function getCountryNameFromProps(props = {}) {
   const candidate =
     props.name_en ||
@@ -625,15 +645,19 @@ function applyOwnershipToFeatureIds(
     recomputeReason = "sidebar-ownership-batch",
   } = {}
 ) {
-  const normalizedTargetIds = Array.from(new Set((targetIds || []).map((id) => String(id || "").trim()).filter(Boolean)));
+  const {
+    requestedIds,
+    matchedIds: normalizedTargetIds,
+    missingIds,
+  } = filterToVisibleFeatureIds(targetIds);
   const normalizedOwnerCode = normalizeCountryCode(ownerCode);
   if (!normalizedTargetIds.length) {
     return {
       applied: false,
       changed: 0,
       matchedCount: 0,
-      requestedCount: 0,
-      missingCount: 0,
+      requestedCount: requestedIds.length,
+      missingCount: missingIds.length,
       reason: "empty-target",
       mode: "ownership",
     };
@@ -643,8 +667,8 @@ function applyOwnershipToFeatureIds(
       applied: false,
       changed: 0,
       matchedCount: normalizedTargetIds.length,
-      requestedCount: normalizedTargetIds.length,
-      missingCount: 0,
+      requestedCount: requestedIds.length,
+      missingCount: missingIds.length,
       reason: "missing-active-owner",
       mode: "ownership",
     };
@@ -674,8 +698,8 @@ function applyOwnershipToFeatureIds(
     applied: true,
     changed,
     matchedCount: normalizedTargetIds.length,
-    requestedCount: normalizedTargetIds.length,
-    missingCount: 0,
+    requestedCount: requestedIds.length,
+    missingCount: missingIds.length,
     reason: "",
     mode: "ownership",
   };
@@ -903,7 +927,8 @@ function filterToVisibleFeatureIds(featureIds = []) {
   const matchedIds = [];
   const missingIds = [];
   requestedIds.forEach((id) => {
-    if (landIndex.has(id)) {
+    const feature = landIndex.get(id);
+    if (feature && !shouldExcludeScenarioPoliticalFeature(feature, id)) {
       matchedIds.push(id);
       return;
     }

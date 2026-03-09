@@ -11,6 +11,7 @@ import geopandas as gpd
 import topojson as tp
 from shapely.geometry import GeometryCollection, MultiPolygon, Polygon
 from shapely.geometry.polygon import orient
+from shapely.ops import unary_union
 from topojson.utils import serialize_as_geodataframe, serialize_as_geojson
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -287,6 +288,61 @@ def _repair_political_geometries(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     return out
 
 
+def _clip_ru_managed_detail_to_land(
+    political_gdf: gpd.GeoDataFrame,
+    land_gdf: gpd.GeoDataFrame | None,
+) -> gpd.GeoDataFrame:
+    if political_gdf.empty or land_gdf is None or land_gdf.empty or "id" not in political_gdf.columns:
+        return political_gdf
+
+    land = _ensure_epsg4326(land_gdf.copy())
+    land_geometries = [
+        normalized
+        for normalized in (_normalize_polygonal_geometry(geometry) for geometry in land.geometry.tolist())
+        if normalized is not None and not normalized.is_empty
+    ]
+    if not land_geometries:
+        return political_gdf
+
+    land_union = _normalize_polygonal_geometry(unary_union(land_geometries))
+    if land_union is None or land_union.is_empty:
+        return political_gdf
+
+    out = _ensure_epsg4326(political_gdf.copy())
+    feature_ids = out["id"].fillna("").astype(str).str.strip()
+    managed_mask = feature_ids.str.startswith(("RU_RAY_", "RU_ARCTIC_FB_", "RU_CITY_"))
+    if not managed_mask.any():
+        return political_gdf
+
+    clipped = 0
+    dropped = 0
+    geom_series = out.geometry.copy()
+
+    for index in out.index[managed_mask]:
+        geometry = geom_series.loc[index]
+        if geometry is None or geometry.is_empty:
+            continue
+        clipped_geometry = _normalize_polygonal_geometry(geometry.intersection(land_union))
+        if clipped_geometry is None:
+            geom_series.loc[index] = None
+            dropped += 1
+            continue
+        try:
+            changed = not clipped_geometry.equals(geometry)
+        except Exception:
+            changed = True
+        if changed:
+            clipped += 1
+        geom_series.loc[index] = clipped_geometry
+
+    out = out.set_geometry(geom_series)
+    out = out[out.geometry.notnull()].copy()
+    out = out[~out.geometry.is_empty].copy()
+    if clipped or dropped:
+        print(f"[Detail patch] Clipped {clipped} RU managed detail geometries to land; dropped={dropped}.")
+    return out
+
+
 def _inject_computed_neighbors(topology_dict: dict, political_gdf: gpd.GeoDataFrame) -> None:
     objects = topology_dict.get("objects", {})
     political = objects.get("political", {}) if isinstance(objects, dict) else {}
@@ -388,6 +444,10 @@ def main() -> None:
     patched_political = apply_belarus_replacement(patched_political)
     patched_political = apply_russia_ukraine_replacement(patched_political)
     patched_political = apply_au_city_overrides(patched_political)
+    patched_political = _clip_ru_managed_detail_to_land(
+        patched_political,
+        layers.get("land"),
+    )
     if getattr(cfg, "ENABLE_SUBDIVISION_ENRICHMENT", False):
         patched_political = apply_config_subdivisions(patched_political)
     patched_political = _repair_political_metadata(patched_political)
@@ -410,6 +470,10 @@ def main() -> None:
 
     roundtrip_political = _topology_object_to_gdf(staging_dict, "political")
     roundtrip_political = _repair_political_geometries(roundtrip_political)
+    roundtrip_political = _clip_ru_managed_detail_to_land(
+        roundtrip_political,
+        primary_layers.get("land") if primary_layers is not None else layers.get("land"),
+    )
     if roundtrip_political.empty:
         raise ValueError("Detail topology round-trip repair removed all political geometries.")
     if len(roundtrip_political) != len(patched_political):
@@ -421,7 +485,12 @@ def main() -> None:
         roundtrip_political = repair_shell_coverage(
             roundtrip_political,
             primary_layers["political"],
+            allowed_area_gdf=primary_layers.get("land"),
             log_prefix="[Detail patch]",
+        )
+        roundtrip_political = _clip_ru_managed_detail_to_land(
+            roundtrip_political,
+            primary_layers.get("land"),
         )
     layers["political"] = roundtrip_political
     _record_timing(
@@ -452,6 +521,7 @@ def main() -> None:
             gaps = collect_shell_coverage_gaps(
                 output_political,
                 primary_layers["political"],
+                allowed_area_gdf=primary_layers.get("land"),
             )
             if not gaps:
                 break
@@ -465,7 +535,12 @@ def main() -> None:
             roundtrip_political = append_shell_coverage_gap_fragments(
                 output_political,
                 primary_layers["political"],
+                allowed_area_gdf=primary_layers.get("land"),
                 log_prefix=f"[Detail patch pass {repair_pass}]",
+            )
+            roundtrip_political = _clip_ru_managed_detail_to_land(
+                roundtrip_political,
+                primary_layers.get("land"),
             )
             layers["political"] = roundtrip_political
             _write_output_topology(

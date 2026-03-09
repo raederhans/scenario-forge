@@ -454,6 +454,10 @@ function isScenarioShellCandidate(featureId, featureName = "") {
   return String(featureName || "").toLowerCase().includes("shell fallback");
 }
 
+function isScenarioShellOverlayEnabled() {
+  return false;
+}
+
 function getScenarioEffectiveOwnerCodeByFeatureId(featureId) {
   const normalizedId = String(featureId || "").trim();
   if (!normalizedId) return "";
@@ -511,7 +515,7 @@ function refreshScenarioShellOverlays({ renderNow = false, borderReason = "scena
   let nextOwnerMap = {};
   let nextControllerMap = {};
 
-  if (state.activeScenarioId) {
+  if (state.activeScenarioId && isScenarioShellOverlayEnabled()) {
     const geometries = state.runtimePoliticalTopology?.objects?.political?.geometries || [];
     if (Array.isArray(geometries) && geometries.length) {
       const neighborGraph = getScenarioRuntimeNeighborGraph(geometries);
@@ -570,16 +574,15 @@ function getScenarioDisplayOwnerByFeatureId(featureId, { fallbackOwner = "" } = 
   const normalizedId = String(featureId || "").trim();
   if (!normalizedId) return String(fallbackOwner || "").trim().toUpperCase();
   const fallback = String(fallbackOwner || "").trim().toUpperCase();
-  const shellOwner = String(state.scenarioAutoShellOwnerByFeatureId?.[normalizedId] || "").trim().toUpperCase();
+  const directOwner = String(state.sovereigntyByFeatureId?.[normalizedId] || "").trim().toUpperCase();
+  const directController = String(state.scenarioControllersByFeatureId?.[normalizedId] || "").trim().toUpperCase();
   if (!state.activeScenarioId || normalizeScenarioViewMode(state.scenarioViewMode) !== "frontline") {
-    return shellOwner || fallback;
+    return directOwner || fallback;
   }
   return String(
-    state.scenarioAutoShellControllerByFeatureId?.[normalizedId]
-    || state.scenarioControllersByFeatureId?.[normalizedId]
-    || shellOwner
+    directController
+    || directOwner
     || fallback
-    || state.sovereigntyByFeatureId?.[normalizedId]
     || ""
   ).trim().toUpperCase();
 }

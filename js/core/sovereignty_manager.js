@@ -30,6 +30,26 @@ function getCanonicalCountryCodeForFeature(feature) {
   return normalizeOwnerCode(direct);
 }
 
+function isScenarioShellLikeFeature(feature, featureId = "") {
+  const candidate = getFeatureId(feature) || String(featureId || "").trim();
+  if (!candidate) return false;
+  if (String(candidate).toUpperCase().includes("_FB_")) return true;
+  return String(feature?.properties?.name || "").toLowerCase().includes("shell fallback");
+}
+
+function isAntarcticSectorLikeFeature(feature, featureId = "") {
+  const candidate = (getFeatureId(feature) || String(featureId || "").trim()).toUpperCase();
+  if (!candidate) return false;
+  const detailTier = String(feature?.properties?.detail_tier || "").trim().toLowerCase();
+  if (detailTier !== "antarctic_sector") return false;
+  const countryCode = getCanonicalCountryCodeForFeature(feature);
+  return countryCode === "AQ" || candidate.startsWith("AQ_");
+}
+
+function shouldExcludeScenarioPoliticalFeature(feature, featureId = "") {
+  return isScenarioShellLikeFeature(feature, featureId) || isAntarcticSectorLikeFeature(feature, featureId);
+}
+
 function getFeatureId(featureOrId) {
   if (!featureOrId) return "";
   if (typeof featureOrId === "string") return featureOrId.trim();
@@ -47,7 +67,7 @@ function seedSovereigntyFromLandData(featureCollection) {
   features.forEach((feature) => {
     const id = getFeatureId(feature);
     const code = getCanonicalCountryCodeForFeature(feature);
-    if (!id || !code) return;
+    if (!id || !code || shouldExcludeScenarioPoliticalFeature(feature, id)) return;
     next[id] = code;
   });
   return next;
@@ -75,6 +95,8 @@ function rebuildOwnerIndex() {
   state.ownerToFeatureIds.clear();
   Object.entries(state.sovereigntyByFeatureId || {}).forEach(([id, ownerCode]) => {
     const code = normalizeOwnerCode(ownerCode);
+    const feature = state.landIndex?.get(id);
+    if (shouldExcludeScenarioPoliticalFeature(feature, id)) return;
     if (!id || !code) return;
     const bucket = state.ownerToFeatureIds.get(code) || new Set();
     bucket.add(id);
@@ -148,6 +170,9 @@ function setFeatureOwnerCode(featureId, ownerCode) {
     // Ignore writes for features that are not currently present in the loaded map topology.
     return false;
   }
+  if (shouldExcludeScenarioPoliticalFeature(landIndex?.get(id), id)) {
+    return false;
+  }
   ensureSovereigntyState();
   const prev = getFeatureOwnerCode(id, { skipEnsure: true });
   if (prev === code) return false;
@@ -174,6 +199,7 @@ function resetFeatureOwnerCode(featureId) {
   if (!id) return false;
   ensureSovereigntyState();
   const feature = state.landIndex?.get(id);
+  if (shouldExcludeScenarioPoliticalFeature(feature, id)) return false;
   const canonical = getCanonicalCountryCodeForFeature(feature);
   if (!canonical) return false;
   const prev = getFeatureOwnerCode(id, { skipEnsure: true });

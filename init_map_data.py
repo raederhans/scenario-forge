@@ -1562,6 +1562,8 @@ def build_na_detail_topology(
             patch_script,
             source_topology,
             PROJECT_ROOT / "map_builder" / "config.py",
+            PROJECT_ROOT / "map_builder" / "processors" / "detail_shell_coverage.py",
+            PROJECT_ROOT / "map_builder" / "processors" / "russia_ukraine.py",
         ],
         extra={"output": str(output_path)},
     )
@@ -1649,6 +1651,7 @@ def build_runtime_political_topology(
             detail_topology,
             ru_overrides_path,
             PROJECT_ROOT / "map_builder" / "config.py",
+            PROJECT_ROOT / "map_builder" / "processors" / "detail_shell_coverage.py",
         ],
         extra={"output": str(output_path)},
     )

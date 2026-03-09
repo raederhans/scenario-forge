@@ -11,6 +11,7 @@ import time
 import geopandas as gpd
 from shapely.geometry import GeometryCollection, MultiPolygon, Polygon
 from shapely.geometry.polygon import orient
+from shapely.ops import unary_union
 from topojson.utils import serialize_as_geodataframe, serialize_as_geojson
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -263,6 +264,64 @@ def _repair_geometries(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     return out
 
 
+def _clip_ru_managed_detail_to_land(
+    political_gdf: gpd.GeoDataFrame,
+    land_gdf: gpd.GeoDataFrame | None,
+) -> gpd.GeoDataFrame:
+    if political_gdf.empty or land_gdf is None or land_gdf.empty or "id" not in political_gdf.columns:
+        return political_gdf
+
+    land = _ensure_epsg4326(land_gdf.copy())
+    land_geometries = [
+        normalized
+        for normalized in (_normalize_polygonal_geometry(geometry) for geometry in land.geometry.tolist())
+        if normalized is not None and not normalized.is_empty
+    ]
+    if not land_geometries:
+        return political_gdf
+
+    land_union = _normalize_polygonal_geometry(unary_union(land_geometries))
+    if land_union is None or land_union.is_empty:
+        return political_gdf
+
+    out = _ensure_epsg4326(political_gdf.copy())
+    feature_ids = out["id"].fillna("").astype(str).str.strip()
+    managed_mask = feature_ids.str.startswith(("RU_RAY_", "RU_ARCTIC_FB_", "RU_CITY_"))
+    if not managed_mask.any():
+        return political_gdf
+
+    clipped = 0
+    dropped = 0
+    geom_series = out.geometry.copy()
+
+    for index in out.index[managed_mask]:
+        geometry = geom_series.loc[index]
+        if geometry is None or geometry.is_empty:
+            continue
+        clipped_geometry = _normalize_polygonal_geometry(geometry.intersection(land_union))
+        if clipped_geometry is None:
+            geom_series.loc[index] = None
+            dropped += 1
+            continue
+        try:
+            changed = not clipped_geometry.equals(geometry)
+        except Exception:
+            changed = True
+        if changed:
+            clipped += 1
+        geom_series.loc[index] = clipped_geometry
+
+    out = out.set_geometry(geom_series)
+    out = out[out.geometry.notnull()].copy()
+    out = out[~out.geometry.is_empty].copy()
+    if clipped or dropped:
+        print(
+            f"[Runtime Political] Clipped {clipped} RU managed detail geometries to land; "
+            f"dropped={dropped}."
+        )
+    return out
+
+
 def _merge_override_features(
     base_features: list[dict],
     override_features: list[dict],
@@ -333,6 +392,7 @@ def _compose_political_features(
     override_collection: dict | None,
 ) -> gpd.GeoDataFrame:
     primary_gdf = _topology_object_to_gdf(primary_topology, "political")
+    primary_land_gdf = _topology_object_to_gdf(primary_topology, "land")
     if primary_gdf.empty:
         raise ValueError("Primary topology has no political features.")
 
@@ -405,11 +465,14 @@ def _compose_political_features(
 
     runtime_gdf = runtime_gdf[runtime_gdf.geometry.notna() & ~runtime_gdf.geometry.is_empty].copy()
     runtime_gdf = _repair_geometries(runtime_gdf)
+    runtime_gdf = _clip_ru_managed_detail_to_land(runtime_gdf, primary_land_gdf)
     runtime_gdf = repair_shell_coverage(
         runtime_gdf,
         primary_gdf,
+        allowed_area_gdf=primary_land_gdf,
         log_prefix="[Runtime Political]",
     )
+    runtime_gdf = _clip_ru_managed_detail_to_land(runtime_gdf, primary_land_gdf)
     runtime_gdf = _prune_political_columns(runtime_gdf)
     runtime_gdf = runtime_gdf.reset_index(drop=True)
     runtime_gdf = _dedupe_feature_ids(runtime_gdf)
@@ -473,6 +536,7 @@ def main() -> None:
     load_start = time.perf_counter()
     primary_topology = _load_topology(args.primary_topology)
     primary_political = _topology_object_to_gdf(primary_topology, "political")
+    primary_land = _topology_object_to_gdf(primary_topology, "land")
     detail_topology = _load_topology(args.detail_topology) if args.detail_topology.exists() else None
     override_collection = (
         json.loads(args.ru_overrides.read_text(encoding="utf-8"))
@@ -518,7 +582,11 @@ def main() -> None:
     for repair_pass in range(1, 4):
         output_topology = _load_topology(args.output_topology)
         output_political = _topology_object_to_gdf(output_topology, "political")
-        gaps = collect_shell_coverage_gaps(output_political, primary_political)
+        gaps = collect_shell_coverage_gaps(
+            output_political,
+            primary_political,
+            allowed_area_gdf=primary_land,
+        )
         if not gaps:
             break
         repair_passes += 1
@@ -532,8 +600,10 @@ def main() -> None:
             runtime_political,
             primary_political,
             gap_source_gdf=output_political,
+            allowed_area_gdf=primary_land,
             log_prefix=f"[Runtime Political pass {repair_pass}]",
         )
+        runtime_political = _clip_ru_managed_detail_to_land(runtime_political, primary_land)
         runtime_political = _prune_political_columns(runtime_political)
         runtime_political = _dedupe_feature_ids(runtime_political)
         _write_output_topology(

@@ -73,7 +73,8 @@ const LAND_FILL_COLOR = "#f0f0f0";
 const BORDER_FALLBACK_COLOR = "rgba(0, 0, 0, 0.2)";
 const SPECIAL_REGION_FALLBACK_FILL = "#d6c19a";
 const SPECIAL_REGION_FALLBACK_STROKE = "#8d6f47";
-const SCENARIO_LAKE_STROKE_COLOR = "rgba(47, 78, 112, 0.82)";
+const UNIFIED_WATER_STROKE_COLOR = "rgba(62, 96, 138, 0)";
+const UNIFIED_WATER_FILL_OPACITY = 1;
 const RELIEF_SALT_FILL_COLOR = "rgba(222, 203, 170, 0.22)";
 const RELIEF_SALT_STROKE_COLOR = "rgba(128, 100, 63, 0.55)";
 const RELIEF_SHORELINE_COLOR = "rgba(109, 84, 50, 0.78)";
@@ -466,6 +467,33 @@ function invalidateAllRenderPasses(reason = "unspecified") {
   invalidateRenderPasses(RENDER_PASS_NAMES, reason);
 }
 
+function clearRenderPassReferenceTransforms(passNames = null) {
+  const cache = getRenderPassCacheState();
+  if (!passNames) {
+    cache.referenceTransform = null;
+    cache.referenceTransforms = {};
+    return;
+  }
+  const rawTargetPassNames = Array.isArray(passNames) ? passNames : [passNames];
+  const targetPassNames = rawTargetPassNames.flatMap((passName) => {
+    if (passName === "context") {
+      return ["contextBase", "contextScenario"];
+    }
+    return [passName];
+  });
+  targetPassNames.forEach((passName) => {
+    if (!passName) return;
+    delete cache.referenceTransforms[passName];
+  });
+  cache.referenceTransform = null;
+}
+
+function invalidateOceanVisualState(reason = "ocean-visual") {
+  cancelExactAfterSettleRefresh({ clearDefer: true });
+  invalidateRenderPasses(["background", "political", "contextBase", "contextScenario"], reason);
+  clearRenderPassReferenceTransforms(["background", "political", "contextBase", "contextScenario", "effects", "dayNight"]);
+}
+
 function resizeRenderPassCanvases() {
   const cache = getRenderPassCacheState();
   const scaledWidth = Math.max(1, Math.floor((state.width || 1) * Math.max(state.dpr || 1, 1)));
@@ -526,6 +554,7 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       transformSignature,
       state.topologyRevision || 0,
       state.colorRevision || 0,
+      `ocean-fill:${getOceanBaseFillColor()}`,
       debugMode,
       state.topologyBundleMode || "single",
       getColorsHash(),
@@ -577,6 +606,7 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
       `scenario-overlays:${getScenarioOverlaySignatureToken()}`,
       state.showWaterRegions ? "scenario-water:on" : "scenario-water:off",
+      state.showOpenOceanRegions ? "open-ocean:on" : "open-ocean:off",
       state.showScenarioSpecialRegions ? "scenario-special:on" : "scenario-special:off",
       state.showScenarioReliefOverlays ? "scenario-relief:on" : "scenario-relief:off",
       `ocean-fill:${getOceanBaseFillColor()}`,
@@ -765,6 +795,14 @@ function isOpenOceanWaterRegion(feature) {
   return getWaterRegionType(feature) === "ocean";
 }
 
+function isMacroOceanWaterRegion(feature) {
+  if (!feature) return false;
+  return (
+    isOpenOceanWaterRegion(feature)
+    || String(feature?.properties?.region_group || "").trim().toLowerCase() === "ocean_macro"
+  );
+}
+
 function isWaterRegionEnabled(feature) {
   if (!feature) return false;
   if (isBaseGeographyScenarioFeature(feature)) {
@@ -777,19 +815,7 @@ function isWaterRegionEnabled(feature) {
 }
 
 function getWaterRegionDefaultStyle(feature) {
-  const waterType = getWaterRegionType(feature);
-  if (waterType === "lake") {
-    return {
-      fill: getLakeBaseFillColor(),
-      stroke: SCENARIO_LAKE_STROKE_COLOR,
-      opacity: 0.92,
-    };
-  }
-  return {
-    fill: getOceanBaseFillColor(),
-    stroke: "rgba(62, 96, 138, 0.45)",
-    opacity: 1,
-  };
+  return getUnifiedWaterBaseStyle(feature);
 }
 
 function getWaterRegionColor(id) {
@@ -1157,6 +1183,10 @@ function isAtlantropaSeaFeature(feature) {
 
 function getAtlantropaSeaPoliticalFillColor() {
   return getOceanBaseFillColor();
+}
+
+function getAtlantropaSeaPoliticalStrokeColor() {
+  return UNIFIED_WATER_STROKE_COLOR;
 }
 
 function getMediterraneanAtlantropaBounds() {
@@ -1727,9 +1757,30 @@ function isAdmin0ShellFeature(feature, featureId) {
   if (/^[A-Z]{2,3}$/.test(candidate)) {
     return true;
   }
+  const detailTier = String(feature?.properties?.detail_tier || "").trim().toLowerCase();
+  return detailTier === "antarctic_sector" && candidate.startsWith("AQ_");
+}
+
+function isScenarioShellFeature(feature, featureId = null) {
+  const candidate = String(
+    feature?.properties?.id ?? featureId ?? feature?.id ?? ""
+  ).trim().toUpperCase();
+  if (candidate.includes("_FB_")) return true;
+  return String(feature?.properties?.name || "").toLowerCase().includes("shell fallback");
+}
+
+function isAntarcticSectorFeature(feature, featureId = null) {
+  const candidate = String(
+    feature?.properties?.id ?? featureId ?? feature?.id ?? ""
+  ).trim().toUpperCase();
+  if (!candidate) return false;
   const countryCode = getFeatureCountryCodeNormalized(feature);
   const detailTier = String(feature?.properties?.detail_tier || "").trim().toLowerCase();
-  return countryCode === "AQ" && detailTier === "antarctic_sector" && candidate.startsWith("AQ_");
+  return detailTier === "antarctic_sector" && (countryCode === "AQ" || candidate.startsWith("AQ_"));
+}
+
+function shouldExcludePoliticalInteractionFeature(feature, featureId = null) {
+  return isScenarioShellFeature(feature, featureId) || isAntarcticSectorFeature(feature, featureId);
 }
 
 function isGiantFeature(feature, canvasWidth, canvasHeight, boundsOverride = null) {
@@ -2278,16 +2329,24 @@ function scheduleRenderPhaseIdle() {
 
 function getDisplayOwnerCode(feature, id) {
   const resolvedId = String(id || "").trim() || getFeatureId(feature);
+  if (isAntarcticSectorFeature(feature, resolvedId)) {
+    return "";
+  }
+  const isScenarioShell = isScenarioShellFeature(feature, resolvedId);
   const shellOwnerCode = String(state.scenarioAutoShellOwnerByFeatureId?.[resolvedId] || "").trim().toUpperCase();
   const directOwnerCode = canonicalCountryCode(state.sovereigntyByFeatureId?.[resolvedId] || "");
   const fallbackOwnerCode = getFeatureCountryCodeNormalized(feature);
-  const ownershipOwnerCode = shellOwnerCode || directOwnerCode || fallbackOwnerCode;
+  const ownershipOwnerCode = isScenarioShell
+    ? (directOwnerCode || shellOwnerCode || "")
+    : (directOwnerCode || fallbackOwnerCode || "");
   if (!state.activeScenarioId || String(state.scenarioViewMode || "ownership") !== "frontline") {
     return ownershipOwnerCode;
   }
   const shellControllerCode = String(state.scenarioAutoShellControllerByFeatureId?.[resolvedId] || "").trim().toUpperCase();
   const directControllerCode = canonicalCountryCode(state.scenarioControllersByFeatureId?.[resolvedId] || "");
-  return shellControllerCode || directControllerCode || ownershipOwnerCode || "";
+  return isScenarioShell
+    ? (directControllerCode || shellControllerCode || ownershipOwnerCode || "")
+    : (directControllerCode || ownershipOwnerCode || "");
 }
 
 function getResolvedFeatureColor(feature, id) {
@@ -3003,11 +3062,18 @@ function getEntityOwnerCode(entity) {
 }
 
 function shouldExcludeOwnerBorderEntity(entity, { excludeSea = false } = {}) {
-  if (!entity || !excludeSea) return false;
-  return isAtlantropaSeaFeature(asFeatureLike(entity));
+  if (!entity) return false;
+  const feature = asFeatureLike(entity);
+  if (shouldExcludePoliticalInteractionFeature(feature)) return true;
+  if (!excludeSea) return false;
+  return isAtlantropaSeaFeature(feature);
 }
 
 function resolveOwnerBorderCode(entity, ownershipContext = {}) {
+  const feature = asFeatureLike(entity);
+  if (shouldExcludePoliticalInteractionFeature(feature)) {
+    return "";
+  }
   const featureId = getEntityFeatureId(entity);
   const fallbackCode = getEntityCountryCode(entity) || "";
   const ownershipByFeatureId = ownershipContext?.ownershipByFeatureId || {};
@@ -3019,12 +3085,13 @@ function resolveOwnerBorderCode(entity, ownershipContext = {}) {
   if (!featureId) {
     return canonicalCountryCode(fallbackCode);
   }
+  const isScenarioShell = isScenarioShellFeature(feature, featureId);
   return canonicalCountryCode(
-    (useFrontline ? shellControllerByFeatureId?.[featureId] : "")
-    || (useFrontline ? controllerByFeatureId?.[featureId] : "")
-    || shellOwnerByFeatureId?.[featureId]
+    (useFrontline ? controllerByFeatureId?.[featureId] : "")
+    || (useFrontline && isScenarioShell ? shellControllerByFeatureId?.[featureId] : "")
     || ownershipByFeatureId?.[featureId]
-    || fallbackCode
+    || (!isScenarioShell ? fallbackCode : "")
+    || (isScenarioShell ? shellOwnerByFeatureId?.[featureId] : "")
     || ""
   );
 }
@@ -3077,7 +3144,7 @@ function getCountryFeatureEntriesMap() {
   features.forEach((feature) => {
     const id = getFeatureId(feature);
     const countryCode = getFeatureCountryCodeNormalized(feature);
-    if (!id || !countryCode) return;
+    if (!id || !countryCode || shouldExcludePoliticalInteractionFeature(feature, id)) return;
     const list = byCountry.get(countryCode) || [];
     list.push({ id, feature });
     byCountry.set(countryCode, list);
@@ -3377,7 +3444,8 @@ function getSourceCountrySets() {
   features.forEach((feature) => {
     const source = String(feature?.properties?.__source || "primary");
     const countryCode = getFeatureCountryCodeNormalized(feature);
-    if (!countryCode) return;
+    const featureId = getFeatureId(feature);
+    if (!countryCode || shouldExcludePoliticalInteractionFeature(feature, featureId)) return;
     if (source === "detail") {
       sets.detail.add(countryCode);
     } else {
@@ -3446,6 +3514,9 @@ function buildGlobalCountryBorderMesh(primaryTopology) {
     object,
     (a, b) => {
       if (!a || !b) return false;
+      if (shouldExcludePoliticalInteractionFeature(asFeatureLike(a)) || shouldExcludePoliticalInteractionFeature(asFeatureLike(b))) {
+        return false;
+      }
       const codeA = getFeatureCountryCodeNormalized(a);
       const codeB = getFeatureCountryCodeNormalized(b);
       return !!(codeA && codeB && codeA !== codeB);
@@ -3746,6 +3817,7 @@ function drawHitCanvas() {
     const id = getFeatureId(feature) || `feature-${index}`;
     const key = state.idToKey.get(id);
     if (!key) return;
+    if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
     if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) return;
     if (!pathBoundsInScreen(feature)) return;
     hitContext.beginPath();
@@ -3832,7 +3904,11 @@ function getHitResultFromCanvas(event) {
   if (!id) return createHitResult();
   const feature = state.landIndex.get(id);
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
-  if (!feature || shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) {
+  if (
+    !feature
+    || shouldExcludePoliticalInteractionFeature(feature, id)
+    || shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })
+  ) {
     return createHitResult();
   }
   return createHitResult({
@@ -3955,7 +4031,7 @@ function collectGridCandidates(px, py, radiusProj = 0) {
 
   const maybePush = (item) => {
     if (!item?.id || seen.has(item.id)) return;
-    if (!isWaterRegionEnabled(item.feature)) return;
+    if (shouldExcludePoliticalInteractionFeature(item.feature, item.id)) return;
     seen.add(item.id);
     const distanceProj = getBBoxDistanceToPoint(item, px, py);
     if (strict) {
@@ -4008,6 +4084,7 @@ function collectWaterGridCandidates(px, py, radiusProj = 0) {
 
   const maybePush = (item) => {
     if (!item?.id || seen.has(item.id)) return;
+    if (!isWaterRegionEnabled(item.feature)) return;
     seen.add(item.id);
     const distanceProj = getBBoxDistanceToPoint(item, px, py);
     if (strict) {
@@ -4358,6 +4435,7 @@ function buildIndex() {
   state.landData.features.forEach((feature, index) => {
     const id = getFeatureId(feature) || `feature-${index}`;
     state.landIndex.set(id, feature);
+    if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
     const countryCode = getFeatureCountryCodeNormalized(feature);
     if (countryCode) {
       const ids = state.countryToFeatureIds.get(countryCode) || [];
@@ -4442,6 +4520,7 @@ function buildSpatialIndex() {
   for (const feature of state.landData.features) {
     const id = getFeatureId(feature);
     if (!id) continue;
+    if (shouldExcludePoliticalInteractionFeature(feature, id)) continue;
     if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) continue;
     const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: false })
       || getProjectedFeatureBounds(feature, { featureId: id });
@@ -4766,6 +4845,15 @@ function getLakeBaseFillColor() {
     return getOceanBaseFillColor();
   }
   return getSafeCanvasColor(lakeStyle.fillColor, getOceanBaseFillColor()) || getOceanBaseFillColor();
+}
+
+function getUnifiedWaterBaseStyle(feature) {
+  const waterType = getWaterRegionType(feature);
+  return {
+    fill: waterType === "lake" ? getLakeBaseFillColor() : getOceanBaseFillColor(),
+    stroke: UNIFIED_WATER_STROKE_COLOR,
+    opacity: UNIFIED_WATER_FILL_OPACITY,
+  };
 }
 
 function getWaterRegionDefaultFillColorById(id) {
@@ -6728,20 +6816,24 @@ function shouldSkipScenarioPoliticalBackgroundMergeShape(
   { displayCode = "", fillColor = "", groupSize = 0 } = {}
 ) {
   const scenarioId = String(state.activeScenarioId || "").trim();
-  if (scenarioId !== "hoi4_1936" && scenarioId !== "hoi4_1939") {
-    return false;
-  }
   const geoAreaFn = globalThis.d3?.geoArea;
+  const geoBoundsFn = globalThis.d3?.geoBounds;
   if (typeof geoAreaFn !== "function") {
     return false;
   }
   let area = Number.NaN;
+  let bounds = null;
   try {
     area = geoAreaFn(mergedShape);
+    bounds = typeof geoBoundsFn === "function" ? geoBoundsFn(mergedShape) : null;
   } catch (_error) {
     area = Number.NaN;
+    bounds = null;
   }
-  const suspicious = !Number.isFinite(area) || area > SCENARIO_BACKGROUND_MERGE_MAX_AREA;
+  const suspicious =
+    !Number.isFinite(area) ||
+    area > SCENARIO_BACKGROUND_MERGE_MAX_AREA ||
+    isWorldBounds(bounds);
   if (!suspicious) {
     return false;
   }
@@ -6833,6 +6925,7 @@ function buildScenarioPoliticalBackgroundEntries() {
   geometries.forEach((geometry, index) => {
     const id = getFeatureId(geometry) || `feature-${index}`;
     if (!includedFeatureIds.has(id)) return;
+    if (shouldExcludePoliticalInteractionFeature(geometry, id)) return;
 
     const displayCode =
       getDisplayOwnerCode(geometry, id) ||
@@ -6858,7 +6951,18 @@ function buildScenarioPoliticalBackgroundEntries() {
     if (!Array.isArray(group) || !group.length) return;
     try {
       const mergedShape = globalThis.topojson.merge(topology, group);
-      if (shouldSkipScenarioPoliticalBackgroundMergeShape(mergedShape, {
+      const normalizedMergedFeature = normalizeFeatureGeometry(
+        {
+          type: "Feature",
+          properties: {
+            id: `scenario-background-${state.activeScenarioId || "scenario"}-${displayCode || "unknown"}`,
+          },
+          geometry: mergedShape,
+        },
+        { sourceLabel: "scenario_background_merge" }
+      );
+      const normalizedMergedShape = normalizedMergedFeature?.geometry || mergedShape;
+      if (shouldSkipScenarioPoliticalBackgroundMergeShape(normalizedMergedShape, {
         displayCode,
         fillColor,
         groupSize: group.length,
@@ -6866,7 +6970,7 @@ function buildScenarioPoliticalBackgroundEntries() {
         skippedSuspiciousCount += 1;
         return;
       }
-      entries.push({ fillColor, mergedShape });
+      entries.push({ fillColor, mergedShape: normalizedMergedShape });
     } catch (_error) {
       // Skip groups that fail to merge and fall back to per-feature fills below.
     }
@@ -6995,6 +7099,7 @@ function drawPoliticalPass(k) {
   const islandNeighbors = debugMode === "ISLANDS" ? getIslandNeighborGraph() : null;
   state.landData.features.forEach((feature, index) => {
     const id = getFeatureId(feature) || `feature-${index}`;
+    if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
     if (shouldSkipFeature(feature, canvasWidth, canvasHeight)) return;
     if (!pathBoundsInScreen(feature)) return;
     const isAtlantropaSea = debugMode === "PROD" && isAtlantropaSeaFeature(feature);
@@ -7031,10 +7136,9 @@ function drawPoliticalPass(k) {
 
     if (debugMode === "PROD") {
       if (!useScenarioBackgroundMerge || isAtlantropaSea) {
-        if (isAtlantropaSea) {
-          return;
-        }
-        context.strokeStyle = fillColor;
+        context.strokeStyle = isAtlantropaSea
+          ? getAtlantropaSeaPoliticalStrokeColor()
+          : fillColor;
         context.lineWidth = 0.5 / k;
         context.lineJoin = "round";
         context.stroke();
@@ -7067,28 +7171,32 @@ function drawScenarioRegionOverlaysPass(k) {
   if (showWater) {
     waterFeatures.forEach((feature, index) => {
       const id = getFeatureId(feature) || `water-${index}`;
-      const renderAsBase = isBaseGeographyScenarioFeature(feature);
-      if (!renderAsBase && !showWater) return;
       if (!isWaterRegionEnabled(feature)) return;
       if (!pathBoundsInScreen(feature)) return;
-      const waterType = getWaterRegionType(feature);
-      const hasOverride = Object.prototype.hasOwnProperty.call(state.waterRegionOverrides || {}, id);
-      const opaqueFillTypes = new Set(["lake", "inland_sea", "strait", "chokepoint"]);
+      const isMacroOcean = isMacroOceanWaterRegion(feature);
       const defaultStyle = getWaterRegionDefaultStyle(feature);
-      const fillOpacity = renderAsBase
-        ? Math.max(defaultStyle.opacity, 0.94)
-        : (hasOverride || opaqueFillTypes.has(waterType) ? defaultStyle.opacity : 0.18);
+      const isHighlighted = state.selectedWaterRegionId === id || state.hoveredWaterRegionId === id;
+      const fillOpacity = isMacroOcean
+        ? 0
+        : defaultStyle.opacity;
       context.beginPath();
       pathCanvas(feature);
-      context.save();
-      context.globalAlpha = fillOpacity;
-      context.fillStyle = getWaterRegionColor(id);
-      context.fill();
-      context.restore();
-      context.strokeStyle = defaultStyle.stroke;
-      context.lineWidth = 0.65 / Math.max(0.0001, k);
-      context.lineJoin = "round";
-      context.stroke();
+      if (fillOpacity > 0) {
+        context.save();
+        context.globalAlpha = fillOpacity;
+        context.fillStyle = getWaterRegionColor(id);
+        context.fill();
+        context.restore();
+      }
+      if (isHighlighted) {
+        context.save();
+        context.globalAlpha = isMacroOcean ? 0.92 : 1;
+        context.strokeStyle = "#f1c40f";
+        context.lineWidth = (isMacroOcean ? 1.15 : 0.9) / Math.max(0.0001, k);
+        context.lineJoin = "round";
+        context.stroke();
+        context.restore();
+      }
       renderedWaterCount += 1;
     });
   }
@@ -7334,6 +7442,10 @@ function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } 
   const compositeStart = nowMs();
   resetMainCanvas();
   const transformedPasses = ["background", "political", "effects", "contextBase", "contextScenario", "dayNight"];
+  const cache = getRenderPassCacheState();
+  if (transformedPasses.some((passName) => cache.dirty?.[passName])) {
+    return false;
+  }
   const drewAll = transformedPasses.every((passName) =>
     drawTransformedPass(passName, currentTransform)
   );
@@ -8038,6 +8150,7 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
     const ownerColors = computed?.ownerColors || {};
     state.landData.features.forEach((feature, index) => {
       const id = getFeatureId(feature) || `feature-${index}`;
+      if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
       if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) return;
       const ownerCode = getFeatureOwnerCode(id) || getFeatureCountryCodeNormalized(feature);
       if (!ownerCode || nextCountryBaseColors[ownerCode]) return;
@@ -8055,6 +8168,8 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
     // Region mode: assign one region-derived color per country to country base colors.
     const countryRegionTag = new Map();
     state.landData.features.forEach((feature, index) => {
+      const id = getFeatureId(feature) || `feature-${index}`;
+      if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
       if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) return;
       const countryCode = getFeatureCountryCodeNormalized(feature);
       if (!countryCode) return;
@@ -8340,7 +8455,11 @@ function commitHistoryEntry({ kind, before, after, affectsSovereignty = false } 
 function getCountryFeatureIds(countryCode) {
   if (!countryCode || !(state.countryToFeatureIds instanceof Map)) return [];
   const ids = state.countryToFeatureIds.get(countryCode);
-  return Array.isArray(ids) ? ids : [];
+  if (!Array.isArray(ids)) return [];
+  return ids.filter((candidateId) => {
+    const candidateFeature = state.landIndex?.get(candidateId);
+    return candidateFeature && !shouldExcludePoliticalInteractionFeature(candidateFeature, candidateId);
+  });
 }
 
 function getCountryInteractionPolicy(countryCode) {
@@ -8472,6 +8591,9 @@ function refreshSidebarAfterPaint({
 }
 
 function resolveInteractionTargetIds(feature, id) {
+  if (shouldExcludePoliticalInteractionFeature(feature, id)) {
+    return [];
+  }
   if (isSovereigntyModeActive()) {
     return [id];
   }
@@ -8515,6 +8637,7 @@ function resolveParentGroupKey(feature, featureId) {
 
 function resolveParentGroupTargetIds(feature, featureId) {
   if (!featureId || !state.landIndex?.has(featureId)) return [];
+  if (shouldExcludePoliticalInteractionFeature(feature, featureId)) return [];
   const countryCode = getFeatureCountryCodeNormalized(feature);
   const parentGroupKey = resolveParentGroupKey(feature, featureId);
   if (!countryCode || !parentGroupKey) return [];
@@ -8523,6 +8646,7 @@ function resolveParentGroupTargetIds(feature, featureId) {
   const targetIds = ids.filter((candidateId) => {
     const candidateFeature = state.landIndex.get(candidateId);
     if (!candidateFeature) return false;
+    if (shouldExcludePoliticalInteractionFeature(candidateFeature, candidateId)) return false;
     return resolveParentGroupKey(candidateFeature, candidateId) === parentGroupKey;
   });
   if (targetIds.length < 2) return [];
@@ -8531,9 +8655,13 @@ function resolveParentGroupTargetIds(feature, featureId) {
 
 function resolveCountryFillTargetIds(feature, featureId, { allowWhenParentGrouping = false } = {}) {
   if (!featureId || !state.landIndex?.has(featureId)) return [];
+  if (shouldExcludePoliticalInteractionFeature(feature, featureId)) return [];
   const countryCode = getFeatureCountryCodeNormalized(feature);
   if (!countryCode) return [];
-  const ids = getCountryFeatureIds(countryCode);
+  const ids = getCountryFeatureIds(countryCode).filter((candidateId) => {
+    const candidateFeature = state.landIndex.get(candidateId);
+    return candidateFeature && !shouldExcludePoliticalInteractionFeature(candidateFeature, candidateId);
+  });
   if (ids.length < 2) return [];
 
   if (!allowWhenParentGrouping) {
@@ -8560,6 +8688,7 @@ function isBatchFillDoubleClickBaseEligible(hit, feature) {
 
 function buildDoubleClickBatchPlan(feature, featureId) {
   if (!feature || !featureId) return null;
+  if (shouldExcludePoliticalInteractionFeature(feature, featureId)) return null;
   const requestedScope = String(state.batchFillScope || "parent") === "country" ? "country" : "parent";
   if (requestedScope === "parent") {
     const parentTargetIds = resolveParentGroupTargetIds(feature, featureId);
@@ -9691,6 +9820,7 @@ export {
   markDynamicBordersDirty,
   recomputeDynamicBordersNow,
   scheduleDynamicBorderRecompute,
+  invalidateOceanVisualState,
   setDebugMode,
   getWaterRegionColor,
   getZoomPercent,

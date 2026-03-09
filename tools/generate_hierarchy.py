@@ -690,120 +690,49 @@ def build_russia_groups_hybrid(adm2_path: Path, adm1_path: Path):
     if "shapeID" not in adm2.columns:
         raise ValueError("RU ADM2 missing shapeID column.")
     adm2 = ensure_crs(adm2)
+    centroids = centroid_points(adm2)
 
     adm1 = gpd.read_file(adm1_path)
     adm1 = ensure_crs(adm1)
     adm1_country = filter_admin1_by_iso(adm1, "RU", fallback_names=["Russia"])
+    adm1_for_city_overrides = adm1_country.copy()
 
     name_col = pick_column(adm1_country.columns, ADMIN1_NAME_COLS)
     if not name_col:
         raise ValueError("RU ADM1 missing name columns.")
 
-    id_col = pick_column(adm1_country.columns, ADMIN1_ID_COLS)
-    if not id_col:
-        iso_col = pick_column(adm1_country.columns, ADMIN1_ISO_COLS)
-        adm1_country = adm1_country.copy()
-        if iso_col:
-            adm1_country["adm1_code"] = (
-                adm1_country[iso_col].astype(str)
-                + "_"
-                + adm1_country[name_col].astype(str)
-            )
-        else:
-            adm1_country["adm1_code"] = "RU_" + adm1_country[name_col].astype(str)
-        id_col = "adm1_code"
+    adm1_country = adm1_country[[name_col, "geometry"]].copy()
+    joined = gpd.sjoin(centroids, adm1_country, how="left", predicate="within")
 
-    adm1_country = adm1_country.copy()
-    adm1_country["__coarse_feature_id"] = adm1_country[id_col].fillna("").astype(str).str.strip()
-    rep_lon_adm1 = representative_longitudes(adm1_country)
-    adm1_country["__rep_lon"] = rep_lon_adm1
-    adm1_country["__should_refine"] = [
-        should_refine_ru_parent(feature_id, rep_lon)
-        for feature_id, rep_lon in zip(adm1_country["__coarse_feature_id"], adm1_country["__rep_lon"])
-    ]
-    feature_migration_map = load_feature_migration_map()
-    explicit_far_east_parents = {
-        feature_id
-        for feature_id in RUSSIA_COASTAL_FAR_EAST_DETAIL_PARENT_IDS
-        if feature_migration_map.get(feature_id)
-    }
-    explicit_far_east_child_ids = {
-        child_id
-        for feature_id in explicit_far_east_parents
-        for child_id in feature_migration_map.get(feature_id, [])
-    }
+    if joined[name_col].isna().any():
+        try:
+            missing = joined[name_col].isna()
+            nearest = nearest_join_projected(
+                centroids.loc[missing].copy(),
+                adm1_country,
+                distance_col="distance",
+            )
+            joined.loc[missing, name_col] = nearest[name_col].values
+        except Exception:
+            pass
 
     groups = defaultdict(list)
     labels = {}
 
-    for _, row in adm1_country.iterrows():
-        feature_id = str(row.get("__coarse_feature_id", "")).strip()
-        if feature_id not in explicit_far_east_parents:
-            continue
+    for _, row in joined.iterrows():
         region = row.get(name_col)
         if not region or str(region).strip() == "":
             continue
         group_id = f"RU_{slugify(region)}"
-        for child_id in feature_migration_map.get(feature_id, []):
-            if child_id not in groups[group_id]:
-                groups[group_id].append(child_id)
+        child_id = f"RU_RAY_{row['shapeID']}"
+        if child_id not in groups[group_id]:
+            groups[group_id].append(child_id)
         if group_id not in labels:
             labels[group_id] = str(region)
 
-    if not adm2.empty:
-        centroids = centroid_points(adm2)
-        adm1_join = adm1_country[[name_col, "__coarse_feature_id", "__should_refine", "geometry"]].copy()
-        joined = gpd.sjoin(centroids, adm1_join, how="left", predicate="within")
-
-        if joined[name_col].isna().any() or joined["__coarse_feature_id"].isna().any():
-            try:
-                missing = joined[name_col].isna() | joined["__coarse_feature_id"].isna()
-                nearest = nearest_join_projected(
-                    centroids.loc[missing].copy(),
-                    adm1_join,
-                    distance_col="distance",
-                )
-                for column in (name_col, "__coarse_feature_id", "__should_refine"):
-                    joined.loc[missing, column] = nearest[column].values
-            except Exception:
-                pass
-
-        for _, row in joined.iterrows():
-            if not bool(row.get("__should_refine")):
-                continue
-            if str(row.get("__coarse_feature_id", "")).strip() in explicit_far_east_parents:
-                continue
-            region = row.get(name_col)
-            if not region or str(region).strip() == "":
-                continue
-            group_id = f"RU_{slugify(region)}"
-            child_id = f"RU_RAY_{row['shapeID']}"
-            if child_id in explicit_far_east_child_ids:
-                continue
-            if child_id not in groups[group_id]:
-                groups[group_id].append(child_id)
-            if group_id not in labels:
-                labels[group_id] = str(region)
-
-    adm1_coarse = adm1_country.loc[~adm1_country["__should_refine"]].copy()
-
-    if not adm1_coarse.empty:
-        for _, row in adm1_coarse.iterrows():
-            region = row.get(name_col)
-            if not region or str(region).strip() == "":
-                continue
-            child_id = str(row.get("__coarse_feature_id", "")).strip()
-            if not child_id:
-                continue
-            group_id = f"RU_{slugify(region)}"
-            if child_id not in groups[group_id]:
-                groups[group_id].append(child_id)
-            if group_id not in labels:
-                labels[group_id] = str(region)
-
     if build_ru_city_overrides is not None and RU_CITY_GROUP_BY_ID:
         try:
-            city_overrides = build_ru_city_overrides(adm2, adm1_country, strict=False)
+            city_overrides = build_ru_city_overrides(adm2, adm1_for_city_overrides, strict=False)
             for _, row in city_overrides.iterrows():
                 city_id = str(row.get("id", "")).strip()
                 if not city_id:

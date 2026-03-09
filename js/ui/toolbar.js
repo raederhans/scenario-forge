@@ -11,6 +11,7 @@ import {
 import {
   autoFillMap,
   getZoomPercent,
+  invalidateOceanVisualState,
   refreshColorState,
   resetZoomToFit,
   recomputeDynamicBordersNow,
@@ -1302,6 +1303,7 @@ function initToolbar({ render } = {}) {
     oceanFillColor.addEventListener("input", (event) => {
       state.styleConfig.ocean.fillColor = normalizeOceanFillColor(event.target.value);
       renderLakeUi();
+      invalidateOceanVisualState("ocean-fill");
       renderDirty("ocean-fill");
     });
   }
@@ -3215,6 +3217,7 @@ function initToolbar({ render } = {}) {
       } else {
         state.styleConfig.ocean.preset = nextPreset;
       }
+      invalidateOceanVisualState("ocean-style");
       renderDirty("ocean-style");
     });
   }
@@ -3231,6 +3234,7 @@ function initToolbar({ render } = {}) {
       if (oceanTextureOpacityValue) {
         oceanTextureOpacityValue.textContent = `${event.target.value}%`;
       }
+      invalidateOceanVisualState("ocean-opacity");
       renderDirty("ocean-opacity");
     });
     if (!OCEAN_ADVANCED_STYLES_ENABLED) {
@@ -3251,6 +3255,7 @@ function initToolbar({ render } = {}) {
       if (oceanTextureScaleValue) {
         oceanTextureScaleValue.textContent = `${state.styleConfig.ocean.scale.toFixed(2)}x`;
       }
+      invalidateOceanVisualState("ocean-scale");
       renderDirty("ocean-scale");
     });
     if (!OCEAN_ADVANCED_STYLES_ENABLED) {
@@ -3271,6 +3276,7 @@ function initToolbar({ render } = {}) {
       if (oceanContourStrengthValue) {
         oceanContourStrengthValue.textContent = `${event.target.value}%`;
       }
+      invalidateOceanVisualState("ocean-contour");
       renderDirty("ocean-contour");
     });
     if (!OCEAN_ADVANCED_STYLES_ENABLED) {
@@ -3286,6 +3292,7 @@ function initToolbar({ render } = {}) {
       const lakeConfig = syncLakeConfig();
       lakeConfig.linkedToOcean = !!event.target.checked;
       renderLakeUi();
+      invalidateOceanVisualState("lake-link");
       renderDirty("lake-link");
       commitLakeHistory("lake-link");
     });
@@ -3302,6 +3309,7 @@ function initToolbar({ render } = {}) {
       beginLakeHistoryCapture();
       lakeConfig.fillColor = normalizeOceanFillColor(event.target.value);
       renderLakeUi();
+      invalidateOceanVisualState("lake-fill");
       renderDirty("lake-fill");
     });
     lakeFillColor.addEventListener("change", () => {
