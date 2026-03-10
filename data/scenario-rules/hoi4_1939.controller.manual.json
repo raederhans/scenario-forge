@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "scenario_id": "hoi4_1939",
   "palette_id": "hoi4_vanilla",
   "notes": "1939 preview collaboration-government frontline overlays for the Sino-Japanese theater. Legal ownership stays on the owner layer while operational control is expressed through controller splits.",

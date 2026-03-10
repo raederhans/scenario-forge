@@ -154,7 +154,7 @@
     {
       "rule_id": "japanese_korea",
       "owner_tag": "KOR",
-      "priority": 109,
+      "priority": 110,
       "quality": "manual_reviewed",
       "critical": true,
       "notes": "Japanese colonial rule across Korea.",
@@ -831,7 +831,7 @@
     {
       "rule_id": "italy_absorbs_san_marino_1936",
       "owner_tag": "ITA",
-      "priority": 220,
+      "priority": 234,
       "quality": "manual_reviewed",
       "critical": false,
       "notes": "San Marino is folded into Italy for this scenario baseline.",

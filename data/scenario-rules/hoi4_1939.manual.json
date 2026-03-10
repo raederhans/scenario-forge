@@ -1,11 +1,11 @@
 {
-  "version": 1,
+  "version": 2,
   "scenario_id": "hoi4_1939",
   "palette_id": "hoi4_vanilla",
   "state_delta_coverage": {
     "baseline_as_of_date": "1936.1.1.12",
     "target_as_of_date": "1939.8.14.12",
-    "enable_region_checks": false,
+    "enable_region_checks": true,
     "enforce_region_checks": false,
     "frontline_state_ids": [283, 591, 592, 593, 615, 621, 746, 753, 1033],
     "covered_by_manual_rules": [4, 9, 44, 69, 70, 71, 72, 73, 74, 75, 152, 153, 188, 271, 664, 799, 805, 835, 836, 837, 838, 839, 840, 841, 842, 843, 848, 908, 934, 972, 975, 976, 992],
