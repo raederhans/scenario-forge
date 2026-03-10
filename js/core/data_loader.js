@@ -13,6 +13,7 @@ const DETAIL_SOURCES = {
   na_v1: "data/europe_topology.na_v1.json",
   na_v2: "data/europe_topology.na_v2.json",
 };
+const DETAIL_SOURCE_FALLBACK_ORDER = ["na_v2", "na_v1", "legacy_bak", "highres"];
 const RU_CITY_OVERRIDES_URL = "data/ru_city_overrides.geojson";
 const SPECIAL_ZONES_URL = "data/special_zones.geojson";
 const RUNTIME_POLITICAL_URL = "data/europe_topology.runtime_political_v1.json";
@@ -245,31 +246,18 @@ async function loadExplicitVariant({
 async function loadDetailTopologyWithFallback({
   d3Client,
   detailSource,
+  candidateKeys = null,
 } = {}) {
-  const candidates = [];
-  if (detailSource?.key && detailSource?.url) {
-    candidates.push({ key: detailSource.key, url: detailSource.url });
-  }
+  const orderedKeys = Array.from(new Set([
+    ...(Array.isArray(candidateKeys) ? candidateKeys : []),
+    detailSource?.key,
+    ...DETAIL_SOURCE_FALLBACK_ORDER,
+  ].filter((key) => key && Object.prototype.hasOwnProperty.call(DETAIL_SOURCES, key))));
 
-  if (detailSource?.key !== "na_v2") {
-    candidates.push({ key: "na_v2", url: DETAIL_SOURCES.na_v2 });
-  }
-
-  if (detailSource?.key !== "na_v1") {
-    candidates.push({ key: "na_v1", url: DETAIL_SOURCES.na_v1 });
-  }
-
-  if (detailSource?.key !== "legacy_bak") {
-    candidates.push({ key: "legacy_bak", url: DETAIL_SOURCES.legacy_bak });
-  }
-
-  const deduped = [];
-  const seen = new Set();
-  candidates.forEach((candidate) => {
-    if (!candidate?.url || seen.has(candidate.url)) return;
-    seen.add(candidate.url);
-    deduped.push(candidate);
-  });
+  const deduped = orderedKeys.map((key) => ({
+    key,
+    url: DETAIL_SOURCES[key],
+  }));
 
   let firstError = null;
   for (const candidate of deduped) {
@@ -378,6 +366,7 @@ async function loadTopologyBundle({
 export async function loadDeferredDetailBundle({
   d3Client = globalThis.d3,
   detailSourceKey = null,
+  detailSourceKeys = null,
   runtimePoliticalUrl = RUNTIME_POLITICAL_URL,
 } = {}) {
   if (!d3Client || typeof d3Client.json !== "function") {
@@ -393,10 +382,19 @@ export async function loadDeferredDetailBundle({
     key: resolvedKey,
     url: DETAIL_SOURCES[resolvedKey],
   };
+  const orderedDetailSourceKeys = Array.from(new Set([
+    ...(Array.isArray(detailSourceKeys) ? detailSourceKeys : []),
+    resolvedKey,
+    ...DETAIL_SOURCE_FALLBACK_ORDER,
+  ].filter((key) => key && Object.prototype.hasOwnProperty.call(DETAIL_SOURCES, key))));
 
   const [{ topology: topologyDetail, sourceKey: detailSourceUsed }, runtimePoliticalTopology] =
     await Promise.all([
-      loadDetailTopologyWithFallback({ d3Client, detailSource }),
+      loadDetailTopologyWithFallback({
+        d3Client,
+        detailSource,
+        candidateKeys: orderedDetailSourceKeys,
+      }),
       d3Client.json(runtimePoliticalUrl).catch((err) => {
         console.warn("Runtime political topology missing or invalid during deferred load.", err);
         return null;

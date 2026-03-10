@@ -1273,6 +1273,8 @@ details.card[open] > summary::after {
   word-break: break-word;
   pointer-events: none;
   opacity: 0;
+  transform: translate3d(-9999px, -9999px, 0);
+  will-change: transform, opacity;
   transition: opacity 75ms ease;
 }
 

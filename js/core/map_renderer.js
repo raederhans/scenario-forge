@@ -60,6 +60,9 @@ let brushSession = null;
 let suppressNextClickAfterBrush = false;
 let lastDetailToastToken = "";
 let lastDetailToastAt = 0;
+let lastSpecialZonesOverlaySignature = "";
+let lastInspectorOverlaySignature = "";
+let lastHoverOverlaySignature = "";
 
 const PROJECTION_PRECISION = 0.1;
 const PATH_POINT_RADIUS = 2;
@@ -2307,9 +2310,133 @@ function clearRenderPhaseTimer() {
 }
 
 function setRenderPhase(phase) {
+  const previousPhase = state.renderPhase;
   state.renderPhase = phase;
   state.phaseEnteredAt = nowMs();
   state.isInteracting = phase === RENDER_PHASE_INTERACTING;
+  if (previousPhase !== phase && (previousPhase === RENDER_PHASE_IDLE || phase === RENDER_PHASE_IDLE)) {
+    state.hoverOverlayDirty = true;
+  }
+}
+
+function markOverlaysDirty({
+  specialZones = false,
+  inspector = false,
+  hover = false,
+} = {}) {
+  if (specialZones) {
+    state.specialZonesOverlayDirty = true;
+  }
+  if (inspector) {
+    state.inspectorOverlayDirty = true;
+  }
+  if (hover) {
+    state.hoverOverlayDirty = true;
+  }
+}
+
+function markAllOverlaysDirty() {
+  markOverlaysDirty({
+    specialZones: true,
+    inspector: true,
+    hover: true,
+  });
+}
+
+function getOverlayProjectionSignature() {
+  return [
+    Number(state.topologyRevision || 0),
+    getProjectionRenderSignature(),
+  ].join("::");
+}
+
+function getSpecialZonesOverlaySignature() {
+  return [
+    getOverlayProjectionSignature(),
+    Number(state.dirtyRevision || 0),
+    state.showSpecialZones ? "1" : "0",
+    Array.isArray(state.scenarioSpecialRegionsData?.features) ? state.scenarioSpecialRegionsData.features.length : 0,
+    Array.isArray(state.manualSpecialZones?.features) ? state.manualSpecialZones.features.length : 0,
+    !!state.specialZoneEditor?.active ? "1" : "0",
+    String(state.specialZoneEditor?.selectedId || ""),
+    String(state.specialZoneEditor?.zoneType || ""),
+    String(state.specialZoneEditor?.label || ""),
+    Array.isArray(state.specialZoneEditor?.vertices) ? state.specialZoneEditor.vertices.length : 0,
+  ].join("::");
+}
+
+function getInspectorOverlaySignature() {
+  return [
+    getOverlayProjectionSignature(),
+    String(state.inspectorHighlightCountryCode || "").trim().toUpperCase(),
+    Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
+  ].join("::");
+}
+
+function getHoverOverlaySignature() {
+  return [
+    getOverlayProjectionSignature(),
+    String(state.renderPhase || RENDER_PHASE_IDLE),
+    String(state.hoveredId || ""),
+    String(state.hoveredWaterRegionId || ""),
+    String(state.hoveredSpecialRegionId || ""),
+  ].join("::");
+}
+
+function renderSpecialZonesIfNeeded({ force = false } = {}) {
+  const nextSignature = getSpecialZonesOverlaySignature();
+  if (!force && !state.specialZonesOverlayDirty && nextSignature === lastSpecialZonesOverlaySignature) {
+    return;
+  }
+  renderSpecialZones();
+  state.specialZonesOverlayDirty = false;
+  lastSpecialZonesOverlaySignature = nextSignature;
+}
+
+function renderInspectorHighlightOverlayIfNeeded({ force = false } = {}) {
+  const nextSignature = getInspectorOverlaySignature();
+  if (!force && !state.inspectorOverlayDirty && nextSignature === lastInspectorOverlaySignature) {
+    return;
+  }
+  renderInspectorHighlightOverlay();
+  state.inspectorOverlayDirty = false;
+  lastInspectorOverlaySignature = nextSignature;
+}
+
+function renderHoverOverlayIfNeeded({ force = false } = {}) {
+  const nextSignature = getHoverOverlaySignature();
+  if (!force && !state.hoverOverlayDirty && nextSignature === lastHoverOverlaySignature) {
+    return;
+  }
+  renderHoverOverlay();
+  state.hoverOverlayDirty = false;
+  lastHoverOverlaySignature = nextSignature;
+}
+
+function applyTooltipState(nextState = null) {
+  if (!tooltip) return;
+  const visible = !!nextState?.visible;
+  const text = visible ? String(nextState?.text || "") : "";
+  tooltip.textContent = text;
+  tooltip.style.opacity = visible ? "1" : "0";
+  tooltip.style.transform = visible
+    ? `translate3d(${Math.round(Number(nextState?.x || 0))}px, ${Math.round(Number(nextState?.y || 0))}px, 0)`
+    : "translate3d(-9999px, -9999px, 0)";
+}
+
+function queueTooltipUpdate(nextState = null) {
+  state.tooltipPendingState = nextState && typeof nextState === "object"
+    ? { ...nextState }
+    : { visible: false };
+  if (state.tooltipRafHandle) {
+    return;
+  }
+  state.tooltipRafHandle = globalThis.requestAnimationFrame(() => {
+    state.tooltipRafHandle = null;
+    const pendingState = state.tooltipPendingState;
+    state.tooltipPendingState = null;
+    applyTooltipState(pendingState);
+  });
 }
 
 function scheduleRenderPhaseIdle() {
@@ -7905,14 +8032,14 @@ function renderInspectorHighlightOverlay() {
 
 function renderSpecialZones() {
   if (!specialZonesGroup || !specialZoneEditorGroup) return;
-  updateSpecialZonesPaths();
-  renderSpecialZoneEditorOverlay();
   const isDrawing = !!state.specialZoneEditor?.active;
   if (!state.showSpecialZones && !isDrawing) {
     specialZonesGroup.attr("display", "none");
     specialZoneEditorGroup.attr("display", "none");
     return;
   }
+  updateSpecialZonesPaths();
+  renderSpecialZoneEditorOverlay();
   specialZonesGroup.attr("display", state.showSpecialZones ? null : "none");
   specialZoneEditorGroup.attr("display", null);
 }
@@ -8109,9 +8236,9 @@ function render() {
   if (state.renderPhase === RENDER_PHASE_IDLE) {
     scheduleHitCanvasBuildIfNeeded();
   }
-  renderSpecialZones();
-  renderInspectorHighlightOverlay();
-  renderHoverOverlay();
+  renderSpecialZonesIfNeeded();
+  renderInspectorHighlightOverlayIfNeeded();
+  renderHoverOverlayIfNeeded();
   if (state.renderPhase === RENDER_PHASE_IDLE) {
     renderLegend();
     if (typeof state.updateLegendUI === "function") {
@@ -8188,6 +8315,7 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
   const historyFeatureIds = Object.keys(state.visualOverrides || {});
   const historyOwnerCodes = Array.from(new Set([
     ...Object.keys(state.sovereignBaseColors || {}),
+    ...Object.keys(state.countryBaseColors || {}),
     ...Object.keys(nextCountryBaseColors || {}),
   ]));
   const stylePaths = styleUpdates && typeof styleUpdates === "object"
@@ -8221,10 +8349,7 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
     });
   }
   markDirty(mode === "political" ? "auto-fill-political" : "auto-fill-region");
-  refreshResolvedColorsForOwners(Object.keys(nextCountryBaseColors), { renderNow: true });
-  if (typeof state.renderCountryListFn === "function") {
-    state.renderCountryListFn();
-  }
+  refreshResolvedColorsForOwners(Object.keys(nextCountryBaseColors), { renderNow: false });
   if (recordHistory) {
     commitHistoryEntry({
       kind: mode === "political" ? "auto-fill-political" : "auto-fill-region",
@@ -8235,6 +8360,12 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
         stylePaths,
       }),
     });
+  }
+  if (typeof state.renderCountryListFn === "function") {
+    state.renderCountryListFn();
+  }
+  if (context) {
+    render();
   }
 }
 
@@ -8277,6 +8408,7 @@ function appendSpecialZoneVertexFromEvent(event) {
   const coord = getMapLonLatFromEvent(event);
   if (!coord) return false;
   state.specialZoneEditor.vertices.push(coord);
+  state.specialZonesOverlayDirty = true;
   updateSpecialZoneEditorUI();
   renderSpecialZoneEditorOverlay();
   return true;
@@ -8288,6 +8420,7 @@ function startSpecialZoneDraw({ zoneType = DEFAULT_SPECIAL_ZONE_TYPE, label = ""
   state.specialZoneEditor.vertices = [];
   state.specialZoneEditor.zoneType = String(zoneType || DEFAULT_SPECIAL_ZONE_TYPE);
   state.specialZoneEditor.label = String(label || "");
+  state.specialZonesOverlayDirty = true;
   updateSpecialZoneEditorUI();
   if (context) render();
 }
@@ -8296,6 +8429,7 @@ function undoSpecialZoneVertex() {
   ensureSpecialZoneEditorState();
   if (!state.specialZoneEditor.active || !state.specialZoneEditor.vertices.length) return;
   state.specialZoneEditor.vertices.pop();
+  state.specialZonesOverlayDirty = true;
   updateSpecialZoneEditorUI();
   if (context) render();
 }
@@ -8304,6 +8438,7 @@ function cancelSpecialZoneDraw() {
   ensureSpecialZoneEditorState();
   state.specialZoneEditor.active = false;
   state.specialZoneEditor.vertices = [];
+  state.specialZonesOverlayDirty = true;
   updateSpecialZoneEditorUI();
   if (context) render();
 }
@@ -8341,6 +8476,7 @@ function finishSpecialZoneDraw() {
   state.specialZoneEditor.selectedId = id;
   state.specialZoneEditor.active = false;
   state.specialZoneEditor.vertices = [];
+  state.specialZonesOverlayDirty = true;
   updateSpecialZoneEditorUI();
   if (context) render();
   return true;
@@ -8350,6 +8486,7 @@ function selectSpecialZoneById(id) {
   ensureSpecialZoneEditorState();
   const next = String(id || "").trim();
   state.specialZoneEditor.selectedId = next || null;
+  state.specialZonesOverlayDirty = true;
   updateSpecialZoneEditorUI();
   if (context) render();
 }
@@ -8365,6 +8502,7 @@ function deleteSelectedManualSpecialZone() {
   const removed = before - state.manualSpecialZones.features.length;
   if (removed > 0) {
     state.specialZoneEditor.selectedId = null;
+    state.specialZonesOverlayDirty = true;
     updateSpecialZoneEditorUI();
     if (context) render();
     return true;
@@ -8381,11 +8519,9 @@ function handleMouseMove(event) {
     state.hoveredId = null;
     state.hoveredWaterRegionId = null;
     state.hoveredSpecialRegionId = null;
-    renderHoverOverlay();
-    if (tooltip) {
-      tooltip.textContent = "";
-      tooltip.style.opacity = "0";
-    }
+    state.hoverOverlayDirty = true;
+    renderHoverOverlayIfNeeded();
+    queueTooltipUpdate({ visible: false });
     return;
   }
 
@@ -8407,8 +8543,9 @@ function handleMouseMove(event) {
     state.hoveredId = nextHoveredLandId;
     state.hoveredWaterRegionId = nextHoveredWaterId;
     state.hoveredSpecialRegionId = nextHoveredSpecialId;
+    state.hoverOverlayDirty = true;
     if (!reducedHoverPhase) {
-      renderHoverOverlay();
+      renderHoverOverlayIfNeeded();
     }
   }
 
@@ -8419,13 +8556,14 @@ function handleMouseMove(event) {
       : hit.targetType === "water"
         ? state.waterRegionsById.get(id)
         : state.landIndex.get(id);
-    tooltip.textContent = getTooltipText(feature);
-    tooltip.style.left = `${event.clientX + 12}px`;
-    tooltip.style.top = `${event.clientY + 12}px`;
-    tooltip.style.opacity = "1";
+    queueTooltipUpdate({
+      visible: true,
+      text: getTooltipText(feature),
+      x: event.clientX + 12,
+      y: event.clientY + 12,
+    });
   } else {
-    tooltip.textContent = "";
-    tooltip.style.opacity = "0";
+    queueTooltipUpdate({ visible: false });
   }
 }
 
@@ -9554,6 +9692,7 @@ function fitProjection() {
   updateSpecialZonesPaths();
   renderSpecialZoneEditorOverlay();
   updateZoomTranslateExtent();
+  markAllOverlaysDirty();
 }
 
 function handleResize() {
@@ -9561,6 +9700,7 @@ function handleResize() {
   fitProjection();
   resetZoomToFit();
   enforceZoomConstraints();
+  markAllOverlaysDirty();
   render();
 }
 
@@ -9574,7 +9714,7 @@ function initZoom() {
       clearRenderPhaseTimer();
       cancelExactAfterSettleRefresh();
       setRenderPhase(RENDER_PHASE_INTERACTING);
-      renderHoverOverlay();
+      renderHoverOverlayIfNeeded({ force: true });
     })
     .on("zoom", (event) => {
       if (!state.zoomRenderScheduled) {
@@ -9607,11 +9747,10 @@ function bindEvents() {
   interactionRect.on("mouseleave", () => {
     state.hoveredId = null;
     state.hoveredWaterRegionId = null;
-    renderHoverOverlay();
-    if (tooltip) {
-      tooltip.textContent = "";
-      tooltip.style.opacity = "0";
-    }
+    state.hoveredSpecialRegionId = null;
+    state.hoverOverlayDirty = true;
+    renderHoverOverlayIfNeeded();
+    queueTooltipUpdate({ visible: false });
   });
   interactionRect.on("click", handleClick);
   interactionRect.on("dblclick", handleDoubleClick);
@@ -9688,6 +9827,9 @@ function initMap({ containerId = "mapContainer" } = {}) {
   state.renderPhase = RENDER_PHASE_IDLE;
   state.phaseEnteredAt = nowMs();
   state.renderPhaseTimerId = null;
+  state.tooltipPendingState = { visible: false };
+  state.tooltipRafHandle = null;
+  markAllOverlaysDirty();
   clearStagedMapDataTasks();
   cancelExactAfterSettleRefresh();
   state.deferContextBasePass = false;
@@ -9717,6 +9859,7 @@ function initMap({ containerId = "mapContainer" } = {}) {
 
 function setMapData({ refitProjection = true, resetZoom = true } = {}) {
   const startedAt = nowMs();
+  clearPendingDynamicBorderTimer();
   clearRenderPhaseTimer();
   setRenderPhase(RENDER_PHASE_IDLE);
   resetRenderDiagnostics();
@@ -9735,6 +9878,8 @@ function setMapData({ refitProjection = true, resetZoom = true } = {}) {
   getRenderPassCacheState().referenceTransform = null;
   getRenderPassCacheState().referenceTransforms = {};
   invalidateAllRenderPasses("set-map-data");
+  markAllOverlaysDirty();
+  queueTooltipUpdate({ visible: false });
   ensureLayerDataFromTopology();
   const { fullCollection, interactiveCollection } = rebuildPoliticalLandCollections();
 

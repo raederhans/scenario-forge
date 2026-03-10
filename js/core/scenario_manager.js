@@ -23,6 +23,8 @@ const SCENARIO_DETAIL_MIN_RATIO_STRICT = 0.7;
 const SCENARIO_DETAIL_ABSOLUTE_DROP_THRESHOLD = 1000;
 const DEFAULT_OCEAN_FILL_COLOR = "#aadaff";
 const SCENARIO_RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
+const SCENARIO_LOAD_TIMEOUT_MS = 12_000;
+const SCENARIO_DETAIL_SOURCE_FALLBACK_ORDER = ["na_v2", "na_v1", "legacy_bak", "highres"];
 const COUNTRY_CODE_ALIASES = {
   UK: "GB",
   EL: "GR",
@@ -56,6 +58,28 @@ function cacheBust(url) {
   if (!url) return url;
   const sep = String(url).includes("?") ? "&" : "?";
   return `${url}${sep}_t=${Date.now()}`;
+}
+
+function withScenarioLoadTimeout(promise, ms, { scenarioId = "", resourceLabel = "resource" } = {}) {
+  let timeoutId = null;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = globalThis.setTimeout(() => {
+      reject(new Error(`[scenario] Timed out loading "${resourceLabel}" for "${scenarioId}" after ${ms}ms.`));
+    }, ms);
+  });
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    if (timeoutId !== null) {
+      globalThis.clearTimeout(timeoutId);
+    }
+  });
+}
+
+function loadScenarioJsonWithTimeout(d3Client, url, { scenarioId = "", resourceLabel = "resource" } = {}) {
+  return withScenarioLoadTimeout(
+    d3Client.json(cacheBust(url)),
+    SCENARIO_LOAD_TIMEOUT_MS,
+    { scenarioId, resourceLabel }
+  );
 }
 
 function normalizeScenarioId(value) {
@@ -971,7 +995,10 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available for scenario loading.");
   }
-  const manifest = await d3Client.json(cacheBust(meta.manifest_url));
+  const manifest = await loadScenarioJsonWithTimeout(d3Client, meta.manifest_url, {
+    scenarioId: targetId,
+    resourceLabel: "manifest",
+  });
   const hints = normalizeScenarioPerformanceHints(manifest);
   const [
     countriesPayload,
@@ -982,19 +1009,39 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     releasableCatalog,
   ] =
     await Promise.all([
-    d3Client.json(cacheBust(manifest.countries_url)),
-    d3Client.json(cacheBust(manifest.owners_url)),
-    manifest.controllers_url ? d3Client.json(cacheBust(manifest.controllers_url)) : Promise.resolve(null),
-    d3Client.json(cacheBust(manifest.cores_url)),
+    loadScenarioJsonWithTimeout(d3Client, manifest.countries_url, {
+      scenarioId: targetId,
+      resourceLabel: "countries",
+    }),
+    loadScenarioJsonWithTimeout(d3Client, manifest.owners_url, {
+      scenarioId: targetId,
+      resourceLabel: "owners",
+    }),
+    manifest.controllers_url
+      ? loadScenarioJsonWithTimeout(d3Client, manifest.controllers_url, {
+        scenarioId: targetId,
+        resourceLabel: "controllers",
+      })
+      : Promise.resolve(null),
+    loadScenarioJsonWithTimeout(d3Client, manifest.cores_url, {
+      scenarioId: targetId,
+      resourceLabel: "cores",
+    }),
     manifest.runtime_topology_url
-      ? d3Client.json(cacheBust(manifest.runtime_topology_url)).catch((error) => {
-        console.warn(`[scenario] Failed to load scenario runtime topology for "${targetId}".`, error);
+      ? loadScenarioJsonWithTimeout(d3Client, manifest.runtime_topology_url, {
+        scenarioId: targetId,
+        resourceLabel: "runtime_topology",
+      }).catch((error) => {
+        console.warn(`[scenario] Failed to load optional resource "runtime_topology" for "${targetId}".`, error);
         return null;
       })
       : Promise.resolve(null),
     manifest.releasable_catalog_url
-      ? d3Client.json(cacheBust(manifest.releasable_catalog_url)).catch((error) => {
-        console.warn(`[scenario] Failed to load scenario releasable catalog for "${targetId}".`, error);
+      ? loadScenarioJsonWithTimeout(d3Client, manifest.releasable_catalog_url, {
+        scenarioId: targetId,
+        resourceLabel: "releasable_catalog",
+      }).catch((error) => {
+        console.warn(`[scenario] Failed to load optional resource "releasable_catalog" for "${targetId}".`, error);
         return null;
       })
       : Promise.resolve(null),
@@ -1224,49 +1271,52 @@ async function ensureScenarioDetailTopologyLoaded() {
   }
   state.detailPromotionInFlight = true;
   try {
-    let lastError = null;
-    for (let attempt = 1; attempt <= 2; attempt += 1) {
-      try {
-        const {
-          topologyDetail,
-          runtimePoliticalTopology,
-          detailSourceUsed,
-        } = await loadDeferredDetailBundle({
-          detailSourceKey: state.detailSourceRequested,
-        });
+    const detailSourceKeys = Array.from(new Set([
+      String(state.detailSourceRequested || "").trim(),
+      String(state.activeScenarioManifest?.detail_source || "").trim(),
+      ...SCENARIO_DETAIL_SOURCE_FALLBACK_ORDER,
+    ].filter(Boolean)));
+    try {
+      const {
+        topologyDetail,
+        runtimePoliticalTopology,
+        detailSourceUsed,
+      } = await loadDeferredDetailBundle({
+        detailSourceKey: detailSourceKeys[0] || state.detailSourceRequested,
+        detailSourceKeys,
+      });
 
-        const runtimeFallback = runtimePoliticalTopology || state.runtimePoliticalTopology || null;
-        const resolvedDetail = hasUsablePoliticalTopology(topologyDetail)
-          ? topologyDetail
-          : (hasUsablePoliticalTopology(runtimeFallback) ? runtimeFallback : null);
-        if (!resolvedDetail) {
-          console.warn(`[scenario] Detail promotion attempt ${attempt}/2 resolved no usable topology.`);
-          continue;
-        }
-        if (!hasUsablePoliticalTopology(topologyDetail) && hasUsablePoliticalTopology(runtimeFallback)) {
-          console.warn(`[scenario] Detail promotion attempt ${attempt}/2 using runtime political fallback.`);
-        }
-        state.topologyDetail = resolvedDetail;
-        state.runtimePoliticalTopology = runtimeFallback;
-        state.topologyBundleMode = "composite";
+      const runtimeFallback = runtimePoliticalTopology || state.runtimePoliticalTopology || null;
+      const resolvedDetail = hasUsablePoliticalTopology(topologyDetail)
+        ? topologyDetail
+        : (hasUsablePoliticalTopology(runtimeFallback) ? runtimeFallback : null);
+      if (!resolvedDetail) {
+        console.warn(
+          `[scenario] Detail promotion resolved no usable topology. Tried sources: ${detailSourceKeys.join(", ") || "(default)"}.`
+        );
         state.detailDeferred = false;
-        state.detailPromotionCompleted = true;
-        state.detailSourceRequested = detailSourceUsed || state.detailSourceRequested;
-        setMapData({ refitProjection: false, resetZoom: false });
-        return true;
-      } catch (error) {
-        lastError = error;
-        console.warn(`[scenario] Detail promotion attempt ${attempt}/2 failed.`, error);
+        return false;
       }
-    }
 
-    state.detailDeferred = false;
-    if (lastError) {
-      console.warn("[scenario] Detail topology could not be promoted after retry. Staying on coarse map.", lastError);
-    } else {
-      console.warn("[scenario] Detail topology could not be promoted after retry. Staying on coarse map.");
+      if (!hasUsablePoliticalTopology(topologyDetail) && hasUsablePoliticalTopology(runtimeFallback)) {
+        console.warn("[scenario] Detail promotion using runtime political fallback.");
+      }
+      state.topologyDetail = resolvedDetail;
+      state.runtimePoliticalTopology = runtimeFallback;
+      state.topologyBundleMode = "composite";
+      state.detailDeferred = false;
+      state.detailPromotionCompleted = true;
+      state.detailSourceRequested = detailSourceUsed || detailSourceKeys[0] || state.detailSourceRequested;
+      setMapData({ refitProjection: false, resetZoom: false });
+      return true;
+    } catch (error) {
+      state.detailDeferred = false;
+      console.warn(
+        `[scenario] Detail topology could not be promoted. Tried sources: ${detailSourceKeys.join(", ") || "(default)"}. Staying on coarse map.`,
+        error
+      );
+      return false;
     }
-    return false;
   } catch (error) {
     console.warn("Unable to force-load detail topology before scenario apply:", error);
     return false;
