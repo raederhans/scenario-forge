@@ -82,6 +82,87 @@ function loadScenarioJsonWithTimeout(d3Client, url, { scenarioId = "", resourceL
   );
 }
 
+function validateScenarioRequiredResourcePayload(
+  payload,
+  {
+    scenarioId = "",
+    resourceLabel = "resource",
+    requiredField = "",
+  } = {}
+) {
+  if (!payload || typeof payload !== "object") {
+    throw new Error(`[scenario] Required resource "${resourceLabel}" for "${scenarioId}" returned an invalid payload.`);
+  }
+  if (requiredField && (!payload[requiredField] || typeof payload[requiredField] !== "object")) {
+    throw new Error(
+      `[scenario] Required resource "${resourceLabel}" for "${scenarioId}" is missing "${requiredField}".`
+    );
+  }
+  return payload;
+}
+
+async function loadRequiredScenarioResource(
+  d3Client,
+  url,
+  {
+    scenarioId = "",
+    resourceLabel = "resource",
+    requiredField = "",
+  } = {}
+) {
+  if (!url) {
+    throw new Error(`[scenario] Required resource "${resourceLabel}" is missing for "${scenarioId}".`);
+  }
+  const payload = await loadScenarioJsonWithTimeout(d3Client, url, {
+    scenarioId,
+    resourceLabel,
+  });
+  return validateScenarioRequiredResourcePayload(payload, {
+    scenarioId,
+    resourceLabel,
+    requiredField,
+  });
+}
+
+async function loadOptionalScenarioResource(
+  d3Client,
+  url,
+  {
+    scenarioId = "",
+    resourceLabel = "resource",
+  } = {}
+) {
+  if (!url) {
+    return {
+      ok: false,
+      value: null,
+      reason: "missing_url",
+      errorMessage: "",
+    };
+  }
+  try {
+    const value = await loadScenarioJsonWithTimeout(d3Client, url, {
+      scenarioId,
+      resourceLabel,
+    });
+    return {
+      ok: true,
+      value: value ?? null,
+      reason: "loaded",
+      errorMessage: "",
+    };
+  } catch (error) {
+    const errorMessage = String(error?.message || `Failed to load optional resource "${resourceLabel}".`);
+    console.warn(`[scenario] Failed to load optional resource "${resourceLabel}" for "${scenarioId}".`, error);
+    return {
+      ok: false,
+      value: null,
+      reason: errorMessage.includes("Timed out") ? "timeout" : "load_error",
+      errorMessage,
+    };
+  }
+}
+
 function normalizeScenarioId(value) {
   return String(value || "").trim();
 }
@@ -1005,46 +1086,40 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     ownersPayload,
     controllersPayload,
     coresPayload,
-    runtimeTopologyPayload,
-    releasableCatalog,
+    runtimeTopologyResult,
+    releasableCatalogResult,
   ] =
     await Promise.all([
-    loadScenarioJsonWithTimeout(d3Client, manifest.countries_url, {
+    loadRequiredScenarioResource(d3Client, manifest.countries_url, {
       scenarioId: targetId,
       resourceLabel: "countries",
+      requiredField: "countries",
     }),
-    loadScenarioJsonWithTimeout(d3Client, manifest.owners_url, {
+    loadRequiredScenarioResource(d3Client, manifest.owners_url, {
       scenarioId: targetId,
       resourceLabel: "owners",
+      requiredField: "owners",
     }),
     manifest.controllers_url
-      ? loadScenarioJsonWithTimeout(d3Client, manifest.controllers_url, {
+      ? loadRequiredScenarioResource(d3Client, manifest.controllers_url, {
         scenarioId: targetId,
         resourceLabel: "controllers",
+        requiredField: "controllers",
       })
       : Promise.resolve(null),
-    loadScenarioJsonWithTimeout(d3Client, manifest.cores_url, {
+    loadRequiredScenarioResource(d3Client, manifest.cores_url, {
       scenarioId: targetId,
       resourceLabel: "cores",
+      requiredField: "cores",
     }),
-    manifest.runtime_topology_url
-      ? loadScenarioJsonWithTimeout(d3Client, manifest.runtime_topology_url, {
-        scenarioId: targetId,
-        resourceLabel: "runtime_topology",
-      }).catch((error) => {
-        console.warn(`[scenario] Failed to load optional resource "runtime_topology" for "${targetId}".`, error);
-        return null;
-      })
-      : Promise.resolve(null),
-    manifest.releasable_catalog_url
-      ? loadScenarioJsonWithTimeout(d3Client, manifest.releasable_catalog_url, {
-        scenarioId: targetId,
-        resourceLabel: "releasable_catalog",
-      }).catch((error) => {
-        console.warn(`[scenario] Failed to load optional resource "releasable_catalog" for "${targetId}".`, error);
-        return null;
-      })
-      : Promise.resolve(null),
+    loadOptionalScenarioResource(d3Client, manifest.runtime_topology_url, {
+      scenarioId: targetId,
+      resourceLabel: "runtime_topology",
+    }),
+    loadOptionalScenarioResource(d3Client, manifest.releasable_catalog_url, {
+      scenarioId: targetId,
+      resourceLabel: "releasable_catalog",
+    }),
     ]);
   const bundle = {
     meta,
@@ -1056,11 +1131,25 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     waterRegionsPayload: null,
     specialRegionsPayload: null,
     reliefOverlaysPayload: null,
-    runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(runtimeTopologyPayload),
-    releasableCatalog,
+    runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(runtimeTopologyResult.value),
+    releasableCatalog: releasableCatalogResult.value,
     auditPayload: null,
     optionalLayerPromises: {},
     optionalLayerSettledByKey: {},
+    loadDiagnostics: {
+      optionalResources: {
+        runtime_topology: {
+          ok: !!runtimeTopologyResult.ok,
+          reason: runtimeTopologyResult.reason,
+          errorMessage: runtimeTopologyResult.errorMessage,
+        },
+        releasable_catalog: {
+          ok: !!releasableCatalogResult.ok,
+          reason: releasableCatalogResult.reason,
+          errorMessage: releasableCatalogResult.errorMessage,
+        },
+      },
+    },
   };
   const eagerOptionalLayers = Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
     .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, bundle.runtimeTopologyPayload, hints));

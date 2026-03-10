@@ -2928,25 +2928,45 @@ function ensureHybridLayers() {
   if (specialZonesGroup.empty()) {
     specialZonesGroup = viewportGroup.append("g").attr("class", "special-zones-layer");
   }
-  specialZonesGroup.style("pointer-events", "none");
+  specialZonesGroup
+    .style("pointer-events", "none")
+    .attr("role", "img")
+    .attr("aria-label", "Special zones overlay")
+    .attr("aria-hidden", "true")
+    .attr("focusable", "false");
 
   specialZoneEditorGroup = viewportGroup.select("g.special-zone-editor-layer");
   if (specialZoneEditorGroup.empty()) {
     specialZoneEditorGroup = viewportGroup.append("g").attr("class", "special-zone-editor-layer");
   }
-  specialZoneEditorGroup.style("pointer-events", "none");
+  specialZoneEditorGroup
+    .style("pointer-events", "none")
+    .attr("role", "img")
+    .attr("aria-label", "Special zone drawing overlay")
+    .attr("aria-hidden", "true")
+    .attr("focusable", "false");
 
   hoverGroup = viewportGroup.select("g.hover-layer");
   if (hoverGroup.empty()) {
     hoverGroup = viewportGroup.append("g").attr("class", "hover-layer");
   }
-  hoverGroup.style("pointer-events", "none");
+  hoverGroup
+    .style("pointer-events", "none")
+    .attr("role", "img")
+    .attr("aria-label", "Hovered region outline overlay")
+    .attr("aria-hidden", "true")
+    .attr("focusable", "false");
 
   inspectorHighlightGroup = viewportGroup.select("g.inspector-highlight-layer");
   if (inspectorHighlightGroup.empty()) {
     inspectorHighlightGroup = viewportGroup.append("g").attr("class", "inspector-highlight-layer");
   }
-  inspectorHighlightGroup.style("pointer-events", "none");
+  inspectorHighlightGroup
+    .style("pointer-events", "none")
+    .attr("role", "img")
+    .attr("aria-label", "Inspector highlight overlay")
+    .attr("aria-hidden", "true")
+    .attr("focusable", "false");
 
   legendGroup = svg.select("g.legend-group");
   if (legendGroup.empty()) {
@@ -7873,6 +7893,8 @@ function updateSpecialZonesPaths() {
     .enter()
     .append("path")
     .attr("class", "special-zone")
+    .attr("role", "presentation")
+    .attr("aria-hidden", "true")
     .attr("vector-effect", "non-scaling-stroke")
     .merge(selection)
     .attr("d", pathSVG)
@@ -7937,6 +7959,8 @@ function renderSpecialZoneEditorOverlay() {
     .enter()
     .append("path")
     .attr("class", "special-zone-editor-path")
+    .attr("role", "presentation")
+    .attr("aria-hidden", "true")
     .attr("vector-effect", "non-scaling-stroke")
     .merge(pathSelection)
     .attr("d", (d) => pathSVG(d.feature))
@@ -7957,6 +7981,8 @@ function renderSpecialZoneEditorOverlay() {
     .enter()
     .append("circle")
     .attr("class", "special-zone-editor-point")
+    .attr("role", "presentation")
+    .attr("aria-hidden", "true")
     .merge(pointSelection)
     .attr("r", 3.4)
     .attr("cx", (d) => projection(d.coord)?.[0] ?? -9999)
@@ -7973,6 +7999,7 @@ function renderHoverOverlay() {
 
   if (state.renderPhase !== RENDER_PHASE_IDLE) {
     hoverGroup.selectAll("path.hovered-feature").remove();
+    hoverGroup.attr("aria-hidden", "true");
     return;
   }
 
@@ -7994,6 +8021,8 @@ function renderHoverOverlay() {
     .enter()
     .append("path")
     .attr("class", "hovered-feature")
+    .attr("role", "presentation")
+    .attr("aria-hidden", "true")
     .attr("vector-effect", "non-scaling-stroke")
     .merge(selection)
     .attr("d", pathSVG)
@@ -8002,6 +8031,7 @@ function renderHoverOverlay() {
     .attr("stroke-width", 2.0);
 
   selection.exit().remove();
+  hoverGroup.attr("aria-hidden", data.length ? "false" : "true");
 }
 
 function renderInspectorHighlightOverlay() {
@@ -8009,6 +8039,7 @@ function renderInspectorHighlightOverlay() {
   const code = String(state.inspectorHighlightCountryCode || "").trim().toUpperCase();
   if (!code) {
     inspectorHighlightGroup.selectAll("path.inspector-highlight").remove();
+    inspectorHighlightGroup.attr("aria-hidden", "true");
     return;
   }
   const data = (state.landData?.features || []).filter((feature) => getFeatureCountryCodeNormalized(feature) === code);
@@ -8020,6 +8051,8 @@ function renderInspectorHighlightOverlay() {
     .enter()
     .append("path")
     .attr("class", "inspector-highlight")
+    .attr("role", "presentation")
+    .attr("aria-hidden", "true")
     .attr("vector-effect", "non-scaling-stroke")
     .merge(selection)
     .attr("d", pathSVG)
@@ -8028,6 +8061,9 @@ function renderInspectorHighlightOverlay() {
     .attr("stroke-width", 2.4);
 
   selection.exit().remove();
+  inspectorHighlightGroup
+    .attr("aria-hidden", data.length ? "false" : "true")
+    .attr("aria-label", data.length ? `Inspector highlight overlay for ${code}` : "Inspector highlight overlay");
 }
 
 function renderSpecialZones() {
@@ -8036,12 +8072,19 @@ function renderSpecialZones() {
   if (!state.showSpecialZones && !isDrawing) {
     specialZonesGroup.attr("display", "none");
     specialZoneEditorGroup.attr("display", "none");
+    specialZonesGroup.attr("aria-hidden", "true");
+    specialZoneEditorGroup.attr("aria-hidden", "true");
     return;
   }
   updateSpecialZonesPaths();
   renderSpecialZoneEditorOverlay();
-  specialZonesGroup.attr("display", state.showSpecialZones ? null : "none");
-  specialZoneEditorGroup.attr("display", null);
+  const visibleSpecialZones = state.showSpecialZones && getEffectiveSpecialZonesFeatureCollection().features.length > 0;
+  specialZonesGroup
+    .attr("display", state.showSpecialZones ? null : "none")
+    .attr("aria-hidden", visibleSpecialZones ? "false" : "true");
+  specialZoneEditorGroup
+    .attr("display", null)
+    .attr("aria-hidden", isDrawing ? "false" : "true");
 }
 
 export function renderLegend(uniqueColors = null, labels = null) {
