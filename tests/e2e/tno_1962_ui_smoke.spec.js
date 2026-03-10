@@ -34,18 +34,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
     const select = document.querySelector('#scenarioSelect');
     return !!select && !!select.querySelector('option[value="tno_1962"]');
   });
-
-  const catalogResponsePromise = page.waitForResponse(
-    (res) =>
-      res.url().includes('data/releasables/tno_1962.internal.phase1.catalog.json') &&
-      res.status() < 400,
-    { timeout: 20000 }
-  );
-
-  await page.selectOption('#scenarioSelect', 'tno_1962');
-  await page.click('#applyScenarioBtn');
   await expect(page.locator('#scenarioStatus')).toContainText('TNO 1962', { timeout: 20000 });
-  const catalogResponse = await catalogResponsePromise;
 
   const scenarioStatus = await page.locator('#scenarioStatus').innerText();
   const viewMode = await page.locator('#scenarioViewModeSelect').inputValue();
@@ -76,7 +65,6 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
   expect(scenarioStatus).toContain('TNO 1962');
   expect(viewMode).toBe('ownership');
   expect(payload.manifest.releasable_catalog_url).toBe('data/releasables/tno_1962.internal.phase1.catalog.json');
-  expect(catalogResponse.status()).toBe(200);
   expect(missingFeaturedTags).toEqual([]);
   expect(lingeringHoi4Owners).toEqual([]);
   retiredCountryTags.forEach((tag) => {

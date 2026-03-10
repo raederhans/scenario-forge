@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
 
+const APP_URL = 'http://127.0.0.1:18080';
+
 const SAMPLE_POINTS = [
   { id: 'volgograd', lon: 44.515, lat: 48.708 },
   { id: 'arkhangelsk', lon: 40.533, lat: 64.54 },
@@ -47,7 +49,7 @@ test('hoi4 rkm/rko/rku reapply closes RU coverage gaps', async ({ page }) => {
     });
   });
 
-  await page.goto('http://127.0.0.1:8000', { waitUntil: 'domcontentloaded' });
+  await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1500);
 
   await page.selectOption('#scenarioSelect', 'hoi4_1939');

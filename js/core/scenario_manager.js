@@ -789,14 +789,22 @@ async function loadScenarioOptionalLayerPayload(
   bundle.optionalLayerPromises = bundle.optionalLayerPromises && typeof bundle.optionalLayerPromises === "object"
     ? bundle.optionalLayerPromises
     : {};
-  if (!forceReload && Object.prototype.hasOwnProperty.call(bundle, config.bundleField) && bundle[config.bundleField]) {
-    if (applyToActiveScenario) {
-      assignOptionalLayerPayloadToActiveScenario(bundle, layerKey, bundle[config.bundleField]);
-    }
-    return bundle[config.bundleField];
-  }
+  bundle.optionalLayerSettledByKey = bundle.optionalLayerSettledByKey
+    && typeof bundle.optionalLayerSettledByKey === "object"
+    ? bundle.optionalLayerSettledByKey
+    : {};
   if (!forceReload && bundle.optionalLayerPromises[layerKey]) {
     const payload = await bundle.optionalLayerPromises[layerKey];
+    if (applyToActiveScenario) {
+      assignOptionalLayerPayloadToActiveScenario(bundle, layerKey, payload);
+    }
+    return payload;
+  }
+  if (forceReload) {
+    delete bundle.optionalLayerSettledByKey[layerKey];
+  }
+  if (!forceReload && bundle.optionalLayerSettledByKey[layerKey] === true) {
+    const payload = bundle[config.bundleField] ?? null;
     if (applyToActiveScenario) {
       assignOptionalLayerPayloadToActiveScenario(bundle, layerKey, payload);
     }
@@ -809,22 +817,26 @@ async function loadScenarioOptionalLayerPayload(
       const payload = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, config.objectName);
       if (payload) {
         bundle[config.bundleField] = payload;
+        bundle.optionalLayerSettledByKey[layerKey] = true;
         return payload;
       }
     }
     const requestUrl = bundle.manifest?.[config.urlField];
     if (!requestUrl || !d3Client || typeof d3Client.json !== "function") {
       bundle[config.bundleField] = null;
+      bundle.optionalLayerSettledByKey[layerKey] = true;
       return null;
     }
     try {
       const rawPayload = await d3Client.json(cacheBust(requestUrl));
       const payload = normalizeScenarioFeatureCollection(rawPayload);
       bundle[config.bundleField] = payload;
+      bundle.optionalLayerSettledByKey[layerKey] = true;
       return payload;
     } catch (error) {
       console.warn(`[scenario] Failed to load scenario ${layerKey} layer for "${getScenarioBundleId(bundle)}".`, error);
       bundle[config.bundleField] = null;
+      bundle.optionalLayerSettledByKey[layerKey] = true;
       return null;
     }
   })();
@@ -881,6 +893,7 @@ async function ensureActiveScenarioOptionalLayersForVisibility(
   if (!activeScenarioId || !activeBundle) return [];
   const requestedLayers = Object.entries(SCENARIO_OPTIONAL_LAYER_CONFIGS)
     .filter(([, config]) => state[config.visibilityField])
+    .filter(([layerKey]) => activeBundle.optionalLayerSettledByKey?.[layerKey] !== true)
     .filter(([layerKey, config]) => !activeBundle[config.bundleField] && !state[config.stateField])
     .map(([layerKey]) => layerKey);
   if (!requestedLayers.length) return [];
@@ -1000,6 +1013,7 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     releasableCatalog,
     auditPayload: null,
     optionalLayerPromises: {},
+    optionalLayerSettledByKey: {},
   };
   const eagerOptionalLayers = Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
     .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, bundle.runtimeTopologyPayload, hints));
@@ -1330,19 +1344,242 @@ function restorePaintModeAfterScenario() {
   }
 }
 
-async function applyScenarioBundle(
+function cloneScenarioStateValue(value) {
+  if (value === null || value === undefined || typeof value !== "object") {
+    return value;
+  }
+  if (typeof globalThis.structuredClone === "function") {
+    return globalThis.structuredClone(value);
+  }
+  if (value instanceof Set) {
+    return new Set(Array.from(value, (entry) => cloneScenarioStateValue(entry)));
+  }
+  if (Array.isArray(value)) {
+    return value.map((entry) => cloneScenarioStateValue(entry));
+  }
+  const cloned = {};
+  Object.entries(value).forEach(([key, entry]) => {
+    cloned[key] = cloneScenarioStateValue(entry);
+  });
+  return cloned;
+}
+
+function captureScenarioApplyRollbackSnapshot() {
+  return {
+    activeScenarioId: state.activeScenarioId,
+    scenarioBorderMode: state.scenarioBorderMode,
+    activeScenarioManifest: cloneScenarioStateValue(state.activeScenarioManifest),
+    scenarioCountriesByTag: cloneScenarioStateValue(state.scenarioCountriesByTag),
+    scenarioFixedOwnerColors: cloneScenarioStateValue(state.scenarioFixedOwnerColors),
+    defaultRuntimePoliticalTopology: cloneScenarioStateValue(state.defaultRuntimePoliticalTopology),
+    scenarioRuntimeTopologyData: cloneScenarioStateValue(state.scenarioRuntimeTopologyData),
+    scenarioLandMaskData: cloneScenarioStateValue(state.scenarioLandMaskData),
+    scenarioContextLandMaskData: cloneScenarioStateValue(state.scenarioContextLandMaskData),
+    runtimePoliticalTopology: cloneScenarioStateValue(state.runtimePoliticalTopology),
+    scenarioWaterRegionsData: cloneScenarioStateValue(state.scenarioWaterRegionsData),
+    scenarioSpecialRegionsData: cloneScenarioStateValue(state.scenarioSpecialRegionsData),
+    scenarioReliefOverlaysData: cloneScenarioStateValue(state.scenarioReliefOverlaysData),
+    scenarioReliefOverlayRevision: Number(state.scenarioReliefOverlayRevision) || 0,
+    scenarioReleasableIndex: cloneScenarioStateValue(state.scenarioReleasableIndex),
+    releasableCatalog: cloneScenarioStateValue(state.releasableCatalog),
+    scenarioAudit: cloneScenarioStateValue(state.scenarioAudit),
+    scenarioAuditUi: cloneScenarioStateValue(ensureScenarioAuditUiState()),
+    scenarioBaselineHash: String(state.scenarioBaselineHash || ""),
+    scenarioBaselineOwnersByFeatureId: cloneScenarioStateValue(state.scenarioBaselineOwnersByFeatureId),
+    scenarioControllersByFeatureId: cloneScenarioStateValue(state.scenarioControllersByFeatureId),
+    scenarioAutoShellOwnerByFeatureId: cloneScenarioStateValue(state.scenarioAutoShellOwnerByFeatureId),
+    scenarioAutoShellControllerByFeatureId: cloneScenarioStateValue(state.scenarioAutoShellControllerByFeatureId),
+    scenarioBaselineControllersByFeatureId: cloneScenarioStateValue(state.scenarioBaselineControllersByFeatureId),
+    scenarioBaselineCoresByFeatureId: cloneScenarioStateValue(state.scenarioBaselineCoresByFeatureId),
+    scenarioShellOverlayRevision: Number(state.scenarioShellOverlayRevision) || 0,
+    scenarioControllerRevision: Number(state.scenarioControllerRevision) || 0,
+    scenarioOwnerControllerDiffCount: Number(state.scenarioOwnerControllerDiffCount) || 0,
+    scenarioDataHealth: cloneScenarioStateValue(state.scenarioDataHealth),
+    scenarioViewMode: String(state.scenarioViewMode || "ownership"),
+    countryNames: cloneScenarioStateValue(state.countryNames),
+    sovereigntyByFeatureId: cloneScenarioStateValue(state.sovereigntyByFeatureId),
+    sovereigntyInitialized: !!state.sovereigntyInitialized,
+    visualOverrides: cloneScenarioStateValue(state.visualOverrides),
+    featureOverrides: cloneScenarioStateValue(state.featureOverrides),
+    sovereignBaseColors: cloneScenarioStateValue(state.sovereignBaseColors),
+    countryBaseColors: cloneScenarioStateValue(state.countryBaseColors),
+    activeSovereignCode: String(state.activeSovereignCode || ""),
+    selectedWaterRegionId: String(state.selectedWaterRegionId || ""),
+    selectedSpecialRegionId: String(state.selectedSpecialRegionId || ""),
+    hoveredWaterRegionId: state.hoveredWaterRegionId ?? null,
+    hoveredSpecialRegionId: state.hoveredSpecialRegionId ?? null,
+    selectedInspectorCountryCode: String(state.selectedInspectorCountryCode || ""),
+    inspectorHighlightCountryCode: String(state.inspectorHighlightCountryCode || ""),
+    inspectorExpansionInitialized: !!state.inspectorExpansionInitialized,
+    expandedInspectorContinents: cloneScenarioStateValue(state.expandedInspectorContinents),
+    expandedInspectorReleaseParents: cloneScenarioStateValue(state.expandedInspectorReleaseParents),
+    scenarioParentBorderEnabledBeforeActivate: cloneScenarioStateValue(state.scenarioParentBorderEnabledBeforeActivate),
+    parentBorderEnabledByCountry: cloneScenarioStateValue(state.parentBorderEnabledByCountry),
+    scenarioPaintModeBeforeActivate: cloneScenarioStateValue(state.scenarioPaintModeBeforeActivate),
+    paintMode: String(state.paintMode || "visual"),
+    interactionGranularity: String(state.interactionGranularity || "subdivision"),
+    batchFillScope: String(state.batchFillScope || "parent"),
+    scenarioUiState: {
+      politicalEditingExpanded: !!state.ui?.politicalEditingExpanded,
+      scenarioVisualAdjustmentsOpen: !!state.ui?.scenarioVisualAdjustmentsOpen,
+    },
+    scenarioOceanFillBeforeActivate: state.scenarioOceanFillBeforeActivate,
+    styleConfigOcean: cloneScenarioStateValue(state.styleConfig?.ocean || {}),
+    scenarioDisplaySettingsBeforeActivate: cloneScenarioStateValue(state.scenarioDisplaySettingsBeforeActivate),
+    activeScenarioPerformanceHints: cloneScenarioStateValue(state.activeScenarioPerformanceHints),
+    renderProfile: String(state.renderProfile || "auto"),
+    dynamicBordersEnabled: state.dynamicBordersEnabled !== false,
+    showWaterRegions: state.showWaterRegions !== false,
+    showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
+    showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
+    activePaletteId: String(state.activePaletteId || ""),
+    activePaletteMeta: cloneScenarioStateValue(state.activePaletteMeta),
+    activePalettePack: cloneScenarioStateValue(state.activePalettePack),
+    activePaletteMap: cloneScenarioStateValue(state.activePaletteMap),
+    currentPaletteTheme: String(state.currentPaletteTheme || ""),
+    activePaletteOceanMeta: cloneScenarioStateValue(state.activePaletteOceanMeta),
+    fixedPaletteColorsByIso2: cloneScenarioStateValue(state.fixedPaletteColorsByIso2),
+    resolvedDefaultCountryPalette: cloneScenarioStateValue(state.resolvedDefaultCountryPalette),
+    paletteLibraryEntries: cloneScenarioStateValue(state.paletteLibraryEntries),
+    paletteQuickSwatches: cloneScenarioStateValue(state.paletteQuickSwatches),
+    paletteLoadErrorById: cloneScenarioStateValue(state.paletteLoadErrorById),
+  };
+}
+
+function restoreScenarioApplyRollbackSnapshot(snapshot, { renderNow = false } = {}) {
+  if (!snapshot || typeof snapshot !== "object") return;
+
+  state.activeScenarioId = snapshot.activeScenarioId;
+  state.scenarioBorderMode = snapshot.scenarioBorderMode;
+  state.activeScenarioManifest = cloneScenarioStateValue(snapshot.activeScenarioManifest);
+  state.scenarioCountriesByTag = cloneScenarioStateValue(snapshot.scenarioCountriesByTag);
+  state.scenarioFixedOwnerColors = cloneScenarioStateValue(snapshot.scenarioFixedOwnerColors);
+  state.defaultRuntimePoliticalTopology = cloneScenarioStateValue(snapshot.defaultRuntimePoliticalTopology);
+  state.scenarioRuntimeTopologyData = cloneScenarioStateValue(snapshot.scenarioRuntimeTopologyData);
+  state.scenarioLandMaskData = cloneScenarioStateValue(snapshot.scenarioLandMaskData);
+  state.scenarioContextLandMaskData = cloneScenarioStateValue(snapshot.scenarioContextLandMaskData);
+  state.runtimePoliticalTopology = cloneScenarioStateValue(snapshot.runtimePoliticalTopology);
+  state.scenarioWaterRegionsData = cloneScenarioStateValue(snapshot.scenarioWaterRegionsData);
+  state.scenarioSpecialRegionsData = cloneScenarioStateValue(snapshot.scenarioSpecialRegionsData);
+  state.scenarioReliefOverlaysData = cloneScenarioStateValue(snapshot.scenarioReliefOverlaysData);
+  state.scenarioReliefOverlayRevision = Number(snapshot.scenarioReliefOverlayRevision) || 0;
+  state.scenarioReleasableIndex = cloneScenarioStateValue(snapshot.scenarioReleasableIndex);
+  state.releasableCatalog = cloneScenarioStateValue(snapshot.releasableCatalog);
+  state.scenarioAudit = cloneScenarioStateValue(snapshot.scenarioAudit);
+  setScenarioAuditUiState(cloneScenarioStateValue(snapshot.scenarioAuditUi) || {});
+  state.scenarioBaselineHash = String(snapshot.scenarioBaselineHash || "");
+  state.scenarioBaselineOwnersByFeatureId = cloneScenarioStateValue(snapshot.scenarioBaselineOwnersByFeatureId);
+  state.scenarioControllersByFeatureId = cloneScenarioStateValue(snapshot.scenarioControllersByFeatureId);
+  state.scenarioAutoShellOwnerByFeatureId = cloneScenarioStateValue(snapshot.scenarioAutoShellOwnerByFeatureId);
+  state.scenarioAutoShellControllerByFeatureId = cloneScenarioStateValue(snapshot.scenarioAutoShellControllerByFeatureId);
+  state.scenarioBaselineControllersByFeatureId = cloneScenarioStateValue(snapshot.scenarioBaselineControllersByFeatureId);
+  state.scenarioBaselineCoresByFeatureId = cloneScenarioStateValue(snapshot.scenarioBaselineCoresByFeatureId);
+  state.scenarioShellOverlayRevision = Number(snapshot.scenarioShellOverlayRevision) || 0;
+  state.scenarioControllerRevision = Number(snapshot.scenarioControllerRevision) || 0;
+  state.scenarioOwnerControllerDiffCount = Number(snapshot.scenarioOwnerControllerDiffCount) || 0;
+  state.scenarioDataHealth = cloneScenarioStateValue(snapshot.scenarioDataHealth);
+  state.scenarioViewMode = String(snapshot.scenarioViewMode || "ownership");
+  state.countryNames = cloneScenarioStateValue(snapshot.countryNames) || { ...countryNames };
+  state.sovereigntyByFeatureId = cloneScenarioStateValue(snapshot.sovereigntyByFeatureId);
+  state.sovereigntyInitialized = !!snapshot.sovereigntyInitialized;
+  state.visualOverrides = cloneScenarioStateValue(snapshot.visualOverrides);
+  state.featureOverrides = cloneScenarioStateValue(snapshot.featureOverrides);
+  state.sovereignBaseColors = cloneScenarioStateValue(snapshot.sovereignBaseColors);
+  state.countryBaseColors = cloneScenarioStateValue(snapshot.countryBaseColors);
+  state.activeSovereignCode = String(snapshot.activeSovereignCode || "");
+  state.selectedWaterRegionId = String(snapshot.selectedWaterRegionId || "");
+  state.selectedSpecialRegionId = String(snapshot.selectedSpecialRegionId || "");
+  state.hoveredWaterRegionId = snapshot.hoveredWaterRegionId ?? null;
+  state.hoveredSpecialRegionId = snapshot.hoveredSpecialRegionId ?? null;
+  state.selectedInspectorCountryCode = String(snapshot.selectedInspectorCountryCode || "");
+  state.inspectorHighlightCountryCode = String(snapshot.inspectorHighlightCountryCode || "");
+  state.inspectorExpansionInitialized = !!snapshot.inspectorExpansionInitialized;
+  state.expandedInspectorContinents =
+    cloneScenarioStateValue(snapshot.expandedInspectorContinents) || new Set();
+  state.expandedInspectorReleaseParents =
+    cloneScenarioStateValue(snapshot.expandedInspectorReleaseParents) || new Set();
+  state.scenarioParentBorderEnabledBeforeActivate =
+    cloneScenarioStateValue(snapshot.scenarioParentBorderEnabledBeforeActivate);
+  state.parentBorderEnabledByCountry = cloneScenarioStateValue(snapshot.parentBorderEnabledByCountry) || {};
+  state.scenarioPaintModeBeforeActivate = cloneScenarioStateValue(snapshot.scenarioPaintModeBeforeActivate);
+  state.paintMode = String(snapshot.paintMode || "visual");
+  state.interactionGranularity = String(snapshot.interactionGranularity || "subdivision");
+  state.batchFillScope = String(snapshot.batchFillScope || "parent");
+  if (!state.ui || typeof state.ui !== "object") {
+    state.ui = {};
+  }
+  state.ui.politicalEditingExpanded = !!snapshot.scenarioUiState?.politicalEditingExpanded;
+  state.ui.scenarioVisualAdjustmentsOpen = !!snapshot.scenarioUiState?.scenarioVisualAdjustmentsOpen;
+  state.scenarioOceanFillBeforeActivate = snapshot.scenarioOceanFillBeforeActivate;
+  if (!state.styleConfig || typeof state.styleConfig !== "object") {
+    state.styleConfig = {};
+  }
+  state.styleConfig.ocean = cloneScenarioStateValue(snapshot.styleConfigOcean) || {};
+  state.scenarioDisplaySettingsBeforeActivate =
+    cloneScenarioStateValue(snapshot.scenarioDisplaySettingsBeforeActivate);
+  state.activeScenarioPerformanceHints = cloneScenarioStateValue(snapshot.activeScenarioPerformanceHints);
+  state.renderProfile = String(snapshot.renderProfile || "auto");
+  state.dynamicBordersEnabled = snapshot.dynamicBordersEnabled !== false;
+  state.showWaterRegions = snapshot.showWaterRegions !== false;
+  state.showScenarioSpecialRegions = snapshot.showScenarioSpecialRegions !== false;
+  state.showScenarioReliefOverlays = snapshot.showScenarioReliefOverlays !== false;
+  state.activePaletteId = String(snapshot.activePaletteId || "");
+  state.activePaletteMeta = cloneScenarioStateValue(snapshot.activePaletteMeta);
+  state.activePalettePack = cloneScenarioStateValue(snapshot.activePalettePack);
+  state.activePaletteMap = cloneScenarioStateValue(snapshot.activePaletteMap);
+  state.currentPaletteTheme = String(snapshot.currentPaletteTheme || "");
+  state.activePaletteOceanMeta = cloneScenarioStateValue(snapshot.activePaletteOceanMeta);
+  state.fixedPaletteColorsByIso2 = cloneScenarioStateValue(snapshot.fixedPaletteColorsByIso2) || {};
+  state.resolvedDefaultCountryPalette =
+    cloneScenarioStateValue(snapshot.resolvedDefaultCountryPalette) || { ...defaultCountryPalette };
+  state.paletteLibraryEntries = cloneScenarioStateValue(snapshot.paletteLibraryEntries) || [];
+  state.paletteQuickSwatches = cloneScenarioStateValue(snapshot.paletteQuickSwatches) || [];
+  state.paletteLoadErrorById = cloneScenarioStateValue(snapshot.paletteLoadErrorById) || {};
+  syncResolvedDefaultCountryPalette({ overwriteCountryPalette: false });
+  if (typeof state.renderPaletteFn === "function") {
+    state.renderPaletteFn(state.currentPaletteTheme);
+  }
+  if (typeof state.updatePaletteLibraryUIFn === "function") {
+    state.updatePaletteLibraryUIFn();
+  }
+  if (typeof state.updatePaletteSourceUIFn === "function") {
+    state.updatePaletteSourceUIFn();
+  }
+  if (typeof state.updateParentBorderCountryListFn === "function") {
+    state.updateParentBorderCountryListFn();
+  }
+  if (typeof state.updatePaintModeUIFn === "function") {
+    state.updatePaintModeUIFn();
+  }
+  if (typeof state.updateToolbarInputsFn === "function") {
+    state.updateToolbarInputsFn();
+  }
+  if (typeof state.updateWaterInteractionUIFn === "function") {
+    state.updateWaterInteractionUIFn();
+  }
+  if (typeof state.updateScenarioSpecialRegionUIFn === "function") {
+    state.updateScenarioSpecialRegionUIFn();
+  }
+  if (typeof state.updateScenarioReliefOverlayUIFn === "function") {
+    state.updateScenarioReliefOverlayUIFn();
+  }
+  if (typeof state.updateDynamicBorderStatusUIFn === "function") {
+    state.updateDynamicBorderStatusUIFn();
+  }
+  setMapData({ refitProjection: false, resetZoom: false });
+  rebuildPresetState();
+  refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: "scenario-rollback" });
+  refreshScenarioShellOverlays({ renderNow: false, borderReason: "scenario-rollback" });
+  refreshScenarioDataHealth({ showWarningToast: false, showErrorToast: false });
+  syncCountryUi({ renderNow });
+}
+
+async function prepareScenarioApplyState(
   bundle,
   {
-    renderNow = true,
-    markDirtyReason = "scenario-apply",
     syncPalette = true,
-    showToastOnComplete = false,
   } = {}
 ) {
-  const applyStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
-  if (!bundle?.manifest) {
-    throw new Error("Scenario bundle is missing a manifest.");
-  }
   const detailPromoted = await ensureScenarioDetailTopologyLoaded();
   const detailReady = (
     state.topologyBundleMode === "composite"
@@ -1361,28 +1598,42 @@ async function applyScenarioBundle(
     console.warn("[scenario] Applying bundle without confirmed detail promotion; health gate will validate runtime topology.");
   }
   if (syncPalette) {
-    await setActivePaletteSource(
+    const paletteApplied = await setActivePaletteSource(
       normalizeScenarioId(bundle.manifest?.palette_id) || "hoi4_vanilla",
       {
-      syncUI: true,
-      overwriteCountryPalette: false,
+        syncUI: true,
+        overwriteCountryPalette: false,
       }
     );
+    if (!paletteApplied) {
+      throw new Error(
+        `Unable to load palette for scenario "${normalizeScenarioId(bundle.manifest?.scenario_id || bundle.meta?.scenario_id)}".`
+      );
+    }
   }
 
   const scenarioId = normalizeScenarioId(bundle.manifest.scenario_id || bundle.meta?.scenario_id);
-  const baseCountryMap = bundle.countriesPayload?.countries || {};
-  const baseCountryTags = Object.keys(baseCountryMap || {});
-  const owners = bundle.ownersPayload?.owners || {};
-  const controllers = bundle.controllersPayload?.controllers || owners;
-  const cores = bundle.coresPayload?.cores || {};
+  if (!scenarioId) {
+    throw new Error("Scenario bundle is missing a scenario id.");
+  }
+  const baseCountryMap = bundle.countriesPayload?.countries;
+  if (!baseCountryMap || typeof baseCountryMap !== "object") {
+    throw new Error(`Scenario "${scenarioId}" is missing countries data.`);
+  }
+  const ownersPayload = bundle.ownersPayload?.owners;
+  if (!ownersPayload || typeof ownersPayload !== "object") {
+    throw new Error(`Scenario "${scenarioId}" is missing owner data.`);
+  }
+  const baseCountryTags = Object.keys(baseCountryMap);
+  const owners = ownersPayload;
+  const controllers = bundle.controllersPayload?.controllers && typeof bundle.controllersPayload.controllers === "object"
+    ? bundle.controllersPayload.controllers
+    : owners;
+  const cores = bundle.coresPayload?.cores && typeof bundle.coresPayload.cores === "object"
+    ? bundle.coresPayload.cores
+    : {};
   const defaultCountryCode = getScenarioDefaultCountryCode(bundle.manifest, baseCountryMap);
-  disableScenarioParentBorders();
-  captureScenarioDisplaySettingsBeforeActivate();
-
-  state.activeScenarioId = scenarioId;
-  state.releasableCatalog = bundle.releasableCatalog || state.defaultReleasableCatalog || null;
-  state.scenarioReleasableIndex = buildScenarioReleasableIndex(scenarioId, {
+  const releasableIndex = buildScenarioReleasableIndex(scenarioId, {
     excludeTags: baseCountryTags,
   });
   const releasableCountries = getScenarioReleasableCountries(scenarioId, {
@@ -1420,125 +1671,204 @@ async function applyScenarioBundle(
       ...scenarioOwnerBackfill,
     }
     : { ...owners };
-  state.scenarioBorderMode = "scenario_owner_only";
-  state.activeScenarioManifest = bundle.manifest || null;
-  state.scenarioCountriesByTag = countryMap;
-  state.scenarioFixedOwnerColors = scenarioColorMap;
-  state.defaultRuntimePoliticalTopology = state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null;
-  state.scenarioRuntimeTopologyData = runtimeTopologyPayload;
-  state.runtimePoliticalTopology = runtimeTopologyPayload?.objects?.political
-    ? runtimeTopologyPayload
-    : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null);
-  state.scenarioLandMaskData = scenarioLandMaskFromTopology || null;
-  state.scenarioContextLandMaskData = scenarioContextLandMaskFromTopology || null;
-  state.scenarioWaterRegionsData = scenarioWaterRegionsFromTopology || bundle.waterRegionsPayload || null;
-  state.scenarioSpecialRegionsData = scenarioSpecialRegionsFromTopology || bundle.specialRegionsPayload || null;
-  state.scenarioReliefOverlaysData = bundle.reliefOverlaysPayload || null;
-  state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;
-  state.scenarioAudit = bundle.auditPayload || null;
-  setScenarioAuditUiState({
-    loading: false,
-    loadedForScenarioId: bundle.auditPayload ? scenarioId : "",
-    errorMessage: "",
-  });
-  state.scenarioBaselineHash = getScenarioBaselineHashFromBundle(bundle);
-  state.scenarioBaselineOwnersByFeatureId = { ...resolvedOwners };
-  state.scenarioControllersByFeatureId = { ...controllers };
-  state.scenarioAutoShellOwnerByFeatureId = {};
-  state.scenarioAutoShellControllerByFeatureId = {};
-  state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
-  state.scenarioBaselineControllersByFeatureId = { ...controllers };
-  state.scenarioBaselineCoresByFeatureId = { ...cores };
-  state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
-  state.scenarioViewMode = "ownership";
-  state.countryNames = {
-    ...countryNames,
-    ...scenarioNameMap,
+  const scenarioParentBorderEnabledBeforeActivate =
+    state.scenarioParentBorderEnabledBeforeActivate === null && !state.activeScenarioId
+      ? { ...(state.parentBorderEnabledByCountry || {}) }
+      : cloneScenarioStateValue(state.scenarioParentBorderEnabledBeforeActivate);
+  const scenarioDisplaySettingsBeforeActivate =
+    !state.activeScenarioId && !state.scenarioDisplaySettingsBeforeActivate
+      ? {
+        renderProfile: normalizeScenarioRenderProfile(state.renderProfile, "auto"),
+        dynamicBordersEnabled: state.dynamicBordersEnabled !== false,
+        showWaterRegions: state.showWaterRegions !== false,
+        showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
+        showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
+      }
+      : cloneScenarioStateValue(state.scenarioDisplaySettingsBeforeActivate);
+  const scenarioOceanFillBeforeActivate = state.scenarioOceanFillBeforeActivate === null
+    ? normalizeScenarioOceanFillColor(state.styleConfig?.ocean?.fillColor)
+    : state.scenarioOceanFillBeforeActivate;
+  return {
+    scenarioId,
+    baseCountryMap,
+    defaultCountryCode,
+    countryMap,
+    runtimeTopologyPayload,
+    scenarioWaterRegionsFromTopology,
+    scenarioSpecialRegionsFromTopology,
+    scenarioContextLandMaskFromTopology,
+    scenarioLandMaskFromTopology,
+    scenarioNameMap,
+    scenarioColorMap,
+    scenarioOwnerBackfill,
+    resolvedOwners,
+    controllers,
+    cores,
+    releasableIndex,
+    scenarioParentBorderEnabledBeforeActivate,
+    scenarioDisplaySettingsBeforeActivate,
+    scenarioOceanFillBeforeActivate,
   };
-  state.sovereigntyByFeatureId = { ...resolvedOwners };
-  state.sovereigntyInitialized = false;
-  ensureSovereigntyState({ force: true });
-  if (Object.keys(scenarioOwnerBackfill).length) {
-    console.info(
-      `[scenario] Applied HOI4 Far East owner backfill for "${scenarioId}": ${Object.keys(scenarioOwnerBackfill).length} missing RU runtime features -> SOV.`
-    );
+}
+
+async function applyScenarioBundle(
+  bundle,
+  {
+    renderNow = true,
+    markDirtyReason = "scenario-apply",
+    syncPalette = true,
+    showToastOnComplete = false,
+  } = {}
+) {
+  const applyStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+  if (!bundle?.manifest) {
+    throw new Error("Scenario bundle is missing a manifest.");
   }
-  recalculateScenarioOwnerControllerDiffCount();
-  state.visualOverrides = {};
-  state.featureOverrides = {};
-  state.sovereignBaseColors = { ...scenarioColorMap };
-  state.countryBaseColors = { ...scenarioColorMap };
-  state.activeSovereignCode = defaultCountryCode;
-  state.selectedWaterRegionId = "";
-  state.selectedSpecialRegionId = "";
-  state.hoveredWaterRegionId = null;
-  state.hoveredSpecialRegionId = null;
-  syncScenarioInspectorSelection(defaultCountryCode);
-  rebuildPresetState();
-  applyScenarioPaintMode();
-  syncScenarioOceanFillForActivation(bundle.manifest);
-  applyScenarioPerformanceHints(bundle.manifest);
-  refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: `scenario-opening:${scenarioId}` });
-  setMapData({ refitProjection: false, resetZoom: false });
-  if (typeof document !== "undefined") {
-    const presetSection = document.getElementById("selectedCountryActionsSection");
-    if (presetSection && "open" in presetSection) {
-      presetSection.open = true;
+  const rollbackSnapshot = captureScenarioApplyRollbackSnapshot();
+  let staged = null;
+  try {
+    staged = await prepareScenarioApplyState(bundle, { syncPalette });
+
+    state.scenarioParentBorderEnabledBeforeActivate =
+      cloneScenarioStateValue(staged.scenarioParentBorderEnabledBeforeActivate);
+    state.scenarioDisplaySettingsBeforeActivate =
+      cloneScenarioStateValue(staged.scenarioDisplaySettingsBeforeActivate);
+    state.scenarioOceanFillBeforeActivate = staged.scenarioOceanFillBeforeActivate;
+    state.activeScenarioId = staged.scenarioId;
+    state.scenarioBorderMode = "scenario_owner_only";
+    state.activeScenarioManifest = bundle.manifest || null;
+    state.scenarioCountriesByTag = staged.countryMap;
+    state.scenarioFixedOwnerColors = staged.scenarioColorMap;
+    state.defaultRuntimePoliticalTopology = state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null;
+    state.scenarioRuntimeTopologyData = staged.runtimeTopologyPayload;
+    state.runtimePoliticalTopology = staged.runtimeTopologyPayload?.objects?.political
+      ? staged.runtimeTopologyPayload
+      : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null);
+    state.scenarioLandMaskData = staged.scenarioLandMaskFromTopology || null;
+    state.scenarioContextLandMaskData = staged.scenarioContextLandMaskFromTopology || null;
+    state.scenarioWaterRegionsData = staged.scenarioWaterRegionsFromTopology || bundle.waterRegionsPayload || null;
+    state.scenarioSpecialRegionsData = staged.scenarioSpecialRegionsFromTopology || bundle.specialRegionsPayload || null;
+    state.scenarioReliefOverlaysData = bundle.reliefOverlaysPayload || null;
+    state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;
+    state.releasableCatalog = bundle.releasableCatalog || state.defaultReleasableCatalog || null;
+    state.scenarioReleasableIndex = staged.releasableIndex;
+    state.scenarioAudit = bundle.auditPayload || null;
+    setScenarioAuditUiState({
+      loading: false,
+      loadedForScenarioId: bundle.auditPayload ? staged.scenarioId : "",
+      errorMessage: "",
+    });
+    state.scenarioBaselineHash = getScenarioBaselineHashFromBundle(bundle);
+    state.scenarioBaselineOwnersByFeatureId = { ...staged.resolvedOwners };
+    state.scenarioControllersByFeatureId = { ...staged.controllers };
+    state.scenarioAutoShellOwnerByFeatureId = {};
+    state.scenarioAutoShellControllerByFeatureId = {};
+    state.scenarioBaselineControllersByFeatureId = { ...staged.controllers };
+    state.scenarioBaselineCoresByFeatureId = { ...staged.cores };
+    state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
+    state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
+    state.scenarioViewMode = "ownership";
+    state.countryNames = {
+      ...countryNames,
+      ...staged.scenarioNameMap,
+    };
+    state.sovereigntyByFeatureId = { ...staged.resolvedOwners };
+    state.sovereigntyInitialized = false;
+    state.visualOverrides = {};
+    state.featureOverrides = {};
+    state.sovereignBaseColors = { ...staged.scenarioColorMap };
+    state.countryBaseColors = { ...staged.scenarioColorMap };
+    state.activeSovereignCode = staged.defaultCountryCode;
+    state.selectedWaterRegionId = "";
+    state.selectedSpecialRegionId = "";
+    state.hoveredWaterRegionId = null;
+    state.hoveredSpecialRegionId = null;
+    syncScenarioInspectorSelection(staged.defaultCountryCode);
+
+    disableScenarioParentBorders();
+    applyScenarioPaintMode();
+    syncScenarioOceanFillForActivation(bundle.manifest);
+    applyScenarioPerformanceHints(bundle.manifest);
+    ensureSovereigntyState({ force: true });
+    if (Object.keys(staged.scenarioOwnerBackfill).length) {
+      console.info(
+        `[scenario] Applied HOI4 Far East owner backfill for "${staged.scenarioId}": ${Object.keys(staged.scenarioOwnerBackfill).length} missing RU runtime features -> SOV.`
+      );
     }
-  }
-
-  // Diagnostic: verify key ownership/frontline assignments took effect.
-  const spotChecks = [
-    "SYR-134",
-    "LBN-3022",
-    "BY_HIST_POL_VITEBSK_WEST",
-    "CN_CITY_17275852B74586174185496",
-    "CN_CITY_17275852B2295538790743",
-  ];
-  spotChecks.forEach((fid) => {
-    const owner = state.sovereigntyByFeatureId[fid];
-    const controller = state.scenarioControllersByFeatureId?.[fid] || owner;
-    if (owner) {
-      const color = scenarioColorMap[owner] || "(no color)";
-      console.log(`[scenario] Spot-check: ${fid} -> owner=${owner}, controller=${controller}, color=${color}`);
+    recalculateScenarioOwnerControllerDiffCount();
+    refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: `scenario-opening:${staged.scenarioId}` });
+    setMapData({ refitProjection: false, resetZoom: false });
+    rebuildPresetState();
+    if (typeof document !== "undefined") {
+      const presetSection = document.getElementById("selectedCountryActionsSection");
+      if (presetSection && "open" in presetSection) {
+        presetSection.open = true;
+      }
     }
-  });
 
-  refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario:${scenarioId}` });
-  void ensureActiveScenarioOptionalLayersForVisibility({ bundle, renderNow });
-  const dataHealth = refreshScenarioDataHealth({
-    showWarningToast: true,
-    showErrorToast: true,
-    minRatio: SCENARIO_DETAIL_MIN_RATIO_STRICT,
-  });
-  if (dataHealth.warning) {
-    console.warn(
-      `[scenario] Detail visibility gate triggered for ${scenarioId}: runtime=${dataHealth.runtimeFeatureCount}, expected=${dataHealth.expectedFeatureCount}, ratio=${dataHealth.ratio.toFixed(3)} (min=${dataHealth.minRatio}).`
-    );
-  }
-  if (markDirtyReason) {
-    markDirty(markDirtyReason);
-  }
-  syncCountryUi({ renderNow });
-  if (typeof state.triggerScenarioGuideFn === "function") {
-    state.triggerScenarioGuideFn();
-  }
+    // Diagnostic: verify key ownership/frontline assignments took effect.
+    const spotChecks = [
+      "SYR-134",
+      "LBN-3022",
+      "BY_HIST_POL_VITEBSK_WEST",
+      "CN_CITY_17275852B74586174185496",
+      "CN_CITY_17275852B2295538790743",
+    ];
+    spotChecks.forEach((fid) => {
+      const owner = state.sovereigntyByFeatureId[fid];
+      const controller = state.scenarioControllersByFeatureId?.[fid] || owner;
+      if (owner) {
+        const color = staged.scenarioColorMap[owner] || "(no color)";
+        console.log(`[scenario] Spot-check: ${fid} -> owner=${owner}, controller=${controller}, color=${color}`);
+      }
+    });
 
-  if (showToastOnComplete) {
+    refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario:${staged.scenarioId}` });
+    ensureActiveScenarioOptionalLayersForVisibility({ bundle, renderNow })
+      .catch((error) => {
+        console.warn(`[scenario] Optional layer visibility sync failed for "${staged.scenarioId}".`, error);
+      });
+    const dataHealth = refreshScenarioDataHealth({
+      showWarningToast: true,
+      showErrorToast: true,
+      minRatio: SCENARIO_DETAIL_MIN_RATIO_STRICT,
+    });
+    if (dataHealth.warning) {
+      console.warn(
+        `[scenario] Detail visibility gate triggered for ${staged.scenarioId}: runtime=${dataHealth.runtimeFeatureCount}, expected=${dataHealth.expectedFeatureCount}, ratio=${dataHealth.ratio.toFixed(3)} (min=${dataHealth.minRatio}).`
+      );
+    }
+    if (markDirtyReason) {
+      markDirty(markDirtyReason);
+    }
+    syncCountryUi({ renderNow });
+    if (typeof state.triggerScenarioGuideFn === "function") {
+      state.triggerScenarioGuideFn();
+    }
+
+    if (showToastOnComplete) {
       showToast(
         t("Scenario loaded. Expand the parent country and use Activate to apply releasable territory.", "ui"),
         {
           title: t("Scenario loaded", "ui"),
-      tone: "success",
-      duration: 4200,
-      }
-    );
+          tone: "success",
+          duration: 4200,
+        }
+      );
+    }
+    recordScenarioPerfMetric("applyScenarioBundle", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - applyStartedAt, {
+      scenarioId: staged.scenarioId,
+      expectedFeatureCount: Number(bundle.manifest?.summary?.feature_count || 0),
+      runtimeFeatureCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
+    });
+  } catch (error) {
+    try {
+      restoreScenarioApplyRollbackSnapshot(rollbackSnapshot, { renderNow });
+    } catch (rollbackError) {
+      console.error("[scenario] Failed to restore scenario apply rollback snapshot.", rollbackError);
+    }
+    throw error;
   }
-  recordScenarioPerfMetric("applyScenarioBundle", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - applyStartedAt, {
-    scenarioId,
-    expectedFeatureCount: Number(bundle.manifest?.summary?.feature_count || 0),
-    runtimeFeatureCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
-  });
 }
 
 async function applyScenarioById(
