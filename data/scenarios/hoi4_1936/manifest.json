@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "scenario_id": "hoi4_1936",
   "display_name": "HOI4 1936",
   "bookmark_name": "GATHERING_STORM_NAME",
@@ -54,45 +54,39 @@
     "ARG",
     "AUS",
     "BEL",
-    "NOT",
-    "COG",
     "PER",
     "AFG",
     "IRQ",
-    "PHI",
-    "GDC",
-    "SIC",
-    "XIC",
-    "KHM"
+    "PHI"
   ],
   "palette_id": "hoi4_vanilla",
-  "baseline_hash": "282ccf50c789733361766ea6bed925f231faaa29331fed00c9252f3f278f4214",
+  "baseline_hash": "e73c45a8b9b3c09f5cfca7c54b50f38fcba4aa4452333b36573022ccf1fa9309",
   "countries_url": "data/scenarios/hoi4_1936/countries.json",
   "owners_url": "data/scenarios/hoi4_1936/owners.by_feature.json",
   "controllers_url": "data/scenarios/hoi4_1936/controllers.by_feature.json",
   "cores_url": "data/scenarios/hoi4_1936/cores.by_feature.json",
   "audit_url": "data/scenarios/hoi4_1936/audit.json",
   "summary": {
-    "feature_count": 11607,
+    "feature_count": 12309,
     "owner_count": 122,
     "controller_count": 122,
     "quality_counts": {
-      "approx_existing_geometry": 432,
-      "direct_country_copy": 5202,
-      "manual_reviewed": 5973
+      "approx_existing_geometry": 452,
+      "direct_country_copy": 5204,
+      "manual_reviewed": 6653
     },
     "source_counts": {
-      "direct_active_owner": 5202,
+      "direct_active_owner": 5204,
       "fallback_mapped_tag": 18,
-      "manual_rule": 6387
+      "manual_rule": 7087
     },
-    "approximate_count": 432,
-    "manual_reviewed_feature_count": 5973,
+    "approximate_count": 452,
+    "manual_reviewed_feature_count": 6653,
     "geometry_blocker_count": 0,
     "critical_unresolved_count": 0,
     "synthetic_owner_feature_count": 18,
     "synthetic_count": 18,
-    "changed_feature_count": 6405,
+    "changed_feature_count": 7105,
     "failed_region_check_count": 0,
     "topology_blocker_count": 0,
     "scenario_rule_blocker_count": 0,
@@ -102,5 +96,18 @@
     "critical_region_check_count": 13,
     "manual_reviewed_region_count": 13,
     "belarus_hybrid_feature_count": 35
+  },
+  "generated_at": "2026-03-10T14:40:37.380093+00:00",
+  "performance_hints": {
+    "render_profile_default": "balanced",
+    "dynamic_borders_default": false,
+    "scenario_relief_overlays_default": false,
+    "water_regions_default": false,
+    "special_regions_default": false
+  },
+  "style_defaults": {
+    "ocean": {
+      "fillColor": "#2d4769"
+    }
   }
 }

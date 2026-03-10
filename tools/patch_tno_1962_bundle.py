@@ -43,10 +43,13 @@ WATER_REGIONS_PATH = ROOT / "data/water_regions.geojson"
 REGIONAL_RULE_PACKS: list[tuple[str, Path]] = [
     ("east_asia", ROOT / "data/scenario-rules/tno_1962.east_asia_ownership.manual.json"),
     ("south_asia", ROOT / "data/scenario-rules/tno_1962.south_asia_ownership.manual.json"),
+    ("russia", ROOT / "data/scenario-rules/tno_1962.russia_ownership.manual.json"),
 ]
 HGO_ROOT = ROOT / "historic geographic overhaul"
 TNO_ROOT_CANDIDATES = [
+    Path("C:/Program Files (x86)/Steam/steamapps/workshop/content/394360/2438003901"),
     Path("/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/394360/2438003901"),
+    Path("C:/Program Files (x86)/Steam/steamapps/workshop/content/394360/3583339918"),
     Path("/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/394360/3583339918"),
 ]
 
@@ -1498,9 +1501,13 @@ def apply_regional_rules(
     rule_path: Path,
     countries_payload: dict,
     owners_payload: dict,
+    controllers_payload: dict,
+    cores_payload: dict,
     audit_payload: dict,
 ) -> list[str]:
     rule_payload = load_json(rule_path)
+    apply_to_controllers = bool(rule_payload.get("apply_to_controllers"))
+    apply_to_cores = bool(rule_payload.get("apply_to_cores"))
     hierarchy_groups = load_hierarchy_groups()
     palette_entries = load_palette_entries()
     baseline_owners = {
@@ -1527,6 +1534,10 @@ def apply_regional_rules(
             )
         for feature_id in feature_ids:
             owners_payload["owners"][feature_id] = tag
+            if apply_to_controllers:
+                controllers_payload["controllers"][feature_id] = tag
+            if apply_to_cores:
+                cores_payload["cores"][feature_id] = tag
         if preserve_existing_country_entry:
             if tag not in countries:
                 raise ValueError(
@@ -3701,7 +3712,15 @@ def main() -> None:
     patch_germany_metadata(countries_payload)
     patch_italy_metadata(countries_payload)
     touched_regional_rule_tags = {
-        rule_pack_name: apply_regional_rules(rule_pack_name, rule_path, countries_payload, owners_payload, audit_payload)
+        rule_pack_name: apply_regional_rules(
+            rule_pack_name,
+            rule_path,
+            countries_payload,
+            owners_payload,
+            controllers_payload,
+            cores_payload,
+            audit_payload,
+        )
         for rule_pack_name, rule_path in REGIONAL_RULE_PACKS
     }
     patch_tno_palette_defaults(countries_payload, manifest_payload)

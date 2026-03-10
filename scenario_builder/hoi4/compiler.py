@@ -14,6 +14,7 @@ from .crosswalk import (
     build_feature_indexes,
     build_iso2_to_mapped_tag,
 )
+from .models import ScenarioCountryRecord
 
 
 CRITICAL_REGION_IDS = [
@@ -31,6 +32,13 @@ CRITICAL_REGION_IDS = [
     "africa_western_sahara",
     "soviet_core_coverage",
 ]
+
+COUNTRY_QUALITY_RANK = {
+    "direct_country_copy": 0,
+    "manual_reviewed": 1,
+    "approx_existing_geometry": 2,
+    "geometry_blocker": 3,
+}
 
 
 def _stable_json_hash(payload: object) -> str:
@@ -1117,6 +1125,176 @@ def _build_controller_assignments(
     return controller_assignments, diagnostics
 
 
+def _dedupe_strings(values: list[object]) -> list[str]:
+    deduped: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        candidate = str(value or "").strip()
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+        deduped.append(candidate)
+    return deduped
+
+
+def _worst_country_quality(qualities: list[str]) -> str:
+    if not qualities:
+        return "manual_reviewed"
+    return max(qualities, key=lambda value: COUNTRY_QUALITY_RANK.get(value, 99))
+
+
+def _augment_countries_with_controller_data(
+    *,
+    countries: dict[str, ScenarioCountryRecord],
+    controller_assignments: dict[str, str],
+    controller_rules: list[object],
+    country_meta_by_iso2: dict[str, dict[str, str]],
+    country_histories: dict[str, object],
+    palette_pack: dict,
+) -> Counter[str]:
+    controller_feature_counts: Counter[str] = Counter(
+        tag for tag in controller_assignments.values() if str(tag or "").strip()
+    )
+    for record in countries.values():
+        record.controller_feature_count = int(controller_feature_counts.get(record.tag, 0))
+
+    controller_rule_lookup: defaultdict[str, list[object]] = defaultdict(list)
+    for rule in controller_rules:
+        controller_rule_lookup[str(getattr(rule, "owner_tag", "") or "").strip().upper()].append(rule)
+
+    palette_entries = palette_pack.get("entries", {}) if isinstance(palette_pack, dict) else {}
+    for tag, controller_feature_count in sorted(controller_feature_counts.items()):
+        normalized_tag = str(tag or "").strip().upper()
+        if not normalized_tag or normalized_tag in countries:
+            continue
+
+        tag_rules = sorted(
+            controller_rule_lookup.get(normalized_tag) or [],
+            key=lambda rule: (rule.priority, rule.rule_id),
+        )
+        primary_rule = tag_rules[0] if tag_rules else None
+
+        palette_entry = palette_entries.get(normalized_tag, {}) if isinstance(palette_entries, dict) else {}
+        file_label = str(palette_entry.get("country_file_label") or "").strip()
+        localized_name = str(palette_entry.get("localized_name") or "").strip()
+        display_name = (
+            str(getattr(primary_rule, "display_name_override", "") or "").strip()
+            or localized_name
+            or file_label
+            or normalized_tag
+        )
+        color_hex = (
+            str(getattr(primary_rule, "color_hex_override", "") or "").strip().lower()
+            or str(palette_entry.get("map_hex") or "").strip().lower()
+            or "#808080"
+        )
+        if not color_hex.startswith("#"):
+            color_hex = "#808080"
+
+        base_iso2 = str(getattr(primary_rule, "base_iso2", "") or "").strip().upper()
+        lookup_iso2 = str(getattr(primary_rule, "lookup_iso2", "") or "").strip().upper() or base_iso2
+        meta = country_meta_by_iso2.get(lookup_iso2, {}) if lookup_iso2 else {}
+        history = country_histories.get(normalized_tag)
+
+        parent_owner_tags = _dedupe_strings(
+            [getattr(rule, "parent_owner_tag", "") for rule in tag_rules]
+            + [
+                parent_tag
+                for rule in tag_rules
+                for parent_tag in (getattr(rule, "parent_owner_tags", []) or [])
+            ]
+        )
+        primary_parent_owner_tag = (
+            str(getattr(primary_rule, "parent_owner_tag", "") or "").strip().upper()
+            if primary_rule
+            else ""
+        ) or (parent_owner_tags[0] if parent_owner_tags else "")
+        if primary_parent_owner_tag and primary_parent_owner_tag not in parent_owner_tags:
+            parent_owner_tags.insert(0, primary_parent_owner_tag)
+
+        source_type = (
+            str(getattr(primary_rule, "source_type", "") or "").strip().lower()
+            if primary_rule
+            else ""
+        ) or "controller_overlay"
+        historical_fidelity = (
+            str(getattr(primary_rule, "historical_fidelity", "") or "").strip().lower()
+            if primary_rule
+            else ""
+        ) or "vanilla"
+        subject_kind = (
+            str(getattr(primary_rule, "subject_kind", "") or "").strip().lower()
+            if primary_rule
+            else ""
+        )
+        entry_kind = (
+            str(getattr(primary_rule, "entry_kind", "") or "").strip().lower()
+            if primary_rule
+            else ""
+        ) or "controller_only"
+        rule_sources = _dedupe_strings([getattr(rule, "rule_id", "") for rule in tag_rules])
+        source_types = _dedupe_strings([getattr(rule, "source_type", "") for rule in tag_rules]) or [source_type]
+        historical_fidelity_summary = (
+            _dedupe_strings([getattr(rule, "historical_fidelity", "") for rule in tag_rules])
+            or [historical_fidelity]
+        )
+        notes = (
+            str(getattr(primary_rule, "notes", "") or "").strip()
+            if primary_rule
+            else "Controller-only scenario entry synthesized from controller assignments."
+        )
+
+        countries[normalized_tag] = ScenarioCountryRecord(
+            tag=normalized_tag,
+            display_name=display_name,
+            color_hex=color_hex,
+            feature_count=0,
+            quality=_worst_country_quality(
+                [str(getattr(rule, "quality", "") or "").strip() for rule in tag_rules]
+            ),
+            source="controller_rule",
+            controller_feature_count=int(controller_feature_count),
+            base_iso2=base_iso2,
+            lookup_iso2=lookup_iso2,
+            provenance_iso2=base_iso2,
+            scenario_only=True,
+            featured=False,
+            capital_state_id=getattr(history, "capital_state_id", None),
+            continent_id=str(meta.get("continent_id") or ""),
+            continent_label=str(meta.get("continent_label") or ""),
+            subregion_id=str(meta.get("subregion_id") or ""),
+            subregion_label=str(meta.get("subregion_label") or ""),
+            notes=notes,
+            synthetic_owner=False,
+            source_type=source_type,
+            historical_fidelity=historical_fidelity,
+            primary_rule_source=(str(getattr(primary_rule, "rule_id", "") or "").strip() if primary_rule else ""),
+            rule_sources=rule_sources,
+            source_types=source_types,
+            historical_fidelity_summary=historical_fidelity_summary,
+            parent_owner_tag=primary_parent_owner_tag,
+            parent_owner_tags=parent_owner_tags,
+            subject_kind=subject_kind,
+            entry_kind=entry_kind,
+        )
+
+    return controller_feature_counts
+
+
+def _filter_featured_tags(bookmark, countries: dict[str, ScenarioCountryRecord]) -> tuple[list[str], list[str]]:
+    requested_tags = [
+        str(tag or "").strip().upper()
+        for tag in (getattr(bookmark, "featured_tags", []) or [])
+        if str(tag or "").strip()
+    ]
+    filtered = [tag for tag in requested_tags if tag in countries]
+    dropped = [tag for tag in requested_tags if tag not in countries]
+    featured_set = set(filtered)
+    for record in countries.values():
+        record.featured = record.tag in featured_set
+    return filtered, dropped
+
+
 def compile_scenario_bundle(
     *,
     scenario_id: str,
@@ -1212,6 +1390,23 @@ def compile_scenario_bundle(
         "owner_baseline_hash": baseline_hash,
         "controllers": controllers_only,
     }
+    _augment_countries_with_controller_data(
+        countries=countries,
+        controller_assignments=controllers_only,
+        controller_rules=controller_rules,
+        country_meta_by_iso2=country_meta_by_iso2,
+        country_histories=country_histories,
+        palette_pack=palette_pack,
+    )
+    filtered_featured_tags, dropped_featured_tags = _filter_featured_tags(bookmark, countries)
+    diagnostics["filtered_featured_tags"] = filtered_featured_tags
+    if dropped_featured_tags:
+        diagnostics["dropped_featured_tags"] = dropped_featured_tags
+    diagnostics["controller_only_tags"] = [
+        tag
+        for tag, record in sorted(countries.items())
+        if record.entry_kind == "controller_only" and record.controller_feature_count > 0
+    ]
     owner_controller_split_feature_count = sum(
         1
         for feature_id, owner_tag in owners_only.items()
@@ -1272,6 +1467,7 @@ def compile_scenario_bundle(
         owner_stats[tag] = {
             "display_name": record.display_name,
             "feature_count": record.feature_count,
+            "controller_feature_count": record.controller_feature_count,
             "quality": record.quality,
             "quality_breakdown": dict(sorted(quality_by_owner[tag].items())),
             "base_iso2": record.base_iso2,
@@ -1304,6 +1500,7 @@ def compile_scenario_bundle(
                 "display_name": record.display_name,
                 "color_hex": record.color_hex,
                 "feature_count": record.feature_count,
+                "controller_feature_count": record.controller_feature_count,
                 "quality": record.quality,
                 "source": record.source,
                 "base_iso2": record.base_iso2,
@@ -1420,14 +1617,14 @@ def compile_scenario_bundle(
     }
 
     manifest_payload = {
-        "version": 1,
+        "version": 2,
         "scenario_id": scenario_id,
         "display_name": display_name,
         "bookmark_name": bookmark.name,
         "bookmark_description": bookmark.description,
         "bookmark_date": bookmark.date,
         "default_country": bookmark.default_country,
-        "featured_tags": bookmark.featured_tags,
+        "featured_tags": filtered_featured_tags,
         "palette_id": "hoi4_vanilla",
         "baseline_hash": baseline_hash,
         "countries_url": f"data/scenarios/{scenario_id}/countries.json",
@@ -1436,6 +1633,19 @@ def compile_scenario_bundle(
         "cores_url": f"data/scenarios/{scenario_id}/cores.by_feature.json",
         "audit_url": f"data/scenarios/{scenario_id}/audit.json",
         "summary": summary,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "performance_hints": {
+            "render_profile_default": "balanced",
+            "dynamic_borders_default": False,
+            "scenario_relief_overlays_default": False,
+            "water_regions_default": False,
+            "special_regions_default": False,
+        },
+        "style_defaults": {
+            "ocean": {
+                "fillColor": "#2d4769",
+            }
+        },
     }
 
     failure_reasons: list[str] = []

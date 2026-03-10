@@ -7,10 +7,15 @@
     {
       "rule_id": "1939_frontline_north_china_political_council_control",
       "owner_tag": "NCP",
-      "priority": 900,
+      "priority": 2000,
       "quality": "manual_reviewed",
       "critical": false,
       "notes": "North China collaboration administration across Beijing, Tianjin, the occupied Hebei core, and Shandong while leaving MAN, MEN, and direct Japanese bridgeheads out.",
+      "display_name_override": "North China Political Council",
+      "color_hex_override": "#8f6b3a",
+      "parent_owner_tag": "JAP",
+      "source_type": "controller_overlay",
+      "entry_kind": "controller_only",
       "include_hierarchy_group_ids": [
         "CN_Beijing",
         "CN_Tianjin",
@@ -56,10 +61,15 @@
     {
       "rule_id": "1939_frontline_north_china_political_council_shandong",
       "owner_tag": "NCP",
-      "priority": 901,
+      "priority": 2001,
       "quality": "manual_reviewed",
       "critical": false,
       "notes": "Shandong collaboration administration replaces direct Japanese controller coloring while preserving LUQ legal ownership.",
+      "display_name_override": "North China Political Council",
+      "color_hex_override": "#8f6b3a",
+      "parent_owner_tag": "JAP",
+      "source_type": "controller_overlay",
+      "entry_kind": "controller_only",
       "include_hierarchy_group_ids": [
         "CN_Shandong"
       ],
@@ -68,7 +78,7 @@
     {
       "rule_id": "1939_frontline_hebei_chahar_mengjiang_control",
       "owner_tag": "MEN",
-      "priority": 1000,
+      "priority": 2100,
       "quality": "manual_reviewed",
       "critical": true,
       "notes": "Hebei-Chahar frontline represented as Mengjiang field control over the contested corridor features.",
@@ -85,7 +95,7 @@
     {
       "rule_id": "1939_frontline_hainan_japanese_control",
       "owner_tag": "JAP",
-      "priority": 1001,
+      "priority": 2101,
       "quality": "manual_reviewed",
       "critical": false,
       "notes": "Hainan remains a direct Japanese-controlled frontline zone in the 1939 opening.",
@@ -97,7 +107,7 @@
     {
       "rule_id": "1939_frontline_jidong_bridgehead",
       "owner_tag": "JAP",
-      "priority": 1002,
+      "priority": 2102,
       "quality": "manual_reviewed",
       "critical": false,
       "notes": "Northern Hebei bridgehead remains under direct Japanese operational control.",
@@ -126,10 +136,15 @@
     {
       "rule_id": "1939_frontline_reformed_government_shanghai",
       "owner_tag": "RGC",
-      "priority": 1100,
+      "priority": 2200,
       "quality": "manual_reviewed",
       "critical": false,
       "notes": "Shanghai municipality shifts from direct Japanese controller coloring to the Reformed Government preview layer.",
+      "display_name_override": "Reformed Government of China",
+      "color_hex_override": "#b67f2a",
+      "parent_owner_tag": "JAP",
+      "source_type": "controller_overlay",
+      "entry_kind": "controller_only",
       "include_hierarchy_group_ids": [
         "CN_Shanghai"
       ],
@@ -138,10 +153,15 @@
     {
       "rule_id": "1939_frontline_reformed_government_phase1_lower_yangtze_and_central_axis",
       "owner_tag": "RGC",
-      "priority": 1101,
+      "priority": 2201,
       "quality": "manual_reviewed",
       "critical": false,
       "notes": "Phase 1 hand-curated occupied belt across south Jiangsu, east/lower Anhui, north Zhejiang, east Hubei, and the east-Henan rail axis.",
+      "display_name_override": "Reformed Government of China",
+      "color_hex_override": "#b67f2a",
+      "parent_owner_tag": "JAP",
+      "source_type": "controller_overlay",
+      "entry_kind": "controller_only",
       "include_feature_ids": [
         "CN_CITY_17275852B11407259911678",
         "CN_CITY_17275852B14220584679784",
@@ -346,10 +366,15 @@
     {
       "rule_id": "1939_frontline_reformed_government_phase2_south_china_corridors",
       "owner_tag": "RGC",
-      "priority": 1102,
+      "priority": 2202,
       "quality": "manual_reviewed",
       "critical": false,
       "notes": "Phase 2 hand-curated occupied belt across Fujian, Guangdong, Jiangxi, and Hunan coastal and traffic corridors.",
+      "display_name_override": "Reformed Government of China",
+      "color_hex_override": "#b67f2a",
+      "parent_owner_tag": "JAP",
+      "source_type": "controller_overlay",
+      "entry_kind": "controller_only",
       "include_feature_ids": [
         "CN_CITY_17275852B10267820559553",
         "CN_CITY_17275852B1065790622928",

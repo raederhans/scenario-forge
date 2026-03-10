@@ -821,12 +821,23 @@
       "quality": "manual_reviewed",
       "critical": false,
       "notes": "Italian Somaliland represented separately before the creation of Italian East Africa.",
-      "include_country_codes": ["SO", "SM"],
+      "include_country_codes": ["SO"],
       "base_iso2": "SO",
       "display_name_override": "Italian Somaliland",
       "parent_owner_tag": "ITA",
       "subject_kind": "colony",
       "entry_kind": "scenario_subject"
+    },
+    {
+      "rule_id": "italy_absorbs_san_marino_1936",
+      "owner_tag": "ITA",
+      "priority": 220,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "San Marino is folded into Italy for this scenario baseline.",
+      "include_country_codes": ["SM"],
+      "base_iso2": "IT",
+      "display_name_override": "Italy"
     },
     {
       "rule_id": "dutch_east_indies",

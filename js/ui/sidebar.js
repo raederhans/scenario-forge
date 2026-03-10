@@ -133,6 +133,13 @@ function collectCountryNameByCode() {
 }
 
 function getDynamicCountryEntries() {
+  const resolveScenarioCountryFeatureCount = (entry = {}) => {
+    const entryKind = String(entry?.entry_kind || entry?.entryKind || "").trim().toLowerCase();
+    const ownerFeatureCount = Number(entry?.feature_count ?? entry?.featureCount ?? 0) || 0;
+    const controllerFeatureCount = Number(entry?.controller_feature_count ?? entry?.controllerFeatureCount ?? 0) || 0;
+    return entryKind === "controller_only" ? controllerFeatureCount : ownerFeatureCount;
+  };
+
   if (state.activeScenarioId && state.scenarioCountriesByTag && typeof state.scenarioCountriesByTag === "object") {
     const scenarioEntries = Object.entries(state.scenarioCountriesByTag)
       .map(([rawCode, scenarioCountry]) => {
@@ -140,11 +147,15 @@ function getDynamicCountryEntries() {
         if (!code) return null;
         const name = String(scenarioCountry?.display_name || state.countryNames?.[code] || code).trim() || code;
         const displayName = t(name, "geo") || name || code;
+        const ownerFeatureCount = Number(scenarioCountry?.feature_count || 0) || 0;
+        const controllerFeatureCount = Number(scenarioCountry?.controller_feature_count || 0) || 0;
         return {
           code,
           name,
           displayName,
-          featureCount: Number(scenarioCountry?.feature_count || 0),
+          featureCount: resolveScenarioCountryFeatureCount(scenarioCountry),
+          ownerFeatureCount,
+          controllerFeatureCount,
           quality: String(scenarioCountry?.quality || "").trim(),
           baseIso2: String(scenarioCountry?.base_iso2 || "").trim().toUpperCase(),
           lookupIso2: String(
@@ -1654,6 +1665,21 @@ function initSidebar({ render } = {}) {
     const presetLookupCode = resolveScenarioLookupCode(entry);
     const groupLookupCode = resolveCountryGroupingCode(entry);
     const groupingMeta = getCountryGroupingMeta(entry) || {};
+    const entryKind = String(scenarioMeta.entry_kind || entry.entryKind || "").trim();
+    const ownerFeatureCount = Number(
+      scenarioMeta.feature_count
+      ?? entry.ownerFeatureCount
+      ?? entry.featureCount
+      ?? 0
+    ) || 0;
+    const controllerFeatureCount = Number(
+      scenarioMeta.controller_feature_count
+      ?? entry.controllerFeatureCount
+      ?? 0
+    ) || 0;
+    const featureCount = String(entryKind).trim().toLowerCase() === "controller_only"
+      ? controllerFeatureCount
+      : ownerFeatureCount;
     const continentLabel =
       String(scenarioMeta.continent_label || scenarioMeta.continentLabel || groupingMeta.continentLabel || "Other");
     const subregionLabel =
@@ -1676,7 +1702,9 @@ function initSidebar({ render } = {}) {
       subregionLabel,
       subregionDisplayLabel: t(subregionLabel, "geo") || subregionLabel,
       quality: String(scenarioMeta.quality || entry.quality || "").trim(),
-      featureCount: Number(scenarioMeta.feature_count || entry.featureCount || 0),
+      featureCount,
+      ownerFeatureCount,
+      controllerFeatureCount,
       baseIso2: String(scenarioMeta.base_iso2 || entry.baseIso2 || "").trim().toUpperCase(),
       releaseLookupIso2: String(
         scenarioMeta.release_lookup_iso2
@@ -1685,8 +1713,8 @@ function initSidebar({ render } = {}) {
       ).trim().toUpperCase(),
       scenarioOnly: !!(scenarioMeta.scenario_only ?? entry.scenarioOnly),
       releasable: !!(scenarioMeta.releasable ?? entry.releasable),
-      scenarioSubject: String(scenarioMeta.entry_kind || entry.entryKind || "").trim() === "scenario_subject",
-      entryKind: String(scenarioMeta.entry_kind || entry.entryKind || "").trim(),
+      scenarioSubject: entryKind === "scenario_subject",
+      entryKind,
       subjectKind: String(scenarioMeta.subject_kind || entry.subjectKind || "").trim().toLowerCase(),
       parentOwnerTag: String(scenarioMeta.parent_owner_tag || entry.parentOwnerTag || "").trim().toUpperCase(),
       parentOwnerTags: Array.isArray(scenarioMeta.parent_owner_tags)

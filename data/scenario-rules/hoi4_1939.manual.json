@@ -171,12 +171,23 @@
       "quality": "manual_reviewed",
       "critical": true,
       "notes": "Italian East Africa replaces the separate Eritrean and Somali colonial administrations in the 1939 setup.",
-      "include_country_codes": ["ET", "ER", "SO", "SM"],
+      "include_country_codes": ["ET", "ER", "SO"],
       "base_iso2": "ET",
       "display_name_override": "Italian East Africa",
       "parent_owner_tag": "ITA",
       "subject_kind": "colonial_government",
       "entry_kind": "scenario_subject"
+    },
+    {
+      "rule_id": "1939_italy_absorbs_san_marino",
+      "owner_tag": "ITA",
+      "priority": 911,
+      "quality": "manual_reviewed",
+      "critical": false,
+      "notes": "San Marino is folded into Italy for this scenario baseline.",
+      "include_country_codes": ["SM"],
+      "base_iso2": "IT",
+      "display_name_override": "Italy"
     },
     {
       "rule_id": "1939_turkey_hatay",

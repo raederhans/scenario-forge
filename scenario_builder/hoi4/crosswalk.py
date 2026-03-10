@@ -426,6 +426,7 @@ def build_country_registry(
             feature_count=feature_count,
             quality=_worst_quality(quality_by_tag[tag]),
             source=primary_source,
+            controller_feature_count=0,
             base_iso2=base_iso2,
             lookup_iso2=lookup_iso2,
             provenance_iso2=base_iso2,

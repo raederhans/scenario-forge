@@ -1,4 +1,4 @@
-﻿const { test, expect } = require('playwright/test');
+﻿const { test, expect } = require('@playwright/test');
 
 test('hoi4 1939 owner-sync smoke', async ({ page }) => {
   const consoleIssues = [];
@@ -29,9 +29,13 @@ test('hoi4 1939 owner-sync smoke', async ({ page }) => {
   await page.goto('http://127.0.0.1:18080', { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1200);
 
+  await page.waitForFunction(() => {
+    const select = document.querySelector('#scenarioSelect');
+    return !!select && !!select.querySelector('option[value="hoi4_1939"]');
+  });
   await page.selectOption('#scenarioSelect', 'hoi4_1939');
   await page.click('#applyScenarioBtn');
-  await page.waitForTimeout(3200);
+  await expect(page.locator('#scenarioStatus')).toContainText('HOI4 1939', { timeout: 15000 });
 
   const scenarioStatus = await page.locator('#scenarioStatus').innerText();
   const scenarioAuditHint = await page.locator('#scenarioAuditHint').innerText();
@@ -42,30 +46,38 @@ test('hoi4 1939 owner-sync smoke', async ({ page }) => {
     return payload.countries || {};
   });
 
-  const catalog = await page.evaluate(async () => {
-    const payload = await fetch('data/releasables/hoi4_vanilla.internal.phase1.catalog.json').then((r) => r.json());
-    return Array.isArray(payload.entries) ? payload.entries : [];
+  const manifest = await page.evaluate(async () => {
+    return fetch('data/scenarios/hoi4_1939/manifest.json').then((r) => r.json());
+  });
+
+  const controllers = await page.evaluate(async () => {
+    const payload = await fetch('data/scenarios/hoi4_1939/controllers.by_feature.json').then((r) => r.json());
+    return payload.controllers || {};
   });
 
   const ncp = countries.NCP || null;
   const rgc = countries.RGC || null;
-  const ncpRel = catalog.find((entry) => entry.tag === 'NCP') || null;
-  const rgcRel = catalog.find((entry) => entry.tag === 'RGC') || null;
+  const countControllerFeatures = (tag) => Object.values(controllers).filter((value) => value === tag).length;
+  const ncpControllerCount = countControllerFeatures('NCP');
+  const rgcControllerCount = countControllerFeatures('RGC');
 
   expect(scenarioStatus).toContain('HOI4 1939');
   expect(viewMode).toBe('ownership');
-  expect(scenarioAuditHint).toContain('Split');
-  expect(scenarioAuditHint).toContain('0');
+  expect(scenarioAuditHint.toLowerCase()).toContain('split');
+  expect(scenarioAuditHint).toContain(String(manifest?.summary?.owner_controller_split_feature_count || 0));
 
   expect(ncp).toBeTruthy();
   expect(rgc).toBeTruthy();
-  expect(ncp.feature_count).toBe(6);
-  expect(rgc.feature_count).toBe(18);
-
-  expect(ncpRel).toBeTruthy();
-  expect(rgcRel).toBeTruthy();
-  expect(ncpRel.parent_owner_tag).toBe('JAP');
-  expect(rgcRel.parent_owner_tag).toBe('JAP');
+  expect(ncp.entry_kind).toBe('controller_only');
+  expect(rgc.entry_kind).toBe('controller_only');
+  expect(ncp.parent_owner_tag).toBe('JAP');
+  expect(rgc.parent_owner_tag).toBe('JAP');
+  expect(ncp.feature_count).toBe(0);
+  expect(rgc.feature_count).toBe(0);
+  expect(ncp.controller_feature_count).toBeGreaterThan(0);
+  expect(rgc.controller_feature_count).toBeGreaterThan(0);
+  expect(ncp.controller_feature_count).toBe(ncpControllerCount);
+  expect(rgc.controller_feature_count).toBe(rgcControllerCount);
 
   const shotPath = '.mcp-artifacts/screenshots/hoi4_1939_ui_smoke.png';
   await page.screenshot({ path: shotPath, fullPage: true });
@@ -76,8 +88,8 @@ test('hoi4 1939 owner-sync smoke', async ({ page }) => {
     viewMode,
     ncpFeatureCount: ncp ? ncp.feature_count : null,
     rgcFeatureCount: rgc ? rgc.feature_count : null,
-    ncpReleasableStatus: ncpRel ? ncpRel.validation_status : null,
-    rgcReleasableStatus: rgcRel ? rgcRel.validation_status : null,
+    ncpControllerFeatureCount: ncp ? ncp.controller_feature_count : null,
+    rgcControllerFeatureCount: rgc ? rgc.controller_feature_count : null,
     consoleIssueCount: consoleIssues.length,
     networkFailureCount: networkFailures.length,
     consoleIssues,

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import json
 import re
 from pathlib import Path
@@ -248,6 +249,12 @@ def main() -> int:
     audit_summary = audit.get("summary", {}) if isinstance(audit.get("summary"), dict) else {}
     country_map = countries.get("countries", {}) if isinstance(countries.get("countries"), dict) else {}
     markdown_summary = parse_markdown_summary(coverage_report)
+    owners_by_feature_id = owners.get("owners", {}) if isinstance(owners.get("owners", {}), dict) else {}
+    controllers_by_feature_id = (
+        controllers.get("controllers", {})
+        if isinstance(controllers.get("controllers", {}), dict)
+        else {}
+    )
 
     errors: list[str] = []
 
@@ -273,6 +280,17 @@ def main() -> int:
             field_name = str(field).strip()
             if field_name:
                 expect(bool(manifest.get(field_name)), f"manifest.{field_name} must be present.")
+
+    featured_tags = [
+        str(tag or "").strip().upper()
+        for tag in (manifest.get("featured_tags") or [])
+        if str(tag or "").strip()
+    ]
+    missing_featured_tags = [tag for tag in featured_tags if tag not in country_map]
+    expect(
+        not missing_featured_tags,
+        f"manifest.featured_tags must all exist in countries.json. Missing: {missing_featured_tags[:10]}",
+    )
 
     required_country_fields = expectation.get("required_country_fields", [])
     if isinstance(required_country_fields, list):
@@ -308,18 +326,14 @@ def main() -> int:
         evaluate_owner_set_assertions(
             errors=errors,
             assertions=owner_set_assertions,
-            owners_by_feature_id=owners.get("owners", {}) if isinstance(owners.get("owners", {}), dict) else {},
+            owners_by_feature_id=owners_by_feature_id,
         )
     controller_set_assertions = expectation.get("controller_set_assertions", [])
     if isinstance(controller_set_assertions, list):
         evaluate_controller_set_assertions(
             errors=errors,
             assertions=controller_set_assertions,
-            controllers_by_feature_id=(
-                controllers.get("controllers", {})
-                if isinstance(controllers.get("controllers", {}), dict)
-                else {}
-            ),
+            controllers_by_feature_id=controllers_by_feature_id,
         )
 
     apply_numeric_assertions(
@@ -352,7 +366,7 @@ def main() -> int:
         expect(manifest_value == audit_value, f"manifest.summary.{key} must equal audit.summary.{key}.")
 
     expect(
-        summary.get("feature_count") == len(owners.get("owners", {})),
+        summary.get("feature_count") == len(owners_by_feature_id),
         "manifest.summary.feature_count must equal owners.by_feature entry count.",
     )
     expect(
@@ -361,8 +375,48 @@ def main() -> int:
     )
     if require_controllers and controllers:
         expect(
-            summary.get("feature_count") == len(controllers.get("controllers", {})),
+            summary.get("feature_count") == len(controllers_by_feature_id),
             "manifest.summary.feature_count must equal controllers.by_feature entry count.",
+        )
+
+    owner_tag_counts = Counter(
+        str(tag or "").strip().upper()
+        for tag in owners_by_feature_id.values()
+        if str(tag or "").strip()
+    )
+    controller_tag_counts = Counter(
+        str(tag or "").strip().upper()
+        for tag in controllers_by_feature_id.values()
+        if str(tag or "").strip()
+    )
+    missing_controller_country_tags = [
+        tag
+        for tag, count in sorted(controller_tag_counts.items())
+        if count > 0 and tag not in country_map
+    ]
+    expect(
+        not missing_controller_country_tags,
+        "All controller tags must exist in countries.json. Missing: "
+        f"{missing_controller_country_tags[:10]}",
+    )
+    for tag, entry in country_map.items():
+        if str(entry.get("entry_kind") or "").strip().lower() != "controller_only":
+            continue
+        expected_controller_count = controller_tag_counts.get(tag, 0)
+        actual_controller_count = int(entry.get("controller_feature_count") or 0)
+        actual_owner_count = int(entry.get("feature_count") or 0)
+        expect(
+            actual_controller_count == expected_controller_count,
+            f"controller_only country {tag}.controller_feature_count must equal controller payload count "
+            f"({expected_controller_count}). Found {actual_controller_count}.",
+        )
+        expect(
+            actual_owner_count == 0,
+            f"controller_only country {tag}.feature_count must stay at 0. Found {actual_owner_count}.",
+        )
+        expect(
+            owner_tag_counts.get(tag, 0) == 0,
+            f"controller_only country {tag} must not own features in owners payload.",
         )
 
     if coverage_report:
