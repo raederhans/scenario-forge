@@ -33,8 +33,8 @@ DEFAULT_TNO_ROOTS = [
     Path("/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/394360/2438003901"),
 ]
 DEFAULT_RULES_PATH = PROJECT_ROOT / "data/scenario-rules/tno_1962.russia_ownership.manual.json"
-DEFAULT_REPORT_JSON = PROJECT_ROOT / "reports/generated/scenarios/tno_1962_russia_audit.json"
-DEFAULT_REPORT_MD = PROJECT_ROOT / "reports/generated/scenarios/tno_1962_russia_audit.md"
+DEFAULT_REPORT_JSON = PROJECT_ROOT / ".runtime/reports/generated/scenarios/tno_1962_russia_audit.json"
+DEFAULT_REPORT_MD = PROJECT_ROOT / ".runtime/reports/generated/scenarios/tno_1962_russia_audit.md"
 DEFAULT_AS_OF_DATE = "1962.1.1.1"
 DIRECT_COVERAGE_THRESHOLD = 0.80
 DIRECT_SPILL_THRESHOLD = 0.25

@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const { test, expect } = require('@playwright/test');
 
 const SAMPLE_POINTS = [
@@ -105,8 +107,10 @@ test('hoi4 rkm/rko/rku reapply closes RU coverage gaps', async ({ page }) => {
     expect(sample.owner, `missing owner at ${sample.id}`).toBeTruthy();
   }
 
-  const fullShot = '.mcp-artifacts/screenshots/hoi4_rk_russia_regression_full.png';
-  const mapShot = '.mcp-artifacts/screenshots/hoi4_rk_russia_regression_map.png';
+  const screenshotDir = path.join('.runtime', 'browser', 'mcp-artifacts', 'screenshots');
+  fs.mkdirSync(screenshotDir, { recursive: true });
+  const fullShot = path.join(screenshotDir, 'hoi4_rk_russia_regression_full.png');
+  const mapShot = path.join(screenshotDir, 'hoi4_rk_russia_regression_map.png');
   await page.screenshot({ path: fullShot, fullPage: true });
   await page.locator('#mapContainer').screenshot({ path: mapShot });
 

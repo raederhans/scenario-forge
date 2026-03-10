@@ -6,8 +6,8 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "$ROOT_DIR"
 
 URL="http://127.0.0.1:8000/?perf_overlay=1"
-OUT_PATH="output/perf/editor-performance-benchmark.json"
-SCREENSHOT_DIR=".mcp-artifacts/perf"
+OUT_PATH=".runtime/output/perf/editor-performance-benchmark.json"
+SCREENSHOT_DIR=".runtime/browser/mcp-artifacts/perf"
 
 usage() {
   cat <<USAGE

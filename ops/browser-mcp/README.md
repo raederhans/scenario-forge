@@ -1,6 +1,7 @@
 # Browser MCP Ops
 
 This folder centralizes non-essential operational helpers for browser inspection.
+Runtime evidence defaults to `.runtime/browser/` and generated reports default to `.runtime/reports/generated/`.
 
 ## Files
 - `inspection-profile.toml`: profile-driven traversal config (routes, sections, gestures, budgets, auto-upgrade).

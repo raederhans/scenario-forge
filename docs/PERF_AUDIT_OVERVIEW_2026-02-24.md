@@ -30,8 +30,8 @@
 
 前 UI 阶段的历史截图、Playwright 证据图、临时日志与自动生成报表已经从主文档区移出。需要重新生成时，统一走：
 
-- `reports/generated/`
-- `.mcp-artifacts/`（运行期临时证据）
+- `.runtime/reports/generated/`
+- `.runtime/browser/mcp-artifacts/`（运行期临时证据）
 
 ## 5. 不在本轮整理范围内
 

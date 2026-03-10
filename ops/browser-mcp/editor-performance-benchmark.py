@@ -13,6 +13,7 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
 PWCLI = Path(os.environ.get("CODEX_HOME", str(Path.home() / ".codex"))) / "skills" / "playwright" / "scripts" / "playwright_cli.sh"
+PWCLI_WORKDIR = ROOT_DIR / ".runtime" / "browser" / "playwright-cli"
 SESSION_ID = "editor-perf-benchmark"
 BROWSER_OPENED = False
 SCENARIO_IDS = ["none", "hoi4_1939", "tno_1962"]
@@ -32,10 +33,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--url", default="http://127.0.0.1:8000/?perf_overlay=1", help="Benchmark target URL.")
     parser.add_argument(
         "--out",
-        default=".mcp-artifacts/perf/editor-performance-benchmark.json",
+        default=".runtime/output/perf/editor-performance-benchmark.json",
         help="Output JSON path.",
     )
-    parser.add_argument("--screenshot-dir", default=".mcp-artifacts/perf", help="Screenshot directory.")
+    parser.add_argument("--screenshot-dir", default=".runtime/browser/mcp-artifacts/perf", help="Screenshot directory.")
     return parser.parse_args()
 
 
@@ -45,7 +46,7 @@ def run_pw(*args: str, expect_json: bool = False, timeout_sec: int = 240) -> dic
     try:
       proc = subprocess.run(
           ["bash", str(PWCLI), *args],
-          cwd=ROOT_DIR,
+          cwd=PWCLI_WORKDIR,
           env=env,
           capture_output=True,
           text=True,
@@ -76,7 +77,7 @@ def close_session() -> None:
     try:
       subprocess.run(
           ["bash", str(PWCLI), "close"],
-          cwd=ROOT_DIR,
+          cwd=PWCLI_WORKDIR,
           env=env,
           capture_output=True,
           text=True,
@@ -198,8 +199,7 @@ def capture_network_issues() -> list[str]:
 
 def take_screenshot(target_path: Path) -> str:
     target_path.parent.mkdir(parents=True, exist_ok=True)
-    relative_target = target_path.resolve().relative_to(ROOT_DIR).as_posix()
-    run_pw("screenshot", "--filename", relative_target, "--full-page", timeout_sec=120)
+    run_pw("screenshot", "--filename", target_path.resolve().as_posix(), "--full-page", timeout_sec=120)
     if not target_path.exists():
       raise RuntimeError(f"Screenshot was not created at {target_path}")
     return str(target_path)
@@ -734,6 +734,7 @@ def main() -> None:
     args = parse_args()
     if not PWCLI.exists():
       raise SystemExit(f"Missing Playwright CLI wrapper: {PWCLI}")
+    PWCLI_WORKDIR.mkdir(parents=True, exist_ok=True)
 
     out_path = (ROOT_DIR / args.out).resolve()
     screenshot_dir = (ROOT_DIR / args.screenshot_dir).resolve()

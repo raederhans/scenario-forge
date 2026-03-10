@@ -32,9 +32,17 @@ If budget causes incomplete coverage, report uncovered sections explicitly.
 When returning findings, prioritize output in this order:
 1. Console errors and warnings.
 2. Network failures and 4xx/5xx clues.
-3. Key screenshot paths under `.mcp-artifacts/`.
+3. Key screenshot paths under `.runtime/browser/mcp-artifacts/`.
 4. Reproduction steps.
 5. Minimal patch proposal.
 
 ## Scope Constraint
 Prefer localhost-only browsing for this project unless the user explicitly asks otherwise.
+
+## Runtime Output Policy
+- Use `.runtime/` as the only root for disposable runtime outputs.
+- Put browser inspection evidence under `.runtime/browser/`.
+- Put Playwright test outputs under `.runtime/tests/playwright/`.
+- Put generated reports under `.runtime/reports/generated/`.
+- Put temporary caches and scratch outputs under `.runtime/tmp/` or `.runtime/python/pycache/`.
+- Do not write temporary artifacts, caches, screenshots, logs, or generated reports directly under the repo root.

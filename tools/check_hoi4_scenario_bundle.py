@@ -10,7 +10,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SCENARIO_DIR = PROJECT_ROOT / "data/scenarios/hoi4_1936"
-DEFAULT_REPORT_DIR = PROJECT_ROOT / "reports/generated/scenarios/hoi4_1936"
+DEFAULT_REPORT_DIR = PROJECT_ROOT / ".runtime/reports/generated/scenarios/hoi4_1936"
 DEFAULT_EXPECTATION_DIR = PROJECT_ROOT / "data/scenarios/expectations"
 
 

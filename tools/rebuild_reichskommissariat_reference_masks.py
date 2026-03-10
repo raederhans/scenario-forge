@@ -22,7 +22,7 @@ from scenario_builder.hoi4.parser import load_hierarchy_groups, load_runtime_fea
 DEFAULT_SPEC_PATH = PROJECT_ROOT / "data/releasables/hoi4_reichskommissariat_boundaries.internal.json"
 DEFAULT_TOPOLOGY_PATH = PROJECT_ROOT / "data/europe_topology.runtime_political_v1.json"
 DEFAULT_HIERARCHY_PATH = PROJECT_ROOT / "data/hierarchy.json"
-DEFAULT_REPORTS_DIR = PROJECT_ROOT / "reports/generated/releasables"
+DEFAULT_REPORTS_DIR = PROJECT_ROOT / ".runtime/reports/generated/releasables"
 
 
 def parse_args() -> argparse.Namespace:

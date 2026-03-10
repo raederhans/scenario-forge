@@ -15,8 +15,8 @@ from scenario_builder.hoi4.parser import load_hierarchy_groups, load_runtime_fea
 
 DEFAULT_SPEC_PATH = PROJECT_ROOT / "data/releasables/hoi4_reichskommissariat_boundaries.internal.json"
 DEFAULT_SOURCE_PATH = PROJECT_ROOT / "data/releasables/hoi4_vanilla.internal.phase1.source.json"
-DEFAULT_REPORT_JSON = PROJECT_ROOT / "reports/generated/releasables/hoi4_reichskommissariat_boundaries.audit.json"
-DEFAULT_REPORT_MD = PROJECT_ROOT / "reports/generated/releasables/hoi4_reichskommissariat_boundaries.audit.md"
+DEFAULT_REPORT_JSON = PROJECT_ROOT / ".runtime/reports/generated/releasables/hoi4_reichskommissariat_boundaries.audit.json"
+DEFAULT_REPORT_MD = PROJECT_ROOT / ".runtime/reports/generated/releasables/hoi4_reichskommissariat_boundaries.audit.md"
 EXPLICIT_ONLY_TAGS = {"RKP", "RKO", "RKU", "RKM"}
 EXPLICIT_ONLY_VARIANT_IDS = {"hoi4", "historical_reference"}
 EXPLICIT_ONLY_ACTION_IDS = {

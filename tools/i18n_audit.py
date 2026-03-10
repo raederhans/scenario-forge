@@ -304,11 +304,11 @@ def main() -> None:
     scenarios_root = args.scenarios_root or (repo_root / "data" / "scenarios")
     markdown_out = (
         args.markdown_out
-        or (repo_root / "reports" / "generated" / "translation" / "translation_coverage_report.md")
+        or (repo_root / ".runtime" / "reports" / "generated" / "translation" / "translation_coverage_report.md")
     )
     json_out = (
         args.json_out
-        or (repo_root / "reports" / "generated" / "translation" / "translation_coverage_report.json")
+        or (repo_root / ".runtime" / "reports" / "generated" / "translation" / "translation_coverage_report.json")
     )
 
     locales = load_locales(locales_path)

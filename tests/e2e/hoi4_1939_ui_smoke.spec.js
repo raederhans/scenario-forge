@@ -1,4 +1,6 @@
-﻿const { test, expect } = require('@playwright/test');
+const fs = require('fs');
+const path = require('path');
+const { test, expect } = require('@playwright/test');
 
 test('hoi4 1939 owner-sync smoke', async ({ page }) => {
   const consoleIssues = [];
@@ -79,7 +81,8 @@ test('hoi4 1939 owner-sync smoke', async ({ page }) => {
   expect(ncp.controller_feature_count).toBe(ncpControllerCount);
   expect(rgc.controller_feature_count).toBe(rgcControllerCount);
 
-  const shotPath = '.mcp-artifacts/screenshots/hoi4_1939_ui_smoke.png';
+  const shotPath = path.join('.runtime', 'browser', 'mcp-artifacts', 'screenshots', 'hoi4_1939_ui_smoke.png');
+  fs.mkdirSync(path.dirname(shotPath), { recursive: true });
   await page.screenshot({ path: shotPath, fullPage: true });
 
   console.log(JSON.stringify({
@@ -97,4 +100,3 @@ test('hoi4 1939 owner-sync smoke', async ({ page }) => {
     screenshot: shotPath,
   }, null, 2));
 });
-

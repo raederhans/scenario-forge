@@ -2568,7 +2568,7 @@ def _validate_dependent_hoi4_assets(
     scenarios_root = output_dir / "scenarios"
     if scenarios_root.exists():
         for scenario_dir in sorted(path for path in scenarios_root.iterdir() if path.is_dir() and path.name.startswith("hoi4_")):
-            report_dir = PROJECT_ROOT / "reports" / "generated" / "scenarios" / scenario_dir.name
+            report_dir = PROJECT_ROOT / ".runtime" / "reports" / "generated" / "scenarios" / scenario_dir.name
             _run_validation_command(
                 [
                     sys.executable,
@@ -3038,7 +3038,7 @@ def rebuild_derived_hoi4_assets(output_dir: Path, strict: bool = False) -> bool:
             "manual_rules": ["data/scenario-rules/hoi4_1936.manual.json"],
             "controller_rules": [],
             "scenario_output_dir": "data/scenarios/hoi4_1936",
-            "report_dir": "reports/generated/scenarios/hoi4_1936",
+            "report_dir": ".runtime/reports/generated/scenarios/hoi4_1936",
         },
         {
             "scenario_id": "hoi4_1939",
@@ -3051,7 +3051,7 @@ def rebuild_derived_hoi4_assets(output_dir: Path, strict: bool = False) -> bool:
             ],
             "controller_rules": ["data/scenario-rules/hoi4_1939.controller.manual.json"],
             "scenario_output_dir": "data/scenarios/hoi4_1939",
-            "report_dir": "reports/generated/scenarios/hoi4_1939",
+            "report_dir": ".runtime/reports/generated/scenarios/hoi4_1939",
         },
     ]
 

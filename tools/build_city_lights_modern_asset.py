@@ -82,7 +82,7 @@ def fetch_source_image(source_url: str, source_file: str) -> tuple[Path, str]:
             raise SystemExit(f"Source file not found: {source_path}")
         return source_path, source_path.as_uri()
 
-    build_cache_dir = PROJECT_ROOT / ".tmp" / "city_lights"
+    build_cache_dir = PROJECT_ROOT / ".runtime" / "tmp" / "city_lights"
     build_cache_dir.mkdir(parents=True, exist_ok=True)
     target_path = build_cache_dir / Path(source_url).name
     if not target_path.exists():

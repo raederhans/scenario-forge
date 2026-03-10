@@ -28,8 +28,9 @@ This directory is the project's long-lived QA knowledge base, not a dump for run
 
 Use these locations for regenerable evidence instead:
 
-- `.mcp-artifacts/`
-- `tmp_pw/`
-- `reports/generated/`
+- `.runtime/browser/mcp-artifacts/`
+- `.runtime/browser/playwright-cli/`
+- `.runtime/tmp/`
+- `.runtime/reports/generated/`
 
 Those locations are intentionally treated as disposable runtime outputs.

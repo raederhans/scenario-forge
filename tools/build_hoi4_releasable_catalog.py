@@ -80,7 +80,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--report-output",
-        default=str(PROJECT_ROOT / "reports/generated/releasables/hoi4_vanilla.internal.phase1.report.md"),
+        default=str(PROJECT_ROOT / ".runtime/reports/generated/releasables/hoi4_vanilla.internal.phase1.report.md"),
     )
     parser.add_argument("--source-root", default="")
     parser.add_argument(

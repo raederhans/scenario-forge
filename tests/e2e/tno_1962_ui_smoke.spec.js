@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const { test, expect } = require('@playwright/test');
 
 test('tno 1962 releasable catalog smoke', async ({ page }) => {
@@ -85,7 +87,8 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
   });
   expect(payload.countries.POR?.hidden_from_country_list).toBeTruthy();
 
-  const shotPath = '.mcp-artifacts/screenshots/tno_1962_ui_smoke.png';
+  const shotPath = path.join('.runtime', 'browser', 'mcp-artifacts', 'screenshots', 'tno_1962_ui_smoke.png');
+  fs.mkdirSync(path.dirname(shotPath), { recursive: true });
   await page.screenshot({ path: shotPath, fullPage: true });
 
   console.log(JSON.stringify({

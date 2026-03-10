@@ -85,7 +85,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--report-dir",
-        default=str(PROJECT_ROOT / "reports/generated/scenarios/hoi4_1936"),
+        default=str(PROJECT_ROOT / ".runtime/reports/generated/scenarios/hoi4_1936"),
     )
     parser.add_argument(
         "--default-scenario-id",

@@ -8,11 +8,11 @@ Capabilities include:
 - scroll and interact with map canvas
 - collect console warning/error signals
 - collect failed network request signals
-- save screenshots and evidence under `.mcp-artifacts/`
+- save screenshots and evidence under `.runtime/browser/mcp-artifacts/`
 
 Notes:
-- `.mcp-artifacts/` is a temporary runtime evidence directory, not a source-doc location.
-- Long-lived generated reports should go under `reports/generated/`.
+- `.runtime/browser/mcp-artifacts/` is a temporary runtime evidence directory, not a source-doc location.
+- Long-lived generated reports should go under `.runtime/reports/generated/`.
 
 ## One-time setup and checks
 1. Verify MCP is configured:
@@ -25,11 +25,11 @@ Expected: `playwright` appears and is enabled.
 ```bash
 cat .codex/config.toml
 ```
-Expected: `--browser msedge`, localhost restrictions, `--output-dir .mcp-artifacts`, and `startup_timeout_sec = 60`.
+Expected: `--browser msedge`, localhost restrictions, `--output-dir .runtime/browser/mcp-artifacts`, and `startup_timeout_sec = 60`.
 
 3. Verify artifacts folder is ignored:
 ```bash
-rg -n "\.mcp-artifacts/" .gitignore
+rg -n "\.runtime/" .gitignore
 ```
 
 ## Configuration-driven traversal
@@ -83,7 +83,7 @@ url = "http://localhost:8931/mcp"
 2. `你自己打开页面看看，我描述不清楚；请滚动、跳转并给最小修复建议。`
 3. `对 localhost 做一次 smoke：主页拖拽+缩放地图，再检查 docs 和 data 页面，输出证据。`
 4. `请用 Playwright MCP 主动排查这个 UI 问题，按“console -> network -> 截图 -> 复现步骤”顺序汇报。`
-5. `回归验证这三个路由：/、/docs/、/data/ne_10m_admin_1_states_provinces.README.html，并保存截图到 .mcp-artifacts。`
+5. `回归验证这三个路由：/、/docs/、/data/ne_10m_admin_1_states_provinces.README.html，并保存截图到 .runtime/browser/mcp-artifacts。`
 
 ## Smoke runner
 ```bash
@@ -95,7 +95,7 @@ This will:
 - otherwise start `python3 tools/dev_server.py`
 - run browser smoke flow via Playwright CLI MCP commands on Edge
 - auto-fallback to a Windows-local `http.server` when Edge cannot reach a WSL-bound localhost endpoint
-- write report to `reports/generated/browser/ai-browser-mcp-smoketest.md`
+- write report to `.runtime/reports/generated/browser/ai-browser-mcp-smoketest.md`
 
 CLI contracts:
 - `--profile <path>` default `ops/browser-mcp/inspection-profile.toml`
@@ -131,7 +131,7 @@ In another project:
 - Ensure URL starts with `http://localhost:` or `http://127.0.0.1:`.
 - Keep host/origin restrictions aligned between config and target URL.
 
-### `.mcp-artifacts` write permission issues
+### `.runtime/browser/mcp-artifacts` write permission issues
 - Ensure repo root is writable.
 - Ensure no external process locks screenshot/log files.
 
