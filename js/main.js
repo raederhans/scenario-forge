@@ -277,6 +277,7 @@ async function bootstrap() {
     state.physicalContourMajorData = state.contextLayerExternalDataByName?.physical_contours_major || null;
     state.physicalContourMinorData = state.contextLayerExternalDataByName?.physical_contours_minor || null;
     state.paletteRegistry = paletteRegistry || null;
+    state.defaultReleasableCatalog = releasableCatalog || null;
     state.releasableCatalog = releasableCatalog || null;
     state.activePaletteMeta = activePaletteMeta || null;
     state.activePalettePack = activePalettePack || null;

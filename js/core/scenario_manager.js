@@ -966,6 +966,7 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     controllersPayload,
     coresPayload,
     runtimeTopologyPayload,
+    releasableCatalog,
   ] =
     await Promise.all([
     d3Client.json(cacheBust(manifest.countries_url)),
@@ -975,6 +976,12 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     manifest.runtime_topology_url
       ? d3Client.json(cacheBust(manifest.runtime_topology_url)).catch((error) => {
         console.warn(`[scenario] Failed to load scenario runtime topology for "${targetId}".`, error);
+        return null;
+      })
+      : Promise.resolve(null),
+    manifest.releasable_catalog_url
+      ? d3Client.json(cacheBust(manifest.releasable_catalog_url)).catch((error) => {
+        console.warn(`[scenario] Failed to load scenario releasable catalog for "${targetId}".`, error);
         return null;
       })
       : Promise.resolve(null),
@@ -990,6 +997,7 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     specialRegionsPayload: null,
     reliefOverlaysPayload: null,
     runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(runtimeTopologyPayload),
+    releasableCatalog,
     auditPayload: null,
     optionalLayerPromises: {},
   };
@@ -1373,6 +1381,7 @@ async function applyScenarioBundle(
   captureScenarioDisplaySettingsBeforeActivate();
 
   state.activeScenarioId = scenarioId;
+  state.releasableCatalog = bundle.releasableCatalog || state.defaultReleasableCatalog || null;
   state.scenarioReleasableIndex = buildScenarioReleasableIndex(scenarioId, {
     excludeTags: baseCountryTags,
   });
@@ -1671,6 +1680,7 @@ function clearActiveScenario(
     childTagsByParent: {},
     consumedPresetNamesByParentLookup: {},
   };
+  state.releasableCatalog = state.defaultReleasableCatalog || null;
   state.scenarioAudit = null;
   setScenarioAuditUiState({
     loading: false,

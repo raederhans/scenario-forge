@@ -1,0 +1,86 @@
+{
+  "scenario_id": "tno_1962",
+  "require_controllers": true,
+  "manifest_required_fields": [
+    "countries_url",
+    "owners_url",
+    "controllers_url",
+    "cores_url",
+    "audit_url",
+    "releasable_catalog_url"
+  ],
+  "forbidden_country_tags": [
+    "BEL",
+    "EST",
+    "LAT",
+    "LIT",
+    "LUX",
+    "NOR",
+    "POL",
+    "RKB",
+    "YUG",
+    "NOT"
+  ],
+  "forbidden_country_field_values": [
+    {
+      "field": "source_type",
+      "equals": "hoi4_owner"
+    }
+  ],
+  "summary_equals": {
+    "blocker_count": 0
+  },
+  "summary_min": {
+    "feature_count": 13000,
+    "owner_count": 140,
+    "controller_count": 140,
+    "tno_reichskommissariat_count": 8
+  },
+  "country_assertions": [
+    {
+      "tag": "GER",
+      "field": "source_type",
+      "equals": "tno_baseline"
+    },
+    {
+      "tag": "USA",
+      "field": "source_type",
+      "equals": "tno_baseline"
+    },
+    {
+      "tag": "BRG",
+      "field": "entry_kind",
+      "equals": "scenario_country"
+    },
+    {
+      "tag": "POR",
+      "field": "entry_kind",
+      "equals": "controller_only"
+    },
+    {
+      "tag": "POR",
+      "field": "hidden_from_country_list",
+      "equals": true
+    },
+    {
+      "tag": "PRC",
+      "field": "entry_kind",
+      "equals": "controller_only"
+    },
+    {
+      "tag": "SIC",
+      "field": "entry_kind",
+      "equals": "controller_only"
+    },
+    {
+      "tag": "SIK",
+      "field": "entry_kind",
+      "equals": "controller_only"
+    },
+    {
+      "tag": "XSM",
+      "field": "entry_kind",
+      "equals": "controller_only"
+    }
+  ]
+}

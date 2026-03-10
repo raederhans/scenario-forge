@@ -816,6 +816,7 @@ export const state = {
   activeScenarioManifest: null,
   scenarioCountriesByTag: {},
   scenarioFixedOwnerColors: {},
+  defaultReleasableCatalog: null,
   releasableCatalog: null,
   scenarioReleasableIndex: {
     byTag: {},

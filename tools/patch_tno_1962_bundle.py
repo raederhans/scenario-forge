@@ -35,9 +35,9 @@ SCENARIO_DIR = ROOT / f"data/scenarios/{SCENARIO_ID}"
 RUNTIME_POLITICAL_PATH = ROOT / "data/europe_topology.runtime_political_v1.json"
 FEATURE_MIGRATION_PATH = ROOT / "data/feature-migrations/by_hybrid_v1.json"
 REICHSKOMMISSARIAT_ACTIONS_PATH = ROOT / "data/releasables/hoi4_reichskommissariat_boundaries.internal.json"
-RELEASABLE_SOURCE_PATH = ROOT / "data/releasables/hoi4_vanilla.internal.phase1.source.json"
+RELEASABLE_SOURCE_PATH = ROOT / "data/releasables/tno_1962.internal.phase1.source.json"
+RELEASABLE_CATALOG_PATH = ROOT / "data/releasables/tno_1962.internal.phase1.catalog.json"
 HIERARCHY_PATH = ROOT / "data/hierarchy.json"
-PALETTE_PATH = ROOT / "data/palettes/hoi4_vanilla.palette.json"
 TNO_PALETTE_PATH = ROOT / "data/palettes/tno.palette.json"
 WATER_REGIONS_PATH = ROOT / "data/water_regions.geojson"
 REGIONAL_RULE_PACKS: list[tuple[str, Path]] = [
@@ -110,6 +110,75 @@ DONOR_CAUSEWAY_NAME_HINTS = (
 )
 
 MEDITERRANEAN_WATER_REGION_GROUP = "mediterranean"
+TNO_RETIRED_ZERO_FEATURE_TAGS = {"BEL", "EST", "LAT", "LIT", "LUX", "NOR", "POL", "POR"}
+TNO_FEATURED_TAG_REPLACEMENTS = {"RKB": "BRG"}
+TNO_CONTROLLER_ONLY_COUNTRY_META = {
+    "POR": {
+        "display_name": "Portugal",
+        "color_hex": "#4c664c",
+        "base_iso2": "PT",
+        "lookup_iso2": "PT",
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_southern_europe",
+        "subregion_label": "Southern Europe",
+        "notes": "Controller-only TNO passthrough stub for the Macau administrative overlay.",
+        "parent_owner_tag": "IBR",
+        "hidden_from_country_list": True,
+    },
+    "PRC": {
+        "display_name": "Communist China",
+        "color_hex": "",
+        "base_iso2": "CN",
+        "lookup_iso2": "CN",
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_eastern_asia",
+        "subregion_label": "Eastern Asia",
+        "notes": "Controller-only TNO frontline stub for the Communist China overlay.",
+        "parent_owner_tag": "",
+        "hidden_from_country_list": False,
+    },
+    "SIC": {
+        "display_name": "Xikang Clique",
+        "color_hex": "",
+        "base_iso2": "CN",
+        "lookup_iso2": "CN",
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_eastern_asia",
+        "subregion_label": "Eastern Asia",
+        "notes": "Controller-only TNO frontline stub for the Xikang Clique overlay.",
+        "parent_owner_tag": "",
+        "hidden_from_country_list": False,
+    },
+    "SIK": {
+        "display_name": "Sinkiang",
+        "color_hex": "",
+        "base_iso2": "CN",
+        "lookup_iso2": "CN",
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_eastern_asia",
+        "subregion_label": "Eastern Asia",
+        "notes": "Controller-only TNO frontline stub for the Sinkiang overlay.",
+        "parent_owner_tag": "",
+        "hidden_from_country_list": False,
+    },
+    "XSM": {
+        "display_name": "Xibei San Ma",
+        "color_hex": "#695a84",
+        "base_iso2": "CN",
+        "lookup_iso2": "CN",
+        "continent_id": "continent_asia",
+        "continent_label": "Asia",
+        "subregion_id": "subregion_eastern_asia",
+        "subregion_label": "Eastern Asia",
+        "notes": "Controller-only TNO frontline stub for the Xibei San Ma overlay.",
+        "parent_owner_tag": "",
+        "hidden_from_country_list": False,
+    },
+}
 
 GER_PRESET_FEATURE_IDS = {
     "Alsace-Lorraine + Luxembourg": [
@@ -1104,7 +1173,7 @@ def load_hierarchy_groups() -> dict[str, list[str]]:
     }
 
 
-def load_palette_entries(path: Path = PALETTE_PATH) -> dict[str, dict]:
+def load_palette_entries(path: Path) -> dict[str, dict]:
     payload = load_json(path)
     entries = payload.get("entries", {}) if isinstance(payload, dict) else {}
     return {
@@ -1161,6 +1230,95 @@ def patch_tno_palette_defaults(countries_payload: dict, manifest_payload: dict) 
     ocean_defaults["fillColor"] = load_tno_ocean_fill_color()
     style_defaults["ocean"] = ocean_defaults
     manifest_payload["style_defaults"] = style_defaults
+
+
+def normalize_tno_country_registry(countries_payload: dict, owners_payload: dict) -> None:
+    countries = countries_payload.setdefault("countries", {})
+    owner_counts = Counter(
+        normalize_tag(tag)
+        for tag in owners_payload.get("owners", {}).values()
+        if str(tag).strip()
+    )
+
+    for tag in sorted(TNO_RETIRED_ZERO_FEATURE_TAGS):
+        if int(owner_counts.get(tag, 0)) == 0:
+            countries.pop(tag, None)
+
+    for country_entry in countries.values():
+        if not isinstance(country_entry, dict):
+            continue
+        if str(country_entry.get("source_type") or "").strip() != "hoi4_owner":
+            continue
+        country_entry["source_type"] = "tno_baseline"
+        country_entry["historical_fidelity"] = "tno_baseline"
+        country_entry["source_types"] = ["tno_baseline"]
+        country_entry["historical_fidelity_summary"] = ["tno_baseline"]
+
+
+def ensure_tno_controller_only_countries(countries_payload: dict, controllers_payload: dict) -> None:
+    countries = countries_payload.setdefault("countries", {})
+    controller_counts = Counter(
+        normalize_tag(tag)
+        for tag in controllers_payload.get("controllers", {}).values()
+        if str(tag).strip()
+    )
+    palette_entries = load_palette_entries(TNO_PALETTE_PATH)
+    missing_controller_tags = sorted(
+        tag
+        for tag, count in controller_counts.items()
+        if count > 0 and tag not in countries
+    )
+
+    for tag in missing_controller_tags:
+        metadata = TNO_CONTROLLER_ONLY_COUNTRY_META.get(tag)
+        if not metadata:
+            raise ValueError(f"Missing TNO controller-only country metadata for controller tag {tag}.")
+        countries[tag] = build_manual_country_entry(
+            tag=tag,
+            existing_entry=None,
+            palette_entries=palette_entries,
+            feature_count=0,
+            continent_id=metadata["continent_id"],
+            continent_label=metadata["continent_label"],
+            subregion_id=metadata["subregion_id"],
+            subregion_label=metadata["subregion_label"],
+            base_iso2=metadata["base_iso2"],
+            lookup_iso2=metadata["lookup_iso2"],
+            display_name=metadata["display_name"],
+            color_hex=metadata["color_hex"],
+            rule_id=f"tno_1962_controller_only_{tag.lower()}",
+            notes=metadata["notes"],
+            source="controller_rule",
+            source_type="controller_overlay",
+            historical_fidelity="tno_baseline",
+            entry_kind="controller_only",
+            parent_owner_tag=metadata["parent_owner_tag"],
+            scenario_only=True,
+            hidden_from_country_list=bool(metadata["hidden_from_country_list"]),
+        )
+        countries[tag]["controller_feature_count"] = int(controller_counts.get(tag, 0))
+
+
+def rebuild_tno_featured_tags(manifest_payload: dict, countries_payload: dict) -> None:
+    countries = countries_payload.get("countries", {}) if isinstance(countries_payload.get("countries"), dict) else {}
+    releasable_payload = load_json(RELEASABLE_CATALOG_PATH)
+    releasable_tags = {
+        normalize_tag(entry.get("tag"))
+        for entry in releasable_payload.get("entries", [])
+        if isinstance(entry, dict) and normalize_tag(entry.get("tag"))
+    }
+    rebuilt_featured_tags: list[str] = []
+    seen_tags: set[str] = set()
+    for raw_tag in manifest_payload.get("featured_tags", []):
+        normalized_tag = normalize_tag(raw_tag)
+        normalized_tag = TNO_FEATURED_TAG_REPLACEMENTS.get(normalized_tag, normalized_tag)
+        if not normalized_tag or normalized_tag in seen_tags:
+            continue
+        if normalized_tag not in countries and normalized_tag not in releasable_tags:
+            continue
+        rebuilt_featured_tags.append(normalized_tag)
+        seen_tags.add(normalized_tag)
+    manifest_payload["featured_tags"] = rebuilt_featured_tags
 
 
 def infer_region_meta(tag: str) -> tuple[str, str, str, str]:
@@ -1403,6 +1561,7 @@ def build_owner_stats_entry(country_entry: dict) -> dict:
     return {
         "display_name": str(country_entry.get("display_name") or country_entry.get("tag") or "").strip(),
         "feature_count": feature_count,
+        "controller_feature_count": int(country_entry.get("controller_feature_count", 0) or 0),
         "quality": quality,
         "quality_breakdown": {quality: feature_count} if feature_count > 0 else {},
         "base_iso2": str(country_entry.get("base_iso2") or "").strip().upper(),
@@ -1509,7 +1668,7 @@ def apply_regional_rules(
     apply_to_controllers = bool(rule_payload.get("apply_to_controllers"))
     apply_to_cores = bool(rule_payload.get("apply_to_cores"))
     hierarchy_groups = load_hierarchy_groups()
-    palette_entries = load_palette_entries()
+    palette_entries = load_palette_entries(TNO_PALETTE_PATH)
     baseline_owners = {
         str(feature_id).strip(): normalize_tag(tag)
         for feature_id, tag in owners_payload.get("owners", {}).items()
@@ -2650,7 +2809,7 @@ def patch_tno_europe_baseline(
     cores_payload: dict,
 ) -> dict[str, list[str]]:
     countries = countries_payload.setdefault("countries", {})
-    palette_entries = load_palette_entries()
+    palette_entries = load_palette_entries(TNO_PALETTE_PATH)
     applied: dict[str, list[str]] = {}
     brg_source_entry = load_releasable_source_entry("BRG")
     brg_default_variant_id = str(brg_source_entry.get("default_boundary_variant_id") or "current_tno_initial").strip()
@@ -3585,6 +3744,7 @@ def recalculate_country_feature_counts(
     manifest_payload: dict,
 ) -> None:
     counts = Counter(str(tag).upper() for tag in owners_payload.get("owners", {}).values())
+    controller_counts = Counter(str(tag).upper() for tag in controllers_payload.get("controllers", {}).values())
     countries = countries_payload.get("countries", {})
     quality_counts: Counter[str] = Counter()
     source_counts: Counter[str] = Counter()
@@ -3594,6 +3754,7 @@ def recalculate_country_feature_counts(
     for tag, country_entry in countries.items():
         feature_count = int(counts.get(str(tag).upper(), 0))
         country_entry["feature_count"] = feature_count
+        country_entry["controller_feature_count"] = int(controller_counts.get(str(tag).upper(), 0))
         quality = str(country_entry.get("quality") or "").strip()
         source = str(country_entry.get("source") or "").strip()
         if quality:
@@ -3818,6 +3979,8 @@ def main() -> None:
             and normalize_tag(assignment.get("owner")) == ATL_TAG
         ),
     )
+    normalize_tno_country_registry(countries_payload, owners_payload)
+    ensure_tno_controller_only_countries(countries_payload, controllers_payload)
 
     congo_props = {}
     if current_water_regions.get("features"):
@@ -3891,6 +4054,7 @@ def main() -> None:
         audit_payload,
         manifest_payload,
     )
+    rebuild_tno_featured_tags(manifest_payload, countries_payload)
 
     owner_baseline_hash = stable_json_hash(owners_payload["owners"])
     controller_baseline_hash = stable_json_hash(controllers_payload["controllers"])
@@ -3908,6 +4072,7 @@ def main() -> None:
     manifest_payload["water_regions_url"] = "data/scenarios/tno_1962/water_regions.geojson"
     manifest_payload["relief_overlays_url"] = "data/scenarios/tno_1962/relief_overlays.geojson"
     manifest_payload["runtime_topology_url"] = "data/scenarios/tno_1962/runtime_topology.topo.json"
+    manifest_payload["releasable_catalog_url"] = "data/releasables/tno_1962.internal.phase1.catalog.json"
     manifest_payload["performance_hints"] = {
         "render_profile_default": "balanced",
         "dynamic_borders_default": False,

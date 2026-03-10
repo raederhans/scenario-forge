@@ -305,6 +305,36 @@ def main() -> int:
             ]
             expect(not missing, f"All countries must include `{field_name}`. Missing: {missing[:10]}")
 
+    forbidden_country_tags = [
+        str(tag or "").strip().upper()
+        for tag in (expectation.get("forbidden_country_tags") or [])
+        if str(tag or "").strip()
+    ]
+    present_forbidden_country_tags = [tag for tag in forbidden_country_tags if tag in country_map]
+    expect(
+        not present_forbidden_country_tags,
+        f"countries.json must not include forbidden tags. Present: {present_forbidden_country_tags[:10]}",
+    )
+
+    forbidden_country_field_values = expectation.get("forbidden_country_field_values", [])
+    if isinstance(forbidden_country_field_values, list):
+        for raw_assertion in forbidden_country_field_values:
+            if not isinstance(raw_assertion, dict):
+                continue
+            field_name = str(raw_assertion.get("field") or "").strip()
+            expected_value = raw_assertion.get("equals")
+            if not field_name:
+                continue
+            matching_tags = sorted(
+                tag
+                for tag, entry in country_map.items()
+                if isinstance(entry, dict) and entry.get(field_name) == expected_value
+            )
+            expect(
+                not matching_tags,
+                f"countries.json must not include `{field_name} == {expected_value}`. Matching tags: {matching_tags[:10]}",
+            )
+
     country_assertions = expectation.get("country_assertions", [])
     if isinstance(country_assertions, list):
         for assertion in country_assertions:
