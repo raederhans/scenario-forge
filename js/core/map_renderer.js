@@ -132,10 +132,16 @@ const INTERNAL_BORDER_PROVINCE_MIN_ALPHA = 0.30;
 const INTERNAL_BORDER_LOCAL_MIN_ALPHA = 0.22;
 const INTERNAL_BORDER_PROVINCE_MIN_WIDTH = 0.52;
 const INTERNAL_BORDER_LOCAL_MIN_WIDTH = 0.36;
+const INTERNAL_BORDER_LOCAL_ALPHA_SCALE = 0.60;
+const INTERNAL_BORDER_LOCAL_WIDTH_SCALE = 0.75;
 const DETAIL_ADM_BORDER_COLOR = "#888888";
 const DETAIL_ADM_BORDER_MIN_ALPHA = 0.24;
 const DETAIL_ADM_BORDER_MAX_ALPHA = 0.34;
 const DETAIL_ADM_BORDER_MIN_WIDTH = 0.30;
+const DETAIL_ADM_BORDER_TARGET_MIN_ALPHA = 0.12;
+const DETAIL_ADM_BORDER_TARGET_MAX_ALPHA = 0.18;
+const DETAIL_ADM_BORDER_ALPHA_SCALE = 0.70;
+const DETAIL_ADM_BORDER_WIDTH_SCALE = 0.70;
 const LOCAL_BORDERS_MIN_ZOOM = 2.0;
 const DETAIL_ADM_BORDERS_MIN_ZOOM = 2.4;
 const PROVINCE_BORDERS_FADE_START_ZOOM = 1.1;
@@ -144,6 +150,9 @@ const PROVINCE_BORDERS_FAR_ALPHA = 0.10;
 const PROVINCE_BORDERS_TRANSITION_ALPHA = 0.38;
 const PROVINCE_BORDERS_FAR_WIDTH_MAX_ZOOM = 1.5;
 const PROVINCE_BORDERS_FAR_WIDTH_SCALE = 0.75;
+const PROVINCE_BORDERS_NEAR_ZOOM_START = 2.2;
+const PROVINCE_BORDERS_NEAR_ALPHA_SCALE = 0.86;
+const PROVINCE_BORDERS_NEAR_WIDTH_SCALE = 0.90;
 const PARENT_BORDER_MIN_COVERAGE = 0.70;
 const PARENT_BORDER_MAX_DOMINANT_SHARE = 0.90;
 const PARENT_BORDER_MIN_RENDERABLE_GROUPS = 2;
@@ -217,6 +226,12 @@ let admin0MergedCache = {
   featureCount: 0,
   entries: [],
 };
+let scenarioCoastlineSourceCache = {
+  primaryRef: null,
+  runtimeRef: null,
+  scenarioId: "",
+  decision: null,
+};
 let scenarioPoliticalBackgroundCache = {
   topologyRef: null,
   landCollectionRef: null,
@@ -238,7 +253,11 @@ let physicalLandClipPathCache = {
   path: null,
 };
 const SCENARIO_BACKGROUND_MERGE_MAX_AREA = Math.PI * 2;
+const SCENARIO_COASTLINE_MAX_AREA_DELTA_RATIO = 0.02;
+const SCENARIO_COASTLINE_MAX_INTERIOR_RING_RATIO = 0.25;
+const SCENARIO_COASTLINE_MAX_INTERIOR_RING_COUNT = 500;
 const suspiciousScenarioBackgroundMergeWarnings = new Set();
+const scenarioCoastlineDecisionWarnings = new Set();
 const missingPhysicalContextWarnings = new Set();
 const physicalAtlasFallbackCache = {
   sourceRef: null,
@@ -3745,8 +3764,202 @@ function buildGlobalCountryBorderMesh(primaryTopology) {
   );
 }
 
+function getTopologyObjectFeatureCollection(topology, objectNames = []) {
+  if (!topology?.objects || typeof globalThis.topojson?.feature !== "function") {
+    return { objectName: "", collection: null };
+  }
+  for (const objectName of objectNames) {
+    const object = topology.objects?.[objectName];
+    if (!object) continue;
+    try {
+      const collection = globalThis.topojson.feature(topology, object);
+      if (collection?.features?.length) {
+        return { objectName, collection };
+      }
+    } catch (_error) {
+      continue;
+    }
+  }
+  return { objectName: "", collection: null };
+}
+
+function countGeometryPolygonParts(geometry) {
+  if (!geometry || !geometry.type) return { polygonPartCount: 0, interiorRingCount: 0 };
+  if (geometry.type === "Polygon") {
+    const rings = Array.isArray(geometry.coordinates) ? geometry.coordinates.length : 0;
+    return {
+      polygonPartCount: 1,
+      interiorRingCount: Math.max(0, rings - 1),
+    };
+  }
+  if (geometry.type === "MultiPolygon") {
+    const polygons = Array.isArray(geometry.coordinates) ? geometry.coordinates : [];
+    const polygonPartCount = polygons.length;
+    const interiorRingCount = polygons.reduce((total, polygon) => {
+      const rings = Array.isArray(polygon) ? polygon.length : 0;
+      return total + Math.max(0, rings - 1);
+    }, 0);
+    return { polygonPartCount, interiorRingCount };
+  }
+  if (geometry.type === "GeometryCollection") {
+    return (geometry.geometries || []).reduce((acc, child) => {
+      const childCounts = countGeometryPolygonParts(child);
+      acc.polygonPartCount += childCounts.polygonPartCount;
+      acc.interiorRingCount += childCounts.interiorRingCount;
+      return acc;
+    }, { polygonPartCount: 0, interiorRingCount: 0 });
+  }
+  return { polygonPartCount: 0, interiorRingCount: 0 };
+}
+
+function getCoastlineTopologyMetrics(topology, objectNames = []) {
+  const { objectName, collection } = getTopologyObjectFeatureCollection(topology, objectNames);
+  if (!collection?.features?.length) {
+    return {
+      objectName: "",
+      featureCount: 0,
+      polygonPartCount: 0,
+      interiorRingCount: 0,
+      totalArea: 0,
+      bounds: null,
+      worldBounds: false,
+    };
+  }
+  let totalArea = 0;
+  collection.features.forEach((feature) => {
+    try {
+      totalArea += Number(globalThis.d3?.geoArea?.(feature)) || 0;
+    } catch (_error) {
+      // Ignore per-feature area failures; the gate is conservative.
+    }
+  });
+  const counts = collection.features.reduce((acc, feature) => {
+    const featureCounts = countGeometryPolygonParts(feature?.geometry);
+    acc.polygonPartCount += featureCounts.polygonPartCount;
+    acc.interiorRingCount += featureCounts.interiorRingCount;
+    return acc;
+  }, { polygonPartCount: 0, interiorRingCount: 0 });
+  let bounds = null;
+  try {
+    bounds = globalThis.d3?.geoBounds?.(collection) || null;
+  } catch (_error) {
+    bounds = null;
+  }
+  return {
+    objectName,
+    featureCount: collection.features.length,
+    polygonPartCount: counts.polygonPartCount,
+    interiorRingCount: counts.interiorRingCount,
+    totalArea,
+    bounds,
+    worldBounds: isWorldBounds(bounds),
+  };
+}
+
+function publishScenarioCoastlineDecision(decision) {
+  if (!decision || typeof decision !== "object") return decision;
+  const publicDecision = { ...decision };
+  delete publicDecision.topology;
+  recordRenderPerfMetric("resolveScenarioCoastlineSource", 0, publicDecision);
+  globalThis.__mapCoastlineDiag = publicDecision;
+  if (renderDiag.enabled) {
+    globalThis.__mapRenderDiag = {
+      ...(globalThis.__mapRenderDiag || { enabled: true }),
+      coastline: publicDecision,
+    };
+  }
+  return decision;
+}
+
+function resolveCoastlineTopologySource() {
+  const primaryTopology = state.topologyPrimary || state.topology || null;
+  const runtimeTopology = state.runtimePoliticalTopology || null;
+  const scenarioId = String(state.activeScenarioId || "").trim();
+
+  const cacheMatches =
+    scenarioCoastlineSourceCache.primaryRef === primaryTopology &&
+    scenarioCoastlineSourceCache.runtimeRef === runtimeTopology &&
+    scenarioCoastlineSourceCache.scenarioId === scenarioId;
+  if (cacheMatches && scenarioCoastlineSourceCache.decision) {
+    return scenarioCoastlineSourceCache.decision;
+  }
+
+  const primaryMetrics = getCoastlineTopologyMetrics(primaryTopology, ["land_mask", "land"]);
+  const runtimeMetrics = scenarioId
+    ? getCoastlineTopologyMetrics(runtimeTopology, ["context_land_mask", "land_mask", "land"])
+    : null;
+
+  let decision = {
+    source: "primary",
+    reason: scenarioId ? "missing_runtime_land_mask" : "no_active_scenario",
+    scenarioId,
+    primaryObjectName: primaryMetrics.objectName || "",
+    runtimeObjectName: runtimeMetrics?.objectName || "",
+    primaryFeatureCount: Number(primaryMetrics.featureCount || 0),
+    runtimeFeatureCount: Number(runtimeMetrics?.featureCount || 0),
+    primaryPolygonPartCount: Number(primaryMetrics.polygonPartCount || 0),
+    runtimePolygonPartCount: Number(runtimeMetrics?.polygonPartCount || 0),
+    primaryInteriorRingCount: Number(primaryMetrics.interiorRingCount || 0),
+    runtimeInteriorRingCount: Number(runtimeMetrics?.interiorRingCount || 0),
+    runtimeInteriorRingRatio: 0,
+    areaDeltaRatio: 0,
+    topology: primaryTopology,
+  };
+
+  if (scenarioId && runtimeMetrics?.objectName && primaryMetrics.featureCount > 0) {
+    const areaBase = Math.max(1e-9, Number(primaryMetrics.totalArea) || 0);
+    const areaDeltaRatio = Math.abs((Number(runtimeMetrics.totalArea) || 0) - areaBase) / areaBase;
+    const runtimeInteriorRingRatio =
+      Number(runtimeMetrics.interiorRingCount || 0) / Math.max(1, Number(runtimeMetrics.polygonPartCount || 0));
+    let accepted = true;
+    let reason = "scenario_accepted";
+    if (runtimeMetrics.worldBounds) {
+      accepted = false;
+      reason = "runtime_world_bounds";
+    } else if (areaDeltaRatio > SCENARIO_COASTLINE_MAX_AREA_DELTA_RATIO) {
+      accepted = false;
+      reason = "area_delta_exceeded";
+    } else if (Number(runtimeMetrics.interiorRingCount || 0) > SCENARIO_COASTLINE_MAX_INTERIOR_RING_COUNT) {
+      accepted = false;
+      reason = "interior_ring_count_exceeded";
+    } else if (runtimeInteriorRingRatio > SCENARIO_COASTLINE_MAX_INTERIOR_RING_RATIO) {
+      accepted = false;
+      reason = "interior_ring_ratio_exceeded";
+    }
+    decision = {
+      ...decision,
+      source: accepted ? "scenario" : "primary",
+      reason,
+      runtimeInteriorRingRatio,
+      areaDeltaRatio,
+      topology: accepted ? runtimeTopology : primaryTopology,
+    };
+  }
+
+  if (scenarioId) {
+    const logKey = `${scenarioId}::${decision.source}::${decision.reason}`;
+    if (!scenarioCoastlineDecisionWarnings.has(logKey)) {
+      scenarioCoastlineDecisionWarnings.add(logKey);
+      console.info(
+        `[map_renderer] Scenario coastline source ${decision.source}: scenario=${scenarioId} reason=${decision.reason} runtimeObject=${decision.runtimeObjectName || "(none)"} areaDelta=${(Number(decision.areaDeltaRatio) || 0).toFixed(5)} interiorRings=${Number(decision.runtimeInteriorRingCount || 0)} parts=${Number(decision.runtimePolygonPartCount || 0)}`
+      );
+    }
+  }
+
+  scenarioCoastlineSourceCache = {
+    primaryRef: primaryTopology,
+    runtimeRef: runtimeTopology,
+    scenarioId,
+    decision: publishScenarioCoastlineDecision(decision),
+  };
+  return scenarioCoastlineSourceCache.decision;
+}
+
 function buildGlobalCoastlineMesh(primaryTopology) {
   if (!primaryTopology?.objects || !globalThis.topojson) return null;
+  if (primaryTopology.objects.context_land_mask) {
+    return globalThis.topojson.mesh(primaryTopology, primaryTopology.objects.context_land_mask);
+  }
   if (primaryTopology.objects.land_mask) {
     return globalThis.topojson.mesh(primaryTopology, primaryTopology.objects.land_mask);
   }
@@ -3935,7 +4148,8 @@ function rebuildStaticMeshes() {
     state.cachedCountryBorders.push(countryMesh);
   }
 
-  const coastlineMesh = buildGlobalCoastlineMesh(unifiedBorderTopology);
+  const coastlineSourceDecision = resolveCoastlineTopologySource();
+  const coastlineMesh = buildGlobalCoastlineMesh(coastlineSourceDecision?.topology || (state.topologyPrimary || state.topology));
   if (isUsableMesh(coastlineMesh)) {
     state.cachedCoastlines.push(coastlineMesh);
     state.cachedCoastlinesHigh.push(coastlineMesh);
@@ -3971,6 +4185,8 @@ function rebuildStaticMeshes() {
     provinceMeshes: state.cachedProvinceBorders.length,
     localMeshes: state.cachedLocalBorders.length,
     coastlineMeshes: state.cachedCoastlines.length,
+    coastlineSource: String(coastlineSourceDecision?.source || "primary"),
+    coastlineReason: String(coastlineSourceDecision?.reason || ""),
   });
 }
 
@@ -4978,13 +5194,17 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
     provinceAlpha = Math.max(regularProvinceAlpha, PROVINCE_BORDERS_TRANSITION_ALPHA);
   }
   const localAlpha = clamp(
-    internalOpacity * (0.08 + 0.34 * t) * lowZoomDeclutter,
-    INTERNAL_BORDER_LOCAL_MIN_ALPHA,
-    0.48
+    internalOpacity * (0.08 + 0.34 * t) * lowZoomDeclutter * INTERNAL_BORDER_LOCAL_ALPHA_SCALE,
+    INTERNAL_BORDER_LOCAL_MIN_ALPHA * INTERNAL_BORDER_LOCAL_ALPHA_SCALE,
+    0.48 * INTERNAL_BORDER_LOCAL_ALPHA_SCALE
   );
   const parentAlpha = clamp(parentOpacity * (0.55 + 0.25 * t), 0.30, 0.90);
   const coastAlpha = clamp(0.74 + 0.12 * t, 0.74, 0.86);
-  const detailAdmAlpha = clamp(0.20 + 0.12 * t, DETAIL_ADM_BORDER_MIN_ALPHA, DETAIL_ADM_BORDER_MAX_ALPHA);
+  const detailAdmAlpha = clamp(
+    (0.20 + 0.12 * t) * DETAIL_ADM_BORDER_ALPHA_SCALE,
+    DETAIL_ADM_BORDER_TARGET_MIN_ALPHA,
+    DETAIL_ADM_BORDER_TARGET_MAX_ALPHA
+  );
 
   const countryWidth = (empireWidthBase * (0.95 + 0.40 * t)) / kDenom;
   let provinceWidth = Math.max(
@@ -4994,16 +5214,20 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
   if (k < PROVINCE_BORDERS_FAR_WIDTH_MAX_ZOOM) {
     provinceWidth *= PROVINCE_BORDERS_FAR_WIDTH_SCALE;
   }
+  if (k >= PROVINCE_BORDERS_NEAR_ZOOM_START) {
+    provinceAlpha *= PROVINCE_BORDERS_NEAR_ALPHA_SCALE;
+    provinceWidth *= PROVINCE_BORDERS_NEAR_WIDTH_SCALE;
+  }
   const localWidth = Math.max(
     INTERNAL_BORDER_LOCAL_MIN_WIDTH,
     internalWidthBase * 0.40 * (0.70 + 0.55 * t) * lowZoomWidthScale
-  ) / kDenom;
+  ) * INTERNAL_BORDER_LOCAL_WIDTH_SCALE / kDenom;
   const parentWidth = (parentWidthBase * (0.90 + 0.35 * t)) / kDenom;
   const coastWidth = (coastWidthBase * (0.90 + 0.30 * t)) / kDenom;
   const detailAdmWidth = Math.max(
     DETAIL_ADM_BORDER_MIN_WIDTH,
     internalWidthBase * 0.42 * (0.72 + 0.40 * t) * lowZoomWidthScale
-  ) / kDenom;
+  ) * DETAIL_ADM_BORDER_WIDTH_SCALE / kDenom;
   const coastlineCollection = k < COASTLINE_LOD_LOW_ZOOM_MAX
     ? (state.cachedCoastlinesLow?.length ? state.cachedCoastlinesLow : state.cachedCoastlines)
     : k < COASTLINE_LOD_MID_ZOOM_MAX
@@ -7058,7 +7282,7 @@ function shouldUseScenarioPoliticalBackgroundMerge() {
   );
 }
 
-function shouldSkipScenarioPoliticalBackgroundMergeShape(
+function shouldFallbackScenarioPoliticalBackgroundMergeShape(
   mergedShape,
   { displayCode = "", fillColor = "", groupSize = 0 } = {}
 ) {
@@ -7090,7 +7314,7 @@ function shouldSkipScenarioPoliticalBackgroundMergeShape(
     suspiciousScenarioBackgroundMergeWarnings.add(logKey);
     const areaText = Number.isFinite(area) ? area.toFixed(5) : "non-finite";
     console.warn(
-      `[map_renderer] Skipping suspicious scenario political background merge: scenario=${scenarioId || "(none)"} view=${viewMode} owner=${displayCode || "(unknown)"} fill=${fillColor || "(none)"} group=${groupSize} area=${areaText}`
+      `[map_renderer] Scenario political background merge fallback engaged: scenario=${scenarioId || "(none)"} view=${viewMode} owner=${displayCode || "(unknown)"} fill=${fillColor || "(none)"} group=${groupSize} area=${areaText}`
     );
   }
   return true;
@@ -7193,9 +7417,29 @@ function buildScenarioPoliticalBackgroundEntries() {
   });
 
   const entries = [];
-  let skippedSuspiciousCount = 0;
+  let fallbackCount = 0;
   groupedGeometries.forEach(({ displayCode, fillColor, geometries: group }) => {
     if (!Array.isArray(group) || !group.length) return;
+    const buildBatchedEntry = () => {
+      const features = group
+        .map((geometry) => {
+          try {
+            const feature = globalThis.topojson?.feature?.(topology, geometry);
+            return normalizeFeatureGeometry(feature, { sourceLabel: "scenario_background_batch" }) || feature;
+          } catch (_error) {
+            return null;
+          }
+        })
+        .filter((feature) => feature?.geometry);
+      if (!features.length) return;
+      fallbackCount += 1;
+      entries.push({
+        mode: "batched",
+        displayCode,
+        fillColor,
+        features,
+      });
+    };
     try {
       const mergedShape = globalThis.topojson.merge(topology, group);
       const normalizedMergedFeature = normalizeFeatureGeometry(
@@ -7209,17 +7453,22 @@ function buildScenarioPoliticalBackgroundEntries() {
         { sourceLabel: "scenario_background_merge" }
       );
       const normalizedMergedShape = normalizedMergedFeature?.geometry || mergedShape;
-      if (shouldSkipScenarioPoliticalBackgroundMergeShape(normalizedMergedShape, {
+      if (shouldFallbackScenarioPoliticalBackgroundMergeShape(normalizedMergedShape, {
         displayCode,
         fillColor,
         groupSize: group.length,
       })) {
-        skippedSuspiciousCount += 1;
+        buildBatchedEntry();
         return;
       }
-      entries.push({ fillColor, mergedShape: normalizedMergedShape });
+      entries.push({
+        mode: "merged",
+        displayCode,
+        fillColor,
+        mergedShape: normalizedMergedShape,
+      });
     } catch (_error) {
-      // Skip groups that fail to merge and fall back to per-feature fills below.
+      buildBatchedEntry();
     }
   });
 
@@ -7243,7 +7492,7 @@ function buildScenarioPoliticalBackgroundEntries() {
     cacheHit: false,
     entryCount: entries.length,
     featureCount,
-    skippedSuspiciousCount,
+    fallbackCount,
   });
   return entries;
 }
@@ -7252,9 +7501,17 @@ function drawScenarioPoliticalBackgroundFills() {
   const entries = buildScenarioPoliticalBackgroundEntries();
   if (!entries.length) return;
 
-  entries.forEach(({ fillColor, mergedShape }) => {
+  entries.forEach(({ mode = "merged", fillColor, mergedShape, features }) => {
     context.beginPath();
-    pathCanvas(mergedShape);
+    if (mode === "batched") {
+      features?.forEach((feature) => {
+        if (feature?.geometry) {
+          pathCanvas(feature);
+        }
+      });
+    } else if (mergedShape) {
+      pathCanvas(mergedShape);
+    }
     context.fillStyle = fillColor;
     context.fill();
   });
@@ -7382,14 +7639,13 @@ function drawPoliticalPass(k) {
     context.fill();
 
     if (debugMode === "PROD") {
-      if (!useScenarioBackgroundMerge || isAtlantropaSea) {
-        context.strokeStyle = isAtlantropaSea
-          ? getAtlantropaSeaPoliticalStrokeColor()
-          : fillColor;
-        context.lineWidth = 0.5 / k;
-        context.lineJoin = "round";
-        context.stroke();
-      }
+      context.strokeStyle = isAtlantropaSea
+        ? getAtlantropaSeaPoliticalStrokeColor()
+        : fillColor;
+      context.lineWidth = 0.75 / Math.max(0.0001, k);
+      context.lineJoin = "round";
+      context.lineCap = "round";
+      context.stroke();
     }
   });
 }

@@ -19,6 +19,10 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from map_builder import config as cfg
+from map_builder.geo.local_canonicalization import (
+    LOCAL_CANONICAL_COUNTRY_CODES,
+    canonicalize_country_boundaries,
+)
 from map_builder.geo.topology import build_political_only_topology
 from map_builder.processors.detail_shell_coverage import (
     append_shell_coverage_gap_fragments,
@@ -392,6 +396,7 @@ def _compose_political_features(
     primary_topology: dict,
     detail_topology: dict | None,
     override_collection: dict | None,
+    canonicalize_countries: tuple[str, ...] | list[str] | None = None,
 ) -> gpd.GeoDataFrame:
     primary_gdf = _topology_object_to_gdf(primary_topology, "political")
     primary_land_gdf = _topology_object_to_gdf(primary_topology, "land")
@@ -468,6 +473,24 @@ def _compose_political_features(
     runtime_gdf = runtime_gdf[runtime_gdf.geometry.notna() & ~runtime_gdf.geometry.is_empty].copy()
     runtime_gdf = _repair_geometries(runtime_gdf)
     runtime_gdf = _clip_ru_managed_detail_to_land(runtime_gdf, primary_land_gdf)
+    runtime_gdf, canonicalize_metrics = canonicalize_country_boundaries(
+        runtime_gdf,
+        shell_gdf=primary_gdf,
+        allowed_area_gdf=primary_land_gdf,
+        target_country_codes=canonicalize_countries,
+        log_prefix="[Runtime Political canonicalize]",
+    )
+    if canonicalize_metrics:
+        print(
+            "[Runtime Political] Local canonicalization countries: "
+            + ", ".join(
+                sorted(
+                    entry["country_code"]
+                    for entry in canonicalize_metrics
+                    if not entry.get("skipped")
+                )
+            )
+        )
     runtime_gdf = repair_shell_coverage(
         runtime_gdf,
         primary_gdf,
@@ -493,6 +516,17 @@ def _write_output_topology(
         output_path,
         quantization=cfg.RUNTIME_POLITICAL_TOPOLOGY_QUANTIZATION,
     )
+
+
+def _parse_country_codes_arg(raw_value: str | None) -> tuple[str, ...]:
+    if raw_value is None:
+        return LOCAL_CANONICAL_COUNTRY_CODES
+    values = tuple(
+        str(item).strip().upper()
+        for item in str(raw_value).split(",")
+        if str(item).strip()
+    )
+    return values
 
 
 def parse_args() -> argparse.Namespace:
@@ -527,6 +561,12 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Optional path to write per-stage wall time and peak memory stats as JSON.",
     )
+    parser.add_argument(
+        "--canonicalize-countries",
+        type=str,
+        default=",".join(LOCAL_CANONICAL_COUNTRY_CODES),
+        help="Comma-separated country codes for local shared-boundary canonicalization.",
+    )
     return parser.parse_args()
 
 
@@ -534,6 +574,7 @@ def main() -> None:
     args = parse_args()
     stage_timings: dict[str, dict] = {}
     main_start = time.perf_counter()
+    canonicalize_countries = _parse_country_codes_arg(args.canonicalize_countries)
 
     load_start = time.perf_counter()
     primary_topology = _load_topology(args.primary_topology)
@@ -558,6 +599,7 @@ def main() -> None:
         primary_topology=primary_topology,
         detail_topology=detail_topology,
         override_collection=override_collection,
+        canonicalize_countries=canonicalize_countries,
     )
     _record_timing(
         stage_timings,

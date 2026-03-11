@@ -83,6 +83,10 @@ else:  # pragma: no cover - palettes mode does not touch GIS stack
 from map_builder import config as cfg
 
 if REQUESTED_MODE != "palettes":
+    from map_builder.geo.local_canonicalization import (
+        LOCAL_CANONICAL_COUNTRY_CODES,
+        collect_topology_country_metrics,
+    )
     from map_builder.geo.topology import build_topology, _repair_geometry, _extract_country_code_from_id
     from map_builder.geo.utils import (
         clip_to_map_bounds,
@@ -136,6 +140,8 @@ else:  # pragma: no cover - palettes mode avoids GIS/runtime build imports
     generate_hierarchy = None
     geo_key_normalizer = None
     translate_manager = None
+    LOCAL_CANONICAL_COUNTRY_CODES = ()
+    collect_topology_country_metrics = None
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 D3_VENDOR_PATH = PROJECT_ROOT / 'vendor' / 'd3.v7.min.js'
@@ -688,6 +694,215 @@ def _write_timings_json(path: Path | None, timings: dict[str, dict]) -> None:
         return
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(timings, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def _candidate_topology_path(path: Path) -> Path:
+    return path.with_name(f"{path.stem}.candidate{path.suffix}")
+
+
+def _previous_topology_path(path: Path) -> Path:
+    return path.with_name(f"{path.stem}.previous{path.suffix}")
+
+
+def _summarize_country_gate_metrics(
+    stage_label: str,
+    metrics: dict[str, dict[str, float | int]] | None,
+) -> None:
+    if not metrics:
+        print(f"[{stage_label}] No country gate metrics available.")
+        return
+    for country_code in LOCAL_CANONICAL_COUNTRY_CODES:
+        row = metrics.get(country_code, {})
+        print(
+            f"[{stage_label}] {country_code}: "
+            f"features={int(row.get('feature_count', 0) or 0)}, "
+            f"gaps={int(row.get('fragment_count', 0) or 0)}, "
+            f"total_area_km2={float(row.get('total_area_km2', 0.0) or 0.0):.3f}, "
+            f"max_fragment_area_km2={float(row.get('max_fragment_area_km2', 0.0) or 0.0):.3f}, "
+            f"arc_shared_ratio={float(row.get('shared_arc_ratio', 0.0) or 0.0):.4f}"
+        )
+
+
+def _validate_candidate_topology_contract(candidate_path: Path, *, label: str) -> list[str]:
+    problems: list[str] = []
+    if not candidate_path.exists():
+        return [f"{label}: candidate output missing ({candidate_path})"]
+
+    ids, duplicates, missing_names, illegal_ids = _extract_political_topology_ids(candidate_path)
+    if duplicates:
+        problems.append(f"{label}: duplicate ids={len(duplicates)}")
+    if illegal_ids:
+        problems.append(f"{label}: illegal sentinel ids={len(illegal_ids)}")
+    if missing_names:
+        problems.append(f"{label}: missing names={len(missing_names)}")
+
+    summary = _topology_summary(candidate_path)
+    if summary.get("political_geometries", 0) and not summary.get("has_computed_neighbors", False):
+        problems.append(f"{label}: missing computed_neighbors")
+    if int(summary.get("world_bounds_geometries", 0) or 0) > 0:
+        problems.append(f"{label}: world-bounds geometries={summary['world_bounds_geometries']}")
+    if not ids:
+        problems.append(f"{label}: zero political ids")
+    return problems
+
+
+def _collect_country_gate_metrics(
+    topology_path: Path,
+    *,
+    primary_topology_path: Path,
+) -> dict[str, dict[str, float | int]] | None:
+    if collect_topology_country_metrics is None or not topology_path.exists() or not primary_topology_path.exists():
+        return None
+    primary_shell = _load_political_gdf_from_topology(primary_topology_path)
+    allowed_area = _load_topology_object_gdf_from_topology(primary_topology_path, "land")
+    return collect_topology_country_metrics(
+        topology_path,
+        shell_gdf=primary_shell,
+        allowed_area_gdf=allowed_area,
+        target_country_codes=LOCAL_CANONICAL_COUNTRY_CODES,
+    )
+
+
+def _evaluate_country_gate_metrics(
+    baseline_metrics: dict[str, dict[str, float | int]] | None,
+    candidate_metrics: dict[str, dict[str, float | int]] | None,
+) -> list[str]:
+    if not candidate_metrics:
+        return ["candidate country metrics unavailable"]
+
+    problems: list[str] = []
+    baseline_metrics = baseline_metrics or {}
+    for country_code in LOCAL_CANONICAL_COUNTRY_CODES:
+        candidate = candidate_metrics.get(country_code, {})
+        baseline = baseline_metrics.get(country_code, {})
+
+        candidate_feature_count = int(candidate.get("feature_count", 0) or 0)
+        candidate_fragment_count = int(candidate.get("fragment_count", 0) or 0)
+        candidate_total_area = float(candidate.get("total_area_km2", 0.0) or 0.0)
+        candidate_max_area = float(candidate.get("max_fragment_area_km2", 0.0) or 0.0)
+        candidate_shared_ratio = float(candidate.get("shared_arc_ratio", 0.0) or 0.0)
+
+        baseline_feature_count = int(baseline.get("feature_count", 0) or 0)
+        baseline_fragment_count = int(baseline.get("fragment_count", 0) or 0)
+        baseline_total_area = float(baseline.get("total_area_km2", 0.0) or 0.0)
+        baseline_max_area = float(baseline.get("max_fragment_area_km2", 0.0) or 0.0)
+        baseline_shared_ratio = float(baseline.get("shared_arc_ratio", 0.0) or 0.0)
+
+        if baseline and candidate_feature_count < baseline_feature_count:
+            problems.append(
+                f"{country_code}: feature_count regressed {baseline_feature_count}->{candidate_feature_count}"
+            )
+        if baseline and candidate_total_area > baseline_total_area + 0.25:
+            problems.append(
+                f"{country_code}: total_area_km2 regressed {baseline_total_area:.3f}->{candidate_total_area:.3f}"
+            )
+        if baseline and candidate_max_area > baseline_max_area + 0.25:
+            problems.append(
+                f"{country_code}: max_fragment_area_km2 regressed {baseline_max_area:.3f}->{candidate_max_area:.3f}"
+            )
+        if (
+            baseline
+            and candidate_fragment_count > baseline_fragment_count
+            and candidate_total_area >= baseline_total_area - 0.25
+        ):
+            problems.append(
+                f"{country_code}: fragment_count regressed {baseline_fragment_count}->{candidate_fragment_count}"
+            )
+        if baseline and candidate_shared_ratio + 0.01 < baseline_shared_ratio:
+            problems.append(
+                f"{country_code}: shared_arc_ratio regressed {baseline_shared_ratio:.4f}->{candidate_shared_ratio:.4f}"
+            )
+
+        if country_code in {"DE", "GB", "CZ"} and candidate_total_area > SHELL_COVERAGE_MIN_AREA_KM2 + 1e-6:
+            problems.append(
+                f"{country_code}: total_area_km2 target missed ({candidate_total_area:.3f} > {SHELL_COVERAGE_MIN_AREA_KM2:.3f})"
+            )
+        if (
+            country_code in {"RU", "UA"}
+            and baseline_total_area > SHELL_COVERAGE_MIN_AREA_KM2
+            and candidate_total_area > baseline_total_area / 10.0
+        ):
+            problems.append(
+                f"{country_code}: order-of-magnitude reduction target missed "
+                f"({baseline_total_area:.3f}->{candidate_total_area:.3f})"
+            )
+
+    return problems
+
+
+def _promote_candidate_topology_if_safe(
+    *,
+    stage_label: str,
+    primary_topology_path: Path,
+    candidate_path: Path,
+    output_path: Path,
+    detail_topology_path: Path | None = None,
+    override_path: Path | None = None,
+) -> None:
+    if collect_topology_country_metrics is None:
+        shutil.copy2(candidate_path, output_path)
+        return
+
+    contract_problems = _validate_candidate_topology_contract(candidate_path, label=stage_label)
+    if contract_problems:
+        raise SystemExit(f"{stage_label}: candidate contract failed: {'; '.join(contract_problems)}")
+
+    if detail_topology_path is not None:
+        try:
+            from tools.build_runtime_political_topology import _compose_political_features, _load_topology
+
+            override_collection = _read_json(override_path) if override_path is not None and override_path.exists() else None
+            expected_runtime = _compose_political_features(
+                primary_topology=_load_topology(primary_topology_path),
+                detail_topology=_load_topology(detail_topology_path) if detail_topology_path.exists() else None,
+                override_collection=override_collection,
+                canonicalize_countries=LOCAL_CANONICAL_COUNTRY_CODES,
+            )
+            expected_ids = {
+                str(feature_id).strip()
+                for feature_id in expected_runtime.get("id", [])
+                if str(feature_id).strip()
+            }
+            candidate_ids, _duplicates, _missing_names, _illegal_ids = _extract_political_topology_ids(candidate_path)
+            missing_runtime_ids = expected_ids - candidate_ids
+            extra_runtime_ids = candidate_ids - expected_ids
+            unexpected_extra_ids = {
+                feature_id
+                for feature_id in extra_runtime_ids
+                if not _is_managed_shell_coverage_id(feature_id)
+            }
+            if missing_runtime_ids or unexpected_extra_ids:
+                raise SystemExit(
+                    f"{stage_label}: runtime political ids drift: "
+                    f"expected={len(expected_ids)}, actual={len(candidate_ids)}, "
+                    f"missing={len(missing_runtime_ids)}, extra={len(extra_runtime_ids)}, "
+                    f"unexpected_extra={len(unexpected_extra_ids)}"
+                )
+        except Exception as exc:
+            raise SystemExit(f"{stage_label}: runtime political validation failed: {exc}") from exc
+
+    candidate_metrics = _collect_country_gate_metrics(
+        candidate_path,
+        primary_topology_path=primary_topology_path,
+    )
+    _summarize_country_gate_metrics(f"{stage_label} candidate", candidate_metrics)
+
+    baseline_metrics = None
+    if output_path.exists():
+        baseline_metrics = _collect_country_gate_metrics(
+            output_path,
+            primary_topology_path=primary_topology_path,
+        )
+        _summarize_country_gate_metrics(f"{stage_label} baseline", baseline_metrics)
+
+    gate_problems = _evaluate_country_gate_metrics(baseline_metrics, candidate_metrics)
+    if gate_problems:
+        raise SystemExit(f"{stage_label}: candidate gate failed: {'; '.join(gate_problems)}")
+
+    if output_path.exists():
+        shutil.copy2(output_path, _previous_topology_path(output_path))
+    shutil.copy2(candidate_path, output_path)
+    print(f"[{stage_label}] Promoted candidate -> {output_path.name}")
 
 
 def _read_optional_json(path: Path | None) -> dict | None:
@@ -1540,6 +1755,7 @@ def build_na_detail_topology(
 ) -> None:
     stage_name = "detail_topology"
     stage_start = time.perf_counter()
+    primary_topology = output_dir / "europe_topology.json"
     source_topology = output_dir / "europe_topology.highres.json"
     if not source_topology.exists():
         source_topology = output_dir / "europe_topology.json.bak"
@@ -1557,6 +1773,7 @@ def build_na_detail_topology(
         return
 
     output_path = output_dir / "europe_topology.na_v2.json"
+    candidate_path = _candidate_topology_path(output_path)
     signature = _compute_stage_signature(
         stage_name=stage_name,
         inputs=[
@@ -1564,6 +1781,7 @@ def build_na_detail_topology(
             patch_script,
             source_topology,
             PROJECT_ROOT / "map_builder" / "config.py",
+            PROJECT_ROOT / "map_builder" / "geo" / "local_canonicalization.py",
             PROJECT_ROOT / "map_builder" / "processors" / "detail_shell_coverage.py",
             PROJECT_ROOT / "map_builder" / "processors" / "russia_ukraine.py",
         ],
@@ -1587,7 +1805,7 @@ def build_na_detail_topology(
         "--source-topology",
         str(source_topology),
         "--output-topology",
-        str(output_path),
+        str(candidate_path),
     ]
     if child_timings_path is not None:
         child_timings_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1600,6 +1818,21 @@ def build_na_detail_topology(
         if stage_timings is not None:
             _record_stage_timing(stage_timings, stage_name, stage_start, failed=True)
         return
+    try:
+        if primary_topology.exists():
+            _promote_candidate_topology_if_safe(
+                stage_label="Detail Bundle",
+                primary_topology_path=primary_topology,
+                candidate_path=candidate_path,
+                output_path=output_path,
+            )
+        elif candidate_path.exists():
+            shutil.copy2(candidate_path, output_path)
+            print("[Detail Bundle] Promoted candidate without baseline comparison.")
+    except BaseException:
+        if stage_timings is not None:
+            _record_stage_timing(stage_timings, stage_name, stage_start, failed=True, gate_failed=True)
+        raise
     if build_stage_cache is not None:
         _update_stage_cache(
             cache_payload=build_stage_cache,
@@ -1643,6 +1876,7 @@ def build_runtime_political_topology(
         return
 
     output_path = output_dir / "europe_topology.runtime_political_v1.json"
+    candidate_path = _candidate_topology_path(output_path)
     ru_overrides_path = output_dir / "ru_city_overrides.geojson"
     signature = _compute_stage_signature(
         stage_name=stage_name,
@@ -1653,6 +1887,7 @@ def build_runtime_political_topology(
             detail_topology,
             ru_overrides_path,
             PROJECT_ROOT / "map_builder" / "config.py",
+            PROJECT_ROOT / "map_builder" / "geo" / "local_canonicalization.py",
             PROJECT_ROOT / "map_builder" / "processors" / "detail_shell_coverage.py",
         ],
         extra={"output": str(output_path)},
@@ -1679,7 +1914,7 @@ def build_runtime_political_topology(
         "--ru-overrides",
         str(ru_overrides_path),
         "--output-topology",
-        str(output_path),
+        str(candidate_path),
     ]
     if child_timings_path is not None:
         child_timings_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1692,6 +1927,19 @@ def build_runtime_political_topology(
         if stage_timings is not None:
             _record_stage_timing(stage_timings, stage_name, stage_start, failed=True)
         return
+    try:
+        _promote_candidate_topology_if_safe(
+            stage_label="Runtime Political",
+            primary_topology_path=primary_topology,
+            candidate_path=candidate_path,
+            output_path=output_path,
+            detail_topology_path=detail_topology,
+            override_path=ru_overrides_path,
+        )
+    except BaseException:
+        if stage_timings is not None:
+            _record_stage_timing(stage_timings, stage_name, stage_start, failed=True, gate_failed=True)
+        raise
     if build_stage_cache is not None:
         _update_stage_cache(
             cache_payload=build_stage_cache,

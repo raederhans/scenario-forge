@@ -19,6 +19,10 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from map_builder import config as cfg
+from map_builder.geo.local_canonicalization import (
+    LOCAL_CANONICAL_COUNTRY_CODES,
+    canonicalize_country_boundaries,
+)
 from map_builder.geo.topology import build_topology, compute_neighbor_graph
 from map_builder.processors.detail_shell_coverage import (
     append_shell_coverage_gap_fragments,
@@ -388,6 +392,17 @@ def _write_output_topology(
     )
 
 
+def _parse_country_codes_arg(raw_value: str | None) -> tuple[str, ...]:
+    if raw_value is None:
+        return LOCAL_CANONICAL_COUNTRY_CODES
+    values = tuple(
+        str(item).strip().upper()
+        for item in str(raw_value).split(",")
+        if str(item).strip()
+    )
+    return values
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build the enriched detail topology bundle.")
     parser.add_argument(
@@ -408,6 +423,12 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Optional path to write per-stage wall time and peak memory stats as JSON.",
     )
+    parser.add_argument(
+        "--canonicalize-countries",
+        type=str,
+        default=",".join(LOCAL_CANONICAL_COUNTRY_CODES),
+        help="Comma-separated country codes for local shared-boundary canonicalization.",
+    )
     return parser.parse_args()
 
 
@@ -417,6 +438,7 @@ def main() -> None:
     main_start = time.perf_counter()
     source_path = args.source_topology
     output_path = args.output_topology
+    canonicalize_countries = _parse_country_codes_arg(args.canonicalize_countries)
 
     load_start = time.perf_counter()
     print(f"[Detail patch] Loading source topology: {source_path}")
@@ -465,6 +487,20 @@ def main() -> None:
             )
     patched_political = _repair_political_metadata(patched_political)
     patched_political = _repair_political_geometries(patched_political)
+    canonicalize_start = time.perf_counter()
+    patched_political, canonicalize_metrics = canonicalize_country_boundaries(
+        patched_political,
+        shell_gdf=primary_layers["political"] if primary_layers is not None else None,
+        allowed_area_gdf=primary_layers.get("land") if primary_layers is not None else layers.get("land"),
+        target_country_codes=canonicalize_countries,
+        log_prefix="[Detail patch canonicalize]",
+    )
+    _record_timing(
+        stage_timings,
+        "local_country_canonicalization",
+        canonicalize_start,
+        countries=[entry["country_code"] for entry in canonicalize_metrics if not entry.get("skipped")],
+    )
     layers["political"] = patched_political
     print(f"[Detail patch] Patched political features: {len(patched_political)}")
     _record_timing(

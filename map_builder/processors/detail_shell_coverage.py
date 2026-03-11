@@ -28,6 +28,12 @@ DEFAULT_SHELL_COVERAGE_SPECS: dict[str, ManagedShellCoverageSpec] = {
         name_prefix="Russia Shell Fallback",
         source_label="detail",
     ),
+    "UA": ManagedShellCoverageSpec(
+        country_code="UA",
+        id_prefix="UA_SHELL_FB",
+        name_prefix="Ukraine Shell Fallback",
+        source_label="detail",
+    ),
     "DE": ManagedShellCoverageSpec(
         country_code="DE",
         id_prefix="DE_SHELL_FB",
