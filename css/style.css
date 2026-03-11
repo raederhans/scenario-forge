@@ -1257,6 +1257,8 @@ details.card[open] > summary::after {
 /* ── Floating Tooltip ──────────────────────────────────── */
 #tooltip {
   position: fixed;
+  top: 0;
+  left: 0;
   z-index: 50;
   background: rgba(45, 52, 54, 0.92);
   color: #FFFFFF;
@@ -2105,6 +2107,157 @@ details.card[open] > summary::after {
   pointer-events: auto;
 }
 
+.dev-workspace-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid rgba(0, 47, 167, 0.16);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.dev-workspace-toggle:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0, 47, 167, 0.28);
+  box-shadow: 0 16px 28px rgba(15, 23, 42, 0.16);
+}
+
+.dev-workspace-toggle.is-active {
+  background: rgba(0, 47, 167, 0.92);
+  color: #ffffff;
+  border-color: rgba(0, 47, 167, 0.92);
+}
+
+.bottom-dock.dev-workspace-mode .bottom-dock-primary,
+.bottom-dock.dev-workspace-mode .bottom-dock-swatches {
+  display: none;
+}
+
+.dev-workspace-dock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: min(37vh, 340px);
+  overflow: auto;
+}
+
+.dev-workspace-dock.is-hidden {
+  display: none;
+}
+
+.bottom-dock.is-collapsed .dev-workspace-dock {
+  display: none;
+}
+
+.dev-workspace-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dev-workspace-title-row {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dev-workspace-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 8px;
+}
+
+.dev-workspace-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.dev-workspace-panel-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dev-workspace-meta {
+  display: grid;
+  gap: 6px;
+}
+
+.dev-workspace-meta-row {
+  display: grid;
+  grid-template-columns: minmax(84px, 0.8fr) minmax(0, 1.8fr);
+  gap: 8px;
+  align-items: start;
+  font-size: 0.72rem;
+}
+
+.dev-workspace-meta-label {
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.dev-workspace-meta-value {
+  color: var(--text-primary);
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.dev-workspace-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dev-workspace-actions .btn-secondary,
+.dev-workspace-actions .btn-primary {
+  min-height: 34px;
+  padding: 0 12px;
+}
+
+.dev-workspace-select {
+  min-height: 34px;
+}
+
+.dev-selection-preview {
+  width: 100%;
+  min-height: 84px;
+  max-height: 104px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: rgba(248, 250, 252, 0.92);
+  color: var(--text-primary);
+  font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  resize: vertical;
+}
+
+.dev-workspace-empty {
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+}
+
+.dev-workspace-note {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
 .country-explorer-group,
 .country-explorer-list {
   display: flex;
@@ -2799,6 +2952,10 @@ body.right-drawer-open::after {
     right: 18px;
     top: 72px;
   }
+
+  .dev-workspace-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 1023px) {
@@ -2862,6 +3019,10 @@ body.right-drawer-open::after {
     top: 72px;
     right: 18px;
   }
+
+  .dev-workspace-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 767px) {
@@ -2896,6 +3057,11 @@ body.right-drawer-open::after {
     right: 10px;
     padding: 6px 8px;
     gap: 4px;
+  }
+
+  .dev-workspace-toggle {
+    min-width: 40px;
+    padding: 0 10px;
   }
 
   .scenario-context-bar {

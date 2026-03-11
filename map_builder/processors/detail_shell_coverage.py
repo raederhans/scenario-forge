@@ -18,11 +18,32 @@ class ManagedShellCoverageSpec:
     source_label: str = "detail"
 
 
+SHELL_COVERAGE_MIN_AREA_KM2 = 1.0
+
+
 DEFAULT_SHELL_COVERAGE_SPECS: dict[str, ManagedShellCoverageSpec] = {
     "RU": ManagedShellCoverageSpec(
         country_code="RU",
         id_prefix="RU_ARCTIC_FB",
         name_prefix="Russia Shell Fallback",
+        source_label="detail",
+    ),
+    "DE": ManagedShellCoverageSpec(
+        country_code="DE",
+        id_prefix="DE_SHELL_FB",
+        name_prefix="Germany Shell Fallback",
+        source_label="detail",
+    ),
+    "GB": ManagedShellCoverageSpec(
+        country_code="GB",
+        id_prefix="GB_SHELL_FB",
+        name_prefix="United Kingdom Shell Fallback",
+        source_label="detail",
+    ),
+    "CZ": ManagedShellCoverageSpec(
+        country_code="CZ",
+        id_prefix="CZ_SHELL_FB",
+        name_prefix="Czech Republic Shell Fallback",
         source_label="detail",
     ),
 }
@@ -149,7 +170,11 @@ def collect_shell_coverage_gaps(
     detail = _prepare_country_layer(detail_gdf)
     shell = _prepare_country_layer(shell_gdf)
     results: list[dict[str, object]] = []
-    area_threshold = cfg.MIN_VISIBLE_AREA_KM2 if min_area_km2 is None else float(min_area_km2)
+    area_threshold = (
+        SHELL_COVERAGE_MIN_AREA_KM2
+        if min_area_km2 is None
+        else float(min_area_km2)
+    )
 
     for spec in _iter_specs(coverage_specs):
         country_code = str(spec.country_code).strip().upper()

@@ -999,6 +999,17 @@
             <input id="zoomPercentInput" type="text" inputmode="numeric" class="input dock-zoom-input" aria-label="Zoom percentage" value="100%" />
             <button id="zoomInBtn" type="button" class="zoom-btn" aria-label="Zoom in" title="Zoom in">+</button>
             <button id="zoomResetBtn" type="button" class="zoom-btn zoom-btn-reset" aria-label="Reset zoom" title="Fit">Fit</button>
+            <button
+              id="devWorkspaceToggleBtn"
+              class="zoom-btn dev-workspace-toggle"
+              type="button"
+              aria-controls="devWorkspacePanel"
+              aria-expanded="false"
+              aria-pressed="false"
+              title="Toggle development workspace"
+            >
+              Dev
+            </button>
           </div>
 
           <section id="bottomDock" class="bottom-dock" aria-labelledby="bottomDockHeading">
@@ -1258,72 +1269,13 @@
             </div>
           </details>
 
-          <h2 id="waterInspectorHeading" class="visually-hidden">Water Regions</h2>
-          <details id="waterInspectorSection" class="card inspector-section" open aria-labelledby="waterInspectorHeading lblWaterInspector">
-            <summary id="lblWaterInspector" class="section-header">Water Regions</summary>
+          <h2 id="selectedCountryActionsHeading" class="visually-hidden">Territories and Presets</h2>
+          <details id="selectedCountryActionsSection" class="card inspector-section" aria-labelledby="selectedCountryActionsHeading lblPresetsHierarchy">
+            <summary id="lblPresetsHierarchy" class="section-header">Territories &amp; Presets</summary>
             <div class="inspector-panel-body">
-              <div class="card-flat inspector-detail-section">
-                <h3 id="lblWaterInteraction" class="section-header-block">Interaction</h3>
-                <label class="toggle-label mt-2">
-                  <input id="waterInspectorOpenOceanToggle" type="checkbox" class="checkbox-input" />
-                  <span id="lblWaterInspectorOpenOceanToggle">Allow Open-Ocean Interaction</span>
-                </label>
-                <p id="waterInspectorOpenOceanHint" class="sidebar-tool-hint mt-2">
-                  When off, macro ocean regions are ignored for hover, click, and paint.
-                </p>
-              </div>
-              <div class="card-flat inspector-search-block">
-                <label id="lblWaterSearch" class="visually-hidden" for="waterRegionSearch">Search Water Regions</label>
-                <div class="inspector-search-input-row">
-                  <svg class="inspector-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
-                    <path d="M16 16 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                  </svg>
-                  <input
-                    id="waterRegionSearch"
-                    type="text"
-                    placeholder="Search sea, lake, or strait..."
-                    class="input inspector-search-input"
-                  />
-                </div>
-              </div>
-              <div id="waterRegionList" class="country-list inspector-scroll mt-3"></div>
-              <div id="waterInspectorDetail" class="inspector-detail-card mt-3">
-                <div id="waterInspectorEmpty" class="inspector-empty-state">
-                  <h3 id="waterInspectorEmptyTitle" class="section-header-block">Select a water region to inspect</h3>
-                  <p id="waterInspectorEmptyHint" class="sidebar-tool-hint">
-                    Click a sea, lake, or strait on the map, or choose one from the list.
-                  </p>
-                </div>
-                <div id="waterInspectorSelected" class="hidden">
-                  <p id="waterInspectorDetailHint" class="sidebar-tool-hint mt-2 hidden"></p>
-                  <div id="waterInspectorColorRow" class="inspector-color-row mt-3 hidden">
-                    <h3 id="waterInspectorColorLabel" class="section-header-block">Water Color</h3>
-                    <div class="inspector-color-row-main mt-2">
-                      <button
-                        id="waterInspectorColorSwatch"
-                        type="button"
-                        class="inspector-color-swatch-btn"
-                        aria-label="Edit water region color"
-                      ></button>
-                      <div id="waterInspectorColorValue" class="inspector-color-value">#aadaff</div>
-                      <input
-                        id="waterInspectorColorInput"
-                        type="color"
-                        value="#aadaff"
-                        class="inspector-color-native-input"
-                        tabindex="-1"
-                        aria-hidden="true"
-                      />
-                    </div>
-                    <button id="clearWaterRegionColorBtn" type="button" class="btn-secondary mt-3">Clear Water Override</button>
-                  </div>
-                </div>
-              </div>
-              <div class="inspector-detail-section mt-3">
-                <h3 id="lblWaterLegend" class="section-header-block">Water Overrides</h3>
-                <div id="waterLegendList" class="inspector-scroll mt-3"></div>
-              </div>
+              <h3 class="section-header-block" id="lblHistoricalPresets">Selected Country Actions</h3>
+              <p id="selectedCountryActionHint" class="tip-text mt-2">Choose a country above to inspect territories, presets, and releasables.</p>
+              <div id="presetTree" class="inspector-scroll preset-tree mt-3"></div>
             </div>
           </details>
 
@@ -1403,13 +1355,72 @@
             </div>
           </details>
 
-          <h2 id="selectedCountryActionsHeading" class="visually-hidden">Territories and Presets</h2>
-          <details id="selectedCountryActionsSection" class="card inspector-section" aria-labelledby="selectedCountryActionsHeading lblPresetsHierarchy">
-            <summary id="lblPresetsHierarchy" class="section-header">Territories &amp; Presets</summary>
+          <h2 id="waterInspectorHeading" class="visually-hidden">Water Regions</h2>
+          <details id="waterInspectorSection" class="card inspector-section" open aria-labelledby="waterInspectorHeading lblWaterInspector">
+            <summary id="lblWaterInspector" class="section-header">Water Regions</summary>
             <div class="inspector-panel-body">
-              <h3 class="section-header-block" id="lblHistoricalPresets">Selected Country Actions</h3>
-              <p id="selectedCountryActionHint" class="tip-text mt-2">Choose a country above to inspect territories, presets, and releasables.</p>
-              <div id="presetTree" class="inspector-scroll preset-tree mt-3"></div>
+              <div class="card-flat inspector-detail-section">
+                <h3 id="lblWaterInteraction" class="section-header-block">Interaction</h3>
+                <label class="toggle-label mt-2">
+                  <input id="waterInspectorOpenOceanToggle" type="checkbox" class="checkbox-input" />
+                  <span id="lblWaterInspectorOpenOceanToggle">Allow Open-Ocean Interaction</span>
+                </label>
+                <p id="waterInspectorOpenOceanHint" class="sidebar-tool-hint mt-2">
+                  When off, macro ocean regions are ignored for hover, click, and paint.
+                </p>
+              </div>
+              <div class="card-flat inspector-search-block">
+                <label id="lblWaterSearch" class="visually-hidden" for="waterRegionSearch">Search Water Regions</label>
+                <div class="inspector-search-input-row">
+                  <svg class="inspector-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
+                    <path d="M16 16 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                  </svg>
+                  <input
+                    id="waterRegionSearch"
+                    type="text"
+                    placeholder="Search sea, lake, or strait..."
+                    class="input inspector-search-input"
+                  />
+                </div>
+              </div>
+              <div id="waterRegionList" class="country-list inspector-scroll mt-3"></div>
+              <div id="waterInspectorDetail" class="inspector-detail-card mt-3">
+                <div id="waterInspectorEmpty" class="inspector-empty-state">
+                  <h3 id="waterInspectorEmptyTitle" class="section-header-block">Select a water region to inspect</h3>
+                  <p id="waterInspectorEmptyHint" class="sidebar-tool-hint">
+                    Click a sea, lake, or strait on the map, or choose one from the list.
+                  </p>
+                </div>
+                <div id="waterInspectorSelected" class="hidden">
+                  <p id="waterInspectorDetailHint" class="sidebar-tool-hint mt-2 hidden"></p>
+                  <div id="waterInspectorColorRow" class="inspector-color-row mt-3 hidden">
+                    <h3 id="waterInspectorColorLabel" class="section-header-block">Water Color</h3>
+                    <div class="inspector-color-row-main mt-2">
+                      <button
+                        id="waterInspectorColorSwatch"
+                        type="button"
+                        class="inspector-color-swatch-btn"
+                        aria-label="Edit water region color"
+                      ></button>
+                      <div id="waterInspectorColorValue" class="inspector-color-value">#aadaff</div>
+                      <input
+                        id="waterInspectorColorInput"
+                        type="color"
+                        value="#aadaff"
+                        class="inspector-color-native-input"
+                        tabindex="-1"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <button id="clearWaterRegionColorBtn" type="button" class="btn-secondary mt-3">Clear Water Override</button>
+                  </div>
+                </div>
+              </div>
+              <div class="inspector-detail-section mt-3">
+                <h3 id="lblWaterLegend" class="section-header-block">Water Overrides</h3>
+                <div id="waterLegendList" class="inspector-scroll mt-3"></div>
+              </div>
             </div>
           </details>
 

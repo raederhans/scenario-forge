@@ -533,12 +533,56 @@ function mergePresetLayers(...layers) {
   return merged;
 }
 
+function buildScenarioRegionalPresetOverlays() {
+  if (!state.activeScenarioId) return {};
+  const scenarioCountries = state.scenarioCountriesByTag && typeof state.scenarioCountriesByTag === "object"
+    ? state.scenarioCountriesByTag
+    : {};
+  const overlays = {};
+  const assignOverlayPresets = (rawCode, presets) => {
+    const normalizedCode = normalizeCountryCode(rawCode);
+    if (!normalizedCode || !presets.length) return;
+    overlays[normalizedCode] = presets.map((preset) => clonePreset(preset));
+  };
+
+  Object.entries(scenarioCountries).forEach(([rawCode, entry]) => {
+    const code = normalizeCountryCode(rawCode || entry?.tag);
+    if (!code) return;
+    const regionalPresets = Array.isArray(entry?.regional_presets)
+      ? entry.regional_presets
+      : Array.isArray(entry?.regionalPresets)
+        ? entry.regionalPresets
+        : [];
+    if (!regionalPresets.length) return;
+
+    const normalizedPresets = regionalPresets
+      .map((preset) => clonePreset(preset))
+      .filter((preset) => preset.name && preset.ids.length);
+
+    if (normalizedPresets.length) {
+      [
+        code,
+        entry?.preset_lookup_code,
+        entry?.presetLookupCode,
+        entry?.lookup_iso2,
+        entry?.lookupIso2,
+        entry?.base_iso2,
+        entry?.baseIso2,
+      ].forEach((candidate) => assignOverlayPresets(candidate, normalizedPresets));
+    }
+  });
+
+  return overlays;
+}
+
 function rebuildPresetState() {
   const { defaultOverlays, scenarioOverlays } = buildReleasablePresetOverlays();
+  const scenarioRegionalPresetOverlays = buildScenarioRegionalPresetOverlays();
   state.defaultReleasablePresetOverlays = defaultOverlays;
   state.scenarioReleasablePresetOverlays = scenarioOverlays;
   state.presetsState = mergePresetLayers(
     countryPresets,
+    scenarioRegionalPresetOverlays,
     state.activeScenarioId ? scenarioOverlays : defaultOverlays,
     state.customPresets || {}
   );

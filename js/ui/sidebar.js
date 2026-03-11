@@ -26,6 +26,7 @@ import {
 } from "../core/scenario_manager.js";
 import { t } from "./i18n.js";
 import { showToast } from "./toast.js";
+import { initDevWorkspace } from "./dev_workspace.js";
 import {
   setFeatureOwnerCodes,
   ensureSovereigntyState,
@@ -1367,6 +1368,8 @@ function initSidebar({ render } = {}) {
   const diagnosticsSection = document.getElementById("lblDiagnostics")?.closest("details");
   const selectedCountryActionsTitle = document.getElementById("lblHistoricalPresets");
   const selectedCountryActionHint = document.getElementById("selectedCountryActionHint");
+
+  initDevWorkspace();
 
   const updateScenarioInspectorLayout = () => {
     const isScenarioMode = !!state.activeScenarioId;
@@ -4129,9 +4132,16 @@ function initSidebar({ render } = {}) {
         ? state.scenarioReleasableIndex.consumedPresetNamesByParentLookup[presetLookupCode]
         : []
       : [];
+    const disabledPresetNames = state.activeScenarioId && Array.isArray(countryState?.disabledRegionalPresetNames)
+      ? countryState.disabledRegionalPresetNames
+      : [];
     return buildPresetEntries(presetLookupCode, (preset) => {
       if (!state.activeScenarioId) return true;
-      return !consumedPresetNames.includes(normalizePresetName(preset?.name));
+      const normalizedPresetName = normalizePresetName(preset?.name);
+      return (
+        !consumedPresetNames.includes(normalizedPresetName)
+        && !disabledPresetNames.includes(normalizedPresetName)
+      );
     });
   };
 
@@ -4196,10 +4206,6 @@ function initSidebar({ render } = {}) {
       });
     } else {
       groupSection.appendChild(createEmptyNote(t("No hierarchy groups", "ui")));
-    }
-
-    if (String(state.activeScenarioId || "").trim() === "tno_1962" && normalizeCountryCode(countryState?.code) === "GER") {
-      return;
     }
 
     const presetSection = appendActionSection(container, t("Regional Presets", "ui"));
@@ -5005,6 +5011,12 @@ function initSidebar({ render } = {}) {
         }
         state.dynamicBordersDirty = !!data.dynamicBordersDirty;
         state.dynamicBordersDirtyReason = data.dynamicBordersDirtyReason || "";
+        state.devHoverHit = null;
+        state.devSelectedHit = null;
+        state.devSelectionFeatureIds = new Set();
+        state.devSelectionOrder = [];
+        state.devClipboardFallbackText = "";
+        state.devClipboardPreviewFormat = "names_with_ids";
         ensureSovereigntyState({ force: true });
         state.specialZones = data.specialZones || {};
         state.manualSpecialZones =

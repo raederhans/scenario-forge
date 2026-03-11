@@ -95,6 +95,7 @@ if REQUESTED_MODE != "palettes":
     from map_builder.processors.china import apply_china_replacement
     from map_builder.processors.detail_shell_coverage import (
         DEFAULT_SHELL_COVERAGE_SPECS,
+        SHELL_COVERAGE_MIN_AREA_KM2,
         collect_shell_coverage_gaps,
     )
     from map_builder.processors.denmark_border_detail import apply_denmark_border_detail
@@ -121,6 +122,7 @@ else:  # pragma: no cover - palettes mode avoids GIS/runtime build imports
     extract_country_code = None
     apply_china_replacement = None
     DEFAULT_SHELL_COVERAGE_SPECS = {}
+    SHELL_COVERAGE_MIN_AREA_KM2 = 1.0
     collect_shell_coverage_gaps = None
     apply_denmark_border_detail = None
     apply_holistic_replacements = None
@@ -2402,14 +2404,14 @@ def _scan_detail_overlay_overlap_risks(
     return risks
 
 
-def _load_political_gdf_from_topology(path: Path) -> gpd.GeoDataFrame:
+def _load_topology_object_gdf_from_topology(path: Path, object_name: str) -> gpd.GeoDataFrame:
     if gpd is None or not path.exists():
         return gpd.GeoDataFrame(columns=["geometry"], geometry="geometry", crs="EPSG:4326")
 
     from topojson.utils import serialize_as_geojson
 
     topo_payload = _read_json(path)
-    feature_collection = serialize_as_geojson(topo_payload, objectname="political")
+    feature_collection = serialize_as_geojson(topo_payload, objectname=object_name)
     raw_features = feature_collection.get("features", []) if isinstance(feature_collection, dict) else []
     if not isinstance(raw_features, list) or not raw_features:
         return gpd.GeoDataFrame(columns=["geometry"], geometry="geometry", crs="EPSG:4326")
@@ -2430,6 +2432,10 @@ def _load_political_gdf_from_topology(path: Path) -> gpd.GeoDataFrame:
     return gdf
 
 
+def _load_political_gdf_from_topology(path: Path) -> gpd.GeoDataFrame:
+    return _load_topology_object_gdf_from_topology(path, "political")
+
+
 def _validate_shell_coverage(
     *,
     primary_path: Path,
@@ -2443,6 +2449,7 @@ def _validate_shell_coverage(
 
     shell_gdf = _load_political_gdf_from_topology(primary_path)
     target_gdf = _load_political_gdf_from_topology(target_path)
+    allowed_area_gdf = _load_topology_object_gdf_from_topology(primary_path, "land")
     if shell_gdf.empty or target_gdf.empty:
         return
 
@@ -2451,9 +2458,14 @@ def _validate_shell_coverage(
         shell_gdf,
         DEFAULT_SHELL_COVERAGE_SPECS,
         exclude_managed_fragments=False,
+        allowed_area_gdf=allowed_area_gdf,
+        min_area_km2=SHELL_COVERAGE_MIN_AREA_KM2,
     )
     if not gaps:
-        print(f"[Validate] {target_label}: managed shell coverage OK")
+        print(
+            f"[Validate] {target_label}: managed shell coverage OK "
+            f"(threshold={SHELL_COVERAGE_MIN_AREA_KM2:.1f} km^2)"
+        )
         return
 
     for gap in gaps:

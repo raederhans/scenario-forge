@@ -19,7 +19,7 @@ import {
 import { ColorManager } from "./color_manager.js";
 import { LegendManager } from "./legend_manager.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
-import { getTooltipText } from "../ui/i18n.js";
+import { getTooltipText, t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
 import { markDirty } from "./dirty_state.js";
 import {
@@ -51,6 +51,7 @@ let viewportGroup = null;
 let specialZonesGroup = null;
 let specialZoneEditorGroup = null;
 let hoverGroup = null;
+let devSelectionGroup = null;
 let inspectorHighlightGroup = null;
 let legendGroup = null;
 let legendItemsGroup = null;
@@ -63,6 +64,7 @@ let lastDetailToastAt = 0;
 let lastSpecialZonesOverlaySignature = "";
 let lastInspectorOverlaySignature = "";
 let lastHoverOverlaySignature = "";
+let lastDevSelectionOverlaySignature = "";
 
 const PROJECTION_PRECISION = 0.1;
 const PATH_POINT_RADIUS = 2;
@@ -134,6 +136,14 @@ const DETAIL_ADM_BORDER_COLOR = "#888888";
 const DETAIL_ADM_BORDER_MIN_ALPHA = 0.24;
 const DETAIL_ADM_BORDER_MAX_ALPHA = 0.34;
 const DETAIL_ADM_BORDER_MIN_WIDTH = 0.30;
+const LOCAL_BORDERS_MIN_ZOOM = 2.0;
+const DETAIL_ADM_BORDERS_MIN_ZOOM = 2.4;
+const PROVINCE_BORDERS_FADE_START_ZOOM = 1.1;
+const PROVINCE_BORDERS_TRANSITION_END_ZOOM = 2.0;
+const PROVINCE_BORDERS_FAR_ALPHA = 0.10;
+const PROVINCE_BORDERS_TRANSITION_ALPHA = 0.38;
+const PROVINCE_BORDERS_FAR_WIDTH_MAX_ZOOM = 1.5;
+const PROVINCE_BORDERS_FAR_WIDTH_SCALE = 0.75;
 const PARENT_BORDER_MIN_COVERAGE = 0.70;
 const PARENT_BORDER_MAX_DOMINANT_SHARE = 0.90;
 const PARENT_BORDER_MIN_RENDERABLE_GROUPS = 2;
@@ -2383,6 +2393,17 @@ function getHoverOverlaySignature() {
   ].join("::");
 }
 
+function getDevSelectionOverlaySignature() {
+  const orderedIds = Array.isArray(state.devSelectionOrder)
+    ? state.devSelectionOrder.map((value) => String(value || "").trim()).filter(Boolean)
+    : [];
+  return [
+    getOverlayProjectionSignature(),
+    orderedIds.join("|"),
+    Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
+  ].join("::");
+}
+
 function renderSpecialZonesIfNeeded({ force = false } = {}) {
   const nextSignature = getSpecialZonesOverlaySignature();
   if (!force && !state.specialZonesOverlayDirty && nextSignature === lastSpecialZonesOverlaySignature) {
@@ -2411,6 +2432,48 @@ function renderHoverOverlayIfNeeded({ force = false } = {}) {
   renderHoverOverlay();
   state.hoverOverlayDirty = false;
   lastHoverOverlaySignature = nextSignature;
+}
+
+function renderDevSelectionOverlay() {
+  if (!devSelectionGroup || !pathSVG) return;
+  const orderedIds = Array.isArray(state.devSelectionOrder)
+    ? state.devSelectionOrder.map((value) => String(value || "").trim()).filter(Boolean)
+    : [];
+  const data = orderedIds
+    .map((featureId) => state.landIndex?.get(featureId) || null)
+    .filter(Boolean);
+
+  const selection = devSelectionGroup
+    .selectAll("path.dev-selected-feature")
+    .data(data, (feature, index) => getFeatureId(feature) || `dev-selection-${index}`);
+
+  selection
+    .enter()
+    .append("path")
+    .attr("class", "dev-selected-feature")
+    .attr("role", "presentation")
+    .attr("aria-hidden", "true")
+    .attr("vector-effect", "non-scaling-stroke")
+    .merge(selection)
+    .attr("d", pathSVG)
+    .attr("fill", "rgba(14, 165, 233, 0.14)")
+    .attr("stroke", "rgba(14, 165, 233, 0.94)")
+    .attr("stroke-width", 1.8);
+
+  selection.exit().remove();
+  devSelectionGroup
+    .attr("aria-hidden", data.length ? "false" : "true")
+    .attr("aria-label", data.length ? `Development selection overlay (${data.length})` : "Development selection overlay");
+}
+
+function renderDevSelectionOverlayIfNeeded({ force = false } = {}) {
+  const nextSignature = getDevSelectionOverlaySignature();
+  if (!force && !state.devSelectionOverlayDirty && nextSignature === lastDevSelectionOverlaySignature) {
+    return;
+  }
+  renderDevSelectionOverlay();
+  state.devSelectionOverlayDirty = false;
+  lastDevSelectionOverlaySignature = nextSignature;
 }
 
 function applyTooltipState(nextState = null) {
@@ -2954,6 +3017,17 @@ function ensureHybridLayers() {
     .style("pointer-events", "none")
     .attr("role", "img")
     .attr("aria-label", "Hovered region outline overlay")
+    .attr("aria-hidden", "true")
+    .attr("focusable", "false");
+
+  devSelectionGroup = viewportGroup.select("g.dev-selection-layer");
+  if (devSelectionGroup.empty()) {
+    devSelectionGroup = viewportGroup.append("g").attr("class", "dev-selection-layer");
+  }
+  devSelectionGroup
+    .style("pointer-events", "none")
+    .attr("role", "img")
+    .attr("aria-label", "Development selection overlay")
     .attr("aria-hidden", "true")
     .attr("focusable", "false");
 
@@ -3911,6 +3985,7 @@ function createHitResult(overrides = {}) {
     countryCode: null,
     targetType: null,
     feature: null,
+    hitSource: "none",
     bboxArea: Infinity,
     viaSnap: false,
     strict: false,
@@ -4063,6 +4138,7 @@ function getHitResultFromCanvas(event) {
     countryCode: getFeatureCountryCodeNormalized(feature),
     targetType: "land",
     feature,
+    hitSource: "canvas",
     bboxArea: Number(state.spatialItemsById?.get(id)?.bboxArea || Infinity),
     viaSnap: false,
     strict: true,
@@ -4364,6 +4440,7 @@ function toHitResult(candidate, { viaSnap = false, strict = false, zoomK = 1, ta
     countryCode: candidate.item.countryCode || getFeatureCountryCodeNormalized(candidate.item.feature),
     targetType,
     feature: candidate.item.feature || null,
+    hitSource: "spatial",
     bboxArea: Number(candidate.bboxArea || candidate.item.bboxArea || Infinity),
     viaSnap,
     strict,
@@ -4606,6 +4683,8 @@ function buildIndex() {
   if (typeof state.renderPresetTreeFn === "function") {
     state.renderPresetTreeFn();
   }
+  state.devSelectionOverlayDirty = true;
+  notifyDevWorkspace();
   state.hitCanvasDirty = true;
 }
 
@@ -4823,7 +4902,6 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
   const kDenom = Math.max(0.0001, k);
   const lowZoomDeclutter = k < COASTLINE_LOD_LOW_ZOOM_MAX ? 0.82 : 1;
   const lowZoomWidthScale = k < COASTLINE_LOD_LOW_ZOOM_MAX ? 0.92 : 1;
-  const lowZoomInternalBoost = k < 1.45 ? 1.55 : 1;
   const internal = state.styleConfig?.internalBorders || {};
   const empire = state.styleConfig?.empireBorders || {};
   const coast = state.styleConfig?.coastlines || {};
@@ -4879,13 +4957,28 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
   }
 
   const countryAlpha = 0.90;
-  const provinceAlpha = clamp(
-    internalOpacity * (0.22 + 0.50 * t) * lowZoomDeclutter * lowZoomInternalBoost,
+  const regularProvinceAlpha = clamp(
+    internalOpacity * (0.22 + 0.50 * t) * lowZoomDeclutter,
     INTERNAL_BORDER_PROVINCE_MIN_ALPHA,
     0.74
   );
+  let provinceAlpha = regularProvinceAlpha;
+  if (k <= PROVINCE_BORDERS_FADE_START_ZOOM) {
+    provinceAlpha = PROVINCE_BORDERS_FAR_ALPHA;
+  } else if (k < PROVINCE_BORDERS_TRANSITION_END_ZOOM) {
+    const fadeT = clamp(
+      (k - PROVINCE_BORDERS_FADE_START_ZOOM)
+      / (PROVINCE_BORDERS_TRANSITION_END_ZOOM - PROVINCE_BORDERS_FADE_START_ZOOM),
+      0,
+      1
+    );
+    provinceAlpha = PROVINCE_BORDERS_FAR_ALPHA
+      + ((PROVINCE_BORDERS_TRANSITION_ALPHA - PROVINCE_BORDERS_FAR_ALPHA) * fadeT);
+  } else {
+    provinceAlpha = Math.max(regularProvinceAlpha, PROVINCE_BORDERS_TRANSITION_ALPHA);
+  }
   const localAlpha = clamp(
-    internalOpacity * (0.08 + 0.34 * t) * lowZoomDeclutter * (lowZoomInternalBoost + 0.2),
+    internalOpacity * (0.08 + 0.34 * t) * lowZoomDeclutter,
     INTERNAL_BORDER_LOCAL_MIN_ALPHA,
     0.48
   );
@@ -4894,10 +4987,13 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
   const detailAdmAlpha = clamp(0.20 + 0.12 * t, DETAIL_ADM_BORDER_MIN_ALPHA, DETAIL_ADM_BORDER_MAX_ALPHA);
 
   const countryWidth = (empireWidthBase * (0.95 + 0.40 * t)) / kDenom;
-  const provinceWidth = Math.max(
+  let provinceWidth = Math.max(
     INTERNAL_BORDER_PROVINCE_MIN_WIDTH,
     internalWidthBase * (0.72 + 0.65 * t) * lowZoomWidthScale
   ) / kDenom;
+  if (k < PROVINCE_BORDERS_FAR_WIDTH_MAX_ZOOM) {
+    provinceWidth *= PROVINCE_BORDERS_FAR_WIDTH_SCALE;
+  }
   const localWidth = Math.max(
     INTERNAL_BORDER_LOCAL_MIN_WIDTH,
     internalWidthBase * 0.40 * (0.70 + 0.55 * t) * lowZoomWidthScale
@@ -4914,14 +5010,18 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
       ? (state.cachedCoastlinesMid?.length ? state.cachedCoastlinesMid : state.cachedCoastlines)
       : (state.cachedCoastlinesHigh?.length ? state.cachedCoastlinesHigh : state.cachedCoastlines);
 
-  context.globalAlpha = localAlpha;
-  drawMeshCollection(state.cachedLocalBorders, internalColor, localWidth);
+  if (k >= LOCAL_BORDERS_MIN_ZOOM) {
+    context.globalAlpha = localAlpha;
+    drawMeshCollection(state.cachedLocalBorders, internalColor, localWidth);
+  }
 
   context.globalAlpha = provinceAlpha;
   drawMeshCollection(state.cachedProvinceBorders, internalColor, provinceWidth);
 
-  context.globalAlpha = detailAdmAlpha;
-  drawMeshCollection(state.cachedDetailAdmBorders, DETAIL_ADM_BORDER_COLOR, detailAdmWidth);
+  if (k >= DETAIL_ADM_BORDERS_MIN_ZOOM) {
+    context.globalAlpha = detailAdmAlpha;
+    drawMeshCollection(state.cachedDetailAdmBorders, DETAIL_ADM_BORDER_COLOR, detailAdmWidth);
+  }
 
   const enabledParentCountries = (state.parentBorderSupportedCountries || []).filter(
     (countryCode) => !!state.parentBorderEnabledByCountry?.[countryCode]
@@ -8280,6 +8380,7 @@ function render() {
     scheduleHitCanvasBuildIfNeeded();
   }
   renderSpecialZonesIfNeeded();
+  renderDevSelectionOverlayIfNeeded();
   renderInspectorHighlightOverlayIfNeeded();
   renderHoverOverlayIfNeeded();
   if (state.renderPhase === RENDER_PHASE_IDLE) {
@@ -8562,6 +8663,7 @@ function handleMouseMove(event) {
     state.hoveredId = null;
     state.hoveredWaterRegionId = null;
     state.hoveredSpecialRegionId = null;
+    updateDevHoverHit(null);
     state.hoverOverlayDirty = true;
     renderHoverOverlayIfNeeded();
     queueTooltipUpdate({ visible: false });
@@ -8591,6 +8693,7 @@ function handleMouseMove(event) {
       renderHoverOverlayIfNeeded();
     }
   }
+  updateDevHoverHit(id ? hit : null);
 
   if (!tooltip) return;
   if (id && (state.landIndex.has(id) || state.waterRegionsById.has(id) || state.specialRegionsById.has(id))) {
@@ -8769,6 +8872,423 @@ function refreshSidebarAfterPaint({
   if (refreshPresetTree && typeof state.renderPresetTreeFn === "function") {
     state.renderPresetTreeFn();
   }
+}
+
+function notifyDevWorkspace() {
+  if (typeof state.updateDevWorkspaceUIFn === "function") {
+    state.updateDevWorkspaceUIFn();
+  }
+}
+
+function isDevSelectionEligibleFeature(feature, featureId = null) {
+  return !!feature
+    && !shouldExcludePoliticalInteractionFeature(feature, featureId)
+    && !isAtlantropaSeaFeature(feature);
+}
+
+function setDevSelectionDirty() {
+  state.devSelectionOverlayDirty = true;
+  state.devClipboardFallbackText = "";
+  notifyDevWorkspace();
+}
+
+function updateDevHoverHit(hit = null) {
+  state.devHoverHit = hit?.id
+    ? {
+      id: String(hit.id || "").trim(),
+      targetType: String(hit.targetType || ""),
+      countryCode: String(hit.countryCode || "").trim().toUpperCase(),
+      hitSource: String(hit.hitSource || "spatial"),
+      viaSnap: !!hit.viaSnap,
+      strict: !!hit.strict,
+    }
+    : null;
+  notifyDevWorkspace();
+}
+
+function updateDevSelectedHit(hit = null) {
+  state.devSelectedHit = hit?.id
+    ? {
+      id: String(hit.id || "").trim(),
+      targetType: String(hit.targetType || ""),
+      countryCode: String(hit.countryCode || "").trim().toUpperCase(),
+      hitSource: String(hit.hitSource || "spatial"),
+      viaSnap: !!hit.viaSnap,
+      strict: !!hit.strict,
+    }
+    : null;
+  notifyDevWorkspace();
+}
+
+function getDevSelectionIds() {
+  const rawIds = Array.isArray(state.devSelectionOrder)
+    ? state.devSelectionOrder.map((value) => String(value || "").trim()).filter(Boolean)
+    : [];
+  const nextIds = [];
+  const seen = new Set();
+  rawIds.forEach((id) => {
+    if (!id || seen.has(id)) return;
+    const feature = state.landIndex?.get(id);
+    if (!isDevSelectionEligibleFeature(feature, id)) return;
+    seen.add(id);
+    nextIds.push(id);
+  });
+  const changed = rawIds.length !== nextIds.length || rawIds.some((id, index) => id !== nextIds[index]);
+  if (changed) {
+    state.devSelectionOrder = nextIds;
+    state.devSelectionFeatureIds = new Set(nextIds);
+    state.devClipboardFallbackText = "";
+    state.devSelectionOverlayDirty = true;
+  } else if (!(state.devSelectionFeatureIds instanceof Set)) {
+    state.devSelectionFeatureIds = new Set(nextIds);
+  }
+  return nextIds;
+}
+
+function addFeatureToDevSelection(featureId) {
+  const id = String(featureId || "").trim();
+  const feature = id ? state.landIndex?.get(id) : null;
+  if (!isDevSelectionEligibleFeature(feature, id)) return false;
+  state.devSelectionFeatureIds = state.devSelectionFeatureIds instanceof Set
+    ? state.devSelectionFeatureIds
+    : new Set();
+  state.devSelectionOrder = getDevSelectionIds();
+  if (state.devSelectionFeatureIds.has(id)) {
+    return false;
+  }
+  const limit = Math.max(1, Number(state.devSelectionLimit) || 200);
+  if (state.devSelectionOrder.length >= limit) {
+    showToast(
+      state.currentLanguage === "zh"
+        ? `开发多选已达到上限（${limit}）。`
+        : `Selection limit reached (${limit}).`,
+      {
+      title: t("Dev Workspace", "ui"),
+      tone: "warning",
+      duration: 3600,
+    });
+    return false;
+  }
+  state.devSelectionFeatureIds.add(id);
+  state.devSelectionOrder.push(id);
+  setDevSelectionDirty();
+  if (context) {
+    render();
+  }
+  return true;
+}
+
+function toggleFeatureInDevSelection(featureId) {
+  const id = String(featureId || "").trim();
+  const feature = id ? state.landIndex?.get(id) : null;
+  if (!isDevSelectionEligibleFeature(feature, id)) return false;
+  state.devSelectionFeatureIds = state.devSelectionFeatureIds instanceof Set
+    ? state.devSelectionFeatureIds
+    : new Set();
+  state.devSelectionOrder = getDevSelectionIds();
+  if (state.devSelectionFeatureIds.has(id)) {
+    state.devSelectionFeatureIds.delete(id);
+    state.devSelectionOrder = state.devSelectionOrder.filter((value) => value !== id);
+    setDevSelectionDirty();
+    if (context) {
+      render();
+    }
+    return true;
+  }
+  return addFeatureToDevSelection(id);
+}
+
+function removeLastDevSelection() {
+  const ids = getDevSelectionIds();
+  if (!ids.length) return false;
+  const lastId = ids[ids.length - 1];
+  state.devSelectionFeatureIds.delete(lastId);
+  state.devSelectionOrder = ids.slice(0, -1);
+  setDevSelectionDirty();
+  if (context) {
+    render();
+  }
+  return true;
+}
+
+function clearDevSelection() {
+  const hadEntries = getDevSelectionIds().length > 0;
+  state.devSelectionFeatureIds = new Set();
+  state.devSelectionOrder = [];
+  if (hadEntries) {
+    setDevSelectionDirty();
+    if (context) {
+      render();
+    }
+  } else {
+    notifyDevWorkspace();
+  }
+  return hadEntries;
+}
+
+function getDevWorkspaceActiveLandContext() {
+  const selectedHit = state.devSelectedHit;
+  const selectedId = selectedHit?.targetType === "land" ? String(selectedHit.id || "").trim() : "";
+  const hoveredId = String(state.hoveredId || "").trim();
+  const featureId = selectedId || hoveredId;
+  if (!featureId) return null;
+  const feature = state.landIndex?.get(featureId);
+  if (!isDevSelectionEligibleFeature(feature, featureId)) return null;
+  const countryCode = getFeatureCountryCodeNormalized(feature);
+  return {
+    featureId,
+    feature,
+    countryCode,
+  };
+}
+
+function applyVisualFillToResolvedIds(targetIds, selectedColor, kind, dirtyReason) {
+  const resolvedIds = Array.from(new Set((Array.isArray(targetIds) ? targetIds : [])
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)));
+  if (!resolvedIds.length) return false;
+  return applyVisualSubdivisionFill(resolvedIds, selectedColor, {
+    kind,
+    dirtyReason,
+  });
+}
+
+function eraseVisualOverridesForIds(targetIds, { kind, dirtyReason } = {}) {
+  const resolvedIds = Array.from(new Set((Array.isArray(targetIds) ? targetIds : [])
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)));
+  if (!resolvedIds.length) return false;
+  const historyBefore = captureHistoryState({
+    featureIds: resolvedIds,
+  });
+  resolvedIds.forEach((targetId) => {
+    delete state.visualOverrides[targetId];
+    delete state.featureOverrides[targetId];
+  });
+  refreshResolvedColorsForFeatures(resolvedIds, { renderNow: false });
+  markDirty(dirtyReason || kind || "erase-feature-color");
+  commitHistoryEntry({
+    kind: kind || "erase-feature-color",
+    before: historyBefore,
+    after: captureHistoryState({
+      featureIds: resolvedIds,
+    }),
+  });
+  if (context) {
+    render();
+  }
+  refreshSidebarAfterPaint({ featureIds: resolvedIds });
+  return true;
+}
+
+function applySovereigntyFillToIds(targetIds, { kind, dirtyReason, recomputeReason } = {}) {
+  const resolvedIds = Array.from(new Set((Array.isArray(targetIds) ? targetIds : [])
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)));
+  if (!resolvedIds.length) return false;
+  if (!state.activeSovereignCode) {
+    showToast(t("No active sovereign selected.", "ui"), {
+      title: t("Dev Workspace", "ui"),
+      tone: "warning",
+    });
+    return false;
+  }
+  const historyBefore = captureHistoryState({
+    sovereigntyFeatureIds: resolvedIds,
+  });
+  const changed = setFeatureOwnerCodes(resolvedIds, state.activeSovereignCode);
+  refreshResolvedColorsForFeatures(resolvedIds, { renderNow: false });
+  if (changed > 0) {
+    scheduleDynamicBorderRecompute(recomputeReason || kind || "dev-workspace-sovereignty-fill", 90);
+    markDirty(dirtyReason || kind || "fill-sovereignty");
+    commitHistoryEntry({
+      kind: kind || "fill-sovereignty",
+      before: historyBefore,
+      after: captureHistoryState({
+        sovereigntyFeatureIds: resolvedIds,
+      }),
+      affectsSovereignty: true,
+    });
+    if (context) {
+      render();
+    }
+    refreshSidebarAfterPaint({ featureIds: resolvedIds });
+    return true;
+  }
+  return false;
+}
+
+function eraseSovereigntyForIds(targetIds, { kind, dirtyReason, recomputeReason } = {}) {
+  const resolvedIds = Array.from(new Set((Array.isArray(targetIds) ? targetIds : [])
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)));
+  if (!resolvedIds.length) return false;
+  const historyBefore = captureHistoryState({
+    sovereigntyFeatureIds: resolvedIds,
+  });
+  const changed = resetFeatureOwnerCodes(resolvedIds);
+  refreshResolvedColorsForFeatures(resolvedIds, { renderNow: false });
+  if (changed > 0) {
+    scheduleDynamicBorderRecompute(recomputeReason || kind || "dev-workspace-sovereignty-reset", 90);
+    markDirty(dirtyReason || kind || "erase-sovereignty");
+    commitHistoryEntry({
+      kind: kind || "erase-sovereignty",
+      before: historyBefore,
+      after: captureHistoryState({
+        sovereigntyFeatureIds: resolvedIds,
+      }),
+      affectsSovereignty: true,
+    });
+    if (context) {
+      render();
+    }
+    refreshSidebarAfterPaint({ featureIds: resolvedIds });
+    return true;
+  }
+  return false;
+}
+
+function applyDevLandBatchAction(targetIds, {
+  ownerCodes = [],
+  visualKind = "dev-batch-fill",
+  visualDirtyReason = visualKind,
+  sovereigntyFillKind = "dev-batch-sovereignty-fill",
+  sovereigntyEraseKind = "dev-batch-sovereignty-reset",
+  recomputeReason = "dev-batch",
+} = {}) {
+  const resolvedIds = Array.from(new Set((Array.isArray(targetIds) ? targetIds : [])
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)));
+  if (!resolvedIds.length) return false;
+  if (state.currentTool === "eyedropper") {
+    showToast(t("Switch to Fill or Eraser before running a batch action.", "ui"), {
+      title: t("Dev Workspace", "ui"),
+      tone: "warning",
+    });
+    return false;
+  }
+  if (isSovereigntyModeActive()) {
+    return state.currentTool === "eraser"
+      ? eraseSovereigntyForIds(resolvedIds, {
+        kind: sovereigntyEraseKind,
+        dirtyReason: sovereigntyEraseKind,
+        recomputeReason,
+      })
+      : applySovereigntyFillToIds(resolvedIds, {
+        kind: sovereigntyFillKind,
+        dirtyReason: sovereigntyFillKind,
+        recomputeReason,
+      });
+  }
+  if (state.currentTool === "eraser") {
+    return eraseVisualOverridesForIds(resolvedIds, {
+      kind: `${visualKind}-erase`,
+      dirtyReason: `${visualDirtyReason}-erase`,
+    });
+  }
+  const color = getSafeCanvasColor(state.selectedColor, LAND_FILL_COLOR);
+  if (ownerCodes.length === 1) {
+    refreshSidebarAfterPaint({
+      featureIds: resolvedIds,
+      ownerCodes,
+    });
+  }
+  return applyVisualFillToResolvedIds(resolvedIds, color, visualKind, visualDirtyReason);
+}
+
+function applyDevMacroFillCurrentCountry() {
+  const contextInfo = getDevWorkspaceActiveLandContext();
+  if (!contextInfo?.countryCode) {
+    showToast(t("Select or hover a land feature first.", "ui"), {
+      title: t("Dev Workspace", "ui"),
+      tone: "warning",
+    });
+    return false;
+  }
+  const ids = getCountryFeatureIds(contextInfo.countryCode);
+  if (!ids.length) return false;
+  return applyDevLandBatchAction(ids, {
+    ownerCodes: [contextInfo.countryCode],
+    visualKind: "dev-fill-country",
+    visualDirtyReason: "dev-fill-country",
+    sovereigntyFillKind: "dev-fill-country-sovereignty",
+    sovereigntyEraseKind: "dev-erase-country-sovereignty",
+    recomputeReason: "dev-fill-country",
+  });
+}
+
+function applyDevMacroFillCurrentParentGroup() {
+  const contextInfo = getDevWorkspaceActiveLandContext();
+  if (!contextInfo) {
+    showToast(t("Select or hover a land feature first.", "ui"), {
+      title: t("Dev Workspace", "ui"),
+      tone: "warning",
+    });
+    return false;
+  }
+  const ids = resolveParentGroupTargetIds(contextInfo.feature, contextInfo.featureId);
+  if (!ids.length) {
+    showToast(t("No parent group is available for this feature.", "ui"), {
+      title: t("Dev Workspace", "ui"),
+      tone: "warning",
+    });
+    return false;
+  }
+  return applyDevLandBatchAction(ids, {
+    visualKind: "dev-fill-parent-group",
+    visualDirtyReason: "dev-fill-parent-group",
+    sovereigntyFillKind: "dev-fill-parent-group-sovereignty",
+    sovereigntyEraseKind: "dev-erase-parent-group-sovereignty",
+    recomputeReason: "dev-fill-parent-group",
+  });
+}
+
+function applyDevMacroFillCurrentOwnerScope() {
+  const contextInfo = getDevWorkspaceActiveLandContext();
+  if (!contextInfo) {
+    showToast(t("Select or hover a land feature first.", "ui"), {
+      title: t("Dev Workspace", "ui"),
+      tone: "warning",
+    });
+    return false;
+  }
+  const ownerCode = getFeatureOwnerCode(contextInfo.featureId) || contextInfo.countryCode;
+  const ids = getFeatureIdsForOwner(ownerCode)
+    .map((value) => String(value || "").trim())
+    .filter((featureId) => featureId && state.landIndex?.has(featureId));
+  if (!ids.length) {
+    showToast(t("No owner scope is available for this feature.", "ui"), {
+      title: t("Dev Workspace", "ui"),
+      tone: "warning",
+    });
+    return false;
+  }
+  return applyDevLandBatchAction(ids, {
+    ownerCodes: ownerCode ? [ownerCode] : [],
+    visualKind: "dev-fill-owner-scope",
+    visualDirtyReason: "dev-fill-owner-scope",
+    sovereigntyFillKind: "dev-fill-owner-scope-sovereignty",
+    sovereigntyEraseKind: "dev-erase-owner-scope-sovereignty",
+    recomputeReason: "dev-fill-owner-scope",
+  });
+}
+
+function applyDevSelectionFill() {
+  const ids = getDevSelectionIds();
+  if (!ids.length) {
+    showToast(t("No selected regions in the development selection.", "ui"), {
+      title: t("Dev Workspace", "ui"),
+      tone: "warning",
+    });
+    return false;
+  }
+  return applyDevLandBatchAction(ids, {
+    visualKind: "dev-fill-selection",
+    visualDirtyReason: "dev-fill-selection",
+    sovereigntyFillKind: "dev-fill-selection-sovereignty",
+    sovereigntyEraseKind: "dev-erase-selection-sovereignty",
+    recomputeReason: "dev-fill-selection",
+  });
 }
 
 function resolveInteractionTargetIds(feature, id) {
@@ -9264,6 +9784,7 @@ async function handleClick(event) {
   });
   const id = hit.id;
   if (!id) return;
+  updateDevSelectedHit(hit);
   if (hit.targetType === "special") {
     const specialFeature = state.specialRegionsById.get(id);
     if (!specialFeature) return;
@@ -9382,6 +9903,14 @@ async function handleClick(event) {
   let landId = id;
   let feature = state.landIndex.get(landId);
   if (!feature) return;
+  if (state.devSelectionModeEnabled && (event?.ctrlKey || event?.metaKey)) {
+    toggleFeatureInDevSelection(landId);
+    if (context) {
+      render();
+    }
+    noteRenderAction("dev-selection-toggle", actionStart);
+    return;
+  }
   let countryCode = landHit.countryCode || getFeatureCountryCodeNormalized(feature);
   if (!(await ensureLeafDetailReady(countryCode, { announce: true }))) {
     return;
@@ -9399,6 +9928,7 @@ async function handleClick(event) {
       landId = refreshedId;
       feature = refreshedFeature;
       countryCode = landHit.countryCode || getFeatureCountryCodeNormalized(feature);
+      updateDevSelectedHit(landHit);
     }
   }
   const targetIds = resolveInteractionTargetIds(feature, landId);
@@ -9791,6 +10321,7 @@ function bindEvents() {
     state.hoveredId = null;
     state.hoveredWaterRegionId = null;
     state.hoveredSpecialRegionId = null;
+    updateDevHoverHit(null);
     state.hoverOverlayDirty = true;
     renderHoverOverlayIfNeeded();
     queueTooltipUpdate({ visible: false });
@@ -9916,6 +10447,12 @@ function setMapData({ refitProjection = true, resetZoom = true } = {}) {
   layerResolverCache.primaryRef = null;
   layerResolverCache.detailRef = null;
   layerResolverCache.bundleMode = null;
+  state.devHoverHit = null;
+  state.devSelectedHit = null;
+  state.devSelectionFeatureIds = new Set();
+  state.devSelectionOrder = [];
+  state.devClipboardFallbackText = "";
+  state.devClipboardPreviewFormat = "names_with_ids";
   resetPhysicalLandClipPathCache();
   state.topologyRevision = Number(state.topologyRevision || 0) + 1;
   getRenderPassCacheState().referenceTransform = null;
@@ -10010,6 +10547,14 @@ export {
   scheduleDynamicBorderRecompute,
   invalidateOceanVisualState,
   setDebugMode,
+  addFeatureToDevSelection,
+  toggleFeatureInDevSelection,
+  removeLastDevSelection,
+  clearDevSelection,
+  applyDevMacroFillCurrentCountry,
+  applyDevMacroFillCurrentParentGroup,
+  applyDevMacroFillCurrentOwnerScope,
+  applyDevSelectionFill,
   getWaterRegionColor,
   getZoomPercent,
   resetZoomToFit,

@@ -1,7 +1,7 @@
 import { state } from "../core/state.js";
 import { FileManager } from "../core/file_manager.js";
 import { redoHistory, undoHistory } from "../core/history_manager.js";
-import { resetZoomToFit, undoSpecialZoneVertex, zoomByStep } from "../core/map_renderer.js";
+import { cancelSpecialZoneDraw, resetZoomToFit, undoSpecialZoneVertex, zoomByStep } from "../core/map_renderer.js";
 
 function isEditableTarget(target) {
   const node = target instanceof Element ? target : null;
@@ -32,6 +32,48 @@ function refreshAfterSpecialZoneShortcut() {
   }
 }
 
+function syncToolUi() {
+  if (typeof state.updateToolUIFn === "function") {
+    state.updateToolUIFn();
+  }
+}
+
+function toggleBrushMode() {
+  state.brushModeEnabled = !state.brushModeEnabled;
+  if (state.brushModeEnabled && state.currentTool === "eyedropper") {
+    state.currentTool = "fill";
+  }
+  syncToolUi();
+}
+
+function setBrushPanModifier(active) {
+  if (state.brushPanModifierActive === active) return;
+  state.brushPanModifierActive = active;
+  syncToolUi();
+}
+
+function pickQuickSwatch(index) {
+  const swatches = Array.from(document.querySelectorAll("#paletteGrid .color-swatch"));
+  const button = swatches[index];
+  const color = String(button?.dataset?.color || "").trim();
+  if (!color) return false;
+  state.selectedColor = color;
+  if (typeof state.updateSwatchUIFn === "function") {
+    state.updateSwatchUIFn();
+  }
+  return true;
+}
+
+function cyclePaintGranularity(direction = 1) {
+  const select = document.getElementById("paintGranularitySelect");
+  if (!select || !select.options?.length) return false;
+  const currentIndex = Math.max(0, select.selectedIndex);
+  const nextIndex = (currentIndex + direction + select.options.length) % select.options.length;
+  select.selectedIndex = nextIndex;
+  select.dispatchEvent(new Event("change", { bubbles: true }));
+  return true;
+}
+
 function initShortcuts() {
   if (document.body?.dataset.shortcutsBound === "true") return;
 
@@ -39,23 +81,23 @@ function initShortcuts() {
     const key = String(event.key || "");
     const lower = key.toLowerCase();
     const modifier = event.metaKey || event.ctrlKey;
+    const editableTarget = isEditableTarget(event.target);
+
+    if (editableTarget) {
+      return;
+    }
 
     if (key === "Shift") {
-      if (!state.brushPanModifierActive) {
-        state.brushPanModifierActive = true;
-        if (typeof state.updateToolUIFn === "function") {
-          state.updateToolUIFn();
-        }
-      }
+      setBrushPanModifier(true);
+    }
+
+    if (key === " ") {
+      setBrushPanModifier(true);
     }
 
     if (modifier && lower === "s") {
       event.preventDefault();
       FileManager.exportProject(state);
-      return;
-    }
-
-    if (isEditableTarget(event.target)) {
       return;
     }
 
@@ -85,14 +127,49 @@ function initShortcuts() {
       setCurrentTool("fill");
       return;
     }
+    if (!modifier && lower === "q") {
+      event.preventDefault();
+      setCurrentTool("fill");
+      return;
+    }
+    if (!modifier && lower === "w") {
+      event.preventDefault();
+      setCurrentTool("eraser");
+      return;
+    }
     if (!modifier && lower === "e") {
       event.preventDefault();
       setCurrentTool("eraser");
       return;
     }
+    if (!modifier && lower === "b") {
+      event.preventDefault();
+      toggleBrushMode();
+      return;
+    }
+    if (!modifier && lower === "g") {
+      event.preventDefault();
+      cyclePaintGranularity(1);
+      return;
+    }
     if (!modifier && lower === "i") {
       event.preventDefault();
       setCurrentTool("eyedropper");
+      return;
+    }
+    if (!modifier && key === "[") {
+      event.preventDefault();
+      cyclePaintGranularity(-1);
+      return;
+    }
+    if (!modifier && key === "]") {
+      event.preventDefault();
+      cyclePaintGranularity(1);
+      return;
+    }
+    if (!modifier && /^[1-6]$/.test(key)) {
+      event.preventDefault();
+      pickQuickSwatch(Number(key) - 1);
       return;
     }
     if (!modifier && (key === "+" || key === "=")) {
@@ -108,24 +185,31 @@ function initShortcuts() {
     if (!modifier && key === "0") {
       event.preventDefault();
       resetZoomToFit();
+      return;
+    }
+    if (!modifier && key === "Escape") {
+      if (state.specialZoneEditor?.active) {
+        event.preventDefault();
+        cancelSpecialZoneDraw();
+        refreshAfterSpecialZoneShortcut();
+        return;
+      }
+      if (state.brushModeEnabled) {
+        event.preventDefault();
+        state.brushModeEnabled = false;
+        setBrushPanModifier(false);
+        syncToolUi();
+      }
     }
   });
 
   window.addEventListener("keyup", (event) => {
-    if (event.key !== "Shift") return;
-    if (!state.brushPanModifierActive) return;
-    state.brushPanModifierActive = false;
-    if (typeof state.updateToolUIFn === "function") {
-      state.updateToolUIFn();
-    }
+    if (event.key !== "Shift" && event.key !== " ") return;
+    setBrushPanModifier(false);
   });
 
   window.addEventListener("blur", () => {
-    if (!state.brushPanModifierActive) return;
-    state.brushPanModifierActive = false;
-    if (typeof state.updateToolUIFn === "function") {
-      state.updateToolUIFn();
-    }
+    setBrushPanModifier(false);
   });
 
   if (document.body) {

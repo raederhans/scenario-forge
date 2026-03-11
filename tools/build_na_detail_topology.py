@@ -33,7 +33,13 @@ from map_builder.processors.denmark_border_detail import apply_denmark_border_de
 from map_builder.processors.global_basic_admin1 import apply_global_basic_admin1_replacement
 from map_builder.processors.north_america import apply_north_america_replacement
 from map_builder.processors.russia_ukraine import apply_russia_ukraine_replacement
-from init_map_data import apply_config_subdivisions
+
+try:
+    from init_map_data import apply_config_subdivisions
+    APPLY_CONFIG_SUBDIVISIONS_IMPORT_ERROR = None
+except BaseException as exc:  # pragma: no cover - optional build-time dependency chain
+    apply_config_subdivisions = None
+    APPLY_CONFIG_SUBDIVISIONS_IMPORT_ERROR = exc
 
 try:
     import resource
@@ -44,6 +50,7 @@ LAYER_NAMES = ("political", "special_zones", "water_regions", "ocean", "land", "
 SPECIAL_NAME_FALLBACKS = {
     "RUS+99?": "Russia Special Region",
 }
+MAX_SHELL_COVERAGE_REPAIR_PASSES = 6
 
 
 def _get_peak_memory_mb() -> float | None:
@@ -449,7 +456,13 @@ def main() -> None:
         layers.get("land"),
     )
     if getattr(cfg, "ENABLE_SUBDIVISION_ENRICHMENT", False):
-        patched_political = apply_config_subdivisions(patched_political)
+        if callable(apply_config_subdivisions):
+            patched_political = apply_config_subdivisions(patched_political)
+        else:
+            print(
+                "[Detail patch] Subdivision enrichment skipped: "
+                f"{APPLY_CONFIG_SUBDIVISIONS_IMPORT_ERROR}"
+            )
     patched_political = _repair_political_metadata(patched_political)
     patched_political = _repair_political_geometries(patched_political)
     layers["political"] = patched_political
@@ -515,7 +528,7 @@ def main() -> None:
     if primary_layers is not None:
         repair_start = time.perf_counter()
         repair_passes = 0
-        for repair_pass in range(1, 4):
+        for repair_pass in range(1, MAX_SHELL_COVERAGE_REPAIR_PASSES + 1):
             output_dict = _load_topology(output_path)
             output_political = _topology_object_to_gdf(output_dict, "political")
             gaps = collect_shell_coverage_gaps(

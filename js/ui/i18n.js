@@ -270,6 +270,9 @@ function updateUIText() {
   if (typeof state.updatePaintModeUIFn === "function") {
     state.updatePaintModeUIFn();
   }
+  if (typeof state.updateDevWorkspaceUIFn === "function") {
+    state.updateDevWorkspaceUIFn();
+  }
 
   const searchInput = document.getElementById("countrySearch");
   if (searchInput) {
@@ -416,6 +419,9 @@ function toggleLanguage() {
   }
   if (typeof state.updatePaintModeUIFn === "function") {
     state.updatePaintModeUIFn();
+  }
+  if (typeof state.updateDevWorkspaceUIFn === "function") {
+    state.updateDevWorkspaceUIFn();
   }
   if (typeof state.updateSpecialZoneEditorUIFn === "function") {
     state.updateSpecialZoneEditorUIFn();

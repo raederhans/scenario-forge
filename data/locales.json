@@ -364,6 +364,294 @@
       "en": "Copy",
       "zh": "复制"
     },
+    "Copy ID": {
+      "en": "Copy ID",
+      "zh": "复制 ID"
+    },
+    "Copy Names": {
+      "en": "Copy Names",
+      "zh": "复制名称"
+    },
+    "Copy Names + ID": {
+      "en": "Copy Names + ID",
+      "zh": "复制名称 + ID"
+    },
+    "Clipboard API unavailable. The preview text is selected for manual copy.": {
+      "en": "Clipboard API unavailable. The preview text is selected for manual copy.",
+      "zh": "剪贴板 API 不可用，已选中预览文本，方便手动复制。"
+    },
+    "Clipboard write failed. The preview text is selected for manual copy.": {
+      "en": "Clipboard write failed. The preview text is selected for manual copy.",
+      "zh": "写入剪贴板失败，已选中预览文本，方便手动复制。"
+    },
+    "Controller": {
+      "en": "Controller",
+      "zh": "控制方"
+    },
+    "Action Time": {
+      "en": "Action Time",
+      "zh": "操作耗时"
+    },
+    "Border Reason": {
+      "en": "Border Reason",
+      "zh": "边界原因"
+    },
+    "Borders Pass": {
+      "en": "Borders Pass",
+      "zh": "边界渲染"
+    },
+    "Bundle Mode": {
+      "en": "Bundle Mode",
+      "zh": "打包模式"
+    },
+    "Dev": {
+      "en": "Dev",
+      "zh": "开发"
+    },
+    "Dev Workspace": {
+      "en": "Dev Workspace",
+      "zh": "开发工作台"
+    },
+    "Development selection preview": {
+      "en": "Development selection preview",
+      "zh": "开发多选预览"
+    },
+    "Development tools take over the center dock while enabled.": {
+      "en": "Development tools take over the center dock while enabled.",
+      "zh": "启用后，开发工具会接管中间快捷栏。"
+    },
+    "Detail Deferred": {
+      "en": "Detail Deferred",
+      "zh": "细节延迟加载"
+    },
+    "Detail Source": {
+      "en": "Detail Source",
+      "zh": "细节来源"
+    },
+    "Detail Tier": {
+      "en": "Detail Tier",
+      "zh": "细节层级"
+    },
+    "Dynamic Borders": {
+      "en": "Dynamic Borders",
+      "zh": "动态边界"
+    },
+    "Feature Inspector": {
+      "en": "Feature Inspector",
+      "zh": "地块检查器"
+    },
+    "Fill Country": {
+      "en": "Fill Country",
+      "zh": "填充国家"
+    },
+    "Fill Multi-Selection": {
+      "en": "Fill Multi-Selection",
+      "zh": "填充多选"
+    },
+    "Fill Owner Scope": {
+      "en": "Fill Owner Scope",
+      "zh": "填充所属范围"
+    },
+    "Fill Parent Group": {
+      "en": "Fill Parent Group",
+      "zh": "填充父级分组"
+    },
+    "Hide development workspace": {
+      "en": "Hide development workspace",
+      "zh": "隐藏开发工作台"
+    },
+    "Hit Canvas": {
+      "en": "Hit Canvas",
+      "zh": "命中画布"
+    },
+    "Hit Source": {
+      "en": "Hit Source",
+      "zh": "命中来源"
+    },
+    "Hover a region or click one to inspect live debug metadata.": {
+      "en": "Hover a region or click one to inspect live debug metadata.",
+      "zh": "悬停或点击地块以查看实时调试信息。"
+    },
+    "Last Action": {
+      "en": "Last Action",
+      "zh": "最近操作"
+    },
+    "Last Frame": {
+      "en": "Last Frame",
+      "zh": "最近一帧"
+    },
+    "Local Runtime": {
+      "en": "Local Runtime",
+      "zh": "本地运行时"
+    },
+    "Name": {
+      "en": "Name",
+      "zh": "名称"
+    },
+    "Neighbors": {
+      "en": "Neighbors",
+      "zh": "邻接数"
+    },
+    "No": {
+      "en": "No",
+      "zh": "否"
+    },
+    "No active feature": {
+      "en": "No active feature",
+      "zh": "当前没有激活地块"
+    },
+    "No active sovereign selected.": {
+      "en": "No active sovereign selected.",
+      "zh": "当前没有激活所属。"
+    },
+    "No data yet.": {
+      "en": "No data yet.",
+      "zh": "暂无数据。"
+    },
+    "No owner scope is available for this feature.": {
+      "en": "No owner scope is available for this feature.",
+      "zh": "这个地块没有可用的所属范围。"
+    },
+    "No parent group is available for this feature.": {
+      "en": "No parent group is available for this feature.",
+      "zh": "这个地块没有可用的父级分组。"
+    },
+    "No selected regions in the development selection.": {
+      "en": "No selected regions in the development selection.",
+      "zh": "开发多选中没有已选地块。"
+    },
+    "Open Path": {
+      "en": "Open Path",
+      "zh": "打开路径"
+    },
+    "Owner": {
+      "en": "Owner",
+      "zh": "所属方"
+    },
+    "Paint Macros": {
+      "en": "Paint Macros",
+      "zh": "绘图宏操作"
+    },
+    "Parent Group": {
+      "en": "Parent Group",
+      "zh": "父级分组"
+    },
+    "Phase": {
+      "en": "Phase",
+      "zh": "阶段"
+    },
+    "Political Pass": {
+      "en": "Political Pass",
+      "zh": "政治渲染"
+    },
+    "Port": {
+      "en": "Port",
+      "zh": "端口"
+    },
+    "Render Profile": {
+      "en": "Render Profile",
+      "zh": "渲染档位"
+    },
+    "Render Status": {
+      "en": "Render Status",
+      "zh": "渲染状态"
+    },
+    "Runtime metadata is only available on localhost.": {
+      "en": "Runtime metadata is only available on localhost.",
+      "zh": "运行时元数据仅在 localhost 下可用。"
+    },
+    "Runtime metadata is only available on the local dev server.": {
+      "en": "Runtime metadata is only available on the local dev server.",
+      "zh": "运行时元数据仅在本地开发服务器上可用。"
+    },
+    "Runtime metadata not available yet.": {
+      "en": "Runtime metadata not available yet.",
+      "zh": "运行时元数据暂不可用。"
+    },
+    "Selection Clipboard": {
+      "en": "Selection Clipboard",
+      "zh": "多选剪贴板"
+    },
+    "Selection copied": {
+      "en": "Selection copied",
+      "zh": "多选已复制"
+    },
+    "Selection Order": {
+      "en": "Selection Order",
+      "zh": "选择顺序"
+    },
+    "Show development workspace": {
+      "en": "Show development workspace",
+      "zh": "显示开发工作台"
+    },
+    "Sort": {
+      "en": "Sort",
+      "zh": "排序"
+    },
+    "Source Topology": {
+      "en": "Source Topology",
+      "zh": "来源拓扑"
+    },
+    "Spatial Index": {
+      "en": "Spatial Index",
+      "zh": "空间索引"
+    },
+    "Started": {
+      "en": "Started",
+      "zh": "启动时间"
+    },
+    "Static Meshes": {
+      "en": "Static Meshes",
+      "zh": "静态网格"
+    },
+    "Strict hit": {
+      "en": "Strict hit",
+      "zh": "严格命中"
+    },
+    "Snap": {
+      "en": "Snap",
+      "zh": "吸附"
+    },
+    "Snap hit": {
+      "en": "Snap hit",
+      "zh": "吸附命中"
+    },
+    "Switch to Fill or Eraser before running a batch action.": {
+      "en": "Switch to Fill or Eraser before running a batch action.",
+      "zh": "运行批量操作前，请先切换到填充或橡皮擦。"
+    },
+    "Target": {
+      "en": "Target",
+      "zh": "目标"
+    },
+    "These actions reuse the current tool mode and selected color or owner.": {
+      "en": "These actions reuse the current tool mode and selected color or owner.",
+      "zh": "这些操作会复用当前工具模式以及选中的颜色或所属。"
+    },
+    "Toggle Selected": {
+      "en": "Toggle Selected",
+      "zh": "切换所选"
+    },
+    "Add Hovered": {
+      "en": "Add Hovered",
+      "zh": "添加悬停项"
+    },
+    "Remove Last": {
+      "en": "Remove Last",
+      "zh": "移除最后一项"
+    },
+    "Topology Variant": {
+      "en": "Topology Variant",
+      "zh": "拓扑变体"
+    },
+    "Yes": {
+      "en": "Yes",
+      "zh": "是"
+    },
+    "Select or hover a land feature first.": {
+      "en": "Select or hover a land feature first.",
+      "zh": "请先选择或悬停一个陆地地块。"
+    },
     "Core Territory": {
       "en": "Core Territory",
       "zh": "核心领土"
@@ -3164,11 +3452,11 @@
     },
     "Alatyr": {
       "en": "Alatyr",
-      "zh": "阿拉泰尔"
+      "zh": "阿拉季尔"
     },
     "Alatyr (RU)": {
       "en": "Alatyr (RU)",
-      "zh": "阿拉泰尔"
+      "zh": "阿拉季尔"
     },
     "Alatyrsky District": {
       "en": "Alatyrsky District",
@@ -3736,7 +4024,7 @@
     },
     "Alytaus apskritis": {
       "en": "Alytaus apskritis",
-      "zh": "尖吻蝽"
+      "zh": "阿利滕"
     },
     "Alytaus apskritis (LT)": {
       "en": "Alytaus apskritis (LT)",
@@ -5940,11 +6228,11 @@
     },
     "Arzamas": {
       "en": "Arzamas",
-      "zh": "阿尔扎马斯"
+      "zh": "阿尔萨马斯"
     },
     "Arzamas (RU)": {
       "en": "Arzamas (RU)",
-      "zh": "阿尔扎马斯"
+      "zh": "阿尔萨马斯"
     },
     "Arzamassky District": {
       "en": "Arzamassky District",
@@ -7332,7 +7620,7 @@
     },
     "Bakhmut": {
       "en": "Bakhmut",
-      "zh": "巴克穆特"
+      "zh": "萨尔茨施塔特"
     },
     "Bakhmut (UA)": {
       "en": "Bakhmut (UA)",
@@ -7364,7 +7652,7 @@
     },
     "Bakı": {
       "en": "Bakı",
-      "zh": "巴基"
+      "zh": "阿塞尔施塔特"
     },
     "Bakı (AZ)": {
       "en": "Bakı (AZ)",
@@ -9512,7 +9800,7 @@
     },
     "Berdychiv": {
       "en": "Berdychiv",
-      "zh": "别尔季奇夫"
+      "zh": "别尔季切夫"
     },
     "Berdychiv (UA)": {
       "en": "Berdychiv (UA)",
@@ -10108,7 +10396,7 @@
     },
     "Bila Tserkva": {
       "en": "Bila Tserkva",
-      "zh": "比拉采尔科瓦"
+      "zh": "白教堂"
     },
     "Bila Tserkva (UA)": {
       "en": "Bila Tserkva (UA)",
@@ -11360,7 +11648,7 @@
     },
     "Boryspil": {
       "en": "Boryspil",
-      "zh": "鲍里斯波尔"
+      "zh": "博里斯波尔"
     },
     "Boryspil (UA)": {
       "en": "Boryspil (UA)",
@@ -11947,8 +12235,8 @@
       "zh": "布雷叙尔"
     },
     "Brest": {
-      "en": "Brest",
-      "zh": "布雷斯特"
+      "en": "Brest-Litowsk",
+      "zh": "布列斯特-立托夫斯克"
     },
     "Brest (BY)": {
       "en": "Brest (BY)",
@@ -11960,7 +12248,7 @@
     },
     "Brest Interior": {
       "en": "Brest Interior",
-      "zh": "布雷斯特内饰"
+      "zh": "布列斯特-立托夫斯克内地"
     },
     "Brest Interior (BY)": {
       "en": "Brest Interior (BY)",
@@ -12144,15 +12432,15 @@
     },
     "Brno-City": {
       "en": "Brno-City",
-      "zh": "布尔诺市"
+      "zh": "布伦"
     },
     "Brno-City (CZ)": {
       "en": "Brno-City (CZ)",
-      "zh": "布尔诺市"
+      "zh": "布伦"
     },
     "Brno-City [Jihomoravský kraj]": {
       "en": "Brno-City [Jihomoravský kraj]",
-      "zh": "布尔诺市"
+      "zh": "布伦"
     },
     "Brno-Country": {
       "en": "Brno-Country",
@@ -12340,11 +12628,11 @@
     },
     "Bryansk": {
       "en": "Bryansk",
-      "zh": "布良斯克"
+      "zh": "施佩尔施塔特"
     },
     "Bryansk (RU)": {
       "en": "Bryansk (RU)",
-      "zh": "布良斯克"
+      "zh": "施佩尔施塔特"
     },
     "Bryansky District": {
       "en": "Bryansky District",
@@ -12932,11 +13220,11 @@
     },
     "Bydgoszcz": {
       "en": "Bydgoszcz",
-      "zh": "比得哥什"
+      "zh": "布龙贝格"
     },
     "Bydgoszcz (PL)": {
       "en": "Bydgoszcz (PL)",
-      "zh": "比得哥什"
+      "zh": "布龙贝格"
     },
     "Byen København": {
       "en": "Byen København",
@@ -12972,11 +13260,11 @@
     },
     "Bytom": {
       "en": "Bytom",
-      "zh": "比原链"
+      "zh": "博伊滕"
     },
     "Bytom (PL)": {
       "en": "Bytom (PL)",
-      "zh": "比原链"
+      "zh": "博伊滕"
     },
     "Bà Rịa - Vũng Tàu": {
       "en": "Bà Rịa - Vũng Tàu",
@@ -15388,15 +15676,15 @@
     },
     "Cheb": {
       "en": "Cheb",
-      "zh": "切布"
+      "zh": "埃格尔"
     },
     "Cheb (CZ)": {
       "en": "Cheb (CZ)",
-      "zh": "切布"
+      "zh": "埃格尔"
     },
     "Cheb [Karlovarský kraj]": {
       "en": "Cheb [Karlovarský kraj]",
-      "zh": "切布"
+      "zh": "埃格尔"
     },
     "Chebarkul": {
       "en": "Chebarkul",
@@ -15756,7 +16044,7 @@
     },
     "Cherkasy": {
       "en": "Cherkasy",
-      "zh": "切尔卡瑟"
+      "zh": "切尔卡森"
     },
     "Cherkasy (UA)": {
       "en": "Cherkasy (UA)",
@@ -15928,7 +16216,7 @@
     },
     "Chełm": {
       "en": "Chełm",
-      "zh": "海乌姆"
+      "zh": "霍尔姆"
     },
     "Chełm (PL)": {
       "en": "Chełm (PL)",
@@ -16792,7 +17080,7 @@
     },
     "Chuhuiv": {
       "en": "Chuhuiv",
-      "zh": "楚胡伊夫"
+      "zh": "楚古耶夫"
     },
     "Chuhuiv (UA)": {
       "en": "Chuhuiv (UA)",
@@ -17760,11 +18048,11 @@
     },
     "Commercy": {
       "en": "Commercy",
-      "zh": "商业"
+      "zh": "科梅尔西"
     },
     "Commercy (FR)": {
       "en": "Commercy (FR)",
-      "zh": "商业"
+      "zh": "科梅尔西"
     },
     "Commewijne": {
       "en": "Commewijne",
@@ -18536,7 +18824,7 @@
     },
     "Częstochowa": {
       "en": "Częstochowa",
-      "zh": "琴斯托霍瓦"
+      "zh": "琴申斯托豪"
     },
     "Częstochowa (PL)": {
       "en": "Częstochowa (PL)",
@@ -21664,7 +21952,7 @@
     },
     "Dnipro": {
       "en": "Dnipro",
-      "zh": "第聂伯河"
+      "zh": "第聂普施塔特"
     },
     "Dnipro (UA)": {
       "en": "Dnipro (UA)",
@@ -22404,15 +22692,15 @@
     },
     "Dubna": {
       "en": "Dubna",
-      "zh": "杜布纳"
+      "zh": "杜贝瑙"
     },
     "Dubna (RU)": {
       "en": "Dubna (RU)",
-      "zh": "杜布纳"
+      "zh": "杜贝瑙"
     },
     "Dubno": {
       "en": "Dubno",
-      "zh": "杜布诺"
+      "zh": "杜本"
     },
     "Dubno (UA)": {
       "en": "Dubno (UA)",
@@ -23860,19 +24148,19 @@
     },
     "Elektrogorsk": {
       "en": "Elektrogorsk",
-      "zh": "埃列克特罗戈尔斯克"
+      "zh": "施特龙贝格"
     },
     "Elektrogorsk (RU)": {
       "en": "Elektrogorsk (RU)",
-      "zh": "埃列克特罗戈尔斯克"
+      "zh": "施特龙贝格"
     },
     "Elektrostal": {
       "en": "Elektrostal",
-      "zh": "埃莱克特罗斯塔尔"
+      "zh": "施塔尔施塔特"
     },
     "Elektrostal (RU)": {
       "en": "Elektrostal (RU)",
-      "zh": "埃莱克特罗斯塔尔"
+      "zh": "施塔尔施塔特"
     },
     "Elgin—St. Thomas—London South": {
       "en": "Elgin—St. Thomas—London South",
@@ -24864,7 +25152,7 @@
     },
     "Fastiv": {
       "en": "Fastiv",
-      "zh": "法斯蒂夫"
+      "zh": "法斯托夫"
     },
     "Fastiv (UA)": {
       "en": "Fastiv (UA)",
@@ -26972,11 +27260,11 @@
     },
     "Gdańsk": {
       "en": "Gdańsk",
-      "zh": "格但斯克"
+      "zh": "但泽"
     },
     "Gdańsk (PL)": {
       "en": "Gdańsk (PL)",
-      "zh": "格但斯克"
+      "zh": "但泽"
     },
     "Gdovsky District": {
       "en": "Gdovsky District",
@@ -26988,11 +27276,11 @@
     },
     "Gdynia": {
       "en": "Gdynia",
-      "zh": "格丁尼亚"
+      "zh": "戈滕哈芬"
     },
     "Gdynia (PL)": {
       "en": "Gdynia (PL)",
-      "zh": "格丁尼亚"
+      "zh": "戈滕哈芬"
     },
     "Gedo": {
       "en": "Gedo",
@@ -27848,7 +28136,7 @@
     },
     "Gomel Interior": {
       "en": "Gomel Interior",
-      "zh": "戈梅利内饰"
+      "zh": "霍梅尔内地"
     },
     "Gomel Interior (BY)": {
       "en": "Gomel Interior (BY)",
@@ -28580,7 +28868,7 @@
     },
     "Grodno Interior": {
       "en": "Grodno Interior",
-      "zh": "格罗德诺内政"
+      "zh": "格罗德诺内地"
     },
     "Grodno Interior (BY)": {
       "en": "Grodno Interior (BY)",
@@ -28624,7 +28912,7 @@
     },
     "Grozny": {
       "en": "Grozny",
-      "zh": "格罗兹尼"
+      "zh": "捷列克施塔特"
     },
     "Grozny (RU)": {
       "en": "Grozny (RU)",
@@ -29720,7 +30008,7 @@
     },
     "Gəncə": {
       "en": "Gəncə",
-      "zh": "甘贾"
+      "zh": "伊丽莎白波尔"
     },
     "Gəncə (AZ)": {
       "en": "Gəncə (AZ)",
@@ -29816,7 +30104,7 @@
     },
     "Hadiach": {
       "en": "Hadiach",
-      "zh": "哈迪亚克"
+      "zh": "哈佳奇"
     },
     "Hadiach (UA)": {
       "en": "Hadiach (UA)",
@@ -29964,7 +30252,7 @@
     },
     "Haisyn": {
       "en": "Haisyn",
-      "zh": "我闻到"
+      "zh": "海辛"
     },
     "Haisyn (UA)": {
       "en": "Haisyn (UA)",
@@ -31832,7 +32120,7 @@
     },
     "Hlukhiv": {
       "en": "Hlukhiv",
-      "zh": "赫卢希夫"
+      "zh": "格卢霍夫"
     },
     "Hlukhiv (UA)": {
       "en": "Hlukhiv (UA)",
@@ -34748,11 +35036,11 @@
     },
     "Ivanovo": {
       "en": "Ivanovo",
-      "zh": "伊万诺沃"
+      "zh": "约翰尼斯施塔特"
     },
     "Ivanovo (RU)": {
       "en": "Ivanovo (RU)",
-      "zh": "伊万诺沃"
+      "zh": "约翰尼斯施塔特"
     },
     "Ivanovsky District": {
       "en": "Ivanovsky District",
@@ -34860,7 +35148,7 @@
     },
     "Izium": {
       "en": "Izium",
-      "zh": "伊兹乌姆"
+      "zh": "伊久姆"
     },
     "Izium (UA)": {
       "en": "Izium (UA)",
@@ -36292,11 +36580,11 @@
     },
     "Jinggudaizhuyizuzizhixian": {
       "en": "Jinggudaizhuyizuzizhixian",
-      "zh": "景谷代珠一族自治县"
+      "zh": "景谷傣族彝族自治县"
     },
     "Jinggudaizhuyizuzizhixian (CN)": {
       "en": "Jinggudaizhuyizuzizhixian (CN)",
-      "zh": "景谷代珠一族自治县"
+      "zh": "景谷傣族彝族自治县"
     },
     "Jinghaixian": {
       "en": "Jinghaixian",
@@ -36340,11 +36628,11 @@
     },
     "Jinglexian": {
       "en": "Jinglexian",
-      "zh": "精乐贤"
+      "zh": "精乐县"
     },
     "Jinglexian (CN)": {
       "en": "Jinglexian (CN)",
-      "zh": "精乐贤"
+      "zh": "精乐县"
     },
     "Jingmen": {
       "en": "Jingmen",
@@ -36356,11 +36644,11 @@
     },
     "Jingningshezuzizhixian": {
       "en": "Jingningshezuzizhixian",
-      "zh": "静宁社族自治县"
+      "zh": "景宁畲族自治县"
     },
     "Jingningshezuzizhixian (CN)": {
       "en": "Jingningshezuzizhixian (CN)",
-      "zh": "静宁社族自治县"
+      "zh": "景宁畲族自治县"
     },
     "Jingningxian": {
       "en": "Jingningxian",
@@ -36420,11 +36708,11 @@
     },
     "Jingzhoumiaozhudongzuzizhixian": {
       "en": "Jingzhoumiaozhudongzuzizhixian",
-      "zh": "荆州庙珠洞祖子之线"
+      "zh": "荆州苗族侗族自治县"
     },
     "Jingzhoumiaozhudongzuzizhixian (CN)": {
       "en": "Jingzhoumiaozhudongzuzizhixian (CN)",
-      "zh": "荆州庙珠洞祖子之线"
+      "zh": "荆州苗族侗族自治县"
     },
     "Jinhua": {
       "en": "Jinhua",
@@ -36480,7 +36768,7 @@
     },
     "Jinpingmiaozhuyaozhudaizuzizhixian": {
       "en": "Jinpingmiaozhuyaozhudaizuzizhixian",
-      "zh": "金平庙珠窑竹黛族自治县"
+      "zh": "净瓶苗族瑶族傣族资质"
     },
     "Jinpingmiaozhuyaozhudaizuzizhixian (CN)": {
       "en": "Jinpingmiaozhuyaozhudaizuzizhixian (CN)",
@@ -37456,11 +37744,11 @@
     },
     "Kaliningrad": {
       "en": "Kaliningrad",
-      "zh": "加里宁格勒"
+      "zh": "柯尼斯堡"
     },
     "Kaliningrad (RU)": {
       "en": "Kaliningrad (RU)",
-      "zh": "加里宁格勒"
+      "zh": "柯尼斯堡"
     },
     "Kalininsky District": {
       "en": "Kalininsky District",
@@ -37588,7 +37876,7 @@
     },
     "Kamianets-Podilskyi": {
       "en": "Kamianets-Podilskyi",
-      "zh": "卡缅涅茨-波多利斯基"
+      "zh": "卡缅涅茨-波多尔斯克"
     },
     "Kamianets-Podilskyi (UA)": {
       "en": "Kamianets-Podilskyi (UA)",
@@ -37700,11 +37988,11 @@
     },
     "Kamyshin": {
       "en": "Kamyshin",
-      "zh": "卡梅申"
+      "zh": "卡梅施"
     },
     "Kamyshin (RU)": {
       "en": "Kamyshin (RU)",
-      "zh": "卡梅申"
+      "zh": "卡梅施"
     },
     "Kamyshinsky District": {
       "en": "Kamyshinsky District",
@@ -37912,7 +38200,7 @@
     },
     "Kaniv": {
       "en": "Kaniv",
-      "zh": "卡尼夫"
+      "zh": "卡涅夫"
     },
     "Kaniv (UA)": {
       "en": "Kaniv (UA)",
@@ -38428,15 +38716,15 @@
     },
     "Karlovy Vary": {
       "en": "Karlovy Vary",
-      "zh": "卡罗维发利"
+      "zh": "卡尔斯巴德"
     },
     "Karlovy Vary (CZ)": {
       "en": "Karlovy Vary (CZ)",
-      "zh": "卡罗维发利"
+      "zh": "卡尔斯巴德"
     },
     "Karlovy Vary [Karlovarský kraj]": {
       "en": "Karlovy Vary [Karlovarský kraj]",
-      "zh": "卡罗维发利"
+      "zh": "卡尔斯巴德"
     },
     "Karlsruhe, Landkreis": {
       "en": "Karlsruhe, Landkreis",
@@ -38692,11 +38980,11 @@
     },
     "Kastsyukovichy": {
       "en": "Kastsyukovichy",
-      "zh": "卡斯久科维奇"
+      "zh": "卡斯琴"
     },
     "Kastsyukovichy (BY)": {
       "en": "Kastsyukovichy (BY)",
-      "zh": "卡斯久科维奇"
+      "zh": "卡斯琴"
     },
     "Kastsyukovichy [Mogilev]": {
       "en": "Kastsyukovichy [Mogilev]",
@@ -38776,11 +39064,11 @@
     },
     "Katowice": {
       "en": "Katowice",
-      "zh": "卡托维兹"
+      "zh": "卡托维茨"
     },
     "Katowice (PL)": {
       "en": "Katowice (PL)",
-      "zh": "卡托维兹"
+      "zh": "卡托维茨"
     },
     "Katsina State": {
       "en": "Katsina State",
@@ -38828,7 +39116,7 @@
     },
     "Kauno apskritis": {
       "en": "Kauno apskritis",
-      "zh": "考纳斯县"
+      "zh": "考恩"
     },
     "Kauno apskritis (LT)": {
       "en": "Kauno apskritis (LT)",
@@ -39840,7 +40128,7 @@
     },
     "Khmelnytskyi": {
       "en": "Khmelnytskyi",
-      "zh": "赫梅利尼茨基"
+      "zh": "普罗斯库罗夫"
     },
     "Khmelnytskyi (UA)": {
       "en": "Khmelnytskyi (UA)",
@@ -39848,7 +40136,7 @@
     },
     "Khmilnyk": {
       "en": "Khmilnyk",
-      "zh": "赫米尔尼克"
+      "zh": "赫米利尼克"
     },
     "Khmilnyk (UA)": {
       "en": "Khmilnyk (UA)",
@@ -39968,11 +40256,11 @@
     },
     "Khotsimsk": {
       "en": "Khotsimsk",
-      "zh": "霍特西姆斯克"
+      "zh": "霍季姆斯克"
     },
     "Khotsimsk (BY)": {
       "en": "Khotsimsk (BY)",
-      "zh": "霍特西姆斯克"
+      "zh": "霍季姆斯克"
     },
     "Khotsimsk [Mogilev]": {
       "en": "Khotsimsk [Mogilev]",
@@ -40256,11 +40544,11 @@
     },
     "Kimry": {
       "en": "Kimry",
-      "zh": "基姆里"
+      "zh": "基默恩"
     },
     "Kimry (RU)": {
       "en": "Kimry (RU)",
-      "zh": "基姆里"
+      "zh": "基默恩"
     },
     "Kindia": {
       "en": "Kindia",
@@ -40288,11 +40576,11 @@
     },
     "Kineshma": {
       "en": "Kineshma",
-      "zh": "基内什玛"
+      "zh": "金讷斯海姆"
     },
     "Kineshma (RU)": {
       "en": "Kineshma (RU)",
-      "zh": "基内什玛"
+      "zh": "金讷斯海姆"
     },
     "King": {
       "en": "King",
@@ -40692,7 +40980,7 @@
     },
     "Klaipėdos apskritis": {
       "en": "Klaipėdos apskritis",
-      "zh": "克莱佩达县"
+      "zh": "梅梅尔"
     },
     "Klaipėdos apskritis (LT)": {
       "en": "Klaipėdos apskritis (LT)",
@@ -40760,11 +41048,11 @@
     },
     "Klimavichy": {
       "en": "Klimavichy",
-      "zh": "克利马维奇"
+      "zh": "克利莫维茨"
     },
     "Klimavichy (BY)": {
       "en": "Klimavichy (BY)",
-      "zh": "克利马维奇"
+      "zh": "克利莫维茨"
     },
     "Klimavichy [Mogilev]": {
       "en": "Klimavichy [Mogilev]",
@@ -41096,7 +41384,7 @@
     },
     "Kolomyia": {
       "en": "Kolomyia",
-      "zh": "科洛米亚"
+      "zh": "科洛梅亚"
     },
     "Kolomyia (UA)": {
       "en": "Kolomyia (UA)",
@@ -41660,11 +41948,11 @@
     },
     "Kostroma": {
       "en": "Kostroma",
-      "zh": "科斯特罗马"
+      "zh": "科斯特罗姆"
     },
     "Kostroma (RU)": {
       "en": "Kostroma (RU)",
-      "zh": "科斯特罗马"
+      "zh": "科斯特罗姆"
     },
     "Kostromskoy District": {
       "en": "Kostromskoy District",
@@ -41820,11 +42108,11 @@
     },
     "Kovrov": {
       "en": "Kovrov",
-      "zh": "科夫罗夫"
+      "zh": "科夫罗"
     },
     "Kovrov (RU)": {
       "en": "Kovrov (RU)",
-      "zh": "科夫罗夫"
+      "zh": "科夫罗"
     },
     "Kovrovsky District": {
       "en": "Kovrovsky District",
@@ -41964,7 +42252,7 @@
     },
     "Kraków": {
       "en": "Kraków",
-      "zh": "克拉科夫"
+      "zh": "克拉考"
     },
     "Kraków (PL)": {
       "en": "Kraków (PL)",
@@ -41980,11 +42268,11 @@
     },
     "Krasnapolle": {
       "en": "Krasnapolle",
-      "zh": "克拉斯纳波尔"
+      "zh": "舍恩费尔德"
     },
     "Krasnapolle (BY)": {
       "en": "Krasnapolle (BY)",
-      "zh": "克拉斯纳波尔"
+      "zh": "舍恩费尔德"
     },
     "Krasnapolle [Mogilev]": {
       "en": "Krasnapolle [Mogilev]",
@@ -42044,7 +42332,7 @@
     },
     "Krasnodar Municipality": {
       "en": "Krasnodar Municipality",
-      "zh": "克拉斯诺达尔市"
+      "zh": "新法兰克福"
     },
     "Krasnodar Municipality (RU)": {
       "en": "Krasnodar Municipality (RU)",
@@ -42308,7 +42596,7 @@
     },
     "Kremenchuk": {
       "en": "Kremenchuk",
-      "zh": "克列缅丘克"
+      "zh": "布吕肯施塔特"
     },
     "Kremenchuk (UA)": {
       "en": "Kremenchuk (UA)",
@@ -42420,7 +42708,7 @@
     },
     "Kropyvnytskyi": {
       "en": "Kropyvnytskyi",
-      "zh": "克罗佩夫尼茨基"
+      "zh": "因古尔施塔特"
     },
     "Kropyvnytskyi (UA)": {
       "en": "Kropyvnytskyi (UA)",
@@ -42484,7 +42772,7 @@
     },
     "Kryvyi Rih": {
       "en": "Kryvyi Rih",
-      "zh": "克里沃罗格"
+      "zh": "克吕夫博根"
     },
     "Kryvyi Rih (UA)": {
       "en": "Kryvyi Rih (UA)",
@@ -42904,11 +43192,11 @@
     },
     "Kursk": {
       "en": "Kursk",
-      "zh": "库尔斯克"
+      "zh": "古德里安施塔特"
     },
     "Kursk (RU)": {
       "en": "Kursk (RU)",
-      "zh": "库尔斯克"
+      "zh": "古德里安施塔特"
     },
     "Kursky District": {
       "en": "Kursky District",
@@ -42956,7 +43244,7 @@
     },
     "Kurzeme": {
       "en": "Kurzeme",
-      "zh": "库尔泽梅"
+      "zh": "库尔兰"
     },
     "Kurzeme (LV)": {
       "en": "Kurzeme (LV)",
@@ -44376,7 +44664,7 @@
     },
     "Latgale": {
       "en": "Latgale",
-      "zh": "拉特盖尔"
+      "zh": "莱特加伦"
     },
     "Latgale (LV)": {
       "en": "Latgale (LV)",
@@ -44860,11 +45148,11 @@
     },
     "Lens": {
       "en": "Lens",
-      "zh": "镜片"
+      "zh": "朗斯"
     },
     "Lens (FR)": {
       "en": "Lens (FR)",
-      "zh": "镜片"
+      "zh": "朗斯"
     },
     "Lensky District": {
       "en": "Lensky District",
@@ -45944,11 +46232,11 @@
     },
     "Linz-Wels": {
       "en": "Linz-Wels",
-      "zh": "林茨鲶鱼"
+      "zh": "林茨-韦尔斯"
     },
     "Linz-Wels (AT)": {
       "en": "Linz-Wels (AT)",
-      "zh": "林茨鲶鱼"
+      "zh": "林茨-韦尔斯"
     },
     "Linzhexian": {
       "en": "Linzhexian",
@@ -45988,11 +46276,11 @@
     },
     "Lipetsk": {
       "en": "Lipetsk",
-      "zh": "利佩茨克"
+      "zh": "林登施塔特"
     },
     "Lipetsk (RU)": {
       "en": "Lipetsk (RU)",
-      "zh": "利佩茨克"
+      "zh": "林登施塔特"
     },
     "Lipetsky District": {
       "en": "Lipetsky District",
@@ -46324,11 +46612,11 @@
     },
     "Livny": {
       "en": "Livny",
-      "zh": "利夫尼"
+      "zh": "利文"
     },
     "Livny (RU)": {
       "en": "Livny (RU)",
-      "zh": "利夫尼"
+      "zh": "利文"
     },
     "Livorno": {
       "en": "Livorno",
@@ -47780,11 +48068,11 @@
     },
     "Lure": {
       "en": "Lure",
-      "zh": "饵"
+      "zh": "吕尔"
     },
     "Lure (FR)": {
       "en": "Lure (FR)",
-      "zh": "饵"
+      "zh": "吕尔"
     },
     "Lusaka": {
       "en": "Lusaka",
@@ -50760,7 +51048,7 @@
     },
     "Melitopol": {
       "en": "Melitopol",
-      "zh": "梅利托波尔"
+      "zh": "霍尼希施塔特"
     },
     "Melitopol (UA)": {
       "en": "Melitopol (UA)",
@@ -51576,11 +51864,11 @@
     },
     "Michurinsk": {
       "en": "Michurinsk",
-      "zh": "米丘林斯克"
+      "zh": "加滕施塔特"
     },
     "Michurinsk (RU)": {
       "en": "Michurinsk (RU)",
-      "zh": "米丘林斯克"
+      "zh": "加滕施塔特"
     },
     "Michurinsky District": {
       "en": "Michurinsky District",
@@ -52040,7 +52328,7 @@
     },
     "Mingəçevir": {
       "en": "Mingəçevir",
-      "zh": "变成了一千个"
+      "zh": "明盖察乌尔"
     },
     "Mingəçevir (AZ)": {
       "en": "Mingəçevir (AZ)",
@@ -52264,7 +52552,7 @@
     },
     "Minsk Interior": {
       "en": "Minsk Interior",
-      "zh": "明斯克内饰"
+      "zh": "明斯克内地"
     },
     "Minsk Interior (BY)": {
       "en": "Minsk Interior (BY)",
@@ -52944,7 +53232,7 @@
     },
     "Mogilev Interior": {
       "en": "Mogilev Interior",
-      "zh": "莫吉廖夫内饰"
+      "zh": "莫吉廖夫内地"
     },
     "Mogilev Interior (BY)": {
       "en": "Mogilev Interior (BY)",
@@ -53076,11 +53364,11 @@
     },
     "Molidawadahanerzuzizhiqi": {
       "en": "Molidawadahanerzuzizhiqi",
-      "zh": "莫力达瓦达哈尔祖兹之奇"
+      "zh": "莫力达瓦达翰尔族自治旗"
     },
     "Molidawadahanerzuzizhiqi (CN)": {
       "en": "Molidawadahanerzuzizhiqi (CN)",
-      "zh": "莫力达瓦达哈尔祖兹之奇"
+      "zh": "莫力达瓦达翰尔族自治旗"
     },
     "Molokovsky District": {
       "en": "Molokovsky District",
@@ -53784,11 +54072,11 @@
     },
     "Morshansk": {
       "en": "Morshansk",
-      "zh": "莫尔尚斯克"
+      "zh": "摩尔施塔特"
     },
     "Morshansk (RU)": {
       "en": "Morshansk (RU)",
-      "zh": "莫尔尚斯克"
+      "zh": "摩尔施塔特"
     },
     "Morshansky District": {
       "en": "Morshansky District",
@@ -53848,15 +54136,15 @@
     },
     "Most": {
       "en": "Most",
-      "zh": "最多"
+      "zh": "布吕克斯"
     },
     "Most (CZ)": {
       "en": "Most (CZ)",
-      "zh": "最多"
+      "zh": "布吕克斯"
     },
     "Most [Ústecký kraj]": {
       "en": "Most [Ústecký kraj]",
-      "zh": "最多"
+      "zh": "布吕克斯"
     },
     "Mostaganem": {
       "en": "Mostaganem",
@@ -54208,11 +54496,11 @@
     },
     "Mulhouse": {
       "en": "Mulhouse",
-      "zh": "米卢斯"
+      "zh": "米尔豪森"
     },
     "Mulhouse (FR)": {
       "en": "Mulhouse (FR)",
-      "zh": "米卢斯"
+      "zh": "米尔豪森"
     },
     "Mulicangzuzizhixian": {
       "en": "Mulicangzuzizhixian",
@@ -57484,7 +57772,7 @@
     },
     "Nikopol": {
       "en": "Nikopol",
-      "zh": "尼科波尔"
+      "zh": "尼科佩尔"
     },
     "Nikopol (UA)": {
       "en": "Nikopol (UA)",
@@ -57868,11 +58156,11 @@
     },
     "Nizhny Novgorod": {
       "en": "Nizhny Novgorod",
-      "zh": "下诺夫哥罗德"
+      "zh": "兴登堡施塔特"
     },
     "Nizhny Novgorod (RU)": {
       "en": "Nizhny Novgorod (RU)",
-      "zh": "下诺夫哥罗德"
+      "zh": "兴登堡施塔特"
     },
     "Nizhyn": {
       "en": "Nizhyn",
@@ -59276,11 +59564,11 @@
     },
     "Novocherkassk": {
       "en": "Novocherkassk",
-      "zh": "新切尔卡斯克"
+      "zh": "新卡塞尔"
     },
     "Novocherkassk (RU)": {
       "en": "Novocherkassk (RU)",
-      "zh": "新切尔卡斯克"
+      "zh": "新卡塞尔"
     },
     "Novoderevenkovsky District": {
       "en": "Novoderevenkovsky District",
@@ -59548,11 +59836,11 @@
     },
     "Novozybkov": {
       "en": "Novozybkov",
-      "zh": "诺沃济布科夫"
+      "zh": "新西巴赫"
     },
     "Novozybkov (RU)": {
       "en": "Novozybkov (RU)",
-      "zh": "诺沃济布科夫"
+      "zh": "新西巴赫"
     },
     "Novozybkovsky District": {
       "en": "Novozybkovsky District",
@@ -59584,7 +59872,7 @@
     },
     "Nowy Sącz": {
       "en": "Nowy Sącz",
-      "zh": "新松奇"
+      "zh": "新桑德茨"
     },
     "Nowy Sącz (PL)": {
       "en": "Nowy Sącz (PL)",
@@ -60872,11 +61160,11 @@
     },
     "Obninsk": {
       "en": "Obninsk",
-      "zh": "奥布宁斯克"
+      "zh": "奥布尼茨"
     },
     "Obninsk (RU)": {
       "en": "Obninsk (RU)",
-      "zh": "奥布宁斯克"
+      "zh": "奥布尼茨"
     },
     "Obock": {
       "en": "Obock",
@@ -61728,11 +62016,11 @@
     },
     "Olsztyn": {
       "en": "Olsztyn",
-      "zh": "奥尔什丁"
+      "zh": "阿伦施泰因"
     },
     "Olsztyn (PL)": {
       "en": "Olsztyn (PL)",
-      "zh": "奥尔什丁"
+      "zh": "阿伦施泰因"
     },
     "Olt": {
       "en": "Olt",
@@ -61920,11 +62208,11 @@
     },
     "Opole": {
       "en": "Opole",
-      "zh": "奥波莱"
+      "zh": "奥珀恩"
     },
     "Opole (PL)": {
       "en": "Opole (PL)",
-      "zh": "奥波莱"
+      "zh": "奥珀恩"
     },
     "Orahovac": {
       "en": "Orahovac",
@@ -62336,11 +62624,11 @@
     },
     "Oryol": {
       "en": "Oryol",
-      "zh": "奥廖尔"
+      "zh": "阿德勒施塔特"
     },
     "Oryol (RU)": {
       "en": "Oryol (RU)",
-      "zh": "奥廖尔"
+      "zh": "阿德勒施塔特"
     },
     "Orzhytsia": {
       "en": "Orzhytsia",
@@ -62540,15 +62828,15 @@
     },
     "Ostrava-City": {
       "en": "Ostrava-City",
-      "zh": "俄斯特拉发市"
+      "zh": "摩拉维亚奥斯特劳"
     },
     "Ostrava-City (CZ)": {
       "en": "Ostrava-City (CZ)",
-      "zh": "俄斯特拉发市"
+      "zh": "摩拉维亚奥斯特劳"
     },
     "Ostrava-City [Moravskoslezský kraj]": {
       "en": "Ostrava-City [Moravskoslezský kraj]",
-      "zh": "俄斯特拉发市"
+      "zh": "摩拉维亚奥斯特劳"
     },
     "Ostrogozhsky District": {
       "en": "Ostrogozhsky District",
@@ -63180,7 +63468,7 @@
     },
     "Panevėžio apskritis": {
       "en": "Panevėžio apskritis",
-      "zh": "帕内韦日斯县"
+      "zh": "波内韦施"
     },
     "Panevėžio apskritis (LT)": {
       "en": "Panevėžio apskritis (LT)",
@@ -63752,7 +64040,7 @@
     },
     "Pavlohrad": {
       "en": "Pavlohrad",
-      "zh": "巴夫洛赫拉德"
+      "zh": "保卢斯格勒"
     },
     "Pavlohrad (UA)": {
       "en": "Pavlohrad (UA)",
@@ -64180,11 +64468,11 @@
     },
     "Penza": {
       "en": "Penza",
-      "zh": "差不多"
+      "zh": "奔萨"
     },
     "Penza (RU)": {
       "en": "Penza (RU)",
-      "zh": "差不多"
+      "zh": "奔萨"
     },
     "Penzensky District": {
       "en": "Penzensky District",
@@ -65252,7 +65540,7 @@
     },
     "Piotrków Trybunalski": {
       "en": "Piotrków Trybunalski",
-      "zh": "彼得库夫·特雷布纳尔斯基"
+      "zh": "佩特里考"
     },
     "Piotrków Trybunalski (PL)": {
       "en": "Piotrków Trybunalski (PL)",
@@ -65552,15 +65840,15 @@
     },
     "Plzeň-City": {
       "en": "Plzeň-City",
-      "zh": "比尔森市"
+      "zh": "比尔森"
     },
     "Plzeň-City (CZ)": {
       "en": "Plzeň-City (CZ)",
-      "zh": "比尔森市"
+      "zh": "比尔森"
     },
     "Plzeň-City [Plzeňský kraj]": {
       "en": "Plzeň-City [Plzeňský kraj]",
-      "zh": "比尔森市"
+      "zh": "比尔森"
     },
     "Plzeň-North": {
       "en": "Plzeň-North",
@@ -66212,11 +66500,11 @@
     },
     "Poznań": {
       "en": "Poznań",
-      "zh": "波兹南"
+      "zh": "波森"
     },
     "Poznań (PL)": {
       "en": "Poznań (PL)",
-      "zh": "波兹南"
+      "zh": "波森"
     },
     "Požeško-slavonska županija": {
       "en": "Požeško-slavonska županija",
@@ -66728,7 +67016,7 @@
     },
     "Przemyśl": {
       "en": "Przemyśl",
-      "zh": "行业"
+      "zh": "普雷米瑟尔"
     },
     "Przemyśl (PL)": {
       "en": "Przemyśl (PL)",
@@ -67316,11 +67604,11 @@
     },
     "Pushchino": {
       "en": "Pushchino",
-      "zh": "普希诺"
+      "zh": "海德施塔特"
     },
     "Pushchino (RU)": {
       "en": "Pushchino (RU)",
-      "zh": "普希诺"
+      "zh": "海德施塔特"
     },
     "Pushkinogorsky District": {
       "en": "Pushkinogorsky District",
@@ -67488,7 +67776,7 @@
     },
     "Pyatigorsk": {
       "en": "Pyatigorsk",
-      "zh": "皮亚季戈尔斯克"
+      "zh": "丰夫贝根"
     },
     "Pyatigorsk (RU)": {
       "en": "Pyatigorsk (RU)",
@@ -69616,7 +69904,7 @@
     },
     "Resort Town of Sochi (municipal formation)": {
       "en": "Resort Town of Sochi (municipal formation)",
-      "zh": "索契度假小镇（市政府）"
+      "zh": "索契浴城"
     },
     "Resort Town of Sochi (municipal formation) (RU)": {
       "en": "Resort Town of Sochi (municipal formation) (RU)",
@@ -70556,11 +70844,11 @@
     },
     "Rostov-on-Don": {
       "en": "Rostov-on-Don",
-      "zh": "顿河畔罗斯托夫"
+      "zh": "顿施塔特"
     },
     "Rostov-on-Don (RU)": {
       "en": "Rostov-on-Don (RU)",
-      "zh": "顿河畔罗斯托夫"
+      "zh": "顿施塔特"
     },
     "Rostovsky District": {
       "en": "Rostovsky District",
@@ -70656,11 +70944,11 @@
     },
     "Rozdolne": {
       "en": "Rozdolne",
-      "zh": "多产"
+      "zh": "罗兹多尔涅"
     },
     "Rozdolne (UA)": {
       "en": "Rozdolne (UA)",
-      "zh": "多产"
+      "zh": "罗兹多尔涅"
     },
     "Rozhniativ": {
       "en": "Rozhniativ",
@@ -75896,7 +76184,7 @@
     },
     "Rzeszów": {
       "en": "Rzeszów",
-      "zh": "热舒夫"
+      "zh": "赖希斯霍夫"
     },
     "Rzeszów (PL)": {
       "en": "Rzeszów (PL)",
@@ -76308,11 +76596,11 @@
     },
     "Saint Petersburg": {
       "en": "Saint Petersburg",
-      "zh": "圣彼得堡"
+      "zh": "林德曼施塔特"
     },
     "Saint Petersburg (RU)": {
       "en": "Saint Petersburg (RU)",
-      "zh": "圣彼得堡"
+      "zh": "林德曼施塔特"
     },
     "Saint Pierre and Miquelon": {
       "en": "Saint Pierre and Miquelon",
@@ -76780,11 +77068,15 @@
     },
     "Samara": {
       "en": "Samara",
-      "zh": "萨马拉"
+      "zh": "伏尔加施塔特"
     },
     "Samara (RU)": {
       "en": "Samara (RU)",
-      "zh": "萨马拉"
+      "zh": "伏尔加施塔特"
+    },
+    "Tatar Republic": {
+      "en": "Tatar Republic",
+      "zh": "鞑靼共和国"
     },
     "Samarkand": {
       "en": "Samarkand",
@@ -76828,7 +77120,7 @@
     },
     "Sambir": {
       "en": "Sambir",
-      "zh": "桑比尔"
+      "zh": "桑博尔"
     },
     "Sambir (UA)": {
       "en": "Sambir (UA)",
@@ -77832,11 +78124,11 @@
     },
     "Sarreguemines": {
       "en": "Sarreguemines",
-      "zh": "萨尔格米纳"
+      "zh": "萨尔格明德"
     },
     "Sarreguemines (FR)": {
       "en": "Sarreguemines (FR)",
-      "zh": "萨尔格米纳"
+      "zh": "萨尔格明德"
     },
     "Sartène": {
       "en": "Sartène",
@@ -78396,11 +78688,11 @@
     },
     "Sedan": {
       "en": "Sedan",
-      "zh": "轿车"
+      "zh": "色当"
     },
     "Sedan (FR)": {
       "en": "Sedan (FR)",
-      "zh": "轿车"
+      "zh": "色当"
     },
     "Sedelnikovsky District": {
       "en": "Sedelnikovsky District",
@@ -80752,7 +81044,7 @@
     },
     "Siedlce": {
       "en": "Siedlce",
-      "zh": "谢德尔采"
+      "zh": "泽德莱茨"
     },
     "Siedlce (PL)": {
       "en": "Siedlce (PL)",
@@ -81284,7 +81576,7 @@
     },
     "Skierniewice": {
       "en": "Skierniewice",
-      "zh": "斯基尔涅维采"
+      "zh": "斯基尔内维茨"
     },
     "Skierniewice (PL)": {
       "en": "Skierniewice (PL)",
@@ -81476,11 +81768,11 @@
     },
     "Smolensk": {
       "en": "Smolensk",
-      "zh": "斯摩棱斯克"
+      "zh": "克卢格堡"
     },
     "Smolensk (RU)": {
       "en": "Smolensk (RU)",
-      "zh": "斯摩棱斯克"
+      "zh": "克卢格堡"
     },
     "Smolensky District": {
       "en": "Smolensky District",
@@ -82200,11 +82492,11 @@
     },
     "Sosnovy Bor": {
       "en": "Sosnovy Bor",
-      "zh": "索斯诺维博尔"
+      "zh": "基费恩瓦尔德"
     },
     "Sosnovy Bor (RU)": {
       "en": "Sosnovy Bor (RU)",
-      "zh": "索斯诺维博尔"
+      "zh": "基费恩瓦尔德"
     },
     "Sosnowiec": {
       "en": "Sosnowiec",
@@ -83072,11 +83364,11 @@
     },
     "Sovietsky": {
       "en": "Sovietsky",
-      "zh": "苏联"
+      "zh": "索维茨基"
     },
     "Sovietsky (UA)": {
       "en": "Sovietsky (UA)",
-      "zh": "苏联"
+      "zh": "索维茨基"
     },
     "Sowa": {
       "en": "Sowa",
@@ -83420,11 +83712,11 @@
     },
     "Star City": {
       "en": "Star City",
-      "zh": "星城"
+      "zh": "施特嫩施塔特"
     },
     "Star City (RU)": {
       "en": "Star City (RU)",
-      "zh": "星城"
+      "zh": "施特嫩施塔特"
     },
     "Stara Syniava": {
       "en": "Stara Syniava",
@@ -83480,11 +83772,11 @@
     },
     "Starodub": {
       "en": "Starodub",
-      "zh": "斯塔罗杜布"
+      "zh": "阿尔滕艾歇"
     },
     "Starodub (RU)": {
       "en": "Starodub (RU)",
-      "zh": "斯塔罗杜布"
+      "zh": "阿尔滕艾歇"
     },
     "Starodubsky District": {
       "en": "Starodubsky District",
@@ -83780,7 +84072,7 @@
     },
     "Stavropol": {
       "en": "Stavropol",
-      "zh": "斯塔夫罗波尔"
+      "zh": "克罗伊茨施塔特"
     },
     "Stavropol (RU)": {
       "en": "Stavropol (RU)",
@@ -85184,11 +85476,11 @@
     },
     "Szczecin": {
       "en": "Szczecin",
-      "zh": "什切青"
+      "zh": "斯德丁"
     },
     "Szczecin (PL)": {
       "en": "Szczecin (PL)",
-      "zh": "什切青"
+      "zh": "斯德丁"
     },
     "Sánchez Ramírez": {
       "en": "Sánchez Ramírez",
@@ -86198,6 +86490,74 @@
       "en": "Tannu Tuva",
       "zh": "坦努图瓦人"
     },
+    "People's Revolutionary Council": {
+      "en": "People's Revolutionary Council",
+      "zh": "人民革命委员会"
+    },
+    "Far Eastern Presidium": {
+      "en": "Far Eastern Presidium",
+      "zh": "远东主席团"
+    },
+    "Buryat Soviet Socialist Republic": {
+      "en": "Buryat Soviet Socialist Republic",
+      "zh": "布里亚特苏维埃社会主义共和国"
+    },
+    "Far Eastern Tsardom": {
+      "en": "Far Eastern Tsardom",
+      "zh": "远东沙皇国"
+    },
+    "Sakha Republic": {
+      "en": "Sakha Republic",
+      "zh": "萨哈共和国"
+    },
+    "Siberian Black Army": {
+      "en": "Siberian Black Army",
+      "zh": "西伯利亚黑军"
+    },
+    "13th Panzer Army - Gorky": {
+      "en": "13th Panzer Army - Gorky",
+      "zh": "第13装甲集团军-高尔基"
+    },
+    "Komi Republic": {
+      "en": "Komi Republic",
+      "zh": "科米共和国"
+    },
+    "Vologda Neutral Zone": {
+      "en": "Vologda Neutral Zone",
+      "zh": "沃洛格达中立区"
+    },
+    "Kurdistan": {
+      "en": "Kurdistan",
+      "zh": "库尔德斯坦"
+    },
+    "Korean Residency-General": {
+      "en": "Korean Residency-General",
+      "zh": "朝鲜统监府"
+    },
+    "Free France": {
+      "en": "Free France",
+      "zh": "自由法国"
+    },
+    "African Anarchy": {
+      "en": "African Anarchy",
+      "zh": "非洲无政府地区"
+    },
+    "Russian Anarchy": {
+      "en": "Russian Anarchy",
+      "zh": "俄罗斯无政府地区"
+    },
+    "Russian Liberation Army": {
+      "en": "Russian Liberation Army",
+      "zh": "俄罗斯解放军"
+    },
+    "Rurik Kingdom": {
+      "en": "Rurik Kingdom",
+      "zh": "留里克王国"
+    },
+    "Tyumen": {
+      "en": "Tyumen",
+      "zh": "秋明"
+    },
     "Tanzania": {
       "en": "Tanzania",
       "zh": "坦桑尼亚"
@@ -86352,7 +86712,7 @@
     },
     "Tarnów": {
       "en": "Tarnów",
-      "zh": "塔尔努夫"
+      "zh": "塔尔诺"
     },
     "Tarnów (PL)": {
       "en": "Tarnów (PL)",
@@ -86576,7 +86936,7 @@
     },
     "Tauragės apskritis": {
       "en": "Tauragės apskritis",
-      "zh": "托拉奇县"
+      "zh": "陶罗根"
     },
     "Tauragės apskritis (LT)": {
       "en": "Tauragės apskritis (LT)",
@@ -87100,7 +87460,7 @@
     },
     "Ternopil": {
       "en": "Ternopil",
-      "zh": "捷尔诺波尔"
+      "zh": "塔尔诺波尔"
     },
     "Ternopil (UA)": {
       "en": "Ternopil (UA)",
@@ -87352,11 +87712,11 @@
     },
     "Thionville": {
       "en": "Thionville",
-      "zh": "蒂永维尔"
+      "zh": "迪登霍芬"
     },
     "Thionville (FR)": {
       "en": "Thionville (FR)",
-      "zh": "蒂永维尔"
+      "zh": "迪登霍芬"
     },
     "Thiruvallur": {
       "en": "Thiruvallur",
@@ -88228,11 +88588,11 @@
     },
     "Tolyatti": {
       "en": "Tolyatti",
-      "zh": "陶里亚蒂"
+      "zh": "伏尔加河畔斯塔夫罗波尔"
     },
     "Tolyatti (RU)": {
       "en": "Tolyatti (RU)",
-      "zh": "陶里亚蒂"
+      "zh": "伏尔加河畔斯塔夫罗波尔"
     },
     "Tom Green": {
       "en": "Tom Green",
@@ -88684,11 +89044,11 @@
     },
     "Toruń": {
       "en": "Toruń",
-      "zh": "托伦"
+      "zh": "托恩"
     },
     "Toruń (PL)": {
       "en": "Toruń (PL)",
-      "zh": "托伦"
+      "zh": "托恩"
     },
     "Torzhoksky District": {
       "en": "Torzhoksky District",
@@ -89548,7 +89908,7 @@
     },
     "Turkey": {
       "en": "Turkey",
-      "zh": "火鸡"
+      "zh": "土耳其"
     },
     "Turkmenistan": {
       "en": "Turkmenistan",
@@ -89652,11 +90012,11 @@
     },
     "Tver": {
       "en": "Tver",
-      "zh": "捕获"
+      "zh": "鲍曼施塔特"
     },
     "Tver (RU)": {
       "en": "Tver (RU)",
-      "zh": "捕获"
+      "zh": "鲍曼施塔特"
     },
     "Twente": {
       "en": "Twente",
@@ -90188,7 +90548,7 @@
     },
     "Uman": {
       "en": "Uman",
-      "zh": "乌曼"
+      "zh": "乌曼施塔特"
     },
     "Uman (UA)": {
       "en": "Uman (UA)",
@@ -90505,6 +90865,10 @@
     "Ural": {
       "en": "Ural",
       "zh": "乌拉尔"
+    },
+    "Ural Military District Red Air Force": {
+      "en": "Ural Military District Red Air Force",
+      "zh": "乌拉尔军区红空军"
     },
     "Uralsky": {
       "en": "Uralsky",
@@ -91700,11 +92064,11 @@
     },
     "Veliky Novgorod": {
       "en": "Veliky Novgorod",
-      "zh": "大诺夫哥罗德"
+      "zh": "霍尔姆加德"
     },
     "Veliky Novgorod (RU)": {
       "en": "Veliky Novgorod (RU)",
-      "zh": "大诺夫哥罗德"
+      "zh": "霍尔姆加德"
     },
     "Velizhsky District": {
       "en": "Velizhsky District",
@@ -92684,7 +93048,7 @@
     },
     "Vidzeme": {
       "en": "Vidzeme",
-      "zh": "维泽梅"
+      "zh": "利夫兰"
     },
     "Vidzeme (LV)": {
       "en": "Vidzeme (LV)",
@@ -92749,6 +93113,10 @@
     "Vietnam": {
       "en": "Vietnam",
       "zh": "越南"
+    },
+    "Viet Minh": {
+      "en": "Viet Minh",
+      "zh": "越盟"
     },
     "Vigan": {
       "en": "Vigan",
@@ -92836,7 +93204,7 @@
     },
     "Vilniaus apskritis": {
       "en": "Vilniaus apskritis",
-      "zh": "维尔纽斯县"
+      "zh": "维尔纳"
     },
     "Vilniaus apskritis (LT)": {
       "en": "Vilniaus apskritis (LT)",
@@ -92896,7 +93264,7 @@
     },
     "Vinnytsia": {
       "en": "Vinnytsia",
-      "zh": "文尼察"
+      "zh": "狼人城"
     },
     "Vinnytsia (UA)": {
       "en": "Vinnytsia (UA)",
@@ -93152,7 +93520,7 @@
     },
     "Vitebsk Interior": {
       "en": "Vitebsk Interior",
-      "zh": "维捷布斯克内饰"
+      "zh": "维捷布斯克内地"
     },
     "Vitebsk Interior (BY)": {
       "en": "Vitebsk Interior (BY)",
@@ -93268,19 +93636,19 @@
     },
     "Volgodonsk": {
       "en": "Volgodonsk",
-      "zh": "伏尔加顿斯克"
+      "zh": "伏尔加顿施塔特"
     },
     "Volgodonsk (RU)": {
       "en": "Volgodonsk (RU)",
-      "zh": "伏尔加顿斯克"
+      "zh": "伏尔加顿施塔特"
     },
     "Volgograd": {
-      "en": "Volgograd",
-      "zh": "伏尔加格勒"
+      "en": "Paulusburg",
+      "zh": "保卢斯堡"
     },
     "Volgograd (RU)": {
-      "en": "Volgograd (RU)",
-      "zh": "伏尔加格勒"
+      "en": "Paulusburg (RU)",
+      "zh": "保卢斯堡"
     },
     "Volgorechensk": {
       "en": "Volgorechensk",
@@ -93476,11 +93844,11 @@
     },
     "Voronezh": {
       "en": "Voronezh",
-      "zh": "沃罗涅日"
+      "zh": "曼施泰因施塔特"
     },
     "Voronezh (RU)": {
       "en": "Voronezh (RU)",
-      "zh": "沃罗涅日"
+      "zh": "曼施泰因施塔特"
     },
     "Vorotynsky District": {
       "en": "Vorotynsky District",
@@ -93544,11 +93912,11 @@
     },
     "Vouziers": {
       "en": "Vouziers",
-      "zh": "优惠券"
+      "zh": "武济耶"
     },
     "Vouziers (FR)": {
       "en": "Vouziers (FR)",
-      "zh": "优惠券"
+      "zh": "武济耶"
     },
     "Vovchansk": {
       "en": "Vovchansk",
@@ -95452,7 +95820,7 @@
     },
     "Western Minsk Kresy": {
       "en": "Western Minsk Kresy",
-      "zh": "西明斯克州"
+      "zh": "明斯克西部边区"
     },
     "Western Minsk Kresy (BY)": {
       "en": "Western Minsk Kresy (BY)",
@@ -95480,7 +95848,7 @@
     },
     "Western Vitebsk Kresy": {
       "en": "Western Vitebsk Kresy",
-      "zh": "西维捷布斯克州"
+      "zh": "维捷布斯克西部边区"
     },
     "Western Vitebsk Kresy (BY)": {
       "en": "Western Vitebsk Kresy (BY)",
@@ -96160,11 +96528,11 @@
     },
     "Wrocław": {
       "en": "Wrocław",
-      "zh": "弗罗茨瓦夫"
+      "zh": "布雷斯劳"
     },
     "Wrocław (PL)": {
       "en": "Wrocław (PL)",
-      "zh": "弗罗茨瓦夫"
+      "zh": "布雷斯劳"
     },
     "Wuan": {
       "en": "Wuan",
@@ -98484,11 +98852,11 @@
     },
     "Yaroslavl": {
       "en": "Yaroslavl",
-      "zh": "雅罗斯拉夫尔"
+      "zh": "罗森贝格施塔特"
     },
     "Yaroslavl (RU)": {
       "en": "Yaroslavl (RU)",
-      "zh": "雅罗斯拉夫尔"
+      "zh": "罗森贝格施塔特"
     },
     "Yaroslavsky District": {
       "en": "Yaroslavsky District",
@@ -98688,11 +99056,11 @@
     },
     "Yelets": {
       "en": "Yelets",
-      "zh": "叶列茨"
+      "zh": "耶列茨"
     },
     "Yelets (RU)": {
       "en": "Yelets (RU)",
-      "zh": "叶列茨"
+      "zh": "耶列茨"
     },
     "Yeletsky District": {
       "en": "Yeletsky District",
@@ -100760,7 +101128,7 @@
     },
     "Zamość": {
       "en": "Zamość",
-      "zh": "扎莫希奇"
+      "zh": "扎莫施"
     },
     "Zamość (PL)": {
       "en": "Zamość (PL)",
@@ -101024,7 +101392,7 @@
     },
     "Zemgale": {
       "en": "Zemgale",
-      "zh": "泽姆盖尔"
+      "zh": "泽姆加伦"
     },
     "Zemgale (LV)": {
       "en": "Zemgale (LV)",
@@ -101964,7 +102332,7 @@
     },
     "Zhytomyr": {
       "en": "Zhytomyr",
-      "zh": "日托米尔"
+      "zh": "黑格瓦尔德"
     },
     "Zhytomyr (UA)": {
       "en": "Zhytomyr (UA)",
@@ -101996,11 +102364,11 @@
     },
     "Zielona Góra": {
       "en": "Zielona Góra",
-      "zh": "绿山城"
+      "zh": "格吕恩贝格"
     },
     "Zielona Góra (PL)": {
       "en": "Zielona Góra (PL)",
-      "zh": "绿山城"
+      "zh": "格吕恩贝格"
     },
     "Zigong": {
       "en": "Zigong",
@@ -102148,11 +102516,11 @@
     },
     "Znamensk": {
       "en": "Znamensk",
-      "zh": "意义"
+      "zh": "班纳施塔特"
     },
     "Znamensk (RU)": {
       "en": "Znamensk (RU)",
-      "zh": "意义"
+      "zh": "班纳施塔特"
     },
     "Znamensky District": {
       "en": "Znamensky District",
@@ -102436,11 +102804,11 @@
     },
     "Zvenigorod": {
       "en": "Zvenigorod",
-      "zh": "兹韦尼哥罗德"
+      "zh": "格洛肯堡"
     },
     "Zvenigorod (RU)": {
       "en": "Zvenigorod (RU)",
-      "zh": "兹韦尼哥罗德"
+      "zh": "格洛肯堡"
     },
     "Zvenigovsky District": {
       "en": "Zvenigovsky District",
@@ -105000,7 +105368,7 @@
     },
     "id::BY_RAY_67162791B11584975294724": {
       "en": "Khotsimsk",
-      "zh": "霍特西姆斯克"
+      "zh": "霍季姆斯克"
     },
     "id::BY_RAY_67162791B13547290723272": {
       "en": "Grodno",
@@ -105008,7 +105376,7 @@
     },
     "id::BY_RAY_67162791B14569635979911": {
       "en": "Kastsyukovichy",
-      "zh": "卡斯久科维奇"
+      "zh": "卡斯琴"
     },
     "id::BY_RAY_67162791B17030122378697": {
       "en": "Dobrush",
@@ -105060,7 +105428,7 @@
     },
     "id::BY_RAY_67162791B52564132020414": {
       "en": "Krasnapolle",
-      "zh": "克拉斯纳波尔"
+      "zh": "舍恩费尔德"
     },
     "id::BY_RAY_67162791B54270193950847": {
       "en": "Astravyets",
@@ -105068,7 +105436,7 @@
     },
     "id::BY_RAY_67162791B58533541453403": {
       "en": "Klimavichy",
-      "zh": "克利马维奇"
+      "zh": "克利莫维茨"
     },
     "id::BY_RAY_67162791B59963656038120": {
       "en": "Kamenets",
@@ -114692,7 +115060,7 @@
     },
     "id::CN_CITY_17275852B8889121757377": {
       "en": "Muleihashakezizhixian",
-      "zh": "木垒哈沙克自知线"
+      "zh": "木垒哈萨克自治县"
     },
     "id::CN_CITY_17275852B88896253540800": {
       "en": "Changduxian",
@@ -130356,7 +130724,7 @@
     },
     "id::PL_POW_1061": {
       "en": "Łódź",
-      "zh": "罗兹"
+      "zh": "利茨曼施塔特"
     },
     "id::PL_POW_1062": {
       "en": "Piotrków Trybunalski",
@@ -133796,11 +134164,11 @@
     },
     "id::RU_CITY_SAINT_PETERSBURG": {
       "en": "Saint Petersburg",
-      "zh": "圣彼得堡"
+      "zh": "林德曼施塔特"
     },
     "id::RU_CITY_VOLGOGRAD": {
       "en": "Volgograd",
-      "zh": "伏尔加格勒"
+      "zh": "保卢斯堡"
     },
     "id::RU_RAY_50074027B10003621776126": {
       "en": "Ust-Ishimsky District",
@@ -133932,7 +134300,7 @@
     },
     "id::RU_RAY_50074027B10833307399195": {
       "en": "Kostroma",
-      "zh": "科斯特罗马"
+      "zh": "科斯特罗姆"
     },
     "id::RU_RAY_50074027B10865784748365": {
       "en": "Kichmengsko-Gorodetsky District",
@@ -134076,7 +134444,7 @@
     },
     "id::RU_RAY_50074027B12162041502673": {
       "en": "Sosnovy Bor",
-      "zh": "索斯诺维博尔"
+      "zh": "基费恩瓦尔德"
     },
     "id::RU_RAY_50074027B12197449065569": {
       "en": "Sarayevsky District",
@@ -134084,7 +134452,7 @@
     },
     "id::RU_RAY_50074027B12201890066789": {
       "en": "Samara",
-      "zh": "萨马拉"
+      "zh": "伏尔加施塔特"
     },
     "id::RU_RAY_50074027B12225471433206": {
       "en": "Volzhsky",
@@ -134788,7 +135156,7 @@
     },
     "id::RU_RAY_50074027B18879924091572": {
       "en": "Kimry",
-      "zh": "基姆里"
+      "zh": "基默恩"
     },
     "id::RU_RAY_50074027B18889738151841": {
       "en": "Dobrovsky District",
@@ -134832,7 +135200,7 @@
     },
     "id::RU_RAY_50074027B19325401389824": {
       "en": "Kineshma",
-      "zh": "基内什玛"
+      "zh": "金讷斯海姆"
     },
     "id::RU_RAY_50074027B19345825479949": {
       "en": "Kontupohja District",
@@ -135036,7 +135404,7 @@
     },
     "id::RU_RAY_50074027B21233041988666": {
       "en": "Voronezh",
-      "zh": "沃罗涅日"
+      "zh": "曼施泰因施塔特"
     },
     "id::RU_RAY_50074027B21235649033503": {
       "en": "Vologodsky District",
@@ -135532,7 +135900,7 @@
     },
     "id::RU_RAY_50074027B25563950651561": {
       "en": "Bryansk",
-      "zh": "布良斯克"
+      "zh": "施佩尔施塔特"
     },
     "id::RU_RAY_50074027B25608767413280": {
       "en": "Mtsensky District",
@@ -136132,7 +136500,7 @@
     },
     "id::RU_RAY_50074027B3207695915667": {
       "en": "Zvenigorod",
-      "zh": "兹韦尼哥罗德"
+      "zh": "格洛肯堡"
     },
     "id::RU_RAY_50074027B32129611538850": {
       "en": "Pravoberezhny District",
@@ -136188,7 +136556,7 @@
     },
     "id::RU_RAY_50074027B32606930376124": {
       "en": "Novocherkassk",
-      "zh": "新切尔卡斯克"
+      "zh": "新卡塞尔"
     },
     "id::RU_RAY_50074027B32613603530958": {
       "en": "Sarapulsky District",
@@ -136628,7 +136996,7 @@
     },
     "id::RU_RAY_50074027B37574948551047": {
       "en": "Kamyshin",
-      "zh": "卡梅申"
+      "zh": "卡梅施"
     },
     "id::RU_RAY_50074027B37615161597227": {
       "en": "Gulkevichsky District",
@@ -136772,7 +137140,7 @@
     },
     "id::RU_RAY_50074027B38735593525636": {
       "en": "Livny",
-      "zh": "利夫尼"
+      "zh": "利文"
     },
     "id::RU_RAY_50074027B38761368779030": {
       "en": "Matveyevsky District",
@@ -136880,7 +137248,7 @@
     },
     "id::RU_RAY_50074027B39817723955170": {
       "en": "Alatyr",
-      "zh": "阿拉泰尔"
+      "zh": "阿拉季尔"
     },
     "id::RU_RAY_50074027B39854197147849": {
       "en": "Kochenyovsky District",
@@ -137164,7 +137532,7 @@
     },
     "id::RU_RAY_50074027B42449829895110": {
       "en": "Starodub",
-      "zh": "斯塔罗杜布"
+      "zh": "阿尔滕艾歇"
     },
     "id::RU_RAY_50074027B42465403886102": {
       "en": "Vesyegonsky District",
@@ -137356,7 +137724,7 @@
     },
     "id::RU_RAY_50074027B44365109797977": {
       "en": "Nizhny Novgorod",
-      "zh": "下诺夫哥罗德"
+      "zh": "兴登堡施塔特"
     },
     "id::RU_RAY_50074027B44442883085225": {
       "en": "Limansky District",
@@ -137364,7 +137732,7 @@
     },
     "id::RU_RAY_50074027B44469290153568": {
       "en": "Ivanovo",
-      "zh": "伊万诺沃"
+      "zh": "约翰尼斯施塔特"
     },
     "id::RU_RAY_50074027B44480084064397": {
       "en": "Mezhdurechensky District",
@@ -137792,7 +138160,7 @@
     },
     "id::RU_RAY_50074027B49841574383841": {
       "en": "Oryol",
-      "zh": "奥廖尔"
+      "zh": "阿德勒施塔特"
     },
     "id::RU_RAY_50074027B49862990703614": {
       "en": "Vyazemsky District",
@@ -138172,7 +138540,7 @@
     },
     "id::RU_RAY_50074027B53551011789267": {
       "en": "Dubna",
-      "zh": "杜布纳"
+      "zh": "杜贝瑙"
     },
     "id::RU_RAY_50074027B53591318245597": {
       "en": "Bugulminsky District",
@@ -138192,7 +138560,7 @@
     },
     "id::RU_RAY_50074027B53939252162264": {
       "en": "Rostov-on-Don",
-      "zh": "顿河畔罗斯托夫"
+      "zh": "顿施塔特"
     },
     "id::RU_RAY_50074027B5396224069740": {
       "en": "Sergachsky District",
@@ -138432,7 +138800,7 @@
     },
     "id::RU_RAY_50074027B5612057998042": {
       "en": "Yelets",
-      "zh": "叶列茨"
+      "zh": "耶列茨"
     },
     "id::RU_RAY_50074027B56135401776723": {
       "en": "городской округ Фокино",
@@ -138540,7 +138908,7 @@
     },
     "id::RU_RAY_50074027B57358126207690": {
       "en": "Yaroslavl",
-      "zh": "雅罗斯拉夫尔"
+      "zh": "罗森贝格施塔特"
     },
     "id::RU_RAY_50074027B5738399844926": {
       "en": "Ardonsky District",
@@ -138708,7 +139076,7 @@
     },
     "id::RU_RAY_50074027B58494309327601": {
       "en": "Tolyatti",
-      "zh": "陶里亚蒂"
+      "zh": "伏尔加河畔斯塔夫罗波尔"
     },
     "id::RU_RAY_50074027B5850420655248": {
       "en": "Pallasovsky District",
@@ -138992,7 +139360,7 @@
     },
     "id::RU_RAY_50074027B61355742422522": {
       "en": "Michurinsk",
-      "zh": "米丘林斯克"
+      "zh": "加滕施塔特"
     },
     "id::RU_RAY_50074027B61439072113324": {
       "en": "Lyambirsky District",
@@ -139304,7 +139672,7 @@
     },
     "id::RU_RAY_50074027B64455240716412": {
       "en": "Veliky Novgorod",
-      "zh": "大诺夫哥罗德"
+      "zh": "霍尔姆加德"
     },
     "id::RU_RAY_50074027B64491392404782": {
       "en": "Kinel-Cherkassky District",
@@ -140172,7 +140540,7 @@
     },
     "id::RU_RAY_50074027B73956111205177": {
       "en": "Lipetsk",
-      "zh": "利佩茨克"
+      "zh": "林登施塔特"
     },
     "id::RU_RAY_50074027B73978553723393": {
       "en": "Grayvoronsky District",
@@ -140316,7 +140684,7 @@
     },
     "id::RU_RAY_50074027B75402656675224": {
       "en": "Volgodonsk",
-      "zh": "伏尔加顿斯克"
+      "zh": "伏尔加顿施塔特"
     },
     "id::RU_RAY_50074027B75423208990464": {
       "en": "Karaidelsky District",
@@ -140496,7 +140864,7 @@
     },
     "id::RU_RAY_50074027B77320350284147": {
       "en": "Tver",
-      "zh": "捕获"
+      "zh": "鲍曼施塔特"
     },
     "id::RU_RAY_50074027B77344027071403": {
       "en": "Khabarsky District",
@@ -140524,7 +140892,7 @@
     },
     "id::RU_RAY_50074027B77582248025356": {
       "en": "Smolensk",
-      "zh": "斯摩棱斯克"
+      "zh": "克卢格堡"
     },
     "id::RU_RAY_50074027B77663912086268": {
       "en": "городской округ Апатиты",
@@ -140576,7 +140944,7 @@
     },
     "id::RU_RAY_50074027B78363579504678": {
       "en": "Pushchino",
-      "zh": "普希诺"
+      "zh": "海德施塔特"
     },
     "id::RU_RAY_50074027B78384695872642": {
       "en": "Tyulgansky District",
@@ -140704,7 +141072,7 @@
     },
     "id::RU_RAY_50074027B80046840644847": {
       "en": "Obninsk",
-      "zh": "奥布宁斯克"
+      "zh": "奥布尼茨"
     },
     "id::RU_RAY_50074027B80052568352424": {
       "en": "Bogoroditsky District",
@@ -140808,7 +141176,7 @@
     },
     "id::RU_RAY_50074027B81132289602019": {
       "en": "Morshansk",
-      "zh": "莫尔尚斯克"
+      "zh": "摩尔施塔特"
     },
     "id::RU_RAY_50074027B81144067595181": {
       "en": "Yershichsky District",
@@ -140868,7 +141236,7 @@
     },
     "id::RU_RAY_50074027B81611401929093": {
       "en": "Elektrogorsk",
-      "zh": "埃列克特罗戈尔斯克"
+      "zh": "施特龙贝格"
     },
     "id::RU_RAY_50074027B81632682072915": {
       "en": "Krasnoshchyokovsky District",
@@ -140916,7 +141284,7 @@
     },
     "id::RU_RAY_50074027B81882539182238": {
       "en": "Znamensk",
-      "zh": "意义"
+      "zh": "班纳施塔特"
     },
     "id::RU_RAY_50074027B81997779181689": {
       "en": "Menzelinsky District",
@@ -141484,7 +141852,7 @@
     },
     "id::RU_RAY_50074027B87683621003887": {
       "en": "Kursk",
-      "zh": "库尔斯克"
+      "zh": "古德里安施塔特"
     },
     "id::RU_RAY_50074027B87706467004865": {
       "en": "Olkhovatsky District",
@@ -141512,7 +141880,7 @@
     },
     "id::RU_RAY_50074027B88070495991427": {
       "en": "Penza",
-      "zh": "差不多"
+      "zh": "奔萨"
     },
     "id::RU_RAY_50074027B88217560441212": {
       "en": "Kalyazinsky District",
@@ -141676,7 +142044,7 @@
     },
     "id::RU_RAY_50074027B90093816910352": {
       "en": "Kovrov",
-      "zh": "科夫罗夫"
+      "zh": "科夫罗"
     },
     "id::RU_RAY_50074027B90118567248058": {
       "en": "Aznakayevsky District",
@@ -141688,7 +142056,7 @@
     },
     "id::RU_RAY_50074027B90178869914073": {
       "en": "Star City",
-      "zh": "星城"
+      "zh": "施特嫩施塔特"
     },
     "id::RU_RAY_50074027B90244452662579": {
       "en": "Zeysky District",
@@ -141772,7 +142140,7 @@
     },
     "id::RU_RAY_50074027B9105763704567": {
       "en": "Novozybkov",
-      "zh": "诺沃济布科夫"
+      "zh": "新西巴赫"
     },
     "id::RU_RAY_50074027B91132812213332": {
       "en": "Yeysky District",
@@ -141876,7 +142244,7 @@
     },
     "id::RU_RAY_50074027B92070848873743": {
       "en": "Arzamas",
-      "zh": "阿尔扎马斯"
+      "zh": "阿尔萨马斯"
     },
     "id::RU_RAY_50074027B92108534487256": {
       "en": "городской округ Шарыпово",
@@ -142248,7 +142616,7 @@
     },
     "id::RU_RAY_50074027B95764525225523": {
       "en": "Elektrostal",
-      "zh": "埃莱克特罗斯塔尔"
+      "zh": "施塔尔施塔特"
     },
     "id::RU_RAY_50074027B95803310425506": {
       "en": "Duldurginsky District",
@@ -153564,7 +153932,7 @@
     },
     "urban okrug of Derbent": {
       "en": "urban okrug of Derbent",
-      "zh": "杰尔宾特市区"
+      "zh": "杰尔本特市"
     },
     "urban okrug of Derbent (RU)": {
       "en": "urban okrug of Derbent (RU)",
@@ -154216,11 +154584,11 @@
     },
     "Łódź": {
       "en": "Łódź",
-      "zh": "罗兹"
+      "zh": "利茨曼施塔特"
     },
     "Łódź (PL)": {
       "en": "Łódź (PL)",
-      "zh": "罗兹"
+      "zh": "利茨曼施塔特"
     },
     "łaski": {
       "en": "łaski",
@@ -154448,7 +154816,7 @@
     },
     "Šiaulių apskritis": {
       "en": "Šiaulių apskritis",
-      "zh": "希奥利艾县"
+      "zh": "绍伦"
     },
     "Šiaulių apskritis (LT)": {
       "en": "Šiaulių apskritis (LT)",

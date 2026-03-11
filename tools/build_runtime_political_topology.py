@@ -31,6 +31,8 @@ try:
 except Exception:  # pragma: no cover - unavailable on some platforms
     resource = None
 
+MAX_SHELL_COVERAGE_REPAIR_PASSES = 6
+
 
 def _get_peak_memory_mb() -> float | None:
     if resource is None:
@@ -579,7 +581,7 @@ def main() -> None:
 
     repair_start = time.perf_counter()
     repair_passes = 0
-    for repair_pass in range(1, 4):
+    for repair_pass in range(1, MAX_SHELL_COVERAGE_REPAIR_PASSES + 1):
         output_topology = _load_topology(args.output_topology)
         output_political = _topology_object_to_gdf(output_topology, "political")
         gaps = collect_shell_coverage_gaps(
