@@ -3686,6 +3686,10 @@
       "en": "Algeria",
       "zh": "阿尔及利亚"
     },
+    "Algerian Command": {
+      "en": "Algerian Command",
+      "zh": "阿尔及利亚指挥部"
+    },
     "Algonquin—Renfrew—Pembroke": {
       "en": "Algonquin—Renfrew—Pembroke",
       "zh": "阿冈昆—伦弗鲁—彭布罗克"
@@ -26858,9 +26862,9 @@
       "en": "Ganquanxian (CN)",
       "zh": "甘泉县"
     },
-    "Gansu Ma Clique": {
-      "en": "Gansu Ma Clique",
-      "zh": "甘肃马派"
+    "Northwest Pacification Government": {
+      "en": "Northwest Pacification Government",
+      "zh": "西北绥靖政府"
     },
     "Ganxian": {
       "en": "Ganxian",
@@ -29098,9 +29102,9 @@
       "en": "Guangdexian (CN)",
       "zh": "广德县"
     },
-    "Guangdong National Government": {
-      "en": "Guangdong National Government",
-      "zh": "广东国民政府"
+    "Guangdong State": {
+      "en": "Guangdong State",
+      "zh": "广东国"
     },
     "Guangfengxian": {
       "en": "Guangfengxian",
@@ -34977,6 +34981,10 @@
     "Italian East Africa": {
       "en": "Italian East Africa",
       "zh": "意属东非"
+    },
+    "Italian Algeria": {
+      "en": "Italian Algeria",
+      "zh": "意属阿尔及利亚"
     },
     "Italian Egypt": {
       "en": "Italian Egypt",
@@ -55638,9 +55646,9 @@
       "en": "Nanjing (CN)",
       "zh": "南京"
     },
-    "Nanjing China": {
-      "en": "Nanjing China",
-      "zh": "南京中国"
+    "Republic of China": {
+      "en": "Republic of China",
+      "zh": "中华民国"
     },
     "Nanjingxian": {
       "en": "Nanjingxian",
@@ -68130,9 +68138,9 @@
       "en": "Qinggangxian (CN)",
       "zh": "青冈县"
     },
-    "Qinghai Ma Clique": {
-      "en": "Qinghai Ma Clique",
-      "zh": "青海马派"
+    "13th National Revolutionary Army": {
+      "en": "13th National Revolutionary Army",
+      "zh": "国民革命第13军"
     },
     "Qinghemenqu": {
       "en": "Qinghemenqu",
@@ -69538,9 +69546,9 @@
       "en": "Reeves [Texas]",
       "zh": "里夫斯"
     },
-    "Reformed Government of China": {
-      "en": "Reformed Government of China",
-      "zh": "中华民国维新政府"
+    "Sichuan Clique": {
+      "en": "Sichuan Clique",
+      "zh": "川系军阀"
     },
     "Reftinsky": {
       "en": "Reftinsky",
@@ -90869,6 +90877,10 @@
     "Ural Military District Red Air Force": {
       "en": "Ural Military District Red Air Force",
       "zh": "乌拉尔军区红空军"
+    },
+    "Ural Military District": {
+      "en": "Ural Military District",
+      "zh": "乌拉尔军区"
     },
     "Uralsky": {
       "en": "Uralsky",

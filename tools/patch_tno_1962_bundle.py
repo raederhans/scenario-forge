@@ -110,7 +110,7 @@ DONOR_CAUSEWAY_NAME_HINTS = (
 )
 
 MEDITERRANEAN_WATER_REGION_GROUP = "mediterranean"
-TNO_RETIRED_ZERO_FEATURE_TAGS = {"BEL", "EST", "LAT", "LIT", "LUX", "NOR", "POL", "POR"}
+TNO_RETIRED_ZERO_FEATURE_TAGS = {"BEL", "EST", "LAT", "LIT", "LUX", "NOR", "POL", "POR", "SSH", "TAI"}
 TNO_FEATURED_TAG_REPLACEMENTS = {"RKB": "BRG"}
 TNO_CONTROLLER_ONLY_COUNTRY_META = {
     "POR": {
@@ -345,6 +345,9 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "ATLISL_west_med_ATL_2",
         "ATLSHL_west_med_17",
         "ATLSHL_west_med_16",
+        "MAR-3456",
+        "MAR-3469",
+        "EH_ADMIN0_PASSTHROUGH",
     ],
     "BUL": [
         "ATLPRV_18220",
@@ -355,6 +358,23 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "ATLSHL_aegean_8",
         "EL514",
         "EL526",
+    ],
+    "CRO": [
+        "RS127",
+    ],
+    "RKO": [
+        "RU_RAY_50074027B5223158268211",
+        "RU_RAY_50074027B99227036451137",
+        "RU_RAY_50074027B49278461872326",
+        "RU_RAY_50074027B12162041502673",
+        "RU_RAY_50074027B5631740772865",
+        "RU_RAY_50074027B64055482679717",
+        "RU_RAY_50074027B11673707761487",
+        "RU_RAY_50074027B87627181065564",
+        "RU_RAY_50074027B58076034090645",
+        "RU_RAY_50074027B71157437388348",
+        "RU_RAY_50074027B99894122533642",
+        "BY_RAY_67162791B52564132020414",
     ],
     "RKM": [
         "RU_RAY_50074027B44154738908147",
@@ -435,6 +455,18 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "PAK-1123",
         "PAK-1108",
     ],
+    "PER": [
+        "XK_ADM1_KOS-5909",
+        "RS228",
+        "AZE-2415",
+        "AZE-2419",
+        "AZE-2420",
+        "AZE-5567",
+        "AZE-2423",
+        "AZE-2421",
+        "AZE-2422",
+        "AZE-2418",
+    ],
     "FRI": [
         "IN_ADM2_76128533B27432148084533",
         "IN_ADM2_76128533B32499449492865",
@@ -449,6 +481,15 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "IN_ADM2_76128533B40226077866964",
         "IN_ADM2_76128533B88623139855224",
     ],
+    "BRM": [
+        "CN_CITY_17275852B59976310203554",
+        "CN_CITY_17275852B66801672405752",
+        "CN_CITY_17275852B45889256371362",
+        "CN_CITY_17275852B14658621666192",
+        "CN_CITY_17275852B85492016083287",
+        "CN_CITY_17275852B50071782197016",
+        "CN_CITY_17275852B20068359050292",
+    ],
     "AEF": [
         "TD_ADM1_TCD-1485",
         "TD_ADM1_TCD-1484",
@@ -462,6 +503,56 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "TD_ADM1_TCD-1489",
         "TD_ADM1_TCD-5583",
         "TD_ADM1_TCD-1488",
+    ],
+    "IAL": [
+        "DZA-2189",
+        "DZA-2188",
+        "DZA-2194",
+        "DZA-2192",
+        "DZA-2193",
+        "DZA-2212",
+        "DZA-2214",
+        "DZA-2211",
+        "DZA-2210",
+        "DZA-2213",
+        "DZA-2197",
+        "DZA-2208",
+        "ATLSHL_west_med_5",
+        "ATLPRV_18179",
+        "DZA-2207",
+        "DZA-2215",
+        "DZA-2165",
+        "DZA-2166",
+        "DZA-2163",
+        "DZA-2164",
+        "DZA-2218",
+        "DZA-2217",
+        "DZA-2220",
+        "DZA-2221",
+        "DZA-2216",
+        "DZA-2219",
+        "DZA-2222",
+        "DZA-2223",
+        "DZA-2191",
+    ],
+    "ALC": [
+        "DZA-2190",
+        "DZA-2143",
+        "DZA-2148",
+        "DZA-2150",
+        "DZA-2149",
+        "DZA-2147",
+        "DZA-2145",
+        "DZA-2144",
+        "DZA-2146",
+        "DZA-2204",
+        "DZA-2201",
+        "DZA-2202",
+        "DZA-2203",
+        "DZA-2205",
+        "DZA-2206",
+        "DZA-2200",
+        "DZA-2199",
     ],
     "IRK": [
         "RU_RAY_50074027B4550186077468",
@@ -636,6 +727,98 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "RU_RAY_50074027B7896527915062",
         "RU_RAY_50074027B49802974490397",
         "RU_RAY_50074027B76724970954393",
+        "RU_RAY_50074027B32782787425978",
+        "RU_RAY_50074027B42819317151918",
+        "RU_RAY_50074027B85218865173974",
+        "RU_RAY_50074027B34235942495173",
+        "RU_RAY_50074027B73796424716840",
+        "RU_RAY_50074027B37788861563784",
+        "RU_RAY_50074027B62324973885793",
+        "RU_RAY_50074027B44706978372394",
+        "RU_RAY_50074027B87884382763880",
+    ],
+    "SVR": [
+        "RU_RAY_50074027B3033714852105",
+        "RU_RAY_50074027B86150609365879",
+        "RU_RAY_50074027B55874149600418",
+        "RU_RAY_50074027B61183763679661",
+        "RU_RAY_50074027B16928982325503",
+        "RU_RAY_50074027B62555187301125",
+        "RU_RAY_50074027B36993675567197",
+        "RU_RAY_50074027B44863367100393",
+        "RU_RAY_50074027B68145102947423",
+        "RU_RAY_50074027B44738927608854",
+        "RU_RAY_50074027B28906813018549",
+        "RU_RAY_50074027B28606060123578",
+        "RU_RAY_50074027B31496942337081",
+        "RU_RAY_50074027B79985122577956",
+        "RU_RAY_50074027B57809326542315",
+        "RU_RAY_50074027B37019235113150",
+        "RU_RAY_50074027B962577442304",
+        "RU_RAY_50074027B62340614203489",
+        "RU_RAY_50074027B58786109430878",
+        "RU_RAY_50074027B31451009482636",
+        "RU_RAY_50074027B28860706284605",
+        "RU_RAY_50074027B77564912174395",
+        "RU_RAY_50074027B58259564251603",
+        "RU_RAY_50074027B17433324636715",
+        "RU_RAY_50074027B93262234465303",
+        "RU_RAY_50074027B16274342774122",
+        "RU_RAY_50074027B90256927178975",
+        "RU_RAY_50074027B67031396039838",
+        "RU_RAY_50074027B58553463142023",
+        "RU_RAY_50074027B83808818851185",
+        "RU_RAY_50074027B56223588847735",
+        "RU_RAY_50074027B71545540908305",
+        "RU_RAY_50074027B77128141881548",
+        "RU_RAY_50074027B39416650406639",
+        "RU_RAY_50074027B44910664086930",
+        "RU_RAY_50074027B98445565270592",
+        "RU_RAY_50074027B68372650413659",
+        "RU_RAY_50074027B86383441268360",
+        "RU_RAY_50074027B84577315553056",
+        "RU_RAY_50074027B45586328769605",
+        "RU_RAY_50074027B10143941987755",
+        "RU_RAY_50074027B21858159893222",
+        "RU_RAY_50074027B39462320896821",
+        "RU_RAY_50074027B85683095957373",
+        "RU_RAY_50074027B28518869085431",
+        "RU_RAY_50074027B59084982393772",
+        "RU_RAY_50074027B89723245705099",
+        "RU_RAY_50074027B34194149868379",
+        "RU_RAY_50074027B59260333720882",
+        "RU_RAY_50074027B76835864360350",
+        "RU_RAY_50074027B29117855811227",
+        "RU_RAY_50074027B913230287563",
+        "RU_RAY_50074027B6339965141747",
+        "RU_RAY_50074027B36040821067036",
+        "RU_RAY_50074027B98412549184479",
+        "RU_RAY_50074027B64020270132903",
+        "RU_RAY_50074027B11508462713906",
+        "RU_RAY_50074027B87493845819863",
+        "RU_RAY_50074027B88833009922563",
+        "RU_RAY_50074027B92699557632668",
+        "RU_RAY_50074027B80098888986721",
+        "RU_RAY_50074027B74307668400106",
+        "RU_RAY_50074027B4275177079349",
+        "RU_RAY_50074027B66293111099001",
+        "RU_RAY_50074027B9614004188530",
+        "RU_RAY_50074027B55283752941545",
+        "RU_RAY_50074027B84070546227145",
+        "RU_RAY_50074027B78325838366914",
+        "RU_RAY_50074027B52749496042519",
+        "RU_RAY_50074027B45280576569410",
+        "RU_RAY_50074027B31277912642085",
+        "RU_RAY_50074027B46582029535198",
+        "RU_RAY_50074027B74305253047814",
+        "RU_RAY_50074027B14479824484507",
+        "RU_RAY_50074027B15132137133452",
+        "RU_RAY_50074027B15595970902062",
+        "RU_RAY_50074027B63395441094430",
+        "RU_RAY_50074027B16195915824724",
+        "RU_RAY_50074027B5367199922404",
+        "RU_RAY_50074027B50410806068929",
+        "RU_RAY_50074027B30834192101705",
     ],
     "KUR": [
         "IRQ-3051",
@@ -1462,6 +1645,20 @@ TNO_1962_MANUAL_COUNTRY_OVERRIDES = {
         "entry_kind": "scenario_country",
         "parent_owner_tag": "",
     },
+    "SVR": {
+        "display_name": "Ural Military District",
+        "continent_id": "continent_europe",
+        "continent_label": "Europe",
+        "subregion_id": "subregion_eastern_europe",
+        "subregion_label": "Eastern Europe",
+        "base_iso2": "RU",
+        "lookup_iso2": "RU",
+        "provenance_iso2": "RU",
+        "color_hex": "#8c6e7c",
+        "notes": "Sverdlovsk is restyled as the Ural Military District for the requested west Siberian transfer set in TNO 1962.",
+        "entry_kind": "scenario_country",
+        "parent_owner_tag": "",
+    },
     "KUR": {
         "display_name": "Kurdistan",
         "continent_id": "continent_asia",
@@ -1588,6 +1785,42 @@ TNO_1962_MANUAL_COUNTRY_OVERRIDES = {
         "entry_kind": "scenario_country",
         "parent_owner_tag": "",
     },
+    "IAL": {
+        "display_name": "Italian Algeria",
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_northern_africa",
+        "subregion_label": "Northern Africa",
+        "base_iso2": "DZ",
+        "lookup_iso2": "DZ",
+        "provenance_iso2": "DZ",
+        "color_hex": "#5f7f55",
+        "notes": "Italian Algeria created from the requested eastern and southern Algerian transfer set in TNO 1962.",
+        "entry_kind": "scenario_subject",
+        "parent_owner_tag": "ITA",
+    },
+    "ALC": {
+        "display_name": "Algerian Command",
+        "continent_id": "continent_africa",
+        "continent_label": "Africa",
+        "subregion_id": "subregion_northern_africa",
+        "subregion_label": "Northern Africa",
+        "base_iso2": "DZ",
+        "lookup_iso2": "DZ",
+        "provenance_iso2": "DZ",
+        "color_hex": "#b89d73",
+        "notes": "Algerian Command created from the requested western Algerian transfer set in TNO 1962.",
+        "entry_kind": "scenario_subject",
+        "parent_owner_tag": "IBR",
+    },
+}
+
+TNO_1962_COUNTRY_DISPLAY_NAME_OVERRIDES = {
+    "CHI": "Republic of China",
+    "RGC": "Sichuan Clique",
+    "GNG": "Guangdong State",
+    "GMA": "Northwest Pacification Government",
+    "QMA": "13th National Revolutionary Army",
 }
 
 TNO_1962_DIRECT_TNO_COLOR_TAGS = {
@@ -2649,6 +2882,20 @@ def ensure_tno_manual_override_countries(countries_payload: dict, owners_payload
             scenario_only=True,
             hidden_from_country_list=False,
         )
+
+
+def apply_tno_country_display_name_overrides(countries_payload: dict) -> None:
+    countries = countries_payload.get("countries", {})
+    if not isinstance(countries, dict):
+        return
+    for raw_tag, display_name in TNO_1962_COUNTRY_DISPLAY_NAME_OVERRIDES.items():
+        tag = normalize_tag(raw_tag)
+        if not tag or tag not in countries:
+            continue
+        entry = countries.get(tag)
+        if not isinstance(entry, dict):
+            continue
+        entry["display_name"] = str(display_name).strip()
 
 
 def rebuild_tno_featured_tags(manifest_payload: dict, countries_payload: dict) -> None:
@@ -5436,6 +5683,7 @@ def main() -> None:
     normalize_tno_country_registry(countries_payload, owners_payload)
     ensure_tno_manual_override_countries(countries_payload, owners_payload)
     ensure_tno_controller_only_countries(countries_payload, controllers_payload)
+    apply_tno_country_display_name_overrides(countries_payload)
 
     congo_props = {}
     if current_water_regions.get("features"):
