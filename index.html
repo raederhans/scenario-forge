@@ -30,7 +30,7 @@
             <div id="paletteLibraryPanel" class="palette-library mt-3 hidden">
               <div id="paletteLibrarySources" class="palette-library-sources" role="tablist" aria-label="Palette sources"></div>
               <label id="lblPaletteSearch" class="section-header-block" for="paletteLibrarySearch">Search Colors</label>
-              <input id="paletteLibrarySearch" type="text" placeholder="Search country, ISO-2, or source tag..." class="input mt-2" />
+              <input id="paletteLibrarySearch" type="text" name="palette-library-search" autocomplete="off" spellcheck="false" placeholder="Search country, ISO-2, or source tag…" class="input mt-2" />
               <div id="paletteLibrarySummary" class="body-text mt-2">0 colors</div>
               <div id="paletteLibraryList" class="palette-library-list mt-3"></div>
             </div>
@@ -42,11 +42,11 @@
             <div id="scenarioStatus" class="body-text mt-3">No scenario active</div>
             <div id="scenarioAuditHint" class="body-text mt-2 hidden">Coverage report unavailable</div>
             <label id="lblScenarioSelect" class="section-header-block mt-3" for="scenarioSelect">Scenario</label>
-            <select id="scenarioSelect" class="select-input mt-2">
+            <select id="scenarioSelect" name="scenario-select" autocomplete="off" class="select-input mt-2">
               <option value="">None</option>
             </select>
             <label id="lblScenarioViewMode" class="section-header-block mt-3" for="scenarioViewModeSelect">View</label>
-            <select id="scenarioViewModeSelect" class="select-input mt-2 hidden" disabled>
+            <select id="scenarioViewModeSelect" name="scenario-view-mode" autocomplete="off" class="select-input mt-2 hidden" disabled>
               <option value="ownership">Ownership</option>
               <option value="frontline">Frontline</option>
             </select>
@@ -910,7 +910,7 @@
             <div class="space-y-3 mt-4">
               <div class="flex items-center justify-between gap-3">
                 <label id="lblSpecialZoneType" class="range-label" for="specialZoneTypeSelect">Type</label>
-                <select id="specialZoneTypeSelect" class="select-input">
+                <select id="specialZoneTypeSelect" name="special-zone-type" autocomplete="off" class="select-input">
                   <option value="disputed">Disputed</option>
                   <option value="wasteland">Wasteland</option>
                   <option value="custom" selected>Custom</option>
@@ -918,7 +918,7 @@
               </div>
               <div>
                 <label id="lblSpecialZoneLabel" class="range-label" for="specialZoneLabelInput">Label</label>
-                <input id="specialZoneLabelInput" type="text" class="input mt-2" placeholder="e.g. Buffer Zone A" />
+                <input id="specialZoneLabelInput" type="text" name="special-zone-label" autocomplete="off" spellcheck="false" class="input mt-2" placeholder="e.g. Buffer Zone A…" />
               </div>
               <div class="parent-border-actions mt-2">
                 <button id="specialZoneStartBtn" type="button" class="btn-secondary">Start Draw</button>
@@ -930,7 +930,7 @@
               </div>
               <div>
                 <label id="lblSpecialZoneList" class="range-label" for="specialZoneFeatureList">Manual Zones</label>
-                <select id="specialZoneFeatureList" class="select-input mt-2"></select>
+                <select id="specialZoneFeatureList" name="special-zone-feature-list" autocomplete="off" class="select-input mt-2"></select>
               </div>
               <button id="specialZoneDeleteBtn" type="button" class="btn-secondary mt-2">Delete Selected</button>
               <div id="specialZoneEditorHint" class="parent-border-empty mt-2">
@@ -996,7 +996,7 @@
 
           <div id="zoomControls" class="zoom-controls" role="group" aria-label="Map zoom controls">
             <button id="zoomOutBtn" type="button" class="zoom-btn" aria-label="Zoom out" title="Zoom out">-</button>
-            <input id="zoomPercentInput" type="text" inputmode="numeric" class="input dock-zoom-input" aria-label="Zoom percentage" value="100%" />
+            <input id="zoomPercentInput" type="text" name="zoom-percent" autocomplete="off" spellcheck="false" inputmode="numeric" class="input dock-zoom-input" aria-label="Zoom percentage" value="100%" />
             <button id="zoomInBtn" type="button" class="zoom-btn" aria-label="Zoom in" title="Zoom in">+</button>
             <button id="zoomResetBtn" type="button" class="zoom-btn zoom-btn-reset" aria-label="Reset zoom" title="Fit">Fit</button>
             <button
@@ -1052,7 +1052,7 @@
                 <div id="lblEditingRules" class="dock-group-label">Paint</div>
                 <div id="dockPaintPrimaryRow" class="dock-paint-row">
                   <div id="dockPaintSummary" class="dock-paint-summary">Visual Color brush</div>
-                  <select id="paintGranularitySelect" class="select-input dock-select">
+                  <select id="paintGranularitySelect" name="paint-granularity" autocomplete="off" class="select-input dock-select">
                     <option id="optPaintSubdivision" value="subdivision">By Subdivision</option>
                     <option id="optPaintCountry" value="country">By Country</option>
                   </select>
@@ -1069,7 +1069,7 @@
                 </div>
                 <div id="dockPoliticalEditingPanel" class="dock-political-panel hidden">
                   <div class="dock-paint-row">
-                    <select id="paintModeSelect" class="select-input dock-select">
+                    <select id="paintModeSelect" name="paint-mode" autocomplete="off" class="select-input dock-select">
                       <option id="optPaintMeaningVisual" value="visual">Visual Color</option>
                       <option id="optPaintMeaningSovereignty" value="sovereignty">Political Ownership</option>
                     </select>
@@ -1101,7 +1101,7 @@
                 <div class="dock-color-row">
                   <button id="selectedColorPreview" class="selected-color-preview" type="button" aria-label="Selected color preview"></button>
                   <input id="customColor" type="color" value="#1f3a5f" class="color-input dock-custom-color" aria-label="Custom color" />
-                  <select id="themeSelect" class="select-input dock-select">
+                  <select id="themeSelect" name="quick-palette-source" autocomplete="off" class="select-input dock-select">
                     <option value="HOI4 Vanilla">HOI4 Vanilla</option>
                   </select>
                 </div>
@@ -1110,7 +1110,7 @@
               <div class="dock-group dock-group-autofill">
                 <div id="lblMapStyle" class="dock-group-label">Auto-Fill</div>
                 <div class="dock-autofill-row">
-                  <select id="colorModeSelect" class="select-input dock-select">
+                  <select id="colorModeSelect" name="color-mode" autocomplete="off" class="select-input dock-select">
                     <option id="optColorModeRegion" value="region">By Region</option>
                     <option id="optColorModePolitical" value="political" selected>By Neighbor (Political)</option>
                   </select>
@@ -1145,7 +1145,7 @@
                 </div>
                 <div id="dockReferencePopover" class="dock-utility-popover hidden" role="dialog" aria-label="Reference tools">
                   <h3 id="lblReferenceImage" class="section-header">Reference Image</h3>
-                  <input id="referenceImageInput" type="file" accept="image/*" class="file-input mt-3" />
+                  <input id="referenceImageInput" type="file" name="reference-image-file" accept="image/*" class="file-input mt-3" />
                   <div class="space-y-3 mt-4">
                     <div>
                       <div class="range-row">
@@ -1189,7 +1189,7 @@
                     </div>
                   </div>
                   <label id="lblExportFormat" class="section-header-block mt-3" for="exportFormat">Format</label>
-                  <select id="exportFormat" class="select-input mt-2">
+                  <select id="exportFormat" name="export-format" autocomplete="off" class="select-input mt-2">
                     <option value="png">PNG</option>
                     <option value="jpg">JPG</option>
                   </select>
@@ -1217,7 +1217,7 @@
                   <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
                   <path d="M16 16 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
                 </svg>
-                <input id="countrySearch" type="text" placeholder="Search country or code..." class="input inspector-search-input" />
+                <input id="countrySearch" type="text" name="country-search" autocomplete="off" spellcheck="false" placeholder="Search country or code…" class="input inspector-search-input" />
               </div>
             </div>
           </div>
@@ -1310,7 +1310,10 @@
                   <input
                     id="specialRegionSearch"
                     type="text"
-                    placeholder="Search basin, shelf, or exposure..."
+                    name="special-region-search"
+                    autocomplete="off"
+                    spellcheck="false"
+                    placeholder="Search basin, shelf, or exposure…"
                     class="input inspector-search-input"
                   />
                 </div>
@@ -1379,7 +1382,10 @@
                   <input
                     id="waterRegionSearch"
                     type="text"
-                    placeholder="Search sea, lake, or strait..."
+                    name="water-region-search"
+                    autocomplete="off"
+                    spellcheck="false"
+                    placeholder="Search sea, lake, or strait…"
                     class="input inspector-search-input"
                   />
                 </div>

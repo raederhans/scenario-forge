@@ -365,6 +365,8 @@ function initToolbar({ render } = {}) {
     { key: "countries", label: () => t("Countries", "ui"), defaultOpen: false },
     { key: "extra", label: () => t("Extra", "ui"), defaultOpen: false },
   ];
+  const MOBILE_WORKSPACE_MAX_WIDTH = 767;
+  const TABLET_WORKSPACE_MAX_WIDTH = 1023;
   const SCENARIO_BAR_LEFT_OFFSET = 18;
   const SCENARIO_BAR_MOBILE_LEFT_OFFSET = 12;
   const SCENARIO_BAR_SAFE_GAP = 16;
@@ -378,9 +380,28 @@ function initToolbar({ render } = {}) {
   state.ui.scenarioGuideDismissed = !!state.ui.scenarioGuideDismissed;
   state.ui.politicalEditingExpanded = !!state.ui.politicalEditingExpanded;
   state.ui.scenarioVisualAdjustmentsOpen = !!state.ui.scenarioVisualAdjustmentsOpen;
+  state.ui.responsiveChromeTier = String(state.ui.responsiveChromeTier || "");
   if (!state.ui.paletteLibrarySections || typeof state.ui.paletteLibrarySections !== "object") {
     state.ui.paletteLibrarySections = {};
   }
+
+  const getResponsiveChromeTier = () => {
+    const viewportWidth = Number(globalThis.innerWidth) || 0;
+    if (viewportWidth <= MOBILE_WORKSPACE_MAX_WIDTH) return "mobile";
+    if (viewportWidth <= TABLET_WORKSPACE_MAX_WIDTH) return "tablet";
+    return "desktop";
+  };
+
+  const applyResponsiveChromeDefaults = () => {
+    const nextTier = getResponsiveChromeTier();
+    if (state.ui.responsiveChromeTier === nextTier) return;
+    if (nextTier === "mobile") {
+      state.ui.dockCollapsed = true;
+      state.ui.scenarioBarCollapsed = true;
+    }
+    state.ui.responsiveChromeTier = nextTier;
+  };
+  applyResponsiveChromeDefaults();
 
   const getPaintModeLabel = () => (
     String(state.paintMode || "visual") === "sovereignty"
@@ -3417,6 +3438,8 @@ function initToolbar({ render } = {}) {
 
   if (!state.ui.overlayResizeBound) {
     globalThis.addEventListener("resize", () => {
+      applyResponsiveChromeDefaults();
+      updateDockCollapsedUi();
       refreshScenarioContextBar();
       scheduleAdaptivePaletteLibraryHeight();
     });

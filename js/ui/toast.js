@@ -1,5 +1,6 @@
 let toastViewport = null;
 let toastCounter = 0;
+const TOAST_EXIT_DELAY_MS = 180;
 
 function initToast({ viewportId = "toastViewport" } = {}) {
   toastViewport = document.getElementById(viewportId);
@@ -11,6 +12,26 @@ function normalizeTone(tone) {
     return value;
   }
   return "info";
+}
+
+function resolveToastDuration(duration, tone) {
+  const explicitDuration = Number(duration);
+  if (Number.isFinite(explicitDuration) && explicitDuration > 0) {
+    return Math.max(1200, explicitDuration);
+  }
+  if (tone === "error") return 5600;
+  if (tone === "warning") return 4600;
+  if (tone === "success") return 3200;
+  return 2800;
+}
+
+function dismissToast(toast) {
+  if (!toast || toast.dataset.removing === "true") return;
+  toast.dataset.removing = "true";
+  toast.classList.add("is-removing");
+  globalThis.setTimeout(() => {
+    toast.remove();
+  }, TOAST_EXIT_DELAY_MS);
 }
 
 function showToast(message, { title = "", tone = "info", duration = 3000 } = {}) {
@@ -42,12 +63,21 @@ function showToast(message, { title = "", tone = "info", duration = 3000 } = {})
   content.appendChild(messageEl);
 
   toast.appendChild(content);
+  const dismissButton = document.createElement("button");
+  dismissButton.type = "button";
+  dismissButton.className = "toast-dismiss";
+  dismissButton.setAttribute("aria-label", "Dismiss notification");
+  dismissButton.textContent = "×";
+  dismissButton.addEventListener("click", () => {
+    dismissToast(toast);
+  });
+  toast.appendChild(dismissButton);
   toastViewport.appendChild(toast);
 
-  const ttl = Math.max(1200, Number(duration) || 3000);
+  const normalizedDuration = resolveToastDuration(duration, normalizedTone);
   globalThis.setTimeout(() => {
-    toast.remove();
-  }, ttl);
+    dismissToast(toast);
+  }, normalizedDuration);
 
   return toast;
 }

@@ -1,27 +1,36 @@
 /* ── Design Tokens ─────────────────────────────────────── */
 :root {
-  --bg-app: #F5F7FA;
-  --bg-surface: #FFFFFF;
-  --bg-input: #F0F2F5;
-  --text-primary: #2D3436;
-  --text-secondary: #636E72;
-  --text-disabled: #A0A4A8;
-  --color-accent: #002FA7;
-  --color-accent-hover: #0038c7;
-  --color-success: #27AE60;
-  --color-warning: #F39C12;
-  --color-danger: #E74C3C;
-  --color-disabled: #BDC3C7;
-  --border-subtle: rgba(0, 0, 0, 0.05);
-  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
-  --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
-  --shadow-floating: 0 18px 50px rgba(15, 23, 42, 0.18);
-  --radius-card: 16px;
-  --radius-btn: 8px;
+  --bg-app: #dfe6eb;
+  --bg-surface: rgba(248, 250, 252, 0.94);
+  --bg-input: #e7edf2;
+  --bg-surface-subtle: rgba(234, 240, 245, 0.74);
+  --bg-overlay: rgba(239, 243, 247, 0.84);
+  --bg-overlay-strong: rgba(247, 249, 251, 0.92);
+  --text-primary: #1e2d3d;
+  --text-secondary: #5b6978;
+  --text-disabled: #97a4b0;
+  --color-accent: #204c77;
+  --color-accent-hover: #2d618f;
+  --color-map-accent: #b05b2d;
+  --color-map-accent-soft: rgba(176, 91, 45, 0.12);
+  --color-success: #2f7d57;
+  --color-warning: #b7791f;
+  --color-danger: #b94d3f;
+  --color-disabled: #c3ccd4;
+  --border-subtle: rgba(37, 54, 73, 0.12);
+  --border-strong: rgba(37, 54, 73, 0.24);
+  --shadow-soft: 0 12px 24px rgba(18, 27, 38, 0.08);
+  --shadow-hover: 0 16px 34px rgba(18, 27, 38, 0.12);
+  --shadow-floating: 0 24px 52px rgba(11, 20, 34, 0.2);
+  --radius-card: 18px;
+  --radius-btn: 12px;
   --spacing-md: 24px;
   --spacing-lg: 32px;
-  --transition-fast: 150ms ease;
-  --transition-medium: 300ms ease;
+  --transition-fast: 160ms ease;
+  --transition-medium: 260ms ease;
+  --font-title: "Palatino Linotype", "Book Antiqua", Georgia, "Times New Roman", serif;
+  --font-body: "Segoe UI Variable", "Segoe UI", "PingFang SC", "Microsoft YaHei UI", "Noto Sans SC", sans-serif;
+  --font-mono: "Consolas", "SFMono-Regular", "Cascadia Mono", monospace;
 }
 
 /* ── Reset & Global ────────────────────────────────────── */
@@ -35,13 +44,16 @@ body {
   padding: 0;
   width: 100%;
   height: 100%;
-  background: var(--bg-app);
-  font-family: 'Inter', 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, system-ui, -apple-system, sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0) 34%),
+    linear-gradient(180deg, #edf2f5 0%, var(--bg-app) 58%, #d6dde4 100%);
+  font-family: var(--font-body);
   color: var(--text-primary);
   line-height: 1.6;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color-scheme: light;
 }
 
 button,
@@ -87,8 +99,11 @@ textarea {
 .sidebar {
   width: 320px;
   flex-shrink: 0;
-  background: var(--bg-surface);
-  box-shadow: var(--shadow-soft);
+  background:
+    linear-gradient(180deg, rgba(248, 250, 252, 0.98) 0%, rgba(236, 241, 245, 0.94) 100%);
+  box-shadow:
+    inset -1px 0 0 rgba(255, 255, 255, 0.45),
+    var(--shadow-soft);
   border-right: 1px solid var(--border-subtle);
   padding: var(--spacing-lg) var(--spacing-md);
   max-height: 100vh;
@@ -99,8 +114,11 @@ textarea {
 .sidebar-right {
   width: 300px;
   flex-shrink: 0;
-  background: var(--bg-surface);
-  box-shadow: var(--shadow-soft);
+  background:
+    linear-gradient(180deg, rgba(247, 249, 251, 0.98) 0%, rgba(234, 239, 244, 0.96) 100%);
+  box-shadow:
+    inset 1px 0 0 rgba(255, 255, 255, 0.45),
+    var(--shadow-soft);
   border-left: 1px solid var(--border-subtle);
   padding: var(--spacing-lg) var(--spacing-md);
   max-height: 100vh;
@@ -134,11 +152,13 @@ textarea {
 
 /* ── Typography ────────────────────────────────────────── */
 .app-title {
-  font-size: 2rem;
+  font-size: 2.15rem;
   font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: -0.5px;
+  letter-spacing: -0.03em;
   line-height: 1.2;
+  font-family: var(--font-title);
+  text-wrap: balance;
 }
 
 .app-title-row {
@@ -163,19 +183,20 @@ textarea {
 }
 
 .section-header {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: #425062;
   margin: 0;
+  text-wrap: balance;
 }
 
 .section-header-block {
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.74rem;
+  font-weight: 700;
   text-transform: none;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.04em;
   color: var(--text-secondary);
   margin: 0;
   display: block;
@@ -184,7 +205,7 @@ textarea {
 .body-text {
   font-size: 0.875rem;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
 .tip-text {
@@ -208,15 +229,19 @@ textarea {
 
 /* ── Card ──────────────────────────────────────────────── */
 .card {
-  background: var(--bg-surface);
+  background:
+    linear-gradient(180deg, rgba(249, 250, 251, 0.96) 0%, rgba(242, 246, 249, 0.94) 100%);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-soft);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 10px 26px rgba(18, 27, 38, 0.06);
   padding: 20px;
 }
 
 .card-flat {
-  background: var(--bg-input);
+  background:
+    linear-gradient(180deg, rgba(237, 242, 246, 0.92) 0%, rgba(231, 237, 242, 0.84) 100%);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-card);
   padding: 20px;
@@ -282,20 +307,23 @@ textarea {
 .input,
 .select-input {
   width: 100%;
-  border: none;
-  background: var(--bg-input);
+  border: 1px solid rgba(37, 54, 73, 0.08);
+  background: rgba(255, 255, 255, 0.7);
   border-radius: var(--radius-btn);
   padding: 12px 16px;
   font-size: 0.875rem;
   color: var(--text-primary);
   font-family: inherit;
   outline: none;
-  transition: box-shadow 0.2s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
 }
 
 .input:focus,
 .select-input:focus {
-  box-shadow: 0 0 0 2px rgba(0, 47, 167, 0.15);
+  border-color: rgba(32, 76, 119, 0.2);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 0 0 3px rgba(32, 76, 119, 0.12);
 }
 
 .input::placeholder {
@@ -376,27 +404,27 @@ input[type="checkbox"].checkbox-input {
   justify-content: center;
   gap: 8px;
   width: 100%;
-  background: var(--color-accent);
+  background: linear-gradient(135deg, var(--color-accent), #2d5f87);
   color: #FFFFFF;
   font-weight: 600;
   font-size: 0.875rem;
   font-family: inherit;
   padding: 12px 24px;
-  border: none;
+  border: 1px solid rgba(18, 27, 38, 0.08);
   border-radius: var(--radius-btn);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  box-shadow: 0 10px 22px rgba(32, 76, 119, 0.18);
+  transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast);
 }
 
 .btn-primary:hover {
-  background: var(--color-accent-hover);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
+  background: linear-gradient(135deg, var(--color-accent-hover), #3874a6);
+  border-color: rgba(18, 27, 38, 0.12);
+  box-shadow: 0 14px 26px rgba(32, 76, 119, 0.22);
 }
 
 .btn-primary:active {
-  transform: scale(0.98);
-  box-shadow: none;
+  box-shadow: 0 6px 14px rgba(32, 76, 119, 0.18);
 }
 
 .btn-secondary {
@@ -405,30 +433,31 @@ input[type="checkbox"].checkbox-input {
   justify-content: center;
   gap: 8px;
   width: 100%;
-  background: transparent;
-  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.54);
+  color: var(--text-primary);
   font-weight: 600;
   font-size: 0.875rem;
   font-family: inherit;
   padding: 12px 24px;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(37, 54, 73, 0.1);
   border-radius: var(--radius-btn);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast);
 }
 
 .btn-secondary:hover {
-  background: var(--bg-input);
-  border-color: #ccc;
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(37, 54, 73, 0.18);
+  box-shadow: 0 8px 18px rgba(18, 27, 38, 0.08);
 }
 
 .btn-secondary:active {
-  transform: scale(0.98);
+  box-shadow: none;
 }
 
 .btn-tool {
   flex: 1;
-  background: var(--bg-surface);
+  background: rgba(255, 255, 255, 0.66);
   color: var(--text-secondary);
   font-weight: 500;
   font-size: 0.8rem;
@@ -437,11 +466,12 @@ input[type="checkbox"].checkbox-input {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-btn);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .btn-tool:hover {
-  background: var(--bg-input);
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(37, 54, 73, 0.18);
 }
 
 .btn-tool.active,
@@ -452,20 +482,24 @@ input[type="checkbox"].checkbox-input {
 }
 
 .btn-lang {
-  padding: 4px 10px;
+  min-height: 32px;
+  padding: 0 12px;
   font-size: 0.75rem;
   font-weight: 700;
   font-family: inherit;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-btn);
-  background: transparent;
-  color: var(--text-secondary);
+  border: 1px solid rgba(37, 54, 73, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--text-primary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .btn-lang:hover {
-  background: var(--bg-input);
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(37, 54, 73, 0.18);
+  box-shadow: 0 8px 16px rgba(18, 27, 38, 0.08);
 }
 
 .btn-primary:disabled,
@@ -808,7 +842,7 @@ input[type="checkbox"].checkbox-input {
 
 .appearance-tab-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -817,17 +851,17 @@ input[type="checkbox"].checkbox-input {
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 52px;
+  min-height: 48px;
   border: 1px solid rgba(15, 23, 42, 0.1);
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.7);
   color: var(--text-secondary);
   border-radius: 12px;
   padding: 10px 12px;
-  font-size: 0.68rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 700;
   line-height: 1.2;
-  letter-spacing: 0.04em;
-  text-align: center;
+  letter-spacing: 0.02em;
+  text-align: left;
   white-space: normal;
   cursor: pointer;
   transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
@@ -1093,7 +1127,7 @@ details.card[open] > summary::after {
   border: none;
   border-left: 2px solid transparent;
   color: var(--text-secondary);
-  transition: all 0.2s ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), padding-left var(--transition-fast);
 }
 
 .sidebar-right .country-list button.country-btn:hover,
@@ -1177,9 +1211,11 @@ details.card[open] > summary::after {
   min-width: 0;
   min-height: 0;
   height: 100%;
-  background: var(--bg-app);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 42%),
+    linear-gradient(180deg, rgba(226, 233, 239, 0.88) 0%, rgba(215, 223, 231, 0.96) 100%);
   overflow: hidden;
-  padding: 16px;
+  padding: 18px;
 }
 
 .map-stage {
@@ -1195,12 +1231,12 @@ details.card[open] > summary::after {
   height: auto;
   transform-origin: 0 0;
   will-change: transform;
-  background-color: #111827;
+  background-color: #0c1830;
   background-image:
-    radial-gradient(circle at 50% 35%, rgba(37, 99, 235, 0.12), rgba(15, 23, 42, 0.95) 72%);
+    radial-gradient(circle at 50% 35%, rgba(67, 114, 173, 0.18), rgba(10, 18, 32, 0.96) 74%);
   background-size: 100% 100%;
   border: 1px solid rgba(148, 163, 184, 0.25);
-  border-radius: 22px;
+  border-radius: 26px;
   overflow: hidden;
   box-shadow:
     inset 0 0 0 1px rgba(15, 23, 42, 0.9),
@@ -1220,8 +1256,6 @@ details.card[open] > summary::after {
 
 #map-canvas,
 #colorCanvas {
-  outline: 1px solid rgba(148, 163, 184, 0.22);
-  outline-offset: -1px;
   box-shadow: 0 16px 34px rgba(2, 6, 23, 0.35);
 }
 
@@ -1300,7 +1334,7 @@ details.card[open] > summary::after {
   z-index: 6;
   padding-bottom: 12px;
   margin-bottom: -2px;
-  background: linear-gradient(180deg, rgba(248, 249, 250, 0.98) 0%, rgba(248, 249, 250, 0.96) 78%, rgba(248, 249, 250, 0) 100%);
+  background: linear-gradient(180deg, rgba(244, 248, 251, 0.98) 0%, rgba(244, 248, 251, 0.94) 78%, rgba(244, 248, 251, 0) 100%);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
@@ -1309,8 +1343,8 @@ details.card[open] > summary::after {
 .inspector-search-block {
   position: relative;
   z-index: 1;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
   padding: 12px 14px;
 }
 
@@ -1400,17 +1434,17 @@ details.card[open] > summary::after {
 .bottom-dock {
   position: absolute;
   left: 50%;
-  bottom: 16px;
-  width: min(880px, calc(100% - 56px));
+  bottom: 18px;
+  width: min(820px, calc(100% - 88px));
   transform: translateX(-50%);
   z-index: 25;
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 7px 9px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
+  gap: 8px;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, rgba(240, 244, 247, 0.88) 0%, rgba(230, 236, 241, 0.82) 100%);
+  border: 1px solid rgba(37, 54, 73, 0.16);
+  border-radius: 24px;
   box-shadow: var(--shadow-floating);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -1422,9 +1456,9 @@ details.card[open] > summary::after {
 }
 
 .dock-collapse-btn {
-  border: 1px solid rgba(15, 23, 42, 0.1);
+  border: 1px solid rgba(37, 54, 73, 0.12);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.64);
   color: var(--text-secondary);
   font-size: 0.7rem;
   font-weight: 600;
@@ -1516,7 +1550,7 @@ details.card[open] > summary::after {
   padding: 7px 10px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.62);
   color: var(--text-primary);
   font-size: 0.78rem;
   font-weight: 600;
@@ -1531,7 +1565,7 @@ details.card[open] > summary::after {
   padding: 8px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.74);
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .dock-paint-secondary {
@@ -1542,7 +1576,7 @@ details.card[open] > summary::after {
   padding: 8px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.66);
+  background: rgba(255, 255, 255, 0.54);
 }
 
 .dock-paint-mini-label {
@@ -1550,7 +1584,7 @@ details.card[open] > summary::after {
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .dock-paint-toggle-row {
@@ -1595,12 +1629,13 @@ details.card[open] > summary::after {
   justify-content: center;
   min-width: 38px;
   min-height: 38px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(37, 54, 73, 0.12);
   border-radius: 10px;
-  background: var(--bg-surface);
+  background: rgba(255, 255, 255, 0.56);
   color: var(--text-primary);
   cursor: pointer;
-  transition: transform var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast);
 }
 
 .dock-tool-btn {
@@ -1625,8 +1660,9 @@ details.card[open] > summary::after {
 .zoom-btn:hover,
 .panel-toggle:hover,
 .selected-color-preview:hover {
-  transform: translateY(-1px);
-  border-color: rgba(0, 47, 167, 0.22);
+  border-color: rgba(32, 76, 119, 0.24);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 10px 18px rgba(18, 27, 38, 0.08);
 }
 
 .dock-select {
@@ -1717,8 +1753,8 @@ details.card[open] > summary::after {
 }
 
 .dock-icon-btn.is-active {
-  border-color: rgba(0, 47, 167, 0.24);
-  background: rgba(0, 47, 167, 0.08);
+  border-color: rgba(37, 54, 73, 0.22);
+  background: rgba(32, 76, 119, 0.08);
   color: var(--color-accent);
 }
 
@@ -1773,20 +1809,22 @@ details.card[open] > summary::after {
 
 .scenario-context-bar {
   position: absolute;
-  left: 18px;
-  top: 18px;
+  left: 16px;
+  top: 16px;
   z-index: 26;
   width: max-content;
-  max-width: min(620px, calc(100% - 160px));
+  max-width: min(560px, calc(100% - 180px));
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   min-width: 0;
-  padding: 7px 10px;
+  padding: 8px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(15, 23, 42, 0.1);
-  background: rgba(255, 255, 255, 0.93);
-  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(37, 54, 73, 0.16);
+  background: var(--bg-overlay-strong);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .scenario-context-bar.is-scenario {
@@ -1808,10 +1846,10 @@ details.card[open] > summary::after {
   flex: 0 1 auto;
   min-width: 0;
   max-width: 100%;
-  padding: 4px 8px;
+  padding: 5px 10px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.04);
-  font-size: 0.72rem;
+  background: rgba(18, 32, 52, 0.05);
+  font-size: 0.74rem;
   color: var(--text-secondary);
   white-space: nowrap;
 }
@@ -1833,7 +1871,7 @@ details.card[open] > summary::after {
   border-radius: 50%;
   font-size: 0.64rem;
   font-weight: 700;
-  background: rgba(0, 47, 167, 0.12);
+  background: rgba(32, 76, 119, 0.12);
   color: var(--color-accent);
 }
 
@@ -1858,15 +1896,17 @@ details.card[open] > summary::after {
 
 .scenario-guide-popover {
   position: absolute;
-  top: 56px;
-  left: 18px;
+  top: 58px;
+  left: 16px;
   z-index: 26;
   width: min(360px, calc(100% - 36px));
   padding: 12px 14px;
   border-radius: 14px;
-  border: 1px solid rgba(15, 23, 42, 0.1);
-  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(37, 54, 73, 0.14);
+  background: var(--bg-overlay-strong);
   box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .scenario-guide-status {
@@ -1913,17 +1953,17 @@ details.card[open] > summary::after {
 
 .zoom-controls {
   position: absolute;
-  top: 22px;
+  top: 18px;
   right: 24px;
   z-index: 26;
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 10px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 8px;
+  border: 1px solid rgba(37, 54, 73, 0.14);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 14px 24px rgba(15, 23, 42, 0.12);
+  background: var(--bg-overlay-strong);
+  box-shadow: 0 14px 24px rgba(15, 23, 42, 0.1);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -1951,26 +1991,36 @@ details.card[open] > summary::after {
 
 .toast-viewport {
   position: absolute;
-  top: 94px;
+  top: 88px;
   right: 24px;
   z-index: 30;
   display: flex;
   flex-direction: column;
   gap: 10px;
   pointer-events: none;
-  max-width: min(360px, 80vw);
+  max-width: min(340px, 78vw);
 }
 
 .toast {
   display: flex;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 10px;
-  padding: 12px 14px;
+  padding: 13px 14px;
   border-radius: 16px;
-  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(17, 27, 41, 0.88);
   color: #fff;
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.2);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.18);
   pointer-events: auto;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.toast.is-removing {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 
 .toast.toast-success {
@@ -1991,10 +2041,34 @@ details.card[open] > summary::after {
   line-height: 1.35;
 }
 
+.toast-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+}
+
 .toast-message {
   font-size: 0.78rem;
   line-height: 1.45;
   opacity: 0.92;
+}
+
+.toast-dismiss {
+  flex: 0 0 auto;
+  min-width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: inherit;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.toast-dismiss:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .panel-toggle {
@@ -2022,9 +2096,9 @@ details.card[open] > summary::after {
   left: 24px;
   z-index: 27;
   padding: 8px 12px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(37, 54, 73, 0.14);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--bg-overlay-strong);
   color: var(--text-primary);
   font-size: 0.78rem;
   font-weight: 700;
@@ -2051,14 +2125,14 @@ details.card[open] > summary::after {
   left: 50%;
   top: 50%;
   z-index: 24;
-  max-width: min(460px, calc(100% - 48px));
-  padding: 14px 16px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  max-width: min(390px, calc(100% - 48px));
+  padding: 12px 16px;
+  border: 1px solid rgba(37, 54, 73, 0.14);
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.88);
+  background: var(--bg-overlay);
   color: var(--text-primary);
   text-align: center;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   line-height: 1.45;
   transform: translate(-50%, -50%);
   box-shadow: 0 18px 34px rgba(15, 23, 42, 0.16);
@@ -2315,7 +2389,7 @@ details.card[open] > summary::after {
 
 .country-select-row {
   justify-content: space-between;
-  background: var(--bg-input);
+  background: linear-gradient(180deg, rgba(239, 243, 247, 0.84) 0%, rgba(232, 238, 243, 0.78) 100%);
   text-align: left;
   cursor: pointer;
   position: relative;
@@ -2323,15 +2397,15 @@ details.card[open] > summary::after {
 }
 
 .country-select-row:hover {
-  background: rgba(240, 242, 245, 0.92);
-  border-color: rgba(0, 47, 167, 0.18);
-  transform: translateY(-1px);
+  background: rgba(246, 249, 251, 0.98);
+  border-color: rgba(37, 54, 73, 0.18);
+  box-shadow: 0 10px 18px rgba(18, 27, 38, 0.06);
 }
 
 .country-select-row.is-selected {
-  border-color: rgba(0, 47, 167, 0.24);
-  background: rgba(0, 47, 167, 0.06);
-  box-shadow: inset 0 0 0 1px rgba(0, 47, 167, 0.05);
+  border-color: rgba(32, 76, 119, 0.22);
+  background: rgba(32, 76, 119, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(32, 76, 119, 0.06);
 }
 
 .country-select-row.is-active-owner {
@@ -2346,7 +2420,7 @@ details.card[open] > summary::after {
   bottom: 7px;
   height: 4px;
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(0, 47, 167, 0.92), rgba(67, 116, 255, 0.78));
+  background: linear-gradient(90deg, rgba(176, 91, 45, 0.96), rgba(211, 126, 74, 0.78));
 }
 
 .country-select-card.has-subaction > .country-select-row {
@@ -2361,15 +2435,15 @@ details.card[open] > summary::after {
 .country-select-subaction {
   width: 100%;
   margin-top: -1px;
-  border: 1px solid rgba(0, 47, 167, 0.14);
-  border-top-color: rgba(0, 47, 167, 0.08);
+  border: 1px solid rgba(32, 76, 119, 0.14);
+  border-top-color: rgba(32, 76, 119, 0.08);
   border-radius: 0 0 12px 12px;
-  background: rgba(0, 47, 167, 0.05);
+  background: rgba(32, 76, 119, 0.05);
   color: var(--color-accent);
   font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-transform: none;
   line-height: 1.2;
   padding: 7px 10px 8px;
   text-align: center;
@@ -2378,8 +2452,8 @@ details.card[open] > summary::after {
 }
 
 .country-select-subaction:hover {
-  background: rgba(0, 47, 167, 0.09);
-  border-color: rgba(0, 47, 167, 0.22);
+  background: rgba(32, 76, 119, 0.08);
+  border-color: rgba(32, 76, 119, 0.22);
 }
 
 .country-select-subaction:focus-visible {
@@ -2417,7 +2491,7 @@ details.card[open] > summary::after {
 
 .country-select-title {
   min-width: 0;
-  font-size: 0.84rem;
+  font-size: 0.86rem;
   font-weight: 600;
   line-height: 1.35;
   color: var(--text-primary);
@@ -2425,8 +2499,8 @@ details.card[open] > summary::after {
 
 .country-select-meta {
   min-width: 0;
-  font-size: 0.72rem;
-  line-height: 1.35;
+  font-size: 0.71rem;
+  line-height: 1.4;
   color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2457,7 +2531,7 @@ details.card[open] > summary::after {
   height: 1.45rem;
   padding: 0 6px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.06);
+  background: rgba(37, 54, 73, 0.08);
   color: var(--text-secondary);
   font-size: 0.7rem;
   font-weight: 700;
@@ -2467,9 +2541,9 @@ details.card[open] > summary::after {
 .scenario-action-intro {
   margin-bottom: 10px;
   padding: 10px 12px;
-  border: 1px solid rgba(0, 47, 167, 0.14);
+  border: 1px solid rgba(32, 76, 119, 0.14);
   border-radius: 12px;
-  background: rgba(0, 47, 167, 0.05);
+  background: rgba(32, 76, 119, 0.05);
   color: var(--text-primary);
   font-size: 0.78rem;
   line-height: 1.5;
@@ -2485,7 +2559,7 @@ details.card[open] > summary::after {
 .scenario-visual-adjustments {
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .scenario-visual-adjustments > summary {
@@ -2518,12 +2592,12 @@ details.card[open] > summary::after {
   align-items: center;
   padding: 2px 6px;
   border-radius: 999px;
-  background: rgba(184, 74, 0, 0.1);
+  background: var(--color-map-accent-soft);
   color: #8a3c00;
   font-size: 0.66rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-transform: none;
 }
 
 .country-row {
@@ -2580,9 +2654,9 @@ details.card[open] > summary::after {
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  border: 1px solid rgba(0, 47, 167, 0.12);
+  border: 1px solid rgba(32, 76, 119, 0.12);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.84);
+  background: rgba(255, 255, 255, 0.68);
   color: inherit;
   text-align: left;
   transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
@@ -2593,9 +2667,9 @@ button.scenario-action-card {
 }
 
 button.scenario-action-card:hover {
-  border-color: rgba(0, 47, 167, 0.22);
-  background: rgba(246, 248, 252, 0.96);
-  transform: translateY(-1px);
+  border-color: rgba(32, 76, 119, 0.22);
+  background: rgba(248, 251, 253, 0.96);
+  box-shadow: 0 10px 20px rgba(18, 27, 38, 0.06);
 }
 
 .scenario-action-card-copy {
@@ -2854,7 +2928,7 @@ button.scenario-action-card:hover {
   color: var(--text-secondary);
   padding: 6px 8px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .country-action-btn:hover,
@@ -3035,6 +3109,7 @@ body.right-drawer-open::after {
     width: calc(100% - 20px);
     transform: none;
     bottom: 10px;
+    padding: 8px 10px;
   }
 
   .bottom-dock-primary {
@@ -3066,7 +3141,7 @@ body.right-drawer-open::after {
 
   .scenario-context-bar {
     top: 14px;
-    max-width: calc(100% - 118px);
+    max-width: calc(100% - 132px);
     justify-content: flex-start;
     overflow-x: auto;
     left: 12px;
@@ -3078,6 +3153,33 @@ body.right-drawer-open::after {
     right: 12px;
     bottom: 112px;
     width: auto;
+  }
+
+  .bottom-dock.is-collapsed .dock-group-history,
+  .bottom-dock.is-collapsed .dock-group-autofill,
+  .bottom-dock.is-collapsed .dock-group-utilities,
+  .bottom-dock.is-collapsed .bottom-dock-swatches {
+    display: none !important;
+  }
+
+  .bottom-dock.is-collapsed .bottom-dock-primary {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .map-onboarding-hint {
+    top: 40%;
+    max-width: calc(100% - 36px);
+    padding: 11px 13px;
+    font-size: 0.78rem;
+  }
+
+  .toast-viewport {
+    left: 12px;
+    right: 12px;
+    top: 72px;
+    max-width: none;
   }
 }
 
