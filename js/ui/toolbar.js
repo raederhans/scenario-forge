@@ -2,6 +2,7 @@
 import {
   state,
   PALETTE_THEMES,
+  normalizeCityLayerStyleConfig,
   normalizeDayNightStyleConfig,
   normalizeLakeStyleConfig,
   normalizePhysicalStyleConfig,
@@ -153,9 +154,20 @@ function initToolbar({ render } = {}) {
   const toggleUrban = document.getElementById("toggleUrban");
   const togglePhysical = document.getElementById("togglePhysical");
   const toggleRivers = document.getElementById("toggleRivers");
+  const toggleCityPoints = document.getElementById("toggleCityPoints");
   const toggleWaterRegions = document.getElementById("toggleWaterRegions");
   const toggleOpenOceanRegions = document.getElementById("toggleOpenOceanRegions");
   const toggleSpecialZones = document.getElementById("toggleSpecialZones");
+  const cityPointsTheme = document.getElementById("cityPointsTheme");
+  const cityPointsMarkerScale = document.getElementById("cityPointsMarkerScale");
+  const cityPointsLabelDensity = document.getElementById("cityPointsLabelDensity");
+  const cityPointsColor = document.getElementById("cityPointsColor");
+  const cityPointsCapitalColor = document.getElementById("cityPointsCapitalColor");
+  const cityPointsOpacity = document.getElementById("cityPointsOpacity");
+  const cityPointsRadius = document.getElementById("cityPointsRadius");
+  const cityPointLabelsEnabled = document.getElementById("cityPointLabelsEnabled");
+  const cityPointsLabelSize = document.getElementById("cityPointsLabelSize");
+  const cityCapitalOverlayEnabled = document.getElementById("cityCapitalOverlayEnabled");
   const urbanColor = document.getElementById("urbanColor");
   const urbanOpacity = document.getElementById("urbanOpacity");
   const urbanBlendMode = document.getElementById("urbanBlendMode");
@@ -298,6 +310,10 @@ function initToolbar({ render } = {}) {
   const parentBorderWidthValue = document.getElementById("parentBorderWidthValue");
   const urbanOpacityValue = document.getElementById("urbanOpacityValue");
   const urbanMinAreaValue = document.getElementById("urbanMinAreaValue");
+  const cityPointsOpacityValue = document.getElementById("cityPointsOpacityValue");
+  const cityPointsMarkerScaleValue = document.getElementById("cityPointsMarkerScaleValue");
+  const cityPointsRadiusValue = document.getElementById("cityPointsRadiusValue");
+  const cityPointsLabelSizeValue = document.getElementById("cityPointsLabelSizeValue");
   const physicalOpacityValue = document.getElementById("physicalOpacityValue");
   const physicalAtlasIntensityValue = document.getElementById("physicalAtlasIntensityValue");
   const physicalRainforestEmphasisValue = document.getElementById("physicalRainforestEmphasisValue");
@@ -856,6 +872,9 @@ function initToolbar({ render } = {}) {
     markDirty(reason);
     if (render) render();
   };
+  const persistCityViewSettings = () => {
+    state.persistViewSettingsFn?.();
+  };
   const textureStylePaths = [
     "styleConfig.texture.mode",
     "styleConfig.texture.opacity",
@@ -936,6 +955,11 @@ function initToolbar({ render } = {}) {
   const syncLakeConfig = () => {
     state.styleConfig.lakes = normalizeLakeStyleConfig(state.styleConfig.lakes);
     return state.styleConfig.lakes;
+  };
+
+  const syncCityPointsConfig = () => {
+    state.styleConfig.cityPoints = normalizeCityLayerStyleConfig(state.styleConfig.cityPoints);
+    return state.styleConfig.cityPoints;
   };
 
   const syncPhysicalConfig = () => {
@@ -1739,10 +1763,53 @@ function initToolbar({ render } = {}) {
   function renderSpecialZoneEditorUI() {
     if (toggleWaterRegions) toggleWaterRegions.checked = !!state.showWaterRegions;
     if (toggleOpenOceanRegions) toggleOpenOceanRegions.checked = !!state.showOpenOceanRegions;
+    if (toggleCityPoints) toggleCityPoints.checked = !!state.showCityPoints;
     if (toggleUrban) toggleUrban.checked = !!state.showUrban;
     if (togglePhysical) togglePhysical.checked = !!state.showPhysical;
     if (toggleRivers) toggleRivers.checked = !!state.showRivers;
     if (toggleSpecialZones) toggleSpecialZones.checked = !!state.showSpecialZones;
+
+    const cityPointsConfig = syncCityPointsConfig();
+    if (cityPointsTheme) {
+      cityPointsTheme.value = String(cityPointsConfig.theme || "classic_graphite");
+    }
+    if (cityPointsMarkerScale) {
+      cityPointsMarkerScale.value = Number(cityPointsConfig.markerScale || 1).toFixed(2);
+    }
+    if (cityPointsMarkerScaleValue) {
+      cityPointsMarkerScaleValue.textContent = `${Number(cityPointsConfig.markerScale || 1).toFixed(2)}x`;
+    }
+    if (cityPointsLabelDensity) {
+      cityPointsLabelDensity.value = String(cityPointsConfig.labelDensity || "balanced");
+    }
+    if (cityPointsColor) cityPointsColor.value = normalizeOceanFillColor(cityPointsConfig.color || "#2f343a");
+    if (cityPointsCapitalColor) {
+      cityPointsCapitalColor.value = normalizeOceanFillColor(cityPointsConfig.capitalColor || "#9f9072");
+    }
+    if (cityPointsOpacity) {
+      cityPointsOpacity.value = String(Math.round(cityPointsConfig.opacity * 100));
+    }
+    if (cityPointsOpacityValue) {
+      cityPointsOpacityValue.textContent = `${Math.round(cityPointsConfig.opacity * 100)}%`;
+    }
+    if (cityPointsRadius) {
+      cityPointsRadius.value = Number(cityPointsConfig.radius).toFixed(1);
+    }
+    if (cityPointsRadiusValue) {
+      cityPointsRadiusValue.textContent = Number(cityPointsConfig.radius).toFixed(1);
+    }
+    if (cityPointLabelsEnabled) {
+      cityPointLabelsEnabled.checked = !!cityPointsConfig.showLabels;
+    }
+    if (cityPointsLabelSize) {
+      cityPointsLabelSize.value = String(Math.round(cityPointsConfig.labelSize));
+    }
+    if (cityPointsLabelSizeValue) {
+      cityPointsLabelSizeValue.textContent = `${Math.round(cityPointsConfig.labelSize)}px`;
+    }
+    if (cityCapitalOverlayEnabled) {
+      cityCapitalOverlayEnabled.checked = !!cityPointsConfig.showCapitalOverlay;
+    }
 
     if (urbanColor) urbanColor.value = state.styleConfig.urban.color;
     if (urbanOpacity) urbanOpacity.value = String(Math.round(state.styleConfig.urban.opacity * 100));
@@ -2492,6 +2559,18 @@ function initToolbar({ render } = {}) {
     });
   }
 
+  if (toggleCityPoints) {
+    toggleCityPoints.checked = !!state.showCityPoints;
+    toggleCityPoints.addEventListener("change", (event) => {
+      state.showCityPoints = !!event.target.checked;
+      if (state.showCityPoints) {
+        void ensureActiveScenarioOptionalLayerLoaded("cities", { renderNow: true });
+      }
+      persistCityViewSettings();
+      renderDirty("toggle-city-points");
+    });
+  }
+
   if (toggleWaterRegions) {
     toggleWaterRegions.checked = !!state.showWaterRegions;
     toggleWaterRegions.addEventListener("change", (event) => {
@@ -2531,6 +2610,102 @@ function initToolbar({ render } = {}) {
     urbanColor.addEventListener("input", (event) => {
       state.styleConfig.urban.color = normalizeOceanFillColor(event.target.value);
       renderDirty("urban-color");
+    });
+  }
+  if (cityPointsColor) {
+    cityPointsColor.addEventListener("input", (event) => {
+      const cfg = syncCityPointsConfig();
+      cfg.color = normalizeOceanFillColor(event.target.value);
+      persistCityViewSettings();
+      renderDirty("city-points-color");
+    });
+  }
+  if (cityPointsTheme) {
+    cityPointsTheme.addEventListener("change", (event) => {
+      const cfg = syncCityPointsConfig();
+      cfg.theme = String(event.target.value || "classic_graphite");
+      persistCityViewSettings();
+      renderDirty("city-points-theme");
+    });
+  }
+  if (cityPointsMarkerScale) {
+    cityPointsMarkerScale.addEventListener("input", (event) => {
+      const cfg = syncCityPointsConfig();
+      const value = Number(event.target.value);
+      cfg.markerScale = clamp(Number.isFinite(value) ? value : 1, 0.75, 1.4);
+      if (cityPointsMarkerScaleValue) {
+        cityPointsMarkerScaleValue.textContent = `${Number(cfg.markerScale).toFixed(2)}x`;
+      }
+      persistCityViewSettings();
+      renderDirty("city-points-marker-scale");
+    });
+  }
+  if (cityPointsLabelDensity) {
+    cityPointsLabelDensity.addEventListener("change", (event) => {
+      const cfg = syncCityPointsConfig();
+      cfg.labelDensity = String(event.target.value || "balanced");
+      persistCityViewSettings();
+      renderDirty("city-points-label-density");
+    });
+  }
+  if (cityPointsCapitalColor) {
+    cityPointsCapitalColor.addEventListener("input", (event) => {
+      const cfg = syncCityPointsConfig();
+      cfg.capitalColor = normalizeOceanFillColor(event.target.value);
+      persistCityViewSettings();
+      renderDirty("city-points-capital-color");
+    });
+  }
+  if (cityPointsOpacity) {
+    cityPointsOpacity.addEventListener("input", (event) => {
+      const cfg = syncCityPointsConfig();
+      const value = Number(event.target.value);
+      cfg.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.92, 0, 1);
+      if (cityPointsOpacityValue) {
+        cityPointsOpacityValue.textContent = `${Math.round(cfg.opacity * 100)}%`;
+      }
+      persistCityViewSettings();
+      renderDirty("city-points-opacity");
+    });
+  }
+  if (cityPointsRadius) {
+    cityPointsRadius.addEventListener("input", (event) => {
+      const cfg = syncCityPointsConfig();
+      const value = Number(event.target.value);
+      cfg.radius = clamp(Number.isFinite(value) ? value : 2.6, 1, 8);
+      if (cityPointsRadiusValue) {
+        cityPointsRadiusValue.textContent = Number(cfg.radius).toFixed(1);
+      }
+      persistCityViewSettings();
+      renderDirty("city-points-radius");
+    });
+  }
+  if (cityPointLabelsEnabled) {
+    cityPointLabelsEnabled.addEventListener("change", (event) => {
+      const cfg = syncCityPointsConfig();
+      cfg.showLabels = !!event.target.checked;
+      persistCityViewSettings();
+      renderDirty("city-points-labels-toggle");
+    });
+  }
+  if (cityPointsLabelSize) {
+    cityPointsLabelSize.addEventListener("input", (event) => {
+      const cfg = syncCityPointsConfig();
+      const value = Number(event.target.value);
+      cfg.labelSize = clamp(Math.round(Number.isFinite(value) ? value : 12), 8, 24);
+      if (cityPointsLabelSizeValue) {
+        cityPointsLabelSizeValue.textContent = `${Math.round(cfg.labelSize)}px`;
+      }
+      persistCityViewSettings();
+      renderDirty("city-points-label-size");
+    });
+  }
+  if (cityCapitalOverlayEnabled) {
+    cityCapitalOverlayEnabled.addEventListener("change", (event) => {
+      const cfg = syncCityPointsConfig();
+      cfg.showCapitalOverlay = !!event.target.checked;
+      persistCityViewSettings();
+      renderDirty("city-points-capital-overlay");
     });
   }
   if (urbanOpacity) {

@@ -47,5 +47,7 @@
     "critical_region_check_count": 0,
     "manual_reviewed_region_count": 0
   },
-  "generated_at": "2026-03-09T14:09:29.123Z"
+  "generated_at": "2026-03-09T14:09:29.123Z",
+  "city_overrides_url": "data/scenarios/blank_base/city_overrides.json",
+  "capital_hints_url": "data/scenarios/blank_base/capital_hints.json"
 }

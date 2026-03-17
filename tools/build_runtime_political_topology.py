@@ -195,6 +195,8 @@ def _prune_political_columns(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     keep_cols = [
         "id",
         "name",
+        "legacy_name",
+        "anchor_county_name",
         "cntr_code",
         "admin1_group",
         "detail_tier",

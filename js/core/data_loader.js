@@ -14,6 +14,8 @@ const DETAIL_SOURCES = {
   na_v2: "data/europe_topology.na_v2.json",
 };
 const DETAIL_SOURCE_FALLBACK_ORDER = ["na_v2", "na_v1", "legacy_bak", "highres"];
+const WORLD_CITIES_URLS = ["data/world_cities.geojson", "data/world_cities.json"];
+const CITY_ALIASES_URLS = ["data/city_aliases.json"];
 const RU_CITY_OVERRIDES_URL = "data/ru_city_overrides.geojson";
 const SPECIAL_ZONES_URL = "data/special_zones.geojson";
 const RUNTIME_POLITICAL_URL = "data/europe_topology.runtime_political_v1.json";
@@ -40,6 +42,466 @@ const CONTEXT_LAYER_PACKS = {
 const PALETTE_REGISTRY_URL = "data/palettes/index.json";
 const RELEASABLE_CATALOG_URL = "data/releasables/hoi4_vanilla.internal.phase1.catalog.json";
 const RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
+
+function asArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function normalizeCityText(value) {
+  const text = String(value ?? "").trim();
+  return text || "";
+}
+
+function parseCityAliases(value) {
+  if (Array.isArray(value)) {
+    return value.flatMap((entry) => parseCityAliases(entry));
+  }
+  if (typeof value === "string") {
+    return value
+      .split(/[|;/]/)
+      .map((entry) => normalizeCityText(entry))
+      .filter(Boolean);
+  }
+  return [];
+}
+
+function parseBoolean(value, fallback = false) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value !== 0;
+  const text = String(value ?? "").trim().toLowerCase();
+  if (!text) return fallback;
+  if (["1", "true", "yes", "y"].includes(text)) return true;
+  if (["0", "false", "no", "n"].includes(text)) return false;
+  return fallback;
+}
+
+function parseFiniteNumber(value, fallback = null) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function getCityLocaleEntry(source = {}, fallbackName = "") {
+  const displayName = source?.display_name && typeof source.display_name === "object"
+    ? source.display_name
+    : (source?.displayName && typeof source.displayName === "object" ? source.displayName : {});
+  const en = normalizeCityText(
+    displayName.en || displayName.EN || source.name_en || source.label_en || source.en || source.name || source.label || fallbackName
+  );
+  const zh = normalizeCityText(
+    displayName.zh || displayName.ZH || source.name_zh || source.label_zh || source.zh || source.name_cn || source.label_cn || ""
+  );
+  if (!en && !zh) return null;
+  return {
+    en: en || zh || fallbackName,
+    zh: zh || en || fallbackName,
+  };
+}
+
+function normalizeCityFeature(feature, index, { sourceLabel = "world_cities" } = {}) {
+  if (!feature || typeof feature !== "object" || !feature.geometry) return null;
+  const props = feature.properties && typeof feature.properties === "object" ? feature.properties : {};
+  const id = normalizeCityText(
+    props.id || props.city_id || props.cityId || props.stable_id || feature.id || `${sourceLabel}_${index + 1}`
+  );
+  if (!id) return null;
+
+  const stableKey = normalizeCityText(props.stable_key || props.locale_key || props.localeKey || `city::${id}`);
+  const localeEntry = getCityLocaleEntry(props, id);
+  const population = parseFiniteNumber(
+    props.population || props.pop || props.population_est || props.populationEstimate,
+    null
+  );
+  const capitalKind = normalizeCityText(
+    props.capital_kind || props.capitalKind || props.capital_type || props.capitalType || props.capital_status || props.capitalStatus
+  ).toLowerCase();
+  const baseTierRaw = normalizeCityText(props.base_tier || props.baseTier).toLowerCase();
+  const validBaseTier = ["minor", "regional", "major"].includes(baseTierRaw) ? baseTierRaw : "";
+  const aliases = Array.from(new Set([
+    id,
+    stableKey,
+    normalizeCityText(props.name),
+    normalizeCityText(props.label),
+    normalizeCityText(props.name_en),
+    normalizeCityText(props.label_en),
+    normalizeCityText(props.name_zh),
+    normalizeCityText(props.label_zh),
+    ...parseCityAliases(props.aliases),
+    ...parseCityAliases(props.alias),
+    ...parseCityAliases(props.alt_names),
+    ...parseCityAliases(props.altNames),
+    ...parseCityAliases(props.alias_names),
+    ...parseCityAliases(props.aliasNames),
+  ].filter(Boolean)));
+
+  const isCountryCapital = parseBoolean(props.is_country_capital, false)
+    || capitalKind === "country_capital"
+    || capitalKind === "admin-0 capital";
+  const isAdminCapital = parseBoolean(props.is_admin_capital, false)
+    || capitalKind === "admin_capital"
+    || capitalKind === "admin-1 capital"
+    || capitalKind === "admin-0 region capital";
+  const isCapital = parseBoolean(props.is_capital, false)
+    || parseBoolean(props.capital, false)
+    || isCountryCapital
+    || isAdminCapital
+    || ["capital", "primary", "national", "state", "regional"].includes(capitalKind);
+  const isHidden = parseBoolean(props.hidden, false)
+    || parseBoolean(props.remove, false)
+    || parseBoolean(props.deleted, false);
+  const baseTier = validBaseTier || (
+    isCountryCapital || (population !== null && population >= 1_500_000)
+      ? "major"
+      : (isAdminCapital || (population !== null && population >= 350_000) ? "regional" : "minor")
+  );
+  const minZoom = parseFiniteNumber(
+    props.min_zoom || props.minZoom,
+    baseTier === "major" ? 0.8 : (baseTier === "regional" ? 1.6 : 2.9)
+  );
+  const hostFeatureId = normalizeCityText(
+    props.host_feature_id || props.hostFeatureId || props.political_feature_id || props.politicalFeatureId
+  );
+  const urbanMatchId = normalizeCityText(
+    props.urban_match_id || props.urbanMatchId || props.urban_area_id || props.urbanAreaId
+  );
+  const countryCode = normalizeCityText(
+    props.cntr_code || props.country_code || props.countryCode || props.iso_a2 || props.ISO_A2
+  ).toUpperCase();
+
+  return {
+    ...feature,
+    id,
+    properties: {
+      ...props,
+      id,
+      stable_key: stableKey,
+      __city_source: sourceLabel,
+      __city_id: id,
+      __city_stable_key: stableKey,
+      __city_locale: localeEntry,
+      __city_aliases: aliases,
+      __city_is_capital: isCapital,
+      __city_capital_kind: capitalKind,
+      __city_capital_type: capitalKind,
+      __city_is_country_capital: isCountryCapital,
+      __city_is_admin_capital: isAdminCapital,
+      __city_hidden: isHidden,
+      __city_population: population,
+      __city_country_code: countryCode,
+      __city_base_tier: baseTier,
+      __city_min_zoom: minZoom,
+      __city_host_feature_id: hostFeatureId,
+      __city_urban_match_id: urbanMatchId,
+      __city_dataset_source: normalizeCityText(props.source || props.dataset_source || props.datasetSource || sourceLabel),
+      __city_replace_ids: Array.from(new Set([
+        ...parseCityAliases(props.replace_ids),
+        ...parseCityAliases(props.replaceIds),
+        ...parseCityAliases(props.remove_ids),
+        ...parseCityAliases(props.removeIds),
+      ].filter(Boolean))),
+    },
+  };
+}
+
+function normalizeCityFeatureCollection(payload, { sourceLabel = "world_cities" } = {}) {
+  if (!Array.isArray(payload?.features)) {
+    return null;
+  }
+  const features = payload.features
+    .map((feature, index) => normalizeCityFeature(feature, index, { sourceLabel }))
+    .filter(Boolean);
+  return {
+    type: "FeatureCollection",
+    features,
+  };
+}
+
+function normalizeScenarioCityOverrideEntry(rawEntry, rawCityId = "") {
+  if (!rawEntry || typeof rawEntry !== "object") return null;
+  const cityId = normalizeCityText(rawEntry.city_id || rawEntry.cityId || rawCityId);
+  if (!cityId) return null;
+  const stableKey = normalizeCityText(rawEntry.stable_key || rawEntry.stableKey || `id::${cityId}`);
+  const localeEntry = getCityLocaleEntry(rawEntry, cityId);
+  const tierRaw = normalizeCityText(
+    rawEntry.tier || rawEntry.base_tier || rawEntry.baseTier || rawEntry.level
+  ).toLowerCase();
+  const tier = ["minor", "regional", "major"].includes(tierRaw) ? tierRaw : "";
+  const aliases = Array.from(new Set([
+    cityId,
+    stableKey,
+    ...(localeEntry ? [localeEntry.en, localeEntry.zh] : []),
+    ...parseCityAliases(rawEntry.aliases),
+    ...parseCityAliases(rawEntry.alias),
+    ...parseCityAliases(rawEntry.alt_names),
+    ...parseCityAliases(rawEntry.altNames),
+  ].filter(Boolean)));
+  return {
+    ...rawEntry,
+    city_id: cityId,
+    stable_key: stableKey,
+    name_en: localeEntry?.en || normalizeCityText(rawEntry.name_en || rawEntry.name),
+    name_zh: localeEntry?.zh || normalizeCityText(rawEntry.name_zh || ""),
+    display_name: localeEntry ? { ...localeEntry } : null,
+    aliases,
+    tier,
+    hidden: parseBoolean(rawEntry.hidden, false),
+    replace_ids: Array.from(new Set([
+      ...parseCityAliases(rawEntry.replace_ids),
+      ...parseCityAliases(rawEntry.replaceIds),
+      ...parseCityAliases(rawEntry.remove_ids),
+      ...parseCityAliases(rawEntry.removeIds),
+    ].filter(Boolean))),
+  };
+}
+
+function normalizeScenarioCityOverridesPayload(payload, { sourceLabel = "scenario_city_overrides" } = {}) {
+  if (!payload || typeof payload !== "object") {
+    return null;
+  }
+  if (Array.isArray(payload.features)) {
+    return {
+      type: "city_overrides",
+      version: 1,
+      scenario_id: "",
+      generated_at: "",
+      cities: {},
+      capitals_by_tag: {},
+      capital_city_hints: {},
+      audit: null,
+      featureCollection: normalizeCityFeatureCollection(payload, { sourceLabel }),
+    };
+  }
+
+  const rawCityMap = payload.cities && typeof payload.cities === "object" ? payload.cities : {};
+  const cities = {};
+  Object.entries(rawCityMap).forEach(([rawCityId, rawEntry]) => {
+    const normalizedEntry = normalizeScenarioCityOverrideEntry(rawEntry, rawCityId);
+    if (!normalizedEntry) return;
+    cities[normalizedEntry.city_id] = normalizedEntry;
+  });
+
+  const capitalsByTag = {};
+  Object.entries(payload.capitals_by_tag || payload.capitalsByTag || {}).forEach(([rawTag, rawCityId]) => {
+    const tag = normalizeCityText(rawTag).toUpperCase();
+    const cityId = normalizeCityText(rawCityId);
+    if (!tag || !cityId) return;
+    capitalsByTag[tag] = cityId;
+  });
+
+  const capitalCityHints = {};
+  const rawHintMap = payload.capital_city_hints || payload.capitalCityHints || payload.capital_hints || {};
+  Object.entries(rawHintMap && typeof rawHintMap === "object" ? rawHintMap : {}).forEach(([rawTag, rawHint]) => {
+    const tag = normalizeCityText(rawTag).toUpperCase();
+    if (!tag || !rawHint || typeof rawHint !== "object") return;
+    capitalCityHints[tag] = {
+      ...rawHint,
+      tag,
+      city_id: normalizeCityText(rawHint.city_id || rawHint.cityId),
+      capital_state_id: rawHint.capital_state_id ?? rawHint.capitalStateId ?? null,
+      resolution_method: normalizeCityText(rawHint.resolution_method || rawHint.resolutionMethod),
+      confidence: normalizeCityText(rawHint.confidence),
+      host_feature_id: normalizeCityText(rawHint.host_feature_id || rawHint.hostFeatureId),
+      lookup_iso2: normalizeCityText(rawHint.lookup_iso2 || rawHint.lookupIso2).toUpperCase(),
+      base_iso2: normalizeCityText(rawHint.base_iso2 || rawHint.baseIso2).toUpperCase(),
+    };
+  });
+
+  const featureCollection = Array.isArray(payload.feature_collection?.features)
+    ? normalizeCityFeatureCollection(payload.feature_collection, { sourceLabel: `${sourceLabel}:feature_collection` })
+    : null;
+
+  return {
+    type: "city_overrides",
+    version: Number(payload.version || 1) || 1,
+    scenario_id: normalizeCityText(payload.scenario_id || payload.scenarioId),
+    generated_at: normalizeCityText(payload.generated_at || payload.generatedAt),
+    cities,
+    capitals_by_tag: capitalsByTag,
+    capital_city_hints: capitalCityHints,
+    audit: payload.audit && typeof payload.audit === "object" ? payload.audit : null,
+    featureCollection,
+  };
+}
+
+function normalizeScenarioGeoLocalePatchEntry(source = {}) {
+  if (!source || typeof source !== "object") {
+    return null;
+  }
+  const displayName = source?.display_name && typeof source.display_name === "object"
+    ? source.display_name
+    : (source?.displayName && typeof source.displayName === "object" ? source.displayName : {});
+  const en = normalizeCityText(
+    displayName.en || displayName.EN || source.name_en || source.label_en || source.en || ""
+  );
+  const zh = normalizeCityText(
+    displayName.zh || displayName.ZH || source.name_zh || source.label_zh || source.zh || source.name_cn || source.label_cn || ""
+  );
+  if (!en && !zh) return null;
+  const localeEntry = {};
+  if (en) localeEntry.en = en;
+  if (zh) localeEntry.zh = zh;
+  return Object.keys(localeEntry).length ? localeEntry : null;
+}
+
+function normalizeScenarioGeoLocalePatchPayload(payload) {
+  if (!payload || typeof payload !== "object") {
+    return null;
+  }
+  const geo = {};
+  Object.entries(payload.geo && typeof payload.geo === "object" ? payload.geo : {}).forEach(([rawFeatureId, rawEntry]) => {
+    const featureId = normalizeCityText(rawFeatureId);
+    const localeEntry = normalizeScenarioGeoLocalePatchEntry(rawEntry);
+    if (!featureId || !localeEntry) return;
+    geo[featureId] = localeEntry;
+  });
+  return {
+    type: "scenario_geo_locale_patch",
+    version: Number(payload.version || 1) || 1,
+    scenario_id: normalizeCityText(payload.scenario_id || payload.scenarioId),
+    generated_at: normalizeCityText(payload.generated_at || payload.generatedAt),
+    geo,
+    audit: payload.audit && typeof payload.audit === "object" ? payload.audit : null,
+  };
+}
+
+function applyAliasObjectToPatch(rawAliasMap, aliasToStableKey) {
+  if (!rawAliasMap || typeof rawAliasMap !== "object") return;
+  Object.entries(rawAliasMap).forEach(([rawAlias, rawStableKey]) => {
+    const alias = normalizeCityText(rawAlias);
+    const stableKey = normalizeCityText(rawStableKey);
+    if (!alias || !stableKey) return;
+    aliasToStableKey[alias] = stableKey;
+  });
+}
+
+function applyGeoLocaleObjectToPatch(rawGeoMap, geo) {
+  if (!rawGeoMap || typeof rawGeoMap !== "object") return;
+  Object.entries(rawGeoMap).forEach(([rawStableKey, rawEntry]) => {
+    const stableKey = normalizeCityText(rawStableKey);
+    const localeEntry = getCityLocaleEntry(rawEntry, stableKey);
+    if (!stableKey || !localeEntry) return;
+    geo[stableKey] = {
+      ...(geo[stableKey] || {}),
+      ...localeEntry,
+    };
+  });
+}
+
+function applyCityAliasEntriesToPatch(entries, geo, aliasToStableKey) {
+  asArray(entries).forEach((entry, index) => {
+    if (!entry || typeof entry !== "object") return;
+    const stableKey = normalizeCityText(
+      entry.stable_key || entry.locale_key || entry.localeKey || entry.id || entry.city_id || `city_alias_${index + 1}`
+    );
+    if (!stableKey) return;
+    const localeEntry = getCityLocaleEntry(entry, stableKey);
+    if (localeEntry) {
+      geo[stableKey] = {
+        ...(geo[stableKey] || {}),
+        ...localeEntry,
+      };
+    }
+    const aliases = Array.from(new Set([
+      stableKey,
+      normalizeCityText(entry.city_id || entry.cityId),
+      ...parseCityAliases(entry.aliases),
+      ...parseCityAliases(entry.alias),
+      ...parseCityAliases(entry.names),
+      ...parseCityAliases(entry.alt_names),
+      ...parseCityAliases(entry.altNames),
+      normalizeCityText(entry.name),
+      normalizeCityText(entry.label),
+      normalizeCityText(entry.name_en),
+      normalizeCityText(entry.name_zh),
+    ].filter(Boolean)));
+    aliases.forEach((alias) => {
+      aliasToStableKey[alias] = stableKey;
+    });
+  });
+}
+
+function buildCityLocalizationPatch({ cityCollection = null, cityAliases = null } = {}) {
+  const geo = {};
+  const aliasToStableKey = {};
+
+  asArray(cityCollection?.features).forEach((feature) => {
+    const props = feature?.properties || {};
+    const stableKey = normalizeCityText(props.__city_stable_key || props.stable_key || props.id || feature?.id);
+    if (!stableKey) return;
+    const localeEntry = getCityLocaleEntry(props.__city_locale || props, stableKey);
+    if (localeEntry) {
+      geo[stableKey] = {
+        ...(geo[stableKey] || {}),
+        ...localeEntry,
+      };
+    }
+    asArray(props.__city_aliases).forEach((alias) => {
+      const normalizedAlias = normalizeCityText(alias);
+      if (!normalizedAlias) return;
+      aliasToStableKey[normalizedAlias] = stableKey;
+    });
+  });
+
+  applyAliasObjectToPatch(cityAliases?.alias_to_stable_key, aliasToStableKey);
+  applyGeoLocaleObjectToPatch(cityAliases?.geo, geo);
+  applyGeoLocaleObjectToPatch(cityAliases?.locales?.geo, geo);
+  applyCityAliasEntriesToPatch(cityAliases?.entries, geo, aliasToStableKey);
+  applyCityAliasEntriesToPatch(cityAliases?.cities, geo, aliasToStableKey);
+  applyCityAliasEntriesToPatch(cityAliases?.aliases, geo, aliasToStableKey);
+
+  return {
+    geo,
+    aliasToStableKey,
+  };
+}
+
+function mergeCityLocalizationData({
+  locales = { ui: {}, geo: {} },
+  geoAliases = { alias_to_stable_key: {} },
+  cityCollection = null,
+  cityAliases = null,
+} = {}) {
+  const patch = buildCityLocalizationPatch({ cityCollection, cityAliases });
+  return {
+    locales: {
+      ...(locales || { ui: {}, geo: {} }),
+      geo: {
+        ...(locales?.geo || {}),
+        ...patch.geo,
+      },
+    },
+    geoAliases: {
+      ...(geoAliases || { alias_to_stable_key: {} }),
+      alias_to_stable_key: {
+        ...(geoAliases?.alias_to_stable_key || {}),
+        ...patch.aliasToStableKey,
+      },
+    },
+    cityLocalizationPatch: patch,
+  };
+}
+
+async function loadOptionalJsonCandidate(d3Client, candidateUrls, { label = "resource", normalizer = (payload) => payload } = {}) {
+  const urls = Array.isArray(candidateUrls) ? candidateUrls : [candidateUrls];
+  let sawFailure = false;
+  for (const url of urls.filter(Boolean)) {
+    try {
+      const payload = await d3Client.json(url);
+      const normalized = normalizer(payload, url);
+      if (normalized !== null && normalized !== undefined) {
+        return normalized;
+      }
+      console.warn(`[data_loader] Optional ${label} payload invalid at ${url}.`);
+      sawFailure = true;
+    } catch (error) {
+      sawFailure = true;
+      console.warn(`[data_loader] Optional ${label} missing or invalid at ${url}.`, error);
+    }
+  }
+  if (!sawFailure) {
+    console.warn(`[data_loader] Optional ${label} is unavailable; no candidate URL resolved.`);
+  }
+  return null;
+}
 
 async function loadRiversFallbackCollection(d3Client) {
   try {
@@ -413,6 +875,8 @@ export async function loadMapData({
   topologyUrl = "data/europe_topology.json",
   localesUrl = "data/locales.json",
   geoAliasesUrl = "data/geo_aliases.json",
+  worldCitiesUrls = WORLD_CITIES_URLS,
+  cityAliasesUrls = CITY_ALIASES_URLS,
   hierarchyUrl = "data/hierarchy.json",
   ruCityOverridesUrl = RU_CITY_OVERRIDES_URL,
   specialZonesUrl = SPECIAL_ZONES_URL,
@@ -447,6 +911,8 @@ export async function loadMapData({
   const [
     localeData,
     geoAliases,
+    worldCities,
+    cityAliases,
     hierarchy,
     ruCityOverrides,
     specialZones,
@@ -462,6 +928,14 @@ export async function loadMapData({
     d3Client.json(geoAliasesUrl).catch((err) => {
       console.warn("Geo alias file missing or invalid, using defaults.", err);
       return { alias_to_stable_key: {} };
+    }),
+    loadOptionalJsonCandidate(d3Client, worldCitiesUrls, {
+      label: "world_cities",
+      normalizer: (payload) => normalizeCityFeatureCollection(payload, { sourceLabel: "world_cities" }),
+    }),
+    loadOptionalJsonCandidate(d3Client, cityAliasesUrls, {
+      label: "city_aliases",
+      normalizer: (payload) => (payload && typeof payload === "object" ? payload : null),
     }),
     d3Client.json(hierarchyUrl).catch((err) => {
       console.warn("Hierarchy file missing or invalid, using defaults.", err);
@@ -498,6 +972,12 @@ export async function loadMapData({
     releasableCatalogPromise,
     contextLayerPackPromise,
   ]);
+  const cityLocalizationMerged = mergeCityLocalizationData({
+    locales: localeData || { ui: {}, geo: {} },
+    geoAliases: geoAliases || { alias_to_stable_key: {} },
+    cityCollection: worldCities,
+    cityAliases,
+  });
 
   let activePaletteMeta = null;
   let activePalettePack = null;
@@ -531,8 +1011,10 @@ export async function loadMapData({
   return {
     ...topologyBundle,
     renderProfile,
-    locales: localeData || { ui: {}, geo: {} },
-    geoAliases: geoAliases || { alias_to_stable_key: {} },
+    locales: cityLocalizationMerged.locales,
+    geoAliases: cityLocalizationMerged.geoAliases,
+    worldCities,
+    cityAliases,
     hierarchy,
     ruCityOverrides,
     specialZones,
@@ -545,4 +1027,14 @@ export async function loadMapData({
     activePaletteMap,
   };
 }
+
+export {
+  buildCityLocalizationPatch,
+  getCityLocaleEntry,
+  mergeCityLocalizationData,
+  normalizeCityText,
+  normalizeCityFeatureCollection,
+  normalizeScenarioCityOverridesPayload,
+  normalizeScenarioGeoLocalePatchPayload,
+};
 

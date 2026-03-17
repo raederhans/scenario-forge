@@ -41,16 +41,20 @@ def collect_aliases(properties: dict) -> list[str]:
     return sorted(aliases)
 
 
-def collect_disambiguated_aliases(properties: dict, primary_name: str) -> list[str]:
-    aliases = set()
+def collect_disambiguated_aliases(properties: dict, aliases: list[str]) -> list[str]:
+    variants = set()
     country_code = str(properties.get("cntr_code", "")).strip().upper()
     admin1_group = str(properties.get("admin1_group", "")).strip()
 
-    if primary_name and country_code:
-        aliases.add(f"{primary_name} ({country_code})")
-    if primary_name and admin1_group and admin1_group != primary_name:
-        aliases.add(f"{primary_name} [{admin1_group}]")
-    return sorted(aliases)
+    for raw_alias in aliases:
+        alias = str(raw_alias).strip()
+        if not alias:
+            continue
+        if country_code:
+            variants.add(f"{alias} ({country_code})")
+        if admin1_group and admin1_group != alias:
+            variants.add(f"{alias} [{admin1_group}]")
+    return sorted(variants)
 
 
 def stable_key_for_geometry(geometry: dict, primary_name: str) -> str:
@@ -103,7 +107,8 @@ def normalize_geokeys(topology_path: Path) -> dict:
         aliases = collect_aliases(properties)
         if primary_name not in aliases:
             aliases.append(primary_name)
-        aliases.extend(collect_disambiguated_aliases(properties, primary_name))
+        aliases = sorted(set(aliases))
+        aliases.extend(collect_disambiguated_aliases(properties, aliases))
         aliases = sorted(set(aliases))
 
         for alias in aliases:

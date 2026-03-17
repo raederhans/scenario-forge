@@ -120,6 +120,95 @@ def _load_cached_csv(url: str, filename: str) -> pd.DataFrame:
     return pd.read_csv(cache_path, encoding="latin1", dtype={"STATE": str, "COUNTY": str})
 
 
+def _clean_text(value: object) -> str:
+    if value is None:
+        return ""
+    try:
+        if bool(pd.isna(value)):
+            return ""
+    except (TypeError, ValueError):
+        pass
+    return " ".join(str(value or "").split())
+
+
+def _county_legal_name(row: pd.Series | dict[str, object]) -> str:
+    if isinstance(row, pd.Series):
+        data = row.to_dict()
+    else:
+        data = row
+    return _clean_text(data.get("NAMELSAD")) or _clean_text(data.get("NAME")) or _clean_text(data.get("GEOID"))
+
+
+def _best_us_anchor_county(frame: pd.DataFrame) -> pd.Series:
+    if frame.empty:
+        raise ValueError("Cannot select anchor county from empty frame.")
+
+    work = frame.copy()
+    work["population"] = pd.to_numeric(work.get("population"), errors="coerce").fillna(0.0)
+    work["ALAND"] = pd.to_numeric(work.get("ALAND"), errors="coerce").fillna(0.0)
+    work["GEOID"] = work.get("GEOID", "").fillna("").astype(str)
+    work = work.sort_values(
+        by=["population", "ALAND", "GEOID"],
+        ascending=[False, False, True],
+        kind="stable",
+    )
+    return work.iloc[0]
+
+
+def _assign_us_feature_names(us_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    if us_gdf.empty:
+        return us_gdf
+
+    out = _ensure_epsg4326(us_gdf.copy())
+    for col in ("legacy_name", "anchor_county_name"):
+        if col not in out.columns:
+            out[col] = ""
+        out[col] = out[col].fillna("").astype(str).str.strip()
+
+    city_name_by_feature: dict[str, str] = {}
+    top_n = int(getattr(cfg, "US_CITY_RENAME_TOP_N", 25) or 0)
+    if top_n > 0:
+        from map_builder.cities import build_country_city_catalog
+
+        city_catalog = build_country_city_catalog("US", top_n=top_n)
+        if not city_catalog.empty:
+            city_points = city_catalog[["id", "name", "population", "capital_kind", "geometry"]].copy()
+            feature_ref = out[["id", "geometry"]].copy()
+            try:
+                joined = gpd.sjoin(city_points, feature_ref, how="left", predicate="within")
+            except Exception:
+                joined = gpd.sjoin(city_points, feature_ref, how="left", predicate="intersects")
+            joined = joined.rename(columns={"id_left": "city_id", "id_right": "feature_id"})
+            joined = joined[joined["feature_id"].fillna("").astype(str) != ""].copy()
+            if not joined.empty:
+                joined["population"] = pd.to_numeric(joined["population"], errors="coerce").fillna(0.0)
+                joined["capital_score"] = joined["capital_kind"].apply(
+                    lambda value: 3 if _clean_text(value) == "country_capital" else 2 if _clean_text(value) == "admin_capital" else 1
+                )
+                joined["name_sort"] = joined["name"].fillna("").astype(str)
+                joined["city_id"] = joined["city_id"].fillna("").astype(str)
+                joined = joined.sort_values(
+                    by=["feature_id", "population", "capital_score", "name_sort", "city_id"],
+                    ascending=[True, False, False, True, True],
+                    kind="stable",
+                )
+                best = joined.groupby("feature_id", sort=False).first()
+                city_name_by_feature = {
+                    str(feature_id): _clean_text(name)
+                    for feature_id, name in best["name"].items()
+                    if _clean_text(name)
+                }
+
+    final_names: list[str] = []
+    for row in out.itertuples(index=False):
+        city_name = city_name_by_feature.get(str(row.id), "")
+        anchor_name = _clean_text(getattr(row, "anchor_county_name", ""))
+        current_name = _clean_text(getattr(row, "name", ""))
+        final_names.append(city_name or anchor_name or current_name)
+    out["name"] = final_names
+    return out
+
+
 def _load_admin0_country(iso_code: str, country_names: list[str] | None = None) -> gpd.GeoDataFrame:
     admin0 = _read_zip_layer(
         cfg.BORDERS_URL,
@@ -256,13 +345,13 @@ def _connected_components(nodes: set[int], adjacency: list[set[int]]) -> list[li
     remaining = set(nodes)
     components: list[list[int]] = []
     while remaining:
-        seed = next(iter(remaining))
+        seed = min(remaining)
         queue = deque([seed])
         remaining.remove(seed)
         comp = [seed]
         while queue:
             cur = queue.popleft()
-            for nxt in adjacency[cur]:
+            for nxt in sorted(adjacency[cur]):
                 if nxt not in remaining:
                     continue
                 remaining.remove(nxt)
@@ -519,37 +608,59 @@ def _partition_indices(gdf: gpd.GeoDataFrame, quota: int) -> list[list[int]]:
     points = [(float(pt.x), float(pt.y)) for pt in reps]
     all_nodes = set(range(n))
     components = _connected_components(all_nodes, adjacency)
+    components.sort(
+        key=lambda comp: (
+            min(points[i][0] for i in comp),
+            min(points[i][1] for i in comp),
+            min(comp),
+        )
+    )
+    quota = max(len(components), min(quota, n))
     component_sizes = [len(comp) for comp in components]
     component_quotas = _allocate_component_quotas(component_sizes, quota)
 
     groups: list[list[int]] = []
-    orphan_nodes: list[int] = []
     for comp, comp_quota in zip(components, component_quotas):
         if comp_quota <= 0:
-            orphan_nodes.extend(comp)
             continue
         groups.extend(_partition_component(comp, adjacency, points, comp_quota))
+    return [group for group in groups if group]
 
-    if orphan_nodes:
-        if not groups:
-            groups = [orphan_nodes]
-        else:
-            group_centers = [
-                (
-                    sum(points[i][0] for i in grp) / max(len(grp), 1),
-                    sum(points[i][1] for i in grp) / max(len(grp), 1),
-                )
-                for grp in groups
-            ]
-            for node in orphan_nodes:
-                node_pt = points[node]
-                best_group = min(
-                    range(len(groups)),
-                    key=lambda idx: (_sq_dist(group_centers[idx], node_pt), idx),
-                )
-                groups[best_group].append(node)
 
-    return _rebalance_groups(groups, quota)
+def _component_floor(gdf: gpd.GeoDataFrame) -> int:
+    if gdf.empty:
+        return 0
+    adjacency = _build_adjacency(gdf)
+    components = _connected_components(set(range(len(gdf))), adjacency)
+    return len(components)
+
+
+def _select_us_locked_indices(
+    state_df: gpd.GeoDataFrame,
+    quota: int,
+    fine_threshold: float,
+) -> tuple[set[int], gpd.GeoDataFrame, int, int]:
+    candidates = (
+        state_df[state_df["population"] >= fine_threshold]
+        .sort_values("population", ascending=False)
+        .index.tolist()
+    )
+    max_locked = min(len(candidates), max(0, quota - 1))
+
+    for locked_count in range(max_locked, -1, -1):
+        locked_indices = set(candidates[:locked_count])
+        rest_df = state_df.drop(index=list(locked_indices)).reset_index(drop=True)
+        if rest_df.empty:
+            return locked_indices, rest_df, 0, 0
+        component_floor = _component_floor(rest_df)
+        rest_quota = max(1, quota - locked_count)
+        if rest_quota >= component_floor:
+            return locked_indices, rest_df, rest_quota, component_floor
+
+    locked_indices: set[int] = set()
+    rest_df = state_df.reset_index(drop=True)
+    component_floor = _component_floor(rest_df)
+    return locked_indices, rest_df, max(1, component_floor), component_floor
 
 
 def _split_geometry_once(geom):
@@ -916,7 +1027,7 @@ def _build_us_zones() -> gpd.GeoDataFrame:
     pop_df = _load_cached_csv(cfg.US_COUNTY_POP_2024_URL, cfg.US_COUNTY_POP_2024_FILENAME)
 
     counties = counties.copy()
-    for col in ("STATEFP", "COUNTYFP", "GEOID", "NAME", "STUSPS"):
+    for col in ("STATEFP", "COUNTYFP", "GEOID", "NAME", "NAMELSAD", "STUSPS"):
         if col not in counties.columns:
             raise SystemExit(
                 f"[North America] US county dataset missing '{col}'. Available: {counties.columns.tolist()}"
@@ -953,6 +1064,13 @@ def _build_us_zones() -> gpd.GeoDataFrame:
     counties["population"] = counties["GEOID"].map(pop_map).fillna(0).astype(float)
 
     fixed_states = {str(code).upper() for code in cfg.US_FIXED_FINE_STATES}
+    state_target_overrides = {
+        str(code).upper(): int(target)
+        for code, target in getattr(cfg, "US_STATE_ZONE_TARGET_OVERRIDES", {}).items()
+    }
+    skip_merge_states = {
+        str(code).upper() for code in getattr(cfg, "US_STATE_ZONE_SKIP_MERGE_STATES", set())
+    }
     fixed_count = int(counties[counties["STUSPS"].isin(fixed_states)].shape[0])
     target_total = int(cfg.US_HYBRID_TARGET)
     target_rest = max(0, target_total - fixed_count)
@@ -978,10 +1096,14 @@ def _build_us_zones() -> gpd.GeoDataFrame:
 
         if stusps in fixed_states:
             for row in state_df.itertuples(index=False):
+                anchor_county_name = _county_legal_name(pd.Series(row._asdict()))
+                legacy_name = _clean_text(row.NAME)
                 records.append(
                     {
                         "id": f"US_CNTY_{row.GEOID}",
-                        "name": str(row.NAME),
+                        "name": legacy_name,
+                        "legacy_name": legacy_name if legacy_name and legacy_name != anchor_county_name else "",
+                        "anchor_county_name": anchor_county_name,
                         "cntr_code": "US",
                         "admin1_group": state_name,
                         "detail_tier": "fine",
@@ -991,13 +1113,20 @@ def _build_us_zones() -> gpd.GeoDataFrame:
             continue
 
         quota = int(state_quota.get(stusps, 1))
+        override_quota = state_target_overrides.get(stusps)
+        if override_quota is not None and stusps not in skip_merge_states:
+            quota = int(override_quota)
         quota = max(1, min(quota, n_counties))
         if quota >= n_counties:
             for row in state_df.itertuples(index=False):
+                anchor_county_name = _county_legal_name(pd.Series(row._asdict()))
+                legacy_name = _clean_text(row.NAME)
                 records.append(
                     {
                         "id": f"US_CNTY_{row.GEOID}",
-                        "name": str(row.NAME),
+                        "name": legacy_name,
+                        "legacy_name": legacy_name if legacy_name and legacy_name != anchor_county_name else "",
+                        "anchor_county_name": anchor_county_name,
                         "cntr_code": "US",
                         "admin1_group": state_name,
                         "detail_tier": "fine",
@@ -1006,21 +1135,31 @@ def _build_us_zones() -> gpd.GeoDataFrame:
                 )
             continue
 
-        candidates = (
-            state_df[state_df["population"] >= fine_threshold]
-            .sort_values("population", ascending=False)
-            .index.tolist()
+        locked_indices, rest_df, rest_quota, component_floor = _select_us_locked_indices(
+            state_df,
+            quota,
+            fine_threshold,
         )
-        max_locked = max(0, quota - 1)
-        locked_indices = set(candidates[:max_locked])
-        remaining_quota = max(1, quota - len(locked_indices))
+        effective_quota = len(locked_indices) + (
+            len(rest_df) if rest_quota >= len(rest_df) else rest_quota
+        )
+        if effective_quota > quota:
+            print(
+                "[North America] US "
+                f"{stusps}: lifted target from {quota} to {effective_quota} "
+                f"to preserve coarse-zone connectivity (component floor {component_floor})."
+            )
 
         for idx in sorted(locked_indices):
             row = state_df.loc[idx]
+            anchor_county_name = _county_legal_name(row)
+            legacy_name = _clean_text(row.get("NAME"))
             records.append(
                 {
                     "id": f"US_CNTY_{row['GEOID']}",
-                    "name": str(row["NAME"]),
+                    "name": legacy_name,
+                    "legacy_name": legacy_name if legacy_name and legacy_name != anchor_county_name else "",
+                    "anchor_county_name": anchor_county_name,
                     "cntr_code": "US",
                     "admin1_group": state_name,
                     "detail_tier": "fine",
@@ -1028,19 +1167,60 @@ def _build_us_zones() -> gpd.GeoDataFrame:
                 }
             )
 
-        rest_df = state_df.drop(index=list(locked_indices)).reset_index(drop=True)
-        rest_quota = max(1, min(remaining_quota, len(rest_df)))
+        if rest_df.empty:
+            continue
+        if rest_quota >= len(rest_df):
+            for row in rest_df.itertuples(index=False):
+                anchor_county_name = _county_legal_name(pd.Series(row._asdict()))
+                legacy_name = _clean_text(row.NAME)
+                records.append(
+                    {
+                        "id": f"US_CNTY_{row.GEOID}",
+                        "name": legacy_name,
+                        "legacy_name": legacy_name if legacy_name and legacy_name != anchor_county_name else "",
+                        "anchor_county_name": anchor_county_name,
+                        "cntr_code": "US",
+                        "admin1_group": state_name,
+                        "detail_tier": "fine",
+                        "geometry": row.geometry,
+                    }
+                )
+            continue
         groups = _partition_indices(rest_df, rest_quota)
+        rest_adjacency = _build_adjacency(rest_df)
+        contiguous_groups: list[list[int]] = []
+        for members in groups:
+            contiguous_groups.extend(_connected_components(set(members), rest_adjacency))
+        if len(contiguous_groups) > len(groups):
+            print(
+                "[North America] US "
+                f"{stusps}: split {len(groups)} coarse groups into "
+                f"{len(contiguous_groups)} connected groups after partitioning."
+            )
+        group_points = rest_df.geometry.representative_point()
+        groups = sorted(
+            contiguous_groups,
+            key=lambda members: (
+                min(float(group_points.iloc[idx].x) for idx in members),
+                min(float(group_points.iloc[idx].y) for idx in members),
+                min(members),
+            ),
+        )
         for zone_idx, members in enumerate(groups, start=1):
             if not members:
                 continue
+            group_frame = rest_df.loc[members].copy()
+            anchor_row = _best_us_anchor_county(group_frame)
             geom = unary_union(rest_df.loc[members, "geometry"].tolist())
             if geom is None or geom.is_empty:
                 geom = rest_df.loc[members[0], "geometry"]
+            legacy_name = f"{state_name} Zone {zone_idx}"
             records.append(
                 {
                     "id": f"US_ZN_{statefp}_{zone_idx:03d}",
-                    "name": f"{state_name} Zone {zone_idx}",
+                    "name": legacy_name,
+                    "legacy_name": legacy_name,
+                    "anchor_county_name": _county_legal_name(anchor_row),
                     "cntr_code": "US",
                     "admin1_group": state_name,
                     "detail_tier": "coarse",
@@ -1049,8 +1229,8 @@ def _build_us_zones() -> gpd.GeoDataFrame:
             )
 
     us_out = gpd.GeoDataFrame(records, crs="EPSG:4326")
-    us_out = _top_up_us_feature_count(us_out, int(cfg.US_HYBRID_TARGET))
     us_out = us_out[us_out.geometry.notna() & ~us_out.geometry.is_empty].copy()
+    us_out = _assign_us_feature_names(us_out)
     us_out["geometry"] = us_out.geometry.simplify(
         cfg.SIMPLIFY_US_COUNTY, preserve_topology=True
     )

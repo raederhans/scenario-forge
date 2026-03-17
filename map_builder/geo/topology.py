@@ -256,6 +256,8 @@ def build_topology(
                 "MAPCOLOR9",
                 "admin1_group",
                 "name_local",
+                "legacy_name",
+                "anchor_county_name",
                 "constituent_country",
                 "adm1_name",
                 "detail_tier",

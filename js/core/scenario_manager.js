@@ -6,7 +6,13 @@ import {
   refreshScenarioOpeningOwnerBorders,
   setMapData,
 } from "./map_renderer.js";
-import { loadDeferredDetailBundle } from "./data_loader.js";
+import {
+  buildCityLocalizationPatch,
+  loadDeferredDetailBundle,
+  normalizeCityText,
+  normalizeScenarioCityOverridesPayload,
+  normalizeScenarioGeoLocalePatchPayload,
+} from "./data_loader.js";
 import { setActivePaletteSource, syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { markDirty } from "./dirty_state.js";
 import {
@@ -51,6 +57,14 @@ const SCENARIO_OPTIONAL_LAYER_CONFIGS = {
     objectName: "",
     visibilityField: "showScenarioReliefOverlays",
     revisionField: "scenarioReliefOverlayRevision",
+  },
+  cities: {
+    bundleField: "cityOverridesPayload",
+    stateField: "scenarioCityOverridesData",
+    urlField: "city_overrides_url",
+    objectName: "",
+    visibilityField: "showCityPoints",
+    revisionField: "cityLayerRevision",
   },
 };
 
@@ -851,7 +865,11 @@ function shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, runtimeTopolog
     ? hints.waterRegionsDefault !== false
     : config.visibilityField === "showScenarioSpecialRegions"
       ? hints.specialRegionsDefault !== false
-      : hints.scenarioReliefOverlaysDefault === true;
+      : config.visibilityField === "showScenarioReliefOverlays"
+        ? hints.scenarioReliefOverlaysDefault === true
+        : config.visibilityField === "showCityPoints"
+          ? state.showCityPoints !== false
+          : false;
   if (!visibleByDefault) {
     return false;
   }
@@ -865,6 +883,46 @@ function getScenarioBundleId(bundle) {
   return normalizeScenarioId(bundle?.manifest?.scenario_id || bundle?.meta?.scenario_id);
 }
 
+function applyScenarioGeoLocalization() {
+  const baseGeoLocales = state.baseGeoLocales && typeof state.baseGeoLocales === "object"
+    ? state.baseGeoLocales
+    : {};
+  const baseAliasMap = state.baseGeoAliasToStableKey && typeof state.baseGeoAliasToStableKey === "object"
+    ? state.baseGeoAliasToStableKey
+    : {};
+  const scenarioGeoPatch = state.scenarioGeoLocalePatchData?.geo
+    && typeof state.scenarioGeoLocalePatchData.geo === "object"
+    ? state.scenarioGeoLocalePatchData.geo
+    : {};
+  const overrideEntries = Object.values(state.scenarioCityOverridesData?.cities || {});
+  const patch = buildCityLocalizationPatch({
+    cityCollection: state.scenarioCityOverridesData?.featureCollection || null,
+    cityAliases: { cities: overrideEntries },
+  });
+  if (!state.locales || typeof state.locales !== "object") {
+    state.locales = { ui: {}, geo: {} };
+  }
+  state.locales.geo = {
+    ...baseGeoLocales,
+    ...scenarioGeoPatch,
+    ...patch.geo,
+  };
+  state.geoAliasToStableKey = {
+    ...baseAliasMap,
+    ...patch.aliasToStableKey,
+  };
+}
+
+function syncScenarioLocalizationState({
+  cityOverridesPayload = state.scenarioCityOverridesData,
+  geoLocalePatchPayload = state.scenarioGeoLocalePatchData,
+} = {}) {
+  state.scenarioCityOverridesData = cityOverridesPayload || null;
+  state.scenarioGeoLocalePatchData = geoLocalePatchPayload || null;
+  state.cityLayerRevision = (Number(state.cityLayerRevision) || 0) + 1;
+  applyScenarioGeoLocalization();
+}
+
 function assignOptionalLayerPayloadToActiveScenario(bundle, layerKey, payload) {
   const config = getScenarioOptionalLayerConfig(layerKey);
   if (!config) return false;
@@ -872,8 +930,12 @@ function assignOptionalLayerPayloadToActiveScenario(bundle, layerKey, payload) {
   if (!bundleScenarioId || bundleScenarioId !== normalizeScenarioId(state.activeScenarioId)) {
     return false;
   }
-  state[config.stateField] = payload || null;
-  if (config.revisionField) {
+  if (config.stateField === "scenarioCityOverridesData") {
+    syncScenarioLocalizationState({ cityOverridesPayload: payload });
+  } else {
+    state[config.stateField] = payload || null;
+  }
+  if (config.revisionField && config.stateField !== "scenarioCityOverridesData") {
     state[config.revisionField] = (Number(state[config.revisionField]) || 0) + 1;
   }
   syncScenarioUi();
@@ -934,7 +996,11 @@ async function loadScenarioOptionalLayerPayload(
     }
     try {
       const rawPayload = await d3Client.json(cacheBust(requestUrl));
-      const payload = normalizeScenarioFeatureCollection(rawPayload);
+      const payload = layerKey === "cities"
+        ? normalizeScenarioCityOverridesPayload(rawPayload, {
+          sourceLabel: `scenario_city_overrides:${getScenarioBundleId(bundle) || "scenario"}`,
+        })
+        : normalizeScenarioFeatureCollection(rawPayload);
       bundle[config.bundleField] = payload;
       bundle.optionalLayerSettledByKey[layerKey] = true;
       return payload;
@@ -1087,6 +1153,7 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     controllersPayload,
     coresPayload,
     runtimeTopologyResult,
+    geoLocalePatchResult,
     releasableCatalogResult,
   ] =
     await Promise.all([
@@ -1116,6 +1183,10 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
       scenarioId: targetId,
       resourceLabel: "runtime_topology",
     }),
+    loadOptionalScenarioResource(d3Client, manifest.geo_locale_patch_url, {
+      scenarioId: targetId,
+      resourceLabel: "geo_locale_patch",
+    }),
     loadOptionalScenarioResource(d3Client, manifest.releasable_catalog_url, {
       scenarioId: targetId,
       resourceLabel: "releasable_catalog",
@@ -1131,6 +1202,8 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     waterRegionsPayload: null,
     specialRegionsPayload: null,
     reliefOverlaysPayload: null,
+    cityOverridesPayload: null,
+    geoLocalePatchPayload: normalizeScenarioGeoLocalePatchPayload(geoLocalePatchResult.value),
     runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(runtimeTopologyResult.value),
     releasableCatalog: releasableCatalogResult.value,
     auditPayload: null,
@@ -1142,6 +1215,11 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
           ok: !!runtimeTopologyResult.ok,
           reason: runtimeTopologyResult.reason,
           errorMessage: runtimeTopologyResult.errorMessage,
+        },
+        geo_locale_patch: {
+          ok: !!geoLocalePatchResult.ok,
+          reason: geoLocalePatchResult.reason,
+          errorMessage: geoLocalePatchResult.errorMessage,
         },
         releasable_catalog: {
           ok: !!releasableCatalogResult.ok,
@@ -1519,6 +1597,9 @@ function captureScenarioApplyRollbackSnapshot() {
     scenarioSpecialRegionsData: cloneScenarioStateValue(state.scenarioSpecialRegionsData),
     scenarioReliefOverlaysData: cloneScenarioStateValue(state.scenarioReliefOverlaysData),
     scenarioReliefOverlayRevision: Number(state.scenarioReliefOverlayRevision) || 0,
+    scenarioGeoLocalePatchData: cloneScenarioStateValue(state.scenarioGeoLocalePatchData),
+    scenarioCityOverridesData: cloneScenarioStateValue(state.scenarioCityOverridesData),
+    cityLayerRevision: Number(state.cityLayerRevision) || 0,
     scenarioReleasableIndex: cloneScenarioStateValue(state.scenarioReleasableIndex),
     releasableCatalog: cloneScenarioStateValue(state.releasableCatalog),
     scenarioAudit: cloneScenarioStateValue(state.scenarioAudit),
@@ -1564,6 +1645,8 @@ function captureScenarioApplyRollbackSnapshot() {
     },
     scenarioOceanFillBeforeActivate: state.scenarioOceanFillBeforeActivate,
     styleConfigOcean: cloneScenarioStateValue(state.styleConfig?.ocean || {}),
+    locales: cloneScenarioStateValue(state.locales),
+    geoAliasToStableKey: cloneScenarioStateValue(state.geoAliasToStableKey),
     scenarioDisplaySettingsBeforeActivate: cloneScenarioStateValue(state.scenarioDisplaySettingsBeforeActivate),
     activeScenarioPerformanceHints: cloneScenarioStateValue(state.activeScenarioPerformanceHints),
     renderProfile: String(state.renderProfile || "auto"),
@@ -1602,6 +1685,9 @@ function restoreScenarioApplyRollbackSnapshot(snapshot, { renderNow = false } = 
   state.scenarioSpecialRegionsData = cloneScenarioStateValue(snapshot.scenarioSpecialRegionsData);
   state.scenarioReliefOverlaysData = cloneScenarioStateValue(snapshot.scenarioReliefOverlaysData);
   state.scenarioReliefOverlayRevision = Number(snapshot.scenarioReliefOverlayRevision) || 0;
+  state.scenarioGeoLocalePatchData = cloneScenarioStateValue(snapshot.scenarioGeoLocalePatchData);
+  state.scenarioCityOverridesData = cloneScenarioStateValue(snapshot.scenarioCityOverridesData);
+  state.cityLayerRevision = Number(snapshot.cityLayerRevision) || 0;
   state.scenarioReleasableIndex = cloneScenarioStateValue(snapshot.scenarioReleasableIndex);
   state.releasableCatalog = cloneScenarioStateValue(snapshot.releasableCatalog);
   state.scenarioAudit = cloneScenarioStateValue(snapshot.scenarioAudit);
@@ -1654,6 +1740,8 @@ function restoreScenarioApplyRollbackSnapshot(snapshot, { renderNow = false } = 
     state.styleConfig = {};
   }
   state.styleConfig.ocean = cloneScenarioStateValue(snapshot.styleConfigOcean) || {};
+  state.locales = cloneScenarioStateValue(snapshot.locales) || { ui: {}, geo: {} };
+  state.geoAliasToStableKey = cloneScenarioStateValue(snapshot.geoAliasToStableKey) || {};
   state.scenarioDisplaySettingsBeforeActivate =
     cloneScenarioStateValue(snapshot.scenarioDisplaySettingsBeforeActivate);
   state.activeScenarioPerformanceHints = cloneScenarioStateValue(snapshot.activeScenarioPerformanceHints);
@@ -1889,6 +1977,10 @@ async function applyScenarioBundle(
     state.scenarioSpecialRegionsData = staged.scenarioSpecialRegionsFromTopology || bundle.specialRegionsPayload || null;
     state.scenarioReliefOverlaysData = bundle.reliefOverlaysPayload || null;
     state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;
+    syncScenarioLocalizationState({
+      cityOverridesPayload: bundle.cityOverridesPayload || null,
+      geoLocalePatchPayload: bundle.geoLocalePatchPayload || null,
+    });
     state.releasableCatalog = bundle.releasableCatalog || state.defaultReleasableCatalog || null;
     state.scenarioReleasableIndex = staged.releasableIndex;
     state.scenarioAudit = bundle.auditPayload || null;
@@ -2144,6 +2236,10 @@ function clearActiveScenario(
   state.scenarioSpecialRegionsData = null;
   state.scenarioReliefOverlaysData = null;
   state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;
+  syncScenarioLocalizationState({
+    cityOverridesPayload: null,
+    geoLocalePatchPayload: null,
+  });
   state.scenarioReleasableIndex = {
     byTag: {},
     childTagsByParent: {},

@@ -610,6 +610,52 @@ function normalizeLakeStyleConfig(rawConfig) {
   };
 }
 
+function createDefaultCityLayerStyleConfig() {
+  return {
+    theme: "classic_graphite",
+    revealProfile: "hybrid_country_budget",
+    labelDensity: "balanced",
+    color: "#2f343a",
+    capitalColor: "#9f9072",
+    opacity: 0.94,
+    radius: 3.2,
+    markerScale: 1,
+    showLabels: true,
+    labelSize: 11,
+    labelMinZoom: 2.45,
+    showCapitalOverlay: true,
+    capitalScale: 1.6,
+  };
+}
+
+function normalizeCityLayerStyleConfig(rawConfig) {
+  const defaults = createDefaultCityLayerStyleConfig();
+  const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
+  const color = typeof raw.color === "string" ? raw.color.trim() : "";
+  const capitalColor = typeof raw.capitalColor === "string" ? raw.capitalColor.trim() : "";
+  const theme = String(raw.theme || defaults.theme).trim().toLowerCase();
+  const revealProfile = String(raw.revealProfile || defaults.revealProfile).trim().toLowerCase();
+  const labelDensity = String(raw.labelDensity || defaults.labelDensity).trim().toLowerCase();
+
+  return {
+    theme: theme === "classic_graphite" ? theme : defaults.theme,
+    revealProfile: revealProfile === "hybrid_country_budget" ? revealProfile : defaults.revealProfile,
+    labelDensity: ["sparse", "balanced", "dense"].includes(labelDensity) ? labelDensity : defaults.labelDensity,
+    color: color || defaults.color,
+    capitalColor: capitalColor || defaults.capitalColor,
+    opacity: clamp(toFiniteNumber(raw.opacity, defaults.opacity), 0, 1),
+    radius: clamp(toFiniteNumber(raw.radius, defaults.radius), 1, 8),
+    markerScale: clamp(toFiniteNumber(raw.markerScale, defaults.markerScale), 0.75, 1.4),
+    showLabels: raw.showLabels === undefined ? defaults.showLabels : !!raw.showLabels,
+    labelSize: clamp(Math.round(toFiniteNumber(raw.labelSize, defaults.labelSize)), 8, 24),
+    labelMinZoom: clamp(toFiniteNumber(raw.labelMinZoom, defaults.labelMinZoom), 0.5, 8),
+    showCapitalOverlay: raw.showCapitalOverlay === undefined
+      ? defaults.showCapitalOverlay
+      : !!raw.showCapitalOverlay,
+    capitalScale: clamp(toFiniteNumber(raw.capitalScale, defaults.capitalScale), 1, 3.5),
+  };
+}
+
 function createDefaultTextureStyleConfig() {
   return {
     mode: "none",
@@ -784,6 +830,8 @@ export {
   normalizePhysicalStyleConfig,
   createDefaultLakeStyleConfig,
   normalizeLakeStyleConfig,
+  createDefaultCityLayerStyleConfig,
+  normalizeCityLayerStyleConfig,
   PRESET_STORAGE_KEY,
   createDefaultTextureStyleConfig,
   normalizeTextureMode,
@@ -794,7 +842,9 @@ export {
 
 export const state = {
   locales: { ui: {}, geo: {} },
+  baseGeoLocales: {},
   geoAliasToStableKey: {},
+  baseGeoAliasToStableKey: {},
   currentLanguage: globalThis.currentLanguage || "en",
   topology: null,
   topologyPrimary: null,
@@ -869,12 +919,15 @@ export const state = {
   scenarioLandMaskData: null,
   scenarioContextLandMaskData: null,
   scenarioReliefOverlaysData: null,
+  scenarioGeoLocalePatchData: null,
+  scenarioCityOverridesData: null,
   riversData: null,
   oceanData: null,
   oceanMaskMode: "topology_ocean",
   oceanMaskQuality: 1,
   landBgData: null,
   urbanData: null,
+  worldCitiesData: null,
   physicalData: null,
   physicalSemanticsData: null,
   physicalContourMajorData: null,
@@ -975,10 +1028,12 @@ export const state = {
   showOpenOceanRegions: false,
   showScenarioSpecialRegions: true,
   showScenarioReliefOverlays: true,
+  showCityPoints: true,
   showUrban: true,
   showPhysical: true,
   showRivers: true,
   showSpecialZones: false,
+  cityLayerRevision: 0,
   manualSpecialZones: {
     type: "FeatureCollection",
     features: [],
@@ -1044,6 +1099,9 @@ export const state = {
       contourStrength: 0.75,
     },
     lakes: createDefaultLakeStyleConfig(),
+    cityPoints: {
+      ...createDefaultCityLayerStyleConfig(),
+    },
     urban: {
       color: "#4b5563",
       opacity: 0.4,
@@ -1101,6 +1159,7 @@ export const state = {
   updateSpecialZoneEditorUIFn: null,
   updateScenarioContextBarFn: null,
   triggerScenarioGuideFn: null,
+  persistViewSettingsFn: null,
   renderCountryListFn: null,
   refreshCountryListRowsFn: null,
   refreshCountryInspectorDetailFn: null,

@@ -1,5 +1,6 @@
 // Hybrid canvas + SVG rendering engine.
 import {
+  normalizeCityLayerStyleConfig,
   normalizeDayNightStyleConfig,
   normalizeLakeStyleConfig,
   normalizePhysicalStyleConfig,
@@ -19,7 +20,13 @@ import {
 import { ColorManager } from "./color_manager.js";
 import { LegendManager } from "./legend_manager.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
-import { getTooltipText, t } from "../ui/i18n.js";
+import {
+  getPreferredGeoLabel,
+  getStrictGeoLabel,
+  getTooltipText,
+  renderTooltipText,
+  t,
+} from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
 import { markDirty } from "./dirty_state.js";
 import {
@@ -172,6 +179,7 @@ const CONTEXT_LAYER_MIN_SCORE = 0.08;
 const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
   "drawPhysicalAtlasLayer",
   "drawPhysicalContourLayer",
+  "drawCityPointsLayer",
   "drawUrbanLayer",
   "drawRiversLayer",
   "drawScenarioRegionOverlaysPass",
@@ -181,7 +189,85 @@ const LAYER_DIAG_PREFIX = "[layer-resolver]";
 const DEFAULT_SPECIAL_ZONE_TYPE = "custom";
 const PAPER_TEXTURE_BASE_TILE_SIZE = 512;
 const PAPER_NOISE_TILE_SIZE = 192;
-const TEXTURE_LABEL_SERIF_STACK = "\"Iowan Old Style\", \"Palatino Linotype\", Georgia, serif";
+const TEXTURE_LABEL_SERIF_STACK = "\"Libre Baskerville\", \"Palatino Linotype\", Georgia, serif";
+const CITY_MARKER_THEME_GRAPHITE = "classic_graphite";
+const CITY_REVEAL_PROFILE_HYBRID = "hybrid_country_budget";
+const CITY_COUNTRY_TIER_RANK = {
+  A: 5,
+  B: 4,
+  C: 3,
+  D: 2,
+  E: 1,
+};
+const CITY_MARKER_THEME_TOKENS = {
+  classic_graphite: {
+    fillTop: "rgba(126, 134, 143, 0.99)",
+    fillMid: "rgba(86, 94, 102, 0.99)",
+    fillBottom: "rgba(42, 48, 55, 0.99)",
+    rimDark: "rgba(15, 21, 28, 0.44)",
+    stroke: "rgba(202, 193, 176, 0.54)",
+    highlight: "rgba(244, 247, 250, 0.22)",
+    specular: "rgba(230, 236, 241, 0.14)",
+    baseShadow: "rgba(11, 17, 23, 0.26)",
+    capitalAccent: "rgba(175, 161, 126, 0.96)",
+    capitalHighlight: "rgba(246, 236, 208, 0.42)",
+    label: "rgba(56, 52, 46, 0.92)",
+    capitalLabel: "rgba(74, 67, 56, 0.96)",
+    halo: "rgba(255, 252, 245, 0.08)",
+    shadow: "rgba(20, 24, 31, 0.18)",
+  },
+};
+const CITY_MARKER_SIZE_LIMITS_PX = {
+  minor: 10,
+  regional: 14,
+  major: 18,
+  capital: 22,
+};
+const CITY_MARKER_BASE_SIZES_PX = {
+  minor: 5.8,
+  regional: 7.7,
+  major: 10.4,
+};
+const CITY_LABEL_DENSITY_BUDGETS = {
+  sparse: { P4: 16, P5: 32 },
+  balanced: { P4: 24, P5: 48 },
+  dense: { P4: 32, P5: 64 },
+};
+const CITY_LABEL_MAX_WIDTH_PX = {
+  sparse: { capital: 212, major: 186, regional: 164, minor: 150 },
+  balanced: { capital: 188, major: 166, regional: 148, minor: 134 },
+  dense: { capital: 166, major: 148, regional: 132, minor: 120 },
+};
+const CITY_ADMIN_LABEL_PATTERNS = [
+  /\bcounty\b/giu,
+  /\bdistrict\b/giu,
+  /\boblast\b/giu,
+  /\bokrug\b/giu,
+  /\braion\b/giu,
+  /\bmunicipality\b/giu,
+  /\bgovernorate\b/giu,
+  /городской округ/giu,
+  /район/giu,
+  /область/giu,
+];
+const CITY_ADMIN_LABEL_REJECT_PATTERNS = [
+  /\bcounty\b/iu,
+  /\bdistrict\b/iu,
+  /\boblast\b/iu,
+  /\bokrug\b/iu,
+  /\braion\b/iu,
+  /городской округ/iu,
+  /район/iu,
+  /область/iu,
+];
+const CITY_REVEAL_PHASES = [
+  { id: "P0", minScale: 0, maxScale: 1.15, markerBudget: 18, labelBudget: 0 },
+  { id: "P1", minScale: 1.15, maxScale: 1.45, markerBudget: 28, labelBudget: 0 },
+  { id: "P2", minScale: 1.45, maxScale: 1.9, markerBudget: 42, labelBudget: 0 },
+  { id: "P3", minScale: 1.9, maxScale: 2.45, markerBudget: 72, labelBudget: 0 },
+  { id: "P4", minScale: 2.45, maxScale: 3.05, markerBudget: 110, labelBudget: 24 },
+  { id: "P5", minScale: 3.05, maxScale: Infinity, markerBudget: 170, labelBudget: 48 },
+];
 const GRATICULE_SAMPLE_DEGREES = 2;
 const PAPER_TEXTURE_ASSET_URLS = {
   paper_vintage_01: new URL("../../vendor/textures/paper_vintage_01.svg", import.meta.url).href,
@@ -272,6 +358,19 @@ const renderDiag = {
 };
 const rewoundFeatureLogKeys = new Set();
 const urbanGeoCentroidCache = new WeakMap();
+let cityAnchorCache = new WeakMap();
+const cityLayerCache = {
+  baseRef: null,
+  scenarioRef: null,
+  scenarioId: "",
+  cityLayerRevision: -1,
+  scenarioControllerRevision: -1,
+  sovereigntyRevision: -1,
+  merged: null,
+};
+const cityCountryProfileCache = new WeakMap();
+const cityMarkerSpriteCache = new Map();
+let visibleCityHoverEntries = [];
 let dayNightClockTimerId = null;
 let lastDayNightClockToken = "";
 
@@ -608,12 +707,15 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       state.deferContextBasePass ? "context-base:deferred" : "context-base:ready",
       `bucket:${zoomBucket}`,
       state.showPhysical ? "physical:on" : "physical:off",
+      state.showCityPoints ? "cities:on" : "cities:off",
       state.showUrban ? "urban:on" : "urban:off",
       state.showRivers ? "rivers:on" : "rivers:off",
+      `cities:${Number(state.cityLayerRevision || 0)}`,
       `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}`,
       `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
       String(state.renderProfile || "auto"),
       stableJson(normalizePhysicalStyleConfig(state.styleConfig?.physical || {})),
+      stableJson(normalizeCityLayerStyleConfig(state.styleConfig?.cityPoints || {})),
       stableJson(state.styleConfig?.urban || {}),
       stableJson(state.styleConfig?.rivers || {}),
     ];
@@ -6174,6 +6276,1310 @@ function drawRiversLayer(k, { interactive = false } = {}) {
   });
 }
 
+function getCityFeatureKey(feature, fallbackKey = "") {
+  const props = feature?.properties || {};
+  return String(
+    props.__city_stable_key
+    || props.stable_key
+    || props.__city_id
+    || props.id
+    || feature?.id
+    || fallbackKey
+    || ""
+  ).trim();
+}
+
+function getCityFeatureAliases(feature, key = "") {
+  const props = feature?.properties || {};
+  const aliases = new Set([
+    key,
+    props.__city_stable_key,
+    props.stable_key,
+    props.__city_id,
+    props.id,
+    props.name,
+    props.label,
+    props.name_en,
+    props.label_en,
+    props.name_zh,
+    props.label_zh,
+  ].filter(Boolean).map((value) => String(value).trim()));
+  const extraAliases = Array.isArray(props.__city_aliases) ? props.__city_aliases : [];
+  extraAliases.forEach((value) => {
+    const alias = String(value || "").trim();
+    if (alias) aliases.add(alias);
+  });
+  return Array.from(aliases);
+}
+
+function normalizeCityLabelComparisonValue(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
+function getCityRawLanguageLabel(feature, language = state.currentLanguage) {
+  const props = feature?.properties || {};
+  if (String(language || "en").trim().toLowerCase() === "zh") {
+    return String(props.label_zh || props.name_zh || props.label_cn || props.name_cn || "").trim();
+  }
+  return String(props.label_en || props.name_en || props.label || props.name || "").trim();
+}
+
+function getCityOverrideDisplayLabel(feature) {
+  const props = feature?.properties || {};
+  if (!props.__city_has_display_name_override) {
+    return "";
+  }
+  const displayName = props.__city_display_name_override && typeof props.__city_display_name_override === "object"
+    ? props.__city_display_name_override
+    : {};
+  return String(
+    state.currentLanguage === "zh"
+      ? (displayName.zh || "")
+      : (displayName.en || "")
+  ).trim();
+}
+
+function getCityBaseLocalizedLabel(feature, { strict = false } = {}) {
+  const props = feature?.properties || {};
+  const baseCandidates = [
+    props.__city_stable_key,
+    props.stable_key,
+    props.__city_id,
+    props.id,
+    props.name,
+    props.label,
+    props.name_en,
+    props.label_en,
+    props.name_zh,
+    props.label_zh,
+  ];
+  const aliases = Array.isArray(props.__city_aliases) ? props.__city_aliases : [];
+  return strict
+    ? getStrictGeoLabel([...baseCandidates, ...aliases], "")
+    : getPreferredGeoLabel([...baseCandidates, ...aliases], "");
+}
+
+function isAdministrativeCityLabelCandidate(label = "") {
+  const normalizedLabel = String(label || "").trim();
+  if (!normalizedLabel) return false;
+  return CITY_ADMIN_LABEL_REJECT_PATTERNS.some((pattern) => pattern.test(normalizedLabel));
+}
+
+function getCityHostFeatureDisplayLabel(feature) {
+  const props = feature?.properties || {};
+  const hostFeatureId = String(props.__city_host_feature_id || "").trim();
+  if (!hostFeatureId) return "";
+  const hostLabel = getStrictGeoLabel(hostFeatureId, "");
+  if (!hostLabel || isAdministrativeCityLabelCandidate(hostLabel)) {
+    return "";
+  }
+  return hostLabel;
+}
+
+function getCityRawFallbackLabel(feature) {
+  const props = feature?.properties || {};
+  const currentLanguageLabel = getCityRawLanguageLabel(feature, state.currentLanguage);
+  if (currentLanguageLabel) {
+    return currentLanguageLabel;
+  }
+  const alternateLanguageLabel = getCityRawLanguageLabel(feature, state.currentLanguage === "zh" ? "en" : "zh");
+  if (alternateLanguageLabel) {
+    return alternateLanguageLabel;
+  }
+  const localeEntry = props.__city_locale && typeof props.__city_locale === "object" ? props.__city_locale : {};
+  return String(
+    state.currentLanguage === "zh"
+      ? (localeEntry.zh || localeEntry.en || props.label_zh || props.name_zh || props.label || props.name || props.__city_id || feature?.id || "")
+      : (localeEntry.en || localeEntry.zh || props.label_en || props.name_en || props.label || props.name || props.__city_id || feature?.id || "")
+  ).trim();
+}
+
+function getCityDisplayLabel(feature) {
+  const overrideLabel = getCityOverrideDisplayLabel(feature);
+  if (overrideLabel) {
+    return overrideLabel;
+  }
+  const baseStrict = getCityBaseLocalizedLabel(feature, { strict: true });
+  const baseFallback = getCityBaseLocalizedLabel(feature);
+  const rawFallback = getCityRawFallbackLabel(feature);
+  const hostFeatureLabel = getCityHostFeatureDisplayLabel(feature);
+  const hostComparison = normalizeCityLabelComparisonValue(hostFeatureLabel);
+  const baseComparison = normalizeCityLabelComparisonValue(baseStrict || baseFallback || rawFallback);
+  if (hostComparison && hostComparison !== baseComparison) {
+    return hostFeatureLabel;
+  }
+  if (baseStrict) {
+    return baseStrict;
+  }
+  if (baseFallback) {
+    return baseFallback;
+  }
+  return rawFallback;
+}
+
+function cleanCityMapLabelText(label = "") {
+  const rawLabel = String(label || "").trim();
+  if (!rawLabel) return "";
+  let cleaned = rawLabel
+    .replace(/\s*\(([^)]*)\)\s*/g, " ")
+    .replace(/\s*,\s*/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  CITY_ADMIN_LABEL_PATTERNS.forEach((pattern) => {
+    cleaned = cleaned.replace(pattern, " ").replace(/\s+/g, " ").trim();
+  });
+  cleaned = cleaned.replace(/^[\s,;:-]+|[\s,;:-]+$/g, "").trim();
+  return cleaned.length >= 3 ? cleaned : rawLabel;
+}
+
+function isCjkText(value = "") {
+  return /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/u.test(String(value || ""));
+}
+
+function abbreviateCityMapLabel(label = "") {
+  const rawLabel = String(label || "").trim();
+  if (!rawLabel || isCjkText(rawLabel) || !/[\s-]/u.test(rawLabel)) {
+    return rawLabel;
+  }
+  const segments = rawLabel.split(/([\s-]+)/u);
+  let wordIndex = 0;
+  return segments.map((segment) => {
+    if (!segment || /^[\s-]+$/u.test(segment)) {
+      return segment;
+    }
+    wordIndex += 1;
+    if (wordIndex === 1) {
+      return segment;
+    }
+    const firstGlyph = Array.from(segment)[0] || "";
+    return firstGlyph ? `${firstGlyph}.` : segment;
+  }).join("").replace(/\s+/g, " ").trim();
+}
+
+function truncateCityLabelToWidth(text = "", maxWidthPx = 0, measureWidth = () => 0) {
+  const rawText = String(text || "").trim();
+  if (!rawText) return "";
+  if (measureWidth(rawText) <= maxWidthPx) {
+    return rawText;
+  }
+  const glyphs = Array.from(rawText);
+  if (glyphs.length <= 4) {
+    return rawText;
+  }
+  let truncated = rawText;
+  while (glyphs.length > 4) {
+    glyphs.pop();
+    truncated = `${glyphs.join("")}\u2026`;
+    if (measureWidth(truncated) <= maxWidthPx) {
+      return truncated;
+    }
+  }
+  return truncated;
+}
+
+function getCityMapLabelMaxWidth(entry, config = {}) {
+  const densityKey = String(config.labelDensity || "balanced").trim().toLowerCase();
+  const widthTable = CITY_LABEL_MAX_WIDTH_PX[densityKey] || CITY_LABEL_MAX_WIDTH_PX.balanced;
+  const widthKey = entry?.isCapital ? "capital" : (String(entry?.cityTier || "minor").trim().toLowerCase());
+  return Number(widthTable[widthKey] || widthTable.minor || 132);
+}
+
+function formatCityMapLabel(fullLabel, { entry = null, context: labelContext = null, config = {}, scale = 1 } = {}) {
+  const rawLabel = String(fullLabel || "").trim();
+  if (!rawLabel || !labelContext?.measureText) {
+    return rawLabel;
+  }
+  const maxWidthPx = getCityMapLabelMaxWidth(entry, config);
+  const measureWidth = (candidate) => Number(labelContext.measureText(String(candidate || "")).width || 0) * scale;
+  const cleanedLabel = cleanCityMapLabelText(rawLabel);
+  if (cleanedLabel && measureWidth(cleanedLabel) <= maxWidthPx) {
+    return cleanedLabel;
+  }
+  const abbreviatedLabel = abbreviateCityMapLabel(cleanedLabel || rawLabel);
+  if (abbreviatedLabel && measureWidth(abbreviatedLabel) <= maxWidthPx) {
+    return abbreviatedLabel;
+  }
+  return truncateCityLabelToWidth(abbreviatedLabel || cleanedLabel || rawLabel, maxWidthPx, measureWidth);
+}
+
+function getCityCanonicalId(feature) {
+  const props = feature?.properties || {};
+  return String(props.__city_id || props.id || feature?.id || "").trim();
+}
+
+function getCityTier(feature) {
+  const props = feature?.properties || {};
+  const tier = String(props.__city_base_tier || props.base_tier || props.baseTier || "").trim().toLowerCase();
+  if (tier === "major" || tier === "regional" || tier === "minor") {
+    return tier;
+  }
+  return "minor";
+}
+
+function getCityTierWeight(feature) {
+  switch (getCityTier(feature)) {
+    case "major":
+      return 3;
+    case "regional":
+      return 2;
+    default:
+      return 1;
+  }
+}
+
+function getDefaultCityMinZoomForTier(tier) {
+  switch (String(tier || "").trim().toLowerCase()) {
+    case "major":
+      return 0.8;
+    case "regional":
+      return 1.6;
+    default:
+      return 2.9;
+  }
+}
+
+function getCityEffectiveMinZoom(feature) {
+  const props = feature?.properties || {};
+  const explicit = Number(props.__city_min_zoom ?? props.min_zoom ?? props.minZoom);
+  if (Number.isFinite(explicit)) return explicit;
+  return getDefaultCityMinZoomForTier(getCityTier(feature));
+}
+
+function getCityRadiusMultiplier(feature) {
+  switch (getCityTier(feature)) {
+    case "major":
+      return 1.45;
+    case "regional":
+      return 1.1;
+    default:
+      return 0.85;
+  }
+}
+
+function getCityCapitalScore(feature) {
+  const props = feature?.properties || {};
+  if (props.__city_is_country_capital) return 3;
+  if (props.__city_is_admin_capital) return 2;
+  if (props.__city_is_capital) return 1;
+  return 0;
+}
+
+function getCitySortWeight(feature) {
+  const props = feature?.properties || {};
+  const population = Math.max(0, Number(props.__city_population || 0));
+  return (
+    (props.__city_is_capital ? 2_000_000_000 : 0)
+    + (getCityTierWeight(feature) * 250_000_000)
+    + population
+  );
+}
+
+function getCityMarkerThemeTokens(config = {}) {
+  const themeKey = String(config.theme || CITY_MARKER_THEME_GRAPHITE).trim().toLowerCase();
+  const baseTokens = CITY_MARKER_THEME_TOKENS[themeKey] || CITY_MARKER_THEME_TOKENS.classic_graphite;
+  return {
+    ...baseTokens,
+    fillBottom: getSafeCanvasColor(config.color, baseTokens.fillBottom),
+    capitalAccent: getSafeCanvasColor(config.capitalColor, baseTokens.capitalAccent),
+  };
+}
+
+function getCityCountryGroupKey(feature) {
+  const props = feature?.properties || {};
+  const scenarioTag = getCityScenarioTag(feature);
+  if (scenarioTag) return `tag:${scenarioTag}`;
+  const countryCode = String(props.__city_country_code || props.country_code || "").trim().toUpperCase();
+  if (countryCode) return `cc:${countryCode}`;
+  const hostFeatureId = String(props.__city_host_feature_id || props.host_feature_id || "").trim();
+  if (hostFeatureId) return `host:${hostFeatureId}`;
+  return `city:${getCityCanonicalId(feature) || getCityFeatureKey(feature)}`;
+}
+
+function getScenarioFeaturedTagSet() {
+  return new Set(
+    Array.isArray(state.activeScenarioManifest?.featured_tags)
+      ? state.activeScenarioManifest.featured_tags
+        .map((value) => String(value || "").trim().toUpperCase())
+        .filter(Boolean)
+      : []
+  );
+}
+
+function getCityCountryTierFromScenarioRecord(profile, record, { defaultCountry = "", featuredTags = new Set() } = {}) {
+  if (!record || typeof record !== "object") return "";
+  const tag = String(profile?.scenarioTag || "").trim().toUpperCase();
+  const entryKind = String(record.entry_kind || record.entryKind || "").trim().toLowerCase();
+  const controllerFeatureCount = Math.max(
+    0,
+    Number(record.controller_feature_count ?? record.controllerFeatureCount ?? 0) || 0
+  );
+  const isFeatured = !!record.featured || featuredTags.has(tag);
+  if (entryKind === "controller_only" || controllerFeatureCount <= 0) {
+    return "E";
+  }
+  if (
+    tag === defaultCountry
+    || (isFeatured && controllerFeatureCount >= 40)
+    || (!isFeatured && controllerFeatureCount >= 150)
+  ) {
+    return "A";
+  }
+  if ((isFeatured && controllerFeatureCount < 40) || (!isFeatured && controllerFeatureCount >= 40)) {
+    return "B";
+  }
+  if (controllerFeatureCount >= 12) return "C";
+  if (controllerFeatureCount >= 1) return "D";
+  return "E";
+}
+
+function getFallbackCityCountryTier(profile) {
+  const maxPopulation = Math.max(0, Number(profile?.maxPopulation || 0));
+  if ((profile?.hasCountryCapital && maxPopulation >= 2_500_000) || maxPopulation >= 5_000_000) {
+    return "A";
+  }
+  if (profile?.hasCountryCapital || maxPopulation >= 1_500_000) {
+    return "B";
+  }
+  if (maxPopulation >= 350_000) {
+    return "C";
+  }
+  if ((profile?.featureCount || 0) > 0) {
+    return "D";
+  }
+  return "E";
+}
+
+function getCityCountryProfileIndex(cityCollection) {
+  if (!cityCollection?.features?.length) {
+    return new Map();
+  }
+  const cached = cityCountryProfileCache.get(cityCollection);
+  if (cached) {
+    return cached;
+  }
+
+  const profiles = new Map();
+  cityCollection.features.forEach((feature) => {
+    const props = feature?.properties || {};
+    const groupKey = getCityCountryGroupKey(feature);
+    let profile = profiles.get(groupKey);
+    if (!profile) {
+      profile = {
+        groupKey,
+        scenarioTag: getCityScenarioTag(feature),
+        countryCode: String(props.__city_country_code || props.country_code || "").trim().toUpperCase(),
+        featureCount: 0,
+        hasCapital: false,
+        hasCountryCapital: false,
+        maxPopulation: 0,
+        maxTierWeight: 0,
+      };
+      profiles.set(groupKey, profile);
+    }
+    profile.featureCount += 1;
+    profile.hasCapital = profile.hasCapital || !!props.__city_is_capital;
+    profile.hasCountryCapital = profile.hasCountryCapital || !!props.__city_is_country_capital;
+    profile.maxPopulation = Math.max(profile.maxPopulation, Math.max(0, Number(props.__city_population || 0)));
+    profile.maxTierWeight = Math.max(profile.maxTierWeight, getCityTierWeight(feature));
+  });
+
+  const featuredTags = getScenarioFeaturedTagSet();
+  const defaultCountry = String(state.activeScenarioManifest?.default_country || "")
+    .trim()
+    .toUpperCase();
+  profiles.forEach((profile) => {
+    const record = profile.scenarioTag ? state.scenarioCountriesByTag?.[profile.scenarioTag] : null;
+    profile.countryTier = getCityCountryTierFromScenarioRecord(profile, record, {
+      defaultCountry,
+      featuredTags,
+    }) || getFallbackCityCountryTier(profile);
+    profile.countryTierRank = CITY_COUNTRY_TIER_RANK[profile.countryTier] || 0;
+  });
+
+  cityCountryProfileCache.set(cityCollection, profiles);
+  return profiles;
+}
+
+function getCityRevealPhase(scale) {
+  const normalizedScale = Math.max(0.0001, Number(scale || 1));
+  return CITY_REVEAL_PHASES.find((phase) => normalizedScale >= phase.minScale && normalizedScale < phase.maxScale)
+    || CITY_REVEAL_PHASES[CITY_REVEAL_PHASES.length - 1];
+}
+
+function getCityRevealBucket(entry, phaseId) {
+  const countryTier = String(entry?.countryTier || "D").trim().toUpperCase();
+  const cityTier = String(entry?.cityTier || "minor").trim().toLowerCase();
+  const isCapital = !!entry?.isCapital;
+  switch (String(phaseId || "P0")) {
+    case "P0":
+      return countryTier === "A" && isCapital ? 0 : Number.POSITIVE_INFINITY;
+    case "P1":
+      if ((countryTier === "A" || countryTier === "B") && isCapital) return 0;
+      if ((countryTier === "C" || countryTier === "D") && isCapital) return 1;
+      if (countryTier === "E" && isCapital) return 2;
+      return Number.POSITIVE_INFINITY;
+    case "P2":
+      if ((countryTier === "A" || countryTier === "B") && isCapital) return 0;
+      if ((countryTier === "C" || countryTier === "D") && isCapital) return 1;
+      if (countryTier === "E" && isCapital) return 2;
+      if (countryTier === "A" && cityTier === "major") return 3;
+      return Number.POSITIVE_INFINITY;
+    case "P3":
+      if ((countryTier === "A" || countryTier === "B") && isCapital) return 0;
+      if ((countryTier === "C" || countryTier === "D") && isCapital) return 1;
+      if (countryTier === "E" && isCapital) return 2;
+      if (countryTier === "A" && cityTier === "major") return 3;
+      if (countryTier === "B" && cityTier === "major") return 4;
+      return Number.POSITIVE_INFINITY;
+    case "P4":
+      if ((countryTier === "A" || countryTier === "B") && isCapital) return 0;
+      if ((countryTier === "C" || countryTier === "D") && isCapital) return 1;
+      if (countryTier === "E" && isCapital) return 2;
+      if (countryTier === "A" && cityTier === "major") return 3;
+      if (countryTier === "B" && cityTier === "major") return 4;
+      if ((countryTier === "A" || countryTier === "B" || countryTier === "C") && (cityTier === "regional" || cityTier === "major")) {
+        return 5;
+      }
+      return Number.POSITIVE_INFINITY;
+    case "P5":
+    default:
+      if ((countryTier === "A" || countryTier === "B") && isCapital) return 0;
+      if ((countryTier === "C" || countryTier === "D") && isCapital) return 1;
+      if (countryTier === "E" && isCapital) return 2;
+      if (cityTier === "major") return 3;
+      if (cityTier === "regional") return 4;
+      if (countryTier !== "E" && cityTier === "minor") return 5;
+      return Number.POSITIVE_INFINITY;
+  }
+}
+
+function getCityMarkerQuotaForTier(phaseId, countryTier) {
+  const phaseQuotas = {
+    P0: { A: 1, B: 1, C: 1, D: 1, E: 0 },
+    P1: { A: 1, B: 1, C: 1, D: 1, E: 1 },
+    P2: { A: 3, B: 1, C: 0, D: 0, E: 0 },
+    P3: { A: 4, B: 2, C: 1, D: 1, E: 1 },
+    P4: { A: 6, B: 4, C: 2, D: 1, E: 1 },
+    P5: { A: 8, B: 6, C: 4, D: 2, E: 1 },
+  };
+  const quotaTable = phaseQuotas[String(phaseId || "P0")] || phaseQuotas.P0;
+  return quotaTable[String(countryTier || "D").trim().toUpperCase()] ?? 0;
+}
+
+function compareCityRevealEntries(left, right) {
+  const leftBucket = Number(left?.revealBucket ?? Number.POSITIVE_INFINITY);
+  const rightBucket = Number(right?.revealBucket ?? Number.POSITIVE_INFINITY);
+  if (leftBucket !== rightBucket) return leftBucket - rightBucket;
+  const leftCountryRank = Number(left?.countryTierRank || 0);
+  const rightCountryRank = Number(right?.countryTierRank || 0);
+  if (leftCountryRank !== rightCountryRank) return rightCountryRank - leftCountryRank;
+  if (!!left?.isCapital !== !!right?.isCapital) return left?.isCapital ? -1 : 1;
+  const leftTierWeight = Number(left?.cityTierWeight || 0);
+  const rightTierWeight = Number(right?.cityTierWeight || 0);
+  if (leftTierWeight !== rightTierWeight) return rightTierWeight - leftTierWeight;
+  const leftPopulation = Math.max(0, Number(left?.population || 0));
+  const rightPopulation = Math.max(0, Number(right?.population || 0));
+  if (leftPopulation !== rightPopulation) return rightPopulation - leftPopulation;
+  return String(left?.cityId || "").localeCompare(String(right?.cityId || ""));
+}
+
+function getCityLabelBudget(phase, config = {}) {
+  const densityKey = String(config.labelDensity || "balanced").trim().toLowerCase();
+  const budgetTable = CITY_LABEL_DENSITY_BUDGETS[densityKey] || CITY_LABEL_DENSITY_BUDGETS.balanced;
+  const phaseId = String(phase?.id || "");
+  if (Object.prototype.hasOwnProperty.call(budgetTable, phaseId)) {
+    return Math.max(0, Number(budgetTable[phaseId] || 0));
+  }
+  return Math.max(0, Number(phase?.labelBudget || 0));
+}
+
+function isCityLabelEligibleForPhase(entry, phaseId) {
+  const cityTier = String(entry?.cityTier || "minor").trim().toLowerCase();
+  if (String(phaseId || "P0") === "P4") {
+    return !!entry?.isCapital || cityTier === "major";
+  }
+  if (String(phaseId || "P0") === "P5") {
+    return true;
+  }
+  return false;
+}
+
+function getCityMarkerSizePx(entry, config = {}) {
+  const cityTier = String(entry?.cityTier || "minor").trim().toLowerCase();
+  const markerScale = clamp(Number(config.markerScale) || 1, 0.75, 1.4);
+  const legacyScale = clamp((Number(config.radius) || 3.2) / 3.2, 0.75, 1.3);
+  const baseSize = CITY_MARKER_BASE_SIZES_PX[cityTier] || CITY_MARKER_BASE_SIZES_PX.minor;
+  const hardLimit = CITY_MARKER_SIZE_LIMITS_PX[cityTier] || CITY_MARKER_SIZE_LIMITS_PX.minor;
+  const capitalLimit = entry?.isCapital ? CITY_MARKER_SIZE_LIMITS_PX.capital : hardLimit;
+  const boostedSize = entry?.isCapital ? baseSize * 1.08 : baseSize;
+  return Math.min(capitalLimit, boostedSize * markerScale * legacyScale);
+}
+
+function createCityMarkerSpriteCanvas(width, height) {
+  if (typeof OffscreenCanvas === "function") {
+    return new OffscreenCanvas(width, height);
+  }
+  if (typeof document !== "undefined" && typeof document.createElement === "function") {
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    return canvas;
+  }
+  return null;
+}
+
+function getCityMarkerVisualSpec(entry, config = {}) {
+  const sizePx = Math.max(4, Number(entry?.markerSizePx || getCityMarkerSizePx(entry, config)));
+  const cityTier = String(entry?.cityTier || "minor").trim().toLowerCase();
+  const tierScale = cityTier === "major" ? 1.18 : cityTier === "regional" ? 1 : 0.84;
+  const discRadius = Math.max(3.2, sizePx * (cityTier === "major" ? 0.62 : cityTier === "regional" ? 0.56 : 0.5));
+  const discHeight = Math.max(3.4, sizePx * (cityTier === "major" ? 0.66 : cityTier === "regional" ? 0.58 : 0.5));
+  const widthPx = Math.max(18, Math.ceil(discRadius * 2.8 * tierScale));
+  const heightPx = Math.max(16, Math.ceil((discHeight * 1.9) + (sizePx * 0.34)));
+  const capitalTopExtra = entry?.isCapital ? Math.ceil(sizePx * 0.86) : 0;
+  return {
+    sizePx,
+    cityTier,
+    discRadius,
+    discHeight,
+    widthPx,
+    heightPx,
+    capitalTopExtra,
+  };
+}
+
+function renderCityMarkerSprite(spriteContext, spec, tokens, entry) {
+  const { sizePx, discRadius, discHeight, widthPx, heightPx, capitalTopExtra } = spec;
+  const cx = widthPx / 2;
+  const centerY = capitalTopExtra + Math.max(discHeight + (sizePx * 0.26), (heightPx * 0.56));
+  const topY = centerY - discHeight;
+  const bottomY = centerY + discHeight;
+  const baseShadowY = centerY + (discHeight * 0.78);
+  const bodyGradient = spriteContext.createLinearGradient(0, topY, 0, bottomY);
+  bodyGradient.addColorStop(0, tokens.fillTop);
+  bodyGradient.addColorStop(0.55, tokens.fillMid || tokens.fillTop);
+  bodyGradient.addColorStop(1, tokens.fillBottom);
+
+  spriteContext.save();
+  spriteContext.lineJoin = "round";
+  spriteContext.lineCap = "round";
+
+  spriteContext.beginPath();
+  spriteContext.ellipse(cx, baseShadowY, discRadius * 0.98, Math.max(1.5, discHeight * 0.46), 0, 0, Math.PI * 2);
+  spriteContext.fillStyle = tokens.baseShadow;
+  spriteContext.fill();
+
+  spriteContext.beginPath();
+  spriteContext.ellipse(cx, centerY, discRadius, discHeight, 0, 0, Math.PI * 2);
+  spriteContext.fillStyle = bodyGradient;
+  spriteContext.fill();
+  spriteContext.strokeStyle = tokens.stroke;
+  spriteContext.lineWidth = Math.max(1, sizePx * 0.08);
+  spriteContext.stroke();
+
+  spriteContext.save();
+  spriteContext.globalCompositeOperation = "multiply";
+  const rimGradient = spriteContext.createLinearGradient(cx, centerY - discHeight, cx, centerY + discHeight);
+  rimGradient.addColorStop(0, "rgba(0, 0, 0, 0)");
+  rimGradient.addColorStop(0.58, "rgba(0, 0, 0, 0)");
+  rimGradient.addColorStop(1, tokens.rimDark || tokens.fillBottom);
+  spriteContext.beginPath();
+  spriteContext.ellipse(cx, centerY, discRadius, discHeight, 0, 0, Math.PI * 2);
+  spriteContext.fillStyle = rimGradient;
+  spriteContext.fill();
+  spriteContext.restore();
+
+  spriteContext.save();
+  spriteContext.globalCompositeOperation = "screen";
+  spriteContext.beginPath();
+  spriteContext.ellipse(cx - (discRadius * 0.18), centerY - (discHeight * 0.36), discRadius * 0.52, discHeight * 0.3, -0.25, 0, Math.PI * 2);
+  spriteContext.fillStyle = tokens.highlight;
+  spriteContext.fill();
+  spriteContext.beginPath();
+  spriteContext.ellipse(cx + (discRadius * 0.08), centerY - (discHeight * 0.1), discRadius * 0.78, discHeight * 0.52, 0, Math.PI, Math.PI * 2);
+  spriteContext.fillStyle = tokens.specular || tokens.highlight;
+  spriteContext.fill();
+  spriteContext.restore();
+
+  if (entry?.isCapital) {
+    const crownY = topY - (sizePx * 0.18);
+    const crownRadiusX = Math.min(CITY_MARKER_SIZE_LIMITS_PX.capital * 0.34, discRadius * 0.76);
+    const crownRadiusY = Math.max(1.6, crownRadiusX * 0.34);
+    spriteContext.beginPath();
+    spriteContext.ellipse(cx, crownY, crownRadiusX, crownRadiusY, 0, 0, Math.PI * 2);
+    spriteContext.strokeStyle = tokens.capitalAccent;
+    spriteContext.lineWidth = Math.max(1.4, sizePx * 0.11);
+    spriteContext.stroke();
+
+    spriteContext.save();
+    spriteContext.globalCompositeOperation = "screen";
+    spriteContext.beginPath();
+    spriteContext.ellipse(cx, crownY - (crownRadiusY * 0.1), crownRadiusX * 0.74, crownRadiusY * 0.55, 0, 0, Math.PI);
+    spriteContext.strokeStyle = tokens.capitalHighlight;
+    spriteContext.lineWidth = Math.max(1, sizePx * 0.06);
+    spriteContext.stroke();
+    spriteContext.restore();
+
+    spriteContext.beginPath();
+    spriteContext.moveTo(cx - crownRadiusX * 0.7, crownY);
+    spriteContext.lineTo(cx - crownRadiusX * 0.28, crownY - crownRadiusY * 1.2);
+    spriteContext.lineTo(cx, crownY - crownRadiusY * 0.35);
+    spriteContext.lineTo(cx + crownRadiusX * 0.28, crownY - crownRadiusY * 1.2);
+    spriteContext.lineTo(cx + crownRadiusX * 0.7, crownY);
+    spriteContext.strokeStyle = tokens.capitalHighlight;
+    spriteContext.lineWidth = Math.max(1, sizePx * 0.055);
+    spriteContext.stroke();
+  }
+
+  spriteContext.restore();
+  return {
+    anchorX: widthPx / 2,
+    anchorY: centerY + discHeight + Math.max(2, sizePx * 0.18),
+  };
+}
+
+function getCityMarkerSprite(entry, config = {}) {
+  const spec = getCityMarkerVisualSpec(entry, config);
+  const sizePx = spec.sizePx;
+  const themeKey = String(config.theme || CITY_MARKER_THEME_GRAPHITE).trim().toLowerCase();
+  const baseColorKey = String(config.color || "");
+  const capitalColorKey = String(config.capitalColor || "");
+  const spriteKey = [
+    themeKey,
+    String(entry?.cityTier || "minor"),
+    entry?.isCapital ? "capital" : "regular",
+    sizePx.toFixed(2),
+    baseColorKey,
+    capitalColorKey,
+  ].join("|");
+  if (cityMarkerSpriteCache.has(spriteKey)) {
+    return cityMarkerSpriteCache.get(spriteKey);
+  }
+
+  const tokens = getCityMarkerThemeTokens(config);
+  const canvas = createCityMarkerSpriteCanvas(spec.widthPx, spec.heightPx + spec.capitalTopExtra);
+  const sprite = {
+    canvas,
+    width: spec.widthPx,
+    height: spec.heightPx + spec.capitalTopExtra,
+    anchorX: spec.widthPx / 2,
+    anchorY: spec.heightPx + spec.capitalTopExtra - Math.max(2, sizePx * 0.12),
+  };
+  if (!canvas) {
+    cityMarkerSpriteCache.set(spriteKey, sprite);
+    return sprite;
+  }
+
+  const spriteContext = canvas.getContext("2d");
+  if (!spriteContext) {
+    cityMarkerSpriteCache.set(spriteKey, sprite);
+    return sprite;
+  }
+
+  const anchor = renderCityMarkerSprite(spriteContext, spec, tokens, entry);
+  sprite.anchorX = anchor.anchorX;
+  sprite.anchorY = anchor.anchorY;
+  cityMarkerSpriteCache.set(spriteKey, sprite);
+  return sprite;
+}
+
+function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
+  const phase = getCityRevealPhase(scale);
+  const countryProfiles = getCityCountryProfileIndex(cityCollection);
+  const markerEntries = [];
+  const countsByCountry = new Map();
+  const markerBudget = Math.max(0, Number(phase.markerBudget || 0));
+  const labelBudget = getCityLabelBudget(phase, config);
+  const labelEntries = [];
+
+  const candidateEntries = cityCollection.features
+    .map((feature) => {
+      const anchor = getCityAnchor(feature);
+      if (!anchor || !isCityAnchorInViewport(anchor, { padding: 48, transform })) {
+        return null;
+      }
+      const profile = countryProfiles.get(getCityCountryGroupKey(feature)) || {
+        countryTier: "D",
+        countryTierRank: CITY_COUNTRY_TIER_RANK.D,
+      };
+      const isCapital = !!feature?.properties?.__city_is_capital;
+      const minZoom = getCityEffectiveMinZoom(feature);
+      if (!isCapital && scale < minZoom) {
+        return null;
+      }
+      const cityTier = getCityTier(feature);
+      const entry = {
+        feature,
+        anchor,
+        screenPoint: getCityScreenPoint(anchor, transform),
+        cityId: getCityCanonicalId(feature) || getCityFeatureKey(feature),
+        isCapital,
+        minZoom,
+        cityTier,
+        cityTierWeight: getCityTierWeight(feature),
+        countryKey: profile.groupKey || getCityCountryGroupKey(feature),
+        countryTier: profile.countryTier || "D",
+        countryTierRank: profile.countryTierRank || CITY_COUNTRY_TIER_RANK.D,
+        population: Math.max(0, Number(feature?.properties?.__city_population || 0)),
+        sortWeight: getCitySortWeight(feature),
+      };
+      entry.revealBucket = getCityRevealBucket(entry, phase.id);
+      if (!Number.isFinite(entry.revealBucket)) {
+        return null;
+      }
+      return entry;
+    })
+    .filter(Boolean)
+    .sort(compareCityRevealEntries);
+
+  for (const entry of candidateEntries) {
+    if (markerEntries.length >= markerBudget) break;
+    const currentCount = countsByCountry.get(entry.countryKey) || 0;
+    const quota = Math.max(
+      getCityMarkerQuotaForTier(phase.id, entry.countryTier),
+      entry.isCapital ? 1 : 0
+    );
+    if (currentCount >= quota) continue;
+    entry.markerSizePx = getCityMarkerSizePx(entry, config);
+    markerEntries.push(entry);
+    countsByCountry.set(entry.countryKey, currentCount + 1);
+  }
+
+  if (config.showLabels && !state.deferExactAfterSettle && labelBudget > 0 && scale >= Number(config.labelMinZoom || 0)) {
+    markerEntries
+      .filter((entry) => isCityLabelEligibleForPhase(entry, phase.id))
+      .sort(compareCityRevealEntries)
+      .some((entry) => {
+        if (scale < Math.max(Number(config.labelMinZoom || 0), Number(entry.minZoom || 0))) {
+          return false;
+        }
+        labelEntries.push(entry);
+        return labelEntries.length >= labelBudget;
+      });
+  }
+
+  return {
+    phase,
+    markerEntries,
+    labelEntries,
+  };
+}
+
+function cloneCityFeature(feature, propertyPatch = {}) {
+  const props = feature?.properties || {};
+  return {
+    ...feature,
+    properties: {
+      ...props,
+      ...propertyPatch,
+    },
+  };
+}
+
+function resolveCityFeatureKey(reference, featuresByKey, aliasToKey) {
+  const value = String(reference || "").trim();
+  if (!value) return "";
+  if (featuresByKey.has(value)) return value;
+  return String(aliasToKey.get(value) || "").trim();
+}
+
+function getScenarioCountryCodesForTag(tag) {
+  const record = state.scenarioCountriesByTag?.[tag];
+  if (!record || typeof record !== "object") return new Set();
+  return new Set(
+    [record.lookup_iso2, record.base_iso2]
+      .map((value) => String(value || "").trim().toUpperCase())
+      .filter((value) => /^[A-Z]{2}$/.test(value))
+  );
+}
+
+function getCityScenarioTag(feature) {
+  const props = feature?.properties || {};
+  const hostFeatureId = String(props.__city_host_feature_id || props.host_feature_id || "").trim();
+  if (!hostFeatureId) return "";
+  return String(
+    state.scenarioControllersByFeatureId?.[hostFeatureId]
+    || state.sovereigntyByFeatureId?.[hostFeatureId]
+    || ""
+  ).trim().toUpperCase();
+}
+
+function getCapitalCandidateSortTuple(feature, preferredCountryCodes = new Set()) {
+  const props = feature?.properties || {};
+  const countryCode = String(props.__city_country_code || props.country_code || "").trim().toUpperCase();
+  const countryPenalty = preferredCountryCodes.size > 0 && !preferredCountryCodes.has(countryCode) ? 1 : 0;
+  return [
+    countryPenalty,
+    -getCityCapitalScore(feature),
+    -getCityTierWeight(feature),
+    -Math.max(0, Number(props.__city_population || 0)),
+    getCityFeatureKey(feature),
+  ];
+}
+
+function compareCapitalCandidateEntries(left, right, preferredCountryCodes = new Set()) {
+  const leftTuple = getCapitalCandidateSortTuple(left?.feature, preferredCountryCodes);
+  const rightTuple = getCapitalCandidateSortTuple(right?.feature, preferredCountryCodes);
+  for (let index = 0; index < leftTuple.length; index += 1) {
+    if (leftTuple[index] < rightTuple[index]) return -1;
+    if (leftTuple[index] > rightTuple[index]) return 1;
+  }
+  return 0;
+}
+
+function applyScenarioCityOverride(feature, overrideEntry) {
+  if (!feature || !overrideEntry || typeof overrideEntry !== "object") {
+    return feature;
+  }
+  const props = feature.properties || {};
+  const nextTier = ["major", "regional", "minor"].includes(String(overrideEntry.tier || "").trim().toLowerCase())
+    ? String(overrideEntry.tier || "").trim().toLowerCase()
+    : getCityTier(feature);
+  const displayName = overrideEntry.display_name && typeof overrideEntry.display_name === "object"
+    ? overrideEntry.display_name
+    : {};
+  const nextAliases = Array.from(new Set([
+    ...(Array.isArray(props.__city_aliases) ? props.__city_aliases : []),
+    ...(Array.isArray(overrideEntry.aliases) ? overrideEntry.aliases : []),
+    displayName.en,
+    displayName.zh,
+    overrideEntry.city_id,
+    overrideEntry.stable_key,
+  ].filter(Boolean).map((value) => String(value).trim())));
+  const overrideMinZoom = Number(overrideEntry.min_zoom ?? overrideEntry.minZoom);
+  return cloneCityFeature(feature, {
+    __city_aliases: nextAliases,
+    __city_has_display_name_override: Object.keys(displayName).length > 0,
+    __city_display_name_override: Object.keys(displayName).length > 0 ? { ...displayName } : null,
+    __city_hidden: overrideEntry.hidden === undefined ? !!props.__city_hidden : !!overrideEntry.hidden,
+    __city_base_tier: nextTier,
+    __city_min_zoom: Number.isFinite(overrideMinZoom) ? overrideMinZoom : getDefaultCityMinZoomForTier(nextTier),
+    name_en: String(displayName.en || overrideEntry.name_en || props.name_en || props.name || "").trim(),
+    label_en: String(displayName.en || overrideEntry.name_en || props.label_en || props.name_en || props.name || "").trim(),
+    name_zh: String(displayName.zh || overrideEntry.name_zh || props.name_zh || "").trim(),
+    label_zh: String(displayName.zh || overrideEntry.name_zh || props.label_zh || props.name_zh || "").trim(),
+  });
+}
+
+function getEffectiveCityCollection() {
+  const baseRef = state.worldCitiesData || null;
+  const scenarioRef = state.scenarioCityOverridesData || null;
+  const scenarioId = String(state.activeScenarioId || "");
+  const cityLayerRevision = Number(state.cityLayerRevision || 0);
+  const scenarioControllerRevision = Number(state.scenarioControllerRevision || 0);
+  const sovereigntyRevision = Number(state.sovereigntyRevision || 0);
+  if (
+    cityLayerCache.baseRef === baseRef
+    && cityLayerCache.scenarioRef === scenarioRef
+    && cityLayerCache.scenarioId === scenarioId
+    && cityLayerCache.cityLayerRevision === cityLayerRevision
+    && cityLayerCache.scenarioControllerRevision === scenarioControllerRevision
+    && cityLayerCache.sovereigntyRevision === sovereigntyRevision
+  ) {
+    return cityLayerCache.merged;
+  }
+
+  const featuresByKey = new Map();
+  const aliasToKey = new Map();
+  const rememberFeatureAliases = (feature, key) => {
+    getCityFeatureAliases(feature, key).forEach((alias) => {
+      aliasToKey.set(alias, key);
+    });
+  };
+  const setFeature = (feature, key) => {
+    featuresByKey.set(key, feature);
+    rememberFeatureAliases(feature, key);
+  };
+  const deleteByAlias = (rawAlias) => {
+    const alias = String(rawAlias || "").trim();
+    if (!alias) return;
+    const resolvedKey = aliasToKey.get(alias) || alias;
+    featuresByKey.delete(resolvedKey);
+  };
+
+  (Array.isArray(baseRef?.features) ? baseRef.features : []).forEach((feature, index) => {
+    const key = getCityFeatureKey(feature, `world_city_${index + 1}`);
+    if (!key || feature?.properties?.__city_hidden) return;
+    setFeature(feature, key);
+  });
+
+  const legacyScenarioCollection = scenarioRef?.featureCollection || (
+    Array.isArray(scenarioRef?.features) ? scenarioRef : null
+  );
+  (Array.isArray(legacyScenarioCollection?.features) ? legacyScenarioCollection.features : []).forEach((feature, index) => {
+    const props = feature?.properties || {};
+    const key = getCityFeatureKey(feature, `scenario_city_${index + 1}`);
+    const replaceIds = Array.isArray(props.__city_replace_ids) ? props.__city_replace_ids : [];
+    replaceIds.forEach((value) => deleteByAlias(value));
+    if (!key) return;
+    deleteByAlias(key);
+    if (props.__city_hidden) return;
+    setFeature(feature, key);
+  });
+
+  Object.values(scenarioRef?.cities || {}).forEach((overrideEntry) => {
+    const replaceIds = Array.isArray(overrideEntry?.replace_ids) ? overrideEntry.replace_ids : [];
+    replaceIds.forEach((value) => deleteByAlias(value));
+    const key = resolveCityFeatureKey(
+      overrideEntry?.city_id || overrideEntry?.stable_key || "",
+      featuresByKey,
+      aliasToKey
+    );
+    if (!key || !featuresByKey.has(key)) return;
+    const nextFeature = applyScenarioCityOverride(featuresByKey.get(key), overrideEntry);
+    if (nextFeature?.properties?.__city_hidden) {
+      featuresByKey.delete(key);
+      return;
+    }
+    setFeature(nextFeature, key);
+  });
+
+  const activeCapitalCityIds = new Set();
+  if (scenarioId && state.scenarioCountriesByTag && typeof state.scenarioCountriesByTag === "object") {
+    const candidatesByTag = new Map();
+    Array.from(featuresByKey.entries()).forEach(([key, feature]) => {
+      const tag = getCityScenarioTag(feature);
+      if (!tag) return;
+      const current = candidatesByTag.get(tag) || [];
+      current.push({ key, feature });
+      candidatesByTag.set(tag, current);
+    });
+
+    Object.keys(state.scenarioCountriesByTag).forEach((rawTag) => {
+      const tag = String(rawTag || "").trim().toUpperCase();
+      if (!tag) return;
+      const explicitKey = resolveCityFeatureKey(scenarioRef?.capitals_by_tag?.[tag], featuresByKey, aliasToKey);
+      const hintedKey = explicitKey
+        ? ""
+        : resolveCityFeatureKey(scenarioRef?.capital_city_hints?.[tag]?.city_id, featuresByKey, aliasToKey);
+      let resolvedKey = explicitKey || hintedKey;
+      if (!resolvedKey) {
+        const candidateEntries = (candidatesByTag.get(tag) || []).slice();
+        if (candidateEntries.length) {
+          const preferredCountryCodes = getScenarioCountryCodesForTag(tag);
+          candidateEntries.sort((left, right) => compareCapitalCandidateEntries(left, right, preferredCountryCodes));
+          resolvedKey = candidateEntries[0]?.key || "";
+        }
+      }
+      if (!resolvedKey || !featuresByKey.has(resolvedKey)) return;
+      const resolvedCityId = getCityCanonicalId(featuresByKey.get(resolvedKey)) || resolvedKey;
+      if (resolvedCityId) {
+        activeCapitalCityIds.add(resolvedCityId);
+      }
+    });
+  }
+
+  const finalFeatures = [];
+  Array.from(featuresByKey.entries()).forEach(([key, feature]) => {
+    const cityId = getCityCanonicalId(feature) || key;
+    const nextIsCapital = scenarioId ? activeCapitalCityIds.has(cityId) : !!feature?.properties?.__city_is_capital;
+    const nextFeature = feature?.properties?.__city_is_capital === nextIsCapital
+      ? feature
+      : cloneCityFeature(feature, { __city_is_capital: nextIsCapital });
+    if (!nextFeature?.properties?.__city_hidden) {
+      finalFeatures.push(nextFeature);
+    }
+  });
+
+  cityLayerCache.baseRef = baseRef;
+  cityLayerCache.scenarioRef = scenarioRef;
+  cityLayerCache.scenarioId = scenarioId;
+  cityLayerCache.cityLayerRevision = cityLayerRevision;
+  cityLayerCache.scenarioControllerRevision = scenarioControllerRevision;
+  cityLayerCache.sovereigntyRevision = sovereigntyRevision;
+  cityLayerCache.merged = finalFeatures.length
+    ? {
+      type: "FeatureCollection",
+      features: finalFeatures,
+    }
+    : null;
+  return cityLayerCache.merged;
+}
+
+function getCityAnchor(feature) {
+  if (!feature || !projection) return null;
+  const cached = cityAnchorCache.get(feature);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  let anchor = null;
+  const geometry = feature.geometry;
+  if (geometry?.type === "Point" && Array.isArray(geometry.coordinates) && geometry.coordinates.length >= 2) {
+    const projected = projection(geometry.coordinates);
+    if (Array.isArray(projected) && projected.every((value) => Number.isFinite(Number(value)))) {
+      anchor = projected;
+    }
+  } else if (geometry?.type === "MultiPoint" && Array.isArray(geometry.coordinates) && geometry.coordinates.length) {
+    const projectedPoints = geometry.coordinates
+      .map((coords) => projection(coords))
+      .filter((point) => Array.isArray(point) && point.every((value) => Number.isFinite(Number(value))));
+    if (projectedPoints.length) {
+      const [sumX, sumY] = projectedPoints.reduce(
+        (acc, point) => [acc[0] + Number(point[0]), acc[1] + Number(point[1])],
+        [0, 0]
+      );
+      anchor = [sumX / projectedPoints.length, sumY / projectedPoints.length];
+    }
+  }
+
+  if (!anchor && pathCanvas?.centroid) {
+    const centroid = pathCanvas.centroid(feature);
+    if (Array.isArray(centroid) && centroid.every((value) => Number.isFinite(Number(value)))) {
+      anchor = centroid;
+    }
+  }
+
+  if (!anchor && globalThis.d3?.geoCentroid) {
+    const geoCentroid = globalThis.d3.geoCentroid(feature);
+    const projected = Array.isArray(geoCentroid) ? projection(geoCentroid) : null;
+    if (Array.isArray(projected) && projected.every((value) => Number.isFinite(Number(value)))) {
+      anchor = projected;
+    }
+  }
+
+  cityAnchorCache.set(feature, anchor);
+  return anchor;
+}
+
+function getCityScreenPoint(anchor, transform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
+  if (!Array.isArray(anchor) || anchor.length < 2) return null;
+  const scale = Math.max(0.0001, Number(transform?.k || 1));
+  const x = Number(anchor[0]);
+  const y = Number(anchor[1]);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  return [
+    (x * scale) + Number(transform?.x || 0),
+    (y * scale) + Number(transform?.y || 0),
+  ];
+}
+
+function isCityAnchorInViewport(anchor, { padding = 24, transform = state.zoomTransform || globalThis.d3?.zoomIdentity } = {}) {
+  const screenPoint = getCityScreenPoint(anchor, transform);
+  if (!screenPoint) return false;
+  return (
+    screenPoint[0] >= -padding
+    && screenPoint[0] <= state.width + padding
+    && screenPoint[1] >= -padding
+    && screenPoint[1] <= state.height + padding
+  );
+}
+
+function getCityCapitalDescriptor(entry) {
+  if (entry?.feature?.properties?.__city_is_country_capital) {
+    return state.currentLanguage === "zh" ? "\u9996\u90fd" : "Capital";
+  }
+  if (entry?.feature?.properties?.__city_is_admin_capital) {
+    return state.currentLanguage === "zh" ? "\u884c\u653f\u4e2d\u5fc3" : "Administrative capital";
+  }
+  return "";
+}
+
+function getCityTooltipText(entry) {
+  const fullLabel = getCityDisplayLabel(entry?.feature);
+  const props = entry?.feature?.properties || {};
+  const hostFeatureId = String(props.__city_host_feature_id || "").trim();
+  const hostFeature = hostFeatureId ? state.landIndex?.get(hostFeatureId) : null;
+  const countryCode = String(
+    (hostFeature ? getDisplayOwnerCode(hostFeature, hostFeatureId) : "")
+      || props.__city_scenario_tag
+      || props.__city_country_code
+      || props.country_code
+      || ""
+  ).trim().toUpperCase();
+  const rawCountryName =
+    state.scenarioCountriesByTag?.[countryCode]?.display_name
+    || state.countryNames?.[countryCode]
+    || countryCode;
+  const countryDisplayName = rawCountryName ? (t(rawCountryName, "geo") || rawCountryName) : "";
+  const lines = [fullLabel];
+  const capitalDescriptor = getCityCapitalDescriptor(entry);
+  if (capitalDescriptor) {
+    lines.push(capitalDescriptor);
+  }
+  if (countryDisplayName) {
+    lines.push(countryCode ? `${countryDisplayName} (${countryCode})` : countryDisplayName);
+  }
+  return renderTooltipText({ lines: lines.filter(Boolean) });
+}
+
+function getCityHoverRadiusPx(entry) {
+  return Math.max(7, Number(entry?.markerSizePx || 0) * 0.92 + (entry?.isCapital ? 2.4 : 1.4));
+}
+
+function cacheVisibleCityHoverEntries(entries = []) {
+  visibleCityHoverEntries = Array.isArray(entries)
+    ? entries
+      .filter((entry) => Array.isArray(entry?.screenPoint) && entry.screenPoint.length >= 2)
+      .map((entry) => ({
+        ...entry,
+        hoverRadiusPx: getCityHoverRadiusPx(entry),
+        tooltipText: getCityTooltipText(entry),
+      }))
+    : [];
+}
+
+function getHoveredCityEntryFromEvent(event) {
+  if (!visibleCityHoverEntries.length || !mapSvg || !globalThis.d3?.pointer) {
+    return null;
+  }
+  const [sx, sy] = globalThis.d3.pointer(event, mapSvg);
+  if (![sx, sy].every(Number.isFinite)) {
+    return null;
+  }
+  let bestEntry = null;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  visibleCityHoverEntries.forEach((entry) => {
+    const [entryX, entryY] = entry.screenPoint || [];
+    if (![entryX, entryY].every(Number.isFinite)) {
+      return;
+    }
+    const threshold = Math.max(6, Number(entry.hoverRadiusPx || 0));
+    const distance = Math.hypot(sx - entryX, sy - entryY);
+    if (distance <= threshold && distance < bestDistance) {
+      bestDistance = distance;
+      bestEntry = entry;
+    }
+  });
+  return bestEntry;
+}
+
+function doScreenBoxesOverlap(a, b) {
+  return (
+    a.x < (b.x + b.w)
+    && (a.x + a.w) > b.x
+    && a.y < (b.y + b.h)
+    && (a.y + a.h) > b.y
+  );
+}
+
+function drawCityPointsLayer(k, { interactive = false } = {}) {
+  const startedAt = nowMs();
+  const cityCollection = getEffectiveCityCollection();
+  const featureCount = getFeatureCollectionFeatureCount(cityCollection);
+  if (!state.showCityPoints || !cityCollection?.features?.length || !projection) {
+    cacheVisibleCityHoverEntries([]);
+    collectContextMetric("drawCityPointsLayer", nowMs() - startedAt, {
+      featureCount,
+      interactive: !!interactive,
+      skipped: true,
+      reason: !state.showCityPoints ? "hidden" : !projection ? "no-projection" : "no-data",
+    });
+    return;
+  }
+
+  const config = normalizeCityLayerStyleConfig(state.styleConfig?.cityPoints || {});
+  const transform = state.zoomTransform || globalThis.d3?.zoomIdentity;
+  const scale = Math.max(0.0001, Number(transform?.k || k || 1));
+  const opacity = clamp(Number(config.opacity) || 0.92, 0, 1);
+  const plan = config.revealProfile === CITY_REVEAL_PROFILE_HYBRID
+    ? buildCityRevealPlan(cityCollection, scale, transform, config)
+    : buildCityRevealPlan(cityCollection, scale, transform, {
+      ...config,
+      revealProfile: CITY_REVEAL_PROFILE_HYBRID,
+    });
+  const markerEntries = Array.isArray(plan?.markerEntries) ? plan.markerEntries : [];
+
+  if (!markerEntries.length) {
+    cacheVisibleCityHoverEntries([]);
+    collectContextMetric("drawCityPointsLayer", nowMs() - startedAt, {
+      featureCount,
+      visibleFeatureCount: 0,
+      labelCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: "culled",
+    });
+    return;
+  }
+  cacheVisibleCityHoverEntries(markerEntries);
+
+  context.save();
+  context.globalCompositeOperation = "source-over";
+  context.lineJoin = "round";
+  context.lineCap = "round";
+  context.globalAlpha = interactive ? Math.min(opacity, 0.8) : opacity;
+
+  markerEntries.forEach((entry) => {
+    const spriteEntry = entry.isCapital && !config.showCapitalOverlay
+      ? { ...entry, isCapital: false }
+      : entry;
+    const sprite = getCityMarkerSprite(spriteEntry, config);
+    if (!sprite?.canvas) return;
+    const drawWidth = sprite.width / scale;
+    const drawHeight = sprite.height / scale;
+    const drawX = entry.anchor[0] - (sprite.anchorX / scale);
+    const drawY = entry.anchor[1] - (sprite.anchorY / scale);
+    context.drawImage(sprite.canvas, drawX, drawY, drawWidth, drawHeight);
+  });
+
+  let labelCount = 0;
+  const labelEntries = !interactive && config.showLabels ? plan.labelEntries || [] : [];
+  if (labelEntries.length) {
+    const tokens = getCityMarkerThemeTokens(config);
+    const fontPx = clamp((Number(config.labelSize) || 11) - 1, 7, 23);
+    context.globalAlpha = 1;
+    context.textAlign = "left";
+    context.textBaseline = "middle";
+    context.lineJoin = "round";
+    context.shadowColor = tokens.shadow;
+    context.shadowBlur = Math.max(1.1, fontPx * 0.12) / scale;
+    context.shadowOffsetX = 0;
+    context.shadowOffsetY = Math.max(0.5, fontPx * 0.04) / scale;
+    const occupiedBoxes = [];
+    labelEntries.forEach((entry) => {
+      context.font = `${entry.isCapital ? 600 : 400} ${fontPx / scale}px ${TEXTURE_LABEL_SERIF_STACK}`;
+      const fullText = getCityDisplayLabel(entry.feature);
+      const text = formatCityMapLabel(fullText, {
+        entry,
+        context,
+        config,
+        scale,
+      });
+      const labelMinZoom = Math.max(Number(config.labelMinZoom || 2.45), Number(entry.minZoom || 0));
+      if (!text || !entry.screenPoint || scale < labelMinZoom) return;
+      const markerSizePx = Number(entry.markerSizePx || getCityMarkerSizePx(entry, config));
+      const offsetPx = Math.max(7, markerSizePx + 4);
+      const metrics = context.measureText(text);
+      const box = {
+        x: entry.screenPoint[0] + offsetPx - 2,
+        y: entry.screenPoint[1] - (fontPx * 0.58),
+        w: Math.max(1, metrics.width * scale) + 6,
+        h: fontPx + 4,
+      };
+      if (
+        box.x > state.width + 24
+        || box.y > state.height + 24
+        || (box.x + box.w) < -24
+        || (box.y + box.h) < -24
+      ) {
+        return;
+      }
+      if (occupiedBoxes.some((occupied) => doScreenBoxesOverlap(box, occupied))) {
+        return;
+      }
+      occupiedBoxes.push(box);
+      labelCount += 1;
+      const labelX = entry.anchor[0] + (offsetPx / scale);
+      const labelY = entry.anchor[1];
+      context.fillStyle = entry.isCapital ? tokens.capitalLabel : tokens.label;
+      context.fillText(text, labelX, labelY);
+    });
+  }
+
+  context.restore();
+  collectContextMetric("drawCityPointsLayer", nowMs() - startedAt, {
+    featureCount,
+    visibleFeatureCount: markerEntries.length,
+    labelCount,
+    interactive: !!interactive,
+    skipped: false,
+  });
+}
+
 function getTextureStyleConfig() {
   if (!state.styleConfig || typeof state.styleConfig !== "object") {
     state.styleConfig = {};
@@ -7775,6 +9181,12 @@ function drawContextBasePass(k, { interactive = false } = {}) {
         skipped: true,
         reason: "staged-apply",
       });
+      collectContextMetric("drawCityPointsLayer", 0, {
+        featureCount: getFeatureCollectionFeatureCount(getEffectiveCityCollection()),
+        interactive: false,
+        skipped: true,
+        reason: "staged-apply",
+      });
       collectContextMetric("drawRiversLayer", 0, {
         featureCount: getFeatureCollectionFeatureCount(state.riversData),
         interactive: false,
@@ -7785,6 +9197,7 @@ function drawContextBasePass(k, { interactive = false } = {}) {
       drawPhysicalLayer(k, { interactive });
       drawUrbanLayer(k, { interactive });
       drawRiversLayer(k, { interactive });
+      drawCityPointsLayer(k, { interactive });
     }
   } finally {
     endContextMetricSession();
@@ -8952,6 +10365,16 @@ function handleMouseMove(event) {
   updateDevHoverHit(id ? hit : null);
 
   if (!tooltip) return;
+  const hoveredCityEntry = getHoveredCityEntryFromEvent(event);
+  if (hoveredCityEntry?.tooltipText) {
+    queueTooltipUpdate({
+      visible: true,
+      text: hoveredCityEntry.tooltipText,
+      x: event.clientX + 12,
+      y: event.clientY + 12,
+    });
+    return;
+  }
   if (id && (state.landIndex.has(id) || state.waterRegionsById.has(id) || state.specialRegionsById.has(id))) {
     const feature = hit.targetType === "special"
       ? state.specialRegionsById.get(id)
@@ -10515,6 +11938,7 @@ function fitProjection() {
     ? { type: "FeatureCollection", features: renderableFeatures }
     : state.landData;
   projection.fitExtent([[padding, padding], [x1, y1]], fitTarget);
+  cityAnchorCache = new WeakMap();
   rebuildProjectedBoundsCache();
   buildSpatialIndex();
   state.hitCanvasDirty = true;

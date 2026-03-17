@@ -13,8 +13,10 @@ MARINE_POLYS_URL = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_ge
 LAKES_URL = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_lakes.zip"
 LAND_BG_URL = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_land.zip"
 URBAN_URL = "https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_urban_areas.zip"
+POPULATED_PLACES_URL = "https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_populated_places.zip"
 PHYSICAL_URL = "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip"
 ADMIN1_URL = "https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_admin_1_states_provinces.zip"
+GEONAMES_CITIES15000_URL = "https://download.geonames.org/export/dump/cities15000.zip"
 ETOPO_2022_SURFACE_URL = (
     "https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO2022/data/60s/60s_surface_elev_gtif/"
     "ETOPO_2022_v1_60s_N90W180_surface.tif"
@@ -182,6 +184,8 @@ GB_NUTS1_2021_FILENAME = "gisco_nuts_2021_level1.geojson"
 BIH_ADM1_FILENAME = "geoBoundaries-BIH-ADM1.geojson"
 IDN_ADM1_FILENAME = "geoBoundaries-IDN-ADM1.geojson"
 ABS_SUA_2021_GDA94_FILENAME = "abs_sua_2021_aust_gda94_shp.zip"
+POPULATED_PLACES_FILENAME = "ne_10m_populated_places.zip"
+GEONAMES_CITIES15000_FILENAME = "cities15000.zip"
 ETOPO_2022_SURFACE_FILENAME = "ETOPO_2022_v1_60s_N90W180_surface.tif"
 CGLS_LC100_2019_DISCRETE_FILENAME = "PROBAV_LC100_global_v3.0.1_2019_discrete.tif"
 CGLS_LC100_2019_FOREST_TYPE_FILENAME = "PROBAV_LC100_global_v3.0.1_2019_forest_type.tif"
@@ -189,6 +193,10 @@ CGLS_LC100_2019_FOREST_TYPE_FILENAME = "PROBAV_LC100_global_v3.0.1_2019_forest_t
 PHYSICAL_SEMANTICS_TOPO_FILENAME = "global_physical_semantics.topo.json"
 PHYSICAL_CONTOUR_MAJOR_TOPO_FILENAME = "global_contours.major.topo.json"
 PHYSICAL_CONTOUR_MINOR_TOPO_FILENAME = "global_contours.minor.topo.json"
+WORLD_CITIES_FILENAME = "world_cities.geojson"
+CITY_ALIASES_FILENAME = "city_aliases.json"
+SCENARIO_CITY_OVERRIDES_FILENAME = "city_overrides.json"
+SCENARIO_CAPITAL_HINTS_FILENAME = "capital_hints.json"
 
 # Geography configuration
 MAP_NAME = "Global Admin-0 Skeleton"
@@ -340,8 +348,49 @@ ENABLE_SUBDIVISION_ENRICHMENT = False
 
 US_HYBRID_TARGET = 900
 US_FIXED_FINE_STATES = {"CA", "TX", "FL"}
+US_STATE_ZONE_TARGET_OVERRIDES = {
+    "AL": 10,
+    "AR": 6,
+    "IA": 7,
+    "IN": 12,
+    "KS": 6,
+    "MO": 11,
+    "MS": 7,
+    "MT": 5,
+    "NE": 6,
+    "NH": 5,
+    "NM": 6,
+    "ND": 4,
+    "OK": 7,
+    "PA": 18,
+    "SC": 10,
+    "SD": 4,
+    "UT": 6,
+    "VT": 3,
+    "WV": 5,
+    "WY": 3,
+}
+US_STATE_ZONE_SKIP_MERGE_STATES = {
+    "AK",
+    "CA",
+    "CO",
+    "FL",
+    "HI",
+    "LA",
+    "MD",
+    "MI",
+    "NY",
+    "NJ",
+    "OH",
+    "OR",
+    "TX",
+    "VA",
+    "WA",
+    "WI",
+}
 US_FINE_POP_PERCENTILE = 97.0
 US_POP_WEIGHT_EXPONENT = 0.5
+US_CITY_RENAME_TOP_N = 25
 MX_TARGET_UNITS = 300
 
 AFRICA_BASIC_NE_COUNTRIES = {
@@ -648,6 +697,10 @@ SIMPLIFY_MEXICO_ZONES = 0.012
 SIMPLIFY_AFRICA_ADMIN1 = 0.02
 SIMPLIFY_GLOBAL_BASIC_ADMIN1 = 0.02
 SIMPLIFY_GB_NUTS1 = 0.01
+WORLD_CITY_MIN_POPULATION = 15_000
+WORLD_CITY_MATCH_MAX_DISTANCE_KM = 35.0
+WORLD_CITY_POLITICAL_ATTACH_MAX_DISTANCE_KM = 75.0
+WORLD_CITY_URBAN_ATTACH_MAX_DISTANCE_KM = 50.0
 URAL_LONGITUDE = 60.0
 RUSSIA_COASTAL_FAR_EAST_DETAIL_PARENT_IDS = (
     "RUS-2609",  # Amur

@@ -85,6 +85,31 @@ def _make_valid(geom):
     return geom
 
 
+def _safe_unary_union(geometries: list) -> object | None:
+    cleaned = [
+        geom
+        for geom in (_make_valid(geometry) for geometry in geometries)
+        if geom is not None and not geom.is_empty
+    ]
+    if not cleaned:
+        return None
+    try:
+        return _make_valid(unary_union(cleaned))
+    except Exception:
+        result = cleaned[0]
+        for geom in cleaned[1:]:
+            try:
+                result = _make_valid(result.union(geom))
+            except Exception:
+                try:
+                    result = _make_valid(unary_union([_make_valid(result), _make_valid(geom)]))
+                except Exception:
+                    continue
+            if result is None or result.is_empty:
+                result = geom
+        return _make_valid(result)
+
+
 def _prepare_country_layer(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     if gdf is None or gdf.empty:
         return _empty_gdf()
@@ -158,7 +183,7 @@ def _resolve_allowed_area_geometry(
         country_allowed = allowed[allowed["cntr_code"] == country_code].copy()
         if not country_allowed.empty:
             allowed = country_allowed
-    allowed_union = _make_valid(unary_union(allowed.geometry.tolist()))
+    allowed_union = _safe_unary_union(allowed.geometry.tolist())
     if allowed_union is None or allowed_union.is_empty:
         return None
     return allowed_union
@@ -191,9 +216,9 @@ def collect_shell_coverage_gaps(
         if managed_shell.empty:
             continue
 
-        shell_union = _make_valid(unary_union(managed_shell.geometry.tolist()))
+        shell_union = _safe_unary_union(managed_shell.geometry.tolist())
         detail_union = (
-            _make_valid(unary_union(managed_detail.geometry.tolist()))
+            _safe_unary_union(managed_detail.geometry.tolist())
             if not managed_detail.empty
             else None
         )

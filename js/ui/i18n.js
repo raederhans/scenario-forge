@@ -12,6 +12,125 @@ function resolveGeoLocaleEntry(key) {
   return null;
 }
 
+function resolveGeoLocaleText(
+  key,
+  {
+    allowCrossLanguageFallback = true,
+    includeCandidateFallback = true,
+  } = {}
+) {
+  const candidate = String(key || "").trim();
+  if (!candidate) return "";
+  const entry = resolveGeoLocaleEntry(candidate);
+  if (!entry || typeof entry !== "object") return "";
+  const preferred = state.currentLanguage === "zh" ? entry.zh : entry.en;
+  const secondary = state.currentLanguage === "zh" ? entry.en : entry.zh;
+  return String(
+    preferred
+      || (allowCrossLanguageFallback ? secondary : "")
+      || (includeCandidateFallback ? candidate : "")
+  ).trim();
+}
+
+function getPreferredGeoLabel(candidates = [], fallback = "", options = {}) {
+  const items = Array.isArray(candidates) ? candidates : [candidates];
+  for (const rawCandidate of items) {
+    const candidate = String(rawCandidate || "").trim();
+    if (!candidate) continue;
+    const localized = resolveGeoLocaleText(candidate, options);
+    if (localized) return localized;
+  }
+  return String(fallback || "").trim();
+}
+
+function getStrictGeoLabel(candidates = [], fallback = "") {
+  return getPreferredGeoLabel(candidates, fallback, {
+    allowCrossLanguageFallback: false,
+    includeCandidateFallback: false,
+  });
+}
+
+function hasExplicitScenarioGeoLocaleEntry(key) {
+  const candidate = String(key || "").trim();
+  if (!candidate) return false;
+  const scenarioGeo = state.scenarioGeoLocalePatchData?.geo;
+  return !!(
+    scenarioGeo
+    && typeof scenarioGeo === "object"
+    && Object.prototype.hasOwnProperty.call(scenarioGeo, candidate)
+  );
+}
+
+function getSafeRawFeatureLabel(candidates = []) {
+  const items = Array.isArray(candidates) ? candidates : [candidates];
+  for (const rawCandidate of items) {
+    const candidate = String(rawCandidate || "").trim();
+    if (!candidate) continue;
+    const entry = resolveGeoLocaleEntry(candidate);
+    if (!entry || typeof entry !== "object") continue;
+    const entryEn = String(entry.en || "").trim();
+    const entryZh = String(entry.zh || "").trim();
+    const isSafeDirectMatch = (entryEn && entryEn === candidate) || (!entryEn && entryZh === candidate);
+    if (!isSafeDirectMatch) continue;
+    const localized = resolveGeoLocaleText(candidate, {
+      allowCrossLanguageFallback: true,
+      includeCandidateFallback: false,
+    });
+    if (localized) return localized;
+  }
+  return "";
+}
+
+function getGeoFeatureDisplayLabel(feature, fallback = "") {
+  const props = feature?.properties || {};
+  const preferredIdCandidates = [];
+  [
+    props.__city_host_feature_id,
+    props.__city_stable_key,
+    props.stable_key,
+    props.__city_id,
+  ].forEach((rawCandidate) => {
+    const candidate = String(rawCandidate || "").trim();
+    if (!candidate || preferredIdCandidates.includes(candidate)) return;
+    preferredIdCandidates.push(candidate);
+  });
+  [
+    props.id,
+    feature?.id,
+  ].forEach((rawCandidate) => {
+    const candidate = String(rawCandidate || "").trim();
+    if (!candidate || preferredIdCandidates.includes(candidate)) return;
+    if (hasExplicitScenarioGeoLocaleEntry(candidate)) {
+      preferredIdCandidates.push(candidate);
+    }
+  });
+  const explicitLabel = getPreferredGeoLabel(preferredIdCandidates, "", {
+    allowCrossLanguageFallback: true,
+    includeCandidateFallback: false,
+  });
+  if (explicitLabel) {
+    return explicitLabel;
+  }
+
+  const rawNameCandidates = [
+    props.label,
+    props.name,
+    props.name_en,
+    props.NAME,
+  ];
+  const safeRawLabel = getSafeRawFeatureLabel(rawNameCandidates);
+  if (safeRawLabel) {
+    return safeRawLabel;
+  }
+
+  return String(
+    rawNameCandidates.find((value) => String(value || "").trim())
+    || props.id
+    || feature?.id
+    || fallback
+  ).trim();
+}
+
 function t(key, type = "geo") {
   if (!key) return "";
   const entry = type === "geo" ? resolveGeoLocaleEntry(key) : state.locales?.[type]?.[key];
@@ -142,6 +261,24 @@ function updateUIText() {
     ["lblUrbanOpacity", "Opacity"],
     ["lblUrbanBlendMode", "Blend Mode"],
     ["lblUrbanMinArea", "Min Area (px)"],
+    ["lblCityPointsPanel", "City Points"],
+    ["lblCityPointsLayer", "City Points"],
+    ["lblCityPointsStylePreset", "Style Preset"],
+    ["optCityThemeClassicGraphite", "Classic Graphite"],
+    ["lblCityPointsMarkerScale", "Marker Scale"],
+    ["lblCityPointsLabelDensity", "Label Density"],
+    ["cityPointsLabelDensityHint", "Controls how many labels can appear per viewport at mid/high zoom."],
+    ["optCityLabelDensitySparse", "Sparse"],
+    ["optCityLabelDensityBalanced", "Balanced"],
+    ["optCityLabelDensityDense", "Dense"],
+    ["lblCityPointsAdvanced", "Advanced"],
+    ["lblCityPointsColor", "Point Color"],
+    ["lblCityPointsCapitalColor", "Capital Highlight Color"],
+    ["lblCityPointsOpacity", "Point Opacity"],
+    ["lblCityPointsRadius", "Point Size"],
+    ["lblCityPointLabelsEnabled", "Show City Labels"],
+    ["lblCityPointsLabelSize", "Label Size"],
+    ["lblCityCapitalOverlayEnabled", "Highlight Capitals"],
     ["lblDayNightPanel", "Day / Night"],
     ["lblDayNightEnabled", "Enable Day / Night Cycle"],
     ["dayNightModeManualBtn", "Manual"],
@@ -490,12 +627,13 @@ function getTooltipFeatureCountryCode(feature) {
 
 function getTooltipRegionName(feature, fallback) {
   const rawName =
+    getGeoFeatureDisplayLabel(feature) ||
     feature?.properties?.label ||
     feature?.properties?.name ||
     feature?.properties?.name_en ||
     feature?.properties?.NAME ||
     fallback;
-  return t(rawName, "geo") || rawName || fallback;
+  return rawName || fallback;
 }
 
 function normalizeTooltipComparisonValue(value) {
@@ -625,6 +763,9 @@ export {
   initTranslations,
   toggleLanguage,
   updateUIText,
+  getPreferredGeoLabel,
+  getStrictGeoLabel,
+  getGeoFeatureDisplayLabel,
   getTooltipCountryContext,
   buildTooltipModel,
   renderTooltipText,

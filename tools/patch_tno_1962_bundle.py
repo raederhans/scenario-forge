@@ -28,6 +28,7 @@ if str(ROOT) not in sys.path:
 
 from map_builder.geo.topology import compute_neighbor_graph
 from scenario_builder.hoi4.audit import read_bmp24
+from tools.build_tno_1962_geo_locale_patch import build_patch as build_tno_geo_locale_patch
 
 
 SCENARIO_ID = "tno_1962"
@@ -5950,6 +5951,7 @@ def main() -> None:
     manifest_payload["relief_overlays_url"] = "data/scenarios/tno_1962/relief_overlays.geojson"
     manifest_payload["runtime_topology_url"] = "data/scenarios/tno_1962/runtime_topology.topo.json"
     manifest_payload["releasable_catalog_url"] = "data/releasables/tno_1962.internal.phase1.catalog.json"
+    manifest_payload["geo_locale_patch_url"] = "data/scenarios/tno_1962/geo_locale_patch.json"
     manifest_payload["performance_hints"] = {
         "render_profile_default": "balanced",
         "dynamic_borders_default": False,
@@ -6053,6 +6055,13 @@ def main() -> None:
     write_json(SCENARIO_DIR / "water_regions.geojson", runtime_water_regions)
     write_json(SCENARIO_DIR / "relief_overlays.geojson", relief_overlays_payload)
     write_json(SCENARIO_DIR / "runtime_topology.topo.json", runtime_topology_payload)
+    build_tno_geo_locale_patch(
+        scenario_id=SCENARIO_ID,
+        scenario_dir=SCENARIO_DIR,
+        locales_path=ROOT / "data/locales.json",
+        manual_overrides_path=SCENARIO_DIR / "geo_name_overrides.manual.json",
+        output_path=SCENARIO_DIR / "geo_locale_patch.json",
+    )
 
     print("Rebuilt tno_1962 bundle with HGO donor Atlantropa features.")
     print(f"Owners baseline hash: {owner_baseline_hash}")

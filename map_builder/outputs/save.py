@@ -12,6 +12,24 @@ from map_builder import config as cfg
 from map_builder.geo.utils import round_geometries
 
 
+def _write_geojson(path: Path, gdf: gpd.GeoDataFrame | None) -> None:
+    if gdf is None:
+        return
+    if gdf.empty:
+        path.write_text(
+            json.dumps({"type": "FeatureCollection", "features": []}, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        return
+    path.write_text(gdf.to_json(drop_id=True), encoding="utf-8")
+
+
+def _write_json(path: Path, payload: dict | None) -> None:
+    if payload is None:
+        return
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 def save_outputs(
     land: gpd.GeoDataFrame,
     rivers: gpd.GeoDataFrame,
@@ -23,6 +41,8 @@ def save_outputs(
     physical: gpd.GeoDataFrame,
     hybrid: gpd.GeoDataFrame,
     final: gpd.GeoDataFrame,
+    world_cities: gpd.GeoDataFrame | None = None,
+    city_aliases: dict | None = None,
     output_dir: Path | None = None,
 ) -> None:
     if output_dir is None:
@@ -38,6 +58,7 @@ def save_outputs(
     land_bg_out = round_geometries(land_bg)
     urban_out = round_geometries(urban)
     physical_out = round_geometries(physical)
+    world_cities_out = round_geometries(world_cities) if world_cities is not None else None
 
     print(f"Saving preview image to {preview_path}...")
     fig, ax = plt.subplots(figsize=(8, 8))
@@ -53,3 +74,6 @@ def save_outputs(
     ax.set_axis_off()
     fig.savefig(preview_path, dpi=200, bbox_inches="tight")
     plt.close(fig)
+
+    _write_geojson(output_dir / cfg.WORLD_CITIES_FILENAME, world_cities_out)
+    _write_json(output_dir / cfg.CITY_ALIASES_FILENAME, city_aliases)

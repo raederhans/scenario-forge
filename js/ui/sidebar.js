@@ -4,6 +4,7 @@ import {
   countryNames,
   PRESET_STORAGE_KEY,
   defaultCountryPalette,
+  normalizeCityLayerStyleConfig,
   normalizeDayNightStyleConfig,
   normalizeLakeStyleConfig,
   normalizePhysicalStyleConfig,
@@ -24,7 +25,7 @@ import {
   setScenarioViewMode,
   validateImportedScenarioBaseline,
 } from "../core/scenario_manager.js";
-import { t } from "./i18n.js";
+import { getGeoFeatureDisplayLabel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 import { initDevWorkspace } from "./dev_workspace.js";
 import {
@@ -91,14 +92,15 @@ function shouldExcludeScenarioPoliticalFeature(feature, featureId = "") {
 }
 
 function getCountryNameFromProps(props = {}) {
-  const candidate =
+  const candidate = getGeoFeatureDisplayLabel({ properties: props }) || (
     props.name_en ||
     props.name ||
     props.NAME_EN ||
     props.NAME ||
     props.admin ||
     props.ADMIN ||
-    "";
+    ""
+  );
   return String(candidate || "").trim();
 }
 
@@ -3082,14 +3084,9 @@ function initSidebar({ render } = {}) {
   const getWaterSearchTerm = () => (waterSearchInput?.value || "").trim().toLowerCase();
 
   const getWaterFeatureDisplayName = (feature) => {
-    const rawName =
-      feature?.properties?.label ||
-      feature?.properties?.name ||
-      feature?.properties?.name_en ||
-      feature?.properties?.NAME ||
-      feature?.id ||
-      "Water Region";
-    return t(rawName, "geo") || String(rawName || "").trim() || "Water Region";
+    return getGeoFeatureDisplayLabel(feature, "Water Region")
+      || t("Water Region", "ui")
+      || "Water Region";
   };
 
   const getWaterFeatureMeta = (feature) => {
@@ -3325,14 +3322,9 @@ function initSidebar({ render } = {}) {
   };
 
   const getSpecialFeatureDisplayName = (feature) => {
-    const rawName =
-      feature?.properties?.label ||
-      feature?.properties?.name ||
-      feature?.properties?.name_en ||
-      feature?.properties?.NAME ||
-      feature?.id ||
-      "Special Region";
-    return t(rawName, "geo") || String(rawName || "").trim() || "Special Region";
+    return getGeoFeatureDisplayLabel(feature, "Special Region")
+      || t("Special Region", "ui")
+      || "Special Region";
   };
 
   const getSpecialFeatureMeta = (feature) => {
@@ -5051,6 +5043,12 @@ function initSidebar({ render } = {}) {
           };
         }
         state.styleConfig.lakes = normalizeLakeStyleConfig(data.styleConfig?.lakes);
+        if (data.styleConfig?.cityPoints && typeof data.styleConfig.cityPoints === "object") {
+          state.styleConfig.cityPoints = normalizeCityLayerStyleConfig({
+            ...(state.styleConfig.cityPoints || {}),
+            ...data.styleConfig.cityPoints,
+          });
+        }
         if (data.styleConfig?.urban && typeof data.styleConfig.urban === "object") {
           state.styleConfig.urban = {
             ...(state.styleConfig.urban || {}),
@@ -5116,6 +5114,10 @@ function initSidebar({ render } = {}) {
             data.layerVisibility.showScenarioReliefOverlays === undefined
               ? true
               : !!data.layerVisibility.showScenarioReliefOverlays;
+          state.showCityPoints =
+            data.layerVisibility.showCityPoints === undefined
+              ? true
+              : !!data.layerVisibility.showCityPoints;
           state.showUrban = !!data.layerVisibility.showUrban;
           state.showPhysical = !!data.layerVisibility.showPhysical;
           state.showRivers = !!data.layerVisibility.showRivers;
@@ -5123,6 +5125,9 @@ function initSidebar({ render } = {}) {
             data.layerVisibility.showSpecialZones === undefined
               ? true
               : !!data.layerVisibility.showSpecialZones;
+        }
+        if (state.activeScenarioId && state.showCityPoints) {
+          await ensureActiveScenarioOptionalLayerLoaded("cities", { renderNow: false });
         }
         if (typeof state.updateParentBorderCountryListFn === "function") {
           state.updateParentBorderCountryListFn();
@@ -5148,6 +5153,7 @@ function initSidebar({ render } = {}) {
         if (typeof state.updateToolbarInputsFn === "function") {
           state.updateToolbarInputsFn();
         }
+        state.persistViewSettingsFn?.();
         rebuildPresetState();
         mapRenderer.refreshColorState({ renderNow: false });
         if (render) render();

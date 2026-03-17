@@ -5,7 +5,7 @@ import geopandas as gpd
 
 from map_builder import config as cfg
 from map_builder.geo.utils import clip_to_map_bounds, pick_column
-from map_builder.io.fetch import fetch_ne_zip
+from map_builder.io.fetch import fetch_ne_zip, fetch_or_load_vector_archive
 
 
 def load_natural_earth_admin0(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
@@ -25,6 +25,14 @@ def load_rivers() -> gpd.GeoDataFrame:
 def load_urban() -> gpd.GeoDataFrame:
     gdf = fetch_ne_zip(cfg.URBAN_URL, "urban")
     return clip_to_map_bounds(gdf, "urban")
+
+
+def load_populated_places() -> gpd.GeoDataFrame:
+    gdf = fetch_or_load_vector_archive(
+        cfg.POPULATED_PLACES_URL,
+        cfg.POPULATED_PLACES_FILENAME,
+    )
+    return clip_to_map_bounds(gdf, "populated places")
 
 
 def load_physical() -> gpd.GeoDataFrame:

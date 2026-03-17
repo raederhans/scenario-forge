@@ -1,5 +1,5 @@
 // App entry point (Phase 13)
-import { state } from "./core/state.js";
+import { normalizeCityLayerStyleConfig, state } from "./core/state.js";
 import { loadDeferredDetailBundle, loadMapData } from "./core/data_loader.js";
 import { initMap, setMapData, render } from "./core/map_renderer.js";
 import { applyActivePaletteState } from "./core/palette_manager.js";
@@ -16,6 +16,7 @@ const COUNTRY_CODE_ALIASES = {
   EL: "GR",
 };
 const VALID_BATCH_FILL_SCOPES = new Set(["parent", "country"]);
+const VIEW_SETTINGS_STORAGE_KEY = "map_view_settings_v1";
 
 function normalizeCountryCode(rawCode) {
   const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
@@ -92,6 +93,46 @@ function hydrateLanguage() {
     }
   } catch (error) {
     console.warn("Language preference not available:", error);
+  }
+}
+
+function hydrateViewSettings() {
+  try {
+    const raw = localStorage.getItem(VIEW_SETTINGS_STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return;
+    const cityPoints = parsed.cityPoints && typeof parsed.cityPoints === "object"
+      ? parsed.cityPoints
+      : {};
+    if (cityPoints.show !== undefined) {
+      state.showCityPoints = !!cityPoints.show;
+    }
+    if (cityPoints.style && typeof cityPoints.style === "object") {
+      state.styleConfig.cityPoints = normalizeCityLayerStyleConfig({
+        ...(state.styleConfig.cityPoints || {}),
+        ...cityPoints.style,
+      });
+    }
+  } catch (error) {
+    console.warn("View settings preference not available:", error);
+  }
+}
+
+function persistViewSettings() {
+  try {
+    localStorage.setItem(
+      VIEW_SETTINGS_STORAGE_KEY,
+      JSON.stringify({
+        schemaVersion: 1,
+        cityPoints: {
+          show: state.showCityPoints !== false,
+          style: normalizeCityLayerStyleConfig(state.styleConfig?.cityPoints),
+        },
+      })
+    );
+  } catch (error) {
+    console.warn("Unable to persist view settings:", error);
   }
 }
 
@@ -247,6 +288,7 @@ async function bootstrap() {
       detailSourceRequested,
       locales,
       geoAliases,
+      worldCities,
       hierarchy,
       ruCityOverrides,
       specialZones,
@@ -269,7 +311,11 @@ async function bootstrap() {
     state.detailPromotionInFlight = false;
     state.detailPromotionCompleted = !detailDeferred;
     state.locales = locales || { ui: {}, geo: {} };
+    state.baseGeoLocales = { ...(state.locales?.geo || {}) };
     state.geoAliasToStableKey = geoAliases?.alias_to_stable_key || {};
+    state.baseGeoAliasToStableKey = { ...state.geoAliasToStableKey };
+    state.worldCitiesData = worldCities || null;
+    state.cityLayerRevision = (Number(state.cityLayerRevision) || 0) + 1;
     state.ruCityOverrides = ruCityOverrides || null;
     state.specialZonesExternalData = specialZones || null;
     state.contextLayerExternalDataByName = contextLayerExternal || {};
@@ -304,6 +350,8 @@ async function bootstrap() {
     }
     applyActivePaletteState({ overwriteCountryPalette: true });
     processHierarchyData(hierarchy);
+    hydrateViewSettings();
+    state.persistViewSettingsFn = persistViewSettings;
 
     if (!state.topologyPrimary) {
       console.error("CRITICAL: TopoJSON file loaded but is null/undefined");

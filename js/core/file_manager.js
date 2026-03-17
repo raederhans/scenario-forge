@@ -1,5 +1,6 @@
 // Project file manager (Phase 13)
 import {
+  normalizeCityLayerStyleConfig,
   normalizeDayNightStyleConfig,
   normalizeLakeStyleConfig,
   normalizePhysicalStyleConfig,
@@ -54,6 +55,7 @@ class FileManager {
           appState.showScenarioSpecialRegions === undefined ? true : !!appState.showScenarioSpecialRegions,
         showScenarioReliefOverlays:
           appState.showScenarioReliefOverlays === undefined ? true : !!appState.showScenarioReliefOverlays,
+        showCityPoints: appState.showCityPoints === undefined ? true : !!appState.showCityPoints,
         showUrban: !!appState.showUrban,
         showPhysical: !!appState.showPhysical,
         showRivers: !!appState.showRivers,
@@ -63,6 +65,7 @@ class FileManager {
         parentBorders: appState.styleConfig?.parentBorders || null,
         ocean: appState.styleConfig?.ocean || null,
         lakes: normalizeLakeStyleConfig(appState.styleConfig?.lakes),
+        cityPoints: normalizeCityLayerStyleConfig(appState.styleConfig?.cityPoints),
         urban: appState.styleConfig?.urban || null,
         physical: normalizePhysicalStyleConfig(appState.styleConfig?.physical),
         rivers: appState.styleConfig?.rivers || null,
@@ -155,6 +158,7 @@ class FileManager {
           data.styleConfig.ocean = null;
         }
         data.styleConfig.lakes = normalizeLakeStyleConfig(data.styleConfig.lakes);
+        data.styleConfig.cityPoints = normalizeCityLayerStyleConfig(data.styleConfig.cityPoints);
         if (!data.styleConfig.urban || typeof data.styleConfig.urban !== "object") {
           data.styleConfig.urban = null;
         }
@@ -206,6 +210,8 @@ class FileManager {
           data.layerVisibility.showScenarioReliefOverlays === undefined
             ? true
             : !!data.layerVisibility.showScenarioReliefOverlays;
+        data.layerVisibility.showCityPoints =
+          data.layerVisibility.showCityPoints === undefined ? true : !!data.layerVisibility.showCityPoints;
         data.layerVisibility.showUrban =
           data.layerVisibility.showUrban === undefined ? true : !!data.layerVisibility.showUrban;
         data.layerVisibility.showPhysical =

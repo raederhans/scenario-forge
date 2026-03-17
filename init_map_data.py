@@ -83,6 +83,12 @@ else:  # pragma: no cover - palettes mode does not touch GIS stack
 from map_builder import config as cfg
 
 if REQUESTED_MODE != "palettes":
+    from map_builder.cities import (
+        assign_stable_urban_area_ids,
+        build_city_aliases_payload,
+        build_world_cities,
+        emit_default_scenario_city_assets,
+    )
     from map_builder.geo.local_canonicalization import (
         LOCAL_CANONICAL_COUNTRY_CODES,
         collect_topology_country_metrics,
@@ -113,6 +119,10 @@ if REQUESTED_MODE != "palettes":
     from map_builder.outputs.save import save_outputs
     from tools import generate_hierarchy, geo_key_normalizer, translate_manager
 else:  # pragma: no cover - palettes mode avoids GIS/runtime build imports
+    assign_stable_urban_area_ids = None
+    build_city_aliases_payload = None
+    build_world_cities = None
+    emit_default_scenario_city_assets = None
     build_topology = None
     clip_to_map_bounds = None
     pick_column = None
@@ -2892,6 +2902,8 @@ def write_data_manifest(output_dir: Path) -> Path:
         "global_contours.minor.topo.json": "terrain_contours_minor_topology",
         "hierarchy.json": "hierarchy",
         "geo_aliases.json": "geo_aliases",
+        "world_cities.geojson": "world_cities",
+        "city_aliases.json": "city_aliases",
         "locales.json": "locales",
         "palettes/index.json": "palette_registry",
         "palettes/hoi4_vanilla.palette.json": "palette_pack",
@@ -2917,7 +2929,7 @@ def write_data_manifest(output_dir: Path) -> Path:
             "size_bytes": path.stat().st_size,
             "sha256": _sha256_file(path),
         }
-        if path.suffix == ".json":
+        if path.suffix in {".json", ".geojson"}:
             try:
                 if "topology" in file_name or file_name.endswith(".topo.json"):
                     item.update(_topology_summary(path))
@@ -2939,6 +2951,16 @@ def write_data_manifest(output_dir: Path) -> Path:
                             "entry_count": int(payload.get("entry_count", 0)),
                             "alias_count": int(payload.get("alias_count", 0)),
                             "conflict_count": int(payload.get("conflict_count", 0)),
+                        }
+                    )
+                elif file_name == "city_aliases.json":
+                    payload = _read_json(path)
+                    item.update(
+                        {
+                            "type": "city_aliases",
+                            "entry_count": int(payload.get("entry_count", 0)),
+                            "alias_count": int(payload.get("alias_count", 0)),
+                            "ambiguous_alias_count": int(payload.get("ambiguous_alias_count", 0)),
                         }
                     )
                 elif file_name == "locales.json":
@@ -2997,6 +3019,31 @@ def write_data_manifest(output_dir: Path) -> Path:
                             "unmapped_count": int(summary.get("unmapped_count", 0)),
                         }
                     )
+                elif file_name == "world_cities.geojson":
+                    payload = _read_json(path)
+                    features = payload.get("features", []) if isinstance(payload, dict) else []
+                    capital_count = 0
+                    attached_feature_count = 0
+                    attached_urban_count = 0
+                    for feature in features if isinstance(features, list) else []:
+                        props = feature.get("properties", {}) if isinstance(feature, dict) else {}
+                        if not isinstance(props, dict):
+                            continue
+                        if str(props.get("capital_kind") or "").strip() == "country_capital":
+                            capital_count += 1
+                        if str(props.get("political_feature_id") or "").strip():
+                            attached_feature_count += 1
+                        if str(props.get("urban_area_id") or "").strip():
+                            attached_urban_count += 1
+                    item.update(
+                        {
+                            "type": "world_cities",
+                            "feature_count": len(features) if isinstance(features, list) else 0,
+                            "country_capital_count": capital_count,
+                            "attached_feature_count": attached_feature_count,
+                            "attached_urban_count": attached_urban_count,
+                        }
+                    )
             except Exception as exc:
                 item["inspection_error"] = str(exc)
         outputs[file_name] = item
@@ -3024,6 +3071,8 @@ def validate_build_outputs(
     runtime_path = output_dir / "europe_topology.runtime_political_v1.json"
     hierarchy_path = output_dir / "hierarchy.json"
     aliases_path = output_dir / "geo_aliases.json"
+    world_cities_path = output_dir / cfg.WORLD_CITIES_FILENAME
+    city_aliases_path = output_dir / cfg.CITY_ALIASES_FILENAME
     runtime_ids: set[str] = set()
 
     for topology_path in [primary_path, detail_path, runtime_path]:
@@ -3111,6 +3160,35 @@ def validate_build_outputs(
         print(f"[Validate] geo_aliases.json: conflicts={conflict_count}")
         if strict and conflict_count > 0:
             problems.append(f"geo_aliases.json: conflicts={conflict_count}")
+
+    if city_aliases_path.exists():
+        city_aliases_payload = _read_json(city_aliases_path)
+        conflict_count = int(city_aliases_payload.get("conflict_count", 0))
+        print(f"[Validate] city_aliases.json: conflicts={conflict_count}")
+        if strict and conflict_count > 0:
+            problems.append(f"city_aliases.json: conflicts={conflict_count}")
+
+    if world_cities_path.exists():
+        world_cities_payload = _read_json(world_cities_path)
+        features = world_cities_payload.get("features", []) if isinstance(world_cities_payload, dict) else []
+        city_ids: list[str] = []
+        missing_feature_links = 0
+        for feature in features if isinstance(features, list) else []:
+            props = feature.get("properties", {}) if isinstance(feature, dict) else {}
+            if not isinstance(props, dict):
+                continue
+            city_id = str(props.get("id") or "").strip()
+            if city_id:
+                city_ids.append(city_id)
+            if not str(props.get("political_feature_id") or "").strip():
+                missing_feature_links += 1
+        duplicate_count = len(city_ids) - len(set(city_ids))
+        print(
+            f"[Validate] world_cities.geojson: features={len(features) if isinstance(features, list) else 0}, "
+            f"duplicates={duplicate_count}, missing_feature_links={missing_feature_links}"
+        )
+        if strict and duplicate_count > 0:
+            problems.append(f"world_cities.geojson: duplicate ids={duplicate_count}")
 
     if strict and primary_path.exists() and detail_path.exists() and runtime_path.exists():
         try:
@@ -3690,6 +3768,7 @@ def main() -> None:
     hybrid = cull_small_geometries(hybrid, "hybrid", group_col="id")
     final_hybrid = cull_small_geometries(final_hybrid, "political", group_col="id")
     special_zones = cull_small_geometries(special_zones, "special zones", group_col="id")
+    urban_clipped = assign_stable_urban_area_ids(urban_clipped)
 
     target_bounds = getattr(cfg, "MAP_BOUNDS", cfg.GLOBAL_BOUNDS)
     log_layer_coverage("political", final_hybrid, target_bounds)
@@ -3737,6 +3816,21 @@ def main() -> None:
     else:
         print("[ID Validation] WARNING: 'id' column missing from final_hybrid!")
 
+    world_cities_start = time.perf_counter()
+    print("[INFO] Building global city assets....")
+    world_cities = build_world_cities(
+        political=final_hybrid,
+        urban=urban_clipped,
+    )
+    city_aliases = build_city_aliases_payload(world_cities)
+    _record_stage_timing(
+        stage_timings,
+        "world_cities",
+        world_cities_start,
+        city_count=len(world_cities),
+        alias_count=city_aliases.get("alias_count"),
+    )
+
     save_outputs(
         filtered,
         rivers_clipped,
@@ -3748,6 +3842,8 @@ def main() -> None:
         physical_filtered,
         hybrid,
         final_hybrid,
+        world_cities,
+        city_aliases,
         output_dir,
     )
 
@@ -3846,6 +3942,10 @@ def main() -> None:
     derived_assets_start = time.perf_counter()
     rebuild_derived_hoi4_assets(output_dir, strict=args.strict)
     _record_stage_timing(stage_timings, "derived_hoi4_assets", derived_assets_start)
+
+    scenario_city_assets_start = time.perf_counter()
+    emit_default_scenario_city_assets(output_dir, world_cities)
+    _record_stage_timing(stage_timings, "scenario_city_assets", scenario_city_assets_start)
 
     manifest_start = time.perf_counter()
     write_data_manifest(output_dir)

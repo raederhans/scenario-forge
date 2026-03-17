@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "scenario_id": "modern_world",
+  "generated_at": "2026-03-17T01:21:53.752894+00:00",
+  "capitals_by_tag": {},
+  "capital_city_hints": {},
+  "cities": {},
+  "audit": {
+    "manual_capital_count": 0,
+    "capital_hint_count": 0,
+    "renamed_city_count": 0,
+    "name_conflict_count": 0,
+    "unresolved_capital_count": 2,
+    "unresolved_manual_capital_count": 0,
+    "unresolved_city_rename_count": 0,
+    "name_conflicts": [],
+    "unresolved_capitals": [
+      {
+        "tag": "MC",
+        "display_name": "Monaco",
+        "lookup_iso2": "MC",
+        "base_iso2": "MC",
+        "capital_state_id": null,
+        "reason": "no_controlled_city_candidates"
+      },
+      {
+        "tag": "MO",
+        "display_name": "Macao S.A.R",
+        "lookup_iso2": "MO",
+        "base_iso2": "MO",
+        "capital_state_id": null,
+        "reason": "no_controlled_city_candidates"
+      }
+    ],
+    "unresolved_manual_capitals": [],
+    "unresolved_city_renames": []
+  }
+}

@@ -1,0 +1,263 @@
+{
+  "version": 1,
+  "scenario_id": "tno_1962",
+  "generated_at": "2026-03-17T02:49:17Z",
+  "geo": {
+    "BE100": {
+      "en": "Hauptstadtbezirk Brüssel",
+      "zh": "布吕塞尔首都区"
+    },
+    "BE211": {
+      "en": "Bezirk Antwerpen",
+      "zh": "安特卫普区"
+    },
+    "BE212": {
+      "en": "Bezirk Mecheln",
+      "zh": "梅赫伦区"
+    },
+    "BE213": {
+      "en": "Bezirk Turnhout",
+      "zh": "蒂恩豪特区"
+    },
+    "BE223": {
+      "en": "Bezirk Tongern",
+      "zh": "通厄恩区"
+    },
+    "BE224": {
+      "en": "Bezirk Hasselt",
+      "zh": "哈瑟尔特区"
+    },
+    "BE225": {
+      "en": "Bezirk Maaseik",
+      "zh": "马瑟克区"
+    },
+    "BE231": {
+      "en": "Bezirk Aalst",
+      "zh": "阿尔斯特区"
+    },
+    "BE232": {
+      "en": "Bezirk Dendermünde",
+      "zh": "登德明德区"
+    },
+    "BE233": {
+      "en": "Bezirk Eeklo",
+      "zh": "埃克洛区"
+    },
+    "BE234": {
+      "en": "Bezirk Gent",
+      "zh": "根特区"
+    },
+    "BE235": {
+      "en": "Bezirk Oudenaarde",
+      "zh": "奥德纳尔德区"
+    },
+    "BE236": {
+      "en": "Bezirk Sankt Nikolaus",
+      "zh": "圣尼古劳斯区"
+    },
+    "BE241": {
+      "en": "Bezirk Halle-Vilvoorde",
+      "zh": "哈勒-维尔福德区"
+    },
+    "BE242": {
+      "en": "Bezirk Löwen",
+      "zh": "勒汶区"
+    },
+    "BE251": {
+      "en": "Bezirk Brügge",
+      "zh": "布吕赫区"
+    },
+    "BE252": {
+      "en": "Bezirk Diksmuide",
+      "zh": "迪克斯迈德区"
+    },
+    "BE253": {
+      "en": "Bezirk Ypern",
+      "zh": "伊珀恩区"
+    },
+    "BE254": {
+      "en": "Bezirk Kortrijk",
+      "zh": "科特赖克区"
+    },
+    "BE255": {
+      "en": "Bezirk Ostende",
+      "zh": "奥斯滕德区"
+    },
+    "BE256": {
+      "en": "Bezirk Roeselare",
+      "zh": "鲁瑟拉勒区"
+    },
+    "BE257": {
+      "en": "Bezirk Thielt",
+      "zh": "蒂尔特区"
+    },
+    "BE258": {
+      "en": "Bezirk Furnes",
+      "zh": "菲尔讷区"
+    },
+    "BE310": {
+      "en": "Bezirk Nivelles",
+      "zh": "尼韦勒区"
+    },
+    "BE323": {
+      "en": "Bezirk Bergen",
+      "zh": "贝亨区"
+    },
+    "BE328": {
+      "en": "Bezirk Doornik-Moeskroen",
+      "zh": "多尔尼克-穆斯克龙区"
+    },
+    "BE329": {
+      "en": "Bezirk La Louvière",
+      "zh": "拉卢维耶尔区"
+    },
+    "BE32A": {
+      "en": "Bezirk Aat",
+      "zh": "阿特区"
+    },
+    "BE32B": {
+      "en": "Bezirk Charleroi",
+      "zh": "沙勒鲁瓦区"
+    },
+    "BE32C": {
+      "en": "Bezirk Zinnik",
+      "zh": "济尼克区"
+    },
+    "BE32D": {
+      "en": "Bezirk Thuin",
+      "zh": "蒂安区"
+    },
+    "BE331": {
+      "en": "Bezirk Hoei",
+      "zh": "胡伊区"
+    },
+    "BE332": {
+      "en": "Bezirk Lüttich",
+      "zh": "吕蒂希区"
+    },
+    "BE334": {
+      "en": "Bezirk Borgworm",
+      "zh": "博格沃姆区"
+    },
+    "BE335": {
+      "en": "Bezirk Verviers — Französische Gemeinden",
+      "zh": "费尔维耶法语市镇区"
+    },
+    "BE341": {
+      "en": "Bezirk Arel",
+      "zh": "阿雷尔区"
+    },
+    "BE342": {
+      "en": "Bezirk Bastenaken",
+      "zh": "巴斯特纳肯区"
+    },
+    "BE343": {
+      "en": "Bezirk Marche-en-Famenne",
+      "zh": "马尔什-昂法梅讷区"
+    },
+    "BE344": {
+      "en": "Bezirk Neufchâteau",
+      "zh": "讷沙托区"
+    },
+    "BE345": {
+      "en": "Bezirk Virton",
+      "zh": "维尔通区"
+    },
+    "BE351": {
+      "en": "Bezirk Dinant",
+      "zh": "迪南区"
+    },
+    "BE352": {
+      "en": "Bezirk Namen",
+      "zh": "纳门区"
+    },
+    "BE353": {
+      "en": "Bezirk Philippeville",
+      "zh": "菲利普维尔区"
+    },
+    "BY_RAY_67162791B30498032594927": {
+      "en": "Brest-Litowsk",
+      "zh": "布列斯特-立托夫斯克"
+    },
+    "FR_ARR_25001": {
+      "en": "Bisanz",
+      "zh": "比桑茨"
+    },
+    "FR_ARR_25002": {
+      "en": "Mömpelgard",
+      "zh": "蒙佩尔加德"
+    },
+    "FR_ARR_54001": {
+      "en": "Brietz",
+      "zh": "布里茨"
+    },
+    "FR_ARR_54003": {
+      "en": "Nanzig",
+      "zh": "南齐希"
+    },
+    "FR_ARR_54004": {
+      "en": "Tull",
+      "zh": "图尔"
+    },
+    "FR_ARR_55001": {
+      "en": "Herzogenbar",
+      "zh": "黑尔措根巴尔"
+    },
+    "FR_ARR_55003": {
+      "en": "Verden an der Maas",
+      "zh": "马斯河畔韦尔登"
+    },
+    "FR_ARR_59002": {
+      "en": "Kamerijk",
+      "zh": "卡默赖克"
+    },
+    "FR_ARR_59003": {
+      "en": "Dowaai",
+      "zh": "多瓦伊"
+    },
+    "FR_ARR_59004": {
+      "en": "Dünkirchen",
+      "zh": "敦基兴"
+    },
+    "FR_ARR_59005": {
+      "en": "Rijsel",
+      "zh": "赖瑟尔"
+    },
+    "FR_ARR_59006": {
+      "en": "Schwanenthal",
+      "zh": "施瓦嫩塔尔"
+    },
+    "FR_ARR_62001": {
+      "en": "Atrecht",
+      "zh": "阿特雷赫特"
+    },
+    "FR_ARR_62003": {
+      "en": "Bonen",
+      "zh": "博嫩"
+    },
+    "FR_ARR_62005": {
+      "en": "Sint-Omaars",
+      "zh": "圣奥马尔斯"
+    },
+    "FR_ARR_62006": {
+      "en": "Kales",
+      "zh": "卡勒斯"
+    },
+    "FR_ARR_88001": {
+      "en": "Spinneln",
+      "zh": "施平嫩"
+    },
+    "FR_ARR_88002": {
+      "en": "Neuenberg",
+      "zh": "诺伊恩贝格"
+    },
+    "FR_ARR_90001": {
+      "en": "Beffert",
+      "zh": "贝费尔特"
+    },
+    "RU_CITY_VOLGOGRAD": {
+      "en": "Paulusburg",
+      "zh": "保卢斯堡"
+    }
+  }
+}
