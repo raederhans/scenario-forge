@@ -23,19 +23,6 @@
       "notes": "Formalized Japanese colonial administration over Korea in the 1962 Co-Prosperity Sphere order."
     },
     {
-      "rule_id": "japan_taiwan_colony_1962",
-      "tag": "TAI",
-      "display_name": "Taiwan",
-      "color_hex": "#EDC9B8",
-      "base_iso2": "TW",
-      "featured": false,
-      "parent_owner_tag": "JAP",
-      "subject_kind": "colony",
-      "entry_kind": "scenario_subject",
-      "include_existing_owner_tags": ["TAI"],
-      "notes": "Formalized Japanese colonial administration over Taiwan in the 1962 Co-Prosperity Sphere order."
-    },
-    {
       "rule_id": "japan_manchukuo_protectorate_1962",
       "tag": "MAN",
       "display_name": "Manchukuo",

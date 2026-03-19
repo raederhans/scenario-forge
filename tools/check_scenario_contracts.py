@@ -256,10 +256,14 @@ def validate_locale_patch(
     audit = payload.get("audit") if isinstance(payload.get("audit"), dict) else {}
     collision_candidates = audit.get("collision_candidates") if isinstance(audit, dict) else []
     if collision_candidates and isinstance(collision_candidates, list):
-        sample = collision_candidates[:5]
+        sample = audit.get("collision_candidates_sample") if isinstance(audit.get("collision_candidates_sample"), list) else collision_candidates[:5]
+        collision_count = int(audit.get("collision_candidate_count") or len(collision_candidates))
+        cross_base_collision_count = int(audit.get("cross_base_collision_count") or collision_count)
+        split_clone_safe_copy_count = int(audit.get("split_clone_safe_copy_count") or 0)
         warnings.append(
             "geo_locale_patch.json recorded locale collision candidates for manual review. "
-            f"Sample: {sample!r}."
+            f"{cross_base_collision_count} cross-base collisions remain after "
+            f"{split_clone_safe_copy_count} split-clone safe copies. Sample: {sample[:5]!r}."
         )
     elif collision_candidates not in (None, [], {}):
         errors.append("geo_locale_patch.json audit.collision_candidates must be a list when present.")

@@ -45,6 +45,7 @@ import {
   rebuildPresetState,
   setReleasableBoundaryVariant,
 } from "../core/releasable_manager.js";
+import { setActivePaletteSource } from "../core/palette_manager.js";
 
 function extractCountryCodeFromId(value) {
   const text = String(value || "").trim().toUpperCase();
@@ -5010,6 +5011,14 @@ function initSidebar({ render } = {}) {
         state.devClipboardFallbackText = "";
         state.devClipboardPreviewFormat = "names_with_ids";
         ensureSovereigntyState({ force: true });
+        state.specialZoneEditor = {
+          active: false,
+          vertices: [],
+          zoneType: "custom",
+          label: "",
+          selectedId: null,
+          counter: 1,
+        };
         state.specialZones = data.specialZones || {};
         state.manualSpecialZones =
           data.manualSpecialZones && data.manualSpecialZones.type === "FeatureCollection"
@@ -5027,6 +5036,46 @@ function initSidebar({ render } = {}) {
           normalizedParentEnabled[countryCode] = !!importedParentEnabled[countryCode];
         });
         state.parentBorderEnabledByCountry = normalizedParentEnabled;
+        state.styleConfig.internalBorders = {
+          color: "#cccccc",
+          opacity: 1,
+          width: 0.5,
+        };
+        state.styleConfig.empireBorders = {
+          color: "#666666",
+          width: 1,
+        };
+        state.styleConfig.coastlines = {
+          color: "#333333",
+          width: 1.2,
+        };
+        if (
+          data.styleConfig?.internalBorders &&
+          typeof data.styleConfig.internalBorders === "object"
+        ) {
+          state.styleConfig.internalBorders = {
+            ...(state.styleConfig.internalBorders || {}),
+            ...data.styleConfig.internalBorders,
+          };
+        }
+        if (
+          data.styleConfig?.empireBorders &&
+          typeof data.styleConfig.empireBorders === "object"
+        ) {
+          state.styleConfig.empireBorders = {
+            ...(state.styleConfig.empireBorders || {}),
+            ...data.styleConfig.empireBorders,
+          };
+        }
+        if (
+          data.styleConfig?.coastlines &&
+          typeof data.styleConfig.coastlines === "object"
+        ) {
+          state.styleConfig.coastlines = {
+            ...(state.styleConfig.coastlines || {}),
+            ...data.styleConfig.coastlines,
+          };
+        }
         if (
           data.styleConfig?.parentBorders &&
           typeof data.styleConfig.parentBorders === "object"
@@ -5123,8 +5172,40 @@ function initSidebar({ render } = {}) {
           state.showRivers = !!data.layerVisibility.showRivers;
           state.showSpecialZones =
             data.layerVisibility.showSpecialZones === undefined
-              ? true
+              ? false
               : !!data.layerVisibility.showSpecialZones;
+        }
+        state.recentColors = Array.isArray(data.recentColors) ? [...data.recentColors] : [];
+        state.interactionGranularity = data.interactionGranularity || "subdivision";
+        state.batchFillScope = data.batchFillScope || "parent";
+        state.referenceImageState = {
+          ...(state.referenceImageState || {}),
+          ...(data.referenceImageState || {}),
+        };
+        state.customPresets =
+          data.customPresets && typeof data.customPresets === "object"
+            ? data.customPresets
+            : {};
+        const paletteRestoreTarget = String(data.activePaletteId || "").trim();
+        const shouldRestorePalette = !!paletteRestoreTarget && (
+          paletteRestoreTarget !== String(state.activePaletteId || "").trim()
+          || !state.activePaletteMeta
+          || !state.activePalettePack
+          || !state.activePaletteMap
+        );
+        if (shouldRestorePalette) {
+          const paletteRestored = await setActivePaletteSource(paletteRestoreTarget, {
+            syncUI: true,
+            overwriteCountryPalette: false,
+          });
+          if (!paletteRestored) {
+            console.warn(`[project-import] Unable to restore saved palette source: ${paletteRestoreTarget}`);
+            showToast(t("Saved palette could not be restored. Keeping the current palette.", "ui"), {
+              title: t("Palette restore skipped", "ui"),
+              tone: "warning",
+              duration: 3600,
+            });
+          }
         }
         if (state.activeScenarioId && state.showCityPoints) {
           await ensureActiveScenarioOptionalLayerLoaded("cities", { renderNow: false });
@@ -5153,12 +5234,21 @@ function initSidebar({ render } = {}) {
         if (typeof state.updateToolbarInputsFn === "function") {
           state.updateToolbarInputsFn();
         }
+        if (typeof state.updateRecentUI === "function") {
+          state.updateRecentUI();
+        }
+        if (typeof state.updateScenarioContextBarFn === "function") {
+          state.updateScenarioContextBarFn();
+        }
         state.persistViewSettingsFn?.();
         rebuildPresetState();
         mapRenderer.refreshColorState({ renderNow: false });
         if (render) render();
         if (typeof state.renderCountryListFn === "function") {
           state.renderCountryListFn();
+        }
+        if (typeof state.refreshCountryInspectorDetailFn === "function") {
+          state.refreshCountryInspectorDetailFn();
         }
         if (typeof state.renderWaterRegionListFn === "function") {
           state.renderWaterRegionListFn();

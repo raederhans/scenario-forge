@@ -1223,6 +1223,46 @@ function initToolbar({ render } = {}) {
     1
   );
   state.styleConfig.lakes = normalizeLakeStyleConfig(state.styleConfig.lakes);
+  if (!state.styleConfig.internalBorders || typeof state.styleConfig.internalBorders !== "object") {
+    state.styleConfig.internalBorders = {};
+  }
+  state.styleConfig.internalBorders.color = normalizeOceanFillColor(state.styleConfig.internalBorders.color || "#cccccc");
+  state.styleConfig.internalBorders.opacity = clamp(
+    Number.isFinite(Number(state.styleConfig.internalBorders.opacity))
+      ? Number(state.styleConfig.internalBorders.opacity)
+      : 1,
+    0,
+    1
+  );
+  state.styleConfig.internalBorders.width = clamp(
+    Number.isFinite(Number(state.styleConfig.internalBorders.width))
+      ? Number(state.styleConfig.internalBorders.width)
+      : 0.5,
+    0.01,
+    2
+  );
+  if (!state.styleConfig.empireBorders || typeof state.styleConfig.empireBorders !== "object") {
+    state.styleConfig.empireBorders = {};
+  }
+  state.styleConfig.empireBorders.color = normalizeOceanFillColor(state.styleConfig.empireBorders.color || "#666666");
+  state.styleConfig.empireBorders.width = clamp(
+    Number.isFinite(Number(state.styleConfig.empireBorders.width))
+      ? Number(state.styleConfig.empireBorders.width)
+      : 1,
+    0.01,
+    5
+  );
+  if (!state.styleConfig.coastlines || typeof state.styleConfig.coastlines !== "object") {
+    state.styleConfig.coastlines = {};
+  }
+  state.styleConfig.coastlines.color = normalizeOceanFillColor(state.styleConfig.coastlines.color || "#333333");
+  state.styleConfig.coastlines.width = clamp(
+    Number.isFinite(Number(state.styleConfig.coastlines.width))
+      ? Number(state.styleConfig.coastlines.width)
+      : 1.2,
+    0.5,
+    3
+  );
   if (!state.styleConfig.parentBorders || typeof state.styleConfig.parentBorders !== "object") {
     state.styleConfig.parentBorders = {};
   }
@@ -1342,6 +1382,29 @@ function initToolbar({ render } = {}) {
   }
   state.specialZoneEditor.zoneType = String(state.specialZoneEditor.zoneType || "custom");
   state.specialZoneEditor.label = String(state.specialZoneEditor.label || "");
+  if (!state.referenceImageState || typeof state.referenceImageState !== "object") {
+    state.referenceImageState = {};
+  }
+  state.referenceImageState.opacity = clamp(
+    Number.isFinite(Number(state.referenceImageState.opacity)) ? Number(state.referenceImageState.opacity) : 0.6,
+    0,
+    1
+  );
+  state.referenceImageState.scale = clamp(
+    Number.isFinite(Number(state.referenceImageState.scale)) ? Number(state.referenceImageState.scale) : 1,
+    0.2,
+    3
+  );
+  state.referenceImageState.offsetX = clamp(
+    Number.isFinite(Number(state.referenceImageState.offsetX)) ? Number(state.referenceImageState.offsetX) : 0,
+    -1000,
+    1000
+  );
+  state.referenceImageState.offsetY = clamp(
+    Number.isFinite(Number(state.referenceImageState.offsetY)) ? Number(state.referenceImageState.offsetY) : 0,
+    -1000,
+    1000
+  );
 
   if (oceanFillColor) {
     oceanFillColor.value = state.styleConfig.ocean.fillColor;
@@ -2040,6 +2103,39 @@ function initToolbar({ render } = {}) {
   }
 
   state.updateToolbarInputsFn = () => {
+    if (internalBorderColor) {
+      internalBorderColor.value = state.styleConfig.internalBorders.color;
+    }
+    if (internalBorderOpacity) {
+      internalBorderOpacity.value = String(Math.round(state.styleConfig.internalBorders.opacity * 100));
+    }
+    if (internalBorderOpacityValue) {
+      internalBorderOpacityValue.textContent = `${Math.round(state.styleConfig.internalBorders.opacity * 100)}%`;
+    }
+    if (internalBorderWidth) {
+      internalBorderWidth.value = String(Number(state.styleConfig.internalBorders.width).toFixed(2));
+    }
+    if (internalBorderWidthValue) {
+      internalBorderWidthValue.textContent = Number(state.styleConfig.internalBorders.width).toFixed(2);
+    }
+    if (empireBorderColor) {
+      empireBorderColor.value = state.styleConfig.empireBorders.color;
+    }
+    if (empireBorderWidth) {
+      empireBorderWidth.value = String(Number(state.styleConfig.empireBorders.width).toFixed(2));
+    }
+    if (empireBorderWidthValue) {
+      empireBorderWidthValue.textContent = Number(state.styleConfig.empireBorders.width).toFixed(2);
+    }
+    if (coastlineColor) {
+      coastlineColor.value = state.styleConfig.coastlines.color;
+    }
+    if (coastlineWidth) {
+      coastlineWidth.value = String(Number(state.styleConfig.coastlines.width).toFixed(1));
+    }
+    if (coastlineWidthValue) {
+      coastlineWidthValue.textContent = Number(state.styleConfig.coastlines.width).toFixed(1);
+    }
     if (oceanFillColor) {
       oceanFillColor.value = normalizeOceanFillColor(state.styleConfig.ocean.fillColor);
     }
@@ -2049,6 +2145,36 @@ function initToolbar({ render } = {}) {
     }
     if (themeSelect) {
       themeSelect.value = String(state.activePaletteId || themeSelect.value || "");
+    }
+    if (referenceOpacity) {
+      referenceOpacity.value = String(Math.round(state.referenceImageState.opacity * 100));
+    }
+    if (referenceOpacityValue) {
+      referenceOpacityValue.textContent = `${Math.round(state.referenceImageState.opacity * 100)}%`;
+    }
+    if (referenceScale) {
+      referenceScale.value = String(Number(state.referenceImageState.scale).toFixed(2));
+    }
+    if (referenceScaleValue) {
+      referenceScaleValue.textContent = `${Number(state.referenceImageState.scale).toFixed(2)}x`;
+    }
+    if (referenceOffsetX) {
+      referenceOffsetX.value = String(Math.round(state.referenceImageState.offsetX));
+    }
+    if (referenceOffsetXValue) {
+      referenceOffsetXValue.textContent = `${Math.round(state.referenceImageState.offsetX)}px`;
+    }
+    if (referenceOffsetY) {
+      referenceOffsetY.value = String(Math.round(state.referenceImageState.offsetY));
+    }
+    if (referenceOffsetYValue) {
+      referenceOffsetYValue.textContent = `${Math.round(state.referenceImageState.offsetY)}px`;
+    }
+    if (referenceImage) {
+      referenceImage.style.opacity = String(state.referenceImageState.opacity);
+      referenceImage.style.transform =
+        `translate(${state.referenceImageState.offsetX}px, ${state.referenceImageState.offsetY}px) `
+        + `scale(${state.referenceImageState.scale})`;
     }
     renderTextureUI();
     renderDayNightUI();

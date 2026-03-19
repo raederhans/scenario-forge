@@ -235,6 +235,14 @@ const CITY_LABEL_MAX_WIDTH_PX = {
   balanced: { capital: 188, major: 166, regional: 148, minor: 134 },
   dense: { capital: 166, major: 148, regional: 132, minor: 120 },
 };
+const CITY_LABEL_PLACEMENT_ORDER = [
+  "right",
+  "left",
+  "upper-right",
+  "lower-right",
+  "upper-left",
+  "lower-left",
+];
 const CITY_ADMIN_LABEL_PATTERNS = [
   /\bcounty\b/giu,
   /\bdistrict\b/giu,
@@ -356,6 +364,10 @@ const renderDiag = {
 const rewoundFeatureLogKeys = new Set();
 const urbanGeoCentroidCache = new WeakMap();
 let cityAnchorCache = new WeakMap();
+const urbanFeatureIndexCache = {
+  sourceRef: null,
+  byId: new Map(),
+};
 const cityLayerCache = {
   baseRef: null,
   scenarioRef: null,
@@ -6543,6 +6555,56 @@ function getCityEffectiveMinZoom(feature) {
   return getDefaultCityMinZoomForTier(getCityTier(feature));
 }
 
+function getUrbanFeatureStableId(feature) {
+  const directId = String(feature?.id || "").trim();
+  if (directId) return directId;
+  const props = feature?.properties || {};
+  return String(props.id || props.ID || "").trim();
+}
+
+function getUrbanFeatureIndex() {
+  const urbanCollection = state.urbanData;
+  if (urbanFeatureIndexCache.sourceRef === urbanCollection) {
+    return urbanFeatureIndexCache.byId;
+  }
+  const byId = new Map();
+  if (Array.isArray(urbanCollection?.features)) {
+    urbanCollection.features.forEach((feature) => {
+      const urbanId = getUrbanFeatureStableId(feature);
+      if (urbanId) {
+        byId.set(urbanId, feature);
+      }
+    });
+  }
+  urbanFeatureIndexCache.sourceRef = urbanCollection;
+  urbanFeatureIndexCache.byId = byId;
+  return byId;
+}
+
+function getCityUrbanRuntimeInfo(feature, urbanIndex = getUrbanFeatureIndex()) {
+  const props = feature?.properties || {};
+  const urbanMatchId = String(
+    props.__city_urban_match_id
+    || props.urban_match_id
+    || props.urban_area_id
+    || props.urbanMatchId
+    || props.urbanAreaId
+    || ""
+  ).trim();
+  const urbanMatchMethod = String(
+    props.urban_match_method
+    || props.urbanMatchMethod
+    || ""
+  ).trim().toLowerCase();
+  const urbanFeature = urbanMatchId ? (urbanIndex.get(urbanMatchId) || null) : null;
+  return {
+    urbanMatchId,
+    urbanFeature,
+    hasUrbanMatch: !!urbanFeature,
+    urbanMatchMethod,
+  };
+}
+
 function getCityRadiusMultiplier(feature) {
   switch (getCityTier(feature)) {
     case "major":
@@ -6984,6 +7046,7 @@ function getCityMarkerSprite(entry, config = {}) {
 function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
   const phase = getCityRevealPhase(scale);
   const countryProfiles = getCityCountryProfileIndex(cityCollection);
+  const urbanIndex = getUrbanFeatureIndex();
   const markerEntries = [];
   const countsByCountry = new Map();
   const markerBudget = Math.max(0, Number(phase.markerBudget || 0));
@@ -7006,6 +7069,7 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
         return null;
       }
       const cityTier = getCityTier(feature);
+      const urbanInfo = getCityUrbanRuntimeInfo(feature, urbanIndex);
       const entry = {
         feature,
         anchor,
@@ -7020,6 +7084,11 @@ function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
         countryTierRank: profile.countryTierRank || CITY_COUNTRY_TIER_RANK.D,
         population: Math.max(0, Number(feature?.properties?.__city_population || 0)),
         sortWeight: getCitySortWeight(feature),
+        urbanMatchId: urbanInfo.urbanMatchId,
+        urbanFeature: urbanInfo.urbanFeature,
+        hasUrbanMatch: urbanInfo.hasUrbanMatch,
+        urbanMatchMethod: urbanInfo.urbanMatchMethod,
+        acceptedLabelPlacement: "",
       };
       entry.revealBucket = getCityRevealBucket(entry, phase.id);
       if (!Number.isFinite(entry.revealBucket)) {
@@ -7352,6 +7421,105 @@ function getCityScreenPoint(anchor, transform = state.zoomTransform || globalThi
   ];
 }
 
+function getCityGeoCoordinates(feature) {
+  const geometry = feature?.geometry;
+  if (geometry?.type === "Point" && Array.isArray(geometry.coordinates) && geometry.coordinates.length >= 2) {
+    const lon = Number(geometry.coordinates[0]);
+    const lat = Number(geometry.coordinates[1]);
+    if (Number.isFinite(lon) && Number.isFinite(lat)) {
+      return [normalizeLongitude(lon), clamp(lat, -89.999, 89.999)];
+    }
+  }
+  if (geometry?.type === "MultiPoint" && Array.isArray(geometry.coordinates) && geometry.coordinates.length) {
+    const points = geometry.coordinates
+      .map((coords) => [Number(coords?.[0]), Number(coords?.[1])])
+      .filter((coords) => coords.every((value) => Number.isFinite(value)));
+    if (points.length) {
+      const sums = points.reduce((acc, coords) => [acc[0] + coords[0], acc[1] + coords[1]], [0, 0]);
+      return [
+        normalizeLongitude(sums[0] / points.length),
+        clamp(sums[1] / points.length, -89.999, 89.999),
+      ];
+    }
+  }
+  return getFeatureGeoCentroid(feature);
+}
+
+function buildCityLabelPlacementCandidates(entry, {
+  textWidthPx,
+  fontPx,
+  scale,
+  offsetPx,
+  verticalOffsetPx,
+}) {
+  if (!entry?.screenPoint || !entry?.anchor) return [];
+  const widthPx = Math.max(1, Number(textWidthPx || 0));
+  const heightPx = fontPx + 4;
+  const halfHeightPx = heightPx * 0.5;
+  const placements = {
+    right: {
+      textAlign: "left",
+      dxPx: offsetPx,
+      dyPx: 0,
+      boxX: entry.screenPoint[0] + offsetPx - 2,
+      boxY: entry.screenPoint[1] - halfHeightPx,
+    },
+    left: {
+      textAlign: "right",
+      dxPx: -offsetPx,
+      dyPx: 0,
+      boxX: entry.screenPoint[0] - offsetPx - widthPx - 4,
+      boxY: entry.screenPoint[1] - halfHeightPx,
+    },
+    "upper-right": {
+      textAlign: "left",
+      dxPx: offsetPx,
+      dyPx: -verticalOffsetPx,
+      boxX: entry.screenPoint[0] + offsetPx - 2,
+      boxY: entry.screenPoint[1] - verticalOffsetPx - halfHeightPx,
+    },
+    "lower-right": {
+      textAlign: "left",
+      dxPx: offsetPx,
+      dyPx: verticalOffsetPx,
+      boxX: entry.screenPoint[0] + offsetPx - 2,
+      boxY: entry.screenPoint[1] + verticalOffsetPx - halfHeightPx,
+    },
+    "upper-left": {
+      textAlign: "right",
+      dxPx: -offsetPx,
+      dyPx: -verticalOffsetPx,
+      boxX: entry.screenPoint[0] - offsetPx - widthPx - 4,
+      boxY: entry.screenPoint[1] - verticalOffsetPx - halfHeightPx,
+    },
+    "lower-left": {
+      textAlign: "right",
+      dxPx: -offsetPx,
+      dyPx: verticalOffsetPx,
+      boxX: entry.screenPoint[0] - offsetPx - widthPx - 4,
+      boxY: entry.screenPoint[1] + verticalOffsetPx - halfHeightPx,
+    },
+  };
+  return CITY_LABEL_PLACEMENT_ORDER
+    .map((placementId) => {
+      const candidate = placements[placementId];
+      if (!candidate) return null;
+      return {
+        id: placementId,
+        textAlign: candidate.textAlign,
+        drawX: entry.anchor[0] + (candidate.dxPx / scale),
+        drawY: entry.anchor[1] + (candidate.dyPx / scale),
+        box: {
+          x: candidate.boxX,
+          y: candidate.boxY,
+          w: widthPx + 6,
+          h: heightPx,
+        },
+      };
+    })
+    .filter(Boolean);
+}
+
 function isCityAnchorInViewport(anchor, { padding = 24, transform = state.zoomTransform || globalThis.d3?.zoomIdentity } = {}) {
   const screenPoint = getCityScreenPoint(anchor, transform);
   if (!screenPoint) return false;
@@ -7517,7 +7685,6 @@ function drawCityPointsLayer(k, { interactive = false } = {}) {
     const tokens = getCityMarkerThemeTokens(config);
     const fontPx = clamp((Number(config.labelSize) || 11) - 1, 7, 23);
     context.globalAlpha = 1;
-    context.textAlign = "left";
     context.textBaseline = "middle";
     context.lineJoin = "round";
     context.shadowColor = tokens.shadow;
@@ -7538,30 +7705,31 @@ function drawCityPointsLayer(k, { interactive = false } = {}) {
       if (!text || !entry.screenPoint || scale < labelMinZoom) return;
       const markerSizePx = Number(entry.markerSizePx || getCityMarkerSizePx(entry, config));
       const offsetPx = Math.max(7, markerSizePx + 4);
+      const verticalOffsetPx = Math.max(fontPx + 2, markerSizePx + 6);
       const metrics = context.measureText(text);
-      const box = {
-        x: entry.screenPoint[0] + offsetPx - 2,
-        y: entry.screenPoint[1] - (fontPx * 0.58),
-        w: Math.max(1, metrics.width * scale) + 6,
-        h: fontPx + 4,
-      };
-      if (
-        box.x > state.width + 24
+      const candidates = buildCityLabelPlacementCandidates(entry, {
+        textWidthPx: metrics.width * scale,
+        fontPx,
+        scale,
+        offsetPx,
+        verticalOffsetPx,
+      });
+      const acceptedPlacement = candidates.find(({ box }) => (
+        !(box.x > state.width + 24
         || box.y > state.height + 24
         || (box.x + box.w) < -24
-        || (box.y + box.h) < -24
-      ) {
+        || (box.y + box.h) < -24)
+        && !occupiedBoxes.some((occupied) => doScreenBoxesOverlap(box, occupied))
+      ));
+      if (!acceptedPlacement) {
         return;
       }
-      if (occupiedBoxes.some((occupied) => doScreenBoxesOverlap(box, occupied))) {
-        return;
-      }
-      occupiedBoxes.push(box);
+      occupiedBoxes.push(acceptedPlacement.box);
+      entry.acceptedLabelPlacement = acceptedPlacement.id;
       labelCount += 1;
-      const labelX = entry.anchor[0] + (offsetPx / scale);
-      const labelY = entry.anchor[1];
+      context.textAlign = acceptedPlacement.textAlign;
       context.fillStyle = entry.isCapital ? tokens.capitalLabel : tokens.label;
-      context.fillText(text, labelX, labelY);
+      context.fillText(text, acceptedPlacement.drawX, acceptedPlacement.drawY);
     });
   }
 
@@ -7933,14 +8101,15 @@ function drawModernCityLightsCorridors(config, intensity) {
   });
 }
 
-function drawModernCityLightsCores(k, config, intensity) {
-  if (!Array.isArray(state.urbanData?.features) || !state.urbanData.features.length) return;
-  const palette = getNightLightPalette("modern");
+function collectModernUrbanCoreEntries(k, config, intensity) {
+  if (!Array.isArray(state.urbanData?.features) || !state.urbanData.features.length) return [];
   const textureOpacity = clamp(Number(config.cityLightsTextureOpacity) || 0, 0, 1);
   const coreSharpness = clamp(Number(config.cityLightsCoreSharpness) || 0, 0, 1);
-  const zoomScale = Math.max(0.0001, Number(state.zoomTransform?.k || 1));
+  const transform = state.zoomTransform || globalThis.d3?.zoomIdentity || { x: 0, y: 0, k: 1 };
+  const zoomScale = Math.max(0.0001, Number(transform?.k || 1));
   const minProjectedAreaPx = zoomScale <= 1.15 ? 4.6 : zoomScale <= 1.7 ? 3.2 : 2.2;
   const overscan = Math.max(32, Math.min(state.width, state.height) * 0.06);
+  const entries = [];
 
   state.urbanData.features.forEach((feature) => {
     if (!pathBoundsInScreen(feature)) return;
@@ -7965,8 +8134,8 @@ function drawModernCityLightsCores(k, config, intensity) {
     const cy = Number(centroid?.[1]);
     if (!Number.isFinite(cx) || !Number.isFinite(cy)) return;
 
-    const screenX = (cx * state.zoomTransform.k) + state.zoomTransform.x;
-    const screenY = (cy * state.zoomTransform.k) + state.zoomTransform.y;
+    const screenX = (cx * transform.k) + transform.x;
+    const screenY = (cy * transform.k) + transform.y;
     if (
       screenX < -overscan ||
       screenX > state.width + overscan ||
@@ -7991,36 +8160,146 @@ function drawModernCityLightsCores(k, config, intensity) {
       ? 0
       : clamp(intensity * weight * (0.03 + (sample * 0.08)), 0, 0.16);
     const offsetPx = baseRadiusPx * (0.22 + (sample * 0.28));
+    entries.push({
+      feature,
+      cx,
+      cy,
+      screenX,
+      screenY,
+      weight,
+      sample,
+      orientation,
+      baseRadiusPx,
+      stretch,
+      haloAlpha,
+      coreAlpha,
+      glintAlpha,
+      offsetX: (Math.cos(orientation) * offsetPx) / Math.max(0.0001, k),
+      offsetY: (Math.sin(orientation) * offsetPx) / Math.max(0.0001, k),
+    });
+  });
+  return entries;
+}
+
+function drawModernCityLightsCores(k, _config, _intensity, coreEntries = null) {
+  const palette = getNightLightPalette("modern");
+  const entries = Array.isArray(coreEntries) ? coreEntries : [];
+  entries.forEach((entry) => {
+    context.fillStyle = palette.halo;
+    context.globalAlpha = entry.haloAlpha;
+    drawLightEllipse(
+      entry.cx,
+      entry.cy,
+      (entry.baseRadiusPx * entry.stretch * 1.45) / Math.max(0.0001, k),
+      (entry.baseRadiusPx * 0.74) / Math.max(0.0001, k),
+      entry.orientation
+    );
+
+    context.fillStyle = palette.core;
+    context.globalAlpha = entry.coreAlpha;
+    drawLightEllipse(
+      entry.cx,
+      entry.cy,
+      (entry.baseRadiusPx * entry.stretch) / Math.max(0.0001, k),
+      (entry.baseRadiusPx * 0.5) / Math.max(0.0001, k),
+      entry.orientation
+    );
+
+    context.fillStyle = palette.glint;
+    context.globalAlpha = entry.glintAlpha;
+    drawLightEllipse(
+      entry.cx + entry.offsetX,
+      entry.cy + entry.offsetY,
+      (entry.baseRadiusPx * 0.6) / Math.max(0.0001, k),
+      (entry.baseRadiusPx * 0.24) / Math.max(0.0001, k),
+      entry.orientation
+    );
+  });
+}
+
+function drawModernCapitalFallbackLights(k, config, intensity, urbanCoreEntries = []) {
+  const cityCollection = getEffectiveCityCollection();
+  if (!Array.isArray(cityCollection?.features) || !cityCollection.features.length) return;
+  const palette = getNightLightPalette("modern");
+  const coreSharpness = clamp(Number(config.cityLightsCoreSharpness) || 0, 0, 1);
+  const zoomScale = Math.max(0.0001, Number(state.zoomTransform?.k || 1));
+  const overscan = Math.max(28, Math.min(state.width, state.height) * 0.05);
+  const urbanIndex = getUrbanFeatureIndex();
+
+  cityCollection.features.forEach((feature) => {
+    const props = feature?.properties || {};
+    if (!props.__city_is_country_capital) return;
+    if (getCityUrbanRuntimeInfo(feature, urbanIndex).hasUrbanMatch) return;
+    const anchor = getCityAnchor(feature);
+    const screenPoint = getCityScreenPoint(anchor);
+    if (!anchor || !screenPoint) return;
+    if (
+      screenPoint[0] < -overscan ||
+      screenPoint[0] > state.width + overscan ||
+      screenPoint[1] < -overscan ||
+      screenPoint[1] > state.height + overscan
+    ) {
+      return;
+    }
+    const overlapsUrbanCore = urbanCoreEntries.some((entry) => (
+      Math.hypot(entry.screenX - screenPoint[0], entry.screenY - screenPoint[1]) <= Math.max(18, entry.baseRadiusPx * 10)
+    ));
+    if (overlapsUrbanCore) return;
+
+    const population = Math.max(0, Number(props.__city_population || 0));
+    const populationScore = clamp(Math.log10(population + 1) / 6.5, 0.18, 1);
+    const geographicCoords = getCityGeoCoordinates(feature);
+    const sample = geographicCoords
+      ? sampleModernCityLightsGridNormalized(geographicCoords[0], geographicCoords[1])
+      : 0;
+    const weight = clamp(0.34 + (populationScore * 0.34) + (sample * 0.28), 0.24, 0.92);
+    if (zoomScale <= 1.1 && weight < 0.45) return;
+
+    const orientation = (stringHash(
+      getCityCanonicalId(feature) ||
+      props.name_en ||
+      props.name ||
+      feature?.id ||
+      `${anchor[0]}:${anchor[1]}`
+    ) % 180) * (Math.PI / 180);
+    const baseRadiusPx = 0.32 + (weight * (0.42 + (coreSharpness * 0.22)));
+    const stretch = 1.02 + (coreSharpness * 0.16) + (sample * 0.16);
+    const haloAlpha = clamp(intensity * weight * (0.016 + (sample * 0.035)), 0, 0.09);
+    const coreAlpha = clamp(intensity * weight * (0.048 + (sample * 0.09)), 0, 0.2);
+    const glintAlpha = zoomScale < 1.5
+      ? 0
+      : clamp(intensity * weight * (0.015 + (sample * 0.03)), 0, 0.08);
+    const offsetPx = baseRadiusPx * (0.16 + (sample * 0.18));
     const offsetX = (Math.cos(orientation) * offsetPx) / Math.max(0.0001, k);
     const offsetY = (Math.sin(orientation) * offsetPx) / Math.max(0.0001, k);
 
     context.fillStyle = palette.halo;
     context.globalAlpha = haloAlpha;
     drawLightEllipse(
-      cx,
-      cy,
-      (baseRadiusPx * stretch * 1.45) / Math.max(0.0001, k),
-      (baseRadiusPx * 0.74) / Math.max(0.0001, k),
+      anchor[0],
+      anchor[1],
+      (baseRadiusPx * stretch * 1.35) / Math.max(0.0001, k),
+      (baseRadiusPx * 0.68) / Math.max(0.0001, k),
       orientation
     );
 
     context.fillStyle = palette.core;
     context.globalAlpha = coreAlpha;
     drawLightEllipse(
-      cx,
-      cy,
+      anchor[0],
+      anchor[1],
       (baseRadiusPx * stretch) / Math.max(0.0001, k),
-      (baseRadiusPx * 0.5) / Math.max(0.0001, k),
+      (baseRadiusPx * 0.44) / Math.max(0.0001, k),
       orientation
     );
 
     context.fillStyle = palette.glint;
     context.globalAlpha = glintAlpha;
     drawLightEllipse(
-      cx + offsetX,
-      cy + offsetY,
-      (baseRadiusPx * 0.6) / Math.max(0.0001, k),
-      (baseRadiusPx * 0.24) / Math.max(0.0001, k),
+      anchor[0] + offsetX,
+      anchor[1] + offsetY,
+      (baseRadiusPx * 0.48) / Math.max(0.0001, k),
+      (baseRadiusPx * 0.2) / Math.max(0.0001, k),
       orientation
     );
   });
@@ -8039,7 +8318,9 @@ function drawModernNightLightsLayer(k, config, solarState) {
   context.globalCompositeOperation = getSafeBlendMode("screen", "lighter");
   drawModernCityLightsTexture(config, intensity);
   drawModernCityLightsCorridors(config, intensity);
-  drawModernCityLightsCores(k, config, intensity);
+  const urbanCoreEntries = collectModernUrbanCoreEntries(k, config, intensity);
+  drawModernCityLightsCores(k, config, intensity, urbanCoreEntries);
+  drawModernCapitalFallbackLights(k, config, intensity, urbanCoreEntries);
   context.restore();
 }
 

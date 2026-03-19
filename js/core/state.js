@@ -628,6 +628,10 @@ function createDefaultCityLayerStyleConfig() {
   };
 }
 
+const VALID_CITY_LAYER_THEMES = ["classic_graphite"];
+const VALID_CITY_LAYER_REVEAL_PROFILES = ["hybrid_country_budget"];
+const VALID_CITY_LAYER_LABEL_DENSITIES = ["sparse", "balanced", "dense"];
+
 function normalizeCityLayerStyleConfig(rawConfig) {
   const defaults = createDefaultCityLayerStyleConfig();
   const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
@@ -638,9 +642,9 @@ function normalizeCityLayerStyleConfig(rawConfig) {
   const labelDensity = String(raw.labelDensity || defaults.labelDensity).trim().toLowerCase();
 
   return {
-    theme: theme === "classic_graphite" ? theme : defaults.theme,
-    revealProfile: revealProfile === "hybrid_country_budget" ? revealProfile : defaults.revealProfile,
-    labelDensity: ["sparse", "balanced", "dense"].includes(labelDensity) ? labelDensity : defaults.labelDensity,
+    theme: VALID_CITY_LAYER_THEMES.includes(theme) ? theme : defaults.theme,
+    revealProfile: VALID_CITY_LAYER_REVEAL_PROFILES.includes(revealProfile) ? revealProfile : defaults.revealProfile,
+    labelDensity: VALID_CITY_LAYER_LABEL_DENSITIES.includes(labelDensity) ? labelDensity : defaults.labelDensity,
     color: color || defaults.color,
     capitalColor: capitalColor || defaults.capitalColor,
     opacity: clamp(toFiniteNumber(raw.opacity, defaults.opacity), 0, 1),

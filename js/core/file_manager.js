@@ -14,6 +14,79 @@ import { clearDirty } from "./dirty_state.js";
 const LEGACY_BOUNDARY_VARIANT_ALIASES = {
   legacy_approx: "historical_reference",
 };
+const DEFAULT_ACTIVE_PALETTE_ID = "hoi4_vanilla";
+const MAX_SAVED_RECENT_COLORS = 10;
+const DEFAULT_REFERENCE_IMAGE_STATE = Object.freeze({
+  opacity: 0.6,
+  scale: 1,
+  offsetX: 0,
+  offsetY: 0,
+});
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function normalizeProjectHexColor(value) {
+  const candidate = String(value || "").trim();
+  if (/^#(?:[0-9a-f]{6})$/i.test(candidate)) return candidate.toLowerCase();
+  if (/^#(?:[0-9a-f]{3})$/i.test(candidate)) {
+    return `#${candidate[1]}${candidate[1]}${candidate[2]}${candidate[2]}${candidate[3]}${candidate[3]}`.toLowerCase();
+  }
+  return "";
+}
+
+function normalizeReferenceImageState(rawState) {
+  const state = rawState && typeof rawState === "object" ? rawState : {};
+  return {
+    opacity: clamp(
+      Number.isFinite(Number(state.opacity)) ? Number(state.opacity) : DEFAULT_REFERENCE_IMAGE_STATE.opacity,
+      0,
+      1
+    ),
+    scale: clamp(
+      Number.isFinite(Number(state.scale)) ? Number(state.scale) : DEFAULT_REFERENCE_IMAGE_STATE.scale,
+      0.2,
+      3
+    ),
+    offsetX: clamp(
+      Number.isFinite(Number(state.offsetX)) ? Number(state.offsetX) : DEFAULT_REFERENCE_IMAGE_STATE.offsetX,
+      -1000,
+      1000
+    ),
+    offsetY: clamp(
+      Number.isFinite(Number(state.offsetY)) ? Number(state.offsetY) : DEFAULT_REFERENCE_IMAGE_STATE.offsetY,
+      -1000,
+      1000
+    ),
+  };
+}
+
+function normalizeRecentColors(rawColors) {
+  if (!Array.isArray(rawColors)) return [];
+  const seen = new Set();
+  return rawColors
+    .map((value) => normalizeProjectHexColor(value))
+    .filter((value) => {
+      if (!value || seen.has(value)) return false;
+      seen.add(value);
+      return true;
+    })
+    .slice(0, MAX_SAVED_RECENT_COLORS);
+}
+
+function normalizeInteractionGranularity(value) {
+  return String(value || "").trim().toLowerCase() === "country" ? "country" : "subdivision";
+}
+
+function normalizeBatchFillScope(value) {
+  return String(value || "").trim().toLowerCase() === "country" ? "country" : "parent";
+}
+
+function normalizeActivePaletteId(value) {
+  const paletteId = String(value || "").trim();
+  return paletteId || DEFAULT_ACTIVE_PALETTE_ID;
+}
 
 function normalizeBoundaryVariantSelectionMap(rawMap) {
   if (!rawMap || typeof rawMap !== "object") return {};
@@ -33,7 +106,7 @@ class FileManager {
   static exportProject(appState) {
     if (!appState) return;
     const payload = {
-      schemaVersion: 13,
+      schemaVersion: 14,
       countryBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
       featureOverrides: appState.visualOverrides || appState.featureOverrides || {},
       sovereignBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
@@ -42,12 +115,18 @@ class FileManager {
       specialRegionOverrides: appState.specialRegionOverrides || {},
       sovereigntyByFeatureId: appState.sovereigntyByFeatureId || {},
       paintMode: appState.paintMode || "visual",
+      interactionGranularity: normalizeInteractionGranularity(appState.interactionGranularity),
+      batchFillScope: normalizeBatchFillScope(appState.batchFillScope),
       activeSovereignCode: appState.activeSovereignCode || "",
+      activePaletteId: normalizeActivePaletteId(appState.activePaletteId),
       dynamicBordersDirty: !!appState.dynamicBordersDirty,
       dynamicBordersDirtyReason: appState.dynamicBordersDirtyReason || "",
       specialZones: appState.specialZones || {},
       parentBorderEnabledByCountry: appState.parentBorderEnabledByCountry || {},
       manualSpecialZones: appState.manualSpecialZones || { type: "FeatureCollection", features: [] },
+      customPresets: appState.customPresets || {},
+      referenceImageState: normalizeReferenceImageState(appState.referenceImageState),
+      recentColors: normalizeRecentColors(appState.recentColors),
       layerVisibility: {
         showWaterRegions: appState.showWaterRegions === undefined ? true : !!appState.showWaterRegions,
         showOpenOceanRegions: !!appState.showOpenOceanRegions,
@@ -62,6 +141,9 @@ class FileManager {
         showSpecialZones: !!appState.showSpecialZones,
       },
       styleConfig: {
+        internalBorders: appState.styleConfig?.internalBorders || null,
+        empireBorders: appState.styleConfig?.empireBorders || null,
+        coastlines: appState.styleConfig?.coastlines || null,
         parentBorders: appState.styleConfig?.parentBorders || null,
         ocean: appState.styleConfig?.ocean || null,
         lakes: normalizeLakeStyleConfig(appState.styleConfig?.lakes),
@@ -95,7 +177,7 @@ class FileManager {
     document.body.appendChild(link);
     link.click();
     link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 0);
+    setTimeout(() => URL.revokeObjectURL(url), 100);
     showToast(t("Project file downloaded.", "ui"), {
       title: t("Project saved", "ui"),
       tone: "success",
@@ -143,13 +225,30 @@ class FileManager {
         if (!data.sovereigntyByFeatureId || typeof data.sovereigntyByFeatureId !== "object") {
           data.sovereigntyByFeatureId = {};
         }
+        data.interactionGranularity = normalizeInteractionGranularity(data.interactionGranularity);
+        data.batchFillScope = normalizeBatchFillScope(data.batchFillScope);
+        data.activePaletteId = normalizeActivePaletteId(data.activePaletteId);
         data.dynamicBordersDirty = !!data.dynamicBordersDirty;
         data.dynamicBordersDirtyReason = String(data.dynamicBordersDirtyReason || "");
+        if (!data.customPresets || typeof data.customPresets !== "object") {
+          data.customPresets = {};
+        }
+        data.referenceImageState = normalizeReferenceImageState(data.referenceImageState);
+        data.recentColors = normalizeRecentColors(data.recentColors);
         if (!data.parentBorderEnabledByCountry || typeof data.parentBorderEnabledByCountry !== "object") {
           data.parentBorderEnabledByCountry = {};
         }
         if (!data.styleConfig || typeof data.styleConfig !== "object") {
           data.styleConfig = {};
+        }
+        if (!data.styleConfig.internalBorders || typeof data.styleConfig.internalBorders !== "object") {
+          data.styleConfig.internalBorders = null;
+        }
+        if (!data.styleConfig.empireBorders || typeof data.styleConfig.empireBorders !== "object") {
+          data.styleConfig.empireBorders = null;
+        }
+        if (!data.styleConfig.coastlines || typeof data.styleConfig.coastlines !== "object") {
+          data.styleConfig.coastlines = null;
         }
         if (!data.styleConfig.parentBorders || typeof data.styleConfig.parentBorders !== "object") {
           data.styleConfig.parentBorders = null;
@@ -220,7 +319,7 @@ class FileManager {
           data.layerVisibility.showRivers === undefined ? true : !!data.layerVisibility.showRivers;
         data.layerVisibility.showSpecialZones =
           data.layerVisibility.showSpecialZones === undefined
-            ? true
+            ? false
             : !!data.layerVisibility.showSpecialZones;
 
         if (typeof callback === "function") {

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import copy
 import csv
 import hashlib
@@ -43,6 +44,19 @@ RELEASABLE_CATALOG_PATH = ROOT / "data/releasables/tno_1962.internal.phase1.cata
 HIERARCHY_PATH = ROOT / "data/hierarchy.json"
 TNO_PALETTE_PATH = ROOT / "data/palettes/tno.palette.json"
 WATER_REGIONS_PATH = ROOT / "data/water_regions.geojson"
+DEFAULT_CHECKPOINT_DIR = ROOT / ".runtime" / "tmp" / "tno_1962_bundle"
+STAGE_ALL = "all"
+STAGE_COUNTRIES = "countries"
+STAGE_RUNTIME_TOPOLOGY = "runtime_topology"
+STAGE_GEO_LOCALE = "geo_locale"
+STAGE_WRITE_BUNDLE = "write_bundle"
+STAGE_CHOICES = [
+    STAGE_ALL,
+    STAGE_COUNTRIES,
+    STAGE_RUNTIME_TOPOLOGY,
+    STAGE_GEO_LOCALE,
+    STAGE_WRITE_BUNDLE,
+]
 REGIONAL_RULE_PACKS: list[tuple[str, Path]] = [
     ("east_asia", ROOT / "data/scenario-rules/tno_1962.east_asia_ownership.manual.json"),
     ("south_asia", ROOT / "data/scenario-rules/tno_1962.south_asia_ownership.manual.json"),
@@ -311,12 +325,10 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
     "ITA": [
         "ATLPRV_18263",
         "ATLPRV_18260",
-        "ATLWLD_adriatica_24",
         "ATLISL_adriatica_CRO_3",
         "ATLPRV_18380",
         "ATLPRV_18254",
         "ATLPRV_19222",
-        "ATLWLD_adriatica_21",
         "ATLISL_adriatica_CRO_4",
         "SI044",
         "SI043",
@@ -326,9 +338,7 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "ATLISL_adriatica_CRO_12",
         "ATLSHL_adriatica_6",
         "ATLSHL_adriatica_4",
-        "ATLSHL_adriatica_18",
         "ATLSHL_adriatica_17",
-        "ATLWLD_adriatica_39",
         "ATLSHL_adriatica_11",
         "ATLPRV_18235",
         "ATLPRV_18348",
@@ -2794,6 +2804,70 @@ def write_json(path: Path, payload: dict) -> None:
     )
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Patch the checked-in tno_1962 scenario bundle.")
+    parser.add_argument("--stage", choices=STAGE_CHOICES, default=STAGE_ALL)
+    parser.add_argument("--checkpoint-dir", default=str(DEFAULT_CHECKPOINT_DIR))
+    parser.add_argument("--scenario-dir", default=str(SCENARIO_DIR))
+    return parser.parse_args()
+
+
+def checkpoint_path(checkpoint_dir: Path, filename: str) -> Path:
+    return checkpoint_dir / filename
+
+
+def write_checkpoint_json(checkpoint_dir: Path, filename: str, payload: dict) -> None:
+    checkpoint_dir.mkdir(parents=True, exist_ok=True)
+    write_json(checkpoint_path(checkpoint_dir, filename), payload)
+
+
+def write_checkpoint_gdf(checkpoint_dir: Path, filename: str, gdf: gpd.GeoDataFrame) -> None:
+    write_checkpoint_json(checkpoint_dir, filename, gdf_to_feature_collection(gdf))
+
+
+def load_checkpoint_json(checkpoint_dir: Path, filename: str) -> dict:
+    path = checkpoint_path(checkpoint_dir, filename)
+    if not path.exists():
+        raise FileNotFoundError(f"Missing checkpoint artifact: {path}")
+    payload = load_json(path)
+    if not isinstance(payload, dict):
+        raise TypeError(f"Checkpoint artifact must be a JSON object: {path}")
+    return payload
+
+
+def gdf_to_feature_collection(gdf: gpd.GeoDataFrame) -> dict:
+    if gdf is None or gdf.empty:
+        return feature_collection_from_features([])
+    return json.loads(gdf.to_json())
+
+
+def load_checkpoint_gdf(checkpoint_dir: Path, filename: str) -> gpd.GeoDataFrame:
+    payload = load_checkpoint_json(checkpoint_dir, filename)
+    return geopandas_from_features(payload.get("features", []))
+
+
+CHECKPOINT_STAGE_METADATA_FILENAME = "stage_metadata.json"
+CHECKPOINT_SCENARIO_POLITICAL_FILENAME = "scenario_political.geojson"
+CHECKPOINT_SCENARIO_WATER_SEED_FILENAME = "scenario_water_seed.geojson"
+CHECKPOINT_WATER_FILENAME = "water_regions.geojson"
+CHECKPOINT_RELIEF_FILENAME = "relief_overlays.geojson"
+CHECKPOINT_LAND_MASK_FILENAME = "land_mask.geojson"
+CHECKPOINT_CONTEXT_LAND_MASK_FILENAME = "context_land_mask.geojson"
+PUBLISH_FILENAMES = (
+    "countries.json",
+    "owners.by_feature.json",
+    "controllers.by_feature.json",
+    "cores.by_feature.json",
+    "manifest.json",
+    "audit.json",
+    "special_regions.geojson",
+    "water_regions.geojson",
+    "relief_overlays.geojson",
+    "runtime_topology.topo.json",
+    "geo_locale_patch.json",
+)
+
+
 def load_feature_migration_map() -> dict[str, list[str]]:
     if not FEATURE_MIGRATION_PATH.exists():
         return {}
@@ -3459,7 +3533,6 @@ def apply_regional_rules(
     }
     countries = countries_payload.get("countries", {})
     touched_tags: list[str] = []
-
     for rule in rule_payload.get("country_rules", []):
         tag = normalize_tag(rule.get("tag"))
         if not tag:
@@ -5711,14 +5784,14 @@ def build_runtime_topology_payload(
     return topo_dict
 
 
-def main() -> None:
-    countries_payload = load_json(SCENARIO_DIR / "countries.json")
-    owners_payload = load_json(SCENARIO_DIR / "owners.by_feature.json")
-    controllers_payload = load_json(SCENARIO_DIR / "controllers.by_feature.json")
-    cores_payload = load_json(SCENARIO_DIR / "cores.by_feature.json")
-    manifest_payload = load_json(SCENARIO_DIR / "manifest.json")
-    audit_payload = load_json(SCENARIO_DIR / "audit.json")
-    current_water_regions = load_json(SCENARIO_DIR / "water_regions.geojson")
+def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
+    countries_payload = load_json(scenario_dir / "countries.json")
+    owners_payload = load_json(scenario_dir / "owners.by_feature.json")
+    controllers_payload = load_json(scenario_dir / "controllers.by_feature.json")
+    cores_payload = load_json(scenario_dir / "cores.by_feature.json")
+    manifest_payload = load_json(scenario_dir / "manifest.json")
+    audit_payload = load_json(scenario_dir / "audit.json")
+    current_water_regions = load_json(scenario_dir / "water_regions.geojson")
 
     generated_at = utc_timestamp()
     runtime_political_full_gdf = load_runtime_political_gdf()
@@ -5922,6 +5995,64 @@ def main() -> None:
         "name": "TNO 1962 Context Land Mask",
         "geometry": context_land_mask_geom,
     }], geometry="geometry", crs="EPSG:4326")
+    relief_overlays_payload = build_relief_overlays(atlantropa_region_unions, lake_geom)
+
+    stage_metadata = {
+        "generated_at": generated_at,
+        "source_root": str(tno_root),
+        "hgo_donor_root": str(hgo_root),
+        "touched_east_asia_tags": touched_east_asia_tags,
+        "touched_south_asia_tags": touched_south_asia_tags,
+        "touched_regional_rule_tags": touched_regional_rule_tags,
+        "applied_annex_maps": {key: list(value) for key, value in applied_annex_maps.items()},
+        "atlantropa_diagnostics": atlantropa_diagnostics,
+        "island_replacement_diagnostics": island_replacement_diagnostics,
+        "med_water_diagnostics": med_water_diagnostics,
+        "restore_diagnostics": restore_diagnostics,
+        "feature_assignment_override_diagnostics": feature_assignment_override_diagnostics,
+        "atl_feature_ids": sorted(atl_feature_ids),
+        "atl_sea_feature_ids": sorted(atl_sea_feature_ids),
+        "context_land_mask_tolerance": context_land_mask_tolerance,
+        "context_land_mask_area_delta_ratio": context_land_mask_area_delta_ratio,
+        "context_land_mask_fallback_used": context_land_mask_fallback_used,
+        "context_land_mask_arc_refs": context_land_mask_arc_refs,
+    }
+
+    return {
+        "countries_payload": countries_payload,
+        "owners_payload": owners_payload,
+        "controllers_payload": controllers_payload,
+        "cores_payload": cores_payload,
+        "manifest_payload": manifest_payload,
+        "audit_payload": audit_payload,
+        "relief_overlays_payload": relief_overlays_payload,
+        "scenario_political_gdf": scenario_political_gdf,
+        "water_gdf": water_gdf,
+        "land_mask_gdf": land_mask_gdf,
+        "context_land_mask_gdf": context_land_mask_gdf,
+        "atl_feature_ids": sorted(atl_feature_ids),
+        "atl_sea_feature_ids": sorted(atl_sea_feature_ids),
+        "context_land_mask_tolerance": context_land_mask_tolerance,
+        "context_land_mask_area_delta_ratio": context_land_mask_area_delta_ratio,
+        "context_land_mask_fallback_used": context_land_mask_fallback_used,
+        "context_land_mask_arc_refs": context_land_mask_arc_refs,
+        "stage_metadata": stage_metadata,
+    }
+
+
+def build_runtime_topology_state_from_countries_state(state: dict[str, object]) -> dict[str, object]:
+    countries_payload = state["countries_payload"]
+    owners_payload = state["owners_payload"]
+    controllers_payload = state["controllers_payload"]
+    cores_payload = state["cores_payload"]
+    manifest_payload = state["manifest_payload"]
+    audit_payload = state["audit_payload"]
+    scenario_political_gdf = state["scenario_political_gdf"]
+    water_gdf = state["water_gdf"]
+    land_mask_gdf = state["land_mask_gdf"]
+    context_land_mask_gdf = state["context_land_mask_gdf"]
+    relief_overlays_payload = state["relief_overlays_payload"]
+    stage_metadata = state["stage_metadata"]
 
     runtime_topology_payload = build_runtime_topology_payload(
         scenario_political_gdf,
@@ -5932,7 +6063,6 @@ def main() -> None:
     context_land_mask_arc_refs = estimate_topology_object_arc_refs(runtime_topology_payload, "context_land_mask")
     runtime_water_regions = topology_object_to_feature_collection(runtime_topology_payload, "scenario_water")
     runtime_special_regions = feature_collection_from_features([])
-    relief_overlays_payload = build_relief_overlays(atlantropa_region_unions, lake_geom)
 
     recalculate_country_feature_counts(
         countries_payload,
@@ -5946,6 +6076,7 @@ def main() -> None:
     owner_baseline_hash = stable_json_hash(owners_payload["owners"])
     controller_baseline_hash = stable_json_hash(controllers_payload["controllers"])
     core_baseline_hash = stable_json_hash(cores_payload["cores"])
+    generated_at = stage_metadata.get("generated_at") or utc_timestamp()
 
     manifest_payload["generated_at"] = generated_at
     audit_payload["generated_at"] = generated_at
@@ -5970,6 +6101,10 @@ def main() -> None:
     }
     manifest_payload["excluded_water_region_groups"] = ["mediterranean"]
 
+    context_land_mask_tolerance = stage_metadata["context_land_mask_tolerance"]
+    context_land_mask_area_delta_ratio = stage_metadata["context_land_mask_area_delta_ratio"]
+    context_land_mask_fallback_used = stage_metadata["context_land_mask_fallback_used"]
+
     for summary in (
         manifest_payload.get("summary", {}),
         audit_payload.get("summary", {}),
@@ -5984,6 +6119,8 @@ def main() -> None:
         summary["context_land_mask_fallback_used"] = context_land_mask_fallback_used
         summary["context_land_mask_arc_refs"] = context_land_mask_arc_refs
 
+    atlantropa_diagnostics = stage_metadata["atlantropa_diagnostics"]
+    med_water_diagnostics = stage_metadata["med_water_diagnostics"]
     diagnostics = audit_payload.setdefault("diagnostics", {})
     sea_coverage_hole_count_by_cluster = {
         region_id: int((med_water_diagnostics.get(region_id) or {}).get("remaining_hole_count") or 0)
@@ -5999,8 +6136,8 @@ def main() -> None:
     }
     diagnostics.pop("derived_from_scenario_id", None)
     diagnostics.update({
-        "source_root": str(tno_root),
-        "hgo_donor_root": str(hgo_root),
+        "source_root": stage_metadata["source_root"],
+        "hgo_donor_root": stage_metadata["hgo_donor_root"],
         "bookmark_file": "tno_1962.bundle",
         "as_of_date": "1962.1.1.12",
         "scenario_source": "tno_local_bundle_patch_v6",
@@ -6021,9 +6158,9 @@ def main() -> None:
         "romania_transnistria_applied": True,
         "finland_greater_finland_applied": True,
         "left_unapplied_action_ids": list(UNAPPLIED_ACTION_IDS),
-        "east_asia_owner_layer_tags": touched_east_asia_tags,
-        "south_asia_owner_layer_tags": touched_south_asia_tags,
-        "regional_owner_layer_tags": touched_regional_rule_tags,
+        "east_asia_owner_layer_tags": stage_metadata["touched_east_asia_tags"],
+        "south_asia_owner_layer_tags": stage_metadata["touched_south_asia_tags"],
+        "regional_owner_layer_tags": stage_metadata["touched_regional_rule_tags"],
         "atlantropa_geometry_source": "hgo_donor_provinces",
         "atlantropa_ownership_model": "dummy_tag_atl",
         "mediterranean_water_mode": "atl_sea_tiles_from_hgo_donor",
@@ -6041,40 +6178,150 @@ def main() -> None:
         "context_land_mask_area_delta_ratio": context_land_mask_area_delta_ratio,
         "context_land_mask_fallback_used": context_land_mask_fallback_used,
         "context_land_mask_arc_refs": context_land_mask_arc_refs,
-        "action_feature_counts": {key: len(value) for key, value in applied_annex_maps.items()},
+        "action_feature_counts": {key: len(value) for key, value in stage_metadata["applied_annex_maps"].items()},
         "atlantropa_region_stats": atlantropa_diagnostics,
-        "atlantropa_island_replacement_stats": island_replacement_diagnostics,
+        "atlantropa_island_replacement_stats": stage_metadata["island_replacement_diagnostics"],
         "mediterranean_water_region_stats": med_water_diagnostics,
         "sea_coverage_hole_count_by_cluster": sea_coverage_hole_count_by_cluster,
         "fallback_ocean_hit_count_by_cluster": fallback_ocean_hit_count_by_cluster,
         "pixel_fragment_count_by_cluster": pixel_fragment_count_by_cluster,
-        "atl_feature_count": len(atl_feature_ids),
-        "atl_sea_feature_count": len(atl_sea_feature_ids),
-        "coastal_restore_stats": restore_diagnostics,
-        "feature_assignment_override_diagnostics": feature_assignment_override_diagnostics,
+        "atl_feature_count": len(stage_metadata["atl_feature_ids"]),
+        "atl_sea_feature_count": len(stage_metadata["atl_sea_feature_ids"]),
+        "coastal_restore_stats": stage_metadata["restore_diagnostics"],
+        "feature_assignment_override_diagnostics": stage_metadata["feature_assignment_override_diagnostics"],
     })
 
-    write_json(SCENARIO_DIR / "countries.json", countries_payload)
-    write_json(SCENARIO_DIR / "owners.by_feature.json", owners_payload)
-    write_json(SCENARIO_DIR / "controllers.by_feature.json", controllers_payload)
-    write_json(SCENARIO_DIR / "cores.by_feature.json", cores_payload)
-    write_json(SCENARIO_DIR / "manifest.json", manifest_payload)
-    write_json(SCENARIO_DIR / "audit.json", audit_payload)
-    write_json(SCENARIO_DIR / "special_regions.geojson", runtime_special_regions)
-    write_json(SCENARIO_DIR / "water_regions.geojson", runtime_water_regions)
-    write_json(SCENARIO_DIR / "relief_overlays.geojson", relief_overlays_payload)
-    write_json(SCENARIO_DIR / "runtime_topology.topo.json", runtime_topology_payload)
+    stage_metadata["owner_baseline_hash"] = owner_baseline_hash
+    stage_metadata["controller_baseline_hash"] = controller_baseline_hash
+    stage_metadata["core_baseline_hash"] = core_baseline_hash
+    stage_metadata["context_land_mask_arc_refs"] = context_land_mask_arc_refs
+
+    full_state = dict(state)
+    full_state.update({
+        "runtime_topology_payload": runtime_topology_payload,
+        "runtime_special_regions": runtime_special_regions,
+        "runtime_water_regions": runtime_water_regions,
+        "owner_baseline_hash": owner_baseline_hash,
+        "context_land_mask_arc_refs": context_land_mask_arc_refs,
+        "stage_metadata": stage_metadata,
+    })
+    return full_state
+
+
+def build_bundle_state(scenario_dir: Path) -> dict[str, object]:
+    return build_runtime_topology_state_from_countries_state(build_countries_stage_state(scenario_dir))
+
+
+def write_countries_stage_checkpoints(state: dict[str, object], checkpoint_dir: Path) -> None:
+    checkpoint_dir.mkdir(parents=True, exist_ok=True)
+    write_checkpoint_json(checkpoint_dir, "countries.json", state["countries_payload"])
+    write_checkpoint_json(checkpoint_dir, "owners.by_feature.json", state["owners_payload"])
+    write_checkpoint_json(checkpoint_dir, "controllers.by_feature.json", state["controllers_payload"])
+    write_checkpoint_json(checkpoint_dir, "cores.by_feature.json", state["cores_payload"])
+    write_checkpoint_json(checkpoint_dir, "manifest.json", state["manifest_payload"])
+    write_checkpoint_json(checkpoint_dir, "audit.json", state["audit_payload"])
+    write_checkpoint_json(checkpoint_dir, CHECKPOINT_STAGE_METADATA_FILENAME, state["stage_metadata"])
+    write_checkpoint_gdf(checkpoint_dir, CHECKPOINT_SCENARIO_POLITICAL_FILENAME, state["scenario_political_gdf"])
+    write_checkpoint_gdf(checkpoint_dir, CHECKPOINT_SCENARIO_WATER_SEED_FILENAME, state["water_gdf"])
+    write_checkpoint_json(checkpoint_dir, CHECKPOINT_RELIEF_FILENAME, state["relief_overlays_payload"])
+    write_checkpoint_gdf(checkpoint_dir, CHECKPOINT_LAND_MASK_FILENAME, state["land_mask_gdf"])
+    write_checkpoint_gdf(checkpoint_dir, CHECKPOINT_CONTEXT_LAND_MASK_FILENAME, state["context_land_mask_gdf"])
+
+
+def load_countries_stage_checkpoints(checkpoint_dir: Path) -> dict[str, object]:
+    return {
+        "countries_payload": load_checkpoint_json(checkpoint_dir, "countries.json"),
+        "owners_payload": load_checkpoint_json(checkpoint_dir, "owners.by_feature.json"),
+        "controllers_payload": load_checkpoint_json(checkpoint_dir, "controllers.by_feature.json"),
+        "cores_payload": load_checkpoint_json(checkpoint_dir, "cores.by_feature.json"),
+        "manifest_payload": load_checkpoint_json(checkpoint_dir, "manifest.json"),
+        "audit_payload": load_checkpoint_json(checkpoint_dir, "audit.json"),
+        "scenario_political_gdf": load_checkpoint_gdf(checkpoint_dir, CHECKPOINT_SCENARIO_POLITICAL_FILENAME),
+        "water_gdf": load_checkpoint_gdf(checkpoint_dir, CHECKPOINT_SCENARIO_WATER_SEED_FILENAME),
+        "relief_overlays_payload": load_checkpoint_json(checkpoint_dir, CHECKPOINT_RELIEF_FILENAME),
+        "land_mask_gdf": load_checkpoint_gdf(checkpoint_dir, CHECKPOINT_LAND_MASK_FILENAME),
+        "context_land_mask_gdf": load_checkpoint_gdf(checkpoint_dir, CHECKPOINT_CONTEXT_LAND_MASK_FILENAME),
+        "stage_metadata": load_checkpoint_json(checkpoint_dir, CHECKPOINT_STAGE_METADATA_FILENAME),
+    }
+
+
+def write_runtime_topology_stage_checkpoints(state: dict[str, object], checkpoint_dir: Path) -> None:
+    checkpoint_dir.mkdir(parents=True, exist_ok=True)
+    write_countries_stage_checkpoints(state, checkpoint_dir)
+    write_checkpoint_json(checkpoint_dir, "special_regions.geojson", state["runtime_special_regions"])
+    write_checkpoint_json(checkpoint_dir, CHECKPOINT_WATER_FILENAME, state["runtime_water_regions"])
+    write_checkpoint_json(checkpoint_dir, CHECKPOINT_RELIEF_FILENAME, state["relief_overlays_payload"])
+    write_checkpoint_json(checkpoint_dir, "runtime_topology.topo.json", state["runtime_topology_payload"])
+
+
+def ensure_runtime_topology_checkpoints(scenario_dir: Path, checkpoint_dir: Path) -> None:
+    countries_stage_required = [
+        "countries.json",
+        "owners.by_feature.json",
+        "controllers.by_feature.json",
+        "cores.by_feature.json",
+        "manifest.json",
+        "audit.json",
+        CHECKPOINT_SCENARIO_POLITICAL_FILENAME,
+        CHECKPOINT_SCENARIO_WATER_SEED_FILENAME,
+        CHECKPOINT_RELIEF_FILENAME,
+        CHECKPOINT_LAND_MASK_FILENAME,
+        CHECKPOINT_CONTEXT_LAND_MASK_FILENAME,
+        CHECKPOINT_STAGE_METADATA_FILENAME,
+    ]
+    required = [
+        *countries_stage_required,
+        "runtime_topology.topo.json",
+    ]
+    if all(checkpoint_path(checkpoint_dir, filename).exists() for filename in required):
+        return
+    if all(checkpoint_path(checkpoint_dir, filename).exists() for filename in countries_stage_required):
+        state = build_runtime_topology_stage(checkpoint_dir)
+    else:
+        state = build_runtime_topology_state_from_countries_state(build_countries_stage_state(scenario_dir))
+    write_runtime_topology_stage_checkpoints(state, checkpoint_dir)
+
+
+def build_runtime_topology_stage(checkpoint_dir: Path) -> dict[str, object]:
+    return build_runtime_topology_state_from_countries_state(load_countries_stage_checkpoints(checkpoint_dir))
+
+
+def build_geo_locale_stage(scenario_dir: Path, checkpoint_dir: Path) -> None:
+    ensure_runtime_topology_checkpoints(scenario_dir, checkpoint_dir)
     build_tno_geo_locale_patch(
         scenario_id=SCENARIO_ID,
-        scenario_dir=SCENARIO_DIR,
+        scenario_dir=checkpoint_dir,
         locales_path=ROOT / "data/locales.json",
-        manual_overrides_path=SCENARIO_DIR / "geo_name_overrides.manual.json",
-        output_path=SCENARIO_DIR / "geo_locale_patch.json",
+        manual_overrides_path=scenario_dir / "geo_name_overrides.manual.json",
+        output_path=checkpoint_dir / "geo_locale_patch.json",
     )
 
+
+def write_bundle_stage(scenario_dir: Path, checkpoint_dir: Path) -> None:
+    scenario_dir.mkdir(parents=True, exist_ok=True)
+    for filename in PUBLISH_FILENAMES:
+        payload = load_checkpoint_json(checkpoint_dir, filename)
+        write_json(scenario_dir / filename, payload)
+
+
+def print_bundle_summary(state: dict[str, object]) -> None:
+    runtime_water_regions = state["runtime_water_regions"]
+    stage_metadata = state.get("stage_metadata", {}) or {}
+    atl_feature_ids = state.get("atl_feature_ids") or stage_metadata.get("atl_feature_ids") or []
+    atl_sea_feature_ids = state.get("atl_sea_feature_ids") or stage_metadata.get("atl_sea_feature_ids") or []
+    context_land_mask_tolerance = state.get("context_land_mask_tolerance", stage_metadata.get("context_land_mask_tolerance"))
+    context_land_mask_area_delta_ratio = state.get(
+        "context_land_mask_area_delta_ratio",
+        stage_metadata.get("context_land_mask_area_delta_ratio"),
+    )
+    context_land_mask_fallback_used = state.get(
+        "context_land_mask_fallback_used",
+        stage_metadata.get("context_land_mask_fallback_used"),
+    )
+    context_land_mask_arc_refs = state.get("context_land_mask_arc_refs", stage_metadata.get("context_land_mask_arc_refs"))
     print("Rebuilt tno_1962 bundle with HGO donor Atlantropa features.")
-    print(f"Owners baseline hash: {owner_baseline_hash}")
-    print(f"Political features: {len(owners_payload['owners'])}")
+    print(f"Owners baseline hash: {state['owner_baseline_hash']}")
+    print(f"Political features: {len(state['owners_payload']['owners'])}")
     print(f"ATL land features: {len(atl_feature_ids)}")
     print(f"ATL sea features: {len(atl_sea_feature_ids)}")
     print(f"Water regions: {len(runtime_water_regions['features'])}")
@@ -6087,6 +6334,42 @@ def main() -> None:
             "arc_refs": context_land_mask_arc_refs,
         },
     )
+
+
+def main() -> None:
+    args = parse_args()
+    scenario_dir = Path(args.scenario_dir).resolve()
+    checkpoint_dir = Path(args.checkpoint_dir).resolve()
+
+    if args.stage == STAGE_COUNTRIES:
+        state = build_countries_stage_state(scenario_dir)
+        write_countries_stage_checkpoints(state, checkpoint_dir)
+        print(f"Wrote countries-stage checkpoints to {checkpoint_dir}")
+        return
+
+    if args.stage == STAGE_RUNTIME_TOPOLOGY:
+        state = build_runtime_topology_stage(checkpoint_dir)
+        write_runtime_topology_stage_checkpoints(state, checkpoint_dir)
+        print_bundle_summary(state)
+        return
+
+    if args.stage == STAGE_GEO_LOCALE:
+        build_geo_locale_stage(scenario_dir, checkpoint_dir)
+        print(f"Updated geo locale checkpoint: {checkpoint_path(checkpoint_dir, 'geo_locale_patch.json')}")
+        return
+
+    if args.stage == STAGE_WRITE_BUNDLE:
+        write_bundle_stage(scenario_dir, checkpoint_dir)
+        print(f"Published checkpoint bundle to {scenario_dir}")
+        return
+
+    countries_state = build_countries_stage_state(scenario_dir)
+    write_countries_stage_checkpoints(countries_state, checkpoint_dir)
+    state = build_runtime_topology_stage(checkpoint_dir)
+    write_runtime_topology_stage_checkpoints(state, checkpoint_dir)
+    build_geo_locale_stage(scenario_dir, checkpoint_dir)
+    write_bundle_stage(scenario_dir, checkpoint_dir)
+    print_bundle_summary(state)
 
 
 def pd_concat_geodataframes(gdfs: list[gpd.GeoDataFrame]) -> gpd.GeoDataFrame:
