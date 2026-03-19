@@ -407,6 +407,19 @@
       ]
     },
     {
+      "tag": "BRI",
+      "parent_owner_tag": "FRA",
+      "release_lookup_iso2": "FR",
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "preset_source": {
+        "type": "legacy_preset_name",
+        "name": "Brittany"
+      },
+      "notes": "French internal releasable. Runtime geometry reuses the existing Brittany preset."
+    },
+    {
       "tag": "CRO",
       "display_name_override": "Independent State of Croatia",
       "color_hex_override": "#5a8f55",

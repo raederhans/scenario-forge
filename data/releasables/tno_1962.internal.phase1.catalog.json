@@ -436,6 +436,41 @@
       "notes": "Burgundian releasable with current TNO, Franco-Burgundian War, and early maximum boundary variants."
     },
     {
+      "tag": "BRI",
+      "display_name": "Brittany",
+      "color_hex": "#766397",
+      "capital_state_id": 14,
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "release_lookup_iso2": "FR",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "scenario_only": true,
+      "allow_manual_overlay": false,
+      "preset_source": {
+        "type": "legacy_preset_name",
+        "name": "Brittany",
+        "group_ids": [],
+        "feature_ids": [],
+        "exclude_group_ids": [],
+        "exclude_feature_ids": []
+      },
+      "default_boundary_variant_id": "",
+      "boundary_variants": [],
+      "companion_actions": [],
+      "core_state_ids": [
+        14
+      ],
+      "resolved_feature_count_hint": null,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "French internal releasable. Runtime geometry reuses the existing Brittany preset."
+    },
+    {
       "tag": "CRO",
       "display_name": "Independent State of Croatia",
       "color_hex": "#5a8f55",
@@ -1138,7 +1173,7 @@
   ],
   "excluded": [],
   "summary": {
-    "entry_count": 10,
+    "entry_count": 11,
     "excluded_count": 0,
     "validation_error_count": 0
   }

@@ -4783,9 +4783,9 @@ def patch_tno_europe_baseline(
         controllers_payload=controllers_payload,
         cores_payload=cores_payload,
     )
-    applied["brittany_to_bri"] = assign_feature_bundle(
+    applied["brittany_to_fra"] = assign_feature_bundle(
         feature_ids=TNO_1962_BRITTANY_FEATURE_IDS,
-        target_tag="BRI",
+        target_tag="FRA",
         owners_payload=owners_payload,
         controllers_payload=controllers_payload,
         cores_payload=cores_payload,
@@ -4836,21 +4836,7 @@ def patch_tno_europe_baseline(
         color_hex="#b066b4",
         notes="TNO 1962 baseline independent Armenia released from Reichskommissariat Kaukasien.",
     )
-    countries["BRI"] = build_manual_country_entry(
-        tag="BRI",
-        existing_entry=countries.get("BRI"),
-        palette_entries=palette_entries,
-        feature_count=len(TNO_1962_BRITTANY_FEATURE_IDS),
-        continent_id="continent_europe",
-        continent_label="Europe",
-        subregion_id="subregion_western_europe",
-        subregion_label="Western Europe",
-        base_iso2="FR",
-        lookup_iso2="FR",
-        provenance_iso2="FR",
-        color_hex="#766397",
-        notes="TNO 1962 baseline independent Brittany released from France.",
-    )
+    countries.pop("BRI", None)
     countries["BRG"] = build_manual_country_entry(
         tag="BRG",
         existing_entry=countries.get("BRG") or countries.get("RKB"),
