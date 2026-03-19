@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "blank_base",
-  "generated_at": "2026-03-17T01:21:53.752894+00:00",
+  "generated_at": "2026-03-17T04:10:44.164493+00:00",
   "entry_count": 172,
   "missing_tag_count": 2,
   "missing_tags": [
@@ -3965,5 +3965,11 @@
       "confidence": "high",
       "candidate_count": 23
     }
-  ]
+  ],
+  "audit": {
+    "rejected_candidate_count": 0,
+    "rejected_candidates": [],
+    "featured_runtime_missing_count": 0,
+    "featured_runtime_missing_tags": []
+  }
 }

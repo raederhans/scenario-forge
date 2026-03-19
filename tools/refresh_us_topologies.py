@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+import shutil
 import sys
 
 import geopandas as gpd
@@ -19,6 +20,8 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from map_builder import config as cfg
+from map_builder.io.readers import read_json_strict
+from map_builder.io.writers import write_json_atomic
 from map_builder.processors.north_america import (
     _US_TERRITORY_CODES,
     _build_adjacency,
@@ -87,10 +90,10 @@ def _parse_args() -> argparse.Namespace:
 
 
 def _load_topology_dict(path: Path) -> dict:
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except UnicodeDecodeError:
-        return json.loads(path.read_text(encoding="utf-8-sig"))
+    payload = read_json_strict(path)
+    if not isinstance(payload, dict):
+        raise ValueError(f"Expected JSON object in {path}, found {type(payload).__name__}.")
+    return payload
 
 
 def _load_detail_layers(path: Path) -> dict[str, gpd.GeoDataFrame]:
@@ -318,7 +321,9 @@ def main() -> None:
     args = _parse_args()
     previous_detail_path = args.previous_detail_topology
     if not previous_detail_path.exists():
-        previous_detail_path = args.detail_topology
+        previous_detail_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(args.detail_topology, previous_detail_path)
+        print(f"[US refresh] Created previous detail snapshot: {previous_detail_path}")
 
     detail_political, detail_metrics = _refresh_detail_topology(
         detail_path=args.detail_topology,
@@ -337,8 +342,13 @@ def main() -> None:
         **detail_metrics,
         **runtime_metrics,
     }
-    args.report_path.parent.mkdir(parents=True, exist_ok=True)
-    args.report_path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    write_json_atomic(
+        args.report_path,
+        report,
+        ensure_ascii=False,
+        indent=2,
+        trailing_newline=True,
+    )
     print(json.dumps(report, indent=2, ensure_ascii=False))
 
 

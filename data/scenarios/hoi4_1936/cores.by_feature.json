@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "scenario_id": "hoi4_1939",
-  "generated_at": "2026-03-17T00:58:28.201430+00:00",
-  "baseline_hash": "147efd690d39a08b7975288bfbd3a991daf1544b2db5c06dd62e131553605678",
+  "scenario_id": "hoi4_1936",
+  "generated_at": "2026-03-17T04:09:09.138458+00:00",
+  "baseline_hash": "557e518139934d41ace728bd3ceabc63ae5998d9e40a8c073bdac2a76fa5c6d8",
   "cores": {
     "AFG-1741": [
       "AFG"
@@ -35488,9 +35488,6 @@
     "RU_ARCTIC_FB_819": [
       "SOV"
     ],
-    "RU_ARCTIC_FB_820": [
-      "SOV"
-    ],
     "RU_ARCTIC_FB_821": [
       "SOV"
     ],
@@ -61219,9 +61216,6 @@
     "RU_ARCTIC_FB_8542": [
       "SOV"
     ],
-    "RU_ARCTIC_FB_8543": [
-      "SOV"
-    ],
     "RU_ARCTIC_FB_8544": [
       "SOV"
     ],
@@ -61978,9 +61972,6 @@
     "RU_ARCTIC_FB_8805": [
       "SOV"
     ],
-    "RU_ARCTIC_FB_8806": [
-      "SOV"
-    ],
     "RU_ARCTIC_FB_8807": [
       "SOV"
     ],
@@ -62533,9 +62524,6 @@
     "RU_ARCTIC_FB_9005": [
       "SOV"
     ],
-    "RU_ARCTIC_FB_9006": [
-      "SOV"
-    ],
     "RU_ARCTIC_FB_9007": [
       "SOV"
     ],
@@ -62720,9 +62708,6 @@
       "SOV"
     ],
     "RU_ARCTIC_FB_9075": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_9076": [
       "SOV"
     ],
     "RU_ARCTIC_FB_9077": [
@@ -63262,9 +63247,6 @@
     "RU_ARCTIC_FB_9220": [
       "SOV"
     ],
-    "RU_ARCTIC_FB_9223": [
-      "SOV"
-    ],
     "RU_ARCTIC_FB_9224": [
       "SOV"
     ],
@@ -63556,9 +63538,6 @@
     "RU_ARCTIC_FB_9355": [
       "SOV"
     ],
-    "RU_ARCTIC_FB_9356": [
-      "SOV"
-    ],
     "RU_ARCTIC_FB_9357": [
       "SOV"
     ],
@@ -63626,9 +63605,6 @@
       "SOV"
     ],
     "RU_ARCTIC_FB_9383": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_9384": [
       "SOV"
     ],
     "RU_ARCTIC_FB_9385": [
@@ -64126,9 +64102,6 @@
     "RU_ARCTIC_FB_9580": [
       "SOV"
     ],
-    "RU_ARCTIC_FB_9581": [
-      "SOV"
-    ],
     "RU_ARCTIC_FB_9582": [
       "SOV"
     ],
@@ -64595,9 +64568,6 @@
       "SOV"
     ],
     "RU_ARCTIC_FB_9783": [
-      "SOV"
-    ],
-    "RU_ARCTIC_FB_9784": [
       "SOV"
     ],
     "RU_ARCTIC_FB_9788": [

@@ -2,12 +2,17 @@
 from __future__ import annotations
 
 import argparse
-import json
 from datetime import datetime, timezone
 from pathlib import Path
-
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from map_builder.io.readers import read_json_strict
+from map_builder.io.writers import write_json_atomic
+
 DEFAULT_SCENARIO_ID = "tno_1962"
 DEFAULT_SCENARIO_DIR = ROOT / "data" / "scenarios" / DEFAULT_SCENARIO_ID
 DEFAULT_LOCALES_PATH = ROOT / "data" / "locales.json"
@@ -28,12 +33,11 @@ def normalize_text(value: object) -> str:
 
 
 def read_json(path: Path) -> object:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return read_json_strict(path)
 
 
 def write_json(path: Path, payload: object) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_json_atomic(path, payload, ensure_ascii=False, indent=2, trailing_newline=True)
 
 
 def normalize_locale_entry(source: object) -> dict[str, str] | None:
@@ -75,6 +79,20 @@ def build_patch(*, scenario_id: str, scenario_dir: Path, locales_path: Path, man
     omitted_features: list[dict[str, str]] = []
     safe_feature_copies = 0
     manual_feature_overrides = 0
+    raw_name_feature_ids: dict[str, list[str]] = {}
+
+    for geometry in political_geometries:
+        properties = geometry.get("properties", {}) if isinstance(geometry, dict) else {}
+        feature_id = normalize_text(properties.get("id") or geometry.get("id"))
+        raw_name = normalize_text(properties.get("name") or properties.get("label"))
+        if feature_id and raw_name:
+            raw_name_feature_ids.setdefault(raw_name, []).append(feature_id)
+
+    ambiguous_raw_names = {
+        raw_name: sorted(feature_ids)
+        for raw_name, feature_ids in raw_name_feature_ids.items()
+        if len(feature_ids) > 1
+    }
 
     for geometry in political_geometries:
         properties = geometry.get("properties", {}) if isinstance(geometry, dict) else {}
@@ -94,12 +112,28 @@ def build_patch(*, scenario_id: str, scenario_dir: Path, locales_path: Path, man
         locale_en = normalize_text(normalized_locale.get("en")) if normalized_locale else ""
         locale_zh = normalize_text(normalized_locale.get("zh")) if normalized_locale else ""
 
-        if raw_name and locale_zh and locale_en == raw_name:
+        raw_name_is_unique = bool(raw_name) and raw_name not in ambiguous_raw_names
+
+        if raw_name and locale_zh and locale_en == raw_name and raw_name_is_unique:
             geo[feature_id] = {
                 "en": raw_name,
                 "zh": locale_zh,
             }
             safe_feature_copies += 1
+            continue
+
+        if raw_name and locale_zh and locale_en == raw_name and not raw_name_is_unique:
+            collision_candidates.append(
+                {
+                    "feature_id": feature_id,
+                    "owner_tag": owner_tag,
+                    "raw_name": raw_name,
+                    "locale_en": locale_en,
+                    "locale_zh": locale_zh,
+                    "reason": "non_unique_raw_name",
+                    "matching_feature_ids": ambiguous_raw_names.get(raw_name, []),
+                }
+            )
             continue
 
         if raw_name and locale_en and locale_en != raw_name:
@@ -110,6 +144,7 @@ def build_patch(*, scenario_id: str, scenario_dir: Path, locales_path: Path, man
                     "raw_name": raw_name,
                     "locale_en": locale_en,
                     "locale_zh": locale_zh,
+                    "reason": "locale_en_mismatch",
                 }
             )
             continue
@@ -137,6 +172,14 @@ def build_patch(*, scenario_id: str, scenario_dir: Path, locales_path: Path, man
         "audit": {
             "safe_feature_copies": safe_feature_copies,
             "manual_feature_overrides": manual_feature_overrides,
+            "ambiguous_raw_name_count": len(ambiguous_raw_names),
+            "ambiguous_raw_name_sample": [
+                {
+                    "raw_name": raw_name,
+                    "feature_ids": ambiguous_raw_names[raw_name],
+                }
+                for raw_name in sorted(ambiguous_raw_names)[:200]
+            ],
             "collision_candidates": sorted(
                 collision_candidates,
                 key=lambda row: (row.get("owner_tag", ""), row.get("feature_id", "")),

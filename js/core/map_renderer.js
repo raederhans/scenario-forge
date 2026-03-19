@@ -37,6 +37,7 @@ import {
   setFeatureOwnerCodes,
   resetFeatureOwnerCodes,
 } from "./sovereignty_manager.js";
+import { COUNTRY_CODE_ALIASES, normalizeCountryCodeAlias } from "./country_code_aliases.js";
 
 let mapContainer = null;
 let mapCanvas = null;
@@ -97,10 +98,6 @@ const RELIEF_LAKE_SHORELINE_COLOR = "rgba(214, 232, 244, 0.92)";
 const RELIEF_DAM_APPROACH_COLOR = "rgba(102, 86, 62, 0.8)";
 const GIANT_FEATURE_CULL_RATIO = 0.95;
 const GIANT_FEATURE_ALLOWLIST = new Set(["RU", "CA", "CN", "US", "AQ", "ATA"]);
-const COUNTRY_CODE_ALIASES = {
-  UK: "GB",
-  EL: "GR",
-};
 const INTERACTIVE_AGGREGATE_TIER_FILTERS = {
   GB: new Set(["nuts1_basic"]),
   GR: new Set(["adm1_basic"]),
@@ -876,9 +873,7 @@ function recordSkipDiagnostic(feature, decision) {
 }
 
 function canonicalCountryCode(rawCode) {
-  const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
-  if (!code) return "";
-  return COUNTRY_CODE_ALIASES[code] || code;
+  return normalizeCountryCodeAlias(rawCode);
 }
 
 function getColorByCanonicalCountryCode(colorMap, canonicalCode) {

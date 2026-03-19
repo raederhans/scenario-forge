@@ -100,7 +100,14 @@ if REQUESTED_MODE != "palettes":
         smart_island_cull,
     )
     from map_builder.io.fetch import fetch_ne_zip, fetch_or_load_geojson
-    from map_builder.io.readers import load_physical, load_rivers, load_urban
+    from map_builder.io.readers import (
+        load_physical,
+        load_rivers,
+        load_urban,
+        read_json_optional,
+        read_json_strict,
+    )
+    from map_builder.io.writers import write_json_atomic
     from map_builder.processors.admin1 import build_extension_admin1, extract_country_code
     from map_builder.processors.china import apply_china_replacement
     from map_builder.processors.detail_shell_coverage import (
@@ -702,8 +709,7 @@ def _record_stage_timing(timings: dict[str, dict], stage_name: str, start_time: 
 def _write_timings_json(path: Path | None, timings: dict[str, dict]) -> None:
     if path is None:
         return
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(timings, indent=2, ensure_ascii=False), encoding="utf-8")
+    write_json_atomic(path, timings, ensure_ascii=False, indent=2)
 
 
 def _candidate_topology_path(path: Path) -> Path:
@@ -916,12 +922,7 @@ def _promote_candidate_topology_if_safe(
 
 
 def _read_optional_json(path: Path | None) -> dict | None:
-    if path is None or not path.exists():
-        return None
-    try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
-        return None
+    payload = read_json_optional(path, default=None)
     return payload if isinstance(payload, dict) else None
 
 
@@ -942,18 +943,13 @@ def _describe_path_state(path: Path) -> dict[str, object]:
 
 def _load_build_stage_cache(output_dir: Path) -> dict[str, dict]:
     cache_path = output_dir / BUILD_STAGE_CACHE_FILENAME
-    if not cache_path.exists():
-        return {}
-    try:
-        payload = json.loads(cache_path.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
+    payload = read_json_optional(cache_path, default={})
     return payload if isinstance(payload, dict) else {}
 
 
 def _write_build_stage_cache(output_dir: Path, cache_payload: dict[str, dict]) -> None:
     cache_path = output_dir / BUILD_STAGE_CACHE_FILENAME
-    cache_path.write_text(json.dumps(cache_payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    write_json_atomic(cache_path, cache_payload, ensure_ascii=False, indent=2)
 
 
 def _compute_stage_signature(
@@ -1254,20 +1250,20 @@ def _compute_water_region_neighbors(water_regions: gpd.GeoDataFrame) -> gpd.GeoD
         return water_regions
     indexed = list(water_regions[["id", "geometry"]].itertuples(index=False, name=None))
     neighbors_by_id: dict[str, set[str]] = {feature_id: set() for feature_id, _ in indexed}
+    sindex = water_regions.sindex
     for left_index, (left_id, left_geom) in enumerate(indexed):
         if left_geom is None or left_geom.is_empty:
             continue
-        left_bounds = left_geom.bounds
-        for right_id, right_geom in indexed[left_index + 1 :]:
-            if right_geom is None or right_geom.is_empty:
+        try:
+            candidate_indexes = list(sindex.query(left_geom, predicate="intersects"))
+        except TypeError:
+            candidate_indexes = list(sindex.intersection(left_geom.bounds))
+        for right_index in candidate_indexes:
+            right_index = int(right_index)
+            if right_index <= left_index:
                 continue
-            right_bounds = right_geom.bounds
-            if (
-                left_bounds[2] < right_bounds[0]
-                or right_bounds[2] < left_bounds[0]
-                or left_bounds[3] < right_bounds[1]
-                or right_bounds[3] < left_bounds[1]
-            ):
+            right_id, right_geom = indexed[right_index]
+            if right_geom is None or right_geom.is_empty:
                 continue
             if not (left_geom.touches(right_geom) or left_geom.intersects(right_geom)):
                 continue
@@ -1593,12 +1589,23 @@ def despeckle_hybrid(
         print("Despeckle removed all geometries, keeping original hybrid.")
         return gdf
 
-    dissolved = filtered.dissolve(by="id", aggfunc={"name": "first", "cntr_code": "first"})
+    aggfunc = {
+        column: "first"
+        for column in filtered.columns
+        if column not in {"geometry", "id"}
+    }
+    dissolved = filtered.dissolve(by="id", aggfunc=aggfunc)
     dissolved = dissolved.reset_index()
-    dissolved = dissolved.set_crs(gdf.crs)
+    if dissolved.crs is None and gdf.crs is not None:
+        dissolved = dissolved.set_crs(gdf.crs, allow_override=True)
     dissolved["geometry"] = dissolved.geometry.simplify(
         tolerance=tolerance, preserve_topology=True
     )
+    missing_cols = sorted(
+        {column for column in gdf.columns if column != "geometry"} - set(dissolved.columns)
+    )
+    if missing_cols:
+        raise ValueError(f"Despeckle dropped required columns: {missing_cols}")
     return dissolved
 
 
@@ -2292,7 +2299,10 @@ def parse_args() -> argparse.Namespace:
 
 
 def _read_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
+    payload = read_json_strict(path)
+    if not isinstance(payload, dict):
+        raise ValueError(f"Expected JSON object in {path}, found {type(payload).__name__}.")
+    return payload
 
 
 def _sha256_file(path: Path) -> str:
@@ -3054,7 +3064,7 @@ def write_data_manifest(output_dir: Path) -> Path:
         "outputs": outputs,
     }
     manifest_path = output_dir / "manifest.json"
-    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_json_atomic(manifest_path, manifest, ensure_ascii=False, indent=2)
     print(f"[Manifest] Wrote {manifest_path}")
     return manifest_path
 
@@ -3249,7 +3259,7 @@ def run_geo_alias_normalization(output_dir: Path) -> None:
     topology_path = geo_key_normalizer.resolve_default_topology(Path(__file__).resolve().parent)
     payload = geo_key_normalizer.normalize_geokeys(topology_path)
     output_path = output_dir / "geo_aliases.json"
-    output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_json_atomic(output_path, payload, ensure_ascii=False, indent=2)
     print(
         f"OK: geo aliases generated. entries={payload['entry_count']}, "
         f"aliases={payload['alias_count']}, conflicts={payload['conflict_count']}"

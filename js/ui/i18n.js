@@ -1,5 +1,6 @@
 // Translation helpers (Phase 13)
 import { state } from "../core/state.js";
+import { normalizeCountryCodeAlias } from "../core/country_code_aliases.js";
 
 function resolveGeoLocaleEntry(key) {
   const geoLocales = state.locales?.geo || {};
@@ -134,13 +135,8 @@ function getGeoFeatureDisplayLabel(feature, fallback = "") {
 function t(key, type = "geo") {
   if (!key) return "";
   const entry = type === "geo" ? resolveGeoLocaleEntry(key) : state.locales?.[type]?.[key];
-  if (state.currentLanguage === "zh") {
-    return entry?.zh || key;
-  }
-  if (type === "geo") {
-    return entry?.en || key;
-  }
-  return key;
+  const lang = state.currentLanguage === "zh" ? "zh" : "en";
+  return entry?.[lang] || entry?.en || key;
 }
 
 function updateUIText() {
@@ -154,8 +150,12 @@ function updateUIText() {
     ["lblColorLibraryHint", "Browse the full palette library for manual work and palette reference."],
     ["lblPaletteSearch", "Search Colors"],
     ["lblScenario", "Scenario"],
+    ["lblAppHint", "Click countries to paint. Use the dock below the map for quick tools and the left panel for deeper controls."],
     ["lblScenarioHint", "Load a bundled historical setup and reset to its baseline."],
     ["lblScenarioSelect", "Scenario"],
+    ["optScenarioNone", "None"],
+    ["optScenarioOwnership", "Ownership"],
+    ["optScenarioFrontline", "Frontline"],
     ["applyScenarioBtn", "Apply"],
     ["resetScenarioBtn", "Reset Changes To Baseline"],
     ["clearScenarioBtn", "Exit Scenario"],
@@ -189,6 +189,10 @@ function updateUIText() {
     ["labelMapStyle", "Appearance"],
     ["appearanceTabOcean", "Ocean"],
     ["appearanceTabBorders", "Borders"],
+    ["lblBordersPanel", "Borders"],
+    ["lblInternalBorders", "Internal Borders"],
+    ["lblEmpireBorders", "Empire Borders"],
+    ["lblCoastlines", "Coastlines"],
     ["appearanceTabLayers", "Context Layers"],
     ["appearanceTabDayNight", "Day / Night"],
     ["appearanceTabTexture", "Texture"],
@@ -256,10 +260,18 @@ function updateUIText() {
     ["lblPhysicalContourMinorInterval", "Minor Interval (m)"],
     ["lblPhysicalContourLowReliefCutoff", "Low-Relief Cutoff (m)"],
     ["lblPhysicalBlendMode", "Blend Mode"],
+    ["optPhysicalBlendMultiply", "Multiply"],
+    ["optPhysicalBlendSoftLight", "Soft Light"],
+    ["optPhysicalBlendOverlay", "Overlay"],
+    ["optPhysicalBlendNormal", "Normal"],
+    ["lblUrbanPanel", "Urban Areas"],
     ["lblUrbanLayer", "Urban Areas"],
     ["lblUrbanColor", "Color"],
     ["lblUrbanOpacity", "Opacity"],
     ["lblUrbanBlendMode", "Blend Mode"],
+    ["optUrbanBlendMultiply", "Multiply"],
+    ["optUrbanBlendNormal", "Normal"],
+    ["optUrbanBlendOverlay", "Overlay"],
     ["lblUrbanMinArea", "Min Area (px)"],
     ["lblCityPointsPanel", "City Points"],
     ["lblCityPointsLayer", "City Points"],
@@ -303,7 +315,12 @@ function updateUIText() {
     ["lblRiversOutlineColor", "Outline Color"],
     ["lblRiversOutlineWidth", "Outline Width"],
     ["lblRiversDashStyle", "Dash"],
+    ["lblRiversPanel", "Rivers"],
+    ["optRiversDashSolid", "Solid"],
+    ["optRiversDashDashed", "Dashed"],
+    ["optRiversDashDotted", "Dotted"],
     ["lblWaterRegions", "Water Regions"],
+    ["lblWaterRegionsPanel", "Water Regions"],
     ["lblOpenOceanRegions", "Allow Open-Ocean Interaction"],
     ["labelPresetPolitical", "Auto-Fill Countries"],
     ["presetClear", "Clear Map"],
@@ -353,8 +370,15 @@ function updateUIText() {
     ["lblSpecialZonesOpacity", "Opacity"],
     ["lblSpecialZonesStrokeWidth", "Stroke Width"],
     ["lblSpecialZonesDashStyle", "Dash"],
+    ["lblSpecialZonesStylePanel", "Special Zones Style"],
+    ["optSpecialZonesDashSolid", "Solid"],
+    ["optSpecialZonesDashDashed", "Dashed"],
+    ["optSpecialZonesDashDotted", "Dotted"],
     ["lblSpecialZoneEditor", "Special Zone Editor"],
     ["lblSpecialZoneType", "Type"],
+    ["optSpecialZoneDisputed", "Disputed"],
+    ["optSpecialZoneWasteland", "Wasteland"],
+    ["optSpecialZoneCustom", "Custom"],
     ["lblSpecialZoneLabel", "Label"],
     ["specialZoneStartBtn", "Start Draw"],
     ["specialZoneUndoBtn", "Undo Vertex"],
@@ -370,6 +394,12 @@ function updateUIText() {
     ["downloadProjectBtn", "Download Project"],
     ["uploadProjectBtn", "Load Project"],
     ["lblProjectFile", "Selected File"],
+    ["lblUtilities", "Utilities"],
+    ["lblReferenceOpacity", "Opacity"],
+    ["lblReferenceScale", "Scale"],
+    ["lblReferenceOffsetX", "Offset X"],
+    ["lblReferenceOffsetY", "Offset Y"],
+    ["lblExportInfoTooltip", "Export the visible map as a PNG or JPG snapshot."],
     ["lblLegendEditor", "Legend Editor"],
     ["lblLegendHint", "Paint regions to generate a legend."],
     ["debugOptionPROD", "Normal View"],
@@ -569,11 +599,6 @@ function initTranslations() {
   updateUIText();
 }
 
-const TOOLTIP_COUNTRY_CODE_ALIASES = {
-  UK: "GB",
-  EL: "GR",
-};
-
 function getTooltipFeatureId(feature) {
   const raw =
     feature?.properties?.id ??
@@ -584,9 +609,7 @@ function getTooltipFeatureId(feature) {
 }
 
 function normalizeTooltipCountryCode(rawCode) {
-  const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
-  if (!code) return "";
-  return TOOLTIP_COUNTRY_CODE_ALIASES[code] || code;
+  return normalizeCountryCodeAlias(rawCode);
 }
 
 function extractTooltipCountryCodeFromId(value) {
@@ -679,7 +702,7 @@ function getTooltipAdmin1Name(feature, { regionName = "", countryDisplayName = "
 }
 
 function buildLegacyTooltipModel(feature, { isWaterRegion = false, isSpecialRegion = false } = {}) {
-  const fallback = isWaterRegion ? "Unknown Water Region" : "Unknown Region";
+  const fallback = isWaterRegion ? t("Unknown Water Region", "ui") : t("Unknown Region", "ui");
   const name = getTooltipRegionName(feature, fallback);
   const code = getTooltipFeatureCountryCode(feature);
   const labelKey = isWaterRegion ? "Water Region" : "Region";
@@ -726,7 +749,7 @@ function buildTooltipModel(feature) {
     return buildLegacyTooltipModel(feature, { isWaterRegion, isSpecialRegion });
   }
 
-  const regionName = getTooltipRegionName(feature, "Unknown Region");
+  const regionName = getTooltipRegionName(feature, t("Unknown Region", "ui"));
   const { countryCode, countryDisplayName } = getTooltipCountryContext(feature);
   const admin1Name = getTooltipAdmin1Name(feature, {
     regionName,

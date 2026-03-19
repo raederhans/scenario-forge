@@ -1,14 +1,8 @@
 import { state, defaultCountryPalette, legacyDefaultCountryPalette } from "./state.js";
-
-const COUNTRY_CODE_ALIASES = {
-  UK: "GB",
-  EL: "GR",
-};
+import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 
 function normalizeCountryCode(rawCode) {
-  const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
-  if (!code) return "";
-  return COUNTRY_CODE_ALIASES[code] || code;
+  return normalizeCountryCodeAlias(rawCode);
 }
 
 function normalizeHexColor(value) {

@@ -1,9 +1,12 @@
 ﻿"""North America detail replacement (US/CA/MX hybrid tiers)."""
 from __future__ import annotations
 
+import csv
 import math
+import os
 from collections import deque
 from pathlib import Path
+import tempfile
 
 import geopandas as gpd
 import pandas as pd
@@ -113,11 +116,49 @@ def _read_zip_layer(
 
 def _load_cached_csv(url: str, filename: str) -> pd.DataFrame:
     cache_path = _data_dir() / filename
+    required_columns = {"STATE", "COUNTY"}
+
+    def _validate_csv(path: Path) -> None:
+        try:
+            with path.open("r", encoding="latin1", newline="") as handle:
+                header = next(csv.reader(handle), [])
+        except Exception as exc:
+            raise SystemExit(f"[North America] Failed reading cached CSV {path.name}: {exc}") from exc
+        header_set = {str(value).strip().upper() for value in header if str(value).strip()}
+        if not required_columns.issubset(header_set):
+            raise SystemExit(
+                f"[North America] Invalid CSV cache {path.name}: missing expected columns {sorted(required_columns)}."
+            )
+
+    if cache_path.exists() and cache_path.stat().st_size > 0:
+        try:
+            _validate_csv(cache_path)
+        except SystemExit:
+            cache_path.unlink(missing_ok=True)
     if not cache_path.exists() or cache_path.stat().st_size == 0:
-        response = requests.get(url, timeout=(10, 180), headers=get_headers())
-        response.raise_for_status()
-        cache_path.write_bytes(response.content)
-    return pd.read_csv(cache_path, encoding="latin1", dtype={"STATE": str, "COUNTY": str})
+        fd, temp_name = tempfile.mkstemp(
+            prefix=f".{cache_path.name}.",
+            suffix=".tmp",
+            dir=cache_path.parent,
+        )
+        temp_path = Path(temp_name)
+        try:
+            os.close(fd)
+            try:
+                response = requests.get(url, timeout=(10, 180), headers=get_headers())
+                response.raise_for_status()
+            except requests.RequestException as exc:
+                raise SystemExit(f"[North America] Failed downloading {filename} from {url}: {exc}") from exc
+            temp_path.write_bytes(response.content)
+            _validate_csv(temp_path)
+            temp_path.replace(cache_path)
+        finally:
+            temp_path.unlink(missing_ok=True)
+    try:
+        return pd.read_csv(cache_path, encoding="latin1", dtype={"STATE": str, "COUNTY": str})
+    except Exception as exc:
+        cache_path.unlink(missing_ok=True)
+        raise SystemExit(f"[North America] Failed parsing cached CSV {cache_path.name}: {exc}") from exc
 
 
 def _clean_text(value: object) -> str:

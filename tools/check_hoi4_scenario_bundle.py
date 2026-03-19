@@ -21,7 +21,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--expectation",
         default="",
-        help="Optional explicit expectation file. Defaults to data/scenarios/expectations/<scenario_id>.expectation.json",
+        help="Optional explicit expectation file. Defaults to data/scenarios/expectations/<scenario_dir_name>.expectation.json",
     )
     return parser.parse_args()
 
@@ -228,6 +228,7 @@ def evaluate_controller_set_assertions(
 def main() -> int:
     args = parse_args()
     scenario_dir = Path(args.scenario_dir)
+    scenario_dir_name = scenario_dir.name
     report_dir = Path(args.report_dir)
 
     manifest = load_json(scenario_dir / "manifest.json")
@@ -239,7 +240,11 @@ def main() -> int:
     controllers = load_json(controllers_path) if controllers_path.exists() else {}
 
     scenario_id = str(manifest.get("scenario_id") or "").strip()
-    expectation_path = Path(args.expectation) if args.expectation else DEFAULT_EXPECTATION_DIR / f"{scenario_id}.expectation.json"
+    expectation_path = (
+        Path(args.expectation)
+        if args.expectation
+        else DEFAULT_EXPECTATION_DIR / f"{scenario_dir_name}.expectation.json"
+    )
     expectation = load_json(expectation_path) if expectation_path.exists() else {}
 
     coverage_report_path = report_dir / "coverage_report.md"
@@ -262,10 +267,17 @@ def main() -> int:
         if not condition:
             errors.append(message)
 
-    expected_scenario_id = str(expectation.get("scenario_id") or scenario_id).strip()
+    expected_scenario_id = str(expectation.get("scenario_id") or scenario_dir_name).strip()
     require_controllers = bool(expectation.get("require_controllers", bool(manifest.get("controllers_url"))))
     expect(bool(scenario_id), "manifest.scenario_id must be present.")
     expect(scenario_id == expected_scenario_id, f"scenario_id must be {expected_scenario_id}. Found {scenario_id}.")
+    expectation_scenario_id = str(expectation.get("scenario_id") or "").strip()
+    if expectation_scenario_id:
+        expect(
+            expectation_scenario_id == scenario_dir_name,
+            "expectation.scenario_id must match the scenario directory name. "
+            f"Expected {scenario_dir_name}, found {expectation_scenario_id}.",
+        )
     expect(bool(manifest.get("owners_url")), "manifest.owners_url must be present.")
     expect(bool(manifest.get("cores_url")), "manifest.cores_url must be present.")
     expect(bool(manifest.get("countries_url")), "manifest.countries_url must be present.")

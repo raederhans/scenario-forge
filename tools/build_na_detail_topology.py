@@ -6,6 +6,7 @@ from collections import deque
 import json
 from pathlib import Path
 import sys
+import tempfile
 import time
 
 import geopandas as gpd
@@ -26,6 +27,8 @@ from map_builder.geo.local_canonicalization import (
     canonicalize_country_boundaries,
 )
 from map_builder.geo.topology import build_topology, compute_neighbor_graph
+from map_builder.io.readers import read_json_optional, read_json_strict
+from map_builder.io.writers import write_json_atomic
 from map_builder.processors.detail_shell_coverage import (
     append_shell_coverage_gap_fragments,
     collect_shell_coverage_gaps,
@@ -87,8 +90,7 @@ def _record_timing(timings: dict[str, dict], stage_name: str, start_time: float,
 def _write_timings_json(path: Path | None, timings: dict[str, dict]) -> None:
     if path is None:
         return
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(timings, indent=2, ensure_ascii=False), encoding="utf-8")
+    write_json_atomic(path, timings, ensure_ascii=False, indent=2)
 
 
 def _empty_gdf() -> gpd.GeoDataFrame:
@@ -110,15 +112,11 @@ def _load_existing_output_political(output_path: Path) -> gpd.GeoDataFrame:
         output_dict = _load_topology(output_path)
         return _repair_political_geometries(_topology_object_to_gdf(output_dict, "political"))
     except Exception as exc:
-        try:
-            output_dict = json.loads(output_path.read_text(encoding="utf-8-sig"))
-            return _repair_political_geometries(_topology_object_to_gdf(output_dict, "political"))
-        except Exception:
-            print(
-                "[Detail patch] Failed to load existing output topology for US ID reconciliation: "
-                f"{exc}"
-            )
-            return _empty_gdf()
+        print(
+            "[Detail patch] Failed to load existing output topology for US ID reconciliation: "
+            f"{exc}"
+        )
+        return _empty_gdf()
 
 
 def _us_feature_mask(gdf: gpd.GeoDataFrame) -> gpd.Series:
@@ -506,7 +504,8 @@ def _update_us_feature_migration_asset(
 
     existing_payload: dict[str, list[str]] = {}
     if migration_path.exists():
-        existing_payload = json.loads(migration_path.read_text(encoding="utf-8"))
+        payload = read_json_optional(migration_path, default={})
+        existing_payload = payload if isinstance(payload, dict) else {}
 
     next_payload = {
         key: value
@@ -514,10 +513,12 @@ def _update_us_feature_migration_asset(
         if not str(key).startswith("US_")
     }
     next_payload.update(dict(sorted(migration_payload.items())))
-    migration_path.parent.mkdir(parents=True, exist_ok=True)
-    migration_path.write_text(
-        json.dumps(next_payload, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
+    write_json_atomic(
+        migration_path,
+        next_payload,
+        ensure_ascii=False,
+        indent=2,
+        trailing_newline=True,
     )
 
     metrics["us_migration_entries"] = len(migration_payload)
@@ -531,10 +532,12 @@ def _update_us_feature_migration_asset(
         "expanded_entry_count": int(metrics["us_migration_expansions"]),
         "entries": audit_rows,
     }
-    US_MIGRATION_AUDIT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    US_MIGRATION_AUDIT_PATH.write_text(
-        json.dumps(audit_payload, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
+    write_json_atomic(
+        US_MIGRATION_AUDIT_PATH,
+        audit_payload,
+        ensure_ascii=False,
+        indent=2,
+        trailing_newline=True,
     )
     print(
         "[Detail patch] Updated US feature migration asset: "
@@ -621,7 +624,10 @@ def _safe_polygonal_intersection(left, right):
 def _load_topology(path: Path) -> dict:
     if not path.exists():
         raise FileNotFoundError(f"Topology not found: {path}")
-    return json.loads(path.read_text(encoding="utf-8"))
+    payload = read_json_strict(path)
+    if not isinstance(payload, dict):
+        raise ValueError(f"Expected JSON object in {path}, found {type(payload).__name__}.")
+    return payload
 
 
 def _topology_object_to_gdf(topo_dict: dict, object_name: str) -> gpd.GeoDataFrame:
@@ -850,18 +856,30 @@ def _write_output_topology(
     political: gpd.GeoDataFrame,
     layers: dict[str, gpd.GeoDataFrame],
 ) -> None:
-    build_topology(
-        political=political,
-        ocean=layers.get("ocean", _empty_gdf()),
-        land=layers.get("land", _empty_gdf()),
-        urban=layers.get("urban", _empty_gdf()),
-        physical=layers.get("physical", _empty_gdf()),
-        rivers=layers.get("rivers", _empty_gdf()),
-        special_zones=layers.get("special_zones"),
-        water_regions=layers.get("water_regions"),
-        output_path=output_path,
-        quantization=cfg.DETAIL_OUTPUT_TOPOLOGY_QUANTIZATION,
-    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        prefix=f".{output_path.name}.",
+        suffix=output_path.suffix,
+        dir=output_path.parent,
+        delete=False,
+    ) as handle:
+        temp_path = Path(handle.name)
+    try:
+        build_topology(
+            political=political,
+            ocean=layers.get("ocean", _empty_gdf()),
+            land=layers.get("land", _empty_gdf()),
+            urban=layers.get("urban", _empty_gdf()),
+            physical=layers.get("physical", _empty_gdf()),
+            rivers=layers.get("rivers", _empty_gdf()),
+            special_zones=layers.get("special_zones"),
+            water_regions=layers.get("water_regions"),
+            output_path=temp_path,
+            quantization=cfg.DETAIL_OUTPUT_TOPOLOGY_QUANTIZATION,
+        )
+        temp_path.replace(output_path)
+    finally:
+        temp_path.unlink(missing_ok=True)
 
 
 def _parse_country_codes_arg(raw_value: str | None) -> tuple[str, ...]:

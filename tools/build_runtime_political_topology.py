@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import re
 import sys
+import tempfile
 import time
 
 import geopandas as gpd
@@ -24,6 +25,8 @@ from map_builder.geo.local_canonicalization import (
     canonicalize_country_boundaries,
 )
 from map_builder.geo.topology import build_political_only_topology
+from map_builder.io.readers import read_json_strict
+from map_builder.io.writers import write_json_atomic
 from map_builder.processors.detail_shell_coverage import (
     append_shell_coverage_gap_fragments,
     collect_shell_coverage_gaps,
@@ -62,8 +65,7 @@ def _record_timing(timings: dict[str, dict], stage_name: str, start_time: float,
 def _write_timings_json(path: Path | None, timings: dict[str, dict]) -> None:
     if path is None:
         return
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(timings, indent=2, ensure_ascii=False), encoding="utf-8")
+    write_json_atomic(path, timings, ensure_ascii=False, indent=2)
 
 
 def _empty_gdf() -> gpd.GeoDataFrame:
@@ -130,7 +132,10 @@ def _normalize_polygonal_geometry(geometry):
 def _load_topology(path: Path) -> dict:
     if not path.exists():
         raise FileNotFoundError(f"Topology not found: {path}")
-    return json.loads(path.read_text(encoding="utf-8"))
+    payload = read_json_strict(path)
+    if not isinstance(payload, dict):
+        raise ValueError(f"Expected JSON object in {path}, found {type(payload).__name__}.")
+    return payload
 
 
 def _topology_object_to_gdf(topo_dict: dict, object_name: str) -> gpd.GeoDataFrame:
@@ -513,11 +518,23 @@ def _write_output_topology(
     output_path: Path,
     political: gpd.GeoDataFrame,
 ) -> None:
-    build_political_only_topology(
-        political,
-        output_path,
-        quantization=cfg.RUNTIME_POLITICAL_TOPOLOGY_QUANTIZATION,
-    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        prefix=f".{output_path.name}.",
+        suffix=output_path.suffix,
+        dir=output_path.parent,
+        delete=False,
+    ) as handle:
+        temp_path = Path(handle.name)
+    try:
+        build_political_only_topology(
+            political,
+            temp_path,
+            quantization=cfg.RUNTIME_POLITICAL_TOPOLOGY_QUANTIZATION,
+        )
+        temp_path.replace(output_path)
+    finally:
+        temp_path.unlink(missing_ok=True)
 
 
 def _parse_country_codes_arg(raw_value: str | None) -> tuple[str, ...]:
@@ -583,11 +600,14 @@ def main() -> None:
     primary_political = _topology_object_to_gdf(primary_topology, "political")
     primary_land = _topology_object_to_gdf(primary_topology, "land")
     detail_topology = _load_topology(args.detail_topology) if args.detail_topology.exists() else None
-    override_collection = (
-        json.loads(args.ru_overrides.read_text(encoding="utf-8"))
-        if args.ru_overrides.exists()
-        else None
-    )
+    override_collection = None
+    if args.ru_overrides.exists():
+        override_payload = read_json_strict(args.ru_overrides)
+        if not isinstance(override_payload, dict):
+            raise ValueError(
+                f"Expected JSON object in {args.ru_overrides}, found {type(override_payload).__name__}."
+            )
+        override_collection = override_payload
     _record_timing(
         stage_timings,
         "load_inputs",

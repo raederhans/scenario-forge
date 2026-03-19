@@ -18,7 +18,7 @@
               </div>
               <button id="btnToggleLang" class="btn-lang">EN / 中文</button>
             </div>
-            <p class="body-text mt-2">
+            <p id="lblAppHint" class="body-text mt-2">
               Click countries to paint. Use the dock below the map for quick tools and the left panel for deeper controls.
             </p>
           </div>
@@ -43,12 +43,12 @@
             <div id="scenarioAuditHint" class="body-text mt-2 hidden">Coverage report unavailable</div>
             <label id="lblScenarioSelect" class="section-header-block mt-3" for="scenarioSelect">Scenario</label>
             <select id="scenarioSelect" name="scenario-select" autocomplete="off" class="select-input mt-2">
-              <option value="">None</option>
+              <option id="optScenarioNone" value="">None</option>
             </select>
             <label id="lblScenarioViewMode" class="section-header-block mt-3" for="scenarioViewModeSelect">View</label>
             <select id="scenarioViewModeSelect" name="scenario-view-mode" autocomplete="off" class="select-input mt-2 hidden" disabled>
-              <option value="ownership">Ownership</option>
-              <option value="frontline">Frontline</option>
+              <option id="optScenarioOwnership" value="ownership">Ownership</option>
+              <option id="optScenarioFrontline" value="frontline">Frontline</option>
             </select>
             <div class="parent-border-actions mt-3">
               <button id="applyScenarioBtn" type="button" class="btn-secondary">Apply</button>
@@ -184,10 +184,10 @@
                 aria-labelledby="appearanceTabBorders"
                 hidden
               >
-                <h2 class="section-header">Borders</h2>
+                <h2 id="lblBordersPanel" class="section-header">Borders</h2>
                 <div class="appearance-subsection-stack mt-3">
                   <details class="appearance-mini-section">
-                    <summary class="section-header">Internal Borders</summary>
+                    <summary id="lblInternalBorders" class="section-header">Internal Borders</summary>
                     <div class="space-y-3 mt-3">
                       <div class="flex items-center justify-between gap-3">
                         <label class="range-label" for="internalBorderColor">Color</label>
@@ -211,7 +211,7 @@
                   </details>
 
                   <details class="appearance-mini-section">
-                    <summary class="section-header">Empire Borders</summary>
+                    <summary id="lblEmpireBorders" class="section-header">Empire Borders</summary>
                     <div class="space-y-3 mt-3">
                       <div class="flex items-center justify-between gap-3">
                         <label class="range-label" for="empireBorderColor">Color</label>
@@ -228,7 +228,7 @@
                   </details>
 
                   <details class="appearance-mini-section">
-                    <summary class="section-header">Coastlines</summary>
+                    <summary id="lblCoastlines" class="section-header">Coastlines</summary>
                     <div class="space-y-3 mt-3">
                       <div class="flex items-center justify-between gap-3">
                         <label class="range-label" for="coastlineColor">Color</label>
@@ -319,10 +319,10 @@
                             <label id="lblPhysicalBlendMode" class="range-label" for="physicalBlendMode">Blend Mode</label>
                           </div>
                           <select id="physicalBlendMode" class="select-input mt-2">
-                            <option value="multiply">Multiply</option>
-                            <option value="soft-light">Soft Light</option>
-                            <option value="overlay">Overlay</option>
-                            <option value="source-over" selected>Normal</option>
+                            <option id="optPhysicalBlendMultiply" value="multiply">Multiply</option>
+                            <option id="optPhysicalBlendSoftLight" value="soft-light">Soft Light</option>
+                            <option id="optPhysicalBlendOverlay" value="overlay">Overlay</option>
+                            <option id="optPhysicalBlendNormal" value="source-over" selected>Normal</option>
                           </select>
                         </div>
                       </div>
@@ -440,7 +440,7 @@
                   </details>
 
                   <details class="appearance-mini-section">
-                    <summary class="section-header">Urban Areas</summary>
+                    <summary id="lblUrbanPanel" class="section-header">Urban Areas</summary>
                     <div class="mt-3">
                       <label class="toggle-label mt-2">
                         <input id="toggleUrban" type="checkbox" class="checkbox-input" />
@@ -463,9 +463,9 @@
                             <label id="lblUrbanBlendMode" class="range-label" for="urbanBlendMode">Blend Mode</label>
                           </div>
                           <select id="urbanBlendMode" class="select-input mt-2">
-                            <option value="multiply" selected>Multiply</option>
-                            <option value="source-over">Normal</option>
-                            <option value="overlay">Overlay</option>
+                            <option id="optUrbanBlendMultiply" value="multiply" selected>Multiply</option>
+                            <option id="optUrbanBlendNormal" value="source-over">Normal</option>
+                            <option id="optUrbanBlendOverlay" value="overlay">Overlay</option>
                           </select>
                         </div>
                         <div>
@@ -558,7 +558,7 @@
                   </details>
 
                   <details class="appearance-mini-section">
-                    <summary class="section-header">Rivers</summary>
+                    <summary id="lblRiversPanel" class="section-header">Rivers</summary>
                     <div class="mt-3">
                       <label class="toggle-label mt-2">
                         <input id="toggleRivers" type="checkbox" class="checkbox-input" checked />
@@ -599,9 +599,9 @@
                             <label id="lblRiversDashStyle" class="range-label" for="riversDashStyle">Dash</label>
                           </div>
                           <select id="riversDashStyle" class="select-input mt-2">
-                            <option value="solid" selected>Solid</option>
-                            <option value="dashed">Dashed</option>
-                            <option value="dotted">Dotted</option>
+                            <option id="optRiversDashSolid" value="solid" selected>Solid</option>
+                            <option id="optRiversDashDashed" value="dashed">Dashed</option>
+                            <option id="optRiversDashDotted" value="dotted">Dotted</option>
                           </select>
                         </div>
                       </div>
@@ -609,7 +609,7 @@
                   </details>
 
                   <details class="appearance-mini-section">
-                    <summary class="section-header">Water Regions</summary>
+                    <summary id="lblWaterRegionsPanel" class="section-header">Water Regions</summary>
                     <div class="mt-3">
                       <label class="toggle-label mt-2">
                         <input id="toggleWaterRegions" type="checkbox" class="checkbox-input" checked />
@@ -625,7 +625,7 @@
                   </details>
 
                   <details class="appearance-mini-section">
-                    <summary class="section-header">Special Zones Style</summary>
+                    <summary id="lblSpecialZonesStylePanel" class="section-header">Special Zones Style</summary>
                     <div class="mt-3">
                       <label class="toggle-label mt-2">
                         <input id="toggleSpecialZones" type="checkbox" class="checkbox-input" />
@@ -675,9 +675,9 @@
                             <label id="lblSpecialZonesDashStyle" class="range-label" for="specialZonesDashStyle">Dash</label>
                           </div>
                           <select id="specialZonesDashStyle" class="select-input mt-2">
-                            <option value="solid">Solid</option>
-                            <option value="dashed" selected>Dashed</option>
-                            <option value="dotted">Dotted</option>
+                            <option id="optSpecialZonesDashSolid" value="solid">Solid</option>
+                            <option id="optSpecialZonesDashDashed" value="dashed" selected>Dashed</option>
+                            <option id="optSpecialZonesDashDotted" value="dotted">Dotted</option>
                           </select>
                         </div>
                       </div>
@@ -989,9 +989,9 @@
               <div class="flex items-center justify-between gap-3">
                 <label id="lblSpecialZoneType" class="range-label" for="specialZoneTypeSelect">Type</label>
                 <select id="specialZoneTypeSelect" name="special-zone-type" autocomplete="off" class="select-input">
-                  <option value="disputed">Disputed</option>
-                  <option value="wasteland">Wasteland</option>
-                  <option value="custom" selected>Custom</option>
+                  <option id="optSpecialZoneDisputed" value="disputed">Disputed</option>
+                  <option id="optSpecialZoneWasteland" value="wasteland">Wasteland</option>
+                  <option id="optSpecialZoneCustom" value="custom" selected>Custom</option>
                 </select>
               </div>
               <div>
@@ -1204,7 +1204,7 @@
               </div>
 
               <div id="dockUtilityGroup" class="dock-group dock-group-utilities">
-                <div class="dock-group-label">Utilities</div>
+                <div id="lblUtilities" class="dock-group-label">Utilities</div>
                 <div class="dock-icon-row">
                   <button id="dockReferenceBtn" class="dock-icon-btn" type="button" aria-label="Reference" title="Reference">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -1227,28 +1227,28 @@
                   <div class="space-y-3 mt-4">
                     <div>
                       <div class="range-row">
-                        <label class="range-label" for="referenceOpacity">Opacity</label>
+                        <label id="lblReferenceOpacity" class="range-label" for="referenceOpacity">Opacity</label>
                         <span id="referenceOpacityValue" class="range-value">60%</span>
                       </div>
                       <input id="referenceOpacity" type="range" min="0" max="100" value="60" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label class="range-label" for="referenceScale">Scale</label>
+                        <label id="lblReferenceScale" class="range-label" for="referenceScale">Scale</label>
                         <span id="referenceScaleValue" class="range-value">1.00×</span>
                       </div>
                       <input id="referenceScale" type="range" min="0.2" max="3.0" step="0.01" value="1.00" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label class="range-label" for="referenceOffsetX">Offset X</label>
+                        <label id="lblReferenceOffsetX" class="range-label" for="referenceOffsetX">Offset X</label>
                         <span id="referenceOffsetXValue" class="range-value">0px</span>
                       </div>
                       <input id="referenceOffsetX" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label class="range-label" for="referenceOffsetY">Offset Y</label>
+                        <label id="lblReferenceOffsetY" class="range-label" for="referenceOffsetY">Offset Y</label>
                         <span id="referenceOffsetYValue" class="range-value">0px</span>
                       </div>
                       <input id="referenceOffsetY" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
@@ -1263,7 +1263,7 @@
                         <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
                         <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
                       </svg>
-                      <div class="info-tooltip">Export the visible map as a PNG or JPG snapshot.</div>
+                      <div id="lblExportInfoTooltip" class="info-tooltip">Export the visible map as a PNG or JPG snapshot.</div>
                     </div>
                   </div>
                   <label id="lblExportFormat" class="section-header-block mt-3" for="exportFormat">Format</label>

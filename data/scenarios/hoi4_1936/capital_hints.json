@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1936",
-  "generated_at": "2026-03-17T01:21:53.752894+00:00",
+  "generated_at": "2026-03-17T04:10:44.164493+00:00",
   "entry_count": 121,
   "missing_tag_count": 1,
   "missing_tags": [
@@ -2791,5 +2791,11 @@
       "confidence": "medium",
       "candidate_count": 94
     }
-  ]
+  ],
+  "audit": {
+    "rejected_candidate_count": 0,
+    "rejected_candidates": [],
+    "featured_runtime_missing_count": 0,
+    "featured_runtime_missing_tags": []
+  }
 }

@@ -3,16 +3,10 @@ import { state, countryPalette, defaultCountryPalette } from "./state.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import { syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { refreshColorState, refreshResolvedColorsForOwners } from "./map_renderer.js";
-
-const COUNTRY_CODE_ALIASES = {
-  UK: "GB",
-  EL: "GR",
-};
+import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 
 function normalizeCountryCode(rawCode) {
-  const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
-  if (!code) return "";
-  return COUNTRY_CODE_ALIASES[code] || code;
+  return normalizeCountryCodeAlias(rawCode);
 }
 
 function getCountryCode(feature) {

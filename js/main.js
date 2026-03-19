@@ -10,18 +10,13 @@ import { initToolbar } from "./ui/toolbar.js";
 import { initTranslations } from "./ui/i18n.js";
 import { initToast } from "./ui/toast.js";
 import { bindBeforeUnload } from "./core/dirty_state.js";
+import { normalizeCountryCodeAlias } from "./core/country_code_aliases.js";
 
-const COUNTRY_CODE_ALIASES = {
-  UK: "GB",
-  EL: "GR",
-};
 const VALID_BATCH_FILL_SCOPES = new Set(["parent", "country"]);
 const VIEW_SETTINGS_STORAGE_KEY = "map_view_settings_v1";
 
 function normalizeCountryCode(rawCode) {
-  const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
-  if (!code) return "";
-  return COUNTRY_CODE_ALIASES[code] || code;
+  return normalizeCountryCodeAlias(rawCode);
 }
 
 function normalizeBatchFillScopes(rawScopes) {

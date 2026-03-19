@@ -1,16 +1,11 @@
 import { normalizePhysicalStyleConfig, normalizeTextureMode, state } from "./state.js";
+import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 
-const COUNTRY_CODE_ALIASES = {
-  UK: "GB",
-  EL: "GR",
-};
 const FEATURE_MIGRATION_URLS = ["data/feature-migrations/by_hybrid_v1.json"];
 let featureMigrationMapPromise = null;
 
 function normalizeOwnerCode(rawCode) {
-  const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
-  if (!code) return "";
-  return COUNTRY_CODE_ALIASES[code] || code;
+  return normalizeCountryCodeAlias(rawCode);
 }
 
 function getCanonicalCountryCodeForFeature(feature) {

@@ -13,6 +13,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from scenario_builder.hoi4.audit import build_source_atlas, write_report_files
 from scenario_builder.hoi4.compiler import compile_scenario_bundle
+from map_builder.io.writers import write_json_atomic
 from scenario_builder.hoi4.parser import (
     discover_hoi4_source_root,
     load_hierarchy_groups,
@@ -101,8 +102,26 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def write_json(path: Path, payload: object) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_json_atomic(path, payload, ensure_ascii=False, indent=2, trailing_newline=True)
+
+
+def resolve_scenario_output_dir(raw_value: str, scenario_id: str) -> Path:
+    scenario_output_dir = Path(raw_value)
+    folder_name = scenario_output_dir.name.strip()
+    expected_name = str(scenario_id or "").strip()
+    if not expected_name:
+        raise ValueError("--scenario-id must not be empty.")
+    if not folder_name:
+        raise ValueError(
+            f"--scenario-output-dir must end with the scenario folder name. Received: {scenario_output_dir}"
+        )
+    if folder_name != expected_name:
+        raise ValueError(
+            "--scenario-output-dir basename must match --scenario-id exactly. "
+            f"Received basename `{folder_name}` for scenario `{expected_name}` "
+            f"at `{scenario_output_dir}`."
+        )
+    return scenario_output_dir
 
 
 def split_paths(raw_value: str) -> list[Path]:
@@ -220,6 +239,7 @@ def gate_state_delta_coverage(
 
 def main() -> int:
     args = build_parser().parse_args()
+    scenario_output_dir = resolve_scenario_output_dir(args.scenario_output_dir, args.scenario_id)
 
     source_root = discover_hoi4_source_root(args.source_root or None)
     bookmark = parse_bookmark(source_root / args.bookmark_file)
@@ -317,7 +337,6 @@ def main() -> int:
         diagnostics=diagnostics,
     )
 
-    scenario_output_dir = Path(args.scenario_output_dir)
     report_dir = Path(args.report_dir)
     atlas_dir = report_dir / "source_atlas"
     atlas_paths: list[str] = []

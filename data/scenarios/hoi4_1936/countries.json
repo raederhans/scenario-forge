@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "scenario_id": "hoi4_1939",
-  "generated_at": "2026-03-17T00:58:28.230916+00:00",
+  "scenario_id": "hoi4_1936",
+  "generated_at": "2026-03-17T04:09:09.176175+00:00",
   "default_country": "GER",
   "countries": {
     "AEF": {
@@ -3699,8 +3699,8 @@
       "tag": "SOV",
       "display_name": "Soviet Union",
       "color_hex": "#7d0d18",
-      "feature_count": 12959,
-      "controller_feature_count": 12959,
+      "feature_count": 12949,
+      "controller_feature_count": 12949,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "RU",

@@ -17,7 +17,8 @@ from shapely.geometry import Point
 
 from map_builder import config as cfg
 from map_builder.io.fetch import fetch_or_cache_binary
-from map_builder.io.readers import load_populated_places
+from map_builder.io.readers import load_populated_places, read_json_optional
+from map_builder.io.writers import write_json_atomic
 
 
 GEONAMES_COLUMNS = [
@@ -48,6 +49,7 @@ ALIAS_LIMIT = 24
 ALIAS_SAMPLE_LIMIT = 200
 CITY_TIER_WEIGHT = {"minor": 1, "regional": 2, "major": 3}
 CITY_SOURCE_PRIORITY = {"merged": 0, "natural_earth": 1, "geonames": 2}
+# Deprecated: use SCENARIO_MANUAL_CAPITALS instead.
 TNO_MANUAL_CAPITALS = {
     "GER": "Berlin",
     "USA": "Washington, D.C.",
@@ -62,6 +64,7 @@ TNO_MANUAL_CAPITALS = {
     "KOM": "Syktyvkar",
     "SBA": "Novosibirsk",
 }
+# Deprecated: use SCENARIO_CITY_RENAMES instead.
 TNO_CITY_RENAMES = {
     "Saint Petersburg": {
         "display_name": {"en": "Leningrad", "zh": "列宁格勒"},
@@ -100,6 +103,21 @@ SCENARIO_MANUAL_CAPITALS = {
         "KOM": "Syktyvkar",
         "SBA": "Novosibirsk",
         "RUR": "Kemerovo",
+        "RKP": "Warsaw",
+        "RKNO": "Oslo",
+        "AST": "Canberra",
+        "SAF": "Pretoria",
+        "HOL": "Paramaribo",
+        "GEA": "Dar es Salaam",
+        "GCO": "Kinshasa",
+        "GSW": "Windhoek",
+        "ARE": "Abu Dhabi",
+        "BHR": "Manama",
+        "QAT": "Doha",
+        "PAK": "Islamabad",
+        "RSF": "Magadan",
+        "PFC": "Petropavlovsk-Kamchatsky",
+        "FIC": "Tynda",
     },
 }
 SOVIET_ERA_CITY_RENAMES = {
@@ -647,15 +665,20 @@ def _country_city_rank_key(row: dict[str, object]) -> tuple[object, ...]:
     )
 
 
+@lru_cache(maxsize=1)
+def _load_merged_world_city_dataset() -> gpd.GeoDataFrame:
+    geonames = _normalize_geonames(_load_geonames_source())
+    natural_earth = _normalize_natural_earth()
+    return merge_world_cities(geonames, natural_earth)
+
+
 @lru_cache(maxsize=16)
 def _build_country_city_catalog_cached(country_code: str) -> gpd.GeoDataFrame:
     normalized_country = _clean_text(country_code).upper()
     if not re.fullmatch(r"[A-Z]{2}", normalized_country):
         return gpd.GeoDataFrame(columns=["id", "name", "country_code", "geometry"], crs="EPSG:4326")
 
-    geonames = _normalize_geonames(_load_geonames_source())
-    natural_earth = _normalize_natural_earth()
-    merged = merge_world_cities(geonames, natural_earth)
+    merged = _load_merged_world_city_dataset()
     catalog = merged[
         merged["country_code"].fillna("").astype(str).str.upper() == normalized_country
     ].copy()
@@ -913,9 +936,7 @@ def build_world_cities(
     political: gpd.GeoDataFrame,
     urban: gpd.GeoDataFrame,
 ) -> gpd.GeoDataFrame:
-    geonames = _normalize_geonames(_load_geonames_source())
-    natural_earth = _normalize_natural_earth()
-    merged = merge_world_cities(geonames, natural_earth)
+    merged = _load_merged_world_city_dataset().copy()
     merged = _attach_cities_to_political(merged, political)
     merged = _attach_cities_to_urban(merged, urban)
     geonames_mask = merged["source"].fillna("").astype(str).str.casefold() == "geonames"
@@ -1162,12 +1183,7 @@ def _resolve_city_reference(
 
 
 def _read_json_payload(path: Path) -> dict[str, object]:
-    if not path.exists():
-        return {}
-    try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return {}
+    payload = read_json_optional(path, default={})
     return payload if isinstance(payload, dict) else {}
 
 
@@ -1263,6 +1279,16 @@ def _build_capital_entry(
     }
 
 
+def _append_unique_capital_entry(
+    accepted_entries: dict[str, dict[str, object]],
+    *,
+    tag: str,
+    entry: dict[str, object],
+) -> None:
+    if tag and tag not in accepted_entries:
+        accepted_entries[tag] = entry
+
+
 def emit_default_scenario_city_assets(output_dir: Path, world_cities: gpd.GeoDataFrame) -> None:
     scenarios_root = output_dir / "scenarios"
     if not scenarios_root.exists():
@@ -1277,10 +1303,16 @@ def emit_default_scenario_city_assets(output_dir: Path, world_cities: gpd.GeoDat
         if path.is_dir() and (path / "manifest.json").exists()
     ):
         scenario_id = scenario_dir.name
+        manifest = _read_json_payload(scenario_dir / "manifest.json")
         countries_payload = _read_json_payload(scenario_dir / "countries.json")
         countries = countries_payload.get("countries", {}) if isinstance(countries_payload, dict) else {}
         if not isinstance(countries, dict):
             countries = {}
+        featured_tags = {
+            _clean_text(raw_tag).upper()
+            for raw_tag in (manifest.get("featured_tags", []) if isinstance(manifest, dict) else [])
+            if _clean_text(raw_tag)
+        }
 
         owners_by_feature = _extract_assignment_map(scenario_dir / "owners.by_feature.json", "owners")
         controllers_by_feature = _extract_assignment_map(scenario_dir / "controllers.by_feature.json", "controllers")
@@ -1293,7 +1325,8 @@ def emit_default_scenario_city_assets(output_dir: Path, world_cities: gpd.GeoDat
         capitals_by_tag: dict[str, str] = {}
         capital_city_hints: dict[str, dict[str, object]] = {}
         city_overrides: dict[str, dict[str, object]] = {}
-        capital_hint_entries: list[dict[str, object]] = []
+        accepted_capital_entries: dict[str, dict[str, object]] = {}
+        rejected_capital_entries: list[dict[str, object]] = []
         unresolved_capitals: list[dict[str, object]] = []
         unresolved_manual_capitals: list[dict[str, object]] = []
         unresolved_city_renames: list[dict[str, object]] = []
@@ -1379,16 +1412,15 @@ def emit_default_scenario_city_assets(output_dir: Path, world_cities: gpd.GeoDat
                 )
             if manual_city:
                 capitals_by_tag[tag] = _clean_text(manual_city.get("id"))
-                capital_hint_entries.append(
-                    _build_capital_entry(
-                        tag=tag,
-                        country_record=raw_record,
-                        city_row=manual_city,
-                        resolution_method="manual_override",
-                        confidence="high",
-                        candidate_count=1,
-                    )
+                manual_entry = _build_capital_entry(
+                    tag=tag,
+                    country_record=raw_record,
+                    city_row=manual_city,
+                    resolution_method="manual_override",
+                    confidence="high",
+                    candidate_count=1,
                 )
+                _append_unique_capital_entry(accepted_capital_entries, tag=tag, entry=manual_entry)
 
             candidate_rows = _dedupe_city_rows(tag_city_index.get(tag, []))
             candidate_rows.sort(key=lambda row: _city_resolution_sort_key(row, preferred_country_codes))
@@ -1401,27 +1433,36 @@ def emit_default_scenario_city_assets(output_dir: Path, world_cities: gpd.GeoDat
             capital_state_id = raw_record.get("capital_state_id")
             has_capital_state_hint = capital_state_id not in (None, "", 0, "0")
 
+            candidate_entry = None
             if best_candidate:
-                capital_hint_entries.append(
-                    _build_capital_entry(
-                        tag=tag,
-                        country_record=raw_record,
-                        city_row=best_candidate,
-                        resolution_method="capital_state_fallback" if has_capital_state_hint else "controlled_city_fallback",
-                        confidence=confidence or "low",
-                        candidate_count=len(candidate_rows),
-                    )
-                )
-
-            if has_capital_state_hint and best_candidate and (confidence in {"high", "medium"} or len(candidate_rows) == 1):
-                capital_city_hints[tag] = _build_capital_entry(
+                candidate_entry = _build_capital_entry(
                     tag=tag,
                     country_record=raw_record,
                     city_row=best_candidate,
-                    resolution_method="capital_state_fallback",
+                    resolution_method="capital_state_fallback" if has_capital_state_hint else "controlled_city_fallback",
+                    confidence=confidence or "low",
+                    candidate_count=len(candidate_rows),
+                )
+
+            should_accept_candidate = bool(best_candidate) and (
+                confidence in {"high", "medium"} or len(candidate_rows) == 1
+            )
+            accepted_resolution_method = (
+                "capital_state_fallback" if has_capital_state_hint else "controlled_city_fallback"
+            )
+            if should_accept_candidate:
+                accepted_entry = _build_capital_entry(
+                    tag=tag,
+                    country_record=raw_record,
+                    city_row=best_candidate,
+                    resolution_method=accepted_resolution_method,
                     confidence=confidence or "medium",
                     candidate_count=len(candidate_rows),
                 )
+                capital_city_hints[tag] = accepted_entry
+                _append_unique_capital_entry(accepted_capital_entries, tag=tag, entry=accepted_entry)
+            elif candidate_entry and tag not in accepted_capital_entries:
+                rejected_capital_entries.append(candidate_entry)
             elif not manual_city and not best_candidate:
                 unresolved_capitals.append(
                     {
@@ -1433,7 +1474,7 @@ def emit_default_scenario_city_assets(output_dir: Path, world_cities: gpd.GeoDat
                         "reason": "no_controlled_city_candidates",
                     }
                 )
-            elif has_capital_state_hint and not manual_city and best_candidate and confidence not in {"high", "medium"} and len(candidate_rows) > 1:
+            elif not manual_city and best_candidate and confidence not in {"high", "medium"} and len(candidate_rows) > 1:
                 unresolved_capitals.append(
                     {
                         "tag": tag,
@@ -1441,11 +1482,20 @@ def emit_default_scenario_city_assets(output_dir: Path, world_cities: gpd.GeoDat
                         "lookup_iso2": _clean_text(raw_record.get("lookup_iso2")).upper(),
                         "base_iso2": _clean_text(raw_record.get("base_iso2")).upper(),
                         "capital_state_id": capital_state_id,
-                        "reason": "capital_hint_low_confidence",
+                        "reason": (
+                            "capital_hint_low_confidence"
+                            if has_capital_state_hint
+                            else "controlled_city_low_confidence"
+                        ),
                         "candidate_city_id": _clean_text(best_candidate.get("id")),
                     }
                 )
 
+        featured_runtime_missing = [
+            tag
+            for tag in sorted(featured_tags)
+            if tag not in capitals_by_tag and tag not in capital_city_hints
+        ]
         overrides_payload = {
             "version": 1,
             "scenario_id": scenario_id,
@@ -1461,6 +1511,8 @@ def emit_default_scenario_city_assets(output_dir: Path, world_cities: gpd.GeoDat
                 "unresolved_capital_count": len(unresolved_capitals),
                 "unresolved_manual_capital_count": len(unresolved_manual_capitals),
                 "unresolved_city_rename_count": len(unresolved_city_renames),
+                "featured_runtime_missing_count": len(featured_runtime_missing),
+                "featured_runtime_missing_tags": featured_runtime_missing,
                 "name_conflicts": name_conflicts,
                 "unresolved_capitals": unresolved_capitals,
                 "unresolved_manual_capitals": unresolved_manual_capitals,
@@ -1468,24 +1520,28 @@ def emit_default_scenario_city_assets(output_dir: Path, world_cities: gpd.GeoDat
             },
         }
         overrides_path = scenario_dir / cfg.SCENARIO_CITY_OVERRIDES_FILENAME
-        overrides_path.write_text(json.dumps(overrides_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        write_json_atomic(overrides_path, overrides_payload, ensure_ascii=False, indent=2)
 
         capital_hints_payload = {
             "version": 1,
             "scenario_id": scenario_id,
             "generated_at": generated_at,
-            "entry_count": len(capital_hint_entries),
+            "entry_count": len(accepted_capital_entries),
             "missing_tag_count": len(unresolved_capitals),
             "missing_tags": [entry["tag"] for entry in unresolved_capitals],
-            "entries": capital_hint_entries,
+            "entries": [accepted_capital_entries[tag] for tag in sorted(accepted_capital_entries)],
+            "audit": {
+                "rejected_candidate_count": len(rejected_capital_entries),
+                "rejected_candidates": rejected_capital_entries,
+                "featured_runtime_missing_count": len(featured_runtime_missing),
+                "featured_runtime_missing_tags": featured_runtime_missing,
+            },
         }
         capital_hints_path = scenario_dir / cfg.SCENARIO_CAPITAL_HINTS_FILENAME
-        capital_hints_path.write_text(json.dumps(capital_hints_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        write_json_atomic(capital_hints_path, capital_hints_payload, ensure_ascii=False, indent=2)
 
         manifest_path = scenario_dir / "manifest.json"
-        if manifest_path.exists():
-            manifest = _read_json_payload(manifest_path)
-            if isinstance(manifest, dict):
-                manifest["city_overrides_url"] = f"data/scenarios/{scenario_id}/{cfg.SCENARIO_CITY_OVERRIDES_FILENAME}"
-                manifest["capital_hints_url"] = f"data/scenarios/{scenario_id}/{cfg.SCENARIO_CAPITAL_HINTS_FILENAME}"
-                manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+        if manifest_path.exists() and isinstance(manifest, dict):
+            manifest["city_overrides_url"] = f"data/scenarios/{scenario_id}/{cfg.SCENARIO_CITY_OVERRIDES_FILENAME}"
+            manifest["capital_hints_url"] = f"data/scenarios/{scenario_id}/{cfg.SCENARIO_CAPITAL_HINTS_FILENAME}"
+            write_json_atomic(manifest_path, manifest, ensure_ascii=False, indent=2)

@@ -22,6 +22,7 @@ import {
 } from "./releasable_manager.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
+import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 
 const SCENARIO_REGISTRY_URL = "data/scenarios/index.json";
 const DETAIL_POLITICAL_MIN_FEATURES = 1000;
@@ -31,10 +32,6 @@ const DEFAULT_OCEAN_FILL_COLOR = "#aadaff";
 const SCENARIO_RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
 const SCENARIO_LOAD_TIMEOUT_MS = 12_000;
 const SCENARIO_DETAIL_SOURCE_FALLBACK_ORDER = ["na_v2", "na_v1", "legacy_bak", "highres"];
-const COUNTRY_CODE_ALIASES = {
-  UK: "GB",
-  EL: "GR",
-};
 const SCENARIO_OPTIONAL_LAYER_CONFIGS = {
   water: {
     bundleField: "waterRegionsPayload",
@@ -67,6 +64,7 @@ const SCENARIO_OPTIONAL_LAYER_CONFIGS = {
     revisionField: "cityLayerRevision",
   },
 };
+let activeScenarioApplyPromise = null;
 
 function cacheBust(url) {
   if (!url) return url;
@@ -182,9 +180,7 @@ function normalizeScenarioId(value) {
 }
 
 function canonicalScenarioCountryCode(rawCode) {
-  const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
-  if (!code) return "";
-  return COUNTRY_CODE_ALIASES[code] || code;
+  return normalizeCountryCodeAlias(rawCode);
 }
 
 function extractScenarioCountryCodeFromId(value) {
@@ -2110,13 +2106,33 @@ async function applyScenarioById(
     showToastOnComplete = false,
   } = {}
 ) {
-  const bundle = await loadScenarioBundle(scenarioId);
-  await applyScenarioBundle(bundle, {
-    renderNow,
-    markDirtyReason,
-    showToastOnComplete,
-  });
-  return bundle;
+  const normalizedScenarioId = normalizeScenarioId(scenarioId);
+  if (!normalizedScenarioId) {
+    throw new Error("[scenario] Scenario id is required.");
+  }
+  if (state.scenarioApplyInFlight && activeScenarioApplyPromise) {
+    return activeScenarioApplyPromise;
+  }
+
+  state.scenarioApplyInFlight = true;
+  syncScenarioUi();
+  activeScenarioApplyPromise = (async () => {
+    const bundle = await loadScenarioBundle(normalizedScenarioId);
+    await applyScenarioBundle(bundle, {
+      renderNow,
+      markDirtyReason,
+      showToastOnComplete,
+    });
+    return bundle;
+  })();
+
+  try {
+    return await activeScenarioApplyPromise;
+  } finally {
+    activeScenarioApplyPromise = null;
+    state.scenarioApplyInFlight = false;
+    syncScenarioUi();
+  }
 }
 
 async function applyDefaultScenarioOnStartup(
@@ -2336,6 +2352,7 @@ function initScenarioManager({ render } = {}) {
 
   const renderScenarioControls = () => {
     const entries = getScenarioRegistryEntries();
+    const isApplyInFlight = !!state.scenarioApplyInFlight;
     if (scenarioSelect) {
       const pendingValue = normalizeScenarioId(scenarioSelect.value);
       const activeValue = normalizeScenarioId(state.activeScenarioId);
@@ -2376,12 +2393,12 @@ function initScenarioManager({ render } = {}) {
     }
     if (resetScenarioBtn) {
       resetScenarioBtn.textContent = t("Reset Changes To Baseline", "ui");
-      resetScenarioBtn.disabled = !state.activeScenarioId;
+      resetScenarioBtn.disabled = !state.activeScenarioId || isApplyInFlight;
       resetScenarioBtn.classList.toggle("hidden", !state.activeScenarioId);
     }
     if (clearScenarioBtn) {
       clearScenarioBtn.textContent = t("Exit Scenario", "ui");
-      clearScenarioBtn.disabled = !state.activeScenarioId;
+      clearScenarioBtn.disabled = !state.activeScenarioId || isApplyInFlight;
       clearScenarioBtn.classList.toggle("hidden", !state.activeScenarioId);
     }
     if (applyScenarioBtn) {
@@ -2389,7 +2406,7 @@ function initScenarioManager({ render } = {}) {
       const isSelectedScenarioActive =
         !!selectedScenarioId && selectedScenarioId === normalizeScenarioId(state.activeScenarioId);
       applyScenarioBtn.textContent = t("Apply", "ui");
-      applyScenarioBtn.disabled = !selectedScenarioId || isSelectedScenarioActive;
+      applyScenarioBtn.disabled = !selectedScenarioId || isSelectedScenarioActive || isApplyInFlight;
       applyScenarioBtn.classList.toggle("hidden", isSelectedScenarioActive);
     }
   };
@@ -2443,7 +2460,7 @@ function initScenarioManager({ render } = {}) {
 
   if (resetScenarioBtn && !resetScenarioBtn.dataset.bound) {
     resetScenarioBtn.addEventListener("click", () => {
-      if (!state.activeScenarioId) return;
+      if (!state.activeScenarioId || state.scenarioApplyInFlight) return;
       resetToScenarioBaseline({
         renderNow: true,
         markDirtyReason: "scenario-reset",
@@ -2459,7 +2476,7 @@ function initScenarioManager({ render } = {}) {
 
   if (clearScenarioBtn && !clearScenarioBtn.dataset.bound) {
     clearScenarioBtn.addEventListener("click", () => {
-      if (!state.activeScenarioId) return;
+      if (!state.activeScenarioId || state.scenarioApplyInFlight) return;
       clearActiveScenario({
         renderNow: true,
         markDirtyReason: "scenario-clear",

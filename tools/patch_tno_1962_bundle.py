@@ -27,6 +27,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from map_builder.geo.topology import compute_neighbor_graph
+from map_builder.io.readers import read_json_strict
+from map_builder.io.writers import write_json_atomic
 from scenario_builder.hoi4.audit import read_bmp24
 from tools.build_tno_1962_geo_locale_patch import build_patch as build_tno_geo_locale_patch
 
@@ -2745,7 +2747,10 @@ def utc_timestamp() -> str:
 
 
 def load_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
+    payload = read_json_strict(path)
+    if not isinstance(payload, dict):
+        raise ValueError(f"Expected JSON object in {path}, found {type(payload).__name__}.")
+    return payload
 
 
 _mediterranean_template_water_gdf: gpd.GeoDataFrame | None = None
@@ -2779,9 +2784,13 @@ def sanitize_jsonable(value):
 
 def write_json(path: Path, payload: dict) -> None:
     sanitized = sanitize_jsonable(payload)
-    path.write_text(
-        json.dumps(sanitized, ensure_ascii=False, separators=(",", ":"), allow_nan=False),
-        encoding="utf-8",
+    write_json_atomic(
+        path,
+        sanitized,
+        ensure_ascii=False,
+        separators=(",", ":"),
+        allow_nan=False,
+        indent=None,
     )
 
 

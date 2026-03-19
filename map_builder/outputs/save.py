@@ -1,8 +1,6 @@
 """Output writers for the map pipeline."""
 from __future__ import annotations
 
-import json
-import os
 from pathlib import Path
 
 import geopandas as gpd
@@ -10,24 +8,17 @@ import matplotlib.pyplot as plt
 
 from map_builder import config as cfg
 from map_builder.geo.utils import round_geometries
+from map_builder.io.writers import write_geojson_atomic, write_json_atomic
 
 
 def _write_geojson(path: Path, gdf: gpd.GeoDataFrame | None) -> None:
-    if gdf is None:
-        return
-    if gdf.empty:
-        path.write_text(
-            json.dumps({"type": "FeatureCollection", "features": []}, ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
-        return
-    path.write_text(gdf.to_json(drop_id=True), encoding="utf-8")
+    write_geojson_atomic(path, gdf)
 
 
 def _write_json(path: Path, payload: dict | None) -> None:
     if payload is None:
         return
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_json_atomic(path, payload, ensure_ascii=False, indent=2)
 
 
 def save_outputs(
@@ -60,20 +51,26 @@ def save_outputs(
     physical_out = round_geometries(physical)
     world_cities_out = round_geometries(world_cities) if world_cities is not None else None
 
-    print(f"Saving preview image to {preview_path}...")
-    fig, ax = plt.subplots(figsize=(8, 8))
-    ocean_out.plot(ax=ax, color="#b3d9ff")
-    land_bg_out.plot(ax=ax, linewidth=0, color="#e0e0e0")
-    if water_regions_out is not None and not water_regions_out.empty:
-        water_regions_out.plot(ax=ax, linewidth=0.3, edgecolor="#5f7797", color="#8bc7ff")
-    physical_out.plot(ax=ax, linewidth=0.6, edgecolor="#5c4033", facecolor="none")
-    urban_out.plot(ax=ax, linewidth=0, color="#333333", alpha=0.2)
-    land_out.plot(ax=ax, linewidth=0.3, edgecolor="#999999", color="#d0d0d0")
-    borders_out.plot(ax=ax, linewidth=1.2, edgecolor="#000000", facecolor="none")
-    rivers_out.plot(ax=ax, linewidth=0.8, color="#3498db")
-    ax.set_axis_off()
-    fig.savefig(preview_path, dpi=200, bbox_inches="tight")
-    plt.close(fig)
-
     _write_geojson(output_dir / cfg.WORLD_CITIES_FILENAME, world_cities_out)
     _write_json(output_dir / cfg.CITY_ALIASES_FILENAME, city_aliases)
+    try:
+        print(f"Saving preview image to {preview_path}...")
+        fig, ax = plt.subplots(figsize=(8, 8))
+        ocean_out.plot(ax=ax, color="#b3d9ff")
+        land_bg_out.plot(ax=ax, linewidth=0, color="#e0e0e0")
+        if water_regions_out is not None and not water_regions_out.empty:
+            water_regions_out.plot(ax=ax, linewidth=0.3, edgecolor="#5f7797", color="#8bc7ff")
+        physical_out.plot(ax=ax, linewidth=0.6, edgecolor="#5c4033", facecolor="none")
+        urban_out.plot(ax=ax, linewidth=0, color="#333333", alpha=0.2)
+        land_out.plot(ax=ax, linewidth=0.3, edgecolor="#999999", color="#d0d0d0")
+        borders_out.plot(ax=ax, linewidth=1.2, edgecolor="#000000", facecolor="none")
+        rivers_out.plot(ax=ax, linewidth=0.8, color="#3498db")
+        ax.set_axis_off()
+        fig.savefig(preview_path, dpi=200, bbox_inches="tight")
+    except Exception as exc:
+        print(f"[Outputs] Preview generation failed: {exc}")
+    finally:
+        try:
+            plt.close(fig)
+        except Exception:
+            pass

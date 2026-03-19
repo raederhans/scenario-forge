@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "scenario_id": "modern_world",
   "display_name": "Modern World",
   "bookmark_name": "Modern World",
@@ -54,6 +54,18 @@
     "manual_reviewed_region_count": 0
   },
   "generated_at": "2026-03-09T14:09:29.123Z",
+  "performance_hints": {
+    "render_profile_default": "balanced",
+    "dynamic_borders_default": false,
+    "scenario_relief_overlays_default": false,
+    "water_regions_default": false,
+    "special_regions_default": false
+  },
+  "style_defaults": {
+    "ocean": {
+      "fillColor": "#2d4769"
+    }
+  },
   "city_overrides_url": "data/scenarios/modern_world/city_overrides.json",
   "capital_hints_url": "data/scenarios/modern_world/capital_hints.json"
 }

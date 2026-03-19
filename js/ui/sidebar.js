@@ -4934,7 +4934,7 @@ function initSidebar({ render } = {}) {
           if (!validation.ok) {
             const shouldContinue = validation.reason === "baseline_mismatch"
               ? globalThis.confirm(
-                `${validation.message}\n\nContinue loading this project anyway?`
+                `${validation.message}\n\n${t("Continue loading this project anyway?", "ui")}`
               )
               : false;
             if (!shouldContinue) {

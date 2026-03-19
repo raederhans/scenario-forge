@@ -1,17 +1,12 @@
 import { countryPresets, state } from "./state.js";
+import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 
-const COUNTRY_CODE_ALIASES = {
-  UK: "GB",
-  EL: "GR",
-};
 const BOUNDARY_VARIANT_ID_ALIASES = {
   legacy_approx: "historical_reference",
 };
 
 function normalizeCountryCode(rawCode) {
-  const code = String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
-  if (!code) return "";
-  return COUNTRY_CODE_ALIASES[code] || code;
+  return normalizeCountryCodeAlias(rawCode);
 }
 
 function clonePreset(preset = {}) {

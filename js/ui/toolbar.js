@@ -1365,7 +1365,7 @@ function initToolbar({ render } = {}) {
       lakeFillColor.value = resolvedLakeColor;
       lakeFillColor.disabled = lakeConfig.linkedToOcean;
       lakeFillColor.title = lakeConfig.linkedToOcean
-        ? "Linked to the current ocean fill color."
+        ? t("Linked to the current ocean fill color.", "ui")
         : "";
     }
   };
@@ -3401,7 +3401,7 @@ function initToolbar({ render } = {}) {
           option.disabled = true;
         }
       });
-      oceanStyleSelect.title = "Advanced ocean styles are temporarily disabled for performance.";
+      oceanStyleSelect.title = t("Advanced ocean styles are temporarily disabled for performance.", "ui");
       oceanStyleSelect.value = "flat";
     }
     oceanStyleSelect.value = state.styleConfig.ocean.preset || "flat";
@@ -3435,7 +3435,7 @@ function initToolbar({ render } = {}) {
     });
     if (!OCEAN_ADVANCED_STYLES_ENABLED) {
       oceanTextureOpacity.disabled = true;
-      oceanTextureOpacity.title = "Temporarily disabled while advanced ocean styles are off.";
+      oceanTextureOpacity.title = t("Temporarily disabled while advanced ocean styles are off.", "ui");
     }
   }
 
@@ -3456,7 +3456,7 @@ function initToolbar({ render } = {}) {
     });
     if (!OCEAN_ADVANCED_STYLES_ENABLED) {
       oceanTextureScale.disabled = true;
-      oceanTextureScale.title = "Temporarily disabled while advanced ocean styles are off.";
+      oceanTextureScale.title = t("Temporarily disabled while advanced ocean styles are off.", "ui");
     }
   }
 
@@ -3477,7 +3477,7 @@ function initToolbar({ render } = {}) {
     });
     if (!OCEAN_ADVANCED_STYLES_ENABLED) {
       oceanContourStrength.disabled = true;
-      oceanContourStrength.title = "Temporarily disabled while advanced ocean styles are off.";
+      oceanContourStrength.title = t("Temporarily disabled while advanced ocean styles are off.", "ui");
     }
   }
 

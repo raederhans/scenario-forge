@@ -858,6 +858,7 @@ export const state = {
   detailSourceRequested: "na_v2",
   detailPromotionInFlight: false,
   detailPromotionCompleted: false,
+  scenarioApplyInFlight: false,
   scenarioRegistry: null,
   scenarioBundleCacheById: {},
   activeScenarioId: "",
