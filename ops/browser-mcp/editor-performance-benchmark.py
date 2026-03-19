@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import json
 import os
 import re
@@ -26,6 +27,66 @@ CONTEXT_PROBE_CASES = [
     ("water_off", {"showWaterRegions": False}),
     ("physical_urban_rivers_off", {"showPhysical": False, "showUrban": False, "showRivers": False}),
 ]
+WSL_LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "::1"}
+WSL_GATEWAY_HOST = None
+
+
+def normalize_bash_path(path: Path) -> str:
+    resolved = path.resolve()
+    posix_path = resolved.as_posix()
+    if os.name != "nt":
+        return posix_path
+    drive, tail = os.path.splitdrive(posix_path)
+    if drive:
+        return f"/mnt/{drive[0].lower()}{tail}"
+    return posix_path
+
+
+def resolve_wsl_gateway_host() -> str | None:
+    global WSL_GATEWAY_HOST
+    if WSL_GATEWAY_HOST is not None:
+        return WSL_GATEWAY_HOST or None
+    if os.name != "nt":
+        WSL_GATEWAY_HOST = ""
+        return None
+    try:
+        proc = subprocess.run(
+            ["bash", "-lc", "ip route show default"],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=10,
+        )
+    except (subprocess.SubprocessError, OSError):
+        WSL_GATEWAY_HOST = ""
+        return None
+    gateway_host = ""
+    if proc.returncode == 0:
+        match = re.search(r"\bvia\s+(\S+)", proc.stdout)
+        gateway_host = match.group(1).strip() if match else ""
+    WSL_GATEWAY_HOST = gateway_host
+    return gateway_host or None
+
+
+def normalize_playwright_url(url: str) -> str:
+    if os.name != "nt":
+        return url
+    parts = urlsplit(url)
+    hostname = parts.hostname or ""
+    if hostname.lower() not in WSL_LOOPBACK_HOSTS:
+        return url
+    gateway_host = resolve_wsl_gateway_host()
+    if not gateway_host:
+        return url
+    auth = ""
+    if parts.username:
+        auth = parts.username
+        if parts.password:
+            auth += f":{parts.password}"
+        auth += "@"
+    port = f":{parts.port}" if parts.port else ""
+    netloc = f"{auth}{gateway_host}{port}"
+    return urlunsplit((parts.scheme, netloc, parts.path, parts.query, parts.fragment))
 
 
 def parse_args() -> argparse.Namespace:
@@ -43,9 +104,10 @@ def parse_args() -> argparse.Namespace:
 def run_pw(*args: str, expect_json: bool = False, timeout_sec: int = 240) -> dict | list | str:
     env = os.environ.copy()
     env["PLAYWRIGHT_CLI_SESSION"] = SESSION_ID
+    PWCLI_WORKDIR.mkdir(parents=True, exist_ok=True)
     try:
       proc = subprocess.run(
-          ["bash", str(PWCLI), *args],
+          ["bash", normalize_bash_path(PWCLI), *args],
           cwd=PWCLI_WORKDIR,
           env=env,
           capture_output=True,
@@ -74,9 +136,10 @@ def close_session() -> None:
     global BROWSER_OPENED
     env = os.environ.copy()
     env["PLAYWRIGHT_CLI_SESSION"] = SESSION_ID
+    PWCLI_WORKDIR.mkdir(parents=True, exist_ok=True)
     try:
       subprocess.run(
-          ["bash", str(PWCLI), "close"],
+          ["bash", normalize_bash_path(PWCLI), "close"],
           cwd=PWCLI_WORKDIR,
           env=env,
           capture_output=True,
@@ -169,7 +232,7 @@ async (page) => {{
 def open_page(url: str) -> None:
     global BROWSER_OPENED
     if not BROWSER_OPENED:
-      run_pw("open", "about:blank", "--browser", "msedge")
+      run_pw("open", url, "--browser", "msedge")
       BROWSER_OPENED = True
     navigate(url)
 
@@ -199,7 +262,7 @@ def capture_network_issues() -> list[str]:
 
 def take_screenshot(target_path: Path) -> str:
     target_path.parent.mkdir(parents=True, exist_ok=True)
-    run_pw("screenshot", "--filename", target_path.resolve().as_posix(), "--full-page", timeout_sec=120)
+    run_pw("screenshot", "--filename", normalize_bash_path(target_path.resolve()), "--full-page", timeout_sec=120)
     if not target_path.exists():
       raise RuntimeError(f"Screenshot was not created at {target_path}")
     return str(target_path)
@@ -357,7 +420,14 @@ def measure_context_probes(scenario_id: str) -> dict | None:
     probes = {}
     for label, flags in CONTEXT_PROBE_CASES:
       print(f"[benchmark] context probe scenario={scenario_id} case={label}", flush=True)
-      probes[label] = measure_context_probe_case(label, flags)
+      try:
+        probes[label] = measure_context_probe_case(label, flags)
+      except RuntimeError as exc:
+        probes[label] = {
+          "label": label,
+          "flags": flags,
+          "error": str(exc),
+        }
     return probes
 
 
@@ -741,11 +811,14 @@ def main() -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     screenshot_dir.mkdir(parents=True, exist_ok=True)
 
+    effective_url = normalize_playwright_url(args.url)
+
     try:
-      suites = {scenario_id: run_scenario_suite(args.url, scenario_id, screenshot_dir) for scenario_id in SCENARIO_IDS}
+      suites = {scenario_id: run_scenario_suite(effective_url, scenario_id, screenshot_dir) for scenario_id in SCENARIO_IDS}
       report = {
-        "createdAt": subprocess.run(["date", "-Iseconds"], capture_output=True, text=True, check=True).stdout.strip(),
+        "createdAt": datetime.now(timezone.utc).astimezone().isoformat(),
         "url": args.url,
+        "effectiveUrl": effective_url,
         "scenarioIds": SCENARIO_IDS,
         "suites": suites,
       }

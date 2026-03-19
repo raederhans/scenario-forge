@@ -2148,7 +2148,6 @@ async function applyScenarioBundle(
     applyScenarioPaintMode();
     syncScenarioOceanFillForActivation(bundle.manifest);
     applyScenarioPerformanceHints(bundle.manifest);
-    ensureSovereigntyState({ force: true });
     if (Object.keys(staged.scenarioOwnerBackfill).length) {
       console.info(
         `[scenario] Applied HOI4 Far East owner backfill for "${staged.scenarioId}": ${Object.keys(staged.scenarioOwnerBackfill).length} missing RU runtime features -> SOV.`

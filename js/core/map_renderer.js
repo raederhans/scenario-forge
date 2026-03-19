@@ -313,16 +313,35 @@ const layerResolverCache = {
   detailRef: null,
   bundleMode: null,
 };
+const politicalFeatureCollectionCache = new WeakMap();
 let admin0MergedCache = {
   topologyRef: null,
   featureCount: 0,
   entries: [],
+};
+let composedPoliticalCollectionCache = {
+  primaryRef: null,
+  detailRef: null,
+  overrideRef: null,
+  result: null,
 };
 let scenarioCoastlineSourceCache = {
   primaryRef: null,
   runtimeRef: null,
   scenarioId: "",
   decision: null,
+};
+let staticMeshCache = {
+  primaryRef: null,
+  detailRef: null,
+  runtimeRef: null,
+  bundleMode: "",
+  activeScenarioId: "",
+  scenarioBorderMode: "",
+  scenarioViewMode: "",
+  sourceCountriesSignature: "",
+  coastlineDecisionSignature: "",
+  snapshot: null,
 };
 let scenarioPoliticalBackgroundCache = {
   topologyRef: null,
@@ -384,6 +403,8 @@ const cityMarkerSpriteCache = new Map();
 let visibleCityHoverEntries = [];
 let dayNightClockTimerId = null;
 let lastDayNightClockToken = "";
+let pendingIndexUiRefreshHandle = null;
+let pendingIndexUiRefreshState = null;
 
 function readSearchParam(name) {
   const search = globalThis?.location?.search || "";
@@ -2083,9 +2104,13 @@ function getPoliticalFeatureCollection(topology, sourceName) {
   if (!topology?.objects?.political || !globalThis.topojson) {
     return { type: "FeatureCollection", features: [] };
   }
+  const cachedCollections = politicalFeatureCollectionCache.get(topology);
+  if (cachedCollections?.has(sourceName)) {
+    return cachedCollections.get(sourceName);
+  }
   const collection = globalThis.topojson.feature(topology, topology.objects.political);
   const features = Array.isArray(collection?.features) ? collection.features : [];
-  return {
+  const normalizedCollection = {
     type: "FeatureCollection",
     features: features.map((feature) => {
       const normalizedFeature = normalizeFeatureGeometry(feature, { sourceLabel: sourceName });
@@ -2099,6 +2124,10 @@ function getPoliticalFeatureCollection(topology, sourceName) {
       };
     }),
   };
+  const nextCollections = cachedCollections || new Map();
+  nextCollections.set(sourceName, normalizedCollection);
+  politicalFeatureCollectionCache.set(topology, nextCollections);
+  return normalizedCollection;
 }
 
 function parseReplaceFeatureIds(rawValue) {
@@ -2308,16 +2337,30 @@ function mergeOverrideFeatures(baseFeatures, overrideCollection) {
 }
 
 function composePoliticalFeatures(primaryTopology, detailTopology, overrideCollection = null) {
+  const cacheMatches =
+    composedPoliticalCollectionCache.primaryRef === primaryTopology &&
+    composedPoliticalCollectionCache.detailRef === detailTopology &&
+    composedPoliticalCollectionCache.overrideRef === overrideCollection;
+  if (cacheMatches && composedPoliticalCollectionCache.result) {
+    return composedPoliticalCollectionCache.result;
+  }
   const primaryCollection = getPoliticalFeatureCollection(primaryTopology, "primary");
   if (!detailTopology) {
     const baseFeatures = primaryCollection.features;
     const features = overrideCollection
       ? mergeOverrideFeatures(baseFeatures, overrideCollection)
       : baseFeatures;
-    return {
+    const result = {
       type: "FeatureCollection",
       features,
     };
+    composedPoliticalCollectionCache = {
+      primaryRef: primaryTopology,
+      detailRef: detailTopology,
+      overrideRef: overrideCollection,
+      result,
+    };
+    return result;
   }
 
   const detailCollection = getPoliticalFeatureCollection(detailTopology, "detail");
@@ -2349,10 +2392,17 @@ function composePoliticalFeatures(primaryTopology, detailTopology, overrideColle
     ? mergeOverrideFeatures(features, overrideCollection)
     : features;
 
-  return {
+  const result = {
     type: "FeatureCollection",
     features: mergedFeatures,
   };
+  composedPoliticalCollectionCache = {
+    primaryRef: primaryTopology,
+    detailRef: detailTopology,
+    overrideRef: overrideCollection,
+    result,
+  };
+  return result;
 }
 
 function collectCountryCoverageStats(features = []) {
@@ -3836,6 +3886,74 @@ function getSourceCountrySets() {
   return sets;
 }
 
+function serializeCountrySetSignature(countrySet) {
+  return Array.from(countrySet || []).sort((left, right) => left.localeCompare(right)).join(",");
+}
+
+function getSourceCountriesSignature(sourceCountries = {}) {
+  return [
+    `primary:${serializeCountrySetSignature(sourceCountries.primary)}`,
+    `detail:${serializeCountrySetSignature(sourceCountries.detail)}`,
+  ].join("|");
+}
+
+function getCoastlineDecisionSignature(decision = null) {
+  if (!decision || typeof decision !== "object") {
+    return "";
+  }
+  return [
+    String(decision.source || ""),
+    String(decision.reason || ""),
+    String(decision.scenarioId || ""),
+    String(decision.primaryObjectName || ""),
+    String(decision.runtimeObjectName || ""),
+    Number(decision.primaryFeatureCount || 0),
+    Number(decision.runtimeFeatureCount || 0),
+    Number(decision.primaryPolygonPartCount || 0),
+    Number(decision.runtimePolygonPartCount || 0),
+    Number(decision.primaryInteriorRingCount || 0),
+    Number(decision.runtimeInteriorRingCount || 0),
+    Number(decision.runtimeInteriorRingRatio || 0),
+    Number(decision.areaDeltaRatio || 0),
+  ].join("|");
+}
+
+function captureStaticMeshSnapshot() {
+  return {
+    cachedCountryBorders: [...(state.cachedCountryBorders || [])],
+    cachedProvinceBorders: [...(state.cachedProvinceBorders || [])],
+    cachedLocalBorders: [...(state.cachedLocalBorders || [])],
+    cachedDetailAdmBorders: [...(state.cachedDetailAdmBorders || [])],
+    cachedCoastlines: [...(state.cachedCoastlines || [])],
+    cachedCoastlinesHigh: [...(state.cachedCoastlinesHigh || [])],
+    cachedCoastlinesMid: [...(state.cachedCoastlinesMid || [])],
+    cachedCoastlinesLow: [...(state.cachedCoastlinesLow || [])],
+    cachedParentBordersByCountry: new Map(state.cachedParentBordersByCountry || []),
+    cachedGridLines: [...(state.cachedGridLines || [])],
+    parentGroupByFeatureId: new Map(state.parentGroupByFeatureId || []),
+    parentBorderMetaByCountry: { ...(state.parentBorderMetaByCountry || {}) },
+    parentBorderSupportedCountries: [...(state.parentBorderSupportedCountries || [])],
+  };
+}
+
+function restoreStaticMeshSnapshot(snapshot) {
+  if (!snapshot) return;
+  state.cachedCountryBorders = [...(snapshot.cachedCountryBorders || [])];
+  state.cachedProvinceBorders = [...(snapshot.cachedProvinceBorders || [])];
+  state.cachedLocalBorders = [...(snapshot.cachedLocalBorders || [])];
+  state.cachedDetailAdmBorders = [...(snapshot.cachedDetailAdmBorders || [])];
+  state.cachedCoastlines = [...(snapshot.cachedCoastlines || [])];
+  state.cachedCoastlinesHigh = [...(snapshot.cachedCoastlinesHigh || [])];
+  state.cachedCoastlinesMid = [...(snapshot.cachedCoastlinesMid || [])];
+  state.cachedCoastlinesLow = [...(snapshot.cachedCoastlinesLow || [])];
+  state.cachedParentBordersByCountry = new Map(snapshot.cachedParentBordersByCountry || []);
+  state.cachedGridLines = [...(snapshot.cachedGridLines || [])];
+  state.parentGroupByFeatureId = new Map(snapshot.parentGroupByFeatureId || []);
+  state.parentBorderMetaByCountry = { ...(snapshot.parentBorderMetaByCountry || {}) };
+  state.parentBorderSupportedCountries = [...(snapshot.parentBorderSupportedCountries || [])];
+  syncParentBorderEnabledByCountry(state.parentBorderSupportedCountries);
+}
+
 function buildSourceBorderMeshes(topology, includedCountries) {
   const object = topology?.objects?.political;
   if (!object || !globalThis.topojson || !includedCountries?.size) {
@@ -4228,6 +4346,69 @@ function simplifyCoastlineMesh(mesh, { epsilon = 0, minLength = 0 } = {}) {
 
 function rebuildStaticMeshes() {
   const startedAt = nowMs();
+  if (!globalThis.topojson) {
+    staticMeshCache.snapshot = null;
+    state.cachedCountryBorders = [];
+    state.cachedProvinceBorders = [];
+    state.cachedLocalBorders = [];
+    state.cachedDetailAdmBorders = [];
+    state.cachedCoastlines = [];
+    state.cachedCoastlinesHigh = [];
+    state.cachedCoastlinesMid = [];
+    state.cachedCoastlinesLow = [];
+    state.cachedParentBordersByCountry = new Map();
+    state.cachedGridLines = [];
+    state.parentGroupByFeatureId = new Map();
+    state.parentBorderMetaByCountry = {};
+    state.parentBorderSupportedCountries = [];
+    syncParentBorderEnabledByCountry([]);
+    if (typeof state.updateParentBorderCountryListFn === "function") {
+      state.updateParentBorderCountryListFn();
+    }
+    recordRenderPerfMetric("rebuildStaticMeshes", nowMs() - startedAt, {
+      hasTopojson: false,
+      countryMeshes: 0,
+      coastlineMeshes: 0,
+    });
+    return;
+  }
+
+  const sourceCountries = getSourceCountrySets();
+  const coastlineSourceDecision = resolveCoastlineTopologySource();
+  const sourceCountriesSignature = getSourceCountriesSignature(sourceCountries);
+  const coastlineDecisionSignature = getCoastlineDecisionSignature(coastlineSourceDecision);
+  const primaryTopology = state.topologyPrimary || state.topology;
+  const detailTopology = state.topologyDetail || null;
+  const runtimeTopology = state.runtimePoliticalTopology || null;
+  const cacheMatches =
+    staticMeshCache.primaryRef === primaryTopology &&
+    staticMeshCache.detailRef === detailTopology &&
+    staticMeshCache.runtimeRef === runtimeTopology &&
+    staticMeshCache.bundleMode === String(state.topologyBundleMode || "") &&
+    staticMeshCache.activeScenarioId === String(state.activeScenarioId || "") &&
+    staticMeshCache.scenarioBorderMode === String(state.scenarioBorderMode || "") &&
+    staticMeshCache.scenarioViewMode === String(state.scenarioViewMode || "") &&
+    staticMeshCache.sourceCountriesSignature === sourceCountriesSignature &&
+    staticMeshCache.coastlineDecisionSignature === coastlineDecisionSignature &&
+    staticMeshCache.snapshot;
+  if (cacheMatches) {
+    restoreStaticMeshSnapshot(staticMeshCache.snapshot);
+    if (typeof state.updateParentBorderCountryListFn === "function") {
+      state.updateParentBorderCountryListFn();
+    }
+    recordRenderPerfMetric("rebuildStaticMeshes", nowMs() - startedAt, {
+      hasTopojson: true,
+      cacheHit: true,
+      countryMeshes: state.cachedCountryBorders.length,
+      provinceMeshes: state.cachedProvinceBorders.length,
+      localMeshes: state.cachedLocalBorders.length,
+      coastlineMeshes: state.cachedCoastlines.length,
+      coastlineSource: String(coastlineSourceDecision?.source || "primary"),
+      coastlineReason: String(coastlineSourceDecision?.reason || ""),
+    });
+    return;
+  }
+
   state.cachedCountryBorders = [];
   state.cachedProvinceBorders = [];
   state.cachedLocalBorders = [];
@@ -4241,25 +4422,11 @@ function rebuildStaticMeshes() {
   state.parentGroupByFeatureId = new Map();
   state.parentBorderMetaByCountry = {};
   state.parentBorderSupportedCountries = [];
-  if (!globalThis.topojson) {
-    syncParentBorderEnabledByCountry([]);
-    if (typeof state.updateParentBorderCountryListFn === "function") {
-      state.updateParentBorderCountryListFn();
-    }
-    recordRenderPerfMetric("rebuildStaticMeshes", nowMs() - startedAt, {
-      hasTopojson: false,
-      countryMeshes: 0,
-      coastlineMeshes: 0,
-    });
-    return;
-  }
-
   refreshParentBorderSupport();
 
-  const sourceCountries = getSourceCountrySets();
   const sources = [
-    { key: "detail", topology: state.topologyDetail },
-    { key: "primary", topology: state.topologyPrimary || state.topology },
+    { key: "detail", topology: detailTopology },
+    { key: "primary", topology: primaryTopology },
   ];
 
   sources.forEach(({ key, topology }) => {
@@ -4280,16 +4447,15 @@ function rebuildStaticMeshes() {
   }
 
   const unifiedBorderTopology =
-    state.topologyBundleMode === "composite" && state.runtimePoliticalTopology?.objects?.political
-      ? state.runtimePoliticalTopology
-      : (state.topologyPrimary || state.topology);
+    state.topologyBundleMode === "composite" && runtimeTopology?.objects?.political
+      ? runtimeTopology
+      : primaryTopology;
   const countryMesh = buildGlobalCountryBorderMesh(unifiedBorderTopology);
   if (isUsableMesh(countryMesh)) {
     state.cachedCountryBorders.push(countryMesh);
   }
 
-  const coastlineSourceDecision = resolveCoastlineTopologySource();
-  const coastlineMesh = buildGlobalCoastlineMesh(coastlineSourceDecision?.topology || (state.topologyPrimary || state.topology));
+  const coastlineMesh = buildGlobalCoastlineMesh(coastlineSourceDecision?.topology || primaryTopology);
   if (isUsableMesh(coastlineMesh)) {
     state.cachedCoastlines.push(coastlineMesh);
     state.cachedCoastlinesHigh.push(coastlineMesh);
@@ -4319,8 +4485,21 @@ function rebuildStaticMeshes() {
 
   // Backward compatibility: expose local boundaries as "grid lines".
   state.cachedGridLines = [...(state.cachedLocalBorders || [])];
+  staticMeshCache = {
+    primaryRef: primaryTopology,
+    detailRef: detailTopology,
+    runtimeRef: runtimeTopology,
+    bundleMode: String(state.topologyBundleMode || ""),
+    activeScenarioId: String(state.activeScenarioId || ""),
+    scenarioBorderMode: String(state.scenarioBorderMode || ""),
+    scenarioViewMode: String(state.scenarioViewMode || ""),
+    sourceCountriesSignature,
+    coastlineDecisionSignature,
+    snapshot: captureStaticMeshSnapshot(),
+  };
   recordRenderPerfMetric("rebuildStaticMeshes", nowMs() - startedAt, {
     hasTopojson: true,
+    cacheHit: false,
     countryMeshes: state.cachedCountryBorders.length,
     provinceMeshes: state.cachedProvinceBorders.length,
     localMeshes: state.cachedLocalBorders.length,
@@ -4965,6 +5144,57 @@ function getSpecialHitFromPointer(
   });
 }
 
+function cancelPendingIndexUiRefresh() {
+  if (pendingIndexUiRefreshHandle === null || pendingIndexUiRefreshHandle === undefined) {
+    pendingIndexUiRefreshState = null;
+    return;
+  }
+  if (typeof globalThis.cancelAnimationFrame === "function") {
+    globalThis.cancelAnimationFrame(pendingIndexUiRefreshHandle);
+  } else {
+    globalThis.clearTimeout(pendingIndexUiRefreshHandle);
+  }
+  pendingIndexUiRefreshHandle = null;
+  pendingIndexUiRefreshState = null;
+}
+
+function flushPendingIndexUiRefresh() {
+  const pending = pendingIndexUiRefreshState;
+  pendingIndexUiRefreshHandle = null;
+  pendingIndexUiRefreshState = null;
+  if (!pending) return;
+  if (pending.renderCountryList && typeof state.renderCountryListFn === "function") {
+    state.renderCountryListFn();
+  }
+  if (pending.renderWaterRegionList && typeof state.renderWaterRegionListFn === "function") {
+    state.renderWaterRegionListFn();
+  }
+  if (pending.renderSpecialRegionList && typeof state.renderSpecialRegionListFn === "function") {
+    state.renderSpecialRegionListFn();
+  }
+}
+
+function scheduleIndexUiRefresh({
+  renderCountryList = false,
+  renderWaterRegionList = false,
+  renderSpecialRegionList = false,
+} = {}) {
+  pendingIndexUiRefreshState = {
+    renderCountryList: !!(pendingIndexUiRefreshState?.renderCountryList || renderCountryList),
+    renderWaterRegionList: !!(pendingIndexUiRefreshState?.renderWaterRegionList || renderWaterRegionList),
+    renderSpecialRegionList: !!(pendingIndexUiRefreshState?.renderSpecialRegionList || renderSpecialRegionList),
+  };
+  if (pendingIndexUiRefreshHandle !== null && pendingIndexUiRefreshHandle !== undefined) {
+    return;
+  }
+  const callback = () => {
+    flushPendingIndexUiRefresh();
+  };
+  pendingIndexUiRefreshHandle = typeof globalThis.requestAnimationFrame === "function"
+    ? globalThis.requestAnimationFrame(callback)
+    : globalThis.setTimeout(callback, 0);
+}
+
 function buildIndex() {
   state.landIndex.clear();
   state.countryToFeatureIds.clear();
@@ -5004,12 +5234,10 @@ function buildIndex() {
   }
 
   if (!state.landData || !state.landData.features) {
-    if (typeof state.renderWaterRegionListFn === "function") {
-      state.renderWaterRegionListFn();
-    }
-    if (typeof state.renderSpecialRegionListFn === "function") {
-      state.renderSpecialRegionListFn();
-    }
+    scheduleIndexUiRefresh({
+      renderWaterRegionList: true,
+      renderSpecialRegionList: true,
+    });
     return;
   }
   state.landData.features.forEach((feature, index) => {
@@ -5027,18 +5255,11 @@ function buildIndex() {
     state.keyToId.set(key, id);
   });
 
-  if (typeof state.renderCountryListFn === "function") {
-    state.renderCountryListFn();
-  }
-  if (typeof state.renderWaterRegionListFn === "function") {
-    state.renderWaterRegionListFn();
-  }
-  if (typeof state.renderSpecialRegionListFn === "function") {
-    state.renderSpecialRegionListFn();
-  }
-  if (typeof state.renderPresetTreeFn === "function") {
-    state.renderPresetTreeFn();
-  }
+  scheduleIndexUiRefresh({
+    renderCountryList: true,
+    renderWaterRegionList: true,
+    renderSpecialRegionList: true,
+  });
   state.devSelectionOverlayDirty = true;
   notifyDevWorkspace();
   state.hitCanvasDirty = true;
@@ -12468,6 +12689,7 @@ function initMap({ containerId = "mapContainer" } = {}) {
   markAllOverlaysDirty();
   clearStagedMapDataTasks();
   cancelExactAfterSettleRefresh();
+  cancelPendingIndexUiRefresh();
   state.deferContextBasePass = false;
   state.deferHitCanvasBuild = false;
   state.deferExactAfterSettle = false;
@@ -12497,6 +12719,7 @@ function setMapData({ refitProjection = true, resetZoom = true } = {}) {
   const startedAt = nowMs();
   clearPendingDynamicBorderTimer();
   clearRenderPhaseTimer();
+  cancelPendingIndexUiRefresh();
   setRenderPhase(RENDER_PHASE_IDLE);
   resetRenderDiagnostics();
   clearStagedMapDataTasks();
@@ -12553,7 +12776,9 @@ function setMapData({ refitProjection = true, resetZoom = true } = {}) {
   state.sphericalFeatureDiagnosticsById = new Map();
   buildIndex();
   ensureSovereigntyState();
-  rebuildProjectedBoundsCache();
+  if (!refitProjection) {
+    rebuildProjectedBoundsCache();
+  }
   rebuildStaticMeshes();
   invalidateBorderCache();
   updateDynamicBorderStatusUI();
