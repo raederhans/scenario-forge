@@ -1,6 +1,14 @@
 import { state } from "../core/state.js";
 import * as mapRenderer from "../core/map_renderer.js";
+import { syncScenarioLocalizationState } from "../core/scenario_manager.js";
 import { getFeatureOwnerCode } from "../core/sovereignty_manager.js";
+import {
+  applyOwnerToFeatureIds,
+  buildScenarioOwnershipSavePayload,
+  filterEditableOwnershipFeatureIds,
+  resetOwnersToScenarioBaselineForFeatureIds,
+  summarizeOwnershipForFeatureIds,
+} from "../core/scenario_ownership_editor.js";
 import { buildTooltipModel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 
@@ -118,6 +126,142 @@ function buildClipboardText(format = "names_with_ids") {
     return entries.map((entry) => entry.id).join("\n");
   }
   return entries.map((entry) => `${entry.name} | ${entry.id}`).join("\n");
+}
+
+function normalizeOwnerInput(value) {
+  return String(value || "").trim().toUpperCase().replace(/\s+/g, "");
+}
+
+function resolveOwnershipTargetIds() {
+  const selectedIds = filterEditableOwnershipFeatureIds(sanitizeSelectionState()).matchedIds;
+  if (selectedIds.length > 0) {
+    return selectedIds;
+  }
+  const selectedId = state.devSelectedHit?.targetType === "land"
+    ? String(state.devSelectedHit.id || "").trim()
+    : "";
+  return filterEditableOwnershipFeatureIds(selectedId ? [selectedId] : []).matchedIds;
+}
+
+function resolveOwnershipEditorModel() {
+  const targetIds = resolveOwnershipTargetIds();
+  const summary = summarizeOwnershipForFeatureIds(targetIds);
+  const singleFeatureId = targetIds.length === 1 ? targetIds[0] : "";
+  const singleFeature = singleFeatureId ? state.landIndex?.get(singleFeatureId) || null : null;
+  const currentOwnerCode = singleFeatureId ? normalizeOwnerInput(getFeatureOwnerCode(singleFeatureId)) : "";
+  const currentControllerCode = singleFeatureId
+    ? normalizeOwnerInput(state.scenarioControllersByFeatureId?.[singleFeatureId] || currentOwnerCode)
+    : "";
+  return {
+    targetIds,
+    selectionCount: targetIds.length,
+    singleFeatureId,
+    singleFeature,
+    currentOwnerCode,
+    currentControllerCode,
+    ownerCodes: summary.ownerCodes,
+    isMixedOwner: summary.isMixed,
+  };
+}
+
+function buildOwnershipMetaRows(model) {
+  if (!model.selectionCount) return [];
+  if (model.singleFeatureId) {
+    return [
+      ["ID", model.singleFeatureId],
+      [ui("Name"), resolveFeatureName(model.singleFeature, model.singleFeatureId)],
+      [ui("Owner"), model.currentOwnerCode],
+      [ui("Controller"), model.currentControllerCode],
+    ].filter(([, value]) => String(value || "").trim());
+  }
+  return [
+    [ui("Selected"), String(model.selectionCount)],
+    [
+      ui("Owner"),
+      model.isMixedOwner
+        ? `${ui("Mixed")} (${model.ownerCodes.join(", ")})`
+        : (model.ownerCodes[0] || ui("Unknown")),
+    ],
+  ];
+}
+
+function resolveOwnershipEditorHint(model) {
+  if (!state.activeScenarioId) {
+    return ui("Activate a scenario to edit and save political ownership.");
+  }
+  if (!model.selectionCount) {
+    return ui("Select one or more land features to edit political ownership.");
+  }
+  if (model.singleFeatureId) {
+    return ui("Apply a new owner tag to the selected feature or reset it to the active scenario baseline.");
+  }
+  return ui("Apply one owner tag across the current selection or reset those features to the active scenario baseline.");
+}
+
+function normalizeLocaleInput(value) {
+  return String(value || "").trim();
+}
+
+function getScenarioGeoLocaleEntry(featureId) {
+  const normalizedFeatureId = String(featureId || "").trim();
+  const baseEntry = normalizedFeatureId
+    ? (state.baseGeoLocales?.[normalizedFeatureId] && typeof state.baseGeoLocales[normalizedFeatureId] === "object"
+      ? state.baseGeoLocales[normalizedFeatureId]
+      : null)
+    : null;
+  const patchEntry = normalizedFeatureId
+    ? (state.scenarioGeoLocalePatchData?.geo?.[normalizedFeatureId]
+      && typeof state.scenarioGeoLocalePatchData.geo[normalizedFeatureId] === "object"
+      ? state.scenarioGeoLocalePatchData.geo[normalizedFeatureId]
+      : null)
+    : null;
+  return {
+    baseEntry,
+    patchEntry,
+    mergedEntry: {
+      en: normalizeLocaleInput(patchEntry?.en || baseEntry?.en || ""),
+      zh: normalizeLocaleInput(patchEntry?.zh || baseEntry?.zh || ""),
+    },
+  };
+}
+
+function resolveLocaleEditorModel() {
+  const targetIds = resolveOwnershipTargetIds();
+  const featureId = targetIds.length === 1 ? String(targetIds[0] || "").trim() : "";
+  const feature = featureId ? state.landIndex?.get(featureId) || null : null;
+  const localeEntry = getScenarioGeoLocaleEntry(featureId);
+  return {
+    featureId,
+    feature,
+    selectionCount: targetIds.length,
+    hasScenario: !!String(state.activeScenarioId || "").trim(),
+    hasGeoLocalePatch: !!String(state.activeScenarioManifest?.geo_locale_patch_url || "").trim(),
+    ...localeEntry,
+  };
+}
+
+function buildLocaleMetaRows(model) {
+  if (!model.featureId || !model.feature) return [];
+  const rows = [
+    ["ID", model.featureId],
+    [ui("Name"), resolveFeatureName(model.feature, model.featureId)],
+    [ui("Current EN"), model.mergedEntry.en],
+    [ui("Current ZH"), model.mergedEntry.zh],
+  ];
+  return rows.filter(([, value]) => String(value || "").trim());
+}
+
+function resolveLocaleEditorHint(model) {
+  if (!model.hasScenario) {
+    return ui("Activate a scenario to edit localized geo names.");
+  }
+  if (!model.hasGeoLocalePatch) {
+    return ui("The active scenario does not declare a geo locale patch target.");
+  }
+  if (model.selectionCount !== 1 || !model.featureId) {
+    return ui("Select exactly one land feature to edit localized geo names.");
+  }
+  return ui("Edit EN and ZH for the selected feature, then save to rebuild the active scenario locale patch.");
 }
 
 function resolveInspectorRows() {
@@ -295,6 +439,55 @@ function createDevWorkspacePanel(bottomDock) {
         <p id="devFeatureInspectorHint" class="dev-workspace-note">Hover a region or click one to inspect live debug metadata.</p>
         <div id="devFeatureInspectorMeta" class="dev-workspace-meta"></div>
       </div>
+      <div id="devScenarioLocalePanel" class="dev-workspace-panel hidden">
+        <div id="devScenarioLocaleLabel" class="dev-workspace-panel-title">Scenario Locale Editor</div>
+        <div id="devScenarioLocaleTitle" class="section-header-block">No active scenario</div>
+        <p id="devScenarioLocaleHint" class="dev-workspace-note">Select exactly one land feature to edit localized geo names.</p>
+        <div id="devScenarioLocaleMeta" class="dev-workspace-meta"></div>
+        <label id="devScenarioLocaleEnLabel" class="dev-workspace-note" for="devScenarioLocaleEnInput">Localized EN</label>
+        <input
+          id="devScenarioLocaleEnInput"
+          class="input dev-workspace-input"
+          type="text"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="Badghis"
+        />
+        <label id="devScenarioLocaleZhLabel" class="dev-workspace-note" for="devScenarioLocaleZhInput">Localized ZH</label>
+        <textarea
+          id="devScenarioLocaleZhInput"
+          class="input dev-workspace-input dev-workspace-textarea"
+          rows="2"
+          spellcheck="false"
+          placeholder="巴德吉斯"
+        ></textarea>
+        <div class="dev-workspace-actions">
+          <button id="devScenarioSaveLocaleBtn" type="button" class="btn-secondary">Save Localized Names</button>
+        </div>
+        <div id="devScenarioLocaleStatus" class="dev-workspace-note"></div>
+      </div>
+      <div id="devScenarioOwnershipPanel" class="dev-workspace-panel hidden">
+        <div id="devScenarioOwnershipLabel" class="dev-workspace-panel-title">Scenario Ownership Editor</div>
+        <div id="devScenarioOwnershipTitle" class="section-header-block">No active scenario</div>
+        <p id="devScenarioOwnershipHint" class="dev-workspace-note">Select one or more land features to edit political ownership.</p>
+        <div id="devScenarioOwnershipMeta" class="dev-workspace-meta"></div>
+        <label id="devScenarioOwnerInputLabel" class="dev-workspace-note" for="devScenarioOwnerInput">Target Owner Tag</label>
+        <input
+          id="devScenarioOwnerInput"
+          class="input dev-workspace-input"
+          type="text"
+          autocomplete="off"
+          spellcheck="false"
+          maxlength="8"
+          placeholder="GER"
+        />
+        <div class="dev-workspace-actions">
+          <button id="devScenarioApplyOwnerBtn" type="button" class="btn-primary">Apply to Selection</button>
+          <button id="devScenarioResetOwnerBtn" type="button" class="btn-secondary">Reset Selection</button>
+          <button id="devScenarioSaveOwnersBtn" type="button" class="btn-secondary">Save Owners File</button>
+        </div>
+        <div id="devScenarioOwnershipStatus" class="dev-workspace-note"></div>
+      </div>
       <div class="dev-workspace-panel">
         <div id="devRenderStatusLabel" class="dev-workspace-panel-title">Render Status</div>
         <div id="devRenderStatusMeta" class="dev-workspace-meta"></div>
@@ -450,6 +643,19 @@ function initDevWorkspace() {
   const featureInspectorTitle = panel.querySelector("#devFeatureInspectorTitle");
   const featureInspectorHint = panel.querySelector("#devFeatureInspectorHint");
   const featureInspectorMeta = panel.querySelector("#devFeatureInspectorMeta");
+  const scenarioLocalePanel = panel.querySelector("#devScenarioLocalePanel");
+  const scenarioLocaleTitle = panel.querySelector("#devScenarioLocaleTitle");
+  const scenarioLocaleHint = panel.querySelector("#devScenarioLocaleHint");
+  const scenarioLocaleMeta = panel.querySelector("#devScenarioLocaleMeta");
+  const scenarioLocaleEnInput = panel.querySelector("#devScenarioLocaleEnInput");
+  const scenarioLocaleZhInput = panel.querySelector("#devScenarioLocaleZhInput");
+  const scenarioLocaleStatus = panel.querySelector("#devScenarioLocaleStatus");
+  const scenarioOwnershipPanel = panel.querySelector("#devScenarioOwnershipPanel");
+  const scenarioOwnershipTitle = panel.querySelector("#devScenarioOwnershipTitle");
+  const scenarioOwnershipHint = panel.querySelector("#devScenarioOwnershipHint");
+  const scenarioOwnershipMeta = panel.querySelector("#devScenarioOwnershipMeta");
+  const scenarioOwnerInput = panel.querySelector("#devScenarioOwnerInput");
+  const scenarioOwnershipStatus = panel.querySelector("#devScenarioOwnershipStatus");
   const renderStatusMeta = panel.querySelector("#devRenderStatusMeta");
   const runtimeTitle = panel.querySelector("#devRuntimeTitle");
   const runtimeHint = panel.querySelector("#devRuntimeHint");
@@ -461,6 +667,11 @@ function initDevWorkspace() {
   const renderWorkspace = () => {
     panel.querySelector("#devWorkspaceIntro").textContent = ui("Development tools take over the center dock while enabled.");
     panel.querySelector("#devFeatureInspectorLabel").textContent = ui("Feature Inspector");
+    panel.querySelector("#devScenarioLocaleLabel").textContent = ui("Scenario Locale Editor");
+    panel.querySelector("#devScenarioLocaleEnLabel").textContent = ui("Localized EN");
+    panel.querySelector("#devScenarioLocaleZhLabel").textContent = ui("Localized ZH");
+    panel.querySelector("#devScenarioOwnershipLabel").textContent = ui("Scenario Ownership Editor");
+    panel.querySelector("#devScenarioOwnerInputLabel").textContent = ui("Target Owner Tag");
     panel.querySelector("#devRenderStatusLabel").textContent = ui("Render Status");
     panel.querySelector("#devPaintMacrosLabel").textContent = ui("Paint Macros");
     panel.querySelector("#devPaintMacrosHint").textContent = ui("These actions reuse the current tool mode and selected color or owner.");
@@ -487,6 +698,115 @@ function initDevWorkspace() {
     featureInspectorTitle.textContent = inspector.title;
     featureInspectorHint.textContent = inspector.hint || ui("Hover a region or click one to inspect live debug metadata.");
     renderMetaRows(featureInspectorMeta, inspector.rows);
+
+    const hasActiveScenario = !!String(state.activeScenarioId || "").trim();
+    const localeModel = resolveLocaleEditorModel();
+    const priorLocaleEditorState = state.devLocaleEditor || {};
+    const localeFeatureChanged = String(priorLocaleEditorState.featureId || "") !== String(localeModel.featureId || "");
+    const localeEditorState = localeFeatureChanged
+      ? {
+        ...priorLocaleEditorState,
+        featureId: localeModel.featureId,
+        en: localeModel.mergedEntry.en,
+        zh: localeModel.mergedEntry.zh,
+      }
+      : priorLocaleEditorState;
+    if (localeFeatureChanged) {
+      state.devLocaleEditor = localeEditorState;
+    }
+    scenarioLocalePanel?.classList.toggle("hidden", !hasActiveScenario);
+    if (scenarioLocaleTitle) {
+      scenarioLocaleTitle.textContent = hasActiveScenario
+        ? String(state.activeScenarioManifest?.display_name || state.activeScenarioId || "")
+        : ui("No active scenario");
+    }
+    if (scenarioLocaleHint) {
+      scenarioLocaleHint.textContent = resolveLocaleEditorHint(localeModel);
+    }
+    renderMetaRows(scenarioLocaleMeta, buildLocaleMetaRows(localeModel));
+    if (scenarioLocaleEnInput && scenarioLocaleEnInput.value !== normalizeLocaleInput(localeEditorState.en)) {
+      scenarioLocaleEnInput.value = normalizeLocaleInput(localeEditorState.en);
+    }
+    if (scenarioLocaleZhInput && scenarioLocaleZhInput.value !== normalizeLocaleInput(localeEditorState.zh)) {
+      scenarioLocaleZhInput.value = normalizeLocaleInput(localeEditorState.zh);
+    }
+    const canEditLocale = hasActiveScenario && localeModel.selectionCount === 1 && !!localeModel.featureId && !localeEditorState.isSaving;
+    if (scenarioLocaleEnInput) {
+      scenarioLocaleEnInput.disabled = !canEditLocale;
+      scenarioLocaleEnInput.placeholder = localeModel.baseEntry?.en || resolveFeatureName(localeModel.feature, localeModel.featureId) || "Badghis";
+    }
+    if (scenarioLocaleZhInput) {
+      scenarioLocaleZhInput.disabled = !canEditLocale;
+      scenarioLocaleZhInput.placeholder = localeModel.baseEntry?.zh || "";
+    }
+    const saveLocaleBtn = panel.querySelector("#devScenarioSaveLocaleBtn");
+    if (saveLocaleBtn) {
+      saveLocaleBtn.textContent = localeEditorState.isSaving ? ui("Saving...") : ui("Save Localized Names");
+      saveLocaleBtn.disabled = !(hasActiveScenario && localeModel.hasGeoLocalePatch && localeModel.selectionCount === 1 && !!localeModel.featureId) || !!localeEditorState.isSaving;
+    }
+    if (scenarioLocaleStatus) {
+      const localeStatusBits = [];
+      if (localeEditorState.lastSaveMessage) {
+        localeStatusBits.push(localeEditorState.lastSaveMessage);
+      } else if (localeEditorState.lastSavedAt) {
+        localeStatusBits.push(`${ui("Last Saved")}: ${localeEditorState.lastSavedAt}`);
+      }
+      scenarioLocaleStatus.textContent = localeStatusBits.join(" | ");
+    }
+
+    const ownershipModel = resolveOwnershipEditorModel();
+    const editorState = state.devScenarioEditor || {};
+    const requestedOwnerCode = normalizeOwnerInput(editorState.targetOwnerCode);
+    const fallbackOwnerCode = normalizeOwnerInput(state.activeSovereignCode);
+    const effectiveOwnerCode = requestedOwnerCode || fallbackOwnerCode;
+    scenarioOwnershipPanel?.classList.toggle("hidden", !hasActiveScenario);
+    if (scenarioOwnershipTitle) {
+      scenarioOwnershipTitle.textContent = hasActiveScenario
+        ? String(state.activeScenarioManifest?.display_name || state.activeScenarioId || "")
+        : ui("No active scenario");
+    }
+    if (scenarioOwnershipHint) {
+      scenarioOwnershipHint.textContent = resolveOwnershipEditorHint(ownershipModel);
+    }
+    renderMetaRows(scenarioOwnershipMeta, buildOwnershipMetaRows(ownershipModel));
+    if (scenarioOwnerInput && scenarioOwnerInput.value !== requestedOwnerCode) {
+      scenarioOwnerInput.value = requestedOwnerCode;
+    }
+    if (scenarioOwnerInput) {
+      scenarioOwnerInput.placeholder = fallbackOwnerCode || "GER";
+      scenarioOwnerInput.disabled = !hasActiveScenario || !!editorState.isSaving;
+    }
+    const statusBits = [];
+    if (fallbackOwnerCode && !requestedOwnerCode) {
+      statusBits.push(`${ui("Active Owner")}: ${fallbackOwnerCode}`);
+    }
+    if (editorState.lastSaveMessage) {
+      statusBits.push(editorState.lastSaveMessage);
+    } else if (editorState.lastSavedAt) {
+      statusBits.push(`${ui("Last Saved")}: ${editorState.lastSavedAt}`);
+    }
+    if (scenarioOwnershipStatus) {
+      scenarioOwnershipStatus.textContent = statusBits.join(" | ");
+    }
+    const canApplyOwner = hasActiveScenario && ownershipModel.selectionCount > 0 && !!effectiveOwnerCode && !editorState.isSaving;
+    const canResetOwner = hasActiveScenario && ownershipModel.selectionCount > 0 && !editorState.isSaving;
+    const canSaveOwners = hasActiveScenario && !editorState.isSaving;
+    const applyOwnerBtn = panel.querySelector("#devScenarioApplyOwnerBtn");
+    const resetOwnerBtn = panel.querySelector("#devScenarioResetOwnerBtn");
+    const saveOwnersBtn = panel.querySelector("#devScenarioSaveOwnersBtn");
+    if (applyOwnerBtn) {
+      applyOwnerBtn.textContent = ui("Apply to Selection");
+      applyOwnerBtn.disabled = !canApplyOwner;
+    }
+    if (resetOwnerBtn) {
+      resetOwnerBtn.textContent = ui("Reset Selection");
+      resetOwnerBtn.disabled = !canResetOwner;
+    }
+    if (saveOwnersBtn) {
+      saveOwnersBtn.textContent = editorState.isSaving ? ui("Saving...") : ui("Save Owners File");
+      saveOwnersBtn.disabled = !canSaveOwners;
+    }
+
     renderMetaRows(renderStatusMeta, resolveRenderRows());
 
     const runtime = resolveRuntimeRows();
@@ -559,6 +879,203 @@ function initDevWorkspace() {
     mapRenderer.applyDevSelectionFill();
   });
 
+  bindButtonAction(panel.querySelector("#devScenarioSaveLocaleBtn"), async () => {
+    const localeModel = resolveLocaleEditorModel();
+    if (!state.activeScenarioId || !localeModel.featureId) {
+      showToast(ui("Select exactly one land feature before saving localized names."), {
+        title: ui("Scenario Locale Editor"),
+        tone: "warning",
+      });
+      renderWorkspace();
+      return;
+    }
+    const geoLocalePatchUrl = String(state.activeScenarioManifest?.geo_locale_patch_url || "").trim();
+    if (!geoLocalePatchUrl) {
+      showToast(ui("The active scenario does not declare a geo locale patch target."), {
+        title: ui("Scenario Locale Editor"),
+        tone: "warning",
+      });
+      renderWorkspace();
+      return;
+    }
+    const localeEditorState = state.devLocaleEditor || {};
+    state.devLocaleEditor = {
+      ...localeEditorState,
+      isSaving: true,
+      lastSaveMessage: "",
+      lastSaveTone: "",
+    };
+    renderWorkspace();
+    try {
+      const response = await fetch("/__dev/scenario/geo-locale/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          scenarioId: state.activeScenarioId,
+          featureId: localeModel.featureId,
+          en: normalizeLocaleInput(state.devLocaleEditor?.en),
+          zh: normalizeLocaleInput(state.devLocaleEditor?.zh),
+          mode: "manual_override",
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result?.ok) {
+        throw new Error(String(result?.message || `HTTP ${response.status}`));
+      }
+      const patchUrl = new URL(geoLocalePatchUrl, globalThis.location?.origin || globalThis.location?.href);
+      patchUrl.searchParams.set("_t", String(Date.now()));
+      const patchResponse = await fetch(patchUrl.href, { cache: "no-store" });
+      if (!patchResponse.ok) {
+        throw new Error(`Unable to reload geo locale patch (HTTP ${patchResponse.status}).`);
+      }
+      const patchPayload = await patchResponse.json();
+      syncScenarioLocalizationState({
+        cityOverridesPayload: state.scenarioCityOverridesData,
+        geoLocalePatchPayload: patchPayload,
+      });
+      state.devLocaleEditor = {
+        ...(state.devLocaleEditor || {}),
+        isSaving: false,
+        featureId: localeModel.featureId,
+        en: normalizeLocaleInput(state.devLocaleEditor?.en),
+        zh: normalizeLocaleInput(state.devLocaleEditor?.zh),
+        lastSavedAt: String(result.savedAt || ""),
+        lastSaveMessage: `${ui("Saved")}: ${String(result.filePath || "")}`,
+        lastSaveTone: "success",
+      };
+      if (typeof state.renderNowFn === "function") {
+        state.renderNowFn();
+      }
+      showToast(ui("Scenario localized names saved."), {
+        title: ui("Scenario Locale Editor"),
+        tone: "success",
+      });
+    } catch (error) {
+      state.devLocaleEditor = {
+        ...(state.devLocaleEditor || {}),
+        isSaving: false,
+        lastSaveMessage: String(error?.message || ui("Unable to save localized names.")),
+        lastSaveTone: "critical",
+      };
+      showToast(String(error?.message || ui("Unable to save localized names.")), {
+        title: ui("Scenario Locale Editor"),
+        tone: "critical",
+        duration: 4200,
+      });
+    }
+    renderWorkspace();
+  });
+
+  bindButtonAction(panel.querySelector("#devScenarioApplyOwnerBtn"), () => {
+    const targetIds = resolveOwnershipTargetIds();
+    const requestedOwnerCode = normalizeOwnerInput(state.devScenarioEditor?.targetOwnerCode);
+    const ownerCode = requestedOwnerCode || normalizeOwnerInput(state.activeSovereignCode);
+    const result = applyOwnerToFeatureIds(targetIds, ownerCode, {
+      historyKind: "dev-workspace-ownership-apply",
+      dirtyReason: "dev-workspace-ownership-apply",
+      recomputeReason: "dev-workspace-ownership-apply",
+    });
+    if (!result.applied) {
+      const message = result.reason === "missing-owner"
+        ? ui("Enter a target owner tag or choose an active owner first.")
+        : ui("Select one or more land features before applying ownership.");
+      showToast(message, {
+        title: ui("Scenario Ownership Editor"),
+        tone: "warning",
+      });
+      renderWorkspace();
+      return;
+    }
+    const changedLabel = result.changed === 1 ? ui("feature") : ui("features");
+    showToast(`${ui("Applied ownership to")} ${result.changed} ${changedLabel}.`, {
+      title: ui("Scenario Ownership Editor"),
+      tone: result.changed > 0 ? "success" : "info",
+    });
+    renderWorkspace();
+  });
+
+  bindButtonAction(panel.querySelector("#devScenarioResetOwnerBtn"), () => {
+    const result = resetOwnersToScenarioBaselineForFeatureIds(resolveOwnershipTargetIds(), {
+      historyKind: "dev-workspace-ownership-reset",
+      dirtyReason: "dev-workspace-ownership-reset",
+      recomputeReason: "dev-workspace-ownership-reset",
+    });
+    if (!result.applied) {
+      showToast(ui("Select one or more land features with scenario ownership before resetting."), {
+        title: ui("Scenario Ownership Editor"),
+        tone: "warning",
+      });
+      renderWorkspace();
+      return;
+    }
+    showToast(
+      result.changed > 0
+        ? `${ui("Reset ownership for")} ${result.changed} ${result.changed === 1 ? ui("feature") : ui("features")}.`
+        : ui("Selected features already match the active scenario baseline."),
+      {
+        title: ui("Scenario Ownership Editor"),
+        tone: result.changed > 0 ? "success" : "info",
+      }
+    );
+    renderWorkspace();
+  });
+
+  bindButtonAction(panel.querySelector("#devScenarioSaveOwnersBtn"), async () => {
+    if (!state.activeScenarioId || state.devScenarioEditor?.isSaving) return;
+    const payload = buildScenarioOwnershipSavePayload();
+    state.devScenarioEditor = {
+      ...(state.devScenarioEditor || {}),
+      isSaving: true,
+      lastSaveMessage: "",
+      lastSaveTone: "",
+    };
+    renderWorkspace();
+    try {
+      const response = await fetch("/__dev/scenario/ownership/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          scenarioId: payload.scenarioId,
+          baselineHash: payload.baselineHash,
+          owners: payload.owners,
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result?.ok) {
+        throw new Error(String(result?.message || `HTTP ${response.status}`));
+      }
+      state.devScenarioEditor = {
+        ...(state.devScenarioEditor || {}),
+        isSaving: false,
+        lastSavedAt: String(result.savedAt || ""),
+        lastSavedPath: String(result.filePath || ""),
+        lastSaveMessage: `${ui("Saved")}: ${String(result.filePath || "")}`,
+        lastSaveTone: "success",
+      };
+      showToast(ui("Scenario ownership file saved."), {
+        title: ui("Scenario Ownership Editor"),
+        tone: "success",
+      });
+    } catch (error) {
+      state.devScenarioEditor = {
+        ...(state.devScenarioEditor || {}),
+        isSaving: false,
+        lastSaveMessage: String(error?.message || ui("Unable to save ownership file.")),
+        lastSaveTone: "critical",
+      };
+      showToast(String(error?.message || ui("Unable to save ownership file.")), {
+        title: ui("Scenario Ownership Editor"),
+        tone: "critical",
+        duration: 4200,
+      });
+    }
+    renderWorkspace();
+  });
+
   bindButtonAction(panel.querySelector("#devCopyNamesBtn"), () => {
     copySelectionToClipboard("names", selectionPreview);
   });
@@ -575,6 +1092,39 @@ function initDevWorkspace() {
       renderWorkspace();
     });
     selectionSortMode.dataset.bound = "true";
+  }
+
+  if (scenarioOwnerInput && scenarioOwnerInput.dataset.bound !== "true") {
+    scenarioOwnerInput.addEventListener("input", (event) => {
+      state.devScenarioEditor = {
+        ...(state.devScenarioEditor || {}),
+        targetOwnerCode: normalizeOwnerInput(event.target.value),
+      };
+      renderWorkspace();
+    });
+    scenarioOwnerInput.dataset.bound = "true";
+  }
+
+  if (scenarioLocaleEnInput && scenarioLocaleEnInput.dataset.bound !== "true") {
+    scenarioLocaleEnInput.addEventListener("input", (event) => {
+      state.devLocaleEditor = {
+        ...(state.devLocaleEditor || {}),
+        en: normalizeLocaleInput(event.target.value),
+      };
+      renderWorkspace();
+    });
+    scenarioLocaleEnInput.dataset.bound = "true";
+  }
+
+  if (scenarioLocaleZhInput && scenarioLocaleZhInput.dataset.bound !== "true") {
+    scenarioLocaleZhInput.addEventListener("input", (event) => {
+      state.devLocaleEditor = {
+        ...(state.devLocaleEditor || {}),
+        zh: normalizeLocaleInput(event.target.value),
+      };
+      renderWorkspace();
+    });
+    scenarioLocaleZhInput.dataset.bound = "true";
   }
 
   const initialExpanded = readStoredExpanded();

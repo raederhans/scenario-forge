@@ -72,6 +72,57 @@ function cacheBust(url) {
   return `${url}${sep}_t=${Date.now()}`;
 }
 
+function normalizeScenarioCoreTag(rawValue) {
+  return String(rawValue || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
+function normalizeScenarioCoreValue(rawValue) {
+  if (Array.isArray(rawValue)) {
+    const seen = new Set();
+    const tags = [];
+    rawValue.forEach((entry) => {
+      const tag = normalizeScenarioCoreTag(entry);
+      if (!tag || seen.has(tag)) return;
+      seen.add(tag);
+      tags.push(tag);
+    });
+    return tags;
+  }
+  const text = String(rawValue || "").trim();
+  if (!text) return [];
+  if (text.startsWith("[") && text.endsWith("]")) {
+    try {
+      const parsed = JSON.parse(text.replace(/'/g, "\""));
+      if (Array.isArray(parsed)) {
+        return normalizeScenarioCoreValue(parsed);
+      }
+    } catch (_error) {
+      const inner = text.slice(1, -1).trim();
+      if (inner) {
+        return normalizeScenarioCoreValue(
+          inner
+            .split(",")
+            .map((entry) => entry.trim().replace(/^['"]|['"]$/g, ""))
+            .filter(Boolean)
+        );
+      }
+    }
+  }
+  const normalized = normalizeScenarioCoreTag(text);
+  return normalized ? [normalized] : [];
+}
+
+function normalizeScenarioCoreMap(rawMap) {
+  const cores = {};
+  Object.entries(rawMap && typeof rawMap === "object" ? rawMap : {}).forEach(([rawFeatureId, rawValue]) => {
+    const featureId = normalizeCityText(rawFeatureId);
+    const coreTags = normalizeScenarioCoreValue(rawValue);
+    if (!featureId || !coreTags.length) return;
+    cores[featureId] = coreTags;
+  });
+  return cores;
+}
+
 function withScenarioLoadTimeout(promise, ms, { scenarioId = "", resourceLabel = "resource" } = {}) {
   let timeoutId = null;
   const timeoutPromise = new Promise((_, reject) => {
@@ -1547,15 +1598,17 @@ function setScenarioViewMode(
   return true;
 }
 
-async function ensureScenarioDetailTopologyLoaded() {
+async function ensureScenarioDetailTopologyLoaded({ applyMapData = true } = {}) {
   if (typeof state.ensureDetailTopologyFn === "function") {
-    const promoted = await state.ensureDetailTopologyFn();
+    const promoted = await state.ensureDetailTopologyFn({ applyMapData });
     if (promoted) return true;
   }
   const hasDetailNow = hasUsablePoliticalTopology(state.topologyDetail);
   if (hasDetailNow && state.topologyBundleMode !== "composite") {
     state.topologyBundleMode = "composite";
-    setMapData({ refitProjection: false, resetZoom: false });
+    if (applyMapData) {
+      setMapData({ refitProjection: false, resetZoom: false });
+    }
     return true;
   }
   if (hasDetailNow && state.topologyBundleMode === "composite") {
@@ -1602,7 +1655,9 @@ async function ensureScenarioDetailTopologyLoaded() {
       state.detailDeferred = false;
       state.detailPromotionCompleted = true;
       state.detailSourceRequested = detailSourceUsed || detailSourceKeys[0] || state.detailSourceRequested;
-      setMapData({ refitProjection: false, resetZoom: false });
+      if (applyMapData) {
+        setMapData({ refitProjection: false, resetZoom: false });
+      }
       return true;
     } catch (error) {
       state.detailDeferred = false;
@@ -1935,7 +1990,7 @@ async function prepareScenarioApplyState(
     syncPalette = true,
   } = {}
 ) {
-  const detailPromoted = await ensureScenarioDetailTopologyLoaded();
+  const detailPromoted = await ensureScenarioDetailTopologyLoaded({ applyMapData: false });
   const detailReady = (
     state.topologyBundleMode === "composite"
     && hasUsablePoliticalTopology(state.topologyDetail)
@@ -1985,7 +2040,7 @@ async function prepareScenarioApplyState(
     ? bundle.controllersPayload.controllers
     : owners;
   const cores = bundle.coresPayload?.cores && typeof bundle.coresPayload.cores === "object"
-    ? bundle.coresPayload.cores
+    ? normalizeScenarioCoreMap(bundle.coresPayload.cores)
     : {};
   const defaultCountryCode = getScenarioDefaultCountryCode(bundle.manifest, baseCountryMap);
   const releasableIndex = buildScenarioReleasableIndex(scenarioId, {
@@ -2648,5 +2703,6 @@ export {
   refreshScenarioShellOverlays,
   resetToScenarioBaseline,
   setScenarioViewMode,
+  syncScenarioLocalizationState,
   validateImportedScenarioBaseline,
 };

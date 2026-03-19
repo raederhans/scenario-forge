@@ -402,6 +402,7 @@ export {
   normalizeOwnerCode,
   getCanonicalCountryCodeForFeature,
   getFeatureId,
+  shouldExcludeScenarioPoliticalFeature,
   seedSovereigntyFromLandData,
   ensureSovereigntyState,
   rebuildOwnerIndex,

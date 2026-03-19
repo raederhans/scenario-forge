@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "scenario_id": "tno_1962",
+  "notes": "Post-bundle decolonization cleanup for residual British and French overseas holdings in the 1962 TNO-derived scenario bundle.",
+  "apply_to_controllers": true,
+  "apply_to_cores": true,
+  "retired_tags": [],
+  "country_rules": [
+    {
+      "rule_id": "tno_1962_djibouti_to_aoi",
+      "tag": "AOI",
+      "preserve_existing_country_entry": true,
+      "include_feature_prefixes": ["DJ_ADM1_DJI-"],
+      "notes": "Djibouti transfers from residual French ownership to Italian East Africa."
+    },
+    {
+      "rule_id": "tno_1962_comoros_to_ger",
+      "tag": "GER",
+      "preserve_existing_country_entry": true,
+      "include_feature_prefixes": ["KM_ADM1_COM-"],
+      "notes": "Comoros transfers from residual French ownership to Germany."
+    },
+    {
+      "rule_id": "tno_1962_st_pierre_to_usa",
+      "tag": "USA",
+      "preserve_existing_country_entry": true,
+      "include_feature_ids": ["PM"],
+      "notes": "Saint Pierre and Miquelon transfers from residual French ownership to the United States."
+    },
+    {
+      "rule_id": "tno_1962_monaco_independent",
+      "tag": "MC",
+      "display_name": "Monaco",
+      "color_hex": "#5d7cba",
+      "base_iso2": "MC",
+      "lookup_iso2": "MC",
+      "provenance_iso2": "MC",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_western_europe",
+      "subregion_label": "Western Europe",
+      "scenario_only": false,
+      "featured": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended",
+      "entry_kind": "scenario_country",
+      "include_feature_ids": ["MC_ADMIN0_PASSTHROUGH"],
+      "notes": "Monaco split out of residual French ownership as an independent microstate."
+    },
+    {
+      "rule_id": "tno_1962_guyana_independent",
+      "tag": "GY",
+      "display_name": "Guyana",
+      "color_hex": "#ffcc99",
+      "base_iso2": "GY",
+      "lookup_iso2": "GY",
+      "provenance_iso2": "GY",
+      "continent_id": "continent_south_america",
+      "continent_label": "South America",
+      "subregion_id": "subregion_south_america",
+      "subregion_label": "South America",
+      "scenario_only": false,
+      "featured": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended",
+      "entry_kind": "scenario_country",
+      "include_feature_prefixes": ["GY_ADM1_GUY-"],
+      "notes": "Guyana split out of residual British ownership as an independent state."
+    },
+    {
+      "rule_id": "tno_1962_belize_independent",
+      "tag": "BZ",
+      "display_name": "Belize",
+      "color_hex": "#00cccc",
+      "base_iso2": "BZ",
+      "lookup_iso2": "BZ",
+      "provenance_iso2": "BZ",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "subregion_id": "subregion_central_america",
+      "subregion_label": "Central America",
+      "scenario_only": false,
+      "featured": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended",
+      "entry_kind": "scenario_country",
+      "include_feature_prefixes": ["BZ_ADM1_BLZ-"],
+      "notes": "Belize split out of residual British ownership as an independent state."
+    },
+    {
+      "rule_id": "tno_1962_british_atlantic_islands_to_canada",
+      "tag": "CAN",
+      "preserve_existing_country_entry": true,
+      "include_feature_ids": ["BS", "FK", "GS", "JM", "SH", "TT"],
+      "notes": "Selected British Atlantic and Caribbean island remnants transfer to Canada."
+    },
+    {
+      "rule_id": "tno_1962_hong_kong_controller_to_gng",
+      "tag": "GNG",
+      "preserve_existing_country_entry": true,
+      "include_feature_prefixes": ["HK_ADM1_HKG-"],
+      "notes": "Hong Kong controller alignment is normalized to the Guangdong National Government."
+    }
+  ]
+}

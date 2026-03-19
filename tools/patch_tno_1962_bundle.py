@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import copy
 import csv
 import hashlib
@@ -62,7 +63,9 @@ REGIONAL_RULE_PACKS: list[tuple[str, Path]] = [
     ("east_asia", ROOT / "data/scenario-rules/tno_1962.east_asia_ownership.manual.json"),
     ("south_asia", ROOT / "data/scenario-rules/tno_1962.south_asia_ownership.manual.json"),
     ("russia", ROOT / "data/scenario-rules/tno_1962.russia_ownership.manual.json"),
+    ("decolonization", ROOT / "data/scenario-rules/tno_1962.decolonization.manual.json"),
 ]
+MODERN_WORLD_COUNTRIES_PATH = ROOT / "data/scenarios/modern_world/countries.json"
 HGO_ROOT = ROOT / "historic geographic overhaul"
 TNO_ROOT_CANDIDATES = [
     Path("C:/Program Files (x86)/Steam/steamapps/workshop/content/394360/2438003901"),
@@ -330,6 +333,15 @@ TNO_1962_ITALY_REMOVED_FRENCH_BASELINE_TARGETS = {
     "FR_ARR_05001": "FRA",
     "FR_ARR_05002": "FRA",
     "FR_ARR_06001": "FRA",
+}
+TNO_DECOLONIZATION_CANONICAL_TAGS = ("BZ", "GY", "MC")
+TNO_DECOLONIZATION_INDEPENDENT_TAGS = ("CEY", "AST", "BWA", "RAJ", "SAF")
+TNO_DECOLONIZATION_NOTES = {
+    "CEY": "Ceylon retained as an independent state after the British decolonization cleanup in TNO 1962.",
+    "AST": "Australian dependencies approximation retained outside the British subject tree in TNO 1962.",
+    "BWA": "British West Africa retained as an independent West African macro administration outside the British subject tree in TNO 1962.",
+    "RAJ": "British Raj retained as an independent South Asian macro state outside the British subject tree in TNO 1962.",
+    "SAF": "South Africa retained outside the British subject tree while preserving the South West Africa approximation in TNO 1962.",
 }
 
 TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
@@ -2942,6 +2954,99 @@ def normalize_tag(raw: object) -> str:
     return "".join(char for char in str(raw or "").strip().upper() if char.isalnum())
 
 
+def normalize_core_tags(raw_value: object) -> list[str]:
+    if raw_value is None:
+        return []
+    if isinstance(raw_value, str):
+        text = raw_value.strip()
+        if not text:
+            return []
+        if text[:1] in "[({" and text[-1:] in "])}":
+            try:
+                parsed = ast.literal_eval(text)
+            except (SyntaxError, ValueError):
+                parsed = None
+            if parsed is not None and parsed is not raw_value:
+                return normalize_core_tags(parsed)
+        normalized = normalize_tag(text)
+        return [normalized] if normalized else []
+    if isinstance(raw_value, (list, tuple, set)):
+        tags: list[str] = []
+        seen: set[str] = set()
+        for item in raw_value:
+            for tag in normalize_core_tags(item):
+                if tag in seen:
+                    continue
+                seen.add(tag)
+                tags.append(tag)
+        return tags
+    normalized = normalize_tag(raw_value)
+    return [normalized] if normalized else []
+
+
+def normalize_feature_core_map(feature_map: dict[str, object]) -> dict[str, list[str]]:
+    normalized: dict[str, list[str]] = {}
+    source = feature_map if isinstance(feature_map, dict) else {}
+    for raw_feature_id, raw_value in source.items():
+        feature_id = str(raw_feature_id or "").strip()
+        tags = normalize_core_tags(raw_value)
+        if not feature_id or not tags:
+            continue
+        normalized[feature_id] = tags
+    return normalized
+
+
+def expand_feature_core_map(
+    feature_map: dict[str, object],
+    *,
+    valid_feature_ids: set[str],
+    migration_map: dict[str, list[str]],
+) -> dict[str, list[str]]:
+    expanded: dict[str, list[str]] = {}
+    for feature_id, tags in normalize_feature_core_map(feature_map).items():
+        if feature_id in valid_feature_ids:
+            expanded[feature_id] = list(tags)
+            continue
+        successor_ids = migration_map.get(feature_id) or []
+        for successor_id in successor_ids:
+            if successor_id in valid_feature_ids and successor_id not in expanded:
+                expanded[successor_id] = list(tags)
+    return expanded
+
+
+def primary_core_tag(raw_value: object, *, fallback: object = "") -> str:
+    tags = normalize_core_tags(raw_value)
+    if tags:
+        return tags[0]
+    return normalize_tag(fallback)
+
+
+def canonicalize_feature_core_map(feature_map: dict[str, object]) -> dict[str, list[str]]:
+    canonical: dict[str, list[str]] = {}
+    for raw_feature_id, raw_value in feature_map.items():
+        feature_id = str(raw_feature_id).strip()
+        tags = normalize_core_tags(raw_value)
+        if not feature_id or not tags:
+            continue
+        canonical[feature_id] = list(tags)
+        source_feature_id = SCENARIO_SPLIT_SUFFIX_RE.sub("", feature_id)
+        existing = canonical.get(source_feature_id)
+        if existing and existing != tags:
+            raise ValueError(
+                f"Conflicting canonical core mapping for {source_feature_id}: {existing} vs {tags}"
+            )
+        canonical[source_feature_id] = list(tags)
+    return canonical
+
+
+def set_feature_core_tags(core_map: dict[str, object], feature_id: str, raw_value: object) -> None:
+    normalized_feature_id = str(feature_id or "").strip()
+    tags = normalize_core_tags(raw_value)
+    if not normalized_feature_id or not tags:
+        return
+    core_map[normalized_feature_id] = tags
+
+
 def normalize_iso2(raw: object) -> str:
     return "".join(char for char in str(raw or "").strip().upper() if char.isalpha())
 
@@ -3504,6 +3609,96 @@ def build_owner_stats_entry(country_entry: dict) -> dict:
     }
 
 
+def load_scenario_country_entries(path: Path) -> dict[str, dict]:
+    payload = load_json(path)
+    countries = payload.get("countries", {})
+    if not isinstance(countries, dict):
+        raise ValueError(f"Scenario countries payload is not a dict: {path}")
+    return countries
+
+
+def apply_tno_decolonization_metadata(countries_payload: dict) -> None:
+    countries = countries_payload.get("countries", {})
+    if not isinstance(countries, dict):
+        raise ValueError("tno_1962 countries payload does not contain a `countries` mapping.")
+
+    palette_entries = load_palette_entries(TNO_PALETTE_PATH)
+    canonical_countries = load_scenario_country_entries(MODERN_WORLD_COUNTRIES_PATH)
+
+    for tag in TNO_DECOLONIZATION_CANONICAL_TAGS:
+        existing_entry = countries.get(tag)
+        if not isinstance(existing_entry, dict):
+            raise ValueError(f"Decolonization metadata expected country entry for {tag}.")
+        reference_entry = canonical_countries.get(tag)
+        if not isinstance(reference_entry, dict):
+            raise ValueError(f"Canonical modern_world country entry not found for {tag}.")
+        countries[tag] = build_manual_country_entry(
+            tag=tag,
+            existing_entry=existing_entry,
+            palette_entries=palette_entries,
+            feature_count=int(existing_entry.get("feature_count", 0) or 0),
+            continent_id=str(reference_entry.get("continent_id") or ""),
+            continent_label=str(reference_entry.get("continent_label") or ""),
+            subregion_id=str(reference_entry.get("subregion_id") or ""),
+            subregion_label=str(reference_entry.get("subregion_label") or ""),
+            base_iso2=str(reference_entry.get("base_iso2") or ""),
+            lookup_iso2=str(reference_entry.get("lookup_iso2") or ""),
+            provenance_iso2=str(reference_entry.get("provenance_iso2") or ""),
+            display_name=str(reference_entry.get("display_name") or ""),
+            color_hex=str(reference_entry.get("color_hex") or ""),
+            rule_id=f"tno_1962_decolonization_{tag.lower()}",
+            notes=str(existing_entry.get("notes") or "").strip(),
+            source=str(existing_entry.get("source") or "manual_rule").strip() or "manual_rule",
+            source_type=str(existing_entry.get("source_type") or "scenario_extension").strip() or "scenario_extension",
+            historical_fidelity=str(existing_entry.get("historical_fidelity") or "extended").strip() or "extended",
+            entry_kind="scenario_country",
+            parent_owner_tag="",
+            subject_kind="",
+            featured=bool(existing_entry.get("featured", reference_entry.get("featured", False))),
+            scenario_only=bool(reference_entry.get("scenario_only")),
+            hidden_from_country_list=bool(
+                existing_entry.get("hidden_from_country_list", reference_entry.get("hidden_from_country_list", False))
+            ),
+        )
+
+    for tag in TNO_DECOLONIZATION_INDEPENDENT_TAGS:
+        existing_entry = countries.get(tag)
+        if not isinstance(existing_entry, dict):
+            raise ValueError(f"Decolonization metadata expected country entry for {tag}.")
+        countries[tag] = build_manual_country_entry(
+            tag=tag,
+            existing_entry=existing_entry,
+            palette_entries=palette_entries,
+            feature_count=int(existing_entry.get("feature_count", 0) or 0),
+            continent_id=str(existing_entry.get("continent_id") or ""),
+            continent_label=str(existing_entry.get("continent_label") or ""),
+            subregion_id=str(existing_entry.get("subregion_id") or ""),
+            subregion_label=str(existing_entry.get("subregion_label") or ""),
+            base_iso2=str(existing_entry.get("base_iso2") or ""),
+            lookup_iso2=str(existing_entry.get("lookup_iso2") or ""),
+            provenance_iso2=str(existing_entry.get("provenance_iso2") or ""),
+            display_name=str(existing_entry.get("display_name") or ""),
+            color_hex=str(existing_entry.get("color_hex") or ""),
+            rule_id=f"tno_1962_independent_{tag.lower()}",
+            notes=TNO_DECOLONIZATION_NOTES.get(tag, str(existing_entry.get("notes") or "").strip()),
+            source=str(existing_entry.get("source") or "manual_rule").strip() or "manual_rule",
+            source_type=str(existing_entry.get("source_type") or "scenario_extension").strip() or "scenario_extension",
+            historical_fidelity=str(existing_entry.get("historical_fidelity") or "tno_baseline").strip() or "tno_baseline",
+            entry_kind="scenario_country",
+            parent_owner_tag="",
+            subject_kind="",
+            featured=bool(existing_entry.get("featured")),
+            scenario_only=bool(existing_entry.get("scenario_only", True)),
+            hidden_from_country_list=bool(existing_entry.get("hidden_from_country_list")),
+        )
+        countries[tag]["parent_owner_tag"] = ""
+        countries[tag]["parent_owner_tags"] = []
+        countries[tag]["subject_kind"] = ""
+        countries[tag]["entry_kind"] = "scenario_country"
+
+    countries.pop("SUD", None)
+
+
 def resolve_rule_feature_ids(
     rule: dict,
     *,
@@ -3614,7 +3809,7 @@ def apply_regional_rules(
             if apply_to_controllers:
                 controllers_payload["controllers"][feature_id] = tag
             if apply_to_cores:
-                cores_payload["cores"][feature_id] = tag
+                set_feature_core_tags(cores_payload["cores"], feature_id, [tag])
         if preserve_existing_country_entry:
             if tag not in countries:
                 raise ValueError(
@@ -4715,7 +4910,7 @@ def assign_feature_bundle(
             continue
         owners_payload["owners"][feature_id] = normalized_target
         controllers_payload["controllers"][feature_id] = normalized_target
-        cores_payload["cores"][feature_id] = normalized_target
+        set_feature_core_tags(cores_payload["cores"], feature_id, [normalized_target])
         applied_feature_ids.append(feature_id)
     return applied_feature_ids
 
@@ -4897,7 +5092,7 @@ def patch_baseline_maps(owners_payload: dict, controllers_payload: dict, cores_p
         for feature_id in action["feature_ids"]:
             owners_payload["owners"][feature_id] = target_tag
             controllers_payload["controllers"][feature_id] = target_tag
-            cores_payload["cores"][feature_id] = target_tag
+            set_feature_core_tags(cores_payload["cores"], feature_id, [target_tag])
         if target_tag == "GER":
             combined_german_features.extend(action["feature_ids"])
 
@@ -4906,13 +5101,13 @@ def patch_baseline_maps(owners_payload: dict, controllers_payload: dict, cores_p
     for feature_id in combined_german_features:
         owners_payload["owners"][feature_id] = "GER"
         controllers_payload["controllers"][feature_id] = "GER"
-        cores_payload["cores"][feature_id] = "GER"
+        set_feature_core_tags(cores_payload["cores"], feature_id, ["GER"])
 
     applied["italy_french_baseline_restored"] = list(TNO_1962_ITALY_REMOVED_FRENCH_BASELINE_TARGETS.keys())
     for feature_id, target_tag in TNO_1962_ITALY_REMOVED_FRENCH_BASELINE_TARGETS.items():
         owners_payload["owners"][feature_id] = target_tag
         controllers_payload["controllers"][feature_id] = target_tag
-        cores_payload["cores"][feature_id] = target_tag
+        set_feature_core_tags(cores_payload["cores"], feature_id, [target_tag])
 
     return applied
 
@@ -5012,7 +5207,7 @@ def apply_tno_feature_assignment_overrides(
     for feature_id, tag in override_map.items():
         owners[feature_id] = tag
         controllers[feature_id] = tag
-        cores[feature_id] = tag
+        set_feature_core_tags(cores, feature_id, [tag])
 
     if scenario_political_gdf is not None and not scenario_political_gdf.empty:
         id_series = scenario_political_gdf["id"].fillna("").astype(str).str.strip()
@@ -5148,14 +5343,14 @@ def build_restore_assignments(
     runtime_political_full_gdf: gpd.GeoDataFrame,
     source_owners: dict[str, str],
     source_controllers: dict[str, str],
-    source_cores: dict[str, str],
-) -> tuple[gpd.GeoDataFrame, dict[str, dict[str, str]], dict[str, dict]]:
+    source_cores: dict[str, list[str]],
+) -> tuple[gpd.GeoDataFrame, dict[str, dict[str, object]], dict[str, dict]]:
     source_feature_ids = {str(feature_id).strip() for feature_id in source_owners if str(feature_id).strip()}
     source_rows = runtime_political_full_gdf.loc[
         runtime_political_full_gdf["id"].isin(source_feature_ids)
     ].copy().reset_index(drop=True)
     restored_rows: list[dict] = []
-    explicit_assignments: dict[str, dict[str, str]] = {}
+    explicit_assignments: dict[str, dict[str, object]] = {}
     diagnostics: dict[str, dict] = {}
     seen_feature_ids: set[str] = set()
 
@@ -5165,7 +5360,8 @@ def build_restore_assignments(
         feature_id = str(row.get("id") or "").strip()
         owner = normalize_tag(source_owners.get(feature_id))
         controller = normalize_tag(source_controllers.get(feature_id) or owner)
-        core = normalize_tag(source_cores.get(feature_id) or owner)
+        core_tags = normalize_core_tags(source_cores.get(feature_id)) or ([owner] if owner else [])
+        core = primary_core_tag(core_tags, fallback=owner)
         if not feature_id or not owner:
             continue
         source_with_assignment.append({
@@ -5173,6 +5369,7 @@ def build_restore_assignments(
             "owner_tag": owner,
             "controller_tag": controller,
             "core_tag": core,
+            "core_tags": core_tags,
         })
 
     for restore_id, config in COASTAL_RESTORE_AOI_CONFIGS.items():
@@ -5209,7 +5406,7 @@ def build_restore_assignments(
             explicit_assignments[feature_id] = {
                 "owner": owner_tag,
                 "controller": controller_tag,
-                "core": core_tag,
+                "core": [core_tag] if core_tag else [owner_tag],
             }
             seen_feature_ids.add(feature_id)
             restored_count += 1
@@ -5237,12 +5434,12 @@ def rebuild_feature_maps_from_political_gdf(
     source_feature_id_by_new_id: dict[str, str],
     source_owners: dict[str, str],
     source_controllers: dict[str, str],
-    source_cores: dict[str, str],
-    explicit_assignments: dict[str, dict[str, str]] | None = None,
+    source_cores: dict[str, list[str]],
+    explicit_assignments: dict[str, dict[str, object]] | None = None,
 ) -> tuple[dict, dict, dict]:
     owners: dict[str, str] = {}
     controllers: dict[str, str] = {}
-    cores: dict[str, str] = {}
+    cores: dict[str, list[str]] = {}
     explicit_assignments = explicit_assignments or {}
     for row in political_gdf.to_dict("records"):
         feature_id = str(row.get("id") or "").strip()
@@ -5255,23 +5452,50 @@ def rebuild_feature_maps_from_political_gdf(
         if explicit:
             owner_tag = normalize_tag(explicit.get("owner"))
             controller_tag = normalize_tag(explicit.get("controller")) or owner_tag
-            core_tag = normalize_tag(explicit.get("core")) or owner_tag
+            core_tags = normalize_core_tags(explicit.get("core")) or ([owner_tag] if owner_tag else [])
             if not owner_tag:
                 raise ValueError(f"Explicit assignment for {feature_id} is missing owner tag.")
             owners[feature_id] = owner_tag
             controllers[feature_id] = controller_tag
-            cores[feature_id] = core_tag
+            cores[feature_id] = core_tags
             continue
         if source_feature_id not in source_owners:
             raise KeyError(f"Missing owner mapping for source feature id {source_feature_id} (new id {feature_id}).")
         owners[feature_id] = str(source_owners[source_feature_id]).strip().upper()
         controllers[feature_id] = str(source_controllers.get(source_feature_id) or owners[feature_id]).strip().upper()
-        cores[feature_id] = str(source_cores.get(source_feature_id) or owners[feature_id]).strip().upper()
+        cores[feature_id] = normalize_core_tags(source_cores.get(source_feature_id)) or [owners[feature_id]]
     return (
         {"owners": owners},
         {"controllers": controllers},
         {"cores": cores},
     )
+
+
+def compact_topology_properties(topo_payload: dict, object_name: str) -> None:
+    geometries = (
+        topo_payload.get("objects", {})
+        .get(object_name, {})
+        .get("geometries", [])
+    )
+    if not isinstance(geometries, list):
+        return
+    for geometry in geometries:
+        if not isinstance(geometry, dict):
+            continue
+        properties = geometry.get("properties")
+        if not isinstance(properties, dict):
+            continue
+        compacted = {
+            key: value
+            for key, value in properties.items()
+            if value is not None
+            and value != ""
+            and not (isinstance(value, float) and math.isnan(value))
+        }
+        if compacted:
+            geometry["properties"] = compacted
+        else:
+            geometry.pop("properties", None)
 
 
 def build_region_affine_coeffs(config: dict, donor_context: dict) -> tuple[tuple[float, float, float, float, float, float], list[dict]]:
@@ -5826,7 +6050,7 @@ def build_runtime_topology_payload(
         "type": "GeometryCollection",
         "geometries": [],
     }
-    topo_dict["objects"]["land"] = copy.deepcopy(topo_dict["objects"]["land_mask"])
+    compact_topology_properties(topo_dict, "political")
     political_out = topology_object_to_gdf(topo_dict, "political")
     topo_dict["objects"]["political"]["computed_neighbors"] = compute_neighbor_graph(political_out)
     return topo_dict
@@ -5840,6 +6064,7 @@ def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
     manifest_payload = load_json(scenario_dir / "manifest.json")
     audit_payload = load_json(scenario_dir / "audit.json")
     current_water_regions = load_json(scenario_dir / "water_regions.geojson")
+    cores_payload["cores"] = normalize_feature_core_map(cores_payload.get("cores", {}))
 
     generated_at = utc_timestamp()
     runtime_political_full_gdf = load_runtime_political_gdf()
@@ -5860,7 +6085,7 @@ def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
             valid_feature_ids=valid_runtime_feature_ids,
             migration_map=migration_map,
         )
-        cores_payload["cores"] = expand_feature_code_map(
+        cores_payload["cores"] = expand_feature_core_map(
             cores_payload.get("cores", {}),
             valid_feature_ids=valid_runtime_feature_ids,
             migration_map=migration_map,
@@ -5884,6 +6109,7 @@ def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
         )
         for rule_pack_name, rule_path in REGIONAL_RULE_PACKS
     }
+    apply_tno_decolonization_metadata(countries_payload)
     patch_tno_palette_defaults(countries_payload, manifest_payload)
     touched_east_asia_tags = touched_regional_rule_tags.get("east_asia", [])
     touched_south_asia_tags = touched_regional_rule_tags.get("south_asia", [])
@@ -5895,7 +6121,7 @@ def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
     source_owner_feature_ids = {str(feature_id).strip() for feature_id in owners_payload.get("owners", {}).keys() if str(feature_id).strip()}
     canonical_source_owners = canonicalize_feature_code_map(owners_payload["owners"])
     canonical_source_controllers = canonicalize_feature_code_map(controllers_payload["controllers"])
-    canonical_source_cores = canonicalize_feature_code_map(cores_payload["cores"])
+    canonical_source_cores = canonicalize_feature_core_map(cores_payload["cores"])
     restore_gdf, restore_assignments, restore_diagnostics = build_restore_assignments(
         runtime_political_full_gdf,
         canonical_source_owners,

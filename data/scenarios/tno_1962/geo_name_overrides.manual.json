@@ -1,31 +1,31 @@
 {
   "version": 1,
   "scenario_id": "tno_1962",
-  "generated_at": "2026-03-17T02:49:17Z",
+  "generated_at": "2026-03-19T18:21:05.570988-04:00",
   "geo": {
     "AFG-1748": {
       "en": "Sari Pul",
-      "zh": "\u8428\u91cc\u666e\u52d2"
+      "zh": "萨里普勒"
     },
     "AFG-1758": {
       "en": "Khost",
-      "zh": "\u970d\u65af\u7279"
+      "zh": "霍斯特"
     },
     "AFG-1759": {
       "en": "Paktika",
-      "zh": "\u5e15\u514b\u63d0\u5361"
+      "zh": "帕克提卡"
     },
     "AFG-1771": {
       "en": "Logar",
-      "zh": "\u6d1b\u52a0\u5c14"
+      "zh": "洛加尔"
     },
     "AFG-1773": {
       "en": "Samangan",
-      "zh": "\u8428\u66fc\u7518"
+      "zh": "萨曼甘"
     },
     "CN_CITY_17275852B50191422864704": {
       "en": "Leping",
-      "zh": "\u4e50\u5e73"
+      "zh": "乐平"
     },
     "BE100": {
       "en": "Hauptstadtbezirk Brüssel",
@@ -282,6 +282,34 @@
     "RU_CITY_VOLGOGRAD": {
       "en": "Paulusburg",
       "zh": "保卢斯堡"
+    },
+    "AFG-1741": {
+      "en": "Badghis",
+      "zh": "巴德吉斯"
+    },
+    "RU_CITY_SAINT_PETERSBURG": {
+      "en": "Saint Petersburg",
+      "zh": "林德曼施塔特"
+    },
+    "RU_RAY_50074027B61494461730219": {
+      "en": "городской округ Тула",
+      "zh": "戈培尔"
+    },
+    "RU_RAY_50074027B61241799946425": {
+      "en": "Paulusburg",
+      "zh": "保卢斯堡"
+    },
+    "RU_RAY_50074027B67860704242461": {
+      "en": "Goeringstadt",
+      "zh": "戈林施塔特"
+    },
+    "HU120": {
+      "en": "Pest",
+      "zh": "佩斯特"
+    },
+    "RU_RAY_50074027B97493150269350": {
+      "en": "Goering",
+      "zh": "戈林"
     }
   }
 }

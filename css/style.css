@@ -2308,6 +2308,16 @@ details.card[open] > summary::after {
   min-height: 34px;
 }
 
+.dev-workspace-input {
+  width: 100%;
+  min-height: 36px;
+}
+
+.dev-workspace-textarea {
+  min-height: 72px;
+  resize: vertical;
+}
+
 .dev-selection-preview {
   width: 100%;
   min-height: 84px;

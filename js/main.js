@@ -160,15 +160,21 @@ function hasDetailTopologyLoaded() {
   return !!state.topologyDetail?.objects?.political;
 }
 
-async function ensureDetailTopologyReady({ renderDispatcher = null, requireIdle = false } = {}) {
+async function ensureDetailTopologyReady({
+  renderDispatcher = null,
+  requireIdle = false,
+  applyMapData = true,
+} = {}) {
   if (hasDetailTopologyLoaded()) {
     if (state.topologyBundleMode !== "composite") {
       state.topologyBundleMode = "composite";
-      setMapData({ refitProjection: false, resetZoom: false });
-      if (renderDispatcher?.schedule) {
-        renderDispatcher.schedule();
-      } else if (typeof state.renderNowFn === "function") {
-        state.renderNowFn();
+      if (applyMapData) {
+        setMapData({ refitProjection: false, resetZoom: false });
+        if (renderDispatcher?.schedule) {
+          renderDispatcher.schedule();
+        } else if (typeof state.renderNowFn === "function") {
+          state.renderNowFn();
+        }
       }
     }
     state.detailDeferred = false;
@@ -211,11 +217,13 @@ async function ensureDetailTopologyReady({ renderDispatcher = null, requireIdle 
     console.info(
       `[main] Detail promotion applied. source=${state.detailSourceRequested}, mode=${state.topologyBundleMode}.`
     );
-    setMapData({ refitProjection: false, resetZoom: false });
-    if (renderDispatcher?.schedule) {
-      renderDispatcher.schedule();
-    } else if (typeof state.renderNowFn === "function") {
-      state.renderNowFn();
+    if (applyMapData) {
+      setMapData({ refitProjection: false, resetZoom: false });
+      if (renderDispatcher?.schedule) {
+        renderDispatcher.schedule();
+      } else if (typeof state.renderNowFn === "function") {
+        state.renderNowFn();
+      }
     }
     return true;
   } catch (error) {

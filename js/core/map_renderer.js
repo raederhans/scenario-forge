@@ -344,20 +344,24 @@ let staticMeshCache = {
   snapshot: null,
 };
 let scenarioPoliticalBackgroundCache = {
-  topologyRef: null,
-  landCollectionRef: null,
+  runtimeRef: null,
   scenarioId: "",
   viewMode: "ownership",
   oceanFillColor: "",
-  topologyRevision: 0,
-  colorRevision: 0,
   sovereigntyRevision: 0,
   controllerRevision: 0,
   shellRevision: 0,
   canvasWidth: 0,
   canvasHeight: 0,
-  featureCount: 0,
+  semanticSignature: "",
   entries: [],
+};
+let scenarioOpeningOwnerBorderCache = {
+  runtimeRef: null,
+  scenarioId: "",
+  baselineHash: "",
+  baselineOwnersRef: null,
+  mesh: null,
 };
 let physicalLandClipPathCache = {
   key: "",
@@ -3413,17 +3417,40 @@ function refreshScenarioOpeningOwnerBorders({ renderNow = false, reason = "" } =
     && !!state.runtimePoliticalTopology?.objects?.political
     && Object.keys(state.scenarioBaselineOwnersByFeatureId || {}).length > 0;
 
-  state.cachedScenarioOpeningOwnerBorders = shouldBuild
-    ? buildOwnerBorderMesh(
-      state.runtimePoliticalTopology,
-      {
-        ownershipByFeatureId: state.scenarioBaselineOwnersByFeatureId,
-        scenarioActive: false,
-        viewMode: "ownership",
-      },
-      { excludeSea: true }
-    )
-    : null;
+  if (shouldBuild) {
+    const runtimeRef = state.runtimePoliticalTopology;
+    const scenarioId = String(state.activeScenarioId || "");
+    const baselineHash = String(state.scenarioBaselineHash || "");
+    const cacheMatches =
+      scenarioOpeningOwnerBorderCache.runtimeRef === runtimeRef
+      && scenarioOpeningOwnerBorderCache.scenarioId === scenarioId
+      && (baselineHash
+        ? scenarioOpeningOwnerBorderCache.baselineHash === baselineHash
+        : scenarioOpeningOwnerBorderCache.baselineOwnersRef === state.scenarioBaselineOwnersByFeatureId)
+      && isUsableMesh(scenarioOpeningOwnerBorderCache.mesh);
+
+    state.cachedScenarioOpeningOwnerBorders = cacheMatches
+      ? scenarioOpeningOwnerBorderCache.mesh
+      : buildOwnerBorderMesh(
+        runtimeRef,
+        {
+          ownershipByFeatureId: state.scenarioBaselineOwnersByFeatureId,
+          scenarioActive: false,
+          viewMode: "ownership",
+        },
+        { excludeSea: true }
+      );
+
+    scenarioOpeningOwnerBorderCache = {
+      runtimeRef,
+      scenarioId,
+      baselineHash,
+      baselineOwnersRef: state.scenarioBaselineOwnersByFeatureId,
+      mesh: state.cachedScenarioOpeningOwnerBorders,
+    };
+  } else {
+    state.cachedScenarioOpeningOwnerBorders = null;
+  }
 
   invalidateRenderPasses("borders", reason || "scenario-opening-borders");
   recordRenderPerfMetric("refreshScenarioOpeningOwnerBorders", nowMs() - startedAt, {
@@ -9345,60 +9372,13 @@ function buildScenarioPoliticalBackgroundEntries() {
   const landCollection = state.landData;
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
   const featureCount = Array.isArray(landCollection?.features) ? landCollection.features.length : 0;
-  const cacheMatches =
-    scenarioPoliticalBackgroundCache.topologyRef === topology &&
-    scenarioPoliticalBackgroundCache.landCollectionRef === landCollection &&
-    scenarioPoliticalBackgroundCache.scenarioId === state.activeScenarioId &&
-    scenarioPoliticalBackgroundCache.viewMode === String(state.scenarioViewMode || "ownership") &&
-    scenarioPoliticalBackgroundCache.oceanFillColor === getAtlantropaSeaPoliticalFillColor() &&
-    scenarioPoliticalBackgroundCache.topologyRevision === Number(state.topologyRevision || 0) &&
-    scenarioPoliticalBackgroundCache.colorRevision === Number(state.colorRevision || 0) &&
-    scenarioPoliticalBackgroundCache.sovereigntyRevision === Number(state.sovereigntyRevision || 0) &&
-    scenarioPoliticalBackgroundCache.controllerRevision === Number(state.scenarioControllerRevision || 0) &&
-    scenarioPoliticalBackgroundCache.shellRevision === Number(state.scenarioShellOverlayRevision || 0) &&
-    scenarioPoliticalBackgroundCache.canvasWidth === canvasWidth &&
-    scenarioPoliticalBackgroundCache.canvasHeight === canvasHeight &&
-    scenarioPoliticalBackgroundCache.featureCount === featureCount;
-  if (cacheMatches) {
-    recordRenderPerfMetric("drawScenarioPoliticalBackgroundEntries", nowMs() - startedAt, {
-      cacheHit: true,
-      entryCount: scenarioPoliticalBackgroundCache.entries.length,
-      featureCount,
-    });
-    return scenarioPoliticalBackgroundCache.entries;
-  }
-
   const includedFeatureIds = new Set(
     getRenderableLandFeatures(canvasWidth, canvasHeight, { forceProd: true })
       .map((feature) => getFeatureId(feature))
       .filter(Boolean)
   );
-  if (!includedFeatureIds.size) {
-    scenarioPoliticalBackgroundCache = {
-      topologyRef: topology,
-      landCollectionRef: landCollection,
-      scenarioId: state.activeScenarioId || "",
-      viewMode: String(state.scenarioViewMode || "ownership"),
-      oceanFillColor: getAtlantropaSeaPoliticalFillColor(),
-      topologyRevision: Number(state.topologyRevision || 0),
-      colorRevision: Number(state.colorRevision || 0),
-      sovereigntyRevision: Number(state.sovereigntyRevision || 0),
-      controllerRevision: Number(state.scenarioControllerRevision || 0),
-      shellRevision: Number(state.scenarioShellOverlayRevision || 0),
-      canvasWidth,
-      canvasHeight,
-      featureCount,
-      entries: [],
-    };
-    recordRenderPerfMetric("drawScenarioPoliticalBackgroundEntries", nowMs() - startedAt, {
-      cacheHit: false,
-      entryCount: 0,
-      featureCount,
-    });
-    return scenarioPoliticalBackgroundCache.entries;
-  }
-
   const groupedGeometries = new Map();
+  const semanticSignatureParts = [];
   const geometries = Array.isArray(topology?.objects?.political?.geometries)
     ? topology.objects.political.geometries
     : [];
@@ -9418,12 +9398,54 @@ function buildScenarioPoliticalBackgroundEntries() {
       getSafeCanvasColor(state.colors?.[id], null) ||
       getSafeCanvasColor(getResolvedFeatureColor(geometry, id), null) ||
       LAND_FILL_COLOR;
+    semanticSignatureParts.push(`${id}\u0001${displayCode}\u0001${fillColor}`);
     const groupKey = `${displayCode}::${fillColor}`;
     if (!groupedGeometries.has(groupKey)) {
       groupedGeometries.set(groupKey, { displayCode, fillColor, geometries: [] });
     }
     groupedGeometries.get(groupKey).geometries.push(geometry);
   });
+  const semanticSignature = semanticSignatureParts.join("\u0002");
+  const cacheMatches =
+    scenarioPoliticalBackgroundCache.runtimeRef === topology &&
+    scenarioPoliticalBackgroundCache.scenarioId === state.activeScenarioId &&
+    scenarioPoliticalBackgroundCache.viewMode === String(state.scenarioViewMode || "ownership") &&
+    scenarioPoliticalBackgroundCache.oceanFillColor === getAtlantropaSeaPoliticalFillColor() &&
+    scenarioPoliticalBackgroundCache.sovereigntyRevision === Number(state.sovereigntyRevision || 0) &&
+    scenarioPoliticalBackgroundCache.controllerRevision === Number(state.scenarioControllerRevision || 0) &&
+    scenarioPoliticalBackgroundCache.shellRevision === Number(state.scenarioShellOverlayRevision || 0) &&
+    scenarioPoliticalBackgroundCache.canvasWidth === canvasWidth &&
+    scenarioPoliticalBackgroundCache.canvasHeight === canvasHeight &&
+    scenarioPoliticalBackgroundCache.semanticSignature === semanticSignature;
+  if (cacheMatches) {
+    recordRenderPerfMetric("drawScenarioPoliticalBackgroundEntries", nowMs() - startedAt, {
+      cacheHit: true,
+      entryCount: scenarioPoliticalBackgroundCache.entries.length,
+      featureCount,
+    });
+    return scenarioPoliticalBackgroundCache.entries;
+  }
+  if (!includedFeatureIds.size) {
+    scenarioPoliticalBackgroundCache = {
+      runtimeRef: topology,
+      scenarioId: state.activeScenarioId || "",
+      viewMode: String(state.scenarioViewMode || "ownership"),
+      oceanFillColor: getAtlantropaSeaPoliticalFillColor(),
+      sovereigntyRevision: Number(state.sovereigntyRevision || 0),
+      controllerRevision: Number(state.scenarioControllerRevision || 0),
+      shellRevision: Number(state.scenarioShellOverlayRevision || 0),
+      canvasWidth,
+      canvasHeight,
+      semanticSignature,
+      entries: [],
+    };
+    recordRenderPerfMetric("drawScenarioPoliticalBackgroundEntries", nowMs() - startedAt, {
+      cacheHit: false,
+      entryCount: 0,
+      featureCount,
+    });
+    return scenarioPoliticalBackgroundCache.entries;
+  }
 
   const entries = [];
   let fallbackCount = 0;
@@ -9482,19 +9504,16 @@ function buildScenarioPoliticalBackgroundEntries() {
   });
 
   scenarioPoliticalBackgroundCache = {
-    topologyRef: topology,
-    landCollectionRef: landCollection,
+    runtimeRef: topology,
     scenarioId: state.activeScenarioId || "",
     viewMode: String(state.scenarioViewMode || "ownership"),
     oceanFillColor: getAtlantropaSeaPoliticalFillColor(),
-    topologyRevision: Number(state.topologyRevision || 0),
-    colorRevision: Number(state.colorRevision || 0),
     sovereigntyRevision: Number(state.sovereigntyRevision || 0),
     controllerRevision: Number(state.scenarioControllerRevision || 0),
     shellRevision: Number(state.scenarioShellOverlayRevision || 0),
     canvasWidth,
     canvasHeight,
-    featureCount,
+    semanticSignature,
     entries,
   };
   recordRenderPerfMetric("drawScenarioPoliticalBackgroundEntries", nowMs() - startedAt, {
