@@ -58,6 +58,7 @@ STAGE_CHOICES = [
     STAGE_WRITE_BUNDLE,
 ]
 REGIONAL_RULE_PACKS: list[tuple[str, Path]] = [
+    ("africa", ROOT / "data/scenario-rules/tno_1962.africa_ownership.manual.json"),
     ("east_asia", ROOT / "data/scenario-rules/tno_1962.east_asia_ownership.manual.json"),
     ("south_asia", ROOT / "data/scenario-rules/tno_1962.south_asia_ownership.manual.json"),
     ("russia", ROOT / "data/scenario-rules/tno_1962.russia_ownership.manual.json"),
@@ -195,6 +196,16 @@ TNO_CONTROLLER_ONLY_COUNTRY_META = {
         "parent_owner_tag": "",
         "hidden_from_country_list": False,
     },
+}
+TNO_INSPECTOR_GROUP_CHINA = {
+    "id": "scenario_group_china_region",
+    "label": "China Region",
+    "anchor_id": "continent_asia",
+}
+TNO_INSPECTOR_GROUP_RUSSIA = {
+    "id": "scenario_group_russia_region",
+    "label": "Russia Region",
+    "anchor_id": "continent_europe",
 }
 
 GER_PRESET_FEATURE_IDS = {
@@ -2029,6 +2040,16 @@ TNO_1962_TNO_COLOR_PROXY_TAGS = {
     "FRA": "FRM",
     "WLS": "WAL",
     "PUE": "USA",
+    "RKO": "OST",
+    "RKU": "UKR",
+    "RKK": "CAU",
+    "RKN": "HOL",
+    "RKP": "GGN",
+    "RKNO": "NOR",
+}
+
+TNO_1962_TNO_COLOR_FIXED_HEX = {
+    "RKM": "#4f4554",
 }
 
 UNAPPLIED_ACTION_IDS = (
@@ -2996,6 +3017,9 @@ def resolve_tno_palette_color(tag: str, palette_entries: dict[str, dict]) -> str
     normalized_tag = normalize_tag(tag)
     if not normalized_tag:
         return ""
+    fixed_color = normalize_hex(TNO_1962_TNO_COLOR_FIXED_HEX.get(normalized_tag))
+    if fixed_color:
+        return fixed_color
     direct_entry = palette_entries.get(normalized_tag, {})
     direct_color = normalize_hex(direct_entry.get("map_hex"))
     if direct_color:
@@ -3011,7 +3035,11 @@ def patch_tno_palette_defaults(countries_payload: dict, manifest_payload: dict) 
     countries = countries_payload.setdefault("countries", {})
     tno_palette_entries = load_palette_entries(TNO_PALETTE_PATH)
 
-    target_tags = set(TNO_1962_DIRECT_TNO_COLOR_TAGS) | set(TNO_1962_TNO_COLOR_PROXY_TAGS.keys())
+    target_tags = (
+        set(TNO_1962_DIRECT_TNO_COLOR_TAGS)
+        | set(TNO_1962_TNO_COLOR_PROXY_TAGS.keys())
+        | set(TNO_1962_TNO_COLOR_FIXED_HEX.keys())
+    )
     for tag, country_entry in countries.items():
         normalized_tag = normalize_tag(tag)
         continent_id = str(country_entry.get("continent_id") or "").strip()
@@ -3100,6 +3128,37 @@ def ensure_tno_controller_only_countries(countries_payload: dict, controllers_pa
             hidden_from_country_list=bool(metadata["hidden_from_country_list"]),
         )
         countries[tag]["controller_feature_count"] = int(controller_counts.get(tag, 0))
+
+
+def apply_tno_inspector_groups(countries_payload: dict) -> None:
+    countries = countries_payload.setdefault("countries", {})
+
+    for tag, country_entry in countries.items():
+        if not isinstance(country_entry, dict):
+            continue
+
+        normalized_tag = normalize_tag(tag or country_entry.get("tag"))
+        iso_candidates = {
+            normalize_iso2(country_entry.get("base_iso2")),
+            normalize_iso2(country_entry.get("lookup_iso2")),
+            normalize_iso2(country_entry.get("provenance_iso2")),
+        }
+        iso_candidates.discard("")
+
+        group_meta = None
+        if "RU" in iso_candidates and not normalized_tag.startswith("RK"):
+            group_meta = TNO_INSPECTOR_GROUP_RUSSIA
+        elif "CN" in iso_candidates and normalized_tag != "MAN":
+            group_meta = TNO_INSPECTOR_GROUP_CHINA
+
+        if group_meta:
+            country_entry["inspector_group_id"] = group_meta["id"]
+            country_entry["inspector_group_label"] = group_meta["label"]
+            country_entry["inspector_group_anchor_id"] = group_meta["anchor_id"]
+        else:
+            country_entry.pop("inspector_group_id", None)
+            country_entry.pop("inspector_group_label", None)
+            country_entry.pop("inspector_group_anchor_id", None)
 
 
 def ensure_tno_manual_override_countries(countries_payload: dict, owners_payload: dict) -> None:
@@ -3374,6 +3433,9 @@ def build_manual_country_entry(
         "subject_kind": str(subject_kind or existing_entry.get("subject_kind") or "").strip(),
         "entry_kind": str(entry_kind or existing_entry.get("entry_kind") or "").strip(),
         "hidden_from_country_list": bool(hidden_from_country_list),
+        "inspector_group_id": str(existing_entry.get("inspector_group_id") or "").strip(),
+        "inspector_group_label": str(existing_entry.get("inspector_group_label") or "").strip(),
+        "inspector_group_anchor_id": str(existing_entry.get("inspector_group_anchor_id") or "").strip(),
     }
 
 
@@ -5940,6 +6002,7 @@ def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
     normalize_tno_country_registry(countries_payload, owners_payload)
     ensure_tno_manual_override_countries(countries_payload, owners_payload)
     ensure_tno_controller_only_countries(countries_payload, controllers_payload)
+    apply_tno_inspector_groups(countries_payload)
     apply_tno_country_display_name_overrides(countries_payload)
 
     congo_props = {}

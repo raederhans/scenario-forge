@@ -2,6 +2,8 @@
 import { state } from "../core/state.js";
 import { normalizeCountryCodeAlias } from "../core/country_code_aliases.js";
 
+const US_LEGACY_ZONE_LABEL_RE = /(?:\bZone\s+\d+\b|第?\s*\d+\s*[区號号])/i;
+
 function resolveGeoLocaleEntry(key) {
   const geoLocales = state.locales?.geo || {};
   if (geoLocales[key]) return geoLocales[key];
@@ -82,8 +84,28 @@ function getSafeRawFeatureLabel(candidates = []) {
   return "";
 }
 
+function isUsFeature(feature) {
+  const props = feature?.properties || {};
+  const featureId = String(props.id || feature?.id || "").trim();
+  const countryCode = String(props.cntr_code || "").trim().toUpperCase();
+  return countryCode === "US" || featureId.startsWith("US_");
+}
+
+function isUsLegacyZoneLabel(text) {
+  return US_LEGACY_ZONE_LABEL_RE.test(String(text || "").trim());
+}
+
 function getGeoFeatureDisplayLabel(feature, fallback = "") {
   const props = feature?.properties || {};
+  const rawNameCandidates = [
+    props.label,
+    props.name,
+    props.name_en,
+    props.NAME,
+  ];
+  const canonicalRawName = String(
+    rawNameCandidates.find((value) => String(value || "").trim()) || ""
+  ).trim();
   const preferredIdCandidates = [];
   [
     props.__city_host_feature_id,
@@ -109,16 +131,17 @@ function getGeoFeatureDisplayLabel(feature, fallback = "") {
     allowCrossLanguageFallback: true,
     includeCandidateFallback: false,
   });
-  if (explicitLabel) {
+  const shouldBypassUsLegacyZoneLabel = (
+    explicitLabel
+    && isUsFeature(feature)
+    && canonicalRawName
+    && !isUsLegacyZoneLabel(canonicalRawName)
+    && isUsLegacyZoneLabel(explicitLabel)
+  );
+  if (explicitLabel && !shouldBypassUsLegacyZoneLabel) {
     return explicitLabel;
   }
 
-  const rawNameCandidates = [
-    props.label,
-    props.name,
-    props.name_en,
-    props.NAME,
-  ];
   const safeRawLabel = getSafeRawFeatureLabel(rawNameCandidates);
   if (safeRawLabel) {
     return safeRawLabel;

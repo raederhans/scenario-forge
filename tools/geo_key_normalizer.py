@@ -4,6 +4,8 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
+US_LEGACY_ZONE_RE = re.compile(r"\bZone\s+\d+\b", re.IGNORECASE)
+
 
 def slugify(text: str) -> str:
     cleaned = re.sub(r"[^A-Za-z0-9]+", "_", str(text).strip())
@@ -55,6 +57,35 @@ def collect_disambiguated_aliases(properties: dict, aliases: list[str]) -> list[
         if admin1_group and admin1_group != alias:
             variants.add(f"{alias} [{admin1_group}]")
     return sorted(variants)
+
+
+def is_us_legacy_zone_alias(properties: dict, alias: str) -> bool:
+    country_code = str(properties.get("cntr_code", "")).strip().upper()
+    if country_code != "US":
+        return False
+    return bool(US_LEGACY_ZONE_RE.search(str(alias or "").strip()))
+
+
+def split_display_and_search_aliases(properties: dict, aliases: list[str]) -> tuple[list[str], list[str]]:
+    display_aliases: list[str] = []
+    search_only_aliases: list[str] = []
+    seen_display: set[str] = set()
+    seen_search: set[str] = set()
+
+    for raw_alias in aliases:
+        alias = str(raw_alias or "").strip()
+        if not alias:
+            continue
+        if is_us_legacy_zone_alias(properties, alias):
+            if alias not in seen_search:
+                search_only_aliases.append(alias)
+                seen_search.add(alias)
+            continue
+        if alias not in seen_display:
+            display_aliases.append(alias)
+            seen_display.add(alias)
+
+    return sorted(display_aliases), sorted(search_only_aliases)
 
 
 def stable_key_for_geometry(geometry: dict, primary_name: str) -> str:
@@ -110,8 +141,9 @@ def normalize_geokeys(topology_path: Path) -> dict:
         aliases = sorted(set(aliases))
         aliases.extend(collect_disambiguated_aliases(properties, aliases))
         aliases = sorted(set(aliases))
+        display_aliases, search_only_aliases = split_display_and_search_aliases(properties, aliases)
 
-        for alias in aliases:
+        for alias in [*display_aliases, *search_only_aliases]:
             bucket = alias_candidates.setdefault(alias, set())
             bucket.add(stable_key)
 
@@ -121,7 +153,8 @@ def normalize_geokeys(topology_path: Path) -> dict:
                 "feature_id": geometry.get("id"),
                 "country_code": properties.get("cntr_code"),
                 "primary_name": primary_name,
-                "aliases": aliases,
+                "aliases": display_aliases,
+                "search_only_aliases": search_only_aliases,
             }
         )
 

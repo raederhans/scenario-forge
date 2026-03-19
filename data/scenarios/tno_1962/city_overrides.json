@@ -15,7 +15,7 @@
     "KOM": "CITY::ne::1159146551",
     "NOV": "CITY::ne::1159150713",
     "OMS": "CITY::ne::1159149579",
-    "ORE": "CITY::ne::1159149571",
+    "VYT": "CITY::ne::1159149571",
     "OUR": "CITY::ne::1159149571",
     "PAK": "CITY::ne::1159150645",
     "PFC": "CITY::ne::1159150795",
@@ -31,7 +31,8 @@
     "SBA": "CITY::ne::1159150713",
     "TOM": "CITY::ne::1159150685",
     "TYM": "CITY::ne::1159149581",
-    "USA": "CITY::ne::1159151573"
+    "USA": "CITY::ne::1159151573",
+    "VOR": "CITY::ne::1159149563"
   },
   "capital_city_hints": {
     "AEF": {
@@ -1920,9 +1921,9 @@
       "confidence": "high",
       "candidate_count": 16
     },
-    "ORE": {
-      "tag": "ORE",
-      "display_name": "Orenburg",
+    "VYT": {
+      "tag": "VYT",
+      "display_name": "Vyatka",
       "lookup_iso2": "RU",
       "base_iso2": "RU",
       "capital_state_id": 652,
@@ -2955,9 +2956,9 @@
       "confidence": "high",
       "candidate_count": 32
     },
-    "URL": {
-      "tag": "URL",
-      "display_name": "Ural",
+    "ZLT": {
+      "tag": "ZLT",
+      "display_name": "Zlatoust",
       "lookup_iso2": "RU",
       "base_iso2": "RU",
       "capital_state_id": 848,
@@ -3230,6 +3231,29 @@
       "resolution_method": "capital_state_fallback",
       "confidence": "medium",
       "candidate_count": 74
+    },
+    "VOR": {
+      "tag": "VOR",
+      "display_name": "Vorkuta",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "city_id": "CITY::ne::1159149563",
+      "stable_key": "id::CITY::ne::1159149563",
+      "city_name": "Vorkuta",
+      "name_ascii": "Vorkuta",
+      "capital_kind": "admin_capital",
+      "base_tier": "regional",
+      "population": 80039,
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B78297177563949",
+      "urban_match_id": "",
+      "lon": 64.0667,
+      "lat": 67.50867,
+      "source": "merged",
+      "resolution_method": "manual_override",
+      "confidence": "high",
+      "candidate_count": 1
     }
   },
   "cities": {

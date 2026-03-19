@@ -183,6 +183,9 @@ function getDynamicCountryEntries() {
           continentLabel: String(scenarioCountry?.continent_label || "").trim(),
           subregionId: String(scenarioCountry?.subregion_id || "").trim(),
           subregionLabel: String(scenarioCountry?.subregion_label || "").trim(),
+          inspector_group_id: String(scenarioCountry?.inspector_group_id || "").trim(),
+          inspector_group_label: String(scenarioCountry?.inspector_group_label || "").trim(),
+          inspector_group_anchor_id: String(scenarioCountry?.inspector_group_anchor_id || "").trim(),
           syntheticOwner: !!scenarioCountry?.synthetic_owner,
           hiddenFromCountryList: !!scenarioCountry?.hidden_from_country_list,
           featured: !!scenarioCountry?.featured,
@@ -236,7 +239,9 @@ function getDynamicCountryEntries() {
 
 function buildInspectorTopLevelCountryEntries(entries = []) {
   return (Array.isArray(entries) ? entries : []).filter(
-    (entry) => !entry?.releasable && !entry?.scenarioSubject && !entry?.hiddenFromCountryList
+    (entry) => !entry?.releasable
+      && !entry?.hiddenFromCountryList
+      && (!entry?.scenarioSubject || !!entry?.inspectorGroupId)
   );
 }
 
@@ -282,6 +287,89 @@ function getScenarioCountryMeta(entryOrCode) {
   const entry = state.scenarioCountriesByTag?.[normalizedCode];
   if (!entry || typeof entry !== "object") return null;
   return entry;
+}
+
+const TNO_SCENARIO_ID = "tno_1962";
+const TNO_CHINA_INSPECTOR_GROUP = Object.freeze({
+  id: "scenario_group_china_region",
+  label: "China Region",
+  anchorId: "continent_asia",
+});
+const TNO_RUSSIA_INSPECTOR_GROUP = Object.freeze({
+  id: "scenario_group_russia_region",
+  label: "Russia Region",
+  anchorId: "continent_europe",
+});
+
+function readExplicitInspectorGroupMeta(entry = {}) {
+  const id = String(entry?.inspector_group_id || entry?.inspectorGroupId || "").trim();
+  const label = String(entry?.inspector_group_label || entry?.inspectorGroupLabel || "").trim();
+  const anchorId = String(entry?.inspector_group_anchor_id || entry?.inspectorGroupAnchorId || "").trim();
+  if (!id) {
+    return {
+      id: "",
+      label: "",
+      anchorId: "",
+    };
+  }
+  return {
+    id,
+    label: label || id,
+    anchorId,
+  };
+}
+
+function collectScenarioInspectorIso2Codes(...entries) {
+  const iso2Codes = new Set();
+  entries.forEach((entry) => {
+    if (!entry || typeof entry !== "object") return;
+    [
+      entry.base_iso2,
+      entry.baseIso2,
+      entry.lookup_iso2,
+      entry.lookupIso2,
+      entry.provenance_iso2,
+      entry.provenanceIso2,
+    ].forEach((value) => {
+      const normalized = String(value || "").trim().toUpperCase();
+      if (normalized) {
+        iso2Codes.add(normalized);
+      }
+    });
+  });
+  return iso2Codes;
+}
+
+function resolveScenarioInspectorGroupMeta(entryOrCode) {
+  const entry = typeof entryOrCode === "object" && entryOrCode ? entryOrCode : null;
+  const scenarioMeta = getScenarioCountryMeta(entryOrCode) || null;
+  const explicitScenarioGroup = readExplicitInspectorGroupMeta(scenarioMeta || {});
+  if (explicitScenarioGroup.id) return explicitScenarioGroup;
+  const explicitEntryGroup = readExplicitInspectorGroupMeta(entry || {});
+  if (explicitEntryGroup.id) return explicitEntryGroup;
+
+  if (String(state.activeScenarioId || "").trim() !== TNO_SCENARIO_ID) {
+    return explicitEntryGroup;
+  }
+
+  const tag = normalizeCountryCode(
+    scenarioMeta?.tag
+    || entry?.tag
+    || entry?.code
+    || (typeof entryOrCode === "string" ? entryOrCode : "")
+  );
+  if (!tag) {
+    return explicitEntryGroup;
+  }
+
+  const iso2Codes = collectScenarioInspectorIso2Codes(scenarioMeta, entry);
+  if (iso2Codes.has("RU") && !tag.startsWith("RK")) {
+    return TNO_RUSSIA_INSPECTOR_GROUP;
+  }
+  if (iso2Codes.has("CN") && tag !== "MAN") {
+    return TNO_CHINA_INSPECTOR_GROUP;
+  }
+  return explicitEntryGroup;
 }
 
 function resolveScenarioLookupCode(entryOrCode) {
@@ -443,42 +531,113 @@ function sortCountriesWithinContinent(entries, priorityOrderMap = getPriorityCou
   return [...entries].sort((a, b) => compareInspectorCountries(a, b, priorityOrderMap));
 }
 
+function getInspectorGroupExpansionKey(groupId) {
+  return `group::${String(groupId || "").trim()}`;
+}
+
+function getInspectorTopLevelGroupMeta(entry = {}) {
+  const fallbackContinentId = String(entry?.continentId || "continent_other").trim() || "continent_other";
+  const fallbackContinentLabel = String(entry?.continentLabel || "Other").trim() || "Other";
+  const groupId = String(entry?.topLevelGroupId || fallbackContinentId).trim() || fallbackContinentId;
+  const groupLabel = String(entry?.topLevelGroupLabel || fallbackContinentLabel).trim() || fallbackContinentLabel;
+  const groupAnchorId = String(entry?.topLevelGroupAnchorId || "").trim();
+  return {
+    id: groupId,
+    label: groupLabel,
+    displayLabel: t(groupLabel, "geo") || groupLabel,
+    anchorId: groupAnchorId,
+  };
+}
+
+function getInspectorTopLevelGroupIdForCode(code) {
+  const normalizedCode = normalizeCountryCode(code);
+  if (!normalizedCode) return "";
+  const inspectorGroupId = resolveScenarioInspectorGroupMeta(normalizedCode).id;
+  if (inspectorGroupId) return inspectorGroupId;
+  return getCountryGroupingMeta(normalizedCode)?.continentId || "";
+}
+
 function buildCountryColorTree(entries) {
   const tree = new Map();
-  const continentOrder = new Map();
+  const topLevelOrder = new Map();
   const configuredContinents = Array.isArray(state.countryGroupsData?.continents)
     ? state.countryGroupsData.continents
     : [];
   const priorityOrderMap = getPriorityCountryOrderMap();
+  const anchoredScenarioGroups = new Map();
+  const unanchoredScenarioGroups = new Map();
+  const orderedTopLevelGroups = [];
 
-  configuredContinents.forEach((continent, continentIndex) => {
+  const pushTopLevelGroup = (groupMeta) => {
+    if (!groupMeta?.id || topLevelOrder.has(groupMeta.id)) return;
+    topLevelOrder.set(groupMeta.id, orderedTopLevelGroups.length);
+    orderedTopLevelGroups.push(groupMeta);
+  };
+
+  entries.forEach((entry) => {
+    const groupMeta = getInspectorTopLevelGroupMeta(entry);
+    if (groupMeta.id === entry?.continentId) return;
+    if (groupMeta.anchorId) {
+      const list = anchoredScenarioGroups.get(groupMeta.anchorId) || [];
+      if (!list.some((item) => item.id === groupMeta.id)) {
+        list.push(groupMeta);
+        anchoredScenarioGroups.set(groupMeta.anchorId, list);
+      }
+      return;
+    }
+    if (!unanchoredScenarioGroups.has(groupMeta.id)) {
+      unanchoredScenarioGroups.set(groupMeta.id, groupMeta);
+    }
+  });
+
+  configuredContinents.forEach((continent) => {
     const continentId = String(continent?.id || "").trim();
     if (!continentId) return;
-    continentOrder.set(continentId, continentIndex);
+
+    (anchoredScenarioGroups.get(continentId) || [])
+      .sort((a, b) => a.displayLabel.localeCompare(b.displayLabel))
+      .forEach(pushTopLevelGroup);
+
+    const continentLabel = String(continent?.label || "").trim() || continentId;
+    pushTopLevelGroup({
+      id: continentId,
+      label: continentLabel,
+      displayLabel: t(continentLabel, "geo") || continentLabel,
+      anchorId: "",
+    });
+  });
+
+  Array.from(unanchoredScenarioGroups.values())
+    .sort((a, b) => a.displayLabel.localeCompare(b.displayLabel))
+    .forEach(pushTopLevelGroup);
+
+  entries.forEach((entry) => {
+    const groupMeta = getInspectorTopLevelGroupMeta(entry);
+    if (!topLevelOrder.has(groupMeta.id)) {
+      pushTopLevelGroup(groupMeta);
+    }
   });
 
   entries.forEach((entry) => {
-    const meta = getCountryGroupingMeta(entry);
-    const continentId = meta?.continentId || "continent_other";
-    const continentLabel = meta?.continentLabel || "Other";
+    const groupMeta = getInspectorTopLevelGroupMeta(entry);
 
-    if (!tree.has(continentId)) {
-      tree.set(continentId, {
-        id: continentId,
-        label: continentLabel,
-        displayLabel: t(continentLabel, "geo") || continentLabel,
-        sortIndex: continentOrder.has(continentId) ? continentOrder.get(continentId) : Number.MAX_SAFE_INTEGER,
+    if (!tree.has(groupMeta.id)) {
+      tree.set(groupMeta.id, {
+        id: groupMeta.id,
+        label: groupMeta.label,
+        displayLabel: groupMeta.displayLabel,
+        sortIndex: topLevelOrder.has(groupMeta.id) ? topLevelOrder.get(groupMeta.id) : Number.MAX_SAFE_INTEGER,
         countries: [],
       });
     }
 
-    tree.get(continentId).countries.push(entry);
+    tree.get(groupMeta.id).countries.push(entry);
   });
 
   return Array.from(tree.values())
-    .map((continentNode) => ({
-      ...continentNode,
-      countries: sortCountriesWithinContinent(continentNode.countries, priorityOrderMap),
+    .map((groupNode) => ({
+      ...groupNode,
+      countries: sortCountriesWithinContinent(groupNode.countries, priorityOrderMap),
     }))
     .sort((a, b) => {
       if (a.sortIndex !== b.sortIndex) return a.sortIndex - b.sortIndex;
@@ -486,14 +645,14 @@ function buildCountryColorTree(entries) {
     });
 }
 
-function getDefaultExpandedContinentId(groupedEntries = []) {
+function getDefaultExpandedInspectorGroupId(groupedEntries = []) {
   const selectedCode = normalizeCountryCode(state.selectedInspectorCountryCode);
-  const selectedContinentId = getCountryGroupingMeta(selectedCode)?.continentId;
-  if (selectedContinentId) return selectedContinentId;
+  const selectedGroupId = getInspectorTopLevelGroupIdForCode(selectedCode);
+  if (selectedGroupId) return selectedGroupId;
 
   const activeCode = normalizeCountryCode(state.activeSovereignCode);
-  const activeContinentId = getCountryGroupingMeta(activeCode)?.continentId;
-  if (activeContinentId) return activeContinentId;
+  const activeGroupId = getInspectorTopLevelGroupIdForCode(activeCode);
+  if (activeGroupId) return activeGroupId;
 
   const europeNode = groupedEntries.find((entry) => entry.id === "continent_europe");
   if (europeNode) return europeNode.id;
@@ -512,9 +671,9 @@ function ensureInitialInspectorExpansion(groupedEntries = []) {
     return;
   }
 
-  const defaultContinentId = getDefaultExpandedContinentId(groupedEntries);
-  if (defaultContinentId) {
-    state.expandedInspectorContinents.add(`continent::${defaultContinentId}`);
+  const defaultGroupId = getDefaultExpandedInspectorGroupId(groupedEntries);
+  if (defaultGroupId) {
+    state.expandedInspectorContinents.add(getInspectorGroupExpansionKey(defaultGroupId));
   }
   state.inspectorExpansionInitialized = true;
 }
@@ -1686,10 +1845,24 @@ function initSidebar({ render } = {}) {
     const featureCount = String(entryKind).trim().toLowerCase() === "controller_only"
       ? controllerFeatureCount
       : ownerFeatureCount;
-    const continentLabel =
-      String(scenarioMeta.continent_label || scenarioMeta.continentLabel || groupingMeta.continentLabel || "Other");
-    const subregionLabel =
-      String(scenarioMeta.subregion_label || scenarioMeta.subregionLabel || groupingMeta.subregionLabel || "Unclassified");
+    const continentId = String(
+      scenarioMeta.continent_id || scenarioMeta.continentId || groupingMeta.continentId || "continent_other"
+    );
+    const continentLabel = String(
+      scenarioMeta.continent_label || scenarioMeta.continentLabel || groupingMeta.continentLabel || "Other"
+    );
+    const subregionId = String(
+      scenarioMeta.subregion_id || scenarioMeta.subregionId || groupingMeta.subregionId || "subregion_unclassified"
+    );
+    const subregionLabel = String(
+      scenarioMeta.subregion_label || scenarioMeta.subregionLabel || groupingMeta.subregionLabel || "Unclassified"
+    );
+    const inspectorGroupMeta = resolveScenarioInspectorGroupMeta(entry);
+    const inspectorGroupId = inspectorGroupMeta.id;
+    const inspectorGroupLabel = inspectorGroupMeta.label;
+    const inspectorGroupAnchorId = inspectorGroupMeta.anchorId;
+    const topLevelGroupId = inspectorGroupId || continentId;
+    const topLevelGroupLabel = inspectorGroupLabel || continentLabel;
     return {
       ...entry,
       fallbackIndex,
@@ -1699,14 +1872,19 @@ function initSidebar({ render } = {}) {
       groupingCode: groupLookupCode,
       presets: state.presetsState[presetLookupCode] || [],
       hierarchyGroups: scenarioMeta.releasable ? [] : getHierarchyGroupsForCode(groupLookupCode),
-      continentId:
-        String(scenarioMeta.continent_id || scenarioMeta.continentId || groupingMeta.continentId || "continent_other"),
+      continentId,
       continentLabel,
       continentDisplayLabel: t(continentLabel, "geo") || continentLabel,
-      subregionId:
-        String(scenarioMeta.subregion_id || scenarioMeta.subregionId || groupingMeta.subregionId || "subregion_unclassified"),
+      subregionId,
       subregionLabel,
       subregionDisplayLabel: t(subregionLabel, "geo") || subregionLabel,
+      inspectorGroupId,
+      inspectorGroupLabel,
+      inspectorGroupAnchorId,
+      topLevelGroupId,
+      topLevelGroupLabel,
+      topLevelGroupDisplayLabel: t(topLevelGroupLabel, "geo") || topLevelGroupLabel,
+      topLevelGroupAnchorId: inspectorGroupAnchorId,
       quality: String(scenarioMeta.quality || entry.quality || "").trim(),
       featureCount,
       ownerFeatureCount,
@@ -2372,8 +2550,8 @@ function initSidebar({ render } = {}) {
     const normalized = normalizeCountryCode(code);
     if (!normalized) return;
     const countryState = latestCountryStatesByCode.get(normalized);
-    if (countryState?.continentId) {
-      state.expandedInspectorContinents.add(`continent::${countryState.continentId}`);
+    if (countryState?.topLevelGroupId) {
+      state.expandedInspectorContinents.add(getInspectorGroupExpansionKey(countryState.topLevelGroupId));
     }
     if (countryState?.releasable && countryState.parentOwnerTag && state.expandedInspectorReleaseParents instanceof Set) {
       state.expandedInspectorReleaseParents.add(countryState.parentOwnerTag);
@@ -3634,8 +3812,8 @@ function initSidebar({ render } = {}) {
 
       if (!countries.length) return;
 
-      const continentKey = `continent::${continent.id}`;
-      const isOpen = state.expandedInspectorContinents.has(continentKey);
+      const groupKey = getInspectorGroupExpansionKey(continent.id);
+      const isOpen = state.expandedInspectorContinents.has(groupKey);
 
       const group = document.createElement("div");
       group.className = "country-explorer-group";
@@ -3645,10 +3823,10 @@ function initSidebar({ render } = {}) {
       header.className = "inspector-accordion-btn country-explorer-header";
       header.setAttribute("aria-expanded", String(isOpen));
       header.addEventListener("click", () => {
-        if (state.expandedInspectorContinents.has(continentKey)) {
-          state.expandedInspectorContinents.delete(continentKey);
+        if (state.expandedInspectorContinents.has(groupKey)) {
+          state.expandedInspectorContinents.delete(groupKey);
         } else {
-          state.expandedInspectorContinents.add(continentKey);
+          state.expandedInspectorContinents.add(groupKey);
         }
         renderList();
       });

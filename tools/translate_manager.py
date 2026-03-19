@@ -143,6 +143,31 @@ MANUAL_GEO_OVERRIDES = {
     "United States of America": "\u7f8e\u56fd",
     "USA": "\u7f8e\u56fd",
     "US": "\u7f8e\u56fd",
+    "New York": "\u7ebd\u7ea6",
+    "Los Angeles": "\u6d1b\u6749\u77f6",
+    "Chicago": "\u829d\u52a0\u54e5",
+    "New York City": "\u7ebd\u7ea6\u5e02",
+    "Miami": "\u8fc8\u963f\u5bc6",
+    "Philadelphia": "\u8d39\u57ce",
+    "Dallas": "\u8fbe\u62c9\u65af",
+    "Atlanta": "\u4e9a\u7279\u5170\u5927",
+    "Boston": "\u6ce2\u58eb\u987f",
+    "Houston": "\u4f11\u65af\u6566",
+    "Washington,  D.C.": "\u534e\u76db\u987f\u7279\u533a",
+    "Detroit": "\u5e95\u7279\u5f8b",
+    "Phoenix": "\u83f2\u5c3c\u514b\u65af",
+    "San Francisco": "\u65e7\u91d1\u5c71",
+    "Seattle": "\u897f\u96c5\u56fe",
+    "Irvine": "\u6b27\u6587",
+    "San Diego": "\u5723\u8fea\u4e9a\u54e5",
+    "Brooklyn": "\u5e03\u9c81\u514b\u6797",
+    "Minneapolis": "\u660e\u5c3c\u963f\u6ce2\u5229\u65af",
+    "Queens": "\u7687\u540e\u533a",
+    "Tampa": "\u5766\u5e15",
+    "Denver": "\u4e39\u4f5b",
+    "Baltimore": "\u5df4\u5c14\u7684\u6469",
+    "St. Louis": "\u5723\u8def\u6613\u65af",
+    "Fort Lauderdale": "\u52b3\u5fb7\u4ee3\u5c14\u5821",
     "Russian Federation": "\u4fc4\u7f57\u65af",
     "People's Republic of China": "\u4e2d\u56fd",
     "Ards": "\u963f\u5179",
@@ -240,6 +265,8 @@ PRIVATE_USE_RE = re.compile(r"[\ue000-\uf8ff]")
 MOJIBAKE_RE = re.compile(r"[\ufffd]|鈥|锟|€")
 SHELL_FALLBACK_NAME_RE = re.compile(r"^Russia Shell Fallback(?: \d+)?(?: \(RU\))?$", re.IGNORECASE)
 SHELL_FALLBACK_STABLE_KEY_RE = re.compile(r"^id::[A-Za-z0-9_]+_FB_[A-Za-z0-9_]+$")
+ZONE_NAME_RE = re.compile(r"\bZone\s+\d+\b", re.IGNORECASE)
+US_ZONE_TRANSLATION_RE = re.compile(r"(?:\bZone\s*\d+\b|\u7b2c?\s*\d+\s*[\u533a\u865f\u53f7])", re.IGNORECASE)
 SCENARIO_DISPLAY_FIELDS = ("display_name", "displayName")
 SCENARIO_METADATA_FIELDS = ("bookmark_name", "bookmarkName", "bookmark_description", "bookmarkDescription")
 TOOLTIP_ADMIN_FIELDS = ("admin1_group", "constituent_country")
@@ -345,6 +372,44 @@ def should_track_geo_missing_like(key: str, en_value: str = "") -> bool:
     )
 
 
+def is_us_stable_key(value: str = "") -> bool:
+    return str(value or "").strip().startswith("id::US_")
+
+
+def is_us_legacy_zone_name(value: str = "") -> bool:
+    return bool(ZONE_NAME_RE.search(str(value or "").strip()))
+
+
+def is_zoneish_us_translation(value: str = "") -> bool:
+    return bool(US_ZONE_TRANSLATION_RE.search(strip_placeholder_prefix(value or "")))
+
+
+def should_ignore_existing_us_geo_zh(
+    *,
+    key: str,
+    en_value: str,
+    existing_zh: str,
+    primary_name: str = "",
+    stable_key: str = "",
+) -> bool:
+    if not existing_zh:
+        return False
+    us_context = (
+        is_us_stable_key(key)
+        or is_us_stable_key(stable_key)
+        or str(stable_key or "").startswith("id::US_")
+    )
+    if not us_context:
+        return False
+    if (
+        is_us_legacy_zone_name(key)
+        or is_us_legacy_zone_name(en_value)
+        or is_us_legacy_zone_name(primary_name)
+    ):
+        return False
+    return is_zoneish_us_translation(existing_zh)
+
+
 def get_geo_primary_name(key: str, alias_to_stable: dict, stable_to_primary: dict) -> str:
     stable_key = alias_to_stable.get(key)
     if stable_key:
@@ -368,13 +433,20 @@ def should_drop_geo_entry(
     geo_names: set[str],
     alias_to_stable: dict,
     stable_to_primary: dict,
+    search_only_aliases: set[str],
 ) -> bool:
     if not key:
+        return True
+    if key in search_only_aliases:
         return True
     if key in geo_names or key in MANUAL_GEO_OVERRIDES or key in EUROPE_GEO_SEEDS:
         return False
     if key in alias_to_stable or key in stable_to_primary:
         return False
+    if is_us_stable_key(key):
+        return True
+    if is_us_legacy_zone_name(key):
+        return True
     if "\ufffd" in key:
         return True
     return bool(ORPHAN_STABLE_KEY_RE.fullmatch(key))
@@ -634,18 +706,19 @@ def load_existing_locales(path: Path) -> dict:
         return {"ui": {}, "geo": {}}
 
 
-def load_geo_aliases(path: Path) -> tuple[dict, dict]:
+def load_geo_aliases(path: Path) -> tuple[dict, dict, set[str]]:
     if not path.exists():
-        return {}, {}
+        return {}, {}, set()
     try:
         with path.open("r", encoding="utf-8") as file:
             data = json.load(file)
     except Exception:
-        return {}, {}
+        return {}, {}, set()
 
     alias_to_stable = data.get("alias_to_stable_key") or {}
     entries = data.get("entries") or []
     stable_to_primary = {}
+    search_only_aliases: set[str] = set()
     for entry in entries:
         if not isinstance(entry, dict):
             continue
@@ -653,7 +726,11 @@ def load_geo_aliases(path: Path) -> tuple[dict, dict]:
         primary = str(entry.get("primary_name", "")).strip()
         if stable and primary:
             stable_to_primary[stable] = primary
-    return alias_to_stable, stable_to_primary
+        for raw_alias in entry.get("search_only_aliases") or []:
+            alias = str(raw_alias or "").strip()
+            if alias:
+                search_only_aliases.add(alias)
+    return alias_to_stable, stable_to_primary, search_only_aliases
 
 
 def normalize_entry(key: str, value) -> dict:
@@ -802,10 +879,6 @@ def resolve_zh(
     stable_to_primary: dict,
     resolved_primary_zh: dict | None = None,
 ) -> str:
-    existing_zh = get_existing_usable_zh(existing, key, en_value)
-    if existing_zh:
-        return existing_zh
-
     if key in MANUAL_UI_DICT:
         return MANUAL_UI_DICT[key]
 
@@ -820,22 +893,46 @@ def resolve_zh(
         return MANUAL_GEO_OVERRIDES[en_value]
 
     primary_name = get_geo_primary_name(key, alias_to_stable, stable_to_primary)
+    stable_key = alias_to_stable.get(key)
+    if primary_name and primary_name in MANUAL_GEO_OVERRIDES and key != primary_name:
+        return MANUAL_GEO_OVERRIDES[primary_name]
+    existing_zh = get_existing_usable_zh(existing, key, en_value)
+    if existing_zh and not should_ignore_existing_us_geo_zh(
+        key=key,
+        en_value=en_value,
+        existing_zh=existing_zh,
+        primary_name=primary_name,
+        stable_key=stable_key or key,
+    ):
+        return existing_zh
+
     if resolved_primary_zh and primary_name:
         primary_zh = resolved_primary_zh.get(primary_name)
         if primary_zh and not is_missing_like(primary_zh, primary_name):
             return primary_zh
 
-    stable_key = alias_to_stable.get(key)
     if stable_key:
         stable_zh = get_existing_usable_zh(existing, stable_key, stable_to_primary.get(stable_key, stable_key))
-        if stable_zh:
+        if stable_zh and not should_ignore_existing_us_geo_zh(
+            key=stable_key,
+            en_value=stable_to_primary.get(stable_key, stable_key),
+            existing_zh=stable_zh,
+            primary_name=primary_name or stable_to_primary.get(stable_key, ""),
+            stable_key=stable_key,
+        ):
             return stable_zh
 
     if primary_name:
         if primary_name in EUROPE_GEO_SEEDS:
             return EUROPE_GEO_SEEDS[primary_name]
         primary_existing_zh = get_existing_usable_zh(existing, primary_name, primary_name)
-        if primary_existing_zh:
+        if primary_existing_zh and not should_ignore_existing_us_geo_zh(
+            key=primary_name,
+            en_value=primary_name,
+            existing_zh=primary_existing_zh,
+            primary_name=primary_name,
+            stable_key=stable_key or key,
+        ):
             return primary_existing_zh
 
     if is_shell_fallback_name(key) or is_shell_fallback_name(en_value):
@@ -874,6 +971,7 @@ def merge_geo(
     existing_geo: dict,
     alias_to_stable: dict,
     stable_to_primary: dict,
+    search_only_aliases: set[str],
     translator: MachineTranslator,
     include_stable_geo_keys: bool,
     restrict_scope: bool = False,
@@ -892,6 +990,7 @@ def merge_geo(
         keys = set(geo_names) | set(normalized.keys()) | set(alias_to_stable.keys())
         if include_stable_geo_keys:
             keys.update(alias_to_stable.values())
+        keys.difference_update(search_only_aliases)
         merged = {}
 
     primary_names = {
@@ -935,7 +1034,7 @@ def merge_geo(
     return {
         key: merged[key]
         for key in sorted(merged.keys())
-        if not should_drop_geo_entry(key, geo_name_set, alias_to_stable, stable_to_primary)
+        if not should_drop_geo_entry(key, geo_name_set, alias_to_stable, stable_to_primary, search_only_aliases)
     }
 
 
@@ -1091,7 +1190,7 @@ def sync_translations(
         geo_names |= set(load_scenario_geo_names(scenarios_root))
     geo_names |= set(EUROPE_GEO_SEEDS.keys())
     geo_names = sorted(geo_names)
-    alias_to_stable, stable_to_primary = load_geo_aliases(geo_aliases_path)
+    alias_to_stable, stable_to_primary, search_only_aliases = load_geo_aliases(geo_aliases_path)
     discovered_ui_keys = collect_ui_keys(base_dir)
     translator = MachineTranslator(
         enabled=machine_translate_enabled,
@@ -1105,6 +1204,7 @@ def sync_translations(
         existing_geo=existing.get("geo", {}),
         alias_to_stable=alias_to_stable,
         stable_to_primary=stable_to_primary,
+        search_only_aliases=search_only_aliases,
         translator=translator,
         include_stable_geo_keys=include_stable_geo_keys,
         restrict_scope=bool(resolved_country_codes),

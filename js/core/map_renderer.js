@@ -189,6 +189,7 @@ const PAPER_NOISE_TILE_SIZE = 192;
 const TEXTURE_LABEL_SERIF_STACK = "\"Libre Baskerville\", \"Palatino Linotype\", Georgia, serif";
 const CITY_MARKER_THEME_GRAPHITE = "classic_graphite";
 const CITY_REVEAL_PROFILE_HYBRID = "hybrid_country_budget";
+const CITY_LABEL_DARK_BACKGROUND_LUMINANCE = 0.34;
 const CITY_COUNTRY_TIER_RANK = {
   A: 5,
   B: 4,
@@ -371,6 +372,7 @@ const urbanFeatureIndexCache = {
 const cityLayerCache = {
   baseRef: null,
   scenarioRef: null,
+  scenarioCountriesRef: null,
   scenarioId: "",
   cityLayerRevision: -1,
   scenarioControllerRevision: -1,
@@ -1439,6 +1441,35 @@ function getSafeCanvasColor(value, fallback) {
     return String(value).trim();
   }
   return fallback;
+}
+
+function parseCanvasColorChannels(value) {
+  const candidate = String(value || "").trim();
+  if (!candidate) return null;
+
+  const normalizedHex = ColorManager.normalizeHexColor(candidate);
+  if (normalizedHex) {
+    const rgb = ColorManager.hexToRgb(normalizedHex);
+    return rgb ? { ...rgb, a: 1 } : null;
+  }
+
+  const rgbMatch = /^rgba?\(\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)(?:\s*,\s*([0-9.]+)\s*)?\)$/iu.exec(candidate);
+  if (!rgbMatch) return null;
+  return {
+    r: clamp(Number(rgbMatch[1]) || 0, 0, 255),
+    g: clamp(Number(rgbMatch[2]) || 0, 0, 255),
+    b: clamp(Number(rgbMatch[3]) || 0, 0, 255),
+    a: clamp(rgbMatch[4] === undefined ? 1 : (Number(rgbMatch[4]) || 0), 0, 1),
+  };
+}
+
+function getCanvasColorRelativeLuminance(value) {
+  const channels = parseCanvasColorChannels(value);
+  if (!channels) return null;
+  const r = ColorManager.srgbToLinear(channels.r / 255);
+  const g = ColorManager.srgbToLinear(channels.g / 255);
+  const b = ColorManager.srgbToLinear(channels.b / 255);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
 function sanitizeColorMap(input) {
@@ -7171,6 +7202,16 @@ function getCityScenarioTag(feature) {
   ).trim().toUpperCase();
 }
 
+function doesScenarioCountryHideCityPoints(tag) {
+  const normalizedTag = String(tag || "").trim().toUpperCase();
+  if (!normalizedTag) return false;
+  return !!state.scenarioCountriesByTag?.[normalizedTag]?.hide_city_points;
+}
+
+function shouldHideCityPointForScenarioCountry(feature) {
+  return doesScenarioCountryHideCityPoints(getCityScenarioTag(feature));
+}
+
 function getCapitalCandidateSortTuple(feature, preferredCountryCodes = new Set()) {
   const props = feature?.properties || {};
   const countryCode = String(props.__city_country_code || props.country_code || "").trim().toUpperCase();
@@ -7231,6 +7272,7 @@ function applyScenarioCityOverride(feature, overrideEntry) {
 function getEffectiveCityCollection() {
   const baseRef = state.worldCitiesData || null;
   const scenarioRef = state.scenarioCityOverridesData || null;
+  const scenarioCountriesRef = state.scenarioCountriesByTag || null;
   const scenarioId = String(state.activeScenarioId || "");
   const cityLayerRevision = Number(state.cityLayerRevision || 0);
   const scenarioControllerRevision = Number(state.scenarioControllerRevision || 0);
@@ -7238,6 +7280,7 @@ function getEffectiveCityCollection() {
   if (
     cityLayerCache.baseRef === baseRef
     && cityLayerCache.scenarioRef === scenarioRef
+    && cityLayerCache.scenarioCountriesRef === scenarioCountriesRef
     && cityLayerCache.scenarioId === scenarioId
     && cityLayerCache.cityLayerRevision === cityLayerRevision
     && cityLayerCache.scenarioControllerRevision === scenarioControllerRevision
@@ -7343,13 +7386,14 @@ function getEffectiveCityCollection() {
     const nextFeature = feature?.properties?.__city_is_capital === nextIsCapital
       ? feature
       : cloneCityFeature(feature, { __city_is_capital: nextIsCapital });
-    if (!nextFeature?.properties?.__city_hidden) {
+    if (!nextFeature?.properties?.__city_hidden && !shouldHideCityPointForScenarioCountry(nextFeature)) {
       finalFeatures.push(nextFeature);
     }
   });
 
   cityLayerCache.baseRef = baseRef;
   cityLayerCache.scenarioRef = scenarioRef;
+  cityLayerCache.scenarioCountriesRef = scenarioCountriesRef;
   cityLayerCache.scenarioId = scenarioId;
   cityLayerCache.cityLayerRevision = cityLayerRevision;
   cityLayerCache.scenarioControllerRevision = scenarioControllerRevision;
@@ -7569,6 +7613,64 @@ function getCityTooltipText(entry) {
   return renderTooltipText({ lines: lines.filter(Boolean) });
 }
 
+function getCityLabelBackgroundColor(entry) {
+  const props = entry?.feature?.properties || entry?.properties || {};
+  const hostFeatureId = String(props.__city_host_feature_id || props.host_feature_id || "").trim();
+  const hostFeature = hostFeatureId ? state.landIndex?.get(hostFeatureId) : null;
+  if (hostFeature && hostFeatureId) {
+    return (
+      getSafeCanvasColor(state.colors?.[hostFeatureId], null) ||
+      getSafeCanvasColor(getResolvedFeatureColor(hostFeature, hostFeatureId), null)
+    );
+  }
+
+  const countryCode = String(
+    props.__city_scenario_tag ||
+    props.__city_country_code ||
+    props.country_code ||
+    props.cntr_code ||
+    ""
+  ).trim().toUpperCase();
+  if (!countryCode) return null;
+  return (
+    getSafeCanvasColor(state.sovereignBaseColors?.[countryCode], null) ||
+    getSafeCanvasColor(state.countryBaseColors?.[countryCode], null)
+  );
+}
+
+function getCityLabelRenderStyle(entry, config = {}) {
+  const tokens = getCityMarkerThemeTokens(config);
+  const backgroundColor = getCityLabelBackgroundColor(entry);
+  const luminance = getCanvasColorRelativeLuminance(backgroundColor);
+  const usesLightLabel = Number.isFinite(luminance) && luminance < CITY_LABEL_DARK_BACKGROUND_LUMINANCE;
+
+  if (!usesLightLabel) {
+    return {
+      fillStyle: entry?.isCapital ? tokens.capitalLabel : tokens.label,
+      strokeStyle: "rgba(255, 252, 245, 0.22)",
+      shadowColor: tokens.shadow,
+      strokeWidthFactor: 0.1,
+      shadowBlurFactor: 0.12,
+      shadowOffsetYFactor: 0.04,
+      usesLightLabel: false,
+      backgroundColor: backgroundColor || "",
+      luminance,
+    };
+  }
+
+  return {
+    fillStyle: entry?.isCapital ? "rgba(248, 245, 238, 0.98)" : "rgba(243, 240, 233, 0.96)",
+    strokeStyle: "rgba(12, 16, 24, 0.46)",
+    shadowColor: "rgba(6, 9, 14, 0.34)",
+    strokeWidthFactor: 0.18,
+    shadowBlurFactor: 0.18,
+    shadowOffsetYFactor: 0.05,
+    usesLightLabel: true,
+    backgroundColor: backgroundColor || "",
+    luminance,
+  };
+}
+
 function getCityHoverRadiusPx(entry) {
   return Math.max(7, Number(entry?.markerSizePx || 0) * 0.92 + (entry?.isCapital ? 2.4 : 1.4));
 }
@@ -7682,15 +7784,10 @@ function drawCityPointsLayer(k, { interactive = false } = {}) {
   let labelCount = 0;
   const labelEntries = !interactive && config.showLabels ? plan.labelEntries || [] : [];
   if (labelEntries.length) {
-    const tokens = getCityMarkerThemeTokens(config);
     const fontPx = clamp((Number(config.labelSize) || 11) - 1, 7, 23);
     context.globalAlpha = 1;
     context.textBaseline = "middle";
     context.lineJoin = "round";
-    context.shadowColor = tokens.shadow;
-    context.shadowBlur = Math.max(1.1, fontPx * 0.12) / scale;
-    context.shadowOffsetX = 0;
-    context.shadowOffsetY = Math.max(0.5, fontPx * 0.04) / scale;
     const occupiedBoxes = [];
     labelEntries.forEach((entry) => {
       context.font = `${entry.isCapital ? 600 : 400} ${fontPx / scale}px ${TEXTURE_LABEL_SERIF_STACK}`;
@@ -7727,9 +7824,18 @@ function drawCityPointsLayer(k, { interactive = false } = {}) {
       occupiedBoxes.push(acceptedPlacement.box);
       entry.acceptedLabelPlacement = acceptedPlacement.id;
       labelCount += 1;
+      const labelStyle = getCityLabelRenderStyle(entry, config);
       context.textAlign = acceptedPlacement.textAlign;
-      context.fillStyle = entry.isCapital ? tokens.capitalLabel : tokens.label;
+      context.shadowColor = labelStyle.shadowColor;
+      context.shadowBlur = Math.max(1.1, fontPx * labelStyle.shadowBlurFactor) / scale;
+      context.shadowOffsetX = 0;
+      context.shadowOffsetY = Math.max(0.5, fontPx * labelStyle.shadowOffsetYFactor) / scale;
+      context.lineWidth = Math.max(0.9, fontPx * labelStyle.strokeWidthFactor) / scale;
+      context.strokeStyle = labelStyle.strokeStyle;
+      context.strokeText(text, acceptedPlacement.drawX, acceptedPlacement.drawY);
+      context.fillStyle = labelStyle.fillStyle;
       context.fillText(text, acceptedPlacement.drawX, acceptedPlacement.drawY);
+      entry.labelContrastMode = labelStyle.usesLightLabel ? "light" : "default";
     });
   }
 
@@ -12512,6 +12618,10 @@ export {
   applyDevMacroFillCurrentOwnerScope,
   applyDevSelectionFill,
   getWaterRegionColor,
+  getCityScenarioTag,
+  getCityLabelRenderStyle,
+  getEffectiveCityCollection,
+  doesScenarioCountryHideCityPoints,
   getZoomPercent,
   resetZoomToFit,
   setZoomPercent,

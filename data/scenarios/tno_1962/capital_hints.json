@@ -2,8 +2,8 @@
   "version": 1,
   "scenario_id": "tno_1962",
   "generated_at": "2026-03-17T04:10:44.164493+00:00",
-  "entry_count": 152,
-  "missing_tag_count": 29,
+  "entry_count": 153,
+  "missing_tag_count": 28,
   "missing_tags": [
     "ALT",
     "ANG",
@@ -29,7 +29,6 @@
     "TZA",
     "UGA",
     "URA",
-    "VOR",
     "XIN",
     "YAK",
     "ZAM",
@@ -2038,8 +2037,8 @@
       "candidate_count": 1
     },
     {
-      "tag": "ORE",
-      "display_name": "Orenburg",
+      "tag": "VYT",
+      "display_name": "Vyatka",
       "lookup_iso2": "RU",
       "base_iso2": "RU",
       "capital_state_id": 652,
@@ -3257,8 +3256,8 @@
       "candidate_count": 32
     },
     {
-      "tag": "URL",
-      "display_name": "Ural",
+      "tag": "ZLT",
+      "display_name": "Zlatoust",
       "lookup_iso2": "RU",
       "base_iso2": "RU",
       "capital_state_id": 848,
@@ -3531,6 +3530,29 @@
       "resolution_method": "capital_state_fallback",
       "confidence": "medium",
       "candidate_count": 74
+    },
+    {
+      "tag": "VOR",
+      "display_name": "Vorkuta",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "city_id": "CITY::ne::1159149563",
+      "stable_key": "id::CITY::ne::1159149563",
+      "city_name": "Vorkuta",
+      "name_ascii": "Vorkuta",
+      "capital_kind": "admin_capital",
+      "base_tier": "regional",
+      "population": 80039,
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B78297177563949",
+      "urban_match_id": "",
+      "lon": 64.0667,
+      "lat": 67.50867,
+      "source": "merged",
+      "resolution_method": "manual_override",
+      "confidence": "high",
+      "candidate_count": 1
     }
   ],
   "audit": {

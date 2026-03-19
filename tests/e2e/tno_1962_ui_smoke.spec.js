@@ -74,6 +74,80 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
     expect(payload.countries[tag]?.entry_kind).toBe('controller_only');
   });
   expect(payload.countries.POR?.hidden_from_country_list).toBeTruthy();
+  expect(payload.countries.SOV?.inspector_group_id).toBe('scenario_group_russia_region');
+  expect(payload.countries.WRS?.inspector_group_id).toBe('scenario_group_russia_region');
+  expect(payload.countries.CHI?.inspector_group_id).toBe('scenario_group_china_region');
+  expect(payload.countries.PRC?.inspector_group_id).toBe('scenario_group_china_region');
+  expect(payload.countries.MEN?.inspector_group_id).toBe('scenario_group_china_region');
+  expect(payload.countries.RKM?.inspector_group_id).toBeFalsy();
+  expect(payload.countries.MAN?.inspector_group_id).toBeFalsy();
+
+  await expect.poll(async () => {
+    const headers = await page.locator('#countryList .country-explorer-header').allTextContents();
+    return headers.map((text) => text.trim()).join('|');
+  }, { timeout: 20000 }).toContain('China Region');
+  await expect.poll(async () => {
+    const headers = await page.locator('#countryList .country-explorer-header').allTextContents();
+    return headers.map((text) => text.trim()).join('|');
+  }, { timeout: 20000 }).toContain('Russia Region');
+  const stableTopLevelHeaders = await page.locator('#countryList .country-explorer-header').allTextContents();
+  const chinaHeaderIndex = stableTopLevelHeaders.findIndex((text) => text.includes('China Region'));
+  const asiaHeaderIndex = stableTopLevelHeaders.findIndex((text) => text.includes('Asia'));
+  const russiaHeaderIndex = stableTopLevelHeaders.findIndex((text) => text.includes('Russia Region'));
+  const europeHeaderIndex = stableTopLevelHeaders.findIndex((text) => text.includes('Europe'));
+
+  expect(chinaHeaderIndex).toBeGreaterThanOrEqual(0);
+  expect(asiaHeaderIndex).toBeGreaterThanOrEqual(0);
+  expect(russiaHeaderIndex).toBeGreaterThanOrEqual(0);
+  expect(europeHeaderIndex).toBeGreaterThanOrEqual(0);
+  expect(chinaHeaderIndex).toBeLessThan(asiaHeaderIndex);
+  expect(russiaHeaderIndex).toBeLessThan(europeHeaderIndex);
+
+  const getGroup = (label) =>
+    page.locator('#countryList .country-explorer-group').filter({
+      has: page.locator('.country-explorer-header').filter({ hasText: new RegExp(`^${label}\\s*\\(`) }),
+    }).first();
+
+  const ensureGroupOpen = async (label) => {
+    const group = getGroup(label);
+    await expect(group).toBeVisible();
+    const header = group.locator('.country-explorer-header').first();
+    if ((await header.getAttribute('aria-expanded')) !== 'true') {
+      await header.click();
+    }
+  };
+
+  await ensureGroupOpen('China Region');
+  await expect(getGroup('China Region').locator('.country-select-main-btn').filter({ hasText: /Republic of China \(CHI\)/ })).toBeVisible();
+  await expect(getGroup('China Region').locator('.country-select-main-btn').filter({ hasText: /Communist China \(PRC\)/ })).toBeVisible();
+  await expect(getGroup('China Region').locator('.country-select-main-btn').filter({ hasText: /Mengjiang \(MEN\)/ })).toBeVisible();
+
+  await ensureGroupOpen('Asia');
+  await expect(getGroup('Asia').locator('.country-select-main-btn').filter({ hasText: /Japan \(JAP\)/ })).toBeVisible();
+
+  await ensureGroupOpen('Russia Region');
+  await expect(getGroup('Russia Region').locator('.country-select-main-btn').filter({ hasText: /Soviet Union \(SOV\)/ })).toBeVisible();
+  await expect(getGroup('Russia Region').locator('.country-select-main-btn').filter({ hasText: /West Russian Revolutionary Front \(WRS\)/ })).toBeVisible();
+
+  await ensureGroupOpen('Europe');
+  await expect(getGroup('Europe').locator('.country-select-main-btn').filter({ hasText: /Reichskommissariat Moskowien \(RKM\)/ })).toBeVisible();
+
+  await page.locator('#countrySearch').fill('RKM');
+  await expect(page.locator('#countryList').getByRole('button', { name: /Reichskommissariat Moskowien \(RKM\)/ })).toBeVisible();
+  await page.locator('#countryList').getByRole('button', { name: /Reichskommissariat Moskowien \(RKM\)/ }).click();
+  await expect(page.locator('#countryInspectorColorSwatch')).toHaveAttribute('aria-label', /Reichskommissariat Moskowien/);
+
+  await page.locator('#countrySearch').fill('CHI');
+  await expect(page.locator('#countryList').getByRole('button', { name: /Republic of China \(CHI\)/ })).toBeVisible();
+  await page.locator('#countryList').getByRole('button', { name: /Republic of China \(CHI\)/ }).click();
+  await expect(page.locator('#countryInspectorColorSwatch')).toHaveAttribute('aria-label', /Republic of China/);
+
+  await page.locator('#countrySearch').fill('SOV');
+  await expect(page.locator('#countryList').getByRole('button', { name: /Soviet Union \(SOV\)/ })).toBeVisible();
+  await page.locator('#countryList').getByRole('button', { name: /Soviet Union \(SOV\)/ }).click();
+  await expect(page.locator('#countryInspectorColorSwatch')).toHaveAttribute('aria-label', /Soviet Union/);
+
+  await page.locator('#countrySearch').fill('');
 
   const shotPath = path.join('.runtime', 'browser', 'mcp-artifacts', 'screenshots', 'tno_1962_ui_smoke.png');
   fs.mkdirSync(path.dirname(shotPath), { recursive: true });
