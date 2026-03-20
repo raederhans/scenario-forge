@@ -34,6 +34,17 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
     const select = document.querySelector('#scenarioSelect');
     return !!select && !!select.querySelector('option[value="tno_1962"]');
   });
+  const initialScenarioId = await page.evaluate(async () => {
+    const { state } = await import('/js/core/state.js');
+    return String(state.activeScenarioId || '');
+  });
+  if (initialScenarioId !== 'tno_1962') {
+    await page.selectOption('#scenarioSelect', 'tno_1962');
+    const applyButton = page.locator('#applyScenarioBtn');
+    if ((await applyButton.isVisible()) && (await applyButton.isEnabled())) {
+      await applyButton.click();
+    }
+  }
   await expect(page.locator('#scenarioStatus')).toContainText('TNO 1962', { timeout: 20000 });
 
   const scenarioStatus = await page.locator('#scenarioStatus').innerText();

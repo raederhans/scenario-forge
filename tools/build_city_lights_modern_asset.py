@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import math
 import sys
 import urllib.request
 from pathlib import Path
@@ -93,8 +94,56 @@ def fetch_source_image(source_url: str, source_file: str) -> tuple[Path, str]:
 
 def load_grid_values(source_path: Path, width: int, height: int) -> list[int]:
     image = Image.open(source_path).convert("L")
-    resized = image.resize((width, height), Image.Resampling.BOX)
-    return list(resized.tobytes())
+    source_width, source_height = image.size
+    pixels = image.load()
+    values: list[int] = []
+    for row in range(height):
+        y0 = math.floor((row * source_height) / height)
+        y1 = math.floor(((row + 1) * source_height) / height)
+        if y1 <= y0:
+            y1 = min(source_height, y0 + 1)
+        for col in range(width):
+            x0 = math.floor((col * source_width) / width)
+            x1 = math.floor(((col + 1) * source_width) / width)
+            if x1 <= x0:
+                x1 = min(source_width, x0 + 1)
+            cell_max = 0
+            for y in range(y0, y1):
+                for x in range(x0, x1):
+                    pixel_value = int(pixels[x, y])
+                    if pixel_value > cell_max:
+                        cell_max = pixel_value
+            values.append(cell_max)
+    return values
+
+
+def _percentile(sorted_values: list[int], percentile: float) -> int:
+    if not sorted_values:
+        return 0
+    if len(sorted_values) == 1:
+        return int(sorted_values[0])
+    index = int(round((len(sorted_values) - 1) * percentile))
+    index = max(0, min(len(sorted_values) - 1, index))
+    return int(sorted_values[index])
+
+
+def build_stats(values: list[int]) -> dict[str, float | int]:
+    nonzero_values = sorted(value for value in values if value > 0)
+    nonzero_count = len(nonzero_values)
+    nonzero_mean = (sum(nonzero_values) / nonzero_count) if nonzero_count else 0.0
+    p50 = _percentile(nonzero_values, 0.50)
+    p90 = _percentile(nonzero_values, 0.90)
+    p99 = _percentile(nonzero_values, 0.99)
+    return {
+        "max": max(values) if values else 0,
+        "nonzeroCount": nonzero_count,
+        "nonzeroMean": round(nonzero_mean, 4),
+        "p50": p50,
+        "p90": p90,
+        "p99": p99,
+        "nonzero_count": nonzero_count,
+        "nonzero_mean": round(nonzero_mean, 4),
+    }
 
 
 def format_uint8_array(values: list[int], indent: str = "  ", row_size: int = 32) -> str:
@@ -114,6 +163,7 @@ def write_module(
     base_threshold: int,
     corridor_threshold: int,
     values: list[int],
+    stats: dict[str, float | int],
 ) -> None:
     step_lon = 360 / width
     step_lat = 180 / height
@@ -132,6 +182,16 @@ export const MODERN_CITY_LIGHTS_STEP_LON_DEG = {step_lon:.12g};
 export const MODERN_CITY_LIGHTS_STEP_LAT_DEG = {step_lat:.12g};
 export const MODERN_CITY_LIGHTS_BASE_THRESHOLD = {base_threshold};
 export const MODERN_CITY_LIGHTS_CORRIDOR_THRESHOLD = {corridor_threshold};
+export const MODERN_CITY_LIGHTS_STATS = Object.freeze({{
+  max: {stats["max"]},
+  nonzeroCount: {stats["nonzeroCount"]},
+  nonzeroMean: {stats["nonzeroMean"]},
+  p50: {stats["p50"]},
+  p90: {stats["p90"]},
+  p99: {stats["p99"]},
+  nonzero_count: {stats["nonzero_count"]},
+  nonzero_mean: {stats["nonzero_mean"]},
+}});
 export const MODERN_CITY_LIGHTS_GRID = new Uint8Array([
 {format_uint8_array(values)}
 ]);
@@ -145,6 +205,7 @@ def main() -> int:
     output_path = Path(args.output).expanduser().resolve()
     source_path, source_ref = fetch_source_image(args.source_url, args.source_file)
     values = load_grid_values(source_path, args.grid_width, args.grid_height)
+    stats = build_stats(values)
     write_module(
         output_path,
         source_ref=source_ref,
@@ -153,10 +214,12 @@ def main() -> int:
         base_threshold=args.base_threshold,
         corridor_threshold=args.corridor_threshold,
         values=values,
+        stats=stats,
     )
     print(
         f"Built modern city lights asset: {output_path} "
-        f"(cells={args.grid_width}x{args.grid_height}, source={source_ref})"
+        f"(cells={args.grid_width}x{args.grid_height}, source={source_ref}, "
+        f"max={stats['max']}, p90={stats['p90']}, nonzero={stats['nonzeroCount']})"
     )
     return 0
 

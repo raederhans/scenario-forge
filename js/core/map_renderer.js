@@ -13,10 +13,14 @@ import {
   MODERN_CITY_LIGHTS_CORRIDOR_THRESHOLD,
   MODERN_CITY_LIGHTS_GRID,
   MODERN_CITY_LIGHTS_GRID_HEIGHT,
+  MODERN_CITY_LIGHTS_STATS,
   MODERN_CITY_LIGHTS_GRID_WIDTH,
   MODERN_CITY_LIGHTS_STEP_LAT_DEG,
   MODERN_CITY_LIGHTS_STEP_LON_DEG,
 } from "./city_lights_modern_asset.js";
+import {
+  HISTORICAL_1930_CITY_LIGHTS_ENTRIES,
+} from "./city_lights_historical_1930_asset.js";
 import { ColorManager } from "./color_manager.js";
 import { LegendManager } from "./legend_manager.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
@@ -29,6 +33,7 @@ import {
 } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
 import { markDirty } from "./dirty_state.js";
+import { getScenarioCountryDisplayName } from "./scenario_country_display.js";
 import {
   ensureSovereigntyState,
   getFeatureOwnerCode,
@@ -287,7 +292,25 @@ const COLOR_NAME_RE = /^[a-z]+$/i;
 const RENDER_DIAG_PARAM = "render_diag";
 const PERF_OVERLAY_PARAM = "perf_overlay";
 const DAY_NIGHT_CLOCK_INTERVAL_MS = 15_000;
-const RENDER_PASS_NAMES = ["background", "political", "effects", "contextBase", "contextScenario", "dayNight", "borders"];
+const RENDER_PASS_NAMES = ["background", "political", "effects", "contextBase", "contextScenario", "dayNight", "borders", "labels"];
+const TRANSFORM_REUSED_RENDER_PASS_NAMES = new Set([
+  "background",
+  "political",
+  "effects",
+  "contextBase",
+  "contextScenario",
+  "dayNight",
+]);
+const TRANSFORMED_FRAME_PASS_NAMES = [
+  "background",
+  "political",
+  "effects",
+  "contextBase",
+  "contextScenario",
+  "dayNight",
+  "labels",
+];
+const RENDER_PASS_OVERSCAN_RATIO_PER_SIDE = 0.15;
 const HEAVY_SCENARIO_STAGED_APPLY_FEATURE_THRESHOLD = 12000;
 const STAGED_CONTEXT_BASE_TIMEOUT_MS = 180;
 const STAGED_HIT_CANVAS_TIMEOUT_MS = 260;
@@ -437,6 +460,7 @@ function getRenderPassCacheState() {
   }
   const cache = state.renderPassCache;
   cache.canvases = cache.canvases && typeof cache.canvases === "object" ? cache.canvases : {};
+  cache.layouts = cache.layouts && typeof cache.layouts === "object" ? cache.layouts : {};
   cache.signatures = cache.signatures && typeof cache.signatures === "object" ? cache.signatures : {};
   cache.referenceTransforms = cache.referenceTransforms && typeof cache.referenceTransforms === "object"
     ? cache.referenceTransforms
@@ -465,6 +489,7 @@ function getRenderPassCacheState() {
     contextScenarioPassRenders: 0,
     dayNightPassRenders: 0,
     borderPassRenders: 0,
+    labelPassRenders: 0,
     hitCanvasRenders: 0,
     dynamicBorderRebuilds: 0,
   };
@@ -661,15 +686,49 @@ function invalidateOceanVisualState(reason = "ocean-visual") {
   clearRenderPassReferenceTransforms(["background", "political", "contextBase", "contextScenario", "effects", "dayNight"]);
 }
 
+function getRenderPassOverscanRatio(passName) {
+  return TRANSFORM_REUSED_RENDER_PASS_NAMES.has(passName)
+    ? RENDER_PASS_OVERSCAN_RATIO_PER_SIDE
+    : 0;
+}
+
+function buildRenderPassLayout(passName) {
+  const dpr = Math.max(state.dpr || 1, 1);
+  const logicalWidth = Math.max(1, Number(state.width || 1));
+  const logicalHeight = Math.max(1, Number(state.height || 1));
+  const overscanRatio = getRenderPassOverscanRatio(passName);
+  const offsetX = overscanRatio > 0 ? Math.ceil(logicalWidth * overscanRatio) : 0;
+  const offsetY = overscanRatio > 0 ? Math.ceil(logicalHeight * overscanRatio) : 0;
+  const paddedWidth = logicalWidth + offsetX * 2;
+  const paddedHeight = logicalHeight + offsetY * 2;
+  return {
+    offsetX,
+    offsetY,
+    logicalWidth,
+    logicalHeight,
+    paddedWidth,
+    paddedHeight,
+    pixelWidth: Math.max(1, Math.floor(paddedWidth * dpr)),
+    pixelHeight: Math.max(1, Math.floor(paddedHeight * dpr)),
+    dpr,
+  };
+}
+
+function getRenderPassLayout(passName) {
+  const cache = getRenderPassCacheState();
+  const layout = buildRenderPassLayout(passName);
+  cache.layouts[passName] = layout;
+  return layout;
+}
+
 function resizeRenderPassCanvases() {
   const cache = getRenderPassCacheState();
-  const scaledWidth = Math.max(1, Math.floor((state.width || 1) * Math.max(state.dpr || 1, 1)));
-  const scaledHeight = Math.max(1, Math.floor((state.height || 1) * Math.max(state.dpr || 1, 1)));
   RENDER_PASS_NAMES.forEach((passName) => {
+    const layout = getRenderPassLayout(passName);
     const canvas = cache.canvases?.[passName];
     if (!canvas) return;
-    if (canvas.width !== scaledWidth) canvas.width = scaledWidth;
-    if (canvas.height !== scaledHeight) canvas.height = scaledHeight;
+    if (canvas.width !== layout.pixelWidth) canvas.width = layout.pixelWidth;
+    if (canvas.height !== layout.pixelHeight) canvas.height = layout.pixelHeight;
   });
 }
 
@@ -793,6 +852,16 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       getDayNightSignatureClockToken(dayNightConfig),
     ].join("::");
   }
+  if (passName === "labels") {
+    return [
+      transformSignature,
+      state.topologyRevision || 0,
+      state.activeScenarioId || "",
+      state.showCityPoints ? "cities:on" : "cities:off",
+      `cities:${Number(state.cityLayerRevision || 0)}`,
+      stableJson(normalizeCityLayerStyleConfig(state.styleConfig?.cityPoints || {})),
+    ].join("::");
+  }
   if (passName === "borders") {
     return [
       transformSignature,
@@ -865,6 +934,11 @@ function resetRenderDiagnostics() {
   renderDiag.skippedByReason = new Map();
   renderDiag.skippedByCountry = new Map();
   renderDiag.sampleByReason = new Map();
+  state.projectedBoundsDiagnostics = {
+    total: 0,
+    byGeometryType: {},
+    byReason: {},
+  };
   if (!renderDiag.enabled) {
     delete globalThis.__mapRenderDiag;
   } else {
@@ -1603,11 +1677,17 @@ function setDebugMode(modeName) {
   }
 }
 
-function prepareTargetContext(targetContext, transform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
+function prepareTargetContext(
+  targetContext,
+  transform = state.zoomTransform || globalThis.d3?.zoomIdentity,
+  layout = null,
+) {
   if (!targetContext?.canvas) return 1;
   const width = targetContext.canvas.width;
   const height = targetContext.canvas.height;
   const normalized = cloneZoomTransform(transform);
+  const offsetX = Number(layout?.offsetX || 0);
+  const offsetY = Number(layout?.offsetY || 0);
   targetContext.setTransform(1, 0, 0, 1, 0, 0);
   targetContext.clearRect(0, 0, width, height);
   targetContext.globalCompositeOperation = "source-over";
@@ -1615,6 +1695,7 @@ function prepareTargetContext(targetContext, transform = state.zoomTransform || 
   targetContext.shadowBlur = 0;
   targetContext.filter = "none";
   targetContext.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+  targetContext.translate(offsetX, offsetY);
   targetContext.translate(normalized.x, normalized.y);
   targetContext.scale(normalized.k, normalized.k);
   return normalized.k;
@@ -1642,6 +1723,7 @@ function getPassCounterNames(passName) {
   if (passName === "contextScenario") return ["contextPassRenders", "contextScenarioPassRenders"];
   if (passName === "dayNight") return ["dayNightPassRenders"];
   if (passName === "borders") return ["borderPassRenders"];
+  if (passName === "labels") return ["labelPassRenders"];
   return [];
 }
 
@@ -1878,6 +1960,40 @@ function clearProjectedBoundsCache() {
   ensureProjectedBoundsCache().clear();
 }
 
+function isLineGeometryType(geometryType) {
+  return geometryType === "LineString" || geometryType === "MultiLineString";
+}
+
+function recordProjectedBoundsDiagnostic(feature, reason = "unknown") {
+  const geometryType = String(feature?.geometry?.type || "").trim() || "Unknown";
+  const diagnostics = state.projectedBoundsDiagnostics && typeof state.projectedBoundsDiagnostics === "object"
+    ? state.projectedBoundsDiagnostics
+    : { total: 0, byGeometryType: {}, byReason: {} };
+  diagnostics.total = Math.max(0, Number(diagnostics.total || 0) + 1);
+  diagnostics.byGeometryType = diagnostics.byGeometryType && typeof diagnostics.byGeometryType === "object"
+    ? diagnostics.byGeometryType
+    : {};
+  diagnostics.byReason = diagnostics.byReason && typeof diagnostics.byReason === "object"
+    ? diagnostics.byReason
+    : {};
+  diagnostics.byGeometryType[geometryType] = Math.max(
+    0,
+    Number(diagnostics.byGeometryType[geometryType] || 0) + 1,
+  );
+  diagnostics.byReason[reason] = Math.max(
+    0,
+    Number(diagnostics.byReason[reason] || 0) + 1,
+  );
+  state.projectedBoundsDiagnostics = diagnostics;
+  recordRenderPerfMetric("projectedBoundsDiagnostics", 0, {
+    total: diagnostics.total,
+    byGeometryType: { ...diagnostics.byGeometryType },
+    byReason: { ...diagnostics.byReason },
+    lastGeometryType: geometryType,
+    lastReason: reason,
+  });
+}
+
 function computeProjectedFeatureBounds(feature) {
   const pathRef = pathCanvas || pathSVG;
   if (!pathRef || !feature) return null;
@@ -1911,16 +2027,25 @@ function computeProjectedFeatureBounds(feature) {
 
 function rebuildProjectedBoundsCache() {
   clearProjectedBoundsCache();
-  if (!state.landData?.features?.length) return;
-
   const cache = ensureProjectedBoundsCache();
-  state.landData.features.forEach((feature) => {
-    const featureId = getFeatureId(feature);
-    if (!featureId) return;
-    const bounds = computeProjectedFeatureBounds(feature);
-    if (!bounds) return;
-    cache.set(featureId, bounds);
-  });
+  if (state.landData?.features?.length) {
+    state.landData.features.forEach((feature) => {
+      const featureId = getFeatureId(feature);
+      if (!featureId) return;
+      const bounds = computeProjectedFeatureBounds(feature);
+      if (!bounds) return;
+      cache.set(featureId, bounds);
+    });
+  }
+  if (state.riversData?.features?.length) {
+    state.riversData.features.forEach((feature) => {
+      const featureId = getFeatureId(feature);
+      if (!featureId) return;
+      const bounds = computeProjectedFeatureBounds(feature);
+      if (!bounds) return;
+      cache.set(featureId, bounds);
+    });
+  }
 }
 
 function getProjectedFeatureBounds(feature, { featureId = null, allowCompute = true } = {}) {
@@ -2858,13 +2983,20 @@ function refreshColorState({ renderNow = true } = {}) {
 
 function pathBoundsInScreen(feature) {
   if (!pathSVG) return false;
+  const geometryType = String(feature?.geometry?.type || "").trim();
   const bounds = getProjectedFeatureBounds(feature, { allowCompute: false }) || getProjectedFeatureBounds(feature);
-  if (!bounds) return false;
+  if (!bounds) {
+    recordProjectedBoundsDiagnostic(feature, "missing-bounds");
+    return isLineGeometryType(geometryType);
+  }
   const minX = bounds.minX * state.zoomTransform.k + state.zoomTransform.x;
   const minY = bounds.minY * state.zoomTransform.k + state.zoomTransform.y;
   const maxX = bounds.maxX * state.zoomTransform.k + state.zoomTransform.x;
   const maxY = bounds.maxY * state.zoomTransform.k + state.zoomTransform.y;
-  if (![minX, minY, maxX, maxY].every(Number.isFinite)) return false;
+  if (![minX, minY, maxX, maxY].every(Number.isFinite)) {
+    recordProjectedBoundsDiagnostic(feature, "non-finite-screen-bounds");
+    return isLineGeometryType(geometryType);
+  }
 
   const overscan = Math.max(
     VIEWPORT_CULL_OVERSCAN_PX,
@@ -3679,6 +3811,46 @@ function buildAdmin1GroupingCandidate(countryCode, featureEntries) {
   return evaluateCountryGroupingCandidate(countryCode, "admin1_group", featureEntries, featureToGroup);
 }
 
+function buildScenarioDistrictGroupingCandidate(countryCode, featureEntries) {
+  const districtCountry = state.scenarioDistrictGroupsData?.countries?.[countryCode];
+  if (!districtCountry || typeof districtCountry !== "object") return null;
+  const idSet = new Set(featureEntries.map((entry) => entry.id));
+  const featureToGroup = new Map();
+  Object.entries(districtCountry.districts && typeof districtCountry.districts === "object" ? districtCountry.districts : {})
+    .forEach(([districtId, rawDistrict]) => {
+      const normalizedDistrictId = String(rawDistrict?.id || rawDistrict?.district_id || districtId || "").trim();
+      if (!normalizedDistrictId) return;
+      const featureIds = Array.isArray(rawDistrict?.feature_ids) ? rawDistrict.feature_ids : [];
+      featureIds.forEach((featureId) => {
+        const normalizedFeatureId = String(featureId || "").trim();
+        if (!normalizedFeatureId || !idSet.has(normalizedFeatureId)) return;
+        if (!featureToGroup.has(normalizedFeatureId)) {
+          featureToGroup.set(normalizedFeatureId, normalizedDistrictId);
+        }
+      });
+    });
+  if (!featureToGroup.size) {
+    return {
+      countryCode,
+      source: "scenario_district",
+      featureToGroup,
+      groupCounts: new Map(),
+      totalCount: featureEntries.length,
+      groupedCount: 0,
+      groupCount: 0,
+      groupCountTotal: 0,
+      coverage: 0,
+      dominantShare: 1,
+      accepted: false,
+      forcedRule: "scenario_district",
+    };
+  }
+  return {
+    ...evaluateCountryGroupingCandidate(countryCode, "scenario_district", featureEntries, featureToGroup),
+    forcedRule: "scenario_district",
+  };
+}
+
 function buildIdPrefixGroupingCandidate(countryCode, featureEntries, prefixLength) {
   const length = Number(prefixLength);
   if (!Number.isFinite(length) || length < 3) return null;
@@ -3736,6 +3908,11 @@ function isBritishNuts1GroupingCandidate(candidate) {
 
 function resolveCountryParentGroupingCandidate(countryCode, featureEntries) {
   if (!countryCode || !featureEntries?.length) return null;
+
+  const scenarioDistrictCandidate = buildScenarioDistrictGroupingCandidate(countryCode, featureEntries);
+  if (scenarioDistrictCandidate) {
+    return scenarioDistrictCandidate;
+  }
 
   const hierarchyCandidate = buildHierarchyGroupingCandidate(countryCode, featureEntries);
   const adminCandidate = buildAdmin1GroupingCandidate(countryCode, featureEntries);
@@ -3816,12 +3993,14 @@ function refreshParentBorderSupport() {
 
   byCountry.forEach((featureEntries, countryCode) => {
     const candidate = resolveCountryParentGroupingCandidate(countryCode, featureEntries);
-    if (!candidate?.accepted) return;
+    if (!candidate) return;
 
-    supported.push(countryCode);
     candidate.featureToGroup.forEach((group, featureId) => {
       featureToGroup.set(featureId, group);
     });
+    if (candidate.accepted) {
+      supported.push(countryCode);
+    }
     meta[countryCode] = {
       source: candidate.source,
       groupCount: candidate.groupCountTotal,
@@ -4597,18 +4776,30 @@ function drawHitCanvas() {
   hitContext.translate(t.x, t.y);
   hitContext.scale(k, k);
 
-  state.landData.features.forEach((feature, index) => {
-    const id = getFeatureId(feature) || `feature-${index}`;
-    const key = state.idToKey.get(id);
-    if (!key) return;
-    if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
-    if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) return;
-    if (!pathBoundsInScreen(feature)) return;
-    hitContext.beginPath();
-    pathHitCanvas(feature);
-    hitContext.fillStyle = keyToHitColor(key);
-    hitContext.fill();
-  });
+  const visibleSpatialItems = collectVisibleLandSpatialItems();
+  if (visibleSpatialItems) {
+    visibleSpatialItems.forEach((item) => {
+      const key = state.idToKey.get(item.id);
+      if (!key || !item?.feature) return;
+      hitContext.beginPath();
+      pathHitCanvas(item.feature);
+      hitContext.fillStyle = keyToHitColor(key);
+      hitContext.fill();
+    });
+  } else {
+    state.landData.features.forEach((feature, index) => {
+      const id = getFeatureId(feature) || `feature-${index}`;
+      const key = state.idToKey.get(id);
+      if (!key) return;
+      if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
+      if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) return;
+      if (!pathBoundsInScreen(feature)) return;
+      hitContext.beginPath();
+      pathHitCanvas(feature);
+      hitContext.fillStyle = keyToHitColor(key);
+      hitContext.fill();
+    });
+  }
 
   hitContext.restore();
   state.hitCanvasDirty = false;
@@ -4833,6 +5024,71 @@ function collectGridCandidates(px, py, radiusProj = 0) {
   globals?.forEach(maybePush);
 
   return candidates;
+}
+
+function getProjectedViewportBounds({
+  overscanPx = Math.max(
+    VIEWPORT_CULL_OVERSCAN_PX,
+    Math.min(state.width || 0, state.height || 0) * 0.08
+  ),
+} = {}) {
+  const width = Number(state.width) || 0;
+  const height = Number(state.height) || 0;
+  const t = state.zoomTransform || globalThis.d3?.zoomIdentity || { x: 0, y: 0, k: 1 };
+  const k = Math.max(0.0001, Number(t.k) || 1);
+  if (width <= 0 || height <= 0) return null;
+  const minX = (-Number(t.x || 0) - overscanPx) / k;
+  const minY = (-Number(t.y || 0) - overscanPx) / k;
+  const maxX = (width - Number(t.x || 0) + overscanPx) / k;
+  const maxY = (height - Number(t.y || 0) + overscanPx) / k;
+  if (![minX, minY, maxX, maxY].every(Number.isFinite)) return null;
+  return {
+    minX: Math.min(minX, maxX),
+    minY: Math.min(minY, maxY),
+    maxX: Math.max(minX, maxX),
+    maxY: Math.max(minY, maxY),
+  };
+}
+
+function doesSpatialItemIntersectProjectedViewport(item, viewportBounds) {
+  if (!item || !viewportBounds) return false;
+  return !(
+    item.maxX < viewportBounds.minX ||
+    item.maxY < viewportBounds.minY ||
+    item.minX > viewportBounds.maxX ||
+    item.minY > viewportBounds.maxY
+  );
+}
+
+function collectVisibleLandSpatialItems() {
+  const meta = state.spatialGridMeta;
+  const grid = state.spatialGrid;
+  if (!meta || !grid || !Array.isArray(state.spatialItems)) return null;
+  const { cellSize, cols, rows, globals } = meta;
+  if (!cellSize || cols <= 0 || rows <= 0) return null;
+  const viewportBounds = getProjectedViewportBounds();
+  if (!viewportBounds) return null;
+  const c0 = clamp(Math.floor(viewportBounds.minX / cellSize), 0, cols - 1);
+  const c1 = clamp(Math.floor(viewportBounds.maxX / cellSize), 0, cols - 1);
+  const r0 = clamp(Math.floor(viewportBounds.minY / cellSize), 0, rows - 1);
+  const r1 = clamp(Math.floor(viewportBounds.maxY / cellSize), 0, rows - 1);
+  const visibleItems = [];
+  const seen = new Set();
+  const maybePush = (item) => {
+    if (!item?.id || seen.has(item.id)) return;
+    seen.add(item.id);
+    if (!doesSpatialItemIntersectProjectedViewport(item, viewportBounds)) return;
+    visibleItems.push(item);
+  };
+  for (let row = r0; row <= r1; row += 1) {
+    for (let col = c0; col <= c1; col += 1) {
+      const bucket = grid.get(getSpatialBucketKey(col, row));
+      bucket?.forEach(maybePush);
+    }
+  }
+  globals?.forEach(maybePush);
+  visibleItems.sort((left, right) => (left?.drawOrder ?? 0) - (right?.drawOrder ?? 0));
+  return visibleItems;
 }
 
 function collectWaterGridCandidates(px, py, radiusProj = 0) {
@@ -5347,7 +5603,7 @@ function buildSpatialIndex() {
   }
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
 
-  for (const feature of state.landData.features) {
+  for (const [drawOrder, feature] of state.landData.features.entries()) {
     const id = getFeatureId(feature);
     if (!id) continue;
     if (shouldExcludePoliticalInteractionFeature(feature, id)) continue;
@@ -5358,6 +5614,7 @@ function buildSpatialIndex() {
 
     state.spatialItems.push({
       id,
+      drawOrder,
       feature,
       countryCode: getFeatureCountryCodeNormalized(feature),
       source: String(feature?.properties?.__source || "primary"),
@@ -6171,11 +6428,7 @@ function getPhysicalLandMask() {
 
 function getPhysicalLandClipCacheKey(maskInfo) {
   return [
-    String(state.activeScenarioId || ""),
-    String(state.renderProfile || "auto"),
-    getViewportRenderSignature(),
     getProjectionRenderSignature(),
-    getContextBaseZoomBucketId(),
     `mask:${maskInfo?.maskSource || "none"}:${maskInfo?.maskFeatureCount || 0}:${maskInfo?.maskArcRefEstimate ?? "na"}`,
     `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
   ].join("::");
@@ -7846,7 +8099,7 @@ function getCityTooltipText(entry) {
       || ""
   ).trim().toUpperCase();
   const rawCountryName =
-    state.scenarioCountriesByTag?.[countryCode]?.display_name
+    getScenarioCountryDisplayName(state.scenarioCountriesByTag?.[countryCode])
     || state.countryNames?.[countryCode]
     || countryCode;
   const countryDisplayName = rawCountryName ? (t(rawCountryName, "geo") || rawCountryName) : "";
@@ -7969,19 +8222,20 @@ function doScreenBoxesOverlap(a, b) {
   );
 }
 
-function drawCityPointsLayer(k, { interactive = false } = {}) {
-  const startedAt = nowMs();
+function getCityLayerRenderState(k, { interactive = false, cacheHoverEntries = false } = {}) {
   const cityCollection = getEffectiveCityCollection();
   const featureCount = getFeatureCollectionFeatureCount(cityCollection);
   if (!state.showCityPoints || !cityCollection?.features?.length || !projection) {
-    cacheVisibleCityHoverEntries([]);
-    collectContextMetric("drawCityPointsLayer", nowMs() - startedAt, {
+    if (cacheHoverEntries) {
+      cacheVisibleCityHoverEntries([]);
+    }
+    return {
       featureCount,
-      interactive: !!interactive,
+      markerEntries: [],
+      labelEntries: [],
       skipped: true,
       reason: !state.showCityPoints ? "hidden" : !projection ? "no-projection" : "no-data",
-    });
-    return;
+    };
   }
 
   const config = normalizeCityLayerStyleConfig(state.styleConfig?.cityPoints || {});
@@ -7997,19 +8251,37 @@ function drawCityPointsLayer(k, { interactive = false } = {}) {
   const markerEntries = Array.isArray(plan?.markerEntries) ? plan.markerEntries : [];
 
   if (!markerEntries.length) {
-    cacheVisibleCityHoverEntries([]);
-    collectContextMetric("drawCityPointsLayer", nowMs() - startedAt, {
+    if (cacheHoverEntries) {
+      cacheVisibleCityHoverEntries([]);
+    }
+    return {
       featureCount,
-      visibleFeatureCount: 0,
-      labelCount: 0,
-      interactive: !!interactive,
       skipped: true,
       reason: "culled",
-    });
-    return;
+      markerEntries,
+      labelEntries: [],
+      config,
+      scale,
+      opacity: clamp(Number(config.opacity) || 0.92, 0, 1),
+    };
   }
-  cacheVisibleCityHoverEntries(markerEntries);
+  if (cacheHoverEntries) {
+    cacheVisibleCityHoverEntries(markerEntries);
+  }
+  return {
+    featureCount,
+    markerEntries,
+    labelEntries: !interactive && config.showLabels ? plan.labelEntries || [] : [],
+    skipped: false,
+    reason: "",
+    config,
+    scale,
+    opacity: clamp(Number(config.opacity) || 0.92, 0, 1),
+  };
+}
 
+function drawCityMarkersFromEntries(markerEntries, { config, scale, opacity, interactive = false } = {}) {
+  if (!Array.isArray(markerEntries) || !markerEntries.length) return;
   context.save();
   context.globalCompositeOperation = "source-over";
   context.lineJoin = "round";
@@ -8028,70 +8300,97 @@ function drawCityPointsLayer(k, { interactive = false } = {}) {
     const drawY = entry.anchor[1] - (sprite.anchorY / scale);
     context.drawImage(sprite.canvas, drawX, drawY, drawWidth, drawHeight);
   });
-
-  let labelCount = 0;
-  const labelEntries = !interactive && config.showLabels ? plan.labelEntries || [] : [];
-  if (labelEntries.length) {
-    const fontPx = clamp((Number(config.labelSize) || 11) - 1, 7, 23);
-    context.globalAlpha = 1;
-    context.textBaseline = "middle";
-    context.lineJoin = "round";
-    const occupiedBoxes = [];
-    labelEntries.forEach((entry) => {
-      context.font = `${entry.isCapital ? 600 : 400} ${fontPx / scale}px ${TEXTURE_LABEL_SERIF_STACK}`;
-      const fullText = getCityDisplayLabel(entry.feature);
-      const text = formatCityMapLabel(fullText, {
-        entry,
-        context,
-        config,
-        scale,
-      });
-      const labelMinZoom = Math.max(Number(config.labelMinZoom || 2.45), Number(entry.minZoom || 0));
-      if (!text || !entry.screenPoint || scale < labelMinZoom) return;
-      const markerSizePx = Number(entry.markerSizePx || getCityMarkerSizePx(entry, config));
-      const offsetPx = Math.max(7, markerSizePx + 4);
-      const verticalOffsetPx = Math.max(fontPx + 2, markerSizePx + 6);
-      const metrics = context.measureText(text);
-      const candidates = buildCityLabelPlacementCandidates(entry, {
-        textWidthPx: metrics.width * scale,
-        fontPx,
-        scale,
-        offsetPx,
-        verticalOffsetPx,
-      });
-      const acceptedPlacement = candidates.find(({ box }) => (
-        !(box.x > state.width + 24
-        || box.y > state.height + 24
-        || (box.x + box.w) < -24
-        || (box.y + box.h) < -24)
-        && !occupiedBoxes.some((occupied) => doScreenBoxesOverlap(box, occupied))
-      ));
-      if (!acceptedPlacement) {
-        return;
-      }
-      occupiedBoxes.push(acceptedPlacement.box);
-      entry.acceptedLabelPlacement = acceptedPlacement.id;
-      labelCount += 1;
-      const labelStyle = getCityLabelRenderStyle(entry, config);
-      context.textAlign = acceptedPlacement.textAlign;
-      context.shadowColor = labelStyle.shadowColor;
-      context.shadowBlur = Math.max(1.1, fontPx * labelStyle.shadowBlurFactor) / scale;
-      context.shadowOffsetX = 0;
-      context.shadowOffsetY = Math.max(0.5, fontPx * labelStyle.shadowOffsetYFactor) / scale;
-      context.lineWidth = Math.max(0.9, fontPx * labelStyle.strokeWidthFactor) / scale;
-      context.strokeStyle = labelStyle.strokeStyle;
-      context.strokeText(text, acceptedPlacement.drawX, acceptedPlacement.drawY);
-      context.fillStyle = labelStyle.fillStyle;
-      context.fillText(text, acceptedPlacement.drawX, acceptedPlacement.drawY);
-      entry.labelContrastMode = labelStyle.usesLightLabel ? "light" : "default";
-    });
-  }
-
   context.restore();
+}
+
+function drawCityLabelsFromEntries(labelEntries, { config, scale } = {}) {
+  if (!Array.isArray(labelEntries) || !labelEntries.length) return 0;
+  let labelCount = 0;
+  const fontPx = clamp((Number(config?.labelSize) || 11) - 1, 7, 23);
+  context.save();
+  context.globalAlpha = 1;
+  context.textBaseline = "middle";
+  context.lineJoin = "round";
+  const occupiedBoxes = [];
+  labelEntries.forEach((entry) => {
+    context.font = `${entry.isCapital ? 600 : 400} ${fontPx / scale}px ${TEXTURE_LABEL_SERIF_STACK}`;
+    const fullText = getCityDisplayLabel(entry.feature);
+    const text = formatCityMapLabel(fullText, {
+      entry,
+      context,
+      config,
+      scale,
+    });
+    const labelMinZoom = Math.max(Number(config?.labelMinZoom || 2.45), Number(entry.minZoom || 0));
+    if (!text || !entry.screenPoint || scale < labelMinZoom) return;
+    const markerSizePx = Number(entry.markerSizePx || getCityMarkerSizePx(entry, config));
+    const offsetPx = Math.max(7, markerSizePx + 4);
+    const verticalOffsetPx = Math.max(fontPx + 2, markerSizePx + 6);
+    const metrics = context.measureText(text);
+    const candidates = buildCityLabelPlacementCandidates(entry, {
+      textWidthPx: metrics.width * scale,
+      fontPx,
+      scale,
+      offsetPx,
+      verticalOffsetPx,
+    });
+    const acceptedPlacement = candidates.find(({ box }) => (
+      !(box.x > state.width + 24
+      || box.y > state.height + 24
+      || (box.x + box.w) < -24
+      || (box.y + box.h) < -24)
+      && !occupiedBoxes.some((occupied) => doScreenBoxesOverlap(box, occupied))
+    ));
+    if (!acceptedPlacement) {
+      return;
+    }
+    occupiedBoxes.push(acceptedPlacement.box);
+    entry.acceptedLabelPlacement = acceptedPlacement.id;
+    labelCount += 1;
+    const labelStyle = getCityLabelRenderStyle(entry, config);
+    context.textAlign = acceptedPlacement.textAlign;
+    context.shadowColor = labelStyle.shadowColor;
+    context.shadowBlur = Math.max(1.1, fontPx * labelStyle.shadowBlurFactor) / scale;
+    context.shadowOffsetX = 0;
+    context.shadowOffsetY = Math.max(0.5, fontPx * labelStyle.shadowOffsetYFactor) / scale;
+    context.lineWidth = Math.max(0.9, fontPx * labelStyle.strokeWidthFactor) / scale;
+    context.strokeStyle = labelStyle.strokeStyle;
+    context.strokeText(text, acceptedPlacement.drawX, acceptedPlacement.drawY);
+    context.fillStyle = labelStyle.fillStyle;
+    context.fillText(text, acceptedPlacement.drawX, acceptedPlacement.drawY);
+    entry.labelContrastMode = labelStyle.usesLightLabel ? "light" : "default";
+  });
+  context.restore();
+  return labelCount;
+}
+
+function drawCityPointsLayer(k, { interactive = false } = {}) {
+  const startedAt = nowMs();
+  const renderState = getCityLayerRenderState(k, {
+    interactive,
+    cacheHoverEntries: true,
+  });
+  if (renderState.skipped) {
+    collectContextMetric("drawCityPointsLayer", nowMs() - startedAt, {
+      featureCount: renderState.featureCount,
+      visibleFeatureCount: 0,
+      labelCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: renderState.reason,
+    });
+    return;
+  }
+  drawCityMarkersFromEntries(renderState.markerEntries, {
+    config: renderState.config,
+    scale: renderState.scale,
+    opacity: renderState.opacity,
+    interactive,
+  });
   collectContextMetric("drawCityPointsLayer", nowMs() - startedAt, {
-    featureCount,
-    visibleFeatureCount: markerEntries.length,
-    labelCount,
+    featureCount: renderState.featureCount,
+    visibleFeatureCount: renderState.markerEntries.length,
+    labelCount: 0,
     interactive: !!interactive,
     skipped: false,
   });
@@ -8267,6 +8566,22 @@ function getModernCityLightsGridValue(x, y) {
   return MODERN_CITY_LIGHTS_GRID[(clampedY * MODERN_CITY_LIGHTS_GRID_WIDTH) + wrappedX] || 0;
 }
 
+function getModernCityLightsNormalizationDenominator() {
+  const p90 = Number(MODERN_CITY_LIGHTS_STATS?.p90 ?? MODERN_CITY_LIGHTS_STATS?.p90_nonzero ?? 0);
+  if (Number.isFinite(p90) && p90 > 0) {
+    return p90;
+  }
+  const maxValue = Number(MODERN_CITY_LIGHTS_STATS?.max ?? 255);
+  if (Number.isFinite(maxValue) && maxValue > 0) {
+    return maxValue;
+  }
+  return 255;
+}
+
+function normalizeModernCityLightsValue(value) {
+  return clamp(Number(value || 0) / Math.max(getModernCityLightsNormalizationDenominator(), 0.0001), 0, 1);
+}
+
 function sampleModernCityLightsGridNormalized(lon, lat) {
   if (!MODERN_CITY_LIGHTS_GRID?.length) return 0;
   const normalizedLon = (
@@ -8288,7 +8603,7 @@ function sampleModernCityLightsGridNormalized(lon, lat) {
   const v11 = getModernCityLightsGridValue(x0 + 1, y1);
   const top = v00 + ((v10 - v00) * tx);
   const bottom = v01 + ((v11 - v01) * tx);
-  return clamp((top + ((bottom - top) * ty)) / 255, 0, 1);
+  return normalizeModernCityLightsValue(top + ((bottom - top) * ty));
 }
 
 function getFeatureGeoCentroid(feature) {
@@ -8361,6 +8676,8 @@ function getModernCityLightsGeometry() {
         rx,
         ry,
         rotation: Math.atan2(ewDy, ewDx),
+        gridX: x,
+        gridY: y,
         value,
       };
       baseEntries.push(entry);
@@ -8405,27 +8722,134 @@ function drawLightEllipse(x, y, rx, ry, rotation = 0) {
   context.restore();
 }
 
+function getLightBlobRgb(color) {
+  const normalized = ColorManager.normalizeHexColor(color);
+  const rgb = normalized ? ColorManager.hexToRgb(normalized) : null;
+  if (rgb) return rgb;
+  return { r: 255, g: 255, b: 255 };
+}
+
+function toRgbaString(rgb, alpha = 1) {
+  const resolvedAlpha = clamp(Number(alpha) || 0, 0, 1);
+  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${resolvedAlpha})`;
+}
+
+function drawSoftLightBlob(
+  x,
+  y,
+  rx,
+  ry,
+  {
+    rotation = 0,
+    rgb = { r: 255, g: 255, b: 255 },
+    alpha = 1,
+    innerStop = 0.1,
+    midStop = 0.5,
+    innerAlphaScale = 0.88,
+    midAlphaScale = 0.28,
+  } = {},
+) {
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+  const resolvedRx = Math.max(Number(rx) || 0, 0.0001);
+  const resolvedRy = Math.max(Number(ry) || 0, 0.0001);
+  const resolvedAlpha = clamp(Number(alpha) || 0, 0, 1);
+  if (resolvedAlpha <= 0.0001) return;
+
+  context.save();
+  context.translate(x, y);
+  context.rotate(Number(rotation) || 0);
+  context.scale(resolvedRx, resolvedRy);
+  const gradient = context.createRadialGradient(0, 0, 0, 0, 0, 1);
+  gradient.addColorStop(0, toRgbaString(rgb, resolvedAlpha * innerAlphaScale));
+  gradient.addColorStop(
+    clamp(Number(innerStop) || 0.1, 0.01, 0.92),
+    toRgbaString(rgb, resolvedAlpha * Math.max(innerAlphaScale, midAlphaScale)),
+  );
+  gradient.addColorStop(
+    clamp(Number(midStop) || 0.5, 0.08, 0.97),
+    toRgbaString(rgb, resolvedAlpha * midAlphaScale),
+  );
+  gradient.addColorStop(1, toRgbaString(rgb, 0));
+  context.fillStyle = gradient;
+  context.beginPath();
+  context.arc(0, 0, 1, 0, Math.PI * 2);
+  context.fill();
+  context.restore();
+}
+
+function getModernCityLightsZoomProfile() {
+  const zoomScale = Math.max(0.0001, Number(state.zoomTransform?.k || 1));
+  const fadeT = clamp((zoomScale - 1) / 2.5, 0, 1);
+  const detailT = clamp((zoomScale - 0.9) / 1.6, 0, 1);
+  return {
+    zoomScale,
+    fadeT,
+    detailT,
+    textureAlphaScale: 1 - (fadeT * 0.3),
+    corridorAlphaScale: 1 - (fadeT * 0.35),
+    textureRadiusScale: 1.44 + (detailT * 0.26),
+    corridorRadiusScale: 1.24 + (detailT * 0.14),
+    textureJitterStrength: 0.2 + (detailT * 0.06),
+    corridorJitterStrength: 0.12 + (detailT * 0.04),
+    coreAlphaScale: 0.92 + (fadeT * 0.52),
+    coreRadiusScale: 0.96 + (detailT * 0.22),
+  };
+}
+
+function getSignedHashUnit(seed) {
+  return (((stringHash(seed) >>> 0) % 2001) / 1000) - 1;
+}
+
+function getModernGridEntryJitter(entry, strength = 0.18) {
+  const resolvedStrength = clamp(Number(strength) || 0, 0, 0.4);
+  const dx = getSignedHashUnit(`${entry?.gridX ?? 0}:${entry?.gridY ?? 0}:x`)
+    * Math.max(Number(entry?.rx) || 0, 0.0001)
+    * resolvedStrength;
+  const dy = getSignedHashUnit(`${entry?.gridX ?? 0}:${entry?.gridY ?? 0}:y`)
+    * Math.max(Number(entry?.ry) || 0, 0.0001)
+    * resolvedStrength;
+  return { dx, dy };
+}
+
 function drawModernCityLightsTexture(config, intensity) {
   const textureOpacity = clamp(Number(config.cityLightsTextureOpacity) || 0, 0, 1);
   if (textureOpacity <= 0) return;
   const palette = getNightLightPalette("modern");
   const geometry = getModernCityLightsGeometry();
+  const zoomProfile = getModernCityLightsZoomProfile();
+  const textureRgb = getLightBlobRgb(palette.texture);
   const overscan = Math.max(32, Math.min(state.width, state.height) * 0.06);
-  context.fillStyle = palette.texture;
 
   geometry.baseEntries.forEach((entry) => {
     if (shouldCullModernLightEntry(entry, overscan)) return;
-    const normalized = clamp(entry.value / 255, 0, 1);
-    const lumaWeight = Math.pow(normalized, 0.66);
-    const alpha = clamp(intensity * textureOpacity * (0.01 + (lumaWeight * 0.2)), 0, 0.2);
+    const normalized = normalizeModernCityLightsValue(entry.value);
+    const lumaWeight = Math.pow(normalized, 0.35);
+    const alpha = clamp(
+      intensity
+      * textureOpacity
+      * (0.022 + (lumaWeight * 0.18))
+      * zoomProfile.textureAlphaScale,
+      0,
+      0.18
+    );
     if (alpha <= 0.002) return;
-    context.globalAlpha = alpha;
-    drawLightEllipse(
-      entry.x,
-      entry.y,
-      entry.rx * (1.02 + (lumaWeight * 0.72)),
-      entry.ry * (1.02 + (lumaWeight * 0.72)),
-      0
+    const jitter = getModernGridEntryJitter(entry, zoomProfile.textureJitterStrength);
+    const baseRadius = Math.max((entry.rx + entry.ry) * 0.5, 0.0001);
+    const radius = baseRadius * (zoomProfile.textureRadiusScale + (lumaWeight * 0.54));
+    drawSoftLightBlob(
+      entry.x + jitter.dx,
+      entry.y + jitter.dy,
+      radius,
+      radius * 0.97,
+      {
+        rotation: 0,
+        rgb: textureRgb,
+        alpha,
+        innerStop: 0.08,
+        midStop: 0.64,
+        innerAlphaScale: 0.8,
+        midAlphaScale: 0.16,
+      }
     );
   });
 }
@@ -8435,22 +8859,40 @@ function drawModernCityLightsCorridors(config, intensity) {
   if (corridorStrength <= 0) return;
   const palette = getNightLightPalette("modern");
   const geometry = getModernCityLightsGeometry();
+  const zoomProfile = getModernCityLightsZoomProfile();
+  const corridorRgb = getLightBlobRgb(palette.corridor);
   const overscan = Math.max(40, Math.min(state.width, state.height) * 0.08);
-  context.fillStyle = palette.corridor;
 
   geometry.corridorEntries.forEach((entry) => {
     if (shouldCullModernLightEntry(entry, overscan)) return;
-    const normalized = clamp(entry.value / 255, 0, 1);
-    const corridorWeight = Math.pow(normalized, 0.82);
-    const alpha = clamp(intensity * corridorStrength * (0.008 + (corridorWeight * 0.1)), 0, 0.14);
+    const normalized = normalizeModernCityLightsValue(entry.value);
+    const corridorWeight = Math.pow(normalized, 0.45);
+    const alpha = clamp(
+      intensity
+      * corridorStrength
+      * (0.016 + (corridorWeight * 0.12))
+      * zoomProfile.corridorAlphaScale,
+      0,
+      0.15
+    );
     if (alpha <= 0.003) return;
-    context.globalAlpha = alpha;
-    drawLightEllipse(
-      entry.x,
-      entry.y,
-      entry.rx * (0.94 + (corridorStrength * 0.26) + (corridorWeight * 0.22)),
-      entry.ry * (0.72 + (corridorStrength * 0.12)),
-      0
+    const jitter = getModernGridEntryJitter(entry, zoomProfile.corridorJitterStrength);
+    const baseRadius = Math.max((entry.rx + entry.ry) * 0.5, 0.0001);
+    const majorRadius = baseRadius * (zoomProfile.corridorRadiusScale + (corridorStrength * 0.18) + (corridorWeight * 0.18));
+    drawSoftLightBlob(
+      entry.x + jitter.dx,
+      entry.y + jitter.dy,
+      majorRadius,
+      majorRadius * 0.9,
+      {
+        rotation: entry.rotation * 0.18,
+        rgb: corridorRgb,
+        alpha,
+        innerStop: 0.05,
+        midStop: 0.5,
+        innerAlphaScale: 0.84,
+        midAlphaScale: 0.18,
+      }
     );
   });
 }
@@ -8460,6 +8902,7 @@ function collectModernUrbanCoreEntries(k, config, intensity) {
   const textureOpacity = clamp(Number(config.cityLightsTextureOpacity) || 0, 0, 1);
   const coreSharpness = clamp(Number(config.cityLightsCoreSharpness) || 0, 0, 1);
   const transform = state.zoomTransform || globalThis.d3?.zoomIdentity || { x: 0, y: 0, k: 1 };
+  const zoomProfile = getModernCityLightsZoomProfile();
   const zoomScale = Math.max(0.0001, Number(transform?.k || 1));
   const minProjectedAreaPx = zoomScale <= 1.15 ? 4.6 : zoomScale <= 1.7 ? 3.2 : 2.2;
   const overscan = Math.max(32, Math.min(state.width, state.height) * 0.06);
@@ -8477,7 +8920,7 @@ function collectModernUrbanCoreEntries(k, config, intensity) {
     const sample = geographicCentroid
       ? sampleModernCityLightsGridNormalized(geographicCentroid[0], geographicCentroid[1])
       : 0;
-    const sampledBoost = clamp(0.28 + (Math.pow(sample, 0.58) * 1.45), 0.22, 1.6);
+    const sampledBoost = clamp(0.28 + (Math.pow(sample, 0.58) * 1.45), 0.55, 1.6);
     const weight = clamp(heuristicWeight * sampledBoost, 0.04, 1.22);
     if (sample <= 0.01 && heuristicWeight < 0.34) return;
     if (weight < 0.16) return;
@@ -8499,21 +8942,26 @@ function collectModernUrbanCoreEntries(k, config, intensity) {
       return;
     }
 
-    const orientation = (stringHash(
+    const identitySeed = String(
       feature?.properties?.nameascii ||
       feature?.properties?.name ||
       feature?.properties?.NAME ||
       feature?.id ||
       `${cx}:${cy}`
-    ) % 180) * (Math.PI / 180);
-    const baseRadiusPx = 0.48 + (weight * (0.74 + (coreSharpness * 0.74)));
-    const stretch = 1.08 + (coreSharpness * 0.52) + (sample * 0.36);
-    const haloAlpha = clamp(intensity * weight * (0.03 + (textureOpacity * 0.05) + (sample * 0.06)), 0, 0.18);
-    const coreAlpha = clamp(intensity * weight * (0.12 + (coreSharpness * 0.18) + (sample * 0.18)), 0, 0.48);
-    const glintAlpha = zoomScale < 1.45
-      ? 0
-      : clamp(intensity * weight * (0.03 + (sample * 0.08)), 0, 0.16);
-    const offsetPx = baseRadiusPx * (0.22 + (sample * 0.28));
+    );
+    const orientation = getSignedHashUnit(`${identitySeed}:rotation`) * (Math.PI / 60);
+    const baseRadiusPx = 0.52 + (weight * (0.68 + (coreSharpness * 0.52)));
+    const aspectRatio = clamp(1.03 + (coreSharpness * 0.05) + (sample * 0.04), 1.03, 1.12);
+    const haloAlpha = clamp(
+      intensity * weight * (0.026 + (textureOpacity * 0.04) + (sample * 0.05)) * zoomProfile.coreAlphaScale,
+      0,
+      0.16
+    );
+    const coreAlpha = clamp(
+      intensity * weight * (0.09 + (coreSharpness * 0.12) + (sample * 0.12)) * zoomProfile.coreAlphaScale,
+      0,
+      0.34
+    );
     entries.push({
       feature,
       cx,
@@ -8524,12 +8972,9 @@ function collectModernUrbanCoreEntries(k, config, intensity) {
       sample,
       orientation,
       baseRadiusPx,
-      stretch,
+      aspectRatio,
       haloAlpha,
       coreAlpha,
-      glintAlpha,
-      offsetX: (Math.cos(orientation) * offsetPx) / Math.max(0.0001, k),
-      offsetY: (Math.sin(orientation) * offsetPx) / Math.max(0.0001, k),
     });
   });
   return entries;
@@ -8537,52 +8982,63 @@ function collectModernUrbanCoreEntries(k, config, intensity) {
 
 function drawModernCityLightsCores(k, _config, _intensity, coreEntries = null) {
   const palette = getNightLightPalette("modern");
+  const zoomProfile = getModernCityLightsZoomProfile();
+  const haloRgb = getLightBlobRgb(palette.halo);
+  const coreRgb = getLightBlobRgb(palette.core);
   const entries = Array.isArray(coreEntries) ? coreEntries : [];
   entries.forEach((entry) => {
-    context.fillStyle = palette.halo;
-    context.globalAlpha = entry.haloAlpha;
-    drawLightEllipse(
+    drawSoftLightBlob(
       entry.cx,
       entry.cy,
-      (entry.baseRadiusPx * entry.stretch * 1.45) / Math.max(0.0001, k),
-      (entry.baseRadiusPx * 0.74) / Math.max(0.0001, k),
-      entry.orientation
+      (entry.baseRadiusPx * entry.aspectRatio * 1.18 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (entry.baseRadiusPx * 1.08 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      {
+        rotation: entry.orientation,
+        rgb: haloRgb,
+        alpha: entry.haloAlpha,
+        innerStop: 0.06,
+        midStop: 0.54,
+        innerAlphaScale: 0.8,
+        midAlphaScale: 0.2,
+      }
     );
 
-    context.fillStyle = palette.core;
-    context.globalAlpha = entry.coreAlpha;
-    drawLightEllipse(
+    drawSoftLightBlob(
       entry.cx,
       entry.cy,
-      (entry.baseRadiusPx * entry.stretch) / Math.max(0.0001, k),
-      (entry.baseRadiusPx * 0.5) / Math.max(0.0001, k),
-      entry.orientation
-    );
-
-    context.fillStyle = palette.glint;
-    context.globalAlpha = entry.glintAlpha;
-    drawLightEllipse(
-      entry.cx + entry.offsetX,
-      entry.cy + entry.offsetY,
-      (entry.baseRadiusPx * 0.6) / Math.max(0.0001, k),
-      (entry.baseRadiusPx * 0.24) / Math.max(0.0001, k),
-      entry.orientation
+      (entry.baseRadiusPx * entry.aspectRatio * 0.96 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (entry.baseRadiusPx * 0.92 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      {
+        rotation: entry.orientation,
+        rgb: coreRgb,
+        alpha: entry.coreAlpha,
+        innerStop: 0.04,
+        midStop: 0.42,
+        innerAlphaScale: 0.94,
+        midAlphaScale: 0.34,
+      }
     );
   });
 }
 
-function drawModernCapitalFallbackLights(k, config, intensity, urbanCoreEntries = []) {
+function drawModernCityFallbackLights(k, config, intensity, urbanCoreEntries = []) {
   const cityCollection = getEffectiveCityCollection();
   if (!Array.isArray(cityCollection?.features) || !cityCollection.features.length) return;
   const palette = getNightLightPalette("modern");
   const coreSharpness = clamp(Number(config.cityLightsCoreSharpness) || 0, 0, 1);
+  const zoomProfile = getModernCityLightsZoomProfile();
+  const haloRgb = getLightBlobRgb(palette.halo);
+  const coreRgb = getLightBlobRgb(palette.core);
   const zoomScale = Math.max(0.0001, Number(state.zoomTransform?.k || 1));
   const overscan = Math.max(28, Math.min(state.width, state.height) * 0.05);
   const urbanIndex = getUrbanFeatureIndex();
+  const minPopulation = zoomScale <= 1.1 ? 100000 : zoomScale <= 1.8 ? 50000 : 20000;
 
   cityCollection.features.forEach((feature) => {
     const props = feature?.properties || {};
-    if (!props.__city_is_country_capital) return;
+    const population = Math.max(0, Number(props.__city_population || 0));
+    const isCapital = !!props.__city_is_country_capital;
+    if (!isCapital && population < minPopulation) return;
     if (getCityUrbanRuntimeInfo(feature, urbanIndex).hasUrbanMatch) return;
     const anchor = getCityAnchor(feature);
     const screenPoint = getCityScreenPoint(anchor);
@@ -8600,61 +9056,61 @@ function drawModernCapitalFallbackLights(k, config, intensity, urbanCoreEntries 
     ));
     if (overlapsUrbanCore) return;
 
-    const population = Math.max(0, Number(props.__city_population || 0));
     const populationScore = clamp(Math.log10(population + 1) / 6.5, 0.18, 1);
     const geographicCoords = getCityGeoCoordinates(feature);
     const sample = geographicCoords
       ? sampleModernCityLightsGridNormalized(geographicCoords[0], geographicCoords[1])
       : 0;
-    const weight = clamp(0.34 + (populationScore * 0.34) + (sample * 0.28), 0.24, 0.92);
+    const weight = clamp(
+      (isCapital ? 0.34 : 0.22) + (populationScore * 0.38) + (sample * 0.28),
+      0.14,
+      0.92
+    );
     if (zoomScale <= 1.1 && weight < 0.45) return;
 
-    const orientation = (stringHash(
+    const identitySeed = String(
       getCityCanonicalId(feature) ||
       props.name_en ||
       props.name ||
       feature?.id ||
       `${anchor[0]}:${anchor[1]}`
-    ) % 180) * (Math.PI / 180);
+    );
+    const orientation = getSignedHashUnit(`${identitySeed}:rotation`) * (Math.PI / 80);
     const baseRadiusPx = 0.32 + (weight * (0.42 + (coreSharpness * 0.22)));
-    const stretch = 1.02 + (coreSharpness * 0.16) + (sample * 0.16);
-    const haloAlpha = clamp(intensity * weight * (0.016 + (sample * 0.035)), 0, 0.09);
-    const coreAlpha = clamp(intensity * weight * (0.048 + (sample * 0.09)), 0, 0.2);
-    const glintAlpha = zoomScale < 1.5
-      ? 0
-      : clamp(intensity * weight * (0.015 + (sample * 0.03)), 0, 0.08);
-    const offsetPx = baseRadiusPx * (0.16 + (sample * 0.18));
-    const offsetX = (Math.cos(orientation) * offsetPx) / Math.max(0.0001, k);
-    const offsetY = (Math.sin(orientation) * offsetPx) / Math.max(0.0001, k);
+    const aspectRatio = clamp(1.03 + (coreSharpness * 0.04) + (sample * 0.03), 1.03, 1.1);
+    const haloAlpha = clamp(intensity * weight * (0.016 + (sample * 0.03)) * zoomProfile.coreAlphaScale, 0, 0.09);
+    const coreAlpha = clamp(intensity * weight * (0.042 + (sample * 0.08)) * zoomProfile.coreAlphaScale, 0, 0.18);
 
-    context.fillStyle = palette.halo;
-    context.globalAlpha = haloAlpha;
-    drawLightEllipse(
+    drawSoftLightBlob(
       anchor[0],
       anchor[1],
-      (baseRadiusPx * stretch * 1.35) / Math.max(0.0001, k),
-      (baseRadiusPx * 0.68) / Math.max(0.0001, k),
-      orientation
+      (baseRadiusPx * aspectRatio * 1.14 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (baseRadiusPx * 1.04 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      {
+        rotation: orientation,
+        rgb: haloRgb,
+        alpha: haloAlpha,
+        innerStop: 0.05,
+        midStop: 0.52,
+        innerAlphaScale: 0.8,
+        midAlphaScale: 0.2,
+      }
     );
 
-    context.fillStyle = palette.core;
-    context.globalAlpha = coreAlpha;
-    drawLightEllipse(
+    drawSoftLightBlob(
       anchor[0],
       anchor[1],
-      (baseRadiusPx * stretch) / Math.max(0.0001, k),
-      (baseRadiusPx * 0.44) / Math.max(0.0001, k),
-      orientation
-    );
-
-    context.fillStyle = palette.glint;
-    context.globalAlpha = glintAlpha;
-    drawLightEllipse(
-      anchor[0] + offsetX,
-      anchor[1] + offsetY,
-      (baseRadiusPx * 0.48) / Math.max(0.0001, k),
-      (baseRadiusPx * 0.2) / Math.max(0.0001, k),
-      orientation
+      (baseRadiusPx * aspectRatio * 0.98 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (baseRadiusPx * 0.94 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      {
+        rotation: orientation,
+        rgb: coreRgb,
+        alpha: coreAlpha,
+        innerStop: 0.04,
+        midStop: 0.4,
+        innerAlphaScale: 0.94,
+        midAlphaScale: 0.34,
+      }
     );
   });
 }
@@ -8674,12 +9130,165 @@ function drawModernNightLightsLayer(k, config, solarState) {
   drawModernCityLightsCorridors(config, intensity);
   const urbanCoreEntries = collectModernUrbanCoreEntries(k, config, intensity);
   drawModernCityLightsCores(k, config, intensity, urbanCoreEntries);
-  drawModernCapitalFallbackLights(k, config, intensity, urbanCoreEntries);
+  drawModernCityFallbackLights(k, config, intensity, urbanCoreEntries);
   context.restore();
 }
 
+const historicalCityLightsFallbackCache = {
+  cityCollection: null,
+  cityLayerRevision: -1,
+  scenarioId: "",
+  entries: [],
+};
+
+function getHistoricalCityLightCapitalBoost(capitalKind = "") {
+  const normalizedKind = String(capitalKind || "").trim().toLowerCase();
+  if (normalizedKind === "country_capital") return 0.16;
+  if (normalizedKind === "admin_capital") return 0.08;
+  return 0;
+}
+
+function sanitizeHistoricalCityLightEntry(rawEntry) {
+  const lon = normalizeLongitude(Number(rawEntry?.lon));
+  const lat = clamp(Number(rawEntry?.lat), -89.999, 89.999);
+  const weight = clamp(Number(rawEntry?.weight), 0, 1.08);
+  if (!Number.isFinite(lon) || !Number.isFinite(lat) || weight <= 0) {
+    return null;
+  }
+  return {
+    lon,
+    lat,
+    weight,
+    capitalKind: String(rawEntry?.capitalKind || rawEntry?.capital_kind || "").trim().toLowerCase(),
+    population: Math.max(0, Number(rawEntry?.population || 0)),
+    nameAscii: String(rawEntry?.nameAscii || rawEntry?.name_ascii || rawEntry?.name || "").trim(),
+  };
+}
+
+function shouldRenderHistoricalCityLightEntry(entry) {
+  const capitalKind = String(entry?.capitalKind || "").trim().toLowerCase();
+  const population = Math.max(0, Number(entry?.population || 0));
+  const weight = clamp(Number(entry?.weight || 0), 0, 1.08);
+  if (capitalKind === "country_capital") {
+    return true;
+  }
+  if (capitalKind === "admin_capital") {
+    return population >= 250000 || weight >= 0.42;
+  }
+  return population >= 1250000 && weight >= 0.4;
+}
+
+function getHistoricalProxyAssetEntries() {
+  if (!Array.isArray(HISTORICAL_1930_CITY_LIGHTS_ENTRIES) || !HISTORICAL_1930_CITY_LIGHTS_ENTRIES.length) {
+    return [];
+  }
+  return HISTORICAL_1930_CITY_LIGHTS_ENTRIES
+    .map(sanitizeHistoricalCityLightEntry)
+    .filter((entry) => shouldRenderHistoricalCityLightEntry(entry))
+    .filter(Boolean);
+}
+
+function computeHistoricalFallbackCityLightWeight(feature) {
+  const props = feature?.properties || {};
+  const population = Math.max(
+    0,
+    Number(
+      props.__city_population
+      ?? props.population
+      ?? props.pop_max
+      ?? props.POP_MAX
+      ?? 0
+    )
+  );
+  const isCountryCapital = !!(props.__city_is_country_capital ?? props.is_country_capital);
+  const isAdminCapital = !!(props.__city_is_admin_capital ?? props.is_admin_capital);
+  const baseTier = String(props.__city_base_tier || props.base_tier || "").trim().toLowerCase();
+  const tierBoost = baseTier === "major" ? 0.1 : baseTier === "regional" ? 0.04 : 0;
+  const scalerank = clamp(
+    Math.round(Number(props.__city_scalerank ?? props.scalerank ?? props.SCALERANK ?? 8)) || 8,
+    1,
+    10
+  );
+  const rankBoost = scalerank <= 3 ? 0.06 : 0;
+  const populationScore = clamp(Math.log10(population + 1) / 7.1, 0.16, 1);
+  const capitalBoost = isCountryCapital ? 0.34 : isAdminCapital ? 0.2 : 0;
+  return clamp((populationScore * 0.74) + capitalBoost + tierBoost + rankBoost, 0.18, 1.02);
+}
+
+function shouldIncludeHistoricalFallbackCity(feature) {
+  const props = feature?.properties || {};
+  if (!!(props.__city_is_country_capital ?? props.is_country_capital)) return true;
+  if (!!(props.__city_is_admin_capital ?? props.is_admin_capital)) return true;
+  const scalerank = clamp(
+    Math.round(Number(props.__city_scalerank ?? props.scalerank ?? props.SCALERANK ?? 8)) || 8,
+    1,
+    10
+  );
+  if (scalerank <= 3) return true;
+  const population = Math.max(
+    0,
+    Number(
+      props.__city_population
+      ?? props.population
+      ?? props.pop_max
+      ?? props.POP_MAX
+      ?? 0
+    )
+  );
+  return population >= 750000;
+}
+
+function getHistoricalProxyFallbackEntries() {
+  const cityCollection = getEffectiveCityCollection();
+  const cityLayerRevision = Number(state.cityLayerRevision || 0);
+  const scenarioId = String(state.activeScenarioId || "");
+  if (
+    historicalCityLightsFallbackCache.cityCollection === cityCollection
+    && historicalCityLightsFallbackCache.cityLayerRevision === cityLayerRevision
+    && historicalCityLightsFallbackCache.scenarioId === scenarioId
+  ) {
+    return historicalCityLightsFallbackCache.entries;
+  }
+
+  const entries = Array.isArray(cityCollection?.features)
+    ? cityCollection.features
+      .filter((feature) => shouldIncludeHistoricalFallbackCity(feature))
+      .map((feature) => {
+        const coordinates = getCityGeoCoordinates(feature);
+        if (!coordinates) return null;
+        const props = feature?.properties || {};
+        return sanitizeHistoricalCityLightEntry({
+          lon: coordinates[0],
+          lat: coordinates[1],
+          weight: computeHistoricalFallbackCityLightWeight(feature),
+          capitalKind: props.__city_capital_kind || props.capital_kind || "",
+          population: props.__city_population ?? props.population ?? 0,
+          nameAscii: props.name_ascii || props.__city_name_ascii || props.name_en || props.name || "",
+        });
+      })
+      .filter((entry) => shouldRenderHistoricalCityLightEntry(entry))
+      .filter(Boolean)
+      .sort((left, right) => right.weight - left.weight)
+    : [];
+
+  historicalCityLightsFallbackCache.cityCollection = cityCollection;
+  historicalCityLightsFallbackCache.cityLayerRevision = cityLayerRevision;
+  historicalCityLightsFallbackCache.scenarioId = scenarioId;
+  historicalCityLightsFallbackCache.entries = entries;
+  return entries;
+}
+
+function getHistoricalNightLightEntries() {
+  const assetEntries = getHistoricalProxyAssetEntries();
+  if (assetEntries.length) {
+    return assetEntries;
+  }
+  return getHistoricalProxyFallbackEntries();
+}
+
 function drawHistoricalNightLightsLayer(k, config, solarState) {
-  if (!Array.isArray(state.urbanData?.features) || !state.urbanData.features.length) {
+  const historicalEntries = getHistoricalNightLightEntries();
+  if (!historicalEntries.length) {
     return;
   }
   const nightHemisphere = buildNightHemisphereFeature(solarState, 90);
@@ -8689,7 +9298,6 @@ function drawHistoricalNightLightsLayer(k, config, solarState) {
   const intensity = clamp(Number(config.cityLightsIntensity) || 0, 0, 1.2);
   if (intensity <= 0) return;
   const palette = getNightLightPalette(variant);
-  const minProjectedAreaPx = 2.8;
   const overscan = Math.max(24, Math.min(state.width, state.height) * 0.05);
 
   context.save();
@@ -8698,17 +9306,14 @@ function drawHistoricalNightLightsLayer(k, config, solarState) {
   context.clip();
   context.globalCompositeOperation = getSafeBlendMode("screen", "lighter");
 
-  state.urbanData.features.forEach((feature) => {
-    if (!pathBoundsInScreen(feature)) return;
-    if (estimateProjectedAreaPx(feature, k) < minProjectedAreaPx) return;
-
-    const weight = getUrbanLightWeight(feature, variant);
+  historicalEntries.forEach((entry) => {
+    const projected = projection ? projection([entry.lon, entry.lat]) : null;
+    if (!Array.isArray(projected) || !projected.every((value) => Number.isFinite(Number(value)))) return;
+    const weight = clamp(Number(entry.weight || 0), 0, 1.08);
     if (weight <= 0) return;
 
-    const centroid = pathCanvas.centroid(feature);
-    const cx = Number(centroid?.[0]);
-    const cy = Number(centroid?.[1]);
-    if (!Number.isFinite(cx) || !Number.isFinite(cy)) return;
+    const cx = Number(projected[0]);
+    const cy = Number(projected[1]);
 
     const screenX = (cx * state.zoomTransform.k) + state.zoomTransform.x;
     const screenY = (cy * state.zoomTransform.k) + state.zoomTransform.y;
@@ -8721,16 +9326,14 @@ function drawHistoricalNightLightsLayer(k, config, solarState) {
       return;
     }
 
-    const baseRadiusPx = 0.76 + (weight * 1.55);
-    const haloRadiusPx = baseRadiusPx * 1.44;
-    const haloAlpha = clamp(intensity * weight * 0.14, 0, 0.24);
-    const coreAlpha = clamp(intensity * weight * 0.28, 0, 0.52);
+    const capitalBoost = getHistoricalCityLightCapitalBoost(entry.capitalKind);
+    const baseRadiusPx = 0.36 + (weight * (0.8 + capitalBoost));
+    const haloRadiusPx = baseRadiusPx * (1.16 + (capitalBoost * 0.5));
+    const haloAlpha = clamp(intensity * weight * 0.06, 0, 0.12);
+    const coreAlpha = clamp(intensity * weight * 0.12, 0, 0.24);
     const orientation = (stringHash(
-      feature?.properties?.nameascii ||
-      feature?.properties?.name ||
-      feature?.properties?.NAME ||
-      feature?.id ||
-      `${cx}:${cy}`
+      entry.nameAscii ||
+      `${entry.lon}:${entry.lat}`
     ) % 180) * (Math.PI / 180);
 
     context.fillStyle = palette.halo;
@@ -8738,8 +9341,8 @@ function drawHistoricalNightLightsLayer(k, config, solarState) {
     drawLightEllipse(
       cx,
       cy,
-      (haloRadiusPx * 1.12) / Math.max(0.0001, k),
-      (haloRadiusPx * 0.74) / Math.max(0.0001, k),
+      (haloRadiusPx * 1.04) / Math.max(0.0001, k),
+      (haloRadiusPx * 0.62) / Math.max(0.0001, k),
       orientation
     );
 
@@ -8749,7 +9352,7 @@ function drawHistoricalNightLightsLayer(k, config, solarState) {
       cx,
       cy,
       baseRadiusPx / Math.max(0.0001, k),
-      (baseRadiusPx * 0.58) / Math.max(0.0001, k),
+      (baseRadiusPx * 0.46) / Math.max(0.0001, k),
       orientation
     );
   });
@@ -9859,13 +10462,62 @@ function drawBordersPass(k, { interactive = false } = {}) {
   drawHierarchicalBorders(k, { interactive });
 }
 
+function drawLabelsPass(k, { interactive = false } = {}) {
+  const startedAt = nowMs();
+  if (interactive) {
+    recordRenderPerfMetric("drawLabelsPass", nowMs() - startedAt, {
+      interactive: true,
+      skipped: true,
+      reason: "interactive",
+      labelCount: 0,
+    });
+    return;
+  }
+  if (state.deferContextBasePass) {
+    recordRenderPerfMetric("drawLabelsPass", nowMs() - startedAt, {
+      interactive: false,
+      skipped: true,
+      reason: "staged-apply",
+      labelCount: 0,
+    });
+    return;
+  }
+  const renderState = getCityLayerRenderState(k, {
+    interactive: false,
+    cacheHoverEntries: false,
+  });
+  if (renderState.skipped || !renderState.labelEntries.length) {
+    recordRenderPerfMetric("drawLabelsPass", nowMs() - startedAt, {
+      interactive: false,
+      skipped: true,
+      reason: renderState.skipped ? renderState.reason : "labels-hidden",
+      featureCount: renderState.featureCount,
+      visibleFeatureCount: renderState.markerEntries.length,
+      labelCount: 0,
+    });
+    return;
+  }
+  const labelCount = drawCityLabelsFromEntries(renderState.labelEntries, {
+    config: renderState.config,
+    scale: renderState.scale,
+  });
+  recordRenderPerfMetric("drawLabelsPass", nowMs() - startedAt, {
+    interactive: false,
+    skipped: false,
+    featureCount: renderState.featureCount,
+    visibleFeatureCount: renderState.markerEntries.length,
+    labelCount,
+  });
+}
+
 function renderPassToCache(passName, drawFn, transform, timings) {
   const passCanvas = ensureRenderPassCanvas(passName);
   const passContext = passCanvas.getContext("2d");
   if (!passContext) return;
   const passStart = nowMs();
+  const layout = getRenderPassLayout(passName);
   withRenderTarget(passContext, () => {
-    const k = prepareTargetContext(passContext, transform);
+    const k = prepareTargetContext(passContext, transform, layout);
     drawFn(k);
   });
   setPassReferenceTransform(passName, transform);
@@ -9886,6 +10538,7 @@ function ensureIdleRenderPasses(timings) {
     ["contextScenario", (k) => drawContextScenarioPass(k)],
     ["dayNight", (k) => drawDayNightPass(k)],
     ["borders", (k) => drawBordersPass(k)],
+    ["labels", (k) => drawLabelsPass(k)],
   ];
   passDefinitions.forEach(([passName, drawFn]) => {
     const nextSignature = getRenderPassSignature(passName, transform);
@@ -9950,7 +10603,12 @@ function composeCachedPasses(passNames, currentTransform = state.zoomTransform |
       drawTransformedPass(passName, currentTransform, referenceTransform);
       return;
     }
-    context.drawImage(passCanvas, 0, 0);
+    const layout = getRenderPassLayout(passName);
+    context.drawImage(
+      passCanvas,
+      Math.round(-Number(layout?.offsetX || 0) * state.dpr),
+      Math.round(-Number(layout?.offsetY || 0) * state.dpr),
+    );
   });
   incrementPerfCounter("composites");
 }
@@ -9963,12 +10621,16 @@ function drawTransformedPass(passName, currentTransform, referenceTransform = nu
   if (!resolvedReferenceTransform) return false;
   const current = cloneZoomTransform(currentTransform);
   const reference = cloneZoomTransform(resolvedReferenceTransform);
+  const layout = getRenderPassLayout(passName);
   const scaleRatio = current.k / Math.max(reference.k, 0.0001);
   const dx = current.x - (reference.x * scaleRatio);
   const dy = current.y - (reference.y * scaleRatio);
   context.save();
   context.setTransform(1, 0, 0, 1, 0, 0);
-  context.translate(dx * state.dpr, dy * state.dpr);
+  context.translate(
+    (dx - Number(layout?.offsetX || 0) * scaleRatio) * state.dpr,
+    (dy - Number(layout?.offsetY || 0) * scaleRatio) * state.dpr,
+  );
   context.scale(scaleRatio, scaleRatio);
   context.drawImage(passCanvas, 0, 0);
   context.restore();
@@ -9979,11 +10641,11 @@ function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } 
   const currentTransform = state.zoomTransform || globalThis.d3.zoomIdentity;
   const compositeStart = nowMs();
   resetMainCanvas();
-  const transformedPasses = ["background", "political", "effects", "contextBase", "contextScenario", "dayNight"];
   const cache = getRenderPassCacheState();
-  if (transformedPasses.some((passName) => cache.dirty?.[passName])) {
+  if (TRANSFORMED_FRAME_PASS_NAMES.some((passName) => cache.dirty?.[passName])) {
     return false;
   }
+  const transformedPasses = TRANSFORMED_FRAME_PASS_NAMES.filter((passName) => passName !== "labels");
   const drewAll = transformedPasses.every((passName) =>
     drawTransformedPass(passName, currentTransform)
   );
@@ -9995,6 +10657,9 @@ function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } 
   context.scale(k, k);
   drawBordersPass(k, { interactive: !!interactiveBorders });
   context.setTransform(1, 0, 0, 1, 0, 0);
+  if (!drawTransformedPass("labels", currentTransform)) {
+    return false;
+  }
   const timingLabel = interactiveBorders ? "interactiveComposite" : "transformedComposite";
   recordPassTiming(timings, timingLabel, compositeStart);
   if (Number.isFinite(timings.contextBase) || Number.isFinite(timings.contextScenario)) {
@@ -10634,6 +11299,7 @@ function updatePerfOverlay() {
     ["physicalClip", renderPerf.applyPhysicalLandClipMask?.durationMs],
     ["oceanClip", renderPerf.applyOceanClipMask?.durationMs],
     ["contextBase", renderPerf.drawContextBasePass?.durationMs],
+    ["labels", renderPerf.drawLabelsPass?.durationMs],
     ["contextScenario", renderPerf.drawContextScenarioPass?.durationMs],
     ["hitCanvas", renderPerf.buildHitCanvas?.durationMs],
     ["bgMerge", renderPerf.drawScenarioPoliticalBackgroundEntries?.durationMs],
@@ -10659,8 +11325,9 @@ function updatePerfOverlay() {
     `contextBreakdown ${contextBreakdownEntries || "none"}`,
     `ops ${opEntries || "none"}`,
     `ctxReuse skip=${renderPerf.contextBaseReuseSkipped ? "yes" : "no"} scale=${Number(renderPerf.contextBaseReuseScaleRatio?.scaleRatio || 0).toFixed(4)} dist=${Number(renderPerf.contextBaseReuseDistancePx?.distancePx || 0).toFixed(2)}px`,
+    `projBounds total=${Number(renderPerf.projectedBoundsDiagnostics?.total || 0)} reasons=${JSON.stringify(renderPerf.projectedBoundsDiagnostics?.byReason || {})}`,
     `invalidations ${invalidations}`,
-    `render draw=${cache.counters.drawCanvas || 0} frame=${cache.counters.frames || 0} ctxBase=${cache.counters.contextBasePassRenders || 0} ctxScenario=${cache.counters.contextScenarioPassRenders || 0} dayNight=${cache.counters.dayNightPassRenders || 0} hit=${cache.counters.hitCanvasRenders || 0} dynBorder=${cache.counters.dynamicBorderRebuilds || 0}`,
+    `render draw=${cache.counters.drawCanvas || 0} frame=${cache.counters.frames || 0} ctxBase=${cache.counters.contextBasePassRenders || 0} labels=${cache.counters.labelPassRenders || 0} ctxScenario=${cache.counters.contextScenarioPassRenders || 0} dayNight=${cache.counters.dayNightPassRenders || 0} hit=${cache.counters.hitCanvasRenders || 0} dynBorder=${cache.counters.dynamicBorderRebuilds || 0}`,
     `sidebar list=${sidebarPerf.counters.fullListRenders || 0} rows=${sidebarPerf.counters.rowRefreshes || 0} detail=${sidebarPerf.counters.inspectorRenders || 0} preset=${sidebarPerf.counters.presetTreeRenders || 0} legend=${sidebarPerf.counters.legendRenders || 0}`,
   ].join("\n");
 }

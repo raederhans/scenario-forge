@@ -1,6 +1,7 @@
 // Translation helpers (Phase 13)
 import { state } from "../core/state.js";
 import { normalizeCountryCodeAlias } from "../core/country_code_aliases.js";
+import { getScenarioCountryDisplayName } from "../core/scenario_country_display.js";
 
 const US_LEGACY_ZONE_LABEL_RE = /(?:\bZone\s+\d+\b|第?\s*\d+\s*[区號号])/i;
 
@@ -323,12 +324,12 @@ function updateUIText() {
     ["lblDayNightCityLights", "City Lights"],
     ["lblDayNightCityLightsStyle", "Style"],
     ["optDayNightCityLightsModern", "Modern"],
-    ["optDayNightCityLightsHistorical1930s", "1930s Sparse Electrification"],
+    ["optDayNightCityLightsHistorical1930s", "1930s Electrification Proxy"],
     ["lblDayNightCityLightsIntensity", "Intensity"],
     ["lblDayNightAdvanced", "Advanced"],
-    ["lblDayNightTextureOpacity", "Texture Opacity"],
-    ["lblDayNightCorridorStrength", "Corridor Strength"],
-    ["lblDayNightCoreSharpness", "Core Sharpness"],
+    ["lblDayNightTextureOpacity", "Texture Opacity (Modern only)"],
+    ["lblDayNightCorridorStrength", "Corridor Strength (Modern only)"],
+    ["lblDayNightCoreSharpness", "Core Sharpness (Modern only)"],
     ["lblDayNightShadowOpacity", "Shadow Opacity"],
     ["lblDayNightTwilightWidth", "Twilight Width"],
     ["lblRiversLayer", "Rivers"],
@@ -693,7 +694,7 @@ function getTooltipCountryContext(feature) {
     : "";
   const countryCode = scenarioBaselineCode || getTooltipFeatureCountryCode(feature);
   const rawCountryName =
-    state.scenarioCountriesByTag?.[countryCode]?.display_name ||
+    getScenarioCountryDisplayName(state.scenarioCountriesByTag?.[countryCode]) ||
     state.countryNames?.[countryCode] ||
     countryCode;
   const countryDisplayName = t(rawCountryName, "geo") || rawCountryName || countryCode;

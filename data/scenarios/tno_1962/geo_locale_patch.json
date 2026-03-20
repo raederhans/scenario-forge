@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "tno_1962",
-  "generated_at": "2026-03-19T22:21:06Z",
+  "generated_at": "2026-03-20T00:00:49Z",
   "geo": {
     "AFG-1741": {
       "en": "Badghis",
@@ -10068,8 +10068,8 @@
       "zh": "上阿尔高"
     },
     "DE300": {
-      "en": "Berlin",
-      "zh": "柏林"
+      "en": "Germania",
+      "zh": "日耳曼尼亚都会区"
     },
     "DE401": {
       "en": "Brandenburg an der Havel, Kreisfreie Stadt",
@@ -45469,9 +45469,9 @@
     }
   },
   "audit": {
-    "safe_feature_copies": 11289,
-    "manual_feature_overrides": 77,
-    "unique_raw_name_safe_copy_count": 11258,
+    "safe_feature_copies": 11288,
+    "manual_feature_overrides": 78,
+    "unique_raw_name_safe_copy_count": 11257,
     "split_clone_safe_copy_count": 31,
     "collision_candidate_count": 937,
     "cross_base_collision_count": 936,
@@ -50841,6 +50841,24 @@
         ]
       },
       {
+        "feature_id": "RU_RAY_50074027B13558455717271",
+        "owner_tag": "FIC",
+        "raw_name": "Blagoveshchensky District",
+        "locale_en": "Blagoveshchensky District",
+        "locale_zh": "布拉戈维申斯基区",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "RU_RAY_50074027B13558455717271",
+          "RU_RAY_50074027B66246158599284",
+          "RU_RAY_50074027B71899291249917"
+        ],
+        "matching_base_feature_ids": [
+          "RU_RAY_50074027B13558455717271",
+          "RU_RAY_50074027B66246158599284",
+          "RU_RAY_50074027B71899291249917"
+        ]
+      },
+      {
         "feature_id": "FR_ARR_29001",
         "owner_tag": "FRA",
         "raw_name": "Brest",
@@ -51284,22 +51302,6 @@
         "matching_base_feature_ids": [
           "PL_POW_0802",
           "PL_POW_1807"
-        ]
-      },
-      {
-        "feature_id": "PL_POW_1416",
-        "owner_tag": "GER",
-        "raw_name": "ostrowski",
-        "locale_en": "ostrowski",
-        "locale_zh": "奥斯特罗斯基",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "PL_POW_1416",
-          "PL_POW_3017"
-        ],
-        "matching_base_feature_ids": [
-          "PL_POW_1416",
-          "PL_POW_3017"
         ]
       }
     ],
@@ -54252,6 +54254,24 @@
         ]
       },
       {
+        "feature_id": "RU_RAY_50074027B13558455717271",
+        "owner_tag": "FIC",
+        "raw_name": "Blagoveshchensky District",
+        "locale_en": "Blagoveshchensky District",
+        "locale_zh": "布拉戈维申斯基区",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "RU_RAY_50074027B13558455717271",
+          "RU_RAY_50074027B66246158599284",
+          "RU_RAY_50074027B71899291249917"
+        ],
+        "matching_base_feature_ids": [
+          "RU_RAY_50074027B13558455717271",
+          "RU_RAY_50074027B66246158599284",
+          "RU_RAY_50074027B71899291249917"
+        ]
+      },
+      {
         "feature_id": "FR_ARR_29001",
         "owner_tag": "FRA",
         "raw_name": "Brest",
@@ -56130,6 +56150,22 @@
         ]
       },
       {
+        "feature_id": "ME_ADM1_MNE-1496",
+        "owner_tag": "ITA",
+        "raw_name": "Bar",
+        "locale_en": "Bar",
+        "locale_zh": "酒吧",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "ME_ADM1_MNE-1496",
+          "UA_RAY_74538382B24202642451616"
+        ],
+        "matching_base_feature_ids": [
+          "ME_ADM1_MNE-1496",
+          "UA_RAY_74538382B24202642451616"
+        ]
+      },
+      {
         "feature_id": "CN_CITY_17275852B36539700725824",
         "owner_tag": "JAP",
         "raw_name": "Qingdao",
@@ -56960,24 +56996,6 @@
         ]
       },
       {
-        "feature_id": "RU_RAY_50074027B13558455717271",
-        "owner_tag": "MAN",
-        "raw_name": "Blagoveshchensky District",
-        "locale_en": "Blagoveshchensky District",
-        "locale_zh": "布拉戈维申斯基区",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "RU_RAY_50074027B13558455717271",
-          "RU_RAY_50074027B66246158599284",
-          "RU_RAY_50074027B71899291249917"
-        ],
-        "matching_base_feature_ids": [
-          "RU_RAY_50074027B13558455717271",
-          "RU_RAY_50074027B66246158599284",
-          "RU_RAY_50074027B71899291249917"
-        ]
-      },
-      {
         "feature_id": "RU_RAY_50074027B14672397481772",
         "owner_tag": "MAN",
         "raw_name": "Ivanovsky District",
@@ -57356,22 +57374,6 @@
         ]
       },
       {
-        "feature_id": "ME_ADM1_MNE-1496",
-        "owner_tag": "MNT",
-        "raw_name": "Bar",
-        "locale_en": "Bar",
-        "locale_zh": "酒吧",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "ME_ADM1_MNE-1496",
-          "UA_RAY_74538382B24202642451616"
-        ],
-        "matching_base_feature_ids": [
-          "ME_ADM1_MNE-1496",
-          "UA_RAY_74538382B24202642451616"
-        ]
-      },
-      {
         "feature_id": "ME_ADM1_MNE-1515",
         "owner_tag": "MNT",
         "raw_name": "Plužine",
@@ -57385,6 +57387,22 @@
         "matching_base_feature_ids": [
           "ME_ADM1_MNE-1515",
           "XK_ADM1_KOS-5908"
+        ]
+      },
+      {
+        "feature_id": "CN_CITY_17275852B66735617717919",
+        "owner_tag": "MON",
+        "raw_name": "Qinghexian",
+        "locale_en": "Qinghexian",
+        "locale_zh": "清河县",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "CN_CITY_17275852B66735617717919",
+          "CN_CITY_17275852B82114276452469"
+        ],
+        "matching_base_feature_ids": [
+          "CN_CITY_17275852B66735617717919",
+          "CN_CITY_17275852B82114276452469"
         ]
       },
       {
@@ -67842,22 +67860,6 @@
         ]
       },
       {
-        "feature_id": "CN_CITY_17275852B66735617717919",
-        "owner_tag": "XIN",
-        "raw_name": "Qinghexian",
-        "locale_en": "Qinghexian",
-        "locale_zh": "清河县",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "CN_CITY_17275852B66735617717919",
-          "CN_CITY_17275852B82114276452469"
-        ],
-        "matching_base_feature_ids": [
-          "CN_CITY_17275852B66735617717919",
-          "CN_CITY_17275852B82114276452469"
-        ]
-      },
-      {
         "feature_id": "CN_CITY_17275852B82842450374708",
         "owner_tag": "XIN",
         "raw_name": "Yutianxian",
@@ -70996,45 +70998,15 @@
         "reason": "missing_locale"
       },
       {
-        "feature_id": "ATLISL_adriatica_CRO_5",
-        "owner_tag": "CRO",
-        "raw_name": "Adriatica Salt Basin Island Cluster 5",
-        "reason": "missing_locale"
-      },
-      {
         "feature_id": "ATLISL_adriatica_CRO_6",
         "owner_tag": "CRO",
         "raw_name": "Adriatica Salt Basin Island Cluster 6",
         "reason": "missing_locale"
       },
       {
-        "feature_id": "ATLISL_adriatica_CRO_7",
-        "owner_tag": "CRO",
-        "raw_name": "Adriatica Salt Basin Island Cluster 7",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLISL_adriatica_CRO_8",
-        "owner_tag": "CRO",
-        "raw_name": "Adriatica Salt Basin Island Cluster 8",
-        "reason": "missing_locale"
-      },
-      {
         "feature_id": "ATLSHL_adriatica_10",
         "owner_tag": "CRO",
         "raw_name": "Adriatica Salt Basin Shore Seal 10",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLSHL_adriatica_15",
-        "owner_tag": "CRO",
-        "raw_name": "Adriatica Salt Basin Shore Seal 15",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLSHL_adriatica_16",
-        "owner_tag": "CRO",
-        "raw_name": "Adriatica Salt Basin Shore Seal 16",
         "reason": "missing_locale"
       },
       {
@@ -71050,12 +71022,6 @@
         "reason": "missing_locale"
       },
       {
-        "feature_id": "ATLSHL_adriatica_9",
-        "owner_tag": "CRO",
-        "raw_name": "Adriatica Salt Basin Shore Seal 9",
-        "reason": "missing_locale"
-      },
-      {
         "feature_id": "ATLWLD_adriatica_15",
         "owner_tag": "CRO",
         "raw_name": "Adriatica Salt Basin Boolean Weld 15",
@@ -71068,12 +71034,6 @@
         "reason": "missing_locale"
       },
       {
-        "feature_id": "ATLWLD_adriatica_19",
-        "owner_tag": "CRO",
-        "raw_name": "Adriatica Salt Basin Boolean Weld 19",
-        "reason": "missing_locale"
-      },
-      {
         "feature_id": "ATLWLD_adriatica_193",
         "owner_tag": "CRO",
         "raw_name": "Adriatica Salt Basin Boolean Weld 193",
@@ -71083,24 +71043,6 @@
         "feature_id": "ATLWLD_adriatica_194",
         "owner_tag": "CRO",
         "raw_name": "Adriatica Salt Basin Boolean Weld 194",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_adriatica_20",
-        "owner_tag": "CRO",
-        "raw_name": "Adriatica Salt Basin Boolean Weld 20",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_adriatica_22",
-        "owner_tag": "CRO",
-        "raw_name": "Adriatica Salt Basin Boolean Weld 22",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_adriatica_23",
-        "owner_tag": "CRO",
-        "raw_name": "Adriatica Salt Basin Boolean Weld 23",
         "reason": "missing_locale"
       },
       {
@@ -71134,12 +71076,6 @@
         "reason": "missing_locale"
       },
       {
-        "feature_id": "ATLWLD_adriatica_252",
-        "owner_tag": "CRO",
-        "raw_name": "Adriatica Salt Basin Boolean Weld 252",
-        "reason": "missing_locale"
-      },
-      {
         "feature_id": "ATLWLD_adriatica_28",
         "owner_tag": "CRO",
         "raw_name": "Adriatica Salt Basin Boolean Weld 28",
@@ -71149,12 +71085,6 @@
         "feature_id": "ATLWLD_adriatica_29",
         "owner_tag": "CRO",
         "raw_name": "Adriatica Salt Basin Boolean Weld 29",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_adriatica_35",
-        "owner_tag": "CRO",
-        "raw_name": "Adriatica Salt Basin Boolean Weld 35",
         "reason": "missing_locale"
       },
       {
@@ -72298,6 +72228,24 @@
         "reason": "missing_locale"
       },
       {
+        "feature_id": "ATLISL_adriatica_CRO_5",
+        "owner_tag": "ITA",
+        "raw_name": "Adriatica Salt Basin Island Cluster 5",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLISL_adriatica_CRO_7",
+        "owner_tag": "ITA",
+        "raw_name": "Adriatica Salt Basin Island Cluster 7",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLISL_adriatica_CRO_8",
+        "owner_tag": "ITA",
+        "raw_name": "Adriatica Salt Basin Island Cluster 8",
+        "reason": "missing_locale"
+      },
+      {
         "feature_id": "ATLISL_adriatica_CRO_9",
         "owner_tag": "ITA",
         "raw_name": "Adriatica Salt Basin Island Cluster 9",
@@ -72604,6 +72552,18 @@
         "reason": "missing_locale"
       },
       {
+        "feature_id": "ATLSHL_adriatica_15",
+        "owner_tag": "ITA",
+        "raw_name": "Adriatica Salt Basin Shore Seal 15",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLSHL_adriatica_16",
+        "owner_tag": "ITA",
+        "raw_name": "Adriatica Salt Basin Shore Seal 16",
+        "reason": "missing_locale"
+      },
+      {
         "feature_id": "ATLSHL_adriatica_17",
         "owner_tag": "ITA",
         "raw_name": "Adriatica Salt Basin Shore Seal 17",
@@ -72619,6 +72579,12 @@
         "feature_id": "ATLSHL_adriatica_6",
         "owner_tag": "ITA",
         "raw_name": "Adriatica Salt Basin Shore Seal 6",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLSHL_adriatica_9",
+        "owner_tag": "ITA",
+        "raw_name": "Adriatica Salt Basin Shore Seal 9",
         "reason": "missing_locale"
       },
       {
@@ -72760,9 +72726,33 @@
         "reason": "missing_locale"
       },
       {
+        "feature_id": "ATLWLD_adriatica_19",
+        "owner_tag": "ITA",
+        "raw_name": "Adriatica Salt Basin Boolean Weld 19",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_adriatica_20",
+        "owner_tag": "ITA",
+        "raw_name": "Adriatica Salt Basin Boolean Weld 20",
+        "reason": "missing_locale"
+      },
+      {
         "feature_id": "ATLWLD_adriatica_214",
         "owner_tag": "ITA",
         "raw_name": "Adriatica Salt Basin Boolean Weld 214",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_adriatica_22",
+        "owner_tag": "ITA",
+        "raw_name": "Adriatica Salt Basin Boolean Weld 22",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_adriatica_23",
+        "owner_tag": "ITA",
+        "raw_name": "Adriatica Salt Basin Boolean Weld 23",
         "reason": "missing_locale"
       },
       {
@@ -72772,9 +72762,21 @@
         "reason": "missing_locale"
       },
       {
+        "feature_id": "ATLWLD_adriatica_252",
+        "owner_tag": "ITA",
+        "raw_name": "Adriatica Salt Basin Boolean Weld 252",
+        "reason": "missing_locale"
+      },
+      {
         "feature_id": "ATLWLD_adriatica_26",
         "owner_tag": "ITA",
         "raw_name": "Adriatica Salt Basin Boolean Weld 26",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_adriatica_35",
+        "owner_tag": "ITA",
+        "raw_name": "Adriatica Salt Basin Boolean Weld 35",
         "reason": "missing_locale"
       },
       {

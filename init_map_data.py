@@ -164,6 +164,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 D3_VENDOR_PATH = PROJECT_ROOT / 'vendor' / 'd3.v7.min.js'
 TOPOJSON_VENDOR_PATH = PROJECT_ROOT / 'vendor' / 'topojson-client.min.js'
 BUILD_STAGE_CACHE_FILENAME = ".build_stage_cache.json"
+MODERN_CITY_LIGHTS_ASSET_PATH = PROJECT_ROOT / "js" / "core" / "city_lights_modern_asset.js"
+HISTORICAL_1930_CITY_LIGHTS_ASSET_PATH = PROJECT_ROOT / "js" / "core" / "city_lights_historical_1930_asset.js"
 
 GLOBAL_OCEAN_MIN_BBOX_WIDTH = 220.0
 GLOBAL_OCEAN_MIN_BBOX_HEIGHT = 90.0
@@ -2928,10 +2930,67 @@ def write_data_manifest(output_dir: Path) -> Path:
         "palette-maps/kaiserreich.audit.json": "palette_audit",
         "palette-maps/tno.audit.json": "palette_audit",
         "palette-maps/red_flood.audit.json": "palette_audit",
+        "js/core/city_lights_modern_asset.js": "modern_city_lights_asset",
+        "js/core/city_lights_historical_1930_asset.js": "historical_1930_city_lights_asset",
     }
+
+    def resolve_manifest_path(file_name: str) -> Path:
+        if file_name.startswith("js/"):
+            return PROJECT_ROOT / file_name
+        return output_dir / file_name
+
+    def parse_generated_js_object_export(path: Path, export_name: str) -> dict[str, object]:
+        try:
+            text = path.read_text(encoding="utf-8")
+        except Exception:
+            return {}
+        match = re.search(
+            rf"export const {re.escape(export_name)} = Object\.freeze\(\{{(.*?)\}}\);",
+            text,
+            flags=re.DOTALL,
+        )
+        if not match:
+            return {}
+        body = match.group(1)
+        payload: dict[str, object] = {}
+        for raw_line in body.splitlines():
+            line = raw_line.strip().rstrip(",")
+            if not line or ":" not in line:
+                continue
+            key, raw_value = line.split(":", 1)
+            key = key.strip()
+            raw_value = raw_value.strip()
+            if raw_value.startswith('"'):
+                payload[key] = json.loads(raw_value)
+                continue
+            lowered = raw_value.lower()
+            if lowered == "true":
+                payload[key] = True
+                continue
+            if lowered == "false":
+                payload[key] = False
+                continue
+            if re.fullmatch(r"-?\d+", raw_value):
+                payload[key] = int(raw_value)
+                continue
+            if re.fullmatch(r"-?\d+\.\d+", raw_value):
+                payload[key] = float(raw_value)
+        return payload
+
+    def parse_generated_js_number_export(path: Path, export_name: str) -> int | float | None:
+        try:
+            text = path.read_text(encoding="utf-8")
+        except Exception:
+            return None
+        match = re.search(rf"export const {re.escape(export_name)} = ([0-9.]+);", text)
+        if not match:
+            return None
+        raw_value = match.group(1)
+        return float(raw_value) if "." in raw_value else int(raw_value)
+
     outputs: dict[str, dict] = {}
     for file_name, role in roles.items():
-        path = output_dir / file_name
+        path = resolve_manifest_path(file_name)
         if not path.exists():
             continue
         item: dict[str, object] = {
@@ -2939,7 +2998,11 @@ def write_data_manifest(output_dir: Path) -> Path:
             "size_bytes": path.stat().st_size,
             "sha256": _sha256_file(path),
         }
-        if path.suffix in {".json", ".geojson"}:
+        should_inspect = path.suffix in {".json", ".geojson"} or file_name in {
+            "js/core/city_lights_modern_asset.js",
+            "js/core/city_lights_historical_1930_asset.js",
+        }
+        if should_inspect:
             try:
                 if "topology" in file_name or file_name.endswith(".topo.json"):
                     item.update(_topology_summary(path))
@@ -3054,6 +3117,26 @@ def write_data_manifest(output_dir: Path) -> Path:
                             "attached_urban_count": attached_urban_count,
                         }
                     )
+                elif file_name == "js/core/city_lights_modern_asset.js":
+                    stats = parse_generated_js_object_export(path, "MODERN_CITY_LIGHTS_STATS")
+                    grid_width = parse_generated_js_number_export(path, "MODERN_CITY_LIGHTS_GRID_WIDTH")
+                    grid_height = parse_generated_js_number_export(path, "MODERN_CITY_LIGHTS_GRID_HEIGHT")
+                    item.update(
+                        {
+                            "type": "modern_city_lights_asset",
+                            "grid_width": grid_width,
+                            "grid_height": grid_height,
+                            "stats": stats,
+                        }
+                    )
+                elif file_name == "js/core/city_lights_historical_1930_asset.js":
+                    stats = parse_generated_js_object_export(path, "HISTORICAL_1930_CITY_LIGHTS_STATS")
+                    item.update(
+                        {
+                            "type": "historical_1930_city_lights_asset",
+                            "stats": stats,
+                        }
+                    )
             except Exception as exc:
                 item["inspection_error"] = str(exc)
         outputs[file_name] = item
@@ -3067,6 +3150,38 @@ def write_data_manifest(output_dir: Path) -> Path:
     write_json_atomic(manifest_path, manifest, ensure_ascii=False, indent=2)
     print(f"[Manifest] Wrote {manifest_path}")
     return manifest_path
+
+
+def build_city_lights_assets(output_dir: Path) -> None:
+    world_cities_path = output_dir / cfg.WORLD_CITIES_FILENAME
+    if not world_cities_path.exists():
+        raise SystemExit(f"World cities dataset missing; cannot build city lights assets: {world_cities_path}")
+
+    print("[City Lights] Rebuilding modern night-lights asset")
+    subprocess.run(
+        [
+            sys.executable,
+            str(PROJECT_ROOT / "tools" / "build_city_lights_modern_asset.py"),
+            "--output",
+            str(MODERN_CITY_LIGHTS_ASSET_PATH),
+        ],
+        cwd=PROJECT_ROOT,
+        check=True,
+    )
+
+    print("[City Lights] Rebuilding 1930s electrification proxy asset")
+    subprocess.run(
+        [
+            sys.executable,
+            str(PROJECT_ROOT / "tools" / "build_city_lights_historical_1930_asset.py"),
+            "--source-file",
+            str(world_cities_path),
+            "--output",
+            str(HISTORICAL_1930_CITY_LIGHTS_ASSET_PATH),
+        ],
+        cwd=PROJECT_ROOT,
+        check=True,
+    )
 
 
 def validate_build_outputs(
@@ -3084,6 +3199,10 @@ def validate_build_outputs(
     world_cities_path = output_dir / cfg.WORLD_CITIES_FILENAME
     city_aliases_path = output_dir / cfg.CITY_ALIASES_FILENAME
     runtime_ids: set[str] = set()
+    if include_dependent_asset_checks:
+        for asset_path in [MODERN_CITY_LIGHTS_ASSET_PATH, HISTORICAL_1930_CITY_LIGHTS_ASSET_PATH]:
+            if not asset_path.exists():
+                problems.append(f"Missing city lights asset: {asset_path.relative_to(PROJECT_ROOT)}")
 
     for topology_path in [primary_path, detail_path, runtime_path]:
         if not topology_path.exists():
@@ -3857,6 +3976,10 @@ def main() -> None:
         output_dir,
     )
 
+    city_lights_assets_start = time.perf_counter()
+    build_city_lights_assets(output_dir)
+    _record_stage_timing(stage_timings, "city_lights_assets", city_lights_assets_start)
+
     topology_path = output_dir / "europe_topology.json"
     build_topology(
         political=final_hybrid,
@@ -3876,7 +3999,11 @@ def main() -> None:
         write_data_manifest(output_dir)
         _record_stage_timing(stage_timings, "manifest", manifest_start)
         validation_start = time.perf_counter()
-        validate_build_outputs(output_dir, strict=args.strict)
+        validate_build_outputs(
+            output_dir,
+            strict=args.strict,
+            include_dependent_asset_checks=True,
+        )
         _record_stage_timing(stage_timings, "validation", validation_start)
         print(f"Features with missing CNTR_CODE: {final_hybrid['cntr_code'].isnull().sum()}")
         print("Done.")

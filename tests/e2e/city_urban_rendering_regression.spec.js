@@ -56,6 +56,26 @@ async function waitForMapReady(page) {
   await page.waitForTimeout(1500);
 }
 
+async function ensureScenario(page, scenarioId, label) {
+  await page.waitForFunction((targetScenarioId) => {
+    const select = document.querySelector('#scenarioSelect');
+    return !!select && !!select.querySelector(`option[value="${targetScenarioId}"]`);
+  }, scenarioId);
+  const initialScenarioId = await page.evaluate(async () => {
+    const { state } = await import('/js/core/state.js');
+    return String(state.activeScenarioId || '');
+  });
+  if (initialScenarioId !== scenarioId) {
+    await page.selectOption('#scenarioSelect', scenarioId);
+    const applyButton = page.locator('#applyScenarioBtn');
+    if ((await applyButton.isVisible()) && (await applyButton.isEnabled())) {
+      await applyButton.click();
+    }
+  }
+  await expect(page.locator('#scenarioStatus')).toContainText(label, { timeout: 20000 });
+  await page.waitForTimeout(800);
+}
+
 async function captureCanvasSample(page) {
   return page.evaluate(() => {
     const candidates = Array.from(document.querySelectorAll('canvas'))
@@ -125,6 +145,7 @@ test('city and urban rendering regression smoke', async ({ page }) => {
 
   await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
   await waitForMapReady(page);
+  await ensureScenario(page, 'tno_1962', 'TNO 1962');
   consoleIssues.length = 0;
   networkFailures.length = 0;
   pageErrors.length = 0;

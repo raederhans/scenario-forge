@@ -1,0 +1,8 @@
+[
+  { "country_code": "CN", "name_ascii": "Shenzhen" },
+  { "country_code": "US", "name_ascii": "Las Vegas" },
+  { "country_code": "BR", "name_ascii": "Brasilia" },
+  { "country_code": "PK", "name_ascii": "Islamabad" },
+  { "country_code": "MM", "name_ascii": "Naypyidaw" },
+  { "country_code": "MY", "name_ascii": "Putrajaya" }
+]

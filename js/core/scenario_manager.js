@@ -13,6 +13,10 @@ import {
   normalizeScenarioCityOverridesPayload,
   normalizeScenarioGeoLocalePatchPayload,
 } from "./data_loader.js";
+import {
+  buildScenarioDistrictGroupByFeatureId,
+  normalizeScenarioDistrictGroupsPayload,
+} from "./scenario_districts.js";
 import { setActivePaletteSource, syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { markDirty } from "./dirty_state.js";
 import {
@@ -796,6 +800,35 @@ function getScenarioFixedOwnerColors(countryMap = {}) {
   return next;
 }
 
+function mergeReleasableCatalogs(baseCatalog, overlayCatalog) {
+  const baseEntries = Array.isArray(baseCatalog?.entries) ? baseCatalog.entries : [];
+  const overlayEntries = Array.isArray(overlayCatalog?.entries) ? overlayCatalog.entries : [];
+  if (!baseEntries.length && !overlayEntries.length) {
+    return overlayCatalog || baseCatalog || null;
+  }
+  const mergedByTag = new Map();
+  baseEntries.forEach((entry) => {
+    const tag = String(entry?.tag || "").trim().toUpperCase();
+    if (!tag) return;
+    mergedByTag.set(tag, entry);
+  });
+  overlayEntries.forEach((entry) => {
+    const tag = String(entry?.tag || "").trim().toUpperCase();
+    if (!tag) return;
+    mergedByTag.set(tag, entry);
+  });
+  const scenarioIds = Array.from(new Set([
+    ...(Array.isArray(baseCatalog?.scenario_ids) ? baseCatalog.scenario_ids : []),
+    ...(Array.isArray(overlayCatalog?.scenario_ids) ? overlayCatalog.scenario_ids : []),
+  ]));
+  return {
+    ...(baseCatalog && typeof baseCatalog === "object" ? baseCatalog : {}),
+    ...(overlayCatalog && typeof overlayCatalog === "object" ? overlayCatalog : {}),
+    scenario_ids: scenarioIds,
+    entries: Array.from(mergedByTag.values()),
+  };
+}
+
 async function loadScenarioRegistry({ d3Client = globalThis.d3 } = {}) {
   if (state.scenarioRegistry) {
     return state.scenarioRegistry;
@@ -1208,6 +1241,38 @@ async function loadScenarioOptionalLayerPayload(
   }
 }
 
+function prewarmScenarioOptionalLayersOnCacheHit(
+  bundle,
+  {
+    d3Client = globalThis.d3,
+    manifest = bundle?.manifest,
+    runtimeTopologyPayload = bundle?.runtimeTopologyPayload,
+    hints = normalizeScenarioPerformanceHints(manifest),
+  } = {}
+) {
+  if (!bundle || !manifest) return;
+  bundle.optionalLayerPromises = bundle.optionalLayerPromises && typeof bundle.optionalLayerPromises === "object"
+    ? bundle.optionalLayerPromises
+    : {};
+  bundle.optionalLayerSettledByKey = bundle.optionalLayerSettledByKey
+    && typeof bundle.optionalLayerSettledByKey === "object"
+    ? bundle.optionalLayerSettledByKey
+    : {};
+  Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
+    .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, runtimeTopologyPayload, hints))
+    .forEach((layerKey) => {
+      if (bundle.optionalLayerSettledByKey[layerKey] === true || bundle.optionalLayerPromises[layerKey]) {
+        return;
+      }
+      loadScenarioOptionalLayerPayload(bundle, layerKey, { d3Client }).catch((error) => {
+        console.warn(
+          `[scenario] Failed to prewarm optional layer "${layerKey}" for "${getScenarioBundleId(bundle)}".`,
+          error
+        );
+      });
+    });
+}
+
 async function ensureActiveScenarioOptionalLayerLoaded(
   layerKey,
   {
@@ -1307,6 +1372,7 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     throw new Error("Scenario id is required.");
   }
   if (!forceReload && state.scenarioBundleCacheById?.[targetId]) {
+    prewarmScenarioOptionalLayersOnCacheHit(state.scenarioBundleCacheById[targetId], { d3Client });
     recordScenarioPerfMetric("loadScenarioBundle", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - loadStartedAt, {
       scenarioId: targetId,
       cacheHit: true,
@@ -1334,6 +1400,7 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     runtimeTopologyResult,
     geoLocalePatchResult,
     releasableCatalogResult,
+    districtGroupsResult,
   ] =
     await Promise.all([
     loadRequiredScenarioResource(d3Client, manifest.countries_url, {
@@ -1370,6 +1437,10 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
       scenarioId: targetId,
       resourceLabel: "releasable_catalog",
     }),
+    loadOptionalScenarioResource(d3Client, manifest.district_groups_url, {
+      scenarioId: targetId,
+      resourceLabel: "district_groups",
+    }),
     ]);
   const bundle = {
     meta,
@@ -1385,6 +1456,7 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     geoLocalePatchPayload: normalizeScenarioGeoLocalePatchPayload(geoLocalePatchResult.value),
     runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(runtimeTopologyResult.value),
     releasableCatalog: releasableCatalogResult.value,
+    districtGroupsPayload: normalizeScenarioDistrictGroupsPayload(districtGroupsResult.value, targetId),
     auditPayload: null,
     optionalLayerPromises: {},
     optionalLayerSettledByKey: {},
@@ -1404,6 +1476,11 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
           ok: !!releasableCatalogResult.ok,
           reason: releasableCatalogResult.reason,
           errorMessage: releasableCatalogResult.errorMessage,
+        },
+        district_groups: {
+          ok: !!districtGroupsResult.ok,
+          reason: districtGroupsResult.reason,
+          errorMessage: districtGroupsResult.errorMessage,
         },
       },
     },
@@ -1751,6 +1828,12 @@ function cloneScenarioStateValue(value) {
   if (typeof globalThis.structuredClone === "function") {
     return globalThis.structuredClone(value);
   }
+  if (value instanceof Map) {
+    return new Map(Array.from(value.entries(), ([key, entry]) => [
+      cloneScenarioStateValue(key),
+      cloneScenarioStateValue(entry),
+    ]));
+  }
   if (value instanceof Set) {
     return new Set(Array.from(value, (entry) => cloneScenarioStateValue(entry)));
   }
@@ -1779,6 +1862,8 @@ function captureScenarioApplyRollbackSnapshot() {
     scenarioWaterRegionsData: cloneScenarioStateValue(state.scenarioWaterRegionsData),
     scenarioSpecialRegionsData: cloneScenarioStateValue(state.scenarioSpecialRegionsData),
     scenarioReliefOverlaysData: cloneScenarioStateValue(state.scenarioReliefOverlaysData),
+    scenarioDistrictGroupsData: cloneScenarioStateValue(state.scenarioDistrictGroupsData),
+    scenarioDistrictGroupByFeatureId: cloneScenarioStateValue(state.scenarioDistrictGroupByFeatureId),
     scenarioReliefOverlayRevision: Number(state.scenarioReliefOverlayRevision) || 0,
     scenarioGeoLocalePatchData: cloneScenarioStateValue(state.scenarioGeoLocalePatchData),
     scenarioCityOverridesData: cloneScenarioStateValue(state.scenarioCityOverridesData),
@@ -1867,6 +1952,8 @@ function restoreScenarioApplyRollbackSnapshot(snapshot, { renderNow = false } = 
   state.scenarioWaterRegionsData = cloneScenarioStateValue(snapshot.scenarioWaterRegionsData);
   state.scenarioSpecialRegionsData = cloneScenarioStateValue(snapshot.scenarioSpecialRegionsData);
   state.scenarioReliefOverlaysData = cloneScenarioStateValue(snapshot.scenarioReliefOverlaysData);
+  state.scenarioDistrictGroupsData = cloneScenarioStateValue(snapshot.scenarioDistrictGroupsData);
+  state.scenarioDistrictGroupByFeatureId = cloneScenarioStateValue(snapshot.scenarioDistrictGroupByFeatureId) || new Map();
   state.scenarioReliefOverlayRevision = Number(snapshot.scenarioReliefOverlayRevision) || 0;
   state.scenarioGeoLocalePatchData = cloneScenarioStateValue(snapshot.scenarioGeoLocalePatchData);
   state.scenarioCityOverridesData = cloneScenarioStateValue(snapshot.scenarioCityOverridesData);
@@ -2059,6 +2146,7 @@ async function prepareScenarioApplyState(
     ...releasableCountries,
   };
   const runtimeTopologyPayload = bundle.runtimeTopologyPayload || null;
+  const districtGroupsPayload = normalizeScenarioDistrictGroupsPayload(bundle.districtGroupsPayload, scenarioId);
   const scenarioWaterRegionsFromTopology = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water");
   const scenarioSpecialRegionsFromTopology = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land");
   const scenarioContextLandMaskFromTopology =
@@ -2104,6 +2192,7 @@ async function prepareScenarioApplyState(
     defaultCountryCode,
     countryMap,
     runtimeTopologyPayload,
+    districtGroupsPayload,
     scenarioWaterRegionsFromTopology,
     scenarioSpecialRegionsFromTopology,
     scenarioContextLandMaskFromTopology,
@@ -2160,11 +2249,13 @@ async function applyScenarioBundle(
     state.scenarioSpecialRegionsData = staged.scenarioSpecialRegionsFromTopology || bundle.specialRegionsPayload || null;
     state.scenarioReliefOverlaysData = bundle.reliefOverlaysPayload || null;
     state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;
+    state.scenarioDistrictGroupsData = staged.districtGroupsPayload;
+    state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(staged.districtGroupsPayload);
     syncScenarioLocalizationState({
       cityOverridesPayload: bundle.cityOverridesPayload || null,
       geoLocalePatchPayload: bundle.geoLocalePatchPayload || null,
     });
-    state.releasableCatalog = bundle.releasableCatalog || state.defaultReleasableCatalog || null;
+    state.releasableCatalog = mergeReleasableCatalogs(state.defaultReleasableCatalog, bundle.releasableCatalog);
     state.scenarioReleasableIndex = staged.releasableIndex;
     state.scenarioAudit = bundle.auditPayload || null;
     setScenarioAuditUiState({
@@ -2437,6 +2528,8 @@ function clearActiveScenario(
   state.scenarioWaterRegionsData = null;
   state.scenarioSpecialRegionsData = null;
   state.scenarioReliefOverlaysData = null;
+  state.scenarioDistrictGroupsData = null;
+  state.scenarioDistrictGroupByFeatureId = new Map();
   state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;
   syncScenarioLocalizationState({
     cityOverridesPayload: null,

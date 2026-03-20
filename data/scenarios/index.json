@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "default_scenario_id": "tno_1962",
+  "default_scenario_id": "blank_base",
   "scenarios": [
     {
       "scenario_id": "blank_base",

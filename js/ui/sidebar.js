@@ -45,6 +45,7 @@ import {
   rebuildPresetState,
   setReleasableBoundaryVariant,
 } from "../core/releasable_manager.js";
+import { getScenarioCountryDisplayName } from "../core/scenario_country_display.js";
 import { setActivePaletteSource } from "../core/palette_manager.js";
 
 function extractCountryCodeFromId(value) {
@@ -149,7 +150,7 @@ function getDynamicCountryEntries() {
       .map(([rawCode, scenarioCountry]) => {
         const code = normalizeCountryCode(rawCode);
         if (!code) return null;
-        const name = String(scenarioCountry?.display_name || state.countryNames?.[code] || code).trim() || code;
+        const name = getScenarioCountryDisplayName(scenarioCountry, state.countryNames?.[code] || code) || code;
         const displayName = t(name, "geo") || name || code;
         const ownerFeatureCount = Number(scenarioCountry?.feature_count || 0) || 0;
         const controllerFeatureCount = Number(scenarioCountry?.controller_feature_count || 0) || 0;
@@ -1732,7 +1733,7 @@ function initSidebar({ render } = {}) {
       return inspectorState.displayName;
     }
     const scenarioCountry = state.scenarioCountriesByTag?.[normalized];
-    const scenarioName = String(scenarioCountry?.display_name || "").trim();
+    const scenarioName = getScenarioCountryDisplayName(scenarioCountry);
     if (scenarioName) {
       return t(scenarioName, "geo") || scenarioName;
     }
