@@ -135,10 +135,10 @@
                   </div>
                   <label class="toggle-label">
                     <input id="lakeLinkToOcean" type="checkbox" class="checkbox-input" checked />
-                    <span id="lblLakeLinkToOcean">Link Lakes To Ocean</span>
+                    <span id="lblLakeLinkToOcean" data-i18n="Link Lakes To Ocean">Link Lakes To Ocean</span>
                   </label>
                   <div class="flex items-center justify-between gap-3">
-                    <label id="lblLakeFillColor" class="range-label" for="lakeFillColor">Lake Fill Color</label>
+                    <label id="lblLakeFillColor" class="range-label" for="lakeFillColor" data-i18n="Lake Fill Color">Lake Fill Color</label>
                     <input id="lakeFillColor" type="color" value="#aadaff" class="color-input" />
                   </div>
                   <div>
@@ -856,13 +856,13 @@
                 <h2 id="lblTexture" class="section-header">Texture</h2>
                 <div class="space-y-3 mt-3">
                   <div class="flex items-center justify-between">
-                    <h3 id="lblTextureInfo" class="section-header">Texture Overlay</h3>
+                    <h3 id="lblTextureInfo" class="section-header" data-i18n="Texture Overlay">Texture Overlay</h3>
                     <div class="relative info-trigger">
                       <svg class="info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                         <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
                         <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
                       </svg>
-                      <div class="info-tooltip" style="width: 220px;">Apply a subtle overlay texture for a vintage map feel.</div>
+                      <div class="info-tooltip" style="width: 220px;" data-i18n="Apply a subtle overlay texture for a vintage map feel.">Apply a subtle overlay texture for a vintage map feel.</div>
                     </div>
                   </div>
                   <label id="lblOverlay" class="section-header-block mt-2" for="textureSelect">Overlay</label>
@@ -1020,10 +1020,10 @@
           </div>
 
           <div class="map-overlay-controls">
-            <button id="leftPanelToggle" class="panel-toggle panel-toggle-left" type="button" aria-controls="leftSidebar" aria-label="Toggle left panel">
+            <button id="leftPanelToggle" class="panel-toggle panel-toggle-left" type="button" aria-controls="leftSidebar" data-i18n="Panels" data-i18n-aria-label="Toggle left panel">
               Panels
             </button>
-            <button id="rightPanelToggle" class="panel-toggle panel-toggle-right" type="button" aria-controls="rightSidebar" aria-label="Toggle right panel">
+            <button id="rightPanelToggle" class="panel-toggle panel-toggle-right" type="button" aria-controls="rightSidebar" data-i18n="Inspector" data-i18n-aria-label="Toggle right panel">
               Inspector
             </button>
           </div>
@@ -1082,33 +1082,33 @@
           </div>
 
           <section id="bottomDock" class="bottom-dock" aria-labelledby="bottomDockHeading">
-            <h2 id="bottomDockHeading" class="visually-hidden">Quick edit dock</h2>
+            <h2 id="bottomDockHeading" class="visually-hidden" data-i18n="Quick edit dock">Quick edit dock</h2>
             <div class="dock-header-row">
-              <button id="dockCollapseBtn" type="button" class="dock-collapse-btn" aria-label="Collapse quick dock">Collapse</button>
+              <button id="dockCollapseBtn" type="button" class="dock-collapse-btn" data-i18n="Collapse" data-i18n-aria-label="Collapse quick dock">Collapse</button>
             </div>
             <div class="bottom-dock-primary">
               <div class="dock-group dock-group-tools">
                 <div id="lblCurrentTool" class="dock-group-label">Tools</div>
-                <div class="dock-button-row dock-button-row-tools" role="toolbar" aria-label="Current tool">
-                  <button id="toolFillBtn" class="btn-tool dock-tool-btn" data-tool="fill" type="button" aria-label="Fill tool" title="Fill tool">
+                <div class="dock-button-row dock-button-row-tools" role="toolbar" data-i18n-aria-label="Current tool">
+                  <button id="toolFillBtn" class="btn-tool dock-tool-btn" data-tool="fill" type="button" data-i18n-aria-label="Fill tool" data-i18n-title="Fill tool">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M14.5 4.5 19.5 9.5 10 19H5v-5l9.5-9.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
                       <path d="m12.5 6.5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
                     </svg>
                   </button>
-                  <button id="toolEraserBtn" class="btn-tool dock-tool-btn" data-tool="eraser" type="button" aria-label="Eraser tool" title="Eraser tool">
+                  <button id="toolEraserBtn" class="btn-tool dock-tool-btn" data-tool="eraser" type="button" data-i18n-aria-label="Eraser tool" data-i18n-title="Eraser tool">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="m8 16.5 7.8-7.8a2 2 0 0 1 2.8 0l.7.7a2 2 0 0 1 0 2.8L14 18H9.5L8 16.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
                       <path d="M4.5 18h9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
                     </svg>
                   </button>
-                  <button id="toolEyedropperBtn" class="btn-tool dock-tool-btn" data-tool="eyedropper" type="button" aria-label="Eyedropper tool" title="Eyedropper tool">
+                  <button id="toolEyedropperBtn" class="btn-tool dock-tool-btn" data-tool="eyedropper" type="button" data-i18n-aria-label="Eyedropper tool" data-i18n-title="Eyedropper tool">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="m14 6 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
                       <path d="m8 16 8.5-8.5a2.12 2.12 0 0 0-3-3L5 13v3h3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
                     </svg>
                   </button>
-                  <button id="brushModeBtn" class="dock-icon-btn dock-tool-btn" type="button" aria-label="Brush" title="Brush">
+                  <button id="brushModeBtn" class="dock-icon-btn dock-tool-btn" type="button" data-i18n-aria-label="Brush" data-i18n-title="Brush">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M7 15c-1.5 1-2 2.3-2 3.5 0 1.4 1.1 2.5 2.5 2.5 2.3 0 4.5-1.8 4.5-4.8 0-.7-.2-1.5-.6-2.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
                       <path d="m14 4 6 6-5.2 5.2a1.8 1.8 0 0 1-2.5 0l-3.5-3.5a1.8 1.8 0 0 1 0-2.5L14 4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
@@ -1125,16 +1125,16 @@
                     <option id="optPaintSubdivision" value="subdivision">By Subdivision</option>
                     <option id="optPaintCountry" value="country">By Country</option>
                   </select>
-                  <button id="politicalEditingToggleBtn" type="button" class="preset-action-btn">Political Editing</button>
-                  <button id="scenarioVisualAdjustmentsBtn" type="button" class="preset-action-btn hidden">Visual Adjustments</button>
+                  <button id="politicalEditingToggleBtn" type="button" class="preset-action-btn" data-i18n="Political Editing">Political Editing</button>
+                  <button id="scenarioVisualAdjustmentsBtn" type="button" class="preset-action-btn hidden" data-i18n="Visual Adjustments">Visual Adjustments</button>
                 </div>
                 <div id="dockQuickFillRow" class="dock-paint-secondary hidden">
                   <div id="dockQuickFillLabel" class="dock-paint-mini-label">Double-Click Quick Fill</div>
-                  <div class="mode-toggle-row dock-paint-toggle-row" role="group" aria-label="Double-click quick fill scope">
-                    <button id="quickFillParentBtn" type="button" class="mode-toggle-btn">By Parent</button>
-                    <button id="quickFillCountryBtn" type="button" class="mode-toggle-btn">By Country</button>
+                  <div class="mode-toggle-row dock-paint-toggle-row" role="group" data-i18n-aria-label="Double-click quick fill scope">
+                    <button id="quickFillParentBtn" type="button" class="mode-toggle-btn" data-i18n="By Parent">By Parent</button>
+                    <button id="quickFillCountryBtn" type="button" class="mode-toggle-btn" data-i18n="By Country">By Country</button>
                   </div>
-                  <div id="dockQuickFillHint" class="dock-paint-hint">Single-click: one subdivision | Double-click: parent</div>
+                  <div id="dockQuickFillHint" class="dock-paint-hint" data-i18n="Single-click: one subdivision | Double-click: parent">Single-click: one subdivision | Double-click: parent</div>
                 </div>
                 <div id="dockPoliticalEditingPanel" class="dock-political-panel hidden">
                   <div class="dock-paint-row">
@@ -1150,13 +1150,13 @@
               <div class="dock-group dock-group-history">
                 <div id="lblHistory" class="dock-group-label">History</div>
                 <div class="dock-icon-row">
-                  <button id="undoBtn" class="dock-icon-btn" type="button" aria-label="Undo" title="Undo">
+                  <button id="undoBtn" class="dock-icon-btn" type="button" data-i18n-aria-label="Undo" data-i18n-title="Undo">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M9 7 4 12l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
                       <path d="M20 12H5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
                     </svg>
                   </button>
-                  <button id="redoBtn" class="dock-icon-btn" type="button" aria-label="Redo" title="Redo">
+                  <button id="redoBtn" class="dock-icon-btn" type="button" data-i18n-aria-label="Redo" data-i18n-title="Redo">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="m15 7 5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
                       <path d="M4 12h15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
@@ -1168,10 +1168,10 @@
               <div class="dock-group dock-group-colors">
                 <div id="lblQuickPalette" class="dock-group-label">Quick Colors</div>
                 <div class="dock-color-row">
-                  <button id="selectedColorPreview" class="selected-color-preview" type="button" aria-label="Selected color preview"></button>
-                  <input id="customColor" type="color" value="#1f3a5f" class="color-input dock-custom-color" aria-label="Custom color" />
+                  <button id="selectedColorPreview" class="selected-color-preview" type="button" data-i18n-aria-label="Selected color preview"></button>
+                  <input id="customColor" type="color" value="#1f3a5f" class="color-input dock-custom-color" data-i18n-aria-label="Custom color" />
                   <select id="themeSelect" name="quick-palette-source" autocomplete="off" class="select-input dock-select">
-                    <option value="HOI4 Vanilla">HOI4 Vanilla</option>
+                    <option value="HOI4 Vanilla" data-i18n="HOI4 Vanilla">HOI4 Vanilla</option>
                   </select>
                 </div>
               </div>

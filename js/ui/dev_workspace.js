@@ -18,7 +18,7 @@ import {
   normalizeScenarioDistrictGroupsPayload,
   resolveFeatureGeoCountryCode,
 } from "../core/scenario_districts.js";
-import { buildTooltipModel, t } from "./i18n.js";
+import { applyDeclarativeTranslations, buildTooltipModel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 
 const DEV_WORKSPACE_STORAGE_KEY = "mapcreator_dev_workspace_expanded";
@@ -44,10 +44,16 @@ function ui(key) {
   return t(key, "ui");
 }
 
+function formatUi(key, replacements = {}) {
+  let text = ui(key);
+  Object.entries(replacements).forEach(([token, value]) => {
+    text = text.split(`{${token}}`).join(String(value));
+  });
+  return text;
+}
+
 function localizeSelectionSummary(count) {
-  return state.currentLanguage === "zh"
-    ? `${count} 个地块已选。`
-    : `${count} features selected.`;
+  return formatUi("{count} features selected.", { count });
 }
 
 function isLocalHost() {
@@ -1157,12 +1163,18 @@ function getScenarioGeoLocaleEntry(featureId) {
       ? state.scenarioGeoLocalePatchData.geo[normalizedFeatureId]
       : null)
     : null;
+  const effectiveEntry = normalizedFeatureId
+    ? (state.locales?.geo?.[normalizedFeatureId] && typeof state.locales.geo[normalizedFeatureId] === "object"
+      ? state.locales.geo[normalizedFeatureId]
+      : null)
+    : null;
   return {
     baseEntry,
     patchEntry,
+    effectiveEntry,
     mergedEntry: {
-      en: normalizeLocaleInput(patchEntry?.en || baseEntry?.en || ""),
-      zh: normalizeLocaleInput(patchEntry?.zh || baseEntry?.zh || ""),
+      en: normalizeLocaleInput(effectiveEntry?.en || patchEntry?.en || baseEntry?.en || ""),
+      zh: normalizeLocaleInput(effectiveEntry?.zh || patchEntry?.zh || baseEntry?.zh || ""),
     },
   };
 }
@@ -1358,291 +1370,6 @@ async function loadRuntimeMeta() {
   state.updateDevWorkspaceUIFn?.();
 }
 
-function createDevWorkspacePanelLegacy(bottomDock) {
-  let section = document.getElementById("devWorkspacePanel");
-  if (section || !bottomDock) return section;
-
-  section = document.createElement("section");
-  section.id = "devWorkspacePanel";
-  section.className = "dev-workspace-dock is-hidden";
-  section.innerHTML = `
-    <div class="dev-workspace-header">
-      <div class="dev-workspace-title-row">
-        <div>
-          <div class="section-header sidebar-tool-title">Dev Workspace</div>
-          <p id="devWorkspaceIntro" class="dev-workspace-note">Development tools take over the center dock while enabled.</p>
-        </div>
-      </div>
-    </div>
-    <div class="dev-workspace-grid">
-      <div class="dev-workspace-panel">
-        <div id="devFeatureInspectorLabel" class="dev-workspace-panel-title">Feature Inspector</div>
-        <div id="devFeatureInspectorTitle" class="section-header-block">No active feature</div>
-        <p id="devFeatureInspectorHint" class="dev-workspace-note">Hover a region or click one to inspect live debug metadata.</p>
-        <div id="devFeatureInspectorMeta" class="dev-workspace-meta"></div>
-      </div>
-      <div id="devScenarioTagCreatorPanel" class="dev-workspace-panel dev-workspace-panel-wide hidden">
-        <div id="devScenarioTagCreatorLabel" class="dev-workspace-panel-title">Scenario Tag Creator</div>
-        <div id="devScenarioTagCreatorTitle" class="section-header-block">No active scenario</div>
-        <p id="devScenarioTagCreatorHint" class="dev-workspace-note">Select one or more land features to create and assign a new scenario tag.</p>
-        <div id="devScenarioTagCreatorMeta" class="dev-workspace-meta"></div>
-        <label id="devScenarioTagLabel" class="dev-workspace-note" for="devScenarioTagInput">Tag</label>
-        <input
-          id="devScenarioTagInput"
-          class="input dev-workspace-input"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          maxlength="4"
-          placeholder="ABC"
-        />
-        <div id="devScenarioTagInlineStatus" class="dev-workspace-note"></div>
-        <label id="devScenarioTagNameEnLabel" class="dev-workspace-note" for="devScenarioTagNameEnInput">English Name</label>
-        <input
-          id="devScenarioTagNameEnInput"
-          class="input dev-workspace-input"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          placeholder="New Country"
-        />
-        <label id="devScenarioTagNameZhLabel" class="dev-workspace-note" for="devScenarioTagNameZhInput">Chinese Name</label>
-        <input
-          id="devScenarioTagNameZhInput"
-          class="input dev-workspace-input"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          placeholder="新国家"
-        />
-        <label id="devScenarioTagColorLabel" class="dev-workspace-note" for="devScenarioTagColorInput">Color Hex</label>
-        <input
-          id="devScenarioTagColorInput"
-          class="input dev-workspace-input"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          maxlength="7"
-          placeholder="#5D7CBA"
-        />
-        <label id="devScenarioTagParentLabel" class="dev-workspace-note" for="devScenarioTagParentInput">Parent Owner Tag</label>
-        <input
-          id="devScenarioTagParentInput"
-          class="input dev-workspace-input"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          maxlength="4"
-          placeholder="GER"
-        />
-        <div class="dev-workspace-actions">
-          <button id="devScenarioCreateTagBtn" type="button" class="btn-primary">Create Tag</button>
-          <button id="devScenarioClearTagBtn" type="button" class="btn-secondary">Clear</button>
-        </div>
-        <div id="devScenarioTagCreatorStatus" class="dev-workspace-note"></div>
-      </div>
-      <div id="devScenarioDistrictPanel" class="dev-workspace-panel hidden">
-        <div id="devScenarioDistrictLabel" class="dev-workspace-panel-title">Scenario District Editor</div>
-        <div id="devScenarioDistrictTitle" class="section-header-block">No active scenario</div>
-        <p id="devScenarioDistrictHint" class="dev-workspace-note">Choose a geo country code or select land features from one country to edit districts.</p>
-        <div id="devScenarioDistrictMeta" class="dev-workspace-meta"></div>
-        <label id="devScenarioDistrictCountryLabel" class="dev-workspace-note" for="devScenarioDistrictCountryInput">Geo Country</label>
-        <input
-          id="devScenarioDistrictCountryInput"
-          class="input dev-workspace-input"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          maxlength="3"
-          placeholder="DE"
-        />
-        <div id="devScenarioDistrictCountryModeNote" class="dev-workspace-note"></div>
-        <label id="devScenarioDistrictSelectLabel" class="dev-workspace-note" for="devScenarioDistrictSelect">District</label>
-        <select id="devScenarioDistrictSelect" class="select-input dev-workspace-select">
-          <option value="">Select district</option>
-        </select>
-        <label id="devScenarioDistrictIdLabel" class="dev-workspace-note" for="devScenarioDistrictIdInput">District ID</label>
-        <input
-          id="devScenarioDistrictIdInput"
-          class="input dev-workspace-input"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          maxlength="64"
-          placeholder="berlin"
-        />
-        <label id="devScenarioDistrictNameEnLabel" class="dev-workspace-note" for="devScenarioDistrictNameEnInput">English Name</label>
-        <input
-          id="devScenarioDistrictNameEnInput"
-          class="input dev-workspace-input"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          placeholder="Berlin"
-        />
-        <label id="devScenarioDistrictNameZhLabel" class="dev-workspace-note" for="devScenarioDistrictNameZhInput">Chinese Name</label>
-        <input
-          id="devScenarioDistrictNameZhInput"
-          class="input dev-workspace-input"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          placeholder="Berlin"
-        />
-        <div class="dev-workspace-actions">
-          <button id="devScenarioDistrictUseSelectionBtn" type="button" class="btn-secondary">Use Selection Country</button>
-          <button id="devScenarioDistrictClearBtn" type="button" class="btn-secondary">Clear</button>
-        </div>
-        <div class="dev-workspace-actions">
-          <button id="devScenarioDistrictUpsertBtn" type="button" class="btn-secondary">Upsert District</button>
-          <button id="devScenarioDistrictAssignBtn" type="button" class="btn-secondary">Assign Selection</button>
-          <button id="devScenarioDistrictRemoveBtn" type="button" class="btn-secondary">Remove Selection</button>
-        </div>
-        <div class="dev-workspace-actions">
-          <button id="devScenarioDistrictDeleteBtn" type="button" class="btn-secondary">Delete Empty District</button>
-          <button id="devScenarioDistrictSaveBtn" type="button" class="btn-primary">Save Districts File</button>
-        </div>
-        <div id="devScenarioDistrictStatus" class="dev-workspace-note"></div>
-      </div>
-      <div id="devScenarioLocalePanel" class="dev-workspace-panel hidden">
-        <div id="devScenarioLocaleLabel" class="dev-workspace-panel-title">Scenario Locale Editor</div>
-        <div id="devScenarioLocaleTitle" class="section-header-block">No active scenario</div>
-        <p id="devScenarioLocaleHint" class="dev-workspace-note">Select exactly one land feature to edit localized geo names.</p>
-        <div id="devScenarioLocaleMeta" class="dev-workspace-meta"></div>
-        <label id="devScenarioLocaleEnLabel" class="dev-workspace-note" for="devScenarioLocaleEnInput">Localized EN</label>
-        <input
-          id="devScenarioLocaleEnInput"
-          class="input dev-workspace-input"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          placeholder="Badghis"
-        />
-        <label id="devScenarioLocaleZhLabel" class="dev-workspace-note" for="devScenarioLocaleZhInput">Localized ZH</label>
-        <textarea
-          id="devScenarioLocaleZhInput"
-          class="input dev-workspace-input dev-workspace-textarea"
-          rows="2"
-          spellcheck="false"
-          placeholder="巴德吉斯"
-        ></textarea>
-        <div class="dev-workspace-actions">
-          <button id="devScenarioSaveLocaleBtn" type="button" class="btn-secondary">Save Localized Names</button>
-        </div>
-        <div id="devScenarioLocaleStatus" class="dev-workspace-note"></div>
-      </div>
-      <div id="devScenarioOwnershipPanel" class="dev-workspace-panel hidden">
-        <div id="devScenarioOwnershipLabel" class="dev-workspace-panel-title">Scenario Ownership Editor</div>
-        <div id="devScenarioOwnershipTitle" class="section-header-block">No active scenario</div>
-        <p id="devScenarioOwnershipHint" class="dev-workspace-note">Select one or more land features to edit political ownership.</p>
-        <div id="devScenarioOwnershipMeta" class="dev-workspace-meta"></div>
-        <label id="devScenarioOwnerInputLabel" class="dev-workspace-note" for="devScenarioOwnerInput">Target Owner Tag</label>
-        <input
-          id="devScenarioOwnerInput"
-          class="input dev-workspace-input"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          maxlength="8"
-          placeholder="GER"
-        />
-        <div class="dev-workspace-actions">
-          <button id="devScenarioApplyOwnerBtn" type="button" class="btn-primary">Apply to Selection</button>
-          <button id="devScenarioResetOwnerBtn" type="button" class="btn-secondary">Reset Selection</button>
-          <button id="devScenarioSaveOwnersBtn" type="button" class="btn-secondary">Save Owners File</button>
-        </div>
-        <div id="devScenarioOwnershipStatus" class="dev-workspace-note"></div>
-      </div>
-      <div class="dev-workspace-panel">
-        <div id="devRenderStatusLabel" class="dev-workspace-panel-title">Render Status</div>
-        <div id="devRenderStatusMeta" class="dev-workspace-meta"></div>
-      </div>
-      <div class="dev-workspace-panel">
-        <div id="devPaintMacrosLabel" class="dev-workspace-panel-title">Paint Macros</div>
-        <p id="devPaintMacrosHint" class="dev-workspace-note">These actions reuse the current tool mode and selected color or owner.</p>
-        <div class="dev-workspace-actions">
-          <button id="devMacroCountryBtn" type="button" class="btn-secondary">Fill Country</button>
-          <button id="devMacroParentBtn" type="button" class="btn-secondary">Fill Parent Group</button>
-          <button id="devMacroOwnerBtn" type="button" class="btn-secondary">Fill Owner Scope</button>
-          <button id="devMacroSelectionBtn" type="button" class="btn-secondary">Fill Multi-Selection</button>
-        </div>
-      </div>
-      <div class="dev-workspace-panel">
-        <div id="devSelectionClipboardLabel" class="dev-workspace-panel-title">Selection Clipboard</div>
-        <div class="dev-workspace-actions">
-          <button id="devSelectionAddHoveredBtn" type="button" class="btn-secondary">Add Hovered</button>
-          <button id="devSelectionToggleSelectedBtn" type="button" class="btn-secondary">Toggle Selected</button>
-          <button id="devSelectionRemoveLastBtn" type="button" class="btn-secondary">Remove Last</button>
-          <button id="devSelectionClearBtn" type="button" class="btn-secondary">Clear Selection</button>
-        </div>
-        <div class="dev-workspace-actions">
-          <label id="devSelectionSortLabel" class="dev-workspace-note" for="devSelectionSortMode">Sort</label>
-          <select id="devSelectionSortMode" class="select-input dev-workspace-select">
-            <option value="selection">Selection Order</option>
-            <option value="name">Name</option>
-          </select>
-        </div>
-        <div class="dev-workspace-actions">
-          <button id="devCopyNamesBtn" type="button" class="btn-primary">Copy Names</button>
-          <button id="devCopyNamesIdsBtn" type="button" class="btn-primary">Copy Names + ID</button>
-          <button id="devCopyIdsBtn" type="button" class="btn-primary">Copy ID</button>
-        </div>
-        <div id="devSelectionSummary" class="dev-workspace-note">0 features selected.</div>
-        <textarea id="devSelectionPreview" class="dev-selection-preview" readonly aria-label="Development selection preview"></textarea>
-      </div>
-      <div class="dev-workspace-panel">
-        <div id="devLocalRuntimeLabel" class="dev-workspace-panel-title">Local Runtime</div>
-        <div id="devRuntimeTitle" class="section-header-block">Runtime metadata unavailable</div>
-        <p id="devRuntimeHint" class="dev-workspace-note"></p>
-        <div id="devRuntimeMeta" class="dev-workspace-meta"></div>
-      </div>
-    </div>
-  `;
-
-  const workspaceGrid = section.querySelector(".dev-workspace-grid");
-  const featureInspectorPanel = section.querySelector("#devFeatureInspectorTitle")?.closest(".dev-workspace-panel");
-  const tagCreatorPanel = section.querySelector("#devScenarioTagCreatorPanel");
-  const tagColorLabel = section.querySelector("#devScenarioTagColorLabel");
-  const tagColorInput = section.querySelector("#devScenarioTagColorInput");
-  const tagParentLabel = section.querySelector("#devScenarioTagParentLabel");
-  if (workspaceGrid && featureInspectorPanel) {
-    workspaceGrid.appendChild(featureInspectorPanel);
-  }
-  if (tagCreatorPanel) {
-    tagCreatorPanel.classList.add("dev-workspace-panel-wide");
-  }
-  if (tagColorLabel && tagColorInput && tagParentLabel) {
-    const colorField = document.createElement("div");
-    colorField.className = "dev-workspace-form-field dev-workspace-form-field--span-2";
-    colorField.innerHTML = `
-      <div class="dev-workspace-inline-row">
-        <label id="devScenarioTagColorPaletteLabel" class="dev-workspace-note" for="devScenarioTagPalette">Color Palette</label>
-        <div class="dev-workspace-color-anchor">
-          <button id="devScenarioTagColorPreview" type="button" class="dev-workspace-color-preview dev-workspace-color-trigger" aria-haspopup="dialog" aria-expanded="false">#5D7CBA</button>
-          <div id="devScenarioTagColorPopover" class="dev-workspace-color-popover hidden" role="dialog" aria-label="Custom tag color">
-            <button id="devScenarioTagCustomColorBtn" type="button" class="btn-secondary">Custom...</button>
-          </div>
-        </div>
-      </div>
-      <div id="devScenarioTagPalette" class="dev-workspace-swatch-grid" role="listbox" aria-label="Scenario tag color palette"></div>
-      <div id="devScenarioTagRecentWrap" class="dev-workspace-form-field hidden">
-        <label id="devScenarioTagRecentLabel" class="dev-workspace-note" for="devScenarioTagRecentColors">Recent Colors</label>
-        <div id="devScenarioTagRecentColors" class="dev-workspace-swatch-row" role="listbox" aria-label="Recent scenario tag colors"></div>
-      </div>
-    `;
-    tagColorLabel.remove();
-    tagColorInput.type = "color";
-    tagColorInput.className = "dev-workspace-native-color-input";
-    tagColorInput.setAttribute("aria-hidden", "true");
-    tagColorInput.tabIndex = -1;
-    tagCreatorPanel.insertBefore(colorField, tagParentLabel);
-  }
-
-  const headerRow = bottomDock.querySelector(".dock-header-row");
-  bottomDock.insertBefore(section, headerRow?.nextSibling || bottomDock.firstChild || null);
-  return section;
-}
-
 function createDevWorkspacePanel(bottomDock) {
   let section = document.getElementById("devWorkspacePanel");
   if (section || !bottomDock) return section;
@@ -1654,52 +1381,52 @@ function createDevWorkspacePanel(bottomDock) {
     <div class="dev-workspace-header">
       <div class="dev-workspace-title-row">
         <div>
-          <div class="section-header sidebar-tool-title">Dev Workspace</div>
-          <p id="devWorkspaceIntro" class="dev-workspace-note">Development tools take over the center dock while enabled.</p>
+          <div class="section-header sidebar-tool-title" data-i18n="Dev Workspace"></div>
+          <p id="devWorkspaceIntro" class="dev-workspace-note" data-i18n="Development tools take over the center dock while enabled."></p>
         </div>
       </div>
     </div>
     <div class="dev-workspace-grid">
       <div id="devScenarioTagCreatorPanel" class="dev-workspace-panel dev-workspace-panel-wide hidden">
-        <div id="devScenarioTagCreatorLabel" class="dev-workspace-panel-title">Scenario Tag Creator</div>
-        <div id="devScenarioTagCreatorTitle" class="section-header-block">No active scenario</div>
-        <p id="devScenarioTagCreatorHint" class="dev-workspace-note">Select one or more land features to create and assign a new scenario tag.</p>
+        <div id="devScenarioTagCreatorLabel" class="dev-workspace-panel-title" data-i18n="Scenario Tag Creator"></div>
+        <div id="devScenarioTagCreatorTitle" class="section-header-block"></div>
+        <p id="devScenarioTagCreatorHint" class="dev-workspace-note"></p>
         <div id="devScenarioTagCreatorMeta" class="dev-workspace-meta"></div>
         <div class="dev-workspace-form-grid">
           <div class="dev-workspace-form-field">
-            <label id="devScenarioTagLabel" class="dev-workspace-note" for="devScenarioTagInput">Tag</label>
+            <label id="devScenarioTagLabel" class="dev-workspace-note" for="devScenarioTagInput" data-i18n="Tag"></label>
             <input id="devScenarioTagInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" maxlength="4" placeholder="ABC" />
             <div id="devScenarioTagFieldStatus" class="dev-workspace-field-status"></div>
           </div>
           <div class="dev-workspace-form-field">
-            <label id="devScenarioTagParentLabel" class="dev-workspace-note" for="devScenarioTagParentInput">Parent Owner Tag</label>
+            <label id="devScenarioTagParentLabel" class="dev-workspace-note" for="devScenarioTagParentInput" data-i18n="Parent Owner Tag"></label>
             <input id="devScenarioTagParentInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" maxlength="4" placeholder="GER" />
           </div>
           <div class="dev-workspace-form-field">
-            <label id="devScenarioTagNameEnLabel" class="dev-workspace-note" for="devScenarioTagNameEnInput">English Name</label>
-            <input id="devScenarioTagNameEnInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" placeholder="New Country" />
+            <label id="devScenarioTagNameEnLabel" class="dev-workspace-note" for="devScenarioTagNameEnInput" data-i18n="English Name"></label>
+            <input id="devScenarioTagNameEnInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" data-i18n-placeholder="New Country" />
           </div>
           <div class="dev-workspace-form-field">
-            <label id="devScenarioTagNameZhLabel" class="dev-workspace-note" for="devScenarioTagNameZhInput">Chinese Name</label>
-            <input id="devScenarioTagNameZhInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" placeholder="New Country" />
+            <label id="devScenarioTagNameZhLabel" class="dev-workspace-note" for="devScenarioTagNameZhInput" data-i18n="Chinese Name"></label>
+            <input id="devScenarioTagNameZhInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" data-i18n-placeholder="New Country" />
           </div>
           <div class="dev-workspace-form-field dev-workspace-form-field-span-2">
             <div class="dev-workspace-inline-row">
-              <label id="devScenarioTagColorPaletteLabel" class="dev-workspace-note" for="devScenarioTagColorPreviewBtn">Color Palette</label>
+              <label id="devScenarioTagColorPaletteLabel" class="dev-workspace-note" for="devScenarioTagColorPreviewBtn" data-i18n="Color Palette"></label>
               <button id="devScenarioTagColorPreviewBtn" type="button" class="dev-workspace-color-preview-button">
                 <span id="devScenarioTagColorPreview" class="dev-workspace-color-preview">#5D7CBA</span>
               </button>
             </div>
-            <div id="devScenarioTagPalette" class="dev-workspace-swatch-grid" role="listbox" aria-label="Scenario tag color palette"></div>
+            <div id="devScenarioTagPalette" class="dev-workspace-swatch-grid" role="listbox" data-i18n-aria-label="Scenario tag color palette"></div>
             <div id="devScenarioTagRecentWrap" class="dev-workspace-form-field hidden">
-              <label id="devScenarioTagRecentLabel" class="dev-workspace-note" for="devScenarioTagRecentColors">Recent Colors</label>
-              <div id="devScenarioTagRecentColors" class="dev-workspace-swatch-row" role="listbox" aria-label="Recent scenario tag colors"></div>
+              <label id="devScenarioTagRecentLabel" class="dev-workspace-note" for="devScenarioTagRecentColors" data-i18n="Recent Colors"></label>
+              <div id="devScenarioTagRecentColors" class="dev-workspace-swatch-row" role="listbox" data-i18n-aria-label="Recent scenario tag colors"></div>
             </div>
             <div id="devScenarioTagColorPopoverAnchor" class="dev-workspace-color-popover-anchor">
               <div id="devScenarioTagColorPopover" class="dev-workspace-color-popover hidden" role="dialog" aria-modal="false">
-                <div id="devScenarioTagColorPopoverLabel" class="dev-workspace-note">Custom Color</div>
+                <div id="devScenarioTagColorPopoverLabel" class="dev-workspace-note" data-i18n="Custom Color"></div>
                 <div class="dev-workspace-actions">
-                  <button id="devScenarioTagColorCustomBtn" type="button" class="btn-secondary">Custom...</button>
+                  <button id="devScenarioTagColorCustomBtn" type="button" class="btn-secondary" data-i18n="Custom..."></button>
                 </div>
               </div>
             </div>
@@ -1707,119 +1434,119 @@ function createDevWorkspacePanel(bottomDock) {
           </div>
         </div>
         <div class="dev-workspace-actions">
-          <button id="devScenarioClearTagBtn" type="button" class="btn-secondary">Clear</button>
-          <button id="devScenarioCreateTagBtn" type="button" class="btn-primary">Create Tag</button>
+          <button id="devScenarioClearTagBtn" type="button" class="btn-secondary" data-i18n="Clear"></button>
+          <button id="devScenarioCreateTagBtn" type="button" class="btn-primary" data-i18n="Create Tag"></button>
         </div>
         <div id="devScenarioTagCreatorStatus" class="dev-workspace-note"></div>
       </div>
       <div id="devScenarioDistrictPanel" class="dev-workspace-panel hidden">
-        <div id="devScenarioDistrictLabel" class="dev-workspace-panel-title">Scenario District Editor</div>
-        <div id="devScenarioDistrictTitle" class="section-header-block">No active scenario</div>
-        <p id="devScenarioDistrictHint" class="dev-workspace-note">Choose a geo country code or select land features from one country to edit districts.</p>
+        <div id="devScenarioDistrictLabel" class="dev-workspace-panel-title" data-i18n="Scenario District Editor"></div>
+        <div id="devScenarioDistrictTitle" class="section-header-block"></div>
+        <p id="devScenarioDistrictHint" class="dev-workspace-note"></p>
         <div id="devScenarioDistrictMeta" class="dev-workspace-meta"></div>
-        <label id="devScenarioDistrictCountryLabel" class="dev-workspace-note" for="devScenarioDistrictCountryInput">Geo Country</label>
+        <label id="devScenarioDistrictCountryLabel" class="dev-workspace-note" for="devScenarioDistrictCountryInput" data-i18n="Geo Country"></label>
         <input id="devScenarioDistrictCountryInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" maxlength="3" placeholder="DE" />
         <div id="devScenarioDistrictCountryModeNote" class="dev-workspace-note"></div>
         <div class="dev-workspace-actions">
-          <button id="devScenarioDistrictUseSelectionBtn" type="button" class="btn-secondary">Use Selection Country</button>
-          <button id="devScenarioDistrictClearBtn" type="button" class="btn-secondary">Clear</button>
+          <button id="devScenarioDistrictUseSelectionBtn" type="button" class="btn-secondary" data-i18n="Use Selection Country"></button>
+          <button id="devScenarioDistrictClearBtn" type="button" class="btn-secondary" data-i18n="Clear"></button>
         </div>
-        <label id="devScenarioDistrictSelectLabel" class="dev-workspace-note" for="devScenarioDistrictSelect">District</label>
+        <label id="devScenarioDistrictSelectLabel" class="dev-workspace-note" for="devScenarioDistrictSelect" data-i18n="District"></label>
         <select id="devScenarioDistrictSelect" class="select-input dev-workspace-select">
-          <option value="">Select district</option>
+          <option value="" data-i18n="Select district"></option>
         </select>
-        <label id="devScenarioDistrictIdLabel" class="dev-workspace-note" for="devScenarioDistrictIdInput">District ID</label>
+        <label id="devScenarioDistrictIdLabel" class="dev-workspace-note" for="devScenarioDistrictIdInput" data-i18n="District ID"></label>
         <input id="devScenarioDistrictIdInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" maxlength="64" placeholder="berlin" />
-        <label id="devScenarioDistrictNameEnLabel" class="dev-workspace-note" for="devScenarioDistrictNameEnInput">English Name</label>
-        <input id="devScenarioDistrictNameEnInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" placeholder="Berlin" />
-        <label id="devScenarioDistrictNameZhLabel" class="dev-workspace-note" for="devScenarioDistrictNameZhInput">Chinese Name</label>
-        <input id="devScenarioDistrictNameZhInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" placeholder="Berlin" />
+        <label id="devScenarioDistrictNameEnLabel" class="dev-workspace-note" for="devScenarioDistrictNameEnInput" data-i18n="English Name"></label>
+        <input id="devScenarioDistrictNameEnInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" data-i18n-placeholder="Berlin" />
+        <label id="devScenarioDistrictNameZhLabel" class="dev-workspace-note" for="devScenarioDistrictNameZhInput" data-i18n="Chinese Name"></label>
+        <input id="devScenarioDistrictNameZhInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" data-i18n-placeholder="Berlin" />
         <div class="dev-workspace-actions">
-          <button id="devScenarioDistrictUpsertBtn" type="button" class="btn-secondary">Upsert District</button>
-          <button id="devScenarioDistrictAssignBtn" type="button" class="btn-secondary">Assign Selection</button>
-          <button id="devScenarioDistrictRemoveBtn" type="button" class="btn-secondary">Remove Selection</button>
+          <button id="devScenarioDistrictUpsertBtn" type="button" class="btn-secondary" data-i18n="Upsert District"></button>
+          <button id="devScenarioDistrictAssignBtn" type="button" class="btn-secondary" data-i18n="Assign Selection"></button>
+          <button id="devScenarioDistrictRemoveBtn" type="button" class="btn-secondary" data-i18n="Remove Selection"></button>
         </div>
         <div class="dev-workspace-actions">
-          <button id="devScenarioDistrictDeleteBtn" type="button" class="btn-secondary">Delete Empty District</button>
-          <button id="devScenarioDistrictSaveBtn" type="button" class="btn-primary">Save Districts File</button>
+          <button id="devScenarioDistrictDeleteBtn" type="button" class="btn-secondary" data-i18n="Delete Empty District"></button>
+          <button id="devScenarioDistrictSaveBtn" type="button" class="btn-primary" data-i18n="Save Districts File"></button>
         </div>
         <div id="devScenarioDistrictStatus" class="dev-workspace-note"></div>
       </div>
       <div id="devScenarioLocalePanel" class="dev-workspace-panel hidden">
-        <div id="devScenarioLocaleLabel" class="dev-workspace-panel-title">Scenario Locale Editor</div>
-        <div id="devScenarioLocaleTitle" class="section-header-block">No active scenario</div>
-        <p id="devScenarioLocaleHint" class="dev-workspace-note">Select exactly one land feature to edit localized geo names.</p>
+        <div id="devScenarioLocaleLabel" class="dev-workspace-panel-title" data-i18n="Scenario Locale Editor"></div>
+        <div id="devScenarioLocaleTitle" class="section-header-block"></div>
+        <p id="devScenarioLocaleHint" class="dev-workspace-note"></p>
         <div id="devScenarioLocaleMeta" class="dev-workspace-meta"></div>
-        <label id="devScenarioLocaleEnLabel" class="dev-workspace-note" for="devScenarioLocaleEnInput">Localized EN</label>
-        <input id="devScenarioLocaleEnInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" placeholder="Badghis" />
-        <label id="devScenarioLocaleZhLabel" class="dev-workspace-note" for="devScenarioLocaleZhInput">Localized ZH</label>
-        <textarea id="devScenarioLocaleZhInput" class="input dev-workspace-input dev-workspace-textarea" rows="2" spellcheck="false" placeholder="Localized name"></textarea>
+        <label id="devScenarioLocaleEnLabel" class="dev-workspace-note" for="devScenarioLocaleEnInput" data-i18n="Localized EN"></label>
+        <input id="devScenarioLocaleEnInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" data-i18n-placeholder="Badghis" />
+        <label id="devScenarioLocaleZhLabel" class="dev-workspace-note" for="devScenarioLocaleZhInput" data-i18n="Localized ZH"></label>
+        <textarea id="devScenarioLocaleZhInput" class="input dev-workspace-input dev-workspace-textarea" rows="2" spellcheck="false" data-i18n-placeholder="Localized name"></textarea>
         <div class="dev-workspace-actions">
-          <button id="devScenarioSaveLocaleBtn" type="button" class="btn-secondary">Save Localized Names</button>
+          <button id="devScenarioSaveLocaleBtn" type="button" class="btn-secondary" data-i18n="Save Localized Names"></button>
         </div>
         <div id="devScenarioLocaleStatus" class="dev-workspace-note"></div>
       </div>
       <div id="devScenarioOwnershipPanel" class="dev-workspace-panel hidden">
-        <div id="devScenarioOwnershipLabel" class="dev-workspace-panel-title">Scenario Ownership Editor</div>
-        <div id="devScenarioOwnershipTitle" class="section-header-block">No active scenario</div>
-        <p id="devScenarioOwnershipHint" class="dev-workspace-note">Select one or more land features to edit political ownership.</p>
+        <div id="devScenarioOwnershipLabel" class="dev-workspace-panel-title" data-i18n="Scenario Ownership Editor"></div>
+        <div id="devScenarioOwnershipTitle" class="section-header-block"></div>
+        <p id="devScenarioOwnershipHint" class="dev-workspace-note"></p>
         <div id="devScenarioOwnershipMeta" class="dev-workspace-meta"></div>
-        <label id="devScenarioOwnerInputLabel" class="dev-workspace-note" for="devScenarioOwnerInput">Target Owner Tag</label>
+        <label id="devScenarioOwnerInputLabel" class="dev-workspace-note" for="devScenarioOwnerInput" data-i18n="Target Owner Tag"></label>
         <input id="devScenarioOwnerInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" maxlength="8" placeholder="GER" />
         <div class="dev-workspace-actions">
-          <button id="devScenarioApplyOwnerBtn" type="button" class="btn-primary">Apply to Selection</button>
-          <button id="devScenarioResetOwnerBtn" type="button" class="btn-secondary">Reset Selection</button>
-          <button id="devScenarioSaveOwnersBtn" type="button" class="btn-secondary">Save Owners File</button>
+          <button id="devScenarioApplyOwnerBtn" type="button" class="btn-primary" data-i18n="Apply to Selection"></button>
+          <button id="devScenarioResetOwnerBtn" type="button" class="btn-secondary" data-i18n="Reset Selection"></button>
+          <button id="devScenarioSaveOwnersBtn" type="button" class="btn-secondary" data-i18n="Save Owners File"></button>
         </div>
         <div id="devScenarioOwnershipStatus" class="dev-workspace-note"></div>
       </div>
       <div class="dev-workspace-panel">
-        <div id="devRenderStatusLabel" class="dev-workspace-panel-title">Render Status</div>
+        <div id="devRenderStatusLabel" class="dev-workspace-panel-title" data-i18n="Render Status"></div>
         <div id="devRenderStatusMeta" class="dev-workspace-meta"></div>
       </div>
       <div class="dev-workspace-panel">
-        <div id="devPaintMacrosLabel" class="dev-workspace-panel-title">Paint Macros</div>
-        <p id="devPaintMacrosHint" class="dev-workspace-note">These actions reuse the current tool mode and selected color or owner.</p>
+        <div id="devPaintMacrosLabel" class="dev-workspace-panel-title" data-i18n="Paint Macros"></div>
+        <p id="devPaintMacrosHint" class="dev-workspace-note" data-i18n="These actions reuse the current tool mode and selected color or owner."></p>
         <div class="dev-workspace-actions">
-          <button id="devMacroCountryBtn" type="button" class="btn-secondary">Fill Country</button>
-          <button id="devMacroParentBtn" type="button" class="btn-secondary">Fill Parent Group</button>
-          <button id="devMacroOwnerBtn" type="button" class="btn-secondary">Fill Owner Scope</button>
-          <button id="devMacroSelectionBtn" type="button" class="btn-secondary">Fill Multi-Selection</button>
+          <button id="devMacroCountryBtn" type="button" class="btn-secondary" data-i18n="Fill Country"></button>
+          <button id="devMacroParentBtn" type="button" class="btn-secondary" data-i18n="Fill Parent Group"></button>
+          <button id="devMacroOwnerBtn" type="button" class="btn-secondary" data-i18n="Fill Owner Scope"></button>
+          <button id="devMacroSelectionBtn" type="button" class="btn-secondary" data-i18n="Fill Multi-Selection"></button>
         </div>
       </div>
       <div class="dev-workspace-panel">
-        <div id="devSelectionClipboardLabel" class="dev-workspace-panel-title">Selection Clipboard</div>
+        <div id="devSelectionClipboardLabel" class="dev-workspace-panel-title" data-i18n="Selection Clipboard"></div>
         <div class="dev-workspace-actions">
-          <button id="devSelectionAddHoveredBtn" type="button" class="btn-secondary">Add Hovered</button>
-          <button id="devSelectionToggleSelectedBtn" type="button" class="btn-secondary">Toggle Selected</button>
-          <button id="devSelectionRemoveLastBtn" type="button" class="btn-secondary">Remove Last</button>
-          <button id="devSelectionClearBtn" type="button" class="btn-secondary">Clear Selection</button>
+          <button id="devSelectionAddHoveredBtn" type="button" class="btn-secondary" data-i18n="Add Hovered"></button>
+          <button id="devSelectionToggleSelectedBtn" type="button" class="btn-secondary" data-i18n="Toggle Selected"></button>
+          <button id="devSelectionRemoveLastBtn" type="button" class="btn-secondary" data-i18n="Remove Last"></button>
+          <button id="devSelectionClearBtn" type="button" class="btn-secondary" data-i18n="Clear Selection"></button>
         </div>
         <div class="dev-workspace-actions">
-          <label id="devSelectionSortLabel" class="dev-workspace-note" for="devSelectionSortMode">Sort</label>
+          <label id="devSelectionSortLabel" class="dev-workspace-note" for="devSelectionSortMode" data-i18n="Sort"></label>
           <select id="devSelectionSortMode" class="select-input dev-workspace-select">
-            <option value="selection">Selection Order</option>
-            <option value="name">Name</option>
+            <option value="selection" data-i18n="Selection Order"></option>
+            <option value="name" data-i18n="Name"></option>
           </select>
         </div>
         <div class="dev-workspace-actions">
-          <button id="devCopyNamesBtn" type="button" class="btn-primary">Copy Names</button>
-          <button id="devCopyNamesIdsBtn" type="button" class="btn-primary">Copy Names + ID</button>
-          <button id="devCopyIdsBtn" type="button" class="btn-primary">Copy ID</button>
+          <button id="devCopyNamesBtn" type="button" class="btn-primary" data-i18n="Copy Names"></button>
+          <button id="devCopyNamesIdsBtn" type="button" class="btn-primary" data-i18n="Copy Names + ID"></button>
+          <button id="devCopyIdsBtn" type="button" class="btn-primary" data-i18n="Copy ID"></button>
         </div>
-        <div id="devSelectionSummary" class="dev-workspace-note">0 features selected.</div>
-        <textarea id="devSelectionPreview" class="dev-selection-preview" readonly aria-label="Development selection preview"></textarea>
+        <div id="devSelectionSummary" class="dev-workspace-note"></div>
+        <textarea id="devSelectionPreview" class="dev-selection-preview" readonly data-i18n-aria-label="Development selection preview"></textarea>
       </div>
       <div class="dev-workspace-panel">
-        <div id="devLocalRuntimeLabel" class="dev-workspace-panel-title">Local Runtime</div>
-        <div id="devRuntimeTitle" class="section-header-block">Runtime metadata unavailable</div>
+        <div id="devLocalRuntimeLabel" class="dev-workspace-panel-title" data-i18n="Local Runtime"></div>
+        <div id="devRuntimeTitle" class="section-header-block" data-i18n="Runtime metadata unavailable"></div>
         <p id="devRuntimeHint" class="dev-workspace-note"></p>
         <div id="devRuntimeMeta" class="dev-workspace-meta"></div>
       </div>
       <div class="dev-workspace-panel">
-        <div id="devFeatureInspectorLabel" class="dev-workspace-panel-title">Feature Inspector</div>
-        <div id="devFeatureInspectorTitle" class="section-header-block">No active feature</div>
-        <p id="devFeatureInspectorHint" class="dev-workspace-note">Hover a region or click one to inspect live debug metadata.</p>
+        <div id="devFeatureInspectorLabel" class="dev-workspace-panel-title" data-i18n="Feature Inspector"></div>
+        <div id="devFeatureInspectorTitle" class="section-header-block" data-i18n="No active feature"></div>
+        <p id="devFeatureInspectorHint" class="dev-workspace-note" data-i18n="Hover a region or click one to inspect live debug metadata."></p>
         <div id="devFeatureInspectorMeta" class="dev-workspace-meta"></div>
       </div>
     </div>
@@ -1827,6 +1554,7 @@ function createDevWorkspacePanel(bottomDock) {
 
   const headerRow = bottomDock.querySelector(".dock-header-row");
   bottomDock.insertBefore(section, headerRow?.nextSibling || bottomDock.firstChild || null);
+  applyDeclarativeTranslations(section);
   return section;
 }
 
@@ -1878,7 +1606,7 @@ function copySelectionToClipboard(format, previewEl) {
   const text = buildClipboardText(format);
   state.devClipboardPreviewFormat = format;
   if (!text) {
-    showToast("No selected regions to copy.", {
+    showToast(ui("No selected regions to copy."), {
       title: ui("Selection Clipboard"),
       tone: "warning",
     });
@@ -1901,11 +1629,8 @@ function copySelectionToClipboard(format, previewEl) {
 
   globalThis.navigator.clipboard.writeText(text)
     .then(() => {
-      showToast(
-        state.currentLanguage === "zh"
-          ? `已复制 ${sortSelectionEntries(resolveSelectionEntries()).length} 条地块记录到剪贴板。`
-          : `Copied ${sortSelectionEntries(resolveSelectionEntries()).length} region entries to the clipboard.`,
-        {
+      const entryCount = sortSelectionEntries(resolveSelectionEntries()).length;
+      showToast(formatUi("Copied {count} region entries to the clipboard.", { count: entryCount }), {
         title: ui("Selection copied"),
         tone: "success",
       });
@@ -1987,62 +1712,7 @@ function initDevWorkspace() {
   const selectionPreview = panel.querySelector("#devSelectionPreview");
   const selectionSortMode = panel.querySelector("#devSelectionSortMode");
 
-  const setPanelText = (selector, text) => {
-    const element = panel.querySelector(selector);
-    if (element) {
-      element.textContent = text;
-    }
-  };
-
   const renderWorkspace = () => {
-    setPanelText("#devWorkspaceIntro", ui("Development tools take over the center dock while enabled."));
-    setPanelText("#devFeatureInspectorLabel", ui("Feature Inspector"));
-    setPanelText("#devScenarioTagCreatorLabel", ui("Scenario Tag Creator"));
-    setPanelText("#devScenarioTagLabel", ui("Tag"));
-    setPanelText("#devScenarioTagNameEnLabel", ui("English Name"));
-    setPanelText("#devScenarioTagNameZhLabel", ui("Chinese Name"));
-    setPanelText("#devScenarioTagColorPaletteLabel", ui("Color Palette"));
-    setPanelText("#devScenarioTagColorPopoverLabel", ui("Custom Color"));
-    setPanelText("#devScenarioTagRecentLabel", ui("Recent Colors"));
-    setPanelText("#devScenarioTagParentLabel", ui("Parent Owner Tag"));
-    setPanelText("#devScenarioTagColorCustomBtn", ui("Custom..."));
-    setPanelText("#devScenarioClearTagBtn", ui("Clear"));
-    setPanelText("#devScenarioCreateTagBtn", ui("Create Tag"));
-    setPanelText("#devScenarioDistrictLabel", ui("Scenario District Editor"));
-    setPanelText("#devScenarioDistrictCountryLabel", ui("Geo Country"));
-    setPanelText("#devScenarioDistrictUseSelectionBtn", ui("Use Selection Country"));
-    setPanelText("#devScenarioDistrictClearBtn", ui("Clear"));
-    setPanelText("#devScenarioDistrictSelectLabel", ui("District"));
-    setPanelText("#devScenarioDistrictIdLabel", ui("District ID"));
-    setPanelText("#devScenarioDistrictNameEnLabel", ui("English Name"));
-    setPanelText("#devScenarioDistrictNameZhLabel", ui("Chinese Name"));
-    setPanelText("#devScenarioLocaleLabel", ui("Scenario Locale Editor"));
-    setPanelText("#devScenarioLocaleEnLabel", ui("Localized EN"));
-    setPanelText("#devScenarioLocaleZhLabel", ui("Localized ZH"));
-    setPanelText("#devScenarioOwnershipLabel", ui("Scenario Ownership Editor"));
-    setPanelText("#devScenarioOwnerInputLabel", ui("Target Owner Tag"));
-    setPanelText("#devRenderStatusLabel", ui("Render Status"));
-    setPanelText("#devPaintMacrosLabel", ui("Paint Macros"));
-    setPanelText("#devPaintMacrosHint", ui("These actions reuse the current tool mode and selected color or owner."));
-    setPanelText("#devSelectionClipboardLabel", ui("Selection Clipboard"));
-    setPanelText("#devSelectionSortLabel", ui("Sort"));
-    setPanelText("#devLocalRuntimeLabel", ui("Local Runtime"));
-
-    setPanelText("#devSelectionAddHoveredBtn", ui("Add Hovered"));
-    setPanelText("#devSelectionToggleSelectedBtn", ui("Toggle Selected"));
-    setPanelText("#devSelectionRemoveLastBtn", ui("Remove Last"));
-    setPanelText("#devSelectionClearBtn", ui("Clear Selection"));
-    setPanelText("#devMacroCountryBtn", ui("Fill Country"));
-    setPanelText("#devMacroParentBtn", ui("Fill Parent Group"));
-    setPanelText("#devMacroOwnerBtn", ui("Fill Owner Scope"));
-    setPanelText("#devMacroSelectionBtn", ui("Fill Multi-Selection"));
-    setPanelText("#devCopyNamesBtn", ui("Copy Names"));
-    setPanelText("#devCopyNamesIdsBtn", ui("Copy Names + ID"));
-    setPanelText("#devCopyIdsBtn", ui("Copy ID"));
-    selectionPreview?.setAttribute("aria-label", ui("Development selection preview"));
-    if (selectionSortMode?.options?.[0]) selectionSortMode.options[0].textContent = ui("Selection Order");
-    if (selectionSortMode?.options?.[1]) selectionSortMode.options[1].textContent = ui("Name");
-
     const inspector = resolveInspectorRows();
     if (featureInspectorTitle) {
       featureInspectorTitle.textContent = inspector.title;
@@ -2160,19 +1830,16 @@ function initDevWorkspace() {
       );
     }
     if (scenarioTagNameEnInput) {
-      scenarioTagNameEnInput.placeholder = "New Country";
+      scenarioTagNameEnInput.placeholder = ui("New Country");
       scenarioTagNameEnInput.disabled = !hasActiveScenario || !!tagCreatorState.isSaving;
     }
     if (scenarioTagNameZhInput) {
-      scenarioTagNameZhInput.placeholder = "新国家";
+      scenarioTagNameZhInput.placeholder = ui("New Country");
       scenarioTagNameZhInput.disabled = !hasActiveScenario || !!tagCreatorState.isSaving;
     }
     if (scenarioTagParentInput) {
       scenarioTagParentInput.placeholder = normalizeOwnerInput(state.activeSovereignCode) || "GER";
       scenarioTagParentInput.disabled = !hasActiveScenario || !!tagCreatorState.isSaving;
-    }
-    if (scenarioTagNameZhInput) {
-      scenarioTagNameZhInput.placeholder = "New Country";
     }
     if (scenarioClearTagBtn) {
       scenarioClearTagBtn.disabled = !hasActiveScenario || !!tagCreatorState.isSaving || !canClearTagForm;
@@ -3243,4 +2910,4 @@ function initDevWorkspace() {
   loadRuntimeMeta();
 }
 
-export { initDevWorkspace };
+export { getScenarioGeoLocaleEntry, initDevWorkspace };

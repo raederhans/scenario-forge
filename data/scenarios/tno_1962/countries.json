@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "tno_1962",
-  "generated_at": "2026-03-19T20:38:27.758190-04:00",
+  "generated_at": "2026-03-20T09:34:19.177582-04:00",
   "default_country": "GER",
   "countries": {
     "AEF": {
@@ -1036,7 +1036,7 @@
       "tag": "FIN",
       "display_name": "Finland",
       "color_hex": "#a2a2a2",
-      "feature_count": 57,
+      "feature_count": 56,
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "FI",
@@ -1067,7 +1067,7 @@
       "parent_owner_tags": [],
       "subject_kind": "",
       "entry_kind": "",
-      "controller_feature_count": 57
+      "controller_feature_count": 56
     },
     "FRA": {
       "tag": "FRA",
@@ -4342,7 +4342,7 @@
       "tag": "RKO",
       "display_name": "Reichskommissariat Ostland",
       "color_hex": "#666456",
-      "feature_count": 89,
+      "feature_count": 65,
       "quality": "manual_reviewed",
       "source": "tno_reichskommissariat_baseline",
       "base_iso2": "LT",
@@ -4380,7 +4380,7 @@
       "tag": "RKM",
       "display_name": "Reichskommissariat Moskowien",
       "color_hex": "#4f4554",
-      "feature_count": 747,
+      "feature_count": 771,
       "quality": "manual_reviewed",
       "source": "tno_reichskommissariat_baseline",
       "base_iso2": "RU",
@@ -4412,7 +4412,7 @@
         "GER"
       ],
       "entry_kind": "scenario_country",
-      "controller_feature_count": 805
+      "controller_feature_count": 803
     },
     "RKK": {
       "tag": "RKK",
@@ -6758,7 +6758,7 @@
       "tag": "WRS",
       "display_name": "West Russian Revolutionary Front",
       "color_hex": "#a3424c",
-      "feature_count": 35,
+      "feature_count": 29,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "RU",
@@ -6793,7 +6793,7 @@
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
       "inspector_group_anchor_id": "continent_europe",
-      "controller_feature_count": 30
+      "controller_feature_count": 26
     },
     "GCE": {
       "tag": "GCE",
@@ -8314,6 +8314,42 @@
       "base_iso2": "XIK",
       "lookup_iso2": "XIK",
       "provenance_iso2": "XIK",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended",
+      "primary_rule_source": "dev_manual_tag_create",
+      "rule_sources": [
+        "dev_manual_tag_create"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": "scenario_country",
+      "hidden_from_country_list": false
+    },
+    "ONG": {
+      "tag": "ONG",
+      "display_name": "Onega",
+      "display_name_en": "Onega",
+      "display_name_zh": "奥涅加",
+      "color_hex": "#0d4510",
+      "feature_count": 7,
+      "controller_feature_count": 7,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "ONG",
+      "lookup_iso2": "ONG",
+      "provenance_iso2": "ONG",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": null,

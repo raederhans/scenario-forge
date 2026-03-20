@@ -7,6 +7,8 @@ const IGNORED_CONSOLE_PATTERNS = [
   /\[map_renderer\] Scenario political background merge fallback engaged:/i,
 ];
 
+test.setTimeout(60000);
+
 function countChangedPixels(left, right, threshold = 12) {
   const limit = Math.min(left.length, right.length);
   let changed = 0;
@@ -86,6 +88,33 @@ async function configureCityLights(page, style, enabled) {
   }, { targetStyle: style, targetEnabled: enabled });
 }
 
+async function ensureScenario(page, scenarioId) {
+  await page.waitForFunction((targetScenarioId) => {
+    const select = document.querySelector('#scenarioSelect');
+    return !!select && !!select.querySelector(`option[value="${targetScenarioId}"]`);
+  }, scenarioId);
+
+  const activeScenarioId = await page.evaluate(async () => {
+    const { state } = await import('/js/core/state.js');
+    return String(state.activeScenarioId || '');
+  });
+
+  if (activeScenarioId !== scenarioId) {
+    await page.selectOption('#scenarioSelect', scenarioId);
+    const applyButton = page.locator('#applyScenarioBtn');
+    if ((await applyButton.isVisible()) && (await applyButton.isEnabled())) {
+      await applyButton.click();
+    }
+  }
+
+  await expect.poll(async () => {
+    return page.evaluate(async () => {
+      const { state } = await import('/js/core/state.js');
+      return String(state.activeScenarioId || '');
+    });
+  }, { timeout: 20000 }).toBe(scenarioId);
+}
+
 async function setMapZoom(page, percent) {
   await page.evaluate(async (targetPercent) => {
     const { setZoomPercent } = await import('/js/core/map_renderer.js');
@@ -131,13 +160,7 @@ test('city lights default scene and intensity regression', async ({ page }) => {
 
   await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
   await waitForMapReady(page);
-
-  await expect.poll(async () => {
-    return page.evaluate(async () => {
-      const { state } = await import('/js/core/state.js');
-      return String(state.activeScenarioId || '');
-    });
-  }, { timeout: 20000 }).toBe('blank_base');
+  await ensureScenario(page, 'blank_base');
 
   consoleIssues.length = 0;
   networkFailures.length = 0;

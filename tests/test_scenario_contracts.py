@@ -65,6 +65,12 @@ def _create_scenario_dir(tmp_path: Path, scenario_name: str, scenario_id: str | 
 
 
 class ScenarioContractTest(unittest.TestCase):
+    def test_checked_in_scenario_registry_defaults_to_tno_1962(self) -> None:
+        registry_path = Path(__file__).resolve().parents[1] / "data" / "scenarios" / "index.json"
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(registry.get("default_scenario_id"), "tno_1962")
+
     def test_validate_scenario_contract_rejects_manifest_scenario_id_mismatch(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_root = Path(tmp_dir)

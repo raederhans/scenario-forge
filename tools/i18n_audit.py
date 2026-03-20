@@ -2,6 +2,7 @@ import argparse
 import json
 import re
 from datetime import datetime, timezone
+from html.parser import HTMLParser
 from pathlib import Path
 
 try:
@@ -30,10 +31,57 @@ except ImportError:
 UI_T_CALL_RE = re.compile(r"""t\(\s*(['\"])(?P<text>.*?)\1\s*,\s*(['\"])ui\3\s*\)""")
 GEO_T_CALL_RE = re.compile(r"""t\(\s*(['\"])(?P<text>.*?)\1\s*,\s*(['\"])geo\3\s*\)""")
 MODAL_CALL_RE = re.compile(r"""\b(?:alert|confirm|prompt)\(\s*(['\"])(?P<text>.*?)\1\s*\)""")
-TEXT_ASSIGN_RE = re.compile(r"""\b(?:textContent|innerText)\s*=\s*(['\"])(?P<text>.*?)\1""")
-PLACEHOLDER_RE = re.compile(
-    r"""setAttribute\(\s*(['\"])placeholder\1\s*,\s*(['\"])(?P<text>.*?)\2"""
+UI_MAP_ENTRY_RE = re.compile(
+    r"""\[\s*"[^"]+"\s*,\s*"(?P<text>(?:\\.|[^"])*)"\s*\]""",
+    re.DOTALL,
 )
+TEXT_ASSIGN_LITERAL_RE = re.compile(
+    r"""\b(?:textContent|innerText)\s*=\s*(['\"])(?P<text>(?:\\.|(?!\1).)*)\1""",
+    re.DOTALL,
+)
+TEXT_ASSIGN_TEMPLATE_RE = re.compile(
+    r"""\b(?:textContent|innerText)\s*=\s*`(?P<text>(?:\\.|[^`])*)`""",
+    re.DOTALL,
+)
+SHOW_TOAST_LITERAL_RE = re.compile(
+    r"""\bshowToast\(\s*(['\"])(?P<text>(?:\\.|(?!\1).)*)\1""",
+    re.DOTALL,
+)
+SHOW_TOAST_TEMPLATE_RE = re.compile(
+    r"""\bshowToast\(\s*`(?P<text>(?:\\.|[^`])*)`""",
+    re.DOTALL,
+)
+SET_ATTR_LITERAL_RE = re.compile(
+    r"""setAttribute\(\s*(['\"])(?P<attr>placeholder|title|aria-label)\1\s*,\s*(['\"])(?P<text>(?:\\.|(?!\3).)*)\3""",
+    re.DOTALL,
+)
+SET_ATTR_TEMPLATE_RE = re.compile(
+    r"""setAttribute\(\s*(['\"])(?P<attr>placeholder|title|aria-label)\1\s*,\s*`(?P<text>(?:\\.|[^`])*)`""",
+    re.DOTALL,
+)
+PLACEHOLDER_HTML_RE = re.compile(r"""placeholder=(['\"])(?P<text>.*?)\1""", re.DOTALL)
+ARIA_LABEL_HTML_RE = re.compile(r"""aria-label=(['\"])(?P<text>.*?)\1""", re.DOTALL)
+TITLE_HTML_RE = re.compile(r"""title=(['\"])(?P<text>.*?)\1""", re.DOTALL)
+INNER_HTML_TEMPLATE_RE = re.compile(
+    r"""\binnerHTML\s*=\s*`(?P<text>(?:\\.|[^`])*)`""",
+    re.DOTALL,
+)
+STRING_LITERAL_RE = re.compile(r"""(['\"])(?P<text>(?:\\.|(?!\1).)*)\1""", re.DOTALL)
+
+DECLARATIVE_ATTR_NAMES = {
+    "data-i18n",
+    "data-i18n-placeholder",
+    "data-i18n-title",
+    "data-i18n-aria-label",
+}
+VISIBLE_ATTR_NAMES = {"placeholder", "title", "aria-label"}
+A11Y_ATTR_NAMES = {"aria-label", "title"}
+NON_TRANSLATABLE_PATTERNS = (
+    re.compile(r"^\d+(?:\.\d+)?(?:px|x|ms|s|%)$", re.IGNORECASE),
+    re.compile(r"^\d{1,2}:\d{2}(?:\s*(?:UTC|AM|PM))?$", re.IGNORECASE),
+    re.compile(r"^[+\-]?\d+(?:\.\d+)?$"),
+)
+PLACEHOLDER_SAMPLE_RE = re.compile(r"^[a-z][a-z0-9_-]{2,}$")
 
 
 def decode_js_string(text: str) -> str:
@@ -41,9 +89,16 @@ def decode_js_string(text: str) -> str:
     value = value.replace(r"\'", "'").replace(r'\"', '"')
     value = value.replace(r"\n", " ").replace(r"\r", " ").replace(r"\t", " ")
     return " ".join(value.split())
+
+
 def is_user_visible_candidate(value: str) -> bool:
     text = (value or "").strip()
     if len(text) < 3:
+        return False
+    text_without_placeholders = re.sub(r"\{[A-Za-z_]+\}", "", text).strip()
+    if not text_without_placeholders:
+        return False
+    if re.fullmatch(r"\{[A-Za-z_]+\}(?:px|x|ms|%)", text):
         return False
     if text.startswith("#"):
         return False
@@ -53,7 +108,110 @@ def is_user_visible_candidate(value: str) -> bool:
         return False
     if re.fullmatch(r"[{}()<>:=;,.\-_/\\]+", text):
         return False
-    return bool(re.search(r"[A-Za-z]", text))
+    return bool(re.search(r"[A-Za-z]", text_without_placeholders))
+
+
+def is_non_translatable_token(value: str, attr_name: str | None = None) -> bool:
+    text = decode_js_string(value)
+    if not text:
+        return True
+    if any(pattern.fullmatch(text) for pattern in NON_TRANSLATABLE_PATTERNS):
+        return True
+    if attr_name == "placeholder" and PLACEHOLDER_SAMPLE_RE.fullmatch(text):
+        return True
+    return False
+
+
+def add_ui_candidate(bucket: set[str], value: str) -> str | None:
+    normalized = decode_js_string(value)
+    if normalized and is_user_visible_candidate(normalized):
+        bucket.add(normalized)
+        return normalized
+    return None
+
+
+def sanitize_template_literal(text: str, placeholder: str = "{expr}") -> str:
+    result = []
+    index = 0
+    length = len(text)
+    while index < length:
+        if text[index] == "$" and index + 1 < length and text[index + 1] == "{":
+            depth = 1
+            index += 2
+            while index < length and depth > 0:
+                char = text[index]
+                if char == "{":
+                    depth += 1
+                elif char == "}":
+                    depth -= 1
+                index += 1
+            result.append(placeholder)
+            continue
+        result.append(text[index])
+        index += 1
+    return "".join(result)
+
+
+def build_dynamic_candidate(text: str) -> str:
+    return decode_js_string(sanitize_template_literal(text))
+
+
+def collect_dynamic_line_candidates(line: str, dynamic_ui: set[str]) -> None:
+    if "t(" in line or "ui(" in line:
+        return
+    if not any(token in line for token in ("showToast(", "textContent", "innerText", "setAttribute(", "innerHTML")):
+        return
+    if "+" not in line:
+        return
+    literal_parts = [
+        decode_js_string(match.group("text"))
+        for match in STRING_LITERAL_RE.finditer(line)
+    ]
+    visible_parts = [part for part in literal_parts if is_user_visible_candidate(part)]
+    if not visible_parts:
+        return
+    dynamic_ui.add(" {expr} ".join(visible_parts))
+
+
+class MarkupAuditParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.text_nodes: list[str] = []
+        self.visible_attrs: list[dict[str, str]] = []
+        self.declarative_ui_keys: list[str] = []
+
+    def _collect_attrs(self, attrs) -> None:
+        for name, value in attrs:
+            attr_name = str(name or "").strip().lower()
+            attr_value = str(value or "").strip()
+            if not attr_name or not attr_value:
+                continue
+            if attr_name in DECLARATIVE_ATTR_NAMES:
+                self.declarative_ui_keys.append(attr_value)
+            elif attr_name in VISIBLE_ATTR_NAMES:
+                self.visible_attrs.append({"name": attr_name, "value": attr_value})
+
+    def handle_starttag(self, _tag, attrs):
+        self._collect_attrs(attrs)
+
+    def handle_startendtag(self, _tag, attrs):
+        self._collect_attrs(attrs)
+
+    def handle_data(self, data):
+        value = decode_js_string(data)
+        if value:
+            self.text_nodes.append(value)
+
+
+def parse_markup(markup: str) -> dict:
+    parser = MarkupAuditParser()
+    parser.feed(markup)
+    parser.close()
+    return {
+        "text_nodes": parser.text_nodes,
+        "visible_attrs": parser.visible_attrs,
+        "declarative_ui_keys": parser.declarative_ui_keys,
+    }
 
 
 def load_locales(path: Path) -> dict:
@@ -78,7 +236,16 @@ def collect_code_strings(repo_root: Path) -> dict:
     ui_t_keys = set()
     geo_t_keys = set()
     modal_keys = set()
-    hardcoded_ui = set()
+    declarative_ui_keys = set()
+    legacy_ui_map_keys = set()
+    covered_default_literals = set()
+    uncovered_user_visible_literals = set()
+    a11y_literals = set()
+    non_translatable_tokens = set()
+    dynamic_ui = set()
+    template_html_candidates = set()
+    default_markup_literals: list[dict[str, object]] = []
+    runtime_literal_candidates: list[dict[str, str | None]] = []
 
     source_files = sorted((repo_root / "js").rglob("*.js"))
     source_files.append(repo_root / "index.html")
@@ -96,35 +263,135 @@ def collect_code_strings(repo_root: Path) -> dict:
             if value:
                 ui_t_keys.add(value)
 
+        if path.name == "i18n.js":
+            for match in UI_MAP_ENTRY_RE.finditer(content):
+                value = decode_js_string(match.group("text"))
+                if value:
+                    legacy_ui_map_keys.add(value)
+
         for match in GEO_T_CALL_RE.finditer(content):
             value = decode_js_string(match.group("text"))
             if value:
                 geo_t_keys.add(value)
 
-        lines = content.splitlines()
-        for line in lines:
-            line_stripped = line.strip()
-            has_t_call = "t(" in line_stripped
+        for match in MODAL_CALL_RE.finditer(content):
+            value = decode_js_string(match.group("text"))
+            if value:
+                modal_keys.add(value)
+                runtime_literal_candidates.append({"value": value, "attr_name": None})
 
-            for pattern, bucket in ((MODAL_CALL_RE, modal_keys),):
-                for match in pattern.finditer(line):
-                    value = decode_js_string(match.group("text"))
-                    if value:
-                        bucket.add(value)
-                        if not has_t_call and is_user_visible_candidate(value):
-                            hardcoded_ui.add(value)
+        for pattern in (TEXT_ASSIGN_LITERAL_RE, SHOW_TOAST_LITERAL_RE, SET_ATTR_LITERAL_RE):
+            for match in pattern.finditer(content):
+                runtime_literal_candidates.append({
+                    "value": match.group("text"),
+                    "attr_name": match.groupdict().get("attr"),
+                })
 
-            for pattern in (TEXT_ASSIGN_RE, PLACEHOLDER_RE):
-                for match in pattern.finditer(line):
-                    value = decode_js_string(match.group("text"))
-                    if value and not has_t_call and is_user_visible_candidate(value):
-                        hardcoded_ui.add(value)
+        for pattern in (TEXT_ASSIGN_TEMPLATE_RE, SHOW_TOAST_TEMPLATE_RE, SET_ATTR_TEMPLATE_RE):
+            for match in pattern.finditer(content):
+                raw_template = match.group("text")
+                if "t(" in raw_template or "ui(" in raw_template:
+                    continue
+                candidate = build_dynamic_candidate(raw_template)
+                if "${" in raw_template:
+                    add_ui_candidate(dynamic_ui, candidate)
+                else:
+                    runtime_literal_candidates.append({
+                        "value": candidate,
+                        "attr_name": match.groupdict().get("attr"),
+                    })
+
+        for match in INNER_HTML_TEMPLATE_RE.finditer(content):
+            raw_markup = match.group("text")
+            parsed = parse_markup(sanitize_template_literal(raw_markup))
+            for key in parsed["declarative_ui_keys"]:
+                add_ui_candidate(declarative_ui_keys, key)
+            for value in parsed["text_nodes"]:
+                default_markup_literals.append({
+                    "value": value,
+                    "attr_name": None,
+                    "from_template": True,
+                })
+            for attr in parsed["visible_attrs"]:
+                default_markup_literals.append({
+                    "value": attr["value"],
+                    "attr_name": attr["name"],
+                    "from_template": True,
+                })
+
+        if path.suffix.lower() == ".html":
+            parsed = parse_markup(content)
+            for key in parsed["declarative_ui_keys"]:
+                add_ui_candidate(declarative_ui_keys, key)
+            for value in parsed["text_nodes"]:
+                default_markup_literals.append({
+                    "value": value,
+                    "attr_name": None,
+                    "from_template": False,
+                })
+            for attr in parsed["visible_attrs"]:
+                default_markup_literals.append({
+                    "value": attr["value"],
+                    "attr_name": attr["name"],
+                    "from_template": False,
+                })
+
+        for line in content.splitlines():
+            collect_dynamic_line_candidates(line, dynamic_ui)
+
+    translation_keys = ui_t_keys | declarative_ui_keys | legacy_ui_map_keys
+
+    def classify_default_literal(value: str, attr_name: str | None, from_template: bool) -> None:
+        normalized = decode_js_string(value)
+        if not normalized or not is_user_visible_candidate(normalized):
+            return
+        if is_non_translatable_token(normalized, attr_name):
+            non_translatable_tokens.add(normalized)
+            return
+        if normalized in translation_keys:
+            covered_default_literals.add(normalized)
+            return
+        if attr_name in A11Y_ATTR_NAMES:
+            a11y_literals.add(normalized)
+        else:
+            uncovered_user_visible_literals.add(normalized)
+        if from_template:
+            template_html_candidates.add(normalized)
+
+    def classify_runtime_literal(value: str, attr_name: str | None) -> None:
+        normalized = decode_js_string(value)
+        if not normalized or not is_user_visible_candidate(normalized):
+            return
+        if is_non_translatable_token(normalized, attr_name):
+            non_translatable_tokens.add(normalized)
+            return
+        if attr_name in A11Y_ATTR_NAMES:
+            a11y_literals.add(normalized)
+            return
+        uncovered_user_visible_literals.add(normalized)
+
+    for entry in default_markup_literals:
+        classify_default_literal(
+            str(entry["value"]),
+            entry["attr_name"],
+            bool(entry["from_template"]),
+        )
+    for entry in runtime_literal_candidates:
+        classify_runtime_literal(str(entry["value"]), entry["attr_name"])
 
     return {
         "ui_t_keys": sorted(ui_t_keys),
         "geo_t_keys": sorted(geo_t_keys),
         "modal_keys": sorted(modal_keys),
-        "hardcoded_ui_candidates": sorted(hardcoded_ui),
+        "declarative_ui_keys": sorted(declarative_ui_keys),
+        "legacy_ui_map_keys": sorted(legacy_ui_map_keys),
+        "literal_translated_ui_keys": sorted(ui_t_keys),
+        "covered_default_literals": sorted(covered_default_literals),
+        "uncovered_user_visible_literals": sorted(uncovered_user_visible_literals),
+        "a11y_literals": sorted(a11y_literals),
+        "non_translatable_tokens": sorted(non_translatable_tokens),
+        "dynamic_ui_candidates": sorted(dynamic_ui),
+        "template_html_candidates": sorted(template_html_candidates),
     }
 
 
@@ -137,9 +404,17 @@ def render_markdown(report: dict) -> str:
 
     lines.append("## Summary")
     lines.append(f"- UI locale keys: {report['ui_locale_count']}")
-    lines.append(f"- UI keys used via t(..., \"ui\"): {report['ui_used_count']}")
+    lines.append(f"- UI keys used via t(..., \"ui\"), data-i18n*, or legacy uiMap: {report['ui_used_count']}")
+    lines.append(f"- Literal translated UI keys via t(..., \"ui\"): {report['literal_translated_ui_count']}")
+    lines.append(f"- Declarative UI keys via data-i18n*: {report['declarative_ui_key_count']}")
+    lines.append(f"- Legacy uiMap keys: {report['legacy_ui_map_key_count']}")
     lines.append(f"- Missing UI locale keys: {report['ui_missing_count']}")
-    lines.append(f"- Hardcoded visible UI string candidates (not wrapped in t): {report['hardcoded_ui_count']}")
+    lines.append(f"- Covered default literals: {report['covered_default_literal_count']}")
+    lines.append(f"- Uncovered user-visible literals: {report['uncovered_user_visible_count']}")
+    lines.append(f"- A11y literals requiring translation wiring: {report['a11y_literal_count']}")
+    lines.append(f"- Non-translatable tokens: {report['non_translatable_token_count']}")
+    lines.append(f"- Dynamic UI string candidates: {report['dynamic_ui_count']}")
+    lines.append(f"- Template HTML candidates: {report['template_html_count']}")
     lines.append(f"- GEO locale keys: {report['geo_locale_count']}")
     lines.append(f"- GEO missing-like entries: {report['geo_missing_like_count']}")
     lines.append(f"- Shell fallback GEO entries: {report['shell_fallback_geo_count']}")
@@ -175,9 +450,49 @@ def render_markdown(report: dict) -> str:
         lines.append("- None")
     lines.append("")
 
-    lines.append("## Hardcoded UI Candidates")
-    if report["hardcoded_ui_candidates"]:
-        for key in report["hardcoded_ui_candidates"]:
+    lines.append("## Covered Default Literals")
+    if report["covered_default_literals"]:
+        for key in report["covered_default_literals"]:
+            lines.append(f"- {key}")
+    else:
+        lines.append("- None")
+    lines.append("")
+
+    lines.append("## Uncovered User-Visible Literals")
+    if report["uncovered_user_visible_literals"]:
+        for key in report["uncovered_user_visible_literals"]:
+            lines.append(f"- {key}")
+    else:
+        lines.append("- None")
+    lines.append("")
+
+    lines.append("## A11y Literals")
+    if report["a11y_literals"]:
+        for key in report["a11y_literals"]:
+            lines.append(f"- {key}")
+    else:
+        lines.append("- None")
+    lines.append("")
+
+    lines.append("## Non-Translatable Tokens")
+    if report["non_translatable_tokens"]:
+        for key in report["non_translatable_tokens"]:
+            lines.append(f"- {key}")
+    else:
+        lines.append("- None")
+    lines.append("")
+
+    lines.append("## Dynamic UI Candidates")
+    if report["dynamic_ui_candidates"]:
+        for key in report["dynamic_ui_candidates"]:
+            lines.append(f"- {key}")
+    else:
+        lines.append("- None")
+    lines.append("")
+
+    lines.append("## Template HTML Candidates")
+    if report["template_html_candidates"]:
+        for key in report["template_html_candidates"]:
             lines.append(f"- {key}")
     else:
         lines.append("- None")
@@ -317,7 +632,11 @@ def main() -> None:
     ui_locale_keys = sorted((locales.get("ui") or {}).keys())
     geo_locale = locales.get("geo") or {}
 
-    ui_used = set(code_strings["ui_t_keys"]) | set(code_strings["modal_keys"])
+    ui_used = (
+        set(code_strings["ui_t_keys"])
+        | set(code_strings["declarative_ui_keys"])
+        | set(code_strings["legacy_ui_map_keys"])
+    )
     ui_missing = sorted(key for key in ui_used if key not in ui_locale_keys)
 
     shell_fallback_geo = sorted(key for key in geo_locale if is_shell_fallback_name(key))
@@ -402,10 +721,28 @@ def main() -> None:
         "scenarios_root": str(scenarios_root),
         "ui_locale_count": len(ui_locale_keys),
         "ui_used_count": len(ui_used),
+        "literal_translated_ui_count": len(code_strings["literal_translated_ui_keys"]),
+        "literal_translated_ui_keys": code_strings["literal_translated_ui_keys"],
+        "declarative_ui_key_count": len(code_strings["declarative_ui_keys"]),
+        "declarative_ui_keys": code_strings["declarative_ui_keys"],
+        "legacy_ui_map_key_count": len(code_strings["legacy_ui_map_keys"]),
+        "legacy_ui_map_keys": code_strings["legacy_ui_map_keys"],
         "ui_missing_count": len(ui_missing),
         "ui_missing_keys": ui_missing,
-        "hardcoded_ui_count": len(code_strings["hardcoded_ui_candidates"]),
-        "hardcoded_ui_candidates": code_strings["hardcoded_ui_candidates"],
+        "covered_default_literal_count": len(code_strings["covered_default_literals"]),
+        "covered_default_literals": code_strings["covered_default_literals"],
+        "uncovered_user_visible_count": len(code_strings["uncovered_user_visible_literals"]),
+        "uncovered_user_visible_literals": code_strings["uncovered_user_visible_literals"],
+        "a11y_literal_count": len(code_strings["a11y_literals"]),
+        "a11y_literals": code_strings["a11y_literals"],
+        "non_translatable_token_count": len(code_strings["non_translatable_tokens"]),
+        "non_translatable_tokens": code_strings["non_translatable_tokens"],
+        "hardcoded_ui_count": len(code_strings["uncovered_user_visible_literals"]),
+        "hardcoded_ui_candidates": code_strings["uncovered_user_visible_literals"],
+        "dynamic_ui_count": len(code_strings["dynamic_ui_candidates"]),
+        "dynamic_ui_candidates": code_strings["dynamic_ui_candidates"],
+        "template_html_count": len(code_strings["template_html_candidates"]),
+        "template_html_candidates": code_strings["template_html_candidates"],
         "geo_locale_count": len(geo_locale),
         "geo_todo_count": geo_missing_like_count,
         "geo_missing_like_count": geo_missing_like_count,
@@ -442,7 +779,12 @@ def main() -> None:
     print(
         "OK: i18n audit complete. "
         f"ui_missing={report['ui_missing_count']}, "
-        f"hardcoded_ui={report['hardcoded_ui_count']}, "
+        f"covered_defaults={report['covered_default_literal_count']}, "
+        f"uncovered_visible_ui={report['uncovered_user_visible_count']}, "
+        f"a11y_literals={report['a11y_literal_count']}, "
+        f"non_translatable={report['non_translatable_token_count']}, "
+        f"dynamic_ui={report['dynamic_ui_count']}, "
+        f"template_html={report['template_html_count']}, "
         f"geo_missing_like={report['geo_missing_like_count']}, "
         f"shell_fallback_missing_like={report['shell_fallback_missing_like_count']}, "
         f"scenario_geo_missing={report['scenario_geo_missing_count']}, "

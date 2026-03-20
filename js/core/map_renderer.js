@@ -137,6 +137,52 @@ const CONTEXT_BASE_REUSE_MAX_DISTANCE_VIEWPORT_RATIO = 0.35;
 const CONTEXT_BASE_MINOR_CONTOUR_THRESHOLD = 2;
 const CONTEXT_BASE_BUCKET_LOW_MAX = 1.4;
 const CONTEXT_BASE_BUCKET_MID_MAX = 2.5;
+const RIVER_LOW_MAX_SCALERANK = 5;
+const RIVER_MID_MAX_SCALERANK = 7;
+const RIVER_ZOOM_STYLE_FACTORS = {
+  low: {
+    coreWidthFactor: 1.2,
+    outlineWidthFactor: 0.85,
+    outlineAlphaFactor: 0.6,
+  },
+  mid: {
+    coreWidthFactor: 1,
+    outlineWidthFactor: 0.7,
+    outlineAlphaFactor: 0.7,
+  },
+  high: {
+    coreWidthFactor: 0.75,
+    outlineWidthFactor: 0.35,
+    outlineAlphaFactor: 0.45,
+  },
+};
+const RIVER_CLASS_STYLE_FACTORS = {
+  river: {
+    widthFactor: 1,
+    opacityFactor: 1,
+    outlineFactor: 1,
+  },
+  intermittent: {
+    widthFactor: 0.8,
+    opacityFactor: 0.7,
+    outlineFactor: 0.5,
+  },
+  lakeCenterline: {
+    widthFactor: 0.72,
+    opacityFactor: 0.55,
+    outlineFactor: 0,
+  },
+  canal: {
+    widthFactor: 0.72,
+    opacityFactor: 0.6,
+    outlineFactor: 0,
+  },
+  unknown: {
+    widthFactor: 1,
+    opacityFactor: 1,
+    outlineFactor: 1,
+  },
+};
 const INTERNAL_BORDER_PROVINCE_MIN_ALPHA = 0.30;
 const INTERNAL_BORDER_LOCAL_MIN_ALPHA = 0.22;
 const INTERNAL_BORDER_PROVINCE_MIN_WIDTH = 0.52;
@@ -6330,7 +6376,7 @@ function getAtlasFeatureAlphaMultiplier(atlasClass, cfg) {
   if (atlasClass === "rainforest") {
     return clamp(0.72 + cfg.rainforestEmphasis * 0.38, 0.2, 1.2);
   }
-  if (atlasClass === "plains_lowlands") return 0.88;
+  if (atlasClass === "plains_lowlands") return 0.68;
   if (atlasClass === "wetlands_delta") return 0.92;
   return 1;
 }
@@ -6646,7 +6692,6 @@ function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied =
     return;
   }
 
-  const blendMode = getSafeBlendMode(cfg.blendMode, "source-over");
   const contourColor = getSafeCanvasColor(cfg.contourColor, "#6b5947");
   const lowReliefCutoff = clamp(Number(cfg.contourLowReliefCutoffM) || 0, 0, 2000);
   const majorOpacity = clamp(cfg.opacity * cfg.contourOpacity, 0, 1);
@@ -6656,7 +6701,7 @@ function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied =
   if (!clipAlreadyApplied) {
     applyPhysicalLandClipMask();
   }
-  context.globalCompositeOperation = blendMode;
+  context.globalCompositeOperation = "source-over";
 
   drawContourCollection(state.physicalContourMajorData, {
     color: contourColor,
@@ -6756,6 +6801,68 @@ function drawUrbanLayer(k, { interactive = false } = {}) {
   });
 }
 
+function getRiverZoomStyleFactors(k) {
+  return RIVER_ZOOM_STYLE_FACTORS[getContextBaseZoomBucketId(k)] || RIVER_ZOOM_STYLE_FACTORS.mid;
+}
+
+function getRiverClassKind(feature) {
+  const props = feature?.properties || {};
+  const featureClass = String(props.featurecla || props.FEATURECLA || "").trim().toLowerCase();
+  switch (featureClass) {
+    case "river":
+      return "river";
+    case "river (intermittent)":
+      return "intermittent";
+    case "lake centerline":
+      return "lakeCenterline";
+    case "canal":
+      return "canal";
+    default:
+      return "unknown";
+  }
+}
+
+function getRiverVisibilityProfile(feature, k) {
+  const props = feature?.properties || {};
+  const zoomBucket = getContextBaseZoomBucketId(k);
+  const classKind = getRiverClassKind(feature);
+  const scalerank = clamp(
+    Math.round(Number(props.scalerank ?? props.SCALERANK ?? 8)) || 8,
+    0,
+    12,
+  );
+  const minZoom = Number(props.min_zoom ?? props.minZoom);
+  let visible = false;
+
+  if (zoomBucket === "low") {
+    visible = classKind === "river" && scalerank <= RIVER_LOW_MAX_SCALERANK;
+  } else if (zoomBucket === "mid") {
+    visible = classKind === "river"
+      && (
+        scalerank <= RIVER_MID_MAX_SCALERANK
+        || (
+          scalerank === RIVER_MID_MAX_SCALERANK + 1
+          && Number.isFinite(minZoom)
+          && minZoom <= 5
+        )
+      );
+  } else {
+    visible = classKind !== "unknown";
+  }
+
+  const classStyle = RIVER_CLASS_STYLE_FACTORS[classKind] || RIVER_CLASS_STYLE_FACTORS.unknown;
+  return {
+    visible,
+    zoomBucket,
+    classKind,
+    scalerank,
+    minZoom: Number.isFinite(minZoom) ? minZoom : null,
+    widthFactor: classStyle.widthFactor,
+    opacityFactor: classStyle.opacityFactor,
+    outlineFactor: classStyle.outlineFactor,
+  };
+}
+
 function drawRiversLayer(k, { interactive = false } = {}) {
   const startedAt = nowMs();
   if (!state.showRivers || !state.riversData?.features?.length) {
@@ -6770,37 +6877,59 @@ function drawRiversLayer(k, { interactive = false } = {}) {
   const cfg = state.styleConfig?.rivers || {};
   const color = getSafeCanvasColor(cfg.color, "#3b82f6");
   const opacity = clamp(Number.isFinite(Number(cfg.opacity)) ? Number(cfg.opacity) : 0.88, 0, 1);
-  const widthBase = clamp(Number.isFinite(Number(cfg.width)) ? Number(cfg.width) : 1.1, 0.2, 4);
+  const widthBase = clamp(Number.isFinite(Number(cfg.width)) ? Number(cfg.width) : 0.5, 0.2, 4);
   const outlineColor = getSafeCanvasColor(cfg.outlineColor, "#e2efff");
-  const outlineWidth = clamp(Number.isFinite(Number(cfg.outlineWidth)) ? Number(cfg.outlineWidth) : 0.9, 0, 3);
+  const outlineWidth = clamp(Number.isFinite(Number(cfg.outlineWidth)) ? Number(cfg.outlineWidth) : 0.25, 0, 3);
   const dashPattern = getDashPattern(cfg.dashStyle, widthBase);
   const scale = Math.max(0.0001, k);
+  const zoomStyle = getRiverZoomStyleFactors(k);
+  const visibleEntries = [];
+
+  state.riversData.features.forEach((feature) => {
+    if (!pathBoundsInScreen(feature)) return;
+    const profile = getRiverVisibilityProfile(feature, k);
+    if (!profile.visible) return;
+    visibleEntries.push({ feature, profile });
+  });
 
   context.save();
 
   if (outlineWidth > 0) {
-    context.globalAlpha = interactive ? Math.min(opacity * 0.7, 0.65) : Math.min(opacity, 0.95);
     context.strokeStyle = outlineColor;
-    context.lineWidth = (widthBase + outlineWidth * 2) / scale;
     context.lineCap = "round";
     context.lineJoin = "round";
     context.setLineDash([]);
-    state.riversData.features.forEach((feature) => {
-      if (!pathBoundsInScreen(feature)) return;
+    visibleEntries.forEach(({ feature, profile }) => {
+      const resolvedOutlineWidth = outlineWidth
+        * zoomStyle.outlineWidthFactor
+        * profile.outlineFactor;
+      if (!(resolvedOutlineWidth > 0)) return;
+      const resolvedCoreWidth = widthBase
+        * zoomStyle.coreWidthFactor
+        * profile.widthFactor;
+      const outlineAlpha = opacity
+        * zoomStyle.outlineAlphaFactor
+        * profile.opacityFactor;
+      context.globalAlpha = interactive ? Math.min(outlineAlpha * 0.7, 0.65) : Math.min(outlineAlpha, 0.95);
+      context.lineWidth = (resolvedCoreWidth + resolvedOutlineWidth * 2) / scale;
       context.beginPath();
       pathCanvas(feature);
       context.stroke();
     });
   }
 
-  context.globalAlpha = interactive ? Math.min(opacity, 0.78) : opacity;
   context.strokeStyle = color;
-  context.lineWidth = widthBase / scale;
   context.lineCap = "round";
   context.lineJoin = "round";
   context.setLineDash(dashPattern);
-  state.riversData.features.forEach((feature) => {
-    if (!pathBoundsInScreen(feature)) return;
+  visibleEntries.forEach(({ feature, profile }) => {
+    const resolvedCoreWidth = widthBase
+      * zoomStyle.coreWidthFactor
+      * profile.widthFactor;
+    context.globalAlpha = interactive
+      ? Math.min(opacity * profile.opacityFactor, 0.78)
+      : opacity * profile.opacityFactor;
+    context.lineWidth = resolvedCoreWidth / scale;
     context.beginPath();
     pathCanvas(feature);
     context.stroke();
@@ -6810,6 +6939,11 @@ function drawRiversLayer(k, { interactive = false } = {}) {
   context.restore();
   collectContextMetric("drawRiversLayer", nowMs() - startedAt, {
     featureCount: getFeatureCollectionFeatureCount(state.riversData),
+    visibleFeatureCount: visibleEntries.length,
+    zoomBucket: getContextBaseZoomBucketId(k),
+    coreWidthFactor: zoomStyle.coreWidthFactor,
+    outlineWidthFactor: zoomStyle.outlineWidthFactor,
+    outlineAlphaFactor: zoomStyle.outlineAlphaFactor,
     interactive: !!interactive,
     skipped: false,
   });

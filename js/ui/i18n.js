@@ -163,7 +163,48 @@ function t(key, type = "geo") {
   return entry?.[lang] || entry?.en || key;
 }
 
+function applyDeclarativeTranslationToElement(element) {
+  if (!element?.getAttribute) return;
+
+  const textKey = String(element.getAttribute("data-i18n") || "").trim();
+  if (textKey) {
+    element.textContent = t(textKey, "ui");
+  }
+
+  const placeholderKey = String(element.getAttribute("data-i18n-placeholder") || "").trim();
+  if (placeholderKey) {
+    element.setAttribute("placeholder", t(placeholderKey, "ui"));
+  }
+
+  const titleKey = String(element.getAttribute("data-i18n-title") || "").trim();
+  if (titleKey) {
+    element.setAttribute("title", t(titleKey, "ui"));
+  }
+
+  const ariaLabelKey = String(element.getAttribute("data-i18n-aria-label") || "").trim();
+  if (ariaLabelKey) {
+    element.setAttribute("aria-label", t(ariaLabelKey, "ui"));
+  }
+}
+
+function applyDeclarativeTranslations(root = document) {
+  if (!root) return;
+  const selector = "[data-i18n], [data-i18n-placeholder], [data-i18n-title], [data-i18n-aria-label]";
+  const elements = [];
+  if (root.nodeType === 1 && root.matches?.(selector)) {
+    elements.push(root);
+  }
+  if (typeof root.querySelectorAll === "function") {
+    elements.push(...root.querySelectorAll(selector));
+  }
+  elements.forEach((element) => {
+    applyDeclarativeTranslationToElement(element);
+  });
+}
+
 function updateUIText() {
+  applyDeclarativeTranslations(document);
+
   const uiMap = [
     ["lblCurrentTool", "Tools"],
     ["lblHistory", "History"],
@@ -810,6 +851,7 @@ export {
   initTranslations,
   toggleLanguage,
   updateUIText,
+  applyDeclarativeTranslations,
   getPreferredGeoLabel,
   getStrictGeoLabel,
   getGeoFeatureDisplayLabel,

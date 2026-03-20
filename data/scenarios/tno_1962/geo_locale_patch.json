@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "tno_1962",
-  "generated_at": "2026-03-20T01:53:14Z",
+  "generated_at": "2026-03-20T21:10:31Z",
   "geo": {
     "AFG-1741": {
       "en": "Badghis",
@@ -665,15 +665,15 @@
     },
     "BE100": {
       "en": "Hauptstadtbezirk Brüssel",
-      "zh": "布吕塞尔首都区"
+      "zh": "布吕塞尔"
     },
     "BE211": {
       "en": "Bezirk Antwerpen",
-      "zh": "安特卫普区"
+      "zh": "安特卫普"
     },
     "BE212": {
       "en": "Bezirk Mecheln",
-      "zh": "梅赫伦区"
+      "zh": "梅赫伦"
     },
     "BE213": {
       "en": "Bezirk Turnhout",
@@ -681,79 +681,79 @@
     },
     "BE223": {
       "en": "Bezirk Tongern",
-      "zh": "通厄恩区"
+      "zh": "通厄恩"
     },
     "BE224": {
       "en": "Bezirk Hasselt",
-      "zh": "哈瑟尔特区"
+      "zh": "哈瑟尔特"
     },
     "BE225": {
       "en": "Bezirk Maaseik",
-      "zh": "马瑟克区"
+      "zh": "马瑟克"
     },
     "BE231": {
       "en": "Bezirk Aalst",
-      "zh": "阿尔斯特区"
+      "zh": "阿尔斯特"
     },
     "BE232": {
       "en": "Bezirk Dendermünde",
-      "zh": "登德明德区"
+      "zh": "登德明德"
     },
     "BE233": {
       "en": "Bezirk Eeklo",
-      "zh": "埃克洛区"
+      "zh": "埃克洛"
     },
     "BE234": {
       "en": "Bezirk Gent",
-      "zh": "根特区"
+      "zh": "根特"
     },
     "BE235": {
       "en": "Bezirk Oudenaarde",
-      "zh": "奥德纳尔德区"
+      "zh": "奥德纳尔德"
     },
     "BE236": {
       "en": "Bezirk Sankt Nikolaus",
-      "zh": "圣尼古劳斯区"
+      "zh": "圣尼古劳斯"
     },
     "BE241": {
       "en": "Bezirk Halle-Vilvoorde",
-      "zh": "哈勒-维尔福德区"
+      "zh": "哈勒-维尔福德"
     },
     "BE242": {
       "en": "Bezirk Löwen",
-      "zh": "勒汶区"
+      "zh": "勒汶"
     },
     "BE251": {
       "en": "Bezirk Brügge",
-      "zh": "布吕赫区"
+      "zh": "布吕赫"
     },
     "BE252": {
       "en": "Bezirk Diksmuide",
-      "zh": "迪克斯迈德区"
+      "zh": "迪克斯迈德"
     },
     "BE253": {
       "en": "Bezirk Ypern",
-      "zh": "伊珀恩区"
+      "zh": "伊珀恩"
     },
     "BE254": {
       "en": "Bezirk Kortrijk",
-      "zh": "科特赖克区"
+      "zh": "科特赖兴"
     },
     "BE255": {
       "en": "Bezirk Ostende",
-      "zh": "奥斯滕德区"
+      "zh": "奥斯滕德"
     },
     "BE256": {
       "en": "Bezirk Roeselare",
-      "zh": "鲁瑟拉勒区"
+      "zh": "鲁瑟拉勒"
     },
     "BE257": {
       "en": "Bezirk Thielt",
-      "zh": "蒂尔特区"
+      "zh": "蒂尔特"
     },
     "BE258": {
       "en": "Bezirk Furnes",
-      "zh": "菲尔讷区"
+      "zh": "菲尔讷"
     },
     "BE310": {
       "en": "Bezirk Nivelles",
@@ -761,7 +761,7 @@
     },
     "BE323": {
       "en": "Bezirk Bergen",
-      "zh": "贝亨区"
+      "zh": "贝亨"
     },
     "BE328": {
       "en": "Bezirk Doornik-Moeskroen",
@@ -769,39 +769,39 @@
     },
     "BE329": {
       "en": "Bezirk La Louvière",
-      "zh": "拉卢维耶尔区"
+      "zh": "拉卢维耶尔"
     },
     "BE32A": {
       "en": "Bezirk Aat",
-      "zh": "阿特区"
+      "zh": "阿特"
     },
     "BE32B": {
       "en": "Bezirk Charleroi",
-      "zh": "沙勒鲁瓦区"
+      "zh": "沙勒鲁瓦"
     },
     "BE32C": {
       "en": "Bezirk Zinnik",
-      "zh": "济尼克区"
+      "zh": "济尼克"
     },
     "BE32D": {
       "en": "Bezirk Thuin",
-      "zh": "蒂安区"
+      "zh": "蒂安"
     },
     "BE331": {
       "en": "Bezirk Hoei",
-      "zh": "胡伊区"
+      "zh": "胡伊"
     },
     "BE332": {
       "en": "Bezirk Lüttich",
-      "zh": "吕蒂希区"
+      "zh": "吕蒂希"
     },
     "BE334": {
       "en": "Bezirk Borgworm",
-      "zh": "博格沃姆区"
+      "zh": "博格沃姆"
     },
     "BE335": {
       "en": "Bezirk Verviers — Französische Gemeinden",
-      "zh": "费尔维耶法语市镇区"
+      "zh": "费尔维耶"
     },
     "BE336": {
       "en": "Bezirk Verviers — Deutschsprachige Gemeinschaft",
@@ -813,19 +813,19 @@
     },
     "BE342": {
       "en": "Bezirk Bastenaken",
-      "zh": "巴斯特纳肯区"
+      "zh": "巴斯特纳肯"
     },
     "BE343": {
       "en": "Bezirk Marche-en-Famenne",
-      "zh": "马尔什-昂法梅讷区"
+      "zh": "马尔什-昂法梅讷"
     },
     "BE344": {
       "en": "Bezirk Neufchâteau",
-      "zh": "讷沙托区"
+      "zh": "讷沙托"
     },
     "BE345": {
       "en": "Bezirk Virton",
-      "zh": "维尔通区"
+      "zh": "维尔滕"
     },
     "BE351": {
       "en": "Bezirk Dinant",
@@ -833,11 +833,11 @@
     },
     "BE352": {
       "en": "Bezirk Namen",
-      "zh": "纳门区"
+      "zh": "纳门"
     },
     "BE353": {
       "en": "Bezirk Philippeville",
-      "zh": "菲利普维尔区"
+      "zh": "菲利普维尔"
     },
     "BG311": {
       "en": "Видин",
@@ -11821,7 +11821,7 @@
     },
     "FI196": {
       "en": "Satakunta",
-      "zh": "一百"
+      "zh": "萨塔昆塔"
     },
     "FI197": {
       "en": "Pirkanmaa",
@@ -30233,7 +30233,7 @@
     },
     "BY_RAY_67162791B30498032594927": {
       "en": "Brest-Litowsk",
-      "zh": "布列斯特-立托夫斯克"
+      "zh": "布列瑟-立陶施"
     },
     "BY_RAY_67162791B30546828632542": {
       "en": "Haradok",
@@ -32712,7 +32712,7 @@
       "zh": "杜宾斯基区"
     },
     "RU_RAY_50074027B61494461730219": {
-      "en": "городской округ Тула",
+      "en": "Gobelstadt",
       "zh": "戈培尔"
     },
     "RU_RAY_50074027B37042575240117": {
@@ -37145,7 +37145,7 @@
     },
     "RU_RAY_50074027B41842513634160": {
       "en": "Perm",
-      "zh": "烫发"
+      "zh": "彼尔姆"
     },
     "RU_RAY_50074027B14010959057624": {
       "en": "Nytvensky District",
@@ -38896,8 +38896,8 @@
       "zh": "基洛夫斯克"
     },
     "UA_RAY_74538382B91806639169097": {
-      "en": "Lenine",
-      "zh": "列宁"
+      "en": "Hindenburg",
+      "zh": "兴登堡"
     },
     "UA_RAY_74538382B17328028725822": {
       "en": "Chornomorske",
@@ -40949,7 +40949,7 @@
     },
     "RU_CITY_SAINT_PETERSBURG": {
       "en": "Saint Petersburg",
-      "zh": "林德曼施塔特"
+      "zh": "圣彼得堡"
     },
     "RU_CITY_VOLGOGRAD": {
       "en": "Paulusburg",
@@ -42549,23 +42549,23 @@
     },
     "US_ZN_02_005": {
       "en": "Aleutians West Census Area",
-      "zh": "阿拉斯加 5 区"
+      "zh": "Aleutians West Census Area"
     },
     "US_ZN_02_002__R": {
       "en": "Kenai Peninsula Borough",
-      "zh": "阿拉斯加 2 区"
+      "zh": "Kenai Peninsula Borough"
     },
     "US_ZN_02_003__R": {
       "en": "Matanuska-Susitna Borough",
-      "zh": "阿拉斯加3区"
+      "zh": "Matanuska-Susitna Borough"
     },
     "US_ZN_02_004__R": {
       "en": "Anchorage Municipality",
-      "zh": "阿拉斯加4区"
+      "zh": "Anchorage Municipality"
     },
     "US_ZN_02_005__R": {
       "en": "Juneau City and Borough",
-      "zh": "阿拉斯加 5 区"
+      "zh": "Juneau City and Borough"
     },
     "US_ZN_02_006": {
       "en": "Ketchikan Gateway Borough",
@@ -42573,31 +42573,31 @@
     },
     "US_ZN_01_002__R": {
       "en": "Mobile County",
-      "zh": "阿拉巴马州 2 区"
+      "zh": "Mobile County"
     },
     "US_ZN_01_003__R": {
       "en": "Tuscaloosa County",
-      "zh": "阿拉巴马州 3 区"
+      "zh": "Tuscaloosa County"
     },
     "US_ZN_01_005__R": {
       "en": "Morgan County",
-      "zh": "阿拉巴马州 5 区"
+      "zh": "Morgan County"
     },
     "US_ZN_01_008__R": {
       "en": "Talladega County",
-      "zh": "阿拉巴马州 8 区"
+      "zh": "Talladega County"
     },
     "US_ZN_05_001__R": {
       "en": "Miller County",
-      "zh": "阿肯色州 1 区"
+      "zh": "Miller County"
     },
     "US_ZN_05_005__R": {
       "en": "Craighead County",
-      "zh": "阿肯色州 5 区"
+      "zh": "Craighead County"
     },
     "US_ZN_05_006__R": {
       "en": "Crittenden County",
-      "zh": "阿肯色州 6 区"
+      "zh": "Crittenden County"
     },
     "US_CNTY_04015": {
       "en": "Mohave County",
@@ -42605,7 +42605,7 @@
     },
     "US_CNTY_04013": {
       "en": "Phoenix",
-      "zh": "马里科帕"
+      "zh": "菲尼克斯"
     },
     "US_CNTY_04007": {
       "en": "Gila County",
@@ -42689,7 +42689,7 @@
     },
     "US_CNTY_06059": {
       "en": "Irvine",
-      "zh": "橙子"
+      "zh": "欧文"
     },
     "US_CNTY_06037": {
       "en": "Los Angeles",
@@ -42753,7 +42753,7 @@
     },
     "US_CNTY_06073": {
       "en": "San Diego",
-      "zh": "圣地亚哥"
+      "zh": "圣迪亚哥"
     },
     "US_CNTY_06053": {
       "en": "Monterey County",
@@ -42877,39 +42877,39 @@
     },
     "US_ZN_08_001__R": {
       "en": "La Plata County",
-      "zh": "科罗拉多州 1 区"
+      "zh": "La Plata County"
     },
     "US_ZN_08_002__R": {
       "en": "Mesa County",
-      "zh": "科罗拉多州 2 区"
+      "zh": "Mesa County"
     },
     "US_ZN_08_003__R": {
       "en": "Eagle County",
-      "zh": "科罗拉多州 3 区"
+      "zh": "Eagle County"
     },
     "US_ZN_08_004__R": {
       "en": "Ouray County",
-      "zh": "科罗拉多州 4 区"
+      "zh": "Ouray County"
     },
     "US_ZN_08_005__R": {
       "en": "Archuleta County",
-      "zh": "科罗拉多州 5 区"
+      "zh": "Archuleta County"
     },
     "US_ZN_08_006__R": {
       "en": "Fremont County",
-      "zh": "科罗拉多6区"
+      "zh": "Fremont County"
     },
     "US_ZN_08_007__R": {
       "en": "Pueblo County",
-      "zh": "科罗拉多州 7 区"
+      "zh": "Pueblo County"
     },
     "US_ZN_08_009__R": {
       "en": "Arapahoe County",
-      "zh": "科罗拉多州 9 区"
+      "zh": "Arapahoe County"
     },
     "US_ZN_08_011__R": {
       "en": "Otero County",
-      "zh": "科罗拉多州 11 区"
+      "zh": "Otero County"
     },
     "US_CNTY_09190": {
       "en": "Western Connecticut Planning Region",
@@ -42985,7 +42985,7 @@
     },
     "US_CNTY_12057": {
       "en": "Tampa",
-      "zh": "希尔斯伯勒"
+      "zh": "坦帕"
     },
     "US_CNTY_12075": {
       "en": "Levy County",
@@ -42993,7 +42993,7 @@
     },
     "US_CNTY_12086": {
       "en": "Miami",
-      "zh": "迈阿密-戴德县"
+      "zh": "迈阿密"
     },
     "US_CNTY_12113": {
       "en": "Santa Rosa County",
@@ -43101,7 +43101,7 @@
     },
     "US_CNTY_12011": {
       "en": "Fort Lauderdale",
-      "zh": "布劳沃德"
+      "zh": "劳德代尔堡"
     },
     "US_CNTY_12127": {
       "en": "Volusia County",
@@ -43133,7 +43133,7 @@
     },
     "US_CNTY_13121": {
       "en": "Atlanta",
-      "zh": "富尔顿"
+      "zh": "亚特兰大"
     },
     "US_CNTY_13067": {
       "en": "Cobb County",
@@ -43149,43 +43149,43 @@
     },
     "US_ZN_13_001__R": {
       "en": "Bartow County",
-      "zh": "乔治亚州 1 区"
+      "zh": "Bartow County"
     },
     "US_ZN_13_002__R": {
       "en": "Paulding County",
-      "zh": "乔治亚州 2 区"
+      "zh": "Paulding County"
     },
     "US_ZN_13_003__R": {
       "en": "Early County",
-      "zh": "乔治亚州 3 区"
+      "zh": "Early County"
     },
     "US_ZN_13_004__R": {
       "en": "Muscogee County",
-      "zh": "乔治亚州 4 区"
+      "zh": "Muscogee County"
     },
     "US_ZN_13_005__R": {
       "en": "Dougherty County",
-      "zh": "乔治亚州 5 区"
+      "zh": "Dougherty County"
     },
     "US_ZN_13_007__R": {
       "en": "Clayton County",
-      "zh": "佐治亚州7区"
+      "zh": "Clayton County"
     },
     "US_ZN_13_010__R": {
       "en": "Lowndes County",
-      "zh": "乔治亚州10区"
+      "zh": "Lowndes County"
     },
     "US_ZN_13_011__R": {
       "en": "Laurens County",
-      "zh": "乔治亚州11区"
+      "zh": "Laurens County"
     },
     "US_ZN_13_013__R": {
       "en": "Ware County",
-      "zh": "乔治亚州13区"
+      "zh": "Ware County"
     },
     "US_ZN_13_014__R": {
       "en": "Clinch County",
-      "zh": "乔治亚州14区"
+      "zh": "Clinch County"
     },
     "US_ZN_13_015": {
       "en": "Chatham County",
@@ -43213,11 +43213,11 @@
     },
     "US_ZN_19_001__R": {
       "en": "Woodbury County",
-      "zh": "爱荷华州 1 区"
+      "zh": "Woodbury County"
     },
     "US_ZN_19_002__R": {
       "en": "Pottawattamie County",
-      "zh": "爱荷华州 2 区"
+      "zh": "Pottawattamie County"
     },
     "US_ZN_19_003__R": {
       "en": "Dallas County",
@@ -43225,35 +43225,35 @@
     },
     "US_ZN_19_005__R": {
       "en": "Black Hawk County",
-      "zh": "爱荷华州 5 区"
+      "zh": "Black Hawk County"
     },
     "US_ZN_16_001__R": {
       "en": "Payette County",
-      "zh": "爱达荷州 1 区"
+      "zh": "Payette County"
     },
     "US_ZN_16_002__R": {
       "en": "Nez Perce County",
-      "zh": "爱达荷州 2 区"
+      "zh": "Nez Perce County"
     },
     "US_ZN_16_003__R": {
       "en": "Kootenai County",
-      "zh": "爱达荷州 3 区"
+      "zh": "Kootenai County"
     },
     "US_ZN_16_004__R": {
       "en": "Ada County",
-      "zh": "爱达荷州 4 区"
+      "zh": "Ada County"
     },
     "US_ZN_16_005__R": {
       "en": "Jerome County",
-      "zh": "爱达荷州 5 区"
+      "zh": "Jerome County"
     },
     "US_ZN_16_006__R": {
       "en": "Lemhi County",
-      "zh": "爱达荷州 6 区"
+      "zh": "Lemhi County"
     },
     "US_ZN_16_007__R": {
       "en": "Bannock County",
-      "zh": "爱达荷州7区"
+      "zh": "Bannock County"
     },
     "US_ZN_16_008": {
       "en": "Bonneville County",
@@ -43269,55 +43269,55 @@
     },
     "US_CNTY_17031": {
       "en": "Chicago",
-      "zh": "厨师"
+      "zh": "芝加哥"
     },
     "US_ZN_17_001__R": {
       "en": "Adams County",
-      "zh": "伊利诺伊州 1 区"
+      "zh": "Adams County"
     },
     "US_ZN_17_004__R": {
       "en": "Rock Island County",
-      "zh": "伊利诺伊州 4 区"
+      "zh": "Rock Island County"
     },
     "US_ZN_17_005__R": {
       "en": "Sangamon County",
-      "zh": "伊利诺伊州 5 区"
+      "zh": "Sangamon County"
     },
     "US_ZN_17_006__R": {
       "en": "McHenry County",
-      "zh": "伊利诺伊州 6 区"
+      "zh": "McHenry County"
     },
     "US_ZN_17_008__R": {
       "en": "Peoria County",
-      "zh": "伊利诺伊州 8 区"
+      "zh": "Peoria County"
     },
     "US_ZN_17_011__R": {
       "en": "McLean County",
-      "zh": "伊利诺伊州 11 区"
+      "zh": "McLean County"
     },
     "US_ZN_17_013__R": {
       "en": "Massac County",
-      "zh": "伊利诺伊州 13 区"
+      "zh": "Massac County"
     },
     "US_ZN_17_014__R": {
       "en": "Will County",
-      "zh": "伊利诺伊州 14 区"
+      "zh": "Will County"
     },
     "US_ZN_17_015__R": {
       "en": "Effingham County",
-      "zh": "伊利诺伊州 15 区"
+      "zh": "Effingham County"
     },
     "US_ZN_17_016__R": {
       "en": "Kane County",
-      "zh": "伊利诺伊州 16 区"
+      "zh": "Kane County"
     },
     "US_ZN_17_017__R": {
       "en": "Champaign County",
-      "zh": "伊利诺伊州 17 区"
+      "zh": "Champaign County"
     },
     "US_ZN_17_018": {
       "en": "Coles County",
-      "zh": "伊利诺伊州 18 区"
+      "zh": "Coles County"
     },
     "US_ZN_17_019": {
       "en": "Wabash County",
@@ -43325,111 +43325,111 @@
     },
     "US_ZN_18_001__R": {
       "en": "Vanderburgh County",
-      "zh": "印第安纳州 1 区"
+      "zh": "Vanderburgh County"
     },
     "US_ZN_18_002__R": {
       "en": "Vigo County",
-      "zh": "印第安纳州 2 区"
+      "zh": "Vigo County"
     },
     "US_ZN_18_006__R": {
       "en": "St. Joseph County",
-      "zh": "印第安纳州 6 区"
+      "zh": "St. Joseph County"
     },
     "US_ZN_18_008__R": {
       "en": "Hendricks County",
-      "zh": "印第安纳州 8 区"
+      "zh": "Hendricks County"
     },
     "US_ZN_18_011__R": {
       "en": "Dearborn County",
-      "zh": "印第安纳州 11 区"
+      "zh": "Dearborn County"
     },
     "US_ZN_20_001__R": {
       "en": "Finney County",
-      "zh": "堪萨斯 1 区"
+      "zh": "Finney County"
     },
     "US_ZN_20_002__R": {
       "en": "Ford County",
-      "zh": "堪萨斯 2 区"
+      "zh": "Ford County"
     },
     "US_ZN_20_004__R": {
       "en": "Sedgwick County",
-      "zh": "堪萨斯 4 区"
+      "zh": "Sedgwick County"
     },
     "US_ZN_20_005__R": {
       "en": "Shawnee County",
-      "zh": "堪萨斯 5 区"
+      "zh": "Shawnee County"
     },
     "US_ZN_21_001__R": {
       "en": "McCracken County",
-      "zh": "肯塔基州 1 区"
+      "zh": "McCracken County"
     },
     "US_ZN_21_002__R": {
       "en": "Daviess County",
-      "zh": "肯塔基州 2 区"
+      "zh": "Daviess County"
     },
     "US_ZN_21_004__R": {
       "en": "Meade County",
-      "zh": "肯塔基州 4 区"
+      "zh": "Meade County"
     },
     "US_ZN_21_005__R": {
       "en": "Bullitt County",
-      "zh": "肯塔基州 5 区"
+      "zh": "Bullitt County"
     },
     "US_ZN_21_009__R": {
       "en": "Kenton County",
-      "zh": "肯塔基州 9 区"
+      "zh": "Kenton County"
     },
     "US_ZN_21_010__R": {
       "en": "Whitley County",
-      "zh": "肯塔基州 10 区"
+      "zh": "Whitley County"
     },
     "US_ZN_21_011": {
       "en": "Pike County",
-      "zh": "肯塔基州 11 区"
+      "zh": "Pike County"
     },
     "US_ZN_22_001__R": {
       "en": "Caddo Parish",
-      "zh": "路易斯安那州 1 区"
+      "zh": "Caddo Parish"
     },
     "US_ZN_22_002__R": {
       "en": "Rapides Parish",
-      "zh": "路易斯安那州 2 区"
+      "zh": "Rapides Parish"
     },
     "US_ZN_22_003__R": {
       "en": "Calcasieu Parish",
-      "zh": "路易斯安那州 3 区"
+      "zh": "Calcasieu Parish"
     },
     "US_ZN_22_004__R": {
       "en": "Ouachita Parish",
-      "zh": "路易斯安那州 4 区"
+      "zh": "Ouachita Parish"
     },
     "US_ZN_22_005__R": {
       "en": "Lafayette Parish",
-      "zh": "路易斯安那州 5 区"
+      "zh": "Lafayette Parish"
     },
     "US_ZN_22_006__R": {
       "en": "Avoyelles Parish",
-      "zh": "路易斯安那州 6 区"
+      "zh": "Avoyelles Parish"
     },
     "US_ZN_22_007__R": {
       "en": "Richland Parish",
-      "zh": "路易斯安那州 7 区"
+      "zh": "Richland Parish"
     },
     "US_ZN_22_008__R": {
       "en": "East Baton Rouge Parish",
-      "zh": "路易斯安那州 8 区"
+      "zh": "East Baton Rouge Parish"
     },
     "US_ZN_22_009__R": {
       "en": "West Feliciana Parish",
-      "zh": "路易斯安那州 9 区"
+      "zh": "West Feliciana Parish"
     },
     "US_ZN_22_010__R": {
       "en": "Terrebonne Parish",
-      "zh": "路易斯安那州 10 区"
+      "zh": "Terrebonne Parish"
     },
     "US_ZN_22_011__R": {
       "en": "St. Tammany Parish",
-      "zh": "路易斯安那州 11 区"
+      "zh": "St. Tammany Parish"
     },
     "US_ZN_22_012": {
       "en": "Jefferson Parish",
@@ -43437,7 +43437,7 @@
     },
     "US_ZN_22_013": {
       "en": "Washington Parish",
-      "zh": "路易斯安那州 13 区"
+      "zh": "Washington Parish"
     },
     "US_CNTY_25001": {
       "en": "Barnstable County",
@@ -43445,7 +43445,7 @@
     },
     "US_CNTY_25025": {
       "en": "Boston",
-      "zh": "萨福克"
+      "zh": "波士顿"
     },
     "US_CNTY_25021": {
       "en": "Norfolk County",
@@ -43485,15 +43485,15 @@
     },
     "US_ZN_24_001__R": {
       "en": "Allegany County",
-      "zh": "马里兰州 1 区"
+      "zh": "Allegany County"
     },
     "US_ZN_24_002__R": {
       "en": "Frederick County",
-      "zh": "马里兰州 2 区"
+      "zh": "Frederick County"
     },
     "US_ZN_24_003__R": {
       "en": "Charles County",
-      "zh": "马里兰州 3 区"
+      "zh": "Charles County"
     },
     "US_ZN_24_005__R": {
       "en": "Baltimore",
@@ -43501,47 +43501,47 @@
     },
     "US_ZN_24_006__R": {
       "en": "St. Mary's County",
-      "zh": "马里兰州 6 区"
+      "zh": "St. Mary's County"
     },
     "US_ZN_24_007__R": {
       "en": "Harford County",
-      "zh": "马里兰州 7 区"
+      "zh": "Harford County"
     },
     "US_ZN_24_008__R": {
       "en": "Queen Anne's County",
-      "zh": "马里兰州 8 区"
+      "zh": "Queen Anne's County"
     },
     "US_ZN_24_009__R": {
       "en": "Talbot County",
-      "zh": "马里兰州 9 区"
+      "zh": "Talbot County"
     },
     "US_ZN_24_010__R": {
       "en": "Wicomico County",
-      "zh": "马里兰州 10 区"
+      "zh": "Wicomico County"
     },
     "US_ZN_23_002__R": {
       "en": "Androscoggin County",
-      "zh": "缅因州 2 区"
+      "zh": "Androscoggin County"
     },
     "US_ZN_23_003__R": {
       "en": "Sagadahoc County",
-      "zh": "缅因州 3 区"
+      "zh": "Sagadahoc County"
     },
     "US_ZN_23_004__R": {
       "en": "Kennebec County",
-      "zh": "缅因州 4 区"
+      "zh": "Kennebec County"
     },
     "US_ZN_23_005__R": {
       "en": "Penobscot County",
-      "zh": "缅因州 5 区"
+      "zh": "Penobscot County"
     },
     "US_ZN_23_006__R": {
       "en": "Aroostook County",
-      "zh": "缅因州 6 区"
+      "zh": "Aroostook County"
     },
     "US_CNTY_26163": {
       "en": "Detroit",
-      "zh": "韦恩"
+      "zh": "底特律"
     },
     "US_CNTY_26099": {
       "en": "Macomb County",
@@ -43553,55 +43553,55 @@
     },
     "US_ZN_26_001__R": {
       "en": "Houghton County",
-      "zh": "密歇根1区"
+      "zh": "Houghton County"
     },
     "US_ZN_26_002__R": {
       "en": "Keweenaw County",
-      "zh": "密歇根2区"
+      "zh": "Keweenaw County"
     },
     "US_ZN_26_003__R": {
       "en": "Marquette County",
-      "zh": "密歇根3区"
+      "zh": "Marquette County"
     },
     "US_ZN_26_004__R": {
       "en": "Menominee County",
-      "zh": "密歇根4区"
+      "zh": "Menominee County"
     },
     "US_ZN_26_005__R": {
       "en": "Kalamazoo County",
-      "zh": "密歇根5区"
+      "zh": "Kalamazoo County"
     },
     "US_ZN_26_006__R": {
       "en": "Muskegon County",
-      "zh": "密歇根6区"
+      "zh": "Muskegon County"
     },
     "US_ZN_26_007__R": {
       "en": "Chippewa County",
-      "zh": "密歇根7区"
+      "zh": "Chippewa County"
     },
     "US_ZN_26_008__R": {
       "en": "Grand Traverse County",
-      "zh": "密歇根8区"
+      "zh": "Grand Traverse County"
     },
     "US_ZN_26_010__R": {
       "en": "Isabella County",
-      "zh": "密歇根10区"
+      "zh": "Isabella County"
     },
     "US_ZN_26_011__R": {
       "en": "Emmet County",
-      "zh": "密歇根11区"
+      "zh": "Emmet County"
     },
     "US_ZN_26_012__R": {
       "en": "Ingham County",
-      "zh": "密歇根12区"
+      "zh": "Ingham County"
     },
     "US_ZN_26_013__R": {
       "en": "Saginaw County",
-      "zh": "密歇根13区"
+      "zh": "Saginaw County"
     },
     "US_ZN_26_014__R": {
       "en": "Alpena County",
-      "zh": "密歇根14区"
+      "zh": "Alpena County"
     },
     "US_ZN_26_015": {
       "en": "Presque Isle County",
@@ -43613,7 +43613,7 @@
     },
     "US_ZN_26_017": {
       "en": "Washtenaw County",
-      "zh": "密歇根17区"
+      "zh": "Washtenaw County"
     },
     "US_ZN_26_018": {
       "en": "Genesee County",
@@ -43621,35 +43621,35 @@
     },
     "US_CNTY_27053": {
       "en": "Minneapolis",
-      "zh": "亨内平"
+      "zh": "明尼阿波利斯"
     },
     "US_ZN_27_001__R": {
       "en": "Beltrami County",
-      "zh": "明尼苏达州 1 区"
+      "zh": "Beltrami County"
     },
     "US_ZN_27_005__R": {
       "en": "Red Lake County",
-      "zh": "明尼苏达州 5 区"
+      "zh": "Red Lake County"
     },
     "US_ZN_27_006__R": {
       "en": "Blue Earth County",
-      "zh": "明尼苏达 6 区"
+      "zh": "Blue Earth County"
     },
     "US_ZN_27_007__R": {
       "en": "Stearns County",
-      "zh": "明尼苏达州 7 区"
+      "zh": "Stearns County"
     },
     "US_ZN_27_008__R": {
       "en": "Crow Wing County",
-      "zh": "明尼苏达 8 区"
+      "zh": "Crow Wing County"
     },
     "US_ZN_27_009__R": {
       "en": "Sherburne County",
-      "zh": "明尼苏达州 9 区"
+      "zh": "Sherburne County"
     },
     "US_ZN_27_011__R": {
       "en": "Wright County",
-      "zh": "明尼苏达州 11 区"
+      "zh": "Wright County"
     },
     "US_ZN_27_013": {
       "en": "Ramsey County",
@@ -43665,27 +43665,27 @@
     },
     "US_ZN_29_001__R": {
       "en": "Platte County",
-      "zh": "密苏里州 1 区"
+      "zh": "Platte County"
     },
     "US_ZN_29_003__R": {
       "en": "Greene County",
-      "zh": "密苏里州 3 区"
+      "zh": "Greene County"
     },
     "US_ZN_29_004__R": {
       "en": "Adair County",
-      "zh": "密苏里州 4 区"
+      "zh": "Adair County"
     },
     "US_ZN_29_006__R": {
       "en": "Christian County",
-      "zh": "密苏里州 6 区"
+      "zh": "Christian County"
     },
     "US_ZN_29_009__R": {
       "en": "Cape Girardeau County",
-      "zh": "密苏里州 9 区"
+      "zh": "Cape Girardeau County"
     },
     "US_ZN_29_011__R": {
       "en": "St. Charles County",
-      "zh": "密苏里州 11 区"
+      "zh": "St. Charles County"
     },
     "US_ZN_29_012": {
       "en": "St. Louis",
@@ -43693,31 +43693,31 @@
     },
     "US_ZN_28_001__R": {
       "en": "Hinds County",
-      "zh": "密西西比州 1 区"
+      "zh": "Hinds County"
     },
     "US_ZN_28_004__R": {
       "en": "Rankin County",
-      "zh": "密西西比州 4 区"
+      "zh": "Rankin County"
     },
     "US_ZN_28_005__R": {
       "en": "Oktibbeha County",
-      "zh": "密西西比州 5 区"
+      "zh": "Oktibbeha County"
     },
     "US_ZN_30_001__R": {
       "en": "Missoula County",
-      "zh": "蒙大拿州 1 区"
+      "zh": "Missoula County"
     },
     "US_ZN_30_002__R": {
       "en": "Gallatin County",
-      "zh": "蒙大拿州 2 区"
+      "zh": "Gallatin County"
     },
     "US_ZN_30_003__R": {
       "en": "Cascade County",
-      "zh": "蒙大拿州 3 区"
+      "zh": "Cascade County"
     },
     "US_ZN_30_004__R": {
       "en": "Yellowstone County",
-      "zh": "蒙大拿州 4 区"
+      "zh": "Yellowstone County"
     },
     "US_CNTY_37119": {
       "en": "Mecklenburg County",
@@ -43729,79 +43729,79 @@
     },
     "US_ZN_37_002__R": {
       "en": "Buncombe County",
-      "zh": "北卡罗来纳州 2 区"
+      "zh": "Buncombe County"
     },
     "US_ZN_37_005__R": {
       "en": "Cabarrus County",
-      "zh": "北卡罗来纳州 5 区"
+      "zh": "Cabarrus County"
     },
     "US_ZN_37_006__R": {
       "en": "Forsyth County",
-      "zh": "北卡罗来纳州 6 区"
+      "zh": "Forsyth County"
     },
     "US_ZN_37_008__R": {
       "en": "Guilford County",
-      "zh": "北卡罗来纳州 8 区"
+      "zh": "Guilford County"
     },
     "US_ZN_37_010__R": {
       "en": "Durham County",
-      "zh": "北卡罗来纳州 10 区"
+      "zh": "Durham County"
     },
     "US_ZN_37_011__R": {
       "en": "Johnston County",
-      "zh": "北卡罗来纳州 11 区"
+      "zh": "Johnston County"
     },
     "US_ZN_37_012__R": {
       "en": "New Hanover County",
-      "zh": "北卡罗来纳州 12 区"
+      "zh": "New Hanover County"
     },
     "US_ZN_37_013__R": {
       "en": "Nash County",
-      "zh": "北卡罗来纳州 13 区"
+      "zh": "Nash County"
     },
     "US_ZN_37_014__R": {
       "en": "Pitt County",
-      "zh": "北卡罗来纳州 14 区"
+      "zh": "Pitt County"
     },
     "US_ZN_37_015__R": {
       "en": "Pasquotank County",
-      "zh": "北卡罗来纳州 15 区"
+      "zh": "Pasquotank County"
     },
     "US_ZN_37_016__R": {
       "en": "Dare County",
-      "zh": "北卡罗来纳州 16 区"
+      "zh": "Dare County"
     },
     "US_ZN_37_017": {
       "en": "Carteret County",
-      "zh": "北卡罗来纳州 17 区"
+      "zh": "Carteret County"
     },
     "US_ZN_38_001__R": {
       "en": "Williams County",
-      "zh": "北达科他州 1 区"
+      "zh": "Williams County"
     },
     "US_ZN_38_002__R": {
       "en": "Burleigh County",
-      "zh": "北达科他州 2 区"
+      "zh": "Burleigh County"
     },
     "US_ZN_38_003__R": {
       "en": "Morton County",
-      "zh": "北达科他州 3 区"
+      "zh": "Morton County"
     },
     "US_ZN_31_001__R": {
       "en": "Scotts Bluff County",
-      "zh": "内布拉斯加州 1 区"
+      "zh": "Scotts Bluff County"
     },
     "US_ZN_31_005__R": {
       "en": "Dodge County",
-      "zh": "内布拉斯加州 5 区"
+      "zh": "Dodge County"
     },
     "US_ZN_33_001__R": {
       "en": "Cheshire County",
-      "zh": "新罕布什尔州 1 区"
+      "zh": "Cheshire County"
     },
     "US_ZN_33_002__R": {
       "en": "Grafton County",
-      "zh": "新罕布什尔州 2 区"
+      "zh": "Grafton County"
     },
     "US_ZN_33_003__R": {
       "en": "Hillsborough County",
@@ -43809,15 +43809,15 @@
     },
     "US_ZN_33_004__R": {
       "en": "Strafford County",
-      "zh": "新罕布什尔州 4 区"
+      "zh": "Strafford County"
     },
     "US_ZN_33_005__R": {
       "en": "Coos County",
-      "zh": "新罕布什尔州 5 区"
+      "zh": "Coos County"
     },
     "US_ZN_33_006__R": {
       "en": "Rockingham County",
-      "zh": "新罕布什尔州 6 区"
+      "zh": "Rockingham County"
     },
     "US_CNTY_34003": {
       "en": "Bergen County",
@@ -43829,95 +43829,95 @@
     },
     "US_ZN_34_001__R": {
       "en": "Salem County",
-      "zh": "新泽西州 1 区"
+      "zh": "Salem County"
     },
     "US_ZN_34_002__R": {
       "en": "Gloucester County",
-      "zh": "新泽西州 2 区"
+      "zh": "Gloucester County"
     },
     "US_ZN_34_004__R": {
       "en": "Camden County",
-      "zh": "新泽西州 4 区"
+      "zh": "Camden County"
     },
     "US_ZN_34_005__R": {
       "en": "Hunterdon County",
-      "zh": "新泽西州 5 区"
+      "zh": "Hunterdon County"
     },
     "US_ZN_34_007__R": {
       "en": "Burlington County",
-      "zh": "新泽西7区"
+      "zh": "Burlington County"
     },
     "US_ZN_34_008__R": {
       "en": "Mercer County",
-      "zh": "新泽西8区"
+      "zh": "Mercer County"
     },
     "US_ZN_34_010__R": {
       "en": "Passaic County",
-      "zh": "新泽西州 10 区"
+      "zh": "Passaic County"
     },
     "US_ZN_34_012__R": {
       "en": "Ocean County",
-      "zh": "新泽西12区"
+      "zh": "Ocean County"
     },
     "US_ZN_34_013": {
       "en": "Monmouth County",
-      "zh": "新泽西13区"
+      "zh": "Monmouth County"
     },
     "US_ZN_35_001__R": {
       "en": "Doña Ana County",
-      "zh": "新墨西哥州 1 区"
+      "zh": "Doña Ana County"
     },
     "US_ZN_35_002__R": {
       "en": "Sandoval County",
-      "zh": "新墨西哥州 2 区"
+      "zh": "Sandoval County"
     },
     "US_ZN_35_003__R": {
       "en": "Bernalillo County",
-      "zh": "新墨西哥州 3 区"
+      "zh": "Bernalillo County"
     },
     "US_ZN_35_004__R": {
       "en": "Los Alamos County",
-      "zh": "新墨西哥州 4 区"
+      "zh": "Los Alamos County"
     },
     "US_ZN_35_005__R": {
       "en": "Lea County",
-      "zh": "新墨西哥州 5 区"
+      "zh": "Lea County"
     },
     "US_ZN_35_006__R": {
       "en": "Taos County",
-      "zh": "新墨西哥州 6 区"
+      "zh": "Taos County"
     },
     "US_ZN_35_007__R": {
       "en": "Curry County",
-      "zh": "新墨西哥州 7 区"
+      "zh": "Curry County"
     },
     "US_ZN_32_001__R": {
       "en": "Carson City",
-      "zh": "内华达州 1 区"
+      "zh": "Carson City"
     },
     "US_ZN_32_002__R": {
       "en": "Washoe County",
-      "zh": "内华达2区"
+      "zh": "Washoe County"
     },
     "US_ZN_32_004__R": {
       "en": "Mineral County",
-      "zh": "内华达州 4 区"
+      "zh": "Mineral County"
     },
     "US_ZN_32_005__R": {
       "en": "Churchill County",
-      "zh": "内华达5区"
+      "zh": "Churchill County"
     },
     "US_ZN_32_006__R": {
       "en": "Elko County",
-      "zh": "内华达6区"
+      "zh": "Elko County"
     },
     "US_ZN_32_007__R": {
       "en": "Nye County",
-      "zh": "内华达7区"
+      "zh": "Nye County"
     },
     "US_ZN_32_008__R": {
       "en": "White Pine County",
-      "zh": "内华达州 8 区"
+      "zh": "White Pine County"
     },
     "US_CNTY_36005": {
       "en": "Bronx County",
@@ -43929,7 +43929,7 @@
     },
     "US_CNTY_36047": {
       "en": "Brooklyn",
-      "zh": "国王队"
+      "zh": "布鲁克林"
     },
     "US_CNTY_36061": {
       "en": "New York",
@@ -43945,47 +43945,47 @@
     },
     "US_ZN_36_001__R": {
       "en": "Chautauqua County",
-      "zh": "纽约1区"
+      "zh": "Chautauqua County"
     },
     "US_ZN_36_002__R": {
       "en": "Niagara County",
-      "zh": "纽约2区"
+      "zh": "Niagara County"
     },
     "US_ZN_36_003__R": {
       "en": "Ontario County",
-      "zh": "纽约3区"
+      "zh": "Ontario County"
     },
     "US_ZN_36_004__R": {
       "en": "Tompkins County",
-      "zh": "纽约4区"
+      "zh": "Tompkins County"
     },
     "US_ZN_36_005__R": {
       "en": "Broome County",
-      "zh": "纽约5区"
+      "zh": "Broome County"
     },
     "US_ZN_36_006__R": {
       "en": "Onondaga County",
-      "zh": "纽约6区"
+      "zh": "Onondaga County"
     },
     "US_ZN_36_008__R": {
       "en": "St. Lawrence County",
-      "zh": "纽约8区"
+      "zh": "St. Lawrence County"
     },
     "US_ZN_36_011__R": {
       "en": "Schenectady County",
-      "zh": "纽约11区"
+      "zh": "Schenectady County"
     },
     "US_ZN_36_012__R": {
       "en": "Clinton County",
-      "zh": "纽约12区"
+      "zh": "Clinton County"
     },
     "US_ZN_36_014__R": {
       "en": "Albany County",
-      "zh": "纽约14区"
+      "zh": "Albany County"
     },
     "US_ZN_36_015__R": {
       "en": "Dutchess County",
-      "zh": "纽约15区"
+      "zh": "Dutchess County"
     },
     "US_CNTY_39035": {
       "en": "Cuyahoga County",
@@ -43993,35 +43993,35 @@
     },
     "US_ZN_39_003__R": {
       "en": "Lucas County",
-      "zh": "俄亥俄州 3 区"
+      "zh": "Lucas County"
     },
     "US_ZN_39_004__R": {
       "en": "Clermont County",
-      "zh": "俄亥俄州 4 区"
+      "zh": "Clermont County"
     },
     "US_ZN_39_007__R": {
       "en": "Lorain County",
-      "zh": "俄亥俄州 7 区"
+      "zh": "Lorain County"
     },
     "US_ZN_39_008__R": {
       "en": "Ross County",
-      "zh": "俄亥俄州 8 区"
+      "zh": "Ross County"
     },
     "US_ZN_39_010__R": {
       "en": "Fairfield County",
-      "zh": "俄亥俄州 10 区"
+      "zh": "Fairfield County"
     },
     "US_ZN_39_013__R": {
       "en": "Summit County",
-      "zh": "俄亥俄州 13 区"
+      "zh": "Summit County"
     },
     "US_ZN_39_015__R": {
       "en": "Tuscarawas County",
-      "zh": "俄亥俄州 15 区"
+      "zh": "Tuscarawas County"
     },
     "US_ZN_39_018": {
       "en": "Columbiana County",
-      "zh": "俄亥俄州 18 区"
+      "zh": "Columbiana County"
     },
     "US_CNTY_40109": {
       "en": "Oklahoma County",
@@ -44029,27 +44029,27 @@
     },
     "US_ZN_40_001__R": {
       "en": "Custer County",
-      "zh": "俄克拉荷马州 1 区"
+      "zh": "Custer County"
     },
     "US_ZN_40_002__R": {
       "en": "Canadian County",
-      "zh": "俄克拉荷马州 2 区"
+      "zh": "Canadian County"
     },
     "US_ZN_40_003__R": {
       "en": "Tulsa County",
-      "zh": "俄克拉荷马州 3 区"
+      "zh": "Tulsa County"
     },
     "US_ZN_40_005__R": {
       "en": "Bryan County",
-      "zh": "俄克拉荷马州 5 区"
+      "zh": "Bryan County"
     },
     "US_ZN_40_006__R": {
       "en": "Creek County",
-      "zh": "俄克拉荷马州 6 区"
+      "zh": "Creek County"
     },
     "US_ZN_40_007__R": {
       "en": "Rogers County",
-      "zh": "俄克拉荷马州 7 区"
+      "zh": "Rogers County"
     },
     "US_CNTY_41051": {
       "en": "Multnomah County",
@@ -44057,27 +44057,27 @@
     },
     "US_ZN_41_005__R": {
       "en": "Clackamas County",
-      "zh": "俄勒冈州 5 区"
+      "zh": "Clackamas County"
     },
     "US_ZN_41_006__R": {
       "en": "Lane County",
-      "zh": "俄勒冈州 6 区"
+      "zh": "Lane County"
     },
     "US_ZN_41_008__R": {
       "en": "Hood River County",
-      "zh": "俄勒冈州 8 区"
+      "zh": "Hood River County"
     },
     "US_ZN_41_010__R": {
       "en": "Crook County",
-      "zh": "俄勒冈州 10 区"
+      "zh": "Crook County"
     },
     "US_ZN_41_011": {
       "en": "Umatilla County",
-      "zh": "俄勒冈州 11 区"
+      "zh": "Umatilla County"
     },
     "US_ZN_41_012": {
       "en": "Malheur County",
-      "zh": "俄勒冈州 12 区"
+      "zh": "Malheur County"
     },
     "US_CNTY_42003": {
       "en": "Allegheny County",
@@ -44089,59 +44089,59 @@
     },
     "US_ZN_42_001__R": {
       "en": "Butler County",
-      "zh": "宾夕法尼亚州 1 区"
+      "zh": "Butler County"
     },
     "US_ZN_42_002__R": {
       "en": "Westmoreland County",
-      "zh": "宾夕法尼亚州 2 区"
+      "zh": "Westmoreland County"
     },
     "US_ZN_42_004__R": {
       "en": "Indiana County",
-      "zh": "宾夕法尼亚州 4 区"
+      "zh": "Indiana County"
     },
     "US_ZN_42_005__R": {
       "en": "Clearfield County",
-      "zh": "宾夕法尼亚州 5 区"
+      "zh": "Clearfield County"
     },
     "US_ZN_42_006__R": {
       "en": "Cambria County",
-      "zh": "宾夕法尼亚6区"
+      "zh": "Cambria County"
     },
     "US_ZN_42_007__R": {
       "en": "Tioga County",
-      "zh": "宾夕法尼亚7区"
+      "zh": "Tioga County"
     },
     "US_ZN_42_009__R": {
       "en": "Centre County",
-      "zh": "宾夕法尼亚州 9 区"
+      "zh": "Centre County"
     },
     "US_ZN_42_010__R": {
       "en": "Dauphin County",
-      "zh": "宾夕法尼亚10区"
+      "zh": "Dauphin County"
     },
     "US_ZN_42_011__R": {
       "en": "Lancaster County",
-      "zh": "宾夕法尼亚11区"
+      "zh": "Lancaster County"
     },
     "US_ZN_42_012__R": {
       "en": "Schuylkill County",
-      "zh": "宾夕法尼亚12区"
+      "zh": "Schuylkill County"
     },
     "US_ZN_42_013__R": {
       "en": "Luzerne County",
-      "zh": "宾夕法尼亚13区"
+      "zh": "Luzerne County"
     },
     "US_ZN_42_014__R": {
       "en": "Lehigh County",
-      "zh": "宾夕法尼亚14区"
+      "zh": "Lehigh County"
     },
     "US_ZN_42_015__R": {
       "en": "Lackawanna County",
-      "zh": "宾夕法尼亚15区"
+      "zh": "Lackawanna County"
     },
     "US_ZN_42_017": {
       "en": "Bucks County",
-      "zh": "宾夕法尼亚17区"
+      "zh": "Bucks County"
     },
     "US_CNTY_44007": {
       "en": "Providence County",
@@ -44153,51 +44153,51 @@
     },
     "US_ZN_45_001__R": {
       "en": "Greenville County",
-      "zh": "南卡罗来纳州 1 区"
+      "zh": "Greenville County"
     },
     "US_ZN_45_002__R": {
       "en": "Aiken County",
-      "zh": "南卡罗来纳州 2 区"
+      "zh": "Aiken County"
     },
     "US_ZN_45_003__R": {
       "en": "Spartanburg County",
-      "zh": "南卡罗来纳州 3 区"
+      "zh": "Spartanburg County"
     },
     "US_ZN_45_004__R": {
       "en": "York County",
-      "zh": "南卡罗来纳州 4 区"
+      "zh": "York County"
     },
     "US_ZN_45_005__R": {
       "en": "Orangeburg County",
-      "zh": "南卡罗来纳州 5 区"
+      "zh": "Orangeburg County"
     },
     "US_ZN_45_007__R": {
       "en": "Beaufort County",
-      "zh": "南卡罗来纳州 7 区"
+      "zh": "Beaufort County"
     },
     "US_ZN_45_008__R": {
       "en": "Charleston County",
-      "zh": "南卡罗来纳州 8 区"
+      "zh": "Charleston County"
     },
     "US_ZN_45_009__R": {
       "en": "Florence County",
-      "zh": "南卡罗来纳州 9 区"
+      "zh": "Florence County"
     },
     "US_ZN_45_010__R": {
       "en": "Horry County",
-      "zh": "南卡罗来纳州 10 区"
+      "zh": "Horry County"
     },
     "US_ZN_46_001__R": {
       "en": "Pennington County",
-      "zh": "南达科他州 1 区"
+      "zh": "Pennington County"
     },
     "US_ZN_46_002__R": {
       "en": "Hughes County",
-      "zh": "南达科他州 2 区"
+      "zh": "Hughes County"
     },
     "US_ZN_46_004__R": {
       "en": "Minnehaha County",
-      "zh": "南达科他州 4 区"
+      "zh": "Minnehaha County"
     },
     "US_CNTY_47037": {
       "en": "Davidson County",
@@ -44205,31 +44205,31 @@
     },
     "US_ZN_47_002__R": {
       "en": "Gibson County",
-      "zh": "田纳西州 2 区"
+      "zh": "Gibson County"
     },
     "US_ZN_47_005__R": {
       "en": "Rutherford County",
-      "zh": "田纳西州 5 区"
+      "zh": "Rutherford County"
     },
     "US_ZN_47_006__R": {
       "en": "Sumner County",
-      "zh": "田纳西州 6 区"
+      "zh": "Sumner County"
     },
     "US_ZN_47_007__R": {
       "en": "Coffee County",
-      "zh": "田纳西州 7 区"
+      "zh": "Coffee County"
     },
     "US_ZN_47_010__R": {
       "en": "Blount County",
-      "zh": "田纳西州 10 区"
+      "zh": "Blount County"
     },
     "US_ZN_47_011__R": {
       "en": "Sevier County",
-      "zh": "田纳西州 11 区"
+      "zh": "Sevier County"
     },
     "US_ZN_47_012__R": {
       "en": "Sullivan County",
-      "zh": "田纳西州 12 区"
+      "zh": "Sullivan County"
     },
     "US_CNTY_48037": {
       "en": "Bowie County",
@@ -44729,7 +44729,7 @@
     },
     "US_CNTY_48201": {
       "en": "Houston",
-      "zh": "休斯顿"
+      "zh": "休斯敦"
     },
     "US_CNTY_48165": {
       "en": "Gaines County",
@@ -45101,15 +45101,15 @@
     },
     "US_ZN_49_002__R": {
       "en": "Davis County",
-      "zh": "犹他州 2 区"
+      "zh": "Davis County"
     },
     "US_ZN_49_003__R": {
       "en": "Uintah County",
-      "zh": "犹他州 3 区"
+      "zh": "Uintah County"
     },
     "US_ZN_49_004__R": {
       "en": "Cache County",
-      "zh": "犹他州 4 区"
+      "zh": "Cache County"
     },
     "US_CNTY_51059": {
       "en": "Fairfax County",
@@ -45117,99 +45117,99 @@
     },
     "US_ZN_51_002__R": {
       "en": "Bristol city",
-      "zh": "弗吉尼亚2区"
+      "zh": "Bristol city"
     },
     "US_ZN_51_005__R": {
       "en": "Covington city",
-      "zh": "弗吉尼亚5区"
+      "zh": "Covington city"
     },
     "US_ZN_51_006__R": {
       "en": "Martinsville city",
-      "zh": "弗吉尼亚6区"
+      "zh": "Martinsville city"
     },
     "US_ZN_51_007__R": {
       "en": "Augusta County",
-      "zh": "弗吉尼亚7区"
+      "zh": "Augusta County"
     },
     "US_ZN_51_008__R": {
       "en": "Lynchburg city",
-      "zh": "弗吉尼亚8区"
+      "zh": "Lynchburg city"
     },
     "US_ZN_51_009__R": {
       "en": "Albemarle County",
-      "zh": "弗吉尼亚9区"
+      "zh": "Albemarle County"
     },
     "US_ZN_51_010__R": {
       "en": "Chesterfield County",
-      "zh": "弗吉尼亚10区"
+      "zh": "Chesterfield County"
     },
     "US_ZN_51_011__R": {
       "en": "Charlottesville city",
-      "zh": "弗吉尼亚11区"
+      "zh": "Charlottesville city"
     },
     "US_ZN_51_012__R": {
       "en": "Prince George County",
-      "zh": "弗吉尼亚12区"
+      "zh": "Prince George County"
     },
     "US_ZN_51_013__R": {
       "en": "Winchester city",
-      "zh": "弗吉尼亚13区"
+      "zh": "Winchester city"
     },
     "US_ZN_51_014__R": {
       "en": "Prince William County",
-      "zh": "弗吉尼亚14区"
+      "zh": "Prince William County"
     },
     "US_ZN_51_015__R": {
       "en": "Manassas city",
-      "zh": "弗吉尼亚15区"
+      "zh": "Manassas city"
     },
     "US_ZN_51_016": {
       "en": "Henrico County",
-      "zh": "弗吉尼亚16区"
+      "zh": "Henrico County"
     },
     "US_ZN_51_017": {
       "en": "Petersburg city",
-      "zh": "弗吉尼亚17区"
+      "zh": "Petersburg city"
     },
     "US_ZN_51_014": {
       "en": "Fairfax city",
-      "zh": "弗吉尼亚14区"
+      "zh": "Fairfax city"
     },
     "US_ZN_51_019": {
       "en": "Hopewell city",
-      "zh": "弗吉尼亚19区"
+      "zh": "Hopewell city"
     },
     "US_ZN_51_020": {
       "en": "King George County",
-      "zh": "弗吉尼亚20区"
+      "zh": "King George County"
     },
     "US_ZN_51_015": {
       "en": "Arlington County",
-      "zh": "弗吉尼亚15区"
+      "zh": "Arlington County"
     },
     "US_ZN_51_022": {
       "en": "Virginia Beach city",
-      "zh": "弗吉尼亚22区"
+      "zh": "Virginia Beach city"
     },
     "US_ZN_51_023": {
       "en": "Hampton city",
-      "zh": "弗吉尼亚23区"
+      "zh": "Hampton city"
     },
     "US_ZN_51_024": {
       "en": "Mathews County",
-      "zh": "弗吉尼亚24区"
+      "zh": "Mathews County"
     },
     "US_ZN_51_013": {
       "en": "Accomack County",
-      "zh": "弗吉尼亚13区"
+      "zh": "Accomack County"
     },
     "US_ZN_50_001__R": {
       "en": "Chittenden County",
-      "zh": "佛蒙特州 1 区"
+      "zh": "Chittenden County"
     },
     "US_ZN_50_002__R": {
       "en": "Rutland County",
-      "zh": "佛蒙特州 2 区"
+      "zh": "Rutland County"
     },
     "US_CNTY_53053": {
       "en": "Pierce County",
@@ -45217,7 +45217,7 @@
     },
     "US_CNTY_53033": {
       "en": "Seattle",
-      "zh": "国王"
+      "zh": "西雅图"
     },
     "US_CNTY_53061": {
       "en": "Snohomish County",
@@ -45229,47 +45229,47 @@
     },
     "US_ZN_53_002__R": {
       "en": "Lewis County",
-      "zh": "华盛顿2区"
+      "zh": "Lewis County"
     },
     "US_ZN_53_003__R": {
       "en": "Thurston County",
-      "zh": "华盛顿3区"
+      "zh": "Thurston County"
     },
     "US_ZN_53_011": {
       "en": "San Juan County",
-      "zh": "华盛顿11区"
+      "zh": "San Juan County"
     },
     "US_ZN_53_005__R": {
       "en": "Cowlitz County",
-      "zh": "华盛顿5区"
+      "zh": "Cowlitz County"
     },
     "US_ZN_53_012": {
       "en": "Island County",
-      "zh": "华盛顿12区"
+      "zh": "Island County"
     },
     "US_ZN_53_008__R": {
       "en": "Whatcom County",
-      "zh": "华盛顿8区"
+      "zh": "Whatcom County"
     },
     "US_ZN_53_009__R": {
       "en": "Yakima County",
-      "zh": "华盛顿9区"
+      "zh": "Yakima County"
     },
     "US_ZN_53_011__R": {
       "en": "Stevens County",
-      "zh": "华盛顿11区"
+      "zh": "Stevens County"
     },
     "US_ZN_53_012__R": {
       "en": "Whitman County",
-      "zh": "华盛顿12区"
+      "zh": "Whitman County"
     },
     "US_ZN_53_013": {
       "en": "Spokane County",
-      "zh": "华盛顿13区"
+      "zh": "Spokane County"
     },
     "US_ZN_53_014": {
       "en": "Asotin County",
-      "zh": "华盛顿14区"
+      "zh": "Asotin County"
     },
     "US_CNTY_55079": {
       "en": "Milwaukee County",
@@ -45277,71 +45277,71 @@
     },
     "US_ZN_55_001__R": {
       "en": "St. Croix County",
-      "zh": "威斯康星州 1 区"
+      "zh": "St. Croix County"
     },
     "US_ZN_55_003__R": {
       "en": "La Crosse County",
-      "zh": "威斯康星州 3 区"
+      "zh": "La Crosse County"
     },
     "US_ZN_55_004__R": {
       "en": "Grant County",
-      "zh": "威斯康星州 4 区"
+      "zh": "Grant County"
     },
     "US_ZN_55_006__R": {
       "en": "Marathon County",
-      "zh": "威斯康星州 6 区"
+      "zh": "Marathon County"
     },
     "US_ZN_55_008__R": {
       "en": "Dane County",
-      "zh": "威斯康星州 8 区"
+      "zh": "Dane County"
     },
     "US_ZN_55_009__R": {
       "en": "Shawano County",
-      "zh": "威斯康星州 9 区"
+      "zh": "Shawano County"
     },
     "US_ZN_55_010__R": {
       "en": "Waukesha County",
-      "zh": "威斯康星州 10 区"
+      "zh": "Waukesha County"
     },
     "US_ZN_55_011__R": {
       "en": "Outagamie County",
-      "zh": "威斯康星州 11 区"
+      "zh": "Outagamie County"
     },
     "US_ZN_55_012__R": {
       "en": "Marinette County",
-      "zh": "威斯康星州 12 区"
+      "zh": "Marinette County"
     },
     "US_ZN_55_014": {
       "en": "Racine County",
-      "zh": "威斯康星州 14 区"
+      "zh": "Racine County"
     },
     "US_ZN_54_001__R": {
       "en": "Kanawha County",
-      "zh": "西弗吉尼亚州 1 区"
+      "zh": "Kanawha County"
     },
     "US_ZN_54_003__R": {
       "en": "Raleigh County",
-      "zh": "西弗吉尼亚州 3 区"
+      "zh": "Raleigh County"
     },
     "US_ZN_54_004__R": {
       "en": "Monongalia County",
-      "zh": "西弗吉尼亚州 4 区"
+      "zh": "Monongalia County"
     },
     "US_ZN_54_006__R": {
       "en": "Berkeley County",
-      "zh": "西弗吉尼亚州 6 区"
+      "zh": "Berkeley County"
     },
     "US_ZN_56_001__R": {
       "en": "Sweetwater County",
-      "zh": "怀俄明州 1 区"
+      "zh": "Sweetwater County"
     },
     "US_ZN_56_002__R": {
       "en": "Natrona County",
-      "zh": "怀俄明州 2 区"
+      "zh": "Natrona County"
     },
     "US_ZN_56_003__R": {
       "en": "Laramie County",
-      "zh": "怀俄明州 3 区"
+      "zh": "Laramie County"
     },
     "CD_ADM1_COD-1461__tno1962_1": {
       "en": "Équateur",
@@ -45469,9 +45469,9 @@
     }
   },
   "audit": {
-    "safe_feature_copies": 11285,
-    "manual_feature_overrides": 81,
-    "unique_raw_name_safe_copy_count": 11254,
+    "safe_feature_copies": 11282,
+    "manual_feature_overrides": 84,
+    "unique_raw_name_safe_copy_count": 11251,
     "split_clone_safe_copy_count": 31,
     "collision_candidate_count": 937,
     "cross_base_collision_count": 936,

@@ -511,7 +511,7 @@ function createDefaultPhysicalStyleConfig() {
   return {
     mode: "atlas_and_contours",
     opacity: 0.5,
-    atlasOpacity: 0.34,
+    atlasOpacity: 0.52,
     atlasIntensity: 0.9,
     atlasClassVisibility: createDefaultPhysicalAtlasVisibility(),
     rainforestEmphasis: 0.72,
@@ -523,7 +523,7 @@ function createDefaultPhysicalStyleConfig() {
     contourMinorIntervalM: 100,
     contourMinorVisible: true,
     contourLowReliefCutoffM: 300,
-    blendMode: "source-over",
+    blendMode: "soft-light",
   };
 }
 

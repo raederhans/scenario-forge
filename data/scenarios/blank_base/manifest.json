@@ -1,9 +1,9 @@
 {
   "version": 2,
   "scenario_id": "blank_base",
-  "display_name": "Blank Base",
-  "bookmark_name": "Blank Base",
-  "bookmark_description": "Canonical ownership baseline without scenario-only overlays.",
+  "display_name": "Canonical Baseline",
+  "bookmark_name": "Canonical Baseline",
+  "bookmark_description": "Canonical ownership baseline for manual editing and comparison, without scenario-only overlays.",
   "bookmark_date": "2026.1.1.12",
   "default_country": "US",
   "featured_tags": [

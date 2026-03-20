@@ -3256,128 +3256,18 @@
       "candidate_count": 1
     }
   },
-  "cities": {
-    "CITY::ne::1159151291": {
-      "stable_key": "id::CITY::ne::1159151291",
-      "display_name": {
-        "en": "Leningrad",
-        "zh": "列宁格勒"
-      },
-      "aliases": [
-        "Leningrad",
-        "Saint Petersburg"
-      ],
-      "tier": "major",
-      "hidden": false
-    },
-    "CITY::ne::1159150695": {
-      "stable_key": "id::CITY::ne::1159150695",
-      "display_name": {
-        "en": "Gorky",
-        "zh": "高尔基"
-      },
-      "aliases": [
-        "Gorky",
-        "Nizhniy Novgorod"
-      ],
-      "tier": "regional",
-      "hidden": false
-    },
-    "CITY::ne::1159150701": {
-      "stable_key": "id::CITY::ne::1159150701",
-      "display_name": {
-        "en": "Sverdlovsk",
-        "zh": "斯维尔德洛夫斯克"
-      },
-      "aliases": [
-        "Sverdlovsk",
-        "Yekaterinburg"
-      ],
-      "tier": "regional",
-      "hidden": false
-    },
-    "CITY::ne::1159150697": {
-      "stable_key": "id::CITY::ne::1159150697",
-      "display_name": {
-        "en": "Stalingrad",
-        "zh": "斯大林格勒"
-      },
-      "aliases": [
-        "Stalingrad",
-        "Volgograd"
-      ],
-      "tier": "major",
-      "hidden": false
-    }
-  },
+  "cities": {},
   "audit": {
     "manual_capital_count": 29,
     "capital_hint_count": 139,
-    "renamed_city_count": 4,
-    "name_conflict_count": 4,
+    "renamed_city_count": 0,
+    "name_conflict_count": 0,
     "unresolved_capital_count": 29,
     "unresolved_manual_capital_count": 0,
     "unresolved_city_rename_count": 0,
     "featured_runtime_missing_count": 0,
     "featured_runtime_missing_tags": [],
-    "name_conflicts": [
-      {
-        "city_id": "CITY::ne::1159151291",
-        "host_feature_id": "RU_CITY_SAINT_PETERSBURG",
-        "stable_key": "id::CITY::ne::1159151291",
-        "base_name": {
-          "en": "St.  Petersburg",
-          "zh": "圣彼得堡"
-        },
-        "scenario_name": {
-          "en": "Leningrad",
-          "zh": "列宁格勒"
-        },
-        "resolution": "scenario_city_override"
-      },
-      {
-        "city_id": "CITY::ne::1159150695",
-        "host_feature_id": "RU_RAY_50074027B44365109797977",
-        "stable_key": "id::CITY::ne::1159150695",
-        "base_name": {
-          "en": "Nizhny Novgorod",
-          "zh": "下诺夫哥罗德"
-        },
-        "scenario_name": {
-          "en": "Gorky",
-          "zh": "高尔基"
-        },
-        "resolution": "scenario_city_override"
-      },
-      {
-        "city_id": "CITY::ne::1159150701",
-        "host_feature_id": "RUS-2386",
-        "stable_key": "id::CITY::ne::1159150701",
-        "base_name": {
-          "en": "Yekaterinburg",
-          "zh": "叶卡捷琳堡"
-        },
-        "scenario_name": {
-          "en": "Sverdlovsk",
-          "zh": "斯维尔德洛夫斯克"
-        },
-        "resolution": "scenario_city_override"
-      },
-      {
-        "city_id": "CITY::ne::1159150697",
-        "host_feature_id": "RU_CITY_VOLGOGRAD",
-        "stable_key": "id::CITY::ne::1159150697",
-        "base_name": {
-          "en": "Volgograd",
-          "zh": "伏尔加格勒"
-        },
-        "scenario_name": {
-          "en": "Stalingrad",
-          "zh": "斯大林格勒"
-        },
-        "resolution": "scenario_city_override"
-      }
-    ],
+    "name_conflicts": [],
     "unresolved_capitals": [
       {
         "tag": "ALT",

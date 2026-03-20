@@ -17,7 +17,7 @@
   },
   "diagnostics": {
     "source": "generated_from_canonical_baseline",
-    "note": "Canonical ownership baseline without scenario-only overlays.",
+    "note": "Canonical ownership baseline for manual editing and comparison, without scenario-only overlays.",
     "detail_topology_feature_count": 11724,
     "primary_country_count": 209,
     "canonical_country_count": 174,

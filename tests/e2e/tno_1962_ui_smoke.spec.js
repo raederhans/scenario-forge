@@ -34,21 +34,21 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
     const select = document.querySelector('#scenarioSelect');
     return !!select && !!select.querySelector('option[value="tno_1962"]');
   });
+  await expect.poll(async () => {
+    return page.evaluate(async () => {
+      const { state } = await import('/js/core/state.js');
+      return String(state.activeScenarioId || '');
+    });
+  }, { timeout: 20000 }).toBe('tno_1962');
+  await expect(page.locator('#scenarioStatus')).toContainText('TNO 1962', { timeout: 20000 });
+
   const initialScenarioId = await page.evaluate(async () => {
     const { state } = await import('/js/core/state.js');
     return String(state.activeScenarioId || '');
   });
-  if (initialScenarioId !== 'tno_1962') {
-    await page.selectOption('#scenarioSelect', 'tno_1962');
-    const applyButton = page.locator('#applyScenarioBtn');
-    if ((await applyButton.isVisible()) && (await applyButton.isEnabled())) {
-      await applyButton.click();
-    }
-  }
-  await expect(page.locator('#scenarioStatus')).toContainText('TNO 1962', { timeout: 20000 });
-
   const scenarioStatus = await page.locator('#scenarioStatus').innerText();
   const viewMode = await page.locator('#scenarioViewModeSelect').inputValue();
+  const selectedScenarioId = await page.locator('#scenarioSelect').inputValue();
 
   const payload = await page.evaluate(async () => {
     const [manifest, countriesPayload, catalogPayload] = await Promise.all([
@@ -74,6 +74,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
     .map((entry) => entry.tag);
 
   expect(scenarioStatus).toContain('TNO 1962');
+  expect(selectedScenarioId).toBe('tno_1962');
   expect(viewMode).toBe('ownership');
   expect(payload.manifest.releasable_catalog_url).toBe('data/releasables/tno_1962.internal.phase1.catalog.json');
   expect(missingFeaturedTags).toEqual([]);
@@ -165,7 +166,9 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
   await page.screenshot({ path: shotPath, fullPage: true });
 
   console.log(JSON.stringify({
+    initialScenarioId,
     scenarioStatus,
+    selectedScenarioId,
     viewMode,
     releasableCatalogUrl: payload.manifest.releasable_catalog_url,
     catalogEntryCount: payload.catalogEntries.length,

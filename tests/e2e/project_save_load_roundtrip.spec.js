@@ -89,6 +89,8 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   await setInputValue(page, "#empireBorderWidth", "2.25");
   await setInputValue(page, "#coastlineColor", "#2468ac");
   await setInputValue(page, "#coastlineWidth", "2.4");
+  await setInputValue(page, "#physicalOpacity", "61");
+  await setSelectValue(page, "#physicalBlendMode", "overlay");
 
   const selectedPaletteId = await page.locator("#themeSelect").evaluate((select) => {
     const options = Array.from(select.options)
@@ -124,6 +126,10 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     color: "#2468ac",
     width: 2.4,
   });
+  expect(initialExport.styleConfig.physical).toMatchObject({
+    opacity: 0.61,
+    blendMode: "overlay",
+  });
   expect(initialExport.activePaletteId).toBe(selectedPaletteId);
   expect(initialExport.interactionGranularity).toBe("subdivision");
   expect(initialExport.batchFillScope).toBe("parent");
@@ -144,6 +150,12 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   importedProject.styleConfig.coastlines = {
     color: "#0f8f6f",
     width: 2.7,
+  };
+  importedProject.styleConfig.physical = {
+    ...cloneJson(importedProject.styleConfig.physical || {}),
+    opacity: 0.44,
+    blendMode: "multiply",
+    atlasOpacity: 0.52,
   };
   importedProject.layerVisibility.showSpecialZones = true;
   importedProject.recentColors = ["#112233", "#445566"];
@@ -169,6 +181,8 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   await setInputValue(page, "#internalBorderColor", "#abcdef");
   await setInputValue(page, "#empireBorderWidth", "1.50");
   await setInputValue(page, "#coastlineWidth", "1.3");
+  await setInputValue(page, "#physicalOpacity", "77");
+  await setSelectValue(page, "#physicalBlendMode", "overlay");
   await setSelectValue(page, "#themeSelect", "hoi4_vanilla");
   await page.waitForFunction(() => document.querySelector("#themeSelect")?.value === "hoi4_vanilla");
 
@@ -185,6 +199,8 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
       && byId("#empireBorderWidth")?.value === expected.empireWidth
       && byId("#coastlineColor")?.value.toLowerCase() === expected.coastColor
       && byId("#coastlineWidth")?.value === expected.coastWidth
+      && byId("#physicalOpacity")?.value === expected.physicalOpacity
+      && byId("#physicalBlendMode")?.value === expected.physicalBlendMode
       && byId("#paintGranularitySelect")?.value === expected.granularity
       && byId("#toggleSpecialZones")?.checked === true
       && byId("#referenceOpacity")?.value === expected.referenceOpacity
@@ -203,6 +219,8 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     empireWidth: "3.14",
     coastColor: "#0f8f6f",
     coastWidth: "2.7",
+    physicalOpacity: "44",
+    physicalBlendMode: "multiply",
     granularity: "country",
     referenceOpacity: "33",
     referenceScale: "1.23",
@@ -228,6 +246,11 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     offsetY: -18,
   });
   expect(roundtripExport.recentColors).toEqual(["#112233", "#445566"]);
+  expect(roundtripExport.styleConfig.physical).toMatchObject({
+    opacity: 0.44,
+    blendMode: "multiply",
+    atlasOpacity: 0.52,
+  });
   expect(roundtripExport.customPresets).toEqual({
     ZZZ: [
       {
@@ -248,6 +271,7 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   delete legacyProject.styleConfig.internalBorders;
   delete legacyProject.styleConfig.empireBorders;
   delete legacyProject.styleConfig.coastlines;
+  delete legacyProject.styleConfig.physical;
   delete legacyProject.layerVisibility.showSpecialZones;
   const legacyProjectPath = path.join(artifactDir, "legacy-import.json");
   fs.writeFileSync(legacyProjectPath, JSON.stringify(legacyProject, null, 2));
@@ -267,6 +291,8 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     const recentCount = document.querySelectorAll("#recentColors .color-swatch").length;
     return byId("#themeSelect")?.value === "hoi4_vanilla"
       && byId("#toggleSpecialZones")?.checked === false
+      && byId("#physicalBlendMode")?.value === "soft-light"
+      && byId("#physicalOpacity")?.value === "50"
       && byId("#specialZoneStartBtn")?.disabled === false
       && byId("#specialZoneFinishBtn")?.disabled === true
       && recentCount === 0;
@@ -303,6 +329,11 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   expect(legacyExport.styleConfig.coastlines).toEqual({
     color: "#333333",
     width: 1.2,
+  });
+  expect(legacyExport.styleConfig.physical).toMatchObject({
+    opacity: 0.5,
+    atlasOpacity: 0.52,
+    blendMode: "soft-light",
   });
 
   expect(consoleErrors, `Console errors: ${JSON.stringify(consoleErrors, null, 2)}`).toEqual([]);
