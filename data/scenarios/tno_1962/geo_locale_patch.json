@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "tno_1962",
-  "generated_at": "2026-03-20T00:00:49Z",
+  "generated_at": "2026-03-20T01:53:14Z",
   "geo": {
     "AFG-1741": {
       "en": "Badghis",
@@ -31860,8 +31860,8 @@
       "zh": "恩格尔斯基区"
     },
     "RU_RAY_50074027B39404018386654": {
-      "en": "Saratov",
-      "zh": "萨拉托夫"
+      "en": "Saratau",
+      "zh": "萨拉陶"
     },
     "RU_RAY_50074027B97557760790791": {
       "en": "Saratovsky District",
@@ -33760,8 +33760,8 @@
       "zh": "维亚兹尼科夫斯基区"
     },
     "RU_RAY_50074027B28906353717530": {
-      "en": "Dzerzhinsk",
-      "zh": "捷尔任斯克"
+      "en": "Hortonburg",
+      "zh": "霍顿堡"
     },
     "RU_RAY_50074027B51459937565873": {
       "en": "Volodarsky District",
@@ -33837,7 +33837,7 @@
     },
     "RU_RAY_50074027B44365109797977": {
       "en": "Nizhny Novgorod",
-      "zh": "兴登堡施塔特"
+      "zh": "下诺夫哥罗德"
     },
     "RU_RAY_50074027B22385146451904": {
       "en": "городской округ Бор",
@@ -45469,9 +45469,9 @@
     }
   },
   "audit": {
-    "safe_feature_copies": 11288,
-    "manual_feature_overrides": 78,
-    "unique_raw_name_safe_copy_count": 11257,
+    "safe_feature_copies": 11285,
+    "manual_feature_overrides": 81,
+    "unique_raw_name_safe_copy_count": 11254,
     "split_clone_safe_copy_count": 31,
     "collision_candidate_count": 937,
     "cross_base_collision_count": 936,
@@ -48603,6 +48603,50 @@
         ]
       },
       {
+        "feature_id": "RU_RAY_50074027B28906813018549",
+        "owner_tag": "BOP",
+        "raw_name": "Sovetsky District",
+        "locale_en": "Sovetsky District",
+        "locale_zh": "苏联区",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "RU_RAY_50074027B17085348963900",
+          "RU_RAY_50074027B17370675709037",
+          "RU_RAY_50074027B25745585862808",
+          "RU_RAY_50074027B28906813018549",
+          "RU_RAY_50074027B33071735903653",
+          "RU_RAY_50074027B72395378197129",
+          "RU_RAY_50074027B85935779911627",
+          "RU_RAY_50074027B87044205310914"
+        ],
+        "matching_base_feature_ids": [
+          "RU_RAY_50074027B17085348963900",
+          "RU_RAY_50074027B17370675709037",
+          "RU_RAY_50074027B25745585862808",
+          "RU_RAY_50074027B28906813018549",
+          "RU_RAY_50074027B33071735903653",
+          "RU_RAY_50074027B72395378197129",
+          "RU_RAY_50074027B85935779911627",
+          "RU_RAY_50074027B87044205310914"
+        ]
+      },
+      {
+        "feature_id": "RU_RAY_50074027B92092388399011",
+        "owner_tag": "BOP",
+        "raw_name": "Beryozovsky District",
+        "locale_en": "Beryozovsky District",
+        "locale_zh": "别廖佐夫斯基区",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "RU_RAY_50074027B26854249827151",
+          "RU_RAY_50074027B92092388399011"
+        ],
+        "matching_base_feature_ids": [
+          "RU_RAY_50074027B26854249827151",
+          "RU_RAY_50074027B92092388399011"
+        ]
+      },
+      {
         "feature_id": "BR_ADM1_BRA-592",
         "owner_tag": "BRA",
         "raw_name": "Amazonas",
@@ -51271,38 +51315,6 @@
           "PL_POW_0218",
           "PL_POW_3025"
         ]
-      },
-      {
-        "feature_id": "PL_POW_0219",
-        "owner_tag": "GER",
-        "raw_name": "świdnicki",
-        "locale_en": "świdnicki",
-        "locale_zh": "斯维德尼察",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "PL_POW_0219",
-          "PL_POW_0617"
-        ],
-        "matching_base_feature_ids": [
-          "PL_POW_0219",
-          "PL_POW_0617"
-        ]
-      },
-      {
-        "feature_id": "PL_POW_0802",
-        "owner_tag": "GER",
-        "raw_name": "krośnieński",
-        "locale_en": "krośnieński",
-        "locale_zh": "克罗斯诺",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "PL_POW_0802",
-          "PL_POW_1807"
-        ],
-        "matching_base_feature_ids": [
-          "PL_POW_0802",
-          "PL_POW_1807"
-        ]
       }
     ],
     "collision_candidates": [
@@ -52013,6 +52025,50 @@
           "AR_ADM1_ARG-1271",
           "BO_ADM1_BOL-1940",
           "CV_ADM1_CPV-5048"
+        ]
+      },
+      {
+        "feature_id": "RU_RAY_50074027B28906813018549",
+        "owner_tag": "BOP",
+        "raw_name": "Sovetsky District",
+        "locale_en": "Sovetsky District",
+        "locale_zh": "苏联区",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "RU_RAY_50074027B17085348963900",
+          "RU_RAY_50074027B17370675709037",
+          "RU_RAY_50074027B25745585862808",
+          "RU_RAY_50074027B28906813018549",
+          "RU_RAY_50074027B33071735903653",
+          "RU_RAY_50074027B72395378197129",
+          "RU_RAY_50074027B85935779911627",
+          "RU_RAY_50074027B87044205310914"
+        ],
+        "matching_base_feature_ids": [
+          "RU_RAY_50074027B17085348963900",
+          "RU_RAY_50074027B17370675709037",
+          "RU_RAY_50074027B25745585862808",
+          "RU_RAY_50074027B28906813018549",
+          "RU_RAY_50074027B33071735903653",
+          "RU_RAY_50074027B72395378197129",
+          "RU_RAY_50074027B85935779911627",
+          "RU_RAY_50074027B87044205310914"
+        ]
+      },
+      {
+        "feature_id": "RU_RAY_50074027B92092388399011",
+        "owner_tag": "BOP",
+        "raw_name": "Beryozovsky District",
+        "locale_en": "Beryozovsky District",
+        "locale_zh": "别廖佐夫斯基区",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "RU_RAY_50074027B26854249827151",
+          "RU_RAY_50074027B92092388399011"
+        ],
+        "matching_base_feature_ids": [
+          "RU_RAY_50074027B26854249827151",
+          "RU_RAY_50074027B92092388399011"
         ]
       },
       {
@@ -58546,24 +58602,28 @@
         ]
       },
       {
-        "feature_id": "RU_RAY_50074027B17054577586342",
-        "owner_tag": "OUR",
-        "raw_name": "Fyodorovsky District",
-        "locale_en": "Fyodorovsky District",
-        "locale_zh": "费奥多罗夫斯基区",
+        "feature_id": "RU_RAY_50074027B23901278564844",
+        "owner_tag": "ORN",
+        "raw_name": "Alexandrovsky District",
+        "locale_en": "Alexandrovsky District",
+        "locale_zh": "亚历山德罗夫斯基区",
         "reason": "non_unique_raw_name",
         "matching_feature_ids": [
-          "RU_RAY_50074027B17054577586342",
-          "RU_RAY_50074027B85554811388393"
+          "RU_RAY_50074027B23901278564844",
+          "RU_RAY_50074027B36835452024659",
+          "RU_RAY_50074027B62097006871085",
+          "RU_RAY_50074027B89987768012006"
         ],
         "matching_base_feature_ids": [
-          "RU_RAY_50074027B17054577586342",
-          "RU_RAY_50074027B85554811388393"
+          "RU_RAY_50074027B23901278564844",
+          "RU_RAY_50074027B36835452024659",
+          "RU_RAY_50074027B62097006871085",
+          "RU_RAY_50074027B89987768012006"
         ]
       },
       {
         "feature_id": "RU_RAY_50074027B45994623884743",
-        "owner_tag": "OUR",
+        "owner_tag": "ORN",
         "raw_name": "Oktyabrsky District",
         "locale_en": "Oktyabrsky District",
         "locale_zh": "十月区",
@@ -58595,6 +58655,58 @@
           "RU_RAY_50074027B66955592022274",
           "RU_RAY_50074027B71338417410099",
           "RU_RAY_50074027B90499708128895"
+        ]
+      },
+      {
+        "feature_id": "RU_RAY_50074027B51975947955569",
+        "owner_tag": "ORN",
+        "raw_name": "Grachyovsky District",
+        "locale_en": "Grachyovsky District",
+        "locale_zh": "格拉乔夫斯基区",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "RU_RAY_50074027B51975947955569",
+          "RU_RAY_50074027B92028031785312"
+        ],
+        "matching_base_feature_ids": [
+          "RU_RAY_50074027B51975947955569",
+          "RU_RAY_50074027B92028031785312"
+        ]
+      },
+      {
+        "feature_id": "RU_RAY_50074027B85521720356059",
+        "owner_tag": "ORN",
+        "raw_name": "Krasnogvardeysky District",
+        "locale_en": "Krasnogvardeysky District",
+        "locale_zh": "克拉斯诺瓦尔杰斯基区",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "RU_RAY_50074027B19439417163926",
+          "RU_RAY_50074027B24595988238566",
+          "RU_RAY_50074027B36547207144508",
+          "RU_RAY_50074027B85521720356059"
+        ],
+        "matching_base_feature_ids": [
+          "RU_RAY_50074027B19439417163926",
+          "RU_RAY_50074027B24595988238566",
+          "RU_RAY_50074027B36547207144508",
+          "RU_RAY_50074027B85521720356059"
+        ]
+      },
+      {
+        "feature_id": "RU_RAY_50074027B17054577586342",
+        "owner_tag": "OUR",
+        "raw_name": "Fyodorovsky District",
+        "locale_en": "Fyodorovsky District",
+        "locale_zh": "费奥多罗夫斯基区",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "RU_RAY_50074027B17054577586342",
+          "RU_RAY_50074027B85554811388393"
+        ],
+        "matching_base_feature_ids": [
+          "RU_RAY_50074027B17054577586342",
+          "RU_RAY_50074027B85554811388393"
         ]
       },
       {
@@ -59313,22 +59425,6 @@
         "matching_base_feature_ids": [
           "CN_CITY_17275852B30186056441572",
           "CN_CITY_17275852B84693836922329"
-        ]
-      },
-      {
-        "feature_id": "CN_CITY_17275852B31291032699823",
-        "owner_tag": "RGC",
-        "raw_name": "Xiangchengxian",
-        "locale_en": "Xiangchengxian",
-        "locale_zh": "相城县",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "CN_CITY_17275852B31291032699823",
-          "CN_CITY_17275852B79917267034965"
-        ],
-        "matching_base_feature_ids": [
-          "CN_CITY_17275852B31291032699823",
-          "CN_CITY_17275852B79917267034965"
         ]
       },
       {
@@ -60107,6 +60203,22 @@
           "RU_RAY_50074027B63531451261544",
           "RU_RAY_50074027B72026568542942",
           "RU_RAY_50074027B81340357021350"
+        ]
+      },
+      {
+        "feature_id": "RU_RAY_50074027B8830125873264",
+        "owner_tag": "RKK",
+        "raw_name": "Орловский район",
+        "locale_en": "Орловский район",
+        "locale_zh": "奥廖尔区",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "RU_RAY_50074027B24648015441",
+          "RU_RAY_50074027B8830125873264"
+        ],
+        "matching_base_feature_ids": [
+          "RU_RAY_50074027B24648015441",
+          "RU_RAY_50074027B8830125873264"
         ]
       },
       {
@@ -61388,22 +61500,6 @@
         ]
       },
       {
-        "feature_id": "RU_RAY_50074027B8830125873264",
-        "owner_tag": "RKM",
-        "raw_name": "Орловский район",
-        "locale_en": "Орловский район",
-        "locale_zh": "奥廖尔区",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "RU_RAY_50074027B24648015441",
-          "RU_RAY_50074027B8830125873264"
-        ],
-        "matching_base_feature_ids": [
-          "RU_RAY_50074027B24648015441",
-          "RU_RAY_50074027B8830125873264"
-        ]
-      },
-      {
         "feature_id": "RU_RAY_50074027B88958089507858",
         "owner_tag": "RKM",
         "raw_name": "Gorodishchensky District",
@@ -62288,6 +62384,22 @@
         ]
       },
       {
+        "feature_id": "RU_RAY_50074027B16098031684006",
+        "owner_tag": "SAM",
+        "raw_name": "Severny District",
+        "locale_en": "Severny District",
+        "locale_zh": "北区",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "RU_RAY_50074027B16098031684006",
+          "RU_RAY_50074027B3453987182776"
+        ],
+        "matching_base_feature_ids": [
+          "RU_RAY_50074027B16098031684006",
+          "RU_RAY_50074027B3453987182776"
+        ]
+      },
+      {
         "feature_id": "RU_RAY_50074027B162254919557",
         "owner_tag": "SAM",
         "raw_name": "Krasnoyarsky District",
@@ -62828,42 +62940,6 @@
         ]
       },
       {
-        "feature_id": "RU_RAY_50074027B16098031684006",
-        "owner_tag": "SOV",
-        "raw_name": "Severny District",
-        "locale_en": "Severny District",
-        "locale_zh": "北区",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "RU_RAY_50074027B16098031684006",
-          "RU_RAY_50074027B3453987182776"
-        ],
-        "matching_base_feature_ids": [
-          "RU_RAY_50074027B16098031684006",
-          "RU_RAY_50074027B3453987182776"
-        ]
-      },
-      {
-        "feature_id": "RU_RAY_50074027B23901278564844",
-        "owner_tag": "SOV",
-        "raw_name": "Alexandrovsky District",
-        "locale_en": "Alexandrovsky District",
-        "locale_zh": "亚历山德罗夫斯基区",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "RU_RAY_50074027B23901278564844",
-          "RU_RAY_50074027B36835452024659",
-          "RU_RAY_50074027B62097006871085",
-          "RU_RAY_50074027B89987768012006"
-        ],
-        "matching_base_feature_ids": [
-          "RU_RAY_50074027B23901278564844",
-          "RU_RAY_50074027B36835452024659",
-          "RU_RAY_50074027B62097006871085",
-          "RU_RAY_50074027B89987768012006"
-        ]
-      },
-      {
         "feature_id": "RU_RAY_50074027B27848812268076",
         "owner_tag": "SOV",
         "raw_name": "ЗАТО Солнечный",
@@ -62877,42 +62953,6 @@
         "matching_base_feature_ids": [
           "RU_RAY_50074027B27848812268076",
           "RU_RAY_50074027B8557161294330"
-        ]
-      },
-      {
-        "feature_id": "RU_RAY_50074027B51975947955569",
-        "owner_tag": "SOV",
-        "raw_name": "Grachyovsky District",
-        "locale_en": "Grachyovsky District",
-        "locale_zh": "格拉乔夫斯基区",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "RU_RAY_50074027B51975947955569",
-          "RU_RAY_50074027B92028031785312"
-        ],
-        "matching_base_feature_ids": [
-          "RU_RAY_50074027B51975947955569",
-          "RU_RAY_50074027B92028031785312"
-        ]
-      },
-      {
-        "feature_id": "RU_RAY_50074027B85521720356059",
-        "owner_tag": "SOV",
-        "raw_name": "Krasnogvardeysky District",
-        "locale_en": "Krasnogvardeysky District",
-        "locale_zh": "克拉斯诺瓦尔杰斯基区",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "RU_RAY_50074027B19439417163926",
-          "RU_RAY_50074027B24595988238566",
-          "RU_RAY_50074027B36547207144508",
-          "RU_RAY_50074027B85521720356059"
-        ],
-        "matching_base_feature_ids": [
-          "RU_RAY_50074027B19439417163926",
-          "RU_RAY_50074027B24595988238566",
-          "RU_RAY_50074027B36547207144508",
-          "RU_RAY_50074027B85521720356059"
         ]
       },
       {
@@ -62937,34 +62977,6 @@
           "RU_RAY_50074027B42226450891188",
           "RU_RAY_50074027B6183649278140",
           "RU_RAY_50074027B83572278411540"
-        ]
-      },
-      {
-        "feature_id": "RU_RAY_50074027B28906813018549",
-        "owner_tag": "SVR",
-        "raw_name": "Sovetsky District",
-        "locale_en": "Sovetsky District",
-        "locale_zh": "苏联区",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "RU_RAY_50074027B17085348963900",
-          "RU_RAY_50074027B17370675709037",
-          "RU_RAY_50074027B25745585862808",
-          "RU_RAY_50074027B28906813018549",
-          "RU_RAY_50074027B33071735903653",
-          "RU_RAY_50074027B72395378197129",
-          "RU_RAY_50074027B85935779911627",
-          "RU_RAY_50074027B87044205310914"
-        ],
-        "matching_base_feature_ids": [
-          "RU_RAY_50074027B17085348963900",
-          "RU_RAY_50074027B17370675709037",
-          "RU_RAY_50074027B25745585862808",
-          "RU_RAY_50074027B28906813018549",
-          "RU_RAY_50074027B33071735903653",
-          "RU_RAY_50074027B72395378197129",
-          "RU_RAY_50074027B85935779911627",
-          "RU_RAY_50074027B87044205310914"
         ]
       },
       {
@@ -63039,22 +63051,6 @@
           "RU_RAY_50074027B63247354154361",
           "RU_RAY_50074027B6563040372631",
           "RU_RAY_50074027B908465227031"
-        ]
-      },
-      {
-        "feature_id": "RU_RAY_50074027B92092388399011",
-        "owner_tag": "SVR",
-        "raw_name": "Beryozovsky District",
-        "locale_en": "Beryozovsky District",
-        "locale_zh": "别廖佐夫斯基区",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "RU_RAY_50074027B26854249827151",
-          "RU_RAY_50074027B92092388399011"
-        ],
-        "matching_base_feature_ids": [
-          "RU_RAY_50074027B26854249827151",
-          "RU_RAY_50074027B92092388399011"
         ]
       },
       {
@@ -67807,6 +67803,22 @@
         "matching_base_feature_ids": [
           "RU_RAY_50074027B82856800380020",
           "RU_RAY_50074027B8829363251142"
+        ]
+      },
+      {
+        "feature_id": "CN_CITY_17275852B31291032699823",
+        "owner_tag": "XIK",
+        "raw_name": "Xiangchengxian",
+        "locale_en": "Xiangchengxian",
+        "locale_zh": "相城县",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "CN_CITY_17275852B31291032699823",
+          "CN_CITY_17275852B79917267034965"
+        ],
+        "matching_base_feature_ids": [
+          "CN_CITY_17275852B31291032699823",
+          "CN_CITY_17275852B79917267034965"
         ]
       },
       {

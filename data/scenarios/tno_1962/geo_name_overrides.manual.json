@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "tno_1962",
-  "generated_at": "2026-03-19T20:00:48.349290-04:00",
+  "generated_at": "2026-03-19T21:53:13.571545-04:00",
   "geo": {
     "AFG-1748": {
       "en": "Sari Pul",
@@ -29,15 +29,15 @@
     },
     "BE100": {
       "en": "Hauptstadtbezirk Brüssel",
-      "zh": "布吕塞尔首都区"
+      "zh": "布吕塞尔"
     },
     "BE211": {
       "en": "Bezirk Antwerpen",
-      "zh": "安特卫普区"
+      "zh": "安特卫普"
     },
     "BE212": {
       "en": "Bezirk Mecheln",
-      "zh": "梅赫伦区"
+      "zh": "梅赫伦"
     },
     "BE213": {
       "en": "Bezirk Turnhout",
@@ -45,79 +45,79 @@
     },
     "BE223": {
       "en": "Bezirk Tongern",
-      "zh": "通厄恩区"
+      "zh": "通厄恩"
     },
     "BE224": {
       "en": "Bezirk Hasselt",
-      "zh": "哈瑟尔特区"
+      "zh": "哈瑟尔特"
     },
     "BE225": {
       "en": "Bezirk Maaseik",
-      "zh": "马瑟克区"
+      "zh": "马瑟克"
     },
     "BE231": {
       "en": "Bezirk Aalst",
-      "zh": "阿尔斯特区"
+      "zh": "阿尔斯特"
     },
     "BE232": {
       "en": "Bezirk Dendermünde",
-      "zh": "登德明德区"
+      "zh": "登德明德"
     },
     "BE233": {
       "en": "Bezirk Eeklo",
-      "zh": "埃克洛区"
+      "zh": "埃克洛"
     },
     "BE234": {
       "en": "Bezirk Gent",
-      "zh": "根特区"
+      "zh": "根特"
     },
     "BE235": {
       "en": "Bezirk Oudenaarde",
-      "zh": "奥德纳尔德区"
+      "zh": "奥德纳尔德"
     },
     "BE236": {
       "en": "Bezirk Sankt Nikolaus",
-      "zh": "圣尼古劳斯区"
+      "zh": "圣尼古劳斯"
     },
     "BE241": {
       "en": "Bezirk Halle-Vilvoorde",
-      "zh": "哈勒-维尔福德区"
+      "zh": "哈勒-维尔福德"
     },
     "BE242": {
       "en": "Bezirk Löwen",
-      "zh": "勒汶区"
+      "zh": "勒汶"
     },
     "BE251": {
       "en": "Bezirk Brügge",
-      "zh": "布吕赫区"
+      "zh": "布吕赫"
     },
     "BE252": {
       "en": "Bezirk Diksmuide",
-      "zh": "迪克斯迈德区"
+      "zh": "迪克斯迈德"
     },
     "BE253": {
       "en": "Bezirk Ypern",
-      "zh": "伊珀恩区"
+      "zh": "伊珀恩"
     },
     "BE254": {
       "en": "Bezirk Kortrijk",
-      "zh": "科特赖克区"
+      "zh": "科特赖兴"
     },
     "BE255": {
       "en": "Bezirk Ostende",
-      "zh": "奥斯滕德区"
+      "zh": "奥斯滕德"
     },
     "BE256": {
       "en": "Bezirk Roeselare",
-      "zh": "鲁瑟拉勒区"
+      "zh": "鲁瑟拉勒"
     },
     "BE257": {
       "en": "Bezirk Thielt",
-      "zh": "蒂尔特区"
+      "zh": "蒂尔特"
     },
     "BE258": {
       "en": "Bezirk Furnes",
-      "zh": "菲尔讷区"
+      "zh": "菲尔讷"
     },
     "BE310": {
       "en": "Bezirk Nivelles",
@@ -125,7 +125,7 @@
     },
     "BE323": {
       "en": "Bezirk Bergen",
-      "zh": "贝亨区"
+      "zh": "贝亨"
     },
     "BE328": {
       "en": "Bezirk Doornik-Moeskroen",
@@ -133,39 +133,39 @@
     },
     "BE329": {
       "en": "Bezirk La Louvière",
-      "zh": "拉卢维耶尔区"
+      "zh": "拉卢维耶尔"
     },
     "BE32A": {
       "en": "Bezirk Aat",
-      "zh": "阿特区"
+      "zh": "阿特"
     },
     "BE32B": {
       "en": "Bezirk Charleroi",
-      "zh": "沙勒鲁瓦区"
+      "zh": "沙勒鲁瓦"
     },
     "BE32C": {
       "en": "Bezirk Zinnik",
-      "zh": "济尼克区"
+      "zh": "济尼克"
     },
     "BE32D": {
       "en": "Bezirk Thuin",
-      "zh": "蒂安区"
+      "zh": "蒂安"
     },
     "BE331": {
       "en": "Bezirk Hoei",
-      "zh": "胡伊区"
+      "zh": "胡伊"
     },
     "BE332": {
       "en": "Bezirk Lüttich",
-      "zh": "吕蒂希区"
+      "zh": "吕蒂希"
     },
     "BE334": {
       "en": "Bezirk Borgworm",
-      "zh": "博格沃姆区"
+      "zh": "博格沃姆"
     },
     "BE335": {
       "en": "Bezirk Verviers — Französische Gemeinden",
-      "zh": "费尔维耶法语市镇区"
+      "zh": "费尔维耶"
     },
     "BE341": {
       "en": "Bezirk Arel",
@@ -173,19 +173,19 @@
     },
     "BE342": {
       "en": "Bezirk Bastenaken",
-      "zh": "巴斯特纳肯区"
+      "zh": "巴斯特纳肯"
     },
     "BE343": {
       "en": "Bezirk Marche-en-Famenne",
-      "zh": "马尔什-昂法梅讷区"
+      "zh": "马尔什-昂法梅讷"
     },
     "BE344": {
       "en": "Bezirk Neufchâteau",
-      "zh": "讷沙托区"
+      "zh": "讷沙托"
     },
     "BE345": {
       "en": "Bezirk Virton",
-      "zh": "维尔通区"
+      "zh": "维尔滕"
     },
     "BE351": {
       "en": "Bezirk Dinant",
@@ -193,15 +193,15 @@
     },
     "BE352": {
       "en": "Bezirk Namen",
-      "zh": "纳门区"
+      "zh": "纳门"
     },
     "BE353": {
       "en": "Bezirk Philippeville",
-      "zh": "菲利普维尔区"
+      "zh": "菲利普维尔"
     },
     "BY_RAY_67162791B30498032594927": {
       "en": "Brest-Litowsk",
-      "zh": "布列斯特-立托夫斯克"
+      "zh": "布列瑟-立陶施"
     },
     "FR_ARR_25001": {
       "en": "Bisanz",
@@ -289,10 +289,10 @@
     },
     "RU_CITY_SAINT_PETERSBURG": {
       "en": "Saint Petersburg",
-      "zh": "林德曼施塔特"
+      "zh": "圣彼得堡"
     },
     "RU_RAY_50074027B61494461730219": {
-      "en": "городской округ Тула",
+      "en": "Gobelstadt",
       "zh": "戈培尔"
     },
     "RU_RAY_50074027B61241799946425": {
@@ -314,6 +314,18 @@
     "DE300": {
       "en": "Germania",
       "zh": "日耳曼尼亚都会区"
+    },
+    "RU_RAY_50074027B39404018386654": {
+      "en": "Saratau",
+      "zh": "萨拉陶"
+    },
+    "RU_RAY_50074027B44365109797977": {
+      "en": "Nizhny Novgorod",
+      "zh": "下诺夫哥罗德"
+    },
+    "RU_RAY_50074027B28906353717530": {
+      "en": "Hortonburg",
+      "zh": "霍顿堡"
     }
   }
 }
