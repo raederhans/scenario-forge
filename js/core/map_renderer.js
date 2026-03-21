@@ -360,8 +360,14 @@ const RENDER_PASS_OVERSCAN_RATIO_PER_SIDE = 0.15;
 const POLITICAL_PARTIAL_REPAINT_FEATURE_THRESHOLD = 48;
 const POLITICAL_PARTIAL_REPAINT_CANDIDATE_THRESHOLD = 160;
 const POLITICAL_PARTIAL_REPAINT_VIEWPORT_COVERAGE_MAX = 0.18;
-const POLITICAL_PARTIAL_REPAINT_PATH_CACHE_MISS_RATIO_MAX = 0.25;
+const POLITICAL_PARTIAL_REPAINT_SYNC_BUILD_CANDIDATE_MAX = 96;
+const POLITICAL_PARTIAL_REPAINT_SYNC_BUILD_MISS_MAX = 96;
 const POLITICAL_PARTIAL_REPAINT_PAD_PX = 4;
+const POLITICAL_PATH_WARMUP_OVERSCAN_PX = 96;
+const POLITICAL_PATH_WARMUP_QUEUE_MAX = 512;
+const POLITICAL_PATH_WARMUP_MAX_FEATURES_PER_SLICE = 24;
+const POLITICAL_PATH_WARMUP_CPU_BUDGET_MS = 4;
+const POLITICAL_PATH_WARMUP_TIMEOUT_MS = 24;
 const HEAVY_SCENARIO_STAGED_APPLY_FEATURE_THRESHOLD = 12000;
 const STAGED_CONTEXT_BASE_TIMEOUT_MS = 180;
 const STAGED_HIT_CANVAS_TIMEOUT_MS = 260;
@@ -539,6 +545,15 @@ function getRenderPassCacheState() {
   cache.politicalPathCacheTransform = cache.politicalPathCacheTransform
     ? cloneZoomTransform(cache.politicalPathCacheTransform)
     : null;
+  cache.politicalPathWarmupQueue = Array.isArray(cache.politicalPathWarmupQueue)
+    ? cache.politicalPathWarmupQueue
+    : [];
+  cache.politicalPathWarmupHandle = cache.politicalPathWarmupHandle && typeof cache.politicalPathWarmupHandle === "object"
+    ? cache.politicalPathWarmupHandle
+    : null;
+  cache.politicalPathWarmupSignature = typeof cache.politicalPathWarmupSignature === "string"
+    ? cache.politicalPathWarmupSignature
+    : "";
   cache.dirty = cache.dirty && typeof cache.dirty === "object" ? cache.dirty : {};
   cache.reasons = cache.reasons && typeof cache.reasons === "object" ? cache.reasons : {};
   cache.counters = cache.counters && typeof cache.counters === "object" ? cache.counters : {};
@@ -572,7 +587,11 @@ function getRenderPassCacheState() {
     politicalPartialFallbacks: 0,
     politicalPartialCandidateCount: 0,
     politicalPartialPathCacheMisses: 0,
+    politicalPartialPathBuild: 0,
     politicalPathCacheBuild: 0,
+    politicalPathWarmupBuild: 0,
+    politicalPathWarmupSlices: 0,
+    politicalPathWarmupCancels: 0,
   };
   Object.entries(counterDefaults).forEach(([counterName, initialValue]) => {
     if (!Number.isFinite(Number(cache.counters[counterName]))) {
@@ -734,7 +753,10 @@ function invalidateRenderPasses(passNames, reason = "unspecified") {
     cache.dirty[passName] = true;
     cache.reasons[passName] = String(reason || "unspecified");
   });
-  if (targetPassNames.includes("political") && String(reason || "unspecified") !== "refresh-colors") {
+  if (
+    targetPassNames.includes("political")
+    && !["refresh-colors", "rebuild-colors"].includes(String(reason || "unspecified"))
+  ) {
     cache.partialPoliticalDirtyIds.clear();
     invalidatePoliticalPathCache(reason);
   }
@@ -903,8 +925,27 @@ function getPoliticalPathCacheSignature(transform = state.zoomTransform || globa
   ].join("::");
 }
 
+function cancelPoliticalPathWarmup(reason = "unspecified") {
+  const cache = getRenderPassCacheState();
+  const hadWork =
+    !!cache.politicalPathWarmupHandle
+    || (Array.isArray(cache.politicalPathWarmupQueue) && cache.politicalPathWarmupQueue.length > 0)
+    || !!cache.politicalPathWarmupSignature;
+  if (cache.politicalPathWarmupHandle) {
+    cancelDeferredWork(cache.politicalPathWarmupHandle);
+  }
+  cache.politicalPathWarmupHandle = null;
+  cache.politicalPathWarmupQueue = [];
+  cache.politicalPathWarmupSignature = "";
+  cache.politicalPathWarmupReason = String(reason || "unspecified");
+  if (hadWork) {
+    incrementPerfCounter("politicalPathWarmupCancels");
+  }
+}
+
 function invalidatePoliticalPathCache(reason = "unspecified") {
   const cache = getRenderPassCacheState();
+  cancelPoliticalPathWarmup(reason);
   if (cache.politicalPathCache instanceof Map) {
     cache.politicalPathCache.clear();
   } else {
@@ -998,6 +1039,164 @@ function getPoliticalFeaturePathEntry(
   handle.map.set(resolvedId, builtEntry);
   if (countBuild) incrementPerfCounter("politicalPathCacheBuild");
   return builtEntry;
+}
+
+function collectWarmupCandidateItems(transform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
+  const viewportWidth = Math.max(1, Number(state.width || 1));
+  const viewportHeight = Math.max(1, Number(state.height || 1));
+  const overscan = Math.max(0, Number(POLITICAL_PATH_WARMUP_OVERSCAN_PX || 0));
+  const viewportRect = {
+    minX: -overscan,
+    minY: -overscan,
+    maxX: viewportWidth + overscan,
+    maxY: viewportHeight + overscan,
+  };
+  const projectedViewportRect = screenRectToProjectedRect(viewportRect, transform);
+  if (!projectedViewportRect) return null;
+  const candidateResult = collectLandSpatialItemsForProjectedRects([projectedViewportRect]);
+  if (!candidateResult || candidateResult.overflow) {
+    return null;
+  }
+  const normalizedTransform = cloneZoomTransform(transform);
+  const centerX = ((viewportWidth / 2) - normalizedTransform.x) / normalizedTransform.k;
+  const centerY = ((viewportHeight / 2) - normalizedTransform.y) / normalizedTransform.k;
+  return candidateResult.items
+    .map((item) => ({
+      ...item,
+      warmupDistance: Math.hypot(
+        (((Number(item?.minX || 0) + Number(item?.maxX || 0)) / 2) - centerX),
+        (((Number(item?.minY || 0) + Number(item?.maxY || 0)) / 2) - centerY),
+      ),
+    }))
+    .sort((left, right) => {
+      const distanceDelta = Number(left?.warmupDistance || 0) - Number(right?.warmupDistance || 0);
+      if (Math.abs(distanceDelta) > 0.001) return distanceDelta;
+      return (left?.drawOrder ?? 0) - (right?.drawOrder ?? 0);
+    })
+    .slice(0, POLITICAL_PATH_WARMUP_QUEUE_MAX);
+}
+
+function runPoliticalPathWarmupSlice(deadline = null) {
+  const cache = getRenderPassCacheState();
+  cache.politicalPathWarmupHandle = null;
+  if (
+    state.renderPhase !== RENDER_PHASE_IDLE
+    || state.deferExactAfterSettle
+    || cache.dirty?.political
+  ) {
+    cancelPoliticalPathWarmup("warmup-non-idle");
+    return false;
+  }
+  const transform = state.zoomTransform || globalThis.d3?.zoomIdentity;
+  const expectedSignature = getPoliticalPathCacheSignature(transform);
+  if (
+    cache.politicalPathWarmupSignature !== expectedSignature
+    || (
+      cache.politicalPathCacheSignature
+      && cache.politicalPathCacheSignature !== expectedSignature
+    )
+  ) {
+    invalidatePoliticalPathCache("warmup-signature-mismatch");
+    return false;
+  }
+  if (!Array.isArray(cache.politicalPathWarmupQueue) || !cache.politicalPathWarmupQueue.length) {
+    cache.politicalPathWarmupQueue = [];
+    cache.politicalPathWarmupSignature = "";
+    return false;
+  }
+  const handle = getPoliticalPathCacheHandle(transform, { resetIfMismatch: true });
+  if (!handle.valid || !(handle.map instanceof Map)) {
+    invalidatePoliticalPathCache("warmup-handle-invalid");
+    return false;
+  }
+  const startedAt = nowMs();
+  let processedCount = 0;
+  let builtCount = 0;
+  while (cache.politicalPathWarmupQueue.length > 0) {
+    if (processedCount >= POLITICAL_PATH_WARMUP_MAX_FEATURES_PER_SLICE) break;
+    if (processedCount > 0 && (nowMs() - startedAt) >= POLITICAL_PATH_WARMUP_CPU_BUDGET_MS) break;
+    if (
+      processedCount > 0
+      && deadline
+      && typeof deadline.timeRemaining === "function"
+      && deadline.timeRemaining() <= 0
+    ) {
+      break;
+    }
+    const nextItem = cache.politicalPathWarmupQueue.shift();
+    if (!nextItem?.id || !nextItem?.feature) continue;
+    processedCount += 1;
+    if (handle.map.get(nextItem.id)?.path) continue;
+    const pathEntry = getPoliticalFeaturePathEntry(nextItem.feature, {
+      featureId: nextItem.id,
+      transform,
+      allowBuild: true,
+      countBuild: true,
+    });
+    if (pathEntry?.path) {
+      builtCount += 1;
+      incrementPerfCounter("politicalPathWarmupBuild");
+    }
+  }
+  incrementPerfCounter("politicalPathWarmupSlices");
+  const durationMs = nowMs() - startedAt;
+  recordRenderPerfMetric("politicalPathWarmupSlice", durationMs, {
+    builtCount,
+    processedCount,
+    remainingCount: cache.politicalPathWarmupQueue.length,
+    activeScenarioId: String(state.activeScenarioId || ""),
+    transformK: Number(transform?.k || 1),
+  });
+  recordRenderPerfMetric("politicalPathWarmup", durationMs, {
+    builtCount,
+    processedCount,
+    remainingCount: cache.politicalPathWarmupQueue.length,
+    activeScenarioId: String(state.activeScenarioId || ""),
+    transformK: Number(transform?.k || 1),
+  });
+  if (cache.politicalPathWarmupQueue.length > 0) {
+    cache.politicalPathWarmupHandle = scheduleDeferredWork(runPoliticalPathWarmupSlice, {
+      timeout: POLITICAL_PATH_WARMUP_TIMEOUT_MS,
+    });
+  } else {
+    cache.politicalPathWarmupSignature = "";
+  }
+  return builtCount > 0;
+}
+
+function schedulePoliticalPathWarmup(transform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
+  const cache = getRenderPassCacheState();
+  if (
+    state.renderPhase !== RENDER_PHASE_IDLE
+    || state.deferExactAfterSettle
+    || cache.dirty?.political
+  ) {
+    return false;
+  }
+  const signature = getPoliticalPathCacheSignature(transform);
+  const candidateItems = collectWarmupCandidateItems(transform);
+  if (!Array.isArray(candidateItems)) {
+    cancelPoliticalPathWarmup("warmup-spatial-unavailable");
+    return false;
+  }
+  const handle = getPoliticalPathCacheHandle(transform, { resetIfMismatch: false });
+  const cacheMap = handle.valid && handle.map instanceof Map ? handle.map : null;
+  const queue = candidateItems.filter((item) => item?.id && item?.feature && !cacheMap?.get(item.id)?.path);
+  if (!queue.length) {
+    cancelPoliticalPathWarmup("warmup-complete");
+    return false;
+  }
+  if (cache.politicalPathWarmupHandle) {
+    cancelDeferredWork(cache.politicalPathWarmupHandle);
+  }
+  cache.politicalPathWarmupHandle = null;
+  cache.politicalPathWarmupQueue = queue;
+  cache.politicalPathWarmupSignature = signature;
+  cache.politicalPathWarmupReason = "scheduled";
+  cache.politicalPathWarmupHandle = scheduleDeferredWork(runPoliticalPathWarmupSlice, {
+    timeout: POLITICAL_PATH_WARMUP_TIMEOUT_MS,
+  });
+  return true;
 }
 
 function invalidateInteractionBorderSnapshot(reason = "unspecified") {
@@ -2985,6 +3184,9 @@ function setRenderPhase(phase) {
   state.renderPhase = phase;
   state.phaseEnteredAt = nowMs();
   state.isInteracting = phase === RENDER_PHASE_INTERACTING;
+  if (phase !== RENDER_PHASE_IDLE) {
+    cancelPoliticalPathWarmup(`phase-${phase}`);
+  }
   if (previousPhase !== phase && (previousPhase === RENDER_PHASE_IDLE || phase === RENDER_PHASE_IDLE)) {
     state.hoverOverlayDirty = true;
   }
@@ -11125,6 +11327,7 @@ function drawPoliticalFeature(
     skipScreenCheck = false,
     path = null,
     transform = state.zoomTransform || globalThis.d3?.zoomIdentity,
+    useCachedPath = true,
     allowBuildPath = false,
     countPathBuild = false,
   } = {},
@@ -11162,12 +11365,14 @@ function drawPoliticalFeature(
 
   const cachedPath =
     path
-    || getPoliticalFeaturePathEntry(feature, {
-      featureId: id,
-      transform,
-      allowBuild: allowBuildPath,
-      countBuild: countPathBuild,
-    })?.path
+    || (useCachedPath
+      ? getPoliticalFeaturePathEntry(feature, {
+        featureId: id,
+        transform,
+        allowBuild: allowBuildPath,
+        countBuild: countPathBuild,
+      })?.path
+      : null)
     || null;
   context.fillStyle = fillColor;
   if (cachedPath) {
@@ -11219,7 +11424,7 @@ function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
   if (debugMode !== "PROD") {
     return fallback("non-prod-mode");
   }
-  if (cache.reasons?.political !== "refresh-colors") {
+  if (!["refresh-colors", "rebuild-colors"].includes(String(cache.reasons?.political || ""))) {
     return fallback("non-color-invalidation");
   }
   if (!dirtyFeatureCount) {
@@ -11336,17 +11541,13 @@ function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
       candidateCount,
     });
   }
-  const pathCacheHandle = getPoliticalPathCacheHandle(transform, { resetIfMismatch: false });
+  const pathCacheHandle = getPoliticalPathCacheHandle(transform, { resetIfMismatch: true });
   let pathCacheMisses = 0;
   if (!pathCacheHandle.valid || !(pathCacheHandle.map instanceof Map)) {
-    pathCacheMisses = candidateCount;
-    incrementPerfCounter("politicalPartialPathCacheMisses", pathCacheMisses);
-    return fallback("path-cache-miss-threshold", {
+    return fallback("path-cache-unavailable", {
       dirtyRectCount: mergedDirtyRects.length,
       viewportCoverage,
       candidateCount,
-      pathCacheMisses,
-      pathCacheMissRatio: 1,
     });
   }
   candidateItems.forEach((item) => {
@@ -11360,8 +11561,11 @@ function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
   const pathCacheMissRatio = candidateCount > 0
     ? (pathCacheMisses / candidateCount)
     : 0;
-  if (pathCacheMissRatio > POLITICAL_PARTIAL_REPAINT_PATH_CACHE_MISS_RATIO_MAX) {
-    return fallback("path-cache-miss-threshold", {
+  const allowSyncPartialBuild =
+    candidateCount <= POLITICAL_PARTIAL_REPAINT_SYNC_BUILD_CANDIDATE_MAX
+    && pathCacheMisses <= POLITICAL_PARTIAL_REPAINT_SYNC_BUILD_MISS_MAX;
+  if (pathCacheMisses > 0 && !allowSyncPartialBuild) {
+    return fallback("partial-build-threshold", {
       dirtyRectCount: mergedDirtyRects.length,
       viewportCoverage,
       candidateCount,
@@ -11370,14 +11574,19 @@ function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
     });
   }
   const redrawEntries = candidateItems.map((item) => {
-    const pathEntry =
-      pathCacheHandle.map.get(item.id)
-      || getPoliticalFeaturePathEntry(item.feature, {
+    let pathEntry = pathCacheHandle.map.get(item.id) || null;
+    const shouldBuildPath = !pathEntry?.path && allowSyncPartialBuild;
+    if (shouldBuildPath) {
+      pathEntry = getPoliticalFeaturePathEntry(item.feature, {
         featureId: item.id,
         transform,
         allowBuild: true,
         countBuild: true,
       });
+      if (pathEntry?.path) {
+        incrementPerfCounter("politicalPartialPathBuild");
+      }
+    }
     if (!pathEntry?.path) return null;
     return {
       feature: item.feature,
@@ -11446,11 +11655,11 @@ function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
     dirtyFeatureCount,
     dirtyRectCount: mergedDirtyRects.length,
     viewportCoverage: Number(viewportCoverage.toFixed(4)),
-    candidateCount,
-    affectedFeatureCount: redrawEntries.length,
-    backgroundGroupCount,
-    pathCacheMisses,
-    pathCacheMissRatio: Number(pathCacheMissRatio.toFixed(4)),
+      candidateCount,
+      affectedFeatureCount: redrawEntries.length,
+      backgroundGroupCount,
+      pathCacheMisses,
+      pathCacheMissRatio: Number(pathCacheMissRatio.toFixed(4)),
   });
   return true;
 }
@@ -11458,7 +11667,6 @@ function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
 function drawPoliticalPass(k) {
   const transform = state.zoomTransform || globalThis.d3?.zoomIdentity;
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
-  getPoliticalPathCacheHandle(transform, { resetIfMismatch: true });
   drawPoliticalBackgroundFills();
   if (!state.landData?.features?.length) return;
   const islandNeighbors = debugMode === "ISLANDS" ? getIslandNeighborGraph() : null;
@@ -11469,8 +11677,9 @@ function drawPoliticalPass(k) {
       canvasHeight,
       islandNeighbors,
       transform,
-      allowBuildPath: true,
-      countPathBuild: true,
+      useCachedPath: false,
+      allowBuildPath: false,
+      countPathBuild: false,
     });
   });
 }
@@ -11718,7 +11927,9 @@ function renderPassToCache(passName, drawFn, transform, timings) {
   getRenderPassCacheState().signatures[passName] = getRenderPassSignature(passName, transform);
   getRenderPassCacheState().dirty[passName] = false;
   if (passName === "political") {
-    getRenderPassCacheState().partialPoliticalDirtyIds.clear();
+    const cache = getRenderPassCacheState();
+    cache.partialPoliticalDirtyIds.clear();
+    schedulePoliticalPathWarmup(transform);
   }
   recordPassTiming(timings, passName, passStart);
   getPassCounterNames(passName).forEach((counterName) => incrementPerfCounter(counterName));
@@ -11919,6 +12130,9 @@ function drawCanvas() {
   if (!context || !pathCanvas) return;
   ensureLayerDataFromTopology();
   incrementPerfCounter("drawCanvas");
+  if (state.renderPhase !== RENDER_PHASE_IDLE || state.deferExactAfterSettle) {
+    cancelPoliticalPathWarmup("drawCanvas-non-idle");
+  }
   promoteDeferredColorRenderToIdle();
   const frameStart = nowMs();
   const frameTimings = {};

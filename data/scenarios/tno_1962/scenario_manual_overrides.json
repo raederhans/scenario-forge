@@ -1,1 +1,777 @@
-{"version":1,"scenario_id":"tno_1962","generated_at":"2026-03-20T09:34:19.177582-04:00","countries":{"BOP":{"mode":"create","display_name":"вор в законе","display_name_en":"вор в законе","display_name_zh":"律贼领地","color_hex":"#e0e0e0","parent_owner_tag":"","subject_kind":"","entry_kind":"scenario_country","featured":false,"hidden_from_country_list":false,"base_iso2":"BOP","lookup_iso2":"BOP","provenance_iso2":"BOP","capital_state_id":null,"continent_id":"","continent_label":"","subregion_id":"","subregion_label":"","notes":"","scenario_only":true,"source_type":"scenario_extension","historical_fidelity":"extended"},"MAG":{"mode":"create","display_name":"Magnitogorsk","display_name_en":"Magnitogorsk","display_name_zh":"马格尼托哥尔斯克","color_hex":"#415638","parent_owner_tag":"","subject_kind":"","entry_kind":"scenario_country","featured":false,"hidden_from_country_list":false,"base_iso2":"MAG","lookup_iso2":"MAG","provenance_iso2":"MAG","capital_state_id":null,"continent_id":"","continent_label":"","subregion_id":"","subregion_label":"","notes":"","scenario_only":true,"source_type":"scenario_extension","historical_fidelity":"extended"},"ONG":{"mode":"create","display_name":"Onega","display_name_en":"Onega","display_name_zh":"奥涅加","color_hex":"#0d4510","parent_owner_tag":"","subject_kind":"","entry_kind":"scenario_country","featured":false,"hidden_from_country_list":false,"base_iso2":"ONG","lookup_iso2":"ONG","provenance_iso2":"ONG","capital_state_id":null,"continent_id":"","continent_label":"","subregion_id":"","subregion_label":"","notes":"","scenario_only":true,"source_type":"scenario_extension","historical_fidelity":"extended"},"ORN":{"mode":"create","display_name":"Orenburg","display_name_en":"Orenburg","display_name_zh":"奥伦堡","color_hex":"#63342c","parent_owner_tag":"","subject_kind":"","entry_kind":"scenario_country","featured":false,"hidden_from_country_list":false,"base_iso2":"ORN","lookup_iso2":"ORN","provenance_iso2":"ORN","capital_state_id":null,"continent_id":"","continent_label":"","subregion_id":"","subregion_label":"","notes":"","scenario_only":true,"source_type":"scenario_extension","historical_fidelity":"extended"},"ORS":{"mode":"create","display_name":"Orsk","display_name_en":"Orsk","display_name_zh":"奥尔斯克","color_hex":"#1f1f1f","parent_owner_tag":"","subject_kind":"","entry_kind":"scenario_country","featured":false,"hidden_from_country_list":false,"base_iso2":"ORS","lookup_iso2":"ORS","provenance_iso2":"ORS","capital_state_id":null,"continent_id":"","continent_label":"","subregion_id":"","subregion_label":"","notes":"","scenario_only":true,"source_type":"scenario_extension","historical_fidelity":"extended"},"VOK":{"mode":"create","display_name":"Vorkuta","display_name_en":"Vorkuta","display_name_zh":"沃尔库塔","color_hex":"#648abe","parent_owner_tag":"","subject_kind":"","entry_kind":"scenario_country","featured":false,"hidden_from_country_list":false,"base_iso2":"VOK","lookup_iso2":"VOK","provenance_iso2":"VOK","capital_state_id":null,"continent_id":"","continent_label":"","subregion_id":"","subregion_label":"","notes":"","scenario_only":true,"source_type":"scenario_extension","historical_fidelity":"extended"},"XIK":{"mode":"create","display_name":"XiKang","display_name_en":"XiKang","display_name_zh":"国民革命第24军","color_hex":"#6873a0","parent_owner_tag":"","subject_kind":"","entry_kind":"scenario_country","featured":false,"hidden_from_country_list":false,"base_iso2":"XIK","lookup_iso2":"XIK","provenance_iso2":"XIK","capital_state_id":null,"continent_id":"","continent_label":"","subregion_id":"","subregion_label":"","notes":"","scenario_only":true,"source_type":"scenario_extension","historical_fidelity":"extended"}},"assignments":{"CN_CITY_17275852B11052099771689":{"owner":"XIK","controller":"XIK","cores":["CHI"]},"CN_CITY_17275852B22120662831852":{"owner":"XIK","controller":"XIK","cores":["CHI"]},"CN_CITY_17275852B22886367507423":{"owner":"XIK","controller":"XIK","cores":["CHI"]},"CN_CITY_17275852B31291032699823":{"owner":"XIK","controller":"XIK","cores":["CHI"]},"CN_CITY_17275852B35412891437316":{"owner":"XIK","controller":"XIK","cores":["CHI"]},"CN_CITY_17275852B40415823663758":{"owner":"XIK","controller":"XIK","cores":["TIB"]},"CN_CITY_17275852B41775887521063":{"owner":"XIK","controller":"XIK","cores":["CHI"]},"CN_CITY_17275852B43185565483198":{"owner":"XIK","controller":"XIK","cores":["SIC"]},"CN_CITY_17275852B44606538982234":{"owner":"XIK","controller":"XIK","cores":["TIB"]},"CN_CITY_17275852B52005472318098":{"owner":"XIK","controller":"XIK","cores":["TIB"]},"CN_CITY_17275852B55184179127017":{"owner":"XIK","controller":"XIK","cores":["CHI"]},"CN_CITY_17275852B61252282595237":{"owner":"XIK","controller":"XIK","cores":["CHI"]},"CN_CITY_17275852B61899141263472":{"owner":"XIK","controller":"XIK","cores":["TIB"]},"CN_CITY_17275852B62345811013503":{"owner":"XIK","controller":"XIK","cores":["CHI"]},"CN_CITY_17275852B66113099800997":{"owner":"XIK","controller":"XIK","cores":["CHI"]},"CN_CITY_17275852B74822957782790":{"owner":"XIK","controller":"XIK","cores":["SIC"]},"CN_CITY_17275852B77624704817132":{"owner":"XIK","controller":"XIK","cores":["SIC"]},"CN_CITY_17275852B93800386737284":{"owner":"XIK","controller":"XIK","cores":["SIC"]},"RU_RAY_50074027B11628373622146":{"owner":"MAG","controller":"MAG","cores":["OUR"]},"RU_RAY_50074027B1349259071180":{"owner":"ORS","controller":"ORS","cores":["OUR"]},"RU_RAY_50074027B1436275614224":{"owner":"ORN","controller":"ORN","cores":["SOV"]},"RU_RAY_50074027B1688129398280":{"owner":"MAG","controller":"MAG","cores":["OUR"]},"RU_RAY_50074027B16928982325503":{"owner":"ORS","controller":"ORS","cores":["SVR"]},"RU_RAY_50074027B20766953749366":{"owner":"MAG","controller":"MAG","cores":["OUR"]},"RU_RAY_50074027B21488641063420":{"owner":"MAG","controller":"MAG","cores":["OUR"]},"RU_RAY_50074027B22575347101555":{"owner":"MAG","controller":"MAG","cores":["OUR"]},"RU_RAY_50074027B23901278564844":{"owner":"ORN","controller":"ORN","cores":["SOV"]},"RU_RAY_50074027B24150612748554":{"owner":"ORN","controller":"ORN","cores":["SOV"]},"RU_RAY_50074027B28606060123578":{"owner":"BOP","controller":"SVR","cores":["SVR"]},"RU_RAY_50074027B28906813018549":{"owner":"BOP","controller":"SVR","cores":["SVR"]},"RU_RAY_50074027B30219941944137":{"owner":"BOP","controller":"BOP","cores":["OUR"]},"RU_RAY_50074027B3033714852105":{"owner":"ORS","controller":"ORS","cores":["SVR"]},"RU_RAY_50074027B31496942337081":{"owner":"BOP","controller":"SVR","cores":["SVR"]},"RU_RAY_50074027B32234523409019":{"owner":"ORN","controller":"ORN","cores":["OUR"]},"RU_RAY_50074027B32656053456514":{"owner":"MAG","controller":"MAG","cores":["OUR"]},"RU_RAY_50074027B34738491600615":{"owner":"BOP","controller":"BOP","cores":["OUR"]},"RU_RAY_50074027B36993675567197":{"owner":"ORS","controller":"ORS","cores":["SVR"]},"RU_RAY_50074027B39041476138502":{"owner":"ONG","controller":"ONG","cores":["SOV","RKM"]},"RU_RAY_50074027B40271227634983":{"owner":"MAG","controller":"MAG","cores":["OUR"]},"RU_RAY_50074027B41643930675404":{"owner":"ONG","controller":"ONG","cores":["WRS"]},"RU_RAY_50074027B42894474720971":{"owner":"ORS","controller":"ORS","cores":["OUR"]},"RU_RAY_50074027B43089956732561":{"owner":"MAG","controller":"MAG","cores":["OUR"]},"RU_RAY_50074027B43884412711869":{"owner":"MAG","controller":"MAG","cores":["OUR"]},"RU_RAY_50074027B44738927608854":{"owner":"BOP","controller":"SVR","cores":["SVR"]},"RU_RAY_50074027B44863367100393":{"owner":"ORS","controller":"ORS","cores":["SVR"]},"RU_RAY_50074027B45493241507504":{"owner":"ONG","controller":"ONG","cores":["SOV","RKM"]},"RU_RAY_50074027B45994623884743":{"owner":"ORN","controller":"ORN","cores":["OUR"]},"RU_RAY_50074027B49390035135032":{"owner":"ONG","controller":"ONG","cores":["FIN"]},"RU_RAY_50074027B51176471238152":{"owner":"ONG","controller":"ONG","cores":["WRS"]},"RU_RAY_50074027B51975947955569":{"owner":"ORN","controller":"ORN","cores":["SOV"]},"RU_RAY_50074027B5291843877359":{"owner":"ONG","controller":"ONG","cores":["WRS"]},"RU_RAY_50074027B55874149600418":{"owner":"ORS","controller":"ORS","cores":["SVR"]},"RU_RAY_50074027B56233113775442":{"owner":"BOP","controller":"BOP","cores":["OUR"]},"RU_RAY_50074027B56261269840227":{"owner":"ORS","controller":"ORS","cores":["OUR"]},"RU_RAY_50074027B59785641495471":{"owner":"ORN","controller":"ORN","cores":["SOV"]},"RU_RAY_50074027B60413300894613":{"owner":"MAG","controller":"MAG","cores":["SOV"]},"RU_RAY_50074027B62555187301125":{"owner":"ORS","controller":"ORS","cores":["SVR"]},"RU_RAY_50074027B63939328308322":{"owner":"MAG","controller":"MAG","cores":["OUR"]},"RU_RAY_50074027B66770935409727":{"owner":"ONG","controller":"ONG","cores":["WRS"]},"RU_RAY_50074027B68145102947423":{"owner":"ORS","controller":"ORS","cores":["SVR"]},"RU_RAY_50074027B76424633116960":{"owner":"ORN","controller":"ORN","cores":["SOV"]},"RU_RAY_50074027B78297177563949":{"owner":"VOK","controller":"VOK","cores":["OUR"]},"RU_RAY_50074027B80768671311936":{"owner":"MAG","controller":"MAG","cores":["OUR"]},"RU_RAY_50074027B80784778261580":{"owner":"ORN","controller":"ORN","cores":["OUR"]},"RU_RAY_50074027B84484580118953":{"owner":"MAG","controller":"MAG","cores":["OUR"]},"RU_RAY_50074027B85521720356059":{"owner":"ORN","controller":"ORN","cores":["SOV"]},"RU_RAY_50074027B86150609365879":{"owner":"ORS","controller":"ORS","cores":["SVR"]},"RU_RAY_50074027B88013185762354":{"owner":"ORN","controller":"ORN","cores":["OUR"]},"RU_RAY_50074027B90298108562486":{"owner":"ORS","controller":"ORS","cores":["OUR"]},"RU_RAY_50074027B90614779989095":{"owner":"ORN","controller":"ORN","cores":["OUR"]},"RU_RAY_50074027B92092388399011":{"owner":"BOP","controller":"BOP","cores":["SVR"]},"RU_RAY_50074027B95058446933868":{"owner":"ORN","controller":"ORN","cores":["SOV"]},"RU_RAY_50074027B99663793376292":{"owner":"ORN","controller":"ORN","cores":["SOV"]}}}
+{
+  "version": 1,
+  "scenario_id": "tno_1962",
+  "generated_at": "2026-03-21T09:15:19.842495-04:00",
+  "countries": {
+    "BOP": {
+      "mode": "create",
+      "display_name": "вор в законе",
+      "display_name_en": "вор в законе",
+      "display_name_zh": "律贼领地",
+      "color_hex": "#e0e0e0",
+      "parent_owner_tag": "",
+      "subject_kind": "",
+      "entry_kind": "scenario_country",
+      "featured": false,
+      "hidden_from_country_list": false,
+      "base_iso2": "BOP",
+      "lookup_iso2": "BOP",
+      "provenance_iso2": "BOP",
+      "capital_state_id": null,
+      "continent_id": "",
+      "continent_label": "",
+      "subregion_id": "",
+      "subregion_label": "",
+      "notes": "",
+      "scenario_only": true,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended"
+    },
+    "MAG": {
+      "mode": "create",
+      "display_name": "Magnitogorsk",
+      "display_name_en": "Magnitogorsk",
+      "display_name_zh": "马格尼托哥尔斯克",
+      "color_hex": "#415638",
+      "parent_owner_tag": "",
+      "subject_kind": "",
+      "entry_kind": "scenario_country",
+      "featured": false,
+      "hidden_from_country_list": false,
+      "base_iso2": "MAG",
+      "lookup_iso2": "MAG",
+      "provenance_iso2": "MAG",
+      "capital_state_id": null,
+      "continent_id": "",
+      "continent_label": "",
+      "subregion_id": "",
+      "subregion_label": "",
+      "notes": "",
+      "scenario_only": true,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended"
+    },
+    "ONG": {
+      "mode": "create",
+      "display_name": "Onega",
+      "display_name_en": "Onega",
+      "display_name_zh": "奥涅加",
+      "color_hex": "#0d4510",
+      "parent_owner_tag": "",
+      "subject_kind": "",
+      "entry_kind": "scenario_country",
+      "featured": false,
+      "hidden_from_country_list": false,
+      "base_iso2": "ONG",
+      "lookup_iso2": "ONG",
+      "provenance_iso2": "ONG",
+      "capital_state_id": null,
+      "continent_id": "",
+      "continent_label": "",
+      "subregion_id": "",
+      "subregion_label": "",
+      "notes": "",
+      "scenario_only": true,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended"
+    },
+    "ORN": {
+      "mode": "create",
+      "display_name": "Orenburg",
+      "display_name_en": "Orenburg",
+      "display_name_zh": "奥伦堡",
+      "color_hex": "#63342c",
+      "parent_owner_tag": "",
+      "subject_kind": "",
+      "entry_kind": "scenario_country",
+      "featured": false,
+      "hidden_from_country_list": false,
+      "base_iso2": "ORN",
+      "lookup_iso2": "ORN",
+      "provenance_iso2": "ORN",
+      "capital_state_id": null,
+      "continent_id": "",
+      "continent_label": "",
+      "subregion_id": "",
+      "subregion_label": "",
+      "notes": "",
+      "scenario_only": true,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended"
+    },
+    "ORS": {
+      "mode": "create",
+      "display_name": "Orsk",
+      "display_name_en": "Orsk",
+      "display_name_zh": "奥尔斯克",
+      "color_hex": "#1f1f1f",
+      "parent_owner_tag": "",
+      "subject_kind": "",
+      "entry_kind": "scenario_country",
+      "featured": false,
+      "hidden_from_country_list": false,
+      "base_iso2": "ORS",
+      "lookup_iso2": "ORS",
+      "provenance_iso2": "ORS",
+      "capital_state_id": null,
+      "continent_id": "",
+      "continent_label": "",
+      "subregion_id": "",
+      "subregion_label": "",
+      "notes": "",
+      "scenario_only": true,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended"
+    },
+    "VOK": {
+      "mode": "create",
+      "display_name": "Vorkuta",
+      "display_name_en": "Vorkuta",
+      "display_name_zh": "沃尔库塔",
+      "color_hex": "#648abe",
+      "parent_owner_tag": "",
+      "subject_kind": "",
+      "entry_kind": "scenario_country",
+      "featured": false,
+      "hidden_from_country_list": false,
+      "base_iso2": "VOK",
+      "lookup_iso2": "VOK",
+      "provenance_iso2": "VOK",
+      "capital_state_id": null,
+      "continent_id": "",
+      "continent_label": "",
+      "subregion_id": "",
+      "subregion_label": "",
+      "notes": "",
+      "scenario_only": true,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended"
+    },
+    "XIK": {
+      "mode": "create",
+      "display_name": "XiKang",
+      "display_name_en": "XiKang",
+      "display_name_zh": "国民革命第24军",
+      "color_hex": "#6873a0",
+      "parent_owner_tag": "",
+      "subject_kind": "",
+      "entry_kind": "scenario_country",
+      "featured": false,
+      "hidden_from_country_list": false,
+      "base_iso2": "XIK",
+      "lookup_iso2": "XIK",
+      "provenance_iso2": "XIK",
+      "capital_state_id": null,
+      "continent_id": "",
+      "continent_label": "",
+      "subregion_id": "",
+      "subregion_label": "",
+      "notes": "",
+      "scenario_only": true,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended"
+    },
+    "NIE": {
+      "mode": "create",
+      "display_name": "Northern-Ireland",
+      "display_name_en": "Northern-Ireland",
+      "display_name_zh": "北爱尔兰",
+      "color_hex": "#46864b",
+      "parent_owner_tag": "IRE",
+      "subject_kind": "releasable_state",
+      "entry_kind": "scenario_subject",
+      "featured": false,
+      "hidden_from_country_list": false,
+      "base_iso2": "NIE",
+      "lookup_iso2": "NIE",
+      "provenance_iso2": "NIE",
+      "capital_state_id": null,
+      "continent_id": "",
+      "continent_label": "",
+      "subregion_id": "",
+      "subregion_label": "",
+      "notes": "",
+      "scenario_only": true,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended"
+    }
+  },
+  "assignments": {
+    "CN_CITY_17275852B11052099771689": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "CHI"
+      ]
+    },
+    "CN_CITY_17275852B22120662831852": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "CHI"
+      ]
+    },
+    "CN_CITY_17275852B22886367507423": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "CHI"
+      ]
+    },
+    "CN_CITY_17275852B31291032699823": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "CHI"
+      ]
+    },
+    "CN_CITY_17275852B35412891437316": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "CHI"
+      ]
+    },
+    "CN_CITY_17275852B40415823663758": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "TIB"
+      ]
+    },
+    "CN_CITY_17275852B41775887521063": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "CHI"
+      ]
+    },
+    "CN_CITY_17275852B43185565483198": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "SIC"
+      ]
+    },
+    "CN_CITY_17275852B44606538982234": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "TIB"
+      ]
+    },
+    "CN_CITY_17275852B52005472318098": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "TIB"
+      ]
+    },
+    "CN_CITY_17275852B55184179127017": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "CHI"
+      ]
+    },
+    "CN_CITY_17275852B61252282595237": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "CHI"
+      ]
+    },
+    "CN_CITY_17275852B61899141263472": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "TIB"
+      ]
+    },
+    "CN_CITY_17275852B62345811013503": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "CHI"
+      ]
+    },
+    "CN_CITY_17275852B66113099800997": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "CHI"
+      ]
+    },
+    "CN_CITY_17275852B74822957782790": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "SIC"
+      ]
+    },
+    "CN_CITY_17275852B77624704817132": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "SIC"
+      ]
+    },
+    "CN_CITY_17275852B93800386737284": {
+      "owner": "XIK",
+      "controller": "XIK",
+      "cores": [
+        "SIC"
+      ]
+    },
+    "RU_RAY_50074027B11628373622146": {
+      "owner": "MAG",
+      "controller": "MAG",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B1349259071180": {
+      "owner": "ORS",
+      "controller": "ORS",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B1436275614224": {
+      "owner": "ORN",
+      "controller": "ORN",
+      "cores": [
+        "SOV"
+      ]
+    },
+    "RU_RAY_50074027B1688129398280": {
+      "owner": "MAG",
+      "controller": "MAG",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B16928982325503": {
+      "owner": "ORS",
+      "controller": "ORS",
+      "cores": [
+        "SVR"
+      ]
+    },
+    "RU_RAY_50074027B20766953749366": {
+      "owner": "MAG",
+      "controller": "MAG",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B21488641063420": {
+      "owner": "MAG",
+      "controller": "MAG",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B22575347101555": {
+      "owner": "MAG",
+      "controller": "MAG",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B23901278564844": {
+      "owner": "ORN",
+      "controller": "ORN",
+      "cores": [
+        "SOV"
+      ]
+    },
+    "RU_RAY_50074027B24150612748554": {
+      "owner": "ORN",
+      "controller": "ORN",
+      "cores": [
+        "SOV"
+      ]
+    },
+    "RU_RAY_50074027B28606060123578": {
+      "owner": "BOP",
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ]
+    },
+    "RU_RAY_50074027B28906813018549": {
+      "owner": "BOP",
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ]
+    },
+    "RU_RAY_50074027B30219941944137": {
+      "owner": "BOP",
+      "controller": "BOP",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B3033714852105": {
+      "owner": "ORS",
+      "controller": "ORS",
+      "cores": [
+        "SVR"
+      ]
+    },
+    "RU_RAY_50074027B31496942337081": {
+      "owner": "BOP",
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ]
+    },
+    "RU_RAY_50074027B32234523409019": {
+      "owner": "ORN",
+      "controller": "ORN",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B32656053456514": {
+      "owner": "MAG",
+      "controller": "MAG",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B34738491600615": {
+      "owner": "BOP",
+      "controller": "BOP",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B36993675567197": {
+      "owner": "ORS",
+      "controller": "ORS",
+      "cores": [
+        "SVR"
+      ]
+    },
+    "RU_RAY_50074027B39041476138502": {
+      "owner": "ONG",
+      "controller": "ONG",
+      "cores": [
+        "SOV",
+        "RKM"
+      ]
+    },
+    "RU_RAY_50074027B40271227634983": {
+      "owner": "MAG",
+      "controller": "MAG",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B41643930675404": {
+      "owner": "ONG",
+      "controller": "ONG",
+      "cores": [
+        "WRS"
+      ]
+    },
+    "RU_RAY_50074027B42894474720971": {
+      "owner": "ORS",
+      "controller": "ORS",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B43089956732561": {
+      "owner": "MAG",
+      "controller": "MAG",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B43884412711869": {
+      "owner": "MAG",
+      "controller": "MAG",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B44738927608854": {
+      "owner": "BOP",
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ]
+    },
+    "RU_RAY_50074027B44863367100393": {
+      "owner": "ORS",
+      "controller": "ORS",
+      "cores": [
+        "SVR"
+      ]
+    },
+    "RU_RAY_50074027B45493241507504": {
+      "owner": "ONG",
+      "controller": "ONG",
+      "cores": [
+        "SOV",
+        "RKM"
+      ]
+    },
+    "RU_RAY_50074027B45994623884743": {
+      "owner": "ORN",
+      "controller": "ORN",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B49390035135032": {
+      "owner": "ONG",
+      "controller": "ONG",
+      "cores": [
+        "FIN"
+      ]
+    },
+    "RU_RAY_50074027B51176471238152": {
+      "owner": "ONG",
+      "controller": "ONG",
+      "cores": [
+        "WRS"
+      ]
+    },
+    "RU_RAY_50074027B51975947955569": {
+      "owner": "ORN",
+      "controller": "ORN",
+      "cores": [
+        "SOV"
+      ]
+    },
+    "RU_RAY_50074027B5291843877359": {
+      "owner": "ONG",
+      "controller": "ONG",
+      "cores": [
+        "WRS"
+      ]
+    },
+    "RU_RAY_50074027B55874149600418": {
+      "owner": "ORS",
+      "controller": "ORS",
+      "cores": [
+        "SVR"
+      ]
+    },
+    "RU_RAY_50074027B56233113775442": {
+      "owner": "BOP",
+      "controller": "BOP",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B56261269840227": {
+      "owner": "ORS",
+      "controller": "ORS",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B59785641495471": {
+      "owner": "ORN",
+      "controller": "ORN",
+      "cores": [
+        "SOV"
+      ]
+    },
+    "RU_RAY_50074027B60413300894613": {
+      "owner": "MAG",
+      "controller": "MAG",
+      "cores": [
+        "SOV"
+      ]
+    },
+    "RU_RAY_50074027B62555187301125": {
+      "owner": "ORS",
+      "controller": "ORS",
+      "cores": [
+        "SVR"
+      ]
+    },
+    "RU_RAY_50074027B63939328308322": {
+      "owner": "MAG",
+      "controller": "MAG",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B66770935409727": {
+      "owner": "ONG",
+      "controller": "ONG",
+      "cores": [
+        "WRS"
+      ]
+    },
+    "RU_RAY_50074027B68145102947423": {
+      "owner": "ORS",
+      "controller": "ORS",
+      "cores": [
+        "SVR"
+      ]
+    },
+    "RU_RAY_50074027B76424633116960": {
+      "owner": "ORN",
+      "controller": "ORN",
+      "cores": [
+        "SOV"
+      ]
+    },
+    "RU_RAY_50074027B78297177563949": {
+      "owner": "VOK",
+      "controller": "VOK",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B80768671311936": {
+      "owner": "MAG",
+      "controller": "MAG",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B80784778261580": {
+      "owner": "ORN",
+      "controller": "ORN",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B84484580118953": {
+      "owner": "MAG",
+      "controller": "MAG",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B85521720356059": {
+      "owner": "ORN",
+      "controller": "ORN",
+      "cores": [
+        "SOV"
+      ]
+    },
+    "RU_RAY_50074027B86150609365879": {
+      "owner": "ORS",
+      "controller": "ORS",
+      "cores": [
+        "SVR"
+      ]
+    },
+    "RU_RAY_50074027B88013185762354": {
+      "owner": "ORN",
+      "controller": "ORN",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B90298108562486": {
+      "owner": "ORS",
+      "controller": "ORS",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B90614779989095": {
+      "owner": "ORN",
+      "controller": "ORN",
+      "cores": [
+        "OUR"
+      ]
+    },
+    "RU_RAY_50074027B92092388399011": {
+      "owner": "BOP",
+      "controller": "BOP",
+      "cores": [
+        "SVR"
+      ]
+    },
+    "RU_RAY_50074027B95058446933868": {
+      "owner": "ORN",
+      "controller": "ORN",
+      "cores": [
+        "SOV"
+      ]
+    },
+    "RU_RAY_50074027B99663793376292": {
+      "owner": "ORN",
+      "controller": "ORN",
+      "cores": [
+        "SOV"
+      ]
+    },
+    "UKN0C": {
+      "owner": "NIE",
+      "controller": "NIE",
+      "cores": [
+        "NIE"
+      ]
+    },
+    "UKN0F": {
+      "owner": "NIE",
+      "controller": "NIE",
+      "cores": [
+        "NIE"
+      ]
+    },
+    "UKN0B": {
+      "owner": "NIE",
+      "controller": "NIE",
+      "cores": [
+        "NIE"
+      ]
+    },
+    "UKN0D": {
+      "owner": "NIE",
+      "controller": "NIE",
+      "cores": [
+        "NIE"
+      ]
+    },
+    "UKN0E": {
+      "owner": "NIE",
+      "controller": "NIE",
+      "cores": [
+        "NIE"
+      ]
+    },
+    "UKN06": {
+      "owner": "NIE",
+      "controller": "NIE",
+      "cores": [
+        "NIE"
+      ]
+    },
+    "UKN07": {
+      "owner": "NIE",
+      "controller": "NIE",
+      "cores": [
+        "NIE"
+      ]
+    },
+    "UKN09": {
+      "owner": "NIE",
+      "controller": "NIE",
+      "cores": [
+        "NIE"
+      ]
+    },
+    "UKN08": {
+      "owner": "NIE",
+      "controller": "NIE",
+      "cores": [
+        "NIE"
+      ]
+    }
+  }
+}
