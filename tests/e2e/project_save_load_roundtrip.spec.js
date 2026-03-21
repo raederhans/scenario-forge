@@ -129,6 +129,7 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   expect(initialExport.styleConfig.physical).toMatchObject({
     opacity: 0.61,
     blendMode: "overlay",
+    atlasOpacity: 0.52,
   });
   expect(initialExport.activePaletteId).toBe(selectedPaletteId);
   expect(initialExport.interactionGranularity).toBe("subdivision");
@@ -152,10 +153,9 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     width: 2.7,
   };
   importedProject.styleConfig.physical = {
-    ...cloneJson(importedProject.styleConfig.physical || {}),
+    mode: "atlas_and_contours",
     opacity: 0.44,
     blendMode: "multiply",
-    atlasOpacity: 0.52,
   };
   importedProject.layerVisibility.showSpecialZones = true;
   importedProject.recentColors = ["#112233", "#445566"];

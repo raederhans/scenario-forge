@@ -36,6 +36,11 @@ function resolveFeatureGeoCountryCode(feature) {
   );
 }
 
+function normalizeScenarioDistrictTag(rawValue) {
+  const normalized = String(rawValue || "").trim().toUpperCase();
+  return /^[A-Z]{2,4}$/.test(normalized) ? normalized : "";
+}
+
 function normalizeFeatureIdList(values = []) {
   return Array.from(new Set(
     (Array.isArray(values) ? values : [])
@@ -45,7 +50,7 @@ function normalizeFeatureIdList(values = []) {
 }
 
 function normalizeDistrictRecord(rawDistrict = {}, fallbackId = "") {
-  const id = String(rawDistrict?.id || fallbackId || "").trim();
+  const id = String(rawDistrict?.id || rawDistrict?.district_id || fallbackId || "").trim();
   if (!id) return null;
   return {
     id,
@@ -55,7 +60,23 @@ function normalizeDistrictRecord(rawDistrict = {}, fallbackId = "") {
   };
 }
 
-function normalizeCountryDistrictRecord(rawCountry = {}, fallbackCode = "") {
+function normalizeTagDistrictRecord(rawTag = {}, fallbackTag = "") {
+  const tag = normalizeScenarioDistrictTag(rawTag?.tag || rawTag?.owner_tag || rawTag?.ownerTag || fallbackTag);
+  if (!tag) return null;
+  const districts = {};
+  Object.entries(rawTag?.districts && typeof rawTag.districts === "object" ? rawTag.districts : {})
+    .forEach(([districtId, rawDistrict]) => {
+      const normalized = normalizeDistrictRecord(rawDistrict, districtId);
+      if (!normalized) return;
+      districts[normalized.id] = normalized;
+    });
+  return {
+    tag,
+    districts,
+  };
+}
+
+function normalizeLegacyCountryDistrictRecord(rawCountry = {}, fallbackCode = "") {
   const countryCode = normalizeGeoCountryCode(rawCountry?.country_code || rawCountry?.countryCode || fallbackCode);
   if (!countryCode) return null;
   const districts = {};
@@ -76,7 +97,9 @@ function createEmptyScenarioDistrictGroupsPayload(scenarioId = "") {
     version: 1,
     scenario_id: String(scenarioId || "").trim(),
     generated_at: "",
-    countries: {},
+    tags: {},
+    legacy_countries: {},
+    has_legacy_geo_countries: false,
   };
 }
 
@@ -89,27 +112,34 @@ function normalizeScenarioDistrictGroupsPayload(payload, scenarioId = "") {
   }
   normalized.version = Number(payload.version || 1) || 1;
   normalized.generated_at = String(payload.generated_at || payload.generatedAt || "").trim();
+  Object.entries(payload.tags && typeof payload.tags === "object" ? payload.tags : {})
+    .forEach(([tag, rawTag]) => {
+      const record = normalizeTagDistrictRecord(rawTag, tag);
+      if (!record) return;
+      normalized.tags[record.tag] = record;
+    });
   Object.entries(payload.countries && typeof payload.countries === "object" ? payload.countries : {})
     .forEach(([countryCode, rawCountry]) => {
-      const record = normalizeCountryDistrictRecord(rawCountry, countryCode);
+      const record = normalizeLegacyCountryDistrictRecord(rawCountry, countryCode);
       if (!record) return;
-      normalized.countries[record.country_code] = record;
+      normalized.legacy_countries[record.country_code] = record;
     });
+  normalized.has_legacy_geo_countries = Object.keys(normalized.legacy_countries).length > 0;
   return normalized;
 }
 
-function getScenarioDistrictCountryRecord(payload, countryCode = "") {
-  const normalizedCountryCode = normalizeGeoCountryCode(countryCode);
-  if (!normalizedCountryCode) return null;
+function getScenarioDistrictTagRecord(payload, tag = "") {
+  const normalizedTag = normalizeScenarioDistrictTag(tag);
+  if (!normalizedTag) return null;
   const normalizedPayload = normalizeScenarioDistrictGroupsPayload(payload);
-  return normalizedPayload.countries[normalizedCountryCode] || null;
+  return normalizedPayload.tags[normalizedTag] || null;
 }
 
 function buildScenarioDistrictGroupByFeatureId(payload) {
   const featureToGroup = new Map();
   const normalizedPayload = normalizeScenarioDistrictGroupsPayload(payload);
-  Object.values(normalizedPayload.countries || {}).forEach((countryRecord) => {
-    Object.values(countryRecord?.districts || {}).forEach((district) => {
+  Object.values(normalizedPayload.tags || {}).forEach((tagRecord) => {
+    Object.values(tagRecord?.districts || {}).forEach((district) => {
       const districtId = String(district?.id || "").trim();
       if (!districtId) return;
       normalizeFeatureIdList(district?.feature_ids || []).forEach((featureId) => {
@@ -125,8 +155,9 @@ function buildScenarioDistrictGroupByFeatureId(payload) {
 export {
   buildScenarioDistrictGroupByFeatureId,
   createEmptyScenarioDistrictGroupsPayload,
-  getScenarioDistrictCountryRecord,
+  getScenarioDistrictTagRecord,
   normalizeGeoCountryCode,
   normalizeScenarioDistrictGroupsPayload,
+  normalizeScenarioDistrictTag,
   resolveFeatureGeoCountryCode,
 };

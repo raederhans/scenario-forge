@@ -13,10 +13,9 @@ import {
 import { buildScenarioReleasableIndex, rebuildPresetState } from "../core/releasable_manager.js";
 import {
   buildScenarioDistrictGroupByFeatureId,
-  getScenarioDistrictCountryRecord,
-  normalizeGeoCountryCode,
+  getScenarioDistrictTagRecord,
   normalizeScenarioDistrictGroupsPayload,
-  resolveFeatureGeoCountryCode,
+  normalizeScenarioDistrictTag,
 } from "../core/scenario_districts.js";
 import { applyDeclarativeTranslations, buildTooltipModel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
@@ -689,9 +688,10 @@ function applyScenarioTagCreatorSuccess(response, payload, targetIds = []) {
 function updateDistrictEditorState(nextPartial = {}) {
   const current = state.devScenarioDistrictEditor || {};
   state.devScenarioDistrictEditor = {
-    countryMode: "auto",
-    manualCountryCode: "",
-    inferredCountryCode: "",
+    tagMode: "auto",
+    manualTag: "",
+    inferredTag: "",
+    templateTag: "",
     ...current,
     ...nextPartial,
   };
@@ -701,17 +701,20 @@ function clearDistrictEditorForm({ preserveStatus = false } = {}) {
   const current = state.devScenarioDistrictEditor || {};
   updateDistrictEditorState({
     ...current,
-    countryCode: "",
-    countryMode: "auto",
-    manualCountryCode: "",
-    inferredCountryCode: "",
+    tag: "",
+    tagMode: "auto",
+    manualTag: "",
+    inferredTag: "",
+    templateTag: "",
     selectedDistrictId: "",
     nameEn: "",
     nameZh: "",
     loadedScenarioId: "",
-    loadedCountryCode: "",
-    draftCountry: null,
+    loadedTag: "",
+    draftTag: null,
     isSaving: false,
+    isTemplateSaving: false,
+    isTemplateApplying: false,
     ...(preserveStatus
       ? {}
       : {
@@ -723,38 +726,39 @@ function clearDistrictEditorForm({ preserveStatus = false } = {}) {
   });
 }
 
-function setDistrictDraftCountry(countryCode = "", draftCountry = null, nextOverrides = {}) {
-  const normalizedCountryCode = normalizeGeoCountryCode(countryCode);
-  const nextDraftCountry = cloneDistrictCountryRecord(normalizedCountryCode, draftCountry);
-  const districtIds = Object.keys(nextDraftCountry.districts || {});
+function setDistrictDraftTag(tag = "", draftTag = null, nextOverrides = {}) {
+  const normalizedTag = normalizeScenarioDistrictTag(tag);
+  const nextDraftTag = cloneDistrictTagRecord(normalizedTag, draftTag);
+  const districtIds = Object.keys(nextDraftTag.districts || {});
   const requestedDistrictId = normalizeScenarioDistrictId(
     nextOverrides.selectedDistrictId ?? state.devScenarioDistrictEditor?.selectedDistrictId
   );
   const selectedDistrictId = districtIds.includes(requestedDistrictId)
     ? requestedDistrictId
     : (requestedDistrictId === "" ? "" : (districtIds[0] || ""));
-  const selectedDistrict = selectedDistrictId ? nextDraftCountry.districts?.[selectedDistrictId] || null : null;
+  const selectedDistrict = selectedDistrictId ? nextDraftTag.districts?.[selectedDistrictId] || null : null;
   updateDistrictEditorState({
-    countryCode: normalizedCountryCode,
+    tag: normalizedTag,
     loadedScenarioId: String(state.activeScenarioId || ""),
-    loadedCountryCode: normalizedCountryCode,
-    draftCountry: nextDraftCountry,
+    loadedTag: normalizedTag,
+    draftTag: nextDraftTag,
     selectedDistrictId,
     nameEn: normalizeScenarioNameInput(nextOverrides.nameEn ?? selectedDistrict?.name_en ?? ""),
     nameZh: normalizeScenarioNameInput(nextOverrides.nameZh ?? selectedDistrict?.name_zh ?? ""),
+    templateTag: normalizeScenarioDistrictTag(nextOverrides.templateTag ?? state.devScenarioDistrictEditor?.templateTag ?? normalizedTag),
     ...nextOverrides,
   });
 }
 
-function syncScenarioDistrictState(countryCode = "", countryPayload = null) {
-  const normalizedCountryCode = normalizeGeoCountryCode(countryCode);
+function syncScenarioDistrictState(tag = "", tagPayload = null) {
+  const normalizedTag = normalizeScenarioDistrictTag(tag);
   const nextPayload = normalizeScenarioDistrictGroupsPayload(
     {
       ...(state.scenarioDistrictGroupsData || {}),
       scenario_id: String(state.activeScenarioId || ""),
-      countries: {
-        ...((state.scenarioDistrictGroupsData && state.scenarioDistrictGroupsData.countries) || {}),
-        [normalizedCountryCode]: countryPayload,
+      tags: {
+        ...((state.scenarioDistrictGroupsData && state.scenarioDistrictGroupsData.tags) || {}),
+        [normalizedTag]: tagPayload,
       },
     },
     state.activeScenarioId
@@ -767,8 +771,8 @@ function normalizeScenarioDistrictId(value) {
   return String(value || "").trim().replace(/\s+/g, "_");
 }
 
-function cloneDistrictCountryRecord(countryCode = "", record = null) {
-  const normalizedCountryCode = normalizeGeoCountryCode(countryCode);
+function cloneDistrictTagRecord(tag = "", record = null) {
+  const normalizedTag = normalizeScenarioDistrictTag(tag);
   const districts = {};
   const sourceDistricts = record?.districts && typeof record.districts === "object" ? record.districts : {};
   Object.entries(sourceDistricts).forEach(([districtId, rawDistrict]) => {
@@ -786,56 +790,55 @@ function cloneDistrictCountryRecord(countryCode = "", record = null) {
     };
   });
   return {
-    country_code: normalizedCountryCode,
+    tag: normalizedTag,
     districts,
   };
 }
 
-function resolveSelectionGeoCountryCodes(targetIds = []) {
+function resolveSelectionScenarioTags(targetIds = []) {
   return Array.from(new Set(
     (Array.isArray(targetIds) ? targetIds : [])
-      .map((featureId) => state.landIndex?.get(featureId))
-      .filter(Boolean)
-      .map((feature) => resolveFeatureGeoCountryCode(feature))
+      .map((featureId) => normalizeScenarioDistrictTag(state.sovereigntyByFeatureId?.[featureId]))
       .filter(Boolean)
   )).sort((left, right) => left.localeCompare(right));
 }
 
-function ensureDistrictDraftForCountry(countryCode = "") {
-  const normalizedCountryCode = normalizeGeoCountryCode(countryCode);
+function ensureDistrictDraftForTag(tag = "") {
+  const normalizedTag = normalizeScenarioDistrictTag(tag);
   const priorState = state.devScenarioDistrictEditor || {};
-  if (!normalizedCountryCode || !state.activeScenarioId) {
+  if (!normalizedTag || !state.activeScenarioId) {
     return {
       ...priorState,
-      draftCountry: null,
+      draftTag: null,
     };
   }
   const needsReload =
     String(priorState.loadedScenarioId || "") !== String(state.activeScenarioId || "")
-    || normalizeGeoCountryCode(priorState.loadedCountryCode) !== normalizedCountryCode
-    || !priorState.draftCountry;
+    || normalizeScenarioDistrictTag(priorState.loadedTag) !== normalizedTag
+    || !priorState.draftTag;
   if (!needsReload) {
     return priorState;
   }
-  const savedCountry = cloneDistrictCountryRecord(
-    normalizedCountryCode,
-    getScenarioDistrictCountryRecord(state.scenarioDistrictGroupsData, normalizedCountryCode)
+  const savedTag = cloneDistrictTagRecord(
+    normalizedTag,
+    getScenarioDistrictTagRecord(state.scenarioDistrictGroupsData, normalizedTag)
   );
-  const districtIds = Object.keys(savedCountry.districts);
+  const districtIds = Object.keys(savedTag.districts);
   const normalizedSelectedDistrictId = normalizeScenarioDistrictId(priorState.selectedDistrictId);
   const nextSelectedDistrictId = districtIds.includes(normalizedSelectedDistrictId)
     ? normalizedSelectedDistrictId
     : (normalizedSelectedDistrictId === "" ? "" : (districtIds[0] || ""));
-  const selectedDistrict = nextSelectedDistrictId ? savedCountry.districts[nextSelectedDistrictId] || null : null;
+  const selectedDistrict = nextSelectedDistrictId ? savedTag.districts[nextSelectedDistrictId] || null : null;
   const nextState = {
     ...priorState,
-    countryCode: normalizedCountryCode,
+    tag: normalizedTag,
     loadedScenarioId: String(state.activeScenarioId || ""),
-    loadedCountryCode: normalizedCountryCode,
-    draftCountry: savedCountry,
+    loadedTag: normalizedTag,
+    draftTag: savedTag,
     selectedDistrictId: nextSelectedDistrictId,
     nameEn: normalizeScenarioNameInput(selectedDistrict?.name_en || ""),
     nameZh: normalizeScenarioNameInput(selectedDistrict?.name_zh || ""),
+    templateTag: normalizeScenarioDistrictTag(priorState.templateTag) || normalizedTag,
   };
   state.devScenarioDistrictEditor = nextState;
   return nextState;
@@ -843,14 +846,16 @@ function ensureDistrictDraftForCountry(countryCode = "") {
 
 function resetDistrictEditorForm({ clearStatus = true } = {}) {
   updateDistrictEditorState({
-    countryCode: "",
-    countryMode: "auto",
-    manualCountryCode: "",
+    tag: "",
+    tagMode: "auto",
+    manualTag: "",
+    inferredTag: "",
+    templateTag: "",
     selectedDistrictId: "",
     nameEn: "",
     nameZh: "",
-    draftCountry: null,
-    loadedCountryCode: "",
+    draftTag: null,
+    loadedTag: "",
     loadedScenarioId: String(state.activeScenarioId || ""),
     ...(clearStatus
       ? {
@@ -863,65 +868,73 @@ function resetDistrictEditorForm({ clearStatus = true } = {}) {
 
 function resolveDistrictEditorModel() {
   const targetIds = resolveOwnershipTargetIds();
-  const selectionGeoCountryCodes = resolveSelectionGeoCountryCodes(targetIds);
-  const inferredCountryCode = selectionGeoCountryCodes.length === 1 ? selectionGeoCountryCodes[0] : "";
+  const selectionTags = resolveSelectionScenarioTags(targetIds);
+  const inferredTag = selectionTags.length === 1 ? selectionTags[0] : "";
   const editorBaseState = state.devScenarioDistrictEditor || {};
-  const manualCountryCode = normalizeGeoCountryCode(editorBaseState.manualCountryCode);
-  const isManualMode = editorBaseState.countryMode === "manual" && !!manualCountryCode;
-  const countryMode = isManualMode ? "manual" : "auto";
-  const countryCode = countryMode === "manual" ? manualCountryCode : inferredCountryCode;
+  const manualTag = normalizeScenarioDistrictTag(editorBaseState.manualTag);
+  const isManualMode = editorBaseState.tagMode === "manual" && !!manualTag;
+  const tagMode = isManualMode ? "manual" : "auto";
+  const tag = tagMode === "manual" ? manualTag : inferredTag;
+  const normalizedDistrictPayload = normalizeScenarioDistrictGroupsPayload(state.scenarioDistrictGroupsData, state.activeScenarioId);
+  const legacyCountryCodes = Object.keys(normalizedDistrictPayload.legacy_countries || {});
   if (
-    editorBaseState.inferredCountryCode !== inferredCountryCode
-    || editorBaseState.countryMode !== countryMode
-    || editorBaseState.countryCode !== countryCode
+    editorBaseState.inferredTag !== inferredTag
+    || editorBaseState.tagMode !== tagMode
+    || editorBaseState.tag !== tag
   ) {
     updateDistrictEditorState({
-      inferredCountryCode,
-      countryMode,
-      countryCode,
+      inferredTag,
+      tagMode,
+      tag,
     });
   }
-  const editorState = ensureDistrictDraftForCountry(countryCode);
-  const draftCountry = editorState?.draftCountry
-    ? cloneDistrictCountryRecord(countryCode, editorState.draftCountry)
-    : cloneDistrictCountryRecord(countryCode, null);
-  const districtEntries = Object.values(draftCountry?.districts || {}).sort((left, right) => {
+  const editorState = ensureDistrictDraftForTag(tag);
+  const draftTag = editorState?.draftTag
+    ? cloneDistrictTagRecord(tag, editorState.draftTag)
+    : cloneDistrictTagRecord(tag, null);
+  const districtEntries = Object.values(draftTag?.districts || {}).sort((left, right) => {
     const leftName = normalizeScenarioNameInput(left?.name_en || left?.name_zh || left?.id || "");
     const rightName = normalizeScenarioNameInput(right?.name_en || right?.name_zh || right?.id || "");
     return leftName.localeCompare(rightName) || String(left?.id || "").localeCompare(String(right?.id || ""));
   });
   const selectedDistrictId = normalizeScenarioDistrictId(editorState?.selectedDistrictId);
-  const selectedDistrict = selectedDistrictId ? draftCountry?.districts?.[selectedDistrictId] || null : null;
+  const selectedDistrict = selectedDistrictId ? draftTag?.districts?.[selectedDistrictId] || null : null;
   return {
     targetIds,
     selectionCount: targetIds.length,
-    selectionGeoCountryCodes,
-    countryMode,
-    manualCountryCode,
-    inferredCountryCode,
-    countryCode,
-    draftCountry,
+    selectionTags,
+    tagMode,
+    manualTag,
+    inferredTag,
+    tag,
+    draftTag,
     districtEntries,
     selectedDistrictId,
     selectedDistrict,
-    canInferCountry: selectionGeoCountryCodes.length === 1,
-    canUseSelectionCountry: !!inferredCountryCode,
-    hasEffectiveCountry: !!countryCode,
-    isAutoMode: countryMode === "auto",
+    canInferTag: selectionTags.length === 1,
+    canUseSelectionTag: !!inferredTag,
+    hasEffectiveTag: !!tag,
+    isAutoMode: tagMode === "auto",
+    hasLegacyGeoCountryData: normalizedDistrictPayload.has_legacy_geo_countries,
+    legacyCountryCodes,
+    effectiveTemplateTag: normalizeScenarioDistrictTag(editorState?.templateTag) || tag,
   };
 }
 
 function buildDistrictMetaRows(model) {
   const rows = [];
   rows.push([ui("Mode"), model.isAutoMode ? ui("Auto") : ui("Manual")]);
-  if (model.countryCode) {
-    rows.push([ui("Geo Country"), model.countryCode]);
+  if (model.tag) {
+    rows.push([ui("Scenario Tag"), model.tag]);
   }
-  if (model.selectionGeoCountryCodes.length > 1) {
-    rows.push([ui("Selection Countries"), model.selectionGeoCountryCodes.join(", ")]);
+  if (model.selectionTags.length > 1) {
+    rows.push([ui("Selection Tags"), model.selectionTags.join(", ")]);
   }
   if (model.selectionCount) {
     rows.push([ui("Selected"), String(model.selectionCount)]);
+  }
+  if (model.hasLegacyGeoCountryData) {
+    rows.push([ui("Legacy"), model.legacyCountryCodes.join(", ") || ui("Detected")]);
   }
   if (model.selectedDistrict) {
     rows.push([ui("District"), model.selectedDistrict.name_en || model.selectedDistrict.name_zh || model.selectedDistrict.id]);
@@ -936,23 +949,26 @@ function resolveDistrictEditorHint(model) {
   if (!state.activeScenarioId) {
     return ui("Activate a scenario to edit district groups.");
   }
-  if (!model.countryCode && model.isAutoMode) {
-    return ui("Select land features from one geo country or type a country code manually to edit districts.");
+  if (model.hasLegacyGeoCountryData) {
+    return ui("Legacy geo-country districts detected. Migrate them before editing scenario-tag districts.");
   }
-  if (!model.countryCode && !model.isAutoMode) {
-    return ui("Type a geo country code manually or switch back to the current selection country.");
+  if (!model.tag && model.isAutoMode) {
+    return ui("Select land features owned by one scenario tag or type a tag manually to edit districts.");
   }
-  if (model.selectionGeoCountryCodes.length > 1) {
-    return ui("The current selection spans multiple geo countries. District assignment only uses features from the selected country code.");
+  if (!model.tag && !model.isAutoMode) {
+    return ui("Type a scenario tag manually or switch back to the current selection tag.");
+  }
+  if (model.selectionTags.length > 1) {
+    return ui("The current selection spans multiple scenario tags. District assignment only uses features owned by the active tag.");
   }
   if (!model.isAutoMode) {
-    return ui("Manual geo country override is active. District assignment only uses features that match the typed country code.");
+    return ui("Manual scenario tag override is active. District assignment only uses features owned by the typed tag.");
   }
-  return ui("Create or update a district, assign the current selection, then save the full country payload.");
+  return ui("Create or update a district, assign the current selection, then save the full scenario-tag payload.");
 }
 
 function buildDistrictSavePayload(model) {
-  const districts = Object.values(model?.draftCountry?.districts || {}).map((district) => ({
+  const districts = Object.values(model?.draftTag?.districts || {}).map((district) => ({
     districtId: normalizeScenarioDistrictId(district?.id),
     nameEn: normalizeScenarioNameInput(district?.name_en),
     nameZh: normalizeScenarioNameInput(district?.name_zh),
@@ -964,18 +980,18 @@ function buildDistrictSavePayload(model) {
   }));
   return {
     scenarioId: String(state.activeScenarioId || "").trim(),
-    countryCode: normalizeGeoCountryCode(model?.countryCode),
+    tag: normalizeScenarioDistrictTag(model?.tag),
     districts,
   };
 }
 
 function selectDistrictDraft(districtId = "") {
   const editorState = state.devScenarioDistrictEditor || {};
-  const draftCountry = cloneDistrictCountryRecord(editorState.countryCode, editorState.draftCountry);
+  const draftTag = cloneDistrictTagRecord(editorState.tag, editorState.draftTag);
   const normalizedDistrictId = normalizeScenarioDistrictId(districtId);
-  const selectedDistrict = normalizedDistrictId ? draftCountry.districts?.[normalizedDistrictId] || null : null;
+  const selectedDistrict = normalizedDistrictId ? draftTag.districts?.[normalizedDistrictId] || null : null;
   updateDistrictEditorState({
-    draftCountry,
+    draftTag,
     selectedDistrictId: normalizedDistrictId,
     nameEn: normalizeScenarioNameInput(selectedDistrict?.name_en || ""),
     nameZh: normalizeScenarioNameInput(selectedDistrict?.name_zh || ""),
@@ -986,14 +1002,14 @@ function upsertDistrictDraft(model) {
   const districtId = normalizeScenarioDistrictId(state.devScenarioDistrictEditor?.selectedDistrictId);
   const nameEn = normalizeScenarioNameInput(state.devScenarioDistrictEditor?.nameEn);
   const nameZh = normalizeScenarioNameInput(state.devScenarioDistrictEditor?.nameZh);
-  if (!model.countryCode || !districtId || !nameEn || !nameZh) {
+  if (!model.tag || !districtId || !nameEn || !nameZh) {
     return {
       ok: false,
-      message: ui("Country code, district id, English name, and Chinese name are required."),
+      message: ui("Scenario tag, district id, English name, and Chinese name are required."),
     };
   }
-  const nextDraftCountry = cloneDistrictCountryRecord(model.countryCode, model.draftCountry);
-  const duplicateDistrict = Object.values(nextDraftCountry.districts || {}).find((district) => {
+  const nextDraftTag = cloneDistrictTagRecord(model.tag, model.draftTag);
+  const duplicateDistrict = Object.values(nextDraftTag.districts || {}).find((district) => {
     if (!district || String(district.id || "") === districtId) return false;
     return String(district.name_en || "").trim().toLowerCase() === nameEn.toLowerCase()
       || String(district.name_zh || "").trim().toLowerCase() === nameZh.toLowerCase();
@@ -1001,17 +1017,17 @@ function upsertDistrictDraft(model) {
   if (duplicateDistrict) {
     return {
       ok: false,
-      message: ui("District names must be unique within the selected country."),
+      message: ui("District names must be unique within the selected scenario tag."),
     };
   }
-  const priorDistrict = nextDraftCountry.districts?.[districtId] || null;
-  nextDraftCountry.districts[districtId] = {
+  const priorDistrict = nextDraftTag.districts?.[districtId] || null;
+  nextDraftTag.districts[districtId] = {
     id: districtId,
     name_en: nameEn,
     name_zh: nameZh,
     feature_ids: Array.isArray(priorDistrict?.feature_ids) ? [...priorDistrict.feature_ids] : [],
   };
-  setDistrictDraftCountry(model.countryCode, nextDraftCountry, {
+  setDistrictDraftTag(model.tag, nextDraftTag, {
     selectedDistrictId: districtId,
     nameEn,
     nameZh,
@@ -1025,31 +1041,30 @@ function upsertDistrictDraft(model) {
 
 function assignSelectionToDistrictDraft(model) {
   const districtId = normalizeScenarioDistrictId(state.devScenarioDistrictEditor?.selectedDistrictId);
-  if (!model.countryCode || !districtId) {
+  if (!model.tag || !districtId) {
     return {
       ok: false,
-      message: ui("Select a country and district before assigning features."),
+      message: ui("Select a scenario tag and district before assigning features."),
     };
   }
   const selectionIds = model.targetIds.filter((featureId) => {
-    const feature = state.landIndex?.get(featureId) || null;
-    return feature && resolveFeatureGeoCountryCode(feature) === model.countryCode;
+    return normalizeScenarioDistrictTag(state.sovereigntyByFeatureId?.[featureId]) === model.tag;
   });
   if (!selectionIds.length) {
     return {
       ok: false,
-      message: ui("Select one or more land features from the chosen geo country."),
+      message: ui("Select one or more land features owned by the chosen scenario tag."),
     };
   }
-  const nextDraftCountry = cloneDistrictCountryRecord(model.countryCode, model.draftCountry);
-  const district = nextDraftCountry.districts?.[districtId];
+  const nextDraftTag = cloneDistrictTagRecord(model.tag, model.draftTag);
+  const district = nextDraftTag.districts?.[districtId];
   if (!district) {
     return {
       ok: false,
       message: ui("Create the district before assigning features."),
     };
   }
-  Object.values(nextDraftCountry.districts || {}).forEach((entry) => {
+  Object.values(nextDraftTag.districts || {}).forEach((entry) => {
     entry.feature_ids = (Array.isArray(entry.feature_ids) ? entry.feature_ids : []).filter(
       (featureId) => !selectionIds.includes(featureId)
     );
@@ -1058,7 +1073,7 @@ function assignSelectionToDistrictDraft(model) {
     ...(Array.isArray(district.feature_ids) ? district.feature_ids : []),
     ...selectionIds,
   ])).sort((left, right) => left.localeCompare(right));
-  setDistrictDraftCountry(model.countryCode, nextDraftCountry, {
+  setDistrictDraftTag(model.tag, nextDraftTag, {
     selectedDistrictId: districtId,
   });
   updateDistrictEditorState({
@@ -1070,24 +1085,23 @@ function assignSelectionToDistrictDraft(model) {
 
 function removeSelectionFromDistrictDraft(model) {
   const districtId = normalizeScenarioDistrictId(state.devScenarioDistrictEditor?.selectedDistrictId);
-  if (!model.countryCode || !districtId) {
+  if (!model.tag || !districtId) {
     return {
       ok: false,
-      message: ui("Select a country and district before removing features."),
+      message: ui("Select a scenario tag and district before removing features."),
     };
   }
   const selectionIds = model.targetIds.filter((featureId) => {
-    const feature = state.landIndex?.get(featureId) || null;
-    return feature && resolveFeatureGeoCountryCode(feature) === model.countryCode;
+    return normalizeScenarioDistrictTag(state.sovereigntyByFeatureId?.[featureId]) === model.tag;
   });
   if (!selectionIds.length) {
     return {
       ok: false,
-      message: ui("Select one or more land features from the chosen geo country."),
+      message: ui("Select one or more land features owned by the chosen scenario tag."),
     };
   }
-  const nextDraftCountry = cloneDistrictCountryRecord(model.countryCode, model.draftCountry);
-  const district = nextDraftCountry.districts?.[districtId];
+  const nextDraftTag = cloneDistrictTagRecord(model.tag, model.draftTag);
+  const district = nextDraftTag.districts?.[districtId];
   if (!district) {
     return {
       ok: false,
@@ -1099,7 +1113,7 @@ function removeSelectionFromDistrictDraft(model) {
     (featureId) => !selectionIds.includes(featureId)
   );
   const removedCount = Math.max(beforeCount - district.feature_ids.length, 0);
-  setDistrictDraftCountry(model.countryCode, nextDraftCountry, {
+  setDistrictDraftTag(model.tag, nextDraftTag, {
     selectedDistrictId: districtId,
   });
   updateDistrictEditorState({
@@ -1113,14 +1127,14 @@ function removeSelectionFromDistrictDraft(model) {
 
 function deleteDistrictDraft(model) {
   const districtId = normalizeScenarioDistrictId(state.devScenarioDistrictEditor?.selectedDistrictId);
-  if (!model.countryCode || !districtId) {
+  if (!model.tag || !districtId) {
     return {
       ok: false,
       message: ui("Select a district before deleting it."),
     };
   }
-  const nextDraftCountry = cloneDistrictCountryRecord(model.countryCode, model.draftCountry);
-  const district = nextDraftCountry.districts?.[districtId];
+  const nextDraftTag = cloneDistrictTagRecord(model.tag, model.draftTag);
+  const district = nextDraftTag.districts?.[districtId];
   if (!district) {
     return {
       ok: false,
@@ -1133,8 +1147,8 @@ function deleteDistrictDraft(model) {
       message: ui("Remove all assigned features before deleting a district."),
     };
   }
-  delete nextDraftCountry.districts[districtId];
-  setDistrictDraftCountry(model.countryCode, nextDraftCountry, {
+  delete nextDraftTag.districts[districtId];
+  setDistrictDraftTag(model.tag, nextDraftTag, {
     selectedDistrictId: "",
     nameEn: "",
     nameZh: "",
@@ -1144,6 +1158,24 @@ function deleteDistrictDraft(model) {
     lastSaveTone: "info",
   });
   return { ok: true };
+}
+
+function buildDistrictTemplatePayload(model, templateTag = "") {
+  return {
+    scenarioId: String(state.activeScenarioId || "").trim(),
+    tag: normalizeScenarioDistrictTag(model?.tag),
+    templateTag: normalizeScenarioDistrictTag(templateTag),
+    districts: Object.values(model?.draftTag?.districts || {}).map((district) => ({
+      districtId: normalizeScenarioDistrictId(district?.id),
+      nameEn: normalizeScenarioNameInput(district?.name_en),
+      nameZh: normalizeScenarioNameInput(district?.name_zh),
+      featureIds: Array.from(new Set(
+        (Array.isArray(district?.feature_ids) ? district.feature_ids : [])
+          .map((featureId) => String(featureId || "").trim())
+          .filter(Boolean)
+      )).sort((left, right) => left.localeCompare(right)),
+    })),
+  };
 }
 
 function normalizeLocaleInput(value) {
@@ -1444,11 +1476,11 @@ function createDevWorkspacePanel(bottomDock) {
         <div id="devScenarioDistrictTitle" class="section-header-block"></div>
         <p id="devScenarioDistrictHint" class="dev-workspace-note"></p>
         <div id="devScenarioDistrictMeta" class="dev-workspace-meta"></div>
-        <label id="devScenarioDistrictCountryLabel" class="dev-workspace-note" for="devScenarioDistrictCountryInput" data-i18n="Geo Country"></label>
-        <input id="devScenarioDistrictCountryInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" maxlength="3" placeholder="DE" />
-        <div id="devScenarioDistrictCountryModeNote" class="dev-workspace-note"></div>
+        <label id="devScenarioDistrictTagLabel" class="dev-workspace-note" for="devScenarioDistrictTagInput" data-i18n="Scenario Tag"></label>
+        <input id="devScenarioDistrictTagInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" maxlength="4" placeholder="FRA" />
+        <div id="devScenarioDistrictTagModeNote" class="dev-workspace-note"></div>
         <div class="dev-workspace-actions">
-          <button id="devScenarioDistrictUseSelectionBtn" type="button" class="btn-secondary" data-i18n="Use Selection Country"></button>
+          <button id="devScenarioDistrictUseSelectionBtn" type="button" class="btn-secondary" data-i18n="Use Selection Tag"></button>
           <button id="devScenarioDistrictClearBtn" type="button" class="btn-secondary" data-i18n="Clear"></button>
         </div>
         <label id="devScenarioDistrictSelectLabel" class="dev-workspace-note" for="devScenarioDistrictSelect" data-i18n="District"></label>
@@ -1469,6 +1501,12 @@ function createDevWorkspacePanel(bottomDock) {
         <div class="dev-workspace-actions">
           <button id="devScenarioDistrictDeleteBtn" type="button" class="btn-secondary" data-i18n="Delete Empty District"></button>
           <button id="devScenarioDistrictSaveBtn" type="button" class="btn-primary" data-i18n="Save Districts File"></button>
+        </div>
+        <label id="devScenarioDistrictTemplateLabel" class="dev-workspace-note" for="devScenarioDistrictTemplateTagInput" data-i18n="Shared Template Tag"></label>
+        <input id="devScenarioDistrictTemplateTagInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" maxlength="4" placeholder="FRA" />
+        <div class="dev-workspace-actions">
+          <button id="devScenarioDistrictPromoteBtn" type="button" class="btn-secondary" data-i18n="Promote To Shared Template"></button>
+          <button id="devScenarioDistrictApplyTemplateBtn" type="button" class="btn-secondary" data-i18n="Apply Shared Template"></button>
         </div>
         <div id="devScenarioDistrictStatus" class="dev-workspace-note"></div>
       </div>
@@ -1682,14 +1720,17 @@ function initDevWorkspace() {
   const scenarioDistrictTitle = panel.querySelector("#devScenarioDistrictTitle");
   const scenarioDistrictHint = panel.querySelector("#devScenarioDistrictHint");
   const scenarioDistrictMeta = panel.querySelector("#devScenarioDistrictMeta");
-  const scenarioDistrictCountryInput = panel.querySelector("#devScenarioDistrictCountryInput");
-  const scenarioDistrictCountryModeNote = panel.querySelector("#devScenarioDistrictCountryModeNote");
+  const scenarioDistrictTagInput = panel.querySelector("#devScenarioDistrictTagInput");
+  const scenarioDistrictTagModeNote = panel.querySelector("#devScenarioDistrictTagModeNote");
   const scenarioDistrictUseSelectionBtn = panel.querySelector("#devScenarioDistrictUseSelectionBtn");
   const scenarioDistrictClearBtn = panel.querySelector("#devScenarioDistrictClearBtn");
   const scenarioDistrictSelect = panel.querySelector("#devScenarioDistrictSelect");
   const scenarioDistrictIdInput = panel.querySelector("#devScenarioDistrictIdInput");
   const scenarioDistrictNameEnInput = panel.querySelector("#devScenarioDistrictNameEnInput");
   const scenarioDistrictNameZhInput = panel.querySelector("#devScenarioDistrictNameZhInput");
+  const scenarioDistrictTemplateTagInput = panel.querySelector("#devScenarioDistrictTemplateTagInput");
+  const scenarioDistrictPromoteBtn = panel.querySelector("#devScenarioDistrictPromoteBtn");
+  const scenarioDistrictApplyTemplateBtn = panel.querySelector("#devScenarioDistrictApplyTemplateBtn");
   const scenarioDistrictStatus = panel.querySelector("#devScenarioDistrictStatus");
   const scenarioLocalePanel = panel.querySelector("#devScenarioLocalePanel");
   const scenarioLocaleTitle = panel.querySelector("#devScenarioLocaleTitle");
@@ -1878,34 +1919,35 @@ function initDevWorkspace() {
       scenarioDistrictHint.textContent = resolveDistrictEditorHint(districtModel);
     }
     renderMetaRows(scenarioDistrictMeta, buildDistrictMetaRows(districtModel));
-    const renderedDistrictCountryValue = districtModel.isAutoMode
-      ? districtModel.inferredCountryCode
-      : districtModel.manualCountryCode;
-    if (scenarioDistrictCountryInput && scenarioDistrictCountryInput.value !== renderedDistrictCountryValue) {
-      scenarioDistrictCountryInput.value = renderedDistrictCountryValue;
+    const renderedDistrictTagValue = districtModel.isAutoMode
+      ? districtModel.inferredTag
+      : districtModel.manualTag;
+    if (scenarioDistrictTagInput && scenarioDistrictTagInput.value !== renderedDistrictTagValue) {
+      scenarioDistrictTagInput.value = renderedDistrictTagValue;
     }
-    if (scenarioDistrictCountryInput) {
-      scenarioDistrictCountryInput.placeholder = districtModel.isAutoMode
-        ? (districtModel.inferredCountryCode || ui("Auto from selection"))
-        : "DE";
-      scenarioDistrictCountryInput.disabled = !hasActiveScenario || !!districtState.isSaving;
+    if (scenarioDistrictTagInput) {
+      scenarioDistrictTagInput.placeholder = districtModel.isAutoMode
+        ? (districtModel.inferredTag || ui("Auto from selection"))
+        : "FRA";
+      scenarioDistrictTagInput.disabled = !hasActiveScenario || !!districtState.isSaving || !!districtState.isTemplateApplying;
     }
-    if (scenarioDistrictCountryModeNote) {
-      scenarioDistrictCountryModeNote.textContent = districtModel.isAutoMode
-        ? (districtModel.inferredCountryCode
-          ? `${ui("Auto")}: ${districtModel.inferredCountryCode}`
+    if (scenarioDistrictTagModeNote) {
+      scenarioDistrictTagModeNote.textContent = districtModel.isAutoMode
+        ? (districtModel.inferredTag
+          ? `${ui("Auto")}: ${districtModel.inferredTag}`
           : ui("Auto from selection"))
-        : `${ui("Manual")}: ${districtModel.manualCountryCode || ui("Type a geo country code.")}`;
+        : `${ui("Manual")}: ${districtModel.manualTag || ui("Type a scenario tag.")}`;
     }
     if (scenarioDistrictUseSelectionBtn) {
-      scenarioDistrictUseSelectionBtn.disabled = !hasActiveScenario || !!districtState.isSaving || !districtModel.canUseSelectionCountry;
+      scenarioDistrictUseSelectionBtn.disabled = !hasActiveScenario || !!districtState.isSaving || !!districtState.isTemplateApplying || !districtModel.canUseSelectionTag;
     }
     if (scenarioDistrictClearBtn) {
-      scenarioDistrictClearBtn.disabled = !hasActiveScenario || !!districtState.isSaving || !(
-        districtModel.manualCountryCode
+      scenarioDistrictClearBtn.disabled = !hasActiveScenario || !!districtState.isSaving || !!districtState.isTemplateApplying || !(
+        districtModel.manualTag
         || districtModel.selectedDistrictId
         || normalizeScenarioNameInput(districtState.nameEn)
         || normalizeScenarioNameInput(districtState.nameZh)
+        || normalizeScenarioDistrictTag(districtState.templateTag)
       );
     }
     if (scenarioDistrictSelect) {
@@ -1923,14 +1965,14 @@ function initDevWorkspace() {
       if (scenarioDistrictSelect.value !== selectedDistrictId) {
         scenarioDistrictSelect.value = selectedDistrictId;
       }
-      scenarioDistrictSelect.disabled = !hasActiveScenario || !districtModel.hasEffectiveCountry || !!districtState.isSaving;
+      scenarioDistrictSelect.disabled = !hasActiveScenario || !districtModel.hasEffectiveTag || !!districtState.isSaving || !!districtState.isTemplateApplying || districtModel.hasLegacyGeoCountryData;
     }
     if (scenarioDistrictIdInput && scenarioDistrictIdInput.value !== districtModel.selectedDistrictId) {
       scenarioDistrictIdInput.value = districtModel.selectedDistrictId;
     }
     if (scenarioDistrictIdInput) {
       scenarioDistrictIdInput.placeholder = "berlin";
-      scenarioDistrictIdInput.disabled = !hasActiveScenario || !districtModel.hasEffectiveCountry || !!districtState.isSaving;
+      scenarioDistrictIdInput.disabled = !hasActiveScenario || !districtModel.hasEffectiveTag || !!districtState.isSaving || !!districtState.isTemplateApplying || districtModel.hasLegacyGeoCountryData;
     }
     const districtNameEn = normalizeScenarioNameInput(districtState.nameEn ?? districtModel.selectedDistrict?.name_en ?? "");
     const districtNameZh = normalizeScenarioNameInput(districtState.nameZh ?? districtModel.selectedDistrict?.name_zh ?? "");
@@ -1942,41 +1984,70 @@ function initDevWorkspace() {
     }
     if (scenarioDistrictNameEnInput) {
       scenarioDistrictNameEnInput.placeholder = districtModel.selectedDistrict?.name_en || "Berlin";
-      scenarioDistrictNameEnInput.disabled = !hasActiveScenario || !districtModel.hasEffectiveCountry || !!districtState.isSaving;
+      scenarioDistrictNameEnInput.disabled = !hasActiveScenario || !districtModel.hasEffectiveTag || !!districtState.isSaving || !!districtState.isTemplateApplying || districtModel.hasLegacyGeoCountryData;
     }
     if (scenarioDistrictNameZhInput) {
       scenarioDistrictNameZhInput.placeholder = districtModel.selectedDistrict?.name_zh || "Berlin";
-      scenarioDistrictNameZhInput.disabled = !hasActiveScenario || !districtModel.hasEffectiveCountry || !!districtState.isSaving;
+      scenarioDistrictNameZhInput.disabled = !hasActiveScenario || !districtModel.hasEffectiveTag || !!districtState.isSaving || !!districtState.isTemplateApplying || districtModel.hasLegacyGeoCountryData;
+    }
+    if (scenarioDistrictTemplateTagInput) {
+      const renderedTemplateTag = districtModel.effectiveTemplateTag || districtModel.tag || "";
+      if (scenarioDistrictTemplateTagInput.value !== renderedTemplateTag) {
+        scenarioDistrictTemplateTagInput.value = renderedTemplateTag;
+      }
+      scenarioDistrictTemplateTagInput.placeholder = districtModel.tag || "FRA";
+      scenarioDistrictTemplateTagInput.disabled = !hasActiveScenario || !!districtState.isSaving || !!districtState.isTemplateSaving || !!districtState.isTemplateApplying || districtModel.hasLegacyGeoCountryData;
     }
     const selectedDistrictFeatureIds = new Set(districtModel.selectedDistrict?.feature_ids || []);
     const matchingSelectionIds = districtModel.targetIds.filter((featureId) => {
-      const feature = state.landIndex?.get(featureId);
-      return feature && resolveFeatureGeoCountryCode(feature) === districtModel.countryCode;
+      return normalizeScenarioDistrictTag(state.sovereigntyByFeatureId?.[featureId]) === districtModel.tag;
     });
     const removableSelectionIds = matchingSelectionIds.filter((featureId) => selectedDistrictFeatureIds.has(featureId));
     const districtIdValue = normalizeScenarioDistrictId(scenarioDistrictIdInput?.value || districtState.selectedDistrictId);
     const canUpsertDistrict = hasActiveScenario
-      && !!districtModel.countryCode
+      && !!districtModel.tag
       && !!districtIdValue
       && !!districtNameEn
       && !!districtNameZh
-      && !districtState.isSaving;
+      && !districtState.isSaving
+      && !districtState.isTemplateApplying
+      && !districtModel.hasLegacyGeoCountryData;
     const canAssignDistrict = hasActiveScenario
-      && !!districtModel.countryCode
+      && !!districtModel.tag
       && !!districtModel.selectedDistrictId
       && matchingSelectionIds.length > 0
-      && !districtState.isSaving;
+      && !districtState.isSaving
+      && !districtState.isTemplateApplying
+      && !districtModel.hasLegacyGeoCountryData;
     const canRemoveDistrictSelection = hasActiveScenario
-      && !!districtModel.countryCode
+      && !!districtModel.tag
       && !!districtModel.selectedDistrictId
       && removableSelectionIds.length > 0
-      && !districtState.isSaving;
+      && !districtState.isSaving
+      && !districtState.isTemplateApplying
+      && !districtModel.hasLegacyGeoCountryData;
     const canDeleteDistrict = hasActiveScenario
-      && !!districtModel.countryCode
+      && !!districtModel.tag
       && !!districtModel.selectedDistrictId
       && (districtModel.selectedDistrict?.feature_ids || []).length === 0
-      && !districtState.isSaving;
-    const canSaveDistricts = hasActiveScenario && !!districtModel.countryCode && !districtState.isSaving;
+      && !districtState.isSaving
+      && !districtState.isTemplateApplying
+      && !districtModel.hasLegacyGeoCountryData;
+    const canSaveDistricts = hasActiveScenario && !!districtModel.tag && !districtState.isSaving && !districtState.isTemplateApplying && !districtModel.hasLegacyGeoCountryData;
+    const canPromoteTemplate = hasActiveScenario
+      && !!districtModel.tag
+      && !!districtModel.effectiveTemplateTag
+      && !districtState.isSaving
+      && !districtState.isTemplateSaving
+      && !districtState.isTemplateApplying
+      && !districtModel.hasLegacyGeoCountryData;
+    const canApplyTemplate = hasActiveScenario
+      && !!districtModel.tag
+      && !!districtModel.effectiveTemplateTag
+      && !districtState.isSaving
+      && !districtState.isTemplateSaving
+      && !districtState.isTemplateApplying
+      && !districtModel.hasLegacyGeoCountryData;
     const districtUpsertBtn = panel.querySelector("#devScenarioDistrictUpsertBtn");
     const districtAssignBtn = panel.querySelector("#devScenarioDistrictAssignBtn");
     const districtRemoveBtn = panel.querySelector("#devScenarioDistrictRemoveBtn");
@@ -2002,10 +2073,20 @@ function initDevWorkspace() {
       districtSaveBtn.textContent = districtState.isSaving ? ui("Saving...") : ui("Save Districts File");
       districtSaveBtn.disabled = !canSaveDistricts;
     }
+    if (scenarioDistrictPromoteBtn) {
+      scenarioDistrictPromoteBtn.textContent = districtState.isTemplateSaving ? ui("Saving...") : ui("Promote To Shared Template");
+      scenarioDistrictPromoteBtn.disabled = !canPromoteTemplate;
+    }
+    if (scenarioDistrictApplyTemplateBtn) {
+      scenarioDistrictApplyTemplateBtn.textContent = districtState.isTemplateApplying ? ui("Applying...") : ui("Apply Shared Template");
+      scenarioDistrictApplyTemplateBtn.disabled = !canApplyTemplate;
+    }
     if (scenarioDistrictStatus) {
       const districtStatusBits = [];
       if (districtState.lastSaveMessage) {
         districtStatusBits.push(districtState.lastSaveMessage);
+      } else if (districtModel.hasLegacyGeoCountryData) {
+        districtStatusBits.push(ui("Legacy geo-country districts detected."));
       } else if (districtState.lastSavedAt) {
         districtStatusBits.push(`${ui("Last Saved")}: ${districtState.lastSavedAt}`);
       }
@@ -2266,8 +2347,8 @@ function initDevWorkspace() {
 
   bindButtonAction(scenarioDistrictUseSelectionBtn, () => {
     const model = resolveDistrictEditorModel();
-    if (!model.canUseSelectionCountry) {
-      showToast(ui("Select land features from exactly one geo country first."), {
+    if (!model.canUseSelectionTag) {
+      showToast(ui("Select land features owned by exactly one scenario tag first."), {
         title: ui("Scenario District Editor"),
         tone: "warning",
       });
@@ -2276,8 +2357,9 @@ function initDevWorkspace() {
     }
     resetDistrictEditorForm();
     updateDistrictEditorState({
-      inferredCountryCode: model.inferredCountryCode,
-      countryCode: model.inferredCountryCode,
+      inferredTag: model.inferredTag,
+      tag: model.inferredTag,
+      templateTag: model.inferredTag,
     });
     renderWorkspace();
   });
@@ -2289,8 +2371,16 @@ function initDevWorkspace() {
 
   bindButtonAction(panel.querySelector("#devScenarioDistrictUpsertBtn"), () => {
     const model = resolveDistrictEditorModel();
-    if (!state.activeScenarioId || !model.countryCode) {
-      showToast(ui("Choose a geo country code before editing districts."), {
+    if (model.hasLegacyGeoCountryData) {
+      showToast(ui("Legacy geo-country districts detected. Migrate them before editing scenario-tag districts."), {
+        title: ui("Scenario District Editor"),
+        tone: "warning",
+      });
+      renderWorkspace();
+      return;
+    }
+    if (!state.activeScenarioId || !model.tag) {
+      showToast(ui("Choose a scenario tag before editing districts."), {
         title: ui("Scenario District Editor"),
         tone: "warning",
       });
@@ -2372,15 +2462,23 @@ function initDevWorkspace() {
 
   bindButtonAction(panel.querySelector("#devScenarioDistrictSaveBtn"), async () => {
     const model = resolveDistrictEditorModel();
-    if (!state.activeScenarioId || !model.countryCode) {
-      showToast(ui("Choose a geo country code before saving districts."), {
+    if (model.hasLegacyGeoCountryData) {
+      showToast(ui("Legacy geo-country districts detected. Migrate them before saving scenario-tag districts."), {
         title: ui("Scenario District Editor"),
         tone: "warning",
       });
       renderWorkspace();
       return;
     }
-    const draftCountry = cloneDistrictCountryRecord(model.countryCode, model.draftCountry);
+    if (!state.activeScenarioId || !model.tag) {
+      showToast(ui("Choose a scenario tag before saving districts."), {
+        title: ui("Scenario District Editor"),
+        tone: "warning",
+      });
+      renderWorkspace();
+      return;
+    }
+    const draftTag = cloneDistrictTagRecord(model.tag, model.draftTag);
     updateDistrictEditorState({
       isSaving: true,
       lastSaveMessage: "",
@@ -2395,16 +2493,16 @@ function initDevWorkspace() {
         },
         body: JSON.stringify(buildDistrictSavePayload({
           ...model,
-          draftCountry,
+          draftTag,
         })),
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result?.ok) {
         throw new Error(String(result?.message || `HTTP ${response.status}`));
       }
-      if (result?.country && typeof result.country === "object") {
-        syncScenarioDistrictState(model.countryCode, result.country);
-        setDistrictDraftCountry(model.countryCode, result.country, {
+      if (result?.tagRecord && typeof result.tagRecord === "object") {
+        syncScenarioDistrictState(model.tag, result.tagRecord);
+        setDistrictDraftTag(model.tag, result.tagRecord, {
           lastSavedAt: String(result.savedAt || ""),
           lastSaveMessage: `${ui("Saved")}: ${String(result.filePath || "")}`,
           lastSaveTone: "success",
@@ -2437,6 +2535,150 @@ function initDevWorkspace() {
         lastSaveTone: "critical",
       });
       showToast(String(error?.message || ui("Unable to save districts file.")), {
+        title: ui("Scenario District Editor"),
+        tone: "critical",
+        duration: 4200,
+      });
+    }
+    renderWorkspace();
+  });
+
+  bindButtonAction(scenarioDistrictPromoteBtn, async () => {
+    const model = resolveDistrictEditorModel();
+    const templateTag = normalizeScenarioDistrictTag(state.devScenarioDistrictEditor?.templateTag) || model.tag;
+    if (model.hasLegacyGeoCountryData) {
+      showToast(ui("Legacy geo-country districts detected. Migrate them before promoting shared templates."), {
+        title: ui("Scenario District Editor"),
+        tone: "warning",
+      });
+      renderWorkspace();
+      return;
+    }
+    if (!state.activeScenarioId || !model.tag || !templateTag) {
+      showToast(ui("Choose a scenario tag and template tag before promoting a shared template."), {
+        title: ui("Scenario District Editor"),
+        tone: "warning",
+      });
+      renderWorkspace();
+      return;
+    }
+    updateDistrictEditorState({
+      isTemplateSaving: true,
+      lastSaveMessage: "",
+      lastSaveTone: "",
+    });
+    renderWorkspace();
+    try {
+      const response = await fetch("/__dev/scenario/district-templates/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(buildDistrictTemplatePayload(model, templateTag)),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result?.ok) {
+        throw new Error(String(result?.message || `HTTP ${response.status}`));
+      }
+      updateDistrictEditorState({
+        isTemplateSaving: false,
+        templateTag,
+        lastSavedAt: String(result.savedAt || ""),
+        lastSavedPath: String(result.filePath || ""),
+        lastSaveMessage: `${ui("Shared template saved")}: ${String(result.filePath || "")}`,
+        lastSaveTone: "success",
+      });
+      showToast(ui("Shared district template saved."), {
+        title: ui("Scenario District Editor"),
+        tone: "success",
+      });
+    } catch (error) {
+      updateDistrictEditorState({
+        isTemplateSaving: false,
+        lastSaveMessage: String(error?.message || ui("Unable to save shared district template.")),
+        lastSaveTone: "critical",
+      });
+      showToast(String(error?.message || ui("Unable to save shared district template.")), {
+        title: ui("Scenario District Editor"),
+        tone: "critical",
+        duration: 4200,
+      });
+    }
+    renderWorkspace();
+  });
+
+  bindButtonAction(scenarioDistrictApplyTemplateBtn, async () => {
+    const model = resolveDistrictEditorModel();
+    const templateTag = normalizeScenarioDistrictTag(state.devScenarioDistrictEditor?.templateTag) || model.tag;
+    if (model.hasLegacyGeoCountryData) {
+      showToast(ui("Legacy geo-country districts detected. Migrate them before applying shared templates."), {
+        title: ui("Scenario District Editor"),
+        tone: "warning",
+      });
+      renderWorkspace();
+      return;
+    }
+    if (!state.activeScenarioId || !model.tag || !templateTag) {
+      showToast(ui("Choose a scenario tag and template tag before applying a shared template."), {
+        title: ui("Scenario District Editor"),
+        tone: "warning",
+      });
+      renderWorkspace();
+      return;
+    }
+    updateDistrictEditorState({
+      isTemplateApplying: true,
+      lastSaveMessage: "",
+      lastSaveTone: "",
+    });
+    renderWorkspace();
+    try {
+      const response = await fetch("/__dev/scenario/district-templates/apply", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          scenarioId: String(state.activeScenarioId || "").trim(),
+          tag: model.tag,
+          templateTag,
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result?.ok) {
+        throw new Error(String(result?.message || `HTTP ${response.status}`));
+      }
+      if (result?.tagRecord && typeof result.tagRecord === "object") {
+        syncScenarioDistrictState(model.tag, result.tagRecord);
+        setDistrictDraftTag(model.tag, result.tagRecord, {
+          templateTag,
+          isTemplateApplying: false,
+          lastSavedAt: String(result.savedAt || ""),
+          lastSavedPath: String(result.filePath || ""),
+          lastSaveMessage: `${ui("Applied shared template")}: ${templateTag}`,
+          lastSaveTone: "success",
+        });
+      } else {
+        updateDistrictEditorState({
+          isTemplateApplying: false,
+          templateTag,
+          lastSavedAt: String(result.savedAt || ""),
+          lastSavedPath: String(result.filePath || ""),
+          lastSaveMessage: `${ui("Applied shared template")}: ${templateTag}`,
+          lastSaveTone: "success",
+        });
+      }
+      showToast(ui("Shared district template applied."), {
+        title: ui("Scenario District Editor"),
+        tone: "success",
+      });
+    } catch (error) {
+      updateDistrictEditorState({
+        isTemplateApplying: false,
+        lastSaveMessage: String(error?.message || ui("Unable to apply shared district template.")),
+        lastSaveTone: "critical",
+      });
+      showToast(String(error?.message || ui("Unable to apply shared district template.")), {
         title: ui("Scenario District Editor"),
         tone: "critical",
         duration: 4200,
@@ -2810,13 +3052,13 @@ function initDevWorkspace() {
     scenarioTagParentInput.dataset.bound = "true";
   }
 
-  if (scenarioDistrictCountryInput && scenarioDistrictCountryInput.dataset.bound !== "true") {
-    scenarioDistrictCountryInput.addEventListener("input", (event) => {
-      const nextCountryCode = normalizeGeoCountryCode(event.target.value);
+  if (scenarioDistrictTagInput && scenarioDistrictTagInput.dataset.bound !== "true") {
+    scenarioDistrictTagInput.addEventListener("input", (event) => {
+      const nextTag = normalizeScenarioDistrictTag(event.target.value);
       updateDistrictEditorState({
-        countryMode: nextCountryCode ? "manual" : "auto",
-        manualCountryCode: nextCountryCode,
-        countryCode: nextCountryCode,
+        tagMode: nextTag ? "manual" : "auto",
+        manualTag: nextTag,
+        tag: nextTag,
         selectedDistrictId: "",
         nameEn: "",
         nameZh: "",
@@ -2825,7 +3067,7 @@ function initDevWorkspace() {
       });
       renderWorkspace();
     });
-    scenarioDistrictCountryInput.dataset.bound = "true";
+    scenarioDistrictTagInput.dataset.bound = "true";
   }
 
   if (scenarioDistrictSelect && scenarioDistrictSelect.dataset.bound !== "true") {
@@ -2875,6 +3117,18 @@ function initDevWorkspace() {
       renderWorkspace();
     });
     scenarioDistrictNameZhInput.dataset.bound = "true";
+  }
+
+  if (scenarioDistrictTemplateTagInput && scenarioDistrictTemplateTagInput.dataset.bound !== "true") {
+    scenarioDistrictTemplateTagInput.addEventListener("input", (event) => {
+      updateDistrictEditorState({
+        templateTag: normalizeScenarioDistrictTag(event.target.value),
+        lastSaveMessage: "",
+        lastSaveTone: "",
+      });
+      renderWorkspace();
+    });
+    scenarioDistrictTemplateTagInput.dataset.bound = "true";
   }
 
   if (scenarioLocaleEnInput && scenarioLocaleEnInput.dataset.bound !== "true") {

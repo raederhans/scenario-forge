@@ -62,6 +62,42 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
       catalogEntries: catalogPayload.entries || [],
     };
   });
+  const readPolarRuntime = async () => page.evaluate(async () => {
+    const { state } = await import('/js/core/state.js');
+    const landIds = Array.isArray(state.landData?.features)
+      ? state.landData.features.map((feature) => String(feature?.properties?.id || feature?.id || '')).filter(Boolean)
+      : [];
+    const ruPolarId = landIds.find((id) => id.startsWith('RU_ARCTIC_FB_')) || '';
+    const idToKey = state.idToKey;
+    const landIndex = state.landIndex;
+    const spatialItemsById = state.spatialItemsById;
+    return {
+      ruPolarId,
+      ruPolarOwner: String(state.scenarioAutoShellOwnerByFeatureId?.[ruPolarId] || ''),
+      hasRuPolarLand: !!ruPolarId,
+      hasRuPolarKey: !!(ruPolarId && typeof idToKey?.has === 'function' && idToKey.has(ruPolarId)),
+      hasRuPolarSpatial: !!(ruPolarId && typeof spatialItemsById?.has === 'function' && spatialItemsById.has(ruPolarId)),
+      hasRuPolarIndex: !!(ruPolarId && typeof landIndex?.has === 'function' && landIndex.has(ruPolarId)),
+      hasAQ: landIds.includes('AQ'),
+      aqOwner: String(state.sovereigntyByFeatureId?.AQ || ''),
+      hasAQKey: !!(typeof idToKey?.has === 'function' && idToKey.has('AQ')),
+      hasAQSpatial: !!(typeof spatialItemsById?.has === 'function' && spatialItemsById.has('AQ')),
+      hasAQIndex: !!(typeof landIndex?.has === 'function' && landIndex.has('AQ')),
+      hasLegacyAQSectors: landIds.some((id) => id.startsWith('AQ_')),
+    };
+  });
+  await expect.poll(readPolarRuntime, { timeout: 20000 }).toMatchObject({
+    hasRuPolarLand: true,
+    hasRuPolarKey: true,
+    hasRuPolarSpatial: true,
+    hasRuPolarIndex: true,
+    hasAQ: true,
+    hasAQKey: true,
+    hasAQSpatial: true,
+    hasAQIndex: true,
+    hasLegacyAQSectors: false,
+  });
+  const polarRuntime = await readPolarRuntime();
 
   const catalogTags = new Set(payload.catalogEntries.map((entry) => entry.tag));
   const missingFeaturedTags = (payload.manifest.featured_tags || []).filter(
@@ -91,8 +127,11 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
   expect(payload.countries.CHI?.inspector_group_id).toBe('scenario_group_china_region');
   expect(payload.countries.PRC?.inspector_group_id).toBe('scenario_group_china_region');
   expect(payload.countries.MEN?.inspector_group_id).toBe('scenario_group_china_region');
+  expect(payload.countries.AQ?.display_name).toBe('Antarctica');
   expect(payload.countries.RKM?.inspector_group_id).toBeFalsy();
   expect(payload.countries.MAN?.inspector_group_id).toBeFalsy();
+  expect(polarRuntime.ruPolarOwner).toBeTruthy();
+  expect(polarRuntime.aqOwner).toBe('AQ');
 
   await expect.poll(async () => {
     const headers = await page.locator('#countryList .country-explorer-header').allTextContents();

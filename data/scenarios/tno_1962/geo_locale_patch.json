@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "tno_1962",
-  "generated_at": "2026-03-20T21:10:31Z",
+  "generated_at": "2026-03-20T22:50:47Z",
   "geo": {
     "AFG-1741": {
       "en": "Badghis",
@@ -28051,50 +28051,6 @@
       "en": "Santo Domingo de los Tsáchilas",
       "zh": "圣多明各德洛斯察奇拉斯"
     },
-    "GR_ADM1_GRC-2883": {
-      "en": "Ionian Islands",
-      "zh": "爱奥尼亚群岛"
-    },
-    "GR_ADM1_GRC-2884": {
-      "en": "Attica",
-      "zh": "阿提卡"
-    },
-    "GR_ADM1_GRC-2885": {
-      "en": "Peloponnese",
-      "zh": "伯罗奔尼撒半岛"
-    },
-    "GR_ADM1_GRC-2886": {
-      "en": "West Greece",
-      "zh": "西希腊"
-    },
-    "GR_ADM1_GRC-2892": {
-      "en": "West Macedonia",
-      "zh": "西马其顿"
-    },
-    "GR_ADM1_GRC-2900": {
-      "en": "Thessalia",
-      "zh": "色萨利"
-    },
-    "GR_ADM1_GRC-2949": {
-      "en": "Epirus",
-      "zh": "伊庇鲁斯"
-    },
-    "GR_ADM1_GRC-2989": {
-      "en": "Central Greece",
-      "zh": "中部希腊"
-    },
-    "GR_ADM1_GRC-2991": {
-      "en": "Centre Macedonia",
-      "zh": "中马其顿"
-    },
-    "GR_ADM1_GRC-2992": {
-      "en": "Mount Athos",
-      "zh": "阿索斯山"
-    },
-    "GR_ADM1_GRC-3001": {
-      "en": "East Macedonia and Thrace",
-      "zh": "东马其顿和色雷斯"
-    },
     "GT_ADM1_GTM-1942": {
       "en": "Baja Verapaz",
       "zh": "巴哈韦拉帕斯"
@@ -29338,54 +29294,6 @@
     "NZ_ADM1_NZL-5470": {
       "en": "Chatham Islands",
       "zh": "查塔姆群岛"
-    },
-    "GB_NUTS1_UKC": {
-      "en": "North East (England)",
-      "zh": "东北部（英格兰）"
-    },
-    "GB_NUTS1_UKD": {
-      "en": "North West (England)",
-      "zh": "西北（英格兰）"
-    },
-    "GB_NUTS1_UKE": {
-      "en": "Yorkshire and the Humber",
-      "zh": "约克郡和亨伯河"
-    },
-    "GB_NUTS1_UKF": {
-      "en": "East Midlands (England)",
-      "zh": "东米德兰兹（英格兰）"
-    },
-    "GB_NUTS1_UKG": {
-      "en": "West Midlands (England)",
-      "zh": "西米德兰兹郡（英格兰）"
-    },
-    "GB_NUTS1_UKH": {
-      "en": "East of England",
-      "zh": "英格兰东部"
-    },
-    "GB_NUTS1_UKI": {
-      "en": "London",
-      "zh": "伦敦"
-    },
-    "GB_NUTS1_UKJ": {
-      "en": "South East (England)",
-      "zh": "东南部（英格兰）"
-    },
-    "GB_NUTS1_UKK": {
-      "en": "South West (England)",
-      "zh": "西南部（英格兰）"
-    },
-    "GB_NUTS1_UKL": {
-      "en": "Wales",
-      "zh": "威尔士"
-    },
-    "GB_NUTS1_UKM": {
-      "en": "Scotland",
-      "zh": "苏格兰"
-    },
-    "GB_NUTS1_UKN": {
-      "en": "Northern Ireland",
-      "zh": "北爱尔兰"
     },
     "BA_ADM1_54001226B17629474923252": {
       "en": "Federation of Bosnia and Herzegovina",
@@ -40815,50 +40723,6 @@
       "en": "Perth",
       "zh": "珀斯"
     },
-    "AQ_AAT_EAST": {
-      "en": "Antarctica / 142E-160E Sector",
-      "zh": "南极洲 / 142E-160E 扇区"
-    },
-    "AQ_AAT_WEST": {
-      "en": "Antarctica / 45E-136E Sector",
-      "zh": "南极洲 / 45E-136E 扇区"
-    },
-    "AQ_ADELIE": {
-      "en": "Antarctica / 136E-142E Sector",
-      "zh": "南极洲 / 136E-142E 扇区"
-    },
-    "AQ_MARIE_BYRD": {
-      "en": "Antarctica / 150W-90W Sector",
-      "zh": "南极/150W-90W扇区"
-    },
-    "AQ_PEN_EAST": {
-      "en": "Antarctica / Peninsula 25W-20W Sector",
-      "zh": "南极洲/半岛25W-20W扇区"
-    },
-    "AQ_PEN_OVERLAP_CORE": {
-      "en": "Antarctica / Peninsula 74W-53W Overlap Sector",
-      "zh": "南极洲/半岛74W-53W重叠扇区"
-    },
-    "AQ_PEN_OVERLAP_EAST": {
-      "en": "Antarctica / Peninsula 53W-25W Overlap Sector",
-      "zh": "南极洲/半岛53W-25W重叠扇区"
-    },
-    "AQ_PEN_OVERLAP_WEST": {
-      "en": "Antarctica / Peninsula 80W-74W Overlap Sector",
-      "zh": "南极洲/半岛 80W-74W 重叠扇区"
-    },
-    "AQ_PEN_WEST": {
-      "en": "Antarctica / Peninsula 90W-80W Sector",
-      "zh": "南极洲/半岛90W-80W扇区"
-    },
-    "AQ_QML": {
-      "en": "Antarctica / 20W-45E Sector",
-      "zh": "南极洲 / 20W-45E 扇区"
-    },
-    "AQ_ROSS": {
-      "en": "Antarctica / 160E-150W Sector",
-      "zh": "南极洲 / 160E-150W 扇区"
-    },
     "AX": {
       "en": "Aland",
       "zh": "奥兰"
@@ -40958,1594 +40822,6 @@
     "RU_CITY_ARKHANGELSK": {
       "en": "Arkhangelsk",
       "zh": "阿尔汉格尔斯克"
-    },
-    "RU_ARCTIC_FB_001": {
-      "en": "Russia Shell Fallback 1",
-      "zh": "俄罗斯北极后备 1"
-    },
-    "RU_ARCTIC_FB_002": {
-      "en": "Russia Shell Fallback 2",
-      "zh": "俄罗斯北极后备2"
-    },
-    "RU_ARCTIC_FB_003": {
-      "en": "Russia Shell Fallback 3",
-      "zh": "俄罗斯北极后备3"
-    },
-    "RU_ARCTIC_FB_004": {
-      "en": "Russia Shell Fallback 4",
-      "zh": "俄罗斯北极后备4"
-    },
-    "RU_ARCTIC_FB_005": {
-      "en": "Russia Shell Fallback 5",
-      "zh": "俄罗斯北极后备 5"
-    },
-    "RU_ARCTIC_FB_006": {
-      "en": "Russia Shell Fallback 6",
-      "zh": "俄罗斯北极后备 6"
-    },
-    "RU_ARCTIC_FB_007": {
-      "en": "Russia Shell Fallback 7",
-      "zh": "俄罗斯北极后备 7"
-    },
-    "RU_ARCTIC_FB_008": {
-      "en": "Russia Shell Fallback 8",
-      "zh": "俄罗斯北极后备 8"
-    },
-    "RU_ARCTIC_FB_009": {
-      "en": "Russia Shell Fallback 9",
-      "zh": "俄罗斯北极后备 9"
-    },
-    "RU_ARCTIC_FB_010": {
-      "en": "Russia Shell Fallback 10",
-      "zh": "俄罗斯北极后备 10"
-    },
-    "RU_ARCTIC_FB_011": {
-      "en": "Russia Shell Fallback 11",
-      "zh": "俄罗斯北极后备 11"
-    },
-    "RU_ARCTIC_FB_012": {
-      "en": "Russia Shell Fallback 12",
-      "zh": "俄罗斯北极后备 12"
-    },
-    "RU_ARCTIC_FB_013": {
-      "en": "Russia Shell Fallback 13",
-      "zh": "俄罗斯北极后备 13"
-    },
-    "RU_ARCTIC_FB_014": {
-      "en": "Russia Shell Fallback 14",
-      "zh": "俄罗斯北极后备 14"
-    },
-    "RU_ARCTIC_FB_015": {
-      "en": "Russia Shell Fallback 15",
-      "zh": "俄罗斯北极后备 15"
-    },
-    "RU_ARCTIC_FB_016": {
-      "en": "Russia Shell Fallback 16",
-      "zh": "俄罗斯北极后备 16"
-    },
-    "RU_ARCTIC_FB_017": {
-      "en": "Russia Shell Fallback 17",
-      "zh": "俄罗斯北极后备 17"
-    },
-    "RU_ARCTIC_FB_018": {
-      "en": "Russia Shell Fallback 18",
-      "zh": "俄罗斯北极后备 18"
-    },
-    "RU_ARCTIC_FB_019": {
-      "en": "Russia Shell Fallback 19",
-      "zh": "俄罗斯北极后备 19"
-    },
-    "RU_ARCTIC_FB_020": {
-      "en": "Russia Shell Fallback 20",
-      "zh": "俄罗斯北极后备 20"
-    },
-    "RU_ARCTIC_FB_021": {
-      "en": "Russia Shell Fallback 21",
-      "zh": "俄罗斯北极后备 21"
-    },
-    "RU_ARCTIC_FB_022": {
-      "en": "Russia Shell Fallback 22",
-      "zh": "俄罗斯北极后备 22"
-    },
-    "RU_ARCTIC_FB_023": {
-      "en": "Russia Shell Fallback 23",
-      "zh": "俄罗斯北极后备 23"
-    },
-    "RU_ARCTIC_FB_024": {
-      "en": "Russia Shell Fallback 24",
-      "zh": "俄罗斯北极后备 24"
-    },
-    "RU_ARCTIC_FB_025": {
-      "en": "Russia Shell Fallback 25",
-      "zh": "俄罗斯北极后备 25"
-    },
-    "RU_ARCTIC_FB_026": {
-      "en": "Russia Shell Fallback 26",
-      "zh": "俄罗斯北极后备 26"
-    },
-    "RU_ARCTIC_FB_027": {
-      "en": "Russia Shell Fallback 27",
-      "zh": "俄罗斯北极后备 27"
-    },
-    "RU_ARCTIC_FB_028": {
-      "en": "Russia Shell Fallback 28",
-      "zh": "俄罗斯北极后备 28"
-    },
-    "RU_ARCTIC_FB_029": {
-      "en": "Russia Shell Fallback 29",
-      "zh": "俄罗斯北极后备 29"
-    },
-    "RU_ARCTIC_FB_030": {
-      "en": "Russia Shell Fallback 30",
-      "zh": "俄罗斯北极后备 30"
-    },
-    "RU_ARCTIC_FB_031": {
-      "en": "Russia Shell Fallback 31",
-      "zh": "俄罗斯北极后备 31"
-    },
-    "RU_ARCTIC_FB_032": {
-      "en": "Russia Shell Fallback 32",
-      "zh": "俄罗斯北极后备 32"
-    },
-    "RU_ARCTIC_FB_033": {
-      "en": "Russia Shell Fallback 33",
-      "zh": "俄罗斯北极后备 33"
-    },
-    "RU_ARCTIC_FB_034": {
-      "en": "Russia Shell Fallback 34",
-      "zh": "俄罗斯北极后备 34"
-    },
-    "RU_ARCTIC_FB_035": {
-      "en": "Russia Shell Fallback 35",
-      "zh": "俄罗斯北极后备 35"
-    },
-    "RU_ARCTIC_FB_036": {
-      "en": "Russia Shell Fallback 36",
-      "zh": "俄罗斯北极后备 36"
-    },
-    "RU_ARCTIC_FB_037": {
-      "en": "Russia Shell Fallback 37",
-      "zh": "俄罗斯北极后备 37"
-    },
-    "RU_ARCTIC_FB_038": {
-      "en": "Russia Shell Fallback 38",
-      "zh": "俄罗斯北极后备 38"
-    },
-    "RU_ARCTIC_FB_039": {
-      "en": "Russia Shell Fallback 39",
-      "zh": "俄罗斯北极后备 39"
-    },
-    "RU_ARCTIC_FB_040": {
-      "en": "Russia Shell Fallback 40",
-      "zh": "俄罗斯北极后备 40"
-    },
-    "RU_ARCTIC_FB_041": {
-      "en": "Russia Shell Fallback 41",
-      "zh": "俄罗斯北极后备 41"
-    },
-    "RU_ARCTIC_FB_042": {
-      "en": "Russia Shell Fallback 42",
-      "zh": "俄罗斯北极后备 42"
-    },
-    "RU_ARCTIC_FB_043": {
-      "en": "Russia Shell Fallback 43",
-      "zh": "俄罗斯北极后备 43"
-    },
-    "RU_ARCTIC_FB_044": {
-      "en": "Russia Shell Fallback 44",
-      "zh": "俄罗斯北极后备 44"
-    },
-    "RU_ARCTIC_FB_045": {
-      "en": "Russia Shell Fallback 45",
-      "zh": "俄罗斯北极后备 45"
-    },
-    "RU_ARCTIC_FB_046": {
-      "en": "Russia Shell Fallback 46",
-      "zh": "俄罗斯北极后备 46"
-    },
-    "RU_ARCTIC_FB_047": {
-      "en": "Russia Shell Fallback 47",
-      "zh": "俄罗斯北极后备 47"
-    },
-    "RU_ARCTIC_FB_048": {
-      "en": "Russia Shell Fallback 48",
-      "zh": "俄罗斯北极后备 48"
-    },
-    "RU_ARCTIC_FB_049": {
-      "en": "Russia Shell Fallback 49",
-      "zh": "俄罗斯北极后备 49"
-    },
-    "RU_ARCTIC_FB_050": {
-      "en": "Russia Shell Fallback 50",
-      "zh": "俄罗斯北极后备 50"
-    },
-    "RU_ARCTIC_FB_051": {
-      "en": "Russia Shell Fallback 51",
-      "zh": "俄罗斯北极后备 51"
-    },
-    "RU_ARCTIC_FB_052": {
-      "en": "Russia Shell Fallback 52",
-      "zh": "俄罗斯北极后备 52"
-    },
-    "RU_ARCTIC_FB_053": {
-      "en": "Russia Shell Fallback 53",
-      "zh": "俄罗斯北极后备 53"
-    },
-    "RU_ARCTIC_FB_054": {
-      "en": "Russia Shell Fallback 54",
-      "zh": "俄罗斯北极后备 54"
-    },
-    "RU_ARCTIC_FB_055": {
-      "en": "Russia Shell Fallback 55",
-      "zh": "俄罗斯北极后备 55"
-    },
-    "RU_ARCTIC_FB_056": {
-      "en": "Russia Shell Fallback 56",
-      "zh": "俄罗斯北极后备 56"
-    },
-    "RU_ARCTIC_FB_057": {
-      "en": "Russia Shell Fallback 57",
-      "zh": "俄罗斯北极后备 57"
-    },
-    "RU_ARCTIC_FB_058": {
-      "en": "Russia Shell Fallback 58",
-      "zh": "俄罗斯北极后备 58"
-    },
-    "RU_ARCTIC_FB_059": {
-      "en": "Russia Shell Fallback 59",
-      "zh": "俄罗斯北极后备 59"
-    },
-    "RU_ARCTIC_FB_060": {
-      "en": "Russia Shell Fallback 60",
-      "zh": "俄罗斯北极后备 60"
-    },
-    "RU_ARCTIC_FB_061": {
-      "en": "Russia Shell Fallback 61",
-      "zh": "俄罗斯北极后备 61"
-    },
-    "RU_ARCTIC_FB_062": {
-      "en": "Russia Shell Fallback 62",
-      "zh": "俄罗斯北极后备 62"
-    },
-    "RU_ARCTIC_FB_063": {
-      "en": "Russia Shell Fallback 63",
-      "zh": "俄罗斯北极后备 63"
-    },
-    "RU_ARCTIC_FB_064": {
-      "en": "Russia Shell Fallback 64",
-      "zh": "俄罗斯北极后备 64"
-    },
-    "RU_ARCTIC_FB_065": {
-      "en": "Russia Shell Fallback 65",
-      "zh": "俄罗斯北极后备 65"
-    },
-    "RU_ARCTIC_FB_066": {
-      "en": "Russia Shell Fallback 66",
-      "zh": "俄罗斯北极后备 66"
-    },
-    "RU_ARCTIC_FB_067": {
-      "en": "Russia Shell Fallback 67",
-      "zh": "俄罗斯北极后备 67"
-    },
-    "RU_ARCTIC_FB_068": {
-      "en": "Russia Shell Fallback 68",
-      "zh": "俄罗斯北极后备 68"
-    },
-    "RU_ARCTIC_FB_069": {
-      "en": "Russia Shell Fallback 69",
-      "zh": "俄罗斯北极后备 69"
-    },
-    "RU_ARCTIC_FB_070": {
-      "en": "Russia Shell Fallback 70",
-      "zh": "俄罗斯北极后备 70"
-    },
-    "RU_ARCTIC_FB_071": {
-      "en": "Russia Shell Fallback 71",
-      "zh": "俄罗斯北极后备 71"
-    },
-    "RU_ARCTIC_FB_072": {
-      "en": "Russia Shell Fallback 72",
-      "zh": "俄罗斯北极后备72"
-    },
-    "RU_ARCTIC_FB_073": {
-      "en": "Russia Shell Fallback 73",
-      "zh": "俄罗斯北极后备 73"
-    },
-    "RU_ARCTIC_FB_074": {
-      "en": "Russia Shell Fallback 74",
-      "zh": "俄罗斯北极后备 74"
-    },
-    "RU_ARCTIC_FB_075": {
-      "en": "Russia Shell Fallback 75",
-      "zh": "俄罗斯北极后备75"
-    },
-    "RU_ARCTIC_FB_076": {
-      "en": "Russia Shell Fallback 76",
-      "zh": "俄罗斯北极后备76"
-    },
-    "RU_ARCTIC_FB_077": {
-      "en": "Russia Shell Fallback 77",
-      "zh": "俄罗斯北极后备77"
-    },
-    "RU_ARCTIC_FB_078": {
-      "en": "Russia Shell Fallback 78",
-      "zh": "俄罗斯北极后备78"
-    },
-    "RU_ARCTIC_FB_079": {
-      "en": "Russia Shell Fallback 79",
-      "zh": "俄罗斯北极后备79"
-    },
-    "RU_ARCTIC_FB_080": {
-      "en": "Russia Shell Fallback 80",
-      "zh": "俄罗斯北极后备 80"
-    },
-    "RU_ARCTIC_FB_081": {
-      "en": "Russia Shell Fallback 81",
-      "zh": "俄罗斯北极后备 81"
-    },
-    "RU_ARCTIC_FB_082": {
-      "en": "Russia Shell Fallback 82",
-      "zh": "俄罗斯北极后备 82"
-    },
-    "RU_ARCTIC_FB_083": {
-      "en": "Russia Shell Fallback 83",
-      "zh": "俄罗斯北极后备 83"
-    },
-    "RU_ARCTIC_FB_084": {
-      "en": "Russia Shell Fallback 84",
-      "zh": "俄罗斯北极后备 84"
-    },
-    "RU_ARCTIC_FB_085": {
-      "en": "Russia Shell Fallback 85",
-      "zh": "俄罗斯北极后备 85"
-    },
-    "RU_ARCTIC_FB_086": {
-      "en": "Russia Shell Fallback 86",
-      "zh": "俄罗斯北极后备86"
-    },
-    "RU_ARCTIC_FB_087": {
-      "en": "Russia Shell Fallback 87",
-      "zh": "俄罗斯北极后备 87"
-    },
-    "RU_ARCTIC_FB_088": {
-      "en": "Russia Shell Fallback 88",
-      "zh": "俄罗斯北极后备88"
-    },
-    "RU_ARCTIC_FB_089": {
-      "en": "Russia Shell Fallback 89",
-      "zh": "俄罗斯北极后备89"
-    },
-    "RU_ARCTIC_FB_090": {
-      "en": "Russia Shell Fallback 90",
-      "zh": "俄罗斯北极后备 90"
-    },
-    "RU_ARCTIC_FB_091": {
-      "en": "Russia Shell Fallback 91",
-      "zh": "俄罗斯北极后备 91"
-    },
-    "RU_ARCTIC_FB_092": {
-      "en": "Russia Shell Fallback 92",
-      "zh": "俄罗斯北极后备 92"
-    },
-    "RU_ARCTIC_FB_093": {
-      "en": "Russia Shell Fallback 93",
-      "zh": "俄罗斯北极后备 93"
-    },
-    "RU_ARCTIC_FB_094": {
-      "en": "Russia Shell Fallback 94",
-      "zh": "俄罗斯北极后备 94"
-    },
-    "RU_ARCTIC_FB_095": {
-      "en": "Russia Shell Fallback 95",
-      "zh": "俄罗斯北极后备 95"
-    },
-    "RU_ARCTIC_FB_096": {
-      "en": "Russia Shell Fallback 96",
-      "zh": "俄罗斯北极后备 96"
-    },
-    "RU_ARCTIC_FB_097": {
-      "en": "Russia Shell Fallback 97",
-      "zh": "俄罗斯北极后备 97"
-    },
-    "RU_ARCTIC_FB_098": {
-      "en": "Russia Shell Fallback 98",
-      "zh": "俄罗斯北极后备 98"
-    },
-    "RU_ARCTIC_FB_099": {
-      "en": "Russia Shell Fallback 99",
-      "zh": "俄罗斯北极后备99"
-    },
-    "RU_ARCTIC_FB_100": {
-      "en": "Russia Shell Fallback 100",
-      "zh": "俄罗斯北极后备 100"
-    },
-    "RU_ARCTIC_FB_101": {
-      "en": "Russia Shell Fallback 101",
-      "zh": "俄罗斯北极后备101"
-    },
-    "RU_ARCTIC_FB_102": {
-      "en": "Russia Shell Fallback 102",
-      "zh": "俄罗斯北极后备102"
-    },
-    "RU_ARCTIC_FB_103": {
-      "en": "Russia Shell Fallback 103",
-      "zh": "俄罗斯北极后备103"
-    },
-    "RU_ARCTIC_FB_104": {
-      "en": "Russia Shell Fallback 104",
-      "zh": "俄罗斯北极后备104"
-    },
-    "RU_ARCTIC_FB_105": {
-      "en": "Russia Shell Fallback 105",
-      "zh": "俄罗斯北极后备105"
-    },
-    "RU_ARCTIC_FB_106": {
-      "en": "Russia Shell Fallback 106",
-      "zh": "俄罗斯北极后备106"
-    },
-    "RU_ARCTIC_FB_107": {
-      "en": "Russia Shell Fallback 107",
-      "zh": "俄罗斯北极后备107"
-    },
-    "RU_ARCTIC_FB_108": {
-      "en": "Russia Shell Fallback 108",
-      "zh": "俄罗斯北极后备108"
-    },
-    "RU_ARCTIC_FB_109": {
-      "en": "Russia Shell Fallback 109",
-      "zh": "俄罗斯北极后备109"
-    },
-    "RU_ARCTIC_FB_110": {
-      "en": "Russia Shell Fallback 110",
-      "zh": "俄罗斯北极后备110"
-    },
-    "RU_ARCTIC_FB_111": {
-      "en": "Russia Shell Fallback 111",
-      "zh": "俄罗斯北极后备111"
-    },
-    "RU_ARCTIC_FB_112": {
-      "en": "Russia Shell Fallback 112",
-      "zh": "俄罗斯北极后备112"
-    },
-    "RU_ARCTIC_FB_113": {
-      "en": "Russia Shell Fallback 113",
-      "zh": "俄罗斯北极后备 113"
-    },
-    "RU_ARCTIC_FB_114": {
-      "en": "Russia Shell Fallback 114",
-      "zh": "俄罗斯北极后备114"
-    },
-    "RU_ARCTIC_FB_115": {
-      "en": "Russia Shell Fallback 115",
-      "zh": "俄罗斯北极后备115"
-    },
-    "RU_ARCTIC_FB_116": {
-      "en": "Russia Shell Fallback 116",
-      "zh": "俄罗斯北极后备116"
-    },
-    "RU_ARCTIC_FB_117": {
-      "en": "Russia Shell Fallback 117",
-      "zh": "俄罗斯北极后备 117"
-    },
-    "RU_ARCTIC_FB_118": {
-      "en": "Russia Shell Fallback 118",
-      "zh": "俄罗斯北极后备 118"
-    },
-    "RU_ARCTIC_FB_119": {
-      "en": "Russia Shell Fallback 119",
-      "zh": "俄罗斯北极后备119"
-    },
-    "RU_ARCTIC_FB_120": {
-      "en": "Russia Shell Fallback 120",
-      "zh": "俄罗斯北极后备 120"
-    },
-    "RU_ARCTIC_FB_121": {
-      "en": "Russia Shell Fallback 121",
-      "zh": "俄罗斯北极后备121"
-    },
-    "RU_ARCTIC_FB_122": {
-      "en": "Russia Shell Fallback 122",
-      "zh": "俄罗斯北极后备 122"
-    },
-    "RU_ARCTIC_FB_123": {
-      "en": "Russia Shell Fallback 123",
-      "zh": "俄罗斯北极后备 123"
-    },
-    "RU_ARCTIC_FB_124": {
-      "en": "Russia Shell Fallback 124",
-      "zh": "俄罗斯北极后备 124"
-    },
-    "RU_ARCTIC_FB_125": {
-      "en": "Russia Shell Fallback 125",
-      "zh": "俄罗斯北极后备 125"
-    },
-    "RU_ARCTIC_FB_126": {
-      "en": "Russia Shell Fallback 126",
-      "zh": "俄罗斯北极后备 126"
-    },
-    "RU_ARCTIC_FB_127": {
-      "en": "Russia Shell Fallback 127",
-      "zh": "俄罗斯北极后备 127"
-    },
-    "RU_ARCTIC_FB_128": {
-      "en": "Russia Shell Fallback 128",
-      "zh": "俄罗斯北极后备 128"
-    },
-    "RU_ARCTIC_FB_129": {
-      "en": "Russia Shell Fallback 129",
-      "zh": "俄罗斯北极后备 129"
-    },
-    "RU_ARCTIC_FB_130": {
-      "en": "Russia Shell Fallback 130",
-      "zh": "俄罗斯北极后备 130"
-    },
-    "RU_ARCTIC_FB_131": {
-      "en": "Russia Shell Fallback 131",
-      "zh": "俄罗斯北极后备 131"
-    },
-    "RU_ARCTIC_FB_132": {
-      "en": "Russia Shell Fallback 132",
-      "zh": "俄罗斯北极后备 132"
-    },
-    "RU_ARCTIC_FB_133": {
-      "en": "Russia Shell Fallback 133",
-      "zh": "俄罗斯北极后备 133"
-    },
-    "RU_ARCTIC_FB_134": {
-      "en": "Russia Shell Fallback 134",
-      "zh": "俄罗斯北极后备 134"
-    },
-    "RU_ARCTIC_FB_135": {
-      "en": "Russia Shell Fallback 135",
-      "zh": "俄罗斯北极后备 135"
-    },
-    "RU_ARCTIC_FB_136": {
-      "en": "Russia Shell Fallback 136",
-      "zh": "俄罗斯北极后备 136"
-    },
-    "RU_ARCTIC_FB_137": {
-      "en": "Russia Shell Fallback 137",
-      "zh": "俄罗斯北极后备 137"
-    },
-    "RU_ARCTIC_FB_138": {
-      "en": "Russia Shell Fallback 138",
-      "zh": "俄罗斯北极后备 138"
-    },
-    "RU_ARCTIC_FB_139": {
-      "en": "Russia Shell Fallback 139",
-      "zh": "俄罗斯北极后备 139"
-    },
-    "RU_ARCTIC_FB_140": {
-      "en": "Russia Shell Fallback 140",
-      "zh": "俄罗斯北极后备 140"
-    },
-    "RU_ARCTIC_FB_141": {
-      "en": "Russia Shell Fallback 141",
-      "zh": "俄罗斯北极后备 141"
-    },
-    "RU_ARCTIC_FB_142": {
-      "en": "Russia Shell Fallback 142",
-      "zh": "俄罗斯北极后备 142"
-    },
-    "RU_ARCTIC_FB_143": {
-      "en": "Russia Shell Fallback 143",
-      "zh": "俄罗斯北极后备 143"
-    },
-    "RU_ARCTIC_FB_144": {
-      "en": "Russia Shell Fallback 144",
-      "zh": "俄罗斯北极后备 144"
-    },
-    "RU_ARCTIC_FB_145": {
-      "en": "Russia Shell Fallback 145",
-      "zh": "俄罗斯北极后备 145"
-    },
-    "RU_ARCTIC_FB_146": {
-      "en": "Russia Shell Fallback 146",
-      "zh": "俄罗斯北极后备 146"
-    },
-    "RU_ARCTIC_FB_147": {
-      "en": "Russia Shell Fallback 147",
-      "zh": "俄罗斯北极后备 147"
-    },
-    "RU_ARCTIC_FB_148": {
-      "en": "Russia Shell Fallback 148",
-      "zh": "俄罗斯壳牌后备 148"
-    },
-    "RU_ARCTIC_FB_149": {
-      "en": "Russia Shell Fallback 149",
-      "zh": "俄罗斯壳牌后备 149"
-    },
-    "RU_ARCTIC_FB_150": {
-      "en": "Russia Shell Fallback 150",
-      "zh": "俄罗斯壳牌后备 150"
-    },
-    "RU_ARCTIC_FB_151": {
-      "en": "Russia Shell Fallback 151",
-      "zh": "俄罗斯壳牌后备 151"
-    },
-    "RU_ARCTIC_FB_152": {
-      "en": "Russia Shell Fallback 152",
-      "zh": "俄罗斯壳牌后备 152"
-    },
-    "RU_ARCTIC_FB_153": {
-      "en": "Russia Shell Fallback 153",
-      "zh": "俄罗斯壳牌后备 153"
-    },
-    "RU_ARCTIC_FB_154": {
-      "en": "Russia Shell Fallback 154",
-      "zh": "俄罗斯壳牌后备 154"
-    },
-    "RU_ARCTIC_FB_155": {
-      "en": "Russia Shell Fallback 155",
-      "zh": "俄罗斯壳牌后备 155"
-    },
-    "RU_ARCTIC_FB_156": {
-      "en": "Russia Shell Fallback 156",
-      "zh": "俄罗斯壳牌后备 156"
-    },
-    "RU_ARCTIC_FB_157": {
-      "en": "Russia Shell Fallback 157",
-      "zh": "俄罗斯壳牌后备 157"
-    },
-    "RU_ARCTIC_FB_158": {
-      "en": "Russia Shell Fallback 158",
-      "zh": "俄罗斯壳牌后备 158"
-    },
-    "RU_ARCTIC_FB_159": {
-      "en": "Russia Shell Fallback 159",
-      "zh": "俄罗斯壳牌后备 159"
-    },
-    "RU_ARCTIC_FB_160": {
-      "en": "Russia Shell Fallback 160",
-      "zh": "俄罗斯壳牌 Fallback 160"
-    },
-    "RU_ARCTIC_FB_161": {
-      "en": "Russia Shell Fallback 161",
-      "zh": "俄罗斯壳牌后备 161"
-    },
-    "RU_ARCTIC_FB_162": {
-      "en": "Russia Shell Fallback 162",
-      "zh": "俄罗斯壳牌后备 162"
-    },
-    "RU_ARCTIC_FB_163": {
-      "en": "Russia Shell Fallback 163",
-      "zh": "俄罗斯壳牌后备 163"
-    },
-    "RU_ARCTIC_FB_164": {
-      "en": "Russia Shell Fallback 164",
-      "zh": "俄罗斯壳牌后备 164"
-    },
-    "RU_ARCTIC_FB_165": {
-      "en": "Russia Shell Fallback 165",
-      "zh": "俄罗斯壳牌后备 165"
-    },
-    "RU_ARCTIC_FB_166": {
-      "en": "Russia Shell Fallback 166",
-      "zh": "俄罗斯壳牌后备 166"
-    },
-    "RU_ARCTIC_FB_167": {
-      "en": "Russia Shell Fallback 167",
-      "zh": "俄罗斯壳牌后备 167"
-    },
-    "RU_ARCTIC_FB_168": {
-      "en": "Russia Shell Fallback 168",
-      "zh": "俄罗斯壳牌后备 168"
-    },
-    "RU_ARCTIC_FB_169": {
-      "en": "Russia Shell Fallback 169",
-      "zh": "俄罗斯壳牌后备 169"
-    },
-    "RU_ARCTIC_FB_170": {
-      "en": "Russia Shell Fallback 170",
-      "zh": "俄罗斯壳牌后备 170"
-    },
-    "RU_ARCTIC_FB_171": {
-      "en": "Russia Shell Fallback 171",
-      "zh": "俄罗斯壳牌后备 171"
-    },
-    "RU_ARCTIC_FB_172": {
-      "en": "Russia Shell Fallback 172",
-      "zh": "俄罗斯壳牌后备 172"
-    },
-    "RU_ARCTIC_FB_173": {
-      "en": "Russia Shell Fallback 173",
-      "zh": "俄罗斯壳牌后备 173"
-    },
-    "RU_ARCTIC_FB_174": {
-      "en": "Russia Shell Fallback 174",
-      "zh": "俄罗斯壳牌后备 174"
-    },
-    "RU_ARCTIC_FB_175": {
-      "en": "Russia Shell Fallback 175",
-      "zh": "俄罗斯壳牌后备 175"
-    },
-    "RU_ARCTIC_FB_176": {
-      "en": "Russia Shell Fallback 176",
-      "zh": "俄罗斯壳牌后备 176"
-    },
-    "RU_ARCTIC_FB_177": {
-      "en": "Russia Shell Fallback 177",
-      "zh": "俄罗斯壳牌后备 177"
-    },
-    "RU_ARCTIC_FB_178": {
-      "en": "Russia Shell Fallback 178",
-      "zh": "俄罗斯壳牌后备 178"
-    },
-    "RU_ARCTIC_FB_179": {
-      "en": "Russia Shell Fallback 179",
-      "zh": "俄罗斯壳牌后备 179"
-    },
-    "RU_ARCTIC_FB_180": {
-      "en": "Russia Shell Fallback 180",
-      "zh": "俄罗斯壳牌 Fallback 180"
-    },
-    "RU_ARCTIC_FB_181": {
-      "en": "Russia Shell Fallback 181",
-      "zh": "俄罗斯壳牌后备 181"
-    },
-    "RU_ARCTIC_FB_182": {
-      "en": "Russia Shell Fallback 182",
-      "zh": "俄罗斯壳牌后备 182"
-    },
-    "RU_ARCTIC_FB_183": {
-      "en": "Russia Shell Fallback 183",
-      "zh": "俄罗斯壳牌后备 183"
-    },
-    "RU_ARCTIC_FB_184": {
-      "en": "Russia Shell Fallback 184",
-      "zh": "俄罗斯壳牌后备 184"
-    },
-    "RU_ARCTIC_FB_185": {
-      "en": "Russia Shell Fallback 185",
-      "zh": "俄罗斯壳牌后备 185"
-    },
-    "RU_ARCTIC_FB_186": {
-      "en": "Russia Shell Fallback 186",
-      "zh": "俄罗斯壳牌后备 186"
-    },
-    "RU_ARCTIC_FB_187": {
-      "en": "Russia Shell Fallback 187",
-      "zh": "俄罗斯壳牌后备 187"
-    },
-    "RU_ARCTIC_FB_188": {
-      "en": "Russia Shell Fallback 188",
-      "zh": "俄罗斯壳牌后备 188"
-    },
-    "RU_ARCTIC_FB_189": {
-      "en": "Russia Shell Fallback 189",
-      "zh": "俄罗斯壳牌后备 189"
-    },
-    "RU_ARCTIC_FB_190": {
-      "en": "Russia Shell Fallback 190",
-      "zh": "俄罗斯壳牌后备 190"
-    },
-    "RU_ARCTIC_FB_191": {
-      "en": "Russia Shell Fallback 191",
-      "zh": "俄罗斯壳牌后备 191"
-    },
-    "RU_ARCTIC_FB_192": {
-      "en": "Russia Shell Fallback 192",
-      "zh": "俄罗斯壳牌后备 192"
-    },
-    "RU_ARCTIC_FB_193": {
-      "en": "Russia Shell Fallback 193",
-      "zh": "俄罗斯壳牌后备 193"
-    },
-    "RU_ARCTIC_FB_194": {
-      "en": "Russia Shell Fallback 194",
-      "zh": "俄罗斯壳牌后备 194"
-    },
-    "RU_ARCTIC_FB_195": {
-      "en": "Russia Shell Fallback 195",
-      "zh": "俄罗斯壳牌后备 195"
-    },
-    "RU_ARCTIC_FB_196": {
-      "en": "Russia Shell Fallback 196",
-      "zh": "俄罗斯壳牌后备 196"
-    },
-    "RU_ARCTIC_FB_197": {
-      "en": "Russia Shell Fallback 197",
-      "zh": "俄罗斯壳牌后备 197"
-    },
-    "RU_ARCTIC_FB_198": {
-      "en": "Russia Shell Fallback 198",
-      "zh": "俄罗斯壳牌后备 198"
-    },
-    "RU_ARCTIC_FB_199": {
-      "en": "Russia Shell Fallback 199",
-      "zh": "俄罗斯壳牌后备 199"
-    },
-    "RU_ARCTIC_FB_200": {
-      "en": "Russia Shell Fallback 200",
-      "zh": "俄罗斯壳牌 Fallback 200"
-    },
-    "RU_ARCTIC_FB_201": {
-      "en": "Russia Shell Fallback 201",
-      "zh": "俄罗斯壳牌后备 201"
-    },
-    "RU_ARCTIC_FB_202": {
-      "en": "Russia Shell Fallback 202",
-      "zh": "俄罗斯壳牌后备 202"
-    },
-    "RU_ARCTIC_FB_203": {
-      "en": "Russia Shell Fallback 203",
-      "zh": "俄罗斯壳牌后备 203"
-    },
-    "RU_ARCTIC_FB_204": {
-      "en": "Russia Shell Fallback 204",
-      "zh": "俄罗斯壳牌后备 204"
-    },
-    "RU_ARCTIC_FB_205": {
-      "en": "Russia Shell Fallback 205",
-      "zh": "俄罗斯壳牌后备 205"
-    },
-    "RU_ARCTIC_FB_206": {
-      "en": "Russia Shell Fallback 206",
-      "zh": "俄罗斯壳牌后备 206"
-    },
-    "RU_ARCTIC_FB_207": {
-      "en": "Russia Shell Fallback 207",
-      "zh": "俄罗斯壳牌后备 207"
-    },
-    "RU_ARCTIC_FB_208": {
-      "en": "Russia Shell Fallback 208",
-      "zh": "俄罗斯壳牌后备 208"
-    },
-    "RU_ARCTIC_FB_209": {
-      "en": "Russia Shell Fallback 209",
-      "zh": "俄罗斯壳牌后备 209"
-    },
-    "RU_ARCTIC_FB_210": {
-      "en": "Russia Shell Fallback 210",
-      "zh": "俄罗斯壳牌 Fallback 210"
-    },
-    "RU_ARCTIC_FB_211": {
-      "en": "Russia Shell Fallback 211",
-      "zh": "俄罗斯壳牌后备 211"
-    },
-    "RU_ARCTIC_FB_212": {
-      "en": "Russia Shell Fallback 212",
-      "zh": "俄罗斯壳牌后备 212"
-    },
-    "RU_ARCTIC_FB_213": {
-      "en": "Russia Shell Fallback 213",
-      "zh": "俄罗斯壳牌后备 213"
-    },
-    "RU_ARCTIC_FB_214": {
-      "en": "Russia Shell Fallback 214",
-      "zh": "俄罗斯壳牌后备 214"
-    },
-    "RU_ARCTIC_FB_215": {
-      "en": "Russia Shell Fallback 215",
-      "zh": "俄罗斯壳牌后备 215"
-    },
-    "RU_ARCTIC_FB_216": {
-      "en": "Russia Shell Fallback 216",
-      "zh": "俄罗斯壳牌后备 216"
-    },
-    "RU_ARCTIC_FB_217": {
-      "en": "Russia Shell Fallback 217",
-      "zh": "俄罗斯壳牌后备 217"
-    },
-    "RU_ARCTIC_FB_218": {
-      "en": "Russia Shell Fallback 218",
-      "zh": "俄罗斯壳牌后备 218"
-    },
-    "RU_ARCTIC_FB_219": {
-      "en": "Russia Shell Fallback 219",
-      "zh": "俄罗斯壳牌后备 219"
-    },
-    "RU_ARCTIC_FB_220": {
-      "en": "Russia Shell Fallback 220",
-      "zh": "俄罗斯壳牌 Fallback 220"
-    },
-    "RU_ARCTIC_FB_221": {
-      "en": "Russia Shell Fallback 221",
-      "zh": "俄罗斯壳牌后备 221"
-    },
-    "RU_ARCTIC_FB_222": {
-      "en": "Russia Shell Fallback 222",
-      "zh": "俄罗斯壳牌后备 222"
-    },
-    "RU_ARCTIC_FB_223": {
-      "en": "Russia Shell Fallback 223",
-      "zh": "俄罗斯壳牌后备 223"
-    },
-    "RU_ARCTIC_FB_224": {
-      "en": "Russia Shell Fallback 224",
-      "zh": "俄罗斯壳牌后备 224"
-    },
-    "RU_ARCTIC_FB_225": {
-      "en": "Russia Shell Fallback 225",
-      "zh": "俄罗斯壳牌后备 225"
-    },
-    "RU_ARCTIC_FB_226": {
-      "en": "Russia Shell Fallback 226",
-      "zh": "俄罗斯壳牌后备 226"
-    },
-    "RU_ARCTIC_FB_227": {
-      "en": "Russia Shell Fallback 227",
-      "zh": "俄罗斯壳牌后备 227"
-    },
-    "RU_ARCTIC_FB_228": {
-      "en": "Russia Shell Fallback 228",
-      "zh": "俄罗斯壳牌后备 228"
-    },
-    "RU_ARCTIC_FB_229": {
-      "en": "Russia Shell Fallback 229",
-      "zh": "俄罗斯壳牌后备 229"
-    },
-    "RU_ARCTIC_FB_230": {
-      "en": "Russia Shell Fallback 230",
-      "zh": "俄罗斯壳牌后备 230"
-    },
-    "RU_ARCTIC_FB_231": {
-      "en": "Russia Shell Fallback 231",
-      "zh": "俄罗斯壳牌后备 231"
-    },
-    "RU_ARCTIC_FB_232": {
-      "en": "Russia Shell Fallback 232",
-      "zh": "俄罗斯壳牌后备 232"
-    },
-    "RU_ARCTIC_FB_233": {
-      "en": "Russia Shell Fallback 233",
-      "zh": "俄罗斯壳牌后备 233"
-    },
-    "RU_ARCTIC_FB_234": {
-      "en": "Russia Shell Fallback 234",
-      "zh": "俄罗斯壳牌后备 234"
-    },
-    "RU_ARCTIC_FB_235": {
-      "en": "Russia Shell Fallback 235",
-      "zh": "俄罗斯壳牌后备 235"
-    },
-    "RU_ARCTIC_FB_236": {
-      "en": "Russia Shell Fallback 236",
-      "zh": "俄罗斯壳牌后备 236"
-    },
-    "RU_ARCTIC_FB_237": {
-      "en": "Russia Shell Fallback 237",
-      "zh": "俄罗斯壳牌后备 237"
-    },
-    "RU_ARCTIC_FB_238": {
-      "en": "Russia Shell Fallback 238",
-      "zh": "俄罗斯壳牌后备 238"
-    },
-    "RU_ARCTIC_FB_239": {
-      "en": "Russia Shell Fallback 239",
-      "zh": "俄罗斯壳牌后备 239"
-    },
-    "RU_ARCTIC_FB_240": {
-      "en": "Russia Shell Fallback 240",
-      "zh": "俄罗斯壳牌后备 240"
-    },
-    "RU_ARCTIC_FB_241": {
-      "en": "Russia Shell Fallback 241",
-      "zh": "俄罗斯壳牌后备 241"
-    },
-    "RU_ARCTIC_FB_242": {
-      "en": "Russia Shell Fallback 242",
-      "zh": "俄罗斯壳牌后备 242"
-    },
-    "RU_ARCTIC_FB_243": {
-      "en": "Russia Shell Fallback 243",
-      "zh": "俄罗斯壳牌后备 243"
-    },
-    "RU_ARCTIC_FB_244": {
-      "en": "Russia Shell Fallback 244",
-      "zh": "俄罗斯壳牌后备 244"
-    },
-    "RU_ARCTIC_FB_245": {
-      "en": "Russia Shell Fallback 245",
-      "zh": "俄罗斯壳牌后备 245"
-    },
-    "RU_ARCTIC_FB_246": {
-      "en": "Russia Shell Fallback 246",
-      "zh": "俄罗斯壳牌后备 246"
-    },
-    "RU_ARCTIC_FB_247": {
-      "en": "Russia Shell Fallback 247",
-      "zh": "俄罗斯壳牌后备 247"
-    },
-    "RU_ARCTIC_FB_248": {
-      "en": "Russia Shell Fallback 248",
-      "zh": "俄罗斯壳牌后备 248"
-    },
-    "RU_ARCTIC_FB_249": {
-      "en": "Russia Shell Fallback 249",
-      "zh": "俄罗斯壳牌后备 249"
-    },
-    "RU_ARCTIC_FB_250": {
-      "en": "Russia Shell Fallback 250",
-      "zh": "俄罗斯壳牌 Fallback 250"
-    },
-    "RU_ARCTIC_FB_251": {
-      "en": "Russia Shell Fallback 251",
-      "zh": "俄罗斯壳牌后备 251"
-    },
-    "RU_ARCTIC_FB_252": {
-      "en": "Russia Shell Fallback 252",
-      "zh": "俄罗斯壳牌后备 252"
-    },
-    "RU_ARCTIC_FB_253": {
-      "en": "Russia Shell Fallback 253",
-      "zh": "俄罗斯壳牌后备 253"
-    },
-    "RU_ARCTIC_FB_254": {
-      "en": "Russia Shell Fallback 254",
-      "zh": "俄罗斯壳牌后备 254"
-    },
-    "RU_ARCTIC_FB_255": {
-      "en": "Russia Shell Fallback 255",
-      "zh": "俄罗斯壳牌后备 255"
-    },
-    "RU_ARCTIC_FB_256": {
-      "en": "Russia Shell Fallback 256",
-      "zh": "俄罗斯壳牌后备 256"
-    },
-    "RU_ARCTIC_FB_257": {
-      "en": "Russia Shell Fallback 257",
-      "zh": "俄罗斯壳牌后备 257"
-    },
-    "RU_ARCTIC_FB_258": {
-      "en": "Russia Shell Fallback 258",
-      "zh": "俄罗斯壳牌后备 258"
-    },
-    "RU_ARCTIC_FB_259": {
-      "en": "Russia Shell Fallback 259",
-      "zh": "俄罗斯壳牌后备 259"
-    },
-    "RU_ARCTIC_FB_260": {
-      "en": "Russia Shell Fallback 260",
-      "zh": "俄罗斯壳牌 Fallback 260"
-    },
-    "RU_ARCTIC_FB_261": {
-      "en": "Russia Shell Fallback 261",
-      "zh": "俄罗斯壳牌后备 261"
-    },
-    "RU_ARCTIC_FB_262": {
-      "en": "Russia Shell Fallback 262",
-      "zh": "俄罗斯壳牌后备 262"
-    },
-    "RU_ARCTIC_FB_263": {
-      "en": "Russia Shell Fallback 263",
-      "zh": "俄罗斯壳牌后备 263"
-    },
-    "RU_ARCTIC_FB_264": {
-      "en": "Russia Shell Fallback 264",
-      "zh": "俄罗斯壳牌后备 264"
-    },
-    "RU_ARCTIC_FB_265": {
-      "en": "Russia Shell Fallback 265",
-      "zh": "俄罗斯壳牌后备 265"
-    },
-    "RU_ARCTIC_FB_266": {
-      "en": "Russia Shell Fallback 266",
-      "zh": "俄罗斯壳牌后备 266"
-    },
-    "RU_ARCTIC_FB_267": {
-      "en": "Russia Shell Fallback 267",
-      "zh": "俄罗斯壳牌后备 267"
-    },
-    "RU_ARCTIC_FB_268": {
-      "en": "Russia Shell Fallback 268",
-      "zh": "Russia Shell Fallback 268"
-    },
-    "RU_ARCTIC_FB_269": {
-      "en": "Russia Shell Fallback 269",
-      "zh": "Russia Shell Fallback 269"
-    },
-    "RU_ARCTIC_FB_270": {
-      "en": "Russia Shell Fallback 270",
-      "zh": "Russia Shell Fallback 270"
-    },
-    "RU_ARCTIC_FB_271": {
-      "en": "Russia Shell Fallback 271",
-      "zh": "Russia Shell Fallback 271"
-    },
-    "RU_ARCTIC_FB_272": {
-      "en": "Russia Shell Fallback 272",
-      "zh": "Russia Shell Fallback 272"
-    },
-    "RU_ARCTIC_FB_273": {
-      "en": "Russia Shell Fallback 273",
-      "zh": "Russia Shell Fallback 273"
-    },
-    "RU_ARCTIC_FB_274": {
-      "en": "Russia Shell Fallback 274",
-      "zh": "Russia Shell Fallback 274"
-    },
-    "RU_ARCTIC_FB_275": {
-      "en": "Russia Shell Fallback 275",
-      "zh": "Russia Shell Fallback 275"
-    },
-    "RU_ARCTIC_FB_276": {
-      "en": "Russia Shell Fallback 276",
-      "zh": "Russia Shell Fallback 276"
-    },
-    "RU_ARCTIC_FB_277": {
-      "en": "Russia Shell Fallback 277",
-      "zh": "Russia Shell Fallback 277"
-    },
-    "RU_ARCTIC_FB_278": {
-      "en": "Russia Shell Fallback 278",
-      "zh": "Russia Shell Fallback 278"
-    },
-    "RU_ARCTIC_FB_279": {
-      "en": "Russia Shell Fallback 279",
-      "zh": "Russia Shell Fallback 279"
-    },
-    "RU_ARCTIC_FB_280": {
-      "en": "Russia Shell Fallback 280",
-      "zh": "Russia Shell Fallback 280"
-    },
-    "RU_ARCTIC_FB_281": {
-      "en": "Russia Shell Fallback 281",
-      "zh": "Russia Shell Fallback 281"
-    },
-    "RU_ARCTIC_FB_282": {
-      "en": "Russia Shell Fallback 282",
-      "zh": "Russia Shell Fallback 282"
-    },
-    "RU_ARCTIC_FB_283": {
-      "en": "Russia Shell Fallback 283",
-      "zh": "Russia Shell Fallback 283"
-    },
-    "RU_ARCTIC_FB_284": {
-      "en": "Russia Shell Fallback 284",
-      "zh": "Russia Shell Fallback 284"
-    },
-    "RU_ARCTIC_FB_285": {
-      "en": "Russia Shell Fallback 285",
-      "zh": "Russia Shell Fallback 285"
-    },
-    "RU_ARCTIC_FB_286": {
-      "en": "Russia Shell Fallback 286",
-      "zh": "Russia Shell Fallback 286"
-    },
-    "RU_ARCTIC_FB_287": {
-      "en": "Russia Shell Fallback 287",
-      "zh": "Russia Shell Fallback 287"
-    },
-    "RU_ARCTIC_FB_288": {
-      "en": "Russia Shell Fallback 288",
-      "zh": "Russia Shell Fallback 288"
-    },
-    "RU_ARCTIC_FB_289": {
-      "en": "Russia Shell Fallback 289",
-      "zh": "Russia Shell Fallback 289"
-    },
-    "RU_ARCTIC_FB_290": {
-      "en": "Russia Shell Fallback 290",
-      "zh": "Russia Shell Fallback 290"
-    },
-    "RU_ARCTIC_FB_291": {
-      "en": "Russia Shell Fallback 291",
-      "zh": "Russia Shell Fallback 291"
-    },
-    "RU_ARCTIC_FB_292": {
-      "en": "Russia Shell Fallback 292",
-      "zh": "Russia Shell Fallback 292"
-    },
-    "RU_ARCTIC_FB_293": {
-      "en": "Russia Shell Fallback 293",
-      "zh": "Russia Shell Fallback 293"
-    },
-    "RU_ARCTIC_FB_294": {
-      "en": "Russia Shell Fallback 294",
-      "zh": "Russia Shell Fallback 294"
-    },
-    "RU_ARCTIC_FB_295": {
-      "en": "Russia Shell Fallback 295",
-      "zh": "Russia Shell Fallback 295"
-    },
-    "RU_ARCTIC_FB_296": {
-      "en": "Russia Shell Fallback 296",
-      "zh": "Russia Shell Fallback 296"
-    },
-    "RU_ARCTIC_FB_297": {
-      "en": "Russia Shell Fallback 297",
-      "zh": "Russia Shell Fallback 297"
-    },
-    "RU_ARCTIC_FB_298": {
-      "en": "Russia Shell Fallback 298",
-      "zh": "Russia Shell Fallback 298"
-    },
-    "RU_ARCTIC_FB_299": {
-      "en": "Russia Shell Fallback 299",
-      "zh": "Russia Shell Fallback 299"
-    },
-    "RU_ARCTIC_FB_300": {
-      "en": "Russia Shell Fallback 300",
-      "zh": "Russia Shell Fallback 300"
-    },
-    "RU_ARCTIC_FB_301": {
-      "en": "Russia Shell Fallback 301",
-      "zh": "Russia Shell Fallback 301"
-    },
-    "RU_ARCTIC_FB_302": {
-      "en": "Russia Shell Fallback 302",
-      "zh": "Russia Shell Fallback 302"
-    },
-    "RU_ARCTIC_FB_303": {
-      "en": "Russia Shell Fallback 303",
-      "zh": "Russia Shell Fallback 303"
-    },
-    "RU_ARCTIC_FB_304": {
-      "en": "Russia Shell Fallback 304",
-      "zh": "Russia Shell Fallback 304"
-    },
-    "RU_ARCTIC_FB_305": {
-      "en": "Russia Shell Fallback 305",
-      "zh": "Russia Shell Fallback 305"
-    },
-    "RU_ARCTIC_FB_306": {
-      "en": "Russia Shell Fallback 306",
-      "zh": "Russia Shell Fallback 306"
-    },
-    "RU_ARCTIC_FB_307": {
-      "en": "Russia Shell Fallback 307",
-      "zh": "Russia Shell Fallback 307"
-    },
-    "RU_ARCTIC_FB_308": {
-      "en": "Russia Shell Fallback 308",
-      "zh": "Russia Shell Fallback 308"
-    },
-    "RU_ARCTIC_FB_309": {
-      "en": "Russia Shell Fallback 309",
-      "zh": "Russia Shell Fallback 309"
-    },
-    "RU_ARCTIC_FB_310": {
-      "en": "Russia Shell Fallback 310",
-      "zh": "Russia Shell Fallback 310"
-    },
-    "RU_ARCTIC_FB_311": {
-      "en": "Russia Shell Fallback 311",
-      "zh": "Russia Shell Fallback 311"
-    },
-    "RU_ARCTIC_FB_312": {
-      "en": "Russia Shell Fallback 312",
-      "zh": "Russia Shell Fallback 312"
-    },
-    "RU_ARCTIC_FB_313": {
-      "en": "Russia Shell Fallback 313",
-      "zh": "Russia Shell Fallback 313"
-    },
-    "RU_ARCTIC_FB_314": {
-      "en": "Russia Shell Fallback 314",
-      "zh": "Russia Shell Fallback 314"
-    },
-    "RU_ARCTIC_FB_315": {
-      "en": "Russia Shell Fallback 315",
-      "zh": "Russia Shell Fallback 315"
-    },
-    "RU_ARCTIC_FB_316": {
-      "en": "Russia Shell Fallback 316",
-      "zh": "Russia Shell Fallback 316"
-    },
-    "RU_ARCTIC_FB_317": {
-      "en": "Russia Shell Fallback 317",
-      "zh": "Russia Shell Fallback 317"
-    },
-    "RU_ARCTIC_FB_318": {
-      "en": "Russia Shell Fallback 318",
-      "zh": "Russia Shell Fallback 318"
-    },
-    "RU_ARCTIC_FB_319": {
-      "en": "Russia Shell Fallback 319",
-      "zh": "Russia Shell Fallback 319"
-    },
-    "RU_ARCTIC_FB_320": {
-      "en": "Russia Shell Fallback 320",
-      "zh": "Russia Shell Fallback 320"
-    },
-    "RU_ARCTIC_FB_321": {
-      "en": "Russia Shell Fallback 321",
-      "zh": "Russia Shell Fallback 321"
-    },
-    "RU_ARCTIC_FB_322": {
-      "en": "Russia Shell Fallback 322",
-      "zh": "Russia Shell Fallback 322"
-    },
-    "RU_ARCTIC_FB_323": {
-      "en": "Russia Shell Fallback 323",
-      "zh": "Russia Shell Fallback 323"
-    },
-    "RU_ARCTIC_FB_324": {
-      "en": "Russia Shell Fallback 324",
-      "zh": "Russia Shell Fallback 324"
-    },
-    "RU_ARCTIC_FB_325": {
-      "en": "Russia Shell Fallback 325",
-      "zh": "Russia Shell Fallback 325"
-    },
-    "RU_ARCTIC_FB_326": {
-      "en": "Russia Shell Fallback 326",
-      "zh": "Russia Shell Fallback 326"
-    },
-    "RU_ARCTIC_FB_327": {
-      "en": "Russia Shell Fallback 327",
-      "zh": "Russia Shell Fallback 327"
-    },
-    "RU_ARCTIC_FB_328": {
-      "en": "Russia Shell Fallback 328",
-      "zh": "Russia Shell Fallback 328"
-    },
-    "RU_ARCTIC_FB_329": {
-      "en": "Russia Shell Fallback 329",
-      "zh": "Russia Shell Fallback 329"
-    },
-    "RU_ARCTIC_FB_330": {
-      "en": "Russia Shell Fallback 330",
-      "zh": "Russia Shell Fallback 330"
-    },
-    "RU_ARCTIC_FB_331": {
-      "en": "Russia Shell Fallback 331",
-      "zh": "Russia Shell Fallback 331"
-    },
-    "RU_ARCTIC_FB_332": {
-      "en": "Russia Shell Fallback 332",
-      "zh": "Russia Shell Fallback 332"
-    },
-    "RU_ARCTIC_FB_333": {
-      "en": "Russia Shell Fallback 333",
-      "zh": "Russia Shell Fallback 333"
-    },
-    "RU_ARCTIC_FB_334": {
-      "en": "Russia Shell Fallback 334",
-      "zh": "Russia Shell Fallback 334"
-    },
-    "RU_ARCTIC_FB_335": {
-      "en": "Russia Shell Fallback 335",
-      "zh": "Russia Shell Fallback 335"
-    },
-    "RU_ARCTIC_FB_336": {
-      "en": "Russia Shell Fallback 336",
-      "zh": "Russia Shell Fallback 336"
-    },
-    "RU_ARCTIC_FB_337": {
-      "en": "Russia Shell Fallback 337",
-      "zh": "Russia Shell Fallback 337"
-    },
-    "RU_ARCTIC_FB_338": {
-      "en": "Russia Shell Fallback 338",
-      "zh": "Russia Shell Fallback 338"
-    },
-    "RU_ARCTIC_FB_339": {
-      "en": "Russia Shell Fallback 339",
-      "zh": "Russia Shell Fallback 339"
-    },
-    "RU_ARCTIC_FB_340": {
-      "en": "Russia Shell Fallback 340",
-      "zh": "Russia Shell Fallback 340"
-    },
-    "RU_ARCTIC_FB_341": {
-      "en": "Russia Shell Fallback 341",
-      "zh": "Russia Shell Fallback 341"
-    },
-    "RU_ARCTIC_FB_342": {
-      "en": "Russia Shell Fallback 342",
-      "zh": "Russia Shell Fallback 342"
-    },
-    "RU_ARCTIC_FB_343": {
-      "en": "Russia Shell Fallback 343",
-      "zh": "Russia Shell Fallback 343"
-    },
-    "RU_ARCTIC_FB_344": {
-      "en": "Russia Shell Fallback 344",
-      "zh": "Russia Shell Fallback 344"
-    },
-    "RU_ARCTIC_FB_345": {
-      "en": "Russia Shell Fallback 345",
-      "zh": "Russia Shell Fallback 345"
-    },
-    "RU_ARCTIC_FB_346": {
-      "en": "Russia Shell Fallback 346",
-      "zh": "Russia Shell Fallback 346"
-    },
-    "RU_ARCTIC_FB_347": {
-      "en": "Russia Shell Fallback 347",
-      "zh": "Russia Shell Fallback 347"
-    },
-    "RU_ARCTIC_FB_348": {
-      "en": "Russia Shell Fallback 348",
-      "zh": "Russia Shell Fallback 348"
-    },
-    "RU_ARCTIC_FB_349": {
-      "en": "Russia Shell Fallback 349",
-      "zh": "Russia Shell Fallback 349"
-    },
-    "RU_ARCTIC_FB_350": {
-      "en": "Russia Shell Fallback 350",
-      "zh": "Russia Shell Fallback 350"
-    },
-    "RU_ARCTIC_FB_351": {
-      "en": "Russia Shell Fallback 351",
-      "zh": "Russia Shell Fallback 351"
-    },
-    "RU_ARCTIC_FB_352": {
-      "en": "Russia Shell Fallback 352",
-      "zh": "Russia Shell Fallback 352"
-    },
-    "RU_ARCTIC_FB_353": {
-      "en": "Russia Shell Fallback 353",
-      "zh": "Russia Shell Fallback 353"
-    },
-    "RU_ARCTIC_FB_354": {
-      "en": "Russia Shell Fallback 354",
-      "zh": "Russia Shell Fallback 354"
-    },
-    "RU_ARCTIC_FB_355": {
-      "en": "Russia Shell Fallback 355",
-      "zh": "Russia Shell Fallback 355"
-    },
-    "RU_ARCTIC_FB_356": {
-      "en": "Russia Shell Fallback 356",
-      "zh": "Russia Shell Fallback 356"
-    },
-    "RU_ARCTIC_FB_357": {
-      "en": "Russia Shell Fallback 357",
-      "zh": "Russia Shell Fallback 357"
-    },
-    "RU_ARCTIC_FB_358": {
-      "en": "Russia Shell Fallback 358",
-      "zh": "Russia Shell Fallback 358"
-    },
-    "RU_ARCTIC_FB_359": {
-      "en": "Russia Shell Fallback 359",
-      "zh": "Russia Shell Fallback 359"
-    },
-    "RU_ARCTIC_FB_360": {
-      "en": "Russia Shell Fallback 360",
-      "zh": "Russia Shell Fallback 360"
-    },
-    "RU_ARCTIC_FB_361": {
-      "en": "Russia Shell Fallback 361",
-      "zh": "Russia Shell Fallback 361"
-    },
-    "RU_ARCTIC_FB_362": {
-      "en": "Russia Shell Fallback 362",
-      "zh": "Russia Shell Fallback 362"
-    },
-    "RU_ARCTIC_FB_363": {
-      "en": "Russia Shell Fallback 363",
-      "zh": "Russia Shell Fallback 363"
-    },
-    "RU_ARCTIC_FB_364": {
-      "en": "Russia Shell Fallback 364",
-      "zh": "Russia Shell Fallback 364"
-    },
-    "RU_ARCTIC_FB_365": {
-      "en": "Russia Shell Fallback 365",
-      "zh": "Russia Shell Fallback 365"
-    },
-    "RU_ARCTIC_FB_366": {
-      "en": "Russia Shell Fallback 366",
-      "zh": "Russia Shell Fallback 366"
-    },
-    "RU_ARCTIC_FB_367": {
-      "en": "Russia Shell Fallback 367",
-      "zh": "Russia Shell Fallback 367"
-    },
-    "RU_ARCTIC_FB_368": {
-      "en": "Russia Shell Fallback 368",
-      "zh": "Russia Shell Fallback 368"
-    },
-    "RU_ARCTIC_FB_369": {
-      "en": "Russia Shell Fallback 369",
-      "zh": "Russia Shell Fallback 369"
-    },
-    "RU_ARCTIC_FB_370": {
-      "en": "Russia Shell Fallback 370",
-      "zh": "Russia Shell Fallback 370"
-    },
-    "RU_ARCTIC_FB_371": {
-      "en": "Russia Shell Fallback 371",
-      "zh": "Russia Shell Fallback 371"
-    },
-    "RU_ARCTIC_FB_372": {
-      "en": "Russia Shell Fallback 372",
-      "zh": "Russia Shell Fallback 372"
-    },
-    "RU_ARCTIC_FB_373": {
-      "en": "Russia Shell Fallback 373",
-      "zh": "Russia Shell Fallback 373"
-    },
-    "RU_ARCTIC_FB_374": {
-      "en": "Russia Shell Fallback 374",
-      "zh": "Russia Shell Fallback 374"
-    },
-    "RU_ARCTIC_FB_375": {
-      "en": "Russia Shell Fallback 375",
-      "zh": "Russia Shell Fallback 375"
-    },
-    "RU_ARCTIC_FB_376": {
-      "en": "Russia Shell Fallback 376",
-      "zh": "Russia Shell Fallback 376"
-    },
-    "RU_ARCTIC_FB_377": {
-      "en": "Russia Shell Fallback 377",
-      "zh": "Russia Shell Fallback 377"
-    },
-    "RU_ARCTIC_FB_378": {
-      "en": "Russia Shell Fallback 378",
-      "zh": "Russia Shell Fallback 378"
-    },
-    "RU_ARCTIC_FB_379": {
-      "en": "Russia Shell Fallback 379",
-      "zh": "Russia Shell Fallback 379"
-    },
-    "RU_ARCTIC_FB_380": {
-      "en": "Russia Shell Fallback 380",
-      "zh": "Russia Shell Fallback 380"
-    },
-    "RU_ARCTIC_FB_381": {
-      "en": "Russia Shell Fallback 381",
-      "zh": "Russia Shell Fallback 381"
-    },
-    "RU_ARCTIC_FB_382": {
-      "en": "Russia Shell Fallback 382",
-      "zh": "Russia Shell Fallback 382"
-    },
-    "RU_ARCTIC_FB_383": {
-      "en": "Russia Shell Fallback 383",
-      "zh": "Russia Shell Fallback 383"
-    },
-    "RU_ARCTIC_FB_384": {
-      "en": "Russia Shell Fallback 384",
-      "zh": "Russia Shell Fallback 384"
-    },
-    "RU_ARCTIC_FB_385": {
-      "en": "Russia Shell Fallback 385",
-      "zh": "Russia Shell Fallback 385"
-    },
-    "RU_ARCTIC_FB_386": {
-      "en": "Russia Shell Fallback 386",
-      "zh": "Russia Shell Fallback 386"
-    },
-    "RU_ARCTIC_FB_387": {
-      "en": "Russia Shell Fallback 387",
-      "zh": "Russia Shell Fallback 387"
-    },
-    "RU_ARCTIC_FB_388": {
-      "en": "Russia Shell Fallback 388",
-      "zh": "Russia Shell Fallback 388"
-    },
-    "RU_ARCTIC_FB_389": {
-      "en": "Russia Shell Fallback 389",
-      "zh": "Russia Shell Fallback 389"
-    },
-    "RU_ARCTIC_FB_390": {
-      "en": "Russia Shell Fallback 390",
-      "zh": "Russia Shell Fallback 390"
-    },
-    "RU_ARCTIC_FB_391": {
-      "en": "Russia Shell Fallback 391",
-      "zh": "Russia Shell Fallback 391"
-    },
-    "RU_ARCTIC_FB_392": {
-      "en": "Russia Shell Fallback 392",
-      "zh": "Russia Shell Fallback 392"
-    },
-    "RU_ARCTIC_FB_393": {
-      "en": "Russia Shell Fallback 393",
-      "zh": "Russia Shell Fallback 393"
-    },
-    "RU_ARCTIC_FB_394": {
-      "en": "Russia Shell Fallback 394",
-      "zh": "Russia Shell Fallback 394"
-    },
-    "RU_ARCTIC_FB_395": {
-      "en": "Russia Shell Fallback 395",
-      "zh": "Russia Shell Fallback 395"
-    },
-    "RU_ARCTIC_FB_396": {
-      "en": "Russia Shell Fallback 396",
-      "zh": "Russia Shell Fallback 396"
-    },
-    "RU_ARCTIC_FB_397": {
-      "en": "Russia Shell Fallback 397",
-      "zh": "Russia Shell Fallback 397"
     },
     "US_ZN_02_005": {
       "en": "Aleutians West Census Area",
@@ -45343,6 +43619,50 @@
       "en": "Laramie County",
       "zh": "Laramie County"
     },
+    "GR_ADM1_GRC-2883": {
+      "en": "Ionian Islands",
+      "zh": "爱奥尼亚群岛"
+    },
+    "GR_ADM1_GRC-2884": {
+      "en": "Attica",
+      "zh": "阿提卡"
+    },
+    "GR_ADM1_GRC-2885": {
+      "en": "Peloponnese",
+      "zh": "伯罗奔尼撒半岛"
+    },
+    "GR_ADM1_GRC-2886": {
+      "en": "West Greece",
+      "zh": "西希腊"
+    },
+    "GR_ADM1_GRC-2892": {
+      "en": "West Macedonia",
+      "zh": "西马其顿"
+    },
+    "GR_ADM1_GRC-2900": {
+      "en": "Thessalia",
+      "zh": "色萨利"
+    },
+    "GR_ADM1_GRC-2949": {
+      "en": "Epirus",
+      "zh": "伊庇鲁斯"
+    },
+    "GR_ADM1_GRC-2989": {
+      "en": "Central Greece",
+      "zh": "中部希腊"
+    },
+    "GR_ADM1_GRC-2991": {
+      "en": "Centre Macedonia",
+      "zh": "中马其顿"
+    },
+    "GR_ADM1_GRC-2992": {
+      "en": "Mount Athos",
+      "zh": "阿索斯山"
+    },
+    "GR_ADM1_GRC-3001": {
+      "en": "East Macedonia and Thrace",
+      "zh": "东马其顿和色雷斯"
+    },
     "CD_ADM1_COD-1461__tno1962_1": {
       "en": "Équateur",
       "zh": "赤道线"
@@ -45466,12 +43786,1604 @@
     "CG_ADM1_COG-3341__tno1962_2": {
       "en": "Pool",
       "zh": "水池"
+    },
+    "AQ": {
+      "en": "Antarctica",
+      "zh": "南极洲"
+    },
+    "RU_ARCTIC_FB_001": {
+      "en": "Russia Shell Fallback 1",
+      "zh": "俄罗斯北极后备 1"
+    },
+    "RU_ARCTIC_FB_002": {
+      "en": "Russia Shell Fallback 2",
+      "zh": "俄罗斯北极后备2"
+    },
+    "RU_ARCTIC_FB_003": {
+      "en": "Russia Shell Fallback 3",
+      "zh": "俄罗斯北极后备3"
+    },
+    "RU_ARCTIC_FB_004": {
+      "en": "Russia Shell Fallback 4",
+      "zh": "俄罗斯北极后备4"
+    },
+    "RU_ARCTIC_FB_005": {
+      "en": "Russia Shell Fallback 5",
+      "zh": "俄罗斯北极后备 5"
+    },
+    "RU_ARCTIC_FB_006": {
+      "en": "Russia Shell Fallback 6",
+      "zh": "俄罗斯北极后备 6"
+    },
+    "RU_ARCTIC_FB_007": {
+      "en": "Russia Shell Fallback 7",
+      "zh": "俄罗斯北极后备 7"
+    },
+    "RU_ARCTIC_FB_008": {
+      "en": "Russia Shell Fallback 8",
+      "zh": "俄罗斯北极后备 8"
+    },
+    "RU_ARCTIC_FB_009": {
+      "en": "Russia Shell Fallback 9",
+      "zh": "俄罗斯北极后备 9"
+    },
+    "RU_ARCTIC_FB_010": {
+      "en": "Russia Shell Fallback 10",
+      "zh": "俄罗斯北极后备 10"
+    },
+    "RU_ARCTIC_FB_011": {
+      "en": "Russia Shell Fallback 11",
+      "zh": "俄罗斯北极后备 11"
+    },
+    "RU_ARCTIC_FB_012": {
+      "en": "Russia Shell Fallback 12",
+      "zh": "俄罗斯北极后备 12"
+    },
+    "RU_ARCTIC_FB_013": {
+      "en": "Russia Shell Fallback 13",
+      "zh": "俄罗斯北极后备 13"
+    },
+    "RU_ARCTIC_FB_014": {
+      "en": "Russia Shell Fallback 14",
+      "zh": "俄罗斯北极后备 14"
+    },
+    "RU_ARCTIC_FB_015": {
+      "en": "Russia Shell Fallback 15",
+      "zh": "俄罗斯北极后备 15"
+    },
+    "RU_ARCTIC_FB_016": {
+      "en": "Russia Shell Fallback 16",
+      "zh": "俄罗斯北极后备 16"
+    },
+    "RU_ARCTIC_FB_017": {
+      "en": "Russia Shell Fallback 17",
+      "zh": "俄罗斯北极后备 17"
+    },
+    "RU_ARCTIC_FB_018": {
+      "en": "Russia Shell Fallback 18",
+      "zh": "俄罗斯北极后备 18"
+    },
+    "RU_ARCTIC_FB_019": {
+      "en": "Russia Shell Fallback 19",
+      "zh": "俄罗斯北极后备 19"
+    },
+    "RU_ARCTIC_FB_020": {
+      "en": "Russia Shell Fallback 20",
+      "zh": "俄罗斯北极后备 20"
+    },
+    "RU_ARCTIC_FB_021": {
+      "en": "Russia Shell Fallback 21",
+      "zh": "俄罗斯北极后备 21"
+    },
+    "RU_ARCTIC_FB_022": {
+      "en": "Russia Shell Fallback 22",
+      "zh": "俄罗斯北极后备 22"
+    },
+    "RU_ARCTIC_FB_023": {
+      "en": "Russia Shell Fallback 23",
+      "zh": "俄罗斯北极后备 23"
+    },
+    "RU_ARCTIC_FB_024": {
+      "en": "Russia Shell Fallback 24",
+      "zh": "俄罗斯北极后备 24"
+    },
+    "RU_ARCTIC_FB_025": {
+      "en": "Russia Shell Fallback 25",
+      "zh": "俄罗斯北极后备 25"
+    },
+    "RU_ARCTIC_FB_026": {
+      "en": "Russia Shell Fallback 26",
+      "zh": "俄罗斯北极后备 26"
+    },
+    "RU_ARCTIC_FB_027": {
+      "en": "Russia Shell Fallback 27",
+      "zh": "俄罗斯北极后备 27"
+    },
+    "RU_ARCTIC_FB_028": {
+      "en": "Russia Shell Fallback 28",
+      "zh": "俄罗斯北极后备 28"
+    },
+    "RU_ARCTIC_FB_029": {
+      "en": "Russia Shell Fallback 29",
+      "zh": "俄罗斯北极后备 29"
+    },
+    "RU_ARCTIC_FB_030": {
+      "en": "Russia Shell Fallback 30",
+      "zh": "俄罗斯北极后备 30"
+    },
+    "RU_ARCTIC_FB_031": {
+      "en": "Russia Shell Fallback 31",
+      "zh": "俄罗斯北极后备 31"
+    },
+    "RU_ARCTIC_FB_032": {
+      "en": "Russia Shell Fallback 32",
+      "zh": "俄罗斯北极后备 32"
+    },
+    "RU_ARCTIC_FB_033": {
+      "en": "Russia Shell Fallback 33",
+      "zh": "俄罗斯北极后备 33"
+    },
+    "RU_ARCTIC_FB_034": {
+      "en": "Russia Shell Fallback 34",
+      "zh": "俄罗斯北极后备 34"
+    },
+    "RU_ARCTIC_FB_035": {
+      "en": "Russia Shell Fallback 35",
+      "zh": "俄罗斯北极后备 35"
+    },
+    "RU_ARCTIC_FB_036": {
+      "en": "Russia Shell Fallback 36",
+      "zh": "俄罗斯北极后备 36"
+    },
+    "RU_ARCTIC_FB_037": {
+      "en": "Russia Shell Fallback 37",
+      "zh": "俄罗斯北极后备 37"
+    },
+    "RU_ARCTIC_FB_038": {
+      "en": "Russia Shell Fallback 38",
+      "zh": "俄罗斯北极后备 38"
+    },
+    "RU_ARCTIC_FB_039": {
+      "en": "Russia Shell Fallback 39",
+      "zh": "俄罗斯北极后备 39"
+    },
+    "RU_ARCTIC_FB_040": {
+      "en": "Russia Shell Fallback 40",
+      "zh": "俄罗斯北极后备 40"
+    },
+    "RU_ARCTIC_FB_041": {
+      "en": "Russia Shell Fallback 41",
+      "zh": "俄罗斯北极后备 41"
+    },
+    "RU_ARCTIC_FB_042": {
+      "en": "Russia Shell Fallback 42",
+      "zh": "俄罗斯北极后备 42"
+    },
+    "RU_ARCTIC_FB_043": {
+      "en": "Russia Shell Fallback 43",
+      "zh": "俄罗斯北极后备 43"
+    },
+    "RU_ARCTIC_FB_044": {
+      "en": "Russia Shell Fallback 44",
+      "zh": "俄罗斯北极后备 44"
+    },
+    "RU_ARCTIC_FB_045": {
+      "en": "Russia Shell Fallback 45",
+      "zh": "俄罗斯北极后备 45"
+    },
+    "RU_ARCTIC_FB_046": {
+      "en": "Russia Shell Fallback 46",
+      "zh": "俄罗斯北极后备 46"
+    },
+    "RU_ARCTIC_FB_047": {
+      "en": "Russia Shell Fallback 47",
+      "zh": "俄罗斯北极后备 47"
+    },
+    "RU_ARCTIC_FB_048": {
+      "en": "Russia Shell Fallback 48",
+      "zh": "俄罗斯北极后备 48"
+    },
+    "RU_ARCTIC_FB_049": {
+      "en": "Russia Shell Fallback 49",
+      "zh": "俄罗斯北极后备 49"
+    },
+    "RU_ARCTIC_FB_050": {
+      "en": "Russia Shell Fallback 50",
+      "zh": "俄罗斯北极后备 50"
+    },
+    "RU_ARCTIC_FB_051": {
+      "en": "Russia Shell Fallback 51",
+      "zh": "俄罗斯北极后备 51"
+    },
+    "RU_ARCTIC_FB_052": {
+      "en": "Russia Shell Fallback 52",
+      "zh": "俄罗斯北极后备 52"
+    },
+    "RU_ARCTIC_FB_053": {
+      "en": "Russia Shell Fallback 53",
+      "zh": "俄罗斯北极后备 53"
+    },
+    "RU_ARCTIC_FB_054": {
+      "en": "Russia Shell Fallback 54",
+      "zh": "俄罗斯北极后备 54"
+    },
+    "RU_ARCTIC_FB_055": {
+      "en": "Russia Shell Fallback 55",
+      "zh": "俄罗斯北极后备 55"
+    },
+    "RU_ARCTIC_FB_056": {
+      "en": "Russia Shell Fallback 56",
+      "zh": "俄罗斯北极后备 56"
+    },
+    "RU_ARCTIC_FB_057": {
+      "en": "Russia Shell Fallback 57",
+      "zh": "俄罗斯北极后备 57"
+    },
+    "RU_ARCTIC_FB_058": {
+      "en": "Russia Shell Fallback 58",
+      "zh": "俄罗斯北极后备 58"
+    },
+    "RU_ARCTIC_FB_059": {
+      "en": "Russia Shell Fallback 59",
+      "zh": "俄罗斯北极后备 59"
+    },
+    "RU_ARCTIC_FB_060": {
+      "en": "Russia Shell Fallback 60",
+      "zh": "俄罗斯北极后备 60"
+    },
+    "RU_ARCTIC_FB_061": {
+      "en": "Russia Shell Fallback 61",
+      "zh": "俄罗斯北极后备 61"
+    },
+    "RU_ARCTIC_FB_062": {
+      "en": "Russia Shell Fallback 62",
+      "zh": "俄罗斯北极后备 62"
+    },
+    "RU_ARCTIC_FB_063": {
+      "en": "Russia Shell Fallback 63",
+      "zh": "俄罗斯北极后备 63"
+    },
+    "RU_ARCTIC_FB_064": {
+      "en": "Russia Shell Fallback 64",
+      "zh": "俄罗斯北极后备 64"
+    },
+    "RU_ARCTIC_FB_065": {
+      "en": "Russia Shell Fallback 65",
+      "zh": "俄罗斯北极后备 65"
+    },
+    "RU_ARCTIC_FB_066": {
+      "en": "Russia Shell Fallback 66",
+      "zh": "俄罗斯北极后备 66"
+    },
+    "RU_ARCTIC_FB_067": {
+      "en": "Russia Shell Fallback 67",
+      "zh": "俄罗斯北极后备 67"
+    },
+    "RU_ARCTIC_FB_068": {
+      "en": "Russia Shell Fallback 68",
+      "zh": "俄罗斯北极后备 68"
+    },
+    "RU_ARCTIC_FB_069": {
+      "en": "Russia Shell Fallback 69",
+      "zh": "俄罗斯北极后备 69"
+    },
+    "RU_ARCTIC_FB_070": {
+      "en": "Russia Shell Fallback 70",
+      "zh": "俄罗斯北极后备 70"
+    },
+    "RU_ARCTIC_FB_071": {
+      "en": "Russia Shell Fallback 71",
+      "zh": "俄罗斯北极后备 71"
+    },
+    "RU_ARCTIC_FB_072": {
+      "en": "Russia Shell Fallback 72",
+      "zh": "俄罗斯北极后备72"
+    },
+    "RU_ARCTIC_FB_073": {
+      "en": "Russia Shell Fallback 73",
+      "zh": "俄罗斯北极后备 73"
+    },
+    "RU_ARCTIC_FB_074": {
+      "en": "Russia Shell Fallback 74",
+      "zh": "俄罗斯北极后备 74"
+    },
+    "RU_ARCTIC_FB_075": {
+      "en": "Russia Shell Fallback 75",
+      "zh": "俄罗斯北极后备75"
+    },
+    "RU_ARCTIC_FB_076": {
+      "en": "Russia Shell Fallback 76",
+      "zh": "俄罗斯北极后备76"
+    },
+    "RU_ARCTIC_FB_077": {
+      "en": "Russia Shell Fallback 77",
+      "zh": "俄罗斯北极后备77"
+    },
+    "RU_ARCTIC_FB_078": {
+      "en": "Russia Shell Fallback 78",
+      "zh": "俄罗斯北极后备78"
+    },
+    "RU_ARCTIC_FB_079": {
+      "en": "Russia Shell Fallback 79",
+      "zh": "俄罗斯北极后备79"
+    },
+    "RU_ARCTIC_FB_080": {
+      "en": "Russia Shell Fallback 80",
+      "zh": "俄罗斯北极后备 80"
+    },
+    "RU_ARCTIC_FB_081": {
+      "en": "Russia Shell Fallback 81",
+      "zh": "俄罗斯北极后备 81"
+    },
+    "RU_ARCTIC_FB_082": {
+      "en": "Russia Shell Fallback 82",
+      "zh": "俄罗斯北极后备 82"
+    },
+    "RU_ARCTIC_FB_083": {
+      "en": "Russia Shell Fallback 83",
+      "zh": "俄罗斯北极后备 83"
+    },
+    "RU_ARCTIC_FB_084": {
+      "en": "Russia Shell Fallback 84",
+      "zh": "俄罗斯北极后备 84"
+    },
+    "RU_ARCTIC_FB_085": {
+      "en": "Russia Shell Fallback 85",
+      "zh": "俄罗斯北极后备 85"
+    },
+    "RU_ARCTIC_FB_086": {
+      "en": "Russia Shell Fallback 86",
+      "zh": "俄罗斯北极后备86"
+    },
+    "RU_ARCTIC_FB_087": {
+      "en": "Russia Shell Fallback 87",
+      "zh": "俄罗斯北极后备 87"
+    },
+    "RU_ARCTIC_FB_088": {
+      "en": "Russia Shell Fallback 88",
+      "zh": "俄罗斯北极后备88"
+    },
+    "RU_ARCTIC_FB_089": {
+      "en": "Russia Shell Fallback 89",
+      "zh": "俄罗斯北极后备89"
+    },
+    "RU_ARCTIC_FB_090": {
+      "en": "Russia Shell Fallback 90",
+      "zh": "俄罗斯北极后备 90"
+    },
+    "RU_ARCTIC_FB_091": {
+      "en": "Russia Shell Fallback 91",
+      "zh": "俄罗斯北极后备 91"
+    },
+    "RU_ARCTIC_FB_092": {
+      "en": "Russia Shell Fallback 92",
+      "zh": "俄罗斯北极后备 92"
+    },
+    "RU_ARCTIC_FB_093": {
+      "en": "Russia Shell Fallback 93",
+      "zh": "俄罗斯北极后备 93"
+    },
+    "RU_ARCTIC_FB_094": {
+      "en": "Russia Shell Fallback 94",
+      "zh": "俄罗斯北极后备 94"
+    },
+    "RU_ARCTIC_FB_095": {
+      "en": "Russia Shell Fallback 95",
+      "zh": "俄罗斯北极后备 95"
+    },
+    "RU_ARCTIC_FB_096": {
+      "en": "Russia Shell Fallback 96",
+      "zh": "俄罗斯北极后备 96"
+    },
+    "RU_ARCTIC_FB_097": {
+      "en": "Russia Shell Fallback 97",
+      "zh": "俄罗斯北极后备 97"
+    },
+    "RU_ARCTIC_FB_098": {
+      "en": "Russia Shell Fallback 98",
+      "zh": "俄罗斯北极后备 98"
+    },
+    "RU_ARCTIC_FB_099": {
+      "en": "Russia Shell Fallback 99",
+      "zh": "俄罗斯北极后备99"
+    },
+    "RU_ARCTIC_FB_100": {
+      "en": "Russia Shell Fallback 100",
+      "zh": "俄罗斯北极后备 100"
+    },
+    "RU_ARCTIC_FB_101": {
+      "en": "Russia Shell Fallback 101",
+      "zh": "俄罗斯北极后备101"
+    },
+    "RU_ARCTIC_FB_102": {
+      "en": "Russia Shell Fallback 102",
+      "zh": "俄罗斯北极后备102"
+    },
+    "RU_ARCTIC_FB_103": {
+      "en": "Russia Shell Fallback 103",
+      "zh": "俄罗斯北极后备103"
+    },
+    "RU_ARCTIC_FB_104": {
+      "en": "Russia Shell Fallback 104",
+      "zh": "俄罗斯北极后备104"
+    },
+    "RU_ARCTIC_FB_105": {
+      "en": "Russia Shell Fallback 105",
+      "zh": "俄罗斯北极后备105"
+    },
+    "RU_ARCTIC_FB_106": {
+      "en": "Russia Shell Fallback 106",
+      "zh": "俄罗斯北极后备106"
+    },
+    "RU_ARCTIC_FB_107": {
+      "en": "Russia Shell Fallback 107",
+      "zh": "俄罗斯北极后备107"
+    },
+    "RU_ARCTIC_FB_108": {
+      "en": "Russia Shell Fallback 108",
+      "zh": "俄罗斯北极后备108"
+    },
+    "RU_ARCTIC_FB_109": {
+      "en": "Russia Shell Fallback 109",
+      "zh": "俄罗斯北极后备109"
+    },
+    "RU_ARCTIC_FB_110": {
+      "en": "Russia Shell Fallback 110",
+      "zh": "俄罗斯北极后备110"
+    },
+    "RU_ARCTIC_FB_111": {
+      "en": "Russia Shell Fallback 111",
+      "zh": "俄罗斯北极后备111"
+    },
+    "RU_ARCTIC_FB_112": {
+      "en": "Russia Shell Fallback 112",
+      "zh": "俄罗斯北极后备112"
+    },
+    "RU_ARCTIC_FB_113": {
+      "en": "Russia Shell Fallback 113",
+      "zh": "俄罗斯北极后备 113"
+    },
+    "RU_ARCTIC_FB_114": {
+      "en": "Russia Shell Fallback 114",
+      "zh": "俄罗斯北极后备114"
+    },
+    "RU_ARCTIC_FB_115": {
+      "en": "Russia Shell Fallback 115",
+      "zh": "俄罗斯北极后备115"
+    },
+    "RU_ARCTIC_FB_116": {
+      "en": "Russia Shell Fallback 116",
+      "zh": "俄罗斯北极后备116"
+    },
+    "RU_ARCTIC_FB_117": {
+      "en": "Russia Shell Fallback 117",
+      "zh": "俄罗斯北极后备 117"
+    },
+    "RU_ARCTIC_FB_118": {
+      "en": "Russia Shell Fallback 118",
+      "zh": "俄罗斯北极后备 118"
+    },
+    "RU_ARCTIC_FB_119": {
+      "en": "Russia Shell Fallback 119",
+      "zh": "俄罗斯北极后备119"
+    },
+    "RU_ARCTIC_FB_120": {
+      "en": "Russia Shell Fallback 120",
+      "zh": "俄罗斯北极后备 120"
+    },
+    "RU_ARCTIC_FB_121": {
+      "en": "Russia Shell Fallback 121",
+      "zh": "俄罗斯北极后备121"
+    },
+    "RU_ARCTIC_FB_122": {
+      "en": "Russia Shell Fallback 122",
+      "zh": "俄罗斯北极后备 122"
+    },
+    "RU_ARCTIC_FB_123": {
+      "en": "Russia Shell Fallback 123",
+      "zh": "俄罗斯北极后备 123"
+    },
+    "RU_ARCTIC_FB_124": {
+      "en": "Russia Shell Fallback 124",
+      "zh": "俄罗斯北极后备 124"
+    },
+    "RU_ARCTIC_FB_125": {
+      "en": "Russia Shell Fallback 125",
+      "zh": "俄罗斯北极后备 125"
+    },
+    "RU_ARCTIC_FB_126": {
+      "en": "Russia Shell Fallback 126",
+      "zh": "俄罗斯北极后备 126"
+    },
+    "RU_ARCTIC_FB_127": {
+      "en": "Russia Shell Fallback 127",
+      "zh": "俄罗斯北极后备 127"
+    },
+    "RU_ARCTIC_FB_128": {
+      "en": "Russia Shell Fallback 128",
+      "zh": "俄罗斯北极后备 128"
+    },
+    "RU_ARCTIC_FB_129": {
+      "en": "Russia Shell Fallback 129",
+      "zh": "俄罗斯北极后备 129"
+    },
+    "RU_ARCTIC_FB_130": {
+      "en": "Russia Shell Fallback 130",
+      "zh": "俄罗斯北极后备 130"
+    },
+    "RU_ARCTIC_FB_131": {
+      "en": "Russia Shell Fallback 131",
+      "zh": "俄罗斯北极后备 131"
+    },
+    "RU_ARCTIC_FB_132": {
+      "en": "Russia Shell Fallback 132",
+      "zh": "俄罗斯北极后备 132"
+    },
+    "RU_ARCTIC_FB_133": {
+      "en": "Russia Shell Fallback 133",
+      "zh": "俄罗斯北极后备 133"
+    },
+    "RU_ARCTIC_FB_134": {
+      "en": "Russia Shell Fallback 134",
+      "zh": "俄罗斯北极后备 134"
+    },
+    "RU_ARCTIC_FB_135": {
+      "en": "Russia Shell Fallback 135",
+      "zh": "俄罗斯北极后备 135"
+    },
+    "RU_ARCTIC_FB_136": {
+      "en": "Russia Shell Fallback 136",
+      "zh": "俄罗斯北极后备 136"
+    },
+    "RU_ARCTIC_FB_137": {
+      "en": "Russia Shell Fallback 137",
+      "zh": "俄罗斯北极后备 137"
+    },
+    "RU_ARCTIC_FB_138": {
+      "en": "Russia Shell Fallback 138",
+      "zh": "俄罗斯北极后备 138"
+    },
+    "RU_ARCTIC_FB_139": {
+      "en": "Russia Shell Fallback 139",
+      "zh": "俄罗斯北极后备 139"
+    },
+    "RU_ARCTIC_FB_140": {
+      "en": "Russia Shell Fallback 140",
+      "zh": "俄罗斯北极后备 140"
+    },
+    "RU_ARCTIC_FB_141": {
+      "en": "Russia Shell Fallback 141",
+      "zh": "俄罗斯北极后备 141"
+    },
+    "RU_ARCTIC_FB_142": {
+      "en": "Russia Shell Fallback 142",
+      "zh": "俄罗斯北极后备 142"
+    },
+    "RU_ARCTIC_FB_143": {
+      "en": "Russia Shell Fallback 143",
+      "zh": "俄罗斯北极后备 143"
+    },
+    "RU_ARCTIC_FB_144": {
+      "en": "Russia Shell Fallback 144",
+      "zh": "俄罗斯北极后备 144"
+    },
+    "RU_ARCTIC_FB_145": {
+      "en": "Russia Shell Fallback 145",
+      "zh": "俄罗斯北极后备 145"
+    },
+    "RU_ARCTIC_FB_146": {
+      "en": "Russia Shell Fallback 146",
+      "zh": "俄罗斯北极后备 146"
+    },
+    "RU_ARCTIC_FB_147": {
+      "en": "Russia Shell Fallback 147",
+      "zh": "俄罗斯北极后备 147"
+    },
+    "RU_ARCTIC_FB_148": {
+      "en": "Russia Shell Fallback 148",
+      "zh": "俄罗斯壳牌后备 148"
+    },
+    "RU_ARCTIC_FB_149": {
+      "en": "Russia Shell Fallback 149",
+      "zh": "俄罗斯壳牌后备 149"
+    },
+    "RU_ARCTIC_FB_150": {
+      "en": "Russia Shell Fallback 150",
+      "zh": "俄罗斯壳牌后备 150"
+    },
+    "RU_ARCTIC_FB_151": {
+      "en": "Russia Shell Fallback 151",
+      "zh": "俄罗斯壳牌后备 151"
+    },
+    "RU_ARCTIC_FB_152": {
+      "en": "Russia Shell Fallback 152",
+      "zh": "俄罗斯壳牌后备 152"
+    },
+    "RU_ARCTIC_FB_153": {
+      "en": "Russia Shell Fallback 153",
+      "zh": "俄罗斯壳牌后备 153"
+    },
+    "RU_ARCTIC_FB_154": {
+      "en": "Russia Shell Fallback 154",
+      "zh": "俄罗斯壳牌后备 154"
+    },
+    "RU_ARCTIC_FB_155": {
+      "en": "Russia Shell Fallback 155",
+      "zh": "俄罗斯壳牌后备 155"
+    },
+    "RU_ARCTIC_FB_156": {
+      "en": "Russia Shell Fallback 156",
+      "zh": "俄罗斯壳牌后备 156"
+    },
+    "RU_ARCTIC_FB_157": {
+      "en": "Russia Shell Fallback 157",
+      "zh": "俄罗斯壳牌后备 157"
+    },
+    "RU_ARCTIC_FB_158": {
+      "en": "Russia Shell Fallback 158",
+      "zh": "俄罗斯壳牌后备 158"
+    },
+    "RU_ARCTIC_FB_159": {
+      "en": "Russia Shell Fallback 159",
+      "zh": "俄罗斯壳牌后备 159"
+    },
+    "RU_ARCTIC_FB_160": {
+      "en": "Russia Shell Fallback 160",
+      "zh": "俄罗斯壳牌 Fallback 160"
+    },
+    "RU_ARCTIC_FB_161": {
+      "en": "Russia Shell Fallback 161",
+      "zh": "俄罗斯壳牌后备 161"
+    },
+    "RU_ARCTIC_FB_162": {
+      "en": "Russia Shell Fallback 162",
+      "zh": "俄罗斯壳牌后备 162"
+    },
+    "RU_ARCTIC_FB_163": {
+      "en": "Russia Shell Fallback 163",
+      "zh": "俄罗斯壳牌后备 163"
+    },
+    "RU_ARCTIC_FB_164": {
+      "en": "Russia Shell Fallback 164",
+      "zh": "俄罗斯壳牌后备 164"
+    },
+    "RU_ARCTIC_FB_165": {
+      "en": "Russia Shell Fallback 165",
+      "zh": "俄罗斯壳牌后备 165"
+    },
+    "RU_ARCTIC_FB_166": {
+      "en": "Russia Shell Fallback 166",
+      "zh": "俄罗斯壳牌后备 166"
+    },
+    "RU_ARCTIC_FB_167": {
+      "en": "Russia Shell Fallback 167",
+      "zh": "俄罗斯壳牌后备 167"
+    },
+    "RU_ARCTIC_FB_168": {
+      "en": "Russia Shell Fallback 168",
+      "zh": "俄罗斯壳牌后备 168"
+    },
+    "RU_ARCTIC_FB_169": {
+      "en": "Russia Shell Fallback 169",
+      "zh": "俄罗斯壳牌后备 169"
+    },
+    "RU_ARCTIC_FB_170": {
+      "en": "Russia Shell Fallback 170",
+      "zh": "俄罗斯壳牌后备 170"
+    },
+    "RU_ARCTIC_FB_171": {
+      "en": "Russia Shell Fallback 171",
+      "zh": "俄罗斯壳牌后备 171"
+    },
+    "RU_ARCTIC_FB_172": {
+      "en": "Russia Shell Fallback 172",
+      "zh": "俄罗斯壳牌后备 172"
+    },
+    "RU_ARCTIC_FB_173": {
+      "en": "Russia Shell Fallback 173",
+      "zh": "俄罗斯壳牌后备 173"
+    },
+    "RU_ARCTIC_FB_174": {
+      "en": "Russia Shell Fallback 174",
+      "zh": "俄罗斯壳牌后备 174"
+    },
+    "RU_ARCTIC_FB_175": {
+      "en": "Russia Shell Fallback 175",
+      "zh": "俄罗斯壳牌后备 175"
+    },
+    "RU_ARCTIC_FB_176": {
+      "en": "Russia Shell Fallback 176",
+      "zh": "俄罗斯壳牌后备 176"
+    },
+    "RU_ARCTIC_FB_177": {
+      "en": "Russia Shell Fallback 177",
+      "zh": "俄罗斯壳牌后备 177"
+    },
+    "RU_ARCTIC_FB_178": {
+      "en": "Russia Shell Fallback 178",
+      "zh": "俄罗斯壳牌后备 178"
+    },
+    "RU_ARCTIC_FB_179": {
+      "en": "Russia Shell Fallback 179",
+      "zh": "俄罗斯壳牌后备 179"
+    },
+    "RU_ARCTIC_FB_180": {
+      "en": "Russia Shell Fallback 180",
+      "zh": "俄罗斯壳牌 Fallback 180"
+    },
+    "RU_ARCTIC_FB_181": {
+      "en": "Russia Shell Fallback 181",
+      "zh": "俄罗斯壳牌后备 181"
+    },
+    "RU_ARCTIC_FB_182": {
+      "en": "Russia Shell Fallback 182",
+      "zh": "俄罗斯壳牌后备 182"
+    },
+    "RU_ARCTIC_FB_183": {
+      "en": "Russia Shell Fallback 183",
+      "zh": "俄罗斯壳牌后备 183"
+    },
+    "RU_ARCTIC_FB_184": {
+      "en": "Russia Shell Fallback 184",
+      "zh": "俄罗斯壳牌后备 184"
+    },
+    "RU_ARCTIC_FB_185": {
+      "en": "Russia Shell Fallback 185",
+      "zh": "俄罗斯壳牌后备 185"
+    },
+    "RU_ARCTIC_FB_186": {
+      "en": "Russia Shell Fallback 186",
+      "zh": "俄罗斯壳牌后备 186"
+    },
+    "RU_ARCTIC_FB_187": {
+      "en": "Russia Shell Fallback 187",
+      "zh": "俄罗斯壳牌后备 187"
+    },
+    "RU_ARCTIC_FB_188": {
+      "en": "Russia Shell Fallback 188",
+      "zh": "俄罗斯壳牌后备 188"
+    },
+    "RU_ARCTIC_FB_189": {
+      "en": "Russia Shell Fallback 189",
+      "zh": "俄罗斯壳牌后备 189"
+    },
+    "RU_ARCTIC_FB_190": {
+      "en": "Russia Shell Fallback 190",
+      "zh": "俄罗斯壳牌后备 190"
+    },
+    "RU_ARCTIC_FB_191": {
+      "en": "Russia Shell Fallback 191",
+      "zh": "俄罗斯壳牌后备 191"
+    },
+    "RU_ARCTIC_FB_192": {
+      "en": "Russia Shell Fallback 192",
+      "zh": "俄罗斯壳牌后备 192"
+    },
+    "RU_ARCTIC_FB_193": {
+      "en": "Russia Shell Fallback 193",
+      "zh": "俄罗斯壳牌后备 193"
+    },
+    "RU_ARCTIC_FB_194": {
+      "en": "Russia Shell Fallback 194",
+      "zh": "俄罗斯壳牌后备 194"
+    },
+    "RU_ARCTIC_FB_195": {
+      "en": "Russia Shell Fallback 195",
+      "zh": "俄罗斯壳牌后备 195"
+    },
+    "RU_ARCTIC_FB_196": {
+      "en": "Russia Shell Fallback 196",
+      "zh": "俄罗斯壳牌后备 196"
+    },
+    "RU_ARCTIC_FB_197": {
+      "en": "Russia Shell Fallback 197",
+      "zh": "俄罗斯壳牌后备 197"
+    },
+    "RU_ARCTIC_FB_198": {
+      "en": "Russia Shell Fallback 198",
+      "zh": "俄罗斯壳牌后备 198"
+    },
+    "RU_ARCTIC_FB_199": {
+      "en": "Russia Shell Fallback 199",
+      "zh": "俄罗斯壳牌后备 199"
+    },
+    "RU_ARCTIC_FB_200": {
+      "en": "Russia Shell Fallback 200",
+      "zh": "俄罗斯壳牌 Fallback 200"
+    },
+    "RU_ARCTIC_FB_201": {
+      "en": "Russia Shell Fallback 201",
+      "zh": "俄罗斯壳牌后备 201"
+    },
+    "RU_ARCTIC_FB_202": {
+      "en": "Russia Shell Fallback 202",
+      "zh": "俄罗斯壳牌后备 202"
+    },
+    "RU_ARCTIC_FB_203": {
+      "en": "Russia Shell Fallback 203",
+      "zh": "俄罗斯壳牌后备 203"
+    },
+    "RU_ARCTIC_FB_204": {
+      "en": "Russia Shell Fallback 204",
+      "zh": "俄罗斯壳牌后备 204"
+    },
+    "RU_ARCTIC_FB_205": {
+      "en": "Russia Shell Fallback 205",
+      "zh": "俄罗斯壳牌后备 205"
+    },
+    "RU_ARCTIC_FB_206": {
+      "en": "Russia Shell Fallback 206",
+      "zh": "俄罗斯壳牌后备 206"
+    },
+    "RU_ARCTIC_FB_207": {
+      "en": "Russia Shell Fallback 207",
+      "zh": "俄罗斯壳牌后备 207"
+    },
+    "RU_ARCTIC_FB_208": {
+      "en": "Russia Shell Fallback 208",
+      "zh": "俄罗斯壳牌后备 208"
+    },
+    "RU_ARCTIC_FB_209": {
+      "en": "Russia Shell Fallback 209",
+      "zh": "俄罗斯壳牌后备 209"
+    },
+    "RU_ARCTIC_FB_210": {
+      "en": "Russia Shell Fallback 210",
+      "zh": "俄罗斯壳牌 Fallback 210"
+    },
+    "RU_ARCTIC_FB_211": {
+      "en": "Russia Shell Fallback 211",
+      "zh": "俄罗斯壳牌后备 211"
+    },
+    "RU_ARCTIC_FB_212": {
+      "en": "Russia Shell Fallback 212",
+      "zh": "俄罗斯壳牌后备 212"
+    },
+    "RU_ARCTIC_FB_213": {
+      "en": "Russia Shell Fallback 213",
+      "zh": "俄罗斯壳牌后备 213"
+    },
+    "RU_ARCTIC_FB_214": {
+      "en": "Russia Shell Fallback 214",
+      "zh": "俄罗斯壳牌后备 214"
+    },
+    "RU_ARCTIC_FB_215": {
+      "en": "Russia Shell Fallback 215",
+      "zh": "俄罗斯壳牌后备 215"
+    },
+    "RU_ARCTIC_FB_216": {
+      "en": "Russia Shell Fallback 216",
+      "zh": "俄罗斯壳牌后备 216"
+    },
+    "RU_ARCTIC_FB_217": {
+      "en": "Russia Shell Fallback 217",
+      "zh": "俄罗斯壳牌后备 217"
+    },
+    "RU_ARCTIC_FB_218": {
+      "en": "Russia Shell Fallback 218",
+      "zh": "俄罗斯壳牌后备 218"
+    },
+    "RU_ARCTIC_FB_219": {
+      "en": "Russia Shell Fallback 219",
+      "zh": "俄罗斯壳牌后备 219"
+    },
+    "RU_ARCTIC_FB_220": {
+      "en": "Russia Shell Fallback 220",
+      "zh": "俄罗斯壳牌 Fallback 220"
+    },
+    "RU_ARCTIC_FB_221": {
+      "en": "Russia Shell Fallback 221",
+      "zh": "俄罗斯壳牌后备 221"
+    },
+    "RU_ARCTIC_FB_222": {
+      "en": "Russia Shell Fallback 222",
+      "zh": "俄罗斯壳牌后备 222"
+    },
+    "RU_ARCTIC_FB_223": {
+      "en": "Russia Shell Fallback 223",
+      "zh": "俄罗斯壳牌后备 223"
+    },
+    "RU_ARCTIC_FB_224": {
+      "en": "Russia Shell Fallback 224",
+      "zh": "俄罗斯壳牌后备 224"
+    },
+    "RU_ARCTIC_FB_225": {
+      "en": "Russia Shell Fallback 225",
+      "zh": "俄罗斯壳牌后备 225"
+    },
+    "RU_ARCTIC_FB_226": {
+      "en": "Russia Shell Fallback 226",
+      "zh": "俄罗斯壳牌后备 226"
+    },
+    "RU_ARCTIC_FB_227": {
+      "en": "Russia Shell Fallback 227",
+      "zh": "俄罗斯壳牌后备 227"
+    },
+    "RU_ARCTIC_FB_228": {
+      "en": "Russia Shell Fallback 228",
+      "zh": "俄罗斯壳牌后备 228"
+    },
+    "RU_ARCTIC_FB_229": {
+      "en": "Russia Shell Fallback 229",
+      "zh": "俄罗斯壳牌后备 229"
+    },
+    "RU_ARCTIC_FB_230": {
+      "en": "Russia Shell Fallback 230",
+      "zh": "俄罗斯壳牌后备 230"
+    },
+    "RU_ARCTIC_FB_231": {
+      "en": "Russia Shell Fallback 231",
+      "zh": "俄罗斯壳牌后备 231"
+    },
+    "RU_ARCTIC_FB_232": {
+      "en": "Russia Shell Fallback 232",
+      "zh": "俄罗斯壳牌后备 232"
+    },
+    "RU_ARCTIC_FB_233": {
+      "en": "Russia Shell Fallback 233",
+      "zh": "俄罗斯壳牌后备 233"
+    },
+    "RU_ARCTIC_FB_234": {
+      "en": "Russia Shell Fallback 234",
+      "zh": "俄罗斯壳牌后备 234"
+    },
+    "RU_ARCTIC_FB_235": {
+      "en": "Russia Shell Fallback 235",
+      "zh": "俄罗斯壳牌后备 235"
+    },
+    "RU_ARCTIC_FB_236": {
+      "en": "Russia Shell Fallback 236",
+      "zh": "俄罗斯壳牌后备 236"
+    },
+    "RU_ARCTIC_FB_237": {
+      "en": "Russia Shell Fallback 237",
+      "zh": "俄罗斯壳牌后备 237"
+    },
+    "RU_ARCTIC_FB_238": {
+      "en": "Russia Shell Fallback 238",
+      "zh": "俄罗斯壳牌后备 238"
+    },
+    "RU_ARCTIC_FB_239": {
+      "en": "Russia Shell Fallback 239",
+      "zh": "俄罗斯壳牌后备 239"
+    },
+    "RU_ARCTIC_FB_240": {
+      "en": "Russia Shell Fallback 240",
+      "zh": "俄罗斯壳牌后备 240"
+    },
+    "RU_ARCTIC_FB_241": {
+      "en": "Russia Shell Fallback 241",
+      "zh": "俄罗斯壳牌后备 241"
+    },
+    "RU_ARCTIC_FB_242": {
+      "en": "Russia Shell Fallback 242",
+      "zh": "俄罗斯壳牌后备 242"
+    },
+    "RU_ARCTIC_FB_243": {
+      "en": "Russia Shell Fallback 243",
+      "zh": "俄罗斯壳牌后备 243"
+    },
+    "RU_ARCTIC_FB_244": {
+      "en": "Russia Shell Fallback 244",
+      "zh": "俄罗斯壳牌后备 244"
+    },
+    "RU_ARCTIC_FB_245": {
+      "en": "Russia Shell Fallback 245",
+      "zh": "俄罗斯壳牌后备 245"
+    },
+    "RU_ARCTIC_FB_246": {
+      "en": "Russia Shell Fallback 246",
+      "zh": "俄罗斯壳牌后备 246"
+    },
+    "RU_ARCTIC_FB_247": {
+      "en": "Russia Shell Fallback 247",
+      "zh": "俄罗斯壳牌后备 247"
+    },
+    "RU_ARCTIC_FB_248": {
+      "en": "Russia Shell Fallback 248",
+      "zh": "俄罗斯壳牌后备 248"
+    },
+    "RU_ARCTIC_FB_249": {
+      "en": "Russia Shell Fallback 249",
+      "zh": "俄罗斯壳牌后备 249"
+    },
+    "RU_ARCTIC_FB_250": {
+      "en": "Russia Shell Fallback 250",
+      "zh": "俄罗斯壳牌 Fallback 250"
+    },
+    "RU_ARCTIC_FB_251": {
+      "en": "Russia Shell Fallback 251",
+      "zh": "俄罗斯壳牌后备 251"
+    },
+    "RU_ARCTIC_FB_252": {
+      "en": "Russia Shell Fallback 252",
+      "zh": "俄罗斯壳牌后备 252"
+    },
+    "RU_ARCTIC_FB_253": {
+      "en": "Russia Shell Fallback 253",
+      "zh": "俄罗斯壳牌后备 253"
+    },
+    "RU_ARCTIC_FB_254": {
+      "en": "Russia Shell Fallback 254",
+      "zh": "俄罗斯壳牌后备 254"
+    },
+    "RU_ARCTIC_FB_255": {
+      "en": "Russia Shell Fallback 255",
+      "zh": "俄罗斯壳牌后备 255"
+    },
+    "RU_ARCTIC_FB_256": {
+      "en": "Russia Shell Fallback 256",
+      "zh": "俄罗斯壳牌后备 256"
+    },
+    "RU_ARCTIC_FB_257": {
+      "en": "Russia Shell Fallback 257",
+      "zh": "俄罗斯壳牌后备 257"
+    },
+    "RU_ARCTIC_FB_258": {
+      "en": "Russia Shell Fallback 258",
+      "zh": "俄罗斯壳牌后备 258"
+    },
+    "RU_ARCTIC_FB_259": {
+      "en": "Russia Shell Fallback 259",
+      "zh": "俄罗斯壳牌后备 259"
+    },
+    "RU_ARCTIC_FB_260": {
+      "en": "Russia Shell Fallback 260",
+      "zh": "俄罗斯壳牌 Fallback 260"
+    },
+    "RU_ARCTIC_FB_261": {
+      "en": "Russia Shell Fallback 261",
+      "zh": "俄罗斯壳牌后备 261"
+    },
+    "RU_ARCTIC_FB_262": {
+      "en": "Russia Shell Fallback 262",
+      "zh": "俄罗斯壳牌后备 262"
+    },
+    "RU_ARCTIC_FB_263": {
+      "en": "Russia Shell Fallback 263",
+      "zh": "俄罗斯壳牌后备 263"
+    },
+    "RU_ARCTIC_FB_264": {
+      "en": "Russia Shell Fallback 264",
+      "zh": "俄罗斯壳牌后备 264"
+    },
+    "RU_ARCTIC_FB_265": {
+      "en": "Russia Shell Fallback 265",
+      "zh": "俄罗斯壳牌后备 265"
+    },
+    "RU_ARCTIC_FB_266": {
+      "en": "Russia Shell Fallback 266",
+      "zh": "俄罗斯壳牌后备 266"
+    },
+    "RU_ARCTIC_FB_267": {
+      "en": "Russia Shell Fallback 267",
+      "zh": "俄罗斯壳牌后备 267"
+    },
+    "RU_ARCTIC_FB_268": {
+      "en": "Russia Shell Fallback 268",
+      "zh": "Russia Shell Fallback 268"
+    },
+    "RU_ARCTIC_FB_269": {
+      "en": "Russia Shell Fallback 269",
+      "zh": "Russia Shell Fallback 269"
+    },
+    "RU_ARCTIC_FB_270": {
+      "en": "Russia Shell Fallback 270",
+      "zh": "Russia Shell Fallback 270"
+    },
+    "RU_ARCTIC_FB_271": {
+      "en": "Russia Shell Fallback 271",
+      "zh": "Russia Shell Fallback 271"
+    },
+    "RU_ARCTIC_FB_272": {
+      "en": "Russia Shell Fallback 272",
+      "zh": "Russia Shell Fallback 272"
+    },
+    "RU_ARCTIC_FB_273": {
+      "en": "Russia Shell Fallback 273",
+      "zh": "Russia Shell Fallback 273"
+    },
+    "RU_ARCTIC_FB_274": {
+      "en": "Russia Shell Fallback 274",
+      "zh": "Russia Shell Fallback 274"
+    },
+    "RU_ARCTIC_FB_275": {
+      "en": "Russia Shell Fallback 275",
+      "zh": "Russia Shell Fallback 275"
+    },
+    "RU_ARCTIC_FB_276": {
+      "en": "Russia Shell Fallback 276",
+      "zh": "Russia Shell Fallback 276"
+    },
+    "RU_ARCTIC_FB_277": {
+      "en": "Russia Shell Fallback 277",
+      "zh": "Russia Shell Fallback 277"
+    },
+    "RU_ARCTIC_FB_278": {
+      "en": "Russia Shell Fallback 278",
+      "zh": "Russia Shell Fallback 278"
+    },
+    "RU_ARCTIC_FB_279": {
+      "en": "Russia Shell Fallback 279",
+      "zh": "Russia Shell Fallback 279"
+    },
+    "RU_ARCTIC_FB_280": {
+      "en": "Russia Shell Fallback 280",
+      "zh": "Russia Shell Fallback 280"
+    },
+    "RU_ARCTIC_FB_281": {
+      "en": "Russia Shell Fallback 281",
+      "zh": "Russia Shell Fallback 281"
+    },
+    "RU_ARCTIC_FB_282": {
+      "en": "Russia Shell Fallback 282",
+      "zh": "Russia Shell Fallback 282"
+    },
+    "RU_ARCTIC_FB_283": {
+      "en": "Russia Shell Fallback 283",
+      "zh": "Russia Shell Fallback 283"
+    },
+    "RU_ARCTIC_FB_284": {
+      "en": "Russia Shell Fallback 284",
+      "zh": "Russia Shell Fallback 284"
+    },
+    "RU_ARCTIC_FB_285": {
+      "en": "Russia Shell Fallback 285",
+      "zh": "Russia Shell Fallback 285"
+    },
+    "RU_ARCTIC_FB_286": {
+      "en": "Russia Shell Fallback 286",
+      "zh": "Russia Shell Fallback 286"
+    },
+    "RU_ARCTIC_FB_287": {
+      "en": "Russia Shell Fallback 287",
+      "zh": "Russia Shell Fallback 287"
+    },
+    "RU_ARCTIC_FB_288": {
+      "en": "Russia Shell Fallback 288",
+      "zh": "Russia Shell Fallback 288"
+    },
+    "RU_ARCTIC_FB_289": {
+      "en": "Russia Shell Fallback 289",
+      "zh": "Russia Shell Fallback 289"
+    },
+    "RU_ARCTIC_FB_290": {
+      "en": "Russia Shell Fallback 290",
+      "zh": "Russia Shell Fallback 290"
+    },
+    "RU_ARCTIC_FB_291": {
+      "en": "Russia Shell Fallback 291",
+      "zh": "Russia Shell Fallback 291"
+    },
+    "RU_ARCTIC_FB_292": {
+      "en": "Russia Shell Fallback 292",
+      "zh": "Russia Shell Fallback 292"
+    },
+    "RU_ARCTIC_FB_293": {
+      "en": "Russia Shell Fallback 293",
+      "zh": "Russia Shell Fallback 293"
+    },
+    "RU_ARCTIC_FB_294": {
+      "en": "Russia Shell Fallback 294",
+      "zh": "Russia Shell Fallback 294"
+    },
+    "RU_ARCTIC_FB_295": {
+      "en": "Russia Shell Fallback 295",
+      "zh": "Russia Shell Fallback 295"
+    },
+    "RU_ARCTIC_FB_296": {
+      "en": "Russia Shell Fallback 296",
+      "zh": "Russia Shell Fallback 296"
+    },
+    "RU_ARCTIC_FB_297": {
+      "en": "Russia Shell Fallback 297",
+      "zh": "Russia Shell Fallback 297"
+    },
+    "RU_ARCTIC_FB_298": {
+      "en": "Russia Shell Fallback 298",
+      "zh": "Russia Shell Fallback 298"
+    },
+    "RU_ARCTIC_FB_299": {
+      "en": "Russia Shell Fallback 299",
+      "zh": "Russia Shell Fallback 299"
+    },
+    "RU_ARCTIC_FB_300": {
+      "en": "Russia Shell Fallback 300",
+      "zh": "Russia Shell Fallback 300"
+    },
+    "RU_ARCTIC_FB_301": {
+      "en": "Russia Shell Fallback 301",
+      "zh": "Russia Shell Fallback 301"
+    },
+    "RU_ARCTIC_FB_302": {
+      "en": "Russia Shell Fallback 302",
+      "zh": "Russia Shell Fallback 302"
+    },
+    "RU_ARCTIC_FB_303": {
+      "en": "Russia Shell Fallback 303",
+      "zh": "Russia Shell Fallback 303"
+    },
+    "RU_ARCTIC_FB_304": {
+      "en": "Russia Shell Fallback 304",
+      "zh": "Russia Shell Fallback 304"
+    },
+    "RU_ARCTIC_FB_305": {
+      "en": "Russia Shell Fallback 305",
+      "zh": "Russia Shell Fallback 305"
+    },
+    "RU_ARCTIC_FB_306": {
+      "en": "Russia Shell Fallback 306",
+      "zh": "Russia Shell Fallback 306"
+    },
+    "RU_ARCTIC_FB_307": {
+      "en": "Russia Shell Fallback 307",
+      "zh": "Russia Shell Fallback 307"
+    },
+    "RU_ARCTIC_FB_308": {
+      "en": "Russia Shell Fallback 308",
+      "zh": "Russia Shell Fallback 308"
+    },
+    "RU_ARCTIC_FB_309": {
+      "en": "Russia Shell Fallback 309",
+      "zh": "Russia Shell Fallback 309"
+    },
+    "RU_ARCTIC_FB_310": {
+      "en": "Russia Shell Fallback 310",
+      "zh": "Russia Shell Fallback 310"
+    },
+    "RU_ARCTIC_FB_311": {
+      "en": "Russia Shell Fallback 311",
+      "zh": "Russia Shell Fallback 311"
+    },
+    "RU_ARCTIC_FB_312": {
+      "en": "Russia Shell Fallback 312",
+      "zh": "Russia Shell Fallback 312"
+    },
+    "RU_ARCTIC_FB_313": {
+      "en": "Russia Shell Fallback 313",
+      "zh": "Russia Shell Fallback 313"
+    },
+    "RU_ARCTIC_FB_314": {
+      "en": "Russia Shell Fallback 314",
+      "zh": "Russia Shell Fallback 314"
+    },
+    "RU_ARCTIC_FB_315": {
+      "en": "Russia Shell Fallback 315",
+      "zh": "Russia Shell Fallback 315"
+    },
+    "RU_ARCTIC_FB_316": {
+      "en": "Russia Shell Fallback 316",
+      "zh": "Russia Shell Fallback 316"
+    },
+    "RU_ARCTIC_FB_317": {
+      "en": "Russia Shell Fallback 317",
+      "zh": "Russia Shell Fallback 317"
+    },
+    "RU_ARCTIC_FB_318": {
+      "en": "Russia Shell Fallback 318",
+      "zh": "Russia Shell Fallback 318"
+    },
+    "RU_ARCTIC_FB_319": {
+      "en": "Russia Shell Fallback 319",
+      "zh": "Russia Shell Fallback 319"
+    },
+    "RU_ARCTIC_FB_320": {
+      "en": "Russia Shell Fallback 320",
+      "zh": "Russia Shell Fallback 320"
+    },
+    "RU_ARCTIC_FB_321": {
+      "en": "Russia Shell Fallback 321",
+      "zh": "Russia Shell Fallback 321"
+    },
+    "RU_ARCTIC_FB_322": {
+      "en": "Russia Shell Fallback 322",
+      "zh": "Russia Shell Fallback 322"
+    },
+    "RU_ARCTIC_FB_323": {
+      "en": "Russia Shell Fallback 323",
+      "zh": "Russia Shell Fallback 323"
+    },
+    "RU_ARCTIC_FB_324": {
+      "en": "Russia Shell Fallback 324",
+      "zh": "Russia Shell Fallback 324"
+    },
+    "RU_ARCTIC_FB_325": {
+      "en": "Russia Shell Fallback 325",
+      "zh": "Russia Shell Fallback 325"
+    },
+    "RU_ARCTIC_FB_326": {
+      "en": "Russia Shell Fallback 326",
+      "zh": "Russia Shell Fallback 326"
+    },
+    "RU_ARCTIC_FB_327": {
+      "en": "Russia Shell Fallback 327",
+      "zh": "Russia Shell Fallback 327"
+    },
+    "RU_ARCTIC_FB_328": {
+      "en": "Russia Shell Fallback 328",
+      "zh": "Russia Shell Fallback 328"
+    },
+    "RU_ARCTIC_FB_329": {
+      "en": "Russia Shell Fallback 329",
+      "zh": "Russia Shell Fallback 329"
+    },
+    "RU_ARCTIC_FB_330": {
+      "en": "Russia Shell Fallback 330",
+      "zh": "Russia Shell Fallback 330"
+    },
+    "RU_ARCTIC_FB_331": {
+      "en": "Russia Shell Fallback 331",
+      "zh": "Russia Shell Fallback 331"
+    },
+    "RU_ARCTIC_FB_332": {
+      "en": "Russia Shell Fallback 332",
+      "zh": "Russia Shell Fallback 332"
+    },
+    "RU_ARCTIC_FB_333": {
+      "en": "Russia Shell Fallback 333",
+      "zh": "Russia Shell Fallback 333"
+    },
+    "RU_ARCTIC_FB_334": {
+      "en": "Russia Shell Fallback 334",
+      "zh": "Russia Shell Fallback 334"
+    },
+    "RU_ARCTIC_FB_335": {
+      "en": "Russia Shell Fallback 335",
+      "zh": "Russia Shell Fallback 335"
+    },
+    "RU_ARCTIC_FB_336": {
+      "en": "Russia Shell Fallback 336",
+      "zh": "Russia Shell Fallback 336"
+    },
+    "RU_ARCTIC_FB_337": {
+      "en": "Russia Shell Fallback 337",
+      "zh": "Russia Shell Fallback 337"
+    },
+    "RU_ARCTIC_FB_338": {
+      "en": "Russia Shell Fallback 338",
+      "zh": "Russia Shell Fallback 338"
+    },
+    "RU_ARCTIC_FB_339": {
+      "en": "Russia Shell Fallback 339",
+      "zh": "Russia Shell Fallback 339"
+    },
+    "RU_ARCTIC_FB_340": {
+      "en": "Russia Shell Fallback 340",
+      "zh": "Russia Shell Fallback 340"
+    },
+    "RU_ARCTIC_FB_341": {
+      "en": "Russia Shell Fallback 341",
+      "zh": "Russia Shell Fallback 341"
+    },
+    "RU_ARCTIC_FB_342": {
+      "en": "Russia Shell Fallback 342",
+      "zh": "Russia Shell Fallback 342"
+    },
+    "RU_ARCTIC_FB_343": {
+      "en": "Russia Shell Fallback 343",
+      "zh": "Russia Shell Fallback 343"
+    },
+    "RU_ARCTIC_FB_344": {
+      "en": "Russia Shell Fallback 344",
+      "zh": "Russia Shell Fallback 344"
+    },
+    "RU_ARCTIC_FB_345": {
+      "en": "Russia Shell Fallback 345",
+      "zh": "Russia Shell Fallback 345"
+    },
+    "RU_ARCTIC_FB_346": {
+      "en": "Russia Shell Fallback 346",
+      "zh": "Russia Shell Fallback 346"
+    },
+    "RU_ARCTIC_FB_347": {
+      "en": "Russia Shell Fallback 347",
+      "zh": "Russia Shell Fallback 347"
+    },
+    "RU_ARCTIC_FB_348": {
+      "en": "Russia Shell Fallback 348",
+      "zh": "Russia Shell Fallback 348"
+    },
+    "RU_ARCTIC_FB_349": {
+      "en": "Russia Shell Fallback 349",
+      "zh": "Russia Shell Fallback 349"
+    },
+    "RU_ARCTIC_FB_350": {
+      "en": "Russia Shell Fallback 350",
+      "zh": "Russia Shell Fallback 350"
+    },
+    "RU_ARCTIC_FB_351": {
+      "en": "Russia Shell Fallback 351",
+      "zh": "Russia Shell Fallback 351"
+    },
+    "RU_ARCTIC_FB_352": {
+      "en": "Russia Shell Fallback 352",
+      "zh": "Russia Shell Fallback 352"
+    },
+    "RU_ARCTIC_FB_353": {
+      "en": "Russia Shell Fallback 353",
+      "zh": "Russia Shell Fallback 353"
+    },
+    "RU_ARCTIC_FB_354": {
+      "en": "Russia Shell Fallback 354",
+      "zh": "Russia Shell Fallback 354"
+    },
+    "RU_ARCTIC_FB_355": {
+      "en": "Russia Shell Fallback 355",
+      "zh": "Russia Shell Fallback 355"
+    },
+    "RU_ARCTIC_FB_356": {
+      "en": "Russia Shell Fallback 356",
+      "zh": "Russia Shell Fallback 356"
+    },
+    "RU_ARCTIC_FB_357": {
+      "en": "Russia Shell Fallback 357",
+      "zh": "Russia Shell Fallback 357"
+    },
+    "RU_ARCTIC_FB_358": {
+      "en": "Russia Shell Fallback 358",
+      "zh": "Russia Shell Fallback 358"
+    },
+    "RU_ARCTIC_FB_359": {
+      "en": "Russia Shell Fallback 359",
+      "zh": "Russia Shell Fallback 359"
+    },
+    "RU_ARCTIC_FB_360": {
+      "en": "Russia Shell Fallback 360",
+      "zh": "Russia Shell Fallback 360"
+    },
+    "RU_ARCTIC_FB_361": {
+      "en": "Russia Shell Fallback 361",
+      "zh": "Russia Shell Fallback 361"
+    },
+    "RU_ARCTIC_FB_362": {
+      "en": "Russia Shell Fallback 362",
+      "zh": "Russia Shell Fallback 362"
+    },
+    "RU_ARCTIC_FB_363": {
+      "en": "Russia Shell Fallback 363",
+      "zh": "Russia Shell Fallback 363"
+    },
+    "RU_ARCTIC_FB_364": {
+      "en": "Russia Shell Fallback 364",
+      "zh": "Russia Shell Fallback 364"
+    },
+    "RU_ARCTIC_FB_365": {
+      "en": "Russia Shell Fallback 365",
+      "zh": "Russia Shell Fallback 365"
+    },
+    "RU_ARCTIC_FB_366": {
+      "en": "Russia Shell Fallback 366",
+      "zh": "Russia Shell Fallback 366"
+    },
+    "RU_ARCTIC_FB_367": {
+      "en": "Russia Shell Fallback 367",
+      "zh": "Russia Shell Fallback 367"
+    },
+    "RU_ARCTIC_FB_368": {
+      "en": "Russia Shell Fallback 368",
+      "zh": "Russia Shell Fallback 368"
+    },
+    "RU_ARCTIC_FB_369": {
+      "en": "Russia Shell Fallback 369",
+      "zh": "Russia Shell Fallback 369"
+    },
+    "RU_ARCTIC_FB_370": {
+      "en": "Russia Shell Fallback 370",
+      "zh": "Russia Shell Fallback 370"
+    },
+    "RU_ARCTIC_FB_371": {
+      "en": "Russia Shell Fallback 371",
+      "zh": "Russia Shell Fallback 371"
+    },
+    "RU_ARCTIC_FB_372": {
+      "en": "Russia Shell Fallback 372",
+      "zh": "Russia Shell Fallback 372"
+    },
+    "RU_ARCTIC_FB_373": {
+      "en": "Russia Shell Fallback 373",
+      "zh": "Russia Shell Fallback 373"
+    },
+    "RU_ARCTIC_FB_374": {
+      "en": "Russia Shell Fallback 374",
+      "zh": "Russia Shell Fallback 374"
+    },
+    "RU_ARCTIC_FB_375": {
+      "en": "Russia Shell Fallback 375",
+      "zh": "Russia Shell Fallback 375"
+    },
+    "RU_ARCTIC_FB_376": {
+      "en": "Russia Shell Fallback 376",
+      "zh": "Russia Shell Fallback 376"
+    },
+    "RU_ARCTIC_FB_377": {
+      "en": "Russia Shell Fallback 377",
+      "zh": "Russia Shell Fallback 377"
+    },
+    "RU_ARCTIC_FB_378": {
+      "en": "Russia Shell Fallback 378",
+      "zh": "Russia Shell Fallback 378"
+    },
+    "RU_ARCTIC_FB_379": {
+      "en": "Russia Shell Fallback 379",
+      "zh": "Russia Shell Fallback 379"
+    },
+    "RU_ARCTIC_FB_380": {
+      "en": "Russia Shell Fallback 380",
+      "zh": "Russia Shell Fallback 380"
+    },
+    "RU_ARCTIC_FB_381": {
+      "en": "Russia Shell Fallback 381",
+      "zh": "Russia Shell Fallback 381"
+    },
+    "RU_ARCTIC_FB_382": {
+      "en": "Russia Shell Fallback 382",
+      "zh": "Russia Shell Fallback 382"
+    },
+    "RU_ARCTIC_FB_383": {
+      "en": "Russia Shell Fallback 383",
+      "zh": "Russia Shell Fallback 383"
+    },
+    "RU_ARCTIC_FB_384": {
+      "en": "Russia Shell Fallback 384",
+      "zh": "Russia Shell Fallback 384"
+    },
+    "RU_ARCTIC_FB_385": {
+      "en": "Russia Shell Fallback 385",
+      "zh": "Russia Shell Fallback 385"
+    },
+    "RU_ARCTIC_FB_386": {
+      "en": "Russia Shell Fallback 386",
+      "zh": "Russia Shell Fallback 386"
+    },
+    "RU_ARCTIC_FB_387": {
+      "en": "Russia Shell Fallback 387",
+      "zh": "Russia Shell Fallback 387"
+    },
+    "RU_ARCTIC_FB_388": {
+      "en": "Russia Shell Fallback 388",
+      "zh": "Russia Shell Fallback 388"
+    },
+    "RU_ARCTIC_FB_389": {
+      "en": "Russia Shell Fallback 389",
+      "zh": "Russia Shell Fallback 389"
+    },
+    "RU_ARCTIC_FB_390": {
+      "en": "Russia Shell Fallback 390",
+      "zh": "Russia Shell Fallback 390"
+    },
+    "RU_ARCTIC_FB_391": {
+      "en": "Russia Shell Fallback 391",
+      "zh": "Russia Shell Fallback 391"
+    },
+    "RU_ARCTIC_FB_392": {
+      "en": "Russia Shell Fallback 392",
+      "zh": "Russia Shell Fallback 392"
+    },
+    "RU_ARCTIC_FB_393": {
+      "en": "Russia Shell Fallback 393",
+      "zh": "Russia Shell Fallback 393"
+    },
+    "RU_ARCTIC_FB_394": {
+      "en": "Russia Shell Fallback 394",
+      "zh": "Russia Shell Fallback 394"
+    },
+    "RU_ARCTIC_FB_395": {
+      "en": "Russia Shell Fallback 395",
+      "zh": "Russia Shell Fallback 395"
+    },
+    "RU_ARCTIC_FB_396": {
+      "en": "Russia Shell Fallback 396",
+      "zh": "Russia Shell Fallback 396"
+    },
+    "RU_ARCTIC_FB_397": {
+      "en": "Russia Shell Fallback 397",
+      "zh": "Russia Shell Fallback 397"
     }
   },
   "audit": {
-    "safe_feature_copies": 11282,
+    "safe_feature_copies": 11260,
     "manual_feature_overrides": 84,
-    "unique_raw_name_safe_copy_count": 11251,
+    "unique_raw_name_safe_copy_count": 11229,
     "split_clone_safe_copy_count": 31,
     "collision_candidate_count": 937,
     "cross_base_collision_count": 936,
@@ -47894,142 +47806,6 @@
     ],
     "collision_candidates_sample": [
       {
-        "feature_id": "CG_ADM1_COG-3346__tno1962_1",
-        "owner_tag": "AEF",
-        "raw_name": "Plateaux",
-        "locale_en": "Plateaux",
-        "locale_zh": "高原",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "CG_ADM1_COG-3346__tno1962_1",
-          "CG_ADM1_COG-3346__tno1962_2",
-          "TG_ADM1_TGO-86"
-        ],
-        "matching_base_feature_ids": [
-          "CG_ADM1_COG-3346",
-          "TG_ADM1_TGO-86"
-        ]
-      },
-      {
-        "feature_id": "CG_ADM1_COG-3346__tno1962_2",
-        "owner_tag": "AEF",
-        "raw_name": "Plateaux",
-        "locale_en": "Plateaux",
-        "locale_zh": "高原",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "CG_ADM1_COG-3346__tno1962_1",
-          "CG_ADM1_COG-3346__tno1962_2",
-          "TG_ADM1_TGO-86"
-        ],
-        "matching_base_feature_ids": [
-          "CG_ADM1_COG-3346",
-          "TG_ADM1_TGO-86"
-        ]
-      },
-      {
-        "feature_id": "CM_ADM1_CMR-1476",
-        "owner_tag": "AEF",
-        "raw_name": "Littoral",
-        "locale_en": "Littoral",
-        "locale_zh": "滨海",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "BJ_ADM1_BEN-2175",
-          "CM_ADM1_CMR-1476"
-        ],
-        "matching_base_feature_ids": [
-          "BJ_ADM1_BEN-2175",
-          "CM_ADM1_CMR-1476"
-        ]
-      },
-      {
-        "feature_id": "CM_ADM1_CMR-1480",
-        "owner_tag": "AEF",
-        "raw_name": "Centre",
-        "locale_en": "Centre",
-        "locale_zh": "中心",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "BF_ADM1_92566538B14190085014946",
-          "CM_ADM1_CMR-1480",
-          "HT_ADM1_HTI-1385",
-          "TG_ADM1_TGO-89"
-        ],
-        "matching_base_feature_ids": [
-          "BF_ADM1_92566538B14190085014946",
-          "CM_ADM1_CMR-1480",
-          "HT_ADM1_HTI-1385",
-          "TG_ADM1_TGO-89"
-        ]
-      },
-      {
-        "feature_id": "CM_ADM1_CMR-1481",
-        "owner_tag": "AEF",
-        "raw_name": "East",
-        "locale_en": "East",
-        "locale_zh": "东方",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "CM_ADM1_CMR-1481",
-          "IN_ADM2_76128533B72485933575946"
-        ],
-        "matching_base_feature_ids": [
-          "CM_ADM1_CMR-1481",
-          "IN_ADM2_76128533B72485933575946"
-        ]
-      },
-      {
-        "feature_id": "CM_ADM1_CMR-1483",
-        "owner_tag": "AEF",
-        "raw_name": "North",
-        "locale_en": "North",
-        "locale_zh": "北",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "CM_ADM1_CMR-1483",
-          "IN_ADM2_76128533B45574198291616"
-        ],
-        "matching_base_feature_ids": [
-          "CM_ADM1_CMR-1483",
-          "IN_ADM2_76128533B45574198291616"
-        ]
-      },
-      {
-        "feature_id": "CM_ADM1_CMR-798",
-        "owner_tag": "AEF",
-        "raw_name": "West",
-        "locale_en": "West",
-        "locale_zh": "西方",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "CM_ADM1_CMR-798",
-          "IE042",
-          "IN_ADM2_76128533B68379889579232"
-        ],
-        "matching_base_feature_ids": [
-          "CM_ADM1_CMR-798",
-          "IE042",
-          "IN_ADM2_76128533B68379889579232"
-        ]
-      },
-      {
-        "feature_id": "CM_ADM1_CMR-803",
-        "owner_tag": "AEF",
-        "raw_name": "South",
-        "locale_en": "South",
-        "locale_zh": "南",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "CM_ADM1_CMR-803",
-          "IN_ADM2_76128533B97089774514948"
-        ],
-        "matching_base_feature_ids": [
-          "CM_ADM1_CMR-803",
-          "IN_ADM2_76128533B97089774514948"
-        ]
-      },
-      {
         "feature_id": "BF_ADM1_92566538B14190085014946",
         "owner_tag": "AFA",
         "raw_name": "Centre",
@@ -48233,6 +48009,22 @@
         "matching_base_feature_ids": [
           "AFG-1769",
           "AFG-1772"
+        ]
+      },
+      {
+        "feature_id": "DZA-2143",
+        "owner_tag": "ALC",
+        "raw_name": "Adrar",
+        "locale_en": "Adrar",
+        "locale_zh": "阿德拉尔",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "DZA-2143",
+          "MR_ADM1_MRT-2795"
+        ],
+        "matching_base_feature_ids": [
+          "DZA-2143",
+          "MR_ADM1_MRT-2795"
         ]
       },
       {
@@ -51004,6 +50796,142 @@
         "matching_base_feature_ids": [
           "IN_ADM2_76128533B66426066081507",
           "NPL-1134"
+        ]
+      },
+      {
+        "feature_id": "CG_ADM1_COG-3346__tno1962_1",
+        "owner_tag": "GCO",
+        "raw_name": "Plateaux",
+        "locale_en": "Plateaux",
+        "locale_zh": "高原",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "CG_ADM1_COG-3346__tno1962_1",
+          "CG_ADM1_COG-3346__tno1962_2",
+          "TG_ADM1_TGO-86"
+        ],
+        "matching_base_feature_ids": [
+          "CG_ADM1_COG-3346",
+          "TG_ADM1_TGO-86"
+        ]
+      },
+      {
+        "feature_id": "CG_ADM1_COG-3346__tno1962_2",
+        "owner_tag": "GCO",
+        "raw_name": "Plateaux",
+        "locale_en": "Plateaux",
+        "locale_zh": "高原",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "CG_ADM1_COG-3346__tno1962_1",
+          "CG_ADM1_COG-3346__tno1962_2",
+          "TG_ADM1_TGO-86"
+        ],
+        "matching_base_feature_ids": [
+          "CG_ADM1_COG-3346",
+          "TG_ADM1_TGO-86"
+        ]
+      },
+      {
+        "feature_id": "CM_ADM1_CMR-1476",
+        "owner_tag": "GCO",
+        "raw_name": "Littoral",
+        "locale_en": "Littoral",
+        "locale_zh": "滨海",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "BJ_ADM1_BEN-2175",
+          "CM_ADM1_CMR-1476"
+        ],
+        "matching_base_feature_ids": [
+          "BJ_ADM1_BEN-2175",
+          "CM_ADM1_CMR-1476"
+        ]
+      },
+      {
+        "feature_id": "CM_ADM1_CMR-1480",
+        "owner_tag": "GCO",
+        "raw_name": "Centre",
+        "locale_en": "Centre",
+        "locale_zh": "中心",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "BF_ADM1_92566538B14190085014946",
+          "CM_ADM1_CMR-1480",
+          "HT_ADM1_HTI-1385",
+          "TG_ADM1_TGO-89"
+        ],
+        "matching_base_feature_ids": [
+          "BF_ADM1_92566538B14190085014946",
+          "CM_ADM1_CMR-1480",
+          "HT_ADM1_HTI-1385",
+          "TG_ADM1_TGO-89"
+        ]
+      },
+      {
+        "feature_id": "CM_ADM1_CMR-1481",
+        "owner_tag": "GCO",
+        "raw_name": "East",
+        "locale_en": "East",
+        "locale_zh": "东方",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "CM_ADM1_CMR-1481",
+          "IN_ADM2_76128533B72485933575946"
+        ],
+        "matching_base_feature_ids": [
+          "CM_ADM1_CMR-1481",
+          "IN_ADM2_76128533B72485933575946"
+        ]
+      },
+      {
+        "feature_id": "CM_ADM1_CMR-1483",
+        "owner_tag": "GCO",
+        "raw_name": "North",
+        "locale_en": "North",
+        "locale_zh": "北",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "CM_ADM1_CMR-1483",
+          "IN_ADM2_76128533B45574198291616"
+        ],
+        "matching_base_feature_ids": [
+          "CM_ADM1_CMR-1483",
+          "IN_ADM2_76128533B45574198291616"
+        ]
+      },
+      {
+        "feature_id": "CM_ADM1_CMR-798",
+        "owner_tag": "GCO",
+        "raw_name": "West",
+        "locale_en": "West",
+        "locale_zh": "西方",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "CM_ADM1_CMR-798",
+          "IE042",
+          "IN_ADM2_76128533B68379889579232"
+        ],
+        "matching_base_feature_ids": [
+          "CM_ADM1_CMR-798",
+          "IE042",
+          "IN_ADM2_76128533B68379889579232"
+        ]
+      },
+      {
+        "feature_id": "CM_ADM1_CMR-803",
+        "owner_tag": "GCO",
+        "raw_name": "South",
+        "locale_en": "South",
+        "locale_zh": "南",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "CM_ADM1_CMR-803",
+          "IN_ADM2_76128533B97089774514948"
+        ],
+        "matching_base_feature_ids": [
+          "CM_ADM1_CMR-803",
+          "IN_ADM2_76128533B97089774514948"
         ]
       },
       {
@@ -51299,161 +51227,9 @@
           "RW_ADM1_RWA-3492",
           "ZM_ADM1_ZMB-523"
         ]
-      },
-      {
-        "feature_id": "PL_POW_0218",
-        "owner_tag": "GER",
-        "raw_name": "średzki",
-        "locale_en": "średzki",
-        "locale_zh": "斯列兹基",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "PL_POW_0218",
-          "PL_POW_3025"
-        ],
-        "matching_base_feature_ids": [
-          "PL_POW_0218",
-          "PL_POW_3025"
-        ]
       }
     ],
     "collision_candidates": [
-      {
-        "feature_id": "CG_ADM1_COG-3346__tno1962_1",
-        "owner_tag": "AEF",
-        "raw_name": "Plateaux",
-        "locale_en": "Plateaux",
-        "locale_zh": "高原",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "CG_ADM1_COG-3346__tno1962_1",
-          "CG_ADM1_COG-3346__tno1962_2",
-          "TG_ADM1_TGO-86"
-        ],
-        "matching_base_feature_ids": [
-          "CG_ADM1_COG-3346",
-          "TG_ADM1_TGO-86"
-        ]
-      },
-      {
-        "feature_id": "CG_ADM1_COG-3346__tno1962_2",
-        "owner_tag": "AEF",
-        "raw_name": "Plateaux",
-        "locale_en": "Plateaux",
-        "locale_zh": "高原",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "CG_ADM1_COG-3346__tno1962_1",
-          "CG_ADM1_COG-3346__tno1962_2",
-          "TG_ADM1_TGO-86"
-        ],
-        "matching_base_feature_ids": [
-          "CG_ADM1_COG-3346",
-          "TG_ADM1_TGO-86"
-        ]
-      },
-      {
-        "feature_id": "CM_ADM1_CMR-1476",
-        "owner_tag": "AEF",
-        "raw_name": "Littoral",
-        "locale_en": "Littoral",
-        "locale_zh": "滨海",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "BJ_ADM1_BEN-2175",
-          "CM_ADM1_CMR-1476"
-        ],
-        "matching_base_feature_ids": [
-          "BJ_ADM1_BEN-2175",
-          "CM_ADM1_CMR-1476"
-        ]
-      },
-      {
-        "feature_id": "CM_ADM1_CMR-1480",
-        "owner_tag": "AEF",
-        "raw_name": "Centre",
-        "locale_en": "Centre",
-        "locale_zh": "中心",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "BF_ADM1_92566538B14190085014946",
-          "CM_ADM1_CMR-1480",
-          "HT_ADM1_HTI-1385",
-          "TG_ADM1_TGO-89"
-        ],
-        "matching_base_feature_ids": [
-          "BF_ADM1_92566538B14190085014946",
-          "CM_ADM1_CMR-1480",
-          "HT_ADM1_HTI-1385",
-          "TG_ADM1_TGO-89"
-        ]
-      },
-      {
-        "feature_id": "CM_ADM1_CMR-1481",
-        "owner_tag": "AEF",
-        "raw_name": "East",
-        "locale_en": "East",
-        "locale_zh": "东方",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "CM_ADM1_CMR-1481",
-          "IN_ADM2_76128533B72485933575946"
-        ],
-        "matching_base_feature_ids": [
-          "CM_ADM1_CMR-1481",
-          "IN_ADM2_76128533B72485933575946"
-        ]
-      },
-      {
-        "feature_id": "CM_ADM1_CMR-1483",
-        "owner_tag": "AEF",
-        "raw_name": "North",
-        "locale_en": "North",
-        "locale_zh": "北",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "CM_ADM1_CMR-1483",
-          "IN_ADM2_76128533B45574198291616"
-        ],
-        "matching_base_feature_ids": [
-          "CM_ADM1_CMR-1483",
-          "IN_ADM2_76128533B45574198291616"
-        ]
-      },
-      {
-        "feature_id": "CM_ADM1_CMR-798",
-        "owner_tag": "AEF",
-        "raw_name": "West",
-        "locale_en": "West",
-        "locale_zh": "西方",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "CM_ADM1_CMR-798",
-          "IE042",
-          "IN_ADM2_76128533B68379889579232"
-        ],
-        "matching_base_feature_ids": [
-          "CM_ADM1_CMR-798",
-          "IE042",
-          "IN_ADM2_76128533B68379889579232"
-        ]
-      },
-      {
-        "feature_id": "CM_ADM1_CMR-803",
-        "owner_tag": "AEF",
-        "raw_name": "South",
-        "locale_en": "South",
-        "locale_zh": "南",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "CM_ADM1_CMR-803",
-          "IN_ADM2_76128533B97089774514948"
-        ],
-        "matching_base_feature_ids": [
-          "CM_ADM1_CMR-803",
-          "IN_ADM2_76128533B97089774514948"
-        ]
-      },
       {
         "feature_id": "BF_ADM1_92566538B14190085014946",
         "owner_tag": "AFA",
@@ -51658,6 +51434,22 @@
         "matching_base_feature_ids": [
           "AFG-1769",
           "AFG-1772"
+        ]
+      },
+      {
+        "feature_id": "DZA-2143",
+        "owner_tag": "ALC",
+        "raw_name": "Adrar",
+        "locale_en": "Adrar",
+        "locale_zh": "阿德拉尔",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "DZA-2143",
+          "MR_ADM1_MRT-2795"
+        ],
+        "matching_base_feature_ids": [
+          "DZA-2143",
+          "MR_ADM1_MRT-2795"
         ]
       },
       {
@@ -54429,6 +54221,142 @@
         "matching_base_feature_ids": [
           "IN_ADM2_76128533B66426066081507",
           "NPL-1134"
+        ]
+      },
+      {
+        "feature_id": "CG_ADM1_COG-3346__tno1962_1",
+        "owner_tag": "GCO",
+        "raw_name": "Plateaux",
+        "locale_en": "Plateaux",
+        "locale_zh": "高原",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "CG_ADM1_COG-3346__tno1962_1",
+          "CG_ADM1_COG-3346__tno1962_2",
+          "TG_ADM1_TGO-86"
+        ],
+        "matching_base_feature_ids": [
+          "CG_ADM1_COG-3346",
+          "TG_ADM1_TGO-86"
+        ]
+      },
+      {
+        "feature_id": "CG_ADM1_COG-3346__tno1962_2",
+        "owner_tag": "GCO",
+        "raw_name": "Plateaux",
+        "locale_en": "Plateaux",
+        "locale_zh": "高原",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "CG_ADM1_COG-3346__tno1962_1",
+          "CG_ADM1_COG-3346__tno1962_2",
+          "TG_ADM1_TGO-86"
+        ],
+        "matching_base_feature_ids": [
+          "CG_ADM1_COG-3346",
+          "TG_ADM1_TGO-86"
+        ]
+      },
+      {
+        "feature_id": "CM_ADM1_CMR-1476",
+        "owner_tag": "GCO",
+        "raw_name": "Littoral",
+        "locale_en": "Littoral",
+        "locale_zh": "滨海",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "BJ_ADM1_BEN-2175",
+          "CM_ADM1_CMR-1476"
+        ],
+        "matching_base_feature_ids": [
+          "BJ_ADM1_BEN-2175",
+          "CM_ADM1_CMR-1476"
+        ]
+      },
+      {
+        "feature_id": "CM_ADM1_CMR-1480",
+        "owner_tag": "GCO",
+        "raw_name": "Centre",
+        "locale_en": "Centre",
+        "locale_zh": "中心",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "BF_ADM1_92566538B14190085014946",
+          "CM_ADM1_CMR-1480",
+          "HT_ADM1_HTI-1385",
+          "TG_ADM1_TGO-89"
+        ],
+        "matching_base_feature_ids": [
+          "BF_ADM1_92566538B14190085014946",
+          "CM_ADM1_CMR-1480",
+          "HT_ADM1_HTI-1385",
+          "TG_ADM1_TGO-89"
+        ]
+      },
+      {
+        "feature_id": "CM_ADM1_CMR-1481",
+        "owner_tag": "GCO",
+        "raw_name": "East",
+        "locale_en": "East",
+        "locale_zh": "东方",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "CM_ADM1_CMR-1481",
+          "IN_ADM2_76128533B72485933575946"
+        ],
+        "matching_base_feature_ids": [
+          "CM_ADM1_CMR-1481",
+          "IN_ADM2_76128533B72485933575946"
+        ]
+      },
+      {
+        "feature_id": "CM_ADM1_CMR-1483",
+        "owner_tag": "GCO",
+        "raw_name": "North",
+        "locale_en": "North",
+        "locale_zh": "北",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "CM_ADM1_CMR-1483",
+          "IN_ADM2_76128533B45574198291616"
+        ],
+        "matching_base_feature_ids": [
+          "CM_ADM1_CMR-1483",
+          "IN_ADM2_76128533B45574198291616"
+        ]
+      },
+      {
+        "feature_id": "CM_ADM1_CMR-798",
+        "owner_tag": "GCO",
+        "raw_name": "West",
+        "locale_en": "West",
+        "locale_zh": "西方",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "CM_ADM1_CMR-798",
+          "IE042",
+          "IN_ADM2_76128533B68379889579232"
+        ],
+        "matching_base_feature_ids": [
+          "CM_ADM1_CMR-798",
+          "IE042",
+          "IN_ADM2_76128533B68379889579232"
+        ]
+      },
+      {
+        "feature_id": "CM_ADM1_CMR-803",
+        "owner_tag": "GCO",
+        "raw_name": "South",
+        "locale_en": "South",
+        "locale_zh": "南",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "CM_ADM1_CMR-803",
+          "IN_ADM2_76128533B97089774514948"
+        ],
+        "matching_base_feature_ids": [
+          "CM_ADM1_CMR-803",
+          "IN_ADM2_76128533B97089774514948"
         ]
       },
       {
@@ -55976,22 +55904,6 @@
         ]
       },
       {
-        "feature_id": "DZA-2143",
-        "owner_tag": "IAL",
-        "raw_name": "Adrar",
-        "locale_en": "Adrar",
-        "locale_zh": "阿德拉尔",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "DZA-2143",
-          "MR_ADM1_MRT-2795"
-        ],
-        "matching_base_feature_ids": [
-          "DZA-2143",
-          "MR_ADM1_MRT-2795"
-        ]
-      },
-      {
         "feature_id": "CV_ADM1_CPV-5046",
         "owner_tag": "IBR",
         "raw_name": "Santa Catarina",
@@ -57443,22 +57355,6 @@
         "matching_base_feature_ids": [
           "ME_ADM1_MNE-1515",
           "XK_ADM1_KOS-5908"
-        ]
-      },
-      {
-        "feature_id": "CN_CITY_17275852B66735617717919",
-        "owner_tag": "MON",
-        "raw_name": "Qinghexian",
-        "locale_en": "Qinghexian",
-        "locale_zh": "清河县",
-        "reason": "non_unique_raw_name",
-        "matching_feature_ids": [
-          "CN_CITY_17275852B66735617717919",
-          "CN_CITY_17275852B82114276452469"
-        ],
-        "matching_base_feature_ids": [
-          "CN_CITY_17275852B66735617717919",
-          "CN_CITY_17275852B82114276452469"
         ]
       },
       {
@@ -67872,6 +67768,22 @@
         ]
       },
       {
+        "feature_id": "CN_CITY_17275852B66735617717919",
+        "owner_tag": "XIN",
+        "raw_name": "Qinghexian",
+        "locale_en": "Qinghexian",
+        "locale_zh": "清河县",
+        "reason": "non_unique_raw_name",
+        "matching_feature_ids": [
+          "CN_CITY_17275852B66735617717919",
+          "CN_CITY_17275852B82114276452469"
+        ],
+        "matching_base_feature_ids": [
+          "CN_CITY_17275852B66735617717919",
+          "CN_CITY_17275852B82114276452469"
+        ]
+      },
+      {
         "feature_id": "CN_CITY_17275852B82842450374708",
         "owner_tag": "XIN",
         "raw_name": "Yutianxian",
@@ -68123,78 +68035,6 @@
       }
     ],
     "omitted_features": [
-      {
-        "feature_id": "ATLPRV_18153",
-        "owner_tag": "ALG",
-        "raw_name": "West Mediterranean and Iberia-Algeria Province 18153",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLSHL_west_med_6",
-        "owner_tag": "ALG",
-        "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 6",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLSHL_west_med_7",
-        "owner_tag": "ALG",
-        "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 7",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLSHL_west_med_9",
-        "owner_tag": "ALG",
-        "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 9",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_west_med_22",
-        "owner_tag": "ALG",
-        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 22",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_west_med_24",
-        "owner_tag": "ALG",
-        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 24",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_west_med_25",
-        "owner_tag": "ALG",
-        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 25",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_west_med_26",
-        "owner_tag": "ALG",
-        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 26",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_west_med_27",
-        "owner_tag": "ALG",
-        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 27",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_west_med_29",
-        "owner_tag": "ALG",
-        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 29",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_west_med_31",
-        "owner_tag": "ALG",
-        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 31",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_west_med_70",
-        "owner_tag": "ALG",
-        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 70",
-        "reason": "missing_locale"
-      },
       {
         "feature_id": "ATLPRV_18164",
         "owner_tag": "ATL",
@@ -70986,6 +70826,12 @@
         "reason": "missing_locale"
       },
       {
+        "feature_id": "ATLPRV_18220",
+        "owner_tag": "BUL",
+        "raw_name": "Aegean and Greek Islands Province 18220",
+        "reason": "missing_locale"
+      },
+      {
         "feature_id": "ATLSHL_aegean_8",
         "owner_tag": "BUL",
         "raw_name": "Aegean and Greek Islands Shore Seal 8",
@@ -71010,15 +70856,45 @@
         "reason": "missing_locale"
       },
       {
+        "feature_id": "ATLISL_adriatica_CRO_5",
+        "owner_tag": "CRO",
+        "raw_name": "Adriatica Salt Basin Island Cluster 5",
+        "reason": "missing_locale"
+      },
+      {
         "feature_id": "ATLISL_adriatica_CRO_6",
         "owner_tag": "CRO",
         "raw_name": "Adriatica Salt Basin Island Cluster 6",
         "reason": "missing_locale"
       },
       {
+        "feature_id": "ATLISL_adriatica_CRO_7",
+        "owner_tag": "CRO",
+        "raw_name": "Adriatica Salt Basin Island Cluster 7",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLISL_adriatica_CRO_8",
+        "owner_tag": "CRO",
+        "raw_name": "Adriatica Salt Basin Island Cluster 8",
+        "reason": "missing_locale"
+      },
+      {
         "feature_id": "ATLSHL_adriatica_10",
         "owner_tag": "CRO",
         "raw_name": "Adriatica Salt Basin Shore Seal 10",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLSHL_adriatica_15",
+        "owner_tag": "CRO",
+        "raw_name": "Adriatica Salt Basin Shore Seal 15",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLSHL_adriatica_16",
+        "owner_tag": "CRO",
+        "raw_name": "Adriatica Salt Basin Shore Seal 16",
         "reason": "missing_locale"
       },
       {
@@ -71034,6 +70910,12 @@
         "reason": "missing_locale"
       },
       {
+        "feature_id": "ATLSHL_adriatica_9",
+        "owner_tag": "CRO",
+        "raw_name": "Adriatica Salt Basin Shore Seal 9",
+        "reason": "missing_locale"
+      },
+      {
         "feature_id": "ATLWLD_adriatica_15",
         "owner_tag": "CRO",
         "raw_name": "Adriatica Salt Basin Boolean Weld 15",
@@ -71046,6 +70928,12 @@
         "reason": "missing_locale"
       },
       {
+        "feature_id": "ATLWLD_adriatica_19",
+        "owner_tag": "CRO",
+        "raw_name": "Adriatica Salt Basin Boolean Weld 19",
+        "reason": "missing_locale"
+      },
+      {
         "feature_id": "ATLWLD_adriatica_193",
         "owner_tag": "CRO",
         "raw_name": "Adriatica Salt Basin Boolean Weld 193",
@@ -71055,6 +70943,24 @@
         "feature_id": "ATLWLD_adriatica_194",
         "owner_tag": "CRO",
         "raw_name": "Adriatica Salt Basin Boolean Weld 194",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_adriatica_20",
+        "owner_tag": "CRO",
+        "raw_name": "Adriatica Salt Basin Boolean Weld 20",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_adriatica_22",
+        "owner_tag": "CRO",
+        "raw_name": "Adriatica Salt Basin Boolean Weld 22",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_adriatica_23",
+        "owner_tag": "CRO",
+        "raw_name": "Adriatica Salt Basin Boolean Weld 23",
         "reason": "missing_locale"
       },
       {
@@ -71088,6 +70994,12 @@
         "reason": "missing_locale"
       },
       {
+        "feature_id": "ATLWLD_adriatica_252",
+        "owner_tag": "CRO",
+        "raw_name": "Adriatica Salt Basin Boolean Weld 252",
+        "reason": "missing_locale"
+      },
+      {
         "feature_id": "ATLWLD_adriatica_28",
         "owner_tag": "CRO",
         "raw_name": "Adriatica Salt Basin Boolean Weld 28",
@@ -71097,6 +71009,12 @@
         "feature_id": "ATLWLD_adriatica_29",
         "owner_tag": "CRO",
         "raw_name": "Adriatica Salt Basin Boolean Weld 29",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_adriatica_35",
+        "owner_tag": "CRO",
+        "raw_name": "Adriatica Salt Basin Boolean Weld 35",
         "reason": "missing_locale"
       },
       {
@@ -71238,6 +71156,12 @@
         "reason": "missing_locale"
       },
       {
+        "feature_id": "ATLPRV_18153",
+        "owner_tag": "FRA",
+        "raw_name": "West Mediterranean and Iberia-Algeria Province 18153",
+        "reason": "missing_locale"
+      },
+      {
         "feature_id": "ATLPRV_18246",
         "owner_tag": "FRA",
         "raw_name": "West Mediterranean and Iberia-Algeria Province 18246",
@@ -71301,6 +71225,24 @@
         "feature_id": "ATLSHL_west_med_4",
         "owner_tag": "FRA",
         "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 4",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLSHL_west_med_6",
+        "owner_tag": "FRA",
+        "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 6",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLSHL_west_med_7",
+        "owner_tag": "FRA",
+        "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 7",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLSHL_west_med_9",
+        "owner_tag": "FRA",
+        "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 9",
         "reason": "missing_locale"
       },
       {
@@ -71424,9 +71366,57 @@
         "reason": "missing_locale"
       },
       {
+        "feature_id": "ATLWLD_west_med_22",
+        "owner_tag": "FRA",
+        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 22",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_west_med_24",
+        "owner_tag": "FRA",
+        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 24",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_west_med_25",
+        "owner_tag": "FRA",
+        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 25",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_west_med_26",
+        "owner_tag": "FRA",
+        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 26",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_west_med_27",
+        "owner_tag": "FRA",
+        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 27",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_west_med_29",
+        "owner_tag": "FRA",
+        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 29",
+        "reason": "missing_locale"
+      },
+      {
         "feature_id": "ATLWLD_west_med_296",
         "owner_tag": "FRA",
         "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 296",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_west_med_31",
+        "owner_tag": "FRA",
+        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 31",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_west_med_70",
+        "owner_tag": "FRA",
+        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 70",
         "reason": "missing_locale"
       },
       {
@@ -71502,6 +71492,42 @@
         "reason": "missing_locale"
       },
       {
+        "feature_id": "ATLISL_aegean_GRE_20",
+        "owner_tag": "GRE",
+        "raw_name": "Aegean and Greek Islands Island Cluster 20",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLISL_aegean_GRE_21",
+        "owner_tag": "GRE",
+        "raw_name": "Aegean and Greek Islands Island Cluster 21",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLISL_aegean_GRE_22",
+        "owner_tag": "GRE",
+        "raw_name": "Aegean and Greek Islands Island Cluster 22",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLISL_aegean_GRE_23",
+        "owner_tag": "GRE",
+        "raw_name": "Aegean and Greek Islands Island Cluster 23",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLISL_aegean_GRE_24",
+        "owner_tag": "GRE",
+        "raw_name": "Aegean and Greek Islands Island Cluster 24",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLISL_aegean_GRE_25",
+        "owner_tag": "GRE",
+        "raw_name": "Aegean and Greek Islands Island Cluster 25",
+        "reason": "missing_locale"
+      },
+      {
         "feature_id": "ATLISL_aegean_GRE_26",
         "owner_tag": "GRE",
         "raw_name": "Aegean and Greek Islands Island Cluster 26",
@@ -71559,6 +71585,12 @@
         "feature_id": "ATLISL_aegean_euboea",
         "owner_tag": "GRE",
         "raw_name": "Euboea Rebuilt Island",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLISL_aegean_limnos",
+        "owner_tag": "GRE",
+        "raw_name": "Limnos Rebuilt Island",
         "reason": "missing_locale"
       },
       {
@@ -72126,18 +72158,6 @@
         "reason": "missing_locale"
       },
       {
-        "feature_id": "ATLPRV_18160",
-        "owner_tag": "IBR",
-        "raw_name": "West Mediterranean and Iberia-Algeria Province 18160",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLPRV_18167",
-        "owner_tag": "IBR",
-        "raw_name": "West Mediterranean and Iberia-Algeria Province 18167",
-        "reason": "missing_locale"
-      },
-      {
         "feature_id": "ATLPRV_18170",
         "owner_tag": "IBR",
         "raw_name": "West Mediterranean and Iberia-Algeria Province 18170",
@@ -72162,33 +72182,9 @@
         "reason": "missing_locale"
       },
       {
-        "feature_id": "ATLPRV_18216",
-        "owner_tag": "IBR",
-        "raw_name": "West Mediterranean and Iberia-Algeria Province 18216",
-        "reason": "missing_locale"
-      },
-      {
         "feature_id": "ATLSHL_west_med_10",
         "owner_tag": "IBR",
         "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 10",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLSHL_west_med_12",
-        "owner_tag": "IBR",
-        "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 12",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLSHL_west_med_14",
-        "owner_tag": "IBR",
-        "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 14",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLSHL_west_med_15",
-        "owner_tag": "IBR",
-        "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 15",
         "reason": "missing_locale"
       },
       {
@@ -72201,18 +72197,6 @@
         "feature_id": "ATLSHL_west_med_17",
         "owner_tag": "IBR",
         "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 17",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_west_med_74",
-        "owner_tag": "IBR",
-        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 74",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_west_med_76",
-        "owner_tag": "IBR",
-        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 76",
         "reason": "missing_locale"
       },
       {
@@ -72237,24 +72221,6 @@
         "feature_id": "ATLISL_adriatica_CRO_4",
         "owner_tag": "ITA",
         "raw_name": "Adriatica Salt Basin Island Cluster 4",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLISL_adriatica_CRO_5",
-        "owner_tag": "ITA",
-        "raw_name": "Adriatica Salt Basin Island Cluster 5",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLISL_adriatica_CRO_7",
-        "owner_tag": "ITA",
-        "raw_name": "Adriatica Salt Basin Island Cluster 7",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLISL_adriatica_CRO_8",
-        "owner_tag": "ITA",
-        "raw_name": "Adriatica Salt Basin Island Cluster 8",
         "reason": "missing_locale"
       },
       {
@@ -72564,18 +72530,6 @@
         "reason": "missing_locale"
       },
       {
-        "feature_id": "ATLSHL_adriatica_15",
-        "owner_tag": "ITA",
-        "raw_name": "Adriatica Salt Basin Shore Seal 15",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLSHL_adriatica_16",
-        "owner_tag": "ITA",
-        "raw_name": "Adriatica Salt Basin Shore Seal 16",
-        "reason": "missing_locale"
-      },
-      {
         "feature_id": "ATLSHL_adriatica_17",
         "owner_tag": "ITA",
         "raw_name": "Adriatica Salt Basin Shore Seal 17",
@@ -72591,12 +72545,6 @@
         "feature_id": "ATLSHL_adriatica_6",
         "owner_tag": "ITA",
         "raw_name": "Adriatica Salt Basin Shore Seal 6",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLSHL_adriatica_9",
-        "owner_tag": "ITA",
-        "raw_name": "Adriatica Salt Basin Shore Seal 9",
         "reason": "missing_locale"
       },
       {
@@ -72738,33 +72686,9 @@
         "reason": "missing_locale"
       },
       {
-        "feature_id": "ATLWLD_adriatica_19",
-        "owner_tag": "ITA",
-        "raw_name": "Adriatica Salt Basin Boolean Weld 19",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_adriatica_20",
-        "owner_tag": "ITA",
-        "raw_name": "Adriatica Salt Basin Boolean Weld 20",
-        "reason": "missing_locale"
-      },
-      {
         "feature_id": "ATLWLD_adriatica_214",
         "owner_tag": "ITA",
         "raw_name": "Adriatica Salt Basin Boolean Weld 214",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_adriatica_22",
-        "owner_tag": "ITA",
-        "raw_name": "Adriatica Salt Basin Boolean Weld 22",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_adriatica_23",
-        "owner_tag": "ITA",
-        "raw_name": "Adriatica Salt Basin Boolean Weld 23",
         "reason": "missing_locale"
       },
       {
@@ -72774,21 +72698,9 @@
         "reason": "missing_locale"
       },
       {
-        "feature_id": "ATLWLD_adriatica_252",
-        "owner_tag": "ITA",
-        "raw_name": "Adriatica Salt Basin Boolean Weld 252",
-        "reason": "missing_locale"
-      },
-      {
         "feature_id": "ATLWLD_adriatica_26",
         "owner_tag": "ITA",
         "raw_name": "Adriatica Salt Basin Boolean Weld 26",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLWLD_adriatica_35",
-        "owner_tag": "ITA",
-        "raw_name": "Adriatica Salt Basin Boolean Weld 35",
         "reason": "missing_locale"
       },
       {
@@ -73080,15 +72992,51 @@
         "reason": "missing_locale"
       },
       {
+        "feature_id": "ATLPRV_18160",
+        "owner_tag": "SPR",
+        "raw_name": "West Mediterranean and Iberia-Algeria Province 18160",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLPRV_18167",
+        "owner_tag": "SPR",
+        "raw_name": "West Mediterranean and Iberia-Algeria Province 18167",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLPRV_18216",
+        "owner_tag": "SPR",
+        "raw_name": "West Mediterranean and Iberia-Algeria Province 18216",
+        "reason": "missing_locale"
+      },
+      {
         "feature_id": "ATLSHL_west_med_11",
         "owner_tag": "SPR",
         "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 11",
         "reason": "missing_locale"
       },
       {
+        "feature_id": "ATLSHL_west_med_12",
+        "owner_tag": "SPR",
+        "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 12",
+        "reason": "missing_locale"
+      },
+      {
         "feature_id": "ATLSHL_west_med_13",
         "owner_tag": "SPR",
         "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 13",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLSHL_west_med_14",
+        "owner_tag": "SPR",
+        "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 14",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLSHL_west_med_15",
+        "owner_tag": "SPR",
+        "raw_name": "West Mediterranean and Iberia-Algeria Shore Seal 15",
         "reason": "missing_locale"
       },
       {
@@ -73179,6 +73127,18 @@
         "feature_id": "ATLWLD_west_med_73",
         "owner_tag": "SPR",
         "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 73",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_west_med_74",
+        "owner_tag": "SPR",
+        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 74",
+        "reason": "missing_locale"
+      },
+      {
+        "feature_id": "ATLWLD_west_med_76",
+        "owner_tag": "SPR",
+        "raw_name": "West Mediterranean and Iberia-Algeria Boolean Weld 76",
         "reason": "missing_locale"
       },
       {
@@ -73380,42 +73340,6 @@
         "reason": "missing_locale"
       },
       {
-        "feature_id": "ATLISL_aegean_GRE_20",
-        "owner_tag": "TUR",
-        "raw_name": "Aegean and Greek Islands Island Cluster 20",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLISL_aegean_GRE_21",
-        "owner_tag": "TUR",
-        "raw_name": "Aegean and Greek Islands Island Cluster 21",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLISL_aegean_GRE_22",
-        "owner_tag": "TUR",
-        "raw_name": "Aegean and Greek Islands Island Cluster 22",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLISL_aegean_GRE_23",
-        "owner_tag": "TUR",
-        "raw_name": "Aegean and Greek Islands Island Cluster 23",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLISL_aegean_GRE_24",
-        "owner_tag": "TUR",
-        "raw_name": "Aegean and Greek Islands Island Cluster 24",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLISL_aegean_GRE_25",
-        "owner_tag": "TUR",
-        "raw_name": "Aegean and Greek Islands Island Cluster 25",
-        "reason": "missing_locale"
-      },
-      {
         "feature_id": "ATLISL_aegean_chios",
         "owner_tag": "TUR",
         "raw_name": "Chios Rebuilt Island",
@@ -73431,12 +73355,6 @@
         "feature_id": "ATLISL_aegean_lesvos",
         "owner_tag": "TUR",
         "raw_name": "Lesvos Rebuilt Island",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLISL_aegean_limnos",
-        "owner_tag": "TUR",
-        "raw_name": "Limnos Rebuilt Island",
         "reason": "missing_locale"
       },
       {
@@ -73479,12 +73397,6 @@
         "feature_id": "ATLPRV_18181",
         "owner_tag": "TUR",
         "raw_name": "Aegean and Greek Islands Province 18181",
-        "reason": "missing_locale"
-      },
-      {
-        "feature_id": "ATLPRV_18220",
-        "owner_tag": "TUR",
-        "raw_name": "Aegean and Greek Islands Province 18220",
         "reason": "missing_locale"
       },
       {

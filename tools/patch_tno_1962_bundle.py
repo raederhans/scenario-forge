@@ -8,6 +8,7 @@ import hashlib
 import json
 import math
 import re
+import shutil
 import sys
 from collections import Counter, deque
 from datetime import datetime, timezone
@@ -51,12 +52,28 @@ STAGE_COUNTRIES = "countries"
 STAGE_RUNTIME_TOPOLOGY = "runtime_topology"
 STAGE_GEO_LOCALE = "geo_locale"
 STAGE_WRITE_BUNDLE = "write_bundle"
+PUBLISH_SCOPE_POLAR_RUNTIME = "polar_runtime"
+PUBLISH_SCOPE_SCENARIO_DATA = "scenario_data"
+PUBLISH_SCOPE_ALL = "all"
 STAGE_CHOICES = [
     STAGE_ALL,
     STAGE_COUNTRIES,
     STAGE_RUNTIME_TOPOLOGY,
     STAGE_GEO_LOCALE,
     STAGE_WRITE_BUNDLE,
+]
+PUBLISH_SCOPE_CHOICES = [
+    PUBLISH_SCOPE_POLAR_RUNTIME,
+    PUBLISH_SCOPE_SCENARIO_DATA,
+    PUBLISH_SCOPE_ALL,
+]
+MANUAL_SYNC_POLICY_BACKUP_CONTINUE = "backup-continue"
+MANUAL_SYNC_POLICY_WARN_CONTINUE = "warn-continue"
+MANUAL_SYNC_POLICY_STRICT_BLOCK = "strict-block"
+MANUAL_SYNC_POLICY_CHOICES = [
+    MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
+    MANUAL_SYNC_POLICY_WARN_CONTINUE,
+    MANUAL_SYNC_POLICY_STRICT_BLOCK,
 ]
 REGIONAL_RULE_PACKS: list[tuple[str, Path]] = [
     ("africa", ROOT / "data/scenario-rules/tno_1962.africa_ownership.manual.json"),
@@ -66,6 +83,9 @@ REGIONAL_RULE_PACKS: list[tuple[str, Path]] = [
     ("decolonization", ROOT / "data/scenario-rules/tno_1962.decolonization.manual.json"),
 ]
 MODERN_WORLD_COUNTRIES_PATH = ROOT / "data/scenarios/modern_world/countries.json"
+MANUAL_OVERRIDE_FILENAME = "scenario_manual_overrides.json"
+MANUAL_SYNC_REPORT_DIR = ROOT / ".runtime" / "reports" / "generated" / "manual-sync"
+MANUAL_SYNC_BACKUP_ROOT = ROOT / ".runtime" / "backups" / "scenario-rebuild"
 HGO_ROOT = ROOT / "historic geographic overhaul"
 TNO_ROOT_CANDIDATES = [
     Path("C:/Program Files (x86)/Steam/steamapps/workshop/content/394360/2438003901"),
@@ -131,7 +151,7 @@ DONOR_CAUSEWAY_NAME_HINTS = (
 )
 
 MEDITERRANEAN_WATER_REGION_GROUP = "mediterranean"
-TNO_RETIRED_ZERO_FEATURE_TAGS = {"BEL", "EST", "LAT", "LIT", "LUX", "NOR", "POL", "POR", "SSH", "TAI"}
+TNO_RETIRED_ZERO_FEATURE_TAGS = {"AEF", "ALG", "BEL", "EST", "LAT", "LIT", "LUX", "NOR", "POL", "POR", "SSH", "TAI"}
 TNO_FEATURED_TAG_REPLACEMENTS = {"RKB": "BRG"}
 TNO_CONTROLLER_ONLY_COUNTRY_META = {
     "POR": {
@@ -345,6 +365,90 @@ TNO_DECOLONIZATION_NOTES = {
 }
 
 TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
+    "FRA": [
+        "DZA-2195",
+        "DZA-2196",
+        "DZA-2198",
+        "DZA-2209",
+        "ATLPRV_18153",
+        "ATLSHL_west_med_6",
+        "ATLSHL_west_med_7",
+        "ATLSHL_west_med_9",
+        "ATLWLD_west_med_22",
+        "ATLWLD_west_med_24",
+        "ATLWLD_west_med_25",
+        "ATLWLD_west_med_26",
+        "ATLWLD_west_med_27",
+        "ATLWLD_west_med_29",
+        "ATLWLD_west_med_31",
+        "ATLWLD_west_med_70",
+    ],
+    "GCO": [
+        "CM_ADM1_CMR-1462",
+        "CM_ADM1_CMR-1476",
+        "CM_ADM1_CMR-1477",
+        "CM_ADM1_CMR-1480",
+        "CM_ADM1_CMR-1481",
+        "CM_ADM1_CMR-1482",
+        "CM_ADM1_CMR-1483",
+        "CM_ADM1_CMR-798",
+        "CM_ADM1_CMR-799",
+        "CM_ADM1_CMR-803",
+        "CF_ADM1_CAF-1460",
+        "CF_ADM1_CAF-4856",
+        "CF_ADM1_CAF-794",
+        "CF_ADM1_CAF-795",
+        "CF_ADM1_CAF-801",
+        "CF_ADM1_CAF-802",
+        "CF_ADM1_CAF-804",
+        "CF_ADM1_CAF-805",
+        "CF_ADM1_CAF-806",
+        "CF_ADM1_CAF-807",
+        "CF_ADM1_CAF-808",
+        "CF_ADM1_CAF-809",
+        "CF_ADM1_CAF-810",
+        "CF_ADM1_CAF-812",
+        "CF_ADM1_CAF-866",
+        "CF_ADM1_CAF-867",
+        "CF_ADM1_CAF-868",
+        "TD_ADM1_TCD-1464",
+        "TD_ADM1_TCD-1474",
+        "TD_ADM1_TCD-1484",
+        "TD_ADM1_TCD-1485",
+        "TD_ADM1_TCD-1486",
+        "TD_ADM1_TCD-1487",
+        "TD_ADM1_TCD-1488",
+        "TD_ADM1_TCD-1489",
+        "TD_ADM1_TCD-4858",
+        "TD_ADM1_TCD-5580",
+        "TD_ADM1_TCD-5582",
+        "TD_ADM1_TCD-5583",
+        "GA_ADM1_GAB-2168",
+        "GA_ADM1_GAB-2186",
+        "GA_ADM1_GAB-2187",
+        "GA_ADM1_GAB-2621",
+        "GA_ADM1_GAB-2622",
+        "GA_ADM1_GAB-2623",
+        "GA_ADM1_GAB-2624",
+        "GA_ADM1_GAB-2627",
+        "GA_ADM1_GAB-2628",
+        "CG_ADM1_COG-2626",
+        "CG_ADM1_COG-2880",
+        "CG_ADM1_COG-3342",
+        "CG_ADM1_COG-3343",
+        "CG_ADM1_COG-3344",
+        "CG_ADM1_COG-3345",
+        "CG_ADM1_COG-4855",
+        "CG_ADM1_COG-5855",
+        "CG_ADM1_COG-2185__tno1962_1",
+        "CG_ADM1_COG-2185__tno1962_2",
+        "CG_ADM1_COG-2185__tno1962_3",
+        "CG_ADM1_COG-2185__tno1962_4",
+        "CG_ADM1_COG-3341__tno1962_1",
+        "CG_ADM1_COG-3341__tno1962_2",
+        "CG_ADM1_COG-3346__tno1962_1",
+        "CG_ADM1_COG-3346__tno1962_2",
+    ],
     "ITA": [
         "ATLPRV_18263",
         "ATLPRV_18260",
@@ -553,20 +657,6 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "CN_CITY_17275852B85492016083287",
         "CN_CITY_17275852B50071782197016",
         "CN_CITY_17275852B20068359050292",
-    ],
-    "AEF": [
-        "TD_ADM1_TCD-1485",
-        "TD_ADM1_TCD-1484",
-        "TD_ADM1_TCD-4858",
-        "TD_ADM1_TCD-1486",
-        "TD_ADM1_TCD-1487",
-        "TD_ADM1_TCD-5580",
-        "TD_ADM1_TCD-1474",
-        "TD_ADM1_TCD-1464",
-        "TD_ADM1_TCD-5582",
-        "TD_ADM1_TCD-1489",
-        "TD_ADM1_TCD-5583",
-        "TD_ADM1_TCD-1488",
     ],
     "IAL": [
         "DZA-2189",
@@ -2030,6 +2120,7 @@ TNO_1962_COUNTRY_DISPLAY_NAME_OVERRIDES = {
     "GNG": "Guangdong State",
     "GMA": "Northwest Pacification Government",
     "QMA": "13th National Revolutionary Army",
+    "GCO": "German Central Africa",
 }
 
 TNO_1962_DIRECT_TNO_COLOR_TAGS = {
@@ -2061,7 +2152,22 @@ TNO_1962_TNO_COLOR_PROXY_TAGS = {
 }
 
 TNO_1962_TNO_COLOR_FIXED_HEX = {
+    "BRM": "#40839e",
+    "CAM": "#685d6d",
+    "CHI": "#ce9f61",
+    "FRI": "#2a62a2",
+    "GER": "#3c3c3c",
+    "INS": "#9f344d",
+    "MAN": "#a80043",
+    "MEN": "#8f354b",
+    "PAK": "#21331e",
     "RKM": "#4f4554",
+    "SHX": "#955a74",
+    "TIB": "#c8c8c8",
+    "VIN": "#a76286",
+    "XIK": "#6873a0",
+    "XIN": "#5f8e9c",
+    "YUN": "#763446",
 }
 
 UNAPPLIED_ACTION_IDS = (
@@ -2842,6 +2948,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--stage", choices=STAGE_CHOICES, default=STAGE_ALL)
     parser.add_argument("--checkpoint-dir", default=str(DEFAULT_CHECKPOINT_DIR))
     parser.add_argument("--scenario-dir", default=str(SCENARIO_DIR))
+    parser.add_argument("--publish-scope", choices=PUBLISH_SCOPE_CHOICES, default=PUBLISH_SCOPE_POLAR_RUNTIME)
+    parser.add_argument(
+        "--manual-sync-policy",
+        choices=MANUAL_SYNC_POLICY_CHOICES,
+        default=MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
+    )
     return parser.parse_args()
 
 
@@ -2886,19 +2998,249 @@ CHECKPOINT_WATER_FILENAME = "water_regions.geojson"
 CHECKPOINT_RELIEF_FILENAME = "relief_overlays.geojson"
 CHECKPOINT_LAND_MASK_FILENAME = "land_mask.geojson"
 CHECKPOINT_CONTEXT_LAND_MASK_FILENAME = "context_land_mask.geojson"
-PUBLISH_FILENAMES = (
-    "countries.json",
-    "owners.by_feature.json",
-    "controllers.by_feature.json",
-    "cores.by_feature.json",
-    "manifest.json",
-    "audit.json",
-    "special_regions.geojson",
-    "water_regions.geojson",
-    "relief_overlays.geojson",
-    "runtime_topology.topo.json",
-    "geo_locale_patch.json",
+PUBLISH_FILENAMES_BY_SCOPE = {
+    PUBLISH_SCOPE_POLAR_RUNTIME: (
+        "runtime_topology.topo.json",
+    ),
+    PUBLISH_SCOPE_SCENARIO_DATA: (
+        "countries.json",
+        "owners.by_feature.json",
+        "controllers.by_feature.json",
+        "cores.by_feature.json",
+        "manifest.json",
+        "audit.json",
+        "special_regions.geojson",
+        "water_regions.geojson",
+        "relief_overlays.geojson",
+        "geo_locale_patch.json",
+    ),
+}
+PUBLISH_FILENAMES_BY_SCOPE[PUBLISH_SCOPE_ALL] = (
+    *PUBLISH_FILENAMES_BY_SCOPE[PUBLISH_SCOPE_SCENARIO_DATA],
+    *PUBLISH_FILENAMES_BY_SCOPE[PUBLISH_SCOPE_POLAR_RUNTIME],
 )
+
+
+def normalize_locale_override_entry(source: object) -> dict[str, str] | None:
+    if not isinstance(source, dict):
+        return None
+    en = str(source.get("en") or source.get("name_en") or source.get("label_en") or "").strip()
+    zh = str(source.get("zh") or source.get("name_zh") or source.get("label_zh") or source.get("name_cn") or "").strip()
+    entry: dict[str, str] = {}
+    if en:
+        entry["en"] = en
+    if zh:
+        entry["zh"] = zh
+    return entry or None
+
+
+def resolve_publish_filenames(scope: str) -> tuple[str, ...]:
+    if scope not in PUBLISH_FILENAMES_BY_SCOPE:
+        raise ValueError(f"Unsupported publish scope: {scope}")
+    return PUBLISH_FILENAMES_BY_SCOPE[scope]
+
+
+def validate_geo_locale_manual_overrides(geo_locale_payload: dict, manual_overrides_payload: dict) -> None:
+    geo = geo_locale_payload.get("geo", {}) if isinstance(geo_locale_payload, dict) else {}
+    manual_geo_raw = manual_overrides_payload.get("geo", {}) if isinstance(manual_overrides_payload, dict) else {}
+    missing_feature_ids: list[str] = []
+    mismatched_feature_ids: list[str] = []
+    for raw_feature_id, raw_entry in manual_geo_raw.items():
+        feature_id = str(raw_feature_id or "").strip()
+        expected_entry = normalize_locale_override_entry(raw_entry)
+        if not feature_id or not expected_entry:
+            continue
+        actual_entry = normalize_locale_override_entry(geo.get(feature_id))
+        if actual_entry is None:
+            missing_feature_ids.append(feature_id)
+            continue
+        if actual_entry != expected_entry:
+            mismatched_feature_ids.append(feature_id)
+    if missing_feature_ids or mismatched_feature_ids:
+        details: list[str] = []
+        if missing_feature_ids:
+            details.append(f"missing={missing_feature_ids[:20]}")
+        if mismatched_feature_ids:
+            details.append(f"mismatched={mismatched_feature_ids[:20]}")
+        raise ValueError("Geo locale checkpoint does not reflect manual overrides: " + "; ".join(details))
+
+
+def validate_geo_locale_checkpoint(checkpoint_dir: Path, manual_overrides_path: Path) -> None:
+    geo_locale_payload = load_checkpoint_json(checkpoint_dir, "geo_locale_patch.json")
+    manual_overrides_payload = load_json(manual_overrides_path) if manual_overrides_path.exists() else {}
+    validate_geo_locale_manual_overrides(geo_locale_payload, manual_overrides_payload)
+
+
+def default_scenario_manual_overrides_payload(scenario_id: str) -> dict[str, object]:
+    return {
+        "version": 1,
+        "scenario_id": scenario_id,
+        "generated_at": "",
+        "countries": {},
+        "assignments": {},
+    }
+
+
+def load_scenario_manual_overrides_payload(scenario_dir: Path) -> dict[str, object]:
+    manual_path = scenario_dir / MANUAL_OVERRIDE_FILENAME
+    payload = load_json(manual_path) if manual_path.exists() else default_scenario_manual_overrides_payload(SCENARIO_ID)
+    if not isinstance(payload, dict):
+        payload = {}
+    countries = payload.get("countries", {})
+    assignments = payload.get("assignments", {})
+    normalized = dict(payload)
+    normalized["version"] = int(normalized.get("version") or 1)
+    normalized["scenario_id"] = SCENARIO_ID
+    normalized["generated_at"] = str(normalized.get("generated_at") or "").strip()
+    normalized["countries"] = dict(countries) if isinstance(countries, dict) else {}
+    normalized["assignments"] = dict(assignments) if isinstance(assignments, dict) else {}
+    return normalized
+
+
+def apply_dev_manual_overrides(
+    countries_payload: dict,
+    owners_payload: dict,
+    controllers_payload: dict,
+    cores_payload: dict,
+    manual_overrides_payload: dict,
+    audit_payload: dict,
+) -> dict[str, object]:
+    countries = countries_payload.setdefault("countries", {})
+    owners = owners_payload.setdefault("owners", {})
+    controllers = controllers_payload.setdefault("controllers", {})
+    cores = normalize_feature_core_map(cores_payload.setdefault("cores", {}))
+    cores_payload["cores"] = cores
+    manual_countries = manual_overrides_payload.get("countries", {}) if isinstance(manual_overrides_payload, dict) else {}
+    manual_assignments = manual_overrides_payload.get("assignments", {}) if isinstance(manual_overrides_payload, dict) else {}
+    touched_country_tags: list[str] = []
+    touched_assignment_feature_ids: list[str] = []
+    create_tags: list[str] = []
+    override_tags: list[str] = []
+
+    for raw_tag, raw_entry in manual_countries.items():
+        tag = normalize_tag(raw_tag)
+        if not tag or not isinstance(raw_entry, dict):
+            continue
+        mode = str(raw_entry.get("mode") or "override").strip().lower() or "override"
+        existing_entry = countries.get(tag)
+        if mode == "create":
+            if isinstance(existing_entry, dict):
+                raise ValueError(f"Dev manual override cannot create existing tag: {tag}")
+            countries[tag] = {
+                "tag": tag,
+                "display_name": str(raw_entry.get("display_name") or raw_entry.get("display_name_en") or tag).strip(),
+                "display_name_en": str(raw_entry.get("display_name_en") or raw_entry.get("display_name") or tag).strip(),
+                "display_name_zh": str(raw_entry.get("display_name_zh") or "").strip(),
+                "color_hex": normalize_hex(raw_entry.get("color_hex")) or "#808080",
+                "feature_count": 0,
+                "controller_feature_count": 0,
+                "quality": "manual_reviewed",
+                "source": "manual_rule",
+                "base_iso2": normalize_iso2(raw_entry.get("base_iso2")) or tag,
+                "lookup_iso2": normalize_iso2(raw_entry.get("lookup_iso2")) or tag,
+                "provenance_iso2": normalize_iso2(raw_entry.get("provenance_iso2")) or tag,
+                "scenario_only": bool(raw_entry.get("scenario_only", True)),
+                "featured": bool(raw_entry.get("featured")),
+                "capital_state_id": raw_entry.get("capital_state_id"),
+                "notes": str(raw_entry.get("notes") or "").strip(),
+                "synthetic_owner": False,
+                "source_type": "scenario_extension",
+                "historical_fidelity": "extended",
+                "primary_rule_source": "dev_manual_tag_create",
+                "rule_sources": ["dev_manual_tag_create"],
+                "source_types": ["scenario_extension"],
+                "historical_fidelity_summary": ["extended"],
+                "parent_owner_tag": normalize_tag(raw_entry.get("parent_owner_tag")),
+                "parent_owner_tags": [normalize_tag(raw_entry.get("parent_owner_tag"))] if normalize_tag(raw_entry.get("parent_owner_tag")) else [],
+                "subject_kind": str(raw_entry.get("subject_kind") or "").strip(),
+                "entry_kind": str(raw_entry.get("entry_kind") or ("scenario_subject" if normalize_tag(raw_entry.get("parent_owner_tag")) else "scenario_country")).strip(),
+                "hidden_from_country_list": bool(raw_entry.get("hidden_from_country_list")),
+                "continent_id": str(raw_entry.get("continent_id") or "").strip(),
+                "continent_label": str(raw_entry.get("continent_label") or "").strip(),
+                "subregion_id": str(raw_entry.get("subregion_id") or "").strip(),
+                "subregion_label": str(raw_entry.get("subregion_label") or "").strip(),
+            }
+            create_tags.append(tag)
+        elif not isinstance(existing_entry, dict):
+            raise ValueError(f"Dev manual override cannot update missing tag: {tag}")
+        entry = countries[tag]
+        for field in (
+            "display_name",
+            "display_name_en",
+            "display_name_zh",
+            "parent_owner_tag",
+            "subject_kind",
+            "entry_kind",
+            "capital_state_id",
+            "continent_id",
+            "continent_label",
+            "subregion_id",
+            "subregion_label",
+            "notes",
+        ):
+            if field in raw_entry:
+                entry[field] = raw_entry.get(field)
+        if "color_hex" in raw_entry:
+            normalized_hex = normalize_hex(raw_entry.get("color_hex"))
+            if normalized_hex:
+                entry["color_hex"] = normalized_hex
+        if "featured" in raw_entry:
+            entry["featured"] = bool(raw_entry.get("featured"))
+        if "hidden_from_country_list" in raw_entry:
+            entry["hidden_from_country_list"] = bool(raw_entry.get("hidden_from_country_list"))
+        if "scenario_only" in raw_entry:
+            entry["scenario_only"] = bool(raw_entry.get("scenario_only"))
+        for field in ("base_iso2", "lookup_iso2", "provenance_iso2"):
+            if field in raw_entry:
+                normalized_iso2 = normalize_iso2(raw_entry.get(field))
+                if normalized_iso2:
+                    entry[field] = normalized_iso2
+        entry["source_type"] = "scenario_extension"
+        entry["historical_fidelity"] = "extended"
+        entry["source_types"] = ["scenario_extension"]
+        entry["historical_fidelity_summary"] = ["extended"]
+        if mode == "create":
+            entry["primary_rule_source"] = "dev_manual_tag_create"
+            entry["rule_sources"] = ["dev_manual_tag_create"]
+        else:
+            override_tags.append(tag)
+        normalized_parent = normalize_tag(entry.get("parent_owner_tag"))
+        entry["parent_owner_tag"] = normalized_parent
+        entry["parent_owner_tags"] = [normalized_parent] if normalized_parent else []
+        touched_country_tags.append(tag)
+
+    for raw_feature_id, raw_assignment in manual_assignments.items():
+        feature_id = str(raw_feature_id or "").strip()
+        if not feature_id or not isinstance(raw_assignment, dict):
+            continue
+        if "owner" in raw_assignment:
+            owner_tag = normalize_tag(raw_assignment.get("owner"))
+            if owner_tag:
+                owners[feature_id] = owner_tag
+        if "controller" in raw_assignment:
+            controller_tag = normalize_tag(raw_assignment.get("controller"))
+            if controller_tag:
+                controllers[feature_id] = controller_tag
+        if "cores" in raw_assignment:
+            normalized_core_tags = normalize_core_tags(raw_assignment.get("cores"))
+            if normalized_core_tags:
+                cores[feature_id] = normalized_core_tags
+            else:
+                cores.pop(feature_id, None)
+        touched_assignment_feature_ids.append(feature_id)
+
+    audit_payload["dev_manual_override_summary"] = {
+        "country_count": len(touched_country_tags),
+        "assignment_count": len(touched_assignment_feature_ids),
+        "create_tags": sorted(set(create_tags)),
+        "override_tags": sorted(set(override_tags)),
+    }
+    return {
+        "country_tags": sorted(set(touched_country_tags)),
+        "assignment_feature_ids": sorted(set(touched_assignment_feature_ids)),
+        "create_tags": sorted(set(create_tags)),
+        "override_tags": sorted(set(override_tags)),
+    }
 
 
 def load_feature_migration_map() -> dict[str, list[str]]:
@@ -5429,6 +5771,119 @@ def build_restore_assignments(
     return restore_gdf, explicit_assignments, diagnostics
 
 
+def build_single_antarctic_feature(
+    runtime_political_full_gdf: gpd.GeoDataFrame,
+) -> tuple[gpd.GeoDataFrame, dict[str, dict[str, object]], dict[str, object]]:
+    aq_mask = runtime_political_full_gdf["cntr_code"].fillna("").astype(str).str.strip().str.upper() == "AQ"
+    aq_rows = runtime_political_full_gdf.loc[aq_mask].copy().reset_index(drop=True)
+    if aq_rows.empty:
+        raise ValueError("Runtime political topology is missing Antarctic sector geometry.")
+
+    antarctic_geom = normalize_polygonal(safe_unary_union(aq_rows.geometry.tolist()))
+    if antarctic_geom is None or antarctic_geom.is_empty:
+        raise ValueError("Antarctic sector union collapsed to empty geometry.")
+
+    antarctic_gdf = gpd.GeoDataFrame(
+        [{
+            "id": "AQ",
+            "name": "Antarctica",
+            "cntr_code": "AQ",
+            "admin1_group": "",
+            "detail_tier": "",
+            "__source": "scenario_runtime",
+            "geometry": antarctic_geom,
+        }],
+        geometry="geometry",
+        crs="EPSG:4326",
+    )
+    diagnostics = {
+        "source_feature_ids": sorted(aq_rows["id"].astype(str).tolist()),
+        "source_feature_count": int(len(aq_rows)),
+        "union_part_count": int(len(iter_polygon_parts(antarctic_geom))),
+    }
+    explicit_assignments = {
+        "AQ": {
+            "owner": "AQ",
+            "controller": "AQ",
+            "core": ["AQ"],
+        }
+    }
+    return antarctic_gdf, explicit_assignments, diagnostics
+
+
+def build_runtime_shell_fragment_gdf(runtime_political_full_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    id_series = runtime_political_full_gdf["id"].fillna("").astype(str).str.strip()
+    shell_gdf = runtime_political_full_gdf.loc[
+        id_series.str.upper().str.startswith("RU_ARCTIC_FB_")
+    ].copy().reset_index(drop=True)
+    if shell_gdf.crs is None:
+        shell_gdf = shell_gdf.set_crs("EPSG:4326", allow_override=True)
+    return shell_gdf
+
+
+def load_existing_scenario_runtime_shell_fragment_gdf(scenario_dir: Path) -> gpd.GeoDataFrame:
+    runtime_topology_path = scenario_dir / "runtime_topology.topo.json"
+    if not runtime_topology_path.exists():
+        return gpd.GeoDataFrame([], geometry="geometry", crs="EPSG:4326")
+    topology_payload = load_json(runtime_topology_path)
+    political_gdf = topology_object_to_gdf(topology_payload, "political")
+    if political_gdf.empty:
+        return gpd.GeoDataFrame([], geometry="geometry", crs="EPSG:4326")
+    return build_runtime_shell_fragment_gdf(political_gdf)
+
+
+def is_runtime_shell_fragment_row(row: dict[str, object]) -> bool:
+    feature_id = str(row.get("id") or "").strip().upper()
+    if feature_id.startswith("RU_ARCTIC_FB_"):
+        return True
+    return "shell fallback" in str(row.get("name") or "").strip().lower()
+
+
+def build_polar_feature_diagnostics(political_gdf: gpd.GeoDataFrame) -> dict[str, dict[str, object]]:
+    if political_gdf is None or political_gdf.empty:
+        return {}
+
+    id_series = political_gdf["id"].fillna("").astype(str).str.strip()
+    polar_mask = (id_series == "AQ") | id_series.str.startswith("RU_ARCTIC_FB_")
+    polar_gdf = political_gdf.loc[polar_mask].copy().reset_index(drop=True)
+    if polar_gdf.empty:
+        return {}
+
+    area_km2_by_id: dict[str, float] = {}
+    try:
+        equal_area = polar_gdf.to_crs("EPSG:6933")
+        for feature_id, geom in zip(polar_gdf["id"].astype(str).tolist(), equal_area.geometry.tolist()):
+            area_km2_by_id[str(feature_id).strip()] = float(getattr(geom, "area", 0.0) or 0.0) / 1_000_000.0
+    except Exception:
+        area_km2_by_id = {}
+
+    diagnostics: dict[str, dict[str, object]] = {}
+    for row in polar_gdf.to_dict("records"):
+        feature_id = str(row.get("id") or "").strip()
+        geom = normalize_polygonal(row.get("geometry"))
+        if not feature_id or geom is None:
+            continue
+        min_x, min_y, max_x, max_y = [float(value) for value in geom.bounds]
+        area_km2 = float(area_km2_by_id.get(feature_id, 0.0) or 0.0)
+        flags: list[str] = []
+        if (
+            abs(min_x + 180.0) < 1e-9
+            and abs(min_y + 90.0) < 1e-9
+            and abs(max_x - 180.0) < 1e-9
+            and abs(max_y - 90.0) < 1e-9
+        ):
+            flags.append("world_bounds")
+        if area_km2 > 25_000_000.0:
+            flags.append("giant_feature")
+        diagnostics[feature_id] = {
+            "country_code": normalize_tag(row.get("cntr_code")),
+            "bounds": [min_x, min_y, max_x, max_y],
+            "area_km2": area_km2,
+            "flags": flags,
+        }
+    return diagnostics
+
+
 def rebuild_feature_maps_from_political_gdf(
     political_gdf: gpd.GeoDataFrame,
     source_feature_id_by_new_id: dict[str, str],
@@ -5460,6 +5915,8 @@ def rebuild_feature_maps_from_political_gdf(
             cores[feature_id] = core_tags
             continue
         if source_feature_id not in source_owners:
+            if is_runtime_shell_fragment_row(row):
+                continue
             raise KeyError(f"Missing owner mapping for source feature id {source_feature_id} (new id {feature_id}).")
         owners[feature_id] = str(source_owners[source_feature_id]).strip().upper()
         controllers[feature_id] = str(source_controllers.get(source_feature_id) or owners[feature_id]).strip().upper()
@@ -6061,6 +6518,7 @@ def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
     owners_payload = load_json(scenario_dir / "owners.by_feature.json")
     controllers_payload = load_json(scenario_dir / "controllers.by_feature.json")
     cores_payload = load_json(scenario_dir / "cores.by_feature.json")
+    manual_overrides_payload = load_scenario_manual_overrides_payload(scenario_dir)
     manifest_payload = load_json(scenario_dir / "manifest.json")
     audit_payload = load_json(scenario_dir / "audit.json")
     current_water_regions = load_json(scenario_dir / "water_regions.geojson")
@@ -6128,6 +6586,10 @@ def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
         canonical_source_controllers,
         canonical_source_cores,
     )
+    antarctic_gdf, antarctic_assignments, antarctic_diagnostics = build_single_antarctic_feature(
+        runtime_political_full_gdf
+    )
+    shell_fragment_gdf = load_existing_scenario_runtime_shell_fragment_gdf(scenario_dir)
     runtime_owned_political_gdf = runtime_political_full_gdf.loc[
         runtime_political_full_gdf["id"].isin(source_owner_feature_ids)
     ].copy().reset_index(drop=True)
@@ -6166,15 +6628,17 @@ def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
 
     scenario_cut_political_gdf, source_feature_id_by_new_id = cut_political_features(runtime_owned_political_gdf, lake_geom)
     scenario_political_gdf = gpd.GeoDataFrame(
-        pd_concat_geodataframes([scenario_cut_political_gdf, atl_political_gdf, atl_sea_gdf]),
+        pd_concat_geodataframes([scenario_cut_political_gdf, shell_fragment_gdf, antarctic_gdf, atl_political_gdf, atl_sea_gdf]),
         geometry="geometry",
         crs="EPSG:4326",
     )
+    scenario_political_gdf = scenario_political_gdf.drop_duplicates(subset=["id"], keep="first").reset_index(drop=True)
     if scenario_political_gdf["id"].duplicated().any():
         duplicates = scenario_political_gdf.loc[scenario_political_gdf["id"].duplicated(), "id"].tolist()[:10]
         raise ValueError(f"Duplicate political feature ids after ATL append: {duplicates}")
 
     explicit_assignments = {}
+    explicit_assignments.update(antarctic_assignments)
     for feature in [*atl_feature_collection, *atl_sea_collection]:
         props = feature.get("properties", {}) if isinstance(feature, dict) else {}
         feature_id = str(props.get("id") or "").strip()
@@ -6201,6 +6665,7 @@ def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
         cores_payload,
         scenario_political_gdf,
     )
+    polar_feature_diagnostics = build_polar_feature_diagnostics(scenario_political_gdf)
 
     countries_payload.setdefault("countries", {})[ATL_TAG] = build_atl_country_entry(
         countries_payload.get("countries", {}).get(ATL_TAG),
@@ -6211,11 +6676,41 @@ def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
             and normalize_tag(assignment.get("owner")) == ATL_TAG
         ),
     )
+    countries_payload.setdefault("countries", {})["AQ"] = build_manual_country_entry(
+        tag="AQ",
+        existing_entry=countries_payload.get("countries", {}).get("AQ"),
+        palette_entries=load_palette_entries(TNO_PALETTE_PATH),
+        feature_count=sum(
+            1
+            for feature_id, assignment in explicit_assignments.items()
+            if feature_id == "AQ" and normalize_tag(assignment.get("owner")) == "AQ"
+        ),
+        continent_id="continent_antarctica",
+        continent_label="Antarctica",
+        subregion_id="subregion_antarctica",
+        subregion_label="Antarctica",
+        base_iso2="AQ",
+        lookup_iso2="AQ",
+        provenance_iso2="AQ",
+        display_name="Antarctica",
+        notes="Collapsed from runtime Antarctic sectors into a single land-only political feature for the TNO 1962 scenario.",
+        source="scenario_generated",
+        source_type="scenario_extension",
+        historical_fidelity="tno_runtime_polar_fix",
+    )
     normalize_tno_country_registry(countries_payload, owners_payload)
     ensure_tno_manual_override_countries(countries_payload, owners_payload)
     ensure_tno_controller_only_countries(countries_payload, controllers_payload)
     apply_tno_inspector_groups(countries_payload)
     apply_tno_country_display_name_overrides(countries_payload)
+    dev_manual_override_diagnostics = apply_dev_manual_overrides(
+        countries_payload,
+        owners_payload,
+        controllers_payload,
+        cores_payload,
+        manual_overrides_payload,
+        audit_payload,
+    )
 
     congo_props = {}
     if current_water_regions.get("features"):
@@ -6283,8 +6778,11 @@ def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
         "atlantropa_diagnostics": atlantropa_diagnostics,
         "island_replacement_diagnostics": island_replacement_diagnostics,
         "med_water_diagnostics": med_water_diagnostics,
+        "antarctic_diagnostics": antarctic_diagnostics,
         "restore_diagnostics": restore_diagnostics,
+        "polar_feature_diagnostics": polar_feature_diagnostics,
         "feature_assignment_override_diagnostics": feature_assignment_override_diagnostics,
+        "dev_manual_override_diagnostics": dev_manual_override_diagnostics,
         "atl_feature_ids": sorted(atl_feature_ids),
         "atl_sea_feature_ids": sorted(atl_sea_feature_ids),
         "context_land_mask_tolerance": context_land_mask_tolerance,
@@ -6300,6 +6798,7 @@ def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
         "cores_payload": cores_payload,
         "manifest_payload": manifest_payload,
         "audit_payload": audit_payload,
+        "manual_overrides_payload": manual_overrides_payload,
         "relief_overlays_payload": relief_overlays_payload,
         "scenario_political_gdf": scenario_political_gdf,
         "water_gdf": water_gdf,
@@ -6570,11 +7069,134 @@ def build_geo_locale_stage(scenario_dir: Path, checkpoint_dir: Path) -> None:
         manual_overrides_path=scenario_dir / "geo_name_overrides.manual.json",
         output_path=checkpoint_dir / "geo_locale_patch.json",
     )
+    validate_geo_locale_checkpoint(checkpoint_dir, scenario_dir / "geo_name_overrides.manual.json")
 
 
-def write_bundle_stage(scenario_dir: Path, checkpoint_dir: Path) -> None:
+def _build_manual_sync_file_report(filename: str, scenario_payload: dict, checkpoint_payload: dict) -> dict[str, object]:
+    if filename == "countries.json":
+        scenario_countries = scenario_payload.get("countries", {}) if isinstance(scenario_payload, dict) else {}
+        checkpoint_countries = checkpoint_payload.get("countries", {}) if isinstance(checkpoint_payload, dict) else {}
+        changed_keys = sorted(
+            key
+            for key in set(scenario_countries.keys()) | set(checkpoint_countries.keys())
+            if scenario_countries.get(key) != checkpoint_countries.get(key)
+        )
+        kind = "countries"
+    elif filename in {"owners.by_feature.json", "controllers.by_feature.json"}:
+        key = "owners" if filename.startswith("owners") else "controllers"
+        scenario_map = scenario_payload.get(key, {}) if isinstance(scenario_payload, dict) else {}
+        checkpoint_map = checkpoint_payload.get(key, {}) if isinstance(checkpoint_payload, dict) else {}
+        changed_keys = sorted(
+            feature_id
+            for feature_id in set(scenario_map.keys()) | set(checkpoint_map.keys())
+            if scenario_map.get(feature_id) != checkpoint_map.get(feature_id)
+        )
+        kind = key
+    elif filename == "cores.by_feature.json":
+        scenario_map = scenario_payload.get("cores", {}) if isinstance(scenario_payload, dict) else {}
+        checkpoint_map = checkpoint_payload.get("cores", {}) if isinstance(checkpoint_payload, dict) else {}
+        changed_keys = sorted(
+            feature_id
+            for feature_id in set(scenario_map.keys()) | set(checkpoint_map.keys())
+            if normalize_core_tags(scenario_map.get(feature_id)) != normalize_core_tags(checkpoint_map.get(feature_id))
+        )
+        kind = "cores"
+    else:
+        scenario_geo = scenario_payload.get("geo", {}) if isinstance(scenario_payload, dict) else {}
+        checkpoint_geo = checkpoint_payload.get("geo", {}) if isinstance(checkpoint_payload, dict) else {}
+        changed_keys = sorted(
+            feature_id
+            for feature_id in set(scenario_geo.keys()) | set(checkpoint_geo.keys())
+            if normalize_locale_override_entry(scenario_geo.get(feature_id))
+            != normalize_locale_override_entry(checkpoint_geo.get(feature_id))
+        )
+        kind = "geo_locale_patch"
+    return {
+        "file": filename,
+        "kind": kind,
+        "changed_keys_sample": changed_keys[:25],
+        "changed_key_count": len(changed_keys),
+    }
+
+
+def detect_unsynced_manual_edits(
+    scenario_dir: Path,
+    checkpoint_dir: Path,
+    manual_sources: dict[str, Path],
+    policy: str = MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
+    report_dir: Path | None = None,
+    backup_root: Path | None = None,
+) -> dict[str, object]:
+    monitored_filenames = (
+        "countries.json",
+        "owners.by_feature.json",
+        "controllers.by_feature.json",
+        "cores.by_feature.json",
+        "geo_locale_patch.json",
+    )
+    drift_files: list[dict[str, object]] = []
+    for filename in monitored_filenames:
+        scenario_path = scenario_dir / filename
+        checkpoint_payload_path = checkpoint_dir / filename
+        if not scenario_path.exists() or not checkpoint_payload_path.exists():
+            continue
+        scenario_payload = load_json(scenario_path)
+        checkpoint_payload = load_json(checkpoint_payload_path)
+        if scenario_payload == checkpoint_payload:
+            continue
+        drift_files.append(_build_manual_sync_file_report(filename, scenario_payload, checkpoint_payload))
+
+    timestamp = utc_timestamp().replace(":", "").replace("-", "")
+    report = {
+        "scenario_id": SCENARIO_ID,
+        "generated_at": utc_timestamp(),
+        "policy": policy,
+        "has_drift": bool(drift_files),
+        "manual_sources": {key: str(path) for key, path in manual_sources.items()},
+        "files": drift_files,
+    }
+    report_dir = report_dir or MANUAL_SYNC_REPORT_DIR
+    backup_root = backup_root or MANUAL_SYNC_BACKUP_ROOT
+    report_dir.mkdir(parents=True, exist_ok=True)
+    report_path = report_dir / f"{SCENARIO_ID}-{timestamp}.json"
+    write_json(report_path, report)
+    report["report_path"] = str(report_path)
+    if not drift_files:
+        return report
+
+    if policy == MANUAL_SYNC_POLICY_BACKUP_CONTINUE:
+        backup_dir = backup_root / SCENARIO_ID / timestamp
+        backup_dir.mkdir(parents=True, exist_ok=True)
+        for filename in resolve_publish_filenames(PUBLISH_SCOPE_SCENARIO_DATA):
+            source_path = scenario_dir / filename
+            if source_path.exists():
+                shutil.copy2(source_path, backup_dir / filename)
+        report["backup_path"] = str(backup_dir)
+    if policy == MANUAL_SYNC_POLICY_STRICT_BLOCK:
+        raise ValueError(f"Unsynced manual edits detected. See report: {report_path}")
+    return report
+
+
+def write_bundle_stage(
+    scenario_dir: Path,
+    checkpoint_dir: Path,
+    publish_scope: str = PUBLISH_SCOPE_POLAR_RUNTIME,
+    manual_sync_policy: str = MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
+) -> None:
     scenario_dir.mkdir(parents=True, exist_ok=True)
-    for filename in PUBLISH_FILENAMES:
+    if publish_scope in {PUBLISH_SCOPE_SCENARIO_DATA, PUBLISH_SCOPE_ALL}:
+        validate_geo_locale_checkpoint(checkpoint_dir, scenario_dir / "geo_name_overrides.manual.json")
+        detect_unsynced_manual_edits(
+            scenario_dir,
+            checkpoint_dir,
+            {
+                "scenario_manual_overrides": scenario_dir / MANUAL_OVERRIDE_FILENAME,
+                "geo_name_overrides": scenario_dir / "geo_name_overrides.manual.json",
+                "district_groups": scenario_dir / "district_groups.manual.json",
+            },
+            policy=manual_sync_policy,
+        )
+    for filename in resolve_publish_filenames(publish_scope):
         payload = load_checkpoint_json(checkpoint_dir, filename)
         write_json(scenario_dir / filename, payload)
 
@@ -6634,8 +7256,13 @@ def main() -> None:
         return
 
     if args.stage == STAGE_WRITE_BUNDLE:
-        write_bundle_stage(scenario_dir, checkpoint_dir)
-        print(f"Published checkpoint bundle to {scenario_dir}")
+        write_bundle_stage(
+            scenario_dir,
+            checkpoint_dir,
+            args.publish_scope,
+            manual_sync_policy=args.manual_sync_policy,
+        )
+        print(f"Published {args.publish_scope} checkpoint bundle to {scenario_dir}")
         return
 
     countries_state = build_countries_stage_state(scenario_dir)
@@ -6643,7 +7270,12 @@ def main() -> None:
     state = build_runtime_topology_stage(checkpoint_dir)
     write_runtime_topology_stage_checkpoints(state, checkpoint_dir)
     build_geo_locale_stage(scenario_dir, checkpoint_dir)
-    write_bundle_stage(scenario_dir, checkpoint_dir)
+    write_bundle_stage(
+        scenario_dir,
+        checkpoint_dir,
+        PUBLISH_SCOPE_ALL,
+        manual_sync_policy=args.manual_sync_policy,
+    )
     print_bundle_summary(state)
 
 

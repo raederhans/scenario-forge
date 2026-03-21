@@ -620,12 +620,12 @@ function getRuntimeGeometryFeatureName(geometry) {
 function isScenarioShellCandidate(featureId, featureName = "") {
   const normalizedId = String(featureId || "").trim();
   if (!normalizedId) return false;
-  if (normalizedId.includes("_FB_")) return true;
+  if (normalizedId.toUpperCase().startsWith("RU_ARCTIC_FB_")) return true;
   return String(featureName || "").toLowerCase().includes("shell fallback");
 }
 
 function isScenarioShellOverlayEnabled() {
-  return false;
+  return !!state.runtimePoliticalTopology?.objects?.political;
 }
 
 function getScenarioEffectiveOwnerCodeByFeatureId(featureId) {
@@ -679,6 +679,75 @@ function haveSameScenarioShellMapping(previousMap, nextMap) {
   return true;
 }
 
+function incrementScenarioCodeVote(counterMap, code) {
+  const normalizedCode = canonicalScenarioCountryCode(code);
+  if (!normalizedCode) return;
+  counterMap.set(normalizedCode, (counterMap.get(normalizedCode) || 0) + 1);
+}
+
+function pickScenarioMajorityCode(counterMap) {
+  if (!(counterMap instanceof Map) || !counterMap.size) return "";
+  const ranked = Array.from(counterMap.entries()).sort((a, b) => {
+    if (b[1] !== a[1]) return b[1] - a[1];
+    return String(a[0]).localeCompare(String(b[0]));
+  });
+  if (ranked.length > 1 && ranked[0][1] === ranked[1][1]) {
+    return "";
+  }
+  return String(ranked[0]?.[0] || "").trim().toUpperCase();
+}
+
+function buildScenarioCanonicalFallbackMaps(geometries) {
+  const ownerVotesByCountry = new Map();
+  const controllerVotesByCountry = new Map();
+
+  geometries.forEach((geometry) => {
+    const featureId = getRuntimeGeometryFeatureId(geometry);
+    const featureName = getRuntimeGeometryFeatureName(geometry);
+    if (!featureId || isScenarioShellCandidate(featureId, featureName)) return;
+    const countryCode = getScenarioRuntimeGeometryCountryCode(geometry);
+    if (!countryCode) return;
+
+    const ownerCode = getScenarioEffectiveOwnerCodeByFeatureId(featureId);
+    const controllerCode = getScenarioEffectiveControllerCodeByFeatureId(featureId);
+
+    if (ownerCode) {
+      let counter = ownerVotesByCountry.get(countryCode);
+      if (!counter) {
+        counter = new Map();
+        ownerVotesByCountry.set(countryCode, counter);
+      }
+      incrementScenarioCodeVote(counter, ownerCode);
+    }
+
+    if (controllerCode) {
+      let counter = controllerVotesByCountry.get(countryCode);
+      if (!counter) {
+        counter = new Map();
+        controllerVotesByCountry.set(countryCode, counter);
+      }
+      incrementScenarioCodeVote(counter, controllerCode);
+    }
+  });
+
+  const ownerFallbackByCountry = {};
+  ownerVotesByCountry.forEach((counter, countryCode) => {
+    const winner = pickScenarioMajorityCode(counter);
+    if (winner) ownerFallbackByCountry[countryCode] = winner;
+  });
+
+  const controllerFallbackByCountry = {};
+  controllerVotesByCountry.forEach((counter, countryCode) => {
+    const winner = pickScenarioMajorityCode(counter);
+    if (winner) controllerFallbackByCountry[countryCode] = winner;
+  });
+
+  return {
+    ownerFallbackByCountry,
+    controllerFallbackByCountry,
+  };
+}
+
 function refreshScenarioShellOverlays({ renderNow = false, borderReason = "scenario-shell-overlay" } = {}) {
   const previousOwnerMap = state.scenarioAutoShellOwnerByFeatureId || {};
   const previousControllerMap = state.scenarioAutoShellControllerByFeatureId || {};
@@ -689,14 +758,17 @@ function refreshScenarioShellOverlays({ renderNow = false, borderReason = "scena
     const geometries = state.runtimePoliticalTopology?.objects?.political?.geometries || [];
     if (Array.isArray(geometries) && geometries.length) {
       const neighborGraph = getScenarioRuntimeNeighborGraph(geometries);
+      const {
+        ownerFallbackByCountry,
+        controllerFallbackByCountry,
+      } = buildScenarioCanonicalFallbackMaps(geometries);
       geometries.forEach((geometry, index) => {
         const featureId = getRuntimeGeometryFeatureId(geometry);
         const featureName = getRuntimeGeometryFeatureName(geometry);
         if (!isScenarioShellCandidate(featureId, featureName)) return;
         const neighborIndexes = Array.isArray(neighborGraph[index]) ? neighborGraph[index] : [];
-        if (!neighborIndexes.length) return;
-        const ownerCodes = new Set();
-        const controllerCodes = new Set();
+        const ownerVotes = new Map();
+        const controllerVotes = new Map();
         neighborIndexes.forEach((neighborIndex) => {
           const neighborGeometry = geometries[neighborIndex];
           const neighborId = getRuntimeGeometryFeatureId(neighborGeometry);
@@ -706,14 +778,30 @@ function refreshScenarioShellOverlays({ renderNow = false, borderReason = "scena
           }
           const ownerCode = getScenarioEffectiveOwnerCodeByFeatureId(neighborId);
           const controllerCode = getScenarioEffectiveControllerCodeByFeatureId(neighborId);
-          if (ownerCode) ownerCodes.add(ownerCode);
-          if (controllerCode) controllerCodes.add(controllerCode);
+          incrementScenarioCodeVote(ownerVotes, ownerCode);
+          incrementScenarioCodeVote(controllerVotes, controllerCode);
         });
-        if (ownerCodes.size === 1) {
-          nextOwnerMap[featureId] = [...ownerCodes][0];
+
+        const canonicalCountryCode = getScenarioRuntimeGeometryCountryCode(geometry);
+        const directOwnerCode = canonicalScenarioCountryCode(state.sovereigntyByFeatureId?.[featureId] || "");
+        const directControllerCode = canonicalScenarioCountryCode(state.scenarioControllersByFeatureId?.[featureId] || "");
+        const resolvedOwnerCode =
+          directOwnerCode
+          || pickScenarioMajorityCode(ownerVotes)
+          || ownerFallbackByCountry[canonicalCountryCode]
+          || "";
+        const resolvedControllerCode =
+          directControllerCode
+          || pickScenarioMajorityCode(controllerVotes)
+          || controllerFallbackByCountry[canonicalCountryCode]
+          || resolvedOwnerCode
+          || "";
+
+        if (resolvedOwnerCode) {
+          nextOwnerMap[featureId] = resolvedOwnerCode;
         }
-        if (controllerCodes.size === 1) {
-          nextControllerMap[featureId] = [...controllerCodes][0];
+        if (resolvedControllerCode) {
+          nextControllerMap[featureId] = resolvedControllerCode;
         }
       });
     }

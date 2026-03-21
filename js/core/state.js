@@ -474,14 +474,14 @@ const PHYSICAL_ATLAS_CLASS_KEYS = [
   "tundra_ice",
 ];
 const PHYSICAL_ATLAS_PALETTE = {
-  mountain_high_relief: "#8b5e3c",
-  upland_plateau: "#a1764f",
-  plains_lowlands: "#7d8f69",
-  wetlands_delta: "#4f8f8b",
-  forest: "#5f7d3a",
-  rainforest: "#2f6f4f",
-  desert_bare: "#c6a269",
-  tundra_ice: "#a8b6c8",
+  mountain_high_relief: "#7a4a2a",
+  upland_plateau: "#c4956a",
+  plains_lowlands: "#8aad62",
+  wetlands_delta: "#3d9e96",
+  forest: "#3e6e28",
+  rainforest: "#1a5c3e",
+  desert_bare: "#dbb56a",
+  tundra_ice: "#b8c8dc",
 };
 
 function clamp(value, min, max) {
@@ -546,6 +546,7 @@ function normalizePhysicalStyleConfig(rawConfig) {
     "layerOpacity",
   ].some((key) => Object.prototype.hasOwnProperty.call(raw, key));
   const legacyOpacity = toFiniteNumber(raw.opacity, defaults.atlasOpacity);
+  const atlasOpacityFallback = hasNewPhysicalSchema ? defaults.atlasOpacity : legacyOpacity;
   const legacyContourWidth = toFiniteNumber(raw.contourWidth, defaults.contourMajorWidth);
   const rawVisibility =
     raw.atlasClassVisibility && typeof raw.atlasClassVisibility === "object"
@@ -559,7 +560,7 @@ function normalizePhysicalStyleConfig(rawConfig) {
       0,
       1
     ),
-    atlasOpacity: clamp(toFiniteNumber(raw.atlasOpacity, legacyOpacity), 0, 1),
+    atlasOpacity: clamp(toFiniteNumber(raw.atlasOpacity, atlasOpacityFallback), 0, 1),
     atlasIntensity: clamp(toFiniteNumber(raw.atlasIntensity, defaults.atlasIntensity), 0.2, 1.4),
     atlasClassVisibility: Object.fromEntries(
       PHYSICAL_ATLAS_CLASS_KEYS.map((key) => [key, rawVisibility[key] === undefined ? true : !!rawVisibility[key]])
@@ -926,6 +927,7 @@ export const state = {
   scenarioReliefOverlaysData: null,
   scenarioDistrictGroupsData: null,
   scenarioDistrictGroupByFeatureId: new Map(),
+  scenarioDistrictSharedTemplatesData: null,
   scenarioGeoLocalePatchData: null,
   scenarioCityOverridesData: null,
   riversData: null,
@@ -1057,17 +1059,20 @@ export const state = {
     lastSavedPath: "",
   },
   devScenarioDistrictEditor: {
-    countryCode: "",
-    countryMode: "auto",
-    manualCountryCode: "",
-    inferredCountryCode: "",
+    tag: "",
+    tagMode: "auto",
+    manualTag: "",
+    inferredTag: "",
+    templateTag: "",
     selectedDistrictId: "",
     nameEn: "",
     nameZh: "",
     loadedScenarioId: "",
-    loadedCountryCode: "",
-    draftCountry: null,
+    loadedTag: "",
+    draftTag: null,
     isSaving: false,
+    isTemplateSaving: false,
+    isTemplateApplying: false,
     lastSavedAt: "",
     lastSavedPath: "",
     lastSaveMessage: "",

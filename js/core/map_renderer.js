@@ -2133,7 +2133,7 @@ function isScenarioShellFeature(feature, featureId = null) {
   const candidate = String(
     feature?.properties?.id ?? featureId ?? feature?.id ?? ""
   ).trim().toUpperCase();
-  if (candidate.includes("_FB_")) return true;
+  if (candidate.startsWith("RU_ARCTIC_FB_")) return true;
   return String(feature?.properties?.name || "").toLowerCase().includes("shell fallback");
 }
 
@@ -2148,7 +2148,7 @@ function isAntarcticSectorFeature(feature, featureId = null) {
 }
 
 function shouldExcludePoliticalInteractionFeature(feature, featureId = null) {
-  return isScenarioShellFeature(feature, featureId) || isAntarcticSectorFeature(feature, featureId);
+  return isAntarcticSectorFeature(feature, featureId);
 }
 
 function isGiantFeature(feature, canvasWidth, canvasHeight, boundsOverride = null) {
@@ -6259,9 +6259,40 @@ function drawOceanStyle() {
   context.globalAlpha = 1;
 }
 
+const VALID_BLEND_MODES = new Set([
+  "source-over",
+  "source-in",
+  "source-out",
+  "source-atop",
+  "destination-over",
+  "destination-in",
+  "destination-out",
+  "destination-atop",
+  "lighter",
+  "copy",
+  "xor",
+  "multiply",
+  "screen",
+  "overlay",
+  "darken",
+  "lighten",
+  "color-dodge",
+  "color-burn",
+  "hard-light",
+  "soft-light",
+  "difference",
+  "exclusion",
+  "hue",
+  "saturation",
+  "color",
+  "luminosity",
+]);
+
 function getSafeBlendMode(value, fallback = "source-over") {
-  const mode = String(value || fallback).trim();
-  return mode || fallback;
+  const normalizedFallback = String(fallback || "source-over").trim().toLowerCase();
+  const safeFallback = VALID_BLEND_MODES.has(normalizedFallback) ? normalizedFallback : "source-over";
+  const mode = String(value || "").trim().toLowerCase();
+  return VALID_BLEND_MODES.has(mode) ? mode : safeFallback;
 }
 
 function getDashPattern(styleName, baseWidth = 1) {
@@ -6373,11 +6404,16 @@ function getResolvedPhysicalAtlasCollection() {
 }
 
 function getAtlasFeatureAlphaMultiplier(atlasClass, cfg) {
+  if (atlasClass === "mountain_high_relief") return 1.15;
+  if (atlasClass === "desert_bare") return 1.1;
   if (atlasClass === "rainforest") {
     return clamp(0.72 + cfg.rainforestEmphasis * 0.38, 0.2, 1.2);
   }
+  if (atlasClass === "forest") return 0.95;
+  if (atlasClass === "upland_plateau") return 0.9;
   if (atlasClass === "plains_lowlands") return 0.68;
   if (atlasClass === "wetlands_delta") return 0.92;
+  if (atlasClass === "tundra_ice") return 0.85;
   return 1;
 }
 
@@ -11848,6 +11884,17 @@ function getCountryFeatureIds(countryCode) {
   });
 }
 
+function getScenarioOwnerFeatureIds(ownerTag) {
+  const normalizedOwnerTag = String(ownerTag || "").trim().toUpperCase();
+  if (!normalizedOwnerTag || !(state.ownerToFeatureIds instanceof Map)) return [];
+  const ids = state.ownerToFeatureIds.get(normalizedOwnerTag);
+  if (!Array.isArray(ids)) return [];
+  return ids.filter((candidateId) => {
+    const candidateFeature = state.landIndex?.get(candidateId);
+    return candidateFeature && !shouldExcludePoliticalInteractionFeature(candidateFeature, candidateId);
+  });
+}
+
 function getCountryInteractionPolicy(countryCode) {
   if (!countryCode || !(state.countryInteractionPoliciesByCode instanceof Map)) return null;
   return state.countryInteractionPoliciesByCode.get(countryCode) || null;
@@ -12429,23 +12476,29 @@ function shouldAllowZoomEvent(event) {
 }
 
 function resolveParentGroupKey(feature, featureId) {
-  const countryCode = getFeatureCountryCodeNormalized(feature);
-  if (!countryCode) return "";
-  const fallbackGroup = state.parentGroupByFeatureId?.get(featureId);
+  const scenarioDistrictGroup = String(state.scenarioDistrictGroupByFeatureId?.get(featureId) || "").trim();
+  const scenarioOwnerTag = String(state.sovereigntyByFeatureId?.[featureId] || "").trim().toUpperCase();
+  const scopeCode = scenarioDistrictGroup && scenarioOwnerTag
+    ? scenarioOwnerTag
+    : getFeatureCountryCodeNormalized(feature);
+  if (!scopeCode) return "";
   const directGroup = getAdmin1Group(feature);
-  const groupName = String(fallbackGroup || directGroup || "").trim();
+  const groupName = String(scenarioDistrictGroup || state.parentGroupByFeatureId?.get(featureId) || directGroup || "").trim();
   if (!groupName) return "";
-  return `${countryCode}::${groupName}`;
+  return `${scopeCode}::${groupName}`;
 }
 
 function resolveParentGroupTargetIds(feature, featureId) {
   if (!featureId || !state.landIndex?.has(featureId)) return [];
   if (shouldExcludePoliticalInteractionFeature(feature, featureId)) return [];
+  const scenarioDistrictGroup = String(state.scenarioDistrictGroupByFeatureId?.get(featureId) || "").trim();
+  const scenarioOwnerTag = String(state.sovereigntyByFeatureId?.[featureId] || "").trim().toUpperCase();
   const countryCode = getFeatureCountryCodeNormalized(feature);
   const parentGroupKey = resolveParentGroupKey(feature, featureId);
-  if (!countryCode || !parentGroupKey) return [];
-  const ids = getCountryFeatureIds(countryCode);
-  if (!ids.length) return [];
+  const ids = scenarioDistrictGroup && scenarioOwnerTag
+    ? getScenarioOwnerFeatureIds(scenarioOwnerTag)
+    : getCountryFeatureIds(countryCode);
+  if (!parentGroupKey || !ids.length) return [];
   const targetIds = ids.filter((candidateId) => {
     const candidateFeature = state.landIndex.get(candidateId);
     if (!candidateFeature) return false;

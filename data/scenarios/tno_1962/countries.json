@@ -1,48 +1,9 @@
 {
   "version": 1,
   "scenario_id": "tno_1962",
-  "generated_at": "2026-03-20T09:34:19.177582-04:00",
+  "generated_at": "2026-03-20T20:15:50.784952-04:00",
   "default_country": "GER",
   "countries": {
-    "AEF": {
-      "tag": "AEF",
-      "display_name": "German Equatorial Africa",
-      "color_hex": "#625950",
-      "feature_count": 64,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "TD",
-      "lookup_iso2": "TD",
-      "provenance_iso2": "TD",
-      "scenario_only": true,
-      "featured": false,
-      "capital_state_id": null,
-      "continent_id": "continent_africa",
-      "continent_label": "Africa",
-      "subregion_id": "subregion_middle_africa",
-      "subregion_label": "Middle Africa",
-      "notes": "German Equatorial Africa represented as a German-controlled macro-level colonial federation after the transfer of Chad to French West Africa.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
-      "historical_fidelity": "extended",
-      "primary_rule_source": "tno_1962_german_equatorial_africa",
-      "rule_sources": [
-        "tno_1962_german_equatorial_africa"
-      ],
-      "source_types": [
-        "scenario_extension"
-      ],
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "parent_owner_tag": "GER",
-      "parent_owner_tags": [
-        "GER"
-      ],
-      "subject_kind": "colonial_federation",
-      "entry_kind": "scenario_subject",
-      "controller_feature_count": 64
-    },
     "AFG": {
       "tag": "AFG",
       "display_name": "Afghanistan",
@@ -77,45 +38,6 @@
       "subject_kind": "",
       "entry_kind": "",
       "controller_feature_count": 38
-    },
-    "ALG": {
-      "tag": "ALG",
-      "display_name": "French Algeria",
-      "color_hex": "#1746e6",
-      "feature_count": 16,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "DZ",
-      "lookup_iso2": "DZ",
-      "provenance_iso2": "DZ",
-      "scenario_only": true,
-      "featured": false,
-      "capital_state_id": 459,
-      "continent_id": "continent_africa",
-      "continent_label": "Africa",
-      "subregion_id": "subregion_northern_africa",
-      "subregion_label": "Northern Africa",
-      "notes": "French Algeria represented as a separate colonial administration.",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
-      "historical_fidelity": "vanilla",
-      "primary_rule_source": "french_algeria",
-      "rule_sources": [
-        "french_algeria"
-      ],
-      "source_types": [
-        "scenario_extension"
-      ],
-      "historical_fidelity_summary": [
-        "vanilla"
-      ],
-      "parent_owner_tag": "FRA",
-      "parent_owner_tags": [
-        "FRA"
-      ],
-      "subject_kind": "colony",
-      "entry_kind": "scenario_subject",
-      "controller_feature_count": 16
     },
     "ANG": {
       "tag": "ANG",
@@ -450,7 +372,7 @@
     "BRM": {
       "tag": "BRM",
       "display_name": "Burma",
-      "color_hex": "#c78c75",
+      "color_hex": "#40839e",
       "feature_count": 20,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -490,7 +412,7 @@
       "tag": "BUL",
       "display_name": "Bulgaria",
       "color_hex": "#785d5d",
-      "feature_count": 38,
+      "feature_count": 45,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "BG",
@@ -519,7 +441,7 @@
       "parent_owner_tags": [],
       "subject_kind": "",
       "entry_kind": "",
-      "controller_feature_count": 45
+      "controller_feature_count": 47
     },
     "BWA": {
       "tag": "BWA",
@@ -635,7 +557,7 @@
     "CHI": {
       "tag": "CHI",
       "display_name": "Republic of China",
-      "color_hex": "#40529d",
+      "color_hex": "#ce9f61",
       "feature_count": 704,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -997,7 +919,7 @@
       "tag": "ENG",
       "display_name": "Britain",
       "color_hex": "#7d2020",
-      "feature_count": 136,
+      "feature_count": 135,
       "quality": "approx_existing_geometry",
       "source": "direct_active_owner",
       "base_iso2": "GB",
@@ -1030,7 +952,7 @@
       "parent_owner_tags": [],
       "subject_kind": "",
       "entry_kind": "",
-      "controller_feature_count": 153
+      "controller_feature_count": 130
     },
     "FIN": {
       "tag": "FIN",
@@ -1073,7 +995,7 @@
       "tag": "FRA",
       "display_name": "France",
       "color_hex": "#0f0f65",
-      "feature_count": 279,
+      "feature_count": 295,
       "quality": "approx_existing_geometry",
       "source": "direct_active_owner",
       "base_iso2": "FR",
@@ -1104,13 +1026,13 @@
       "parent_owner_tags": [],
       "subject_kind": "",
       "entry_kind": "",
-      "controller_feature_count": 279
+      "controller_feature_count": 295
     },
     "GER": {
       "tag": "GER",
       "display_name": "Germany",
-      "color_hex": "#2f2f2f",
-      "feature_count": 842,
+      "color_hex": "#3c3c3c",
+      "feature_count": 843,
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "DE",
@@ -1212,43 +1134,19 @@
             "LV007",
             "LV008",
             "LV009",
-            "RU_RAY_50074027B11673707761487",
-            "RU_RAY_50074027B12162041502673",
             "RU_RAY_50074027B19741518738580",
-            "RU_RAY_50074027B19806335982571",
             "RU_RAY_50074027B24532097372880",
             "RU_RAY_50074027B29794452235096",
-            "RU_RAY_50074027B33020072188575",
-            "RU_RAY_50074027B3638705238012",
             "RU_RAY_50074027B37881642500609",
             "RU_RAY_50074027B38818394200389",
             "RU_RAY_50074027B4006940257071",
             "RU_RAY_50074027B464999176845",
-            "RU_RAY_50074027B49278461872326",
-            "RU_RAY_50074027B49826229755475",
-            "RU_RAY_50074027B51055674062633",
-            "RU_RAY_50074027B5223158268211",
-            "RU_RAY_50074027B5631740772865",
-            "RU_RAY_50074027B56853684893187",
-            "RU_RAY_50074027B58076034090645",
-            "RU_RAY_50074027B59238589503343",
-            "RU_RAY_50074027B59467297897339",
-            "RU_RAY_50074027B64055482679717",
-            "RU_RAY_50074027B68450782776786",
-            "RU_RAY_50074027B71157437388348",
-            "RU_RAY_50074027B756292024869",
-            "RU_RAY_50074027B79799250945808",
             "RU_RAY_50074027B81570356192981",
             "RU_RAY_50074027B86147871749672",
             "RU_RAY_50074027B86681375933080",
-            "RU_RAY_50074027B87627181065564",
             "RU_RAY_50074027B88274438285408",
             "RU_RAY_50074027B90555869339870",
-            "RU_RAY_50074027B91439993213773",
-            "RU_RAY_50074027B93378157948323",
-            "RU_RAY_50074027B97238953837028",
-            "RU_RAY_50074027B99227036451137",
-            "RU_RAY_50074027B99894122533642"
+            "RU_RAY_50074027B93378157948323"
           ]
         },
         {
@@ -1528,8 +1426,7 @@
             "FR_ARR_80004",
             "FR_ARR_88001",
             "FR_ARR_88002",
-            "FR_ARR_88003",
-            "FR_ARR_90001"
+            "FR_ARR_88003"
           ]
         },
         {
@@ -1625,7 +1522,7 @@
       "tag": "GRE",
       "display_name": "Greek Protectorate",
       "color_hex": "#799f99",
-      "feature_count": 146,
+      "feature_count": 153,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "GR",
@@ -1658,7 +1555,7 @@
       ],
       "subject_kind": "protectorate",
       "entry_kind": "scenario_subject",
-      "controller_feature_count": 164
+      "controller_feature_count": 162
     },
     "GRN": {
       "tag": "GRN",
@@ -1955,7 +1852,7 @@
     "INS": {
       "tag": "INS",
       "display_name": "Indonesia",
-      "color_hex": "#9c7448",
+      "color_hex": "#9f344d",
       "feature_count": 54,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -2143,7 +2040,7 @@
       "parent_owner_tags": [],
       "subject_kind": "",
       "entry_kind": "",
-      "controller_feature_count": 130
+      "controller_feature_count": 123
     },
     "JOR": {
       "tag": "JOR",
@@ -2453,7 +2350,7 @@
     "MAN": {
       "tag": "MAN",
       "display_name": "Manchukuo",
-      "color_hex": "#bb6848",
+      "color_hex": "#a80043",
       "feature_count": 323,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -2492,7 +2389,7 @@
     "MEN": {
       "tag": "MEN",
       "display_name": "Mengjiang",
-      "color_hex": "#dfc3a2",
+      "color_hex": "#8f354b",
       "feature_count": 73,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -3339,7 +3236,7 @@
     "SHX": {
       "tag": "SHX",
       "display_name": "Shanxi",
-      "color_hex": "#293650",
+      "color_hex": "#955a74",
       "feature_count": 196,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -3763,7 +3660,7 @@
       "tag": "TUR",
       "display_name": "Turkey",
       "color_hex": "#901717",
-      "feature_count": 148,
+      "feature_count": 134,
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "TR",
@@ -3904,7 +3801,7 @@
     "VIN": {
       "tag": "VIN",
       "display_name": "Vietnam",
-      "color_hex": "#c7a489",
+      "color_hex": "#a76286",
       "feature_count": 52,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -3978,7 +3875,7 @@
     "YUN": {
       "tag": "YUN",
       "display_name": "Yunnan",
-      "color_hex": "#355174",
+      "color_hex": "#763446",
       "feature_count": 119,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -4342,7 +4239,7 @@
       "tag": "RKO",
       "display_name": "Reichskommissariat Ostland",
       "color_hex": "#666456",
-      "feature_count": 65,
+      "feature_count": 66,
       "quality": "manual_reviewed",
       "source": "tno_reichskommissariat_baseline",
       "base_iso2": "LT",
@@ -4380,7 +4277,7 @@
       "tag": "RKM",
       "display_name": "Reichskommissariat Moskowien",
       "color_hex": "#4f4554",
-      "feature_count": 771,
+      "feature_count": 770,
       "quality": "manual_reviewed",
       "source": "tno_reichskommissariat_baseline",
       "base_iso2": "RU",
@@ -4619,7 +4516,7 @@
     "XIN": {
       "tag": "XIN",
       "display_name": "Xinjiang",
-      "color_hex": "#47be98",
+      "color_hex": "#5f8e9c",
       "feature_count": 86,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -4700,7 +4597,7 @@
     "CAM": {
       "tag": "CAM",
       "display_name": "Cambodia",
-      "color_hex": "#b69082",
+      "color_hex": "#685d6d",
       "feature_count": 17,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -5011,7 +4908,7 @@
     "TIB": {
       "tag": "TIB",
       "display_name": "Tibet",
-      "color_hex": "#4a5b40",
+      "color_hex": "#c8c8c8",
       "feature_count": 82,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -5053,7 +4950,7 @@
     "FRI": {
       "tag": "FRI",
       "display_name": "Azad Hind",
-      "color_hex": "#867f53",
+      "color_hex": "#2a62a2",
       "feature_count": 199,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -5922,9 +5819,9 @@
     },
     "GCO": {
       "tag": "GCO",
-      "display_name": "German Congo",
+      "display_name": "German Central Africa",
       "color_hex": "#5d554c",
-      "feature_count": 32,
+      "feature_count": 96,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "CD",
@@ -5957,7 +5854,7 @@
       ],
       "subject_kind": "colonial_government",
       "entry_kind": "scenario_subject",
-      "controller_feature_count": 32
+      "controller_feature_count": 96
     },
     "GSW": {
       "tag": "GSW",
@@ -6115,7 +6012,7 @@
     "PAK": {
       "tag": "PAK",
       "display_name": "Pakistan",
-      "color_hex": "#7d8a67",
+      "color_hex": "#21331e",
       "feature_count": 19,
       "quality": "manual_reviewed",
       "source": "manual_rule",
@@ -6356,7 +6253,7 @@
       "tag": "PRM",
       "display_name": "Perm",
       "color_hex": "#aa8c55",
-      "feature_count": 4,
+      "feature_count": 2,
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "RU",
@@ -6390,7 +6287,7 @@
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
       "inspector_group_anchor_id": "continent_europe",
-      "controller_feature_count": 3
+      "controller_feature_count": 2
     },
     "SAM": {
       "tag": "SAM",
@@ -6437,7 +6334,7 @@
       "tag": "BKR",
       "display_name": "Bashkir",
       "color_hex": "#92ba8b",
-      "feature_count": 18,
+      "feature_count": 17,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "RU",
@@ -6471,7 +6368,7 @@
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
       "inspector_group_anchor_id": "continent_europe",
-      "controller_feature_count": 18
+      "controller_feature_count": 17
     },
     "URL": {
       "tag": "URL",
@@ -7761,7 +7658,7 @@
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
       "inspector_group_anchor_id": "continent_europe",
-      "controller_feature_count": 26
+      "controller_feature_count": 25
     },
     "VYT": {
       "tag": "VYT",
@@ -7916,6 +7813,296 @@
       "entry_kind": "scenario_country",
       "hidden_from_country_list": false,
       "controller_feature_count": 6
+    },
+    "VOK": {
+      "tag": "VOK",
+      "display_name": "Vorkuta",
+      "display_name_en": "Vorkuta",
+      "display_name_zh": "沃尔库塔",
+      "color_hex": "#648abe",
+      "feature_count": 1,
+      "controller_feature_count": 1,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "VOK",
+      "lookup_iso2": "VOK",
+      "provenance_iso2": "VOK",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended",
+      "primary_rule_source": "dev_manual_tag_create",
+      "rule_sources": [
+        "dev_manual_tag_create"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": "scenario_country",
+      "hidden_from_country_list": false
+    },
+    "BOP": {
+      "tag": "BOP",
+      "display_name": "вор в законе",
+      "display_name_en": "вор в законе",
+      "display_name_zh": "律贼领地",
+      "color_hex": "#e0e0e0",
+      "feature_count": 8,
+      "controller_feature_count": 4,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "BOP",
+      "lookup_iso2": "BOP",
+      "provenance_iso2": "BOP",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended",
+      "primary_rule_source": "dev_manual_tag_create",
+      "rule_sources": [
+        "dev_manual_tag_create"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": "scenario_country",
+      "hidden_from_country_list": false
+    },
+    "ORS": {
+      "tag": "ORS",
+      "display_name": "Orsk",
+      "display_name_en": "Orsk",
+      "display_name_zh": "奥尔斯克",
+      "color_hex": "#1f1f1f",
+      "feature_count": 12,
+      "controller_feature_count": 12,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "ORS",
+      "lookup_iso2": "ORS",
+      "provenance_iso2": "ORS",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended",
+      "primary_rule_source": "dev_manual_tag_create",
+      "rule_sources": [
+        "dev_manual_tag_create"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": "scenario_country",
+      "hidden_from_country_list": false
+    },
+    "MAG": {
+      "tag": "MAG",
+      "display_name": "Magnitogorsk",
+      "display_name_en": "Magnitogorsk",
+      "display_name_zh": "马格尼托哥尔斯克",
+      "color_hex": "#415638",
+      "feature_count": 13,
+      "controller_feature_count": 13,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "MAG",
+      "lookup_iso2": "MAG",
+      "provenance_iso2": "MAG",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended",
+      "primary_rule_source": "dev_manual_tag_create",
+      "rule_sources": [
+        "dev_manual_tag_create"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": "scenario_country",
+      "hidden_from_country_list": false
+    },
+    "ORN": {
+      "tag": "ORN",
+      "display_name": "Orenburg",
+      "display_name_en": "Orenburg",
+      "display_name_zh": "奥伦堡",
+      "color_hex": "#63342c",
+      "feature_count": 14,
+      "controller_feature_count": 14,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "ORN",
+      "lookup_iso2": "ORN",
+      "provenance_iso2": "ORN",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended",
+      "primary_rule_source": "dev_manual_tag_create",
+      "rule_sources": [
+        "dev_manual_tag_create"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": "scenario_country",
+      "hidden_from_country_list": false
+    },
+    "XIK": {
+      "tag": "XIK",
+      "display_name": "XiKang",
+      "display_name_en": "XiKang",
+      "display_name_zh": "国民革命第24军",
+      "color_hex": "#6873a0",
+      "feature_count": 18,
+      "controller_feature_count": 18,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "XIK",
+      "lookup_iso2": "XIK",
+      "provenance_iso2": "XIK",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended",
+      "primary_rule_source": "dev_manual_tag_create",
+      "rule_sources": [
+        "dev_manual_tag_create"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": "scenario_country",
+      "hidden_from_country_list": false
+    },
+    "ONG": {
+      "tag": "ONG",
+      "display_name": "Onega",
+      "display_name_en": "Onega",
+      "display_name_zh": "奥涅加",
+      "color_hex": "#0d4510",
+      "feature_count": 7,
+      "controller_feature_count": 7,
+      "quality": "manual_reviewed",
+      "source": "manual_rule",
+      "base_iso2": "ONG",
+      "lookup_iso2": "ONG",
+      "provenance_iso2": "ONG",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended",
+      "primary_rule_source": "dev_manual_tag_create",
+      "rule_sources": [
+        "dev_manual_tag_create"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": "scenario_country",
+      "hidden_from_country_list": false
+    },
+    "AQ": {
+      "tag": "AQ",
+      "display_name": "Antarctica",
+      "color_hex": "#5b6859",
+      "feature_count": 1,
+      "quality": "manual_reviewed",
+      "source": "scenario_generated",
+      "base_iso2": "AQ",
+      "lookup_iso2": "AQ",
+      "provenance_iso2": "AQ",
+      "scenario_only": true,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_antarctica",
+      "continent_label": "Antarctica",
+      "subregion_id": "subregion_antarctica",
+      "subregion_label": "Antarctica",
+      "notes": "Collapsed from runtime Antarctic sectors into a single land-only political feature for the TNO 1962 scenario.",
+      "synthetic_owner": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "tno_runtime_polar_fix",
+      "primary_rule_source": "tno_1962_aq_baseline",
+      "rule_sources": [
+        "tno_1962_aq_baseline"
+      ],
+      "source_types": [
+        "scenario_extension"
+      ],
+      "historical_fidelity_summary": [
+        "tno_runtime_polar_fix"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": "",
+      "hidden_from_country_list": false,
+      "controller_feature_count": 1
     },
     "POR": {
       "tag": "POR",
@@ -8121,235 +8308,19 @@
       "inspector_group_anchor_id": "continent_asia",
       "controller_feature_count": 24
     },
-    "VOK": {
-      "tag": "VOK",
-      "display_name": "Vorkuta",
-      "display_name_en": "Vorkuta",
-      "display_name_zh": "沃尔库塔",
-      "color_hex": "#648abe",
-      "feature_count": 1,
-      "controller_feature_count": 1,
+    "GAY": {
+      "tag": "GAY",
+      "display_name": "Gayny",
+      "display_name_en": "Gayny",
+      "display_name_zh": "盖尼",
+      "color_hex": "#4f4f4f",
+      "feature_count": 3,
+      "controller_feature_count": 3,
       "quality": "manual_reviewed",
       "source": "manual_rule",
-      "base_iso2": "VOK",
-      "lookup_iso2": "VOK",
-      "provenance_iso2": "VOK",
-      "scenario_only": true,
-      "featured": false,
-      "capital_state_id": null,
-      "notes": "",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
-      "historical_fidelity": "extended",
-      "primary_rule_source": "dev_manual_tag_create",
-      "rule_sources": [
-        "dev_manual_tag_create"
-      ],
-      "source_types": [
-        "scenario_extension"
-      ],
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "subject_kind": "",
-      "entry_kind": "scenario_country",
-      "hidden_from_country_list": false
-    },
-    "BOP": {
-      "tag": "BOP",
-      "display_name": "вор в законе",
-      "display_name_en": "вор в законе",
-      "display_name_zh": "律贼领地",
-      "color_hex": "#e0e0e0",
-      "feature_count": 8,
-      "controller_feature_count": 4,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "BOP",
-      "lookup_iso2": "BOP",
-      "provenance_iso2": "BOP",
-      "scenario_only": true,
-      "featured": false,
-      "capital_state_id": null,
-      "notes": "",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
-      "historical_fidelity": "extended",
-      "primary_rule_source": "dev_manual_tag_create",
-      "rule_sources": [
-        "dev_manual_tag_create"
-      ],
-      "source_types": [
-        "scenario_extension"
-      ],
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "subject_kind": "",
-      "entry_kind": "scenario_country",
-      "hidden_from_country_list": false
-    },
-    "ORS": {
-      "tag": "ORS",
-      "display_name": "Orsk",
-      "display_name_en": "Orsk",
-      "display_name_zh": "奥尔斯克",
-      "color_hex": "#1f1f1f",
-      "feature_count": 12,
-      "controller_feature_count": 12,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "ORS",
-      "lookup_iso2": "ORS",
-      "provenance_iso2": "ORS",
-      "scenario_only": true,
-      "featured": false,
-      "capital_state_id": null,
-      "notes": "",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
-      "historical_fidelity": "extended",
-      "primary_rule_source": "dev_manual_tag_create",
-      "rule_sources": [
-        "dev_manual_tag_create"
-      ],
-      "source_types": [
-        "scenario_extension"
-      ],
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "subject_kind": "",
-      "entry_kind": "scenario_country",
-      "hidden_from_country_list": false
-    },
-    "MAG": {
-      "tag": "MAG",
-      "display_name": "Magnitogorsk",
-      "display_name_en": "Magnitogorsk",
-      "display_name_zh": "马格尼托哥尔斯克",
-      "color_hex": "#415638",
-      "feature_count": 13,
-      "controller_feature_count": 13,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "MAG",
-      "lookup_iso2": "MAG",
-      "provenance_iso2": "MAG",
-      "scenario_only": true,
-      "featured": false,
-      "capital_state_id": null,
-      "notes": "",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
-      "historical_fidelity": "extended",
-      "primary_rule_source": "dev_manual_tag_create",
-      "rule_sources": [
-        "dev_manual_tag_create"
-      ],
-      "source_types": [
-        "scenario_extension"
-      ],
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "subject_kind": "",
-      "entry_kind": "scenario_country",
-      "hidden_from_country_list": false
-    },
-    "ORN": {
-      "tag": "ORN",
-      "display_name": "Orenburg",
-      "display_name_en": "Orenburg",
-      "display_name_zh": "奥伦堡",
-      "color_hex": "#63342c",
-      "feature_count": 14,
-      "controller_feature_count": 14,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "ORN",
-      "lookup_iso2": "ORN",
-      "provenance_iso2": "ORN",
-      "scenario_only": true,
-      "featured": false,
-      "capital_state_id": null,
-      "notes": "",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
-      "historical_fidelity": "extended",
-      "primary_rule_source": "dev_manual_tag_create",
-      "rule_sources": [
-        "dev_manual_tag_create"
-      ],
-      "source_types": [
-        "scenario_extension"
-      ],
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "subject_kind": "",
-      "entry_kind": "scenario_country",
-      "hidden_from_country_list": false
-    },
-    "XIK": {
-      "tag": "XIK",
-      "display_name": "XiKang",
-      "display_name_en": "XiKang",
-      "display_name_zh": "国民革命第24军",
-      "color_hex": "#d2ddf4",
-      "feature_count": 18,
-      "controller_feature_count": 18,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "XIK",
-      "lookup_iso2": "XIK",
-      "provenance_iso2": "XIK",
-      "scenario_only": true,
-      "featured": false,
-      "capital_state_id": null,
-      "notes": "",
-      "synthetic_owner": false,
-      "source_type": "scenario_extension",
-      "historical_fidelity": "extended",
-      "primary_rule_source": "dev_manual_tag_create",
-      "rule_sources": [
-        "dev_manual_tag_create"
-      ],
-      "source_types": [
-        "scenario_extension"
-      ],
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "subject_kind": "",
-      "entry_kind": "scenario_country",
-      "hidden_from_country_list": false
-    },
-    "ONG": {
-      "tag": "ONG",
-      "display_name": "Onega",
-      "display_name_en": "Onega",
-      "display_name_zh": "奥涅加",
-      "color_hex": "#0d4510",
-      "feature_count": 7,
-      "controller_feature_count": 7,
-      "quality": "manual_reviewed",
-      "source": "manual_rule",
-      "base_iso2": "ONG",
-      "lookup_iso2": "ONG",
-      "provenance_iso2": "ONG",
+      "base_iso2": "GAY",
+      "lookup_iso2": "GAY",
+      "provenance_iso2": "GAY",
       "scenario_only": true,
       "featured": false,
       "capital_state_id": null,

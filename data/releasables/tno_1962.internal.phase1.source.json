@@ -6,6 +6,39 @@
   ],
   "entries": [
     {
+      "tag": "ALG",
+      "display_name_override": "French Algeria",
+      "color_hex_override": "#1746e6",
+      "parent_owner_tag": "FRA",
+      "release_lookup_iso2": "DZ",
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "allow_manual_overlay": true,
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "DZA-2195",
+          "DZA-2196",
+          "DZA-2198",
+          "DZA-2209",
+          "ATLPRV_18153",
+          "ATLSHL_west_med_6",
+          "ATLSHL_west_med_7",
+          "ATLSHL_west_med_9",
+          "ATLWLD_west_med_22",
+          "ATLWLD_west_med_24",
+          "ATLWLD_west_med_25",
+          "ATLWLD_west_med_26",
+          "ATLWLD_west_med_27",
+          "ATLWLD_west_med_29",
+          "ATLWLD_west_med_31",
+          "ATLWLD_west_med_70"
+        ]
+      },
+      "notes": "France releasable for the retained TNO 1962 French Algeria footprint."
+    },
+    {
       "tag": "BRG",
       "display_name_override": "Ordensstaat Burgund",
       "color_hex_override": "#1a1a1a",
