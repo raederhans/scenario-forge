@@ -3126,7 +3126,20 @@ def apply_dev_manual_overrides(
         existing_entry = countries.get(tag)
         if mode == "create":
             if isinstance(existing_entry, dict):
-                raise ValueError(f"Dev manual override cannot create existing tag: {tag}")
+                existing_primary_rule = str(existing_entry.get("primary_rule_source") or "").strip()
+                existing_rule_sources = existing_entry.get("rule_sources")
+                existing_is_dev_manual_create = (
+                    existing_primary_rule == "dev_manual_tag_create"
+                    or (
+                        isinstance(existing_rule_sources, list)
+                        and "dev_manual_tag_create" in existing_rule_sources
+                    )
+                )
+                if existing_is_dev_manual_create:
+                    mode = "override"
+                else:
+                    raise ValueError(f"Dev manual override cannot create existing tag: {tag}")
+        if mode == "create":
             countries[tag] = {
                 "tag": tag,
                 "display_name": str(raw_entry.get("display_name") or raw_entry.get("display_name_en") or tag).strip(),
@@ -6870,7 +6883,7 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
     manifest_payload["performance_hints"] = {
         "render_profile_default": "balanced",
         "dynamic_borders_default": False,
-        "scenario_relief_overlays_default": False,
+        "scenario_relief_overlays_default": True,
         "water_regions_default": True,
         "special_regions_default": True,
     }

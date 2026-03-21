@@ -3614,10 +3614,13 @@ function initSidebar({ render } = {}) {
     if (scenarioReliefOverlayVisibilityHint) {
       scenarioReliefOverlayVisibilityHint.textContent = state.showScenarioReliefOverlays
         ? t(
-          "Scenario relief overlays are currently visible. During pan and zoom they redraw only after the view settles.",
+          "Scenario relief overlays are currently visible. Cached relief stays visible during pan and zoom, then redraws exactly after the view settles.",
           "ui"
         )
-        : t("When off, shoreline, basin contour, and texture overlays are hidden for the active scenario.", "ui");
+        : t(
+          "When off, shoreline, basin contour, and texture overlays are hidden for the active scenario.",
+          "ui"
+        );
     }
   };
 

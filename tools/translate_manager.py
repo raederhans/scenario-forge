@@ -257,7 +257,11 @@ MANUAL_UI_DICT = {
     "Critical checks": "关键检查",
     "Target This Country": "将此国家设为目标",
     "When off, shoreline, basin contour, and texture overlays are hidden for the active scenario.": "关闭后，当前剧本的海岸线、盆地等高线和纹理覆盖层将被隐藏。",
-    "Scenario relief overlays are currently visible. During pan and zoom they redraw only after the view settles.": "当前剧本的地形覆盖层处于可见状态。平移和缩放期间会在视图稳定后重绘。",
+    "Scenario relief overlays are currently visible. Cached relief stays visible during pan and zoom, then redraws exactly after the view settles.": "当前剧本的地形覆盖层处于可见状态。平移和缩放期间会继续显示缓存纹理，并在视图稳定后进行精确重绘。",
+    "Experimental Ocean Styles": "实验性海洋样式",
+    "Enable bathymetry and wave presets for testing. May reduce pan and zoom performance.": "启用测深与波纹预设以供测试，可能降低平移和缩放性能。",
+    "Enable Experimental Ocean Styles to unlock advanced ocean textures.": "启用“实验性海洋样式”后才能使用高级海洋纹理。",
+    "Available when Experimental Ocean Styles is enabled.": "启用“实验性海洋样式”后可用。",
 }
 
 MANUAL_GEO_OVERRIDES = {

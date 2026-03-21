@@ -96,8 +96,8 @@ const RELIEF_SALT_FILL_COLOR = "rgba(222, 203, 170, 0.22)";
 const RELIEF_SALT_STROKE_COLOR = "rgba(128, 100, 63, 0.55)";
 const RELIEF_SHORELINE_COLOR = "rgba(109, 84, 50, 0.78)";
 const RELIEF_CONTOUR_COLOR = "rgba(176, 148, 103, 0.6)";
-const RELIEF_SWAMP_FILL_COLOR = "rgba(128, 150, 114, 0.18)";
-const RELIEF_SWAMP_STROKE_COLOR = "rgba(88, 108, 76, 0.52)";
+const RELIEF_SWAMP_FILL_COLOR = "rgba(128, 150, 114, 0.28)";
+const RELIEF_SWAMP_STROKE_COLOR = "rgba(88, 108, 76, 0.68)";
 const RELIEF_LAKE_SHORELINE_COLOR = "rgba(214, 232, 244, 0.92)";
 const RELIEF_DAM_APPROACH_COLOR = "rgba(102, 86, 62, 0.8)";
 const GIANT_FEATURE_CULL_RATIO = 0.95;
@@ -218,7 +218,6 @@ const DE_STATE_GROUP_MIN = 12;
 const DE_STATE_GROUP_MAX = 20;
 const DE_CITY_STATES = new Set(["Berlin", "Hamburg", "Bremen"]);
 const OCEAN_PATTERN_BASE_SIZE = 160;
-const OCEAN_ADVANCED_STYLES_ENABLED = false;
 const OCEAN_MASK_MODE_TOPOLOGY = "topology_ocean";
 const OCEAN_MASK_MODE_SPHERE_MINUS_LAND = "sphere_minus_land";
 const OCEAN_MASK_MIN_QUALITY = 0.35;
@@ -1839,6 +1838,7 @@ function drawScenarioReliefOverlaysLayer(k) {
     if (!isReliefOverlayEnabled(feature)) return;
     if (!pathBoundsInScreen(feature)) return;
     const style = getReliefOverlayStyle(feature);
+    const kind = getReliefOverlayKind(feature);
     const bounds = getPathBounds(feature);
     if (!bounds) return;
     const geometryType = String(feature?.geometry?.type || "").trim();
@@ -1850,7 +1850,7 @@ function drawScenarioReliefOverlaysLayer(k) {
       context.fillStyle = style.fill;
       context.fill();
       context.clip();
-      if (getReliefOverlayKind(feature) === "salt_flat_texture") {
+      if (kind === "salt_flat_texture") {
         drawPolygonLinePattern(bounds, {
           color: style.stroke,
           spacing: 11 / Math.max(0.3, Math.min(4, k)),
@@ -1865,13 +1865,28 @@ function drawScenarioReliefOverlaysLayer(k) {
           lineWidth: 0.45 / Math.max(0.0001, k),
           alpha: 0.25,
         });
+      } else if (kind === "swamp_margin") {
+        drawPolygonLinePattern(bounds, {
+          color: style.stroke,
+          spacing: 8 / Math.max(0.3, Math.min(4, k)),
+          angleDeg: 82,
+          lineWidth: 0.5 / Math.max(0.0001, k),
+          alpha: 0.4,
+        });
+        drawPolygonLinePattern(bounds, {
+          color: "rgba(90, 140, 180, 0.8)",
+          spacing: 14 / Math.max(0.3, Math.min(4, k)),
+          angleDeg: 0,
+          lineWidth: 0.35 / Math.max(0.0001, k),
+          alpha: 0.22,
+        });
       }
       context.restore();
     }
     context.beginPath();
     pathCanvas(feature);
     context.save();
-    if (getReliefOverlayKind(feature) === "dam_approach") {
+    if (kind === "dam_approach") {
       context.setLineDash([3 / Math.max(0.0001, k), 2 / Math.max(0.0001, k)]);
     }
     context.strokeStyle = style.stroke;
@@ -6580,6 +6595,7 @@ function getOceanStyleConfig() {
       0,
       1
     ),
+    experimentalAdvancedStyles: ocean.experimentalAdvancedStyles === true,
   };
 }
 
@@ -6795,12 +6811,12 @@ function getOceanPattern({ preset, scale, contourStrength }) {
 
 function drawOceanStyle() {
   if (!context || !pathCanvas) return;
-  if (!OCEAN_ADVANCED_STYLES_ENABLED) {
+  const oceanStyle = getOceanStyleConfig();
+  if (!oceanStyle.experimentalAdvancedStyles) {
     state.oceanMaskMode = OCEAN_MASK_MODE_TOPOLOGY;
     state.oceanMaskQuality = 0;
     return;
   }
-  const oceanStyle = getOceanStyleConfig();
   if (oceanStyle.preset === "flat") return;
   const oceanMask = resolveOceanMask();
 

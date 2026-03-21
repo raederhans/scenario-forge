@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 import json
 from pathlib import Path
 import tempfile
@@ -10,9 +11,12 @@ from shapely.geometry import Polygon
 
 from tools.check_scenario_contracts import validate_publish_bundle_dir
 from tools.patch_tno_1962_bundle import (
+    ATLANTROPA_REGION_CONFIGS,
     MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
     MANUAL_SYNC_POLICY_STRICT_BLOCK,
     apply_dev_manual_overrides,
+    build_relief_overlays,
+    build_runtime_topology_state_from_countries_state,
     build_polar_feature_diagnostics,
     build_runtime_topology_payload,
     build_single_antarctic_feature,
@@ -175,6 +179,57 @@ class TnoBundleBuilderTest(unittest.TestCase):
         self.assertIn("CCC", diagnostics["create_tags"])
         self.assertIn("AAA", diagnostics["override_tags"])
 
+    def test_apply_dev_manual_overrides_allows_rerunning_dev_manual_creates(self) -> None:
+        countries_payload = {
+            "countries": {
+                "BOP": {
+                    "tag": "BOP",
+                    "display_name": "Old Name",
+                    "display_name_en": "Old Name",
+                    "display_name_zh": "旧名称",
+                    "color_hex": "#111111",
+                    "feature_count": 0,
+                    "controller_feature_count": 0,
+                    "primary_rule_source": "dev_manual_tag_create",
+                    "rule_sources": ["dev_manual_tag_create"],
+                }
+            }
+        }
+        owners_payload = {"owners": {}}
+        controllers_payload = {"controllers": {}}
+        cores_payload = {"cores": {}}
+        audit_payload = {}
+        manual_overrides_payload = {
+            "countries": {
+                "BOP": {
+                    "mode": "create",
+                    "display_name": "Bopland",
+                    "display_name_en": "Bopland",
+                    "display_name_zh": "博普兰",
+                    "color_hex": "#abcdef",
+                    "entry_kind": "scenario_country",
+                    "base_iso2": "BOP",
+                    "lookup_iso2": "BOP",
+                    "provenance_iso2": "BOP",
+                }
+            }
+        }
+
+        diagnostics = apply_dev_manual_overrides(
+            countries_payload,
+            owners_payload,
+            controllers_payload,
+            cores_payload,
+            manual_overrides_payload,
+            audit_payload,
+        )
+
+        self.assertEqual(countries_payload["countries"]["BOP"]["display_name_en"], "Bopland")
+        self.assertEqual(countries_payload["countries"]["BOP"]["display_name_zh"], "博普兰")
+        self.assertEqual(countries_payload["countries"]["BOP"]["color_hex"], "#abcdef")
+        self.assertNotIn("BOP", diagnostics["create_tags"])
+        self.assertIn("BOP", diagnostics["override_tags"])
+
     def test_normalize_feature_core_map_handles_legacy_formats(self) -> None:
         payload = normalize_feature_core_map(
             {
@@ -286,6 +341,96 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 "render_as_base_geography": False,
             },
         )
+
+    def test_build_relief_overlays_keeps_expected_overlay_kind_distribution(self) -> None:
+        region_unions = {
+            region_id: _square(index * 2, 0, 0.18 if index >= 6 else 1.0)
+            for index, region_id in enumerate(ATLANTROPA_REGION_CONFIGS)
+        }
+        lake_geom = _square(0, 4, 2.0)
+
+        payload = build_relief_overlays(region_unions, lake_geom)
+        overlay_counts = Counter(
+            feature["properties"]["overlay_kind"]
+            for feature in payload["features"]
+        )
+
+        self.assertEqual(
+            overlay_counts,
+            Counter({
+                "salt_flat_texture": 8,
+                "new_shoreline": 8,
+                "drained_basin_contour": 6,
+                "lake_shoreline": 1,
+                "swamp_margin": 1,
+                "dam_approach": 1,
+            }),
+        )
+        self.assertEqual(len(payload["features"]), 25)
+
+    def test_build_runtime_topology_state_sets_tno_relief_default_hint_true(self) -> None:
+        state = {
+            "countries_payload": {
+                "countries": {
+                    "AAA": {
+                        "tag": "AAA",
+                        "display_name": "Alpha",
+                        "display_name_en": "Alpha",
+                        "display_name_zh": "阿尔法",
+                        "featured": False,
+                    }
+                }
+            },
+            "owners_payload": {"owners": {"AAA-1": "AAA"}},
+            "controllers_payload": {"controllers": {"AAA-1": "AAA"}},
+            "cores_payload": {"cores": {"AAA-1": ["AAA"]}},
+            "manifest_payload": {"scenario_id": "tno_1962", "featured_tags": [], "summary": {}},
+            "audit_payload": {"summary": {}, "diagnostics": {}},
+            "scenario_political_gdf": gpd.GeoDataFrame(
+                [{"id": "AAA-1", "name": "Alpha", "cntr_code": "AAA", "geometry": _square(0, 0, 1.0)}],
+                geometry="geometry",
+                crs="EPSG:4326",
+            ),
+            "water_gdf": gpd.GeoDataFrame(
+                [{"id": "water-1", "name": "Lake", "geometry": _square(2, 2, 1.0)}],
+                geometry="geometry",
+                crs="EPSG:4326",
+            ),
+            "land_mask_gdf": gpd.GeoDataFrame(
+                [{"id": "mask-1", "name": "Mask", "geometry": _square(0, 0, 4.0)}],
+                geometry="geometry",
+                crs="EPSG:4326",
+            ),
+            "context_land_mask_gdf": gpd.GeoDataFrame(
+                [{"id": "context-mask-1", "name": "Context Mask", "geometry": _square(0, 0, 4.0)}],
+                geometry="geometry",
+                crs="EPSG:4326",
+            ),
+            "relief_overlays_payload": {"type": "FeatureCollection", "features": []},
+            "stage_metadata": {
+                "generated_at": "2026-03-21T00:00:00Z",
+                "source_root": "test-source-root",
+                "hgo_donor_root": "test-hgo-root",
+                "touched_east_asia_tags": [],
+                "touched_south_asia_tags": [],
+                "touched_regional_rule_tags": [],
+                "applied_annex_maps": {},
+                "atlantropa_diagnostics": {},
+                "island_replacement_diagnostics": {},
+                "med_water_diagnostics": {},
+                "restore_diagnostics": {},
+                "feature_assignment_override_diagnostics": {},
+                "atl_feature_ids": [],
+                "atl_sea_feature_ids": [],
+                "context_land_mask_tolerance": 0.25,
+                "context_land_mask_area_delta_ratio": 0.0,
+                "context_land_mask_fallback_used": False,
+            },
+        }
+
+        result = build_runtime_topology_state_from_countries_state(state)
+
+        self.assertTrue(result["manifest_payload"]["performance_hints"]["scenario_relief_overlays_default"])
 
     def test_build_single_antarctic_feature_collapses_runtime_sectors(self) -> None:
         runtime_gdf = gpd.GeoDataFrame(

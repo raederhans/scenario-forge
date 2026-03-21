@@ -128,7 +128,7 @@ applyScenarioById()
 代码中已存在一些优化基础设施：
 
 1. **`beginStagedMapDataWarmup()`** (`map_renderer.js:9917`) — 当 features > 12,000 时延迟 contextBase 渲染和 hitCanvas 构建。但仅在 `setMapData()` **末尾**触发，之前的所有重计算仍然阻塞。
-2. **`performance_hints`** 在 manifest 中配置：`render_profile_default: "balanced"`, `dynamic_borders_default: false`, `scenario_relief_overlays_default: false`。减少了运行时开销但不影响初始加载。
+2. **`performance_hints`** 在 manifest 中配置：`render_profile_default: "balanced"`, `dynamic_borders_default: false`, `scenario_relief_overlays_default: true`。当前 TNO 将 relief overlays 视为默认地理表达，不再依赖“默认关闭”来换取首屏成本。
 3. **`layerResolverCache`** — `ensureLayerDataFromTopology()` 有缓存避免重复解码，但场景切换时缓存被清空。
 4. **性能指标记录** — `recordRenderPerfMetric()` 和 `recordScenarioPerfMetric()` 已存在，可用于验证优化效果。
 

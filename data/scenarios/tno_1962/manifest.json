@@ -118,7 +118,7 @@
   "performance_hints": {
     "render_profile_default": "balanced",
     "dynamic_borders_default": false,
-    "scenario_relief_overlays_default": false,
+    "scenario_relief_overlays_default": true,
     "water_regions_default": true,
     "special_regions_default": true
   },

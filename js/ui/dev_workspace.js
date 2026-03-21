@@ -17,6 +17,7 @@ import {
   normalizeScenarioDistrictGroupsPayload,
   normalizeScenarioDistrictTag,
 } from "../core/scenario_districts.js";
+import { getScenarioCountryDisplayName } from "../core/scenario_country_display.js";
 import { applyDeclarativeTranslations, buildTooltipModel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 
@@ -213,6 +214,10 @@ function ensureTagCreatorState() {
     duplicateTag: false,
     tagLengthHint: "",
     isColorPopoverOpen: false,
+    selectedInspectorGroupId: "",
+    inspectorGroupId: "",
+    inspectorGroupLabel: "",
+    inspectorGroupAnchorId: "",
     recentColors: [],
     recentColorsLoaded: false,
     ...current,
@@ -226,6 +231,10 @@ function ensureTagCreatorState() {
     || current.isColorPopoverOpen !== nextState.isColorPopoverOpen
     || current.duplicateTag !== nextState.duplicateTag
     || current.tagLengthHint !== nextState.tagLengthHint
+    || current.selectedInspectorGroupId !== nextState.selectedInspectorGroupId
+    || current.inspectorGroupId !== nextState.inspectorGroupId
+    || current.inspectorGroupLabel !== nextState.inspectorGroupLabel
+    || current.inspectorGroupAnchorId !== nextState.inspectorGroupAnchorId
     || JSON.stringify(current.recentColors || []) !== JSON.stringify(nextState.recentColors)
   ) {
     state.devScenarioTagCreator = nextState;
@@ -304,6 +313,10 @@ function resetTagCreatorForm({ preserveStatus = false } = {}) {
     nameZh: "",
     colorHex: DEFAULT_TAG_CREATOR_COLOR,
     parentOwnerTag: "",
+    selectedInspectorGroupId: "",
+    inspectorGroupId: "",
+    inspectorGroupLabel: "",
+    inspectorGroupAnchorId: "",
     duplicateTag: false,
     tagLengthHint: "",
     isColorPopoverOpen: false,
@@ -420,7 +433,181 @@ function resolveTagCreatorHint(model) {
   return ui("Create a new scenario tag, optionally set a parent owner, and assign the current selection immediately.");
 }
 
-function validateTagCreatorInput({ tag = "", nameEn = "", nameZh = "", colorHex = "", parentOwnerTag = "" } = {}, targetIds = []) {
+function normalizeScenarioInspectorGroupIdInput(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/[^a-z0-9_-]/g, "")
+    .slice(0, 64);
+}
+
+function collectScenarioCountryOptions({ includeReleasable = true } = {}) {
+  return Object.entries(state.scenarioCountriesByTag || {})
+    .map(([rawTag, rawEntry]) => {
+      const tag = normalizeScenarioTagInput(rawTag || rawEntry?.tag);
+      if (!tag || !rawEntry || typeof rawEntry !== "object") return null;
+      const releasable = !!rawEntry.releasable || String(rawEntry.entry_kind || "").trim() === "releasable";
+      if (!includeReleasable && releasable) return null;
+      const displayName = getScenarioCountryDisplayName(rawEntry, state.countryNames?.[tag] || tag) || tag;
+      const nameEn = normalizeScenarioNameInput(rawEntry.display_name_en || rawEntry.display_name || displayName || tag);
+      const nameZh = normalizeScenarioNameInput(rawEntry.display_name_zh);
+      const featureCount = Number(rawEntry.feature_count ?? rawEntry.controller_feature_count ?? 0) || 0;
+      return {
+        tag,
+        entry: rawEntry,
+        releasable,
+        displayName,
+        nameEn,
+        nameZh,
+        featureCount,
+        label: `${displayName} (${tag})`,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.displayName.localeCompare(b.displayName) || a.tag.localeCompare(b.tag));
+}
+
+function collectScenarioInspectorAnchorOptions() {
+  const anchors = new Map();
+  Object.values(state.scenarioCountriesByTag || {}).forEach((entry) => {
+    if (!entry || typeof entry !== "object") return;
+    const anchorId = String(entry.continent_id || "").trim();
+    const anchorLabel = String(entry.continent_label || "").trim() || anchorId;
+    if (!anchorId || anchors.has(anchorId)) return;
+    anchors.set(anchorId, {
+      id: anchorId,
+      label: anchorLabel,
+    });
+  });
+  return Array.from(anchors.values()).sort((a, b) => a.label.localeCompare(b.label) || a.id.localeCompare(b.id));
+}
+
+function collectScenarioInspectorGroupOptions() {
+  const groups = new Map();
+  collectScenarioInspectorAnchorOptions().forEach((anchor) => {
+    groups.set(anchor.id, {
+      id: anchor.id,
+      label: anchor.label,
+      anchorId: anchor.id,
+      isAnchor: true,
+    });
+  });
+  Object.values(state.scenarioCountriesByTag || {}).forEach((entry) => {
+    if (!entry || typeof entry !== "object") return;
+    const id = String(entry.inspector_group_id || "").trim();
+    if (!id || groups.has(id)) return;
+    groups.set(id, {
+      id,
+      label: String(entry.inspector_group_label || id).trim() || id,
+      anchorId: String(entry.inspector_group_anchor_id || entry.continent_id || "").trim(),
+      isAnchor: false,
+    });
+  });
+  return Array.from(groups.values()).sort((a, b) => {
+    if (!!a.isAnchor !== !!b.isAnchor) return a.isAnchor ? -1 : 1;
+    return a.label.localeCompare(b.label) || a.id.localeCompare(b.id);
+  });
+}
+
+function resolvePreferredScenarioTagCode(...candidateValues) {
+  const availableTags = new Set(collectScenarioCountryOptions().map((entry) => entry.tag));
+  const ownershipModel = resolveOwnershipEditorModel();
+  const inferredSelectionTag = ownershipModel.selectionCount > 0 && !ownershipModel.isMixedOwner
+    ? normalizeScenarioTagInput(ownershipModel.currentOwnerCode || ownershipModel.ownerCodes?.[0])
+    : "";
+  const candidates = [
+    ...candidateValues,
+    inferredSelectionTag,
+    normalizeScenarioTagInput(state.selectedInspectorCountryCode),
+    normalizeScenarioTagInput(state.activeSovereignCode),
+  ];
+  return candidates
+    .map((value) => normalizeScenarioTagInput(value))
+    .find((value) => value && availableTags.has(value)) || "";
+}
+
+function resolveSingleSelectionScenarioTag(availableTags = null) {
+  const tagSet = availableTags instanceof Set
+    ? availableTags
+    : new Set(
+      (Array.isArray(availableTags) ? availableTags : collectScenarioCountryOptions())
+        .map((entry) => normalizeScenarioTagInput(entry?.tag))
+        .filter(Boolean)
+    );
+  const ownershipModel = resolveOwnershipEditorModel();
+  if (ownershipModel.selectionCount <= 0 || ownershipModel.isMixedOwner) {
+    return "";
+  }
+  const inferredSelectionTag = normalizeScenarioTagInput(
+    ownershipModel.currentOwnerCode || ownershipModel.ownerCodes?.[0]
+  );
+  return inferredSelectionTag && tagSet.has(inferredSelectionTag) ? inferredSelectionTag : "";
+}
+
+function resolveTagCreatorInspectorGroupSelection(input = {}) {
+  const selectedGroupId = String(input.selectedInspectorGroupId || "").trim();
+  const draftGroupId = normalizeScenarioInspectorGroupIdInput(input.inspectorGroupId);
+  const draftGroupLabel = normalizeScenarioNameInput(input.inspectorGroupLabel);
+  const draftGroupAnchorId = String(input.inspectorGroupAnchorId || "").trim();
+  const hasDraftValues = !!(draftGroupId || draftGroupLabel || draftGroupAnchorId);
+  if (hasDraftValues) {
+    if (!draftGroupId) {
+      return { ok: false, message: ui("New inspector group id is required.") };
+    }
+    if (!/^[a-z0-9_-]+$/i.test(draftGroupId)) {
+      return { ok: false, message: ui("Inspector group id must use letters, numbers, underscore, or hyphen.") };
+    }
+    if (!draftGroupLabel) {
+      return { ok: false, message: ui("New inspector group label is required.") };
+    }
+    if (!draftGroupAnchorId) {
+      return { ok: false, message: ui("Anchor region is required for a new inspector group.") };
+    }
+    return {
+      ok: true,
+      values: {
+        inspectorGroupId: draftGroupId,
+        inspectorGroupLabel: draftGroupLabel,
+        inspectorGroupAnchorId: draftGroupAnchorId,
+      },
+    };
+  }
+  if (!selectedGroupId) {
+    return {
+      ok: true,
+      values: {
+        inspectorGroupId: "",
+        inspectorGroupLabel: "",
+        inspectorGroupAnchorId: "",
+      },
+    };
+  }
+  const selectedGroup = collectScenarioInspectorGroupOptions().find((entry) => entry.id === selectedGroupId) || null;
+  if (!selectedGroup) {
+    return { ok: false, message: ui("Selected inspector group could not be resolved.") };
+  }
+  return {
+    ok: true,
+    values: {
+      inspectorGroupId: selectedGroup.id,
+      inspectorGroupLabel: selectedGroup.label,
+      inspectorGroupAnchorId: selectedGroup.anchorId,
+    },
+  };
+}
+
+function validateTagCreatorInput({
+  tag = "",
+  nameEn = "",
+  nameZh = "",
+  colorHex = "",
+  parentOwnerTag = "",
+  selectedInspectorGroupId = "",
+  inspectorGroupId = "",
+  inspectorGroupLabel = "",
+  inspectorGroupAnchorId = "",
+} = {}, targetIds = []) {
   const tagUiState = deriveTagCreatorUiState(tag);
   const normalizedTag = tagUiState.normalizedTag;
   const normalizedNameEn = normalizeScenarioNameInput(nameEn);
@@ -507,6 +694,21 @@ function validateTagCreatorInput({ tag = "", nameEn = "", nameZh = "", colorHex 
       message: ui("Parent owner tag does not exist in the active scenario."),
     };
   }
+  const inspectorGroup = resolveTagCreatorInspectorGroupSelection({
+    selectedInspectorGroupId,
+    inspectorGroupId,
+    inspectorGroupLabel,
+    inspectorGroupAnchorId,
+  });
+  if (!inspectorGroup.ok) {
+    return {
+      ok: false,
+      code: "invalid-inspector-group",
+      duplicateTag: false,
+      tagLengthHint: tagUiState.tagLengthHint,
+      message: inspectorGroup.message || ui("Inspector group settings are incomplete."),
+    };
+  }
   return {
     ok: true,
     code: "",
@@ -519,6 +721,7 @@ function validateTagCreatorInput({ tag = "", nameEn = "", nameZh = "", colorHex 
       nameZh: normalizedNameZh,
       colorHex: normalizedColorHex,
       parentOwnerTag: normalizedParentOwnerTag,
+      ...inspectorGroup.values,
     },
   };
 }
@@ -547,7 +750,16 @@ function buildScenarioTagCreatorPayload() {
   };
 }
 
-function createScenarioCountryEntryFromTagCreator({ tag, nameEn, nameZh, colorHex, parentOwnerTag }, targetIds = []) {
+function createScenarioCountryEntryFromTagCreator({
+  tag,
+  nameEn,
+  nameZh,
+  colorHex,
+  parentOwnerTag,
+  inspectorGroupId,
+  inspectorGroupLabel,
+  inspectorGroupAnchorId,
+}, targetIds = []) {
   const featureCount = Array.isArray(targetIds) ? targetIds.length : 0;
   const entry = {
     tag,
@@ -573,6 +785,11 @@ function createScenarioCountryEntryFromTagCreator({ tag, nameEn, nameZh, colorHe
     entry.parent_owner_tag = "";
     entry.parent_owner_tags = [];
   }
+  if (inspectorGroupId) {
+    entry.inspector_group_id = inspectorGroupId;
+    entry.inspector_group_label = inspectorGroupLabel || inspectorGroupId;
+    entry.inspector_group_anchor_id = inspectorGroupAnchorId || "";
+  }
   return entry;
 }
 
@@ -590,6 +807,9 @@ function applyScenarioTagCreatorSuccess(response, payload, targetIds = []) {
       nameZh: normalizedNameZh,
       colorHex: normalizedColorHex,
       parentOwnerTag: normalizeScenarioTagInput(payload?.parentOwnerTag),
+      inspectorGroupId: String(payload?.inspectorGroupId || "").trim(),
+      inspectorGroupLabel: normalizeScenarioNameInput(payload?.inspectorGroupLabel),
+      inspectorGroupAnchorId: String(payload?.inspectorGroupAnchorId || "").trim(),
     },
     targetIds
   );
@@ -599,22 +819,7 @@ function applyScenarioTagCreatorSuccess(response, payload, targetIds = []) {
       ? response.country
       : (response?.scenarioCountry && typeof response.scenarioCountry === "object" ? response.scenarioCountry : null));
   const nextCountryEntry = responseCountry ? { ...createdEntry, ...responseCountry, tag: normalizedTag } : createdEntry;
-  state.scenarioCountriesByTag = {
-    ...(state.scenarioCountriesByTag || {}),
-    [normalizedTag]: nextCountryEntry,
-  };
-  state.scenarioFixedOwnerColors = {
-    ...(state.scenarioFixedOwnerColors || {}),
-    [normalizedTag]: normalizedColorHex,
-  };
-  state.sovereignBaseColors = {
-    ...(state.sovereignBaseColors || {}),
-    [normalizedTag]: normalizedColorHex,
-  };
-  state.countryBaseColors = {
-    ...(state.countryBaseColors || {}),
-    [normalizedTag]: normalizedColorHex,
-  };
+  upsertScenarioCountryRuntimeEntry(normalizedTag, nextCountryEntry);
   applyOwnerControllerAssignmentsToFeatureIds(
     targetIds.reduce((accumulator, featureId) => {
       const id = String(featureId || "").trim();
@@ -642,30 +847,12 @@ function applyScenarioTagCreatorSuccess(response, payload, targetIds = []) {
   });
   state.scenarioBaselineOwnersByFeatureId = nextBaselineOwners;
   state.scenarioBaselineControllersByFeatureId = nextBaselineControllers;
+  syncActiveScenarioBundleAssignments(targetIds, normalizedTag);
   if (response?.catalogPath) {
-    state.activeScenarioManifest = {
-      ...(state.activeScenarioManifest || {}),
-      releasable_catalog_url: String(response.catalogPath || ""),
-    };
+    syncActiveScenarioManifestUrl("releasable_catalog_url", response.catalogPath);
   }
   if (response?.releasableEntry && typeof response.releasableEntry === "object") {
-    const priorCatalog = state.releasableCatalog && typeof state.releasableCatalog === "object"
-      ? state.releasableCatalog
-      : { version: 1, entries: [] };
-    const priorEntries = Array.isArray(priorCatalog.entries) ? priorCatalog.entries : [];
-    const nextEntries = [
-      ...priorEntries.filter((entry) => String(entry?.tag || "").trim().toUpperCase() !== normalizedTag),
-      response.releasableEntry,
-    ];
-    state.releasableCatalog = {
-      ...priorCatalog,
-      scenario_ids: [String(state.activeScenarioId || "").trim()],
-      entries: nextEntries,
-    };
-    state.scenarioReleasableIndex = buildScenarioReleasableIndex(state.activeScenarioId, {
-      excludeTags: Object.keys(state.scenarioCountriesByTag || {}),
-    });
-    rebuildPresetState();
+    upsertRuntimeReleasableCatalogEntry(response.releasableEntry);
   }
   state.activeSovereignCode = normalizedTag;
   state.devScenarioEditor = {
@@ -683,6 +870,683 @@ function applyScenarioTagCreatorSuccess(response, payload, targetIds = []) {
   if (typeof state.updateScenarioUIFn === "function") {
     state.updateScenarioUIFn();
   }
+}
+
+function getActiveScenarioBundle() {
+  const scenarioId = String(state.activeScenarioId || "").trim();
+  if (!scenarioId || !state.scenarioBundleCacheById || typeof state.scenarioBundleCacheById !== "object") {
+    return null;
+  }
+  return state.scenarioBundleCacheById[scenarioId] || null;
+}
+
+function syncActiveScenarioManifestUrl(field, nextValue) {
+  const normalizedValue = String(nextValue || "").trim();
+  if (!normalizedValue) return;
+  state.activeScenarioManifest = {
+    ...(state.activeScenarioManifest || {}),
+    [field]: normalizedValue,
+  };
+  const bundle = getActiveScenarioBundle();
+  if (bundle) {
+    bundle.manifest = {
+      ...(bundle.manifest || {}),
+      [field]: normalizedValue,
+    };
+  }
+}
+
+function syncActiveScenarioBundleCountryEntry(tag, entry) {
+  const bundle = getActiveScenarioBundle();
+  if (!bundle || !tag || !entry) return;
+  const priorCountriesPayload = bundle.countriesPayload && typeof bundle.countriesPayload === "object"
+    ? bundle.countriesPayload
+    : { countries: {} };
+  const priorCountries = priorCountriesPayload.countries && typeof priorCountriesPayload.countries === "object"
+    ? priorCountriesPayload.countries
+    : {};
+  bundle.countriesPayload = {
+    ...priorCountriesPayload,
+    countries: {
+      ...priorCountries,
+      [tag]: entry,
+    },
+  };
+}
+
+function syncActiveScenarioBundleAssignments(targetIds = [], ownerCode = "") {
+  const bundle = getActiveScenarioBundle();
+  const normalizedOwnerCode = normalizeScenarioTagInput(ownerCode);
+  if (!bundle || !normalizedOwnerCode || !Array.isArray(targetIds) || !targetIds.length) return;
+  const nextOwners = {
+    ...((bundle.ownersPayload && typeof bundle.ownersPayload === "object" && bundle.ownersPayload.owners && typeof bundle.ownersPayload.owners === "object")
+      ? bundle.ownersPayload.owners
+      : {}),
+  };
+  targetIds.forEach((featureId) => {
+    const id = String(featureId || "").trim();
+    if (!id) return;
+    nextOwners[id] = normalizedOwnerCode;
+  });
+  bundle.ownersPayload = {
+    ...(bundle.ownersPayload || {}),
+    owners: nextOwners,
+  };
+  if (bundle.controllersPayload && typeof bundle.controllersPayload === "object") {
+    const nextControllers = {
+      ...((bundle.controllersPayload.controllers && typeof bundle.controllersPayload.controllers === "object")
+        ? bundle.controllersPayload.controllers
+        : {}),
+    };
+    targetIds.forEach((featureId) => {
+      const id = String(featureId || "").trim();
+      if (!id) return;
+      nextControllers[id] = normalizedOwnerCode;
+    });
+    bundle.controllersPayload = {
+      ...bundle.controllersPayload,
+      controllers: nextControllers,
+    };
+  }
+  if (bundle.coresPayload && typeof bundle.coresPayload === "object") {
+    const nextCores = {
+      ...((bundle.coresPayload.cores && typeof bundle.coresPayload.cores === "object")
+        ? bundle.coresPayload.cores
+        : {}),
+    };
+    targetIds.forEach((featureId) => {
+      const id = String(featureId || "").trim();
+      if (!id) return;
+      nextCores[id] = [normalizedOwnerCode];
+    });
+    bundle.coresPayload = {
+      ...bundle.coresPayload,
+      cores: nextCores,
+    };
+  }
+}
+
+function upsertRuntimeReleasableCatalogEntry(entry) {
+  const normalizedTag = normalizeScenarioTagInput(entry?.tag);
+  if (!normalizedTag || !entry || typeof entry !== "object") return;
+  const replaceEntry = (catalog) => {
+    const priorCatalog = catalog && typeof catalog === "object"
+      ? catalog
+      : { version: 1, entries: [] };
+    const priorEntries = Array.isArray(priorCatalog.entries) ? priorCatalog.entries : [];
+    return {
+      ...priorCatalog,
+      entries: [
+        ...priorEntries.filter((item) => normalizeScenarioTagInput(item?.tag) !== normalizedTag),
+        { ...entry, tag: normalizedTag },
+      ],
+    };
+  };
+  state.releasableCatalog = replaceEntry(state.releasableCatalog);
+  const bundle = getActiveScenarioBundle();
+  if (bundle) {
+    bundle.releasableCatalog = replaceEntry(bundle.releasableCatalog);
+  }
+  state.scenarioReleasableIndex = buildScenarioReleasableIndex(state.activeScenarioId, {
+    excludeTags: Object.keys(state.scenarioCountriesByTag || {}),
+  });
+  rebuildPresetState();
+}
+
+function upsertScenarioCountryRuntimeEntry(tag, entry) {
+  const normalizedTag = normalizeScenarioTagInput(tag || entry?.tag);
+  if (!normalizedTag || !entry || typeof entry !== "object") return null;
+  const priorEntry = state.scenarioCountriesByTag?.[normalizedTag] && typeof state.scenarioCountriesByTag[normalizedTag] === "object"
+    ? state.scenarioCountriesByTag[normalizedTag]
+    : {};
+  const nextEntry = {
+    ...priorEntry,
+    ...entry,
+    tag: normalizedTag,
+  };
+  state.scenarioCountriesByTag = {
+    ...(state.scenarioCountriesByTag || {}),
+    [normalizedTag]: nextEntry,
+  };
+  const englishName = normalizeScenarioNameInput(
+    nextEntry.display_name_en
+    || nextEntry.display_name
+    || state.countryNames?.[normalizedTag]
+    || normalizedTag
+  );
+  if (englishName) {
+    state.countryNames = {
+      ...(state.countryNames || {}),
+      [normalizedTag]: englishName,
+    };
+  }
+  const colorHex = normalizeScenarioColorInput(nextEntry.color_hex);
+  if (/^#[0-9A-F]{6}$/.test(colorHex)) {
+    state.scenarioFixedOwnerColors = {
+      ...(state.scenarioFixedOwnerColors || {}),
+      [normalizedTag]: colorHex,
+    };
+    state.sovereignBaseColors = {
+      ...(state.sovereignBaseColors || {}),
+      [normalizedTag]: colorHex,
+    };
+    state.countryBaseColors = {
+      ...(state.countryBaseColors || {}),
+      [normalizedTag]: colorHex,
+    };
+  }
+  syncActiveScenarioBundleCountryEntry(normalizedTag, nextEntry);
+  return nextEntry;
+}
+
+function syncRuntimeScenarioCityOverrides(payload) {
+  if (!payload || typeof payload !== "object") return;
+  state.scenarioCityOverridesData = payload;
+  const bundle = getActiveScenarioBundle();
+  if (bundle) {
+    bundle.cityOverridesPayload = payload;
+  }
+  syncScenarioLocalizationState({
+    cityOverridesPayload: payload,
+    geoLocalePatchPayload: state.scenarioGeoLocalePatchData,
+  });
+}
+
+function buildLowFeatureTagInspectorRows(threshold = 3) {
+  const normalizedThreshold = Math.max(0, Number.parseInt(threshold, 10) || 0);
+  const counts = new Map();
+  state.landIndex?.forEach((_feature, featureId) => {
+    const ownerCode = normalizeScenarioTagInput(getFeatureOwnerCode(featureId));
+    if (!ownerCode) return;
+    counts.set(ownerCode, (counts.get(ownerCode) || 0) + 1);
+  });
+  return collectScenarioCountryOptions({ includeReleasable: true })
+    .filter((entry) => !entry.releasable)
+    .map((entry) => ({
+      ...entry,
+      featureCountLive: counts.get(entry.tag) || 0,
+      isHighlighted: normalizeScenarioTagInput(state.inspectorHighlightCountryCode) === entry.tag,
+    }))
+    .filter((entry) => entry.featureCountLive <= normalizedThreshold)
+    .sort((a, b) => (a.featureCountLive - b.featureCountLive) || a.displayName.localeCompare(b.displayName) || a.tag.localeCompare(b.tag));
+}
+
+function resolveCurrentSampleFeatureContext() {
+  const selectedFeatureId = state.devSelectedHit?.targetType === "land"
+    ? String(state.devSelectedHit.id || "").trim()
+    : "";
+  if (selectedFeatureId && state.landIndex?.has(selectedFeatureId)) {
+    return {
+      featureId: selectedFeatureId,
+      feature: state.landIndex.get(selectedFeatureId) || null,
+      source: "selected",
+    };
+  }
+  const selectionIds = sanitizeSelectionState();
+  const recentFeatureId = selectionIds.length ? selectionIds[selectionIds.length - 1] : "";
+  if (recentFeatureId && state.landIndex?.has(recentFeatureId)) {
+    return {
+      featureId: recentFeatureId,
+      feature: state.landIndex.get(recentFeatureId) || null,
+      source: "selection",
+    };
+  }
+  const hoveredFeatureId = state.devHoverHit?.targetType === "land"
+    ? String(state.devHoverHit.id || "").trim()
+    : (state.hoveredId && state.landIndex?.has(state.hoveredId) ? String(state.hoveredId || "").trim() : "");
+  if (hoveredFeatureId && state.landIndex?.has(hoveredFeatureId)) {
+    return {
+      featureId: hoveredFeatureId,
+      feature: state.landIndex.get(hoveredFeatureId) || null,
+      source: "hovered",
+    };
+  }
+  return {
+    featureId: "",
+    feature: null,
+    source: "",
+  };
+}
+
+function sampleScenarioTagColorFromContext() {
+  const context = resolveCurrentSampleFeatureContext();
+  if (!context.featureId) {
+    return { ok: false, message: ui("Select or hover a land feature before sampling a color.") };
+  }
+  const ownerCode = normalizeScenarioTagInput(getFeatureOwnerCode(context.featureId));
+  const candidateColors = [
+    normalizeScenarioColorInput(state.colors?.[context.featureId]),
+    normalizeScenarioColorInput(state.sovereignBaseColors?.[ownerCode]),
+    normalizeScenarioColorInput(state.countryBaseColors?.[ownerCode]),
+  ];
+  const colorHex = candidateColors.find((value) => /^#[0-9A-F]{6}$/.test(value)) || "";
+  if (!colorHex) {
+    return { ok: false, message: ui("Unable to resolve a color from the current feature.") };
+  }
+  return {
+    ok: true,
+    colorHex,
+    featureId: context.featureId,
+    featureName: resolveFeatureName(context.feature, context.featureId),
+    source: context.source,
+  };
+}
+
+function clearScenarioTagCreatorSelectionTarget() {
+  mapRenderer.clearDevSelection();
+  state.devSelectedHit = null;
+  if (typeof state.renderNowFn === "function") {
+    state.renderNowFn();
+  }
+}
+
+function resolveCountryEditorModel() {
+  const options = collectScenarioCountryOptions({ includeReleasable: true });
+  const availableTags = new Set(options.map((entry) => entry.tag));
+  const explicitTag = normalizeScenarioTagInput(state.devScenarioCountryEditor?.tag);
+  const selectionTag = resolveSingleSelectionScenarioTag(availableTags);
+  const fallbackTag = options.some((entry) => entry.tag === explicitTag)
+    ? explicitTag
+    : resolvePreferredScenarioTagCode(explicitTag);
+  const tag = selectionTag || fallbackTag;
+  const option = options.find((entry) => entry.tag === tag) || null;
+  const entry = option?.entry || null;
+  return {
+    tag,
+    option,
+    entry,
+    options,
+    defaultNameEn: normalizeScenarioNameInput(entry?.display_name_en || entry?.display_name || ""),
+    defaultNameZh: normalizeScenarioNameInput(entry?.display_name_zh),
+  };
+}
+
+function buildCountryEditorMetaRows(model) {
+  return [
+    [ui("Tag"), model.tag],
+    [ui("Name"), model.option?.displayName || ""],
+    [ui("Feature Count"), String(Number(model.entry?.feature_count || 0) || 0)],
+    [ui("Kind"), model.option?.releasable ? ui("Releasable") : ui("Scenario Country")],
+    [ui("Parent"), normalizeScenarioTagInput(model.entry?.parent_owner_tag)],
+  ].filter(([, value]) => String(value || "").trim());
+}
+
+function resolveCountryEditorHint(model) {
+  if (!state.activeScenarioId) {
+    return ui("Activate a scenario to edit country names.");
+  }
+  if (!model.tag) {
+    return ui("Choose a scenario country tag to edit country names.");
+  }
+  return ui("Edit EN and CH for the selected country tag, then save the scenario country record.");
+}
+
+function resolveCapitalCandidateForFeature(featureId, tag) {
+  const normalizedFeatureId = String(featureId || "").trim();
+  const normalizedTag = normalizeScenarioTagInput(tag);
+  if (!normalizedFeatureId || !normalizedTag) return null;
+  const cityCollection = mapRenderer.getEffectiveCityCollection();
+  const candidates = Array.isArray(cityCollection?.features)
+    ? cityCollection.features.filter((feature) => String(feature?.properties?.__city_host_feature_id || "").trim() === normalizedFeatureId)
+    : [];
+  if (!candidates.length) return null;
+  const priorHint = state.scenarioCityOverridesData?.capital_city_hints?.[normalizedTag] || null;
+  const scoreCandidate = (feature) => {
+    const props = feature?.properties || {};
+    const cityId = String(props.__city_id || feature?.id || "").trim();
+    const population = Math.max(0, Number(props.__city_population || 0));
+    const label = String(
+      props.label_en
+      || props.name_en
+      || props.label
+      || props.name
+      || cityId
+    ).trim();
+    return (
+      (cityId && cityId === String(priorHint?.city_id || "").trim() ? 9_000_000_000_000 : 0)
+      + (props.__city_is_country_capital ? 6_000_000_000_000 : 0)
+      + (props.__city_is_capital ? 3_000_000_000_000 : 0)
+      + population
+      - (label ? label.charCodeAt(0) / 10_000 : 0)
+    );
+  };
+  const sortedCandidates = [...candidates].sort((a, b) => scoreCandidate(b) - scoreCandidate(a));
+  const feature = sortedCandidates[0];
+  const props = feature?.properties || {};
+  return {
+    feature,
+    cityId: String(props.__city_id || feature?.id || "").trim(),
+    stableKey: String(props.__city_stable_key || props.stable_key || `id::${String(props.__city_id || feature?.id || "").trim()}`).trim(),
+    cityName: String(props.label_en || props.name_en || props.label || props.name || feature?.id || "").trim(),
+    nameAscii: String(props.name_en || props.label_en || props.label || props.name || "").trim(),
+    countryCode: String(props.__city_country_code || props.country_code || "").trim().toUpperCase(),
+    capitalKind: String(props.__city_capital_kind || props.__city_capital_type || "").trim(),
+    population: Math.max(0, Number(props.__city_population || 0)) || 0,
+    urbanMatchId: String(props.__city_urban_match_id || "").trim(),
+    baseTier: String(props.__city_base_tier || "").trim(),
+    lon: Array.isArray(feature?.geometry?.coordinates) ? Number(feature.geometry.coordinates[0]) : null,
+    lat: Array.isArray(feature?.geometry?.coordinates) ? Number(feature.geometry.coordinates[1]) : null,
+    capitalStateId: priorHint?.capital_state_id ?? state.scenarioCountriesByTag?.[normalizedTag]?.capital_state_id ?? null,
+  };
+}
+
+function resolveCapitalEditorModel() {
+  const options = collectScenarioCountryOptions({ includeReleasable: true });
+  const explicitTag = normalizeScenarioTagInput(state.devScenarioCapitalEditor?.tag);
+  const tag = options.some((entry) => entry.tag === explicitTag)
+    ? explicitTag
+    : resolvePreferredScenarioTagCode(explicitTag);
+  const option = options.find((entry) => entry.tag === tag) || null;
+  const entry = option?.entry || null;
+  const targetIds = resolveOwnershipTargetIds();
+  const featureId = targetIds.length === 1 ? targetIds[0] : "";
+  const feature = featureId ? state.landIndex?.get(featureId) || null : null;
+  const ownerCode = featureId ? normalizeScenarioTagInput(getFeatureOwnerCode(featureId)) : "";
+  const ownerMatches = !!(featureId && tag && ownerCode === tag);
+  const candidate = ownerMatches ? resolveCapitalCandidateForFeature(featureId, tag) : null;
+  return {
+    tag,
+    option,
+    entry,
+    options,
+    targetIds,
+    selectionCount: targetIds.length,
+    featureId,
+    feature,
+    ownerCode,
+    ownerMatches,
+    candidate,
+  };
+}
+
+function buildCapitalEditorSearchMatches(query, options = []) {
+  const normalizedQuery = normalizeScenarioNameInput(query);
+  const queryLower = normalizedQuery.toLowerCase();
+  const tagQuery = normalizeScenarioTagInput(query);
+  if (!normalizedQuery) {
+    return [];
+  }
+  return options
+    .map((entry) => {
+      const displayName = normalizeScenarioNameInput(entry?.displayName || "");
+      const nameEn = normalizeScenarioNameInput(entry?.nameEn || displayName);
+      const nameZh = normalizeScenarioNameInput(entry?.nameZh);
+      const tag = normalizeScenarioTagInput(entry?.tag);
+      const tagLower = tag.toLowerCase();
+      const displayLower = displayName.toLowerCase();
+      const nameEnLower = nameEn.toLowerCase();
+      const nameZhLower = nameZh.toLowerCase();
+      let score = 0;
+      if (tagQuery && tag === tagQuery) {
+        score = 500;
+      } else if (tagQuery && tag.startsWith(tagQuery)) {
+        score = 400;
+      } else if (
+        (displayLower && displayLower.startsWith(queryLower))
+        || (nameEnLower && nameEnLower.startsWith(queryLower))
+        || (nameZhLower && nameZhLower.startsWith(queryLower))
+      ) {
+        score = 300;
+      } else if (tagQuery && tagLower.includes(tagQuery.toLowerCase())) {
+        score = 200;
+      } else if (
+        (displayLower && displayLower.includes(queryLower))
+        || (nameEnLower && nameEnLower.includes(queryLower))
+        || (nameZhLower && nameZhLower.includes(queryLower))
+      ) {
+        score = 100;
+      }
+      if (!score) return null;
+      return {
+        ...entry,
+        score,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => (
+      b.score - a.score
+      || a.displayName.localeCompare(b.displayName)
+      || a.tag.localeCompare(b.tag)
+    ))
+    .slice(0, 8);
+}
+
+function buildCapitalEditorMetaRows(model) {
+  return [
+    [ui("Tag"), model.tag],
+    [ui("Feature"), model.featureId ? resolveFeatureName(model.feature, model.featureId) : ""],
+    [ui("Owner"), model.ownerCode],
+    [ui("Candidate"), model.candidate?.cityName || ""],
+    [ui("Current Capital State"), String(model.entry?.capital_state_id ?? "")],
+  ].filter(([, value]) => String(value || "").trim());
+}
+
+function resolveCapitalEditorHint(model) {
+  if (!state.activeScenarioId) {
+    return ui("Activate a scenario to edit capitals.");
+  }
+  if (model.selectionCount !== 1) {
+    return ui("Select exactly one land feature to assign a capital.");
+  }
+  if (!model.tag) {
+    return ui("Choose a country tag before assigning a capital.");
+  }
+  if (!model.ownerMatches) {
+    return ui("The selected feature must be owned by the chosen country tag.");
+  }
+  if (!model.candidate?.cityId) {
+    return ui("No city candidate was found on the selected feature.");
+  }
+  return ui("Save to move the selected country's capital to the chosen feature's best city candidate.");
+}
+
+function buildScenarioCountrySavePayload() {
+  const model = resolveCountryEditorModel();
+  const editorState = state.devScenarioCountryEditor || {};
+  const nameEn = normalizeScenarioNameInput(editorState.nameEn);
+  const nameZh = normalizeScenarioNameInput(editorState.nameZh);
+  if (!state.activeScenarioId) {
+    return { ok: false, message: ui("Activate a scenario to edit country names.") };
+  }
+  if (!model.tag) {
+    return { ok: false, message: ui("Choose a scenario country tag first.") };
+  }
+  if (!nameEn || !nameZh) {
+    return { ok: false, message: ui("Both English and Chinese country names are required.") };
+  }
+  return {
+    ok: true,
+    payload: {
+      scenarioId: String(state.activeScenarioId || "").trim(),
+      tag: model.tag,
+      nameEn,
+      nameZh,
+    },
+  };
+}
+
+function buildScenarioCapitalSavePayload() {
+  const model = resolveCapitalEditorModel();
+  if (!state.activeScenarioId) {
+    return { ok: false, message: ui("Activate a scenario to edit capitals.") };
+  }
+  if (model.selectionCount !== 1 || !model.featureId) {
+    return { ok: false, message: ui("Select exactly one land feature before saving a capital.") };
+  }
+  if (!model.tag) {
+    return { ok: false, message: ui("Choose a scenario country tag before saving a capital.") };
+  }
+  if (!model.ownerMatches) {
+    return { ok: false, message: ui("The selected feature is not owned by the chosen country tag.") };
+  }
+  if (!model.candidate?.cityId) {
+    return { ok: false, message: ui("No city candidate was found for the selected feature.") };
+  }
+  return {
+    ok: true,
+    payload: {
+      scenarioId: String(state.activeScenarioId || "").trim(),
+      tag: model.tag,
+      featureId: model.featureId,
+      cityId: model.candidate.cityId,
+      capitalStateId: model.candidate.capitalStateId,
+      cityName: model.candidate.cityName,
+      stableKey: model.candidate.stableKey,
+      countryCode: model.candidate.countryCode,
+      lookupIso2: String(model.entry?.lookup_iso2 || model.entry?.release_lookup_iso2 || model.tag || "").trim().toUpperCase(),
+      baseIso2: String(model.entry?.base_iso2 || model.tag || "").trim().toUpperCase(),
+      capitalKind: model.candidate.capitalKind,
+      population: model.candidate.population,
+      lon: model.candidate.lon,
+      lat: model.candidate.lat,
+      urbanMatchId: model.candidate.urbanMatchId,
+      baseTier: model.candidate.baseTier,
+      nameAscii: model.candidate.nameAscii,
+    },
+  };
+}
+
+function applyScenarioCountrySaveSuccess(response, payload) {
+  const normalizedTag = normalizeScenarioTagInput(payload?.tag);
+  if (!normalizedTag) return;
+  const nextEntry = upsertScenarioCountryRuntimeEntry(normalizedTag, response?.countryEntry || {
+    tag: normalizedTag,
+    display_name: payload.nameEn,
+    display_name_en: payload.nameEn,
+    display_name_zh: payload.nameZh,
+  });
+  if (response?.catalogEntry && typeof response.catalogEntry === "object") {
+    upsertRuntimeReleasableCatalogEntry(response.catalogEntry);
+  }
+  if (response?.catalogPath) {
+    syncActiveScenarioManifestUrl("releasable_catalog_url", response.catalogPath);
+  }
+  state.devScenarioCountryEditor = {
+    ...(state.devScenarioCountryEditor || {}),
+    tag: normalizedTag,
+    nameEn: normalizeScenarioNameInput(nextEntry?.display_name_en || payload.nameEn),
+    nameZh: normalizeScenarioNameInput(nextEntry?.display_name_zh || payload.nameZh),
+    lastSavedAt: String(response?.savedAt || ""),
+    lastSavedPath: String(response?.filePath || response?.catalogPath || ""),
+    lastSaveMessage: `${ui("Saved")}: ${String(response?.filePath || response?.catalogPath || normalizedTag)}`,
+    lastSaveTone: "success",
+  };
+}
+
+function applyScenarioCapitalSaveSuccess(response, payload) {
+  const normalizedTag = normalizeScenarioTagInput(payload?.tag);
+  if (!normalizedTag) return;
+  const nextEntry = upsertScenarioCountryRuntimeEntry(normalizedTag, response?.countryEntry || {
+    tag: normalizedTag,
+    capital_state_id: payload.capitalStateId ?? null,
+  });
+  if (response?.catalogEntry && typeof response.catalogEntry === "object") {
+    upsertRuntimeReleasableCatalogEntry(response.catalogEntry);
+  }
+  if (response?.catalogPath) {
+    syncActiveScenarioManifestUrl("releasable_catalog_url", response.catalogPath);
+  }
+  const priorOverrides = state.scenarioCityOverridesData && typeof state.scenarioCityOverridesData === "object"
+    ? state.scenarioCityOverridesData
+    : {
+      version: 1,
+      scenario_id: String(state.activeScenarioId || "").trim(),
+      generated_at: "",
+      cities: {},
+      capitals_by_tag: {},
+      capital_city_hints: {},
+    };
+  const nextOverrides = {
+    ...priorOverrides,
+    scenario_id: String(state.activeScenarioId || "").trim(),
+    generated_at: String(response?.savedAt || priorOverrides.generated_at || ""),
+    capitals_by_tag: {
+      ...(priorOverrides.capitals_by_tag || {}),
+      [normalizedTag]: String(response?.cityOverrideEntry?.city_id || payload.cityId || "").trim(),
+    },
+    capital_city_hints: {
+      ...(priorOverrides.capital_city_hints || {}),
+      [normalizedTag]: response?.cityOverrideEntry || {
+        tag: normalizedTag,
+        city_id: String(payload.cityId || "").trim(),
+        host_feature_id: String(payload.featureId || "").trim(),
+        capital_state_id: payload.capitalStateId ?? nextEntry?.capital_state_id ?? null,
+      },
+    },
+  };
+  syncRuntimeScenarioCityOverrides(nextOverrides);
+  if (response?.cityOverridesPath) {
+    syncActiveScenarioManifestUrl("city_overrides_url", response.cityOverridesPath);
+  }
+  state.devScenarioCapitalEditor = {
+    ...(state.devScenarioCapitalEditor || {}),
+    tag: normalizedTag,
+    lastSavedAt: String(response?.savedAt || ""),
+    lastSavedPath: String(response?.cityOverridesPath || response?.filePath || ""),
+    lastSaveMessage: `${ui("Saved")}: ${String(response?.cityOverridesPath || response?.filePath || normalizedTag)}`,
+    lastSaveTone: "success",
+  };
+}
+
+function renderScenarioTagInspectorDetails(container, row = null) {
+  if (!container) return;
+  if (!row) {
+    container.replaceChildren();
+    const empty = document.createElement("div");
+    empty.className = "dev-workspace-empty";
+    empty.textContent = ui("No data yet.");
+    container.appendChild(empty);
+    return;
+  }
+  renderMetaRows(container, [
+    [ui("Tag"), row.tag],
+    [ui("Name"), row.displayName || row.nameEn || row.tag],
+    [ui("Feature Count"), String(Number(row.featureCountLive || 0) || 0)],
+  ]);
+}
+
+function renderCapitalEditorSearchResults(container, matches = [], query = "") {
+  if (!container) return;
+  container.replaceChildren();
+  if (!matches.length) {
+    if (normalizeScenarioNameInput(query)) {
+      const empty = document.createElement("div");
+      empty.className = "dev-workspace-empty";
+      empty.textContent = ui("No matching countries.");
+      container.appendChild(empty);
+    }
+    return;
+  }
+  matches.forEach((entry) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn-secondary";
+    button.dataset.devCapitalSearchTag = entry.tag;
+    button.style.display = "flex";
+    button.style.width = "100%";
+    button.style.justifyContent = "space-between";
+    button.style.alignItems = "center";
+    button.style.marginBottom = "0.35rem";
+
+    const label = document.createElement("span");
+    label.textContent = `${entry.tag} | ${entry.displayName || entry.nameEn || entry.nameZh || entry.tag}`;
+
+    const meta = document.createElement("span");
+    meta.textContent = entry.releasable ? ui("Releasable") : ui("Scenario Country");
+
+    button.append(label, meta);
+    container.appendChild(button);
+  });
+}
+
+function selectScenarioCapitalEditorTag(tag, { clearSearch = false } = {}) {
+  state.devScenarioCapitalEditor = {
+    ...(state.devScenarioCapitalEditor || {}),
+    tag: normalizeScenarioTagInput(tag),
+    searchQuery: clearSearch ? "" : normalizeScenarioNameInput(state.devScenarioCapitalEditor?.searchQuery),
+    lastSaveMessage: "",
+    lastSaveTone: "",
+  };
 }
 
 function updateDistrictEditorState(nextPartial = {}) {
@@ -1435,12 +2299,32 @@ function createDevWorkspacePanel(bottomDock) {
             <input id="devScenarioTagParentInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" maxlength="4" placeholder="GER" />
           </div>
           <div class="dev-workspace-form-field">
+            <label id="devScenarioTagGroupSelectLabel" class="dev-workspace-note" for="devScenarioTagGroupSelect" data-i18n="Inspector Group"></label>
+            <select id="devScenarioTagGroupSelect" class="select-input dev-workspace-select">
+              <option value="" data-i18n="No Inspector Group"></option>
+            </select>
+          </div>
+          <div class="dev-workspace-form-field">
             <label id="devScenarioTagNameEnLabel" class="dev-workspace-note" for="devScenarioTagNameEnInput" data-i18n="English Name"></label>
             <input id="devScenarioTagNameEnInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" data-i18n-placeholder="New Country" />
           </div>
           <div class="dev-workspace-form-field">
             <label id="devScenarioTagNameZhLabel" class="dev-workspace-note" for="devScenarioTagNameZhInput" data-i18n="Chinese Name"></label>
             <input id="devScenarioTagNameZhInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" data-i18n-placeholder="New Country" />
+          </div>
+          <div class="dev-workspace-form-field">
+            <label id="devScenarioTagGroupIdLabel" class="dev-workspace-note" for="devScenarioTagGroupIdInput" data-i18n="New Group ID"></label>
+            <input id="devScenarioTagGroupIdInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" placeholder="scenario_group_europe" />
+          </div>
+          <div class="dev-workspace-form-field">
+            <label id="devScenarioTagGroupLabelLabel" class="dev-workspace-note" for="devScenarioTagGroupLabelInput" data-i18n="New Group Label"></label>
+            <input id="devScenarioTagGroupLabelInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" data-i18n-placeholder="Europe" />
+          </div>
+          <div class="dev-workspace-form-field dev-workspace-form-field-span-2">
+            <label id="devScenarioTagGroupAnchorLabel" class="dev-workspace-note" for="devScenarioTagGroupAnchorSelect" data-i18n="Anchor Region"></label>
+            <select id="devScenarioTagGroupAnchorSelect" class="select-input dev-workspace-select">
+              <option value="" data-i18n="Select anchor region"></option>
+            </select>
           </div>
           <div class="dev-workspace-form-field dev-workspace-form-field-span-2">
             <div class="dev-workspace-inline-row">
@@ -1458,6 +2342,7 @@ function createDevWorkspacePanel(bottomDock) {
               <div id="devScenarioTagColorPopover" class="dev-workspace-color-popover hidden" role="dialog" aria-modal="false">
                 <div id="devScenarioTagColorPopoverLabel" class="dev-workspace-note" data-i18n="Custom Color"></div>
                 <div class="dev-workspace-actions">
+                  <button id="devScenarioTagColorSampleBtn" type="button" class="btn-secondary" data-i18n="Sample Selected"></button>
                   <button id="devScenarioTagColorCustomBtn" type="button" class="btn-secondary" data-i18n="Custom..."></button>
                 </div>
               </div>
@@ -1466,10 +2351,64 @@ function createDevWorkspacePanel(bottomDock) {
           </div>
         </div>
         <div class="dev-workspace-actions">
+          <button id="devScenarioClearTagSelectionBtn" type="button" class="btn-secondary" data-i18n="Clear Selection"></button>
           <button id="devScenarioClearTagBtn" type="button" class="btn-secondary" data-i18n="Clear"></button>
           <button id="devScenarioCreateTagBtn" type="button" class="btn-primary" data-i18n="Create Tag"></button>
         </div>
         <div id="devScenarioTagCreatorStatus" class="dev-workspace-note"></div>
+      </div>
+      <div id="devScenarioCountryPanel" class="dev-workspace-panel hidden">
+        <div id="devScenarioCountryLabel" class="dev-workspace-panel-title" data-i18n="Country Name Editor"></div>
+        <div id="devScenarioCountryTitle" class="section-header-block"></div>
+        <p id="devScenarioCountryHint" class="dev-workspace-note"></p>
+        <div id="devScenarioCountryMeta" class="dev-workspace-meta"></div>
+        <label id="devScenarioCountrySelectLabel" class="dev-workspace-note" for="devScenarioCountrySelect" data-i18n="Scenario Tag"></label>
+        <select id="devScenarioCountrySelect" class="select-input dev-workspace-select">
+          <option value="" data-i18n="Select country"></option>
+        </select>
+        <label id="devScenarioCountryNameEnLabel" class="dev-workspace-note" for="devScenarioCountryNameEnInput" data-i18n="English Name"></label>
+        <input id="devScenarioCountryNameEnInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" />
+        <label id="devScenarioCountryNameZhLabel" class="dev-workspace-note" for="devScenarioCountryNameZhInput" data-i18n="Chinese Name"></label>
+        <input id="devScenarioCountryNameZhInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" />
+        <div class="dev-workspace-actions">
+          <button id="devScenarioSaveCountryBtn" type="button" class="btn-primary" data-i18n="Save Country Names"></button>
+        </div>
+        <div id="devScenarioCountryStatus" class="dev-workspace-note"></div>
+      </div>
+      <div id="devScenarioTagInspectorPanel" class="dev-workspace-panel hidden">
+        <div id="devScenarioTagInspectorLabel" class="dev-workspace-panel-title" data-i18n="Tag Inspector"></div>
+        <div id="devScenarioTagInspectorTitle" class="section-header-block"></div>
+        <p id="devScenarioTagInspectorHint" class="dev-workspace-note"></p>
+        <div id="devScenarioTagInspectorMeta" class="dev-workspace-meta"></div>
+        <label id="devScenarioTagInspectorThresholdLabel" class="dev-workspace-note" for="devScenarioTagInspectorThresholdInput" data-i18n="Low Feature Threshold"></label>
+        <input id="devScenarioTagInspectorThresholdInput" class="input dev-workspace-input" type="number" min="0" max="999" step="1" />
+        <label class="dev-workspace-note" for="devScenarioTagInspectorSelect">${ui("Scenario Tag")}</label>
+        <select id="devScenarioTagInspectorSelect" class="select-input dev-workspace-select">
+          <option value="">${ui("Select country")}</option>
+        </select>
+        <div class="dev-workspace-actions">
+          <button id="devScenarioTagInspectorClearHighlightBtn" type="button" class="btn-secondary" data-i18n="Clear Highlight"></button>
+        </div>
+        <div id="devScenarioTagInspectorDetails" class="dev-workspace-meta"></div>
+        <div id="devScenarioTagInspectorStatus" class="dev-workspace-note"></div>
+      </div>
+      <div id="devScenarioCapitalPanel" class="dev-workspace-panel hidden">
+        <div id="devScenarioCapitalLabel" class="dev-workspace-panel-title" data-i18n="Capital Editor"></div>
+        <div id="devScenarioCapitalTitle" class="section-header-block"></div>
+        <p id="devScenarioCapitalHint" class="dev-workspace-note"></p>
+        <div id="devScenarioCapitalMeta" class="dev-workspace-meta"></div>
+        <label class="dev-workspace-note" for="devScenarioCapitalSearchInput">${ui("Search country")}</label>
+        <input id="devScenarioCapitalSearchInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" />
+        <div id="devScenarioCapitalSearchResults" class="dev-workspace-meta"></div>
+        <label id="devScenarioCapitalSelectLabel" class="dev-workspace-note" for="devScenarioCapitalSelect" data-i18n="Scenario Tag"></label>
+        <select id="devScenarioCapitalSelect" class="select-input dev-workspace-select">
+          <option value="" data-i18n="Select country"></option>
+        </select>
+        <div id="devScenarioCapitalCandidate" class="dev-workspace-note"></div>
+        <div class="dev-workspace-actions">
+          <button id="devScenarioSaveCapitalBtn" type="button" class="btn-primary" data-i18n="Save Capital"></button>
+        </div>
+        <div id="devScenarioCapitalStatus" class="dev-workspace-note"></div>
       </div>
       <div id="devScenarioDistrictPanel" class="dev-workspace-panel hidden">
         <div id="devScenarioDistrictLabel" class="dev-workspace-panel-title" data-i18n="Scenario District Editor"></div>
@@ -1714,8 +2653,39 @@ function initDevWorkspace() {
   const scenarioTagRecentWrap = panel.querySelector("#devScenarioTagRecentWrap");
   const scenarioTagRecentColors = panel.querySelector("#devScenarioTagRecentColors");
   const scenarioTagParentInput = panel.querySelector("#devScenarioTagParentInput");
+  const scenarioTagGroupSelect = panel.querySelector("#devScenarioTagGroupSelect");
+  const scenarioTagGroupIdInput = panel.querySelector("#devScenarioTagGroupIdInput");
+  const scenarioTagGroupLabelInput = panel.querySelector("#devScenarioTagGroupLabelInput");
+  const scenarioTagGroupAnchorSelect = panel.querySelector("#devScenarioTagGroupAnchorSelect");
+  const scenarioTagColorSampleBtn = panel.querySelector("#devScenarioTagColorSampleBtn");
+  const scenarioClearTagSelectionBtn = panel.querySelector("#devScenarioClearTagSelectionBtn");
   const scenarioClearTagBtn = panel.querySelector("#devScenarioClearTagBtn");
   const scenarioTagCreatorStatus = panel.querySelector("#devScenarioTagCreatorStatus");
+  const scenarioCountryPanel = panel.querySelector("#devScenarioCountryPanel");
+  const scenarioCountryTitle = panel.querySelector("#devScenarioCountryTitle");
+  const scenarioCountryHint = panel.querySelector("#devScenarioCountryHint");
+  const scenarioCountryMeta = panel.querySelector("#devScenarioCountryMeta");
+  const scenarioCountrySelect = panel.querySelector("#devScenarioCountrySelect");
+  const scenarioCountryNameEnInput = panel.querySelector("#devScenarioCountryNameEnInput");
+  const scenarioCountryNameZhInput = panel.querySelector("#devScenarioCountryNameZhInput");
+  const scenarioCountryStatus = panel.querySelector("#devScenarioCountryStatus");
+  const scenarioTagInspectorPanel = panel.querySelector("#devScenarioTagInspectorPanel");
+  const scenarioTagInspectorTitle = panel.querySelector("#devScenarioTagInspectorTitle");
+  const scenarioTagInspectorHint = panel.querySelector("#devScenarioTagInspectorHint");
+  const scenarioTagInspectorMeta = panel.querySelector("#devScenarioTagInspectorMeta");
+  const scenarioTagInspectorThresholdInput = panel.querySelector("#devScenarioTagInspectorThresholdInput");
+  const scenarioTagInspectorSelect = panel.querySelector("#devScenarioTagInspectorSelect");
+  const scenarioTagInspectorDetails = panel.querySelector("#devScenarioTagInspectorDetails");
+  const scenarioTagInspectorStatus = panel.querySelector("#devScenarioTagInspectorStatus");
+  const scenarioCapitalPanel = panel.querySelector("#devScenarioCapitalPanel");
+  const scenarioCapitalTitle = panel.querySelector("#devScenarioCapitalTitle");
+  const scenarioCapitalHint = panel.querySelector("#devScenarioCapitalHint");
+  const scenarioCapitalMeta = panel.querySelector("#devScenarioCapitalMeta");
+  const scenarioCapitalSearchInput = panel.querySelector("#devScenarioCapitalSearchInput");
+  const scenarioCapitalSearchResults = panel.querySelector("#devScenarioCapitalSearchResults");
+  const scenarioCapitalSelect = panel.querySelector("#devScenarioCapitalSelect");
+  const scenarioCapitalCandidate = panel.querySelector("#devScenarioCapitalCandidate");
+  const scenarioCapitalStatus = panel.querySelector("#devScenarioCapitalStatus");
   const scenarioDistrictPanel = panel.querySelector("#devScenarioDistrictPanel");
   const scenarioDistrictTitle = panel.querySelector("#devScenarioDistrictTitle");
   const scenarioDistrictHint = panel.querySelector("#devScenarioDistrictHint");
@@ -1851,12 +2821,52 @@ function initDevWorkspace() {
     if (scenarioTagParentInput && scenarioTagParentInput.value !== normalizeScenarioTagInput(tagCreatorState.parentOwnerTag)) {
       scenarioTagParentInput.value = normalizeScenarioTagInput(tagCreatorState.parentOwnerTag);
     }
+    const inspectorGroups = collectScenarioInspectorGroupOptions();
+    const inspectorAnchors = collectScenarioInspectorAnchorOptions();
+    if (scenarioTagGroupSelect) {
+      const groupOptionsMarkup = [
+        `<option value="">${ui("No Inspector Group")}</option>`,
+        ...inspectorGroups.map((group) => `<option value="${group.id}">${group.label}</option>`),
+      ].join("");
+      if (scenarioTagGroupSelect.innerHTML !== groupOptionsMarkup) {
+        scenarioTagGroupSelect.innerHTML = groupOptionsMarkup;
+      }
+      const selectedGroupId = String(tagCreatorState.selectedInspectorGroupId || "").trim();
+      if (scenarioTagGroupSelect.value !== selectedGroupId) {
+        scenarioTagGroupSelect.value = selectedGroupId;
+      }
+      scenarioTagGroupSelect.disabled = !hasActiveScenario || !!tagCreatorState.isSaving;
+    }
+    if (scenarioTagGroupIdInput && scenarioTagGroupIdInput.value !== normalizeScenarioInspectorGroupIdInput(tagCreatorState.inspectorGroupId)) {
+      scenarioTagGroupIdInput.value = normalizeScenarioInspectorGroupIdInput(tagCreatorState.inspectorGroupId);
+    }
+    if (scenarioTagGroupLabelInput && scenarioTagGroupLabelInput.value !== normalizeScenarioNameInput(tagCreatorState.inspectorGroupLabel)) {
+      scenarioTagGroupLabelInput.value = normalizeScenarioNameInput(tagCreatorState.inspectorGroupLabel);
+    }
+    if (scenarioTagGroupAnchorSelect) {
+      const anchorOptionsMarkup = [
+        `<option value="">${ui("Select anchor region")}</option>`,
+        ...inspectorAnchors.map((anchor) => `<option value="${anchor.id}">${anchor.label}</option>`),
+      ].join("");
+      if (scenarioTagGroupAnchorSelect.innerHTML !== anchorOptionsMarkup) {
+        scenarioTagGroupAnchorSelect.innerHTML = anchorOptionsMarkup;
+      }
+      const selectedAnchorId = String(tagCreatorState.inspectorGroupAnchorId || "").trim();
+      if (scenarioTagGroupAnchorSelect.value !== selectedAnchorId) {
+        scenarioTagGroupAnchorSelect.value = selectedAnchorId;
+      }
+      scenarioTagGroupAnchorSelect.disabled = !hasActiveScenario || !!tagCreatorState.isSaving;
+    }
     const canCreateTag = hasActiveScenario && tagCreatorModel.selectionCount > 0 && tagCreatorValidation.ok && !tagCreatorState.isSaving;
     const canClearTagForm = !!(
       normalizeScenarioTagInput(tagCreatorState.tag)
       || normalizeScenarioNameInput(tagCreatorState.nameEn)
       || normalizeScenarioNameInput(tagCreatorState.nameZh)
       || normalizeScenarioTagInput(tagCreatorState.parentOwnerTag)
+      || normalizeScenarioTagInput(tagCreatorState.selectedInspectorGroupId)
+      || normalizeScenarioInspectorGroupIdInput(tagCreatorState.inspectorGroupId)
+      || normalizeScenarioNameInput(tagCreatorState.inspectorGroupLabel)
+      || String(tagCreatorState.inspectorGroupAnchorId || "").trim()
       || normalizeScenarioColorInput(tagCreatorState.colorHex) !== DEFAULT_TAG_CREATOR_COLOR
       || tagCreatorState.isColorPopoverOpen
       || tagCreatorState.lastSaveMessage
@@ -1882,6 +2892,20 @@ function initDevWorkspace() {
       scenarioTagParentInput.placeholder = normalizeOwnerInput(state.activeSovereignCode) || "GER";
       scenarioTagParentInput.disabled = !hasActiveScenario || !!tagCreatorState.isSaving;
     }
+    if (scenarioTagGroupIdInput) {
+      scenarioTagGroupIdInput.placeholder = "scenario_group_europe";
+      scenarioTagGroupIdInput.disabled = !hasActiveScenario || !!tagCreatorState.isSaving;
+    }
+    if (scenarioTagGroupLabelInput) {
+      scenarioTagGroupLabelInput.placeholder = ui("Europe");
+      scenarioTagGroupLabelInput.disabled = !hasActiveScenario || !!tagCreatorState.isSaving;
+    }
+    if (scenarioTagColorSampleBtn) {
+      scenarioTagColorSampleBtn.disabled = !hasActiveScenario || !!tagCreatorState.isSaving;
+    }
+    if (scenarioClearTagSelectionBtn) {
+      scenarioClearTagSelectionBtn.disabled = !hasActiveScenario || !!tagCreatorState.isSaving || !resolveTagCreatorTargetIds().length;
+    }
     if (scenarioClearTagBtn) {
       scenarioClearTagBtn.disabled = !hasActiveScenario || !!tagCreatorState.isSaving || !canClearTagForm;
     }
@@ -1898,13 +2922,236 @@ function initDevWorkspace() {
         !tagCreatorValidation.ok
         && tagCreatorValidation.code !== "invalid-tag"
         && tagCreatorValidation.code !== "duplicate-tag"
-        && (normalizeScenarioTagInput(tagCreatorState.tag) || normalizeScenarioNameInput(tagCreatorState.nameEn) || normalizeScenarioNameInput(tagCreatorState.nameZh) || normalizeScenarioColorInput(tagCreatorState.colorHex) || normalizeScenarioTagInput(tagCreatorState.parentOwnerTag))
+        && (
+          normalizeScenarioTagInput(tagCreatorState.tag)
+          || normalizeScenarioNameInput(tagCreatorState.nameEn)
+          || normalizeScenarioNameInput(tagCreatorState.nameZh)
+          || normalizeScenarioColorInput(tagCreatorState.colorHex)
+          || normalizeScenarioTagInput(tagCreatorState.parentOwnerTag)
+          || normalizeScenarioTagInput(tagCreatorState.selectedInspectorGroupId)
+          || normalizeScenarioInspectorGroupIdInput(tagCreatorState.inspectorGroupId)
+          || normalizeScenarioNameInput(tagCreatorState.inspectorGroupLabel)
+          || String(tagCreatorState.inspectorGroupAnchorId || "").trim()
+        )
       ) {
         tagStatusBits.push(tagCreatorValidation.message);
       } else if (tagCreatorState.lastSavedAt) {
         tagStatusBits.push(`${ui("Last Saved")}: ${tagCreatorState.lastSavedAt}`);
       }
       scenarioTagCreatorStatus.textContent = tagStatusBits.join(" | ");
+    }
+
+    const priorCountryEditorState = state.devScenarioCountryEditor || {};
+    const countryModel = resolveCountryEditorModel();
+    const currentCountryTag = normalizeScenarioTagInput(priorCountryEditorState.tag);
+    const hasValidCountryTag = !!currentCountryTag && countryModel.options.some((entry) => entry.tag === currentCountryTag);
+    const needsCountryPrefill = !!countryModel.tag && (!hasValidCountryTag || currentCountryTag !== countryModel.tag);
+    const countryEditorState = needsCountryPrefill
+      ? {
+        ...priorCountryEditorState,
+        tag: countryModel.tag,
+        nameEn: countryModel.defaultNameEn,
+        nameZh: countryModel.defaultNameZh,
+      }
+      : priorCountryEditorState;
+    if (needsCountryPrefill) {
+      state.devScenarioCountryEditor = countryEditorState;
+    }
+    scenarioCountryPanel?.classList.toggle("hidden", !hasActiveScenario);
+    if (scenarioCountryTitle) {
+      scenarioCountryTitle.textContent = hasActiveScenario
+        ? String(state.activeScenarioManifest?.display_name || state.activeScenarioId || "")
+        : ui("No active scenario");
+    }
+    if (scenarioCountryHint) {
+      scenarioCountryHint.textContent = resolveCountryEditorHint(countryModel);
+    }
+    renderMetaRows(scenarioCountryMeta, buildCountryEditorMetaRows(countryModel));
+    if (scenarioCountrySelect) {
+      const countryOptionsMarkup = [
+        `<option value="">${ui("Select country")}</option>`,
+        ...countryModel.options.map((entry) => `<option value="${entry.tag}">${entry.label}</option>`),
+      ].join("");
+      if (scenarioCountrySelect.innerHTML !== countryOptionsMarkup) {
+        scenarioCountrySelect.innerHTML = countryOptionsMarkup;
+      }
+      if (scenarioCountrySelect.value !== (countryEditorState.tag || "")) {
+        scenarioCountrySelect.value = countryEditorState.tag || "";
+      }
+      scenarioCountrySelect.disabled = !hasActiveScenario || !!countryEditorState.isSaving;
+    }
+    if (scenarioCountryNameEnInput && scenarioCountryNameEnInput.value !== normalizeScenarioNameInput(countryEditorState.nameEn)) {
+      scenarioCountryNameEnInput.value = normalizeScenarioNameInput(countryEditorState.nameEn);
+    }
+    if (scenarioCountryNameZhInput && scenarioCountryNameZhInput.value !== normalizeScenarioNameInput(countryEditorState.nameZh)) {
+      scenarioCountryNameZhInput.value = normalizeScenarioNameInput(countryEditorState.nameZh);
+    }
+    if (scenarioCountryNameEnInput) {
+      scenarioCountryNameEnInput.disabled = !hasActiveScenario || !!countryEditorState.isSaving || !countryModel.tag;
+      scenarioCountryNameEnInput.placeholder = countryModel.defaultNameEn || ui("New Country");
+    }
+    if (scenarioCountryNameZhInput) {
+      scenarioCountryNameZhInput.disabled = !hasActiveScenario || !!countryEditorState.isSaving || !countryModel.tag;
+      scenarioCountryNameZhInput.placeholder = countryModel.defaultNameZh || ui("New Country");
+    }
+    const saveCountryBtn = panel.querySelector("#devScenarioSaveCountryBtn");
+    const canSaveCountry = hasActiveScenario
+      && !!countryModel.tag
+      && !!normalizeScenarioNameInput(countryEditorState.nameEn)
+      && !!normalizeScenarioNameInput(countryEditorState.nameZh)
+      && !countryEditorState.isSaving;
+    if (saveCountryBtn) {
+      saveCountryBtn.textContent = countryEditorState.isSaving ? ui("Saving...") : ui("Save Country Names");
+      saveCountryBtn.disabled = !canSaveCountry;
+    }
+    if (scenarioCountryStatus) {
+      const countryStatusBits = [];
+      if (countryEditorState.lastSaveMessage) {
+        countryStatusBits.push(countryEditorState.lastSaveMessage);
+      } else if (countryEditorState.lastSavedAt) {
+        countryStatusBits.push(`${ui("Last Saved")}: ${countryEditorState.lastSavedAt}`);
+      }
+      scenarioCountryStatus.textContent = countryStatusBits.join(" | ");
+    }
+
+    const tagInspectorState = state.devScenarioTagInspector || {};
+    const tagInspectorThreshold = Math.max(0, Number.parseInt(tagInspectorState.threshold, 10) || 0);
+    const tagInspectorRows = buildLowFeatureTagInspectorRows(tagInspectorThreshold);
+    const currentTagInspectorTag = normalizeScenarioTagInput(tagInspectorState.selectedTag);
+    const selectedTagInspectorRow = tagInspectorRows.find((entry) => entry.tag === currentTagInspectorTag) || tagInspectorRows[0] || null;
+    if (selectedTagInspectorRow?.tag !== currentTagInspectorTag) {
+      state.devScenarioTagInspector = {
+        ...tagInspectorState,
+        threshold: tagInspectorThreshold,
+        selectedTag: selectedTagInspectorRow?.tag || "",
+      };
+    }
+    scenarioTagInspectorPanel?.classList.toggle("hidden", !hasActiveScenario);
+    if (scenarioTagInspectorTitle) {
+      scenarioTagInspectorTitle.textContent = hasActiveScenario
+        ? String(state.activeScenarioManifest?.display_name || state.activeScenarioId || "")
+        : ui("No active scenario");
+    }
+    if (scenarioTagInspectorHint) {
+      scenarioTagInspectorHint.textContent = hasActiveScenario
+        ? ui("Inspect small non-releasable countries, then choose one to highlight its territories.")
+        : ui("Activate a scenario to inspect small country tags.");
+    }
+    renderMetaRows(scenarioTagInspectorMeta, [
+      [ui("Threshold"), String(tagInspectorThreshold)],
+      [ui("Matches"), String(tagInspectorRows.length)],
+      [ui("Highlighted"), normalizeScenarioTagInput(state.inspectorHighlightCountryCode)],
+    ].filter(([, value]) => String(value || "").trim()));
+    if (scenarioTagInspectorThresholdInput) {
+      const renderedThreshold = String(tagInspectorThreshold);
+      if (scenarioTagInspectorThresholdInput.value !== renderedThreshold) {
+        scenarioTagInspectorThresholdInput.value = renderedThreshold;
+      }
+      scenarioTagInspectorThresholdInput.disabled = !hasActiveScenario;
+    }
+    if (scenarioTagInspectorSelect) {
+      const nextInspectorOptions = [
+        `<option value="">${ui("Select country")}</option>`,
+        ...tagInspectorRows.map((entry) => (
+          `<option value="${entry.tag}">${entry.tag} | ${entry.displayName || entry.nameEn || entry.tag} | ${entry.featureCountLive}</option>`
+        )),
+      ].join("");
+      if (scenarioTagInspectorSelect.innerHTML !== nextInspectorOptions) {
+        scenarioTagInspectorSelect.innerHTML = nextInspectorOptions;
+      }
+      if (scenarioTagInspectorSelect.value !== (selectedTagInspectorRow?.tag || "")) {
+        scenarioTagInspectorSelect.value = selectedTagInspectorRow?.tag || "";
+      }
+      scenarioTagInspectorSelect.disabled = !hasActiveScenario || !tagInspectorRows.length;
+    }
+    renderScenarioTagInspectorDetails(scenarioTagInspectorDetails, selectedTagInspectorRow);
+    const clearTagInspectorHighlightBtn = panel.querySelector("#devScenarioTagInspectorClearHighlightBtn");
+    if (clearTagInspectorHighlightBtn) {
+      clearTagInspectorHighlightBtn.disabled = !hasActiveScenario || !normalizeScenarioTagInput(state.inspectorHighlightCountryCode);
+    }
+    if (scenarioTagInspectorStatus) {
+      const statusBits = [];
+      if (selectedTagInspectorRow?.tag) {
+        statusBits.push(`${ui("Selected")}: ${selectedTagInspectorRow.tag}`);
+      }
+      if (normalizeScenarioTagInput(state.inspectorHighlightCountryCode)) {
+        statusBits.push(`${ui("Highlighted")}: ${normalizeScenarioTagInput(state.inspectorHighlightCountryCode)}`);
+      }
+      scenarioTagInspectorStatus.textContent = statusBits.join(" | ");
+    }
+
+    const priorCapitalEditorState = state.devScenarioCapitalEditor || {};
+    const capitalModel = resolveCapitalEditorModel();
+    const capitalSearchQuery = normalizeScenarioNameInput(priorCapitalEditorState.searchQuery);
+    const capitalSearchMatches = buildCapitalEditorSearchMatches(capitalSearchQuery, capitalModel.options);
+    const currentCapitalTag = normalizeScenarioTagInput(priorCapitalEditorState.tag);
+    const hasValidCapitalTag = !!currentCapitalTag && capitalModel.options.some((entry) => entry.tag === currentCapitalTag);
+    const needsCapitalPrefill = !hasValidCapitalTag && !!capitalModel.tag;
+    const capitalEditorState = needsCapitalPrefill
+      ? {
+        ...priorCapitalEditorState,
+        tag: capitalModel.tag,
+        searchQuery: capitalSearchQuery,
+      }
+      : priorCapitalEditorState;
+    if (needsCapitalPrefill) {
+      state.devScenarioCapitalEditor = capitalEditorState;
+    }
+    scenarioCapitalPanel?.classList.toggle("hidden", !hasActiveScenario);
+    if (scenarioCapitalTitle) {
+      scenarioCapitalTitle.textContent = hasActiveScenario
+        ? String(state.activeScenarioManifest?.display_name || state.activeScenarioId || "")
+        : ui("No active scenario");
+    }
+    if (scenarioCapitalHint) {
+      scenarioCapitalHint.textContent = resolveCapitalEditorHint(capitalModel);
+    }
+    renderMetaRows(scenarioCapitalMeta, buildCapitalEditorMetaRows(capitalModel));
+    if (scenarioCapitalSearchInput) {
+      if (scenarioCapitalSearchInput.value !== capitalSearchQuery) {
+        scenarioCapitalSearchInput.value = capitalSearchQuery;
+      }
+      scenarioCapitalSearchInput.disabled = !hasActiveScenario || !!capitalEditorState.isSaving;
+      scenarioCapitalSearchInput.placeholder = ui("Search country");
+    }
+    renderCapitalEditorSearchResults(scenarioCapitalSearchResults, capitalSearchMatches, capitalSearchQuery);
+    if (scenarioCapitalSelect) {
+      const capitalOptionsMarkup = [
+        `<option value="">${ui("Select country")}</option>`,
+        ...capitalModel.options.map((entry) => `<option value="${entry.tag}">${entry.label}</option>`),
+      ].join("");
+      if (scenarioCapitalSelect.innerHTML !== capitalOptionsMarkup) {
+        scenarioCapitalSelect.innerHTML = capitalOptionsMarkup;
+      }
+      if (scenarioCapitalSelect.value !== (capitalEditorState.tag || "")) {
+        scenarioCapitalSelect.value = capitalEditorState.tag || "";
+      }
+      scenarioCapitalSelect.disabled = !hasActiveScenario || !!capitalEditorState.isSaving;
+    }
+    if (scenarioCapitalCandidate) {
+      scenarioCapitalCandidate.textContent = capitalModel.candidate?.cityId
+        ? `${ui("Candidate")}: ${capitalModel.candidate.cityName || capitalModel.candidate.cityId} (${capitalModel.candidate.cityId})`
+        : ui("No capital city candidate resolved for the current selection.");
+    }
+    const saveCapitalBtn = panel.querySelector("#devScenarioSaveCapitalBtn");
+    const canSaveCapital = hasActiveScenario
+      && capitalModel.selectionCount === 1
+      && !!capitalModel.tag
+      && capitalModel.ownerMatches
+      && !!capitalModel.candidate?.cityId
+      && !capitalEditorState.isSaving;
+    if (saveCapitalBtn) {
+      saveCapitalBtn.textContent = capitalEditorState.isSaving ? ui("Saving...") : ui("Save Capital");
+      saveCapitalBtn.disabled = !canSaveCapital;
+    }
+    if (scenarioCapitalStatus) {
+      const capitalStatusBits = [];
+      if (capitalEditorState.lastSaveMessage) {
+        capitalStatusBits.push(capitalEditorState.lastSaveMessage);
+      } else if (capitalEditorState.lastSavedAt) {
+        capitalStatusBits.push(`${ui("Last Saved")}: ${capitalEditorState.lastSavedAt}`);
+      }
+      scenarioCapitalStatus.textContent = capitalStatusBits.join(" | ");
     }
 
     const districtModel = resolveDistrictEditorModel();
@@ -2342,6 +3589,143 @@ function initDevWorkspace() {
 
   bindButtonAction(scenarioClearTagBtn, () => {
     resetTagCreatorForm();
+    renderWorkspace();
+  });
+
+  bindButtonAction(scenarioClearTagSelectionBtn, () => {
+    clearScenarioTagCreatorSelectionTarget();
+    showToast(ui("Tag creator selection cleared."), {
+      title: ui("Scenario Tag Creator"),
+      tone: "info",
+    });
+    renderWorkspace();
+  });
+
+  bindButtonAction(panel.querySelector("#devScenarioSaveCountryBtn"), async () => {
+    const built = buildScenarioCountrySavePayload();
+    if (!built.ok || !built.payload) {
+      showToast(built.message || ui("Choose a country tag and fill both names before saving."), {
+        title: ui("Country Name Editor"),
+        tone: "warning",
+      });
+      renderWorkspace();
+      return;
+    }
+    state.devScenarioCountryEditor = {
+      ...(state.devScenarioCountryEditor || {}),
+      isSaving: true,
+      lastSaveMessage: "",
+      lastSaveTone: "",
+    };
+    renderWorkspace();
+    try {
+      const response = await fetch("/__dev/scenario/country/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(built.payload),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result?.ok) {
+        throw new Error(String(result?.message || `HTTP ${response.status}`));
+      }
+      applyScenarioCountrySaveSuccess(result, built.payload);
+      if (typeof state.renderNowFn === "function") {
+        state.renderNowFn();
+      }
+      if (typeof state.updateScenarioUIFn === "function") {
+        state.updateScenarioUIFn();
+      }
+      showToast(ui("Country names saved."), {
+        title: ui("Country Name Editor"),
+        tone: "success",
+      });
+    } catch (error) {
+      state.devScenarioCountryEditor = {
+        ...(state.devScenarioCountryEditor || {}),
+        isSaving: false,
+        lastSaveMessage: String(error?.message || ui("Unable to save country names.")),
+        lastSaveTone: "critical",
+      };
+      showToast(String(error?.message || ui("Unable to save country names.")), {
+        title: ui("Country Name Editor"),
+        tone: "critical",
+        duration: 4200,
+      });
+    }
+    state.devScenarioCountryEditor = {
+      ...(state.devScenarioCountryEditor || {}),
+      isSaving: false,
+    };
+    renderWorkspace();
+  });
+
+  bindButtonAction(panel.querySelector("#devScenarioTagInspectorClearHighlightBtn"), () => {
+    state.inspectorHighlightCountryCode = "";
+    if (typeof state.renderNowFn === "function") {
+      state.renderNowFn();
+    }
+    renderWorkspace();
+  });
+
+  bindButtonAction(panel.querySelector("#devScenarioSaveCapitalBtn"), async () => {
+    const built = buildScenarioCapitalSavePayload();
+    if (!built.ok || !built.payload) {
+      showToast(built.message || ui("Select one feature and a matching country tag before saving a capital."), {
+        title: ui("Capital Editor"),
+        tone: "warning",
+      });
+      renderWorkspace();
+      return;
+    }
+    state.devScenarioCapitalEditor = {
+      ...(state.devScenarioCapitalEditor || {}),
+      isSaving: true,
+      lastSaveMessage: "",
+      lastSaveTone: "",
+    };
+    renderWorkspace();
+    try {
+      const response = await fetch("/__dev/scenario/capital/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(built.payload),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result?.ok) {
+        throw new Error(String(result?.message || `HTTP ${response.status}`));
+      }
+      applyScenarioCapitalSaveSuccess(result, built.payload);
+      if (typeof state.renderNowFn === "function") {
+        state.renderNowFn();
+      }
+      if (typeof state.updateScenarioUIFn === "function") {
+        state.updateScenarioUIFn();
+      }
+      showToast(ui("Scenario capital saved."), {
+        title: ui("Capital Editor"),
+        tone: "success",
+      });
+    } catch (error) {
+      state.devScenarioCapitalEditor = {
+        ...(state.devScenarioCapitalEditor || {}),
+        isSaving: false,
+        lastSaveMessage: String(error?.message || ui("Unable to save capital.")),
+        lastSaveTone: "critical",
+      };
+      showToast(String(error?.message || ui("Unable to save capital.")), {
+        title: ui("Capital Editor"),
+        tone: "critical",
+        duration: 4200,
+      });
+    }
+    state.devScenarioCapitalEditor = {
+      ...(state.devScenarioCapitalEditor || {}),
+      isSaving: false,
+    };
     renderWorkspace();
   });
 
@@ -2997,6 +4381,34 @@ function initDevWorkspace() {
     scenarioTagColorCustomBtn.dataset.bound = "true";
   }
 
+  if (scenarioTagColorSampleBtn && scenarioTagColorSampleBtn.dataset.bound !== "true") {
+    scenarioTagColorSampleBtn.addEventListener("click", () => {
+      const sampled = sampleScenarioTagColorFromContext();
+      if (!sampled.ok) {
+        showToast(sampled.message || ui("Unable to sample a color."), {
+          title: ui("Scenario Tag Creator"),
+          tone: "warning",
+        });
+        renderWorkspace();
+        return;
+      }
+      state.devScenarioTagCreator = {
+        ...ensureTagCreatorState(),
+        colorHex: sampled.colorHex,
+        isColorPopoverOpen: false,
+        lastSaveMessage: `${ui("Sampled")}: ${sampled.featureName || sampled.featureId}`,
+        lastSaveTone: "info",
+      };
+      pushRecentTagColor(sampled.colorHex);
+      showToast(`${ui("Sampled color from")} ${sampled.featureName || sampled.featureId}.`, {
+        title: ui("Scenario Tag Creator"),
+        tone: "success",
+      });
+      renderWorkspace();
+    });
+    scenarioTagColorSampleBtn.dataset.bound = "true";
+  }
+
   if (panel && panel.dataset.tagPopoverBound !== "true") {
     document.addEventListener("click", (event) => {
       const creatorState = state.devScenarioTagCreator || {};
@@ -3050,6 +4462,174 @@ function initDevWorkspace() {
       renderWorkspace();
     });
     scenarioTagParentInput.dataset.bound = "true";
+  }
+
+  if (scenarioTagGroupSelect && scenarioTagGroupSelect.dataset.bound !== "true") {
+    scenarioTagGroupSelect.addEventListener("change", (event) => {
+      state.devScenarioTagCreator = {
+        ...ensureTagCreatorState(),
+        selectedInspectorGroupId: String(event.target.value || "").trim(),
+        lastSaveMessage: "",
+        lastSaveTone: "",
+      };
+      renderWorkspace();
+    });
+    scenarioTagGroupSelect.dataset.bound = "true";
+  }
+
+  if (scenarioTagGroupIdInput && scenarioTagGroupIdInput.dataset.bound !== "true") {
+    scenarioTagGroupIdInput.addEventListener("input", (event) => {
+      state.devScenarioTagCreator = {
+        ...ensureTagCreatorState(),
+        inspectorGroupId: normalizeScenarioInspectorGroupIdInput(event.target.value),
+        lastSaveMessage: "",
+        lastSaveTone: "",
+      };
+      renderWorkspace();
+    });
+    scenarioTagGroupIdInput.dataset.bound = "true";
+  }
+
+  if (scenarioTagGroupLabelInput && scenarioTagGroupLabelInput.dataset.bound !== "true") {
+    scenarioTagGroupLabelInput.addEventListener("input", (event) => {
+      state.devScenarioTagCreator = {
+        ...ensureTagCreatorState(),
+        inspectorGroupLabel: normalizeScenarioNameInput(event.target.value),
+        lastSaveMessage: "",
+        lastSaveTone: "",
+      };
+      renderWorkspace();
+    });
+    scenarioTagGroupLabelInput.dataset.bound = "true";
+  }
+
+  if (scenarioTagGroupAnchorSelect && scenarioTagGroupAnchorSelect.dataset.bound !== "true") {
+    scenarioTagGroupAnchorSelect.addEventListener("change", (event) => {
+      state.devScenarioTagCreator = {
+        ...ensureTagCreatorState(),
+        inspectorGroupAnchorId: String(event.target.value || "").trim(),
+        lastSaveMessage: "",
+        lastSaveTone: "",
+      };
+      renderWorkspace();
+    });
+    scenarioTagGroupAnchorSelect.dataset.bound = "true";
+  }
+
+  if (scenarioCountrySelect && scenarioCountrySelect.dataset.bound !== "true") {
+    scenarioCountrySelect.addEventListener("change", (event) => {
+      const tag = normalizeScenarioTagInput(event.target.value);
+      const entry = state.scenarioCountriesByTag?.[tag] || {};
+      state.devScenarioCountryEditor = {
+        ...(state.devScenarioCountryEditor || {}),
+        tag,
+        nameEn: normalizeScenarioNameInput(entry.display_name_en || entry.display_name || ""),
+        nameZh: normalizeScenarioNameInput(entry.display_name_zh),
+        lastSaveMessage: "",
+        lastSaveTone: "",
+      };
+      renderWorkspace();
+    });
+    scenarioCountrySelect.dataset.bound = "true";
+  }
+
+  if (scenarioCountryNameEnInput && scenarioCountryNameEnInput.dataset.bound !== "true") {
+    scenarioCountryNameEnInput.addEventListener("input", (event) => {
+      state.devScenarioCountryEditor = {
+        ...(state.devScenarioCountryEditor || {}),
+        nameEn: normalizeScenarioNameInput(event.target.value),
+        lastSaveMessage: "",
+        lastSaveTone: "",
+      };
+      renderWorkspace();
+    });
+    scenarioCountryNameEnInput.dataset.bound = "true";
+  }
+
+  if (scenarioCountryNameZhInput && scenarioCountryNameZhInput.dataset.bound !== "true") {
+    scenarioCountryNameZhInput.addEventListener("input", (event) => {
+      state.devScenarioCountryEditor = {
+        ...(state.devScenarioCountryEditor || {}),
+        nameZh: normalizeScenarioNameInput(event.target.value),
+        lastSaveMessage: "",
+        lastSaveTone: "",
+      };
+      renderWorkspace();
+    });
+    scenarioCountryNameZhInput.dataset.bound = "true";
+  }
+
+  if (scenarioTagInspectorThresholdInput && scenarioTagInspectorThresholdInput.dataset.bound !== "true") {
+    scenarioTagInspectorThresholdInput.addEventListener("input", (event) => {
+      state.devScenarioTagInspector = {
+        ...(state.devScenarioTagInspector || {}),
+        threshold: Math.max(0, Number.parseInt(event.target.value, 10) || 0),
+      };
+      renderWorkspace();
+    });
+    scenarioTagInspectorThresholdInput.dataset.bound = "true";
+  }
+
+  if (scenarioTagInspectorSelect && scenarioTagInspectorSelect.dataset.bound !== "true") {
+    scenarioTagInspectorSelect.addEventListener("change", (event) => {
+      const tag = normalizeScenarioTagInput(event.target.value);
+      if (!tag) return;
+      state.devScenarioTagInspector = {
+        ...(state.devScenarioTagInspector || {}),
+        selectedTag: tag,
+      };
+      state.selectedInspectorCountryCode = tag;
+      state.inspectorHighlightCountryCode = tag;
+      if (typeof state.renderNowFn === "function") {
+        state.renderNowFn();
+      }
+      renderWorkspace();
+    });
+    scenarioTagInspectorSelect.dataset.bound = "true";
+  }
+
+  if (scenarioCapitalSelect && scenarioCapitalSelect.dataset.bound !== "true") {
+    scenarioCapitalSelect.addEventListener("change", (event) => {
+      selectScenarioCapitalEditorTag(event.target.value, { clearSearch: true });
+      renderWorkspace();
+    });
+    scenarioCapitalSelect.dataset.bound = "true";
+  }
+
+  if (scenarioCapitalSearchInput && scenarioCapitalSearchInput.dataset.bound !== "true") {
+    scenarioCapitalSearchInput.addEventListener("input", (event) => {
+      state.devScenarioCapitalEditor = {
+        ...(state.devScenarioCapitalEditor || {}),
+        searchQuery: normalizeScenarioNameInput(event.target.value),
+        lastSaveMessage: "",
+        lastSaveTone: "",
+      };
+      renderWorkspace();
+    });
+    scenarioCapitalSearchInput.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      const matches = buildCapitalEditorSearchMatches(
+        normalizeScenarioNameInput(event.target.value),
+        collectScenarioCountryOptions({ includeReleasable: true })
+      );
+      if (!matches.length) return;
+      event.preventDefault();
+      selectScenarioCapitalEditorTag(matches[0].tag, { clearSearch: true });
+      renderWorkspace();
+    });
+    scenarioCapitalSearchInput.dataset.bound = "true";
+  }
+
+  if (scenarioCapitalSearchResults && scenarioCapitalSearchResults.dataset.bound !== "true") {
+    scenarioCapitalSearchResults.addEventListener("click", (event) => {
+      const button = event.target?.closest?.("[data-dev-capital-search-tag]");
+      if (!button) return;
+      const tag = normalizeScenarioTagInput(button.dataset.devCapitalSearchTag);
+      if (!tag) return;
+      selectScenarioCapitalEditorTag(tag, { clearSearch: true });
+      renderWorkspace();
+    });
+    scenarioCapitalSearchResults.dataset.bound = "true";
   }
 
   if (scenarioDistrictTagInput && scenarioDistrictTagInput.dataset.bound !== "true") {

@@ -109,7 +109,6 @@ function populatePaletteSourceOptions(select) {
 
 
 function initToolbar({ render } = {}) {
-  const OCEAN_ADVANCED_STYLES_ENABLED = false;
   const OCEAN_ADVANCED_PRESETS = new Set([
     "bathymetry_soft",
     "bathymetry_contours",
@@ -290,6 +289,7 @@ function initToolbar({ render } = {}) {
   const oceanFillColor = document.getElementById("oceanFillColor");
   const lakeLinkToOcean = document.getElementById("lakeLinkToOcean");
   const lakeFillColor = document.getElementById("lakeFillColor");
+  const oceanAdvancedStylesToggle = document.getElementById("oceanAdvancedStylesToggle");
   const oceanStyleSelect = document.getElementById("oceanStyleSelect");
   const oceanTextureOpacity = document.getElementById("oceanTextureOpacity");
   const oceanTextureScale = document.getElementById("oceanTextureScale");
@@ -1201,7 +1201,8 @@ function initToolbar({ render } = {}) {
     state.styleConfig.ocean = {};
   }
   state.styleConfig.ocean.preset = normalizeOceanPreset(state.styleConfig.ocean.preset || "flat");
-  if (!OCEAN_ADVANCED_STYLES_ENABLED && OCEAN_ADVANCED_PRESETS.has(state.styleConfig.ocean.preset)) {
+  state.styleConfig.ocean.experimentalAdvancedStyles = state.styleConfig.ocean.experimentalAdvancedStyles === true;
+  if (!state.styleConfig.ocean.experimentalAdvancedStyles && OCEAN_ADVANCED_PRESETS.has(state.styleConfig.ocean.preset)) {
     state.styleConfig.ocean.preset = "flat";
   }
   state.styleConfig.ocean.fillColor = normalizeOceanFillColor(state.styleConfig.ocean.fillColor);
@@ -1432,7 +1433,36 @@ function initToolbar({ render } = {}) {
         : "";
     }
   };
+
+  const oceanAdvancedStylesEnabled = () => state.styleConfig.ocean.experimentalAdvancedStyles === true;
+
+  const renderOceanAdvancedStylesUi = () => {
+    const enabled = oceanAdvancedStylesEnabled();
+    const selectDisabledTitle = t("Enable Experimental Ocean Styles to unlock advanced ocean textures.", "ui");
+    const sliderDisabledTitle = t("Available when Experimental Ocean Styles is enabled.", "ui");
+    if (!enabled && OCEAN_ADVANCED_PRESETS.has(state.styleConfig.ocean.preset)) {
+      state.styleConfig.ocean.preset = "flat";
+    }
+    if (oceanAdvancedStylesToggle) {
+      oceanAdvancedStylesToggle.checked = enabled;
+    }
+    if (oceanStyleSelect) {
+      Array.from(oceanStyleSelect.options).forEach((option) => {
+        if (OCEAN_ADVANCED_PRESETS.has(option.value)) {
+          option.disabled = !enabled;
+        }
+      });
+      oceanStyleSelect.value = state.styleConfig.ocean.preset || "flat";
+      oceanStyleSelect.title = enabled ? "" : selectDisabledTitle;
+    }
+    [oceanTextureOpacity, oceanTextureScale, oceanContourStrength].forEach((control) => {
+      if (!control) return;
+      control.disabled = !enabled;
+      control.title = enabled ? "" : sliderDisabledTitle;
+    });
+  };
   renderLakeUi();
+  renderOceanAdvancedStylesUi();
 
   function renderRecentColors() {
     if (!recentContainer) return;
@@ -2139,6 +2169,28 @@ function initToolbar({ render } = {}) {
     if (oceanFillColor) {
       oceanFillColor.value = normalizeOceanFillColor(state.styleConfig.ocean.fillColor);
     }
+    if (oceanStyleSelect) {
+      oceanStyleSelect.value = state.styleConfig.ocean.preset || "flat";
+    }
+    if (oceanTextureOpacity) {
+      oceanTextureOpacity.value = String(Math.round(clamp(state.styleConfig.ocean.opacity || 0.72, 0, 1) * 100));
+    }
+    if (oceanTextureOpacityValue) {
+      oceanTextureOpacityValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.opacity || 0.72, 0, 1) * 100)}%`;
+    }
+    if (oceanTextureScale) {
+      oceanTextureScale.value = String(Math.round(clamp(state.styleConfig.ocean.scale || 1, 0.6, 2.4) * 100));
+    }
+    if (oceanTextureScaleValue) {
+      oceanTextureScaleValue.textContent = `${clamp(state.styleConfig.ocean.scale || 1, 0.6, 2.4).toFixed(2)}x`;
+    }
+    if (oceanContourStrength) {
+      oceanContourStrength.value = String(Math.round(clamp(state.styleConfig.ocean.contourStrength || 0.75, 0, 1) * 100));
+    }
+    if (oceanContourStrengthValue) {
+      oceanContourStrengthValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.contourStrength || 0.75, 0, 1) * 100)}%`;
+    }
+    renderOceanAdvancedStylesUi();
     renderLakeUi();
     if (colorModeSelect) {
       colorModeSelect.value = state.colorMode || "political";
@@ -3521,19 +3573,10 @@ function initToolbar({ render } = {}) {
   }
 
   if (oceanStyleSelect) {
-    if (!OCEAN_ADVANCED_STYLES_ENABLED) {
-      Array.from(oceanStyleSelect.options).forEach((option) => {
-        if (OCEAN_ADVANCED_PRESETS.has(option.value)) {
-          option.disabled = true;
-        }
-      });
-      oceanStyleSelect.title = t("Advanced ocean styles are temporarily disabled for performance.", "ui");
-      oceanStyleSelect.value = "flat";
-    }
-    oceanStyleSelect.value = state.styleConfig.ocean.preset || "flat";
+    renderOceanAdvancedStylesUi();
     oceanStyleSelect.addEventListener("change", (event) => {
       const nextPreset = normalizeOceanPreset(event.target.value);
-      if (!OCEAN_ADVANCED_STYLES_ENABLED && OCEAN_ADVANCED_PRESETS.has(nextPreset)) {
+      if (!oceanAdvancedStylesEnabled() && OCEAN_ADVANCED_PRESETS.has(nextPreset)) {
         state.styleConfig.ocean.preset = "flat";
         event.target.value = "flat";
       } else {
@@ -3559,10 +3602,6 @@ function initToolbar({ render } = {}) {
       invalidateOceanVisualState("ocean-opacity");
       renderDirty("ocean-opacity");
     });
-    if (!OCEAN_ADVANCED_STYLES_ENABLED) {
-      oceanTextureOpacity.disabled = true;
-      oceanTextureOpacity.title = t("Temporarily disabled while advanced ocean styles are off.", "ui");
-    }
   }
 
   if (oceanTextureScale) {
@@ -3580,10 +3619,6 @@ function initToolbar({ render } = {}) {
       invalidateOceanVisualState("ocean-scale");
       renderDirty("ocean-scale");
     });
-    if (!OCEAN_ADVANCED_STYLES_ENABLED) {
-      oceanTextureScale.disabled = true;
-      oceanTextureScale.title = t("Temporarily disabled while advanced ocean styles are off.", "ui");
-    }
   }
 
   if (oceanContourStrength) {
@@ -3601,10 +3636,20 @@ function initToolbar({ render } = {}) {
       invalidateOceanVisualState("ocean-contour");
       renderDirty("ocean-contour");
     });
-    if (!OCEAN_ADVANCED_STYLES_ENABLED) {
-      oceanContourStrength.disabled = true;
-      oceanContourStrength.title = t("Temporarily disabled while advanced ocean styles are off.", "ui");
-    }
+  }
+
+  if (oceanAdvancedStylesToggle && !oceanAdvancedStylesToggle.dataset.bound) {
+    oceanAdvancedStylesToggle.checked = oceanAdvancedStylesEnabled();
+    oceanAdvancedStylesToggle.addEventListener("change", (event) => {
+      state.styleConfig.ocean.experimentalAdvancedStyles = !!event.target.checked;
+      if (!state.styleConfig.ocean.experimentalAdvancedStyles && OCEAN_ADVANCED_PRESETS.has(state.styleConfig.ocean.preset)) {
+        state.styleConfig.ocean.preset = "flat";
+      }
+      renderOceanAdvancedStylesUi();
+      invalidateOceanVisualState("ocean-experimental-advanced-styles");
+      renderDirty("ocean-experimental-advanced-styles");
+    });
+    oceanAdvancedStylesToggle.dataset.bound = "true";
   }
 
   if (lakeLinkToOcean && !lakeLinkToOcean.dataset.bound) {

@@ -193,7 +193,7 @@ While subtle, these 2px differences create inconsistent vertical rhythm. The rig
 
 ### 3.3 Disabled Ocean Controls — No Visual Grouping (P2, Small)
 
-**Problem:** Ocean advanced styles (Bathymetry, Wave Hachure) are permanently disabled (`OCEAN_ADVANCED_STYLES_ENABLED = false`). The disabled `<option>` elements in the select and the disabled sliders (Opacity, Scale, Contour Strength) below are individually grayed out, but there's no visual indication that these form a disabled group.
+**Problem:** Ocean advanced styles (Bathymetry, Wave Hachure) are now opt-in experimental controls. When the experiment toggle is off, the disabled `<option>` elements in the select and the disabled sliders (Opacity, Scale, Contour Strength) below are individually grayed out, but there's no visual indication that these form a disabled group.
 
 **Recommendation:**
 - Wrap the disabled ocean controls in a `.control-group-disabled` div with `opacity: 0.5` and a dashed border.

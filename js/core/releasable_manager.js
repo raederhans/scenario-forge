@@ -599,6 +599,8 @@ function getScenarioReleasableCountries(scenarioId = state.activeScenarioId, { e
 
     const colorHex = String(entry.color_hex || "").trim().toLowerCase();
     const displayName = String(entry.display_name || tag).trim() || tag;
+    const displayNameEn = String(entry.display_name_en || displayName || tag).trim() || tag;
+    const displayNameZh = String(entry.display_name_zh || "").trim();
     const parentOwnerTag = String(entry.parent_owner_tag || "").trim().toUpperCase();
     const parentOwnerTags = Array.isArray(entry.parent_owner_tags)
       ? entry.parent_owner_tags
@@ -611,6 +613,8 @@ function getScenarioReleasableCountries(scenarioId = state.activeScenarioId, { e
     releasables[tag] = {
       code: tag,
       display_name: displayName,
+      display_name_en: displayNameEn,
+      display_name_zh: displayNameZh,
       color_hex: colorHex,
       feature_count: featureIds.length,
       quality: "releasable",
@@ -637,6 +641,9 @@ function getScenarioReleasableCountries(scenarioId = state.activeScenarioId, { e
       continent_label: groupingMeta.continentLabel,
       subregion_id: groupingMeta.subregionId,
       subregion_label: groupingMeta.subregionLabel,
+      inspector_group_id: String(entry.inspector_group_id || "").trim(),
+      inspector_group_label: String(entry.inspector_group_label || "").trim(),
+      inspector_group_anchor_id: String(entry.inspector_group_anchor_id || "").trim(),
     };
   });
 

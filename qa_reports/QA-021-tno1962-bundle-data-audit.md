@@ -237,7 +237,7 @@ audit.json 是纯诊断数据，包含：
 
 25 个 Atlantropa 浮雕覆盖层。使用 GeoJSON 格式（非 TopoJSON）。
 
-**优化潜力：** 将其转为 TopoJSON 格式可利用 arc 共享，预计节省 30-40%（约 430-570 KB）。但这些覆盖层默认关闭（`scenario_relief_overlays_default: false`），且通过 eager loading 机制**按需加载**，不影响首屏。
+**优化潜力：** 将其转为 TopoJSON 格式可利用 arc 共享，预计节省 30-40%（约 430-570 KB）。当前 `tno_1962` 已将这些覆盖层改为默认开启（`scenario_relief_overlays_default: true`），因为它们属于基础地理表达。若未来复用到默认关闭的场景，再讨论按需加载或更轻量的传输格式更合适。
 
 ---
 

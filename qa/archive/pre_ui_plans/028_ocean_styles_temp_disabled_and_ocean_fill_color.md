@@ -1,7 +1,7 @@
-# QA-028: Temporary Disable of Advanced Ocean Styles + Ocean Fill Color Picker
+# QA-028: Experimental Ocean Styles Gate + Ocean Fill Color Picker
 
 **Date:** 2026-02-24  
-**Decision Type:** Temporary product/performance safeguard  
+**Decision Type:** Product/performance safeguard with explicit experiment gate  
 **Related:** `./027_ocean_mask_fallback_and_visual_delta.md`
 
 ---
@@ -9,43 +9,45 @@
 ## 1) Decision Record
 
 ### Decision
-- Temporarily disable advanced ocean presets:
+- Keep advanced ocean presets behind an explicit experimental opt-in:
   - `bathymetry_soft`
   - `bathymetry_contours`
   - `wave_hachure`
-- Keep Ocean UI visible for future re-enable.
+- Keep Ocean UI visible and preserve `flat` as the default preset.
 - Add configurable ocean base fill color (was fixed light blue).
 
 ### Why
 - User-observed behavior: advanced presets had little visible difference but caused severe frame drops / interaction stutter.
-- Short-term priority is stable interaction and clear UX.
+- Default interaction should remain stable, but advanced presets still need a low-friction path for targeted testing.
 
 ### Scope
-- Disabled at runtime and UI option level.
-- No removal of controls or schema; this is reversible.
+- Runtime gating now comes from `state.styleConfig.ocean.experimentalAdvancedStyles`.
+- When the experiment is off, advanced presets and related sliders stay disabled and `flat` is enforced.
+- No removal of controls or schema; this remains reversible.
 
 ---
 
 ## 2) Code Changes
 
 ### `js/core/map_renderer.js`
-- Added `OCEAN_ADVANCED_STYLES_ENABLED = false` kill-switch.
-- `drawOceanStyle()` now early-returns when switch is off to avoid pattern generation/render overhead.
+- `drawOceanStyle()` now early-returns when `state.styleConfig.ocean.experimentalAdvancedStyles` is off to avoid pattern generation/render overhead.
 - Added `getOceanBaseFillColor()` and wired ocean base fill to `state.styleConfig.ocean.fillColor`.
 
 ### `js/core/state.js`
 - Added ocean config default:
   - `styleConfig.ocean.fillColor = "#aadaff"`
+  - `styleConfig.ocean.experimentalAdvancedStyles = false`
 
 ### `js/ui/toolbar.js`
 - Added ocean fill color binding (`#oceanFillColor`) to state + realtime render.
-- Forced advanced presets to `flat` while switch is off.
-- Disabled non-flat options in select at runtime.
-- Disabled ocean texture sliders while advanced styles are off (UI retained, non-destructive).
+- Added experimental styles toggle binding (`#oceanAdvancedStylesToggle`) to state + realtime render.
+- Forced advanced presets to `flat` while the experiment is off.
+- Disabled non-flat options in select at runtime until the experiment is enabled.
+- Disabled ocean texture sliders while the experiment is off (UI retained, non-destructive).
 
 ### `index.html`
 - Added Ocean Fill Color input (`#oceanFillColor`).
-- Marked three advanced preset options as `disabled` (UI retained).
+- Added Experimental Ocean Styles toggle (`#oceanAdvancedStylesToggle`).
 - Synced initial slider labels to current defaults.
 
 ### `js/ui/i18n.js`
@@ -56,12 +58,13 @@
 ## 3) Verification Checklist
 
 1. Open map page and confirm Ocean section is visible.
-2. Ocean style select shows `Flat Blue` active; three advanced options visible but disabled.
+2. With the experimental toggle off, Ocean style select shows `Flat Blue` active; three advanced options remain visible but disabled.
 3. Adjusting `Ocean Fill Color` immediately changes ocean base color.
-4. Pan/zoom remains responsive without heavy stutter from ocean style pass.
-5. Land painting behavior remains unchanged.
+4. With the experimental toggle on, the three advanced presets become selectable and the three ocean texture sliders enable.
+5. Pan/zoom remains responsive without heavy stutter from ocean style pass when the experiment is off.
+6. Land painting behavior remains unchanged.
 
----
+--- 
 
 ## 4) Re-enable Conditions (Future)
 
