@@ -81,6 +81,46 @@ showToast(`Copied ${count} region entries to the clipboard.`);
             self.assertIn("berlin", result["non_translatable_tokens"])
             self.assertIn("0px", result["non_translatable_tokens"])
 
+    def test_keeps_literal_translated_ui_alias_in_sync_with_ui_t_keys(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            self._write_repo_file(
+                repo_root,
+                "js/sample.js",
+                """
+const label = t("Create Tag", "ui");
+                """.strip(),
+            )
+
+            result = collect_code_strings(repo_root)
+
+            self.assertEqual(result["ui_t_keys"], result["literal_translated_ui_keys"])
+
+    def test_collect_code_strings_ignores_broken_multiline_declarative_markup_without_hiding_valid_entries(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            self._write_repo_file(
+                repo_root,
+                "index.html",
+                """
+<!doctype html>
+<html>
+  <body>
+    <button
+      data-i18n="Broken
+      data-extra="ignored"
+    >Broken</button>
+    <button data-i18n="Scenario Tag Creator">Scenario Tag Creator</button>
+  </body>
+</html>
+                """.strip(),
+            )
+
+            result = collect_code_strings(repo_root)
+
+            self.assertIn("Scenario Tag Creator", result["declarative_ui_keys"])
+            self.assertNotIn("Broken      data-extra=", result["declarative_ui_keys"])
+
 
 if __name__ == "__main__":
     unittest.main()

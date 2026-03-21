@@ -398,12 +398,8 @@ function resolveOwnershipEditorHint(model) {
   return ui("Apply one owner tag across the current selection or reset those features to the active scenario baseline.");
 }
 
-function resolveTagCreatorTargetIds() {
-  return resolveOwnershipTargetIds();
-}
-
 function resolveTagCreatorModel() {
-  const targetIds = resolveTagCreatorTargetIds();
+  const targetIds = resolveOwnershipTargetIds();
   const ownershipModel = resolveOwnershipEditorModel();
   const singleFeatureId = targetIds.length === 1 ? targetIds[0] : "";
   const singleFeature = singleFeatureId ? state.landIndex?.get(singleFeatureId) || null : null;
@@ -417,10 +413,6 @@ function resolveTagCreatorModel() {
     currentOwnerCode: ownershipModel.currentOwnerCode,
     currentControllerCode: ownershipModel.currentControllerCode,
   };
-}
-
-function buildTagCreatorMetaRows(model) {
-  return buildOwnershipMetaRows(model);
 }
 
 function resolveTagCreatorHint(model) {
@@ -727,7 +719,7 @@ function validateTagCreatorInput({
 }
 
 function buildScenarioTagCreatorPayload() {
-  const targetIds = resolveTagCreatorTargetIds();
+  const targetIds = resolveOwnershipTargetIds();
   const editorState = state.devScenarioTagCreator || {};
   const validation = validateTagCreatorInput(editorState, targetIds);
   if (!validation.ok) {
@@ -1984,9 +1976,9 @@ function removeSelectionFromDistrictDraft(model) {
     lastSaveMessage: removedCount > 0
       ? ui("Selection removed from the district draft.")
       : ui("Selected features were not assigned to the current district draft."),
-    lastSaveTone: removedCount > 0 ? "info" : "warning",
+    lastSaveTone: "info",
   });
-  return { ok: removedCount > 0, count: removedCount };
+  return { ok: true, changed: removedCount > 0, count: removedCount };
 }
 
 function deleteDistrictDraft(model) {
@@ -2240,6 +2232,35 @@ function renderMetaRows(container, rows) {
     row.append(labelEl, valueEl);
     container.appendChild(row);
   });
+}
+
+function syncSelectOptions(select, options, { placeholderLabel = "", placeholderValue = "" } = {}) {
+  if (!select) return;
+  const normalizedOptions = [];
+  if (placeholderLabel !== null) {
+    normalizedOptions.push({
+      value: String(placeholderValue ?? ""),
+      label: String(placeholderLabel || ""),
+    });
+  }
+  (Array.isArray(options) ? options : []).forEach((option) => {
+    normalizedOptions.push({
+      value: String(option?.value ?? ""),
+      label: String(option?.label ?? option?.value ?? ""),
+    });
+  });
+  const signature = normalizedOptions
+    .map((option) => `${option.value}\u241f${option.label}`)
+    .join("\u241e");
+  if (select.dataset.optionSignature === signature) {
+    return;
+  }
+  const fragment = document.createDocumentFragment();
+  normalizedOptions.forEach((option) => {
+    fragment.appendChild(new Option(option.label, option.value));
+  });
+  select.replaceChildren(fragment);
+  select.dataset.optionSignature = signature;
 }
 
 async function loadRuntimeMeta() {
@@ -2746,7 +2767,7 @@ function initDevWorkspace() {
     if (scenarioTagCreatorHint) {
       scenarioTagCreatorHint.textContent = resolveTagCreatorHint(tagCreatorModel);
     }
-    renderMetaRows(scenarioTagCreatorMeta, buildTagCreatorMetaRows(tagCreatorModel));
+    renderMetaRows(scenarioTagCreatorMeta, buildOwnershipMetaRows(tagCreatorModel));
     if (scenarioTagInput && scenarioTagInput.value !== normalizeScenarioTagInput(tagCreatorState.tag)) {
       scenarioTagInput.value = normalizeScenarioTagInput(tagCreatorState.tag);
     }
@@ -2824,13 +2845,11 @@ function initDevWorkspace() {
     const inspectorGroups = collectScenarioInspectorGroupOptions();
     const inspectorAnchors = collectScenarioInspectorAnchorOptions();
     if (scenarioTagGroupSelect) {
-      const groupOptionsMarkup = [
-        `<option value="">${ui("No Inspector Group")}</option>`,
-        ...inspectorGroups.map((group) => `<option value="${group.id}">${group.label}</option>`),
-      ].join("");
-      if (scenarioTagGroupSelect.innerHTML !== groupOptionsMarkup) {
-        scenarioTagGroupSelect.innerHTML = groupOptionsMarkup;
-      }
+      syncSelectOptions(
+        scenarioTagGroupSelect,
+        inspectorGroups.map((group) => ({ value: group.id, label: group.label })),
+        { placeholderLabel: ui("No Inspector Group") }
+      );
       const selectedGroupId = String(tagCreatorState.selectedInspectorGroupId || "").trim();
       if (scenarioTagGroupSelect.value !== selectedGroupId) {
         scenarioTagGroupSelect.value = selectedGroupId;
@@ -2844,13 +2863,11 @@ function initDevWorkspace() {
       scenarioTagGroupLabelInput.value = normalizeScenarioNameInput(tagCreatorState.inspectorGroupLabel);
     }
     if (scenarioTagGroupAnchorSelect) {
-      const anchorOptionsMarkup = [
-        `<option value="">${ui("Select anchor region")}</option>`,
-        ...inspectorAnchors.map((anchor) => `<option value="${anchor.id}">${anchor.label}</option>`),
-      ].join("");
-      if (scenarioTagGroupAnchorSelect.innerHTML !== anchorOptionsMarkup) {
-        scenarioTagGroupAnchorSelect.innerHTML = anchorOptionsMarkup;
-      }
+      syncSelectOptions(
+        scenarioTagGroupAnchorSelect,
+        inspectorAnchors.map((anchor) => ({ value: anchor.id, label: anchor.label })),
+        { placeholderLabel: ui("Select anchor region") }
+      );
       const selectedAnchorId = String(tagCreatorState.inspectorGroupAnchorId || "").trim();
       if (scenarioTagGroupAnchorSelect.value !== selectedAnchorId) {
         scenarioTagGroupAnchorSelect.value = selectedAnchorId;
@@ -2904,7 +2921,7 @@ function initDevWorkspace() {
       scenarioTagColorSampleBtn.disabled = !hasActiveScenario || !!tagCreatorState.isSaving;
     }
     if (scenarioClearTagSelectionBtn) {
-      scenarioClearTagSelectionBtn.disabled = !hasActiveScenario || !!tagCreatorState.isSaving || !resolveTagCreatorTargetIds().length;
+      scenarioClearTagSelectionBtn.disabled = !hasActiveScenario || !!tagCreatorState.isSaving || tagCreatorModel.selectionCount === 0;
     }
     if (scenarioClearTagBtn) {
       scenarioClearTagBtn.disabled = !hasActiveScenario || !!tagCreatorState.isSaving || !canClearTagForm;
@@ -2968,13 +2985,11 @@ function initDevWorkspace() {
     }
     renderMetaRows(scenarioCountryMeta, buildCountryEditorMetaRows(countryModel));
     if (scenarioCountrySelect) {
-      const countryOptionsMarkup = [
-        `<option value="">${ui("Select country")}</option>`,
-        ...countryModel.options.map((entry) => `<option value="${entry.tag}">${entry.label}</option>`),
-      ].join("");
-      if (scenarioCountrySelect.innerHTML !== countryOptionsMarkup) {
-        scenarioCountrySelect.innerHTML = countryOptionsMarkup;
-      }
+      syncSelectOptions(
+        scenarioCountrySelect,
+        countryModel.options.map((entry) => ({ value: entry.tag, label: entry.label })),
+        { placeholderLabel: ui("Select country") }
+      );
       if (scenarioCountrySelect.value !== (countryEditorState.tag || "")) {
         scenarioCountrySelect.value = countryEditorState.tag || "";
       }
@@ -3050,15 +3065,14 @@ function initDevWorkspace() {
       scenarioTagInspectorThresholdInput.disabled = !hasActiveScenario;
     }
     if (scenarioTagInspectorSelect) {
-      const nextInspectorOptions = [
-        `<option value="">${ui("Select country")}</option>`,
-        ...tagInspectorRows.map((entry) => (
-          `<option value="${entry.tag}">${entry.tag} | ${entry.displayName || entry.nameEn || entry.tag} | ${entry.featureCountLive}</option>`
-        )),
-      ].join("");
-      if (scenarioTagInspectorSelect.innerHTML !== nextInspectorOptions) {
-        scenarioTagInspectorSelect.innerHTML = nextInspectorOptions;
-      }
+      syncSelectOptions(
+        scenarioTagInspectorSelect,
+        tagInspectorRows.map((entry) => ({
+          value: entry.tag,
+          label: `${entry.tag} | ${entry.displayName || entry.nameEn || entry.tag} | ${entry.featureCountLive}`,
+        })),
+        { placeholderLabel: ui("Select country") }
+      );
       if (scenarioTagInspectorSelect.value !== (selectedTagInspectorRow?.tag || "")) {
         scenarioTagInspectorSelect.value = selectedTagInspectorRow?.tag || "";
       }
@@ -3116,13 +3130,11 @@ function initDevWorkspace() {
     }
     renderCapitalEditorSearchResults(scenarioCapitalSearchResults, capitalSearchMatches, capitalSearchQuery);
     if (scenarioCapitalSelect) {
-      const capitalOptionsMarkup = [
-        `<option value="">${ui("Select country")}</option>`,
-        ...capitalModel.options.map((entry) => `<option value="${entry.tag}">${entry.label}</option>`),
-      ].join("");
-      if (scenarioCapitalSelect.innerHTML !== capitalOptionsMarkup) {
-        scenarioCapitalSelect.innerHTML = capitalOptionsMarkup;
-      }
+      syncSelectOptions(
+        scenarioCapitalSelect,
+        capitalModel.options.map((entry) => ({ value: entry.tag, label: entry.label })),
+        { placeholderLabel: ui("Select country") }
+      );
       if (scenarioCapitalSelect.value !== (capitalEditorState.tag || "")) {
         scenarioCapitalSelect.value = capitalEditorState.tag || "";
       }
@@ -3198,16 +3210,14 @@ function initDevWorkspace() {
       );
     }
     if (scenarioDistrictSelect) {
-      const nextOptions = [
-        `<option value="">${ui("Select district")}</option>`,
-        ...districtModel.districtEntries.map((district) => {
-          const label = district.name_en || district.name_zh || district.id;
-          return `<option value="${district.id}">${label}</option>`;
-        }),
-      ].join("");
-      if (scenarioDistrictSelect.innerHTML !== nextOptions) {
-        scenarioDistrictSelect.innerHTML = nextOptions;
-      }
+      syncSelectOptions(
+        scenarioDistrictSelect,
+        districtModel.districtEntries.map((district) => ({
+          value: district.id,
+          label: district.name_en || district.name_zh || district.id,
+        })),
+        { placeholderLabel: ui("Select district") }
+      );
       const selectedDistrictId = districtModel.selectedDistrictId || "";
       if (scenarioDistrictSelect.value !== selectedDistrictId) {
         scenarioDistrictSelect.value = selectedDistrictId;
@@ -3269,7 +3279,7 @@ function initDevWorkspace() {
     const canRemoveDistrictSelection = hasActiveScenario
       && !!districtModel.tag
       && !!districtModel.selectedDistrictId
-      && removableSelectionIds.length > 0
+      && matchingSelectionIds.length > 0
       && !districtState.isSaving
       && !districtState.isTemplateApplying
       && !districtModel.hasLegacyGeoCountryData;
@@ -3450,8 +3460,12 @@ function initDevWorkspace() {
     renderMetaRows(renderStatusMeta, resolveRenderRows());
 
     const runtime = resolveRuntimeRows();
-    runtimeTitle.textContent = runtime.title;
-    runtimeHint.textContent = runtime.hint;
+    if (runtimeTitle) {
+      runtimeTitle.textContent = runtime.title;
+    }
+    if (runtimeHint) {
+      runtimeHint.textContent = runtime.hint;
+    }
     renderMetaRows(runtimeMeta, runtime.rows);
 
     if (selectionSortMode && selectionSortMode.value !== state.devSelectionSortMode) {
@@ -3460,10 +3474,21 @@ function initDevWorkspace() {
 
     const entries = sortSelectionEntries(resolveSelectionEntries());
     const entryCount = entries.length;
-    selectionSummary.textContent = localizeSelectionSummary(entryCount);
-    selectionPreview.value = buildClipboardText(state.devClipboardPreviewFormat || "names_with_ids")
-      || state.devClipboardFallbackText
-      || "";
+    if (selectionSummary) {
+      selectionSummary.textContent = localizeSelectionSummary(entryCount);
+    }
+    if (selectionPreview) {
+      selectionPreview.value = buildClipboardText(state.devClipboardPreviewFormat || "names_with_ids")
+        || state.devClipboardFallbackText
+        || "";
+    }
+    const hoveredSelectionId = state.devHoverHit?.targetType === "land"
+      ? String(state.devHoverHit.id || "").trim()
+      : "";
+    const addHoveredBtn = panel.querySelector("#devSelectionAddHoveredBtn");
+    if (addHoveredBtn) {
+      addHoveredBtn.disabled = !hoveredSelectionId || !state.landIndex?.get(hoveredSelectionId);
+    }
 
     [
       panel.querySelector("#devCopyNamesBtn"),
@@ -3492,7 +3517,12 @@ function initDevWorkspace() {
   });
 
   bindButtonAction(panel.querySelector("#devSelectionAddHoveredBtn"), () => {
-    const hoveredId = state.devHoverHit?.targetType === "land" ? state.devHoverHit.id : state.hoveredId;
+    const hoveredId = state.devHoverHit?.targetType === "land"
+      ? String(state.devHoverHit.id || "").trim()
+      : "";
+    if (!hoveredId) {
+      return;
+    }
     mapRenderer.addFeatureToDevSelection(hoveredId);
   });
   bindButtonAction(panel.querySelector("#devSelectionToggleSelectedBtn"), () => {
@@ -3819,9 +3849,14 @@ function initDevWorkspace() {
       renderWorkspace();
       return;
     }
-    showToast(ui("Removed selection from district."), {
+    showToast(result.changed === false
+      ? (
+        state.devScenarioDistrictEditor?.lastSaveMessage
+        || ui("Selected features were not assigned to the current district draft.")
+      )
+      : ui("Removed selection from district."), {
       title: ui("Scenario District Editor"),
-      tone: "success",
+      tone: result.changed === false ? "info" : "success",
     });
     renderWorkspace();
   });
@@ -4409,25 +4444,26 @@ function initDevWorkspace() {
     scenarioTagColorSampleBtn.dataset.bound = "true";
   }
 
-  if (panel && panel.dataset.tagPopoverBound !== "true") {
-    document.addEventListener("click", (event) => {
-      const creatorState = state.devScenarioTagCreator || {};
-      if (!creatorState.isColorPopoverOpen) return;
-      const target = event.target;
-      if (
-        scenarioTagColorPreviewBtn?.contains(target)
-        || scenarioTagColorPopover?.contains(target)
-      ) {
-        return;
-      }
-      state.devScenarioTagCreator = {
-        ...ensureTagCreatorState(),
-        isColorPopoverOpen: false,
-      };
-      renderWorkspace();
-    });
-    panel.dataset.tagPopoverBound = "true";
+  if (typeof state.devWorkspaceTagPopoverDismissHandler === "function") {
+    document.removeEventListener("click", state.devWorkspaceTagPopoverDismissHandler);
   }
+  state.devWorkspaceTagPopoverDismissHandler = (event) => {
+    const creatorState = state.devScenarioTagCreator || {};
+    if (!creatorState.isColorPopoverOpen) return;
+    const target = event.target;
+    if (
+      scenarioTagColorPreviewBtn?.contains(target)
+      || scenarioTagColorPopover?.contains(target)
+    ) {
+      return;
+    }
+    state.devScenarioTagCreator = {
+      ...ensureTagCreatorState(),
+      isColorPopoverOpen: false,
+    };
+    renderWorkspace();
+  };
+  document.addEventListener("click", state.devWorkspaceTagPopoverDismissHandler);
 
   const bindTagColorSwatchContainer = (container) => {
     if (!container || container.dataset.bound === "true") return;

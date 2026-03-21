@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import http.server
 import json
+import math
 import os
 import re
 from pathlib import Path
@@ -17,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from map_builder.io.writers import write_json_atomic
+from map_builder.io.writers import write_json_atomic, write_text_atomic
 
 # Define the range of ports to try
 PORT_START = 8000
@@ -33,6 +34,7 @@ DEFAULT_SCENARIO_DISTRICT_GROUPS_FILENAME = "district_groups.manual.json"
 DEFAULT_SCENARIO_MANUAL_OVERRIDES_FILENAME = "scenario_manual_overrides.json"
 DEFAULT_SCENARIO_CITY_OVERRIDES_FILENAME = "city_overrides.json"
 DEFAULT_SHARED_DISTRICT_TEMPLATES_PATH = ROOT / "data" / "scenarios" / "district_templates.shared.json"
+MAX_JSON_BODY_BYTES = 1024 * 1024
 TAG_CODE_PATTERN = re.compile(r"^[A-Z]{2,4}$")
 COUNTRY_CODE_PATTERN = re.compile(r"^[A-Z]{2,3}$")
 DISTRICT_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
@@ -63,6 +65,19 @@ def _read_json_or_none(path: Path | None) -> object | None:
     return _read_json(path)
 
 
+def _capture_text_snapshot(path: Path) -> tuple[Path, bool, str]:
+    if path.exists():
+        return path, True, path.read_text(encoding="utf-8")
+    return path, False, ""
+
+
+def _restore_text_snapshot(path: Path, *, existed: bool, original_text: str) -> None:
+    if existed:
+        write_text_atomic(path, original_text, encoding="utf-8")
+    else:
+        path.unlink(missing_ok=True)
+
+
 def _repo_relative(path: Path, *, root: Path = ROOT) -> str:
     return path.resolve().relative_to(root.resolve()).as_posix()
 
@@ -85,6 +100,29 @@ def _resolve_repo_path(raw_path: object, *, root: Path = ROOT) -> Path:
     if not text:
         raise DevServerError("missing_path", "Required scenario path is missing.", status=400)
     return _ensure_path_within_root(root / text, root=root)
+
+
+def _ensure_path_within_allowed_bases(
+    path: Path,
+    *,
+    allowed_bases: tuple[Path, ...],
+    label: str,
+    root: Path = ROOT,
+) -> Path:
+    resolved = _ensure_path_within_root(path, root=root)
+    normalized_bases = tuple(_ensure_path_within_root(base, root=root) for base in allowed_bases if base)
+    for base in normalized_bases:
+        try:
+            resolved.relative_to(base)
+            return resolved
+        except ValueError:
+            continue
+    allowed_display = ", ".join(_repo_relative(base, root=root) for base in normalized_bases)
+    raise DevServerError(
+        "path_not_allowed",
+        f"{label} must stay within one of: {allowed_display}",
+        status=400,
+    )
 
 
 def _normalize_code(value: object) -> str:
@@ -264,7 +302,9 @@ def load_scenario_context(scenario_id: object, *, root: Path = ROOT) -> dict[str
             status=404,
         )
     manifest = _read_json(manifest_path)
-    scenario_dir = manifest_path.parent
+    scenario_dir = _ensure_path_within_root(manifest_path.parent, root=root)
+    shared_data_dir = _ensure_path_within_root(root / "data", root=root)
+    tools_dir = _ensure_path_within_root(root / "tools", root=root)
 
     owners_path = _resolve_repo_path(manifest.get("owners_url"), root=root)
     countries_path = _resolve_repo_path(manifest.get("countries_url"), root=root)
@@ -288,6 +328,7 @@ def load_scenario_context(scenario_id: object, *, root: Path = ROOT) -> dict[str
     geo_locale_builder_path = _resolve_repo_path(geo_locale_builder_url, root=root) if geo_locale_builder_url else None
 
     for candidate in (
+        manifest_path,
         owners_path,
         countries_path,
         controllers_path,
@@ -296,16 +337,27 @@ def load_scenario_context(scenario_id: object, *, root: Path = ROOT) -> dict[str
         geo_locale_patch_path,
         district_groups_path,
     ):
-        if not candidate:
-            continue
-        try:
-            candidate.relative_to(scenario_dir.resolve())
-        except ValueError as exc:
-            raise DevServerError(
-                "path_not_allowed",
-                f"Scenario file is outside the scenario directory: {candidate}",
-                status=400,
-            ) from exc
+        if candidate:
+            _ensure_path_within_allowed_bases(
+                candidate,
+                allowed_bases=(scenario_dir,),
+                label="Scenario file",
+                root=root,
+            )
+    if releasable_catalog_path:
+        releasable_catalog_path = _ensure_path_within_allowed_bases(
+            releasable_catalog_path,
+            allowed_bases=(scenario_dir, shared_data_dir),
+            label="Releasable catalog path",
+            root=root,
+        )
+    if geo_locale_builder_path:
+        geo_locale_builder_path = _ensure_path_within_allowed_bases(
+            geo_locale_builder_path,
+            allowed_bases=(scenario_dir, tools_dir),
+            label="Geo locale builder path",
+            root=root,
+        )
 
     context = {
         "scenarioId": normalized_id,
@@ -656,19 +708,19 @@ def _write_json_transaction(file_payloads: list[tuple[Path, object]]) -> None:
     snapshots: list[tuple[Path, bool, str]] = []
     for path, _payload in file_payloads:
         path.parent.mkdir(parents=True, exist_ok=True)
-        if path.exists():
-            snapshots.append((path, True, path.read_text(encoding="utf-8")))
-        else:
-            snapshots.append((path, False, ""))
+        snapshots.append(_capture_text_snapshot(path))
     try:
         for path, payload in file_payloads:
             write_json_atomic(path, payload, ensure_ascii=False, indent=2, trailing_newline=True)
-    except Exception:
+    except Exception as exc:
+        rollback_errors: list[str] = []
         for path, existed, original_text in reversed(snapshots):
-            if existed:
-                path.write_text(original_text, encoding="utf-8")
-            elif path.exists():
-                path.unlink()
+            try:
+                _restore_text_snapshot(path, existed=existed, original_text=original_text)
+            except Exception as rollback_exc:
+                rollback_errors.append(f"{path}: {rollback_exc}")
+        for error in rollback_errors:
+            exc.add_note(f"Rollback failed: {error}")
         raise
 
 
@@ -1160,28 +1212,6 @@ def _recompute_country_feature_counts(
             continue
         raw_country["feature_count"] = int(owner_counts.get(tag, 0))
         raw_country["controller_feature_count"] = int(controller_counts.get(tag, 0))
-
-
-def _bootstrap_releasable_catalog(
-    context: dict[str, object],
-    *,
-    root: Path = ROOT,
-) -> tuple[dict[str, object], Path]:
-    scenario_id = str(context["scenarioId"])
-    local_path = Path(context["releasableCatalogLocalPath"])
-    source_path = Path(context["releasableCatalogPath"]) if context.get("releasableCatalogPath") else None
-    if local_path.exists():
-        payload = _read_json(local_path)
-    elif source_path and source_path.exists():
-        payload = _read_json(source_path)
-    else:
-        payload = _default_releasable_catalog(scenario_id)
-    catalog = _normalize_releasable_catalog(payload, scenario_id=scenario_id)
-    write_json_atomic(local_path, catalog, ensure_ascii=False, indent=2, trailing_newline=True)
-    current_url = _repo_relative(local_path, root=root)
-    if str(context.get("manifest", {}).get("releasable_catalog_url") or "").strip() != current_url:
-        _write_manifest(context, updates={"releasable_catalog_url": current_url}, root=root)
-    return catalog, local_path
 
 
 def _build_scenario_tag_create_payload(
@@ -2111,6 +2141,7 @@ def save_scenario_geo_locale_entry(
         raise DevServerError("missing_feature_id", "Feature id is required for geo locale saves.", status=400)
 
     manual_path = Path(context["manualGeoOverridesPath"])
+    manual_snapshot = _capture_text_snapshot(manual_path)
     if manual_path.exists():
         manual_payload = _read_json(manual_path)
         if not isinstance(manual_payload, dict):
@@ -2132,23 +2163,53 @@ def save_scenario_geo_locale_entry(
     write_json_atomic(manual_path, manual_payload, ensure_ascii=False, indent=2, trailing_newline=True)
 
     command = _build_geo_locale_command(context, root=root)
-    result = subprocess.run(
-        command,
-        cwd=root,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if result.returncode != 0:
+    build_error_details: dict[str, object] = {
+        "command": command,
+    }
+    try:
+        result = subprocess.run(
+            command,
+            cwd=root,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except Exception as exc:
+        try:
+            _restore_text_snapshot(
+                manual_snapshot[0],
+                existed=manual_snapshot[1],
+                original_text=manual_snapshot[2],
+            )
+        except Exception as rollback_exc:
+            build_error_details["rollbackError"] = str(rollback_exc)
+        build_error_details["error"] = repr(exc)
         raise DevServerError(
             "geo_locale_build_failed",
             "The geo locale patch builder failed after updating manual overrides.",
             status=500,
-            details={
-                "command": command,
+            details=build_error_details,
+        ) from exc
+    if result.returncode != 0:
+        try:
+            _restore_text_snapshot(
+                manual_snapshot[0],
+                existed=manual_snapshot[1],
+                original_text=manual_snapshot[2],
+            )
+        except Exception as rollback_exc:
+            build_error_details["rollbackError"] = str(rollback_exc)
+        build_error_details.update(
+            {
                 "stdout": result.stdout[-2000:],
                 "stderr": result.stderr[-2000:],
-            },
+            }
+        )
+        raise DevServerError(
+            "geo_locale_build_failed",
+            "The geo locale patch builder failed after updating manual overrides.",
+            status=500,
+            details=build_error_details,
         )
 
     geo_locale_patch_payload = _read_json(Path(context["geoLocalePatchPath"]))
@@ -2235,6 +2296,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             raise DevServerError("invalid_content_length", "Content-Length must be an integer.", status=400) from exc
         if content_length <= 0:
             raise DevServerError("empty_body", "Request body is required.", status=400)
+        if content_length > MAX_JSON_BODY_BYTES:
+            raise DevServerError(
+                "body_too_large",
+                f"Request body exceeds the {MAX_JSON_BODY_BYTES} byte limit.",
+                status=413,
+            )
         body = self.rfile.read(content_length)
         try:
             payload = json.loads(body.decode("utf-8"))

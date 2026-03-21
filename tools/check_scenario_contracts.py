@@ -260,12 +260,24 @@ def validate_locale_patch(
         return
 
     audit = payload.get("audit") if isinstance(payload.get("audit"), dict) else {}
-    collision_candidates = audit.get("collision_candidates") if isinstance(audit, dict) else []
+    collision_candidates = audit.get("collision_candidates", [])
     if collision_candidates and isinstance(collision_candidates, list):
+        def _parse_audit_count(field: str, fallback: int) -> int:
+            raw_value = audit.get(field)
+            if raw_value in (None, ""):
+                return fallback
+            try:
+                return int(raw_value)
+            except (TypeError, ValueError):
+                warnings.append(
+                    f"geo_locale_patch.json audit.{field} must be numeric when present; using fallback value {fallback}."
+                )
+                return fallback
+
         sample = audit.get("collision_candidates_sample") if isinstance(audit.get("collision_candidates_sample"), list) else collision_candidates[:5]
-        collision_count = int(audit.get("collision_candidate_count") or len(collision_candidates))
-        cross_base_collision_count = int(audit.get("cross_base_collision_count") or collision_count)
-        split_clone_safe_copy_count = int(audit.get("split_clone_safe_copy_count") or 0)
+        collision_count = _parse_audit_count("collision_candidate_count", len(collision_candidates))
+        cross_base_collision_count = _parse_audit_count("cross_base_collision_count", collision_count)
+        split_clone_safe_copy_count = _parse_audit_count("split_clone_safe_copy_count", 0)
         warnings.append(
             "geo_locale_patch.json recorded locale collision candidates for manual review. "
             f"{cross_base_collision_count} cross-base collisions remain after "

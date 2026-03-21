@@ -387,8 +387,7 @@ UI_MAP_ENTRY_RE = re.compile(
     re.DOTALL,
 )
 DECLARATIVE_UI_ATTR_RE = re.compile(
-    r"""data-i18n(?:-placeholder|-title|-aria-label)?=(['"])(?P<text>.*?)\1""",
-    re.DOTALL,
+    r"""data-i18n(?:-placeholder|-title|-aria-label)?=(['"])(?P<text>[^\r\n]*?)\1""",
 )
 PLACEHOLDER_PREFIX_RE = re.compile(
     r"^\s*(?:\[(?:TODO|todo)\]|TODO:?|To do:?|待办|待翻|未翻译|未汉化|去做)\s*[:：-]?\s*"
@@ -531,7 +530,6 @@ def should_ignore_existing_us_geo_zh(
     us_context = (
         is_us_stable_key(key)
         or is_us_stable_key(stable_key)
-        or str(stable_key or "").startswith("id::US_")
     )
     if not us_context:
         return False
@@ -896,7 +894,7 @@ def normalize_translation_candidate(candidate: str | None, en_value: str) -> str
 
 
 def contains_cjk(text: str) -> bool:
-    return bool(re.search(r"[\u4e00-\u9fff]", text or ""))
+    return bool(CJK_RE.search(text or ""))
 
 
 def detect_translation_source_language(text: str) -> str:
@@ -997,19 +995,21 @@ class MachineTranslator:
         url = f"https://translate.googleapis.com/translate_a/single?{query}"
         req = urllib.request.Request(url, headers={"User-Agent": "mapcreator-translate-manager/1.0"})
         translated = None
-        self.requests_made += 1
         try:
             with urllib.request.urlopen(req, timeout=8) as response:
                 payload = json.loads(response.read().decode("utf-8"))
+        except (urllib.error.URLError, TimeoutError, ValueError, json.JSONDecodeError):
+            translated = None
+        else:
             if isinstance(payload, list) and payload and isinstance(payload[0], list):
                 translated = "".join(
                     segment[0] for segment in payload[0] if isinstance(segment, list) and segment
-                ).strip()
-        except (urllib.error.URLError, TimeoutError, ValueError, json.JSONDecodeError):
-            translated = None
+                ).strip() or None
+            if translated is not None:
+                self.requests_made += 1
+                self.cache[value] = translated
         if self.delay_seconds:
             time.sleep(self.delay_seconds)
-        self.cache[value] = translated
         return translated
 
 

@@ -173,6 +173,48 @@ class ScenarioContractTest(unittest.TestCase):
             self.assertEqual(errors, [])
             self.assertTrue(any("collision candidates" in warning for warning in warnings))
 
+    def test_validate_scenario_contract_warns_when_locale_audit_counts_are_not_numeric(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            scenario_dir = _create_scenario_dir(tmp_root, "warning_counts")
+            manifest_path = scenario_dir / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["geo_locale_patch_url"] = "data/scenarios/warning_counts/geo_locale_patch.json"
+            _write_json(manifest_path, manifest)
+            _write_json(
+                scenario_dir / "geo_locale_patch.json",
+                {
+                    "version": 1,
+                    "scenario_id": "warning_counts",
+                    "geo": {},
+                    "audit": {
+                        "collision_candidates": [
+                            {
+                                "feature_id": "FEATURE-1",
+                                "raw_name": "Pool",
+                                "reason": "non_unique_raw_name",
+                            }
+                        ],
+                        "collision_candidate_count": "N/A",
+                        "cross_base_collision_count": "unknown",
+                        "split_clone_safe_copy_count": "n/a",
+                    },
+                },
+            )
+
+            try:
+                errors, warnings = validate_scenario_contract(scenario_dir, {})
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            self.assertEqual(errors, [])
+            self.assertTrue(any("audit.collision_candidate_count must be numeric" in warning for warning in warnings))
+            self.assertTrue(any("audit.cross_base_collision_count must be numeric" in warning for warning in warnings))
+            self.assertTrue(any("audit.split_clone_safe_copy_count must be numeric" in warning for warning in warnings))
+            self.assertTrue(any("collision candidates" in warning for warning in warnings))
+
     def test_validate_scenario_contract_default_mode_keeps_authoring_safe_bundle_mismatches(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_root = Path(tmp_dir)

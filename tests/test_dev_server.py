@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 import json
 import tempfile
 import unittest
@@ -15,6 +16,7 @@ def _write_json(path: Path, payload: object) -> None:
 
 
 def _write_geo_builder_script(path: Path, *, generated_at: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         "\n".join(
             [
@@ -35,6 +37,21 @@ def _write_geo_builder_script(path: Path, *, generated_at: str) -> None:
                 "  'geo': manual.get('geo', {}),",
                 "}",
                 "Path(args.output).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+
+def _write_failing_geo_builder_script(path: Path, *, stderr: str = "builder failed") -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "\n".join(
+            [
+                "from __future__ import annotations",
+                "import sys",
+                f"sys.stderr.write({stderr!r})",
+                "raise SystemExit(1)",
             ]
         ),
         encoding="utf-8",
@@ -185,6 +202,14 @@ class DevServerTest(unittest.TestCase):
 
         self.assertEqual(exc_info.exception.code, "invalid_country_code")
 
+    def test_normalize_optional_float_accepts_finite_values_and_rejects_non_finite(self) -> None:
+        self.assertEqual(dev_server._normalize_optional_float("12.5"), 12.5)
+        self.assertIsNone(dev_server._normalize_optional_float(""))
+        with self.assertRaises(dev_server.DevServerError) as exc_info:
+            dev_server._normalize_optional_float("inf")
+
+        self.assertEqual(exc_info.exception.code, "invalid_number")
+
     def test_load_scenario_tag_feature_ids_uses_owners_only_path(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
@@ -277,6 +302,76 @@ class DevServerTest(unittest.TestCase):
             self.assertEqual(catalog_payload["entries"][1]["tag"], "CCC")
             self.assertEqual(catalog_payload["entries"][1]["parent_owner_tag"], "AAA")
             self.assertEqual(catalog_payload["entries"][1]["preset_source"]["feature_ids"], ["DE-1", "DE-2"])
+
+    def test_load_scenario_context_allows_shared_releasable_catalog_under_data_dir(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            source_catalog_url = "data/releasables/test_scenario.source.catalog.json"
+            self._create_scenario_fixture(
+                root,
+                releasable_catalog_url=source_catalog_url,
+            )
+
+            context = dev_server.load_scenario_context("test_scenario", root=root)
+
+            self.assertEqual(
+                context["releasableCatalogPath"],
+                (root / source_catalog_url).resolve(),
+            )
+
+    def test_load_scenario_context_allows_geo_locale_builder_under_tools_dir(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            builder_path = root / "tools" / "override_builder.py"
+            _write_geo_builder_script(builder_path, generated_at="override")
+            self._create_scenario_fixture(
+                root,
+                geo_locale_builder_url="tools/override_builder.py",
+            )
+
+            context = dev_server.load_scenario_context("test_scenario", root=root)
+
+            self.assertEqual(
+                context["geoLocaleBuilderPath"],
+                builder_path.resolve(),
+            )
+
+    def test_load_scenario_context_rejects_releasable_catalog_outside_allowed_roots(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            self._create_scenario_fixture(
+                root,
+                releasable_catalog_url="misc/test_scenario.source.catalog.json",
+            )
+
+            with self.assertRaises(dev_server.DevServerError) as exc_info:
+                dev_server.load_scenario_context("test_scenario", root=root)
+
+            self.assertEqual(exc_info.exception.code, "path_not_allowed")
+
+    def test_load_scenario_context_rejects_geo_locale_builder_outside_allowed_roots(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            self._create_scenario_fixture(
+                root,
+                geo_locale_builder_url="builders/override_builder.py",
+            )
+
+            with self.assertRaises(dev_server.DevServerError) as exc_info:
+                dev_server.load_scenario_context("test_scenario", root=root)
+
+            self.assertEqual(exc_info.exception.code, "path_not_allowed")
+
+    def test_read_json_body_rejects_oversized_payloads_before_reading(self) -> None:
+        handler = object.__new__(dev_server.Handler)
+        handler.headers = {"Content-Length": str(dev_server.MAX_JSON_BODY_BYTES + 1)}
+        handler.rfile = io.BytesIO(b"")
+
+        with self.assertRaises(dev_server.DevServerError) as exc_info:
+            dev_server.Handler._read_json_body(handler)
+
+        self.assertEqual(exc_info.exception.code, "body_too_large")
+        self.assertEqual(exc_info.exception.status, 413)
 
     def test_save_scenario_ownership_payload_accepts_assignments_by_feature_id(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -526,6 +621,35 @@ class DevServerTest(unittest.TestCase):
             self.assertFalse((scenario_dir / "district_groups.manual.json").exists())
             self.assertNotIn("district_groups_url", manifest_payload)
 
+    def test_write_json_transaction_preserves_original_exception_when_rollback_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            first_path = root / "first.json"
+            second_path = root / "second.json"
+            _write_json(first_path, {"version": 1, "value": "original"})
+            _write_json(second_path, {"version": 1, "value": "unchanged"})
+            original_write_json_atomic = dev_server.write_json_atomic
+
+            def failing_write_json_atomic(path: Path, payload: object, **kwargs: object) -> None:
+                if Path(path) == second_path:
+                    raise RuntimeError("primary failure")
+                original_write_json_atomic(path, payload, **kwargs)
+
+            with (
+                mock.patch.object(dev_server, "write_json_atomic", side_effect=failing_write_json_atomic),
+                mock.patch.object(dev_server, "write_text_atomic", side_effect=OSError("rollback failure")),
+            ):
+                with self.assertRaises(RuntimeError) as exc_info:
+                    dev_server._write_json_transaction(
+                        [
+                            (first_path, {"version": 2, "value": "updated"}),
+                            (second_path, {"version": 2, "value": "blocked"}),
+                        ]
+                    )
+
+            self.assertEqual(str(exc_info.exception), "primary failure")
+            self.assertTrue(any("Rollback failed:" in note for note in exc_info.exception.__notes__))
+
     def test_save_scenario_district_groups_payload_rejects_duplicate_feature_ids(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
@@ -677,13 +801,13 @@ class DevServerTest(unittest.TestCase):
     def test_save_scenario_geo_locale_entry_prefers_manifest_builder_override(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            override_builder = root / "override_builder.py"
-            registry_builder = root / "registry_builder.py"
+            override_builder = root / "tools" / "override_builder.py"
+            registry_builder = root / "tools" / "registry_builder.py"
             _write_geo_builder_script(override_builder, generated_at="override")
             _write_geo_builder_script(registry_builder, generated_at="registry")
             scenario_dir = self._create_scenario_fixture(
                 root,
-                geo_locale_builder_url="override_builder.py",
+                geo_locale_builder_url="tools/override_builder.py",
             )
             original_registry = dict(dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO)
             dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = {
@@ -703,6 +827,46 @@ class DevServerTest(unittest.TestCase):
             patch_payload = json.loads((scenario_dir / "geo_locale_patch.json").read_text(encoding="utf-8"))
             self.assertTrue(result["ok"])
             self.assertEqual(patch_payload["generated_at"], "override")
+
+    def test_save_scenario_geo_locale_entry_rolls_back_manual_overrides_on_builder_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(root)
+            builder_script = root / "tools" / "failing_builder.py"
+            _write_failing_geo_builder_script(builder_script, stderr="intentional failure")
+            manual_path = scenario_dir / "geo_name_overrides.manual.json"
+            original_manual_payload = {
+                "version": 1,
+                "scenario_id": "test_scenario",
+                "generated_at": "before",
+                "geo": {
+                    "AAA-1": {
+                        "en": "Original",
+                        "zh": "原始",
+                    }
+                },
+            }
+            _write_json(manual_path, original_manual_payload)
+            original_registry = dict(dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO)
+            dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = {
+                "test_scenario": builder_script,
+            }
+            try:
+                with self.assertRaises(dev_server.DevServerError) as exc_info:
+                    dev_server.save_scenario_geo_locale_entry(
+                        "test_scenario",
+                        feature_id="AAA-1",
+                        en="Updated",
+                        zh="已更新",
+                        root=root,
+                    )
+            finally:
+                dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = original_registry
+
+            manual_payload = json.loads(manual_path.read_text(encoding="utf-8"))
+            self.assertEqual(exc_info.exception.code, "geo_locale_build_failed")
+            self.assertEqual(manual_payload, original_manual_payload)
+            self.assertEqual(exc_info.exception.details["stderr"], "intentional failure")
 
     def test_save_scenario_geo_locale_entry_rejects_when_no_builder_is_registered(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

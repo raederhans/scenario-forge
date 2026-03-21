@@ -379,13 +379,15 @@ def collect_code_strings(repo_root: Path) -> dict:
     for entry in runtime_literal_candidates:
         classify_runtime_literal(str(entry["value"]), entry["attr_name"])
 
+    sorted_ui_t_keys = sorted(ui_t_keys)
+
     return {
-        "ui_t_keys": sorted(ui_t_keys),
+        "ui_t_keys": sorted_ui_t_keys,
         "geo_t_keys": sorted(geo_t_keys),
         "modal_keys": sorted(modal_keys),
         "declarative_ui_keys": sorted(declarative_ui_keys),
         "legacy_ui_map_keys": sorted(legacy_ui_map_keys),
-        "literal_translated_ui_keys": sorted(ui_t_keys),
+        "literal_translated_ui_keys": sorted_ui_t_keys,
         "covered_default_literals": sorted(covered_default_literals),
         "uncovered_user_visible_literals": sorted(uncovered_user_visible_literals),
         "a11y_literals": sorted(a11y_literals),
@@ -629,7 +631,8 @@ def main() -> None:
     locales = load_locales(locales_path)
     code_strings = collect_code_strings(repo_root)
 
-    ui_locale_keys = sorted((locales.get("ui") or {}).keys())
+    ui_locale_key_set = set((locales.get("ui") or {}).keys())
+    ui_locale_keys = sorted(ui_locale_key_set)
     geo_locale = locales.get("geo") or {}
 
     ui_used = (
@@ -637,7 +640,7 @@ def main() -> None:
         | set(code_strings["declarative_ui_keys"])
         | set(code_strings["legacy_ui_map_keys"])
     )
-    ui_missing = sorted(key for key in ui_used if key not in ui_locale_keys)
+    ui_missing = sorted(key for key in ui_used if key not in ui_locale_key_set)
 
     shell_fallback_geo = sorted(key for key in geo_locale if is_shell_fallback_name(key))
     shell_fallback_missing_like = sorted(
@@ -712,6 +715,9 @@ def main() -> None:
         if is_missing_like(zh_value, en_value):
             scenario_metadata_missing.append(name)
 
+    literal_translated_ui_keys = code_strings["ui_t_keys"]
+    geo_todo_count = geo_missing_like_count
+
     report = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "repo_root": str(repo_root),
@@ -721,8 +727,8 @@ def main() -> None:
         "scenarios_root": str(scenarios_root),
         "ui_locale_count": len(ui_locale_keys),
         "ui_used_count": len(ui_used),
-        "literal_translated_ui_count": len(code_strings["literal_translated_ui_keys"]),
-        "literal_translated_ui_keys": code_strings["literal_translated_ui_keys"],
+        "literal_translated_ui_count": len(literal_translated_ui_keys),
+        "literal_translated_ui_keys": literal_translated_ui_keys,
         "declarative_ui_key_count": len(code_strings["declarative_ui_keys"]),
         "declarative_ui_keys": code_strings["declarative_ui_keys"],
         "legacy_ui_map_key_count": len(code_strings["legacy_ui_map_keys"]),
@@ -744,7 +750,7 @@ def main() -> None:
         "template_html_count": len(code_strings["template_html_candidates"]),
         "template_html_candidates": code_strings["template_html_candidates"],
         "geo_locale_count": len(geo_locale),
-        "geo_todo_count": geo_missing_like_count,
+        "geo_todo_count": geo_todo_count,
         "geo_missing_like_count": geo_missing_like_count,
         "shell_fallback_geo_count": len(shell_fallback_geo),
         "shell_fallback_missing_like_count": len(shell_fallback_missing_like),
