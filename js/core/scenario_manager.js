@@ -819,6 +819,10 @@ function refreshScenarioShellOverlays({ renderNow = false, borderReason = "scena
   }
   refreshColorState({ renderNow: false });
   recomputeDynamicBordersNow({ renderNow: false, reason: borderReason });
+  refreshScenarioOpeningOwnerBorders({
+    renderNow: false,
+    reason: borderReason ? `${borderReason}:opening` : "scenario-shell-opening",
+  });
   if (renderNow && typeof state.renderNowFn === "function") {
     state.renderNowFn();
   }

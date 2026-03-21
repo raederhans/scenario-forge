@@ -88,7 +88,6 @@ const MIN_ZOOM_SCALE = 1;
 const MAX_ZOOM_SCALE = 50;
 const OCEAN_FILL_COLOR = "#aadaff";
 const LAND_FILL_COLOR = "#f0f0f0";
-const BORDER_FALLBACK_COLOR = "rgba(0, 0, 0, 0.2)";
 const SPECIAL_REGION_FALLBACK_FILL = "#d6c19a";
 const SPECIAL_REGION_FALLBACK_STROKE = "#8d6f47";
 const UNIFIED_WATER_STROKE_COLOR = "rgba(62, 96, 138, 0)";
@@ -441,6 +440,7 @@ let scenarioOpeningOwnerBorderCache = {
   scenarioId: "",
   baselineHash: "",
   baselineOwnersRef: null,
+  shellRevision: 0,
   mesh: null,
 };
 let physicalLandClipPathCache = {
@@ -453,6 +453,7 @@ const SCENARIO_COASTLINE_MAX_INTERIOR_RING_RATIO = 0.25;
 const SCENARIO_COASTLINE_MAX_INTERIOR_RING_COUNT = 500;
 const suspiciousScenarioBackgroundMergeWarnings = new Set();
 const scenarioCoastlineDecisionWarnings = new Set();
+const scenarioOwnerOnlyCanonicalFallbackWarnings = new Set();
 const missingPhysicalContextWarnings = new Set();
 const physicalAtlasFallbackCache = {
   sourceRef: null,
@@ -4077,12 +4078,14 @@ function refreshScenarioOpeningOwnerBorders({ renderNow = false, reason = "" } =
     const runtimeRef = state.runtimePoliticalTopology;
     const scenarioId = String(state.activeScenarioId || "");
     const baselineHash = String(state.scenarioBaselineHash || "");
+    const shellRevision = Number(state.scenarioShellOverlayRevision) || 0;
     const cacheMatches =
       scenarioOpeningOwnerBorderCache.runtimeRef === runtimeRef
       && scenarioOpeningOwnerBorderCache.scenarioId === scenarioId
       && (baselineHash
         ? scenarioOpeningOwnerBorderCache.baselineHash === baselineHash
         : scenarioOpeningOwnerBorderCache.baselineOwnersRef === state.scenarioBaselineOwnersByFeatureId)
+      && scenarioOpeningOwnerBorderCache.shellRevision === shellRevision
       && isUsableMesh(scenarioOpeningOwnerBorderCache.mesh);
 
     state.cachedScenarioOpeningOwnerBorders = cacheMatches
@@ -4091,6 +4094,7 @@ function refreshScenarioOpeningOwnerBorders({ renderNow = false, reason = "" } =
         runtimeRef,
         {
           ownershipByFeatureId: state.scenarioBaselineOwnersByFeatureId,
+          shellOwnerByFeatureId: state.scenarioAutoShellOwnerByFeatureId,
           scenarioActive: false,
           viewMode: "ownership",
         },
@@ -4102,6 +4106,7 @@ function refreshScenarioOpeningOwnerBorders({ renderNow = false, reason = "" } =
       scenarioId,
       baselineHash,
       baselineOwnersRef: state.scenarioBaselineOwnersByFeatureId,
+      shellRevision,
       mesh: state.cachedScenarioOpeningOwnerBorders,
     };
   } else {
@@ -4436,6 +4441,9 @@ function resolveCountryParentGroupingCandidate(countryCode, featureEntries) {
   const scenarioDistrictCandidate = buildScenarioDistrictGroupingCandidate(countryCode, featureEntries);
   if (scenarioDistrictCandidate) {
     return scenarioDistrictCandidate;
+  }
+  if (String(state.activeScenarioId || "").trim().toLowerCase() === "tno_1962") {
+    return null;
   }
 
   const hierarchyCandidate = buildHierarchyGroupingCandidate(countryCode, featureEntries);
@@ -6416,9 +6424,19 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
     && isUsableMesh(state.cachedScenarioOpeningOwnerBorders)
       ? [state.cachedScenarioOpeningOwnerBorders]
       : null;
-  const empireMeshes = scenarioOwnerOnlyBorders
-    ? (dynamicOwnerMeshes || openingOwnerMeshes || state.cachedCountryBorders)
-    : (dynamicOwnerMeshes || state.cachedCountryBorders);
+  let empireMeshes = dynamicOwnerMeshes || state.cachedCountryBorders;
+  if (scenarioOwnerOnlyBorders) {
+    empireMeshes = dynamicOwnerMeshes || openingOwnerMeshes || null;
+    if (!dynamicOwnerMeshes && !openingOwnerMeshes && state.cachedCountryBorders?.length) {
+      const scenarioId = String(state.activeScenarioId || "").trim() || "(unknown)";
+      if (!scenarioOwnerOnlyCanonicalFallbackWarnings.has(scenarioId)) {
+        scenarioOwnerOnlyCanonicalFallbackWarnings.add(scenarioId);
+        console.warn(
+          `[map_renderer] scenario_owner_only borders unavailable for scenario=${scenarioId}; canonical country-border fallback suppressed to preserve scenario integrity.`
+        );
+      }
+    }
+  }
 
   if (interactive) {
     const countryWidth = (empireWidthBase * 0.95) / kDenom;
