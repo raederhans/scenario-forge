@@ -4,6 +4,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from tools import dev_server
 
@@ -13,12 +14,42 @@ def _write_json(path: Path, payload: object) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def _write_geo_builder_script(path: Path, *, generated_at: str) -> None:
+    path.write_text(
+        "\n".join(
+            [
+                "from __future__ import annotations",
+                "import argparse, json",
+                "from pathlib import Path",
+                "parser = argparse.ArgumentParser()",
+                "parser.add_argument('--scenario-id')",
+                "parser.add_argument('--scenario-dir')",
+                "parser.add_argument('--manual-overrides')",
+                "parser.add_argument('--output')",
+                "args = parser.parse_args()",
+                "manual = json.loads(Path(args.manual_overrides).read_text(encoding='utf-8'))",
+                "payload = {",
+                "  'version': 1,",
+                "  'scenario_id': args.scenario_id,",
+                f"  'generated_at': {generated_at!r},",
+                "  'geo': manual.get('geo', {}),",
+                "}",
+                "Path(args.output).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+
 class DevServerTest(unittest.TestCase):
     def _create_scenario_fixture(
         self,
         root: Path,
         scenario_id: str = "test_scenario",
         *,
+        include_controllers: bool = True,
+        include_cores: bool = True,
+        geo_locale_builder_url: str | None = None,
         releasable_catalog_url: str | None = None,
     ) -> Path:
         scenario_dir = root / "data" / "scenarios" / scenario_id
@@ -28,10 +59,14 @@ class DevServerTest(unittest.TestCase):
             "baseline_hash": "baseline-123",
             "countries_url": f"data/scenarios/{scenario_id}/countries.json",
             "owners_url": f"data/scenarios/{scenario_id}/owners.by_feature.json",
-            "controllers_url": f"data/scenarios/{scenario_id}/controllers.by_feature.json",
-            "cores_url": f"data/scenarios/{scenario_id}/cores.by_feature.json",
             "geo_locale_patch_url": f"data/scenarios/{scenario_id}/geo_locale_patch.json",
         }
+        if include_controllers:
+            manifest_payload["controllers_url"] = f"data/scenarios/{scenario_id}/controllers.by_feature.json"
+        if include_cores:
+            manifest_payload["cores_url"] = f"data/scenarios/{scenario_id}/cores.by_feature.json"
+        if geo_locale_builder_url:
+            manifest_payload["geo_locale_builder_url"] = geo_locale_builder_url
         if releasable_catalog_url:
             manifest_payload["releasable_catalog_url"] = releasable_catalog_url
         _write_json(
@@ -58,19 +93,20 @@ class DevServerTest(unittest.TestCase):
                 }
             },
         )
-        _write_json(
-            scenario_dir / "controllers.by_feature.json",
-            {
-                "controllers": {
-                    "DE-1": "AAA",
-                    "DE-2": "BBB",
-                    "DE-3": "AAA",
-                    "AAA-1": "AAA",
-                    "BBB-2": "BBB",
+        if include_controllers:
+            _write_json(
+                scenario_dir / "controllers.by_feature.json",
+                {
+                    "controllers": {
+                        "DE-1": "AAA",
+                        "DE-2": "BBB",
+                        "DE-3": "AAA",
+                        "AAA-1": "AAA",
+                        "BBB-2": "BBB",
+                    },
+                    "baseline_hash": "baseline-123",
                 },
-                "baseline_hash": "baseline-123",
-            },
-        )
+            )
         _write_json(
             scenario_dir / "owners.by_feature.json",
             {
@@ -84,19 +120,20 @@ class DevServerTest(unittest.TestCase):
                 "baseline_hash": "baseline-123",
             },
         )
-        _write_json(
-            scenario_dir / "cores.by_feature.json",
-            {
-                "cores": {
-                    "DE-1": ["AAA"],
-                    "DE-2": ["BBB"],
-                    "DE-3": ["AAA"],
-                    "AAA-1": ["AAA"],
-                    "BBB-2": ["BBB"],
+        if include_cores:
+            _write_json(
+                scenario_dir / "cores.by_feature.json",
+                {
+                    "cores": {
+                        "DE-1": ["AAA"],
+                        "DE-2": ["BBB"],
+                        "DE-3": ["AAA"],
+                        "AAA-1": ["AAA"],
+                        "BBB-2": ["BBB"],
+                    },
+                    "baseline_hash": "baseline-123",
                 },
-                "baseline_hash": "baseline-123",
-            },
-        )
+            )
         _write_json(
             scenario_dir / "geo_locale_patch.json",
             {
@@ -139,6 +176,27 @@ class DevServerTest(unittest.TestCase):
             self.assertEqual(manual_payload["assignments"]["DE-1"]["cores"], ["AAA"])
             self.assertEqual(result["stats"]["featureCount"], 5)
             self.assertEqual(result["stats"]["touchedFeatureCount"], 2)
+
+    def test_validate_country_code_accepts_two_or_three_uppercase_letters_and_rejects_invalid_values(self) -> None:
+        self.assertEqual(dev_server._validate_country_code("de"), "DE")
+        self.assertEqual(dev_server._validate_country_code("USA"), "USA")
+        with self.assertRaises(dev_server.DevServerError) as exc_info:
+            dev_server._validate_country_code("A1")
+
+        self.assertEqual(exc_info.exception.code, "invalid_country_code")
+
+    def test_load_scenario_tag_feature_ids_uses_owners_only_path(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            self._create_scenario_fixture(root, include_controllers=False, include_cores=False)
+
+            with mock.patch.object(dev_server, "_load_political_payload_bundle", side_effect=AssertionError("bundle should not be used")):
+                feature_ids = dev_server._load_scenario_tag_feature_ids(
+                    dev_server.load_scenario_context("test_scenario", root=root),
+                    "AAA",
+                )
+
+            self.assertEqual(feature_ids, {"DE-1", "DE-3", "AAA-1"})
 
     def test_save_scenario_tag_create_payload_bootstraps_local_catalog_and_updates_political_files(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -249,6 +307,64 @@ class DevServerTest(unittest.TestCase):
             self.assertEqual(cores_payload["cores"]["DE-1"], ["BBB", "AAA"])
             self.assertEqual(manual_payload["assignments"]["DE-1"]["cores"], ["BBB", "AAA"])
 
+    def test_save_scenario_ownership_payload_owner_only_update_succeeds_without_controllers_or_cores(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(
+                root,
+                include_controllers=False,
+                include_cores=False,
+            )
+
+            result = dev_server.save_scenario_ownership_payload(
+                "test_scenario",
+                {"DE-1": "BBB"},
+                baseline_hash="baseline-123",
+                root=root,
+            )
+
+            owners_payload = json.loads((scenario_dir / "owners.by_feature.json").read_text(encoding="utf-8"))
+            manual_payload = json.loads((scenario_dir / "scenario_manual_overrides.json").read_text(encoding="utf-8"))
+            self.assertTrue(result["ok"])
+            self.assertEqual(owners_payload["owners"]["DE-1"], "BBB")
+            self.assertFalse((scenario_dir / "controllers.by_feature.json").exists())
+            self.assertFalse((scenario_dir / "cores.by_feature.json").exists())
+            self.assertEqual(manual_payload["assignments"]["DE-1"]["owner"], "BBB")
+            self.assertNotIn("controller", manual_payload["assignments"]["DE-1"])
+            self.assertNotIn("cores", manual_payload["assignments"]["DE-1"])
+
+    def test_save_scenario_ownership_payload_rejects_controller_assignment_when_controllers_file_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            self._create_scenario_fixture(root, include_controllers=False)
+
+            with self.assertRaises(dev_server.DevServerError) as exc_info:
+                dev_server.save_scenario_ownership_payload(
+                    "test_scenario",
+                    None,
+                    assignments_by_feature_id={"DE-1": {"controller": "BBB"}},
+                    baseline_hash="baseline-123",
+                    root=root,
+                )
+
+            self.assertEqual(exc_info.exception.code, "missing_controllers_file")
+
+    def test_save_scenario_ownership_payload_rejects_core_assignment_when_cores_file_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            self._create_scenario_fixture(root, include_cores=False)
+
+            with self.assertRaises(dev_server.DevServerError) as exc_info:
+                dev_server.save_scenario_ownership_payload(
+                    "test_scenario",
+                    None,
+                    assignments_by_feature_id={"DE-1": {"cores": ["BBB"]}},
+                    baseline_hash="baseline-123",
+                    root=root,
+                )
+
+            self.assertEqual(exc_info.exception.code, "missing_cores_file")
+
     def test_save_scenario_country_payload_updates_manual_overrides_and_country_metadata(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
@@ -311,6 +427,37 @@ class DevServerTest(unittest.TestCase):
 
             self.assertEqual(exc_info.exception.code, "duplicate_country_tag")
 
+    def test_save_scenario_tag_create_payload_succeeds_without_controllers_or_cores(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(
+                root,
+                include_controllers=False,
+                include_cores=False,
+            )
+
+            result = dev_server.save_scenario_tag_create_payload(
+                "test_scenario",
+                feature_ids=["DE-1", "DE-2"],
+                tag="CCC",
+                name_en="Caledonia",
+                name_zh="卡莱多尼亚",
+                color_hex="#123456",
+                root=root,
+            )
+
+            countries_payload = json.loads((scenario_dir / "countries.json").read_text(encoding="utf-8"))
+            owners_payload = json.loads((scenario_dir / "owners.by_feature.json").read_text(encoding="utf-8"))
+            manual_payload = json.loads((scenario_dir / "scenario_manual_overrides.json").read_text(encoding="utf-8"))
+            self.assertTrue(result["ok"])
+            self.assertEqual(countries_payload["countries"]["CCC"]["display_name_en"], "Caledonia")
+            self.assertEqual(owners_payload["owners"]["DE-1"], "CCC")
+            self.assertFalse((scenario_dir / "controllers.by_feature.json").exists())
+            self.assertFalse((scenario_dir / "cores.by_feature.json").exists())
+            self.assertEqual(manual_payload["assignments"]["DE-1"]["owner"], "CCC")
+            self.assertNotIn("controller", manual_payload["assignments"]["DE-1"])
+            self.assertNotIn("cores", manual_payload["assignments"]["DE-1"])
+
     def test_save_scenario_district_groups_payload_writes_country_payload_and_updates_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
@@ -345,7 +492,39 @@ class DevServerTest(unittest.TestCase):
             self.assertEqual(aaa_payload["districts"]["berlin"]["name_en"], "Berlin")
             self.assertEqual(aaa_payload["districts"]["alpha_core"]["feature_ids"], ["AAA-1"])
             self.assertEqual(manifest_payload["district_groups_url"], "data/scenarios/test_scenario/district_groups.manual.json")
+            self.assertEqual(result["districtGroupsUrl"], "data/scenarios/test_scenario/district_groups.manual.json")
             self.assertEqual(result["stats"]["districtCount"], 2)
+
+    def test_save_scenario_district_groups_payload_rolls_back_when_manifest_write_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(root)
+            original_write_json_atomic = dev_server.write_json_atomic
+
+            def failing_write_json_atomic(path: Path, payload: object, **kwargs: object) -> None:
+                if Path(path) == scenario_dir / "manifest.json":
+                    raise RuntimeError("manifest write failed")
+                original_write_json_atomic(path, payload, **kwargs)
+
+            with mock.patch.object(dev_server, "write_json_atomic", side_effect=failing_write_json_atomic):
+                with self.assertRaises(RuntimeError):
+                    dev_server.save_scenario_district_groups_payload(
+                        "test_scenario",
+                        tag="AAA",
+                        districts=[
+                            {
+                                "districtId": "berlin",
+                                "nameEn": "Berlin",
+                                "nameZh": "柏林",
+                                "featureIds": ["DE-1", "DE-3"],
+                            }
+                        ],
+                        root=root,
+                    )
+
+            manifest_payload = json.loads((scenario_dir / "manifest.json").read_text(encoding="utf-8"))
+            self.assertFalse((scenario_dir / "district_groups.manual.json").exists())
+            self.assertNotIn("district_groups_url", manifest_payload)
 
     def test_save_scenario_district_groups_payload_rejects_duplicate_feature_ids(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -473,30 +652,7 @@ class DevServerTest(unittest.TestCase):
             root = Path(tmp_dir)
             scenario_dir = self._create_scenario_fixture(root)
             builder_script = root / "builder.py"
-            builder_script.write_text(
-                "\n".join(
-                    [
-                        "from __future__ import annotations",
-                        "import argparse, json",
-                        "from pathlib import Path",
-                        "parser = argparse.ArgumentParser()",
-                        "parser.add_argument('--scenario-id')",
-                        "parser.add_argument('--scenario-dir')",
-                        "parser.add_argument('--manual-overrides')",
-                        "parser.add_argument('--output')",
-                        "args = parser.parse_args()",
-                        "manual = json.loads(Path(args.manual_overrides).read_text(encoding='utf-8'))",
-                        "payload = {",
-                        "  'version': 1,",
-                        "  'scenario_id': args.scenario_id,",
-                        "  'generated_at': 'now',",
-                        "  'geo': manual.get('geo', {}),",
-                        "}",
-                        "Path(args.output).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')",
-                    ]
-                ),
-                encoding="utf-8",
-            )
+            _write_geo_builder_script(builder_script, generated_at="now")
             original_registry = dict(dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO)
             dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = {
                 "test_scenario": builder_script,
@@ -517,6 +673,97 @@ class DevServerTest(unittest.TestCase):
             self.assertTrue(result["ok"])
             self.assertEqual(manual_payload["geo"]["AAA-1"]["en"], "Alpha")
             self.assertEqual(patch_payload["geo"]["AAA-1"]["zh"], "\u963f\u5c14\u6cd5")
+
+    def test_save_scenario_geo_locale_entry_prefers_manifest_builder_override(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            override_builder = root / "override_builder.py"
+            registry_builder = root / "registry_builder.py"
+            _write_geo_builder_script(override_builder, generated_at="override")
+            _write_geo_builder_script(registry_builder, generated_at="registry")
+            scenario_dir = self._create_scenario_fixture(
+                root,
+                geo_locale_builder_url="override_builder.py",
+            )
+            original_registry = dict(dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO)
+            dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = {
+                "test_scenario": registry_builder,
+            }
+            try:
+                result = dev_server.save_scenario_geo_locale_entry(
+                    "test_scenario",
+                    feature_id="AAA-1",
+                    en="Alpha",
+                    zh="阿尔法",
+                    root=root,
+                )
+            finally:
+                dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = original_registry
+
+            patch_payload = json.loads((scenario_dir / "geo_locale_patch.json").read_text(encoding="utf-8"))
+            self.assertTrue(result["ok"])
+            self.assertEqual(patch_payload["generated_at"], "override")
+
+    def test_save_scenario_geo_locale_entry_rejects_when_no_builder_is_registered(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            self._create_scenario_fixture(root)
+            original_registry = dict(dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO)
+            dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = {}
+            try:
+                with self.assertRaises(dev_server.DevServerError) as exc_info:
+                    dev_server.save_scenario_geo_locale_entry(
+                        "test_scenario",
+                        feature_id="AAA-1",
+                        en="Alpha",
+                        zh="阿尔法",
+                        root=root,
+                    )
+            finally:
+                dev_server.GEO_LOCALE_BUILDER_BY_SCENARIO = original_registry
+
+            self.assertEqual(exc_info.exception.code, "geo_locale_not_supported")
+
+    def test_apply_shared_district_template_payload_loads_context_once(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(root)
+
+            template_result = dev_server.save_shared_district_template_payload(
+                "test_scenario",
+                tag="AAA",
+                template_tag="AAA",
+                districts=[
+                    {
+                        "districtId": "alpha",
+                        "nameEn": "Alpha",
+                        "nameZh": "阿尔法",
+                        "featureIds": ["DE-1", "DE-3", "AAA-1"],
+                    }
+                ],
+                root=root,
+            )
+            self.assertTrue(template_result["ok"])
+
+            original_load_scenario_context = dev_server.load_scenario_context
+            call_count = {"value": 0}
+
+            def counting_load_scenario_context(*args: object, **kwargs: object) -> dict[str, object]:
+                call_count["value"] += 1
+                return original_load_scenario_context(*args, **kwargs)
+
+            with mock.patch.object(dev_server, "load_scenario_context", side_effect=counting_load_scenario_context):
+                apply_result = dev_server.apply_shared_district_template_payload(
+                    "test_scenario",
+                    tag="AAA",
+                    template_tag="AAA",
+                    root=root,
+                )
+
+            district_payload = json.loads((scenario_dir / "district_groups.manual.json").read_text(encoding="utf-8"))
+            self.assertTrue(apply_result["ok"])
+            self.assertEqual(call_count["value"], 1)
+            self.assertEqual(district_payload["tags"]["AAA"]["districts"]["alpha"]["feature_ids"], ["DE-1", "DE-3", "AAA-1"])
 
 
 if __name__ == "__main__":

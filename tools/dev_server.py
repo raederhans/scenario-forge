@@ -33,6 +33,7 @@ DEFAULT_SCENARIO_DISTRICT_GROUPS_FILENAME = "district_groups.manual.json"
 DEFAULT_SCENARIO_MANUAL_OVERRIDES_FILENAME = "scenario_manual_overrides.json"
 DEFAULT_SHARED_DISTRICT_TEMPLATES_PATH = ROOT / "data" / "scenarios" / "district_templates.shared.json"
 TAG_CODE_PATTERN = re.compile(r"^[A-Z]{2,4}$")
+COUNTRY_CODE_PATTERN = re.compile(r"^[A-Z]{2,3}$")
 DISTRICT_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 COLOR_HEX_PATTERN = re.compile(r"^#[0-9A-Fa-f]{6}$")
 
@@ -213,13 +214,15 @@ def load_scenario_context(scenario_id: object, *, root: Path = ROOT) -> dict[str
     releasable_catalog_url = str(manifest.get("releasable_catalog_url") or "").strip()
     district_groups_url = str(manifest.get("district_groups_url") or "").strip()
     geo_locale_patch_url = str(manifest.get("geo_locale_patch_url") or "").strip()
+    geo_locale_builder_url = str(manifest.get("geo_locale_builder_url") or "").strip()
     controllers_path = _resolve_repo_path(controllers_url, root=root) if controllers_url else None
-    cores_path = _resolve_repo_path(cores_url, root=root) if cores_url else (scenario_dir / "cores.by_feature.json")
+    cores_path = _resolve_repo_path(cores_url, root=root) if cores_url else None
     releasable_catalog_path = _resolve_repo_path(releasable_catalog_url, root=root) if releasable_catalog_url else None
     district_groups_path = _resolve_repo_path(district_groups_url, root=root) if district_groups_url else (
         scenario_dir / DEFAULT_SCENARIO_DISTRICT_GROUPS_FILENAME
     )
     geo_locale_patch_path = _resolve_repo_path(geo_locale_patch_url, root=root) if geo_locale_patch_url else None
+    geo_locale_builder_path = _resolve_repo_path(geo_locale_builder_url, root=root) if geo_locale_builder_url else None
 
     for candidate in (
         owners_path,
@@ -258,6 +261,7 @@ def load_scenario_context(scenario_id: object, *, root: Path = ROOT) -> dict[str
         "districtGroupsUrl": district_groups_url,
         "districtGroupsPath": district_groups_path,
         "geoLocalePatchPath": geo_locale_patch_path,
+        "geoLocaleBuilderPath": geo_locale_builder_path,
         "manualGeoOverridesPath": _ensure_path_within_root(
             scenario_dir / "geo_name_overrides.manual.json",
             root=root,
@@ -270,8 +274,7 @@ def load_scenario_context(scenario_id: object, *, root: Path = ROOT) -> dict[str
     return context
 
 
-def _load_allowed_country_tags(context: dict[str, object]) -> set[str]:
-    payload = _read_json(Path(context["countriesPath"]))
+def _extract_allowed_country_tags(payload: object) -> set[str]:
     countries = payload.get("countries", {}) if isinstance(payload, dict) else {}
     allowed_tags = {
         str(tag or "").strip().upper()
@@ -285,6 +288,11 @@ def _load_allowed_country_tags(context: dict[str, object]) -> set[str]:
             status=400,
         )
     return allowed_tags
+
+
+def _load_allowed_country_tags(context: dict[str, object], *, countries_payload: object | None = None) -> set[str]:
+    payload = countries_payload if countries_payload is not None else _read_json(Path(context["countriesPath"]))
+    return _extract_allowed_country_tags(payload)
 
 
 def build_scenario_ownership_payload(
@@ -357,6 +365,7 @@ def save_scenario_ownership_payload(
 ) -> dict[str, object]:
     context = load_scenario_context(scenario_id, root=root)
     countries_payload = _load_country_catalog(context)
+    countries = countries_payload["countries"]
     expected_baseline_hash = str(context["manifest"].get("baseline_hash") or "").strip()
     normalized_baseline_hash = str(baseline_hash or "").strip()
     if normalized_baseline_hash and expected_baseline_hash and normalized_baseline_hash != expected_baseline_hash:
@@ -369,25 +378,21 @@ def save_scenario_ownership_payload(
                 "received": normalized_baseline_hash,
             },
         )
-    owners_payload = _read_json(Path(context["ownersPath"]))
-    if not isinstance(owners_payload, dict) or not isinstance(owners_payload.get("owners"), dict):
-        raise DevServerError("invalid_owners_file", "Scenario owners file must contain an owners object.", status=500)
-    controllers_path = Path(context["controllersPath"]) if context.get("controllersPath") else None
-    cores_path = Path(context["coresPath"]) if context.get("coresPath") else None
-    if controllers_path is None:
-        raise DevServerError("missing_controllers_file", "Scenario controllers file is required for ownership saves.", status=400)
-    if cores_path is None:
-        raise DevServerError("missing_cores_file", "Scenario cores file is required for ownership saves.", status=400)
-    controllers_payload = _read_json(controllers_path)
-    cores_payload = _read_json(cores_path)
-    if not isinstance(controllers_payload, dict) or not isinstance(controllers_payload.get("controllers"), dict):
-        raise DevServerError("invalid_controllers_file", "Scenario controllers file must contain a controllers object.", status=500)
-    if not isinstance(cores_payload, dict) or not isinstance(cores_payload.get("cores"), dict):
-        raise DevServerError("invalid_cores_file", "Scenario cores file must contain a cores object.", status=500)
-
-    owners_map, controllers_map, cores_map = _load_full_political_assignments(context)
-    allowed_tags = _load_allowed_country_tags(context)
-    known_feature_ids = set(owners_map.keys()) | set(controllers_map.keys()) | set(cores_map.keys())
+    political_bundle = _load_political_payload_bundle(context)
+    owners_payload = political_bundle["ownersPayload"]
+    owners_map = political_bundle["owners"]
+    controllers_payload = political_bundle["controllersPayload"]
+    controllers_map = political_bundle["controllers"]
+    has_controllers = bool(political_bundle["hasControllers"])
+    cores_payload = political_bundle["coresPayload"]
+    cores_map = political_bundle["cores"]
+    has_cores = bool(political_bundle["hasCores"])
+    allowed_tags = {
+        str(tag or "").strip().upper()
+        for tag in countries.keys()
+        if str(tag or "").strip()
+    }
+    known_feature_ids = set(owners_map.keys())
     manual_payload = _load_scenario_manual_overrides_payload(context)
     manual_assignments = manual_payload["assignments"]
     touched_feature_ids: list[str] = []
@@ -451,9 +456,15 @@ def save_scenario_ownership_payload(
                         f'Feature "{feature_id}" used an owner tag not declared by the scenario.',
                         status=400,
                         details={"featureId": feature_id, "invalidOwnerTag": owner_tag},
-                    )
+                )
                 owners_map[feature_id] = owner_tag
             if "controller" in raw_assignment:
+                if not has_controllers:
+                    raise DevServerError(
+                        "missing_controllers_file",
+                        "Scenario controllers file is required when saving controller assignments.",
+                        status=400,
+                    )
                 controller_tag = _normalize_code(raw_assignment.get("controller"))
                 if controller_tag not in allowed_tags:
                     raise DevServerError(
@@ -464,6 +475,12 @@ def save_scenario_ownership_payload(
                     )
                 controllers_map[feature_id] = controller_tag
             if "cores" in raw_assignment:
+                if not has_cores:
+                    raise DevServerError(
+                        "missing_cores_file",
+                        "Scenario cores file is required when saving core assignments.",
+                        status=400,
+                    )
                 cores_map[feature_id] = _validate_core_tags(
                     raw_assignment.get("cores"),
                     feature_id=feature_id,
@@ -479,30 +496,35 @@ def save_scenario_ownership_payload(
             status=400,
         )
 
-    countries = countries_payload["countries"]
     _recompute_country_feature_counts(countries, owners_map, controllers_map)
     countries_payload["generated_at"] = _now_iso()
     owners_payload["owners"] = owners_map
     owners_payload["baseline_hash"] = expected_baseline_hash or normalized_baseline_hash
-    controllers_payload["controllers"] = controllers_map
-    cores_payload["cores"] = cores_map
+    if has_controllers and controllers_payload is not None:
+        controllers_payload["controllers"] = controllers_map
+    if has_cores and cores_payload is not None:
+        cores_payload["cores"] = cores_map
     for feature_id in touched_feature_ids:
-        manual_assignments[feature_id] = {
-            "owner": owners_map.get(feature_id, ""),
-            "controller": controllers_map.get(feature_id, ""),
-            "cores": list(cores_map.get(feature_id, [])),
-        }
+        manual_assignments[feature_id] = _build_manual_assignment_record(
+            feature_id,
+            owners_map,
+            controllers_map,
+            cores_map,
+            has_controllers=has_controllers,
+            has_cores=has_cores,
+        )
     manual_payload["generated_at"] = _now_iso()
 
-    _write_json_transaction(
-        [
-            (Path(context["countriesPath"]), countries_payload),
-            (Path(context["ownersPath"]), owners_payload),
-            (controllers_path, controllers_payload),
-            (cores_path, cores_payload),
-            (Path(context["manualOverridesPath"]), manual_payload),
-        ]
-    )
+    transaction_payloads: list[tuple[Path, object]] = [
+        (Path(context["countriesPath"]), countries_payload),
+        (Path(context["ownersPath"]), owners_payload),
+        (Path(context["manualOverridesPath"]), manual_payload),
+    ]
+    if has_controllers and political_bundle["controllersPath"] is not None and controllers_payload is not None:
+        transaction_payloads.append((political_bundle["controllersPath"], controllers_payload))
+    if has_cores and political_bundle["coresPath"] is not None and cores_payload is not None:
+        transaction_payloads.append((political_bundle["coresPath"], cores_payload))
+    _write_json_transaction(transaction_payloads)
     owner_codes = sorted(set(owners_map.values()))
     return {
         "ok": True,
@@ -584,35 +606,9 @@ def _write_json_transaction(file_payloads: list[tuple[Path, object]]) -> None:
         raise
 
 
-def _load_full_political_assignments(context: dict[str, object]) -> tuple[dict[str, str], dict[str, str], dict[str, list[str]]]:
-    owners_path = Path(context["ownersPath"])
-    controllers_path = Path(context["controllersPath"]) if context.get("controllersPath") else None
-    cores_path = Path(context["coresPath"]) if context.get("coresPath") else None
-    owners_payload = _read_json(owners_path)
-    if not isinstance(owners_payload, dict) or not isinstance(owners_payload.get("owners"), dict):
-        raise DevServerError("invalid_owners_file", "Scenario owners file must contain an owners object.", status=500)
-    if controllers_path is None:
-        raise DevServerError("missing_controllers_file", "Scenario controllers file is required for tag creation.", status=400)
-    if cores_path is None:
-        raise DevServerError("missing_cores_file", "Scenario cores file is required for scenario political saves.", status=400)
-    controllers_payload = _read_json(controllers_path)
-    cores_payload = _read_json(cores_path)
-    if not isinstance(controllers_payload, dict) or not isinstance(controllers_payload.get("controllers"), dict):
-        raise DevServerError("invalid_controllers_file", "Scenario controllers file must contain a controllers object.", status=500)
-    if not isinstance(cores_payload, dict) or not isinstance(cores_payload.get("cores"), dict):
-        raise DevServerError("invalid_cores_file", "Scenario cores file must contain a cores object.", status=500)
-    owners = {
-        str(feature_id or "").strip(): _normalize_code(owner_code)
-        for feature_id, owner_code in owners_payload["owners"].items()
-        if str(feature_id or "").strip()
-    }
-    controllers = {
-        str(feature_id or "").strip(): _normalize_code(owner_code)
-        for feature_id, owner_code in controllers_payload["controllers"].items()
-        if str(feature_id or "").strip()
-    }
+def _normalize_core_assignments(raw_cores_payload: dict[object, object]) -> dict[str, list[str]]:
     cores: dict[str, list[str]] = {}
-    for raw_feature_id, raw_core_tags in cores_payload["cores"].items():
+    for raw_feature_id, raw_core_tags in raw_cores_payload.items():
         feature_id = str(raw_feature_id or "").strip()
         if not feature_id:
             continue
@@ -630,11 +626,116 @@ def _load_full_political_assignments(context: dict[str, object]) -> tuple[dict[s
             if normalized_tag:
                 normalized_core_tags.append(normalized_tag)
         cores[feature_id] = normalized_core_tags
+    return cores
+
+
+def _load_political_payload_bundle(context: dict[str, object]) -> dict[str, object]:
+    owners_path = Path(context["ownersPath"])
+    if not owners_path.exists():
+        raise DevServerError("missing_owners_file", "Scenario owners file is required for scenario political saves.", status=400)
+    owners_payload = _read_json(owners_path)
+    if not isinstance(owners_payload, dict) or not isinstance(owners_payload.get("owners"), dict):
+        raise DevServerError("invalid_owners_file", "Scenario owners file must contain an owners object.", status=500)
+    owners = {
+        str(feature_id or "").strip(): _normalize_code(owner_code)
+        for feature_id, owner_code in owners_payload["owners"].items()
+        if str(feature_id or "").strip()
+    }
+
+    controllers_path = Path(context["controllersPath"]) if context.get("controllersPath") else None
+    controllers_payload: dict[str, object] | None = None
+    controllers: dict[str, str] = {}
+    if controllers_path is not None:
+        if not controllers_path.exists():
+            raise DevServerError(
+                "missing_controllers_file",
+                "Scenario controllers file is declared but could not be found.",
+                status=400,
+            )
+        controllers_payload = _read_json(controllers_path)
+        if not isinstance(controllers_payload, dict) or not isinstance(controllers_payload.get("controllers"), dict):
+            raise DevServerError("invalid_controllers_file", "Scenario controllers file must contain a controllers object.", status=500)
+        controllers = {
+            str(feature_id or "").strip(): _normalize_code(owner_code)
+            for feature_id, owner_code in controllers_payload["controllers"].items()
+            if str(feature_id or "").strip()
+        }
+
+    cores_path = Path(context["coresPath"]) if context.get("coresPath") else None
+    cores_payload: dict[str, object] | None = None
+    cores: dict[str, list[str]] = {}
+    if cores_path is not None:
+        if not cores_path.exists():
+            raise DevServerError(
+                "missing_cores_file",
+                "Scenario cores file is declared but could not be found.",
+                status=400,
+            )
+        cores_payload = _read_json(cores_path)
+        if not isinstance(cores_payload, dict) or not isinstance(cores_payload.get("cores"), dict):
+            raise DevServerError("invalid_cores_file", "Scenario cores file must contain a cores object.", status=500)
+        cores = _normalize_core_assignments(cores_payload["cores"])
+
+    return {
+        "ownersPath": owners_path,
+        "ownersPayload": owners_payload,
+        "owners": owners,
+        "controllersPath": controllers_path,
+        "controllersPayload": controllers_payload,
+        "controllers": controllers,
+        "hasControllers": controllers_payload is not None,
+        "coresPath": cores_path,
+        "coresPayload": cores_payload,
+        "cores": cores,
+        "hasCores": cores_payload is not None,
+    }
+
+
+def _load_owner_assignments(context: dict[str, object]) -> dict[str, str]:
+    owners_path = Path(context["ownersPath"])
+    if not owners_path.exists():
+        raise DevServerError("missing_owners_file", "Scenario owners file is required for scenario political saves.", status=400)
+    owners_payload = _read_json(owners_path)
+    if not isinstance(owners_payload, dict) or not isinstance(owners_payload.get("owners"), dict):
+        raise DevServerError("invalid_owners_file", "Scenario owners file must contain an owners object.", status=500)
+    return {
+        str(feature_id or "").strip(): _normalize_code(owner_code)
+        for feature_id, owner_code in owners_payload["owners"].items()
+        if str(feature_id or "").strip()
+    }
+
+
+def _build_manual_assignment_record(
+    feature_id: str,
+    owners: dict[str, str],
+    controllers: dict[str, str],
+    cores: dict[str, list[str]],
+    *,
+    has_controllers: bool,
+    has_cores: bool,
+) -> dict[str, object]:
+    record: dict[str, object] = {
+        "owner": owners.get(feature_id, ""),
+    }
+    if has_controllers:
+        record["controller"] = controllers.get(feature_id, "")
+    if has_cores:
+        record["cores"] = list(cores.get(feature_id, []))
+    return record
+
+
+def _load_full_political_assignments(context: dict[str, object]) -> tuple[dict[str, str], dict[str, str], dict[str, list[str]]]:
+    payload_bundle = _load_political_payload_bundle(context)
+    owners = payload_bundle["owners"]
+    controllers = payload_bundle["controllers"]
+    cores = payload_bundle["cores"]
     return owners, controllers, cores
 
 
 def _load_political_assignments(context: dict[str, object]) -> tuple[dict[str, str], dict[str, str]]:
-    owners, controllers, _cores = _load_full_political_assignments(context)
+    payload_bundle = _load_political_payload_bundle(context)
+    owners = payload_bundle["owners"]
+    controllers = payload_bundle["controllers"]
     return owners, controllers
 
 
@@ -705,11 +806,11 @@ def _load_scenario_tag_feature_ids(context: dict[str, object], tag: str) -> set[
             f'Scenario tag "{normalized_tag}" does not exist in the active scenario countries catalog.',
             status=400,
         )
-    owners, _controllers = _load_political_assignments(context)
+    owners = _load_owner_assignments(context)
     return {
         feature_id
         for feature_id, owner_code in owners.items()
-        if _normalize_code(owner_code) == normalized_tag
+        if owner_code == normalized_tag
     }
 
 
@@ -837,15 +938,13 @@ def _recompute_country_feature_counts(
     owner_counts: dict[str, int] = {}
     controller_counts: dict[str, int] = {}
     for owner_code in owners.values():
-        normalized_owner_code = _normalize_code(owner_code)
-        if not normalized_owner_code:
+        if not owner_code:
             continue
-        owner_counts[normalized_owner_code] = owner_counts.get(normalized_owner_code, 0) + 1
+        owner_counts[owner_code] = owner_counts.get(owner_code, 0) + 1
     for controller_code in controllers.values():
-        normalized_controller_code = _normalize_code(controller_code)
-        if not normalized_controller_code:
+        if not controller_code:
             continue
-        controller_counts[normalized_controller_code] = controller_counts.get(normalized_controller_code, 0) + 1
+        controller_counts[controller_code] = controller_counts.get(controller_code, 0) + 1
     for raw_tag, raw_country in countries.items():
         tag = _normalize_code(raw_tag)
         if not tag or not isinstance(raw_country, dict):
@@ -914,11 +1013,19 @@ def _build_scenario_tag_create_payload(
             status=400,
         )
 
-    owners, controllers, cores = _load_full_political_assignments(context)
+    political_bundle = _load_political_payload_bundle(context)
+    owners_payload = political_bundle["ownersPayload"]
+    owners = political_bundle["owners"]
+    controllers_payload = political_bundle["controllersPayload"]
+    controllers = political_bundle["controllers"]
+    has_controllers = bool(political_bundle["hasControllers"])
+    cores_payload = political_bundle["coresPayload"]
+    cores = political_bundle["cores"]
+    has_cores = bool(political_bundle["hasCores"])
     missing_feature_ids = [
         feature_id
         for feature_id in normalized_feature_ids
-        if feature_id not in owners or feature_id not in controllers
+        if feature_id not in owners
     ]
     if missing_feature_ids:
         raise DevServerError(
@@ -969,40 +1076,32 @@ def _build_scenario_tag_create_payload(
 
     for feature_id in normalized_feature_ids:
         owners[feature_id] = normalized_tag
-        controllers[feature_id] = normalized_tag
-        cores[feature_id] = [normalized_tag]
+        if has_controllers:
+            controllers[feature_id] = normalized_tag
+        if has_cores:
+            cores[feature_id] = [normalized_tag]
 
     countries[normalized_tag] = country_entry
     _recompute_country_feature_counts(countries, owners, controllers)
     countries_payload["generated_at"] = _now_iso()
-    owners_path = Path(context["ownersPath"])
-    controllers_path = Path(context["controllersPath"]) if context.get("controllersPath") else None
-    cores_path = Path(context["coresPath"]) if context.get("coresPath") else None
-    owners_payload = _read_json(owners_path)
-    if not isinstance(owners_payload, dict):
-        raise DevServerError("invalid_owners_file", "Scenario owners file must be a JSON object.", status=500)
+    owners_path = political_bundle["ownersPath"]
     owners_payload["owners"] = owners
-    if controllers_path is None:
-        raise DevServerError("missing_controllers_file", "Scenario controllers file is required for tag creation.", status=400)
-    if cores_path is None:
-        raise DevServerError("missing_cores_file", "Scenario cores file is required for tag creation.", status=400)
-    controllers_payload = _read_json(controllers_path)
-    if not isinstance(controllers_payload, dict):
-        raise DevServerError("invalid_controllers_file", "Scenario controllers file must be a JSON object.", status=500)
-    controllers_payload["controllers"] = controllers
-    cores_payload = _read_json(cores_path)
-    if not isinstance(cores_payload, dict):
-        raise DevServerError("invalid_cores_file", "Scenario cores file must be a JSON object.", status=500)
-    cores_payload["cores"] = cores
+    if has_controllers and controllers_payload is not None:
+        controllers_payload["controllers"] = controllers
+    if has_cores and cores_payload is not None:
+        cores_payload["cores"] = cores
 
     manual_payload = _load_scenario_manual_overrides_payload(context)
     manual_payload["countries"][normalized_tag] = _build_manual_override_country_record(country_entry, mode="create")
     for feature_id in normalized_feature_ids:
-        manual_payload["assignments"][feature_id] = {
-            "owner": normalized_tag,
-            "controller": normalized_tag,
-            "cores": [normalized_tag],
-        }
+        manual_payload["assignments"][feature_id] = _build_manual_assignment_record(
+            feature_id,
+            owners,
+            controllers,
+            cores,
+            has_controllers=has_controllers,
+            has_cores=has_cores,
+        )
     manual_payload["generated_at"] = _now_iso()
 
     manifest_payload = dict(context["manifest"]) if isinstance(context.get("manifest"), dict) else {}
@@ -1017,12 +1116,6 @@ def _build_scenario_tag_create_payload(
         catalog_entries = catalog_payload.get("entries", [])
         if not isinstance(catalog_entries, list):
             catalog_entries = []
-        if any(str(entry.get("tag") or "").strip().upper() == normalized_tag for entry in catalog_entries if isinstance(entry, dict)):
-            raise DevServerError(
-                "duplicate_releasable_tag",
-                f'Tag "{normalized_tag}" already exists in the scenario releasable catalog.',
-                status=409,
-            )
         catalog_entries.append(catalog_entry)
         catalog_payload["entries"] = catalog_entries
         catalog_payload["generated_at"] = _now_iso()
@@ -1030,10 +1123,12 @@ def _build_scenario_tag_create_payload(
     transaction_payloads: list[tuple[Path, object]] = [
         (Path(context["countriesPath"]), countries_payload),
         (owners_path, owners_payload),
-        (controllers_path, controllers_payload),
-        (cores_path, cores_payload),
         (Path(context["manualOverridesPath"]), manual_payload),
     ]
+    if has_controllers and political_bundle["controllersPath"] is not None and controllers_payload is not None:
+        transaction_payloads.append((political_bundle["controllersPath"], controllers_payload))
+    if has_cores and political_bundle["coresPath"] is not None and cores_payload is not None:
+        transaction_payloads.append((political_bundle["coresPath"], cores_payload))
     if normalized_parent_owner_tag:
         transaction_payloads.append((Path(context["manifestPath"]), manifest_payload))
         transaction_payloads.append((catalog_path, catalog_payload))
@@ -1270,14 +1365,13 @@ def _build_tag_districts(
     return normalized_districts
 
 
-def save_scenario_district_groups_payload(
-    scenario_id: object,
+def _save_scenario_district_groups_payload_from_context(
+    context: dict[str, object],
     *,
     tag: object,
     districts: object,
     root: Path = ROOT,
 ) -> dict[str, object]:
-    context = load_scenario_context(scenario_id, root=root)
     normalized_tag = _validate_tag_code(tag)
     district_groups_payload = _load_district_groups_payload(context)
     if district_groups_payload.get("countries"):
@@ -1313,10 +1407,14 @@ def save_scenario_district_groups_payload(
     }
 
     district_groups_path = Path(context["districtGroupsPath"])
-    write_json_atomic(district_groups_path, district_groups_payload, ensure_ascii=False, indent=2, trailing_newline=True)
     current_url = _repo_relative(district_groups_path, root=root)
+    transaction_payloads: list[tuple[Path, object]] = [(district_groups_path, district_groups_payload)]
     if str(context.get("manifest", {}).get("district_groups_url") or "").strip() != current_url:
-        _write_manifest(context, updates={"district_groups_url": current_url}, root=root)
+        manifest_payload = dict(context["manifest"]) if isinstance(context.get("manifest"), dict) else {}
+        manifest_payload["district_groups_url"] = current_url
+        context["manifest"] = manifest_payload
+        transaction_payloads.append((Path(context["manifestPath"]), manifest_payload))
+    _write_json_transaction(transaction_payloads)
 
     return {
         "ok": True,
@@ -1324,6 +1422,7 @@ def save_scenario_district_groups_payload(
         "tag": normalized_tag,
         "tagRecord": district_groups_payload["tags"][normalized_tag],
         "filePath": _repo_relative(district_groups_path, root=root),
+        "districtGroupsUrl": current_url,
         "manifestPath": _repo_relative(Path(context["manifestPath"]), root=root),
         "savedAt": _now_iso(),
         "stats": {
@@ -1332,6 +1431,22 @@ def save_scenario_district_groups_payload(
             "featureCount": sum(len(entry["feature_ids"]) for entry in normalized_districts.values()),
         },
     }
+
+
+def save_scenario_district_groups_payload(
+    scenario_id: object,
+    *,
+    tag: object,
+    districts: object,
+    root: Path = ROOT,
+) -> dict[str, object]:
+    context = load_scenario_context(scenario_id, root=root)
+    return _save_scenario_district_groups_payload_from_context(
+        context,
+        tag=tag,
+        districts=districts,
+        root=root,
+    )
 
 
 def _load_shared_district_templates_payload(*, root: Path = ROOT) -> dict[str, object]:
@@ -1425,18 +1540,19 @@ def apply_shared_district_template_payload(
             status=404,
         )
     template_districts = list((template.get("districts") or {}).values()) if isinstance(template.get("districts"), dict) else []
-    save_result = save_scenario_district_groups_payload(
-        context["scenarioId"],
+    applied_districts = [
+        {
+            "districtId": district.get("district_id") or district.get("id"),
+            "nameEn": district.get("name_en") or district.get("nameEn"),
+            "nameZh": district.get("name_zh") or district.get("nameZh"),
+            "featureIds": district.get("feature_ids") or district.get("featureIds") or [],
+        }
+        for district in template_districts
+    ]
+    save_result = _save_scenario_district_groups_payload_from_context(
+        context,
         tag=normalized_tag,
-        districts=[
-            {
-                "districtId": district.get("district_id") or district.get("id"),
-                "nameEn": district.get("name_en") or district.get("nameEn"),
-                "nameZh": district.get("name_zh") or district.get("nameZh"),
-                "featureIds": district.get("feature_ids") or district.get("featureIds") or [],
-            }
-            for district in template_districts
-        ],
+        districts=applied_districts,
         root=root,
     )
     save_result["templateTag"] = normalized_template_tag
@@ -1466,7 +1582,7 @@ def _normalize_locale_entry(en: object, zh: object) -> dict[str, str]:
 
 def _build_geo_locale_command(context: dict[str, object], *, root: Path = ROOT) -> list[str]:
     scenario_id = str(context["scenarioId"])
-    builder_path = GEO_LOCALE_BUILDER_BY_SCENARIO.get(scenario_id)
+    builder_path = context.get("geoLocaleBuilderPath") or GEO_LOCALE_BUILDER_BY_SCENARIO.get(scenario_id)
     if not builder_path:
         raise DevServerError(
             "geo_locale_not_supported",
@@ -1526,7 +1642,7 @@ def save_scenario_geo_locale_entry(
 
     manual_payload["version"] = int(manual_payload.get("version") or 1)
     manual_payload["scenario_id"] = str(context["scenarioId"])
-    manual_payload["generated_at"] = __import__("datetime").datetime.now().astimezone().isoformat()
+    manual_payload["generated_at"] = _now_iso()
     manual_payload["geo"] = manual_payload.get("geo", {}) if isinstance(manual_payload.get("geo"), dict) else {}
 
     locale_entry = _normalize_locale_entry(en, zh)
@@ -1569,7 +1685,7 @@ def save_scenario_geo_locale_entry(
         "featureId": normalized_feature_id,
         "filePath": _repo_relative(Path(context["manualGeoOverridesPath"]), root=root),
         "generatedPath": _repo_relative(Path(context["geoLocalePatchPath"]), root=root),
-        "savedAt": __import__("datetime").datetime.now().astimezone().isoformat(),
+        "savedAt": _now_iso(),
         "entry": current_entry or None,
     }
 
@@ -1599,7 +1715,7 @@ def write_active_server_metadata(base_url, open_path, port):
         "url": base_url,
         "port": port,
         "pid": os.getpid(),
-        "started_at": __import__("datetime").datetime.now().astimezone().isoformat(),
+        "started_at": _now_iso(),
         "open_path": open_path,
         "cwd": str(Path.cwd()),
         "command": " ".join(sys.argv),

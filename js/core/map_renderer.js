@@ -357,6 +357,11 @@ const TRANSFORMED_FRAME_PASS_NAMES = [
   "labels",
 ];
 const RENDER_PASS_OVERSCAN_RATIO_PER_SIDE = 0.15;
+const POLITICAL_PARTIAL_REPAINT_FEATURE_THRESHOLD = 48;
+const POLITICAL_PARTIAL_REPAINT_CANDIDATE_THRESHOLD = 160;
+const POLITICAL_PARTIAL_REPAINT_VIEWPORT_COVERAGE_MAX = 0.18;
+const POLITICAL_PARTIAL_REPAINT_PATH_CACHE_MISS_RATIO_MAX = 0.25;
+const POLITICAL_PARTIAL_REPAINT_PAD_PX = 4;
 const HEAVY_SCENARIO_STAGED_APPLY_FEATURE_THRESHOLD = 12000;
 const STAGED_CONTEXT_BASE_TIMEOUT_MS = 180;
 const STAGED_HIT_CANVAS_TIMEOUT_MS = 260;
@@ -478,6 +483,8 @@ let dayNightClockTimerId = null;
 let lastDayNightClockToken = "";
 let pendingIndexUiRefreshHandle = null;
 let pendingIndexUiRefreshState = null;
+let pendingSidebarRefreshHandle = null;
+let pendingSidebarRefreshState = null;
 
 function readSearchParam(name) {
   const search = globalThis?.location?.search || "";
@@ -511,6 +518,27 @@ function getRenderPassCacheState() {
   cache.referenceTransforms = cache.referenceTransforms && typeof cache.referenceTransforms === "object"
     ? cache.referenceTransforms
     : {};
+  cache.borderSnapshot = cache.borderSnapshot && typeof cache.borderSnapshot === "object"
+    ? cache.borderSnapshot
+    : {
+      canvas: null,
+      layout: null,
+      referenceTransform: null,
+      valid: false,
+      reason: "init",
+    };
+  cache.partialPoliticalDirtyIds = cache.partialPoliticalDirtyIds instanceof Set
+    ? cache.partialPoliticalDirtyIds
+    : new Set();
+  cache.politicalPathCache = cache.politicalPathCache instanceof Map
+    ? cache.politicalPathCache
+    : new Map();
+  cache.politicalPathCacheSignature = typeof cache.politicalPathCacheSignature === "string"
+    ? cache.politicalPathCacheSignature
+    : "";
+  cache.politicalPathCacheTransform = cache.politicalPathCacheTransform
+    ? cloneZoomTransform(cache.politicalPathCacheTransform)
+    : null;
   cache.dirty = cache.dirty && typeof cache.dirty === "object" ? cache.dirty : {};
   cache.reasons = cache.reasons && typeof cache.reasons === "object" ? cache.reasons : {};
   cache.counters = cache.counters && typeof cache.counters === "object" ? cache.counters : {};
@@ -535,9 +563,16 @@ function getRenderPassCacheState() {
     contextScenarioPassRenders: 0,
     dayNightPassRenders: 0,
     borderPassRenders: 0,
+    borderSnapshotRenders: 0,
+    borderSnapshotReuses: 0,
     labelPassRenders: 0,
     hitCanvasRenders: 0,
     dynamicBorderRebuilds: 0,
+    politicalPartialRepaints: 0,
+    politicalPartialFallbacks: 0,
+    politicalPartialCandidateCount: 0,
+    politicalPartialPathCacheMisses: 0,
+    politicalPathCacheBuild: 0,
   };
   Object.entries(counterDefaults).forEach(([counterName, initialValue]) => {
     if (!Number.isFinite(Number(cache.counters[counterName]))) {
@@ -699,6 +734,13 @@ function invalidateRenderPasses(passNames, reason = "unspecified") {
     cache.dirty[passName] = true;
     cache.reasons[passName] = String(reason || "unspecified");
   });
+  if (targetPassNames.includes("political") && String(reason || "unspecified") !== "refresh-colors") {
+    cache.partialPoliticalDirtyIds.clear();
+    invalidatePoliticalPathCache(reason);
+  }
+  if (targetPassNames.includes("borders")) {
+    invalidateInteractionBorderSnapshot(reason);
+  }
 }
 
 function invalidateAllRenderPasses(reason = "unspecified") {
@@ -710,6 +752,8 @@ function clearRenderPassReferenceTransforms(passNames = null) {
   if (!passNames) {
     cache.referenceTransform = null;
     cache.referenceTransforms = {};
+    invalidateInteractionBorderSnapshot("clear-reference-transform");
+    invalidatePoliticalPathCache("clear-reference-transform");
     return;
   }
   const rawTargetPassNames = Array.isArray(passNames) ? passNames : [passNames];
@@ -724,6 +768,12 @@ function clearRenderPassReferenceTransforms(passNames = null) {
     delete cache.referenceTransforms[passName];
   });
   cache.referenceTransform = null;
+  if (targetPassNames.includes("political")) {
+    invalidatePoliticalPathCache("clear-reference-transform");
+  }
+  if (targetPassNames.includes("borders")) {
+    invalidateInteractionBorderSnapshot("clear-reference-transform");
+  }
 }
 
 function invalidateOceanVisualState(reason = "ocean-visual") {
@@ -790,6 +840,233 @@ function ensureRenderPassCanvas(passName) {
   return cache.canvases[passName];
 }
 
+function buildInteractionBorderSnapshotLayout() {
+  const dpr = Math.max(state.dpr || 1, 1);
+  const logicalWidth = Math.max(1, Number(state.width || 1));
+  const logicalHeight = Math.max(1, Number(state.height || 1));
+  const offsetX = Math.ceil(logicalWidth * RENDER_PASS_OVERSCAN_RATIO_PER_SIDE);
+  const offsetY = Math.ceil(logicalHeight * RENDER_PASS_OVERSCAN_RATIO_PER_SIDE);
+  const paddedWidth = logicalWidth + offsetX * 2;
+  const paddedHeight = logicalHeight + offsetY * 2;
+  return {
+    offsetX,
+    offsetY,
+    logicalWidth,
+    logicalHeight,
+    paddedWidth,
+    paddedHeight,
+    pixelWidth: Math.max(1, Math.floor(paddedWidth * dpr)),
+    pixelHeight: Math.max(1, Math.floor(paddedHeight * dpr)),
+    dpr,
+  };
+}
+
+function getInteractionBorderSnapshotState() {
+  const cache = getRenderPassCacheState();
+  return cache.borderSnapshot;
+}
+
+function ensureInteractionBorderSnapshotCanvas() {
+  const snapshot = getInteractionBorderSnapshotState();
+  if (!snapshot.canvas) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1;
+    canvas.height = 1;
+    snapshot.canvas = canvas;
+  }
+  snapshot.layout = buildInteractionBorderSnapshotLayout();
+  if (snapshot.canvas.width !== snapshot.layout.pixelWidth) snapshot.canvas.width = snapshot.layout.pixelWidth;
+  if (snapshot.canvas.height !== snapshot.layout.pixelHeight) snapshot.canvas.height = snapshot.layout.pixelHeight;
+  return snapshot.canvas;
+}
+
+function getPoliticalPassStaticSignature(transform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
+  return [
+    getTransformSignature(transform),
+    state.topologyRevision || 0,
+    `ocean-fill:${getOceanBaseFillColor()}`,
+    debugMode,
+    state.topologyBundleMode || "single",
+  ].join("::");
+}
+
+function getPoliticalPathCacheSignature(transform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
+  return [
+    getPoliticalPassStaticSignature(transform),
+    getProjectionRenderSignature(),
+    getViewportRenderSignature(),
+    String(state.activeScenarioId || ""),
+    String(state.scenarioViewMode || "ownership"),
+    Number(state.sovereigntyRevision || 0),
+    Number(state.scenarioControllerRevision || 0),
+    Number(state.scenarioShellOverlayRevision || 0),
+  ].join("::");
+}
+
+function invalidatePoliticalPathCache(reason = "unspecified") {
+  const cache = getRenderPassCacheState();
+  if (cache.politicalPathCache instanceof Map) {
+    cache.politicalPathCache.clear();
+  } else {
+    cache.politicalPathCache = new Map();
+  }
+  cache.politicalPathCacheSignature = "";
+  cache.politicalPathCacheTransform = null;
+  cache.politicalPathCacheReason = String(reason || "unspecified");
+}
+
+function getPoliticalPathCacheHandle(
+  transform = state.zoomTransform || globalThis.d3?.zoomIdentity,
+  { resetIfMismatch = false } = {},
+) {
+  const cache = getRenderPassCacheState();
+  const signature = getPoliticalPathCacheSignature(transform);
+  const valid =
+    cache.politicalPathCache instanceof Map
+    && cache.politicalPathCacheSignature === signature
+    && areZoomTransformsEquivalent(cache.politicalPathCacheTransform, transform);
+  if (valid) {
+    return {
+      cache,
+      signature,
+      valid: true,
+      map: cache.politicalPathCache,
+    };
+  }
+  if (resetIfMismatch) {
+    if (!(cache.politicalPathCache instanceof Map)) {
+      cache.politicalPathCache = new Map();
+    } else {
+      cache.politicalPathCache.clear();
+    }
+    cache.politicalPathCacheSignature = signature;
+    cache.politicalPathCacheTransform = cloneZoomTransform(transform);
+    cache.politicalPathCacheReason = "prepared";
+  }
+  return {
+    cache,
+    signature,
+    valid: resetIfMismatch,
+    map: cache.politicalPathCache instanceof Map ? cache.politicalPathCache : new Map(),
+  };
+}
+
+function buildPoliticalFeaturePathEntry(feature) {
+  if (!feature?.geometry || !globalThis.Path2D || typeof pathSVG !== "function") {
+    return null;
+  }
+  try {
+    const pathString = pathSVG(feature);
+    if (!pathString) return null;
+    return {
+      path: new globalThis.Path2D(pathString),
+    };
+  } catch (_error) {
+    return null;
+  }
+}
+
+function getPoliticalFeaturePathEntry(
+  feature,
+  {
+    featureId = null,
+    transform = state.zoomTransform || globalThis.d3?.zoomIdentity,
+    allowBuild = false,
+    countMiss = false,
+    countBuild = false,
+  } = {},
+) {
+  const resolvedId = featureId || getFeatureId(feature);
+  if (!resolvedId) return null;
+  const handle = getPoliticalPathCacheHandle(transform, { resetIfMismatch: allowBuild });
+  if (!handle.valid || !(handle.map instanceof Map)) {
+    if (countMiss) incrementPerfCounter("politicalPartialPathCacheMisses");
+    return null;
+  }
+  const cachedEntry = handle.map.get(resolvedId);
+  if (cachedEntry?.path) {
+    return cachedEntry;
+  }
+  if (countMiss) incrementPerfCounter("politicalPartialPathCacheMisses");
+  if (!allowBuild) {
+    return null;
+  }
+  const builtEntry = buildPoliticalFeaturePathEntry(feature);
+  if (!builtEntry?.path) {
+    return null;
+  }
+  handle.map.set(resolvedId, builtEntry);
+  if (countBuild) incrementPerfCounter("politicalPathCacheBuild");
+  return builtEntry;
+}
+
+function invalidateInteractionBorderSnapshot(reason = "unspecified") {
+  const snapshot = getInteractionBorderSnapshotState();
+  snapshot.valid = false;
+  snapshot.reason = String(reason || "unspecified");
+  snapshot.referenceTransform = null;
+}
+
+function captureInteractionBorderSnapshot(transform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
+  if (!state.landData?.features?.length) {
+    invalidateInteractionBorderSnapshot("empty-land-data");
+    return false;
+  }
+  const canvas = ensureInteractionBorderSnapshotCanvas();
+  const snapshot = getInteractionBorderSnapshotState();
+  const targetContext = canvas?.getContext?.("2d");
+  if (!targetContext) {
+    invalidateInteractionBorderSnapshot("missing-context");
+    return false;
+  }
+  const referenceTransform = cloneZoomTransform(transform);
+  const startedAt = nowMs();
+  const k = prepareTargetContext(targetContext, referenceTransform, snapshot.layout);
+  withRenderTarget(targetContext, () => {
+    drawBordersPass(k, { interactive: true });
+  });
+  snapshot.referenceTransform = referenceTransform;
+  snapshot.valid = true;
+  snapshot.reason = "captured";
+  incrementPerfCounter("borderSnapshotRenders");
+  recordRenderPerfMetric("interactionBorderSnapshotBuild", nowMs() - startedAt, {
+    activeScenarioId: String(state.activeScenarioId || ""),
+    transformK: Number(referenceTransform.k || 1),
+  });
+  return true;
+}
+
+function drawInteractionBorderSnapshot(currentTransform = state.zoomTransform || globalThis.d3.zoomIdentity) {
+  const snapshot = getInteractionBorderSnapshotState();
+  if (!snapshot.valid || !snapshot.canvas || !snapshot.referenceTransform || !snapshot.layout) {
+    return false;
+  }
+  const expectedLayout = buildInteractionBorderSnapshotLayout();
+  if (
+    snapshot.canvas.width !== expectedLayout.pixelWidth
+    || snapshot.canvas.height !== expectedLayout.pixelHeight
+  ) {
+    invalidateInteractionBorderSnapshot("layout-mismatch");
+    return false;
+  }
+  const current = cloneZoomTransform(currentTransform);
+  const reference = cloneZoomTransform(snapshot.referenceTransform);
+  const scaleRatio = current.k / Math.max(reference.k, 0.0001);
+  const dx = current.x - (reference.x * scaleRatio);
+  const dy = current.y - (reference.y * scaleRatio);
+  context.save();
+  context.setTransform(1, 0, 0, 1, 0, 0);
+  context.translate(
+    (dx - Number(snapshot.layout.offsetX || 0) * scaleRatio) * state.dpr,
+    (dy - Number(snapshot.layout.offsetY || 0) * scaleRatio) * state.dpr,
+  );
+  context.scale(scaleRatio, scaleRatio);
+  context.drawImage(snapshot.canvas, 0, 0);
+  context.restore();
+  incrementPerfCounter("borderSnapshotReuses");
+  return true;
+}
+
 function getScenarioRuntimeTopologySignatureToken() {
   const runtimeTopology = state.scenarioRuntimeTopologyData || state.runtimePoliticalTopology || null;
   return [
@@ -823,13 +1100,8 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
   }
   if (passName === "political") {
     return [
-      transformSignature,
-      state.topologyRevision || 0,
       state.colorRevision || 0,
-      `ocean-fill:${getOceanBaseFillColor()}`,
-      debugMode,
-      state.topologyBundleMode || "single",
-      getColorsHash(),
+      getPoliticalPassStaticSignature(transform),
     ].join("::");
   }
   if (passName === "effects") {
@@ -1549,22 +1821,6 @@ function getFeatureRegionTag(feature) {
   );
 }
 
-function getColorsHash() {
-  const sovereignEntries = Object.entries(state.sovereignBaseColors || {}).sort((a, b) => a[0].localeCompare(b[0]));
-  const visualEntries = Object.entries(state.visualOverrides || {}).sort((a, b) => a[0].localeCompare(b[0]));
-  const waterEntries = Object.entries(state.waterRegionOverrides || {}).sort((a, b) => a[0].localeCompare(b[0]));
-  const legacyCountryEntries = Object.entries(state.countryBaseColors || {}).sort((a, b) => a[0].localeCompare(b[0]));
-  const legacyFeatureEntries = Object.entries(state.featureOverrides || {}).sort((a, b) => a[0].localeCompare(b[0]));
-  return JSON.stringify([
-    sovereignEntries,
-    visualEntries,
-    waterEntries,
-    legacyCountryEntries,
-    legacyFeatureEntries,
-    state.paintMode || "visual",
-  ]);
-}
-
 function isProbablyCanvasColor(value) {
   if (typeof value !== "string") return false;
   const candidate = value.trim();
@@ -2111,6 +2367,27 @@ function getProjectedFeatureBounds(feature, { featureId = null, allowCompute = t
 
   if (!allowCompute) return null;
   return computeProjectedFeatureBounds(feature);
+}
+
+function mergeProjectedBounds(boundsList = []) {
+  const bounds = (Array.isArray(boundsList) ? boundsList : []).filter(Boolean);
+  if (!bounds.length) return null;
+  const minX = Math.min(...bounds.map((entry) => Number(entry.minX)));
+  const minY = Math.min(...bounds.map((entry) => Number(entry.minY)));
+  const maxX = Math.max(...bounds.map((entry) => Number(entry.maxX)));
+  const maxY = Math.max(...bounds.map((entry) => Number(entry.maxY)));
+  if (![minX, minY, maxX, maxY].every(Number.isFinite)) {
+    return null;
+  }
+  return {
+    minX,
+    minY,
+    maxX,
+    maxY,
+    width: Math.max(0, maxX - minX),
+    height: Math.max(0, maxY - minY),
+    area: Math.max(0, maxX - minX) * Math.max(0, maxY - minY),
+  };
 }
 
 function isKnownBadFeatureId(featureId) {
@@ -2711,6 +2988,10 @@ function setRenderPhase(phase) {
   if (previousPhase !== phase && (previousPhase === RENDER_PHASE_IDLE || phase === RENDER_PHASE_IDLE)) {
     state.hoverOverlayDirty = true;
   }
+  if (phase === RENDER_PHASE_IDLE && state.pendingDayNightRefresh) {
+    state.pendingDayNightRefresh = false;
+    invalidateRenderPasses("dayNight", "day-night-clock-deferred");
+  }
 }
 
 function markOverlaysDirty({
@@ -2977,12 +3258,7 @@ function rebuildResolvedColors() {
 function refreshResolvedColorsForFeatures(featureIds, { renderNow = false } = {}) {
   migrateLegacyColorState();
   ensureSovereigntyState();
-  state.sovereignBaseColors = sanitizeCountryColorMap(state.sovereignBaseColors);
-  state.visualOverrides = sanitizeColorMap(state.visualOverrides);
-  state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
-  state.specialRegionOverrides = sanitizeColorMap(state.specialRegionOverrides);
-  state.countryBaseColors = { ...state.sovereignBaseColors };
-  state.featureOverrides = { ...state.visualOverrides };
+  const cache = getRenderPassCacheState();
 
   const ids = Array.isArray(featureIds)
     ? Array.from(new Set(featureIds.map((value) => String(value || "").trim()).filter(Boolean)))
@@ -2999,6 +3275,7 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false } = {}
     } else {
       delete state.colors[id];
     }
+    cache.partialPoliticalDirtyIds.add(id);
   });
 
   state.colorRevision = Number(state.colorRevision || 0) + 1;
@@ -3509,7 +3786,6 @@ function rebuildDynamicBorders() {
   const startedAt = nowMs();
   incrementPerfCounter("dynamicBorderRebuilds");
   state.cachedBorders = null;
-  state.cachedColorsHash = getColorsHash();
   if (!isDynamicBordersEnabled()) {
     state.cachedDynamicOwnerBorders = null;
     state.cachedDynamicBordersHash = null;
@@ -5520,6 +5796,102 @@ function scheduleIndexUiRefresh({
     flushPendingIndexUiRefresh();
   };
   pendingIndexUiRefreshHandle = typeof globalThis.requestAnimationFrame === "function"
+    ? globalThis.requestAnimationFrame(callback)
+    : globalThis.setTimeout(callback, 0);
+}
+
+function normalizeSidebarRefreshIds(values) {
+  return Array.isArray(values)
+    ? values.map((value) => String(value || "").trim()).filter(Boolean)
+    : [];
+}
+
+function normalizeSidebarRefreshOwnerCodes(values) {
+  return Array.isArray(values)
+    ? values.map((value) => canonicalCountryCode(value)).filter(Boolean)
+    : [];
+}
+
+function cancelPendingSidebarRefresh() {
+  if (pendingSidebarRefreshHandle === null || pendingSidebarRefreshHandle === undefined) {
+    pendingSidebarRefreshState = null;
+    return;
+  }
+  if (typeof globalThis.cancelAnimationFrame === "function") {
+    globalThis.cancelAnimationFrame(pendingSidebarRefreshHandle);
+  } else {
+    globalThis.clearTimeout(pendingSidebarRefreshHandle);
+  }
+  pendingSidebarRefreshHandle = null;
+  pendingSidebarRefreshState = null;
+}
+
+function flushPendingSidebarRefresh() {
+  const pending = pendingSidebarRefreshState;
+  pendingSidebarRefreshHandle = null;
+  pendingSidebarRefreshState = null;
+  if (!pending) return;
+  const countryCodes = Array.from(
+    new Set([
+      ...collectCountryCodesForFeatureIds(pending.featureIds),
+      ...pending.ownerCodes,
+    ])
+  );
+  if (typeof state.renderWaterRegionListFn === "function" && pending.waterRegionIds.length > 0) {
+    state.renderWaterRegionListFn();
+  }
+  if (typeof state.renderSpecialRegionListFn === "function" && pending.specialRegionIds.length > 0) {
+    state.renderSpecialRegionListFn();
+  }
+  if (typeof state.refreshCountryListRowsFn === "function") {
+    state.refreshCountryListRowsFn({
+      countryCodes,
+      refreshInspector: true,
+      refreshPresetTree: pending.refreshPresetTree,
+    });
+    return;
+  }
+  if (typeof state.renderCountryListFn === "function" && (countryCodes.length > 0 || pending.refreshPresetTree)) {
+    state.renderCountryListFn();
+  }
+  if (pending.refreshPresetTree && typeof state.renderPresetTreeFn === "function") {
+    state.renderPresetTreeFn();
+  }
+}
+
+function scheduleSidebarRefresh({
+  featureIds = [],
+  waterRegionIds = [],
+  specialRegionIds = [],
+  ownerCodes = [],
+  refreshPresetTree = false,
+} = {}) {
+  pendingSidebarRefreshState = {
+    featureIds: Array.from(new Set([
+      ...(pendingSidebarRefreshState?.featureIds || []),
+      ...normalizeSidebarRefreshIds(featureIds),
+    ])),
+    waterRegionIds: Array.from(new Set([
+      ...(pendingSidebarRefreshState?.waterRegionIds || []),
+      ...normalizeSidebarRefreshIds(waterRegionIds),
+    ])),
+    specialRegionIds: Array.from(new Set([
+      ...(pendingSidebarRefreshState?.specialRegionIds || []),
+      ...normalizeSidebarRefreshIds(specialRegionIds),
+    ])),
+    ownerCodes: Array.from(new Set([
+      ...(pendingSidebarRefreshState?.ownerCodes || []),
+      ...normalizeSidebarRefreshOwnerCodes(ownerCodes),
+    ])),
+    refreshPresetTree: !!(pendingSidebarRefreshState?.refreshPresetTree || refreshPresetTree),
+  };
+  if (pendingSidebarRefreshHandle !== null && pendingSidebarRefreshHandle !== undefined) {
+    return;
+  }
+  const callback = () => {
+    flushPendingSidebarRefresh();
+  };
+  pendingSidebarRefreshHandle = typeof globalThis.requestAnimationFrame === "function"
     ? globalThis.requestAnimationFrame(callback)
     : globalThis.setTimeout(callback, 0);
 }
@@ -9587,6 +9959,10 @@ function ensureDayNightClockTimer() {
       state.updateToolbarInputsFn();
     }
     if (!config.enabled) return;
+    if (state.renderPhase !== RENDER_PHASE_IDLE) {
+      state.pendingDayNightRefresh = true;
+      return;
+    }
     invalidateRenderPasses("dayNight", "day-night-clock");
     if (typeof state.renderNowFn === "function") {
       state.renderNowFn();
@@ -10236,12 +10612,19 @@ function buildScenarioPoliticalBackgroundEntries() {
         })
         .filter((feature) => feature?.geometry);
       if (!features.length) return;
+      const projectedBounds = mergeProjectedBounds(
+        features.map((feature) => getProjectedFeatureBounds(feature, {
+          featureId: getFeatureId(feature),
+          allowCompute: true,
+        }))
+      );
       fallbackCount += 1;
       entries.push({
         mode: "batched",
         displayCode,
         fillColor,
         features,
+        projectedBounds,
       });
     };
     try {
@@ -10269,7 +10652,24 @@ function buildScenarioPoliticalBackgroundEntries() {
         mode: "merged",
         displayCode,
         fillColor,
+        mergedFeature: normalizedMergedFeature || {
+          type: "Feature",
+          properties: {
+            id: `scenario-background-${state.activeScenarioId || "scenario"}-${displayCode || "unknown"}`,
+          },
+          geometry: normalizedMergedShape,
+        },
         mergedShape: normalizedMergedShape,
+        projectedBounds: getProjectedFeatureBounds(
+          normalizedMergedFeature || {
+            type: "Feature",
+            properties: {
+              id: `scenario-background-${state.activeScenarioId || "scenario"}-${displayCode || "unknown"}`,
+            },
+            geometry: normalizedMergedShape,
+          },
+          { allowCompute: true }
+        ),
       });
     } catch (_error) {
       buildBatchedEntry();
@@ -10298,11 +10698,17 @@ function buildScenarioPoliticalBackgroundEntries() {
   return entries;
 }
 
-function drawScenarioPoliticalBackgroundFills() {
+function drawScenarioPoliticalBackgroundFills({
+  screenRects = null,
+  transform = state.zoomTransform || globalThis.d3?.zoomIdentity,
+} = {}) {
   const entries = buildScenarioPoliticalBackgroundEntries();
   if (!entries.length) return;
 
-  entries.forEach(({ mode = "merged", fillColor, mergedShape, features }) => {
+  entries.forEach(({ mode = "merged", fillColor, mergedShape, mergedFeature, features, projectedBounds }) => {
+    if (!projectedBoundsIntersectScreenRects(projectedBounds, screenRects, { transform })) {
+      return;
+    }
     context.beginPath();
     if (mode === "batched") {
       features?.forEach((feature) => {
@@ -10310,8 +10716,14 @@ function drawScenarioPoliticalBackgroundFills() {
           pathCanvas(feature);
         }
       });
+    } else if (mergedFeature?.geometry) {
+      pathCanvas(mergedFeature);
     } else if (mergedShape) {
-      pathCanvas(mergedShape);
+      pathCanvas({
+        type: "Feature",
+        properties: {},
+        geometry: mergedShape,
+      });
     }
     context.fillStyle = fillColor;
     context.fill();
@@ -10344,7 +10756,20 @@ function buildAdmin0MergedShapes() {
   byCountry.forEach((geoms, code) => {
     try {
       const mergedShape = globalThis.topojson.merge(topology, geoms);
-      entries.push({ code, mergedShape });
+      const mergedFeature = {
+        type: "Feature",
+        properties: {
+          id: `admin0-background-${code}`,
+          cntr_code: code,
+        },
+        geometry: mergedShape,
+      };
+      entries.push({
+        code,
+        mergedShape,
+        mergedFeature,
+        projectedBounds: getProjectedFeatureBounds(mergedFeature, { allowCompute: true }),
+      });
     } catch (_e) {
       // Skip countries that fail to merge
     }
@@ -10354,12 +10779,18 @@ function buildAdmin0MergedShapes() {
   return entries;
 }
 
-function drawAdmin0BackgroundFills() {
+function drawAdmin0BackgroundFills({
+  screenRects = null,
+  transform = state.zoomTransform || globalThis.d3?.zoomIdentity,
+} = {}) {
   const entries = buildAdmin0MergedShapes();
   if (!entries.length) return;
 
-  entries.forEach(({ code, mergedShape }) => {
+  entries.forEach(({ code, mergedShape, mergedFeature, projectedBounds }) => {
     if (code === "ATL") return;
+    if (!projectedBoundsIntersectScreenRects(projectedBounds, screenRects, { transform })) {
+      return;
+    }
     const color =
       (state.sovereignBaseColors && state.sovereignBaseColors[code]) ||
       (state.countryBaseColors && state.countryBaseColors[code]) ||
@@ -10367,7 +10798,14 @@ function drawAdmin0BackgroundFills() {
     const fillColor = getSafeCanvasColor(color, null) || LAND_FILL_COLOR;
 
     context.beginPath();
-    pathCanvas(mergedShape);
+    pathCanvas(mergedFeature || {
+      type: "Feature",
+      properties: {
+        id: `admin0-background-${code}`,
+        cntr_code: code,
+      },
+      geometry: mergedShape,
+    });
     context.fillStyle = fillColor;
     context.fill();
   });
@@ -10389,65 +10827,651 @@ function drawBackgroundPass() {
   drawOceanStyle();
 }
 
-function drawPoliticalPass(k) {
-  const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
-  const useScenarioBackgroundMerge = shouldUseScenarioPoliticalBackgroundMerge();
+function getCachedPoliticalPassStaticSignature(signature) {
+  const parts = String(signature || "").split("::");
+  return parts.length > 1 ? parts.slice(1).join("::") : "";
+}
+
+function getFeatureScreenBounds(feature, {
+  featureId = null,
+  transform = state.zoomTransform || globalThis.d3?.zoomIdentity,
+  allowCompute = true,
+  padding = 0,
+} = {}) {
+  const bounds = getProjectedFeatureBounds(feature, { featureId, allowCompute });
+  if (!bounds) return null;
+  const normalizedTransform = cloneZoomTransform(transform);
+  const rawMinX = bounds.minX * normalizedTransform.k + normalizedTransform.x;
+  const rawMinY = bounds.minY * normalizedTransform.k + normalizedTransform.y;
+  const rawMaxX = bounds.maxX * normalizedTransform.k + normalizedTransform.x;
+  const rawMaxY = bounds.maxY * normalizedTransform.k + normalizedTransform.y;
+  if (![rawMinX, rawMinY, rawMaxX, rawMaxY].every(Number.isFinite)) {
+    return null;
+  }
+  const normalizedPadding = Math.max(0, Number(padding || 0));
+  const minX = rawMinX - normalizedPadding;
+  const minY = rawMinY - normalizedPadding;
+  const maxX = rawMaxX + normalizedPadding;
+  const maxY = rawMaxY + normalizedPadding;
+  return {
+    x: minX,
+    y: minY,
+    minX,
+    minY,
+    maxX,
+    maxY,
+    width: Math.max(0, maxX - minX),
+    height: Math.max(0, maxY - minY),
+  };
+}
+
+function getScreenBoundsFromProjectedBounds(projectedBounds, {
+  transform = state.zoomTransform || globalThis.d3?.zoomIdentity,
+  padding = 0,
+} = {}) {
+  if (!projectedBounds) return null;
+  const normalizedTransform = cloneZoomTransform(transform);
+  const rawMinX = Number(projectedBounds.minX) * normalizedTransform.k + normalizedTransform.x;
+  const rawMinY = Number(projectedBounds.minY) * normalizedTransform.k + normalizedTransform.y;
+  const rawMaxX = Number(projectedBounds.maxX) * normalizedTransform.k + normalizedTransform.x;
+  const rawMaxY = Number(projectedBounds.maxY) * normalizedTransform.k + normalizedTransform.y;
+  if (![rawMinX, rawMinY, rawMaxX, rawMaxY].every(Number.isFinite)) {
+    return null;
+  }
+  const normalizedPadding = Math.max(0, Number(padding || 0));
+  const minX = rawMinX - normalizedPadding;
+  const minY = rawMinY - normalizedPadding;
+  const maxX = rawMaxX + normalizedPadding;
+  const maxY = rawMaxY + normalizedPadding;
+  return {
+    x: minX,
+    y: minY,
+    minX,
+    minY,
+    maxX,
+    maxY,
+    width: Math.max(0, maxX - minX),
+    height: Math.max(0, maxY - minY),
+  };
+}
+
+function rectsIntersect(a, b) {
+  if (!a || !b) return false;
+  return !(
+    a.maxX < b.minX ||
+    a.maxY < b.minY ||
+    a.minX > b.maxX ||
+    a.minY > b.maxY
+  );
+}
+
+function projectedRectsIntersect(a, b) {
+  if (!a || !b) return false;
+  return !(
+    Number(a.maxX) < Number(b.minX) ||
+    Number(a.maxY) < Number(b.minY) ||
+    Number(a.minX) > Number(b.maxX) ||
+    Number(a.minY) > Number(b.maxY)
+  );
+}
+
+function mergeIntersectingRects(rects = []) {
+  const pending = Array.isArray(rects) ? rects.filter(Boolean).map((rect) => ({ ...rect })) : [];
+  const merged = [];
+  while (pending.length) {
+    const next = pending.pop();
+    if (!next) continue;
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (let index = pending.length - 1; index >= 0; index -= 1) {
+        const candidate = pending[index];
+        if (!rectsIntersect(next, candidate)) continue;
+        next.minX = Math.min(next.minX, candidate.minX);
+        next.minY = Math.min(next.minY, candidate.minY);
+        next.maxX = Math.max(next.maxX, candidate.maxX);
+        next.maxY = Math.max(next.maxY, candidate.maxY);
+        next.x = next.minX;
+        next.y = next.minY;
+        next.width = Math.max(0, next.maxX - next.minX);
+        next.height = Math.max(0, next.maxY - next.minY);
+        pending.splice(index, 1);
+        changed = true;
+      }
+    }
+    merged.push(next);
+  }
+  return merged;
+}
+
+function getViewportCoverageForRects(rects = []) {
+  const viewportArea = Math.max(1, Number(state.width || 1) * Number(state.height || 1));
+  const coveredArea = (Array.isArray(rects) ? rects : []).reduce((sum, rect) => {
+    if (!rect) return sum;
+    const minX = clamp(rect.minX, 0, Number(state.width || 0));
+    const minY = clamp(rect.minY, 0, Number(state.height || 0));
+    const maxX = clamp(rect.maxX, 0, Number(state.width || 0));
+    const maxY = clamp(rect.maxY, 0, Number(state.height || 0));
+    if (maxX <= minX || maxY <= minY) return sum;
+    return sum + ((maxX - minX) * (maxY - minY));
+  }, 0);
+  return clamp(coveredArea / viewportArea, 0, 1);
+}
+
+function screenRectToProjectedRect(rect, transform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
+  if (!rect) return null;
+  const normalizedTransform = cloneZoomTransform(transform);
+  const minX = (Number(rect.minX ?? rect.x ?? 0) - normalizedTransform.x) / normalizedTransform.k;
+  const minY = (Number(rect.minY ?? rect.y ?? 0) - normalizedTransform.y) / normalizedTransform.k;
+  const maxX = (Number(rect.maxX ?? ((rect.x || 0) + (rect.width || 0))) - normalizedTransform.x) / normalizedTransform.k;
+  const maxY = (Number(rect.maxY ?? ((rect.y || 0) + (rect.height || 0))) - normalizedTransform.y) / normalizedTransform.k;
+  if (![minX, minY, maxX, maxY].every(Number.isFinite)) {
+    return null;
+  }
+  return {
+    minX: Math.min(minX, maxX),
+    minY: Math.min(minY, maxY),
+    maxX: Math.max(minX, maxX),
+    maxY: Math.max(minY, maxY),
+  };
+}
+
+function screenRectToPassRect(rect, layout) {
+  if (!rect || !layout) return null;
+  const minX = clamp(Number(rect.minX || rect.x || 0) + Number(layout.offsetX || 0), 0, Number(layout.paddedWidth || 0));
+  const minY = clamp(Number(rect.minY || rect.y || 0) + Number(layout.offsetY || 0), 0, Number(layout.paddedHeight || 0));
+  const maxX = clamp(Number(rect.maxX || ((rect.x || 0) + (rect.width || 0))) + Number(layout.offsetX || 0), 0, Number(layout.paddedWidth || 0));
+  const maxY = clamp(Number(rect.maxY || ((rect.y || 0) + (rect.height || 0))) + Number(layout.offsetY || 0), 0, Number(layout.paddedHeight || 0));
+  if (maxX <= minX || maxY <= minY) return null;
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
+  };
+}
+
+function projectedBoundsIntersectScreenRects(projectedBounds, screenRects, {
+  transform = state.zoomTransform || globalThis.d3?.zoomIdentity,
+  padding = 0,
+} = {}) {
+  if (!Array.isArray(screenRects) || !screenRects.length) return true;
+  const screenBounds = getScreenBoundsFromProjectedBounds(projectedBounds, { transform, padding });
+  if (!screenBounds) return false;
+  return screenRects.some((rect) => rectsIntersect(rect, screenBounds));
+}
+
+function collectLandSpatialItemsForProjectedRects(projectedRects = [], { maxCandidates = Infinity } = {}) {
+  const meta = state.spatialGridMeta;
+  const grid = state.spatialGrid;
+  if (!meta || !grid || !Array.isArray(state.spatialItems)) return null;
+  const { cellSize, cols, rows, globals } = meta;
+  if (!cellSize || cols <= 0 || rows <= 0) return null;
+  const normalizedRects = (Array.isArray(projectedRects) ? projectedRects : []).filter(Boolean);
+  if (!normalizedRects.length) return { items: [], overflow: false };
+  const seen = new Set();
+  const candidateItems = [];
+  let overflow = false;
+  const maybePush = (item) => {
+    if (overflow || !item?.id || seen.has(item.id)) return;
+    seen.add(item.id);
+    if (!normalizedRects.some((rect) => projectedRectsIntersect(item, rect))) return;
+    candidateItems.push(item);
+    if (candidateItems.length > maxCandidates) {
+      overflow = true;
+    }
+  };
+  normalizedRects.forEach((rect) => {
+    const c0 = clamp(Math.floor(Number(rect.minX || 0) / cellSize), 0, cols - 1);
+    const c1 = clamp(Math.floor(Number(rect.maxX || 0) / cellSize), 0, cols - 1);
+    const r0 = clamp(Math.floor(Number(rect.minY || 0) / cellSize), 0, rows - 1);
+    const r1 = clamp(Math.floor(Number(rect.maxY || 0) / cellSize), 0, rows - 1);
+    for (let row = r0; row <= r1; row += 1) {
+      for (let col = c0; col <= c1; col += 1) {
+        const bucket = grid.get(getSpatialBucketKey(col, row));
+        bucket?.forEach(maybePush);
+      }
+    }
+  });
+  globals?.forEach(maybePush);
+  candidateItems.sort((left, right) => (left?.drawOrder ?? 0) - (right?.drawOrder ?? 0));
+  return {
+    items: candidateItems,
+    overflow,
+  };
+}
+
+function drawPoliticalBackgroundFills(options = {}) {
+  if (debugMode !== "PROD") return;
+  if (shouldUseScenarioPoliticalBackgroundMerge()) {
+    drawScenarioPoliticalBackgroundFills(options);
+    return;
+  }
+  drawAdmin0BackgroundFills(options);
+}
+
+function drawPoliticalBackgroundFillsForEntries(entries = []) {
+  if (debugMode !== "PROD") return 0;
+  const groupedEntries = new Map();
+  (Array.isArray(entries) ? entries : []).forEach(({ feature, index, id, path = null }) => {
+    if (!feature?.geometry) return;
+    const resolvedId = String(id || getFeatureId(feature) || `feature-${index}`);
+    const fillColor =
+      (isAtlantropaSeaFeature(feature)
+        ? getAtlantropaSeaPoliticalFillColor()
+        : null) ||
+      getSafeCanvasColor(state.colors?.[resolvedId], null) ||
+      getSafeCanvasColor(getResolvedFeatureColor(feature, resolvedId), null) ||
+      LAND_FILL_COLOR;
+    const displayCode = shouldUseScenarioPoliticalBackgroundMerge()
+      ? (
+        getDisplayOwnerCode(feature, resolvedId) ||
+        getFeatureCountryCodeNormalized(feature) ||
+        "__NONE__"
+      )
+      : (
+        getFeatureCountryCodeNormalized(feature) ||
+        "__NONE__"
+      );
+    const groupKey = `${displayCode}::${fillColor}`;
+    if (!groupedEntries.has(groupKey)) {
+      groupedEntries.set(groupKey, {
+        fillColor,
+        entries: [],
+      });
+    }
+    groupedEntries.get(groupKey).entries.push({ feature, path });
+  });
+  groupedEntries.forEach(({ fillColor, entries: groupEntries }) => {
+    const resolvedEntries = Array.isArray(groupEntries) ? groupEntries.filter(Boolean) : [];
+    if (!resolvedEntries.length) return;
+    let filled = false;
+    if (resolvedEntries.length === 1 && resolvedEntries[0]?.path) {
+      context.fillStyle = fillColor;
+      context.fill(resolvedEntries[0].path);
+      filled = true;
+    } else if (
+      globalThis.Path2D
+      && typeof globalThis.Path2D.prototype?.addPath === "function"
+      && resolvedEntries.every((entry) => entry?.path)
+    ) {
+      const mergedPath = new globalThis.Path2D();
+      resolvedEntries.forEach((entry) => {
+        mergedPath.addPath(entry.path);
+      });
+      context.fillStyle = fillColor;
+      context.fill(mergedPath);
+      filled = true;
+    }
+    if (filled) return;
+    context.beginPath();
+    resolvedEntries.forEach((entry) => {
+      pathCanvas(entry.feature);
+    });
+    context.fillStyle = fillColor;
+    context.fill();
+  });
+  return groupedEntries.size;
+}
+
+function drawPoliticalFeature(
+  feature,
+  index,
+  {
+    k,
+    canvasWidth,
+    canvasHeight,
+    islandNeighbors = null,
+    skipScreenCheck = false,
+    path = null,
+    transform = state.zoomTransform || globalThis.d3?.zoomIdentity,
+    allowBuildPath = false,
+    countPathBuild = false,
+  } = {},
+) {
+  const id = getFeatureId(feature) || `feature-${index}`;
+  if (shouldExcludePoliticalInteractionFeature(feature, id)) return false;
+  if (shouldSkipFeature(feature, canvasWidth, canvasHeight)) return false;
+  if (!skipScreenCheck && !pathBoundsInScreen(feature)) return false;
+  const isAtlantropaSea = debugMode === "PROD" && isAtlantropaSeaFeature(feature);
+
+  let fillColor = LAND_FILL_COLOR;
   if (debugMode === "PROD") {
-    if (useScenarioBackgroundMerge) {
-      // Merged background fills keep same-color runtime fragments from exposing anti-aliased seams.
-      drawScenarioPoliticalBackgroundFills();
+    fillColor = isAtlantropaSea
+      ? getAtlantropaSeaPoliticalFillColor()
+      : (getSafeCanvasColor(state.colors[id], null) || LAND_FILL_COLOR);
+  } else if (debugMode === "GEOMETRY") {
+    fillColor = index % 2 === 0 ? "pink" : "lightgreen";
+  } else if (debugMode === "ARTIFACTS") {
+    const bounds = pathCanvas.bounds(feature);
+    let featureWidth = 0;
+    if (bounds && bounds.length === 2) {
+      const minX = bounds[0][0];
+      const maxX = bounds[1][0];
+      if ([minX, maxX].every(Number.isFinite)) {
+        featureWidth = maxX - minX;
+      }
+    }
+    fillColor = featureWidth > canvasWidth * 0.5 ? "red" : "#eee";
+  } else if (debugMode === "ISLANDS") {
+    const degree = islandNeighbors?.[index]?.length || 0;
+    fillColor = degree === 0 ? "orange" : "lightgreen";
+  } else if (debugMode === "ID_HASH") {
+    fillColor = hashToColor(id);
+  }
+
+  const cachedPath =
+    path
+    || getPoliticalFeaturePathEntry(feature, {
+      featureId: id,
+      transform,
+      allowBuild: allowBuildPath,
+      countBuild: countPathBuild,
+    })?.path
+    || null;
+  context.fillStyle = fillColor;
+  if (cachedPath) {
+    context.fill(cachedPath);
+  } else {
+    context.beginPath();
+    pathCanvas(feature);
+    context.fill();
+  }
+
+  if (debugMode === "PROD") {
+    context.strokeStyle = isAtlantropaSea
+      ? getAtlantropaSeaPoliticalStrokeColor()
+      : fillColor;
+    context.lineWidth = 0.75 / Math.max(0.0001, k);
+    context.lineJoin = "round";
+    context.lineCap = "round";
+    if (cachedPath) {
+      context.stroke(cachedPath);
     } else {
-      drawAdmin0BackgroundFills();
+      context.stroke();
     }
   }
+  return true;
+}
+
+function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
+  const cache = getRenderPassCacheState();
+  const dirtyIds = Array.from(cache.partialPoliticalDirtyIds || []).filter(Boolean);
+  const dirtyFeatureCount = dirtyIds.length;
+  const fallback = (fallbackReason, details = {}) => {
+    incrementPerfCounter("politicalPartialFallbacks");
+    recordRenderPerfMetric("politicalPartialRepaint", 0, {
+      applied: false,
+      dirtyFeatureCount,
+      dirtyRectCount: 0,
+      viewportCoverage: 0,
+      candidateCount: 0,
+      pathCacheMisses: 0,
+      pathCacheMissRatio: 0,
+      fallbackReason,
+      ...details,
+    });
+    return false;
+  };
+  if (state.renderPhase !== RENDER_PHASE_IDLE || state.deferExactAfterSettle) {
+    return fallback("non-idle-phase");
+  }
+  if (debugMode !== "PROD") {
+    return fallback("non-prod-mode");
+  }
+  if (cache.reasons?.political !== "refresh-colors") {
+    return fallback("non-color-invalidation");
+  }
+  if (!dirtyFeatureCount) {
+    return fallback("no-dirty-features");
+  }
+  if (dirtyFeatureCount > POLITICAL_PARTIAL_REPAINT_FEATURE_THRESHOLD) {
+    return fallback("dirty-feature-threshold");
+  }
+  const passCanvas = cache.canvases?.political;
+  const passContext = passCanvas?.getContext?.("2d");
+  if (!passCanvas || !passContext) {
+    return fallback("missing-pass-canvas");
+  }
+  const layout = getRenderPassLayout("political");
+  if (passCanvas.width !== layout.pixelWidth || passCanvas.height !== layout.pixelHeight) {
+    return fallback("layout-mismatch");
+  }
+  const referenceTransform = getPassReferenceTransform("political");
+  if (!referenceTransform || !areZoomTransformsEquivalent(referenceTransform, transform)) {
+    return fallback("reference-transform-mismatch");
+  }
+  if (getCachedPoliticalPassStaticSignature(cache.signatures?.political) !== getCachedPoliticalPassStaticSignature(nextSignature)) {
+    return fallback("static-signature-mismatch");
+  }
+
+  const canvasWidth = Math.max(Number(layout.paddedWidth || 0), Number(state.width || 0), 1);
+  const canvasHeight = Math.max(Number(layout.paddedHeight || 0), Number(state.height || 0), 1);
+  const dirtyRects = [];
+  dirtyIds.forEach((id) => {
+    const feature = state.landIndex?.get(id);
+    if (!feature) {
+      dirtyRects.push(null);
+      return;
+    }
+    if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
+    if (shouldSkipFeature(feature, canvasWidth, canvasHeight)) return;
+    const rect = getFeatureScreenBounds(feature, {
+      featureId: id,
+      transform,
+      padding: POLITICAL_PARTIAL_REPAINT_PAD_PX,
+    });
+    if (!rect) {
+      dirtyRects.push(null);
+      return;
+    }
+    dirtyRects.push(rect);
+  });
+  if (dirtyRects.some((rect) => !rect)) {
+    return fallback("missing-dirty-bounds");
+  }
+  if (!dirtyRects.length) {
+    cache.signatures.political = nextSignature;
+    cache.dirty.political = false;
+    cache.partialPoliticalDirtyIds.clear();
+    cache.reasons.political = "partial-noop";
+    setPassReferenceTransform("political", transform);
+    incrementPerfCounter("politicalPartialRepaints");
+    recordRenderPerfMetric("politicalPartialRepaint", 0, {
+      applied: true,
+      dirtyFeatureCount,
+      dirtyRectCount: 0,
+      viewportCoverage: 0,
+      affectedFeatureCount: 0,
+      noop: true,
+    });
+    return true;
+  }
+
+  const mergedDirtyRects = mergeIntersectingRects(dirtyRects);
+  const viewportCoverage = getViewportCoverageForRects(mergedDirtyRects);
+  if (viewportCoverage > POLITICAL_PARTIAL_REPAINT_VIEWPORT_COVERAGE_MAX) {
+    return fallback("coverage-threshold", {
+      dirtyRectCount: mergedDirtyRects.length,
+      viewportCoverage,
+    });
+  }
+
+  const projectedDirtyRects = mergedDirtyRects.map((rect) => screenRectToProjectedRect(rect, transform));
+  if (projectedDirtyRects.some((rect) => !rect)) {
+    return fallback("projected-dirty-rect-missing", {
+      dirtyRectCount: mergedDirtyRects.length,
+      viewportCoverage,
+    });
+  }
+  const candidateResult = collectLandSpatialItemsForProjectedRects(projectedDirtyRects, {
+    maxCandidates: POLITICAL_PARTIAL_REPAINT_CANDIDATE_THRESHOLD,
+  });
+  if (!candidateResult) {
+    return fallback("spatial-index-unavailable", {
+      dirtyRectCount: mergedDirtyRects.length,
+      viewportCoverage,
+    });
+  }
+  if (candidateResult.overflow) {
+    return fallback("candidate-threshold", {
+      dirtyRectCount: mergedDirtyRects.length,
+      viewportCoverage,
+      candidateCount: candidateResult.items.length,
+    });
+  }
+  const candidateItems = candidateResult.items;
+  const candidateCount = candidateItems.length;
+  incrementPerfCounter("politicalPartialCandidateCount", candidateCount);
+  if (!candidateCount) {
+    return fallback("no-spatial-candidates", {
+      dirtyRectCount: mergedDirtyRects.length,
+      viewportCoverage,
+    });
+  }
+  if (candidateCount > POLITICAL_PARTIAL_REPAINT_CANDIDATE_THRESHOLD) {
+    return fallback("candidate-threshold", {
+      dirtyRectCount: mergedDirtyRects.length,
+      viewportCoverage,
+      candidateCount,
+    });
+  }
+  const pathCacheHandle = getPoliticalPathCacheHandle(transform, { resetIfMismatch: false });
+  let pathCacheMisses = 0;
+  if (!pathCacheHandle.valid || !(pathCacheHandle.map instanceof Map)) {
+    pathCacheMisses = candidateCount;
+    incrementPerfCounter("politicalPartialPathCacheMisses", pathCacheMisses);
+    return fallback("path-cache-miss-threshold", {
+      dirtyRectCount: mergedDirtyRects.length,
+      viewportCoverage,
+      candidateCount,
+      pathCacheMisses,
+      pathCacheMissRatio: 1,
+    });
+  }
+  candidateItems.forEach((item) => {
+    if (!pathCacheHandle.map.get(item.id)?.path) {
+      pathCacheMisses += 1;
+    }
+  });
+  if (pathCacheMisses > 0) {
+    incrementPerfCounter("politicalPartialPathCacheMisses", pathCacheMisses);
+  }
+  const pathCacheMissRatio = candidateCount > 0
+    ? (pathCacheMisses / candidateCount)
+    : 0;
+  if (pathCacheMissRatio > POLITICAL_PARTIAL_REPAINT_PATH_CACHE_MISS_RATIO_MAX) {
+    return fallback("path-cache-miss-threshold", {
+      dirtyRectCount: mergedDirtyRects.length,
+      viewportCoverage,
+      candidateCount,
+      pathCacheMisses,
+      pathCacheMissRatio: Number(pathCacheMissRatio.toFixed(4)),
+    });
+  }
+  const redrawEntries = candidateItems.map((item) => {
+    const pathEntry =
+      pathCacheHandle.map.get(item.id)
+      || getPoliticalFeaturePathEntry(item.feature, {
+        featureId: item.id,
+        transform,
+        allowBuild: true,
+        countBuild: true,
+      });
+    if (!pathEntry?.path) return null;
+    return {
+      feature: item.feature,
+      index: item.drawOrder,
+      id: item.id,
+      path: pathEntry.path,
+    };
+  });
+  if (redrawEntries.some((entry) => !entry)) {
+    return fallback("path-cache-build-failed", {
+      dirtyRectCount: mergedDirtyRects.length,
+      viewportCoverage,
+      candidateCount,
+      pathCacheMisses,
+      pathCacheMissRatio: Number(pathCacheMissRatio.toFixed(4)),
+    });
+  }
+
+  const passRects = mergedDirtyRects
+    .map((rect) => screenRectToPassRect(rect, layout))
+    .filter(Boolean);
+  if (!passRects.length) {
+    return fallback("pass-rect-empty", {
+      dirtyRectCount: mergedDirtyRects.length,
+      viewportCoverage,
+    });
+  }
+
+  const startedAt = nowMs();
+  let backgroundGroupCount = 0;
+  passContext.save();
+  passContext.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+  passContext.beginPath();
+  passRects.forEach((rect) => {
+    passContext.rect(rect.x, rect.y, rect.width, rect.height);
+  });
+  passContext.clip();
+  passContext.clearRect(0, 0, layout.paddedWidth, layout.paddedHeight);
+  passContext.translate(layout.offsetX, layout.offsetY);
+  passContext.translate(transform.x, transform.y);
+  passContext.scale(transform.k, transform.k);
+  withRenderTarget(passContext, () => {
+    backgroundGroupCount = drawPoliticalBackgroundFillsForEntries(redrawEntries);
+    redrawEntries.forEach(({ feature, index, path }) => {
+      drawPoliticalFeature(feature, index, {
+        k: transform.k,
+        canvasWidth,
+        canvasHeight,
+        skipScreenCheck: true,
+        path,
+        transform,
+      });
+    });
+  });
+  passContext.restore();
+
+  cache.signatures.political = nextSignature;
+  cache.dirty.political = false;
+  cache.partialPoliticalDirtyIds.clear();
+  cache.reasons.political = "partial-repaint";
+  setPassReferenceTransform("political", transform);
+  incrementPerfCounter("politicalPartialRepaints");
+  recordPassTiming(timings, "political", startedAt);
+  recordRenderPerfMetric("politicalPartialRepaint", nowMs() - startedAt, {
+    applied: true,
+    dirtyFeatureCount,
+    dirtyRectCount: mergedDirtyRects.length,
+    viewportCoverage: Number(viewportCoverage.toFixed(4)),
+    candidateCount,
+    affectedFeatureCount: redrawEntries.length,
+    backgroundGroupCount,
+    pathCacheMisses,
+    pathCacheMissRatio: Number(pathCacheMissRatio.toFixed(4)),
+  });
+  return true;
+}
+
+function drawPoliticalPass(k) {
+  const transform = state.zoomTransform || globalThis.d3?.zoomIdentity;
+  const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
+  getPoliticalPathCacheHandle(transform, { resetIfMismatch: true });
+  drawPoliticalBackgroundFills();
   if (!state.landData?.features?.length) return;
   const islandNeighbors = debugMode === "ISLANDS" ? getIslandNeighborGraph() : null;
   state.landData.features.forEach((feature, index) => {
-    const id = getFeatureId(feature) || `feature-${index}`;
-    if (shouldExcludePoliticalInteractionFeature(feature, id)) return;
-    if (shouldSkipFeature(feature, canvasWidth, canvasHeight)) return;
-    if (!pathBoundsInScreen(feature)) return;
-    const isAtlantropaSea = debugMode === "PROD" && isAtlantropaSeaFeature(feature);
-
-    let fillColor = LAND_FILL_COLOR;
-    if (debugMode === "PROD") {
-      fillColor = isAtlantropaSea
-        ? getAtlantropaSeaPoliticalFillColor()
-        : (getSafeCanvasColor(state.colors[id], null) || LAND_FILL_COLOR);
-    } else if (debugMode === "GEOMETRY") {
-      fillColor = index % 2 === 0 ? "pink" : "lightgreen";
-    } else if (debugMode === "ARTIFACTS") {
-      const bounds = pathCanvas.bounds(feature);
-      let featureWidth = 0;
-      if (bounds && bounds.length === 2) {
-        const minX = bounds[0][0];
-        const maxX = bounds[1][0];
-        if ([minX, maxX].every(Number.isFinite)) {
-          featureWidth = maxX - minX;
-        }
-      }
-      fillColor = featureWidth > canvasWidth * 0.5 ? "red" : "#eee";
-    } else if (debugMode === "ISLANDS") {
-      const degree = islandNeighbors?.[index]?.length || 0;
-      fillColor = degree === 0 ? "orange" : "lightgreen";
-    } else if (debugMode === "ID_HASH") {
-      fillColor = hashToColor(id);
-    }
-
-    context.beginPath();
-    pathCanvas(feature);
-    context.fillStyle = fillColor;
-    context.fill();
-
-    if (debugMode === "PROD") {
-      context.strokeStyle = isAtlantropaSea
-        ? getAtlantropaSeaPoliticalStrokeColor()
-        : fillColor;
-      context.lineWidth = 0.75 / Math.max(0.0001, k);
-      context.lineJoin = "round";
-      context.lineCap = "round";
-      context.stroke();
-    }
+    drawPoliticalFeature(feature, index, {
+      k,
+      canvasWidth,
+      canvasHeight,
+      islandNeighbors,
+      transform,
+      allowBuildPath: true,
+      countPathBuild: true,
+    });
   });
 }
 
@@ -10693,6 +11717,9 @@ function renderPassToCache(passName, drawFn, transform, timings) {
   setPassReferenceTransform(passName, transform);
   getRenderPassCacheState().signatures[passName] = getRenderPassSignature(passName, transform);
   getRenderPassCacheState().dirty[passName] = false;
+  if (passName === "political") {
+    getRenderPassCacheState().partialPoliticalDirtyIds.clear();
+  }
   recordPassTiming(timings, passName, passStart);
   getPassCounterNames(passName).forEach((counterName) => incrementPerfCounter(counterName));
 }
@@ -10731,6 +11758,12 @@ function ensureIdleRenderPasses(timings) {
       }
     }
     if (!cache.dirty[passName]) return;
+    if (
+      passName === "political"
+      && tryPartialPoliticalPassRepaint(transform, nextSignature, timings)
+    ) {
+      return;
+    }
     renderPassToCache(passName, drawFn, transform, timings);
   });
   if (Number.isFinite(timings.contextBase) || Number.isFinite(timings.contextScenario)) {
@@ -10821,12 +11854,14 @@ function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } 
   );
   if (!drewAll) return false;
 
-  const k = Math.max(0.0001, Number(currentTransform?.k || 1));
-  context.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
-  context.translate(currentTransform.x, currentTransform.y);
-  context.scale(k, k);
-  drawBordersPass(k, { interactive: !!interactiveBorders });
-  context.setTransform(1, 0, 0, 1, 0, 0);
+  if (!drawInteractionBorderSnapshot(currentTransform)) {
+    const k = Math.max(0.0001, Number(currentTransform?.k || 1));
+    context.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+    context.translate(currentTransform.x, currentTransform.y);
+    context.scale(k, k);
+    drawBordersPass(k, { interactive: !!interactiveBorders });
+    context.setTransform(1, 0, 0, 1, 0, 0);
+  }
   if (!drawTransformedPass("labels", currentTransform)) {
     return false;
   }
@@ -10848,10 +11883,43 @@ function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } 
   return true;
 }
 
+function shouldPromoteDeferredColorRenderToIdle() {
+  const cache = getRenderPassCacheState();
+  if (
+    state.renderPhase !== RENDER_PHASE_SETTLING
+    && !(state.renderPhase === RENDER_PHASE_IDLE && state.deferExactAfterSettle)
+  ) {
+    return false;
+  }
+  if (!cache.dirty?.political) {
+    return false;
+  }
+  const reason = String(cache.reasons?.political || "");
+  return reason === "refresh-colors" || reason === "rebuild-colors";
+}
+
+function promoteDeferredColorRenderToIdle() {
+  if (!shouldPromoteDeferredColorRenderToIdle()) {
+    return false;
+  }
+  const previousPhase = String(state.renderPhase || "");
+  const previousDefer = !!state.deferExactAfterSettle;
+  clearRenderPhaseTimer();
+  cancelExactAfterSettleRefresh({ clearDefer: true });
+  setRenderPhase(RENDER_PHASE_IDLE);
+  recordRenderPerfMetric("promoteDeferredColorRenderToIdle", 0, {
+    previousPhase,
+    previousDefer,
+    reason: String(getRenderPassCacheState().reasons?.political || ""),
+  });
+  return true;
+}
+
 function drawCanvas() {
   if (!context || !pathCanvas) return;
   ensureLayerDataFromTopology();
   incrementPerfCounter("drawCanvas");
+  promoteDeferredColorRenderToIdle();
   const frameStart = nowMs();
   const frameTimings = {};
   const useTransformedFrame =
@@ -11995,32 +13063,13 @@ function refreshSidebarAfterPaint({
   ownerCodes = [],
   refreshPresetTree = false,
 } = {}) {
-  const countryCodes = Array.from(
-    new Set([
-      ...collectCountryCodesForFeatureIds(featureIds),
-      ...(Array.isArray(ownerCodes) ? ownerCodes.map((code) => canonicalCountryCode(code)).filter(Boolean) : []),
-    ])
-  );
-  if (typeof state.renderWaterRegionListFn === "function" && Array.isArray(waterRegionIds)) {
-    state.renderWaterRegionListFn();
-  }
-  if (typeof state.renderSpecialRegionListFn === "function" && Array.isArray(specialRegionIds)) {
-    state.renderSpecialRegionListFn();
-  }
-  if (typeof state.refreshCountryListRowsFn === "function") {
-    state.refreshCountryListRowsFn({
-      countryCodes,
-      refreshInspector: true,
-      refreshPresetTree,
-    });
-    return;
-  }
-  if (typeof state.renderCountryListFn === "function") {
-    state.renderCountryListFn();
-  }
-  if (refreshPresetTree && typeof state.renderPresetTreeFn === "function") {
-    state.renderPresetTreeFn();
-  }
+  scheduleSidebarRefresh({
+    featureIds,
+    waterRegionIds,
+    specialRegionIds,
+    ownerCodes,
+    refreshPresetTree,
+  });
 }
 
 function notifyDevWorkspace() {
@@ -13443,6 +14492,7 @@ function initZoom() {
       clearRenderPhaseTimer();
       cancelExactAfterSettleRefresh();
       setRenderPhase(RENDER_PHASE_INTERACTING);
+      captureInteractionBorderSnapshot(state.zoomTransform || globalThis.d3.zoomIdentity);
       renderHoverOverlayIfNeeded({ force: true });
     })
     .on("zoom", (event) => {
@@ -13593,6 +14643,7 @@ function setMapData({ refitProjection = true, resetZoom = true } = {}) {
   clearPendingDynamicBorderTimer();
   clearRenderPhaseTimer();
   cancelPendingIndexUiRefresh();
+  cancelPendingSidebarRefresh();
   setRenderPhase(RENDER_PHASE_IDLE);
   resetRenderDiagnostics();
   clearStagedMapDataTasks();

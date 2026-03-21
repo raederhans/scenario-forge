@@ -2518,7 +2518,7 @@ function initDevWorkspace() {
       }
       state.activeScenarioManifest = {
         ...(state.activeScenarioManifest || {}),
-        district_groups_url: String(result.filePath || state.activeScenarioManifest?.district_groups_url || ""),
+        district_groups_url: String(result.districtGroupsUrl || state.activeScenarioManifest?.district_groups_url || ""),
       };
       mapRenderer.rebuildStaticMeshes();
       if (typeof state.renderNowFn === "function") {
