@@ -13,6 +13,10 @@ function isEditableTarget(target) {
 }
 
 function setCurrentTool(tool) {
+  if (typeof state.runToolSelectionFn === "function") {
+    state.runToolSelectionFn(tool, { dismissHint: true });
+    return;
+  }
   state.currentTool = tool;
   if (tool === "eyedropper") {
     state.brushModeEnabled = false;
@@ -39,6 +43,10 @@ function syncToolUi() {
 }
 
 function toggleBrushMode() {
+  if (typeof state.runBrushModeToggleFn === "function") {
+    state.runBrushModeToggleFn(!state.brushModeEnabled, { dismissHint: true });
+    return;
+  }
   state.brushModeEnabled = !state.brushModeEnabled;
   if (state.brushModeEnabled && state.currentTool === "eyedropper") {
     state.currentTool = "fill";
@@ -109,16 +117,28 @@ function initShortcuts() {
         return;
       }
       if (event.shiftKey) {
-        redoHistory();
+        if (typeof state.runHistoryActionFn === "function") {
+          state.runHistoryActionFn("redo");
+        } else {
+          redoHistory();
+        }
       } else {
-        undoHistory();
+        if (typeof state.runHistoryActionFn === "function") {
+          state.runHistoryActionFn("undo");
+        } else {
+          undoHistory();
+        }
       }
       return;
     }
 
     if (modifier && lower === "y") {
       event.preventDefault();
-      redoHistory();
+      if (typeof state.runHistoryActionFn === "function") {
+        state.runHistoryActionFn("redo");
+      } else {
+        redoHistory();
+      }
       return;
     }
 
@@ -174,17 +194,29 @@ function initShortcuts() {
     }
     if (!modifier && (key === "+" || key === "=")) {
       event.preventDefault();
-      zoomByStep(1);
+      if (typeof state.runZoomStepFn === "function") {
+        state.runZoomStepFn(1);
+      } else {
+        zoomByStep(1);
+      }
       return;
     }
     if (!modifier && (key === "-" || key === "_")) {
       event.preventDefault();
-      zoomByStep(-1);
+      if (typeof state.runZoomStepFn === "function") {
+        state.runZoomStepFn(-1);
+      } else {
+        zoomByStep(-1);
+      }
       return;
     }
     if (!modifier && key === "0") {
       event.preventDefault();
-      resetZoomToFit();
+      if (typeof state.runZoomResetFn === "function") {
+        state.runZoomResetFn();
+      } else {
+        resetZoomToFit();
+      }
       return;
     }
     if (!modifier && key === "Escape") {

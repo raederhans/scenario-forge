@@ -40,6 +40,7 @@ import { ensureActiveScenarioOptionalLayerLoaded, resetToScenarioBaseline } from
 import { toggleLanguage, updateUIText, t } from "./i18n.js";
 import { resetAllFeatureOwnersToCanonical } from "../core/sovereignty_manager.js";
 import { showToast } from "./toast.js";
+import { showAppDialog } from "./app_dialog.js";
 import { markDirty, updateDirtyIndicator } from "../core/dirty_state.js";
 
 function renderPalette(themeName) {
@@ -375,6 +376,7 @@ function initToolbar({ render } = {}) {
   let toolHudTimerId = null;
   let scenarioGuideTimerId = null;
   let dockPopoverCloseBound = false;
+  const overlayFocusReturnTargets = new WeakMap();
   const PALETTE_LIBRARY_GROUPS = [
     { key: "essentials", label: () => t("Essentials", "ui"), defaultOpen: true },
     { key: "dynamic", label: () => t("Dynamic / Runtime", "ui"), defaultOpen: false },
@@ -418,6 +420,45 @@ function initToolbar({ render } = {}) {
     state.ui.responsiveChromeTier = nextTier;
   };
   applyResponsiveChromeDefaults();
+
+  const getFocusableElements = (container) => {
+    if (!(container instanceof HTMLElement)) return [];
+    const candidates = Array.from(container.querySelectorAll(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    ));
+    return candidates.filter((element) => (
+      element instanceof HTMLElement
+      && !element.hidden
+      && element.getAttribute("aria-hidden") !== "true"
+      && element.tabIndex >= 0
+    ));
+  };
+
+  const focusOverlaySurface = (container) => {
+    if (!(container instanceof HTMLElement)) return;
+    const [firstFocusable] = getFocusableElements(container);
+    const target = firstFocusable || container;
+    if (!target.hasAttribute("tabindex")) {
+      container.setAttribute("tabindex", "-1");
+    }
+    if (typeof target.focus === "function") {
+      target.focus({ preventScroll: true });
+    }
+  };
+
+  const rememberOverlayTrigger = (overlay, trigger) => {
+    if (!(overlay instanceof HTMLElement) || !(trigger instanceof HTMLElement)) return;
+    overlayFocusReturnTargets.set(overlay, trigger);
+  };
+
+  const restoreOverlayTriggerFocus = (overlay, explicitTrigger = null) => {
+    const target = explicitTrigger instanceof HTMLElement
+      ? explicitTrigger
+      : overlayFocusReturnTargets.get(overlay);
+    if (target && typeof target.focus === "function") {
+      target.focus({ preventScroll: true });
+    }
+  };
 
   const getPaintModeLabel = () => (
     String(state.paintMode || "visual") === "sovereignty"
@@ -564,6 +605,7 @@ function initToolbar({ render } = {}) {
   const closeSpecialZonePopover = () => {
     if (!specialZonePopover || specialZoneEditorInline) return;
     specialZonePopover.classList.add("hidden");
+    specialZonePopover.setAttribute("aria-hidden", "true");
     appearanceSpecialZoneBtn?.classList.remove("is-active");
     appearanceSpecialZoneBtn?.setAttribute("aria-expanded", "false");
   };
@@ -575,18 +617,26 @@ function initToolbar({ render } = {}) {
       closeSpecialZonePopover();
       return;
     }
+    rememberOverlayTrigger(specialZonePopover, appearanceSpecialZoneBtn);
     specialZonePopover.classList.remove("hidden");
+    specialZonePopover.setAttribute("aria-hidden", "false");
     appearanceSpecialZoneBtn?.classList.add("is-active");
     appearanceSpecialZoneBtn?.setAttribute("aria-expanded", "true");
+    focusOverlaySurface(specialZonePopover);
   };
 
-  const closeScenarioGuidePopover = () => {
-    scenarioGuidePopover?.classList.add("hidden");
+  const closeScenarioGuidePopover = ({ restoreFocus = false } = {}) => {
+    if (!scenarioGuidePopover) return;
+    scenarioGuidePopover.classList.add("hidden");
+    scenarioGuidePopover.setAttribute("aria-hidden", "true");
     scenarioGuideBtn?.classList.remove("is-active");
     scenarioGuideBtn?.setAttribute("aria-expanded", "false");
     if (scenarioGuideBtn) {
       scenarioGuideBtn.textContent = "?";
       scenarioGuideBtn.setAttribute("title", t("Show guide", "ui"));
+    }
+    if (restoreFocus) {
+      restoreOverlayTriggerFocus(scenarioGuidePopover, scenarioGuideBtn);
     }
   };
 
@@ -594,17 +644,20 @@ function initToolbar({ render } = {}) {
     if (!scenarioGuidePopover) return;
     const willOpen = scenarioGuidePopover.classList.contains("hidden");
     if (!willOpen) {
-      closeScenarioGuidePopover();
+      closeScenarioGuidePopover({ restoreFocus: true });
       applyScenarioOverlaySafeLayout();
       return;
     }
+    rememberOverlayTrigger(scenarioGuidePopover, scenarioGuideBtn);
     scenarioGuidePopover.classList.remove("hidden");
+    scenarioGuidePopover.setAttribute("aria-hidden", "false");
     scenarioGuideBtn?.classList.add("is-active");
     scenarioGuideBtn?.setAttribute("aria-expanded", "true");
     if (scenarioGuideBtn) {
       scenarioGuideBtn.textContent = "?";
       scenarioGuideBtn.setAttribute("title", t("Hide guide", "ui"));
     }
+    focusOverlaySurface(scenarioGuidePopover);
     applyScenarioOverlaySafeLayout();
   };
 
@@ -749,10 +802,18 @@ function initToolbar({ render } = {}) {
     if (!mapOnboardingHint || state.onboardingDismissed) return;
     state.onboardingDismissed = true;
     mapOnboardingHint.classList.add("is-hidden");
+    mapOnboardingHint.setAttribute("aria-hidden", "true");
+  };
+  const showOnboardingHint = () => {
+    if (!mapOnboardingHint) return;
+    state.onboardingDismissed = false;
+    mapOnboardingHint.classList.remove("is-hidden");
+    mapOnboardingHint.setAttribute("aria-hidden", "false");
   };
   state.dismissOnboardingHintFn = dismissOnboardingHint;
+  state.showOnboardingHintFn = showOnboardingHint;
 
-  const showToolHud = (message) => {
+  const showToolHud = (message, { duration = 1200 } = {}) => {
     if (!toolHudChip || !message) return;
     toolHudChip.textContent = message;
     toolHudChip.classList.remove("hidden", "is-hidden");
@@ -766,28 +827,66 @@ function initToolbar({ render } = {}) {
       globalThis.setTimeout(() => {
         toolHudChip.classList.add("hidden");
       }, 180);
-    }, 1200);
+    }, duration);
   };
 
-  const closeDockPopover = () => {
+  const emitTransientFeedback = (
+    message,
+    { tone = "info", duration = 1200, toast = false, title = "" } = {}
+  ) => {
+    if (!message) return;
+    showToolHud(message, { duration });
+    if (toast) {
+      showToast(message, {
+        title: title || undefined,
+        tone,
+        duration: Math.max(duration + 1200, 3200),
+      });
+    }
+  };
+
+  const getToolFeedbackLabel = (tool) => t(
+    tool === "eraser"
+      ? "Eraser"
+      : tool === "eyedropper"
+        ? "Eyedropper"
+        : "Fill",
+    "ui"
+  );
+
+  const getDockPopoverByKind = (kind) => (kind === "reference" ? dockReferencePopover : kind === "export" ? dockExportPopover : null);
+  const getDockPopoverTrigger = (kind) => (kind === "reference" ? dockReferenceBtn : kind === "export" ? dockExportBtn : null);
+
+  const closeDockPopover = ({ restoreFocus = false } = {}) => {
+    const activeKind = String(state.activeDockPopover || "");
+    const activePopover = getDockPopoverByKind(activeKind);
+    const activeTrigger = getDockPopoverTrigger(activeKind);
     state.activeDockPopover = "";
     dockReferencePopover?.classList.add("hidden");
     dockExportPopover?.classList.add("hidden");
+    dockReferencePopover?.setAttribute("aria-hidden", "true");
+    dockExportPopover?.setAttribute("aria-hidden", "true");
     dockReferenceBtn?.classList.remove("is-active");
     dockExportBtn?.classList.remove("is-active");
     dockReferenceBtn?.setAttribute("aria-expanded", "false");
     dockExportBtn?.setAttribute("aria-expanded", "false");
+    if (restoreFocus && activePopover) {
+      restoreOverlayTriggerFocus(activePopover, activeTrigger);
+    }
   };
   state.closeDockPopoverFn = closeDockPopover;
 
   const openDockPopover = (kind) => {
     const target = kind === "reference" ? dockReferencePopover : dockExportPopover;
+    const trigger = getDockPopoverTrigger(kind);
     if (!target) return;
     const nextKind = state.activeDockPopover === kind ? "" : kind;
     closeDockPopover();
     if (!nextKind) return;
     state.activeDockPopover = nextKind;
+    rememberOverlayTrigger(target, trigger);
     target.classList.remove("hidden");
+    target.setAttribute("aria-hidden", "false");
     if (nextKind === "reference") {
       dockReferenceBtn?.classList.add("is-active");
       dockReferenceBtn?.setAttribute("aria-expanded", "true");
@@ -795,6 +894,7 @@ function initToolbar({ render } = {}) {
       dockExportBtn?.classList.add("is-active");
       dockExportBtn?.setAttribute("aria-expanded", "true");
     }
+    focusOverlaySurface(target);
   };
 
   const bindDockPopoverDismiss = () => {
@@ -817,13 +917,25 @@ function initToolbar({ render } = {}) {
     });
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
+        let closedOverlay = false;
         if (state.activeDockPopover) {
-          closeDockPopover();
+          closeDockPopover({ restoreFocus: true });
+          closedOverlay = true;
         }
         if (!specialZoneEditorInline) {
-          closeSpecialZonePopover();
+          if (specialZonePopover && !specialZonePopover.classList.contains("hidden")) {
+            closeSpecialZonePopover();
+            restoreOverlayTriggerFocus(specialZonePopover, appearanceSpecialZoneBtn);
+            closedOverlay = true;
+          }
         }
-        closeScenarioGuidePopover();
+        if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
+          closeScenarioGuidePopover({ restoreFocus: true });
+          closedOverlay = true;
+        }
+        if (closedOverlay) {
+          event.preventDefault();
+        }
       }
     });
     dockPopoverCloseBound = true;
@@ -843,31 +955,6 @@ function initToolbar({ render } = {}) {
     mapContainer.classList.add(`tool-${state.currentTool || "fill"}`);
   };
 
-  const bindConfirmAction = (button, { key, idleLabel, confirmLabel, onConfirm }) => {
-    if (!button || button.dataset.confirmBound === "true") return;
-    let timerId = null;
-    const reset = () => {
-      if (timerId) globalThis.clearTimeout(timerId);
-      timerId = null;
-      delete button.dataset.confirmState;
-      button.classList.remove("is-danger-confirm");
-      button.textContent = idleLabel();
-    };
-    button.addEventListener("click", () => {
-      if (button.dataset.confirmState === key) {
-        reset();
-        onConfirm();
-        return;
-      }
-      button.dataset.confirmState = key;
-      button.classList.add("is-danger-confirm");
-      button.textContent = confirmLabel();
-      timerId = globalThis.setTimeout(reset, 3000);
-    });
-    button.dataset.confirmReset = "true";
-    button.dataset.confirmBound = "true";
-    button.resetConfirmState = reset;
-  };
   const renderDirty = (reason) => {
     markDirty(reason);
     if (render) render();
@@ -2109,6 +2196,11 @@ function initToolbar({ render } = {}) {
     if (zoomPercentInput && zoomPercentInput.dataset.editing !== "true") {
       zoomPercentInput.value = text;
     }
+    zoomPercentInput?.removeAttribute("aria-invalid");
+    if (zoomPercentInput) {
+      zoomPercentInput.dataset.zoomError = "";
+      zoomPercentInput.setCustomValidity("");
+    }
   }
   state.updateZoomUIFn = updateZoomUi;
 
@@ -2117,20 +2209,94 @@ function initToolbar({ render } = {}) {
     if (!normalized) return null;
     const percent = Number(normalized);
     if (!Number.isFinite(percent)) return null;
-    return clamp(percent, 100, 5000);
+    return percent;
   }
 
-  function commitZoomInputValue() {
+  function commitZoomInputValue({ announceInvalid = true } = {}) {
     if (!zoomPercentInput) return;
     const parsed = parseZoomInputValue(zoomPercentInput.value);
     zoomPercentInput.dataset.editing = "false";
-    if (parsed === null) {
+    if (parsed === null || parsed < 100 || parsed > 5000) {
+      const zoomErrorMessage = t("Zoom percentage must be between 100% and 5000%.", "ui");
+      zoomPercentInput.setAttribute("aria-invalid", "true");
+      zoomPercentInput.dataset.zoomError = "true";
+      zoomPercentInput.setCustomValidity(zoomErrorMessage);
+      if (announceInvalid) {
+        emitTransientFeedback(zoomErrorMessage, {
+          tone: "warning",
+          toast: true,
+          title: t("Invalid zoom", "ui"),
+          duration: 2400,
+        });
+      }
       updateZoomUi();
       return;
     }
-    setZoomPercent(parsed);
+    zoomPercentInput.removeAttribute("aria-invalid");
+    zoomPercentInput.dataset.zoomError = "";
+    zoomPercentInput.setCustomValidity("");
+    setZoomPercent(clamp(parsed, 100, 5000));
     updateZoomUi();
+    emitTransientFeedback(getZoomPercent(), { duration: 1000 });
   }
+
+  const runToolSelection = (tool, { dismissHint = true, feedbackLabel = "" } = {}) => {
+    const nextTool = tool || "fill";
+    state.currentTool = nextTool;
+    if (nextTool === "eyedropper") {
+      state.brushModeEnabled = false;
+      state.brushPanModifierActive = false;
+    }
+    updateToolUI();
+    if (dismissHint) {
+      dismissOnboardingHint();
+    }
+    emitTransientFeedback(feedbackLabel || getToolFeedbackLabel(nextTool));
+  };
+
+  const runBrushModeToggle = (nextValue = !state.brushModeEnabled, { dismissHint = true } = {}) => {
+    state.brushModeEnabled = !!nextValue;
+    if (state.brushModeEnabled && state.currentTool === "eyedropper") {
+      state.currentTool = "fill";
+    }
+    updateToolUI();
+    if (dismissHint) {
+      dismissOnboardingHint();
+    }
+    emitTransientFeedback(t(
+      state.brushModeEnabled ? "Brush On · Shift+Drag to pan" : "Brush Off",
+      "ui"
+    ));
+  };
+
+  const runHistoryAction = (kind) => {
+    if (kind === "redo") {
+      redoHistory();
+      emitTransientFeedback(t("Redo", "ui"), { duration: 900 });
+      return;
+    }
+    undoHistory();
+    emitTransientFeedback(t("Undo", "ui"), { duration: 900 });
+  };
+
+  const runZoomStep = (delta) => {
+    dismissOnboardingHint();
+    zoomByStep(delta);
+    emitTransientFeedback(getZoomPercent(), { duration: 900 });
+  };
+
+  const runZoomReset = () => {
+    dismissOnboardingHint();
+    resetZoomToFit();
+    emitTransientFeedback(getZoomPercent(), { duration: 1000 });
+  };
+
+  state.runToolSelectionFn = runToolSelection;
+  state.runBrushModeToggleFn = runBrushModeToggle;
+  state.runHistoryActionFn = runHistoryAction;
+  state.runZoomStepFn = runZoomStep;
+  state.runZoomResetFn = runZoomReset;
+  state.commitZoomInputValueFn = commitZoomInputValue;
 
   state.updateToolbarInputsFn = () => {
     if (internalBorderColor) {
@@ -2243,33 +2409,14 @@ function initToolbar({ render } = {}) {
 
   toolButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      state.currentTool = button.dataset.tool || "fill";
-      if (state.currentTool === "eyedropper") {
-        state.brushModeEnabled = false;
-      }
-      updateToolUI();
-      dismissOnboardingHint();
-      showToolHud(t(
-        state.currentTool === "eraser"
-          ? "Eraser"
-          : state.currentTool === "eyedropper"
-            ? "Eyedropper"
-            : "Fill",
-        "ui"
-      ));
+      runToolSelection(button.dataset.tool || "fill");
     });
   });
 
   if (brushModeBtn && !brushModeBtn.dataset.bound) {
     brushModeBtn.addEventListener("click", () => {
       if (brushModeBtn.disabled) return;
-      state.brushModeEnabled = !state.brushModeEnabled;
-      updateToolUI();
-      dismissOnboardingHint();
-      showToolHud(t(
-        state.brushModeEnabled ? "Brush On · Shift+Drag to pan" : "Brush Off",
-        "ui"
-      ));
+      runBrushModeToggle();
     });
     brushModeBtn.dataset.bound = "true";
   }
@@ -2283,38 +2430,35 @@ function initToolbar({ render } = {}) {
 
   if (undoBtn && !undoBtn.dataset.bound) {
     undoBtn.addEventListener("click", () => {
-      undoHistory();
+      runHistoryAction("undo");
     });
     undoBtn.dataset.bound = "true";
   }
 
   if (redoBtn && !redoBtn.dataset.bound) {
     redoBtn.addEventListener("click", () => {
-      redoHistory();
+      runHistoryAction("redo");
     });
     redoBtn.dataset.bound = "true";
   }
 
   if (zoomInBtn && !zoomInBtn.dataset.bound) {
     zoomInBtn.addEventListener("click", () => {
-      dismissOnboardingHint();
-      zoomByStep(1);
+      runZoomStep(1);
     });
     zoomInBtn.dataset.bound = "true";
   }
 
   if (zoomOutBtn && !zoomOutBtn.dataset.bound) {
     zoomOutBtn.addEventListener("click", () => {
-      dismissOnboardingHint();
-      zoomByStep(-1);
+      runZoomStep(-1);
     });
     zoomOutBtn.dataset.bound = "true";
   }
 
   if (zoomResetBtn && !zoomResetBtn.dataset.bound) {
     zoomResetBtn.addEventListener("click", () => {
-      dismissOnboardingHint();
-      resetZoomToFit();
+      runZoomReset();
     });
     zoomResetBtn.dataset.bound = "true";
   }
@@ -2377,6 +2521,8 @@ function initToolbar({ render } = {}) {
   }
 
   if (dockReferenceBtn && !dockReferenceBtn.dataset.bound) {
+    dockReferenceBtn.setAttribute("aria-haspopup", "dialog");
+    dockReferenceBtn.setAttribute("aria-controls", "dockReferencePopover");
     dockReferenceBtn.addEventListener("click", () => {
       openDockPopover("reference");
     });
@@ -2384,6 +2530,8 @@ function initToolbar({ render } = {}) {
   }
 
   if (dockExportBtn && !dockExportBtn.dataset.bound) {
+    dockExportBtn.setAttribute("aria-haspopup", "dialog");
+    dockExportBtn.setAttribute("aria-controls", "dockExportPopover");
     dockExportBtn.addEventListener("click", () => {
       openDockPopover("export");
     });
@@ -2426,6 +2574,8 @@ function initToolbar({ render } = {}) {
   }
 
   if (scenarioGuideBtn && !scenarioGuideBtn.dataset.bound) {
+    scenarioGuideBtn.setAttribute("aria-haspopup", "dialog");
+    scenarioGuideBtn.setAttribute("aria-controls", "scenarioGuidePopover");
     scenarioGuideBtn.addEventListener("click", () => {
       toggleScenarioGuidePopover();
     });
@@ -2433,6 +2583,8 @@ function initToolbar({ render } = {}) {
   }
 
   if (appearanceSpecialZoneBtn && !appearanceSpecialZoneBtn.dataset.bound) {
+    appearanceSpecialZoneBtn.setAttribute("aria-haspopup", "dialog");
+    appearanceSpecialZoneBtn.setAttribute("aria-controls", "specialZonePopover");
     appearanceSpecialZoneBtn.addEventListener("click", () => {
       openSpecialZonePopover();
     });
@@ -3242,19 +3394,34 @@ function initToolbar({ render } = {}) {
       if (render) render();
     });
   }
-  bindConfirmAction(specialZoneDeleteBtn, {
-    key: "special-zone-delete",
-    idleLabel: () => t("Delete Selected", "ui"),
-    confirmLabel: () => t("Confirm Delete", "ui"),
-    onConfirm: () => {
+  if (specialZoneDeleteBtn && !specialZoneDeleteBtn.dataset.bound) {
+    specialZoneDeleteBtn.addEventListener("click", async () => {
+      if (!state.specialZoneEditor?.selectedId) return;
+      const confirmed = await showAppDialog({
+        title: t("Delete Selected", "ui"),
+        message: t("Delete the selected special region?", "ui"),
+        details: t(
+          "This removes the selected manual zone from the current project. You can undo the deletion from history.",
+          "ui"
+        ),
+        confirmLabel: t("Delete Zone", "ui"),
+        cancelLabel: t("Cancel", "ui"),
+        tone: "warning",
+      });
+      if (!confirmed) return;
       deleteSelectedManualSpecialZone();
       if (typeof state.updateSpecialZoneEditorUIFn === "function") {
         state.updateSpecialZoneEditorUIFn();
       }
       markDirty("special-zone-delete");
       if (render) render();
-    },
-  });
+      showToast(t("Selected special region was deleted.", "ui"), {
+        title: t("Delete Selected", "ui"),
+        tone: "warning",
+      });
+    });
+    specialZoneDeleteBtn.dataset.bound = "true";
+  }
 
   if (presetPolitical) {
     presetPolitical.addEventListener("click", async () => {
@@ -3344,11 +3511,20 @@ function initToolbar({ render } = {}) {
     });
   }
 
-  bindConfirmAction(presetClear, {
-    key: "clear-map",
-    idleLabel: () => t("Clear Map", "ui"),
-    confirmLabel: () => t("Confirm Clear", "ui"),
-    onConfirm: () => {
+  if (presetClear && !presetClear.dataset.bound) {
+    presetClear.addEventListener("click", async () => {
+      const confirmed = await showAppDialog({
+        title: t("Clear Map", "ui"),
+        message: t("Clear the current map?", "ui"),
+        details: t(
+          "This removes current paint overrides and, in political mode, restores ownership to its baseline. You can undo the clear from history.",
+          "ui"
+        ),
+        confirmLabel: t("Clear Map", "ui"),
+        cancelLabel: t("Keep Current Map", "ui"),
+        tone: "warning",
+      });
+      if (!confirmed) return;
       const featureIds = Object.keys(state.visualOverrides || {});
       const ownerCodes = Array.from(new Set([
         ...Object.keys(state.sovereignBaseColors || {}),
@@ -3396,8 +3572,21 @@ function initToolbar({ render } = {}) {
           affectsSovereignty: state.paintMode === "sovereignty",
         },
       });
-    },
-  });
+      showToast(t("Map cleared. Undo is available from history.", "ui"), {
+        title: t("Clear Map", "ui"),
+        tone: "warning",
+        actionLabel: t("Undo", "ui"),
+        onAction: () => {
+          if (typeof state.runHistoryActionFn === "function") {
+            state.runHistoryActionFn("undo");
+            return;
+          }
+          undoHistory();
+        },
+      });
+    });
+    presetClear.dataset.bound = "true";
+  }
 
   if (themeSelect) {
     populatePaletteSourceOptions(themeSelect);
@@ -3817,16 +4006,26 @@ function initToolbar({ render } = {}) {
   closeDockPopover();
   closeSpecialZonePopover();
   closeScenarioGuidePopover();
-  if (mapContainer && !mapContainer.dataset.onboardingBound) {
-    ["pointerdown", "wheel"].forEach((eventName) => {
-      mapContainer.addEventListener(eventName, dismissOnboardingHint, { passive: true });
-    });
-    mapContainer.dataset.onboardingBound = "true";
+  if (dockReferencePopover) {
+    dockReferencePopover.setAttribute("aria-hidden", "true");
   }
-  if (mapOnboardingHint && !state.onboardingDismissed) {
-    globalThis.setTimeout(() => {
+  if (dockExportPopover) {
+    dockExportPopover.setAttribute("aria-hidden", "true");
+  }
+  if (scenarioGuidePopover) {
+    scenarioGuidePopover.setAttribute("aria-hidden", "true");
+  }
+  if (specialZonePopover) {
+    specialZonePopover.setAttribute("aria-hidden", specialZonePopover.classList.contains("hidden") ? "true" : "false");
+  }
+  if (mapOnboardingHint) {
+    mapOnboardingHint.setAttribute("role", "status");
+    mapOnboardingHint.setAttribute("aria-live", "polite");
+    if (state.onboardingDismissed) {
       dismissOnboardingHint();
-    }, 3000);
+    } else {
+      showOnboardingHint();
+    }
   }
   updateUIText();
 }

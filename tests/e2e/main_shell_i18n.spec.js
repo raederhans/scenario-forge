@@ -22,6 +22,9 @@ test("main shell static i18n updates visible labels and aria text", async ({ pag
   const dockCollapseBtn = page.locator("#dockCollapseBtn");
   const lakeLink = page.locator("#lblLakeLinkToOcean");
   const textureInfo = page.locator("#lblTextureInfo");
+  const workspaceHeading = page.locator(".sidebar-shell-heading").first();
+  const dockKicker = page.locator(".dock-shell-kicker");
+  const dockHint = page.locator(".dock-shell-hint");
 
   await expect(currentTool).toHaveText("Tools");
   await expect(leftPanelToggle).toHaveText("Panels");
@@ -32,6 +35,9 @@ test("main shell static i18n updates visible labels and aria text", async ({ pag
   await expect(dockCollapseBtn).toHaveAttribute("aria-label", "Collapse quick dock");
   await expect(lakeLink).toHaveText("Link Lakes To Ocean");
   await expect(textureInfo).toHaveText("Texture Overlay");
+  await expect(workspaceHeading).toHaveText("Workspace");
+  await expect(dockKicker).toHaveText("Quick Actions");
+  await expect(dockHint).toHaveText("Current tool, paint mode, and map actions");
 
   await page.locator("#btnToggleLang").click();
 
@@ -44,4 +50,7 @@ test("main shell static i18n updates visible labels and aria text", async ({ pag
   await expect(dockCollapseBtn).not.toHaveAttribute("aria-label", "Collapse quick dock");
   await expect(lakeLink).not.toHaveText("Link Lakes To Ocean");
   await expect(textureInfo).not.toHaveText("Texture Overlay");
+  await expect(workspaceHeading).not.toHaveText("Workspace");
+  await expect(dockKicker).not.toHaveText("Quick Actions");
+  await expect(dockHint).not.toHaveText("Current tool, paint mode, and map actions");
 });

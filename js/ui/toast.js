@@ -1,3 +1,5 @@
+import { t } from "./i18n.js";
+
 let toastViewport = null;
 let toastCounter = 0;
 const TOAST_EXIT_DELAY_MS = 180;
@@ -16,7 +18,10 @@ function normalizeTone(tone) {
 
 function resolveToastDuration(duration, tone) {
   const explicitDuration = Number(duration);
-  if (Number.isFinite(explicitDuration) && explicitDuration > 0) {
+  if (Number.isFinite(explicitDuration)) {
+    if (explicitDuration <= 0) {
+      return null;
+    }
     return Math.max(1200, explicitDuration);
   }
   if (tone === "error") return 5600;
@@ -34,7 +39,17 @@ function dismissToast(toast) {
   }, TOAST_EXIT_DELAY_MS);
 }
 
-function showToast(message, { title = "", tone = "info", duration = 3000 } = {}) {
+function showToast(
+  message,
+  {
+    title = "",
+    tone = "info",
+    duration = undefined,
+    actionLabel = "",
+    onAction = null,
+    dismissOnAction = true,
+  } = {}
+) {
   if (!toastViewport) {
     initToast();
   }
@@ -46,6 +61,7 @@ function showToast(message, { title = "", tone = "info", duration = 3000 } = {})
   const normalizedTone = normalizeTone(tone);
   toast.className = `toast toast-${normalizedTone}`;
   toast.dataset.toastId = `toast-${Date.now()}-${toastCounter += 1}`;
+  toast.setAttribute("role", normalizedTone === "error" || normalizedTone === "warning" ? "alert" : "status");
 
   const content = document.createElement("div");
   content.className = "toast-content";
@@ -62,11 +78,33 @@ function showToast(message, { title = "", tone = "info", duration = 3000 } = {})
   messageEl.textContent = text;
   content.appendChild(messageEl);
 
+  const normalizedActionLabel = String(actionLabel || "").trim();
+  if (normalizedActionLabel && typeof onAction === "function") {
+    const actionButton = document.createElement("button");
+    actionButton.type = "button";
+    actionButton.className = "toast-action";
+    actionButton.textContent = normalizedActionLabel;
+    actionButton.addEventListener("click", async () => {
+      actionButton.disabled = true;
+      try {
+        await onAction();
+      } catch (error) {
+        console.error("Toast action failed:", error);
+      } finally {
+        actionButton.disabled = false;
+      }
+      if (dismissOnAction) {
+        dismissToast(toast);
+      }
+    });
+    content.appendChild(actionButton);
+  }
+
   toast.appendChild(content);
   const dismissButton = document.createElement("button");
   dismissButton.type = "button";
   dismissButton.className = "toast-dismiss";
-  dismissButton.setAttribute("aria-label", "Dismiss notification");
+  dismissButton.setAttribute("aria-label", t("Dismiss notification", "ui"));
   dismissButton.textContent = "×";
   dismissButton.addEventListener("click", () => {
     dismissToast(toast);
@@ -75,9 +113,13 @@ function showToast(message, { title = "", tone = "info", duration = 3000 } = {})
   toastViewport.appendChild(toast);
 
   const normalizedDuration = resolveToastDuration(duration, normalizedTone);
-  globalThis.setTimeout(() => {
-    dismissToast(toast);
-  }, normalizedDuration);
+  if (normalizedDuration !== null) {
+    globalThis.setTimeout(() => {
+      dismissToast(toast);
+    }, normalizedDuration);
+  }
+
+  toast.dismiss = () => dismissToast(toast);
 
   return toast;
 }

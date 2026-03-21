@@ -13,7 +13,7 @@ import { ColorManager } from "../core/color_manager.js";
 import * as mapRenderer from "../core/map_renderer.js";
 import { applyCountryColor, resetCountryColors } from "../core/logic.js";
 import { FileManager } from "../core/file_manager.js";
-import { captureHistoryState, clearHistory, pushHistoryEntry } from "../core/history_manager.js";
+import { canUndoHistory, captureHistoryState, clearHistory, pushHistoryEntry, undoHistory } from "../core/history_manager.js";
 import { LegendManager } from "../core/legend_manager.js";
 import {
   applyScenarioById,
@@ -27,6 +27,7 @@ import {
 } from "../core/scenario_manager.js";
 import { getGeoFeatureDisplayLabel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
+import { showAppDialog } from "./app_dialog.js";
 import { initDevWorkspace } from "./dev_workspace.js";
 import {
   setFeatureOwnerCodes,
@@ -5085,24 +5086,19 @@ function initSidebar({ render } = {}) {
   }
 
   if (resetBtn && !resetBtn.dataset.bound) {
-    let resetConfirmTimer = null;
-    resetBtn.addEventListener("click", () => {
-      if (resetBtn.dataset.confirmState === "reset-country-colors") {
-        resetBtn.dataset.confirmState = "";
-        resetBtn.classList.remove("is-danger-confirm");
-        resetBtn.textContent = t("Reset Country Colors", "ui");
-        if (resetConfirmTimer) globalThis.clearTimeout(resetConfirmTimer);
-      } else {
-        resetBtn.dataset.confirmState = "reset-country-colors";
-        resetBtn.classList.add("is-danger-confirm");
-        resetBtn.textContent = t("Confirm Reset", "ui");
-        resetConfirmTimer = globalThis.setTimeout(() => {
-          resetBtn.dataset.confirmState = "";
-          resetBtn.classList.remove("is-danger-confirm");
-          resetBtn.textContent = t("Reset Country Colors", "ui");
-        }, 3000);
-        return;
-      }
+    resetBtn.addEventListener("click", async () => {
+      const confirmed = await showAppDialog({
+        title: t("Reset Country Colors", "ui"),
+        message: t("Reset all country colors and clear visual overrides?", "ui"),
+        details: t(
+          "This removes manual color changes from the current map. You can undo the reset from the toast that follows.",
+          "ui"
+        ),
+        confirmLabel: t("Reset Colors", "ui"),
+        cancelLabel: t("Keep Current Colors", "ui"),
+        tone: "warning",
+      });
+      if (!confirmed) return;
       resetCountryColors();
       markDirty("reset-country-colors");
       if (typeof state.renderCountryListFn === "function") {
@@ -5112,6 +5108,22 @@ function initSidebar({ render } = {}) {
         state.renderNowFn();
       }
       scheduleAdaptiveInspectorHeights();
+      showToast(t("Country colors were reset.", "ui"), {
+        title: t("Colors reset", "ui"),
+        tone: "warning",
+        duration: 7200,
+        actionLabel: canUndoHistory() ? t("Undo", "ui") : "",
+        onAction: canUndoHistory()
+          ? async () => {
+            if (!undoHistory()) return;
+            scheduleAdaptiveInspectorHeights();
+            showToast(t("Country colors were restored.", "ui"), {
+              title: t("Undo applied", "ui"),
+              tone: "success",
+            });
+          }
+          : null,
+      });
     });
     resetBtn.dataset.bound = "true";
   }
@@ -5124,11 +5136,19 @@ function initSidebar({ render } = {}) {
   }
 
   if (uploadProjectBtn && projectFileInput && !uploadProjectBtn.dataset.bound) {
-    uploadProjectBtn.addEventListener("click", () => {
+    uploadProjectBtn.addEventListener("click", async () => {
       if (state.isDirty) {
-        const shouldContinue = globalThis.confirm(
-          t("You have unsaved changes. Loading a project will replace the current map.", "ui")
-        );
+        const shouldContinue = await showAppDialog({
+          title: t("Load Project", "ui"),
+          message: t("You have unsaved changes. Loading a project will replace the current map.", "ui"),
+          details: t(
+            "Continue only if you are ready to discard the current working state or have already exported it.",
+            "ui"
+          ),
+          confirmLabel: t("Discard and Load", "ui"),
+          cancelLabel: t("Stay on Current Map", "ui"),
+          tone: "warning",
+        });
         if (!shouldContinue) return;
       }
       projectFileInput.click();
@@ -5155,9 +5175,17 @@ function initSidebar({ render } = {}) {
           const validation = await validateImportedScenarioBaseline(data.scenario);
           if (!validation.ok) {
             const shouldContinue = validation.reason === "baseline_mismatch"
-              ? globalThis.confirm(
-                `${validation.message}\n\n${t("Continue loading this project anyway?", "ui")}`
-              )
+              ? await showAppDialog({
+                title: t("Scenario Baseline Mismatch", "ui"),
+                message: validation.message,
+                details: t(
+                  "The saved project was created against a different scenario baseline. Continue only if you are comfortable loading it against current assets.",
+                  "ui"
+                ),
+                confirmLabel: t("Load Anyway", "ui"),
+                cancelLabel: t("Cancel Import", "ui"),
+                tone: "warning",
+              })
               : false;
             if (!shouldContinue) {
               const error = new Error("Project import cancelled.");
