@@ -8,6 +8,7 @@ import unittest
 import geopandas as gpd
 from shapely.geometry import Polygon
 
+from tools.check_scenario_contracts import validate_publish_bundle_dir
 from tools.patch_tno_1962_bundle import (
     MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
     MANUAL_SYNC_POLICY_STRICT_BLOCK,
@@ -21,6 +22,7 @@ from tools.patch_tno_1962_bundle import (
     resolve_publish_filenames,
     topology_object_to_gdf,
     validate_geo_locale_manual_overrides,
+    write_bundle_stage,
 )
 
 
@@ -31,6 +33,71 @@ def _square(x: float, y: float, size: float = 1.0) -> Polygon:
         (x + size, y + size),
         (x, y + size),
     ])
+
+
+def _write_publish_bundle_dir(
+    target_dir: Path,
+    *,
+    owners: dict[str, str] | None = None,
+    controllers: dict[str, str] | None = None,
+    cores: dict[str, object] | None = None,
+    runtime_feature_ids: list[str] | None = None,
+    manifest_feature_count: int | None = None,
+) -> None:
+    target_dir.mkdir(parents=True, exist_ok=True)
+    owners_payload = owners if owners is not None else {"F-1": "AAA"}
+    controllers_payload = controllers if controllers is not None else {"F-1": "AAA"}
+    cores_payload = cores if cores is not None else {"F-1": ["AAA"]}
+    runtime_ids = runtime_feature_ids if runtime_feature_ids is not None else ["F-1"]
+    (target_dir / "manifest.json").write_text(
+        json.dumps(
+            {
+                "scenario_id": "test_bundle",
+                "summary": {
+                    "feature_count": manifest_feature_count if manifest_feature_count is not None else len(owners_payload),
+                },
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    (target_dir / "owners.by_feature.json").write_text(
+        json.dumps({"owners": owners_payload}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    (target_dir / "controllers.by_feature.json").write_text(
+        json.dumps({"controllers": controllers_payload}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    (target_dir / "cores.by_feature.json").write_text(
+        json.dumps({"cores": cores_payload}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    (target_dir / "runtime_topology.topo.json").write_text(
+        json.dumps(
+            {
+                "type": "Topology",
+                "objects": {
+                    "political": {
+                        "type": "GeometryCollection",
+                        "geometries": [
+                            {
+                                "type": "Polygon",
+                                "properties": {"id": feature_id},
+                                "arcs": [],
+                            }
+                            for feature_id in runtime_ids
+                        ],
+                    }
+                },
+                "arcs": [],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    (target_dir / "countries.json").write_text(json.dumps({"countries": {"AAA": {"tag": "AAA"}}}), encoding="utf-8")
+    (target_dir / "geo_locale_patch.json").write_text(json.dumps({"geo": {}}), encoding="utf-8")
 
 
 class TnoBundleBuilderTest(unittest.TestCase):
@@ -391,6 +458,66 @@ class TnoBundleBuilderTest(unittest.TestCase):
                     report_dir=root / "reports",
                     backup_root=root / "backups",
                 )
+
+    def test_validate_publish_bundle_dir_accepts_shell_fallback_runtime_only_features(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            bundle_dir = Path(tmp_dir) / "bundle"
+            _write_publish_bundle_dir(
+                bundle_dir,
+                owners={"F-1": "AAA"},
+                controllers={"F-1": "AAA"},
+                cores={"F-1": ["AAA"]},
+                runtime_feature_ids=["F-1", "RU_ARCTIC_FB_1"],
+                manifest_feature_count=1,
+            )
+
+            errors = validate_publish_bundle_dir(bundle_dir)
+
+            self.assertEqual(errors, [])
+
+    def test_validate_publish_bundle_dir_rejects_strict_contract_failures(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            bundle_dir = Path(tmp_dir) / "bundle"
+            _write_publish_bundle_dir(
+                bundle_dir,
+                owners={"F-1": "AAA"},
+                controllers={"F-1": "AAA", "F-2": "AAA"},
+                cores={"F-1": ["AAA"], "F-2": "AAA"},
+                runtime_feature_ids=["F-1", "F-2", "BAD-1"],
+                manifest_feature_count=9,
+            )
+
+            errors = validate_publish_bundle_dir(bundle_dir)
+
+            self.assertTrue(any("owners/controllers feature keysets must match" in error for error in errors))
+            self.assertTrue(any("owners/cores feature keysets must match" in error for error in errors))
+            self.assertTrue(any("must store arrays for every feature" in error for error in errors))
+            self.assertTrue(any("feature_count must equal owners feature count" in error for error in errors))
+            self.assertTrue(any("may only exceed the feature maps with shell fallback ids" in error for error in errors))
+
+    def test_write_bundle_stage_blocks_publish_when_strict_checkpoint_validation_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = root / "scenario"
+            checkpoint_dir = root / "checkpoint"
+            _write_publish_bundle_dir(
+                checkpoint_dir,
+                owners={"F-1": "AAA"},
+                controllers={"F-1": "AAA", "F-2": "AAA"},
+                cores={"F-1": ["AAA"], "F-2": ["AAA"]},
+                runtime_feature_ids=["F-1", "F-2"],
+                manifest_feature_count=1,
+            )
+
+            with self.assertRaisesRegex(ValueError, "Strict bundle validation failed"):
+                write_bundle_stage(
+                    scenario_dir,
+                    checkpoint_dir,
+                    publish_scope="scenario_data",
+                    manual_sync_policy=MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
+                )
+
+            self.assertFalse((scenario_dir / "owners.by_feature.json").exists())
 
 
 if __name__ == "__main__":

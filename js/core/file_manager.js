@@ -102,6 +102,27 @@ function normalizeBoundaryVariantSelectionMap(rawMap) {
   );
 }
 
+function normalizeScenarioImportAudit(rawAudit, { scenarioId = "" } = {}) {
+  if (!rawAudit || typeof rawAudit !== "object") return null;
+  const normalizedScenarioId = String(rawAudit.scenarioId || scenarioId || "").trim();
+  const savedVersion = Number(rawAudit.savedVersion || 1) || 1;
+  const currentVersion = Number(rawAudit.currentVersion || savedVersion || 1) || 1;
+  const savedBaselineHash = String(rawAudit.savedBaselineHash || "").trim();
+  const currentBaselineHash = String(rawAudit.currentBaselineHash || "").trim();
+  const acceptedAt = String(rawAudit.acceptedAt || "").trim();
+  if (!normalizedScenarioId || !savedBaselineHash || !currentBaselineHash || !acceptedAt) {
+    return null;
+  }
+  return {
+    scenarioId: normalizedScenarioId,
+    savedVersion,
+    currentVersion,
+    savedBaselineHash,
+    currentBaselineHash,
+    acceptedAt,
+  };
+}
+
 class FileManager {
   static exportProject(appState) {
     if (!appState) return;
@@ -114,6 +135,7 @@ class FileManager {
       waterRegionOverrides: appState.waterRegionOverrides || {},
       specialRegionOverrides: appState.specialRegionOverrides || {},
       sovereigntyByFeatureId: appState.sovereigntyByFeatureId || {},
+      scenarioControllersByFeatureId: appState.scenarioControllersByFeatureId || {},
       paintMode: appState.paintMode || "visual",
       interactionGranularity: normalizeInteractionGranularity(appState.interactionGranularity),
       batchFillScope: normalizeBatchFillScope(appState.batchFillScope),
@@ -161,6 +183,9 @@ class FileManager {
           version: appState.activeScenarioManifest?.version || 1,
           baselineHash: appState.scenarioBaselineHash || "",
           viewMode: String(appState.scenarioViewMode || "ownership"),
+          importAudit: normalizeScenarioImportAudit(appState.scenarioImportAudit, {
+            scenarioId: appState.activeScenarioId,
+          }),
         }
         : null,
       releasableBoundaryVariantByTag: normalizeBoundaryVariantSelectionMap(appState.releasableBoundaryVariantByTag),
@@ -224,6 +249,11 @@ class FileManager {
         }
         if (!data.sovereigntyByFeatureId || typeof data.sovereigntyByFeatureId !== "object") {
           data.sovereigntyByFeatureId = {};
+        }
+        if (!data.scenarioControllersByFeatureId || typeof data.scenarioControllersByFeatureId !== "object") {
+          data.scenarioControllersByFeatureId = null;
+        } else {
+          data.scenarioControllersByFeatureId = { ...data.scenarioControllersByFeatureId };
         }
         data.interactionGranularity = normalizeInteractionGranularity(data.interactionGranularity);
         data.batchFillScope = normalizeBatchFillScope(data.batchFillScope);
@@ -291,6 +321,9 @@ class FileManager {
             viewMode: String(data.scenario.viewMode || "ownership").trim().toLowerCase() === "frontline"
               ? "frontline"
               : "ownership",
+            importAudit: normalizeScenarioImportAudit(data.scenario.importAudit, {
+              scenarioId: data.scenario.id,
+            }),
           };
           if (!data.scenario.id) {
             data.scenario = null;

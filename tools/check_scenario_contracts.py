@@ -42,6 +42,7 @@ SUSPICIOUS_LOCALE_TRANSLATIONS = {
     "\u4e00\u4e2a\u65e5\u5fd7",
     "\u591a\u4e91",
 }
+STRICT_RUNTIME_ONLY_FEATURE_ID_PREFIXES = ("RU_ARCTIC_FB_",)
 
 
 def parse_args() -> argparse.Namespace:
@@ -61,6 +62,11 @@ def parse_args() -> argparse.Namespace:
         action="append",
         default=[],
         help="Optional specific scenario directory to validate. May be repeated.",
+    )
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Enable strict bundle/runtime validation for publish-ready scenario or checkpoint directories.",
     )
     return parser.parse_args()
 
@@ -287,9 +293,138 @@ def validate_locale_patch(
         )
 
 
+def _load_required_local_json(path: Path, errors: list[str]) -> dict | None:
+    if not path.exists():
+        errors.append(f"Required file is missing: {path}")
+        return None
+    try:
+        return load_json(path)
+    except Exception as exc:
+        errors.append(str(exc))
+        return None
+
+
+def _extract_runtime_political_feature_ids(runtime_payload: dict, errors: list[str], runtime_path: Path) -> set[str]:
+    objects = runtime_payload.get("objects")
+    if not isinstance(objects, dict):
+        errors.append(f"runtime_topology payload must contain objects at {runtime_path}.")
+        return set()
+    political = objects.get("political")
+    if not isinstance(political, dict):
+        errors.append(f"runtime_topology payload must contain objects.political at {runtime_path}.")
+        return set()
+    geometries = political.get("geometries")
+    if not isinstance(geometries, list):
+        errors.append(f"runtime_topology payload must contain objects.political.geometries at {runtime_path}.")
+        return set()
+    feature_ids: set[str] = set()
+    missing_ids = 0
+    for geometry in geometries:
+        if not isinstance(geometry, dict):
+            continue
+        props = geometry.get("properties") if isinstance(geometry.get("properties"), dict) else {}
+        feature_id = str(props.get("id") or geometry.get("id") or "").strip()
+        if not feature_id:
+            missing_ids += 1
+            continue
+        feature_ids.add(feature_id)
+    if missing_ids:
+        errors.append(
+            f"runtime_topology political geometries must expose stable ids. Missing ids on {missing_ids} geometries."
+        )
+    return feature_ids
+
+
+def validate_strict_bundle_contract(target_dir: Path, errors: list[str]) -> None:
+    manifest = _load_required_local_json(target_dir / "manifest.json", errors)
+    owners_payload = _load_required_local_json(target_dir / "owners.by_feature.json", errors)
+    controllers_payload = _load_required_local_json(target_dir / "controllers.by_feature.json", errors)
+    cores_payload = _load_required_local_json(target_dir / "cores.by_feature.json", errors)
+    runtime_payload = _load_required_local_json(target_dir / "runtime_topology.topo.json", errors)
+    if any(payload is None for payload in (manifest, owners_payload, controllers_payload, cores_payload, runtime_payload)):
+        return
+
+    owners = owners_payload.get("owners")
+    controllers = controllers_payload.get("controllers")
+    cores = cores_payload.get("cores")
+    if not isinstance(owners, dict):
+        errors.append("owners.by_feature.json owners payload must be an object in strict mode.")
+        return
+    if not isinstance(controllers, dict):
+        errors.append("controllers.by_feature.json controllers payload must be an object in strict mode.")
+        return
+    if not isinstance(cores, dict):
+        errors.append("cores.by_feature.json cores payload must be an object in strict mode.")
+        return
+
+    non_list_core_ids = [feature_id for feature_id, value in cores.items() if not isinstance(value, list)]
+    if non_list_core_ids:
+        errors.append(
+            "cores.by_feature.json must store arrays for every feature in strict mode. "
+            f"Sample: {non_list_core_ids[:10]}."
+        )
+
+    owner_ids = {str(feature_id).strip() for feature_id in owners.keys() if str(feature_id).strip()}
+    controller_ids = {str(feature_id).strip() for feature_id in controllers.keys() if str(feature_id).strip()}
+    core_ids = {str(feature_id).strip() for feature_id in cores.keys() if str(feature_id).strip()}
+    if owner_ids != controller_ids:
+        errors.append(
+            "owners/controllers feature keysets must match in strict mode. "
+            f"owners={len(owner_ids)} controllers={len(controller_ids)} "
+            f"controller_only={sorted(controller_ids - owner_ids)[:10]} "
+            f"owner_only={sorted(owner_ids - controller_ids)[:10]}."
+        )
+    if owner_ids != core_ids:
+        errors.append(
+            "owners/cores feature keysets must match in strict mode. "
+            f"owners={len(owner_ids)} cores={len(core_ids)} "
+            f"core_only={sorted(core_ids - owner_ids)[:10]} "
+            f"owner_only={sorted(owner_ids - core_ids)[:10]}."
+        )
+
+    manifest_summary = manifest.get("summary") if isinstance(manifest.get("summary"), dict) else {}
+    manifest_feature_count = manifest_summary.get("feature_count")
+    try:
+        expected_feature_count = int(manifest_feature_count)
+    except (TypeError, ValueError):
+        errors.append(f"manifest.summary.feature_count must be an integer in strict mode. Found {manifest_feature_count!r}.")
+        expected_feature_count = None
+    if expected_feature_count is not None and expected_feature_count != len(owner_ids):
+        errors.append(
+            "manifest.summary.feature_count must equal owners feature count in strict mode. "
+            f"manifest={expected_feature_count} owners={len(owner_ids)}."
+        )
+
+    runtime_feature_ids = _extract_runtime_political_feature_ids(runtime_payload, errors, target_dir / "runtime_topology.topo.json")
+    missing_runtime_ids = sorted(owner_ids - runtime_feature_ids)
+    if missing_runtime_ids:
+        errors.append(
+            "runtime_topology is missing feature ids referenced by owners/controllers/cores in strict mode. "
+            f"Sample: {missing_runtime_ids[:10]}."
+        )
+    extra_runtime_ids = runtime_feature_ids - owner_ids
+    illegal_runtime_only_ids = sorted(
+        feature_id
+        for feature_id in extra_runtime_ids
+        if not any(feature_id.startswith(prefix) for prefix in STRICT_RUNTIME_ONLY_FEATURE_ID_PREFIXES)
+    )
+    if illegal_runtime_only_ids:
+        errors.append(
+            "runtime_topology political geometries may only exceed the feature maps with shell fallback ids in strict mode. "
+            f"Sample: {illegal_runtime_only_ids[:10]}."
+        )
+
+
+def validate_publish_bundle_dir(target_dir: Path) -> list[str]:
+    errors: list[str] = []
+    validate_strict_bundle_contract(target_dir, errors)
+    return errors
+
+
 def validate_scenario_contract(
     scenario_dir: Path,
     duplicate_scenario_dirs: dict[str, list[str]],
+    strict: bool = False,
 ) -> tuple[list[str], list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
@@ -320,6 +455,8 @@ def validate_scenario_contract(
     validate_manifest_urls(expected_scenario_id, manifest, errors)
     validate_runtime_capitals(expected_scenario_id, manifest, errors)
     validate_locale_patch(expected_scenario_id, manifest, errors, warnings)
+    if strict:
+        validate_strict_bundle_contract(scenario_dir, errors)
     return errors, warnings
 
 
@@ -354,7 +491,7 @@ def main() -> int:
     duplicate_scenario_dirs = collect_duplicate_scenario_dirs(discover_scenario_dirs(scenarios_root, []))
     any_errors = False
     for scenario_dir in scenario_dirs:
-        errors, warnings = validate_scenario_contract(scenario_dir, duplicate_scenario_dirs)
+        errors, warnings = validate_scenario_contract(scenario_dir, duplicate_scenario_dirs, strict=args.strict)
         if errors:
             any_errors = True
             print(f"[scenario-contract] FAILED {scenario_dir.name}")

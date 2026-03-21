@@ -2,9 +2,103 @@ const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
 
-const APP_URL = 'http://127.0.0.1:18080';
+function resolveBaseUrl() {
+  if (process.env.MAPCREATOR_BASE_URL) {
+    return process.env.MAPCREATOR_BASE_URL;
+  }
+  const metadataPath = path.join(process.cwd(), '.runtime', 'dev', 'active_server.json');
+  if (fs.existsSync(metadataPath)) {
+    try {
+      const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+      if (metadata && typeof metadata.url === 'string' && metadata.url.trim()) {
+        return metadata.url.trim();
+      }
+    } catch (error) {
+      console.warn('[scenario-apply-resilience] Unable to parse active_server.json:', error);
+    }
+  }
+  return 'http://127.0.0.1:18080';
+}
+
+async function waitForScenarioUiReady(page) {
+  await page.waitForFunction(() => {
+    const select = document.querySelector('#scenarioSelect');
+    return !!select
+      && !!select.querySelector('option[value="hoi4_1939"]')
+      && !!select.querySelector('option[value="tno_1962"]');
+  });
+}
+
+async function applyScenario(page, scenarioId) {
+  await page.selectOption('#scenarioSelect', scenarioId);
+  if (await page.locator('#applyScenarioBtn').isVisible()) {
+    await page.click('#applyScenarioBtn');
+  }
+  await page.waitForFunction(async (expectedScenarioId) => {
+    const { state } = await import('/js/core/state.js');
+    return state.activeScenarioId === expectedScenarioId;
+  }, scenarioId);
+}
+
+async function injectScenarioTestHook(page, hookName) {
+  await page.evaluate((name) => {
+    globalThis.__scenarioTestHooks = {
+      ...(globalThis.__scenarioTestHooks || {}),
+      [name]: true,
+    };
+  }, hookName);
+}
+
+async function readScenarioResilienceState(page) {
+  return page.evaluate(async () => {
+    const { state } = await import('/js/core/state.js');
+    return {
+      activeScenarioId: state.activeScenarioId,
+      manifestScenarioId: String(state.activeScenarioManifest?.scenario_id || ''),
+      statusText: document.querySelector('#scenarioStatus')?.textContent || '',
+      fatalRecovery: state.scenarioFatalRecovery
+        ? {
+            phase: String(state.scenarioFatalRecovery.phase || ''),
+            message: String(state.scenarioFatalRecovery.message || ''),
+            problems: Array.isArray(state.scenarioFatalRecovery.problems)
+              ? [...state.scenarioFatalRecovery.problems]
+              : [],
+          }
+        : null,
+      controls: {
+        scenarioSelectDisabled: !!document.querySelector('#scenarioSelect')?.disabled,
+        applyDisabled: !!document.querySelector('#applyScenarioBtn')?.disabled,
+        resetDisabled: !!document.querySelector('#resetScenarioBtn')?.disabled,
+        clearDisabled: !!document.querySelector('#clearScenarioBtn')?.disabled,
+        viewModeDisabled: !!document.querySelector('#scenarioViewModeSelect')?.disabled,
+      },
+    };
+  });
+}
+
+async function attemptLockedScenarioAction(page) {
+  return page.evaluate(async () => {
+    const mod = await import('/js/core/scenario_manager.js');
+    try {
+      await mod.applyScenarioById('hoi4_1939', {
+        renderNow: false,
+        markDirtyReason: '',
+        showToastOnComplete: false,
+      });
+      return { ok: true };
+    } catch (error) {
+      return {
+        ok: false,
+        code: String(error?.code || ''),
+        message: String(error?.message || ''),
+      };
+    }
+  });
+}
 
 test('scenario apply rollback keeps prior stable state on palette failure', async ({ page }) => {
+  test.setTimeout(60000);
+  const APP_URL = resolveBaseUrl();
   const pageErrors = [];
   const unhandledConsoleErrors = [];
   let forcedPaletteFailureCount = 0;
@@ -33,16 +127,8 @@ test('scenario apply rollback keeps prior stable state on palette failure', asyn
   await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1200);
 
-  await page.waitForFunction(() => {
-    const select = document.querySelector('#scenarioSelect');
-    return !!select && !!select.querySelector('option[value="hoi4_1939"]') && !!select.querySelector('option[value="tno_1962"]');
-  });
-
-  await page.selectOption('#scenarioSelect', 'hoi4_1939');
-  const applyVisible = await page.locator('#applyScenarioBtn').isVisible();
-  if (applyVisible) {
-    await page.click('#applyScenarioBtn');
-  }
+  await waitForScenarioUiReady(page);
+  await applyScenario(page, 'hoi4_1939');
   await expect(page.locator('#scenarioStatus')).toContainText('HOI4 1939', { timeout: 20000 });
 
   await page.evaluate(async () => {
@@ -108,4 +194,119 @@ test('scenario apply rollback keeps prior stable state on palette failure', asyn
     finalState,
     screenshot: shotPath,
   }, null, 2));
+});
+
+test('scenario apply fatal recovery locks controls when rollback restore fails', async ({ page }) => {
+  test.setTimeout(60000);
+  const APP_URL = resolveBaseUrl();
+  let forcedPaletteFailureCount = 0;
+  let shouldAbortTnoPalette = false;
+
+  await page.route('**/data/palettes/tno.palette.json', async (route) => {
+    if (shouldAbortTnoPalette && forcedPaletteFailureCount === 0) {
+      forcedPaletteFailureCount += 1;
+      await route.abort('failed');
+      return;
+    }
+    await route.continue();
+  });
+
+  await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(1200);
+  await waitForScenarioUiReady(page);
+  await applyScenario(page, 'hoi4_1939');
+
+  await page.evaluate(async () => {
+    const { state } = await import('/js/core/state.js');
+    if (state.palettePackCacheById && typeof state.palettePackCacheById === 'object') {
+      delete state.palettePackCacheById.tno;
+    }
+    if (state.paletteMapCacheById && typeof state.paletteMapCacheById === 'object') {
+      delete state.paletteMapCacheById.tno;
+    }
+  });
+  await injectScenarioTestHook(page, 'failRollbackRestoreOnce');
+  shouldAbortTnoPalette = true;
+
+  await page.selectOption('#scenarioSelect', 'tno_1962');
+  await page.click('#applyScenarioBtn');
+  await page.waitForTimeout(1500);
+
+  const runtimeState = await readScenarioResilienceState(page);
+  const blockedAction = await attemptLockedScenarioAction(page);
+
+  expect(forcedPaletteFailureCount).toBe(1);
+  expect(runtimeState.fatalRecovery).not.toBeNull();
+  expect(runtimeState.statusText).toMatch(/reload|inconsistent/i);
+  expect(runtimeState.controls).toEqual({
+    scenarioSelectDisabled: true,
+    applyDisabled: true,
+    resetDisabled: true,
+    clearDisabled: true,
+    viewModeDisabled: true,
+  });
+  expect(blockedAction.ok).toBe(false);
+  expect(blockedAction.code).toBe('SCENARIO_FATAL_RECOVERY');
+
+  const shotPath = path.join('.runtime', 'browser', 'mcp-artifacts', 'screenshots', 'scenario_apply_fatal_restore_failure.png');
+  fs.mkdirSync(path.dirname(shotPath), { recursive: true });
+  await page.screenshot({ path: shotPath, fullPage: true });
+});
+
+test('scenario apply fatal recovery locks controls when rollback consistency fails', async ({ page }) => {
+  test.setTimeout(60000);
+  const APP_URL = resolveBaseUrl();
+  let forcedPaletteFailureCount = 0;
+  let shouldAbortTnoPalette = false;
+
+  await page.route('**/data/palettes/tno.palette.json', async (route) => {
+    if (shouldAbortTnoPalette && forcedPaletteFailureCount === 0) {
+      forcedPaletteFailureCount += 1;
+      await route.abort('failed');
+      return;
+    }
+    await route.continue();
+  });
+
+  await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(1200);
+  await waitForScenarioUiReady(page);
+  await applyScenario(page, 'hoi4_1939');
+
+  await page.evaluate(async () => {
+    const { state } = await import('/js/core/state.js');
+    if (state.palettePackCacheById && typeof state.palettePackCacheById === 'object') {
+      delete state.palettePackCacheById.tno;
+    }
+    if (state.paletteMapCacheById && typeof state.paletteMapCacheById === 'object') {
+      delete state.paletteMapCacheById.tno;
+    }
+  });
+  await injectScenarioTestHook(page, 'forceRollbackConsistencyFailureOnce');
+  shouldAbortTnoPalette = true;
+
+  await page.selectOption('#scenarioSelect', 'tno_1962');
+  await page.click('#applyScenarioBtn');
+  await page.waitForTimeout(1500);
+
+  const runtimeState = await readScenarioResilienceState(page);
+  const blockedAction = await attemptLockedScenarioAction(page);
+
+  expect(forcedPaletteFailureCount).toBe(1);
+  expect(runtimeState.fatalRecovery).not.toBeNull();
+  expect(runtimeState.fatalRecovery.problems.join(' ')).toMatch(/Injected rollback consistency failure/i);
+  expect(runtimeState.statusText).toMatch(/reload|inconsistent/i);
+  expect(runtimeState.controls).toEqual({
+    scenarioSelectDisabled: true,
+    applyDisabled: true,
+    resetDisabled: true,
+    clearDisabled: true,
+    viewModeDisabled: true,
+  });
+  expect(blockedAction.ok).toBe(false);
+  expect(blockedAction.code).toBe('SCENARIO_FATAL_RECOVERY');
+
+  const shotPath = path.join('.runtime', 'browser', 'mcp-artifacts', 'screenshots', 'scenario_apply_fatal_consistency_failure.png');
+  fs.mkdirSync(path.dirname(shotPath), { recursive: true });
+  await page.screenshot({ path: shotPath, fullPage: true });
 });

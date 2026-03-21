@@ -36,6 +36,7 @@ const DEFAULT_OCEAN_FILL_COLOR = "#aadaff";
 const SCENARIO_RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
 const SCENARIO_LOAD_TIMEOUT_MS = 12_000;
 const SCENARIO_DETAIL_SOURCE_FALLBACK_ORDER = ["na_v2", "na_v1", "legacy_bak", "highres"];
+const SCENARIO_FATAL_RECOVERY_CODE = "SCENARIO_FATAL_RECOVERY";
 const SCENARIO_OPTIONAL_LAYER_CONFIGS = {
   water: {
     bundleField: "waterRegionsPayload",
@@ -953,6 +954,144 @@ function getScenarioBaselineHashFromBundle(bundle) {
   return String(bundle?.manifest?.baseline_hash || bundle?.ownersPayload?.baseline_hash || "").trim();
 }
 
+function getScenarioTestHooks() {
+  return globalThis.__scenarioTestHooks && typeof globalThis.__scenarioTestHooks === "object"
+    ? globalThis.__scenarioTestHooks
+    : null;
+}
+
+function consumeScenarioTestHook(name) {
+  const hooks = getScenarioTestHooks();
+  if (!hooks || !hooks[name]) return false;
+  delete hooks[name];
+  return true;
+}
+
+function getScenarioFatalRecoveryState() {
+  return state.scenarioFatalRecovery && typeof state.scenarioFatalRecovery === "object"
+    ? state.scenarioFatalRecovery
+    : null;
+}
+
+function clearScenarioFatalRecoveryState() {
+  state.scenarioFatalRecovery = null;
+}
+
+function formatScenarioFatalRecoveryMessage(fatalState = getScenarioFatalRecoveryState()) {
+  const baseMessage = t("Scenario state is inconsistent. Reload the page before continuing.", "ui");
+  const detail = String(fatalState?.message || "").trim();
+  return detail ? `${baseMessage} ${detail}` : baseMessage;
+}
+
+function buildScenarioFatalRecoveryError(actionLabel = "complete this scenario action") {
+  const message = formatScenarioFatalRecoveryMessage();
+  const error = new Error(message);
+  error.code = SCENARIO_FATAL_RECOVERY_CODE;
+  error.toastTitle = t("Scenario locked", "ui");
+  error.toastTone = "error";
+  error.userMessage = message;
+  error.actionLabel = actionLabel;
+  return error;
+}
+
+function validateScenarioRuntimeConsistency({ expectedScenarioId = "", phase = "apply" } = {}) {
+  const problems = [];
+  const activeScenarioId = normalizeScenarioId(state.activeScenarioId);
+  const manifestScenarioId = normalizeScenarioId(state.activeScenarioManifest?.scenario_id);
+  const normalizedExpectedScenarioId = normalizeScenarioId(expectedScenarioId);
+  const requiredObjects = [
+    ["sovereigntyByFeatureId", state.sovereigntyByFeatureId],
+    ["scenarioControllersByFeatureId", state.scenarioControllersByFeatureId],
+    ["scenarioBaselineOwnersByFeatureId", state.scenarioBaselineOwnersByFeatureId],
+    ["scenarioBaselineControllersByFeatureId", state.scenarioBaselineControllersByFeatureId],
+  ];
+
+  if (normalizedExpectedScenarioId && activeScenarioId !== normalizedExpectedScenarioId) {
+    problems.push(
+      `active scenario id mismatch (${activeScenarioId || "none"} != ${normalizedExpectedScenarioId}).`
+    );
+  }
+  if (activeScenarioId && manifestScenarioId !== activeScenarioId) {
+    problems.push(
+      `manifest scenario id mismatch (${manifestScenarioId || "none"} != ${activeScenarioId}).`
+    );
+  }
+  if (activeScenarioId && !String(state.scenarioBaselineHash || "").trim()) {
+    problems.push("scenarioBaselineHash is empty while a scenario is active.");
+  }
+  requiredObjects.forEach(([fieldName, value]) => {
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+      problems.push(`${fieldName} must be a plain object while a scenario is active.`);
+    }
+  });
+
+  const sampleFeatureId =
+    Object.keys(state.scenarioBaselineOwnersByFeatureId || {}).find(Boolean)
+    || Object.keys(state.sovereigntyByFeatureId || {}).find(Boolean)
+    || Object.keys(state.scenarioBaselineControllersByFeatureId || {}).find(Boolean)
+    || Object.keys(state.scenarioControllersByFeatureId || {}).find(Boolean)
+    || "";
+  if (activeScenarioId && !sampleFeatureId) {
+    problems.push("No feature assignments are available in the active scenario state.");
+  } else if (sampleFeatureId) {
+    if (!getScenarioEffectiveOwnerCodeByFeatureId(sampleFeatureId)) {
+      problems.push(`Effective owner lookup failed for ${sampleFeatureId}.`);
+    }
+    if (!getScenarioEffectiveControllerCodeByFeatureId(sampleFeatureId)) {
+      problems.push(`Effective controller lookup failed for ${sampleFeatureId}.`);
+    }
+  }
+
+  const forcedFailureHookName =
+    phase === "rollback" ? "forceRollbackConsistencyFailureOnce" : "forceApplyConsistencyFailureOnce";
+  if (consumeScenarioTestHook(forcedFailureHookName)) {
+    problems.push(`Injected ${phase} consistency failure.`);
+  }
+
+  return {
+    ok: problems.length === 0,
+    problems,
+    activeScenarioId,
+    manifestScenarioId,
+    expectedScenarioId: normalizedExpectedScenarioId,
+    phase,
+  };
+}
+
+function enterScenarioFatalRecovery({
+  phase = "rollback",
+  rootError = null,
+  rollbackError = null,
+  consistencyReport = null,
+} = {}) {
+  const problemSummary = Array.isArray(consistencyReport?.problems) && consistencyReport.problems.length
+    ? consistencyReport.problems.slice(0, 3).join(" ")
+    : "";
+  const detail = rollbackError
+    ? t("Rollback recovery failed.", "ui")
+    : problemSummary || t("Rollback validation failed.", "ui");
+  state.scenarioFatalRecovery = {
+    phase: String(phase || "rollback"),
+    message: detail,
+    recordedAt: new Date().toISOString(),
+    problems: Array.isArray(consistencyReport?.problems) ? [...consistencyReport.problems] : [],
+    rootErrorMessage: String(rootError?.message || "").trim(),
+    rollbackErrorMessage: String(rollbackError?.message || "").trim(),
+  };
+  showToast(formatScenarioFatalRecoveryMessage(state.scenarioFatalRecovery), {
+    title: t("Scenario recovery failed", "ui"),
+    tone: "error",
+    duration: 7000,
+  });
+  syncScenarioUi();
+  return state.scenarioFatalRecovery;
+}
+
+function assertScenarioInteractionsAllowed(actionLabel = "complete this scenario action") {
+  if (!getScenarioFatalRecoveryState()) return;
+  throw buildScenarioFatalRecoveryError(actionLabel);
+}
+
 function getScenarioBlockerCount(summary = {}) {
   const flattened = Number(summary.blocker_count);
   if (Number.isFinite(flattened)) {
@@ -1744,6 +1883,7 @@ function setScenarioViewMode(
     markDirtyReason = "",
   } = {}
 ) {
+  assertScenarioInteractionsAllowed("change scenario view mode");
   const nextMode = normalizeScenarioViewMode(viewMode);
   if (!state.activeScenarioId) {
     state.scenarioViewMode = "ownership";
@@ -1960,6 +2100,7 @@ function captureScenarioApplyRollbackSnapshot() {
     releasableCatalog: cloneScenarioStateValue(state.releasableCatalog),
     scenarioAudit: cloneScenarioStateValue(state.scenarioAudit),
     scenarioAuditUi: cloneScenarioStateValue(ensureScenarioAuditUiState()),
+    scenarioImportAudit: cloneScenarioStateValue(state.scenarioImportAudit),
     scenarioBaselineHash: String(state.scenarioBaselineHash || ""),
     scenarioBaselineOwnersByFeatureId: cloneScenarioStateValue(state.scenarioBaselineOwnersByFeatureId),
     scenarioControllersByFeatureId: cloneScenarioStateValue(state.scenarioControllersByFeatureId),
@@ -2026,6 +2167,9 @@ function captureScenarioApplyRollbackSnapshot() {
 
 function restoreScenarioApplyRollbackSnapshot(snapshot, { renderNow = false } = {}) {
   if (!snapshot || typeof snapshot !== "object") return;
+  if (consumeScenarioTestHook("failRollbackRestoreOnce")) {
+    throw new Error("Injected rollback restore failure.");
+  }
 
   state.activeScenarioId = snapshot.activeScenarioId;
   state.scenarioBorderMode = snapshot.scenarioBorderMode;
@@ -2050,6 +2194,7 @@ function restoreScenarioApplyRollbackSnapshot(snapshot, { renderNow = false } = 
   state.releasableCatalog = cloneScenarioStateValue(snapshot.releasableCatalog);
   state.scenarioAudit = cloneScenarioStateValue(snapshot.scenarioAudit);
   setScenarioAuditUiState(cloneScenarioStateValue(snapshot.scenarioAuditUi) || {});
+  state.scenarioImportAudit = cloneScenarioStateValue(snapshot.scenarioImportAudit);
   state.scenarioBaselineHash = String(snapshot.scenarioBaselineHash || "");
   state.scenarioBaselineOwnersByFeatureId = cloneScenarioStateValue(snapshot.scenarioBaselineOwnersByFeatureId);
   state.scenarioControllersByFeatureId = cloneScenarioStateValue(snapshot.scenarioControllersByFeatureId);
@@ -2351,6 +2496,7 @@ async function applyScenarioBundle(
       loadedForScenarioId: bundle.auditPayload ? staged.scenarioId : "",
       errorMessage: "",
     });
+    state.scenarioImportAudit = null;
     state.scenarioBaselineHash = getScenarioBaselineHashFromBundle(bundle);
     state.scenarioBaselineOwnersByFeatureId = { ...staged.resolvedOwners };
     state.scenarioControllersByFeatureId = { ...staged.controllers };
@@ -2430,6 +2576,16 @@ async function applyScenarioBundle(
         `[scenario] Detail visibility gate triggered for ${staged.scenarioId}: runtime=${dataHealth.runtimeFeatureCount}, expected=${dataHealth.expectedFeatureCount}, ratio=${dataHealth.ratio.toFixed(3)} (min=${dataHealth.minRatio}).`
       );
     }
+    const applyConsistency = validateScenarioRuntimeConsistency({
+      expectedScenarioId: staged.scenarioId,
+      phase: "apply",
+    });
+    if (!applyConsistency.ok) {
+      throw new Error(
+        `[scenario] Scenario state consistency check failed after apply: ${applyConsistency.problems.join(" ")}`
+      );
+    }
+    clearScenarioFatalRecoveryState();
     if (markDirtyReason) {
       markDirty(markDirtyReason);
     }
@@ -2454,10 +2610,36 @@ async function applyScenarioBundle(
       runtimeFeatureCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
     });
   } catch (error) {
+    let rollbackRestoreError = null;
     try {
       restoreScenarioApplyRollbackSnapshot(rollbackSnapshot, { renderNow });
     } catch (rollbackError) {
+      rollbackRestoreError = rollbackError;
       console.error("[scenario] Failed to restore scenario apply rollback snapshot.", rollbackError);
+    }
+    if (rollbackRestoreError) {
+      enterScenarioFatalRecovery({
+        phase: "rollback",
+        rootError: error,
+        rollbackError: rollbackRestoreError,
+      });
+      const fatalError = buildScenarioFatalRecoveryError("recover the previous scenario state");
+      fatalError.cause = error;
+      throw fatalError;
+    }
+    const rollbackConsistency = validateScenarioRuntimeConsistency({
+      expectedScenarioId: rollbackSnapshot?.activeScenarioId,
+      phase: "rollback",
+    });
+    if (!rollbackConsistency.ok) {
+      enterScenarioFatalRecovery({
+        phase: "rollback",
+        rootError: error,
+        consistencyReport: rollbackConsistency,
+      });
+      const fatalError = buildScenarioFatalRecoveryError("recover the previous scenario state");
+      fatalError.cause = error;
+      throw fatalError;
     }
     throw error;
   }
@@ -2471,6 +2653,7 @@ async function applyScenarioById(
     showToastOnComplete = false,
   } = {}
 ) {
+  assertScenarioInteractionsAllowed("apply a scenario");
   const normalizedScenarioId = normalizeScenarioId(scenarioId);
   if (!normalizedScenarioId) {
     throw new Error("[scenario] Scenario id is required.");
@@ -2533,6 +2716,7 @@ function resetToScenarioBaseline(
     showToastOnComplete = false,
   } = {}
 ) {
+  assertScenarioInteractionsAllowed("reset the active scenario");
   if (!state.activeScenarioId || !state.scenarioBaselineOwnersByFeatureId) {
     return false;
   }
@@ -2604,6 +2788,7 @@ function clearActiveScenario(
     showToastOnComplete = false,
   } = {}
 ) {
+  assertScenarioInteractionsAllowed("exit the active scenario");
   state.activeScenarioId = "";
   state.scenarioBorderMode = "canonical";
   state.activeScenarioManifest = null;
@@ -2635,6 +2820,7 @@ function clearActiveScenario(
     loadedForScenarioId: "",
     errorMessage: "",
   });
+  state.scenarioImportAudit = null;
   state.scenarioBaselineHash = "";
   state.scenarioBaselineOwnersByFeatureId = {};
   state.scenarioControllersByFeatureId = {};
@@ -2688,6 +2874,14 @@ function clearActiveScenario(
 }
 
 function formatScenarioStatusText() {
+  const fatalState = getScenarioFatalRecoveryState();
+  if (fatalState) {
+    if (!state.activeScenarioId || !state.activeScenarioManifest) {
+      return formatScenarioFatalRecoveryMessage(fatalState);
+    }
+    const displayName = getScenarioDisplayName(state.activeScenarioManifest, state.activeScenarioId);
+    return `${displayName} - ${formatScenarioFatalRecoveryMessage(fatalState)}`;
+  }
   if (!state.activeScenarioId || !state.activeScenarioManifest) {
     return t("No scenario active", "ui");
   }
@@ -2697,6 +2891,9 @@ function formatScenarioStatusText() {
 }
 
 function formatScenarioAuditText() {
+  if (getScenarioFatalRecoveryState()) {
+    return t("Scenario controls are locked until the page reloads.", "ui");
+  }
   if (!state.activeScenarioId || !state.activeScenarioManifest) {
     return "";
   }
@@ -2720,6 +2917,9 @@ function initScenarioManager({ render } = {}) {
   const renderScenarioControls = () => {
     const entries = getScenarioRegistryEntries();
     const isApplyInFlight = !!state.scenarioApplyInFlight;
+    const fatalState = getScenarioFatalRecoveryState();
+    const isFatalLocked = !!fatalState;
+    const fatalMessage = formatScenarioFatalRecoveryMessage(fatalState);
     if (scenarioSelect) {
       const pendingValue = normalizeScenarioId(scenarioSelect.value);
       const activeValue = normalizeScenarioId(state.activeScenarioId);
@@ -2736,6 +2936,8 @@ function initScenarioManager({ render } = {}) {
         scenarioSelect.appendChild(option);
       });
       scenarioSelect.value = currentValue || "";
+      scenarioSelect.disabled = isApplyInFlight || isFatalLocked;
+      scenarioSelect.title = isFatalLocked ? fatalMessage : "";
     }
 
     if (scenarioStatus) {
@@ -2751,30 +2953,35 @@ function initScenarioManager({ render } = {}) {
       const hasControllerData = Object.keys(state.scenarioControllersByFeatureId || {}).length > 0;
       const hasSplit = Number(state.activeScenarioManifest?.summary?.owner_controller_split_feature_count || 0) > 0;
       scenarioViewModeSelect.value = normalizeScenarioViewMode(state.scenarioViewMode);
-      scenarioViewModeSelect.disabled = !hasScenario || !hasControllerData || !hasSplit;
+      scenarioViewModeSelect.disabled = isFatalLocked || !hasScenario || !hasControllerData || !hasSplit;
       scenarioViewModeSelect.classList.toggle("hidden", !hasScenario);
       scenarioViewModeLabel?.classList.toggle("hidden", !hasScenario);
-      scenarioViewModeSelect.title = hasSplit
+      scenarioViewModeSelect.title = isFatalLocked
+        ? fatalMessage
+        : hasSplit
         ? t("Toggle legal ownership vs frontline control.", "ui")
         : t("No frontline control split in current scenario.", "ui");
     }
     if (resetScenarioBtn) {
       resetScenarioBtn.textContent = t("Reset Changes To Baseline", "ui");
-      resetScenarioBtn.disabled = !state.activeScenarioId || isApplyInFlight;
+      resetScenarioBtn.disabled = !state.activeScenarioId || isApplyInFlight || isFatalLocked;
       resetScenarioBtn.classList.toggle("hidden", !state.activeScenarioId);
+      resetScenarioBtn.title = isFatalLocked ? fatalMessage : "";
     }
     if (clearScenarioBtn) {
       clearScenarioBtn.textContent = t("Exit Scenario", "ui");
-      clearScenarioBtn.disabled = !state.activeScenarioId || isApplyInFlight;
+      clearScenarioBtn.disabled = !state.activeScenarioId || isApplyInFlight || isFatalLocked;
       clearScenarioBtn.classList.toggle("hidden", !state.activeScenarioId);
+      clearScenarioBtn.title = isFatalLocked ? fatalMessage : "";
     }
     if (applyScenarioBtn) {
       const selectedScenarioId = normalizeScenarioId(scenarioSelect?.value);
       const isSelectedScenarioActive =
         !!selectedScenarioId && selectedScenarioId === normalizeScenarioId(state.activeScenarioId);
       applyScenarioBtn.textContent = t("Apply", "ui");
-      applyScenarioBtn.disabled = !selectedScenarioId || isSelectedScenarioActive || isApplyInFlight;
+      applyScenarioBtn.disabled = !selectedScenarioId || isSelectedScenarioActive || isApplyInFlight || isFatalLocked;
       applyScenarioBtn.classList.toggle("hidden", isSelectedScenarioActive);
+      applyScenarioBtn.title = isFatalLocked ? fatalMessage : "";
     }
   };
   state.updateScenarioUIFn = renderScenarioControls;

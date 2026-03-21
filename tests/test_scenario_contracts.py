@@ -64,6 +64,52 @@ def _create_scenario_dir(tmp_path: Path, scenario_name: str, scenario_id: str | 
     return scenario_dir
 
 
+def _write_strict_bundle_files(
+    scenario_dir: Path,
+    *,
+    owners: dict[str, str] | None = None,
+    controllers: dict[str, str] | None = None,
+    cores: dict[str, object] | None = None,
+    runtime_feature_ids: list[str] | None = None,
+    manifest_feature_count: int | None = None,
+) -> None:
+    owners_payload = owners if owners is not None else {"F-1": "AAA"}
+    controllers_payload = controllers if controllers is not None else {"F-1": "AAA", "F-2": "AAA"}
+    cores_payload = cores if cores is not None else {"F-1": ["AAA"], "F-2": ["AAA"]}
+    runtime_ids = runtime_feature_ids if runtime_feature_ids is not None else ["F-1", "F-2"]
+
+    manifest_path = scenario_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["summary"] = {
+        **(manifest.get("summary") or {}),
+        "feature_count": manifest_feature_count if manifest_feature_count is not None else len(owners_payload),
+    }
+    _write_json(manifest_path, manifest)
+    _write_json(scenario_dir / "owners.by_feature.json", {"owners": owners_payload})
+    _write_json(scenario_dir / "controllers.by_feature.json", {"controllers": controllers_payload})
+    _write_json(scenario_dir / "cores.by_feature.json", {"cores": cores_payload})
+    _write_json(
+        scenario_dir / "runtime_topology.topo.json",
+        {
+            "type": "Topology",
+            "objects": {
+                "political": {
+                    "type": "GeometryCollection",
+                    "geometries": [
+                        {
+                            "type": "Polygon",
+                            "properties": {"id": feature_id},
+                            "arcs": [],
+                        }
+                        for feature_id in runtime_ids
+                    ],
+                }
+            },
+            "arcs": [],
+        },
+    )
+
+
 class ScenarioContractTest(unittest.TestCase):
     def test_checked_in_scenario_registry_defaults_to_tno_1962(self) -> None:
         registry_path = Path(__file__).resolve().parents[1] / "data" / "scenarios" / "index.json"
@@ -126,6 +172,49 @@ class ScenarioContractTest(unittest.TestCase):
 
             self.assertEqual(errors, [])
             self.assertTrue(any("collision candidates" in warning for warning in warnings))
+
+    def test_validate_scenario_contract_default_mode_keeps_authoring_safe_bundle_mismatches(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            scenario_dir = _create_scenario_dir(tmp_root, "authoring_safe")
+            _write_strict_bundle_files(scenario_dir)
+
+            try:
+                errors, warnings = validate_scenario_contract(scenario_dir, {}, strict=False)
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            self.assertEqual(errors, [])
+            self.assertEqual(warnings, [])
+
+    def test_validate_scenario_contract_strict_mode_rejects_bundle_mismatches(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            scenario_dir = _create_scenario_dir(tmp_root, "strict_bundle")
+            _write_strict_bundle_files(
+                scenario_dir,
+                owners={"F-1": "AAA"},
+                controllers={"F-1": "AAA", "F-2": "AAA"},
+                cores={"F-1": ["AAA"], "F-2": "AAA"},
+                runtime_feature_ids=["F-1", "F-2", "BAD-1"],
+                manifest_feature_count=5,
+            )
+
+            try:
+                errors, warnings = validate_scenario_contract(scenario_dir, {}, strict=True)
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            self.assertEqual(warnings, [])
+            self.assertTrue(any("owners/controllers feature keysets must match" in error for error in errors))
+            self.assertTrue(any("owners/cores feature keysets must match" in error for error in errors))
+            self.assertTrue(any("must store arrays for every feature" in error for error in errors))
+            self.assertTrue(any("feature_count must equal owners feature count" in error for error in errors))
+            self.assertTrue(any("may only exceed the feature maps with shell fallback ids" in error for error in errors))
 
 
 if __name__ == "__main__":

@@ -40,6 +40,63 @@ async function setSelectValue(page, selector, value) {
   }, value);
 }
 
+async function waitForProjectUiReady(page) {
+  await page.waitForFunction(() => {
+    const downloadBtn = document.querySelector("#downloadProjectBtn");
+    const uploadInput = document.querySelector("#projectFileInput");
+    const themeSelect = document.querySelector("#themeSelect");
+    const scenarioSelect = document.querySelector("#scenarioSelect");
+    return !!downloadBtn
+      && !!uploadInput
+      && !!themeSelect
+      && themeSelect.options.length > 1
+      && !!scenarioSelect;
+  });
+}
+
+async function exportProjectJson(page, outputPath) {
+  const downloadPromise = page.waitForEvent("download");
+  await page.locator("#downloadProjectBtn").evaluate((button) => button.click());
+  const download = await downloadPromise;
+  await download.saveAs(outputPath);
+  return JSON.parse(fs.readFileSync(outputPath, "utf8"));
+}
+
+async function applyScenario(page, scenarioId) {
+  await page.selectOption("#scenarioSelect", scenarioId);
+  if (await page.locator("#applyScenarioBtn").isVisible()) {
+    await page.click("#applyScenarioBtn");
+  }
+  await page.waitForFunction(async (expectedScenarioId) => {
+    const { state } = await import("/js/core/state.js");
+    return state.activeScenarioId === expectedScenarioId;
+  }, scenarioId);
+}
+
+async function getScenarioSplitFeature(page) {
+  return page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    const splitEntry = Object.entries(state.scenarioBaselineControllersByFeatureId || {}).find(([featureId, controller]) => {
+      const owner = state.scenarioBaselineOwnersByFeatureId?.[featureId];
+      return owner && controller && owner !== controller;
+    });
+    if (!splitEntry) return null;
+    const [featureId, baselineController] = splitEntry;
+    const baselineOwner = String(state.scenarioBaselineOwnersByFeatureId?.[featureId] || "");
+    const alternateController = Object.keys(state.scenarioCountriesByTag || {}).find((tag) => (
+      tag
+      && tag !== baselineOwner
+      && tag !== baselineController
+    )) || "";
+    return {
+      featureId,
+      baselineOwner,
+      baselineController: String(baselineController || ""),
+      alternateController,
+    };
+  });
+}
+
 test("project save/load roundtrip preserves extended runtime state", async ({ page }) => {
   test.setTimeout(60000);
   const baseUrl = resolveBaseUrl();
@@ -75,12 +132,7 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
 
   await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(1500);
-  await page.waitForFunction(() => {
-    const downloadBtn = document.querySelector("#downloadProjectBtn");
-    const uploadInput = document.querySelector("#projectFileInput");
-    const themeSelect = document.querySelector("#themeSelect");
-    return !!downloadBtn && !!uploadInput && !!themeSelect && themeSelect.options.length > 1;
-  });
+  await waitForProjectUiReady(page);
 
   await setInputValue(page, "#internalBorderColor", "#123456");
   await setInputValue(page, "#internalBorderOpacity", "42");
@@ -351,4 +403,146 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
       legacyExportPath,
     },
   }, null, 2));
+});
+
+test("scenario project roundtrip preserves controller overrides", async ({ page }) => {
+  test.setTimeout(60000);
+  const baseUrl = resolveBaseUrl();
+  const artifactDir = path.join(".runtime", "tests", "playwright", "project-save-load");
+  fs.mkdirSync(artifactDir, { recursive: true });
+
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
+  await page.waitForTimeout(1500);
+  await waitForProjectUiReady(page);
+  await applyScenario(page, "tno_1962");
+
+  const splitFeature = await getScenarioSplitFeature(page);
+  expect(splitFeature).not.toBeNull();
+  expect(splitFeature.alternateController).not.toBe("");
+
+  await page.evaluate(async ({ featureId, baselineOwner, alternateController }) => {
+    const { state } = await import("/js/core/state.js");
+    state.sovereigntyByFeatureId = state.sovereigntyByFeatureId || {};
+    state.scenarioControllersByFeatureId = state.scenarioControllersByFeatureId || {};
+    state.sovereigntyByFeatureId[featureId] = baselineOwner;
+    state.scenarioControllersByFeatureId[featureId] = alternateController;
+    state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
+  }, splitFeature);
+
+  const importPath = path.join(artifactDir, "scenario-controller-roundtrip.json");
+  const exported = await exportProjectJson(page, importPath);
+  expect(exported.scenarioControllersByFeatureId?.[splitFeature.featureId]).toBe(splitFeature.alternateController);
+
+  await page.locator("#projectFileInput").setInputFiles(importPath);
+  await page.waitForFunction(async ({ featureId, expectedController }) => {
+    const { state } = await import("/js/core/state.js");
+    return state.activeScenarioId === "tno_1962"
+      && state.scenarioControllersByFeatureId?.[featureId] === expectedController;
+  }, {
+    featureId: splitFeature.featureId,
+    expectedController: splitFeature.alternateController,
+  });
+
+  const runtimeState = await page.evaluate(async ({ featureId }) => {
+    const { state } = await import("/js/core/state.js");
+    return {
+      owner: String(state.sovereigntyByFeatureId?.[featureId] || ""),
+      controller: String(state.scenarioControllersByFeatureId?.[featureId] || ""),
+    };
+  }, { featureId: splitFeature.featureId });
+
+  expect(runtimeState.owner).toBe(splitFeature.baselineOwner);
+  expect(runtimeState.controller).toBe(splitFeature.alternateController);
+});
+
+test("legacy scenario project import keeps baseline controllers when controller map is absent", async ({ page }) => {
+  test.setTimeout(60000);
+  const baseUrl = resolveBaseUrl();
+  const artifactDir = path.join(".runtime", "tests", "playwright", "project-save-load");
+  fs.mkdirSync(artifactDir, { recursive: true });
+
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
+  await page.waitForTimeout(1500);
+  await waitForProjectUiReady(page);
+  await applyScenario(page, "tno_1962");
+
+  const splitFeature = await getScenarioSplitFeature(page);
+  expect(splitFeature).not.toBeNull();
+
+  const baselineExportPath = path.join(artifactDir, "scenario-legacy-source.json");
+  const exported = await exportProjectJson(page, baselineExportPath);
+  delete exported.scenarioControllersByFeatureId;
+  const legacyImportPath = path.join(artifactDir, "scenario-legacy-import.json");
+  fs.writeFileSync(legacyImportPath, JSON.stringify(exported, null, 2));
+
+  await page.evaluate(async ({ featureId, baselineOwner }) => {
+    const { state } = await import("/js/core/state.js");
+    state.sovereigntyByFeatureId = state.sovereigntyByFeatureId || {};
+    state.scenarioControllersByFeatureId = state.scenarioControllersByFeatureId || {};
+    state.sovereigntyByFeatureId[featureId] = baselineOwner;
+    state.scenarioControllersByFeatureId[featureId] = baselineOwner;
+    state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
+  }, splitFeature);
+
+  await page.locator("#projectFileInput").setInputFiles(legacyImportPath);
+  await page.waitForFunction(async ({ featureId, expectedController }) => {
+    const { state } = await import("/js/core/state.js");
+    return state.activeScenarioId === "tno_1962"
+      && state.scenarioControllersByFeatureId?.[featureId] === expectedController;
+  }, {
+    featureId: splitFeature.featureId,
+    expectedController: splitFeature.baselineController,
+  });
+
+  const runtimeState = await page.evaluate(async ({ featureId }) => {
+    const { state } = await import("/js/core/state.js");
+    return {
+      owner: String(state.sovereigntyByFeatureId?.[featureId] || ""),
+      controller: String(state.scenarioControllersByFeatureId?.[featureId] || ""),
+    };
+  }, { featureId: splitFeature.featureId });
+
+  expect(runtimeState.owner).toBe(splitFeature.baselineOwner);
+  expect(runtimeState.controller).toBe(splitFeature.baselineController);
+});
+
+test("baseline mismatch acceptance persists scenario import audit", async ({ page }) => {
+  test.setTimeout(60000);
+  const baseUrl = resolveBaseUrl();
+  const artifactDir = path.join(".runtime", "tests", "playwright", "project-save-load");
+  fs.mkdirSync(artifactDir, { recursive: true });
+
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
+  await page.waitForTimeout(1500);
+  await waitForProjectUiReady(page);
+  await applyScenario(page, "tno_1962");
+
+  const exportedPath = path.join(artifactDir, "scenario-mismatch-source.json");
+  const exported = await exportProjectJson(page, exportedPath);
+  exported.scenario.baselineHash = "bogus-baseline-hash";
+  const mismatchPath = path.join(artifactDir, "scenario-mismatch-import.json");
+  fs.writeFileSync(mismatchPath, JSON.stringify(exported, null, 2));
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.locator("#projectFileInput").setInputFiles(mismatchPath);
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    return state.activeScenarioId === "tno_1962"
+      && state.scenarioImportAudit
+      && state.scenarioImportAudit.savedBaselineHash === "bogus-baseline-hash";
+  });
+
+  const reexportPath = path.join(artifactDir, "scenario-mismatch-export.json");
+  const reexported = await exportProjectJson(page, reexportPath);
+  const importAudit = reexported.scenario?.importAudit || null;
+
+  expect(importAudit).toMatchObject({
+    scenarioId: "tno_1962",
+    savedVersion: Number(exported.scenario.version || 1) || 1,
+    currentVersion: expect.any(Number),
+    savedBaselineHash: "bogus-baseline-hash",
+    currentBaselineHash: expect.any(String),
+    acceptedAt: expect.any(String),
+  });
+  expect(importAudit.currentBaselineHash).not.toBe("bogus-baseline-hash");
 });

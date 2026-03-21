@@ -80,6 +80,22 @@ function isScenarioShellLikeFeature(feature, featureId = "") {
   return String(feature?.properties?.name || "").toLowerCase().includes("shell fallback");
 }
 
+function getScenarioInteractionLockMessage() {
+  const baseMessage = t("Scenario state is inconsistent. Reload the page before continuing.", "ui");
+  const detail = String(state.scenarioFatalRecovery?.message || "").trim();
+  return detail ? `${baseMessage} ${detail}` : baseMessage;
+}
+
+function blockLockedScenarioInteraction() {
+  if (!state.activeScenarioId || !state.scenarioFatalRecovery) return false;
+  showToast(getScenarioInteractionLockMessage(), {
+    title: t("Scenario locked", "ui"),
+    tone: "error",
+    duration: 5200,
+  });
+  return true;
+}
+
 function isAntarcticSectorLikeFeature(feature, featureId = "") {
   const candidate = String(feature?.properties?.id || feature?.id || featureId || "").trim().toUpperCase();
   if (!candidate) return false;
@@ -820,6 +836,17 @@ function applyOwnershipToFeatureIds(
     recomputeReason = "sidebar-ownership-batch",
   } = {}
 ) {
+  if (blockLockedScenarioInteraction()) {
+    return {
+      applied: false,
+      changed: 0,
+      matchedCount: 0,
+      requestedCount: 0,
+      missingCount: 0,
+      reason: "scenario-locked",
+      mode: "ownership",
+    };
+  }
   const {
     requestedIds,
     matchedIds: normalizedTargetIds,
@@ -889,6 +916,17 @@ function applyScenarioOwnerControllerAssignments(
     recomputeReason = "scenario-owner-controller-apply",
   } = {}
 ) {
+  if (blockLockedScenarioInteraction()) {
+    return {
+      applied: false,
+      changed: 0,
+      matchedCount: 0,
+      requestedCount: 0,
+      missingCount: 0,
+      reason: "scenario-locked",
+      mode: "ownership",
+    };
+  }
   const entries = Object.entries(assignmentsByFeatureId || {})
     .map(([featureId, assignment]) => {
       const normalizedId = String(featureId || "").trim();
@@ -5109,6 +5147,7 @@ function initSidebar({ render } = {}) {
       }
       FileManager.importProject(file, async (data) => {
         clearHistory();
+        let scenarioImportAudit = null;
         if (data.scenario?.id) {
           const validation = await validateImportedScenarioBaseline(data.scenario);
           if (!validation.ok) {
@@ -5129,6 +5168,16 @@ function initSidebar({ render } = {}) {
                   "ui"
                 );
               throw error;
+            }
+            if (validation.reason === "baseline_mismatch") {
+              scenarioImportAudit = {
+                scenarioId: String(data.scenario.id || "").trim(),
+                savedVersion: Number(data.scenario.version || 1) || 1,
+                currentVersion: Number(validation.currentVersion || 1) || 1,
+                savedBaselineHash: String(data.scenario.baselineHash || "").trim(),
+                currentBaselineHash: String(validation.currentBaselineHash || "").trim(),
+                acceptedAt: new Date().toISOString(),
+              };
             }
           }
           await applyScenarioById(data.scenario.id, {
@@ -5155,6 +5204,17 @@ function initSidebar({ render } = {}) {
         state.waterRegionOverrides = data.waterRegionOverrides || {};
         state.specialRegionOverrides = data.specialRegionOverrides || {};
         state.sovereigntyByFeatureId = data.sovereigntyByFeatureId || {};
+        if (state.activeScenarioId) {
+          if (data.scenarioControllersByFeatureId) {
+            state.scenarioControllersByFeatureId = { ...data.scenarioControllersByFeatureId };
+          }
+          state.scenarioImportAudit = scenarioImportAudit;
+        } else {
+          state.scenarioControllersByFeatureId = data.scenarioControllersByFeatureId
+            ? { ...data.scenarioControllersByFeatureId }
+            : {};
+          state.scenarioImportAudit = null;
+        }
         state.sovereigntyInitialized = false;
         state.paintMode = data.paintMode || "visual";
         state.activeSovereignCode = data.activeSovereignCode || "";

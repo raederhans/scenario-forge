@@ -34,6 +34,7 @@ from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
 from scenario_builder.hoi4.audit import read_bmp24
 from tools.build_tno_1962_geo_locale_patch import build_patch as build_tno_geo_locale_patch
+from tools.check_scenario_contracts import validate_publish_bundle_dir
 
 
 SCENARIO_ID = "tno_1962"
@@ -7185,6 +7186,12 @@ def write_bundle_stage(
 ) -> None:
     scenario_dir.mkdir(parents=True, exist_ok=True)
     if publish_scope in {PUBLISH_SCOPE_SCENARIO_DATA, PUBLISH_SCOPE_ALL}:
+        strict_contract_errors = validate_publish_bundle_dir(checkpoint_dir)
+        if strict_contract_errors:
+            raise ValueError(
+                "Strict bundle validation failed for publish checkpoint:\n- "
+                + "\n- ".join(strict_contract_errors)
+            )
         validate_geo_locale_checkpoint(checkpoint_dir, scenario_dir / "geo_name_overrides.manual.json")
         detect_unsynced_manual_edits(
             scenario_dir,
