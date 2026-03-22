@@ -1,4 +1,9 @@
-import { normalizePhysicalStyleConfig, normalizeTextureMode, state } from "./state.js";
+import {
+  normalizeMapSemanticMode,
+  normalizePhysicalStyleConfig,
+  normalizeTextureMode,
+  state,
+} from "./state.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 
 const FEATURE_MIGRATION_URLS = ["data/feature-migrations/by_hybrid_v1.json"];
@@ -104,17 +109,22 @@ function ensureSovereigntyState({ force = false } = {}) {
   state.sovereignBaseColors = state.sovereignBaseColors || {};
   state.visualOverrides = state.visualOverrides || {};
   state.sovereigntyByFeatureId = state.sovereigntyByFeatureId || {};
+  state.mapSemanticMode = normalizeMapSemanticMode(state.mapSemanticMode);
 
   if (state.sovereigntyInitialized && !force) {
     ensureOwnerIndexMaps();
     return state.sovereigntyByFeatureId;
   }
 
-  const seeded = seedSovereigntyFromLandData(state.landData);
-  state.sovereigntyByFeatureId = {
-    ...seeded,
-    ...state.sovereigntyByFeatureId,
-  };
+  if (state.mapSemanticMode === "blank") {
+    state.sovereigntyByFeatureId = { ...state.sovereigntyByFeatureId };
+  } else {
+    const seeded = seedSovereigntyFromLandData(state.landData);
+    state.sovereigntyByFeatureId = {
+      ...seeded,
+      ...state.sovereigntyByFeatureId,
+    };
+  }
   state.sovereigntyInitialized = true;
   rebuildOwnerIndex();
   return state.sovereigntyByFeatureId;
@@ -218,6 +228,7 @@ function resetFeatureOwnerCodes(featureIds) {
 }
 
 function resetAllFeatureOwnersToCanonical() {
+  state.mapSemanticMode = "political";
   state.sovereigntyByFeatureId = seedSovereigntyFromLandData(state.landData);
   state.sovereigntyInitialized = true;
   rebuildOwnerIndex();
@@ -253,6 +264,7 @@ function migrateImportedProjectData(data) {
       : {};
   payload.paintMode =
     payload.paintMode === "sovereignty" ? "sovereignty" : "visual";
+  payload.mapSemanticMode = normalizeMapSemanticMode(payload.mapSemanticMode);
   payload.activeSovereignCode = normalizeOwnerCode(payload.activeSovereignCode || "");
   payload.dynamicBordersDirty = !!payload.dynamicBordersDirty;
   payload.dynamicBordersDirtyReason = String(payload.dynamicBordersDirtyReason || "");

@@ -3,6 +3,7 @@ import {
   normalizeCityLayerStyleConfig,
   normalizeDayNightStyleConfig,
   normalizeLakeStyleConfig,
+  normalizeMapSemanticMode,
   normalizePhysicalStyleConfig,
   normalizeTextureStyleConfig,
 } from "./state.js";
@@ -136,6 +137,7 @@ class FileManager {
       specialRegionOverrides: appState.specialRegionOverrides || {},
       sovereigntyByFeatureId: appState.sovereigntyByFeatureId || {},
       scenarioControllersByFeatureId: appState.scenarioControllersByFeatureId || {},
+      mapSemanticMode: normalizeMapSemanticMode(appState.mapSemanticMode),
       paintMode: appState.paintMode || "visual",
       interactionGranularity: normalizeInteractionGranularity(appState.interactionGranularity),
       batchFillScope: normalizeBatchFillScope(appState.batchFillScope),
@@ -255,6 +257,7 @@ class FileManager {
         } else {
           data.scenarioControllersByFeatureId = { ...data.scenarioControllersByFeatureId };
         }
+        data.mapSemanticMode = normalizeMapSemanticMode(data.mapSemanticMode);
         data.interactionGranularity = normalizeInteractionGranularity(data.interactionGranularity);
         data.batchFillScope = normalizeBatchFillScope(data.batchFillScope);
         data.activePaletteId = normalizeActivePaletteId(data.activePaletteId);

@@ -1,5 +1,6 @@
 ﻿import { countryNames, defaultCountryPalette, state } from "./state.js";
-import { ensureSovereigntyState, resetAllFeatureOwnersToCanonical } from "./sovereignty_manager.js";
+import { ensureSovereigntyState } from "./sovereignty_manager.js";
+import { normalizeMapSemanticMode } from "./state.js";
 import {
   recomputeDynamicBordersNow,
   refreshColorState,
@@ -1003,6 +1004,7 @@ function validateScenarioRuntimeConsistency({ expectedScenarioId = "", phase = "
   const activeScenarioId = normalizeScenarioId(state.activeScenarioId);
   const manifestScenarioId = normalizeScenarioId(state.activeScenarioManifest?.scenario_id);
   const normalizedExpectedScenarioId = normalizeScenarioId(expectedScenarioId);
+  const mapSemanticMode = normalizeMapSemanticMode(state.mapSemanticMode);
   const requiredObjects = [
     ["sovereigntyByFeatureId", state.sovereigntyByFeatureId],
     ["scenarioControllersByFeatureId", state.scenarioControllersByFeatureId],
@@ -1035,7 +1037,7 @@ function validateScenarioRuntimeConsistency({ expectedScenarioId = "", phase = "
     || Object.keys(state.scenarioBaselineControllersByFeatureId || {}).find(Boolean)
     || Object.keys(state.scenarioControllersByFeatureId || {}).find(Boolean)
     || "";
-  if (activeScenarioId && !sampleFeatureId) {
+  if (activeScenarioId && !sampleFeatureId && mapSemanticMode !== "blank") {
     problems.push("No feature assignments are available in the active scenario state.");
   } else if (sampleFeatureId) {
     if (!getScenarioEffectiveOwnerCodeByFeatureId(sampleFeatureId)) {
@@ -1115,6 +1117,10 @@ function getScenarioDefaultCountryCode(manifest, countryMap = {}) {
     || Object.keys(countryMap || {})[0]
     || ""
   ).trim().toUpperCase();
+}
+
+function getScenarioMapSemanticMode(manifest, fallback = "political") {
+  return normalizeMapSemanticMode(manifest?.map_mode, fallback);
 }
 
 function normalizeScenarioFeatureCollection(payload) {
@@ -2117,6 +2123,7 @@ function captureScenarioApplyRollbackSnapshot() {
     scenarioOwnerControllerDiffCount: Number(state.scenarioOwnerControllerDiffCount) || 0,
     scenarioDataHealth: cloneScenarioStateValue(state.scenarioDataHealth),
     scenarioViewMode: String(state.scenarioViewMode || "ownership"),
+    mapSemanticMode: normalizeMapSemanticMode(state.mapSemanticMode),
     countryNames: cloneScenarioStateValue(state.countryNames),
     sovereigntyByFeatureId: cloneScenarioStateValue(state.sovereigntyByFeatureId),
     sovereigntyInitialized: !!state.sovereigntyInitialized,
@@ -2211,6 +2218,7 @@ function restoreScenarioApplyRollbackSnapshot(snapshot, { renderNow = false } = 
   state.scenarioOwnerControllerDiffCount = Number(snapshot.scenarioOwnerControllerDiffCount) || 0;
   state.scenarioDataHealth = cloneScenarioStateValue(snapshot.scenarioDataHealth);
   state.scenarioViewMode = String(snapshot.scenarioViewMode || "ownership");
+  state.mapSemanticMode = normalizeMapSemanticMode(snapshot.mapSemanticMode);
   state.countryNames = cloneScenarioStateValue(snapshot.countryNames) || { ...countryNames };
   state.sovereigntyByFeatureId = cloneScenarioStateValue(snapshot.sovereigntyByFeatureId);
   state.sovereigntyInitialized = !!snapshot.sovereigntyInitialized;
@@ -2367,6 +2375,7 @@ async function prepareScenarioApplyState(
     ? normalizeScenarioCoreMap(bundle.coresPayload.cores)
     : {};
   const defaultCountryCode = getScenarioDefaultCountryCode(bundle.manifest, baseCountryMap);
+  const mapSemanticMode = getScenarioMapSemanticMode(bundle.manifest);
   const releasableIndex = buildScenarioReleasableIndex(scenarioId, {
     excludeTags: baseCountryTags,
   });
@@ -2427,6 +2436,7 @@ async function prepareScenarioApplyState(
     scenarioId,
     baseCountryMap,
     defaultCountryCode,
+    mapSemanticMode,
     countryMap,
     runtimeTopologyPayload,
     districtGroupsPayload,
@@ -2473,6 +2483,7 @@ async function applyScenarioBundle(
     state.activeScenarioId = staged.scenarioId;
     state.scenarioBorderMode = "scenario_owner_only";
     state.activeScenarioManifest = bundle.manifest || null;
+    state.mapSemanticMode = staged.mapSemanticMode;
     state.scenarioCountriesByTag = staged.countryMap;
     state.scenarioFixedOwnerColors = staged.scenarioColorMap;
     state.defaultRuntimePoliticalTopology = state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null;
@@ -2521,12 +2532,12 @@ async function applyScenarioBundle(
     state.featureOverrides = {};
     state.sovereignBaseColors = { ...staged.scenarioColorMap };
     state.countryBaseColors = { ...staged.scenarioColorMap };
-    state.activeSovereignCode = staged.defaultCountryCode;
+    state.activeSovereignCode = staged.mapSemanticMode === "blank" ? "" : staged.defaultCountryCode;
     state.selectedWaterRegionId = "";
     state.selectedSpecialRegionId = "";
     state.hoveredWaterRegionId = null;
     state.hoveredSpecialRegionId = null;
-    syncScenarioInspectorSelection(staged.defaultCountryCode);
+    syncScenarioInspectorSelection(state.activeSovereignCode);
 
     disableScenarioParentBorders();
     applyScenarioPaintMode();
@@ -2736,6 +2747,7 @@ function resetToScenarioBaseline(
   state.scenarioControllersByFeatureId = { ...(state.scenarioBaselineControllersByFeatureId || {}) };
   state.scenarioAutoShellOwnerByFeatureId = {};
   state.scenarioAutoShellControllerByFeatureId = {};
+  state.mapSemanticMode = getScenarioMapSemanticMode(state.activeScenarioManifest, state.mapSemanticMode);
   state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
   state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
   state.scenarioViewMode = "ownership";
@@ -2746,10 +2758,14 @@ function resetToScenarioBaseline(
   state.featureOverrides = {};
   state.sovereignBaseColors = { ...(state.scenarioFixedOwnerColors || {}) };
   state.countryBaseColors = { ...state.sovereignBaseColors };
-  state.activeSovereignCode = getScenarioDefaultCountryCode(
-    state.activeScenarioManifest,
-    state.scenarioCountriesByTag
-  ) || String(state.activeSovereignCode || "").trim().toUpperCase();
+  state.activeSovereignCode = state.mapSemanticMode === "blank"
+    ? ""
+    : (
+      getScenarioDefaultCountryCode(
+        state.activeScenarioManifest,
+        state.scenarioCountriesByTag
+      ) || String(state.activeSovereignCode || "").trim().toUpperCase()
+    );
   if (state.ui && typeof state.ui === "object") {
     state.ui.scenarioVisualAdjustmentsOpen = false;
   }
@@ -2801,6 +2817,7 @@ function clearActiveScenario(
   state.scenarioRuntimeTopologyData = null;
   state.scenarioLandMaskData = null;
   state.scenarioContextLandMaskData = null;
+  state.mapSemanticMode = "blank";
   state.runtimePoliticalTopology = state.defaultRuntimePoliticalTopology || null;
   state.scenarioWaterRegionsData = null;
   state.scenarioSpecialRegionsData = null;
@@ -2849,7 +2866,11 @@ function clearActiveScenario(
   state.selectedSpecialRegionId = "";
   state.hoveredWaterRegionId = null;
   state.hoveredSpecialRegionId = null;
-  resetAllFeatureOwnersToCanonical();
+  state.sovereigntyByFeatureId = {};
+  state.scenarioControllersByFeatureId = {};
+  state.scenarioAutoShellOwnerByFeatureId = {};
+  state.scenarioAutoShellControllerByFeatureId = {};
+  state.sovereigntyInitialized = false;
   state.visualOverrides = {};
   state.featureOverrides = {};
   const defaults = syncResolvedDefaultCountryPalette({ overwriteCountryPalette: false });

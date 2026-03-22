@@ -3,6 +3,7 @@ import {
   normalizeCityLayerStyleConfig,
   normalizeDayNightStyleConfig,
   normalizeLakeStyleConfig,
+  normalizeMapSemanticMode,
   normalizePhysicalStyleConfig,
   normalizeTextureStyleConfig,
   PHYSICAL_ATLAS_PALETTE,
@@ -126,6 +127,17 @@ const COASTLINE_SIMPLIFY_MID_EPSILON = 0.09;
 const COASTLINE_SIMPLIFY_LOW_EPSILON = 0.22;
 const COASTLINE_SIMPLIFY_MID_MIN_LENGTH = 0.2;
 const COASTLINE_SIMPLIFY_LOW_MIN_LENGTH = 0.45;
+const COASTLINE_SIMPLIFY_LATITUDE_SCALE_MAX = 2.8;
+const COASTLINE_SIMPLIFY_MIN_COS_LAT = 0.35;
+const COASTLINE_EFFECTIVE_AREA_MULTIPLIER = 0.5;
+const COASTLINE_VIEW_SIMPLIFY_LOW_MIN_DISTANCE_PX = 1.8;
+const COASTLINE_VIEW_SIMPLIFY_MID_MIN_DISTANCE_PX = 1.1;
+const COASTLINE_VIEW_SIMPLIFY_COLLINEAR_ANGLE_DEG = 10;
+const COASTLINE_ACCENT_DENSITY_THRESHOLD_LOW = 0.0016;
+const COASTLINE_ACCENT_DENSITY_THRESHOLD_MID = 0.0022;
+const COASTLINE_ACCENT_DENSITY_ALPHA_LOW = 0.68;
+const COASTLINE_ACCENT_DENSITY_ALPHA_MID = 0.82;
+const COASTLINE_ACCENT_DENSITY_WIDTH_SCALE = 0.9;
 const RENDER_PHASE_IDLE = "idle";
 const RENDER_PHASE_INTERACTING = "interacting";
 const RENDER_PHASE_SETTLING = "settling";
@@ -218,7 +230,6 @@ const GB_ID_PATTERN_RE = /^[A-Z]{2}[A-Z0-9]{3}$/;
 const DE_STATE_GROUP_MIN = 12;
 const DE_STATE_GROUP_MAX = 20;
 const DE_CITY_STATES = new Set(["Berlin", "Hamburg", "Bremen"]);
-const OCEAN_PATTERN_BASE_SIZE = 160;
 const OCEAN_MASK_MODE_TOPOLOGY = "topology_ocean";
 const OCEAN_MASK_MODE_SPHERE_MINUS_LAND = "sphere_minus_land";
 const OCEAN_MASK_MODE_BATHYMETRY = "bathymetry_features";
@@ -386,7 +397,6 @@ let islandNeighborsCache = {
   count: 0,
   neighbors: [],
 };
-const oceanPatternCache = new Map();
 const textureAssetCache = new Map();
 const texturePatternCache = new Map();
 const textureGeometryCache = new Map();
@@ -3429,9 +3439,20 @@ function getDisplayOwnerCode(feature, id) {
   if (isAntarcticSectorFeature(feature, resolvedId)) {
     return "";
   }
+  const mapSemanticMode = normalizeMapSemanticMode(state.mapSemanticMode);
   const isScenarioShell = isScenarioShellFeature(feature, resolvedId);
   const shellOwnerCode = String(state.scenarioAutoShellOwnerByFeatureId?.[resolvedId] || "").trim().toUpperCase();
   const directOwnerCode = canonicalCountryCode(state.sovereigntyByFeatureId?.[resolvedId] || "");
+  if (mapSemanticMode === "blank") {
+    if (!state.activeScenarioId || String(state.scenarioViewMode || "ownership") !== "frontline") {
+      return isScenarioShell ? (directOwnerCode || shellOwnerCode || "") : directOwnerCode;
+    }
+    const shellControllerCode = String(state.scenarioAutoShellControllerByFeatureId?.[resolvedId] || "").trim().toUpperCase();
+    const directControllerCode = canonicalCountryCode(state.scenarioControllersByFeatureId?.[resolvedId] || "");
+    return isScenarioShell
+      ? (directControllerCode || shellControllerCode || directOwnerCode || shellOwnerCode || "")
+      : (directControllerCode || directOwnerCode || "");
+  }
   const fallbackOwnerCode = getFeatureCountryCodeNormalized(feature);
   const ownershipOwnerCode = isScenarioShell
     ? (directOwnerCode || shellOwnerCode || "")
@@ -4014,7 +4035,6 @@ function setCanvasSize() {
     hitCanvas.height = scaledH;
   }
   resizeRenderPassCanvases();
-  oceanPatternCache.clear();
   texturePatternCache.clear();
   textureNoiseTileCache.clear();
   clearProjectedBoundsCache();
@@ -5103,6 +5123,134 @@ function sanitizePolyline(line) {
   return result;
 }
 
+function getPolylineMeanAbsLatitude(line) {
+  if (!Array.isArray(line) || !line.length) return 0;
+  let total = 0;
+  let count = 0;
+  line.forEach((point) => {
+    const lat = Number(point?.[1]);
+    if (!Number.isFinite(lat)) return;
+    total += Math.abs(lat);
+    count += 1;
+  });
+  return count > 0 ? total / count : 0;
+}
+
+function getLatitudeAdjustedSimplifyEpsilon(baseEpsilon, line) {
+  const epsilon = Math.max(0, Number(baseEpsilon) || 0);
+  if (!(epsilon > 0)) return 0;
+  const meanAbsLatitude = getPolylineMeanAbsLatitude(line);
+  const cosLatitude = Math.cos((meanAbsLatitude * Math.PI) / 180);
+  const safeCosLatitude = clamp(Math.abs(cosLatitude), COASTLINE_SIMPLIFY_MIN_COS_LAT, 1);
+  const scale = clamp(1 / safeCosLatitude, 1, COASTLINE_SIMPLIFY_LATITUDE_SCALE_MAX);
+  return epsilon * scale;
+}
+
+function getTriangleArea(points, aIndex, bIndex, cIndex) {
+  const a = points[aIndex];
+  const b = points[bIndex];
+  const c = points[cIndex];
+  if (!a || !b || !c) return Infinity;
+  return Math.abs(
+    (a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1])) * 0.5
+  );
+}
+
+function pushMinHeap(heap, entry) {
+  heap.push(entry);
+  let index = heap.length - 1;
+  while (index > 0) {
+    const parentIndex = Math.floor((index - 1) / 2);
+    if (heap[parentIndex][0] <= heap[index][0]) break;
+    [heap[parentIndex], heap[index]] = [heap[index], heap[parentIndex]];
+    index = parentIndex;
+  }
+}
+
+function popMinHeap(heap) {
+  if (!heap.length) return null;
+  const first = heap[0];
+  const last = heap.pop();
+  if (heap.length && last) {
+    heap[0] = last;
+    let index = 0;
+    while (true) {
+      const leftIndex = index * 2 + 1;
+      const rightIndex = leftIndex + 1;
+      let smallestIndex = index;
+      if (leftIndex < heap.length && heap[leftIndex][0] < heap[smallestIndex][0]) {
+        smallestIndex = leftIndex;
+      }
+      if (rightIndex < heap.length && heap[rightIndex][0] < heap[smallestIndex][0]) {
+        smallestIndex = rightIndex;
+      }
+      if (smallestIndex === index) break;
+      [heap[index], heap[smallestIndex]] = [heap[smallestIndex], heap[index]];
+      index = smallestIndex;
+    }
+  }
+  return first;
+}
+
+function simplifyPolylineEffectiveArea(points, areaThreshold) {
+  if (!Array.isArray(points) || points.length <= 2) {
+    return Array.isArray(points) ? points.slice() : [];
+  }
+  const threshold = Math.max(0, Number(areaThreshold) || 0);
+  if (!(threshold > 0)) return points.slice();
+
+  const length = points.length;
+  const previous = new Array(length);
+  const next = new Array(length);
+  const removed = new Array(length).fill(false);
+  const areas = new Array(length).fill(Infinity);
+  const heap = [];
+
+  for (let index = 0; index < length; index += 1) {
+    previous[index] = index - 1;
+    next[index] = index + 1 < length ? index + 1 : -1;
+  }
+
+  const updateArea = (index) => {
+    if (index <= 0 || index >= length - 1 || removed[index]) return;
+    const prevIndex = previous[index];
+    const nextIndex = next[index];
+    if (prevIndex < 0 || nextIndex < 0 || removed[prevIndex] || removed[nextIndex]) {
+      areas[index] = Infinity;
+      return;
+    }
+    const area = getTriangleArea(points, prevIndex, index, nextIndex);
+    areas[index] = area;
+    pushMinHeap(heap, [area, index]);
+  };
+
+  for (let index = 1; index < length - 1; index += 1) {
+    updateArea(index);
+  }
+
+  while (heap.length) {
+    const entry = popMinHeap(heap);
+    if (!entry) break;
+    const [area, index] = entry;
+    if (removed[index] || area !== areas[index]) continue;
+    if (area > threshold) break;
+    const prevIndex = previous[index];
+    const nextIndex = next[index];
+    if (prevIndex < 0 || nextIndex < 0) continue;
+    removed[index] = true;
+    next[prevIndex] = nextIndex;
+    previous[nextIndex] = prevIndex;
+    updateArea(prevIndex);
+    updateArea(nextIndex);
+  }
+
+  const simplified = [];
+  for (let index = 0; index < length; index += 1) {
+    if (!removed[index]) simplified.push(points[index]);
+  }
+  return simplified.length >= 2 ? simplified : points.slice(0, 2);
+}
+
 function simplifyCoastlineMesh(mesh, { epsilon = 0, minLength = 0 } = {}) {
   if (!isUsableMesh(mesh)) return null;
   const simplifiedCoordinates = [];
@@ -5110,7 +5258,9 @@ function simplifyCoastlineMesh(mesh, { epsilon = 0, minLength = 0 } = {}) {
   mesh.coordinates.forEach((line) => {
     const sanitized = sanitizePolyline(line);
     if (sanitized.length < 2) return;
-    const simplified = simplifyPolylineRDP(sanitized, epsilon);
+    const adjustedEpsilon = getLatitudeAdjustedSimplifyEpsilon(epsilon, sanitized);
+    const effectiveAreaThreshold = adjustedEpsilon * adjustedEpsilon * COASTLINE_EFFECTIVE_AREA_MULTIPLIER;
+    const simplified = simplifyPolylineEffectiveArea(sanitized, effectiveAreaThreshold);
     if (simplified.length < 2) return;
     if (getLineLength(simplified) < Math.max(0, Number(minLength) || 0)) return;
     simplifiedCoordinates.push(simplified);
@@ -6426,6 +6576,110 @@ function drawMeshCollection(meshCollection, strokeStyle, lineWidth) {
   });
 }
 
+function getScreenSpaceTurnAngleDeg(previousPoint, currentPoint, nextPoint) {
+  if (!previousPoint || !currentPoint || !nextPoint) return 180;
+  const ax = currentPoint[0] - previousPoint[0];
+  const ay = currentPoint[1] - previousPoint[1];
+  const bx = nextPoint[0] - currentPoint[0];
+  const by = nextPoint[1] - currentPoint[1];
+  const aLength = Math.hypot(ax, ay);
+  const bLength = Math.hypot(bx, by);
+  if (!(aLength > 0) || !(bLength > 0)) return 180;
+  const cosine = clamp((ax * bx + ay * by) / (aLength * bLength), -1, 1);
+  const interiorAngleDeg = Math.acos(cosine) * (180 / Math.PI);
+  return Math.abs(180 - interiorAngleDeg);
+}
+
+function declutterProjectedPolyline(line, minDistancePx, angleThresholdDeg) {
+  const sanitized = sanitizePolyline(line);
+  if (sanitized.length <= 2 || !projection) return sanitized;
+
+  const projected = sanitized.map((point) => projection(point));
+  const keptIndices = [0];
+
+  for (let index = 1; index < sanitized.length - 1; index += 1) {
+    const projectedPoint = projected[index];
+    const previousKeptProjected = projected[keptIndices[keptIndices.length - 1]];
+    const nextProjected = projected[index + 1];
+    if (!projectedPoint || !previousKeptProjected || !nextProjected) {
+      keptIndices.push(index);
+      continue;
+    }
+    const distancePx = Math.hypot(
+      projectedPoint[0] - previousKeptProjected[0],
+      projectedPoint[1] - previousKeptProjected[1],
+    );
+    const turnAngleDeg = getScreenSpaceTurnAngleDeg(previousKeptProjected, projectedPoint, nextProjected);
+    if (distancePx < minDistancePx && turnAngleDeg < angleThresholdDeg) {
+      continue;
+    }
+    keptIndices.push(index);
+  }
+
+  keptIndices.push(sanitized.length - 1);
+  const result = [];
+  keptIndices.forEach((index) => {
+    const point = sanitized[index];
+    if (!point) return;
+    const previousPoint = result[result.length - 1];
+    if (previousPoint && previousPoint[0] === point[0] && previousPoint[1] === point[1]) return;
+    result.push(point);
+  });
+  return result.length >= 2 ? result : sanitized.slice(0, 2);
+}
+
+function getViewportAwareCoastlineCollection(collection, k) {
+  const minDistancePx = k < COASTLINE_LOD_LOW_ZOOM_MAX
+    ? COASTLINE_VIEW_SIMPLIFY_LOW_MIN_DISTANCE_PX
+    : k < COASTLINE_LOD_MID_ZOOM_MAX
+      ? COASTLINE_VIEW_SIMPLIFY_MID_MIN_DISTANCE_PX
+      : 0;
+  if (!(minDistancePx > 0) || !Array.isArray(collection) || !collection.length || !projection) {
+    return collection;
+  }
+  return collection.map((mesh) => {
+    if (!isUsableMesh(mesh)) return mesh;
+    const nextCoordinates = mesh.coordinates
+      .map((line) => declutterProjectedPolyline(line, minDistancePx, COASTLINE_VIEW_SIMPLIFY_COLLINEAR_ANGLE_DEG))
+      .filter((line) => Array.isArray(line) && line.length >= 2);
+    if (!nextCoordinates.length) return mesh;
+    return {
+      type: "MultiLineString",
+      coordinates: nextCoordinates,
+    };
+  });
+}
+
+function getProjectedLineDensityStats(line) {
+  const sanitized = sanitizePolyline(line);
+  if (sanitized.length < 2 || !projection) {
+    return { pointCount: 0, bboxArea: Infinity, density: 0 };
+  }
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  let pointCount = 0;
+  sanitized.forEach((point) => {
+    const projected = projection(point);
+    if (!projected || !Number.isFinite(projected[0]) || !Number.isFinite(projected[1])) return;
+    pointCount += 1;
+    minX = Math.min(minX, projected[0]);
+    minY = Math.min(minY, projected[1]);
+    maxX = Math.max(maxX, projected[0]);
+    maxY = Math.max(maxY, projected[1]);
+  });
+  if (!(pointCount > 1)) {
+    return { pointCount, bboxArea: Infinity, density: 0 };
+  }
+  const bboxArea = Math.max(1, (maxX - minX) * (maxY - minY));
+  return {
+    pointCount,
+    bboxArea,
+    density: pointCount / bboxArea,
+  };
+}
+
 function drawHierarchicalBorders(k, { interactive = false } = {}) {
   const kEff = clamp(k, 1, 8);
   const t = (kEff - 1) / 7;
@@ -6552,11 +6806,7 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
     DETAIL_ADM_BORDER_MIN_WIDTH,
     internalWidthBase * 0.42 * (0.72 + 0.40 * t) * lowZoomWidthScale
   ) * DETAIL_ADM_BORDER_WIDTH_SCALE / kDenom;
-  const coastlineCollection = k < COASTLINE_LOD_LOW_ZOOM_MAX
-    ? (state.cachedCoastlinesLow?.length ? state.cachedCoastlinesLow : state.cachedCoastlines)
-    : k < COASTLINE_LOD_MID_ZOOM_MAX
-      ? (state.cachedCoastlinesMid?.length ? state.cachedCoastlinesMid : state.cachedCoastlines)
-      : (state.cachedCoastlinesHigh?.length ? state.cachedCoastlinesHigh : state.cachedCoastlines);
+  const coastlineCollection = getViewportAwareCoastlineCollection(getCoastlineCollectionForZoom(k), k);
 
   if (k >= LOCAL_BORDERS_MIN_ZOOM) {
     context.globalAlpha = localAlpha;
@@ -6718,6 +6968,36 @@ function setBathymetryStateSlot(slot, url, entry) {
   state.globalBathymetryTopologyUrl = String(url || "");
 }
 
+function cloneBathymetryFeatureWithSource(feature, source) {
+  if (!feature || typeof feature !== "object") return null;
+  return {
+    ...feature,
+    properties: {
+      ...(feature.properties || {}),
+      _bathymetrySource: source,
+    },
+  };
+}
+
+function buildBathymetryFeatureCollection(features) {
+  const nextFeatures = Array.isArray(features) ? features.filter(Boolean) : [];
+  if (!nextFeatures.length) return null;
+  return {
+    type: "FeatureCollection",
+    features: nextFeatures,
+  };
+}
+
+function mergeBathymetryFeatureCollections(scenarioCollection, globalCollection) {
+  const scenarioFeatures = Array.isArray(scenarioCollection?.features)
+    ? scenarioCollection.features.map((feature) => cloneBathymetryFeatureWithSource(feature, "scenario"))
+    : [];
+  const globalFeatures = Array.isArray(globalCollection?.features)
+    ? globalCollection.features.map((feature) => cloneBathymetryFeatureWithSource(feature, "global"))
+    : [];
+  return buildBathymetryFeatureCollection([...scenarioFeatures, ...globalFeatures]);
+}
+
 function syncActiveBathymetryState() {
   const scenarioUrl = getScenarioBathymetryTopologyUrl();
   const scenarioReady =
@@ -6729,16 +7009,29 @@ function syncActiveBathymetryState() {
     state.globalBathymetryTopologyUrl === GLOBAL_BATHYMETRY_TOPOLOGY_URL &&
     (!!state.globalBathymetryBandsData || !!state.globalBathymetryContoursData);
 
+  if (scenarioReady && globalReady) {
+    state.activeBathymetryBandsData = mergeBathymetryFeatureCollections(
+      state.scenarioBathymetryBandsData,
+      state.globalBathymetryBandsData
+    );
+    state.activeBathymetryContoursData = mergeBathymetryFeatureCollections(
+      state.scenarioBathymetryContoursData,
+      state.globalBathymetryContoursData
+    );
+    state.activeBathymetrySource = "merged";
+    state.activeBathymetryTopologyUrl = `${scenarioUrl}|${GLOBAL_BATHYMETRY_TOPOLOGY_URL}`;
+    return;
+  }
   if (scenarioReady) {
-    state.activeBathymetryBandsData = state.scenarioBathymetryBandsData || null;
-    state.activeBathymetryContoursData = state.scenarioBathymetryContoursData || null;
+    state.activeBathymetryBandsData = mergeBathymetryFeatureCollections(state.scenarioBathymetryBandsData, null);
+    state.activeBathymetryContoursData = mergeBathymetryFeatureCollections(state.scenarioBathymetryContoursData, null);
     state.activeBathymetrySource = "scenario";
     state.activeBathymetryTopologyUrl = scenarioUrl;
     return;
   }
   if (globalReady) {
-    state.activeBathymetryBandsData = state.globalBathymetryBandsData || null;
-    state.activeBathymetryContoursData = state.globalBathymetryContoursData || null;
+    state.activeBathymetryBandsData = mergeBathymetryFeatureCollections(null, state.globalBathymetryBandsData);
+    state.activeBathymetryContoursData = mergeBathymetryFeatureCollections(null, state.globalBathymetryContoursData);
     state.activeBathymetrySource = "global";
     state.activeBathymetryTopologyUrl = GLOBAL_BATHYMETRY_TOPOLOGY_URL;
     return;
@@ -6790,7 +7083,7 @@ function applyResolvedBathymetryEntry(slot, url, entry) {
 
 async function loadBathymetryTopology(url, { slot = "global" } = {}) {
   if (!url) return null;
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetch(url, { cache: "default" });
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`);
   }
@@ -6852,6 +7145,7 @@ function getBathymetryFeatureCollections() {
   return {
     bands: Array.isArray(state.activeBathymetryBandsData?.features) ? state.activeBathymetryBandsData : null,
     contours: Array.isArray(state.activeBathymetryContoursData?.features) ? state.activeBathymetryContoursData : null,
+    scenarioCoverage: Array.isArray(state.scenarioBathymetryBandsData?.features) ? state.scenarioBathymetryBandsData : null,
   };
 }
 
@@ -6886,20 +7180,63 @@ function getBathymetryBaseRgb() {
   return { r: 170, g: 218, b: 255 };
 }
 
+function isAtlantropaBathymetryFeature(feature) {
+  return String(feature?.properties?.region_group || "").trim().toLowerCase().startsWith("atlantropa_");
+}
+
+function getBathymetryVisualModifiers(feature) {
+  const source = String(feature?.properties?._bathymetrySource || "").trim().toLowerCase();
+  const mode = String(feature?.properties?.bathymetry_mode || "").trim().toLowerCase();
+  const depthMax = getBathymetryFeatureDepthMax(feature);
+  if (source !== "scenario" || !isAtlantropaBathymetryFeature(feature)) {
+    return {
+      bandBrightness: 1,
+      bandAlpha: 1,
+      contourBrightness: 1,
+      contourAlpha: 1,
+    };
+  }
+
+  if (mode === "synthetic") {
+    const shallowScale = depthMax <= 150 ? 0.92 : 1;
+    return {
+      bandBrightness: 0.7 * shallowScale,
+      bandAlpha: 0.62 * shallowScale,
+      contourBrightness: 0.64 * shallowScale,
+      contourAlpha: 0.56 * shallowScale,
+    };
+  }
+
+  const shallowScale = depthMax <= 150 ? 0.95 : 1;
+  return {
+    bandBrightness: 0.88 * shallowScale,
+    bandAlpha: 0.8 * shallowScale,
+    contourBrightness: 0.86 * shallowScale,
+    contourAlpha: 0.8 * shallowScale,
+  };
+}
+
 function getBathymetryBandFillStyle(feature, oceanStyle) {
   const baseRgb = getBathymetryBaseRgb();
-  const shallowRgb = interpolateRgbChannels(baseRgb, { r: 206, g: 236, b: 249 }, 0.55);
-  const deepRgb = interpolateRgbChannels(baseRgb, { r: 24, g: 74, b: 118 }, 0.92);
+  const shallowRgb = interpolateRgbChannels(baseRgb, { r: 226, g: 242, b: 255 }, 0.88);
+  const deepRgb = interpolateRgbChannels(baseRgb, { r: 12, g: 47, b: 86 }, 0.78);
   const depthRatioRaw = getBathymetryFeatureDepthMax(feature) / BATHYMETRY_MAX_REFERENCE_DEPTH_M;
   const scaledDepthRatio = clamp(
     Math.pow(clamp(depthRatioRaw, 0, 1), 1 / Math.max(0.45, oceanStyle.scale)),
     0,
     1
   );
-  const fillRgb = interpolateRgbChannels(shallowRgb, deepRgb, scaledDepthRatio);
-  const alphaBase = oceanStyle.preset === "bathymetry_soft" ? 0.24 : 0.36;
+  const visualModifiers = getBathymetryVisualModifiers(feature);
+  const fillRgb = interpolateRgbChannels(
+    baseRgb,
+    interpolateRgbChannels(shallowRgb, deepRgb, scaledDepthRatio),
+    visualModifiers.bandBrightness
+  );
+  const alphaBase = oceanStyle.preset === "bathymetry_soft" ? 0.42 : 0.54;
   const alpha = clamp(
-    oceanStyle.opacity * (alphaBase + scaledDepthRatio * 0.26 + oceanStyle.contourStrength * 0.12),
+    oceanStyle.opacity
+      * (alphaBase + scaledDepthRatio * 0.2 + (1 - scaledDepthRatio) * 0.1 + oceanStyle.contourStrength * 0.1)
+      * visualModifiers.bandAlpha,
     0,
     0.96
   );
@@ -6907,16 +7244,24 @@ function getBathymetryBandFillStyle(feature, oceanStyle) {
 }
 
 function getBathymetryContourStrokeStyle(feature, oceanStyle) {
+  const baseRgb = getBathymetryBaseRgb();
   const depthRatioRaw = getBathymetryFeatureDepthMax(feature) / BATHYMETRY_MAX_REFERENCE_DEPTH_M;
   const scaledDepthRatio = clamp(depthRatioRaw, 0, 1);
+  const visualModifiers = getBathymetryVisualModifiers(feature);
   const strokeRgb = interpolateRgbChannels(
-    { r: 27, g: 74, b: 111 },
-    { r: 8, g: 32, b: 64 },
-    scaledDepthRatio
+    baseRgb,
+    interpolateRgbChannels(
+      { r: 204, g: 228, b: 246 },
+      { r: 58, g: 101, b: 144 },
+      scaledDepthRatio
+    ),
+    visualModifiers.contourBrightness
   );
-  const alphaBase = oceanStyle.preset === "bathymetry_soft" ? 0.16 : 0.3;
+  const alphaBase = oceanStyle.preset === "bathymetry_soft" ? 0.28 : 0.42;
   const alpha = clamp(
-    oceanStyle.opacity * (alphaBase + oceanStyle.contourStrength * 0.5 + scaledDepthRatio * 0.14),
+    oceanStyle.opacity
+      * (alphaBase + oceanStyle.contourStrength * 0.46 + scaledDepthRatio * 0.08)
+      * visualModifiers.contourAlpha,
     0,
     0.92
   );
@@ -6938,13 +7283,25 @@ function drawBathymetryBands(collection, oceanStyle) {
   });
 }
 
+function buildVisibleBathymetryContourDepthSet(collection, oceanStyle) {
+  if (oceanStyle.preset !== "bathymetry_soft" || !Array.isArray(collection?.features)) {
+    return null;
+  }
+  const uniqueDepths = [...new Set(collection.features.map((feature) => getBathymetryFeatureDepthMax(feature)))]
+    .filter((depth) => depth > 0)
+    .sort((a, b) => a - b);
+  if (!uniqueDepths.length) return null;
+  return new Set(uniqueDepths.filter((_, index) => index % 2 === 0));
+}
+
 function drawBathymetryContours(collection, oceanStyle) {
   if (!Array.isArray(collection?.features) || !collection.features.length) return;
   const lineWidthBase = oceanStyle.preset === "bathymetry_soft"
     ? 0.45 + oceanStyle.contourStrength * 0.75
     : 0.75 + oceanStyle.contourStrength * 1.1;
-  collection.features.forEach((feature, index) => {
-    if (oceanStyle.preset === "bathymetry_soft" && index % 2 === 1) {
+  const visibleDepths = buildVisibleBathymetryContourDepthSet(collection, oceanStyle);
+  collection.features.forEach((feature) => {
+    if (visibleDepths && !visibleDepths.has(getBathymetryFeatureDepthMax(feature))) {
       return;
     }
     context.beginPath();
@@ -6953,6 +7310,13 @@ function drawBathymetryContours(collection, oceanStyle) {
     context.lineWidth = lineWidthBase;
     context.stroke();
   });
+}
+
+function getBathymetryCollectionBySource(collection, source) {
+  if (!Array.isArray(collection?.features)) return null;
+  return buildBathymetryFeatureCollection(
+    collection.features.filter((feature) => String(feature?.properties?._bathymetrySource || "") === source)
+  );
 }
 
 function getCoastlineCollectionForZoom(k) {
@@ -6968,13 +7332,19 @@ function getCoastlineCollectionForZoom(k) {
 function drawScenarioCoastalAccentOverlays(k) {
   const shorelineFeatures = getScenarioCoastalAccentOverlayFeatures();
   if (!shorelineFeatures.length) return;
+  const overlayAlpha = k < COASTLINE_LOD_LOW_ZOOM_MAX
+    ? COASTLINE_ACCENT_DENSITY_ALPHA_LOW
+    : k < COASTLINE_LOD_MID_ZOOM_MAX
+      ? COASTLINE_ACCENT_DENSITY_ALPHA_MID
+      : 1;
   shorelineFeatures.forEach((feature) => {
     if (!pathBoundsInScreen(feature)) return;
     context.beginPath();
     pathCanvas(feature);
     context.save();
     context.strokeStyle = TNO_COASTAL_ACCENT_COLOR;
-    context.lineWidth = 1.45 / Math.max(0.0001, k);
+    context.globalAlpha *= overlayAlpha;
+    context.lineWidth = 1.22 / Math.max(0.0001, k);
     context.lineJoin = "round";
     context.lineCap = "round";
     context.stroke();
@@ -6984,12 +7354,39 @@ function drawScenarioCoastalAccentOverlays(k) {
 
 function drawTnoCoastalAccentLayer(k, { interactive = false } = {}) {
   if (!context || !isTnoCoastalAccentEnabled()) return;
-  const coastlineCollection = getCoastlineCollectionForZoom(k);
-  const coastlineWidth = (interactive ? 1.35 : 1.7) / Math.max(0.0001, k);
+  const coastlineCollection = interactive
+    ? getCoastlineCollectionForZoom(k)
+    : getViewportAwareCoastlineCollection(getCoastlineCollectionForZoom(k), k);
+  const coastlineWidth = (interactive ? 1.05 : 1.28) / Math.max(0.0001, k);
+  const densityThreshold = k < COASTLINE_LOD_LOW_ZOOM_MAX
+    ? COASTLINE_ACCENT_DENSITY_THRESHOLD_LOW
+    : k < COASTLINE_LOD_MID_ZOOM_MAX
+      ? COASTLINE_ACCENT_DENSITY_THRESHOLD_MID
+      : Infinity;
   context.save();
-  context.globalAlpha = interactive ? 0.42 : 0.68;
-  drawMeshCollection(coastlineCollection, TNO_COASTAL_ACCENT_COLOR, coastlineWidth);
-  context.globalAlpha = interactive ? 0.52 : 0.86;
+  context.strokeStyle = TNO_COASTAL_ACCENT_COLOR;
+  coastlineCollection.forEach((mesh) => {
+    if (!isUsableMesh(mesh)) return;
+    mesh.coordinates.forEach((line) => {
+      const densityStats = interactive
+        ? { density: 0 }
+        : getProjectedLineDensityStats(line);
+      const densityScale = densityStats.density > densityThreshold
+        ? (k < COASTLINE_LOD_LOW_ZOOM_MAX ? COASTLINE_ACCENT_DENSITY_ALPHA_LOW : COASTLINE_ACCENT_DENSITY_ALPHA_MID)
+        : 1;
+      context.save();
+      context.globalAlpha = (interactive ? 0.28 : 0.4) * densityScale;
+      context.lineWidth = coastlineWidth * (densityScale < 1 ? COASTLINE_ACCENT_DENSITY_WIDTH_SCALE : 1);
+      context.beginPath();
+      pathCanvas({
+        type: "LineString",
+        coordinates: line,
+      });
+      context.stroke();
+      context.restore();
+    });
+  });
+  context.globalAlpha = interactive ? 0.38 : 0.62;
   drawScenarioCoastalAccentOverlays(k);
   context.restore();
 }
@@ -7067,88 +7464,16 @@ function applyOceanClipMask(maskMode) {
   });
 }
 
-function createOceanPatternTile(preset, size, contourStrength) {
-  const tile = document.createElement("canvas");
-  tile.width = size;
-  tile.height = size;
-  const ctx = tile.getContext("2d");
-  if (!ctx) return null;
-
-  const strength = clamp(contourStrength, 0, 1);
-  const xStep = Math.max(8, Math.round(size / 12));
-  const yStepBase = Math.max(10, Math.round(size / (8 + strength * 7)));
-
-  if (preset === "wave_hachure") {
-    ctx.strokeStyle = `rgba(15, 60, 105, ${0.34 + 0.46 * strength})`;
-    ctx.lineWidth = 1.1 + 1.2 * strength;
-    const diagStep = Math.max(8, Math.round(size / (8 + strength * 5)));
-    for (let offset = -size; offset <= size * 1.6; offset += diagStep) {
-      ctx.beginPath();
-      for (let x = 0; x <= size; x += xStep) {
-        const y = offset + x * 0.45 + Math.sin((x / size) * Math.PI * 2) * (3 + 6 * strength);
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-    }
-    return tile;
+function applyBathymetryCoverageExclusionMask(coverageCollection) {
+  if (!Array.isArray(coverageCollection?.features) || !coverageCollection.features.length) return;
+  context.beginPath();
+  pathCanvas({ type: "Sphere" });
+  pathCanvas(coverageCollection);
+  try {
+    context.clip("evenodd");
+  } catch (error) {
+    context.clip();
   }
-
-  const contourAlpha = preset === "bathymetry_soft"
-    ? 0.2 + 0.34 * strength
-    : 0.28 + 0.52 * strength;
-  ctx.strokeStyle = `rgba(16, 65, 112, ${contourAlpha})`;
-  ctx.lineWidth = preset === "bathymetry_soft" ? 0.85 + 0.5 * strength : 1.1 + 1.05 * strength;
-
-  const yStep = preset === "bathymetry_soft" ? Math.round(yStepBase * 1.25) : yStepBase;
-  const amp = preset === "bathymetry_soft"
-    ? Math.max(2.2, size * (0.018 + strength * 0.02))
-    : Math.max(3, size * (0.022 + strength * 0.028));
-
-  for (let y = -yStep; y <= size + yStep; y += yStep) {
-    ctx.beginPath();
-    for (let x = 0; x <= size; x += xStep) {
-      const phase = (x / size) * Math.PI * 2.2 + y * 0.06;
-      const wave = Math.sin(phase) * amp + Math.sin(phase * 0.5 + 1.4) * amp * 0.35;
-      const yy = y + wave;
-      if (x === 0) ctx.moveTo(x, yy);
-      else ctx.lineTo(x, yy);
-    }
-    ctx.stroke();
-  }
-
-  if (preset === "bathymetry_contours") {
-    ctx.strokeStyle = `rgba(9, 36, 76, ${0.34 + 0.48 * strength})`;
-    ctx.lineWidth = 1.35 + 1.15 * strength;
-    const majorStep = yStep * 3;
-    for (let y = 0; y <= size + majorStep; y += majorStep) {
-      ctx.beginPath();
-      for (let x = 0; x <= size; x += xStep) {
-        const phase = (x / size) * Math.PI * 2 + y * 0.05;
-        const yy = y + Math.sin(phase) * amp * 1.1;
-        if (x === 0) ctx.moveTo(x, yy);
-        else ctx.lineTo(x, yy);
-      }
-      ctx.stroke();
-    }
-  }
-
-  return tile;
-}
-
-function getOceanPattern({ preset, scale, contourStrength }) {
-  if (!context || preset === "flat") return null;
-  const size = clamp(Math.round(OCEAN_PATTERN_BASE_SIZE * scale), 64, 512);
-  const key = `${preset}:${size}:${contourStrength.toFixed(2)}`;
-  const cached = oceanPatternCache.get(key);
-  if (cached) return cached;
-
-  const tile = createOceanPatternTile(preset, size, contourStrength);
-  if (!tile) return null;
-  const pattern = context.createPattern(tile, "repeat");
-  if (!pattern) return null;
-  oceanPatternCache.set(key, pattern);
-  return pattern;
 }
 
 function drawOceanStyle() {
@@ -7171,18 +7496,36 @@ function drawOceanStyle() {
     return;
   }
 
-  state.oceanMaskMode = OCEAN_MASK_MODE_BATHYMETRY;
-  state.oceanMaskQuality = 1;
+  const { mode: clipMaskMode } = resolveOceanMask();
+  const globalBands = getBathymetryCollectionBySource(bathymetryData.bands, "global");
+  const scenarioBands = getBathymetryCollectionBySource(bathymetryData.bands, "scenario");
+  const globalContours = getBathymetryCollectionBySource(bathymetryData.contours, "global");
+  const scenarioContours = getBathymetryCollectionBySource(bathymetryData.contours, "scenario");
+  const scenarioCoverage = bathymetryData.scenarioCoverage;
 
   context.save();
-  if (hasBands) {
-    drawBathymetryBands(bathymetryData.bands, oceanStyle);
+  applyOceanClipMask(clipMaskMode);
+  if (Array.isArray(globalBands?.features) && globalBands.features.length) {
+    context.save();
+    applyBathymetryCoverageExclusionMask(scenarioCoverage);
+    drawBathymetryBands(globalBands, oceanStyle);
+    context.restore();
   }
-  if (hasContours) {
-    drawBathymetryContours(bathymetryData.contours, oceanStyle);
+  if (Array.isArray(scenarioBands?.features) && scenarioBands.features.length) {
+    drawBathymetryBands(scenarioBands, oceanStyle);
+  }
+  if (Array.isArray(globalContours?.features) && globalContours.features.length) {
+    context.save();
+    applyBathymetryCoverageExclusionMask(scenarioCoverage);
+    drawBathymetryContours(globalContours, oceanStyle);
+    context.restore();
+  }
+  if (Array.isArray(scenarioContours?.features) && scenarioContours.features.length) {
+    drawBathymetryContours(scenarioContours, oceanStyle);
   }
   context.restore();
-  context.globalAlpha = 1;
+  state.oceanMaskMode = OCEAN_MASK_MODE_BATHYMETRY;
+  state.oceanMaskQuality = 1;
 }
 
 const VALID_BLEND_MODES = new Set([

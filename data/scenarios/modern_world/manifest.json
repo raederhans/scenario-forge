@@ -6,6 +6,7 @@
   "bookmark_description": "Canonical modern-world baseline with vanilla palette colors.",
   "bookmark_date": "2026.1.1.12",
   "default_country": "US",
+  "map_mode": "political",
   "featured_tags": [
     "US",
     "CN",

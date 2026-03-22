@@ -7,6 +7,7 @@ import {
   normalizeCityLayerStyleConfig,
   normalizeDayNightStyleConfig,
   normalizeLakeStyleConfig,
+  normalizeMapSemanticMode,
   normalizePhysicalStyleConfig,
 } from "../core/state.js";
 import { ColorManager } from "../core/color_manager.js";
@@ -5243,6 +5244,7 @@ function initSidebar({ render } = {}) {
         state.waterRegionOverrides = data.waterRegionOverrides || {};
         state.specialRegionOverrides = data.specialRegionOverrides || {};
         state.sovereigntyByFeatureId = data.sovereigntyByFeatureId || {};
+        state.mapSemanticMode = normalizeMapSemanticMode(data.mapSemanticMode, state.activeScenarioId ? state.mapSemanticMode : "political");
         if (state.activeScenarioId) {
           if (data.scenarioControllersByFeatureId) {
             state.scenarioControllersByFeatureId = { ...data.scenarioControllersByFeatureId };

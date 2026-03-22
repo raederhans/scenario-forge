@@ -92,6 +92,7 @@ const countryPalette = {
 
 const legacyDefaultCountryPalette = { ...countryPalette };
 const defaultCountryPalette = { ...countryPalette };
+const MAP_SEMANTIC_MODES = new Set(["political", "blank"]);
 
 const countryNames = {
   DE: "Germany",
@@ -825,6 +826,7 @@ export {
   countryPalette,
   defaultCountryPalette,
   legacyDefaultCountryPalette,
+  MAP_SEMANTIC_MODES,
   countryNames,
   countryPresets,
   PHYSICAL_ATLAS_CLASS_KEYS,
@@ -844,6 +846,14 @@ export {
   createDefaultDayNightStyleConfig,
   normalizeDayNightStyleConfig,
 };
+
+export function normalizeMapSemanticMode(value, fallback = "political") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (MAP_SEMANTIC_MODES.has(normalized)) {
+    return normalized;
+  }
+  return MAP_SEMANTIC_MODES.has(fallback) ? fallback : "political";
+}
 
 export const state = {
   locales: { ui: {}, geo: {} },
@@ -978,6 +988,7 @@ export const state = {
   sovereigntyByFeatureId: {},
   sovereigntyInitialized: false,
   sovereigntyRevision: 0,
+  mapSemanticMode: "political",
   dynamicBordersEnabled: true,
   dynamicBordersDirty: false,
   dynamicBordersDirtyReason: "",

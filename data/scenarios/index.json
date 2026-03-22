@@ -4,7 +4,7 @@
   "scenarios": [
     {
       "scenario_id": "blank_base",
-      "display_name": "Canonical Baseline",
+      "display_name": "Blank Map",
       "manifest_url": "data/scenarios/blank_base/manifest.json",
       "audit_url": "data/scenarios/blank_base/audit.json"
     },
