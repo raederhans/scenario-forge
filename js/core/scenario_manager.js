@@ -1372,6 +1372,19 @@ function syncScenarioLocalizationState({
   applyScenarioGeoLocalization();
 }
 
+function applyBlankScenarioPresentationDefaults({ resetLocalization = true } = {}) {
+  if (resetLocalization) {
+    syncScenarioLocalizationState({
+      cityOverridesPayload: null,
+      geoLocalePatchPayload: null,
+    });
+  }
+  state.showCityPoints = false;
+  if (typeof state.updateToolbarInputsFn === "function") {
+    state.updateToolbarInputsFn();
+  }
+}
+
 function assignOptionalLayerPayloadToActiveScenario(bundle, layerKey, payload) {
   const config = getScenarioOptionalLayerConfig(layerKey);
   if (!config) return false;
@@ -2159,6 +2172,7 @@ function captureScenarioApplyRollbackSnapshot() {
     activeScenarioPerformanceHints: cloneScenarioStateValue(state.activeScenarioPerformanceHints),
     renderProfile: String(state.renderProfile || "auto"),
     dynamicBordersEnabled: state.dynamicBordersEnabled !== false,
+    showCityPoints: state.showCityPoints !== false,
     showWaterRegions: state.showWaterRegions !== false,
     showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
     showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
@@ -2262,6 +2276,7 @@ function restoreScenarioApplyRollbackSnapshot(snapshot, { renderNow = false } = 
   state.activeScenarioPerformanceHints = cloneScenarioStateValue(snapshot.activeScenarioPerformanceHints);
   state.renderProfile = String(snapshot.renderProfile || "auto");
   state.dynamicBordersEnabled = snapshot.dynamicBordersEnabled !== false;
+  state.showCityPoints = snapshot.showCityPoints !== false;
   state.showWaterRegions = snapshot.showWaterRegions !== false;
   state.showScenarioSpecialRegions = snapshot.showScenarioSpecialRegions !== false;
   state.showScenarioReliefOverlays = snapshot.showScenarioReliefOverlays !== false;
@@ -2500,9 +2515,12 @@ async function applyScenarioBundle(
     state.scenarioDistrictGroupsData = staged.districtGroupsPayload;
     state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(staged.districtGroupsPayload);
     syncScenarioLocalizationState({
-      cityOverridesPayload: bundle.cityOverridesPayload || null,
-      geoLocalePatchPayload: bundle.geoLocalePatchPayload || null,
+      cityOverridesPayload: staged.mapSemanticMode === "blank" ? null : (bundle.cityOverridesPayload || null),
+      geoLocalePatchPayload: staged.mapSemanticMode === "blank" ? null : (bundle.geoLocalePatchPayload || null),
     });
+    if (staged.mapSemanticMode === "blank") {
+      applyBlankScenarioPresentationDefaults({ resetLocalization: false });
+    }
     state.releasableCatalog = mergeReleasableCatalogs(state.defaultReleasableCatalog, bundle.releasableCatalog);
     state.scenarioReleasableIndex = staged.releasableIndex;
     state.scenarioAudit = bundle.auditPayload || null;
@@ -2748,6 +2766,9 @@ function resetToScenarioBaseline(
   state.scenarioAutoShellOwnerByFeatureId = {};
   state.scenarioAutoShellControllerByFeatureId = {};
   state.mapSemanticMode = getScenarioMapSemanticMode(state.activeScenarioManifest, state.mapSemanticMode);
+  if (state.mapSemanticMode === "blank") {
+    applyBlankScenarioPresentationDefaults();
+  }
   state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
   state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
   state.scenarioViewMode = "ownership";
@@ -2825,10 +2846,7 @@ function clearActiveScenario(
   state.scenarioDistrictGroupsData = null;
   state.scenarioDistrictGroupByFeatureId = new Map();
   state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;
-  syncScenarioLocalizationState({
-    cityOverridesPayload: null,
-    geoLocalePatchPayload: null,
-  });
+  applyBlankScenarioPresentationDefaults();
   state.scenarioReleasableIndex = {
     byTag: {},
     childTagsByParent: {},

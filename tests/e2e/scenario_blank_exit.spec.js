@@ -130,6 +130,9 @@ async function getBlankStateSnapshot(page) {
       activeSovereignCode: String(state.activeSovereignCode || ''),
       sovereigntyCount: Object.keys(state.sovereigntyByFeatureId || {}).length,
       controllerCount: Object.keys(state.scenarioControllersByFeatureId || {}).length,
+      showCityPoints: !!state.showCityPoints,
+      hasScenarioGeoLocalePatch: !!state.scenarioGeoLocalePatchData,
+      hasScenarioCityOverrides: !!state.scenarioCityOverridesData,
     };
   });
 }
@@ -162,6 +165,9 @@ test('blank_base stays empty and exiting scenarios returns to the same blank can
     activeSovereignCode: '',
     sovereigntyCount: 0,
     controllerCount: 0,
+    showCityPoints: false,
+    hasScenarioGeoLocalePatch: false,
+    hasScenarioCityOverrides: false,
   });
 
   const blankScenarioPixels = await captureCanvasSample(page);
@@ -207,6 +213,9 @@ test('blank_base stays empty and exiting scenarios returns to the same blank can
     activeSovereignCode: '',
     sovereigntyCount: 0,
     controllerCount: 0,
+    showCityPoints: false,
+    hasScenarioGeoLocalePatch: false,
+    hasScenarioCityOverrides: false,
   });
 
   await ensureScenario(page, 'tno_1962');
@@ -220,6 +229,9 @@ test('blank_base stays empty and exiting scenarios returns to the same blank can
       activeSovereignCode: String(state.activeSovereignCode || ''),
       sovereigntyCount: Object.keys(state.sovereigntyByFeatureId || {}).length,
       controllerCount: Object.keys(state.scenarioControllersByFeatureId || {}).length,
+      showCityPoints: !!state.showCityPoints,
+      hasScenarioGeoLocalePatch: !!state.scenarioGeoLocalePatchData,
+      hasScenarioCityOverrides: !!state.scenarioCityOverridesData,
     };
   }), { timeout: 30000 }).toEqual({
     activeScenarioId: '',
@@ -227,6 +239,9 @@ test('blank_base stays empty and exiting scenarios returns to the same blank can
     activeSovereignCode: '',
     sovereigntyCount: 0,
     controllerCount: 0,
+    showCityPoints: false,
+    hasScenarioGeoLocalePatch: false,
+    hasScenarioCityOverrides: false,
   });
   await page.waitForTimeout(1200);
 
