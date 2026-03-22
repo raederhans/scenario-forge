@@ -23,6 +23,7 @@ except ImportError:
 
 
 MANUAL_UI_DICT = {
+    "0 colors": "0 种颜色",
     "1930s Electrification Proxy": "1930年代电气化代理",
     "Active Owner": "当前属主",
     "Advanced": "高级",
@@ -165,6 +166,7 @@ MANUAL_UI_DICT = {
     "Texture": "纹理",
     "Overlay": "覆盖层",
     "Map Style": "地图样式",
+    "Map Creator": "地图创建器",
     "Internal Borders": "内部边界",
     "Empire Borders": "帝国边界",
     "Coastlines": "海岸线",
@@ -269,15 +271,20 @@ MANUAL_UI_DICT = {
     "The saved project was created against a different scenario baseline. Continue only if you are comfortable loading it against current assets.": "该保存项目基于不同的剧本基线创建。只有在你接受按当前资源加载它时，才继续。",
     "This removes manual color changes from the current map. You can undo the reset from the toast that follows.": "这会移除当前地图中的手动颜色修改。你可以通过随后出现的提示撤销这次重置。",
     "Current tool, paint mode, and map actions": "当前工具、绘制模式与地图操作",
+    "Skip to map workspace": "跳转到地图工作区",
     "Undo applied": "已撤销",
     "When off, shoreline, basin contour, and texture overlays are hidden for the active scenario.": "关闭后，当前剧本的海岸线、盆地等高线和纹理覆盖层将被隐藏。",
     "Workspace": "工作区",
     "Zoom percentage must be between 100% and 5000%.": "缩放百分比必须在 100% 到 5000% 之间。",
     "Scenario relief overlays are currently visible. Cached relief stays visible during pan and zoom, then redraws exactly after the view settles.": "当前剧本的地形覆盖层处于可见状态。平移和缩放期间会继续显示缓存纹理，并在视图稳定后进行精确重绘。",
-    "Experimental Ocean Styles": "实验性海洋样式",
-    "Enable bathymetry and wave presets for testing. May reduce pan and zoom performance.": "启用测深与波纹预设以供测试，可能降低平移和缩放性能。",
-    "Enable Experimental Ocean Styles to unlock advanced ocean textures.": "启用“实验性海洋样式”后才能使用高级海洋纹理。",
-    "Available when Experimental Ocean Styles is enabled.": "启用“实验性海洋样式”后可用。",
+    "Coastal Accent": "海岸强调",
+    "Available only in the TNO 1962 scenario.": "仅在 TNO 1962 剧本中可用。",
+    "Experimental Bathymetry": "实验性测深",
+    "Enable data-driven bathymetry presets for testing. May reduce pan and zoom performance.": "启用数据驱动的测深预设以供测试，可能降低平移和缩放性能。",
+    "Enable Experimental Bathymetry to unlock data-driven depth presets.": "启用“实验性测深”后才能使用数据驱动的深度预设。",
+    "Available when Experimental Bathymetry is enabled.": "启用“实验性测深”后可用。",
+    "Dev": "开发",
+    "e.g. Buffer Zone A...": "例如：缓冲区 A...",
 }
 
 MANUAL_GEO_OVERRIDES = {
@@ -392,6 +399,7 @@ MANUAL_GEO_OVERRIDES = {
     "South Jutland (Remainder)": "南日德兰（剩余部分）",
     "South Jutland (Remainder) (DK)": "南日德兰（剩余部分）",
     "South Jutland (Remainder) [Sydjylland]": "南日德兰（剩余部分）",
+    "Northern-Ireland": "北爱尔兰",
 }
 
 UI_CALL_RE = re.compile(r"""t\(\s*(['\"])(?P<text>.*?)\1\s*,\s*(['\"])ui\3\s*\)""")

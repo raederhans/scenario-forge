@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Map Creator</title>
+    <title data-i18n="Map Creator">Map Creator</title>
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
@@ -14,7 +14,7 @@
             <div class="sidebar-shell-heading" data-i18n="Workspace">Workspace</div>
             <div class="sidebar-brand-row">
               <div class="app-title-row app-title-row-compact">
-                <h1 class="app-title">Map Creator</h1>
+                <h1 class="app-title" data-i18n="Map Creator">Map Creator</h1>
                 <span id="appDirtyIndicator" class="app-dirty-indicator hidden" aria-hidden="true">*</span>
               </div>
             </div>
@@ -68,8 +68,8 @@
             </div>
             <div id="paletteLibraryPanel" class="palette-library mt-3 hidden">
               <label id="lblPaletteSearch" class="section-header-block" for="paletteLibrarySearch">Search Colors</label>
-              <input id="paletteLibrarySearch" type="text" name="palette-library-search" autocomplete="off" spellcheck="false" placeholder="Search country, ISO-2, or source tag…" class="input mt-2" />
-              <div id="paletteLibrarySummary" class="body-text mt-2">0 colors</div>
+              <input id="paletteLibrarySearch" type="text" name="palette-library-search" autocomplete="off" spellcheck="false" placeholder="Search country, ISO-2, or source tag..." class="input mt-2" />
+              <div id="paletteLibrarySummary" class="body-text mt-2" data-i18n="0 colors">0 colors</div>
               <div id="paletteLibraryList" class="palette-library-list mt-3"></div>
             </div>
           </div>
@@ -180,12 +180,21 @@
                     <label id="lblLakeFillColor" class="range-label" for="lakeFillColor" data-i18n="Lake Fill Color">Lake Fill Color</label>
                     <input id="lakeFillColor" type="color" value="#aadaff" class="color-input" />
                   </div>
+                  <div id="oceanCoastalAccentRow" class="space-y-2 hidden">
+                    <label class="toggle-label">
+                      <input id="oceanCoastalAccentToggle" type="checkbox" class="checkbox-input" checked />
+                      <span id="lblOceanCoastalAccent">Coastal Accent</span>
+                    </label>
+                    <p id="oceanCoastalAccentHint" class="sidebar-tool-hint">
+                      Available only in the TNO 1962 scenario.
+                    </p>
+                  </div>
                   <label class="toggle-label">
                     <input id="oceanAdvancedStylesToggle" type="checkbox" class="checkbox-input" />
-                    <span id="lblOceanAdvancedStylesToggle">Experimental Ocean Styles</span>
+                    <span id="lblOceanAdvancedStylesToggle">Experimental Bathymetry</span>
                   </label>
                   <p id="oceanAdvancedStylesHint" class="sidebar-tool-hint">
-                    Enable bathymetry and wave presets for testing. May reduce pan and zoom performance.
+                    Enable data-driven bathymetry presets for testing. May reduce pan and zoom performance.
                   </p>
                   <div>
                     <div class="range-row">
@@ -195,7 +204,6 @@
                       <option id="optOceanFlat" value="flat" selected>Flat Blue</option>
                       <option id="optOceanBathymetrySoft" value="bathymetry_soft" disabled>Bathymetry Soft</option>
                       <option id="optOceanBathymetryContours" value="bathymetry_contours" disabled>Bathymetry Contours</option>
-                      <option id="optOceanWaveHachure" value="wave_hachure" disabled>Wave Hachure</option>
                     </select>
                   </div>
                   <div>
@@ -1034,7 +1042,7 @@
                 </div>
                 <div>
                   <label id="lblSpecialZoneLabel" class="range-label" for="specialZoneLabelInput">Label</label>
-                  <input id="specialZoneLabelInput" type="text" name="special-zone-label" autocomplete="off" spellcheck="false" class="input mt-2" placeholder="e.g. Buffer Zone A…" />
+                  <input id="specialZoneLabelInput" type="text" name="special-zone-label" autocomplete="off" spellcheck="false" class="input mt-2" placeholder="e.g. Buffer Zone A..." data-i18n-placeholder="e.g. Buffer Zone A..." />
                 </div>
                 <div class="parent-border-actions mt-2">
                   <button id="specialZoneStartBtn" type="button" class="btn-secondary">Start Draw</button>
@@ -1058,7 +1066,7 @@
         </div>
       </aside>
 
-      <a class="skip-link" href="#mapContainer">Skip to map workspace</a>
+      <a class="skip-link" href="#mapContainer" data-i18n="Skip to map workspace">Skip to map workspace</a>
       <main class="map-main">
         <div class="map-stage">
           <div id="mapContainer">
@@ -1171,7 +1179,7 @@
 
               <div class="dock-group dock-group-mode">
                 <div id="lblCurrentMode" class="dock-group-label" data-i18n="Mode">Mode</div>
-                <div class="dock-segmented-control" role="group" aria-label="Paint mode">
+                <div class="dock-segmented-control" role="group" aria-label="Paint mode" data-i18n-aria-label="Paint mode">
                   <button id="paintModeVisualBtn" type="button" class="dock-segment-btn" data-paint-mode="visual" data-i18n="Visual">Visual Color</button>
                   <button id="paintModePoliticalBtn" type="button" class="dock-segment-btn" data-paint-mode="sovereignty" data-i18n="Political">Political</button>
                 </div>
@@ -1181,7 +1189,7 @@
                 <div id="lblEditingRules" class="dock-group-label" data-i18n="Primary Action">Primary Action</div>
                 <div class="dock-action-stack">
                   <div class="dock-action-main-row">
-                    <div id="dockPaintSummary" class="dock-paint-summary">Visual Color brush</div>
+                    <div id="dockPaintSummary" class="dock-paint-summary" data-i18n="Visual Color brush">Visual Color brush</div>
                     <button id="politicalEditingToggleBtn" type="button" class="dock-icon-btn dock-mode-icon-btn" data-i18n-aria-label="Political Editing" data-i18n-title="Political Editing">
                       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                         <path d="M5 4v16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
@@ -1209,7 +1217,7 @@
                       <option id="optColorModePolitical" value="political" selected>By Neighbor (Political)</option>
                     </select>
                     <div id="dockPoliticalEditingPanel" class="dock-political-panel hidden">
-                      <label class="visually-hidden" for="paintModeSelect">Paint mode</label>
+                      <label class="visually-hidden" for="paintModeSelect" data-i18n="Paint mode">Paint mode</label>
                       <select id="paintModeSelect" name="paint-mode" autocomplete="off" class="select-input dock-select dock-select-hidden">
                         <option id="optPaintMeaningVisual" value="visual">Visual Color</option>
                         <option id="optPaintMeaningSovereignty" value="sovereignty">Political Ownership</option>
@@ -1287,7 +1295,7 @@
                   <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
                   <path d="M16 16 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
                 </svg>
-                <input id="countrySearch" type="text" name="country-search" autocomplete="off" spellcheck="false" placeholder="Search country or code…" class="input inspector-search-input" />
+                <input id="countrySearch" type="text" name="country-search" autocomplete="off" spellcheck="false" placeholder="Search country or code..." class="input inspector-search-input" />
               </div>
             </div>
           </div>
@@ -1339,7 +1347,7 @@
             </div>
           </details>
 
-          <h2 id="selectedCountryActionsHeading" class="visually-hidden">Territories and Presets</h2>
+          <h2 id="selectedCountryActionsHeading" class="visually-hidden" data-i18n="Territories & Presets">Territories & Presets</h2>
           <details id="selectedCountryActionsSection" class="card inspector-section" aria-labelledby="selectedCountryActionsHeading lblPresetsHierarchy">
             <summary id="lblPresetsHierarchy" class="section-header">Territories &amp; Presets</summary>
             <div class="inspector-panel-body">
@@ -1359,14 +1367,14 @@
                   <input id="scenarioSpecialRegionVisibilityToggle" type="checkbox" class="checkbox-input" checked />
                   <span id="lblScenarioSpecialRegionVisibilityToggle">Show Scenario Special Regions</span>
                 </label>
-                <p id="scenarioSpecialRegionVisibilityHint" class="sidebar-tool-hint mt-2">
+                <p id="scenarioSpecialRegionVisibilityHint" class="sidebar-tool-hint mt-2" data-i18n="Toggle Atlantropa-style scenario regions without affecting the base map.">
                   Toggle Atlantropa-style scenario regions without affecting the base map.
                 </p>
                 <label class="toggle-label mt-3">
                   <input id="scenarioReliefOverlayVisibilityToggle" type="checkbox" class="checkbox-input" checked />
                   <span id="lblScenarioReliefOverlayVisibilityToggle">Show Scenario Relief Overlays</span>
                 </label>
-                <p id="scenarioReliefOverlayVisibilityHint" class="sidebar-tool-hint mt-2">
+                <p id="scenarioReliefOverlayVisibilityHint" class="sidebar-tool-hint mt-2" data-i18n="Toggle shoreline, basin contour, and texture overlays for the active scenario.">
                   Toggle shoreline, basin contour, and texture overlays for the active scenario.
                 </p>
               </div>
@@ -1383,7 +1391,7 @@
                     name="special-region-search"
                     autocomplete="off"
                     spellcheck="false"
-                    placeholder="Search basin, shelf, or exposure…"
+                    placeholder="Search basin, shelf, or exposure..."
                     class="input inspector-search-input"
                   />
                 </div>
@@ -1455,7 +1463,7 @@
                     name="water-region-search"
                     autocomplete="off"
                     spellcheck="false"
-                    placeholder="Search sea, lake, or strait…"
+                    placeholder="Search sea, lake, or strait..."
                     class="input inspector-search-input"
                   />
                 </div>
@@ -1500,7 +1508,7 @@
             </div>
           </details>
 
-          <h2 id="projectLegendHeading" class="visually-hidden">Project and Legend</h2>
+          <h2 id="projectLegendHeading" class="visually-hidden" data-i18n="Project & Legend">Project & Legend</h2>
           <details id="projectLegendSection" class="card inspector-section" aria-labelledby="projectLegendHeading lblProjectLegend">
             <summary id="lblProjectLegend" class="section-header">Project &amp; Legend</summary>
             <div id="projectLegendStack" class="inspector-panel-body inspector-stack"></div>
@@ -1544,6 +1552,7 @@
                       id="inspectorDevWorkspaceBtn"
                       class="btn-secondary inspector-utility-dev-btn"
                       type="button"
+                      data-i18n="Dev"
                     >
                       Dev
                     </button>

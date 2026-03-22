@@ -1,0 +1,82 @@
+{
+  "generated_at": "2026-03-22T02:01:11Z",
+  "asset_path": "data/scenarios/tno_1962/bathymetry.topo.json",
+  "scenario_id": "tno_1962",
+  "builder": "tools/patch_tno_1962_bundle.py",
+  "source_root": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\394360\\3583339918",
+  "observed_source": "ATL donor_sea geometry derived from the HGO-backed Atlantropa sea donor set.",
+  "synthetic_source": "ATL sea_completion geometry rendered into synthetic depth rings for non-observed retained seas.",
+  "excluded_source": "Atlantropa drained basin unions and salt-flat regions excluded from scenario bathymetry output.",
+  "band_threshold_profiles": {
+    "default": [
+      [
+        0,
+        -50
+      ],
+      [
+        -50,
+        -150
+      ],
+      [
+        -150,
+        -300
+      ],
+      [
+        -300,
+        -500
+      ]
+    ],
+    "libya_suez_and_qattara": [
+      [
+        0,
+        -25
+      ],
+      [
+        -25,
+        -75
+      ],
+      [
+        -75,
+        -150
+      ],
+      [
+        -150,
+        -200
+      ]
+    ]
+  },
+  "diagnostics": {
+    "band_feature_count": 90,
+    "contour_feature_count": 74,
+    "observed_region_ids": [
+      "adriatica",
+      "aegean",
+      "gabes",
+      "levant",
+      "libya_suez",
+      "sicily_tunis",
+      "tyrrhenian",
+      "west_med"
+    ],
+    "synthetic_region_ids": [
+      "adriatica",
+      "aegean",
+      "gabes",
+      "levant",
+      "libya_suez",
+      "sicily_tunis",
+      "tyrrhenian",
+      "west_med"
+    ],
+    "excluded_region_ids": [
+      "adriatica",
+      "aegean",
+      "gabes",
+      "levant",
+      "libya_suez",
+      "sicily_tunis",
+      "tyrrhenian",
+      "west_med"
+    ]
+  }
+}

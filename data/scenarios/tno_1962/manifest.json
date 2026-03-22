@@ -109,7 +109,9 @@
     "context_land_mask_tolerance": 0.25,
     "context_land_mask_area_delta_ratio": 0.003948094751666009,
     "context_land_mask_fallback_used": false,
-    "context_land_mask_arc_refs": 63986
+    "context_land_mask_arc_refs": 63986,
+    "tno_bathymetry_band_count": 90,
+    "tno_bathymetry_contour_count": 74
   },
   "water_regions_url": "data/scenarios/tno_1962/water_regions.geojson",
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
@@ -135,5 +137,6 @@
   "district_groups_url": "data/scenarios/tno_1962/district_groups.manual.json",
   "geo_locale_patch_url": "data/scenarios/tno_1962/geo_locale_patch.json",
   "city_overrides_url": "data/scenarios/tno_1962/city_overrides.json",
-  "capital_hints_url": "data/scenarios/tno_1962/capital_hints.json"
+  "capital_hints_url": "data/scenarios/tno_1962/capital_hints.json",
+  "bathymetry_topology_url": "data/scenarios/tno_1962/bathymetry.topo.json"
 }

@@ -7,7 +7,7 @@ import tempfile
 import unittest
 
 import geopandas as gpd
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, mapping
 
 from tools.check_scenario_contracts import validate_publish_bundle_dir
 from tools.patch_tno_1962_bundle import (
@@ -16,6 +16,7 @@ from tools.patch_tno_1962_bundle import (
     MANUAL_SYNC_POLICY_STRICT_BLOCK,
     apply_dev_manual_overrides,
     build_relief_overlays,
+    build_tno_bathymetry_payload,
     build_runtime_topology_state_from_countries_state,
     build_polar_feature_diagnostics,
     build_runtime_topology_payload,
@@ -102,6 +103,20 @@ def _write_publish_bundle_dir(
     )
     (target_dir / "countries.json").write_text(json.dumps({"countries": {"AAA": {"tag": "AAA"}}}), encoding="utf-8")
     (target_dir / "geo_locale_patch.json").write_text(json.dumps({"geo": {}}), encoding="utf-8")
+    (target_dir / "bathymetry.topo.json").write_text(
+        json.dumps(
+            {
+                "type": "Topology",
+                "objects": {
+                    "bathymetry_bands": {"type": "GeometryCollection", "geometries": []},
+                    "bathymetry_contours": {"type": "GeometryCollection", "geometries": []},
+                },
+                "arcs": [],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
 
 
 class TnoBundleBuilderTest(unittest.TestCase):
@@ -368,6 +383,50 @@ class TnoBundleBuilderTest(unittest.TestCase):
         )
         self.assertEqual(len(payload["features"]), 25)
 
+    def test_build_tno_bathymetry_payload_marks_observed_and_synthetic_modes(self) -> None:
+        region_unions = {
+            "west_mediterranean": _square(0, 0, 1.0),
+            "libya_suez_and_qattara": _square(3, 0, 1.0),
+        }
+        atl_sea_collection = [
+            {
+                "type": "Feature",
+                "properties": {
+                    "id": "ATLSEA_west_obs",
+                    "region_id": "west_mediterranean",
+                    "region_group": "atlantropa_west_mediterranean_margin_sea",
+                    "atl_geometry_role": "donor_sea",
+                },
+                "geometry": mapping(_square(0.0, 1.2, 1.0)),
+            },
+            {
+                "type": "Feature",
+                "properties": {
+                    "id": "ATLSEA_libya_syn",
+                    "region_id": "libya_suez_and_qattara",
+                    "region_group": "atlantropa_libya_suez_and_qattara_sea",
+                    "atl_geometry_role": "sea_completion",
+                },
+                "geometry": mapping(_square(3.0, 1.2, 1.0)),
+            },
+        ]
+
+        payload, diagnostics = build_tno_bathymetry_payload(atl_sea_collection, region_unions)
+        band_gdf = topology_object_to_gdf(payload, "bathymetry_bands")
+        contour_gdf = topology_object_to_gdf(payload, "bathymetry_contours")
+
+        self.assertFalse(band_gdf.empty)
+        self.assertFalse(contour_gdf.empty)
+        self.assertEqual(set(band_gdf["bathymetry_mode"]), {"observed", "synthetic"})
+        self.assertIn("west_mediterranean", diagnostics["observed_region_ids"])
+        self.assertIn("libya_suez_and_qattara", diagnostics["synthetic_region_ids"])
+        shallow_rows = band_gdf.loc[
+            band_gdf["region_id"] == "libya_suez_and_qattara",
+            "depth_max_m",
+        ].astype(int)
+        self.assertTrue((shallow_rows >= -200).all())
+        self.assertTrue((shallow_rows <= -25).any())
+
     def test_build_runtime_topology_state_sets_tno_relief_default_hint_true(self) -> None:
         state = {
             "countries_payload": {
@@ -407,6 +466,32 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 crs="EPSG:4326",
             ),
             "relief_overlays_payload": {"type": "FeatureCollection", "features": []},
+            "bathymetry_payload": {
+                "type": "Topology",
+                "objects": {
+                    "bathymetry_bands": {
+                        "type": "GeometryCollection",
+                        "geometries": [
+                            {
+                                "type": "Polygon",
+                                "properties": {"id": "band-1", "depth_min_m": 0, "depth_max_m": -50},
+                                "arcs": [],
+                            }
+                        ],
+                    },
+                    "bathymetry_contours": {
+                        "type": "GeometryCollection",
+                        "geometries": [
+                            {
+                                "type": "LineString",
+                                "properties": {"id": "contour-1", "depth_m": -100},
+                                "arcs": [],
+                            }
+                        ],
+                    },
+                },
+                "arcs": [],
+            },
             "stage_metadata": {
                 "generated_at": "2026-03-21T00:00:00Z",
                 "source_root": "test-source-root",
@@ -422,6 +507,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 "feature_assignment_override_diagnostics": {},
                 "atl_feature_ids": [],
                 "atl_sea_feature_ids": [],
+                "bathymetry_diagnostics": {"band_feature_count": 1, "contour_feature_count": 1},
                 "context_land_mask_tolerance": 0.25,
                 "context_land_mask_area_delta_ratio": 0.0,
                 "context_land_mask_fallback_used": False,
@@ -431,6 +517,12 @@ class TnoBundleBuilderTest(unittest.TestCase):
         result = build_runtime_topology_state_from_countries_state(state)
 
         self.assertTrue(result["manifest_payload"]["performance_hints"]["scenario_relief_overlays_default"])
+        self.assertEqual(
+            result["manifest_payload"]["bathymetry_topology_url"],
+            "data/scenarios/tno_1962/bathymetry.topo.json",
+        )
+        self.assertEqual(result["manifest_payload"]["summary"]["tno_bathymetry_band_count"], 1)
+        self.assertEqual(result["manifest_payload"]["summary"]["tno_bathymetry_contour_count"], 1)
 
     def test_build_single_antarctic_feature_collapses_runtime_sectors(self) -> None:
         runtime_gdf = gpd.GeoDataFrame(
@@ -505,6 +597,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
 
         self.assertEqual(runtime_only, ("runtime_topology.topo.json",))
         self.assertIn("geo_locale_patch.json", scenario_data)
+        self.assertIn("bathymetry.topo.json", scenario_data)
         self.assertNotIn("runtime_topology.topo.json", scenario_data)
         self.assertEqual(all_files[-1], "runtime_topology.topo.json")
 

@@ -1,0 +1,65 @@
+{
+  "generated_at": "2026-03-22T02:08:51.269975Z",
+  "asset_path": "data/global_bathymetry.topo.json",
+  "coverage_bbox": [
+    -29.4961,
+    19.0,
+    63.0,
+    76.0
+  ],
+  "band_thresholds_m": [
+    [
+      0,
+      -50
+    ],
+    [
+      -50,
+      -100
+    ],
+    [
+      -100,
+      -200
+    ],
+    [
+      -200,
+      -500
+    ],
+    [
+      -500,
+      -1000
+    ],
+    [
+      -1000,
+      -2000
+    ],
+    [
+      -2000,
+      -4000
+    ],
+    [
+      -4000,
+      -6000
+    ]
+  ],
+  "contour_thresholds_m": [
+    -100,
+    -200,
+    -500,
+    -1000,
+    -2000,
+    -4000
+  ],
+  "band_feature_count": 1534,
+  "contour_feature_count": 6,
+  "source": {
+    "name": "ETOPO 2022",
+    "version": "2022 v1 60s local cache",
+    "path": "data/ETOPO_2022_v1_60s_N90W180_surface.tif",
+    "license_note": "Publicly available NOAA relief model used as the local raster source for this generated asset."
+  },
+  "water_mask_sources": [
+    "data/europe_ocean.geojson",
+    "data/water_regions.geojson"
+  ],
+  "coverage_note": "Europe/TNO-focused bathymetry asset for current map extent; excludes lakes from the global ocean bathymetry layer."
+}

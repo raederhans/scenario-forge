@@ -113,7 +113,6 @@ function initToolbar({ render } = {}) {
   const OCEAN_ADVANCED_PRESETS = new Set([
     "bathymetry_soft",
     "bathymetry_contours",
-    "wave_hachure",
   ]);
   const toolButtons = document.querySelectorAll(".btn-tool");
   const customColor = document.getElementById("customColor");
@@ -294,6 +293,8 @@ function initToolbar({ render } = {}) {
   const oceanFillColor = document.getElementById("oceanFillColor");
   const lakeLinkToOcean = document.getElementById("lakeLinkToOcean");
   const lakeFillColor = document.getElementById("lakeFillColor");
+  const oceanCoastalAccentRow = document.getElementById("oceanCoastalAccentRow");
+  const oceanCoastalAccentToggle = document.getElementById("oceanCoastalAccentToggle");
   const oceanAdvancedStylesToggle = document.getElementById("oceanAdvancedStylesToggle");
   const oceanStyleSelect = document.getElementById("oceanStyleSelect");
   const oceanTextureOpacity = document.getElementById("oceanTextureOpacity");
@@ -527,6 +528,7 @@ function initToolbar({ render } = {}) {
     if (workspaceSelectionHint) {
       workspaceSelectionHint.textContent = t("Choose a country, water region, or special region.", "ui");
     }
+    renderOceanCoastalAccentUi();
   };
   state.updateWorkspaceStatusFn = refreshWorkspaceStatus;
 
@@ -863,7 +865,9 @@ function initToolbar({ render } = {}) {
   };
   state.updateScenarioContextBarFn = refreshScenarioContextBar;
   state.triggerScenarioGuideFn = triggerScenarioGuide;
+  let onboardingAutoTimer = 0;
   const dismissOnboardingHint = () => {
+    if (onboardingAutoTimer) { clearTimeout(onboardingAutoTimer); onboardingAutoTimer = 0; }
     if (!mapOnboardingHint || state.onboardingDismissed) return;
     state.onboardingDismissed = true;
     mapOnboardingHint.classList.add("is-hidden");
@@ -874,6 +878,8 @@ function initToolbar({ render } = {}) {
     state.onboardingDismissed = false;
     mapOnboardingHint.classList.remove("is-hidden");
     mapOnboardingHint.setAttribute("aria-hidden", "false");
+    if (onboardingAutoTimer) clearTimeout(onboardingAutoTimer);
+    onboardingAutoTimer = setTimeout(dismissOnboardingHint, 5000);
   };
   state.dismissOnboardingHintFn = dismissOnboardingHint;
   state.showOnboardingHintFn = showOnboardingHint;
@@ -1341,11 +1347,13 @@ function initToolbar({ render } = {}) {
   };
   const normalizeOceanPreset = (value) => {
     const candidate = String(value || "flat").trim().toLowerCase();
+    if (candidate === "wave_hachure") {
+      return "flat";
+    }
     if (
       candidate === "flat" ||
       candidate === "bathymetry_soft" ||
-      candidate === "bathymetry_contours" ||
-      candidate === "wave_hachure"
+      candidate === "bathymetry_contours"
     ) {
       return candidate;
     }
@@ -1367,6 +1375,7 @@ function initToolbar({ render } = {}) {
   if (!state.styleConfig.ocean.experimentalAdvancedStyles && OCEAN_ADVANCED_PRESETS.has(state.styleConfig.ocean.preset)) {
     state.styleConfig.ocean.preset = "flat";
   }
+  state.styleConfig.ocean.coastalAccentEnabled = state.styleConfig.ocean.coastalAccentEnabled !== false;
   state.styleConfig.ocean.fillColor = normalizeOceanFillColor(state.styleConfig.ocean.fillColor);
   state.styleConfig.ocean.opacity = clamp(
     Number.isFinite(Number(state.styleConfig.ocean.opacity)) ? Number(state.styleConfig.ocean.opacity) : 0.72,
@@ -1597,11 +1606,12 @@ function initToolbar({ render } = {}) {
   };
 
   const oceanAdvancedStylesEnabled = () => state.styleConfig.ocean.experimentalAdvancedStyles === true;
+  const isTno1962Scenario = () => String(state.activeScenarioId || "").trim().toLowerCase() === "tno_1962";
 
   const renderOceanAdvancedStylesUi = () => {
     const enabled = oceanAdvancedStylesEnabled();
-    const selectDisabledTitle = t("Enable Experimental Ocean Styles to unlock advanced ocean textures.", "ui");
-    const sliderDisabledTitle = t("Available when Experimental Ocean Styles is enabled.", "ui");
+    const selectDisabledTitle = t("Enable Experimental Bathymetry to unlock data-driven depth presets.", "ui");
+    const sliderDisabledTitle = t("Available when Experimental Bathymetry is enabled.", "ui");
     if (!enabled && OCEAN_ADVANCED_PRESETS.has(state.styleConfig.ocean.preset)) {
       state.styleConfig.ocean.preset = "flat";
     }
@@ -1623,8 +1633,20 @@ function initToolbar({ render } = {}) {
       control.title = enabled ? "" : sliderDisabledTitle;
     });
   };
+  const renderOceanCoastalAccentUi = () => {
+    const visible = isTno1962Scenario();
+    if (oceanCoastalAccentRow) {
+      oceanCoastalAccentRow.classList.toggle("hidden", !visible);
+    }
+    if (oceanCoastalAccentToggle) {
+      oceanCoastalAccentToggle.checked = state.styleConfig.ocean.coastalAccentEnabled !== false;
+      oceanCoastalAccentToggle.disabled = !visible;
+      oceanCoastalAccentToggle.title = visible ? "" : t("Available only in the TNO 1962 scenario.", "ui");
+    }
+  };
   renderLakeUi();
   renderOceanAdvancedStylesUi();
+  renderOceanCoastalAccentUi();
 
   function renderRecentColors() {
     if (!recentContainer) return;
@@ -2450,6 +2472,7 @@ function initToolbar({ render } = {}) {
       oceanContourStrengthValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.contourStrength || 0.75, 0, 1) * 100)}%`;
     }
     renderOceanAdvancedStylesUi();
+    renderOceanCoastalAccentUi();
     renderLakeUi();
     if (colorModeSelect) {
       colorModeSelect.value = state.colorMode || "political";
@@ -3957,6 +3980,16 @@ function initToolbar({ render } = {}) {
       renderDirty("ocean-experimental-advanced-styles");
     });
     oceanAdvancedStylesToggle.dataset.bound = "true";
+  }
+
+  if (oceanCoastalAccentToggle && !oceanCoastalAccentToggle.dataset.bound) {
+    oceanCoastalAccentToggle.checked = state.styleConfig.ocean.coastalAccentEnabled !== false;
+    oceanCoastalAccentToggle.addEventListener("change", (event) => {
+      state.styleConfig.ocean.coastalAccentEnabled = !!event.target.checked;
+      invalidateOceanVisualState("ocean-coastal-accent");
+      renderDirty("ocean-coastal-accent");
+    });
+    oceanCoastalAccentToggle.dataset.bound = "true";
   }
 
   if (lakeLinkToOcean && !lakeLinkToOcean.dataset.bound) {

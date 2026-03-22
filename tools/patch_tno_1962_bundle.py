@@ -152,6 +152,29 @@ DONOR_CAUSEWAY_NAME_HINTS = (
 )
 
 MEDITERRANEAN_WATER_REGION_GROUP = "mediterranean"
+BATHYMETRY_GLOBAL_DEPTH_BANDS = (
+    (0, -50),
+    (-50, -100),
+    (-100, -200),
+    (-200, -500),
+    (-500, -1000),
+    (-1000, -2000),
+    (-2000, -4000),
+    (-4000, -6000),
+)
+BATHYMETRY_GLOBAL_CONTOURS = (-100, -200, -500, -1000, -2000, -4000)
+BATHYMETRY_ATL_SYNTHETIC_PROFILE_DEFAULT = (
+    (0, -50),
+    (-50, -150),
+    (-150, -300),
+    (-300, -500),
+)
+BATHYMETRY_ATL_SYNTHETIC_PROFILE_SHALLOW = (
+    (0, -25),
+    (-25, -75),
+    (-75, -150),
+    (-150, -200),
+)
 TNO_RETIRED_ZERO_FEATURE_TAGS = {"AEF", "ALG", "BEL", "EST", "LAT", "LIT", "LUX", "NOR", "POL", "POR", "SSH", "TAI"}
 TNO_FEATURED_TAG_REPLACEMENTS = {"RKB": "BRG"}
 TNO_CONTROLLER_ONLY_COUNTRY_META = {
@@ -2997,6 +3020,7 @@ CHECKPOINT_SCENARIO_POLITICAL_FILENAME = "scenario_political.geojson"
 CHECKPOINT_SCENARIO_WATER_SEED_FILENAME = "scenario_water_seed.geojson"
 CHECKPOINT_WATER_FILENAME = "water_regions.geojson"
 CHECKPOINT_RELIEF_FILENAME = "relief_overlays.geojson"
+CHECKPOINT_BATHYMETRY_FILENAME = "bathymetry.topo.json"
 CHECKPOINT_LAND_MASK_FILENAME = "land_mask.geojson"
 CHECKPOINT_CONTEXT_LAND_MASK_FILENAME = "context_land_mask.geojson"
 PUBLISH_FILENAMES_BY_SCOPE = {
@@ -3013,6 +3037,7 @@ PUBLISH_FILENAMES_BY_SCOPE = {
         "special_regions.geojson",
         "water_regions.geojson",
         "relief_overlays.geojson",
+        "bathymetry.topo.json",
         "geo_locale_patch.json",
     ),
 }
@@ -6431,6 +6456,180 @@ def build_relief_overlays(atlantropa_region_unions: dict[str, object], lake_geom
     return feature_collection_from_features(features)
 
 
+def _atl_synthetic_depth_profile_for_region(region_id: str) -> tuple[tuple[int, int], ...]:
+    if str(region_id or "").strip().lower() == "libya_suez_and_qattara":
+        return BATHYMETRY_ATL_SYNTHETIC_PROFILE_SHALLOW
+    return BATHYMETRY_ATL_SYNTHETIC_PROFILE_DEFAULT
+
+
+def _estimate_bathymetry_step(geom, level_count: int) -> float:
+    minx, miny, maxx, maxy = geom.bounds
+    min_span = max(min(maxx - minx, maxy - miny), 0.12)
+    return max(min_span / max(level_count * 2.4, 1), 0.02)
+
+
+def _build_bathymetry_ring_rows(
+    geom,
+    *,
+    region_id: str,
+    region_group: str,
+    bathymetry_mode: str,
+    band_defs: tuple[tuple[int, int], ...],
+) -> tuple[list[dict], list[dict]]:
+    current = normalize_polygonal(geom)
+    if current is None:
+        return [], []
+    band_rows: list[dict] = []
+    contour_rows: list[dict] = []
+    step = _estimate_bathymetry_step(current, len(band_defs))
+    for index, (depth_min_m, depth_max_m) in enumerate(band_defs):
+        next_geom = None
+        if index < len(band_defs) - 1:
+            next_geom = normalize_polygonal(current.buffer(-step))
+        band_geom = current
+        if next_geom is not None:
+            band_geom = normalize_polygonal(current.difference(next_geom))
+        if band_geom is not None:
+            band_rows.append({
+                "id": f"bath_{region_id}_{bathymetry_mode}_{abs(int(depth_max_m))}_{index}",
+                "region_id": region_id,
+                "region_group": region_group,
+                "bathymetry_mode": bathymetry_mode,
+                "depth_min_m": int(depth_min_m),
+                "depth_max_m": int(depth_max_m),
+                "geometry": band_geom,
+            })
+        if next_geom is not None:
+            contour_geom = next_geom.boundary
+            if contour_geom is not None and not contour_geom.is_empty:
+                contour_rows.append({
+                    "id": f"bath_contour_{region_id}_{bathymetry_mode}_{abs(int(depth_max_m))}_{index}",
+                    "region_id": region_id,
+                    "region_group": region_group,
+                    "bathymetry_mode": bathymetry_mode,
+                    "depth_m": int(depth_max_m),
+                    "geometry": contour_geom,
+                })
+        if next_geom is None:
+            break
+        current = next_geom
+    return band_rows, contour_rows
+
+
+def _dissolve_bathymetry_rows(rows: list[dict], *, geometry_key: str = "geometry") -> gpd.GeoDataFrame:
+    if not rows:
+        return gpd.GeoDataFrame({geometry_key: gpd.GeoSeries([], crs="EPSG:4326")}, geometry=geometry_key, crs="EPSG:4326")
+    grouped: dict[tuple, list[object]] = {}
+    props_by_key: dict[tuple, dict[str, object]] = {}
+    for row in rows:
+        props = {key: value for key, value in row.items() if key != geometry_key}
+        key = tuple(sorted(props.items(), key=lambda item: item[0]))
+        grouped.setdefault(key, []).append(row[geometry_key])
+        props_by_key[key] = props
+    dissolved_rows: list[dict[str, object]] = []
+    for key, geometries in grouped.items():
+        sample_geom = next((geom for geom in geometries if geom is not None and not geom.is_empty), None)
+        if sample_geom is None:
+            continue
+        if sample_geom.geom_type in {"LineString", "MultiLineString", "LinearRing"}:
+            geom = unary_union(geometries)
+        else:
+            geom = safe_unary_union(geometries)
+        if geom is not None and geom.geom_type in {"Polygon", "MultiPolygon", "GeometryCollection"}:
+            geom = normalize_polygonal(geom)
+        if geom is None or geom.is_empty:
+            continue
+        dissolved_rows.append({
+            **props_by_key[key],
+            geometry_key: geom,
+        })
+    if not dissolved_rows:
+        return gpd.GeoDataFrame({geometry_key: gpd.GeoSeries([], crs="EPSG:4326")}, geometry=geometry_key, crs="EPSG:4326")
+    return gpd.GeoDataFrame(dissolved_rows, geometry=geometry_key, crs="EPSG:4326")
+
+
+def build_tno_bathymetry_payload(
+    atl_sea_collection: list[dict],
+    atlantropa_region_unions: dict[str, object],
+) -> tuple[dict, dict]:
+    band_rows: list[dict] = []
+    contour_rows: list[dict] = []
+    dry_union = safe_unary_union(list(atlantropa_region_unions.values()))
+    dry_union = normalize_polygonal(dry_union)
+    atl_counts = {
+        "observed_region_ids": set(),
+        "synthetic_region_ids": set(),
+        "excluded_region_ids": sorted(atlantropa_region_unions.keys()),
+    }
+
+    for feature in atl_sea_collection:
+        props = feature.get("properties", {}) if isinstance(feature, dict) else {}
+        region_id = str(props.get("region_id") or "").strip()
+        if not region_id:
+            continue
+        geometry = shape(feature.get("geometry")) if isinstance(feature, dict) and feature.get("geometry") else None
+        geometry = normalize_polygonal(geometry)
+        if geometry is None:
+            continue
+        if dry_union is not None:
+            geometry = normalize_polygonal(geometry.difference(dry_union.buffer(0.0002)))
+        if geometry is None:
+            continue
+        geometry_role = str(props.get("atl_geometry_role") or "").strip().lower()
+        bathymetry_mode = "observed" if geometry_role == ATL_GEOMETRY_ROLE_DONOR_SEA else "synthetic"
+        if bathymetry_mode == "observed":
+            band_defs = BATHYMETRY_GLOBAL_DEPTH_BANDS
+            atl_counts["observed_region_ids"].add(region_id)
+        else:
+            band_defs = _atl_synthetic_depth_profile_for_region(region_id)
+            atl_counts["synthetic_region_ids"].add(region_id)
+        region_group = str(props.get("region_group") or f"{region_id}_sea").strip() or f"{region_id}_sea"
+        band_part_rows, contour_part_rows = _build_bathymetry_ring_rows(
+            geometry,
+            region_id=region_id,
+            region_group=region_group,
+            bathymetry_mode=bathymetry_mode,
+            band_defs=band_defs,
+        )
+        band_rows.extend(band_part_rows)
+        contour_rows.extend(contour_part_rows)
+
+    band_gdf = _dissolve_bathymetry_rows(band_rows)
+    contour_gdf = _dissolve_bathymetry_rows(contour_rows)
+    topo = Topology(
+        [band_gdf, contour_gdf],
+        object_name=["bathymetry_bands", "bathymetry_contours"],
+        topology=True,
+        prequantize=1_000_000,
+        topoquantize=False,
+        presimplify=False,
+        toposimplify=False,
+        shared_coords=False,
+    )
+    topo_payload = topo.to_dict()
+    compact_topology_properties(topo_payload, "bathymetry_bands")
+    compact_topology_properties(topo_payload, "bathymetry_contours")
+    diagnostics = {
+        "band_feature_count": int(len(band_gdf)),
+        "contour_feature_count": int(len(contour_gdf)),
+        "observed_region_ids": sorted(atl_counts["observed_region_ids"]),
+        "synthetic_region_ids": sorted(atl_counts["synthetic_region_ids"]),
+        "excluded_region_ids": atl_counts["excluded_region_ids"],
+    }
+    return topo_payload, diagnostics
+
+
+def build_empty_bathymetry_payload() -> dict:
+    return {
+        "type": "Topology",
+        "objects": {
+            "bathymetry_bands": {"type": "GeometryCollection", "geometries": []},
+            "bathymetry_contours": {"type": "GeometryCollection", "geometries": []},
+        },
+        "arcs": [],
+    }
+
+
 def recalculate_country_feature_counts(
     countries_payload: dict,
     owners_payload: dict,
@@ -6780,6 +6979,10 @@ def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
         "geometry": context_land_mask_geom,
     }], geometry="geometry", crs="EPSG:4326")
     relief_overlays_payload = build_relief_overlays(atlantropa_region_unions, lake_geom)
+    bathymetry_payload, bathymetry_diagnostics = build_tno_bathymetry_payload(
+        atl_sea_collection,
+        atlantropa_region_unions,
+    )
 
     stage_metadata = {
         "generated_at": generated_at,
@@ -6799,6 +7002,7 @@ def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
         "dev_manual_override_diagnostics": dev_manual_override_diagnostics,
         "atl_feature_ids": sorted(atl_feature_ids),
         "atl_sea_feature_ids": sorted(atl_sea_feature_ids),
+        "bathymetry_diagnostics": bathymetry_diagnostics,
         "context_land_mask_tolerance": context_land_mask_tolerance,
         "context_land_mask_area_delta_ratio": context_land_mask_area_delta_ratio,
         "context_land_mask_fallback_used": context_land_mask_fallback_used,
@@ -6814,6 +7018,7 @@ def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
         "audit_payload": audit_payload,
         "manual_overrides_payload": manual_overrides_payload,
         "relief_overlays_payload": relief_overlays_payload,
+        "bathymetry_payload": bathymetry_payload,
         "scenario_political_gdf": scenario_political_gdf,
         "water_gdf": water_gdf,
         "land_mask_gdf": land_mask_gdf,
@@ -6840,6 +7045,7 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
     land_mask_gdf = state["land_mask_gdf"]
     context_land_mask_gdf = state["context_land_mask_gdf"]
     relief_overlays_payload = state["relief_overlays_payload"]
+    bathymetry_payload = state.get("bathymetry_payload") or build_empty_bathymetry_payload()
     stage_metadata = state["stage_metadata"]
 
     runtime_topology_payload = build_runtime_topology_payload(
@@ -6877,6 +7083,7 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
     manifest_payload["special_regions_url"] = "data/scenarios/tno_1962/special_regions.geojson"
     manifest_payload["water_regions_url"] = "data/scenarios/tno_1962/water_regions.geojson"
     manifest_payload["relief_overlays_url"] = "data/scenarios/tno_1962/relief_overlays.geojson"
+    manifest_payload["bathymetry_topology_url"] = "data/scenarios/tno_1962/bathymetry.topo.json"
     manifest_payload["runtime_topology_url"] = "data/scenarios/tno_1962/runtime_topology.topo.json"
     manifest_payload["releasable_catalog_url"] = "data/releasables/tno_1962.internal.phase1.catalog.json"
     manifest_payload["geo_locale_patch_url"] = "data/scenarios/tno_1962/geo_locale_patch.json"
@@ -6901,6 +7108,12 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
         summary["tno_special_region_count"] = 0
         summary["tno_water_region_count"] = len(runtime_water_regions.get("features", []))
         summary["tno_relief_overlay_count"] = len(relief_overlays_payload["features"])
+        summary["tno_bathymetry_band_count"] = len(
+            bathymetry_payload.get("objects", {}).get("bathymetry_bands", {}).get("geometries", [])
+        )
+        summary["tno_bathymetry_contour_count"] = len(
+            bathymetry_payload.get("objects", {}).get("bathymetry_contours", {}).get("geometries", [])
+        )
         summary["scenario_runtime_topology_object_count"] = 5
         summary["context_land_mask_tolerance"] = context_land_mask_tolerance
         summary["context_land_mask_area_delta_ratio"] = context_land_mask_area_delta_ratio
@@ -6970,6 +7183,7 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
         "atlantropa_region_stats": atlantropa_diagnostics,
         "atlantropa_island_replacement_stats": stage_metadata["island_replacement_diagnostics"],
         "mediterranean_water_region_stats": med_water_diagnostics,
+        "bathymetry_stats": stage_metadata.get("bathymetry_diagnostics", {}),
         "sea_coverage_hole_count_by_cluster": sea_coverage_hole_count_by_cluster,
         "fallback_ocean_hit_count_by_cluster": fallback_ocean_hit_count_by_cluster,
         "pixel_fragment_count_by_cluster": pixel_fragment_count_by_cluster,
@@ -6989,6 +7203,7 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
         "runtime_topology_payload": runtime_topology_payload,
         "runtime_special_regions": runtime_special_regions,
         "runtime_water_regions": runtime_water_regions,
+        "bathymetry_payload": bathymetry_payload,
         "owner_baseline_hash": owner_baseline_hash,
         "context_land_mask_arc_refs": context_land_mask_arc_refs,
         "stage_metadata": stage_metadata,
@@ -7012,6 +7227,7 @@ def write_countries_stage_checkpoints(state: dict[str, object], checkpoint_dir: 
     write_checkpoint_gdf(checkpoint_dir, CHECKPOINT_SCENARIO_POLITICAL_FILENAME, state["scenario_political_gdf"])
     write_checkpoint_gdf(checkpoint_dir, CHECKPOINT_SCENARIO_WATER_SEED_FILENAME, state["water_gdf"])
     write_checkpoint_json(checkpoint_dir, CHECKPOINT_RELIEF_FILENAME, state["relief_overlays_payload"])
+    write_checkpoint_json(checkpoint_dir, CHECKPOINT_BATHYMETRY_FILENAME, state["bathymetry_payload"])
     write_checkpoint_gdf(checkpoint_dir, CHECKPOINT_LAND_MASK_FILENAME, state["land_mask_gdf"])
     write_checkpoint_gdf(checkpoint_dir, CHECKPOINT_CONTEXT_LAND_MASK_FILENAME, state["context_land_mask_gdf"])
 
@@ -7027,6 +7243,7 @@ def load_countries_stage_checkpoints(checkpoint_dir: Path) -> dict[str, object]:
         "scenario_political_gdf": load_checkpoint_gdf(checkpoint_dir, CHECKPOINT_SCENARIO_POLITICAL_FILENAME),
         "water_gdf": load_checkpoint_gdf(checkpoint_dir, CHECKPOINT_SCENARIO_WATER_SEED_FILENAME),
         "relief_overlays_payload": load_checkpoint_json(checkpoint_dir, CHECKPOINT_RELIEF_FILENAME),
+        "bathymetry_payload": load_checkpoint_json(checkpoint_dir, CHECKPOINT_BATHYMETRY_FILENAME),
         "land_mask_gdf": load_checkpoint_gdf(checkpoint_dir, CHECKPOINT_LAND_MASK_FILENAME),
         "context_land_mask_gdf": load_checkpoint_gdf(checkpoint_dir, CHECKPOINT_CONTEXT_LAND_MASK_FILENAME),
         "stage_metadata": load_checkpoint_json(checkpoint_dir, CHECKPOINT_STAGE_METADATA_FILENAME),
@@ -7039,6 +7256,7 @@ def write_runtime_topology_stage_checkpoints(state: dict[str, object], checkpoin
     write_checkpoint_json(checkpoint_dir, "special_regions.geojson", state["runtime_special_regions"])
     write_checkpoint_json(checkpoint_dir, CHECKPOINT_WATER_FILENAME, state["runtime_water_regions"])
     write_checkpoint_json(checkpoint_dir, CHECKPOINT_RELIEF_FILENAME, state["relief_overlays_payload"])
+    write_checkpoint_json(checkpoint_dir, CHECKPOINT_BATHYMETRY_FILENAME, state["bathymetry_payload"])
     write_checkpoint_json(checkpoint_dir, "runtime_topology.topo.json", state["runtime_topology_payload"])
 
 
@@ -7053,6 +7271,7 @@ def ensure_runtime_topology_checkpoints(scenario_dir: Path, checkpoint_dir: Path
         CHECKPOINT_SCENARIO_POLITICAL_FILENAME,
         CHECKPOINT_SCENARIO_WATER_SEED_FILENAME,
         CHECKPOINT_RELIEF_FILENAME,
+        CHECKPOINT_BATHYMETRY_FILENAME,
         CHECKPOINT_LAND_MASK_FILENAME,
         CHECKPOINT_CONTEXT_LAND_MASK_FILENAME,
         CHECKPOINT_STAGE_METADATA_FILENAME,
