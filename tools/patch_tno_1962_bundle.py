@@ -94,6 +94,39 @@ TNO_ROOT_CANDIDATES = [
     Path("C:/Program Files (x86)/Steam/steamapps/workshop/content/394360/3583339918"),
     Path("/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/394360/3583339918"),
 ]
+TNO_OPEN_OCEAN_SPLIT_SPECS = (
+    {
+        "source_id": "marine_atlantic_ocean",
+        "children": (
+            {
+                "id": "tno_north_atlantic_ocean",
+                "name": "North Atlantic Ocean",
+                "bbox": (-180.0, 0.0, 180.0, 90.0),
+            },
+            {
+                "id": "tno_south_atlantic_ocean",
+                "name": "South Atlantic Ocean",
+                "bbox": (-180.0, -90.0, 180.0, 0.0),
+            },
+        ),
+    },
+    {
+        "source_id": "marine_pacific_ocean",
+        "children": (
+            {
+                "id": "tno_north_pacific_ocean",
+                "name": "North Pacific Ocean",
+                "bbox": (-180.0, 0.0, 180.0, 90.0),
+            },
+            {
+                "id": "tno_south_pacific_ocean",
+                "name": "South Pacific Ocean",
+                "bbox": (-180.0, -90.0, 180.0, 0.0),
+            },
+        ),
+    },
+)
+TNO_EXCLUDED_BASE_WATER_REGION_IDS = [spec["source_id"] for spec in TNO_OPEN_OCEAN_SPLIT_SPECS]
 
 ATL_TAG = "ATL"
 ATL_COLOR_HEX = "#d8c7a6"
@@ -2927,6 +2960,7 @@ def load_json(path: Path) -> dict:
 
 
 _mediterranean_template_water_gdf: gpd.GeoDataFrame | None = None
+_global_water_regions_feature_index: dict[str, dict] | None = None
 
 
 def load_mediterranean_template_water_gdf() -> gpd.GeoDataFrame:
@@ -2943,6 +2977,60 @@ def load_mediterranean_template_water_gdf() -> gpd.GeoDataFrame:
     gdf = geopandas_from_features(features).reset_index(drop=True)
     _mediterranean_template_water_gdf = gdf.copy()
     return gdf
+
+
+def load_global_water_regions_feature_index() -> dict[str, dict]:
+    global _global_water_regions_feature_index
+    if _global_water_regions_feature_index is not None:
+        return copy.deepcopy(_global_water_regions_feature_index)
+    payload = load_json(WATER_REGIONS_PATH)
+    feature_index = {}
+    for feature in payload.get("features", []):
+        props = feature.get("properties", {})
+        region_id = str(props.get("id") or "").strip()
+        if not region_id:
+            continue
+        feature_index[region_id] = feature
+    _global_water_regions_feature_index = copy.deepcopy(feature_index)
+    return feature_index
+
+
+def build_tno_open_ocean_split_features() -> list[dict]:
+    feature_index = load_global_water_regions_feature_index()
+    split_features: list[dict] = []
+    for split_spec in TNO_OPEN_OCEAN_SPLIT_SPECS:
+        source_id = split_spec["source_id"]
+        source_feature = feature_index.get(source_id)
+        if source_feature is None:
+            raise ValueError(f"Unable to locate base water region '{source_id}' for TNO ocean split.")
+        source_props = dict(source_feature.get("properties", {}))
+        source_geom = normalize_polygonal(shape(source_feature.get("geometry")))
+        if source_geom is None:
+            raise ValueError(f"Base water region '{source_id}' has empty geometry.")
+        for child_spec in split_spec["children"]:
+            child_geom = normalize_polygonal(source_geom.intersection(box(*child_spec["bbox"])))
+            if child_geom is None:
+                raise ValueError(
+                    f"TNO ocean split '{child_spec['id']}' produced empty geometry from '{source_id}'."
+                )
+            child_name = child_spec["name"]
+            child_props = dict(source_props)
+            child_props.update({
+                "id": child_spec["id"],
+                "name": child_name,
+                "label": child_name,
+                "water_type": "ocean",
+                "region_group": source_props.get("region_group") or "ocean_macro",
+                "parent_id": source_id,
+                "neighbors": "",
+                "is_chokepoint": False,
+                "interactive": False,
+                "scenario_id": SCENARIO_ID,
+                "source_standard": "tno_bbox_split_from_global_water_regions",
+                "render_as_base_geography": False,
+            })
+            split_features.append(make_feature(child_geom, child_props))
+    return split_features
 
 
 def sanitize_jsonable(value):
@@ -6942,7 +7030,9 @@ def build_countries_stage_state(scenario_dir: Path) -> dict[str, object]:
         "render_as_base_geography": True,
     })
     congo_feature = make_feature(lake_geom, congo_props)
-    water_feature_collection = feature_collection_from_features([congo_feature])
+    scenario_water_features = build_tno_open_ocean_split_features()
+    scenario_water_features.append(congo_feature)
+    water_feature_collection = feature_collection_from_features(scenario_water_features)
     water_gdf = geopandas_from_features(water_feature_collection["features"])
 
     base_land_union = safe_unary_union(runtime_political_full_gdf.geometry.tolist())
@@ -7095,10 +7185,17 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
         "special_regions_default": True,
     }
     manifest_payload["excluded_water_region_groups"] = ["mediterranean"]
+    manifest_payload["excluded_water_region_ids"] = list(TNO_EXCLUDED_BASE_WATER_REGION_IDS)
 
     context_land_mask_tolerance = stage_metadata["context_land_mask_tolerance"]
     context_land_mask_area_delta_ratio = stage_metadata["context_land_mask_area_delta_ratio"]
     context_land_mask_fallback_used = stage_metadata["context_land_mask_fallback_used"]
+
+    runtime_water_region_ids = [
+        str(feature.get("properties", {}).get("id") or "").strip()
+        for feature in runtime_water_regions.get("features", [])
+        if str(feature.get("properties", {}).get("id") or "").strip()
+    ]
 
     for summary in (
         manifest_payload.get("summary", {}),
@@ -7144,9 +7241,9 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
         "scenario_source": "tno_local_bundle_patch_v6",
         "scenario_topology_source": "hgo_donor_and_tno_congo_cut",
         "tno_special_region_ids": [],
-        "tno_water_region_ids": ["congo_lake"],
+        "tno_water_region_ids": runtime_water_region_ids,
         "special_region_source": "runtime_topology_atl_political_features",
-        "water_region_source": "tno_extracted_lake_provinces",
+        "water_region_source": "tno_extracted_lake_provinces+tno_ocean_bbox_split",
         "german_baseline_annex_sets_applied": [
             "Alsace-Lorraine + Luxembourg",
             "North Schleswig + Bornholm",
