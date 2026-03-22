@@ -232,6 +232,7 @@ function initToolbar({ render } = {}) {
   const dockCollapseBtn = document.getElementById("dockCollapseBtn");
   const mapContainer = document.getElementById("mapContainer");
   const selectedColorPreview = document.getElementById("selectedColorPreview");
+  const selectedColorValue = document.getElementById("selectedColorValue");
   const undoBtn = document.getElementById("undoBtn");
   const redoBtn = document.getElementById("redoBtn");
   const brushModeBtn = document.getElementById("brushModeBtn");
@@ -258,6 +259,7 @@ function initToolbar({ render } = {}) {
   const dockExportBtn = document.getElementById("dockExportBtn");
   const dockReferencePopover = document.getElementById("dockReferencePopover");
   const dockExportPopover = document.getElementById("dockExportPopover");
+  const devWorkspaceToggleBtn = document.getElementById("devWorkspaceToggleBtn");
   const leftPanelToggle = document.getElementById("leftPanelToggle");
   const rightPanelToggle = document.getElementById("rightPanelToggle");
   const dockPaintSummary = document.getElementById("dockPaintSummary");
@@ -267,6 +269,8 @@ function initToolbar({ render } = {}) {
   const quickFillCountryBtn = document.getElementById("quickFillCountryBtn");
   const dockQuickFillHint = document.getElementById("dockQuickFillHint");
   const paintModeSelect = document.getElementById("paintModeSelect");
+  const paintModeVisualBtn = document.getElementById("paintModeVisualBtn");
+  const paintModePoliticalBtn = document.getElementById("paintModePoliticalBtn");
   const politicalEditingToggleBtn = document.getElementById("politicalEditingToggleBtn");
   const scenarioVisualAdjustmentsBtn = document.getElementById("scenarioVisualAdjustmentsBtn");
   const dockPoliticalEditingPanel = document.getElementById("dockPoliticalEditingPanel");
@@ -302,6 +306,11 @@ function initToolbar({ render } = {}) {
   const referenceScale = document.getElementById("referenceScale");
   const referenceOffsetX = document.getElementById("referenceOffsetX");
   const referenceOffsetY = document.getElementById("referenceOffsetY");
+  const workspaceScenarioValue = document.getElementById("workspaceScenarioValue");
+  const workspaceModeValue = document.getElementById("workspaceModeValue");
+  const workspaceSelectionValue = document.getElementById("workspaceSelectionValue");
+  const workspaceSelectionHint = document.getElementById("workspaceSelectionHint");
+  const paletteLibraryToggleLabel = document.getElementById("paletteLibraryToggleLabel");
 
   const internalBorderOpacityValue = document.getElementById("internalBorderOpacityValue");
   const internalBorderWidthValue = document.getElementById("internalBorderWidthValue");
@@ -466,8 +475,60 @@ function initToolbar({ render } = {}) {
       : t("Visual Color", "ui")
   );
 
+  const getPrimaryActionLabel = () => (
+    String(state.paintMode || "visual") === "sovereignty"
+      ? t("Auto-Fill Ownership", "ui")
+      : t("Auto-Fill Visuals", "ui")
+  );
+
   const normalizeCountryCode = (rawCode) =>
     String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
+
+  const getFeatureDisplayName = (feature, fallback = "") => {
+    const props = feature?.properties || {};
+    const rawLabel = state.currentLanguage === "zh"
+      ? (props.label_zh || props.name_zh || props.label || props.name)
+      : (props.label_en || props.name_en || props.label || props.name);
+    return String(rawLabel || props.id || feature?.id || fallback || "").trim();
+  };
+
+  const getWorkspaceSelectionLabel = () => {
+    const specialId = String(state.selectedSpecialRegionId || "").trim();
+    if (specialId && state.specialRegionsById?.has(specialId)) {
+      return getFeatureDisplayName(state.specialRegionsById.get(specialId), t("Special Region", "ui"));
+    }
+
+    const waterId = String(state.selectedWaterRegionId || "").trim();
+    if (waterId && state.waterRegionsById?.has(waterId)) {
+      return getFeatureDisplayName(state.waterRegionsById.get(waterId), t("Water Region", "ui"));
+    }
+
+    const selectedCode = normalizeCountryCode(state.selectedInspectorCountryCode);
+    if (selectedCode) {
+      const label = String(state.countryNames?.[selectedCode] || selectedCode).trim() || selectedCode;
+      return `${t(label, "geo") || label} (${selectedCode})`;
+    }
+
+    return t("No selection", "ui");
+  };
+
+  const refreshWorkspaceStatus = () => {
+    if (workspaceScenarioValue) {
+      workspaceScenarioValue.textContent = String(
+        state.activeScenarioManifest?.display_name || state.activeScenarioId || t("None", "ui")
+      ).trim() || t("None", "ui");
+    }
+    if (workspaceModeValue) {
+      workspaceModeValue.textContent = getPaintModeLabel();
+    }
+    if (workspaceSelectionValue) {
+      workspaceSelectionValue.textContent = getWorkspaceSelectionLabel();
+    }
+    if (workspaceSelectionHint) {
+      workspaceSelectionHint.textContent = t("Choose a country, water region, or special region.", "ui");
+    }
+  };
+  state.updateWorkspaceStatusFn = refreshWorkspaceStatus;
 
   const getActiveQuickFillPolicy = () => {
     const selectedCode = normalizeCountryCode(
@@ -544,6 +605,10 @@ function initToolbar({ render } = {}) {
       dockPaintSummary.textContent = `${getPaintModeLabel()} ${t("Brush", "ui")}`;
     }
 
+    if (document.getElementById("labelPresetPolitical")) {
+      document.getElementById("labelPresetPolitical").textContent = getPrimaryActionLabel();
+    }
+
     if (paintGranularitySelect) {
       paintGranularitySelect.classList.toggle("hidden", isScenarioMode);
     }
@@ -551,13 +616,11 @@ function initToolbar({ render } = {}) {
     if (politicalEditingToggleBtn) {
       politicalEditingToggleBtn.classList.toggle("hidden", isScenarioMode);
       politicalEditingToggleBtn.classList.toggle("is-active", showPoliticalPanel);
-      politicalEditingToggleBtn.textContent = t("Political Editing", "ui");
       politicalEditingToggleBtn.setAttribute("aria-expanded", String(showPoliticalPanel));
     }
 
     if (scenarioVisualAdjustmentsBtn) {
       scenarioVisualAdjustmentsBtn.classList.toggle("hidden", !isScenarioMode);
-      scenarioVisualAdjustmentsBtn.textContent = t("Visual Adjustments", "ui");
     }
 
     if (dockPoliticalEditingPanel) {
@@ -574,6 +637,7 @@ function initToolbar({ render } = {}) {
     }
 
     refreshQuickFillControls();
+    refreshWorkspaceStatus();
   };
 
   const updateDockCollapsedUi = () => {
@@ -783,6 +847,7 @@ function initToolbar({ render } = {}) {
       scenarioViewLabel,
       splitCount,
     });
+    refreshWorkspaceStatus();
     applyScenarioOverlaySafeLayout();
   };
 
@@ -1232,6 +1297,7 @@ function initToolbar({ render } = {}) {
       }
     }
     refreshScenarioContextBar();
+    refreshWorkspaceStatus();
     if (typeof state.renderPresetTreeFn === "function") {
       state.renderPresetTreeFn();
     }
@@ -1256,12 +1322,21 @@ function initToolbar({ render } = {}) {
     if (paintModeSelect) {
       paintModeSelect.value = state.paintMode || "visual";
     }
+    const isOwnershipMode = String(state.paintMode || "visual") === "sovereignty";
+    [paintModeVisualBtn, paintModePoliticalBtn].forEach((button) => {
+      if (!button) return;
+      const buttonMode = button.dataset.paintMode || "visual";
+      const isActive = (buttonMode === "sovereignty") === isOwnershipMode;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
     if (paintGranularitySelect) {
       paintGranularitySelect.value = state.interactionGranularity || "subdivision";
     }
     refreshPaintControlsLayout();
     refreshActiveSovereignLabel();
     refreshDynamicBorderStatus();
+    refreshWorkspaceStatus();
     updateDockCollapsedUi();
   };
   const normalizeOceanPreset = (value) => {
@@ -1720,6 +1795,20 @@ function initToolbar({ render } = {}) {
     adaptivePaletteLibraryHeightFrame = globalThis.requestAnimationFrame(syncAdaptivePaletteLibraryHeight);
   };
 
+  const syncPaletteLibraryToggleUi = () => {
+    if (!paletteLibraryToggle) return;
+    const label = state.paletteLibraryOpen
+      ? t("Hide Color Library", "ui")
+      : t("Browse All Colors", "ui");
+    paletteLibraryToggle.setAttribute("aria-expanded", state.paletteLibraryOpen ? "true" : "false");
+    paletteLibraryToggle.setAttribute("aria-label", label);
+    paletteLibraryToggle.setAttribute("title", label);
+    paletteLibraryToggle.dataset.expanded = state.paletteLibraryOpen ? "true" : "false";
+    if (paletteLibraryToggleLabel) {
+      paletteLibraryToggleLabel.textContent = label;
+    }
+  };
+
   async function handlePaletteSourceChange(nextPaletteId) {
     const targetId = String(nextPaletteId || "").trim();
     if (!targetId || targetId === state.activePaletteId) {
@@ -1853,6 +1942,7 @@ function initToolbar({ render } = {}) {
       paletteLibraryList.appendChild(section);
     });
     scheduleAdaptivePaletteLibraryHeight();
+    syncPaletteLibraryToggleUi();
   }
   state.updatePaletteLibraryUIFn = renderPaletteLibrary;
 
@@ -2160,6 +2250,9 @@ function initToolbar({ render } = {}) {
     if (selectedColorPreview) {
       selectedColorPreview.style.backgroundColor = state.selectedColor;
       selectedColorPreview.setAttribute("aria-label", `${t("Selected color", "ui")}: ${state.selectedColor}`);
+    }
+    if (selectedColorValue) {
+      selectedColorValue.textContent = String(state.selectedColor || "").toUpperCase();
     }
   }
   state.updateSwatchUIFn = updateSwatchUI;
@@ -2520,6 +2613,26 @@ function initToolbar({ render } = {}) {
     toggleLang.dataset.bound = "true";
   }
 
+  [paintModeVisualBtn, paintModePoliticalBtn].forEach((button) => {
+    if (!button || button.dataset.bound === "true") return;
+    button.addEventListener("click", () => {
+      const nextMode = button.dataset.paintMode || "visual";
+      if (paintModeSelect) {
+        paintModeSelect.value = nextMode;
+      }
+      state.paintMode = nextMode;
+      state.ui.politicalEditingExpanded = nextMode === "sovereignty";
+      markDirty?.("paint-mode");
+      if (typeof state.updatePaintModeUIFn === "function") {
+        state.updatePaintModeUIFn();
+      }
+      if (typeof render === "function") {
+        render();
+      }
+    });
+    button.dataset.bound = "true";
+  });
+
   if (dockReferenceBtn && !dockReferenceBtn.dataset.bound) {
     dockReferenceBtn.setAttribute("aria-haspopup", "dialog");
     dockReferenceBtn.setAttribute("aria-controls", "dockReferencePopover");
@@ -2544,6 +2657,13 @@ function initToolbar({ render } = {}) {
       updateDockCollapsedUi();
     });
     dockCollapseBtn.dataset.bound = "true";
+  }
+
+  if (inspectorDevWorkspaceBtn && !inspectorDevWorkspaceBtn.dataset.bound) {
+    inspectorDevWorkspaceBtn.addEventListener("click", () => {
+      devWorkspaceToggleBtn?.click();
+    });
+    inspectorDevWorkspaceBtn.dataset.bound = "true";
   }
 
   if (politicalEditingToggleBtn && !politicalEditingToggleBtn.dataset.bound) {
@@ -3605,9 +3725,7 @@ function initToolbar({ render } = {}) {
     paletteLibraryToggle.addEventListener("click", () => {
       state.paletteLibraryOpen = !state.paletteLibraryOpen;
       paletteLibraryPanel?.classList.toggle("hidden", !state.paletteLibraryOpen);
-      paletteLibraryToggle.textContent = state.paletteLibraryOpen
-        ? t("Hide Color Library", "ui")
-        : t("Browse All Colors", "ui");
+      syncPaletteLibraryToggleUi();
       renderPaletteLibrary();
     });
   }
@@ -3982,11 +4100,7 @@ function initToolbar({ render } = {}) {
   }
 
   paletteLibraryPanel?.classList.toggle("hidden", !state.paletteLibraryOpen);
-  if (paletteLibraryToggle) {
-    paletteLibraryToggle.textContent = state.paletteLibraryOpen
-      ? t("Hide Color Library", "ui")
-      : t("Browse All Colors", "ui");
-  }
+  syncPaletteLibraryToggleUi();
   syncPaletteSourceControls();
   renderPalette(state.currentPaletteTheme);
   renderPaletteLibrary();

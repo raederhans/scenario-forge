@@ -2967,7 +2967,7 @@ function initScenarioManager({ render } = {}) {
         : t("No frontline control split in current scenario.", "ui");
     }
     if (resetScenarioBtn) {
-      resetScenarioBtn.textContent = t("Reset Changes To Baseline", "ui");
+      resetScenarioBtn.textContent = t("Reset", "ui");
       resetScenarioBtn.disabled = !state.activeScenarioId || isApplyInFlight || isFatalLocked;
       resetScenarioBtn.classList.toggle("hidden", !state.activeScenarioId);
       resetScenarioBtn.title = isFatalLocked ? fatalMessage : "";

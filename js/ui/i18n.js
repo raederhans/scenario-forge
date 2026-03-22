@@ -535,9 +535,13 @@ function updateUIText() {
   if (paletteLibraryToggle) {
     const paletteLibraryPanel = document.getElementById("paletteLibraryPanel");
     const isOpen = paletteLibraryPanel ? !paletteLibraryPanel.classList.contains("hidden") : false;
-    paletteLibraryToggle.textContent = isOpen
+    const label = isOpen
       ? t("Hide Color Library", "ui")
       : t("Browse All Colors", "ui");
+    paletteLibraryToggle.setAttribute("aria-label", label);
+    paletteLibraryToggle.setAttribute("title", label);
+    const toggleLabel = document.getElementById("paletteLibraryToggleLabel");
+    if (toggleLabel) toggleLabel.textContent = label;
   }
 
   const iconButtonLabels = [
@@ -621,6 +625,12 @@ function updateUIText() {
 
   if (typeof state.updateActiveSovereignUIFn === "function") {
     state.updateActiveSovereignUIFn();
+  }
+  if (typeof state.updatePaintModeUIFn === "function") {
+    state.updatePaintModeUIFn();
+  }
+  if (typeof state.updateWorkspaceStatusFn === "function") {
+    state.updateWorkspaceStatusFn();
   }
   if (typeof state.updatePaletteLibraryUIFn === "function") {
     state.updatePaletteLibraryUIFn();

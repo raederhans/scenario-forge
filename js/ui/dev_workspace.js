@@ -2556,6 +2556,59 @@ function createDevWorkspacePanel(bottomDock) {
   return section;
 }
 
+function createDevWorkspaceQuickbar(bottomDock) {
+  let quickbar = document.getElementById("devWorkspaceQuickbar");
+  if (quickbar || !bottomDock) return quickbar;
+
+  quickbar = document.createElement("div");
+  quickbar.id = "devWorkspaceQuickbar";
+  quickbar.className = "dev-workspace-quickbar";
+  quickbar.innerHTML = `
+    <span class="dev-quickbar-badge" aria-hidden="true">DEV</span>
+    <div class="dev-workspace-quick-meta">
+      <div class="dev-quick-meta">
+        <span class="dev-quick-label" data-i18n="Current Selection"></span>
+        <span id="devQuickSelectionValue" class="dev-quick-value">0</span>
+      </div>
+      <div class="dev-quick-meta">
+        <span class="dev-quick-label" data-i18n="Tag"></span>
+        <span id="devQuickTagValue" class="dev-quick-value">--</span>
+      </div>
+      <div class="dev-quick-meta">
+        <span class="dev-quick-label" data-i18n="Owner"></span>
+        <span id="devQuickOwnerValue" class="dev-quick-value">--</span>
+      </div>
+      <div class="dev-quick-meta">
+        <span class="dev-quick-label" data-i18n="Controller"></span>
+        <span id="devQuickControllerValue" class="dev-quick-value">--</span>
+      </div>
+    </div>
+    <div class="dev-workspace-quick-actions" role="toolbar" aria-label="Development quick actions">
+      <input
+        id="devQuickOwnerInput"
+        class="input dev-workspace-input dev-workspace-quick-input"
+        type="text"
+        autocomplete="off"
+        spellcheck="false"
+        maxlength="8"
+        placeholder="GER"
+        data-i18n-title="Enter owner tag (e.g. GER, FRA, BRA)"
+      />
+      <button id="devQuickUseTagBtn" type="button" class="btn-secondary" data-i18n="Use Selection Tag" data-i18n-title="Copy the selected feature's tag into the owner input"></button>
+      <button id="devQuickApplyOwnerBtn" type="button" class="btn-primary" data-i18n="Apply to Selection" data-i18n-title="Set the owner tag for all selected features"></button>
+      <button id="devQuickResetOwnerBtn" type="button" class="btn-secondary" data-i18n="Reset Selection" data-i18n-title="Clear owner assignment from selected features"></button>
+      <span class="dev-quickbar-divider" aria-hidden="true"></span>
+      <button id="devQuickRebuildBordersBtn" type="button" class="btn-secondary" data-i18n="Recalculate Borders" data-i18n-title="Rebuild political borders based on current ownership"></button>
+      <button id="devQuickSaveOwnersBtn" type="button" class="btn-secondary" data-i18n="Save Owners File" data-i18n-title="Export ownership data to a downloadable JSON file"></button>
+    </div>
+  `;
+
+  const headerRow = bottomDock.querySelector(".dock-header-row");
+  bottomDock.insertBefore(quickbar, headerRow?.nextSibling || bottomDock.firstChild || null);
+  applyDeclarativeTranslations(quickbar);
+  return quickbar;
+}
+
 function bindButtonAction(button, action) {
   if (!button || button.dataset.bound === "true") return;
   button.addEventListener("click", action);
@@ -2651,8 +2704,9 @@ function initDevWorkspace() {
   const toggleBtn = document.getElementById("devWorkspaceToggleBtn");
   if (!bottomDock || !toggleBtn) return;
 
+  const quickbar = createDevWorkspaceQuickbar(bottomDock);
   const panel = createDevWorkspacePanel(bottomDock);
-  if (!panel) return;
+  if (!panel || !quickbar) return;
 
   const featureInspectorTitle = panel.querySelector("#devFeatureInspectorTitle");
   const featureInspectorHint = panel.querySelector("#devFeatureInspectorHint");
@@ -2735,6 +2789,16 @@ function initDevWorkspace() {
   const scenarioOwnershipHint = panel.querySelector("#devScenarioOwnershipHint");
   const scenarioOwnershipMeta = panel.querySelector("#devScenarioOwnershipMeta");
   const scenarioOwnerInput = panel.querySelector("#devScenarioOwnerInput");
+  const devQuickSelectionValue = quickbar.querySelector("#devQuickSelectionValue");
+  const devQuickTagValue = quickbar.querySelector("#devQuickTagValue");
+  const devQuickOwnerValue = quickbar.querySelector("#devQuickOwnerValue");
+  const devQuickControllerValue = quickbar.querySelector("#devQuickControllerValue");
+  const devQuickOwnerInput = quickbar.querySelector("#devQuickOwnerInput");
+  const devQuickUseTagBtn = quickbar.querySelector("#devQuickUseTagBtn");
+  const devQuickApplyOwnerBtn = quickbar.querySelector("#devQuickApplyOwnerBtn");
+  const devQuickResetOwnerBtn = quickbar.querySelector("#devQuickResetOwnerBtn");
+  const devQuickRebuildBordersBtn = quickbar.querySelector("#devQuickRebuildBordersBtn");
+  const devQuickSaveOwnersBtn = quickbar.querySelector("#devQuickSaveOwnersBtn");
   const scenarioOwnershipStatus = panel.querySelector("#devScenarioOwnershipStatus");
   const renderStatusMeta = panel.querySelector("#devRenderStatusMeta");
   const runtimeTitle = panel.querySelector("#devRuntimeTitle");
@@ -3441,6 +3505,17 @@ function initDevWorkspace() {
     const canApplyOwner = hasActiveScenario && ownershipModel.selectionCount > 0 && !!effectiveOwnerCode && !editorState.isSaving;
     const canResetOwner = hasActiveScenario && ownershipModel.selectionCount > 0 && !editorState.isSaving;
     const canSaveOwners = hasActiveScenario && !editorState.isSaving;
+    const selectionTagValue = ownershipModel.selectionCount <= 0
+      ? ui("No selection")
+      : ownershipModel.isMixedOwner
+        ? ownershipModel.ownerCodes.join(", ")
+        : (ownershipModel.currentOwnerCode || ownershipModel.ownerCodes?.[0] || "--");
+    const ownerValue = ownershipModel.selectionCount <= 0
+      ? "--"
+      : (ownershipModel.isMixedOwner ? ownershipModel.ownerCodes.join(", ") : (ownershipModel.currentOwnerCode || "--"));
+    const controllerValue = ownershipModel.selectionCount <= 0
+      ? "--"
+      : (ownershipModel.currentControllerCode || ownerValue || "--");
     const applyOwnerBtn = panel.querySelector("#devScenarioApplyOwnerBtn");
     const resetOwnerBtn = panel.querySelector("#devScenarioResetOwnerBtn");
     const saveOwnersBtn = panel.querySelector("#devScenarioSaveOwnersBtn");
@@ -3453,8 +3528,51 @@ function initDevWorkspace() {
       resetOwnerBtn.disabled = !canResetOwner;
     }
     if (saveOwnersBtn) {
-      saveOwnersBtn.textContent = editorState.isSaving ? ui("Saving...") : ui("Save Owners File");
+      const savingNow = !!editorState.isSaving;
+      if (saveOwnersBtn.dataset.saving !== String(savingNow)) {
+        saveOwnersBtn.dataset.saving = savingNow;
+        saveOwnersBtn.textContent = savingNow ? ui("Saving...") : ui("Save Owners File");
+      }
       saveOwnersBtn.disabled = !canSaveOwners;
+    }
+    if (devQuickSelectionValue) {
+      devQuickSelectionValue.textContent = localizeSelectionSummary(ownershipModel.selectionCount || 0);
+    }
+    if (devQuickTagValue) {
+      devQuickTagValue.textContent = selectionTagValue;
+    }
+    if (devQuickOwnerValue) {
+      devQuickOwnerValue.textContent = ownerValue;
+    }
+    if (devQuickControllerValue) {
+      devQuickControllerValue.textContent = controllerValue;
+    }
+    if (devQuickOwnerInput && devQuickOwnerInput.value !== requestedOwnerCode) {
+      devQuickOwnerInput.value = requestedOwnerCode;
+    }
+    if (devQuickOwnerInput) {
+      devQuickOwnerInput.placeholder = fallbackOwnerCode || "GER";
+      devQuickOwnerInput.disabled = !hasActiveScenario || !!editorState.isSaving;
+    }
+    if (devQuickUseTagBtn) {
+      devQuickUseTagBtn.disabled = !hasActiveScenario || ownershipModel.selectionCount <= 0;
+    }
+    if (devQuickApplyOwnerBtn) {
+      devQuickApplyOwnerBtn.disabled = !canApplyOwner;
+    }
+    if (devQuickResetOwnerBtn) {
+      devQuickResetOwnerBtn.disabled = !canResetOwner;
+    }
+    if (devQuickSaveOwnersBtn) {
+      const savingNow = !!editorState.isSaving;
+      if (devQuickSaveOwnersBtn.dataset.saving !== String(savingNow)) {
+        devQuickSaveOwnersBtn.dataset.saving = savingNow;
+        devQuickSaveOwnersBtn.textContent = savingNow ? ui("Saving...") : ui("Save Owners File");
+      }
+      devQuickSaveOwnersBtn.disabled = !canSaveOwners;
+    }
+    if (devQuickRebuildBordersBtn) {
+      devQuickRebuildBordersBtn.disabled = !state.dynamicBordersDirty;
     }
 
     renderMetaRows(renderStatusMeta, resolveRenderRows());
@@ -4223,6 +4341,10 @@ function initDevWorkspace() {
     renderWorkspace();
   });
 
+  bindButtonAction(devQuickApplyOwnerBtn, () => {
+    panel.querySelector("#devScenarioApplyOwnerBtn")?.click();
+  });
+
   bindButtonAction(panel.querySelector("#devScenarioResetOwnerBtn"), () => {
     const result = resetOwnersToScenarioBaselineForFeatureIds(resolveOwnershipTargetIds(), {
       historyKind: "dev-workspace-ownership-reset",
@@ -4247,6 +4369,10 @@ function initDevWorkspace() {
       }
     );
     renderWorkspace();
+  });
+
+  bindButtonAction(devQuickResetOwnerBtn, () => {
+    panel.querySelector("#devScenarioResetOwnerBtn")?.click();
   });
 
   bindButtonAction(panel.querySelector("#devScenarioSaveOwnersBtn"), async () => {
@@ -4303,6 +4429,29 @@ function initDevWorkspace() {
     renderWorkspace();
   });
 
+  bindButtonAction(devQuickSaveOwnersBtn, () => {
+    panel.querySelector("#devScenarioSaveOwnersBtn")?.click();
+  });
+
+  bindButtonAction(devQuickUseTagBtn, () => {
+    const ownershipModel = resolveOwnershipEditorModel();
+    const inferredTag = ownershipModel.isMixedOwner
+      ? ""
+      : normalizeOwnerInput(ownershipModel.currentOwnerCode || ownershipModel.ownerCodes?.[0] || "");
+    state.devScenarioEditor = {
+      ...(state.devScenarioEditor || {}),
+      targetOwnerCode: inferredTag,
+    };
+    renderWorkspace();
+  });
+
+  bindButtonAction(devQuickRebuildBordersBtn, () => {
+    const toolbarRebuildBtn = document.getElementById("recalculateBordersBtn");
+    if (toolbarRebuildBtn instanceof HTMLButtonElement) {
+      toolbarRebuildBtn.click();
+    }
+  });
+
   bindButtonAction(panel.querySelector("#devCopyNamesBtn"), () => {
     copySelectionToClipboard("names", selectionPreview);
   });
@@ -4330,6 +4479,17 @@ function initDevWorkspace() {
       renderWorkspace();
     });
     scenarioOwnerInput.dataset.bound = "true";
+  }
+
+  if (devQuickOwnerInput && devQuickOwnerInput.dataset.bound !== "true") {
+    devQuickOwnerInput.addEventListener("input", (event) => {
+      state.devScenarioEditor = {
+        ...(state.devScenarioEditor || {}),
+        targetOwnerCode: normalizeOwnerInput(event.target.value),
+      };
+      renderWorkspace();
+    });
+    devQuickOwnerInput.dataset.bound = "true";
   }
 
   if (scenarioTagInput && scenarioTagInput.dataset.bound !== "true") {
@@ -4769,7 +4929,7 @@ function initDevWorkspace() {
     scenarioLocaleZhInput.dataset.bound = "true";
   }
 
-  const initialExpanded = readStoredExpanded();
+  const initialExpanded = false;
   setExpandedState(initialExpanded, {
     bottomDock,
     panel,

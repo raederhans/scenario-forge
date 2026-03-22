@@ -12,24 +12,61 @@
         <div class="sidebar-sections">
           <div class="sidebar-header-block">
             <div class="sidebar-shell-heading" data-i18n="Workspace">Workspace</div>
-            <div class="flex items-start justify-between gap-3">
-              <div class="app-title-row">
+            <div class="sidebar-brand-row">
+              <div class="app-title-row app-title-row-compact">
                 <h1 class="app-title">Map Creator</h1>
                 <span id="appDirtyIndicator" class="app-dirty-indicator hidden" aria-hidden="true">*</span>
               </div>
-              <button id="btnToggleLang" class="btn-lang">EN / 中文</button>
             </div>
-            <p id="lblAppHint" class="body-text mt-2">
-              Click countries to paint. Use the dock below the map for quick tools and the left panel for deeper controls.
-            </p>
+            <div class="workspace-status-block" aria-labelledby="workspaceSessionHeading">
+              <div id="workspaceSessionHeading" class="workspace-status-kicker" data-i18n="Current Session">Current Session</div>
+              <div class="workspace-status-grid" aria-label="Workspace status">
+                <div class="workspace-status-item">
+                  <span id="lblWorkspaceScenario" class="workspace-status-label" data-i18n="Scenario">Scenario</span>
+                  <span id="workspaceScenarioValue" class="workspace-status-value" data-i18n="None">None</span>
+                </div>
+                <div class="workspace-status-item">
+                  <span id="lblWorkspaceMode" class="workspace-status-label" data-i18n="Mode">Mode</span>
+                  <span id="workspaceModeValue" class="workspace-status-value" data-i18n="Visual Color">Visual Color</span>
+                </div>
+              </div>
+            </div>
+            <div class="workspace-status-block workspace-status-block-secondary" aria-labelledby="lblWorkspaceSelection">
+              <span id="lblWorkspaceSelection" class="workspace-status-kicker" data-i18n="Selected Object">Selected Object</span>
+              <span id="workspaceSelectionValue" class="workspace-status-value workspace-status-value-selection" data-i18n="No selection">No selection</span>
+              <p id="workspaceSelectionHint" class="workspace-status-note" data-i18n="Choose a country, water region, or special region.">
+                Choose a country, water region, or special region.
+              </p>
+            </div>
           </div>
 
-          <div class="card">
-            <h2 id="lblColorLibrary" class="section-header">Color Library</h2>
-            <p id="lblColorLibraryHint" class="body-text mt-2">Browse the full palette library for manual work and palette reference.</p>
-            <button id="paletteLibraryToggle" class="btn-secondary mt-3" type="button">Browse All Colors</button>
+          <div class="card color-library-card">
+            <div class="palette-library-header-row">
+              <div class="palette-library-header-copy">
+                <h2 id="lblColorLibrary" class="section-header">Color Library</h2>
+              </div>
+              <button
+                id="paletteLibraryToggle"
+                class="palette-library-toggle-btn"
+                type="button"
+                aria-controls="paletteLibraryPanel"
+                aria-expanded="false"
+                aria-label="Browse All Colors"
+                title="Browse All Colors"
+              >
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="m7 10 5 5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+                <span id="paletteLibraryToggleLabel" class="visually-hidden">Browse All Colors</span>
+              </button>
+            </div>
+            <div class="palette-library-toolbar mt-3">
+              <label id="lblPaletteSource" class="visually-hidden" for="themeSelect" data-i18n="Palette Source">Palette Source</label>
+              <select id="themeSelect" name="quick-palette-source" autocomplete="off" class="select-input palette-library-source-select">
+                <option value="HOI4 Vanilla" data-i18n="HOI4 Vanilla">HOI4 Vanilla</option>
+              </select>
+            </div>
             <div id="paletteLibraryPanel" class="palette-library mt-3 hidden">
-              <div id="paletteLibrarySources" class="palette-library-sources" role="tablist" aria-label="Palette sources"></div>
               <label id="lblPaletteSearch" class="section-header-block" for="paletteLibrarySearch">Search Colors</label>
               <input id="paletteLibrarySearch" type="text" name="palette-library-search" autocomplete="off" spellcheck="false" placeholder="Search country, ISO-2, or source tag…" class="input mt-2" />
               <div id="paletteLibrarySummary" class="body-text mt-2">0 colors</div>
@@ -37,26 +74,27 @@
             </div>
           </div>
 
-          <div class="card">
-            <h2 id="lblScenario" class="section-header">Scenario</h2>
-            <p id="lblScenarioHint" class="body-text mt-2">Load a bundled historical setup and reset to its baseline.</p>
-            <div id="scenarioStatus" class="body-text mt-3">No scenario active</div>
-            <div id="scenarioAuditHint" class="body-text mt-2 hidden">Coverage report unavailable</div>
-            <label id="lblScenarioSelect" class="section-header-block mt-3" for="scenarioSelect">Scenario</label>
-            <select id="scenarioSelect" name="scenario-select" autocomplete="off" class="select-input mt-2">
-              <option id="optScenarioNone" value="">None</option>
-            </select>
-            <label id="lblScenarioViewMode" class="section-header-block mt-3" for="scenarioViewModeSelect">View</label>
-            <select id="scenarioViewModeSelect" name="scenario-view-mode" autocomplete="off" class="select-input mt-2 hidden" disabled>
-              <option id="optScenarioOwnership" value="ownership">Ownership</option>
-              <option id="optScenarioFrontline" value="frontline">Frontline</option>
-            </select>
-            <div class="parent-border-actions mt-3">
-              <button id="applyScenarioBtn" type="button" class="btn-secondary">Apply</button>
-              <button id="resetScenarioBtn" type="button" class="btn-secondary hidden" disabled>Reset Changes To Baseline</button>
+          <details class="card sidebar-details-card" aria-labelledby="lblScenario">
+            <summary id="lblScenario" class="section-header">Scenario</summary>
+            <div class="sidebar-details-body">
+              <div id="scenarioStatus" class="body-text">No scenario active</div>
+              <div id="scenarioAuditHint" class="body-text mt-2 hidden">Coverage report unavailable</div>
+              <label id="lblScenarioSelect" class="section-header-block mt-3" for="scenarioSelect">Scenario</label>
+              <select id="scenarioSelect" name="scenario-select" autocomplete="off" class="select-input mt-2">
+                <option id="optScenarioNone" value="">None</option>
+              </select>
+              <label id="lblScenarioViewMode" class="section-header-block mt-3" for="scenarioViewModeSelect">View</label>
+              <select id="scenarioViewModeSelect" name="scenario-view-mode" autocomplete="off" class="select-input mt-2 hidden" disabled>
+                <option id="optScenarioOwnership" value="ownership">Ownership</option>
+                <option id="optScenarioFrontline" value="frontline">Frontline</option>
+              </select>
+              <div class="sidebar-equal-actions mt-3">
+                <button id="applyScenarioBtn" type="button" class="btn-secondary">Apply</button>
+                <button id="resetScenarioBtn" type="button" class="btn-secondary hidden" disabled>Reset</button>
+                <button id="clearScenarioBtn" type="button" class="btn-secondary hidden" disabled>Exit Scenario</button>
+              </div>
             </div>
-            <button id="clearScenarioBtn" type="button" class="btn-secondary mt-3 hidden" disabled>Exit Scenario</button>
-          </div>
+          </details>
 
           <h2 id="appearanceSectionHeading" class="visually-hidden">Appearance</h2>
           <details class="card appearance-card" open aria-labelledby="appearanceSectionHeading labelMapStyle">
@@ -982,39 +1020,41 @@
             </div>
           </details>
 
-          <section id="specialZonePopover" class="card special-zone-editor-card" data-inline-editor="true" aria-labelledby="lblSpecialZoneEditor">
-            <h2 class="section-header" id="lblSpecialZoneEditor">Special Zone Editor</h2>
-            <div class="space-y-3 mt-4">
-              <div class="flex items-center justify-between gap-3">
-                <label id="lblSpecialZoneType" class="range-label" for="specialZoneTypeSelect">Type</label>
-                <select id="specialZoneTypeSelect" name="special-zone-type" autocomplete="off" class="select-input">
-                  <option id="optSpecialZoneDisputed" value="disputed">Disputed</option>
-                  <option id="optSpecialZoneWasteland" value="wasteland">Wasteland</option>
-                  <option id="optSpecialZoneCustom" value="custom" selected>Custom</option>
-                </select>
-              </div>
-              <div>
-                <label id="lblSpecialZoneLabel" class="range-label" for="specialZoneLabelInput">Label</label>
-                <input id="specialZoneLabelInput" type="text" name="special-zone-label" autocomplete="off" spellcheck="false" class="input mt-2" placeholder="e.g. Buffer Zone A…" />
-              </div>
-              <div class="parent-border-actions mt-2">
-                <button id="specialZoneStartBtn" type="button" class="btn-secondary">Start Draw</button>
-                <button id="specialZoneUndoBtn" type="button" class="btn-secondary">Undo Vertex</button>
-              </div>
-              <div class="parent-border-actions mt-2">
-                <button id="specialZoneFinishBtn" type="button" class="btn-secondary">Finish</button>
-                <button id="specialZoneCancelBtn" type="button" class="btn-secondary">Cancel</button>
-              </div>
-              <div>
-                <label id="lblSpecialZoneList" class="range-label" for="specialZoneFeatureList">Manual Zones</label>
-                <select id="specialZoneFeatureList" name="special-zone-feature-list" autocomplete="off" class="select-input mt-2"></select>
-              </div>
-              <button id="specialZoneDeleteBtn" type="button" class="btn-secondary mt-2">Delete Selected</button>
-              <div id="specialZoneEditorHint" class="parent-border-empty mt-2">
-                Click map to add vertices, double-click to finish.
+          <details id="specialZonePopover" class="card special-zone-editor-card sidebar-details-card" data-inline-editor="true" aria-labelledby="lblSpecialZoneEditor">
+            <summary class="section-header" id="lblSpecialZoneEditor">Special Zone Editor</summary>
+            <div class="sidebar-details-body">
+              <div class="space-y-3">
+                <div class="flex items-center justify-between gap-3">
+                  <label id="lblSpecialZoneType" class="range-label" for="specialZoneTypeSelect">Type</label>
+                  <select id="specialZoneTypeSelect" name="special-zone-type" autocomplete="off" class="select-input">
+                    <option id="optSpecialZoneDisputed" value="disputed">Disputed</option>
+                    <option id="optSpecialZoneWasteland" value="wasteland">Wasteland</option>
+                    <option id="optSpecialZoneCustom" value="custom" selected>Custom</option>
+                  </select>
+                </div>
+                <div>
+                  <label id="lblSpecialZoneLabel" class="range-label" for="specialZoneLabelInput">Label</label>
+                  <input id="specialZoneLabelInput" type="text" name="special-zone-label" autocomplete="off" spellcheck="false" class="input mt-2" placeholder="e.g. Buffer Zone A…" />
+                </div>
+                <div class="parent-border-actions mt-2">
+                  <button id="specialZoneStartBtn" type="button" class="btn-secondary">Start Draw</button>
+                  <button id="specialZoneUndoBtn" type="button" class="btn-secondary">Undo Vertex</button>
+                </div>
+                <div class="parent-border-actions mt-2">
+                  <button id="specialZoneFinishBtn" type="button" class="btn-secondary">Finish</button>
+                  <button id="specialZoneCancelBtn" type="button" class="btn-secondary">Cancel</button>
+                </div>
+                <div>
+                  <label id="lblSpecialZoneList" class="range-label" for="specialZoneFeatureList">Manual Zones</label>
+                  <select id="specialZoneFeatureList" name="special-zone-feature-list" autocomplete="off" class="select-input mt-2"></select>
+                </div>
+                <button id="specialZoneDeleteBtn" type="button" class="btn-secondary mt-2">Delete Selected</button>
+                <div id="specialZoneEditorHint" class="parent-border-empty mt-2">
+                  Click map to add vertices, double-click to finish.
+                </div>
               </div>
             </div>
-          </section>
+          </details>
         </div>
       </aside>
 
@@ -1129,160 +1169,108 @@
                 </div>
               </div>
 
-              <div class="dock-group dock-group-paint">
-                <div id="lblEditingRules" class="dock-group-label">Paint</div>
-                <div id="dockPaintPrimaryRow" class="dock-paint-row">
-                  <div id="dockPaintSummary" class="dock-paint-summary">Visual Color brush</div>
-                  <select id="paintGranularitySelect" name="paint-granularity" autocomplete="off" class="select-input dock-select">
-                    <option id="optPaintSubdivision" value="subdivision">By Subdivision</option>
-                    <option id="optPaintCountry" value="country">By Country</option>
-                  </select>
-                  <button id="politicalEditingToggleBtn" type="button" class="preset-action-btn" data-i18n="Political Editing">Political Editing</button>
-                  <button id="scenarioVisualAdjustmentsBtn" type="button" class="preset-action-btn hidden" data-i18n="Visual Adjustments">Visual Adjustments</button>
-                </div>
-                <div id="dockQuickFillRow" class="dock-paint-secondary hidden">
-                  <div id="dockQuickFillLabel" class="dock-paint-mini-label">Double-Click Quick Fill</div>
-                  <div class="mode-toggle-row dock-paint-toggle-row" role="group" data-i18n-aria-label="Double-click quick fill scope">
-                    <button id="quickFillParentBtn" type="button" class="mode-toggle-btn" data-i18n="By Parent">By Parent</button>
-                    <button id="quickFillCountryBtn" type="button" class="mode-toggle-btn" data-i18n="By Country">By Country</button>
-                  </div>
-                  <div id="dockQuickFillHint" class="dock-paint-hint" data-i18n="Single-click: one subdivision | Double-click: parent">Single-click: one subdivision | Double-click: parent</div>
-                </div>
-                <div id="dockPoliticalEditingPanel" class="dock-political-panel hidden">
-                  <div class="dock-paint-row">
-                    <select id="paintModeSelect" name="paint-mode" autocomplete="off" class="select-input dock-select">
-                      <option id="optPaintMeaningVisual" value="visual">Visual Color</option>
-                      <option id="optPaintMeaningSovereignty" value="sovereignty">Political Ownership</option>
-                    </select>
-                    <div id="activeSovereignLabel" class="dock-political-owner">None selected</div>
-                  </div>
+              <div class="dock-group dock-group-mode">
+                <div id="lblCurrentMode" class="dock-group-label" data-i18n="Mode">Mode</div>
+                <div class="dock-segmented-control" role="group" aria-label="Paint mode">
+                  <button id="paintModeVisualBtn" type="button" class="dock-segment-btn" data-paint-mode="visual" data-i18n="Visual">Visual Color</button>
+                  <button id="paintModePoliticalBtn" type="button" class="dock-segment-btn" data-paint-mode="sovereignty" data-i18n="Political">Political</button>
                 </div>
               </div>
 
-              <div class="dock-group dock-group-history">
-                <div id="lblHistory" class="dock-group-label">History</div>
-                <div class="dock-icon-row">
-                  <button id="undoBtn" class="dock-icon-btn" type="button" data-i18n-aria-label="Undo" data-i18n-title="Undo">
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M9 7 4 12l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
-                      <path d="M20 12H5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                    </svg>
-                  </button>
-                  <button id="redoBtn" class="dock-icon-btn" type="button" data-i18n-aria-label="Redo" data-i18n-title="Redo">
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="m15 7 5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
-                      <path d="M4 12h15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              <div class="dock-group dock-group-colors">
-                <div id="lblQuickPalette" class="dock-group-label">Quick Colors</div>
-                <div class="dock-color-row">
-                  <button id="selectedColorPreview" class="selected-color-preview" type="button" data-i18n-aria-label="Selected color preview"></button>
-                  <input id="customColor" type="color" value="#1f3a5f" class="color-input dock-custom-color" data-i18n-aria-label="Custom color" />
-                  <select id="themeSelect" name="quick-palette-source" autocomplete="off" class="select-input dock-select">
-                    <option value="HOI4 Vanilla" data-i18n="HOI4 Vanilla">HOI4 Vanilla</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="dock-group dock-group-autofill">
-                <div id="lblMapStyle" class="dock-group-label">Auto-Fill</div>
-                <div class="dock-autofill-row">
-                  <select id="colorModeSelect" name="color-mode" autocomplete="off" class="select-input dock-select">
-                    <option id="optColorModeRegion" value="region">By Region</option>
-                    <option id="optColorModePolitical" value="political" selected>By Neighbor (Political)</option>
-                  </select>
-                  <button id="presetPolitical" class="btn-primary dock-action-btn" type="button">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                      <path d="M5 3h9l-1.5 2H5v6h7l-1.5 2H5v8H3V3h2z" />
-                      <path d="M13.5 3H21l-2 3 2 3h-7.5l2-3-2-3z" />
-                    </svg>
-                    <span id="labelPresetPolitical">Auto-Fill Countries</span>
-                  </button>
-                  <button id="presetClear" class="btn-secondary dock-clear-btn" type="button">Clear Map</button>
-                </div>
-              </div>
-
-              <div id="dockUtilityGroup" class="dock-group dock-group-utilities">
-                <div id="lblUtilities" class="dock-group-label">Utilities</div>
-                <div class="dock-icon-row">
-                  <button id="dockReferenceBtn" class="dock-icon-btn" type="button" aria-label="Reference" title="Reference">
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <rect x="4" y="5" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.6"></rect>
-                      <path d="M7 15.5 10.5 12l2.5 2.5 2.5-3 1.5 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
-                      <circle cx="9" cy="9.5" r="1.2" fill="currentColor"></circle>
-                    </svg>
-                  </button>
-                  <button id="dockExportBtn" class="dock-icon-btn" type="button" aria-label="Export" title="Export">
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M12 4v10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                      <path d="m8 10 4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
-                      <path d="M5 18h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                    </svg>
-                  </button>
-                </div>
-                <div id="dockReferencePopover" class="dock-utility-popover hidden" role="dialog" aria-label="Reference tools">
-                  <h3 id="lblReferenceImage" class="section-header">Reference Image</h3>
-                  <input id="referenceImageInput" type="file" name="reference-image-file" accept="image/*" class="file-input mt-3" />
-                  <div class="space-y-3 mt-4">
-                    <div>
-                      <div class="range-row">
-                        <label id="lblReferenceOpacity" class="range-label" for="referenceOpacity">Opacity</label>
-                        <span id="referenceOpacityValue" class="range-value">60%</span>
-                      </div>
-                      <input id="referenceOpacity" type="range" min="0" max="100" value="60" class="range-input" />
-                    </div>
-                    <div>
-                      <div class="range-row">
-                        <label id="lblReferenceScale" class="range-label" for="referenceScale">Scale</label>
-                        <span id="referenceScaleValue" class="range-value">1.00×</span>
-                      </div>
-                      <input id="referenceScale" type="range" min="0.2" max="3.0" step="0.01" value="1.00" class="range-input" />
-                    </div>
-                    <div>
-                      <div class="range-row">
-                        <label id="lblReferenceOffsetX" class="range-label" for="referenceOffsetX">Offset X</label>
-                        <span id="referenceOffsetXValue" class="range-value">0px</span>
-                      </div>
-                      <input id="referenceOffsetX" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
-                    </div>
-                    <div>
-                      <div class="range-row">
-                        <label id="lblReferenceOffsetY" class="range-label" for="referenceOffsetY">Offset Y</label>
-                        <span id="referenceOffsetYValue" class="range-value">0px</span>
-                      </div>
-                      <input id="referenceOffsetY" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
-                    </div>
-                  </div>
-                </div>
-                <div id="dockExportPopover" class="dock-utility-popover hidden" role="dialog" aria-labelledby="lblExport">
-                  <div class="flex items-center justify-between">
-                    <h3 id="lblExport" class="section-header">Export Map</h3>
-                    <div class="relative info-trigger">
-                      <svg class="info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                        <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+              <div class="dock-group dock-group-actions">
+                <div id="lblEditingRules" class="dock-group-label" data-i18n="Primary Action">Primary Action</div>
+                <div class="dock-action-stack">
+                  <div class="dock-action-main-row">
+                    <div id="dockPaintSummary" class="dock-paint-summary">Visual Color brush</div>
+                    <button id="politicalEditingToggleBtn" type="button" class="dock-icon-btn dock-mode-icon-btn" data-i18n-aria-label="Political Editing" data-i18n-title="Political Editing">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M5 4v16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <path d="M6 5.5h8l-1.6 2.5L14 10.5H6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
+                        <path d="M10 14.5h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <path d="M10 18.5h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
                       </svg>
-                      <div id="lblExportInfoTooltip" class="info-tooltip">Export the visible map as a PNG or JPG snapshot.</div>
+                    </button>
+                    <button id="scenarioVisualAdjustmentsBtn" type="button" class="dock-icon-btn dock-mode-icon-btn hidden" data-i18n-aria-label="Visual Adjustments" data-i18n-title="Visual Adjustments">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M6 6h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <path d="M6 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <path d="M6 18h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <circle cx="9" cy="6" r="1.8" fill="currentColor"></circle>
+                        <circle cx="15" cy="12" r="1.8" fill="currentColor"></circle>
+                        <circle cx="11" cy="18" r="1.8" fill="currentColor"></circle>
+                      </svg>
+                    </button>
+                    <select id="paintGranularitySelect" name="paint-granularity" autocomplete="off" class="select-input dock-select">
+                      <option id="optPaintSubdivision" value="subdivision">By Subdivision</option>
+                      <option id="optPaintCountry" value="country">By Country</option>
+                    </select>
+                    <select id="colorModeSelect" name="color-mode" autocomplete="off" class="select-input dock-select">
+                      <option id="optColorModeRegion" value="region">By Region</option>
+                      <option id="optColorModePolitical" value="political" selected>By Neighbor (Political)</option>
+                    </select>
+                    <div id="dockPoliticalEditingPanel" class="dock-political-panel hidden">
+                      <label class="visually-hidden" for="paintModeSelect">Paint mode</label>
+                      <select id="paintModeSelect" name="paint-mode" autocomplete="off" class="select-input dock-select dock-select-hidden">
+                        <option id="optPaintMeaningVisual" value="visual">Visual Color</option>
+                        <option id="optPaintMeaningSovereignty" value="sovereignty">Political Ownership</option>
+                      </select>
+                      <div id="activeSovereignLabel" class="dock-political-owner">None selected</div>
                     </div>
+                    <button id="presetPolitical" class="btn-primary dock-action-btn" type="button">
+                      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M5 3h9l-1.5 2H5v6h7l-1.5 2H5v8H3V3h2z" />
+                        <path d="M13.5 3H21l-2 3 2 3h-7.5l2-3-2-3z" />
+                      </svg>
+                      <span id="labelPresetPolitical">Auto-Fill Countries</span>
+                    </button>
+                    <button id="presetClear" class="btn-secondary dock-clear-btn" type="button">Clear Map</button>
                   </div>
-                  <label id="lblExportFormat" class="section-header-block mt-3" for="exportFormat">Format</label>
-                  <select id="exportFormat" name="export-format" autocomplete="off" class="select-input mt-2">
-                    <option value="png">PNG</option>
-                    <option value="jpg">JPG</option>
-                  </select>
-                  <button id="exportBtn" class="btn-primary mt-4">Download Snapshot</button>
+                  <div id="dockQuickFillRow" class="dock-paint-secondary hidden">
+                    <div id="dockQuickFillLabel" class="dock-paint-mini-label">Double-Click Quick Fill</div>
+                    <div class="mode-toggle-row dock-paint-toggle-row" role="group" data-i18n-aria-label="Double-click quick fill scope">
+                      <button id="quickFillParentBtn" type="button" class="mode-toggle-btn" data-i18n="By Parent">By Parent</button>
+                      <button id="quickFillCountryBtn" type="button" class="mode-toggle-btn" data-i18n="By Country">By Country</button>
+                    </div>
+                    <div id="dockQuickFillHint" class="dock-paint-hint" data-i18n="Single-click: one subdivision | Double-click: parent">Single-click: one subdivision | Double-click: parent</div>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div class="bottom-dock-swatches">
-              <div id="paletteGrid" class="color-grid dock-inline-swatches"></div>
-              <div id="dockRecentDivider" class="dock-swatch-divider" aria-hidden="true"></div>
-              <div id="recentColors" class="dock-recent-swatches" aria-label="Recent colors"></div>
+              <div class="dock-group dock-group-history-colors">
+                <div class="dock-inline-cluster dock-inline-cluster-history">
+                  <div id="lblHistory" class="dock-group-label">History</div>
+                  <div class="dock-icon-row">
+                    <button id="undoBtn" class="dock-icon-btn" type="button" data-i18n-aria-label="Undo" data-i18n-title="Undo">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M9 7 4 12l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M20 12H5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                      </svg>
+                    </button>
+                    <button id="redoBtn" class="dock-icon-btn" type="button" data-i18n-aria-label="Redo" data-i18n-title="Redo">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="m15 7 5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M4 12h15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="dock-inline-divider" aria-hidden="true"></div>
+                <div class="dock-inline-cluster dock-inline-cluster-colors">
+                  <div id="lblQuickPalette" class="dock-group-label" data-i18n="Current Color">Current Color</div>
+                  <div class="dock-color-stack">
+                    <div class="dock-color-row">
+                      <button id="selectedColorPreview" class="selected-color-preview" type="button" data-i18n-aria-label="Selected color preview"></button>
+                      <div class="dock-color-current-copy">
+                        <div id="selectedColorValue" class="dock-color-value">#1f3a5f</div>
+                        <div class="dock-color-hint" data-i18n="Selected color">Selected color</div>
+                      </div>
+                      <input id="customColor" type="color" value="#1f3a5f" class="color-input dock-custom-color" data-i18n-aria-label="Custom color" />
+                      <div id="recentColors" class="dock-recent-swatches" aria-label="Recent colors"></div>
+                    </div>
+                    <div id="paletteGrid" class="color-grid dock-inline-swatches dock-palette-grid-hidden"></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         </div>
@@ -1522,6 +1510,100 @@
           <details id="diagnosticsSection" class="card inspector-section" aria-labelledby="diagnosticsHeading lblDiagnostics">
             <summary id="lblDiagnostics" class="section-header">Diagnostics</summary>
             <div id="diagnosticStack" class="inspector-panel-body inspector-stack"></div>
+          </details>
+
+          <h2 id="inspectorUtilitiesHeading" class="visually-hidden">Utilities</h2>
+          <details id="inspectorUtilitiesSection" class="card inspector-section" aria-labelledby="inspectorUtilitiesHeading lblInspectorUtilities">
+            <summary id="lblInspectorUtilities" class="section-header" data-i18n="Utilities">Utilities</summary>
+            <div class="inspector-panel-body">
+              <div class="inspector-utilities-shell">
+                <div class="inspector-utility-stack">
+              <div class="inspector-utility-actions" role="toolbar" aria-label="Utilities">
+                    <button id="dockReferenceBtn" class="dock-icon-btn inspector-utility-btn" type="button" aria-label="Reference" title="Reference">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <rect x="4" y="5" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.6"></rect>
+                        <path d="M7 15.5 10.5 12l2.5 2.5 2.5-3 1.5 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <circle cx="9" cy="9.5" r="1.2" fill="currentColor"></circle>
+                      </svg>
+                    </button>
+                    <button id="dockExportBtn" class="dock-icon-btn inspector-utility-btn" type="button" aria-label="Export" title="Export">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 4v10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <path d="m8 10 4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M5 18h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                      </svg>
+                    </button>
+                    <button id="btnToggleLang" class="dock-icon-btn inspector-utility-btn" type="button" aria-label="Language" title="Language">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.6"></circle>
+                        <path d="M4 12h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <path d="M12 4c2 2.2 3 5 3 8s-1 5.8-3 8c-2-2.2-3-5-3-8s1-5.8 3-8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
+                      </svg>
+                    </button>
+                    <button
+                      id="inspectorDevWorkspaceBtn"
+                      class="btn-secondary inspector-utility-dev-btn"
+                      type="button"
+                    >
+                      Dev
+                    </button>
+                  </div>
+
+                  <div id="dockReferencePopover" class="dock-utility-popover hidden" role="dialog" aria-label="Reference tools">
+                    <h3 id="lblReferenceImage" class="section-header">Reference Image</h3>
+                    <input id="referenceImageInput" type="file" name="reference-image-file" accept="image/*" class="file-input mt-3" />
+                    <div class="space-y-3 mt-4">
+                      <div>
+                        <div class="range-row">
+                          <label id="lblReferenceOpacity" class="range-label" for="referenceOpacity">Opacity</label>
+                          <span id="referenceOpacityValue" class="range-value">60%</span>
+                        </div>
+                        <input id="referenceOpacity" type="range" min="0" max="100" value="60" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblReferenceScale" class="range-label" for="referenceScale">Scale</label>
+                          <span id="referenceScaleValue" class="range-value">1.00×</span>
+                        </div>
+                        <input id="referenceScale" type="range" min="0.2" max="3.0" step="0.01" value="1.00" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblReferenceOffsetX" class="range-label" for="referenceOffsetX">Offset X</label>
+                          <span id="referenceOffsetXValue" class="range-value">0px</span>
+                        </div>
+                        <input id="referenceOffsetX" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblReferenceOffsetY" class="range-label" for="referenceOffsetY">Offset Y</label>
+                          <span id="referenceOffsetYValue" class="range-value">0px</span>
+                        </div>
+                        <input id="referenceOffsetY" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
+                      </div>
+                    </div>
+                  </div>
+                  <div id="dockExportPopover" class="dock-utility-popover hidden" role="dialog" aria-labelledby="lblExport">
+                    <div class="flex items-center justify-between">
+                      <h3 id="lblExport" class="section-header">Export Map</h3>
+                      <div class="relative info-trigger">
+                        <svg class="info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
+                          <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                        </svg>
+                        <div id="lblExportInfoTooltip" class="info-tooltip">Export the visible map as a PNG or JPG snapshot.</div>
+                      </div>
+                    </div>
+                    <label id="lblExportFormat" class="section-header-block mt-3" for="exportFormat">Format</label>
+                    <select id="exportFormat" name="export-format" autocomplete="off" class="select-input mt-2">
+                      <option value="png">PNG</option>
+                      <option value="jpg">JPG</option>
+                    </select>
+                    <button id="exportBtn" class="btn-primary mt-4">Download Snapshot</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </details>
         </div>
       </aside>

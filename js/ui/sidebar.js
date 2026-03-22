@@ -2573,13 +2573,9 @@ function initSidebar({ render } = {}) {
 
   const ensureSelectedInspectorCountry = () => {
     const normalized = normalizeCountryCode(state.selectedInspectorCountryCode);
-    const activeNormalized = normalizeCountryCode(state.activeSovereignCode);
-    const fallbackCode = activeNormalized && latestCountryStatesByCode.has(activeNormalized)
-      ? activeNormalized
-      : "";
     const resolved = normalized && latestCountryStatesByCode.has(normalized)
       ? normalized
-      : fallbackCode;
+      : "";
 
     state.selectedInspectorCountryCode = resolved;
     state.inspectorHighlightCountryCode = resolved;
@@ -3537,6 +3533,9 @@ function initSidebar({ render } = {}) {
 
     renderWaterInspectorDetail();
     renderWaterLegend();
+    if (typeof state.updateWorkspaceStatusFn === "function") {
+      state.updateWorkspaceStatusFn();
+    }
     scheduleAdaptiveInspectorHeights();
   };
 
@@ -3810,6 +3809,9 @@ function initSidebar({ render } = {}) {
 
     renderSpecialRegionInspectorDetail();
     renderSpecialRegionLegend();
+    if (typeof state.updateWorkspaceStatusFn === "function") {
+      state.updateWorkspaceStatusFn();
+    }
     scheduleAdaptiveInspectorHeights();
   };
 
@@ -3938,6 +3940,9 @@ function initSidebar({ render } = {}) {
     if (typeof state.renderPresetTreeFn === "function") {
       state.renderPresetTreeFn();
     }
+    if (typeof state.updateWorkspaceStatusFn === "function") {
+      state.updateWorkspaceStatusFn();
+    }
     scheduleAdaptiveInspectorHeights();
   };
 
@@ -3973,6 +3978,9 @@ function initSidebar({ render } = {}) {
     }
     if (refreshPresetTree && typeof state.renderPresetTreeFn === "function") {
       state.renderPresetTreeFn();
+    }
+    if (typeof state.updateWorkspaceStatusFn === "function") {
+      state.updateWorkspaceStatusFn();
     }
     scheduleAdaptiveInspectorHeights();
   };
