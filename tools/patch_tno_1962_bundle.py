@@ -132,7 +132,12 @@ TNO_OPEN_OCEAN_SPLIT_SPECS = (
         ),
     },
 )
-TNO_EXCLUDED_BASE_WATER_REGION_IDS = [spec["source_id"] for spec in TNO_OPEN_OCEAN_SPLIT_SPECS]
+TNO_EXCLUDED_BASE_WATER_REGION_IDS = [
+    spec["source_id"] for spec in TNO_OPEN_OCEAN_SPLIT_SPECS
+] + [
+    "marine_black_sea",
+    "marine_sea_of_azov",
+]
 MARINE_REGIONS_WFS_URL = "https://geo.vliz.be/geoserver/MarineRegions/ows"
 MARINE_REGIONS_REQUEST_TIMEOUT_SECONDS = 60
 MARINE_REGIONS_SOURCES_URL = "https://marineregions.org/sources.php"
@@ -306,6 +311,47 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "subtract_base_ids": ("marine_north_sea", "marine_baltic_sea"),
         "clip_open_ocean_ids": ("tno_northeast_atlantic_ocean",),
         "simplify_tolerance": 0.01,
+    },
+    {
+        "id": "tno_sea_of_marmara",
+        "name": "Sea of Marmara",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "source_layer": "iho",
+        "source_query": "mrgid=3369",
+        "source_standard": "marine_regions_iho_v3",
+        "subtract_base_ids": ("marine_black_sea",),
+        "simplify_tolerance": 0.005,
+    },
+    {
+        "id": "tno_bosporus_dardanelles",
+        "name": "Bosporus-Dardanelles Chokepoint",
+        "water_type": "chokepoint",
+        "region_group": "marine_macro",
+        "is_chokepoint": True,
+        "global_source_id": "med_bosporus_dardanelles",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "subtract_named_ids": ("tno_sea_of_marmara",),
+        "simplify_tolerance": 0.005,
+    },
+    {
+        "id": "tno_black_sea",
+        "name": "Black Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_black_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+    },
+    {
+        "id": "tno_sea_of_azov",
+        "name": "Sea of Azov",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_sea_of_azov",
+        "source_standard": "tno_cloned_from_global_water_regions",
     },
 )
 
@@ -3301,11 +3347,25 @@ def build_tno_named_marginal_water_features(snapshot_payload: dict) -> tuple[lis
     prepared_geometries_by_id: dict[str, object] = {}
     diagnostics: dict[str, dict] = {}
     for spec in TNO_NAMED_MARGINAL_WATER_SPECS:
-        snapshot_feature = snapshot_features_by_id.get(spec["id"])
-        if snapshot_feature is None:
-            raise ValueError(f"Named water snapshot is missing '{spec['id']}'.")
-        snapshot_props = snapshot_feature.get("properties", {}) if isinstance(snapshot_feature, dict) else {}
-        source_geom = normalize_polygonal(shape(snapshot_feature.get("geometry")))
+        global_source_id = str(spec.get("global_source_id") or "").strip()
+        source_record_ids: list[str]
+        source_layer = str(spec.get("source_layer") or "").strip()
+        source_query = str(spec.get("source_query") or "").strip()
+        if global_source_id:
+            base_feature = feature_index.get(global_source_id)
+            if base_feature is None:
+                raise ValueError(f"Unable to locate cloned base water region '{global_source_id}' for {spec['id']}.")
+            source_geom = normalize_polygonal(shape(base_feature.get("geometry")))
+            source_record_ids = [global_source_id]
+            source_layer = "global_water_regions"
+            source_query = f"id='{global_source_id}'"
+        else:
+            snapshot_feature = snapshot_features_by_id.get(spec["id"])
+            if snapshot_feature is None:
+                raise ValueError(f"Named water snapshot is missing '{spec['id']}'.")
+            snapshot_props = snapshot_feature.get("properties", {}) if isinstance(snapshot_feature, dict) else {}
+            source_geom = normalize_polygonal(shape(snapshot_feature.get("geometry")))
+            source_record_ids = list(snapshot_props.get("source_record_ids", []) or [])
         if source_geom is None:
             raise ValueError(f"Snapshot geometry collapsed for named water '{spec['id']}'.")
         subtract_base_ids = [
@@ -3330,10 +3390,11 @@ def build_tno_named_marginal_water_features(snapshot_payload: dict) -> tuple[lis
         prepared_geometries_by_id[spec["id"]] = prepared_geom
         diagnostics[spec["id"]] = {
             "name": spec["name"],
-            "source_layer": spec["source_layer"],
-            "source_query": spec["source_query"],
-            "source_record_ids": list(snapshot_props.get("source_record_ids", []) or []),
+            "source_layer": source_layer,
+            "source_query": source_query,
+            "source_record_ids": source_record_ids,
             "source_standard": spec["source_standard"],
+            "global_source_id": global_source_id,
             "subtract_base_ids": subtract_base_ids,
             "subtract_named_ids": [
                 str(region_id).strip()
@@ -3361,6 +3422,9 @@ def build_tno_named_marginal_water_features(snapshot_payload: dict) -> tuple[lis
         final_geom = subtract_geometry_list(final_geom, subtract_named_geometries)
         if final_geom is None:
             raise ValueError(f"Named water feature '{named_feature_id}' collapsed after named water subtraction.")
+        final_geom = safe_unary_union(iter_polygon_parts(final_geom))
+        if final_geom is None:
+            raise ValueError(f"Named water feature '{named_feature_id}' collapsed after final polygon normalization.")
         properties = {
             "id": named_feature_id,
             "name": spec["name"],
@@ -3434,9 +3498,27 @@ def build_marine_regions_named_water_snapshot_payload() -> tuple[dict, dict]:
     snapshot_generated_at = utc_timestamp()
     snapshot_features: list[dict] = []
     water_extracts: list[dict[str, object]] = []
+    local_clone_extracts: list[dict[str, object]] = []
     source_layers_used: set[str] = set()
     total_source_feature_count = 0
+    feature_index = load_global_water_regions_feature_index()
     for spec in TNO_NAMED_MARGINAL_WATER_SPECS:
+        global_source_id = str(spec.get("global_source_id") or "").strip()
+        if global_source_id:
+            base_feature = feature_index.get(global_source_id)
+            if base_feature is None:
+                raise ValueError(f"Unable to locate cloned base water region '{global_source_id}' for {spec['id']}.")
+            base_props = base_feature.get("properties", {}) if isinstance(base_feature, dict) else {}
+            local_clone_extracts.append({
+                "id": spec["id"],
+                "name": spec["name"],
+                "label": spec.get("label") or spec["name"],
+                "source_water_region_id": global_source_id,
+                "source_water_region_name": str(base_props.get("name") or "").strip(),
+                "source_standard": spec["source_standard"],
+                "source_feature_count": 1,
+            })
+            continue
         payload = fetch_marine_regions_feature_collection(spec["source_layer"], spec["source_query"])
         source_features = payload.get("features", [])
         source_gdf = geopandas_from_features(source_features)
@@ -3485,8 +3567,10 @@ def build_marine_regions_named_water_snapshot_payload() -> tuple[dict, dict]:
         "snapshot_path": f"data/scenarios/{SCENARIO_ID}/{MARINE_REGIONS_NAMED_WATER_SNAPSHOT_FILENAME}",
         "source_datasets": source_datasets,
         "water_extracts": water_extracts,
+        "local_clone_extracts": local_clone_extracts,
         "diagnostics": {
             "snapshot_feature_count": len(snapshot_features),
+            "local_clone_feature_count": len(local_clone_extracts),
             "source_feature_count": total_source_feature_count,
             "source_layers": sorted(source_layers_used),
         },
@@ -5030,6 +5114,29 @@ def topology_object_to_gdf(topo_dict: dict, object_name: str) -> gpd.GeoDataFram
     elif str(gdf.crs).upper() != "EPSG:4326":
         gdf = gdf.to_crs("EPSG:4326")
     return gdf
+
+
+def sanitize_feature_collection_polygonal_geometries(feature_collection: dict) -> dict:
+    if not isinstance(feature_collection, dict):
+        return feature_collection
+    sanitized_features: list[dict] = []
+    for feature in feature_collection.get("features", []):
+        if not isinstance(feature, dict):
+            continue
+        geometry_payload = feature.get("geometry")
+        if not geometry_payload:
+            sanitized_features.append(feature)
+            continue
+        normalized_geom = normalize_polygonal(shape(geometry_payload))
+        if normalized_geom is None:
+            sanitized_features.append(feature)
+            continue
+        sanitized_features.append({
+            "type": "Feature",
+            "properties": dict(feature.get("properties", {})),
+            "geometry": mapping(normalized_geom),
+        })
+    return feature_collection_from_features(sanitized_features)
 
 
 def load_state_path_index(states_dir: Path) -> tuple[dict[int, Path], dict[int, str]]:
@@ -7646,7 +7753,9 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
         context_land_mask_gdf,
     )
     context_land_mask_arc_refs = estimate_topology_object_arc_refs(runtime_topology_payload, "context_land_mask")
-    runtime_water_regions = topology_object_to_feature_collection(runtime_topology_payload, "scenario_water")
+    runtime_water_regions = sanitize_feature_collection_polygonal_geometries(
+        topology_object_to_feature_collection(runtime_topology_payload, "scenario_water")
+    )
     runtime_special_regions = feature_collection_from_features([])
 
     recalculate_country_feature_counts(
@@ -7747,7 +7856,7 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
         "tno_water_region_ids": runtime_water_region_ids,
         "tno_named_marginal_water_ids": named_marginal_water_ids,
         "special_region_source": "runtime_topology_atl_political_features",
-        "water_region_source": "tno_extracted_lake_provinces+tno_ocean_bbox_split+marine_regions_named_waters_snapshot",
+        "water_region_source": "tno_extracted_lake_provinces+tno_ocean_bbox_split+marine_regions_named_waters_snapshot+global_water_region_clones",
         "german_baseline_annex_sets_applied": [
             "Alsace-Lorraine + Luxembourg",
             "North Schleswig + Bornholm",
