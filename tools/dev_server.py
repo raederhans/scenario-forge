@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import gzip
 import http.server
 import json
 import math
@@ -40,6 +41,7 @@ COUNTRY_CODE_PATTERN = re.compile(r"^[A-Z]{2,3}$")
 DISTRICT_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 COLOR_HEX_PATTERN = re.compile(r"^#[0-9A-Fa-f]{6}$")
 INSPECTOR_GROUP_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{1,63}$")
+GZIP_STATIC_SUFFIXES = (".json", ".geojson", ".topo.json")
 
 
 class DevServerError(Exception):
@@ -2286,6 +2288,39 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _client_accepts_gzip(self) -> bool:
+        encodings = str(self.headers.get("Accept-Encoding") or "").lower()
+        return "gzip" in encodings
+
+    def _resolve_static_gzip_target(self) -> Path | None:
+        route = urlparse(self.path or "").path
+        if route.startswith("/__dev/"):
+            return None
+        filesystem_path = Path(self.translate_path(self.path))
+        if not filesystem_path.is_file():
+            return None
+        name = filesystem_path.name.lower()
+        if not any(name.endswith(suffix) for suffix in GZIP_STATIC_SUFFIXES):
+            return None
+        return filesystem_path
+
+    def _maybe_send_gzip_static(self, *, head_only: bool) -> bool:
+        if not self._client_accepts_gzip():
+            return False
+        target_path = self._resolve_static_gzip_target()
+        if not target_path:
+            return False
+        compressed_body = gzip.compress(target_path.read_bytes())
+        self.send_response(200)
+        self.send_header("Content-Type", self.guess_type(str(target_path)))
+        self.send_header("Content-Encoding", "gzip")
+        self.send_header("Vary", "Accept-Encoding")
+        self.send_header("Content-Length", str(len(compressed_body)))
+        self.end_headers()
+        if not head_only:
+            self.wfile.write(compressed_body)
+        return True
+
     def _read_json_body(self) -> dict[str, object]:
         raw_length = self.headers.get("Content-Length", "").strip()
         if not raw_length:
@@ -2318,6 +2353,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Methods", "GET, HEAD, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
+
+    def do_GET(self):
+        if self._maybe_send_gzip_static(head_only=False):
+            return
+        super().do_GET()
+
+    def do_HEAD(self):
+        if self._maybe_send_gzip_static(head_only=True):
+            return
+        super().do_HEAD()
 
     def do_POST(self):
         route = urlparse(self.path or "").path

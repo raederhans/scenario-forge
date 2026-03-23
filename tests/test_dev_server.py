@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import gzip
 import io
 import json
 import tempfile
@@ -59,6 +60,25 @@ def _write_failing_geo_builder_script(path: Path, *, stderr: str = "builder fail
 
 
 class DevServerTest(unittest.TestCase):
+    def _build_handler_for_static_response(
+        self,
+        *,
+        target_path: Path,
+        route: str | None = None,
+        accept_encoding: str = "gzip",
+    ) -> tuple[dev_server.Handler, list[tuple[str, object]]]:
+        events: list[tuple[str, object]] = []
+        handler = object.__new__(dev_server.Handler)
+        handler.path = route or f"/{target_path.name}"
+        handler.headers = {"Accept-Encoding": accept_encoding}
+        handler.wfile = io.BytesIO()
+        handler.translate_path = lambda _path: str(target_path)
+        handler.guess_type = lambda _path: "application/json"
+        handler.send_response = lambda status: events.append(("status", status))
+        handler.send_header = lambda name, value: events.append(("header", (name, value)))
+        handler.end_headers = lambda: events.append(("end_headers", None))
+        return handler, events
+
     def _create_scenario_fixture(
         self,
         root: Path,
@@ -372,6 +392,55 @@ class DevServerTest(unittest.TestCase):
 
         self.assertEqual(exc_info.exception.code, "body_too_large")
         self.assertEqual(exc_info.exception.status, 413)
+
+    def test_maybe_send_gzip_static_compresses_static_json_when_client_accepts_gzip(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            target_path = Path(tmp_dir) / "sample.json"
+            target_payload = {"hello": "world"}
+            _write_json(target_path, target_payload)
+            handler, events = self._build_handler_for_static_response(target_path=target_path)
+
+            handled = dev_server.Handler._maybe_send_gzip_static(handler, head_only=False)
+
+            self.assertTrue(handled)
+            self.assertIn(("status", 200), events)
+            self.assertIn(("header", ("Content-Encoding", "gzip")), events)
+            self.assertIn(("header", ("Vary", "Accept-Encoding")), events)
+            compressed_body = handler.wfile.getvalue()
+            self.assertEqual(
+                json.loads(gzip.decompress(compressed_body).decode("utf-8")),
+                target_payload,
+            )
+
+    def test_maybe_send_gzip_static_skips_static_json_when_client_does_not_accept_gzip(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            target_path = Path(tmp_dir) / "sample.json"
+            _write_json(target_path, {"hello": "world"})
+            handler, events = self._build_handler_for_static_response(
+                target_path=target_path,
+                accept_encoding="br",
+            )
+
+            handled = dev_server.Handler._maybe_send_gzip_static(handler, head_only=False)
+
+            self.assertFalse(handled)
+            self.assertEqual(events, [])
+            self.assertEqual(handler.wfile.getvalue(), b"")
+
+    def test_maybe_send_gzip_static_skips_dev_api_routes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            target_path = Path(tmp_dir) / "sample.json"
+            _write_json(target_path, {"ok": True})
+            handler, events = self._build_handler_for_static_response(
+                target_path=target_path,
+                route="/__dev/scenario/tag/create",
+            )
+
+            handled = dev_server.Handler._maybe_send_gzip_static(handler, head_only=False)
+
+            self.assertFalse(handled)
+            self.assertEqual(events, [])
+            self.assertEqual(handler.wfile.getvalue(), b"")
 
     def test_save_scenario_ownership_payload_accepts_assignments_by_feature_id(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

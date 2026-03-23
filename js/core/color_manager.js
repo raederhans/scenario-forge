@@ -29,6 +29,10 @@ class ColorManager {
 
   static regionColorMap = new Map();
   static labCache = new Map();
+  static ownerColorCache = {
+    signature: "",
+    result: null,
+  };
 
   static getRegionColor(tag) {
     const key = String(tag || "Unknown").trim() || "Unknown";
@@ -125,6 +129,33 @@ class ColorManager {
       g: parseInt(normalized.slice(3, 5), 16),
       b: parseInt(normalized.slice(5, 7), 16),
     };
+  }
+
+  static getStableObjectSignature(mapLike) {
+    const entries = Object.entries(mapLike && typeof mapLike === "object" ? mapLike : {});
+    if (!entries.length) return "0";
+    const text = entries
+      .sort(([leftKey], [rightKey]) => String(leftKey).localeCompare(String(rightKey)))
+      .map(([key, value]) => `${key}:${JSON.stringify(value)}`)
+      .join("|");
+    return `${entries.length}:${ColorManager.stableHash(text)}`;
+  }
+
+  static getOwnerColorCacheSignature({
+    featureIds = [],
+    sovereigntyByFeatureId = {},
+    fixedOwnerColors = {},
+    canonicalCountryByFeatureId = null,
+  } = {}) {
+    const featureSignature = Array.isArray(featureIds) && featureIds.length
+      ? `${featureIds.length}:${ColorManager.stableHash(featureIds.join("|"))}`
+      : "0";
+    return [
+      featureSignature,
+      ColorManager.getStableObjectSignature(sovereigntyByFeatureId),
+      ColorManager.getStableObjectSignature(fixedOwnerColors),
+      ColorManager.getStableObjectSignature(canonicalCountryByFeatureId),
+    ].join("::");
   }
 
   static rgbToHex(r, g, b) {
@@ -549,6 +580,19 @@ class ColorManager {
     if (!featureIds.length) {
       return { featureColors: result, ownerColors, contrastStats: null };
     }
+    const cacheSignature = ColorManager.getOwnerColorCacheSignature({
+      featureIds,
+      sovereigntyByFeatureId,
+      fixedOwnerColors,
+      canonicalCountryByFeatureId: canonicalByFeatureId,
+    });
+    if (
+      cacheSignature
+      && ColorManager.ownerColorCache.signature === cacheSignature
+      && ColorManager.ownerColorCache.result
+    ) {
+      return ColorManager.ownerColorCache.result;
+    }
 
     const ownerByIndex = featureIds.map((featureId, index) => {
       const rawOwner =
@@ -638,7 +682,12 @@ class ColorManager {
       colorByOwner,
       ColorManager.sovereignPoliticalMinDeltaE
     );
-    return { featureColors: result, ownerColors, contrastStats };
+    const computedResult = { featureColors: result, ownerColors, contrastStats };
+    ColorManager.ownerColorCache = {
+      signature: cacheSignature,
+      result: computedResult,
+    };
+    return computedResult;
   }
 }
 

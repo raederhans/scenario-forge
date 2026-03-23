@@ -1602,6 +1602,31 @@ function setScenarioAuditUiState(partial = {}) {
   return current;
 }
 
+function getCachedScenarioBundle(scenarioId = state.activeScenarioId) {
+  const normalizedScenarioId = normalizeScenarioId(scenarioId);
+  if (!normalizedScenarioId) return null;
+  return state.scenarioBundleCacheById?.[normalizedScenarioId] || null;
+}
+
+function releaseScenarioAuditPayload(scenarioId = state.activeScenarioId, { syncUi = true } = {}) {
+  const normalizedScenarioId = normalizeScenarioId(scenarioId);
+  const bundle = getCachedScenarioBundle(normalizedScenarioId);
+  if (bundle) {
+    bundle.auditPayload = null;
+  }
+  if (!normalizedScenarioId || normalizeScenarioId(state.activeScenarioId) === normalizedScenarioId) {
+    state.scenarioAudit = null;
+    setScenarioAuditUiState({
+      loading: false,
+      loadedForScenarioId: "",
+      errorMessage: "",
+    });
+    if (syncUi) {
+      syncScenarioUi();
+    }
+  }
+}
+
 function syncScenarioInspectorSelection(countryCode = "") {
   const normalized = String(countryCode || "").trim().toUpperCase();
   state.selectedInspectorCountryCode = normalized;
@@ -2830,6 +2855,8 @@ function clearActiveScenario(
   } = {}
 ) {
   assertScenarioInteractionsAllowed("exit the active scenario");
+  const previousScenarioId = normalizeScenarioId(state.activeScenarioId);
+  releaseScenarioAuditPayload(previousScenarioId, { syncUi: false });
   state.activeScenarioId = "";
   state.scenarioBorderMode = "canonical";
   state.activeScenarioManifest = null;
@@ -2853,12 +2880,6 @@ function clearActiveScenario(
     consumedPresetNamesByParentLookup: {},
   };
   state.releasableCatalog = state.defaultReleasableCatalog || null;
-  state.scenarioAudit = null;
-  setScenarioAuditUiState({
-    loading: false,
-    loadedForScenarioId: "",
-    errorMessage: "",
-  });
   state.scenarioImportAudit = null;
   state.scenarioBaselineHash = "";
   state.scenarioBaselineOwnersByFeatureId = {};
@@ -3131,6 +3152,7 @@ export {
   loadScenarioBundle,
   loadScenarioRegistry,
   recalculateScenarioOwnerControllerDiffCount,
+  releaseScenarioAuditPayload,
   refreshScenarioShellOverlays,
   resetToScenarioBaseline,
   setScenarioViewMode,

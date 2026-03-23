@@ -2,9 +2,30 @@ const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
 
+test.setTimeout(120000);
+
+function resolveBaseUrl() {
+  if (process.env.MAPCREATOR_BASE_URL) {
+    return process.env.MAPCREATOR_BASE_URL;
+  }
+  const metadataPath = path.join(process.cwd(), '.runtime', 'dev', 'active_server.json');
+  if (fs.existsSync(metadataPath)) {
+    try {
+      const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+      if (metadata && typeof metadata.url === 'string' && metadata.url.trim()) {
+        return metadata.url.trim();
+      }
+    } catch (error) {
+      console.warn('[tno-1962-ui-smoke] Unable to parse active_server.json:', error);
+    }
+  }
+  return 'http://127.0.0.1:18080';
+}
+
 test('tno 1962 releasable catalog smoke', async ({ page }) => {
   const consoleIssues = [];
   const networkFailures = [];
+  const bathymetryRequests = [];
 
   page.on('console', (msg) => {
     const type = msg.type();
@@ -27,25 +48,48 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
     });
   });
 
-  await page.goto('http://127.0.0.1:18080', { waitUntil: 'domcontentloaded' });
+  page.on('request', (req) => {
+    const url = req.url();
+    if (
+      url.includes('/data/global_bathymetry.topo.json')
+      || url.includes('/data/scenarios/tno_1962/bathymetry.topo.json')
+    ) {
+      bathymetryRequests.push(url);
+    }
+  });
+
+  await page.goto(resolveBaseUrl(), { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1200);
 
   await page.waitForFunction(() => {
     const select = document.querySelector('#scenarioSelect');
     return !!select && !!select.querySelector('option[value="tno_1962"]');
   });
-  await expect.poll(async () => {
-    return page.evaluate(async () => {
-      const { state } = await import('/js/core/state.js');
-      return String(state.activeScenarioId || '');
-    });
-  }, { timeout: 20000 }).toBe('tno_1962');
-  await expect(page.locator('#scenarioStatus')).toContainText('TNO 1962', { timeout: 20000 });
-
   const initialScenarioId = await page.evaluate(async () => {
     const { state } = await import('/js/core/state.js');
     return String(state.activeScenarioId || '');
   });
+  if (initialScenarioId !== 'tno_1962') {
+    await page.evaluate(() => {
+      const select = document.querySelector('#scenarioSelect');
+      if (select instanceof HTMLSelectElement) {
+        select.value = 'tno_1962';
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+    await page.evaluate(async () => {
+      const { applyScenarioById } = await import('/js/core/scenario_manager.js');
+      await applyScenarioById('tno_1962', {
+        renderNow: true,
+        markDirtyReason: 'tno-ui-smoke-apply',
+        showToastOnComplete: false,
+      });
+    });
+    await page.waitForTimeout(1200);
+  }
+  await expect(page.locator('#scenarioStatus')).toContainText('TNO 1962', { timeout: 20000 });
+  await expect.poll(() => page.locator('#scenarioSelect').inputValue(), { timeout: 20000 }).toBe('tno_1962');
+
   const scenarioStatus = await page.locator('#scenarioStatus').innerText();
   const viewMode = await page.locator('#scenarioViewModeSelect').inputValue();
   const selectedScenarioId = await page.locator('#scenarioSelect').inputValue();
@@ -132,6 +176,8 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
   expect(payload.countries.MAN?.inspector_group_id).toBeFalsy();
   expect(polarRuntime.ruPolarOwner).toBeTruthy();
   expect(polarRuntime.aqOwner).toBe('AQ');
+  expect(bathymetryRequests).toEqual([]);
+  const bathymetryRequestCountBeforeAdvancedOcean = bathymetryRequests.length;
 
   await expect.poll(async () => {
     const headers = await page.locator('#countryList .country-explorer-header').allTextContents();
@@ -200,6 +246,12 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
 
   await page.locator('#countrySearch').fill('');
 
+  await page.locator('#oceanAdvancedStylesToggle').check();
+  await page.locator('#oceanStyleSelect').selectOption('bathymetry_soft');
+  await expect.poll(() => bathymetryRequests.length, { timeout: 20000 }).toBeGreaterThan(
+    bathymetryRequestCountBeforeAdvancedOcean
+  );
+
   const shotPath = path.join('.runtime', 'browser', 'mcp-artifacts', 'screenshots', 'tno_1962_ui_smoke.png');
   fs.mkdirSync(path.dirname(shotPath), { recursive: true });
   await page.screenshot({ path: shotPath, fullPage: true });
@@ -213,6 +265,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
     catalogEntryCount: payload.catalogEntries.length,
     missingFeaturedTags,
     lingeringHoi4Owners,
+    bathymetryRequests,
     consoleIssueCount: consoleIssues.length,
     networkFailureCount: networkFailures.length,
     consoleIssues,

@@ -22,6 +22,7 @@ import {
   ensureActiveScenarioOptionalLayerLoaded,
   loadScenarioAuditPayload,
   recalculateScenarioOwnerControllerDiffCount,
+  releaseScenarioAuditPayload,
   refreshScenarioShellOverlays,
   setScenarioViewMode,
   validateImportedScenarioBaseline,
@@ -2528,11 +2529,15 @@ function initSidebar({ render } = {}) {
     loadButton.type = "button";
     loadButton.className = activeAuditLoaded ? "btn-secondary" : "btn-primary";
     loadButton.disabled = !!auditUi.loading;
-    loadButton.textContent = t(activeAuditLoaded ? "Reload Audit" : "Load Audit Details", "ui");
+    loadButton.textContent = t(activeAuditLoaded ? "Hide Audit Details" : "Load Audit Details", "ui");
     loadButton.addEventListener("click", async () => {
+      if (activeAuditLoaded) {
+        releaseScenarioAuditPayload(activeScenarioId);
+        return;
+      }
       try {
         await loadScenarioAuditPayload(activeScenarioId, {
-          forceReload: activeAuditLoaded,
+          forceReload: false,
         });
       } catch (error) {
         console.error("Failed to load scenario audit:", error);
@@ -2586,12 +2591,21 @@ function initSidebar({ render } = {}) {
   const selectInspectorCountry = (code) => {
     const normalized = normalizeCountryCode(code);
     if (!normalized) return;
+    const previousSelectedCode = normalizeCountryCode(state.selectedInspectorCountryCode);
     const countryState = latestCountryStatesByCode.get(normalized);
+    let requiresListRebuild = false;
     if (countryState?.topLevelGroupId) {
-      state.expandedInspectorContinents.add(getInspectorGroupExpansionKey(countryState.topLevelGroupId));
+      const groupKey = getInspectorGroupExpansionKey(countryState.topLevelGroupId);
+      if (!state.expandedInspectorContinents.has(groupKey)) {
+        state.expandedInspectorContinents.add(groupKey);
+        requiresListRebuild = true;
+      }
     }
     if (countryState?.releasable && countryState.parentOwnerTag && state.expandedInspectorReleaseParents instanceof Set) {
-      state.expandedInspectorReleaseParents.add(countryState.parentOwnerTag);
+      if (!state.expandedInspectorReleaseParents.has(countryState.parentOwnerTag)) {
+        state.expandedInspectorReleaseParents.add(countryState.parentOwnerTag);
+        requiresListRebuild = true;
+      }
     }
     state.selectedInspectorCountryCode = normalized;
     state.inspectorHighlightCountryCode = normalized;
@@ -2601,7 +2615,14 @@ function initSidebar({ render } = {}) {
     if (typeof state.renderNowFn === "function") {
       state.renderNowFn();
     }
-    renderList();
+    if (requiresListRebuild) {
+      renderList();
+      return;
+    }
+    refreshCountryRows({
+      countryCodes: [previousSelectedCode, normalized],
+      refreshInspector: true,
+    });
   };
 
   const getPrimaryReleasablePresetRef = (countryState, { warnOnMissing = true } = {}) => {
@@ -4052,7 +4073,10 @@ function initSidebar({ render } = {}) {
       applyCountryColor(selectedCode, nextColor);
       closeCountryInspectorColorPicker();
       markDirty("inspector-country-color");
-      renderList();
+      refreshCountryRows({
+        countryCodes: [selectedCode],
+        refreshInspector: true,
+      });
     });
     countryInspectorColorInput.addEventListener("blur", () => {
       countryInspectorColorPickerOpen = false;
@@ -4644,6 +4668,8 @@ function initSidebar({ render } = {}) {
     activateBtn.addEventListener("click", () => {
       const normalizedCountryCode = normalizeCountryCode(countryState.code);
       const alreadyActive = normalizedCountryCode && normalizedCountryCode === normalizeCountryCode(state.activeSovereignCode);
+      const previousActiveCode = normalizeCountryCode(state.activeSovereignCode);
+      const selectedCode = normalizeCountryCode(state.selectedInspectorCountryCode);
       if (normalizedCountryCode) {
         state.activeSovereignCode = normalizedCountryCode;
       }
@@ -4654,7 +4680,10 @@ function initSidebar({ render } = {}) {
       if (typeof state.updateActiveSovereignUIFn === "function") {
         state.updateActiveSovereignUIFn();
       }
-      renderList();
+      refreshCountryRows({
+        countryCodes: [previousActiveCode, normalizedCountryCode, selectedCode],
+        refreshInspector: true,
+      });
       showToast(
         t(
           alreadyActive
