@@ -671,6 +671,16 @@ function toggleLanguage() {
   if (typeof state.updateSpecialZoneEditorUIFn === "function") {
     state.updateSpecialZoneEditorUIFn();
   }
+  import("../core/scenario_manager.js")
+    .then(({ ensureScenarioGeoLocalePatchForLanguage }) => {
+      if (typeof ensureScenarioGeoLocalePatchForLanguage === "function") {
+        return ensureScenarioGeoLocalePatchForLanguage(nextLang, { renderNow: false });
+      }
+      return null;
+    })
+    .catch((error) => {
+      console.warn("Unable to refresh scenario geo locale patch for active language:", error);
+    });
 }
 
 function initTranslations() {

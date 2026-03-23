@@ -13,7 +13,6 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
-PWCLI = Path(os.environ.get("CODEX_HOME", str(Path.home() / ".codex"))) / "skills" / "playwright" / "scripts" / "playwright_cli.sh"
 PWCLI_WORKDIR = ROOT_DIR / ".runtime" / "browser" / "playwright-cli"
 SESSION_ID = "editor-perf-benchmark"
 BROWSER_OPENED = False
@@ -29,6 +28,40 @@ CONTEXT_PROBE_CASES = [
 ]
 WSL_LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "::1"}
 WSL_GATEWAY_HOST = None
+
+
+def resolve_playwright_cli_wrapper() -> Path:
+    candidate_roots: list[Path] = []
+    seen_roots: set[Path] = set()
+
+    def add_root(root: Path | None) -> None:
+        if root is None:
+            return
+        normalized = root.expanduser().resolve()
+        if normalized in seen_roots:
+            return
+        candidate_roots.append(normalized)
+        seen_roots.add(normalized)
+
+    codex_home_env = os.environ.get("CODEX_HOME")
+    if codex_home_env:
+        add_root(Path(codex_home_env))
+
+    home_dir = Path.home()
+    add_root(home_dir / ".codex")
+    if home_dir.name == "powershell-profile-home" and home_dir.parent.name == ".codex":
+        add_root(home_dir.parent)
+
+    for root in candidate_roots:
+        wrapper_path = root / "skills" / "playwright" / "scripts" / "playwright_cli.sh"
+        if wrapper_path.exists():
+            return wrapper_path
+
+    fallback_root = candidate_roots[0] if candidate_roots else (home_dir / ".codex")
+    return fallback_root / "skills" / "playwright" / "scripts" / "playwright_cli.sh"
+
+
+PWCLI = resolve_playwright_cli_wrapper()
 
 
 def normalize_bash_path(path: Path) -> str:
@@ -359,9 +392,11 @@ async (page) => {{
 
 
 def measure_context_probe_case(label: str, flags: dict[str, bool]) -> dict:
+    probe_payload_json = json.dumps({"label": label, "flags": flags})
     js = f"""
 async (page) => {{
-  return await page.evaluate(async (payload) => {{
+  return await page.evaluate(async () => {{
+    const payload = {probe_payload_json};
     const probeLabel = String(payload?.label || '');
     const probeFlags = payload?.flags || {{}};
     const {{ state }} = await import('/js/core/state.js');
@@ -408,7 +443,7 @@ async (page) => {{
     }}
     render();
     return result;
-  }}, {json.dumps({"label": label, "flags": flags})});
+  }});
 }}
 """.strip()
     return run_code_json(js)  # type: ignore[return-value]

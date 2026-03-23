@@ -38,7 +38,43 @@ def read_json(path: Path) -> object:
 
 
 def write_json(path: Path, payload: object) -> None:
-    write_json_atomic(path, payload, ensure_ascii=False, indent=2, trailing_newline=True)
+    write_json_atomic(
+        path,
+        payload,
+        ensure_ascii=False,
+        indent=None,
+        separators=(",", ":"),
+        trailing_newline=True,
+    )
+
+
+def build_locale_specific_patch_payload(
+    payload: dict[str, object],
+    *,
+    language: str,
+) -> dict[str, object]:
+    normalized_language = "zh" if str(language or "").strip().lower() == "zh" else "en"
+    source_geo = payload.get("geo", {}) if isinstance(payload, dict) else {}
+    next_geo: dict[str, dict[str, str]] = {}
+    for raw_feature_id, raw_entry in source_geo.items():
+        feature_id = normalize_text(raw_feature_id)
+        locale_entry = normalize_locale_entry(raw_entry)
+        localized_value = normalize_text(locale_entry.get(normalized_language)) if locale_entry else ""
+        if not feature_id or not localized_value:
+            continue
+        next_geo[feature_id] = {normalized_language: localized_value}
+    return {
+        **payload,
+        "geo": next_geo,
+        "language": normalized_language,
+    }
+
+
+def build_locale_specific_patch_paths(output_path: Path) -> dict[str, Path]:
+    return {
+        "en": output_path.with_name(f"{output_path.stem}.en{output_path.suffix}"),
+        "zh": output_path.with_name(f"{output_path.stem}.zh{output_path.suffix}"),
+    }
 
 
 def normalize_locale_entry(source: object) -> dict[str, str] | None:
@@ -242,6 +278,11 @@ def build_patch(*, scenario_id: str, scenario_dir: Path, locales_path: Path, man
         },
     }
     write_json(output_path, payload)
+    for language, locale_output_path in build_locale_specific_patch_paths(output_path).items():
+        write_json(
+            locale_output_path,
+            build_locale_specific_patch_payload(payload, language=language),
+        )
     return payload
 
 

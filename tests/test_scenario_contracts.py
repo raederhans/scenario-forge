@@ -215,6 +215,89 @@ class ScenarioContractTest(unittest.TestCase):
             self.assertTrue(any("audit.split_clone_safe_copy_count must be numeric" in warning for warning in warnings))
             self.assertTrue(any("collision candidates" in warning for warning in warnings))
 
+    def test_validate_scenario_contract_accepts_locale_specific_patch_urls(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            scenario_dir = _create_scenario_dir(tmp_root, "locale_split")
+            manifest_path = scenario_dir / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["geo_locale_patch_url_en"] = "data/scenarios/locale_split/geo_locale_patch.en.json"
+            manifest["geo_locale_patch_url_zh"] = "data/scenarios/locale_split/geo_locale_patch.zh.json"
+            _write_json(manifest_path, manifest)
+            for filename, locale_key, value in (
+                ("geo_locale_patch.en.json", "en", "Alpha"),
+                ("geo_locale_patch.zh.json", "zh", "阿尔法"),
+            ):
+                _write_json(
+                    scenario_dir / filename,
+                    {
+                        "version": 1,
+                        "scenario_id": "locale_split",
+                        "geo": {
+                            "FEATURE-1": {
+                                locale_key: value,
+                            }
+                        },
+                        "audit": {},
+                    },
+                )
+
+            try:
+                errors, warnings = validate_scenario_contract(scenario_dir, {})
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            self.assertEqual(errors, [])
+            self.assertEqual(warnings, [])
+
+    def test_validate_scenario_contract_dedupes_locale_patch_audit_warnings_across_split_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            scenario_dir = _create_scenario_dir(tmp_root, "locale_split_warning")
+            manifest_path = scenario_dir / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["geo_locale_patch_url_en"] = "data/scenarios/locale_split_warning/geo_locale_patch.en.json"
+            manifest["geo_locale_patch_url_zh"] = "data/scenarios/locale_split_warning/geo_locale_patch.zh.json"
+            _write_json(manifest_path, manifest)
+            for filename, locale_key, value in (
+                ("geo_locale_patch.en.json", "en", "Pool"),
+                ("geo_locale_patch.zh.json", "zh", "泳池"),
+            ):
+                _write_json(
+                    scenario_dir / filename,
+                    {
+                        "version": 1,
+                        "scenario_id": "locale_split_warning",
+                        "geo": {
+                            "FEATURE-1": {
+                                locale_key: value,
+                            }
+                        },
+                        "audit": {
+                            "collision_candidates": [
+                                {
+                                    "feature_id": "FEATURE-1",
+                                    "raw_name": "Pool",
+                                    "reason": "non_unique_raw_name",
+                                }
+                            ]
+                        },
+                    },
+                )
+
+            try:
+                errors, warnings = validate_scenario_contract(scenario_dir, {})
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            self.assertEqual(errors, [])
+            collision_warnings = [warning for warning in warnings if "collision candidates" in warning]
+            self.assertEqual(len(collision_warnings), 1)
+
     def test_validate_scenario_contract_default_mode_keeps_authoring_safe_bundle_mismatches(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_root = Path(tmp_dir)

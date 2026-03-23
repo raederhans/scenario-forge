@@ -28,6 +28,50 @@ def _write_locale_fixture(locales_path: Path, raw_name: str, zh_name: str) -> No
 
 
 class TnoGeoLocalePatchTest(unittest.TestCase):
+    def test_build_patch_writes_locale_specific_variants(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            scenario_dir = tmp_path / "scenario"
+            _write_json(
+                scenario_dir / "runtime_topology.topo.json",
+                {
+                    "objects": {
+                        "political": {
+                            "geometries": [
+                                {"id": "FEATURE-1", "properties": {"id": "FEATURE-1", "name": "Pool"}},
+                            ]
+                        }
+                    }
+                },
+            )
+            _write_json(
+                scenario_dir / "owners.by_feature.json",
+                {
+                    "owners": {
+                        "FEATURE-1": "AEF",
+                    }
+                },
+            )
+            locales_path = tmp_path / "locales.json"
+            _write_locale_fixture(locales_path, "Pool", "普尔")
+            output_path = scenario_dir / "geo_locale_patch.json"
+
+            payload = build_patch(
+                scenario_id="tno_1962",
+                scenario_dir=scenario_dir,
+                locales_path=locales_path,
+                manual_overrides_path=scenario_dir / "missing.manual.json",
+                output_path=output_path,
+            )
+
+            en_payload = json.loads((scenario_dir / "geo_locale_patch.en.json").read_text(encoding="utf-8"))
+            zh_payload = json.loads((scenario_dir / "geo_locale_patch.zh.json").read_text(encoding="utf-8"))
+            self.assertEqual(payload["geo"]["FEATURE-1"], {"en": "Pool", "zh": "普尔"})
+            self.assertEqual(en_payload["language"], "en")
+            self.assertEqual(en_payload["geo"]["FEATURE-1"], {"en": "Pool"})
+            self.assertEqual(zh_payload["language"], "zh")
+            self.assertEqual(zh_payload["geo"]["FEATURE-1"], {"zh": "普尔"})
+
     def test_split_clone_duplicates_are_safe_copied(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_path = Path(tmp_dir)

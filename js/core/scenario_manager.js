@@ -236,6 +236,31 @@ function normalizeScenarioId(value) {
   return String(value || "").trim();
 }
 
+function normalizeScenarioLanguage(value) {
+  return String(value || "").trim().toLowerCase() === "zh" ? "zh" : "en";
+}
+
+function getScenarioGeoLocalePatchDescriptor(manifest, language = state.currentLanguage) {
+  const normalizedLanguage = normalizeScenarioLanguage(language);
+  const localeSpecificUrl = String(
+    normalizedLanguage === "zh"
+      ? manifest?.geo_locale_patch_url_zh || ""
+      : manifest?.geo_locale_patch_url_en || ""
+  ).trim();
+  if (localeSpecificUrl) {
+    return {
+      url: localeSpecificUrl,
+      language: normalizedLanguage,
+      localeSpecific: true,
+    };
+  }
+  return {
+    url: String(manifest?.geo_locale_patch_url || "").trim(),
+    language: normalizedLanguage,
+    localeSpecific: false,
+  };
+}
+
 function canonicalScenarioCountryCode(rawCode) {
   return normalizeCountryCodeAlias(rawCode);
 }
@@ -1372,6 +1397,65 @@ function syncScenarioLocalizationState({
   applyScenarioGeoLocalization();
 }
 
+async function ensureScenarioGeoLocalePatchForLanguage(
+  language,
+  {
+    d3Client = globalThis.d3,
+    forceReload = false,
+    renderNow = false,
+  } = {}
+) {
+  const scenarioId = normalizeScenarioId(state.activeScenarioId);
+  if (!scenarioId) return null;
+  const bundle = await loadScenarioBundle(scenarioId, { d3Client });
+  if (!bundle?.manifest) return null;
+
+  const descriptor = getScenarioGeoLocalePatchDescriptor(bundle.manifest, language);
+  if (!descriptor.url) {
+    syncScenarioLocalizationState({ geoLocalePatchPayload: null });
+    syncCountryUi({ renderNow });
+    if (typeof state.updateDevWorkspaceUIFn === "function") {
+      state.updateDevWorkspaceUIFn();
+    }
+    return null;
+  }
+
+  bundle.geoLocalePatchPayloadsByLanguage =
+    bundle.geoLocalePatchPayloadsByLanguage && typeof bundle.geoLocalePatchPayloadsByLanguage === "object"
+      ? bundle.geoLocalePatchPayloadsByLanguage
+      : {};
+
+  let payload = !forceReload ? bundle.geoLocalePatchPayloadsByLanguage[descriptor.language] || null : null;
+  if (!payload) {
+    const result = await loadOptionalScenarioResource(d3Client, descriptor.url, {
+      scenarioId,
+      resourceLabel: descriptor.localeSpecific
+        ? `geo_locale_patch_${descriptor.language}`
+        : "geo_locale_patch",
+    });
+    payload = normalizeScenarioGeoLocalePatchPayload(result.value);
+    if (payload) {
+      if (descriptor.localeSpecific) {
+        bundle.geoLocalePatchPayloadsByLanguage[descriptor.language] = payload;
+      } else {
+        bundle.geoLocalePatchPayloadsByLanguage.en = payload;
+        bundle.geoLocalePatchPayloadsByLanguage.zh = payload;
+      }
+    }
+  }
+
+  if (normalizeScenarioId(state.activeScenarioId) !== scenarioId) {
+    return payload || null;
+  }
+  bundle.geoLocalePatchPayload = payload || null;
+  syncScenarioLocalizationState({ geoLocalePatchPayload: payload || null });
+  syncCountryUi({ renderNow });
+  if (typeof state.updateDevWorkspaceUIFn === "function") {
+    state.updateDevWorkspaceUIFn();
+  }
+  return payload || null;
+}
+
 function applyBlankScenarioPresentationDefaults({ resetLocalization = true } = {}) {
   if (resetLocalization) {
     syncScenarioLocalizationState({
@@ -1666,6 +1750,7 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     scenarioId: targetId,
     resourceLabel: "manifest",
   });
+  const geoLocalePatchDescriptor = getScenarioGeoLocalePatchDescriptor(manifest);
   const hints = normalizeScenarioPerformanceHints(manifest);
   const [
     countriesPayload,
@@ -1704,9 +1789,11 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
       scenarioId: targetId,
       resourceLabel: "runtime_topology",
     }),
-    loadOptionalScenarioResource(d3Client, manifest.geo_locale_patch_url, {
+    loadOptionalScenarioResource(d3Client, geoLocalePatchDescriptor.url, {
       scenarioId: targetId,
-      resourceLabel: "geo_locale_patch",
+      resourceLabel: geoLocalePatchDescriptor.localeSpecific
+        ? `geo_locale_patch_${geoLocalePatchDescriptor.language}`
+        : "geo_locale_patch",
     }),
     loadOptionalScenarioResource(d3Client, manifest.releasable_catalog_url, {
       scenarioId: targetId,
@@ -1729,6 +1816,7 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
     reliefOverlaysPayload: null,
     cityOverridesPayload: null,
     geoLocalePatchPayload: normalizeScenarioGeoLocalePatchPayload(geoLocalePatchResult.value),
+    geoLocalePatchPayloadsByLanguage: {},
     runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(runtimeTopologyResult.value),
     releasableCatalog: releasableCatalogResult.value,
     districtGroupsPayload: normalizeScenarioDistrictGroupsPayload(districtGroupsResult.value, targetId),
@@ -1746,6 +1834,8 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
           ok: !!geoLocalePatchResult.ok,
           reason: geoLocalePatchResult.reason,
           errorMessage: geoLocalePatchResult.errorMessage,
+          language: geoLocalePatchDescriptor.language,
+          localeSpecific: geoLocalePatchDescriptor.localeSpecific,
         },
         releasable_catalog: {
           ok: !!releasableCatalogResult.ok,
@@ -1760,6 +1850,14 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
       },
     },
   };
+  if (bundle.geoLocalePatchPayload) {
+    if (geoLocalePatchDescriptor.localeSpecific) {
+      bundle.geoLocalePatchPayloadsByLanguage[geoLocalePatchDescriptor.language] = bundle.geoLocalePatchPayload;
+    } else {
+      bundle.geoLocalePatchPayloadsByLanguage.en = bundle.geoLocalePatchPayload;
+      bundle.geoLocalePatchPayloadsByLanguage.zh = bundle.geoLocalePatchPayload;
+    }
+  }
   const eagerOptionalLayers = Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
     .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, bundle.runtimeTopologyPayload, hints));
   if (eagerOptionalLayers.length) {
@@ -3145,6 +3243,7 @@ export {
   clearActiveScenario,
   ensureActiveScenarioOptionalLayerLoaded,
   ensureActiveScenarioOptionalLayersForVisibility,
+  ensureScenarioGeoLocalePatchForLanguage,
   getDefaultScenarioId,
   getScenarioDisplayOwnerByFeatureId,
   initScenarioManager,

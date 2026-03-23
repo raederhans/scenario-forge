@@ -4,28 +4,67 @@ const { test, expect } = require('@playwright/test');
 
 test.setTimeout(120000);
 
-function resolveBaseUrl() {
-  if (process.env.MAPCREATOR_BASE_URL) {
-    return process.env.MAPCREATOR_BASE_URL;
-  }
-  const metadataPath = path.join(process.cwd(), '.runtime', 'dev', 'active_server.json');
-  if (fs.existsSync(metadataPath)) {
+async function resolveBaseUrl() {
+  const candidates = [];
+  const pushCandidate = (value) => {
+    const normalized = String(value || '').trim();
+    if (!normalized || candidates.includes(normalized)) return;
+    candidates.push(normalized);
+  };
+
+  pushCandidate(process.env.MAPCREATOR_BASE_URL);
+  pushCandidate(process.env.PLAYWRIGHT_TEST_BASE_URL);
+
+  const metadataPaths = [
+    path.join(__dirname, '..', '..', '.runtime', 'dev', 'active_server.json'),
+    path.join(process.cwd(), '.runtime', 'dev', 'active_server.json'),
+  ];
+  for (const metadataPath of metadataPaths) {
+    if (!fs.existsSync(metadataPath)) continue;
     try {
       const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
-      if (metadata && typeof metadata.url === 'string' && metadata.url.trim()) {
-        return metadata.url.trim();
-      }
+      pushCandidate(metadata?.url);
     } catch (error) {
       console.warn('[tno-1962-ui-smoke] Unable to parse active_server.json:', error);
     }
   }
-  return 'http://127.0.0.1:18080';
+
+  pushCandidate('http://127.0.0.1:18080');
+  pushCandidate('http://127.0.0.1:8000');
+
+  for (const candidate of candidates) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
+      const response = await fetch(candidate, {
+        method: 'GET',
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (response.ok || response.status < 500) {
+        return candidate;
+      }
+    } catch (_error) {
+      // Try the next candidate.
+    }
+  }
+
+  return candidates[0] || 'http://127.0.0.1:18080';
 }
 
 test('tno 1962 releasable catalog smoke', async ({ page }) => {
   const consoleIssues = [];
   const networkFailures = [];
   const bathymetryRequests = [];
+  const geoLocalePatchRequests = [];
+
+  await page.addInitScript(() => {
+    try {
+      localStorage.setItem('map_lang', 'en');
+    } catch (_error) {
+      // Ignore localStorage failures in constrained environments.
+    }
+  });
 
   page.on('console', (msg) => {
     const type = msg.type();
@@ -55,10 +94,17 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
       || url.includes('/data/scenarios/tno_1962/bathymetry.topo.json')
     ) {
       bathymetryRequests.push(url);
+      return;
+    }
+    if (
+      url.includes('/data/scenarios/tno_1962/geo_locale_patch')
+      && url.endsWith('.json')
+    ) {
+      geoLocalePatchRequests.push(url);
     }
   });
 
-  await page.goto(resolveBaseUrl(), { waitUntil: 'domcontentloaded' });
+  await page.goto(await resolveBaseUrl(), { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1200);
 
   await page.waitForFunction(() => {
@@ -157,6 +203,8 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
   expect(selectedScenarioId).toBe('tno_1962');
   expect(viewMode).toBe('ownership');
   expect(payload.manifest.releasable_catalog_url).toBe('data/releasables/tno_1962.internal.phase1.catalog.json');
+  expect(payload.manifest.geo_locale_patch_url_en).toBe('data/scenarios/tno_1962/geo_locale_patch.en.json');
+  expect(payload.manifest.geo_locale_patch_url_zh).toBe('data/scenarios/tno_1962/geo_locale_patch.zh.json');
   expect(missingFeaturedTags).toEqual([]);
   expect(lingeringHoi4Owners).toEqual([]);
   retiredCountryTags.forEach((tag) => {
@@ -176,6 +224,8 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
   expect(payload.countries.MAN?.inspector_group_id).toBeFalsy();
   expect(polarRuntime.ruPolarOwner).toBeTruthy();
   expect(polarRuntime.aqOwner).toBe('AQ');
+  expect(geoLocalePatchRequests.some((url) => url.includes('/geo_locale_patch.en.json'))).toBeTruthy();
+  expect(geoLocalePatchRequests.some((url) => url.includes('/geo_locale_patch.zh.json'))).toBeFalsy();
   expect(bathymetryRequests).toEqual([]);
   const bathymetryRequestCountBeforeAdvancedOcean = bathymetryRequests.length;
 
@@ -266,6 +316,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
     missingFeaturedTags,
     lingeringHoi4Owners,
     bathymetryRequests,
+    geoLocalePatchRequests,
     consoleIssueCount: consoleIssues.length,
     networkFailureCount: networkFailures.length,
     consoleIssues,

@@ -3456,6 +3456,8 @@ def sanitize_jsonable(value):
 
 def write_json(path: Path, payload: dict) -> None:
     sanitized = sanitize_jsonable(payload)
+    if path.name in {"water_regions.geojson", "relief_overlays.geojson"}:
+        sanitized = round_geojson_coordinates(sanitized, decimals=6)
     write_json_atomic(
         path,
         sanitized,
@@ -3464,6 +3466,37 @@ def write_json(path: Path, payload: dict) -> None:
         allow_nan=False,
         indent=None,
     )
+
+
+def round_geojson_coordinates(payload: object, decimals: int = 6) -> object:
+    if isinstance(payload, list):
+        if payload and all(isinstance(value, (int, float)) for value in payload):
+            rounded = []
+            for value in payload:
+                if isinstance(value, int):
+                    rounded.append(value)
+                else:
+                    rounded.append(round(value, decimals))
+            return rounded
+        return [round_geojson_coordinates(item, decimals=decimals) for item in payload]
+    if isinstance(payload, dict):
+        next_payload = dict(payload)
+        if "coordinates" in next_payload:
+            next_payload["coordinates"] = round_geojson_coordinates(next_payload["coordinates"], decimals=decimals)
+        if "geometries" in next_payload and isinstance(next_payload["geometries"], list):
+            next_payload["geometries"] = [
+                round_geojson_coordinates(item, decimals=decimals)
+                for item in next_payload["geometries"]
+            ]
+        if "features" in next_payload and isinstance(next_payload["features"], list):
+            next_payload["features"] = [
+                round_geojson_coordinates(item, decimals=decimals)
+                for item in next_payload["features"]
+            ]
+        if "geometry" in next_payload and next_payload["geometry"] is not None:
+            next_payload["geometry"] = round_geojson_coordinates(next_payload["geometry"], decimals=decimals)
+        return next_payload
+    return payload
 
 
 def marine_regions_named_water_snapshot_path(scenario_dir: Path) -> Path:
@@ -3662,6 +3695,9 @@ CHECKPOINT_SCENARIO_WATER_SEED_FILENAME = "scenario_water_seed.geojson"
 CHECKPOINT_WATER_FILENAME = "water_regions.geojson"
 CHECKPOINT_RELIEF_FILENAME = "relief_overlays.geojson"
 CHECKPOINT_BATHYMETRY_FILENAME = "bathymetry.topo.json"
+CHECKPOINT_GEO_LOCALE_FILENAME = "geo_locale_patch.json"
+CHECKPOINT_GEO_LOCALE_EN_FILENAME = "geo_locale_patch.en.json"
+CHECKPOINT_GEO_LOCALE_ZH_FILENAME = "geo_locale_patch.zh.json"
 CHECKPOINT_LAND_MASK_FILENAME = "land_mask.geojson"
 CHECKPOINT_CONTEXT_LAND_MASK_FILENAME = "context_land_mask.geojson"
 CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME = MARINE_REGIONS_NAMED_WATER_SNAPSHOT_FILENAME
@@ -3681,7 +3717,9 @@ PUBLISH_FILENAMES_BY_SCOPE = {
         "water_regions.geojson",
         "relief_overlays.geojson",
         "bathymetry.topo.json",
-        "geo_locale_patch.json",
+        CHECKPOINT_GEO_LOCALE_FILENAME,
+        CHECKPOINT_GEO_LOCALE_EN_FILENAME,
+        CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
         CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME,
         CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME,
     ),
@@ -3703,6 +3741,63 @@ def normalize_locale_override_entry(source: object) -> dict[str, str] | None:
     if zh:
         entry["zh"] = zh
     return entry or None
+
+
+def round_geojson_coordinates(payload: object, decimals: int = 6) -> object:
+    if isinstance(payload, list):
+        if payload and all(isinstance(value, (int, float)) for value in payload):
+            rounded: list[object] = []
+            for value in payload:
+                if isinstance(value, float):
+                    rounded.append(round(value, decimals))
+                else:
+                    rounded.append(value)
+            return rounded
+        return [round_geojson_coordinates(item, decimals=decimals) for item in payload]
+    if isinstance(payload, dict):
+        rounded = {}
+        for key, value in payload.items():
+            if key in {"coordinates", "geometries", "features", "geometry"}:
+                rounded[key] = round_geojson_coordinates(value, decimals=decimals)
+            else:
+                rounded[key] = value
+        return rounded
+    return payload
+
+
+def build_locale_specific_geo_locale_payload(payload: dict, language: str) -> dict:
+    normalized_language = "zh" if str(language or "").strip().lower() == "zh" else "en"
+    language_geo: dict[str, dict[str, str]] = {}
+    raw_geo = payload.get("geo", {}) if isinstance(payload, dict) else {}
+    for feature_id, raw_entry in raw_geo.items():
+        entry = normalize_locale_override_entry(raw_entry)
+        if not entry:
+            continue
+        value = str(entry.get(normalized_language) or "").strip()
+        if not value:
+            continue
+        language_geo[str(feature_id)] = {normalized_language: value}
+    locale_payload = {
+        key: value
+        for key, value in payload.items()
+        if key != "audit"
+    }
+    locale_payload["geo"] = language_geo
+    return locale_payload
+
+
+def ensure_geo_locale_variant_checkpoints(checkpoint_dir: Path) -> None:
+    base_payload = load_checkpoint_json(checkpoint_dir, CHECKPOINT_GEO_LOCALE_FILENAME)
+    write_checkpoint_json(
+        checkpoint_dir,
+        CHECKPOINT_GEO_LOCALE_EN_FILENAME,
+        build_locale_specific_geo_locale_payload(base_payload, "en"),
+    )
+    write_checkpoint_json(
+        checkpoint_dir,
+        CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
+        build_locale_specific_geo_locale_payload(base_payload, "zh"),
+    )
 
 
 def resolve_publish_filenames(scope: str) -> tuple[str, ...]:
@@ -3737,9 +3832,10 @@ def validate_geo_locale_manual_overrides(geo_locale_payload: dict, manual_overri
 
 
 def validate_geo_locale_checkpoint(checkpoint_dir: Path, manual_overrides_path: Path) -> None:
-    geo_locale_payload = load_checkpoint_json(checkpoint_dir, "geo_locale_patch.json")
+    geo_locale_payload = load_checkpoint_json(checkpoint_dir, CHECKPOINT_GEO_LOCALE_FILENAME)
     manual_overrides_payload = load_json(manual_overrides_path) if manual_overrides_path.exists() else {}
     validate_geo_locale_manual_overrides(geo_locale_payload, manual_overrides_payload)
+    ensure_geo_locale_variant_checkpoints(checkpoint_dir)
 
 
 def default_scenario_manual_overrides_payload(scenario_id: str) -> dict[str, object]:
@@ -7753,10 +7849,14 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
         context_land_mask_gdf,
     )
     context_land_mask_arc_refs = estimate_topology_object_arc_refs(runtime_topology_payload, "context_land_mask")
-    runtime_water_regions = sanitize_feature_collection_polygonal_geometries(
-        topology_object_to_feature_collection(runtime_topology_payload, "scenario_water")
+    runtime_water_regions = round_geojson_coordinates(
+        sanitize_feature_collection_polygonal_geometries(
+            topology_object_to_feature_collection(runtime_topology_payload, "scenario_water")
+        ),
+        decimals=6,
     )
     runtime_special_regions = feature_collection_from_features([])
+    relief_overlays_payload = round_geojson_coordinates(relief_overlays_payload, decimals=6)
 
     recalculate_country_feature_counts(
         countries_payload,
@@ -7786,7 +7886,9 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
     manifest_payload["bathymetry_topology_url"] = "data/scenarios/tno_1962/bathymetry.topo.json"
     manifest_payload["runtime_topology_url"] = "data/scenarios/tno_1962/runtime_topology.topo.json"
     manifest_payload["releasable_catalog_url"] = "data/releasables/tno_1962.internal.phase1.catalog.json"
-    manifest_payload["geo_locale_patch_url"] = "data/scenarios/tno_1962/geo_locale_patch.json"
+    manifest_payload["geo_locale_patch_url"] = f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_GEO_LOCALE_FILENAME}"
+    manifest_payload["geo_locale_patch_url_en"] = f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_GEO_LOCALE_EN_FILENAME}"
+    manifest_payload["geo_locale_patch_url_zh"] = f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_GEO_LOCALE_ZH_FILENAME}"
     manifest_payload["performance_hints"] = {
         "render_profile_default": "balanced",
         "dynamic_borders_default": False,
@@ -8060,8 +8162,9 @@ def build_geo_locale_stage(
         scenario_dir=checkpoint_dir,
         locales_path=ROOT / "data/locales.json",
         manual_overrides_path=scenario_dir / "geo_name_overrides.manual.json",
-        output_path=checkpoint_dir / "geo_locale_patch.json",
+        output_path=checkpoint_dir / CHECKPOINT_GEO_LOCALE_FILENAME,
     )
+    ensure_geo_locale_variant_checkpoints(checkpoint_dir)
     validate_geo_locale_checkpoint(checkpoint_dir, scenario_dir / "geo_name_overrides.manual.json")
 
 

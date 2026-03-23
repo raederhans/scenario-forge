@@ -222,6 +222,39 @@ class DevServerTest(unittest.TestCase):
 
         self.assertEqual(exc_info.exception.code, "invalid_country_code")
 
+    def test_load_scenario_context_accepts_locale_specific_geo_patch_urls(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = self._create_scenario_fixture(root)
+            manifest_path = scenario_dir / "manifest.json"
+            manifest_payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest_payload.pop("geo_locale_patch_url", None)
+            manifest_payload["geo_locale_patch_url_en"] = "data/scenarios/test_scenario/geo_locale_patch.en.json"
+            manifest_payload["geo_locale_patch_url_zh"] = "data/scenarios/test_scenario/geo_locale_patch.zh.json"
+            _write_json(manifest_path, manifest_payload)
+            _write_json(
+                scenario_dir / "geo_locale_patch.en.json",
+                {
+                    "version": 1,
+                    "scenario_id": "test_scenario",
+                    "language": "en",
+                    "geo": {},
+                },
+            )
+            _write_json(
+                scenario_dir / "geo_locale_patch.zh.json",
+                {
+                    "version": 1,
+                    "scenario_id": "test_scenario",
+                    "language": "zh",
+                    "geo": {},
+                },
+            )
+
+            context = dev_server.load_scenario_context("test_scenario", root=root)
+
+            self.assertEqual(context["geoLocalePatchPath"], scenario_dir / "geo_locale_patch.en.json")
+
     def test_normalize_optional_float_accepts_finite_values_and_rejects_non_finite(self) -> None:
         self.assertEqual(dev_server._normalize_optional_float("12.5"), 12.5)
         self.assertIsNone(dev_server._normalize_optional_float(""))

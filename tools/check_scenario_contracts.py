@@ -235,74 +235,92 @@ def validate_locale_patch(
     errors: list[str],
     warnings: list[str],
 ) -> None:
-    geo_locale_patch_url = str(manifest.get("geo_locale_patch_url") or "").strip()
-    if not geo_locale_patch_url:
+    patch_descriptors = [
+        ("geo_locale_patch_url", str(manifest.get("geo_locale_patch_url") or "").strip()),
+        ("geo_locale_patch_url_en", str(manifest.get("geo_locale_patch_url_en") or "").strip()),
+        ("geo_locale_patch_url_zh", str(manifest.get("geo_locale_patch_url_zh") or "").strip()),
+    ]
+    active_patch_descriptors = [(field, url) for field, url in patch_descriptors if url]
+    if not active_patch_descriptors:
         return
-    geo_locale_patch_path = scenario_relative_url_to_path(geo_locale_patch_url)
-    if geo_locale_patch_path is None or not geo_locale_patch_path.exists():
-        errors.append(f"geo_locale_patch_url target must exist. Missing: {geo_locale_patch_url}")
-        return
-
-    try:
-        payload = load_json(geo_locale_patch_path)
-    except Exception as exc:
-        errors.append(str(exc))
-        return
-    payload_scenario_id = str(payload.get("scenario_id") or "").strip()
-    if payload_scenario_id and payload_scenario_id != expected_scenario_id:
-        errors.append(
-            f"geo_locale_patch.json scenario_id must be `{expected_scenario_id}`. Found `{payload_scenario_id}`."
-        )
-
-    geo_payload = payload.get("geo")
-    if not isinstance(geo_payload, dict):
-        errors.append("geo_locale_patch.json geo payload must be an object.")
-        return
-
-    audit = payload.get("audit") if isinstance(payload.get("audit"), dict) else {}
-    collision_candidates = audit.get("collision_candidates", [])
-    if collision_candidates and isinstance(collision_candidates, list):
-        def _parse_audit_count(field: str, fallback: int) -> int:
-            raw_value = audit.get(field)
-            if raw_value in (None, ""):
-                return fallback
-            try:
-                return int(raw_value)
-            except (TypeError, ValueError):
-                warnings.append(
-                    f"geo_locale_patch.json audit.{field} must be numeric when present; using fallback value {fallback}."
-                )
-                return fallback
-
-        sample = audit.get("collision_candidates_sample") if isinstance(audit.get("collision_candidates_sample"), list) else collision_candidates[:5]
-        collision_count = _parse_audit_count("collision_candidate_count", len(collision_candidates))
-        cross_base_collision_count = _parse_audit_count("cross_base_collision_count", collision_count)
-        split_clone_safe_copy_count = _parse_audit_count("split_clone_safe_copy_count", 0)
-        warnings.append(
-            "geo_locale_patch.json recorded locale collision candidates for manual review. "
-            f"{cross_base_collision_count} cross-base collisions remain after "
-            f"{split_clone_safe_copy_count} split-clone safe copies. Sample: {sample[:5]!r}."
-        )
-    elif collision_candidates not in (None, [], {}):
-        errors.append("geo_locale_patch.json audit.collision_candidates must be a list when present.")
-
-    suspicious_samples: list[str] = []
-    for feature_id, entry in geo_payload.items():
-        if not isinstance(entry, dict):
+    audit_reported = False
+    suspicious_reported = False
+    warned_invalid_audit_counts: set[str] = set()
+    suspicious_sample_signatures: set[tuple[str, ...]] = set()
+    for field_name, geo_locale_patch_url in active_patch_descriptors:
+        geo_locale_patch_path = scenario_relative_url_to_path(geo_locale_patch_url)
+        if geo_locale_patch_path is None or not geo_locale_patch_path.exists():
+            errors.append(f"{field_name} target must exist. Missing: {geo_locale_patch_url}")
             continue
-        zh_value = entry.get("zh")
-        en_value = entry.get("en")
-        if zh_value in SUSPICIOUS_LOCALE_TRANSLATIONS:
-            suspicious_samples.append(
-                f"{feature_id}:{str(en_value or '').strip()}->{str(zh_value or '').strip()}"
+
+        try:
+            payload = load_json(geo_locale_patch_path)
+        except Exception as exc:
+            errors.append(str(exc))
+            continue
+        payload_scenario_id = str(payload.get("scenario_id") or "").strip()
+        if payload_scenario_id and payload_scenario_id != expected_scenario_id:
+            errors.append(
+                f"{field_name} scenario_id must be `{expected_scenario_id}`. Found `{payload_scenario_id}`."
             )
-        if len(suspicious_samples) >= 8:
-            break
-    if suspicious_samples:
-        errors.append(
-            "geo_locale_patch.json contains high-risk machine-translation candidates. "
-            f"Sample: {suspicious_samples}."
-        )
+
+        geo_payload = payload.get("geo")
+        if not isinstance(geo_payload, dict):
+            errors.append(f"{field_name} geo payload must be an object.")
+            continue
+
+        audit = payload.get("audit") if isinstance(payload.get("audit"), dict) else {}
+        collision_candidates = audit.get("collision_candidates", [])
+        if collision_candidates and isinstance(collision_candidates, list):
+            def _parse_audit_count(field: str, fallback: int) -> int:
+                raw_value = audit.get(field)
+                if raw_value in (None, ""):
+                    return fallback
+                try:
+                    return int(raw_value)
+                except (TypeError, ValueError):
+                    warning_key = f"{field}:{fallback}"
+                    if warning_key not in warned_invalid_audit_counts:
+                        warnings.append(
+                            f"{field_name} audit.{field} must be numeric when present; using fallback value {fallback}."
+                        )
+                        warned_invalid_audit_counts.add(warning_key)
+                    return fallback
+
+            if not audit_reported:
+                sample = audit.get("collision_candidates_sample") if isinstance(audit.get("collision_candidates_sample"), list) else collision_candidates[:5]
+                collision_count = _parse_audit_count("collision_candidate_count", len(collision_candidates))
+                cross_base_collision_count = _parse_audit_count("cross_base_collision_count", collision_count)
+                split_clone_safe_copy_count = _parse_audit_count("split_clone_safe_copy_count", 0)
+                warnings.append(
+                    f"{field_name} recorded locale collision candidates for manual review. "
+                    f"{cross_base_collision_count} cross-base collisions remain after "
+                    f"{split_clone_safe_copy_count} split-clone safe copies. Sample: {sample[:5]!r}."
+                )
+                audit_reported = True
+        elif collision_candidates not in (None, [], {}):
+            errors.append(f"{field_name} audit.collision_candidates must be a list when present.")
+
+        suspicious_samples: list[str] = []
+        for feature_id, entry in geo_payload.items():
+            if not isinstance(entry, dict):
+                continue
+            zh_value = entry.get("zh")
+            en_value = entry.get("en")
+            if zh_value in SUSPICIOUS_LOCALE_TRANSLATIONS:
+                suspicious_samples.append(
+                    f"{feature_id}:{str(en_value or '').strip()}->{str(zh_value or '').strip()}"
+                )
+            if len(suspicious_samples) >= 8:
+                break
+        suspicious_signature = tuple(suspicious_samples)
+        if suspicious_samples and not suspicious_reported and suspicious_signature not in suspicious_sample_signatures:
+            errors.append(
+                f"{field_name} contains high-risk machine-translation candidates. "
+                f"Sample: {suspicious_samples}."
+            )
+            suspicious_reported = True
+            suspicious_sample_signatures.add(suspicious_signature)
 
 
 def _load_required_local_json(path: Path, errors: list[str]) -> dict | None:

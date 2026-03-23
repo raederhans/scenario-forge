@@ -315,7 +315,12 @@ def load_scenario_context(scenario_id: object, *, root: Path = ROOT) -> dict[str
     releasable_catalog_url = str(manifest.get("releasable_catalog_url") or "").strip()
     district_groups_url = str(manifest.get("district_groups_url") or "").strip()
     city_overrides_url = str(manifest.get("city_overrides_url") or "").strip()
-    geo_locale_patch_url = str(manifest.get("geo_locale_patch_url") or "").strip()
+    geo_locale_patch_url = str(
+        manifest.get("geo_locale_patch_url")
+        or manifest.get("geo_locale_patch_url_en")
+        or manifest.get("geo_locale_patch_url_zh")
+        or ""
+    ).strip()
     geo_locale_builder_url = str(manifest.get("geo_locale_builder_url") or "").strip()
     controllers_path = _resolve_repo_path(controllers_url, root=root) if controllers_url else None
     cores_path = _resolve_repo_path(cores_url, root=root) if cores_url else None
