@@ -294,9 +294,9 @@ const DEFAULT_OPERATION_GRAPHIC_OPACITY = 0.96;
 const DEFAULT_OPERATION_GRAPHIC_WIDTH = 4.4;
 const DEFAULT_UNIT_COUNTER_SIDC = "130310001412110000000000000000";
 const UNIT_COUNTER_MILSTD_SIZE_BY_TOKEN = Object.freeze({
-  small: 24,
-  medium: 28,
-  large: 32,
+  small: 12,
+  medium: 14,
+  large: 18,
 });
 const UNIT_COUNTER_SIDC_ALIASES = Object.freeze({
   INF: DEFAULT_UNIT_COUNTER_SIDC,
@@ -13899,31 +13899,31 @@ function renderStrategicDefs() {
   const defs = [
     {
       id: "strategic-arrow-attack",
-      path: "M 0 0 L 11 5 L 0 10 z",
-      fill: "#991b1b",
-      stroke: "#fecaca",
-      strokeWidth: 0.6,
+      path: "M 0 5 L 8 1.8 L 7 5 L 8 8.2 z",
+      fill: "#7f1d1d",
+      stroke: "#f5d7d3",
+      strokeWidth: 0.45,
     },
     {
       id: "strategic-arrow-retreat",
-      path: "M 0 5 L 11 0 L 8 5 L 11 10 z",
-      fill: "#f59e0b",
-      stroke: "#fef3c7",
-      strokeWidth: 0.6,
+      path: "M 1 5 L 8 2 L 6.6 5 L 8 8 z",
+      fill: "#9a3412",
+      stroke: "#f3dec6",
+      strokeWidth: 0.45,
     },
     {
       id: "strategic-arrow-supply",
-      path: "M 0 5 L 8 1 L 8 4 L 11 4 L 11 6 L 8 6 L 8 9 z",
+      path: "M 0 5 L 6 2.5 L 6 4.2 L 8 4.2 L 8 5.8 L 6 5.8 L 6 7.5 z",
       fill: "#475569",
-      stroke: "#e2e8f0",
+      stroke: "#dbe2eb",
       strokeWidth: 0.5,
     },
     {
       id: "strategic-arrow-naval",
-      path: "M 0 5 L 10 0 L 7 5 L 10 10 z",
-      fill: "#1d4ed8",
-      stroke: "#dbeafe",
-      strokeWidth: 0.6,
+      path: "M 0 5 L 7 1.6 L 6 5 L 7 8.4 z",
+      fill: "#1e3a8a",
+      stroke: "#d8e6ff",
+      strokeWidth: 0.45,
     },
   ];
 
@@ -13955,55 +13955,55 @@ function renderStrategicDefs() {
 function getOperationGraphicPreset(kind) {
   const presets = {
     attack: {
-      stroke: "#991b1b",
-      width: 4.4,
-      opacity: 0.96,
+      stroke: "#7f1d1d",
+      width: 2.2,
+      opacity: 0.9,
       dasharray: null,
       markerEnd: "url(#strategic-arrow-attack)",
       curved: true,
       closed: false,
     },
     retreat: {
-      stroke: "#b45309",
-      width: 3.4,
-      opacity: 0.9,
-      dasharray: "9 6",
+      stroke: "#9a3412",
+      width: 1.8,
+      opacity: 0.82,
+      dasharray: "7 5",
       markerEnd: "url(#strategic-arrow-retreat)",
       curved: true,
       closed: false,
     },
     supply: {
       stroke: "#475569",
-      width: 2.4,
-      opacity: 0.92,
-      dasharray: "5 5",
+      width: 1.4,
+      opacity: 0.8,
+      dasharray: "4 4",
       markerEnd: "url(#strategic-arrow-supply)",
       curved: true,
       closed: false,
     },
     naval: {
-      stroke: "#1d4ed8",
-      width: 3,
-      opacity: 0.9,
-      dasharray: "10 6",
+      stroke: "#1e3a8a",
+      width: 1.8,
+      opacity: 0.82,
+      dasharray: "8 5",
       markerEnd: "url(#strategic-arrow-naval)",
       curved: true,
       closed: false,
     },
     encirclement: {
-      stroke: "#6d28d9",
-      width: 2.8,
-      opacity: 0.88,
-      dasharray: "7 5",
+      stroke: "#4c1d95",
+      width: 1.7,
+      opacity: 0.76,
+      dasharray: "6 4",
       markerEnd: null,
       curved: true,
       closed: true,
     },
     theater: {
-      stroke: "#92400e",
-      width: 3.2,
-      opacity: 0.82,
-      dasharray: "12 6",
+      stroke: "#7c2d12",
+      width: 1.9,
+      opacity: 0.74,
+      dasharray: "10 5",
       markerEnd: null,
       curved: true,
       closed: true,
@@ -14182,21 +14182,23 @@ function renderFrontlineOverlay() {
   }
 
   const style = String(state.annotationView?.frontlineStyle || "clean");
+  const zoomK = Math.max(0.1, Number(state.zoomTransform?.k || 1));
+  const widthScale = zoomK >= 5 ? 1.18 : zoomK >= 2.4 ? 1.04 : zoomK >= 1.2 ? 0.92 : 0.82;
   const pathValue = pathSVG(mesh);
   const layers = style === "dual-rail"
     ? [
-      { key: "base", stroke: "rgba(15, 23, 42, 0.92)", width: 5.4, dasharray: null },
-      { key: "inner-a", stroke: "rgba(190, 24, 93, 0.85)", width: 2.5, dasharray: null },
-      { key: "inner-b", stroke: "rgba(59, 130, 246, 0.85)", width: 1.1, dasharray: "16 10" },
+      { key: "base", stroke: "rgba(17, 24, 39, 0.78)", width: 4.2 * widthScale, dasharray: null },
+      { key: "inner-a", stroke: "rgba(127, 29, 29, 0.46)", width: 1.5 * widthScale, dasharray: null },
+      { key: "inner-b", stroke: "rgba(30, 58, 138, 0.42)", width: 0.8 * widthScale, dasharray: "10 7" },
     ]
-    : style === "teeth"
+      : style === "teeth"
       ? [
-        { key: "base", stroke: "rgba(17, 24, 39, 0.96)", width: 5.1, dasharray: null },
-        { key: "teeth", stroke: "rgba(248, 250, 252, 0.95)", width: 2.3, dasharray: "2 6" },
+        { key: "base", stroke: "rgba(24, 32, 45, 0.82)", width: 4.1 * widthScale, dasharray: null },
+        { key: "teeth", stroke: "rgba(231, 229, 221, 0.84)", width: 1.3 * widthScale, dasharray: "1.5 5.8" },
       ]
       : [
-        { key: "base", stroke: "rgba(241, 245, 249, 0.95)", width: 5.2, dasharray: null },
-        { key: "inner", stroke: "rgba(15, 23, 42, 0.92)", width: 2.4, dasharray: null },
+        { key: "base", stroke: "rgba(20, 29, 43, 0.78)", width: 4.3 * widthScale, dasharray: null },
+        { key: "inner", stroke: "rgba(236, 232, 223, 0.9)", width: 1.7 * widthScale, dasharray: null },
       ];
 
   const selection = frontlineOverlayGroup
@@ -14483,6 +14485,31 @@ function renderOperationGraphicsEditorOverlay() {
   syncInteractionLayerPointerEvents();
 }
 
+function getOperationGraphicLabelAnchor(projectedPoints = [], { closed = false } = {}) {
+  if (!Array.isArray(projectedPoints) || projectedPoints.length === 0) {
+    return null;
+  }
+  if (closed) {
+    const [sumX, sumY] = projectedPoints.reduce(
+      (acc, point) => [acc[0] + Number(point?.[0] || 0), acc[1] + Number(point?.[1] || 0)],
+      [0, 0]
+    );
+    return [sumX / projectedPoints.length, sumY / projectedPoints.length];
+  }
+  if (projectedPoints.length === 1) {
+    return projectedPoints[0];
+  }
+  const midIndex = Math.floor((projectedPoints.length - 1) / 2);
+  const start = projectedPoints[midIndex];
+  const end = projectedPoints[Math.min(projectedPoints.length - 1, midIndex + 1)];
+  const anchorX = (Number(start?.[0] || 0) + Number(end?.[0] || 0)) / 2;
+  const anchorY = (Number(start?.[1] || 0) + Number(end?.[1] || 0)) / 2;
+  const dx = Number(end?.[0] || 0) - Number(start?.[0] || 0);
+  const dy = Number(end?.[1] || 0) - Number(start?.[1] || 0);
+  const length = Math.max(1, Math.hypot(dx, dy));
+  return [anchorX - (dy / length) * 9, anchorY + (dx / length) * 9];
+}
+
 function renderOperationGraphicsOverlay() {
   if (!operationGraphicsGroup) return;
   renderStrategicDefs();
@@ -14492,12 +14519,20 @@ function renderOperationGraphicsOverlay() {
     .map((graphic) => {
       const geometryPreset = getOperationGraphicPreset(graphic.kind);
       const stylePreset = getOperationGraphicPreset(graphic.stylePreset || graphic.kind);
+      const projectedPoints = projectStrategicPoints(graphic.points);
       const path = createOperationGraphicPath(graphic.points, {
         closed: geometryPreset.closed,
         curved: geometryPreset.curved,
       });
       if (!path) return null;
-      return { graphic, geometryPreset, stylePreset, path, pathId: `strategic-graphic-path-${graphic.id}` };
+      return {
+        graphic,
+        geometryPreset,
+        stylePreset,
+        path,
+        projectedPoints,
+        labelAnchor: getOperationGraphicLabelAnchor(projectedPoints, { closed: geometryPreset.closed }),
+      };
     })
     .filter(Boolean);
 
@@ -14506,19 +14541,35 @@ function renderOperationGraphicsOverlay() {
     .data(rendered, (d) => d.graphic.id);
 
   const groupEnter = groups.enter().append("g").attr("class", "operation-graphic");
+  groupEnter.append("path").attr("class", "operation-graphic-casing");
   groupEnter.append("path").attr("class", "operation-graphic-path");
   groupEnter.append("path").attr("class", "operation-graphic-hit");
-  groupEnter.append("text").attr("class", "operation-graphic-label").append("textPath");
+  const labelEnter = groupEnter.append("g").attr("class", "operation-graphic-label");
+  labelEnter.append("rect");
+  labelEnter.append("text");
 
   const merged = groupEnter.merge(groups);
-  merged.select("path.operation-graphic-path")
-    .attr("id", (d) => d.pathId)
+  merged.select("path.operation-graphic-casing")
     .attr("d", (d) => d.path)
-    .attr("fill", (d) => (d.geometryPreset.closed ? "rgba(15, 23, 42, 0.06)" : "none"))
+    .attr("fill", "none")
+    .attr("stroke", (d) => (d.graphic.id === selectedId ? "rgba(248, 244, 233, 0.92)" : "rgba(17, 24, 39, 0.45)"))
+    .attr("stroke-width", (d) => {
+      const baseWidth = d.graphic.width > 0 ? d.graphic.width : d.stylePreset.width;
+      return baseWidth + (d.graphic.id === selectedId ? 1.8 : 1.2);
+    })
+    .attr("stroke-linecap", "round")
+    .attr("stroke-linejoin", "round")
+    .attr("stroke-dasharray", (d) => d.stylePreset.dasharray || null)
+    .attr("opacity", (d) => (d.graphic.id === selectedId ? 0.95 : 0.68))
+    .attr("marker-end", null);
+
+  merged.select("path.operation-graphic-path")
+    .attr("d", (d) => d.path)
+    .attr("fill", (d) => (d.geometryPreset.closed ? "rgba(15, 23, 42, 0.04)" : "none"))
     .attr("stroke", (d) => d.graphic.stroke || d.stylePreset.stroke)
     .attr("stroke-width", (d) => {
       const baseWidth = d.graphic.width > 0 ? d.graphic.width : d.stylePreset.width;
-      return d.graphic.id === selectedId ? baseWidth + 1.4 : baseWidth;
+      return d.graphic.id === selectedId ? baseWidth + 0.4 : baseWidth;
     })
     .attr("stroke-linecap", "round")
     .attr("stroke-linejoin", "round")
@@ -14530,21 +14581,40 @@ function renderOperationGraphicsOverlay() {
     .attr("d", (d) => d.path)
     .attr("fill", "none")
     .attr("stroke", "transparent")
-    .attr("stroke-width", (d) => Math.max(10, (d.graphic.width > 0 ? d.graphic.width : d.stylePreset.width) + 6))
+    .attr("stroke-width", (d) => Math.max(10, (d.graphic.width > 0 ? d.graphic.width : d.stylePreset.width) + 7))
     .attr("pointer-events", "stroke");
 
-  merged.select("text.operation-graphic-label")
-    .attr("display", (d) => (d.graphic.label ? null : "none"))
-    .attr("fill", "#111827")
-    .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
-    .attr("font-size", 11)
-    .attr("font-weight", 600);
+  merged.select("g.operation-graphic-label")
+    .attr("display", (d) => (d.graphic.label && Array.isArray(d.labelAnchor) ? null : "none"))
+    .attr("transform", (d) => `translate(${d.labelAnchor?.[0] ?? -9999},${d.labelAnchor?.[1] ?? -9999})`);
 
-  merged.select("text.operation-graphic-label textPath")
-    .attr("href", (d) => `#${d.pathId}`)
-    .attr("startOffset", "50%")
+  merged.select("g.operation-graphic-label text")
     .attr("text-anchor", "middle")
+    .attr("dominant-baseline", "central")
+    .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
+    .attr("font-size", 9)
+    .attr("font-weight", 600)
+    .attr("letter-spacing", "0.04em")
+    .attr("fill", "#1f2937")
     .text((d) => d.graphic.label || "");
+
+  merged.select("g.operation-graphic-label rect")
+    .each(function eachLabelPlate() {
+      const textNode = globalThis.d3.select(this.parentNode).select("text").node();
+      const bbox = textNode?.getBBox?.();
+      const width = bbox ? bbox.width + 10 : 48;
+      const height = bbox ? bbox.height + 6 : 16;
+      globalThis.d3.select(this)
+        .attr("x", -width / 2)
+        .attr("y", -height / 2)
+        .attr("width", width)
+        .attr("height", height)
+        .attr("rx", 2)
+        .attr("ry", 2)
+        .attr("fill", "rgba(248, 244, 233, 0.92)")
+        .attr("stroke", "rgba(55, 65, 81, 0.55)")
+        .attr("stroke-width", 0.8);
+    });
 
   merged.on("click", (event, datum) => {
     event.stopPropagation();
@@ -14685,11 +14755,17 @@ function renderUnitCountersOverlay() {
   if (!unitCountersGroup) return;
   ensureUnitCounterEditorState();
   const selectedId = String(state.unitCounterEditor?.selectedId || "");
+  const zoomK = Math.max(0.1, Number(state.zoomTransform?.k || 1));
   const entries = getUnitCounterRenderEntries()
     .map(({ counter, stackCount }) => {
       const projected = getProjectedPoint([counter.anchor?.lon, counter.anchor?.lat]);
       if (!projected) return null;
-      return { counter, projected, stackCount };
+      return {
+        counter,
+        projected,
+        stackCount,
+        model: getUnitCounterCardModel(counter, { stackCount }),
+      };
     })
     .filter(Boolean)
     .sort((a, b) => Number(a.counter.zIndex || 0) - Number(b.counter.zIndex || 0));
@@ -14715,179 +14791,205 @@ function renderUnitCountersOverlay() {
   groupEnter.append("circle").attr("class", "unit-counter-stack-badge");
   groupEnter.append("text").attr("class", "unit-counter-stack-text");
 
-  const zoomK = Math.max(0.1, Number(state.zoomTransform?.k || 1));
   const merged = groupEnter.merge(groups)
     .attr("transform", (d) => {
-      const metrics = getUnitCounterScreenMetrics(d.counter.size);
+      const metrics = d.model.metrics;
       return `translate(${d.projected[0]},${d.projected[1]}) scale(${(metrics.scale || 1) / zoomK})`;
     })
     .attr("data-counter-id", (d) => d.counter.id)
     .attr("pointer-events", "all");
 
   merged.select("rect.unit-counter-shadow")
-    .attr("x", (d) => -getUnitCounterScreenMetrics(d.counter.size).width / 2)
-    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2)
-    .attr("width", (d) => getUnitCounterScreenMetrics(d.counter.size).width)
-    .attr("height", (d) => getUnitCounterScreenMetrics(d.counter.size).height)
-    .attr("rx", 16)
-    .attr("ry", 16)
-    .attr("fill", "rgba(15, 23, 42, 0.16)")
-    .attr("opacity", 0.28)
-    .attr("transform", "translate(0, 2)");
+    .attr("x", (d) => -d.model.metrics.width / 2)
+    .attr("y", (d) => -d.model.metrics.height / 2)
+    .attr("width", (d) => d.model.metrics.width)
+    .attr("height", (d) => d.model.metrics.height)
+    .attr("rx", 2)
+    .attr("ry", 2)
+    .attr("fill", "rgba(15, 23, 42, 0.22)")
+    .attr("opacity", 0.44)
+    .attr("transform", "translate(0.9, 0.9)");
 
   merged.select("rect.unit-counter-shell")
-    .attr("x", (d) => -getUnitCounterScreenMetrics(d.counter.size).width / 2)
-    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2)
-    .attr("width", (d) => getUnitCounterScreenMetrics(d.counter.size).width)
-    .attr("height", (d) => getUnitCounterScreenMetrics(d.counter.size).height)
-    .attr("rx", 16)
-    .attr("ry", 16)
-    .attr("fill", "#f8fafc")
-    .attr("stroke", (d) => (d.counter.id === selectedId ? "#0f5fff" : "rgba(15, 23, 42, 0.16)"))
-    .attr("stroke-width", (d) => (d.counter.id === selectedId ? 2.8 : 1.1));
+    .attr("x", (d) => -d.model.metrics.width / 2)
+    .attr("y", (d) => -d.model.metrics.height / 2)
+    .attr("width", (d) => d.model.metrics.width)
+    .attr("height", (d) => d.model.metrics.height)
+    .attr("rx", 2)
+    .attr("ry", 2)
+    .attr("fill", "#f4f0e6")
+    .attr("stroke", (d) => (d.counter.id === selectedId ? "#f5ecd7" : "rgba(31, 41, 55, 0.82)"))
+    .attr("stroke-width", (d) => (d.counter.id === selectedId ? 1.3 : 0.9));
 
   merged.select("rect.unit-counter-strip")
-    .attr("x", (d) => -getUnitCounterScreenMetrics(d.counter.size).width / 2)
-    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2)
-    .attr("width", (d) => getUnitCounterScreenMetrics(d.counter.size).width)
-    .attr("height", 8)
-    .attr("rx", 16)
-    .attr("ry", 16)
-    .attr("fill", (d) => getUnitCounterNationMeta(d.counter.nationTag).color);
+    .attr("x", (d) => -d.model.metrics.width / 2)
+    .attr("y", (d) => -d.model.metrics.height / 2)
+    .attr("width", (d) => Math.max(1.6, d.model.metrics.width * 0.12))
+    .attr("height", (d) => d.model.metrics.height)
+    .attr("rx", 0)
+    .attr("ry", 0)
+    .attr("fill", (d) => d.model.nation.color);
 
   merged.select("rect.unit-counter-tag-pill")
-    .attr("x", (d) => -getUnitCounterScreenMetrics(d.counter.size).width / 2 + 8)
-    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2 + 12)
-    .attr("width", 28)
-    .attr("height", 15)
-    .attr("rx", 7.5)
-    .attr("ry", 7.5)
-    .attr("fill", "rgba(15, 23, 42, 0.86)");
+    .attr("x", (d) => -d.model.metrics.width / 2 + Math.max(2.2, d.model.metrics.width * 0.14))
+    .attr("y", (d) => -d.model.metrics.height / 2 + 2)
+    .attr("width", (d) => Math.max(9, d.model.metrics.width * 0.32))
+    .attr("height", 4.6)
+    .attr("rx", 0.8)
+    .attr("ry", 0.8)
+    .attr("fill", "rgba(31, 41, 55, 0.9)");
 
   merged.select("text.unit-counter-tag-text")
-    .attr("x", (d) => -getUnitCounterScreenMetrics(d.counter.size).width / 2 + 22)
-    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2 + 19.5)
+    .attr("x", (d) => -d.model.metrics.width / 2 + Math.max(2.2, d.model.metrics.width * 0.14) + Math.max(9, d.model.metrics.width * 0.32) / 2)
+    .attr("y", (d) => -d.model.metrics.height / 2 + 4.3)
     .attr("text-anchor", "middle")
     .attr("dominant-baseline", "central")
     .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
-    .attr("font-size", 8)
+    .attr("font-size", 3.2)
     .attr("font-weight", 700)
+    .attr("letter-spacing", "0.03em")
     .attr("fill", "#f8fafc")
-    .text((d) => getUnitCounterNationMeta(d.counter.nationTag).tag || "N/A");
+    .text((d) => d.model.nation.tag || "AUTO");
 
   merged.select("rect.unit-counter-type-chip")
-    .attr("x", (d) => getUnitCounterScreenMetrics(d.counter.size).width / 2 - 40)
-    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2 + 12)
-    .attr("width", 32)
-    .attr("height", 15)
-    .attr("rx", 7.5)
-    .attr("ry", 7.5)
-    .attr("fill", "rgba(226, 232, 240, 0.96)");
+    .attr("x", (d) => d.model.metrics.width / 2 - Math.max(10, d.model.metrics.width * 0.36) - 2)
+    .attr("y", (d) => -d.model.metrics.height / 2 + 2)
+    .attr("width", (d) => Math.max(10, d.model.metrics.width * 0.36))
+    .attr("height", 4.6)
+    .attr("rx", 0.8)
+    .attr("ry", 0.8)
+    .attr("fill", "rgba(226, 221, 208, 0.96)");
 
   merged.select("text.unit-counter-type-text")
-    .attr("x", (d) => getUnitCounterScreenMetrics(d.counter.size).width / 2 - 24)
-    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2 + 19.5)
+    .attr("x", (d) => d.model.metrics.width / 2 - 2 - Math.max(10, d.model.metrics.width * 0.36) / 2)
+    .attr("y", (d) => -d.model.metrics.height / 2 + 4.3)
     .attr("text-anchor", "middle")
     .attr("dominant-baseline", "central")
     .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
-    .attr("font-size", 7.8)
+    .attr("font-size", 3.2)
     .attr("font-weight", 700)
-    .attr("fill", "#0f172a")
-    .text((d) => getUnitCounterCardModel(d.counter).shortCode.slice(0, 4));
+    .attr("letter-spacing", "0.03em")
+    .attr("fill", "#111827")
+    .text((d) => d.model.shortCode.slice(0, 3));
 
   merged.select("image.unit-counter-milsymbol")
-    .attr("display", (d) => (d.counter.renderer === "milstd" ? null : "none"))
-    .attr("x", (d) => -(getUnitCounterScreenMetrics(d.counter.size).symbolBox / 2))
-    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2 + 21)
-    .attr("width", (d) => getUnitCounterScreenMetrics(d.counter.size).symbolBox)
-    .attr("height", (d) => getUnitCounterScreenMetrics(d.counter.size).symbolBox)
+    .attr("display", (d) => (d.model.renderer === "milstd" ? null : "none"))
+    .attr("x", (d) => -(d.model.metrics.symbolBox / 2))
+    .attr("y", (d) => -d.model.metrics.symbolBox / 2 + 1)
+    .attr("width", (d) => d.model.metrics.symbolBox)
+    .attr("height", (d) => d.model.metrics.symbolBox)
     .attr("preserveAspectRatio", "xMidYMid meet")
-    .attr("href", (d) => getUnitCounterCardModel(d.counter).symbolUri);
+    .attr("href", (d) => d.model.symbolUri);
 
   merged.select("text.unit-counter-symbol")
     .attr("display", (d) => {
-      if (d.counter.renderer === "milstd") {
-        return getUnitCounterCardModel(d.counter).symbolUri ? "none" : null;
+      if (d.model.renderer === "milstd") {
+        return d.model.symbolUri ? "none" : null;
       }
       return null;
     })
     .attr("x", 0)
-    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2 + 39)
+    .attr("y", 1)
     .attr("text-anchor", "middle")
     .attr("dominant-baseline", "central")
     .attr("font-family", "\"Roboto Condensed\", \"Segoe UI\", sans-serif")
-    .attr("font-size", (d) => (d.counter.renderer === "milstd" ? 10 : 13))
+    .attr("font-size", (d) => (d.model.renderer === "milstd" ? 5.6 : 6.6))
     .attr("font-weight", 700)
     .attr("fill", "#0f172a")
-    .text((d) => {
-      const model = getUnitCounterCardModel(d.counter);
-      if (d.counter.renderer === "milstd") {
-        return model.shortCode.slice(0, 6);
-      }
-      return model.shortCode.slice(0, 6);
-    });
+    .text((d) => d.model.shortCode.slice(0, 3));
 
   merged.select("text.unit-counter-echelons")
-    .attr("display", (d) => (getUnitCounterCardModel(d.counter).echelonLabel ? null : "none"))
+    .attr("display", (d) => (d.model.echelonLabel ? null : "none"))
     .attr("x", 0)
-    .attr("y", (d) => getUnitCounterScreenMetrics(d.counter.size).height / 2 - 14)
+    .attr("y", (d) => d.model.metrics.height / 2 - 2.5)
     .attr("text-anchor", "middle")
     .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
-    .attr("font-size", 8)
+    .attr("font-size", 3.3)
     .attr("font-weight", 700)
-    .attr("fill", "rgba(15, 23, 42, 0.72)")
-    .text((d) => getUnitCounterCardModel(d.counter).echelonLabel);
+    .attr("letter-spacing", "0.04em")
+    .attr("fill", "rgba(17, 24, 39, 0.78)")
+    .text((d) => d.model.echelonLabel.slice(0, 3).toUpperCase());
 
   merged.select("text.unit-counter-label")
-    .attr("display", (d) => (state.annotationView?.showUnitLabels !== false && d.counter.label ? null : "none"))
+    .attr("display", (d) => (
+      state.annotationView?.showUnitLabels !== false
+      && d.counter.label
+      && (d.counter.id === selectedId || zoomK >= 7)
+        ? null
+        : "none"
+    ))
     .attr("x", 0)
-    .attr("y", (d) => getUnitCounterScreenMetrics(d.counter.size).height / 2 + 12)
+    .attr("y", (d) => d.model.metrics.height / 2 + 4.5)
     .attr("text-anchor", "middle")
     .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
-    .attr("font-size", 10)
+    .attr("dominant-baseline", "hanging")
+    .attr("font-size", 4.2)
     .attr("font-weight", 600)
-    .attr("fill", "#111827")
+    .attr("letter-spacing", "0.03em")
+    .attr("fill", "#f6f1e6")
+    .attr("stroke", "rgba(17, 24, 39, 0.88)")
+    .attr("stroke-width", 0.45)
+    .attr("paint-order", "stroke")
     .text((d) => d.counter.label || "");
 
   merged.select("text.unit-counter-sublabel")
-    .attr("display", (d) => (state.annotationView?.showUnitLabels !== false && d.counter.subLabel ? null : "none"))
+    .attr("display", (d) => (
+      state.annotationView?.showUnitLabels !== false
+      && d.counter.subLabel
+      && (d.counter.id === selectedId || zoomK >= 10)
+        ? null
+        : "none"
+    ))
     .attr("x", 0)
-    .attr("y", (d) => getUnitCounterScreenMetrics(d.counter.size).height / 2 + 23)
+    .attr("y", (d) => d.model.metrics.height / 2 + 9.5)
     .attr("text-anchor", "middle")
     .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
-    .attr("font-size", 8)
+    .attr("dominant-baseline", "hanging")
+    .attr("font-size", 3.5)
     .attr("font-weight", 500)
-    .attr("fill", "rgba(15, 23, 42, 0.72)")
+    .attr("fill", "rgba(243, 239, 231, 0.92)")
+    .attr("stroke", "rgba(17, 24, 39, 0.78)")
+    .attr("stroke-width", 0.35)
+    .attr("paint-order", "stroke")
     .text((d) => d.counter.subLabel || "");
 
   merged.select("text.unit-counter-strength")
-    .attr("display", (d) => (d.counter.strengthText ? null : "none"))
-    .attr("x", (d) => getUnitCounterScreenMetrics(d.counter.size).width / 2 - 12)
-    .attr("y", (d) => getUnitCounterScreenMetrics(d.counter.size).height / 2 - 13)
+    .attr("display", (d) => (
+      d.counter.strengthText
+      && (d.counter.id === selectedId || zoomK >= 8)
+        ? null
+        : "none"
+    ))
+    .attr("x", (d) => d.model.metrics.width / 2 - 2)
+    .attr("y", (d) => d.model.metrics.height / 2 + 4.6)
     .attr("text-anchor", "end")
     .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
-    .attr("font-size", 8)
+    .attr("dominant-baseline", "hanging")
+    .attr("font-size", 3.4)
     .attr("font-weight", 700)
-    .attr("fill", "#0f172a")
+    .attr("fill", "#f8e7be")
+    .attr("stroke", "rgba(17, 24, 39, 0.84)")
+    .attr("stroke-width", 0.3)
+    .attr("paint-order", "stroke")
     .text((d) => d.counter.strengthText || "");
 
   merged.select("circle.unit-counter-stack-badge")
     .attr("display", (d) => (d.stackCount > 1 ? null : "none"))
-    .attr("cx", (d) => getUnitCounterScreenMetrics(d.counter.size).width / 2 - 11)
-    .attr("cy", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2 + 12)
-    .attr("r", 8)
+    .attr("cx", (d) => d.model.metrics.width / 2 - 1.5)
+    .attr("cy", (d) => -d.model.metrics.height / 2 + 1.5)
+    .attr("r", 3.5)
     .attr("fill", "#0f172a")
     .attr("stroke", "#f8fafc")
-    .attr("stroke-width", 1);
+    .attr("stroke-width", 0.6);
 
   merged.select("text.unit-counter-stack-text")
     .attr("display", (d) => (d.stackCount > 1 ? null : "none"))
-    .attr("x", (d) => getUnitCounterScreenMetrics(d.counter.size).width / 2 - 11)
-    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2 + 12)
+    .attr("x", (d) => d.model.metrics.width / 2 - 1.5)
+    .attr("y", (d) => -d.model.metrics.height / 2 + 1.5)
     .attr("text-anchor", "middle")
     .attr("dominant-baseline", "central")
     .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
-    .attr("font-size", 9)
+    .attr("font-size", 3.1)
     .attr("font-weight", 700)
     .attr("fill", "#f8fafc")
     .text((d) => `+${d.stackCount - 1}`);

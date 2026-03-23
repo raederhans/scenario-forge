@@ -106,9 +106,9 @@ const UNIT_COUNTER_ECHELONS = Object.freeze([
 ]);
 
 const UNIT_COUNTER_SCREEN_SIZE = Object.freeze({
-  small: Object.freeze({ width: 74, height: 46, symbolBox: 22, scale: 1 }),
-  medium: Object.freeze({ width: 88, height: 54, symbolBox: 26, scale: 1 }),
-  large: Object.freeze({ width: 102, height: 62, symbolBox: 30, scale: 1 }),
+  small: Object.freeze({ width: 24, height: 15, symbolBox: 9, scale: 1 }),
+  medium: Object.freeze({ width: 28, height: 18, symbolBox: 10, scale: 1 }),
+  large: Object.freeze({ width: 34, height: 22, symbolBox: 12, scale: 1 }),
 });
 
 function normalizeUnitCounterSizeToken(value) {

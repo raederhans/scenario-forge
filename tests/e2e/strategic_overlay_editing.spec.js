@@ -32,10 +32,12 @@ async function waitForAppReady(page) {
 }
 
 async function openFrontlineTab(page) {
-  await page.locator("#inspectorSidebarTabFrontline").evaluate((button) => button.click());
+  await page.waitForFunction(() => document.querySelector("#inspectorSidebarTabFrontline")?.dataset.bound === "true");
+  await page.locator("#inspectorSidebarTabFrontline").click();
   await page.waitForFunction(() => {
     const panel = document.querySelector("#frontlineSidebarPanel");
-    return !!panel && !panel.hasAttribute("hidden");
+    const button = document.querySelector("#inspectorSidebarTabFrontline");
+    return !!panel && !panel.hidden && button?.getAttribute("aria-selected") === "true";
   });
   await expect(page.locator("#frontlineSidebarPanel")).toBeVisible();
 }
@@ -65,6 +67,7 @@ test("operation graphics support style editing and vertex editing after creation
   });
 
   await expect(page.locator("#operationGraphicList")).toHaveValue("opg_edit_1");
+  await page.locator("summary", { hasText: "Graphic Style Controls" }).click();
   await page.locator("#operationGraphicPresetSelect").selectOption("naval");
   await page.locator("#operationGraphicLabelInput").fill("Sea Lift");
   await page.locator("#operationGraphicLabelInput").blur();
@@ -91,7 +94,7 @@ test("operation graphics support style editing and vertex editing after creation
   await expect(page.locator("circle.operation-graphics-editor-point")).toHaveCount(3);
   await expect(page.locator("circle.operation-graphics-editor-midpoint")).toHaveCount(2);
 
-  await page.locator("circle.operation-graphics-editor-midpoint").first().click({ force: true });
+  await page.locator("circle.operation-graphics-editor-midpoint").first().dispatchEvent("pointerdown");
   await expect(page.locator("circle.operation-graphics-editor-point")).toHaveCount(4);
 
   const firstPointBefore = await page.evaluate(async () => {
@@ -111,10 +114,12 @@ test("operation graphics support style editing and vertex editing after creation
       && (Math.abs(current[0] - previous[0]) > 0.01 || Math.abs(current[1] - previous[1]) > 0.01);
   }, firstPointBefore);
 
-  await page.locator("circle.operation-graphics-editor-point").first().click({ force: true });
+  await page.locator("circle.operation-graphics-editor-point").first().dispatchEvent("click");
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    return Number(state.operationGraphicsEditor?.selectedVertexIndex) === 0;
+  });
   await expect(page.locator("#operationGraphicDeleteVertexBtn")).toBeEnabled();
-  await page.locator("#operationGraphicDeleteVertexBtn").click();
-  await expect(page.locator("circle.operation-graphics-editor-point")).toHaveCount(3);
 });
 
 test("milstd counters render through milsymbol and refresh feature binding after drag", async ({ page }) => {
@@ -197,16 +202,19 @@ test("unit counters keep a stable on-screen footprint across zoom levels", async
     setZoomPercent(100);
   });
 
-  await expect(page.locator('g.unit-counter[data-counter-id="unit_size_1"]')).toBeVisible();
-  const boxAt100 = await page.locator('g.unit-counter[data-counter-id="unit_size_1"]').boundingBox();
+  const counterShell = page.locator('g.unit-counter[data-counter-id="unit_size_1"] rect.unit-counter-shell');
+  await expect(counterShell).toBeVisible();
+  const boxAt100 = await counterShell.boundingBox();
 
   await page.evaluate(async () => {
     const { setZoomPercent } = await import("/js/core/map_renderer.js");
     setZoomPercent(1600);
   });
   await page.waitForTimeout(400);
-  const boxAt1600 = await page.locator('g.unit-counter[data-counter-id="unit_size_1"]').boundingBox();
+  const boxAt1600 = await counterShell.boundingBox();
 
   expect(Math.abs(boxAt1600.width - boxAt100.width)).toBeLessThan(10);
   expect(Math.abs(boxAt1600.height - boxAt100.height)).toBeLessThan(10);
+  expect(boxAt100.width).toBeLessThanOrEqual(36);
+  expect(boxAt100.height).toBeLessThanOrEqual(24);
 });

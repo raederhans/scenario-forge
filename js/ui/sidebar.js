@@ -1500,6 +1500,26 @@ function initSidebar({ render } = {}) {
     }
     return input;
   };
+  const buildSegmentedChoiceField = (id, options, {
+    groupClassName = "frontline-segmented-field",
+    buttonClassName = "frontline-segmented-choice",
+  } = {}) => {
+    const shell = document.createElement("div");
+    shell.className = groupClassName;
+    const select = buildSelect(id, options);
+    select.classList.add("frontline-segmented-native");
+    shell.appendChild(select);
+    options.forEach(([value, label]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = buttonClassName;
+      button.dataset.value = value;
+      button.dataset.frontlineStyleChoice = "true";
+      button.textContent = t(label, "ui");
+      shell.appendChild(button);
+    });
+    return { shell, select };
+  };
   const unitCounterPresets = Object.freeze([
     {
       id: "INF",
@@ -1704,20 +1724,20 @@ function initSidebar({ render } = {}) {
     strip.className = "unit-counter-preview-strip";
     card.appendChild(strip);
 
-    const chromeRow = document.createElement("div");
-    chromeRow.className = "unit-counter-preview-chrome";
+    const topLine = document.createElement("div");
+    topLine.className = "unit-counter-preview-topline";
 
     const nationPill = document.createElement("span");
     nationPill.className = "unit-counter-preview-nation";
     nationPill.textContent = nationMeta.tag || t("AUTO", "ui");
 
-    const rendererPill = document.createElement("span");
-    rendererPill.className = "unit-counter-preview-renderer";
-    rendererPill.textContent = previewRenderer === "milstd" ? "MILSTD" : "GAME";
+    const typePill = document.createElement("span");
+    typePill.className = "unit-counter-preview-renderer";
+    typePill.textContent = presetMeta.shortCode;
 
-    chromeRow.appendChild(nationPill);
-    chromeRow.appendChild(rendererPill);
-    card.appendChild(chromeRow);
+    topLine.appendChild(nationPill);
+    topLine.appendChild(typePill);
+    card.appendChild(topLine);
 
     const body = document.createElement("div");
     body.className = "unit-counter-preview-body";
@@ -1727,11 +1747,11 @@ function initSidebar({ render } = {}) {
     if (previewRenderer === "milstd" && globalThis.ms?.Symbol && String(sidc || "").trim()) {
       try {
         const symbolMarkup = new globalThis.ms.Symbol(String(sidc || "").trim(), {
-          size: 24,
+          size: 18,
           fill: true,
           monoColor: "#0f172a",
-          outlineColor: "#ffffff",
-          outlineWidth: 4,
+          outlineColor: "#f8f5eb",
+          outlineWidth: 3,
         }).asSVG();
         symbolShell.innerHTML = symbolMarkup;
       } catch (_error) {
@@ -1740,6 +1760,14 @@ function initSidebar({ render } = {}) {
     } else {
       symbolShell.textContent = previewSymbolToken || presetMeta.shortCode;
     }
+
+    const echelonTag = document.createElement("div");
+    echelonTag.className = "unit-counter-preview-echelons";
+    echelonTag.textContent = getUnitCounterEchelonLabel(echelon || presetMeta.defaultEchelon).slice(0, 3).toUpperCase();
+
+    const strengthBadge = document.createElement("div");
+    strengthBadge.className = "unit-counter-preview-strength";
+    strengthBadge.textContent = previewStrength;
 
     const content = document.createElement("div");
     content.className = "unit-counter-preview-copy";
@@ -1750,31 +1778,23 @@ function initSidebar({ render } = {}) {
 
     const meta = document.createElement("div");
     meta.className = "unit-counter-preview-meta";
-    meta.textContent = `${nationMeta.displayName} · ${getUnitCounterEchelonLabel(echelon || presetMeta.defaultEchelon)}`;
+    meta.textContent = `${nationMeta.displayName} · ${previewSubLabel}`;
 
     const footer = document.createElement("div");
     footer.className = "unit-counter-preview-footer";
 
-    const subLabelBadge = document.createElement("span");
-    subLabelBadge.className = "unit-counter-preview-chip";
-    subLabelBadge.textContent = previewSubLabel;
-
-    const strengthBadge = document.createElement("span");
-    strengthBadge.className = "unit-counter-preview-chip is-strength";
-    strengthBadge.textContent = previewStrength;
-
     const sourceBadge = document.createElement("span");
     sourceBadge.className = "unit-counter-preview-chip is-muted";
-    sourceBadge.textContent = String(nationSource || "controller").trim().toUpperCase();
+    sourceBadge.textContent = `${previewRenderer === "milstd" ? "MILSTD" : "GAME"} · ${String(nationSource || "controller").trim().toUpperCase()}`;
 
-    footer.appendChild(subLabelBadge);
-    footer.appendChild(strengthBadge);
     footer.appendChild(sourceBadge);
     content.appendChild(title);
     content.appendChild(meta);
     content.appendChild(footer);
 
     body.appendChild(symbolShell);
+    body.appendChild(echelonTag);
+    body.appendChild(strengthBadge);
     body.appendChild(content);
     card.appendChild(body);
     container.appendChild(card);
@@ -1831,14 +1851,20 @@ function initSidebar({ render } = {}) {
 
     const controlsHeader = document.createElement("div");
     controlsHeader.className = "section-header mt-2";
-    controlsHeader.textContent = t("Style & Labels", "ui");
+    controlsHeader.textContent = t("View", "ui");
+
+    const controlsHint = document.createElement("p");
+    controlsHint.className = "sidebar-tool-hint";
+    controlsHint.textContent = t("Keep the line restrained by default, then opt into labels only when the theater needs annotation.", "ui");
 
     const controlsRow = buildRow();
-    const frontlineStyleSelect = buildSelect("strategicFrontlineStyleSelect", [
+    controlsRow.classList.add("frontline-compact-row");
+    const frontlineStyleField = buildSegmentedChoiceField("strategicFrontlineStyleSelect", [
       ["clean", "Clean"],
       ["dual-rail", "Dual Rail"],
       ["teeth", "Teeth"],
     ]);
+    const frontlineStyleSelect = frontlineStyleField.select;
     const frontlineLabelToggle = document.createElement("label");
     frontlineLabelToggle.className = "checkbox-row";
     frontlineLabelToggle.innerHTML = `<input id="strategicFrontlineLabelsToggle" type="checkbox" class="checkbox-input" /> <span>${t("Labels", "ui")}</span>`;
@@ -1846,12 +1872,25 @@ function initSidebar({ render } = {}) {
       ["midpoint", "Midpoint"],
       ["centroid", "Centroid"],
     ]);
-    controlsRow.appendChild(frontlineStyleSelect);
+    frontlineLabelPlacement.classList.add("frontline-inline-select");
+    controlsRow.appendChild(frontlineStyleField.shell);
     controlsRow.appendChild(frontlineLabelToggle);
-    controlsRow.appendChild(frontlineLabelPlacement);
+
+    const controlsAdvanced = document.createElement("details");
+    controlsAdvanced.className = "unit-counter-advanced-shell frontline-advanced-shell";
+    const controlsAdvancedSummary = document.createElement("summary");
+    controlsAdvancedSummary.className = "unit-counter-advanced-summary";
+    controlsAdvancedSummary.textContent = t("Advanced Label Placement", "ui");
+    const controlsAdvancedBody = document.createElement("div");
+    controlsAdvancedBody.className = "unit-counter-advanced-body";
+    controlsAdvancedBody.appendChild(frontlineLabelPlacement);
+    controlsAdvanced.appendChild(controlsAdvancedSummary);
+    controlsAdvanced.appendChild(controlsAdvancedBody);
 
     settings.appendChild(controlsHeader);
+    settings.appendChild(controlsHint);
     settings.appendChild(controlsRow);
+    settings.appendChild(controlsAdvanced);
 
     frontlineOverlaySection.appendChild(statusRow);
     frontlineOverlaySection.appendChild(statusHint);
@@ -1875,10 +1914,16 @@ function initSidebar({ render } = {}) {
     hint.className = "sidebar-tool-hint";
     hint.textContent = t("Operation graphics and unit counters stay in the same frontline workspace and remain project-local.", "ui");
 
+    const graphicsBlock = document.createElement("div");
+    graphicsBlock.className = "frontline-workbench-block";
     const graphicsHeader = document.createElement("div");
     graphicsHeader.className = "section-header mt-3";
     graphicsHeader.textContent = t("Operation Graphics", "ui");
+    const graphicsHint = document.createElement("p");
+    graphicsHint.className = "sidebar-tool-hint";
+    graphicsHint.textContent = t("Use short intent lines and quiet captions so arrows support the frontline instead of overpowering it.", "ui");
     const graphicsRow = buildRow();
+    graphicsRow.classList.add("frontline-compact-row");
     const graphicsKindSelect = buildSelect("operationGraphicKindSelect", [
       ["attack", "Attack"],
       ["retreat", "Retreat"],
@@ -1890,8 +1935,10 @@ function initSidebar({ render } = {}) {
     const graphicsLabelInput = buildInput("operationGraphicLabelInput", "Label");
     graphicsRow.appendChild(graphicsKindSelect);
     graphicsRow.appendChild(graphicsLabelInput);
+    graphicsRow.appendChild(buildButton("operationGraphicStartBtn", "Start Draw"));
 
     const graphicsStyleRow = buildRow();
+    graphicsStyleRow.classList.add("frontline-compact-row");
     const graphicsPresetSelect = buildSelect("operationGraphicPresetSelect", [
       ["attack", "Attack Style"],
       ["retreat", "Retreat Style"],
@@ -1926,7 +1973,7 @@ function initSidebar({ render } = {}) {
     );
 
     const graphicsActions = buildRow();
-    graphicsActions.appendChild(buildButton("operationGraphicStartBtn", "Start Draw"));
+    graphicsActions.className = "sidebar-equal-actions mt-3";
     graphicsActions.appendChild(buildButton("operationGraphicUndoBtn", "Undo Vertex"));
     graphicsActions.appendChild(buildButton("operationGraphicFinishBtn", "Finish"));
     graphicsActions.appendChild(buildButton("operationGraphicCancelBtn", "Cancel"));
@@ -1955,9 +2002,25 @@ function initSidebar({ render } = {}) {
     graphicsList.className = "select-input mt-2";
     graphicsList.size = 4;
 
+    const graphicsAdvanced = document.createElement("details");
+    graphicsAdvanced.className = "unit-counter-advanced-shell frontline-advanced-shell mt-2";
+    const graphicsAdvancedSummary = document.createElement("summary");
+    graphicsAdvancedSummary.className = "unit-counter-advanced-summary";
+    graphicsAdvancedSummary.textContent = t("Graphic Style Controls", "ui");
+    const graphicsAdvancedBody = document.createElement("div");
+    graphicsAdvancedBody.className = "unit-counter-advanced-body";
+    graphicsAdvancedBody.appendChild(graphicsStyleRow);
+    graphicsAdvanced.appendChild(graphicsAdvancedSummary);
+    graphicsAdvanced.appendChild(graphicsAdvancedBody);
+
+    const countersBlock = document.createElement("div");
+    countersBlock.className = "frontline-workbench-block";
     const unitHeader = document.createElement("div");
     unitHeader.className = "section-header mt-4";
     unitHeader.textContent = t("Unit Counters", "ui");
+    const unitHint = document.createElement("p");
+    unitHint.className = "sidebar-tool-hint";
+    unitHint.textContent = t("Counters should read like map pieces first. Keep only unit, nation, echelon, and label in the fast path.", "ui");
     const unitEditorShell = document.createElement("div");
     unitEditorShell.className = "unit-counter-editor-shell mt-2";
 
@@ -1976,9 +2039,13 @@ function initSidebar({ render } = {}) {
       ["manual", "Nation: Manual"],
     ]);
     const unitNationSelect = buildSelect("unitCounterNationSelect", [["", "Auto from placement"]]);
+    const unitEchelonSelect = buildSelect("unitCounterEchelonSelect", unitCounterEchelons);
+    const unitLabelInput = buildInput("unitCounterLabelInput", "Counter Label");
     unitPresetNationRow.appendChild(unitPresetSelect);
     unitPresetNationRow.appendChild(unitNationModeSelect);
     unitPresetNationRow.appendChild(unitNationSelect);
+    unitPresetNationRow.appendChild(unitEchelonSelect);
+    unitPresetNationRow.appendChild(unitLabelInput);
 
     const unitModeRow = buildRow();
     unitModeRow.className = "unit-counter-grid-row mt-2";
@@ -1991,17 +2058,13 @@ function initSidebar({ render } = {}) {
       ["medium", "Medium"],
       ["large", "Large"],
     ]);
-    const unitEchelonSelect = buildSelect("unitCounterEchelonSelect", unitCounterEchelons);
     unitModeRow.appendChild(unitRendererSelect);
     unitModeRow.appendChild(unitSizeSelect);
-    unitModeRow.appendChild(unitEchelonSelect);
 
     const unitCopyRow = buildRow();
     unitCopyRow.className = "unit-counter-grid-row mt-2";
-    const unitLabelInput = buildInput("unitCounterLabelInput", "Counter Label");
     const unitSubLabelInput = buildInput("unitCounterSubLabelInput", "Sub-label");
     const unitStrengthInput = buildInput("unitCounterStrengthInput", "Strength");
-    unitCopyRow.appendChild(unitLabelInput);
     unitCopyRow.appendChild(unitSubLabelInput);
     unitCopyRow.appendChild(unitStrengthInput);
 
@@ -2017,6 +2080,8 @@ function initSidebar({ render } = {}) {
     const unitAdvancedBody = document.createElement("div");
     unitAdvancedBody.className = "unit-counter-advanced-body";
     const unitSymbolInput = buildInput("unitCounterSymbolInput", "SIDC / Symbol Code");
+    unitAdvancedBody.appendChild(unitModeRow);
+    unitAdvancedBody.appendChild(unitCopyRow);
     unitAdvancedBody.appendChild(unitSymbolInput);
 
     const unitSymbolHint = document.createElement("p");
@@ -2053,23 +2118,25 @@ function initSidebar({ render } = {}) {
 
     strategicOverlaySection.appendChild(title);
     strategicOverlaySection.appendChild(hint);
-    strategicOverlaySection.appendChild(graphicsHeader);
-    strategicOverlaySection.appendChild(graphicsRow);
-    strategicOverlaySection.appendChild(graphicsStyleRow);
-    strategicOverlaySection.appendChild(graphicsEditorHint);
-    strategicOverlaySection.appendChild(graphicsActions);
-    strategicOverlaySection.appendChild(graphicsList);
-    strategicOverlaySection.appendChild(unitHeader);
+    graphicsBlock.appendChild(graphicsHeader);
+    graphicsBlock.appendChild(graphicsHint);
+    graphicsBlock.appendChild(graphicsRow);
+    graphicsBlock.appendChild(graphicsAdvanced);
+    graphicsBlock.appendChild(graphicsEditorHint);
+    graphicsBlock.appendChild(graphicsActions);
+    graphicsBlock.appendChild(graphicsList);
+    strategicOverlaySection.appendChild(graphicsBlock);
+    countersBlock.appendChild(unitHeader);
+    countersBlock.appendChild(unitHint);
     unitEditorShell.appendChild(unitPreviewCard);
     unitEditorShell.appendChild(unitPresetNationRow);
-    unitEditorShell.appendChild(unitModeRow);
-    unitEditorShell.appendChild(unitCopyRow);
     unitEditorShell.appendChild(unitAdvancedDetails);
     unitEditorShell.appendChild(unitOptionsRow);
     unitEditorShell.appendChild(unitActions);
     unitEditorShell.appendChild(unitListHeader);
     unitEditorShell.appendChild(unitList);
-    strategicOverlaySection.appendChild(unitEditorShell);
+    countersBlock.appendChild(unitEditorShell);
+    strategicOverlaySection.appendChild(countersBlock);
     frontlineTabStack.appendChild(strategicOverlaySection);
   }
 
@@ -2146,6 +2213,7 @@ function initSidebar({ render } = {}) {
   const frontlineEmptyState = document.getElementById("frontlineEmptyState");
   const frontlineSettingsPanel = document.getElementById("frontlineSettingsPanel");
   const strategicFrontlineStyleSelect = document.getElementById("strategicFrontlineStyleSelect");
+  const frontlineStyleChoiceButtons = Array.from(document.querySelectorAll("[data-frontline-style-choice]"));
   const strategicFrontlineLabelsToggle = document.getElementById("strategicFrontlineLabelsToggle");
   const strategicLabelPlacementSelect = document.getElementById("strategicLabelPlacementSelect");
   const operationGraphicKindSelect = document.getElementById("operationGraphicKindSelect");
@@ -5802,6 +5870,12 @@ function initSidebar({ render } = {}) {
       strategicFrontlineStyleSelect.value = String(annotationView.frontlineStyle || "clean");
       strategicFrontlineStyleSelect.disabled = !frontlineEnabled;
     }
+    frontlineStyleChoiceButtons.forEach((button) => {
+      const isActive = String(button.dataset.value || "") === String(annotationView.frontlineStyle || "clean");
+      button.classList.toggle("is-active", isActive);
+      button.disabled = !frontlineEnabled;
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
     if (strategicFrontlineLabelsToggle) {
       strategicFrontlineLabelsToggle.checked = !!annotationView.showFrontlineLabels;
       strategicFrontlineLabelsToggle.disabled = !frontlineEnabled;
@@ -6065,6 +6139,20 @@ function initSidebar({ render } = {}) {
     });
     strategicFrontlineStyleSelect.dataset.bound = "true";
   }
+  frontlineStyleChoiceButtons.forEach((button) => {
+    if (button.dataset.bound) return;
+    button.addEventListener("click", () => {
+      const nextStyle = String(button.dataset.value || "clean");
+      if (strategicFrontlineStyleSelect) {
+        strategicFrontlineStyleSelect.value = nextStyle;
+      }
+      applyFrontlineAnnotationViewPatch(
+        { frontlineStyle: nextStyle },
+        "frontline-style"
+      );
+    });
+    button.dataset.bound = "true";
+  });
   if (strategicFrontlineLabelsToggle && !strategicFrontlineLabelsToggle.dataset.bound) {
     strategicFrontlineLabelsToggle.addEventListener("change", (event) => {
       applyFrontlineAnnotationViewPatch(
