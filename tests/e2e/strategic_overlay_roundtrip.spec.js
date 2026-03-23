@@ -82,6 +82,13 @@ test("strategic overlay state roundtrips through project import/export", async (
         renderer: "milstd",
         sidc: "130310001412110000000000000000",
         symbolCode: "130310001412110000000000000000",
+        nationTag: "GER",
+        nationSource: "manual",
+        presetId: "inf",
+        unitType: "INF",
+        echelon: "corps",
+        subLabel: "Nord",
+        strengthText: "76%",
         label: "1st Corps",
         size: "large",
         facing: 0,
@@ -92,6 +99,13 @@ test("strategic overlay state roundtrips through project import/export", async (
         id: "unit_test_2",
         renderer: "game",
         symbolCode: "ARM",
+        nationTag: "ENG",
+        nationSource: "manual",
+        presetId: "arm",
+        unitType: "ARM",
+        echelon: "army",
+        subLabel: "Reserve",
+        strengthText: "Ready",
         label: "2nd Army",
         size: "medium",
         facing: 0,
@@ -114,7 +128,7 @@ test("strategic overlay state roundtrips through project import/export", async (
   const exportPath = path.join(artifactDir, "strategic-overlay-export.json");
   const exported = await exportProjectJson(page, exportPath);
 
-  expect(exported.schemaVersion).toBe(17);
+  expect(exported.schemaVersion).toBe(18);
   expect(exported.annotationView).toEqual({
     frontlineEnabled: true,
     frontlineStyle: "dual-rail",
@@ -126,6 +140,15 @@ test("strategic overlay state roundtrips through project import/export", async (
   expect(exported.operationGraphics).toHaveLength(2);
   expect(exported.unitCounters).toHaveLength(2);
   expect(exported.unitCounters[0].sidc).toBe("130310001412110000000000000000");
+  expect(exported.unitCounters[0]).toMatchObject({
+    nationTag: "GER",
+    nationSource: "manual",
+    presetId: "inf",
+    unitType: "INF",
+    echelon: "corps",
+    subLabel: "Nord",
+    strengthText: "76%",
+  });
 
   await page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");

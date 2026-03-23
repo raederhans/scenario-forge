@@ -1500,6 +1500,285 @@ function initSidebar({ render } = {}) {
     }
     return input;
   };
+  const unitCounterPresets = Object.freeze([
+    {
+      id: "INF",
+      label: "Infantry",
+      shortCode: "INF",
+      defaultRenderer: "milstd",
+      baseSidc: "100310001712110000000000000000",
+      shellVariant: "line",
+      defaultEchelon: "BN",
+    },
+    {
+      id: "MOT",
+      label: "Motorized",
+      shortCode: "MOT",
+      defaultRenderer: "milstd",
+      baseSidc: "100310001712120000000000000000",
+      shellVariant: "line",
+      defaultEchelon: "BN",
+    },
+    {
+      id: "MECH",
+      label: "Mechanized",
+      shortCode: "MECH",
+      defaultRenderer: "milstd",
+      baseSidc: "100310001712130000000000000000",
+      shellVariant: "line",
+      defaultEchelon: "BN",
+    },
+    {
+      id: "ARM",
+      label: "Armored",
+      shortCode: "ARM",
+      defaultRenderer: "milstd",
+      baseSidc: "100310001812110000000000000000",
+      shellVariant: "line",
+      defaultEchelon: "REG",
+    },
+    {
+      id: "ART",
+      label: "Artillery",
+      shortCode: "ART",
+      defaultRenderer: "milstd",
+      baseSidc: "100320001312110000000000000000",
+      shellVariant: "support",
+      defaultEchelon: "REG",
+    },
+    {
+      id: "HQ",
+      label: "Headquarters",
+      shortCode: "HQ",
+      defaultRenderer: "game",
+      baseSidc: "100310001012110000000000000000",
+      shellVariant: "command",
+      defaultEchelon: "CORPS",
+    },
+    {
+      id: "GAR",
+      label: "Garrison",
+      shortCode: "GAR",
+      defaultRenderer: "game",
+      baseSidc: "100310001712150000000000000000",
+      shellVariant: "line",
+      defaultEchelon: "CO",
+    },
+    {
+      id: "AIR",
+      label: "Air Wing",
+      shortCode: "AIR",
+      defaultRenderer: "game",
+      baseSidc: "100010000012110000000000000000",
+      shellVariant: "air",
+      defaultEchelon: "WG",
+    },
+    {
+      id: "NAVAL",
+      label: "Naval Group",
+      shortCode: "NAV",
+      defaultRenderer: "game",
+      baseSidc: "100430000012110000000000000000",
+      shellVariant: "naval",
+      defaultEchelon: "TF",
+    },
+  ]);
+  const unitCounterEchelons = Object.freeze([
+    ["", "Auto"],
+    ["TM", "Team"],
+    ["SQ", "Squad"],
+    ["PLT", "Platoon"],
+    ["CO", "Company"],
+    ["BN", "Battalion"],
+    ["REG", "Regiment"],
+    ["BDE", "Brigade"],
+    ["DIV", "Division"],
+    ["CORPS", "Corps"],
+    ["ARMY", "Army"],
+    ["WG", "Wing"],
+    ["TF", "Task Force"],
+  ]);
+  const unitCounterSizeLabels = Object.freeze({
+    small: "Small",
+    medium: "Medium",
+    large: "Large",
+  });
+  const getUnitCounterPresetMeta = (presetId = "") => {
+    const normalizedPresetId = String(presetId || "").trim().toUpperCase();
+    return unitCounterPresets.find((preset) => preset.id === normalizedPresetId)
+      || unitCounterPresets[0];
+  };
+  const inferUnitCounterPresetId = (candidate = {}) => {
+    const rawPreset = String(candidate?.presetId || candidate?.unitType || "").trim().toUpperCase();
+    if (rawPreset && unitCounterPresets.some((preset) => preset.id === rawPreset)) {
+      return rawPreset;
+    }
+    const rawToken = String(candidate?.symbolCode || candidate?.sidc || candidate?.label || "").trim().toUpperCase();
+    const matchedPreset = unitCounterPresets.find((preset) => {
+      if (!rawToken) return false;
+      return rawToken === preset.id
+        || rawToken === preset.shortCode
+        || rawToken.includes(preset.shortCode);
+    });
+    return matchedPreset?.id || unitCounterPresets[0].id;
+  };
+  const getUnitCounterNationMeta = (nationTag = "") => {
+    const normalizedTag = normalizeCountryCode(nationTag);
+    if (!normalizedTag) {
+      return {
+        tag: "",
+        displayName: t("Auto from placement", "ui"),
+        color: "rgba(71, 85, 105, 0.78)",
+      };
+    }
+    const scenarioMeta = getScenarioCountryMeta(normalizedTag);
+    const fallbackName = state.countryNames?.[normalizedTag] || countryNames[normalizedTag] || normalizedTag;
+    const scenarioName = scenarioMeta
+      ? getScenarioCountryDisplayName(scenarioMeta, fallbackName) || fallbackName
+      : fallbackName;
+    return {
+      tag: normalizedTag,
+      displayName: t(scenarioName || normalizedTag, "geo") || scenarioName || normalizedTag,
+      color: String(
+        scenarioMeta?.color_hex
+          || scenarioMeta?.colorHex
+          || ensureCountryPaletteColor(normalizedTag)
+          || "#64748b"
+      ),
+    };
+  };
+  const getUnitCounterNationOptions = () => getDynamicCountryEntries().map((entry) => {
+    const meta = getUnitCounterNationMeta(entry.code);
+    return {
+      value: entry.code,
+      label: `${entry.code} · ${meta.displayName}`,
+    };
+  });
+  const getUnitCounterEchelonLabel = (value = "") => {
+    const normalizedValue = String(value || "").trim().toUpperCase();
+    return unitCounterEchelons.find(([code]) => code === normalizedValue)?.[1] || normalizedValue || t("Auto", "ui");
+  };
+  const formatUnitCounterListLabel = (counter = {}) => {
+    const presetMeta = getUnitCounterPresetMeta(inferUnitCounterPresetId(counter));
+    const nationMeta = getUnitCounterNationMeta(counter.nationTag);
+    const primaryLabel = String(counter.label || "").trim() || presetMeta.label;
+    const rendererLabel = String(counter.renderer || "game").trim().toUpperCase();
+    const detailTokens = [
+      presetMeta.shortCode,
+      String(counter.echelon || "").trim() ? getUnitCounterEchelonLabel(counter.echelon) : "",
+      rendererLabel,
+    ].filter(Boolean);
+    return [`${nationMeta.tag || "AUTO"} · ${primaryLabel}`, detailTokens.join(" · ")].filter(Boolean).join(" · ");
+  };
+  const renderUnitCounterPreview = (container, {
+    renderer = "game",
+    size = "medium",
+    nationTag = "",
+    nationSource = "controller",
+    label = "",
+    subLabel = "",
+    strengthText = "",
+    sidc = "",
+    symbolCode = "",
+    presetId = "",
+    echelon = "",
+  } = {}) => {
+    if (!container) return;
+    const presetMeta = getUnitCounterPresetMeta(presetId || inferUnitCounterPresetId({ presetId, symbolCode, sidc, label }));
+    const nationMeta = getUnitCounterNationMeta(nationTag);
+    const previewLabel = String(label || "").trim() || presetMeta.label;
+    const previewSubLabel = String(subLabel || "").trim() || `${presetMeta.shortCode} · ${getUnitCounterEchelonLabel(echelon || presetMeta.defaultEchelon)}`;
+    const previewStrength = String(strengthText || "").trim() || "Ready";
+    const previewRenderer = String(renderer || presetMeta.defaultRenderer || "game").trim().toLowerCase();
+    const previewSymbolToken = String(symbolCode || sidc || presetMeta.shortCode || "").trim().toUpperCase() || presetMeta.shortCode;
+
+    container.replaceChildren();
+    container.classList.toggle("is-milstd", previewRenderer === "milstd");
+    container.classList.toggle("is-game", previewRenderer !== "milstd");
+    container.style.setProperty("--unit-counter-accent", nationMeta.color || "#64748b");
+
+    const card = document.createElement("div");
+    card.className = `unit-counter-preview-card is-${String(size || "medium").trim().toLowerCase()}`;
+
+    const strip = document.createElement("div");
+    strip.className = "unit-counter-preview-strip";
+    card.appendChild(strip);
+
+    const chromeRow = document.createElement("div");
+    chromeRow.className = "unit-counter-preview-chrome";
+
+    const nationPill = document.createElement("span");
+    nationPill.className = "unit-counter-preview-nation";
+    nationPill.textContent = nationMeta.tag || t("AUTO", "ui");
+
+    const rendererPill = document.createElement("span");
+    rendererPill.className = "unit-counter-preview-renderer";
+    rendererPill.textContent = previewRenderer === "milstd" ? "MILSTD" : "GAME";
+
+    chromeRow.appendChild(nationPill);
+    chromeRow.appendChild(rendererPill);
+    card.appendChild(chromeRow);
+
+    const body = document.createElement("div");
+    body.className = "unit-counter-preview-body";
+
+    const symbolShell = document.createElement("div");
+    symbolShell.className = "unit-counter-preview-symbol";
+    if (previewRenderer === "milstd" && globalThis.ms?.Symbol && String(sidc || "").trim()) {
+      try {
+        const symbolMarkup = new globalThis.ms.Symbol(String(sidc || "").trim(), {
+          size: 24,
+          fill: true,
+          monoColor: "#0f172a",
+          outlineColor: "#ffffff",
+          outlineWidth: 4,
+        }).asSVG();
+        symbolShell.innerHTML = symbolMarkup;
+      } catch (_error) {
+        symbolShell.textContent = presetMeta.shortCode;
+      }
+    } else {
+      symbolShell.textContent = previewSymbolToken || presetMeta.shortCode;
+    }
+
+    const content = document.createElement("div");
+    content.className = "unit-counter-preview-copy";
+
+    const title = document.createElement("div");
+    title.className = "unit-counter-preview-title";
+    title.textContent = previewLabel;
+
+    const meta = document.createElement("div");
+    meta.className = "unit-counter-preview-meta";
+    meta.textContent = `${nationMeta.displayName} · ${getUnitCounterEchelonLabel(echelon || presetMeta.defaultEchelon)}`;
+
+    const footer = document.createElement("div");
+    footer.className = "unit-counter-preview-footer";
+
+    const subLabelBadge = document.createElement("span");
+    subLabelBadge.className = "unit-counter-preview-chip";
+    subLabelBadge.textContent = previewSubLabel;
+
+    const strengthBadge = document.createElement("span");
+    strengthBadge.className = "unit-counter-preview-chip is-strength";
+    strengthBadge.textContent = previewStrength;
+
+    const sourceBadge = document.createElement("span");
+    sourceBadge.className = "unit-counter-preview-chip is-muted";
+    sourceBadge.textContent = String(nationSource || "controller").trim().toUpperCase();
+
+    footer.appendChild(subLabelBadge);
+    footer.appendChild(strengthBadge);
+    footer.appendChild(sourceBadge);
+    content.appendChild(title);
+    content.appendChild(meta);
+    content.appendChild(footer);
+
+    body.appendChild(symbolShell);
+    body.appendChild(content);
+    card.appendChild(body);
+    container.appendChild(card);
+  };
 
   let frontlineOverlaySection = document.getElementById("frontlineOverlayPanel");
   if (!frontlineOverlaySection && frontlineTabStack) {
@@ -1679,7 +1958,30 @@ function initSidebar({ render } = {}) {
     const unitHeader = document.createElement("div");
     unitHeader.className = "section-header mt-4";
     unitHeader.textContent = t("Unit Counters", "ui");
-    const unitRow = buildRow();
+    const unitEditorShell = document.createElement("div");
+    unitEditorShell.className = "unit-counter-editor-shell mt-2";
+
+    const unitPreviewCard = document.createElement("div");
+    unitPreviewCard.id = "unitCounterPreviewCard";
+    unitPreviewCard.className = "unit-counter-preview-shell";
+
+    const unitPresetNationRow = buildRow();
+    unitPresetNationRow.className = "unit-counter-grid-row mt-3";
+    const unitPresetSelect = buildSelect("unitCounterPresetSelect", unitCounterPresets.map((preset) => [
+      preset.id,
+      `${preset.label} · ${preset.shortCode}`,
+    ]));
+    const unitNationModeSelect = buildSelect("unitCounterNationModeSelect", [
+      ["controller", "Nation: Auto"],
+      ["manual", "Nation: Manual"],
+    ]);
+    const unitNationSelect = buildSelect("unitCounterNationSelect", [["", "Auto from placement"]]);
+    unitPresetNationRow.appendChild(unitPresetSelect);
+    unitPresetNationRow.appendChild(unitNationModeSelect);
+    unitPresetNationRow.appendChild(unitNationSelect);
+
+    const unitModeRow = buildRow();
+    unitModeRow.className = "unit-counter-grid-row mt-2";
     const unitRendererSelect = buildSelect("unitCounterRendererSelect", [
       ["game", "Game"],
       ["milstd", "MILSTD"],
@@ -1689,32 +1991,64 @@ function initSidebar({ render } = {}) {
       ["medium", "Medium"],
       ["large", "Large"],
     ]);
+    const unitEchelonSelect = buildSelect("unitCounterEchelonSelect", unitCounterEchelons);
+    unitModeRow.appendChild(unitRendererSelect);
+    unitModeRow.appendChild(unitSizeSelect);
+    unitModeRow.appendChild(unitEchelonSelect);
+
+    const unitCopyRow = buildRow();
+    unitCopyRow.className = "unit-counter-grid-row mt-2";
     const unitLabelInput = buildInput("unitCounterLabelInput", "Counter Label");
+    const unitSubLabelInput = buildInput("unitCounterSubLabelInput", "Sub-label");
+    const unitStrengthInput = buildInput("unitCounterStrengthInput", "Strength");
+    unitCopyRow.appendChild(unitLabelInput);
+    unitCopyRow.appendChild(unitSubLabelInput);
+    unitCopyRow.appendChild(unitStrengthInput);
+
+    const unitAdvancedDetails = document.createElement("details");
+    unitAdvancedDetails.id = "unitCounterAdvancedDetails";
+    unitAdvancedDetails.className = "unit-counter-advanced-shell mt-2";
+
+    const unitAdvancedSummary = document.createElement("summary");
+    unitAdvancedSummary.className = "unit-counter-advanced-summary";
+    unitAdvancedSummary.textContent = t("Advanced SIDC Override", "ui");
+    unitAdvancedDetails.appendChild(unitAdvancedSummary);
+
+    const unitAdvancedBody = document.createElement("div");
+    unitAdvancedBody.className = "unit-counter-advanced-body";
     const unitSymbolInput = buildInput("unitCounterSymbolInput", "SIDC / Symbol Code");
-    unitRow.appendChild(unitRendererSelect);
-    unitRow.appendChild(unitSizeSelect);
-    unitRow.appendChild(unitLabelInput);
-    unitRow.appendChild(unitSymbolInput);
+    unitAdvancedBody.appendChild(unitSymbolInput);
 
     const unitSymbolHint = document.createElement("p");
     unitSymbolHint.id = "unitCounterSymbolHint";
     unitSymbolHint.className = "sidebar-tool-hint mt-2";
     unitSymbolHint.textContent = t("Game renderer uses short codes like HQ or ARM. MILSTD expects a SIDC string.", "ui");
+    unitAdvancedBody.appendChild(unitSymbolHint);
+    unitAdvancedDetails.appendChild(unitAdvancedBody);
 
     const unitOptionsRow = buildRow();
+    unitOptionsRow.className = "mt-2 flex flex-wrap items-center justify-between gap-2";
     const unitLabelToggle = document.createElement("label");
     unitLabelToggle.className = "checkbox-row";
     unitLabelToggle.innerHTML = `<input id="unitCounterLabelsToggle" type="checkbox" class="checkbox-input" /> <span>${t("Show Labels", "ui")}</span>`;
     unitOptionsRow.appendChild(unitLabelToggle);
 
     const unitActions = buildRow();
+    unitActions.className = "sidebar-equal-actions mt-3";
     unitActions.appendChild(buildButton("unitCounterPlaceBtn", "Place Counter"));
     unitActions.appendChild(buildButton("unitCounterCancelBtn", "Cancel Place"));
     unitActions.appendChild(buildButton("unitCounterDeleteBtn", "Delete Selected"));
 
+    const unitListHeader = document.createElement("div");
+    unitListHeader.className = "unit-counter-list-header mt-3";
+    unitListHeader.innerHTML = `
+      <div class="section-header">${t("Placed Counters", "ui")}</div>
+      <p class="sidebar-tool-hint">${t("Each entry now shows nation, unit preset, echelon, and renderer at a glance.", "ui")}</p>
+    `;
+
     const unitList = document.createElement("select");
     unitList.id = "unitCounterList";
-    unitList.className = "select-input mt-2";
+    unitList.className = "select-input mt-2 unit-counter-list";
     unitList.size = 4;
 
     strategicOverlaySection.appendChild(title);
@@ -1726,11 +2060,16 @@ function initSidebar({ render } = {}) {
     strategicOverlaySection.appendChild(graphicsActions);
     strategicOverlaySection.appendChild(graphicsList);
     strategicOverlaySection.appendChild(unitHeader);
-    strategicOverlaySection.appendChild(unitRow);
-    strategicOverlaySection.appendChild(unitSymbolHint);
-    strategicOverlaySection.appendChild(unitOptionsRow);
-    strategicOverlaySection.appendChild(unitActions);
-    strategicOverlaySection.appendChild(unitList);
+    unitEditorShell.appendChild(unitPreviewCard);
+    unitEditorShell.appendChild(unitPresetNationRow);
+    unitEditorShell.appendChild(unitModeRow);
+    unitEditorShell.appendChild(unitCopyRow);
+    unitEditorShell.appendChild(unitAdvancedDetails);
+    unitEditorShell.appendChild(unitOptionsRow);
+    unitEditorShell.appendChild(unitActions);
+    unitEditorShell.appendChild(unitListHeader);
+    unitEditorShell.appendChild(unitList);
+    strategicOverlaySection.appendChild(unitEditorShell);
     frontlineTabStack.appendChild(strategicOverlaySection);
   }
 
@@ -1823,9 +2162,16 @@ function initSidebar({ render } = {}) {
   const operationGraphicDeleteBtn = document.getElementById("operationGraphicDeleteBtn");
   const operationGraphicDeleteVertexBtn = document.getElementById("operationGraphicDeleteVertexBtn");
   const operationGraphicList = document.getElementById("operationGraphicList");
+  const unitCounterPreviewCard = document.getElementById("unitCounterPreviewCard");
+  const unitCounterPresetSelect = document.getElementById("unitCounterPresetSelect");
+  const unitCounterNationModeSelect = document.getElementById("unitCounterNationModeSelect");
+  const unitCounterNationSelect = document.getElementById("unitCounterNationSelect");
   const unitCounterRendererSelect = document.getElementById("unitCounterRendererSelect");
   const unitCounterSizeSelect = document.getElementById("unitCounterSizeSelect");
+  const unitCounterEchelonSelect = document.getElementById("unitCounterEchelonSelect");
   const unitCounterLabelInput = document.getElementById("unitCounterLabelInput");
+  const unitCounterSubLabelInput = document.getElementById("unitCounterSubLabelInput");
+  const unitCounterStrengthInput = document.getElementById("unitCounterStrengthInput");
   const unitCounterSymbolInput = document.getElementById("unitCounterSymbolInput");
   const unitCounterSymbolHint = document.getElementById("unitCounterSymbolHint");
   const unitCounterLabelsToggle = document.getElementById("unitCounterLabelsToggle");
@@ -5551,18 +5897,94 @@ function initSidebar({ render } = {}) {
     const selectedCounter = (state.unitCounters || []).find(
       (counter) => String(counter?.id || "") === String(unitEditor.selectedId || "")
     ) || null;
-    const effectiveRenderer = String(unitEditor.renderer || selectedCounter?.renderer || annotationView.unitRendererDefault || "game");
+    const effectivePresetId = String(
+      unitEditor.presetId
+      || selectedCounter?.presetId
+      || inferUnitCounterPresetId({
+        ...(selectedCounter || {}),
+        ...(unitEditor || {}),
+      })
+      || unitCounterPresets[0].id
+    ).trim().toUpperCase();
+    const effectivePreset = getUnitCounterPresetMeta(effectivePresetId);
+    const effectiveRenderer = String(
+      unitEditor.renderer
+      || selectedCounter?.renderer
+      || effectivePreset.defaultRenderer
+      || annotationView.unitRendererDefault
+      || "game"
+    );
+    const effectiveSize = String(unitEditor.size || selectedCounter?.size || "medium");
+    const effectiveNationSource = String(unitEditor.nationSource || selectedCounter?.nationSource || "controller").trim().toLowerCase() || "controller";
+    const effectiveNationTag = String(unitEditor.nationTag || selectedCounter?.nationTag || "").trim().toUpperCase();
+    const effectiveEchelon = String(unitEditor.echelon || selectedCounter?.echelon || effectivePreset.defaultEchelon || "").trim().toUpperCase();
+    const effectiveLabel = String(unitEditor.label || selectedCounter?.label || "").trim();
+    const effectiveSubLabel = String(unitEditor.subLabel || selectedCounter?.subLabel || "").trim();
+    const effectiveStrengthText = String(unitEditor.strengthText || selectedCounter?.strengthText || "").trim();
+    const rawEffectiveSymbol = String(
+      unitEditor.sidc
+      || unitEditor.symbolCode
+      || selectedCounter?.sidc
+      || selectedCounter?.symbolCode
+      || ""
+    ).trim().toUpperCase();
+    const effectiveSymbol = rawEffectiveSymbol || (
+      effectiveRenderer === "milstd"
+        ? String(effectivePreset.baseSidc || "").trim().toUpperCase()
+        : String(effectivePreset.shortCode || "").trim().toUpperCase()
+    );
+    const nationOptions = getUnitCounterNationOptions();
+    if (unitCounterPresetSelect) {
+      unitCounterPresetSelect.value = effectivePresetId;
+    }
+    if (unitCounterNationModeSelect) {
+      unitCounterNationModeSelect.value = effectiveNationSource === "manual" ? "manual" : "controller";
+    }
+    if (unitCounterNationSelect) {
+      const selectedNationValue = effectiveNationTag;
+      const knownNationValues = new Set(["", ...nationOptions.map((entry) => entry.value)]);
+      const nextNationOptions = nationOptions.slice();
+      if (selectedNationValue && !knownNationValues.has(selectedNationValue)) {
+        const fallbackMeta = getUnitCounterNationMeta(selectedNationValue);
+        nextNationOptions.unshift({
+          value: selectedNationValue,
+          label: `${selectedNationValue} · ${fallbackMeta.displayName}`,
+        });
+      }
+      unitCounterNationSelect.replaceChildren();
+      const autoOption = document.createElement("option");
+      autoOption.value = "";
+      autoOption.textContent = t("Auto from placement", "ui");
+      unitCounterNationSelect.appendChild(autoOption);
+      nextNationOptions.forEach((entry) => {
+        const option = document.createElement("option");
+        option.value = String(entry.value || "");
+        option.textContent = entry.label;
+        unitCounterNationSelect.appendChild(option);
+      });
+      unitCounterNationSelect.value = selectedNationValue;
+      unitCounterNationSelect.disabled = effectiveNationSource !== "manual";
+    }
     if (unitCounterRendererSelect) {
       unitCounterRendererSelect.value = effectiveRenderer;
     }
     if (unitCounterSizeSelect) {
-      unitCounterSizeSelect.value = String(unitEditor.size || selectedCounter?.size || "medium");
+      unitCounterSizeSelect.value = effectiveSize;
+    }
+    if (unitCounterEchelonSelect) {
+      unitCounterEchelonSelect.value = effectiveEchelon;
     }
     if (unitCounterLabelInput) {
-      unitCounterLabelInput.value = String(unitEditor.label || selectedCounter?.label || "");
+      unitCounterLabelInput.value = effectiveLabel;
+    }
+    if (unitCounterSubLabelInput) {
+      unitCounterSubLabelInput.value = effectiveSubLabel;
+    }
+    if (unitCounterStrengthInput) {
+      unitCounterStrengthInput.value = effectiveStrengthText;
     }
     if (unitCounterSymbolInput) {
-      unitCounterSymbolInput.value = String(unitEditor.sidc || unitEditor.symbolCode || selectedCounter?.sidc || selectedCounter?.symbolCode || "");
+      unitCounterSymbolInput.value = effectiveSymbol;
       unitCounterSymbolInput.placeholder = effectiveRenderer === "milstd"
         ? t("SIDC (e.g. 130310001412110000000000000000)", "ui")
         : t("Short code (e.g. HQ / ARM / INF)", "ui");
@@ -5572,6 +5994,19 @@ function initSidebar({ render } = {}) {
         ? t("MILSTD uses the browser-loaded milsymbol renderer. Paste a full SIDC for the symbol body.", "ui")
         : t("Game renderer keeps the lighter counter style and uses a short internal code or abbreviation.", "ui");
     }
+    renderUnitCounterPreview(unitCounterPreviewCard, {
+      renderer: effectiveRenderer,
+      size: effectiveSize,
+      nationTag: effectiveNationTag,
+      nationSource: effectiveNationSource,
+      label: effectiveLabel,
+      subLabel: effectiveSubLabel,
+      strengthText: effectiveStrengthText,
+      sidc: effectiveSymbol,
+      symbolCode: effectiveSymbol,
+      presetId: effectivePresetId,
+      echelon: effectiveEchelon,
+    });
     if (unitCounterLabelsToggle) {
       unitCounterLabelsToggle.checked = annotationView.showUnitLabels !== false;
     }
@@ -5584,7 +6019,7 @@ function initSidebar({ render } = {}) {
       (state.unitCounters || []).forEach((counter) => {
         const option = document.createElement("option");
         option.value = String(counter.id || "");
-        option.textContent = `${String(counter.label || counter.sidc || counter.symbolCode || counter.id || "").trim()} (${counter.renderer})`;
+        option.textContent = formatUnitCounterListLabel(counter);
         unitCounterList.appendChild(option);
       });
       unitCounterList.value = String(unitEditor.selectedId || "");
@@ -5801,6 +6236,73 @@ function initSidebar({ render } = {}) {
     operationGraphicDeleteVertexBtn.dataset.bound = "true";
   }
 
+  if (unitCounterPresetSelect && !unitCounterPresetSelect.dataset.bound) {
+    unitCounterPresetSelect.addEventListener("change", (event) => {
+      const nextPresetId = String(event.target.value || unitCounterPresets[0].id).trim().toUpperCase();
+      const nextPreset = getUnitCounterPresetMeta(nextPresetId);
+      state.unitCounterEditor.presetId = nextPresetId;
+      state.unitCounterEditor.unitType = nextPresetId;
+      const previewRenderer = String(state.unitCounterEditor.renderer || nextPreset.defaultRenderer || "game").trim().toLowerCase();
+      const fallbackToken = previewRenderer === "milstd"
+        ? String(nextPreset.baseSidc || "").trim().toUpperCase()
+        : String(nextPreset.shortCode || "").trim().toUpperCase();
+      if (!String(state.unitCounterEditor.renderer || "").trim()) {
+        state.unitCounterEditor.renderer = previewRenderer;
+      }
+      if (!String(state.unitCounterEditor.echelon || "").trim()) {
+        state.unitCounterEditor.echelon = nextPreset.defaultEchelon;
+      }
+      if (!String(state.unitCounterEditor.sidc || state.unitCounterEditor.symbolCode || "").trim()) {
+        state.unitCounterEditor.sidc = fallbackToken;
+        state.unitCounterEditor.symbolCode = fallbackToken;
+      }
+      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
+        mapRenderer.updateSelectedUnitCounter({
+          presetId: nextPresetId,
+          unitType: nextPreset.id,
+          renderer: previewRenderer,
+          echelon: String(state.unitCounterEditor.echelon || nextPreset.defaultEchelon || "").trim().toUpperCase(),
+          sidc: String(state.unitCounterEditor.sidc || state.unitCounterEditor.symbolCode || fallbackToken || "").trim().toUpperCase(),
+        });
+      } else if (render) {
+        render();
+      }
+      refreshStrategicOverlayUI();
+    });
+    unitCounterPresetSelect.dataset.bound = "true";
+  }
+  if (unitCounterNationModeSelect && !unitCounterNationModeSelect.dataset.bound) {
+    unitCounterNationModeSelect.addEventListener("change", (event) => {
+      const nextMode = String(event.target.value || "controller").trim().toLowerCase();
+      state.unitCounterEditor.nationSource = nextMode === "manual" ? "manual" : "controller";
+      if (nextMode !== "manual") {
+        state.unitCounterEditor.nationTag = "";
+      }
+      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
+        mapRenderer.updateSelectedUnitCounter({
+          nationSource: state.unitCounterEditor.nationSource,
+          nationTag: state.unitCounterEditor.nationTag,
+        });
+      }
+      refreshStrategicOverlayUI();
+    });
+    unitCounterNationModeSelect.dataset.bound = "true";
+  }
+  if (unitCounterNationSelect && !unitCounterNationSelect.dataset.bound) {
+    unitCounterNationSelect.addEventListener("change", (event) => {
+      const nextNationTag = String(event.target.value || "").trim().toUpperCase();
+      state.unitCounterEditor.nationTag = nextNationTag;
+      state.unitCounterEditor.nationSource = nextNationTag ? "manual" : "controller";
+      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
+        mapRenderer.updateSelectedUnitCounter({
+          nationTag: nextNationTag,
+          nationSource: state.unitCounterEditor.nationSource,
+        });
+      }
+      refreshStrategicOverlayUI();
+    });
+    unitCounterNationSelect.dataset.bound = "true";
+  }
   if (unitCounterRendererSelect && !unitCounterRendererSelect.dataset.bound) {
     unitCounterRendererSelect.addEventListener("change", (event) => {
       const nextRenderer = String(event.target.value || "game");
@@ -5836,9 +6338,20 @@ function initSidebar({ render } = {}) {
     });
     unitCounterSizeSelect.dataset.bound = "true";
   }
+  if (unitCounterEchelonSelect && !unitCounterEchelonSelect.dataset.bound) {
+    unitCounterEchelonSelect.addEventListener("change", (event) => {
+      state.unitCounterEditor.echelon = String(event.target.value || "").trim().toUpperCase();
+      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
+        mapRenderer.updateSelectedUnitCounter({ echelon: state.unitCounterEditor.echelon });
+      }
+      refreshStrategicOverlayUI();
+    });
+    unitCounterEchelonSelect.dataset.bound = "true";
+  }
   if (unitCounterLabelInput && !unitCounterLabelInput.dataset.bound) {
     unitCounterLabelInput.addEventListener("input", (event) => {
       state.unitCounterEditor.label = String(event.target.value || "");
+      refreshStrategicOverlayUI();
     });
     unitCounterLabelInput.addEventListener("change", (event) => {
       const nextLabel = String(event.target.value || "");
@@ -5850,11 +6363,40 @@ function initSidebar({ render } = {}) {
     });
     unitCounterLabelInput.dataset.bound = "true";
   }
+  if (unitCounterSubLabelInput && !unitCounterSubLabelInput.dataset.bound) {
+    unitCounterSubLabelInput.addEventListener("input", (event) => {
+      state.unitCounterEditor.subLabel = String(event.target.value || "");
+      refreshStrategicOverlayUI();
+    });
+    unitCounterSubLabelInput.addEventListener("change", (event) => {
+      state.unitCounterEditor.subLabel = String(event.target.value || "");
+      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
+        mapRenderer.updateSelectedUnitCounter({ subLabel: state.unitCounterEditor.subLabel });
+      }
+      refreshStrategicOverlayUI();
+    });
+    unitCounterSubLabelInput.dataset.bound = "true";
+  }
+  if (unitCounterStrengthInput && !unitCounterStrengthInput.dataset.bound) {
+    unitCounterStrengthInput.addEventListener("input", (event) => {
+      state.unitCounterEditor.strengthText = String(event.target.value || "");
+      refreshStrategicOverlayUI();
+    });
+    unitCounterStrengthInput.addEventListener("change", (event) => {
+      state.unitCounterEditor.strengthText = String(event.target.value || "");
+      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
+        mapRenderer.updateSelectedUnitCounter({ strengthText: state.unitCounterEditor.strengthText });
+      }
+      refreshStrategicOverlayUI();
+    });
+    unitCounterStrengthInput.dataset.bound = "true";
+  }
   if (unitCounterSymbolInput && !unitCounterSymbolInput.dataset.bound) {
     unitCounterSymbolInput.addEventListener("input", (event) => {
       const nextToken = String(event.target.value || "").trim().toUpperCase();
       state.unitCounterEditor.sidc = nextToken;
       state.unitCounterEditor.symbolCode = nextToken;
+      refreshStrategicOverlayUI();
     });
     unitCounterSymbolInput.addEventListener("change", (event) => {
       const nextSymbol = String(event.target.value || "").trim().toUpperCase();
@@ -5883,12 +6425,31 @@ function initSidebar({ render } = {}) {
   }
   if (unitCounterPlaceBtn && !unitCounterPlaceBtn.dataset.bound) {
     unitCounterPlaceBtn.addEventListener("click", () => {
+      const nextPresetId = String(unitCounterPresetSelect?.value || state.unitCounterEditor?.presetId || unitCounterPresets[0].id).trim().toUpperCase();
+      const nextPreset = getUnitCounterPresetMeta(nextPresetId);
+      const nextRenderer = String(unitCounterRendererSelect?.value || state.unitCounterEditor?.renderer || nextPreset.defaultRenderer || "game");
+      const nextSymbol = String(
+        unitCounterSymbolInput?.value
+        || state.unitCounterEditor?.sidc
+        || state.unitCounterEditor?.symbolCode
+        || (String(nextRenderer).trim().toLowerCase() === "milstd"
+          ? nextPreset.baseSidc
+          : nextPreset.shortCode)
+        || ""
+      ).trim().toUpperCase();
       mapRenderer.startUnitCounterPlacement({
-        renderer: String(unitCounterRendererSelect?.value || state.unitCounterEditor?.renderer || "game"),
+        renderer: nextRenderer,
         label: String(unitCounterLabelInput?.value || state.unitCounterEditor?.label || ""),
-        sidc: String(unitCounterSymbolInput?.value || state.unitCounterEditor?.sidc || state.unitCounterEditor?.symbolCode || ""),
-        symbolCode: String(unitCounterSymbolInput?.value || state.unitCounterEditor?.symbolCode || state.unitCounterEditor?.sidc || ""),
+        sidc: nextSymbol,
+        symbolCode: nextSymbol,
         size: String(unitCounterSizeSelect?.value || state.unitCounterEditor?.size || "medium"),
+        nationTag: String(unitCounterNationSelect?.value || state.unitCounterEditor?.nationTag || "").trim().toUpperCase(),
+        nationSource: String(unitCounterNationModeSelect?.value || state.unitCounterEditor?.nationSource || "controller").trim().toLowerCase(),
+        presetId: nextPresetId,
+        unitType: nextPreset.id,
+        echelon: String(unitCounterEchelonSelect?.value || state.unitCounterEditor?.echelon || nextPreset.defaultEchelon || "").trim().toUpperCase(),
+        subLabel: String(unitCounterSubLabelInput?.value || state.unitCounterEditor?.subLabel || ""),
+        strengthText: String(unitCounterStrengthInput?.value || state.unitCounterEditor?.strengthText || ""),
       });
       refreshStrategicOverlayUI();
     });

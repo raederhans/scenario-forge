@@ -32,7 +32,11 @@ async function waitForAppReady(page) {
 }
 
 async function openFrontlineTab(page) {
-  await page.locator("#inspectorSidebarTabFrontline").click();
+  await page.locator("#inspectorSidebarTabFrontline").evaluate((button) => button.click());
+  await page.waitForFunction(() => {
+    const panel = document.querySelector("#frontlineSidebarPanel");
+    return !!panel && !panel.hasAttribute("hidden");
+  });
   await expect(page.locator("#frontlineSidebarPanel")).toBeVisible();
 }
 
@@ -158,4 +162,51 @@ test("milstd counters render through milsymbol and refresh feature binding after
       && Number.isFinite(Number(counter.anchor.lon))
       && Number.isFinite(Number(counter.anchor.lat));
   });
+});
+
+test("unit counters keep a stable on-screen footprint across zoom levels", async ({ page }) => {
+  test.setTimeout(120000);
+  await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
+  await waitForAppReady(page);
+  await openFrontlineTab(page);
+
+  await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    const { render, setZoomPercent } = await import("/js/core/map_renderer.js");
+    state.unitCounters = [{
+      id: "unit_size_1",
+      renderer: "milstd",
+      sidc: "130310001412110000000000000000",
+      symbolCode: "130310001412110000000000000000",
+      nationTag: "GER",
+      nationSource: "manual",
+      presetId: "inf",
+      unitType: "INF",
+      echelon: "corps",
+      subLabel: "Nord",
+      strengthText: "76%",
+      label: "1st Corps",
+      size: "medium",
+      facing: 0,
+      zIndex: 0,
+      anchor: { lon: 12, lat: 48, featureId: "" },
+    }];
+    state.unitCounterEditor.selectedId = "unit_size_1";
+    state.unitCountersDirty = true;
+    render();
+    setZoomPercent(100);
+  });
+
+  await expect(page.locator('g.unit-counter[data-counter-id="unit_size_1"]')).toBeVisible();
+  const boxAt100 = await page.locator('g.unit-counter[data-counter-id="unit_size_1"]').boundingBox();
+
+  await page.evaluate(async () => {
+    const { setZoomPercent } = await import("/js/core/map_renderer.js");
+    setZoomPercent(1600);
+  });
+  await page.waitForTimeout(400);
+  const boxAt1600 = await page.locator('g.unit-counter[data-counter-id="unit_size_1"]').boundingBox();
+
+  expect(Math.abs(boxAt1600.width - boxAt100.width)).toBeLessThan(10);
+  expect(Math.abs(boxAt1600.height - boxAt100.height)).toBeLessThan(10);
 });

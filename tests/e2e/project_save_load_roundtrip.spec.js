@@ -182,7 +182,7 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   await initialDownload.saveAs(initialExportPath);
   const initialExport = JSON.parse(fs.readFileSync(initialExportPath, "utf8"));
 
-  expect(initialExport.schemaVersion).toBe(17);
+  expect(initialExport.schemaVersion).toBe(18);
   expect(initialExport.styleConfig.internalBorders).toEqual({
     color: "#123456",
     opacity: 0.42,
@@ -276,6 +276,13 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
       renderer: "milstd",
       sidc: "130310001412110000000000000000",
       symbolCode: "130310001412110000000000000000",
+      nationTag: "GER",
+      nationSource: "manual",
+      presetId: "inf",
+      unitType: "INF",
+      echelon: "corps",
+      subLabel: "Northern Group",
+      strengthText: "76%",
       label: "1st Corps",
       size: "large",
       anchor: { lon: 12, lat: 48, featureId: "" },
@@ -284,6 +291,13 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
       id: "unit_test_2",
       renderer: "game",
       symbolCode: "ARM",
+      nationTag: "ENG",
+      nationSource: "manual",
+      presetId: "arm",
+      unitType: "ARM",
+      echelon: "army",
+      subLabel: "Reserve",
+      strengthText: "Ready",
       label: "2nd Army",
       size: "medium",
       anchor: { lon: 15, lat: 46, featureId: "" },
@@ -409,6 +423,13 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     renderer: "milstd",
     sidc: "130310001412110000000000000000",
     symbolCode: "130310001412110000000000000000",
+    nationTag: "GER",
+    nationSource: "manual",
+    presetId: "inf",
+    unitType: "INF",
+    echelon: "corps",
+    subLabel: "Northern Group",
+    strengthText: "76%",
     label: "1st Corps",
     size: "large",
   });

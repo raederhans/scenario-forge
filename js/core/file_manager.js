@@ -167,6 +167,11 @@ function normalizeOperationGraphics(rawGraphics) {
     .filter(Boolean);
 }
 
+function normalizeUnitCounterNationSource(value) {
+  const source = String(value || "").trim().toLowerCase();
+  return ["controller", "owner", "active", "manual"].includes(source) ? source : "controller";
+}
+
 function normalizeUnitCounters(rawCounters) {
   if (!Array.isArray(rawCounters)) return [];
   return rawCounters
@@ -179,12 +184,21 @@ function normalizeUnitCounters(rawCounters) {
       const renderer = String(raw.renderer || "game").trim().toLowerCase() === "milstd" ? "milstd" : "game";
       const size = String(raw.size || "medium").trim().toLowerCase();
       const sidc = String(raw.sidc || raw.symbolCode || raw.templateId || "").trim().toUpperCase();
+      const presetId = String(raw.presetId || raw.templateId || "").trim();
+      const nationTag = String(raw.nationTag || raw.countryTag || raw.ownerTag || "").trim().toUpperCase();
       return {
         id: String(raw.id || `unit_${index + 1}`).trim() || `unit_${index + 1}`,
         renderer,
         sidc,
         symbolCode: sidc,
         label: String(raw.label || "").trim(),
+        nationTag,
+        nationSource: normalizeUnitCounterNationSource(raw.nationSource),
+        presetId,
+        unitType: String(raw.unitType || presetId || "").trim(),
+        echelon: String(raw.echelon || "").trim(),
+        subLabel: String(raw.subLabel || "").trim(),
+        strengthText: String(raw.strengthText || "").trim(),
         size: ["small", "medium", "large"].includes(size) ? size : "medium",
         facing: clamp(Number.isFinite(Number(raw.facing)) ? Number(raw.facing) : 0, -180, 180),
         zIndex: Math.round(Number.isFinite(Number(raw.zIndex)) ? Number(raw.zIndex) : index),
@@ -202,7 +216,7 @@ class FileManager {
   static exportProject(appState) {
     if (!appState) return;
     const payload = {
-      schemaVersion: 17,
+      schemaVersion: 18,
       countryBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
       featureOverrides: appState.visualOverrides || appState.featureOverrides || {},
       sovereignBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},

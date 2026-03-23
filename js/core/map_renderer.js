@@ -44,6 +44,13 @@ import {
   resetFeatureOwnerCodes,
 } from "./sovereignty_manager.js";
 import { COUNTRY_CODE_ALIASES, normalizeCountryCodeAlias } from "./country_code_aliases.js";
+import {
+  DEFAULT_UNIT_COUNTER_PRESET_ID,
+  getUnitCounterEchelonLabel,
+  getUnitCounterPresetById,
+  normalizeUnitCounterSizeToken,
+  UNIT_COUNTER_SCREEN_SIZE,
+} from "./unit_counter_presets.js";
 
 let mapContainer = null;
 let mapCanvas = null;
@@ -288,8 +295,8 @@ const DEFAULT_OPERATION_GRAPHIC_WIDTH = 4.4;
 const DEFAULT_UNIT_COUNTER_SIDC = "130310001412110000000000000000";
 const UNIT_COUNTER_MILSTD_SIZE_BY_TOKEN = Object.freeze({
   small: 24,
-  medium: 30,
-  large: 38,
+  medium: 28,
+  large: 32,
 });
 const UNIT_COUNTER_SIDC_ALIASES = Object.freeze({
   INF: DEFAULT_UNIT_COUNTER_SIDC,
@@ -13686,6 +13693,13 @@ function ensureUnitCounterEditorState() {
       label: "",
       sidc: "",
       symbolCode: "",
+      nationTag: "",
+      nationSource: "controller",
+      presetId: DEFAULT_UNIT_COUNTER_PRESET_ID,
+      unitType: "",
+      echelon: "",
+      subLabel: "",
+      strengthText: "",
       size: "medium",
       selectedId: null,
       counter: 1,
@@ -13701,6 +13715,20 @@ function ensureUnitCounterEditorState() {
     || state.unitCounterEditor.sidc
     || ""
   ).trim();
+  state.unitCounterEditor.nationTag = canonicalCountryCode(state.unitCounterEditor.nationTag || "");
+  state.unitCounterEditor.nationSource = ["controller", "owner", "active", "manual"].includes(String(state.unitCounterEditor.nationSource || "").trim().toLowerCase())
+    ? String(state.unitCounterEditor.nationSource || "").trim().toLowerCase()
+    : "controller";
+  state.unitCounterEditor.presetId = String(state.unitCounterEditor.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toLowerCase() || DEFAULT_UNIT_COUNTER_PRESET_ID;
+  state.unitCounterEditor.unitType = String(
+    state.unitCounterEditor.unitType
+    || getUnitCounterPresetById(state.unitCounterEditor.presetId).unitType
+    || ""
+  ).trim().toUpperCase();
+  state.unitCounterEditor.echelon = String(state.unitCounterEditor.echelon || "").trim().toLowerCase();
+  state.unitCounterEditor.subLabel = String(state.unitCounterEditor.subLabel || "").trim();
+  state.unitCounterEditor.strengthText = String(state.unitCounterEditor.strengthText || "").trim();
+  state.unitCounterEditor.size = normalizeUnitCounterSizeToken(state.unitCounterEditor.size);
 }
 
 function getFrontlineOwnershipContext() {
@@ -14086,7 +14114,7 @@ function getOperationGraphicEditorMidpoints(points = [], { closed = false } = {}
 }
 
 function getUnitCounterSymbolToken(counter = {}) {
-  return String(counter.sidc || counter.symbolCode || "").trim();
+  return String(counter.sidc || counter.symbolCode || getUnitCounterPresetById(counter.presetId).baseSidc || "").trim();
 }
 
 function getUnitCounterEffectiveSidc(counter = {}) {
@@ -14528,10 +14556,109 @@ function renderOperationGraphicsOverlay() {
   renderOperationGraphicsEditorOverlay();
 }
 
-function getUnitCounterScale(size = "medium") {
-  if (size === "small") return 0.82;
-  if (size === "large") return 1.18;
-  return 1;
+function getUnitCounterNationMeta(tag) {
+  const normalizedTag = canonicalCountryCode(tag);
+  if (!normalizedTag) {
+    return {
+      tag: "",
+      name: "",
+      color: "#7c8ba1",
+    };
+  }
+  const scenarioEntry = state.scenarioCountriesByTag?.[normalizedTag];
+  const name = getScenarioCountryDisplayName(
+    scenarioEntry,
+    state.countryNames?.[normalizedTag] || normalizedTag
+  ) || state.countryNames?.[normalizedTag] || normalizedTag;
+  const color = String(
+    scenarioEntry?.color_hex
+    || scenarioEntry?.colorHex
+    || state.countryPalette?.[normalizedTag]
+    || ColorManager.getPoliticalFallbackColor(normalizedTag, 0)
+    || "#7c8ba1"
+  ).trim() || "#7c8ba1";
+  return {
+    tag: normalizedTag,
+    name,
+    color,
+  };
+}
+
+function resolveUnitCounterNationForPlacement(featureId = "", manualTag = "") {
+  const normalizedFeatureId = String(featureId || "").trim();
+  const normalizedManualTag = canonicalCountryCode(manualTag);
+  if (normalizedManualTag) {
+    return { tag: normalizedManualTag, source: "manual" };
+  }
+  const controllerTag = canonicalCountryCode(state.scenarioControllersByFeatureId?.[normalizedFeatureId] || "");
+  if (controllerTag) {
+    return { tag: controllerTag, source: "controller" };
+  }
+  const ownerTag = canonicalCountryCode(getFeatureOwnerCode(normalizedFeatureId) || "");
+  if (ownerTag) {
+    return { tag: ownerTag, source: "owner" };
+  }
+  const activeTag = canonicalCountryCode(state.selectedInspectorCountryCode || "");
+  if (activeTag) {
+    return { tag: activeTag, source: "active" };
+  }
+  return { tag: "", source: "active" };
+}
+
+function getUnitCounterScreenMetrics(size = "medium") {
+  const token = normalizeUnitCounterSizeToken(size);
+  return UNIT_COUNTER_SCREEN_SIZE[token] || UNIT_COUNTER_SCREEN_SIZE.medium;
+}
+
+function getUnitCounterCardModel(counter = {}, { stackCount = 1 } = {}) {
+  const preset = getUnitCounterPresetById(counter.presetId || counter.unitType || DEFAULT_UNIT_COUNTER_PRESET_ID);
+  const sizeToken = normalizeUnitCounterSizeToken(counter.size);
+  const metrics = getUnitCounterScreenMetrics(sizeToken);
+  const nation = getUnitCounterNationMeta(counter.nationTag);
+  const renderer = String(counter.renderer || preset.defaultRenderer || DEFAULT_UNIT_COUNTER_RENDERER).trim().toLowerCase() === "milstd" ? "milstd" : "game";
+  const sidc = getUnitCounterEffectiveSidc({
+    ...counter,
+    presetId: preset.id,
+  });
+  return {
+    counter,
+    preset,
+    renderer,
+    metrics,
+    nation,
+    nationTag: nation.tag || "N/A",
+    nationName: nation.name || t("Unassigned", "ui"),
+    label: String(counter.label || "").trim(),
+    subLabel: String(counter.subLabel || "").trim(),
+    strengthText: String(counter.strengthText || "").trim(),
+    echelon: String(counter.echelon || preset.defaultEchelon || "").trim().toLowerCase(),
+    echelonLabel: getUnitCounterEchelonLabel(counter.echelon || preset.defaultEchelon || ""),
+    shortCode: String(counter.unitType || preset.shortCode || "").trim().toUpperCase() || preset.shortCode,
+    shellVariant: preset.shellVariant || "line",
+    sidc,
+    stackCount: Math.max(1, Number(stackCount) || 1),
+    symbolUri: renderer === "milstd"
+      ? getMilSymbolDataUri(sidc, UNIT_COUNTER_MILSTD_SIZE_BY_TOKEN[sizeToken] || UNIT_COUNTER_MILSTD_SIZE_BY_TOKEN.medium)
+      : "",
+    sizeToken,
+  };
+}
+
+function getUnitCounterPreviewData(partialCounter = {}) {
+  ensureUnitCounterEditorState();
+  return getUnitCounterCardModel({
+    renderer: partialCounter.renderer || state.unitCounterEditor.renderer || DEFAULT_UNIT_COUNTER_RENDERER,
+    sidc: partialCounter.sidc || partialCounter.symbolCode || state.unitCounterEditor.sidc || state.unitCounterEditor.symbolCode || "",
+    symbolCode: partialCounter.symbolCode || partialCounter.sidc || state.unitCounterEditor.symbolCode || state.unitCounterEditor.sidc || "",
+    nationTag: partialCounter.nationTag || state.unitCounterEditor.nationTag || "",
+    presetId: partialCounter.presetId || state.unitCounterEditor.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID,
+    unitType: partialCounter.unitType || state.unitCounterEditor.unitType || "",
+    echelon: partialCounter.echelon || state.unitCounterEditor.echelon || "",
+    label: partialCounter.label || state.unitCounterEditor.label || "",
+    subLabel: partialCounter.subLabel || state.unitCounterEditor.subLabel || "",
+    strengthText: partialCounter.strengthText || state.unitCounterEditor.strengthText || "",
+    size: partialCounter.size || state.unitCounterEditor.size || "medium",
+  });
 }
 
 function getUnitCounterRenderEntries() {
@@ -14572,70 +14699,149 @@ function renderUnitCountersOverlay() {
     .data(entries, (d) => d.counter.id);
 
   const groupEnter = groups.enter().append("g").attr("class", "unit-counter").style("cursor", "grab");
+  groupEnter.append("rect").attr("class", "unit-counter-shadow");
   groupEnter.append("rect").attr("class", "unit-counter-shell");
-  groupEnter.append("rect").attr("class", "unit-counter-band");
+  groupEnter.append("rect").attr("class", "unit-counter-strip");
+  groupEnter.append("rect").attr("class", "unit-counter-tag-pill");
+  groupEnter.append("text").attr("class", "unit-counter-tag-text");
+  groupEnter.append("rect").attr("class", "unit-counter-type-chip");
+  groupEnter.append("text").attr("class", "unit-counter-type-text");
   groupEnter.append("image").attr("class", "unit-counter-milsymbol");
   groupEnter.append("text").attr("class", "unit-counter-symbol");
+  groupEnter.append("text").attr("class", "unit-counter-echelons");
   groupEnter.append("text").attr("class", "unit-counter-label");
+  groupEnter.append("text").attr("class", "unit-counter-sublabel");
+  groupEnter.append("text").attr("class", "unit-counter-strength");
   groupEnter.append("circle").attr("class", "unit-counter-stack-badge");
   groupEnter.append("text").attr("class", "unit-counter-stack-text");
 
+  const zoomK = Math.max(0.1, Number(state.zoomTransform?.k || 1));
   const merged = groupEnter.merge(groups)
-    .attr("transform", (d) => `translate(${d.projected[0]},${d.projected[1]}) scale(${getUnitCounterScale(d.counter.size)})`)
+    .attr("transform", (d) => {
+      const metrics = getUnitCounterScreenMetrics(d.counter.size);
+      return `translate(${d.projected[0]},${d.projected[1]}) scale(${(metrics.scale || 1) / zoomK})`;
+    })
     .attr("data-counter-id", (d) => d.counter.id)
     .attr("pointer-events", "all");
 
-  merged.select("rect.unit-counter-shell")
-    .attr("x", -26)
-    .attr("y", -16)
-    .attr("width", 52)
-    .attr("height", 32)
-    .attr("rx", (d) => (d.counter.renderer === "game" ? 7 : 2))
-    .attr("ry", (d) => (d.counter.renderer === "game" ? 7 : 2))
-    .attr("fill", (d) => (d.counter.renderer === "milstd" ? "rgba(248, 250, 252, 0.72)" : "#1f2937"))
-    .attr("stroke", (d) => (d.counter.id === selectedId ? "#38bdf8" : (d.counter.renderer === "milstd" ? "rgba(15, 23, 42, 0.24)" : "#0f172a")))
-    .attr("stroke-width", (d) => (d.counter.id === selectedId ? 2.4 : 1.3));
+  merged.select("rect.unit-counter-shadow")
+    .attr("x", (d) => -getUnitCounterScreenMetrics(d.counter.size).width / 2)
+    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2)
+    .attr("width", (d) => getUnitCounterScreenMetrics(d.counter.size).width)
+    .attr("height", (d) => getUnitCounterScreenMetrics(d.counter.size).height)
+    .attr("rx", 16)
+    .attr("ry", 16)
+    .attr("fill", "rgba(15, 23, 42, 0.16)")
+    .attr("opacity", 0.28)
+    .attr("transform", "translate(0, 2)");
 
-  merged.select("rect.unit-counter-band")
-    .attr("display", (d) => (d.counter.renderer === "milstd" ? "none" : null))
-    .attr("x", -26)
-    .attr("y", -16)
-    .attr("width", 52)
+  merged.select("rect.unit-counter-shell")
+    .attr("x", (d) => -getUnitCounterScreenMetrics(d.counter.size).width / 2)
+    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2)
+    .attr("width", (d) => getUnitCounterScreenMetrics(d.counter.size).width)
+    .attr("height", (d) => getUnitCounterScreenMetrics(d.counter.size).height)
+    .attr("rx", 16)
+    .attr("ry", 16)
+    .attr("fill", "#f8fafc")
+    .attr("stroke", (d) => (d.counter.id === selectedId ? "#0f5fff" : "rgba(15, 23, 42, 0.16)"))
+    .attr("stroke-width", (d) => (d.counter.id === selectedId ? 2.8 : 1.1));
+
+  merged.select("rect.unit-counter-strip")
+    .attr("x", (d) => -getUnitCounterScreenMetrics(d.counter.size).width / 2)
+    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2)
+    .attr("width", (d) => getUnitCounterScreenMetrics(d.counter.size).width)
     .attr("height", 8)
-    .attr("fill", (d) => (d.counter.renderer === "milstd" ? "#dbeafe" : "#991b1b"));
+    .attr("rx", 16)
+    .attr("ry", 16)
+    .attr("fill", (d) => getUnitCounterNationMeta(d.counter.nationTag).color);
+
+  merged.select("rect.unit-counter-tag-pill")
+    .attr("x", (d) => -getUnitCounterScreenMetrics(d.counter.size).width / 2 + 8)
+    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2 + 12)
+    .attr("width", 28)
+    .attr("height", 15)
+    .attr("rx", 7.5)
+    .attr("ry", 7.5)
+    .attr("fill", "rgba(15, 23, 42, 0.86)");
+
+  merged.select("text.unit-counter-tag-text")
+    .attr("x", (d) => -getUnitCounterScreenMetrics(d.counter.size).width / 2 + 22)
+    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2 + 19.5)
+    .attr("text-anchor", "middle")
+    .attr("dominant-baseline", "central")
+    .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
+    .attr("font-size", 8)
+    .attr("font-weight", 700)
+    .attr("fill", "#f8fafc")
+    .text((d) => getUnitCounterNationMeta(d.counter.nationTag).tag || "N/A");
+
+  merged.select("rect.unit-counter-type-chip")
+    .attr("x", (d) => getUnitCounterScreenMetrics(d.counter.size).width / 2 - 40)
+    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2 + 12)
+    .attr("width", 32)
+    .attr("height", 15)
+    .attr("rx", 7.5)
+    .attr("ry", 7.5)
+    .attr("fill", "rgba(226, 232, 240, 0.96)");
+
+  merged.select("text.unit-counter-type-text")
+    .attr("x", (d) => getUnitCounterScreenMetrics(d.counter.size).width / 2 - 24)
+    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2 + 19.5)
+    .attr("text-anchor", "middle")
+    .attr("dominant-baseline", "central")
+    .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
+    .attr("font-size", 7.8)
+    .attr("font-weight", 700)
+    .attr("fill", "#0f172a")
+    .text((d) => getUnitCounterCardModel(d.counter).shortCode.slice(0, 4));
 
   merged.select("image.unit-counter-milsymbol")
     .attr("display", (d) => (d.counter.renderer === "milstd" ? null : "none"))
-    .attr("x", -23)
-    .attr("y", -15)
-    .attr("width", 46)
-    .attr("height", 30)
+    .attr("x", (d) => -(getUnitCounterScreenMetrics(d.counter.size).symbolBox / 2))
+    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2 + 21)
+    .attr("width", (d) => getUnitCounterScreenMetrics(d.counter.size).symbolBox)
+    .attr("height", (d) => getUnitCounterScreenMetrics(d.counter.size).symbolBox)
     .attr("preserveAspectRatio", "xMidYMid meet")
-    .attr("href", (d) => getMilSymbolDataUri(getUnitCounterEffectiveSidc(d.counter), 44));
+    .attr("href", (d) => getUnitCounterCardModel(d.counter).symbolUri);
 
   merged.select("text.unit-counter-symbol")
     .attr("display", (d) => {
-      if (d.counter.renderer !== "milstd") return null;
-      return getMilSymbolDataUri(getUnitCounterEffectiveSidc(d.counter), 44) ? "none" : null;
+      if (d.counter.renderer === "milstd") {
+        return getUnitCounterCardModel(d.counter).symbolUri ? "none" : null;
+      }
+      return null;
     })
     .attr("x", 0)
-    .attr("y", d => (d.counter.renderer === "milstd" ? 1 : -1))
+    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2 + 39)
     .attr("text-anchor", "middle")
     .attr("dominant-baseline", "central")
-    .attr("font-family", d => (d.counter.renderer === "milstd" ? "\"Roboto Condensed\", \"Segoe UI\", sans-serif" : STRATEGIC_LINE_LABEL_FONT))
-    .attr("font-size", d => (d.counter.renderer === "milstd" ? 10 : 11))
+    .attr("font-family", "\"Roboto Condensed\", \"Segoe UI\", sans-serif")
+    .attr("font-size", (d) => (d.counter.renderer === "milstd" ? 10 : 13))
     .attr("font-weight", 700)
-    .attr("fill", d => (d.counter.renderer === "milstd" ? "#0f172a" : "#f8fafc"))
+    .attr("fill", "#0f172a")
     .text((d) => {
-      const raw = getUnitCounterSymbolToken(d.counter) || String(d.counter.label || "").trim();
-      if (!raw) return d.counter.renderer === "milstd" ? "INF" : "HQ";
-      return raw.slice(0, 10);
+      const model = getUnitCounterCardModel(d.counter);
+      if (d.counter.renderer === "milstd") {
+        return model.shortCode.slice(0, 6);
+      }
+      return model.shortCode.slice(0, 6);
     });
 
-  merged.select("text.unit-counter-label")
-    .attr("display", (d) => (state.annotationView?.showUnitLabels && d.counter.label ? null : "none"))
+  merged.select("text.unit-counter-echelons")
+    .attr("display", (d) => (getUnitCounterCardModel(d.counter).echelonLabel ? null : "none"))
     .attr("x", 0)
-    .attr("y", 24)
+    .attr("y", (d) => getUnitCounterScreenMetrics(d.counter.size).height / 2 - 14)
+    .attr("text-anchor", "middle")
+    .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
+    .attr("font-size", 8)
+    .attr("font-weight", 700)
+    .attr("fill", "rgba(15, 23, 42, 0.72)")
+    .text((d) => getUnitCounterCardModel(d.counter).echelonLabel);
+
+  merged.select("text.unit-counter-label")
+    .attr("display", (d) => (state.annotationView?.showUnitLabels !== false && d.counter.label ? null : "none"))
+    .attr("x", 0)
+    .attr("y", (d) => getUnitCounterScreenMetrics(d.counter.size).height / 2 + 12)
     .attr("text-anchor", "middle")
     .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
     .attr("font-size", 10)
@@ -14643,10 +14849,32 @@ function renderUnitCountersOverlay() {
     .attr("fill", "#111827")
     .text((d) => d.counter.label || "");
 
+  merged.select("text.unit-counter-sublabel")
+    .attr("display", (d) => (state.annotationView?.showUnitLabels !== false && d.counter.subLabel ? null : "none"))
+    .attr("x", 0)
+    .attr("y", (d) => getUnitCounterScreenMetrics(d.counter.size).height / 2 + 23)
+    .attr("text-anchor", "middle")
+    .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
+    .attr("font-size", 8)
+    .attr("font-weight", 500)
+    .attr("fill", "rgba(15, 23, 42, 0.72)")
+    .text((d) => d.counter.subLabel || "");
+
+  merged.select("text.unit-counter-strength")
+    .attr("display", (d) => (d.counter.strengthText ? null : "none"))
+    .attr("x", (d) => getUnitCounterScreenMetrics(d.counter.size).width / 2 - 12)
+    .attr("y", (d) => getUnitCounterScreenMetrics(d.counter.size).height / 2 - 13)
+    .attr("text-anchor", "end")
+    .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
+    .attr("font-size", 8)
+    .attr("font-weight", 700)
+    .attr("fill", "#0f172a")
+    .text((d) => d.counter.strengthText || "");
+
   merged.select("circle.unit-counter-stack-badge")
     .attr("display", (d) => (d.stackCount > 1 ? null : "none"))
-    .attr("cx", 20)
-    .attr("cy", -12)
+    .attr("cx", (d) => getUnitCounterScreenMetrics(d.counter.size).width / 2 - 11)
+    .attr("cy", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2 + 12)
     .attr("r", 8)
     .attr("fill", "#0f172a")
     .attr("stroke", "#f8fafc")
@@ -14654,8 +14882,8 @@ function renderUnitCountersOverlay() {
 
   merged.select("text.unit-counter-stack-text")
     .attr("display", (d) => (d.stackCount > 1 ? null : "none"))
-    .attr("x", 20)
-    .attr("y", -12)
+    .attr("x", (d) => getUnitCounterScreenMetrics(d.counter.size).width / 2 - 11)
+    .attr("y", (d) => -getUnitCounterScreenMetrics(d.counter.size).height / 2 + 12)
     .attr("text-anchor", "middle")
     .attr("dominant-baseline", "central")
     .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
@@ -14714,7 +14942,14 @@ function renderUnitCountersOverlay() {
     state.unitCounterEditor.label = String(datum.counter.label || "");
     state.unitCounterEditor.sidc = String(datum.counter.sidc || datum.counter.symbolCode || "").trim().toUpperCase();
     state.unitCounterEditor.symbolCode = String(datum.counter.symbolCode || datum.counter.sidc || "").trim().toUpperCase();
-    state.unitCounterEditor.size = String(datum.counter.size || "medium");
+    state.unitCounterEditor.nationTag = canonicalCountryCode(datum.counter.nationTag || "");
+    state.unitCounterEditor.nationSource = String(datum.counter.nationSource || "controller").trim().toLowerCase() || "controller";
+    state.unitCounterEditor.presetId = String(datum.counter.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toLowerCase() || DEFAULT_UNIT_COUNTER_PRESET_ID;
+    state.unitCounterEditor.unitType = String(datum.counter.unitType || getUnitCounterPresetById(datum.counter.presetId).unitType || "").trim().toUpperCase();
+    state.unitCounterEditor.echelon = String(datum.counter.echelon || "").trim().toLowerCase();
+    state.unitCounterEditor.subLabel = String(datum.counter.subLabel || "");
+    state.unitCounterEditor.strengthText = String(datum.counter.strengthText || "");
+    state.unitCounterEditor.size = normalizeUnitCounterSizeToken(datum.counter.size || "medium");
     state.unitCountersDirty = true;
     updateStrategicOverlayUi();
     renderUnitCountersIfNeeded({ force: true });
@@ -15535,20 +15770,32 @@ function placeUnitCounterFromEvent(event) {
     eventType: "unit-counter-place",
   });
   const featureId = hit?.targetType === "land" ? String(hit.id || "") : "";
+  const nationResolution = String(state.unitCounterEditor.nationSource || "controller") === "manual"
+    ? resolveUnitCounterNationForPlacement("", state.unitCounterEditor.nationTag)
+    : resolveUnitCounterNationForPlacement(featureId, "");
+  const preset = getUnitCounterPresetById(state.unitCounterEditor.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID);
   const before = captureHistoryState({ strategicOverlay: true });
   const id = `unit_${state.unitCounterEditor.counter}`;
   const nextToken = String(
     state.unitCounterEditor.sidc
     || state.unitCounterEditor.symbolCode
+    || preset.baseSidc
     || (String(state.unitCounterEditor.renderer || "").toLowerCase() === "milstd" ? DEFAULT_MILSTD_SIDC : "")
   ).trim().toUpperCase();
   state.unitCounters.push({
     id,
-    renderer: String(state.unitCounterEditor.renderer || state.annotationView?.unitRendererDefault || DEFAULT_UNIT_COUNTER_RENDERER),
+    renderer: String(state.unitCounterEditor.renderer || preset.defaultRenderer || state.annotationView?.unitRendererDefault || DEFAULT_UNIT_COUNTER_RENDERER),
     sidc: nextToken,
     symbolCode: nextToken,
     label: String(state.unitCounterEditor.label || "").trim(),
-    size: String(state.unitCounterEditor.size || "medium"),
+    nationTag: nationResolution.tag,
+    nationSource: nationResolution.source,
+    presetId: preset.id,
+    unitType: String(state.unitCounterEditor.unitType || preset.unitType || "").trim().toUpperCase(),
+    echelon: String(state.unitCounterEditor.echelon || preset.defaultEchelon || "").trim().toLowerCase(),
+    subLabel: String(state.unitCounterEditor.subLabel || "").trim(),
+    strengthText: String(state.unitCounterEditor.strengthText || "").trim(),
+    size: normalizeUnitCounterSizeToken(state.unitCounterEditor.size || "medium"),
     facing: 0,
     zIndex: state.unitCounters.length,
     anchor: {
@@ -15577,15 +15824,32 @@ function startUnitCounterPlacement({
   label = "",
   sidc = "",
   symbolCode = "",
+  nationTag = "",
+  nationSource = "controller",
+  presetId = DEFAULT_UNIT_COUNTER_PRESET_ID,
+  unitType = "",
+  echelon = "",
+  subLabel = "",
+  strengthText = "",
   size = "medium",
 } = {}) {
   ensureUnitCounterEditorState();
+  const preset = getUnitCounterPresetById(presetId || DEFAULT_UNIT_COUNTER_PRESET_ID);
   state.unitCounterEditor.active = true;
-  state.unitCounterEditor.renderer = String(renderer || DEFAULT_UNIT_COUNTER_RENDERER);
+  state.unitCounterEditor.renderer = String(renderer || preset.defaultRenderer || DEFAULT_UNIT_COUNTER_RENDERER);
   state.unitCounterEditor.label = String(label || "");
-  state.unitCounterEditor.sidc = String(sidc || symbolCode || "").trim().toUpperCase();
-  state.unitCounterEditor.symbolCode = String(symbolCode || sidc || "").trim().toUpperCase();
-  state.unitCounterEditor.size = String(size || "medium");
+  state.unitCounterEditor.sidc = String(sidc || symbolCode || preset.baseSidc || "").trim().toUpperCase();
+  state.unitCounterEditor.symbolCode = String(symbolCode || sidc || preset.baseSidc || "").trim().toUpperCase();
+  state.unitCounterEditor.nationTag = canonicalCountryCode(nationTag || "");
+  state.unitCounterEditor.nationSource = ["controller", "owner", "active", "manual"].includes(String(nationSource || "").trim().toLowerCase())
+    ? String(nationSource || "").trim().toLowerCase()
+    : "controller";
+  state.unitCounterEditor.presetId = preset.id;
+  state.unitCounterEditor.unitType = String(unitType || preset.unitType || "").trim().toUpperCase();
+  state.unitCounterEditor.echelon = String(echelon || preset.defaultEchelon || "").trim().toLowerCase();
+  state.unitCounterEditor.subLabel = String(subLabel || "");
+  state.unitCounterEditor.strengthText = String(strengthText || "");
+  state.unitCounterEditor.size = normalizeUnitCounterSizeToken(size || "medium");
   state.unitCountersDirty = true;
   updateStrategicOverlayUi();
   if (context) render();
@@ -15609,7 +15873,14 @@ function selectUnitCounterById(id) {
     state.unitCounterEditor.label = String(counter.label || "");
     state.unitCounterEditor.sidc = String(counter.sidc || counter.symbolCode || "").trim().toUpperCase();
     state.unitCounterEditor.symbolCode = String(counter.symbolCode || counter.sidc || "").trim().toUpperCase();
-    state.unitCounterEditor.size = String(counter.size || "medium");
+    state.unitCounterEditor.nationTag = canonicalCountryCode(counter.nationTag || "");
+    state.unitCounterEditor.nationSource = String(counter.nationSource || "controller").trim().toLowerCase() || "controller";
+    state.unitCounterEditor.presetId = String(counter.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toLowerCase() || DEFAULT_UNIT_COUNTER_PRESET_ID;
+    state.unitCounterEditor.unitType = String(counter.unitType || getUnitCounterPresetById(counter.presetId).unitType || "").trim().toUpperCase();
+    state.unitCounterEditor.echelon = String(counter.echelon || "").trim().toLowerCase();
+    state.unitCounterEditor.subLabel = String(counter.subLabel || "");
+    state.unitCounterEditor.strengthText = String(counter.strengthText || "");
+    state.unitCounterEditor.size = normalizeUnitCounterSizeToken(counter.size || "medium");
   }
   state.unitCountersDirty = true;
   updateStrategicOverlayUi();
@@ -15630,7 +15901,18 @@ function updateSelectedUnitCounter(partial = {}) {
     counter.sidc = nextToken;
     counter.symbolCode = nextToken;
   }
-  if (partial.size) counter.size = String(partial.size || "medium");
+  if (partial.nationTag !== undefined) counter.nationTag = canonicalCountryCode(partial.nationTag || "");
+  if (partial.nationSource !== undefined) {
+    counter.nationSource = ["controller", "owner", "active", "manual"].includes(String(partial.nationSource || "").trim().toLowerCase())
+      ? String(partial.nationSource || "").trim().toLowerCase()
+      : "controller";
+  }
+  if (partial.presetId !== undefined) counter.presetId = String(partial.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toLowerCase() || DEFAULT_UNIT_COUNTER_PRESET_ID;
+  if (partial.unitType !== undefined) counter.unitType = String(partial.unitType || "").trim().toUpperCase();
+  if (partial.echelon !== undefined) counter.echelon = String(partial.echelon || "").trim().toLowerCase();
+  if (partial.subLabel !== undefined) counter.subLabel = String(partial.subLabel || "");
+  if (partial.strengthText !== undefined) counter.strengthText = String(partial.strengthText || "");
+  if (partial.size) counter.size = normalizeUnitCounterSizeToken(partial.size || "medium");
   selectUnitCounterById(selectedId);
   state.unitCountersDirty = true;
   commitHistoryEntry({
@@ -17585,6 +17867,7 @@ export {
   selectUnitCounterById,
   deleteSelectedUnitCounter,
   updateSelectedUnitCounter,
+  getUnitCounterPreviewData,
   startSpecialZoneDraw,
   undoSpecialZoneVertex,
   finishSpecialZoneDraw,
