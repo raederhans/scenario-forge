@@ -52,6 +52,17 @@ import {
   UNIT_COUNTER_SCREEN_SIZE,
 } from "./unit_counter_presets.js";
 
+const DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT = 78;
+const DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT = 74;
+const DEFAULT_UNIT_COUNTER_BASE_FILL = "#f4f0e6";
+const UNIT_COUNTER_STATS_PRESETS = Object.freeze({
+  elite: Object.freeze({ organizationPct: 94, equipmentPct: 92 }),
+  regular: Object.freeze({ organizationPct: 82, equipmentPct: 78 }),
+  worn: Object.freeze({ organizationPct: 68, equipmentPct: 62 }),
+  understrength: Object.freeze({ organizationPct: 58, equipmentPct: 48 }),
+  improvised: Object.freeze({ organizationPct: 47, equipmentPct: 42 }),
+});
+
 let mapContainer = null;
 let mapCanvas = null;
 let hitCanvas = null;
@@ -13685,6 +13696,72 @@ function ensureOperationGraphicsEditorState() {
   state.operationGraphicsEditor.selectedVertexIndex = Math.max(-1, Number(state.operationGraphicsEditor.selectedVertexIndex) || -1);
 }
 
+function normalizeUnitCounterStatPercent(value, fallback = DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT) {
+  const nextValue = Number(value);
+  if (!Number.isFinite(nextValue)) {
+    return Math.max(0, Math.min(100, Number(fallback) || 0));
+  }
+  return Math.max(0, Math.min(100, Math.round(nextValue)));
+}
+
+function normalizeUnitCounterStatsPresetId(value, fallback = "regular") {
+  const normalizedValue = String(value || "").trim().toLowerCase();
+  if (normalizedValue === "random") return "random";
+  return Object.prototype.hasOwnProperty.call(UNIT_COUNTER_STATS_PRESETS, normalizedValue)
+    ? normalizedValue
+    : fallback;
+}
+
+function getUnitCounterStatsPreset(value, fallback = "regular") {
+  const presetId = normalizeUnitCounterStatsPresetId(value, fallback);
+  return UNIT_COUNTER_STATS_PRESETS[presetId] || UNIT_COUNTER_STATS_PRESETS.regular;
+}
+
+function normalizeUnitCounterBaseFillColor(value) {
+  const candidate = String(value || "").trim();
+  return /^#(?:[0-9a-f]{6})$/i.test(candidate) ? candidate.toLowerCase() : "";
+}
+
+function getNormalizedUnitCounterCombatState(candidate = {}) {
+  const statsPresetId = normalizeUnitCounterStatsPresetId(candidate.statsPresetId || "regular");
+  const presetDefaults = getUnitCounterStatsPreset(statsPresetId);
+  const statsSource = ["preset", "random", "manual"].includes(String(candidate.statsSource || "").trim().toLowerCase())
+    ? String(candidate.statsSource || "").trim().toLowerCase()
+    : "preset";
+  return {
+    baseFillColor: normalizeUnitCounterBaseFillColor(candidate.baseFillColor),
+    organizationPct: normalizeUnitCounterStatPercent(candidate.organizationPct, presetDefaults.organizationPct || DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT),
+    equipmentPct: normalizeUnitCounterStatPercent(candidate.equipmentPct, presetDefaults.equipmentPct || DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT),
+    statsPresetId,
+    statsSource,
+  };
+}
+
+function assignUnitCounterEditorFromCounter(counter = null) {
+  ensureUnitCounterEditorState();
+  if (!counter) {
+    return;
+  }
+  const normalizedCombatState = getNormalizedUnitCounterCombatState(counter);
+  state.unitCounterEditor.renderer = String(counter.renderer || DEFAULT_UNIT_COUNTER_RENDERER);
+  state.unitCounterEditor.label = String(counter.label || "");
+  state.unitCounterEditor.sidc = String(counter.sidc || counter.symbolCode || "").trim().toUpperCase();
+  state.unitCounterEditor.symbolCode = String(counter.symbolCode || counter.sidc || "").trim().toUpperCase();
+  state.unitCounterEditor.nationTag = canonicalCountryCode(counter.nationTag || "");
+  state.unitCounterEditor.nationSource = String(counter.nationSource || "controller").trim().toLowerCase() || "controller";
+  state.unitCounterEditor.presetId = String(counter.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toLowerCase() || DEFAULT_UNIT_COUNTER_PRESET_ID;
+  state.unitCounterEditor.unitType = String(counter.unitType || getUnitCounterPresetById(counter.presetId).unitType || "").trim().toUpperCase();
+  state.unitCounterEditor.echelon = String(counter.echelon || "").trim().toLowerCase();
+  state.unitCounterEditor.subLabel = String(counter.subLabel || "");
+  state.unitCounterEditor.strengthText = String(counter.strengthText || "");
+  state.unitCounterEditor.baseFillColor = normalizedCombatState.baseFillColor;
+  state.unitCounterEditor.organizationPct = normalizedCombatState.organizationPct;
+  state.unitCounterEditor.equipmentPct = normalizedCombatState.equipmentPct;
+  state.unitCounterEditor.statsPresetId = normalizedCombatState.statsPresetId;
+  state.unitCounterEditor.statsSource = normalizedCombatState.statsSource;
+  state.unitCounterEditor.size = normalizeUnitCounterSizeToken(counter.size || "medium");
+}
+
 function ensureUnitCounterEditorState() {
   if (!state.unitCounterEditor || typeof state.unitCounterEditor !== "object") {
     state.unitCounterEditor = {
@@ -13700,6 +13777,11 @@ function ensureUnitCounterEditorState() {
       echelon: "",
       subLabel: "",
       strengthText: "",
+      baseFillColor: "",
+      organizationPct: DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT,
+      equipmentPct: DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT,
+      statsPresetId: "regular",
+      statsSource: "preset",
       size: "medium",
       selectedId: null,
       counter: 1,
@@ -13728,6 +13810,19 @@ function ensureUnitCounterEditorState() {
   state.unitCounterEditor.echelon = String(state.unitCounterEditor.echelon || "").trim().toLowerCase();
   state.unitCounterEditor.subLabel = String(state.unitCounterEditor.subLabel || "").trim();
   state.unitCounterEditor.strengthText = String(state.unitCounterEditor.strengthText || "").trim();
+  state.unitCounterEditor.baseFillColor = normalizeUnitCounterBaseFillColor(state.unitCounterEditor.baseFillColor);
+  state.unitCounterEditor.organizationPct = normalizeUnitCounterStatPercent(
+    state.unitCounterEditor.organizationPct,
+    DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT
+  );
+  state.unitCounterEditor.equipmentPct = normalizeUnitCounterStatPercent(
+    state.unitCounterEditor.equipmentPct,
+    DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT
+  );
+  state.unitCounterEditor.statsPresetId = normalizeUnitCounterStatsPresetId(state.unitCounterEditor.statsPresetId || "regular");
+  state.unitCounterEditor.statsSource = ["preset", "random", "manual"].includes(String(state.unitCounterEditor.statsSource || "").trim().toLowerCase())
+    ? String(state.unitCounterEditor.statsSource || "").trim().toLowerCase()
+    : "preset";
   state.unitCounterEditor.size = normalizeUnitCounterSizeToken(state.unitCounterEditor.size);
 }
 
@@ -14690,6 +14785,7 @@ function getUnitCounterCardModel(counter = {}, { stackCount = 1 } = {}) {
     ...counter,
     presetId: preset.id,
   });
+  const combatState = getNormalizedUnitCounterCombatState(counter);
   return {
     counter,
     preset,
@@ -14701,6 +14797,12 @@ function getUnitCounterCardModel(counter = {}, { stackCount = 1 } = {}) {
     label: String(counter.label || "").trim(),
     subLabel: String(counter.subLabel || "").trim(),
     strengthText: String(counter.strengthText || "").trim(),
+    baseFillColor: combatState.baseFillColor || DEFAULT_UNIT_COUNTER_BASE_FILL,
+    baseFillColorOverride: combatState.baseFillColor,
+    organizationPct: combatState.organizationPct,
+    equipmentPct: combatState.equipmentPct,
+    statsPresetId: combatState.statsPresetId,
+    statsSource: combatState.statsSource,
     echelon: String(counter.echelon || preset.defaultEchelon || "").trim().toLowerCase(),
     echelonLabel: getUnitCounterEchelonLabel(counter.echelon || preset.defaultEchelon || ""),
     shortCode: String(counter.unitType || preset.shortCode || "").trim().toUpperCase() || preset.shortCode,
@@ -14727,28 +14829,58 @@ function getUnitCounterPreviewData(partialCounter = {}) {
     label: partialCounter.label || state.unitCounterEditor.label || "",
     subLabel: partialCounter.subLabel || state.unitCounterEditor.subLabel || "",
     strengthText: partialCounter.strengthText || state.unitCounterEditor.strengthText || "",
+    baseFillColor: partialCounter.baseFillColor ?? state.unitCounterEditor.baseFillColor ?? "",
+    organizationPct: partialCounter.organizationPct ?? state.unitCounterEditor.organizationPct ?? DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT,
+    equipmentPct: partialCounter.equipmentPct ?? state.unitCounterEditor.equipmentPct ?? DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT,
+    statsPresetId: partialCounter.statsPresetId || state.unitCounterEditor.statsPresetId || "regular",
+    statsSource: partialCounter.statsSource || state.unitCounterEditor.statsSource || "preset",
     size: partialCounter.size || state.unitCounterEditor.size || "medium",
   });
 }
 
 function getUnitCounterRenderEntries() {
   const counters = Array.isArray(state.unitCounters) ? state.unitCounters : [];
-  const zoomK = Math.max(0.1, Number(state.zoomTransform?.k || 1));
-  if (zoomK >= 1.75) {
-    return counters.map((counter) => ({ counter, stackCount: 1 }));
-  }
   const grouped = new Map();
   counters.forEach((counter) => {
     const featureId = String(counter.anchor?.featureId || "").trim();
     const lon = Number(counter.anchor?.lon || 0);
     const lat = Number(counter.anchor?.lat || 0);
-    const key = featureId || `${Math.round(lon * 2)}:${Math.round(lat * 2)}`;
+    const key = featureId || `${Math.round(lon * 3)}:${Math.round(lat * 3)}`;
     if (!grouped.has(key)) {
       grouped.set(key, []);
     }
     grouped.get(key).push(counter);
   });
-  return Array.from(grouped.values()).map((bucket) => ({ counter: bucket[0], stackCount: bucket.length }));
+  return Array.from(grouped.values()).map((bucket) => {
+    const sortedBucket = bucket
+      .slice()
+      .sort((a, b) => Number(a?.zIndex || 0) - Number(b?.zIndex || 0));
+    return {
+      counter: sortedBucket[sortedBucket.length - 1],
+      stackCount: sortedBucket.length,
+      stackItems: sortedBucket.slice(-3).reverse(),
+      hiddenStackCount: Math.max(0, sortedBucket.length - 3),
+    };
+  });
+}
+
+function getUnitCounterRenderScale(metrics, zoomK) {
+  const normalizedZoom = Math.max(0.1, Number(zoomK) || 1);
+  const desiredScreenScale = Math.max(0.4, Math.min(1.28, Math.pow(normalizedZoom, 0.08)));
+  const effectiveWidth = Number(metrics?.width || 0) * desiredScreenScale;
+  let opacity = 1;
+  let hidden = false;
+  if (effectiveWidth <= 14.5) {
+    opacity = Math.max(0, Math.min(1, (effectiveWidth - 11.3) / 3.2));
+    hidden = effectiveWidth <= 11.3;
+  }
+  return {
+    desiredScreenScale,
+    localScale: desiredScreenScale / normalizedZoom,
+    effectiveWidth,
+    hidden,
+    opacity,
+  };
 }
 
 function renderUnitCountersOverlay() {
@@ -14757,14 +14889,21 @@ function renderUnitCountersOverlay() {
   const selectedId = String(state.unitCounterEditor?.selectedId || "");
   const zoomK = Math.max(0.1, Number(state.zoomTransform?.k || 1));
   const entries = getUnitCounterRenderEntries()
-    .map(({ counter, stackCount }) => {
+    .map(({ counter, stackCount, stackItems = [], hiddenStackCount = 0 }) => {
       const projected = getProjectedPoint([counter.anchor?.lon, counter.anchor?.lat]);
       if (!projected) return null;
+      const model = getUnitCounterCardModel(counter, { stackCount });
+      const scaleModel = getUnitCounterRenderScale(model.metrics, zoomK);
+      if (scaleModel.hidden) return null;
       return {
         counter,
         projected,
         stackCount,
-        model: getUnitCounterCardModel(counter, { stackCount }),
+        hiddenStackCount,
+        stackItems,
+        stackPreview: stackItems.map((item) => getUnitCounterCardModel(item, { stackCount: 1 })),
+        model,
+        scaleModel,
       };
     })
     .filter(Boolean)
@@ -14775,6 +14914,12 @@ function renderUnitCountersOverlay() {
     .data(entries, (d) => d.counter.id);
 
   const groupEnter = groups.enter().append("g").attr("class", "unit-counter").style("cursor", "grab");
+  groupEnter.append("rect").attr("class", "unit-counter-stack-shadow is-back-2");
+  groupEnter.append("rect").attr("class", "unit-counter-stack-shell is-back-2");
+  groupEnter.append("rect").attr("class", "unit-counter-stack-strip is-back-2");
+  groupEnter.append("rect").attr("class", "unit-counter-stack-shadow is-back-1");
+  groupEnter.append("rect").attr("class", "unit-counter-stack-shell is-back-1");
+  groupEnter.append("rect").attr("class", "unit-counter-stack-strip is-back-1");
   groupEnter.append("rect").attr("class", "unit-counter-shadow");
   groupEnter.append("rect").attr("class", "unit-counter-shell");
   groupEnter.append("rect").attr("class", "unit-counter-strip");
@@ -14784,20 +14929,77 @@ function renderUnitCountersOverlay() {
   groupEnter.append("text").attr("class", "unit-counter-type-text");
   groupEnter.append("image").attr("class", "unit-counter-milsymbol");
   groupEnter.append("text").attr("class", "unit-counter-symbol");
+  groupEnter.append("rect").attr("class", "unit-counter-org-track");
+  groupEnter.append("rect").attr("class", "unit-counter-org-fill");
+  groupEnter.append("rect").attr("class", "unit-counter-equip-track");
+  groupEnter.append("rect").attr("class", "unit-counter-equip-fill");
   groupEnter.append("text").attr("class", "unit-counter-echelons");
   groupEnter.append("text").attr("class", "unit-counter-label");
   groupEnter.append("text").attr("class", "unit-counter-sublabel");
-  groupEnter.append("text").attr("class", "unit-counter-strength");
   groupEnter.append("circle").attr("class", "unit-counter-stack-badge");
   groupEnter.append("text").attr("class", "unit-counter-stack-text");
 
   const merged = groupEnter.merge(groups)
     .attr("transform", (d) => {
-      const metrics = d.model.metrics;
-      return `translate(${d.projected[0]},${d.projected[1]}) scale(${(metrics.scale || 1) / zoomK})`;
+      return `translate(${d.projected[0]},${d.projected[1]}) scale(${d.scaleModel.localScale})`;
     })
     .attr("data-counter-id", (d) => d.counter.id)
+    .attr("opacity", (d) => d.scaleModel.opacity)
     .attr("pointer-events", "all");
+
+  const applyStackPlate = (selection, {
+    plateIndex = 0,
+    shadowClass = "rect.unit-counter-stack-shadow",
+    shellClass = "rect.unit-counter-stack-shell",
+    stripClass = "rect.unit-counter-stack-strip",
+  } = {}) => {
+    const offsetX = plateIndex === 1 ? -1.8 : -3.4;
+    const offsetY = plateIndex === 1 ? -1.6 : -3.1;
+    const stackItemIndex = plateIndex;
+    selection.select(shadowClass)
+      .attr("display", (d) => (d.stackCount > stackItemIndex + 1 ? null : "none"))
+      .attr("x", (d) => -d.model.metrics.width / 2 + offsetX)
+      .attr("y", (d) => -d.model.metrics.height / 2 + offsetY)
+      .attr("width", (d) => d.model.metrics.width)
+      .attr("height", (d) => d.model.metrics.height)
+      .attr("rx", 2)
+      .attr("ry", 2)
+      .attr("fill", "rgba(15, 23, 42, 0.18)")
+      .attr("opacity", 0.38);
+
+    selection.select(shellClass)
+      .attr("display", (d) => (d.stackCount > stackItemIndex + 1 ? null : "none"))
+      .attr("x", (d) => -d.model.metrics.width / 2 + offsetX)
+      .attr("y", (d) => -d.model.metrics.height / 2 + offsetY)
+      .attr("width", (d) => d.model.metrics.width)
+      .attr("height", (d) => d.model.metrics.height)
+      .attr("rx", 2)
+      .attr("ry", 2)
+      .attr("fill", (d) => d.stackPreview?.[stackItemIndex + 1]?.baseFillColor || DEFAULT_UNIT_COUNTER_BASE_FILL)
+      .attr("stroke", "rgba(31, 41, 55, 0.46)")
+      .attr("stroke-width", 0.75);
+
+    selection.select(stripClass)
+      .attr("display", (d) => (d.stackCount > stackItemIndex + 1 ? null : "none"))
+      .attr("x", (d) => -d.model.metrics.width / 2 + offsetX)
+      .attr("y", (d) => -d.model.metrics.height / 2 + offsetY)
+      .attr("width", (d) => Math.max(1.6, d.model.metrics.width * 0.12))
+      .attr("height", (d) => d.model.metrics.height)
+      .attr("fill", (d) => d.stackPreview?.[stackItemIndex + 1]?.nation?.color || d.model.nation.color);
+  };
+
+  applyStackPlate(merged, {
+    plateIndex: 1,
+    shadowClass: "rect.unit-counter-stack-shadow.is-back-2",
+    shellClass: "rect.unit-counter-stack-shell.is-back-2",
+    stripClass: "rect.unit-counter-stack-strip.is-back-2",
+  });
+  applyStackPlate(merged, {
+    plateIndex: 0,
+    shadowClass: "rect.unit-counter-stack-shadow.is-back-1",
+    shellClass: "rect.unit-counter-stack-shell.is-back-1",
+    stripClass: "rect.unit-counter-stack-strip.is-back-1",
+  });
 
   merged.select("rect.unit-counter-shadow")
     .attr("x", (d) => -d.model.metrics.width / 2)
@@ -14817,7 +15019,7 @@ function renderUnitCountersOverlay() {
     .attr("height", (d) => d.model.metrics.height)
     .attr("rx", 2)
     .attr("ry", 2)
-    .attr("fill", "#f4f0e6")
+    .attr("fill", (d) => d.model.baseFillColor || DEFAULT_UNIT_COUNTER_BASE_FILL)
     .attr("stroke", (d) => (d.counter.id === selectedId ? "#f5ecd7" : "rgba(31, 41, 55, 0.82)"))
     .attr("stroke-width", (d) => (d.counter.id === selectedId ? 1.3 : 0.9));
 
@@ -14898,10 +15100,50 @@ function renderUnitCountersOverlay() {
     .attr("fill", "#0f172a")
     .text((d) => d.model.shortCode.slice(0, 3));
 
+  merged.select("rect.unit-counter-org-track")
+    .attr("x", (d) => -d.model.metrics.width / 2 + Math.max(2.8, d.model.metrics.width * 0.15))
+    .attr("y", (d) => d.model.metrics.height / 2 - 7.2)
+    .attr("width", (d) => d.model.metrics.width * 0.64)
+    .attr("height", 1.5)
+    .attr("rx", 0.75)
+    .attr("ry", 0.75)
+    .attr("fill", "rgba(255, 255, 255, 0.64)")
+    .attr("stroke", "rgba(15, 23, 42, 0.08)")
+    .attr("stroke-width", 0.22);
+
+  merged.select("rect.unit-counter-org-fill")
+    .attr("x", (d) => -d.model.metrics.width / 2 + Math.max(2.8, d.model.metrics.width * 0.15))
+    .attr("y", (d) => d.model.metrics.height / 2 - 7.2)
+    .attr("width", (d) => (d.model.metrics.width * 0.64) * (d.model.organizationPct / 100))
+    .attr("height", 1.5)
+    .attr("rx", 0.75)
+    .attr("ry", 0.75)
+    .attr("fill", "rgba(34, 197, 94, 0.94)");
+
+  merged.select("rect.unit-counter-equip-track")
+    .attr("x", (d) => -d.model.metrics.width / 2 + Math.max(2.8, d.model.metrics.width * 0.15))
+    .attr("y", (d) => d.model.metrics.height / 2 - 4.8)
+    .attr("width", (d) => d.model.metrics.width * 0.64)
+    .attr("height", 1.5)
+    .attr("rx", 0.75)
+    .attr("ry", 0.75)
+    .attr("fill", "rgba(255, 255, 255, 0.64)")
+    .attr("stroke", "rgba(15, 23, 42, 0.08)")
+    .attr("stroke-width", 0.22);
+
+  merged.select("rect.unit-counter-equip-fill")
+    .attr("x", (d) => -d.model.metrics.width / 2 + Math.max(2.8, d.model.metrics.width * 0.15))
+    .attr("y", (d) => d.model.metrics.height / 2 - 4.8)
+    .attr("width", (d) => (d.model.metrics.width * 0.64) * (d.model.equipmentPct / 100))
+    .attr("height", 1.5)
+    .attr("rx", 0.75)
+    .attr("ry", 0.75)
+    .attr("fill", "rgba(234, 179, 8, 0.96)");
+
   merged.select("text.unit-counter-echelons")
     .attr("display", (d) => (d.model.echelonLabel ? null : "none"))
     .attr("x", 0)
-    .attr("y", (d) => d.model.metrics.height / 2 - 2.5)
+    .attr("y", (d) => d.model.metrics.height / 2 - 1.8)
     .attr("text-anchor", "middle")
     .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
     .attr("font-size", 3.3)
@@ -14953,28 +15195,8 @@ function renderUnitCountersOverlay() {
     .attr("paint-order", "stroke")
     .text((d) => d.counter.subLabel || "");
 
-  merged.select("text.unit-counter-strength")
-    .attr("display", (d) => (
-      d.counter.strengthText
-      && (d.counter.id === selectedId || zoomK >= 8)
-        ? null
-        : "none"
-    ))
-    .attr("x", (d) => d.model.metrics.width / 2 - 2)
-    .attr("y", (d) => d.model.metrics.height / 2 + 4.6)
-    .attr("text-anchor", "end")
-    .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
-    .attr("dominant-baseline", "hanging")
-    .attr("font-size", 3.4)
-    .attr("font-weight", 700)
-    .attr("fill", "#f8e7be")
-    .attr("stroke", "rgba(17, 24, 39, 0.84)")
-    .attr("stroke-width", 0.3)
-    .attr("paint-order", "stroke")
-    .text((d) => d.counter.strengthText || "");
-
   merged.select("circle.unit-counter-stack-badge")
-    .attr("display", (d) => (d.stackCount > 1 ? null : "none"))
+    .attr("display", (d) => ((d.hiddenStackCount > 0 || d.stackCount > 3) ? null : "none"))
     .attr("cx", (d) => d.model.metrics.width / 2 - 1.5)
     .attr("cy", (d) => -d.model.metrics.height / 2 + 1.5)
     .attr("r", 3.5)
@@ -14983,7 +15205,7 @@ function renderUnitCountersOverlay() {
     .attr("stroke-width", 0.6);
 
   merged.select("text.unit-counter-stack-text")
-    .attr("display", (d) => (d.stackCount > 1 ? null : "none"))
+    .attr("display", (d) => ((d.hiddenStackCount > 0 || d.stackCount > 3) ? null : "none"))
     .attr("x", (d) => d.model.metrics.width / 2 - 1.5)
     .attr("y", (d) => -d.model.metrics.height / 2 + 1.5)
     .attr("text-anchor", "middle")
@@ -14992,7 +15214,7 @@ function renderUnitCountersOverlay() {
     .attr("font-size", 3.1)
     .attr("font-weight", 700)
     .attr("fill", "#f8fafc")
-    .text((d) => `+${d.stackCount - 1}`);
+    .text((d) => `+${Math.max(1, d.stackCount - 3)}`);
 
   if (globalThis.d3?.drag) {
     if (!renderUnitCountersOverlay.dragBehavior) {
@@ -15040,18 +15262,7 @@ function renderUnitCountersOverlay() {
   merged.on("click", (_event, datum) => {
     ensureUnitCounterEditorState();
     state.unitCounterEditor.selectedId = datum.counter.id;
-    state.unitCounterEditor.renderer = String(datum.counter.renderer || DEFAULT_UNIT_COUNTER_RENDERER);
-    state.unitCounterEditor.label = String(datum.counter.label || "");
-    state.unitCounterEditor.sidc = String(datum.counter.sidc || datum.counter.symbolCode || "").trim().toUpperCase();
-    state.unitCounterEditor.symbolCode = String(datum.counter.symbolCode || datum.counter.sidc || "").trim().toUpperCase();
-    state.unitCounterEditor.nationTag = canonicalCountryCode(datum.counter.nationTag || "");
-    state.unitCounterEditor.nationSource = String(datum.counter.nationSource || "controller").trim().toLowerCase() || "controller";
-    state.unitCounterEditor.presetId = String(datum.counter.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toLowerCase() || DEFAULT_UNIT_COUNTER_PRESET_ID;
-    state.unitCounterEditor.unitType = String(datum.counter.unitType || getUnitCounterPresetById(datum.counter.presetId).unitType || "").trim().toUpperCase();
-    state.unitCounterEditor.echelon = String(datum.counter.echelon || "").trim().toLowerCase();
-    state.unitCounterEditor.subLabel = String(datum.counter.subLabel || "");
-    state.unitCounterEditor.strengthText = String(datum.counter.strengthText || "");
-    state.unitCounterEditor.size = normalizeUnitCounterSizeToken(datum.counter.size || "medium");
+    assignUnitCounterEditorFromCounter(datum.counter);
     state.unitCountersDirty = true;
     updateStrategicOverlayUi();
     renderUnitCountersIfNeeded({ force: true });
@@ -15884,6 +16095,7 @@ function placeUnitCounterFromEvent(event) {
     || preset.baseSidc
     || (String(state.unitCounterEditor.renderer || "").toLowerCase() === "milstd" ? DEFAULT_MILSTD_SIDC : "")
   ).trim().toUpperCase();
+  const normalizedCombatState = getNormalizedUnitCounterCombatState(state.unitCounterEditor);
   state.unitCounters.push({
     id,
     renderer: String(state.unitCounterEditor.renderer || preset.defaultRenderer || state.annotationView?.unitRendererDefault || DEFAULT_UNIT_COUNTER_RENDERER),
@@ -15897,6 +16109,11 @@ function placeUnitCounterFromEvent(event) {
     echelon: String(state.unitCounterEditor.echelon || preset.defaultEchelon || "").trim().toLowerCase(),
     subLabel: String(state.unitCounterEditor.subLabel || "").trim(),
     strengthText: String(state.unitCounterEditor.strengthText || "").trim(),
+    baseFillColor: normalizedCombatState.baseFillColor,
+    organizationPct: normalizedCombatState.organizationPct,
+    equipmentPct: normalizedCombatState.equipmentPct,
+    statsPresetId: normalizedCombatState.statsPresetId,
+    statsSource: normalizedCombatState.statsSource,
     size: normalizeUnitCounterSizeToken(state.unitCounterEditor.size || "medium"),
     facing: 0,
     zIndex: state.unitCounters.length,
@@ -15933,10 +16150,22 @@ function startUnitCounterPlacement({
   echelon = "",
   subLabel = "",
   strengthText = "",
+  baseFillColor = "",
+  organizationPct = DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT,
+  equipmentPct = DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT,
+  statsPresetId = "regular",
+  statsSource = "preset",
   size = "medium",
 } = {}) {
   ensureUnitCounterEditorState();
   const preset = getUnitCounterPresetById(presetId || DEFAULT_UNIT_COUNTER_PRESET_ID);
+  const normalizedCombatState = getNormalizedUnitCounterCombatState({
+    baseFillColor,
+    organizationPct,
+    equipmentPct,
+    statsPresetId,
+    statsSource,
+  });
   state.unitCounterEditor.active = true;
   state.unitCounterEditor.renderer = String(renderer || preset.defaultRenderer || DEFAULT_UNIT_COUNTER_RENDERER);
   state.unitCounterEditor.label = String(label || "");
@@ -15951,6 +16180,11 @@ function startUnitCounterPlacement({
   state.unitCounterEditor.echelon = String(echelon || preset.defaultEchelon || "").trim().toLowerCase();
   state.unitCounterEditor.subLabel = String(subLabel || "");
   state.unitCounterEditor.strengthText = String(strengthText || "");
+  state.unitCounterEditor.baseFillColor = normalizedCombatState.baseFillColor;
+  state.unitCounterEditor.organizationPct = normalizedCombatState.organizationPct;
+  state.unitCounterEditor.equipmentPct = normalizedCombatState.equipmentPct;
+  state.unitCounterEditor.statsPresetId = normalizedCombatState.statsPresetId;
+  state.unitCounterEditor.statsSource = normalizedCombatState.statsSource;
   state.unitCounterEditor.size = normalizeUnitCounterSizeToken(size || "medium");
   state.unitCountersDirty = true;
   updateStrategicOverlayUi();
@@ -15971,18 +16205,7 @@ function selectUnitCounterById(id) {
   const counter = (state.unitCounters || []).find((entry) => String(entry?.id || "") === selectedId) || null;
   state.unitCounterEditor.selectedId = selectedId || null;
   if (counter) {
-    state.unitCounterEditor.renderer = String(counter.renderer || DEFAULT_UNIT_COUNTER_RENDERER);
-    state.unitCounterEditor.label = String(counter.label || "");
-    state.unitCounterEditor.sidc = String(counter.sidc || counter.symbolCode || "").trim().toUpperCase();
-    state.unitCounterEditor.symbolCode = String(counter.symbolCode || counter.sidc || "").trim().toUpperCase();
-    state.unitCounterEditor.nationTag = canonicalCountryCode(counter.nationTag || "");
-    state.unitCounterEditor.nationSource = String(counter.nationSource || "controller").trim().toLowerCase() || "controller";
-    state.unitCounterEditor.presetId = String(counter.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toLowerCase() || DEFAULT_UNIT_COUNTER_PRESET_ID;
-    state.unitCounterEditor.unitType = String(counter.unitType || getUnitCounterPresetById(counter.presetId).unitType || "").trim().toUpperCase();
-    state.unitCounterEditor.echelon = String(counter.echelon || "").trim().toLowerCase();
-    state.unitCounterEditor.subLabel = String(counter.subLabel || "");
-    state.unitCounterEditor.strengthText = String(counter.strengthText || "");
-    state.unitCounterEditor.size = normalizeUnitCounterSizeToken(counter.size || "medium");
+    assignUnitCounterEditorFromCounter(counter);
   }
   state.unitCountersDirty = true;
   updateStrategicOverlayUi();
@@ -16014,6 +16237,15 @@ function updateSelectedUnitCounter(partial = {}) {
   if (partial.echelon !== undefined) counter.echelon = String(partial.echelon || "").trim().toLowerCase();
   if (partial.subLabel !== undefined) counter.subLabel = String(partial.subLabel || "");
   if (partial.strengthText !== undefined) counter.strengthText = String(partial.strengthText || "");
+  if (partial.baseFillColor !== undefined) counter.baseFillColor = normalizeUnitCounterBaseFillColor(partial.baseFillColor);
+  if (partial.organizationPct !== undefined) counter.organizationPct = normalizeUnitCounterStatPercent(partial.organizationPct, DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT);
+  if (partial.equipmentPct !== undefined) counter.equipmentPct = normalizeUnitCounterStatPercent(partial.equipmentPct, DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT);
+  if (partial.statsPresetId !== undefined) counter.statsPresetId = normalizeUnitCounterStatsPresetId(partial.statsPresetId || "regular");
+  if (partial.statsSource !== undefined) {
+    counter.statsSource = ["preset", "random", "manual"].includes(String(partial.statsSource || "").trim().toLowerCase())
+      ? String(partial.statsSource || "").trim().toLowerCase()
+      : "preset";
+  }
   if (partial.size) counter.size = normalizeUnitCounterSizeToken(partial.size || "medium");
   selectUnitCounterById(selectedId);
   state.unitCountersDirty = true;

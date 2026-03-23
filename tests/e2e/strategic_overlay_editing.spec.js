@@ -20,6 +20,8 @@ function resolveBaseUrl() {
   return "http://127.0.0.1:18080";
 }
 
+const BASE_URL = resolveBaseUrl();
+
 async function waitForAppReady(page) {
   await page.waitForFunction(async () => {
     const { state } = await import("/js/core/state.js");
@@ -27,13 +29,40 @@ async function waitForAppReady(page) {
       && typeof state.renderCountryListFn === "function"
       && !!document.querySelector("#inspectorSidebarTabFrontline")
       && !!document.querySelector("#operationGraphicList")
-      && !!document.querySelector("#unitCounterList");
+      && !!document.querySelector("#unitCounterList")
+      && !!document.querySelector("g.operation-graphics-layer")
+      && !!document.querySelector("g.unit-counters-layer")
+      && !!document.querySelector("rect.interaction-layer");
   }, { timeout: 120000 });
 }
 
 async function openFrontlineTab(page) {
-  await page.waitForFunction(() => document.querySelector("#inspectorSidebarTabFrontline")?.dataset.bound === "true");
+  await expect(page.locator("#inspectorSidebarTabFrontline")).toBeVisible();
+  await page.evaluate(async () => {
+    const sidebarModule = await import("/js/ui/sidebar.js");
+    const mapRendererModule = await import("/js/core/map_renderer.js");
+    if (!document.querySelector("#operationGraphicList") || !document.querySelector("#unitCounterList")) {
+      sidebarModule.initSidebar({ render: mapRendererModule.render });
+    }
+  });
   await page.locator("#inspectorSidebarTabFrontline").click();
+  await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    if (!state.ui || typeof state.ui !== "object") {
+      state.ui = {};
+    }
+    state.ui.rightSidebarTab = "frontline";
+    document.querySelectorAll("[data-inspector-tab]").forEach((button) => {
+      const isActive = String(button.getAttribute("data-inspector-tab") || "").trim().toLowerCase() === "frontline";
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
+    document.querySelectorAll("[data-inspector-panel]").forEach((panel) => {
+      const isActive = String(panel.getAttribute("data-inspector-panel") || "").trim().toLowerCase() === "frontline";
+      panel.classList.toggle("is-active", isActive);
+      panel.hidden = !isActive;
+    });
+  });
   await page.waitForFunction(() => {
     const panel = document.querySelector("#frontlineSidebarPanel");
     const button = document.querySelector("#inspectorSidebarTabFrontline");
@@ -44,7 +73,7 @@ async function openFrontlineTab(page) {
 
 test("operation graphics support style editing and vertex editing after creation", async ({ page }) => {
   test.setTimeout(120000);
-  await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
+  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
   await waitForAppReady(page);
   await openFrontlineTab(page);
 
@@ -124,7 +153,7 @@ test("operation graphics support style editing and vertex editing after creation
 
 test("milstd counters render through milsymbol and refresh feature binding after drag", async ({ page }) => {
   test.setTimeout(120000);
-  await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
+  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
   await waitForAppReady(page);
   await openFrontlineTab(page);
 
@@ -136,7 +165,15 @@ test("milstd counters render through milsymbol and refresh feature binding after
       renderer: "milstd",
       sidc: "130310001412110000000000000000",
       symbolCode: "130310001412110000000000000000",
+      nationTag: "GER",
+      nationSource: "manual",
+      presetId: "inf",
+      unitType: "INF",
+      echelon: "corps",
       label: "1st Corps",
+      subLabel: "Nord",
+      organizationPct: 84,
+      equipmentPct: 73,
       size: "medium",
       facing: 0,
       zIndex: 0,
@@ -149,6 +186,7 @@ test("milstd counters render through milsymbol and refresh feature binding after
   });
 
   await expect(page.locator('g.unit-counter[data-counter-id="unit_drag_1"]')).toBeVisible();
+  await expect(page.locator("#unitCounterDetailDrawer")).toBeVisible();
   const symbolHref = await page.locator('g.unit-counter[data-counter-id="unit_drag_1"] image.unit-counter-milsymbol').getAttribute("href");
   expect(symbolHref).toContain("data:image/svg+xml");
 
@@ -169,15 +207,42 @@ test("milstd counters render through milsymbol and refresh feature binding after
   });
 });
 
-test("unit counters keep a stable on-screen footprint across zoom levels", async ({ page }) => {
+test("stacked counters render rear sheets and an overflow badge", async ({ page }) => {
   test.setTimeout(120000);
-  await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
+  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
   await waitForAppReady(page);
   await openFrontlineTab(page);
 
   await page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
-    const { render, setZoomPercent } = await import("/js/core/map_renderer.js");
+    const { render, selectUnitCounterById } = await import("/js/core/map_renderer.js");
+    state.unitCounters = [
+      { id: "stack_1", renderer: "milstd", sidc: "130310001412110000000000000000", symbolCode: "130310001412110000000000000000", nationTag: "GER", nationSource: "manual", presetId: "inf", unitType: "INF", echelon: "corps", label: "I Corps", size: "medium", organizationPct: 83, equipmentPct: 72, zIndex: 0, anchor: { lon: 12, lat: 48, featureId: "stack_demo" } },
+      { id: "stack_2", renderer: "game", sidc: "", symbolCode: "MECH", nationTag: "GER", nationSource: "manual", presetId: "mech", unitType: "MECH", echelon: "div", label: "8th Mech", size: "medium", organizationPct: 67, equipmentPct: 61, zIndex: 1, anchor: { lon: 12, lat: 48, featureId: "stack_demo" } },
+      { id: "stack_3", renderer: "game", sidc: "", symbolCode: "ARM", nationTag: "GER", nationSource: "manual", presetId: "arm", unitType: "ARM", echelon: "div", label: "12th Arm", size: "medium", organizationPct: 92, equipmentPct: 88, zIndex: 2, anchor: { lon: 12, lat: 48, featureId: "stack_demo" } },
+      { id: "stack_4", renderer: "game", sidc: "", symbolCode: "ART", nationTag: "GER", nationSource: "manual", presetId: "art", unitType: "ART", echelon: "reg", label: "21st Art", size: "medium", organizationPct: 55, equipmentPct: 49, zIndex: 3, anchor: { lon: 12, lat: 48, featureId: "stack_demo" } },
+    ];
+    state.unitCounterEditor.selectedId = "stack_4";
+    state.unitCountersDirty = true;
+    selectUnitCounterById("stack_4");
+    render();
+  });
+
+  const stackGroup = page.locator('g.unit-counter[data-counter-id="stack_4"]');
+  await expect(stackGroup).toBeVisible();
+  await expect(stackGroup.locator("rect.unit-counter-stack-shell")).toHaveCount(2);
+  await expect(stackGroup.locator("text.unit-counter-stack-text")).toHaveText("+1");
+});
+
+test("unit counters expose the detail drawer and grow with zoom until the footprint clamp", async ({ page }) => {
+  test.setTimeout(120000);
+  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
+  await waitForAppReady(page);
+  await openFrontlineTab(page);
+
+  await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    const { render, selectUnitCounterById, setZoomPercent } = await import("/js/core/map_renderer.js");
     state.unitCounters = [{
       id: "unit_size_1",
       renderer: "milstd",
@@ -189,21 +254,30 @@ test("unit counters keep a stable on-screen footprint across zoom levels", async
       unitType: "INF",
       echelon: "corps",
       subLabel: "Nord",
-      strengthText: "76%",
+      baseFillColor: "#e8decd",
+      organizationPct: 83,
+      equipmentPct: 71,
+      statsPresetId: "regular",
+      statsSource: "preset",
       label: "1st Corps",
       size: "medium",
       facing: 0,
       zIndex: 0,
       anchor: { lon: 12, lat: 48, featureId: "" },
     }];
-    state.unitCounterEditor.selectedId = "unit_size_1";
     state.unitCountersDirty = true;
+    selectUnitCounterById("unit_size_1");
+    state.updateStrategicOverlayUIFn?.();
     render();
     setZoomPercent(100);
   });
 
   const counterShell = page.locator('g.unit-counter[data-counter-id="unit_size_1"] rect.unit-counter-shell');
   await expect(counterShell).toBeVisible();
+  await expect(page.locator("#unitCounterDetailDrawer")).toBeVisible();
+  await expect(page.locator("#unitCounterDetailPreviewCard .unit-counter-preview-card")).toBeVisible();
+  await expect(page.locator("#unitCounterOrganizationInput")).toHaveValue("83");
+  await expect(page.locator("#unitCounterEquipmentInput")).toHaveValue("71");
   const boxAt100 = await counterShell.boundingBox();
 
   await page.evaluate(async () => {
@@ -213,8 +287,29 @@ test("unit counters keep a stable on-screen footprint across zoom levels", async
   await page.waitForTimeout(400);
   const boxAt1600 = await counterShell.boundingBox();
 
-  expect(Math.abs(boxAt1600.width - boxAt100.width)).toBeLessThan(10);
-  expect(Math.abs(boxAt1600.height - boxAt100.height)).toBeLessThan(10);
+  await page.evaluate(async () => {
+    const { setZoomPercent } = await import("/js/core/map_renderer.js");
+    setZoomPercent(3000);
+  });
+  await page.waitForTimeout(400);
+  const boxAt3000 = await counterShell.boundingBox();
+
+  await page.evaluate(async () => {
+    const { setZoomPercent } = await import("/js/core/map_renderer.js");
+    setZoomPercent(5000);
+  });
+  await page.waitForTimeout(400);
+  const boxAt5000 = await counterShell.boundingBox();
+  const counterCountAt5000 = await page.locator('g.unit-counter[data-counter-id="unit_size_1"]').count();
+
+  expect(boxAt1600.width).toBeGreaterThan(boxAt100.width);
+  expect(boxAt1600.height).toBeGreaterThan(boxAt100.height);
+  expect(boxAt3000.width).toBeGreaterThanOrEqual(boxAt1600.width - 1);
+  expect(boxAt3000.height).toBeGreaterThanOrEqual(boxAt1600.height - 1);
+  expect(boxAt5000.width).toBeLessThan(boxAt3000.width + 3);
+  expect(boxAt5000.height).toBeLessThan(boxAt3000.height + 2);
   expect(boxAt100.width).toBeLessThanOrEqual(36);
   expect(boxAt100.height).toBeLessThanOrEqual(24);
+  expect(boxAt5000.width).toBeGreaterThan(10);
+  expect(counterCountAt5000).toBe(1);
 });

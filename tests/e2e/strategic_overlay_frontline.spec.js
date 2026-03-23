@@ -20,6 +20,8 @@ function resolveBaseUrl() {
   return "http://127.0.0.1:18080";
 }
 
+const BASE_URL = resolveBaseUrl();
+
 async function waitForProjectUiReady(page) {
   await page.waitForFunction(async () => {
     const { state } = await import("/js/core/state.js");
@@ -65,7 +67,6 @@ async function applyScenario(page, scenarioId) {
 
 test("strategic frontline overlay reacts to controller changes", async ({ page }) => {
   test.setTimeout(120000);
-  const baseUrl = resolveBaseUrl();
   const consoleErrors = [];
   const networkFailures = [];
 
@@ -87,7 +88,7 @@ test("strategic frontline overlay reacts to controller changes", async ({ page }
     });
   });
 
-  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
+  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(1200);
   await waitForProjectUiReady(page);
   await applyScenario(page, "tno_1962");
@@ -123,10 +124,13 @@ test("strategic frontline overlay reacts to controller changes", async ({ page }
     const stack = document.querySelector("#frontlineTabStack");
     const frontlineCard = document.querySelector("#frontlineOverlayPanel");
     const strategicCard = document.querySelector("#strategicOverlayPanel");
+    const counterPreview = document.querySelector("#unitCounterPreviewCard");
+    const detailDrawer = document.querySelector("#unitCounterDetailDrawer");
     const panelRect = tabPanel?.getBoundingClientRect?.();
     const stackRect = stack?.getBoundingClientRect?.();
     const frontlineRect = frontlineCard?.getBoundingClientRect?.();
     const strategicRect = strategicCard?.getBoundingClientRect?.();
+    const previewRect = counterPreview?.getBoundingClientRect?.();
     const stackStyle = stack ? globalThis.getComputedStyle(stack) : null;
     return {
       stackPaddingLeft: Number.parseFloat(stackStyle?.paddingLeft || "0") || 0,
@@ -136,6 +140,10 @@ test("strategic frontline overlay reacts to controller changes", async ({ page }
       stackInset: panelRect && stackRect ? stackRect.left - panelRect.left : 0,
       workbenchBlockCount: document.querySelectorAll("#strategicOverlayPanel .frontline-workbench-block").length,
       styleChoiceCount: document.querySelectorAll("[data-frontline-style-choice]").length,
+      counterPreviewWidth: previewRect?.width || 0,
+      counterPreviewHeight: previewRect?.height || 0,
+      detailDrawerHidden: detailDrawer?.classList.contains("hidden") ?? null,
+      counterStatPresetCount: document.querySelectorAll("[data-unit-counter-stats-preset-choice]").length,
     };
   });
 
@@ -145,6 +153,14 @@ test("strategic frontline overlay reacts to controller changes", async ({ page }
   expect(frontlineLayout.stackGap).toBeGreaterThan(0);
   expect(frontlineLayout.workbenchBlockCount).toBe(2);
   expect(frontlineLayout.styleChoiceCount).toBe(3);
+  expect(frontlineLayout.counterPreviewWidth).toBeGreaterThan(60);
+  expect(frontlineLayout.counterPreviewWidth).toBeLessThan(420);
+  expect(frontlineLayout.counterPreviewHeight).toBeLessThan(280);
+  expect(frontlineLayout.detailDrawerHidden).toBeTruthy();
+  expect(frontlineLayout.counterStatPresetCount).toBe(5);
+
+  await page.locator("#unitCounterDetailToggleBtn").click();
+  await expect(page.locator("#unitCounterDetailDrawer")).toBeVisible();
 
   const initialSnapshot = await page.evaluate(() => ({
     pathCount: document.querySelectorAll(".frontline-overlay-layer path.frontline-path").length,
