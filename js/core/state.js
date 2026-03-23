@@ -1274,6 +1274,11 @@ export const state = {
       contourStrength: 0.75,
       experimentalAdvancedStyles: false,
       coastalAccentEnabled: true,
+      shallowBandFadeEndZoom: 2.8,
+      midBandFadeEndZoom: 3.4,
+      deepBandFadeEndZoom: 4.2,
+      scenarioSyntheticContourFadeEndZoom: 3.0,
+      scenarioShallowContourFadeEndZoom: 3.4,
     },
     lakes: createDefaultLakeStyleConfig(),
     cityPoints: {

@@ -70,6 +70,70 @@ test("dev workspace locale helper prefers effective scenario geo locale over raw
   expect(result.mergedEntry).toEqual({ en: "Effective EN", zh: "生效中文" });
 });
 
+test("explicit scenario geo locale patch wins over derived city override sync", async ({ page }) => {
+  await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
+
+  const result = await page.evaluate(async () => {
+    const stateModuleUrl = new URL("/js/core/state.js", window.location.href).href;
+    const scenarioManagerModuleUrl = new URL("/js/core/scenario_manager.js", window.location.href).href;
+    const { state } = await import(stateModuleUrl);
+    const { syncScenarioLocalizationState } = await import(scenarioManagerModuleUrl);
+
+    state.baseGeoLocales = {
+      TEST_HOST: { en: "Base Host", zh: "基础主机" },
+    };
+    state.scenarioGeoLocalePatchData = {
+      geo: {
+        TEST_HOST: { en: "Patch Host", zh: "补丁主机" },
+      },
+    };
+    state.scenarioCityOverridesData = {
+      cities: {
+        TEST_CITY: {
+          city_id: "TEST_CITY",
+          stable_key: "TEST_CITY",
+          name_en: "Derived City",
+          name_zh: "派生城市",
+        },
+      },
+      featureCollection: null,
+    };
+    state.worldCitiesData = {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          id: "TEST_CITY",
+          properties: {
+            id: "TEST_CITY",
+            __city_id: "TEST_CITY",
+            __city_stable_key: "TEST_CITY",
+            __city_host_feature_id: "TEST_HOST",
+          },
+          geometry: {
+            type: "Point",
+            coordinates: [0, 0],
+          },
+        },
+      ],
+    };
+    state.locales = {
+      ...(state.locales || {}),
+      geo: {},
+    };
+
+    syncScenarioLocalizationState();
+
+    return {
+      effectiveEntry: state.locales?.geo?.TEST_HOST || null,
+      patchEntry: state.scenarioGeoLocalePatchData?.geo?.TEST_HOST || null,
+    };
+  });
+
+  expect(result.patchEntry).toEqual({ en: "Patch Host", zh: "补丁主机" });
+  expect(result.effectiveEntry).toEqual({ en: "Patch Host", zh: "补丁主机" });
+});
+
 test("dev workspace select option labels render injected markup as literal text", async ({ page }) => {
   await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(1200);

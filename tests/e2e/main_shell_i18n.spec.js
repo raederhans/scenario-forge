@@ -25,6 +25,9 @@ test("main shell static i18n updates visible labels and aria text", async ({ pag
   const workspaceHeading = page.locator(".sidebar-shell-heading").first();
   const dockKicker = page.locator(".dock-shell-kicker");
   const dockHint = page.locator(".dock-shell-hint");
+  const languageBtn = page.locator("#btnToggleLang");
+  const recentColors = page.locator("#recentColors");
+  const frontlineIntro = page.locator(".inspector-frontline-intro");
 
   await expect(currentTool).toHaveText("Tools");
   await expect(leftPanelToggle).toHaveText("Panels");
@@ -38,6 +41,11 @@ test("main shell static i18n updates visible labels and aria text", async ({ pag
   await expect(workspaceHeading).toHaveText("Workspace");
   await expect(dockKicker).toHaveText("Quick Actions");
   await expect(dockHint).toHaveText("Current tool, paint mode, and map actions");
+  await expect(languageBtn).toHaveAttribute("aria-label", "Language");
+  await expect(recentColors).toHaveAttribute("aria-label", "Recent colors");
+  await expect(frontlineIntro).toHaveText(
+    "Derived frontlines stay optional and project-local. Enable them only when you want a conflict view."
+  );
 
   await page.locator("#btnToggleLang").click();
 
@@ -53,4 +61,9 @@ test("main shell static i18n updates visible labels and aria text", async ({ pag
   await expect(workspaceHeading).not.toHaveText("Workspace");
   await expect(dockKicker).not.toHaveText("Quick Actions");
   await expect(dockHint).not.toHaveText("Current tool, paint mode, and map actions");
+  await expect(languageBtn).not.toHaveAttribute("aria-label", "Language");
+  await expect(recentColors).not.toHaveAttribute("aria-label", "Recent colors");
+  await expect(frontlineIntro).not.toHaveText(
+    "Derived frontlines stay optional and project-local. Enable them only when you want a conflict view."
+  );
 });

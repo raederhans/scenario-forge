@@ -2583,7 +2583,7 @@ function createDevWorkspaceQuickbar(bottomDock) {
         <span id="devQuickControllerValue" class="dev-quick-value">--</span>
       </div>
     </div>
-    <div class="dev-workspace-quick-actions" role="toolbar" aria-label="Development quick actions">
+    <div class="dev-workspace-quick-actions" role="toolbar" aria-label="Development quick actions" data-i18n-aria-label="Development quick actions">
       <input
         id="devQuickOwnerInput"
         class="input dev-workspace-input dev-workspace-quick-input"

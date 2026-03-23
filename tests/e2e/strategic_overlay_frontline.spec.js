@@ -51,7 +51,7 @@ async function applyScenario(page, scenarioId) {
 }
 
 test("strategic frontline overlay reacts to controller changes", async ({ page }) => {
-  test.setTimeout(60000);
+  test.setTimeout(120000);
   const baseUrl = resolveBaseUrl();
   const consoleErrors = [];
   const networkFailures = [];
@@ -98,8 +98,36 @@ test("strategic frontline overlay reacts to controller changes", async ({ page }
   expect(splitFeature.baselineOwner).not.toBe(splitFeature.baselineController);
 
   await page.locator("#inspectorSidebarTabFrontline").click();
+  await expect(page.locator("#frontlineSidebarPanel #frontlineOverlayPanel")).toBeVisible();
+  await expect(page.locator("#frontlineSidebarPanel #strategicOverlayPanel")).toBeVisible();
+  await expect(page.locator("#inspectorSidebarPanel #strategicOverlayPanel")).toHaveCount(0);
+  await expect(page.locator("#projectLegendStack #strategicOverlayPanel")).toHaveCount(0);
   await expect(page.locator("#frontlineEmptyState")).toBeVisible();
   await expect(page.locator("#frontlineEnabledToggle")).not.toBeChecked();
+
+  const frontlineLayout = await page.evaluate(() => {
+    const tabPanel = document.querySelector("#frontlineSidebarPanel");
+    const stack = document.querySelector("#frontlineTabStack");
+    const frontlineCard = document.querySelector("#frontlineOverlayPanel");
+    const strategicCard = document.querySelector("#strategicOverlayPanel");
+    const panelRect = tabPanel?.getBoundingClientRect?.();
+    const stackRect = stack?.getBoundingClientRect?.();
+    const frontlineRect = frontlineCard?.getBoundingClientRect?.();
+    const strategicRect = strategicCard?.getBoundingClientRect?.();
+    const stackStyle = stack ? globalThis.getComputedStyle(stack) : null;
+    return {
+      stackPaddingLeft: Number.parseFloat(stackStyle?.paddingLeft || "0") || 0,
+      stackGap: Number.parseFloat(stackStyle?.rowGap || stackStyle?.gap || "0") || 0,
+      frontlineInset: panelRect && frontlineRect ? frontlineRect.left - panelRect.left : 0,
+      strategicInset: panelRect && strategicRect ? strategicRect.left - panelRect.left : 0,
+      stackInset: panelRect && stackRect ? stackRect.left - panelRect.left : 0,
+    };
+  });
+
+  expect(frontlineLayout.stackPaddingLeft > 0 || frontlineLayout.stackInset >= 8).toBeTruthy();
+  expect(frontlineLayout.frontlineInset).toBeGreaterThanOrEqual(8);
+  expect(frontlineLayout.strategicInset).toBeGreaterThanOrEqual(8);
+  expect(frontlineLayout.stackGap).toBeGreaterThan(0);
 
   const initialSnapshot = await page.evaluate(() => ({
     pathCount: document.querySelectorAll(".frontline-overlay-layer path.frontline-path").length,

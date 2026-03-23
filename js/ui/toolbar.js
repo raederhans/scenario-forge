@@ -13,7 +13,8 @@ import {
   autoFillMap,
   getZoomPercent,
   invalidateOceanBackgroundVisualState,
-  invalidateOceanTextureVisualState,
+  invalidateOceanCoastalAccentVisualState,
+  invalidateOceanVisualState,
   invalidateOceanWaterInteractionVisualState,
   refreshColorState,
   resetZoomToFit,
@@ -302,6 +303,12 @@ function initToolbar({ render } = {}) {
   const oceanTextureOpacity = document.getElementById("oceanTextureOpacity");
   const oceanTextureScale = document.getElementById("oceanTextureScale");
   const oceanContourStrength = document.getElementById("oceanContourStrength");
+  const oceanBathymetryDebugDetails = document.getElementById("oceanBathymetryDebugDetails");
+  const oceanShallowFadeEndZoom = document.getElementById("oceanShallowFadeEndZoom");
+  const oceanMidFadeEndZoom = document.getElementById("oceanMidFadeEndZoom");
+  const oceanDeepFadeEndZoom = document.getElementById("oceanDeepFadeEndZoom");
+  const oceanScenarioSyntheticContourFadeEndZoom = document.getElementById("oceanScenarioSyntheticContourFadeEndZoom");
+  const oceanScenarioShallowContourFadeEndZoom = document.getElementById("oceanScenarioShallowContourFadeEndZoom");
   const toggleLang = document.getElementById("btnToggleLang");
   const themeSelect = document.getElementById("themeSelect");
   const referenceImageInput = document.getElementById("referenceImageInput");
@@ -364,6 +371,11 @@ function initToolbar({ render } = {}) {
   const oceanTextureOpacityValue = document.getElementById("oceanTextureOpacityValue");
   const oceanTextureScaleValue = document.getElementById("oceanTextureScaleValue");
   const oceanContourStrengthValue = document.getElementById("oceanContourStrengthValue");
+  const oceanShallowFadeEndZoomValue = document.getElementById("oceanShallowFadeEndZoomValue");
+  const oceanMidFadeEndZoomValue = document.getElementById("oceanMidFadeEndZoomValue");
+  const oceanDeepFadeEndZoomValue = document.getElementById("oceanDeepFadeEndZoomValue");
+  const oceanScenarioSyntheticContourFadeEndZoomValue = document.getElementById("oceanScenarioSyntheticContourFadeEndZoomValue");
+  const oceanScenarioShallowContourFadeEndZoomValue = document.getElementById("oceanScenarioShallowContourFadeEndZoomValue");
   const referenceOpacityValue = document.getElementById("referenceOpacityValue");
   const referenceScaleValue = document.getElementById("referenceScaleValue");
   const referenceOffsetXValue = document.getElementById("referenceOffsetXValue");
@@ -1446,6 +1458,41 @@ function initToolbar({ render } = {}) {
     0,
     1
   );
+  state.styleConfig.ocean.shallowBandFadeEndZoom = clamp(
+    Number.isFinite(Number(state.styleConfig.ocean.shallowBandFadeEndZoom))
+      ? Number(state.styleConfig.ocean.shallowBandFadeEndZoom)
+      : 2.8,
+    2.1,
+    4.8
+  );
+  state.styleConfig.ocean.midBandFadeEndZoom = clamp(
+    Number.isFinite(Number(state.styleConfig.ocean.midBandFadeEndZoom))
+      ? Number(state.styleConfig.ocean.midBandFadeEndZoom)
+      : 3.4,
+    2.7,
+    5.2
+  );
+  state.styleConfig.ocean.deepBandFadeEndZoom = clamp(
+    Number.isFinite(Number(state.styleConfig.ocean.deepBandFadeEndZoom))
+      ? Number(state.styleConfig.ocean.deepBandFadeEndZoom)
+      : 4.2,
+    3.3,
+    6
+  );
+  state.styleConfig.ocean.scenarioSyntheticContourFadeEndZoom = clamp(
+    Number.isFinite(Number(state.styleConfig.ocean.scenarioSyntheticContourFadeEndZoom))
+      ? Number(state.styleConfig.ocean.scenarioSyntheticContourFadeEndZoom)
+      : 3.0,
+    2.1,
+    4.6
+  );
+  state.styleConfig.ocean.scenarioShallowContourFadeEndZoom = clamp(
+    Number.isFinite(Number(state.styleConfig.ocean.scenarioShallowContourFadeEndZoom))
+      ? Number(state.styleConfig.ocean.scenarioShallowContourFadeEndZoom)
+      : 3.4,
+    2.5,
+    5
+  );
   state.styleConfig.lakes = normalizeLakeStyleConfig(state.styleConfig.lakes);
   if (!state.styleConfig.internalBorders || typeof state.styleConfig.internalBorders !== "object") {
     state.styleConfig.internalBorders = {};
@@ -1682,11 +1729,23 @@ function initToolbar({ render } = {}) {
       oceanStyleSelect.value = state.styleConfig.ocean.preset || "flat";
       oceanStyleSelect.title = enabled ? "" : selectDisabledTitle;
     }
-    [oceanTextureOpacity, oceanTextureScale, oceanContourStrength].forEach((control) => {
+    [
+      oceanTextureOpacity,
+      oceanTextureScale,
+      oceanContourStrength,
+      oceanShallowFadeEndZoom,
+      oceanMidFadeEndZoom,
+      oceanDeepFadeEndZoom,
+      oceanScenarioSyntheticContourFadeEndZoom,
+      oceanScenarioShallowContourFadeEndZoom,
+    ].forEach((control) => {
       if (!control) return;
       control.disabled = !enabled;
       control.title = enabled ? "" : sliderDisabledTitle;
     });
+    if (oceanBathymetryDebugDetails) {
+      oceanBathymetryDebugDetails.classList.toggle("opacity-60", !enabled);
+    }
   };
   const renderOceanCoastalAccentUi = () => {
     const visible = isTno1962Scenario();
@@ -1699,9 +1758,37 @@ function initToolbar({ render } = {}) {
       oceanCoastalAccentToggle.title = visible ? "" : t("Available only in the TNO 1962 scenario.", "ui");
     }
   };
+  const renderOceanBathymetryDebugUi = () => {
+    const syncZoomSlider = (input, valueEl, value, min, max) => {
+      if (input) {
+        input.value = String(Math.round(clamp(value, min, max) * 100));
+      }
+      if (valueEl) {
+        valueEl.textContent = `${clamp(value, min, max).toFixed(2)}x`;
+      }
+    };
+    syncZoomSlider(oceanShallowFadeEndZoom, oceanShallowFadeEndZoomValue, state.styleConfig.ocean.shallowBandFadeEndZoom || 2.8, 2.1, 4.8);
+    syncZoomSlider(oceanMidFadeEndZoom, oceanMidFadeEndZoomValue, state.styleConfig.ocean.midBandFadeEndZoom || 3.4, 2.7, 5.2);
+    syncZoomSlider(oceanDeepFadeEndZoom, oceanDeepFadeEndZoomValue, state.styleConfig.ocean.deepBandFadeEndZoom || 4.2, 3.3, 6);
+    syncZoomSlider(
+      oceanScenarioSyntheticContourFadeEndZoom,
+      oceanScenarioSyntheticContourFadeEndZoomValue,
+      state.styleConfig.ocean.scenarioSyntheticContourFadeEndZoom || 3.0,
+      2.1,
+      4.6
+    );
+    syncZoomSlider(
+      oceanScenarioShallowContourFadeEndZoom,
+      oceanScenarioShallowContourFadeEndZoomValue,
+      state.styleConfig.ocean.scenarioShallowContourFadeEndZoom || 3.4,
+      2.5,
+      5
+    );
+  };
   renderLakeUi();
   renderOceanAdvancedStylesUi();
   renderOceanCoastalAccentUi();
+  renderOceanBathymetryDebugUi();
 
   function renderRecentColors() {
     if (!recentContainer) return;
@@ -2528,6 +2615,7 @@ function initToolbar({ render } = {}) {
     }
     renderOceanAdvancedStylesUi();
     renderOceanCoastalAccentUi();
+    renderOceanBathymetryDebugUi();
     renderLakeUi();
     if (colorModeSelect) {
       colorModeSelect.value = state.colorMode || "political";
@@ -3987,7 +4075,7 @@ function initToolbar({ render } = {}) {
       } else {
         state.styleConfig.ocean.preset = nextPreset;
       }
-      applyOceanVisualUpdateNow(invalidateOceanTextureVisualState, "ocean-style");
+      applyOceanVisualUpdateNow(invalidateOceanVisualState, "ocean-style");
     });
   }
 
@@ -4004,10 +4092,10 @@ function initToolbar({ render } = {}) {
         oceanTextureOpacityValue.textContent = `${event.target.value}%`;
       }
       if (commitNow) {
-        applyOceanVisualUpdateNow(invalidateOceanTextureVisualState, "ocean-opacity");
+        applyOceanVisualUpdateNow(invalidateOceanVisualState, "ocean-opacity");
         return;
       }
-      scheduleOceanVisualUpdate(invalidateOceanTextureVisualState, "ocean-opacity");
+      scheduleOceanVisualUpdate(invalidateOceanVisualState, "ocean-opacity");
     });
   }
 
@@ -4024,10 +4112,10 @@ function initToolbar({ render } = {}) {
         oceanTextureScaleValue.textContent = `${state.styleConfig.ocean.scale.toFixed(2)}x`;
       }
       if (commitNow) {
-        applyOceanVisualUpdateNow(invalidateOceanTextureVisualState, "ocean-scale");
+        applyOceanVisualUpdateNow(invalidateOceanVisualState, "ocean-scale");
         return;
       }
-      scheduleOceanVisualUpdate(invalidateOceanTextureVisualState, "ocean-scale");
+      scheduleOceanVisualUpdate(invalidateOceanVisualState, "ocean-scale");
     });
   }
 
@@ -4044,10 +4132,10 @@ function initToolbar({ render } = {}) {
         oceanContourStrengthValue.textContent = `${event.target.value}%`;
       }
       if (commitNow) {
-        applyOceanVisualUpdateNow(invalidateOceanTextureVisualState, "ocean-contour");
+        applyOceanVisualUpdateNow(invalidateOceanVisualState, "ocean-contour");
         return;
       }
-      scheduleOceanVisualUpdate(invalidateOceanTextureVisualState, "ocean-contour");
+      scheduleOceanVisualUpdate(invalidateOceanVisualState, "ocean-contour");
     });
   }
 
@@ -4059,7 +4147,7 @@ function initToolbar({ render } = {}) {
         state.styleConfig.ocean.preset = "flat";
       }
       renderOceanAdvancedStylesUi();
-      applyOceanVisualUpdateNow(invalidateOceanTextureVisualState, "ocean-experimental-advanced-styles");
+      applyOceanVisualUpdateNow(invalidateOceanVisualState, "ocean-experimental-advanced-styles");
     });
     oceanAdvancedStylesToggle.dataset.bound = "true";
   }
@@ -4068,10 +4156,71 @@ function initToolbar({ render } = {}) {
     oceanCoastalAccentToggle.checked = state.styleConfig.ocean.coastalAccentEnabled !== false;
     oceanCoastalAccentToggle.addEventListener("change", (event) => {
       state.styleConfig.ocean.coastalAccentEnabled = !!event.target.checked;
-      applyOceanVisualUpdateNow(invalidateOceanWaterInteractionVisualState, "ocean-coastal-accent");
+      applyOceanVisualUpdateNow(invalidateOceanCoastalAccentVisualState, "ocean-coastal-accent");
     });
     oceanCoastalAccentToggle.dataset.bound = "true";
   }
+
+  const bindOceanZoomDebugInput = (element, valueEl, stateKey, min, max, reason) => {
+    if (!element) return;
+    element.value = String(Math.round(clamp(Number(state.styleConfig.ocean[stateKey]) || min, min, max) * 100));
+    if (valueEl) {
+      valueEl.textContent = `${(Number(element.value) / 100).toFixed(2)}x`;
+    }
+    bindOceanVisualInput(element, (event, commitNow) => {
+      const nextValue = clamp(Number(event.target.value) / 100, min, max);
+      state.styleConfig.ocean[stateKey] = nextValue;
+      if (valueEl) {
+        valueEl.textContent = `${nextValue.toFixed(2)}x`;
+      }
+      if (commitNow) {
+        applyOceanVisualUpdateNow(invalidateOceanVisualState, reason);
+        return;
+      }
+      scheduleOceanVisualUpdate(invalidateOceanVisualState, reason);
+    });
+  };
+
+  bindOceanZoomDebugInput(
+    oceanShallowFadeEndZoom,
+    oceanShallowFadeEndZoomValue,
+    "shallowBandFadeEndZoom",
+    2.1,
+    4.8,
+    "ocean-shallow-band-fade"
+  );
+  bindOceanZoomDebugInput(
+    oceanMidFadeEndZoom,
+    oceanMidFadeEndZoomValue,
+    "midBandFadeEndZoom",
+    2.7,
+    5.2,
+    "ocean-mid-band-fade"
+  );
+  bindOceanZoomDebugInput(
+    oceanDeepFadeEndZoom,
+    oceanDeepFadeEndZoomValue,
+    "deepBandFadeEndZoom",
+    3.3,
+    6,
+    "ocean-deep-band-fade"
+  );
+  bindOceanZoomDebugInput(
+    oceanScenarioSyntheticContourFadeEndZoom,
+    oceanScenarioSyntheticContourFadeEndZoomValue,
+    "scenarioSyntheticContourFadeEndZoom",
+    2.1,
+    4.6,
+    "ocean-scenario-synthetic-contour-fade"
+  );
+  bindOceanZoomDebugInput(
+    oceanScenarioShallowContourFadeEndZoom,
+    oceanScenarioShallowContourFadeEndZoomValue,
+    "scenarioShallowContourFadeEndZoom",
+    2.5,
+    5,
+    "ocean-scenario-shallow-contour-fade"
+  );
 
   if (lakeLinkToOcean && !lakeLinkToOcean.dataset.bound) {
     lakeLinkToOcean.checked = !!syncLakeConfig().linkedToOcean;

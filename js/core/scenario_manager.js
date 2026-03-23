@@ -1314,6 +1314,7 @@ function resolveScenarioGeoFeatureIdForCityFeature(cityFeature) {
 function buildScenarioCityNameSyncPatch({ baseGeoLocales = {}, scenarioGeoPatch = {} } = {}) {
   const geo = {};
   const conflicts = [];
+  let preservedExplicitPatchCount = 0;
   const overrideEntries = Object.values(state.scenarioCityOverridesData?.cities || {});
 
   overrideEntries.forEach((overrideEntry) => {
@@ -1329,7 +1330,17 @@ function buildScenarioCityNameSyncPatch({ baseGeoLocales = {}, scenarioGeoPatch 
     ].filter(Boolean));
 
     targetIds.forEach((targetId) => {
-      const existingEntry = scenarioGeoPatch[targetId] || baseGeoLocales[targetId] || null;
+      const explicitPatchEntry = scenarioGeoPatch[targetId] || null;
+      if (explicitPatchEntry) {
+        const explicitEn = normalizeCityText(explicitPatchEntry?.en || "");
+        const explicitZh = normalizeCityText(explicitPatchEntry?.zh || "");
+        if (explicitEn !== localeEntry.en || explicitZh !== localeEntry.zh) {
+          preservedExplicitPatchCount += 1;
+        }
+        return;
+      }
+
+      const existingEntry = baseGeoLocales[targetId] || null;
       const existingEn = normalizeCityText(existingEntry?.en || "");
       const existingZh = normalizeCityText(existingEntry?.zh || "");
       if (existingEn === localeEntry.en && existingZh === localeEntry.zh) {
@@ -1344,7 +1355,7 @@ function buildScenarioCityNameSyncPatch({ baseGeoLocales = {}, scenarioGeoPatch 
     });
   });
 
-  return { geo, conflicts };
+  return { geo, conflicts, preservedExplicitPatchCount };
 }
 
 function applyScenarioGeoLocalization() {
@@ -1372,17 +1383,20 @@ function applyScenarioGeoLocalization() {
   }
   state.locales.geo = {
     ...baseGeoLocales,
-    ...scenarioGeoPatch,
     ...patch.geo,
     ...synchronizedNamePatch.geo,
+    ...scenarioGeoPatch,
   };
   state.geoAliasToStableKey = {
     ...baseAliasMap,
     ...patch.aliasToStableKey,
   };
   if (synchronizedNamePatch.conflicts.length > 0) {
+    const preservedSuffix = synchronizedNamePatch.preservedExplicitPatchCount > 0
+      ? ` Preserved ${synchronizedNamePatch.preservedExplicitPatchCount} explicit scenario patch override${synchronizedNamePatch.preservedExplicitPatchCount === 1 ? "" : "s"}.`
+      : "";
     console.info(
-      `[scenario] Synchronized ${synchronizedNamePatch.conflicts.length} geo locale entr${synchronizedNamePatch.conflicts.length === 1 ? "y" : "ies"} from scenario city overrides.`
+      `[scenario] Synchronized ${synchronizedNamePatch.conflicts.length} geo locale entr${synchronizedNamePatch.conflicts.length === 1 ? "y" : "ies"} from scenario city overrides.${preservedSuffix}`
     );
   }
 }

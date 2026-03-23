@@ -153,6 +153,18 @@ const COASTLINE_OVERLAY_DENSITY_ALPHA_LOW = 0.78;
 const COASTLINE_OVERLAY_DENSITY_ALPHA_MID = 0.86;
 const COASTLINE_ACCENT_MIN_WIDTH_PX = 0.85;
 const COASTLINE_ACCENT_OVERLAY_MIN_WIDTH_PX = 0.95;
+const BATHYMETRY_SHALLOW_DEPTH_MAX_M = 200;
+const BATHYMETRY_MID_DEPTH_MAX_M = 500;
+const BATHYMETRY_BAND_SHALLOW_FADE_START_ZOOM = 2.0;
+const BATHYMETRY_BAND_SHALLOW_FADE_END_ZOOM = 2.8;
+const BATHYMETRY_BAND_MID_FADE_START_ZOOM = 2.6;
+const BATHYMETRY_BAND_MID_FADE_END_ZOOM = 3.4;
+const BATHYMETRY_BAND_DEEP_FADE_START_ZOOM = COASTLINE_LOD_MID_ZOOM_MAX;
+const BATHYMETRY_BAND_DEEP_FADE_END_ZOOM = 4.2;
+const BATHYMETRY_SCENARIO_SYNTHETIC_CONTOUR_FADE_START_ZOOM = 2.0;
+const BATHYMETRY_SCENARIO_SYNTHETIC_CONTOUR_FADE_END_ZOOM = 3.0;
+const BATHYMETRY_SCENARIO_SHALLOW_CONTOUR_FADE_START_ZOOM = 2.4;
+const BATHYMETRY_SCENARIO_SHALLOW_CONTOUR_FADE_END_ZOOM = 3.4;
 const RENDER_PHASE_IDLE = "idle";
 const RENDER_PHASE_INTERACTING = "interacting";
 const RENDER_PHASE_SETTLING = "settling";
@@ -858,6 +870,12 @@ function invalidateOceanWaterInteractionVisualState(reason = "ocean-water-intera
   cancelExactAfterSettleRefresh({ clearDefer: true });
   invalidateRenderPasses(["background", "contextScenario"], reason);
   clearRenderPassReferenceTransforms(["background", "contextScenario"]);
+}
+
+function invalidateOceanCoastalAccentVisualState(reason = "ocean-coastal-accent") {
+  cancelExactAfterSettleRefresh({ clearDefer: true });
+  invalidateRenderPasses("borders", reason);
+  clearRenderPassReferenceTransforms("borders");
 }
 
 function getRenderPassOverscanRatio(passName) {
@@ -7486,13 +7504,85 @@ function sortBathymetryFeaturesForFill(collection) {
   return [...collection.features].sort((a, b) => getBathymetryFeatureDepthMax(b) - getBathymetryFeatureDepthMax(a));
 }
 
+function getBathymetryTuningConfig() {
+  const ocean = state.styleConfig?.ocean || {};
+  const shallowBandFadeEndZoom = clamp(
+    Number.isFinite(Number(ocean.shallowBandFadeEndZoom)) ? Number(ocean.shallowBandFadeEndZoom) : BATHYMETRY_BAND_SHALLOW_FADE_END_ZOOM,
+    BATHYMETRY_BAND_SHALLOW_FADE_START_ZOOM + 0.1,
+    4.8
+  );
+  const midBandFadeEndZoom = clamp(
+    Number.isFinite(Number(ocean.midBandFadeEndZoom)) ? Number(ocean.midBandFadeEndZoom) : BATHYMETRY_BAND_MID_FADE_END_ZOOM,
+    BATHYMETRY_BAND_MID_FADE_START_ZOOM + 0.1,
+    5.2
+  );
+  const deepBandFadeEndZoom = clamp(
+    Number.isFinite(Number(ocean.deepBandFadeEndZoom)) ? Number(ocean.deepBandFadeEndZoom) : BATHYMETRY_BAND_DEEP_FADE_END_ZOOM,
+    BATHYMETRY_BAND_DEEP_FADE_START_ZOOM + 0.1,
+    6
+  );
+  const scenarioSyntheticContourFadeEndZoom = clamp(
+    Number.isFinite(Number(ocean.scenarioSyntheticContourFadeEndZoom))
+      ? Number(ocean.scenarioSyntheticContourFadeEndZoom)
+      : BATHYMETRY_SCENARIO_SYNTHETIC_CONTOUR_FADE_END_ZOOM,
+    BATHYMETRY_SCENARIO_SYNTHETIC_CONTOUR_FADE_START_ZOOM + 0.1,
+    4.6
+  );
+  const scenarioShallowContourFadeEndZoom = clamp(
+    Number.isFinite(Number(ocean.scenarioShallowContourFadeEndZoom))
+      ? Number(ocean.scenarioShallowContourFadeEndZoom)
+      : BATHYMETRY_SCENARIO_SHALLOW_CONTOUR_FADE_END_ZOOM,
+    BATHYMETRY_SCENARIO_SHALLOW_CONTOUR_FADE_START_ZOOM + 0.1,
+    5
+  );
+  return {
+    shallowBandFadeEndZoom,
+    midBandFadeEndZoom,
+    deepBandFadeEndZoom,
+    scenarioSyntheticContourFadeEndZoom,
+    scenarioShallowContourFadeEndZoom,
+  };
+}
+
+function getZoomFadeFactor(k, fadeStartZoom, fadeEndZoom) {
+  if (!(k >= fadeStartZoom)) {
+    return 1;
+  }
+  if (k >= fadeEndZoom) {
+    return 0;
+  }
+  return clamp(
+    1 - (k - fadeStartZoom) / Math.max(0.0001, fadeEndZoom - fadeStartZoom),
+    0,
+    1
+  );
+}
+
+function getBathymetryBandVisibilityConfig(feature, k) {
+  const tuning = getBathymetryTuningConfig();
+  const depthMax = getBathymetryFeatureDepthMax(feature);
+  if (depthMax <= BATHYMETRY_SHALLOW_DEPTH_MAX_M) {
+    return { alpha: getZoomFadeFactor(k, BATHYMETRY_BAND_SHALLOW_FADE_START_ZOOM, tuning.shallowBandFadeEndZoom) };
+  }
+  if (depthMax <= BATHYMETRY_MID_DEPTH_MAX_M) {
+    return { alpha: getZoomFadeFactor(k, BATHYMETRY_BAND_MID_FADE_START_ZOOM, tuning.midBandFadeEndZoom) };
+  }
+  return { alpha: getZoomFadeFactor(k, BATHYMETRY_BAND_DEEP_FADE_START_ZOOM, tuning.deepBandFadeEndZoom) };
+}
+
 function drawBathymetryBands(collection, oceanStyle) {
+  const zoomK = Number(state.zoomTransform?.k) || 1;
   const features = sortBathymetryFeaturesForFill(collection);
   features.forEach((feature) => {
+    const visibilityConfig = getBathymetryBandVisibilityConfig(feature, zoomK);
+    if (visibilityConfig.alpha <= 0) return;
+    context.save();
+    context.globalAlpha *= visibilityConfig.alpha;
     context.beginPath();
     pathCanvas(feature);
     context.fillStyle = getBathymetryBandFillStyle(feature, oceanStyle);
     context.fill();
+    context.restore();
   });
 }
 
@@ -7507,8 +7597,37 @@ function buildVisibleBathymetryContourDepthSet(collection, oceanStyle) {
   return new Set(uniqueDepths.filter((_, index) => index % 2 === 0));
 }
 
+function getBathymetryContourVisibilityConfig(feature, k) {
+  const tuning = getBathymetryTuningConfig();
+  const source = String(feature?.properties?._bathymetrySource || "").trim().toLowerCase();
+  if (source !== "scenario") {
+    return { alpha: 1 };
+  }
+  const mode = String(feature?.properties?.bathymetry_mode || "").trim().toLowerCase();
+  if (mode === "synthetic") {
+    return {
+      alpha: getZoomFadeFactor(
+        k,
+        BATHYMETRY_SCENARIO_SYNTHETIC_CONTOUR_FADE_START_ZOOM,
+        tuning.scenarioSyntheticContourFadeEndZoom
+      ),
+    };
+  }
+  if (getBathymetryFeatureDepthMax(feature) <= BATHYMETRY_SHALLOW_DEPTH_MAX_M) {
+    return {
+      alpha: getZoomFadeFactor(
+        k,
+        BATHYMETRY_SCENARIO_SHALLOW_CONTOUR_FADE_START_ZOOM,
+        tuning.scenarioShallowContourFadeEndZoom
+      ),
+    };
+  }
+  return { alpha: 1 };
+}
+
 function drawBathymetryContours(collection, oceanStyle) {
   if (!Array.isArray(collection?.features) || !collection.features.length) return;
+  const zoomK = Number(state.zoomTransform?.k) || 1;
   const lineWidthBase = oceanStyle.preset === "bathymetry_soft"
     ? 0.45 + oceanStyle.contourStrength * 0.75
     : 0.75 + oceanStyle.contourStrength * 1.1;
@@ -7517,11 +7636,16 @@ function drawBathymetryContours(collection, oceanStyle) {
     if (visibleDepths && !visibleDepths.has(getBathymetryFeatureDepthMax(feature))) {
       return;
     }
+    const visibilityConfig = getBathymetryContourVisibilityConfig(feature, zoomK);
+    if (visibilityConfig.alpha <= 0) return;
+    context.save();
+    context.globalAlpha *= visibilityConfig.alpha;
     context.beginPath();
     pathCanvas(feature);
     context.strokeStyle = getBathymetryContourStrokeStyle(feature, oceanStyle);
     context.lineWidth = lineWidthBase;
     context.stroke();
+    context.restore();
   });
 }
 
@@ -7652,6 +7776,8 @@ function drawTnoCoastalAccentLayer(k, { interactive = false } = {}) {
       : Infinity;
   context.save();
   context.strokeStyle = TNO_COASTAL_ACCENT_COLOR;
+  context.lineJoin = "round";
+  context.lineCap = "round";
   context.save();
   clipOutAtlantropaAccentRegions();
   coastlineCollection.forEach((mesh) => {
@@ -17003,6 +17129,7 @@ export {
   invalidateOceanBackgroundVisualState,
   invalidateOceanTextureVisualState,
   invalidateOceanWaterInteractionVisualState,
+  invalidateOceanCoastalAccentVisualState,
   invalidateOceanVisualState,
   setDebugMode,
   addFeatureToDevSelection,

@@ -1495,7 +1495,7 @@ function initSidebar({ render } = {}) {
   if (!frontlineOverlaySection && frontlineTabStack) {
     frontlineOverlaySection = document.createElement("div");
     frontlineOverlaySection.id = "frontlineOverlayPanel";
-    frontlineOverlaySection.className = "inspector-tool-card";
+    frontlineOverlaySection.className = "inspector-tool-card frontline-tab-card";
 
     const statusRow = document.createElement("div");
     statusRow.className = "frontline-status-row";
@@ -1573,10 +1573,10 @@ function initSidebar({ render } = {}) {
   }
 
   let strategicOverlaySection = document.getElementById("strategicOverlayPanel");
-  if (!strategicOverlaySection && projectLegendStack) {
+  if (!strategicOverlaySection && frontlineTabStack) {
     strategicOverlaySection = document.createElement("div");
     strategicOverlaySection.id = "strategicOverlayPanel";
-    strategicOverlaySection.className = "inspector-tool-card";
+    strategicOverlaySection.className = "inspector-tool-card frontline-tab-card";
 
     const title = document.createElement("div");
     title.className = "section-header sidebar-tool-title";
@@ -1584,7 +1584,7 @@ function initSidebar({ render } = {}) {
 
     const hint = document.createElement("p");
     hint.className = "sidebar-tool-hint";
-    hint.textContent = t("Operation graphics and unit counters stay project-local.", "ui");
+    hint.textContent = t("Operation graphics and unit counters stay in the same frontline workspace and remain project-local.", "ui");
 
     const graphicsHeader = document.createElement("div");
     graphicsHeader.className = "section-header mt-3";
@@ -1673,7 +1673,12 @@ function initSidebar({ render } = {}) {
     strategicOverlaySection.appendChild(unitOptionsRow);
     strategicOverlaySection.appendChild(unitActions);
     strategicOverlaySection.appendChild(unitList);
-    projectLegendStack.appendChild(strategicOverlaySection);
+    frontlineTabStack.appendChild(strategicOverlaySection);
+  }
+
+  if (strategicOverlaySection && frontlineTabStack && strategicOverlaySection.parentElement !== frontlineTabStack) {
+    strategicOverlaySection.classList.add("frontline-tab-card");
+    frontlineTabStack.appendChild(strategicOverlaySection);
   }
 
   let scenarioAuditSection = document.getElementById("scenarioAuditPanel");

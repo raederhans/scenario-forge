@@ -20,7 +20,7 @@
             </div>
             <div class="workspace-status-block" aria-labelledby="workspaceSessionHeading">
               <div id="workspaceSessionHeading" class="workspace-status-kicker" data-i18n="Current Session">Current Session</div>
-              <div class="workspace-status-grid" aria-label="Workspace status">
+              <div class="workspace-status-grid" aria-label="Workspace status" data-i18n-aria-label="Workspace status">
                 <div class="workspace-status-item">
                   <span id="lblWorkspaceScenario" class="workspace-status-label" data-i18n="Scenario">Scenario</span>
                   <span id="workspaceScenarioValue" class="workspace-status-value" data-i18n="None">None</span>
@@ -100,7 +100,7 @@
           <details class="card appearance-card" open aria-labelledby="appearanceSectionHeading labelMapStyle">
             <summary id="labelMapStyle" class="section-header">Appearance</summary>
             <div class="appearance-toolbar mt-3">
-              <div class="appearance-tab-row" role="tablist" aria-label="Appearance sections">
+              <div class="appearance-tab-row" role="tablist" aria-label="Appearance sections" data-i18n-aria-label="Appearance sections">
                 <button
                   id="appearanceTabOcean"
                   type="button"
@@ -227,6 +227,49 @@
                     </div>
                     <input id="oceanContourStrength" type="range" min="0" max="100" value="75" class="range-input" />
                   </div>
+                  <details id="oceanBathymetryDebugDetails" class="appearance-mini-section">
+                    <summary id="lblOceanBathymetryDebug" class="section-header">Bathymetry Debug</summary>
+                    <div class="space-y-3 mt-3">
+                      <p id="oceanBathymetryDebugHint" class="sidebar-tool-hint">
+                        Advanced high-zoom tuning for nearshore fill and scenario contour exit thresholds.
+                      </p>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblOceanShallowFadeEndZoom" class="range-label" for="oceanShallowFadeEndZoom">Nearshore Fill Exit</label>
+                          <span id="oceanShallowFadeEndZoomValue" class="range-value">2.80x</span>
+                        </div>
+                        <input id="oceanShallowFadeEndZoom" type="range" min="210" max="480" step="1" value="280" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblOceanMidFadeEndZoom" class="range-label" for="oceanMidFadeEndZoom">Mid-depth Fill Exit</label>
+                          <span id="oceanMidFadeEndZoomValue" class="range-value">3.40x</span>
+                        </div>
+                        <input id="oceanMidFadeEndZoom" type="range" min="270" max="520" step="1" value="340" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblOceanDeepFadeEndZoom" class="range-label" for="oceanDeepFadeEndZoom">Deep Fill Exit</label>
+                          <span id="oceanDeepFadeEndZoomValue" class="range-value">4.20x</span>
+                        </div>
+                        <input id="oceanDeepFadeEndZoom" type="range" min="330" max="600" step="1" value="420" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblOceanScenarioSyntheticContourFadeEndZoom" class="range-label" for="oceanScenarioSyntheticContourFadeEndZoom">Synthetic Contour Exit</label>
+                          <span id="oceanScenarioSyntheticContourFadeEndZoomValue" class="range-value">3.00x</span>
+                        </div>
+                        <input id="oceanScenarioSyntheticContourFadeEndZoom" type="range" min="210" max="460" step="1" value="300" class="range-input" />
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label id="lblOceanScenarioShallowContourFadeEndZoom" class="range-label" for="oceanScenarioShallowContourFadeEndZoom">Shallow Scenario Contour Exit</label>
+                          <span id="oceanScenarioShallowContourFadeEndZoomValue" class="range-value">3.40x</span>
+                        </div>
+                        <input id="oceanScenarioShallowContourFadeEndZoom" type="range" min="250" max="500" step="1" value="340" class="range-input" />
+                      </div>
+                    </div>
+                  </details>
                 </div>
               </section>
 
@@ -746,7 +789,7 @@
                     <span id="lblDayNightEnabled">Enable Day / Night Cycle</span>
                   </label>
 
-                  <div class="mode-toggle-row" role="group" aria-label="Day and night mode">
+                  <div class="mode-toggle-row" role="group" aria-label="Day and night mode" data-i18n-aria-label="Day and night mode">
                     <button
                       id="dayNightModeManualBtn"
                       type="button"
@@ -1076,10 +1119,10 @@
           </div>
 
           <div class="map-overlay-controls">
-            <button id="leftPanelToggle" class="panel-toggle panel-toggle-left" type="button" aria-controls="leftSidebar" data-i18n="Panels" data-i18n-aria-label="Toggle left panel">
+            <button id="leftPanelToggle" class="panel-toggle panel-toggle-left" type="button" aria-controls="leftSidebar" aria-label="Toggle left panel" data-i18n="Panels" data-i18n-aria-label="Toggle left panel">
               Panels
             </button>
-            <button id="rightPanelToggle" class="panel-toggle panel-toggle-right" type="button" aria-controls="rightSidebar" data-i18n="Inspector" data-i18n-aria-label="Toggle right panel">
+            <button id="rightPanelToggle" class="panel-toggle panel-toggle-right" type="button" aria-controls="rightSidebar" aria-label="Toggle right panel" data-i18n="Inspector" data-i18n-aria-label="Toggle right panel">
               Inspector
             </button>
           </div>
@@ -1089,7 +1132,7 @@
             Click a region to start painting, or use Auto-Fill to color all countries
           </div>
           <div id="scenarioContextBar" class="scenario-context-bar">
-            <button id="scenarioContextCollapseBtn" type="button" class="scenario-context-icon-btn" aria-label="Collapse scenario context">-</button>
+            <button id="scenarioContextCollapseBtn" type="button" class="scenario-context-icon-btn" aria-label="Collapse scenario context" data-i18n-aria-label="Collapse scenario context">-</button>
             <div id="scenarioContextScenarioItem" class="scenario-context-item">
               <span class="scenario-context-icon" aria-hidden="true">S</span>
               <span id="scenarioContextScenarioText">Scenario: None</span>
@@ -1102,7 +1145,7 @@
               <span class="scenario-context-icon" aria-hidden="true">A</span>
               <span id="scenarioContextActiveText">Active: None</span>
             </div>
-            <button id="scenarioGuideBtn" type="button" class="scenario-context-icon-btn" aria-label="Show scenario guide">?</button>
+            <button id="scenarioGuideBtn" type="button" class="scenario-context-icon-btn" aria-label="Show scenario guide" data-i18n-aria-label="Show scenario guide">?</button>
           </div>
           <div id="scenarioGuidePopover" class="scenario-guide-popover hidden" role="dialog" aria-labelledby="scenarioGuideTitle">
             <h2 id="scenarioGuideTitle" class="section-header">Scenario Quick Start</h2>
@@ -1119,11 +1162,11 @@
 
           <div id="toastViewport" class="toast-viewport" aria-live="polite" aria-atomic="false"></div>
 
-          <div id="zoomControls" class="zoom-controls" role="group" aria-label="Map zoom controls">
+          <div id="zoomControls" class="zoom-controls" role="group" aria-label="Map zoom controls" data-i18n-aria-label="Map zoom controls">
             <button id="zoomOutBtn" type="button" class="zoom-btn" aria-label="Zoom out" title="Zoom out">-</button>
             <input id="zoomPercentInput" type="text" name="zoom-percent" autocomplete="off" spellcheck="false" inputmode="numeric" class="input dock-zoom-input" aria-label="Zoom percentage" value="100%" />
             <button id="zoomInBtn" type="button" class="zoom-btn" aria-label="Zoom in" title="Zoom in">+</button>
-            <button id="zoomResetBtn" type="button" class="zoom-btn zoom-btn-reset" aria-label="Reset zoom" title="Fit">Fit</button>
+            <button id="zoomResetBtn" type="button" class="zoom-btn zoom-btn-reset" aria-label="Reset zoom" data-i18n-aria-label="Reset zoom" title="Fit">Fit</button>
             <button
               id="devWorkspaceToggleBtn"
               class="zoom-btn dev-workspace-toggle"
@@ -1132,6 +1175,7 @@
               aria-expanded="false"
               aria-pressed="false"
               title="Toggle development workspace"
+              data-i18n-title="Toggle development workspace"
             >
               Dev
             </button>
@@ -1144,7 +1188,7 @@
                 <span class="dock-shell-kicker" data-i18n="Quick Actions">Quick Actions</span>
                 <span class="dock-shell-hint" data-i18n="Current tool, paint mode, and map actions">Current tool, paint mode, and map actions</span>
               </div>
-              <button id="dockCollapseBtn" type="button" class="dock-collapse-btn" data-i18n="Collapse" data-i18n-aria-label="Collapse quick dock">Collapse</button>
+              <button id="dockCollapseBtn" type="button" class="dock-collapse-btn" aria-label="Collapse quick dock" data-i18n="Collapse" data-i18n-aria-label="Collapse quick dock">Collapse</button>
             </div>
             <div class="bottom-dock-primary">
               <div class="dock-group dock-group-tools">
@@ -1273,7 +1317,7 @@
                         <div class="dock-color-hint" data-i18n="Selected color">Selected color</div>
                       </div>
                       <input id="customColor" type="color" value="#1f3a5f" class="color-input dock-custom-color" data-i18n-aria-label="Custom color" />
-                      <div id="recentColors" class="dock-recent-swatches" aria-label="Recent colors"></div>
+                      <div id="recentColors" class="dock-recent-swatches" aria-label="Recent colors" data-i18n-aria-label="Recent colors"></div>
                     </div>
                     <div id="paletteGrid" class="color-grid dock-inline-swatches dock-palette-grid-hidden"></div>
                   </div>
@@ -1286,7 +1330,7 @@
 
       <aside id="rightSidebar" class="sidebar-right">
         <div class="sidebar-sections inspector-sidebar-sections">
-          <div class="inspector-sidebar-tab-row" role="tablist" aria-label="Inspector panels">
+          <div class="inspector-sidebar-tab-row" role="tablist" aria-label="Inspector panels" data-i18n-aria-label="Inspector panels">
             <button
               id="inspectorSidebarTabInspector"
               type="button"
@@ -1572,7 +1616,7 @@
                         <path d="M5 18h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
                       </svg>
                     </button>
-                    <button id="btnToggleLang" class="dock-icon-btn inspector-utility-btn" type="button" aria-label="Language" title="Language">
+                    <button id="btnToggleLang" class="dock-icon-btn inspector-utility-btn" type="button" aria-label="Language" data-i18n-aria-label="Language" title="Language" data-i18n-title="Language">
                       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                         <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.6"></circle>
                         <path d="M4 12h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
@@ -1655,7 +1699,7 @@
             hidden
           >
             <div class="sidebar-shell-heading sidebar-shell-heading-right" data-i18n="Frontline">Frontline</div>
-            <p class="sidebar-tool-hint inspector-frontline-intro">
+            <p class="sidebar-tool-hint inspector-frontline-intro" data-i18n="Derived frontlines stay optional and project-local. Enable them only when you want a conflict view.">
               Derived frontlines stay optional and project-local. Enable them only when you want a conflict view.
             </p>
             <div id="frontlineTabStack" class="inspector-frontline-stack"></div>

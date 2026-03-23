@@ -1529,14 +1529,38 @@ details.card[open] > summary::after {
   display: none !important;
 }
 
+.inspector-sidebar-tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-inline: 8px;
+  min-width: 0;
+}
+
 .inspector-frontline-stack {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  padding-inline: 4px;
+}
+
+.frontline-tab-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.frontline-tab-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(0, 47, 167, 0.16), rgba(15, 23, 42, 0.04));
+  pointer-events: none;
 }
 
 .inspector-frontline-intro {
   margin-top: -4px;
+  padding-inline: 4px;
 }
 
 .frontline-status-row {
