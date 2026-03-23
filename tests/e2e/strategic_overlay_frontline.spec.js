@@ -1,0 +1,146 @@
+const fs = require("fs");
+const path = require("path");
+const { test, expect } = require("@playwright/test");
+
+function resolveBaseUrl() {
+  if (process.env.MAPCREATOR_BASE_URL) {
+    return process.env.MAPCREATOR_BASE_URL;
+  }
+  const metadataPath = path.join(process.cwd(), ".runtime", "dev", "active_server.json");
+  if (fs.existsSync(metadataPath)) {
+    try {
+      const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf8"));
+      if (metadata && typeof metadata.url === "string" && metadata.url.trim()) {
+        return metadata.url.trim();
+      }
+    } catch (_error) {
+      // Fall through to default.
+    }
+  }
+  return "http://127.0.0.1:18080";
+}
+
+async function waitForProjectUiReady(page) {
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    const scenarioSelect = document.querySelector("#scenarioSelect");
+    return typeof state.renderCountryListFn === "function"
+      && !!scenarioSelect
+      && !!scenarioSelect.querySelector('option[value="tno_1962"]');
+  }, { timeout: 120000 });
+}
+
+async function applyScenario(page, scenarioId) {
+  await page.evaluate(async (expectedScenarioId) => {
+    const select = document.querySelector("#scenarioSelect");
+    if (select instanceof HTMLSelectElement) {
+      select.value = expectedScenarioId;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    const { applyScenarioById } = await import("/js/core/scenario_manager.js");
+    await applyScenarioById(expectedScenarioId, {
+      renderNow: true,
+      markDirtyReason: "playwright-apply-scenario",
+      showToastOnComplete: false,
+    });
+  }, scenarioId);
+  await page.waitForFunction(async (expectedScenarioId) => {
+    const { state } = await import("/js/core/state.js");
+    return state.activeScenarioId === expectedScenarioId;
+  }, scenarioId, { timeout: 120000 });
+}
+
+test("strategic frontline overlay reacts to controller changes", async ({ page }) => {
+  test.setTimeout(60000);
+  const baseUrl = resolveBaseUrl();
+  const consoleErrors = [];
+  const networkFailures = [];
+
+  page.on("console", (msg) => {
+    if (msg.type() === "error") {
+      consoleErrors.push(msg.text());
+    }
+  });
+  page.on("response", (response) => {
+    if (response.status() >= 400) {
+      networkFailures.push({ url: response.url(), status: response.status() });
+    }
+  });
+  page.on("requestfailed", (request) => {
+    networkFailures.push({
+      url: request.url(),
+      status: "failed",
+      errorText: request.failure() ? request.failure().errorText : "requestfailed",
+    });
+  });
+
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
+  await page.waitForTimeout(1200);
+  await waitForProjectUiReady(page);
+  await applyScenario(page, "tno_1962");
+
+  const splitFeature = await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    const splitEntry = Object.entries(state.scenarioBaselineControllersByFeatureId || {}).find(([featureId, controller]) => {
+      const owner = state.scenarioBaselineOwnersByFeatureId?.[featureId];
+      return owner && controller && owner !== controller;
+    });
+    if (!splitEntry) return null;
+    const [featureId, baselineController] = splitEntry;
+    return {
+      featureId,
+      baselineOwner: String(state.scenarioBaselineOwnersByFeatureId?.[featureId] || ""),
+      baselineController: String(baselineController || ""),
+    };
+  });
+
+  expect(splitFeature).not.toBeNull();
+  expect(splitFeature.baselineOwner).not.toBe(splitFeature.baselineController);
+
+  await page.locator("#inspectorSidebarTabFrontline").click();
+  await expect(page.locator("#frontlineEmptyState")).toBeVisible();
+  await expect(page.locator("#frontlineEnabledToggle")).not.toBeChecked();
+
+  const initialSnapshot = await page.evaluate(() => ({
+    pathCount: document.querySelectorAll(".frontline-overlay-layer path.frontline-path").length,
+    firstPath: document.querySelector(".frontline-overlay-layer path.frontline-path")?.getAttribute("d") || "",
+  }));
+
+  expect(initialSnapshot.pathCount).toBe(0);
+  expect(initialSnapshot.firstPath).toBe("");
+
+  await page.locator("#frontlineEnabledToggle").check();
+  await page.waitForFunction(() => document.querySelectorAll(".frontline-overlay-layer path.frontline-path").length > 0);
+
+  const enabledSnapshot = await page.evaluate(() => ({
+    pathCount: document.querySelectorAll(".frontline-overlay-layer path.frontline-path").length,
+    firstPath: document.querySelector(".frontline-overlay-layer path.frontline-path")?.getAttribute("d") || "",
+  }));
+
+  expect(enabledSnapshot.pathCount).toBeGreaterThan(0);
+  expect(enabledSnapshot.firstPath.length).toBeGreaterThan(0);
+
+  await page.evaluate(async ({ featureId, baselineOwner }) => {
+    const { state } = await import("/js/core/state.js");
+    const { render } = await import("/js/core/map_renderer.js");
+    state.scenarioControllersByFeatureId = state.scenarioControllersByFeatureId || {};
+    state.scenarioControllersByFeatureId[featureId] = baselineOwner;
+    state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
+    render();
+  }, splitFeature);
+
+  await page.waitForFunction((previousPath) => {
+    const currentPath = document.querySelector(".frontline-overlay-layer path.frontline-path")?.getAttribute("d") || "";
+    return !!currentPath && currentPath !== previousPath;
+  }, enabledSnapshot.firstPath);
+
+  const updatedSnapshot = await page.evaluate(() => ({
+    pathCount: document.querySelectorAll(".frontline-overlay-layer path.frontline-path").length,
+    firstPath: document.querySelector(".frontline-overlay-layer path.frontline-path")?.getAttribute("d") || "",
+  }));
+
+  expect(updatedSnapshot.pathCount).toBeGreaterThan(0);
+  expect(updatedSnapshot.firstPath).not.toBe(enabledSnapshot.firstPath);
+  expect(consoleErrors).toEqual([]);
+  expect(networkFailures).toEqual([]);
+});

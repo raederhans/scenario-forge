@@ -1286,6 +1286,37 @@
 
       <aside id="rightSidebar" class="sidebar-right">
         <div class="sidebar-sections inspector-sidebar-sections">
+          <div class="inspector-sidebar-tab-row" role="tablist" aria-label="Inspector panels">
+            <button
+              id="inspectorSidebarTabInspector"
+              type="button"
+              class="inspector-sidebar-tab-btn is-active"
+              data-inspector-tab="inspector"
+              role="tab"
+              aria-selected="true"
+              aria-controls="inspectorSidebarPanel"
+            >
+              Inspector
+            </button>
+            <button
+              id="inspectorSidebarTabFrontline"
+              type="button"
+              class="inspector-sidebar-tab-btn"
+              data-inspector-tab="frontline"
+              role="tab"
+              aria-selected="false"
+              aria-controls="frontlineSidebarPanel"
+            >
+              Frontline
+            </button>
+          </div>
+          <section
+            id="inspectorSidebarPanel"
+            class="inspector-sidebar-tab-panel is-active"
+            data-inspector-panel="inspector"
+            role="tabpanel"
+            aria-labelledby="inspectorSidebarTabInspector"
+          >
           <div class="sidebar-shell-heading sidebar-shell-heading-right" data-i18n="Inspector">Inspector</div>
           <div class="inspector-search-shell">
             <div class="card-flat inspector-search-block">
@@ -1614,6 +1645,21 @@
               </div>
             </div>
           </details>
+          </section>
+          <section
+            id="frontlineSidebarPanel"
+            class="inspector-sidebar-tab-panel"
+            data-inspector-panel="frontline"
+            role="tabpanel"
+            aria-labelledby="inspectorSidebarTabFrontline"
+            hidden
+          >
+            <div class="sidebar-shell-heading sidebar-shell-heading-right" data-i18n="Frontline">Frontline</div>
+            <p class="sidebar-tool-hint inspector-frontline-intro">
+              Derived frontlines stay optional and project-local. Enable them only when you want a conflict view.
+            </p>
+            <div id="frontlineTabStack" class="inspector-frontline-stack"></div>
+          </section>
         </div>
       </aside>
     </div>

@@ -62,6 +62,12 @@ let zoomBehavior = null;
 let activeContextMetricSession = null;
 
 let viewportGroup = null;
+let strategicDefs = null;
+let frontlineOverlayGroup = null;
+let frontlineLabelsGroup = null;
+let operationGraphicsGroup = null;
+let operationGraphicsEditorGroup = null;
+let unitCountersGroup = null;
 let specialZonesGroup = null;
 let specialZoneEditorGroup = null;
 let hoverGroup = null;
@@ -76,6 +82,9 @@ let suppressNextClickAfterBrush = false;
 let lastDetailToastToken = "";
 let lastDetailToastAt = 0;
 let lastSpecialZonesOverlaySignature = "";
+let lastFrontlineOverlaySignature = "";
+let lastOperationGraphicsOverlaySignature = "";
+let lastUnitCountersOverlaySignature = "";
 let lastInspectorOverlaySignature = "";
 let lastHoverOverlaySignature = "";
 let lastDevSelectionOverlaySignature = "";
@@ -256,6 +265,9 @@ const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
 ]);
 const LAYER_DIAG_PREFIX = "[layer-resolver]";
 const DEFAULT_SPECIAL_ZONE_TYPE = "custom";
+const DEFAULT_OPERATION_GRAPHIC_KIND = "attack";
+const DEFAULT_UNIT_COUNTER_RENDERER = "game";
+const STRATEGIC_LINE_LABEL_FONT = "\"IBM Plex Sans\", \"Segoe UI\", sans-serif";
 const PAPER_TEXTURE_BASE_TILE_SIZE = 512;
 const PAPER_NOISE_TILE_SIZE = 192;
 const TEXTURE_LABEL_SERIF_STACK = "\"Libre Baskerville\", \"Palatino Linotype\", Georgia, serif";
@@ -3284,10 +3296,22 @@ function setRenderPhase(phase) {
 }
 
 function markOverlaysDirty({
+  frontline = false,
+  operationGraphics = false,
+  unitCounters = false,
   specialZones = false,
   inspector = false,
   hover = false,
 } = {}) {
+  if (frontline) {
+    state.frontlineOverlayDirty = true;
+  }
+  if (operationGraphics) {
+    state.operationGraphicsDirty = true;
+  }
+  if (unitCounters) {
+    state.unitCountersDirty = true;
+  }
   if (specialZones) {
     state.specialZonesOverlayDirty = true;
   }
@@ -3301,6 +3325,9 @@ function markOverlaysDirty({
 
 function markAllOverlaysDirty() {
   markOverlaysDirty({
+    frontline: true,
+    operationGraphics: true,
+    unitCounters: true,
     specialZones: true,
     inspector: true,
     hover: true,
@@ -3326,6 +3353,46 @@ function getSpecialZonesOverlaySignature() {
     String(state.specialZoneEditor?.zoneType || ""),
     String(state.specialZoneEditor?.label || ""),
     Array.isArray(state.specialZoneEditor?.vertices) ? state.specialZoneEditor.vertices.length : 0,
+  ].join("::");
+}
+
+function getFrontlineOverlaySignature() {
+  return [
+    getOverlayProjectionSignature(),
+    String(state.activeScenarioId || ""),
+    Number(state.scenarioControllerRevision || 0),
+    Number(state.scenarioShellOverlayRevision || 0),
+    Number(state.sovereigntyRevision || 0),
+    state.annotationView?.frontlineEnabled ? "1" : "0",
+    String(state.annotationView?.frontlineStyle || "clean"),
+    state.annotationView?.showFrontlineLabels ? "1" : "0",
+    String(state.annotationView?.labelPlacementMode || "midpoint"),
+    Number(state.zoomTransform?.k || 1).toFixed(3),
+  ].join("::");
+}
+
+function getOperationGraphicsOverlaySignature() {
+  return [
+    getOverlayProjectionSignature(),
+    Number(state.dirtyRevision || 0),
+    Number(state.zoomTransform?.k || 1).toFixed(3),
+    Array.isArray(state.operationGraphics) ? state.operationGraphics.length : 0,
+    !!state.operationGraphicsEditor?.active ? "1" : "0",
+    Array.isArray(state.operationGraphicsEditor?.points) ? state.operationGraphicsEditor.points.length : 0,
+    String(state.operationGraphicsEditor?.selectedId || ""),
+  ].join("::");
+}
+
+function getUnitCountersOverlaySignature() {
+  return [
+    getOverlayProjectionSignature(),
+    Number(state.dirtyRevision || 0),
+    Number(state.zoomTransform?.k || 1).toFixed(3),
+    Array.isArray(state.unitCounters) ? state.unitCounters.length : 0,
+    String(state.annotationView?.unitRendererDefault || DEFAULT_UNIT_COUNTER_RENDERER),
+    state.annotationView?.showUnitLabels ? "1" : "0",
+    !!state.unitCounterEditor?.active ? "1" : "0",
+    String(state.unitCounterEditor?.selectedId || ""),
   ].join("::");
 }
 
@@ -3366,6 +3433,36 @@ function renderSpecialZonesIfNeeded({ force = false } = {}) {
   renderSpecialZones();
   state.specialZonesOverlayDirty = false;
   lastSpecialZonesOverlaySignature = nextSignature;
+}
+
+function renderFrontlineOverlayIfNeeded({ force = false } = {}) {
+  const nextSignature = getFrontlineOverlaySignature();
+  if (!force && !state.frontlineOverlayDirty && nextSignature === lastFrontlineOverlaySignature) {
+    return;
+  }
+  renderFrontlineOverlay();
+  state.frontlineOverlayDirty = false;
+  lastFrontlineOverlaySignature = nextSignature;
+}
+
+function renderOperationGraphicsIfNeeded({ force = false } = {}) {
+  const nextSignature = getOperationGraphicsOverlaySignature();
+  if (!force && !state.operationGraphicsDirty && nextSignature === lastOperationGraphicsOverlaySignature) {
+    return;
+  }
+  renderOperationGraphicsOverlay();
+  state.operationGraphicsDirty = false;
+  lastOperationGraphicsOverlaySignature = nextSignature;
+}
+
+function renderUnitCountersIfNeeded({ force = false } = {}) {
+  const nextSignature = getUnitCountersOverlaySignature();
+  if (!force && !state.unitCountersDirty && nextSignature === lastUnitCountersOverlaySignature) {
+    return;
+  }
+  renderUnitCountersOverlay();
+  state.unitCountersDirty = false;
+  lastUnitCountersOverlaySignature = nextSignature;
 }
 
 function renderInspectorHighlightOverlayIfNeeded({ force = false } = {}) {
@@ -3956,6 +4053,66 @@ function ensureHybridLayers() {
     viewportGroup = svg.append("g").attr("class", "viewport-layer");
   }
   viewportGroup.style("pointer-events", "none");
+
+  strategicDefs = svg.select("defs.strategic-overlay-defs");
+  if (strategicDefs.empty()) {
+    strategicDefs = svg.append("defs").attr("class", "strategic-overlay-defs");
+  }
+
+  frontlineOverlayGroup = viewportGroup.select("g.frontline-overlay-layer");
+  if (frontlineOverlayGroup.empty()) {
+    frontlineOverlayGroup = viewportGroup.append("g").attr("class", "frontline-overlay-layer");
+  }
+  frontlineOverlayGroup
+    .style("pointer-events", "none")
+    .attr("role", "img")
+    .attr("aria-label", "Strategic frontline overlay")
+    .attr("aria-hidden", "true")
+    .attr("focusable", "false");
+
+  frontlineLabelsGroup = viewportGroup.select("g.frontline-labels-layer");
+  if (frontlineLabelsGroup.empty()) {
+    frontlineLabelsGroup = viewportGroup.append("g").attr("class", "frontline-labels-layer");
+  }
+  frontlineLabelsGroup
+    .style("pointer-events", "none")
+    .attr("role", "img")
+    .attr("aria-label", "Strategic frontline labels")
+    .attr("aria-hidden", "true")
+    .attr("focusable", "false");
+
+  operationGraphicsGroup = viewportGroup.select("g.operation-graphics-layer");
+  if (operationGraphicsGroup.empty()) {
+    operationGraphicsGroup = viewportGroup.append("g").attr("class", "operation-graphics-layer");
+  }
+  operationGraphicsGroup
+    .style("pointer-events", "none")
+    .attr("role", "img")
+    .attr("aria-label", "Strategic operation graphics")
+    .attr("aria-hidden", "true")
+    .attr("focusable", "false");
+
+  operationGraphicsEditorGroup = viewportGroup.select("g.operation-graphics-editor-layer");
+  if (operationGraphicsEditorGroup.empty()) {
+    operationGraphicsEditorGroup = viewportGroup.append("g").attr("class", "operation-graphics-editor-layer");
+  }
+  operationGraphicsEditorGroup
+    .style("pointer-events", "none")
+    .attr("role", "img")
+    .attr("aria-label", "Strategic operation graphics editor")
+    .attr("aria-hidden", "true")
+    .attr("focusable", "false");
+
+  unitCountersGroup = viewportGroup.select("g.unit-counters-layer");
+  if (unitCountersGroup.empty()) {
+    unitCountersGroup = viewportGroup.append("g").attr("class", "unit-counters-layer");
+  }
+  unitCountersGroup
+    .style("pointer-events", "all")
+    .attr("role", "img")
+    .attr("aria-label", "Strategic unit counters")
+    .attr("aria-hidden", "true")
+    .attr("focusable", "false");
 
   specialZonesGroup = viewportGroup.select("g.special-zones-layer");
   if (specialZonesGroup.empty()) {
@@ -13336,6 +13493,737 @@ function renderSpecialZoneEditorOverlay() {
   pointSelection.exit().remove();
 }
 
+function updateStrategicOverlayUi() {
+  if (typeof state.updateStrategicOverlayUIFn === "function") {
+    state.updateStrategicOverlayUIFn();
+  }
+}
+
+function ensureOperationGraphicsEditorState() {
+  if (!state.operationGraphicsEditor || typeof state.operationGraphicsEditor !== "object") {
+    state.operationGraphicsEditor = {
+      active: false,
+      points: [],
+      kind: DEFAULT_OPERATION_GRAPHIC_KIND,
+      label: "",
+      selectedId: null,
+      counter: 1,
+    };
+  }
+  if (!Array.isArray(state.operationGraphicsEditor.points)) {
+    state.operationGraphicsEditor.points = [];
+  }
+}
+
+function ensureUnitCounterEditorState() {
+  if (!state.unitCounterEditor || typeof state.unitCounterEditor !== "object") {
+    state.unitCounterEditor = {
+      active: false,
+      renderer: DEFAULT_UNIT_COUNTER_RENDERER,
+      label: "",
+      symbolCode: "",
+      size: "medium",
+      selectedId: null,
+      counter: 1,
+    };
+  }
+}
+
+function getFrontlineOwnershipContext() {
+  return {
+    ownershipByFeatureId: state.sovereigntyByFeatureId,
+    controllerByFeatureId: state.scenarioControllersByFeatureId,
+    shellOwnerByFeatureId: state.scenarioAutoShellOwnerByFeatureId,
+    shellControllerByFeatureId: state.scenarioAutoShellControllerByFeatureId,
+    scenarioActive: !!state.activeScenarioId,
+    viewMode: "frontline",
+  };
+}
+
+function getFrontlineMesh() {
+  if (
+    !state.activeScenarioId
+    || !state.annotationView?.frontlineEnabled
+    || !state.runtimePoliticalTopology?.objects?.political
+  ) {
+    state.cachedFrontlineMesh = null;
+    state.cachedFrontlineMeshHash = "";
+    return null;
+  }
+  const nextHash = [
+    `scenario:${String(state.activeScenarioId || "")}`,
+    `ctrl:${Number(state.scenarioControllerRevision || 0)}`,
+    `shell:${Number(state.scenarioShellOverlayRevision || 0)}`,
+    `sov:${Number(state.sovereigntyRevision || 0)}`,
+  ].join("|");
+  if (state.cachedFrontlineMesh && state.cachedFrontlineMeshHash === nextHash) {
+    return state.cachedFrontlineMesh;
+  }
+  state.cachedFrontlineMesh = buildDynamicOwnerBorderMesh(
+    state.runtimePoliticalTopology,
+    getFrontlineOwnershipContext()
+  );
+  state.cachedFrontlineMeshHash = nextHash;
+  return state.cachedFrontlineMesh;
+}
+
+function getProjectedPoint(coord) {
+  const projected = projection?.(coord);
+  if (!Array.isArray(projected) || projected.length < 2) return null;
+  const x = Number(projected[0]);
+  const y = Number(projected[1]);
+  return Number.isFinite(x) && Number.isFinite(y) ? [x, y] : null;
+}
+
+function getLineMidpointFromCoordinates(coordinates = []) {
+  if (!Array.isArray(coordinates) || coordinates.length < 2) return null;
+  const totalSegments = [];
+  let totalLength = 0;
+  for (let index = 1; index < coordinates.length; index += 1) {
+    const previous = coordinates[index - 1];
+    const current = coordinates[index];
+    if (!Array.isArray(previous) || !Array.isArray(current)) continue;
+    const dx = Number(current[0]) - Number(previous[0]);
+    const dy = Number(current[1]) - Number(previous[1]);
+    const segmentLength = Math.hypot(dx, dy);
+    if (!Number.isFinite(segmentLength) || segmentLength <= 0) continue;
+    totalSegments.push({ previous, current, segmentLength });
+    totalLength += segmentLength;
+  }
+  if (!totalLength || !totalSegments.length) return null;
+  let distance = totalLength / 2;
+  for (const segment of totalSegments) {
+    if (distance <= segment.segmentLength) {
+      const ratio = distance / segment.segmentLength;
+      return [
+        Number(segment.previous[0]) + (Number(segment.current[0]) - Number(segment.previous[0])) * ratio,
+        Number(segment.previous[1]) + (Number(segment.current[1]) - Number(segment.previous[1])) * ratio,
+      ];
+    }
+    distance -= segment.segmentLength;
+  }
+  const last = totalSegments[totalSegments.length - 1];
+  return [Number(last.current[0]), Number(last.current[1])];
+}
+
+function getMultiLineLabelAnchor(geometry, placementMode = "midpoint") {
+  const lines = Array.isArray(geometry?.coordinates) ? geometry.coordinates : [];
+  let bestLine = null;
+  let bestLength = -1;
+  lines.forEach((line) => {
+    if (!Array.isArray(line) || line.length < 2) return;
+    let length = 0;
+    for (let index = 1; index < line.length; index += 1) {
+      const previous = line[index - 1];
+      const current = line[index];
+      length += Math.hypot(
+        Number(current?.[0] || 0) - Number(previous?.[0] || 0),
+        Number(current?.[1] || 0) - Number(previous?.[1] || 0)
+      );
+    }
+    if (length > bestLength) {
+      bestLength = length;
+      bestLine = line;
+    }
+  });
+  if (!bestLine) return null;
+  if (placementMode === "centroid") {
+    const sums = bestLine.reduce((acc, coord) => {
+      acc[0] += Number(coord?.[0] || 0);
+      acc[1] += Number(coord?.[1] || 0);
+      acc[2] += 1;
+      return acc;
+    }, [0, 0, 0]);
+    return sums[2] > 0 ? [sums[0] / sums[2], sums[1] / sums[2]] : null;
+  }
+  return getLineMidpointFromCoordinates(bestLine);
+}
+
+function getFrontlineLabelAnchors() {
+  if (
+    !state.activeScenarioId
+    || !state.annotationView?.frontlineEnabled
+    || !state.annotationView?.showFrontlineLabels
+    || !globalThis.topojson
+  ) {
+    state.cachedFrontlineLabelAnchors = [];
+    return [];
+  }
+  const topology = state.runtimePoliticalTopology;
+  const object = topology?.objects?.political;
+  const geometries = Array.isArray(object?.geometries) ? object.geometries : [];
+  const neighbors = Array.isArray(state.runtimeNeighborGraph) ? state.runtimeNeighborGraph : [];
+  const ownershipContext = getFrontlineOwnershipContext();
+  const anchors = [];
+  const seenPairs = new Set();
+
+  geometries.forEach((geometry, index) => {
+    const featureId = getEntityFeatureId(geometry);
+    if (!featureId || shouldExcludeOwnerBorderEntity(geometry, { excludeSea: true })) return;
+    const ownerA = resolveOwnerBorderCode(geometry, ownershipContext);
+    if (!ownerA) return;
+    const neighborIndexes = Array.isArray(neighbors[index]) ? neighbors[index] : [];
+    neighborIndexes.forEach((neighborIndex) => {
+      if (neighborIndex <= index) return;
+      const neighbor = geometries[neighborIndex];
+      if (!neighbor || shouldExcludeOwnerBorderEntity(neighbor, { excludeSea: true })) return;
+      const ownerB = resolveOwnerBorderCode(neighbor, ownershipContext);
+      if (!ownerB || ownerA === ownerB) return;
+      const pairKey = [ownerA, ownerB].sort().join("::");
+      if (seenPairs.has(pairKey)) return;
+      const pairMesh = globalThis.topojson.mesh(topology, object, (a, b) => (
+        (a === geometry && b === neighbor) || (a === neighbor && b === geometry)
+      ));
+      const anchor = getMultiLineLabelAnchor(pairMesh, state.annotationView?.labelPlacementMode || "midpoint");
+      if (!anchor) return;
+      const projected = getProjectedPoint(anchor);
+      if (!projected) return;
+      seenPairs.add(pairKey);
+      anchors.push({
+        key: pairKey,
+        coord: anchor,
+        projected,
+        label: `${getScenarioCountryDisplayName(ownerA) || ownerA} / ${getScenarioCountryDisplayName(ownerB) || ownerB}`,
+      });
+    });
+  });
+
+  state.cachedFrontlineLabelAnchors = anchors;
+  return anchors;
+}
+
+function renderStrategicDefs() {
+  if (!strategicDefs) return;
+  const defs = [
+    {
+      id: "strategic-arrow-attack",
+      path: "M 0 0 L 11 5 L 0 10 z",
+      fill: "#991b1b",
+      stroke: "#fecaca",
+      strokeWidth: 0.6,
+    },
+    {
+      id: "strategic-arrow-retreat",
+      path: "M 0 5 L 11 0 L 8 5 L 11 10 z",
+      fill: "#f59e0b",
+      stroke: "#fef3c7",
+      strokeWidth: 0.6,
+    },
+    {
+      id: "strategic-arrow-supply",
+      path: "M 0 5 L 8 1 L 8 4 L 11 4 L 11 6 L 8 6 L 8 9 z",
+      fill: "#475569",
+      stroke: "#e2e8f0",
+      strokeWidth: 0.5,
+    },
+    {
+      id: "strategic-arrow-naval",
+      path: "M 0 5 L 10 0 L 7 5 L 10 10 z",
+      fill: "#1d4ed8",
+      stroke: "#dbeafe",
+      strokeWidth: 0.6,
+    },
+  ];
+
+  const selection = strategicDefs.selectAll("marker.strategic-marker").data(defs, (d) => d.id);
+  const enter = selection
+    .enter()
+    .append("marker")
+    .attr("class", "strategic-marker")
+    .attr("markerUnits", "strokeWidth")
+    .attr("orient", "auto-start-reverse")
+    .attr("refX", 10)
+    .attr("refY", 5)
+    .attr("markerWidth", 11)
+    .attr("markerHeight", 10)
+    .attr("viewBox", "0 0 11 10");
+
+  enter.append("path");
+  enter.merge(selection)
+    .attr("id", (d) => d.id)
+    .select("path")
+    .attr("d", (d) => d.path)
+    .attr("fill", (d) => d.fill)
+    .attr("stroke", (d) => d.stroke)
+    .attr("stroke-width", (d) => d.strokeWidth);
+
+  selection.exit().remove();
+}
+
+function getOperationGraphicPreset(kind) {
+  const presets = {
+    attack: {
+      stroke: "#991b1b",
+      width: 4.4,
+      opacity: 0.96,
+      dasharray: null,
+      markerEnd: "url(#strategic-arrow-attack)",
+      curved: true,
+      closed: false,
+    },
+    retreat: {
+      stroke: "#b45309",
+      width: 3.4,
+      opacity: 0.9,
+      dasharray: "9 6",
+      markerEnd: "url(#strategic-arrow-retreat)",
+      curved: true,
+      closed: false,
+    },
+    supply: {
+      stroke: "#475569",
+      width: 2.4,
+      opacity: 0.92,
+      dasharray: "5 5",
+      markerEnd: "url(#strategic-arrow-supply)",
+      curved: true,
+      closed: false,
+    },
+    naval: {
+      stroke: "#1d4ed8",
+      width: 3,
+      opacity: 0.9,
+      dasharray: "10 6",
+      markerEnd: "url(#strategic-arrow-naval)",
+      curved: true,
+      closed: false,
+    },
+    encirclement: {
+      stroke: "#6d28d9",
+      width: 2.8,
+      opacity: 0.88,
+      dasharray: "7 5",
+      markerEnd: null,
+      curved: true,
+      closed: true,
+    },
+    theater: {
+      stroke: "#92400e",
+      width: 3.2,
+      opacity: 0.82,
+      dasharray: "12 6",
+      markerEnd: null,
+      curved: true,
+      closed: true,
+    },
+  };
+  return presets[kind] || presets.attack;
+}
+
+function projectStrategicPoints(points = []) {
+  return points.map((point) => getProjectedPoint(point)).filter(Boolean);
+}
+
+function createOperationGraphicPath(points = [], { closed = false, curved = true } = {}) {
+  const projected = projectStrategicPoints(points);
+  if (projected.length < (closed ? 3 : 2) || !globalThis.d3?.line) return "";
+  const curve = closed
+    ? (curved ? globalThis.d3.curveCatmullRomClosed.alpha(0.5) : globalThis.d3.curveLinearClosed)
+    : (curved ? globalThis.d3.curveCatmullRom.alpha(0.5) : globalThis.d3.curveLinear);
+  return globalThis.d3.line().curve(curve)(projected) || "";
+}
+
+function renderFrontlineOverlay() {
+  if (!frontlineOverlayGroup || !frontlineLabelsGroup || !pathSVG) return;
+  if (!state.annotationView?.frontlineEnabled) {
+    state.cachedFrontlineMesh = null;
+    state.cachedFrontlineMeshHash = "";
+    state.cachedFrontlineLabelAnchors = [];
+    frontlineOverlayGroup.selectAll("*").remove();
+    frontlineLabelsGroup.selectAll("*").remove();
+    frontlineOverlayGroup.attr("aria-hidden", "true");
+    frontlineLabelsGroup.attr("aria-hidden", "true");
+    return;
+  }
+  const mesh = getFrontlineMesh();
+  const hasMesh = !!mesh && Array.isArray(mesh.coordinates) && mesh.coordinates.length > 0;
+  if (!hasMesh) {
+    frontlineOverlayGroup.selectAll("*").remove();
+    frontlineLabelsGroup.selectAll("*").remove();
+    frontlineOverlayGroup.attr("aria-hidden", "true");
+    frontlineLabelsGroup.attr("aria-hidden", "true");
+    return;
+  }
+
+  const style = String(state.annotationView?.frontlineStyle || "clean");
+  const pathValue = pathSVG(mesh);
+  const layers = style === "dual-rail"
+    ? [
+      { key: "base", stroke: "rgba(15, 23, 42, 0.92)", width: 5.4, dasharray: null },
+      { key: "inner-a", stroke: "rgba(190, 24, 93, 0.85)", width: 2.5, dasharray: null },
+      { key: "inner-b", stroke: "rgba(59, 130, 246, 0.85)", width: 1.1, dasharray: "16 10" },
+    ]
+    : style === "teeth"
+      ? [
+        { key: "base", stroke: "rgba(17, 24, 39, 0.96)", width: 5.1, dasharray: null },
+        { key: "teeth", stroke: "rgba(248, 250, 252, 0.95)", width: 2.3, dasharray: "2 6" },
+      ]
+      : [
+        { key: "base", stroke: "rgba(241, 245, 249, 0.95)", width: 5.2, dasharray: null },
+        { key: "inner", stroke: "rgba(15, 23, 42, 0.92)", width: 2.4, dasharray: null },
+      ];
+
+  const selection = frontlineOverlayGroup
+    .selectAll("path.frontline-path")
+    .data(layers, (d) => d.key);
+
+  selection
+    .enter()
+    .append("path")
+    .attr("class", "frontline-path")
+    .attr("role", "presentation")
+    .attr("aria-hidden", "true")
+    .attr("vector-effect", "non-scaling-stroke")
+    .merge(selection)
+    .attr("d", pathValue)
+    .attr("fill", "none")
+    .attr("stroke", (d) => d.stroke)
+    .attr("stroke-width", (d) => d.width)
+    .attr("stroke-linecap", "round")
+    .attr("stroke-linejoin", "round")
+    .attr("stroke-dasharray", (d) => d.dasharray || null);
+
+  selection.exit().remove();
+  frontlineOverlayGroup.attr("aria-hidden", "false");
+
+  const labels = state.annotationView?.showFrontlineLabels ? getFrontlineLabelAnchors() : [];
+  const labelSelection = frontlineLabelsGroup
+    .selectAll("g.frontline-label")
+    .data(labels, (d) => d.key);
+
+  const labelEnter = labelSelection.enter().append("g").attr("class", "frontline-label");
+  labelEnter.append("rect").attr("rx", 4).attr("ry", 4);
+  labelEnter.append("text");
+
+  labelEnter.merge(labelSelection)
+    .attr("transform", (d) => `translate(${d.projected[0]},${d.projected[1]})`);
+
+  labelEnter.merge(labelSelection).select("text")
+    .attr("text-anchor", "middle")
+    .attr("dominant-baseline", "central")
+    .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
+    .attr("font-size", 10)
+    .attr("font-weight", 600)
+    .attr("fill", "#f8fafc")
+    .text((d) => d.label);
+
+  labelEnter.merge(labelSelection).select("rect")
+    .each(function eachLabelRect(d) {
+      const textNode = globalThis.d3.select(this.parentNode).select("text").node();
+      const bbox = textNode?.getBBox?.();
+      const width = bbox ? bbox.width + 10 : 64;
+      const height = bbox ? bbox.height + 6 : 18;
+      globalThis.d3.select(this)
+        .attr("x", -width / 2)
+        .attr("y", -height / 2)
+        .attr("width", width)
+        .attr("height", height)
+        .attr("fill", "rgba(15, 23, 42, 0.78)")
+        .attr("stroke", "rgba(248, 250, 252, 0.18)")
+        .attr("stroke-width", 0.8);
+    });
+
+  labelSelection.exit().remove();
+  frontlineLabelsGroup.attr("aria-hidden", labels.length ? "false" : "true");
+}
+
+function renderOperationGraphicsEditorOverlay() {
+  if (!operationGraphicsEditorGroup) return;
+  ensureOperationGraphicsEditorState();
+  const points = Array.isArray(state.operationGraphicsEditor.points) ? state.operationGraphicsEditor.points : [];
+  const kind = String(state.operationGraphicsEditor.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
+  if (!state.operationGraphicsEditor.active || points.length === 0) {
+    operationGraphicsEditorGroup.selectAll("*").remove();
+    operationGraphicsEditorGroup.attr("aria-hidden", "true");
+    return;
+  }
+  const preset = getOperationGraphicPreset(kind);
+  const previewPath = createOperationGraphicPath(points, {
+    closed: !!preset.closed && points.length >= 3,
+    curved: true,
+  });
+  const previewData = previewPath ? [{ id: "preview", d: previewPath, closed: !!preset.closed && points.length >= 3 }] : [];
+  const pathSelection = operationGraphicsEditorGroup
+    .selectAll("path.operation-graphics-editor-path")
+    .data(previewData, (d) => d.id);
+
+  pathSelection
+    .enter()
+    .append("path")
+    .attr("class", "operation-graphics-editor-path")
+    .attr("role", "presentation")
+    .attr("aria-hidden", "true")
+    .attr("vector-effect", "non-scaling-stroke")
+    .merge(pathSelection)
+    .attr("d", (d) => d.d)
+    .attr("fill", (d) => (d.closed ? "rgba(59, 130, 246, 0.08)" : "none"))
+    .attr("stroke", preset.stroke)
+    .attr("stroke-width", Math.max(1.5, preset.width))
+    .attr("stroke-linecap", "round")
+    .attr("stroke-linejoin", "round")
+    .attr("stroke-dasharray", preset.dasharray || "8 4");
+
+  pathSelection.exit().remove();
+
+  const pointSelection = operationGraphicsEditorGroup
+    .selectAll("circle.operation-graphics-editor-point")
+    .data(points.map((coord, index) => ({ coord, id: `opg-point-${index}` })), (d) => d.id);
+
+  pointSelection
+    .enter()
+    .append("circle")
+    .attr("class", "operation-graphics-editor-point")
+    .attr("role", "presentation")
+    .attr("aria-hidden", "true")
+    .merge(pointSelection)
+    .attr("r", 3.2)
+    .attr("cx", (d) => getProjectedPoint(d.coord)?.[0] ?? -9999)
+    .attr("cy", (d) => getProjectedPoint(d.coord)?.[1] ?? -9999)
+    .attr("fill", "#ffffff")
+    .attr("stroke", preset.stroke)
+    .attr("stroke-width", 1.3);
+
+  pointSelection.exit().remove();
+  operationGraphicsEditorGroup.attr("aria-hidden", "false");
+}
+
+function renderOperationGraphicsOverlay() {
+  if (!operationGraphicsGroup) return;
+  renderStrategicDefs();
+  const graphics = Array.isArray(state.operationGraphics) ? state.operationGraphics : [];
+  const selectedId = String(state.operationGraphicsEditor?.selectedId || "");
+  const rendered = graphics
+    .map((graphic) => {
+      const preset = getOperationGraphicPreset(graphic.kind);
+      const path = createOperationGraphicPath(graphic.points, {
+        closed: preset.closed,
+        curved: preset.curved,
+      });
+      if (!path) return null;
+      return { graphic, preset, path, pathId: `strategic-graphic-path-${graphic.id}` };
+    })
+    .filter(Boolean);
+
+  const groups = operationGraphicsGroup
+    .selectAll("g.operation-graphic")
+    .data(rendered, (d) => d.graphic.id);
+
+  const groupEnter = groups.enter().append("g").attr("class", "operation-graphic");
+  groupEnter.append("path").attr("class", "operation-graphic-path");
+  groupEnter.append("path").attr("class", "operation-graphic-hit");
+  groupEnter.append("text").attr("class", "operation-graphic-label").append("textPath");
+
+  const merged = groupEnter.merge(groups);
+  merged.select("path.operation-graphic-path")
+    .attr("id", (d) => d.pathId)
+    .attr("d", (d) => d.path)
+    .attr("fill", (d) => (d.preset.closed ? "rgba(15, 23, 42, 0.06)" : "none"))
+    .attr("stroke", (d) => d.graphic.stroke || d.preset.stroke)
+    .attr("stroke-width", (d) => (d.graphic.id === selectedId ? d.preset.width + 1.4 : d.preset.width))
+    .attr("stroke-linecap", "round")
+    .attr("stroke-linejoin", "round")
+    .attr("stroke-dasharray", (d) => d.preset.dasharray || null)
+    .attr("opacity", (d) => d.graphic.opacity ?? d.preset.opacity)
+    .attr("marker-end", (d) => d.preset.markerEnd || null);
+
+  merged.select("path.operation-graphic-hit")
+    .attr("d", (d) => d.path)
+    .attr("fill", "none")
+    .attr("stroke", "transparent")
+    .attr("stroke-width", (d) => Math.max(10, d.preset.width + 6))
+    .attr("pointer-events", "stroke");
+
+  merged.select("text.operation-graphic-label")
+    .attr("display", (d) => (d.graphic.label ? null : "none"))
+    .attr("fill", "#111827")
+    .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
+    .attr("font-size", 11)
+    .attr("font-weight", 600);
+
+  merged.select("text.operation-graphic-label textPath")
+    .attr("href", (d) => `#${d.pathId}`)
+    .attr("startOffset", "50%")
+    .attr("text-anchor", "middle")
+    .text((d) => d.graphic.label || "");
+
+  groups.exit().remove();
+  operationGraphicsGroup.attr("aria-hidden", rendered.length ? "false" : "true");
+  renderOperationGraphicsEditorOverlay();
+}
+
+function getUnitCounterScale(size = "medium") {
+  if (size === "small") return 0.82;
+  if (size === "large") return 1.18;
+  return 1;
+}
+
+function getUnitCounterRenderEntries() {
+  const counters = Array.isArray(state.unitCounters) ? state.unitCounters : [];
+  const zoomK = Math.max(0.1, Number(state.zoomTransform?.k || 1));
+  if (zoomK >= 1.75) {
+    return counters.map((counter) => ({ counter, stackCount: 1 }));
+  }
+  const grouped = new Map();
+  counters.forEach((counter) => {
+    const featureId = String(counter.anchor?.featureId || "").trim();
+    const lon = Number(counter.anchor?.lon || 0);
+    const lat = Number(counter.anchor?.lat || 0);
+    const key = featureId || `${Math.round(lon * 2)}:${Math.round(lat * 2)}`;
+    if (!grouped.has(key)) {
+      grouped.set(key, []);
+    }
+    grouped.get(key).push(counter);
+  });
+  return Array.from(grouped.values()).map((bucket) => ({ counter: bucket[0], stackCount: bucket.length }));
+}
+
+function renderUnitCountersOverlay() {
+  if (!unitCountersGroup) return;
+  ensureUnitCounterEditorState();
+  const selectedId = String(state.unitCounterEditor?.selectedId || "");
+  const entries = getUnitCounterRenderEntries()
+    .map(({ counter, stackCount }) => {
+      const projected = getProjectedPoint([counter.anchor?.lon, counter.anchor?.lat]);
+      if (!projected) return null;
+      return { counter, projected, stackCount };
+    })
+    .filter(Boolean)
+    .sort((a, b) => Number(a.counter.zIndex || 0) - Number(b.counter.zIndex || 0));
+
+  const groups = unitCountersGroup
+    .selectAll("g.unit-counter")
+    .data(entries, (d) => d.counter.id);
+
+  const groupEnter = groups.enter().append("g").attr("class", "unit-counter").style("cursor", "grab");
+  groupEnter.append("rect").attr("class", "unit-counter-shell");
+  groupEnter.append("rect").attr("class", "unit-counter-band");
+  groupEnter.append("text").attr("class", "unit-counter-symbol");
+  groupEnter.append("text").attr("class", "unit-counter-label");
+  groupEnter.append("circle").attr("class", "unit-counter-stack-badge");
+  groupEnter.append("text").attr("class", "unit-counter-stack-text");
+
+  const merged = groupEnter.merge(groups)
+    .attr("transform", (d) => `translate(${d.projected[0]},${d.projected[1]}) scale(${getUnitCounterScale(d.counter.size)})`)
+    .attr("data-counter-id", (d) => d.counter.id)
+    .attr("pointer-events", "all");
+
+  merged.select("rect.unit-counter-shell")
+    .attr("x", -26)
+    .attr("y", -16)
+    .attr("width", 52)
+    .attr("height", 32)
+    .attr("rx", (d) => (d.counter.renderer === "game" ? 7 : 2))
+    .attr("ry", (d) => (d.counter.renderer === "game" ? 7 : 2))
+    .attr("fill", (d) => (d.counter.renderer === "milstd" ? "#f8fafc" : "#1f2937"))
+    .attr("stroke", (d) => (d.counter.id === selectedId ? "#38bdf8" : "#0f172a"))
+    .attr("stroke-width", (d) => (d.counter.id === selectedId ? 2.4 : 1.3));
+
+  merged.select("rect.unit-counter-band")
+    .attr("x", -26)
+    .attr("y", -16)
+    .attr("width", 52)
+    .attr("height", 8)
+    .attr("fill", (d) => (d.counter.renderer === "milstd" ? "#dbeafe" : "#991b1b"));
+
+  merged.select("text.unit-counter-symbol")
+    .attr("x", 0)
+    .attr("y", d => (d.counter.renderer === "milstd" ? 1 : -1))
+    .attr("text-anchor", "middle")
+    .attr("dominant-baseline", "central")
+    .attr("font-family", d => (d.counter.renderer === "milstd" ? "\"Roboto Condensed\", \"Segoe UI\", sans-serif" : STRATEGIC_LINE_LABEL_FONT))
+    .attr("font-size", d => (d.counter.renderer === "milstd" ? 10 : 11))
+    .attr("font-weight", 700)
+    .attr("fill", d => (d.counter.renderer === "milstd" ? "#0f172a" : "#f8fafc"))
+    .text((d) => {
+      const raw = String(d.counter.symbolCode || d.counter.label || "").trim();
+      if (!raw) return d.counter.renderer === "milstd" ? "INF" : "HQ";
+      return raw.slice(0, 10);
+    });
+
+  merged.select("text.unit-counter-label")
+    .attr("display", (d) => (state.annotationView?.showUnitLabels && d.counter.label ? null : "none"))
+    .attr("x", 0)
+    .attr("y", 24)
+    .attr("text-anchor", "middle")
+    .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
+    .attr("font-size", 10)
+    .attr("font-weight", 600)
+    .attr("fill", "#111827")
+    .text((d) => d.counter.label || "");
+
+  merged.select("circle.unit-counter-stack-badge")
+    .attr("display", (d) => (d.stackCount > 1 ? null : "none"))
+    .attr("cx", 20)
+    .attr("cy", -12)
+    .attr("r", 8)
+    .attr("fill", "#0f172a")
+    .attr("stroke", "#f8fafc")
+    .attr("stroke-width", 1);
+
+  merged.select("text.unit-counter-stack-text")
+    .attr("display", (d) => (d.stackCount > 1 ? null : "none"))
+    .attr("x", 20)
+    .attr("y", -12)
+    .attr("text-anchor", "middle")
+    .attr("dominant-baseline", "central")
+    .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
+    .attr("font-size", 9)
+    .attr("font-weight", 700)
+    .attr("fill", "#f8fafc")
+    .text((d) => `+${d.stackCount - 1}`);
+
+  if (globalThis.d3?.drag) {
+    if (!renderUnitCountersOverlay.dragBehavior) {
+      renderUnitCountersOverlay.dragBehavior = globalThis.d3.drag()
+        .on("start", function onStart(event, datum) {
+          ensureUnitCounterEditorState();
+          datum.__historyBefore = captureHistoryState({ strategicOverlay: true });
+          state.unitCounterEditor.selectedId = datum.counter.id;
+          updateStrategicOverlayUi();
+          globalThis.d3.select(this).style("cursor", "grabbing");
+        })
+        .on("drag", function onDrag(event, datum) {
+          const sourceEvent = event?.sourceEvent || event;
+          const coord = getMapLonLatFromEvent(sourceEvent);
+          if (!coord) return;
+          datum.counter.anchor = {
+            ...(datum.counter.anchor || {}),
+            lon: coord[0],
+            lat: coord[1],
+          };
+          state.unitCountersDirty = true;
+          renderUnitCountersIfNeeded({ force: true });
+        })
+        .on("end", function onEnd(_event, datum) {
+          globalThis.d3.select(this).style("cursor", "grab");
+          pushHistoryEntry({
+            kind: "move-unit-counter",
+            before: datum.__historyBefore,
+            after: captureHistoryState({ strategicOverlay: true }),
+          });
+          datum.__historyBefore = null;
+          markDirty("move-unit-counter");
+        });
+    }
+    merged.call(renderUnitCountersOverlay.dragBehavior);
+  }
+
+  merged.on("click", (_event, datum) => {
+    ensureUnitCounterEditorState();
+    state.unitCounterEditor.selectedId = datum.counter.id;
+    state.unitCounterEditor.renderer = String(datum.counter.renderer || DEFAULT_UNIT_COUNTER_RENDERER);
+    state.unitCounterEditor.label = String(datum.counter.label || "");
+    state.unitCounterEditor.symbolCode = String(datum.counter.symbolCode || "");
+    state.unitCounterEditor.size = String(datum.counter.size || "medium");
+    state.unitCountersDirty = true;
+    updateStrategicOverlayUi();
+    renderUnitCountersIfNeeded({ force: true });
+  });
+
+  groups.exit().remove();
+  unitCountersGroup.attr("aria-hidden", entries.length ? "false" : "true");
+}
+
 function renderHoverOverlay() {
   if (!hoverGroup || !pathSVG) return;
 
@@ -13623,6 +14511,9 @@ function render() {
   if (state.renderPhase === RENDER_PHASE_IDLE) {
     scheduleHitCanvasBuildIfNeeded();
   }
+  renderFrontlineOverlayIfNeeded();
+  renderOperationGraphicsIfNeeded();
+  renderUnitCountersIfNeeded();
   renderSpecialZonesIfNeeded();
   renderDevSelectionOverlayIfNeeded();
   renderInspectorHighlightOverlayIfNeeded();
@@ -13896,6 +14787,283 @@ function deleteSelectedManualSpecialZone() {
     return true;
   }
   return false;
+}
+
+function ensureOperationGraphicCounter() {
+  ensureOperationGraphicsEditorState();
+  const used = new Set((state.operationGraphics || []).map((graphic) => String(graphic?.id || "")));
+  let counter = Math.max(1, Number(state.operationGraphicsEditor.counter) || 1);
+  while (used.has(`opg_${counter}`)) {
+    counter += 1;
+  }
+  state.operationGraphicsEditor.counter = counter;
+}
+
+function appendOperationGraphicVertexFromEvent(event) {
+  ensureOperationGraphicsEditorState();
+  const coord = getMapLonLatFromEvent(event);
+  if (!coord) return false;
+  state.operationGraphicsEditor.points.push(coord);
+  state.operationGraphicsDirty = true;
+  updateStrategicOverlayUi();
+  renderOperationGraphicsIfNeeded({ force: true });
+  return true;
+}
+
+function startOperationGraphicDraw({ kind = DEFAULT_OPERATION_GRAPHIC_KIND, label = "" } = {}) {
+  ensureOperationGraphicsEditorState();
+  state.operationGraphicsEditor.active = true;
+  state.operationGraphicsEditor.points = [];
+  state.operationGraphicsEditor.kind = String(kind || DEFAULT_OPERATION_GRAPHIC_KIND);
+  state.operationGraphicsEditor.label = String(label || "");
+  state.operationGraphicsDirty = true;
+  updateStrategicOverlayUi();
+  if (context) render();
+}
+
+function undoOperationGraphicVertex() {
+  ensureOperationGraphicsEditorState();
+  if (!state.operationGraphicsEditor.active || !state.operationGraphicsEditor.points.length) return;
+  state.operationGraphicsEditor.points.pop();
+  state.operationGraphicsDirty = true;
+  updateStrategicOverlayUi();
+  if (context) render();
+}
+
+function cancelOperationGraphicDraw() {
+  ensureOperationGraphicsEditorState();
+  state.operationGraphicsEditor.active = false;
+  state.operationGraphicsEditor.points = [];
+  state.operationGraphicsDirty = true;
+  updateStrategicOverlayUi();
+  if (context) render();
+}
+
+function finishOperationGraphicDraw() {
+  ensureOperationGraphicsEditorState();
+  const kind = String(state.operationGraphicsEditor.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
+  const minPoints = kind === "encirclement" || kind === "theater" ? 3 : 2;
+  const points = Array.isArray(state.operationGraphicsEditor.points) ? state.operationGraphicsEditor.points : [];
+  if (!state.operationGraphicsEditor.active || points.length < minPoints) {
+    cancelOperationGraphicDraw();
+    return false;
+  }
+  ensureOperationGraphicCounter();
+  const before = captureHistoryState({ strategicOverlay: true });
+  const id = `opg_${state.operationGraphicsEditor.counter}`;
+  state.operationGraphics.push({
+    id,
+    kind,
+    label: String(state.operationGraphicsEditor.label || "").trim(),
+    points: [...points],
+    stylePreset: kind,
+    stroke: null,
+    width: 0,
+    opacity: 1,
+  });
+  state.operationGraphicsEditor.counter += 1;
+  state.operationGraphicsEditor.selectedId = id;
+  state.operationGraphicsEditor.active = false;
+  state.operationGraphicsEditor.points = [];
+  state.operationGraphicsDirty = true;
+  commitHistoryEntry({
+    kind: "finish-operation-graphic",
+    before,
+    after: captureHistoryState({ strategicOverlay: true }),
+  });
+  markDirty("finish-operation-graphic");
+  updateStrategicOverlayUi();
+  if (context) render();
+  return true;
+}
+
+function selectOperationGraphicById(id) {
+  ensureOperationGraphicsEditorState();
+  const selectedId = String(id || "").trim();
+  const graphic = (state.operationGraphics || []).find((entry) => String(entry?.id || "") === selectedId) || null;
+  state.operationGraphicsEditor.selectedId = selectedId || null;
+  if (graphic) {
+    state.operationGraphicsEditor.kind = String(graphic.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
+    state.operationGraphicsEditor.label = String(graphic.label || "");
+  }
+  state.operationGraphicsDirty = true;
+  updateStrategicOverlayUi();
+  if (context) render();
+}
+
+function deleteSelectedOperationGraphic() {
+  ensureOperationGraphicsEditorState();
+  const selectedId = String(state.operationGraphicsEditor.selectedId || "").trim();
+  if (!selectedId) return false;
+  const before = captureHistoryState({ strategicOverlay: true });
+  const nextGraphics = (state.operationGraphics || []).filter((entry) => String(entry?.id || "") !== selectedId);
+  if (nextGraphics.length === (state.operationGraphics || []).length) return false;
+  state.operationGraphics = nextGraphics;
+  state.operationGraphicsEditor.selectedId = null;
+  state.operationGraphicsDirty = true;
+  commitHistoryEntry({
+    kind: "delete-operation-graphic",
+    before,
+    after: captureHistoryState({ strategicOverlay: true }),
+  });
+  markDirty("delete-operation-graphic");
+  updateStrategicOverlayUi();
+  if (context) render();
+  return true;
+}
+
+function updateSelectedOperationGraphic(partial = {}) {
+  ensureOperationGraphicsEditorState();
+  const selectedId = String(state.operationGraphicsEditor.selectedId || "").trim();
+  if (!selectedId) return false;
+  const target = (state.operationGraphics || []).find((entry) => String(entry?.id || "") === selectedId);
+  if (!target) return false;
+  const before = captureHistoryState({ strategicOverlay: true });
+  if (partial.kind) target.kind = String(partial.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
+  if (partial.label !== undefined) target.label = String(partial.label || "");
+  state.operationGraphicsDirty = true;
+  commitHistoryEntry({
+    kind: "update-operation-graphic",
+    before,
+    after: captureHistoryState({ strategicOverlay: true }),
+  });
+  markDirty("update-operation-graphic");
+  updateStrategicOverlayUi();
+  if (context) render();
+  return true;
+}
+
+function ensureUnitCounterCounter() {
+  ensureUnitCounterEditorState();
+  const used = new Set((state.unitCounters || []).map((counter) => String(counter?.id || "")));
+  let counter = Math.max(1, Number(state.unitCounterEditor.counter) || 1);
+  while (used.has(`unit_${counter}`)) {
+    counter += 1;
+  }
+  state.unitCounterEditor.counter = counter;
+}
+
+function placeUnitCounterFromEvent(event) {
+  ensureUnitCounterEditorState();
+  if (!state.unitCounterEditor.active) return false;
+  const coord = getMapLonLatFromEvent(event);
+  if (!coord) return false;
+  ensureUnitCounterCounter();
+  const hit = getHitFromEvent(event, {
+    enableSnap: true,
+    snapPx: HIT_SNAP_RADIUS_CLICK_PX,
+    eventType: "unit-counter-place",
+  });
+  const featureId = hit?.targetType === "land" ? String(hit.id || "") : "";
+  const before = captureHistoryState({ strategicOverlay: true });
+  const id = `unit_${state.unitCounterEditor.counter}`;
+  state.unitCounters.push({
+    id,
+    renderer: String(state.unitCounterEditor.renderer || state.annotationView?.unitRendererDefault || DEFAULT_UNIT_COUNTER_RENDERER),
+    symbolCode: String(state.unitCounterEditor.symbolCode || "").trim(),
+    label: String(state.unitCounterEditor.label || "").trim(),
+    size: String(state.unitCounterEditor.size || "medium"),
+    facing: 0,
+    zIndex: state.unitCounters.length,
+    anchor: {
+      lon: coord[0],
+      lat: coord[1],
+      featureId,
+    },
+  });
+  state.unitCounterEditor.counter += 1;
+  state.unitCounterEditor.selectedId = id;
+  state.unitCounterEditor.active = false;
+  state.unitCountersDirty = true;
+  commitHistoryEntry({
+    kind: "place-unit-counter",
+    before,
+    after: captureHistoryState({ strategicOverlay: true }),
+  });
+  markDirty("place-unit-counter");
+  updateStrategicOverlayUi();
+  if (context) render();
+  return true;
+}
+
+function startUnitCounterPlacement({ renderer = DEFAULT_UNIT_COUNTER_RENDERER, label = "", symbolCode = "", size = "medium" } = {}) {
+  ensureUnitCounterEditorState();
+  state.unitCounterEditor.active = true;
+  state.unitCounterEditor.renderer = String(renderer || DEFAULT_UNIT_COUNTER_RENDERER);
+  state.unitCounterEditor.label = String(label || "");
+  state.unitCounterEditor.symbolCode = String(symbolCode || "");
+  state.unitCounterEditor.size = String(size || "medium");
+  state.unitCountersDirty = true;
+  updateStrategicOverlayUi();
+  if (context) render();
+}
+
+function cancelUnitCounterPlacement() {
+  ensureUnitCounterEditorState();
+  state.unitCounterEditor.active = false;
+  state.unitCountersDirty = true;
+  updateStrategicOverlayUi();
+  if (context) render();
+}
+
+function selectUnitCounterById(id) {
+  ensureUnitCounterEditorState();
+  const selectedId = String(id || "").trim();
+  const counter = (state.unitCounters || []).find((entry) => String(entry?.id || "") === selectedId) || null;
+  state.unitCounterEditor.selectedId = selectedId || null;
+  if (counter) {
+    state.unitCounterEditor.renderer = String(counter.renderer || DEFAULT_UNIT_COUNTER_RENDERER);
+    state.unitCounterEditor.label = String(counter.label || "");
+    state.unitCounterEditor.symbolCode = String(counter.symbolCode || "");
+    state.unitCounterEditor.size = String(counter.size || "medium");
+  }
+  state.unitCountersDirty = true;
+  updateStrategicOverlayUi();
+  if (context) render();
+}
+
+function updateSelectedUnitCounter(partial = {}) {
+  ensureUnitCounterEditorState();
+  const selectedId = String(state.unitCounterEditor.selectedId || "").trim();
+  if (!selectedId) return false;
+  const counter = (state.unitCounters || []).find((entry) => String(entry?.id || "") === selectedId);
+  if (!counter) return false;
+  const before = captureHistoryState({ strategicOverlay: true });
+  if (partial.renderer) counter.renderer = String(partial.renderer || DEFAULT_UNIT_COUNTER_RENDERER);
+  if (partial.label !== undefined) counter.label = String(partial.label || "");
+  if (partial.symbolCode !== undefined) counter.symbolCode = String(partial.symbolCode || "");
+  if (partial.size) counter.size = String(partial.size || "medium");
+  state.unitCountersDirty = true;
+  commitHistoryEntry({
+    kind: "update-unit-counter",
+    before,
+    after: captureHistoryState({ strategicOverlay: true }),
+  });
+  markDirty("update-unit-counter");
+  updateStrategicOverlayUi();
+  if (context) render();
+  return true;
+}
+
+function deleteSelectedUnitCounter() {
+  ensureUnitCounterEditorState();
+  const selectedId = String(state.unitCounterEditor.selectedId || "").trim();
+  if (!selectedId) return false;
+  const before = captureHistoryState({ strategicOverlay: true });
+  const nextCounters = (state.unitCounters || []).filter((entry) => String(entry?.id || "") !== selectedId);
+  if (nextCounters.length === (state.unitCounters || []).length) return false;
+  state.unitCounters = nextCounters;
+  state.unitCounterEditor.selectedId = null;
+  state.unitCountersDirty = true;
+  commitHistoryEntry({
+    kind: "delete-unit-counter",
+    before,
+    after: captureHistoryState({ strategicOverlay: true }),
+  });
+  markDirty("delete-unit-counter");
+  updateStrategicOverlayUi();
+  if (context) render();
+  return true;
 }
 
 function handleMouseMove(event) {
@@ -15028,6 +16196,14 @@ async function handleClick(event) {
     appendSpecialZoneVertexFromEvent(event);
     return;
   }
+  if (state.operationGraphicsEditor?.active) {
+    appendOperationGraphicVertexFromEvent(event);
+    return;
+  }
+  if (state.unitCounterEditor?.active) {
+    placeUnitCounterFromEvent(event);
+    return;
+  }
 
   const hit = getHitFromEvent(event, {
     enableSnap: true,
@@ -15367,6 +16543,11 @@ async function handleDoubleClick(event) {
   if (state.specialZoneEditor?.active) {
     if (event?.preventDefault) event.preventDefault();
     finishSpecialZoneDraw();
+    return;
+  }
+  if (state.operationGraphicsEditor?.active) {
+    if (event?.preventDefault) event.preventDefault();
+    finishOperationGraphicDraw();
     return;
   }
   if (!state.landData) return;
@@ -15792,6 +16973,18 @@ export {
   setMapData,
   render,
   autoFillMap,
+  startOperationGraphicDraw,
+  undoOperationGraphicVertex,
+  finishOperationGraphicDraw,
+  cancelOperationGraphicDraw,
+  selectOperationGraphicById,
+  deleteSelectedOperationGraphic,
+  updateSelectedOperationGraphic,
+  startUnitCounterPlacement,
+  cancelUnitCounterPlacement,
+  selectUnitCounterById,
+  deleteSelectedUnitCounter,
+  updateSelectedUnitCounter,
   startSpecialZoneDraw,
   undoSpecialZoneVertex,
   finishSpecialZoneDraw,

@@ -821,6 +821,42 @@ function normalizeDayNightStyleConfig(rawConfig) {
   };
 }
 
+function createDefaultAnnotationView() {
+  return {
+    frontlineEnabled: false,
+    frontlineStyle: "clean",
+    showFrontlineLabels: false,
+    labelPlacementMode: "midpoint",
+    unitRendererDefault: "game",
+    showUnitLabels: true,
+  };
+}
+
+function normalizeAnnotationView(rawConfig) {
+  const defaults = createDefaultAnnotationView();
+  const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
+  const frontlineStyle = String(raw.frontlineStyle || defaults.frontlineStyle).trim().toLowerCase();
+  const labelPlacementMode = String(raw.labelPlacementMode || defaults.labelPlacementMode).trim().toLowerCase();
+  const unitRendererDefault = String(raw.unitRendererDefault || defaults.unitRendererDefault).trim().toLowerCase();
+
+  return {
+    frontlineEnabled: raw.frontlineEnabled === undefined ? defaults.frontlineEnabled : !!raw.frontlineEnabled,
+    frontlineStyle: ["clean", "dual-rail", "teeth"].includes(frontlineStyle)
+      ? frontlineStyle
+      : defaults.frontlineStyle,
+    showFrontlineLabels: raw.showFrontlineLabels === undefined
+      ? defaults.showFrontlineLabels
+      : !!raw.showFrontlineLabels,
+    labelPlacementMode: ["midpoint", "centroid"].includes(labelPlacementMode)
+      ? labelPlacementMode
+      : defaults.labelPlacementMode,
+    unitRendererDefault: ["milstd", "game"].includes(unitRendererDefault)
+      ? unitRendererDefault
+      : defaults.unitRendererDefault,
+    showUnitLabels: raw.showUnitLabels === undefined ? defaults.showUnitLabels : !!raw.showUnitLabels,
+  };
+}
+
 export {
   PALETTE_THEMES,
   countryPalette,
@@ -845,6 +881,8 @@ export {
   normalizeTextureStyleConfig,
   createDefaultDayNightStyleConfig,
   normalizeDayNightStyleConfig,
+  createDefaultAnnotationView,
+  normalizeAnnotationView,
 };
 
 export function normalizeMapSemanticMode(value, fallback = "political") {
@@ -1131,6 +1169,9 @@ export const state = {
   hoverOverlayDirty: true,
   inspectorOverlayDirty: true,
   specialZonesOverlayDirty: true,
+  frontlineOverlayDirty: true,
+  operationGraphicsDirty: true,
+  unitCountersDirty: true,
   tooltipRafHandle: null,
   tooltipPendingState: null,
   selectedWaterRegionId: "",
@@ -1150,6 +1191,9 @@ export const state = {
     type: "FeatureCollection",
     features: [],
   },
+  annotationView: createDefaultAnnotationView(),
+  operationGraphics: [],
+  unitCounters: [],
   specialZoneEditor: {
     active: false,
     vertices: [],
@@ -1158,10 +1202,30 @@ export const state = {
     selectedId: null,
     counter: 1,
   },
+  operationGraphicsEditor: {
+    active: false,
+    points: [],
+    kind: "attack",
+    label: "",
+    selectedId: null,
+    counter: 1,
+  },
+  unitCounterEditor: {
+    active: false,
+    renderer: "game",
+    label: "",
+    symbolCode: "",
+    size: "medium",
+    selectedId: null,
+    counter: 1,
+  },
   cachedBorders: null,
   cachedCountryBorders: null,
   cachedDynamicOwnerBorders: null,
   cachedScenarioOpeningOwnerBorders: null,
+  cachedFrontlineMesh: null,
+  cachedFrontlineMeshHash: "",
+  cachedFrontlineLabelAnchors: [],
   cachedProvinceBorders: null,
   cachedLocalBorders: null,
   cachedDetailAdmBorders: null,
@@ -1270,6 +1334,7 @@ export const state = {
   updateScenarioReliefOverlayUIFn: null,
   updateParentBorderCountryListFn: null,
   updateSpecialZoneEditorUIFn: null,
+  updateStrategicOverlayUIFn: null,
   updateScenarioContextBarFn: null,
   triggerScenarioGuideFn: null,
   persistViewSettingsFn: null,
@@ -1301,6 +1366,7 @@ export const state = {
     politicalEditingExpanded: false,
     scenarioVisualAdjustmentsOpen: false,
     devWorkspaceExpanded: false,
+    rightSidebarTab: "inspector",
   },
 
   countryPalette,

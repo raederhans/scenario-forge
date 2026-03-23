@@ -1,5 +1,6 @@
 // Project file manager (Phase 13)
 import {
+  normalizeAnnotationView,
   normalizeCityLayerStyleConfig,
   normalizeDayNightStyleConfig,
   normalizeLakeStyleConfig,
@@ -124,11 +125,74 @@ function normalizeScenarioImportAudit(rawAudit, { scenarioId = "" } = {}) {
   };
 }
 
+function normalizeProjectCoordinatePair(value) {
+  if (!Array.isArray(value) || value.length < 2) return null;
+  const lon = Number(value[0]);
+  const lat = Number(value[1]);
+  if (!Number.isFinite(lon) || !Number.isFinite(lat)) return null;
+  return [clamp(lon, -180, 180), clamp(lat, -90, 90)];
+}
+
+function normalizeOperationGraphics(rawGraphics) {
+  if (!Array.isArray(rawGraphics)) return [];
+  return rawGraphics
+    .map((entry, index) => {
+      const raw = entry && typeof entry === "object" ? entry : {};
+      const kind = String(raw.kind || "attack").trim().toLowerCase();
+      const points = Array.isArray(raw.points)
+        ? raw.points.map((point) => normalizeProjectCoordinatePair(point)).filter(Boolean)
+        : [];
+      if (!["attack", "retreat", "supply", "naval", "encirclement", "theater"].includes(kind)) return null;
+      if (points.length < (kind === "encirclement" || kind === "theater" ? 3 : 2)) return null;
+      const stroke = normalizeProjectHexColor(raw.stroke) || null;
+      return {
+        id: String(raw.id || `opg_${index + 1}`).trim() || `opg_${index + 1}`,
+        kind,
+        label: String(raw.label || "").trim(),
+        points,
+        stylePreset: String(raw.stylePreset || kind).trim() || kind,
+        stroke,
+        width: clamp(Number.isFinite(Number(raw.width)) ? Number(raw.width) : 0, 0, 16),
+        opacity: clamp(Number.isFinite(Number(raw.opacity)) ? Number(raw.opacity) : 1, 0, 1),
+      };
+    })
+    .filter(Boolean);
+}
+
+function normalizeUnitCounters(rawCounters) {
+  if (!Array.isArray(rawCounters)) return [];
+  return rawCounters
+    .map((entry, index) => {
+      const raw = entry && typeof entry === "object" ? entry : {};
+      const anchorSource = raw.anchor && typeof raw.anchor === "object" ? raw.anchor : {};
+      const lon = Number(anchorSource.lon);
+      const lat = Number(anchorSource.lat);
+      if (!Number.isFinite(lon) || !Number.isFinite(lat)) return null;
+      const renderer = String(raw.renderer || "game").trim().toLowerCase() === "milstd" ? "milstd" : "game";
+      const size = String(raw.size || "medium").trim().toLowerCase();
+      return {
+        id: String(raw.id || `unit_${index + 1}`).trim() || `unit_${index + 1}`,
+        renderer,
+        symbolCode: String(raw.symbolCode || raw.templateId || "").trim(),
+        label: String(raw.label || "").trim(),
+        size: ["small", "medium", "large"].includes(size) ? size : "medium",
+        facing: clamp(Number.isFinite(Number(raw.facing)) ? Number(raw.facing) : 0, -180, 180),
+        zIndex: Math.round(Number.isFinite(Number(raw.zIndex)) ? Number(raw.zIndex) : index),
+        anchor: {
+          lon: clamp(lon, -180, 180),
+          lat: clamp(lat, -90, 90),
+          featureId: String(anchorSource.featureId || "").trim(),
+        },
+      };
+    })
+    .filter(Boolean);
+}
+
 class FileManager {
   static exportProject(appState) {
     if (!appState) return;
     const payload = {
-      schemaVersion: 14,
+      schemaVersion: 16,
       countryBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
       featureOverrides: appState.visualOverrides || appState.featureOverrides || {},
       sovereignBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
@@ -148,6 +212,9 @@ class FileManager {
       specialZones: appState.specialZones || {},
       parentBorderEnabledByCountry: appState.parentBorderEnabledByCountry || {},
       manualSpecialZones: appState.manualSpecialZones || { type: "FeatureCollection", features: [] },
+      annotationView: normalizeAnnotationView(appState.annotationView),
+      operationGraphics: normalizeOperationGraphics(appState.operationGraphics),
+      unitCounters: normalizeUnitCounters(appState.unitCounters),
       customPresets: appState.customPresets || {},
       referenceImageState: normalizeReferenceImageState(appState.referenceImageState),
       recentColors: normalizeRecentColors(appState.recentColors),
@@ -311,6 +378,9 @@ class FileManager {
         ) {
           data.manualSpecialZones = { type: "FeatureCollection", features: [] };
         }
+        data.annotationView = normalizeAnnotationView(data.annotationView);
+        data.operationGraphics = normalizeOperationGraphics(data.operationGraphics);
+        data.unitCounters = normalizeUnitCounters(data.unitCounters);
         if (!data.layerVisibility || typeof data.layerVisibility !== "object") {
           data.layerVisibility = {};
         }

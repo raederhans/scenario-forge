@@ -2800,7 +2800,7 @@ function initToolbar({ render } = {}) {
   bindDockPopoverDismiss();
 
   if (exportBtn && exportFormat) {
-    exportBtn.addEventListener("click", () => {
+    exportBtn.addEventListener("click", async () => {
       try {
         const format = exportFormat.value === "jpg" ? "image/jpeg" : "image/png";
         const extension = exportFormat.value === "jpg" ? "jpg" : "png";
@@ -2813,6 +2813,26 @@ function initToolbar({ render } = {}) {
         }
         if (state.colorCanvas) exportCtx.drawImage(state.colorCanvas, 0, 0);
         if (state.lineCanvas) exportCtx.drawImage(state.lineCanvas, 0, 0);
+        const mapSvg = document.getElementById("map-svg");
+        if (mapSvg) {
+          const serializer = new XMLSerializer();
+          const svgMarkup = serializer.serializeToString(mapSvg);
+          const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
+          const svgUrl = URL.createObjectURL(svgBlob);
+          try {
+            await new Promise((resolve, reject) => {
+              const image = new Image();
+              image.onload = () => {
+                exportCtx.drawImage(image, 0, 0);
+                resolve();
+              };
+              image.onerror = () => reject(new Error("SVG overlay export failed."));
+              image.src = svgUrl;
+            });
+          } finally {
+            URL.revokeObjectURL(svgUrl);
+          }
+        }
         const dataUrl = exportCanvas.toDataURL(format, 0.92);
         const link = document.createElement("a");
         link.href = dataUrl;

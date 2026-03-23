@@ -7,6 +7,7 @@ import {
   normalizeCityLayerStyleConfig,
   normalizeDayNightStyleConfig,
   normalizeLakeStyleConfig,
+  normalizeAnnotationView,
   normalizeMapSemanticMode,
   normalizePhysicalStyleConfig,
 } from "../core/state.js";
@@ -1463,6 +1464,218 @@ function initSidebar({ render } = {}) {
     projectLegendStack.appendChild(legendSection);
   }
 
+  const frontlineTabStack = document.getElementById("frontlineTabStack");
+  const buildRow = () => {
+    const row = document.createElement("div");
+    row.className = "mt-2 flex flex-wrap items-center gap-2";
+    return row;
+  };
+  const buildSelect = (id, options) => {
+    const select = document.createElement("select");
+    select.id = id;
+    select.className = "select-input";
+    options.forEach(([value, label]) => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = t(label, "ui");
+      select.appendChild(option);
+    });
+    return select;
+  };
+  const buildButton = (id, label, variant = "btn-secondary") => {
+    const button = document.createElement("button");
+    button.id = id;
+    button.type = "button";
+    button.className = variant;
+    button.textContent = t(label, "ui");
+    return button;
+  };
+
+  let frontlineOverlaySection = document.getElementById("frontlineOverlayPanel");
+  if (!frontlineOverlaySection && frontlineTabStack) {
+    frontlineOverlaySection = document.createElement("div");
+    frontlineOverlaySection.id = "frontlineOverlayPanel";
+    frontlineOverlaySection.className = "inspector-tool-card";
+
+    const statusRow = document.createElement("div");
+    statusRow.className = "frontline-status-row";
+
+    const statusTitleGroup = document.createElement("div");
+    statusTitleGroup.className = "frontline-status-copy";
+
+    const title = document.createElement("div");
+    title.className = "section-header sidebar-tool-title";
+    title.textContent = t("Frontline Overlay", "ui");
+
+    const statusPill = document.createElement("span");
+    statusPill.id = "frontlineEnabledStatus";
+    statusPill.className = "frontline-status-pill";
+    statusPill.textContent = t("Off", "ui");
+
+    statusTitleGroup.appendChild(title);
+    statusTitleGroup.appendChild(statusPill);
+
+    const statusHint = document.createElement("p");
+    statusHint.id = "frontlineStatusHint";
+    statusHint.className = "sidebar-tool-hint";
+    statusHint.textContent = t("Frontline rendering is disabled until you explicitly enable it for this project.", "ui");
+
+    statusRow.appendChild(statusTitleGroup);
+
+    const enableRow = buildRow();
+    const enableToggle = document.createElement("label");
+    enableToggle.className = "toggle-label";
+    enableToggle.innerHTML = `<input id="frontlineEnabledToggle" type="checkbox" class="checkbox-input" /> <span>${t("Enable Frontline Overlay", "ui")}</span>`;
+    enableRow.appendChild(enableToggle);
+
+    const emptyState = document.createElement("div");
+    emptyState.id = "frontlineEmptyState";
+    emptyState.className = "inspector-empty-state frontline-empty-state";
+    emptyState.innerHTML = `
+      <h3 class="section-header-block">${t("Frontline is off", "ui")}</h3>
+      <p class="sidebar-tool-hint">${t("Turn it on when you want to derive conflict lines from the active scenario.", "ui")}</p>
+    `;
+
+    const settings = document.createElement("div");
+    settings.id = "frontlineSettingsPanel";
+    settings.className = "frontline-settings-stack hidden";
+
+    const controlsHeader = document.createElement("div");
+    controlsHeader.className = "section-header mt-2";
+    controlsHeader.textContent = t("Style & Labels", "ui");
+
+    const controlsRow = buildRow();
+    const frontlineStyleSelect = buildSelect("strategicFrontlineStyleSelect", [
+      ["clean", "Clean"],
+      ["dual-rail", "Dual Rail"],
+      ["teeth", "Teeth"],
+    ]);
+    const frontlineLabelToggle = document.createElement("label");
+    frontlineLabelToggle.className = "checkbox-row";
+    frontlineLabelToggle.innerHTML = `<input id="strategicFrontlineLabelsToggle" type="checkbox" class="checkbox-input" /> <span>${t("Labels", "ui")}</span>`;
+    const frontlineLabelPlacement = buildSelect("strategicLabelPlacementSelect", [
+      ["midpoint", "Midpoint"],
+      ["centroid", "Centroid"],
+    ]);
+    controlsRow.appendChild(frontlineStyleSelect);
+    controlsRow.appendChild(frontlineLabelToggle);
+    controlsRow.appendChild(frontlineLabelPlacement);
+
+    settings.appendChild(controlsHeader);
+    settings.appendChild(controlsRow);
+
+    frontlineOverlaySection.appendChild(statusRow);
+    frontlineOverlaySection.appendChild(statusHint);
+    frontlineOverlaySection.appendChild(enableRow);
+    frontlineOverlaySection.appendChild(emptyState);
+    frontlineOverlaySection.appendChild(settings);
+    frontlineTabStack.appendChild(frontlineOverlaySection);
+  }
+
+  let strategicOverlaySection = document.getElementById("strategicOverlayPanel");
+  if (!strategicOverlaySection && projectLegendStack) {
+    strategicOverlaySection = document.createElement("div");
+    strategicOverlaySection.id = "strategicOverlayPanel";
+    strategicOverlaySection.className = "inspector-tool-card";
+
+    const title = document.createElement("div");
+    title.className = "section-header sidebar-tool-title";
+    title.textContent = t("Strategic Overlay", "ui");
+
+    const hint = document.createElement("p");
+    hint.className = "sidebar-tool-hint";
+    hint.textContent = t("Operation graphics and unit counters stay project-local.", "ui");
+
+    const graphicsHeader = document.createElement("div");
+    graphicsHeader.className = "section-header mt-3";
+    graphicsHeader.textContent = t("Operation Graphics", "ui");
+    const graphicsRow = buildRow();
+    const graphicsKindSelect = buildSelect("operationGraphicKindSelect", [
+      ["attack", "Attack"],
+      ["retreat", "Retreat"],
+      ["supply", "Supply"],
+      ["naval", "Naval"],
+      ["encirclement", "Encirclement"],
+      ["theater", "Theater"],
+    ]);
+    const graphicsLabelInput = document.createElement("input");
+    graphicsLabelInput.id = "operationGraphicLabelInput";
+    graphicsLabelInput.type = "text";
+    graphicsLabelInput.className = "text-input";
+    graphicsLabelInput.placeholder = t("Label", "ui");
+    graphicsRow.appendChild(graphicsKindSelect);
+    graphicsRow.appendChild(graphicsLabelInput);
+
+    const graphicsActions = buildRow();
+    graphicsActions.appendChild(buildButton("operationGraphicStartBtn", "Start Draw"));
+    graphicsActions.appendChild(buildButton("operationGraphicUndoBtn", "Undo Vertex"));
+    graphicsActions.appendChild(buildButton("operationGraphicFinishBtn", "Finish"));
+    graphicsActions.appendChild(buildButton("operationGraphicCancelBtn", "Cancel"));
+    graphicsActions.appendChild(buildButton("operationGraphicDeleteBtn", "Delete Selected"));
+
+    const graphicsList = document.createElement("select");
+    graphicsList.id = "operationGraphicList";
+    graphicsList.className = "select-input mt-2";
+    graphicsList.size = 4;
+
+    const unitHeader = document.createElement("div");
+    unitHeader.className = "section-header mt-4";
+    unitHeader.textContent = t("Unit Counters", "ui");
+    const unitRow = buildRow();
+    const unitRendererSelect = buildSelect("unitCounterRendererSelect", [
+      ["game", "Game"],
+      ["milstd", "MILSTD"],
+    ]);
+    const unitSizeSelect = buildSelect("unitCounterSizeSelect", [
+      ["small", "Small"],
+      ["medium", "Medium"],
+      ["large", "Large"],
+    ]);
+    const unitLabelInput = document.createElement("input");
+    unitLabelInput.id = "unitCounterLabelInput";
+    unitLabelInput.type = "text";
+    unitLabelInput.className = "text-input";
+    unitLabelInput.placeholder = t("Counter Label", "ui");
+    const unitSymbolInput = document.createElement("input");
+    unitSymbolInput.id = "unitCounterSymbolInput";
+    unitSymbolInput.type = "text";
+    unitSymbolInput.className = "text-input";
+    unitSymbolInput.placeholder = t("Symbol / Code", "ui");
+    unitRow.appendChild(unitRendererSelect);
+    unitRow.appendChild(unitSizeSelect);
+    unitRow.appendChild(unitLabelInput);
+    unitRow.appendChild(unitSymbolInput);
+
+    const unitOptionsRow = buildRow();
+    const unitLabelToggle = document.createElement("label");
+    unitLabelToggle.className = "checkbox-row";
+    unitLabelToggle.innerHTML = `<input id="unitCounterLabelsToggle" type="checkbox" class="checkbox-input" /> <span>${t("Show Labels", "ui")}</span>`;
+    unitOptionsRow.appendChild(unitLabelToggle);
+
+    const unitActions = buildRow();
+    unitActions.appendChild(buildButton("unitCounterPlaceBtn", "Place Counter"));
+    unitActions.appendChild(buildButton("unitCounterCancelBtn", "Cancel Place"));
+    unitActions.appendChild(buildButton("unitCounterDeleteBtn", "Delete Selected"));
+
+    const unitList = document.createElement("select");
+    unitList.id = "unitCounterList";
+    unitList.className = "select-input mt-2";
+    unitList.size = 4;
+
+    strategicOverlaySection.appendChild(title);
+    strategicOverlaySection.appendChild(hint);
+    strategicOverlaySection.appendChild(graphicsHeader);
+    strategicOverlaySection.appendChild(graphicsRow);
+    strategicOverlaySection.appendChild(graphicsActions);
+    strategicOverlaySection.appendChild(graphicsList);
+    strategicOverlaySection.appendChild(unitHeader);
+    strategicOverlaySection.appendChild(unitRow);
+    strategicOverlaySection.appendChild(unitOptionsRow);
+    strategicOverlaySection.appendChild(unitActions);
+    strategicOverlaySection.appendChild(unitList);
+    projectLegendStack.appendChild(strategicOverlaySection);
+  }
+
   let scenarioAuditSection = document.getElementById("scenarioAuditPanel");
   if (!scenarioAuditSection && diagnosticStack) {
     scenarioAuditSection = document.createElement("div");
@@ -1523,6 +1736,33 @@ function initSidebar({ render } = {}) {
   const projectFileInput = document.getElementById("projectFileInput");
   const projectFileName = document.getElementById("projectFileName");
   const legendList = document.getElementById("legendEditorList");
+  const inspectorSidebarTabButtons = Array.from(document.querySelectorAll("[data-inspector-tab]"));
+  const inspectorSidebarTabPanels = Array.from(document.querySelectorAll("[data-inspector-panel]"));
+  const frontlineEnabledStatus = document.getElementById("frontlineEnabledStatus");
+  const frontlineStatusHint = document.getElementById("frontlineStatusHint");
+  const frontlineEnabledToggle = document.getElementById("frontlineEnabledToggle");
+  const frontlineEmptyState = document.getElementById("frontlineEmptyState");
+  const frontlineSettingsPanel = document.getElementById("frontlineSettingsPanel");
+  const strategicFrontlineStyleSelect = document.getElementById("strategicFrontlineStyleSelect");
+  const strategicFrontlineLabelsToggle = document.getElementById("strategicFrontlineLabelsToggle");
+  const strategicLabelPlacementSelect = document.getElementById("strategicLabelPlacementSelect");
+  const operationGraphicKindSelect = document.getElementById("operationGraphicKindSelect");
+  const operationGraphicLabelInput = document.getElementById("operationGraphicLabelInput");
+  const operationGraphicStartBtn = document.getElementById("operationGraphicStartBtn");
+  const operationGraphicUndoBtn = document.getElementById("operationGraphicUndoBtn");
+  const operationGraphicFinishBtn = document.getElementById("operationGraphicFinishBtn");
+  const operationGraphicCancelBtn = document.getElementById("operationGraphicCancelBtn");
+  const operationGraphicDeleteBtn = document.getElementById("operationGraphicDeleteBtn");
+  const operationGraphicList = document.getElementById("operationGraphicList");
+  const unitCounterRendererSelect = document.getElementById("unitCounterRendererSelect");
+  const unitCounterSizeSelect = document.getElementById("unitCounterSizeSelect");
+  const unitCounterLabelInput = document.getElementById("unitCounterLabelInput");
+  const unitCounterSymbolInput = document.getElementById("unitCounterSymbolInput");
+  const unitCounterLabelsToggle = document.getElementById("unitCounterLabelsToggle");
+  const unitCounterPlaceBtn = document.getElementById("unitCounterPlaceBtn");
+  const unitCounterCancelBtn = document.getElementById("unitCounterCancelBtn");
+  const unitCounterDeleteBtn = document.getElementById("unitCounterDeleteBtn");
+  const unitCounterList = document.getElementById("unitCounterList");
   const debugModeSelect = document.getElementById("debug-mode-select");
   const countryInspectorEmpty = document.getElementById("countryInspectorEmpty");
   const countryInspectorSelected = document.getElementById("countryInspectorSelected");
@@ -5068,9 +5308,414 @@ function initSidebar({ render } = {}) {
     });
   };
 
+  const setRightSidebarTab = (tabId) => {
+    const activeId = ["inspector", "frontline"].includes(String(tabId || "").trim().toLowerCase())
+      ? String(tabId || "").trim().toLowerCase()
+      : "inspector";
+    if (!state.ui || typeof state.ui !== "object") {
+      state.ui = {};
+    }
+    state.ui.rightSidebarTab = activeId;
+    inspectorSidebarTabButtons.forEach((button) => {
+      const id = String(button.dataset.inspectorTab || "").trim().toLowerCase();
+      const isActive = id === activeId;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
+    inspectorSidebarTabPanels.forEach((panel) => {
+      const id = String(panel.dataset.inspectorPanel || "").trim().toLowerCase();
+      const isActive = id === activeId;
+      panel.classList.toggle("is-active", isActive);
+      panel.hidden = !isActive;
+    });
+    scheduleAdaptiveInspectorHeights();
+  };
+
+  const invalidateFrontlineOverlayState = () => {
+    state.frontlineOverlayDirty = true;
+    state.cachedFrontlineMesh = null;
+    state.cachedFrontlineMeshHash = "";
+    state.cachedFrontlineLabelAnchors = [];
+  };
+
+  const applyFrontlineAnnotationViewPatch = (patch = {}, dirtyReason = "frontline-overlay") => {
+    const before = captureHistoryState({ strategicOverlay: true });
+    state.annotationView = normalizeAnnotationView({
+      ...(state.annotationView || {}),
+      ...(patch && typeof patch === "object" ? patch : {}),
+    });
+    invalidateFrontlineOverlayState();
+    if (render) render();
+    refreshStrategicOverlayUI();
+    pushHistoryEntry({
+      before,
+      after: captureHistoryState({ strategicOverlay: true }),
+      meta: {
+        kind: "strategic-overlay-frontline",
+        dirtyReason,
+      },
+    });
+    markDirty(dirtyReason);
+  };
+
+  const refreshFrontlineTabUI = () => {
+    const annotationView = normalizeAnnotationView(state.annotationView);
+    const frontlineEnabled = !!annotationView.frontlineEnabled;
+    const hasScenario = !!state.activeScenarioId;
+    if (frontlineEnabledStatus) {
+      frontlineEnabledStatus.textContent = frontlineEnabled ? t("On", "ui") : t("Off", "ui");
+      frontlineEnabledStatus.classList.toggle("is-active", frontlineEnabled);
+    }
+    if (frontlineStatusHint) {
+      frontlineStatusHint.textContent = !hasScenario
+        ? t("Apply a scenario first, then enable the overlay when you want a derived frontline view.", "ui")
+        : frontlineEnabled
+        ? t("This project is currently deriving frontlines from scenario control boundaries.", "ui")
+        : t("Frontline rendering is disabled until you explicitly enable it for this project.", "ui");
+    }
+    if (frontlineEnabledToggle) {
+      frontlineEnabledToggle.checked = frontlineEnabled;
+    }
+    if (frontlineEmptyState) {
+      frontlineEmptyState.classList.toggle("hidden", frontlineEnabled);
+    }
+    if (frontlineSettingsPanel) {
+      frontlineSettingsPanel.classList.toggle("hidden", !frontlineEnabled);
+    }
+    if (strategicFrontlineStyleSelect) {
+      strategicFrontlineStyleSelect.value = String(annotationView.frontlineStyle || "clean");
+      strategicFrontlineStyleSelect.disabled = !frontlineEnabled;
+    }
+    if (strategicFrontlineLabelsToggle) {
+      strategicFrontlineLabelsToggle.checked = !!annotationView.showFrontlineLabels;
+      strategicFrontlineLabelsToggle.disabled = !frontlineEnabled;
+    }
+    if (strategicLabelPlacementSelect) {
+      strategicLabelPlacementSelect.value = String(annotationView.labelPlacementMode || "midpoint");
+      strategicLabelPlacementSelect.disabled = !frontlineEnabled || !annotationView.showFrontlineLabels;
+    }
+  };
+
+  const refreshStrategicOverlayUI = () => {
+    const annotationView = normalizeAnnotationView(state.annotationView);
+    refreshFrontlineTabUI();
+
+    const operationEditor = state.operationGraphicsEditor || {};
+    if (operationGraphicKindSelect) {
+      operationGraphicKindSelect.value = String(operationEditor.kind || "attack");
+    }
+    if (operationGraphicLabelInput) {
+      operationGraphicLabelInput.value = String(operationEditor.label || "");
+    }
+    if (operationGraphicList) {
+      operationGraphicList.replaceChildren();
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = t("No operation graphics", "ui");
+      operationGraphicList.appendChild(placeholder);
+      (state.operationGraphics || []).forEach((graphic) => {
+        const option = document.createElement("option");
+        option.value = String(graphic.id || "");
+        option.textContent = `${String(graphic.label || graphic.kind || graphic.id || "").trim()} (${graphic.kind})`;
+        operationGraphicList.appendChild(option);
+      });
+      const selectedGraphicId = String(operationEditor.selectedId || "");
+      operationGraphicList.value = selectedGraphicId;
+    }
+    const isGraphicDrawing = !!operationEditor.active;
+    if (operationGraphicStartBtn) operationGraphicStartBtn.disabled = isGraphicDrawing;
+    if (operationGraphicUndoBtn) operationGraphicUndoBtn.disabled = !isGraphicDrawing;
+    if (operationGraphicFinishBtn) operationGraphicFinishBtn.disabled = !isGraphicDrawing;
+    if (operationGraphicCancelBtn) operationGraphicCancelBtn.disabled = !isGraphicDrawing;
+    if (operationGraphicDeleteBtn) operationGraphicDeleteBtn.disabled = !String(operationEditor.selectedId || "").trim();
+
+    const unitEditor = state.unitCounterEditor || {};
+    if (unitCounterRendererSelect) {
+      unitCounterRendererSelect.value = String(unitEditor.renderer || annotationView.unitRendererDefault || "game");
+    }
+    if (unitCounterSizeSelect) {
+      unitCounterSizeSelect.value = String(unitEditor.size || "medium");
+    }
+    if (unitCounterLabelInput) {
+      unitCounterLabelInput.value = String(unitEditor.label || "");
+    }
+    if (unitCounterSymbolInput) {
+      unitCounterSymbolInput.value = String(unitEditor.symbolCode || "");
+    }
+    if (unitCounterLabelsToggle) {
+      unitCounterLabelsToggle.checked = annotationView.showUnitLabels !== false;
+    }
+    if (unitCounterList) {
+      unitCounterList.replaceChildren();
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = t("No unit counters", "ui");
+      unitCounterList.appendChild(placeholder);
+      (state.unitCounters || []).forEach((counter) => {
+        const option = document.createElement("option");
+        option.value = String(counter.id || "");
+        option.textContent = `${String(counter.label || counter.symbolCode || counter.id || "").trim()} (${counter.renderer})`;
+        unitCounterList.appendChild(option);
+      });
+      unitCounterList.value = String(unitEditor.selectedId || "");
+    }
+    const isCounterPlacing = !!unitEditor.active;
+    if (unitCounterPlaceBtn) unitCounterPlaceBtn.disabled = isCounterPlacing;
+    if (unitCounterCancelBtn) unitCounterCancelBtn.disabled = !isCounterPlacing;
+    if (unitCounterDeleteBtn) unitCounterDeleteBtn.disabled = !String(unitEditor.selectedId || "").trim();
+  };
+
   state.updateLegendUI = refreshLegendEditor;
+  state.updateStrategicOverlayUIFn = refreshStrategicOverlayUI;
   state.refreshCountryListRowsFn = refreshCountryRows;
   state.refreshCountryInspectorDetailFn = renderCountryInspectorDetail;
+  setRightSidebarTab(state.ui?.rightSidebarTab || "inspector");
+  refreshStrategicOverlayUI();
+
+  inspectorSidebarTabButtons.forEach((button) => {
+    if (button.dataset.bound) return;
+    button.addEventListener("click", () => {
+      setRightSidebarTab(button.dataset.inspectorTab || "inspector");
+    });
+    button.dataset.bound = "true";
+  });
+
+  if (frontlineEnabledToggle && !frontlineEnabledToggle.dataset.bound) {
+    frontlineEnabledToggle.addEventListener("change", (event) => {
+      const nextEnabled = !!event.target.checked;
+      applyFrontlineAnnotationViewPatch(
+        { frontlineEnabled: nextEnabled },
+        nextEnabled ? "frontline-enabled" : "frontline-disabled"
+      );
+    });
+    frontlineEnabledToggle.dataset.bound = "true";
+  }
+
+  if (strategicFrontlineStyleSelect && !strategicFrontlineStyleSelect.dataset.bound) {
+    strategicFrontlineStyleSelect.addEventListener("change", (event) => {
+      applyFrontlineAnnotationViewPatch(
+        { frontlineStyle: String(event.target.value || "clean") },
+        "frontline-style"
+      );
+    });
+    strategicFrontlineStyleSelect.dataset.bound = "true";
+  }
+  if (strategicFrontlineLabelsToggle && !strategicFrontlineLabelsToggle.dataset.bound) {
+    strategicFrontlineLabelsToggle.addEventListener("change", (event) => {
+      applyFrontlineAnnotationViewPatch(
+        { showFrontlineLabels: !!event.target.checked },
+        "frontline-labels"
+      );
+    });
+    strategicFrontlineLabelsToggle.dataset.bound = "true";
+  }
+  if (strategicLabelPlacementSelect && !strategicLabelPlacementSelect.dataset.bound) {
+    strategicLabelPlacementSelect.addEventListener("change", (event) => {
+      applyFrontlineAnnotationViewPatch(
+        { labelPlacementMode: String(event.target.value || "midpoint") },
+        "frontline-label-placement"
+      );
+    });
+    strategicLabelPlacementSelect.dataset.bound = "true";
+  }
+
+  if (operationGraphicKindSelect && !operationGraphicKindSelect.dataset.bound) {
+    operationGraphicKindSelect.addEventListener("change", (event) => {
+      const nextKind = String(event.target.value || "attack");
+      state.operationGraphicsEditor.kind = nextKind;
+      if (!state.operationGraphicsEditor.active && state.operationGraphicsEditor.selectedId) {
+        mapRenderer.updateSelectedOperationGraphic({ kind: nextKind });
+      } else if (render) {
+        render();
+      }
+      refreshStrategicOverlayUI();
+    });
+    operationGraphicKindSelect.dataset.bound = "true";
+  }
+  if (operationGraphicLabelInput && !operationGraphicLabelInput.dataset.bound) {
+    operationGraphicLabelInput.addEventListener("input", (event) => {
+      state.operationGraphicsEditor.label = String(event.target.value || "");
+    });
+    operationGraphicLabelInput.addEventListener("change", (event) => {
+      const nextLabel = String(event.target.value || "");
+      state.operationGraphicsEditor.label = nextLabel;
+      if (!state.operationGraphicsEditor.active && state.operationGraphicsEditor.selectedId) {
+        mapRenderer.updateSelectedOperationGraphic({ label: nextLabel });
+      }
+      refreshStrategicOverlayUI();
+    });
+    operationGraphicLabelInput.dataset.bound = "true";
+  }
+  if (operationGraphicStartBtn && !operationGraphicStartBtn.dataset.bound) {
+    operationGraphicStartBtn.addEventListener("click", () => {
+      mapRenderer.startOperationGraphicDraw({
+        kind: String(operationGraphicKindSelect?.value || state.operationGraphicsEditor?.kind || "attack"),
+        label: String(operationGraphicLabelInput?.value || state.operationGraphicsEditor?.label || ""),
+      });
+      refreshStrategicOverlayUI();
+    });
+    operationGraphicStartBtn.dataset.bound = "true";
+  }
+  if (operationGraphicUndoBtn && !operationGraphicUndoBtn.dataset.bound) {
+    operationGraphicUndoBtn.addEventListener("click", () => {
+      mapRenderer.undoOperationGraphicVertex();
+      refreshStrategicOverlayUI();
+    });
+    operationGraphicUndoBtn.dataset.bound = "true";
+  }
+  if (operationGraphicFinishBtn && !operationGraphicFinishBtn.dataset.bound) {
+    operationGraphicFinishBtn.addEventListener("click", () => {
+      mapRenderer.finishOperationGraphicDraw();
+      refreshStrategicOverlayUI();
+    });
+    operationGraphicFinishBtn.dataset.bound = "true";
+  }
+  if (operationGraphicCancelBtn && !operationGraphicCancelBtn.dataset.bound) {
+    operationGraphicCancelBtn.addEventListener("click", () => {
+      mapRenderer.cancelOperationGraphicDraw();
+      refreshStrategicOverlayUI();
+    });
+    operationGraphicCancelBtn.dataset.bound = "true";
+  }
+  if (operationGraphicList && !operationGraphicList.dataset.bound) {
+    operationGraphicList.addEventListener("change", (event) => {
+      mapRenderer.selectOperationGraphicById(String(event.target.value || ""));
+      refreshStrategicOverlayUI();
+    });
+    operationGraphicList.dataset.bound = "true";
+  }
+  if (operationGraphicDeleteBtn && !operationGraphicDeleteBtn.dataset.bound) {
+    operationGraphicDeleteBtn.addEventListener("click", async () => {
+      if (!state.operationGraphicsEditor?.selectedId) return;
+      const confirmed = await showAppDialog({
+        title: t("Delete Selected", "ui"),
+        message: t("Delete the selected operation graphic?", "ui"),
+        details: t("This only removes the selected project-local strategic line.", "ui"),
+        confirmLabel: t("Delete Graphic", "ui"),
+        cancelLabel: t("Cancel", "ui"),
+        tone: "warning",
+      });
+      if (!confirmed) return;
+      mapRenderer.deleteSelectedOperationGraphic();
+      refreshStrategicOverlayUI();
+    });
+    operationGraphicDeleteBtn.dataset.bound = "true";
+  }
+
+  if (unitCounterRendererSelect && !unitCounterRendererSelect.dataset.bound) {
+    unitCounterRendererSelect.addEventListener("change", (event) => {
+      const nextRenderer = String(event.target.value || "game");
+      state.unitCounterEditor.renderer = nextRenderer;
+      state.annotationView = {
+        ...(state.annotationView || {}),
+        unitRendererDefault: nextRenderer,
+      };
+      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
+        mapRenderer.updateSelectedUnitCounter({ renderer: nextRenderer });
+      } else if (render) {
+        render();
+      }
+      refreshStrategicOverlayUI();
+      markDirty("unit-counter-renderer");
+    });
+    unitCounterRendererSelect.dataset.bound = "true";
+  }
+  if (unitCounterSizeSelect && !unitCounterSizeSelect.dataset.bound) {
+    unitCounterSizeSelect.addEventListener("change", (event) => {
+      const nextSize = String(event.target.value || "medium");
+      state.unitCounterEditor.size = nextSize;
+      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
+        mapRenderer.updateSelectedUnitCounter({ size: nextSize });
+      } else if (render) {
+        render();
+      }
+      refreshStrategicOverlayUI();
+    });
+    unitCounterSizeSelect.dataset.bound = "true";
+  }
+  if (unitCounterLabelInput && !unitCounterLabelInput.dataset.bound) {
+    unitCounterLabelInput.addEventListener("input", (event) => {
+      state.unitCounterEditor.label = String(event.target.value || "");
+    });
+    unitCounterLabelInput.addEventListener("change", (event) => {
+      const nextLabel = String(event.target.value || "");
+      state.unitCounterEditor.label = nextLabel;
+      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
+        mapRenderer.updateSelectedUnitCounter({ label: nextLabel });
+      }
+      refreshStrategicOverlayUI();
+    });
+    unitCounterLabelInput.dataset.bound = "true";
+  }
+  if (unitCounterSymbolInput && !unitCounterSymbolInput.dataset.bound) {
+    unitCounterSymbolInput.addEventListener("input", (event) => {
+      state.unitCounterEditor.symbolCode = String(event.target.value || "");
+    });
+    unitCounterSymbolInput.addEventListener("change", (event) => {
+      const nextSymbol = String(event.target.value || "");
+      state.unitCounterEditor.symbolCode = nextSymbol;
+      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
+        mapRenderer.updateSelectedUnitCounter({ symbolCode: nextSymbol });
+      }
+      refreshStrategicOverlayUI();
+    });
+    unitCounterSymbolInput.dataset.bound = "true";
+  }
+  if (unitCounterLabelsToggle && !unitCounterLabelsToggle.dataset.bound) {
+    unitCounterLabelsToggle.addEventListener("change", (event) => {
+      state.annotationView = {
+        ...(state.annotationView || {}),
+        showUnitLabels: !!event.target.checked,
+      };
+      if (render) render();
+      refreshStrategicOverlayUI();
+      markDirty("unit-counter-label-visibility");
+    });
+    unitCounterLabelsToggle.dataset.bound = "true";
+  }
+  if (unitCounterPlaceBtn && !unitCounterPlaceBtn.dataset.bound) {
+    unitCounterPlaceBtn.addEventListener("click", () => {
+      mapRenderer.startUnitCounterPlacement({
+        renderer: String(unitCounterRendererSelect?.value || state.unitCounterEditor?.renderer || "game"),
+        label: String(unitCounterLabelInput?.value || state.unitCounterEditor?.label || ""),
+        symbolCode: String(unitCounterSymbolInput?.value || state.unitCounterEditor?.symbolCode || ""),
+        size: String(unitCounterSizeSelect?.value || state.unitCounterEditor?.size || "medium"),
+      });
+      refreshStrategicOverlayUI();
+    });
+    unitCounterPlaceBtn.dataset.bound = "true";
+  }
+  if (unitCounterCancelBtn && !unitCounterCancelBtn.dataset.bound) {
+    unitCounterCancelBtn.addEventListener("click", () => {
+      mapRenderer.cancelUnitCounterPlacement();
+      refreshStrategicOverlayUI();
+    });
+    unitCounterCancelBtn.dataset.bound = "true";
+  }
+  if (unitCounterList && !unitCounterList.dataset.bound) {
+    unitCounterList.addEventListener("change", (event) => {
+      mapRenderer.selectUnitCounterById(String(event.target.value || ""));
+      refreshStrategicOverlayUI();
+    });
+    unitCounterList.dataset.bound = "true";
+  }
+  if (unitCounterDeleteBtn && !unitCounterDeleteBtn.dataset.bound) {
+    unitCounterDeleteBtn.addEventListener("click", async () => {
+      if (!state.unitCounterEditor?.selectedId) return;
+      const confirmed = await showAppDialog({
+        title: t("Delete Selected", "ui"),
+        message: t("Delete the selected unit counter?", "ui"),
+        details: t("This removes the selected project-local counter from the map.", "ui"),
+        confirmLabel: t("Delete Counter", "ui"),
+        cancelLabel: t("Cancel", "ui"),
+        tone: "warning",
+      });
+      if (!confirmed) return;
+      mapRenderer.deleteSelectedUnitCounter();
+      refreshStrategicOverlayUI();
+    });
+    unitCounterDeleteBtn.dataset.bound = "true";
+  }
 
   if (sidebar && !sidebar.dataset.adaptiveInspectorBound) {
     globalThis.addEventListener("resize", scheduleAdaptiveInspectorHeights);
@@ -5328,6 +5973,32 @@ function initSidebar({ render } = {}) {
           selectedId: null,
           counter: 1,
         };
+        state.annotationView = normalizeAnnotationView({
+          ...(state.annotationView || {}),
+          ...(data.annotationView || {}),
+        });
+        state.operationGraphics = Array.isArray(data.operationGraphics) ? data.operationGraphics : [];
+        state.unitCounters = Array.isArray(data.unitCounters) ? data.unitCounters : [];
+        state.operationGraphicsEditor = {
+          active: false,
+          points: [],
+          kind: "attack",
+          label: "",
+          selectedId: null,
+          counter: 1,
+        };
+        state.unitCounterEditor = {
+          active: false,
+          renderer: String(state.annotationView?.unitRendererDefault || "game"),
+          label: "",
+          symbolCode: "",
+          size: "medium",
+          selectedId: null,
+          counter: 1,
+        };
+        invalidateFrontlineOverlayState();
+        state.operationGraphicsDirty = true;
+        state.unitCountersDirty = true;
         state.specialZones = data.specialZones || {};
         state.manualSpecialZones =
           data.manualSpecialZones && data.manualSpecialZones.type === "FeatureCollection"
@@ -5524,6 +6195,9 @@ function initSidebar({ render } = {}) {
         }
         if (typeof state.updateSpecialZoneEditorUIFn === "function") {
           state.updateSpecialZoneEditorUIFn();
+        }
+        if (typeof state.updateStrategicOverlayUIFn === "function") {
+          state.updateStrategicOverlayUIFn();
         }
         if (typeof state.updateWaterInteractionUIFn === "function") {
           state.updateWaterInteractionUIFn();

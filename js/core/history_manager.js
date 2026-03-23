@@ -35,6 +35,10 @@ function captureStylePaths(paths) {
   return snapshot;
 }
 
+function cloneStructuredValue(value) {
+  return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+}
+
 function captureHistoryState({
   featureIds = [],
   waterRegionIds = [],
@@ -43,6 +47,7 @@ function captureHistoryState({
   sovereigntyFeatureIds = [],
   scenarioControllerFeatureIds = [],
   stylePaths = [],
+  strategicOverlay = false,
 } = {}) {
   const snapshot = {};
   const ids = uniqueKeys(featureIds);
@@ -85,6 +90,12 @@ function captureHistoryState({
 
   if (styleKeys.length) {
     snapshot.styleConfig = captureStylePaths(styleKeys);
+  }
+
+  if (strategicOverlay) {
+    snapshot.annotationView = cloneStructuredValue(state.annotationView || {});
+    snapshot.operationGraphics = cloneStructuredValue(state.operationGraphics || []);
+    snapshot.unitCounters = cloneStructuredValue(state.unitCounters || []);
   }
 
   return snapshot;
@@ -207,6 +218,9 @@ function refreshUiAfterHistory(direction, entry) {
   if (typeof state.updateLegendUI === "function") {
     state.updateLegendUI();
   }
+  if (typeof state.updateStrategicOverlayUIFn === "function") {
+    state.updateStrategicOverlayUIFn();
+  }
   if (typeof state.renderNowFn === "function") {
     state.renderNowFn();
   }
@@ -235,6 +249,22 @@ function applyHistorySnapshot(snapshot, direction, entry) {
   applyEntries(state.sovereigntyByFeatureId, snapshot.sovereigntyByFeatureId);
   applyEntries(state.scenarioControllersByFeatureId, snapshot.scenarioControllersByFeatureId);
   applyStyleSnapshot(snapshot.styleConfig);
+  if (snapshot.annotationView && typeof snapshot.annotationView === "object") {
+    state.annotationView = cloneStructuredValue(snapshot.annotationView);
+  }
+  if (Array.isArray(snapshot.operationGraphics)) {
+    state.operationGraphics = cloneStructuredValue(snapshot.operationGraphics);
+    state.operationGraphicsDirty = true;
+  }
+  if (Array.isArray(snapshot.unitCounters)) {
+    state.unitCounters = cloneStructuredValue(snapshot.unitCounters);
+    state.unitCountersDirty = true;
+  }
+  if (snapshot.annotationView && typeof snapshot.annotationView === "object") {
+    state.frontlineOverlayDirty = true;
+    state.operationGraphicsDirty = true;
+    state.unitCountersDirty = true;
+  }
 
   refreshUiAfterHistory(direction, entry);
   return true;

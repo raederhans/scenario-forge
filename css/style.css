@@ -1490,6 +1490,104 @@ details.card[open] > summary::after {
   gap: 16px;
 }
 
+.inspector-sidebar-tab-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 7;
+  padding-bottom: 8px;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.98) 0%, rgba(248, 250, 252, 0.94) 76%, rgba(248, 250, 252, 0) 100%);
+}
+
+.inspector-sidebar-tab-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-secondary);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+}
+
+.inspector-sidebar-tab-btn.is-active {
+  color: var(--color-accent);
+  border-color: rgba(0, 47, 167, 0.22);
+  background: rgba(0, 47, 167, 0.06);
+}
+
+.inspector-sidebar-tab-panel[hidden] {
+  display: none !important;
+}
+
+.inspector-frontline-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.inspector-frontline-intro {
+  margin-top: -4px;
+}
+
+.frontline-status-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.frontline-status-copy {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.frontline-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: rgba(148, 163, 184, 0.12);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.frontline-status-pill.is-active {
+  border-color: rgba(0, 47, 167, 0.2);
+  background: rgba(0, 47, 167, 0.08);
+  color: var(--color-accent);
+}
+
+.frontline-empty-state {
+  border: 1px dashed rgba(15, 23, 42, 0.12);
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.frontline-settings-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .inspector-search-shell {
   position: sticky;
   top: 0;

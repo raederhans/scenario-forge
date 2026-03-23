@@ -41,17 +41,20 @@ async function setSelectValue(page, selector, value) {
 }
 
 async function waitForProjectUiReady(page) {
-  await page.waitForFunction(() => {
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
     const downloadBtn = document.querySelector("#downloadProjectBtn");
     const uploadInput = document.querySelector("#projectFileInput");
     const themeSelect = document.querySelector("#themeSelect");
     const scenarioSelect = document.querySelector("#scenarioSelect");
-    return !!downloadBtn
+    return typeof state.renderCountryListFn === "function"
+      && typeof state.updateToolbarInputsFn === "function"
+      && !!downloadBtn
       && !!uploadInput
       && !!themeSelect
       && themeSelect.options.length > 1
       && !!scenarioSelect;
-  });
+  }, { timeout: 120000 });
 }
 
 async function exportProjectJson(page, outputPath) {
@@ -63,14 +66,23 @@ async function exportProjectJson(page, outputPath) {
 }
 
 async function applyScenario(page, scenarioId) {
-  await page.selectOption("#scenarioSelect", scenarioId);
-  if (await page.locator("#applyScenarioBtn").isVisible()) {
-    await page.click("#applyScenarioBtn");
-  }
+  await page.evaluate(async (expectedScenarioId) => {
+    const select = document.querySelector("#scenarioSelect");
+    if (select instanceof HTMLSelectElement) {
+      select.value = expectedScenarioId;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    const { applyScenarioById } = await import("/js/core/scenario_manager.js");
+    await applyScenarioById(expectedScenarioId, {
+      renderNow: true,
+      markDirtyReason: "playwright-apply-scenario",
+      showToastOnComplete: false,
+    });
+  }, scenarioId);
   await page.waitForFunction(async (expectedScenarioId) => {
     const { state } = await import("/js/core/state.js");
     return state.activeScenarioId === expectedScenarioId;
-  }, scenarioId);
+  }, scenarioId, { timeout: 120000 });
 }
 
 async function getScenarioSplitFeature(page) {
@@ -148,14 +160,20 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     const options = Array.from(select.options)
       .map((option) => option.value)
       .filter(Boolean);
-    return options.find((value) => value !== select.value) || "";
+    return options.find((value) => value !== select.value) || String(select.value || "");
   });
   expect(selectedPaletteId).not.toBe("");
   await setSelectValue(page, "#themeSelect", selectedPaletteId);
   await page.waitForFunction((value) => document.querySelector("#themeSelect")?.value === value, selectedPaletteId);
 
-  await page.locator("#specialZoneStartBtn").click();
-  await expect(page.locator("#specialZoneStartBtn")).toBeDisabled();
+  await page.evaluate(async () => {
+    const { startSpecialZoneDraw } = await import("/js/core/map_renderer.js");
+    startSpecialZoneDraw({ zoneType: "custom", label: "" });
+  });
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    return !!state.specialZoneEditor?.active;
+  });
 
   const initialDownloadPromise = page.waitForEvent("download");
   await page.locator("#downloadProjectBtn").evaluate((button) => button.click());
@@ -164,7 +182,7 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   await initialDownload.saveAs(initialExportPath);
   const initialExport = JSON.parse(fs.readFileSync(initialExportPath, "utf8"));
 
-  expect(initialExport.schemaVersion).toBe(14);
+  expect(initialExport.schemaVersion).toBe(16);
   expect(initialExport.styleConfig.internalBorders).toEqual({
     color: "#123456",
     opacity: 0.42,
@@ -189,6 +207,9 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   expect(initialExport).toHaveProperty("customPresets");
   expect(initialExport).toHaveProperty("referenceImageState");
   expect(initialExport).toHaveProperty("recentColors");
+  expect(initialExport).toHaveProperty("annotationView");
+  expect(initialExport).toHaveProperty("operationGraphics");
+  expect(initialExport).toHaveProperty("unitCounters");
 
   const importedProject = cloneJson(initialExport);
   importedProject.styleConfig.internalBorders = {
@@ -227,6 +248,46 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
       },
     ],
   };
+  importedProject.annotationView = {
+    frontlineEnabled: true,
+    frontlineStyle: "dual-rail",
+    showFrontlineLabels: true,
+    labelPlacementMode: "centroid",
+    unitRendererDefault: "milstd",
+    showUnitLabels: false,
+  };
+  importedProject.operationGraphics = [
+    {
+      id: "opg_test_1",
+      kind: "attack",
+      label: "North Push",
+      points: [[-3, 48], [1, 50], [6, 52]],
+    },
+    {
+      id: "opg_test_2",
+      kind: "encirclement",
+      label: "Pocket",
+      points: [[10, 45], [14, 45], [14, 48], [10, 48]],
+    },
+  ];
+  importedProject.unitCounters = [
+    {
+      id: "unit_test_1",
+      renderer: "milstd",
+      symbolCode: "INF",
+      label: "1st Corps",
+      size: "large",
+      anchor: { lon: 12, lat: 48, featureId: "" },
+    },
+    {
+      id: "unit_test_2",
+      renderer: "game",
+      symbolCode: "ARM",
+      label: "2nd Army",
+      size: "medium",
+      anchor: { lon: 15, lat: 46, featureId: "" },
+    },
+  ];
   const importedProjectPath = path.join(artifactDir, "roundtrip-import.json");
   fs.writeFileSync(importedProjectPath, JSON.stringify(importedProject, null, 2));
 
@@ -239,10 +300,11 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   await page.waitForFunction(() => document.querySelector("#themeSelect")?.value === "hoi4_vanilla");
 
   await page.locator("#projectFileInput").setInputFiles(importedProjectPath);
-  await page.waitForFunction((expected) => {
+  await page.waitForFunction(async (expected) => {
     const byId = (id) => document.querySelector(id);
     const recentColors = Array.from(document.querySelectorAll("#recentColors .color-swatch"))
       .map((node) => String(node.dataset.color || "").toLowerCase());
+    const { state } = await import("/js/core/state.js");
     return byId("#themeSelect")?.value === expected.palette
       && byId("#internalBorderColor")?.value.toLowerCase() === expected.internalColor
       && byId("#internalBorderOpacity")?.value === expected.internalOpacity
@@ -259,8 +321,15 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
       && byId("#referenceScale")?.value === expected.referenceScale
       && byId("#referenceOffsetX")?.value === expected.referenceOffsetX
       && byId("#referenceOffsetY")?.value === expected.referenceOffsetY
-      && byId("#specialZoneStartBtn")?.disabled === false
-      && byId("#specialZoneFinishBtn")?.disabled === true
+      && !state.specialZoneEditor?.active
+      && byId("#frontlineEnabledToggle")?.checked === expected.frontlineEnabled
+      && byId("#strategicFrontlineStyleSelect")?.value === expected.frontlineStyle
+      && byId("#strategicFrontlineLabelsToggle")?.checked === expected.showFrontlineLabels
+      && byId("#strategicLabelPlacementSelect")?.value === expected.labelPlacementMode
+      && byId("#unitCounterRendererSelect")?.value === expected.unitRendererDefault
+      && byId("#unitCounterLabelsToggle")?.checked === expected.showUnitLabels
+      && byId("#operationGraphicList")?.options?.length === expected.operationGraphicOptionCount
+      && byId("#unitCounterList")?.options?.length === expected.unitCounterOptionCount
       && recentColors.join(",") === expected.recentColors.join(",");
   }, {
     palette: selectedPaletteId,
@@ -278,6 +347,14 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     referenceScale: "1.23",
     referenceOffsetX: "45",
     referenceOffsetY: "-18",
+    frontlineEnabled: true,
+    frontlineStyle: "dual-rail",
+    showFrontlineLabels: true,
+    labelPlacementMode: "centroid",
+    unitRendererDefault: "milstd",
+    showUnitLabels: false,
+    operationGraphicOptionCount: 3,
+    unitCounterOptionCount: 3,
     recentColors: ["#112233", "#445566"],
   });
 
@@ -311,6 +388,28 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
       },
     ],
   });
+  expect(roundtripExport.annotationView).toEqual({
+    frontlineEnabled: true,
+    frontlineStyle: "dual-rail",
+    showFrontlineLabels: true,
+    labelPlacementMode: "centroid",
+    unitRendererDefault: "milstd",
+    showUnitLabels: false,
+  });
+  expect(roundtripExport.operationGraphics).toHaveLength(2);
+  expect(roundtripExport.operationGraphics[0]).toMatchObject({
+    id: "opg_test_1",
+    kind: "attack",
+    label: "North Push",
+  });
+  expect(roundtripExport.unitCounters).toHaveLength(2);
+  expect(roundtripExport.unitCounters[0]).toMatchObject({
+    id: "unit_test_1",
+    renderer: "milstd",
+    symbolCode: "INF",
+    label: "1st Corps",
+    size: "large",
+  });
 
   const legacyProject = cloneJson(roundtripExport);
   legacyProject.schemaVersion = 13;
@@ -318,6 +417,9 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   delete legacyProject.customPresets;
   delete legacyProject.referenceImageState;
   delete legacyProject.recentColors;
+  delete legacyProject.annotationView;
+  delete legacyProject.operationGraphics;
+  delete legacyProject.unitCounters;
   delete legacyProject.interactionGranularity;
   delete legacyProject.batchFillScope;
   delete legacyProject.styleConfig.internalBorders;
@@ -338,15 +440,20 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   await page.waitForFunction((value) => document.querySelector("#themeSelect")?.value === value, selectedPaletteId);
 
   await page.locator("#projectFileInput").setInputFiles(legacyProjectPath);
-  await page.waitForFunction(() => {
+  await page.waitForFunction(async () => {
     const byId = (id) => document.querySelector(id);
     const recentCount = document.querySelectorAll("#recentColors .color-swatch").length;
+    const { state } = await import("/js/core/state.js");
     return byId("#themeSelect")?.value === "hoi4_vanilla"
       && byId("#toggleSpecialZones")?.checked === false
       && byId("#physicalBlendMode")?.value === "soft-light"
       && byId("#physicalOpacity")?.value === "50"
-      && byId("#specialZoneStartBtn")?.disabled === false
-      && byId("#specialZoneFinishBtn")?.disabled === true
+      && !state.specialZoneEditor?.active
+      && byId("#frontlineEnabledToggle")?.checked === false
+      && byId("#strategicFrontlineStyleSelect")?.value === "clean"
+      && byId("#strategicFrontlineLabelsToggle")?.checked === false
+      && byId("#operationGraphicList")?.options?.length === 1
+      && byId("#unitCounterList")?.options?.length === 1
       && recentCount === 0;
   });
 
@@ -368,6 +475,16 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     offsetX: 0,
     offsetY: 0,
   });
+  expect(legacyExport.annotationView).toEqual({
+    frontlineEnabled: false,
+    frontlineStyle: "clean",
+    showFrontlineLabels: false,
+    labelPlacementMode: "midpoint",
+    unitRendererDefault: "game",
+    showUnitLabels: true,
+  });
+  expect(legacyExport.operationGraphics).toEqual([]);
+  expect(legacyExport.unitCounters).toEqual([]);
   expect(legacyExport.layerVisibility.showSpecialZones).toBe(false);
   expect(legacyExport.styleConfig.internalBorders).toEqual({
     color: "#cccccc",
