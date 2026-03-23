@@ -1612,6 +1612,19 @@ details.card[open] > summary::after {
   gap: 10px;
 }
 
+.frontline-tab-card .input,
+.frontline-tab-card .select-input {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+.strategic-inline-color {
+  flex: 0 0 56px !important;
+  min-width: 56px !important;
+  max-width: 64px;
+  padding: 6px;
+}
+
 .inspector-search-shell {
   position: sticky;
   top: 0;

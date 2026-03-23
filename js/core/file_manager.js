@@ -104,23 +104,31 @@ function normalizeBoundaryVariantSelectionMap(rawMap) {
   );
 }
 
-function normalizeScenarioImportAudit(rawAudit, { scenarioId = "" } = {}) {
+function normalizeScenarioImportAudit(
+  rawAudit,
+  {
+    scenarioId = "",
+    savedVersion = 1,
+    currentVersion = 1,
+    currentBaselineHash = "",
+  } = {}
+) {
   if (!rawAudit || typeof rawAudit !== "object") return null;
   const normalizedScenarioId = String(rawAudit.scenarioId || scenarioId || "").trim();
-  const savedVersion = Number(rawAudit.savedVersion || 1) || 1;
-  const currentVersion = Number(rawAudit.currentVersion || savedVersion || 1) || 1;
+  const normalizedSavedVersion = Number(rawAudit.savedVersion || savedVersion || 1) || 1;
+  const normalizedCurrentVersion = Number(rawAudit.currentVersion || currentVersion || normalizedSavedVersion || 1) || 1;
   const savedBaselineHash = String(rawAudit.savedBaselineHash || "").trim();
-  const currentBaselineHash = String(rawAudit.currentBaselineHash || "").trim();
+  const normalizedCurrentBaselineHash = String(rawAudit.currentBaselineHash || currentBaselineHash || "").trim();
   const acceptedAt = String(rawAudit.acceptedAt || "").trim();
-  if (!normalizedScenarioId || !savedBaselineHash || !currentBaselineHash || !acceptedAt) {
+  if (!normalizedScenarioId || !savedBaselineHash || !normalizedCurrentBaselineHash || !acceptedAt) {
     return null;
   }
   return {
     scenarioId: normalizedScenarioId,
-    savedVersion,
-    currentVersion,
+    savedVersion: normalizedSavedVersion,
+    currentVersion: normalizedCurrentVersion,
     savedBaselineHash,
-    currentBaselineHash,
+    currentBaselineHash: normalizedCurrentBaselineHash,
     acceptedAt,
   };
 }
@@ -170,10 +178,12 @@ function normalizeUnitCounters(rawCounters) {
       if (!Number.isFinite(lon) || !Number.isFinite(lat)) return null;
       const renderer = String(raw.renderer || "game").trim().toLowerCase() === "milstd" ? "milstd" : "game";
       const size = String(raw.size || "medium").trim().toLowerCase();
+      const sidc = String(raw.sidc || raw.symbolCode || raw.templateId || "").trim().toUpperCase();
       return {
         id: String(raw.id || `unit_${index + 1}`).trim() || `unit_${index + 1}`,
         renderer,
-        symbolCode: String(raw.symbolCode || raw.templateId || "").trim(),
+        sidc,
+        symbolCode: sidc,
         label: String(raw.label || "").trim(),
         size: ["small", "medium", "large"].includes(size) ? size : "medium",
         facing: clamp(Number.isFinite(Number(raw.facing)) ? Number(raw.facing) : 0, -180, 180),
@@ -192,7 +202,7 @@ class FileManager {
   static exportProject(appState) {
     if (!appState) return;
     const payload = {
-      schemaVersion: 16,
+      schemaVersion: 17,
       countryBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
       featureOverrides: appState.visualOverrides || appState.featureOverrides || {},
       sovereignBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
@@ -254,6 +264,9 @@ class FileManager {
           viewMode: String(appState.scenarioViewMode || "ownership"),
           importAudit: normalizeScenarioImportAudit(appState.scenarioImportAudit, {
             scenarioId: appState.activeScenarioId,
+            savedVersion: appState.activeScenarioManifest?.version || 1,
+            currentVersion: appState.activeScenarioManifest?.version || 1,
+            currentBaselineHash: appState.scenarioBaselineHash || "",
           }),
         }
         : null,
@@ -396,6 +409,9 @@ class FileManager {
               : "ownership",
             importAudit: normalizeScenarioImportAudit(data.scenario.importAudit, {
               scenarioId: data.scenario.id,
+              savedVersion: data.scenario.version,
+              currentVersion: data.scenario.version,
+              currentBaselineHash: data.scenario.baselineHash,
             }),
           };
           if (!data.scenario.id) {

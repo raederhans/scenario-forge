@@ -182,7 +182,7 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   await initialDownload.saveAs(initialExportPath);
   const initialExport = JSON.parse(fs.readFileSync(initialExportPath, "utf8"));
 
-  expect(initialExport.schemaVersion).toBe(16);
+  expect(initialExport.schemaVersion).toBe(17);
   expect(initialExport.styleConfig.internalBorders).toEqual({
     color: "#123456",
     opacity: 0.42,
@@ -274,7 +274,8 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     {
       id: "unit_test_1",
       renderer: "milstd",
-      symbolCode: "INF",
+      sidc: "130310001412110000000000000000",
+      symbolCode: "130310001412110000000000000000",
       label: "1st Corps",
       size: "large",
       anchor: { lon: 12, lat: 48, featureId: "" },
@@ -406,7 +407,8 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   expect(roundtripExport.unitCounters[0]).toMatchObject({
     id: "unit_test_1",
     renderer: "milstd",
-    symbolCode: "INF",
+    sidc: "130310001412110000000000000000",
+    symbolCode: "130310001412110000000000000000",
     label: "1st Corps",
     size: "large",
   });

@@ -279,7 +279,25 @@ const LAYER_DIAG_PREFIX = "[layer-resolver]";
 const DEFAULT_SPECIAL_ZONE_TYPE = "custom";
 const DEFAULT_OPERATION_GRAPHIC_KIND = "attack";
 const DEFAULT_UNIT_COUNTER_RENDERER = "game";
+const DEFAULT_MILSTD_SIDC = "130310001412110000000000000000";
 const STRATEGIC_LINE_LABEL_FONT = "\"IBM Plex Sans\", \"Segoe UI\", sans-serif";
+const OPERATION_GRAPHIC_STYLE_PRESETS = ["attack", "retreat", "supply", "naval", "encirclement", "theater"];
+const milsymbolSvgUriCache = new Map();
+const DEFAULT_OPERATION_GRAPHIC_OPACITY = 0.96;
+const DEFAULT_OPERATION_GRAPHIC_WIDTH = 4.4;
+const DEFAULT_UNIT_COUNTER_SIDC = "130310001412110000000000000000";
+const UNIT_COUNTER_MILSTD_SIZE_BY_TOKEN = Object.freeze({
+  small: 24,
+  medium: 30,
+  large: 38,
+});
+const UNIT_COUNTER_SIDC_ALIASES = Object.freeze({
+  INF: DEFAULT_UNIT_COUNTER_SIDC,
+  ARMORED: "130310001712110000000000000000",
+  ARM: "130310001712110000000000000000",
+  HQ: "100310001712110000000000000000",
+  ART: "130320000000000000000000000000",
+});
 const PAPER_TEXTURE_BASE_TILE_SIZE = 512;
 const PAPER_NOISE_TILE_SIZE = 192;
 const TEXTURE_LABEL_SERIF_STACK = "\"Libre Baskerville\", \"Palatino Linotype\", Georgia, serif";
@@ -4115,7 +4133,7 @@ function ensureHybridLayers() {
     operationGraphicsEditorGroup = viewportGroup.append("g").attr("class", "operation-graphics-editor-layer");
   }
   operationGraphicsEditorGroup
-    .style("pointer-events", "none")
+    .style("pointer-events", "all")
     .attr("role", "img")
     .attr("aria-label", "Strategic operation graphics editor")
     .attr("aria-hidden", "true")
@@ -4217,7 +4235,10 @@ function ensureHybridLayers() {
       .attr("class", "interaction-layer")
       .attr("fill", "transparent");
   }
-  interactionRect.style("pointer-events", "all");
+  interactionRect
+    .style("pointer-events", "all")
+    // Keep the global hit surface behind editor overlays so midpoint/vertex handles can win hit-testing.
+    .lower();
 }
 
 function setCanvasSize() {
@@ -13629,16 +13650,32 @@ function ensureOperationGraphicsEditorState() {
   if (!state.operationGraphicsEditor || typeof state.operationGraphicsEditor !== "object") {
     state.operationGraphicsEditor = {
       active: false,
+      mode: "idle",
       points: [],
       kind: DEFAULT_OPERATION_GRAPHIC_KIND,
       label: "",
+      stylePreset: DEFAULT_OPERATION_GRAPHIC_KIND,
+      stroke: "",
+      width: 0,
+      opacity: 1,
       selectedId: null,
+      selectedVertexIndex: -1,
       counter: 1,
     };
+  }
+  if (typeof state.operationGraphicsEditor.mode !== "string") {
+    state.operationGraphicsEditor.mode = state.operationGraphicsEditor.active ? "draw" : "idle";
   }
   if (!Array.isArray(state.operationGraphicsEditor.points)) {
     state.operationGraphicsEditor.points = [];
   }
+  if (!OPERATION_GRAPHIC_STYLE_PRESETS.includes(String(state.operationGraphicsEditor.stylePreset || "").trim())) {
+    state.operationGraphicsEditor.stylePreset = String(state.operationGraphicsEditor.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
+  }
+  state.operationGraphicsEditor.stroke = String(state.operationGraphicsEditor.stroke || "").trim();
+  state.operationGraphicsEditor.width = Math.max(0, Math.min(16, Number(state.operationGraphicsEditor.width) || 0));
+  state.operationGraphicsEditor.opacity = Math.max(0, Math.min(1, Number(state.operationGraphicsEditor.opacity) || 1));
+  state.operationGraphicsEditor.selectedVertexIndex = Math.max(-1, Number(state.operationGraphicsEditor.selectedVertexIndex) || -1);
 }
 
 function ensureUnitCounterEditorState() {
@@ -13647,12 +13684,23 @@ function ensureUnitCounterEditorState() {
       active: false,
       renderer: DEFAULT_UNIT_COUNTER_RENDERER,
       label: "",
+      sidc: "",
       symbolCode: "",
       size: "medium",
       selectedId: null,
       counter: 1,
     };
   }
+  state.unitCounterEditor.sidc = String(
+    state.unitCounterEditor.sidc
+    || state.unitCounterEditor.symbolCode
+    || ""
+  ).trim();
+  state.unitCounterEditor.symbolCode = String(
+    state.unitCounterEditor.symbolCode
+    || state.unitCounterEditor.sidc
+    || ""
+  ).trim();
 }
 
 function getFrontlineOwnershipContext() {
@@ -13949,6 +13997,140 @@ function createOperationGraphicPath(points = [], { closed = false, curved = true
   return globalThis.d3.line().curve(curve)(projected) || "";
 }
 
+function getOperationGraphicMinPoints(kind = DEFAULT_OPERATION_GRAPHIC_KIND) {
+  return kind === "encirclement" || kind === "theater" ? 3 : 2;
+}
+
+function getOperationGraphicById(id) {
+  const selectedId = String(id || "").trim();
+  if (!selectedId) return null;
+  return (state.operationGraphics || []).find((entry) => String(entry?.id || "") === selectedId) || null;
+}
+
+function normalizeOperationGraphicStylePreset(value, fallback = DEFAULT_OPERATION_GRAPHIC_KIND) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (OPERATION_GRAPHIC_STYLE_PRESETS.includes(normalized)) {
+    return normalized;
+  }
+  return OPERATION_GRAPHIC_STYLE_PRESETS.includes(String(fallback || "").trim().toLowerCase())
+    ? String(fallback || "").trim().toLowerCase()
+    : DEFAULT_OPERATION_GRAPHIC_KIND;
+}
+
+function normalizeOperationGraphicStroke(value) {
+  const candidate = String(value || "").trim();
+  return /^#(?:[0-9a-f]{6})$/i.test(candidate) ? candidate.toLowerCase() : "";
+}
+
+function normalizeOperationGraphicWidth(value) {
+  return Math.max(0, Math.min(16, Number(value) || 0));
+}
+
+function normalizeOperationGraphicOpacity(value) {
+  return Math.max(0, Math.min(1, Number(value) || 1));
+}
+
+function getOperationGraphicEditorModel() {
+  ensureOperationGraphicsEditorState();
+  const isDrawing = !!state.operationGraphicsEditor.active;
+  if (isDrawing) {
+    const kind = String(state.operationGraphicsEditor.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
+    return {
+      mode: "draw",
+      graphic: null,
+      points: Array.isArray(state.operationGraphicsEditor.points) ? state.operationGraphicsEditor.points : [],
+      kind,
+      stylePreset: normalizeOperationGraphicStylePreset(state.operationGraphicsEditor.stylePreset, kind),
+      stroke: normalizeOperationGraphicStroke(state.operationGraphicsEditor.stroke),
+      width: normalizeOperationGraphicWidth(state.operationGraphicsEditor.width),
+      opacity: normalizeOperationGraphicOpacity(state.operationGraphicsEditor.opacity),
+      selectedVertexIndex: -1,
+    };
+  }
+  const graphic = getOperationGraphicById(state.operationGraphicsEditor.selectedId);
+  if (!graphic) {
+    return null;
+  }
+  const kind = String(graphic.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
+  return {
+    mode: "edit",
+    graphic,
+    points: Array.isArray(graphic.points) ? graphic.points : [],
+    kind,
+    stylePreset: normalizeOperationGraphicStylePreset(graphic.stylePreset, kind),
+    stroke: normalizeOperationGraphicStroke(graphic.stroke),
+    width: normalizeOperationGraphicWidth(graphic.width),
+    opacity: normalizeOperationGraphicOpacity(graphic.opacity),
+    selectedVertexIndex: Math.max(-1, Number(state.operationGraphicsEditor.selectedVertexIndex) || -1),
+  };
+}
+
+function getOperationGraphicEditorMidpoints(points = [], { closed = false } = {}) {
+  const segments = [];
+  const maxIndex = closed ? points.length : points.length - 1;
+  for (let index = 0; index < maxIndex; index += 1) {
+    const start = points[index];
+    const end = points[(index + 1) % points.length];
+    if (!Array.isArray(start) || !Array.isArray(end)) continue;
+    const midpoint = [
+      (Number(start[0]) + Number(end[0])) / 2,
+      (Number(start[1]) + Number(end[1])) / 2,
+    ];
+    segments.push({
+      id: `opg-midpoint-${index}`,
+      insertIndex: index + 1,
+      coord: midpoint,
+    });
+  }
+  return segments;
+}
+
+function getUnitCounterSymbolToken(counter = {}) {
+  return String(counter.sidc || counter.symbolCode || "").trim();
+}
+
+function getUnitCounterEffectiveSidc(counter = {}) {
+  const raw = getUnitCounterSymbolToken(counter);
+  if (/^\d{30}$/.test(raw)) {
+    return raw;
+  }
+  return UNIT_COUNTER_SIDC_ALIASES[String(raw || "").trim().toUpperCase()] || DEFAULT_MILSTD_SIDC;
+}
+
+function getMilSymbolDataUri(sidc, size = 42) {
+  const normalizedSidc = String(sidc || "").trim();
+  const normalizedSize = Math.max(24, Math.min(96, Number(size) || 42));
+  const cacheKey = `${normalizedSidc}|${normalizedSize}`;
+  if (milsymbolSvgUriCache.has(cacheKey)) {
+    return milsymbolSvgUriCache.get(cacheKey);
+  }
+  if (!normalizedSidc || !globalThis.ms?.Symbol) {
+    return "";
+  }
+  try {
+    const symbol = new globalThis.ms.Symbol(normalizedSidc, {
+      size: normalizedSize,
+      frame: true,
+      colorMode: "Light",
+    });
+    const uri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(symbol.asSVG())}`;
+    milsymbolSvgUriCache.set(cacheKey, uri);
+    return uri;
+  } catch (_error) {
+    milsymbolSvgUriCache.set(cacheKey, "");
+    return "";
+  }
+}
+
+function getLandFeatureIdFromEvent(event, eventType = "unit-counter-hit") {
+  const hit = getHitFromEvent(event, {
+    enableSnap: true,
+    snapPx: HIT_SNAP_RADIUS_CLICK_PX,
+    eventType,
+  });
+  return hit?.targetType === "land" ? String(hit.id || "") : "";
+}
+
 function renderFrontlineOverlay() {
   if (!frontlineOverlayGroup || !frontlineLabelsGroup || !pathSVG) return;
   if (!state.annotationView?.frontlineEnabled) {
@@ -14053,22 +14235,38 @@ function renderFrontlineOverlay() {
   frontlineLabelsGroup.attr("aria-hidden", labels.length ? "false" : "true");
 }
 
+function syncInteractionLayerPointerEvents() {
+  if (!interactionRect) return;
+  const operationGraphicEditor = state.operationGraphicsEditor || {};
+  const hasEditableOperationGraphic = !operationGraphicEditor.active
+    && String(operationGraphicEditor.mode || "") === "edit"
+    && !!String(operationGraphicEditor.selectedId || "").trim()
+    && Array.isArray(operationGraphicEditor.points)
+    && operationGraphicEditor.points.length > 0;
+  interactionRect
+    .style("pointer-events", hasEditableOperationGraphic ? "none" : "all")
+    .lower();
+}
+
 function renderOperationGraphicsEditorOverlay() {
   if (!operationGraphicsEditorGroup) return;
   ensureOperationGraphicsEditorState();
-  const points = Array.isArray(state.operationGraphicsEditor.points) ? state.operationGraphicsEditor.points : [];
-  const kind = String(state.operationGraphicsEditor.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
-  if (!state.operationGraphicsEditor.active || points.length === 0) {
+  const editorModel = getOperationGraphicEditorModel();
+  const points = Array.isArray(editorModel?.points) ? editorModel.points : [];
+  const isDrawing = editorModel?.mode === "draw";
+  if (!editorModel || points.length === 0) {
     operationGraphicsEditorGroup.selectAll("*").remove();
     operationGraphicsEditorGroup.attr("aria-hidden", "true");
+    syncInteractionLayerPointerEvents();
     return;
   }
-  const preset = getOperationGraphicPreset(kind);
+  const geometryPreset = getOperationGraphicPreset(editorModel.kind);
+  const stylePreset = getOperationGraphicPreset(editorModel.stylePreset);
   const previewPath = createOperationGraphicPath(points, {
-    closed: !!preset.closed && points.length >= 3,
+    closed: !!geometryPreset.closed && points.length >= 3,
     curved: true,
   });
-  const previewData = previewPath ? [{ id: "preview", d: previewPath, closed: !!preset.closed && points.length >= 3 }] : [];
+  const previewData = previewPath ? [{ id: "preview", d: previewPath, closed: !!geometryPreset.closed && points.length >= 3 }] : [];
   const pathSelection = operationGraphicsEditorGroup
     .selectAll("path.operation-graphics-editor-path")
     .data(previewData, (d) => d.id);
@@ -14079,38 +14277,182 @@ function renderOperationGraphicsEditorOverlay() {
     .attr("class", "operation-graphics-editor-path")
     .attr("role", "presentation")
     .attr("aria-hidden", "true")
+    .attr("pointer-events", "none")
     .attr("vector-effect", "non-scaling-stroke")
     .merge(pathSelection)
     .attr("d", (d) => d.d)
     .attr("fill", (d) => (d.closed ? "rgba(59, 130, 246, 0.08)" : "none"))
-    .attr("stroke", preset.stroke)
-    .attr("stroke-width", Math.max(1.5, preset.width))
+    .attr("stroke", editorModel.stroke || stylePreset.stroke)
+    .attr("stroke-width", Math.max(1.5, editorModel.width || stylePreset.width))
     .attr("stroke-linecap", "round")
     .attr("stroke-linejoin", "round")
-    .attr("stroke-dasharray", preset.dasharray || "8 4");
+    .attr("stroke-dasharray", stylePreset.dasharray || "8 4")
+    .attr("opacity", Number.isFinite(Number(editorModel.opacity)) ? editorModel.opacity : stylePreset.opacity);
 
   pathSelection.exit().remove();
 
   const pointSelection = operationGraphicsEditorGroup
     .selectAll("circle.operation-graphics-editor-point")
-    .data(points.map((coord, index) => ({ coord, id: `opg-point-${index}` })), (d) => d.id);
+    .data(points.map((coord, index) => ({ coord, index, id: `opg-point-${index}` })), (d) => d.id);
 
-  pointSelection
+  const pointEnter = pointSelection
     .enter()
     .append("circle")
     .attr("class", "operation-graphics-editor-point")
     .attr("role", "presentation")
-    .attr("aria-hidden", "true")
-    .merge(pointSelection)
-    .attr("r", 3.2)
+    .attr("aria-hidden", "true");
+
+  pointEnter.merge(pointSelection)
+    .attr("r", 4.2)
     .attr("cx", (d) => getProjectedPoint(d.coord)?.[0] ?? -9999)
     .attr("cy", (d) => getProjectedPoint(d.coord)?.[1] ?? -9999)
-    .attr("fill", "#ffffff")
-    .attr("stroke", preset.stroke)
-    .attr("stroke-width", 1.3);
+    .attr("fill", (_d, index) => (index === editorModel.selectedVertexIndex ? "#0f172a" : "#ffffff"))
+    .attr("stroke", editorModel.stroke || stylePreset.stroke)
+    .attr("stroke-width", (_d, index) => (index === editorModel.selectedVertexIndex ? 2 : 1.3))
+    .attr("pointer-events", "all")
+    .style("cursor", isDrawing ? "default" : "grab");
 
   pointSelection.exit().remove();
+
+  if (!isDrawing && globalThis.d3?.drag) {
+    if (!renderOperationGraphicsEditorOverlay.pointDragBehavior) {
+      renderOperationGraphicsEditorOverlay.pointDragBehavior = globalThis.d3.drag()
+        .on("start", function onStart(event, datum) {
+          event?.sourceEvent?.stopPropagation?.();
+          datum.__historyBefore = captureHistoryState({ strategicOverlay: true });
+          state.operationGraphicsEditor.selectedVertexIndex = datum.index;
+          state.operationGraphicsDirty = true;
+          globalThis.d3.select(this).style("cursor", "grabbing");
+          renderOperationGraphicsIfNeeded({ force: true });
+          updateStrategicOverlayUi();
+        })
+        .on("drag", function onDrag(event, datum) {
+          const graphic = getOperationGraphicById(state.operationGraphicsEditor.selectedId);
+          const coord = getMapLonLatFromEvent(event?.sourceEvent || event);
+          if (!graphic || !coord || !Array.isArray(graphic.points?.[datum.index])) return;
+          graphic.points[datum.index] = coord;
+          state.operationGraphicsEditor.points = Array.isArray(graphic.points) ? graphic.points : [];
+          state.operationGraphicsDirty = true;
+          renderOperationGraphicsIfNeeded({ force: true });
+        })
+        .on("end", function onEnd(_event, datum) {
+          globalThis.d3.select(this).style("cursor", "grab");
+          pushHistoryEntry({
+            kind: "move-operation-graphic-vertex",
+            before: datum.__historyBefore,
+            after: captureHistoryState({ strategicOverlay: true }),
+          });
+          datum.__historyBefore = null;
+          markDirty("move-operation-graphic-vertex");
+          state.operationGraphicsDirty = true;
+          updateStrategicOverlayUi();
+          renderOperationGraphicsIfNeeded({ force: true });
+        });
+    }
+    pointEnter.merge(pointSelection)
+      .on("click", (event, datum) => {
+        event.stopPropagation();
+        state.operationGraphicsEditor.selectedVertexIndex = datum.index;
+        state.operationGraphicsEditor.points = points;
+        state.operationGraphicsDirty = true;
+        updateStrategicOverlayUi();
+        renderOperationGraphicsIfNeeded({ force: true });
+      })
+      .call(renderOperationGraphicsEditorOverlay.pointDragBehavior);
+  }
+
+  const midpointData = !isDrawing
+    ? getOperationGraphicEditorMidpoints(points, { closed: !!geometryPreset.closed && points.length >= 3 })
+    : [];
+  const midpointSelection = operationGraphicsEditorGroup
+    .selectAll("circle.operation-graphics-editor-midpoint")
+    .data(midpointData, (d) => d.id);
+
+  midpointSelection
+    .enter()
+    .append("circle")
+    .attr("class", "operation-graphics-editor-midpoint")
+    .attr("role", "presentation")
+    .attr("aria-hidden", "true")
+    .merge(midpointSelection)
+    .attr("r", 10)
+    .attr("cx", (d) => getProjectedPoint(d.coord)?.[0] ?? -9999)
+    .attr("cy", (d) => getProjectedPoint(d.coord)?.[1] ?? -9999)
+    .attr("fill", editorModel.stroke || stylePreset.stroke)
+    .attr("opacity", 0.001)
+    .attr("stroke", "none")
+    .attr("stroke-width", 0)
+    .attr("pointer-events", "all")
+    .style("cursor", "copy")
+    .on("pointerdown", function onPointerDown(event, datum) {
+      this.dataset.skipMidpointClick = "true";
+      event.stopPropagation();
+      event.preventDefault?.();
+      const graphic = getOperationGraphicById(state.operationGraphicsEditor.selectedId);
+      if (!graphic) return;
+      const before = captureHistoryState({ strategicOverlay: true });
+      graphic.points.splice(datum.insertIndex, 0, datum.coord);
+      state.operationGraphicsEditor.points = Array.isArray(graphic.points) ? graphic.points : [];
+      state.operationGraphicsEditor.selectedVertexIndex = datum.insertIndex;
+      state.operationGraphicsDirty = true;
+      pushHistoryEntry({
+        kind: "insert-operation-graphic-vertex",
+        before,
+        after: captureHistoryState({ strategicOverlay: true }),
+      });
+      markDirty("insert-operation-graphic-vertex");
+      updateStrategicOverlayUi();
+      renderOperationGraphicsIfNeeded({ force: true });
+    })
+    .on("click", function onClick(event, datum) {
+      if (this.dataset.skipMidpointClick === "true") {
+        this.dataset.skipMidpointClick = "false";
+        return;
+      }
+      event.stopPropagation();
+      const graphic = getOperationGraphicById(state.operationGraphicsEditor.selectedId);
+      if (!graphic) return;
+      const before = captureHistoryState({ strategicOverlay: true });
+      graphic.points.splice(datum.insertIndex, 0, datum.coord);
+      state.operationGraphicsEditor.points = Array.isArray(graphic.points) ? graphic.points : [];
+      state.operationGraphicsEditor.selectedVertexIndex = datum.insertIndex;
+      state.operationGraphicsDirty = true;
+      pushHistoryEntry({
+        kind: "insert-operation-graphic-vertex",
+        before,
+        after: captureHistoryState({ strategicOverlay: true }),
+      });
+      markDirty("insert-operation-graphic-vertex");
+      updateStrategicOverlayUi();
+      renderOperationGraphicsIfNeeded({ force: true });
+    });
+
+  const midpointVisualSelection = operationGraphicsEditorGroup
+    .selectAll("circle.operation-graphics-editor-midpoint-visual")
+    .data(midpointData, (d) => d.id);
+
+  midpointVisualSelection
+    .enter()
+    .append("circle")
+    .attr("class", "operation-graphics-editor-midpoint-visual")
+    .attr("role", "presentation")
+    .attr("aria-hidden", "true")
+    .merge(midpointVisualSelection)
+    .attr("r", 4.6)
+    .attr("cx", (d) => getProjectedPoint(d.coord)?.[0] ?? -9999)
+    .attr("cy", (d) => getProjectedPoint(d.coord)?.[1] ?? -9999)
+    .attr("fill", editorModel.stroke || stylePreset.stroke)
+    .attr("opacity", 0.72)
+    .attr("stroke", "#ffffff")
+    .attr("stroke-width", 1)
+    .attr("pointer-events", "none");
+
+  operationGraphicsEditorGroup.selectAll("circle.operation-graphics-editor-point").raise();
+
+  midpointSelection.exit().remove();
+  midpointVisualSelection.exit().remove();
   operationGraphicsEditorGroup.attr("aria-hidden", "false");
+  syncInteractionLayerPointerEvents();
 }
 
 function renderOperationGraphicsOverlay() {
@@ -14120,13 +14462,14 @@ function renderOperationGraphicsOverlay() {
   const selectedId = String(state.operationGraphicsEditor?.selectedId || "");
   const rendered = graphics
     .map((graphic) => {
-      const preset = getOperationGraphicPreset(graphic.kind);
+      const geometryPreset = getOperationGraphicPreset(graphic.kind);
+      const stylePreset = getOperationGraphicPreset(graphic.stylePreset || graphic.kind);
       const path = createOperationGraphicPath(graphic.points, {
-        closed: preset.closed,
-        curved: preset.curved,
+        closed: geometryPreset.closed,
+        curved: geometryPreset.curved,
       });
       if (!path) return null;
-      return { graphic, preset, path, pathId: `strategic-graphic-path-${graphic.id}` };
+      return { graphic, geometryPreset, stylePreset, path, pathId: `strategic-graphic-path-${graphic.id}` };
     })
     .filter(Boolean);
 
@@ -14143,20 +14486,23 @@ function renderOperationGraphicsOverlay() {
   merged.select("path.operation-graphic-path")
     .attr("id", (d) => d.pathId)
     .attr("d", (d) => d.path)
-    .attr("fill", (d) => (d.preset.closed ? "rgba(15, 23, 42, 0.06)" : "none"))
-    .attr("stroke", (d) => d.graphic.stroke || d.preset.stroke)
-    .attr("stroke-width", (d) => (d.graphic.id === selectedId ? d.preset.width + 1.4 : d.preset.width))
+    .attr("fill", (d) => (d.geometryPreset.closed ? "rgba(15, 23, 42, 0.06)" : "none"))
+    .attr("stroke", (d) => d.graphic.stroke || d.stylePreset.stroke)
+    .attr("stroke-width", (d) => {
+      const baseWidth = d.graphic.width > 0 ? d.graphic.width : d.stylePreset.width;
+      return d.graphic.id === selectedId ? baseWidth + 1.4 : baseWidth;
+    })
     .attr("stroke-linecap", "round")
     .attr("stroke-linejoin", "round")
-    .attr("stroke-dasharray", (d) => d.preset.dasharray || null)
-    .attr("opacity", (d) => d.graphic.opacity ?? d.preset.opacity)
-    .attr("marker-end", (d) => d.preset.markerEnd || null);
+    .attr("stroke-dasharray", (d) => d.stylePreset.dasharray || null)
+    .attr("opacity", (d) => Number.isFinite(Number(d.graphic.opacity)) ? Number(d.graphic.opacity) : d.stylePreset.opacity)
+    .attr("marker-end", (d) => d.stylePreset.markerEnd || null);
 
   merged.select("path.operation-graphic-hit")
     .attr("d", (d) => d.path)
     .attr("fill", "none")
     .attr("stroke", "transparent")
-    .attr("stroke-width", (d) => Math.max(10, d.preset.width + 6))
+    .attr("stroke-width", (d) => Math.max(10, (d.graphic.width > 0 ? d.graphic.width : d.stylePreset.width) + 6))
     .attr("pointer-events", "stroke");
 
   merged.select("text.operation-graphic-label")
@@ -14171,6 +14517,11 @@ function renderOperationGraphicsOverlay() {
     .attr("startOffset", "50%")
     .attr("text-anchor", "middle")
     .text((d) => d.graphic.label || "");
+
+  merged.on("click", (event, datum) => {
+    event.stopPropagation();
+    selectOperationGraphicById(datum.graphic.id);
+  });
 
   groups.exit().remove();
   operationGraphicsGroup.attr("aria-hidden", rendered.length ? "false" : "true");
@@ -14223,6 +14574,7 @@ function renderUnitCountersOverlay() {
   const groupEnter = groups.enter().append("g").attr("class", "unit-counter").style("cursor", "grab");
   groupEnter.append("rect").attr("class", "unit-counter-shell");
   groupEnter.append("rect").attr("class", "unit-counter-band");
+  groupEnter.append("image").attr("class", "unit-counter-milsymbol");
   groupEnter.append("text").attr("class", "unit-counter-symbol");
   groupEnter.append("text").attr("class", "unit-counter-label");
   groupEnter.append("circle").attr("class", "unit-counter-stack-badge");
@@ -14240,18 +14592,32 @@ function renderUnitCountersOverlay() {
     .attr("height", 32)
     .attr("rx", (d) => (d.counter.renderer === "game" ? 7 : 2))
     .attr("ry", (d) => (d.counter.renderer === "game" ? 7 : 2))
-    .attr("fill", (d) => (d.counter.renderer === "milstd" ? "#f8fafc" : "#1f2937"))
-    .attr("stroke", (d) => (d.counter.id === selectedId ? "#38bdf8" : "#0f172a"))
+    .attr("fill", (d) => (d.counter.renderer === "milstd" ? "rgba(248, 250, 252, 0.72)" : "#1f2937"))
+    .attr("stroke", (d) => (d.counter.id === selectedId ? "#38bdf8" : (d.counter.renderer === "milstd" ? "rgba(15, 23, 42, 0.24)" : "#0f172a")))
     .attr("stroke-width", (d) => (d.counter.id === selectedId ? 2.4 : 1.3));
 
   merged.select("rect.unit-counter-band")
+    .attr("display", (d) => (d.counter.renderer === "milstd" ? "none" : null))
     .attr("x", -26)
     .attr("y", -16)
     .attr("width", 52)
     .attr("height", 8)
     .attr("fill", (d) => (d.counter.renderer === "milstd" ? "#dbeafe" : "#991b1b"));
 
+  merged.select("image.unit-counter-milsymbol")
+    .attr("display", (d) => (d.counter.renderer === "milstd" ? null : "none"))
+    .attr("x", -23)
+    .attr("y", -15)
+    .attr("width", 46)
+    .attr("height", 30)
+    .attr("preserveAspectRatio", "xMidYMid meet")
+    .attr("href", (d) => getMilSymbolDataUri(getUnitCounterEffectiveSidc(d.counter), 44));
+
   merged.select("text.unit-counter-symbol")
+    .attr("display", (d) => {
+      if (d.counter.renderer !== "milstd") return null;
+      return getMilSymbolDataUri(getUnitCounterEffectiveSidc(d.counter), 44) ? "none" : null;
+    })
     .attr("x", 0)
     .attr("y", d => (d.counter.renderer === "milstd" ? 1 : -1))
     .attr("text-anchor", "middle")
@@ -14261,7 +14627,7 @@ function renderUnitCountersOverlay() {
     .attr("font-weight", 700)
     .attr("fill", d => (d.counter.renderer === "milstd" ? "#0f172a" : "#f8fafc"))
     .text((d) => {
-      const raw = String(d.counter.symbolCode || d.counter.label || "").trim();
+      const raw = getUnitCounterSymbolToken(d.counter) || String(d.counter.label || "").trim();
       if (!raw) return d.counter.renderer === "milstd" ? "INF" : "HQ";
       return raw.slice(0, 10);
     });
@@ -14320,8 +14686,13 @@ function renderUnitCountersOverlay() {
           state.unitCountersDirty = true;
           renderUnitCountersIfNeeded({ force: true });
         })
-        .on("end", function onEnd(_event, datum) {
+        .on("end", function onEnd(event, datum) {
           globalThis.d3.select(this).style("cursor", "grab");
+          datum.counter.anchor = {
+            ...(datum.counter.anchor || {}),
+            featureId: getLandFeatureIdFromEvent(event?.sourceEvent || event, "unit-counter-drag-end"),
+          };
+          state.unitCountersDirty = true;
           pushHistoryEntry({
             kind: "move-unit-counter",
             before: datum.__historyBefore,
@@ -14329,6 +14700,8 @@ function renderUnitCountersOverlay() {
           });
           datum.__historyBefore = null;
           markDirty("move-unit-counter");
+          updateStrategicOverlayUi();
+          renderUnitCountersIfNeeded({ force: true });
         });
     }
     merged.call(renderUnitCountersOverlay.dragBehavior);
@@ -14339,7 +14712,8 @@ function renderUnitCountersOverlay() {
     state.unitCounterEditor.selectedId = datum.counter.id;
     state.unitCounterEditor.renderer = String(datum.counter.renderer || DEFAULT_UNIT_COUNTER_RENDERER);
     state.unitCounterEditor.label = String(datum.counter.label || "");
-    state.unitCounterEditor.symbolCode = String(datum.counter.symbolCode || "");
+    state.unitCounterEditor.sidc = String(datum.counter.sidc || datum.counter.symbolCode || "").trim().toUpperCase();
+    state.unitCounterEditor.symbolCode = String(datum.counter.symbolCode || datum.counter.sidc || "").trim().toUpperCase();
     state.unitCounterEditor.size = String(datum.counter.size || "medium");
     state.unitCountersDirty = true;
     updateStrategicOverlayUi();
@@ -14936,12 +15310,26 @@ function appendOperationGraphicVertexFromEvent(event) {
   return true;
 }
 
-function startOperationGraphicDraw({ kind = DEFAULT_OPERATION_GRAPHIC_KIND, label = "" } = {}) {
+function startOperationGraphicDraw({
+  kind = DEFAULT_OPERATION_GRAPHIC_KIND,
+  label = "",
+  stylePreset = DEFAULT_OPERATION_GRAPHIC_KIND,
+  stroke = "",
+  width = 0,
+  opacity = 1,
+} = {}) {
   ensureOperationGraphicsEditorState();
   state.operationGraphicsEditor.active = true;
+  state.operationGraphicsEditor.mode = "draw";
   state.operationGraphicsEditor.points = [];
   state.operationGraphicsEditor.kind = String(kind || DEFAULT_OPERATION_GRAPHIC_KIND);
   state.operationGraphicsEditor.label = String(label || "");
+  state.operationGraphicsEditor.stylePreset = normalizeOperationGraphicStylePreset(stylePreset, kind);
+  state.operationGraphicsEditor.stroke = normalizeOperationGraphicStroke(stroke);
+  state.operationGraphicsEditor.width = normalizeOperationGraphicWidth(width);
+  state.operationGraphicsEditor.opacity = normalizeOperationGraphicOpacity(opacity);
+  state.operationGraphicsEditor.selectedId = null;
+  state.operationGraphicsEditor.selectedVertexIndex = -1;
   state.operationGraphicsDirty = true;
   updateStrategicOverlayUi();
   if (context) render();
@@ -14959,7 +15347,9 @@ function undoOperationGraphicVertex() {
 function cancelOperationGraphicDraw() {
   ensureOperationGraphicsEditorState();
   state.operationGraphicsEditor.active = false;
+  state.operationGraphicsEditor.mode = state.operationGraphicsEditor.selectedId ? "edit" : "idle";
   state.operationGraphicsEditor.points = [];
+  state.operationGraphicsEditor.selectedVertexIndex = -1;
   state.operationGraphicsDirty = true;
   updateStrategicOverlayUi();
   if (context) render();
@@ -14968,7 +15358,7 @@ function cancelOperationGraphicDraw() {
 function finishOperationGraphicDraw() {
   ensureOperationGraphicsEditorState();
   const kind = String(state.operationGraphicsEditor.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
-  const minPoints = kind === "encirclement" || kind === "theater" ? 3 : 2;
+  const minPoints = getOperationGraphicMinPoints(kind);
   const points = Array.isArray(state.operationGraphicsEditor.points) ? state.operationGraphicsEditor.points : [];
   if (!state.operationGraphicsEditor.active || points.length < minPoints) {
     cancelOperationGraphicDraw();
@@ -14982,15 +15372,17 @@ function finishOperationGraphicDraw() {
     kind,
     label: String(state.operationGraphicsEditor.label || "").trim(),
     points: [...points],
-    stylePreset: kind,
-    stroke: null,
-    width: 0,
-    opacity: 1,
+    stylePreset: normalizeOperationGraphicStylePreset(state.operationGraphicsEditor.stylePreset, kind),
+    stroke: normalizeOperationGraphicStroke(state.operationGraphicsEditor.stroke) || null,
+    width: normalizeOperationGraphicWidth(state.operationGraphicsEditor.width),
+    opacity: normalizeOperationGraphicOpacity(state.operationGraphicsEditor.opacity),
   });
   state.operationGraphicsEditor.counter += 1;
   state.operationGraphicsEditor.selectedId = id;
   state.operationGraphicsEditor.active = false;
-  state.operationGraphicsEditor.points = [];
+  state.operationGraphicsEditor.mode = "edit";
+  state.operationGraphicsEditor.points = [...points];
+  state.operationGraphicsEditor.selectedVertexIndex = -1;
   state.operationGraphicsDirty = true;
   commitHistoryEntry({
     kind: "finish-operation-graphic",
@@ -15006,11 +15398,21 @@ function finishOperationGraphicDraw() {
 function selectOperationGraphicById(id) {
   ensureOperationGraphicsEditorState();
   const selectedId = String(id || "").trim();
-  const graphic = (state.operationGraphics || []).find((entry) => String(entry?.id || "") === selectedId) || null;
+  const graphic = getOperationGraphicById(selectedId);
   state.operationGraphicsEditor.selectedId = selectedId || null;
+  state.operationGraphicsEditor.selectedVertexIndex = -1;
   if (graphic) {
     state.operationGraphicsEditor.kind = String(graphic.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
     state.operationGraphicsEditor.label = String(graphic.label || "");
+    state.operationGraphicsEditor.stylePreset = normalizeOperationGraphicStylePreset(graphic.stylePreset, graphic.kind);
+    state.operationGraphicsEditor.stroke = normalizeOperationGraphicStroke(graphic.stroke);
+    state.operationGraphicsEditor.width = normalizeOperationGraphicWidth(graphic.width);
+    state.operationGraphicsEditor.opacity = normalizeOperationGraphicOpacity(graphic.opacity);
+    state.operationGraphicsEditor.points = Array.isArray(graphic.points) ? [...graphic.points] : [];
+    state.operationGraphicsEditor.mode = "edit";
+  } else {
+    state.operationGraphicsEditor.points = [];
+    state.operationGraphicsEditor.mode = "idle";
   }
   state.operationGraphicsDirty = true;
   updateStrategicOverlayUi();
@@ -15026,6 +15428,9 @@ function deleteSelectedOperationGraphic() {
   if (nextGraphics.length === (state.operationGraphics || []).length) return false;
   state.operationGraphics = nextGraphics;
   state.operationGraphicsEditor.selectedId = null;
+  state.operationGraphicsEditor.points = [];
+  state.operationGraphicsEditor.selectedVertexIndex = -1;
+  state.operationGraphicsEditor.mode = "idle";
   state.operationGraphicsDirty = true;
   commitHistoryEntry({
     kind: "delete-operation-graphic",
@@ -15044,9 +15449,35 @@ function updateSelectedOperationGraphic(partial = {}) {
   if (!selectedId) return false;
   const target = (state.operationGraphics || []).find((entry) => String(entry?.id || "") === selectedId);
   if (!target) return false;
+  const nextKind = partial.kind ? String(partial.kind || DEFAULT_OPERATION_GRAPHIC_KIND) : String(target.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
+  if (
+    partial.kind
+    && Array.isArray(target.points)
+    && target.points.length < getOperationGraphicMinPoints(nextKind)
+  ) {
+    showToast(t("Add more vertices before switching this graphic to a closed style.", "ui"), {
+      title: t("More points required", "ui"),
+      tone: "warning",
+    });
+    return false;
+  }
   const before = captureHistoryState({ strategicOverlay: true });
-  if (partial.kind) target.kind = String(partial.kind || DEFAULT_OPERATION_GRAPHIC_KIND);
+  if (partial.kind) target.kind = nextKind;
   if (partial.label !== undefined) target.label = String(partial.label || "");
+  if (partial.stylePreset !== undefined) {
+    target.stylePreset = normalizeOperationGraphicStylePreset(partial.stylePreset, target.kind);
+  }
+  if (partial.stroke !== undefined) {
+    target.stroke = normalizeOperationGraphicStroke(partial.stroke) || null;
+  }
+  if (partial.width !== undefined) {
+    target.width = normalizeOperationGraphicWidth(partial.width);
+  }
+  if (partial.opacity !== undefined) {
+    target.opacity = normalizeOperationGraphicOpacity(partial.opacity);
+  }
+  state.operationGraphicsEditor.points = Array.isArray(target.points) ? [...target.points] : [];
+  selectOperationGraphicById(selectedId);
   state.operationGraphicsDirty = true;
   commitHistoryEntry({
     kind: "update-operation-graphic",
@@ -15054,6 +15485,29 @@ function updateSelectedOperationGraphic(partial = {}) {
     after: captureHistoryState({ strategicOverlay: true }),
   });
   markDirty("update-operation-graphic");
+  updateStrategicOverlayUi();
+  if (context) render();
+  return true;
+}
+
+function deleteSelectedOperationGraphicVertex() {
+  ensureOperationGraphicsEditorState();
+  const graphic = getOperationGraphicById(state.operationGraphicsEditor.selectedId);
+  const vertexIndex = Number(state.operationGraphicsEditor.selectedVertexIndex);
+  if (!graphic || !Number.isInteger(vertexIndex) || vertexIndex < 0) return false;
+  const minPoints = getOperationGraphicMinPoints(graphic.kind);
+  if (!Array.isArray(graphic.points) || graphic.points.length <= minPoints) return false;
+  const before = captureHistoryState({ strategicOverlay: true });
+  graphic.points.splice(vertexIndex, 1);
+  state.operationGraphicsEditor.points = Array.isArray(graphic.points) ? [...graphic.points] : [];
+  state.operationGraphicsEditor.selectedVertexIndex = Math.min(vertexIndex, graphic.points.length - 1);
+  state.operationGraphicsDirty = true;
+  commitHistoryEntry({
+    kind: "delete-operation-graphic-vertex",
+    before,
+    after: captureHistoryState({ strategicOverlay: true }),
+  });
+  markDirty("delete-operation-graphic-vertex");
   updateStrategicOverlayUi();
   if (context) render();
   return true;
@@ -15083,10 +15537,16 @@ function placeUnitCounterFromEvent(event) {
   const featureId = hit?.targetType === "land" ? String(hit.id || "") : "";
   const before = captureHistoryState({ strategicOverlay: true });
   const id = `unit_${state.unitCounterEditor.counter}`;
+  const nextToken = String(
+    state.unitCounterEditor.sidc
+    || state.unitCounterEditor.symbolCode
+    || (String(state.unitCounterEditor.renderer || "").toLowerCase() === "milstd" ? DEFAULT_MILSTD_SIDC : "")
+  ).trim().toUpperCase();
   state.unitCounters.push({
     id,
     renderer: String(state.unitCounterEditor.renderer || state.annotationView?.unitRendererDefault || DEFAULT_UNIT_COUNTER_RENDERER),
-    symbolCode: String(state.unitCounterEditor.symbolCode || "").trim(),
+    sidc: nextToken,
+    symbolCode: nextToken,
     label: String(state.unitCounterEditor.label || "").trim(),
     size: String(state.unitCounterEditor.size || "medium"),
     facing: 0,
@@ -15112,12 +15572,19 @@ function placeUnitCounterFromEvent(event) {
   return true;
 }
 
-function startUnitCounterPlacement({ renderer = DEFAULT_UNIT_COUNTER_RENDERER, label = "", symbolCode = "", size = "medium" } = {}) {
+function startUnitCounterPlacement({
+  renderer = DEFAULT_UNIT_COUNTER_RENDERER,
+  label = "",
+  sidc = "",
+  symbolCode = "",
+  size = "medium",
+} = {}) {
   ensureUnitCounterEditorState();
   state.unitCounterEditor.active = true;
   state.unitCounterEditor.renderer = String(renderer || DEFAULT_UNIT_COUNTER_RENDERER);
   state.unitCounterEditor.label = String(label || "");
-  state.unitCounterEditor.symbolCode = String(symbolCode || "");
+  state.unitCounterEditor.sidc = String(sidc || symbolCode || "").trim().toUpperCase();
+  state.unitCounterEditor.symbolCode = String(symbolCode || sidc || "").trim().toUpperCase();
   state.unitCounterEditor.size = String(size || "medium");
   state.unitCountersDirty = true;
   updateStrategicOverlayUi();
@@ -15140,7 +15607,8 @@ function selectUnitCounterById(id) {
   if (counter) {
     state.unitCounterEditor.renderer = String(counter.renderer || DEFAULT_UNIT_COUNTER_RENDERER);
     state.unitCounterEditor.label = String(counter.label || "");
-    state.unitCounterEditor.symbolCode = String(counter.symbolCode || "");
+    state.unitCounterEditor.sidc = String(counter.sidc || counter.symbolCode || "").trim().toUpperCase();
+    state.unitCounterEditor.symbolCode = String(counter.symbolCode || counter.sidc || "").trim().toUpperCase();
     state.unitCounterEditor.size = String(counter.size || "medium");
   }
   state.unitCountersDirty = true;
@@ -15157,8 +15625,13 @@ function updateSelectedUnitCounter(partial = {}) {
   const before = captureHistoryState({ strategicOverlay: true });
   if (partial.renderer) counter.renderer = String(partial.renderer || DEFAULT_UNIT_COUNTER_RENDERER);
   if (partial.label !== undefined) counter.label = String(partial.label || "");
-  if (partial.symbolCode !== undefined) counter.symbolCode = String(partial.symbolCode || "");
+  if (partial.sidc !== undefined || partial.symbolCode !== undefined) {
+    const nextToken = String(partial.sidc || partial.symbolCode || "").trim().toUpperCase();
+    counter.sidc = nextToken;
+    counter.symbolCode = nextToken;
+  }
   if (partial.size) counter.size = String(partial.size || "medium");
+  selectUnitCounterById(selectedId);
   state.unitCountersDirty = true;
   commitHistoryEntry({
     kind: "update-unit-counter",
@@ -17105,6 +17578,7 @@ export {
   cancelOperationGraphicDraw,
   selectOperationGraphicById,
   deleteSelectedOperationGraphic,
+  deleteSelectedOperationGraphicVertex,
   updateSelectedOperationGraphic,
   startUnitCounterPlacement,
   cancelUnitCounterPlacement,

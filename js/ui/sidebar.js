@@ -1490,6 +1490,16 @@ function initSidebar({ render } = {}) {
     button.textContent = t(label, "ui");
     return button;
   };
+  const buildInput = (id, placeholder, type = "text") => {
+    const input = document.createElement("input");
+    input.id = id;
+    input.type = type;
+    input.className = "input";
+    if (placeholder) {
+      input.placeholder = t(placeholder, "ui");
+    }
+    return input;
+  };
 
   let frontlineOverlaySection = document.getElementById("frontlineOverlayPanel");
   if (!frontlineOverlaySection && frontlineTabStack) {
@@ -1598,13 +1608,43 @@ function initSidebar({ render } = {}) {
       ["encirclement", "Encirclement"],
       ["theater", "Theater"],
     ]);
-    const graphicsLabelInput = document.createElement("input");
-    graphicsLabelInput.id = "operationGraphicLabelInput";
-    graphicsLabelInput.type = "text";
-    graphicsLabelInput.className = "text-input";
-    graphicsLabelInput.placeholder = t("Label", "ui");
+    const graphicsLabelInput = buildInput("operationGraphicLabelInput", "Label");
     graphicsRow.appendChild(graphicsKindSelect);
     graphicsRow.appendChild(graphicsLabelInput);
+
+    const graphicsStyleRow = buildRow();
+    const graphicsPresetSelect = buildSelect("operationGraphicPresetSelect", [
+      ["attack", "Attack Style"],
+      ["retreat", "Retreat Style"],
+      ["supply", "Supply Style"],
+      ["naval", "Naval Style"],
+      ["encirclement", "Encirclement Style"],
+      ["theater", "Theater Style"],
+    ]);
+    const graphicsStrokeInput = buildInput("operationGraphicStrokeInput", "", "color");
+    graphicsStrokeInput.value = "#991b1b";
+    graphicsStrokeInput.className = "input strategic-inline-color";
+    graphicsStrokeInput.setAttribute("aria-label", t("Graphic stroke", "ui"));
+    const graphicsWidthInput = buildInput("operationGraphicWidthInput", "Width", "number");
+    graphicsWidthInput.min = "0";
+    graphicsWidthInput.max = "16";
+    graphicsWidthInput.step = "0.2";
+    const graphicsOpacityInput = buildInput("operationGraphicOpacityInput", "Opacity", "number");
+    graphicsOpacityInput.min = "0";
+    graphicsOpacityInput.max = "1";
+    graphicsOpacityInput.step = "0.05";
+    graphicsStyleRow.appendChild(graphicsPresetSelect);
+    graphicsStyleRow.appendChild(graphicsStrokeInput);
+    graphicsStyleRow.appendChild(graphicsWidthInput);
+    graphicsStyleRow.appendChild(graphicsOpacityInput);
+
+    const graphicsEditorHint = document.createElement("p");
+    graphicsEditorHint.id = "operationGraphicEditorHint";
+    graphicsEditorHint.className = "sidebar-tool-hint mt-2";
+    graphicsEditorHint.textContent = t(
+      "Select a line to drag vertices, click midpoint pips to insert points, or remove the selected vertex.",
+      "ui"
+    );
 
     const graphicsActions = buildRow();
     graphicsActions.appendChild(buildButton("operationGraphicStartBtn", "Start Draw"));
@@ -1612,6 +1652,24 @@ function initSidebar({ render } = {}) {
     graphicsActions.appendChild(buildButton("operationGraphicFinishBtn", "Finish"));
     graphicsActions.appendChild(buildButton("operationGraphicCancelBtn", "Cancel"));
     graphicsActions.appendChild(buildButton("operationGraphicDeleteBtn", "Delete Selected"));
+    const graphicsDeleteVertexBtn = buildButton("operationGraphicDeleteVertexBtn", "Delete Vertex");
+    let skipDeleteGraphicVertexClick = false;
+    const handleDeleteGraphicVertex = (event) => {
+      event?.preventDefault?.();
+      if (event?.type === "click" && skipDeleteGraphicVertexClick) {
+        skipDeleteGraphicVertexClick = false;
+        return;
+      }
+      if (event?.type === "pointerdown") {
+        skipDeleteGraphicVertexClick = true;
+      }
+      mapRenderer.deleteSelectedOperationGraphicVertex();
+      refreshStrategicOverlayUI();
+    };
+    graphicsDeleteVertexBtn.addEventListener("pointerdown", handleDeleteGraphicVertex);
+    graphicsDeleteVertexBtn.addEventListener("click", handleDeleteGraphicVertex);
+    graphicsDeleteVertexBtn.dataset.bound = "true";
+    graphicsActions.appendChild(graphicsDeleteVertexBtn);
 
     const graphicsList = document.createElement("select");
     graphicsList.id = "operationGraphicList";
@@ -1631,20 +1689,17 @@ function initSidebar({ render } = {}) {
       ["medium", "Medium"],
       ["large", "Large"],
     ]);
-    const unitLabelInput = document.createElement("input");
-    unitLabelInput.id = "unitCounterLabelInput";
-    unitLabelInput.type = "text";
-    unitLabelInput.className = "text-input";
-    unitLabelInput.placeholder = t("Counter Label", "ui");
-    const unitSymbolInput = document.createElement("input");
-    unitSymbolInput.id = "unitCounterSymbolInput";
-    unitSymbolInput.type = "text";
-    unitSymbolInput.className = "text-input";
-    unitSymbolInput.placeholder = t("Symbol / Code", "ui");
+    const unitLabelInput = buildInput("unitCounterLabelInput", "Counter Label");
+    const unitSymbolInput = buildInput("unitCounterSymbolInput", "SIDC / Symbol Code");
     unitRow.appendChild(unitRendererSelect);
     unitRow.appendChild(unitSizeSelect);
     unitRow.appendChild(unitLabelInput);
     unitRow.appendChild(unitSymbolInput);
+
+    const unitSymbolHint = document.createElement("p");
+    unitSymbolHint.id = "unitCounterSymbolHint";
+    unitSymbolHint.className = "sidebar-tool-hint mt-2";
+    unitSymbolHint.textContent = t("Game renderer uses short codes like HQ or ARM. MILSTD expects a SIDC string.", "ui");
 
     const unitOptionsRow = buildRow();
     const unitLabelToggle = document.createElement("label");
@@ -1666,10 +1721,13 @@ function initSidebar({ render } = {}) {
     strategicOverlaySection.appendChild(hint);
     strategicOverlaySection.appendChild(graphicsHeader);
     strategicOverlaySection.appendChild(graphicsRow);
+    strategicOverlaySection.appendChild(graphicsStyleRow);
+    strategicOverlaySection.appendChild(graphicsEditorHint);
     strategicOverlaySection.appendChild(graphicsActions);
     strategicOverlaySection.appendChild(graphicsList);
     strategicOverlaySection.appendChild(unitHeader);
     strategicOverlaySection.appendChild(unitRow);
+    strategicOverlaySection.appendChild(unitSymbolHint);
     strategicOverlaySection.appendChild(unitOptionsRow);
     strategicOverlaySection.appendChild(unitActions);
     strategicOverlaySection.appendChild(unitList);
@@ -1753,16 +1811,23 @@ function initSidebar({ render } = {}) {
   const strategicLabelPlacementSelect = document.getElementById("strategicLabelPlacementSelect");
   const operationGraphicKindSelect = document.getElementById("operationGraphicKindSelect");
   const operationGraphicLabelInput = document.getElementById("operationGraphicLabelInput");
+  const operationGraphicPresetSelect = document.getElementById("operationGraphicPresetSelect");
+  const operationGraphicStrokeInput = document.getElementById("operationGraphicStrokeInput");
+  const operationGraphicWidthInput = document.getElementById("operationGraphicWidthInput");
+  const operationGraphicOpacityInput = document.getElementById("operationGraphicOpacityInput");
+  const operationGraphicEditorHint = document.getElementById("operationGraphicEditorHint");
   const operationGraphicStartBtn = document.getElementById("operationGraphicStartBtn");
   const operationGraphicUndoBtn = document.getElementById("operationGraphicUndoBtn");
   const operationGraphicFinishBtn = document.getElementById("operationGraphicFinishBtn");
   const operationGraphicCancelBtn = document.getElementById("operationGraphicCancelBtn");
   const operationGraphicDeleteBtn = document.getElementById("operationGraphicDeleteBtn");
+  const operationGraphicDeleteVertexBtn = document.getElementById("operationGraphicDeleteVertexBtn");
   const operationGraphicList = document.getElementById("operationGraphicList");
   const unitCounterRendererSelect = document.getElementById("unitCounterRendererSelect");
   const unitCounterSizeSelect = document.getElementById("unitCounterSizeSelect");
   const unitCounterLabelInput = document.getElementById("unitCounterLabelInput");
   const unitCounterSymbolInput = document.getElementById("unitCounterSymbolInput");
+  const unitCounterSymbolHint = document.getElementById("unitCounterSymbolHint");
   const unitCounterLabelsToggle = document.getElementById("unitCounterLabelsToggle");
   const unitCounterPlaceBtn = document.getElementById("unitCounterPlaceBtn");
   const unitCounterCancelBtn = document.getElementById("unitCounterCancelBtn");
@@ -5406,11 +5471,46 @@ function initSidebar({ render } = {}) {
     refreshFrontlineTabUI();
 
     const operationEditor = state.operationGraphicsEditor || {};
+    const selectedGraphic = (state.operationGraphics || []).find(
+      (graphic) => String(graphic?.id || "") === String(operationEditor.selectedId || "")
+    ) || null;
+    const selectedGraphicId = String(operationEditor.selectedId || "");
+    const isGraphicDrawing = !!operationEditor.active;
+    const useSelectedGraphicValues = !isGraphicDrawing && !!selectedGraphicId && !!selectedGraphic;
+    const operationKind = String(
+      useSelectedGraphicValues ? (selectedGraphic?.kind || "attack") : (operationEditor.kind || selectedGraphic?.kind || "attack")
+    );
+    const operationPreset = String(
+      useSelectedGraphicValues
+        ? (selectedGraphic?.stylePreset || operationKind || "attack")
+        : (operationEditor.stylePreset || selectedGraphic?.stylePreset || operationKind || "attack")
+    );
+    const operationStroke = String(
+      useSelectedGraphicValues ? (selectedGraphic?.stroke || "") : (operationEditor.stroke || selectedGraphic?.stroke || "")
+    ).trim();
+    const operationWidth = useSelectedGraphicValues
+      ? Number(selectedGraphic?.width || 0)
+      : (Number.isFinite(Number(operationEditor.width)) ? Number(operationEditor.width) : Number(selectedGraphic?.width || 0));
+    const operationOpacity = useSelectedGraphicValues
+      ? Number(selectedGraphic?.opacity ?? 1)
+      : (Number.isFinite(Number(operationEditor.opacity)) ? Number(operationEditor.opacity) : Number(selectedGraphic?.opacity ?? 1));
     if (operationGraphicKindSelect) {
-      operationGraphicKindSelect.value = String(operationEditor.kind || "attack");
+      operationGraphicKindSelect.value = operationKind;
     }
     if (operationGraphicLabelInput) {
       operationGraphicLabelInput.value = String(operationEditor.label || "");
+    }
+    if (operationGraphicPresetSelect) {
+      operationGraphicPresetSelect.value = operationPreset;
+    }
+    if (operationGraphicStrokeInput) {
+      operationGraphicStrokeInput.value = operationStroke || "#991b1b";
+    }
+    if (operationGraphicWidthInput) {
+      operationGraphicWidthInput.value = String(Number(operationWidth || 0).toFixed(1).replace(/\.0$/, ""));
+    }
+    if (operationGraphicOpacityInput) {
+      operationGraphicOpacityInput.value = String(Number(operationOpacity || 0).toFixed(2).replace(/0+$/, "").replace(/\.$/, ""));
     }
     if (operationGraphicList) {
       operationGraphicList.replaceChildren();
@@ -5424,28 +5524,53 @@ function initSidebar({ render } = {}) {
         option.textContent = `${String(graphic.label || graphic.kind || graphic.id || "").trim()} (${graphic.kind})`;
         operationGraphicList.appendChild(option);
       });
-      const selectedGraphicId = String(operationEditor.selectedId || "");
       operationGraphicList.value = selectedGraphicId;
     }
-    const isGraphicDrawing = !!operationEditor.active;
+    const hasSelectedGraphic = !!String(operationEditor.selectedId || "").trim();
+    const graphicMinPoints = selectedGraphic ? (["encirclement", "theater"].includes(String(selectedGraphic.kind || "")) ? 3 : 2) : 0;
+    const canDeleteVertex = !!selectedGraphic
+      && Number.isInteger(Number(operationEditor.selectedVertexIndex))
+      && Number(operationEditor.selectedVertexIndex) >= 0
+      && Array.isArray(selectedGraphic.points)
+      && selectedGraphic.points.length > graphicMinPoints;
     if (operationGraphicStartBtn) operationGraphicStartBtn.disabled = isGraphicDrawing;
     if (operationGraphicUndoBtn) operationGraphicUndoBtn.disabled = !isGraphicDrawing;
     if (operationGraphicFinishBtn) operationGraphicFinishBtn.disabled = !isGraphicDrawing;
     if (operationGraphicCancelBtn) operationGraphicCancelBtn.disabled = !isGraphicDrawing;
-    if (operationGraphicDeleteBtn) operationGraphicDeleteBtn.disabled = !String(operationEditor.selectedId || "").trim();
+    if (operationGraphicDeleteBtn) operationGraphicDeleteBtn.disabled = !hasSelectedGraphic;
+    if (operationGraphicDeleteVertexBtn) operationGraphicDeleteVertexBtn.disabled = !canDeleteVertex;
+    if (operationGraphicEditorHint) {
+      operationGraphicEditorHint.textContent = isGraphicDrawing
+        ? t("Click the map to place vertices. Double-click or press Finish to commit the line.", "ui")
+        : hasSelectedGraphic
+        ? t("Drag white handles to move vertices, click midpoint pips to insert, then remove the selected vertex if needed.", "ui")
+        : t("Select a line to edit its geometry and style, or start a new drawing from the controls above.", "ui");
+    }
 
     const unitEditor = state.unitCounterEditor || {};
+    const selectedCounter = (state.unitCounters || []).find(
+      (counter) => String(counter?.id || "") === String(unitEditor.selectedId || "")
+    ) || null;
+    const effectiveRenderer = String(unitEditor.renderer || selectedCounter?.renderer || annotationView.unitRendererDefault || "game");
     if (unitCounterRendererSelect) {
-      unitCounterRendererSelect.value = String(unitEditor.renderer || annotationView.unitRendererDefault || "game");
+      unitCounterRendererSelect.value = effectiveRenderer;
     }
     if (unitCounterSizeSelect) {
-      unitCounterSizeSelect.value = String(unitEditor.size || "medium");
+      unitCounterSizeSelect.value = String(unitEditor.size || selectedCounter?.size || "medium");
     }
     if (unitCounterLabelInput) {
-      unitCounterLabelInput.value = String(unitEditor.label || "");
+      unitCounterLabelInput.value = String(unitEditor.label || selectedCounter?.label || "");
     }
     if (unitCounterSymbolInput) {
-      unitCounterSymbolInput.value = String(unitEditor.symbolCode || "");
+      unitCounterSymbolInput.value = String(unitEditor.sidc || unitEditor.symbolCode || selectedCounter?.sidc || selectedCounter?.symbolCode || "");
+      unitCounterSymbolInput.placeholder = effectiveRenderer === "milstd"
+        ? t("SIDC (e.g. 130310001412110000000000000000)", "ui")
+        : t("Short code (e.g. HQ / ARM / INF)", "ui");
+    }
+    if (unitCounterSymbolHint) {
+      unitCounterSymbolHint.textContent = effectiveRenderer === "milstd"
+        ? t("MILSTD uses the browser-loaded milsymbol renderer. Paste a full SIDC for the symbol body.", "ui")
+        : t("Game renderer keeps the lighter counter style and uses a short internal code or abbreviation.", "ui");
     }
     if (unitCounterLabelsToggle) {
       unitCounterLabelsToggle.checked = annotationView.showUnitLabels !== false;
@@ -5459,7 +5584,7 @@ function initSidebar({ render } = {}) {
       (state.unitCounters || []).forEach((counter) => {
         const option = document.createElement("option");
         option.value = String(counter.id || "");
-        option.textContent = `${String(counter.label || counter.symbolCode || counter.id || "").trim()} (${counter.renderer})`;
+        option.textContent = `${String(counter.label || counter.sidc || counter.symbolCode || counter.id || "").trim()} (${counter.renderer})`;
         unitCounterList.appendChild(option);
       });
       unitCounterList.value = String(unitEditor.selectedId || "");
@@ -5527,15 +5652,32 @@ function initSidebar({ render } = {}) {
   if (operationGraphicKindSelect && !operationGraphicKindSelect.dataset.bound) {
     operationGraphicKindSelect.addEventListener("change", (event) => {
       const nextKind = String(event.target.value || "attack");
-      state.operationGraphicsEditor.kind = nextKind;
       if (!state.operationGraphicsEditor.active && state.operationGraphicsEditor.selectedId) {
         mapRenderer.updateSelectedOperationGraphic({ kind: nextKind });
-      } else if (render) {
-        render();
+      } else {
+        state.operationGraphicsEditor.kind = nextKind;
+        if (render) {
+          render();
+        }
       }
       refreshStrategicOverlayUI();
     });
     operationGraphicKindSelect.dataset.bound = "true";
+  }
+  if (operationGraphicPresetSelect && !operationGraphicPresetSelect.dataset.bound) {
+    operationGraphicPresetSelect.addEventListener("change", (event) => {
+      const nextPreset = String(event.target.value || "attack");
+      if (!state.operationGraphicsEditor.active && state.operationGraphicsEditor.selectedId) {
+        mapRenderer.updateSelectedOperationGraphic({ stylePreset: nextPreset });
+      } else {
+        state.operationGraphicsEditor.stylePreset = nextPreset;
+        if (render) {
+          render();
+        }
+      }
+      refreshStrategicOverlayUI();
+    });
+    operationGraphicPresetSelect.dataset.bound = "true";
   }
   if (operationGraphicLabelInput && !operationGraphicLabelInput.dataset.bound) {
     operationGraphicLabelInput.addEventListener("input", (event) => {
@@ -5546,16 +5688,61 @@ function initSidebar({ render } = {}) {
       state.operationGraphicsEditor.label = nextLabel;
       if (!state.operationGraphicsEditor.active && state.operationGraphicsEditor.selectedId) {
         mapRenderer.updateSelectedOperationGraphic({ label: nextLabel });
+      } else if (render) {
+        render();
       }
       refreshStrategicOverlayUI();
     });
     operationGraphicLabelInput.dataset.bound = "true";
+  }
+  if (operationGraphicStrokeInput && !operationGraphicStrokeInput.dataset.bound) {
+    operationGraphicStrokeInput.addEventListener("change", (event) => {
+      const nextStroke = String(event.target.value || "");
+      state.operationGraphicsEditor.stroke = nextStroke;
+      if (!state.operationGraphicsEditor.active && state.operationGraphicsEditor.selectedId) {
+        mapRenderer.updateSelectedOperationGraphic({ stroke: nextStroke });
+      } else if (render) {
+        render();
+      }
+      refreshStrategicOverlayUI();
+    });
+    operationGraphicStrokeInput.dataset.bound = "true";
+  }
+  if (operationGraphicWidthInput && !operationGraphicWidthInput.dataset.bound) {
+    operationGraphicWidthInput.addEventListener("change", (event) => {
+      const nextWidth = Number(event.target.value || 0);
+      state.operationGraphicsEditor.width = nextWidth;
+      if (!state.operationGraphicsEditor.active && state.operationGraphicsEditor.selectedId) {
+        mapRenderer.updateSelectedOperationGraphic({ width: nextWidth });
+      } else if (render) {
+        render();
+      }
+      refreshStrategicOverlayUI();
+    });
+    operationGraphicWidthInput.dataset.bound = "true";
+  }
+  if (operationGraphicOpacityInput && !operationGraphicOpacityInput.dataset.bound) {
+    operationGraphicOpacityInput.addEventListener("change", (event) => {
+      const nextOpacity = Number(event.target.value || 1);
+      state.operationGraphicsEditor.opacity = nextOpacity;
+      if (!state.operationGraphicsEditor.active && state.operationGraphicsEditor.selectedId) {
+        mapRenderer.updateSelectedOperationGraphic({ opacity: nextOpacity });
+      } else if (render) {
+        render();
+      }
+      refreshStrategicOverlayUI();
+    });
+    operationGraphicOpacityInput.dataset.bound = "true";
   }
   if (operationGraphicStartBtn && !operationGraphicStartBtn.dataset.bound) {
     operationGraphicStartBtn.addEventListener("click", () => {
       mapRenderer.startOperationGraphicDraw({
         kind: String(operationGraphicKindSelect?.value || state.operationGraphicsEditor?.kind || "attack"),
         label: String(operationGraphicLabelInput?.value || state.operationGraphicsEditor?.label || ""),
+        stylePreset: String(operationGraphicPresetSelect?.value || state.operationGraphicsEditor?.stylePreset || "attack"),
+        stroke: String(operationGraphicStrokeInput?.value || state.operationGraphicsEditor?.stroke || ""),
+        width: Number(operationGraphicWidthInput?.value || state.operationGraphicsEditor?.width || 0),
+        opacity: Number(operationGraphicOpacityInput?.value || state.operationGraphicsEditor?.opacity || 1),
       });
       refreshStrategicOverlayUI();
     });
@@ -5606,11 +5793,22 @@ function initSidebar({ render } = {}) {
     });
     operationGraphicDeleteBtn.dataset.bound = "true";
   }
+  if (operationGraphicDeleteVertexBtn && !operationGraphicDeleteVertexBtn.dataset.bound) {
+    operationGraphicDeleteVertexBtn.addEventListener("click", () => {
+      mapRenderer.deleteSelectedOperationGraphicVertex();
+      refreshStrategicOverlayUI();
+    });
+    operationGraphicDeleteVertexBtn.dataset.bound = "true";
+  }
 
   if (unitCounterRendererSelect && !unitCounterRendererSelect.dataset.bound) {
     unitCounterRendererSelect.addEventListener("change", (event) => {
       const nextRenderer = String(event.target.value || "game");
       state.unitCounterEditor.renderer = nextRenderer;
+      if (nextRenderer === "milstd" && !String(state.unitCounterEditor.sidc || state.unitCounterEditor.symbolCode || "").trim()) {
+        state.unitCounterEditor.sidc = "130310001412110000000000000000";
+        state.unitCounterEditor.symbolCode = state.unitCounterEditor.sidc;
+      }
       state.annotationView = {
         ...(state.annotationView || {}),
         unitRendererDefault: nextRenderer,
@@ -5654,13 +5852,18 @@ function initSidebar({ render } = {}) {
   }
   if (unitCounterSymbolInput && !unitCounterSymbolInput.dataset.bound) {
     unitCounterSymbolInput.addEventListener("input", (event) => {
-      state.unitCounterEditor.symbolCode = String(event.target.value || "");
+      const nextToken = String(event.target.value || "").trim().toUpperCase();
+      state.unitCounterEditor.sidc = nextToken;
+      state.unitCounterEditor.symbolCode = nextToken;
     });
     unitCounterSymbolInput.addEventListener("change", (event) => {
-      const nextSymbol = String(event.target.value || "");
+      const nextSymbol = String(event.target.value || "").trim().toUpperCase();
+      state.unitCounterEditor.sidc = nextSymbol;
       state.unitCounterEditor.symbolCode = nextSymbol;
       if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
-        mapRenderer.updateSelectedUnitCounter({ symbolCode: nextSymbol });
+        mapRenderer.updateSelectedUnitCounter({ sidc: nextSymbol });
+      } else if (render) {
+        render();
       }
       refreshStrategicOverlayUI();
     });
@@ -5683,7 +5886,8 @@ function initSidebar({ render } = {}) {
       mapRenderer.startUnitCounterPlacement({
         renderer: String(unitCounterRendererSelect?.value || state.unitCounterEditor?.renderer || "game"),
         label: String(unitCounterLabelInput?.value || state.unitCounterEditor?.label || ""),
-        symbolCode: String(unitCounterSymbolInput?.value || state.unitCounterEditor?.symbolCode || ""),
+        sidc: String(unitCounterSymbolInput?.value || state.unitCounterEditor?.sidc || state.unitCounterEditor?.symbolCode || ""),
+        symbolCode: String(unitCounterSymbolInput?.value || state.unitCounterEditor?.symbolCode || state.unitCounterEditor?.sidc || ""),
         size: String(unitCounterSizeSelect?.value || state.unitCounterEditor?.size || "medium"),
       });
       refreshStrategicOverlayUI();
@@ -5858,7 +6062,7 @@ function initSidebar({ render } = {}) {
       }
       FileManager.importProject(file, async (data) => {
         clearHistory();
-        let scenarioImportAudit = null;
+        let scenarioImportAudit = data.scenario?.importAudit || null;
         if (data.scenario?.id) {
           const validation = await validateImportedScenarioBaseline(data.scenario);
           if (!validation.ok) {
@@ -5928,12 +6132,10 @@ function initSidebar({ render } = {}) {
           if (data.scenarioControllersByFeatureId) {
             state.scenarioControllersByFeatureId = { ...data.scenarioControllersByFeatureId };
           }
-          state.scenarioImportAudit = scenarioImportAudit;
         } else {
           state.scenarioControllersByFeatureId = data.scenarioControllersByFeatureId
             ? { ...data.scenarioControllersByFeatureId }
             : {};
-          state.scenarioImportAudit = null;
         }
         state.sovereigntyInitialized = false;
         state.paintMode = data.paintMode || "visual";
@@ -5986,16 +6188,23 @@ function initSidebar({ render } = {}) {
         state.unitCounters = Array.isArray(data.unitCounters) ? data.unitCounters : [];
         state.operationGraphicsEditor = {
           active: false,
+          mode: "idle",
           points: [],
           kind: "attack",
           label: "",
+          stylePreset: "attack",
+          stroke: "",
+          width: 0,
+          opacity: 1,
           selectedId: null,
+          selectedVertexIndex: -1,
           counter: 1,
         };
         state.unitCounterEditor = {
           active: false,
           renderer: String(state.annotationView?.unitRendererDefault || "game"),
           label: "",
+          sidc: "",
           symbolCode: "",
           size: "medium",
           selectedId: null,
@@ -6195,6 +6404,7 @@ function initSidebar({ render } = {}) {
         if (state.activeScenarioId && state.showCityPoints) {
           await ensureActiveScenarioOptionalLayerLoaded("cities", { renderNow: false });
         }
+        state.scenarioImportAudit = state.activeScenarioId ? scenarioImportAudit : null;
         if (typeof state.updateParentBorderCountryListFn === "function") {
           state.updateParentBorderCountryListFn();
         }
