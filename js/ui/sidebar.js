@@ -7947,6 +7947,9 @@ function initSidebar({ render } = {}) {
           }
         }
         if (state.activeScenarioId && state.showCityPoints) {
+          if (typeof state.ensureBaseCityDataFn === "function") {
+            await state.ensureBaseCityDataFn({ reason: "project-import", renderNow: false });
+          }
           await ensureActiveScenarioOptionalLayerLoaded("cities", { renderNow: false });
         }
         state.scenarioImportAudit = state.activeScenarioId ? scenarioImportAudit : null;

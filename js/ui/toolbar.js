@@ -3245,6 +3245,9 @@ function initToolbar({ render } = {}) {
     toggleCityPoints.addEventListener("change", (event) => {
       state.showCityPoints = !!event.target.checked;
       if (state.showCityPoints) {
+        if (typeof state.ensureBaseCityDataFn === "function") {
+          void state.ensureBaseCityDataFn({ reason: "toolbar-toggle", renderNow: false });
+        }
         void ensureActiveScenarioOptionalLayerLoaded("cities", { renderNow: true });
       }
       persistCityViewSettings();

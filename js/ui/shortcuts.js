@@ -95,6 +95,10 @@ function initShortcuts() {
       return;
     }
 
+    if (state.bootBlocking) {
+      return;
+    }
+
     if (key === "Shift") {
       setBrushPanModifier(true);
     }
@@ -236,6 +240,7 @@ function initShortcuts() {
   });
 
   window.addEventListener("keyup", (event) => {
+    if (state.bootBlocking) return;
     if (event.key !== "Shift" && event.key !== " ") return;
     setBrushPanModifier(false);
   });

@@ -2613,6 +2613,7 @@ async function applyScenarioBundle(
   bundle,
   {
     renderNow = true,
+    suppressRender = false,
     markDirtyReason = "scenario-apply",
     syncPalette = true,
     showToastOnComplete = false,
@@ -2705,7 +2706,7 @@ async function applyScenarioBundle(
     }
     recalculateScenarioOwnerControllerDiffCount();
     refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: `scenario-opening:${staged.scenarioId}` });
-    setMapData({ refitProjection: false, resetZoom: false });
+    setMapData({ refitProjection: false, resetZoom: false, suppressRender });
     rebuildPresetState();
     if (typeof document !== "undefined") {
       const presetSection = document.getElementById("selectedCountryActionsSection");
@@ -2759,7 +2760,7 @@ async function applyScenarioBundle(
     if (markDirtyReason) {
       markDirty(markDirtyReason);
     }
-    syncCountryUi({ renderNow });
+    syncCountryUi({ renderNow: renderNow && !suppressRender });
     if (typeof state.triggerScenarioGuideFn === "function") {
       state.triggerScenarioGuideFn();
     }

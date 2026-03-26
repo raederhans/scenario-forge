@@ -894,6 +894,13 @@ export function normalizeMapSemanticMode(value, fallback = "political") {
 }
 
 export const state = {
+  bootPhase: "shell",
+  bootMessage: "Starting workspace…",
+  bootProgress: 0,
+  bootBlocking: true,
+  bootError: "",
+  bootCanContinueWithoutScenario: false,
+  bootMetrics: {},
   locales: { ui: {}, geo: {} },
   baseGeoLocales: {},
   geoAliasToStableKey: {},
@@ -997,6 +1004,10 @@ export const state = {
   landBgData: null,
   urbanData: null,
   worldCitiesData: null,
+  baseCityAliasesData: null,
+  baseCityDataState: "idle",
+  baseCityDataError: "",
+  baseCityDataPromise: null,
   physicalData: null,
   physicalSemanticsData: null,
   physicalContourMajorData: null,
@@ -1386,6 +1397,7 @@ export const state = {
   updateScenarioContextBarFn: null,
   triggerScenarioGuideFn: null,
   persistViewSettingsFn: null,
+  ensureBaseCityDataFn: null,
   renderCountryListFn: null,
   refreshCountryListRowsFn: null,
   refreshCountryInspectorDetailFn: null,

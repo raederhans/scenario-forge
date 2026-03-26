@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-i18n="Map Creator">Map Creator</title>
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="modulepreload" href="js/main.js" />
   </head>
-  <body>
-    <div class="app-layout">
+  <body class="app-booting">
+    <div id="appShell" class="app-layout">
       <aside id="leftSidebar" class="sidebar sidebar-left">
         <div class="sidebar-sections">
           <div class="sidebar-header-block">
@@ -1726,6 +1727,21 @@
     </div>
 
     <div id="tooltip"></div>
+    <div id="bootOverlay" class="boot-overlay" role="status" aria-live="polite" aria-busy="true">
+      <div class="boot-overlay__panel">
+        <div class="boot-overlay__eyebrow">Scenario Boot</div>
+        <h2 id="bootOverlayTitle" class="boot-overlay__title">Preparing default scenario</h2>
+        <p id="bootOverlayMessage" class="boot-overlay__message">Loading the base map and TNO 1962 assets before interaction unlocks.</p>
+        <div class="boot-overlay__progress" aria-hidden="true">
+          <div id="bootOverlayProgressBar" class="boot-overlay__progress-bar"></div>
+        </div>
+        <div id="bootOverlayProgressText" class="boot-overlay__progress-text">0%</div>
+        <div id="bootOverlayActions" class="boot-overlay__actions hidden">
+          <button id="bootRetryBtn" type="button" class="btn-primary">Retry</button>
+          <button id="bootContinueBtn" type="button" class="btn-secondary hidden">Continue without scenario</button>
+        </div>
+      </div>
+    </div>
 
     <script src="vendor/d3.v7.min.js"></script>
     <script src="vendor/topojson-client.min.js"></script>

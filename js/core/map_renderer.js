@@ -10197,6 +10197,23 @@ function getHoveredCityEntryFromEvent(event) {
   return bestEntry;
 }
 
+function isCityEntryEligibleForLandHit(entry, hit) {
+  if (!entry || hit?.targetType !== "land") {
+    return false;
+  }
+  const hostFeatureId = String(
+    entry?.feature?.properties?.__city_host_feature_id
+    || entry?.feature?.properties?.host_feature_id
+    || ""
+  ).trim();
+  return !!hostFeatureId && hostFeatureId === String(hit?.id || "").trim();
+}
+
+function getHoveredCityTooltipEntry(event, hit) {
+  const entry = getHoveredCityEntryFromEvent(event);
+  return isCityEntryEligibleForLandHit(entry, hit) ? entry : null;
+}
+
 function doScreenBoxesOverlap(a, b) {
   return (
     a.x < (b.x + b.w)
@@ -17011,7 +17028,7 @@ function handleMouseMove(event) {
   updateDevHoverHit(id ? hit : null);
 
   if (!tooltip) return;
-  const hoveredCityEntry = getHoveredCityEntryFromEvent(event);
+  const hoveredCityEntry = getHoveredCityTooltipEntry(event, hit);
   if (hoveredCityEntry?.tooltipText) {
     queueTooltipUpdate({
       visible: true,
@@ -18117,6 +18134,8 @@ async function handleClick(event) {
     snapPx: HIT_SNAP_RADIUS_CLICK_PX,
     eventType: "click",
   });
+  // City points may influence hover messaging, but paint/select stays bound to
+  // the canonical land/water/special hit pipeline only.
   const id = hit.id;
   if (!id) return;
   updateDevSelectedHit(hit);
@@ -18682,7 +18701,7 @@ function bindEvents() {
   window.addEventListener("resize", handleResize);
 }
 
-function initMap({ containerId = "mapContainer" } = {}) {
+function initMap({ containerId = "mapContainer", suppressRender = false } = {}) {
   if (!globalThis.d3) {
     console.error("D3 is required for map renderer.");
     return;
@@ -18779,10 +18798,12 @@ function initMap({ containerId = "mapContainer" } = {}) {
   initZoom();
   bindEvents();
 
-  render();
+  if (!suppressRender) {
+    render();
+  }
 }
 
-function setMapData({ refitProjection = true, resetZoom = true } = {}) {
+function setMapData({ refitProjection = true, resetZoom = true, suppressRender = false } = {}) {
   const startedAt = nowMs();
   clearPendingDynamicBorderTimer();
   clearRenderPhaseTimer();
@@ -18865,15 +18886,19 @@ function setMapData({ refitProjection = true, resetZoom = true } = {}) {
   } else {
     state.hitCanvasDirty = true;
   }
-  const stagedApply = beginStagedMapDataWarmup(startedAt);
-  render();
-  recordRenderPerfMetric("setMapDataFirstPaint", nowMs() - startedAt, {
-    staged: stagedApply,
-    activeScenarioId: String(state.activeScenarioId || ""),
-  });
+  let stagedApply = false;
+  if (!suppressRender) {
+    stagedApply = beginStagedMapDataWarmup(startedAt);
+    render();
+    recordRenderPerfMetric("setMapDataFirstPaint", nowMs() - startedAt, {
+      staged: stagedApply,
+      activeScenarioId: String(state.activeScenarioId || ""),
+    });
+  }
   recordRenderPerfMetric("setMapData", nowMs() - startedAt, {
     refitProjection: !!refitProjection,
     resetZoom: !!resetZoom,
+    suppressRender: !!suppressRender,
     landCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
     renderProfile: String(state.renderProfile || "auto"),
     staged: stagedApply,

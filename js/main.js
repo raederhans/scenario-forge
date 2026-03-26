@@ -1,9 +1,15 @@
 // App entry point (Phase 13)
 import { normalizeCityLayerStyleConfig, state } from "./core/state.js";
-import { loadDeferredDetailBundle, loadMapData } from "./core/data_loader.js";
+import { loadCitySupportData, loadDeferredDetailBundle, loadMapData } from "./core/data_loader.js";
 import { initMap, setMapData, render } from "./core/map_renderer.js";
 import { applyActivePaletteState } from "./core/palette_manager.js";
-import { applyDefaultScenarioOnStartup, initScenarioManager } from "./core/scenario_manager.js";
+import {
+  applyScenarioBundle,
+  initScenarioManager,
+  loadScenarioBundle,
+  loadScenarioRegistry,
+  syncScenarioLocalizationState,
+} from "./core/scenario_manager.js";
 import { initSidebar, initPresetState } from "./ui/sidebar.js";
 import { initShortcuts } from "./ui/shortcuts.js";
 import { initToolbar } from "./ui/toolbar.js";
@@ -155,6 +161,351 @@ function getDeferredPromotionDelay(profile) {
 }
 
 let deferredPromotionHandle = null;
+let bootOverlayBound = false;
+let bootContinueHandler = null;
+
+const BOOT_PHASE_PROGRESS = {
+  shell: 4,
+  "base-data": 32,
+  "scenario-bundle": 64,
+  "scenario-apply": 88,
+  warmup: 96,
+  ready: 100,
+};
+
+const BOOT_COPY = {
+  en: {
+    shell: {
+      title: "Preparing application shell",
+      message: "Loading the workspace frame before interaction unlocks.",
+      retry: "Retry",
+      continue: "Continue without scenario",
+    },
+    "base-data": {
+      title: "Loading base map",
+      message: "Fetching topology, palette, hierarchy, and core localization data.",
+    },
+    "scenario-bundle": {
+      title: "Loading default scenario",
+      message: "Preparing the TNO 1962 scenario bundle and any required detail topology.",
+    },
+    "scenario-apply": {
+      title: "Applying default scenario",
+      message: "Composing ownership, controllers, runtime topology, and UI state in one pass.",
+    },
+    warmup: {
+      title: "Finalizing first render",
+      message: "Flushing the first visible frame and unlocking the interface next.",
+    },
+    ready: {
+      title: "Ready",
+      message: "The default scenario is loaded.",
+    },
+    error: {
+      title: "Startup blocked",
+      message: "The default scenario could not be prepared. Retry or continue with the base map.",
+    },
+  },
+  zh: {
+    shell: {
+      title: "正在准备应用框架",
+      message: "先完成工作区壳层初始化，再开放交互。",
+      retry: "重试",
+      continue: "无剧本继续",
+    },
+    "base-data": {
+      title: "正在加载基础地图",
+      message: "正在获取基础拓扑、调色板、层级和核心地名数据。",
+    },
+    "scenario-bundle": {
+      title: "正在加载默认剧本",
+      message: "正在准备 TNO 1962 剧本包，以及所需的细分拓扑。",
+    },
+    "scenario-apply": {
+      title: "正在应用默认剧本",
+      message: "正在一次性组合归属、控制、运行时拓扑和 UI 状态。",
+    },
+    warmup: {
+      title: "正在完成首帧渲染",
+      message: "首个可见画面即将就绪，随后开放交互。",
+    },
+    ready: {
+      title: "加载完成",
+      message: "默认剧本已经就绪。",
+    },
+    error: {
+      title: "启动被阻断",
+      message: "默认剧本未能完成启动。你可以重试，或先进入基础地图。",
+    },
+  },
+};
+
+function nowMs() {
+  return globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+}
+
+function getBootLanguage() {
+  return String(state.currentLanguage || "en").trim().toLowerCase().startsWith("zh") ? "zh" : "en";
+}
+
+function getBootCopy(phase = state.bootPhase) {
+  const language = getBootLanguage();
+  return BOOT_COPY[language]?.[phase] || BOOT_COPY.en[phase] || BOOT_COPY.en.shell;
+}
+
+function getBootDom() {
+  if (typeof document === "undefined") {
+    return {};
+  }
+  return {
+    overlay: document.getElementById("bootOverlay"),
+    title: document.getElementById("bootOverlayTitle"),
+    message: document.getElementById("bootOverlayMessage"),
+    progressBar: document.getElementById("bootOverlayProgressBar"),
+    progressText: document.getElementById("bootOverlayProgressText"),
+    actions: document.getElementById("bootOverlayActions"),
+    retryBtn: document.getElementById("bootRetryBtn"),
+    continueBtn: document.getElementById("bootContinueBtn"),
+  };
+}
+
+function syncBootOverlay() {
+  if (typeof document === "undefined") {
+    return;
+  }
+  const dom = getBootDom();
+  if (!dom.overlay) {
+    return;
+  }
+  const copy = getBootCopy(state.bootPhase);
+  const progress = Math.max(0, Math.min(100, Number(state.bootProgress) || 0));
+  document.body?.classList.toggle("app-booting", !!state.bootBlocking);
+  dom.overlay.classList.toggle("hidden", state.bootPhase === "ready");
+  dom.overlay.setAttribute("aria-busy", state.bootPhase === "ready" ? "false" : "true");
+  if (dom.title) {
+    dom.title.textContent = copy.title;
+  }
+  if (dom.message) {
+    dom.message.textContent = state.bootPhase === "error"
+      ? (state.bootError || copy.message)
+      : (state.bootMessage || copy.message);
+  }
+  if (dom.progressBar) {
+    dom.progressBar.style.width = `${progress}%`;
+  }
+  if (dom.progressText) {
+    dom.progressText.textContent = `${Math.round(progress)}%`;
+  }
+  if (dom.retryBtn) {
+    dom.retryBtn.textContent = copy.retry || BOOT_COPY.en.shell.retry;
+  }
+  if (dom.continueBtn) {
+    dom.continueBtn.textContent = copy.continue || BOOT_COPY.en.shell.continue;
+  }
+  if (dom.actions) {
+    const showActions = state.bootPhase === "error";
+    dom.actions.classList.toggle("hidden", !showActions);
+  }
+  if (dom.continueBtn) {
+    dom.continueBtn.classList.toggle("hidden", !state.bootCanContinueWithoutScenario);
+  }
+}
+
+function initializeBootOverlay() {
+  const dom = getBootDom();
+  if (!dom.overlay || bootOverlayBound) {
+    syncBootOverlay();
+    return;
+  }
+  dom.retryBtn?.addEventListener("click", () => {
+    globalThis.location.reload();
+  });
+  dom.continueBtn?.addEventListener("click", () => {
+    if (typeof bootContinueHandler === "function") {
+      void bootContinueHandler();
+    }
+  });
+  bootOverlayBound = true;
+  syncBootOverlay();
+}
+
+function setBootState(
+  phase,
+  {
+    message = null,
+    progress = null,
+    blocking = null,
+    error = null,
+    canContinueWithoutScenario = null,
+  } = {}
+) {
+  state.bootPhase = phase;
+  state.bootMessage = message ?? getBootCopy(phase).message;
+  state.bootProgress =
+    progress == null
+      ? (BOOT_PHASE_PROGRESS[phase] ?? state.bootProgress ?? 0)
+      : Math.max(0, Math.min(100, Number(progress) || 0));
+  state.bootBlocking = blocking == null ? phase !== "ready" : !!blocking;
+  state.bootError = phase === "error" ? String(error || state.bootError || "") : "";
+  state.bootCanContinueWithoutScenario =
+    canContinueWithoutScenario == null
+      ? (phase === "error" ? !!state.bootCanContinueWithoutScenario : false)
+      : !!canContinueWithoutScenario;
+  syncBootOverlay();
+}
+
+function resetBootMetrics() {
+  state.bootMetrics = {
+    total: {
+      startedAt: nowMs(),
+    },
+  };
+}
+
+function startBootMetric(name) {
+  state.bootMetrics[name] = {
+    ...(state.bootMetrics[name] || {}),
+    startedAt: nowMs(),
+  };
+}
+
+function finishBootMetric(name, extra = {}) {
+  const finishedAt = nowMs();
+  const metric = {
+    ...(state.bootMetrics[name] || {}),
+    finishedAt,
+    ...extra,
+  };
+  if (Number.isFinite(metric.startedAt)) {
+    metric.durationMs = finishedAt - metric.startedAt;
+  }
+  state.bootMetrics[name] = metric;
+  return metric;
+}
+
+function checkpointBootMetric(name) {
+  const startedAt = Number(state.bootMetrics?.total?.startedAt);
+  state.bootMetrics[name] = {
+    atMs: Number.isFinite(startedAt) ? nowMs() - startedAt : 0,
+  };
+  return state.bootMetrics[name];
+}
+
+function logBootMetrics() {
+  const summary = Object.entries(state.bootMetrics || {}).reduce((accumulator, [name, metric]) => {
+    if (Number.isFinite(metric?.durationMs)) {
+      accumulator[name] = `${metric.durationMs.toFixed(1)}ms`;
+      return accumulator;
+    }
+    if (Number.isFinite(metric?.atMs)) {
+      accumulator[name] = `${metric.atMs.toFixed(1)}ms`;
+    }
+    return accumulator;
+  }, {});
+  console.info("[boot] Startup metrics:", summary);
+}
+
+async function ensureBaseCityDataReady({ reason = "manual", renderNow = true } = {}) {
+  if (state.worldCitiesData && state.baseCityDataState === "loaded") {
+    if (renderNow && typeof state.renderNowFn === "function") {
+      state.renderNowFn();
+    }
+    return state.worldCitiesData;
+  }
+  if (state.baseCityDataPromise) {
+    return state.baseCityDataPromise;
+  }
+  state.baseCityDataState = "loading";
+  state.baseCityDataError = "";
+  const promise = loadCitySupportData({
+    d3Client: globalThis.d3,
+    locales: {
+      ui: state.locales?.ui || {},
+      geo: state.baseGeoLocales && typeof state.baseGeoLocales === "object"
+        ? state.baseGeoLocales
+        : (state.locales?.geo || {}),
+    },
+    geoAliases: {
+      alias_to_stable_key: state.baseGeoAliasToStableKey && typeof state.baseGeoAliasToStableKey === "object"
+        ? state.baseGeoAliasToStableKey
+        : (state.geoAliasToStableKey || {}),
+    },
+  })
+    .then((result) => {
+      state.worldCitiesData = result.worldCities || null;
+      state.baseCityAliasesData = result.cityAliases || null;
+      state.baseGeoLocales = {
+        ...(
+          result.locales?.geo && typeof result.locales.geo === "object"
+            ? result.locales.geo
+            : (state.baseGeoLocales || {})
+        ),
+      };
+      state.baseGeoAliasToStableKey = {
+        ...(
+          result.geoAliases?.alias_to_stable_key && typeof result.geoAliases.alias_to_stable_key === "object"
+            ? result.geoAliases.alias_to_stable_key
+            : (state.baseGeoAliasToStableKey || {})
+        ),
+      };
+      if (state.activeScenarioId) {
+        syncScenarioLocalizationState({
+          cityOverridesPayload: state.scenarioCityOverridesData,
+          geoLocalePatchPayload: state.scenarioGeoLocalePatchData,
+        });
+      } else {
+        state.locales = {
+          ...(state.locales || {}),
+          geo: { ...state.baseGeoLocales },
+        };
+        state.geoAliasToStableKey = { ...state.baseGeoAliasToStableKey };
+        state.cityLayerRevision = (Number(state.cityLayerRevision) || 0) + 1;
+      }
+      state.baseCityDataState = "loaded";
+      state.baseCityDataPromise = null;
+      if (typeof state.updateDevWorkspaceUIFn === "function") {
+        state.updateDevWorkspaceUIFn();
+      }
+      if (renderNow && typeof state.renderNowFn === "function") {
+        state.renderNowFn();
+      }
+      console.info(`[boot] Base city support data loaded on demand. reason=${reason}`);
+      return state.worldCitiesData;
+    })
+    .catch((error) => {
+      state.baseCityDataState = "error";
+      state.baseCityDataError = error?.message || String(error || "Unknown city data loading error.");
+      state.baseCityDataPromise = null;
+      console.warn(`[boot] Failed to load base city support data. reason=${reason}`, error);
+      throw error;
+    });
+  state.baseCityDataPromise = promise;
+  return promise;
+}
+
+function schedulePostReadyCityWarmup() {
+  if (
+    state.bootBlocking
+    || state.showCityPoints === false
+    || state.baseCityDataState !== "idle"
+    || typeof state.ensureBaseCityDataFn !== "function"
+  ) {
+    return;
+  }
+  const run = () => {
+    if (state.bootBlocking || state.baseCityDataState !== "idle") {
+      return;
+    }
+    void state.ensureBaseCityDataFn({ reason: "post-ready", renderNow: true }).catch(() => {});
+  };
+  if (typeof globalThis.requestIdleCallback === "function") {
+    globalThis.requestIdleCallback(() => {
+      run();
+    }, { timeout: 2200 });
+  } else {
+    globalThis.setTimeout(run, 900);
+  }
+}
 
 function hasDetailTopologyLoaded() {
   return !!state.topologyDetail?.objects?.political;
@@ -271,15 +622,44 @@ function scheduleDeferredDetailPromotion(renderDispatcher) {
 }
 
 async function bootstrap() {
+  initializeBootOverlay();
   if (!globalThis.d3 || !globalThis.topojson) {
     console.error("D3/topojson not loaded. Ensure scripts are included before main.js.");
+    setBootState("error", {
+      error: "D3/topojson not loaded. Ensure scripts are included before main.js.",
+      canContinueWithoutScenario: false,
+      progress: 0,
+    });
     return;
   }
 
   hydrateLanguage();
+  initializeBootOverlay();
+  resetBootMetrics();
+  setBootState("shell", {
+    progress: BOOT_PHASE_PROGRESS.shell,
+    canContinueWithoutScenario: false,
+  });
+  bootContinueHandler = null;
 
+  let renderDispatcher = null;
   try {
     bindBeforeUnload();
+    setBootState("base-data");
+    startBootMetric("base-data");
+    const d3Client = globalThis.d3;
+    const scenarioRegistryPromise = loadScenarioRegistry({ d3Client });
+    const defaultScenarioIdPromise = scenarioRegistryPromise.then((registry) => {
+      const defaultScenarioId = String(registry?.default_scenario_id || "").trim();
+      if (!defaultScenarioId) {
+        throw new Error("Default scenario is not configured in data/scenarios/index.json.");
+      }
+      return defaultScenarioId;
+    });
+    const scenarioBundlePromise = defaultScenarioIdPromise
+      .then((defaultScenarioId) => loadScenarioBundle(defaultScenarioId, { d3Client }))
+      .then((bundle) => ({ ok: true, bundle }))
+      .catch((error) => ({ ok: false, error }));
     const {
       topology,
       topologyPrimary,
@@ -291,7 +671,6 @@ async function bootstrap() {
       detailSourceRequested,
       locales,
       geoAliases,
-      worldCities,
       hierarchy,
       ruCityOverrides,
       specialZones,
@@ -301,7 +680,10 @@ async function bootstrap() {
       activePaletteMeta,
       activePalettePack,
       activePaletteMap,
-    } = await loadMapData();
+    } = await loadMapData({
+      d3Client,
+      includeCityData: false,
+    });
     state.topology = topology || topologyPrimary || topologyDetail;
     state.topologyPrimary = topologyPrimary || state.topology;
     state.topologyDetail = topologyDetail || null;
@@ -317,7 +699,11 @@ async function bootstrap() {
     state.baseGeoLocales = { ...(state.locales?.geo || {}) };
     state.geoAliasToStableKey = geoAliases?.alias_to_stable_key || {};
     state.baseGeoAliasToStableKey = { ...state.geoAliasToStableKey };
-    state.worldCitiesData = worldCities || null;
+    state.worldCitiesData = null;
+    state.baseCityAliasesData = null;
+    state.baseCityDataState = "idle";
+    state.baseCityDataError = "";
+    state.baseCityDataPromise = null;
     state.cityLayerRevision = (Number(state.cityLayerRevision) || 0) + 1;
     state.ruCityOverrides = ruCityOverrides || null;
     state.specialZonesExternalData = specialZones || null;
@@ -355,16 +741,15 @@ async function bootstrap() {
     processHierarchyData(hierarchy);
     hydrateViewSettings();
     state.persistViewSettingsFn = persistViewSettings;
+    state.ensureBaseCityDataFn = ensureBaseCityDataReady;
 
     if (!state.topologyPrimary) {
-      console.error("CRITICAL: TopoJSON file loaded but is null/undefined");
-      return;
+      throw new Error("CRITICAL: TopoJSON file loaded but is null/undefined");
     }
 
     const objects = state.topologyPrimary.objects || {};
     if (!objects.political) {
-      console.error("CRITICAL: 'political' object missing from TopoJSON");
-      return;
+      throw new Error("CRITICAL: 'political' object missing from TopoJSON");
     }
     const primaryCount = Array.isArray(objects.political.geometries)
       ? objects.political.geometries.length
@@ -412,12 +797,18 @@ async function bootstrap() {
     state.physicalSemanticsData = state.contextLayerExternalDataByName?.physical_semantics || null;
     state.physicalContourMajorData = state.contextLayerExternalDataByName?.physical_contours_major || null;
     state.physicalContourMinorData = state.contextLayerExternalDataByName?.physical_contours_minor || null;
+    finishBootMetric("base-data", {
+      topologyBundleMode: state.topologyBundleMode,
+      primaryCount,
+      detailCount,
+    });
+    await scenarioRegistryPromise;
 
     initPresetState();
-    initMap();
-    setMapData();
+    initMap({ suppressRender: true });
+    setMapData({ suppressRender: true });
 
-    const renderDispatcher = createRenderDispatcher(render);
+    renderDispatcher = createRenderDispatcher(render);
     const renderApp = () => {
       renderDispatcher.schedule();
     };
@@ -436,18 +827,95 @@ async function bootstrap() {
     initSidebar({ render: renderApp });
     initScenarioManager({ render: renderApp });
     initShortcuts();
-    try {
-      await applyDefaultScenarioOnStartup({ renderNow: false });
-    } catch (error) {
-      console.warn("Failed to apply default startup scenario:", error);
-    }
 
+    setBootState("scenario-bundle");
+    startBootMetric("scenario-bundle");
+    const scenarioBundleResult = await scenarioBundlePromise;
+    if (!scenarioBundleResult.ok) {
+      throw scenarioBundleResult.error;
+    }
+    const defaultScenarioBundle = scenarioBundleResult.bundle;
+    if (!defaultScenarioBundle?.manifest) {
+      throw new Error("Default scenario bundle did not include a manifest.");
+    }
+    const expectedScenarioFeatureCount = Number(defaultScenarioBundle.manifest?.summary?.feature_count || 0);
+    const requiresDetailTopology =
+      state.detailDeferred
+      && !hasDetailTopologyLoaded()
+      && expectedScenarioFeatureCount > primaryCount;
+    if (requiresDetailTopology) {
+      setBootState("scenario-bundle", {
+        message: getBootLanguage() === "zh"
+          ? "正在为默认剧本准备细分拓扑。"
+          : "Preparing detail topology for the default scenario.",
+      });
+      await ensureDetailTopologyReady({
+        renderDispatcher,
+        applyMapData: false,
+      });
+    }
+    finishBootMetric("scenario-bundle", {
+      requiresDetailTopology,
+      expectedScenarioFeatureCount,
+    });
+
+    setBootState("scenario-apply");
+    startBootMetric("scenario-apply");
+    await applyScenarioBundle(defaultScenarioBundle, {
+      renderNow: false,
+      suppressRender: true,
+      markDirtyReason: "",
+      showToastOnComplete: false,
+    });
+    finishBootMetric("scenario-apply", {
+      activeScenarioId: String(state.activeScenarioId || ""),
+    });
+
+    setBootState("warmup");
     renderDispatcher.flush();
+    checkpointBootMetric("first-visible");
     scheduleDeferredDetailPromotion(renderDispatcher);
+    setBootState("ready", {
+      blocking: false,
+      progress: 100,
+      canContinueWithoutScenario: false,
+    });
+    checkpointBootMetric("first-interactive");
+    finishBootMetric("total");
+    schedulePostReadyCityWarmup();
+    logBootMetrics();
     console.log("Initial render complete.");
   } catch (error) {
-    console.error("Failed to load TopoJSON:", error);
-    console.error("Stack trace:", error.stack);
+    finishBootMetric("total", { failed: true });
+    console.error("Failed to boot application:", error);
+    console.error("Stack trace:", error?.stack);
+    const canContinueWithoutScenario =
+      !!state.landData?.features?.length
+      && !!renderDispatcher?.flush;
+    bootContinueHandler = canContinueWithoutScenario
+      ? async () => {
+        setBootState("warmup", {
+          message: getBootLanguage() === "zh"
+            ? "正在以基础地图模式继续。"
+            : "Continuing with the base map only.",
+          canContinueWithoutScenario: false,
+        });
+        renderDispatcher.flush();
+        checkpointBootMetric("first-visible");
+        scheduleDeferredDetailPromotion(renderDispatcher);
+        setBootState("ready", {
+          blocking: false,
+          progress: 100,
+          canContinueWithoutScenario: false,
+        });
+        checkpointBootMetric("first-interactive");
+      }
+      : null;
+    setBootState("error", {
+      error: error?.message || "Failed to load the default startup scenario.",
+      canContinueWithoutScenario,
+      progress: state.bootProgress || BOOT_PHASE_PROGRESS["scenario-apply"],
+    });
   }
 }
 

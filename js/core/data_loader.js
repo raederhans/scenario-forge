@@ -884,6 +884,7 @@ export async function loadMapData({
   paletteRegistryUrl = PALETTE_REGISTRY_URL,
   releasableCatalogUrl = RELEASABLE_CATALOG_URL,
   d3Client = globalThis.d3,
+  includeCityData = true,
 } = {}) {
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available. Ensure D3 is loaded before calling loadMapData().");
@@ -908,6 +909,19 @@ export async function loadMapData({
   });
   const contextLayerPackPromise = loadOptionalContextLayerPacks(d3Client);
 
+  const cityDataPromises = includeCityData
+    ? [
+      loadOptionalJsonCandidate(d3Client, worldCitiesUrls, {
+        label: "world_cities",
+        normalizer: (payload) => normalizeCityFeatureCollection(payload, { sourceLabel: "world_cities" }),
+      }),
+      loadOptionalJsonCandidate(d3Client, cityAliasesUrls, {
+        label: "city_aliases",
+        normalizer: (payload) => (payload && typeof payload === "object" ? payload : null),
+      }),
+    ]
+    : [Promise.resolve(null), Promise.resolve(null)];
+
   const [
     localeData,
     geoAliases,
@@ -929,14 +943,7 @@ export async function loadMapData({
       console.warn("Geo alias file missing or invalid, using defaults.", err);
       return { alias_to_stable_key: {} };
     }),
-    loadOptionalJsonCandidate(d3Client, worldCitiesUrls, {
-      label: "world_cities",
-      normalizer: (payload) => normalizeCityFeatureCollection(payload, { sourceLabel: "world_cities" }),
-    }),
-    loadOptionalJsonCandidate(d3Client, cityAliasesUrls, {
-      label: "city_aliases",
-      normalizer: (payload) => (payload && typeof payload === "object" ? payload : null),
-    }),
+    ...cityDataPromises,
     d3Client.json(hierarchyUrl).catch((err) => {
       console.warn("Hierarchy file missing or invalid, using defaults.", err);
       return null;
@@ -1025,6 +1032,44 @@ export async function loadMapData({
     activePaletteMeta,
     activePalettePack,
     activePaletteMap,
+  };
+}
+
+export async function loadCitySupportData({
+  d3Client = globalThis.d3,
+  worldCitiesUrls = WORLD_CITIES_URLS,
+  cityAliasesUrls = CITY_ALIASES_URLS,
+  locales = { ui: {}, geo: {} },
+  geoAliases = { alias_to_stable_key: {} },
+} = {}) {
+  if (!d3Client || typeof d3Client.json !== "function") {
+    throw new Error("d3.json is not available. Ensure D3 is loaded before calling loadCitySupportData().");
+  }
+
+  const [worldCities, cityAliases] = await Promise.all([
+    loadOptionalJsonCandidate(d3Client, worldCitiesUrls, {
+      label: "world_cities",
+      normalizer: (payload) => normalizeCityFeatureCollection(payload, { sourceLabel: "world_cities" }),
+    }),
+    loadOptionalJsonCandidate(d3Client, cityAliasesUrls, {
+      label: "city_aliases",
+      normalizer: (payload) => (payload && typeof payload === "object" ? payload : null),
+    }),
+  ]);
+
+  const merged = mergeCityLocalizationData({
+    locales,
+    geoAliases,
+    cityCollection: worldCities,
+    cityAliases,
+  });
+
+  return {
+    worldCities,
+    cityAliases,
+    locales: merged.locales,
+    geoAliases: merged.geoAliases,
+    cityLocalizationPatch: merged.cityLocalizationPatch,
   };
 }
 
