@@ -62,6 +62,19 @@ test("strategic overlay state roundtrips through project import/export", async (
       unitRendererDefault: "milstd",
       showUnitLabels: false,
     };
+    state.operationalLines = [
+      {
+        id: "opl_test_1",
+        kind: "frontline",
+        label: "Central Front",
+        points: [[8, 47], [12, 49], [17, 50]],
+        stylePreset: "frontline",
+        stroke: "#6b7280",
+        width: 2.2,
+        opacity: 0.84,
+        attachedCounterIds: ["unit_test_1"],
+      },
+    ];
     state.operationGraphics = [
       {
         id: "opg_test_1",
@@ -94,6 +107,9 @@ test("strategic overlay state roundtrips through project import/export", async (
         facing: 0,
         zIndex: 0,
         anchor: { lon: 12, lat: 48, featureId: "" },
+        iconId: "infantry",
+        layoutAnchor: { kind: "attachment", key: "opl_test_1", slotIndex: 0 },
+        attachment: { kind: "operational-line", lineId: "opl_test_1" },
       },
       {
         id: "unit_test_2",
@@ -111,9 +127,13 @@ test("strategic overlay state roundtrips through project import/export", async (
         facing: 0,
         zIndex: 1,
         anchor: { lon: 15, lat: 46, featureId: "" },
+        iconId: "armor",
+        layoutAnchor: { kind: "feature", key: "", slotIndex: 1 },
+        attachment: null,
       },
     ];
     state.frontlineOverlayDirty = true;
+    state.operationalLinesDirty = true;
     state.operationGraphicsDirty = true;
     state.unitCountersDirty = true;
     state.updateStrategicOverlayUIFn?.();
@@ -128,7 +148,7 @@ test("strategic overlay state roundtrips through project import/export", async (
   const exportPath = path.join(artifactDir, "strategic-overlay-export.json");
   const exported = await exportProjectJson(page, exportPath);
 
-  expect(exported.schemaVersion).toBe(18);
+  expect(exported.schemaVersion).toBe(19);
   expect(exported.annotationView).toEqual({
     frontlineEnabled: true,
     frontlineStyle: "dual-rail",
@@ -137,6 +157,13 @@ test("strategic overlay state roundtrips through project import/export", async (
     unitRendererDefault: "milstd",
     showUnitLabels: false,
   });
+  expect(exported.operationalLines).toHaveLength(1);
+  expect(exported.operationalLines[0]).toMatchObject({
+    id: "opl_test_1",
+    kind: "frontline",
+    label: "Central Front",
+    attachedCounterIds: ["unit_test_1"],
+  });
   expect(exported.operationGraphics).toHaveLength(2);
   expect(exported.unitCounters).toHaveLength(2);
   expect(exported.unitCounters[0].sidc).toBe("130310001412110000000000000000");
@@ -144,10 +171,12 @@ test("strategic overlay state roundtrips through project import/export", async (
     nationTag: "GER",
     nationSource: "manual",
     presetId: "inf",
+    iconId: "infantry",
     unitType: "INF",
     echelon: "corps",
     subLabel: "Nord",
     strengthText: "76%",
+    attachment: { kind: "operational-line", lineId: "opl_test_1" },
   });
 
   await page.evaluate(async () => {
@@ -161,9 +190,11 @@ test("strategic overlay state roundtrips through project import/export", async (
       unitRendererDefault: "game",
       showUnitLabels: true,
     };
+    state.operationalLines = [];
     state.operationGraphics = [];
     state.unitCounters = [];
     state.frontlineOverlayDirty = true;
+    state.operationalLinesDirty = true;
     state.operationGraphicsDirty = true;
     state.unitCountersDirty = true;
     state.updateStrategicOverlayUIFn?.();
@@ -177,12 +208,14 @@ test("strategic overlay state roundtrips through project import/export", async (
     const { state } = await import("/js/core/state.js");
     return {
       annotationView: state.annotationView,
+      operationalLines: state.operationalLines,
       operationGraphics: state.operationGraphics,
       unitCounters: state.unitCounters,
     };
   });
 
   expect(runtimeState.annotationView).toEqual(exported.annotationView);
+  expect(runtimeState.operationalLines).toEqual(exported.operationalLines);
   expect(runtimeState.operationGraphics).toEqual(exported.operationGraphics);
   expect(runtimeState.unitCounters).toEqual(exported.unitCounters);
 });

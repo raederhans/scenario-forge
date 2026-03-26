@@ -83,6 +83,7 @@ let viewportGroup = null;
 let strategicDefs = null;
 let frontlineOverlayGroup = null;
 let frontlineLabelsGroup = null;
+let operationalLinesGroup = null;
 let operationGraphicsGroup = null;
 let operationGraphicsEditorGroup = null;
 let unitCountersGroup = null;
@@ -101,6 +102,7 @@ let lastDetailToastToken = "";
 let lastDetailToastAt = 0;
 let lastSpecialZonesOverlaySignature = "";
 let lastFrontlineOverlaySignature = "";
+let lastOperationalLinesOverlaySignature = "";
 let lastOperationGraphicsOverlaySignature = "";
 let lastUnitCountersOverlaySignature = "";
 let lastInspectorOverlaySignature = "";
@@ -318,10 +320,13 @@ const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
 const LAYER_DIAG_PREFIX = "[layer-resolver]";
 const DEFAULT_SPECIAL_ZONE_TYPE = "custom";
 const DEFAULT_OPERATION_GRAPHIC_KIND = "attack";
+const DEFAULT_OPERATIONAL_LINE_KIND = "frontline";
 const DEFAULT_UNIT_COUNTER_RENDERER = "game";
 const DEFAULT_MILSTD_SIDC = "130310001412110000000000000000";
 const STRATEGIC_LINE_LABEL_FONT = "\"IBM Plex Sans\", \"Segoe UI\", sans-serif";
 const OPERATION_GRAPHIC_STYLE_PRESETS = ["attack", "retreat", "supply", "naval", "encirclement", "theater"];
+const OPERATIONAL_LINE_STYLE_PRESETS = ["frontline", "offensive_line", "spearhead_line", "defensive_line"];
+const STRATEGIC_COUNTER_ATTACHMENT_KIND = "operational-line";
 const milsymbolSvgUriCache = new Map();
 const DEFAULT_OPERATION_GRAPHIC_OPACITY = 0.96;
 const DEFAULT_OPERATION_GRAPHIC_WIDTH = 4.4;
@@ -3373,6 +3378,7 @@ function setRenderPhase(phase) {
 
 function markOverlaysDirty({
   frontline = false,
+  operationalLines = false,
   operationGraphics = false,
   unitCounters = false,
   specialZones = false,
@@ -3381,6 +3387,9 @@ function markOverlaysDirty({
 } = {}) {
   if (frontline) {
     state.frontlineOverlayDirty = true;
+  }
+  if (operationalLines) {
+    state.operationalLinesDirty = true;
   }
   if (operationGraphics) {
     state.operationGraphicsDirty = true;
@@ -3402,12 +3411,25 @@ function markOverlaysDirty({
 function markAllOverlaysDirty() {
   markOverlaysDirty({
     frontline: true,
+    operationalLines: true,
     operationGraphics: true,
     unitCounters: true,
     specialZones: true,
     inspector: true,
     hover: true,
   });
+}
+
+function getOperationalLinesOverlaySignature() {
+  return [
+    getOverlayProjectionSignature(),
+    Number(state.dirtyRevision || 0),
+    Number(state.zoomTransform?.k || 1).toFixed(3),
+    Array.isArray(state.operationalLines) ? state.operationalLines.length : 0,
+    !!state.operationalLineEditor?.active ? "1" : "0",
+    Array.isArray(state.operationalLineEditor?.points) ? state.operationalLineEditor.points.length : 0,
+    String(state.operationalLineEditor?.selectedId || ""),
+  ].join("::");
 }
 
 function getOverlayProjectionSignature() {
@@ -3529,6 +3551,16 @@ function renderOperationGraphicsIfNeeded({ force = false } = {}) {
   renderOperationGraphicsOverlay();
   state.operationGraphicsDirty = false;
   lastOperationGraphicsOverlaySignature = nextSignature;
+}
+
+function renderOperationalLinesIfNeeded({ force = false } = {}) {
+  const nextSignature = getOperationalLinesOverlaySignature();
+  if (!force && !state.operationalLinesDirty && nextSignature === lastOperationalLinesOverlaySignature) {
+    return;
+  }
+  renderOperationalLinesOverlay();
+  state.operationalLinesDirty = false;
+  lastOperationalLinesOverlaySignature = nextSignature;
 }
 
 function renderUnitCountersIfNeeded({ force = false } = {}) {
@@ -4154,6 +4186,17 @@ function ensureHybridLayers() {
     .style("pointer-events", "none")
     .attr("role", "img")
     .attr("aria-label", "Strategic frontline labels")
+    .attr("aria-hidden", "true")
+    .attr("focusable", "false");
+
+  operationalLinesGroup = viewportGroup.select("g.operational-lines-layer");
+  if (operationalLinesGroup.empty()) {
+    operationalLinesGroup = viewportGroup.append("g").attr("class", "operational-lines-layer");
+  }
+  operationalLinesGroup
+    .style("pointer-events", "none")
+    .attr("role", "img")
+    .attr("aria-label", "Operational lines")
     .attr("aria-hidden", "true")
     .attr("focusable", "false");
 
@@ -13710,6 +13753,7 @@ function ensureOperationGraphicsEditorState() {
     state.operationGraphicsEditor = {
       active: false,
       mode: "idle",
+      collection: "operationGraphics",
       points: [],
       kind: DEFAULT_OPERATION_GRAPHIC_KIND,
       label: "",
@@ -13725,6 +13769,7 @@ function ensureOperationGraphicsEditorState() {
   if (typeof state.operationGraphicsEditor.mode !== "string") {
     state.operationGraphicsEditor.mode = state.operationGraphicsEditor.active ? "draw" : "idle";
   }
+  state.operationGraphicsEditor.collection = "operationGraphics";
   if (!Array.isArray(state.operationGraphicsEditor.points)) {
     state.operationGraphicsEditor.points = [];
   }
@@ -13735,6 +13780,38 @@ function ensureOperationGraphicsEditorState() {
   state.operationGraphicsEditor.width = Math.max(0, Math.min(16, Number(state.operationGraphicsEditor.width) || 0));
   state.operationGraphicsEditor.opacity = Math.max(0, Math.min(1, Number(state.operationGraphicsEditor.opacity) || 1));
   state.operationGraphicsEditor.selectedVertexIndex = Math.max(-1, Number(state.operationGraphicsEditor.selectedVertexIndex) || -1);
+}
+
+function ensureOperationalLineEditorState() {
+  if (!state.operationalLineEditor || typeof state.operationalLineEditor !== "object") {
+    state.operationalLineEditor = {
+      active: false,
+      mode: "idle",
+      points: [],
+      kind: DEFAULT_OPERATIONAL_LINE_KIND,
+      label: "",
+      stylePreset: DEFAULT_OPERATIONAL_LINE_KIND,
+      stroke: "",
+      width: 0,
+      opacity: 1,
+      selectedId: null,
+      selectedVertexIndex: -1,
+      counter: 1,
+    };
+  }
+  if (typeof state.operationalLineEditor.mode !== "string") {
+    state.operationalLineEditor.mode = state.operationalLineEditor.active ? "draw" : "idle";
+  }
+  if (!Array.isArray(state.operationalLineEditor.points)) {
+    state.operationalLineEditor.points = [];
+  }
+  if (!OPERATIONAL_LINE_STYLE_PRESETS.includes(String(state.operationalLineEditor.stylePreset || "").trim())) {
+    state.operationalLineEditor.stylePreset = String(state.operationalLineEditor.kind || DEFAULT_OPERATIONAL_LINE_KIND);
+  }
+  state.operationalLineEditor.stroke = String(state.operationalLineEditor.stroke || "").trim();
+  state.operationalLineEditor.width = Math.max(0, Math.min(16, Number(state.operationalLineEditor.width) || 0));
+  state.operationalLineEditor.opacity = Math.max(0, Math.min(1, Number(state.operationalLineEditor.opacity) || 1));
+  state.operationalLineEditor.selectedVertexIndex = Math.max(-1, Number(state.operationalLineEditor.selectedVertexIndex) || -1);
 }
 
 function normalizeUnitCounterStatPercent(value, fallback = DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT) {
@@ -13791,10 +13868,17 @@ function assignUnitCounterEditorFromCounter(counter = null) {
   state.unitCounterEditor.nationTag = canonicalCountryCode(counter.nationTag || "");
   state.unitCounterEditor.nationSource = String(counter.nationSource || "controller").trim().toLowerCase() || "controller";
   state.unitCounterEditor.presetId = String(counter.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toLowerCase() || DEFAULT_UNIT_COUNTER_PRESET_ID;
+  state.unitCounterEditor.iconId = String(counter.iconId || getUnitCounterPresetById(counter.presetId).iconId || "").trim().toLowerCase();
   state.unitCounterEditor.unitType = String(counter.unitType || getUnitCounterPresetById(counter.presetId).unitType || "").trim().toUpperCase();
   state.unitCounterEditor.echelon = String(counter.echelon || "").trim().toLowerCase();
   state.unitCounterEditor.subLabel = String(counter.subLabel || "");
   state.unitCounterEditor.strengthText = String(counter.strengthText || "");
+  state.unitCounterEditor.layoutAnchor = counter.layoutAnchor && typeof counter.layoutAnchor === "object"
+    ? { ...counter.layoutAnchor }
+    : { kind: "feature", key: String(counter.anchor?.featureId || ""), slotIndex: null };
+  state.unitCounterEditor.attachment = counter.attachment && typeof counter.attachment === "object"
+    ? { ...counter.attachment }
+    : null;
   state.unitCounterEditor.baseFillColor = normalizedCombatState.baseFillColor;
   state.unitCounterEditor.organizationPct = normalizedCombatState.organizationPct;
   state.unitCounterEditor.equipmentPct = normalizedCombatState.equipmentPct;
@@ -13814,10 +13898,13 @@ function ensureUnitCounterEditorState() {
       nationTag: "",
       nationSource: "controller",
       presetId: DEFAULT_UNIT_COUNTER_PRESET_ID,
+      iconId: "",
       unitType: "",
       echelon: "",
       subLabel: "",
       strengthText: "",
+      layoutAnchor: { kind: "feature", key: "", slotIndex: null },
+      attachment: null,
       baseFillColor: "",
       organizationPct: DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT,
       equipmentPct: DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT,
@@ -13843,6 +13930,11 @@ function ensureUnitCounterEditorState() {
     ? String(state.unitCounterEditor.nationSource || "").trim().toLowerCase()
     : "controller";
   state.unitCounterEditor.presetId = String(state.unitCounterEditor.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toLowerCase() || DEFAULT_UNIT_COUNTER_PRESET_ID;
+  state.unitCounterEditor.iconId = String(
+    state.unitCounterEditor.iconId
+    || getUnitCounterPresetById(state.unitCounterEditor.presetId).iconId
+    || ""
+  ).trim().toLowerCase();
   state.unitCounterEditor.unitType = String(
     state.unitCounterEditor.unitType
     || getUnitCounterPresetById(state.unitCounterEditor.presetId).unitType
@@ -13851,6 +13943,20 @@ function ensureUnitCounterEditorState() {
   state.unitCounterEditor.echelon = String(state.unitCounterEditor.echelon || "").trim().toLowerCase();
   state.unitCounterEditor.subLabel = String(state.unitCounterEditor.subLabel || "").trim();
   state.unitCounterEditor.strengthText = String(state.unitCounterEditor.strengthText || "").trim();
+  if (!state.unitCounterEditor.layoutAnchor || typeof state.unitCounterEditor.layoutAnchor !== "object") {
+    state.unitCounterEditor.layoutAnchor = { kind: "feature", key: "", slotIndex: null };
+  }
+  state.unitCounterEditor.layoutAnchor.kind = String(state.unitCounterEditor.layoutAnchor.kind || "feature").trim().toLowerCase() || "feature";
+  state.unitCounterEditor.layoutAnchor.key = String(state.unitCounterEditor.layoutAnchor.key || "").trim();
+  state.unitCounterEditor.layoutAnchor.slotIndex = Number.isInteger(Number(state.unitCounterEditor.layoutAnchor.slotIndex))
+    ? Math.max(0, Math.round(Number(state.unitCounterEditor.layoutAnchor.slotIndex)))
+    : null;
+  state.unitCounterEditor.attachment = state.unitCounterEditor.attachment && typeof state.unitCounterEditor.attachment === "object"
+    ? {
+      kind: String(state.unitCounterEditor.attachment.kind || STRATEGIC_COUNTER_ATTACHMENT_KIND).trim().toLowerCase() || STRATEGIC_COUNTER_ATTACHMENT_KIND,
+      lineId: String(state.unitCounterEditor.attachment.lineId || "").trim(),
+    }
+    : null;
   state.unitCounterEditor.baseFillColor = normalizeUnitCounterBaseFillColor(state.unitCounterEditor.baseFillColor);
   state.unitCounterEditor.organizationPct = normalizeUnitCounterStatPercent(
     state.unitCounterEditor.organizationPct,
@@ -14148,6 +14254,48 @@ function getOperationGraphicPreset(kind) {
   return presets[kind] || presets.attack;
 }
 
+function getOperationalLinePreset(kind) {
+  const presets = {
+    frontline: {
+      stroke: "#6b7280",
+      width: 2.1,
+      opacity: 0.82,
+      dasharray: "10 5",
+      markerEnd: null,
+      curved: true,
+      closed: false,
+    },
+    offensive_line: {
+      stroke: "#7f1d1d",
+      width: 2.5,
+      opacity: 0.94,
+      dasharray: null,
+      markerEnd: "url(#strategic-arrow-attack)",
+      curved: true,
+      closed: false,
+    },
+    spearhead_line: {
+      stroke: "#991b1b",
+      width: 2.9,
+      opacity: 0.98,
+      dasharray: "14 5 2 5",
+      markerEnd: "url(#strategic-arrow-attack)",
+      curved: true,
+      closed: false,
+    },
+    defensive_line: {
+      stroke: "#92400e",
+      width: 1.9,
+      opacity: 0.82,
+      dasharray: "5 4",
+      markerEnd: null,
+      curved: true,
+      closed: false,
+    },
+  };
+  return presets[kind] || presets.frontline;
+}
+
 function projectStrategicPoints(points = []) {
   return points.map((point) => getProjectedPoint(point)).filter(Boolean);
 }
@@ -14165,10 +14313,20 @@ function getOperationGraphicMinPoints(kind = DEFAULT_OPERATION_GRAPHIC_KIND) {
   return kind === "encirclement" || kind === "theater" ? 3 : 2;
 }
 
+function getOperationalLineMinPoints() {
+  return 2;
+}
+
 function getOperationGraphicById(id) {
   const selectedId = String(id || "").trim();
   if (!selectedId) return null;
   return (state.operationGraphics || []).find((entry) => String(entry?.id || "") === selectedId) || null;
+}
+
+function getOperationalLineById(id) {
+  const selectedId = String(id || "").trim();
+  if (!selectedId) return null;
+  return (state.operationalLines || []).find((entry) => String(entry?.id || "") === selectedId) || null;
 }
 
 function normalizeOperationGraphicStylePreset(value, fallback = DEFAULT_OPERATION_GRAPHIC_KIND) {
@@ -14179,6 +14337,16 @@ function normalizeOperationGraphicStylePreset(value, fallback = DEFAULT_OPERATIO
   return OPERATION_GRAPHIC_STYLE_PRESETS.includes(String(fallback || "").trim().toLowerCase())
     ? String(fallback || "").trim().toLowerCase()
     : DEFAULT_OPERATION_GRAPHIC_KIND;
+}
+
+function normalizeOperationalLineStylePreset(value, fallback = DEFAULT_OPERATIONAL_LINE_KIND) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (OPERATIONAL_LINE_STYLE_PRESETS.includes(normalized)) {
+    return normalized;
+  }
+  return OPERATIONAL_LINE_STYLE_PRESETS.includes(String(fallback || "").trim().toLowerCase())
+    ? String(fallback || "").trim().toLowerCase()
+    : DEFAULT_OPERATIONAL_LINE_KIND;
 }
 
 function normalizeOperationGraphicStroke(value) {
@@ -14646,6 +14814,119 @@ function getOperationGraphicLabelAnchor(projectedPoints = [], { closed = false }
   return [anchorX - (dy / length) * 9, anchorY + (dx / length) * 9];
 }
 
+function renderOperationalLinesOverlay() {
+  if (!operationalLinesGroup) return;
+  renderStrategicDefs();
+  ensureOperationalLineEditorState();
+  const lines = Array.isArray(state.operationalLines) ? state.operationalLines : [];
+  const selectedId = String(state.operationalLineEditor?.selectedId || "");
+  const rendered = lines
+    .map((line) => {
+      const stylePreset = getOperationalLinePreset(line.stylePreset || line.kind);
+      const projectedPoints = projectStrategicPoints(line.points);
+      const path = createOperationGraphicPath(line.points, {
+        closed: false,
+        curved: stylePreset.curved !== false,
+      });
+      if (!path) return null;
+      return {
+        line,
+        stylePreset,
+        path,
+        projectedPoints,
+        labelAnchor: getOperationGraphicLabelAnchor(projectedPoints, { closed: false }),
+      };
+    })
+    .filter(Boolean);
+
+  const groups = operationalLinesGroup
+    .selectAll("g.operational-line")
+    .data(rendered, (d) => d.line.id);
+
+  const groupEnter = groups.enter().append("g").attr("class", "operational-line");
+  groupEnter.append("path").attr("class", "operational-line-casing");
+  groupEnter.append("path").attr("class", "operational-line-path");
+  groupEnter.append("path").attr("class", "operational-line-hit");
+  const labelEnter = groupEnter.append("g").attr("class", "operational-line-label");
+  labelEnter.append("rect");
+  labelEnter.append("text");
+
+  const merged = groupEnter.merge(groups);
+  merged.select("path.operational-line-casing")
+    .attr("d", (d) => d.path)
+    .attr("fill", "none")
+    .attr("stroke", (d) => (d.line.id === selectedId ? "rgba(248, 244, 233, 0.96)" : "rgba(17, 24, 39, 0.5)"))
+    .attr("stroke-width", (d) => {
+      const baseWidth = d.line.width > 0 ? d.line.width : d.stylePreset.width;
+      return baseWidth + (d.line.id === selectedId ? 2.2 : 1.4);
+    })
+    .attr("stroke-linecap", "round")
+    .attr("stroke-linejoin", "round")
+    .attr("stroke-dasharray", (d) => d.stylePreset.dasharray || null)
+    .attr("opacity", (d) => (d.line.id === selectedId ? 0.95 : 0.72));
+
+  merged.select("path.operational-line-path")
+    .attr("d", (d) => d.path)
+    .attr("fill", "none")
+    .attr("stroke", (d) => d.line.stroke || d.stylePreset.stroke)
+    .attr("stroke-width", (d) => {
+      const baseWidth = d.line.width > 0 ? d.line.width : d.stylePreset.width;
+      return d.line.id === selectedId ? baseWidth + 0.6 : baseWidth;
+    })
+    .attr("stroke-linecap", "round")
+    .attr("stroke-linejoin", "round")
+    .attr("stroke-dasharray", (d) => d.stylePreset.dasharray || null)
+    .attr("opacity", (d) => Number.isFinite(Number(d.line.opacity)) ? Number(d.line.opacity) : d.stylePreset.opacity)
+    .attr("marker-end", (d) => d.stylePreset.markerEnd || null);
+
+  merged.select("path.operational-line-hit")
+    .attr("d", (d) => d.path)
+    .attr("fill", "none")
+    .attr("stroke", "transparent")
+    .attr("stroke-width", (d) => Math.max(14, (d.line.width > 0 ? d.line.width : d.stylePreset.width) + 8))
+    .attr("pointer-events", "stroke");
+
+  merged.select("g.operational-line-label")
+    .attr("display", (d) => (d.line.label && Array.isArray(d.labelAnchor) ? null : "none"))
+    .attr("transform", (d) => `translate(${d.labelAnchor?.[0] ?? -9999},${d.labelAnchor?.[1] ?? -9999})`);
+
+  merged.select("g.operational-line-label text")
+    .attr("text-anchor", "middle")
+    .attr("dominant-baseline", "central")
+    .attr("font-family", STRATEGIC_LINE_LABEL_FONT)
+    .attr("font-size", 9)
+    .attr("font-weight", 700)
+    .attr("letter-spacing", "0.05em")
+    .attr("fill", "#1f2937")
+    .text((d) => d.line.label || "");
+
+  merged.select("g.operational-line-label rect")
+    .each(function eachLabelPlate() {
+      const textNode = globalThis.d3.select(this.parentNode).select("text").node();
+      const bbox = textNode?.getBBox?.();
+      const width = bbox ? bbox.width + 12 : 56;
+      const height = bbox ? bbox.height + 6 : 16;
+      globalThis.d3.select(this)
+        .attr("x", -width / 2)
+        .attr("y", -height / 2)
+        .attr("width", width)
+        .attr("height", height)
+        .attr("rx", 2)
+        .attr("ry", 2)
+        .attr("fill", "rgba(248, 244, 233, 0.94)")
+        .attr("stroke", "rgba(55, 65, 81, 0.55)")
+        .attr("stroke-width", 0.8);
+    });
+
+  merged.on("click", (event, datum) => {
+    event.stopPropagation();
+    selectOperationalLineById(datum.line.id);
+  });
+
+  groups.exit().remove();
+  operationalLinesGroup.attr("aria-hidden", rendered.length ? "false" : "true");
+}
+
 function renderOperationGraphicsOverlay() {
   if (!operationGraphicsGroup) return;
   renderStrategicDefs();
@@ -14847,6 +15128,7 @@ function getUnitCounterCardModel(counter = {}, { stackCount = 1 } = {}) {
     echelon: String(counter.echelon || preset.defaultEchelon || "").trim().toLowerCase(),
     echelonLabel: getUnitCounterEchelonLabel(counter.echelon || preset.defaultEchelon || ""),
     shortCode: String(counter.unitType || preset.shortCode || "").trim().toUpperCase() || preset.shortCode,
+    iconId: String(counter.iconId || preset.iconId || "infantry").trim().toLowerCase() || "infantry",
     shellVariant: preset.shellVariant || "line",
     sidc,
     stackCount: Math.max(1, Number(stackCount) || 1),
@@ -14879,29 +15161,84 @@ function getUnitCounterPreviewData(partialCounter = {}) {
   });
 }
 
+function getUnitCounterIconPath(iconId = "") {
+  const paths = {
+    infantry: "M -3.6 -2.8 L -1.1 -2.8 L -1.1 -0.8 L 1.1 -0.8 L 1.1 -2.8 L 3.6 -2.8 L 3.6 -0.8 L 1.1 -0.8 L 1.1 3.1 L -1.1 3.1 L -1.1 -0.8 L -3.6 -0.8 Z",
+    motorized: "M -3.8 0.6 L -2.4 -2.1 L 1.8 -2.1 L 3.7 0.6 L 2.4 0.6 L 1.7 -0.5 L -0.8 -0.5 L -1.5 0.6 Z M -2 2.5 A 1 1 0 1 0 -2 2.48 Z M 2 2.5 A 1 1 0 1 0 2 2.48 Z",
+    mechanized: "M -3.9 -1.8 L 2.1 -1.8 L 3.8 -0.2 L 3.8 1.2 L -3.9 1.2 Z M -2.5 2.6 A 0.95 0.95 0 1 0 -2.5 2.58 Z M 1.8 2.6 A 0.95 0.95 0 1 0 1.8 2.58 Z",
+    armor: "M -4 1.2 L -2.8 -1.8 L 1.6 -1.8 L 3.8 -0.2 L 3.8 1.8 L -4 1.8 Z M -2.6 2.8 A 0.95 0.95 0 1 0 -2.6 2.78 Z M 1.9 2.8 A 0.95 0.95 0 1 0 1.9 2.78 Z",
+    artillery: "M -3.5 0.2 L -0.8 0.2 L 2.4 -2.2 L 3.6 -1.1 L 0.5 1.8 L -3.5 1.8 Z M -2.3 2.7 A 1 1 0 1 0 -2.3 2.68 Z",
+    hq: "M 0 -3.8 L 0.9 -0.9 L 3.8 -0.9 L 1.4 0.8 L 2.3 3.8 L 0 2.1 L -2.3 3.8 L -1.4 0.8 L -3.8 -0.9 L -0.9 -0.9 Z",
+    garrison: "M -3.8 -2.8 L 3.8 -2.8 L 3.8 2.8 L -3.8 2.8 Z M -1.2 -1.2 L 1.2 -1.2 L 1.2 1.2 L -1.2 1.2 Z",
+    air: "M 0 -3.8 L 1.1 -0.4 L 4 0 L 1.1 0.8 L 0.3 3.8 L -0.3 3.8 L -1.1 0.8 L -4 0 L -1.1 -0.4 Z",
+    naval: "M -3.8 1.5 C -2.9 -0.4 -1.6 -1.8 0 -1.8 C 1.6 -1.8 2.9 -0.4 3.8 1.5 Z M -4 2.5 C -2.9 1.6 -1.4 1.6 0 2.5 C 1.4 1.6 2.9 1.6 4 2.5",
+  };
+  return paths[String(iconId || "").trim().toLowerCase()] || paths.infantry;
+}
+
+function getOperationalLineAnchorCoord(lineId = "") {
+  const line = getOperationalLineById(lineId);
+  if (!line || !Array.isArray(line.points) || line.points.length < 2) return null;
+  return getLineMidpointFromCoordinates(line.points);
+}
+
+function getUnitCounterRenderAnchor(counter = {}) {
+  const attachedLineId = String(counter?.attachment?.lineId || "").trim();
+  if (attachedLineId) {
+    const lineCoord = getOperationalLineAnchorCoord(attachedLineId);
+    if (lineCoord) {
+      return {
+        coord: lineCoord,
+        key: `line:${attachedLineId}`,
+      };
+    }
+  }
+  const lon = Number(counter?.anchor?.lon || 0);
+  const lat = Number(counter?.anchor?.lat || 0);
+  return {
+    coord: [lon, lat],
+    key: String(counter?.anchor?.featureId || "").trim() || `${Math.round(lon * 3)}:${Math.round(lat * 3)}`,
+  };
+}
+
+function getUnitCounterSlotOffset(slotIndex = 0, stackCount = 1, metrics = UNIT_COUNTER_SCREEN_SIZE.medium) {
+  const count = Math.max(1, Number(stackCount) || 1);
+  const index = Math.max(0, Number(slotIndex) || 0);
+  const columns = count <= 2 ? count : count <= 4 ? 2 : 3;
+  const rows = Math.max(1, Math.ceil(count / Math.max(1, columns)));
+  const row = Math.floor(index / Math.max(1, columns));
+  const col = index % Math.max(1, columns);
+  const itemsInRow = row === rows - 1 ? Math.min(columns, count - row * columns) : columns;
+  const x = (col - (itemsInRow - 1) / 2) * Math.max(metrics.width * 0.76, 18);
+  const y = (row - (rows - 1) / 2) * Math.max(metrics.height * 0.84, 14);
+  return [x, y];
+}
+
 function getUnitCounterRenderEntries() {
   const counters = Array.isArray(state.unitCounters) ? state.unitCounters : [];
   const grouped = new Map();
   counters.forEach((counter) => {
-    const featureId = String(counter.anchor?.featureId || "").trim();
-    const lon = Number(counter.anchor?.lon || 0);
-    const lat = Number(counter.anchor?.lat || 0);
-    const key = featureId || `${Math.round(lon * 3)}:${Math.round(lat * 3)}`;
+    const anchor = getUnitCounterRenderAnchor(counter);
+    const key = String(anchor?.key || "");
     if (!grouped.has(key)) {
-      grouped.set(key, []);
+      grouped.set(key, { anchor, counters: [] });
     }
-    grouped.get(key).push(counter);
+    grouped.get(key).counters.push(counter);
   });
-  return Array.from(grouped.values()).map((bucket) => {
-    const sortedBucket = bucket
+  return Array.from(grouped.values()).flatMap((bucket) => {
+    const sortedBucket = bucket.counters
       .slice()
-      .sort((a, b) => Number(a?.zIndex || 0) - Number(b?.zIndex || 0));
-    return {
-      counter: sortedBucket[sortedBucket.length - 1],
+      .sort((a, b) => {
+        const zDelta = Number(a?.zIndex || 0) - Number(b?.zIndex || 0);
+        if (zDelta !== 0) return zDelta;
+        return String(a?.id || "").localeCompare(String(b?.id || ""));
+      });
+    return sortedBucket.map((counter, slotIndex) => ({
+      counter,
       stackCount: sortedBucket.length,
-      stackItems: sortedBucket.slice(-3).reverse(),
-      hiddenStackCount: Math.max(0, sortedBucket.length - 3),
-    };
+      slotIndex,
+      anchor: bucket.anchor,
+    }));
   });
 }
 
@@ -14930,19 +15267,19 @@ function renderUnitCountersOverlay() {
   const selectedId = String(state.unitCounterEditor?.selectedId || "");
   const zoomK = Math.max(0.1, Number(state.zoomTransform?.k || 1));
   const entries = getUnitCounterRenderEntries()
-    .map(({ counter, stackCount, stackItems = [], hiddenStackCount = 0 }) => {
-      const projected = getProjectedPoint([counter.anchor?.lon, counter.anchor?.lat]);
+    .map(({ counter, stackCount, slotIndex, anchor }) => {
+      const projected = getProjectedPoint(anchor?.coord);
       if (!projected) return null;
       const model = getUnitCounterCardModel(counter, { stackCount });
       const scaleModel = getUnitCounterRenderScale(model.metrics, zoomK);
       if (scaleModel.hidden) return null;
+      const slotOffset = getUnitCounterSlotOffset(slotIndex, stackCount, model.metrics);
       return {
         counter,
         projected,
         stackCount,
-        hiddenStackCount,
-        stackItems,
-        stackPreview: stackItems.map((item) => getUnitCounterCardModel(item, { stackCount: 1 })),
+        slotIndex,
+        slotOffset,
         model,
         scaleModel,
       };
@@ -14969,6 +15306,7 @@ function renderUnitCountersOverlay() {
   groupEnter.append("rect").attr("class", "unit-counter-type-chip");
   groupEnter.append("text").attr("class", "unit-counter-type-text");
   groupEnter.append("image").attr("class", "unit-counter-milsymbol");
+  groupEnter.append("path").attr("class", "unit-counter-icon");
   groupEnter.append("text").attr("class", "unit-counter-symbol");
   groupEnter.append("rect").attr("class", "unit-counter-org-track");
   groupEnter.append("rect").attr("class", "unit-counter-org-fill");
@@ -14982,7 +15320,7 @@ function renderUnitCountersOverlay() {
 
   const merged = groupEnter.merge(groups)
     .attr("transform", (d) => {
-      return `translate(${d.projected[0]},${d.projected[1]}) scale(${d.scaleModel.localScale})`;
+      return `translate(${d.projected[0]},${d.projected[1]}) scale(${d.scaleModel.localScale}) translate(${d.slotOffset[0]},${d.slotOffset[1]})`;
     })
     .attr("data-counter-id", (d) => d.counter.id)
     .attr("opacity", (d) => d.scaleModel.opacity)
@@ -14996,9 +15334,8 @@ function renderUnitCountersOverlay() {
   } = {}) => {
     const offsetX = plateIndex === 1 ? -1.8 : -3.4;
     const offsetY = plateIndex === 1 ? -1.6 : -3.1;
-    const stackItemIndex = plateIndex;
     selection.select(shadowClass)
-      .attr("display", (d) => (d.stackCount > stackItemIndex + 1 ? null : "none"))
+      .attr("display", "none")
       .attr("x", (d) => -d.model.metrics.width / 2 + offsetX)
       .attr("y", (d) => -d.model.metrics.height / 2 + offsetY)
       .attr("width", (d) => d.model.metrics.width)
@@ -15009,24 +15346,24 @@ function renderUnitCountersOverlay() {
       .attr("opacity", 0.38);
 
     selection.select(shellClass)
-      .attr("display", (d) => (d.stackCount > stackItemIndex + 1 ? null : "none"))
+      .attr("display", "none")
       .attr("x", (d) => -d.model.metrics.width / 2 + offsetX)
       .attr("y", (d) => -d.model.metrics.height / 2 + offsetY)
       .attr("width", (d) => d.model.metrics.width)
       .attr("height", (d) => d.model.metrics.height)
       .attr("rx", 2)
       .attr("ry", 2)
-      .attr("fill", (d) => d.stackPreview?.[stackItemIndex + 1]?.baseFillColor || DEFAULT_UNIT_COUNTER_BASE_FILL)
+      .attr("fill", DEFAULT_UNIT_COUNTER_BASE_FILL)
       .attr("stroke", "rgba(31, 41, 55, 0.46)")
       .attr("stroke-width", 0.75);
 
     selection.select(stripClass)
-      .attr("display", (d) => (d.stackCount > stackItemIndex + 1 ? null : "none"))
+      .attr("display", "none")
       .attr("x", (d) => -d.model.metrics.width / 2 + offsetX)
       .attr("y", (d) => -d.model.metrics.height / 2 + offsetY)
       .attr("width", (d) => Math.max(1.6, d.model.metrics.width * 0.12))
       .attr("height", (d) => d.model.metrics.height)
-      .attr("fill", (d) => d.stackPreview?.[stackItemIndex + 1]?.nation?.color || d.model.nation.color);
+      .attr("fill", (d) => d.model.nation.color);
   };
 
   applyStackPlate(merged, {
@@ -15080,7 +15417,7 @@ function renderUnitCountersOverlay() {
     .attr("height", 4.6)
     .attr("rx", 0.8)
     .attr("ry", 0.8)
-    .attr("fill", "rgba(31, 41, 55, 0.9)");
+    .attr("fill", (d) => d.model.nation.color);
 
   merged.select("text.unit-counter-tag-text")
     .attr("x", (d) => -d.model.metrics.width / 2 + Math.max(2.2, d.model.metrics.width * 0.14) + Math.max(9, d.model.metrics.width * 0.32) / 2)
@@ -15124,12 +15461,22 @@ function renderUnitCountersOverlay() {
     .attr("preserveAspectRatio", "xMidYMid meet")
     .attr("href", (d) => d.model.symbolUri);
 
+  merged.select("path.unit-counter-icon")
+    .attr("display", (d) => (d.model.renderer === "game" ? null : "none"))
+    .attr("d", (d) => getUnitCounterIconPath(d.model.iconId))
+    .attr("transform", "translate(0, 1) scale(1)")
+    .attr("fill", "none")
+    .attr("stroke", "#0f172a")
+    .attr("stroke-width", 0.95)
+    .attr("stroke-linecap", "round")
+    .attr("stroke-linejoin", "round");
+
   merged.select("text.unit-counter-symbol")
     .attr("display", (d) => {
       if (d.model.renderer === "milstd") {
         return d.model.symbolUri ? "none" : null;
       }
-      return null;
+      return "none";
     })
     .attr("x", 0)
     .attr("y", 1)
@@ -15237,7 +15584,7 @@ function renderUnitCountersOverlay() {
     .text((d) => d.counter.subLabel || "");
 
   merged.select("circle.unit-counter-stack-badge")
-    .attr("display", (d) => ((d.hiddenStackCount > 0 || d.stackCount > 3) ? null : "none"))
+    .attr("display", "none")
     .attr("cx", (d) => d.model.metrics.width / 2 - 1.5)
     .attr("cy", (d) => -d.model.metrics.height / 2 + 1.5)
     .attr("r", 3.5)
@@ -15246,7 +15593,7 @@ function renderUnitCountersOverlay() {
     .attr("stroke-width", 0.6);
 
   merged.select("text.unit-counter-stack-text")
-    .attr("display", (d) => ((d.hiddenStackCount > 0 || d.stackCount > 3) ? null : "none"))
+    .attr("display", "none")
     .attr("x", (d) => d.model.metrics.width / 2 - 1.5)
     .attr("y", (d) => -d.model.metrics.height / 2 + 1.5)
     .attr("text-anchor", "middle")
@@ -15255,7 +15602,7 @@ function renderUnitCountersOverlay() {
     .attr("font-size", 3.1)
     .attr("font-weight", 700)
     .attr("fill", "#f8fafc")
-    .text((d) => `+${Math.max(1, d.stackCount - 3)}`);
+    .text("");
 
   if (globalThis.d3?.drag) {
     if (!renderUnitCountersOverlay.dragBehavior) {
@@ -15264,6 +15611,13 @@ function renderUnitCountersOverlay() {
           ensureUnitCounterEditorState();
           datum.__historyBefore = captureHistoryState({ strategicOverlay: true });
           state.unitCounterEditor.selectedId = datum.counter.id;
+          datum.counter.attachment = null;
+          datum.counter.layoutAnchor = {
+            ...(datum.counter.layoutAnchor || {}),
+            kind: "feature",
+            key: String(datum.counter.anchor?.featureId || ""),
+            slotIndex: null,
+          };
           updateStrategicOverlayUi();
           globalThis.d3.select(this).style("cursor", "grabbing");
         })
@@ -15284,6 +15638,12 @@ function renderUnitCountersOverlay() {
           datum.counter.anchor = {
             ...(datum.counter.anchor || {}),
             featureId: getLandFeatureIdFromEvent(event?.sourceEvent || event, "unit-counter-drag-end"),
+          };
+          datum.counter.layoutAnchor = {
+            ...(datum.counter.layoutAnchor || {}),
+            kind: "feature",
+            key: String(datum.counter.anchor?.featureId || ""),
+            slotIndex: null,
           };
           state.unitCountersDirty = true;
           pushHistoryEntry({
@@ -15601,6 +15961,7 @@ function render() {
     scheduleHitCanvasBuildIfNeeded();
   }
   renderFrontlineOverlayIfNeeded();
+  renderOperationalLinesIfNeeded();
   renderOperationGraphicsIfNeeded();
   renderUnitCountersIfNeeded();
   renderSpecialZonesIfNeeded();
@@ -16102,6 +16463,243 @@ function deleteSelectedOperationGraphicVertex() {
   return true;
 }
 
+function ensureOperationalLineCounter() {
+  ensureOperationalLineEditorState();
+  const used = new Set((state.operationalLines || []).map((line) => String(line?.id || "")));
+  let counter = Math.max(1, Number(state.operationalLineEditor.counter) || 1);
+  while (used.has(`opl_${counter}`)) {
+    counter += 1;
+  }
+  state.operationalLineEditor.counter = counter;
+}
+
+function appendOperationalLineVertexFromEvent(event) {
+  ensureOperationalLineEditorState();
+  if (!state.operationalLineEditor.active) return false;
+  const coord = getMapLonLatFromEvent(event);
+  if (!coord) return false;
+  state.operationalLineEditor.points.push(coord);
+  state.operationalLinesDirty = true;
+  updateStrategicOverlayUi();
+  if (context) render();
+  return true;
+}
+
+function startOperationalLineDraw({
+  kind = DEFAULT_OPERATIONAL_LINE_KIND,
+  label = "",
+  stylePreset = DEFAULT_OPERATIONAL_LINE_KIND,
+  stroke = "",
+  width = 0,
+  opacity = 1,
+} = {}) {
+  ensureOperationalLineEditorState();
+  state.operationGraphicsEditor.selectedId = null;
+  state.operationalLineEditor.active = true;
+  state.operationalLineEditor.mode = "draw";
+  state.operationalLineEditor.points = [];
+  state.operationalLineEditor.kind = String(kind || DEFAULT_OPERATIONAL_LINE_KIND).trim().toLowerCase();
+  state.operationalLineEditor.label = String(label || "");
+  state.operationalLineEditor.stylePreset = normalizeOperationalLineStylePreset(stylePreset, kind);
+  state.operationalLineEditor.stroke = normalizeOperationGraphicStroke(stroke);
+  state.operationalLineEditor.width = normalizeOperationGraphicWidth(width);
+  state.operationalLineEditor.opacity = normalizeOperationGraphicOpacity(opacity);
+  state.operationalLineEditor.selectedId = null;
+  state.operationalLineEditor.selectedVertexIndex = -1;
+  state.strategicOverlayUi = {
+    ...(state.strategicOverlayUi || {}),
+    activeMode: state.operationalLineEditor.kind,
+    modalEntityType: "operational-line",
+    modalSection: "line",
+  };
+  state.operationalLinesDirty = true;
+  updateStrategicOverlayUi();
+  if (context) render();
+}
+
+function undoOperationalLineVertex() {
+  ensureOperationalLineEditorState();
+  if (!state.operationalLineEditor.active || !state.operationalLineEditor.points.length) return;
+  state.operationalLineEditor.points.pop();
+  state.operationalLinesDirty = true;
+  updateStrategicOverlayUi();
+  if (context) render();
+}
+
+function cancelOperationalLineDraw() {
+  ensureOperationalLineEditorState();
+  state.operationalLineEditor.active = false;
+  state.operationalLineEditor.mode = state.operationalLineEditor.selectedId ? "edit" : "idle";
+  state.operationalLineEditor.points = [];
+  state.operationalLineEditor.selectedVertexIndex = -1;
+  state.strategicOverlayUi = {
+    ...(state.strategicOverlayUi || {}),
+    activeMode: "idle",
+  };
+  state.operationalLinesDirty = true;
+  updateStrategicOverlayUi();
+  if (context) render();
+}
+
+function finishOperationalLineDraw() {
+  ensureOperationalLineEditorState();
+  const kind = String(state.operationalLineEditor.kind || DEFAULT_OPERATIONAL_LINE_KIND);
+  const points = Array.isArray(state.operationalLineEditor.points) ? state.operationalLineEditor.points : [];
+  if (!state.operationalLineEditor.active || points.length < getOperationalLineMinPoints(kind)) {
+    return false;
+  }
+  ensureOperationalLineCounter();
+  const before = captureHistoryState({ strategicOverlay: true });
+  const id = `opl_${state.operationalLineEditor.counter}`;
+  state.operationalLines.push({
+    id,
+    kind,
+    label: String(state.operationalLineEditor.label || "").trim(),
+    points: [...points],
+    stylePreset: normalizeOperationalLineStylePreset(state.operationalLineEditor.stylePreset, kind),
+    stroke: normalizeOperationGraphicStroke(state.operationalLineEditor.stroke) || null,
+    width: normalizeOperationGraphicWidth(state.operationalLineEditor.width),
+    opacity: normalizeOperationGraphicOpacity(state.operationalLineEditor.opacity),
+    attachedCounterIds: [],
+  });
+  state.operationalLineEditor.counter += 1;
+  state.operationalLineEditor.selectedId = id;
+  state.operationalLineEditor.active = false;
+  state.operationalLineEditor.mode = "edit";
+  state.operationalLineEditor.points = [...points];
+  state.operationalLineEditor.selectedVertexIndex = -1;
+  state.strategicOverlayUi = {
+    ...(state.strategicOverlayUi || {}),
+    activeMode: "idle",
+    modalEntityId: id,
+    modalEntityType: "operational-line",
+    modalSection: "line",
+  };
+  state.operationalLinesDirty = true;
+  commitHistoryEntry({
+    kind: "create-operational-line",
+    before,
+    after: captureHistoryState({ strategicOverlay: true }),
+  });
+  markDirty("create-operational-line");
+  updateStrategicOverlayUi();
+  if (context) render();
+  return true;
+}
+
+function selectOperationalLineById(id) {
+  ensureOperationalLineEditorState();
+  state.operationGraphicsEditor.selectedId = null;
+  const selectedId = String(id || "").trim();
+  const line = getOperationalLineById(selectedId);
+  state.operationalLineEditor.selectedId = selectedId || null;
+  if (line) {
+    state.operationalLineEditor.kind = String(line.kind || DEFAULT_OPERATIONAL_LINE_KIND);
+    state.operationalLineEditor.label = String(line.label || "");
+    state.operationalLineEditor.stylePreset = normalizeOperationalLineStylePreset(line.stylePreset, line.kind);
+    state.operationalLineEditor.stroke = normalizeOperationGraphicStroke(line.stroke);
+    state.operationalLineEditor.width = normalizeOperationGraphicWidth(line.width);
+    state.operationalLineEditor.opacity = normalizeOperationGraphicOpacity(line.opacity);
+    state.operationalLineEditor.points = Array.isArray(line.points) ? [...line.points] : [];
+    state.operationalLineEditor.mode = "edit";
+  } else {
+    state.operationalLineEditor.points = [];
+    state.operationalLineEditor.mode = "idle";
+  }
+  state.strategicOverlayUi = {
+    ...(state.strategicOverlayUi || {}),
+    modalEntityId: selectedId,
+    modalEntityType: line ? "operational-line" : "",
+    modalSection: "line",
+  };
+  state.operationalLinesDirty = true;
+  updateStrategicOverlayUi();
+  if (context) render();
+}
+
+function updateSelectedOperationalLine(partial = {}) {
+  ensureOperationalLineEditorState();
+  const selectedId = String(state.operationalLineEditor.selectedId || "").trim();
+  if (!selectedId) return false;
+  const line = getOperationalLineById(selectedId);
+  if (!line) return false;
+  const before = captureHistoryState({ strategicOverlay: true });
+  const nextKind = partial.kind ? String(partial.kind || DEFAULT_OPERATIONAL_LINE_KIND).trim().toLowerCase() : String(line.kind || DEFAULT_OPERATIONAL_LINE_KIND);
+  if (partial.kind !== undefined) line.kind = nextKind;
+  if (partial.label !== undefined) line.label = String(partial.label || "");
+  if (partial.stylePreset !== undefined) line.stylePreset = normalizeOperationalLineStylePreset(partial.stylePreset, nextKind);
+  if (partial.stroke !== undefined) line.stroke = normalizeOperationGraphicStroke(partial.stroke) || null;
+  if (partial.width !== undefined) line.width = normalizeOperationGraphicWidth(partial.width);
+  if (partial.opacity !== undefined) line.opacity = normalizeOperationGraphicOpacity(partial.opacity);
+  if (Array.isArray(partial.attachedCounterIds)) {
+    line.attachedCounterIds = partial.attachedCounterIds.map((value) => String(value || "").trim()).filter(Boolean);
+  }
+  selectOperationalLineById(selectedId);
+  state.operationalLinesDirty = true;
+  commitHistoryEntry({
+    kind: "update-operational-line",
+    before,
+    after: captureHistoryState({ strategicOverlay: true }),
+  });
+  markDirty("update-operational-line");
+  updateStrategicOverlayUi();
+  if (context) render();
+  return true;
+}
+
+function deleteSelectedOperationalLine() {
+  ensureOperationalLineEditorState();
+  const selectedId = String(state.operationalLineEditor.selectedId || "").trim();
+  if (!selectedId) return false;
+  const before = captureHistoryState({ strategicOverlay: true });
+  const nextLines = (state.operationalLines || []).filter((entry) => String(entry?.id || "") !== selectedId);
+  if (nextLines.length === (state.operationalLines || []).length) return false;
+  state.operationalLines = nextLines;
+  state.unitCounters = (state.unitCounters || []).map((counter) => {
+    if (String(counter?.attachment?.lineId || "") !== selectedId) return counter;
+    return {
+      ...counter,
+      attachment: null,
+      layoutAnchor: {
+        ...(counter.layoutAnchor || {}),
+        kind: "feature",
+        key: String(counter.anchor?.featureId || ""),
+      },
+    };
+  });
+  syncOperationalLineAttachedCounterIds();
+  state.operationalLineEditor.selectedId = null;
+  state.operationalLineEditor.points = [];
+  state.operationalLineEditor.mode = "idle";
+  state.operationalLinesDirty = true;
+  state.unitCountersDirty = true;
+  commitHistoryEntry({
+    kind: "delete-operational-line",
+    before,
+    after: captureHistoryState({ strategicOverlay: true }),
+  });
+  markDirty("delete-operational-line");
+  updateStrategicOverlayUi();
+  if (context) render();
+  return true;
+}
+
+function syncOperationalLineAttachedCounterIds() {
+  const attachedByLineId = new Map();
+  (state.unitCounters || []).forEach((counter) => {
+    const lineId = String(counter?.attachment?.lineId || "").trim();
+    if (!lineId) return;
+    if (!attachedByLineId.has(lineId)) {
+      attachedByLineId.set(lineId, []);
+    }
+    attachedByLineId.get(lineId).push(String(counter.id || "").trim());
+  });
+  state.operationalLines = (state.operationalLines || []).map((line) => ({
+    ...line,
+    attachedCounterIds: attachedByLineId.get(String(line.id || "").trim()) || [],
+  }));
+}
+
 function ensureUnitCounterCounter() {
   ensureUnitCounterEditorState();
   const used = new Set((state.unitCounters || []).map((counter) => String(counter?.id || "")));
@@ -16128,6 +16726,12 @@ function placeUnitCounterFromEvent(event) {
     ? resolveUnitCounterNationForPlacement("", state.unitCounterEditor.nationTag)
     : resolveUnitCounterNationForPlacement(featureId, "");
   const preset = getUnitCounterPresetById(state.unitCounterEditor.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID);
+  const attachment = state.unitCounterEditor.attachment?.lineId
+    ? {
+      kind: String(state.unitCounterEditor.attachment.kind || STRATEGIC_COUNTER_ATTACHMENT_KIND).trim().toLowerCase() || STRATEGIC_COUNTER_ATTACHMENT_KIND,
+      lineId: String(state.unitCounterEditor.attachment.lineId || "").trim(),
+    }
+    : null;
   const before = captureHistoryState({ strategicOverlay: true });
   const id = `unit_${state.unitCounterEditor.counter}`;
   const nextToken = String(
@@ -16146,6 +16750,7 @@ function placeUnitCounterFromEvent(event) {
     nationTag: nationResolution.tag,
     nationSource: nationResolution.source,
     presetId: preset.id,
+    iconId: String(state.unitCounterEditor.iconId || preset.iconId || "").trim().toLowerCase(),
     unitType: String(state.unitCounterEditor.unitType || preset.unitType || "").trim().toUpperCase(),
     echelon: String(state.unitCounterEditor.echelon || preset.defaultEchelon || "").trim().toLowerCase(),
     subLabel: String(state.unitCounterEditor.subLabel || "").trim(),
@@ -16163,11 +16768,19 @@ function placeUnitCounterFromEvent(event) {
       lat: coord[1],
       featureId,
     },
+    layoutAnchor: {
+      kind: attachment ? "attachment" : "feature",
+      key: attachment?.lineId || featureId,
+      slotIndex: null,
+    },
+    attachment,
   });
   state.unitCounterEditor.counter += 1;
   state.unitCounterEditor.selectedId = id;
   state.unitCounterEditor.active = false;
+  syncOperationalLineAttachedCounterIds();
   state.unitCountersDirty = true;
+  state.operationalLinesDirty = true;
   commitHistoryEntry({
     kind: "place-unit-counter",
     before,
@@ -16191,6 +16804,8 @@ function startUnitCounterPlacement({
   echelon = "",
   subLabel = "",
   strengthText = "",
+  iconId = "",
+  attachment = null,
   baseFillColor = "",
   organizationPct = DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT,
   equipmentPct = DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT,
@@ -16217,10 +16832,22 @@ function startUnitCounterPlacement({
     ? String(nationSource || "").trim().toLowerCase()
     : "controller";
   state.unitCounterEditor.presetId = preset.id;
+  state.unitCounterEditor.iconId = String(iconId || preset.iconId || "").trim().toLowerCase();
   state.unitCounterEditor.unitType = String(unitType || preset.unitType || "").trim().toUpperCase();
   state.unitCounterEditor.echelon = String(echelon || preset.defaultEchelon || "").trim().toLowerCase();
   state.unitCounterEditor.subLabel = String(subLabel || "");
   state.unitCounterEditor.strengthText = String(strengthText || "");
+  state.unitCounterEditor.layoutAnchor = {
+    kind: attachment?.lineId ? "attachment" : "feature",
+    key: String(attachment?.lineId || ""),
+    slotIndex: null,
+  };
+  state.unitCounterEditor.attachment = attachment?.lineId
+    ? {
+      kind: String(attachment.kind || STRATEGIC_COUNTER_ATTACHMENT_KIND).trim().toLowerCase() || STRATEGIC_COUNTER_ATTACHMENT_KIND,
+      lineId: String(attachment.lineId || "").trim(),
+    }
+    : null;
   state.unitCounterEditor.baseFillColor = normalizedCombatState.baseFillColor;
   state.unitCounterEditor.organizationPct = normalizedCombatState.organizationPct;
   state.unitCounterEditor.equipmentPct = normalizedCombatState.equipmentPct;
@@ -16274,6 +16901,7 @@ function updateSelectedUnitCounter(partial = {}) {
       : "controller";
   }
   if (partial.presetId !== undefined) counter.presetId = String(partial.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toLowerCase() || DEFAULT_UNIT_COUNTER_PRESET_ID;
+  if (partial.iconId !== undefined) counter.iconId = String(partial.iconId || "").trim().toLowerCase();
   if (partial.unitType !== undefined) counter.unitType = String(partial.unitType || "").trim().toUpperCase();
   if (partial.echelon !== undefined) counter.echelon = String(partial.echelon || "").trim().toLowerCase();
   if (partial.subLabel !== undefined) counter.subLabel = String(partial.subLabel || "");
@@ -16288,8 +16916,24 @@ function updateSelectedUnitCounter(partial = {}) {
       : "preset";
   }
   if (partial.size) counter.size = normalizeUnitCounterSizeToken(partial.size || "medium");
+  if (partial.attachment !== undefined) {
+    counter.attachment = partial.attachment?.lineId
+      ? {
+        kind: String(partial.attachment.kind || STRATEGIC_COUNTER_ATTACHMENT_KIND).trim().toLowerCase() || STRATEGIC_COUNTER_ATTACHMENT_KIND,
+        lineId: String(partial.attachment.lineId || "").trim(),
+      }
+      : null;
+    counter.layoutAnchor = {
+      ...(counter.layoutAnchor || {}),
+      kind: counter.attachment ? "attachment" : "feature",
+      key: counter.attachment?.lineId || String(counter.anchor?.featureId || ""),
+      slotIndex: null,
+    };
+  }
+  syncOperationalLineAttachedCounterIds();
   selectUnitCounterById(selectedId);
   state.unitCountersDirty = true;
+  state.operationalLinesDirty = true;
   commitHistoryEntry({
     kind: "update-unit-counter",
     before,
@@ -16310,7 +16954,9 @@ function deleteSelectedUnitCounter() {
   if (nextCounters.length === (state.unitCounters || []).length) return false;
   state.unitCounters = nextCounters;
   state.unitCounterEditor.selectedId = null;
+  syncOperationalLineAttachedCounterIds();
   state.unitCountersDirty = true;
+  state.operationalLinesDirty = true;
   commitHistoryEntry({
     kind: "delete-unit-counter",
     before,
@@ -17452,6 +18098,10 @@ async function handleClick(event) {
     appendSpecialZoneVertexFromEvent(event);
     return;
   }
+  if (state.operationalLineEditor?.active) {
+    appendOperationalLineVertexFromEvent(event);
+    return;
+  }
   if (state.operationGraphicsEditor?.active) {
     appendOperationGraphicVertexFromEvent(event);
     return;
@@ -17799,6 +18449,11 @@ async function handleDoubleClick(event) {
   if (state.specialZoneEditor?.active) {
     if (event?.preventDefault) event.preventDefault();
     finishSpecialZoneDraw();
+    return;
+  }
+  if (state.operationalLineEditor?.active) {
+    if (event?.preventDefault) event.preventDefault();
+    finishOperationalLineDraw();
     return;
   }
   if (state.operationGraphicsEditor?.active) {
@@ -18229,6 +18884,13 @@ export {
   setMapData,
   render,
   autoFillMap,
+  startOperationalLineDraw,
+  undoOperationalLineVertex,
+  finishOperationalLineDraw,
+  cancelOperationalLineDraw,
+  selectOperationalLineById,
+  deleteSelectedOperationalLine,
+  updateSelectedOperationalLine,
   startOperationGraphicDraw,
   undoOperationGraphicVertex,
   finishOperationGraphicDraw,

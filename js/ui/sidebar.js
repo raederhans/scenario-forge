@@ -51,6 +51,12 @@ import {
 } from "../core/releasable_manager.js";
 import { getScenarioCountryDisplayName } from "../core/scenario_country_display.js";
 import { setActivePaletteSource } from "../core/palette_manager.js";
+import {
+  DEFAULT_UNIT_COUNTER_PRESET_ID,
+  getUnitCounterPresetById,
+  UNIT_COUNTER_ECHELONS,
+  UNIT_COUNTER_PRESETS,
+} from "../core/unit_counter_presets.js";
 
 function extractCountryCodeFromId(value) {
   const text = String(value || "").trim().toUpperCase();
@@ -1520,104 +1526,15 @@ function initSidebar({ render } = {}) {
     });
     return { shell, select };
   };
-  const unitCounterPresets = Object.freeze([
-    {
-      id: "INF",
-      label: "Infantry",
-      shortCode: "INF",
-      defaultRenderer: "milstd",
-      baseSidc: "100310001712110000000000000000",
-      shellVariant: "line",
-      defaultEchelon: "BN",
-    },
-    {
-      id: "MOT",
-      label: "Motorized",
-      shortCode: "MOT",
-      defaultRenderer: "milstd",
-      baseSidc: "100310001712120000000000000000",
-      shellVariant: "line",
-      defaultEchelon: "BN",
-    },
-    {
-      id: "MECH",
-      label: "Mechanized",
-      shortCode: "MECH",
-      defaultRenderer: "milstd",
-      baseSidc: "100310001712130000000000000000",
-      shellVariant: "line",
-      defaultEchelon: "BN",
-    },
-    {
-      id: "ARM",
-      label: "Armored",
-      shortCode: "ARM",
-      defaultRenderer: "milstd",
-      baseSidc: "100310001812110000000000000000",
-      shellVariant: "line",
-      defaultEchelon: "REG",
-    },
-    {
-      id: "ART",
-      label: "Artillery",
-      shortCode: "ART",
-      defaultRenderer: "milstd",
-      baseSidc: "100320001312110000000000000000",
-      shellVariant: "support",
-      defaultEchelon: "REG",
-    },
-    {
-      id: "HQ",
-      label: "Headquarters",
-      shortCode: "HQ",
-      defaultRenderer: "game",
-      baseSidc: "100310001012110000000000000000",
-      shellVariant: "command",
-      defaultEchelon: "CORPS",
-    },
-    {
-      id: "GAR",
-      label: "Garrison",
-      shortCode: "GAR",
-      defaultRenderer: "game",
-      baseSidc: "100310001712150000000000000000",
-      shellVariant: "line",
-      defaultEchelon: "CO",
-    },
-    {
-      id: "AIR",
-      label: "Air Wing",
-      shortCode: "AIR",
-      defaultRenderer: "game",
-      baseSidc: "100010000012110000000000000000",
-      shellVariant: "air",
-      defaultEchelon: "WG",
-    },
-    {
-      id: "NAVAL",
-      label: "Naval Group",
-      shortCode: "NAV",
-      defaultRenderer: "game",
-      baseSidc: "100430000012110000000000000000",
-      shellVariant: "naval",
-      defaultEchelon: "TF",
-    },
-  ]);
-  const unitCounterEchelons = Object.freeze([
-    ["", "Auto"],
-    ["TM", "Team"],
-    ["SQ", "Squad"],
-    ["PLT", "Platoon"],
-    ["CO", "Company"],
-    ["BN", "Battalion"],
-    ["REG", "Regiment"],
-    ["BDE", "Brigade"],
-    ["DIV", "Division"],
-    ["CORPS", "Corps"],
-    ["ARMY", "Army"],
-    ["WG", "Wing"],
-    ["TF", "Task Force"],
-  ]);
+  const unitCounterPresets = Object.freeze(UNIT_COUNTER_PRESETS.map((preset) => ({
+    ...preset,
+    id: String(preset.id || "").trim().toUpperCase(),
+    defaultEchelon: String(preset.defaultEchelon || "").trim().toUpperCase(),
+  })));
+  const unitCounterEchelons = Object.freeze(UNIT_COUNTER_ECHELONS.map(([value, label]) => [
+    String(value || "").trim().toUpperCase(),
+    label,
+  ]));
   const unitCounterSizeLabels = Object.freeze({
     small: "Small",
     medium: "Medium",
@@ -1672,7 +1589,11 @@ function initSidebar({ render } = {}) {
   const getUnitCounterPresetMeta = (presetId = "") => {
     const normalizedPresetId = String(presetId || "").trim().toUpperCase();
     return unitCounterPresets.find((preset) => preset.id === normalizedPresetId)
-      || unitCounterPresets[0];
+      || {
+        ...getUnitCounterPresetById(normalizedPresetId || DEFAULT_UNIT_COUNTER_PRESET_ID),
+        id: String(normalizedPresetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toUpperCase(),
+        defaultEchelon: String(getUnitCounterPresetById(normalizedPresetId || DEFAULT_UNIT_COUNTER_PRESET_ID).defaultEchelon || "").trim().toUpperCase(),
+      };
   };
   const inferUnitCounterPresetId = (candidate = {}) => {
     const rawPreset = String(candidate?.presetId || candidate?.unitType || "").trim().toUpperCase();
@@ -1996,8 +1917,73 @@ function initSidebar({ render } = {}) {
     hint.className = "sidebar-tool-hint";
     hint.textContent = t("Operation graphics and unit counters stay in the same frontline workspace and remain project-local.", "ui");
 
+    const workspaceActions = buildRow();
+    workspaceActions.className = "strategic-workspace-actions mt-2";
+    const workspaceOpenBtn = buildButton("strategicOverlayOpenWorkspaceBtn", "Open Workspace");
+    workspaceOpenBtn.classList.add("secondary");
+    const workspaceCloseBtn = buildButton("strategicOverlayCloseWorkspaceBtn", "Close Workspace");
+    workspaceCloseBtn.classList.add("secondary", "hidden");
+    workspaceActions.appendChild(workspaceOpenBtn);
+    workspaceActions.appendChild(workspaceCloseBtn);
+
+    const operationalLineBlock = document.createElement("div");
+    operationalLineBlock.className = "frontline-workbench-block strategic-workspace-section strategic-workspace-section-lines";
+    const operationalLineHeader = document.createElement("div");
+    operationalLineHeader.className = "section-header mt-3";
+    operationalLineHeader.textContent = t("Operational Lines", "ui");
+    const operationalLineHint = document.createElement("p");
+    operationalLineHint.className = "sidebar-tool-hint";
+    operationalLineHint.textContent = t("These are separate from political frontlines and act as your single-line battle planning layer.", "ui");
+    const operationalLineRow = buildRow();
+    operationalLineRow.classList.add("frontline-compact-row");
+    const operationalLineKindSelect = buildSelect("operationalLineKindSelect", [
+      ["frontline", "Frontline"],
+      ["offensive_line", "Offensive Line"],
+      ["spearhead_line", "Spearhead Line"],
+      ["defensive_line", "Defensive Line"],
+    ]);
+    const operationalLineLabelInput = buildInput("operationalLineLabelInput", "Label");
+    operationalLineRow.appendChild(operationalLineKindSelect);
+    operationalLineRow.appendChild(operationalLineLabelInput);
+    operationalLineRow.appendChild(buildButton("operationalLineStartBtn", "Start Draw"));
+
+    const operationalLineStyleRow = buildRow();
+    operationalLineStyleRow.classList.add("frontline-compact-row");
+    const operationalLineStrokeInput = buildInput("operationalLineStrokeInput", "", "color");
+    operationalLineStrokeInput.value = "#7f1d1d";
+    operationalLineStrokeInput.className = "input strategic-inline-color";
+    operationalLineStrokeInput.setAttribute("aria-label", t("Operational line stroke", "ui"));
+    const operationalLineWidthInput = buildInput("operationalLineWidthInput", "Width", "number");
+    operationalLineWidthInput.min = "0";
+    operationalLineWidthInput.max = "16";
+    operationalLineWidthInput.step = "0.2";
+    const operationalLineOpacityInput = buildInput("operationalLineOpacityInput", "Opacity", "number");
+    operationalLineOpacityInput.min = "0";
+    operationalLineOpacityInput.max = "1";
+    operationalLineOpacityInput.step = "0.05";
+    operationalLineStyleRow.appendChild(operationalLineStrokeInput);
+    operationalLineStyleRow.appendChild(operationalLineWidthInput);
+    operationalLineStyleRow.appendChild(operationalLineOpacityInput);
+
+    const operationalLineEditorHint = document.createElement("p");
+    operationalLineEditorHint.id = "operationalLineEditorHint";
+    operationalLineEditorHint.className = "sidebar-tool-hint mt-2";
+    operationalLineEditorHint.textContent = t("Use the bottom command bar for fast entry, or start drawing here for the selected line type.", "ui");
+
+    const operationalLineActions = buildRow();
+    operationalLineActions.className = "sidebar-equal-actions mt-3";
+    operationalLineActions.appendChild(buildButton("operationalLineUndoBtn", "Undo Vertex"));
+    operationalLineActions.appendChild(buildButton("operationalLineFinishBtn", "Finish"));
+    operationalLineActions.appendChild(buildButton("operationalLineCancelBtn", "Cancel"));
+    operationalLineActions.appendChild(buildButton("operationalLineDeleteBtn", "Delete Selected"));
+
+    const operationalLineList = document.createElement("select");
+    operationalLineList.id = "operationalLineList";
+    operationalLineList.className = "select-input mt-2";
+    operationalLineList.size = 4;
+
     const graphicsBlock = document.createElement("div");
-    graphicsBlock.className = "frontline-workbench-block";
+    graphicsBlock.className = "frontline-workbench-block strategic-workspace-section strategic-workspace-section-graphics";
     const graphicsHeader = document.createElement("div");
     graphicsHeader.className = "section-header mt-3";
     graphicsHeader.textContent = t("Operation Graphics", "ui");
@@ -2096,7 +2082,7 @@ function initSidebar({ render } = {}) {
     graphicsAdvanced.appendChild(graphicsAdvancedBody);
 
     const countersBlock = document.createElement("div");
-    countersBlock.className = "frontline-workbench-block";
+    countersBlock.className = "frontline-workbench-block strategic-workspace-section strategic-workspace-section-counters";
     const unitHeader = document.createElement("div");
     unitHeader.className = "section-header mt-4";
     unitHeader.textContent = t("Unit Counters", "ui");
@@ -2134,11 +2120,13 @@ function initSidebar({ render } = {}) {
       ["manual", "Nation: Manual"],
     ]);
     const unitNationSelect = buildSelect("unitCounterNationSelect", [["", "Auto from placement"]]);
+    const unitAttachmentSelect = buildSelect("unitCounterAttachmentSelect", [["", "Anchor: Province / Free"]]);
     const unitEchelonSelect = buildSelect("unitCounterEchelonSelect", unitCounterEchelons);
     const unitLabelInput = buildInput("unitCounterLabelInput", "Counter Label");
     unitPresetNationRow.appendChild(unitPresetSelect);
     unitPresetNationRow.appendChild(unitNationModeSelect);
     unitPresetNationRow.appendChild(unitNationSelect);
+    unitPresetNationRow.appendChild(unitAttachmentSelect);
     unitPresetNationRow.appendChild(unitEchelonSelect);
     unitPresetNationRow.appendChild(unitLabelInput);
 
@@ -2293,6 +2281,15 @@ function initSidebar({ render } = {}) {
 
     strategicOverlaySection.appendChild(title);
     strategicOverlaySection.appendChild(hint);
+    strategicOverlaySection.appendChild(workspaceActions);
+    operationalLineBlock.appendChild(operationalLineHeader);
+    operationalLineBlock.appendChild(operationalLineHint);
+    operationalLineBlock.appendChild(operationalLineRow);
+    operationalLineBlock.appendChild(operationalLineStyleRow);
+    operationalLineBlock.appendChild(operationalLineEditorHint);
+    operationalLineBlock.appendChild(operationalLineActions);
+    operationalLineBlock.appendChild(operationalLineList);
+    strategicOverlaySection.appendChild(operationalLineBlock);
     graphicsBlock.appendChild(graphicsHeader);
     graphicsBlock.appendChild(graphicsHint);
     graphicsBlock.appendChild(graphicsRow);
@@ -2318,6 +2315,28 @@ function initSidebar({ render } = {}) {
   if (strategicOverlaySection && frontlineTabStack && strategicOverlaySection.parentElement !== frontlineTabStack) {
     strategicOverlaySection.classList.add("frontline-tab-card");
     frontlineTabStack.appendChild(strategicOverlaySection);
+  }
+
+  let strategicWorkspaceBackdrop = document.getElementById("strategicWorkspaceBackdrop");
+  if (!strategicWorkspaceBackdrop) {
+    strategicWorkspaceBackdrop = document.createElement("div");
+    strategicWorkspaceBackdrop.id = "strategicWorkspaceBackdrop";
+    strategicWorkspaceBackdrop.className = "strategic-workspace-backdrop hidden";
+    document.body.appendChild(strategicWorkspaceBackdrop);
+  }
+
+  let strategicCommandBar = document.getElementById("strategicCommandBar");
+  if (!strategicCommandBar) {
+    strategicCommandBar = document.createElement("div");
+    strategicCommandBar.id = "strategicCommandBar";
+    strategicCommandBar.className = "strategic-command-bar";
+    strategicCommandBar.innerHTML = `
+      <button id="strategicCommandFrontlineBtn" type="button" class="strategic-command-btn" data-line-kind="frontline">${t("作战前线", "ui")}</button>
+      <button id="strategicCommandOffensiveBtn" type="button" class="strategic-command-btn" data-line-kind="offensive_line">${t("进攻线", "ui")}</button>
+      <button id="strategicCommandSpearheadBtn" type="button" class="strategic-command-btn" data-line-kind="spearhead_line">${t("穿插线", "ui")}</button>
+      <button id="strategicCommandDefensiveBtn" type="button" class="strategic-command-btn" data-line-kind="defensive_line">${t("防守线", "ui")}</button>
+    `;
+    document.body.appendChild(strategicCommandBar);
   }
 
   let scenarioAuditSection = document.getElementById("scenarioAuditPanel");
@@ -2391,6 +2410,22 @@ function initSidebar({ render } = {}) {
   const frontlineStyleChoiceButtons = Array.from(document.querySelectorAll("[data-frontline-style-choice]"));
   const strategicFrontlineLabelsToggle = document.getElementById("strategicFrontlineLabelsToggle");
   const strategicLabelPlacementSelect = document.getElementById("strategicLabelPlacementSelect");
+  const strategicWorkspaceBackdropEl = document.getElementById("strategicWorkspaceBackdrop");
+  const strategicCommandButtons = Array.from(document.querySelectorAll("#strategicCommandBar .strategic-command-btn"));
+  const strategicOverlayOpenWorkspaceBtn = document.getElementById("strategicOverlayOpenWorkspaceBtn");
+  const strategicOverlayCloseWorkspaceBtn = document.getElementById("strategicOverlayCloseWorkspaceBtn");
+  const operationalLineKindSelect = document.getElementById("operationalLineKindSelect");
+  const operationalLineLabelInput = document.getElementById("operationalLineLabelInput");
+  const operationalLineStrokeInput = document.getElementById("operationalLineStrokeInput");
+  const operationalLineWidthInput = document.getElementById("operationalLineWidthInput");
+  const operationalLineOpacityInput = document.getElementById("operationalLineOpacityInput");
+  const operationalLineEditorHint = document.getElementById("operationalLineEditorHint");
+  const operationalLineStartBtn = document.getElementById("operationalLineStartBtn");
+  const operationalLineUndoBtn = document.getElementById("operationalLineUndoBtn");
+  const operationalLineFinishBtn = document.getElementById("operationalLineFinishBtn");
+  const operationalLineCancelBtn = document.getElementById("operationalLineCancelBtn");
+  const operationalLineDeleteBtn = document.getElementById("operationalLineDeleteBtn");
+  const operationalLineList = document.getElementById("operationalLineList");
   const operationGraphicKindSelect = document.getElementById("operationGraphicKindSelect");
   const operationGraphicLabelInput = document.getElementById("operationGraphicLabelInput");
   const operationGraphicPresetSelect = document.getElementById("operationGraphicPresetSelect");
@@ -2412,6 +2447,7 @@ function initSidebar({ render } = {}) {
   const unitCounterPresetSelect = document.getElementById("unitCounterPresetSelect");
   const unitCounterNationModeSelect = document.getElementById("unitCounterNationModeSelect");
   const unitCounterNationSelect = document.getElementById("unitCounterNationSelect");
+  const unitCounterAttachmentSelect = document.getElementById("unitCounterAttachmentSelect");
   const unitCounterRendererSelect = document.getElementById("unitCounterRendererSelect");
   const unitCounterSizeSelect = document.getElementById("unitCounterSizeSelect");
   const unitCounterEchelonSelect = document.getElementById("unitCounterEchelonSelect");
@@ -6075,9 +6111,96 @@ function initSidebar({ render } = {}) {
     }
   };
 
+  const setStrategicWorkspaceModalState = (nextOpen, section = "line") => {
+    if (!state.strategicOverlayUi || typeof state.strategicOverlayUi !== "object") {
+      state.strategicOverlayUi = {};
+    }
+    state.strategicOverlayUi.modalOpen = !!nextOpen;
+    state.strategicOverlayUi.modalSection = section === "counter" ? "counter" : "line";
+    if (strategicOverlaySection) {
+      strategicOverlaySection.classList.toggle("is-workspace-modal", !!nextOpen);
+      strategicOverlaySection.dataset.workspaceSection = section === "counter" ? "counter" : "line";
+    }
+    if (strategicWorkspaceBackdropEl) {
+      strategicWorkspaceBackdropEl.classList.toggle("hidden", !nextOpen);
+    }
+    if (strategicOverlayOpenWorkspaceBtn) {
+      strategicOverlayOpenWorkspaceBtn.classList.toggle("hidden", !!nextOpen);
+    }
+    if (strategicOverlayCloseWorkspaceBtn) {
+      strategicOverlayCloseWorkspaceBtn.classList.toggle("hidden", !nextOpen);
+    }
+  };
+
   const refreshStrategicOverlayUI = () => {
     const annotationView = normalizeAnnotationView(state.annotationView);
     refreshFrontlineTabUI();
+    setStrategicWorkspaceModalState(
+      !!state.strategicOverlayUi?.modalOpen,
+      String(state.strategicOverlayUi?.modalSection || "line")
+    );
+
+    const operationalLineEditor = state.operationalLineEditor || {};
+    const selectedOperationalLine = (state.operationalLines || []).find(
+      (line) => String(line?.id || "") === String(operationalLineEditor.selectedId || "")
+    ) || null;
+    const selectedOperationalLineId = String(operationalLineEditor.selectedId || "");
+    const isOperationalLineDrawing = !!operationalLineEditor.active;
+    const hasSelectedOperationalLine = !!selectedOperationalLineId && !!selectedOperationalLine;
+    const operationalLineKind = String(
+      hasSelectedOperationalLine && !isOperationalLineDrawing
+        ? (selectedOperationalLine?.kind || "frontline")
+        : (operationalLineEditor.kind || selectedOperationalLine?.kind || "frontline")
+    );
+    const operationalLineStroke = String(
+      hasSelectedOperationalLine && !isOperationalLineDrawing
+        ? (selectedOperationalLine?.stroke || "")
+        : (operationalLineEditor.stroke || selectedOperationalLine?.stroke || "")
+    ).trim();
+    const operationalLineWidth = hasSelectedOperationalLine && !isOperationalLineDrawing
+      ? Number(selectedOperationalLine?.width || 0)
+      : (Number.isFinite(Number(operationalLineEditor.width)) ? Number(operationalLineEditor.width) : Number(selectedOperationalLine?.width || 0));
+    const operationalLineOpacity = hasSelectedOperationalLine && !isOperationalLineDrawing
+      ? Number(selectedOperationalLine?.opacity ?? 1)
+      : (Number.isFinite(Number(operationalLineEditor.opacity)) ? Number(operationalLineEditor.opacity) : Number(selectedOperationalLine?.opacity ?? 1));
+    if (operationalLineKindSelect) operationalLineKindSelect.value = operationalLineKind;
+    if (operationalLineLabelInput) operationalLineLabelInput.value = String(operationalLineEditor.label || selectedOperationalLine?.label || "");
+    if (operationalLineStrokeInput) operationalLineStrokeInput.value = operationalLineStroke || "#7f1d1d";
+    if (operationalLineWidthInput) operationalLineWidthInput.value = String(Number(operationalLineWidth || 0).toFixed(1).replace(/\.0$/, ""));
+    if (operationalLineOpacityInput) {
+      operationalLineOpacityInput.value = String(Number(operationalLineOpacity || 0).toFixed(2).replace(/0+$/, "").replace(/\.$/, ""));
+    }
+    if (operationalLineList) {
+      operationalLineList.replaceChildren();
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = t("No operational lines", "ui");
+      operationalLineList.appendChild(placeholder);
+      (state.operationalLines || []).forEach((line) => {
+        const option = document.createElement("option");
+        option.value = String(line.id || "");
+        option.textContent = `${String(line.label || line.kind || line.id || "").trim()} (${line.kind})`;
+        operationalLineList.appendChild(option);
+      });
+      operationalLineList.value = selectedOperationalLineId;
+    }
+    if (operationalLineStartBtn) operationalLineStartBtn.disabled = isOperationalLineDrawing;
+    if (operationalLineUndoBtn) operationalLineUndoBtn.disabled = !isOperationalLineDrawing;
+    if (operationalLineFinishBtn) operationalLineFinishBtn.disabled = !isOperationalLineDrawing;
+    if (operationalLineCancelBtn) operationalLineCancelBtn.disabled = !isOperationalLineDrawing;
+    if (operationalLineDeleteBtn) operationalLineDeleteBtn.disabled = !hasSelectedOperationalLine;
+    if (operationalLineEditorHint) {
+      operationalLineEditorHint.textContent = isOperationalLineDrawing
+        ? t("Click the map to place vertices. Double-click or press Finish to commit the operational line.", "ui")
+        : hasSelectedOperationalLine
+        ? t("Selected line can be restyled, relabeled, or deleted. Use the map to compose new lines.", "ui")
+        : t("Choose a line type below or from the bottom command bar to begin drawing.", "ui");
+    }
+    strategicCommandButtons.forEach((button) => {
+      const active = String(button.dataset.lineKind || "") === String(state.strategicOverlayUi?.activeMode || "");
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+    });
 
     const operationEditor = state.operationGraphicsEditor || {};
     const selectedGraphic = (state.operationGraphics || []).find(
@@ -6234,6 +6357,21 @@ function initSidebar({ render } = {}) {
       });
       unitCounterNationSelect.value = selectedNationValue;
       unitCounterNationSelect.disabled = effectiveNationSource !== "manual";
+    }
+    if (unitCounterAttachmentSelect) {
+      const selectedAttachmentLineId = String(unitEditor.attachment?.lineId || selectedCounter?.attachment?.lineId || "").trim();
+      unitCounterAttachmentSelect.replaceChildren();
+      const detachedOption = document.createElement("option");
+      detachedOption.value = "";
+      detachedOption.textContent = t("Anchor: Province / Free", "ui");
+      unitCounterAttachmentSelect.appendChild(detachedOption);
+      (state.operationalLines || []).forEach((line) => {
+        const option = document.createElement("option");
+        option.value = String(line.id || "");
+        option.textContent = `${line.label || line.kind || line.id} (${line.kind})`;
+        unitCounterAttachmentSelect.appendChild(option);
+      });
+      unitCounterAttachmentSelect.value = selectedAttachmentLineId;
     }
     if (unitCounterRendererSelect) {
       unitCounterRendererSelect.value = effectiveRenderer;
@@ -6434,6 +6572,194 @@ function initSidebar({ render } = {}) {
       );
     });
     strategicLabelPlacementSelect.dataset.bound = "true";
+  }
+
+  if (strategicOverlayOpenWorkspaceBtn && !strategicOverlayOpenWorkspaceBtn.dataset.bound) {
+    strategicOverlayOpenWorkspaceBtn.addEventListener("click", () => {
+      const preferredSection = state.unitCounterEditor?.selectedId && !state.operationalLineEditor?.selectedId
+        ? "counter"
+        : String(state.strategicOverlayUi?.modalSection || "line");
+      setStrategicWorkspaceModalState(true, preferredSection);
+    });
+    strategicOverlayOpenWorkspaceBtn.dataset.bound = "true";
+  }
+  if (strategicOverlayCloseWorkspaceBtn && !strategicOverlayCloseWorkspaceBtn.dataset.bound) {
+    strategicOverlayCloseWorkspaceBtn.addEventListener("click", () => {
+      setStrategicWorkspaceModalState(false, String(state.strategicOverlayUi?.modalSection || "line"));
+    });
+    strategicOverlayCloseWorkspaceBtn.dataset.bound = "true";
+  }
+  if (strategicWorkspaceBackdropEl && !strategicWorkspaceBackdropEl.dataset.bound) {
+    strategicWorkspaceBackdropEl.addEventListener("click", () => {
+      setStrategicWorkspaceModalState(false, String(state.strategicOverlayUi?.modalSection || "line"));
+    });
+    strategicWorkspaceBackdropEl.dataset.bound = "true";
+  }
+  strategicCommandButtons.forEach((button) => {
+    if (button.dataset.bound) return;
+    button.addEventListener("click", () => {
+      const nextKind = String(button.dataset.lineKind || "frontline");
+      state.strategicOverlayUi = {
+        ...(state.strategicOverlayUi || {}),
+        activeMode: nextKind,
+        modalSection: "line",
+      };
+      if (operationalLineKindSelect) operationalLineKindSelect.value = nextKind;
+      mapRenderer.startOperationalLineDraw({
+        kind: nextKind,
+        stylePreset: nextKind,
+        label: String(operationalLineLabelInput?.value || ""),
+        stroke: String(operationalLineStrokeInput?.value || ""),
+        width: Number(operationalLineWidthInput?.value || 0),
+        opacity: Number(operationalLineOpacityInput?.value || 1),
+      });
+      refreshStrategicOverlayUI();
+    });
+    button.dataset.bound = "true";
+  });
+
+  if (operationalLineKindSelect && !operationalLineKindSelect.dataset.bound) {
+    operationalLineKindSelect.addEventListener("change", (event) => {
+      const nextKind = String(event.target.value || "frontline");
+      state.operationalLineEditor.kind = nextKind;
+      state.operationalLineEditor.stylePreset = nextKind;
+      state.strategicOverlayUi = {
+        ...(state.strategicOverlayUi || {}),
+        activeMode: nextKind,
+        modalSection: "line",
+      };
+      if (!state.operationalLineEditor.active && state.operationalLineEditor.selectedId) {
+        mapRenderer.updateSelectedOperationalLine({ kind: nextKind, stylePreset: nextKind });
+      } else if (render) {
+        render();
+      }
+      refreshStrategicOverlayUI();
+    });
+    operationalLineKindSelect.dataset.bound = "true";
+  }
+  if (operationalLineLabelInput && !operationalLineLabelInput.dataset.bound) {
+    operationalLineLabelInput.addEventListener("input", (event) => {
+      state.operationalLineEditor.label = String(event.target.value || "");
+    });
+    operationalLineLabelInput.addEventListener("change", (event) => {
+      const nextLabel = String(event.target.value || "");
+      state.operationalLineEditor.label = nextLabel;
+      if (!state.operationalLineEditor.active && state.operationalLineEditor.selectedId) {
+        mapRenderer.updateSelectedOperationalLine({ label: nextLabel });
+      } else if (render) {
+        render();
+      }
+      refreshStrategicOverlayUI();
+    });
+    operationalLineLabelInput.dataset.bound = "true";
+  }
+  if (operationalLineStrokeInput && !operationalLineStrokeInput.dataset.bound) {
+    operationalLineStrokeInput.addEventListener("change", (event) => {
+      const nextStroke = String(event.target.value || "");
+      state.operationalLineEditor.stroke = nextStroke;
+      if (!state.operationalLineEditor.active && state.operationalLineEditor.selectedId) {
+        mapRenderer.updateSelectedOperationalLine({ stroke: nextStroke });
+      } else if (render) {
+        render();
+      }
+      refreshStrategicOverlayUI();
+    });
+    operationalLineStrokeInput.dataset.bound = "true";
+  }
+  if (operationalLineWidthInput && !operationalLineWidthInput.dataset.bound) {
+    operationalLineWidthInput.addEventListener("change", (event) => {
+      const nextWidth = Number(event.target.value || 0);
+      state.operationalLineEditor.width = nextWidth;
+      if (!state.operationalLineEditor.active && state.operationalLineEditor.selectedId) {
+        mapRenderer.updateSelectedOperationalLine({ width: nextWidth });
+      } else if (render) {
+        render();
+      }
+      refreshStrategicOverlayUI();
+    });
+    operationalLineWidthInput.dataset.bound = "true";
+  }
+  if (operationalLineOpacityInput && !operationalLineOpacityInput.dataset.bound) {
+    operationalLineOpacityInput.addEventListener("change", (event) => {
+      const nextOpacity = Number(event.target.value || 1);
+      state.operationalLineEditor.opacity = nextOpacity;
+      if (!state.operationalLineEditor.active && state.operationalLineEditor.selectedId) {
+        mapRenderer.updateSelectedOperationalLine({ opacity: nextOpacity });
+      } else if (render) {
+        render();
+      }
+      refreshStrategicOverlayUI();
+    });
+    operationalLineOpacityInput.dataset.bound = "true";
+  }
+  if (operationalLineStartBtn && !operationalLineStartBtn.dataset.bound) {
+    operationalLineStartBtn.addEventListener("click", () => {
+      const nextKind = String(operationalLineKindSelect?.value || state.operationalLineEditor?.kind || "frontline");
+      state.strategicOverlayUi = {
+        ...(state.strategicOverlayUi || {}),
+        activeMode: nextKind,
+        modalSection: "line",
+      };
+      mapRenderer.startOperationalLineDraw({
+        kind: nextKind,
+        label: String(operationalLineLabelInput?.value || state.operationalLineEditor?.label || ""),
+        stylePreset: nextKind,
+        stroke: String(operationalLineStrokeInput?.value || state.operationalLineEditor?.stroke || ""),
+        width: Number(operationalLineWidthInput?.value || state.operationalLineEditor?.width || 0),
+        opacity: Number(operationalLineOpacityInput?.value || state.operationalLineEditor?.opacity || 1),
+      });
+      refreshStrategicOverlayUI();
+    });
+    operationalLineStartBtn.dataset.bound = "true";
+  }
+  if (operationalLineUndoBtn && !operationalLineUndoBtn.dataset.bound) {
+    operationalLineUndoBtn.addEventListener("click", () => {
+      mapRenderer.undoOperationalLineVertex();
+      refreshStrategicOverlayUI();
+    });
+    operationalLineUndoBtn.dataset.bound = "true";
+  }
+  if (operationalLineFinishBtn && !operationalLineFinishBtn.dataset.bound) {
+    operationalLineFinishBtn.addEventListener("click", () => {
+      mapRenderer.finishOperationalLineDraw();
+      refreshStrategicOverlayUI();
+    });
+    operationalLineFinishBtn.dataset.bound = "true";
+  }
+  if (operationalLineCancelBtn && !operationalLineCancelBtn.dataset.bound) {
+    operationalLineCancelBtn.addEventListener("click", () => {
+      mapRenderer.cancelOperationalLineDraw();
+      refreshStrategicOverlayUI();
+    });
+    operationalLineCancelBtn.dataset.bound = "true";
+  }
+  if (operationalLineList && !operationalLineList.dataset.bound) {
+    operationalLineList.addEventListener("change", (event) => {
+      state.strategicOverlayUi = {
+        ...(state.strategicOverlayUi || {}),
+        modalSection: "line",
+      };
+      mapRenderer.selectOperationalLineById(String(event.target.value || ""));
+      refreshStrategicOverlayUI();
+    });
+    operationalLineList.dataset.bound = "true";
+  }
+  if (operationalLineDeleteBtn && !operationalLineDeleteBtn.dataset.bound) {
+    operationalLineDeleteBtn.addEventListener("click", async () => {
+      if (!state.operationalLineEditor?.selectedId) return;
+      const confirmed = await showAppDialog({
+        title: t("Delete Selected", "ui"),
+        message: t("Delete the selected operational line?", "ui"),
+        details: t("Attached counters will fall back to province or free anchors.", "ui"),
+        confirmLabel: t("Delete Line", "ui"),
+        cancelLabel: t("Cancel", "ui"),
+        tone: "warning",
+      });
+      if (!confirmed) return;
+      mapRenderer.deleteSelectedOperationalLine();
+      refreshStrategicOverlayUI();
+    });
+    operationalLineDeleteBtn.dataset.bound = "true";
   }
 
   if (operationGraphicKindSelect && !operationGraphicKindSelect.dataset.bound) {
@@ -6685,6 +7011,21 @@ function initSidebar({ render } = {}) {
     });
     unitCounterNationSelect.dataset.bound = "true";
   }
+  if (unitCounterAttachmentSelect && !unitCounterAttachmentSelect.dataset.bound) {
+    unitCounterAttachmentSelect.addEventListener("change", (event) => {
+      const nextLineId = String(event.target.value || "").trim();
+      state.unitCounterEditor.attachment = nextLineId
+        ? { kind: "operational-line", lineId: nextLineId }
+        : null;
+      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
+        mapRenderer.updateSelectedUnitCounter({ attachment: state.unitCounterEditor.attachment });
+      } else if (render) {
+        render();
+      }
+      refreshStrategicOverlayUI();
+    });
+    unitCounterAttachmentSelect.dataset.bound = "true";
+  }
   if (unitCounterRendererSelect && !unitCounterRendererSelect.dataset.bound) {
     unitCounterRendererSelect.addEventListener("change", (event) => {
       const nextRenderer = String(event.target.value || "game");
@@ -6795,6 +7136,11 @@ function initSidebar({ render } = {}) {
   }
   if (unitCounterDetailToggleBtn && !unitCounterDetailToggleBtn.dataset.bound) {
     unitCounterDetailToggleBtn.addEventListener("click", () => {
+      state.strategicOverlayUi = {
+        ...(state.strategicOverlayUi || {}),
+        modalSection: "counter",
+        modalEntityType: "counter",
+      };
       const nextPinnedOpen = !(unitCounterDetailDrawer?.dataset.pinnedOpen === "true");
       if (unitCounterDetailDrawer) {
         unitCounterDetailDrawer.dataset.pinnedOpen = nextPinnedOpen ? "true" : "false";
@@ -6937,6 +7283,12 @@ function initSidebar({ render } = {}) {
         echelon: String(unitCounterEchelonSelect?.value || state.unitCounterEditor?.echelon || nextPreset.defaultEchelon || "").trim().toUpperCase(),
         subLabel: String(unitCounterSubLabelInput?.value || state.unitCounterEditor?.subLabel || ""),
         strengthText: String(unitCounterStrengthInput?.value || state.unitCounterEditor?.strengthText || ""),
+        attachment: String(unitCounterAttachmentSelect?.value || state.unitCounterEditor?.attachment?.lineId || "").trim()
+          ? {
+            kind: "operational-line",
+            lineId: String(unitCounterAttachmentSelect?.value || state.unitCounterEditor?.attachment?.lineId || "").trim(),
+          }
+          : null,
         baseFillColor: String(state.unitCounterEditor?.baseFillColor || ""),
         organizationPct: clampUnitCounterStatValue(state.unitCounterEditor?.organizationPct, 78),
         equipmentPct: clampUnitCounterStatValue(state.unitCounterEditor?.equipmentPct, 74),
@@ -6956,6 +7308,11 @@ function initSidebar({ render } = {}) {
   }
   if (unitCounterList && !unitCounterList.dataset.bound) {
     unitCounterList.addEventListener("change", (event) => {
+      state.strategicOverlayUi = {
+        ...(state.strategicOverlayUi || {}),
+        modalEntityType: "counter",
+        modalSection: "counter",
+      };
       mapRenderer.selectUnitCounterById(String(event.target.value || ""));
       refreshStrategicOverlayUI();
     });
@@ -7237,11 +7594,27 @@ function initSidebar({ render } = {}) {
           ...(state.annotationView || {}),
           ...(data.annotationView || {}),
         });
+        state.operationalLines = Array.isArray(data.operationalLines) ? data.operationalLines : [];
         state.operationGraphics = Array.isArray(data.operationGraphics) ? data.operationGraphics : [];
         state.unitCounters = Array.isArray(data.unitCounters) ? data.unitCounters : [];
+        state.operationalLineEditor = {
+          active: false,
+          mode: "idle",
+          points: [],
+          kind: "frontline",
+          label: "",
+          stylePreset: "frontline",
+          stroke: "",
+          width: 0,
+          opacity: 1,
+          selectedId: null,
+          selectedVertexIndex: -1,
+          counter: 1,
+        };
         state.operationGraphicsEditor = {
           active: false,
           mode: "idle",
+          collection: "operationGraphics",
           points: [],
           kind: "attack",
           label: "",
@@ -7261,11 +7634,14 @@ function initSidebar({ render } = {}) {
           symbolCode: "",
           nationTag: "",
           nationSource: "controller",
-          presetId: "INF",
+          presetId: "inf",
+          iconId: "",
           unitType: "",
           echelon: "",
           subLabel: "",
           strengthText: "",
+          layoutAnchor: { kind: "feature", key: "", slotIndex: null },
+          attachment: null,
           baseFillColor: "",
           organizationPct: 78,
           equipmentPct: 74,
@@ -7275,7 +7651,15 @@ function initSidebar({ render } = {}) {
           selectedId: null,
           counter: 1,
         };
+        state.strategicOverlayUi = {
+          activeMode: "idle",
+          modalOpen: false,
+          modalSection: "line",
+          modalEntityId: "",
+          modalEntityType: "",
+        };
         invalidateFrontlineOverlayState();
+        state.operationalLinesDirty = true;
         state.operationGraphicsDirty = true;
         state.unitCountersDirty = true;
         state.specialZones = data.specialZones || {};

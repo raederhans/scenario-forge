@@ -139,6 +139,7 @@ test("strategic frontline overlay reacts to controller changes", async ({ page }
       strategicInset: panelRect && strategicRect ? strategicRect.left - panelRect.left : 0,
       stackInset: panelRect && stackRect ? stackRect.left - panelRect.left : 0,
       workbenchBlockCount: document.querySelectorAll("#strategicOverlayPanel .frontline-workbench-block").length,
+      commandBarButtonCount: document.querySelectorAll("#strategicCommandBar .strategic-command-btn").length,
       styleChoiceCount: document.querySelectorAll("[data-frontline-style-choice]").length,
       counterPreviewWidth: previewRect?.width || 0,
       counterPreviewHeight: previewRect?.height || 0,
@@ -151,7 +152,8 @@ test("strategic frontline overlay reacts to controller changes", async ({ page }
   expect(frontlineLayout.frontlineInset).toBeGreaterThanOrEqual(0);
   expect(frontlineLayout.strategicInset).toBeGreaterThanOrEqual(0);
   expect(frontlineLayout.stackGap).toBeGreaterThan(0);
-  expect(frontlineLayout.workbenchBlockCount).toBe(2);
+  expect(frontlineLayout.workbenchBlockCount).toBe(3);
+  expect(frontlineLayout.commandBarButtonCount).toBe(4);
   expect(frontlineLayout.styleChoiceCount).toBe(3);
   expect(frontlineLayout.counterPreviewWidth).toBeGreaterThan(60);
   expect(frontlineLayout.counterPreviewWidth).toBeLessThan(420);

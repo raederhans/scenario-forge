@@ -167,6 +167,36 @@ function normalizeOperationGraphics(rawGraphics) {
     .filter(Boolean);
 }
 
+function normalizeOperationalLines(rawLines) {
+  if (!Array.isArray(rawLines)) return [];
+  return rawLines
+    .map((entry, index) => {
+      const raw = entry && typeof entry === "object" ? entry : {};
+      const kind = String(raw.kind || "frontline").trim().toLowerCase();
+      const points = Array.isArray(raw.points)
+        ? raw.points.map((point) => normalizeProjectCoordinatePair(point)).filter(Boolean)
+        : [];
+      if (!["frontline", "offensive_line", "spearhead_line", "defensive_line"].includes(kind)) return null;
+      if (points.length < 2) return null;
+      const stroke = normalizeProjectHexColor(raw.stroke) || null;
+      const attachedCounterIds = Array.isArray(raw.attachedCounterIds)
+        ? raw.attachedCounterIds.map((value) => String(value || "").trim()).filter(Boolean)
+        : [];
+      return {
+        id: String(raw.id || `opl_${index + 1}`).trim() || `opl_${index + 1}`,
+        kind,
+        label: String(raw.label || "").trim(),
+        points,
+        stylePreset: String(raw.stylePreset || kind).trim().toLowerCase() || kind,
+        stroke,
+        width: clamp(Number.isFinite(Number(raw.width)) ? Number(raw.width) : 0, 0, 16),
+        opacity: clamp(Number.isFinite(Number(raw.opacity)) ? Number(raw.opacity) : 1, 0, 1),
+        attachedCounterIds,
+      };
+    })
+    .filter(Boolean);
+}
+
 function normalizeUnitCounterNationSource(value) {
   const source = String(value || "").trim().toLowerCase();
   return ["controller", "owner", "active", "manual"].includes(source) ? source : "controller";
@@ -184,8 +214,20 @@ function normalizeUnitCounters(rawCounters) {
       const renderer = String(raw.renderer || "game").trim().toLowerCase() === "milstd" ? "milstd" : "game";
       const size = String(raw.size || "medium").trim().toLowerCase();
       const sidc = String(raw.sidc || raw.symbolCode || raw.templateId || "").trim().toUpperCase();
-      const presetId = String(raw.presetId || raw.templateId || "").trim();
+      const presetId = String(raw.presetId || raw.templateId || "").trim().toLowerCase();
       const nationTag = String(raw.nationTag || raw.countryTag || raw.ownerTag || "").trim().toUpperCase();
+      const layoutAnchorSource = raw.layoutAnchor && typeof raw.layoutAnchor === "object" ? raw.layoutAnchor : {};
+      const attachmentSource = raw.attachment && typeof raw.attachment === "object" ? raw.attachment : {};
+      const layoutAnchorSlot = Number.isInteger(Number(layoutAnchorSource.slotIndex))
+        ? Math.max(0, Math.round(Number(layoutAnchorSource.slotIndex)))
+        : null;
+      const attachmentLineId = String(
+        attachmentSource.lineId
+        || attachmentSource.operationalLineId
+        || attachmentSource.targetId
+        || ""
+      ).trim();
+      const attachmentKind = String(attachmentSource.kind || "").trim().toLowerCase() || (attachmentLineId ? "operational-line" : "");
       return {
         id: String(raw.id || `unit_${index + 1}`).trim() || `unit_${index + 1}`,
         renderer,
@@ -196,6 +238,7 @@ function normalizeUnitCounters(rawCounters) {
         nationSource: normalizeUnitCounterNationSource(raw.nationSource),
         presetId,
         unitType: String(raw.unitType || presetId || "").trim(),
+        iconId: String(raw.iconId || "").trim().toLowerCase(),
         echelon: String(raw.echelon || "").trim(),
         subLabel: String(raw.subLabel || "").trim(),
         strengthText: String(raw.strengthText || "").trim(),
@@ -207,6 +250,17 @@ function normalizeUnitCounters(rawCounters) {
           lat: clamp(lat, -90, 90),
           featureId: String(anchorSource.featureId || "").trim(),
         },
+        layoutAnchor: {
+          kind: String(layoutAnchorSource.kind || (attachmentLineId ? "attachment" : "feature")).trim().toLowerCase() || "feature",
+          key: String(layoutAnchorSource.key || anchorSource.featureId || "").trim(),
+          slotIndex: layoutAnchorSlot,
+        },
+        attachment: attachmentLineId
+          ? {
+            kind: attachmentKind,
+            lineId: attachmentLineId,
+          }
+          : null,
       };
     })
     .filter(Boolean);
@@ -216,7 +270,7 @@ class FileManager {
   static exportProject(appState) {
     if (!appState) return;
     const payload = {
-      schemaVersion: 18,
+      schemaVersion: 19,
       countryBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
       featureOverrides: appState.visualOverrides || appState.featureOverrides || {},
       sovereignBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
@@ -237,6 +291,7 @@ class FileManager {
       parentBorderEnabledByCountry: appState.parentBorderEnabledByCountry || {},
       manualSpecialZones: appState.manualSpecialZones || { type: "FeatureCollection", features: [] },
       annotationView: normalizeAnnotationView(appState.annotationView),
+      operationalLines: normalizeOperationalLines(appState.operationalLines),
       operationGraphics: normalizeOperationGraphics(appState.operationGraphics),
       unitCounters: normalizeUnitCounters(appState.unitCounters),
       customPresets: appState.customPresets || {},
@@ -406,6 +461,7 @@ class FileManager {
           data.manualSpecialZones = { type: "FeatureCollection", features: [] };
         }
         data.annotationView = normalizeAnnotationView(data.annotationView);
+        data.operationalLines = normalizeOperationalLines(data.operationalLines);
         data.operationGraphics = normalizeOperationGraphics(data.operationGraphics);
         data.unitCounters = normalizeUnitCounters(data.unitCounters);
         if (!data.layerVisibility || typeof data.layerVisibility !== "object") {

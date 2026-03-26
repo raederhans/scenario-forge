@@ -151,6 +151,66 @@ test("operation graphics support style editing and vertex editing after creation
   await expect(page.locator("#operationGraphicDeleteVertexBtn")).toBeEnabled();
 });
 
+test("operational lines support direct command-bar draw entry and style editing", async ({ page }) => {
+  test.setTimeout(120000);
+  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
+  await waitForAppReady(page);
+  await openFrontlineTab(page);
+
+  await page.locator("#strategicCommandOffensiveBtn").click();
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    return !!state.operationalLineEditor?.active
+      && state.operationalLineEditor.kind === "offensive_line"
+      && state.strategicOverlayUi?.activeMode === "offensive_line";
+  });
+
+  await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    const mapRenderer = await import("/js/core/map_renderer.js");
+    state.operationalLines = [{
+      id: "opl_edit_1",
+      kind: "frontline",
+      label: "Baltic Screen",
+      points: [[8, 48], [13, 49], [18, 51]],
+      stylePreset: "frontline",
+      stroke: "#6b7280",
+      width: 2.1,
+      opacity: 0.82,
+      attachedCounterIds: [],
+    }];
+    state.operationalLinesDirty = true;
+    mapRenderer.cancelOperationalLineDraw();
+    mapRenderer.selectOperationalLineById("opl_edit_1");
+    mapRenderer.render();
+  });
+
+  await expect(page.locator("#operationalLineList")).toHaveValue("opl_edit_1");
+  await page.locator("#operationalLineKindSelect").selectOption("spearhead_line");
+  await page.locator("#operationalLineLabelInput").fill("Breakthrough Axis");
+  await page.locator("#operationalLineLabelInput").blur();
+  await page.locator("#operationalLineStrokeInput").evaluate((node, value) => {
+    node.value = value;
+    node.dispatchEvent(new Event("change", { bubbles: true }));
+  }, "#7f1d1d");
+  await page.locator("#operationalLineWidthInput").fill("5.2");
+  await page.locator("#operationalLineWidthInput").blur();
+  await page.locator("#operationalLineOpacityInput").fill("0.61");
+  await page.locator("#operationalLineOpacityInput").blur();
+
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    const line = (state.operationalLines || []).find((entry) => entry.id === "opl_edit_1");
+    return line
+      && line.kind === "spearhead_line"
+      && line.stylePreset === "spearhead_line"
+      && line.label === "Breakthrough Axis"
+      && line.stroke === "#7f1d1d"
+      && Number(line.width) === 5.2
+      && Number(line.opacity) === 0.61;
+  });
+});
+
 test("milstd counters render through milsymbol and refresh feature binding after drag", async ({ page }) => {
   test.setTimeout(120000);
   await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
@@ -207,7 +267,7 @@ test("milstd counters render through milsymbol and refresh feature binding after
   });
 });
 
-test("stacked counters render rear sheets and an overflow badge", async ({ page }) => {
+test("co-located counters render into deterministic slot positions instead of a single stacked badge", async ({ page }) => {
   test.setTimeout(120000);
   await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
   await waitForAppReady(page);
@@ -228,10 +288,17 @@ test("stacked counters render rear sheets and an overflow badge", async ({ page 
     render();
   });
 
-  const stackGroup = page.locator('g.unit-counter[data-counter-id="stack_4"]');
-  await expect(stackGroup).toBeVisible();
-  await expect(stackGroup.locator("rect.unit-counter-stack-shell")).toHaveCount(2);
-  await expect(stackGroup.locator("text.unit-counter-stack-text")).toHaveText("+1");
+  const stackGroups = page.locator("g.unit-counter");
+  await expect(stackGroups).toHaveCount(4);
+  await expect(page.locator('g.unit-counter[data-counter-id="stack_4"]')).toBeVisible();
+  await expect(page.locator("text.unit-counter-stack-text")).toHaveCount(4);
+
+  const transforms = await page.locator("g.unit-counter").evaluateAll((nodes) =>
+    nodes.map((node) => node.getAttribute("transform") || "")
+  );
+  expect(new Set(transforms).size).toBe(4);
+  const hiddenBadgeCount = await page.locator('text.unit-counter-stack-text[display="none"]').count();
+  expect(hiddenBadgeCount).toBeGreaterThanOrEqual(4);
 });
 
 test("unit counters expose the detail drawer and grow with zoom until the footprint clamp", async ({ page }) => {
