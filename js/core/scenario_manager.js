@@ -1501,6 +1501,12 @@ function applyScenarioGeoLocalization() {
   }
 }
 
+function getScenarioDecodedCollection(bundle, collectionKey) {
+  const decodedCollections = bundle?.runtimeDecodedCollections;
+  const collection = decodedCollections?.[collectionKey];
+  return Array.isArray(collection?.features) ? collection : null;
+}
+
 function syncScenarioLocalizationState({
   cityOverridesPayload = state.scenarioCityOverridesData,
   geoLocalePatchPayload = state.scenarioGeoLocalePatchData,
@@ -1837,6 +1843,7 @@ function createScenarioBootstrapBundleFromCache({
     },
     runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(cachedPayload?.runtimeTopologyPayload),
     runtimePoliticalMeta: cachedPayload?.runtimePoliticalMeta || null,
+    runtimeDecodedCollections: priorBundle?.runtimeDecodedCollections || null,
     releasableCatalog: priorBundle?.releasableCatalog || null,
     districtGroupsPayload: priorBundle?.districtGroupsPayload || null,
     auditPayload: priorBundle?.auditPayload || null,
@@ -1903,6 +1910,7 @@ async function loadScenarioRuntimeTopologyForBundle({
         reason: workerResult.runtimePoliticalTopology ? "ok" : "empty",
         errorMessage: "",
         runtimePoliticalMeta: workerResult.runtimePoliticalMeta || null,
+        decodedCollections: workerResult.decodedCollections || null,
         workerMetrics: workerResult.metrics || null,
       };
     } catch (error) {
@@ -1916,6 +1924,7 @@ async function loadScenarioRuntimeTopologyForBundle({
   return {
     ...fallbackResult,
     runtimePoliticalMeta: null,
+    decodedCollections: null,
   };
 }
 
@@ -1938,18 +1947,24 @@ function hydrateActiveScenarioBundle(
       : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null);
     state.runtimePoliticalMetaSeed = bundle.runtimePoliticalMeta || null;
     state.scenarioLandMaskData =
-      getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land_mask") || state.scenarioLandMaskData || null;
+      getScenarioDecodedCollection(bundle, "scenarioLandMaskData")
+      || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land_mask")
+      || state.scenarioLandMaskData
+      || null;
     state.scenarioContextLandMaskData =
-      getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "context_land_mask")
+      getScenarioDecodedCollection(bundle, "scenarioContextLandMaskData")
+      || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "context_land_mask")
       || state.scenarioContextLandMaskData
       || null;
     state.scenarioWaterRegionsData =
-      getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water")
+      getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData")
+      || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water")
       || bundle.waterRegionsPayload
       || state.scenarioWaterRegionsData
       || null;
     state.scenarioSpecialRegionsData =
-      getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land")
+      getScenarioDecodedCollection(bundle, "scenarioSpecialRegionsData")
+      || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land")
       || bundle.specialRegionsPayload
       || state.scenarioSpecialRegionsData
       || null;
@@ -2198,6 +2213,7 @@ async function loadScenarioBundle(
     },
     runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(runtimeTopologyResult.value),
     runtimePoliticalMeta: runtimeTopologyResult.runtimePoliticalMeta || null,
+    runtimeDecodedCollections: runtimeTopologyResult.decodedCollections || null,
     releasableCatalog: releasableCatalogResult.value || null,
     districtGroupsPayload: normalizeScenarioDistrictGroupsPayload(districtGroupsResult.value, targetId),
     auditPayload: auditResult.value || null,
@@ -2983,12 +2999,18 @@ async function prepareScenarioApplyState(
   };
   const runtimeTopologyPayload = bundle.runtimeTopologyPayload || null;
   const districtGroupsPayload = normalizeScenarioDistrictGroupsPayload(bundle.districtGroupsPayload, scenarioId);
-  const scenarioWaterRegionsFromTopology = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water");
-  const scenarioSpecialRegionsFromTopology = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land");
+  const scenarioWaterRegionsFromTopology =
+    getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData")
+    || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water");
+  const scenarioSpecialRegionsFromTopology =
+    getScenarioDecodedCollection(bundle, "scenarioSpecialRegionsData")
+    || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land");
   const scenarioContextLandMaskFromTopology =
-    getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "context_land_mask");
+    getScenarioDecodedCollection(bundle, "scenarioContextLandMaskData")
+    || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "context_land_mask");
   const scenarioLandMaskFromTopology =
-    getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land_mask")
+    getScenarioDecodedCollection(bundle, "scenarioLandMaskData")
+    || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land_mask")
     || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land");
   const scenarioNameMap = getScenarioNameMap(countryMap);
   const scenarioColorMap = getScenarioFixedOwnerColors(countryMap);

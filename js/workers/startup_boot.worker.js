@@ -133,6 +133,22 @@ function getPoliticalGeometryCount(topology) {
     : 0;
 }
 
+function decodeTopologyObject(topology, objectName) {
+  const object = topology?.objects?.[objectName];
+  if (!object || typeof self.topojson?.feature !== "function") {
+    return null;
+  }
+  try {
+    const collection = self.topojson.feature(topology, object);
+    if (!collection || typeof collection !== "object") {
+      return null;
+    }
+    return collection;
+  } catch (_error) {
+    return null;
+  }
+}
+
 function buildRuntimePoliticalMeta(runtimePoliticalTopology) {
   const geometries = Array.isArray(runtimePoliticalTopology?.objects?.political?.geometries)
     ? runtimePoliticalTopology.objects.political.geometries
@@ -189,6 +205,11 @@ async function handleLoadBaseStartup(message) {
     topologyPrimary: topologyResult.payload,
     locales: localesResult.payload || { ui: {}, geo: {} },
     geoAliases: geoAliasesResult.payload || { alias_to_stable_key: {} },
+    decodedCollections: {
+      landData: decodeTopologyObject(topologyResult.payload, "political"),
+      oceanData: decodeTopologyObject(topologyResult.payload, "ocean"),
+      landBgData: decodeTopologyObject(topologyResult.payload, "land"),
+    },
     metrics: {
       totalMs: nowMs() - startedAt,
       topologyPrimary: {
@@ -214,6 +235,14 @@ async function handleLoadScenarioRuntimeBootstrap(message) {
     taskId,
     runtimePoliticalTopology: runtimeTopologyResult.payload,
     runtimePoliticalMeta,
+    decodedCollections: {
+      scenarioLandMaskData:
+        decodeTopologyObject(runtimeTopologyResult.payload, "land_mask")
+        || decodeTopologyObject(runtimeTopologyResult.payload, "land"),
+      scenarioContextLandMaskData: decodeTopologyObject(runtimeTopologyResult.payload, "context_land_mask"),
+      scenarioWaterRegionsData: decodeTopologyObject(runtimeTopologyResult.payload, "scenario_water"),
+      scenarioSpecialRegionsData: decodeTopologyObject(runtimeTopologyResult.payload, "scenario_special_land"),
+    },
     metrics: {
       totalMs: nowMs() - startedAt,
       runtimePoliticalTopology: {

@@ -1043,6 +1043,7 @@ export async function loadStartupBootArtifacts({
   let topologyPrimary = null;
   let locales = null;
   let geoAliases = null;
+  let decodedCollections = null;
   const resourceMetrics = {
     topologyPrimary: null,
     locales: null,
@@ -1090,6 +1091,7 @@ export async function loadStartupBootArtifacts({
       topologyPrimary = workerResult.topologyPrimary || null;
       locales = workerResult.locales || { ui: {}, geo: {} };
       geoAliases = workerResult.geoAliases || { alias_to_stable_key: {} };
+      decodedCollections = workerResult.decodedCollections || null;
       resourceMetrics.topologyPrimary = workerResult.metrics?.topologyPrimary || null;
       resourceMetrics.locales = workerResult.metrics?.locales || null;
       resourceMetrics.geoAliases = workerResult.metrics?.geoAliases || null;
@@ -1159,6 +1161,7 @@ export async function loadStartupBootArtifacts({
     topologyPrimary,
     locales: locales || { ui: {}, geo: {} },
     geoAliases: geoAliases || { alias_to_stable_key: {} },
+    decodedCollections,
     localeLevel: resolvedLocalization.localeLevel,
     resourceMetrics,
     startupBootCacheState,
@@ -1414,6 +1417,7 @@ export async function loadMapData({
     localeLevel: localizationUrls.localeLevel,
     startupBootCacheState: startupBootArtifacts?.startupBootCacheState || createDefaultStartupBootCacheState(false),
     startupWorkerUsed: !!startupBootArtifacts?.startupWorkerUsed,
+    startupDecodedCollections: startupBootArtifacts?.decodedCollections || null,
     resourceMetrics: {
       ...(topologyBundle.resourceMetrics || {}),
       locales: localizationBundle.resourceMetrics?.locales || null,

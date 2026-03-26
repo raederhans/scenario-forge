@@ -78,6 +78,7 @@ let pathSVG = null;
 let pathCanvas = null;
 let pathHitCanvas = null;
 let zoomBehavior = null;
+let interactionInfrastructurePromise = null;
 let activeContextMetricSession = null;
 
 let viewportGroup = null;
@@ -6637,6 +6638,32 @@ function scheduleSidebarRefresh({
     : globalThis.setTimeout(callback, 0);
 }
 
+function setInteractionInfrastructureState(
+  stage,
+  {
+    ready = null,
+    inFlight = null,
+  } = {}
+) {
+  state.interactionInfrastructureStage = String(stage || "idle").trim() || "idle";
+  if (ready != null) {
+    state.interactionInfrastructureReady = !!ready;
+  }
+  if (inFlight != null) {
+    state.interactionInfrastructureBuildInFlight = !!inFlight;
+  }
+}
+
+async function yieldToMain() {
+  if (typeof globalThis.scheduler?.yield === "function") {
+    await globalThis.scheduler.yield();
+    return;
+  }
+  await new Promise((resolve) => {
+    globalThis.setTimeout(resolve, 0);
+  });
+}
+
 function buildIndex() {
   state.landIndex.clear();
   state.countryToFeatureIds.clear();
@@ -6884,6 +6911,82 @@ function buildSpatialIndex() {
     specialItems: state.specialSpatialItems.length,
     skipped: false,
   });
+}
+
+async function buildIndexChunked() {
+  setInteractionInfrastructureState("building-index", {
+    ready: false,
+    inFlight: true,
+  });
+  await yieldToMain();
+  buildIndex();
+  await yieldToMain();
+}
+
+async function buildSpatialIndexChunked() {
+  setInteractionInfrastructureState("building-spatial", {
+    ready: false,
+    inFlight: true,
+  });
+  await yieldToMain();
+  buildSpatialIndex();
+  await yieldToMain();
+}
+
+async function buildHitCanvasAfterStartup() {
+  setInteractionInfrastructureState("building-hit-canvas", {
+    ready: false,
+    inFlight: true,
+  });
+  await yieldToMain();
+  ensureHitCanvasUpToDate({ force: true });
+  await yieldToMain();
+}
+
+async function buildInteractionInfrastructureAfterStartup({ chunked = true } = {}) {
+  if (state.interactionInfrastructureReady && !state.interactionInfrastructureBuildInFlight) {
+    return true;
+  }
+  if (interactionInfrastructurePromise) {
+    return interactionInfrastructurePromise;
+  }
+  interactionInfrastructurePromise = (async () => {
+    setInteractionInfrastructureState("deferred-startup", {
+      ready: false,
+      inFlight: true,
+    });
+    try {
+      state.deferHitCanvasBuild = false;
+      if (chunked) {
+        await buildIndexChunked();
+      } else {
+        buildIndex();
+      }
+      ensureSovereigntyState({ force: true });
+      rebuildResolvedColors();
+      if (chunked) {
+        await buildSpatialIndexChunked();
+        await buildHitCanvasAfterStartup();
+      } else {
+        buildSpatialIndex();
+        ensureHitCanvasUpToDate({ force: true });
+      }
+      setInteractionInfrastructureState("ready", {
+        ready: true,
+        inFlight: false,
+      });
+      return true;
+    } catch (error) {
+      setInteractionInfrastructureState("error", {
+        ready: false,
+        inFlight: false,
+      });
+      throw error;
+    } finally {
+      interactionInfrastructurePromise = null;
+    }
+  })();
+  return interactionInfrastructurePromise;
 }
 
 function getHitFromEvent(
@@ -18775,7 +18878,7 @@ function enforceZoomConstraints() {
   globalThis.d3.select(interactionRect.node()).call(zoomBehavior.translateBy, 0, 0);
 }
 
-function fitProjection() {
+function fitProjection({ skipSpatialIndex = false } = {}) {
   if (!state.landData?.features?.length || state.width <= 0 || state.height <= 0) {
     return;
   }
@@ -18792,7 +18895,9 @@ function fitProjection() {
   projection.fitExtent([[padding, padding], [x1, y1]], fitTarget);
   cityAnchorCache = new WeakMap();
   rebuildProjectedBoundsCache();
-  buildSpatialIndex();
+  if (!skipSpatialIndex) {
+    buildSpatialIndex();
+  }
   state.hitCanvasDirty = true;
   updateSpecialZonesPaths();
   renderSpecialZoneEditorOverlay();
@@ -18868,7 +18973,12 @@ function bindEvents() {
   window.addEventListener("resize", handleResize);
 }
 
-function initMap({ containerId = "mapContainer", suppressRender = false } = {}) {
+function initMap({
+  containerId = "mapContainer",
+  suppressRender = false,
+  interactionLevel = "full",
+  deferInteractionInfrastructure = false,
+} = {}) {
   if (!globalThis.d3) {
     console.error("D3 is required for map renderer.");
     return;
@@ -18956,22 +19066,44 @@ function initMap({ containerId = "mapContainer", suppressRender = false } = {}) 
   mapCanvas.style.pointerEvents = "none";
   mapCanvas.style.touchAction = "none";
 
+  const shouldDeferInteractionInfrastructure =
+    deferInteractionInfrastructure || interactionLevel === "readonly-startup";
   buildRuntimePoliticalMeta();
   setCanvasSize();
-  buildIndex();
+  if (!shouldDeferInteractionInfrastructure) {
+    buildIndex();
+  } else {
+    state.deferHitCanvasBuild = true;
+    setInteractionInfrastructureState("deferred-startup", {
+      ready: false,
+      inFlight: false,
+    });
+  }
   rebuildStaticMeshes();
   invalidateBorderCache();
   updateDynamicBorderStatusUI();
-  fitProjection();
+  fitProjection({ skipSpatialIndex: shouldDeferInteractionInfrastructure });
   initZoom();
   bindEvents();
+  if (!shouldDeferInteractionInfrastructure) {
+    setInteractionInfrastructureState("ready", {
+      ready: true,
+      inFlight: false,
+    });
+  }
 
   if (!suppressRender) {
     render();
   }
 }
 
-function setMapData({ refitProjection = true, resetZoom = true, suppressRender = false } = {}) {
+function setMapData({
+  refitProjection = true,
+  resetZoom = true,
+  suppressRender = false,
+  interactionLevel = "full",
+  deferInteractionInfrastructure = false,
+} = {}) {
   const startedAt = nowMs();
   clearPendingDynamicBorderTimer();
   clearRenderPhaseTimer();
@@ -19032,8 +19164,18 @@ function setMapData({ refitProjection = true, resetZoom = true, suppressRender =
     neighbors: [],
   };
   state.sphericalFeatureDiagnosticsById = new Map();
-  buildIndex();
-  ensureSovereigntyState();
+  const shouldDeferInteractionInfrastructure =
+    deferInteractionInfrastructure || interactionLevel === "readonly-startup";
+  if (!shouldDeferInteractionInfrastructure) {
+    buildIndex();
+    ensureSovereigntyState();
+  } else {
+    state.deferHitCanvasBuild = true;
+    setInteractionInfrastructureState("deferred-startup", {
+      ready: false,
+      inFlight: false,
+    });
+  }
   if (!refitProjection) {
     rebuildProjectedBoundsCache();
   }
@@ -19042,9 +19184,11 @@ function setMapData({ refitProjection = true, resetZoom = true, suppressRender =
   updateDynamicBorderStatusUI();
   rebuildResolvedColors();
   if (refitProjection) {
-    fitProjection();
+    fitProjection({ skipSpatialIndex: shouldDeferInteractionInfrastructure });
   } else {
-    buildSpatialIndex();
+    if (!shouldDeferInteractionInfrastructure) {
+      buildSpatialIndex();
+    }
     updateSpecialZonesPaths();
     renderSpecialZoneEditorOverlay();
     updateZoomTranslateExtent();
@@ -19072,11 +19216,18 @@ function setMapData({ refitProjection = true, resetZoom = true, suppressRender =
     renderProfile: String(state.renderProfile || "auto"),
     staged: stagedApply,
   });
+  if (!shouldDeferInteractionInfrastructure) {
+    setInteractionInfrastructureState("ready", {
+      ready: true,
+      inFlight: false,
+    });
+  }
 }
 
 export {
   initMap,
   setMapData,
+  buildInteractionInfrastructureAfterStartup,
   render,
   autoFillMap,
   startOperationalLineDraw,

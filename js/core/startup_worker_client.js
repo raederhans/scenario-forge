@@ -130,6 +130,7 @@ export async function loadBaseStartupViaWorker({
     topologyPrimary: message.topologyPrimary || null,
     locales: message.locales || { ui: {}, geo: {} },
     geoAliases: message.geoAliases || { alias_to_stable_key: {} },
+    decodedCollections: message.decodedCollections || null,
     metrics: message.metrics || null,
   };
 }
@@ -144,6 +145,7 @@ export async function loadScenarioRuntimeBootstrapViaWorker({
   return {
     runtimePoliticalTopology: message.runtimePoliticalTopology || null,
     runtimePoliticalMeta: message.runtimePoliticalMeta || null,
+    decodedCollections: message.decodedCollections || null,
     metrics: message.metrics || null,
   };
 }

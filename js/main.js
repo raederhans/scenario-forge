@@ -9,7 +9,13 @@ import {
   loadMapData,
   normalizeRequestedContextLayerNames,
 } from "./core/data_loader.js";
-import { initMap, invalidateContextLayerVisualState, setMapData, render } from "./core/map_renderer.js";
+import {
+  buildInteractionInfrastructureAfterStartup,
+  initMap,
+  invalidateContextLayerVisualState,
+  setMapData,
+  render,
+} from "./core/map_renderer.js";
 import { applyActivePaletteState } from "./core/palette_manager.js";
 import {
   applyScenarioBundle,
@@ -177,13 +183,16 @@ let bootProgressPhaseStartedAt = nowMs();
 let postReadyContextWarmupScheduled = false;
 let postReadyHydrationScheduled = false;
 let startupReadonlyUnlockHandle = null;
+let bootMetricsLogged = false;
 
 const BOOT_PHASE_WINDOWS = {
   shell: { min: 0, max: 8, durationMs: 900 },
   "base-data": { min: 8, max: 52, durationMs: 8800 },
   "scenario-bundle": { min: 52, max: 80, durationMs: 6400 },
   "scenario-apply": { min: 80, max: 94, durationMs: 3400 },
-  warmup: { min: 94, max: 99, durationMs: 1200 },
+  warmup: { min: 94, max: 96, durationMs: 1200 },
+  "detail-promotion": { min: 96, max: 98, durationMs: 2200 },
+  "interaction-infra": { min: 98, max: 99, durationMs: 2800 },
   ready: { min: 100, max: 100, durationMs: 0 },
   error: { min: 0, max: 99, durationMs: 0 },
 };
@@ -224,7 +233,15 @@ const BOOT_COPY = {
     },
     warmup: {
       title: "Finalizing first render",
-      message: "Flushing the first visible frame and unlocking the interface next.",
+      message: "Flushing the first visible frame before detailed interactions finish preparing.",
+    },
+    "detail-promotion": {
+      title: "Preparing detailed interactions",
+      message: "Promoting the detailed topology behind the visible map.",
+    },
+    "interaction-infra": {
+      title: "Building interaction indexes",
+      message: "Finishing selection, hover, and hit-testing before the interface unlocks.",
     },
     ready: {
       title: "Ready",
@@ -256,7 +273,15 @@ const BOOT_COPY = {
     },
     warmup: {
       title: "正在完成首帧渲染",
-      message: "首个可见画面即将就绪，随后开放交互。",
+      message: "首个可见画面即将就绪，随后继续准备细分交互。",
+    },
+    "detail-promotion": {
+      title: "正在准备细分交互",
+      message: "正在在可见地图背后提升细分拓扑。",
+    },
+    "interaction-infra": {
+      title: "正在建立交互索引",
+      message: "正在完成点击、悬停与选择支持，随后开放交互。",
     },
     ready: {
       title: "加载完成",
@@ -377,7 +402,9 @@ function sampleBootPhaseProgress(phase = state.bootPhase) {
   const elapsedMs = Math.max(0, nowMs() - bootProgressPhaseStartedAt);
   const normalizedElapsed = Math.min(1, elapsedMs / Math.max(1, window.durationMs || 1));
   const shapedProgress = (normalizedElapsed * 0.68) + ((normalizedElapsed * normalizedElapsed) * 0.32);
-  const ceiling = phase === "warmup" ? 99 : Math.max(window.min, window.max - 0.35);
+  const ceiling = phase === "warmup" || phase === "interaction-infra"
+    ? 99
+    : Math.max(window.min, window.max - 0.35);
   return Math.max(window.min, Math.min(ceiling, window.min + ((window.max - window.min) * shapedProgress)));
 }
 
@@ -454,7 +481,7 @@ function syncBootOverlay() {
     dom.continueBtn.classList.toggle("hidden", !state.bootCanContinueWithoutScenario);
   }
   if (dom.readonlyBanner) {
-    dom.readonlyBanner.classList.toggle("hidden", !state.startupReadonly);
+    dom.readonlyBanner.classList.toggle("hidden", state.bootBlocking || !state.startupReadonly);
     dom.readonlyBanner.setAttribute("aria-busy", state.startupReadonlyUnlockInFlight ? "true" : "false");
   }
   if (dom.readonlyMessage) {
@@ -569,6 +596,16 @@ function logBootMetrics() {
     return accumulator;
   }, {});
   console.info("[boot] Startup metrics:", summary);
+}
+
+function completeBootSequenceLogging() {
+  if (bootMetricsLogged) {
+    return;
+  }
+  bootMetricsLogged = true;
+  finishBootMetric("total");
+  logBootMetrics();
+  console.log("Initial render complete.");
 }
 
 async function ensureBaseCityDataReady({ reason = "manual", renderNow = true } = {}) {
@@ -1071,6 +1108,11 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
     unlockInFlight: true,
   });
   startBootMetric("startup-readonly:unlock");
+  startBootMetric("detail-promotion");
+  setBootState("detail-promotion", {
+    blocking: true,
+    canContinueWithoutScenario: false,
+  });
   try {
     const promoted = await ensureDetailTopologyReady({
       renderDispatcher,
@@ -1079,6 +1121,9 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
     });
     const detailReady = promoted || hasDetailTopologyLoaded();
     if (!detailReady) {
+      finishBootMetric("detail-promotion", {
+        failed: true,
+      });
       finishBootMetric("startup-readonly:unlock", {
         failed: true,
       });
@@ -1088,7 +1133,16 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
       });
       return false;
     }
-    setMapData({ refitProjection: false, resetZoom: false, suppressRender: true });
+    finishBootMetric("detail-promotion", {
+      activeScenarioId: String(state.activeScenarioId || ""),
+    });
+    setMapData({
+      refitProjection: false,
+      resetZoom: false,
+      suppressRender: true,
+      interactionLevel: "full",
+      deferInteractionInfrastructure: true,
+    });
     const activeScenarioId = String(state.activeScenarioId || "").trim();
     if (activeScenarioId) {
       const cachedBundle = state.scenarioBundleCacheById?.[activeScenarioId] || null;
@@ -1103,16 +1157,41 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
       }
     }
     renderDispatcher?.flush?.();
+    setBootState("interaction-infra", {
+      blocking: true,
+      canContinueWithoutScenario: false,
+    });
+    startBootMetric("interaction-infra");
+    await buildInteractionInfrastructureAfterStartup({ chunked: true });
+    finishBootMetric("interaction-infra", {
+      activeScenarioId,
+    });
     finishBootMetric("startup-readonly:unlock", {
       activeScenarioId,
     });
     setStartupReadonlyState(false);
     checkpointBootMetric("startup-readonly:unlocked");
+    checkpointBootMetric("time-to-interactive");
+    checkpointBootMetric("first-interactive");
+    setBootState("ready", {
+      blocking: false,
+      progress: 100,
+      canContinueWithoutScenario: false,
+    });
+    completeBootSequenceLogging();
     schedulePostReadyHydration();
     schedulePostReadyDeferredContextWarmup();
     schedulePostReadyVisualWarmup();
     return true;
   } catch (error) {
+    finishBootMetric("detail-promotion", {
+      failed: true,
+      errorMessage: error?.message || String(error || "Unknown detail promotion error."),
+    });
+    finishBootMetric("interaction-infra", {
+      failed: true,
+      errorMessage: error?.message || String(error || "Unknown interaction infrastructure error."),
+    });
     finishBootMetric("startup-readonly:unlock", {
       failed: true,
       errorMessage: error?.message || String(error || "Unknown startup readonly unlock error."),
@@ -1188,17 +1267,22 @@ function finalizeReadyState(renderDispatcher) {
       reason: "detail-promotion",
       unlockInFlight: false,
     });
+    setBootState("detail-promotion", {
+      blocking: true,
+      progress: Math.max(Number(state.bootProgress) || 0, BOOT_PHASE_WINDOWS["detail-promotion"].min),
+      canContinueWithoutScenario: false,
+    });
+    scheduleStartupReadonlyUnlock(renderDispatcher);
+    return;
   }
   setBootState("ready", {
     blocking: false,
     progress: 100,
     canContinueWithoutScenario: false,
   });
+  checkpointBootMetric("time-to-interactive");
   checkpointBootMetric("first-interactive");
-  if (shouldEnterStartupReadonly) {
-    scheduleStartupReadonlyUnlock(renderDispatcher);
-    return;
-  }
+  completeBootSequenceLogging();
   scheduleDeferredDetailPromotion(renderDispatcher);
   schedulePostReadyHydration();
   schedulePostReadyDeferredContextWarmup();
@@ -1225,6 +1309,7 @@ async function bootstrap() {
     canContinueWithoutScenario: false,
   });
   bootContinueHandler = null;
+  bootMetricsLogged = false;
   postReadyContextWarmupScheduled = false;
   postReadyHydrationScheduled = false;
   state.startupInteractionMode = resolveStartupInteractionMode();
@@ -1274,6 +1359,7 @@ async function bootstrap() {
       localeLevel,
       startupBootCacheState,
       resourceMetrics,
+      startupDecodedCollections,
     } = await loadMapData({
       d3Client,
       includeCityData: false,
@@ -1382,7 +1468,9 @@ async function bootstrap() {
     );
 
     const baseTopologyDecodeStartedAt = nowMs();
-    state.landData = globalThis.topojson.feature(state.topologyPrimary, objects.political);
+    state.landData =
+      startupDecodedCollections?.landData
+      || globalThis.topojson.feature(state.topologyPrimary, objects.political);
 
     if (state.specialZonesExternalData?.features) {
       state.specialZonesData = state.specialZonesExternalData;
@@ -1395,10 +1483,12 @@ async function bootstrap() {
       state.riversData = state.contextLayerExternalDataByName.rivers;
     }
     if (objects.ocean) {
-      state.oceanData = globalThis.topojson.feature(state.topologyPrimary, objects.ocean);
+      state.oceanData = startupDecodedCollections?.oceanData
+        || globalThis.topojson.feature(state.topologyPrimary, objects.ocean);
     }
     if (objects.land) {
-      state.landBgData = globalThis.topojson.feature(state.topologyPrimary, objects.land);
+      state.landBgData = startupDecodedCollections?.landBgData
+        || globalThis.topojson.feature(state.topologyPrimary, objects.land);
     }
     if (objects.urban) {
       state.urbanData = globalThis.topojson.feature(state.topologyPrimary, objects.urban);
@@ -1421,8 +1511,17 @@ async function bootstrap() {
     await scenarioRegistryPromise;
 
     initPresetState();
-    initMap({ suppressRender: true });
-    setMapData({ suppressRender: true });
+    const startupInteractionLevel = state.startupInteractionMode === "readonly" ? "readonly-startup" : "full";
+    initMap({
+      suppressRender: true,
+      interactionLevel: startupInteractionLevel,
+      deferInteractionInfrastructure: startupInteractionLevel === "readonly-startup",
+    });
+    setMapData({
+      suppressRender: true,
+      interactionLevel: startupInteractionLevel,
+      deferInteractionInfrastructure: startupInteractionLevel === "readonly-startup",
+    });
 
     renderDispatcher = createRenderDispatcher(render);
     const renderApp = () => {
@@ -1487,9 +1586,6 @@ async function bootstrap() {
     renderDispatcher.flush();
     checkpointBootMetric("first-visible");
     finalizeReadyState(renderDispatcher);
-    finishBootMetric("total");
-    logBootMetrics();
-    console.log("Initial render complete.");
   } catch (error) {
     finishBootMetric("total", { failed: true });
     console.error("Failed to boot application:", error);

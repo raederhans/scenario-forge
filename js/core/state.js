@@ -905,6 +905,9 @@ export const state = {
   startupReadonlyReason: "",
   startupReadonlyUnlockInFlight: false,
   startupReadonlySince: 0,
+  interactionInfrastructureReady: true,
+  interactionInfrastructureBuildInFlight: false,
+  interactionInfrastructureStage: "idle",
   bootMetrics: {},
   startupBootCacheState: {
     enabled: false,
