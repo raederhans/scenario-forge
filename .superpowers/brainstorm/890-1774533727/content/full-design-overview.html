@@ -1,0 +1,230 @@
+<h2>Frontline UI Improvements — Full Design Overview</h2>
+<p class="subtitle">Four changes to the strategic overlay system. Review each section below.</p>
+
+<!-- Section 1: Backdrop Fix -->
+<div class="section" style="margin-bottom: 24px;">
+  <h3 style="color: #f8fafc; border-bottom: 2px solid #3b82f6; padding-bottom: 8px;">1. Workspace Backdrop — Fix Stacking</h3>
+
+  <div class="split" style="gap: 20px;">
+    <div class="mockup">
+      <div class="mockup-header" style="color: #ef4444;">Before (Bug)</div>
+      <div class="mockup-body" style="position: relative; height: 200px;">
+        <div style="position: absolute; inset: 0; background: #1e293b; display: flex; align-items: center; justify-content: center; color: #334155; font-size: 40px;">MAP</div>
+        <div style="position: absolute; inset: 0; background: rgba(15,23,42,0.4); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center;">
+          <div style="width: 70%; padding: 16px; background: linear-gradient(180deg, rgb(244,240,230), rgb(238,233,221)); border-radius: 12px; color: #1e293b; font-size: 12px; opacity: 0.6; text-align: center;">
+            <strong>Workspace Modal</strong><br>
+            <span style="color: #ef4444;">Blur leaks onto modal!</span><br>
+            <span style="font-size: 10px; color: #64748b;">Sidebar stacking context traps z-index</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mockup">
+      <div class="mockup-header" style="color: #22c55e;">After (Fix)</div>
+      <div class="mockup-body" style="position: relative; height: 200px;">
+        <div style="position: absolute; inset: 0; background: #1e293b; display: flex; align-items: center; justify-content: center; color: #334155; font-size: 40px;">MAP</div>
+        <div style="position: absolute; inset: 0; background: rgba(15,23,42,0.4); backdrop-filter: blur(4px);"></div>
+        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+          <div style="width: 70%; padding: 16px; background: linear-gradient(180deg, rgb(244,240,230), rgb(238,233,221)); border-radius: 12px; color: #1e293b; font-size: 12px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.4);">
+            <strong>Workspace Modal</strong><br>
+            <span style="color: #22c55e;">Crisp, no blur!</span><br>
+            <span style="font-size: 10px; color: #64748b;">Modal moved to document.body on open</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 12px; padding: 12px; background: rgba(59,130,246,0.06); border-radius: 6px; font-size: 12px; color: #94a3b8;">
+    <strong>Root cause:</strong> The modal (<code>#strategicOverlayPanel</code>) lives inside the sidebar DOM. If the sidebar creates a stacking context, the modal's <code>z-index: 46</code> is trapped, rendering below the backdrop's <code>z-index: 44</code> at the body level.<br>
+    <strong>Fix:</strong> When opening, move the modal element to <code>document.body</code> (escaping any parent stacking context). On close, move it back to the sidebar. This is a standard modal pattern.
+  </div>
+</div>
+
+<!-- Section 2: Accordion Tabs -->
+<div class="section" style="margin-bottom: 24px;">
+  <h3 style="color: #f8fafc; border-bottom: 2px solid #a855f7; padding-bottom: 8px;">2. Three Accordion Tabs</h3>
+
+  <div class="mockup">
+    <div class="mockup-header">Strategic Overlay — Sidebar View</div>
+    <div class="mockup-body">
+      <div style="font-family: monospace; font-size: 12px; line-height: 1.6; color: #e2e8f0;">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #334155; margin-bottom: 8px;">
+          <div>
+            <div style="font-weight: bold; font-size: 14px;">Strategic Overlay</div>
+            <div style="color: #64748b; font-size: 10px;">Select a section to work with</div>
+          </div>
+          <span style="background: #3b82f6; color: white; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;">Open Workspace</span>
+        </div>
+
+        <!-- Tab 1: Operational Lines -->
+        <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; margin-bottom: 6px; overflow: hidden;">
+          <div style="padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: rgba(59,130,246,0.08); border-left: 3px solid #3b82f6;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: #3b82f6;">▼</span>
+              <span style="font-weight: 600; color: #f1f5f9;">Operational Lines</span>
+            </div>
+            <span style="background: #334155; color: #94a3b8; padding: 2px 8px; border-radius: 10px; font-size: 10px;">3</span>
+          </div>
+          <div style="padding: 10px 12px; border-top: 1px solid #334155; color: #94a3b8; font-size: 11px;">
+            Kind: [Frontline ▾] &nbsp; Label: [________]<br>
+            Stroke: [■] W: [2] Op: [1.0] Dash: [—]<br>
+            <div style="display: flex; gap: 4px; margin-top: 6px;">
+              <span style="background: #334155; padding: 3px 8px; border-radius: 4px; font-size: 10px;">Undo</span>
+              <span style="background: #334155; padding: 3px 8px; border-radius: 4px; font-size: 10px;">Finish</span>
+              <span style="background: #334155; padding: 3px 8px; border-radius: 4px; font-size: 10px;">Cancel</span>
+              <span style="background: #334155; padding: 3px 8px; border-radius: 4px; font-size: 10px;">Delete</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Operation Graphics (collapsed) -->
+        <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; margin-bottom: 6px;">
+          <div style="padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: #64748b;">▶</span>
+              <span style="color: #cbd5e1;">Operation Graphics</span>
+            </div>
+            <span style="background: #334155; color: #94a3b8; padding: 2px 8px; border-radius: 10px; font-size: 10px;">2</span>
+          </div>
+        </div>
+
+        <!-- Tab 3: Unit Counters (collapsed) -->
+        <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px;">
+          <div style="padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: #64748b;">▶</span>
+              <span style="color: #cbd5e1;">Unit Counters</span>
+            </div>
+            <span style="background: #334155; color: #94a3b8; padding: 2px 8px; border-radius: 10px; font-size: 10px;">5</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 12px; padding: 12px; background: rgba(168,85,247,0.06); border-radius: 6px; font-size: 12px; color: #94a3b8;">
+    <strong>Behavior:</strong> Click a tab header to expand/collapse. Multiple tabs can be open simultaneously. Active tab gets a blue left accent border. Each header shows item count badge. Opening workspace modal still works per-section.
+  </div>
+</div>
+
+<!-- Section 3: Unit Counter Detail Button -->
+<div class="section" style="margin-bottom: 24px;">
+  <h3 style="color: #f8fafc; border-bottom: 2px solid #f59e0b; padding-bottom: 8px;">3. Unit Counter Detail — Small Icon Toggle</h3>
+
+  <div class="split" style="gap: 20px;">
+    <div class="mockup">
+      <div class="mockup-header" style="color: #ef4444;">Before</div>
+      <div class="mockup-body">
+        <div style="font-family: monospace; font-size: 12px; color: #e2e8f0;">
+          <div style="display: grid; grid-template-columns: 100px 1fr; gap: 8px; align-items: stretch;">
+            <div style="background: #475569; border-radius: 6px; display: flex; align-items: center; justify-content: center; padding: 12px; font-size: 10px;">
+              🎖 INF<br>Division
+            </div>
+            <div style="background: #334155; border-radius: 6px; display: flex; align-items: center; justify-content: center; padding: 12px; color: #94a3b8; font-size: 18px; border: 2px dashed #ef4444;">
+              Details<br>
+              <span style="font-size: 10px; color: #ef4444;">Too large!</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mockup">
+      <div class="mockup-header" style="color: #22c55e;">After</div>
+      <div class="mockup-body">
+        <div style="font-family: monospace; font-size: 12px; color: #e2e8f0;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="background: #475569; border-radius: 6px; display: flex; align-items: center; justify-content: center; padding: 12px 16px; font-size: 10px;">
+              🎖 INF · Division
+            </div>
+            <div style="background: #334155; border-radius: 6px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid #475569; flex-shrink: 0;">
+              ⚙
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 12px; padding: 12px; background: rgba(245,158,11,0.06); border-radius: 6px; font-size: 12px; color: #94a3b8;">
+    <strong>Changes:</strong> Replace <code>grid-template-columns: 148px minmax(0,1fr)</code> with <code>display: flex</code>. Preview card stays at natural width. "Details" becomes a 32×32px icon button (⚙/cog). Detail drawer behavior unchanged — toggling the icon expands/collapses Identity/Combat/Finish groups below. Remove the duplicate "Full Counter Preview" card from inside the detail drawer (the compact preview already shows the token).
+  </div>
+</div>
+
+<!-- Section 4: Token Zoom Scaling -->
+<div class="section" style="margin-bottom: 24px;">
+  <h3 style="color: #f8fafc; border-bottom: 2px solid #22c55e; padding-bottom: 8px;">4. Token Zoom Scaling — Natural Map Behavior</h3>
+
+  <div class="mockup">
+    <div class="mockup-header">Zoom Scaling Comparison</div>
+    <div class="mockup-body">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <!-- Before column -->
+        <div>
+          <div style="text-align: center; color: #ef4444; font-size: 11px; font-weight: 600; margin-bottom: 8px;">BEFORE (counteracted zoom)</div>
+          <div style="font-family: monospace; font-size: 10px; color: #94a3b8; line-height: 1.8;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="width: 60px;">zoom 0.3</span>
+              <div style="width: 22px; height: 14px; background: #475569; border-radius: 2px; border: 1px solid #64748b;"></div>
+              <span style="color: #64748b;">~same</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="width: 60px;">zoom 1.0</span>
+              <div style="width: 24px; height: 16px; background: #475569; border-radius: 2px; border: 1px solid #64748b;"></div>
+              <span style="color: #64748b;">base</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="width: 60px;">zoom 5.0</span>
+              <div style="width: 26px; height: 17px; background: #475569; border-radius: 2px; border: 1px solid #64748b;"></div>
+              <span style="color: #64748b;">~same</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="width: 60px;">zoom 10</span>
+              <div style="width: 28px; height: 18px; background: #475569; border-radius: 2px; border: 1px solid #64748b;"></div>
+              <span style="color: #64748b;">barely grows</span>
+            </div>
+          </div>
+        </div>
+        <!-- After column -->
+        <div>
+          <div style="text-align: center; color: #22c55e; font-size: 11px; font-weight: 600; margin-bottom: 8px;">AFTER (natural scaling)</div>
+          <div style="font-family: monospace; font-size: 10px; color: #94a3b8; line-height: 1.8;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="width: 60px;">zoom 0.3</span>
+              <span style="color: #ef4444; font-size: 9px;">hidden (fade)</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="width: 60px;">zoom 0.5</span>
+              <div style="width: 14px; height: 9px; background: #475569; border-radius: 1px; border: 1px solid #64748b; opacity: 0.5;"></div>
+              <span style="color: #f59e0b;">fading</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="width: 60px;">zoom 1.0</span>
+              <div style="width: 24px; height: 16px; background: #475569; border-radius: 2px; border: 1px solid #64748b;"></div>
+              <span style="color: #64748b;">base</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="width: 60px;">zoom 5.0</span>
+              <div style="width: 40px; height: 26px; background: #475569; border-radius: 3px; border: 1px solid #64748b;"></div>
+              <span style="color: #22c55e;">growing</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="width: 60px;">zoom 10+</span>
+              <div style="width: 48px; height: 32px; background: #475569; border-radius: 3px; border: 1px solid #22c55e;"></div>
+              <span style="color: #22c55e;">2× cap</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 12px; padding: 12px; background: rgba(34,197,94,0.06); border-radius: 6px; font-size: 12px; color: #94a3b8;">
+    <strong>New formula:</strong><br>
+    <code style="color: #e2e8f0;">desiredScreenScale = clamp(0, min(2.0, zoom), 2.0)</code><br>
+    <code style="color: #e2e8f0;">localScale = desiredScreenScale / zoom</code><br>
+    <code style="color: #e2e8f0;">opacity: fade 0.3→0.5, hidden below 0.3</code><br><br>
+    <strong>Key change:</strong> Remove the <code>zoom^0.08</code> exponent that flattened scaling. Instead, let <code>desiredScreenScale</code> track zoom linearly up to the 2× cap. Below zoom 0.5, fade opacity; below 0.3, hide entirely.
+  </div>
+</div>

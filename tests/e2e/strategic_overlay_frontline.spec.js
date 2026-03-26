@@ -145,6 +145,9 @@ test("strategic frontline overlay reacts to controller changes", async ({ page }
       counterPreviewHeight: previewRect?.height || 0,
       detailDrawerHidden: detailDrawer?.classList.contains("hidden") ?? null,
       counterStatPresetCount: document.querySelectorAll("[data-unit-counter-stats-preset-choice]").length,
+      bodyFrontlineModeActive: document.body.classList.contains("frontline-mode-active"),
+      bottomDockDisplay: globalThis.getComputedStyle(document.querySelector("#bottomDock")).display,
+      commandBarDisplay: globalThis.getComputedStyle(document.querySelector("#strategicCommandBar")).display,
     };
   });
 
@@ -155,14 +158,182 @@ test("strategic frontline overlay reacts to controller changes", async ({ page }
   expect(frontlineLayout.workbenchBlockCount).toBe(3);
   expect(frontlineLayout.commandBarButtonCount).toBe(4);
   expect(frontlineLayout.styleChoiceCount).toBe(3);
-  expect(frontlineLayout.counterPreviewWidth).toBeGreaterThan(60);
-  expect(frontlineLayout.counterPreviewWidth).toBeLessThan(420);
-  expect(frontlineLayout.counterPreviewHeight).toBeLessThan(280);
   expect(frontlineLayout.detailDrawerHidden).toBeTruthy();
   expect(frontlineLayout.counterStatPresetCount).toBe(5);
+  expect(frontlineLayout.bodyFrontlineModeActive).toBeTruthy();
+  expect(frontlineLayout.bottomDockDisplay).toBe("none");
+  expect(frontlineLayout.commandBarDisplay).toBe("flex");
 
+  await expect(page.locator("#accordionLines")).toBeVisible();
+  await expect(page.locator("#accordionGraphics")).toBeVisible();
+  await expect(page.locator("#accordionCounters")).toBeVisible();
+  await expect(page.locator("#accordionLines .strategic-accordion-header")).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator("#accordionGraphics .strategic-accordion-header")).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator("#accordionCounters .strategic-accordion-header")).toHaveAttribute("aria-expanded", "false");
+
+  await page.locator("#accordionGraphics .strategic-accordion-header").click();
+  await page.locator("#accordionCounters .strategic-accordion-header").click();
+  await expect(page.locator("#accordionLines .strategic-accordion-header")).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator("#accordionGraphics .strategic-accordion-header")).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator("#accordionCounters .strategic-accordion-header")).toHaveAttribute("aria-expanded", "true");
+  const expandedPreviewBox = await page.locator("#unitCounterPreviewCard").boundingBox();
+  expect(expandedPreviewBox?.width || 0).toBeGreaterThan(60);
+  expect(expandedPreviewBox?.width || 0).toBeLessThan(420);
+  expect(expandedPreviewBox?.height || 0).toBeLessThan(280);
+
+  await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    state.operationalLines = [{ id: "spec-line", kind: "frontline", label: "Spec Line" }];
+    state.operationGraphics = [{ id: "spec-graphic", kind: "attack", label: "Spec Graphic" }];
+    state.unitCounters = [{
+      id: "spec-counter",
+      label: "Spec Counter",
+      nationTag: "USA",
+      presetId: "INF",
+      renderer: "game",
+      echelon: "DIV",
+    }];
+    state.updateStrategicOverlayUIFn?.();
+  });
+  await expect(page.locator("#accordionLines .strategic-accordion-badge")).toHaveText("1");
+  await expect(page.locator("#accordionGraphics .strategic-accordion-badge")).toHaveText("1");
+  await expect(page.locator("#accordionCounters .strategic-accordion-badge")).toHaveText("1");
+
+  await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    state.operationalLines = [];
+    state.operationGraphics = [];
+    state.unitCounters = [];
+    state.updateStrategicOverlayUIFn?.();
+  });
+  await expect(page.locator("#accordionLines .strategic-accordion-badge")).toHaveText("0");
+  await expect(page.locator("#accordionGraphics .strategic-accordion-badge")).toHaveText("0");
+  await expect(page.locator("#accordionCounters .strategic-accordion-badge")).toHaveText("0");
+
+  await page.locator("#accordionLines .strategic-accordion-header").click();
+  await page.locator("#accordionGraphics .strategic-accordion-header").click();
+  await expect(page.locator("#accordionLines .strategic-accordion-header")).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator("#accordionGraphics .strategic-accordion-header")).toHaveAttribute("aria-expanded", "false");
+  await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    state.strategicOverlayUi = {
+      ...(state.strategicOverlayUi || {}),
+      modalSection: "line",
+      modalEntityType: "",
+    };
+    state.updateStrategicOverlayUIFn?.();
+  });
+
+  await page.locator("#strategicOverlayOpenWorkspaceBtn").click();
+  await expect(page.locator("#strategicOverlayIconCloseBtn")).toBeVisible();
+  await page.waitForFunction(() => document.body.classList.contains("strategic-workspace-open"));
+  const workspaceLineSnapshot = await page.evaluate(() => {
+    const isActuallyVisible = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return false;
+      const style = globalThis.getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      return style.display !== "none" && style.visibility !== "hidden" && rect.width > 0 && rect.height > 0;
+    };
+    return {
+      accordionHeaderDisplay: globalThis.getComputedStyle(document.querySelector("#accordionLines .strategic-accordion-header")).display,
+      linesBodyVisible: isActuallyVisible("#accordionLines > .strategic-accordion-body"),
+      graphicsBodyVisible: isActuallyVisible("#accordionGraphics > .strategic-accordion-body"),
+      countersBodyVisible: isActuallyVisible("#accordionCounters > .strategic-accordion-body"),
+      lineSelectVisible: isActuallyVisible("#operationalLineKindSelect"),
+      graphicSelectVisible: isActuallyVisible("#operationGraphicKindSelect"),
+      counterEditorVisible: isActuallyVisible("#unitCounterEditorShell"),
+    };
+  });
+  expect(workspaceLineSnapshot.accordionHeaderDisplay).toBe("none");
+  expect(workspaceLineSnapshot.linesBodyVisible).toBeTruthy();
+  expect(workspaceLineSnapshot.graphicsBodyVisible).toBeTruthy();
+  expect(workspaceLineSnapshot.countersBodyVisible).toBeFalsy();
+  expect(workspaceLineSnapshot.lineSelectVisible).toBeTruthy();
+  expect(workspaceLineSnapshot.graphicSelectVisible).toBeTruthy();
+  expect(workspaceLineSnapshot.counterEditorVisible).toBeFalsy();
+  await page.locator("#strategicOverlayIconCloseBtn").click();
+  await page.waitForFunction(() => !document.body.classList.contains("strategic-workspace-open"));
+  await page.waitForFunction(() => !!document.querySelector("#frontlineTabStack > #strategicOverlayPanel"));
+
+  await expect(page.locator("#unitCounterDetailPreviewCard")).toHaveCount(0);
   await page.locator("#unitCounterDetailToggleBtn").click();
   await expect(page.locator("#unitCounterDetailDrawer")).toBeVisible();
+  await expect(page.locator("#unitCounterIdentityGroup")).toBeVisible();
+  await expect(page.locator("#unitCounterCombatGroup")).toBeVisible();
+  await expect(page.locator("#unitCounterFinishGroup")).toBeVisible();
+
+  await page.locator("#strategicOverlayOpenWorkspaceBtn").click();
+  await expect(page.locator("#strategicOverlayIconCloseBtn")).toBeVisible();
+  await page.waitForFunction(() => document.body.classList.contains("strategic-workspace-open"));
+  const workspaceCounterSnapshot = await page.evaluate(() => {
+    const isActuallyVisible = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return false;
+      const style = globalThis.getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      return style.display !== "none" && style.visibility !== "hidden" && rect.width > 0 && rect.height > 0;
+    };
+    const modal = document.querySelector("#strategicOverlayPanel");
+    const modalRect = modal?.getBoundingClientRect?.();
+    const viewportWidth = globalThis.innerWidth;
+    const viewportHeight = globalThis.innerHeight;
+    const closeRow = document.querySelector("#strategicOverlayPanel .strategic-workspace-actions");
+    const title = document.querySelector("#strategicOverlayPanel .strategic-workspace-header .sidebar-tool-title");
+    const header = document.querySelector("#strategicOverlayPanel .strategic-workspace-header");
+    return {
+      commandBarDisplay: globalThis.getComputedStyle(document.querySelector("#strategicCommandBar")).display,
+      backdropPointerEvents: globalThis.getComputedStyle(document.querySelector("#strategicWorkspaceBackdrop")).pointerEvents,
+      backdropFilter: globalThis.getComputedStyle(document.querySelector("#strategicWorkspaceBackdrop")).backdropFilter,
+      bodyVisualMode: document.body.classList.contains("strategic-workspace-visual-mode"),
+      modalWidth: modalRect?.width || 0,
+      modalHeight: modalRect?.height || 0,
+      modalLeft: modalRect?.left || 0,
+      modalTop: modalRect?.top || 0,
+      modalRightMargin: modalRect ? viewportWidth - modalRect.right : 0,
+      modalBottomMargin: modalRect ? viewportHeight - modalRect.bottom : 0,
+      modalCenterDeltaX: modalRect ? Math.abs((modalRect.left + modalRect.right) / 2 - viewportWidth / 2) : 999,
+      modalCenterDeltaY: modalRect ? Math.abs((modalRect.top + modalRect.bottom) / 2 - viewportHeight / 2) : 999,
+      headerHeight: header?.getBoundingClientRect?.().height || 0,
+      titleWidth: title?.getBoundingClientRect?.().width || 0,
+      closeRowDisplay: closeRow ? globalThis.getComputedStyle(closeRow).display : "",
+      counterAccordionHeaderDisplay: globalThis.getComputedStyle(document.querySelector("#accordionCounters .strategic-accordion-header")).display,
+      counterBodyVisible: isActuallyVisible("#accordionCounters > .strategic-accordion-body"),
+      attachmentSelectVisible: isActuallyVisible("#unitCounterAttachmentSelect"),
+      placeBtnVisible: isActuallyVisible("#unitCounterPlaceBtn"),
+      deleteBtnVisible: isActuallyVisible("#unitCounterDeleteBtn"),
+      counterListVisible: isActuallyVisible("#unitCounterList"),
+      counterEditorVisible: isActuallyVisible("#unitCounterEditorShell"),
+      previewWidth: document.querySelector("#unitCounterPreviewCard")?.getBoundingClientRect?.().width || 0,
+      detailDrawerDisplay: globalThis.getComputedStyle(document.querySelector("#unitCounterDetailDrawer")).display,
+    };
+  });
+  expect(workspaceCounterSnapshot.commandBarDisplay).toBe("none");
+  expect(workspaceCounterSnapshot.backdropPointerEvents).toBe("none");
+  expect(workspaceCounterSnapshot.backdropFilter).toContain("blur");
+  expect(workspaceCounterSnapshot.bodyVisualMode).toBeTruthy();
+  expect(workspaceCounterSnapshot.modalWidth).toBeGreaterThan(600);
+  expect(workspaceCounterSnapshot.modalLeft).toBeGreaterThan(24);
+  expect(workspaceCounterSnapshot.modalTop).toBeGreaterThan(24);
+  expect(workspaceCounterSnapshot.modalRightMargin).toBeGreaterThan(24);
+  expect(workspaceCounterSnapshot.modalBottomMargin).toBeGreaterThan(24);
+  expect(workspaceCounterSnapshot.modalCenterDeltaX).toBeLessThan(20);
+  expect(workspaceCounterSnapshot.modalCenterDeltaY).toBeLessThan(20);
+  expect(workspaceCounterSnapshot.headerHeight).toBeLessThan(140);
+  expect(workspaceCounterSnapshot.titleWidth).toBeGreaterThan(100);
+  expect(workspaceCounterSnapshot.closeRowDisplay).toBe("none");
+  expect(workspaceCounterSnapshot.counterAccordionHeaderDisplay).toBe("none");
+  expect(workspaceCounterSnapshot.counterBodyVisible).toBeTruthy();
+  expect(workspaceCounterSnapshot.attachmentSelectVisible).toBeFalsy();
+  expect(workspaceCounterSnapshot.placeBtnVisible).toBeFalsy();
+  expect(workspaceCounterSnapshot.deleteBtnVisible).toBeFalsy();
+  expect(workspaceCounterSnapshot.counterListVisible).toBeFalsy();
+  expect(workspaceCounterSnapshot.counterEditorVisible).toBeTruthy();
+  expect(workspaceCounterSnapshot.previewWidth).toBeLessThan(140);
+  expect(workspaceCounterSnapshot.detailDrawerDisplay).not.toBe("none");
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => !document.body.classList.contains("strategic-workspace-open"));
+  await page.waitForFunction(() => !!document.querySelector("#frontlineTabStack > #strategicOverlayPanel"));
 
   const initialSnapshot = await page.evaluate(() => ({
     pathCount: document.querySelectorAll(".frontline-overlay-layer path.frontline-path").length,

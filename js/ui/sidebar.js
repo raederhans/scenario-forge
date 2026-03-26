@@ -1526,6 +1526,20 @@ function initSidebar({ render } = {}) {
     });
     return { shell, select };
   };
+  const buildDetailGroup = (id, label, { open = false } = {}) => {
+    const shell = document.createElement("details");
+    shell.id = id;
+    shell.className = "unit-counter-detail-group";
+    shell.open = !!open;
+    const summary = document.createElement("summary");
+    summary.className = "unit-counter-detail-group-summary";
+    summary.textContent = t(label, "ui");
+    const body = document.createElement("div");
+    body.className = "unit-counter-detail-group-body";
+    shell.appendChild(summary);
+    shell.appendChild(body);
+    return { shell, body };
+  };
   const unitCounterPresets = Object.freeze(UNIT_COUNTER_PRESETS.map((preset) => ({
     ...preset,
     id: String(preset.id || "").trim().toUpperCase(),
@@ -1673,6 +1687,7 @@ function initSidebar({ render } = {}) {
     equipmentPct = 74,
     baseFillColor = "",
     detailMode = false,
+    compactMode = false,
   } = {}) => {
     if (!container) return;
     const presetMeta = getUnitCounterPresetMeta(presetId || inferUnitCounterPresetId({ presetId, symbolCode, sidc, label }));
@@ -1687,9 +1702,9 @@ function initSidebar({ render } = {}) {
     const previewStrength = String(strengthText || "").trim();
     const previewRenderer = String(renderer || presetMeta.defaultRenderer || "game").trim().toLowerCase();
     const previewSymbolToken = String(symbolCode || sidc || presetMeta.shortCode || "").trim().toUpperCase() || presetMeta.shortCode;
-
     container.replaceChildren();
     container.classList.toggle("is-detail", !!detailMode);
+    container.classList.toggle("is-compact", !!compactMode);
     container.classList.toggle("is-milstd", previewRenderer === "milstd");
     container.classList.toggle("is-game", previewRenderer !== "milstd");
     container.style.setProperty("--unit-counter-accent", nationMeta.color || "#64748b");
@@ -1698,7 +1713,7 @@ function initSidebar({ render } = {}) {
     container.style.setProperty("--unit-counter-equip-ratio", `${combatState.equipmentPct}%`);
 
     const card = document.createElement("div");
-    card.className = `unit-counter-preview-card is-${String(size || "medium").trim().toLowerCase()}${detailMode ? " is-detail" : ""}`;
+    card.className = `unit-counter-preview-card is-${String(size || "medium").trim().toLowerCase()}${detailMode ? " is-detail" : ""}${compactMode ? " is-compact" : ""}`;
 
     const strip = document.createElement("div");
     strip.className = "unit-counter-preview-strip";
@@ -1750,52 +1765,52 @@ function initSidebar({ render } = {}) {
 
     const meta = document.createElement("div");
     meta.className = "unit-counter-preview-meta";
-    meta.textContent = previewSubLabel;
+    meta.textContent = compactMode
+      ? `${nationMeta.tag || t("AUTO", "ui")} · ${getUnitCounterEchelonLabel(echelon || presetMeta.defaultEchelon)}`
+      : previewSubLabel;
 
-    const statStack = document.createElement("div");
-    statStack.className = "unit-counter-preview-stats";
-
-    const orgStat = document.createElement("div");
-    orgStat.className = "unit-counter-preview-stat is-org";
-    orgStat.innerHTML = `
-      <span class="unit-counter-preview-stat-label">${t("ORG", "ui")}</span>
-      <span class="unit-counter-preview-stat-track"><span class="unit-counter-preview-stat-fill"></span></span>
-      <span class="unit-counter-preview-stat-value">${combatState.organizationPct}</span>
-    `;
-    orgStat.style.setProperty("--unit-counter-stat-ratio", `${combatState.organizationPct}%`);
-
-    const equipmentStat = document.createElement("div");
-    equipmentStat.className = "unit-counter-preview-stat is-equipment";
-    equipmentStat.innerHTML = `
-      <span class="unit-counter-preview-stat-label">${t("EQP", "ui")}</span>
-      <span class="unit-counter-preview-stat-track"><span class="unit-counter-preview-stat-fill"></span></span>
-      <span class="unit-counter-preview-stat-value">${combatState.equipmentPct}</span>
-    `;
-    equipmentStat.style.setProperty("--unit-counter-stat-ratio", `${combatState.equipmentPct}%`);
-    statStack.appendChild(orgStat);
-    statStack.appendChild(equipmentStat);
-
-    const footer = document.createElement("div");
-    footer.className = "unit-counter-preview-footer";
-
-    const echelonBadge = document.createElement("span");
-    echelonBadge.className = "unit-counter-preview-chip";
-    echelonBadge.textContent = getUnitCounterEchelonLabel(echelon || presetMeta.defaultEchelon).slice(0, detailMode ? 24 : 3).toUpperCase();
-    const sourceBadge = document.createElement("span");
-    sourceBadge.className = "unit-counter-preview-chip is-muted";
-    sourceBadge.textContent = `${previewRenderer === "milstd" ? "MILSTD" : "GAME"} · ${String(nationSource || "controller").trim().toUpperCase()}`;
-    footer.appendChild(echelonBadge);
-    footer.appendChild(sourceBadge);
-    if (previewStrength) {
-      const strengthBadge = document.createElement("span");
-      strengthBadge.className = "unit-counter-preview-chip is-alert";
-      strengthBadge.textContent = previewStrength;
-      footer.appendChild(strengthBadge);
-    }
     content.appendChild(title);
     content.appendChild(meta);
-    content.appendChild(statStack);
-    content.appendChild(footer);
+    if (!compactMode) {
+      const statStack = document.createElement("div");
+      statStack.className = "unit-counter-preview-stats";
+
+      const orgStat = document.createElement("div");
+      orgStat.className = "unit-counter-preview-stat is-org";
+      orgStat.innerHTML = `
+        <span class="unit-counter-preview-stat-label">${t("ORG", "ui")}</span>
+        <span class="unit-counter-preview-stat-track"><span class="unit-counter-preview-stat-fill"></span></span>
+        <span class="unit-counter-preview-stat-value">${combatState.organizationPct}</span>
+      `;
+      orgStat.style.setProperty("--unit-counter-stat-ratio", `${combatState.organizationPct}%`);
+
+      const equipmentStat = document.createElement("div");
+      equipmentStat.className = "unit-counter-preview-stat is-equipment";
+      equipmentStat.innerHTML = `
+        <span class="unit-counter-preview-stat-label">${t("EQP", "ui")}</span>
+        <span class="unit-counter-preview-stat-track"><span class="unit-counter-preview-stat-fill"></span></span>
+        <span class="unit-counter-preview-stat-value">${combatState.equipmentPct}</span>
+      `;
+      equipmentStat.style.setProperty("--unit-counter-stat-ratio", `${combatState.equipmentPct}%`);
+      statStack.appendChild(orgStat);
+      statStack.appendChild(equipmentStat);
+
+      const footer = document.createElement("div");
+      footer.className = "unit-counter-preview-footer";
+
+      const echelonBadge = document.createElement("span");
+      echelonBadge.className = "unit-counter-preview-chip";
+      echelonBadge.textContent = getUnitCounterEchelonLabel(echelon || presetMeta.defaultEchelon).slice(0, detailMode ? 24 : 3).toUpperCase();
+      footer.appendChild(echelonBadge);
+      if (previewStrength) {
+        const strengthBadge = document.createElement("span");
+        strengthBadge.className = "unit-counter-preview-chip is-alert";
+        strengthBadge.textContent = previewStrength;
+        footer.appendChild(strengthBadge);
+      }
+      content.appendChild(statStack);
+      content.appendChild(footer);
+    }
 
     body.appendChild(symbolShell);
     body.appendChild(content);
@@ -1909,6 +1924,12 @@ function initSidebar({ render } = {}) {
     strategicOverlaySection.id = "strategicOverlayPanel";
     strategicOverlaySection.className = "inspector-tool-card frontline-tab-card";
 
+    const headerRow = document.createElement("div");
+    headerRow.className = "strategic-workspace-header";
+
+    const headerCopy = document.createElement("div");
+    headerCopy.className = "strategic-workspace-header-copy";
+
     const title = document.createElement("div");
     title.className = "section-header sidebar-tool-title";
     title.textContent = t("Strategic Overlay", "ui");
@@ -1916,6 +1937,13 @@ function initSidebar({ render } = {}) {
     const hint = document.createElement("p");
     hint.className = "sidebar-tool-hint";
     hint.textContent = t("Operation graphics and unit counters stay in the same frontline workspace and remain project-local.", "ui");
+
+    const workspaceIconCloseBtn = buildButton("strategicOverlayIconCloseBtn", "Close");
+    workspaceIconCloseBtn.classList.add("secondary", "strategic-workspace-icon-close", "hidden");
+    headerCopy.appendChild(title);
+    headerCopy.appendChild(hint);
+    headerRow.appendChild(headerCopy);
+    headerRow.appendChild(workspaceIconCloseBtn);
 
     const workspaceActions = buildRow();
     workspaceActions.className = "strategic-workspace-actions mt-2";
@@ -1935,7 +1963,7 @@ function initSidebar({ render } = {}) {
     operationalLineHint.className = "sidebar-tool-hint";
     operationalLineHint.textContent = t("These are separate from political frontlines and act as your single-line battle planning layer.", "ui");
     const operationalLineRow = buildRow();
-    operationalLineRow.classList.add("frontline-compact-row");
+    operationalLineRow.classList.add("frontline-compact-row", "strategic-line-primary-row");
     const operationalLineKindSelect = buildSelect("operationalLineKindSelect", [
       ["frontline", "Frontline"],
       ["offensive_line", "Offensive Line"],
@@ -1971,7 +1999,7 @@ function initSidebar({ render } = {}) {
     operationalLineEditorHint.textContent = t("Use the bottom command bar for fast entry, or start drawing here for the selected line type.", "ui");
 
     const operationalLineActions = buildRow();
-    operationalLineActions.className = "sidebar-equal-actions mt-3";
+    operationalLineActions.className = "sidebar-equal-actions mt-3 strategic-line-management-actions";
     operationalLineActions.appendChild(buildButton("operationalLineUndoBtn", "Undo Vertex"));
     operationalLineActions.appendChild(buildButton("operationalLineFinishBtn", "Finish"));
     operationalLineActions.appendChild(buildButton("operationalLineCancelBtn", "Cancel"));
@@ -1979,7 +2007,7 @@ function initSidebar({ render } = {}) {
 
     const operationalLineList = document.createElement("select");
     operationalLineList.id = "operationalLineList";
-    operationalLineList.className = "select-input mt-2";
+    operationalLineList.className = "select-input mt-2 strategic-line-list";
     operationalLineList.size = 4;
 
     const graphicsBlock = document.createElement("div");
@@ -1991,7 +2019,7 @@ function initSidebar({ render } = {}) {
     graphicsHint.className = "sidebar-tool-hint";
     graphicsHint.textContent = t("Use short intent lines and quiet captions so arrows support the frontline instead of overpowering it.", "ui");
     const graphicsRow = buildRow();
-    graphicsRow.classList.add("frontline-compact-row");
+    graphicsRow.classList.add("frontline-compact-row", "strategic-graphics-primary-row");
     const graphicsKindSelect = buildSelect("operationGraphicKindSelect", [
       ["attack", "Attack"],
       ["retreat", "Retreat"],
@@ -2041,7 +2069,7 @@ function initSidebar({ render } = {}) {
     );
 
     const graphicsActions = buildRow();
-    graphicsActions.className = "sidebar-equal-actions mt-3";
+    graphicsActions.className = "sidebar-equal-actions mt-3 strategic-graphics-management-actions";
     graphicsActions.appendChild(buildButton("operationGraphicUndoBtn", "Undo Vertex"));
     graphicsActions.appendChild(buildButton("operationGraphicFinishBtn", "Finish"));
     graphicsActions.appendChild(buildButton("operationGraphicCancelBtn", "Cancel"));
@@ -2067,7 +2095,7 @@ function initSidebar({ render } = {}) {
 
     const graphicsList = document.createElement("select");
     graphicsList.id = "operationGraphicList";
-    graphicsList.className = "select-input mt-2";
+    graphicsList.className = "select-input mt-2 strategic-graphics-list";
     graphicsList.size = 4;
 
     const graphicsAdvanced = document.createElement("details");
@@ -2098,19 +2126,23 @@ function initSidebar({ render } = {}) {
 
     const unitPreviewCard = document.createElement("div");
     unitPreviewCard.id = "unitCounterPreviewCard";
-    unitPreviewCard.className = "unit-counter-preview-shell";
+    unitPreviewCard.className = "unit-counter-preview-shell is-compact";
 
     const unitPreviewActions = document.createElement("div");
     unitPreviewActions.className = "unit-counter-preview-actions";
-    const unitDetailToggleBtn = buildButton("unitCounterDetailToggleBtn", "Details");
-    unitDetailToggleBtn.classList.add("secondary");
+    const unitDetailToggleBtn = document.createElement("button");
+    unitDetailToggleBtn.type = "button";
+    unitDetailToggleBtn.id = "unitCounterDetailToggleBtn";
+    unitDetailToggleBtn.className = "btn secondary unit-counter-detail-icon-btn";
+    unitDetailToggleBtn.setAttribute("aria-label", t("Toggle details", "ui"));
+    unitDetailToggleBtn.textContent = "\u2699";
     unitPreviewActions.appendChild(unitDetailToggleBtn);
 
     unitPreviewFrame.appendChild(unitPreviewCard);
     unitPreviewFrame.appendChild(unitPreviewActions);
 
     const unitPresetNationRow = buildRow();
-    unitPresetNationRow.className = "unit-counter-grid-row unit-counter-fast-row mt-3";
+    unitPresetNationRow.className = "unit-counter-grid-row unit-counter-fast-row mt-3 strategic-counter-fast-controls";
     const unitPresetSelect = buildSelect("unitCounterPresetSelect", unitCounterPresets.map((preset) => [
       preset.id,
       `${preset.label} · ${preset.shortCode}`,
@@ -2134,14 +2166,12 @@ function initSidebar({ render } = {}) {
     unitDetailDrawer.id = "unitCounterDetailDrawer";
     unitDetailDrawer.className = "unit-counter-detail-drawer hidden";
 
-    const unitDetailPreviewCard = document.createElement("div");
-    unitDetailPreviewCard.id = "unitCounterDetailPreviewCard";
-    unitDetailPreviewCard.className = "unit-counter-preview-shell is-detail";
-    unitDetailDrawer.appendChild(unitDetailPreviewCard);
+    const unitIdentityGroup = buildDetailGroup("unitCounterIdentityGroup", "Identity", { open: true });
+    const unitCombatGroup = buildDetailGroup("unitCounterCombatGroup", "Combat State", { open: true });
+    const unitFinishGroup = buildDetailGroup("unitCounterFinishGroup", "Finish", { open: false });
 
     const unitIdentityBlock = document.createElement("div");
     unitIdentityBlock.className = "unit-counter-detail-block";
-    unitIdentityBlock.innerHTML = `<div class="section-header mt-2">${t("Identity", "ui")}</div>`;
 
     const unitModeRow = buildRow();
     unitModeRow.className = "unit-counter-grid-row mt-2";
@@ -2176,7 +2206,6 @@ function initSidebar({ render } = {}) {
 
     const unitCombatBlock = document.createElement("div");
     unitCombatBlock.className = "unit-counter-detail-block";
-    unitCombatBlock.innerHTML = `<div class="section-header mt-3">${t("Combat State", "ui")}</div>`;
 
     const unitCombatPresetField = buildSegmentedChoiceField("unitCounterStatsPresetSelect", unitCounterCombatPresets.map((preset) => [
       preset.id,
@@ -2192,10 +2221,10 @@ function initSidebar({ render } = {}) {
     const unitRandomizeBtn = buildButton("unitCounterStatsRandomizeBtn", "Randomize");
     unitRandomizeBtn.classList.add("secondary");
 
-    const unitCombatActionRow = buildRow();
-    unitCombatActionRow.className = "unit-counter-detail-actions mt-2";
-    unitCombatActionRow.appendChild(unitCombatPresetField.shell);
-    unitCombatActionRow.appendChild(unitRandomizeBtn);
+    const unitCombatPresetStack = document.createElement("div");
+    unitCombatPresetStack.className = "unit-counter-combat-preset-stack mt-2";
+    unitCombatPresetStack.appendChild(unitCombatPresetField.shell);
+    unitCombatPresetStack.appendChild(unitRandomizeBtn);
 
     const unitStatInputs = buildRow();
     unitStatInputs.className = "unit-counter-grid-row mt-2";
@@ -2222,13 +2251,12 @@ function initSidebar({ render } = {}) {
         <span class="unit-counter-combat-bar-track"><span id="unitCounterEquipmentBar" class="unit-counter-combat-bar-fill"></span></span>
       </div>
     `;
-    unitCombatBlock.appendChild(unitCombatActionRow);
+    unitCombatBlock.appendChild(unitCombatPresetStack);
     unitCombatBlock.appendChild(unitStatInputs);
     unitCombatBlock.appendChild(unitCombatBars);
 
     const unitFinishBlock = document.createElement("div");
     unitFinishBlock.className = "unit-counter-detail-block";
-    unitFinishBlock.innerHTML = `<div class="section-header mt-3">${t("Finish", "ui")}</div>`;
 
     const unitColorPanel = document.createElement("div");
     unitColorPanel.className = "unit-counter-color-panel mt-2";
@@ -2250,25 +2278,28 @@ function initSidebar({ render } = {}) {
     unitColorPanel.appendChild(unitColorEyedropperBtn);
     unitFinishBlock.appendChild(unitColorPanel);
 
-    unitDetailDrawer.appendChild(unitIdentityBlock);
-    unitDetailDrawer.appendChild(unitCombatBlock);
-    unitDetailDrawer.appendChild(unitFinishBlock);
+    unitIdentityGroup.body.appendChild(unitIdentityBlock);
+    unitCombatGroup.body.appendChild(unitCombatBlock);
+    unitFinishGroup.body.appendChild(unitFinishBlock);
+    unitDetailDrawer.appendChild(unitIdentityGroup.shell);
+    unitDetailDrawer.appendChild(unitCombatGroup.shell);
+    unitDetailDrawer.appendChild(unitFinishGroup.shell);
 
     const unitOptionsRow = buildRow();
-    unitOptionsRow.className = "mt-2 flex flex-wrap items-center justify-between gap-2";
+    unitOptionsRow.className = "mt-2 flex flex-wrap items-center justify-between gap-2 strategic-counter-visual-options";
     const unitLabelToggle = document.createElement("label");
     unitLabelToggle.className = "checkbox-row";
     unitLabelToggle.innerHTML = `<input id="unitCounterLabelsToggle" type="checkbox" class="checkbox-input" /> <span>${t("Show Labels", "ui")}</span>`;
     unitOptionsRow.appendChild(unitLabelToggle);
 
     const unitActions = buildRow();
-    unitActions.className = "sidebar-equal-actions mt-3";
+    unitActions.className = "sidebar-equal-actions mt-3 strategic-counter-management-actions";
     unitActions.appendChild(buildButton("unitCounterPlaceBtn", "Place Counter"));
     unitActions.appendChild(buildButton("unitCounterCancelBtn", "Cancel Place"));
     unitActions.appendChild(buildButton("unitCounterDeleteBtn", "Delete Selected"));
 
     const unitListHeader = document.createElement("div");
-    unitListHeader.className = "unit-counter-list-header mt-3";
+    unitListHeader.className = "unit-counter-list-header mt-3 strategic-counter-list-header";
     unitListHeader.innerHTML = `
       <div class="section-header">${t("Placed Counters", "ui")}</div>
       <p class="sidebar-tool-hint">${t("Each entry now shows nation, unit preset, echelon, and renderer at a glance.", "ui")}</p>
@@ -2276,11 +2307,10 @@ function initSidebar({ render } = {}) {
 
     const unitList = document.createElement("select");
     unitList.id = "unitCounterList";
-    unitList.className = "select-input mt-2 unit-counter-list";
+    unitList.className = "select-input mt-2 unit-counter-list strategic-counter-list";
     unitList.size = 4;
 
-    strategicOverlaySection.appendChild(title);
-    strategicOverlaySection.appendChild(hint);
+    strategicOverlaySection.appendChild(headerRow);
     strategicOverlaySection.appendChild(workspaceActions);
     operationalLineBlock.appendChild(operationalLineHeader);
     operationalLineBlock.appendChild(operationalLineHint);
@@ -2289,7 +2319,6 @@ function initSidebar({ render } = {}) {
     operationalLineBlock.appendChild(operationalLineEditorHint);
     operationalLineBlock.appendChild(operationalLineActions);
     operationalLineBlock.appendChild(operationalLineList);
-    strategicOverlaySection.appendChild(operationalLineBlock);
     graphicsBlock.appendChild(graphicsHeader);
     graphicsBlock.appendChild(graphicsHint);
     graphicsBlock.appendChild(graphicsRow);
@@ -2297,7 +2326,6 @@ function initSidebar({ render } = {}) {
     graphicsBlock.appendChild(graphicsEditorHint);
     graphicsBlock.appendChild(graphicsActions);
     graphicsBlock.appendChild(graphicsList);
-    strategicOverlaySection.appendChild(graphicsBlock);
     countersBlock.appendChild(unitHeader);
     countersBlock.appendChild(unitHint);
     unitEditorShell.appendChild(unitPreviewFrame);
@@ -2308,7 +2336,50 @@ function initSidebar({ render } = {}) {
     unitEditorShell.appendChild(unitListHeader);
     unitEditorShell.appendChild(unitList);
     countersBlock.appendChild(unitEditorShell);
-    strategicOverlaySection.appendChild(countersBlock);
+
+    const buildAccordionSection = (id, title, contentBlock, opts = {}) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "strategic-accordion-section";
+      wrapper.id = id;
+      const header = document.createElement("button");
+      header.type = "button";
+      header.className = "strategic-accordion-header";
+      const arrow = document.createElement("span");
+      arrow.className = "strategic-accordion-arrow";
+      arrow.textContent = "\u25B6";
+      const titleEl = document.createElement("span");
+      titleEl.className = "strategic-accordion-title";
+      titleEl.textContent = t(title, "ui");
+      const badge = document.createElement("span");
+      badge.className = "strategic-accordion-badge";
+      badge.textContent = "0";
+      header.appendChild(arrow);
+      header.appendChild(titleEl);
+      header.appendChild(badge);
+      const body = document.createElement("div");
+      body.className = "strategic-accordion-body";
+      body.id = `${id}Body`;
+      body.appendChild(contentBlock);
+      const syncExpandedState = (isOpen) => {
+        wrapper.classList.toggle("is-open", !!isOpen);
+        header.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      };
+      header.setAttribute("aria-controls", body.id);
+      header.addEventListener("click", () => {
+        syncExpandedState(!wrapper.classList.contains("is-open"));
+      });
+      wrapper.appendChild(header);
+      wrapper.appendChild(body);
+      syncExpandedState(!!opts.defaultOpen);
+      return wrapper;
+    };
+
+    const accordionLines = buildAccordionSection("accordionLines", "Operational Lines", operationalLineBlock, { defaultOpen: true });
+    const accordionGraphics = buildAccordionSection("accordionGraphics", "Operation Graphics", graphicsBlock);
+    const accordionCounters = buildAccordionSection("accordionCounters", "Unit Counters", countersBlock);
+    strategicOverlaySection.appendChild(accordionLines);
+    strategicOverlaySection.appendChild(accordionGraphics);
+    strategicOverlaySection.appendChild(accordionCounters);
     frontlineTabStack.appendChild(strategicOverlaySection);
   }
 
@@ -2414,6 +2485,7 @@ function initSidebar({ render } = {}) {
   const strategicCommandButtons = Array.from(document.querySelectorAll("#strategicCommandBar .strategic-command-btn"));
   const strategicOverlayOpenWorkspaceBtn = document.getElementById("strategicOverlayOpenWorkspaceBtn");
   const strategicOverlayCloseWorkspaceBtn = document.getElementById("strategicOverlayCloseWorkspaceBtn");
+  const strategicOverlayIconCloseBtn = document.getElementById("strategicOverlayIconCloseBtn");
   const operationalLineKindSelect = document.getElementById("operationalLineKindSelect");
   const operationalLineLabelInput = document.getElementById("operationalLineLabelInput");
   const operationalLineStrokeInput = document.getElementById("operationalLineStrokeInput");
@@ -2443,7 +2515,6 @@ function initSidebar({ render } = {}) {
   const unitCounterPreviewCard = document.getElementById("unitCounterPreviewCard");
   const unitCounterDetailToggleBtn = document.getElementById("unitCounterDetailToggleBtn");
   const unitCounterDetailDrawer = document.getElementById("unitCounterDetailDrawer");
-  const unitCounterDetailPreviewCard = document.getElementById("unitCounterDetailPreviewCard");
   const unitCounterPresetSelect = document.getElementById("unitCounterPresetSelect");
   const unitCounterNationModeSelect = document.getElementById("unitCounterNationModeSelect");
   const unitCounterNationSelect = document.getElementById("unitCounterNationSelect");
@@ -6025,6 +6096,10 @@ function initSidebar({ render } = {}) {
       state.ui = {};
     }
     state.ui.rightSidebarTab = activeId;
+    document.body.classList.toggle("frontline-mode-active", activeId === "frontline");
+    if (activeId !== "frontline") {
+      setStrategicWorkspaceModalState(false, String(state.strategicOverlayUi?.modalSection || "line"));
+    }
     inspectorSidebarTabButtons.forEach((button) => {
       const id = String(button.dataset.inspectorTab || "").trim().toLowerCase();
       const isActive = id === activeId;
@@ -6117,8 +6192,26 @@ function initSidebar({ render } = {}) {
     }
     state.strategicOverlayUi.modalOpen = !!nextOpen;
     state.strategicOverlayUi.modalSection = section === "counter" ? "counter" : "line";
+    document.body.classList.toggle("strategic-workspace-open", !!nextOpen);
+    document.body.classList.toggle("strategic-workspace-visual-mode", !!nextOpen);
     if (strategicOverlaySection) {
+      if (nextOpen && strategicOverlaySection.parentElement !== document.body) {
+        strategicOverlaySection._originalParent = strategicOverlaySection.parentElement;
+        strategicOverlaySection._originalNextSibling = strategicOverlaySection.nextElementSibling;
+        document.body.appendChild(strategicOverlaySection);
+      } else if (!nextOpen && strategicOverlaySection._originalParent) {
+        const parent = strategicOverlaySection._originalParent;
+        const ref = strategicOverlaySection._originalNextSibling;
+        if (ref && ref.parentElement === parent) {
+          parent.insertBefore(strategicOverlaySection, ref);
+        } else {
+          parent.appendChild(strategicOverlaySection);
+        }
+        delete strategicOverlaySection._originalParent;
+        delete strategicOverlaySection._originalNextSibling;
+      }
       strategicOverlaySection.classList.toggle("is-workspace-modal", !!nextOpen);
+      strategicOverlaySection.classList.toggle("is-visual-workspace", !!nextOpen);
       strategicOverlaySection.dataset.workspaceSection = section === "counter" ? "counter" : "line";
     }
     if (strategicWorkspaceBackdropEl) {
@@ -6129,6 +6222,9 @@ function initSidebar({ render } = {}) {
     }
     if (strategicOverlayCloseWorkspaceBtn) {
       strategicOverlayCloseWorkspaceBtn.classList.toggle("hidden", !nextOpen);
+    }
+    if (strategicOverlayIconCloseBtn) {
+      strategicOverlayIconCloseBtn.classList.toggle("hidden", !nextOpen);
     }
   };
 
@@ -6403,14 +6499,16 @@ function initSidebar({ render } = {}) {
         : t("Game renderer keeps the lighter counter style and uses a short internal code or abbreviation.", "ui");
     }
     const drawerPinnedOpen = unitCounterDetailDrawer?.dataset.pinnedOpen === "true";
-    const drawerForcedOpen = !!selectedCounter || !!unitEditor.active;
+    const drawerForcedOpen = !!selectedCounter
+      || !!unitEditor.active
+      || (state.strategicOverlayUi?.modalOpen && String(state.strategicOverlayUi?.modalSection || "line") === "counter");
     const shouldOpenDetailDrawer = drawerPinnedOpen || drawerForcedOpen;
     if (unitCounterDetailDrawer) {
       unitCounterDetailDrawer.classList.toggle("hidden", !shouldOpenDetailDrawer);
       unitCounterDetailDrawer.dataset.open = shouldOpenDetailDrawer ? "true" : "false";
     }
     if (unitCounterDetailToggleBtn) {
-      unitCounterDetailToggleBtn.textContent = shouldOpenDetailDrawer ? t("Hide Details", "ui") : t("Details", "ui");
+      unitCounterDetailToggleBtn.setAttribute("aria-label", shouldOpenDetailDrawer ? t("Hide details", "ui") : t("Show details", "ui"));
       unitCounterDetailToggleBtn.setAttribute("aria-expanded", shouldOpenDetailDrawer ? "true" : "false");
     }
     renderUnitCounterPreview(unitCounterPreviewCard, {
@@ -6428,23 +6526,7 @@ function initSidebar({ render } = {}) {
       organizationPct: effectiveCombatState.organizationPct,
       equipmentPct: effectiveCombatState.equipmentPct,
       baseFillColor: effectiveCombatState.baseFillColor,
-    });
-    renderUnitCounterPreview(unitCounterDetailPreviewCard, {
-      renderer: effectiveRenderer,
-      size: effectiveSize,
-      nationTag: effectiveNationTag,
-      nationSource: effectiveNationSource,
-      label: effectiveLabel,
-      subLabel: effectiveSubLabel,
-      strengthText: effectiveStrengthText,
-      sidc: effectiveSymbol,
-      symbolCode: effectiveSymbol,
-      presetId: effectivePresetId,
-      echelon: effectiveEchelon,
-      organizationPct: effectiveCombatState.organizationPct,
-      equipmentPct: effectiveCombatState.equipmentPct,
-      baseFillColor: effectiveCombatState.baseFillColor,
-      detailMode: true,
+      compactMode: true,
     });
     if (unitCounterStatsPresetSelect) {
       unitCounterStatsPresetSelect.value = effectiveCombatState.statsPresetId === "random"
@@ -6504,6 +6586,13 @@ function initSidebar({ render } = {}) {
     if (unitCounterPlaceBtn) unitCounterPlaceBtn.disabled = isCounterPlacing;
     if (unitCounterCancelBtn) unitCounterCancelBtn.disabled = !isCounterPlacing;
     if (unitCounterDeleteBtn) unitCounterDeleteBtn.disabled = !String(unitEditor.selectedId || "").trim();
+
+    const linesBadge = document.querySelector("#accordionLines .strategic-accordion-badge");
+    const graphicsBadge = document.querySelector("#accordionGraphics .strategic-accordion-badge");
+    const countersBadge = document.querySelector("#accordionCounters .strategic-accordion-badge");
+    if (linesBadge) linesBadge.textContent = String((state.operationalLines || []).length);
+    if (graphicsBadge) graphicsBadge.textContent = String((state.operationGraphics || []).length);
+    if (countersBadge) countersBadge.textContent = String((state.unitCounters || []).length);
   };
 
   state.updateLegendUI = refreshLegendEditor;
@@ -6589,11 +6678,18 @@ function initSidebar({ render } = {}) {
     });
     strategicOverlayCloseWorkspaceBtn.dataset.bound = "true";
   }
-  if (strategicWorkspaceBackdropEl && !strategicWorkspaceBackdropEl.dataset.bound) {
-    strategicWorkspaceBackdropEl.addEventListener("click", () => {
+  if (strategicOverlayIconCloseBtn && !strategicOverlayIconCloseBtn.dataset.bound) {
+    strategicOverlayIconCloseBtn.addEventListener("click", () => {
       setStrategicWorkspaceModalState(false, String(state.strategicOverlayUi?.modalSection || "line"));
     });
-    strategicWorkspaceBackdropEl.dataset.bound = "true";
+    strategicOverlayIconCloseBtn.dataset.bound = "true";
+  }
+  if (!document.body.dataset.strategicWorkspaceEscapeBound) {
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !state.strategicOverlayUi?.modalOpen) return;
+      setStrategicWorkspaceModalState(false, String(state.strategicOverlayUi?.modalSection || "line"));
+    });
+    document.body.dataset.strategicWorkspaceEscapeBound = "true";
   }
   strategicCommandButtons.forEach((button) => {
     if (button.dataset.bound) return;

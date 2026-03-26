@@ -1837,7 +1837,8 @@ function initToolbar({ render } = {}) {
       oceanStylePresetHint.textContent = getOceanPresetHint(state.styleConfig.ocean.preset || "flat");
     }
     if (oceanBathymetrySourceValue) {
-      oceanBathymetrySourceValue.textContent = String(state.activeBathymetrySource || "none");
+      const bathymetrySourceLabel = String(state.activeBathymetrySource || "").trim();
+      oceanBathymetrySourceValue.textContent = bathymetrySourceLabel || t("None", "ui");
     }
     if (oceanBathymetryBandsValue) {
       oceanBathymetryBandsValue.textContent = String(state.activeBathymetryBandsData?.features?.length || 0);

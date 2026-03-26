@@ -15244,13 +15244,14 @@ function getUnitCounterRenderEntries() {
 
 function getUnitCounterRenderScale(metrics, zoomK) {
   const normalizedZoom = Math.max(0.1, Number(zoomK) || 1);
-  const desiredScreenScale = Math.max(0.4, Math.min(1.28, Math.pow(normalizedZoom, 0.08)));
+  const maxScale = 2.0;
+  const desiredScreenScale = Math.min(maxScale, normalizedZoom);
   const effectiveWidth = Number(metrics?.width || 0) * desiredScreenScale;
   let opacity = 1;
   let hidden = false;
-  if (effectiveWidth <= 14.5) {
-    opacity = Math.max(0, Math.min(1, (effectiveWidth - 11.3) / 3.2));
-    hidden = effectiveWidth <= 11.3;
+  if (normalizedZoom < 0.5) {
+    opacity = Math.max(0, Math.min(1, (normalizedZoom - 0.3) / 0.2));
+    hidden = normalizedZoom <= 0.3;
   }
   return {
     desiredScreenScale,

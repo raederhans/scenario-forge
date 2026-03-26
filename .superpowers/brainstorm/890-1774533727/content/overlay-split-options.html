@@ -1,0 +1,104 @@
+<h2>Strategic Overlay Panel — How to Split into Collapsible Tabs?</h2>
+<p class="subtitle">Currently one flat panel with 3 sections. Choose how to reorganize into expandable/collapsible accordion tabs.</p>
+
+<div class="cards">
+  <!-- Option A: 3 independent accordion tabs -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-family: monospace; font-size: 13px; line-height: 1.5; padding: 16px; background: #1e293b; color: #e2e8f0; border-radius: 8px;">
+        <div style="color: #94a3b8; margin-bottom: 8px;">Strategic Overlay</div>
+        <div style="background: #334155; border-radius: 6px; margin-bottom: 4px; overflow: hidden;">
+          <div style="padding: 8px 12px; display: flex; justify-content: space-between; cursor: pointer; border-bottom: 1px solid #475569;">
+            <span style="color: #f8fafc;">▼ Operational Lines</span>
+            <span style="color: #64748b; font-size: 11px;">3 lines</span>
+          </div>
+          <div style="padding: 10px 12px; color: #94a3b8; font-size: 11px;">
+            Kind: [Frontline ▾] Label: [____]<br>
+            Stroke: [■ #e53] W: [2] Op: [1.0]<br>
+            [Undo] [Finish] [Cancel] [Delete]
+          </div>
+        </div>
+        <div style="background: #334155; border-radius: 6px; margin-bottom: 4px; overflow: hidden;">
+          <div style="padding: 8px 12px; display: flex; justify-content: space-between; cursor: pointer;">
+            <span style="color: #f8fafc;">▶ Operation Graphics</span>
+            <span style="color: #64748b; font-size: 11px;">2 graphics</span>
+          </div>
+        </div>
+        <div style="background: #334155; border-radius: 6px; overflow: hidden;">
+          <div style="padding: 8px 12px; display: flex; justify-content: space-between; cursor: pointer;">
+            <span style="color: #f8fafc;">▶ Unit Counters</span>
+            <span style="color: #64748b; font-size: 11px;">5 placed</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Three Accordion Tabs</h3>
+      <p>Each section (Lines, Graphics, Counters) is an independent collapsible tab. Only one open at a time, or allow multiple open. Each tab header shows a count badge.</p>
+    </div>
+  </div>
+
+  <!-- Option B: 2 groups (Drawing + Units) -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-family: monospace; font-size: 13px; line-height: 1.5; padding: 16px; background: #1e293b; color: #e2e8f0; border-radius: 8px;">
+        <div style="color: #94a3b8; margin-bottom: 8px;">Strategic Overlay</div>
+        <div style="background: #334155; border-radius: 6px; margin-bottom: 4px; overflow: hidden;">
+          <div style="padding: 8px 12px; display: flex; justify-content: space-between; cursor: pointer; border-bottom: 1px solid #475569;">
+            <span style="color: #f8fafc;">▼ Lines & Graphics</span>
+            <span style="color: #64748b; font-size: 11px;">5 items</span>
+          </div>
+          <div style="padding: 10px 12px; color: #94a3b8; font-size: 11px;">
+            <div style="margin-bottom: 6px; color: #cbd5e1;">── Operational Lines ──</div>
+            Kind: [Frontline ▾] Label: [____]<br>
+            [Start Draw] [Undo] [Finish]<br>
+            <div style="margin: 6px 0; color: #cbd5e1;">── Operation Graphics ──</div>
+            Kind: [Attack ▾] Preset: [____]<br>
+            [Start Draw] [Undo] [Finish]
+          </div>
+        </div>
+        <div style="background: #334155; border-radius: 6px; overflow: hidden;">
+          <div style="padding: 8px 12px; display: flex; justify-content: space-between; cursor: pointer;">
+            <span style="color: #f8fafc;">▶ Unit Counters</span>
+            <span style="color: #64748b; font-size: 11px;">5 placed</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Two Groups (Drawing + Units)</h3>
+      <p>Merge Lines & Graphics into one "Drawing" tab (they're related drawing tools), keep Unit Counters separate. Simpler structure, 2 tabs total.</p>
+    </div>
+  </div>
+
+  <!-- Option C: Horizontal pill tabs -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-family: monospace; font-size: 13px; line-height: 1.5; padding: 16px; background: #1e293b; color: #e2e8f0; border-radius: 8px;">
+        <div style="color: #94a3b8; margin-bottom: 8px;">Strategic Overlay</div>
+        <div style="display: flex; gap: 4px; margin-bottom: 10px;">
+          <span style="background: #3b82f6; color: white; padding: 4px 12px; border-radius: 16px; font-size: 11px;">Lines</span>
+          <span style="background: #475569; color: #94a3b8; padding: 4px 12px; border-radius: 16px; font-size: 11px;">Graphics</span>
+          <span style="background: #475569; color: #94a3b8; padding: 4px 12px; border-radius: 16px; font-size: 11px;">Counters</span>
+        </div>
+        <div style="background: #334155; border-radius: 6px; padding: 10px 12px; color: #94a3b8; font-size: 11px;">
+          Kind: [Frontline ▾] Label: [____]<br>
+          Stroke: [■ #e53] W: [2] Op: [1.0]<br>
+          [Undo Vertex] [Finish] [Cancel]<br>
+          [Delete Selected]<br><br>
+          <div style="border-top: 1px solid #475569; padding-top: 6px;">
+            Existing Lines: [select list]
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Horizontal Pill Tabs</h3>
+      <p>Top-level pill/chip tabs switch between sections. Only one section visible at a time. More like traditional tab navigation, less like accordion.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 24px; padding: 16px; background: rgba(59, 130, 246, 0.08); border-radius: 8px; border-left: 3px solid #3b82f6;">
+  <p style="margin: 0; color: #94a3b8; font-size: 13px;"><strong>Context:</strong> The current panel shows all 3 sections stacked vertically with no collapsing. When the workspace modal opens, CSS hides irrelevant sections based on <code>data-workspace-section</code>. This redesign affects the <em>sidebar view</em> — how sections appear before opening the full workspace modal.</p>
+</div>
