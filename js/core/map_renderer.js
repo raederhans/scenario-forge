@@ -78,8 +78,6 @@ let pathCanvas = null;
 let pathHitCanvas = null;
 let zoomBehavior = null;
 let activeContextMetricSession = null;
-let coastalAccentCompositeCanvas = null;
-let coastalAccentCompositeContext = null;
 
 let viewportGroup = null;
 let strategicDefs = null;
@@ -505,6 +503,7 @@ const layerResolverCache = {
   primaryRef: null,
   detailRef: null,
   bundleMode: null,
+  contextRevision: 0,
 };
 const politicalFeatureCollectionCache = new WeakMap();
 let admin0MergedCache = {
@@ -882,6 +881,10 @@ function invalidateRenderPasses(passNames, reason = "unspecified") {
 
 function invalidateAllRenderPasses(reason = "unspecified") {
   invalidateRenderPasses(RENDER_PASS_NAMES, reason);
+}
+
+function isBootInteractionReady() {
+  return String(state.bootPhase || "").trim().toLowerCase() === "ready" && !state.bootBlocking;
 }
 
 function clearRenderPassReferenceTransforms(passNames = null) {
@@ -4034,7 +4037,8 @@ function ensureLayerDataFromTopology() {
   const sameSource =
     layerResolverCache.primaryRef === primaryTopology &&
     layerResolverCache.detailRef === state.topologyDetail &&
-    layerResolverCache.bundleMode === state.topologyBundleMode;
+    layerResolverCache.bundleMode === state.topologyBundleMode &&
+    layerResolverCache.contextRevision === Number(state.contextLayerRevision || 0);
   if (sameSource) {
     return;
   }
@@ -4079,9 +4083,26 @@ function ensureLayerDataFromTopology() {
   layerResolverCache.primaryRef = primaryTopology;
   layerResolverCache.detailRef = state.topologyDetail;
   layerResolverCache.bundleMode = state.topologyBundleMode;
+  layerResolverCache.contextRevision = Number(state.contextLayerRevision || 0);
 
   if (typeof state.updateSpecialZoneEditorUIFn === "function") {
     state.updateSpecialZoneEditorUIFn();
+  }
+}
+
+function invalidateContextLayerVisualState(layerName, reason = "context-layer-loaded", { renderNow = true } = {}) {
+  layerResolverCache.primaryRef = null;
+  layerResolverCache.detailRef = null;
+  layerResolverCache.bundleMode = null;
+  layerResolverCache.contextRevision = Number.NaN;
+  const targetPasses = ["contextBase"];
+  if (layerName === "urban" || layerName === "physical" || layerName === "physical_semantics") {
+    targetPasses.push("dayNight");
+  }
+  invalidateRenderPasses(targetPasses, reason);
+  clearRenderPassReferenceTransforms(targetPasses);
+  if (renderNow && typeof state.renderNowFn === "function") {
+    state.renderNowFn();
   }
 }
 
@@ -7824,30 +7845,6 @@ function getFeatureProjectedDensity(feature) {
   return maxDensity;
 }
 
-function getOpaqueCoastalAccentColor() {
-  const channels = parseCanvasColorChannels(TNO_COASTAL_ACCENT_COLOR);
-  if (!channels) return TNO_COASTAL_ACCENT_COLOR;
-  return toRgbaString({ r: channels.r, g: channels.g, b: channels.b }, 1);
-}
-
-function getCoastalAccentCompositeContext() {
-  const canvasWidth = Number(state.width) || context?.canvas?.width || 0;
-  const canvasHeight = Number(state.height) || context?.canvas?.height || 0;
-  if (!(canvasWidth > 0) || !(canvasHeight > 0)) return null;
-  if (
-    !coastalAccentCompositeCanvas ||
-    coastalAccentCompositeCanvas.width !== canvasWidth ||
-    coastalAccentCompositeCanvas.height !== canvasHeight
-  ) {
-    coastalAccentCompositeCanvas = createCityMarkerSpriteCanvas(canvasWidth, canvasHeight);
-    coastalAccentCompositeContext = coastalAccentCompositeCanvas?.getContext?.("2d") || null;
-  }
-  if (!coastalAccentCompositeContext) return null;
-  coastalAccentCompositeContext.setTransform(1, 0, 0, 1, 0, 0);
-  coastalAccentCompositeContext.clearRect(0, 0, canvasWidth, canvasHeight);
-  return coastalAccentCompositeContext;
-}
-
 function buildCoastalAccentStrokeBuckets(entries) {
   const buckets = new Map();
   entries.forEach((entry) => {
@@ -7871,50 +7868,21 @@ function drawCoastalAccentStrokeBuckets(entries, { clipAtlantropa = false } = {}
   if (!context || !Array.isArray(entries) || !entries.length) return;
   const buckets = buildCoastalAccentStrokeBuckets(entries);
   if (!buckets.length) return;
-  const scratchContext = getCoastalAccentCompositeContext();
-  if (!scratchContext || !coastalAccentCompositeCanvas) {
-    buckets.forEach((bucket) => {
-      context.save();
-      context.strokeStyle = TNO_COASTAL_ACCENT_COLOR;
-      context.globalAlpha = bucket.alpha;
-      context.lineWidth = bucket.lineWidth;
-      context.lineJoin = "round";
-      context.lineCap = "round";
-      context.beginPath();
-      bucket.geometries.forEach((geometry) => {
-        pathCanvas(geometry);
-      });
-      context.stroke();
-      context.restore();
-    });
-    return;
-  }
-
-  const opaqueStrokeColor = getOpaqueCoastalAccentColor();
-  const canvasWidth = coastalAccentCompositeCanvas.width;
-  const canvasHeight = coastalAccentCompositeCanvas.height;
   buckets.forEach((bucket) => {
-    scratchContext.setTransform(1, 0, 0, 1, 0, 0);
-    scratchContext.clearRect(0, 0, canvasWidth, canvasHeight);
-    withRenderTarget(scratchContext, () => {
-      scratchContext.save();
-      if (clipAtlantropa) {
-        clipOutAtlantropaAccentRegions();
-      }
-      scratchContext.beginPath();
-      bucket.geometries.forEach((geometry) => {
-        pathCanvas(geometry);
-      });
-      scratchContext.strokeStyle = opaqueStrokeColor;
-      scratchContext.lineWidth = bucket.lineWidth;
-      scratchContext.lineJoin = "round";
-      scratchContext.lineCap = "round";
-      scratchContext.stroke();
-      scratchContext.restore();
-    });
     context.save();
+    if (clipAtlantropa) {
+      clipOutAtlantropaAccentRegions();
+    }
+    context.strokeStyle = TNO_COASTAL_ACCENT_COLOR;
     context.globalAlpha = bucket.alpha;
-    context.drawImage(coastalAccentCompositeCanvas, 0, 0);
+    context.lineWidth = bucket.lineWidth;
+    context.lineJoin = "round";
+    context.lineCap = "round";
+    context.beginPath();
+    bucket.geometries.forEach((geometry) => {
+      pathCanvas(geometry);
+    });
+    context.stroke();
     context.restore();
   });
 }
@@ -7982,6 +7950,8 @@ function drawScenarioCoastalAccentOverlays(k, { interactive = false } = {}) {
 
 function drawTnoCoastalAccentLayer(k, { interactive = false } = {}) {
   if (!context || !isTnoCoastalAccentEnabled()) return;
+  const coastlineDecision = resolveCoastlineTopologySource();
+  const usesScenarioCoastlineSource = coastlineDecision?.source === "scenario";
   const coastlineCollection = interactive
     ? getCoastlineCollectionForZoom(k)
     : getViewportAwareCoastlineCollection(getCoastlineCollectionForZoom(k), k);
@@ -8011,8 +7981,10 @@ function drawTnoCoastalAccentLayer(k, { interactive = false } = {}) {
       });
     });
   });
-  drawCoastalAccentStrokeBuckets(entries, { clipAtlantropa: true });
-  drawScenarioCoastalAccentOverlays(k, { interactive });
+  drawCoastalAccentStrokeBuckets(entries, { clipAtlantropa: !usesScenarioCoastlineSource });
+  if (!usesScenarioCoastlineSource) {
+    drawScenarioCoastalAccentOverlays(k, { interactive });
+  }
 }
 
 function resolveOceanMask() {
@@ -8296,7 +8268,7 @@ function getResolvedPhysicalAtlasCollection() {
   if (Array.isArray(fallback?.features) && fallback.features.length > 0) {
     warnMissingPhysicalContextOnce(
       "physical-semantics-fallback",
-      "[physical] global_physical_semantics.topo.json missing; using relief-only atlas fallback."
+      "[physical] global_physical_semantics.topo.json unavailable or deferred; using relief-only atlas fallback."
     );
     return fallback;
   }
@@ -8612,7 +8584,7 @@ function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied =
   if (!Array.isArray(state.physicalContourMajorData?.features) || state.physicalContourMajorData.features.length === 0) {
     warnMissingPhysicalContextOnce(
       "physical-contours-major-missing",
-      "[physical] global_contours.major.topo.json missing; skipping terrain contours."
+      "[physical] global_contours.major.topo.json unavailable or deferred; skipping terrain contours."
     );
     collectContextMetric("drawPhysicalContourLayer", nowMs() - startedAt, {
       featureCount: 0,
@@ -8662,10 +8634,10 @@ function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied =
         excludeIntervalM: clamp(Number(cfg.contourMajorIntervalM) || 500, 500, 2000),
       });
     } else {
-      warnMissingPhysicalContextOnce(
-        "physical-contours-minor-missing",
-        "[physical] global_contours.minor.topo.json missing; skipping minor contours."
-      );
+        warnMissingPhysicalContextOnce(
+          "physical-contours-minor-missing",
+          "[physical] global_contours.minor.topo.json unavailable or deferred; skipping minor contours."
+        );
     }
   }
 
@@ -11990,6 +11962,7 @@ function drawTextureLayer(k, { interactive = false } = {}) {
   const texture = getTextureStyleConfig();
   const mode = String(texture.mode || "none").trim().toLowerCase();
   if (mode === "none") return;
+  if (!isBootInteractionReady()) return;
   if (mode === "paper") {
     drawOldPaperTexture(k, { interactive });
     return;
@@ -13196,6 +13169,7 @@ function drawContextScenarioPass(k, { interactive = false } = {}) {
 function drawDayNightPass(k, { interactive = false } = {}) {
   const config = getDayNightStyleConfig();
   if (!config.enabled) return;
+  if (!isBootInteractionReady()) return;
   const solarState = getCurrentSolarState(config);
   drawDayNightShadowLayer(k, config, solarState);
   if (!interactive) {
@@ -18828,6 +18802,7 @@ function initMap({ containerId = "mapContainer", suppressRender = false } = {}) 
   layerResolverCache.primaryRef = null;
   layerResolverCache.detailRef = null;
   layerResolverCache.bundleMode = null;
+  layerResolverCache.contextRevision = 0;
   resetPhysicalLandClipPathCache();
   state.topologyRevision = Number(state.topologyRevision || 0) + 1;
   const renderPassCache = getRenderPassCacheState();
@@ -18907,6 +18882,7 @@ function setMapData({ refitProjection = true, resetZoom = true, suppressRender =
   layerResolverCache.primaryRef = null;
   layerResolverCache.detailRef = null;
   layerResolverCache.bundleMode = null;
+  layerResolverCache.contextRevision = 0;
   state.devHoverHit = null;
   state.devSelectedHit = null;
   state.devSelectionFeatureIds = new Set();
@@ -19032,6 +19008,7 @@ export {
   markDynamicBordersDirty,
   recomputeDynamicBordersNow,
   scheduleDynamicBorderRecompute,
+  invalidateContextLayerVisualState,
   invalidateOceanBackgroundVisualState,
   invalidateOceanTextureVisualState,
   invalidateOceanWaterInteractionVisualState,

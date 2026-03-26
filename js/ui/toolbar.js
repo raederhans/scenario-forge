@@ -3220,6 +3220,9 @@ function initToolbar({ render } = {}) {
     toggleUrban.checked = !!state.showUrban;
     toggleUrban.addEventListener("change", (event) => {
       state.showUrban = event.target.checked;
+      if (state.showUrban && typeof state.ensureContextLayerDataFn === "function") {
+        void state.ensureContextLayerDataFn("urban", { reason: "toolbar-toggle", renderNow: true });
+      }
       renderDirty("toggle-urban");
     });
   }
@@ -3228,6 +3231,9 @@ function initToolbar({ render } = {}) {
     togglePhysical.checked = !!state.showPhysical;
     togglePhysical.addEventListener("change", (event) => {
       state.showPhysical = event.target.checked;
+      if (state.showPhysical && typeof state.ensureContextLayerDataFn === "function") {
+        void state.ensureContextLayerDataFn("physical-set", { reason: "toolbar-toggle", renderNow: true });
+      }
       renderDirty("toggle-physical");
     });
   }
@@ -3236,6 +3242,9 @@ function initToolbar({ render } = {}) {
     toggleRivers.checked = !!state.showRivers;
     toggleRivers.addEventListener("change", (event) => {
       state.showRivers = event.target.checked;
+      if (state.showRivers && typeof state.ensureContextLayerDataFn === "function") {
+        void state.ensureContextLayerDataFn("rivers", { reason: "toolbar-toggle", renderNow: true });
+      }
       renderDirty("toggle-rivers");
     });
   }

@@ -7952,6 +7952,15 @@ function initSidebar({ render } = {}) {
           }
           await ensureActiveScenarioOptionalLayerLoaded("cities", { renderNow: false });
         }
+        if (state.showRivers && typeof state.ensureContextLayerDataFn === "function") {
+          await state.ensureContextLayerDataFn("rivers", { reason: "project-import", renderNow: false });
+        }
+        if (state.showUrban && typeof state.ensureContextLayerDataFn === "function") {
+          await state.ensureContextLayerDataFn("urban", { reason: "project-import", renderNow: false });
+        }
+        if (state.showPhysical && typeof state.ensureContextLayerDataFn === "function") {
+          await state.ensureContextLayerDataFn("physical-set", { reason: "project-import", renderNow: false });
+        }
         state.scenarioImportAudit = state.activeScenarioId ? scenarioImportAudit : null;
         if (typeof state.updateParentBorderCountryListFn === "function") {
           state.updateParentBorderCountryListFn();

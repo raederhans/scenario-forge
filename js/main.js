@@ -1,7 +1,13 @@
 // App entry point (Phase 13)
 import { normalizeCityLayerStyleConfig, state } from "./core/state.js";
-import { loadCitySupportData, loadDeferredDetailBundle, loadMapData } from "./core/data_loader.js";
-import { initMap, setMapData, render } from "./core/map_renderer.js";
+import {
+  loadCitySupportData,
+  loadContextLayerPack,
+  loadDeferredDetailBundle,
+  loadMapData,
+  normalizeRequestedContextLayerNames,
+} from "./core/data_loader.js";
+import { initMap, invalidateContextLayerVisualState, setMapData, render } from "./core/map_renderer.js";
 import { applyActivePaletteState } from "./core/palette_manager.js";
 import {
   applyScenarioBundle,
@@ -163,15 +169,33 @@ function getDeferredPromotionDelay(profile) {
 let deferredPromotionHandle = null;
 let bootOverlayBound = false;
 let bootContinueHandler = null;
+let bootProgressAnimationHandle = null;
+let bootProgressPhaseStartedAt = nowMs();
+let postReadyContextWarmupScheduled = false;
 
-const BOOT_PHASE_PROGRESS = {
-  shell: 4,
-  "base-data": 32,
-  "scenario-bundle": 64,
-  "scenario-apply": 88,
-  warmup: 96,
-  ready: 100,
+const BOOT_PHASE_WINDOWS = {
+  shell: { min: 0, max: 8, durationMs: 900 },
+  "base-data": { min: 8, max: 52, durationMs: 8800 },
+  "scenario-bundle": { min: 52, max: 80, durationMs: 6400 },
+  "scenario-apply": { min: 80, max: 94, durationMs: 3400 },
+  warmup: { min: 94, max: 99, durationMs: 1200 },
+  ready: { min: 100, max: 100, durationMs: 0 },
+  error: { min: 0, max: 99, durationMs: 0 },
 };
+const CONTEXT_LAYER_LOAD_ORDER = [
+  "rivers",
+  "urban",
+  "physical",
+  "physical_semantics",
+  "physical_contours_major",
+  "physical_contours_minor",
+];
+const PHYSICAL_CONTEXT_LAYER_SET = [
+  "physical",
+  "physical_semantics",
+  "physical_contours_major",
+  "physical_contours_minor",
+];
 
 const BOOT_COPY = {
   en: {
@@ -258,15 +282,60 @@ function getBootDom() {
     return {};
   }
   return {
+    appShell: document.getElementById("appShell"),
     overlay: document.getElementById("bootOverlay"),
     title: document.getElementById("bootOverlayTitle"),
     message: document.getElementById("bootOverlayMessage"),
+    progressTrack: document.getElementById("bootOverlayProgress"),
     progressBar: document.getElementById("bootOverlayProgressBar"),
     progressText: document.getElementById("bootOverlayProgressText"),
     actions: document.getElementById("bootOverlayActions"),
     retryBtn: document.getElementById("bootRetryBtn"),
     continueBtn: document.getElementById("bootContinueBtn"),
   };
+}
+
+function getBootProgressWindow(phase = state.bootPhase) {
+  return BOOT_PHASE_WINDOWS[phase] || BOOT_PHASE_WINDOWS.shell;
+}
+
+function sampleBootPhaseProgress(phase = state.bootPhase) {
+  const window = getBootProgressWindow(phase);
+  if (phase === "ready") {
+    return 100;
+  }
+  if (phase === "error") {
+    return Math.max(window.min, Math.min(99, Number(state.bootProgress) || window.min));
+  }
+  const elapsedMs = Math.max(0, nowMs() - bootProgressPhaseStartedAt);
+  const normalizedElapsed = Math.min(1, elapsedMs / Math.max(1, window.durationMs || 1));
+  const shapedProgress = (normalizedElapsed * 0.68) + ((normalizedElapsed * normalizedElapsed) * 0.32);
+  const ceiling = phase === "warmup" ? 99 : Math.max(window.min, window.max - 0.35);
+  return Math.max(window.min, Math.min(ceiling, window.min + ((window.max - window.min) * shapedProgress)));
+}
+
+function stopBootProgressAnimation() {
+  if (bootProgressAnimationHandle !== null) {
+    globalThis.cancelAnimationFrame?.(bootProgressAnimationHandle);
+    bootProgressAnimationHandle = null;
+  }
+}
+
+function startBootProgressAnimation() {
+  stopBootProgressAnimation();
+  const tick = () => {
+    bootProgressAnimationHandle = null;
+    if (state.bootPhase === "ready" || state.bootPhase === "error") {
+      return;
+    }
+    const nextProgress = sampleBootPhaseProgress(state.bootPhase);
+    if (nextProgress > Number(state.bootProgress || 0)) {
+      state.bootProgress = nextProgress;
+      syncBootOverlay();
+    }
+    bootProgressAnimationHandle = globalThis.requestAnimationFrame?.(tick) ?? null;
+  };
+  bootProgressAnimationHandle = globalThis.requestAnimationFrame?.(tick) ?? null;
 }
 
 function syncBootOverlay() {
@@ -280,6 +349,9 @@ function syncBootOverlay() {
   const copy = getBootCopy(state.bootPhase);
   const progress = Math.max(0, Math.min(100, Number(state.bootProgress) || 0));
   document.body?.classList.toggle("app-booting", !!state.bootBlocking);
+  if (dom.appShell) {
+    dom.appShell.setAttribute("aria-busy", state.bootPhase === "ready" ? "false" : "true");
+  }
   dom.overlay.classList.toggle("hidden", state.bootPhase === "ready");
   dom.overlay.setAttribute("aria-busy", state.bootPhase === "ready" ? "false" : "true");
   if (dom.title) {
@@ -292,6 +364,10 @@ function syncBootOverlay() {
   }
   if (dom.progressBar) {
     dom.progressBar.style.width = `${progress}%`;
+  }
+  if (dom.progressTrack) {
+    dom.progressTrack.setAttribute("aria-valuenow", String(Math.round(progress)));
+    dom.progressTrack.setAttribute("aria-valuetext", `${Math.round(progress)}%`);
   }
   if (dom.progressText) {
     dom.progressText.textContent = `${Math.round(progress)}%`;
@@ -333,24 +409,39 @@ function setBootState(
   phase,
   {
     message = null,
-    progress = null,
+    progress = undefined,
     blocking = null,
     error = null,
     canContinueWithoutScenario = null,
   } = {}
 ) {
+  const previousPhase = String(state.bootPhase || "");
   state.bootPhase = phase;
   state.bootMessage = message ?? getBootCopy(phase).message;
-  state.bootProgress =
-    progress == null
-      ? (BOOT_PHASE_PROGRESS[phase] ?? state.bootProgress ?? 0)
-      : Math.max(0, Math.min(100, Number(progress) || 0));
   state.bootBlocking = blocking == null ? phase !== "ready" : !!blocking;
   state.bootError = phase === "error" ? String(error || state.bootError || "") : "";
   state.bootCanContinueWithoutScenario =
     canContinueWithoutScenario == null
       ? (phase === "error" ? !!state.bootCanContinueWithoutScenario : false)
       : !!canContinueWithoutScenario;
+  const window = getBootProgressWindow(phase);
+  if (phase !== previousPhase) {
+    bootProgressPhaseStartedAt = nowMs();
+  }
+  if (progress !== undefined) {
+    state.bootProgress = Math.max(0, Math.min(100, Number(progress) || 0));
+  } else if (phase === "ready") {
+    state.bootProgress = 100;
+  } else if (phase === "error") {
+    state.bootProgress = Math.max(window.min, Math.min(99, Number(state.bootProgress) || window.min));
+  } else {
+    state.bootProgress = Math.max(Number(state.bootProgress) || 0, window.min);
+  }
+  if (phase === "ready" || phase === "error") {
+    stopBootProgressAnimation();
+  } else {
+    startBootProgressAnimation();
+  }
   syncBootOverlay();
 }
 
@@ -481,6 +572,197 @@ async function ensureBaseCityDataReady({ reason = "manual", renderNow = true } =
     });
   state.baseCityDataPromise = promise;
   return promise;
+}
+
+function expandDeferredContextLayerNames(requestedLayerNames) {
+  const requested = Array.isArray(requestedLayerNames) ? requestedLayerNames : [requestedLayerNames];
+  const expanded = requested.flatMap((name) => {
+    const normalized = String(name || "").trim().toLowerCase();
+    if (!normalized) return [];
+    if (normalized === "physical-set") {
+      return PHYSICAL_CONTEXT_LAYER_SET;
+    }
+    return [normalized];
+  });
+  const normalized = normalizeRequestedContextLayerNames(expanded);
+  return normalized.sort((left, right) => {
+    const leftIndex = CONTEXT_LAYER_LOAD_ORDER.indexOf(left);
+    const rightIndex = CONTEXT_LAYER_LOAD_ORDER.indexOf(right);
+    return (leftIndex < 0 ? 999 : leftIndex) - (rightIndex < 0 ? 999 : rightIndex);
+  });
+}
+
+function updateContextLayerDerivedState(layerName, collection) {
+  state.contextLayerExternalDataByName = {
+    ...(state.contextLayerExternalDataByName || {}),
+    [layerName]: collection,
+  };
+  if (layerName === "rivers") {
+    state.riversData = collection;
+  } else if (layerName === "urban") {
+    state.urbanData = collection;
+  } else if (layerName === "physical") {
+    state.physicalData = collection;
+  } else if (layerName === "physical_semantics") {
+    state.physicalSemanticsData = collection;
+  } else if (layerName === "physical_contours_major") {
+    state.physicalContourMajorData = collection;
+  } else if (layerName === "physical_contours_minor") {
+    state.physicalContourMinorData = collection;
+  }
+}
+
+function topologyAlreadyProvidesContextLayer(layerName) {
+  const primaryTopology = state.topologyPrimary || state.topology;
+  const detailTopology = state.topologyDetail;
+  return Boolean(
+    primaryTopology?.objects?.[layerName]
+    || detailTopology?.objects?.[layerName]
+  );
+}
+
+async function ensureContextLayerDataReady(
+  requestedLayerNames,
+  { reason = "manual", renderNow = true } = {}
+) {
+  const layerNames = expandDeferredContextLayerNames(requestedLayerNames);
+  const results = {};
+  for (const layerName of layerNames) {
+    if (Array.isArray(state.contextLayerExternalDataByName?.[layerName]?.features)) {
+      results[layerName] = state.contextLayerExternalDataByName[layerName];
+      continue;
+    }
+    if (topologyAlreadyProvidesContextLayer(layerName)) {
+      state.contextLayerLoadStateByName[layerName] = "loaded";
+      results[layerName] = null;
+      continue;
+    }
+    if (state.contextLayerLoadPromiseByName?.[layerName]) {
+      results[layerName] = await state.contextLayerLoadPromiseByName[layerName];
+      continue;
+    }
+    state.contextLayerLoadStateByName[layerName] = "loading";
+    state.contextLayerLoadErrorByName[layerName] = "";
+    startBootMetric(`layer:${layerName}:load`);
+    const promise = loadContextLayerPack(layerName, globalThis.d3)
+      .then((collection) => {
+        if (!Array.isArray(collection?.features)) {
+          state.contextLayerLoadStateByName[layerName] = "error";
+          state.contextLayerLoadErrorByName[layerName] = `Deferred context layer "${layerName}" is unavailable.`;
+          finishBootMetric(`layer:${layerName}:load`, {
+            failed: true,
+            reason,
+          });
+          return null;
+        }
+        updateContextLayerDerivedState(layerName, collection);
+        state.contextLayerRevision = (Number(state.contextLayerRevision) || 0) + 1;
+        state.contextLayerLoadStateByName[layerName] = "loaded";
+        finishBootMetric(`layer:${layerName}:load`, {
+          featureCount: collection.features.length,
+          reason,
+        });
+        invalidateContextLayerVisualState(layerName, `context-layer:${reason}`, {
+          renderNow,
+        });
+        if (renderNow) {
+          checkpointBootMetric(`layer:${layerName}:first-render-after-load`);
+        }
+        return collection;
+      })
+      .catch((error) => {
+        state.contextLayerLoadStateByName[layerName] = "error";
+        state.contextLayerLoadErrorByName[layerName] = error?.message || String(error || "Unknown context layer error.");
+        finishBootMetric(`layer:${layerName}:load`, {
+          failed: true,
+          reason,
+        });
+        console.warn(`[boot] Deferred context layer failed to load: ${layerName}. reason=${reason}`, error);
+        return null;
+      })
+      .finally(() => {
+        delete state.contextLayerLoadPromiseByName[layerName];
+      });
+    state.contextLayerLoadPromiseByName[layerName] = promise;
+    results[layerName] = await promise;
+  }
+  return results;
+}
+
+function scheduleIdleTask(callback, { timeout = 1200, delayMs = 0 } = {}) {
+  const run = () => {
+    if (typeof globalThis.requestIdleCallback === "function") {
+      globalThis.requestIdleCallback(() => {
+        void callback();
+      }, { timeout });
+      return;
+    }
+    globalThis.setTimeout(() => {
+      void callback();
+    }, 0);
+  };
+  globalThis.setTimeout(run, Math.max(0, delayMs));
+}
+
+function schedulePostReadyVisualWarmup() {
+  const textureMode = String(state.styleConfig?.texture?.mode || "none").trim().toLowerCase();
+  const dayNightEnabled = !!state.styleConfig?.dayNight?.enabled;
+  if (textureMode === "none" && !dayNightEnabled) {
+    return;
+  }
+  globalThis.requestAnimationFrame?.(() => {
+    if (!state.bootBlocking && typeof state.renderNowFn === "function") {
+      state.renderNowFn();
+    }
+  });
+}
+
+function schedulePostReadyDeferredContextWarmup() {
+  if (state.bootBlocking || postReadyContextWarmupScheduled) {
+    return;
+  }
+  const queue = [];
+  if (state.showRivers) {
+    queue.push(() => ensureContextLayerDataReady("rivers", { reason: "post-ready", renderNow: true }));
+  }
+  if (state.showUrban) {
+    queue.push(() => ensureContextLayerDataReady("urban", { reason: "post-ready", renderNow: true }));
+  }
+  if (state.showPhysical) {
+    queue.push(() => ensureContextLayerDataReady("physical-set", { reason: "post-ready", renderNow: true }));
+  }
+  if (
+    state.showCityPoints !== false
+    && state.baseCityDataState === "idle"
+    && typeof state.ensureBaseCityDataFn === "function"
+  ) {
+    queue.push(() => state.ensureBaseCityDataFn({ reason: "post-ready", renderNow: true }));
+  }
+  if (!queue.length) {
+    return;
+  }
+  postReadyContextWarmupScheduled = true;
+  let cursor = 0;
+  const runNext = () => {
+    if (cursor >= queue.length || state.bootBlocking) {
+      return;
+    }
+    const task = queue[cursor];
+    cursor += 1;
+    scheduleIdleTask(async () => {
+      try {
+        await task();
+      } catch (_error) {
+        // Error state is already recorded by the layer loader.
+      } finally {
+        runNext();
+      }
+    }, {
+      timeout: cursor === 1 ? 1000 : 1800,
+      delayMs: cursor === 1 ? 120 : 180,
+    });
+  };
+  runNext();
 }
 
 function schedulePostReadyCityWarmup() {
@@ -621,6 +903,18 @@ function scheduleDeferredDetailPromotion(renderDispatcher) {
   }
 }
 
+function finalizeReadyState(renderDispatcher) {
+  scheduleDeferredDetailPromotion(renderDispatcher);
+  setBootState("ready", {
+    blocking: false,
+    progress: 100,
+    canContinueWithoutScenario: false,
+  });
+  checkpointBootMetric("first-interactive");
+  schedulePostReadyDeferredContextWarmup();
+  schedulePostReadyVisualWarmup();
+}
+
 async function bootstrap() {
   initializeBootOverlay();
   if (!globalThis.d3 || !globalThis.topojson) {
@@ -637,10 +931,11 @@ async function bootstrap() {
   initializeBootOverlay();
   resetBootMetrics();
   setBootState("shell", {
-    progress: BOOT_PHASE_PROGRESS.shell,
+    progress: BOOT_PHASE_WINDOWS.shell.min,
     canContinueWithoutScenario: false,
   });
   bootContinueHandler = null;
+  postReadyContextWarmupScheduled = false;
 
   let renderDispatcher = null;
   try {
@@ -683,6 +978,7 @@ async function bootstrap() {
     } = await loadMapData({
       d3Client,
       includeCityData: false,
+      includeContextLayers: false,
     });
     state.topology = topology || topologyPrimary || topologyDetail;
     state.topologyPrimary = topologyPrimary || state.topology;
@@ -708,9 +1004,20 @@ async function bootstrap() {
     state.ruCityOverrides = ruCityOverrides || null;
     state.specialZonesExternalData = specialZones || null;
     state.contextLayerExternalDataByName = contextLayerExternal || {};
-    state.physicalSemanticsData = state.contextLayerExternalDataByName?.physical_semantics || null;
-    state.physicalContourMajorData = state.contextLayerExternalDataByName?.physical_contours_major || null;
-    state.physicalContourMinorData = state.contextLayerExternalDataByName?.physical_contours_minor || null;
+    state.contextLayerRevision = (Number(state.contextLayerRevision) || 0) + 1;
+    state.contextLayerLoadStateByName = {
+      rivers: "idle",
+      urban: "idle",
+      physical: "idle",
+      physical_semantics: "idle",
+      physical_contours_major: "idle",
+      physical_contours_minor: "idle",
+    };
+    state.contextLayerLoadErrorByName = {};
+    state.contextLayerLoadPromiseByName = {};
+    state.physicalSemanticsData = null;
+    state.physicalContourMajorData = null;
+    state.physicalContourMinorData = null;
     state.paletteRegistry = paletteRegistry || null;
     state.defaultReleasableCatalog = releasableCatalog || null;
     state.releasableCatalog = releasableCatalog || null;
@@ -742,6 +1049,7 @@ async function bootstrap() {
     hydrateViewSettings();
     state.persistViewSettingsFn = persistViewSettings;
     state.ensureBaseCityDataFn = ensureBaseCityDataReady;
+    state.ensureContextLayerDataFn = ensureContextLayerDataReady;
 
     if (!state.topologyPrimary) {
       throw new Error("CRITICAL: TopoJSON file loaded but is null/undefined");
@@ -794,9 +1102,6 @@ async function bootstrap() {
     } else if (Array.isArray(state.contextLayerExternalDataByName?.physical?.features)) {
       state.physicalData = state.contextLayerExternalDataByName.physical;
     }
-    state.physicalSemanticsData = state.contextLayerExternalDataByName?.physical_semantics || null;
-    state.physicalContourMajorData = state.contextLayerExternalDataByName?.physical_contours_major || null;
-    state.physicalContourMinorData = state.contextLayerExternalDataByName?.physical_contours_minor || null;
     finishBootMetric("base-data", {
       topologyBundleMode: state.topologyBundleMode,
       primaryCount,
@@ -874,15 +1179,8 @@ async function bootstrap() {
     setBootState("warmup");
     renderDispatcher.flush();
     checkpointBootMetric("first-visible");
-    scheduleDeferredDetailPromotion(renderDispatcher);
-    setBootState("ready", {
-      blocking: false,
-      progress: 100,
-      canContinueWithoutScenario: false,
-    });
-    checkpointBootMetric("first-interactive");
+    finalizeReadyState(renderDispatcher);
     finishBootMetric("total");
-    schedulePostReadyCityWarmup();
     logBootMetrics();
     console.log("Initial render complete.");
   } catch (error) {
@@ -902,19 +1200,13 @@ async function bootstrap() {
         });
         renderDispatcher.flush();
         checkpointBootMetric("first-visible");
-        scheduleDeferredDetailPromotion(renderDispatcher);
-        setBootState("ready", {
-          blocking: false,
-          progress: 100,
-          canContinueWithoutScenario: false,
-        });
-        checkpointBootMetric("first-interactive");
+        finalizeReadyState(renderDispatcher);
       }
       : null;
     setBootState("error", {
       error: error?.message || "Failed to load the default startup scenario.",
       canContinueWithoutScenario,
-      progress: state.bootProgress || BOOT_PHASE_PROGRESS["scenario-apply"],
+      progress: state.bootProgress || BOOT_PHASE_WINDOWS["scenario-apply"].min,
     });
   }
 }

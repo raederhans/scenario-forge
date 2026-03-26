@@ -1732,7 +1732,16 @@
         <div class="boot-overlay__eyebrow">Scenario Boot</div>
         <h2 id="bootOverlayTitle" class="boot-overlay__title">Preparing default scenario</h2>
         <p id="bootOverlayMessage" class="boot-overlay__message">Loading the base map and TNO 1962 assets before interaction unlocks.</p>
-        <div class="boot-overlay__progress" aria-hidden="true">
+        <div
+          id="bootOverlayProgress"
+          class="boot-overlay__progress"
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+          aria-valuetext="0%"
+          aria-labelledby="bootOverlayTitle"
+        >
           <div id="bootOverlayProgressBar" class="boot-overlay__progress-bar"></div>
         </div>
         <div id="bootOverlayProgressText" class="boot-overlay__progress-text">0%</div>

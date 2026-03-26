@@ -525,49 +525,70 @@ async function loadRiversFallbackCollection(d3Client) {
   }
 }
 
-async function loadOptionalContextLayerPacks(d3Client) {
-  const riversCollection = await loadRiversFallbackCollection(d3Client);
-  const entries = await Promise.all(
-    Object.entries(CONTEXT_LAYER_PACKS).map(async ([layerName, descriptor]) => {
-      const { url, format = "geojson", objectName = "" } = descriptor || {};
-      try {
-        const payload = await d3Client.json(url);
-        if (format === "topology") {
-          const object = payload?.objects?.[objectName];
-          const collection = object && globalThis.topojson
-            ? globalThis.topojson.feature(payload, object)
-            : null;
-          if (!Array.isArray(collection?.features)) {
-            console.warn(`[data_loader] Context topology pack invalid at ${url}. Ignoring ${layerName}.`);
-            return [layerName, null];
-          }
-          return [layerName, collection];
-        }
-        if (!Array.isArray(payload?.features)) {
-          console.warn(`[data_loader] Context layer pack invalid at ${url}. Ignoring ${layerName}.`);
-          return [layerName, null];
-        }
-        return [
-          layerName,
-          {
-            type: "FeatureCollection",
-            features: payload.features,
-          },
-        ];
-      } catch (err) {
-        console.warn(`[data_loader] Context layer pack missing or invalid at ${url}. Ignoring ${layerName}.`, err);
-        return [layerName, null];
-      }
-    })
-  );
-
-  const contextCollections = Object.fromEntries(
-    entries.filter(([, collection]) => Array.isArray(collection?.features))
-  );
-  if (Array.isArray(riversCollection?.features)) {
-    contextCollections.rivers = riversCollection;
+function normalizeRequestedContextLayerNames(includeContextLayers) {
+  if (includeContextLayers === true) {
+    return ["rivers", ...Object.keys(CONTEXT_LAYER_PACKS)];
   }
-  return contextCollections;
+  if (includeContextLayers === false || includeContextLayers == null) {
+    return [];
+  }
+  const requestedNames = Array.isArray(includeContextLayers)
+    ? includeContextLayers
+    : [includeContextLayers];
+  return Array.from(
+    new Set(
+      requestedNames
+        .map((name) => String(name || "").trim().toLowerCase())
+        .filter((name) => name === "rivers" || Object.prototype.hasOwnProperty.call(CONTEXT_LAYER_PACKS, name))
+    )
+  );
+}
+
+async function loadContextLayerPackInternal(layerName, d3Client) {
+  if (layerName === "rivers") {
+    return loadRiversFallbackCollection(d3Client);
+  }
+  const descriptor = CONTEXT_LAYER_PACKS[layerName];
+  if (!descriptor) {
+    return null;
+  }
+  const { url, format = "geojson", objectName = "" } = descriptor;
+  try {
+    const payload = await d3Client.json(url);
+    if (format === "topology") {
+      const object = payload?.objects?.[objectName];
+      const collection = object && globalThis.topojson
+        ? globalThis.topojson.feature(payload, object)
+        : null;
+      if (!Array.isArray(collection?.features)) {
+        console.warn(`[data_loader] Context topology pack invalid at ${url}. Ignoring ${layerName}.`);
+        return null;
+      }
+      return collection;
+    }
+    if (!Array.isArray(payload?.features)) {
+      console.warn(`[data_loader] Context layer pack invalid at ${url}. Ignoring ${layerName}.`);
+      return null;
+    }
+    return {
+      type: "FeatureCollection",
+      features: payload.features,
+    };
+  } catch (err) {
+    console.warn(`[data_loader] Context layer pack missing or invalid for ${layerName}. Ignoring.`, err);
+    return null;
+  }
+}
+
+async function loadOptionalContextLayerPacks(d3Client, includeContextLayers = true) {
+  const requestedNames = normalizeRequestedContextLayerNames(includeContextLayers);
+  if (!requestedNames.length) {
+    return {};
+  }
+  const entries = await Promise.all(
+    requestedNames.map(async (layerName) => [layerName, await loadContextLayerPackInternal(layerName, d3Client)])
+  );
+  return Object.fromEntries(entries.filter(([, collection]) => Array.isArray(collection?.features)));
 }
 
 function getSearchParams() {
@@ -885,6 +906,7 @@ export async function loadMapData({
   releasableCatalogUrl = RELEASABLE_CATALOG_URL,
   d3Client = globalThis.d3,
   includeCityData = true,
+  includeContextLayers = true,
 } = {}) {
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available. Ensure D3 is loaded before calling loadMapData().");
@@ -907,7 +929,7 @@ export async function loadMapData({
     console.warn("Releasable catalog missing or invalid, continuing without releasable overlays.", err);
     return null;
   });
-  const contextLayerPackPromise = loadOptionalContextLayerPacks(d3Client);
+  const contextLayerPackPromise = loadOptionalContextLayerPacks(d3Client, includeContextLayers);
 
   const cityDataPromises = includeCityData
     ? [
@@ -1076,6 +1098,8 @@ export async function loadCitySupportData({
 export {
   buildCityLocalizationPatch,
   getCityLocaleEntry,
+  loadContextLayerPackInternal as loadContextLayerPack,
+  normalizeRequestedContextLayerNames,
   mergeCityLocalizationData,
   normalizeCityText,
   normalizeCityFeatureCollection,
