@@ -53,6 +53,9 @@ import { getScenarioCountryDisplayName } from "../core/scenario_country_display.
 import { setActivePaletteSource } from "../core/palette_manager.js";
 import {
   DEFAULT_UNIT_COUNTER_PRESET_ID,
+  getUnitCounterCatalogCategories,
+  getUnitCounterCategoryLabel,
+  getUnitCounterIconPathById,
   getUnitCounterPresetById,
   UNIT_COUNTER_ECHELONS,
   UNIT_COUNTER_PRESETS,
@@ -1544,7 +1547,12 @@ function initSidebar({ render } = {}) {
     ...preset,
     id: String(preset.id || "").trim().toUpperCase(),
     defaultEchelon: String(preset.defaultEchelon || "").trim().toUpperCase(),
+    category: String(preset.category || "ground").trim().toLowerCase() || "ground",
+    keywords: Array.isArray(preset.keywords) ? preset.keywords.map((entry) => String(entry || "").trim().toLowerCase()).filter(Boolean) : [],
+    featured: preset.featured !== false,
   })));
+  const featuredUnitCounterPresets = Object.freeze(unitCounterPresets.filter((preset) => preset.featured));
+  const unitCounterCatalogCategories = Object.freeze(getUnitCounterCatalogCategories());
   const unitCounterEchelons = Object.freeze(UNIT_COUNTER_ECHELONS.map(([value, label]) => [
     String(value || "").trim().toUpperCase(),
     label,
@@ -1608,6 +1616,40 @@ function initSidebar({ render } = {}) {
         id: String(normalizedPresetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toUpperCase(),
         defaultEchelon: String(getUnitCounterPresetById(normalizedPresetId || DEFAULT_UNIT_COUNTER_PRESET_ID).defaultEchelon || "").trim().toUpperCase(),
       };
+  };
+  const getSidebarUnitCounterPresetOptions = (selectedPresetId = "") => {
+    const normalizedSelectedId = String(selectedPresetId || "").trim().toUpperCase();
+    const options = featuredUnitCounterPresets.slice();
+    if (normalizedSelectedId && !options.some((preset) => preset.id === normalizedSelectedId)) {
+      options.unshift(getUnitCounterPresetMeta(normalizedSelectedId));
+    }
+    return options;
+  };
+  const getFilteredUnitCounterCatalog = ({
+    category = "all",
+    query = "",
+  } = {}) => {
+    const normalizedCategory = String(category || "all").trim().toLowerCase() || "all";
+    const normalizedQuery = String(query || "").trim().toLowerCase();
+    return unitCounterPresets.filter((preset) => {
+      if (normalizedCategory !== "all" && preset.category !== normalizedCategory) {
+        return false;
+      }
+      if (!normalizedQuery) {
+        return true;
+      }
+      const haystacks = [
+        preset.id,
+        preset.label,
+        preset.shortCode,
+        preset.unitType,
+        preset.category,
+        ...(preset.keywords || []),
+      ]
+        .map((entry) => String(entry || "").trim().toLowerCase())
+        .filter(Boolean);
+      return haystacks.some((entry) => entry.includes(normalizedQuery));
+    });
   };
   const inferUnitCounterPresetId = (candidate = {}) => {
     const rawPreset = String(candidate?.presetId || candidate?.unitType || "").trim().toUpperCase();
@@ -1686,6 +1728,7 @@ function initSidebar({ render } = {}) {
     organizationPct = 78,
     equipmentPct = 74,
     baseFillColor = "",
+    statusText = "",
     detailMode = false,
     compactMode = false,
   } = {}) => {
@@ -1770,6 +1813,12 @@ function initSidebar({ render } = {}) {
       : previewSubLabel;
 
     content.appendChild(title);
+    if (statusText) {
+      const status = document.createElement("div");
+      status.className = "unit-counter-preview-status";
+      status.textContent = statusText;
+      content.appendChild(status);
+    }
     content.appendChild(meta);
     if (!compactMode) {
       const statStack = document.createElement("div");
@@ -2135,15 +2184,20 @@ function initSidebar({ render } = {}) {
     unitDetailToggleBtn.id = "unitCounterDetailToggleBtn";
     unitDetailToggleBtn.className = "btn secondary unit-counter-detail-icon-btn";
     unitDetailToggleBtn.setAttribute("aria-label", t("Toggle details", "ui"));
+    unitDetailToggleBtn.setAttribute("aria-haspopup", "dialog");
     unitDetailToggleBtn.textContent = "\u2699";
     unitPreviewActions.appendChild(unitDetailToggleBtn);
 
     unitPreviewFrame.appendChild(unitPreviewCard);
     unitPreviewFrame.appendChild(unitPreviewActions);
 
+    const unitPlacementStatus = document.createElement("div");
+    unitPlacementStatus.id = "unitCounterPlacementStatus";
+    unitPlacementStatus.className = "unit-counter-placement-status hidden";
+
     const unitPresetNationRow = buildRow();
     unitPresetNationRow.className = "unit-counter-grid-row unit-counter-fast-row mt-3 strategic-counter-fast-controls";
-    const unitPresetSelect = buildSelect("unitCounterPresetSelect", unitCounterPresets.map((preset) => [
+    const unitPresetSelect = buildSelect("unitCounterPresetSelect", featuredUnitCounterPresets.map((preset) => [
       preset.id,
       `${preset.label} · ${preset.shortCode}`,
     ]));
@@ -2162,13 +2216,72 @@ function initSidebar({ render } = {}) {
     unitPresetNationRow.appendChild(unitEchelonSelect);
     unitPresetNationRow.appendChild(unitLabelInput);
 
-    const unitDetailDrawer = document.createElement("div");
-    unitDetailDrawer.id = "unitCounterDetailDrawer";
-    unitDetailDrawer.className = "unit-counter-detail-drawer hidden";
-
     const unitIdentityGroup = buildDetailGroup("unitCounterIdentityGroup", "Identity", { open: true });
     const unitCombatGroup = buildDetailGroup("unitCounterCombatGroup", "Combat State", { open: true });
     const unitFinishGroup = buildDetailGroup("unitCounterFinishGroup", "Finish", { open: false });
+
+    const counterEditorModalOverlay = document.createElement("div");
+    counterEditorModalOverlay.id = "unitCounterEditorModalOverlay";
+    counterEditorModalOverlay.className = "counter-editor-modal-overlay hidden";
+    const counterEditorModal = document.createElement("div");
+    counterEditorModal.id = "unitCounterEditorModal";
+    counterEditorModal.className = "counter-editor-modal";
+    counterEditorModal.setAttribute("role", "dialog");
+    counterEditorModal.setAttribute("aria-modal", "true");
+    counterEditorModal.setAttribute("aria-labelledby", "unitCounterEditorModalTitle");
+    counterEditorModal.tabIndex = -1;
+    const counterEditorModalHeader = document.createElement("div");
+    counterEditorModalHeader.className = "counter-editor-modal-header";
+    const counterEditorModalCopy = document.createElement("div");
+    counterEditorModalCopy.className = "counter-editor-modal-copy";
+    const counterEditorModalTitle = document.createElement("h2");
+    counterEditorModalTitle.id = "unitCounterEditorModalTitle";
+    counterEditorModalTitle.className = "counter-editor-modal-title";
+    counterEditorModalTitle.textContent = t("Counter Editor", "ui");
+    const counterEditorModalMessage = document.createElement("p");
+    counterEditorModalMessage.className = "counter-editor-modal-message";
+    counterEditorModalMessage.textContent = t("Browse symbols, tune combat state, and preview the selected counter in one place.", "ui");
+    counterEditorModalCopy.append(counterEditorModalTitle, counterEditorModalMessage);
+    const counterEditorModalCloseBtn = document.createElement("button");
+    counterEditorModalCloseBtn.type = "button";
+    counterEditorModalCloseBtn.id = "unitCounterEditorModalCloseBtn";
+    counterEditorModalCloseBtn.className = "counter-editor-modal-close-btn";
+    counterEditorModalCloseBtn.setAttribute("aria-label", t("Close counter editor", "ui"));
+    counterEditorModalCloseBtn.textContent = "\u00D7";
+    counterEditorModalHeader.append(counterEditorModalCopy, counterEditorModalCloseBtn);
+
+    const counterEditorModalBody = document.createElement("div");
+    counterEditorModalBody.className = "counter-editor-modal-body";
+    const counterEditorModalPreview = document.createElement("div");
+    counterEditorModalPreview.className = "counter-editor-modal-preview";
+    const unitDetailPreviewCard = document.createElement("div");
+    unitDetailPreviewCard.id = "unitCounterDetailPreviewCard";
+    unitDetailPreviewCard.className = "unit-counter-preview-shell counter-editor-preview-shell";
+    const counterEditorModalStatus = document.createElement("div");
+    counterEditorModalStatus.id = "unitCounterEditorModalStatus";
+    counterEditorModalStatus.className = "counter-editor-modal-status hidden";
+    counterEditorModalPreview.append(unitDetailPreviewCard, counterEditorModalStatus);
+
+    const counterEditorModalControls = document.createElement("div");
+    counterEditorModalControls.className = "counter-editor-modal-controls";
+    const unitCounterCatalogPanel = document.createElement("div");
+    unitCounterCatalogPanel.className = "counter-editor-symbol-panel";
+    const unitCounterCatalogHeader = document.createElement("div");
+    unitCounterCatalogHeader.className = "counter-editor-symbol-header";
+    unitCounterCatalogHeader.innerHTML = `<div class="section-header">${t("Symbol Browser", "ui")}</div><p class="sidebar-tool-hint">${t("Search the internal counter catalog, then apply a preset back into the editor.", "ui")}</p>`;
+    const unitCounterCatalogSearchInput = buildInput("unitCounterCatalogSearchInput", "Search symbols");
+    unitCounterCatalogSearchInput.classList.add("counter-editor-symbol-search");
+    const unitCounterCatalogCategoriesEl = document.createElement("div");
+    unitCounterCatalogCategoriesEl.id = "unitCounterCatalogCategories";
+    unitCounterCatalogCategoriesEl.className = "counter-editor-category-row";
+    const unitCounterCatalogGrid = document.createElement("div");
+    unitCounterCatalogGrid.id = "unitCounterCatalogGrid";
+    unitCounterCatalogGrid.className = "counter-editor-symbol-grid";
+    unitCounterCatalogPanel.append(unitCounterCatalogHeader, unitCounterCatalogSearchInput, unitCounterCatalogCategoriesEl, unitCounterCatalogGrid);
+
+    const unitDetailDrawer = document.createElement("div");
+    unitDetailDrawer.id = "unitCounterDetailDrawer";
+    unitDetailDrawer.className = "unit-counter-detail-drawer";
 
     const unitIdentityBlock = document.createElement("div");
     unitIdentityBlock.className = "unit-counter-detail-block";
@@ -2285,6 +2398,11 @@ function initSidebar({ render } = {}) {
     unitDetailDrawer.appendChild(unitCombatGroup.shell);
     unitDetailDrawer.appendChild(unitFinishGroup.shell);
 
+    counterEditorModalControls.append(unitCounterCatalogPanel, unitDetailDrawer);
+    counterEditorModalBody.append(counterEditorModalPreview, counterEditorModalControls);
+    counterEditorModal.append(counterEditorModalHeader, counterEditorModalBody);
+    counterEditorModalOverlay.appendChild(counterEditorModal);
+
     const unitOptionsRow = buildRow();
     unitOptionsRow.className = "mt-2 flex flex-wrap items-center justify-between gap-2 strategic-counter-visual-options";
     const unitLabelToggle = document.createElement("label");
@@ -2294,9 +2412,23 @@ function initSidebar({ render } = {}) {
 
     const unitActions = buildRow();
     unitActions.className = "sidebar-equal-actions mt-3 strategic-counter-management-actions";
-    unitActions.appendChild(buildButton("unitCounterPlaceBtn", "Place Counter"));
-    unitActions.appendChild(buildButton("unitCounterCancelBtn", "Cancel Place"));
-    unitActions.appendChild(buildButton("unitCounterDeleteBtn", "Delete Selected"));
+    const createCounterActionButton = (id, label, iconText, fullLabel) => {
+      const button = buildButton(id, label);
+      button.classList.add("strategic-counter-action-btn");
+      button.setAttribute("title", t(fullLabel || label, "ui"));
+      button.setAttribute("aria-label", t(fullLabel || label, "ui"));
+      const icon = document.createElement("span");
+      icon.className = "strategic-counter-action-icon";
+      icon.textContent = iconText;
+      const copy = document.createElement("span");
+      copy.className = "strategic-counter-action-label";
+      copy.textContent = t(label, "ui");
+      button.replaceChildren(icon, copy);
+      return button;
+    };
+    unitActions.appendChild(createCounterActionButton("unitCounterPlaceBtn", "Place", "+", "Place Counter"));
+    unitActions.appendChild(createCounterActionButton("unitCounterCancelBtn", "Cancel", "\u00D7", "Cancel Place"));
+    unitActions.appendChild(createCounterActionButton("unitCounterDeleteBtn", "Delete", "\u2212", "Delete Selected"));
 
     const unitListHeader = document.createElement("div");
     unitListHeader.className = "unit-counter-list-header mt-3 strategic-counter-list-header";
@@ -2329,13 +2461,14 @@ function initSidebar({ render } = {}) {
     countersBlock.appendChild(unitHeader);
     countersBlock.appendChild(unitHint);
     unitEditorShell.appendChild(unitPreviewFrame);
+    unitEditorShell.appendChild(unitPlacementStatus);
     unitEditorShell.appendChild(unitPresetNationRow);
-    unitEditorShell.appendChild(unitDetailDrawer);
     unitEditorShell.appendChild(unitOptionsRow);
     unitEditorShell.appendChild(unitActions);
     unitEditorShell.appendChild(unitListHeader);
     unitEditorShell.appendChild(unitList);
     countersBlock.appendChild(unitEditorShell);
+    document.body.appendChild(counterEditorModalOverlay);
 
     const buildAccordionSection = (id, title, contentBlock, opts = {}) => {
       const wrapper = document.createElement("div");
@@ -2513,7 +2646,13 @@ function initSidebar({ render } = {}) {
   const operationGraphicDeleteVertexBtn = document.getElementById("operationGraphicDeleteVertexBtn");
   const operationGraphicList = document.getElementById("operationGraphicList");
   const unitCounterPreviewCard = document.getElementById("unitCounterPreviewCard");
+  const unitCounterPlacementStatus = document.getElementById("unitCounterPlacementStatus");
   const unitCounterDetailToggleBtn = document.getElementById("unitCounterDetailToggleBtn");
+  const unitCounterEditorModalOverlay = document.getElementById("unitCounterEditorModalOverlay");
+  const unitCounterEditorModal = document.getElementById("unitCounterEditorModal");
+  const unitCounterEditorModalCloseBtn = document.getElementById("unitCounterEditorModalCloseBtn");
+  const unitCounterEditorModalStatus = document.getElementById("unitCounterEditorModalStatus");
+  const unitCounterDetailPreviewCard = document.getElementById("unitCounterDetailPreviewCard");
   const unitCounterDetailDrawer = document.getElementById("unitCounterDetailDrawer");
   const unitCounterPresetSelect = document.getElementById("unitCounterPresetSelect");
   const unitCounterNationModeSelect = document.getElementById("unitCounterNationModeSelect");
@@ -2543,6 +2682,9 @@ function initSidebar({ render } = {}) {
   const unitCounterCancelBtn = document.getElementById("unitCounterCancelBtn");
   const unitCounterDeleteBtn = document.getElementById("unitCounterDeleteBtn");
   const unitCounterList = document.getElementById("unitCounterList");
+  const unitCounterCatalogSearchInput = document.getElementById("unitCounterCatalogSearchInput");
+  const unitCounterCatalogCategoriesEl = document.getElementById("unitCounterCatalogCategories");
+  const unitCounterCatalogGrid = document.getElementById("unitCounterCatalogGrid");
   const debugModeSelect = document.getElementById("debug-mode-select");
   const countryInspectorEmpty = document.getElementById("countryInspectorEmpty");
   const countryInspectorSelected = document.getElementById("countryInspectorSelected");
@@ -2592,6 +2734,61 @@ function initSidebar({ render } = {}) {
   const diagnosticsSection = document.getElementById("lblDiagnostics")?.closest("details");
   const selectedCountryActionsTitle = document.getElementById("lblHistoricalPresets");
   const selectedCountryActionHint = document.getElementById("selectedCountryActionHint");
+  let counterEditorModalPreviouslyFocused = null;
+
+  const ensureStrategicOverlayUiState = () => {
+    if (!state.strategicOverlayUi || typeof state.strategicOverlayUi !== "object") {
+      state.strategicOverlayUi = {};
+    }
+    state.strategicOverlayUi.counterEditorModalOpen = !!state.strategicOverlayUi.counterEditorModalOpen;
+    state.strategicOverlayUi.counterCatalogCategory = String(state.strategicOverlayUi.counterCatalogCategory || "all").trim().toLowerCase() || "all";
+    state.strategicOverlayUi.counterCatalogQuery = String(state.strategicOverlayUi.counterCatalogQuery || "");
+  };
+  const getCounterEditorModalFocusableElements = () => {
+    if (!(unitCounterEditorModal instanceof HTMLElement)) {
+      return [];
+    }
+    return Array.from(unitCounterEditorModal.querySelectorAll(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )).filter((element) => (
+      element instanceof HTMLElement
+      && !element.hidden
+      && element.getAttribute("aria-hidden") !== "true"
+      && element.tabIndex >= 0
+    ));
+  };
+  const setCounterEditorModalState = (nextOpen, { restoreFocus = true } = {}) => {
+    ensureStrategicOverlayUiState();
+    const isOpen = !!nextOpen;
+    state.strategicOverlayUi.counterEditorModalOpen = isOpen;
+    if (unitCounterEditorModalOverlay) {
+      unitCounterEditorModalOverlay.classList.toggle("hidden", !isOpen);
+    }
+    document.body.classList.toggle("counter-editor-modal-open", isOpen);
+    if (isOpen) {
+      counterEditorModalPreviouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      if (state.strategicOverlayUi?.modalOpen) {
+        setStrategicWorkspaceModalState(false, String(state.strategicOverlayUi?.modalSection || "line"));
+      }
+      globalThis.requestAnimationFrame(() => {
+        if (unitCounterCatalogSearchInput) {
+          unitCounterCatalogSearchInput.focus({ preventScroll: true });
+        } else {
+          unitCounterEditorModal?.focus({ preventScroll: true });
+        }
+      });
+    } else if (restoreFocus && counterEditorModalPreviouslyFocused && document.contains(counterEditorModalPreviouslyFocused)) {
+      counterEditorModalPreviouslyFocused.focus({ preventScroll: true });
+      counterEditorModalPreviouslyFocused = null;
+    }
+  };
+  const cancelStrategicEditingModes = () => {
+    const cancelled = mapRenderer.cancelActiveStrategicInteractionModes();
+    if (cancelled) {
+      refreshStrategicOverlayUI();
+    }
+    return cancelled;
+  };
 
   initDevWorkspace();
 
@@ -6098,6 +6295,8 @@ function initSidebar({ render } = {}) {
     state.ui.rightSidebarTab = activeId;
     document.body.classList.toggle("frontline-mode-active", activeId === "frontline");
     if (activeId !== "frontline") {
+      setCounterEditorModalState(false, { restoreFocus: false });
+      cancelStrategicEditingModes();
       setStrategicWorkspaceModalState(false, String(state.strategicOverlayUi?.modalSection || "line"));
     }
     inspectorSidebarTabButtons.forEach((button) => {
@@ -6192,6 +6391,11 @@ function initSidebar({ render } = {}) {
     }
     state.strategicOverlayUi.modalOpen = !!nextOpen;
     state.strategicOverlayUi.modalSection = section === "counter" ? "counter" : "line";
+    if (nextOpen) {
+      setCounterEditorModalState(false, { restoreFocus: false });
+    } else {
+      cancelStrategicEditingModes();
+    }
     document.body.classList.toggle("strategic-workspace-open", !!nextOpen);
     document.body.classList.toggle("strategic-workspace-visual-mode", !!nextOpen);
     if (strategicOverlaySection) {
@@ -6230,6 +6434,7 @@ function initSidebar({ render } = {}) {
 
   const refreshStrategicOverlayUI = () => {
     const annotationView = normalizeAnnotationView(state.annotationView);
+    ensureStrategicOverlayUiState();
     refreshFrontlineTabUI();
     setStrategicWorkspaceModalState(
       !!state.strategicOverlayUi?.modalOpen,
@@ -6424,6 +6629,13 @@ function initSidebar({ render } = {}) {
     );
     const nationOptions = getUnitCounterNationOptions();
     if (unitCounterPresetSelect) {
+      unitCounterPresetSelect.replaceChildren();
+      getSidebarUnitCounterPresetOptions(effectivePresetId).forEach((preset) => {
+        const option = document.createElement("option");
+        option.value = preset.id;
+        option.textContent = `${preset.label} · ${preset.shortCode}`;
+        unitCounterPresetSelect.appendChild(option);
+      });
       unitCounterPresetSelect.value = effectivePresetId;
     }
     if (unitCounterNationModeSelect) {
@@ -6498,19 +6710,18 @@ function initSidebar({ render } = {}) {
         ? t("MILSTD uses the browser-loaded milsymbol renderer. Paste a full SIDC for the symbol body.", "ui")
         : t("Game renderer keeps the lighter counter style and uses a short internal code or abbreviation.", "ui");
     }
-    const drawerPinnedOpen = unitCounterDetailDrawer?.dataset.pinnedOpen === "true";
-    const drawerForcedOpen = !!selectedCounter
-      || !!unitEditor.active
-      || (state.strategicOverlayUi?.modalOpen && String(state.strategicOverlayUi?.modalSection || "line") === "counter");
-    const shouldOpenDetailDrawer = drawerPinnedOpen || drawerForcedOpen;
     if (unitCounterDetailDrawer) {
-      unitCounterDetailDrawer.classList.toggle("hidden", !shouldOpenDetailDrawer);
-      unitCounterDetailDrawer.dataset.open = shouldOpenDetailDrawer ? "true" : "false";
+      unitCounterDetailDrawer.dataset.open = state.strategicOverlayUi?.counterEditorModalOpen ? "true" : "false";
     }
     if (unitCounterDetailToggleBtn) {
-      unitCounterDetailToggleBtn.setAttribute("aria-label", shouldOpenDetailDrawer ? t("Hide details", "ui") : t("Show details", "ui"));
-      unitCounterDetailToggleBtn.setAttribute("aria-expanded", shouldOpenDetailDrawer ? "true" : "false");
+      unitCounterDetailToggleBtn.setAttribute("aria-label", t("Open counter editor", "ui"));
+      unitCounterDetailToggleBtn.setAttribute("aria-expanded", state.strategicOverlayUi?.counterEditorModalOpen ? "true" : "false");
+      unitCounterDetailToggleBtn.classList.toggle("is-active", !!state.strategicOverlayUi?.counterEditorModalOpen);
     }
+    setCounterEditorModalState(!!state.strategicOverlayUi?.counterEditorModalOpen, { restoreFocus: false });
+    const placementStatusText = unitEditor.active
+      ? t("Placing on map", "ui")
+      : "";
     renderUnitCounterPreview(unitCounterPreviewCard, {
       renderer: effectiveRenderer,
       size: effectiveSize,
@@ -6526,8 +6737,36 @@ function initSidebar({ render } = {}) {
       organizationPct: effectiveCombatState.organizationPct,
       equipmentPct: effectiveCombatState.equipmentPct,
       baseFillColor: effectiveCombatState.baseFillColor,
+      statusText: placementStatusText,
       compactMode: true,
     });
+    renderUnitCounterPreview(unitCounterDetailPreviewCard, {
+      renderer: effectiveRenderer,
+      size: effectiveSize,
+      nationTag: effectiveNationTag,
+      nationSource: effectiveNationSource,
+      label: effectiveLabel,
+      subLabel: effectiveSubLabel,
+      strengthText: effectiveStrengthText,
+      sidc: effectiveSymbol,
+      symbolCode: effectiveSymbol,
+      presetId: effectivePresetId,
+      echelon: effectiveEchelon,
+      organizationPct: effectiveCombatState.organizationPct,
+      equipmentPct: effectiveCombatState.equipmentPct,
+      baseFillColor: effectiveCombatState.baseFillColor,
+      statusText: placementStatusText,
+      detailMode: true,
+    });
+    if (unitCounterPlacementStatus) {
+      unitCounterPlacementStatus.textContent = placementStatusText || t("Use the gear button for the full counter editor.", "ui");
+      unitCounterPlacementStatus.classList.toggle("hidden", !placementStatusText);
+    }
+    if (unitCounterEditorModalStatus) {
+      unitCounterEditorModalStatus.textContent = placementStatusText || t("Apply a symbol, then return to the map to continue placement or edit the selected counter live.", "ui");
+      unitCounterEditorModalStatus.classList.toggle("hidden", false);
+      unitCounterEditorModalStatus.dataset.mode = placementStatusText ? "placing" : "idle";
+    }
     if (unitCounterStatsPresetSelect) {
       unitCounterStatsPresetSelect.value = effectiveCombatState.statsPresetId === "random"
         ? "regular"
@@ -6567,6 +6806,61 @@ function initSidebar({ render } = {}) {
     }
     if (unitCounterLabelsToggle) {
       unitCounterLabelsToggle.checked = annotationView.showUnitLabels !== false;
+    }
+    if (unitCounterCatalogSearchInput) {
+      unitCounterCatalogSearchInput.value = String(state.strategicOverlayUi?.counterCatalogQuery || "");
+    }
+    if (unitCounterCatalogCategoriesEl) {
+      unitCounterCatalogCategoriesEl.replaceChildren();
+      [["all", t("All", "ui")], ...unitCounterCatalogCategories.map((category) => [category, getUnitCounterCategoryLabel(category)])]
+        .forEach(([categoryValue, label]) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "counter-editor-category-btn";
+          button.dataset.counterCatalogCategory = String(categoryValue || "");
+          button.textContent = label;
+          const active = String(state.strategicOverlayUi?.counterCatalogCategory || "all") === String(categoryValue || "");
+          button.classList.toggle("is-active", active);
+          button.setAttribute("aria-pressed", active ? "true" : "false");
+          unitCounterCatalogCategoriesEl.appendChild(button);
+        });
+    }
+    if (unitCounterCatalogGrid) {
+      unitCounterCatalogGrid.replaceChildren();
+      const filteredCatalog = getFilteredUnitCounterCatalog({
+        category: state.strategicOverlayUi?.counterCatalogCategory || "all",
+        query: state.strategicOverlayUi?.counterCatalogQuery || "",
+      });
+      if (!filteredCatalog.length) {
+        const emptyState = document.createElement("div");
+        emptyState.className = "counter-editor-symbol-empty";
+        emptyState.textContent = t("No symbols match the current filter.", "ui");
+        unitCounterCatalogGrid.appendChild(emptyState);
+      } else {
+        filteredCatalog.forEach((preset) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "counter-editor-symbol-card";
+          button.dataset.unitCounterCatalogPreset = preset.id;
+          const active = preset.id === effectivePresetId;
+          button.classList.toggle("is-active", active);
+          button.setAttribute("aria-pressed", active ? "true" : "false");
+          const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+          icon.setAttribute("viewBox", "-5 -5 10 10");
+          icon.setAttribute("aria-hidden", "true");
+          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          path.setAttribute("d", getUnitCounterIconPathById(preset.iconId));
+          icon.appendChild(path);
+          const title = document.createElement("span");
+          title.className = "counter-editor-symbol-card-title";
+          title.textContent = preset.label;
+          const subtitle = document.createElement("span");
+          subtitle.className = "counter-editor-symbol-card-subtitle";
+          subtitle.textContent = `${preset.shortCode} · ${getUnitCounterCategoryLabel(preset.category)}`;
+          button.append(icon, title, subtitle);
+          unitCounterCatalogGrid.appendChild(button);
+        });
+      }
     }
     if (unitCounterList) {
       unitCounterList.replaceChildren();
@@ -6665,9 +6959,8 @@ function initSidebar({ render } = {}) {
 
   if (strategicOverlayOpenWorkspaceBtn && !strategicOverlayOpenWorkspaceBtn.dataset.bound) {
     strategicOverlayOpenWorkspaceBtn.addEventListener("click", () => {
-      const preferredSection = state.unitCounterEditor?.selectedId && !state.operationalLineEditor?.selectedId
-        ? "counter"
-        : String(state.strategicOverlayUi?.modalSection || "line");
+      const currentSection = String(state.strategicOverlayUi?.modalSection || "line");
+      const preferredSection = currentSection === "counter" ? "line" : currentSection;
       setStrategicWorkspaceModalState(true, preferredSection);
     });
     strategicOverlayOpenWorkspaceBtn.dataset.bound = "true";
@@ -7039,39 +7332,38 @@ function initSidebar({ render } = {}) {
       statsSource: source,
     });
   };
+  const applyUnitCounterPresetSelection = (nextPresetId, { commitSelected = true } = {}) => {
+    const normalizedPresetId = String(nextPresetId || unitCounterPresets[0].id).trim().toUpperCase();
+    const nextPreset = getUnitCounterPresetMeta(normalizedPresetId);
+    const nextRenderer = String(nextPreset.defaultRenderer || "game").trim().toLowerCase();
+    const fallbackToken = nextRenderer === "milstd"
+      ? String(nextPreset.baseSidc || "").trim().toUpperCase()
+      : String(nextPreset.shortCode || "").trim().toUpperCase();
+    state.unitCounterEditor.presetId = normalizedPresetId;
+    state.unitCounterEditor.iconId = String(nextPreset.iconId || "").trim().toLowerCase();
+    state.unitCounterEditor.unitType = String(nextPreset.unitType || nextPreset.id || "").trim().toUpperCase();
+    state.unitCounterEditor.renderer = nextRenderer;
+    state.unitCounterEditor.echelon = String(nextPreset.defaultEchelon || "").trim().toUpperCase();
+    state.unitCounterEditor.sidc = fallbackToken;
+    state.unitCounterEditor.symbolCode = fallbackToken;
+    if (commitSelected && !state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
+      mapRenderer.updateSelectedUnitCounter({
+        presetId: normalizedPresetId,
+        iconId: state.unitCounterEditor.iconId,
+        unitType: state.unitCounterEditor.unitType,
+        renderer: String(state.unitCounterEditor.renderer || nextRenderer).trim().toLowerCase(),
+        echelon: String(state.unitCounterEditor.echelon || nextPreset.defaultEchelon || "").trim().toUpperCase(),
+        sidc: String(state.unitCounterEditor.sidc || state.unitCounterEditor.symbolCode || fallbackToken || "").trim().toUpperCase(),
+      });
+    } else if (render) {
+      render();
+    }
+    refreshStrategicOverlayUI();
+  };
 
   if (unitCounterPresetSelect && !unitCounterPresetSelect.dataset.bound) {
     unitCounterPresetSelect.addEventListener("change", (event) => {
-      const nextPresetId = String(event.target.value || unitCounterPresets[0].id).trim().toUpperCase();
-      const nextPreset = getUnitCounterPresetMeta(nextPresetId);
-      state.unitCounterEditor.presetId = nextPresetId;
-      state.unitCounterEditor.unitType = nextPresetId;
-      const previewRenderer = String(state.unitCounterEditor.renderer || nextPreset.defaultRenderer || "game").trim().toLowerCase();
-      const fallbackToken = previewRenderer === "milstd"
-        ? String(nextPreset.baseSidc || "").trim().toUpperCase()
-        : String(nextPreset.shortCode || "").trim().toUpperCase();
-      if (!String(state.unitCounterEditor.renderer || "").trim()) {
-        state.unitCounterEditor.renderer = previewRenderer;
-      }
-      if (!String(state.unitCounterEditor.echelon || "").trim()) {
-        state.unitCounterEditor.echelon = nextPreset.defaultEchelon;
-      }
-      if (!String(state.unitCounterEditor.sidc || state.unitCounterEditor.symbolCode || "").trim()) {
-        state.unitCounterEditor.sidc = fallbackToken;
-        state.unitCounterEditor.symbolCode = fallbackToken;
-      }
-      if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
-        mapRenderer.updateSelectedUnitCounter({
-          presetId: nextPresetId,
-          unitType: nextPreset.id,
-          renderer: previewRenderer,
-          echelon: String(state.unitCounterEditor.echelon || nextPreset.defaultEchelon || "").trim().toUpperCase(),
-          sidc: String(state.unitCounterEditor.sidc || state.unitCounterEditor.symbolCode || fallbackToken || "").trim().toUpperCase(),
-        });
-      } else if (render) {
-        render();
-      }
-      refreshStrategicOverlayUI();
+      applyUnitCounterPresetSelection(String(event.target.value || unitCounterPresets[0].id));
     });
     unitCounterPresetSelect.dataset.bound = "true";
   }
@@ -7232,18 +7524,77 @@ function initSidebar({ render } = {}) {
   }
   if (unitCounterDetailToggleBtn && !unitCounterDetailToggleBtn.dataset.bound) {
     unitCounterDetailToggleBtn.addEventListener("click", () => {
-      state.strategicOverlayUi = {
-        ...(state.strategicOverlayUi || {}),
-        modalSection: "counter",
-        modalEntityType: "counter",
-      };
-      const nextPinnedOpen = !(unitCounterDetailDrawer?.dataset.pinnedOpen === "true");
-      if (unitCounterDetailDrawer) {
-        unitCounterDetailDrawer.dataset.pinnedOpen = nextPinnedOpen ? "true" : "false";
-      }
+      ensureStrategicOverlayUiState();
+      state.strategicOverlayUi.counterEditorModalOpen = true;
       refreshStrategicOverlayUI();
     });
     unitCounterDetailToggleBtn.dataset.bound = "true";
+  }
+  if (unitCounterEditorModalCloseBtn && !unitCounterEditorModalCloseBtn.dataset.bound) {
+    unitCounterEditorModalCloseBtn.addEventListener("click", () => {
+      setCounterEditorModalState(false);
+      refreshStrategicOverlayUI();
+    });
+    unitCounterEditorModalCloseBtn.dataset.bound = "true";
+  }
+  if (unitCounterEditorModalOverlay && !unitCounterEditorModalOverlay.dataset.bound) {
+    unitCounterEditorModalOverlay.addEventListener("click", (event) => {
+      if (event.target !== unitCounterEditorModalOverlay) return;
+      setCounterEditorModalState(false);
+      refreshStrategicOverlayUI();
+    });
+    unitCounterEditorModalOverlay.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setCounterEditorModalState(false);
+        refreshStrategicOverlayUI();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusables = getCounterEditorModalFocusableElements();
+      if (!focusables.length) {
+        event.preventDefault();
+        unitCounterEditorModal?.focus({ preventScroll: true });
+        return;
+      }
+      const currentIndex = focusables.indexOf(document.activeElement);
+      if (currentIndex === -1) {
+        event.preventDefault();
+        focusables[0].focus({ preventScroll: true });
+        return;
+      }
+      event.preventDefault();
+      const delta = event.shiftKey ? -1 : 1;
+      const nextIndex = (currentIndex + delta + focusables.length) % focusables.length;
+      focusables[nextIndex].focus({ preventScroll: true });
+    });
+    unitCounterEditorModalOverlay.dataset.bound = "true";
+  }
+  if (unitCounterCatalogSearchInput && !unitCounterCatalogSearchInput.dataset.bound) {
+    unitCounterCatalogSearchInput.addEventListener("input", (event) => {
+      ensureStrategicOverlayUiState();
+      state.strategicOverlayUi.counterCatalogQuery = String(event.target.value || "");
+      refreshStrategicOverlayUI();
+    });
+    unitCounterCatalogSearchInput.dataset.bound = "true";
+  }
+  if (unitCounterCatalogCategoriesEl && !unitCounterCatalogCategoriesEl.dataset.bound) {
+    unitCounterCatalogCategoriesEl.addEventListener("click", (event) => {
+      const button = event.target instanceof HTMLElement ? event.target.closest("[data-counter-catalog-category]") : null;
+      if (!(button instanceof HTMLButtonElement)) return;
+      ensureStrategicOverlayUiState();
+      state.strategicOverlayUi.counterCatalogCategory = String(button.dataset.counterCatalogCategory || "all").trim().toLowerCase() || "all";
+      refreshStrategicOverlayUI();
+    });
+    unitCounterCatalogCategoriesEl.dataset.bound = "true";
+  }
+  if (unitCounterCatalogGrid && !unitCounterCatalogGrid.dataset.bound) {
+    unitCounterCatalogGrid.addEventListener("click", (event) => {
+      const button = event.target instanceof HTMLElement ? event.target.closest("[data-unit-counter-catalog-preset]") : null;
+      if (!(button instanceof HTMLButtonElement)) return;
+      applyUnitCounterPresetSelection(String(button.dataset.unitCounterCatalogPreset || unitCounterPresets[0].id));
+    });
+    unitCounterCatalogGrid.dataset.bound = "true";
   }
   if (unitCounterStatsPresetSelect && !unitCounterStatsPresetSelect.dataset.bound) {
     unitCounterStatsPresetSelect.addEventListener("change", (event) => {
@@ -7375,7 +7726,8 @@ function initSidebar({ render } = {}) {
         nationTag: String(unitCounterNationSelect?.value || state.unitCounterEditor?.nationTag || "").trim().toUpperCase(),
         nationSource: String(unitCounterNationModeSelect?.value || state.unitCounterEditor?.nationSource || "controller").trim().toLowerCase(),
         presetId: nextPresetId,
-        unitType: nextPreset.id,
+        iconId: String(nextPreset.iconId || "").trim().toLowerCase(),
+        unitType: String(nextPreset.unitType || nextPreset.id || "").trim().toUpperCase(),
         echelon: String(unitCounterEchelonSelect?.value || state.unitCounterEditor?.echelon || nextPreset.defaultEchelon || "").trim().toUpperCase(),
         subLabel: String(unitCounterSubLabelInput?.value || state.unitCounterEditor?.subLabel || ""),
         strengthText: String(unitCounterStrengthInput?.value || state.unitCounterEditor?.strengthText || ""),
@@ -7404,11 +7756,6 @@ function initSidebar({ render } = {}) {
   }
   if (unitCounterList && !unitCounterList.dataset.bound) {
     unitCounterList.addEventListener("change", (event) => {
-      state.strategicOverlayUi = {
-        ...(state.strategicOverlayUi || {}),
-        modalEntityType: "counter",
-        modalSection: "counter",
-      };
       mapRenderer.selectUnitCounterById(String(event.target.value || ""));
       refreshStrategicOverlayUI();
     });
@@ -7753,6 +8100,9 @@ function initSidebar({ render } = {}) {
           modalSection: "line",
           modalEntityId: "",
           modalEntityType: "",
+          counterEditorModalOpen: false,
+          counterCatalogCategory: "all",
+          counterCatalogQuery: "",
         };
         invalidateFrontlineOverlayState();
         state.operationalLinesDirty = true;

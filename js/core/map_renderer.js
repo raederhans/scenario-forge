@@ -46,6 +46,7 @@ import {
 import { COUNTRY_CODE_ALIASES, normalizeCountryCodeAlias } from "./country_code_aliases.js";
 import {
   DEFAULT_UNIT_COUNTER_PRESET_ID,
+  getUnitCounterIconPathById,
   getUnitCounterEchelonLabel,
   getUnitCounterPresetById,
   normalizeUnitCounterSizeToken,
@@ -14050,6 +14051,36 @@ function ensureUnitCounterEditorState() {
   state.unitCounterEditor.size = normalizeUnitCounterSizeToken(state.unitCounterEditor.size);
 }
 
+function resetUnitCounterEditorState({ preserveSelection = false, preserveCounter = true } = {}) {
+  ensureUnitCounterEditorState();
+  const preservedSelection = preserveSelection ? String(state.unitCounterEditor.selectedId || "").trim() || null : null;
+  const preservedCounter = preserveCounter ? Math.max(1, Number(state.unitCounterEditor.counter) || 1) : 1;
+  state.unitCounterEditor.active = false;
+  state.unitCounterEditor.renderer = DEFAULT_UNIT_COUNTER_RENDERER;
+  state.unitCounterEditor.label = "";
+  state.unitCounterEditor.sidc = "";
+  state.unitCounterEditor.symbolCode = "";
+  state.unitCounterEditor.nationTag = "";
+  state.unitCounterEditor.nationSource = "controller";
+  state.unitCounterEditor.presetId = DEFAULT_UNIT_COUNTER_PRESET_ID;
+  state.unitCounterEditor.iconId = "";
+  state.unitCounterEditor.unitType = "";
+  state.unitCounterEditor.echelon = "";
+  state.unitCounterEditor.subLabel = "";
+  state.unitCounterEditor.strengthText = "";
+  state.unitCounterEditor.layoutAnchor = { kind: "feature", key: "", slotIndex: null };
+  state.unitCounterEditor.attachment = null;
+  state.unitCounterEditor.baseFillColor = "";
+  state.unitCounterEditor.organizationPct = DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT;
+  state.unitCounterEditor.equipmentPct = DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT;
+  state.unitCounterEditor.statsPresetId = "regular";
+  state.unitCounterEditor.statsSource = "preset";
+  state.unitCounterEditor.size = "medium";
+  state.unitCounterEditor.selectedId = preservedSelection;
+  state.unitCounterEditor.counter = preservedCounter;
+  ensureUnitCounterEditorState();
+}
+
 function getFrontlineOwnershipContext() {
   return {
     ownershipByFeatureId: state.sovereigntyByFeatureId,
@@ -15239,18 +15270,7 @@ function getUnitCounterPreviewData(partialCounter = {}) {
 }
 
 function getUnitCounterIconPath(iconId = "") {
-  const paths = {
-    infantry: "M -3.6 -2.8 L -1.1 -2.8 L -1.1 -0.8 L 1.1 -0.8 L 1.1 -2.8 L 3.6 -2.8 L 3.6 -0.8 L 1.1 -0.8 L 1.1 3.1 L -1.1 3.1 L -1.1 -0.8 L -3.6 -0.8 Z",
-    motorized: "M -3.8 0.6 L -2.4 -2.1 L 1.8 -2.1 L 3.7 0.6 L 2.4 0.6 L 1.7 -0.5 L -0.8 -0.5 L -1.5 0.6 Z M -2 2.5 A 1 1 0 1 0 -2 2.48 Z M 2 2.5 A 1 1 0 1 0 2 2.48 Z",
-    mechanized: "M -3.9 -1.8 L 2.1 -1.8 L 3.8 -0.2 L 3.8 1.2 L -3.9 1.2 Z M -2.5 2.6 A 0.95 0.95 0 1 0 -2.5 2.58 Z M 1.8 2.6 A 0.95 0.95 0 1 0 1.8 2.58 Z",
-    armor: "M -4 1.2 L -2.8 -1.8 L 1.6 -1.8 L 3.8 -0.2 L 3.8 1.8 L -4 1.8 Z M -2.6 2.8 A 0.95 0.95 0 1 0 -2.6 2.78 Z M 1.9 2.8 A 0.95 0.95 0 1 0 1.9 2.78 Z",
-    artillery: "M -3.5 0.2 L -0.8 0.2 L 2.4 -2.2 L 3.6 -1.1 L 0.5 1.8 L -3.5 1.8 Z M -2.3 2.7 A 1 1 0 1 0 -2.3 2.68 Z",
-    hq: "M 0 -3.8 L 0.9 -0.9 L 3.8 -0.9 L 1.4 0.8 L 2.3 3.8 L 0 2.1 L -2.3 3.8 L -1.4 0.8 L -3.8 -0.9 L -0.9 -0.9 Z",
-    garrison: "M -3.8 -2.8 L 3.8 -2.8 L 3.8 2.8 L -3.8 2.8 Z M -1.2 -1.2 L 1.2 -1.2 L 1.2 1.2 L -1.2 1.2 Z",
-    air: "M 0 -3.8 L 1.1 -0.4 L 4 0 L 1.1 0.8 L 0.3 3.8 L -0.3 3.8 L -1.1 0.8 L -4 0 L -1.1 -0.4 Z",
-    naval: "M -3.8 1.5 C -2.9 -0.4 -1.6 -1.8 0 -1.8 C 1.6 -1.8 2.9 -0.4 3.8 1.5 Z M -4 2.5 C -2.9 1.6 -1.4 1.6 0 2.5 C 1.4 1.6 2.9 1.6 4 2.5",
-  };
-  return paths[String(iconId || "").trim().toLowerCase()] || paths.infantry;
+  return getUnitCounterIconPathById(iconId);
 }
 
 function getOperationalLineAnchorCoord(lineId = "") {
@@ -15689,13 +15709,7 @@ function renderUnitCountersOverlay() {
           ensureUnitCounterEditorState();
           datum.__historyBefore = captureHistoryState({ strategicOverlay: true });
           state.unitCounterEditor.selectedId = datum.counter.id;
-          datum.counter.attachment = null;
-          datum.counter.layoutAnchor = {
-            ...(datum.counter.layoutAnchor || {}),
-            kind: "feature",
-            key: String(datum.counter.anchor?.featureId || ""),
-            slotIndex: null,
-          };
+          datum.__dragMoved = false;
           updateStrategicOverlayUi();
           globalThis.d3.select(this).style("cursor", "grabbing");
         })
@@ -15703,6 +15717,16 @@ function renderUnitCountersOverlay() {
           const sourceEvent = event?.sourceEvent || event;
           const coord = getMapLonLatFromEvent(sourceEvent);
           if (!coord) return;
+          if (!datum.__dragMoved) {
+            datum.__dragMoved = true;
+            datum.counter.attachment = null;
+            datum.counter.layoutAnchor = {
+              ...(datum.counter.layoutAnchor || {}),
+              kind: "feature",
+              key: String(datum.counter.anchor?.featureId || ""),
+              slotIndex: null,
+            };
+          }
           datum.counter.anchor = {
             ...(datum.counter.anchor || {}),
             lon: coord[0],
@@ -15713,24 +15737,27 @@ function renderUnitCountersOverlay() {
         })
         .on("end", function onEnd(event, datum) {
           globalThis.d3.select(this).style("cursor", "grab");
-          datum.counter.anchor = {
-            ...(datum.counter.anchor || {}),
-            featureId: getLandFeatureIdFromEvent(event?.sourceEvent || event, "unit-counter-drag-end"),
-          };
-          datum.counter.layoutAnchor = {
-            ...(datum.counter.layoutAnchor || {}),
-            kind: "feature",
-            key: String(datum.counter.anchor?.featureId || ""),
-            slotIndex: null,
-          };
-          state.unitCountersDirty = true;
-          pushHistoryEntry({
-            kind: "move-unit-counter",
-            before: datum.__historyBefore,
-            after: captureHistoryState({ strategicOverlay: true }),
-          });
+          if (datum.__dragMoved) {
+            datum.counter.anchor = {
+              ...(datum.counter.anchor || {}),
+              featureId: getLandFeatureIdFromEvent(event?.sourceEvent || event, "unit-counter-drag-end"),
+            };
+            datum.counter.layoutAnchor = {
+              ...(datum.counter.layoutAnchor || {}),
+              kind: "feature",
+              key: String(datum.counter.anchor?.featureId || ""),
+              slotIndex: null,
+            };
+            state.unitCountersDirty = true;
+            pushHistoryEntry({
+              kind: "move-unit-counter",
+              before: datum.__historyBefore,
+              after: captureHistoryState({ strategicOverlay: true }),
+            });
+            markDirty("move-unit-counter");
+          }
           datum.__historyBefore = null;
-          markDirty("move-unit-counter");
+          datum.__dragMoved = false;
           updateStrategicOverlayUi();
           renderUnitCountersIfNeeded({ force: true });
         });
@@ -16892,6 +16919,7 @@ function startUnitCounterPlacement({
   size = "medium",
 } = {}) {
   ensureUnitCounterEditorState();
+  resetUnitCounterEditorState({ preserveSelection: false, preserveCounter: true });
   const preset = getUnitCounterPresetById(presetId || DEFAULT_UNIT_COUNTER_PRESET_ID);
   const normalizedCombatState = getNormalizedUnitCounterCombatState({
     baseFillColor,
@@ -16932,6 +16960,7 @@ function startUnitCounterPlacement({
   state.unitCounterEditor.statsPresetId = normalizedCombatState.statsPresetId;
   state.unitCounterEditor.statsSource = normalizedCombatState.statsSource;
   state.unitCounterEditor.size = normalizeUnitCounterSizeToken(size || "medium");
+  state.unitCounterEditor.selectedId = null;
   state.unitCountersDirty = true;
   updateStrategicOverlayUi();
   if (context) render();
@@ -16939,7 +16968,7 @@ function startUnitCounterPlacement({
 
 function cancelUnitCounterPlacement() {
   ensureUnitCounterEditorState();
-  state.unitCounterEditor.active = false;
+  resetUnitCounterEditorState({ preserveSelection: false, preserveCounter: true });
   state.unitCountersDirty = true;
   updateStrategicOverlayUi();
   if (context) render();
@@ -16949,9 +16978,11 @@ function selectUnitCounterById(id) {
   ensureUnitCounterEditorState();
   const selectedId = String(id || "").trim();
   const counter = (state.unitCounters || []).find((entry) => String(entry?.id || "") === selectedId) || null;
-  state.unitCounterEditor.selectedId = selectedId || null;
   if (counter) {
+    state.unitCounterEditor.selectedId = selectedId || null;
     assignUnitCounterEditorFromCounter(counter);
+  } else {
+    resetUnitCounterEditorState({ preserveSelection: false, preserveCounter: true });
   }
   state.unitCountersDirty = true;
   updateStrategicOverlayUi();
@@ -17031,7 +17062,7 @@ function deleteSelectedUnitCounter() {
   const nextCounters = (state.unitCounters || []).filter((entry) => String(entry?.id || "") !== selectedId);
   if (nextCounters.length === (state.unitCounters || []).length) return false;
   state.unitCounters = nextCounters;
-  state.unitCounterEditor.selectedId = null;
+  resetUnitCounterEditorState({ preserveSelection: false, preserveCounter: true });
   syncOperationalLineAttachedCounterIds();
   state.unitCountersDirty = true;
   state.operationalLinesDirty = true;
@@ -17044,6 +17075,23 @@ function deleteSelectedUnitCounter() {
   updateStrategicOverlayUi();
   if (context) render();
   return true;
+}
+
+function cancelActiveStrategicInteractionModes() {
+  let cancelled = false;
+  if (state.unitCounterEditor?.active) {
+    cancelUnitCounterPlacement();
+    cancelled = true;
+  }
+  if (state.operationalLineEditor?.active) {
+    cancelOperationalLineDraw();
+    cancelled = true;
+  }
+  if (state.operationGraphicsEditor?.active) {
+    cancelOperationGraphicDraw();
+    cancelled = true;
+  }
+  return cancelled;
 }
 
 function handleMouseMove(event) {
@@ -17188,6 +17236,16 @@ function showDetailPromotionToast(message, { title = "", tone = "info", duration
   lastDetailToastToken = token;
   lastDetailToastAt = now;
   showToast(nextMessage, { title, tone, duration });
+}
+
+function blockStartupReadonlyInteraction() {
+  if (!state.startupReadonly) return false;
+  showDetailPromotionToast(t("Detailed interactions are still loading. Pan and zoom remain available.", "ui"), {
+    title: t("Startup is still read-only", "ui"),
+    tone: "info",
+    duration: 2200,
+  });
+  return true;
 }
 
 function requestLeafDetailPromotion(countryCode, { announce = false } = {}) {
@@ -18132,6 +18190,11 @@ function flushBrushSession() {
 }
 
 function handleBrushPointerDown(event) {
+  if (state.startupReadonly) {
+    if (event?.preventDefault) event.preventDefault();
+    blockStartupReadonlyInteraction();
+    return;
+  }
   if (!state.brushModeEnabled || state.currentTool === "eyedropper" || state.specialZoneEditor?.active) return;
   if (isBrushNavigationModifier(event)) return;
   if ((event.buttons & 1) !== 1) return;
@@ -18140,6 +18203,9 @@ function handleBrushPointerDown(event) {
 }
 
 function handleBrushPointerMove(event) {
+  if (state.startupReadonly) {
+    return;
+  }
   if (!brushSession || !state.brushModeEnabled || state.currentTool === "eyedropper" || state.specialZoneEditor?.active) {
     return;
   }
@@ -18163,6 +18229,11 @@ function handleBrushPointerMove(event) {
 }
 
 async function handleClick(event) {
+  if (state.startupReadonly) {
+    if (event?.preventDefault) event.preventDefault();
+    blockStartupReadonlyInteraction();
+    return;
+  }
   const actionStart = nowMs();
   if (!state.landData && !state.waterRegionsData && !state.scenarioSpecialRegionsData) return;
   if (suppressNextClickAfterBrush) {
@@ -18525,6 +18596,11 @@ async function handleClick(event) {
 }
 
 async function handleDoubleClick(event) {
+  if (state.startupReadonly) {
+    if (event?.preventDefault) event.preventDefault();
+    blockStartupReadonlyInteraction();
+    return;
+  }
   const actionStart = nowMs();
   if (state.specialZoneEditor?.active) {
     if (event?.preventDefault) event.preventDefault();
@@ -18989,6 +19065,7 @@ export {
   updateSelectedOperationGraphic,
   startUnitCounterPlacement,
   cancelUnitCounterPlacement,
+  cancelActiveStrategicInteractionModes,
   selectUnitCounterById,
   deleteSelectedUnitCounter,
   updateSelectedUnitCounter,

@@ -176,6 +176,7 @@ let bootProgressAnimationHandle = null;
 let bootProgressPhaseStartedAt = nowMs();
 let postReadyContextWarmupScheduled = false;
 let postReadyHydrationScheduled = false;
+let startupReadonlyUnlockHandle = null;
 
 const BOOT_PHASE_WINDOWS = {
   shell: { min: 0, max: 8, durationMs: 900 },
@@ -215,7 +216,7 @@ const BOOT_COPY = {
     },
     "scenario-bundle": {
       title: "Loading default scenario",
-      message: "Preparing the TNO 1962 scenario bundle and any required detail topology.",
+      message: "Preparing the TNO 1962 scenario bundle for the first visible frame.",
     },
     "scenario-apply": {
       title: "Applying default scenario",
@@ -247,7 +248,7 @@ const BOOT_COPY = {
     },
     "scenario-bundle": {
       title: "正在加载默认剧本",
-      message: "正在准备 TNO 1962 剧本包，以及所需的细分拓扑。",
+      message: "正在准备 TNO 1962 剧本包，用于首个可见画面。",
     },
     "scenario-apply": {
       title: "正在应用默认剧本",
@@ -265,6 +266,19 @@ const BOOT_COPY = {
       title: "启动被阻断",
       message: "默认剧本未能完成启动。你可以重试，或先进入基础地图。",
     },
+  },
+};
+
+const STARTUP_READONLY_COPY = {
+  en: {
+    pending: "Detailed interactions are still loading. Pan and zoom remain available.",
+    loading: "Preparing detailed interactions. The map is view-only for a moment.",
+    failed: "Detailed interactions are unavailable right now. The map stays view-only until the detail layer recovers.",
+  },
+  zh: {
+    pending: "细分交互仍在加载中。当前可平移缩放，但保持只读。",
+    loading: "正在准备细分交互。当前地图暂时只读。",
+    failed: "细分交互暂时不可用。在细分图层恢复前，地图将保持只读。",
   },
 };
 
@@ -296,7 +310,56 @@ function getBootDom() {
     actions: document.getElementById("bootOverlayActions"),
     retryBtn: document.getElementById("bootRetryBtn"),
     continueBtn: document.getElementById("bootContinueBtn"),
+    readonlyBanner: document.getElementById("startupReadonlyBanner"),
+    readonlyMessage: document.getElementById("startupReadonlyMessage"),
   };
+}
+
+function getStartupReadonlyCopy() {
+  const language = getBootLanguage();
+  return STARTUP_READONLY_COPY[language] || STARTUP_READONLY_COPY.en;
+}
+
+function getStartupReadonlyMessage() {
+  const copy = getStartupReadonlyCopy();
+  if (state.startupReadonlyReason === "detail-promotion-failed") {
+    return copy.failed;
+  }
+  if (state.startupReadonlyUnlockInFlight) {
+    return copy.loading;
+  }
+  return copy.pending;
+}
+
+function resolveStartupInteractionMode() {
+  const search = globalThis.location?.search || "";
+  if (search && globalThis.URLSearchParams) {
+    const params = new globalThis.URLSearchParams(search);
+    const raw = String(params.get("startup_interaction") || "").trim().toLowerCase();
+    if (raw === "full" || raw === "readonly") {
+      return raw;
+    }
+  }
+  return "readonly";
+}
+
+function clearStartupReadonlyUnlockHandle() {
+  if (startupReadonlyUnlockHandle === null) return;
+  globalThis.clearTimeout?.(startupReadonlyUnlockHandle);
+  startupReadonlyUnlockHandle = null;
+}
+
+function setStartupReadonlyState(active, { reason = "", unlockInFlight = false } = {}) {
+  state.startupReadonly = !!active;
+  state.startupReadonlyReason = state.startupReadonly ? String(reason || "detail-promotion").trim() : "";
+  state.startupReadonlyUnlockInFlight = state.startupReadonly ? !!unlockInFlight : false;
+  state.startupReadonlySince = state.startupReadonly
+    ? (Number(state.startupReadonlySince) || Date.now())
+    : 0;
+  if (!state.startupReadonly) {
+    clearStartupReadonlyUnlockHandle();
+  }
+  syncBootOverlay();
 }
 
 function getBootProgressWindow(phase = state.bootPhase) {
@@ -353,6 +416,7 @@ function syncBootOverlay() {
   const copy = getBootCopy(state.bootPhase);
   const progress = Math.max(0, Math.min(100, Number(state.bootProgress) || 0));
   document.body?.classList.toggle("app-booting", !!state.bootBlocking);
+  document.body?.classList.toggle("app-startup-readonly", !!state.startupReadonly);
   if (dom.appShell) {
     dom.appShell.setAttribute("aria-busy", state.bootPhase === "ready" ? "false" : "true");
   }
@@ -388,6 +452,13 @@ function syncBootOverlay() {
   }
   if (dom.continueBtn) {
     dom.continueBtn.classList.toggle("hidden", !state.bootCanContinueWithoutScenario);
+  }
+  if (dom.readonlyBanner) {
+    dom.readonlyBanner.classList.toggle("hidden", !state.startupReadonly);
+    dom.readonlyBanner.setAttribute("aria-busy", state.startupReadonlyUnlockInFlight ? "true" : "false");
+  }
+  if (dom.readonlyMessage) {
+    dom.readonlyMessage.textContent = getStartupReadonlyMessage();
   }
 }
 
@@ -991,6 +1062,84 @@ async function ensureDetailTopologyReady({
   }
 }
 
+async function unlockStartupReadonlyWithDetail(renderDispatcher) {
+  if (!state.startupReadonly || state.startupReadonlyUnlockInFlight) {
+    return false;
+  }
+  setStartupReadonlyState(true, {
+    reason: "detail-promotion",
+    unlockInFlight: true,
+  });
+  startBootMetric("startup-readonly:unlock");
+  try {
+    const promoted = await ensureDetailTopologyReady({
+      renderDispatcher,
+      requireIdle: false,
+      applyMapData: false,
+    });
+    const detailReady = promoted || hasDetailTopologyLoaded();
+    if (!detailReady) {
+      finishBootMetric("startup-readonly:unlock", {
+        failed: true,
+      });
+      setStartupReadonlyState(true, {
+        reason: "detail-promotion-failed",
+        unlockInFlight: false,
+      });
+      return false;
+    }
+    setMapData({ refitProjection: false, resetZoom: false, suppressRender: true });
+    const activeScenarioId = String(state.activeScenarioId || "").trim();
+    if (activeScenarioId) {
+      const cachedBundle = state.scenarioBundleCacheById?.[activeScenarioId] || null;
+      if (cachedBundle?.manifest) {
+        await applyScenarioBundle(cachedBundle, {
+          renderNow: false,
+          suppressRender: true,
+          markDirtyReason: "",
+          showToastOnComplete: false,
+          interactionLevel: "full",
+        });
+      }
+    }
+    renderDispatcher?.flush?.();
+    finishBootMetric("startup-readonly:unlock", {
+      activeScenarioId,
+    });
+    setStartupReadonlyState(false);
+    checkpointBootMetric("startup-readonly:unlocked");
+    schedulePostReadyHydration();
+    schedulePostReadyDeferredContextWarmup();
+    schedulePostReadyVisualWarmup();
+    return true;
+  } catch (error) {
+    finishBootMetric("startup-readonly:unlock", {
+      failed: true,
+      errorMessage: error?.message || String(error || "Unknown startup readonly unlock error."),
+    });
+    console.warn("[boot] Startup readonly unlock failed:", error);
+    setStartupReadonlyState(true, {
+      reason: "detail-promotion-failed",
+      unlockInFlight: false,
+    });
+    return false;
+  }
+}
+
+function scheduleStartupReadonlyUnlock(renderDispatcher, { delayMs = 120 } = {}) {
+  if (!state.startupReadonly || state.startupReadonlyUnlockInFlight || startupReadonlyUnlockHandle !== null) {
+    return;
+  }
+  startupReadonlyUnlockHandle = globalThis.setTimeout(() => {
+    startupReadonlyUnlockHandle = null;
+    void unlockStartupReadonlyWithDetail(renderDispatcher).then((unlocked) => {
+      if (!unlocked && state.startupReadonly) {
+        scheduleStartupReadonlyUnlock(renderDispatcher, { delayMs: 1600 });
+      }
+    });
+  }, Math.max(0, delayMs));
+}
+
 function scheduleDeferredDetailPromotion(renderDispatcher) {
   if (
     !state.detailDeferred ||
@@ -1028,13 +1177,29 @@ function scheduleDeferredDetailPromotion(renderDispatcher) {
 }
 
 function finalizeReadyState(renderDispatcher) {
-  scheduleDeferredDetailPromotion(renderDispatcher);
+  const shouldEnterStartupReadonly = (
+    !!String(state.activeScenarioId || "").trim()
+    && state.startupInteractionMode === "readonly"
+    && state.detailDeferred
+    && !hasDetailTopologyLoaded()
+  );
+  if (shouldEnterStartupReadonly) {
+    setStartupReadonlyState(true, {
+      reason: "detail-promotion",
+      unlockInFlight: false,
+    });
+  }
   setBootState("ready", {
     blocking: false,
     progress: 100,
     canContinueWithoutScenario: false,
   });
   checkpointBootMetric("first-interactive");
+  if (shouldEnterStartupReadonly) {
+    scheduleStartupReadonlyUnlock(renderDispatcher);
+    return;
+  }
+  scheduleDeferredDetailPromotion(renderDispatcher);
   schedulePostReadyHydration();
   schedulePostReadyDeferredContextWarmup();
   schedulePostReadyVisualWarmup();
@@ -1062,6 +1227,8 @@ async function bootstrap() {
   bootContinueHandler = null;
   postReadyContextWarmupScheduled = false;
   postReadyHydrationScheduled = false;
+  state.startupInteractionMode = resolveStartupInteractionMode();
+  setStartupReadonlyState(false);
 
   let renderDispatcher = null;
   try {
@@ -1283,25 +1450,9 @@ async function bootstrap() {
     if (!defaultScenarioBundle?.manifest) {
       throw new Error("Default scenario bundle did not include a manifest.");
     }
-    const expectedScenarioFeatureCount = Number(defaultScenarioBundle.manifest?.summary?.feature_count || 0);
-    const requiresDetailTopology =
-      state.detailDeferred
-      && !hasDetailTopologyLoaded()
-      && expectedScenarioFeatureCount > primaryCount;
-    if (requiresDetailTopology) {
-      setBootState("scenario-bundle", {
-        message: getBootLanguage() === "zh"
-          ? "正在为默认剧本准备细分拓扑。"
-          : "Preparing detail topology for the default scenario.",
-      });
-      await ensureDetailTopologyReady({
-        renderDispatcher,
-        applyMapData: false,
-      });
-    }
     finishBootMetric("scenario-bundle", {
-      requiresDetailTopology,
-      expectedScenarioFeatureCount,
+      requiresDetailTopology: false,
+      expectedScenarioFeatureCount: Number(defaultScenarioBundle.manifest?.summary?.feature_count || 0),
       bundleLevel: defaultScenarioBundle?.bundleLevel || "bootstrap",
       resourceMetrics: defaultScenarioBundle?.loadDiagnostics?.optionalResources?.runtime_topology?.metrics
         ? {
@@ -1322,6 +1473,7 @@ async function bootstrap() {
       suppressRender: true,
       markDirtyReason: "",
       showToastOnComplete: false,
+      interactionLevel: state.startupInteractionMode === "readonly" ? "readonly-startup" : "full",
     });
     finishBootMetric("scenario-apply", {
       activeScenarioId: String(state.activeScenarioId || ""),
@@ -1338,6 +1490,7 @@ async function bootstrap() {
     finishBootMetric("total", { failed: true });
     console.error("Failed to boot application:", error);
     console.error("Stack trace:", error?.stack);
+    setStartupReadonlyState(false);
     const canContinueWithoutScenario =
       !!state.landData?.features?.length
       && !!renderDispatcher?.flush;

@@ -1200,8 +1200,16 @@ function enterScenarioFatalRecovery({
 }
 
 function assertScenarioInteractionsAllowed(actionLabel = "complete this scenario action") {
+  assertStartupReadonlyUnlocked(actionLabel);
   if (!getScenarioFatalRecoveryState()) return;
   throw buildScenarioFatalRecoveryError(actionLabel);
+}
+
+function assertStartupReadonlyUnlocked(actionLabel = "complete this startup action") {
+  if (!state.startupReadonly) return;
+  throw new Error(
+    `Detailed interactions are still loading. Unable to ${actionLabel} while the startup view is read-only.`
+  );
 }
 
 function getScenarioBlockerCount(summary = {}) {
@@ -2684,14 +2692,18 @@ async function prepareScenarioApplyState(
   bundle,
   {
     syncPalette = true,
+    interactionLevel = "full",
   } = {}
 ) {
-  const detailPromoted = await ensureScenarioDetailTopologyLoaded({ applyMapData: false });
+  const startupReadonly = interactionLevel === "readonly-startup";
+  const detailPromoted = startupReadonly
+    ? false
+    : await ensureScenarioDetailTopologyLoaded({ applyMapData: false });
   const detailReady = (
     state.topologyBundleMode === "composite"
     && hasUsablePoliticalTopology(state.topologyDetail)
   ) || !!detailPromoted;
-  if (!detailReady && scenarioNeedsDetailTopology(bundle.manifest)) {
+  if (!detailReady && scenarioNeedsDetailTopology(bundle.manifest) && !startupReadonly) {
     const scenarioLabel = getScenarioDisplayName(
       bundle.manifest,
       String(bundle.manifest?.scenario_id || "Scenario").trim()
@@ -2829,6 +2841,7 @@ async function applyScenarioBundle(
     markDirtyReason = "scenario-apply",
     syncPalette = true,
     showToastOnComplete = false,
+    interactionLevel = "full",
   } = {}
 ) {
   const applyStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
@@ -2840,7 +2853,7 @@ async function applyScenarioBundle(
   let topologyDecodeMs = 0;
   try {
     const topologyDecodeStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
-    staged = await prepareScenarioApplyState(bundle, { syncPalette });
+    staged = await prepareScenarioApplyState(bundle, { syncPalette, interactionLevel });
     topologyDecodeMs = (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - topologyDecodeStartedAt;
 
     state.scenarioParentBorderEnabledBeforeActivate =

@@ -71,6 +71,13 @@ async function openFrontlineTab(page) {
   await expect(page.locator("#frontlineSidebarPanel")).toBeVisible();
 }
 
+async function openCounterEditorModal(page) {
+  await expect(page.locator("#unitCounterDetailToggleBtn")).toBeVisible();
+  await page.locator("#unitCounterDetailToggleBtn").click();
+  await expect(page.locator("#unitCounterEditorModalOverlay")).toBeVisible();
+  await expect(page.locator("#unitCounterEditorModal")).toBeVisible();
+}
+
 test("operation graphics support style editing and vertex editing after creation", async ({ page }) => {
   test.setTimeout(120000);
   await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
@@ -211,7 +218,7 @@ test("operational lines support direct command-bar draw entry and style editing"
   });
 });
 
-test("milstd counters render through milsymbol and refresh feature binding after drag", async ({ page }) => {
+test("milstd counters keep attachments on click and detach only after a real drag", async ({ page }) => {
   test.setTimeout(120000);
   await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
   await waitForAppReady(page);
@@ -219,7 +226,18 @@ test("milstd counters render through milsymbol and refresh feature binding after
 
   await page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
-    const { render } = await import("/js/core/map_renderer.js");
+    const { render, selectUnitCounterById } = await import("/js/core/map_renderer.js");
+    state.operationalLines = [{
+      id: "line_attach_1",
+      kind: "frontline",
+      label: "Attached Axis",
+      points: [[10, 47], [14, 49], [18, 50]],
+      stylePreset: "frontline",
+      stroke: "#7f1d1d",
+      width: 4.5,
+      opacity: 0.9,
+      attachedCounterIds: ["unit_drag_1"],
+    }];
     state.unitCounters = [{
       id: "unit_drag_1",
       renderer: "milstd",
@@ -238,19 +256,31 @@ test("milstd counters render through milsymbol and refresh feature binding after
       facing: 0,
       zIndex: 0,
       anchor: { lon: 12, lat: 48, featureId: "INVALID" },
+      attachment: { kind: "operational-line", lineId: "line_attach_1" },
+      layoutAnchor: { kind: "line", key: "line_attach_1", slotIndex: 0 },
     }];
-    state.unitCounterEditor.selectedId = "unit_drag_1";
+    state.operationalLinesDirty = true;
     state.unitCountersDirty = true;
+    selectUnitCounterById("unit_drag_1");
     state.updateStrategicOverlayUIFn?.();
     render();
   });
 
   await expect(page.locator('g.unit-counter[data-counter-id="unit_drag_1"]')).toBeVisible();
-  await expect(page.locator("#unitCounterDetailDrawer")).toBeVisible();
   const symbolHref = await page.locator('g.unit-counter[data-counter-id="unit_drag_1"] image.unit-counter-milsymbol').getAttribute("href");
   expect(symbolHref).toContain("data:image/svg+xml");
 
   const counterBox = await page.locator('g.unit-counter[data-counter-id="unit_drag_1"]').boundingBox();
+  await page.mouse.move(counterBox.x + counterBox.width / 2, counterBox.y + counterBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.up();
+
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    const counter = (state.unitCounters || []).find((entry) => entry.id === "unit_drag_1");
+    return counter?.attachment?.lineId === "line_attach_1";
+  });
+
   await page.mouse.move(counterBox.x + counterBox.width / 2, counterBox.y + counterBox.height / 2);
   await page.mouse.down();
   await page.mouse.move(counterBox.x + counterBox.width / 2 + 24, counterBox.y + counterBox.height / 2 + 12, { steps: 12 });
@@ -260,6 +290,7 @@ test("milstd counters render through milsymbol and refresh feature binding after
     const { state } = await import("/js/core/state.js");
     const counter = (state.unitCounters || []).find((entry) => entry.id === "unit_drag_1");
     return counter
+      && !counter.attachment
       && counter.anchor.featureId
       && counter.anchor.featureId !== "INVALID"
       && Number.isFinite(Number(counter.anchor.lon))
@@ -301,7 +332,7 @@ test("co-located counters render into deterministic slot positions instead of a 
   expect(hiddenBadgeCount).toBeGreaterThanOrEqual(4);
 });
 
-test("unit counters expose the detail drawer and grow with zoom until the footprint clamp", async ({ page }) => {
+test("unit counters open a centered modal editor, support symbol search, and still clamp with zoom", async ({ page }) => {
   test.setTimeout(120000);
   await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
   await waitForAppReady(page);
@@ -341,10 +372,25 @@ test("unit counters expose the detail drawer and grow with zoom until the footpr
 
   const counterShell = page.locator('g.unit-counter[data-counter-id="unit_size_1"] rect.unit-counter-shell');
   await expect(counterShell).toBeVisible();
-  await expect(page.locator("#unitCounterDetailDrawer")).toBeVisible();
+  await openCounterEditorModal(page);
+  await expect(page.locator("#unitCounterEditorModalStatus")).toBeVisible();
   await expect(page.locator("#unitCounterDetailPreviewCard .unit-counter-preview-card")).toBeVisible();
   await expect(page.locator("#unitCounterOrganizationInput")).toHaveValue("83");
   await expect(page.locator("#unitCounterEquipmentInput")).toHaveValue("71");
+  await page.locator("#unitCounterCatalogSearchInput").fill("carrier");
+  await expect(page.locator("#unitCounterCatalogGrid .counter-editor-symbol-card")).toHaveCount(1);
+  await expect(page.locator("#unitCounterCatalogGrid .counter-editor-symbol-card-title")).toHaveText("Carrier Group");
+  await page.locator("#unitCounterCatalogGrid .counter-editor-symbol-card").click();
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    const counter = (state.unitCounters || []).find((entry) => entry.id === "unit_size_1");
+    return state.unitCounterEditor?.presetId === "CARRIER"
+      && counter?.presetId === "CARRIER"
+      && counter?.iconId === "carrier";
+  });
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#unitCounterEditorModalOverlay")).toBeHidden();
+  await expect(page.locator("#unitCounterDetailToggleBtn")).toBeFocused();
   const boxAt100 = await counterShell.boundingBox();
 
   await page.evaluate(async () => {
@@ -379,4 +425,98 @@ test("unit counters expose the detail drawer and grow with zoom until the footpr
   expect(boxAt100.height).toBeLessThanOrEqual(24);
   expect(boxAt5000.width).toBeGreaterThan(10);
   expect(counterCountAt5000).toBe(1);
+});
+
+test("unit counter placement cancels on escape or tab switch, resets after delete, and keeps compact sidebar overflow-safe", async ({ page }) => {
+  test.setTimeout(120000);
+  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
+  await waitForAppReady(page);
+  await openFrontlineTab(page);
+
+  const longLabel = "Army Group Center Counter Title That Should Never Spill Outside The Compact Preview Shell";
+  await page.evaluate(async (label) => {
+    const { state } = await import("/js/core/state.js");
+    const { render, selectUnitCounterById } = await import("/js/core/map_renderer.js");
+    state.unitCounters = [{
+      id: "unit_delete_1",
+      renderer: "game",
+      sidc: "ARM",
+      symbolCode: "ARM",
+      nationTag: "GER",
+      nationSource: "manual",
+      presetId: "ARM",
+      iconId: "armor",
+      unitType: "ARM",
+      echelon: "army",
+      label,
+      subLabel: "Panzergruppe Nord With Extended Metadata",
+      organizationPct: 88,
+      equipmentPct: 79,
+      size: "medium",
+      facing: 0,
+      zIndex: 0,
+      anchor: { lon: 11, lat: 47, featureId: "" },
+    }];
+    state.unitCountersDirty = true;
+    selectUnitCounterById("unit_delete_1");
+    state.updateStrategicOverlayUIFn?.();
+    render();
+  }, longLabel);
+
+  await expect(page.locator("#unitCounterList")).toHaveValue("unit_delete_1");
+  const compactPreviewSnapshot = await page.evaluate(() => {
+    const title = document.querySelector("#unitCounterPreviewCard .unit-counter-preview-title");
+    const meta = document.querySelector("#unitCounterPreviewCard .unit-counter-preview-meta");
+    const actions = document.querySelector(".strategic-counter-management-actions");
+    const styles = (node) => node ? globalThis.getComputedStyle(node) : null;
+    return {
+      titleWhiteSpace: styles(title)?.whiteSpace || "",
+      titleOverflow: styles(title)?.overflow || "",
+      titleTextOverflow: styles(title)?.textOverflow || "",
+      metaWhiteSpace: styles(meta)?.whiteSpace || "",
+      actionColumns: styles(actions)?.gridTemplateColumns || "",
+    };
+  });
+  expect(compactPreviewSnapshot.titleWhiteSpace).toBe("nowrap");
+  expect(compactPreviewSnapshot.titleOverflow).toBe("hidden");
+  expect(compactPreviewSnapshot.titleTextOverflow).toBe("ellipsis");
+  expect(compactPreviewSnapshot.metaWhiteSpace).toBe("nowrap");
+  expect(compactPreviewSnapshot.actionColumns.split(" ").length).toBeGreaterThanOrEqual(3);
+
+  await page.locator("#unitCounterPlaceBtn").click();
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    return !!state.unitCounterEditor?.active && !state.unitCounterEditor?.selectedId;
+  });
+  await expect(page.locator("#unitCounterPlacementStatus")).toContainText("Placing");
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    return !state.unitCounterEditor?.active;
+  });
+
+  await page.locator("#unitCounterPlaceBtn").click();
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    return !!state.unitCounterEditor?.active;
+  });
+  await page.locator("#inspectorSidebarTabInspector").click();
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    return state.ui?.rightSidebarTab === "inspector" && !state.unitCounterEditor?.active;
+  });
+
+  await openFrontlineTab(page);
+  await expect(page.locator("#unitCounterList")).toHaveValue("unit_delete_1");
+  await page.locator("#unitCounterDeleteBtn").click();
+  await page.getByRole("button", { name: "Delete Counter" }).click();
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    return !(state.unitCounters || []).some((entry) => entry.id === "unit_delete_1")
+      && !state.unitCounterEditor?.selectedId
+      && !state.unitCounterEditor?.label
+      && !state.unitCounterEditor?.sidc
+      && state.unitCounterEditor?.presetId === "inf";
+  });
+  await expect(page.locator("#unitCounterList")).toHaveValue("");
 });

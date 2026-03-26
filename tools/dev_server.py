@@ -2273,16 +2273,62 @@ def write_active_server_metadata(base_url, open_path, port):
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
+    STATIC_REVALIDATE_SUFFIXES = {
+        ".js",
+        ".mjs",
+        ".css",
+        ".json",
+        ".geojson",
+        ".topo.json",
+        ".svg",
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".webp",
+        ".woff",
+        ".woff2",
+        ".ttf",
+    }
+
     def log_message(self, format, *args):
         # Optional: Silence default logging to keep console clean, or keep it.
         pass
 
+    def _cache_mode(self) -> str:
+        raw = os.environ.get("MAPCREATOR_DEV_CACHE_MODE", "").strip().lower()
+        if raw == "revalidate-static":
+            return "revalidate-static"
+        return "nostore"
+
+    def _resolve_cache_headers(self) -> dict[str, str]:
+        route = urlparse(self.path or "").path
+        if route.startswith("/__dev/"):
+            return {
+                "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+                "Pragma": "no-cache",
+                "Expires": "0",
+            }
+        if self._cache_mode() == "revalidate-static":
+            filesystem_path = Path(self.translate_path(self.path))
+            suffix = "".join(filesystem_path.suffixes[-2:]).lower() or filesystem_path.suffix.lower()
+            if filesystem_path.is_file() and (
+                filesystem_path.suffix.lower() in self.STATIC_REVALIDATE_SUFFIXES
+                or suffix in self.STATIC_REVALIDATE_SUFFIXES
+            ):
+                return {
+                    "Cache-Control": "no-cache, must-revalidate",
+                    "Pragma": "no-cache",
+                    "Expires": "0",
+                }
+        return {
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        }
+
     def end_headers(self):
-        # Keep the dev server aggressively uncached so edited JSON/JS/HTML
-        # cannot leave an already-open tab in a stale UI state.
-        self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
-        self.send_header("Pragma", "no-cache")
-        self.send_header("Expires", "0")
+        for header_name, header_value in self._resolve_cache_headers().items():
+            self.send_header(header_name, header_value)
         super().end_headers()
 
     def _send_json(self, status: int, payload: dict[str, object]) -> None:

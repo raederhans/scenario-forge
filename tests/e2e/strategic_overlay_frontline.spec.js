@@ -256,17 +256,42 @@ test("strategic frontline overlay reacts to controller changes", async ({ page }
   await page.waitForFunction(() => !document.body.classList.contains("strategic-workspace-open"));
   await page.waitForFunction(() => !!document.querySelector("#frontlineTabStack > #strategicOverlayPanel"));
 
-  await expect(page.locator("#unitCounterDetailPreviewCard")).toHaveCount(0);
+  await expect(page.locator("#unitCounterEditorModalOverlay")).toBeHidden();
   await page.locator("#unitCounterDetailToggleBtn").click();
-  await expect(page.locator("#unitCounterDetailDrawer")).toBeVisible();
+  await expect(page.locator("#unitCounterEditorModalOverlay")).toBeVisible();
+  await expect(page.locator("#unitCounterEditorModal")).toBeVisible();
+  await expect(page.locator("#unitCounterDetailPreviewCard")).toBeVisible();
   await expect(page.locator("#unitCounterIdentityGroup")).toBeVisible();
   await expect(page.locator("#unitCounterCombatGroup")).toBeVisible();
   await expect(page.locator("#unitCounterFinishGroup")).toBeVisible();
+  const counterModalSnapshot = await page.evaluate(() => {
+    const modal = document.querySelector("#unitCounterEditorModal");
+    const modalRect = modal?.getBoundingClientRect?.();
+    const viewportWidth = globalThis.innerWidth;
+    const viewportHeight = globalThis.innerHeight;
+    return {
+      bodyModalOpen: document.body.classList.contains("counter-editor-modal-open"),
+      modalWidth: modalRect?.width || 0,
+      modalHeight: modalRect?.height || 0,
+      modalCenterDeltaX: modalRect ? Math.abs((modalRect.left + modalRect.right) / 2 - viewportWidth / 2) : 999,
+      modalCenterDeltaY: modalRect ? Math.abs((modalRect.top + modalRect.bottom) / 2 - viewportHeight / 2) : 999,
+      activeElementId: document.activeElement?.id || "",
+    };
+  });
+  expect(counterModalSnapshot.bodyModalOpen).toBeTruthy();
+  expect(counterModalSnapshot.modalWidth).toBeGreaterThan(680);
+  expect(counterModalSnapshot.modalHeight).toBeGreaterThan(360);
+  expect(counterModalSnapshot.modalCenterDeltaX).toBeLessThan(20);
+  expect(counterModalSnapshot.modalCenterDeltaY).toBeLessThan(20);
+  expect(counterModalSnapshot.activeElementId).toBe("unitCounterCatalogSearchInput");
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#unitCounterEditorModalOverlay")).toBeHidden();
+  await expect(page.locator("#unitCounterDetailToggleBtn")).toBeFocused();
 
   await page.locator("#strategicOverlayOpenWorkspaceBtn").click();
   await expect(page.locator("#strategicOverlayIconCloseBtn")).toBeVisible();
   await page.waitForFunction(() => document.body.classList.contains("strategic-workspace-open"));
-  const workspaceCounterSnapshot = await page.evaluate(() => {
+  const workspaceLineModalSnapshot = await page.evaluate(() => {
     const isActuallyVisible = (selector) => {
       const element = document.querySelector(selector);
       if (!element) return false;
@@ -297,40 +322,32 @@ test("strategic frontline overlay reacts to controller changes", async ({ page }
       headerHeight: header?.getBoundingClientRect?.().height || 0,
       titleWidth: title?.getBoundingClientRect?.().width || 0,
       closeRowDisplay: closeRow ? globalThis.getComputedStyle(closeRow).display : "",
-      counterAccordionHeaderDisplay: globalThis.getComputedStyle(document.querySelector("#accordionCounters .strategic-accordion-header")).display,
+      lineBodyVisible: isActuallyVisible("#accordionLines > .strategic-accordion-body"),
+      graphicsBodyVisible: isActuallyVisible("#accordionGraphics > .strategic-accordion-body"),
       counterBodyVisible: isActuallyVisible("#accordionCounters > .strategic-accordion-body"),
-      attachmentSelectVisible: isActuallyVisible("#unitCounterAttachmentSelect"),
-      placeBtnVisible: isActuallyVisible("#unitCounterPlaceBtn"),
-      deleteBtnVisible: isActuallyVisible("#unitCounterDeleteBtn"),
-      counterListVisible: isActuallyVisible("#unitCounterList"),
       counterEditorVisible: isActuallyVisible("#unitCounterEditorShell"),
-      previewWidth: document.querySelector("#unitCounterPreviewCard")?.getBoundingClientRect?.().width || 0,
-      detailDrawerDisplay: globalThis.getComputedStyle(document.querySelector("#unitCounterDetailDrawer")).display,
+      counterModalVisible: isActuallyVisible("#unitCounterEditorModalOverlay"),
     };
   });
-  expect(workspaceCounterSnapshot.commandBarDisplay).toBe("none");
-  expect(workspaceCounterSnapshot.backdropPointerEvents).toBe("none");
-  expect(workspaceCounterSnapshot.backdropFilter).toContain("blur");
-  expect(workspaceCounterSnapshot.bodyVisualMode).toBeTruthy();
-  expect(workspaceCounterSnapshot.modalWidth).toBeGreaterThan(600);
-  expect(workspaceCounterSnapshot.modalLeft).toBeGreaterThan(24);
-  expect(workspaceCounterSnapshot.modalTop).toBeGreaterThan(24);
-  expect(workspaceCounterSnapshot.modalRightMargin).toBeGreaterThan(24);
-  expect(workspaceCounterSnapshot.modalBottomMargin).toBeGreaterThan(24);
-  expect(workspaceCounterSnapshot.modalCenterDeltaX).toBeLessThan(20);
-  expect(workspaceCounterSnapshot.modalCenterDeltaY).toBeLessThan(20);
-  expect(workspaceCounterSnapshot.headerHeight).toBeLessThan(140);
-  expect(workspaceCounterSnapshot.titleWidth).toBeGreaterThan(100);
-  expect(workspaceCounterSnapshot.closeRowDisplay).toBe("none");
-  expect(workspaceCounterSnapshot.counterAccordionHeaderDisplay).toBe("none");
-  expect(workspaceCounterSnapshot.counterBodyVisible).toBeTruthy();
-  expect(workspaceCounterSnapshot.attachmentSelectVisible).toBeFalsy();
-  expect(workspaceCounterSnapshot.placeBtnVisible).toBeFalsy();
-  expect(workspaceCounterSnapshot.deleteBtnVisible).toBeFalsy();
-  expect(workspaceCounterSnapshot.counterListVisible).toBeFalsy();
-  expect(workspaceCounterSnapshot.counterEditorVisible).toBeTruthy();
-  expect(workspaceCounterSnapshot.previewWidth).toBeLessThan(140);
-  expect(workspaceCounterSnapshot.detailDrawerDisplay).not.toBe("none");
+  expect(workspaceLineModalSnapshot.commandBarDisplay).toBe("none");
+  expect(workspaceLineModalSnapshot.backdropPointerEvents).toBe("none");
+  expect(workspaceLineModalSnapshot.backdropFilter).toContain("blur");
+  expect(workspaceLineModalSnapshot.bodyVisualMode).toBeTruthy();
+  expect(workspaceLineModalSnapshot.modalWidth).toBeGreaterThan(600);
+  expect(workspaceLineModalSnapshot.modalLeft).toBeGreaterThan(24);
+  expect(workspaceLineModalSnapshot.modalTop).toBeGreaterThan(24);
+  expect(workspaceLineModalSnapshot.modalRightMargin).toBeGreaterThan(24);
+  expect(workspaceLineModalSnapshot.modalBottomMargin).toBeGreaterThan(24);
+  expect(workspaceLineModalSnapshot.modalCenterDeltaX).toBeLessThan(20);
+  expect(workspaceLineModalSnapshot.modalCenterDeltaY).toBeLessThan(20);
+  expect(workspaceLineModalSnapshot.headerHeight).toBeLessThan(140);
+  expect(workspaceLineModalSnapshot.titleWidth).toBeGreaterThan(100);
+  expect(workspaceLineModalSnapshot.closeRowDisplay).toBe("none");
+  expect(workspaceLineModalSnapshot.lineBodyVisible).toBeTruthy();
+  expect(workspaceLineModalSnapshot.graphicsBodyVisible).toBeTruthy();
+  expect(workspaceLineModalSnapshot.counterBodyVisible).toBeFalsy();
+  expect(workspaceLineModalSnapshot.counterEditorVisible).toBeFalsy();
+  expect(workspaceLineModalSnapshot.counterModalVisible).toBeFalsy();
   await page.keyboard.press("Escape");
   await page.waitForFunction(() => !document.body.classList.contains("strategic-workspace-open"));
   await page.waitForFunction(() => !!document.querySelector("#frontlineTabStack > #strategicOverlayPanel"));

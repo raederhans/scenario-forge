@@ -1,7 +1,13 @@
 import { state } from "../core/state.js";
 import { FileManager } from "../core/file_manager.js";
 import { redoHistory, undoHistory } from "../core/history_manager.js";
-import { cancelSpecialZoneDraw, resetZoomToFit, undoSpecialZoneVertex, zoomByStep } from "../core/map_renderer.js";
+import {
+  cancelActiveStrategicInteractionModes,
+  cancelSpecialZoneDraw,
+  resetZoomToFit,
+  undoSpecialZoneVertex,
+  zoomByStep,
+} from "../core/map_renderer.js";
 
 function isEditableTarget(target) {
   const node = target instanceof Element ? target : null;
@@ -82,6 +88,11 @@ function cyclePaintGranularity(direction = 1) {
   return true;
 }
 
+function allowShortcutDuringStartupReadonly({ key = "", modifier = false } = {}) {
+  if (modifier) return false;
+  return key === "+" || key === "=" || key === "-" || key === "_" || key === "0";
+}
+
 function initShortcuts() {
   if (document.body?.dataset.shortcutsBound === "true") return;
 
@@ -96,6 +107,10 @@ function initShortcuts() {
     }
 
     if (state.bootBlocking) {
+      return;
+    }
+
+    if (state.startupReadonly && !allowShortcutDuringStartupReadonly({ key, modifier })) {
       return;
     }
 
@@ -224,6 +239,16 @@ function initShortcuts() {
       return;
     }
     if (!modifier && key === "Escape") {
+      if (cancelActiveStrategicInteractionModes()) {
+        event.preventDefault();
+        if (typeof state.updateStrategicOverlayUIFn === "function") {
+          state.updateStrategicOverlayUIFn();
+        }
+        if (typeof state.renderNowFn === "function") {
+          state.renderNowFn();
+        }
+        return;
+      }
       if (state.specialZoneEditor?.active) {
         event.preventDefault();
         cancelSpecialZoneDraw();
@@ -240,7 +265,7 @@ function initShortcuts() {
   });
 
   window.addEventListener("keyup", (event) => {
-    if (state.bootBlocking) return;
+    if (state.bootBlocking || state.startupReadonly) return;
     if (event.key !== "Shift" && event.key !== " ") return;
     setBrushPanModifier(false);
   });
