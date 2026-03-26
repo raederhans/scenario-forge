@@ -78,6 +78,8 @@ let pathCanvas = null;
 let pathHitCanvas = null;
 let zoomBehavior = null;
 let activeContextMetricSession = null;
+let coastalAccentCompositeCanvas = null;
+let coastalAccentCompositeContext = null;
 
 let viewportGroup = null;
 let strategicDefs = null;
@@ -7822,6 +7824,101 @@ function getFeatureProjectedDensity(feature) {
   return maxDensity;
 }
 
+function getOpaqueCoastalAccentColor() {
+  const channels = parseCanvasColorChannels(TNO_COASTAL_ACCENT_COLOR);
+  if (!channels) return TNO_COASTAL_ACCENT_COLOR;
+  return toRgbaString({ r: channels.r, g: channels.g, b: channels.b }, 1);
+}
+
+function getCoastalAccentCompositeContext() {
+  const canvasWidth = Number(state.width) || context?.canvas?.width || 0;
+  const canvasHeight = Number(state.height) || context?.canvas?.height || 0;
+  if (!(canvasWidth > 0) || !(canvasHeight > 0)) return null;
+  if (
+    !coastalAccentCompositeCanvas ||
+    coastalAccentCompositeCanvas.width !== canvasWidth ||
+    coastalAccentCompositeCanvas.height !== canvasHeight
+  ) {
+    coastalAccentCompositeCanvas = createCityMarkerSpriteCanvas(canvasWidth, canvasHeight);
+    coastalAccentCompositeContext = coastalAccentCompositeCanvas?.getContext?.("2d") || null;
+  }
+  if (!coastalAccentCompositeContext) return null;
+  coastalAccentCompositeContext.setTransform(1, 0, 0, 1, 0, 0);
+  coastalAccentCompositeContext.clearRect(0, 0, canvasWidth, canvasHeight);
+  return coastalAccentCompositeContext;
+}
+
+function buildCoastalAccentStrokeBuckets(entries) {
+  const buckets = new Map();
+  entries.forEach((entry) => {
+    if (!entry?.geometry) return;
+    const alpha = clamp(Number(entry.alpha) || 0, 0, 1);
+    const lineWidth = Math.max(0, Number(entry.lineWidth) || 0);
+    if (!(alpha > 0) || !(lineWidth > 0)) return;
+    const key = `${alpha.toFixed(4)}|${lineWidth.toFixed(4)}`;
+    const bucket = buckets.get(key) || {
+      alpha,
+      lineWidth,
+      geometries: [],
+    };
+    bucket.geometries.push(entry.geometry);
+    buckets.set(key, bucket);
+  });
+  return [...buckets.values()];
+}
+
+function drawCoastalAccentStrokeBuckets(entries, { clipAtlantropa = false } = {}) {
+  if (!context || !Array.isArray(entries) || !entries.length) return;
+  const buckets = buildCoastalAccentStrokeBuckets(entries);
+  if (!buckets.length) return;
+  const scratchContext = getCoastalAccentCompositeContext();
+  if (!scratchContext || !coastalAccentCompositeCanvas) {
+    buckets.forEach((bucket) => {
+      context.save();
+      context.strokeStyle = TNO_COASTAL_ACCENT_COLOR;
+      context.globalAlpha = bucket.alpha;
+      context.lineWidth = bucket.lineWidth;
+      context.lineJoin = "round";
+      context.lineCap = "round";
+      context.beginPath();
+      bucket.geometries.forEach((geometry) => {
+        pathCanvas(geometry);
+      });
+      context.stroke();
+      context.restore();
+    });
+    return;
+  }
+
+  const opaqueStrokeColor = getOpaqueCoastalAccentColor();
+  const canvasWidth = coastalAccentCompositeCanvas.width;
+  const canvasHeight = coastalAccentCompositeCanvas.height;
+  buckets.forEach((bucket) => {
+    scratchContext.setTransform(1, 0, 0, 1, 0, 0);
+    scratchContext.clearRect(0, 0, canvasWidth, canvasHeight);
+    withRenderTarget(scratchContext, () => {
+      scratchContext.save();
+      if (clipAtlantropa) {
+        clipOutAtlantropaAccentRegions();
+      }
+      scratchContext.beginPath();
+      bucket.geometries.forEach((geometry) => {
+        pathCanvas(geometry);
+      });
+      scratchContext.strokeStyle = opaqueStrokeColor;
+      scratchContext.lineWidth = bucket.lineWidth;
+      scratchContext.lineJoin = "round";
+      scratchContext.lineCap = "round";
+      scratchContext.stroke();
+      scratchContext.restore();
+    });
+    context.save();
+    context.globalAlpha = bucket.alpha;
+    context.drawImage(coastalAccentCompositeCanvas, 0, 0);
+    context.restore();
+  });
+}
+
 function getScenarioCoastalAccentOverlayVisualConfig(feature, k, { interactive = false } = {}) {
   const isAtlantropa = isAtlantropaScenarioShorelineOverlay(feature);
   let alpha = interactive ? 0.38 : 0.62;
@@ -7870,20 +7967,17 @@ function clipOutAtlantropaAccentRegions() {
 function drawScenarioCoastalAccentOverlays(k, { interactive = false } = {}) {
   const shorelineFeatures = getScenarioCoastalAccentOverlayFeatures();
   if (!shorelineFeatures.length) return;
+  const entries = [];
   shorelineFeatures.forEach((feature) => {
     if (!pathBoundsInScreen(feature)) return;
     const visualConfig = getScenarioCoastalAccentOverlayVisualConfig(feature, k, { interactive });
-    context.beginPath();
-    pathCanvas(feature);
-    context.save();
-    context.strokeStyle = TNO_COASTAL_ACCENT_COLOR;
-    context.globalAlpha = visualConfig.alpha;
-    context.lineWidth = visualConfig.lineWidth;
-    context.lineJoin = "round";
-    context.lineCap = "round";
-    context.stroke();
-    context.restore();
+    entries.push({
+      geometry: feature,
+      alpha: visualConfig.alpha,
+      lineWidth: visualConfig.lineWidth,
+    });
   });
+  drawCoastalAccentStrokeBuckets(entries);
 }
 
 function drawTnoCoastalAccentLayer(k, { interactive = false } = {}) {
@@ -7897,12 +7991,7 @@ function drawTnoCoastalAccentLayer(k, { interactive = false } = {}) {
     : k < COASTLINE_LOD_MID_ZOOM_MAX
       ? COASTLINE_ACCENT_DENSITY_THRESHOLD_MID
       : Infinity;
-  context.save();
-  context.strokeStyle = TNO_COASTAL_ACCENT_COLOR;
-  context.lineJoin = "round";
-  context.lineCap = "round";
-  context.save();
-  clipOutAtlantropaAccentRegions();
+  const entries = [];
   coastlineCollection.forEach((mesh) => {
     if (!isUsableMesh(mesh)) return;
     mesh.coordinates.forEach((line) => {
@@ -7912,21 +8001,18 @@ function drawTnoCoastalAccentLayer(k, { interactive = false } = {}) {
       const densityScale = densityStats.density > densityThreshold
         ? (k < COASTLINE_LOD_LOW_ZOOM_MAX ? COASTLINE_ACCENT_DENSITY_ALPHA_LOW : COASTLINE_ACCENT_DENSITY_ALPHA_MID)
         : 1;
-      context.save();
-      context.globalAlpha = (interactive ? 0.28 : 0.4) * densityScale;
-      context.lineWidth = coastlineWidth * (densityScale < 1 ? COASTLINE_ACCENT_DENSITY_WIDTH_SCALE : 1);
-      context.beginPath();
-      pathCanvas({
+      entries.push({
+        geometry: {
         type: "LineString",
         coordinates: line,
+        },
+        alpha: (interactive ? 0.28 : 0.4) * densityScale,
+        lineWidth: coastlineWidth * (densityScale < 1 ? COASTLINE_ACCENT_DENSITY_WIDTH_SCALE : 1),
       });
-      context.stroke();
-      context.restore();
     });
   });
-  context.restore();
+  drawCoastalAccentStrokeBuckets(entries, { clipAtlantropa: true });
   drawScenarioCoastalAccentOverlays(k, { interactive });
-  context.restore();
 }
 
 function resolveOceanMask() {
