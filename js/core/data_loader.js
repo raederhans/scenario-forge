@@ -19,6 +19,8 @@ const CITY_ALIASES_URLS = ["data/city_aliases.json"];
 const RU_CITY_OVERRIDES_URL = "data/ru_city_overrides.geojson";
 const SPECIAL_ZONES_URL = "data/special_zones.geojson";
 const RUNTIME_POLITICAL_URL = "data/europe_topology.runtime_political_v1.json";
+const STARTUP_LOCALES_URL = "data/locales.startup.json";
+const STARTUP_GEO_ALIASES_URL = "data/geo_aliases.startup.json";
 const GLOBAL_RIVERS_CONTEXT_PACK_URL = "data/global_rivers.geojson";
 const CONTEXT_LAYER_PACKS = {
   physical: { url: "data/europe_physical.geojson", format: "geojson" },
@@ -666,6 +668,31 @@ function resolveDetailSource() {
   return { key, url: DETAIL_SOURCES[key] };
 }
 
+function nowMs() {
+  return globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+}
+
+function normalizeLocaleLevel(value, fallback = "full") {
+  return String(value || fallback).trim().toLowerCase() === "startup" ? "startup" : "full";
+}
+
+function resolveLocalizationUrls({
+  localeLevel = "full",
+  localesUrl = null,
+  geoAliasesUrl = null,
+} = {}) {
+  const normalizedLevel = normalizeLocaleLevel(localeLevel);
+  return {
+    localeLevel: normalizedLevel,
+    localesUrl: String(
+      localesUrl || (normalizedLevel === "startup" ? STARTUP_LOCALES_URL : "data/locales.json")
+    ).trim(),
+    geoAliasesUrl: String(
+      geoAliasesUrl || (normalizedLevel === "startup" ? STARTUP_GEO_ALIASES_URL : "data/geo_aliases.json")
+    ).trim(),
+  };
+}
+
 function getPoliticalGeometryCount(topology) {
   return (
     topology?.objects?.political?.geometries &&
@@ -690,11 +717,84 @@ function shouldDeferDetailLoad(renderProfile) {
   return false;
 }
 
-async function loadTopologyUrl(d3Client, url, label) {
-  const topology = await d3Client.json(url);
+async function loadTopologyUrlWithMetrics(d3Client, url, label) {
+  const { payload: topology, metrics } = await loadMeasuredJsonResource(url, {
+    d3Client,
+    label: `${label}_topology`,
+  });
   const count = getPoliticalGeometryCount(topology);
   console.info(`[data_loader] Loaded ${label} topology ${url} (${count} features).`);
-  return topology;
+  return {
+    topology,
+    metrics: {
+      ...(metrics || {}),
+      featureCount: count,
+    },
+  };
+}
+
+async function loadTopologyUrl(d3Client, url, label) {
+  const result = await loadTopologyUrlWithMetrics(d3Client, url, label);
+  return result.topology;
+}
+
+export async function loadMeasuredJsonResource(
+  url,
+  {
+    d3Client = globalThis.d3,
+    label = "resource",
+  } = {}
+) {
+  if (!url) {
+    throw new Error(`[data_loader] Missing URL for ${label}.`);
+  }
+  const startedAt = nowMs();
+  if (typeof globalThis.fetch === "function") {
+    const response = await globalThis.fetch(url, {
+      cache: "default",
+      credentials: "same-origin",
+    });
+    const textLoadedAt = nowMs();
+    if (!response.ok) {
+      throw new Error(`[data_loader] Failed to fetch ${label} at ${url} (${response.status} ${response.statusText}).`);
+    }
+    const rawText = await response.text();
+    const fetchCompletedAt = nowMs();
+    const parseStartedAt = fetchCompletedAt;
+    try {
+      const payload = rawText ? JSON.parse(rawText) : null;
+      const parsedAt = nowMs();
+      return {
+        payload,
+        metrics: {
+          url,
+          label,
+          fetchMs: fetchCompletedAt - startedAt,
+          jsonParseMs: parsedAt - parseStartedAt,
+          totalMs: parsedAt - startedAt,
+          transferMs: textLoadedAt - startedAt,
+        },
+      };
+    } catch (error) {
+      throw new Error(`[data_loader] Invalid JSON for ${label} at ${url}: ${error?.message || error}`);
+    }
+  }
+  if (!d3Client || typeof d3Client.json !== "function") {
+    throw new Error(`[data_loader] No JSON loader available for ${label}.`);
+  }
+  const payload = await d3Client.json(url);
+  const finishedAt = nowMs();
+  return {
+    payload,
+    metrics: {
+      url,
+      label,
+      fetchMs: finishedAt - startedAt,
+      jsonParseMs: 0,
+      totalMs: finishedAt - startedAt,
+      transferMs: finishedAt - startedAt,
+    },
+  };
 }
 
 async function loadExplicitVariant({
@@ -717,7 +817,7 @@ async function loadExplicitVariant({
   for (const url of candidates) {
     attempted.push(url);
     try {
-      return await loadTopologyUrl(d3Client, url, "single");
+      return await loadTopologyUrlWithMetrics(d3Client, url, "single");
     } catch (error) {
       console.warn(`[data_loader] Failed loading topology ${url}:`, error);
     }
@@ -745,12 +845,12 @@ async function loadDetailTopologyWithFallback({
   let firstError = null;
   for (const candidate of deduped) {
     try {
-      const topology = await loadTopologyUrl(
+      const { topology, metrics } = await loadTopologyUrlWithMetrics(
         d3Client,
         candidate.url,
         `detail(${candidate.key})`
       );
-      return { topology, sourceKey: candidate.key };
+      return { topology, sourceKey: candidate.key, metrics };
     } catch (error) {
       firstError = firstError || error;
       console.warn(
@@ -778,19 +878,24 @@ async function loadTopologyBundle({
     );
     const single = await loadExplicitVariant({ topologyUrl, d3Client, variant });
     return {
-      topology: single,
-      topologyPrimary: single,
+      topology: single.topology,
+      topologyPrimary: single.topology,
       topologyDetail: null,
       topologyBundleMode: "single",
       topologyVariant: variant.key,
       detailDeferred: false,
       detailSourceRequested: null,
+      resourceMetrics: {
+        topologyPrimary: single.metrics || null,
+        topologyDetail: null,
+      },
     };
   }
 
   const detailLayerEnabled = resolveDetailLayerEnabled();
   const detailSource = resolveDetailSource();
-  const topologyPrimary = await loadTopologyUrl(d3Client, topologyUrl, "primary");
+  const topologyPrimaryResult = await loadTopologyUrlWithMetrics(d3Client, topologyUrl, "primary");
+  const topologyPrimary = topologyPrimaryResult.topology;
 
   if (!detailLayerEnabled) {
     console.info("[data_loader] detail_layer=off detected. Running coarse-only primary topology.");
@@ -802,6 +907,10 @@ async function loadTopologyBundle({
       topologyVariant: null,
       detailDeferred: false,
       detailSourceRequested: detailSource.key,
+      resourceMetrics: {
+        topologyPrimary: topologyPrimaryResult.metrics || null,
+        topologyDetail: null,
+      },
     };
   }
 
@@ -817,10 +926,14 @@ async function loadTopologyBundle({
       topologyVariant: null,
       detailDeferred: true,
       detailSourceRequested: detailSource.key,
+      resourceMetrics: {
+        topologyPrimary: topologyPrimaryResult.metrics || null,
+        topologyDetail: null,
+      },
     };
   }
 
-  const { topology: topologyDetail, sourceKey: detailSourceUsed } =
+  const { topology: topologyDetail, sourceKey: detailSourceUsed, metrics: topologyDetailMetrics } =
     await loadDetailTopologyWithFallback({
       d3Client,
       detailSource,
@@ -843,6 +956,10 @@ async function loadTopologyBundle({
     topologyVariant: null,
     detailDeferred: false,
     detailSourceRequested: detailSource.key,
+    resourceMetrics: {
+      topologyPrimary: topologyPrimaryResult.metrics || null,
+      topologyDetail: topologyDetailMetrics || null,
+    },
   };
 }
 
@@ -894,8 +1011,8 @@ export async function loadDeferredDetailBundle({
 
 export async function loadMapData({
   topologyUrl = "data/europe_topology.json",
-  localesUrl = "data/locales.json",
-  geoAliasesUrl = "data/geo_aliases.json",
+  localesUrl = null,
+  geoAliasesUrl = null,
   worldCitiesUrls = WORLD_CITIES_URLS,
   cityAliasesUrls = CITY_ALIASES_URLS,
   hierarchyUrl = "data/hierarchy.json",
@@ -907,12 +1024,18 @@ export async function loadMapData({
   d3Client = globalThis.d3,
   includeCityData = true,
   includeContextLayers = true,
+  localeLevel = "full",
 } = {}) {
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available. Ensure D3 is loaded before calling loadMapData().");
   }
 
   const renderProfile = resolveRenderProfile();
+  const localizationUrls = resolveLocalizationUrls({
+    localeLevel,
+    localesUrl,
+    geoAliasesUrl,
+  });
   const topologyBundle = await loadTopologyBundle({ topologyUrl, d3Client, renderProfile });
   const runtimePoliticalPromise = topologyBundle.detailDeferred
     ? Promise.resolve(null)
@@ -944,9 +1067,14 @@ export async function loadMapData({
     ]
     : [Promise.resolve(null), Promise.resolve(null)];
 
+  const localizationPromise = loadLocalizationData({
+    d3Client,
+    localeLevel: localizationUrls.localeLevel,
+    localesUrl: localizationUrls.localesUrl,
+    geoAliasesUrl: localizationUrls.geoAliasesUrl,
+  });
   const [
-    localeData,
-    geoAliases,
+    localizationBundle,
     worldCities,
     cityAliases,
     hierarchy,
@@ -957,14 +1085,7 @@ export async function loadMapData({
     releasableCatalog,
     contextLayerExternal,
   ] = await Promise.all([
-    d3Client.json(localesUrl).catch((err) => {
-      console.warn("Locales file missing or invalid, using defaults.", err);
-      return { ui: {}, geo: {} };
-    }),
-    d3Client.json(geoAliasesUrl).catch((err) => {
-      console.warn("Geo alias file missing or invalid, using defaults.", err);
-      return { alias_to_stable_key: {} };
-    }),
+    localizationPromise,
     ...cityDataPromises,
     d3Client.json(hierarchyUrl).catch((err) => {
       console.warn("Hierarchy file missing or invalid, using defaults.", err);
@@ -1001,6 +1122,8 @@ export async function loadMapData({
     releasableCatalogPromise,
     contextLayerPackPromise,
   ]);
+  const localeData = localizationBundle.locales;
+  const geoAliases = localizationBundle.geoAliases;
   const cityLocalizationMerged = mergeCityLocalizationData({
     locales: localeData || { ui: {}, geo: {} },
     geoAliases: geoAliases || { alias_to_stable_key: {} },
@@ -1054,6 +1177,75 @@ export async function loadMapData({
     activePaletteMeta,
     activePalettePack,
     activePaletteMap,
+    localeLevel: localizationUrls.localeLevel,
+    resourceMetrics: {
+      ...(topologyBundle.resourceMetrics || {}),
+      locales: localizationBundle.resourceMetrics?.locales || null,
+      geoAliases: localizationBundle.resourceMetrics?.geoAliases || null,
+    },
+  };
+}
+
+export async function loadLocalizationData({
+  d3Client = globalThis.d3,
+  localeLevel = "full",
+  localesUrl = null,
+  geoAliasesUrl = null,
+} = {}) {
+  if (!d3Client || typeof d3Client.json !== "function") {
+    throw new Error("d3.json is not available. Ensure D3 is loaded before calling loadLocalizationData().");
+  }
+  const resolved = resolveLocalizationUrls({
+    localeLevel,
+    localesUrl,
+    geoAliasesUrl,
+  });
+  const [localeResult, geoAliasResult] = await Promise.all([
+    loadMeasuredJsonResource(resolved.localesUrl, {
+      d3Client,
+      label: `locales:${resolved.localeLevel}`,
+    }).catch((err) => {
+      console.warn("Locales file missing or invalid, using defaults.", err);
+      return {
+        payload: { ui: {}, geo: {} },
+        metrics: {
+          url: resolved.localesUrl,
+          label: `locales:${resolved.localeLevel}`,
+          fetchMs: 0,
+          jsonParseMs: 0,
+          totalMs: 0,
+          transferMs: 0,
+          failed: true,
+        },
+      };
+    }),
+    loadMeasuredJsonResource(resolved.geoAliasesUrl, {
+      d3Client,
+      label: `geo_aliases:${resolved.localeLevel}`,
+    }).catch((err) => {
+      console.warn("Geo alias file missing or invalid, using defaults.", err);
+      return {
+        payload: { alias_to_stable_key: {} },
+        metrics: {
+          url: resolved.geoAliasesUrl,
+          label: `geo_aliases:${resolved.localeLevel}`,
+          fetchMs: 0,
+          jsonParseMs: 0,
+          totalMs: 0,
+          transferMs: 0,
+          failed: true,
+        },
+      };
+    }),
+  ]);
+  return {
+    localeLevel: resolved.localeLevel,
+    locales: localeResult.payload || { ui: {}, geo: {} },
+    geoAliases: geoAliasResult.payload || { alias_to_stable_key: {} },
+    resourceMetrics: {
+      locales: localeResult.metrics || null,
+      geoAliases: geoAliasResult.metrics || null,
+    },
   };
 }
 

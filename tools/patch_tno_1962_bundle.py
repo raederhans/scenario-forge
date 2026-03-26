@@ -35,6 +35,7 @@ from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
 from scenario_builder.hoi4.audit import read_bmp24
 from tools.build_tno_1962_geo_locale_patch import build_patch as build_tno_geo_locale_patch
+from tools.build_startup_bootstrap_assets import build_bootstrap_runtime_topology, build_startup_bootstrap_assets
 from tools.check_scenario_contracts import validate_publish_bundle_dir
 
 
@@ -3695,6 +3696,7 @@ CHECKPOINT_SCENARIO_WATER_SEED_FILENAME = "scenario_water_seed.geojson"
 CHECKPOINT_WATER_FILENAME = "water_regions.geojson"
 CHECKPOINT_RELIEF_FILENAME = "relief_overlays.geojson"
 CHECKPOINT_BATHYMETRY_FILENAME = "bathymetry.topo.json"
+CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME = "runtime_topology.bootstrap.topo.json"
 CHECKPOINT_GEO_LOCALE_FILENAME = "geo_locale_patch.json"
 CHECKPOINT_GEO_LOCALE_EN_FILENAME = "geo_locale_patch.en.json"
 CHECKPOINT_GEO_LOCALE_ZH_FILENAME = "geo_locale_patch.zh.json"
@@ -3717,6 +3719,7 @@ PUBLISH_FILENAMES_BY_SCOPE = {
         "water_regions.geojson",
         "relief_overlays.geojson",
         "bathymetry.topo.json",
+        CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
         CHECKPOINT_GEO_LOCALE_FILENAME,
         CHECKPOINT_GEO_LOCALE_EN_FILENAME,
         CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
@@ -7885,6 +7888,9 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
     manifest_payload["relief_overlays_url"] = "data/scenarios/tno_1962/relief_overlays.geojson"
     manifest_payload["bathymetry_topology_url"] = "data/scenarios/tno_1962/bathymetry.topo.json"
     manifest_payload["runtime_topology_url"] = "data/scenarios/tno_1962/runtime_topology.topo.json"
+    manifest_payload["runtime_bootstrap_topology_url"] = (
+        f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME}"
+    )
     manifest_payload["releasable_catalog_url"] = "data/releasables/tno_1962.internal.phase1.catalog.json"
     manifest_payload["geo_locale_patch_url"] = f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_GEO_LOCALE_FILENAME}"
     manifest_payload["geo_locale_patch_url_en"] = f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_GEO_LOCALE_EN_FILENAME}"
@@ -8017,6 +8023,7 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
     full_state = dict(state)
     full_state.update({
         "runtime_topology_payload": runtime_topology_payload,
+        "runtime_bootstrap_topology_payload": build_bootstrap_runtime_topology(runtime_topology_payload),
         "runtime_special_regions": runtime_special_regions,
         "runtime_water_regions": runtime_water_regions,
         "bathymetry_payload": bathymetry_payload,
@@ -8054,6 +8061,11 @@ def write_countries_stage_checkpoints(state: dict[str, object], checkpoint_dir: 
     write_checkpoint_gdf(checkpoint_dir, CHECKPOINT_SCENARIO_WATER_SEED_FILENAME, state["water_gdf"])
     write_checkpoint_json(checkpoint_dir, CHECKPOINT_RELIEF_FILENAME, state["relief_overlays_payload"])
     write_checkpoint_json(checkpoint_dir, CHECKPOINT_BATHYMETRY_FILENAME, state["bathymetry_payload"])
+    write_checkpoint_json(
+        checkpoint_dir,
+        CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
+        state["runtime_bootstrap_topology_payload"],
+    )
     write_checkpoint_json(checkpoint_dir, CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME, state["named_water_snapshot_payload"])
     write_checkpoint_json(
         checkpoint_dir,
@@ -8128,6 +8140,7 @@ def ensure_runtime_topology_checkpoints(
     required = [
         *countries_stage_required,
         "runtime_topology.topo.json",
+        CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
     ]
     if all(checkpoint_path(checkpoint_dir, filename).exists() for filename in required):
         return
@@ -8166,6 +8179,16 @@ def build_geo_locale_stage(
     )
     ensure_geo_locale_variant_checkpoints(checkpoint_dir)
     validate_geo_locale_checkpoint(checkpoint_dir, scenario_dir / "geo_name_overrides.manual.json")
+    build_startup_bootstrap_assets(
+        base_topology_path=ROOT / "data/europe_topology.na_v2.json",
+        full_locales_path=ROOT / "data/locales.json",
+        full_geo_aliases_path=ROOT / "data/geo_aliases.json",
+        full_runtime_topology_path=checkpoint_dir / "runtime_topology.topo.json",
+        scenario_geo_patch_path=checkpoint_dir / CHECKPOINT_GEO_LOCALE_FILENAME,
+        runtime_bootstrap_output_path=checkpoint_dir / CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
+        startup_locales_output_path=ROOT / "data/locales.startup.json",
+        startup_geo_aliases_output_path=ROOT / "data/geo_aliases.startup.json",
+    )
 
 
 def _build_manual_sync_file_report(filename: str, scenario_payload: dict, checkpoint_payload: dict) -> dict[str, object]:

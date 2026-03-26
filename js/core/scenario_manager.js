@@ -10,6 +10,7 @@ import {
 import {
   buildCityLocalizationPatch,
   loadDeferredDetailBundle,
+  loadMeasuredJsonResource,
   normalizeCityText,
   normalizeScenarioCityOverridesPayload,
   normalizeScenarioGeoLocalePatchPayload,
@@ -35,6 +36,7 @@ const SCENARIO_DETAIL_MIN_RATIO_STRICT = 0.7;
 const SCENARIO_DETAIL_ABSOLUTE_DROP_THRESHOLD = 1000;
 const DEFAULT_OCEAN_FILL_COLOR = "#aadaff";
 const SCENARIO_RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
+const SCENARIO_BUNDLE_LEVELS = new Set(["bootstrap", "full"]);
 const SCENARIO_LOAD_TIMEOUT_MS = 12_000;
 const SCENARIO_DETAIL_SOURCE_FALLBACK_ORDER = ["na_v2", "na_v1", "legacy_bak", "highres"];
 const SCENARIO_FATAL_RECOVERY_CODE = "SCENARIO_FATAL_RECOVERY";
@@ -74,8 +76,39 @@ let activeScenarioApplyPromise = null;
 
 function cacheBust(url) {
   if (!url) return url;
+  if (!shouldBypassScenarioCache()) {
+    return url;
+  }
   const sep = String(url).includes("?") ? "&" : "?";
   return `${url}${sep}_t=${Date.now()}`;
+}
+
+function getSearchParams() {
+  try {
+    return new URLSearchParams(globalThis.location?.search || "");
+  } catch (_error) {
+    return null;
+  }
+}
+
+function shouldBypassScenarioCache() {
+  const params = getSearchParams();
+  if (!params) return false;
+  const raw = String(params.get("dev_nocache") || "").trim().toLowerCase();
+  return ["1", "true", "yes", "on"].includes(raw);
+}
+
+function normalizeScenarioBundleLevel(value, fallback = "full") {
+  const normalized = String(value || fallback).trim().toLowerCase();
+  return SCENARIO_BUNDLE_LEVELS.has(normalized) ? normalized : "full";
+}
+
+function getScenarioBundleHydrationRank(bundleLevel) {
+  return normalizeScenarioBundleLevel(bundleLevel) === "full" ? 2 : 1;
+}
+
+function scenarioBundleSatisfiesLevel(bundle, requestedLevel) {
+  return getScenarioBundleHydrationRank(bundle?.bundleLevel) >= getScenarioBundleHydrationRank(requestedLevel);
 }
 
 function normalizeScenarioCoreTag(rawValue) {
@@ -145,7 +178,25 @@ function withScenarioLoadTimeout(promise, ms, { scenarioId = "", resourceLabel =
 
 function loadScenarioJsonWithTimeout(d3Client, url, { scenarioId = "", resourceLabel = "resource" } = {}) {
   return withScenarioLoadTimeout(
-    d3Client.json(cacheBust(url)),
+    loadMeasuredJsonResource(cacheBust(url), {
+      d3Client,
+      label: `scenario:${resourceLabel}`,
+    }).then((result) => result.payload),
+    SCENARIO_LOAD_TIMEOUT_MS,
+    { scenarioId, resourceLabel }
+  );
+}
+
+function loadScenarioJsonResourceWithTimeout(
+  d3Client,
+  url,
+  { scenarioId = "", resourceLabel = "resource" } = {}
+) {
+  return withScenarioLoadTimeout(
+    loadMeasuredJsonResource(cacheBust(url), {
+      d3Client,
+      label: `scenario:${resourceLabel}`,
+    }),
     SCENARIO_LOAD_TIMEOUT_MS,
     { scenarioId, resourceLabel }
   );
@@ -210,13 +261,14 @@ async function loadOptionalScenarioResource(
     };
   }
   try {
-    const value = await loadScenarioJsonWithTimeout(d3Client, url, {
+    const result = await loadScenarioJsonResourceWithTimeout(d3Client, url, {
       scenarioId,
       resourceLabel,
     });
     return {
       ok: true,
-      value: value ?? null,
+      value: result.payload ?? null,
+      metrics: result.metrics || null,
       reason: "loaded",
       errorMessage: "",
     };
@@ -226,10 +278,37 @@ async function loadOptionalScenarioResource(
     return {
       ok: false,
       value: null,
+      metrics: null,
       reason: errorMessage.includes("Timed out") ? "timeout" : "load_error",
       errorMessage,
     };
   }
+}
+
+async function loadMeasuredRequiredScenarioResource(
+  d3Client,
+  url,
+  {
+    scenarioId = "",
+    resourceLabel = "resource",
+    requiredField = "",
+  } = {}
+) {
+  if (!url) {
+    throw new Error(`[scenario] Required resource "${resourceLabel}" is missing for "${scenarioId}".`);
+  }
+  const result = await loadScenarioJsonResourceWithTimeout(d3Client, url, {
+    scenarioId,
+    resourceLabel,
+  });
+  return {
+    payload: validateScenarioRequiredResourcePayload(result.payload, {
+      scenarioId,
+      resourceLabel,
+      requiredField,
+    }),
+    metrics: result.metrics || null,
+  };
 }
 
 function normalizeScenarioId(value) {
@@ -955,7 +1034,9 @@ async function loadScenarioRegistry({ d3Client = globalThis.d3 } = {}) {
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available for scenario registry loading.");
   }
-  const registry = await d3Client.json(cacheBust(SCENARIO_REGISTRY_URL));
+  const registry = await loadScenarioJsonWithTimeout(d3Client, SCENARIO_REGISTRY_URL, {
+    resourceLabel: "scenario_registry",
+  });
   state.scenarioRegistry = registry || { version: 1, default_scenario_id: "", scenarios: [] };
   return state.scenarioRegistry;
 }
@@ -1421,7 +1502,7 @@ async function ensureScenarioGeoLocalePatchForLanguage(
 ) {
   const scenarioId = normalizeScenarioId(state.activeScenarioId);
   if (!scenarioId) return null;
-  const bundle = await loadScenarioBundle(scenarioId, { d3Client });
+  const bundle = await loadScenarioBundle(scenarioId, { d3Client, bundleLevel: "full" });
   if (!bundle?.manifest) return null;
 
   const descriptor = getScenarioGeoLocalePatchDescriptor(bundle.manifest, language);
@@ -1555,7 +1636,10 @@ async function loadScenarioOptionalLayerPayload(
       return null;
     }
     try {
-      const rawPayload = await d3Client.json(cacheBust(requestUrl));
+      const { payload: rawPayload } = await loadMeasuredJsonResource(cacheBust(requestUrl), {
+        d3Client,
+        label: `scenario_optional:${layerKey}`,
+      });
       const payload = layerKey === "cities"
         ? normalizeScenarioCityOverridesPayload(rawPayload, {
           sourceLabel: `scenario_city_overrides:${getScenarioBundleId(bundle) || "scenario"}`,
@@ -1706,6 +1790,61 @@ function getCachedScenarioBundle(scenarioId = state.activeScenarioId) {
   return state.scenarioBundleCacheById?.[normalizedScenarioId] || null;
 }
 
+function hydrateActiveScenarioBundle(
+  bundle,
+  {
+    renderNow = true,
+  } = {}
+) {
+  const bundleScenarioId = getScenarioBundleId(bundle);
+  if (!bundleScenarioId || bundleScenarioId !== normalizeScenarioId(state.activeScenarioId)) {
+    return false;
+  }
+  const runtimeTopologyPayload =
+    normalizeScenarioRuntimeTopologyPayload(bundle.runtimeTopologyPayload) || state.scenarioRuntimeTopologyData || null;
+  if (runtimeTopologyPayload) {
+    state.scenarioRuntimeTopologyData = runtimeTopologyPayload;
+    state.runtimePoliticalTopology = runtimeTopologyPayload?.objects?.political
+      ? runtimeTopologyPayload
+      : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null);
+    state.scenarioLandMaskData =
+      getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land_mask") || state.scenarioLandMaskData || null;
+    state.scenarioContextLandMaskData =
+      getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "context_land_mask")
+      || state.scenarioContextLandMaskData
+      || null;
+    state.scenarioWaterRegionsData =
+      getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water")
+      || bundle.waterRegionsPayload
+      || state.scenarioWaterRegionsData
+      || null;
+    state.scenarioSpecialRegionsData =
+      getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land")
+      || bundle.specialRegionsPayload
+      || state.scenarioSpecialRegionsData
+      || null;
+  }
+  if (bundle.districtGroupsPayload) {
+    state.scenarioDistrictGroupsData = bundle.districtGroupsPayload;
+    state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(bundle.districtGroupsPayload);
+  }
+  if (bundle.releasableCatalog) {
+    state.releasableCatalog = mergeReleasableCatalogs(state.defaultReleasableCatalog, bundle.releasableCatalog);
+    state.scenarioReleasableIndex = buildScenarioReleasableIndex(bundleScenarioId, { excludeTags: [] });
+  }
+  if (bundle.auditPayload) {
+    state.scenarioAudit = bundle.auditPayload;
+    setScenarioAuditUiState({
+      loading: false,
+      loadedForScenarioId: bundleScenarioId,
+      errorMessage: "",
+    });
+  }
+  syncScenarioUi();
+  syncCountryUi({ renderNow });
+  return true;
+}
+
 function releaseScenarioAuditPayload(scenarioId = state.activeScenarioId, { syncUi = true } = {}) {
   const normalizedScenarioId = normalizeScenarioId(scenarioId);
   const bundle = getCachedScenarioBundle(normalizedScenarioId);
@@ -1738,19 +1877,36 @@ function syncScenarioInspectorSelection(countryCode = "") {
   }
 }
 
-async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceReload = false } = {}) {
+async function loadScenarioBundle(
+  scenarioId,
+  {
+    d3Client = globalThis.d3,
+    forceReload = false,
+    bundleLevel = "full",
+  } = {}
+) {
   const loadStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
   const targetId = normalizeScenarioId(scenarioId);
+  const requestedBundleLevel = normalizeScenarioBundleLevel(bundleLevel);
   if (!targetId) {
     throw new Error("Scenario id is required.");
   }
-  if (!forceReload && state.scenarioBundleCacheById?.[targetId]) {
-    prewarmScenarioOptionalLayersOnCacheHit(state.scenarioBundleCacheById[targetId], { d3Client });
-    recordScenarioPerfMetric("loadScenarioBundle", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - loadStartedAt, {
-      scenarioId: targetId,
-      cacheHit: true,
-    });
-    return state.scenarioBundleCacheById[targetId];
+  const cachedBundle = state.scenarioBundleCacheById?.[targetId] || null;
+  if (!forceReload && cachedBundle && scenarioBundleSatisfiesLevel(cachedBundle, requestedBundleLevel)) {
+    if (normalizeScenarioBundleLevel(cachedBundle.bundleLevel) === "full") {
+      prewarmScenarioOptionalLayersOnCacheHit(cachedBundle, { d3Client });
+    }
+    recordScenarioPerfMetric(
+      "loadScenarioBundle",
+      (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - loadStartedAt,
+      {
+        scenarioId: targetId,
+        cacheHit: true,
+        bundleLevel: requestedBundleLevel,
+        hydratedLevel: normalizeScenarioBundleLevel(cachedBundle.bundleLevel),
+      }
+    );
+    return cachedBundle;
   }
   await loadScenarioRegistry({ d3Client });
   const meta = getScenarioMetaById(targetId);
@@ -1760,48 +1916,55 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available for scenario loading.");
   }
-  const manifest = await loadScenarioJsonWithTimeout(d3Client, meta.manifest_url, {
+  const manifestResult = await loadScenarioJsonResourceWithTimeout(d3Client, meta.manifest_url, {
     scenarioId: targetId,
     resourceLabel: "manifest",
   });
+  const manifest = manifestResult.payload;
+  const priorBundle = !forceReload && cachedBundle ? cachedBundle : null;
   const geoLocalePatchDescriptor = getScenarioGeoLocalePatchDescriptor(manifest);
   const hints = normalizeScenarioPerformanceHints(manifest);
+  const runtimeTopologyUrl = String(
+    requestedBundleLevel === "bootstrap"
+      ? manifest.runtime_bootstrap_topology_url || manifest.runtime_topology_url || ""
+      : manifest.runtime_topology_url || manifest.runtime_bootstrap_topology_url || ""
+  ).trim();
   const [
-    countriesPayload,
-    ownersPayload,
-    controllersPayload,
-    coresPayload,
+    countriesResult,
+    ownersResult,
+    controllersResult,
+    coresResult,
     runtimeTopologyResult,
     geoLocalePatchResult,
     releasableCatalogResult,
     districtGroupsResult,
-  ] =
-    await Promise.all([
-    loadRequiredScenarioResource(d3Client, manifest.countries_url, {
+    auditResult,
+  ] = await Promise.all([
+    loadMeasuredRequiredScenarioResource(d3Client, manifest.countries_url, {
       scenarioId: targetId,
       resourceLabel: "countries",
       requiredField: "countries",
     }),
-    loadRequiredScenarioResource(d3Client, manifest.owners_url, {
+    loadMeasuredRequiredScenarioResource(d3Client, manifest.owners_url, {
       scenarioId: targetId,
       resourceLabel: "owners",
       requiredField: "owners",
     }),
     manifest.controllers_url
-      ? loadRequiredScenarioResource(d3Client, manifest.controllers_url, {
+      ? loadMeasuredRequiredScenarioResource(d3Client, manifest.controllers_url, {
         scenarioId: targetId,
         resourceLabel: "controllers",
         requiredField: "controllers",
       })
-      : Promise.resolve(null),
-    loadRequiredScenarioResource(d3Client, manifest.cores_url, {
+      : Promise.resolve({ payload: null, metrics: null }),
+    loadMeasuredRequiredScenarioResource(d3Client, manifest.cores_url, {
       scenarioId: targetId,
       resourceLabel: "cores",
       requiredField: "cores",
     }),
-    loadOptionalScenarioResource(d3Client, manifest.runtime_topology_url, {
+    loadOptionalScenarioResource(d3Client, runtimeTopologyUrl, {
       scenarioId: targetId,
-      resourceLabel: "runtime_topology",
+      resourceLabel: requestedBundleLevel === "bootstrap" ? "runtime_bootstrap_topology" : "runtime_topology",
     }),
     loadOptionalScenarioResource(d3Client, geoLocalePatchDescriptor.url, {
       scenarioId: targetId,
@@ -1809,40 +1972,61 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
         ? `geo_locale_patch_${geoLocalePatchDescriptor.language}`
         : "geo_locale_patch",
     }),
-    loadOptionalScenarioResource(d3Client, manifest.releasable_catalog_url, {
-      scenarioId: targetId,
-      resourceLabel: "releasable_catalog",
-    }),
-    loadOptionalScenarioResource(d3Client, manifest.district_groups_url, {
-      scenarioId: targetId,
-      resourceLabel: "district_groups",
-    }),
-    ]);
+    requestedBundleLevel === "full"
+      ? loadOptionalScenarioResource(d3Client, manifest.releasable_catalog_url, {
+        scenarioId: targetId,
+        resourceLabel: "releasable_catalog",
+      })
+      : Promise.resolve({ ok: false, value: priorBundle?.releasableCatalog || null, metrics: null, reason: "deferred", errorMessage: "" }),
+    requestedBundleLevel === "full"
+      ? loadOptionalScenarioResource(d3Client, manifest.district_groups_url, {
+        scenarioId: targetId,
+        resourceLabel: "district_groups",
+      })
+      : Promise.resolve({ ok: false, value: priorBundle?.districtGroupsPayload || null, metrics: null, reason: "deferred", errorMessage: "" }),
+    requestedBundleLevel === "full"
+      ? loadOptionalScenarioResource(d3Client, manifest.audit_url, {
+        scenarioId: targetId,
+        resourceLabel: "audit",
+      })
+      : Promise.resolve({ ok: false, value: priorBundle?.auditPayload || null, metrics: null, reason: "deferred", errorMessage: "" }),
+  ]);
+
   const bundle = {
+    ...(priorBundle && typeof priorBundle === "object" ? priorBundle : {}),
     meta,
     manifest,
-    countriesPayload,
-    ownersPayload,
-    controllersPayload,
-    coresPayload,
-    waterRegionsPayload: null,
-    specialRegionsPayload: null,
-    reliefOverlaysPayload: null,
-    cityOverridesPayload: null,
+    bundleLevel: requestedBundleLevel,
+    countriesPayload: countriesResult.payload,
+    ownersPayload: ownersResult.payload,
+    controllersPayload: controllersResult.payload,
+    coresPayload: coresResult.payload,
+    waterRegionsPayload: priorBundle?.waterRegionsPayload || null,
+    specialRegionsPayload: priorBundle?.specialRegionsPayload || null,
+    reliefOverlaysPayload: priorBundle?.reliefOverlaysPayload || null,
+    cityOverridesPayload: priorBundle?.cityOverridesPayload || null,
     geoLocalePatchPayload: normalizeScenarioGeoLocalePatchPayload(geoLocalePatchResult.value),
-    geoLocalePatchPayloadsByLanguage: {},
+    geoLocalePatchPayloadsByLanguage: {
+      ...(priorBundle?.geoLocalePatchPayloadsByLanguage || {}),
+    },
     runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(runtimeTopologyResult.value),
-    releasableCatalog: releasableCatalogResult.value,
+    releasableCatalog: releasableCatalogResult.value || null,
     districtGroupsPayload: normalizeScenarioDistrictGroupsPayload(districtGroupsResult.value, targetId),
-    auditPayload: null,
-    optionalLayerPromises: {},
-    optionalLayerSettledByKey: {},
+    auditPayload: auditResult.value || null,
+    optionalLayerPromises: {
+      ...(priorBundle?.optionalLayerPromises || {}),
+    },
+    optionalLayerSettledByKey: {
+      ...(priorBundle?.optionalLayerSettledByKey || {}),
+    },
     loadDiagnostics: {
       optionalResources: {
         runtime_topology: {
           ok: !!runtimeTopologyResult.ok,
           reason: runtimeTopologyResult.reason,
           errorMessage: runtimeTopologyResult.errorMessage,
+          metrics: runtimeTopologyResult.metrics || null,
+          url: runtimeTopologyUrl,
         },
         geo_locale_patch: {
           ok: !!geoLocalePatchResult.ok,
@@ -1850,18 +2034,35 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
           errorMessage: geoLocalePatchResult.errorMessage,
           language: geoLocalePatchDescriptor.language,
           localeSpecific: geoLocalePatchDescriptor.localeSpecific,
+          metrics: geoLocalePatchResult.metrics || null,
         },
         releasable_catalog: {
           ok: !!releasableCatalogResult.ok,
           reason: releasableCatalogResult.reason,
           errorMessage: releasableCatalogResult.errorMessage,
+          metrics: releasableCatalogResult.metrics || null,
         },
         district_groups: {
           ok: !!districtGroupsResult.ok,
           reason: districtGroupsResult.reason,
           errorMessage: districtGroupsResult.errorMessage,
+          metrics: districtGroupsResult.metrics || null,
+        },
+        audit: {
+          ok: !!auditResult.ok,
+          reason: auditResult.reason,
+          errorMessage: auditResult.errorMessage,
+          metrics: auditResult.metrics || null,
         },
       },
+      requiredResources: {
+        manifest: manifestResult.metrics || null,
+        countries: countriesResult.metrics || null,
+        owners: ownersResult.metrics || null,
+        controllers: controllersResult.metrics || null,
+        cores: coresResult.metrics || null,
+      },
+      bundleLevel: requestedBundleLevel,
     },
   };
   if (bundle.geoLocalePatchPayload) {
@@ -1872,26 +2073,34 @@ async function loadScenarioBundle(scenarioId, { d3Client = globalThis.d3, forceR
       bundle.geoLocalePatchPayloadsByLanguage.zh = bundle.geoLocalePatchPayload;
     }
   }
-  const eagerOptionalLayers = Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
-    .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, bundle.runtimeTopologyPayload, hints));
-  if (eagerOptionalLayers.length) {
-    await Promise.all(
-      eagerOptionalLayers.map((layerKey) => loadScenarioOptionalLayerPayload(bundle, layerKey, { d3Client }))
-    );
+  if (requestedBundleLevel === "full") {
+    const eagerOptionalLayers = Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
+      .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, bundle.runtimeTopologyPayload, hints));
+    if (eagerOptionalLayers.length) {
+      await Promise.all(
+        eagerOptionalLayers.map((layerKey) => loadScenarioOptionalLayerPayload(bundle, layerKey, { d3Client }))
+      );
+    }
   }
-  const ownerCount = Object.keys(ownersPayload?.owners || {}).length;
-  const controllerCount = Object.keys(controllersPayload?.controllers || {}).length;
-  const countryCount = Object.keys(countriesPayload?.countries || {}).length;
+  const ownerCount = Object.keys(bundle.ownersPayload?.owners || {}).length;
+  const controllerCount = Object.keys(bundle.controllersPayload?.controllers || {}).length;
+  const countryCount = Object.keys(bundle.countriesPayload?.countries || {}).length;
   console.log(
-    `[scenario] Loaded bundle "${targetId}": ${ownerCount} owner entries, ${controllerCount} controller entries, ${countryCount} countries, baseline=${String(manifest?.baseline_hash || "").slice(0, 12)}`
+    `[scenario] Loaded ${requestedBundleLevel} bundle "${targetId}": ${ownerCount} owner entries, ${controllerCount} controller entries, ${countryCount} countries, baseline=${String(manifest?.baseline_hash || "").slice(0, 12)}`
   );
   state.scenarioBundleCacheById[targetId] = bundle;
   recordScenarioPerfMetric("loadScenarioBundle", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - loadStartedAt, {
     scenarioId: targetId,
     cacheHit: false,
+    bundleLevel: requestedBundleLevel,
     countryCount,
     ownerCount,
     controllerCount,
+    resourceMetrics: {
+      manifest: manifestResult.metrics || null,
+      runtimeTopology: runtimeTopologyResult.metrics || null,
+      geoLocalePatch: geoLocalePatchResult.metrics || null,
+    },
   });
   return bundle;
 }
@@ -1904,7 +2113,7 @@ async function loadScenarioAuditPayload(
   } = {}
 ) {
   const bundle = typeof bundleOrScenarioId === "string"
-    ? await loadScenarioBundle(bundleOrScenarioId, { d3Client })
+    ? await loadScenarioBundle(bundleOrScenarioId, { d3Client, bundleLevel: "full" })
     : bundleOrScenarioId;
   const requestedScenarioId = normalizeScenarioId(
     bundle?.manifest?.scenario_id || bundle?.meta?.scenario_id
@@ -1937,7 +2146,10 @@ async function loadScenarioAuditPayload(
   }
 
   try {
-    const auditPayload = await d3Client.json(cacheBust(bundle.manifest.audit_url));
+    const { payload: auditPayload } = await loadMeasuredJsonResource(cacheBust(bundle.manifest.audit_url), {
+      d3Client,
+      label: "scenario:audit",
+    });
     bundle.auditPayload = auditPayload || null;
     if (requestedScenarioId && normalizeScenarioId(state.activeScenarioId) === requestedScenarioId) {
       state.scenarioAudit = bundle.auditPayload;
@@ -1969,7 +2181,7 @@ async function validateImportedScenarioBaseline(projectScenario, { d3Client = gl
 
   let bundle = null;
   try {
-    bundle = await loadScenarioBundle(scenarioId, { d3Client });
+    bundle = await loadScenarioBundle(scenarioId, { d3Client, bundleLevel: "full" });
   } catch (error) {
     return {
       ok: false,
@@ -2625,8 +2837,11 @@ async function applyScenarioBundle(
   }
   const rollbackSnapshot = captureScenarioApplyRollbackSnapshot();
   let staged = null;
+  let topologyDecodeMs = 0;
   try {
+    const topologyDecodeStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
     staged = await prepareScenarioApplyState(bundle, { syncPalette });
+    topologyDecodeMs = (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - topologyDecodeStartedAt;
 
     state.scenarioParentBorderEnabledBeforeActivate =
       cloneScenarioStateValue(staged.scenarioParentBorderEnabledBeforeActivate);
@@ -2779,6 +2994,8 @@ async function applyScenarioBundle(
       scenarioId: staged.scenarioId,
       expectedFeatureCount: Number(bundle.manifest?.summary?.feature_count || 0),
       runtimeFeatureCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
+      topologyDecodeMs,
+      applyMs: (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - applyStartedAt,
     });
   } catch (error) {
     let rollbackRestoreError = null;
@@ -2836,7 +3053,7 @@ async function applyScenarioById(
   state.scenarioApplyInFlight = true;
   syncScenarioUi();
   activeScenarioApplyPromise = (async () => {
-    const bundle = await loadScenarioBundle(normalizedScenarioId);
+    const bundle = await loadScenarioBundle(normalizedScenarioId, { bundleLevel: "full" });
     await applyScenarioBundle(bundle, {
       renderNow,
       markDirtyReason,
@@ -3261,6 +3478,7 @@ export {
   ensureScenarioGeoLocalePatchForLanguage,
   getDefaultScenarioId,
   getScenarioDisplayOwnerByFeatureId,
+  hydrateActiveScenarioBundle,
   initScenarioManager,
   loadScenarioAuditPayload,
   loadScenarioBundle,

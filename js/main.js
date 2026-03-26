@@ -1,9 +1,11 @@
 // App entry point (Phase 13)
 import { normalizeCityLayerStyleConfig, state } from "./core/state.js";
 import {
+  buildCityLocalizationPatch,
   loadCitySupportData,
   loadContextLayerPack,
   loadDeferredDetailBundle,
+  loadLocalizationData,
   loadMapData,
   normalizeRequestedContextLayerNames,
 } from "./core/data_loader.js";
@@ -12,6 +14,7 @@ import { applyActivePaletteState } from "./core/palette_manager.js";
 import {
   applyScenarioBundle,
   initScenarioManager,
+  hydrateActiveScenarioBundle,
   loadScenarioBundle,
   loadScenarioRegistry,
   syncScenarioLocalizationState,
@@ -172,6 +175,7 @@ let bootContinueHandler = null;
 let bootProgressAnimationHandle = null;
 let bootProgressPhaseStartedAt = nowMs();
 let postReadyContextWarmupScheduled = false;
+let postReadyHydrationScheduled = false;
 
 const BOOT_PHASE_WINDOWS = {
   shell: { min: 0, max: 8, durationMs: 900 },
@@ -574,6 +578,126 @@ async function ensureBaseCityDataReady({ reason = "manual", renderNow = true } =
   return promise;
 }
 
+async function ensureFullLocalizationDataReady({ reason = "post-ready", renderNow = true } = {}) {
+  if (state.baseLocalizationLevel === "full" && state.baseLocalizationDataState === "loaded") {
+    return {
+      locales: state.locales,
+      geoAliases: { alias_to_stable_key: state.geoAliasToStableKey || {} },
+    };
+  }
+  if (state.baseLocalizationDataPromise) {
+    return state.baseLocalizationDataPromise;
+  }
+  state.baseLocalizationDataState = "loading";
+  state.baseLocalizationDataError = "";
+  startBootMetric("localization:full:load");
+  const promise = loadLocalizationData({
+    d3Client: globalThis.d3,
+    localeLevel: "full",
+  })
+    .then((result) => {
+      const fullBaseGeoLocales =
+        result.locales?.geo && typeof result.locales.geo === "object"
+          ? { ...result.locales.geo }
+          : {};
+      const fullBaseAliasMap =
+        result.geoAliases?.alias_to_stable_key && typeof result.geoAliases.alias_to_stable_key === "object"
+          ? { ...result.geoAliases.alias_to_stable_key }
+          : {};
+      if (state.worldCitiesData || state.baseCityAliasesData) {
+        const cityPatch = buildCityLocalizationPatch({
+          cityCollection: state.worldCitiesData || null,
+          cityAliases: state.baseCityAliasesData || null,
+        });
+        Object.assign(fullBaseGeoLocales, cityPatch.geo || {});
+        Object.assign(fullBaseAliasMap, cityPatch.aliasToStableKey || {});
+      }
+      state.baseGeoLocales = fullBaseGeoLocales;
+      state.baseGeoAliasToStableKey = fullBaseAliasMap;
+      state.baseLocalizationLevel = "full";
+      if (state.activeScenarioId) {
+        syncScenarioLocalizationState({
+          cityOverridesPayload: state.scenarioCityOverridesData,
+          geoLocalePatchPayload: state.scenarioGeoLocalePatchData,
+        });
+      } else {
+        state.locales = {
+          ...(state.locales || {}),
+          ui: result.locales?.ui || state.locales?.ui || {},
+          geo: { ...state.baseGeoLocales },
+        };
+        state.geoAliasToStableKey = { ...state.baseGeoAliasToStableKey };
+      }
+      state.baseLocalizationDataState = "loaded";
+      state.baseLocalizationDataError = "";
+      state.baseLocalizationDataPromise = null;
+      finishBootMetric("localization:full:load", {
+        reason,
+        resourceMetrics: result.resourceMetrics || {},
+      });
+      if (typeof state.updateDevWorkspaceUIFn === "function") {
+        state.updateDevWorkspaceUIFn();
+      }
+      if (renderNow && typeof state.renderNowFn === "function") {
+        state.renderNowFn();
+      }
+      return result;
+    })
+    .catch((error) => {
+      state.baseLocalizationDataState = "error";
+      state.baseLocalizationDataError = error?.message || String(error || "Unknown localization hydration error.");
+      state.baseLocalizationDataPromise = null;
+      finishBootMetric("localization:full:load", {
+        reason,
+        failed: true,
+        errorMessage: state.baseLocalizationDataError,
+      });
+      console.warn(`[boot] Failed to hydrate full localization data. reason=${reason}`, error);
+      throw error;
+    });
+  state.baseLocalizationDataPromise = promise;
+  return promise;
+}
+
+async function ensureActiveScenarioBundleHydrated({ reason = "post-ready", renderNow = true } = {}) {
+  const scenarioId = String(state.activeScenarioId || "").trim();
+  if (!scenarioId) return null;
+  startBootMetric("scenario:full:hydrate");
+  try {
+    const bundle = await loadScenarioBundle(scenarioId, {
+      d3Client: globalThis.d3,
+      bundleLevel: "full",
+    });
+    hydrateActiveScenarioBundle(bundle, { renderNow });
+    finishBootMetric("scenario:full:hydrate", {
+      reason,
+      bundleLevel: bundle?.bundleLevel || "full",
+    });
+    return bundle;
+  } catch (error) {
+    finishBootMetric("scenario:full:hydrate", {
+      reason,
+      failed: true,
+      errorMessage: error?.message || String(error || "Unknown scenario hydration error."),
+    });
+    console.warn(`[boot] Failed to hydrate active scenario bundle. reason=${reason}`, error);
+    throw error;
+  }
+}
+
+function schedulePostReadyHydration() {
+  if (postReadyHydrationScheduled) {
+    return;
+  }
+  postReadyHydrationScheduled = true;
+  globalThis.setTimeout(() => {
+    void Promise.allSettled([
+      ensureFullLocalizationDataReady({ reason: "post-ready", renderNow: true }),
+      ensureActiveScenarioBundleHydrated({ reason: "post-ready", renderNow: true }),
+    ]);
+  }, 180);
+}
+
 function expandDeferredContextLayerNames(requestedLayerNames) {
   const requested = Array.isArray(requestedLayerNames) ? requestedLayerNames : [requestedLayerNames];
   const expanded = requested.flatMap((name) => {
@@ -911,6 +1035,7 @@ function finalizeReadyState(renderDispatcher) {
     canContinueWithoutScenario: false,
   });
   checkpointBootMetric("first-interactive");
+  schedulePostReadyHydration();
   schedulePostReadyDeferredContextWarmup();
   schedulePostReadyVisualWarmup();
 }
@@ -936,6 +1061,7 @@ async function bootstrap() {
   });
   bootContinueHandler = null;
   postReadyContextWarmupScheduled = false;
+  postReadyHydrationScheduled = false;
 
   let renderDispatcher = null;
   try {
@@ -952,7 +1078,10 @@ async function bootstrap() {
       return defaultScenarioId;
     });
     const scenarioBundlePromise = defaultScenarioIdPromise
-      .then((defaultScenarioId) => loadScenarioBundle(defaultScenarioId, { d3Client }))
+      .then((defaultScenarioId) => loadScenarioBundle(defaultScenarioId, {
+        d3Client,
+        bundleLevel: "bootstrap",
+      }))
       .then((bundle) => ({ ok: true, bundle }))
       .catch((error) => ({ ok: false, error }));
     const {
@@ -975,10 +1104,13 @@ async function bootstrap() {
       activePaletteMeta,
       activePalettePack,
       activePaletteMap,
+      localeLevel,
+      resourceMetrics,
     } = await loadMapData({
       d3Client,
       includeCityData: false,
       includeContextLayers: false,
+      localeLevel: "startup",
     });
     state.topology = topology || topologyPrimary || topologyDetail;
     state.topologyPrimary = topologyPrimary || state.topology;
@@ -992,6 +1124,10 @@ async function bootstrap() {
     state.detailPromotionInFlight = false;
     state.detailPromotionCompleted = !detailDeferred;
     state.locales = locales || { ui: {}, geo: {} };
+    state.baseLocalizationLevel = localeLevel || "full";
+    state.baseLocalizationDataState = state.baseLocalizationLevel === "full" ? "loaded" : "partial";
+    state.baseLocalizationDataError = "";
+    state.baseLocalizationDataPromise = null;
     state.baseGeoLocales = { ...(state.locales?.geo || {}) };
     state.geoAliasToStableKey = geoAliases?.alias_to_stable_key || {};
     state.baseGeoAliasToStableKey = { ...state.geoAliasToStableKey };
@@ -1074,6 +1210,7 @@ async function bootstrap() {
       `[main] Loaded topology bundle mode=${state.topologyBundleMode}, primary=${primaryCount}, detail=${detailCount}, ruOverrides=${overrideCount}.`
     );
 
+    const baseTopologyDecodeStartedAt = nowMs();
     state.landData = globalThis.topojson.feature(state.topologyPrimary, objects.political);
 
     if (state.specialZonesExternalData?.features) {
@@ -1102,10 +1239,13 @@ async function bootstrap() {
     } else if (Array.isArray(state.contextLayerExternalDataByName?.physical?.features)) {
       state.physicalData = state.contextLayerExternalDataByName.physical;
     }
+    const baseTopologyDecodeMs = nowMs() - baseTopologyDecodeStartedAt;
     finishBootMetric("base-data", {
       topologyBundleMode: state.topologyBundleMode,
       primaryCount,
       detailCount,
+      topologyDecodeMs: baseTopologyDecodeMs,
+      resourceMetrics: resourceMetrics || {},
     });
     await scenarioRegistryPromise;
 
@@ -1162,6 +1302,17 @@ async function bootstrap() {
     finishBootMetric("scenario-bundle", {
       requiresDetailTopology,
       expectedScenarioFeatureCount,
+      bundleLevel: defaultScenarioBundle?.bundleLevel || "bootstrap",
+      resourceMetrics: defaultScenarioBundle?.loadDiagnostics?.optionalResources?.runtime_topology?.metrics
+        ? {
+          runtimeTopology: defaultScenarioBundle.loadDiagnostics.optionalResources.runtime_topology.metrics,
+          geoLocalePatch: defaultScenarioBundle.loadDiagnostics.optionalResources.geo_locale_patch?.metrics || null,
+          manifest: defaultScenarioBundle.loadDiagnostics.requiredResources?.manifest || null,
+        }
+        : {
+          geoLocalePatch: defaultScenarioBundle?.loadDiagnostics?.optionalResources?.geo_locale_patch?.metrics || null,
+          manifest: defaultScenarioBundle?.loadDiagnostics?.requiredResources?.manifest || null,
+        },
     });
 
     setBootState("scenario-apply");
