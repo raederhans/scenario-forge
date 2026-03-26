@@ -1,0 +1,142 @@
+﻿<style>
+  .hero { margin-bottom: 20px; }
+  .hero p { max-width: 980px; }
+  .cards { display:grid; grid-template-columns: repeat(3, minmax(260px, 1fr)); gap:18px; align-items:start; }
+  .card { cursor:pointer; }
+  .card-image { padding:14px; background:#0f172a; }
+  .mock-app { background:#e5e7eb; border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,.08); }
+  .mock-topbar { height:26px; background:#d1d5db; border-bottom:1px solid #cbd5e1; }
+  .mock-shell { display:grid; grid-template-columns: 72px 1fr; min-height:250px; }
+  .mock-sidebar-rail { background:#cbd5e1; padding:10px 8px; display:flex; flex-direction:column; gap:8px; }
+  .rail-pill { height:18px; border-radius:8px; background:#94a3b8; }
+  .mock-map { position:relative; background:linear-gradient(135deg,#d6d3d1,#f5f5f4 48%,#d4d4d8); min-height:250px; overflow:hidden; }
+  .map-patch { position:absolute; border-radius:999px; opacity:.32; }
+  .map-line { position:absolute; height:3px; background:#111827; opacity:.7; transform-origin:left center; }
+  .unit-dot { position:absolute; width:18px; height:18px; border-radius:4px; background:#334155; box-shadow: inset 0 0 0 2px rgba(255,255,255,.5); }
+  .unit-stack { position:absolute; display:flex; gap:4px; }
+  .unit-stack .u { width:18px; height:18px; border-radius:4px; box-shadow: inset 0 0 0 2px rgba(255,255,255,.45); }
+  .modal { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:#f8fafc; border:1px solid #cbd5e1; border-radius:16px; box-shadow:0 18px 40px rgba(15,23,42,.28); }
+  .modal-header { height:34px; background:#e2e8f0; border-bottom:1px solid #cbd5e1; display:flex; align-items:center; padding:0 12px; font-size:12px; font-weight:700; color:#0f172a; }
+  .modal-body { padding:12px; color:#334155; }
+  .field { height:20px; border-radius:6px; background:#e2e8f0; margin-bottom:8px; }
+  .field.sm { width:46%; display:inline-block; margin-right:6px; }
+  .field.lg { height:28px; }
+  .chip-row { display:flex; gap:6px; margin-bottom:8px; }
+  .chip { height:18px; width:58px; border-radius:999px; background:#cbd5e1; }
+  .counter-list { position:absolute; right:14px; top:18px; width:120px; display:flex; flex-direction:column; gap:8px; }
+  .counter-item { height:26px; border-radius:8px; background:rgba(248,250,252,.85); border:1px solid #cbd5e1; }
+  .dock { position:absolute; left:50%; bottom:14px; transform:translateX(-50%); width:72%; height:46px; background:rgba(248,250,252,.84); border:1px solid #cbd5e1; border-radius:14px; }
+  .mini-note { font-size:12px; color:#cbd5e1; margin-top:10px; line-height:1.45; }
+  .badge-rec { display:inline-block; margin-left:8px; padding:2px 8px; border-radius:999px; background:#dbeafe; color:#1d4ed8; font-size:11px; font-weight:700; }
+</style>
+
+<div class="hero">
+  <h2>兵牌编辑壳子对比</h2>
+  <p class="subtitle">目标固定：侧栏只做引导，详细编辑放地图中央大弹窗。请选你觉得最顺手的一种整体组织方式。</p>
+</div>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mock-app">
+        <div class="mock-topbar"></div>
+        <div class="mock-shell">
+          <div class="mock-sidebar-rail">
+            <div class="rail-pill"></div><div class="rail-pill"></div><div class="rail-pill"></div><div class="rail-pill"></div>
+          </div>
+          <div class="mock-map">
+            <div class="map-patch" style="left:18%;top:14%;width:120px;height:74px;background:#94a3b8"></div>
+            <div class="map-patch" style="right:16%;bottom:14%;width:130px;height:86px;background:#64748b"></div>
+            <div class="map-line" style="left:24%;top:48%;width:180px;transform:rotate(-8deg)"></div>
+            <div class="unit-stack" style="left:28%;top:40%"><div class="u" style="background:#334155"></div><div class="u" style="background:#475569"></div><div class="u" style="background:#64748b"></div></div>
+            <div class="unit-stack" style="left:56%;top:54%"><div class="u" style="background:#7c2d12"></div><div class="u" style="background:#9a3412"></div></div>
+            <div class="modal" style="width:62%;height:70%">
+              <div class="modal-header">方案 A: 指挥面板 <span class="badge-rec">推荐</span></div>
+              <div class="modal-body">
+                <div class="chip-row"><div class="chip"></div><div class="chip"></div><div class="chip"></div></div>
+                <div class="field lg"></div>
+                <div class="field sm"></div><div class="field sm"></div>
+                <div class="field"></div><div class="field"></div><div class="field"></div>
+                <div class="field lg"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mini-note">中央弹窗是一套完整工作台，左上保留对象摘要，适合做国家样式、兵种图标、缩略图预览和挂靠前线。</div>
+    </div>
+    <div class="card-body">
+      <h3>A. 指挥面板</h3>
+      <p>侧栏只管选中对象和进入编辑。大弹窗承担绝大多数细节操作，适合你说的“做大做细节”。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mock-app">
+        <div class="mock-topbar"></div>
+        <div class="mock-shell">
+          <div class="mock-sidebar-rail">
+            <div class="rail-pill"></div><div class="rail-pill"></div><div class="rail-pill"></div><div class="rail-pill"></div>
+          </div>
+          <div class="mock-map">
+            <div class="map-patch" style="left:16%;top:20%;width:90px;height:60px;background:#94a3b8"></div>
+            <div class="map-patch" style="right:12%;top:18%;width:110px;height:70px;background:#64748b"></div>
+            <div class="map-line" style="left:22%;top:44%;width:200px;transform:rotate(6deg)"></div>
+            <div class="unit-dot" style="left:34%;top:48%"></div>
+            <div class="unit-dot" style="left:39%;top:50%;background:#475569"></div>
+            <div class="unit-dot" style="left:44%;top:46%;background:#64748b"></div>
+            <div class="counter-list"><div class="counter-item"></div><div class="counter-item"></div><div class="counter-item"></div></div>
+            <div class="modal" style="left:42%;top:56%;transform:translate(-50%,-50%);width:48%;height:58%">
+              <div class="modal-header">方案 B: 列表联动弹窗</div>
+              <div class="modal-body">
+                <div class="field"></div><div class="field"></div>
+                <div class="field sm"></div><div class="field sm"></div>
+                <div class="field lg"></div>
+                <div class="field"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mini-note">右侧地图内保留一个兵牌小列表，弹窗随列表选择变化，视觉上更像“对象管理器”。</div>
+    </div>
+    <div class="card-body">
+      <h3>B. 列表联动弹窗</h3>
+      <p>信息管理更强，适合未来做大量兵牌；但地图中央会同时出现列表和弹窗，界面更容易显得忙。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mock-app">
+        <div class="mock-topbar"></div>
+        <div class="mock-shell">
+          <div class="mock-sidebar-rail">
+            <div class="rail-pill"></div><div class="rail-pill"></div><div class="rail-pill"></div><div class="rail-pill"></div>
+          </div>
+          <div class="mock-map">
+            <div class="map-patch" style="left:14%;bottom:18%;width:110px;height:72px;background:#94a3b8"></div>
+            <div class="map-patch" style="right:20%;top:18%;width:120px;height:80px;background:#64748b"></div>
+            <div class="map-line" style="left:20%;top:42%;width:210px;transform:rotate(-12deg)"></div>
+            <div class="unit-stack" style="left:46%;top:34%"><div class="u" style="background:#7c2d12"></div><div class="u" style="background:#9a3412"></div></div>
+            <div class="dock"></div>
+            <div class="modal" style="width:56%;height:52%;top:40%">
+              <div class="modal-header">方案 C: 画布优先</div>
+              <div class="modal-body">
+                <div class="field lg"></div>
+                <div class="field"></div><div class="field"></div>
+                <div class="field sm"></div><div class="field sm"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mini-note">底部保留一个轻量上下文条，中央弹窗更短更轻，强调“看地图”而不是“填表”。</div>
+    </div>
+    <div class="card-body">
+      <h3>C. 画布优先</h3>
+      <p>观感更轻，适合频繁点选地图；但复杂字段会比较难容纳，后续容易再次长成多层交互。</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,98 @@
+<h2>UI 分级与拥挤问题</h2>
+<p class="subtitle">当前侧边栏承载了太多功能，需要重新组织信息层级</p>
+
+<div class="section">
+  <h3>当前 UI 结构问题</h3>
+  <div class="split">
+    <div class="mockup">
+      <div class="mockup-header">现状：左侧边栏（296px 宽）</div>
+      <div class="mockup-body" style="padding: 12px; font-size: 11px; color: #a0a0a0; line-height: 2;">
+        <div style="border: 1px solid #444; padding: 6px; margin-bottom: 4px; border-radius: 4px;">
+          <span style="color: #e2ddd0;">▸ Scenario 场景控制</span><br>
+          <span style="font-size: 9px;">Mode selector / Apply / Reset</span>
+        </div>
+        <div style="border: 1px solid #444; padding: 6px; margin-bottom: 4px; border-radius: 4px;">
+          <span style="color: #e2ddd0;">▸ Inspector 检查器</span><br>
+          <span style="font-size: 9px;">Frontline overlay toggle + style</span>
+        </div>
+        <div style="border: 1px solid #c1121f55; padding: 6px; margin-bottom: 4px; border-radius: 4px; background: rgba(193,18,31,0.05);">
+          <span style="color: #c1121f;">▸ Strategic Overlay</span><br>
+          <span style="font-size: 9px;">Operation Graphics editor<br>
+          ── 绘制模式 / 样式 / 控制点<br>
+          <span style="color: #c1121f;">Unit Counter editor ← 占用大量空间</span><br>
+          ── Preset / Nation / Echelon<br>
+          ── Preview card<br>
+          ── Detail drawer (展开时更大)<br>
+          &nbsp;&nbsp;&nbsp;── Renderer / Size / SubLabel<br>
+          &nbsp;&nbsp;&nbsp;── Symbol code / SIDC<br>
+          &nbsp;&nbsp;&nbsp;── Combat stats / Randomize<br>
+          &nbsp;&nbsp;&nbsp;── Combat bars<br>
+          ── Counter list</span>
+        </div>
+        <div style="border: 1px solid #444; padding: 6px; margin-bottom: 4px; border-radius: 4px;">
+          <span style="color: #e2ddd0;">▸ Country List 国家列表</span>
+        </div>
+        <div style="border: 1px solid #444; padding: 6px; border-radius: 4px;">
+          <span style="color: #e2ddd0;">▸ Presets 预设</span>
+        </div>
+        <div style="margin-top: 8px; padding: 6px; background: rgba(193,18,31,0.1); border-radius: 4px; text-align: center; color: #c1121f; font-size: 10px;">
+          296px 中塞入所有这些内容 → 需要大量滚动
+        </div>
+      </div>
+    </div>
+    <div class="mockup">
+      <div class="mockup-header">问题总结</div>
+      <div class="mockup-body" style="padding: 16px; font-size: 12px; color: #a0a0a0; line-height: 2.2;">
+        <div style="color: #e2ddd0; font-weight: bold; margin-bottom: 8px;">核心矛盾</div>
+        <div>1. 兵牌编辑器的"快速路径"和"详情"混在一起</div>
+        <div>2. Operation Graphics + Unit Counters 共享一个 Strategic Overlay 面板</div>
+        <div>3. 兵牌列表没有紧凑的缩略模式</div>
+        <div>4. 编辑状态（创建/修改兵牌）和浏览状态（查看列表）不分离</div>
+        <div style="color: #e2ddd0; font-weight: bold; margin-top: 12px; margin-bottom: 8px;">结果</div>
+        <div>• 用户需要频繁滚动</div>
+        <div>• 编辑一个兵牌时看不到其他兵牌</div>
+        <div>• 信息密度太高，认知负担重</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>改进方案</h3>
+
+<div class="options">
+  <div class="option" data-choice="popover-editor" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>弹出式编辑器 (Popover/Floating Panel)</h3>
+      <p>点击地图上的兵牌或列表项时，在兵牌附近弹出一个浮动编辑面板（类似 tooltip 但可交互）。侧边栏只保留紧凑的兵牌列表和快速创建按钮。</p>
+      <p style="color: #a0a0a0; margin-top: 4px;"><strong>侧边栏：</strong>紧凑列表 → <strong>弹出面板：</strong>完整编辑器</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="two-level" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>两级侧边栏 (Summary → Detail)</h3>
+      <p>侧边栏默认显示紧凑的兵牌缩略列表（一行一个：色条 + 国家 + 类型 + 标签）。点击某个兵牌后，侧边栏平滑展开到详情编辑视图，其他列表项折叠。类似手风琴效果。</p>
+      <p style="color: #a0a0a0; margin-top: 4px;"><strong>默认：</strong>紧凑缩略列表 → <strong>展开：</strong>完整编辑</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="right-panel" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>右侧面板 + 左侧列表 (推荐)</h3>
+      <p>左侧边栏保留紧凑的兵牌列表和快速创建功能。右侧边栏（已有 288px）用于显示选中兵牌的完整编辑器。点击兵牌 → 右面板显示详情。这利用了已有的右侧面板（dev_workspace），将编辑器移过去。</p>
+      <p style="color: #a0a0a0; margin-top: 4px;"><strong>左侧：</strong>列表 + 快速操作 → <strong>右侧：</strong>详情编辑器</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="modal-dialog" onclick="toggleSelect(this)">
+    <div class="letter">D</div>
+    <div class="content">
+      <h3>模态对话框编辑</h3>
+      <p>点击兵牌后弹出一个居中的模态对话框，包含完整的编辑界面。侧边栏只显示列表和快速操作。编辑完毕后关闭对话框。</p>
+      <p style="color: #a0a0a0; margin-top: 4px;"><strong>侧边栏：</strong>仅列表 → <strong>模态框：</strong>完整编辑</p>
+    </div>
+  </div>
+</div>

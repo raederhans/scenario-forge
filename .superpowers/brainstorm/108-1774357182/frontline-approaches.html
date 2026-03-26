@@ -1,0 +1,81 @@
+<h2>前线形状改进方向</h2>
+<p class="subtitle">如何让前线看起来更像真实的军事态势线？</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">当前：沿行政边界</div>
+    <div class="mockup-body" style="padding: 20px;">
+      <svg viewBox="0 0 300 200" style="width: 100%; height: auto;">
+        <!-- Background regions -->
+        <path d="M0,0 L100,0 L110,60 L80,100 L120,140 L100,200 L0,200 Z" fill="#5d7cba" opacity="0.3" stroke="#444" stroke-width="0.5"/>
+        <path d="M100,0 L200,0 L200,80 L180,120 L200,200 L100,200 L120,140 L80,100 L110,60 Z" fill="#c1121f" opacity="0.3" stroke="#444" stroke-width="0.5"/>
+        <path d="M200,0 L300,0 L300,200 L200,200 L180,120 L200,80 Z" fill="#c1121f" opacity="0.3" stroke="#444" stroke-width="0.5"/>
+        <!-- Frontline follows admin boundary exactly -->
+        <path d="M110,60 L80,100 L120,140" fill="none" stroke="#1a1f2e" stroke-width="4" stroke-linecap="round"/>
+        <path d="M110,60 L80,100 L120,140" fill="none" stroke="#ece8df" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Labels -->
+        <text x="40" y="110" fill="#ddd" font-size="12" text-anchor="middle" font-weight="bold">GER</text>
+        <text x="180" y="110" fill="#ddd" font-size="12" text-anchor="middle" font-weight="bold">SOV</text>
+        <text x="150" y="30" fill="#888" font-size="9" text-anchor="middle">锐角转折 = 行政边界</text>
+      </svg>
+    </div>
+  </div>
+  <div class="mockup">
+    <div class="mockup-header">目标：平滑军事态势线</div>
+    <div class="mockup-body" style="padding: 20px;">
+      <svg viewBox="0 0 300 200" style="width: 100%; height: auto;">
+        <!-- Background regions -->
+        <path d="M0,0 L100,0 L110,60 L80,100 L120,140 L100,200 L0,200 Z" fill="#5d7cba" opacity="0.3" stroke="#444" stroke-width="0.5"/>
+        <path d="M100,0 L200,0 L200,80 L180,120 L200,200 L100,200 L120,140 L80,100 L110,60 Z" fill="#c1121f" opacity="0.3" stroke="#444" stroke-width="0.5"/>
+        <path d="M200,0 L300,0 L300,200 L200,200 L180,120 L200,80 Z" fill="#c1121f" opacity="0.3" stroke="#444" stroke-width="0.5"/>
+        <!-- Smoothed frontline -->
+        <path d="M105,50 C100,70 85,85 82,100 C79,115 100,130 115,145" fill="none" stroke="#1a1f2e" stroke-width="4" stroke-linecap="round"/>
+        <path d="M105,50 C100,70 85,85 82,100 C79,115 100,130 115,145" fill="none" stroke="#ece8df" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Labels -->
+        <text x="40" y="110" fill="#ddd" font-size="12" text-anchor="middle" font-weight="bold">GER</text>
+        <text x="180" y="110" fill="#ddd" font-size="12" text-anchor="middle" font-weight="bold">SOV</text>
+        <text x="150" y="30" fill="#888" font-size="9" text-anchor="middle">平滑曲线 = 军事前线</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<h3>改进方案</h3>
+
+<div class="options">
+  <div class="option" data-choice="auto-smooth" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>自动曲线平滑</h3>
+      <p><strong>原理：</strong>在现有 mesh path 基础上，用 Catmull-Rom 或 B-spline 对路径进行自动平滑。保留 controller 数据驱动，前线仍从 topology mesh 生成，但渲染时自动将锐角和折线柔化为曲线。</p>
+      <div class="pros-cons" style="margin-top: 8px;">
+        <div class="pros"><h4>优势</h4><ul><li>改动最小，完全兼容现有数据</li><li>自动化，无需用户手动操作</li><li>可调平滑程度</li></ul></div>
+        <div class="cons"><h4>局限</h4><ul><li>仍受限于 feature 粒度</li><li>平滑后可能偏离真实行政边界</li><li>视觉改善但底层问题未解决</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="manual-draw" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>手绘前线工具</h3>
+      <p><strong>原理：</strong>新增前线绘制工具（类似 Operation Graphics 的绘制方式），用户直接在地图上手绘前线路径。前线不再由 controller 数据生成，而是用户自由绘制的路径。可以沿河流、山脉走向画出自然的前线。</p>
+      <div class="pros-cons" style="margin-top: 8px;">
+        <div class="pros"><h4>优势</h4><ul><li>完全自由，精确表达任何态势</li><li>可沿地理特征走向</li><li>最大灵活性</li></ul></div>
+        <div class="cons"><h4>局限</h4><ul><li>需要用户手动画每条前线</li><li>与 controller 数据脱耦</li><li>开发量较大</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="hybrid" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>混合方案：自动生成 + 手动微调 (推荐)</h3>
+      <p><strong>原理：</strong>前线仍由 controller 数据自动生成（保证数据一致性），但生成后自动平滑，并允许用户拖拽控制点来微调路径。用户可以在自动生成的前线上添加/移动控制点，让它沿河流或山脉走向弯曲。</p>
+      <div class="pros-cons" style="margin-top: 8px;">
+        <div class="pros"><h4>优势</h4><ul><li>兼顾数据驱动和视觉精度</li><li>默认自动生成，减少手动工作</li><li>保留 controller 数据的一致性</li><li>渐进式增强，可以先做平滑再加控制点</li></ul></div>
+        <div class="cons"><h4>局限</h4><ul><li>实现复杂度中等</li><li>需要管理额外的控制点数据</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>

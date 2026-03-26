@@ -1,0 +1,95 @@
+<h2>兵牌定位：从"随机放置"到"智能布局"</h2>
+<p class="subtitle">当前问题：同一 feature 上多个兵牌的位置混乱</p>
+
+<div class="section">
+  <div class="split">
+    <div class="mockup">
+      <div class="mockup-header">当前行为</div>
+      <div class="mockup-body" style="padding: 20px;">
+        <svg viewBox="0 0 200 160" style="width: 100%; height: auto;">
+          <!-- Feature polygon -->
+          <path d="M30,20 L170,15 L180,80 L160,140 L40,145 L20,80 Z" fill="rgba(93,124,186,0.15)" stroke="#5d7cba" stroke-width="1"/>
+          <text x="100" y="155" fill="#666" font-size="6" text-anchor="middle">Feature: CZ-112</text>
+
+          <!-- Counter at center -->
+          <rect x="72" y="60" width="28" height="18" rx="2" fill="#f4f0e6" stroke="#333" stroke-width="0.5"/>
+          <rect x="72" y="60" width="3.5" height="18" fill="#5d7cba"/>
+          <text x="86" y="72" fill="#0f172a" font-size="6" text-anchor="middle" font-weight="700">INF</text>
+
+          <!-- Counter at random offset -->
+          <rect x="110" y="35" width="28" height="18" rx="2" fill="#f4f0e6" stroke="#333" stroke-width="0.5"/>
+          <rect x="110" y="35" width="3.5" height="18" fill="#c1121f"/>
+          <text x="124" y="47" fill="#0f172a" font-size="6" text-anchor="middle" font-weight="700">ARM</text>
+
+          <!-- Counter overlapping -->
+          <rect x="78" y="90" width="28" height="18" rx="2" fill="#f4f0e6" stroke="#333" stroke-width="0.5"/>
+          <rect x="78" y="90" width="3.5" height="18" fill="#38b000"/>
+          <text x="92" y="102" fill="#0f172a" font-size="6" text-anchor="middle" font-weight="700">ART</text>
+
+          <!-- Problem annotations -->
+          <text x="100" y="12" fill="#c1121f" font-size="5.5" text-anchor="middle">❌ 随机位置，无规律</text>
+        </svg>
+      </div>
+    </div>
+    <div class="mockup">
+      <div class="mockup-header">目标：有序排列</div>
+      <div class="mockup-body" style="padding: 20px;">
+        <svg viewBox="0 0 200 160" style="width: 100%; height: auto;">
+          <!-- Feature polygon -->
+          <path d="M30,20 L170,15 L180,80 L160,140 L40,145 L20,80 Z" fill="rgba(93,124,186,0.15)" stroke="#5d7cba" stroke-width="1"/>
+          <text x="100" y="155" fill="#666" font-size="6" text-anchor="middle">Feature: CZ-112</text>
+
+          <!-- Counters in neat row -->
+          <g>
+            <rect x="50" y="66" width="28" height="18" rx="2" fill="#f4f0e6" stroke="#333" stroke-width="0.5"/>
+            <rect x="50" y="66" width="3.5" height="18" fill="#5d7cba"/>
+            <text x="64" y="78" fill="#0f172a" font-size="6" text-anchor="middle" font-weight="700">INF</text>
+          </g>
+          <g>
+            <rect x="82" y="66" width="28" height="18" rx="2" fill="#f4f0e6" stroke="#333" stroke-width="0.5"/>
+            <rect x="82" y="66" width="3.5" height="18" fill="#c1121f"/>
+            <text x="96" y="78" fill="#0f172a" font-size="6" text-anchor="middle" font-weight="700">ARM</text>
+          </g>
+          <g>
+            <rect x="114" y="66" width="28" height="18" rx="2" fill="#f4f0e6" stroke="#333" stroke-width="0.5"/>
+            <rect x="114" y="66" width="3.5" height="18" fill="#38b000"/>
+            <text x="128" y="78" fill="#0f172a" font-size="6" text-anchor="middle" font-weight="700">ART</text>
+          </g>
+
+          <text x="100" y="12" fill="#2f7d57" font-size="5.5" text-anchor="middle">✓ Centroid 对齐 + 自动排列</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>布局策略</h3>
+
+<div class="options">
+  <div class="option" data-choice="centroid-grid" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Centroid 网格布局</h3>
+      <p>以 feature 的 centroid 为中心，按网格排列同一 feature 内的所有兵牌。1个=正中心，2个=左右排列，3个=三角，4个=2×2 方阵。超过4个时使用堆叠+徽章（已有功能）。</p>
+      <p style="color: #a0a0a0; margin-top: 4px;">适合：feature 较大的区域，兵牌数量适中</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="stack-only" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>始终堆叠 + 点击展开</h3>
+      <p>同一 feature 上的兵牌始终堆叠为一组（最多3层可见卡片），点击堆叠后弹出展开面板显示所有兵牌。这保持地图整洁，信息通过交互获取。</p>
+      <p style="color: #a0a0a0; margin-top: 4px;">适合：兵牌密集的区域，强调地图可读性</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="hybrid-layout" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>混合：自动布局 + 堆叠阈值 (推荐)</h3>
+      <p>设一个阈值（如3个）：≤3个时用 centroid 网格排列，>3个时自动堆叠+徽章。用户仍可手动拖拽调整位置。布局在 zoom 变化时自动调整——远距离全部堆叠，近距离展开排列。</p>
+      <p style="color: #a0a0a0; margin-top: 4px;">兼顾可读性和信息量，响应缩放级别</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,160 @@
+<h2>兵牌国家区分度改进</h2>
+<p class="subtitle">当前国家间唯一视觉差异：左侧窄色条 + 3字母代码</p>
+
+<div class="section">
+  <h3>当前问题</h3>
+  <div class="mockup">
+    <div class="mockup-header">缩放较远时几乎无法区分</div>
+    <div class="mockup-body" style="padding: 20px;">
+      <svg viewBox="0 0 400 80" style="width: 100%; height: auto;">
+        <!-- Germany -->
+        <g transform="translate(20,10)">
+          <rect width="56" height="36" rx="2" fill="#f4f0e6" stroke="#333" stroke-width="0.5"/>
+          <rect width="6.7" height="36" fill="#5d7cba"/>
+          <rect x="8" y="2" width="18" height="5" rx="1" fill="rgba(31,41,55,0.9)"/>
+          <text x="17" y="5.5" fill="#f8fafc" font-size="3.5" text-anchor="middle" font-weight="700">GER</text>
+          <text x="28" y="21" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+          <text x="28" y="46" fill="#888" font-size="5" text-anchor="middle">德国</text>
+        </g>
+
+        <!-- Soviet Union -->
+        <g transform="translate(100,10)">
+          <rect width="56" height="36" rx="2" fill="#f4f0e6" stroke="#333" stroke-width="0.5"/>
+          <rect width="6.7" height="36" fill="#c1121f"/>
+          <rect x="8" y="2" width="18" height="5" rx="1" fill="rgba(31,41,55,0.9)"/>
+          <text x="17" y="5.5" fill="#f8fafc" font-size="3.5" text-anchor="middle" font-weight="700">SOV</text>
+          <text x="28" y="21" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+          <text x="28" y="46" fill="#888" font-size="5" text-anchor="middle">苏联</text>
+        </g>
+
+        <!-- Japan -->
+        <g transform="translate(180,10)">
+          <rect width="56" height="36" rx="2" fill="#f4f0e6" stroke="#333" stroke-width="0.5"/>
+          <rect width="6.7" height="36" fill="#38b000"/>
+          <rect x="8" y="2" width="18" height="5" rx="1" fill="rgba(31,41,55,0.9)"/>
+          <text x="17" y="5.5" fill="#f8fafc" font-size="3.5" text-anchor="middle" font-weight="700">JAP</text>
+          <text x="28" y="21" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+          <text x="28" y="46" fill="#888" font-size="5" text-anchor="middle">日本</text>
+        </g>
+
+        <!-- China -->
+        <g transform="translate(260,10)">
+          <rect width="56" height="36" rx="2" fill="#f4f0e6" stroke="#333" stroke-width="0.5"/>
+          <rect width="6.7" height="36" fill="#c1121f"/>
+          <rect x="8" y="2" width="18" height="5" rx="1" fill="rgba(31,41,55,0.9)"/>
+          <text x="17" y="5.5" fill="#f8fafc" font-size="3.5" text-anchor="middle" font-weight="700">CHI</text>
+          <text x="28" y="21" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+          <text x="28" y="46" fill="#888" font-size="5" text-anchor="middle">中国</text>
+        </g>
+
+        <!-- Arrow pointing to SOV and CHI -->
+        <line x1="128" y1="54" x2="288" y2="54" stroke="#c1121f" stroke-width="0.5" stroke-dasharray="3 2"/>
+        <text x="210" y="62" fill="#c1121f" font-size="5" text-anchor="middle">← 苏联和中国色条几乎相同 →</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<h3>改进方案</h3>
+
+<div class="options">
+  <div class="option" data-choice="full-tint" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>整体色调染色</h3>
+      <p>将国家颜色从仅左侧色条扩展为整个兵牌底色的淡染色（tint）。例如德国兵牌有淡蓝色底、苏联有淡红色底。保留 #f4f0e6 作为基础色，叠加国家色作为 overlay，透明度约 15-25%。</p>
+      <div style="margin-top: 12px;">
+        <svg viewBox="0 0 320 50" style="width: 100%; height: auto;">
+          <g transform="translate(0,5)">
+            <rect width="56" height="36" rx="2" fill="#d8e0f0" stroke="#5d7cba" stroke-width="0.8"/>
+            <rect width="6.7" height="36" fill="#5d7cba"/>
+            <text x="28" y="21" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+            <text x="28" y="46" fill="#888" font-size="4.5" text-anchor="middle">德国 (淡蓝底)</text>
+          </g>
+          <g transform="translate(70,5)">
+            <rect width="56" height="36" rx="2" fill="#f0d0d0" stroke="#c1121f" stroke-width="0.8"/>
+            <rect width="6.7" height="36" fill="#c1121f"/>
+            <text x="28" y="21" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+            <text x="28" y="46" fill="#888" font-size="4.5" text-anchor="middle">苏联 (淡红底)</text>
+          </g>
+          <g transform="translate(140,5)">
+            <rect width="56" height="36" rx="2" fill="#d0f0d0" stroke="#38b000" stroke-width="0.8"/>
+            <rect width="6.7" height="36" fill="#38b000"/>
+            <text x="28" y="21" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+            <text x="28" y="46" fill="#888" font-size="4.5" text-anchor="middle">日本 (淡绿底)</text>
+          </g>
+          <g transform="translate(210,5)">
+            <rect width="56" height="36" rx="2" fill="#f0d8d0" stroke="#c1121f" stroke-width="0.8"/>
+            <rect width="6.7" height="36" fill="#d62828"/>
+            <text x="28" y="21" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+            <text x="28" y="46" fill="#888" font-size="4.5" text-anchor="middle">中国 (偏暖红底)</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="wider-strip-border" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>加宽色条 + 彩色边框</h3>
+      <p>将左侧色条从 12% 加宽到 25-30%，同时整个兵牌边框使用国家颜色（而非当前的深灰色）。保持兵牌底色为统一的浅色，但边框和色条让国家一眼可辨。</p>
+      <div style="margin-top: 12px;">
+        <svg viewBox="0 0 320 50" style="width: 100%; height: auto;">
+          <g transform="translate(0,5)">
+            <rect width="56" height="36" rx="2" fill="#f4f0e6" stroke="#5d7cba" stroke-width="1.5"/>
+            <rect width="15" height="36" rx="2 0 0 2" fill="#5d7cba"/>
+            <text x="36" y="21" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+          </g>
+          <g transform="translate(70,5)">
+            <rect width="56" height="36" rx="2" fill="#f4f0e6" stroke="#c1121f" stroke-width="1.5"/>
+            <rect width="15" height="36" rx="2 0 0 2" fill="#c1121f"/>
+            <text x="36" y="21" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+          </g>
+          <g transform="translate(140,5)">
+            <rect width="56" height="36" rx="2" fill="#f4f0e6" stroke="#38b000" stroke-width="1.5"/>
+            <rect width="15" height="36" rx="2 0 0 2" fill="#38b000"/>
+            <text x="36" y="21" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+          </g>
+          <g transform="translate(210,5)">
+            <rect width="56" height="36" rx="2" fill="#f4f0e6" stroke="#d62828" stroke-width="1.5"/>
+            <rect width="15" height="36" rx="2 0 0 2" fill="#d62828"/>
+            <text x="36" y="21" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="full-color-shell" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>全色底壳 (HOI4 风格)</h3>
+      <p>兵牌底色完全使用国家颜色（中等饱和度），文字和图标用白色或深色对比。类似 HOI4 游戏中的师团图标。最大区分度，但可能牺牲一些信息可读性。</p>
+      <div style="margin-top: 12px;">
+        <svg viewBox="0 0 320 50" style="width: 100%; height: auto;">
+          <g transform="translate(0,5)">
+            <rect width="56" height="36" rx="2" fill="#5d7cba" stroke="#3a5a8a" stroke-width="1"/>
+            <text x="28" y="21" fill="#f8fafc" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+            <text x="28" y="46" fill="#888" font-size="4.5" text-anchor="middle">德国</text>
+          </g>
+          <g transform="translate(70,5)">
+            <rect width="56" height="36" rx="2" fill="#c1121f" stroke="#8a0a14" stroke-width="1"/>
+            <text x="28" y="21" fill="#f8fafc" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+            <text x="28" y="46" fill="#888" font-size="4.5" text-anchor="middle">苏联</text>
+          </g>
+          <g transform="translate(140,5)">
+            <rect width="56" height="36" rx="2" fill="#38b000" stroke="#2a8500" stroke-width="1"/>
+            <text x="28" y="21" fill="#f8fafc" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+            <text x="28" y="46" fill="#888" font-size="4.5" text-anchor="middle">日本</text>
+          </g>
+          <g transform="translate(210,5)">
+            <rect width="56" height="36" rx="2" fill="#d62828" stroke="#a01e1e" stroke-width="1"/>
+            <text x="28" y="21" fill="#f8fafc" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+            <text x="28" y="46" fill="#888" font-size="4.5" text-anchor="middle">中国</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>

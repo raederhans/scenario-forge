@@ -1,0 +1,210 @@
+<h2>设计方案总结</h2>
+<p class="subtitle">前线 + 兵牌改进 — 确认后进入实施规划</p>
+
+<div class="section">
+  <h3>一、前线系统改进</h3>
+  <div class="mockup">
+    <div class="mockup-header">混合方案：自动平滑 + 控制点微调</div>
+    <div class="mockup-body" style="padding: 20px;">
+      <svg viewBox="0 0 500 120" style="width: 100%; height: auto;">
+        <!-- Step 1 -->
+        <g transform="translate(0,0)">
+          <text x="60" y="12" fill="#e2ddd0" font-size="6" text-anchor="middle" font-weight="bold">① 当前 mesh</text>
+          <path d="M20,30 L40,50 L55,35 L70,60 L90,40 L100,55" fill="none" stroke="#555" stroke-width="1.5"/>
+          <text x="60" y="72" fill="#666" font-size="5" text-anchor="middle">锐角折线</text>
+        </g>
+
+        <!-- Arrow -->
+        <text x="125" y="48" fill="#e2ddd0" font-size="14">→</text>
+
+        <!-- Step 2 -->
+        <g transform="translate(140,0)">
+          <text x="60" y="12" fill="#e2ddd0" font-size="6" text-anchor="middle" font-weight="bold">② 自动平滑</text>
+          <path d="M20,30 C30,40 35,50 45,42 C55,34 60,35 65,48 C70,55 80,42 100,55" fill="none" stroke="#ece8df" stroke-width="1.5"/>
+          <text x="60" y="72" fill="#666" font-size="5" text-anchor="middle">B-spline 柔化</text>
+        </g>
+
+        <!-- Arrow -->
+        <text x="265" y="48" fill="#e2ddd0" font-size="14">→</text>
+
+        <!-- Step 3 -->
+        <g transform="translate(280,0)">
+          <text x="100" y="12" fill="#e2ddd0" font-size="6" text-anchor="middle" font-weight="bold">③ 用户微调控制点</text>
+          <path d="M20,35 C35,45 45,55 60,40 C75,25 85,30 100,45 C115,55 140,38 170,50" fill="none" stroke="#ece8df" stroke-width="1.5"/>
+          <!-- Control points -->
+          <circle cx="60" cy="40" r="3" fill="#e2ddd0" stroke="#1a1f2e" stroke-width="0.5"/>
+          <circle cx="100" cy="45" r="3" fill="#e2ddd0" stroke="#1a1f2e" stroke-width="0.5"/>
+          <circle cx="140" cy="38" r="2" fill="#888" stroke="#1a1f2e" stroke-width="0.5" opacity="0.5"/>
+          <text x="100" y="72" fill="#666" font-size="5" text-anchor="middle">拖拽控制点调整</text>
+        </g>
+      </svg>
+      <div style="margin-top: 12px; padding: 8px; background: rgba(47, 125, 87, 0.1); border-radius: 4px; font-size: 11px; color: #a0a0a0;">
+        <strong style="color: #2f7d57;">混乱状态表达：暂缓。</strong> 先完成形状改进，后续再考虑条纹填充、渐变带等争议区域表达。
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>二、兵牌定位布局</h3>
+  <div class="mockup">
+    <div class="mockup-header">混合布局：自动排列 + 堆叠阈值 + Zoom 响应</div>
+    <div class="mockup-body" style="padding: 20px;">
+      <svg viewBox="0 0 500 100" style="width: 100%; height: auto;">
+        <!-- 1 unit -->
+        <g transform="translate(10,10)">
+          <text x="35" y="0" fill="#e2ddd0" font-size="5.5" text-anchor="middle">1个 = 居中</text>
+          <path d="M5,10 L65,10 L65,70 L5,70 Z" fill="rgba(93,124,186,0.1)" stroke="#5d7cba" stroke-width="0.5"/>
+          <rect x="21" y="30" width="28" height="18" rx="2" fill="#f4f0e6" stroke="#5d7cba" stroke-width="1"/>
+        </g>
+
+        <!-- 2 units -->
+        <g transform="translate(90,10)">
+          <text x="35" y="0" fill="#e2ddd0" font-size="5.5" text-anchor="middle">2个 = 并排</text>
+          <path d="M5,10 L65,10 L65,70 L5,70 Z" fill="rgba(93,124,186,0.1)" stroke="#5d7cba" stroke-width="0.5"/>
+          <rect x="8" y="30" width="24" height="16" rx="2" fill="#f4f0e6" stroke="#5d7cba" stroke-width="0.8"/>
+          <rect x="36" y="30" width="24" height="16" rx="2" fill="#f4f0e6" stroke="#c1121f" stroke-width="0.8"/>
+        </g>
+
+        <!-- 3 units -->
+        <g transform="translate(170,10)">
+          <text x="35" y="0" fill="#e2ddd0" font-size="5.5" text-anchor="middle">3个 = 三角</text>
+          <path d="M5,10 L65,10 L65,70 L5,70 Z" fill="rgba(93,124,186,0.1)" stroke="#5d7cba" stroke-width="0.5"/>
+          <rect x="22" y="18" width="24" height="16" rx="2" fill="#f4f0e6" stroke="#5d7cba" stroke-width="0.8"/>
+          <rect x="8" y="42" width="24" height="16" rx="2" fill="#f4f0e6" stroke="#c1121f" stroke-width="0.8"/>
+          <rect x="36" y="42" width="24" height="16" rx="2" fill="#f4f0e6" stroke="#38b000" stroke-width="0.8"/>
+        </g>
+
+        <!-- >3 units: stack -->
+        <g transform="translate(260,10)">
+          <text x="35" y="0" fill="#e2ddd0" font-size="5.5" text-anchor="middle">>3个 = 堆叠+徽章</text>
+          <path d="M5,10 L65,10 L65,70 L5,70 Z" fill="rgba(93,124,186,0.1)" stroke="#5d7cba" stroke-width="0.5"/>
+          <rect x="17" y="28" width="28" height="18" rx="2" fill="#ddd" stroke="#555" stroke-width="0.5" opacity="0.4"/>
+          <rect x="19" y="30" width="28" height="18" rx="2" fill="#eee" stroke="#555" stroke-width="0.5" opacity="0.5"/>
+          <rect x="21" y="32" width="28" height="18" rx="2" fill="#f4f0e6" stroke="#5d7cba" stroke-width="0.8"/>
+          <circle cx="48" cy="33" r="4" fill="#0f172a" stroke="#f8fafc" stroke-width="0.5"/>
+          <text x="48" y="33.5" fill="#f8fafc" font-size="4" text-anchor="middle" dominant-baseline="central" font-weight="700">+3</text>
+        </g>
+
+        <!-- Zoom out -->
+        <g transform="translate(360,10)">
+          <text x="55" y="0" fill="#e2ddd0" font-size="5.5" text-anchor="middle">远距离 = 全部堆叠</text>
+          <path d="M5,10 L105,10 L105,70 L5,70 Z" fill="rgba(93,124,186,0.05)" stroke="#5d7cba" stroke-width="0.3"/>
+          <rect x="40" y="34" width="18" height="12" rx="1.5" fill="#f4f0e6" stroke="#5d7cba" stroke-width="0.6" opacity="0.7"/>
+          <circle cx="57" cy="35" r="3" fill="#0f172a" stroke="#f8fafc" stroke-width="0.3" opacity="0.7"/>
+          <text x="57" y="35.5" fill="#f8fafc" font-size="3" text-anchor="middle" dominant-baseline="central" font-weight="700">5</text>
+          <text x="55" y="72" fill="#666" font-size="4.5" text-anchor="middle">zoom < 阈值</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>三、UI 重组：左列表 + 右编辑器</h3>
+  <div class="mockup">
+    <div class="mockup-header">信息分流到两侧面板</div>
+    <div class="mockup-body" style="padding: 16px;">
+      <div style="display: flex; gap: 8px; font-size: 10px; color: #a0a0a0;">
+        <!-- Left sidebar -->
+        <div style="width: 110px; border: 1px solid #5d7cba; border-radius: 4px; padding: 8px;">
+          <div style="color: #e2ddd0; font-weight: bold; font-size: 9px; margin-bottom: 6px;">左侧边栏 (296px)</div>
+          <div style="padding: 3px; border-bottom: 1px solid #333; margin-bottom: 2px;">
+            <span style="display: inline-block; width: 6px; height: 6px; background: #5d7cba; margin-right: 3px; vertical-align: middle;"></span>
+            INF · GER · Div
+          </div>
+          <div style="padding: 3px; border-bottom: 1px solid #333; margin-bottom: 2px; background: rgba(93,124,186,0.15);">
+            <span style="display: inline-block; width: 6px; height: 6px; background: #c1121f; margin-right: 3px; vertical-align: middle;"></span>
+            ARM · SOV · Corps
+          </div>
+          <div style="padding: 3px; border-bottom: 1px solid #333; margin-bottom: 2px;">
+            <span style="display: inline-block; width: 6px; height: 6px; background: #38b000; margin-right: 3px; vertical-align: middle;"></span>
+            ART · JAP · Reg
+          </div>
+          <div style="margin-top: 6px; padding: 3px; text-align: center; border: 1px dashed #555; border-radius: 3px; color: #888; font-size: 8px;">
+            + 快速创建
+          </div>
+          <div style="margin-top: 4px; color: #2f7d57; font-size: 8px; text-align: center;">
+            ✓ 紧凑一行一个
+          </div>
+        </div>
+
+        <!-- Map area -->
+        <div style="flex: 1; border: 1px solid #333; border-radius: 4px; padding: 8px; display: flex; align-items: center; justify-content: center; min-height: 100px;">
+          <div style="color: #555; font-size: 11px;">Map Canvas<br><span style="font-size: 9px;">点击兵牌 → 右面板打开</span></div>
+        </div>
+
+        <!-- Right sidebar -->
+        <div style="width: 120px; border: 1px solid #b05b2d; border-radius: 4px; padding: 8px;">
+          <div style="color: #e2ddd0; font-weight: bold; font-size: 9px; margin-bottom: 6px;">右侧面板 (288px)</div>
+          <div style="padding: 4px; border: 1px solid #444; border-radius: 3px; margin-bottom: 4px;">
+            <div style="font-size: 8px; color: #e2ddd0;">预览卡片</div>
+            <div style="height: 20px; background: rgba(93,124,186,0.1); border-radius: 2px; margin-top: 3px;"></div>
+          </div>
+          <div style="font-size: 8px; margin-bottom: 2px;">Preset: <span style="color: #e2ddd0;">Infantry</span></div>
+          <div style="font-size: 8px; margin-bottom: 2px;">Nation: <span style="color: #e2ddd0;">Germany</span></div>
+          <div style="font-size: 8px; margin-bottom: 2px;">Echelon: <span style="color: #e2ddd0;">Division</span></div>
+          <div style="font-size: 8px; margin-bottom: 2px;">Label: <span style="color: #e2ddd0;">12. Inf</span></div>
+          <div style="margin-top: 4px; padding: 3px; background: rgba(31,41,55,0.5); border-radius: 3px; font-size: 8px;">
+            <div style="color: #888;">Renderer / Size / SIDC</div>
+            <div style="color: #888;">Combat stats</div>
+            <div style="color: #888;">SubLabel / Strength</div>
+          </div>
+          <div style="margin-top: 4px; color: #b05b2d; font-size: 8px; text-align: center;">
+            ✓ 充足空间展示详情
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>四、国家区分度增强</h3>
+  <div class="mockup">
+    <div class="mockup-header">加宽色条 (12% → 25-30%) + 彩色边框</div>
+    <div class="mockup-body" style="padding: 20px;">
+      <svg viewBox="0 0 400 50" style="width: 100%; height: auto;">
+        <g transform="translate(10,5)">
+          <rect width="56" height="36" rx="2" fill="#f4f0e6" stroke="#5d7cba" stroke-width="1.5"/>
+          <rect width="15" height="36" rx="2 0 0 2" fill="#5d7cba"/>
+          <text x="36" y="21" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+          <text x="28" y="46" fill="#888" font-size="4.5" text-anchor="middle">GER</text>
+        </g>
+        <g transform="translate(80,5)">
+          <rect width="56" height="36" rx="2" fill="#f4f0e6" stroke="#c1121f" stroke-width="1.5"/>
+          <rect width="15" height="36" rx="2 0 0 2" fill="#c1121f"/>
+          <text x="36" y="21" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">ARM</text>
+          <text x="28" y="46" fill="#888" font-size="4.5" text-anchor="middle">SOV</text>
+        </g>
+        <g transform="translate(150,5)">
+          <rect width="56" height="36" rx="2" fill="#f4f0e6" stroke="#38b000" stroke-width="1.5"/>
+          <rect width="15" height="36" rx="2 0 0 2" fill="#38b000"/>
+          <text x="36" y="21" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+          <text x="28" y="46" fill="#888" font-size="4.5" text-anchor="middle">JAP</text>
+        </g>
+        <g transform="translate(220,5)">
+          <rect width="56" height="36" rx="2" fill="#f4f0e6" stroke="#d62828" stroke-width="1.5"/>
+          <rect width="15" height="36" rx="2 0 0 2" fill="#d62828"/>
+          <text x="36" y="21" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+          <text x="28" y="46" fill="#888" font-size="4.5" text-anchor="middle">CHI</text>
+        </g>
+        <g transform="translate(300,5)">
+          <text x="40" y="12" fill="#2f7d57" font-size="5.5" text-anchor="middle">✓ 边框颜色</text>
+          <text x="40" y="22" fill="#2f7d57" font-size="5.5" text-anchor="middle">✓ 加宽色条</text>
+          <text x="40" y="32" fill="#2f7d57" font-size="5.5" text-anchor="middle">✓ 一眼可辨</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top: 20px; padding: 12px; background: rgba(31,79,126,0.1); border: 1px solid rgba(31,79,126,0.3); border-radius: 8px;">
+  <div style="color: #e2ddd0; font-weight: bold; margin-bottom: 6px;">实施优先级</div>
+  <div style="font-size: 12px; color: #a0a0a0; line-height: 2;">
+    <strong style="color: #2f7d57;">Phase 1:</strong> 兵牌国家区分度（加宽色条+彩色边框）— 改动最小<br>
+    <strong style="color: #2f7d57;">Phase 2:</strong> 兵牌定位布局（混合方案）— 中等改动<br>
+    <strong style="color: #2f7d57;">Phase 3:</strong> UI 重组（左列表+右编辑器）— 较大重构<br>
+    <strong style="color: #2f7d57;">Phase 4:</strong> 前线平滑+控制点 — 独立模块，可并行
+  </div>
+</div>

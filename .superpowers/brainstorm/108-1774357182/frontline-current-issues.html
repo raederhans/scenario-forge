@@ -1,0 +1,67 @@
+<h2>前线系统：当前状态与问题分析</h2>
+<p class="subtitle">基于代码分析的现状梳理 — 你觉得哪个问题最迫切？</p>
+
+<div class="section">
+  <h3>当前实现原理</h3>
+  <div class="mockup">
+    <div class="mockup-header">当前前线：TopoJSON Mesh 边界提取</div>
+    <div class="mockup-body" style="padding: 24px; font-family: monospace; font-size: 13px; line-height: 1.8;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div>
+          <div style="font-weight: bold; margin-bottom: 8px; color: #e2ddd0;">原理</div>
+          <div style="color: #a0a0a0;">
+            每个地块 (feature) 有一个 controller 标记<br>
+            前线 = 相邻地块 controller 不同的共享边<br>
+            TopJSON mesh(a, b) → ownerA ≠ ownerB<br>
+            渲染为 SVG path + 三种样式
+          </div>
+        </div>
+        <div>
+          <div style="font-weight: bold; margin-bottom: 8px; color: #e2ddd0;">三种视觉样式</div>
+          <div style="color: #a0a0a0;">
+            • <span style="color: #f5ecd7;">Clean</span> — 深底色 + 浅内线<br>
+            • <span style="color: #7f1d1d;">Dual Rail</span> — 红蓝双轨线<br>
+            • <span style="color: #e7e5dd;">Teeth</span> — 锯齿虚线
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>你提到的核心问题</h3>
+<p class="subtitle">点击选择你认为最需要优先解决的问题</p>
+
+<div class="options">
+  <div class="option" data-choice="granularity" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>粒度太粗</h3>
+      <p>前线完全取决于 feature 级别的 controller 标记。一个"地块"要么整体属于 A，要么整体属于 B，无法表达"争夺中"、"部分占领"或"模糊地带"。例如，中日战线在华北的实际态势——日军控制铁路沿线和城市，而农村地区处于游击区状态——无法被表达。</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="visual-chaos" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>混乱占领状态无法表达</h3>
+      <p>当前系统只有二元状态（controlled / not controlled），缺少"争议区"、"游击区"、"占领但不稳定"等中间状态。前线在多方交错的区域（如中国战场、巴尔干）显得过于简洁和干净，失去了历史真实感。</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="shape" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>前线形状不自然</h3>
+      <p>因为前线直接沿用了 feature 的共享边界（行政区划线），看起来像行政边界而不是军事前线。真实的前线应该是更流畅的曲线，沿地理特征（河流、山脉、铁路）走向，而非严格沿着行政区划。</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="all-above" onclick="toggleSelect(this)">
+    <div class="letter">D</div>
+    <div class="content">
+      <h3>以上全部</h3>
+      <p>这三个问题相互关联，都源于同一个底层限制——前线系统完全依赖于离散的 feature-level controller 数据，需要一个更灵活的表达体系。</p>
+    </div>
+  </div>
+</div>

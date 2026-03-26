@@ -16,6 +16,7 @@ import {
   invalidateOceanCoastalAccentVisualState,
   invalidateOceanVisualState,
   invalidateOceanWaterInteractionVisualState,
+  getBathymetryPresetStyleDefaults,
   refreshColorState,
   resetZoomToFit,
   recomputeDynamicBordersNow,
@@ -300,10 +301,14 @@ function initToolbar({ render } = {}) {
   const oceanCoastalAccentToggle = document.getElementById("oceanCoastalAccentToggle");
   const oceanAdvancedStylesToggle = document.getElementById("oceanAdvancedStylesToggle");
   const oceanStyleSelect = document.getElementById("oceanStyleSelect");
+  const oceanStylePresetHint = document.getElementById("oceanStylePresetHint");
   const oceanTextureOpacity = document.getElementById("oceanTextureOpacity");
   const oceanTextureScale = document.getElementById("oceanTextureScale");
   const oceanContourStrength = document.getElementById("oceanContourStrength");
   const oceanBathymetryDebugDetails = document.getElementById("oceanBathymetryDebugDetails");
+  const oceanBathymetrySourceValue = document.getElementById("oceanBathymetrySourceValue");
+  const oceanBathymetryBandsValue = document.getElementById("oceanBathymetryBandsValue");
+  const oceanBathymetryContoursValue = document.getElementById("oceanBathymetryContoursValue");
   const oceanShallowFadeEndZoom = document.getElementById("oceanShallowFadeEndZoom");
   const oceanMidFadeEndZoom = document.getElementById("oceanMidFadeEndZoom");
   const oceanDeepFadeEndZoom = document.getElementById("oceanDeepFadeEndZoom");
@@ -1423,6 +1428,50 @@ function initToolbar({ render } = {}) {
     }
     return "flat";
   };
+  const getOceanPresetHint = (preset) => {
+    const normalizedPreset = normalizeOceanPreset(preset);
+    if (normalizedPreset === "bathymetry_soft") {
+      return t("Bathymetry Soft emphasizes depth bands while keeping contours subtle.", "ui");
+    }
+    if (normalizedPreset === "bathymetry_contours") {
+      return t("Bathymetry Contours emphasizes contour lines while bands stay in the background.", "ui");
+    }
+    return t("Flat Blue keeps the ocean fill clean with no bathymetry overlay.", "ui");
+  };
+  const syncOceanPresetControlValues = () => {
+    if (oceanStyleSelect) {
+      oceanStyleSelect.value = state.styleConfig.ocean.preset || "flat";
+    }
+    if (oceanTextureOpacity) {
+      oceanTextureOpacity.value = String(Math.round(clamp(state.styleConfig.ocean.opacity || 0.72, 0, 1) * 100));
+    }
+    if (oceanTextureOpacityValue) {
+      oceanTextureOpacityValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.opacity || 0.72, 0, 1) * 100)}%`;
+    }
+    if (oceanTextureScale) {
+      oceanTextureScale.value = String(Math.round(clamp(state.styleConfig.ocean.scale || 1, 0.6, 2.4) * 100));
+    }
+    if (oceanTextureScaleValue) {
+      oceanTextureScaleValue.textContent = `${clamp(state.styleConfig.ocean.scale || 1, 0.6, 2.4).toFixed(2)}x`;
+    }
+    if (oceanContourStrength) {
+      oceanContourStrength.value = String(Math.round(clamp(state.styleConfig.ocean.contourStrength || 0.75, 0, 1) * 100));
+    }
+    if (oceanContourStrengthValue) {
+      oceanContourStrengthValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.contourStrength || 0.75, 0, 1) * 100)}%`;
+    }
+    if (oceanStylePresetHint) {
+      oceanStylePresetHint.textContent = getOceanPresetHint(state.styleConfig.ocean.preset || "flat");
+    }
+  };
+  const applyBathymetryPresetDefaults = (preset) => {
+    const defaults = getBathymetryPresetStyleDefaults(preset);
+    if (!defaults) return false;
+    state.styleConfig.ocean.opacity = defaults.opacity;
+    state.styleConfig.ocean.scale = defaults.scale;
+    state.styleConfig.ocean.contourStrength = defaults.contourStrength;
+    return true;
+  };
   const normalizeOceanFillColor = (value) => {
     const candidate = String(value || "").trim();
     if (/^#(?:[0-9a-f]{6})$/i.test(candidate)) return candidate;
@@ -1784,6 +1833,18 @@ function initToolbar({ render } = {}) {
       2.5,
       5
     );
+    if (oceanStylePresetHint) {
+      oceanStylePresetHint.textContent = getOceanPresetHint(state.styleConfig.ocean.preset || "flat");
+    }
+    if (oceanBathymetrySourceValue) {
+      oceanBathymetrySourceValue.textContent = String(state.activeBathymetrySource || "none");
+    }
+    if (oceanBathymetryBandsValue) {
+      oceanBathymetryBandsValue.textContent = String(state.activeBathymetryBandsData?.features?.length || 0);
+    }
+    if (oceanBathymetryContoursValue) {
+      oceanBathymetryContoursValue.textContent = String(state.activeBathymetryContoursData?.features?.length || 0);
+    }
   };
   renderLakeUi();
   renderOceanAdvancedStylesUi();
@@ -2595,24 +2656,7 @@ function initToolbar({ render } = {}) {
     if (oceanStyleSelect) {
       oceanStyleSelect.value = state.styleConfig.ocean.preset || "flat";
     }
-    if (oceanTextureOpacity) {
-      oceanTextureOpacity.value = String(Math.round(clamp(state.styleConfig.ocean.opacity || 0.72, 0, 1) * 100));
-    }
-    if (oceanTextureOpacityValue) {
-      oceanTextureOpacityValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.opacity || 0.72, 0, 1) * 100)}%`;
-    }
-    if (oceanTextureScale) {
-      oceanTextureScale.value = String(Math.round(clamp(state.styleConfig.ocean.scale || 1, 0.6, 2.4) * 100));
-    }
-    if (oceanTextureScaleValue) {
-      oceanTextureScaleValue.textContent = `${clamp(state.styleConfig.ocean.scale || 1, 0.6, 2.4).toFixed(2)}x`;
-    }
-    if (oceanContourStrength) {
-      oceanContourStrength.value = String(Math.round(clamp(state.styleConfig.ocean.contourStrength || 0.75, 0, 1) * 100));
-    }
-    if (oceanContourStrengthValue) {
-      oceanContourStrengthValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.contourStrength || 0.75, 0, 1) * 100)}%`;
-    }
+    syncOceanPresetControlValues();
     renderOceanAdvancedStylesUi();
     renderOceanCoastalAccentUi();
     renderOceanBathymetryDebugUi();
@@ -4074,7 +4118,10 @@ function initToolbar({ render } = {}) {
         event.target.value = "flat";
       } else {
         state.styleConfig.ocean.preset = nextPreset;
+        applyBathymetryPresetDefaults(nextPreset);
       }
+      syncOceanPresetControlValues();
+      renderOceanBathymetryDebugUi();
       applyOceanVisualUpdateNow(invalidateOceanVisualState, "ocean-style");
     });
   }
@@ -4146,7 +4193,9 @@ function initToolbar({ render } = {}) {
       if (!state.styleConfig.ocean.experimentalAdvancedStyles && OCEAN_ADVANCED_PRESETS.has(state.styleConfig.ocean.preset)) {
         state.styleConfig.ocean.preset = "flat";
       }
+      syncOceanPresetControlValues();
       renderOceanAdvancedStylesUi();
+      renderOceanBathymetryDebugUi();
       applyOceanVisualUpdateNow(invalidateOceanVisualState, "ocean-experimental-advanced-styles");
     });
     oceanAdvancedStylesToggle.dataset.bound = "true";

@@ -1,0 +1,106 @@
+<h2>争议/混乱占领区域的表达</h2>
+<p class="subtitle">当前系统只有"A控制"或"B控制"的二元状态。如何表达中间态？</p>
+
+<div class="section">
+  <h3>典型场景</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+    <div class="mockup">
+      <div class="mockup-header">中日战争 1939</div>
+      <div class="mockup-body" style="padding: 16px; font-size: 12px; color: #a0a0a0;">
+        日军控制铁路线和主要城市<br>
+        农村和山区处于游击区/无人区<br>
+        伪满洲国区域名义控制 vs 实际渗透<br>
+        <span style="color: #e2ddd0;">→ 需要"渐变"和"混合"的表达</span>
+      </div>
+    </div>
+    <div class="mockup">
+      <div class="mockup-header">东线 1943-44</div>
+      <div class="mockup-body" style="padding: 16px; font-size: 12px; color: #a0a0a0;">
+        大规模推进中的前线不是一条线<br>
+        而是一个宽数十公里的"混战带"<br>
+        包围圈、突出部、分散的抵抗<br>
+        <span style="color: #e2ddd0;">→ 需要"区域化"的前线概念</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>表达方案</h3>
+
+<div class="options">
+  <div class="option" data-choice="hatching" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>条纹 / 斜线填充 (Hatching)</h3>
+      <p>在争议区域的 feature 上叠加斜线纹理，用双色交替条纹表示两方均有存在。类似传统地图中的"争议领土"画法。可以结合现有 controller 数据，标记某些 feature 为 "contested" 状态。</p>
+      <div style="margin-top: 12px;">
+        <svg viewBox="0 0 200 60" style="width: 200px; height: 60px;">
+          <defs>
+            <pattern id="hatch1" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+              <rect width="4" height="8" fill="#5d7cba" opacity="0.5"/>
+              <rect x="4" width="4" height="8" fill="#c1121f" opacity="0.5"/>
+            </pattern>
+          </defs>
+          <rect x="10" y="5" width="80" height="50" fill="#5d7cba" opacity="0.4" rx="4"/>
+          <rect x="110" y="5" width="80" height="50" fill="url(#hatch1)" rx="4"/>
+          <text x="50" y="35" fill="#ddd" font-size="10" text-anchor="middle">正常控制</text>
+          <text x="150" y="35" fill="#ddd" font-size="10" text-anchor="middle">争议区</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="gradient-band" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>前线渐变带 (Gradient Band)</h3>
+      <p>在前线两侧渲染一个可控宽度的渐变色带，从一方颜色过渡到另一方颜色。带越宽表示前线越不稳定/混乱。可以局部调整带宽——稳定段窄，混战段宽。</p>
+      <div style="margin-top: 12px;">
+        <svg viewBox="0 0 200 60" style="width: 200px; height: 60px;">
+          <defs>
+            <linearGradient id="grad1" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#5d7cba" stop-opacity="0.5"/>
+              <stop offset="40%" stop-color="#5d7cba" stop-opacity="0.2"/>
+              <stop offset="50%" stop-color="#888" stop-opacity="0.1"/>
+              <stop offset="60%" stop-color="#c1121f" stop-opacity="0.2"/>
+              <stop offset="100%" stop-color="#c1121f" stop-opacity="0.5"/>
+            </linearGradient>
+          </defs>
+          <rect x="10" y="5" width="180" height="50" fill="url(#grad1)" rx="4"/>
+          <line x1="100" y1="5" x2="100" y2="55" stroke="#ece8df" stroke-width="1.5" stroke-dasharray="3 2"/>
+          <text x="40" y="35" fill="#ddd" font-size="10" text-anchor="middle">GER</text>
+          <text x="160" y="35" fill="#ddd" font-size="10" text-anchor="middle">SOV</text>
+          <text x="100" y="35" fill="#f5ecd7" font-size="8" text-anchor="middle">混战带</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="control-level" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>控制程度层级 (Control Level)</h3>
+      <p>扩展 controller 数据模型，每个 feature 除了"谁控制"外，增加"控制程度"字段（0-100%），通过颜色透明度/饱和度来体现。100% = 完全控制（实色），50% = 争议（半透明），0% = 无控制。</p>
+      <div style="margin-top: 12px;">
+        <svg viewBox="0 0 200 60" style="width: 200px; height: 60px;">
+          <rect x="10" y="5" width="40" height="50" fill="#c1121f" opacity="0.9" rx="2"/>
+          <rect x="55" y="5" width="40" height="50" fill="#c1121f" opacity="0.6" rx="2"/>
+          <rect x="100" y="5" width="40" height="50" fill="#c1121f" opacity="0.3" rx="2"/>
+          <rect x="145" y="5" width="45" height="50" fill="#5d7cba" opacity="0.5" rx="2"/>
+          <text x="30" y="35" fill="#fff" font-size="8" text-anchor="middle">100%</text>
+          <text x="75" y="35" fill="#ddd" font-size="8" text-anchor="middle">70%</text>
+          <text x="120" y="35" fill="#ddd" font-size="8" text-anchor="middle">30%</text>
+          <text x="167" y="35" fill="#ddd" font-size="8" text-anchor="middle">反方</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="not-needed" onclick="toggleSelect(this)">
+    <div class="letter">D</div>
+    <div class="content">
+      <h3>暂不需要此功能</h3>
+      <p>先专注于前线形状改进，混乱区域表达可以后续再考虑。当前优先级不高。</p>
+    </div>
+  </div>
+</div>

@@ -205,6 +205,9 @@
                       <option id="optOceanBathymetrySoft" value="bathymetry_soft" disabled>Bathymetry Soft</option>
                       <option id="optOceanBathymetryContours" value="bathymetry_contours" disabled>Bathymetry Contours</option>
                     </select>
+                    <p id="oceanStylePresetHint" class="sidebar-tool-hint mt-2">
+                      Flat Blue keeps the ocean fill clean with no bathymetry overlay.
+                    </p>
                   </div>
                   <div>
                     <div class="range-row">
@@ -233,6 +236,20 @@
                       <p id="oceanBathymetryDebugHint" class="sidebar-tool-hint">
                         Advanced high-zoom tuning for nearshore fill and scenario contour exit thresholds.
                       </p>
+                      <div>
+                        <div class="range-row">
+                          <span id="lblOceanBathymetrySource" class="range-label">Data Source</span>
+                          <span id="oceanBathymetrySourceValue" class="range-value">none</span>
+                        </div>
+                        <div class="range-row mt-2">
+                          <span id="lblOceanBathymetryBands" class="range-label">Bands</span>
+                          <span id="oceanBathymetryBandsValue" class="range-value">0</span>
+                        </div>
+                        <div class="range-row mt-2">
+                          <span id="lblOceanBathymetryContours" class="range-label">Contours</span>
+                          <span id="oceanBathymetryContoursValue" class="range-value">0</span>
+                        </div>
+                      </div>
                       <div>
                         <div class="range-row">
                           <label id="lblOceanShallowFadeEndZoom" class="range-label" for="oceanShallowFadeEndZoom">Nearshore Fill Exit</label>

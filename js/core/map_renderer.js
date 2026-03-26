@@ -183,6 +183,28 @@ const BATHYMETRY_SCENARIO_SYNTHETIC_CONTOUR_FADE_START_ZOOM = 2.0;
 const BATHYMETRY_SCENARIO_SYNTHETIC_CONTOUR_FADE_END_ZOOM = 3.0;
 const BATHYMETRY_SCENARIO_SHALLOW_CONTOUR_FADE_START_ZOOM = 2.4;
 const BATHYMETRY_SCENARIO_SHALLOW_CONTOUR_FADE_END_ZOOM = 3.4;
+const BATHYMETRY_PRESET_PROFILES = Object.freeze({
+  bathymetry_soft: Object.freeze({
+    defaultOpacity: 0.78,
+    defaultScale: 1.08,
+    defaultContourStrength: 0.30,
+    bandAlphaBase: 0.54,
+    contourAlphaBase: 0.12,
+    contourLineWidthBase: 0.30,
+    contourLineWidthScale: 0.35,
+    skipAlternateContourDepths: true,
+  }),
+  bathymetry_contours: Object.freeze({
+    defaultOpacity: 0.62,
+    defaultScale: 0.95,
+    defaultContourStrength: 0.95,
+    bandAlphaBase: 0.22,
+    contourAlphaBase: 0.52,
+    contourLineWidthBase: 0.95,
+    contourLineWidthScale: 1.25,
+    skipAlternateContourDepths: false,
+  }),
+});
 const RENDER_PHASE_IDLE = "idle";
 const RENDER_PHASE_INTERACTING = "interacting";
 const RENDER_PHASE_SETTLING = "settling";
@@ -7111,10 +7133,25 @@ function normalizeOceanPreset(value) {
   return "flat";
 }
 
+function getBathymetryPresetProfile(preset = "flat") {
+  return BATHYMETRY_PRESET_PROFILES[normalizeOceanPreset(preset)] || null;
+}
+
+function getBathymetryPresetStyleDefaults(preset = "flat") {
+  const profile = getBathymetryPresetProfile(preset);
+  if (!profile) return null;
+  return {
+    opacity: profile.defaultOpacity,
+    scale: profile.defaultScale,
+    contourStrength: profile.defaultContourStrength,
+  };
+}
+
 function getOceanStyleConfig() {
   const ocean = state.styleConfig?.ocean || {};
+  const preset = normalizeOceanPreset(ocean.preset);
   return {
-    preset: normalizeOceanPreset(ocean.preset),
+    preset,
     opacity: clamp(Number.isFinite(Number(ocean.opacity)) ? Number(ocean.opacity) : 0.72, 0, 1),
     scale: clamp(Number.isFinite(Number(ocean.scale)) ? Number(ocean.scale) : 1, 0.6, 2.4),
     contourStrength: clamp(
@@ -7122,6 +7159,7 @@ function getOceanStyleConfig() {
       0,
       1
     ),
+    bathymetryProfile: getBathymetryPresetProfile(preset),
     experimentalAdvancedStyles: ocean.experimentalAdvancedStyles === true,
     coastalAccentEnabled: isTnoCoastalAccentEnabled(),
   };
@@ -7487,6 +7525,7 @@ function getBathymetryVisualModifiers(feature) {
 }
 
 function getBathymetryBandFillStyle(feature, oceanStyle) {
+  const profile = oceanStyle.bathymetryProfile || getBathymetryPresetProfile(oceanStyle.preset);
   const baseRgb = getBathymetryBaseRgb();
   const shallowRgb = interpolateRgbChannels(baseRgb, { r: 226, g: 242, b: 255 }, 0.88);
   const deepRgb = interpolateRgbChannels(baseRgb, { r: 12, g: 47, b: 86 }, 0.78);
@@ -7502,7 +7541,7 @@ function getBathymetryBandFillStyle(feature, oceanStyle) {
     interpolateRgbChannels(shallowRgb, deepRgb, scaledDepthRatio),
     visualModifiers.bandBrightness
   );
-  const alphaBase = oceanStyle.preset === "bathymetry_soft" ? 0.42 : 0.54;
+  const alphaBase = profile?.bandAlphaBase ?? 0.42;
   const alpha = clamp(
     oceanStyle.opacity
       * (alphaBase + scaledDepthRatio * 0.2 + (1 - scaledDepthRatio) * 0.1 + oceanStyle.contourStrength * 0.1)
@@ -7514,6 +7553,7 @@ function getBathymetryBandFillStyle(feature, oceanStyle) {
 }
 
 function getBathymetryContourStrokeStyle(feature, oceanStyle) {
+  const profile = oceanStyle.bathymetryProfile || getBathymetryPresetProfile(oceanStyle.preset);
   const baseRgb = getBathymetryBaseRgb();
   const depthRatioRaw = getBathymetryFeatureDepthMax(feature) / BATHYMETRY_MAX_REFERENCE_DEPTH_M;
   const scaledDepthRatio = clamp(depthRatioRaw, 0, 1);
@@ -7527,7 +7567,7 @@ function getBathymetryContourStrokeStyle(feature, oceanStyle) {
     ),
     visualModifiers.contourBrightness
   );
-  const alphaBase = oceanStyle.preset === "bathymetry_soft" ? 0.28 : 0.42;
+  const alphaBase = profile?.contourAlphaBase ?? 0.28;
   const alpha = clamp(
     oceanStyle.opacity
       * (alphaBase + oceanStyle.contourStrength * 0.46 + scaledDepthRatio * 0.08)
@@ -7626,7 +7666,8 @@ function drawBathymetryBands(collection, oceanStyle) {
 }
 
 function buildVisibleBathymetryContourDepthSet(collection, oceanStyle) {
-  if (oceanStyle.preset !== "bathymetry_soft" || !Array.isArray(collection?.features)) {
+  const profile = oceanStyle.bathymetryProfile || getBathymetryPresetProfile(oceanStyle.preset);
+  if (!profile?.skipAlternateContourDepths || !Array.isArray(collection?.features)) {
     return null;
   }
   const uniqueDepths = [...new Set(collection.features.map((feature) => getBathymetryFeatureDepthMax(feature)))]
@@ -7667,9 +7708,9 @@ function getBathymetryContourVisibilityConfig(feature, k) {
 function drawBathymetryContours(collection, oceanStyle) {
   if (!Array.isArray(collection?.features) || !collection.features.length) return;
   const zoomK = Number(state.zoomTransform?.k) || 1;
-  const lineWidthBase = oceanStyle.preset === "bathymetry_soft"
-    ? 0.45 + oceanStyle.contourStrength * 0.75
-    : 0.75 + oceanStyle.contourStrength * 1.1;
+  const profile = oceanStyle.bathymetryProfile || getBathymetryPresetProfile(oceanStyle.preset);
+  const lineWidthBase = (profile?.contourLineWidthBase ?? 0.45)
+    + oceanStyle.contourStrength * (profile?.contourLineWidthScale ?? 0.75);
   const visibleDepths = buildVisibleBathymetryContourDepthSet(collection, oceanStyle);
   collection.features.forEach((feature) => {
     if (visibleDepths && !visibleDepths.has(getBathymetryFeatureDepthMax(feature))) {
@@ -18222,6 +18263,7 @@ export {
   invalidateOceanWaterInteractionVisualState,
   invalidateOceanCoastalAccentVisualState,
   invalidateOceanVisualState,
+  getBathymetryPresetStyleDefaults,
   setDebugMode,
   addFeatureToDevSelection,
   toggleFeatureInDevSelection,

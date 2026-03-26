@@ -4,6 +4,63 @@ const { test, expect } = require('@playwright/test');
 
 test.setTimeout(120000);
 
+async function readBathymetryRuntime(page) {
+  return page.evaluate(async () => {
+    const { state } = await import('/js/core/state.js');
+    return {
+      activeBathymetrySource: state.activeBathymetrySource,
+      activeBands: state.activeBathymetryBandsData?.features?.length || 0,
+      activeContours: state.activeBathymetryContoursData?.features?.length || 0,
+      globalBands: state.globalBathymetryBandsData?.features?.length || 0,
+      globalContours: state.globalBathymetryContoursData?.features?.length || 0,
+      scenarioBands: state.scenarioBathymetryBandsData?.features?.length || 0,
+      scenarioContours: state.scenarioBathymetryContoursData?.features?.length || 0,
+      oceanPreset: state.styleConfig?.ocean?.preset || 'flat',
+      oceanOpacity: state.styleConfig?.ocean?.opacity ?? null,
+      oceanScale: state.styleConfig?.ocean?.scale ?? null,
+      contourStrength: state.styleConfig?.ocean?.contourStrength ?? null,
+    };
+  });
+}
+
+async function captureCanvasSnapshot(page) {
+  return page.evaluate(() => {
+    const canvas = document.getElementById('map-canvas');
+    const context = canvas instanceof HTMLCanvasElement
+      ? canvas.getContext('2d', { willReadFrequently: true })
+      : null;
+    if (!canvas || !context) {
+      return null;
+    }
+    const { width, height } = canvas;
+    const step = Math.max(4, Math.round(Math.min(width, height) / 220));
+    const imageData = context.getImageData(0, 0, width, height).data;
+    const pixels = [];
+    for (let y = 0; y < height; y += step) {
+      for (let x = 0; x < width; x += step) {
+        const offset = (y * width + x) * 4;
+        pixels.push(imageData[offset], imageData[offset + 1], imageData[offset + 2]);
+      }
+    }
+    return { width, height, step, pixels };
+  });
+}
+
+function getMeanRgbDiff(snapshotA, snapshotB) {
+  if (!snapshotA || !snapshotB) {
+    throw new Error('Missing canvas snapshot for RGB diff comparison.');
+  }
+  expect(snapshotA.width).toBe(snapshotB.width);
+  expect(snapshotA.height).toBe(snapshotB.height);
+  expect(snapshotA.step).toBe(snapshotB.step);
+  expect(snapshotA.pixels.length).toBe(snapshotB.pixels.length);
+  let diffTotal = 0;
+  for (let index = 0; index < snapshotA.pixels.length; index += 1) {
+    diffTotal += Math.abs(snapshotA.pixels[index] - snapshotB.pixels[index]);
+  }
+  return diffTotal / snapshotA.pixels.length;
+}
+
 async function resolveBaseUrl() {
   const candidates = [];
   const pushCandidate = (value) => {
@@ -56,6 +113,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
   const consoleIssues = [];
   const networkFailures = [];
   const bathymetryRequests = [];
+  const bathymetryResponses = [];
   const geoLocalePatchRequests = [];
 
   await page.addInitScript(() => {
@@ -74,8 +132,15 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
   });
 
   page.on('response', (res) => {
+    const url = res.url();
+    if (
+      url.includes('/data/global_bathymetry.topo.json')
+      || url.includes('/data/scenarios/tno_1962/bathymetry.topo.json')
+    ) {
+      bathymetryResponses.push({ url, status: res.status() });
+    }
     if (res.status() >= 400) {
-      networkFailures.push({ url: res.url(), status: res.status() });
+      networkFailures.push({ url, status: res.status() });
     }
   });
 
@@ -136,7 +201,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
   await expect(page.locator('#scenarioStatus')).toContainText('TNO 1962', { timeout: 20000 });
   await expect.poll(() => page.locator('#scenarioSelect').inputValue(), { timeout: 20000 }).toBe('tno_1962');
 
-  const scenarioStatus = await page.locator('#scenarioStatus').innerText();
+  const scenarioStatus = ((await page.locator('#scenarioStatus').textContent()) || '').trim();
   const viewMode = await page.locator('#scenarioViewModeSelect').inputValue();
   const selectedScenarioId = await page.locator('#scenarioSelect').inputValue();
 
@@ -150,6 +215,14 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
       manifest,
       countries: countriesPayload.countries || {},
       catalogEntries: catalogPayload.entries || [],
+    };
+  });
+  const geoLocaleRuntime = await page.evaluate(async () => {
+    const { state } = await import('/js/core/state.js');
+    return {
+      currentLanguage: state.currentLanguage,
+      hasScenarioGeoLocalePatch: !!state.scenarioGeoLocalePatchData?.geo,
+      geoLocaleEntryCount: Object.keys(state.scenarioGeoLocalePatchData?.geo || {}).length,
     };
   });
   const readPolarRuntime = async () => page.evaluate(async () => {
@@ -224,7 +297,9 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
   expect(payload.countries.MAN?.inspector_group_id).toBeFalsy();
   expect(polarRuntime.ruPolarOwner).toBeTruthy();
   expect(polarRuntime.aqOwner).toBe('AQ');
-  expect(geoLocalePatchRequests.some((url) => url.includes('/geo_locale_patch.en.json'))).toBeTruthy();
+  expect(geoLocaleRuntime.currentLanguage).toBe('en');
+  expect(geoLocaleRuntime.hasScenarioGeoLocalePatch).toBeTruthy();
+  expect(geoLocaleRuntime.geoLocaleEntryCount).toBeGreaterThan(0);
   expect(geoLocalePatchRequests.some((url) => url.includes('/geo_locale_patch.zh.json'))).toBeFalsy();
   expect(bathymetryRequests).toEqual([]);
   const bathymetryRequestCountBeforeAdvancedOcean = bathymetryRequests.length;
@@ -297,10 +372,46 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
   await page.locator('#countrySearch').fill('');
 
   await page.locator('#oceanAdvancedStylesToggle').check();
+  await page.waitForTimeout(600);
+  const flatCanvasSnapshot = await captureCanvasSnapshot(page);
   await page.locator('#oceanStyleSelect').selectOption('bathymetry_soft');
   await expect.poll(() => bathymetryRequests.length, { timeout: 20000 }).toBeGreaterThan(
     bathymetryRequestCountBeforeAdvancedOcean
   );
+  await expect.poll(() => readBathymetryRuntime(page), { timeout: 20000 }).toMatchObject({
+    activeBathymetrySource: 'merged',
+  });
+  const softBathymetryRuntime = await readBathymetryRuntime(page);
+  expect(softBathymetryRuntime.globalBands).toBeGreaterThan(0);
+  expect(softBathymetryRuntime.globalContours).toBeGreaterThan(0);
+  expect(softBathymetryRuntime.scenarioBands).toBeGreaterThan(0);
+  expect(softBathymetryRuntime.scenarioContours).toBeGreaterThan(0);
+  expect(softBathymetryRuntime.oceanPreset).toBe('bathymetry_soft');
+  expect(softBathymetryRuntime.oceanOpacity).toBeCloseTo(0.78, 2);
+  expect(softBathymetryRuntime.oceanScale).toBeCloseTo(1.08, 2);
+  expect(softBathymetryRuntime.contourStrength).toBeCloseTo(0.30, 2);
+  expect(bathymetryResponses.some((entry) => entry.url.includes('/data/global_bathymetry.topo.json') && entry.status === 200)).toBeTruthy();
+  expect(bathymetryResponses.some((entry) => entry.url.includes('/data/scenarios/tno_1962/bathymetry.topo.json') && entry.status === 200)).toBeTruthy();
+  await page.waitForTimeout(600);
+  const softCanvasSnapshot = await captureCanvasSnapshot(page);
+
+  await page.locator('#oceanStyleSelect').selectOption('bathymetry_contours');
+  await expect.poll(() => readBathymetryRuntime(page), { timeout: 20000 }).toMatchObject({
+    activeBathymetrySource: 'merged',
+    oceanPreset: 'bathymetry_contours',
+  });
+  const contourBathymetryRuntime = await readBathymetryRuntime(page);
+  expect(contourBathymetryRuntime.oceanOpacity).toBeCloseTo(0.62, 2);
+  expect(contourBathymetryRuntime.oceanScale).toBeCloseTo(0.95, 2);
+  expect(contourBathymetryRuntime.contourStrength).toBeCloseTo(0.95, 2);
+  await page.waitForTimeout(600);
+  const contourCanvasSnapshot = await captureCanvasSnapshot(page);
+
+  const flatToSoftMeanRgbDiff = getMeanRgbDiff(flatCanvasSnapshot, softCanvasSnapshot);
+  const softToContoursMeanRgbDiff = getMeanRgbDiff(softCanvasSnapshot, contourCanvasSnapshot);
+  expect(flatToSoftMeanRgbDiff).toBeGreaterThan(0.5);
+  expect(softToContoursMeanRgbDiff).toBeGreaterThanOrEqual(1.0);
+  expect(softToContoursMeanRgbDiff).toBeGreaterThanOrEqual(flatToSoftMeanRgbDiff * 0.3);
 
   const shotPath = path.join('.runtime', 'browser', 'mcp-artifacts', 'screenshots', 'tno_1962_ui_smoke.png');
   fs.mkdirSync(path.dirname(shotPath), { recursive: true });
@@ -316,6 +427,12 @@ test('tno 1962 releasable catalog smoke', async ({ page }) => {
     missingFeaturedTags,
     lingeringHoi4Owners,
     bathymetryRequests,
+    bathymetryResponses,
+    geoLocaleRuntime,
+    softBathymetryRuntime,
+    contourBathymetryRuntime,
+    flatToSoftMeanRgbDiff,
+    softToContoursMeanRgbDiff,
     geoLocalePatchRequests,
     consoleIssueCount: consoleIssues.length,
     networkFailureCount: networkFailures.length,

@@ -1,0 +1,117 @@
+﻿<style>
+  .hero { margin-bottom: 20px; }
+  .cards { display:grid; grid-template-columns: repeat(3, minmax(270px, 1fr)); gap:18px; }
+  .card { cursor:pointer; }
+  .card-image { padding:14px; background:#0f172a; }
+  .mock-app { background:#e5e7eb; border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,.08); }
+  .mock-topbar { height:26px; background:#d1d5db; border-bottom:1px solid #cbd5e1; }
+  .mock-shell { display:grid; grid-template-columns: 72px 1fr; min-height:270px; }
+  .mock-sidebar-rail { background:#cbd5e1; padding:10px 8px; display:flex; flex-direction:column; gap:8px; }
+  .rail-pill { height:18px; border-radius:8px; background:#94a3b8; }
+  .mock-map { position:relative; background:linear-gradient(135deg,#d6d3d1,#f5f5f4 48%,#d4d4d8); min-height:270px; overflow:hidden; }
+  .map-patch { position:absolute; border-radius:999px; opacity:.32; }
+  .map-line { position:absolute; height:3px; background:#111827; opacity:.7; transform-origin:left center; }
+  .unit-stack { position:absolute; display:flex; gap:4px; }
+  .unit-stack .u { width:18px; height:18px; border-radius:4px; box-shadow: inset 0 0 0 2px rgba(255,255,255,.45); }
+  .modal { position:absolute; left:50%; top:43%; transform:translate(-50%,-50%); width:58%; height:58%; background:#f8fafc; border:1px solid #cbd5e1; border-radius:16px; box-shadow:0 18px 40px rgba(15,23,42,.28); }
+  .modal-header { height:34px; background:#e2e8f0; border-bottom:1px solid #cbd5e1; display:flex; align-items:center; padding:0 12px; font-size:12px; font-weight:700; color:#0f172a; }
+  .modal-body { padding:12px; }
+  .field { height:20px; border-radius:6px; background:#e2e8f0; margin-bottom:8px; }
+  .field.sm { width:46%; display:inline-block; margin-right:6px; }
+  .dock { position:absolute; left:50%; bottom:14px; transform:translateX(-50%); border:1px solid #cbd5e1; background:rgba(248,250,252,.9); box-shadow:0 10px 24px rgba(15,23,42,.12); }
+  .dock-btn { background:#e2e8f0; border-radius:8px; height:24px; }
+  .dock-chip { background:#cbd5e1; border-radius:999px; height:18px; }
+  .mini-note { font-size:12px; color:#cbd5e1; margin-top:10px; line-height:1.45; }
+  .badge-rec { display:inline-block; margin-left:8px; padding:2px 8px; border-radius:999px; background:#dbeafe; color:#1d4ed8; font-size:11px; font-weight:700; }
+</style>
+
+<div class="hero">
+  <h2>A 方案下的底部快捷栏</h2>
+  <p class="subtitle">中央大弹窗保留不变。请选底部轻量栏更该承担哪一种职责。</p>
+</div>
+
+<div class="cards">
+  <div class="card" data-choice="dock-a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mock-app">
+        <div class="mock-topbar"></div>
+        <div class="mock-shell">
+          <div class="mock-sidebar-rail"><div class="rail-pill"></div><div class="rail-pill"></div><div class="rail-pill"></div><div class="rail-pill"></div></div>
+          <div class="mock-map">
+            <div class="map-patch" style="left:18%;top:15%;width:120px;height:74px;background:#94a3b8"></div>
+            <div class="map-patch" style="right:16%;bottom:22%;width:130px;height:86px;background:#64748b"></div>
+            <div class="map-line" style="left:24%;top:50%;width:180px;transform:rotate(-8deg)"></div>
+            <div class="unit-stack" style="left:28%;top:42%"><div class="u" style="background:#334155"></div><div class="u" style="background:#475569"></div><div class="u" style="background:#64748b"></div></div>
+            <div class="modal"><div class="modal-header">快捷栏 A: 动作条 <span class="badge-rec">推荐</span></div><div class="modal-body"><div class="field"></div><div class="field sm"></div><div class="field sm"></div><div class="field"></div></div></div>
+            <div class="dock" style="width:68%;height:52px;border-radius:14px;padding:12px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+              <div class="dock-btn"></div><div class="dock-btn"></div><div class="dock-btn"></div><div class="dock-btn"></div><div class="dock-btn"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mini-note">只放高频动作，比如新建兵牌、吸附前线、切换槽位、展开详情、删除。最克制，也最不容易重新变拥挤。</div>
+    </div>
+    <div class="card-body">
+      <h3>动作条</h3>
+      <p>底部栏只做“马上要按的按钮”，不显示太多信息，保证中央弹窗仍是唯一深编辑入口。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="dock-b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mock-app">
+        <div class="mock-topbar"></div>
+        <div class="mock-shell">
+          <div class="mock-sidebar-rail"><div class="rail-pill"></div><div class="rail-pill"></div><div class="rail-pill"></div><div class="rail-pill"></div></div>
+          <div class="mock-map">
+            <div class="map-patch" style="left:18%;top:15%;width:120px;height:74px;background:#94a3b8"></div>
+            <div class="map-patch" style="right:16%;bottom:22%;width:130px;height:86px;background:#64748b"></div>
+            <div class="map-line" style="left:24%;top:50%;width:180px;transform:rotate(-8deg)"></div>
+            <div class="unit-stack" style="left:28%;top:42%"><div class="u" style="background:#334155"></div><div class="u" style="background:#475569"></div><div class="u" style="background:#64748b"></div></div>
+            <div class="modal"><div class="modal-header">快捷栏 B: 摘要 + 动作</div><div class="modal-body"><div class="field"></div><div class="field sm"></div><div class="field sm"></div><div class="field"></div></div></div>
+            <div class="dock" style="width:76%;height:60px;border-radius:16px;padding:10px 14px;display:grid;grid-template-columns:1.4fr 1fr;gap:12px;align-items:center;">
+              <div>
+                <div class="dock-chip" style="width:52%;margin-bottom:8px;"></div>
+                <div class="dock-chip" style="width:76%;"></div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                <div class="dock-btn"></div><div class="dock-btn"></div><div class="dock-btn"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mini-note">左半边显示当前选中兵牌/前线摘要，右半边给动作。信息更完整，但会开始占视觉注意力。</div>
+    </div>
+    <div class="card-body">
+      <h3>摘要 + 动作</h3>
+      <p>适合强调当前对象状态，比如所属国家、兵种、挂靠前线；代价是底部栏开始变成第二个信息面板。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="dock-c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mock-app">
+        <div class="mock-topbar"></div>
+        <div class="mock-shell">
+          <div class="mock-sidebar-rail"><div class="rail-pill"></div><div class="rail-pill"></div><div class="rail-pill"></div><div class="rail-pill"></div></div>
+          <div class="mock-map">
+            <div class="map-patch" style="left:18%;top:15%;width:120px;height:74px;background:#94a3b8"></div>
+            <div class="map-patch" style="right:16%;bottom:22%;width:130px;height:86px;background:#64748b"></div>
+            <div class="map-line" style="left:24%;top:50%;width:180px;transform:rotate(-8deg)"></div>
+            <div class="unit-stack" style="left:28%;top:42%"><div class="u" style="background:#334155"></div><div class="u" style="background:#475569"></div><div class="u" style="background:#64748b"></div></div>
+            <div class="modal"><div class="modal-header">快捷栏 C: 模式切换栏</div><div class="modal-body"><div class="field"></div><div class="field sm"></div><div class="field sm"></div><div class="field"></div></div></div>
+            <div class="dock" style="width:64%;height:56px;border-radius:999px;padding:10px 12px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;align-items:center;">
+              <div class="dock-chip"></div><div class="dock-chip"></div><div class="dock-chip"></div><div class="dock-chip"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mini-note">底部栏主要切换“兵牌 / 前线 / 挂靠 / 批量”模式，真正动作再从弹窗或侧栏触发。结构干净，但会多一道切换步骤。</div>
+    </div>
+    <div class="card-body">
+      <h3>模式切换栏</h3>
+      <p>更像工具模式导航，适合系统以后变大；但当前阶段会比动作条更绕，不一定必要。</p>
+    </div>
+  </div>
+</div>

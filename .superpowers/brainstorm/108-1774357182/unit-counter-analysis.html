@@ -1,0 +1,120 @@
+<h2>兵牌系统：当前状态分析</h2>
+<p class="subtitle">基于代码分析的现状梳理 — 你提到的五个问题</p>
+
+<div class="section">
+  <h3>当前兵牌渲染结构</h3>
+  <div class="mockup">
+    <div class="mockup-header">SVG Unit Counter 结构 (map_renderer.js:14927-15314)</div>
+    <div class="mockup-body" style="padding: 20px;">
+      <svg viewBox="0 0 400 160" style="width: 100%; height: auto;">
+        <!-- Stack plates (back) -->
+        <rect x="143" y="41" width="56" height="36" rx="2" fill="#3a3d4a" opacity="0.3" stroke="#555" stroke-width="0.5"/>
+        <rect x="145" y="43" width="56" height="36" rx="2" fill="#3a3d4a" opacity="0.3" stroke="#555" stroke-width="0.5"/>
+
+        <!-- Shadow -->
+        <rect x="149" y="47" width="56" height="36" rx="2" fill="rgba(15,23,42,0.22)" transform="translate(0.9,0.9)"/>
+
+        <!-- Main shell -->
+        <rect x="148" y="46" width="56" height="36" rx="2" fill="#f4f0e6" stroke="#1f2937" stroke-width="0.9"/>
+
+        <!-- Nation strip -->
+        <rect x="148" y="46" width="6.7" height="36" fill="#5d7cba"/>
+
+        <!-- Tag pill (top-left) -->
+        <rect x="156" y="48" width="18" height="5" rx="1" fill="rgba(31,41,55,0.9)"/>
+        <text x="165" y="51.5" fill="#f8fafc" font-size="3.5" text-anchor="middle" font-weight="700">GER</text>
+
+        <!-- Type chip (top-right) -->
+        <rect x="184" y="48" width="18" height="5" rx="1" fill="rgba(226,221,208,0.96)"/>
+        <text x="193" y="51.5" fill="#111827" font-size="3.5" text-anchor="middle" font-weight="700">INF</text>
+
+        <!-- Symbol text (center) -->
+        <text x="176" y="66" fill="#0f172a" font-size="7" text-anchor="middle" font-weight="700">INF</text>
+
+        <!-- Org bar -->
+        <rect x="156" y="72" width="36" height="1.5" rx="0.75" fill="rgba(255,255,255,0.64)" stroke="rgba(15,23,42,0.08)" stroke-width="0.22"/>
+        <rect x="156" y="72" width="28" height="1.5" rx="0.75" fill="rgba(34,197,94,0.94)"/>
+
+        <!-- Equip bar -->
+        <rect x="156" y="75" width="36" height="1.5" rx="0.75" fill="rgba(255,255,255,0.64)" stroke="rgba(15,23,42,0.08)" stroke-width="0.22"/>
+        <rect x="156" y="75" width="27" height="1.5" rx="0.75" fill="rgba(234,179,8,0.96)"/>
+
+        <!-- Echelon -->
+        <text x="176" y="80" fill="rgba(17,24,39,0.78)" font-size="3.3" text-anchor="middle" font-weight="700">DIV</text>
+
+        <!-- Stack badge -->
+        <circle cx="203" cy="47" r="3.5" fill="#0f172a" stroke="#f8fafc" stroke-width="0.6"/>
+        <text x="203" y="47.5" fill="#f8fafc" font-size="3.1" text-anchor="middle" dominant-baseline="central" font-weight="700">+2</text>
+
+        <!-- Labels -->
+        <text x="176" y="90" fill="#f6f1e6" font-size="4.2" text-anchor="middle" font-weight="600" stroke="rgba(17,24,39,0.88)" stroke-width="0.45" paint-order="stroke">12. Infanterie</text>
+        <text x="176" y="95" fill="rgba(243,239,231,0.92)" font-size="3.5" text-anchor="middle" font-weight="500" stroke="rgba(17,24,39,0.78)" stroke-width="0.35" paint-order="stroke">Wehrmacht · Division</text>
+
+        <!-- Annotations -->
+        <line x1="148" y1="64" x2="120" y2="30" stroke="#e2ddd0" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <text x="60" y="28" fill="#e2ddd0" font-size="4.5" text-anchor="middle">Nation strip (唯一国家区分)</text>
+
+        <line x1="176" y1="66" x2="270" y2="30" stroke="#e2ddd0" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <text x="330" y="28" fill="#e2ddd0" font-size="4.5" text-anchor="middle">中心: 文字代码 or MilStd图标</text>
+
+        <line x1="176" y1="73" x2="270" y2="60" stroke="#e2ddd0" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <text x="330" y="58" fill="#e2ddd0" font-size="4.5" text-anchor="middle">组织度 / 装备条</text>
+
+        <line x1="176" y1="90" x2="270" y2="110" stroke="#e2ddd0" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <text x="330" y="108" fill="#e2ddd0" font-size="4.5" text-anchor="middle">标签 (zoom≥7 才显示)</text>
+
+        <line x1="148" y1="82" x2="60" y2="110" stroke="#e2ddd0" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <text x="60" y="118" fill="#e2ddd0" font-size="4.5" text-anchor="middle">定位: anchor (lon,lat)</text>
+        <text x="60" y="126" fill="#888" font-size="3.8" text-anchor="middle">拖拽到任意位置</text>
+
+        <!-- Size reference -->
+        <text x="176" y="145" fill="#888" font-size="4" text-anchor="middle">Medium: 28×18px | renderer: "game"=文字 / "milstd"=军标图标</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<h3>你提到的五个问题</h3>
+<p class="subtitle">点击选择你想优先讨论的问题（可多选）</p>
+
+<div class="options" data-multiselect>
+  <div class="option" data-choice="positioning" onclick="toggleSelect(this)">
+    <div class="letter">1</div>
+    <div class="content">
+      <h3>地块上的定位混乱</h3>
+      <p>兵牌放在 feature 上时，要么布置在中心（堆叠时重合），要么偏向随机角度。当前代码按 <code>featureId</code> 或经纬度近似值分组堆叠，但初始定位依赖点击位置或 feature centroid。没有智能布局逻辑。</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="visual-icon" onclick="toggleSelect(this)">
+    <div class="letter">2</div>
+    <div class="content">
+      <h3>视觉效果 — 缺乏图标</h3>
+      <p>当前有两种渲染模式：<strong>"game"</strong> = 只显示文字代码 (INF/ARM/ART...)，<strong>"milstd"</strong> = 军标符号（SIDC）。但 milstd 图标生成依赖 SIDC 码，普通用户难以使用。缺少简单直观的图标选择器。</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="nation-diff" onclick="toggleSelect(this)">
+    <div class="letter">3</div>
+    <div class="content">
+      <h3>国家间差别不大</h3>
+      <p>不同国家的兵牌唯一视觉区分只有左侧的窄色条（nation strip, 宽度≈12%）和顶部 tag pill 中的 3 字母国家代码。在缩放较远时几乎无法区分德国和苏联的兵牌。</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="ui-thumbnail" onclick="toggleSelect(this)">
+    <div class="letter">4</div>
+    <div class="content">
+      <h3>UI 缩略图表达</h3>
+      <p>侧边栏中的兵牌列表/编辑器 UI 信息密度高。预览卡片有完整的组织度、装备、编队等信息，但在列表视图中显得拥挤。需要更好的缩略 vs 详情分级。</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="ui-crowded" onclick="toggleSelect(this)">
+    <div class="letter">5</div>
+    <div class="content">
+      <h3>整体 UI 过于拥挤</h3>
+      <p>兵牌编辑器、前线控制、Operation Graphics 都在侧边栏中，空间紧张。可以考虑弹出面板、分 Tab、或点击兵牌后弹出详情窗口来缓解。</p>
+    </div>
+  </div>
+</div>
