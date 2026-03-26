@@ -1,5 +1,21 @@
 ﻿// Data loading helpers (Phase 13 scaffold)
 
+import {
+  createSerializableStartupBaseTopologyPayload,
+  createSerializableStartupLocalizationPayload,
+  createStartupBaseTopologyCacheKey,
+  createStartupLocalizationCacheKey,
+  isStartupCacheEnabled,
+  loadBuildManifest,
+  readStartupCacheEntry,
+  writeStartupCacheEntry,
+} from "./startup_cache.js";
+import {
+  loadBaseStartupViaWorker,
+  shouldUseStartupWorker,
+} from "./startup_worker_client.js";
+import { state } from "./state.js";
+
 const TOPOLOGY_VARIANT_URLS = {
   highres: "data/europe_topology.highres.json",
   legacy_bak: "data/europe_topology.json.bak",
@@ -870,6 +886,8 @@ async function loadTopologyBundle({
   topologyUrl,
   d3Client,
   renderProfile,
+  prefetchedPrimaryTopology = null,
+  prefetchedPrimaryMetrics = null,
 } = {}) {
   const variant = resolveTopologyVariant();
   if (variant?.url) {
@@ -894,7 +912,12 @@ async function loadTopologyBundle({
 
   const detailLayerEnabled = resolveDetailLayerEnabled();
   const detailSource = resolveDetailSource();
-  const topologyPrimaryResult = await loadTopologyUrlWithMetrics(d3Client, topologyUrl, "primary");
+  const topologyPrimaryResult = prefetchedPrimaryTopology
+    ? {
+      topology: prefetchedPrimaryTopology,
+      metrics: prefetchedPrimaryMetrics || null,
+    }
+    : await loadTopologyUrlWithMetrics(d3Client, topologyUrl, "primary");
   const topologyPrimary = topologyPrimaryResult.topology;
 
   if (!detailLayerEnabled) {
@@ -963,6 +986,186 @@ async function loadTopologyBundle({
   };
 }
 
+function createDefaultStartupBootCacheState(enabled = false) {
+  return {
+    enabled: !!enabled,
+    baseTopology: "idle",
+    localization: "idle",
+    scenarioBootstrap: "idle",
+  };
+}
+
+export async function loadStartupBootArtifacts({
+  topologyUrl = "data/europe_topology.json",
+  localesUrl = null,
+  geoAliasesUrl = null,
+  localeLevel = "startup",
+  d3Client = globalThis.d3,
+  useWorker = true,
+  useStartupCache = true,
+} = {}) {
+  const resolvedLocalization = resolveLocalizationUrls({
+    localeLevel,
+    localesUrl,
+    geoAliasesUrl,
+  });
+  const startupBootCacheState = createDefaultStartupBootCacheState(
+    useStartupCache && isStartupCacheEnabled()
+  );
+  const workerEnabled = useWorker && shouldUseStartupWorker();
+  let buildManifest = null;
+
+  if (startupBootCacheState.enabled) {
+    try {
+      buildManifest = await loadBuildManifest();
+    } catch (error) {
+      console.warn("[data_loader] Startup build manifest unavailable, bypassing persistent startup cache.", error);
+      startupBootCacheState.enabled = false;
+    }
+  }
+
+  const topologyCacheKey = startupBootCacheState.enabled
+    ? createStartupBaseTopologyCacheKey({
+      topologyUrl,
+      buildManifest,
+    })
+    : "";
+  const localizationCacheKey = startupBootCacheState.enabled
+    ? createStartupLocalizationCacheKey({
+      localeLevel: resolvedLocalization.localeLevel,
+      currentLanguage: state.currentLanguage || "en",
+      localesUrl: resolvedLocalization.localesUrl,
+      geoAliasesUrl: resolvedLocalization.geoAliasesUrl,
+      buildManifest,
+    })
+    : "";
+
+  let topologyPrimary = null;
+  let locales = null;
+  let geoAliases = null;
+  const resourceMetrics = {
+    topologyPrimary: null,
+    locales: null,
+    geoAliases: null,
+  };
+
+  if (topologyCacheKey) {
+    try {
+      const cacheEntry = await readStartupCacheEntry(topologyCacheKey);
+      if (cacheEntry?.payload?.topologyPrimary) {
+        topologyPrimary = cacheEntry.payload.topologyPrimary;
+        startupBootCacheState.baseTopology = "hit";
+      } else {
+        startupBootCacheState.baseTopology = "miss";
+      }
+    } catch (error) {
+      console.warn("[data_loader] Startup base-topology cache read failed.", error);
+      startupBootCacheState.baseTopology = "error";
+    }
+  }
+
+  if (localizationCacheKey) {
+    try {
+      const cacheEntry = await readStartupCacheEntry(localizationCacheKey);
+      if (cacheEntry?.payload?.locales && cacheEntry?.payload?.geoAliases) {
+        locales = cacheEntry.payload.locales;
+        geoAliases = cacheEntry.payload.geoAliases;
+        startupBootCacheState.localization = "hit";
+      } else {
+        startupBootCacheState.localization = "miss";
+      }
+    } catch (error) {
+      console.warn("[data_loader] Startup localization cache read failed.", error);
+      startupBootCacheState.localization = "error";
+    }
+  }
+
+  if (!topologyPrimary && !locales && !geoAliases && workerEnabled) {
+    try {
+      const workerResult = await loadBaseStartupViaWorker({
+        topologyUrl,
+        localesUrl: resolvedLocalization.localesUrl,
+        geoAliasesUrl: resolvedLocalization.geoAliasesUrl,
+      });
+      topologyPrimary = workerResult.topologyPrimary || null;
+      locales = workerResult.locales || { ui: {}, geo: {} };
+      geoAliases = workerResult.geoAliases || { alias_to_stable_key: {} };
+      resourceMetrics.topologyPrimary = workerResult.metrics?.topologyPrimary || null;
+      resourceMetrics.locales = workerResult.metrics?.locales || null;
+      resourceMetrics.geoAliases = workerResult.metrics?.geoAliases || null;
+    } catch (error) {
+      console.warn("[data_loader] Startup worker failed for base artifacts, falling back to main thread.", error);
+    }
+  }
+
+  if (!topologyPrimary) {
+    const topologyResult = await loadMeasuredJsonResource(topologyUrl, {
+      d3Client,
+      label: "primary_topology",
+    });
+    topologyPrimary = topologyResult.payload || null;
+    resourceMetrics.topologyPrimary = topologyResult.metrics || null;
+  }
+
+  if (!locales || !geoAliases) {
+    const localizationBundle = await loadLocalizationData({
+      d3Client,
+      localeLevel: resolvedLocalization.localeLevel,
+      localesUrl: resolvedLocalization.localesUrl,
+      geoAliasesUrl: resolvedLocalization.geoAliasesUrl,
+    });
+    locales = locales || localizationBundle.locales;
+    geoAliases = geoAliases || localizationBundle.geoAliases;
+    resourceMetrics.locales = resourceMetrics.locales || localizationBundle.resourceMetrics?.locales || null;
+    resourceMetrics.geoAliases = resourceMetrics.geoAliases || localizationBundle.resourceMetrics?.geoAliases || null;
+  }
+
+  if (topologyCacheKey && topologyPrimary && startupBootCacheState.baseTopology !== "hit") {
+    startupBootCacheState.baseTopology = "write-pending";
+    void writeStartupCacheEntry({
+      kind: "startup-base-topology",
+      cacheKey: topologyCacheKey,
+      payload: createSerializableStartupBaseTopologyPayload({ topologyPrimary }),
+      keyParts: {
+        topologyUrl,
+      },
+    }).then(() => {
+      startupBootCacheState.baseTopology = "written";
+    }).catch((error) => {
+      console.warn("[data_loader] Startup base-topology cache write failed.", error);
+      startupBootCacheState.baseTopology = "write-error";
+    });
+  }
+
+  if (localizationCacheKey && locales && geoAliases && startupBootCacheState.localization !== "hit") {
+    startupBootCacheState.localization = "write-pending";
+    void writeStartupCacheEntry({
+      kind: "startup-localization",
+      cacheKey: localizationCacheKey,
+      payload: createSerializableStartupLocalizationPayload({ locales, geoAliases }),
+      keyParts: {
+        localeLevel: resolvedLocalization.localeLevel,
+        language: state.currentLanguage || "en",
+      },
+    }).then(() => {
+      startupBootCacheState.localization = "written";
+    }).catch((error) => {
+      console.warn("[data_loader] Startup localization cache write failed.", error);
+      startupBootCacheState.localization = "write-error";
+    });
+  }
+
+  return {
+    topologyPrimary,
+    locales: locales || { ui: {}, geo: {} },
+    geoAliases: geoAliases || { alias_to_stable_key: {} },
+    localeLevel: resolvedLocalization.localeLevel,
+    resourceMetrics,
+    startupBootCacheState,
+    startupWorkerUsed: workerEnabled,
+  };
+}
+
 export async function loadDeferredDetailBundle({
   d3Client = globalThis.d3,
   detailSourceKey = null,
@@ -1025,6 +1228,8 @@ export async function loadMapData({
   includeCityData = true,
   includeContextLayers = true,
   localeLevel = "full",
+  useStartupWorker = false,
+  useStartupCache = false,
 } = {}) {
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available. Ensure D3 is loaded before calling loadMapData().");
@@ -1036,7 +1241,26 @@ export async function loadMapData({
     localesUrl,
     geoAliasesUrl,
   });
-  const topologyBundle = await loadTopologyBundle({ topologyUrl, d3Client, renderProfile });
+  const shouldUseStartupBootPath =
+    normalizeLocaleLevel(localeLevel) === "startup" && (useStartupWorker || useStartupCache);
+  const startupBootArtifacts = shouldUseStartupBootPath
+    ? await loadStartupBootArtifacts({
+      topologyUrl,
+      localesUrl,
+      geoAliasesUrl,
+      localeLevel,
+      d3Client,
+      useWorker: useStartupWorker,
+      useStartupCache,
+    })
+    : null;
+  const topologyBundle = await loadTopologyBundle({
+    topologyUrl,
+    d3Client,
+    renderProfile,
+    prefetchedPrimaryTopology: startupBootArtifacts?.topologyPrimary || null,
+    prefetchedPrimaryMetrics: startupBootArtifacts?.resourceMetrics?.topologyPrimary || null,
+  });
   const runtimePoliticalPromise = topologyBundle.detailDeferred
     ? Promise.resolve(null)
     : d3Client.json(runtimePoliticalUrl).catch((err) => {
@@ -1067,12 +1291,22 @@ export async function loadMapData({
     ]
     : [Promise.resolve(null), Promise.resolve(null)];
 
-  const localizationPromise = loadLocalizationData({
-    d3Client,
-    localeLevel: localizationUrls.localeLevel,
-    localesUrl: localizationUrls.localesUrl,
-    geoAliasesUrl: localizationUrls.geoAliasesUrl,
-  });
+  const localizationPromise = startupBootArtifacts
+    ? Promise.resolve({
+      localeLevel: startupBootArtifacts.localeLevel,
+      locales: startupBootArtifacts.locales,
+      geoAliases: startupBootArtifacts.geoAliases,
+      resourceMetrics: {
+        locales: startupBootArtifacts.resourceMetrics?.locales || null,
+        geoAliases: startupBootArtifacts.resourceMetrics?.geoAliases || null,
+      },
+    })
+    : loadLocalizationData({
+      d3Client,
+      localeLevel: localizationUrls.localeLevel,
+      localesUrl: localizationUrls.localesUrl,
+      geoAliasesUrl: localizationUrls.geoAliasesUrl,
+    });
   const [
     localizationBundle,
     worldCities,
@@ -1178,6 +1412,8 @@ export async function loadMapData({
     activePalettePack,
     activePaletteMap,
     localeLevel: localizationUrls.localeLevel,
+    startupBootCacheState: startupBootArtifacts?.startupBootCacheState || createDefaultStartupBootCacheState(false),
+    startupWorkerUsed: !!startupBootArtifacts?.startupWorkerUsed,
     resourceMetrics: {
       ...(topologyBundle.resourceMetrics || {}),
       locales: localizationBundle.resourceMetrics?.locales || null,

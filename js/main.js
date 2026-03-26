@@ -1272,12 +1272,15 @@ async function bootstrap() {
       activePalettePack,
       activePaletteMap,
       localeLevel,
+      startupBootCacheState,
       resourceMetrics,
     } = await loadMapData({
       d3Client,
       includeCityData: false,
       includeContextLayers: false,
       localeLevel: "startup",
+      useStartupWorker: true,
+      useStartupCache: true,
     });
     state.topology = topology || topologyPrimary || topologyDetail;
     state.topologyPrimary = topologyPrimary || state.topology;
@@ -1298,6 +1301,7 @@ async function bootstrap() {
     state.baseGeoLocales = { ...(state.locales?.geo || {}) };
     state.geoAliasToStableKey = geoAliases?.alias_to_stable_key || {};
     state.baseGeoAliasToStableKey = { ...state.geoAliasToStableKey };
+    state.startupBootCacheState = startupBootCacheState || state.startupBootCacheState;
     state.worldCitiesData = null;
     state.baseCityAliasesData = null;
     state.baseCityDataState = "idle";

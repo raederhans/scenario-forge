@@ -16,6 +16,17 @@ import {
   normalizeScenarioGeoLocalePatchPayload,
 } from "./data_loader.js";
 import {
+  createSerializableStartupScenarioBootstrapPayload,
+  createStartupScenarioBootstrapCacheKey,
+  isStartupCacheEnabled,
+  readStartupCacheEntry,
+  writeStartupCacheEntry,
+} from "./startup_cache.js";
+import {
+  loadScenarioRuntimeBootstrapViaWorker,
+  shouldUseStartupWorker,
+} from "./startup_worker_client.js";
+import {
   buildScenarioDistrictGroupByFeatureId,
   normalizeScenarioDistrictGroupsPayload,
 } from "./scenario_districts.js";
@@ -1798,6 +1809,116 @@ function getCachedScenarioBundle(scenarioId = state.activeScenarioId) {
   return state.scenarioBundleCacheById?.[normalizedScenarioId] || null;
 }
 
+function createScenarioBootstrapBundleFromCache({
+  priorBundle,
+  meta,
+  manifest,
+  bundleLevel,
+  cachedPayload,
+  geoLocalePatchDescriptor,
+  runtimeTopologyUrl,
+} = {}) {
+  const bundle = {
+    ...(priorBundle && typeof priorBundle === "object" ? priorBundle : {}),
+    meta,
+    manifest,
+    bundleLevel,
+    countriesPayload: cachedPayload?.countriesPayload || null,
+    ownersPayload: cachedPayload?.ownersPayload || null,
+    controllersPayload: cachedPayload?.controllersPayload || null,
+    coresPayload: cachedPayload?.coresPayload || null,
+    waterRegionsPayload: priorBundle?.waterRegionsPayload || null,
+    specialRegionsPayload: priorBundle?.specialRegionsPayload || null,
+    reliefOverlaysPayload: priorBundle?.reliefOverlaysPayload || null,
+    cityOverridesPayload: priorBundle?.cityOverridesPayload || null,
+    geoLocalePatchPayload: normalizeScenarioGeoLocalePatchPayload(cachedPayload?.geoLocalePatchPayload),
+    geoLocalePatchPayloadsByLanguage: {
+      ...(priorBundle?.geoLocalePatchPayloadsByLanguage || {}),
+    },
+    runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(cachedPayload?.runtimeTopologyPayload),
+    runtimePoliticalMeta: cachedPayload?.runtimePoliticalMeta || null,
+    releasableCatalog: priorBundle?.releasableCatalog || null,
+    districtGroupsPayload: priorBundle?.districtGroupsPayload || null,
+    auditPayload: priorBundle?.auditPayload || null,
+    optionalLayerPromises: {
+      ...(priorBundle?.optionalLayerPromises || {}),
+    },
+    optionalLayerSettledByKey: {
+      ...(priorBundle?.optionalLayerSettledByKey || {}),
+    },
+    loadDiagnostics: {
+      optionalResources: {
+        runtime_topology: {
+          ok: !!cachedPayload?.runtimeTopologyPayload,
+          reason: "persistent-cache-hit",
+          errorMessage: "",
+          metrics: null,
+          url: runtimeTopologyUrl,
+        },
+        geo_locale_patch: {
+          ok: !!cachedPayload?.geoLocalePatchPayload,
+          reason: "persistent-cache-hit",
+          errorMessage: "",
+          language: geoLocalePatchDescriptor?.language,
+          localeSpecific: !!geoLocalePatchDescriptor?.localeSpecific,
+          metrics: null,
+        },
+      },
+      requiredResources: {
+        manifest: null,
+        countries: null,
+        owners: null,
+        controllers: null,
+        cores: null,
+      },
+      bundleLevel,
+      persistentCacheHit: true,
+    },
+  };
+  if (bundle.geoLocalePatchPayload) {
+    if (geoLocalePatchDescriptor?.localeSpecific) {
+      bundle.geoLocalePatchPayloadsByLanguage[geoLocalePatchDescriptor.language] = bundle.geoLocalePatchPayload;
+    } else {
+      bundle.geoLocalePatchPayloadsByLanguage.en = bundle.geoLocalePatchPayload;
+      bundle.geoLocalePatchPayloadsByLanguage.zh = bundle.geoLocalePatchPayload;
+    }
+  }
+  return bundle;
+}
+
+async function loadScenarioRuntimeTopologyForBundle({
+  d3Client,
+  scenarioId,
+  requestedBundleLevel,
+  runtimeTopologyUrl,
+} = {}) {
+  const runtimeLabel = requestedBundleLevel === "bootstrap" ? "runtime_bootstrap_topology" : "runtime_topology";
+  if (requestedBundleLevel === "bootstrap" && runtimeTopologyUrl && shouldUseStartupWorker()) {
+    try {
+      const workerResult = await loadScenarioRuntimeBootstrapViaWorker({ runtimeTopologyUrl });
+      return {
+        ok: !!workerResult.runtimePoliticalTopology,
+        value: workerResult.runtimePoliticalTopology || null,
+        metrics: workerResult.metrics?.runtimePoliticalTopology || workerResult.metrics || null,
+        reason: workerResult.runtimePoliticalTopology ? "ok" : "empty",
+        errorMessage: "",
+        runtimePoliticalMeta: workerResult.runtimePoliticalMeta || null,
+        workerMetrics: workerResult.metrics || null,
+      };
+    } catch (error) {
+      console.warn(`[scenario] Startup worker failed for ${runtimeLabel} of "${scenarioId}", falling back to main thread.`, error);
+    }
+  }
+  const fallbackResult = await loadOptionalScenarioResource(d3Client, runtimeTopologyUrl, {
+    scenarioId,
+    resourceLabel: runtimeLabel,
+  });
+  return {
+    ...fallbackResult,
+    runtimePoliticalMeta: null,
+  };
+}
+
 function hydrateActiveScenarioBundle(
   bundle,
   {
@@ -1815,6 +1936,7 @@ function hydrateActiveScenarioBundle(
     state.runtimePoliticalTopology = runtimeTopologyPayload?.objects?.political
       ? runtimeTopologyPayload
       : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null);
+    state.runtimePoliticalMetaSeed = bundle.runtimePoliticalMeta || null;
     state.scenarioLandMaskData =
       getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land_mask") || state.scenarioLandMaskData || null;
     state.scenarioContextLandMaskData =
@@ -1937,6 +2059,61 @@ async function loadScenarioBundle(
       ? manifest.runtime_bootstrap_topology_url || manifest.runtime_topology_url || ""
       : manifest.runtime_topology_url || manifest.runtime_bootstrap_topology_url || ""
   ).trim();
+  const scenarioBootstrapCacheKey =
+    requestedBundleLevel === "bootstrap" && isStartupCacheEnabled()
+      ? createStartupScenarioBootstrapCacheKey({
+        scenarioRegistry: state.scenarioRegistry,
+        scenarioId: targetId,
+        bundleLevel: requestedBundleLevel,
+        manifest,
+        currentLanguage: state.currentLanguage,
+        runtimeBootstrapTopologyUrl: runtimeTopologyUrl,
+        geoLocalePatchUrl: geoLocalePatchDescriptor.url,
+      })
+      : "";
+  if (requestedBundleLevel === "bootstrap" && state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
+    state.startupBootCacheState.scenarioBootstrap = scenarioBootstrapCacheKey ? "probe" : "disabled";
+  }
+  if (scenarioBootstrapCacheKey) {
+    try {
+      const cacheEntry = await readStartupCacheEntry(scenarioBootstrapCacheKey);
+      if (cacheEntry?.payload?.countriesPayload && cacheEntry?.payload?.ownersPayload && cacheEntry?.payload?.coresPayload) {
+        if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
+          state.startupBootCacheState.scenarioBootstrap = "hit";
+        }
+        const bundle = createScenarioBootstrapBundleFromCache({
+          priorBundle,
+          meta,
+          manifest,
+          bundleLevel: requestedBundleLevel,
+          cachedPayload: cacheEntry.payload,
+          geoLocalePatchDescriptor,
+          runtimeTopologyUrl,
+        });
+        state.scenarioBundleCacheById[targetId] = bundle;
+        recordScenarioPerfMetric(
+          "loadScenarioBundle",
+          (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - loadStartedAt,
+          {
+            scenarioId: targetId,
+            cacheHit: true,
+            persistentCacheHit: true,
+            bundleLevel: requestedBundleLevel,
+            hydratedLevel: normalizeScenarioBundleLevel(bundle.bundleLevel),
+          }
+        );
+        return bundle;
+      }
+      if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
+        state.startupBootCacheState.scenarioBootstrap = "miss";
+      }
+    } catch (error) {
+      console.warn(`[scenario] Startup bootstrap cache read failed for "${targetId}".`, error);
+      if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
+        state.startupBootCacheState.scenarioBootstrap = "error";
+      }
+    }
+  }
   const [
     countriesResult,
     ownersResult,
@@ -1970,9 +2147,11 @@ async function loadScenarioBundle(
       resourceLabel: "cores",
       requiredField: "cores",
     }),
-    loadOptionalScenarioResource(d3Client, runtimeTopologyUrl, {
+    loadScenarioRuntimeTopologyForBundle({
+      d3Client,
       scenarioId: targetId,
-      resourceLabel: requestedBundleLevel === "bootstrap" ? "runtime_bootstrap_topology" : "runtime_topology",
+      requestedBundleLevel,
+      runtimeTopologyUrl,
     }),
     loadOptionalScenarioResource(d3Client, geoLocalePatchDescriptor.url, {
       scenarioId: targetId,
@@ -2018,6 +2197,7 @@ async function loadScenarioBundle(
       ...(priorBundle?.geoLocalePatchPayloadsByLanguage || {}),
     },
     runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(runtimeTopologyResult.value),
+    runtimePoliticalMeta: runtimeTopologyResult.runtimePoliticalMeta || null,
     releasableCatalog: releasableCatalogResult.value || null,
     districtGroupsPayload: normalizeScenarioDistrictGroupsPayload(districtGroupsResult.value, targetId),
     auditPayload: auditResult.value || null,
@@ -2097,6 +2277,40 @@ async function loadScenarioBundle(
     `[scenario] Loaded ${requestedBundleLevel} bundle "${targetId}": ${ownerCount} owner entries, ${controllerCount} controller entries, ${countryCount} countries, baseline=${String(manifest?.baseline_hash || "").slice(0, 12)}`
   );
   state.scenarioBundleCacheById[targetId] = bundle;
+  if (scenarioBootstrapCacheKey && requestedBundleLevel === "bootstrap") {
+    if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
+      state.startupBootCacheState.scenarioBootstrap = "write-pending";
+    }
+    void writeStartupCacheEntry({
+      kind: "startup-scenario-bootstrap",
+      cacheKey: scenarioBootstrapCacheKey,
+      payload: createSerializableStartupScenarioBootstrapPayload({
+        manifest,
+        bundleLevel: requestedBundleLevel,
+        countriesPayload: bundle.countriesPayload,
+        ownersPayload: bundle.ownersPayload,
+        controllersPayload: bundle.controllersPayload,
+        coresPayload: bundle.coresPayload,
+        geoLocalePatchPayload: bundle.geoLocalePatchPayload,
+        runtimeTopologyPayload: bundle.runtimeTopologyPayload,
+        runtimePoliticalMeta: bundle.runtimePoliticalMeta,
+      }),
+      keyParts: {
+        scenarioId: targetId,
+        bundleLevel: requestedBundleLevel,
+        language: state.currentLanguage,
+      },
+    }).then(() => {
+      if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
+        state.startupBootCacheState.scenarioBootstrap = "written";
+      }
+    }).catch((error) => {
+      console.warn(`[scenario] Startup bootstrap cache write failed for "${targetId}".`, error);
+      if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
+        state.startupBootCacheState.scenarioBootstrap = "write-error";
+      }
+    });
+  }
   recordScenarioPerfMetric("loadScenarioBundle", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - loadStartedAt, {
     scenarioId: targetId,
     cacheHit: false,
@@ -2872,6 +3086,7 @@ async function applyScenarioBundle(
     state.runtimePoliticalTopology = staged.runtimeTopologyPayload?.objects?.political
       ? staged.runtimeTopologyPayload
       : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null);
+    state.runtimePoliticalMetaSeed = bundle.runtimePoliticalMeta || null;
     state.scenarioLandMaskData = staged.scenarioLandMaskFromTopology || null;
     state.scenarioContextLandMaskData = staged.scenarioContextLandMaskFromTopology || null;
     state.scenarioWaterRegionsData = staged.scenarioWaterRegionsFromTopology || bundle.waterRegionsPayload || null;

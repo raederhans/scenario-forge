@@ -6707,7 +6707,23 @@ function buildIndex() {
   state.hitCanvasDirty = true;
 }
 
-function buildRuntimePoliticalMeta() {
+function adoptRuntimePoliticalMeta(payload) {
+  const featureIds = Array.isArray(payload?.featureIds) ? payload.featureIds : [];
+  const featureIndexById = payload?.featureIndexById && typeof payload.featureIndexById === "object"
+    ? payload.featureIndexById
+    : {};
+  const canonicalCountryByFeatureId =
+    payload?.canonicalCountryByFeatureId && typeof payload.canonicalCountryByFeatureId === "object"
+      ? payload.canonicalCountryByFeatureId
+      : {};
+  const neighborGraph = Array.isArray(payload?.neighborGraph) ? payload.neighborGraph : [];
+  state.runtimeFeatureIndexById = new Map(Object.entries(featureIndexById));
+  state.runtimeFeatureIds = featureIds.slice();
+  state.runtimeNeighborGraph = neighborGraph.slice();
+  state.runtimeCanonicalCountryByFeatureId = { ...canonicalCountryByFeatureId };
+}
+
+function buildRuntimePoliticalMetaFallback() {
   state.runtimeFeatureIndexById = new Map();
   state.runtimeFeatureIds = [];
   state.runtimeNeighborGraph = [];
@@ -6731,6 +6747,21 @@ function buildRuntimePoliticalMeta() {
     Array.isArray(neighbors) && neighbors.length === geometries.length
       ? neighbors
       : new Array(geometries.length).fill(null).map(() => []);
+}
+
+function buildRuntimePoliticalMeta() {
+  const seed = state.runtimePoliticalMetaSeed;
+  const geometries = state.runtimePoliticalTopology?.objects?.political?.geometries || [];
+  const seedMatches = Array.isArray(seed?.featureIds) && seed.featureIds.length === geometries.length;
+  if (seedMatches) {
+    adoptRuntimePoliticalMeta(seed);
+    state.runtimePoliticalMetaReadyFromWorker = true;
+    state.runtimePoliticalMetaSeed = null;
+    return;
+  }
+  buildRuntimePoliticalMetaFallback();
+  state.runtimePoliticalMetaReadyFromWorker = false;
+  state.runtimePoliticalMetaSeed = null;
 }
 
 function buildSpatialIndex() {
