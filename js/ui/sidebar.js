@@ -1576,6 +1576,13 @@ function initSidebar({ render } = {}) {
     }
     return Math.max(0, Math.min(100, Math.round(nextValue)));
   };
+  const clampUnitCounterFixedScaleMultiplier = (value, fallback = 1.5) => {
+    const nextValue = Number(value);
+    if (!Number.isFinite(nextValue)) {
+      return Math.max(0.5, Math.min(2.0, Number(fallback) || 1.5));
+    }
+    return Math.max(0.5, Math.min(2.0, nextValue));
+  };
   const normalizeUnitCounterStatsPresetId = (value = "") => {
     const normalizedValue = String(value || "").trim().toLowerCase();
     return unitCounterCombatPresets.some((preset) => preset.id === normalizedValue) ? normalizedValue : "regular";
@@ -2463,6 +2470,24 @@ function initSidebar({ render } = {}) {
     unitLabelToggle.className = "checkbox-row";
     unitLabelToggle.innerHTML = `<input id="unitCounterLabelsToggle" type="checkbox" class="checkbox-input" /> <span>${t("Show Labels", "ui")}</span>`;
     unitOptionsRow.appendChild(unitLabelToggle);
+    const unitScaleShell = document.createElement("div");
+    unitScaleShell.className = "strategic-counter-scale-shell";
+    unitScaleShell.innerHTML = `
+      <div class="range-row">
+        <label class="range-label" for="unitCounterFixedScaleRange">${t("Counter Scale", "ui")}</label>
+        <span id="unitCounterFixedScaleValue" class="range-value">1.50x</span>
+      </div>
+    `;
+    const unitScaleRange = document.createElement("input");
+    unitScaleRange.id = "unitCounterFixedScaleRange";
+    unitScaleRange.type = "range";
+    unitScaleRange.min = "50";
+    unitScaleRange.max = "200";
+    unitScaleRange.step = "5";
+    unitScaleRange.value = "150";
+    unitScaleRange.className = "range-input";
+    unitScaleShell.appendChild(unitScaleRange);
+    unitOptionsRow.appendChild(unitScaleShell);
 
     const unitActions = buildRow();
     unitActions.className = "sidebar-equal-actions mt-3 strategic-counter-management-actions";
@@ -2732,6 +2757,8 @@ function initSidebar({ render } = {}) {
   const unitCounterBaseFillResetBtn = document.getElementById("unitCounterBaseFillResetBtn");
   const unitCounterBaseFillEyedropperBtn = document.getElementById("unitCounterBaseFillEyedropperBtn");
   const unitCounterLabelsToggle = document.getElementById("unitCounterLabelsToggle");
+  const unitCounterFixedScaleRange = document.getElementById("unitCounterFixedScaleRange");
+  const unitCounterFixedScaleValue = document.getElementById("unitCounterFixedScaleValue");
   const unitCounterPlaceBtn = document.getElementById("unitCounterPlaceBtn");
   const unitCounterCancelBtn = document.getElementById("unitCounterCancelBtn");
   const unitCounterDeleteBtn = document.getElementById("unitCounterDeleteBtn");
@@ -6755,6 +6782,10 @@ function initSidebar({ render } = {}) {
       || annotationView.unitRendererDefault
       || "game"
     );
+    const effectiveUnitCounterFixedScaleMultiplier = clampUnitCounterFixedScaleMultiplier(
+      annotationView.unitCounterFixedScaleMultiplier,
+      1.5,
+    );
     const effectiveSize = String(unitEditor.size || selectedCounter?.size || "medium");
     const effectiveNationSource = String(unitEditor.nationSource || selectedCounter?.nationSource || "controller").trim().toLowerCase() || "controller";
     const effectiveNationTag = String(unitEditor.nationTag || selectedCounter?.nationTag || "").trim().toUpperCase();
@@ -6856,6 +6887,12 @@ function initSidebar({ render } = {}) {
       if (unitCounterDeleteBtn) unitCounterDeleteBtn.disabled = !String(unitEditor.selectedId || "").trim();
       if (unitCounterLabelsToggle) {
         unitCounterLabelsToggle.checked = annotationView.showUnitLabels !== false;
+      }
+      if (unitCounterFixedScaleRange) {
+        unitCounterFixedScaleRange.value = String(Math.round(effectiveUnitCounterFixedScaleMultiplier * 100));
+      }
+      if (unitCounterFixedScaleValue) {
+        unitCounterFixedScaleValue.textContent = `${effectiveUnitCounterFixedScaleMultiplier.toFixed(2)}x`;
       }
     }
     const placementStatusText = unitEditor.active
@@ -7885,6 +7922,28 @@ function initSidebar({ render } = {}) {
       markDirty("unit-counter-label-visibility");
     });
     unitCounterLabelsToggle.dataset.bound = "true";
+  }
+  if (unitCounterFixedScaleRange && !unitCounterFixedScaleRange.dataset.bound) {
+    const applyUnitCounterFixedScale = (rawValue) => {
+      const nextScale = clampUnitCounterFixedScaleMultiplier(Number(rawValue) / 100, 1.5);
+      state.annotationView = normalizeAnnotationView({
+        ...(state.annotationView || {}),
+        unitCounterFixedScaleMultiplier: nextScale,
+      });
+      if (unitCounterFixedScaleValue) {
+        unitCounterFixedScaleValue.textContent = `${nextScale.toFixed(2)}x`;
+      }
+      if (render) render();
+      scheduleStrategicOverlayRefresh("counterIdentity");
+      markDirty("unit-counter-fixed-scale");
+    };
+    unitCounterFixedScaleRange.addEventListener("input", (event) => {
+      applyUnitCounterFixedScale(event.target.value);
+    });
+    unitCounterFixedScaleRange.addEventListener("change", (event) => {
+      applyUnitCounterFixedScale(event.target.value);
+    });
+    unitCounterFixedScaleRange.dataset.bound = "true";
   }
   if (unitCounterPlaceBtn && !unitCounterPlaceBtn.dataset.bound) {
     unitCounterPlaceBtn.addEventListener("click", () => {

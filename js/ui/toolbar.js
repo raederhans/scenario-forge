@@ -2535,8 +2535,8 @@ function initToolbar({ render } = {}) {
     if (!zoomPercentInput) return;
     const parsed = parseZoomInputValue(zoomPercentInput.value);
     zoomPercentInput.dataset.editing = "false";
-    if (parsed === null || parsed < 100 || parsed > 5000) {
-      const zoomErrorMessage = t("Zoom percentage must be between 100% and 5000%.", "ui");
+    if (parsed === null || parsed < 35 || parsed > 5000) {
+      const zoomErrorMessage = t("Zoom percentage must be between 35% and 5000%.", "ui");
       zoomPercentInput.setAttribute("aria-invalid", "true");
       zoomPercentInput.dataset.zoomError = "true";
       zoomPercentInput.setCustomValidity(zoomErrorMessage);
@@ -2554,7 +2554,7 @@ function initToolbar({ render } = {}) {
     zoomPercentInput.removeAttribute("aria-invalid");
     zoomPercentInput.dataset.zoomError = "";
     zoomPercentInput.setCustomValidity("");
-    setZoomPercent(clamp(parsed, 100, 5000));
+    setZoomPercent(clamp(parsed, 35, 5000));
     updateZoomUi();
     emitTransientFeedback(getZoomPercent(), { duration: 1000 });
   }

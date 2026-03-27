@@ -116,7 +116,7 @@ const PATH_POINT_RADIUS = 2;
 const VIEWPORT_CULL_OVERSCAN_PX = 96;
 const MAP_PAN_PADDING_PX = 50;
 const PROJECTION_FIT_PADDING_RATIO = 0.04;
-const MIN_ZOOM_SCALE = 1;
+const MIN_ZOOM_SCALE = 0.35;
 const MAX_ZOOM_SCALE = 50;
 const OCEAN_FILL_COLOR = "#aadaff";
 const LAND_FILL_COLOR = "#f0f0f0";
@@ -15477,22 +15477,44 @@ function getUnitCounterRenderEntries() {
 
 function getUnitCounterRenderScale(metrics, zoomK) {
   const normalizedZoom = Math.max(0.1, Number(zoomK) || 1);
-  const maxScale = 2.0;
-  const desiredScreenScale = Math.min(maxScale, normalizedZoom);
+  const zoomPercent = normalizedZoom * 100;
+  const fixedScaleMultiplier = clamp(
+    Number(state.annotationView?.unitCounterFixedScaleMultiplier) || 1.5,
+    0.5,
+    2.0,
+  );
+  const desiredScreenScale = 0.5 * fixedScaleMultiplier;
+
   const effectiveWidth = Number(metrics?.width || 0) * desiredScreenScale;
-  let opacity = 1;
-  let hidden = false;
-  if (normalizedZoom < 0.5) {
-    opacity = Math.max(0, Math.min(1, (normalizedZoom - 0.3) / 0.2));
-    hidden = normalizedZoom <= 0.3;
-  }
+  const localScale = desiredScreenScale / normalizedZoom;
+  const hidden = zoomPercent <= 600;
+  const opacity = hidden ? 0 : 1;
+
   return {
     desiredScreenScale,
-    localScale: desiredScreenScale / normalizedZoom,
+    localScale,
     effectiveWidth,
     hidden,
     opacity,
   };
+}
+
+// 在缩放过程中轻量更新兵牌 transform，避免 localScale 陈旧导致跳变
+function syncUnitCounterScalesDuringZoom() {
+  if (!unitCountersGroup) return;
+  const zoomK = Math.max(0.1, Number(state.zoomTransform?.k || 1));
+  unitCountersGroup.selectAll("g.unit-counter").each(function (d) {
+    if (!d || !d.model) return;
+    const sc = getUnitCounterRenderScale(d.model.metrics, zoomK);
+    d.scaleModel = sc;
+    const node = this;
+    node.setAttribute(
+      "transform",
+      `translate(${d.projected[0]},${d.projected[1]}) scale(${sc.localScale}) translate(${d.slotOffset[0]},${d.slotOffset[1]})`,
+    );
+    node.setAttribute("opacity", sc.opacity);
+    node.setAttribute("display", sc.hidden ? "none" : "");
+  });
 }
 
 function renderUnitCountersOverlay() {
@@ -15557,6 +15579,7 @@ function renderUnitCountersOverlay() {
       return `translate(${d.projected[0]},${d.projected[1]}) scale(${d.scaleModel.localScale}) translate(${d.slotOffset[0]},${d.slotOffset[1]})`;
     })
     .attr("data-counter-id", (d) => d.counter.id)
+    .attr("display", "")
     .attr("opacity", (d) => d.scaleModel.opacity)
     .attr("pointer-events", "all");
 
@@ -18854,6 +18877,7 @@ function updateMap(transform) {
   if (viewportGroup) {
     viewportGroup.attr("transform", `translate(${transform.x},${transform.y}) scale(${transform.k})`);
   }
+  syncUnitCounterScalesDuringZoom();
   drawCanvas();
 }
 

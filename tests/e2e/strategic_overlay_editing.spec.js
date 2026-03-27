@@ -367,7 +367,7 @@ test("unit counters open a centered modal editor, support symbol search, and sti
     selectUnitCounterById("unit_size_1");
     state.updateStrategicOverlayUIFn?.();
     render();
-    setZoomPercent(100);
+    setZoomPercent(700);
   });
 
   const counterShell = page.locator('g.unit-counter[data-counter-id="unit_size_1"] rect.unit-counter-shell');
@@ -434,40 +434,120 @@ test("unit counters open a centered modal editor, support symbol search, and sti
   await page.keyboard.press("Escape");
   await expect(page.locator("#unitCounterEditorModalOverlay")).toBeHidden();
   await expect(page.locator("#unitCounterDetailToggleBtn")).toBeFocused();
-  const boxAt100 = await counterShell.boundingBox();
-
-  await page.evaluate(async () => {
-    const { setZoomPercent } = await import("/js/core/map_renderer.js");
-    setZoomPercent(1600);
+  const counterGroup = page.locator('g.unit-counter[data-counter-id="unit_size_1"]');
+  const zoomPercentInput = page.locator("#zoomPercentInput");
+  const unitCounterFixedScaleRange = page.locator("#unitCounterFixedScaleRange");
+  const unitCounterFixedScaleValue = page.locator("#unitCounterFixedScaleValue");
+  const readZoomK = async () => page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    return Number(state.zoomTransform?.k || 0);
   });
-  await page.waitForTimeout(400);
-  const boxAt1600 = await counterShell.boundingBox();
-
-  await page.evaluate(async () => {
-    const { setZoomPercent } = await import("/js/core/map_renderer.js");
-    setZoomPercent(3000);
+  const readCounterVisibility = async () => page.evaluate(() => {
+    const node = document.querySelector('g.unit-counter[data-counter-id="unit_size_1"]');
+    if (!node) return null;
+    return {
+      display: node.getAttribute("display") || "",
+      opacity: Number(node.getAttribute("opacity") || 1),
+    };
   });
-  await page.waitForTimeout(400);
+  const waitForZoomK = async (expectedPercent) => {
+    await expect.poll(async () => {
+      const zoomK = await readZoomK();
+      return Math.round(zoomK * 100);
+    }, { timeout: 4000 }).toBe(expectedPercent);
+  };
+  const setZoomPercentViaApi = async (percent) => {
+    await page.evaluate(async (nextPercent) => {
+      const { setZoomPercent } = await import("/js/core/map_renderer.js");
+      setZoomPercent(nextPercent);
+    }, percent);
+    await waitForZoomK(percent);
+  };
+  const setZoomPercentViaInput = async (percent) => {
+    await zoomPercentInput.click();
+    await zoomPercentInput.fill(String(percent));
+    await zoomPercentInput.press("Enter");
+    await waitForZoomK(percent);
+    await expect.poll(async () => {
+      const rawValue = await zoomPercentInput.inputValue();
+      return Number(rawValue.replace(/[^0-9.]/g, ""));
+    }, { timeout: 4000 }).toBe(percent);
+  };
+
+  await setZoomPercentViaApi(50);
+  const zoomAt50 = await readZoomK();
+  const counterStateAt50 = await readCounterVisibility();
+
+  await setZoomPercentViaApi(100);
+  const counterStateAt100 = await readCounterVisibility();
+
+  await setZoomPercentViaApi(500);
+  const counterStateAt500 = await readCounterVisibility();
+
+  await setZoomPercentViaInput(600);
+  const zoomAt600 = await readZoomK();
+  const counterStateAt600 = await readCounterVisibility();
+
+  await setZoomPercentViaApi(700);
+  const zoomAt700 = await readZoomK();
+  const boxAt700 = await counterShell.boundingBox();
+  await expect(unitCounterFixedScaleRange).toHaveValue("150");
+  await expect(unitCounterFixedScaleValue).toHaveText("1.50x");
+
+  await page.evaluate(() => {
+    const range = document.querySelector("#unitCounterFixedScaleRange");
+    range.value = "200";
+    range.dispatchEvent(new Event("input", { bubbles: true }));
+    range.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  await expect(unitCounterFixedScaleRange).toHaveValue("200");
+  await expect(unitCounterFixedScaleValue).toHaveText("2.00x");
+  await expect.poll(
+    async () => (await counterShell.boundingBox())?.width ?? 0,
+    { timeout: 4000 },
+  ).toBeGreaterThan(boxAt700.width);
+  const boxAt700ScaledUp = await counterShell.boundingBox();
+
+  await setZoomPercentViaInput(3000);
+  const zoomAt3000 = await readZoomK();
+  const counterStateAt3000 = await readCounterVisibility();
   const boxAt3000 = await counterShell.boundingBox();
 
-  await page.evaluate(async () => {
-    const { setZoomPercent } = await import("/js/core/map_renderer.js");
-    setZoomPercent(5000);
-  });
-  await page.waitForTimeout(400);
-  const boxAt5000 = await counterShell.boundingBox();
-  const counterCountAt5000 = await page.locator('g.unit-counter[data-counter-id="unit_size_1"]').count();
-
-  expect(boxAt1600.width).toBeGreaterThan(boxAt100.width);
-  expect(boxAt1600.height).toBeGreaterThan(boxAt100.height);
-  expect(boxAt3000.width).toBeGreaterThanOrEqual(boxAt1600.width - 1);
-  expect(boxAt3000.height).toBeGreaterThanOrEqual(boxAt1600.height - 1);
-  expect(boxAt5000.width).toBeLessThan(boxAt3000.width + 3);
-  expect(boxAt5000.height).toBeLessThan(boxAt3000.height + 2);
-  expect(boxAt100.width).toBeLessThanOrEqual(36);
-  expect(boxAt100.height).toBeLessThanOrEqual(24);
-  expect(boxAt5000.width).toBeGreaterThan(10);
-  expect(counterCountAt5000).toBe(1);
+  expect(zoomAt50).toBeCloseTo(0.5, 2);
+  expect(
+    counterStateAt50 === null
+      || counterStateAt50.display === "none"
+      || counterStateAt50.opacity <= 0.05,
+  ).toBeTruthy();
+  expect(
+    counterStateAt100 === null
+      || counterStateAt100.display === "none"
+      || counterStateAt100.opacity <= 0.05,
+  ).toBeTruthy();
+  expect(
+    counterStateAt500 === null
+      || counterStateAt500.display === "none"
+      || counterStateAt500.opacity <= 0.05,
+  ).toBeTruthy();
+  expect(zoomAt600).toBeCloseTo(6, 1);
+  expect(
+    counterStateAt600 === null
+      || counterStateAt600.display === "none"
+      || counterStateAt600.opacity <= 0.05,
+  ).toBeTruthy();
+  expect(zoomAt700).toBeCloseTo(7, 1);
+  expect(boxAt700.width).toBeGreaterThan(10);
+  expect(boxAt700.height).toBeGreaterThan(6);
+  expect(boxAt700ScaledUp.width).toBeGreaterThan(boxAt700.width);
+  expect(boxAt700ScaledUp.height).toBeGreaterThan(boxAt700.height);
+  expect(zoomAt3000).toBeCloseTo(30, 1);
+  expect(
+    counterStateAt3000 !== null
+      && counterStateAt3000.display !== "none"
+      && counterStateAt3000.opacity >= 0.95,
+  ).toBeTruthy();
+  expect(Math.abs(boxAt3000.width - boxAt700ScaledUp.width)).toBeLessThanOrEqual(2);
+  expect(Math.abs(boxAt3000.height - boxAt700ScaledUp.height)).toBeLessThanOrEqual(2);
 });
 
 test("unit counter placement cancels on escape or tab switch, resets after delete, and keeps compact sidebar overflow-safe", async ({ page }) => {

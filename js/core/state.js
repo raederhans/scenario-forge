@@ -828,6 +828,7 @@ function createDefaultAnnotationView() {
     showFrontlineLabels: false,
     labelPlacementMode: "midpoint",
     unitRendererDefault: "game",
+    unitCounterFixedScaleMultiplier: 1.5,
     showUnitLabels: true,
   };
 }
@@ -853,6 +854,11 @@ function normalizeAnnotationView(rawConfig) {
     unitRendererDefault: ["milstd", "game"].includes(unitRendererDefault)
       ? unitRendererDefault
       : defaults.unitRendererDefault,
+    unitCounterFixedScaleMultiplier: clamp(
+      toFiniteNumber(raw.unitCounterFixedScaleMultiplier, defaults.unitCounterFixedScaleMultiplier),
+      0.5,
+      2.0,
+    ),
     showUnitLabels: raw.showUnitLabels === undefined ? defaults.showUnitLabels : !!raw.showUnitLabels,
   };
 }
