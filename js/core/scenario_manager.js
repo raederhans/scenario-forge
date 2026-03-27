@@ -4,6 +4,7 @@ import { normalizeMapSemanticMode } from "./state.js";
 import {
   recomputeDynamicBordersNow,
   refreshColorState,
+  refreshMapDataForScenarioChunkPromotion,
   refreshScenarioOpeningOwnerBorders,
   setMapData,
 } from "./map_renderer.js";
@@ -1331,6 +1332,10 @@ function scenarioSupportsChunkedRuntime(bundleOrManifest) {
   return !!normalizeScenarioRuntimeShell(manifest)?.detailChunkManifestUrl;
 }
 
+function scenarioBundleHasChunkedData(bundle) {
+  return Array.isArray(bundle?.chunkRegistry?.chunks) && bundle.chunkRegistry.chunks.length > 0;
+}
+
 function scenarioBundleUsesChunkedLayer(bundle, layerKey = "") {
   if (!bundle || !scenarioSupportsChunkedRuntime(bundle)) {
     return false;
@@ -1526,7 +1531,13 @@ async function ensureScenarioChunkRegistryLoaded(
   bundle.contextLodManifest = normalizeScenarioContextLodManifest(contextLodResult?.payload || {});
   bundle.runtimeMetaPayload = runtimeMetaResult?.payload || null;
   bundle.meshPackPayload = meshPackResult?.payload || null;
-  chunkState.registryStatus = "ready";
+  bundle.chunkRegistryLoadMetrics = {
+    detailChunkManifest: chunkManifestResult?.metrics || null,
+    contextLodManifest: contextLodResult?.metrics || null,
+    runtimeMeta: runtimeMetaResult?.metrics || null,
+    meshPack: meshPackResult?.metrics || null,
+  };
+  chunkState.registryStatus = scenarioBundleHasChunkedData(bundle) ? "ready" : "empty";
   return bundle.chunkRegistry;
 }
 
@@ -1558,10 +1569,44 @@ function applyMergedScenarioChunkLayerPayloads(mergedLayerPayloads, { renderNow 
   return changed;
 }
 
+function applyScenarioPoliticalChunkPayload(bundle, politicalPayload, { renderNow = false, reason = "refresh" } = {}) {
+  const startedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+  const normalizedPayload = normalizeScenarioFeatureCollection(politicalPayload);
+  const currentPayload = normalizeScenarioFeatureCollection(state.scenarioPoliticalChunkData);
+  const currentFeatures = Array.isArray(currentPayload?.features) ? currentPayload.features : [];
+  const nextFeatures = Array.isArray(normalizedPayload?.features) ? normalizedPayload.features : [];
+  const currentIds = currentFeatures.map((feature) => String(feature?.id || feature?.properties?.id || "").trim()).filter(Boolean);
+  const nextIds = nextFeatures.map((feature) => String(feature?.id || feature?.properties?.id || "").trim()).filter(Boolean);
+  const samePayload =
+    currentIds.length === nextIds.length
+    && currentIds.every((featureId, index) => featureId === nextIds[index]);
+  if (samePayload) {
+    return false;
+  }
+  state.scenarioPoliticalChunkData = normalizedPayload || null;
+  if (bundle) {
+    bundle.chunkMergedLayerPayloads = bundle.chunkMergedLayerPayloads && typeof bundle.chunkMergedLayerPayloads === "object"
+      ? bundle.chunkMergedLayerPayloads
+      : {};
+    bundle.chunkMergedLayerPayloads.political = normalizedPayload || null;
+  }
+  refreshMapDataForScenarioChunkPromotion({ suppressRender: !renderNow });
+  recordScenarioRenderMetric("politicalChunkPromotionMs", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - startedAt, {
+    scenarioId: getScenarioBundleId(bundle),
+    reason: String(reason || "refresh"),
+    promotedPoliticalFeatureCount: nextIds.length,
+  });
+  return true;
+}
+
 function buildMergedScenarioChunkLayerPayloads(bundle) {
   const chunkState = ensureActiveScenarioChunkState();
   const mergedLayerPayloads = {};
-  Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS).forEach((layerKey) => {
+  const layerKeys = new Set([
+    ...Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS),
+    ...Object.keys(bundle?.chunkRegistry?.byLayer || {}),
+  ]);
+  layerKeys.forEach((layerKey) => {
     const layerChunkPayloads = chunkState.loadedChunkIds
       .map((chunkId) => chunkState.payloadByChunkId?.[chunkId] || null)
       .filter((entry) => entry && entry.layerKey === layerKey)
@@ -1593,6 +1638,7 @@ async function preloadScenarioCoarseChunks(
     ? bundle.chunkPayloadCacheById
     : {};
   const visibleLayers = getVisibleScenarioChunkLayers({
+    includePoliticalCore: scenarioBundleUsesChunkedLayer(bundle, "political"),
     showWaterRegions: normalizeScenarioPerformanceHints(bundle.manifest).waterRegionsDefault !== false,
     showScenarioSpecialRegions: normalizeScenarioPerformanceHints(bundle.manifest).specialRegionsDefault !== false,
     showScenarioReliefOverlays: normalizeScenarioPerformanceHints(bundle.manifest).scenarioReliefOverlaysDefault === true,
@@ -1683,6 +1729,7 @@ async function refreshActiveScenarioChunks({
     ? state.getViewportGeoBoundsFn()
     : [-180, -90, 180, 90];
   const visibleLayers = getVisibleScenarioChunkLayers({
+    includePoliticalCore: scenarioBundleUsesChunkedLayer(bundle, "political"),
     showWaterRegions: state.showWaterRegions !== false,
     showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
     showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
@@ -1732,6 +1779,11 @@ async function refreshActiveScenarioChunks({
   const promotionStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
   const mergedLayerPayloads = buildMergedScenarioChunkLayerPayloads(bundle);
   applyMergedScenarioChunkLayerPayloads(mergedLayerPayloads, { renderNow });
+  const politicalRequired = selection.requiredChunks.some((chunk) => chunk.layer === "political");
+  applyScenarioPoliticalChunkPayload(bundle, mergedLayerPayloads.political || null, {
+    renderNow,
+    reason,
+  });
   recordScenarioRenderMetric(
     "chunkPromotionMs",
     (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - promotionStartedAt,
@@ -1741,6 +1793,27 @@ async function refreshActiveScenarioChunks({
       loadedChunkCount: chunkState.loadedChunkIds.length,
     }
   );
+  if (
+    politicalRequired
+    && Array.isArray(mergedLayerPayloads?.political?.features)
+    && !bundle?.chunkLifecycle?.politicalCoreReadyRecorded
+  ) {
+    const applyStartedAt = Number(bundle?.chunkLifecycle?.applyStartedAt || 0);
+    if (applyStartedAt > 0) {
+      recordScenarioPerfMetric(
+        "timeToPoliticalCoreReady",
+        (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - applyStartedAt,
+        {
+          scenarioId,
+          promotedPoliticalFeatureCount: mergedLayerPayloads.political.features.length,
+          requiredPoliticalChunkCount: selection.requiredChunks.filter((chunk) => chunk.layer === "political").length,
+        }
+      );
+    }
+    if (bundle?.chunkLifecycle) {
+      bundle.chunkLifecycle.politicalCoreReadyRecorded = true;
+    }
+  }
   return selection;
 }
 
@@ -2489,10 +2562,11 @@ function hydrateActiveScenarioBundle(
       bundle.chunkMergedLayerPayloads?.special
       || getScenarioDecodedCollection(bundle, "scenarioSpecialRegionsData")
       || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land")
-      || bundle.specialRegionsPayload
-      || state.scenarioSpecialRegionsData
-      || null;
+        || bundle.specialRegionsPayload
+        || state.scenarioSpecialRegionsData
+        || null;
   }
+  state.scenarioPoliticalChunkData = normalizeScenarioFeatureCollection(bundle.chunkMergedLayerPayloads?.political) || null;
   if (bundle.districtGroupsPayload) {
     state.scenarioDistrictGroupsData = bundle.districtGroupsPayload;
     state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(bundle.districtGroupsPayload);
@@ -2569,7 +2643,7 @@ async function loadScenarioBundle(
   }
   const cachedBundle = state.scenarioBundleCacheById?.[targetId] || null;
   if (!forceReload && cachedBundle && scenarioBundleSatisfiesLevel(cachedBundle, requestedBundleLevel)) {
-    if (normalizeScenarioBundleLevel(cachedBundle.bundleLevel) === "full" && !scenarioSupportsChunkedRuntime(cachedBundle)) {
+    if (normalizeScenarioBundleLevel(cachedBundle.bundleLevel) === "full" && !scenarioBundleUsesChunkedLayer(cachedBundle)) {
       prewarmScenarioOptionalLayersOnCacheHit(cachedBundle, { d3Client });
     }
     recordScenarioPerfMetric(
@@ -2601,10 +2675,13 @@ async function loadScenarioBundle(
   const geoLocalePatchDescriptor = getScenarioGeoLocalePatchDescriptor(manifest);
   const hints = normalizeScenarioPerformanceHints(manifest);
   const runtimeShell = normalizeScenarioRuntimeShell(manifest);
+  const preferStartupTopologyForFullBundle = !!runtimeShell?.detailChunkManifestUrl;
   const runtimeTopologyUrl = String(
     requestedBundleLevel === "bootstrap"
       ? runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || manifest.runtime_topology_url || ""
-      : runtimeShell?.startupTopologyUrl || manifest.runtime_topology_url || manifest.runtime_bootstrap_topology_url || ""
+      : preferStartupTopologyForFullBundle
+        ? runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || manifest.runtime_topology_url || ""
+        : manifest.runtime_topology_url || runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || ""
   ).trim();
   const scenarioBootstrapCacheKey =
     requestedBundleLevel === "bootstrap" && isStartupCacheEnabled()
@@ -2640,7 +2717,6 @@ async function loadScenarioBundle(
         bundle.runtimeShell = runtimeShell;
         if (requestedBundleLevel === "full" && scenarioSupportsChunkedRuntime(bundle)) {
           await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
-          await preloadScenarioCoarseChunks(bundle, { d3Client });
         }
         state.scenarioBundleCacheById[targetId] = bundle;
         recordScenarioPerfMetric(
@@ -2827,14 +2903,23 @@ async function loadScenarioBundle(
   if (requestedBundleLevel === "full") {
     if (scenarioSupportsChunkedRuntime(bundle)) {
       await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
-      await preloadScenarioCoarseChunks(bundle, { d3Client });
-      const eagerFallbackLayers = Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
-        .filter((layerKey) => !scenarioBundleUsesChunkedLayer(bundle, layerKey))
-        .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, bundle.runtimeTopologyPayload, hints));
-      if (eagerFallbackLayers.length) {
-        await Promise.all(
-          eagerFallbackLayers.map((layerKey) => loadScenarioOptionalLayerPayload(bundle, layerKey, { d3Client }))
-        );
+      if (scenarioBundleHasChunkedData(bundle)) {
+        const eagerFallbackLayers = Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
+          .filter((layerKey) => !scenarioBundleUsesChunkedLayer(bundle, layerKey))
+          .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, bundle.runtimeTopologyPayload, hints));
+        if (eagerFallbackLayers.length) {
+          await Promise.all(
+            eagerFallbackLayers.map((layerKey) => loadScenarioOptionalLayerPayload(bundle, layerKey, { d3Client }))
+          );
+        }
+      } else {
+        const eagerOptionalLayers = Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
+          .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, bundle.runtimeTopologyPayload, hints));
+        if (eagerOptionalLayers.length) {
+          await Promise.all(
+            eagerOptionalLayers.map((layerKey) => loadScenarioOptionalLayerPayload(bundle, layerKey, { d3Client }))
+          );
+        }
       }
     } else {
       const eagerOptionalLayers = Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
@@ -2849,6 +2934,11 @@ async function loadScenarioBundle(
   const ownerCount = Object.keys(bundle.ownersPayload?.owners || {}).length;
   const controllerCount = Object.keys(bundle.controllersPayload?.controllers || {}).length;
   const countryCount = Object.keys(bundle.countriesPayload?.countries || {}).length;
+  const runtimeTopologyEquivalentMs =
+    Number(runtimeTopologyResult.metrics?.totalMs || runtimeTopologyResult.metrics?.durationMs || 0)
+    + Number(bundle.chunkRegistryLoadMetrics?.detailChunkManifest?.totalMs || bundle.chunkRegistryLoadMetrics?.detailChunkManifest?.durationMs || 0)
+    + Number(bundle.chunkRegistryLoadMetrics?.runtimeMeta?.totalMs || bundle.chunkRegistryLoadMetrics?.runtimeMeta?.durationMs || 0)
+    + Number(bundle.chunkRegistryLoadMetrics?.meshPack?.totalMs || bundle.chunkRegistryLoadMetrics?.meshPack?.durationMs || 0);
   console.log(
     `[scenario] Loaded ${requestedBundleLevel} bundle "${targetId}": ${ownerCount} owner entries, ${controllerCount} controller entries, ${countryCount} countries, baseline=${String(manifest?.baseline_hash || "").slice(0, 12)}`
   );
@@ -2901,7 +2991,14 @@ async function loadScenarioBundle(
       manifest: manifestResult.metrics || null,
       runtimeTopology: runtimeTopologyResult.metrics || null,
       geoLocalePatch: geoLocalePatchResult.metrics || null,
+      chunkRegistry: bundle.chunkRegistryLoadMetrics || null,
     },
+  });
+  recordScenarioPerfMetric("runtimeTopologyEquivalent", runtimeTopologyEquivalentMs, {
+    scenarioId: targetId,
+    bundleLevel: requestedBundleLevel,
+    runtimeTopologyDecodePath: String(runtimeTopologyResult.reason || "main-thread"),
+    hasChunkedRuntime: scenarioBundleHasChunkedData(bundle),
   });
   return bundle;
 }
@@ -3320,6 +3417,7 @@ function captureScenarioApplyRollbackSnapshot() {
     geoAliasToStableKey: cloneScenarioStateValue(state.geoAliasToStableKey),
     scenarioDisplaySettingsBeforeActivate: cloneScenarioStateValue(state.scenarioDisplaySettingsBeforeActivate),
     activeScenarioPerformanceHints: cloneScenarioStateValue(state.activeScenarioPerformanceHints),
+    scenarioPoliticalChunkData: cloneScenarioStateValue(state.scenarioPoliticalChunkData),
     activeScenarioChunks: cloneScenarioStateValue(state.activeScenarioChunks),
     runtimeChunkLoadState: cloneScenarioStateValue({
       ...(state.runtimeChunkLoadState || {}),
@@ -3432,6 +3530,7 @@ function restoreScenarioApplyRollbackSnapshot(snapshot, { renderNow = false } = 
   state.scenarioDisplaySettingsBeforeActivate =
     cloneScenarioStateValue(snapshot.scenarioDisplaySettingsBeforeActivate);
   state.activeScenarioPerformanceHints = cloneScenarioStateValue(snapshot.activeScenarioPerformanceHints);
+  state.scenarioPoliticalChunkData = cloneScenarioStateValue(snapshot.scenarioPoliticalChunkData);
   state.activeScenarioChunks = cloneScenarioStateValue(snapshot.activeScenarioChunks) || {
     scenarioId: "",
     loadedChunkIds: [],
@@ -3517,10 +3616,13 @@ async function prepareScenarioApplyState(
   const detailPromoted = startupReadonly
     ? false
     : await ensureScenarioDetailTopologyLoaded({ applyMapData: false });
+  const politicalChunkedReady =
+    scenarioBundleUsesChunkedLayer(bundle, "political")
+    && scenarioBundleHasChunkedData(bundle);
   const detailReady = (
     state.topologyBundleMode === "composite"
     && hasUsablePoliticalTopology(state.topologyDetail)
-  ) || !!detailPromoted;
+  ) || !!detailPromoted || politicalChunkedReady;
   if (!detailReady && scenarioNeedsDetailTopology(bundle.manifest) && !startupReadonly) {
     const scenarioLabel = getScenarioDisplayName(
       bundle.manifest,
@@ -3701,6 +3803,7 @@ async function applyScenarioBundle(
     state.runtimePoliticalTopology = staged.runtimeTopologyPayload?.objects?.political
       ? staged.runtimeTopologyPayload
       : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null);
+    state.scenarioPoliticalChunkData = normalizeScenarioFeatureCollection(bundle.chunkMergedLayerPayloads?.political) || null;
     state.runtimePoliticalMetaSeed = bundle.runtimePoliticalMeta || null;
     state.runtimePoliticalFeatureCollectionSeed = getScenarioDecodedCollection(bundle, "politicalData") || null;
     state.scenarioLandMaskData = staged.scenarioLandMaskFromTopology || null;
@@ -3758,7 +3861,7 @@ async function applyScenarioBundle(
     applyScenarioPaintMode();
     syncScenarioOceanFillForActivation(bundle.manifest);
     applyScenarioPerformanceHints(bundle.manifest);
-    state.scheduleScenarioChunkRefreshFn = scheduleScenarioChunkRefresh;
+    state.scheduleScenarioChunkRefreshFn = scenarioBundleUsesChunkedLayer(bundle) ? scheduleScenarioChunkRefresh : null;
     if (scenarioBundleUsesChunkedLayer(bundle)) {
       resetScenarioChunkRuntimeState({ scenarioId: staged.scenarioId });
       const chunkIds = Object.keys(bundle.chunkPayloadCacheById || {});
@@ -3769,7 +3872,7 @@ async function applyScenarioBundle(
         state.activeScenarioChunks.lruChunkIds = [...chunkIds];
       }
       ensureRuntimeChunkLoadState().shellStatus = "ready";
-      ensureRuntimeChunkLoadState().registryStatus = bundle.chunkRegistry ? "ready" : "idle";
+      ensureRuntimeChunkLoadState().registryStatus = scenarioBundleHasChunkedData(bundle) ? "ready" : "idle";
     } else {
       resetScenarioChunkRuntimeState();
     }
@@ -3781,6 +3884,18 @@ async function applyScenarioBundle(
     recalculateScenarioOwnerControllerDiffCount();
     refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: `scenario-opening:${staged.scenarioId}` });
     setMapData({ refitProjection: false, resetZoom: false, suppressRender });
+    bundle.chunkLifecycle = {
+      applyStartedAt,
+      politicalCoreReadyRecorded: false,
+    };
+    recordScenarioPerfMetric(
+      "timeToInteractiveCoarseFrame",
+      (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - applyStartedAt,
+      {
+        scenarioId: staged.scenarioId,
+        hasChunkedRuntime: scenarioBundleUsesChunkedLayer(bundle),
+      }
+    );
     rebuildPresetState();
     if (typeof document !== "undefined") {
       const presetSection = document.getElementById("selectedCountryActionsSection");
@@ -4062,6 +4177,7 @@ function clearActiveScenario(
   state.scenarioCountriesByTag = {};
   state.scenarioFixedOwnerColors = {};
   state.scenarioRuntimeTopologyData = null;
+  state.scenarioPoliticalChunkData = null;
   state.scenarioLandMaskData = null;
   state.scenarioContextLandMaskData = null;
   state.mapSemanticMode = "blank";

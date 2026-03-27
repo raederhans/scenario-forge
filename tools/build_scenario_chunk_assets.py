@@ -57,17 +57,25 @@ def main() -> int:
         runtime_topology_path = PROJECT_ROOT.joinpath(*Path(runtime_topology_url).parts)
         if runtime_topology_path.exists():
             runtime_topology_payload = _read_json(runtime_topology_path)
+    startup_topology_payload = None
+    startup_topology_url = str(
+        manifest_payload.get("startup_topology_url")
+        or manifest_payload.get("runtime_bootstrap_topology_url")
+        or manifest_payload.get("runtime_topology_url")
+        or ""
+    ).strip()
+    if startup_topology_url:
+        startup_topology_path = PROJECT_ROOT.joinpath(*Path(startup_topology_url).parts)
+        if startup_topology_path.exists():
+            startup_topology_payload = _read_json(startup_topology_path)
 
     build_and_write_scenario_chunk_assets(
         scenario_dir=scenario_dir,
         manifest_payload=manifest_payload,
         layer_payloads=layer_payloads,
+        startup_topology_payload=startup_topology_payload,
         runtime_topology_payload=runtime_topology_payload,
-        startup_topology_url=str(
-            manifest_payload.get("runtime_bootstrap_topology_url")
-            or manifest_payload.get("runtime_topology_url")
-            or ""
-        ).strip(),
+        startup_topology_url=startup_topology_url,
         runtime_topology_url=runtime_topology_url,
         generated_at=str(manifest_payload.get("generated_at") or "").strip(),
         default_startup_topology_url=args.default_startup_topology_url,

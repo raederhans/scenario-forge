@@ -233,6 +233,7 @@ function initToolbar({ render } = {}) {
   const colorModeSelect = document.getElementById("colorModeSelect");
   const bottomDock = document.getElementById("bottomDock");
   const dockCollapseBtn = document.getElementById("dockCollapseBtn");
+  const devDockCollapseBtn = document.getElementById("devDockCollapseBtn");
   const mapContainer = document.getElementById("mapContainer");
   const selectedColorPreview = document.getElementById("selectedColorPreview");
   const selectedColorValue = document.getElementById("selectedColorValue");
@@ -667,6 +668,15 @@ function initToolbar({ render } = {}) {
     if (dockCollapseBtn) {
       dockCollapseBtn.textContent = state.ui.dockCollapsed ? t("Expand", "ui") : t("Collapse", "ui");
       dockCollapseBtn.setAttribute("aria-pressed", state.ui.dockCollapsed ? "true" : "false");
+      dockCollapseBtn.classList.toggle("hidden", !!state.ui.devWorkspaceExpanded);
+    }
+    if (devDockCollapseBtn) {
+      const label = state.ui.dockCollapsed ? t("Expand", "ui") : t("Collapse", "ui");
+      devDockCollapseBtn.textContent = label;
+      devDockCollapseBtn.setAttribute("aria-pressed", state.ui.dockCollapsed ? "true" : "false");
+      devDockCollapseBtn.setAttribute("aria-label", label);
+      devDockCollapseBtn.setAttribute("title", label);
+      devDockCollapseBtn.classList.toggle("hidden", !state.ui.devWorkspaceExpanded);
     }
   };
 
@@ -2870,6 +2880,14 @@ function initToolbar({ render } = {}) {
     dockCollapseBtn.dataset.bound = "true";
   }
 
+  if (devDockCollapseBtn && !devDockCollapseBtn.dataset.bound) {
+    devDockCollapseBtn.addEventListener("click", () => {
+      state.ui.dockCollapsed = !state.ui.dockCollapsed;
+      updateDockCollapsedUi();
+    });
+    devDockCollapseBtn.dataset.bound = "true";
+  }
+
   if (inspectorDevWorkspaceBtn && !inspectorDevWorkspaceBtn.dataset.bound) {
     inspectorDevWorkspaceBtn.addEventListener("click", () => {
       devWorkspaceToggleBtn?.click();
@@ -4433,6 +4451,7 @@ function initToolbar({ render } = {}) {
   leftPanelToggle?.setAttribute("aria-expanded", "false");
   rightPanelToggle?.setAttribute("aria-expanded", "false");
   state.updatePaintModeUIFn();
+  state.updateDockCollapsedUiFn = updateDockCollapsedUi;
   updateDockCollapsedUi();
   setAppearanceTab("ocean");
   refreshScenarioContextBar();

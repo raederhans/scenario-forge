@@ -3293,8 +3293,44 @@ function composePoliticalFeatures(primaryTopology, detailTopology, overrideColle
   }
 
   const detailCollection = getPoliticalFeatureCollection(detailTopology, "detail");
+  const result = composePoliticalFeatureCollections(primaryCollection, detailCollection, overrideCollection);
+  composedPoliticalCollectionCache = {
+    primaryRef: primaryTopology,
+    detailRef: detailTopology,
+    overrideRef: overrideCollection,
+    result,
+  };
+  return result;
+}
+
+function composePoliticalFeatureCollections(primaryCollection, detailCollection = null, overrideCollection = null) {
+  const normalizedPrimaryCollection = Array.isArray(primaryCollection?.features)
+    ? primaryCollection
+    : { type: "FeatureCollection", features: [] };
+  const normalizedDetailCollection = Array.isArray(detailCollection?.features)
+    ? {
+      type: "FeatureCollection",
+      features: detailCollection.features.map((feature) => ({
+        ...feature,
+        properties: {
+          ...(feature?.properties || {}),
+          __source: "detail",
+        },
+      })),
+    }
+    : null;
+  if (!normalizedDetailCollection) {
+    const baseFeatures = normalizedPrimaryCollection.features;
+    const features = overrideCollection
+      ? mergeOverrideFeatures(baseFeatures, overrideCollection)
+      : baseFeatures;
+    return {
+      type: "FeatureCollection",
+      features,
+    };
+  }
   const detailCountries = new Set();
-  detailCollection.features.forEach((feature) => {
+  normalizedDetailCollection.features.forEach((feature) => {
     const code = getFeatureCountryCodeNormalized(feature);
     if (code) detailCountries.add(code);
   });
@@ -3310,8 +3346,8 @@ function composePoliticalFeatures(primaryTopology, detailTopology, overrideColle
     features.push(feature);
   };
 
-  detailCollection.features.forEach(pushIfUnique);
-  primaryCollection.features.forEach((feature) => {
+  normalizedDetailCollection.features.forEach(pushIfUnique);
+  normalizedPrimaryCollection.features.forEach((feature) => {
     const code = getFeatureCountryCodeNormalized(feature);
     if (code && detailCountries.has(code)) return;
     pushIfUnique(feature);
@@ -3324,12 +3360,6 @@ function composePoliticalFeatures(primaryTopology, detailTopology, overrideColle
   const result = {
     type: "FeatureCollection",
     features: mergedFeatures,
-  };
-  composedPoliticalCollectionCache = {
-    primaryRef: primaryTopology,
-    detailRef: detailTopology,
-    overrideRef: overrideCollection,
-    result,
   };
   return result;
 }
@@ -3425,10 +3455,16 @@ function rebuildPoliticalLandCollections() {
   const detailTopology = state.topologyBundleMode === "composite" ? state.topologyDetail : null;
   const overrideCollection = state.topologyBundleMode === "composite" ? state.ruCityOverrides : null;
   const runtimeTopology = state.topologyBundleMode === "composite" ? state.runtimePoliticalTopology : null;
+  const scenarioPoliticalChunkCollection = Array.isArray(state.scenarioPoliticalChunkData?.features)
+    ? state.scenarioPoliticalChunkData
+    : null;
 
   let fullCollection = state.landDataFull || state.landData || null;
   if (runtimeTopology?.objects?.political && globalThis.topojson) {
-    fullCollection = getPoliticalFeatureCollection(runtimeTopology, "runtime");
+    const runtimeCollection = getPoliticalFeatureCollection(runtimeTopology, "runtime");
+    fullCollection = scenarioPoliticalChunkCollection
+      ? composePoliticalFeatureCollections(runtimeCollection, scenarioPoliticalChunkCollection)
+      : runtimeCollection;
   } else if (primaryTopology?.objects?.political && globalThis.topojson) {
     fullCollection = state.topologyBundleMode === "composite"
       ? composePoliticalFeatures(primaryTopology, detailTopology, overrideCollection)
@@ -19437,9 +19473,42 @@ function setMapData({
   }
 }
 
+function refreshMapDataForScenarioChunkPromotion({
+  suppressRender = false,
+} = {}) {
+  const startedAt = nowMs();
+  ensureLayerDataFromTopology();
+  rebuildPoliticalLandCollections();
+  buildIndex();
+  ensureSovereigntyState();
+  state.topologyRevision = Number(state.topologyRevision || 0) + 1;
+  state.hitCanvasDirty = true;
+  invalidateAllRenderPasses("scenario-chunk-promotion");
+  markAllOverlaysDirty();
+  rebuildStaticMeshes();
+  invalidateBorderCache();
+  updateDynamicBorderStatusUI();
+  rebuildResolvedColors();
+  buildSpatialIndex();
+  updateSpecialZonesPaths();
+  renderSpecialZoneEditorOverlay();
+  updateZoomTranslateExtent();
+  if (!suppressRender) {
+    render();
+  }
+  recordRenderPerfMetric("scenarioChunkPoliticalPromotion", nowMs() - startedAt, {
+    activeScenarioId: String(state.activeScenarioId || ""),
+    suppressRender: !!suppressRender,
+    promotedFeatureCount: Array.isArray(state.scenarioPoliticalChunkData?.features)
+      ? state.scenarioPoliticalChunkData.features.length
+      : 0,
+  });
+}
+
 export {
   initMap,
   setMapData,
+  refreshMapDataForScenarioChunkPromotion,
   buildInteractionInfrastructureAfterStartup,
   render,
   autoFillMap,

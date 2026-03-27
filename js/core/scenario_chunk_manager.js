@@ -141,12 +141,14 @@ export function normalizeScenarioContextLodManifest(payload = {}) {
 }
 
 export function getVisibleScenarioChunkLayers({
+  includePoliticalCore = false,
   showWaterRegions = false,
   showScenarioSpecialRegions = false,
   showScenarioReliefOverlays = false,
   showCityPoints = false,
 } = {}) {
   return [
+    includePoliticalCore ? "political" : "",
     showWaterRegions ? "water" : "",
     showScenarioSpecialRegions ? "special" : "",
     showScenarioReliefOverlays ? "relief" : "",
@@ -243,6 +245,10 @@ export function selectScenarioChunks({
   const optional = [];
   const visibleLayerSet = new Set((Array.isArray(visibleLayers) ? visibleLayers : []).map((value) => String(value || "").trim().toLowerCase()));
   visibleLayerSet.forEach((layerKey) => {
+    const requiredBudget = layerKey === "political"
+      ? Math.max(hints.max_required_chunks * 4, 24)
+      : hints.max_required_chunks;
+    const optionalBudget = layerKey === "political" ? 0 : hints.max_optional_chunks;
     const candidates = resolveLayerChunksForZoom({
       chunkRegistry,
       contextLodManifest,
@@ -250,9 +256,9 @@ export function selectScenarioChunks({
       zoom,
     }).filter((chunk) => chunk.globalCoverage || boundsIntersect(chunk.bounds, viewportBbox));
     const ordered = sortChunksForSelection(candidates, focusCountry);
-    required.push(...ordered.slice(0, hints.max_required_chunks));
-    if (ordered.length > hints.max_required_chunks) {
-      optional.push(...ordered.slice(hints.max_required_chunks, hints.max_required_chunks + hints.max_optional_chunks));
+    required.push(...ordered.slice(0, requiredBudget));
+    if (ordered.length > requiredBudget && optionalBudget > 0) {
+      optional.push(...ordered.slice(requiredBudget, requiredBudget + optionalBudget));
     }
   });
   const uniqueRequired = Array.from(new Map(required.map((chunk) => [chunk.id, chunk])).values());

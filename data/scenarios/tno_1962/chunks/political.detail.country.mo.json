@@ -1,0 +1,43 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": 7886,
+      "type": "Feature",
+      "properties": {
+        "id": "MO_ADMIN0_PASSTHROUGH",
+        "name": "Macao S.A.R",
+        "cntr_code": "MO",
+        "detail_tier": "admin0_passthrough",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              113.46401346401348,
+              22.19087832797831
+            ],
+            [
+              113.53601353601351,
+              22.227330605430595
+            ],
+            [
+              113.53601353601351,
+              22.242953010053
+            ],
+            [
+              113.5000135000135,
+              22.242953010053
+            ],
+            [
+              113.46401346401348,
+              22.19087832797831
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

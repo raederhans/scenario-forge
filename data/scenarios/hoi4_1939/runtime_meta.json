@@ -4,6 +4,8 @@
   "generated_at": "2026-03-17T00:59:45.665709+00:00",
   "startup_topology_url": "data/europe_topology.runtime_political_v1.json",
   "runtime_topology_url": "",
+  "political_chunk_count": 1,
+  "total_chunk_count": 1,
   "runtime_topology_object_names": [],
   "runtime_topology_object_count": 0
 }

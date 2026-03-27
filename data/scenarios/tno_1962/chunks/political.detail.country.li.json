@@ -1,0 +1,344 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": 7584,
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4892",
+        "name": "Triesenberg",
+        "cntr_code": "LI",
+        "admin1_group": "Triesenberg",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.527589527589527,
+              47.129617155817144
+            ],
+            [
+              9.549189549189549,
+              47.09663652383652
+            ],
+            [
+              9.574389574389585,
+              47.10878728298728
+            ],
+            [
+              9.549189549189549,
+              47.160861965061954
+            ],
+            [
+              9.527589527589527,
+              47.129617155817144
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 7585,
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4893",
+        "name": "Triesen",
+        "cntr_code": "LI",
+        "admin1_group": "Triesen",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.534789534789525,
+              47.056712600912576
+            ],
+            [
+              9.581589581589583,
+              47.058448423648414
+            ],
+            [
+              9.581589581589583,
+              47.086221587421576
+            ],
+            [
+              9.55998955998956,
+              47.07580665100663
+            ],
+            [
+              9.513189513189502,
+              47.12788133308133
+            ],
+            [
+              9.534789534789525,
+              47.056712600912576
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 7586,
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4894",
+        "name": "Balzers",
+        "cntr_code": "LI",
+        "admin1_group": "Balzers",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.534789534789525,
+              47.056712600912576
+            ],
+            [
+              9.513189513189502,
+              47.08795741015739
+            ],
+            [
+              9.498789498789506,
+              47.060184246384225
+            ],
+            [
+              9.534789534789525,
+              47.056712600912576
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 7587,
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4895",
+        "name": "Vaduz",
+        "cntr_code": "LI",
+        "admin1_group": "Vaduz",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.527589527589527,
+              47.129617155817144
+            ],
+            [
+              9.549189549189549,
+              47.160861965061954
+            ],
+            [
+              9.505989505989504,
+              47.16954107874106
+            ],
+            [
+              9.527589527589527,
+              47.129617155817144
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 7588,
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4896",
+        "name": "Schaan",
+        "cntr_code": "LI",
+        "admin1_group": "Schaan",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.49158949158948,
+              47.193842597042575
+            ],
+            [
+              9.498789498789506,
+              47.155654496854496
+            ],
+            [
+              9.538389538389538,
+              47.162597787797765
+            ],
+            [
+              9.53118953118954,
+              47.193842597042575
+            ],
+            [
+              9.49158949158948,
+              47.193842597042575
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 7589,
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4897",
+        "name": "Gamprin",
+        "cntr_code": "LI",
+        "admin1_group": "Gamprin",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.53118953118954,
+              47.193842597042575
+            ],
+            [
+              9.505989505989504,
+              47.226823229023225
+            ],
+            [
+              9.49158949158948,
+              47.193842597042575
+            ],
+            [
+              9.53118953118954,
+              47.193842597042575
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 7590,
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4899",
+        "name": "Schellenberg",
+        "cntr_code": "LI",
+        "admin1_group": "Schellenberg",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.520389520389529,
+              47.225087406287386
+            ],
+            [
+              9.541989541989551,
+              47.23550234270233
+            ],
+            [
+              9.534789534789525,
+              47.25112474732474
+            ],
+            [
+              9.520389520389529,
+              47.225087406287386
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 7591,
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4901",
+        "name": "Planken",
+        "cntr_code": "LI",
+        "admin1_group": "Planken",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.53118953118954,
+              47.193842597042575
+            ],
+            [
+              9.552789552789562,
+              47.17648436968436
+            ],
+            [
+              9.563589563589574,
+              47.19037095157093
+            ],
+            [
+              9.53118953118954,
+              47.193842597042575
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 7592,
+      "type": "Feature",
+      "properties": {
+        "id": "LI_ADM1_LIE-4902",
+        "name": "Eschen",
+        "cntr_code": "LI",
+        "admin1_group": "Eschen",
+        "detail_tier": "adm1_basic",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              9.53118953118954,
+              47.193842597042575
+            ],
+            [
+              9.563589563589574,
+              47.197314242514224
+            ],
+            [
+              9.520389520389529,
+              47.225087406287386
+            ],
+            [
+              9.512829512829512,
+              47.21779695079694
+            ],
+            [
+              9.509589509589517,
+              47.21467246987247
+            ],
+            [
+              9.53118953118954,
+              47.193842597042575
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

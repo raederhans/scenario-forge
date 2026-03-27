@@ -2942,7 +2942,7 @@ function initSidebar({ render } = {}) {
     projectLegendSection?.classList.toggle("inspector-section-secondary", isScenarioMode);
     diagnosticsSection?.classList.toggle("inspector-section-secondary", isScenarioMode);
     if (countryInspectorOrderingHint) {
-      countryInspectorOrderingHint.classList.toggle("hidden", isScenarioMode);
+      countryInspectorOrderingHint.classList.add("hidden");
     }
     if (selectedCountryActionsSection) {
       selectedCountryActionsSection.classList.remove("hidden");
@@ -2964,13 +2964,7 @@ function initSidebar({ render } = {}) {
         : t("Selected Country Actions", "ui");
     }
     if (selectedCountryActionHint) {
-      selectedCountryActionHint.classList.toggle("hidden", isScenarioMode);
-      selectedCountryActionHint.textContent = isScenarioMode
-        ? t(
-          "Scenario Actions below change political ownership first. Open Visual Adjustments only for color-only edits.",
-          "ui"
-        )
-        : t("Choose a country above to inspect territories, presets, and releasables.", "ui");
+      selectedCountryActionHint.classList.add("hidden");
     }
   };
 
@@ -4885,6 +4879,9 @@ function initSidebar({ render } = {}) {
       button.classList.toggle("is-active", featureId === state.selectedWaterRegionId);
       button.addEventListener("click", () => {
         state.selectedWaterRegionId = featureId;
+        if (waterInspectorSection) {
+          waterInspectorSection.open = true;
+        }
         renderWaterRegionList();
       });
 
@@ -4917,6 +4914,9 @@ function initSidebar({ render } = {}) {
 
     renderWaterInspectorDetail();
     renderWaterLegend();
+    if (waterInspectorSection) {
+      waterInspectorSection.open = !!String(state.selectedWaterRegionId || "").trim();
+    }
     if (typeof state.updateWorkspaceStatusFn === "function") {
       state.updateWorkspaceStatusFn();
     }
@@ -4978,34 +4978,19 @@ function initSidebar({ render } = {}) {
       !!state.activeScenarioId &&
       (Array.isArray(state.scenarioReliefOverlaysData?.features) ? state.scenarioReliefOverlaysData.features.length : 0) > 0;
     const hasScenarioInspectorContent = hasScenarioSpecialRegions || hasScenarioReliefOverlays;
+    const selectedSpecialRegionId = ensureSelectedSpecialRegion();
     if (specialRegionInspectorSection) {
       specialRegionInspectorSection.classList.toggle("hidden", !hasScenarioInspectorContent);
-      if (hasScenarioInspectorContent) {
-        specialRegionInspectorSection.open = true;
-      }
+      specialRegionInspectorSection.open = hasScenarioInspectorContent && !!selectedSpecialRegionId;
     }
     if (scenarioSpecialRegionVisibilityToggle) {
       scenarioSpecialRegionVisibilityToggle.checked = !!state.showScenarioSpecialRegions;
     }
-    if (scenarioSpecialRegionVisibilityHint) {
-      scenarioSpecialRegionVisibilityHint.textContent = state.showScenarioSpecialRegions
-        ? t("Scenario special regions are currently visible and interactive.", "ui")
-        : t("When off, scenario special regions are hidden and ignore hover, click, and paint.", "ui");
-    }
+    scenarioSpecialRegionVisibilityHint?.classList.add("hidden");
     if (scenarioReliefOverlayVisibilityToggle) {
       scenarioReliefOverlayVisibilityToggle.checked = !!state.showScenarioReliefOverlays;
     }
-    if (scenarioReliefOverlayVisibilityHint) {
-      scenarioReliefOverlayVisibilityHint.textContent = state.showScenarioReliefOverlays
-        ? t(
-          "Scenario relief overlays are currently visible. Cached relief stays visible during pan and zoom, then redraws exactly after the view settles.",
-          "ui"
-        )
-        : t(
-          "When off, shoreline, basin contour, and texture overlays are hidden for the active scenario.",
-          "ui"
-        );
-    }
+    scenarioReliefOverlayVisibilityHint?.classList.add("hidden");
   };
 
   const renderSpecialRegionLegend = () => {
@@ -6431,15 +6416,16 @@ function initSidebar({ render } = {}) {
   };
 
   const setRightSidebarTab = (tabId) => {
-    const activeId = ["inspector", "frontline"].includes(String(tabId || "").trim().toLowerCase())
-      ? String(tabId || "").trim().toLowerCase()
-      : "inspector";
+    const normalizedId = String(tabId || "").trim().toLowerCase();
+    const activeId = normalizedId === "frontline"
+      ? "project"
+      : (["inspector", "project"].includes(normalizedId) ? normalizedId : "inspector");
     if (!state.ui || typeof state.ui !== "object") {
       state.ui = {};
     }
     state.ui.rightSidebarTab = activeId;
-    document.body.classList.toggle("frontline-mode-active", activeId === "frontline");
-    if (activeId !== "frontline") {
+    document.body.classList.remove("frontline-mode-active");
+    if (activeId !== "project") {
       setCounterEditorModalState(false, { restoreFocus: false });
       cancelStrategicEditingModes();
       setStrategicWorkspaceModalState(false, String(state.strategicOverlayUi?.modalSection || "line"));

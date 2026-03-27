@@ -1,0 +1,43 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": 7885,
+      "type": "Feature",
+      "properties": {
+        "id": "MC_ADMIN0_PASSTHROUGH",
+        "name": "Monaco",
+        "cntr_code": "MC",
+        "detail_tier": "admin0_passthrough",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.363987363987377,
+              43.73781953001951
+            ],
+            [
+              7.4359874359874425,
+              43.75517775737775
+            ],
+            [
+              7.3999873999873955,
+              43.77080016200016
+            ],
+            [
+              7.363987363987377,
+              43.75517775737775
+            ],
+            [
+              7.363987363987377,
+              43.73781953001951
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

@@ -1028,6 +1028,7 @@ export const state = {
   scenarioWaterRegionsData: null,
   scenarioSpecialRegionsData: null,
   scenarioRuntimeTopologyData: null,
+  scenarioPoliticalChunkData: null,
   scenarioLandMaskData: null,
   scenarioContextLandMaskData: null,
   scenarioReliefOverlaysData: null,
@@ -1485,6 +1486,7 @@ export const state = {
     politicalEditingExpanded: false,
     scenarioVisualAdjustmentsOpen: false,
     devWorkspaceExpanded: false,
+    devWorkspaceCategory: "selection",
     rightSidebarTab: "inspector",
   },
 

@@ -1197,6 +1197,17 @@
             >
               Dev
             </button>
+            <button
+              id="devDockCollapseBtn"
+              class="zoom-btn dev-workspace-toggle dev-workspace-dock-toggle hidden"
+              type="button"
+              aria-controls="bottomDock"
+              aria-pressed="false"
+              title="Collapse development dock"
+              data-i18n-title="Collapse development dock"
+            >
+              Collapse
+            </button>
           </div>
 
           <section id="bottomDock" class="bottom-dock" aria-labelledby="bottomDockHeading">
@@ -1361,15 +1372,15 @@
               Inspector
             </button>
             <button
-              id="inspectorSidebarTabFrontline"
+              id="inspectorSidebarTabProject"
               type="button"
               class="inspector-sidebar-tab-btn"
-              data-inspector-tab="frontline"
+              data-inspector-tab="project"
               role="tab"
               aria-selected="false"
-              aria-controls="frontlineSidebarPanel"
+              aria-controls="projectSidebarPanel"
             >
-              Frontline
+              Project
             </button>
           </div>
           <section
@@ -1395,10 +1406,19 @@
 
           <h2 id="countryInspectorHeading" class="visually-hidden">Country Inspector</h2>
           <details id="countryInspectorSection" class="card inspector-section" open aria-labelledby="countryInspectorHeading lblCountryInspector">
-            <summary id="lblCountryInspector" class="section-header">Country Inspector</summary>
+            <summary id="lblCountryInspector" class="section-header inspector-section-summary">
+              <span class="inspector-section-summary-copy">Country Inspector</span>
+              <span class="summary-info-trigger info-trigger" aria-hidden="true">
+                <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
+                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                </svg>
+                <span class="info-tooltip">Inspect countries, active owners, and direct color overrides.</span>
+              </span>
+            </summary>
             <div class="inspector-panel-body">
               <h3 id="lblCountryColors" class="section-header-block">Country Colors</h3>
-              <p id="countryInspectorOrderingHint" class="sidebar-tool-hint inspector-ordering-hint mt-2">
+              <p id="countryInspectorOrderingHint" class="sidebar-tool-hint inspector-ordering-hint mt-2 hidden">
                 Key scenario countries first. Releasables appear under parent countries.
               </p>
               <div id="countryList" class="country-list inspector-scroll mt-3"></div>
@@ -1442,32 +1462,50 @@
 
           <h2 id="selectedCountryActionsHeading" class="visually-hidden" data-i18n="Territories & Presets">Territories & Presets</h2>
           <details id="selectedCountryActionsSection" class="card inspector-section" aria-labelledby="selectedCountryActionsHeading lblPresetsHierarchy">
-            <summary id="lblPresetsHierarchy" class="section-header">Territories &amp; Presets</summary>
+            <summary id="lblPresetsHierarchy" class="section-header inspector-section-summary">
+              <span class="inspector-section-summary-copy">Territories &amp; Presets</span>
+              <span class="summary-info-trigger info-trigger" aria-hidden="true">
+                <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
+                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                </svg>
+                <span class="info-tooltip">Inspect territories, presets, releasables, and scenario ownership actions for the selected country.</span>
+              </span>
+            </summary>
             <div class="inspector-panel-body">
               <h3 class="section-header-block" id="lblHistoricalPresets">Selected Country Actions</h3>
-              <p id="selectedCountryActionHint" class="tip-text mt-2">Choose a country above to inspect territories, presets, and releasables.</p>
+              <p id="selectedCountryActionHint" class="tip-text mt-2 hidden">Choose a country above to inspect territories, presets, and releasables.</p>
               <div id="presetTree" class="inspector-scroll preset-tree mt-3"></div>
             </div>
           </details>
 
           <h2 id="specialRegionInspectorHeading" class="visually-hidden">Special Regions</h2>
           <details id="specialRegionInspectorSection" class="card inspector-section hidden" aria-labelledby="specialRegionInspectorHeading lblSpecialRegionInspector">
-            <summary id="lblSpecialRegionInspector" class="section-header">Special Regions</summary>
+            <summary id="lblSpecialRegionInspector" class="section-header inspector-section-summary">
+              <span class="inspector-section-summary-copy">Special Regions</span>
+              <span class="summary-info-trigger info-trigger" aria-hidden="true">
+                <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
+                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                </svg>
+                <span class="info-tooltip">Inspect scenario-only basins, exposure zones, and their visual overrides.</span>
+              </span>
+            </summary>
             <div class="inspector-panel-body">
               <div class="card-flat inspector-detail-section">
                 <h3 id="lblScenarioSpecialRegionVisibility" class="section-header-block">Visibility</h3>
-                <label class="toggle-label mt-2">
+                <label class="toggle-label mt-2" title="Toggle scenario-only special regions.">
                   <input id="scenarioSpecialRegionVisibilityToggle" type="checkbox" class="checkbox-input" checked />
                   <span id="lblScenarioSpecialRegionVisibilityToggle">Show Scenario Special Regions</span>
                 </label>
-                <p id="scenarioSpecialRegionVisibilityHint" class="sidebar-tool-hint mt-2" data-i18n="Toggle Atlantropa-style scenario regions without affecting the base map.">
+                <p id="scenarioSpecialRegionVisibilityHint" class="sidebar-tool-hint mt-2 hidden" data-i18n="Toggle Atlantropa-style scenario regions without affecting the base map.">
                   Toggle Atlantropa-style scenario regions without affecting the base map.
                 </p>
-                <label class="toggle-label mt-3">
+                <label class="toggle-label mt-3" title="Toggle shoreline, basin contour, and texture overlays for the active scenario.">
                   <input id="scenarioReliefOverlayVisibilityToggle" type="checkbox" class="checkbox-input" checked />
                   <span id="lblScenarioReliefOverlayVisibilityToggle">Show Scenario Relief Overlays</span>
                 </label>
-                <p id="scenarioReliefOverlayVisibilityHint" class="sidebar-tool-hint mt-2" data-i18n="Toggle shoreline, basin contour, and texture overlays for the active scenario.">
+                <p id="scenarioReliefOverlayVisibilityHint" class="sidebar-tool-hint mt-2 hidden" data-i18n="Toggle shoreline, basin contour, and texture overlays for the active scenario.">
                   Toggle shoreline, basin contour, and texture overlays for the active scenario.
                 </p>
               </div>
@@ -1530,16 +1568,25 @@
           </details>
 
           <h2 id="waterInspectorHeading" class="visually-hidden">Water Regions</h2>
-          <details id="waterInspectorSection" class="card inspector-section" open aria-labelledby="waterInspectorHeading lblWaterInspector">
-            <summary id="lblWaterInspector" class="section-header">Water Regions</summary>
+          <details id="waterInspectorSection" class="card inspector-section" aria-labelledby="waterInspectorHeading lblWaterInspector">
+            <summary id="lblWaterInspector" class="section-header inspector-section-summary">
+              <span class="inspector-section-summary-copy">Water Regions</span>
+              <span class="summary-info-trigger info-trigger" aria-hidden="true">
+                <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
+                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                </svg>
+                <span class="info-tooltip">Inspect seas, lakes, straits, and direct water color overrides.</span>
+              </span>
+            </summary>
             <div class="inspector-panel-body">
               <div class="card-flat inspector-detail-section">
                 <h3 id="lblWaterInteraction" class="section-header-block">Interaction</h3>
-                <label class="toggle-label mt-2">
+                <label class="toggle-label mt-2" title="Allow or ignore macro open-ocean regions during hover, click, and paint.">
                   <input id="waterInspectorOpenOceanToggle" type="checkbox" class="checkbox-input" />
                   <span id="lblWaterInspectorOpenOceanToggle">Allow Open-Ocean Interaction</span>
                 </label>
-                <p id="waterInspectorOpenOceanHint" class="sidebar-tool-hint mt-2">
+                <p id="waterInspectorOpenOceanHint" class="sidebar-tool-hint mt-2 hidden">
                   When off, macro ocean regions are ignored for hover, click, and paint.
                 </p>
               </div>
@@ -1600,22 +1647,79 @@
               </div>
             </div>
           </details>
+          </section>
+          <section
+            id="projectSidebarPanel"
+            class="inspector-sidebar-tab-panel"
+            data-inspector-panel="project"
+            role="tabpanel"
+            aria-labelledby="inspectorSidebarTabProject"
+            hidden
+          >
+            <div class="sidebar-shell-heading sidebar-shell-heading-right" data-i18n="Project">Project</div>
+
+            <h2 id="frontlineProjectHeading" class="visually-hidden">Frontline</h2>
+            <details id="frontlineProjectSection" class="card inspector-section inspector-section-secondary" aria-labelledby="frontlineProjectHeading lblFrontlineProject">
+              <summary id="lblFrontlineProject" class="section-header inspector-section-summary">
+                <span class="inspector-section-summary-copy">Frontline</span>
+                <span class="summary-info-trigger info-trigger" aria-hidden="true">
+                  <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
+                    <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                  </svg>
+                  <span class="info-tooltip">Enable derived frontline overlays and strategic workspace tools for conflict views.</span>
+                </span>
+              </summary>
+              <div class="inspector-panel-body">
+                <p class="sidebar-tool-hint inspector-frontline-intro hidden" data-i18n="Derived frontlines stay optional and project-local. Enable them only when you want a conflict view.">
+                  Derived frontlines stay optional and project-local. Enable them only when you want a conflict view.
+                </p>
+                <div id="frontlineTabStack" class="inspector-frontline-stack"></div>
+              </div>
+            </details>
 
           <h2 id="projectLegendHeading" class="visually-hidden" data-i18n="Project & Legend">Project & Legend</h2>
           <details id="projectLegendSection" class="card inspector-section" aria-labelledby="projectLegendHeading lblProjectLegend">
-            <summary id="lblProjectLegend" class="section-header">Project &amp; Legend</summary>
+            <summary id="lblProjectLegend" class="section-header inspector-section-summary">
+              <span class="inspector-section-summary-copy">Project &amp; Legend</span>
+              <span class="summary-info-trigger info-trigger" aria-hidden="true">
+                <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
+                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                </svg>
+                <span class="info-tooltip">Manage project-level legend entries and working map references.</span>
+              </span>
+            </summary>
             <div id="projectLegendStack" class="inspector-panel-body inspector-stack"></div>
           </details>
 
           <h2 id="diagnosticsHeading" class="visually-hidden">Diagnostics</h2>
           <details id="diagnosticsSection" class="card inspector-section" aria-labelledby="diagnosticsHeading lblDiagnostics">
-            <summary id="lblDiagnostics" class="section-header">Diagnostics</summary>
+            <summary id="lblDiagnostics" class="section-header inspector-section-summary">
+              <span class="inspector-section-summary-copy">Diagnostics</span>
+              <span class="summary-info-trigger info-trigger" aria-hidden="true">
+                <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
+                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                </svg>
+                <span class="info-tooltip">Check rendering state, debug views, and project diagnostics when something looks off.</span>
+              </span>
+            </summary>
             <div id="diagnosticStack" class="inspector-panel-body inspector-stack"></div>
           </details>
 
           <h2 id="inspectorUtilitiesHeading" class="visually-hidden">Utilities</h2>
           <details id="inspectorUtilitiesSection" class="card inspector-section" aria-labelledby="inspectorUtilitiesHeading lblInspectorUtilities">
-            <summary id="lblInspectorUtilities" class="section-header" data-i18n="Utilities">Utilities</summary>
+            <summary id="lblInspectorUtilities" class="section-header inspector-section-summary" data-i18n="Utilities">
+              <span class="inspector-section-summary-copy">Utilities</span>
+              <span class="summary-info-trigger info-trigger" aria-hidden="true">
+                <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
+                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                </svg>
+                <span class="info-tooltip">Open reference tools, export utilities, language toggle, and development workspace access.</span>
+              </span>
+            </summary>
             <div class="inspector-panel-body">
               <div class="inspector-utilities-shell">
                 <div class="inspector-utility-stack">
@@ -1645,6 +1749,8 @@
                       id="inspectorDevWorkspaceBtn"
                       class="btn-secondary inspector-utility-dev-btn"
                       type="button"
+                      title="Open development workspace"
+                      data-i18n-title="Open development workspace"
                       data-i18n="Dev"
                     >
                       Dev
@@ -1707,20 +1813,6 @@
               </div>
             </div>
           </details>
-          </section>
-          <section
-            id="frontlineSidebarPanel"
-            class="inspector-sidebar-tab-panel"
-            data-inspector-panel="frontline"
-            role="tabpanel"
-            aria-labelledby="inspectorSidebarTabFrontline"
-            hidden
-          >
-            <div class="sidebar-shell-heading sidebar-shell-heading-right" data-i18n="Frontline">Frontline</div>
-            <p class="sidebar-tool-hint inspector-frontline-intro" data-i18n="Derived frontlines stay optional and project-local. Enable them only when you want a conflict view.">
-              Derived frontlines stay optional and project-local. Enable them only when you want a conflict view.
-            </p>
-            <div id="frontlineTabStack" class="inspector-frontline-stack"></div>
           </section>
         </div>
       </aside>
