@@ -1,0 +1,3720 @@
+{
+  "version": 1,
+  "libraryId": "hoi4",
+  "label": "Hearts of Iron IV",
+  "sourceScope": "vanilla",
+  "sourceRoot": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV",
+  "entryCount": 136,
+  "entries": [
+    {
+      "id": "hoi4-category-all-armor-ce9185e492",
+      "canonicalKey": "category_all_armor",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_all_armor",
+      "spriteAliases": [
+        "GFX_unit_category_tanks"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_all_armor.dds",
+      "sourceTextureFile": "gfx/interface/category_all_armor.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "All Armor",
+      "keywords": [
+        "category",
+        "all",
+        "armor",
+        "tanks"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/category_all_armor.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-category-all-infantry-4254d28281",
+      "canonicalKey": "category_all_infantry",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_all_infantry",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_all_infantry.dds",
+      "sourceTextureFile": "gfx/interface/category_all_infantry.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "All Infantry",
+      "keywords": [
+        "category",
+        "all",
+        "infantry"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/category_all_infantry.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-category-all-recon-4569a9cce1",
+      "canonicalKey": "category_all_recon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_recon",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_all_recon.dds",
+      "sourceTextureFile": "gfx/interface/category_all_recon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "All Recon",
+      "keywords": [
+        "category",
+        "all",
+        "recon"
+      ],
+      "mappedPresetIds": [
+        "recon"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/category_all_recon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-category-army-e25bd9cf94",
+      "canonicalKey": "category_army",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_all_front_line",
+      "spriteAliases": [
+        "GFX_unit_category_army"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_army.dds",
+      "sourceTextureFile": "gfx/interface/category_army.dds",
+      "sourceScope": "vanilla",
+      "domain": "air",
+      "label": "Army",
+      "keywords": [
+        "category",
+        "army",
+        "all",
+        "front",
+        "line"
+      ],
+      "mappedPresetIds": [
+        "air"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/category_army.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-category-artillery-a8f8cb8c62",
+      "canonicalKey": "category_artillery",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_artillery",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_artillery.dds",
+      "sourceTextureFile": "gfx/interface/category_artillery.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Artillery",
+      "keywords": [
+        "category",
+        "artillery"
+      ],
+      "mappedPresetIds": [
+        "art"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/category_artillery.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-category-bomber-963047bb3a",
+      "canonicalKey": "category_bomber",
+      "kind": "division_large",
+      "spriteName": "GFX_category_bomber",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_bomber.dds",
+      "sourceTextureFile": "gfx/interface/category_bomber.dds",
+      "sourceScope": "vanilla",
+      "domain": "air",
+      "label": "Bomber",
+      "keywords": [
+        "category",
+        "bomber"
+      ],
+      "mappedPresetIds": [
+        "bomber"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/category_bomber.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-category-cas-603c3fa9c8",
+      "canonicalKey": "category_cas",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_cas",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_cas.dds",
+      "sourceTextureFile": "gfx/interface/category_cas.dds",
+      "sourceScope": "vanilla",
+      "domain": "air",
+      "label": "CAS",
+      "keywords": [
+        "category",
+        "cas"
+      ],
+      "mappedPresetIds": [
+        "bomber"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/category_cas.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-category-fighter-f259ccb4d4",
+      "canonicalKey": "category_fighter",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_fighter",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_fighter.dds",
+      "sourceTextureFile": "gfx/interface/category_fighter.dds",
+      "sourceScope": "vanilla",
+      "domain": "air",
+      "label": "Fighter",
+      "keywords": [
+        "category",
+        "fighter"
+      ],
+      "mappedPresetIds": [
+        "fighter"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/category_fighter.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-category-heavy-fighter-822aa83991",
+      "canonicalKey": "category_heavy_fighter",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_heavy_fighter",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_heavy_fighter.dds",
+      "sourceTextureFile": "gfx/interface/category_heavy_fighter.dds",
+      "sourceScope": "vanilla",
+      "domain": "air",
+      "label": "Heavy Fighter",
+      "keywords": [
+        "category",
+        "heavy",
+        "fighter"
+      ],
+      "mappedPresetIds": [
+        "fighter"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/category_heavy_fighter.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-category-light-infantry-460370c72d",
+      "canonicalKey": "category_light_infantry",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_light_infantry",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_light_infantry.dds",
+      "sourceTextureFile": "gfx/interface/category_light_infantry.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Light Infantry",
+      "keywords": [
+        "category",
+        "light",
+        "infantry"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/category_light_infantry.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-category-line-artillery-1ca7baa8c6",
+      "canonicalKey": "category_line_artillery",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_line_artillery",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_line_artillery.dds",
+      "sourceTextureFile": "gfx/interface/category_line_artillery.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Line Artillery",
+      "keywords": [
+        "category",
+        "line",
+        "artillery"
+      ],
+      "mappedPresetIds": [
+        "art"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/category_line_artillery.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-category-nav-bomber-72cf98aba6",
+      "canonicalKey": "category_nav_bomber",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_nav_bomber",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_nav_bomber.dds",
+      "sourceTextureFile": "gfx/interface/category_nav_bomber.dds",
+      "sourceScope": "vanilla",
+      "domain": "air",
+      "label": "Naval Bomber",
+      "keywords": [
+        "category",
+        "nav",
+        "bomber",
+        "naval"
+      ],
+      "mappedPresetIds": [
+        "bomber"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/category_nav_bomber.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-category-strat-bomber-5c57c0457c",
+      "canonicalKey": "category_strat_bomber",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_strat_bomber",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_strat_bomber.dds",
+      "sourceTextureFile": "gfx/interface/category_strat_bomber.dds",
+      "sourceScope": "vanilla",
+      "domain": "air",
+      "label": "Strategic Bomber",
+      "keywords": [
+        "category",
+        "strat",
+        "bomber",
+        "strategic"
+      ],
+      "mappedPresetIds": [
+        "bomber"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/category_strat_bomber.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-category-support-battalions-813ed8bd8a",
+      "canonicalKey": "category_support_battalions",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_support_battalions",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_support_battalions.dds",
+      "sourceTextureFile": "gfx/interface/category_support_battalions.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Battalions",
+      "keywords": [
+        "category",
+        "support",
+        "battalions"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/category_support_battalions.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-category-support-unit-art-icon-6e692a0869",
+      "canonicalKey": "category_support_unit_art_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_support_artillery",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_art_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_art_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Art",
+      "keywords": [
+        "category",
+        "support",
+        "art",
+        "artillery"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/support_unit_art_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-category-tac-bomber-3661f50100",
+      "canonicalKey": "category_tac_bomber",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_tac_bomber",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\category_tac_bomber.dds",
+      "sourceTextureFile": "gfx/interface/category_tac_bomber.dds",
+      "sourceScope": "vanilla",
+      "domain": "air",
+      "label": "Tactical Bomber",
+      "keywords": [
+        "category",
+        "tac",
+        "bomber",
+        "tactical"
+      ],
+      "mappedPresetIds": [
+        "bomber"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/category_tac_bomber.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-helicopter-brigade-icon-528412fcda",
+      "canonicalKey": "helicopter_brigade_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_helicopter_brigade_icon_medium_white",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_helicopter_brigade_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_helicopter_brigade_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Helicopter Brigade",
+      "keywords": [
+        "helicopter",
+        "brigade"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_helicopter_brigade_icon.png",
+        "large": null,
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-no-intel-icon-4f9fb6c9c0",
+      "canonicalKey": "no_intel_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_no_intel_icon_medium_white",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_no_intel_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_no_intel_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "No Intel",
+      "keywords": [
+        "no",
+        "intel"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_no_intel_icon.png",
+        "large": null,
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-pioneers-support-b3721beb9f",
+      "canonicalKey": "pioneers_support",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_pioneer_support_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\pioneers_support.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/pioneers_support.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Pioneers",
+      "keywords": [
+        "pioneers",
+        "support",
+        "pioneer"
+      ],
+      "mappedPresetIds": [
+        "eng"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/pioneers_support.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-ship-battlecruiser-ccccf0de9a",
+      "canonicalKey": "ship_battlecruiser",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_battle_cruiser_icon_medium_white",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_battlecruiser.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_battlecruiser.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Battlecruiser",
+      "keywords": [
+        "ship",
+        "battlecruiser",
+        "battle",
+        "cruiser"
+      ],
+      "mappedPresetIds": [
+        "naval"
+      ],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_battlecruiser.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-battlecruiser-inverted-35b2abd325",
+      "canonicalKey": "ship_battlecruiser_inverted",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_battle_cruiser_icon_medium_black",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_battlecruiser_inverted.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_battlecruiser_inverted.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Battlecruiser Inverted",
+      "keywords": [
+        "ship",
+        "battlecruiser",
+        "inverted",
+        "battle",
+        "cruiser",
+        "black"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_battlecruiser_inverted.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-battleship-7ead8ae62c",
+      "canonicalKey": "ship_battleship",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_battleship_icon_medium_white",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_battleship.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_battleship.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Battleship",
+      "keywords": [
+        "ship",
+        "battleship"
+      ],
+      "mappedPresetIds": [
+        "naval"
+      ],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_battleship.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-battleship-inverted-3467e253a7",
+      "canonicalKey": "ship_battleship_inverted",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_battleship_icon_medium_black",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_battleship_inverted.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_battleship_inverted.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Battleinverted",
+      "keywords": [
+        "ship",
+        "battleship",
+        "inverted",
+        "battleinverted",
+        "black"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_battleship_inverted.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-carrier-b1b67d24be",
+      "canonicalKey": "ship_carrier",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_carrier_icon_medium_white",
+      "spriteAliases": [
+        "GFX_unit_escort_carrier_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_carrier.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_carrier.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Carrier",
+      "keywords": [
+        "ship",
+        "carrier",
+        "escort"
+      ],
+      "mappedPresetIds": [
+        "carrier"
+      ],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_carrier.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-carrier-inverted-d695e0d701",
+      "canonicalKey": "ship_carrier_inverted",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_carrier_icon_medium_black",
+      "spriteAliases": [
+        "GFX_unit_escort_carrier_icon_medium_black"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_carrier_inverted.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_carrier_inverted.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Carrier Inverted",
+      "keywords": [
+        "ship",
+        "carrier",
+        "inverted",
+        "black",
+        "escort"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_carrier_inverted.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-destroyer-2a8b5205bd",
+      "canonicalKey": "ship_destroyer",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_destroyer_icon_medium_white",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_destroyer.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_destroyer.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Destroyer",
+      "keywords": [
+        "ship",
+        "destroyer"
+      ],
+      "mappedPresetIds": [
+        "destroyer"
+      ],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_destroyer.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-destroyer-inverted-8624694019",
+      "canonicalKey": "ship_destroyer_inverted",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_destroyer_icon_medium_black",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_destroyer_inverted.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_destroyer_inverted.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Destroyer Inverted",
+      "keywords": [
+        "ship",
+        "destroyer",
+        "inverted",
+        "black"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_destroyer_inverted.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-general-support-ship-7191287379",
+      "canonicalKey": "ship_general_support_ship",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_support_ship_icon_medium_white",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_general_support_ship.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_general_support_ship.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Support Ship",
+      "keywords": [
+        "ship",
+        "general",
+        "support"
+      ],
+      "mappedPresetIds": [
+        "naval"
+      ],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_general_support_ship.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-general-support-ship-inverted-e7a7c33ded",
+      "canonicalKey": "ship_general_support_ship_inverted",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_support_ship_icon_medium_black",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_general_support_ship_inverted.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_general_support_ship_inverted.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "General Inverted",
+      "keywords": [
+        "ship",
+        "general",
+        "support",
+        "inverted",
+        "black"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_general_support_ship_inverted.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-heavy-cruiser-3a7ba180e0",
+      "canonicalKey": "ship_heavy_cruiser",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_heavy_cruiser_icon_medium_white",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_heavy_cruiser.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_heavy_cruiser.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Heavy Cruiser",
+      "keywords": [
+        "ship",
+        "heavy",
+        "cruiser"
+      ],
+      "mappedPresetIds": [
+        "naval"
+      ],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_heavy_cruiser.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-heavy-cruiser-inverted-53491133d2",
+      "canonicalKey": "ship_heavy_cruiser_inverted",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_heavy_cruiser_icon_medium_black",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_heavy_cruiser_inverted.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_heavy_cruiser_inverted.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Heavy Cruiser Inverted",
+      "keywords": [
+        "ship",
+        "heavy",
+        "cruiser",
+        "inverted",
+        "black"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_heavy_cruiser_inverted.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-light-cruiser-5e44eb8144",
+      "canonicalKey": "ship_light_cruiser",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_light_cruiser_icon_medium_white",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_light_cruiser.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_light_cruiser.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Light Cruiser",
+      "keywords": [
+        "ship",
+        "light",
+        "cruiser"
+      ],
+      "mappedPresetIds": [
+        "naval"
+      ],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_light_cruiser.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-light-cruiser-inverted-340e6fbf3f",
+      "canonicalKey": "ship_light_cruiser_inverted",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_light_cruiser_icon_medium_black",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_light_cruiser_inverted.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_light_cruiser_inverted.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Light Cruiser Inverted",
+      "keywords": [
+        "ship",
+        "light",
+        "cruiser",
+        "inverted",
+        "black"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_light_cruiser_inverted.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-repair-support-ship-a7ab407527",
+      "canonicalKey": "ship_repair_support_ship",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_repair_ship_icon_medium_white",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_repair_support_ship.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_repair_support_ship.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Repair Ship",
+      "keywords": [
+        "ship",
+        "repair",
+        "support"
+      ],
+      "mappedPresetIds": [
+        "naval"
+      ],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_repair_support_ship.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-repair-support-ship-inverted-7f1ef49764",
+      "canonicalKey": "ship_repair_support_ship_inverted",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_repair_ship_icon_medium_black",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_repair_support_ship_inverted.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_repair_support_ship_inverted.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Repair Inverted",
+      "keywords": [
+        "ship",
+        "repair",
+        "support",
+        "inverted",
+        "black"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_repair_support_ship_inverted.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-sh-battleship-f2a9b6d78e",
+      "canonicalKey": "ship_sh_battleship",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_sh_battleship_icon_medium_white",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_sh_battleship.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_sh_battleship.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Sh Battleship",
+      "keywords": [
+        "ship",
+        "sh",
+        "battleship"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_sh_battleship.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-sh-battleship-inverted-ea1ca98b63",
+      "canonicalKey": "ship_sh_battleship_inverted",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_sh_battleship_icon_medium_black",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_sh_battleship_inverted.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_sh_battleship_inverted.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Sh Battleinverted",
+      "keywords": [
+        "ship",
+        "sh",
+        "battleship",
+        "inverted",
+        "battleinverted",
+        "black"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_sh_battleship_inverted.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-submarine-0f7a4bec0f",
+      "canonicalKey": "ship_submarine",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_submarine_icon_medium_white",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_submarine.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_submarine.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Submarine",
+      "keywords": [
+        "ship",
+        "submarine"
+      ],
+      "mappedPresetIds": [
+        "submarine"
+      ],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_submarine.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-submarine-inverted-6b37418a10",
+      "canonicalKey": "ship_submarine_inverted",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_submarine_icon_medium_black",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_submarine_inverted.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_submarine_inverted.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Submarine Inverted",
+      "keywords": [
+        "ship",
+        "submarine",
+        "inverted",
+        "black"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_submarine_inverted.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-transport-ea9d9e17e2",
+      "canonicalKey": "ship_transport",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_transport_icon_medium_white",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_transport.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_transport.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Transport",
+      "keywords": [
+        "ship",
+        "transport"
+      ],
+      "mappedPresetIds": [
+        "naval"
+      ],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_transport.png"
+      }
+    },
+    {
+      "id": "hoi4-ship-transport-inverted-fb17aec97e",
+      "canonicalKey": "ship_transport_inverted",
+      "kind": "ship_small",
+      "spriteName": "GFX_unit_convoy_icon_medium_black",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\ships_small\\onmap_transport_inverted.dds",
+      "sourceTextureFile": "gfx/interface/counters/ships_small/onmap_transport_inverted.dds",
+      "sourceScope": "vanilla",
+      "domain": "naval",
+      "label": "Transport Inverted",
+      "keywords": [
+        "ship",
+        "transport",
+        "inverted",
+        "convoy",
+        "black"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": null,
+        "ship": "data/unit_counter_libraries/hoi4/ships_small/onmap_transport_inverted.png"
+      }
+    },
+    {
+      "id": "hoi4-support-unit-airborne-armored-recon-icon-ff54a33f15",
+      "canonicalKey": "support_unit_airborne_armored_recon_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_airborne_light_armor_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_airborne_armored_recon_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_airborne_armored_recon_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Airborne Armored Recon",
+      "keywords": [
+        "support",
+        "airborne",
+        "armored",
+        "recon",
+        "light",
+        "armor"
+      ],
+      "mappedPresetIds": [
+        "recon"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/support_unit_airborne_armored_recon_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-support-unit-anti-air-icon-4654d51859",
+      "canonicalKey": "support_unit_anti_air_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_anti_air_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_anti_air_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_anti_air_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Support Anti-Air",
+      "keywords": [
+        "support",
+        "anti",
+        "air"
+      ],
+      "mappedPresetIds": [
+        "aa"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/support_unit_anti_air_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-support-unit-armored-car-recon-icon-39dc864a41",
+      "canonicalKey": "support_unit_armored_car_recon_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_armored_car_recon_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_armored_car_recon_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_armored_car_recon_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Armored Car Recon",
+      "keywords": [
+        "support",
+        "armored",
+        "car",
+        "recon"
+      ],
+      "mappedPresetIds": [
+        "recon"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/support_unit_armored_car_recon_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-support-unit-armored-recon-icon-4fdf387916",
+      "canonicalKey": "support_unit_armored_recon_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_light_tank_recon_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_armored_recon_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_armored_recon_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Armored Recon",
+      "keywords": [
+        "support",
+        "armored",
+        "recon",
+        "light",
+        "tank"
+      ],
+      "mappedPresetIds": [
+        "recon"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/support_unit_armored_recon_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-support-unit-art-icon-2be569e2f9",
+      "canonicalKey": "support_unit_art_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_artillery_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_art_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_art_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Support Artillery",
+      "keywords": [
+        "support",
+        "art",
+        "artillery"
+      ],
+      "mappedPresetIds": [
+        "art"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/support_unit_art_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-support-unit-at-icon-c04f0955c9",
+      "canonicalKey": "support_unit_at_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_anti_tank_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_at_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_at_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Support Anti-Tank",
+      "keywords": [
+        "support",
+        "at",
+        "anti",
+        "tank"
+      ],
+      "mappedPresetIds": [
+        "at"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/support_unit_at_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-support-unit-field-hospital-icon-862c371992",
+      "canonicalKey": "support_unit_field_hospital_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_field_hospital_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_field_hospital_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_field_hospital_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Field Hospital",
+      "keywords": [
+        "support",
+        "field",
+        "hospital"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/support_unit_field_hospital_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-support-unit-logistics-company-icon-b953402624",
+      "canonicalKey": "support_unit_logistics_company_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_logistics_company_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_logistics_company_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_logistics_company_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Logistics Company",
+      "keywords": [
+        "supply",
+        "service",
+        "support",
+        "logistics",
+        "company"
+      ],
+      "mappedPresetIds": [
+        "log"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/support_unit_logistics_company_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-support-unit-maintenance-company-icon-7c1bbcbbce",
+      "canonicalKey": "support_unit_maintenance_company_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_maintenance_company_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_maintenance_company_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_maintenance_company_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Maintenance Company",
+      "keywords": [
+        "support",
+        "maintenance",
+        "company"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/support_unit_maintenance_company_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-support-unit-military-police-icon-31d543e1f2",
+      "canonicalKey": "support_unit_military_police_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_military_police_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_military_police_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_military_police_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Military Police",
+      "keywords": [
+        "support",
+        "military",
+        "police"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/support_unit_military_police_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-support-unit-motorized-recon-icon-f7fc7372c5",
+      "canonicalKey": "support_unit_motorized_recon_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_mot_recon_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_motorized_recon_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_motorized_recon_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Motorized Recon",
+      "keywords": [
+        "support",
+        "motorized",
+        "recon",
+        "mot"
+      ],
+      "mappedPresetIds": [
+        "recon"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/support_unit_motorized_recon_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-support-unit-rangers-icon-6ad269f303",
+      "canonicalKey": "support_unit_rangers_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_rangers_support_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_rangers_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_rangers_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Rangers",
+      "keywords": [
+        "support",
+        "rangers"
+      ],
+      "mappedPresetIds": [
+        "mountain"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/support_unit_rangers_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-support-unit-rocket-art-icon-57782a9510",
+      "canonicalKey": "support_unit_rocket_art_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_rocket_artillery_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_rocket_art_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_rocket_art_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Rocket Art",
+      "keywords": [
+        "support",
+        "rocket",
+        "art",
+        "artillery"
+      ],
+      "mappedPresetIds": [
+        "art"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/support_unit_rocket_art_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-support-unit-signal-company-icon-9268cea1ff",
+      "canonicalKey": "support_unit_signal_company_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_signal_company_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\support_unit_signal_company_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/support_unit_signal_company_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Signal Company",
+      "keywords": [
+        "support",
+        "signal",
+        "company"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/support_unit_signal_company_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-amphibious-mechanized-icon-8fc533f61e",
+      "canonicalKey": "unit_amphibious_mechanized_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_amphibious_mechanized_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_amphibious_mechanized_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_amphibious_mechanized_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_amphibious_mechanized_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Amphibious Mechanized",
+      "keywords": [
+        "amphibious",
+        "mechanized"
+      ],
+      "mappedPresetIds": [
+        "mech"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_amphibious_mechanized_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_amphibious_mechanized_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-amphibious-tank-icon-b9e935317c",
+      "canonicalKey": "unit_amphibious_tank_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_amphibious_armor_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_amphibious_armor_icon_medium_white",
+        "GFX_unit_category_amphibious_tanks"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_amphibious_tank_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_amphibious_tank_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Amphibious Tank",
+      "keywords": [
+        "amphibious",
+        "tank",
+        "armor",
+        "category",
+        "tanks"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_amphibious_tank_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_amphibious_tank_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-anti-air-icon-19d17836c9",
+      "canonicalKey": "unit_anti_air_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_anti_air_brigade_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_anti_air_brigade_icon_medium_white",
+        "GFX_unit_anti_air_icon_medium_white",
+        "GFX_unit_category_anti_air"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_anti_air_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_anti_air_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Anti-Air",
+      "keywords": [
+        "air defense",
+        "support",
+        "anti",
+        "air",
+        "brigade",
+        "category"
+      ],
+      "mappedPresetIds": [
+        "aa"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_anti_air_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_anti_air_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-armored-car-icon-b3d392de94",
+      "canonicalKey": "unit_armored_car_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_armored_car_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_armored_car_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_armored_car_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_armored_car_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Armored Car",
+      "keywords": [
+        "armored",
+        "car"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_armored_car_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_armored_car_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-armored-engineer-icon-7025bafab2",
+      "canonicalKey": "unit_armored_engineer_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_armored_engineer_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_armored_engineer_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_armored_engineer_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_armored_engineer_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Armored Engineer",
+      "keywords": [
+        "armored",
+        "engineer"
+      ],
+      "mappedPresetIds": [
+        "eng"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_armored_engineer_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_armored_engineer_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-armored-maintenance-icon-3cd218c191",
+      "canonicalKey": "unit_armored_maintenance_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_armored_maintenance_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_armored_maintenance_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_armored_maintenance_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_armored_maintenance_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Armored Maintenance",
+      "keywords": [
+        "armored",
+        "maintenance"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_armored_maintenance_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_armored_maintenance_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-armored-signal-icon-9d10e0672a",
+      "canonicalKey": "unit_armored_signal_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_armored_signal_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_armored_signal_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_armored_signal_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_armored_signal_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Armored Signal",
+      "keywords": [
+        "armored",
+        "signal"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_armored_signal_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_armored_signal_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-art-icon-6374dc0c63",
+      "canonicalKey": "unit_art_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_group_combat_support_icon",
+      "spriteAliases": [
+        "GFX_unit_art_icon_medium_white",
+        "GFX_unit_artillery_brigade_icon_medium",
+        "GFX_unit_artillery_brigade_icon_medium_white",
+        "GFX_unit_artillery_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_art_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_art_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Artillery",
+      "keywords": [
+        "guns",
+        "battery",
+        "support",
+        "art",
+        "artillery",
+        "group",
+        "combat",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "art"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_art_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_art_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-assault-engineer-icon-bf3efcd708",
+      "canonicalKey": "unit_assault_engineer_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_assault_engineer_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_assault_engineer_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_assault_engineer_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_assault_engineer_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Assault Engineer",
+      "keywords": [
+        "assault",
+        "engineer"
+      ],
+      "mappedPresetIds": [
+        "eng"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_assault_engineer_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_assault_engineer_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-at-icon-022dbac06c",
+      "canonicalKey": "unit_at_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_anti_tank_brigade_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_anti_tank_brigade_icon_medium_white",
+        "GFX_unit_anti_tank_icon_medium_white",
+        "GFX_unit_at_icon_medium_white",
+        "GFX_unit_category_anti_tank"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_at_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_at_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Anti-Tank",
+      "keywords": [
+        "anti-armor",
+        "support",
+        "at",
+        "anti",
+        "tank",
+        "brigade",
+        "category"
+      ],
+      "mappedPresetIds": [
+        "at"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_at_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_at_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-bicycle-infantry-icon-51ca3817ab",
+      "canonicalKey": "unit_bicycle_infantry_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_bicycle_battalion_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_bicycle_battalion_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_bicycle_infantry_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_bicycle_infantry_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Bicycle Infantry",
+      "keywords": [
+        "bicycle",
+        "infantry",
+        "battalion"
+      ],
+      "mappedPresetIds": [
+        "inf"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_bicycle_infantry_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_bicycle_infantry_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-blackshirt-assault-battalion-icon-02f6a7282b",
+      "canonicalKey": "unit_blackshirt_assault_battalion_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_blackshirt_assault_battalion_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_unit_blackshirt_assault_battalion_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_blackshirt_assault_battalion_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_blackshirt_assault_battalion_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Blackshirt Assault Battalion",
+      "keywords": [
+        "blackshirt",
+        "assault",
+        "battalion"
+      ],
+      "mappedPresetIds": [
+        "inf"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_blackshirt_assault_battalion_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_blackshirt_assault_battalion_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-camelry-icon-dbd74e1121",
+      "canonicalKey": "unit_camelry_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_camelry_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_camelry_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_camelry_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_camelry_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Camelry",
+      "keywords": [
+        "camelry"
+      ],
+      "mappedPresetIds": [
+        "cav"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_camelry_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_camelry_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-cavalry-icon-f982a7859a",
+      "canonicalKey": "unit_cavalry_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_category_cavalry",
+      "spriteAliases": [
+        "GFX_unit_cavalry_icon_medium",
+        "GFX_unit_cavalry_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_cavalry_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_cavalry_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Cavalry",
+      "keywords": [
+        "horse",
+        "mounted",
+        "ground",
+        "cavalry",
+        "category"
+      ],
+      "mappedPresetIds": [
+        "cav"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_cavalry_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_cavalry_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-elephantry-icon-1586775baa",
+      "canonicalKey": "unit_elephantry_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_elephantry_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_elephantry_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_elephantry_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_elephantry_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Elephantry",
+      "keywords": [
+        "elephantry"
+      ],
+      "mappedPresetIds": [
+        "cav"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_elephantry_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_elephantry_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-engineer-icon-d4c366afbd",
+      "canonicalKey": "unit_engineer_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_engineer_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_engineer_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_engineer_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_engineer_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Engineer",
+      "keywords": [
+        "sap",
+        "bridge",
+        "support",
+        "engineer"
+      ],
+      "mappedPresetIds": [
+        "eng"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_engineer_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_engineer_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-fake-intel-unit-icon-3fddbb40a6",
+      "canonicalKey": "unit_fake_intel_unit_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_fake_intel_unit_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_fake_intel_unit_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_fake_intel_unit_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_fake_intel_unit_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Fake Intel",
+      "keywords": [
+        "fake",
+        "intel"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_fake_intel_unit_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_fake_intel_unit_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-guided-missile-icon-be44b0fbd7",
+      "canonicalKey": "unit_guided_missile_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_guided_missile_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_guided_missile_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_guided_missile_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Guided Missile",
+      "keywords": [
+        "guided",
+        "missile"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_guided_missile_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-heavy-amphibious-tank-icon-d0dcc80517",
+      "canonicalKey": "unit_heavy_amphibious_tank_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_amphibious_heavy_armor_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_amphibious_heavy_armor_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_heavy_amphibious_tank_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_heavy_amphibious_tank_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Heavy Amphibious Tank",
+      "keywords": [
+        "heavy",
+        "amphibious",
+        "tank",
+        "armor"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_heavy_amphibious_tank_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_heavy_amphibious_tank_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-heavy-armor-antiair-icon-2c9fc1efc4",
+      "canonicalKey": "unit_heavy_armor_antiair_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_heavy_sp_anti_air_brigade_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_heavy_armor_antiair_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_heavy_armor_antiair_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Heavy Armor Antiair",
+      "keywords": [
+        "heavy",
+        "armor",
+        "antiair",
+        "sp",
+        "anti",
+        "air",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_heavy_armor_antiair_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-heavy-armor-artillery-icon-a5d78d5b41",
+      "canonicalKey": "unit_heavy_armor_artillery_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_heavy_sp_artillery_brigade_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_heavy_armor_artillery_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_heavy_armor_artillery_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Heavy Armor Artillery",
+      "keywords": [
+        "heavy",
+        "armor",
+        "artillery",
+        "sp",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_heavy_armor_artillery_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-heavy-armor-at-icon-9640dbe00c",
+      "canonicalKey": "unit_heavy_armor_at_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_heavy_tank_destroyer_brigade_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_heavy_armor_at_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_heavy_armor_at_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Heavy Armor AT",
+      "keywords": [
+        "heavy",
+        "armor",
+        "at",
+        "tank",
+        "destroyer",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_heavy_armor_at_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-heavy-armor-icon-3d9cc722a6",
+      "canonicalKey": "unit_heavy_armor_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_heavy_armor_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_heavy_armor_icon_medium_white",
+        "GFX_unit_heavy_sp_anti_air_brigade_icon_medium_white",
+        "GFX_unit_heavy_sp_artillery_brigade_icon_medium_white",
+        "GFX_unit_heavy_tank_destroyer_brigade_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_heavy_armor_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_heavy_armor_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Heavy Armor",
+      "keywords": [
+        "heavy",
+        "armor",
+        "sp",
+        "anti",
+        "air",
+        "brigade",
+        "artillery",
+        "tank",
+        "destroyer"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_heavy_armor_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_heavy_armor_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-heavy-flamethrower-tank-icon-cd686299d4",
+      "canonicalKey": "unit_heavy_flamethrower_tank_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_heavy_flame_tank_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_heavy_flame_tank_icon_medium_white",
+        "GFX_unit_heavy_flamethrower_tank_icon_medium",
+        "GFX_unit_heavy_flamethrower_tank_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_heavy_flamethrower_tank_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_heavy_flamethrower_tank_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Heavy Flamethrower Tank",
+      "keywords": [
+        "heavy",
+        "flamethrower",
+        "tank",
+        "flame"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_heavy_flamethrower_tank_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_heavy_flamethrower_tank_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-helicopter-brigade-icon-7ecb136394",
+      "canonicalKey": "unit_helicopter_brigade_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_helicopter_support_companies",
+      "spriteAliases": [
+        "GFX_unit_helicopter_brigade_icon_medium"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_helicopter_brigade_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_helicopter_brigade_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Helicopter Brigade",
+      "keywords": [
+        "helicopter",
+        "brigade",
+        "category",
+        "support",
+        "companies"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_helicopter_brigade_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-helicopter-field-hospital-icon-aeb86cb5d2",
+      "canonicalKey": "unit_helicopter_field_hospital_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_helicopter_field_hospital_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_helicopter_field_hospital_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_helicopter_field_hospital_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_helicopter_field_hospital_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Helicopter Field Hospital",
+      "keywords": [
+        "helicopter",
+        "field",
+        "hospital"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_helicopter_field_hospital_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_helicopter_field_hospital_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-helicopter-recon-icon-ea6ab2f86a",
+      "canonicalKey": "unit_helicopter_recon_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_helicopter_recon_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_helicopter_recon_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_helicopter_recon_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_helicopter_recon_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Helicopter Recon",
+      "keywords": [
+        "helicopter",
+        "recon"
+      ],
+      "mappedPresetIds": [
+        "recon"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_helicopter_recon_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_helicopter_recon_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-helicopter-transport-icon-3caab9c8e4",
+      "canonicalKey": "unit_helicopter_transport_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_helicopter_transport_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_helicopter_transport_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_helicopter_transport_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_helicopter_transport_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "air",
+      "label": "Helicopter Transport",
+      "keywords": [
+        "helicopter",
+        "transport"
+      ],
+      "mappedPresetIds": [
+        "transport"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_helicopter_transport_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_helicopter_transport_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-infantry-icon-db92e78f18",
+      "canonicalKey": "unit_infantry_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_group_infantry_icon",
+      "spriteAliases": [
+        "GFX_unit_category_unknown",
+        "GFX_unit_infantry_icon_medium",
+        "GFX_unit_infantry_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_infantry_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_infantry_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Infantry",
+      "keywords": [
+        "line",
+        "rifle",
+        "ground",
+        "infantry",
+        "group",
+        "category",
+        "unknown"
+      ],
+      "mappedPresetIds": [
+        "inf"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_infantry_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_infantry_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-integralist-militia-icon-e827e6c073",
+      "canonicalKey": "unit_integralist_militia_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_integralist_militia_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_integralist_militia_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_integralist_militia_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Integralist Militia",
+      "keywords": [
+        "integralist",
+        "militia"
+      ],
+      "mappedPresetIds": [
+        "militia"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_integralist_militia_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-irregular-infantry-icon-af323b8905",
+      "canonicalKey": "unit_irregular_infantry_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_irregular_infantry_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_irregular_infantry_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_irregular_infantry_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_irregular_infantry_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Irregular Infantry",
+      "keywords": [
+        "irregular",
+        "infantry"
+      ],
+      "mappedPresetIds": [
+        "inf"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_irregular_infantry_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_irregular_infantry_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-jungle-pioneers-support-icon-4b716edb58",
+      "canonicalKey": "unit_jungle_pioneers_support_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_jungle_pioneers_support_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_jungle_pioneers_support_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_jungle_pioneers_support_icon_white.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_jungle_pioneers_support_icon_white.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Jungle Pioneers",
+      "keywords": [
+        "jungle",
+        "pioneers",
+        "support"
+      ],
+      "mappedPresetIds": [
+        "eng"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_jungle_pioneers_support_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-land-cruiser-icon-4edac05503",
+      "canonicalKey": "unit_land_cruiser_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_land_cruiser_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_land_cruiser_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_land_cruiser_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_land_cruiser_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Land Cruiser",
+      "keywords": [
+        "land",
+        "cruiser"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_land_cruiser_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_land_cruiser_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-light-amphibious-tank-icon-38d3529409",
+      "canonicalKey": "unit_light_amphibious_tank_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_amphibious_light_armor_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_amphibious_light_armor_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_light_amphibious_tank_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_light_amphibious_tank_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Light Amphibious Tank",
+      "keywords": [
+        "light",
+        "amphibious",
+        "tank",
+        "armor"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_light_amphibious_tank_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_light_amphibious_tank_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-light-flamethrower-tank-icon-4267c44b0f",
+      "canonicalKey": "unit_light_flamethrower_tank_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_light_flame_tank_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_light_flame_tank_icon_medium_white",
+        "GFX_unit_light_flamethrower_tank_icon_medium",
+        "GFX_unit_light_flamethrower_tank_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_light_flamethrower_tank_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_light_flamethrower_tank_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Light Flamethrower Tank",
+      "keywords": [
+        "light",
+        "flamethrower",
+        "tank",
+        "flame"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_light_flamethrower_tank_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_light_flamethrower_tank_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-light-tank-antiair-icon-32224e095f",
+      "canonicalKey": "unit_light_tank_antiair_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_self_propelled_anti_air",
+      "spriteAliases": [
+        "GFX_unit_light_sp_anti_air_brigade_icon_medium"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_light_tank_antiair_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_light_tank_antiair_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Light Tank Antiair",
+      "keywords": [
+        "light",
+        "tank",
+        "antiair",
+        "category",
+        "self",
+        "propelled",
+        "anti",
+        "air",
+        "sp",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_light_tank_antiair_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-light-tank-artillery-icon-ac7da02fe0",
+      "canonicalKey": "unit_light_tank_artillery_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_self_propelled_artillery",
+      "spriteAliases": [
+        "GFX_unit_light_sp_artillery_brigade_icon_medium"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_light_tank_artillery_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_light_tank_artillery_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Light Tank Artillery",
+      "keywords": [
+        "light",
+        "tank",
+        "artillery",
+        "category",
+        "self",
+        "propelled",
+        "sp",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_light_tank_artillery_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-light-tank-at-icon-19d0fdd9b0",
+      "canonicalKey": "unit_light_tank_at_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_tank_destroyers",
+      "spriteAliases": [
+        "GFX_unit_light_tank_destroyer_brigade_icon_medium"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_light_tank_at_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_light_tank_at_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Light Tank AT",
+      "keywords": [
+        "light",
+        "tank",
+        "at",
+        "category",
+        "destroyers",
+        "destroyer",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_light_tank_at_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-light-tank-icon-6f178a7344",
+      "canonicalKey": "unit_light_tank_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_light_armor_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_light_armor_icon_medium_white",
+        "GFX_unit_light_sp_anti_air_brigade_icon_medium_white",
+        "GFX_unit_light_sp_artillery_brigade_icon_medium_white",
+        "GFX_unit_light_tank_destroyer_brigade_icon_medium_white",
+        "GFX_unit_light_tank_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_light_tank_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_light_tank_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Light Armor",
+      "keywords": [
+        "light",
+        "tank",
+        "armor",
+        "sp",
+        "anti",
+        "air",
+        "brigade",
+        "artillery",
+        "destroyer"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_light_tank_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_light_tank_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-long-range-patrol-support-icon-98cef62b05",
+      "canonicalKey": "unit_long_range_patrol_support_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_long_range_patrol_support_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_long_range_patrol_support_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_long_range_patrol_support_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_long_range_patrol_support_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Long Range Patrol",
+      "keywords": [
+        "long",
+        "range",
+        "patrol",
+        "support"
+      ],
+      "mappedPresetIds": [
+        "log"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_long_range_patrol_support_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_long_range_patrol_support_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-marine-commando-icon-7f7ac55ee3",
+      "canonicalKey": "unit_marine_commando_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_marine_commando_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_marine_commando_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_marine_commando_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Marine Commando",
+      "keywords": [
+        "marine",
+        "commando"
+      ],
+      "mappedPresetIds": [
+        "marine"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_marine_commando_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-marine-icon-0978a286b1",
+      "canonicalKey": "unit_marine_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_category_marines",
+      "spriteAliases": [
+        "GFX_unit_integralist_militia_icon_medium_white",
+        "GFX_unit_marine_commando_icon_medium_white",
+        "GFX_unit_marine_icon_medium",
+        "GFX_unit_marine_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_marine_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_marine_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Marine",
+      "keywords": [
+        "amphibious",
+        "naval infantry",
+        "special forces",
+        "marine",
+        "category",
+        "marines",
+        "integralist",
+        "militia",
+        "commando"
+      ],
+      "mappedPresetIds": [
+        "marine"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_marine_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_marine_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-mechanized-icon-473335235d",
+      "canonicalKey": "unit_mechanized_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_mechanized_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_mechanized_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_mechanized_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_mechanized_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Mechanized",
+      "keywords": [
+        "apc",
+        "ifv",
+        "ground",
+        "mechanized"
+      ],
+      "mappedPresetIds": [
+        "mech"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_mechanized_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_mechanized_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-medium-amphibious-tank-icon-09f0afd39f",
+      "canonicalKey": "unit_medium_amphibious_tank_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_amphibious_medium_armor_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_amphibious_medium_armor_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_medium_amphibious_tank_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_medium_amphibious_tank_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Medium Amphibious Tank",
+      "keywords": [
+        "amphibious",
+        "tank",
+        "armor"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_medium_amphibious_tank_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_medium_amphibious_tank_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-medium-flamethrower-tank-icon-76c83ed29f",
+      "canonicalKey": "unit_medium_flamethrower_tank_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_medium_flame_tank_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_medium_flame_tank_icon_medium_white",
+        "GFX_unit_medium_flamethrower_tank_icon_medium",
+        "GFX_unit_medium_flamethrower_tank_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_medium_flamethrower_tank_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_medium_flamethrower_tank_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Medium Flamethrower Tank",
+      "keywords": [
+        "flamethrower",
+        "tank",
+        "flame"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_medium_flamethrower_tank_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_medium_flamethrower_tank_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-medium-tank-antiair-icon-382f62964e",
+      "canonicalKey": "unit_medium_tank_antiair_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_medium_sp_anti_air_brigade_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_medium_tank_antiair_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_medium_tank_antiair_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Medium Tank Antiair",
+      "keywords": [
+        "tank",
+        "antiair",
+        "sp",
+        "anti",
+        "air",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_medium_tank_antiair_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-medium-tank-artillery-icon-e1119def2a",
+      "canonicalKey": "unit_medium_tank_artillery_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_group_armor_combat_support_icon",
+      "spriteAliases": [
+        "GFX_unit_medium_sp_artillery_brigade_icon_medium"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_medium_tank_artillery_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_medium_tank_artillery_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Medium Tank Artillery",
+      "keywords": [
+        "tank",
+        "artillery",
+        "group",
+        "armor",
+        "combat",
+        "support",
+        "sp",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_medium_tank_artillery_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-medium-tank-at-icon-6c83fe789c",
+      "canonicalKey": "unit_medium_tank_at_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_medium_tank_destroyer_brigade_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_medium_tank_at_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_medium_tank_at_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Medium Tank AT",
+      "keywords": [
+        "tank",
+        "at",
+        "destroyer",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_medium_tank_at_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-medium-tank-icon-e6bddf9ab3",
+      "canonicalKey": "unit_medium_tank_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_group_armor_icon",
+      "spriteAliases": [
+        "GFX_unit_medium_armor_icon_medium",
+        "GFX_unit_medium_armor_icon_medium_white",
+        "GFX_unit_medium_sp_anti_air_brigade_icon_medium_white",
+        "GFX_unit_medium_sp_artillery_brigade_icon_medium_white",
+        "GFX_unit_medium_tank_destroyer_brigade_icon_medium_white",
+        "GFX_unit_medium_tank_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_medium_tank_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_medium_tank_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Medium Armor",
+      "keywords": [
+        "armor",
+        "tank",
+        "ground",
+        "group",
+        "sp",
+        "anti",
+        "air",
+        "brigade",
+        "artillery",
+        "destroyer"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_medium_tank_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_medium_tank_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-militia-icon-b3a13a2fd4",
+      "canonicalKey": "unit_militia_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_militia_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_militia_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_militia_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_militia_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Militia",
+      "keywords": [
+        "irregular",
+        "levy",
+        "ground",
+        "militia"
+      ],
+      "mappedPresetIds": [
+        "militia"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_militia_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_militia_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-modern-armor-antiair-icon-0f06f3a5cc",
+      "canonicalKey": "unit_modern_armor_antiair_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_modern_sp_anti_air_brigade_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_modern_armor_antiair_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_modern_armor_antiair_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Modern Armor Antiair",
+      "keywords": [
+        "modern",
+        "armor",
+        "antiair",
+        "sp",
+        "anti",
+        "air",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_modern_armor_antiair_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-modern-armor-artillery-icon-0343680920",
+      "canonicalKey": "unit_modern_armor_artillery_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_modern_sp_artillery_brigade_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_modern_armor_artillery_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_modern_armor_artillery_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Modern Armor Artillery",
+      "keywords": [
+        "modern",
+        "armor",
+        "artillery",
+        "sp",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_modern_armor_artillery_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-modern-armor-at-icon-d0a085359a",
+      "canonicalKey": "unit_modern_armor_at_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_modern_tank_destroyer_brigade_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_modern_armor_at_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_modern_armor_at_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Modern Armor AT",
+      "keywords": [
+        "modern",
+        "armor",
+        "at",
+        "tank",
+        "destroyer",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_modern_armor_at_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-modern-armor-icon-803d3ad0bd",
+      "canonicalKey": "unit_modern_armor_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_modern_armor_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_modern_armor_icon_medium_white",
+        "GFX_unit_modern_sp_anti_air_brigade_icon_medium_white",
+        "GFX_unit_modern_sp_artillery_brigade_icon_medium_white",
+        "GFX_unit_modern_tank_destroyer_brigade_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_modern_armor_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_modern_armor_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Modern Armor",
+      "keywords": [
+        "modern",
+        "armor",
+        "sp",
+        "anti",
+        "air",
+        "brigade",
+        "artillery",
+        "tank",
+        "destroyer"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_modern_armor_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_modern_armor_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-mot-anti-air-icon-8a0d069eec",
+      "canonicalKey": "unit_mot_anti_air_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_mot_anti_air_brigade_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_mot_anti_air_brigade_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_mot_anti_air_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_mot_anti_air_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Motorized Anti-Air",
+      "keywords": [
+        "mot",
+        "anti",
+        "air",
+        "motorized",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "mot"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_mot_anti_air_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_mot_anti_air_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-mot-art-icon-a036952e51",
+      "canonicalKey": "unit_mot_art_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_group_mobile_combat_support_icon",
+      "spriteAliases": [
+        "GFX_unit_category_mobile_and_mobile_combat_sup",
+        "GFX_unit_mot_artillery_brigade_icon_medium",
+        "GFX_unit_mot_artillery_brigade_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_mot_art_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_mot_art_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Motorized Artillery",
+      "keywords": [
+        "mot",
+        "art",
+        "motorized",
+        "artillery",
+        "group",
+        "mobile",
+        "combat",
+        "support",
+        "category",
+        "and",
+        "sup",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "mot"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_mot_art_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_mot_art_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-mot-at-icon-f92e2ea220",
+      "canonicalKey": "unit_mot_at_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_category_mobile_anti_tank",
+      "spriteAliases": [
+        "GFX_unit_mot_anti_tank_brigade_icon_medium",
+        "GFX_unit_mot_anti_tank_brigade_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_mot_at_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_mot_at_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Motorized Anti-Tank",
+      "keywords": [
+        "mot",
+        "at",
+        "motorized",
+        "anti",
+        "tank",
+        "category",
+        "mobile",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "mot"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_mot_at_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_mot_at_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-mot-rocket-art-icon-9a8d060f8b",
+      "canonicalKey": "unit_mot_rocket_art_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_mot_rocket_artillery_brigade_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_mot_rocket_art_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_mot_rocket_art_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Motorized Rocket Art",
+      "keywords": [
+        "mot",
+        "rocket",
+        "art",
+        "motorized",
+        "artillery",
+        "brigade"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_mot_rocket_art_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-mot-rocket-artillery-icon-7de6706a30",
+      "canonicalKey": "unit_mot_rocket_artillery_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_mot_rocket_artillery_brigade_icon_medium_white",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_mot_rocket_artillery_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_mot_rocket_artillery_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Motorized Rocket Artillery",
+      "keywords": [
+        "mot",
+        "rocket",
+        "artillery",
+        "motorized",
+        "brigade"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_mot_rocket_artillery_icon.png",
+        "large": null,
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-mothership-icon-04ef7e1a24",
+      "canonicalKey": "unit_mothership_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_mothership_icon_medium",
+      "spriteAliases": [],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_mothership_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_mothership_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Mothericon",
+      "keywords": [
+        "mothership",
+        "mothericon"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_mothership_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-motorized-icon-68deb66ae5",
+      "canonicalKey": "unit_motorized_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_group_mobile_icon",
+      "spriteAliases": [
+        "GFX_unit_bus_icon_medium",
+        "GFX_unit_bus_icon_medium_white",
+        "GFX_unit_category_vehicle_infantry",
+        "GFX_unit_motorized_icon_medium",
+        "GFX_unit_motorized_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_motorized_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_motorized_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Motorized",
+      "keywords": [
+        "truck",
+        "mobile",
+        "ground",
+        "motorized",
+        "group",
+        "bus",
+        "category",
+        "vehicle",
+        "infantry"
+      ],
+      "mappedPresetIds": [
+        "mot"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_motorized_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_motorized_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-motorized-military-police-icon-fd1f2ff633",
+      "canonicalKey": "unit_motorized_military_police_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_motorized_military_police_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_motorized_military_police_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_motorized_military_police_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_motorized_military_police_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Motorized Military Police",
+      "keywords": [
+        "motorized",
+        "military",
+        "police"
+      ],
+      "mappedPresetIds": [
+        "mot"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_motorized_military_police_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_motorized_military_police_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-motorized-rocket-brigade-icon-66079a6d5f",
+      "canonicalKey": "unit_motorized_rocket_brigade_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_motorized_rocket_brigade_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_motorized_rocket_brigade_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_motorized_rocket_brigade_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_motorized_rocket_brigade_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Motorized Rocket Brigade",
+      "keywords": [
+        "motorized",
+        "rocket",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "mot"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_motorized_rocket_brigade_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_motorized_rocket_brigade_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-mountain-icon-8349607017",
+      "canonicalKey": "unit_mountain_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_category_mountaineers",
+      "spriteAliases": [
+        "GFX_unit_mountaineers_icon_medium",
+        "GFX_unit_mountaineers_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_mountain_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_mountain_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Mountain",
+      "keywords": [
+        "alpine",
+        "terrain",
+        "special forces",
+        "mountain",
+        "category",
+        "mountaineers"
+      ],
+      "mappedPresetIds": [
+        "mountain"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_mountain_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_mountain_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-mountain-ski-icon-ef984f2c11",
+      "canonicalKey": "unit_mountain_ski_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_mountaineers_ski_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_mountaineers_ski_icon_medium_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_mountain_ski_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_mountain_ski_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Mountain Ski",
+      "keywords": [
+        "mountain",
+        "ski",
+        "mountaineers"
+      ],
+      "mappedPresetIds": [
+        "mountain"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_mountain_ski_icon.png",
+        "large": null,
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-paratroop-icon-c143dc7ab2",
+      "canonicalKey": "unit_paratroop_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_category_paratroopers",
+      "spriteAliases": [
+        "GFX_unit_paratrooper_icon_medium",
+        "GFX_unit_paratrooper_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_paratroop_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_paratroop_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Paratrooper",
+      "keywords": [
+        "airborne",
+        "parachute",
+        "special forces",
+        "paratroop",
+        "paratrooper",
+        "category",
+        "paratroopers"
+      ],
+      "mappedPresetIds": [
+        "airborne"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_paratroop_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_paratroop_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-penal-infantry-icon-c149697404",
+      "canonicalKey": "unit_penal_infantry_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_penal_battalion_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_penal_battalion_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_penal_infantry_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_penal_infantry_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Penal Infantry",
+      "keywords": [
+        "penal",
+        "infantry",
+        "battalion"
+      ],
+      "mappedPresetIds": [
+        "inf"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_penal_infantry_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_penal_infantry_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-railway-gun-icon-44d8c2d3e0",
+      "canonicalKey": "unit_railway_gun_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_railway_gun_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_railway_gun_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_railway_gun_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_railway_gun_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Railway Gun",
+      "keywords": [
+        "railway",
+        "gun"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_railway_gun_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_railway_gun_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-ranger-battalion-icon-692be5051a",
+      "canonicalKey": "unit_ranger_battalion_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_category_rangers",
+      "spriteAliases": [
+        "GFX_unit_ranger_battalion_icon_medium",
+        "GFX_unit_ranger_battalion_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_ranger_battalion_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_ranger_battalion_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Ranger Battalion",
+      "keywords": [
+        "ranger",
+        "battalion",
+        "category",
+        "rangers"
+      ],
+      "mappedPresetIds": [
+        "mountain"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_ranger_battalion_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_ranger_battalion_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-recon-icon-0bbbda755e",
+      "canonicalKey": "unit_recon_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_recon_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_recon_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_recon_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_recon_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Recon",
+      "keywords": [
+        "scout",
+        "screen",
+        "support",
+        "recon"
+      ],
+      "mappedPresetIds": [
+        "recon"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_recon_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_recon_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-rocket-art-icon-e62e8ece30",
+      "canonicalKey": "unit_rocket_art_icon",
+      "kind": "division_large",
+      "spriteName": "GFX_unit_category_rocket_artillery",
+      "spriteAliases": [
+        "GFX_unit_rocket_artillery_brigade_icon_medium"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_large\\unit_rocket_art_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_large/unit_rocket_art_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Rocket Art",
+      "keywords": [
+        "rocket",
+        "art",
+        "category",
+        "artillery",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "art"
+      ],
+      "variants": {
+        "small": null,
+        "large": "data/unit_counter_libraries/hoi4/large/unit_rocket_art_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-rocket-artillery-icon-f5b8d6a3d3",
+      "canonicalKey": "unit_rocket_artillery_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_rocket_artillery_brigade_icon_medium_white",
+      "spriteAliases": [
+        "GFX_unit_rocket_artillery_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_rocket_artillery_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_rocket_artillery_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Rocket Artillery",
+      "keywords": [
+        "rocket",
+        "artillery",
+        "brigade"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_rocket_artillery_icon.png",
+        "large": null,
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-self-propelled-super-heavy-artillery-icon-8e01312c96",
+      "canonicalKey": "unit_self_propelled_super_heavy_artillery_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_self_propelled_super_heavy_artillery_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_self_propelled_super_heavy_artillery_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_self_propelled_super_heavy_artillery_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_self_propelled_super_heavy_artillery_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Self Propelled Super Heavy Artillery",
+      "keywords": [
+        "self",
+        "propelled",
+        "super",
+        "heavy",
+        "artillery"
+      ],
+      "mappedPresetIds": [
+        "art"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_self_propelled_super_heavy_artillery_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_self_propelled_super_heavy_artillery_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-sturmtruppe-battalion-icon-dc0bfe8b28",
+      "canonicalKey": "unit_sturmtruppe_battalion_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_sturmtruppe_battalion_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_sturmtruppe_battalion_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_sturmtruppe_battalion_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_sturmtruppe_battalion_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Sturmtruppe Battalion",
+      "keywords": [
+        "sturmtruppe",
+        "battalion"
+      ],
+      "mappedPresetIds": [
+        "inf"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_sturmtruppe_battalion_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_sturmtruppe_battalion_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-super-heavy-armor-antiair-icon-29896c083f",
+      "canonicalKey": "unit_super_heavy_armor_antiair_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_super_heavy_armor_antiair_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_super_heavy_armor_antiair_icon_medium_white",
+        "GFX_unit_super_heavy_sp_anti_air_brigade_icon_medium"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_super_heavy_armor_antiair_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_super_heavy_armor_antiair_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Super Heavy Armor Antiair",
+      "keywords": [
+        "super",
+        "heavy",
+        "armor",
+        "antiair",
+        "sp",
+        "anti",
+        "air",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_super_heavy_armor_antiair_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_super_heavy_armor_antiair_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-super-heavy-armor-artillery-icon-0b87df0feb",
+      "canonicalKey": "unit_super_heavy_armor_artillery_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_super_heavy_armor_artillery_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_super_heavy_armor_artillery_icon_medium_white",
+        "GFX_unit_super_heavy_sp_artillery_brigade_icon_medium"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_super_heavy_armor_artillery_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_super_heavy_armor_artillery_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Super Heavy Armor Artillery",
+      "keywords": [
+        "super",
+        "heavy",
+        "armor",
+        "artillery",
+        "sp",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_super_heavy_armor_artillery_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_super_heavy_armor_artillery_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-super-heavy-armor-at-icon-3be9396918",
+      "canonicalKey": "unit_super_heavy_armor_at_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_super_heavy_armor_at_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_super_heavy_armor_at_icon_medium_white",
+        "GFX_unit_super_heavy_tank_destroyer_brigade_icon_medium"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_super_heavy_armor_at_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_super_heavy_armor_at_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Super Heavy Armor AT",
+      "keywords": [
+        "super",
+        "heavy",
+        "armor",
+        "at",
+        "tank",
+        "destroyer",
+        "brigade"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_super_heavy_armor_at_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_super_heavy_armor_at_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-super-heavy-armor-icon-7e7da27c05",
+      "canonicalKey": "unit_super_heavy_armor_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_super_heavy_armor_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_super_heavy_armor_icon_medium_white",
+        "GFX_unit_super_heavy_sp_anti_air_brigade_icon_medium_white",
+        "GFX_unit_super_heavy_sp_artillery_brigade_icon_medium_white",
+        "GFX_unit_super_heavy_tank_destroyer_brigade_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_super_heavy_armor_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_super_heavy_armor_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Super Heavy Armor",
+      "keywords": [
+        "super",
+        "heavy",
+        "armor",
+        "sp",
+        "anti",
+        "air",
+        "brigade",
+        "artillery",
+        "tank",
+        "destroyer"
+      ],
+      "mappedPresetIds": [
+        "arm"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_super_heavy_armor_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_super_heavy_armor_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-super-heavy-artillery-icon-7c2dab47f7",
+      "canonicalKey": "unit_super_heavy_artillery_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_super_heavy_artillery_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_super_heavy_artillery_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_super_heavy_artillery_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_super_heavy_artillery_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Super Heavy Artillery",
+      "keywords": [
+        "super",
+        "heavy",
+        "artillery"
+      ],
+      "mappedPresetIds": [
+        "art"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_super_heavy_artillery_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_super_heavy_artillery_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-super-heavy-railway-gun-unit-icon-008f7e7b04",
+      "canonicalKey": "unit_super_heavy_railway_gun_unit_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_super_heavy_railway_gun_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_super_heavy_railway_gun_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_super_heavy_railway_gun_unit_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_super_heavy_railway_gun_unit_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Super Heavy Railway Gun",
+      "keywords": [
+        "super",
+        "heavy",
+        "railway",
+        "gun"
+      ],
+      "mappedPresetIds": [],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_super_heavy_railway_gun_unit_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_super_heavy_railway_gun_unit_icon.png",
+        "ship": null
+      }
+    },
+    {
+      "id": "hoi4-unit-winter-logistics-support-icon-ee7cdb71da",
+      "canonicalKey": "unit_winter_logistics_support_icon",
+      "kind": "division_small",
+      "spriteName": "GFX_unit_winter_logistics_support_icon_medium",
+      "spriteAliases": [
+        "GFX_unit_winter_logistics_support_icon_medium_white"
+      ],
+      "sourceGamePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\gfx\\interface\\counters\\divisions_small\\onmap_unit_winter_logistics_support_icon.dds",
+      "sourceTextureFile": "gfx/interface/counters/divisions_small/onmap_unit_winter_logistics_support_icon.dds",
+      "sourceScope": "vanilla",
+      "domain": "ground",
+      "label": "Winter Logistics",
+      "keywords": [
+        "winter",
+        "logistics",
+        "support"
+      ],
+      "mappedPresetIds": [
+        "log"
+      ],
+      "variants": {
+        "small": "data/unit_counter_libraries/hoi4/small/onmap_unit_winter_logistics_support_icon.png",
+        "large": "data/unit_counter_libraries/hoi4/large/unit_winter_logistics_support_icon.png",
+        "ship": null
+      }
+    }
+  ],
+  "skipped": [],
+  "errors": [
+    {
+      "kind": "division_small",
+      "textureFile": "gfx/interface/counters/divisions_small/onmap_unit_jungle_pioneers_support_icon_white.dds",
+      "reason": "missing_source"
+    },
+    {
+      "kind": "division_large",
+      "textureFile": "gfx/interface/counters/divisions_large/unit_mountain_ski_icon.dds",
+      "reason": "missing_source"
+    }
+  ]
+}

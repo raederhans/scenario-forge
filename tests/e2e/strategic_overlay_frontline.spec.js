@@ -176,6 +176,21 @@ test("strategic frontline overlay reacts to controller changes", async ({ page }
   await expect(page.locator("#accordionLines .strategic-accordion-header")).toHaveAttribute("aria-expanded", "true");
   await expect(page.locator("#accordionGraphics .strategic-accordion-header")).toHaveAttribute("aria-expanded", "true");
   await expect(page.locator("#accordionCounters .strategic-accordion-header")).toHaveAttribute("aria-expanded", "true");
+  const accordionHeaderColors = await page.evaluate(() => {
+    const readColor = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return "";
+      return globalThis.getComputedStyle(element).color;
+    };
+    return {
+      linesHeader: readColor("#accordionLines .strategic-accordion-header"),
+      linesArrow: readColor("#accordionLines .strategic-accordion-arrow"),
+      graphicsHeader: readColor("#accordionGraphics .strategic-accordion-header"),
+    };
+  });
+  expect(accordionHeaderColors.linesHeader).not.toBe("rgb(241, 245, 249)");
+  expect(accordionHeaderColors.linesArrow).not.toBe("rgb(241, 245, 249)");
+  expect(accordionHeaderColors.graphicsHeader).not.toBe("rgb(241, 245, 249)");
   const expandedPreviewBox = await page.locator("#unitCounterPreviewCard").boundingBox();
   expect(expandedPreviewBox?.width || 0).toBeGreaterThan(60);
   expect(expandedPreviewBox?.width || 0).toBeLessThan(420);

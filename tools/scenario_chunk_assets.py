@@ -8,6 +8,8 @@ import re
 from typing import Any
 
 from map_builder.io.writers import write_json_atomic
+from shapely.geometry import shape
+from shapely.validation import explain_validity
 from topojson.utils import serialize_as_geojson
 
 DEFAULT_RENDER_BUDGET_HINTS = {
@@ -196,6 +198,139 @@ def _slice_feature_collection(feature_collection: dict[str, Any], selected_featu
     }
 
 
+def _collect_feature_ids(feature_collection: dict[str, Any] | None) -> set[str]:
+    if not isinstance(feature_collection, dict) or not isinstance(feature_collection.get("features"), list):
+        return set()
+    return {
+        str(((feature.get("properties") or {}).get("id") if isinstance(feature, dict) else None) or _feature_id(feature, index)).strip()
+        for index, feature in enumerate(feature_collection.get("features") or [])
+        if str(((feature.get("properties") or {}).get("id") if isinstance(feature, dict) else None) or _feature_id(feature, index)).strip()
+    }
+
+
+def _collect_invalid_feature_geometries(
+    feature_collection: dict[str, Any] | None,
+    *,
+    feature_ids: set[str] | None = None,
+) -> list[str]:
+    if not isinstance(feature_collection, dict) or not isinstance(feature_collection.get("features"), list):
+        return []
+    failures: list[str] = []
+    for index, feature in enumerate(feature_collection.get("features") or []):
+        if not isinstance(feature, dict):
+            continue
+        feature_id = _feature_id(feature, index)
+        if feature_ids is not None and feature_id not in feature_ids:
+            continue
+        geometry_payload = feature.get("geometry")
+        if not geometry_payload:
+            failures.append(f"{feature_id}: empty geometry")
+            continue
+        geom = shape(geometry_payload)
+        if geom.is_empty:
+            failures.append(f"{feature_id}: empty geometry")
+            continue
+        if not geom.is_valid:
+            failures.append(f"{feature_id}: {explain_validity(geom)}")
+    return failures
+
+
+def _collect_chunk_feature_ids(
+    *,
+    scenario_dir: Path,
+    layer_key: str,
+    chunks: list[dict[str, Any]],
+) -> set[str]:
+    feature_ids: set[str] = set()
+    for chunk in chunks:
+        if str(chunk.get("layer") or "").strip() != layer_key:
+            continue
+        raw_url = _normalize_relative_url(chunk.get("url"))
+        if not raw_url:
+            continue
+        chunk_path = scenario_dir / "chunks" / Path(raw_url).name
+        if not chunk_path.exists():
+            raise FileNotFoundError(f"Expected chunk payload missing during validation: {chunk_path}")
+        payload = json.loads(chunk_path.read_text(encoding="utf-8"))
+        feature_collection = _layer_payload_to_feature_collection(layer_key, payload)
+        if feature_collection is None:
+            raise ValueError(f"Chunk payload for layer '{layer_key}' is not a feature collection: {chunk_path}")
+        feature_ids.update(_collect_feature_ids(feature_collection))
+    return feature_ids
+
+
+def _validate_water_chunk_consistency(
+    *,
+    scenario_dir: Path,
+    layer_payloads: dict[str, dict[str, Any] | None] | None,
+    runtime_topology_payload: dict[str, Any] | None,
+    all_chunks: list[dict[str, Any]],
+    validation_feature_ids: set[str] | None = None,
+) -> None:
+    water_layer_payload = (layer_payloads or {}).get("water")
+    runtime_water_feature_collection = _topology_object_to_feature_collection(runtime_topology_payload, "scenario_water")
+    water_chunk_entries = [chunk for chunk in all_chunks if str(chunk.get("layer") or "").strip() == "water"]
+
+    if water_layer_payload is None and runtime_water_feature_collection is None and not water_chunk_entries:
+        return
+
+    if water_layer_payload is None:
+        raise ValueError("Water chunk validation requires layer_payloads['water'].")
+    if runtime_water_feature_collection is None:
+        raise ValueError("Water chunk validation requires runtime_topology_payload.objects['scenario_water'].")
+    if not water_chunk_entries:
+        raise ValueError("Water chunk validation requires at least one generated water chunk.")
+
+    source_water_feature_collection = _layer_payload_to_feature_collection("water", water_layer_payload)
+    if source_water_feature_collection is None:
+        raise ValueError("Water chunk validation could not read a feature collection from layer_payloads['water'].")
+
+    source_water_ids = _collect_feature_ids(source_water_feature_collection)
+    runtime_water_ids = _collect_feature_ids(runtime_water_feature_collection)
+    chunk_water_ids = _collect_chunk_feature_ids(
+        scenario_dir=scenario_dir,
+        layer_key="water",
+        chunks=water_chunk_entries,
+    )
+    if source_water_ids != runtime_water_ids or source_water_ids != chunk_water_ids:
+        raise ValueError(
+            "Water region IDs drifted across publish artifacts: "
+            f"source={len(source_water_ids)} runtime={len(runtime_water_ids)} chunks={len(chunk_water_ids)} "
+            f"missing_in_runtime={sorted(source_water_ids - runtime_water_ids)} "
+            f"missing_in_chunks={sorted(source_water_ids - chunk_water_ids)} "
+            f"extra_in_runtime={sorted(runtime_water_ids - source_water_ids)} "
+            f"extra_in_chunks={sorted(chunk_water_ids - source_water_ids)}"
+        )
+    source_invalid = _collect_invalid_feature_geometries(
+        source_water_feature_collection,
+        feature_ids=validation_feature_ids,
+    )
+    runtime_invalid = _collect_invalid_feature_geometries(
+        runtime_water_feature_collection,
+        feature_ids=validation_feature_ids,
+    )
+    chunk_invalid: list[str] = []
+    for chunk in water_chunk_entries:
+        raw_url = _normalize_relative_url(chunk.get("url"))
+        if not raw_url:
+            continue
+        chunk_path = scenario_dir / "chunks" / Path(raw_url).name
+        payload = json.loads(chunk_path.read_text(encoding="utf-8"))
+        feature_collection = _layer_payload_to_feature_collection("water", payload)
+        chunk_failures = _collect_invalid_feature_geometries(
+            feature_collection,
+            feature_ids=validation_feature_ids,
+        )
+        chunk_invalid.extend(f"{Path(raw_url).name}:{failure}" for failure in chunk_failures)
+    if source_invalid or runtime_invalid or chunk_invalid:
+        raise ValueError(
+            "Water geometry validation failed across publish artifacts: "
+            f"source_invalid={source_invalid[:12]} "
+            f"runtime_invalid={runtime_invalid[:12]} "
+            f"chunk_invalid={chunk_invalid[:12]}"
+        )
+
+
 def _build_chunk_payloads_for_feature_collection(
     *,
     scenario_id: str,
@@ -375,6 +510,7 @@ def build_and_write_scenario_chunk_assets(
     runtime_topology_url: str = "",
     generated_at: str = "",
     default_startup_topology_url: str = "",
+    water_validation_feature_ids: set[str] | None = None,
 ) -> dict[str, Any]:
     scenario_dir = scenario_dir.resolve()
     scenario_id = str(manifest_payload.get("scenario_id") or scenario_dir.name).strip()
@@ -450,6 +586,14 @@ def build_and_write_scenario_chunk_assets(
     _write_json(context_lod_manifest_path, context_lod_manifest)
     _write_json(runtime_meta_path, runtime_meta_payload)
     _write_json(mesh_pack_path, mesh_pack_payload)
+
+    _validate_water_chunk_consistency(
+        scenario_dir=scenario_dir,
+        layer_payloads=layer_payloads,
+        runtime_topology_payload=runtime_topology_payload,
+        all_chunks=all_chunks,
+        validation_feature_ids=water_validation_feature_ids,
+    )
 
     manifest_payload["startup_topology_url"] = startup_topology_url
     manifest_payload["detail_chunk_manifest_url"] = f"data/scenarios/{scenario_id}/detail_chunks.manifest.json"

@@ -1872,7 +1872,8 @@ details.card[open] > summary::after {
 }
 
 .strategic-accordion-section.is-open > .strategic-accordion-header {
-  color: var(--ink-primary, #f1f5f9);
+  color: var(--ink-secondary, #64748b);
+  background: rgba(59, 130, 246, 0.05);
   border-left: 3px solid var(--accent, #3b82f6);
 }
 
@@ -2869,10 +2870,61 @@ body.counter-editor-modal-open {
   width: 100%;
 }
 
+.counter-editor-source-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.counter-editor-source-btn {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 999px;
+  background: rgba(248, 245, 236, 0.92);
+  color: #324154;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.counter-editor-source-btn.is-active {
+  border-color: rgba(127, 29, 29, 0.28);
+  background: linear-gradient(180deg, rgba(97, 28, 23, 0.96), rgba(64, 24, 21, 0.96));
+  color: #f6efe2;
+}
+
 .counter-editor-category-row {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.counter-editor-category-row.hidden {
+  display: none;
+}
+
+.counter-editor-library-review-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.counter-editor-library-review-summary {
+  min-width: 0;
+  font-size: 0.68rem;
+  color: #485569;
+  line-height: 1.45;
+}
+
+.counter-editor-library-export-btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .counter-editor-category-btn {
@@ -2958,6 +3010,117 @@ body.counter-editor-modal-open {
   color: #5a6777;
   letter-spacing: 0.03em;
   text-transform: uppercase;
+}
+
+.counter-editor-hoi4-card {
+  min-height: 196px;
+  content-visibility: auto;
+  contain-intrinsic-size: 220px;
+}
+
+.counter-editor-hoi4-card.is-candidate {
+  border-color: rgba(127, 29, 29, 0.26);
+  box-shadow: 0 12px 24px rgba(127, 29, 29, 0.12);
+}
+
+.counter-editor-hoi4-preview {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  min-height: 72px;
+  padding: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.counter-editor-hoi4-preview.is-single {
+  min-height: 88px;
+}
+
+.counter-editor-hoi4-preview img {
+  max-width: 100%;
+  max-height: 38px;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+.counter-editor-hoi4-preview-missing {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #7a4d47;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.counter-editor-hoi4-preview-label {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #5a6777;
+  text-transform: uppercase;
+}
+
+.counter-editor-hoi4-meta {
+  min-width: 0;
+  font-size: 0.63rem;
+  color: #4b596b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.counter-editor-hoi4-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.counter-editor-hoi4-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(97, 28, 23, 0.08);
+  color: #6d2c22;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.counter-editor-hoi4-tag.is-candidate {
+  background: rgba(127, 29, 29, 0.16);
+  color: #5f1813;
+}
+
+.counter-editor-hoi4-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: auto;
+}
+
+.counter-editor-hoi4-action-btn {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #324154;
+  font-size: 0.64rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.counter-editor-hoi4-action-btn.is-active {
+  border-color: rgba(127, 29, 29, 0.24);
+  background: rgba(127, 29, 29, 0.1);
+  color: #6d2c22;
 }
 
 .counter-editor-symbol-empty {

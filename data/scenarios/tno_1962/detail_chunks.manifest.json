@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "tno_1962",
-  "generated_at": "2026-03-22T23:59:29Z",
+  "generated_at": "2026-03-27T19:16:05Z",
   "chunks": [
     {
       "id": "political.coarse.r0c0",
@@ -5339,7 +5339,7 @@
         90.0
       ],
       "priority": 1,
-      "feature_count": 21,
+      "feature_count": 71,
       "data_format": "geojson",
       "global_coverage": true,
       "country_codes": []
@@ -5358,7 +5358,7 @@
         0.0
       ],
       "priority": 2,
-      "feature_count": 2,
+      "feature_count": 6,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": []
@@ -5377,7 +5377,7 @@
         0.0
       ],
       "priority": 2,
-      "feature_count": 5,
+      "feature_count": 14,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": []
@@ -5396,7 +5396,7 @@
         0.0
       ],
       "priority": 2,
-      "feature_count": 5,
+      "feature_count": 15,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": []
@@ -5415,7 +5415,7 @@
         0.0
       ],
       "priority": 2,
-      "feature_count": 3,
+      "feature_count": 11,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": []
@@ -5434,7 +5434,7 @@
         90.0
       ],
       "priority": 2,
-      "feature_count": 2,
+      "feature_count": 9,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": []
@@ -5453,7 +5453,7 @@
         90.0
       ],
       "priority": 2,
-      "feature_count": 9,
+      "feature_count": 24,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": []
@@ -5472,7 +5472,7 @@
         90.0
       ],
       "priority": 2,
-      "feature_count": 12,
+      "feature_count": 29,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": []
@@ -5491,7 +5491,7 @@
         90.0
       ],
       "priority": 2,
-      "feature_count": 3,
+      "feature_count": 15,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": []

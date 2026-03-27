@@ -2553,9 +2553,9 @@ function hydrateActiveScenarioBundle(
       || null;
     state.scenarioWaterRegionsData =
       bundle.chunkMergedLayerPayloads?.water
+      || bundle.waterRegionsPayload
       || getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData")
       || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water")
-      || bundle.waterRegionsPayload
       || state.scenarioWaterRegionsData
       || null;
     state.scenarioSpecialRegionsData =
@@ -3692,6 +3692,7 @@ async function prepareScenarioApplyState(
   const chunkMergedLayerPayloads = bundle.chunkMergedLayerPayloads || {};
   const scenarioWaterRegionsFromTopology =
     chunkMergedLayerPayloads.water
+    || bundle.waterRegionsPayload
     || getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData")
     || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water");
   const scenarioSpecialRegionsFromTopology =
@@ -3808,7 +3809,7 @@ async function applyScenarioBundle(
     state.runtimePoliticalFeatureCollectionSeed = getScenarioDecodedCollection(bundle, "politicalData") || null;
     state.scenarioLandMaskData = staged.scenarioLandMaskFromTopology || null;
     state.scenarioContextLandMaskData = staged.scenarioContextLandMaskFromTopology || null;
-    state.scenarioWaterRegionsData = staged.scenarioWaterRegionsFromTopology || bundle.waterRegionsPayload || null;
+    state.scenarioWaterRegionsData = bundle.waterRegionsPayload || staged.scenarioWaterRegionsFromTopology || null;
     state.scenarioSpecialRegionsData = staged.scenarioSpecialRegionsFromTopology || bundle.specialRegionsPayload || null;
     state.scenarioReliefOverlaysData = staged.scenarioReliefOverlaysPayload || null;
     state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;

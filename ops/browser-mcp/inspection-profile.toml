@@ -12,7 +12,7 @@ default_mode = "auto"
 auto_start_mode = "quick"
 upgrade_on_cross_section_anomaly = true
 cross_section_threshold = 2
-upgrade_on_insufficient_evidence = true
+upgrade_on_insufficient_evidence = false
 min_sections_for_confidence = 4
 full_trigger_keywords = [
   "遍历所有版块",
@@ -30,9 +30,9 @@ quick_trigger_keywords = [
 ]
 
 [budgets.quick]
-max_sections = 6
-max_screenshots = 8
-max_runtime_sec = 180
+max_sections = 4
+max_screenshots = 5
+max_runtime_sec = 120
 max_network_entries = 300
 
 [budgets.full]
@@ -66,7 +66,7 @@ scroll = 1200
 screenshot = true
 capture_console = true
 capture_network = true
-enabled_modes = ["quick", "full"]
+enabled_modes = ["full"]
 
 [[routes]]
 id = "data_readme"
@@ -75,7 +75,7 @@ scroll = 1400
 screenshot = true
 capture_console = true
 capture_network = true
-enabled_modes = ["quick", "full"]
+enabled_modes = ["full"]
 
 [[sections]]
 id = "left_sidebar"
@@ -105,7 +105,7 @@ expand = "none"
 scroll = 500
 screenshot = "on_error"
 priority = "normal"
-enabled_modes = ["quick", "full"]
+enabled_modes = ["full"]
 
 [[sections]]
 id = "country_list"
@@ -115,7 +115,7 @@ expand = "none"
 scroll = 600
 screenshot = "on_error"
 priority = "normal"
-enabled_modes = ["quick", "full"]
+enabled_modes = ["full"]
 
 [[sections]]
 id = "map_style_details"
@@ -133,7 +133,7 @@ page = "home"
 selector = "#mapContainer"
 expand = "none"
 scroll = 0
-screenshot = "on_error"
+screenshot = "always"
 priority = "high"
 enabled_modes = ["quick", "full"]
 

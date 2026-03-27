@@ -3,14 +3,18 @@
 [mcp_servers.playwright]
 command = "bash"
 startup_timeout_sec = 120
-cwd = "/mnt/c/Users/raede/Desktop/dev/mapcreator"
 args = [
-  "ops/browser-mcp/start-playwright-mcp-stdio.sh",
-  "--browser", "msedge",
-  "--no-sandbox",
-  "--caps", "vision,devtools",
-  "--console-level", "warning",
-  "--output-dir", ".runtime/browser/mcp-artifacts",
-  "--allowed-hosts", "localhost,127.0.0.1",
-  "--allowed-origins", "http://localhost:*;http://127.0.0.1:*"
+  "-lc",
+  '''
+ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$ROOT_DIR"
+exec bash ops/browser-mcp/start-playwright-mcp-stdio.sh \
+  --browser msedge \
+  --no-sandbox \
+  --caps vision,devtools \
+  --console-level warning \
+  --output-dir .runtime/browser/mcp-artifacts \
+  --allowed-hosts localhost,127.0.0.1 \
+  --allowed-origins "http://localhost:*;http://127.0.0.1:*"
+'''
 ]

@@ -60,6 +60,15 @@ import {
   UNIT_COUNTER_ECHELONS,
   UNIT_COUNTER_PRESETS,
 } from "../core/unit_counter_presets.js";
+import {
+  createEmptyHoi4UnitIconReviewDraft,
+  filterHoi4UnitIconEntries,
+  getHoi4UnitIconMappedPresetIds,
+  getHoi4UnitIconVariantPath,
+  loadHoi4UnitIconReviewDraft,
+  loadHoi4UnitIconManifest,
+  saveHoi4UnitIconReviewDraft,
+} from "../core/unit_counter_icon_libraries.js";
 
 function extractCountryCodeFromId(value) {
   const text = String(value || "").trim().toUpperCase();
@@ -1658,6 +1667,295 @@ function initSidebar({ render } = {}) {
       return haystacks.some((entry) => entry.includes(normalizedQuery));
     });
   };
+  let hoi4UnitIconManifestStatus = "idle";
+  let hoi4UnitIconManifestData = null;
+  let hoi4UnitIconManifestError = null;
+  let hoi4UnitIconReviewDraft = loadHoi4UnitIconReviewDraft();
+  const normalizeHoi4ReviewPresetIds = (values = []) => Array.from(
+    new Set(
+      (Array.isArray(values) ? values : [])
+        .map((value) => String(value || "").trim().toLowerCase())
+        .filter(Boolean)
+    )
+  );
+  const persistHoi4UnitIconReviewDraft = () => {
+    hoi4UnitIconReviewDraft = saveHoi4UnitIconReviewDraft(hoi4UnitIconReviewDraft);
+  };
+  const getHoi4EffectiveMappedPresetIds = (entry) => getHoi4UnitIconMappedPresetIds(entry, hoi4UnitIconReviewDraft);
+  const formatUnitCounterPresetChipLabel = (presetId = "") => {
+    const normalizedPresetId = String(presetId || "").trim().toUpperCase();
+    if (!normalizedPresetId) return t("Unmapped", "ui");
+    const preset = getUnitCounterPresetMeta(normalizedPresetId);
+    return preset?.label || normalizedPresetId;
+  };
+  const getHoi4CurrentPresetCandidateEntryId = (presetId = "") => {
+    const normalizedPresetId = String(presetId || "").trim().toLowerCase();
+    return normalizedPresetId
+      ? String(hoi4UnitIconReviewDraft?.presetCandidates?.[normalizedPresetId] || "").trim()
+      : "";
+  };
+  const setHoi4EntryMappedPresetIds = (entryId = "", mappedPresetIds = []) => {
+    const normalizedEntryId = String(entryId || "").trim();
+    if (!normalizedEntryId) return;
+    const nextPresetIds = normalizeHoi4ReviewPresetIds(mappedPresetIds);
+    const entry = hoi4UnitIconManifestData?.entries?.find((candidate) => candidate.id === normalizedEntryId) || null;
+    const basePresetIds = entry ? normalizeHoi4ReviewPresetIds(entry.mappedPresetIds) : [];
+    if (!nextPresetIds.length && !basePresetIds.length) {
+      delete hoi4UnitIconReviewDraft.entryOverrides[normalizedEntryId];
+    } else if (JSON.stringify(nextPresetIds) === JSON.stringify(basePresetIds)) {
+      delete hoi4UnitIconReviewDraft.entryOverrides[normalizedEntryId];
+    } else {
+      hoi4UnitIconReviewDraft.entryOverrides[normalizedEntryId] = { mappedPresetIds: nextPresetIds };
+    }
+  };
+  const toggleHoi4EntryCurrentPresetMapping = (entryId = "", presetId = "") => {
+    const normalizedEntryId = String(entryId || "").trim();
+    const normalizedPresetId = String(presetId || "").trim().toLowerCase();
+    if (!normalizedEntryId || !normalizedPresetId) return false;
+    const entry = hoi4UnitIconManifestData?.entries?.find((candidate) => candidate.id === normalizedEntryId) || null;
+    if (!entry) return false;
+    const nextPresetIds = new Set(getHoi4EffectiveMappedPresetIds(entry));
+    if (nextPresetIds.has(normalizedPresetId)) {
+      nextPresetIds.delete(normalizedPresetId);
+      if (getHoi4CurrentPresetCandidateEntryId(normalizedPresetId) === normalizedEntryId) {
+        delete hoi4UnitIconReviewDraft.presetCandidates[normalizedPresetId];
+      }
+    } else {
+      nextPresetIds.add(normalizedPresetId);
+    }
+    setHoi4EntryMappedPresetIds(normalizedEntryId, Array.from(nextPresetIds));
+    persistHoi4UnitIconReviewDraft();
+    return nextPresetIds.has(normalizedPresetId);
+  };
+  const setHoi4CurrentPresetCandidate = (entryId = "", presetId = "") => {
+    const normalizedEntryId = String(entryId || "").trim();
+    const normalizedPresetId = String(presetId || "").trim().toLowerCase();
+    if (!normalizedEntryId || !normalizedPresetId) return;
+    const entry = hoi4UnitIconManifestData?.entries?.find((candidate) => candidate.id === normalizedEntryId) || null;
+    if (!entry) return;
+    const nextPresetIds = new Set(getHoi4EffectiveMappedPresetIds(entry));
+    nextPresetIds.add(normalizedPresetId);
+    setHoi4EntryMappedPresetIds(normalizedEntryId, Array.from(nextPresetIds));
+    hoi4UnitIconReviewDraft.presetCandidates[normalizedPresetId] = normalizedEntryId;
+    persistHoi4UnitIconReviewDraft();
+  };
+  const exportHoi4UnitIconReviewDraft = () => {
+    const normalizedDraft = saveHoi4UnitIconReviewDraft(hoi4UnitIconReviewDraft || createEmptyHoi4UnitIconReviewDraft());
+    const blob = new Blob([JSON.stringify(normalizedDraft, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "hoi4_unit_icon_review.json";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    globalThis.setTimeout(() => URL.revokeObjectURL(url), 100);
+    showToast(t("HOI4 review draft downloaded.", "ui"), {
+      title: t("Review exported", "ui"),
+      tone: "success",
+    });
+  };
+  const ensureHoi4UnitIconManifest = () => {
+    if (hoi4UnitIconManifestStatus === "loading" || hoi4UnitIconManifestStatus === "ready") {
+      return;
+    }
+    hoi4UnitIconManifestStatus = "loading";
+    hoi4UnitIconManifestError = null;
+    loadHoi4UnitIconManifest()
+      .then((manifest) => {
+        hoi4UnitIconManifestData = manifest;
+        hoi4UnitIconManifestStatus = "ready";
+        scheduleStrategicOverlayRefresh("counterCatalog");
+      })
+      .catch((error) => {
+        console.error("Failed to load HOI4 unit icon manifest:", error);
+        hoi4UnitIconManifestStatus = "error";
+        hoi4UnitIconManifestError = error;
+        scheduleStrategicOverlayRefresh("counterCatalog");
+      });
+  };
+  const getHoi4CatalogFilterOptionsLegacy = (effectivePresetId = "") => {
+    const currentPreset = getUnitCounterPresetMeta(effectivePresetId || DEFAULT_UNIT_COUNTER_PRESET_ID);
+    return [
+      ["all", t("All", "ui")],
+      ["current", currentPreset?.label ? `${t("Current Preset", "ui")} · ${currentPreset.label}` : t("Current Preset", "ui")],
+      ["ground", "Ground"],
+      ["air", "Air"],
+      ["naval", "Naval"],
+    ];
+  };
+  const formatHoi4EntryKind = (value = "") => String(value || "").replace(/_/g, " ");
+  const getHoi4ReviewSummaryText = (effectivePresetId = "") => {
+    const presetMeta = getUnitCounterPresetMeta(effectivePresetId || DEFAULT_UNIT_COUNTER_PRESET_ID);
+    const candidateEntryId = getHoi4CurrentPresetCandidateEntryId(presetMeta.id);
+    const candidateEntry = hoi4UnitIconManifestData?.entries?.find((entry) => entry.id === candidateEntryId) || null;
+    const overrideCount = Object.keys(hoi4UnitIconReviewDraft?.entryOverrides || {}).length;
+    return [
+      `${t("Current Preset", "ui")}: ${presetMeta.label}`,
+      candidateEntry ? `${t("Candidate", "ui")}: ${candidateEntry.label}` : `${t("Candidate", "ui")}: ${t("None selected", "ui")}`,
+      `${t("Draft Overrides", "ui")}: ${overrideCount}`,
+    ].join(" · ");
+  };
+  const cancelHoi4CatalogGridRender = (grid) => {
+    if (!grid) return;
+    if (typeof grid._hoi4RenderHandle === "number" && grid._hoi4RenderHandle) {
+      globalThis.cancelAnimationFrame(grid._hoi4RenderHandle);
+    }
+    grid._hoi4RenderHandle = 0;
+    grid._hoi4RenderToken = Number(grid._hoi4RenderToken || 0) + 1;
+  };
+  const buildHoi4CatalogCardRecord = (entry) => {
+    const card = document.createElement("article");
+    card.className = "counter-editor-symbol-card counter-editor-hoi4-card";
+    card.dataset.hoi4EntryId = entry.id;
+
+    const preview = document.createElement("div");
+    preview.className = "counter-editor-hoi4-preview is-single";
+    const image = document.createElement("img");
+    image.alt = entry.label;
+    image.loading = "lazy";
+    image.decoding = "async";
+    const missing = document.createElement("span");
+    missing.className = "counter-editor-hoi4-preview-missing";
+    const previewLabel = document.createElement("span");
+    previewLabel.className = "counter-editor-hoi4-preview-label";
+    preview.append(image, missing, previewLabel);
+
+    const title = document.createElement("span");
+    title.className = "counter-editor-symbol-card-title";
+    const subtitle = document.createElement("span");
+    subtitle.className = "counter-editor-symbol-card-subtitle";
+    const meta = document.createElement("div");
+    meta.className = "counter-editor-hoi4-meta";
+    const tags = document.createElement("div");
+    tags.className = "counter-editor-hoi4-tags";
+    const actions = document.createElement("div");
+    actions.className = "counter-editor-hoi4-actions";
+    const mappingBtn = document.createElement("button");
+    mappingBtn.type = "button";
+    mappingBtn.className = "counter-editor-hoi4-action-btn";
+    mappingBtn.dataset.hoi4ReviewAction = "toggle-current-mapping";
+    mappingBtn.dataset.hoi4EntryId = entry.id;
+    const candidateBtn = document.createElement("button");
+    candidateBtn.type = "button";
+    candidateBtn.className = "counter-editor-hoi4-action-btn";
+    candidateBtn.dataset.hoi4ReviewAction = "set-current-candidate";
+    candidateBtn.dataset.hoi4EntryId = entry.id;
+    actions.append(mappingBtn, candidateBtn);
+    card.append(preview, title, subtitle, meta, tags, actions);
+
+    return {
+      card,
+      image,
+      missing,
+      previewLabel,
+      title,
+      subtitle,
+      meta,
+      tags,
+      mappingBtn,
+      candidateBtn,
+    };
+  };
+  const updateHoi4CatalogCardRecord = (record, entry, { effectivePresetId, preferredVariant }) => {
+    const currentPresetId = String(effectivePresetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toLowerCase();
+    const variantPath = getHoi4UnitIconVariantPath(entry, preferredVariant);
+    const mappedPresetIds = getHoi4EffectiveMappedPresetIds(entry);
+    const isMappedToCurrentPreset = mappedPresetIds.includes(currentPresetId);
+    const isCurrentPresetCandidate = getHoi4CurrentPresetCandidateEntryId(currentPresetId) === entry.id;
+    record.card.classList.toggle("is-candidate", isCurrentPresetCandidate);
+    if (variantPath) {
+      if (record.image.getAttribute("src") !== variantPath) {
+        record.image.src = variantPath;
+      }
+      record.image.hidden = false;
+      record.missing.hidden = true;
+    } else {
+      record.image.hidden = true;
+      record.image.removeAttribute("src");
+      record.missing.hidden = false;
+      record.missing.textContent = preferredVariant === "large"
+        ? t("Missing Large", "ui")
+        : t("Missing Small", "ui");
+    }
+    record.previewLabel.textContent = preferredVariant === "large"
+      ? t("Large", "ui")
+      : t("On-map Small", "ui");
+    record.title.textContent = entry.label;
+    record.subtitle.textContent = `${entry.domain} · ${formatHoi4EntryKind(entry.kind)}`;
+    record.meta.textContent = entry.spriteName;
+    record.tags.replaceChildren();
+    const visiblePresetIds = mappedPresetIds.length ? mappedPresetIds : [""];
+    visiblePresetIds.forEach((presetId) => {
+      const tag = document.createElement("span");
+      tag.className = "counter-editor-hoi4-tag";
+      tag.textContent = presetId ? formatUnitCounterPresetChipLabel(presetId) : t("Unmapped", "ui");
+      record.tags.appendChild(tag);
+    });
+    if (isCurrentPresetCandidate) {
+      const candidateTag = document.createElement("span");
+      candidateTag.className = "counter-editor-hoi4-tag is-candidate";
+      candidateTag.textContent = t("Current Candidate", "ui");
+      record.tags.appendChild(candidateTag);
+    }
+    const currentPresetLabel = formatUnitCounterPresetChipLabel(currentPresetId);
+    record.mappingBtn.textContent = isMappedToCurrentPreset
+      ? `${t("Unmap", "ui")} ${currentPresetLabel}`
+      : `${t("Map", "ui")} ${currentPresetLabel}`;
+    record.mappingBtn.classList.toggle("is-active", isMappedToCurrentPreset);
+    record.candidateBtn.textContent = isCurrentPresetCandidate
+      ? t("Current Candidate", "ui")
+      : `${t("Set Candidate", "ui")} · ${currentPresetLabel}`;
+    record.candidateBtn.classList.toggle("is-active", isCurrentPresetCandidate);
+  };
+  const renderHoi4CatalogCards = (grid, entries, options) => {
+    cancelHoi4CatalogGridRender(grid);
+    const emptyState = document.createElement("div");
+    emptyState.className = "counter-editor-symbol-empty";
+    if (!entries.length) {
+      emptyState.textContent = t("No HOI4 icons match the current filter.", "ui");
+      grid.replaceChildren(emptyState);
+      return;
+    }
+    const cache = grid._hoi4CardCache instanceof Map ? grid._hoi4CardCache : new Map();
+    grid._hoi4CardCache = cache;
+    grid.replaceChildren();
+    const renderToken = Number(grid._hoi4RenderToken || 0) + 1;
+    grid._hoi4RenderToken = renderToken;
+    const chunkSize = 24;
+    const appendChunk = (startIndex = 0) => {
+      if (grid._hoi4RenderToken !== renderToken) return;
+      const fragment = document.createDocumentFragment();
+      const endIndex = Math.min(startIndex + chunkSize, entries.length);
+      for (let index = startIndex; index < endIndex; index += 1) {
+        const entry = entries[index];
+        let record = cache.get(entry.id);
+        if (!record) {
+          record = buildHoi4CatalogCardRecord(entry);
+          cache.set(entry.id, record);
+        }
+        updateHoi4CatalogCardRecord(record, entry, options);
+        fragment.appendChild(record.card);
+      }
+      grid.appendChild(fragment);
+      if (endIndex < entries.length) {
+        grid._hoi4RenderHandle = globalThis.requestAnimationFrame(() => appendChunk(endIndex));
+      } else {
+        grid._hoi4RenderHandle = 0;
+      }
+    };
+    appendChunk(0);
+  };
+  const getHoi4CatalogFilterOptions = (effectivePresetId = "") => {
+    const currentPreset = getUnitCounterPresetMeta(effectivePresetId || DEFAULT_UNIT_COUNTER_PRESET_ID);
+    return [
+      ["all", t("All", "ui")],
+      ["current", currentPreset?.label ? `${t("Current Preset", "ui")} · ${currentPreset.label}` : t("Current Preset", "ui")],
+      ["ground", "Ground"],
+      ["air", "Air"],
+      ["naval", "Naval"],
+    ];
+  };
   const inferUnitCounterPresetId = (candidate = {}) => {
     const rawPreset = String(candidate?.presetId || candidate?.unitType || "").trim().toUpperCase();
     if (rawPreset && unitCounterPresets.some((preset) => preset.id === rawPreset)) {
@@ -2329,16 +2627,69 @@ function initSidebar({ render } = {}) {
     unitCounterCatalogPanel.className = "counter-editor-symbol-panel";
     const unitCounterCatalogHeader = document.createElement("div");
     unitCounterCatalogHeader.className = "counter-editor-symbol-header";
-    unitCounterCatalogHeader.innerHTML = `<div class="section-header">${t("Symbol Browser", "ui")}</div><p class="sidebar-tool-hint">${t("Search the internal counter catalog, then apply a preset back into the editor.", "ui")}</p>`;
+    const unitCounterCatalogHeaderTitle = document.createElement("div");
+    unitCounterCatalogHeaderTitle.id = "unitCounterCatalogHeaderTitle";
+    unitCounterCatalogHeaderTitle.className = "section-header";
+    unitCounterCatalogHeaderTitle.textContent = t("Symbol Browser", "ui");
+    const unitCounterCatalogHeaderHint = document.createElement("p");
+    unitCounterCatalogHeaderHint.id = "unitCounterCatalogHeaderHint";
+    unitCounterCatalogHeaderHint.className = "sidebar-tool-hint";
+    unitCounterCatalogHeaderHint.textContent = t("Search the internal counter catalog, then apply a preset back into the editor.", "ui");
+    unitCounterCatalogHeader.append(unitCounterCatalogHeaderTitle, unitCounterCatalogHeaderHint);
+    const unitCounterCatalogSourceTabs = document.createElement("div");
+    unitCounterCatalogSourceTabs.id = "unitCounterCatalogSourceTabs";
+    unitCounterCatalogSourceTabs.className = "counter-editor-source-tabs";
+    const unitCounterInternalSourceBtn = document.createElement("button");
+    unitCounterInternalSourceBtn.type = "button";
+    unitCounterInternalSourceBtn.className = "counter-editor-source-btn";
+    unitCounterInternalSourceBtn.dataset.counterCatalogSource = "internal";
+    unitCounterInternalSourceBtn.textContent = t("Internal", "ui");
+    const unitCounterHoi4SourceBtn = document.createElement("button");
+    unitCounterHoi4SourceBtn.type = "button";
+    unitCounterHoi4SourceBtn.className = "counter-editor-source-btn";
+    unitCounterHoi4SourceBtn.dataset.counterCatalogSource = "hoi4";
+    unitCounterHoi4SourceBtn.textContent = "HOI4 Library";
+    unitCounterCatalogSourceTabs.append(unitCounterInternalSourceBtn, unitCounterHoi4SourceBtn);
     const unitCounterCatalogSearchInput = buildInput("unitCounterCatalogSearchInput", "Search symbols");
     unitCounterCatalogSearchInput.classList.add("counter-editor-symbol-search");
+    const unitCounterLibraryVariantRow = document.createElement("div");
+    unitCounterLibraryVariantRow.id = "unitCounterLibraryVariantRow";
+    unitCounterLibraryVariantRow.className = "counter-editor-category-row hidden";
+    const unitCounterLibrarySmallVariantBtn = document.createElement("button");
+    unitCounterLibrarySmallVariantBtn.type = "button";
+    unitCounterLibrarySmallVariantBtn.className = "counter-editor-category-btn";
+    unitCounterLibrarySmallVariantBtn.dataset.counterLibraryVariant = "small";
+    unitCounterLibrarySmallVariantBtn.textContent = t("On-map Small", "ui");
+    const unitCounterLibraryLargeVariantBtn = document.createElement("button");
+    unitCounterLibraryLargeVariantBtn.type = "button";
+    unitCounterLibraryLargeVariantBtn.className = "counter-editor-category-btn";
+    unitCounterLibraryLargeVariantBtn.dataset.counterLibraryVariant = "large";
+    unitCounterLibraryLargeVariantBtn.textContent = t("Large", "ui");
+    unitCounterLibraryVariantRow.append(unitCounterLibrarySmallVariantBtn, unitCounterLibraryLargeVariantBtn);
+    const unitCounterLibraryReviewBar = document.createElement("div");
+    unitCounterLibraryReviewBar.id = "unitCounterLibraryReviewBar";
+    unitCounterLibraryReviewBar.className = "counter-editor-library-review-bar hidden";
+    const unitCounterLibraryReviewSummary = document.createElement("div");
+    unitCounterLibraryReviewSummary.id = "unitCounterLibraryReviewSummary";
+    unitCounterLibraryReviewSummary.className = "counter-editor-library-review-summary";
+    const unitCounterLibraryExportBtn = buildButton("unitCounterLibraryExportBtn", "Export HOI4 Review JSON");
+    unitCounterLibraryExportBtn.classList.add("counter-editor-library-export-btn");
+    unitCounterLibraryReviewBar.append(unitCounterLibraryReviewSummary, unitCounterLibraryExportBtn);
     const unitCounterCatalogCategoriesEl = document.createElement("div");
     unitCounterCatalogCategoriesEl.id = "unitCounterCatalogCategories";
     unitCounterCatalogCategoriesEl.className = "counter-editor-category-row";
     const unitCounterCatalogGrid = document.createElement("div");
     unitCounterCatalogGrid.id = "unitCounterCatalogGrid";
     unitCounterCatalogGrid.className = "counter-editor-symbol-grid";
-    unitCounterCatalogPanel.append(unitCounterCatalogHeader, unitCounterCatalogSearchInput, unitCounterCatalogCategoriesEl, unitCounterCatalogGrid);
+    unitCounterCatalogPanel.append(
+      unitCounterCatalogHeader,
+      unitCounterCatalogSourceTabs,
+      unitCounterCatalogSearchInput,
+      unitCounterLibraryVariantRow,
+      unitCounterLibraryReviewBar,
+      unitCounterCatalogCategoriesEl,
+      unitCounterCatalogGrid
+    );
 
     const unitDetailDrawer = document.createElement("div");
     unitDetailDrawer.id = "unitCounterDetailDrawer";
@@ -2763,7 +3114,14 @@ function initSidebar({ render } = {}) {
   const unitCounterCancelBtn = document.getElementById("unitCounterCancelBtn");
   const unitCounterDeleteBtn = document.getElementById("unitCounterDeleteBtn");
   const unitCounterList = document.getElementById("unitCounterList");
+  const unitCounterCatalogHeaderTitle = document.getElementById("unitCounterCatalogHeaderTitle");
+  const unitCounterCatalogHeaderHint = document.getElementById("unitCounterCatalogHeaderHint");
+  const unitCounterCatalogSourceTabs = document.getElementById("unitCounterCatalogSourceTabs");
   const unitCounterCatalogSearchInput = document.getElementById("unitCounterCatalogSearchInput");
+  const unitCounterLibraryVariantRow = document.getElementById("unitCounterLibraryVariantRow");
+  const unitCounterLibraryReviewBar = document.getElementById("unitCounterLibraryReviewBar");
+  const unitCounterLibraryReviewSummary = document.getElementById("unitCounterLibraryReviewSummary");
+  const unitCounterLibraryExportBtn = document.getElementById("unitCounterLibraryExportBtn");
   const unitCounterCatalogCategoriesEl = document.getElementById("unitCounterCatalogCategories");
   const unitCounterCatalogGrid = document.getElementById("unitCounterCatalogGrid");
   const debugModeSelect = document.getElementById("debug-mode-select");
@@ -2811,6 +3169,7 @@ function initSidebar({ render } = {}) {
   const specialRegionColorInput = document.getElementById("specialRegionColorInput");
   const clearSpecialRegionColorBtn = document.getElementById("clearSpecialRegionColorBtn");
   const selectedCountryActionsSection = document.getElementById("selectedCountryActionsSection");
+  const frontlineProjectSection = document.getElementById("frontlineProjectSection");
   const projectLegendSection = document.getElementById("lblProjectLegend")?.closest("details");
   const diagnosticsSection = document.getElementById("lblDiagnostics")?.closest("details");
   const selectedCountryActionsTitle = document.getElementById("lblHistoricalPresets");
@@ -2840,8 +3199,16 @@ function initSidebar({ render } = {}) {
       state.strategicOverlayUi = {};
     }
     state.strategicOverlayUi.counterEditorModalOpen = !!state.strategicOverlayUi.counterEditorModalOpen;
+    state.strategicOverlayUi.counterCatalogSource = String(state.strategicOverlayUi.counterCatalogSource || "internal").trim().toLowerCase() === "hoi4"
+      ? "hoi4"
+      : "internal";
     state.strategicOverlayUi.counterCatalogCategory = String(state.strategicOverlayUi.counterCatalogCategory || "all").trim().toLowerCase() || "all";
     state.strategicOverlayUi.counterCatalogQuery = String(state.strategicOverlayUi.counterCatalogQuery || "");
+    state.strategicOverlayUi.hoi4CounterCategory = String(state.strategicOverlayUi.hoi4CounterCategory || "all").trim().toLowerCase() || "all";
+    state.strategicOverlayUi.hoi4CounterQuery = String(state.strategicOverlayUi.hoi4CounterQuery || "");
+    state.strategicOverlayUi.hoi4CounterVariant = String(state.strategicOverlayUi.hoi4CounterVariant || "small").trim().toLowerCase() === "large"
+      ? "large"
+      : "small";
   };
   const recordStrategicOverlayPerfCounter = (name) => {
     const key = String(name || "").trim();
@@ -2939,6 +3306,11 @@ function initSidebar({ render } = {}) {
 
   const updateScenarioInspectorLayout = () => {
     const isScenarioMode = !!state.activeScenarioId;
+    const scenarioDefaultsKey = String(state.activeScenarioId || "__base__");
+    if (scenarioDefaultsKey !== lastScenarioInspectorDefaultsKey) {
+      collapseScenarioManagedSections();
+      lastScenarioInspectorDefaultsKey = scenarioDefaultsKey;
+    }
     projectLegendSection?.classList.toggle("inspector-section-secondary", isScenarioMode);
     diagnosticsSection?.classList.toggle("inspector-section-secondary", isScenarioMode);
     if (countryInspectorOrderingHint) {
@@ -2947,12 +3319,6 @@ function initSidebar({ render } = {}) {
     if (selectedCountryActionsSection) {
       selectedCountryActionsSection.classList.remove("hidden");
       selectedCountryActionsSection.setAttribute("aria-hidden", "false");
-      if (isScenarioMode) {
-        selectedCountryActionsSection.open = true;
-      }
-    }
-    if (countryInspectorSection && isScenarioMode) {
-      countryInspectorSection.open = true;
     }
     if (projectLegendSection && diagnosticsSection && isScenarioMode) {
       projectLegendSection.open = false;
@@ -2984,6 +3350,15 @@ function initSidebar({ render } = {}) {
   let countryInspectorColorPickerOpen = false;
   let waterInspectorColorPickerOpen = false;
   let specialRegionColorPickerOpen = false;
+  let lastScenarioInspectorDefaultsKey = null;
+
+  const collapseScenarioManagedSections = () => {
+    countryInspectorSection?.removeAttribute("open");
+    selectedCountryActionsSection?.removeAttribute("open");
+    waterInspectorSection?.removeAttribute("open");
+    specialRegionInspectorSection?.removeAttribute("open");
+    frontlineProjectSection?.removeAttribute("open");
+  };
 
   const clampInspectorHeight = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
   const toViewportPixels = (vh) => (window.innerHeight * vh) / 100;
@@ -3965,6 +4340,9 @@ function initSidebar({ render } = {}) {
     }
     state.selectedInspectorCountryCode = normalized;
     state.inspectorHighlightCountryCode = normalized;
+    if (selectedCountryActionsSection) {
+      selectedCountryActionsSection.open = true;
+    }
     if (typeof state.updatePaintModeUIFn === "function") {
       state.updatePaintModeUIFn();
     }
@@ -4761,6 +5139,7 @@ function initSidebar({ render } = {}) {
       row.className = "scenario-action-card";
       row.addEventListener("click", () => {
         state.selectedWaterRegionId = featureId;
+        waterInspectorSection?.setAttribute("open", "");
         if (typeof state.renderWaterRegionListFn === "function") {
           state.renderWaterRegionListFn();
         }
@@ -4879,9 +5258,7 @@ function initSidebar({ render } = {}) {
       button.classList.toggle("is-active", featureId === state.selectedWaterRegionId);
       button.addEventListener("click", () => {
         state.selectedWaterRegionId = featureId;
-        if (waterInspectorSection) {
-          waterInspectorSection.open = true;
-        }
+        waterInspectorSection?.setAttribute("open", "");
         renderWaterRegionList();
       });
 
@@ -4914,9 +5291,6 @@ function initSidebar({ render } = {}) {
 
     renderWaterInspectorDetail();
     renderWaterLegend();
-    if (waterInspectorSection) {
-      waterInspectorSection.open = !!String(state.selectedWaterRegionId || "").trim();
-    }
     if (typeof state.updateWorkspaceStatusFn === "function") {
       state.updateWorkspaceStatusFn();
     }
@@ -4981,7 +5355,6 @@ function initSidebar({ render } = {}) {
     const selectedSpecialRegionId = ensureSelectedSpecialRegion();
     if (specialRegionInspectorSection) {
       specialRegionInspectorSection.classList.toggle("hidden", !hasScenarioInspectorContent);
-      specialRegionInspectorSection.open = hasScenarioInspectorContent && !!selectedSpecialRegionId;
     }
     if (scenarioSpecialRegionVisibilityToggle) {
       scenarioSpecialRegionVisibilityToggle.checked = !!state.showScenarioSpecialRegions;
@@ -5022,6 +5395,7 @@ function initSidebar({ render } = {}) {
       row.className = "scenario-action-card";
       row.addEventListener("click", () => {
         state.selectedSpecialRegionId = featureId;
+        specialRegionInspectorSection?.setAttribute("open", "");
         renderSpecialRegionList();
       });
 
@@ -5146,6 +5520,7 @@ function initSidebar({ render } = {}) {
       button.classList.toggle("is-active", featureId === state.selectedSpecialRegionId);
       button.addEventListener("click", () => {
         state.selectedSpecialRegionId = featureId;
+        specialRegionInspectorSection?.setAttribute("open", "");
         renderSpecialRegionList();
       });
 
@@ -6974,61 +7349,91 @@ function initSidebar({ render } = {}) {
     }
     if (shouldRefreshCounterCatalog) {
       recordStrategicOverlayPerfCounter("counterCatalog");
+      ensureStrategicOverlayUiState();
+      const catalogSource = state.strategicOverlayUi.counterCatalogSource || "internal";
+      const usingHoi4Catalog = catalogSource === "hoi4";
+      const hoi4PreferredVariant = state.strategicOverlayUi.hoi4CounterVariant === "large" ? "large" : "small";
+      if (unitCounterCatalogHeaderTitle) {
+        unitCounterCatalogHeaderTitle.textContent = usingHoi4Catalog
+          ? t("HOI4 Library", "ui")
+          : t("Symbol Browser", "ui");
+      }
+      if (unitCounterCatalogHeaderHint) {
+        unitCounterCatalogHeaderHint.textContent = usingHoi4Catalog
+          ? t("Review imported Hearts of Iron IV counter icons. This library is read-only for now.", "ui")
+          : t("Search the internal counter catalog, then apply a preset back into the editor.", "ui");
+      }
+      if (unitCounterCatalogSourceTabs) {
+        Array.from(unitCounterCatalogSourceTabs.querySelectorAll("[data-counter-catalog-source]")).forEach((element) => {
+          const button = element instanceof HTMLButtonElement ? element : null;
+          if (!button) return;
+          const active = String(button.dataset.counterCatalogSource || "") === catalogSource;
+          button.classList.toggle("is-active", active);
+          button.setAttribute("aria-pressed", active ? "true" : "false");
+        });
+      }
+      if (unitCounterLibraryVariantRow) {
+        unitCounterLibraryVariantRow.classList.toggle("hidden", !usingHoi4Catalog);
+        Array.from(unitCounterLibraryVariantRow.querySelectorAll("[data-counter-library-variant]")).forEach((element) => {
+          const button = element instanceof HTMLButtonElement ? element : null;
+          if (!button) return;
+          const active = String(button.dataset.counterLibraryVariant || "small") === hoi4PreferredVariant;
+          button.classList.toggle("is-active", active);
+          button.setAttribute("aria-pressed", active ? "true" : "false");
+        });
+      }
+      if (unitCounterLibraryReviewBar) {
+        unitCounterLibraryReviewBar.classList.toggle("hidden", !usingHoi4Catalog);
+      }
+      if (unitCounterLibraryReviewSummary) {
+        unitCounterLibraryReviewSummary.textContent = usingHoi4Catalog
+          ? getHoi4ReviewSummaryText(effectivePresetId)
+          : "";
+      }
       if (unitCounterCatalogSearchInput) {
-      unitCounterCatalogSearchInput.value = String(state.strategicOverlayUi?.counterCatalogQuery || "");
+        unitCounterCatalogSearchInput.value = usingHoi4Catalog
+          ? String(state.strategicOverlayUi?.hoi4CounterQuery || "")
+          : String(state.strategicOverlayUi?.counterCatalogQuery || "");
+        unitCounterCatalogSearchInput.placeholder = usingHoi4Catalog
+          ? t("Search HOI4 sprite names, labels, keywords...", "ui")
+          : t("Search internal presets, symbols, keywords...", "ui");
       }
       if (unitCounterCatalogCategoriesEl) {
-        const categoryButtons = unitCounterCatalogCategoriesEl._categoryButtons || new Map();
-        unitCounterCatalogCategoriesEl._categoryButtons = categoryButtons;
-        [["all", t("All", "ui")], ...unitCounterCatalogCategories.map((category) => [category, getUnitCounterCategoryLabel(category)])]
-          .forEach(([categoryValue, label]) => {
-            let button = categoryButtons.get(categoryValue);
-            if (!(button instanceof HTMLButtonElement)) {
-              button = document.createElement("button");
-              button.type = "button";
-              button.className = "counter-editor-category-btn";
-              button.dataset.counterCatalogCategory = String(categoryValue || "");
-              categoryButtons.set(categoryValue, button);
-            }
-            button.textContent = label;
-            const active = String(state.strategicOverlayUi?.counterCatalogCategory || "all") === String(categoryValue || "");
-            button.classList.toggle("is-active", active);
-            button.setAttribute("aria-pressed", active ? "true" : "false");
-            if (button.parentElement !== unitCounterCatalogCategoriesEl) {
-              unitCounterCatalogCategoriesEl.appendChild(button);
-            }
-          });
+        const categoryOptions = usingHoi4Catalog
+          ? getHoi4CatalogFilterOptions(effectivePresetId)
+          : [["all", t("All", "ui")], ...unitCounterCatalogCategories.map((category) => [category, getUnitCounterCategoryLabel(category)])];
+        const activeCategory = usingHoi4Catalog
+          ? String(state.strategicOverlayUi?.hoi4CounterCategory || "all")
+          : String(state.strategicOverlayUi?.counterCatalogCategory || "all");
+        unitCounterCatalogCategoriesEl.replaceChildren();
+        categoryOptions.forEach(([categoryValue, label]) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "counter-editor-category-btn";
+          button.dataset.counterCatalogCategory = String(categoryValue || "");
+          button.textContent = label;
+          const active = activeCategory === String(categoryValue || "");
+          button.classList.toggle("is-active", active);
+          button.setAttribute("aria-pressed", active ? "true" : "false");
+          unitCounterCatalogCategoriesEl.appendChild(button);
+        });
       }
       if (unitCounterCatalogGrid && state.strategicOverlayUi?.counterEditorModalOpen) {
-        const filteredCatalog = getFilteredUnitCounterCatalog({
-          category: state.strategicOverlayUi?.counterCatalogCategory || "all",
-          query: state.strategicOverlayUi?.counterCatalogQuery || "",
-        });
-        const catalogCardMap = unitCounterCatalogGrid._catalogCardMap || new Map();
-        unitCounterCatalogGrid._catalogCardMap = catalogCardMap;
-        let emptyState = unitCounterCatalogGrid._emptyState;
-        if (!(emptyState instanceof HTMLElement)) {
-          emptyState = document.createElement("div");
-          emptyState.className = "counter-editor-symbol-empty";
-          unitCounterCatalogGrid._emptyState = emptyState;
-        }
-        emptyState.textContent = t("No symbols match the current filter.", "ui");
-        const visibleIds = new Set(filteredCatalog.map((preset) => preset.id));
-        catalogCardMap.forEach((button, presetId) => {
-          if (!visibleIds.has(presetId) && button.parentElement === unitCounterCatalogGrid) {
-            button.remove();
-          }
-        });
-        if (!filteredCatalog.length) {
-          if (emptyState.parentElement !== unitCounterCatalogGrid) {
+        cancelHoi4CatalogGridRender(unitCounterCatalogGrid);
+        unitCounterCatalogGrid.replaceChildren();
+        const emptyState = document.createElement("div");
+        emptyState.className = "counter-editor-symbol-empty";
+        if (!usingHoi4Catalog) {
+          const filteredCatalog = getFilteredUnitCounterCatalog({
+            category: state.strategicOverlayUi?.counterCatalogCategory || "all",
+            query: state.strategicOverlayUi?.counterCatalogQuery || "",
+          });
+          if (!filteredCatalog.length) {
+            emptyState.textContent = t("No symbols match the current filter.", "ui");
             unitCounterCatalogGrid.appendChild(emptyState);
-          }
-        } else {
-          emptyState.remove();
-          filteredCatalog.forEach((preset) => {
-            let button = catalogCardMap.get(preset.id);
-            if (!(button instanceof HTMLButtonElement)) {
-              button = document.createElement("button");
+          } else {
+            filteredCatalog.forEach((preset) => {
+              const button = document.createElement("button");
               button.type = "button";
               button.className = "counter-editor-symbol-card";
               button.dataset.unitCounterCatalogPreset = preset.id;
@@ -7044,17 +7449,101 @@ function initSidebar({ render } = {}) {
               const subtitle = document.createElement("span");
               subtitle.className = "counter-editor-symbol-card-subtitle";
               subtitle.textContent = `${preset.shortCode} · ${getUnitCounterCategoryLabel(preset.category)}`;
+              const active = preset.id === effectivePresetId;
+              button.classList.toggle("is-active", active);
+              button.setAttribute("aria-pressed", active ? "true" : "false");
               button.append(icon, title, subtitle);
-              catalogCardMap.set(preset.id, button);
+              unitCounterCatalogGrid.appendChild(button);
+            });
+          }
+        } else {
+          if (hoi4UnitIconManifestStatus === "idle") {
+            ensureHoi4UnitIconManifest();
+          }
+          if (hoi4UnitIconManifestStatus === "loading" || hoi4UnitIconManifestStatus === "idle") {
+            emptyState.textContent = t("Loading HOI4 unit icon library...", "ui");
+            unitCounterCatalogGrid.appendChild(emptyState);
+          } else if (hoi4UnitIconManifestStatus === "error") {
+            emptyState.textContent = hoi4UnitIconManifestError?.message
+              ? String(hoi4UnitIconManifestError.message)
+              : t("Failed to load the HOI4 unit icon library.", "ui");
+            unitCounterCatalogGrid.appendChild(emptyState);
+          } else {
+            const filteredEntries = filterHoi4UnitIconEntries(hoi4UnitIconManifestData?.entries || [], {
+              filter: state.strategicOverlayUi?.hoi4CounterCategory || "all",
+              query: state.strategicOverlayUi?.hoi4CounterQuery || "",
+              currentPresetId: effectivePresetId,
+              getMappedPresetIds: getHoi4EffectiveMappedPresetIds,
+            });
+            renderHoi4CatalogCards(unitCounterCatalogGrid, filteredEntries, {
+              effectivePresetId,
+              preferredVariant: hoi4PreferredVariant,
+            });
+            /* Legacy two-preview fallback retained only as commented reference during cleanup.
+              filteredEntries.forEach((entry) => {
+                const card = document.createElement("div");
+                card.className = "counter-editor-symbol-card counter-editor-hoi4-card";
+                const previewSet = getHoi4UnitIconPreviewSet(entry, hoi4PreferredVariant);
+                const previewRow = document.createElement("div");
+                previewRow.className = "counter-editor-hoi4-preview-row";
+                const createPreview = (label, src, preferred = false) => {
+                  const box = document.createElement("div");
+                  box.className = "counter-editor-hoi4-preview";
+                  if (preferred) {
+                    box.classList.add("is-preferred");
+                  }
+                  const previewLabel = document.createElement("span");
+                  previewLabel.className = "counter-editor-hoi4-preview-label";
+                  previewLabel.textContent = label;
+                  if (src) {
+                    const image = document.createElement("img");
+                    image.src = src;
+                    image.alt = `${entry.label} ${label}`;
+                    image.loading = "lazy";
+                    box.appendChild(image);
+                  } else {
+                    const fallback = document.createElement("span");
+                    fallback.className = "counter-editor-symbol-card-subtitle";
+                    fallback.textContent = t("Missing", "ui");
+                    box.appendChild(fallback);
+                  }
+                  box.appendChild(previewLabel);
+                  return box;
+                };
+                previewRow.append(
+                  createPreview(t("Small", "ui"), previewSet.small, hoi4PreferredVariant === "small"),
+                  createPreview(t("Large", "ui"), previewSet.large, hoi4PreferredVariant === "large")
+                );
+                const title = document.createElement("span");
+                title.className = "counter-editor-symbol-card-title";
+                title.textContent = entry.label;
+                const subtitle = document.createElement("span");
+                subtitle.className = "counter-editor-symbol-card-subtitle";
+                subtitle.textContent = `${entry.domain} · ${formatEntryKind(entry.kind)}`;
+                const path = document.createElement("div");
+                path.className = "counter-editor-hoi4-path";
+                path.textContent = entry.sourceGamePath || entry.sourceTextureFile || entry.spriteName;
+                const meta = document.createElement("div");
+                meta.className = "counter-editor-hoi4-meta";
+                meta.textContent = entry.spriteName;
+                const tags = document.createElement("div");
+                tags.className = "counter-editor-hoi4-tags";
+                const presetTags = Array.isArray(entry.mappedPresetIds) && entry.mappedPresetIds.length
+                  ? entry.mappedPresetIds
+                  : ["unmapped"];
+                presetTags.forEach((presetId) => {
+                  const tag = document.createElement("span");
+                  tag.className = "counter-editor-hoi4-tag";
+                  tag.textContent = presetId === "unmapped" ? t("Unmapped", "ui") : presetId.toUpperCase();
+                  tags.appendChild(tag);
+                });
+                card.append(previewRow, title, subtitle, meta, path, tags);
+                unitCounterCatalogGrid.appendChild(card);
+              }); */
             }
-            const active = preset.id === effectivePresetId;
-            button.classList.toggle("is-active", active);
-            button.setAttribute("aria-pressed", active ? "true" : "false");
-            unitCounterCatalogGrid.appendChild(button);
-          });
+          }
         }
       }
-    }
     if (shouldRefreshCounterList) {
       recordStrategicOverlayPerfCounter("counterList");
       suppressUnitCounterListChange = true;
@@ -7073,8 +7562,8 @@ function initSidebar({ render } = {}) {
         suppressUnitCounterListChange = false;
       }
     }
-
     }
+
     if (hasStrategicOverlayScope(normalizedScopes, "badgeCounts", "operationalLines", "operationGraphics", "counterList")) {
       recordStrategicOverlayPerfCounter("badgeCounts");
       const linesBadge = document.querySelector("#accordionLines .strategic-accordion-badge");
@@ -7773,7 +8262,11 @@ function initSidebar({ render } = {}) {
   if (unitCounterCatalogSearchInput && !unitCounterCatalogSearchInput.dataset.bound) {
     unitCounterCatalogSearchInput.addEventListener("input", (event) => {
       ensureStrategicOverlayUiState();
-      state.strategicOverlayUi.counterCatalogQuery = String(event.target.value || "");
+      if (state.strategicOverlayUi.counterCatalogSource === "hoi4") {
+        state.strategicOverlayUi.hoi4CounterQuery = String(event.target.value || "");
+      } else {
+        state.strategicOverlayUi.counterCatalogQuery = String(event.target.value || "");
+      }
       if (unitCounterCatalogSearchDebounceHandle !== null) {
         globalThis.clearTimeout(unitCounterCatalogSearchDebounceHandle);
       }
@@ -7789,13 +8282,66 @@ function initSidebar({ render } = {}) {
       const button = event.target instanceof HTMLElement ? event.target.closest("[data-counter-catalog-category]") : null;
       if (!(button instanceof HTMLButtonElement)) return;
       ensureStrategicOverlayUiState();
-      state.strategicOverlayUi.counterCatalogCategory = String(button.dataset.counterCatalogCategory || "all").trim().toLowerCase() || "all";
+      const nextCategory = String(button.dataset.counterCatalogCategory || "all").trim().toLowerCase() || "all";
+      if (state.strategicOverlayUi.counterCatalogSource === "hoi4") {
+        state.strategicOverlayUi.hoi4CounterCategory = nextCategory;
+      } else {
+        state.strategicOverlayUi.counterCatalogCategory = nextCategory;
+      }
       scheduleStrategicOverlayRefresh("counterCatalog");
     });
     unitCounterCatalogCategoriesEl.dataset.bound = "true";
   }
+  if (unitCounterCatalogSourceTabs && !unitCounterCatalogSourceTabs.dataset.bound) {
+    unitCounterCatalogSourceTabs.addEventListener("click", (event) => {
+      const button = event.target instanceof HTMLElement ? event.target.closest("[data-counter-catalog-source]") : null;
+      if (!(button instanceof HTMLButtonElement)) return;
+      ensureStrategicOverlayUiState();
+      const nextSource = String(button.dataset.counterCatalogSource || "internal").trim().toLowerCase() === "hoi4"
+        ? "hoi4"
+        : "internal";
+      if (state.strategicOverlayUi.counterCatalogSource === nextSource) return;
+      state.strategicOverlayUi.counterCatalogSource = nextSource;
+      scheduleStrategicOverlayRefresh("counterCatalog");
+    });
+    unitCounterCatalogSourceTabs.dataset.bound = "true";
+  }
+  if (unitCounterLibraryVariantRow && !unitCounterLibraryVariantRow.dataset.bound) {
+    unitCounterLibraryVariantRow.addEventListener("click", (event) => {
+      const button = event.target instanceof HTMLElement ? event.target.closest("[data-counter-library-variant]") : null;
+      if (!(button instanceof HTMLButtonElement)) return;
+      ensureStrategicOverlayUiState();
+      state.strategicOverlayUi.hoi4CounterVariant = String(button.dataset.counterLibraryVariant || "small").trim().toLowerCase() === "large"
+        ? "large"
+        : "small";
+      scheduleStrategicOverlayRefresh("counterCatalog");
+    });
+    unitCounterLibraryVariantRow.dataset.bound = "true";
+  }
+  if (unitCounterLibraryExportBtn && !unitCounterLibraryExportBtn.dataset.bound) {
+    unitCounterLibraryExportBtn.addEventListener("click", () => {
+      exportHoi4UnitIconReviewDraft();
+    });
+    unitCounterLibraryExportBtn.dataset.bound = "true";
+  }
   if (unitCounterCatalogGrid && !unitCounterCatalogGrid.dataset.bound) {
     unitCounterCatalogGrid.addEventListener("click", (event) => {
+      const reviewButton = event.target instanceof HTMLElement ? event.target.closest("[data-hoi4-review-action]") : null;
+      if (reviewButton instanceof HTMLButtonElement) {
+        const action = String(reviewButton.dataset.hoi4ReviewAction || "").trim();
+        const entryId = String(reviewButton.dataset.hoi4EntryId || "").trim();
+        const currentPresetId = String(state.unitCounterEditor?.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim();
+        if (action === "toggle-current-mapping") {
+          toggleHoi4EntryCurrentPresetMapping(entryId, currentPresetId);
+          scheduleStrategicOverlayRefresh("counterCatalog");
+          return;
+        }
+        if (action === "set-current-candidate") {
+          setHoi4CurrentPresetCandidate(entryId, currentPresetId);
+          scheduleStrategicOverlayRefresh("counterCatalog");
+          return;
+        }
+      }
       const button = event.target instanceof HTMLElement ? event.target.closest("[data-unit-counter-catalog-preset]") : null;
       if (!(button instanceof HTMLButtonElement)) return;
       applyUnitCounterPresetSelection(String(button.dataset.unitCounterCatalogPreset || unitCounterPresets[0].id));
@@ -8336,8 +8882,12 @@ function initSidebar({ render } = {}) {
           modalEntityId: "",
           modalEntityType: "",
           counterEditorModalOpen: false,
+          counterCatalogSource: "internal",
           counterCatalogCategory: "all",
           counterCatalogQuery: "",
+          hoi4CounterCategory: "all",
+          hoi4CounterQuery: "",
+          hoi4CounterVariant: "small",
         };
         invalidateFrontlineOverlayState();
         state.operationalLinesDirty = true;

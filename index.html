@@ -61,13 +61,13 @@
                 <span id="paletteLibraryToggleLabel" class="visually-hidden">Browse All Colors</span>
               </button>
             </div>
-            <div class="palette-library-toolbar mt-3">
-              <label id="lblPaletteSource" class="visually-hidden" for="themeSelect" data-i18n="Palette Source">Palette Source</label>
-              <select id="themeSelect" name="quick-palette-source" autocomplete="off" class="select-input palette-library-source-select">
-                <option value="HOI4 Vanilla" data-i18n="HOI4 Vanilla">HOI4 Vanilla</option>
-              </select>
-            </div>
             <div id="paletteLibraryPanel" class="palette-library mt-3 hidden">
+              <div class="palette-library-toolbar">
+                <label id="lblPaletteSource" class="visually-hidden" for="themeSelect" data-i18n="Palette Source">Palette Source</label>
+                <select id="themeSelect" name="quick-palette-source" autocomplete="off" class="select-input palette-library-source-select">
+                  <option value="HOI4 Vanilla" data-i18n="HOI4 Vanilla">HOI4 Vanilla</option>
+                </select>
+              </div>
               <label id="lblPaletteSearch" class="section-header-block" for="paletteLibrarySearch">Search Colors</label>
               <input id="paletteLibrarySearch" type="text" name="palette-library-search" autocomplete="off" spellcheck="false" placeholder="Search country, ISO-2, or source tag..." class="input mt-2" />
               <div id="paletteLibrarySummary" class="body-text mt-2" data-i18n="0 colors">0 colors</div>
@@ -98,7 +98,7 @@
           </details>
 
           <h2 id="appearanceSectionHeading" class="visually-hidden">Appearance</h2>
-          <details class="card appearance-card" open aria-labelledby="appearanceSectionHeading labelMapStyle">
+          <details class="card appearance-card" aria-labelledby="appearanceSectionHeading labelMapStyle">
             <summary id="labelMapStyle" class="section-header">Appearance</summary>
             <div class="appearance-toolbar mt-3">
               <div class="appearance-tab-row" role="tablist" aria-label="Appearance sections" data-i18n-aria-label="Appearance sections">
@@ -1405,7 +1405,7 @@
           </div>
 
           <h2 id="countryInspectorHeading" class="visually-hidden">Country Inspector</h2>
-          <details id="countryInspectorSection" class="card inspector-section" open aria-labelledby="countryInspectorHeading lblCountryInspector">
+          <details id="countryInspectorSection" class="card inspector-section" aria-labelledby="countryInspectorHeading lblCountryInspector">
             <summary id="lblCountryInspector" class="section-header inspector-section-summary">
               <span class="inspector-section-summary-copy">Country Inspector</span>
               <span class="summary-info-trigger info-trigger" aria-hidden="true">

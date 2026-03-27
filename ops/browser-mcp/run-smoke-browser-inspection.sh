@@ -331,8 +331,31 @@ TS="$(date +%Y%m%d-%H%M%S)"
 RUN_LOG="$LOG_DIR/smoke-run-$TS.log"
 DEV_LOG="$LOG_DIR/dev-server-$TS.log"
 WIN_PID_FILE="$LOG_DIR/win-dev-server-$TS.pid"
+SMOKE_SESSION_ID="mapcreator-smoke-$TS"
 
-export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
+resolve_codex_home() {
+  local candidate windows_user=""
+  for candidate in "${CODEX_HOME:-}" "$HOME/.codex" "/mnt/c/Users/${USER:-}/.codex"; do
+    [[ -n "$candidate" ]] || continue
+    [[ -f "$candidate/skills/playwright/scripts/playwright_cli.sh" ]] || continue
+    printf '%s\n' "$candidate"
+    return 0
+  done
+
+  if command -v powershell.exe >/dev/null 2>&1; then
+    windows_user="$(powershell.exe -NoProfile -Command '$env:USERNAME' 2>/dev/null | tr -d '\r')"
+    candidate="/mnt/c/Users/${windows_user}/.codex"
+    if [[ -n "$windows_user" && -f "$candidate/skills/playwright/scripts/playwright_cli.sh" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+export CODEX_HOME="$(resolve_codex_home || true)"
+export PLAYWRIGHT_CLI_SESSION="$SMOKE_SESSION_ID"
 PWCLI="$CODEX_HOME/skills/playwright/scripts/playwright_cli.sh"
 if [[ ! -f "$PWCLI" ]]; then
   echo "[ERROR] Missing Playwright CLI wrapper: $PWCLI" | tee -a "$RUN_LOG"
@@ -369,6 +392,10 @@ TARGET_PORT=""
 BASE_URL=""
 PHASE_TIMED_OUT="0"
 REPORT_MAX_NETWORK_ENTRIES=0
+BROWSER_SESSION_READY="0"
+LAST_OPEN_URL=""
+PWCLI_CALLS_TOTAL=0
+PWCLI_DURATION_MS_TOTAL=0
 
 CURRENT_MODE=""
 CURRENT_MAX_SECTIONS=0
@@ -395,10 +422,25 @@ cleanup() {
 trap cleanup EXIT
 
 run_pwcli() {
+  local start_ms end_ms elapsed_ms status
+  start_ms="$(date +%s%3N)"
+  set +e
   (
+    export PLAYWRIGHT_CLI_SESSION="${PLAYWRIGHT_CLI_SESSION:-$SMOKE_SESSION_ID}"
     cd "$PWCLI_WORKDIR"
     bash "$PWCLI" "$@"
   )
+  status=$?
+  set -e
+  end_ms="$(date +%s%3N)"
+  if [[ "$start_ms" =~ ^[0-9]+$ && "$end_ms" =~ ^[0-9]+$ ]]; then
+    elapsed_ms=$((end_ms - start_ms))
+  else
+    elapsed_ms=0
+  fi
+  PWCLI_CALLS_TOTAL=$((PWCLI_CALLS_TOTAL + 1))
+  PWCLI_DURATION_MS_TOTAL=$((PWCLI_DURATION_MS_TOTAL + elapsed_ms))
+  return "$status"
 }
 
 mode_enabled() {
@@ -562,6 +604,40 @@ capture_screenshot() {
   return 0
 }
 
+collect_route_evidence() {
+  local context="$1"
+  local mode="$2"
+  local capture_console="$3"
+  local capture_network="$4"
+  local console_log="$LOG_DIR/console-route-${context}-${mode}-$TS.log"
+  local network_log="$LOG_DIR/network-route-${context}-${mode}-$TS.log"
+  local before_console before_network after_console after_network
+
+  before_console=$(wc -l < "$CONSOLE_ISSUES_FILE")
+  before_network=$(wc -l < "$NETWORK_ISSUES_FILE")
+
+  if [[ "$capture_console" == "1" ]]; then
+    run_pwcli console "$EVIDENCE_CONSOLE_MIN_LEVEL" > "$console_log" || true
+    collect_console_issues "$console_log" "route:${context}" "$mode" || true
+  fi
+
+  if [[ "$capture_network" == "1" ]]; then
+    if [[ "$EVIDENCE_NETWORK_INCLUDE_STATIC" == "1" ]]; then
+      run_pwcli network --static > "$network_log" || true
+    else
+      run_pwcli network > "$network_log" || true
+    fi
+    collect_network_issues "$network_log" "route:${context}" "$mode" || true
+  fi
+
+  after_console=$(wc -l < "$CONSOLE_ISSUES_FILE")
+  after_network=$(wc -l < "$NETWORK_ISSUES_FILE")
+  if (( after_console > before_console )) || (( after_network > before_network )); then
+    return 0
+  fi
+  return 1
+}
+
 resolve_url() {
   local raw="$1"
   if [[ "$raw" =~ ^https?:// ]]; then
@@ -650,6 +726,8 @@ ensure_windows_server_for_edge() {
   run_pwcli open "$test_url" --browser msedge > "$probe_log" 2>&1 || true
 
   if ! match_quiet "ERR_CONNECTION_REFUSED|### Error" "$probe_log"; then
+    BROWSER_SESSION_READY="1"
+    LAST_OPEN_URL="$test_url"
     echo "[INFO] Edge can reach $test_url directly." | tee -a "$RUN_LOG"
     return 0
   fi
@@ -672,16 +750,20 @@ ensure_windows_server_for_edge() {
 
   powershell.exe -NoProfile -Command "\$p=Start-Process -FilePath py -ArgumentList '-3','-m','http.server','${port}' -WorkingDirectory '${win_root}' -PassThru -WindowStyle Hidden; \$p.Id | Out-File -Encoding ascii '${win_pid_path}'" >/dev/null
   WINDOWS_SERVER_STARTED="1"
-  sleep 2
+  for _ in $(seq 1 6); do
+    sleep 0.5
+    run_pwcli close >/dev/null 2>&1 || true
+    run_pwcli open "$test_url" --browser msedge > "$probe_log" 2>&1 || true
+    if ! match_quiet "ERR_CONNECTION_REFUSED|### Error" "$probe_log"; then
+      BROWSER_SESSION_READY="1"
+      LAST_OPEN_URL="$test_url"
+      echo "[INFO] Windows-local fallback server active on ${DEFAULT_BASE_HOST}:${port}" | tee -a "$RUN_LOG"
+      return 0
+    fi
+  done
 
-  run_pwcli close >/dev/null 2>&1 || true
-  run_pwcli open "$test_url" --browser msedge > "$probe_log" 2>&1 || true
-  if match_quiet "ERR_CONNECTION_REFUSED|### Error" "$probe_log"; then
-    echo "[ERROR] Edge still cannot reach $test_url after Windows fallback." | tee -a "$RUN_LOG"
-    exit 1
-  fi
-
-  echo "[INFO] Windows-local fallback server active on ${DEFAULT_BASE_HOST}:${port}" | tee -a "$RUN_LOG"
+  echo "[ERROR] Edge still cannot reach $test_url after Windows fallback." | tee -a "$RUN_LOG"
+  exit 1
 }
 
 first_route_url_for_mode() {
@@ -715,12 +797,26 @@ run_section() {
 
   check_phase_runtime || return 0
 
-  local selector_json
+  local selector_json expand_json
   selector_json="$(json_quote "$selector")"
+  expand_json="$(json_quote "$expand")"
 
-  local locate_log="$LOG_DIR/pw-section-locate-${sid}-${mode}-$TS.log"
-  if ! run_pwcli run-code "async (page) => { await page.locator(${selector_json}).first().scrollIntoViewIfNeeded(); }" > "$locate_log" 2>&1; then
+  local action_log="$LOG_DIR/pw-section-action-${sid}-${mode}-$TS.log"
+  if ! run_pwcli run-code "async (page) => {
+    const locator = page.locator(${selector_json}).first();
+    await locator.scrollIntoViewIfNeeded();
+    if (${expand_json} === 'click' || ${expand_json} === 'toggle') {
+      await locator.click();
+    }
+    if (${scroll} > 0) {
+      await page.mouse.wheel(0, ${scroll});
+    }
+  }" > "$action_log" 2>&1; then
     echo "[$mode][$page] ${sid}: skipped (selector not found: ${selector})" >> "$SKIPPED_SECTIONS_FILE"
+    register_anomaly "$mode" "section:${sid}"
+    if [[ "$screenshot_policy" == "on_error" ]]; then
+      capture_screenshot "section-${sid}-error-${mode}-$TS" 0 || true
+    fi
     return 0
   fi
 
@@ -731,45 +827,8 @@ run_section() {
 
   echo "[$mode][$page] ${sid} (${selector})" >> "$VISITED_SECTIONS_FILE"
 
-  if [[ "$expand" == "click" || "$expand" == "toggle" ]]; then
-    local expand_log="$LOG_DIR/pw-section-expand-${sid}-${mode}-$TS.log"
-    run_pwcli run-code "async (page) => { await page.locator(${selector_json}).first().click(); }" > "$expand_log" 2>&1 || true
-  fi
-
-  if (( scroll > 0 )); then
-    local scroll_log="$LOG_DIR/pw-section-scroll-${sid}-${mode}-$TS.log"
-    run_pwcli mousewheel 0 "$scroll" > "$scroll_log" 2>&1 || true
-  fi
-
-  local console_log="$LOG_DIR/console-section-${sid}-${mode}-$TS.log"
-  local network_log="$LOG_DIR/network-section-${sid}-${mode}-$TS.log"
-
-  run_pwcli console "$EVIDENCE_CONSOLE_MIN_LEVEL" > "$console_log" || true
-  if [[ "$EVIDENCE_NETWORK_INCLUDE_STATIC" == "1" ]]; then
-    run_pwcli network --static > "$network_log" || true
-  else
-    run_pwcli network > "$network_log" || true
-  fi
-
-  local before_console before_network after_console after_network
-  before_console=$(wc -l < "$CONSOLE_ISSUES_FILE")
-  before_network=$(wc -l < "$NETWORK_ISSUES_FILE")
-
-  collect_console_issues "$console_log" "section:${sid}" "$mode" || true
-  collect_network_issues "$network_log" "section:${sid}" "$mode" || true
-
-  after_console=$(wc -l < "$CONSOLE_ISSUES_FILE")
-  after_network=$(wc -l < "$NETWORK_ISSUES_FILE")
-
-  local section_has_issue=0
-  if (( after_console > before_console )) || (( after_network > before_network )); then
-    section_has_issue=1
-  fi
-
   if [[ "$screenshot_policy" == "always" ]]; then
     capture_screenshot "section-${sid}-${mode}-$TS" 0 || true
-  elif [[ "$screenshot_policy" == "on_error" && "$section_has_issue" == "1" ]]; then
-    capture_screenshot "section-${sid}-error-${mode}-$TS" 0 || true
   fi
 
   return 0
@@ -790,34 +849,27 @@ run_gesture() {
 
   check_phase_runtime || return 0
 
-  local selector_json
+  local selector_json gtype_json
   selector_json="$(json_quote "$selector")"
-  local locate_log="$LOG_DIR/pw-gesture-locate-${gid}-${mode}-$TS.log"
-  if ! run_pwcli run-code "async (page) => { await page.locator(${selector_json}).first().scrollIntoViewIfNeeded(); }" > "$locate_log" 2>&1; then
+  gtype_json="$(json_quote "$gtype")"
+  local action_log="$LOG_DIR/pw-gesture-action-${gid}-${mode}-$TS.log"
+  if ! run_pwcli run-code "async (page) => {
+    const locator = page.locator(${selector_json}).first();
+    await locator.scrollIntoViewIfNeeded();
+    if (${gtype_json} === 'drag_zoom') {
+      await page.mouse.move(${x1}, ${y1});
+      await page.mouse.down({ button: 'left' });
+      await page.mouse.move(${x2}, ${y2});
+      await page.mouse.up({ button: 'left' });
+      if (${wheel} !== 0) {
+        await page.mouse.wheel(0, ${wheel});
+      }
+    }
+  }" > "$action_log" 2>&1; then
     echo "[$mode][$page] ${gid}: skipped (selector not found: ${selector})" >> "$SKIPPED_SECTIONS_FILE"
+    register_anomaly "$mode" "gesture:${gid}"
     return 0
   fi
-
-  if [[ "$gtype" == "drag_zoom" ]]; then
-    run_pwcli mousemove "$x1" "$y1" > "$LOG_DIR/pw-gesture-move1-${gid}-${mode}-$TS.log"
-    run_pwcli mousedown left > "$LOG_DIR/pw-gesture-down-${gid}-${mode}-$TS.log"
-    run_pwcli mousemove "$x2" "$y2" > "$LOG_DIR/pw-gesture-move2-${gid}-${mode}-$TS.log"
-    run_pwcli mouseup left > "$LOG_DIR/pw-gesture-up-${gid}-${mode}-$TS.log"
-    if (( wheel != 0 )); then
-      run_pwcli mousewheel 0 "$wheel" > "$LOG_DIR/pw-gesture-wheel-${gid}-${mode}-$TS.log"
-    fi
-  fi
-
-  local console_log="$LOG_DIR/console-gesture-${gid}-${mode}-$TS.log"
-  local network_log="$LOG_DIR/network-gesture-${gid}-${mode}-$TS.log"
-  run_pwcli console "$EVIDENCE_CONSOLE_MIN_LEVEL" > "$console_log" || true
-  if [[ "$EVIDENCE_NETWORK_INCLUDE_STATIC" == "1" ]]; then
-    run_pwcli network --static > "$network_log" || true
-  else
-    run_pwcli network > "$network_log" || true
-  fi
-  collect_console_issues "$console_log" "gesture:${gid}" "$mode" || true
-  collect_network_issues "$network_log" "gesture:${gid}" "$mode" || true
 
   if [[ "$gshot" == "1" ]]; then
     capture_screenshot "gesture-${gid}-${mode}-$TS" 0 || true
@@ -834,6 +886,7 @@ run_route() {
   local capture_console="$5"
   local capture_network="$6"
   local mode="$7"
+  local skip_navigation="${8:-0}"
 
   check_phase_runtime || return 0
 
@@ -845,37 +898,19 @@ run_route() {
   run_pwcli console "$EVIDENCE_CONSOLE_MIN_LEVEL" --clear > /dev/null 2>&1 || true
   run_pwcli network --clear > /dev/null 2>&1 || true
 
-  local goto_log="$LOG_DIR/pw-goto-${rid}-${mode}-$TS.log"
-  if ! run_pwcli goto "$url" > "$goto_log"; then
-    echo "[$mode][route:${rid}] navigation failed: $url" >> "$NETWORK_ISSUES_FILE"
-    register_anomaly "$mode" "route:${rid}"
-    return 0
+  if [[ "$skip_navigation" != "1" ]]; then
+    local goto_log="$LOG_DIR/pw-goto-${rid}-${mode}-$TS.log"
+    if ! run_pwcli goto "$url" > "$goto_log"; then
+      echo "[$mode][route:${rid}] navigation failed: $url" >> "$NETWORK_ISSUES_FILE"
+      register_anomaly "$mode" "route:${rid}"
+      return 0
+    fi
+    LAST_OPEN_URL="$url"
+    BROWSER_SESSION_READY="1"
   fi
-
-  run_pwcli snapshot > "$LOG_DIR/pw-snapshot-${rid}-${mode}-$TS.log" || true
 
   if (( scroll > 0 )); then
     run_pwcli mousewheel 0 "$scroll" > "$LOG_DIR/pw-scroll-${rid}-${mode}-$TS.log" || true
-  fi
-
-  if [[ "$do_shot" == "1" ]]; then
-    capture_screenshot "route-${rid}-${mode}-$TS" 1 || true
-  fi
-
-  if [[ "$capture_console" == "1" ]]; then
-    local clog="$LOG_DIR/console-route-${rid}-${mode}-$TS.log"
-    run_pwcli console "$EVIDENCE_CONSOLE_MIN_LEVEL" > "$clog" || true
-    collect_console_issues "$clog" "route:${rid}" "$mode" || true
-  fi
-
-  if [[ "$capture_network" == "1" ]]; then
-    local nlog="$LOG_DIR/network-route-${rid}-${mode}-$TS.log"
-    if [[ "$EVIDENCE_NETWORK_INCLUDE_STATIC" == "1" ]]; then
-      run_pwcli network --static > "$nlog" || true
-    else
-      run_pwcli network > "$nlog" || true
-    fi
-    collect_network_issues "$nlog" "route:${rid}" "$mode" || true
   fi
 
   local section_rows=()
@@ -902,6 +937,14 @@ run_route() {
     [[ "$PHASE_TIMED_OUT" == "1" ]] && break
   done
 
+  if [[ "$do_shot" == "1" ]]; then
+    capture_screenshot "route-${rid}-${mode}-$TS" 1 || true
+  fi
+
+  if [[ "$capture_console" == "1" || "$capture_network" == "1" ]]; then
+    collect_route_evidence "$rid" "$mode" "$capture_console" "$capture_network" || true
+  fi
+
   return 0
 }
 
@@ -909,25 +952,50 @@ run_mode_phase() {
   local mode="$1"
   set_phase_budget "$mode"
 
-  local first_url
-  if ! first_url="$(first_route_url_for_mode "$mode")"; then
-    echo "[WARN] No routes configured for mode=$mode" | tee -a "$RUN_LOG"
-    return 0
-  fi
-
-  run_pwcli close >/dev/null 2>&1 || true
-  run_pwcli open "$first_url" --browser msedge > "$LOG_DIR/pw-open-${mode}-$TS.log" || true
-
-  echo "[INFO] Running mode phase: $mode" | tee -a "$RUN_LOG"
-
   local route_rows=()
   mapfile -t route_rows < "$PARSE_DIR/routes.tsv"
   local route_row rid url scroll do_shot capture_console capture_network modes_csv
+  local first_route_id=""
+  local first_url=""
   for route_row in "${route_rows[@]}"; do
     IFS=$'\t' read -r rid url scroll do_shot capture_console capture_network modes_csv <<< "$route_row"
     [[ -z "$rid" ]] && continue
     mode_enabled "$modes_csv" "$mode" || continue
-    run_route "$rid" "$url" "$scroll" "$do_shot" "$capture_console" "$capture_network" "$mode"
+    first_route_id="$rid"
+    first_url="$(resolve_url "$url")"
+    break
+  done
+
+  if [[ -z "$first_route_id" || -z "$first_url" ]]; then
+    echo "[WARN] No routes configured for mode=$mode" | tee -a "$RUN_LOG"
+    return 0
+  fi
+
+  local first_route_ready="0"
+  if [[ "$BROWSER_SESSION_READY" == "1" && "$LAST_OPEN_URL" == "$first_url" ]]; then
+    first_route_ready="1"
+  else
+    run_pwcli close >/dev/null 2>&1 || true
+    if run_pwcli open "$first_url" --browser msedge > "$LOG_DIR/pw-open-${mode}-$TS.log" 2>&1; then
+      BROWSER_SESSION_READY="1"
+      LAST_OPEN_URL="$first_url"
+      first_route_ready="1"
+    fi
+  fi
+
+  echo "[INFO] Running mode phase: $mode" | tee -a "$RUN_LOG"
+
+  local first_route_consumed="0"
+  for route_row in "${route_rows[@]}"; do
+    IFS=$'\t' read -r rid url scroll do_shot capture_console capture_network modes_csv <<< "$route_row"
+    [[ -z "$rid" ]] && continue
+    mode_enabled "$modes_csv" "$mode" || continue
+    local skip_navigation="0"
+    if [[ "$first_route_ready" == "1" && "$first_route_consumed" == "0" && "$rid" == "$first_route_id" ]]; then
+      skip_navigation="1"
+      first_route_consumed="1"
+    fi
+    run_route "$rid" "$url" "$scroll" "$do_shot" "$capture_console" "$capture_network" "$mode" "$skip_navigation"
     [[ "$PHASE_TIMED_OUT" == "1" ]] && break
   done
 
@@ -986,6 +1054,13 @@ mapfile -t REPORT_ROUTES < <(sort -u "$VISITED_ROUTES_FILE" 2>/dev/null || true)
 mapfile -t REPORT_SECTIONS < <(sort -u "$VISITED_SECTIONS_FILE" 2>/dev/null || true)
 mapfile -t REPORT_SKIPPED < <(sort -u "$SKIPPED_SECTIONS_FILE" 2>/dev/null || true)
 mapfile -t REPORT_PHASES < <(cat "$EXEC_PHASES_FILE" 2>/dev/null || true)
+REPORT_ROUTE_COUNT="${#REPORT_ROUTES[@]}"
+PWCLI_AVG_CALLS_PER_ROUTE=0
+PWCLI_AVG_MS_PER_ROUTE=0
+if (( REPORT_ROUTE_COUNT > 0 )); then
+  PWCLI_AVG_CALLS_PER_ROUTE=$((PWCLI_CALLS_TOTAL / REPORT_ROUTE_COUNT))
+  PWCLI_AVG_MS_PER_ROUTE=$((PWCLI_DURATION_MS_TOTAL / REPORT_ROUTE_COUNT))
+fi
 
 {
   echo "# AI Browser MCP Smoke Test"
@@ -1037,6 +1112,13 @@ mapfile -t REPORT_PHASES < <(cat "$EXEC_PHASES_FILE" 2>/dev/null || true)
   else
     echo "- No screenshots captured."
   fi
+  echo
+  echo "## Playwright CLI Metrics"
+  echo "- Session: $SMOKE_SESSION_ID"
+  echo "- Total CLI calls: $PWCLI_CALLS_TOTAL"
+  echo "- Total CLI time (ms): $PWCLI_DURATION_MS_TOTAL"
+  echo "- Avg CLI calls per visited route: $PWCLI_AVG_CALLS_PER_ROUTE"
+  echo "- Avg CLI time per visited route (ms): $PWCLI_AVG_MS_PER_ROUTE"
   echo
   echo "## Console summary"
   if [[ -s "$CONSOLE_ISSUES_FILE" ]]; then

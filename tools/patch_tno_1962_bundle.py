@@ -23,6 +23,7 @@ from shapely import affinity
 from shapely.geometry import GeometryCollection, LineString, MultiPolygon, Polygon, box, mapping, shape
 from shapely.geometry.polygon import orient
 from shapely.ops import snap, unary_union
+from shapely.validation import explain_validity
 from topojson import Topology
 from topojson.utils import serialize_as_geodataframe, serialize_as_geojson
 
@@ -37,6 +38,7 @@ from scenario_builder.hoi4.audit import read_bmp24
 from tools.build_tno_1962_geo_locale_patch import build_patch as build_tno_geo_locale_patch
 from tools.build_startup_bootstrap_assets import build_bootstrap_runtime_topology, build_startup_bootstrap_assets
 from tools.check_scenario_contracts import validate_publish_bundle_dir
+from tools.scenario_chunk_assets import build_and_write_scenario_chunk_assets
 
 
 SCENARIO_ID = "tno_1962"
@@ -49,6 +51,7 @@ RELEASABLE_CATALOG_PATH = ROOT / "data/releasables/tno_1962.internal.phase1.cata
 HIERARCHY_PATH = ROOT / "data/hierarchy.json"
 TNO_PALETTE_PATH = ROOT / "data/palettes/tno.palette.json"
 WATER_REGIONS_PATH = ROOT / "data/water_regions.geojson"
+DEFAULT_STARTUP_TOPOLOGY_URL = "data/europe_topology.runtime_political_v1.json"
 DEFAULT_CHECKPOINT_DIR = ROOT / ".runtime" / "tmp" / "tno_1962_bundle"
 STAGE_ALL = "all"
 STAGE_COUNTRIES = "countries"
@@ -148,22 +151,28 @@ TNO_OPEN_OCEAN_SPLIT_SPECS = (
                 "name": "Northwest Atlantic Ocean",
                 "bbox": (-180.0, 20.0, -40.0, 90.0),
                 "supplement_bboxes": ((-70.0, 20.0, -40.0, 55.0),),
+                "component_min_area": 0.05,
             },
             {
                 "id": TNO_ATLANTIC_OPEN_OCEAN_IDS[1],
                 "name": "Northeast Atlantic Ocean",
                 "bbox": (-40.0, 20.0, 180.0, 90.0),
                 "supplement_bboxes": ((-40.0, 20.0, 20.0, 50.0),),
+                "component_min_area": 0.05,
             },
             {
                 "id": TNO_ATLANTIC_OPEN_OCEAN_IDS[2],
                 "name": "West Central Atlantic Ocean",
                 "bbox": (-100.0, 0.0, -20.0, 20.0),
+                "supplement_bboxes": ((-80.0, 0.0, -20.0, 20.0),),
+                "component_min_area": 0.05,
             },
             {
                 "id": TNO_ATLANTIC_OPEN_OCEAN_IDS[3],
                 "name": "East Central Atlantic Ocean",
                 "bbox": (-20.0, 0.0, 20.0, 20.0),
+                "supplement_bboxes": ((-20.0, 0.0, 20.0, 20.0),),
+                "component_min_area": 0.05,
             },
             {
                 "id": TNO_ATLANTIC_OPEN_OCEAN_IDS[4],
@@ -472,6 +481,17 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "simplify_tolerance": 0.01,
     },
     {
+        "id": "tno_baltic_sea",
+        "name": "Baltic Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_baltic_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "subtract_named_ids": ("tno_kattegat",),
+        "clip_open_ocean_ids": ("tno_northeast_atlantic_ocean",),
+    },
+    {
         "id": "tno_sea_of_marmara",
         "name": "Sea of Marmara",
         "water_type": "sea",
@@ -571,6 +591,16 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "global_source_id": "marine_baffin_bay",
         "source_standard": "tno_cloned_from_global_water_regions",
         "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS + TNO_ARCTIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_hudson_bay",
+        "name": "Hudson Bay",
+        "water_type": "bay",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_hudson_bay",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": ("tno_northwest_atlantic_ocean", "tno_western_arctic_ocean"),
     },
     {
         "id": "tno_bay_of_biscay",
@@ -733,6 +763,36 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "global_source_id": "marine_great_australian_bight",
         "source_standard": "tno_cloned_from_global_water_regions",
         "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS + TNO_SOUTHERN_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_scotia_sea",
+        "name": "Scotia Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_scotia_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": ("tno_south_atlantic_antarctic_ocean",),
+    },
+    {
+        "id": "tno_weddell_sea",
+        "name": "Weddell Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_weddell_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": ("tno_south_atlantic_antarctic_ocean",),
+    },
+    {
+        "id": "tno_ross_sea",
+        "name": "Ross Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_ross_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": ("tno_south_pacific_antarctic_ocean",),
     },
     {
         "id": "tno_arabian_sea",
@@ -3743,9 +3803,69 @@ def buffer_polygonal(geom, buffer_distance: float) -> object:
     return normalize_polygonal(candidate.buffer(buffer_distance))
 
 
-def build_tno_open_ocean_split_features(land_mask_geom=None) -> list[dict]:
+def prune_polygonal_components(geom, *, min_area: float = 0.0) -> object:
+    candidate = normalize_polygonal(geom)
+    if candidate is None:
+        return None
+    if min_area <= 0:
+        return candidate
+    parts = [part for part in iter_polygon_parts(candidate) if float(part.area) >= float(min_area)]
+    if not parts:
+        parts = [max(iter_polygon_parts(candidate), key=lambda part: float(part.area))]
+    return normalize_polygonal(safe_unary_union(parts))
+
+
+def _geometry_validity_message(geom) -> str:
+    candidate = geom
+    if candidate is None or getattr(candidate, "is_empty", True):
+        return "empty geometry"
+    try:
+        return explain_validity(candidate)
+    except Exception as exc:
+        return f"validity check failed: {exc}"
+
+
+def validate_tno_water_geometries(
+    features: list[dict] | dict,
+    *,
+    stage_label: str,
+    feature_ids: tuple[str, ...] | list[str] | None = None,
+) -> None:
+    target_ids = {
+        str(feature_id).strip()
+        for feature_id in (feature_ids or ())
+        if str(feature_id).strip()
+    }
+    if isinstance(features, dict):
+        iterable = features.get("features", []) or []
+    else:
+        iterable = features or []
+    failures: list[str] = []
+    for feature in iterable:
+        props = feature.get("properties", {}) if isinstance(feature, dict) else {}
+        feature_id = str(props.get("id") or "").strip()
+        if target_ids and feature_id not in target_ids:
+            continue
+        geom = shape(feature.get("geometry")) if isinstance(feature, dict) and feature.get("geometry") else None
+        if geom is None or geom.is_empty:
+            failures.append(f"{feature_id or '<unknown>'}: empty geometry")
+            continue
+        if not geom.is_valid:
+            failures.append(f"{feature_id or '<unknown>'}: {_geometry_validity_message(geom)}")
+    if failures:
+        raise ValueError(
+            f"TNO water geometry validation failed at {stage_label}:\n- " + "\n- ".join(failures)
+        )
+
+
+def build_tno_open_ocean_split_features(
+    land_mask_geom=None,
+    *,
+    supplement_subtract_geometries_by_source_id: dict[str, list] | None = None,
+) -> list[dict]:
     feature_index = load_global_water_regions_feature_index()
     land_mask_geom = normalize_polygonal(land_mask_geom)
+    supplement_subtract_geometries_by_source_id = supplement_subtract_geometries_by_source_id or {}
     split_features: list[dict] = []
     for split_spec in TNO_OPEN_OCEAN_SPLIT_SPECS:
         source_id = split_spec["source_id"]
@@ -3768,6 +3888,14 @@ def build_tno_open_ocean_split_features(land_mask_geom=None) -> list[dict]:
         ]))
         if source_geom is None:
             raise ValueError(f"Base water region '{source_id}' has empty geometry.")
+        supplement_subtract_geometries = [
+            normalized_geom
+            for normalized_geom in (
+                normalize_polygonal(geom)
+                for geom in supplement_subtract_geometries_by_source_id.get(source_id, [])
+            )
+            if normalized_geom is not None
+        ]
         for child_spec in split_spec["children"]:
             child_boxes = child_spec.get("bboxes") or (child_spec.get("bbox"),)
             child_parts = []
@@ -3785,9 +3913,17 @@ def build_tno_open_ocean_split_features(land_mask_geom=None) -> list[dict]:
                     continue
                 if land_mask_geom is not None:
                     supplement_geom = normalize_polygonal(supplement_geom.difference(land_mask_geom))
+                if supplement_geom is not None and supplement_subtract_geometries:
+                    supplement_geom = subtract_geometry_list(supplement_geom, supplement_subtract_geometries)
                 if supplement_geom is not None:
                     child_parts.append(supplement_geom)
             child_geom = normalize_polygonal(safe_unary_union(child_parts))
+            if child_geom is not None and supplement_subtract_geometries:
+                child_geom = subtract_geometry_list(child_geom, supplement_subtract_geometries)
+            child_geom = prune_polygonal_components(
+                child_geom,
+                min_area=float(child_spec.get("component_min_area") or 0.0),
+            )
             if child_geom is None:
                 raise ValueError(
                     f"TNO ocean split '{child_spec['id']}' produced empty geometry from '{source_id}'."
@@ -3809,10 +3945,20 @@ def build_tno_open_ocean_split_features(land_mask_geom=None) -> list[dict]:
                 "render_as_base_geography": False,
             })
             split_features.append(make_feature(child_geom, child_props))
+    validate_tno_water_geometries(
+        split_features,
+        stage_label="scenario_water_seed",
+        feature_ids=TNO_ATLANTIC_OPEN_OCEAN_IDS,
+    )
     return split_features
 
 
-def clip_tno_open_ocean_split_features(split_features: list[dict], clip_geometries_by_id: dict[str, list]) -> list[dict]:
+def clip_tno_open_ocean_split_features(
+    split_features: list[dict],
+    clip_geometries_by_id: dict[str, list],
+    component_min_area_by_id: dict[str, float] | None = None,
+) -> list[dict]:
+    component_min_area_by_id = component_min_area_by_id or {}
     clipped_features: list[dict] = []
     for feature in split_features:
         props = dict(feature.get("properties", {}))
@@ -3829,9 +3975,18 @@ def clip_tno_open_ocean_split_features(split_features: list[dict], clip_geometri
             if buffered_geom is not None
         ]
         clipped_geom = subtract_geometry_list(geom, buffered_clip_geometries)
+        clipped_geom = prune_polygonal_components(
+            clipped_geom,
+            min_area=float(component_min_area_by_id.get(feature_id) or 0.0),
+        )
         if clipped_geom is None:
             raise ValueError(f"TNO ocean split feature '{feature_id}' collapsed after coastal clipping.")
         clipped_features.append(make_feature(clipped_geom, props))
+    validate_tno_water_geometries(
+        clipped_features,
+        stage_label="scenario_water_seed_clipped",
+        feature_ids=TNO_ATLANTIC_OPEN_OCEAN_IDS,
+    )
     return clipped_features
 
 
@@ -3968,6 +4123,16 @@ def write_json(path: Path, payload: dict) -> None:
     )
 
 
+def collect_gdf_feature_ids(gdf: gpd.GeoDataFrame) -> set[str]:
+    if "id" not in gdf.columns:
+        raise ValueError("GeoDataFrame is missing required 'id' column.")
+    return {
+        str(value).strip()
+        for value in gdf["id"].tolist()
+        if str(value).strip()
+    }
+
+
 def round_geojson_coordinates(payload: object, decimals: int = 6) -> object:
     if isinstance(payload, list):
         if payload and all(isinstance(value, (int, float)) for value in payload):
@@ -4005,6 +4170,56 @@ def marine_regions_named_water_snapshot_path(scenario_dir: Path) -> Path:
 
 def tno_water_regions_provenance_path(scenario_dir: Path) -> Path:
     return scenario_dir / TNO_WATER_REGIONS_PROVENANCE_FILENAME
+
+
+def rebuild_published_scenario_chunk_assets(scenario_dir: Path, checkpoint_dir: Path) -> None:
+    manifest_path = scenario_dir / "manifest.json"
+    manifest_payload = load_json(manifest_path)
+    layer_payloads: dict[str, dict | None] = {}
+    for layer_key, raw_url in {
+        "water": manifest_payload.get("water_regions_url"),
+        "special": manifest_payload.get("special_regions_url"),
+        "relief": manifest_payload.get("relief_overlays_url"),
+        "cities": manifest_payload.get("city_overrides_url"),
+    }.items():
+        url = str(raw_url or "").strip()
+        if not url:
+            continue
+        payload_path = ROOT.joinpath(*Path(url).parts)
+        if payload_path.exists():
+            layer_payloads[layer_key] = load_json(payload_path)
+
+    runtime_topology_payload = load_checkpoint_json(checkpoint_dir, "runtime_topology.topo.json")
+    runtime_topology_url = str(
+        manifest_payload.get("runtime_topology_url")
+        or f"data/scenarios/{SCENARIO_ID}/runtime_topology.topo.json"
+    ).strip()
+    runtime_topology_path = ROOT.joinpath(*Path(runtime_topology_url).parts)
+    runtime_topology_path.parent.mkdir(parents=True, exist_ok=True)
+    write_json(runtime_topology_path, runtime_topology_payload)
+
+    runtime_bootstrap_topology_payload = build_bootstrap_runtime_topology(runtime_topology_payload)
+    startup_topology_url = str(
+        manifest_payload.get("runtime_bootstrap_topology_url")
+        or f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME}"
+    ).strip()
+    startup_topology_path = ROOT.joinpath(*Path(startup_topology_url).parts)
+    startup_topology_path.parent.mkdir(parents=True, exist_ok=True)
+    write_json(startup_topology_path, runtime_bootstrap_topology_payload)
+
+    build_and_write_scenario_chunk_assets(
+        scenario_dir=scenario_dir,
+        manifest_payload=manifest_payload,
+        layer_payloads=layer_payloads,
+        startup_topology_payload=runtime_bootstrap_topology_payload,
+        runtime_topology_payload=runtime_topology_payload,
+        startup_topology_url=startup_topology_url,
+        runtime_topology_url=runtime_topology_url,
+        generated_at=str(manifest_payload.get("generated_at") or "").strip(),
+        default_startup_topology_url=DEFAULT_STARTUP_TOPOLOGY_URL,
+        water_validation_feature_ids=set(TNO_ATLANTIC_OPEN_OCEAN_IDS),
+    )
+    write_json_atomic(manifest_path, manifest_payload, ensure_ascii=False, indent=2, trailing_newline=True)
 
 
 def collect_marine_regions_source_record_ids(source_layer: str, features: list[dict]) -> list[str]:
@@ -4182,7 +4397,6 @@ def gdf_to_feature_collection(gdf: gpd.GeoDataFrame) -> dict:
     if gdf is None or gdf.empty:
         return feature_collection_from_features([])
     return json.loads(gdf.to_json())
-
 
 def load_checkpoint_gdf(checkpoint_dir: Path, filename: str) -> gpd.GeoDataFrame:
     payload = load_checkpoint_json(checkpoint_dir, filename)
@@ -8225,6 +8439,23 @@ def build_countries_stage_state(
     ocean_land_mask_geom = safe_unary_union([base_land_union, atl_land_union])
     if ocean_land_mask_geom is None:
         raise ValueError("Open-ocean land mask collapsed to empty geometry.")
+    mediterranean_template_gdf = load_mediterranean_template_water_gdf()
+    mediterranean_template_union = (
+        safe_unary_union(mediterranean_template_gdf.geometry.tolist())
+        if not mediterranean_template_gdf.empty
+        else None
+    )
+    atlantic_supplement_subtract_geometries = [
+        geom
+        for geom in [atl_sea_union, mediterranean_template_union]
+        if geom is not None
+    ]
+    open_ocean_component_min_area_by_id = {
+        str(child_spec.get("id")).strip(): float(child_spec.get("component_min_area") or 0.0)
+        for split_spec in TNO_OPEN_OCEAN_SPLIT_SPECS
+        for child_spec in split_spec.get("children", ())
+        if str(child_spec.get("id") or "").strip()
+    }
     clip_open_ocean_geometries_by_id: dict[str, list] = {}
     for spec, feature in zip(TNO_NAMED_MARGINAL_WATER_SPECS, named_marginal_water_features):
         clip_geom = normalize_polygonal(shape(feature.get("geometry")))
@@ -8233,11 +8464,22 @@ def build_countries_stage_state(
         for split_id in spec.get("clip_open_ocean_ids", ()) or ():
             clip_open_ocean_geometries_by_id.setdefault(str(split_id).strip(), []).append(clip_geom)
     scenario_water_features = clip_tno_open_ocean_split_features(
-        build_tno_open_ocean_split_features(land_mask_geom=ocean_land_mask_geom),
+        build_tno_open_ocean_split_features(
+            land_mask_geom=ocean_land_mask_geom,
+            supplement_subtract_geometries_by_source_id={
+                "marine_atlantic_ocean": atlantic_supplement_subtract_geometries,
+            },
+        ),
         clip_open_ocean_geometries_by_id,
+        open_ocean_component_min_area_by_id,
     )
     scenario_water_features.extend(named_marginal_water_features)
     scenario_water_features.append(congo_feature)
+    validate_tno_water_geometries(
+        scenario_water_features,
+        stage_label="scenario_water_seed_final",
+        feature_ids=TNO_ATLANTIC_OPEN_OCEAN_IDS,
+    )
     water_feature_collection = feature_collection_from_features(scenario_water_features)
     water_gdf = geopandas_from_features(water_feature_collection["features"])
 
@@ -8360,6 +8602,11 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
         ),
         decimals=6,
     )
+    validate_tno_water_geometries(
+        runtime_water_regions,
+        stage_label="runtime_topology.scenario_water",
+        feature_ids=TNO_ATLANTIC_OPEN_OCEAN_IDS,
+    )
     runtime_special_regions = feature_collection_from_features([])
     relief_overlays_payload = round_geojson_coordinates(relief_overlays_payload, decimals=6)
 
@@ -8416,6 +8663,13 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
         for feature in runtime_water_regions.get("features", [])
         if str(feature.get("properties", {}).get("id") or "").strip()
     ]
+    scenario_water_seed_ids = collect_gdf_feature_ids(water_gdf)
+    runtime_water_region_id_set = set(runtime_water_region_ids)
+    if scenario_water_seed_ids != runtime_water_region_id_set:
+        raise ValueError(
+            "Scenario water seed IDs diverged from runtime topology scenario_water IDs: "
+            f"seed={sorted(scenario_water_seed_ids)} runtime={sorted(runtime_water_region_id_set)}"
+        )
     named_marginal_water_ids = [spec["id"] for spec in TNO_NAMED_MARGINAL_WATER_SPECS]
 
     for summary in (
@@ -8563,11 +8817,13 @@ def write_countries_stage_checkpoints(state: dict[str, object], checkpoint_dir: 
     write_checkpoint_gdf(checkpoint_dir, CHECKPOINT_SCENARIO_WATER_SEED_FILENAME, state["water_gdf"])
     write_checkpoint_json(checkpoint_dir, CHECKPOINT_RELIEF_FILENAME, state["relief_overlays_payload"])
     write_checkpoint_json(checkpoint_dir, CHECKPOINT_BATHYMETRY_FILENAME, state["bathymetry_payload"])
-    write_checkpoint_json(
-        checkpoint_dir,
-        CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
-        state["runtime_bootstrap_topology_payload"],
-    )
+    runtime_bootstrap_topology_payload = state.get("runtime_bootstrap_topology_payload")
+    if isinstance(runtime_bootstrap_topology_payload, dict):
+        write_checkpoint_json(
+            checkpoint_dir,
+            CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
+            runtime_bootstrap_topology_payload,
+        )
     write_checkpoint_json(checkpoint_dir, CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME, state["named_water_snapshot_payload"])
     write_checkpoint_json(
         checkpoint_dir,
@@ -8830,6 +9086,8 @@ def write_bundle_stage(
         output_path = scenario_dir / filename
         output_path.parent.mkdir(parents=True, exist_ok=True)
         write_json(output_path, payload)
+    if publish_scope in {PUBLISH_SCOPE_SCENARIO_DATA, PUBLISH_SCOPE_ALL}:
+        rebuild_published_scenario_chunk_assets(scenario_dir, checkpoint_dir)
 
 
 def print_bundle_summary(state: dict[str, object]) -> None:
