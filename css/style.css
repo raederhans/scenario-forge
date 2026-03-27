@@ -8,6 +8,8 @@
   --bg-overlay-strong: rgba(255, 255, 255, 0.94);
   --text-primary: #162333;
   --text-secondary: #5d6b7a;
+  --text-tertiary: #64717e;
+  --text-heading: #425062;
   --text-disabled: #95a0ab;
   --color-accent: #1f4f7e;
   --color-accent-hover: #17456f;
@@ -326,7 +328,7 @@ body.app-startup-readonly #mapOnboardingHint {
   font-weight: 700;
   text-transform: none;
   letter-spacing: 0.01em;
-  color: #425062;
+  color: var(--text-heading);
   margin: 0;
   text-wrap: balance;
 }
@@ -677,6 +679,7 @@ input[type="checkbox"].checkbox-input {
 .ml-5 { margin-left: 20px; }
 .w-full { width: 100%; }
 .relative { position: relative; }
+/* Use .hidden for conditional elements inside an already active panel. */
 .hidden { display: none !important; }
 
 .visually-hidden {
@@ -1059,6 +1062,7 @@ input[type="checkbox"].checkbox-input {
   background: rgba(0, 47, 167, 0.06);
 }
 
+/* Use the hidden attribute for full panel/tab visibility switches. */
 .appearance-tab-panel[hidden] {
   display: none !important;
 }
@@ -1080,7 +1084,7 @@ input[type="checkbox"].checkbox-input {
 .appearance-mini-section > summary {
   cursor: pointer;
   list-style: none;
-  padding: 14px 16px;
+  padding: 14px 0;
 }
 
 .appearance-subsection > summary::-webkit-details-marker,
@@ -1103,7 +1107,7 @@ input[type="checkbox"].checkbox-input {
 
 .appearance-subsection > *:not(summary),
 .appearance-mini-section > *:not(summary) {
-  padding: 0 16px 16px;
+  padding: 0 0 16px;
 }
 
 .appearance-subsection-stack {
@@ -1335,10 +1339,6 @@ details.card[open] > summary::after {
 }
 
 /* ── Preset Tree ───────────────────────────────────────── */
-#presetTree {
-  margin-top: 12px;
-}
-
 /* Preset rows: make sub-country buttons full-width rows */
 .sidebar-right #presetTree details .ml-6 {
   display: flex;
@@ -1551,7 +1551,7 @@ details.card[open] > summary::after {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #7d8793;
+  color: var(--text-tertiary);
 }
 
 .workspace-status-label {
@@ -1560,7 +1560,7 @@ details.card[open] > summary::after {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #7d8793;
+  color: var(--text-tertiary);
 }
 
 .workspace-status-value {
@@ -1596,7 +1596,7 @@ details.card[open] > summary::after {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #7d8793;
+  color: var(--text-tertiary);
 }
 
 .sidebar-shell-heading-right {
@@ -1643,7 +1643,7 @@ details.card[open] > summary::after {
   position: sticky;
   top: 0;
   z-index: 7;
-  padding: 4px 8px 12px;
+  padding: 4px 0 12px;
   background: linear-gradient(180deg, rgba(248, 250, 252, 0.98) 0%, rgba(248, 250, 252, 0.94) 76%, rgba(248, 250, 252, 0) 100%);
 }
 
@@ -1671,6 +1671,7 @@ details.card[open] > summary::after {
   background: rgba(0, 47, 167, 0.06);
 }
 
+/* Use the hidden attribute for full panel/tab visibility switches. */
 .inspector-sidebar-tab-panel[hidden] {
   display: none !important;
 }
@@ -1679,7 +1680,7 @@ details.card[open] > summary::after {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  padding: 6px 12px 0;
+  padding: 6px 0 16px;
   min-width: 0;
 }
 
@@ -3170,8 +3171,8 @@ body.counter-editor-modal-open {
 }
 
 .inspector-panel-body {
-  margin-top: 18px;
-  padding-inline: 2px;
+  margin-top: 22px;
+  padding-inline: 0;
 }
 
 .inspector-stack {
@@ -3219,7 +3220,8 @@ body.counter-editor-modal-open {
 
 .inspector-scroll {
   overflow-y: auto;
-  padding-right: 4px;
+  padding: 6px 4px 10px 1px;
+  scroll-padding-block: 10px;
 }
 
 .inspector-preset-details {
@@ -3233,18 +3235,55 @@ body.counter-editor-modal-open {
   display: none !important;
 }
 
+#presetTree {
+  margin-top: 0;
+}
+
 #presetTree.inspector-scroll {
+  margin-top: 16px;
   max-height: 28vh;
+  gap: 12px;
 }
 
 #countryList.inspector-scroll {
+  margin-top: 16px;
   max-height: 26vh;
+  gap: 10px;
+}
+
+#waterRegionList.inspector-scroll {
+  margin-top: 16px;
+  max-height: 18vh;
+  gap: 10px;
+}
+
+#specialRegionList.inspector-scroll {
+  margin-top: 16px;
+  max-height: 16vh;
+  gap: 10px;
 }
 
 #legendEditorList {
+  margin-top: 16px;
   max-height: 20vh;
   overflow-y: auto;
-  padding-right: 4px;
+  padding: 6px 4px 10px 1px;
+  scroll-padding-block: 10px;
+  gap: 10px;
+}
+
+#waterLegendList.inspector-scroll,
+#specialRegionLegendList.inspector-scroll {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#countryInspectorDetail,
+#waterInspectorDetail,
+#specialRegionInspectorDetail {
+  margin-top: 16px;
 }
 
 .bottom-dock {
@@ -3283,7 +3322,7 @@ body.counter-editor-modal-open {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #7d8793;
+  color: var(--text-tertiary);
 }
 
 .dock-shell-hint {
@@ -3293,6 +3332,7 @@ body.counter-editor-modal-open {
 }
 
 .bottom-dock:not(.is-collapsed) .dock-header-copy {
+  /* Expanded mode hides the header copy to preserve vertical space for controls. */
   display: none;
 }
 
@@ -3309,13 +3349,6 @@ body.counter-editor-modal-open {
   font-weight: 600;
   padding: 6px 10px;
   cursor: pointer;
-}
-
-.bottom-dock-primary {
-  display: grid;
-  grid-template-columns: auto minmax(220px, 1.15fr) auto minmax(210px, 0.92fr) minmax(280px, 1.3fr) auto;
-  align-items: start;
-  gap: 12px 14px;
 }
 
 .bottom-dock-swatches {
@@ -3338,41 +3371,13 @@ body.counter-editor-modal-open {
   border: none;
 }
 
-.dock-group-tools {
-  grid-column: 1;
-}
-
-.dock-group-history {
-  grid-column: 3;
-}
-
-.dock-group-paint {
-  grid-column: 2;
-  min-width: 0;
-}
-
-.dock-group-colors {
-  grid-column: 4;
-  min-width: 0;
-}
-
-.dock-group-autofill {
-  grid-column: 5;
-  min-width: 0;
-}
-
-.dock-group-utilities {
-  position: relative;
-  grid-column: 6;
-}
-
 .dock-group-label {
   display: block;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #7d8793;
+  color: var(--text-tertiary);
 }
 
 .dock-button-row,
@@ -3651,36 +3656,6 @@ body.counter-editor-modal-open {
   z-index: 6;
 }
 
-.bottom-dock.is-collapsed .dock-group-history,
-.bottom-dock.is-collapsed .dock-group-paint,
-.bottom-dock.is-collapsed .dock-group-utilities,
-.bottom-dock.is-collapsed .bottom-dock-swatches,
-.bottom-dock.is-collapsed .dock-recent-swatches,
-.bottom-dock.is-collapsed .dock-swatch-divider {
-  display: none !important;
-}
-
-.bottom-dock.is-collapsed .bottom-dock-primary {
-  align-items: center;
-  gap: 6px;
-}
-
-.bottom-dock.is-collapsed .dock-group-tools,
-.bottom-dock.is-collapsed .dock-group-colors {
-  flex: 0 1 auto;
-  min-width: 0;
-}
-
-.bottom-dock.is-collapsed .bottom-dock-primary > .dock-group + .dock-group {
-  border-left: none;
-  padding-left: 0;
-}
-
-.bottom-dock.is-collapsed .dock-group-autofill {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
 .bottom-dock {
   gap: 7px;
   padding: 9px 12px 8px;
@@ -3747,7 +3722,7 @@ body.counter-editor-modal-open {
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1.2;
-  padding: 7px 10px;
+  padding: 7px 12px;
   cursor: pointer;
   transition: background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
@@ -3766,8 +3741,8 @@ body.counter-editor-modal-open {
 }
 
 .dock-paint-summary {
-  flex: 0 1 156px;
-  min-width: 132px;
+  flex: 0 1 140px;
+  min-width: 112px;
   padding: 7px 9px;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.92);
@@ -5033,7 +5008,7 @@ body.counter-editor-modal-open {
 }
 
 .scenario-action-intro {
-  margin-bottom: 10px;
+  margin-bottom: 0;
   padding: 10px 12px;
   border: 1px solid rgba(32, 76, 119, 0.14);
   border-radius: 12px;
@@ -5078,7 +5053,7 @@ body.counter-editor-modal-open {
 }
 
 .scenario-visual-adjustments-body {
-  padding: 0 14px 14px;
+  padding: 6px 14px 14px;
 }
 
 .country-scenario-badge {
@@ -5328,16 +5303,26 @@ button.scenario-action-card:hover {
 .inspector-detail-section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .inspector-action-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   max-height: 120px;
   overflow-y: auto;
   padding-right: 4px;
+}
+
+.inspector-action-section {
+  margin-top: 0;
+}
+
+.inspector-action-section-body {
+  margin-top: 0;
+  padding-top: 2px;
+  padding-bottom: 4px;
 }
 
 .inspector-empty-state,
@@ -5458,45 +5443,6 @@ body.right-drawer-open::after {
 }
 
 @media (max-width: 1279px) {
-  .bottom-dock-primary {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr);
-    gap: 10px 12px;
-    align-items: start;
-  }
-
-  .dock-group-tools {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .dock-group-history {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .dock-group-paint {
-    grid-column: 3;
-    grid-row: 1;
-  }
-
-  .dock-group-colors {
-    grid-column: 1;
-    grid-row: 2;
-  }
-
-  .dock-group-autofill {
-    grid-column: 2 / span 2;
-    grid-row: 2;
-    min-width: 0;
-  }
-
-  .dock-group-utilities {
-    grid-column: 3;
-    grid-row: 3;
-    justify-self: end;
-  }
-
   .dock-shell-hint {
     max-width: 36ch;
   }
@@ -5552,44 +5498,6 @@ body.right-drawer-open::after {
 
   .panel-toggle-left {
     display: inline-flex;
-  }
-
-  .bottom-dock-primary {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 10px;
-  }
-
-  .dock-group-tools {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .dock-group-history {
-    grid-column: 1;
-    grid-row: 2;
-  }
-
-  .dock-group-paint {
-    grid-column: 1;
-    grid-row: 3;
-    min-width: 0;
-  }
-
-  .dock-group-colors {
-    grid-column: 1;
-    grid-row: 4;
-    min-width: 0;
-  }
-
-  .dock-group-autofill {
-    grid-column: 1;
-    grid-row: 5;
-  }
-
-  .dock-group-utilities {
-    grid-column: 1;
-    grid-row: 6;
-    justify-self: start;
   }
 
   .zoom-controls {
@@ -5697,9 +5605,6 @@ body.right-drawer-open::after {
     width: auto;
   }
 
-  .bottom-dock.is-collapsed .dock-group-history,
-  .bottom-dock.is-collapsed .dock-group-autofill,
-  .bottom-dock.is-collapsed .dock-group-utilities,
   .bottom-dock.is-collapsed .bottom-dock-swatches {
     display: none !important;
   }

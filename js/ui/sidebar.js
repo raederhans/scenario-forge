@@ -5620,12 +5620,12 @@ function initSidebar({ render } = {}) {
 
   const appendActionSection = (container, titleText) => {
     const section = document.createElement("div");
-    section.className = "inspector-detail-section mt-3";
+    section.className = "inspector-detail-section inspector-action-section";
     const title = document.createElement("div");
     title.className = "section-header-block";
     title.textContent = titleText;
     const body = document.createElement("div");
-    body.className = "inspector-action-list mt-2";
+    body.className = "inspector-action-list inspector-action-section-body";
     section.appendChild(title);
     section.appendChild(body);
     container.appendChild(section);
@@ -6115,7 +6115,7 @@ function initSidebar({ render } = {}) {
 
   const renderScenarioVisualAdjustments = (container, countryState) => {
     const details = document.createElement("details");
-    details.className = "scenario-visual-adjustments mt-3";
+    details.className = "scenario-visual-adjustments inspector-action-section";
     details.open = !!state.ui?.scenarioVisualAdjustmentsOpen;
     details.addEventListener("toggle", () => {
       if (!state.ui || typeof state.ui !== "object") {

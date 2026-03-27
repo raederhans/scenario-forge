@@ -2311,13 +2311,13 @@ function createDevWorkspacePanel(bottomDock) {
         </div>
       </div>
       <div class="dev-workspace-category-tabs" role="tablist" aria-label="Development workspace sections" data-i18n-aria-label="Development workspace sections">
-        <button id="devWorkspaceTabSelection" type="button" class="dev-workspace-category-tab is-active" data-dev-workspace-category="selection" role="tab" aria-selected="true">
+        <button id="devWorkspaceTabSelection" type="button" class="dev-workspace-category-tab is-active" data-dev-workspace-category="selection" role="tab" aria-selected="true" data-i18n="Selection & Ownership">
           Selection &amp; Ownership
         </button>
-        <button id="devWorkspaceTabScenario" type="button" class="dev-workspace-category-tab" data-dev-workspace-category="scenario" role="tab" aria-selected="false">
+        <button id="devWorkspaceTabScenario" type="button" class="dev-workspace-category-tab" data-dev-workspace-category="scenario" role="tab" aria-selected="false" data-i18n="Scenario Data">
           Scenario Data
         </button>
-        <button id="devWorkspaceTabRuntime" type="button" class="dev-workspace-category-tab" data-dev-workspace-category="runtime" role="tab" aria-selected="false">
+        <button id="devWorkspaceTabRuntime" type="button" class="dev-workspace-category-tab" data-dev-workspace-category="runtime" role="tab" aria-selected="false" data-i18n="Diagnostics & Runtime">
           Diagnostics &amp; Runtime
         </button>
       </div>
