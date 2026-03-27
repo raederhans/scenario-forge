@@ -1850,7 +1850,7 @@ function initSidebar({ render } = {}) {
     renderer = "game",
     size = "medium",
     nationTag = "",
-    nationSource = "controller",
+    nationSource = "display",
     label = "",
     subLabel = "",
     strengthText = "",
@@ -2263,7 +2263,7 @@ function initSidebar({ render } = {}) {
       `${preset.label} · ${preset.shortCode}`,
     ]));
     const unitNationModeSelect = buildSelect("unitCounterNationModeSelect", [
-      ["controller", "Nation: Auto"],
+      ["display", "Nation: Auto"],
       ["manual", "Nation: Manual"],
     ]);
     const unitNationSelect = buildSelect("unitCounterNationSelect", [["", "Auto from placement"]]);
@@ -6787,7 +6787,7 @@ function initSidebar({ render } = {}) {
       1.5,
     );
     const effectiveSize = String(unitEditor.size || selectedCounter?.size || "medium");
-    const effectiveNationSource = String(unitEditor.nationSource || selectedCounter?.nationSource || "controller").trim().toLowerCase() || "controller";
+    const effectiveNationSource = String(unitEditor.nationSource || selectedCounter?.nationSource || "display").trim().toLowerCase() || "display";
     const effectiveNationTag = String(unitEditor.nationTag || selectedCounter?.nationTag || "").trim().toUpperCase();
     const effectiveEchelon = String(unitEditor.echelon || selectedCounter?.echelon || effectivePreset.defaultEchelon || "").trim().toUpperCase();
     const effectiveLabel = String(unitEditor.label || selectedCounter?.label || "").trim();
@@ -6828,7 +6828,7 @@ function initSidebar({ render } = {}) {
         signatureKey: "presetOptionsSignature",
       });
       if (unitCounterNationModeSelect) {
-        unitCounterNationModeSelect.value = effectiveNationSource === "manual" ? "manual" : "controller";
+        unitCounterNationModeSelect.value = effectiveNationSource === "manual" ? "manual" : "display";
       }
       const selectedNationValue = effectiveNationTag;
       const knownNationValues = new Set(["", ...nationOptions.map((entry) => entry.value)]);
@@ -7581,8 +7581,8 @@ function initSidebar({ render } = {}) {
   }
   if (unitCounterNationModeSelect && !unitCounterNationModeSelect.dataset.bound) {
     unitCounterNationModeSelect.addEventListener("change", (event) => {
-      const nextMode = String(event.target.value || "controller").trim().toLowerCase();
-      state.unitCounterEditor.nationSource = nextMode === "manual" ? "manual" : "controller";
+      const nextMode = String(event.target.value || "display").trim().toLowerCase();
+      state.unitCounterEditor.nationSource = nextMode === "manual" ? "manual" : "display";
       if (nextMode !== "manual") {
         state.unitCounterEditor.nationTag = "";
       }
@@ -7600,7 +7600,7 @@ function initSidebar({ render } = {}) {
     unitCounterNationSelect.addEventListener("change", (event) => {
       const nextNationTag = String(event.target.value || "").trim().toUpperCase();
       state.unitCounterEditor.nationTag = nextNationTag;
-      state.unitCounterEditor.nationSource = nextNationTag ? "manual" : "controller";
+      state.unitCounterEditor.nationSource = nextNationTag ? "manual" : "display";
       if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
         mapRenderer.updateSelectedUnitCounter({
           nationTag: nextNationTag,
@@ -7966,7 +7966,7 @@ function initSidebar({ render } = {}) {
         symbolCode: nextSymbol,
         size: String(unitCounterSizeSelect?.value || state.unitCounterEditor?.size || "medium"),
         nationTag: String(unitCounterNationSelect?.value || state.unitCounterEditor?.nationTag || "").trim().toUpperCase(),
-        nationSource: String(unitCounterNationModeSelect?.value || state.unitCounterEditor?.nationSource || "controller").trim().toLowerCase(),
+        nationSource: String(unitCounterNationModeSelect?.value || state.unitCounterEditor?.nationSource || "display").trim().toLowerCase(),
         presetId: nextPresetId,
         iconId: String(nextPreset.iconId || "").trim().toLowerCase(),
         unitType: String(nextPreset.unitType || nextPreset.id || "").trim().toUpperCase(),
@@ -8325,7 +8325,7 @@ function initSidebar({ render } = {}) {
           sidc: "",
           symbolCode: "",
           nationTag: "",
-          nationSource: "controller",
+          nationSource: "display",
           presetId: "inf",
           iconId: "",
           unitType: "",

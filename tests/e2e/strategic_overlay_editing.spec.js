@@ -78,6 +78,49 @@ async function openCounterEditorModal(page) {
   await expect(page.locator("#unitCounterEditorModal")).toBeVisible();
 }
 
+async function waitForScenarioUiReady(page) {
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    const scenarioSelect = document.querySelector("#scenarioSelect");
+    return typeof state.renderCountryListFn === "function"
+      && !!scenarioSelect
+      && !!scenarioSelect.querySelector('option[value="tno_1962"]');
+  }, { timeout: 120000 });
+}
+
+async function applyScenario(page, scenarioId) {
+  await page.evaluate(async (expectedScenarioId) => {
+    const select = document.querySelector("#scenarioSelect");
+    if (select instanceof HTMLSelectElement) {
+      select.value = expectedScenarioId;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    const { applyScenarioById } = await import("/js/core/scenario_manager.js");
+    let lastError = null;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        await applyScenarioById(expectedScenarioId, {
+          renderNow: true,
+          markDirtyReason: "playwright-apply-scenario",
+          showToastOnComplete: false,
+        });
+        lastError = null;
+        break;
+      } catch (error) {
+        lastError = error;
+        await new Promise((resolve) => globalThis.setTimeout(resolve, 400 * (attempt + 1)));
+      }
+    }
+    if (lastError) {
+      throw lastError;
+    }
+  }, scenarioId);
+  await page.waitForFunction(async (expectedScenarioId) => {
+    const { state } = await import("/js/core/state.js");
+    return state.activeScenarioId === expectedScenarioId;
+  }, scenarioId, { timeout: 120000 });
+}
+
 test("operation graphics support style editing and vertex editing after creation", async ({ page }) => {
   test.setTimeout(120000);
   await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
@@ -642,4 +685,126 @@ test("unit counter placement cancels on escape or tab switch, resets after delet
       && state.unitCounterEditor?.presetId === "inf";
   });
   await expect(page.locator("#unitCounterList")).toHaveValue("");
+});
+
+test("unit counter auto nation follows displayed political code and keeps legacy/controller/manual compatibility", async ({ page }) => {
+  test.setTimeout(120000);
+  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
+  await page.waitForTimeout(1200);
+  await waitForAppReady(page);
+  await waitForScenarioUiReady(page);
+  await applyScenario(page, "tno_1962");
+  await openFrontlineTab(page);
+
+  await expect(page.locator("#unitCounterNationModeSelect")).toHaveValue("display");
+
+  const splitFeature = await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    const splitEntry = Object.entries(state.scenarioBaselineControllersByFeatureId || {}).find(([featureId, controller]) => {
+      const owner = state.scenarioBaselineOwnersByFeatureId?.[featureId];
+      return owner && controller && owner !== controller;
+    });
+    if (!splitEntry) return null;
+    const [featureId, baselineController] = splitEntry;
+    return {
+      featureId,
+      baselineOwner: String(state.scenarioBaselineOwnersByFeatureId?.[featureId] || ""),
+      baselineController: String(baselineController || ""),
+    };
+  });
+
+  expect(splitFeature).not.toBeNull();
+  expect(splitFeature.baselineOwner).not.toBe(splitFeature.baselineController);
+
+  const result = await page.evaluate(async ({ featureId, baselineOwner, baselineController }) => {
+    const { state } = await import("/js/core/state.js");
+    const {
+      resolveUnitCounterNationForPlacement,
+      startUnitCounterPlacement,
+    } = await import("/js/core/map_renderer.js");
+
+    state.sovereigntyByFeatureId = {
+      ...(state.sovereigntyByFeatureId || {}),
+      [featureId]: baselineOwner,
+    };
+    state.scenarioControllersByFeatureId = {
+      ...(state.scenarioControllersByFeatureId || {}),
+      [featureId]: baselineController,
+    };
+    state.activeSovereignCode = baselineOwner;
+    state.scenarioViewMode = "ownership";
+
+    const displayOwnership = resolveUnitCounterNationForPlacement(featureId, "", "display");
+    const explicitOwner = resolveUnitCounterNationForPlacement(featureId, "", "owner");
+    const explicitController = resolveUnitCounterNationForPlacement(featureId, "", "controller");
+    const activeFallback = resolveUnitCounterNationForPlacement("", "", "controller");
+    const manual = resolveUnitCounterNationForPlacement(featureId, baselineController, "manual");
+
+    startUnitCounterPlacement({
+      presetId: "inf",
+      nationSource: "display",
+      nationTag: "",
+    });
+    const displayEditor = {
+      nationSource: String(state.unitCounterEditor?.nationSource || ""),
+      nationTag: String(state.unitCounterEditor?.nationTag || ""),
+    };
+
+    state.scenarioViewMode = "frontline";
+    const displayFrontline = resolveUnitCounterNationForPlacement(featureId, "", "display");
+
+    startUnitCounterPlacement({
+      presetId: "inf",
+      nationSource: "controller",
+      nationTag: "",
+    });
+    const legacyEditor = {
+      nationSource: String(state.unitCounterEditor?.nationSource || ""),
+      nationTag: String(state.unitCounterEditor?.nationTag || ""),
+    };
+
+    return {
+      displayOwnership,
+      displayFrontline,
+      explicitOwner,
+      explicitController,
+      activeFallback,
+      manual,
+      displayEditor,
+      legacyEditor,
+    };
+  }, splitFeature);
+
+  expect(result.displayOwnership).toEqual({
+    tag: splitFeature.baselineOwner,
+    source: "display",
+  });
+  expect(result.displayFrontline).toEqual({
+    tag: splitFeature.baselineController,
+    source: "display",
+  });
+  expect(result.explicitOwner).toEqual({
+    tag: splitFeature.baselineOwner,
+    source: "owner",
+  });
+  expect(result.explicitController).toEqual({
+    tag: splitFeature.baselineController,
+    source: "controller",
+  });
+  expect(result.activeFallback).toEqual({
+    tag: splitFeature.baselineOwner,
+    source: "controller",
+  });
+  expect(result.manual).toEqual({
+    tag: splitFeature.baselineController,
+    source: "manual",
+  });
+  expect(result.displayEditor).toEqual({
+    nationSource: "display",
+    nationTag: "",
+  });
+  expect(result.legacyEditor).toEqual({
+    nationSource: "controller",
+    nationTag: "",
+  });
 });

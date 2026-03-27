@@ -1274,7 +1274,7 @@ export const state = {
     sidc: "",
     symbolCode: "",
     nationTag: "",
-    nationSource: "controller",
+    nationSource: "display",
     presetId: "",
     unitType: "",
     echelon: "",

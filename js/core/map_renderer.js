@@ -14078,7 +14078,7 @@ function assignUnitCounterEditorFromCounter(counter = null) {
   state.unitCounterEditor.sidc = String(counter.sidc || counter.symbolCode || "").trim().toUpperCase();
   state.unitCounterEditor.symbolCode = String(counter.symbolCode || counter.sidc || "").trim().toUpperCase();
   state.unitCounterEditor.nationTag = canonicalCountryCode(counter.nationTag || "");
-  state.unitCounterEditor.nationSource = String(counter.nationSource || "controller").trim().toLowerCase() || "controller";
+  state.unitCounterEditor.nationSource = normalizeUnitCounterNationSource(counter.nationSource, "display");
   state.unitCounterEditor.presetId = String(counter.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toLowerCase() || DEFAULT_UNIT_COUNTER_PRESET_ID;
   state.unitCounterEditor.iconId = String(counter.iconId || getUnitCounterPresetById(counter.presetId).iconId || "").trim().toLowerCase();
   state.unitCounterEditor.unitType = String(counter.unitType || getUnitCounterPresetById(counter.presetId).unitType || "").trim().toUpperCase();
@@ -14108,7 +14108,7 @@ function ensureUnitCounterEditorState() {
       sidc: "",
       symbolCode: "",
       nationTag: "",
-      nationSource: "controller",
+      nationSource: "display",
       presetId: DEFAULT_UNIT_COUNTER_PRESET_ID,
       iconId: "",
       unitType: "",
@@ -14139,9 +14139,7 @@ function ensureUnitCounterEditorState() {
     || ""
   ).trim();
   state.unitCounterEditor.nationTag = canonicalCountryCode(state.unitCounterEditor.nationTag || "");
-  state.unitCounterEditor.nationSource = ["controller", "owner", "active", "manual"].includes(String(state.unitCounterEditor.nationSource || "").trim().toLowerCase())
-    ? String(state.unitCounterEditor.nationSource || "").trim().toLowerCase()
-    : "controller";
+  state.unitCounterEditor.nationSource = normalizeUnitCounterNationSource(state.unitCounterEditor.nationSource, "display");
   state.unitCounterEditor.presetId = String(state.unitCounterEditor.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toLowerCase() || DEFAULT_UNIT_COUNTER_PRESET_ID;
   state.unitCounterEditor.iconId = String(
     state.unitCounterEditor.iconId
@@ -14196,7 +14194,7 @@ function resetUnitCounterEditorState({ preserveSelection = false, preserveCounte
   state.unitCounterEditor.sidc = "";
   state.unitCounterEditor.symbolCode = "";
   state.unitCounterEditor.nationTag = "";
-  state.unitCounterEditor.nationSource = "controller";
+  state.unitCounterEditor.nationSource = "display";
   state.unitCounterEditor.presetId = DEFAULT_UNIT_COUNTER_PRESET_ID;
   state.unitCounterEditor.iconId = "";
   state.unitCounterEditor.unitType = "";
@@ -15315,25 +15313,47 @@ function getUnitCounterNationMeta(tag) {
   };
 }
 
-function resolveUnitCounterNationForPlacement(featureId = "", manualTag = "") {
+function normalizeUnitCounterNationSource(value, fallback = "display") {
+  const source = String(value || "").trim().toLowerCase();
+  return ["display", "controller", "owner", "active", "manual"].includes(source) ? source : fallback;
+}
+
+function resolveUnitCounterNationForPlacement(featureId = "", manualTag = "", preferredSource = "display") {
   const normalizedFeatureId = String(featureId || "").trim();
   const normalizedManualTag = canonicalCountryCode(manualTag);
   if (normalizedManualTag) {
     return { tag: normalizedManualTag, source: "manual" };
   }
+  const requestedSource = normalizeUnitCounterNationSource(preferredSource, "display");
+  const feature = normalizedFeatureId ? state.landIndex?.get(normalizedFeatureId) || null : null;
+  const displayTag = canonicalCountryCode(
+    normalizedFeatureId ? getDisplayOwnerCode(feature, normalizedFeatureId) : ""
+  );
+  if (requestedSource === "display" && displayTag) {
+    return { tag: displayTag, source: "display" };
+  }
   const controllerTag = canonicalCountryCode(state.scenarioControllersByFeatureId?.[normalizedFeatureId] || "");
-  if (controllerTag) {
+  if (requestedSource === "controller" && controllerTag) {
     return { tag: controllerTag, source: "controller" };
   }
   const ownerTag = canonicalCountryCode(getFeatureOwnerCode(normalizedFeatureId) || "");
-  if (ownerTag) {
+  if (requestedSource === "controller" && ownerTag) {
+    return { tag: ownerTag, source: "controller" };
+  }
+  if (requestedSource === "owner" && ownerTag) {
     return { tag: ownerTag, source: "owner" };
   }
-  const activeTag = canonicalCountryCode(state.selectedInspectorCountryCode || "");
-  if (activeTag) {
-    return { tag: activeTag, source: "active" };
+  if (requestedSource === "display" && ownerTag) {
+    return { tag: ownerTag, source: "display" };
   }
-  return { tag: "", source: "active" };
+  if (requestedSource === "display" && controllerTag) {
+    return { tag: controllerTag, source: "display" };
+  }
+  const activeTag = canonicalCountryCode(state.activeSovereignCode || state.selectedInspectorCountryCode || "");
+  if (activeTag) {
+    return { tag: activeTag, source: requestedSource };
+  }
+  return { tag: "", source: requestedSource };
 }
 
 function getUnitCounterScreenMetrics(size = "medium") {
@@ -16986,9 +17006,10 @@ function placeUnitCounterFromEvent(event) {
     eventType: "unit-counter-place",
   });
   const featureId = hit?.targetType === "land" ? String(hit.id || "") : "";
-  const nationResolution = String(state.unitCounterEditor.nationSource || "controller") === "manual"
-    ? resolveUnitCounterNationForPlacement("", state.unitCounterEditor.nationTag)
-    : resolveUnitCounterNationForPlacement(featureId, "");
+  const requestedNationSource = normalizeUnitCounterNationSource(state.unitCounterEditor.nationSource, "display");
+  const nationResolution = requestedNationSource === "manual"
+    ? resolveUnitCounterNationForPlacement("", state.unitCounterEditor.nationTag, "manual")
+    : resolveUnitCounterNationForPlacement(featureId, "", requestedNationSource);
   const preset = getUnitCounterPresetById(state.unitCounterEditor.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID);
   const attachment = state.unitCounterEditor.attachment?.lineId
     ? {
@@ -17012,7 +17033,7 @@ function placeUnitCounterFromEvent(event) {
     symbolCode: nextToken,
     label: String(state.unitCounterEditor.label || "").trim(),
     nationTag: nationResolution.tag,
-    nationSource: nationResolution.source,
+    nationSource: requestedNationSource,
     presetId: preset.id,
     iconId: String(state.unitCounterEditor.iconId || preset.iconId || "").trim().toLowerCase(),
     unitType: String(state.unitCounterEditor.unitType || preset.unitType || "").trim().toUpperCase(),
@@ -17063,7 +17084,7 @@ function startUnitCounterPlacement({
   sidc = "",
   symbolCode = "",
   nationTag = "",
-  nationSource = "controller",
+  nationSource = "display",
   presetId = DEFAULT_UNIT_COUNTER_PRESET_ID,
   unitType = "",
   echelon = "",
@@ -17095,9 +17116,7 @@ function startUnitCounterPlacement({
   state.unitCounterEditor.sidc = String(sidc || symbolCode || preset.baseSidc || "").trim().toUpperCase();
   state.unitCounterEditor.symbolCode = String(symbolCode || sidc || preset.baseSidc || "").trim().toUpperCase();
   state.unitCounterEditor.nationTag = canonicalCountryCode(nationTag || "");
-  state.unitCounterEditor.nationSource = ["controller", "owner", "active", "manual"].includes(String(nationSource || "").trim().toLowerCase())
-    ? String(nationSource || "").trim().toLowerCase()
-    : "controller";
+  state.unitCounterEditor.nationSource = normalizeUnitCounterNationSource(nationSource, "display");
   state.unitCounterEditor.presetId = preset.id;
   state.unitCounterEditor.iconId = String(iconId || preset.iconId || "").trim().toLowerCase();
   state.unitCounterEditor.unitType = String(unitType || preset.unitType || "").trim().toUpperCase();
@@ -17174,9 +17193,7 @@ function updateSelectedUnitCounter(partial = {}) {
   }
   if (partial.nationTag !== undefined) counter.nationTag = canonicalCountryCode(partial.nationTag || "");
   if (partial.nationSource !== undefined) {
-    counter.nationSource = ["controller", "owner", "active", "manual"].includes(String(partial.nationSource || "").trim().toLowerCase())
-      ? String(partial.nationSource || "").trim().toLowerCase()
-      : "controller";
+    counter.nationSource = normalizeUnitCounterNationSource(partial.nationSource, "display");
   }
   if (partial.presetId !== undefined) counter.presetId = String(partial.presetId || DEFAULT_UNIT_COUNTER_PRESET_ID).trim().toLowerCase() || DEFAULT_UNIT_COUNTER_PRESET_ID;
   if (partial.iconId !== undefined) counter.iconId = String(partial.iconId || "").trim().toLowerCase();
@@ -19288,6 +19305,7 @@ export {
   deleteSelectedUnitCounter,
   updateSelectedUnitCounter,
   getUnitCounterPreviewData,
+  resolveUnitCounterNationForPlacement,
   startSpecialZoneDraw,
   undoSpecialZoneVertex,
   finishSpecialZoneDraw,

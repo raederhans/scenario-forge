@@ -199,7 +199,7 @@ function normalizeOperationalLines(rawLines) {
 
 function normalizeUnitCounterNationSource(value) {
   const source = String(value || "").trim().toLowerCase();
-  return ["controller", "owner", "active", "manual"].includes(source) ? source : "controller";
+  return ["display", "controller", "owner", "active", "manual"].includes(source) ? source : "display";
 }
 
 function normalizeUnitCounters(rawCounters) {

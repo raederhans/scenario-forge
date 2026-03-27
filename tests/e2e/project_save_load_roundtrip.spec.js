@@ -433,7 +433,6 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     label: "1st Corps",
     size: "large",
   });
-
   const legacyProject = cloneJson(roundtripExport);
   legacyProject.schemaVersion = 13;
   delete legacyProject.activePaletteId;
@@ -543,6 +542,57 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
       legacyExportPath,
     },
   }, null, 2));
+});
+
+test("project import/export preserves legacy unit counter controller nation source", async ({ page }) => {
+  test.setTimeout(60000);
+  const baseUrl = resolveBaseUrl();
+  const artifactDir = path.join(".runtime", "tests", "playwright", "project-save-load");
+  fs.mkdirSync(artifactDir, { recursive: true });
+
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
+  await page.waitForTimeout(1500);
+  await waitForProjectUiReady(page);
+
+  const baselinePath = path.join(artifactDir, "unit-counter-controller-baseline.json");
+  const baselineExport = await exportProjectJson(page, baselinePath);
+  const importedProject = cloneJson(baselineExport);
+  importedProject.unitCounters = [{
+    id: "unit_controller_legacy",
+    renderer: "game",
+    symbolCode: "INF",
+    nationTag: "ENG",
+    nationSource: "controller",
+    presetId: "inf",
+    unitType: "INF",
+    echelon: "div",
+    label: "Legacy Controller Counter",
+    size: "medium",
+    anchor: { lon: 12, lat: 48, featureId: "" },
+  }];
+
+  const importPath = path.join(artifactDir, "unit-counter-controller-legacy-import.json");
+  fs.writeFileSync(importPath, JSON.stringify(importedProject, null, 2));
+
+  await page.locator("#projectFileInput").setInputFiles(importPath);
+  await page.waitForFunction(async () => {
+    const { state } = await import("/js/core/state.js");
+    const counter = Array.isArray(state.unitCounters) ? state.unitCounters[0] : null;
+    return !!counter
+      && counter.id === "unit_controller_legacy"
+      && counter.nationSource === "controller";
+  });
+
+  const exportPath = path.join(artifactDir, "unit-counter-controller-legacy-export.json");
+  const exported = await exportProjectJson(page, exportPath);
+  expect(exported.unitCounters).toHaveLength(1);
+  expect(exported.unitCounters[0]).toMatchObject({
+    id: "unit_controller_legacy",
+    nationTag: "ENG",
+    nationSource: "controller",
+    presetId: "inf",
+    unitType: "INF",
+  });
 });
 
 test("scenario project roundtrip preserves controller overrides", async ({ page }) => {
