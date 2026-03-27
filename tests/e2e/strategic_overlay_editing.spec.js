@@ -377,9 +377,25 @@ test("unit counters open a centered modal editor, support symbol search, and sti
   await expect(page.locator("#unitCounterDetailPreviewCard .unit-counter-preview-card")).toBeVisible();
   await expect(page.locator("#unitCounterOrganizationInput")).toHaveValue("83");
   await expect(page.locator("#unitCounterEquipmentInput")).toHaveValue("71");
+  const perfBeforeSearch = await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    globalThis.__detailPreviewCardRef = document.querySelector("#unitCounterDetailPreviewCard .unit-counter-preview-card");
+    return state.getStrategicOverlayPerfCountersFn?.() || {};
+  });
   await page.locator("#unitCounterCatalogSearchInput").fill("carrier");
   await expect(page.locator("#unitCounterCatalogGrid .counter-editor-symbol-card")).toHaveCount(1);
   await expect(page.locator("#unitCounterCatalogGrid .counter-editor-symbol-card-title")).toHaveText("Carrier Group");
+  const perfAfterSearch = await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    return {
+      counters: state.getStrategicOverlayPerfCountersFn?.() || {},
+      samePreviewCard: globalThis.__detailPreviewCardRef === document.querySelector("#unitCounterDetailPreviewCard .unit-counter-preview-card"),
+    };
+  });
+  expect(perfAfterSearch.samePreviewCard).toBeTruthy();
+  expect(perfAfterSearch.counters.counterList || 0).toBe(perfBeforeSearch.counterList || 0);
+  expect(perfAfterSearch.counters.operationalLines || 0).toBe(perfBeforeSearch.operationalLines || 0);
+  expect(perfAfterSearch.counters.operationGraphics || 0).toBe(perfBeforeSearch.operationGraphics || 0);
   await page.locator("#unitCounterCatalogGrid .counter-editor-symbol-card").click();
   await page.waitForFunction(async () => {
     const { state } = await import("/js/core/state.js");
@@ -388,6 +404,33 @@ test("unit counters open a centered modal editor, support symbol search, and sti
       && counter?.presetId === "CARRIER"
       && counter?.iconId === "carrier";
   });
+  const perfBeforeCombatInput = await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    globalThis.__detailPreviewCardRef = document.querySelector("#unitCounterDetailPreviewCard .unit-counter-preview-card");
+    return state.getStrategicOverlayPerfCountersFn?.() || {};
+  });
+  await page.locator("#unitCounterOrganizationInput").evaluate((node) => {
+    node.value = "66";
+    node.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  await expect(page.locator("#unitCounterOrganizationInput")).toHaveValue("66");
+  await page.waitForFunction(async (previousCounterCombat) => {
+    const { state } = await import("/js/core/state.js");
+    const counters = state.getStrategicOverlayPerfCountersFn?.() || {};
+    return Number(counters.counterCombat || 0) > Number(previousCounterCombat || 0);
+  }, perfBeforeCombatInput.counterCombat || 0);
+  const perfAfterCombatInput = await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    return {
+      counters: state.getStrategicOverlayPerfCountersFn?.() || {},
+      samePreviewCard: globalThis.__detailPreviewCardRef === document.querySelector("#unitCounterDetailPreviewCard .unit-counter-preview-card"),
+      previewOrgText: document.querySelector("#unitCounterDetailPreviewCard .unit-counter-preview-stat.is-org .unit-counter-preview-stat-value")?.textContent || "",
+    };
+  });
+  expect(perfAfterCombatInput.samePreviewCard).toBeTruthy();
+  expect(perfAfterCombatInput.previewOrgText).toBe("66");
+  expect(perfAfterCombatInput.counters.counterCatalog || 0).toBe(perfBeforeCombatInput.counterCatalog || 0);
+  expect(perfAfterCombatInput.counters.counterList || 0).toBe(perfBeforeCombatInput.counterList || 0);
   await page.keyboard.press("Escape");
   await expect(page.locator("#unitCounterEditorModalOverlay")).toBeHidden();
   await expect(page.locator("#unitCounterDetailToggleBtn")).toBeFocused();

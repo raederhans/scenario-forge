@@ -14124,6 +14124,7 @@ function ensureUnitCounterEditorState() {
       statsSource: "preset",
       size: "medium",
       selectedId: null,
+      returnSelectionId: null,
       counter: 1,
     };
   }
@@ -14211,6 +14212,7 @@ function resetUnitCounterEditorState({ preserveSelection = false, preserveCounte
   state.unitCounterEditor.statsSource = "preset";
   state.unitCounterEditor.size = "medium";
   state.unitCounterEditor.selectedId = preservedSelection;
+  state.unitCounterEditor.returnSelectionId = null;
   state.unitCounterEditor.counter = preservedCounter;
   ensureUnitCounterEditorState();
 }
@@ -17016,6 +17018,7 @@ function placeUnitCounterFromEvent(event) {
   });
   state.unitCounterEditor.counter += 1;
   state.unitCounterEditor.selectedId = id;
+  state.unitCounterEditor.returnSelectionId = null;
   state.unitCounterEditor.active = false;
   syncOperationalLineAttachedCounterIds();
   state.unitCountersDirty = true;
@@ -17053,6 +17056,7 @@ function startUnitCounterPlacement({
   size = "medium",
 } = {}) {
   ensureUnitCounterEditorState();
+  const returnSelectionId = String(state.unitCounterEditor.selectedId || "").trim() || null;
   resetUnitCounterEditorState({ preserveSelection: false, preserveCounter: true });
   const preset = getUnitCounterPresetById(presetId || DEFAULT_UNIT_COUNTER_PRESET_ID);
   const normalizedCombatState = getNormalizedUnitCounterCombatState({
@@ -17095,6 +17099,7 @@ function startUnitCounterPlacement({
   state.unitCounterEditor.statsSource = normalizedCombatState.statsSource;
   state.unitCounterEditor.size = normalizeUnitCounterSizeToken(size || "medium");
   state.unitCounterEditor.selectedId = null;
+  state.unitCounterEditor.returnSelectionId = returnSelectionId;
   state.unitCountersDirty = true;
   updateStrategicOverlayUi();
   if (context) render();
@@ -17102,6 +17107,12 @@ function startUnitCounterPlacement({
 
 function cancelUnitCounterPlacement() {
   ensureUnitCounterEditorState();
+  const returnSelectionId = String(state.unitCounterEditor.returnSelectionId || "").trim();
+  if (returnSelectionId && (state.unitCounters || []).some((entry) => String(entry?.id || "") === returnSelectionId)) {
+    state.unitCounterEditor.returnSelectionId = null;
+    selectUnitCounterById(returnSelectionId);
+    return;
+  }
   resetUnitCounterEditorState({ preserveSelection: false, preserveCounter: true });
   state.unitCountersDirty = true;
   updateStrategicOverlayUi();
@@ -17114,6 +17125,7 @@ function selectUnitCounterById(id) {
   const counter = (state.unitCounters || []).find((entry) => String(entry?.id || "") === selectedId) || null;
   if (counter) {
     state.unitCounterEditor.selectedId = selectedId || null;
+    state.unitCounterEditor.returnSelectionId = null;
     assignUnitCounterEditorFromCounter(counter);
   } else {
     resetUnitCounterEditorState({ preserveSelection: false, preserveCounter: true });

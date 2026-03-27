@@ -1713,6 +1713,132 @@ function initSidebar({ render } = {}) {
     ].filter(Boolean);
     return [`${nationMeta.tag || "AUTO"} · ${primaryLabel}`, detailTokens.join(" · ")].filter(Boolean).join(" · ");
   };
+  const UNIT_COUNTER_PREVIEW_SVG_CACHE_LIMIT = 48;
+  const unitCounterPreviewSvgCache = new Map();
+  const getUnitCounterPreviewSvg = (sidc = "") => {
+    const normalizedSidc = String(sidc || "").trim();
+    if (!normalizedSidc || !globalThis.ms?.Symbol) {
+      return null;
+    }
+    if (unitCounterPreviewSvgCache.has(normalizedSidc)) {
+      const cachedNode = unitCounterPreviewSvgCache.get(normalizedSidc);
+      unitCounterPreviewSvgCache.delete(normalizedSidc);
+      unitCounterPreviewSvgCache.set(normalizedSidc, cachedNode);
+      return cachedNode.cloneNode(true);
+    }
+    try {
+      const markup = new globalThis.ms.Symbol(normalizedSidc, {
+        size: 18,
+        fill: true,
+        monoColor: "#0f172a",
+        outlineColor: "#f8f5eb",
+        outlineWidth: 3,
+      }).asSVG();
+      const parsed = new globalThis.DOMParser().parseFromString(markup, "image/svg+xml");
+      const svg = parsed?.documentElement;
+      if (!(svg instanceof SVGElement)) {
+        return null;
+      }
+      unitCounterPreviewSvgCache.set(normalizedSidc, svg);
+      if (unitCounterPreviewSvgCache.size > UNIT_COUNTER_PREVIEW_SVG_CACHE_LIMIT) {
+        const oldestKey = unitCounterPreviewSvgCache.keys().next().value;
+        unitCounterPreviewSvgCache.delete(oldestKey);
+      }
+      return svg.cloneNode(true);
+    } catch (_error) {
+      return null;
+    }
+  };
+  const buildUnitCounterPreviewStat = (kind, label) => {
+    const stat = document.createElement("div");
+    stat.className = `unit-counter-preview-stat is-${kind}`;
+    const statLabel = document.createElement("span");
+    statLabel.className = "unit-counter-preview-stat-label";
+    statLabel.textContent = label;
+    const track = document.createElement("span");
+    track.className = "unit-counter-preview-stat-track";
+    const fill = document.createElement("span");
+    fill.className = "unit-counter-preview-stat-fill";
+    track.appendChild(fill);
+    const value = document.createElement("span");
+    value.className = "unit-counter-preview-stat-value";
+    stat.append(statLabel, track, value);
+    return { stat, fill, value };
+  };
+  const ensureUnitCounterPreviewNodes = (container) => {
+    if (container?._previewNodes) {
+      return container._previewNodes;
+    }
+    container.replaceChildren();
+    const card = document.createElement("div");
+    card.className = "unit-counter-preview-card is-medium";
+
+    const strip = document.createElement("div");
+    strip.className = "unit-counter-preview-strip";
+    card.appendChild(strip);
+
+    const topLine = document.createElement("div");
+    topLine.className = "unit-counter-preview-topline";
+    const nationPill = document.createElement("span");
+    nationPill.className = "unit-counter-preview-nation";
+    const typePill = document.createElement("span");
+    typePill.className = "unit-counter-preview-renderer";
+    topLine.append(nationPill, typePill);
+    card.appendChild(topLine);
+
+    const body = document.createElement("div");
+    body.className = "unit-counter-preview-body";
+    const symbolShell = document.createElement("div");
+    symbolShell.className = "unit-counter-preview-symbol";
+
+    const content = document.createElement("div");
+    content.className = "unit-counter-preview-copy";
+    const title = document.createElement("div");
+    title.className = "unit-counter-preview-title";
+    const status = document.createElement("div");
+    status.className = "unit-counter-preview-status";
+    status.hidden = true;
+    const meta = document.createElement("div");
+    meta.className = "unit-counter-preview-meta";
+
+    const statStack = document.createElement("div");
+    statStack.className = "unit-counter-preview-stats";
+    const orgStat = buildUnitCounterPreviewStat("org", t("ORG", "ui"));
+    const equipmentStat = buildUnitCounterPreviewStat("equipment", t("EQP", "ui"));
+    statStack.append(orgStat.stat, equipmentStat.stat);
+
+    const footer = document.createElement("div");
+    footer.className = "unit-counter-preview-footer";
+    const echelonBadge = document.createElement("span");
+    echelonBadge.className = "unit-counter-preview-chip";
+    const strengthBadge = document.createElement("span");
+    strengthBadge.className = "unit-counter-preview-chip is-alert";
+    strengthBadge.hidden = true;
+    footer.append(echelonBadge, strengthBadge);
+
+    content.append(title, status, meta, statStack, footer);
+    body.append(symbolShell, content);
+    card.appendChild(body);
+    container.appendChild(card);
+
+    container._previewNodes = {
+      card,
+      nationPill,
+      typePill,
+      symbolShell,
+      title,
+      status,
+      meta,
+      statStack,
+      orgStat,
+      equipmentStat,
+      footer,
+      echelonBadge,
+      strengthBadge,
+      symbolKey: "",
+    };
+    return container._previewNodes;
+  };
   const renderUnitCounterPreview = (container, {
     renderer = "game",
     size = "medium",
@@ -1744,8 +1870,13 @@ function initSidebar({ render } = {}) {
     const previewSubLabel = String(subLabel || "").trim() || `${nationMeta.displayName} · ${getUnitCounterEchelonLabel(echelon || presetMeta.defaultEchelon)}`;
     const previewStrength = String(strengthText || "").trim();
     const previewRenderer = String(renderer || presetMeta.defaultRenderer || "game").trim().toLowerCase();
+    const previewSidc = String(sidc || "").trim().toUpperCase();
     const previewSymbolToken = String(symbolCode || sidc || presetMeta.shortCode || "").trim().toUpperCase() || presetMeta.shortCode;
-    container.replaceChildren();
+    const previewSymbolKey = previewRenderer === "milstd"
+      ? `milstd:${previewSidc}`
+      : `game:${previewSymbolToken || presetMeta.shortCode}`;
+    const nodes = ensureUnitCounterPreviewNodes(container);
+
     container.classList.toggle("is-detail", !!detailMode);
     container.classList.toggle("is-compact", !!compactMode);
     container.classList.toggle("is-milstd", previewRenderer === "milstd");
@@ -1755,116 +1886,39 @@ function initSidebar({ render } = {}) {
     container.style.setProperty("--unit-counter-org-ratio", `${combatState.organizationPct}%`);
     container.style.setProperty("--unit-counter-equip-ratio", `${combatState.equipmentPct}%`);
 
-    const card = document.createElement("div");
-    card.className = `unit-counter-preview-card is-${String(size || "medium").trim().toLowerCase()}${detailMode ? " is-detail" : ""}${compactMode ? " is-compact" : ""}`;
-
-    const strip = document.createElement("div");
-    strip.className = "unit-counter-preview-strip";
-    card.appendChild(strip);
-
-    const topLine = document.createElement("div");
-    topLine.className = "unit-counter-preview-topline";
-
-    const nationPill = document.createElement("span");
-    nationPill.className = "unit-counter-preview-nation";
-    nationPill.textContent = nationMeta.tag || t("AUTO", "ui");
-
-    const typePill = document.createElement("span");
-    typePill.className = "unit-counter-preview-renderer";
-    typePill.textContent = presetMeta.shortCode;
-
-    topLine.appendChild(nationPill);
-    topLine.appendChild(typePill);
-    card.appendChild(topLine);
-
-    const body = document.createElement("div");
-    body.className = "unit-counter-preview-body";
-
-    const symbolShell = document.createElement("div");
-    symbolShell.className = "unit-counter-preview-symbol";
-    if (previewRenderer === "milstd" && globalThis.ms?.Symbol && String(sidc || "").trim()) {
-      try {
-        const symbolMarkup = new globalThis.ms.Symbol(String(sidc || "").trim(), {
-          size: 18,
-          fill: true,
-          monoColor: "#0f172a",
-          outlineColor: "#f8f5eb",
-          outlineWidth: 3,
-        }).asSVG();
-        symbolShell.innerHTML = symbolMarkup;
-      } catch (_error) {
-        symbolShell.textContent = presetMeta.shortCode;
-      }
-    } else {
-      symbolShell.textContent = previewSymbolToken || presetMeta.shortCode;
-    }
-
-    const content = document.createElement("div");
-    content.className = "unit-counter-preview-copy";
-
-    const title = document.createElement("div");
-    title.className = "unit-counter-preview-title";
-    title.textContent = previewLabel;
-
-    const meta = document.createElement("div");
-    meta.className = "unit-counter-preview-meta";
-    meta.textContent = compactMode
+    nodes.card.className = `unit-counter-preview-card is-${String(size || "medium").trim().toLowerCase()}${detailMode ? " is-detail" : ""}${compactMode ? " is-compact" : ""}`;
+    nodes.nationPill.textContent = nationMeta.tag || t("AUTO", "ui");
+    nodes.typePill.textContent = presetMeta.shortCode;
+    nodes.title.textContent = previewLabel;
+    nodes.meta.textContent = compactMode
       ? `${nationMeta.tag || t("AUTO", "ui")} · ${getUnitCounterEchelonLabel(echelon || presetMeta.defaultEchelon)}`
       : previewSubLabel;
+    nodes.status.hidden = !statusText;
+    nodes.status.textContent = statusText || "";
+    nodes.statStack.hidden = !!compactMode;
+    nodes.footer.hidden = !!compactMode;
+    nodes.echelonBadge.textContent = getUnitCounterEchelonLabel(echelon || presetMeta.defaultEchelon).slice(0, detailMode ? 24 : 3).toUpperCase();
+    nodes.strengthBadge.hidden = !previewStrength;
+    nodes.strengthBadge.textContent = previewStrength || "";
+    nodes.orgStat.stat.style.setProperty("--unit-counter-stat-ratio", `${combatState.organizationPct}%`);
+    nodes.orgStat.value.textContent = String(combatState.organizationPct);
+    nodes.equipmentStat.stat.style.setProperty("--unit-counter-stat-ratio", `${combatState.equipmentPct}%`);
+    nodes.equipmentStat.value.textContent = String(combatState.equipmentPct);
 
-    content.appendChild(title);
-    if (statusText) {
-      const status = document.createElement("div");
-      status.className = "unit-counter-preview-status";
-      status.textContent = statusText;
-      content.appendChild(status);
-    }
-    content.appendChild(meta);
-    if (!compactMode) {
-      const statStack = document.createElement("div");
-      statStack.className = "unit-counter-preview-stats";
-
-      const orgStat = document.createElement("div");
-      orgStat.className = "unit-counter-preview-stat is-org";
-      orgStat.innerHTML = `
-        <span class="unit-counter-preview-stat-label">${t("ORG", "ui")}</span>
-        <span class="unit-counter-preview-stat-track"><span class="unit-counter-preview-stat-fill"></span></span>
-        <span class="unit-counter-preview-stat-value">${combatState.organizationPct}</span>
-      `;
-      orgStat.style.setProperty("--unit-counter-stat-ratio", `${combatState.organizationPct}%`);
-
-      const equipmentStat = document.createElement("div");
-      equipmentStat.className = "unit-counter-preview-stat is-equipment";
-      equipmentStat.innerHTML = `
-        <span class="unit-counter-preview-stat-label">${t("EQP", "ui")}</span>
-        <span class="unit-counter-preview-stat-track"><span class="unit-counter-preview-stat-fill"></span></span>
-        <span class="unit-counter-preview-stat-value">${combatState.equipmentPct}</span>
-      `;
-      equipmentStat.style.setProperty("--unit-counter-stat-ratio", `${combatState.equipmentPct}%`);
-      statStack.appendChild(orgStat);
-      statStack.appendChild(equipmentStat);
-
-      const footer = document.createElement("div");
-      footer.className = "unit-counter-preview-footer";
-
-      const echelonBadge = document.createElement("span");
-      echelonBadge.className = "unit-counter-preview-chip";
-      echelonBadge.textContent = getUnitCounterEchelonLabel(echelon || presetMeta.defaultEchelon).slice(0, detailMode ? 24 : 3).toUpperCase();
-      footer.appendChild(echelonBadge);
-      if (previewStrength) {
-        const strengthBadge = document.createElement("span");
-        strengthBadge.className = "unit-counter-preview-chip is-alert";
-        strengthBadge.textContent = previewStrength;
-        footer.appendChild(strengthBadge);
+    if (nodes.symbolKey !== previewSymbolKey) {
+      nodes.symbolShell.replaceChildren();
+      if (previewRenderer === "milstd" && previewSidc) {
+        const svg = getUnitCounterPreviewSvg(previewSidc);
+        if (svg) {
+          nodes.symbolShell.appendChild(svg);
+        } else {
+          nodes.symbolShell.textContent = presetMeta.shortCode;
+        }
+      } else {
+        nodes.symbolShell.textContent = previewSymbolToken || presetMeta.shortCode;
       }
-      content.appendChild(statStack);
-      content.appendChild(footer);
+      nodes.symbolKey = previewSymbolKey;
     }
-
-    body.appendChild(symbolShell);
-    body.appendChild(content);
-    card.appendChild(body);
-    container.appendChild(card);
   };
 
   let frontlineOverlaySection = document.getElementById("frontlineOverlayPanel");
@@ -2735,6 +2789,24 @@ function initSidebar({ render } = {}) {
   const selectedCountryActionsTitle = document.getElementById("lblHistoricalPresets");
   const selectedCountryActionHint = document.getElementById("selectedCountryActionHint");
   let counterEditorModalPreviouslyFocused = null;
+  const STRATEGIC_OVERLAY_REFRESH_SCOPES = Object.freeze([
+    "frontlineControls",
+    "operationalLines",
+    "operationGraphics",
+    "counterIdentity",
+    "counterCombat",
+    "counterPreview",
+    "counterCatalog",
+    "counterList",
+    "badgeCounts",
+    "workspaceChrome",
+  ]);
+  const strategicOverlayRefreshScopeSet = new Set(STRATEGIC_OVERLAY_REFRESH_SCOPES);
+  const strategicOverlayPerfCounters = Object.create(null);
+  let pendingStrategicOverlayRefreshHandle = null;
+  const pendingStrategicOverlayRefreshScopes = new Set();
+  let unitCounterCatalogSearchDebounceHandle = null;
+  let suppressUnitCounterListChange = false;
 
   const ensureStrategicOverlayUiState = () => {
     if (!state.strategicOverlayUi || typeof state.strategicOverlayUi !== "object") {
@@ -2743,6 +2815,49 @@ function initSidebar({ render } = {}) {
     state.strategicOverlayUi.counterEditorModalOpen = !!state.strategicOverlayUi.counterEditorModalOpen;
     state.strategicOverlayUi.counterCatalogCategory = String(state.strategicOverlayUi.counterCatalogCategory || "all").trim().toLowerCase() || "all";
     state.strategicOverlayUi.counterCatalogQuery = String(state.strategicOverlayUi.counterCatalogQuery || "");
+  };
+  const recordStrategicOverlayPerfCounter = (name) => {
+    const key = String(name || "").trim();
+    if (!key) return;
+    strategicOverlayPerfCounters[key] = Number(strategicOverlayPerfCounters[key] || 0) + 1;
+  };
+  const normalizeStrategicOverlayRefreshScopes = (scope = "all") => {
+    const rawScopes = Array.isArray(scope) ? scope : [scope];
+    const normalizedScopes = new Set();
+    rawScopes.forEach((entry) => {
+      const normalizedEntry = String(entry || "all").trim();
+      if (!normalizedEntry || normalizedEntry === "all") {
+        STRATEGIC_OVERLAY_REFRESH_SCOPES.forEach((scopeKey) => normalizedScopes.add(scopeKey));
+        return;
+      }
+      if (strategicOverlayRefreshScopeSet.has(normalizedEntry)) {
+        normalizedScopes.add(normalizedEntry);
+      }
+    });
+    if (!normalizedScopes.size) {
+      STRATEGIC_OVERLAY_REFRESH_SCOPES.forEach((scopeKey) => normalizedScopes.add(scopeKey));
+    }
+    return normalizedScopes;
+  };
+  const hasStrategicOverlayScope = (scopes, ...candidates) => candidates.some((candidate) => scopes.has(candidate));
+  const flushPendingStrategicOverlayRefresh = () => {
+    const scopes = Array.from(pendingStrategicOverlayRefreshScopes);
+    pendingStrategicOverlayRefreshScopes.clear();
+    pendingStrategicOverlayRefreshHandle = null;
+    refreshStrategicOverlayUI({ scopes });
+  };
+  const scheduleStrategicOverlayRefresh = (scope = "all") => {
+    normalizeStrategicOverlayRefreshScopes(scope).forEach((scopeKey) => pendingStrategicOverlayRefreshScopes.add(scopeKey));
+    if (pendingStrategicOverlayRefreshHandle !== null) {
+      return;
+    }
+    pendingStrategicOverlayRefreshHandle = typeof globalThis.requestAnimationFrame === "function"
+      ? globalThis.requestAnimationFrame(() => {
+        flushPendingStrategicOverlayRefresh();
+      })
+      : globalThis.setTimeout(() => {
+        flushPendingStrategicOverlayRefresh();
+      }, 0);
   };
   const getCounterEditorModalFocusableElements = () => {
     if (!(unitCounterEditorModal instanceof HTMLElement)) {
@@ -2763,6 +2878,9 @@ function initSidebar({ render } = {}) {
     state.strategicOverlayUi.counterEditorModalOpen = isOpen;
     if (unitCounterEditorModalOverlay) {
       unitCounterEditorModalOverlay.classList.toggle("hidden", !isOpen);
+    }
+    if (unitCounterDetailDrawer) {
+      unitCounterDetailDrawer.classList.toggle("hidden", !isOpen);
     }
     document.body.classList.toggle("counter-editor-modal-open", isOpen);
     if (isOpen) {
@@ -6389,58 +6507,85 @@ function initSidebar({ render } = {}) {
     if (!state.strategicOverlayUi || typeof state.strategicOverlayUi !== "object") {
       state.strategicOverlayUi = {};
     }
-    state.strategicOverlayUi.modalOpen = !!nextOpen;
+    const wasOpen = !!state.strategicOverlayUi.modalOpen;
+    const nextIsOpen = !!nextOpen;
+    state.strategicOverlayUi.modalOpen = nextIsOpen;
     state.strategicOverlayUi.modalSection = section === "counter" ? "counter" : "line";
-    if (nextOpen) {
+    if (nextIsOpen && !wasOpen) {
       setCounterEditorModalState(false, { restoreFocus: false });
-    } else {
+    } else if (!nextIsOpen && wasOpen) {
       cancelStrategicEditingModes();
     }
-    document.body.classList.toggle("strategic-workspace-open", !!nextOpen);
-    document.body.classList.toggle("strategic-workspace-visual-mode", !!nextOpen);
+    document.body.classList.toggle("strategic-workspace-open", nextIsOpen);
+    document.body.classList.toggle("strategic-workspace-visual-mode", nextIsOpen);
     if (strategicOverlaySection) {
-      if (nextOpen && strategicOverlaySection.parentElement !== document.body) {
-        strategicOverlaySection._originalParent = strategicOverlaySection.parentElement;
-        strategicOverlaySection._originalNextSibling = strategicOverlaySection.nextElementSibling;
-        document.body.appendChild(strategicOverlaySection);
-      } else if (!nextOpen && strategicOverlaySection._originalParent) {
-        const parent = strategicOverlaySection._originalParent;
-        const ref = strategicOverlaySection._originalNextSibling;
-        if (ref && ref.parentElement === parent) {
-          parent.insertBefore(strategicOverlaySection, ref);
-        } else {
-          parent.appendChild(strategicOverlaySection);
-        }
-        delete strategicOverlaySection._originalParent;
-        delete strategicOverlaySection._originalNextSibling;
-      }
-      strategicOverlaySection.classList.toggle("is-workspace-modal", !!nextOpen);
-      strategicOverlaySection.classList.toggle("is-visual-workspace", !!nextOpen);
+      strategicOverlaySection.classList.toggle("is-workspace-modal", nextIsOpen);
+      strategicOverlaySection.classList.toggle("is-visual-workspace", nextIsOpen);
       strategicOverlaySection.dataset.workspaceSection = section === "counter" ? "counter" : "line";
     }
     if (strategicWorkspaceBackdropEl) {
-      strategicWorkspaceBackdropEl.classList.toggle("hidden", !nextOpen);
+      strategicWorkspaceBackdropEl.classList.toggle("hidden", !nextIsOpen);
     }
     if (strategicOverlayOpenWorkspaceBtn) {
-      strategicOverlayOpenWorkspaceBtn.classList.toggle("hidden", !!nextOpen);
+      strategicOverlayOpenWorkspaceBtn.classList.toggle("hidden", nextIsOpen);
     }
     if (strategicOverlayCloseWorkspaceBtn) {
-      strategicOverlayCloseWorkspaceBtn.classList.toggle("hidden", !nextOpen);
+      strategicOverlayCloseWorkspaceBtn.classList.toggle("hidden", !nextIsOpen);
     }
     if (strategicOverlayIconCloseBtn) {
-      strategicOverlayIconCloseBtn.classList.toggle("hidden", !nextOpen);
+      strategicOverlayIconCloseBtn.classList.toggle("hidden", !nextIsOpen);
     }
   };
 
-  const refreshStrategicOverlayUI = () => {
+  const refreshStrategicOverlayUI = ({ scopes = "all" } = {}) => {
+    const normalizedScopes = normalizeStrategicOverlayRefreshScopes(scopes);
     const annotationView = normalizeAnnotationView(state.annotationView);
+    const syncSelectOptions = (selectEl, options, { value, disabled, signatureKey = "optionsSignature" } = {}) => {
+      if (!(selectEl instanceof HTMLSelectElement)) {
+        return;
+      }
+      const nextSignature = options.map((option) => `${option.value}::${option.label}`).join("||");
+      if (selectEl.dataset[signatureKey] !== nextSignature) {
+        selectEl.replaceChildren();
+        options.forEach((entry) => {
+          const optionEl = document.createElement("option");
+          optionEl.value = String(entry.value || "");
+          optionEl.textContent = entry.label;
+          selectEl.appendChild(optionEl);
+        });
+        selectEl.dataset[signatureKey] = nextSignature;
+      }
+      if (typeof value !== "undefined") {
+        selectEl.value = String(value || "");
+      }
+      if (typeof disabled !== "undefined") {
+        selectEl.disabled = !!disabled;
+      }
+    };
     ensureStrategicOverlayUiState();
-    refreshFrontlineTabUI();
-    setStrategicWorkspaceModalState(
-      !!state.strategicOverlayUi?.modalOpen,
-      String(state.strategicOverlayUi?.modalSection || "line")
-    );
+    if (hasStrategicOverlayScope(normalizedScopes, "frontlineControls")) {
+      recordStrategicOverlayPerfCounter("frontlineControls");
+      refreshFrontlineTabUI();
+    }
+    if (hasStrategicOverlayScope(normalizedScopes, "workspaceChrome")) {
+      recordStrategicOverlayPerfCounter("workspaceChrome");
+      setStrategicWorkspaceModalState(
+        !!state.strategicOverlayUi?.modalOpen,
+        String(state.strategicOverlayUi?.modalSection || "line")
+      );
+      if (unitCounterDetailDrawer) {
+        unitCounterDetailDrawer.dataset.open = state.strategicOverlayUi?.counterEditorModalOpen ? "true" : "false";
+      }
+      if (unitCounterDetailToggleBtn) {
+        unitCounterDetailToggleBtn.setAttribute("aria-label", t("Open counter editor", "ui"));
+        unitCounterDetailToggleBtn.setAttribute("aria-expanded", state.strategicOverlayUi?.counterEditorModalOpen ? "true" : "false");
+        unitCounterDetailToggleBtn.classList.toggle("is-active", !!state.strategicOverlayUi?.counterEditorModalOpen);
+      }
+      setCounterEditorModalState(!!state.strategicOverlayUi?.counterEditorModalOpen, { restoreFocus: false });
+    }
 
+    if (hasStrategicOverlayScope(normalizedScopes, "operationalLines")) {
+      recordStrategicOverlayPerfCounter("operationalLines");
     const operationalLineEditor = state.operationalLineEditor || {};
     const selectedOperationalLine = (state.operationalLines || []).find(
       (line) => String(line?.id || "") === String(operationalLineEditor.selectedId || "")
@@ -6471,20 +6616,16 @@ function initSidebar({ render } = {}) {
     if (operationalLineOpacityInput) {
       operationalLineOpacityInput.value = String(Number(operationalLineOpacity || 0).toFixed(2).replace(/0+$/, "").replace(/\.$/, ""));
     }
-    if (operationalLineList) {
-      operationalLineList.replaceChildren();
-      const placeholder = document.createElement("option");
-      placeholder.value = "";
-      placeholder.textContent = t("No operational lines", "ui");
-      operationalLineList.appendChild(placeholder);
-      (state.operationalLines || []).forEach((line) => {
-        const option = document.createElement("option");
-        option.value = String(line.id || "");
-        option.textContent = `${String(line.label || line.kind || line.id || "").trim()} (${line.kind})`;
-        operationalLineList.appendChild(option);
-      });
-      operationalLineList.value = selectedOperationalLineId;
-    }
+    syncSelectOptions(operationalLineList, [
+      { value: "", label: t("No operational lines", "ui") },
+      ...(state.operationalLines || []).map((line) => ({
+        value: String(line.id || ""),
+        label: `${String(line.label || line.kind || line.id || "").trim()} (${line.kind})`,
+      })),
+    ], {
+      value: selectedOperationalLineId,
+      signatureKey: "lineOptionsSignature",
+    });
     if (operationalLineStartBtn) operationalLineStartBtn.disabled = isOperationalLineDrawing;
     if (operationalLineUndoBtn) operationalLineUndoBtn.disabled = !isOperationalLineDrawing;
     if (operationalLineFinishBtn) operationalLineFinishBtn.disabled = !isOperationalLineDrawing;
@@ -6497,12 +6638,21 @@ function initSidebar({ render } = {}) {
         ? t("Selected line can be restyled, relabeled, or deleted. Use the map to compose new lines.", "ui")
         : t("Choose a line type below or from the bottom command bar to begin drawing.", "ui");
     }
+    if (isOperationalLineDrawing || hasSelectedOperationalLine) {
+      const linesAccordion = document.getElementById("accordionLines");
+      const linesAccordionHeader = linesAccordion?.querySelector?.(".strategic-accordion-header");
+      linesAccordion?.classList.add("is-open");
+      linesAccordionHeader?.setAttribute("aria-expanded", "true");
+    }
     strategicCommandButtons.forEach((button) => {
       const active = String(button.dataset.lineKind || "") === String(state.strategicOverlayUi?.activeMode || "");
       button.classList.toggle("is-active", active);
       button.setAttribute("aria-pressed", active ? "true" : "false");
     });
+    }
 
+    if (hasStrategicOverlayScope(normalizedScopes, "operationGraphics")) {
+      recordStrategicOverlayPerfCounter("operationGraphics");
     const operationEditor = state.operationGraphicsEditor || {};
     const selectedGraphic = (state.operationGraphics || []).find(
       (graphic) => String(graphic?.id || "") === String(operationEditor.selectedId || "")
@@ -6545,20 +6695,16 @@ function initSidebar({ render } = {}) {
     if (operationGraphicOpacityInput) {
       operationGraphicOpacityInput.value = String(Number(operationOpacity || 0).toFixed(2).replace(/0+$/, "").replace(/\.$/, ""));
     }
-    if (operationGraphicList) {
-      operationGraphicList.replaceChildren();
-      const placeholder = document.createElement("option");
-      placeholder.value = "";
-      placeholder.textContent = t("No operation graphics", "ui");
-      operationGraphicList.appendChild(placeholder);
-      (state.operationGraphics || []).forEach((graphic) => {
-        const option = document.createElement("option");
-        option.value = String(graphic.id || "");
-        option.textContent = `${String(graphic.label || graphic.kind || graphic.id || "").trim()} (${graphic.kind})`;
-        operationGraphicList.appendChild(option);
-      });
-      operationGraphicList.value = selectedGraphicId;
-    }
+    syncSelectOptions(operationGraphicList, [
+      { value: "", label: t("No operation graphics", "ui") },
+      ...(state.operationGraphics || []).map((graphic) => ({
+        value: String(graphic.id || ""),
+        label: `${String(graphic.label || graphic.kind || graphic.id || "").trim()} (${graphic.kind})`,
+      })),
+    ], {
+      value: selectedGraphicId,
+      signatureKey: "graphicOptionsSignature",
+    });
     const hasSelectedGraphic = !!String(operationEditor.selectedId || "").trim();
     const graphicMinPoints = selectedGraphic ? (["encirclement", "theater"].includes(String(selectedGraphic.kind || "")) ? 3 : 2) : 0;
     const canDeleteVertex = !!selectedGraphic
@@ -6579,7 +6725,15 @@ function initSidebar({ render } = {}) {
         ? t("Drag white handles to move vertices, click midpoint pips to insert, then remove the selected vertex if needed.", "ui")
         : t("Select a line to edit its geometry and style, or start a new drawing from the controls above.", "ui");
     }
+    if (isGraphicDrawing || hasSelectedGraphic) {
+      const graphicsAccordion = document.getElementById("accordionGraphics");
+      const graphicsAccordionHeader = graphicsAccordion?.querySelector?.(".strategic-accordion-header");
+      graphicsAccordion?.classList.add("is-open");
+      graphicsAccordionHeader?.setAttribute("aria-expanded", "true");
+    }
+    }
 
+    if (hasStrategicOverlayScope(normalizedScopes, "counterIdentity", "counterCombat", "counterPreview", "counterCatalog", "counterList", "workspaceChrome")) {
     const unitEditor = state.unitCounterEditor || {};
     const selectedCounter = (state.unitCounters || []).find(
       (counter) => String(counter?.id || "") === String(unitEditor.selectedId || "")
@@ -6628,20 +6782,23 @@ function initSidebar({ render } = {}) {
         : String(effectivePreset.shortCode || "").trim().toUpperCase()
     );
     const nationOptions = getUnitCounterNationOptions();
-    if (unitCounterPresetSelect) {
-      unitCounterPresetSelect.replaceChildren();
-      getSidebarUnitCounterPresetOptions(effectivePresetId).forEach((preset) => {
-        const option = document.createElement("option");
-        option.value = preset.id;
-        option.textContent = `${preset.label} · ${preset.shortCode}`;
-        unitCounterPresetSelect.appendChild(option);
+    const shouldRefreshCounterIdentity = hasStrategicOverlayScope(normalizedScopes, "counterIdentity");
+    const shouldRefreshCounterCombat = hasStrategicOverlayScope(normalizedScopes, "counterCombat");
+    const shouldRefreshCounterPreview = hasStrategicOverlayScope(normalizedScopes, "counterPreview");
+    const shouldRefreshCounterCatalog = hasStrategicOverlayScope(normalizedScopes, "counterCatalog");
+    const shouldRefreshCounterList = hasStrategicOverlayScope(normalizedScopes, "counterList");
+    if (shouldRefreshCounterIdentity) {
+      recordStrategicOverlayPerfCounter("counterIdentity");
+      syncSelectOptions(unitCounterPresetSelect, getSidebarUnitCounterPresetOptions(effectivePresetId).map((preset) => ({
+        value: preset.id,
+        label: `${preset.label} · ${preset.shortCode}`,
+      })), {
+        value: effectivePresetId,
+        signatureKey: "presetOptionsSignature",
       });
-      unitCounterPresetSelect.value = effectivePresetId;
-    }
-    if (unitCounterNationModeSelect) {
-      unitCounterNationModeSelect.value = effectiveNationSource === "manual" ? "manual" : "controller";
-    }
-    if (unitCounterNationSelect) {
+      if (unitCounterNationModeSelect) {
+        unitCounterNationModeSelect.value = effectiveNationSource === "manual" ? "manual" : "controller";
+      }
       const selectedNationValue = effectiveNationTag;
       const knownNationValues = new Set(["", ...nationOptions.map((entry) => entry.value)]);
       const nextNationOptions = nationOptions.slice();
@@ -6652,77 +6809,61 @@ function initSidebar({ render } = {}) {
           label: `${selectedNationValue} · ${fallbackMeta.displayName}`,
         });
       }
-      unitCounterNationSelect.replaceChildren();
-      const autoOption = document.createElement("option");
-      autoOption.value = "";
-      autoOption.textContent = t("Auto from placement", "ui");
-      unitCounterNationSelect.appendChild(autoOption);
-      nextNationOptions.forEach((entry) => {
-        const option = document.createElement("option");
-        option.value = String(entry.value || "");
-        option.textContent = entry.label;
-        unitCounterNationSelect.appendChild(option);
+      syncSelectOptions(unitCounterNationSelect, [
+        { value: "", label: t("Auto from placement", "ui") },
+        ...nextNationOptions,
+      ], {
+        value: selectedNationValue,
+        disabled: effectiveNationSource !== "manual",
+        signatureKey: "nationOptionsSignature",
       });
-      unitCounterNationSelect.value = selectedNationValue;
-      unitCounterNationSelect.disabled = effectiveNationSource !== "manual";
-    }
-    if (unitCounterAttachmentSelect) {
       const selectedAttachmentLineId = String(unitEditor.attachment?.lineId || selectedCounter?.attachment?.lineId || "").trim();
-      unitCounterAttachmentSelect.replaceChildren();
-      const detachedOption = document.createElement("option");
-      detachedOption.value = "";
-      detachedOption.textContent = t("Anchor: Province / Free", "ui");
-      unitCounterAttachmentSelect.appendChild(detachedOption);
-      (state.operationalLines || []).forEach((line) => {
-        const option = document.createElement("option");
-        option.value = String(line.id || "");
-        option.textContent = `${line.label || line.kind || line.id} (${line.kind})`;
-        unitCounterAttachmentSelect.appendChild(option);
+      syncSelectOptions(unitCounterAttachmentSelect, [
+        { value: "", label: t("Anchor: Province / Free", "ui") },
+        ...(state.operationalLines || []).map((line) => ({
+          value: String(line.id || ""),
+          label: `${line.label || line.kind || line.id} (${line.kind})`,
+        })),
+      ], {
+        value: selectedAttachmentLineId,
+        signatureKey: "attachmentOptionsSignature",
       });
-      unitCounterAttachmentSelect.value = selectedAttachmentLineId;
+      if (unitCounterRendererSelect) unitCounterRendererSelect.value = effectiveRenderer;
+      if (unitCounterSizeSelect) unitCounterSizeSelect.value = effectiveSize;
+      if (unitCounterEchelonSelect) unitCounterEchelonSelect.value = effectiveEchelon;
+      if (unitCounterLabelInput) unitCounterLabelInput.value = effectiveLabel;
+      if (unitCounterSubLabelInput) unitCounterSubLabelInput.value = effectiveSubLabel;
+      if (unitCounterStrengthInput) unitCounterStrengthInput.value = effectiveStrengthText;
+      if (unitCounterSymbolInput) {
+        unitCounterSymbolInput.value = effectiveSymbol;
+        unitCounterSymbolInput.placeholder = effectiveRenderer === "milstd"
+          ? t("SIDC (e.g. 130310001412110000000000000000)", "ui")
+          : t("Short code (e.g. HQ / ARM / INF)", "ui");
+      }
+      if (unitCounterSymbolHint) {
+        unitCounterSymbolHint.textContent = effectiveRenderer === "milstd"
+          ? t("MILSTD uses the browser-loaded milsymbol renderer. Paste a full SIDC for the symbol body.", "ui")
+          : t("Game renderer keeps the lighter counter style and uses a short internal code or abbreviation.", "ui");
+      }
+      if (state.unitCounterEditor?.selectedId || state.unitCounterEditor?.active || state.strategicOverlayUi?.counterEditorModalOpen) {
+        const counterAccordion = document.getElementById("accordionCounters");
+        const counterAccordionHeader = counterAccordion?.querySelector?.(".strategic-accordion-header");
+        counterAccordion?.classList.add("is-open");
+        counterAccordionHeader?.setAttribute("aria-expanded", "true");
+      }
+      if (unitCounterPlaceBtn) unitCounterPlaceBtn.disabled = !!unitEditor.active;
+      if (unitCounterCancelBtn) unitCounterCancelBtn.disabled = !unitEditor.active;
+      if (unitCounterDeleteBtn) unitCounterDeleteBtn.disabled = !String(unitEditor.selectedId || "").trim();
+      if (unitCounterLabelsToggle) {
+        unitCounterLabelsToggle.checked = annotationView.showUnitLabels !== false;
+      }
     }
-    if (unitCounterRendererSelect) {
-      unitCounterRendererSelect.value = effectiveRenderer;
-    }
-    if (unitCounterSizeSelect) {
-      unitCounterSizeSelect.value = effectiveSize;
-    }
-    if (unitCounterEchelonSelect) {
-      unitCounterEchelonSelect.value = effectiveEchelon;
-    }
-    if (unitCounterLabelInput) {
-      unitCounterLabelInput.value = effectiveLabel;
-    }
-    if (unitCounterSubLabelInput) {
-      unitCounterSubLabelInput.value = effectiveSubLabel;
-    }
-    if (unitCounterStrengthInput) {
-      unitCounterStrengthInput.value = effectiveStrengthText;
-    }
-    if (unitCounterSymbolInput) {
-      unitCounterSymbolInput.value = effectiveSymbol;
-      unitCounterSymbolInput.placeholder = effectiveRenderer === "milstd"
-        ? t("SIDC (e.g. 130310001412110000000000000000)", "ui")
-        : t("Short code (e.g. HQ / ARM / INF)", "ui");
-    }
-    if (unitCounterSymbolHint) {
-      unitCounterSymbolHint.textContent = effectiveRenderer === "milstd"
-        ? t("MILSTD uses the browser-loaded milsymbol renderer. Paste a full SIDC for the symbol body.", "ui")
-        : t("Game renderer keeps the lighter counter style and uses a short internal code or abbreviation.", "ui");
-    }
-    if (unitCounterDetailDrawer) {
-      unitCounterDetailDrawer.dataset.open = state.strategicOverlayUi?.counterEditorModalOpen ? "true" : "false";
-    }
-    if (unitCounterDetailToggleBtn) {
-      unitCounterDetailToggleBtn.setAttribute("aria-label", t("Open counter editor", "ui"));
-      unitCounterDetailToggleBtn.setAttribute("aria-expanded", state.strategicOverlayUi?.counterEditorModalOpen ? "true" : "false");
-      unitCounterDetailToggleBtn.classList.toggle("is-active", !!state.strategicOverlayUi?.counterEditorModalOpen);
-    }
-    setCounterEditorModalState(!!state.strategicOverlayUi?.counterEditorModalOpen, { restoreFocus: false });
     const placementStatusText = unitEditor.active
       ? t("Placing on map", "ui")
       : "";
-    renderUnitCounterPreview(unitCounterPreviewCard, {
+    if (shouldRefreshCounterPreview) {
+      recordStrategicOverlayPerfCounter("counterPreview");
+      renderUnitCounterPreview(unitCounterPreviewCard, {
       renderer: effectiveRenderer,
       size: effectiveSize,
       nationTag: effectiveNationTag,
@@ -6740,7 +6881,7 @@ function initSidebar({ render } = {}) {
       statusText: placementStatusText,
       compactMode: true,
     });
-    renderUnitCounterPreview(unitCounterDetailPreviewCard, {
+      renderUnitCounterPreview(unitCounterDetailPreviewCard, {
       renderer: effectiveRenderer,
       size: effectiveSize,
       nationTag: effectiveNationTag,
@@ -6758,139 +6899,173 @@ function initSidebar({ render } = {}) {
       statusText: placementStatusText,
       detailMode: true,
     });
-    if (unitCounterPlacementStatus) {
-      unitCounterPlacementStatus.textContent = placementStatusText || t("Use the gear button for the full counter editor.", "ui");
-      unitCounterPlacementStatus.classList.toggle("hidden", !placementStatusText);
+      if (unitCounterPlacementStatus) {
+        unitCounterPlacementStatus.textContent = placementStatusText || t("Use the gear button for the full counter editor.", "ui");
+        unitCounterPlacementStatus.classList.toggle("hidden", !placementStatusText);
+      }
+      if (unitCounterEditorModalStatus) {
+        unitCounterEditorModalStatus.textContent = placementStatusText || t("Apply a symbol, then return to the map to continue placement or edit the selected counter live.", "ui");
+        unitCounterEditorModalStatus.classList.toggle("hidden", false);
+        unitCounterEditorModalStatus.dataset.mode = placementStatusText ? "placing" : "idle";
+      }
     }
-    if (unitCounterEditorModalStatus) {
-      unitCounterEditorModalStatus.textContent = placementStatusText || t("Apply a symbol, then return to the map to continue placement or edit the selected counter live.", "ui");
-      unitCounterEditorModalStatus.classList.toggle("hidden", false);
-      unitCounterEditorModalStatus.dataset.mode = placementStatusText ? "placing" : "idle";
-    }
-    if (unitCounterStatsPresetSelect) {
+    if (shouldRefreshCounterCombat) {
+      recordStrategicOverlayPerfCounter("counterCombat");
+      if (unitCounterStatsPresetSelect) {
       unitCounterStatsPresetSelect.value = effectiveCombatState.statsPresetId === "random"
         ? "regular"
         : effectiveCombatState.statsPresetId;
-    }
-    unitCounterStatsPresetButtons.forEach((button) => {
-      const value = String(button.dataset.value || "").trim().toLowerCase();
-      const active = effectiveCombatState.statsPresetId !== "random" && value === effectiveCombatState.statsPresetId;
-      button.classList.toggle("is-active", active);
-      button.setAttribute("aria-pressed", active ? "true" : "false");
-    });
-    if (unitCounterOrganizationInput) {
-      unitCounterOrganizationInput.value = String(effectiveCombatState.organizationPct);
-    }
-    if (unitCounterEquipmentInput) {
-      unitCounterEquipmentInput.value = String(effectiveCombatState.equipmentPct);
-    }
-    if (unitCounterOrganizationBar) {
-      unitCounterOrganizationBar.style.width = `${effectiveCombatState.organizationPct}%`;
-    }
-    if (unitCounterEquipmentBar) {
-      unitCounterEquipmentBar.style.width = `${effectiveCombatState.equipmentPct}%`;
-    }
-    const effectiveFillColor = effectiveCombatState.baseFillColor || "#f4f0e6";
-    if (unitCounterBaseFillSwatch) {
-      unitCounterBaseFillSwatch.style.setProperty("--unit-counter-fill-preview", effectiveFillColor);
-      unitCounterBaseFillSwatch.dataset.active = effectiveCombatState.baseFillColor ? "true" : "false";
-    }
-    if (unitCounterBaseFillColorInput) {
-      unitCounterBaseFillColorInput.value = /^#(?:[0-9a-f]{6})$/i.test(effectiveFillColor) ? effectiveFillColor : "#f4f0e6";
-    }
-    if (unitCounterBaseFillResetBtn) {
-      unitCounterBaseFillResetBtn.disabled = !effectiveCombatState.baseFillColor;
-    }
-    if (unitCounterBaseFillEyedropperBtn) {
-      unitCounterBaseFillEyedropperBtn.disabled = !("EyeDropper" in globalThis);
-    }
-    if (unitCounterLabelsToggle) {
-      unitCounterLabelsToggle.checked = annotationView.showUnitLabels !== false;
-    }
-    if (unitCounterCatalogSearchInput) {
-      unitCounterCatalogSearchInput.value = String(state.strategicOverlayUi?.counterCatalogQuery || "");
-    }
-    if (unitCounterCatalogCategoriesEl) {
-      unitCounterCatalogCategoriesEl.replaceChildren();
-      [["all", t("All", "ui")], ...unitCounterCatalogCategories.map((category) => [category, getUnitCounterCategoryLabel(category)])]
-        .forEach(([categoryValue, label]) => {
-          const button = document.createElement("button");
-          button.type = "button";
-          button.className = "counter-editor-category-btn";
-          button.dataset.counterCatalogCategory = String(categoryValue || "");
-          button.textContent = label;
-          const active = String(state.strategicOverlayUi?.counterCatalogCategory || "all") === String(categoryValue || "");
-          button.classList.toggle("is-active", active);
-          button.setAttribute("aria-pressed", active ? "true" : "false");
-          unitCounterCatalogCategoriesEl.appendChild(button);
-        });
-    }
-    if (unitCounterCatalogGrid) {
-      unitCounterCatalogGrid.replaceChildren();
-      const filteredCatalog = getFilteredUnitCounterCatalog({
-        category: state.strategicOverlayUi?.counterCatalogCategory || "all",
-        query: state.strategicOverlayUi?.counterCatalogQuery || "",
+      }
+      unitCounterStatsPresetButtons.forEach((button) => {
+        const value = String(button.dataset.value || "").trim().toLowerCase();
+        const active = effectiveCombatState.statsPresetId !== "random" && value === effectiveCombatState.statsPresetId;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", active ? "true" : "false");
       });
-      if (!filteredCatalog.length) {
-        const emptyState = document.createElement("div");
-        emptyState.className = "counter-editor-symbol-empty";
-        emptyState.textContent = t("No symbols match the current filter.", "ui");
-        unitCounterCatalogGrid.appendChild(emptyState);
-      } else {
-        filteredCatalog.forEach((preset) => {
-          const button = document.createElement("button");
-          button.type = "button";
-          button.className = "counter-editor-symbol-card";
-          button.dataset.unitCounterCatalogPreset = preset.id;
-          const active = preset.id === effectivePresetId;
-          button.classList.toggle("is-active", active);
-          button.setAttribute("aria-pressed", active ? "true" : "false");
-          const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-          icon.setAttribute("viewBox", "-5 -5 10 10");
-          icon.setAttribute("aria-hidden", "true");
-          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-          path.setAttribute("d", getUnitCounterIconPathById(preset.iconId));
-          icon.appendChild(path);
-          const title = document.createElement("span");
-          title.className = "counter-editor-symbol-card-title";
-          title.textContent = preset.label;
-          const subtitle = document.createElement("span");
-          subtitle.className = "counter-editor-symbol-card-subtitle";
-          subtitle.textContent = `${preset.shortCode} · ${getUnitCounterCategoryLabel(preset.category)}`;
-          button.append(icon, title, subtitle);
-          unitCounterCatalogGrid.appendChild(button);
-        });
+      if (unitCounterOrganizationInput) {
+        unitCounterOrganizationInput.value = String(effectiveCombatState.organizationPct);
+      }
+      if (unitCounterEquipmentInput) {
+        unitCounterEquipmentInput.value = String(effectiveCombatState.equipmentPct);
+      }
+      if (unitCounterOrganizationBar) {
+        unitCounterOrganizationBar.style.width = `${effectiveCombatState.organizationPct}%`;
+      }
+      if (unitCounterEquipmentBar) {
+        unitCounterEquipmentBar.style.width = `${effectiveCombatState.equipmentPct}%`;
+      }
+      const effectiveFillColor = effectiveCombatState.baseFillColor || "#f4f0e6";
+      if (unitCounterBaseFillSwatch) {
+        unitCounterBaseFillSwatch.style.setProperty("--unit-counter-fill-preview", effectiveFillColor);
+        unitCounterBaseFillSwatch.dataset.active = effectiveCombatState.baseFillColor ? "true" : "false";
+      }
+      if (unitCounterBaseFillColorInput) {
+        unitCounterBaseFillColorInput.value = /^#(?:[0-9a-f]{6})$/i.test(effectiveFillColor) ? effectiveFillColor : "#f4f0e6";
+      }
+      if (unitCounterBaseFillResetBtn) {
+        unitCounterBaseFillResetBtn.disabled = !effectiveCombatState.baseFillColor;
+      }
+      if (unitCounterBaseFillEyedropperBtn) {
+        unitCounterBaseFillEyedropperBtn.disabled = !("EyeDropper" in globalThis);
       }
     }
-    if (unitCounterList) {
-      unitCounterList.replaceChildren();
-      const placeholder = document.createElement("option");
-      placeholder.value = "";
-      placeholder.textContent = t("No unit counters", "ui");
-      unitCounterList.appendChild(placeholder);
-      (state.unitCounters || []).forEach((counter) => {
-        const option = document.createElement("option");
-        option.value = String(counter.id || "");
-        option.textContent = formatUnitCounterListLabel(counter);
-        unitCounterList.appendChild(option);
-      });
-      unitCounterList.value = String(unitEditor.selectedId || "");
+    if (shouldRefreshCounterCatalog) {
+      recordStrategicOverlayPerfCounter("counterCatalog");
+      if (unitCounterCatalogSearchInput) {
+      unitCounterCatalogSearchInput.value = String(state.strategicOverlayUi?.counterCatalogQuery || "");
+      }
+      if (unitCounterCatalogCategoriesEl) {
+        const categoryButtons = unitCounterCatalogCategoriesEl._categoryButtons || new Map();
+        unitCounterCatalogCategoriesEl._categoryButtons = categoryButtons;
+        [["all", t("All", "ui")], ...unitCounterCatalogCategories.map((category) => [category, getUnitCounterCategoryLabel(category)])]
+          .forEach(([categoryValue, label]) => {
+            let button = categoryButtons.get(categoryValue);
+            if (!(button instanceof HTMLButtonElement)) {
+              button = document.createElement("button");
+              button.type = "button";
+              button.className = "counter-editor-category-btn";
+              button.dataset.counterCatalogCategory = String(categoryValue || "");
+              categoryButtons.set(categoryValue, button);
+            }
+            button.textContent = label;
+            const active = String(state.strategicOverlayUi?.counterCatalogCategory || "all") === String(categoryValue || "");
+            button.classList.toggle("is-active", active);
+            button.setAttribute("aria-pressed", active ? "true" : "false");
+            if (button.parentElement !== unitCounterCatalogCategoriesEl) {
+              unitCounterCatalogCategoriesEl.appendChild(button);
+            }
+          });
+      }
+      if (unitCounterCatalogGrid && state.strategicOverlayUi?.counterEditorModalOpen) {
+        const filteredCatalog = getFilteredUnitCounterCatalog({
+          category: state.strategicOverlayUi?.counterCatalogCategory || "all",
+          query: state.strategicOverlayUi?.counterCatalogQuery || "",
+        });
+        const catalogCardMap = unitCounterCatalogGrid._catalogCardMap || new Map();
+        unitCounterCatalogGrid._catalogCardMap = catalogCardMap;
+        let emptyState = unitCounterCatalogGrid._emptyState;
+        if (!(emptyState instanceof HTMLElement)) {
+          emptyState = document.createElement("div");
+          emptyState.className = "counter-editor-symbol-empty";
+          unitCounterCatalogGrid._emptyState = emptyState;
+        }
+        emptyState.textContent = t("No symbols match the current filter.", "ui");
+        const visibleIds = new Set(filteredCatalog.map((preset) => preset.id));
+        catalogCardMap.forEach((button, presetId) => {
+          if (!visibleIds.has(presetId) && button.parentElement === unitCounterCatalogGrid) {
+            button.remove();
+          }
+        });
+        if (!filteredCatalog.length) {
+          if (emptyState.parentElement !== unitCounterCatalogGrid) {
+            unitCounterCatalogGrid.appendChild(emptyState);
+          }
+        } else {
+          emptyState.remove();
+          filteredCatalog.forEach((preset) => {
+            let button = catalogCardMap.get(preset.id);
+            if (!(button instanceof HTMLButtonElement)) {
+              button = document.createElement("button");
+              button.type = "button";
+              button.className = "counter-editor-symbol-card";
+              button.dataset.unitCounterCatalogPreset = preset.id;
+              const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+              icon.setAttribute("viewBox", "-5 -5 10 10");
+              icon.setAttribute("aria-hidden", "true");
+              const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+              path.setAttribute("d", getUnitCounterIconPathById(preset.iconId));
+              icon.appendChild(path);
+              const title = document.createElement("span");
+              title.className = "counter-editor-symbol-card-title";
+              title.textContent = preset.label;
+              const subtitle = document.createElement("span");
+              subtitle.className = "counter-editor-symbol-card-subtitle";
+              subtitle.textContent = `${preset.shortCode} · ${getUnitCounterCategoryLabel(preset.category)}`;
+              button.append(icon, title, subtitle);
+              catalogCardMap.set(preset.id, button);
+            }
+            const active = preset.id === effectivePresetId;
+            button.classList.toggle("is-active", active);
+            button.setAttribute("aria-pressed", active ? "true" : "false");
+            unitCounterCatalogGrid.appendChild(button);
+          });
+        }
+      }
     }
-    const isCounterPlacing = !!unitEditor.active;
-    if (unitCounterPlaceBtn) unitCounterPlaceBtn.disabled = isCounterPlacing;
-    if (unitCounterCancelBtn) unitCounterCancelBtn.disabled = !isCounterPlacing;
-    if (unitCounterDeleteBtn) unitCounterDeleteBtn.disabled = !String(unitEditor.selectedId || "").trim();
+    if (shouldRefreshCounterList) {
+      recordStrategicOverlayPerfCounter("counterList");
+      suppressUnitCounterListChange = true;
+      try {
+        syncSelectOptions(unitCounterList, [
+          { value: "", label: t("No unit counters", "ui") },
+          ...(state.unitCounters || []).map((counter) => ({
+            value: String(counter.id || ""),
+            label: formatUnitCounterListLabel(counter),
+          })),
+        ], {
+          value: String(unitEditor.selectedId || ""),
+          signatureKey: "counterListOptionsSignature",
+        });
+      } finally {
+        suppressUnitCounterListChange = false;
+      }
+    }
 
-    const linesBadge = document.querySelector("#accordionLines .strategic-accordion-badge");
-    const graphicsBadge = document.querySelector("#accordionGraphics .strategic-accordion-badge");
-    const countersBadge = document.querySelector("#accordionCounters .strategic-accordion-badge");
-    if (linesBadge) linesBadge.textContent = String((state.operationalLines || []).length);
-    if (graphicsBadge) graphicsBadge.textContent = String((state.operationGraphics || []).length);
-    if (countersBadge) countersBadge.textContent = String((state.unitCounters || []).length);
+    }
+    if (hasStrategicOverlayScope(normalizedScopes, "badgeCounts", "operationalLines", "operationGraphics", "counterList")) {
+      recordStrategicOverlayPerfCounter("badgeCounts");
+      const linesBadge = document.querySelector("#accordionLines .strategic-accordion-badge");
+      const graphicsBadge = document.querySelector("#accordionGraphics .strategic-accordion-badge");
+      const countersBadge = document.querySelector("#accordionCounters .strategic-accordion-badge");
+      if (linesBadge) linesBadge.textContent = String((state.operationalLines || []).length);
+      if (graphicsBadge) graphicsBadge.textContent = String((state.operationGraphics || []).length);
+      if (countersBadge) countersBadge.textContent = String((state.unitCounters || []).length);
+    }
   };
 
   state.updateLegendUI = refreshLegendEditor;
   state.updateStrategicOverlayUIFn = refreshStrategicOverlayUI;
+  state.getStrategicOverlayPerfCountersFn = () => ({ ...strategicOverlayPerfCounters });
   state.refreshCountryListRowsFn = refreshCountryRows;
   state.refreshCountryInspectorDetailFn = renderCountryInspectorDetail;
   setRightSidebarTab(state.ui?.rightSidebarTab || "inspector");
@@ -7321,7 +7496,7 @@ function initSidebar({ render } = {}) {
     } else if (render) {
       render();
     }
-    refreshStrategicOverlayUI();
+    scheduleStrategicOverlayRefresh(["counterCombat", "counterPreview"]);
   };
   const applyUnitCounterCombatPreset = (presetId, { source = "preset" } = {}) => {
     const preset = getUnitCounterCombatPreset(presetId);
@@ -7358,7 +7533,7 @@ function initSidebar({ render } = {}) {
     } else if (render) {
       render();
     }
-    refreshStrategicOverlayUI();
+    scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview", "counterCatalog"]);
   };
 
   if (unitCounterPresetSelect && !unitCounterPresetSelect.dataset.bound) {
@@ -7380,7 +7555,7 @@ function initSidebar({ render } = {}) {
           nationTag: state.unitCounterEditor.nationTag,
         });
       }
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
     });
     unitCounterNationModeSelect.dataset.bound = "true";
   }
@@ -7395,7 +7570,7 @@ function initSidebar({ render } = {}) {
           nationSource: state.unitCounterEditor.nationSource,
         });
       }
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
     });
     unitCounterNationSelect.dataset.bound = "true";
   }
@@ -7410,7 +7585,7 @@ function initSidebar({ render } = {}) {
       } else if (render) {
         render();
       }
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
     });
     unitCounterAttachmentSelect.dataset.bound = "true";
   }
@@ -7431,7 +7606,7 @@ function initSidebar({ render } = {}) {
       } else if (render) {
         render();
       }
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
       markDirty("unit-counter-renderer");
     });
     unitCounterRendererSelect.dataset.bound = "true";
@@ -7445,7 +7620,7 @@ function initSidebar({ render } = {}) {
       } else if (render) {
         render();
       }
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
     });
     unitCounterSizeSelect.dataset.bound = "true";
   }
@@ -7455,14 +7630,14 @@ function initSidebar({ render } = {}) {
       if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
         mapRenderer.updateSelectedUnitCounter({ echelon: state.unitCounterEditor.echelon });
       }
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
     });
     unitCounterEchelonSelect.dataset.bound = "true";
   }
   if (unitCounterLabelInput && !unitCounterLabelInput.dataset.bound) {
     unitCounterLabelInput.addEventListener("input", (event) => {
       state.unitCounterEditor.label = String(event.target.value || "");
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh("counterPreview");
     });
     unitCounterLabelInput.addEventListener("change", (event) => {
       const nextLabel = String(event.target.value || "");
@@ -7470,35 +7645,35 @@ function initSidebar({ render } = {}) {
       if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
         mapRenderer.updateSelectedUnitCounter({ label: nextLabel });
       }
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview", "counterList"]);
     });
     unitCounterLabelInput.dataset.bound = "true";
   }
   if (unitCounterSubLabelInput && !unitCounterSubLabelInput.dataset.bound) {
     unitCounterSubLabelInput.addEventListener("input", (event) => {
       state.unitCounterEditor.subLabel = String(event.target.value || "");
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh("counterPreview");
     });
     unitCounterSubLabelInput.addEventListener("change", (event) => {
       state.unitCounterEditor.subLabel = String(event.target.value || "");
       if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
         mapRenderer.updateSelectedUnitCounter({ subLabel: state.unitCounterEditor.subLabel });
       }
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
     });
     unitCounterSubLabelInput.dataset.bound = "true";
   }
   if (unitCounterStrengthInput && !unitCounterStrengthInput.dataset.bound) {
     unitCounterStrengthInput.addEventListener("input", (event) => {
       state.unitCounterEditor.strengthText = String(event.target.value || "");
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh("counterPreview");
     });
     unitCounterStrengthInput.addEventListener("change", (event) => {
       state.unitCounterEditor.strengthText = String(event.target.value || "");
       if (!state.unitCounterEditor.active && state.unitCounterEditor.selectedId) {
         mapRenderer.updateSelectedUnitCounter({ strengthText: state.unitCounterEditor.strengthText });
       }
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
     });
     unitCounterStrengthInput.dataset.bound = "true";
   }
@@ -7507,7 +7682,7 @@ function initSidebar({ render } = {}) {
       const nextToken = String(event.target.value || "").trim().toUpperCase();
       state.unitCounterEditor.sidc = nextToken;
       state.unitCounterEditor.symbolCode = nextToken;
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh("counterPreview");
     });
     unitCounterSymbolInput.addEventListener("change", (event) => {
       const nextSymbol = String(event.target.value || "").trim().toUpperCase();
@@ -7518,7 +7693,7 @@ function initSidebar({ render } = {}) {
       } else if (render) {
         render();
       }
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview"]);
     });
     unitCounterSymbolInput.dataset.bound = "true";
   }
@@ -7526,14 +7701,16 @@ function initSidebar({ render } = {}) {
     unitCounterDetailToggleBtn.addEventListener("click", () => {
       ensureStrategicOverlayUiState();
       state.strategicOverlayUi.counterEditorModalOpen = true;
-      refreshStrategicOverlayUI();
+      refreshStrategicOverlayUI({
+        scopes: ["workspaceChrome", "counterIdentity", "counterCombat", "counterPreview", "counterCatalog"],
+      });
     });
     unitCounterDetailToggleBtn.dataset.bound = "true";
   }
   if (unitCounterEditorModalCloseBtn && !unitCounterEditorModalCloseBtn.dataset.bound) {
     unitCounterEditorModalCloseBtn.addEventListener("click", () => {
       setCounterEditorModalState(false);
-      refreshStrategicOverlayUI();
+      refreshStrategicOverlayUI({ scopes: ["workspaceChrome"] });
     });
     unitCounterEditorModalCloseBtn.dataset.bound = "true";
   }
@@ -7541,13 +7718,13 @@ function initSidebar({ render } = {}) {
     unitCounterEditorModalOverlay.addEventListener("click", (event) => {
       if (event.target !== unitCounterEditorModalOverlay) return;
       setCounterEditorModalState(false);
-      refreshStrategicOverlayUI();
+      refreshStrategicOverlayUI({ scopes: ["workspaceChrome"] });
     });
     unitCounterEditorModalOverlay.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         event.preventDefault();
         setCounterEditorModalState(false);
-        refreshStrategicOverlayUI();
+        refreshStrategicOverlayUI({ scopes: ["workspaceChrome"] });
         return;
       }
       if (event.key !== "Tab") return;
@@ -7574,7 +7751,13 @@ function initSidebar({ render } = {}) {
     unitCounterCatalogSearchInput.addEventListener("input", (event) => {
       ensureStrategicOverlayUiState();
       state.strategicOverlayUi.counterCatalogQuery = String(event.target.value || "");
-      refreshStrategicOverlayUI();
+      if (unitCounterCatalogSearchDebounceHandle !== null) {
+        globalThis.clearTimeout(unitCounterCatalogSearchDebounceHandle);
+      }
+      unitCounterCatalogSearchDebounceHandle = globalThis.setTimeout(() => {
+        unitCounterCatalogSearchDebounceHandle = null;
+        scheduleStrategicOverlayRefresh("counterCatalog");
+      }, 180);
     });
     unitCounterCatalogSearchInput.dataset.bound = "true";
   }
@@ -7584,7 +7767,7 @@ function initSidebar({ render } = {}) {
       if (!(button instanceof HTMLButtonElement)) return;
       ensureStrategicOverlayUiState();
       state.strategicOverlayUi.counterCatalogCategory = String(button.dataset.counterCatalogCategory || "all").trim().toLowerCase() || "all";
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh("counterCatalog");
     });
     unitCounterCatalogCategoriesEl.dataset.bound = "true";
   }
@@ -7698,7 +7881,7 @@ function initSidebar({ render } = {}) {
         showUnitLabels: !!event.target.checked,
       };
       if (render) render();
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh("counterIdentity");
       markDirty("unit-counter-label-visibility");
     });
     unitCounterLabelsToggle.dataset.bound = "true";
@@ -7743,21 +7926,28 @@ function initSidebar({ render } = {}) {
         statsPresetId: String(state.unitCounterEditor?.statsPresetId || "regular"),
         statsSource: String(state.unitCounterEditor?.statsSource || "preset"),
       });
-      refreshStrategicOverlayUI();
+      const placementRefreshScopes = ["counterIdentity", "counterPreview", "counterList"];
+      scheduleStrategicOverlayRefresh(placementRefreshScopes);
+      globalThis.requestAnimationFrame?.(() => {
+        scheduleStrategicOverlayRefresh(placementRefreshScopes);
+      });
     });
     unitCounterPlaceBtn.dataset.bound = "true";
   }
   if (unitCounterCancelBtn && !unitCounterCancelBtn.dataset.bound) {
     unitCounterCancelBtn.addEventListener("click", () => {
       mapRenderer.cancelUnitCounterPlacement();
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh(["counterIdentity", "counterPreview", "counterList"]);
     });
     unitCounterCancelBtn.dataset.bound = "true";
   }
   if (unitCounterList && !unitCounterList.dataset.bound) {
     unitCounterList.addEventListener("change", (event) => {
+      if (suppressUnitCounterListChange) {
+        return;
+      }
       mapRenderer.selectUnitCounterById(String(event.target.value || ""));
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh(["counterIdentity", "counterCombat", "counterPreview", "counterList"]);
     });
     unitCounterList.dataset.bound = "true";
   }
@@ -7774,7 +7964,7 @@ function initSidebar({ render } = {}) {
       });
       if (!confirmed) return;
       mapRenderer.deleteSelectedUnitCounter();
-      refreshStrategicOverlayUI();
+      scheduleStrategicOverlayRefresh(["counterIdentity", "counterCombat", "counterPreview", "counterList"]);
     });
     unitCounterDeleteBtn.dataset.bound = "true";
   }

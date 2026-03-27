@@ -243,6 +243,7 @@ test("strategic frontline overlay reacts to controller changes", async ({ page }
       lineSelectVisible: isActuallyVisible("#operationalLineKindSelect"),
       graphicSelectVisible: isActuallyVisible("#operationGraphicKindSelect"),
       counterEditorVisible: isActuallyVisible("#unitCounterEditorShell"),
+      panelParentId: document.querySelector("#strategicOverlayPanel")?.parentElement?.id || "",
     };
   });
   expect(workspaceLineSnapshot.accordionHeaderDisplay).toBe("none");
@@ -252,6 +253,7 @@ test("strategic frontline overlay reacts to controller changes", async ({ page }
   expect(workspaceLineSnapshot.lineSelectVisible).toBeTruthy();
   expect(workspaceLineSnapshot.graphicSelectVisible).toBeTruthy();
   expect(workspaceLineSnapshot.counterEditorVisible).toBeFalsy();
+  expect(workspaceLineSnapshot.panelParentId).toBe("frontlineTabStack");
   await page.locator("#strategicOverlayIconCloseBtn").click();
   await page.waitForFunction(() => !document.body.classList.contains("strategic-workspace-open"));
   await page.waitForFunction(() => !!document.querySelector("#frontlineTabStack > #strategicOverlayPanel"));
@@ -327,6 +329,7 @@ test("strategic frontline overlay reacts to controller changes", async ({ page }
       counterBodyVisible: isActuallyVisible("#accordionCounters > .strategic-accordion-body"),
       counterEditorVisible: isActuallyVisible("#unitCounterEditorShell"),
       counterModalVisible: isActuallyVisible("#unitCounterEditorModalOverlay"),
+      panelParentId: modal?.parentElement?.id || "",
     };
   });
   expect(workspaceLineModalSnapshot.commandBarDisplay).toBe("none");
@@ -348,6 +351,7 @@ test("strategic frontline overlay reacts to controller changes", async ({ page }
   expect(workspaceLineModalSnapshot.counterBodyVisible).toBeFalsy();
   expect(workspaceLineModalSnapshot.counterEditorVisible).toBeFalsy();
   expect(workspaceLineModalSnapshot.counterModalVisible).toBeFalsy();
+  expect(workspaceLineModalSnapshot.panelParentId).toBe("frontlineTabStack");
   await page.keyboard.press("Escape");
   await page.waitForFunction(() => !document.body.classList.contains("strategic-workspace-open"));
   await page.waitForFunction(() => !!document.querySelector("#frontlineTabStack > #strategicOverlayPanel"));
