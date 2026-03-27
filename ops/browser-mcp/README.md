@@ -11,8 +11,11 @@ Runtime evidence defaults to `.runtime/browser/` and generated reports default t
 
 ## Quick use
 ```bash
+npm install
 bash ops/browser-mcp/run-smoke-browser-inspection.sh
 ```
+
+The launcher prefers the repo-local `node_modules/playwright/cli.js` first. npm cache and `npx` remain fallback-only paths.
 
 ## CLI options
 ```bash

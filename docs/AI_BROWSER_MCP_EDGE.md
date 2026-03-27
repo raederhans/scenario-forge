@@ -15,6 +15,12 @@ Notes:
 - Long-lived generated reports should go under `.runtime/reports/generated/`.
 
 ## One-time setup and checks
+0. Restore the local Playwright toolchain:
+```bash
+npm install
+```
+Expected: repo root now has `node_modules/playwright/cli.js` and `node_modules/@playwright/test/cli.js`.
+
 1. Verify MCP is configured:
 ```bash
 codex mcp list
@@ -57,6 +63,8 @@ bash ops/browser-mcp/run-smoke-browser-inspection.sh --profile ops/browser-mcp/i
 Codex starts Playwright MCP directly from `.codex/config.toml`.
 
 Use this first.
+
+The project launcher now prefers the repo-local `node_modules/playwright/cli.js` and only falls back to npm cache or `npx` when the local package is missing.
 
 ### B) Standalone HTTP mode (WSL/headed fallback)
 Use when STDIO mode cannot start browser reliably.
@@ -116,6 +124,7 @@ In another project:
 ## Troubleshooting
 ### Edge startup failure
 - Confirm Edge is installed on host OS.
+- Confirm `npm install` has restored the local Playwright toolchain at repo root.
 - In WSL environments, prefer Standalone HTTP mode.
 
 ### Edge cannot reach local page in WSL
@@ -136,5 +145,6 @@ In another project:
 - Ensure no external process locks screenshot/log files.
 
 ### Codex cannot use Playwright in STDIO mode
+- Re-run `npm install` at repo root so `node_modules/playwright/cli.js` exists.
 - Start standalone server and switch config to URL mode.
 - Re-run smoke script.

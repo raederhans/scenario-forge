@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+resolve_local_playwright_cli_path() {
+  local local_cli="${ROOT_DIR}/node_modules/playwright/cli.js"
+  if [[ -f "${local_cli}" ]]; then
+    printf '%s\n' "${local_cli}"
+    return 0
+  fi
+  return 1
+}
+
 resolve_cli_path() {
   if [[ -n "${PLAYWRIGHT_MCP_CLI:-}" && -f "${PLAYWRIGHT_MCP_CLI}" ]]; then
     printf '%s\n' "${PLAYWRIGHT_MCP_CLI}"
@@ -41,6 +53,11 @@ fi
 if [[ -z "${NODE_BIN}" || ! -x "${NODE_BIN}" ]]; then
   echo "Could not locate a Linux node executable for Playwright MCP." >&2
   exit 1
+fi
+
+LOCAL_PLAYWRIGHT_CLI="$(resolve_local_playwright_cli_path || true)"
+if [[ -n "${LOCAL_PLAYWRIGHT_CLI}" && -f "${LOCAL_PLAYWRIGHT_CLI}" ]]; then
+  exec "${NODE_BIN}" "${LOCAL_PLAYWRIGHT_CLI}" run-mcp-server "$@"
 fi
 
 CLI_PATH="$(resolve_cli_path || true)"
