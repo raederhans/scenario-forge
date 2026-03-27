@@ -23,9 +23,18 @@ import {
   writeStartupCacheEntry,
 } from "./startup_cache.js";
 import {
+  decodeRuntimeChunkViaWorker,
   loadScenarioRuntimeBootstrapViaWorker,
   shouldUseStartupWorker,
 } from "./startup_worker_client.js";
+import {
+  getVisibleScenarioChunkLayers,
+  mergeScenarioChunkPayloads,
+  normalizeScenarioChunkManifest,
+  normalizeScenarioContextLodManifest,
+  normalizeScenarioRenderBudgetHints,
+  selectScenarioChunks,
+} from "./scenario_chunk_manager.js";
 import {
   buildScenarioDistrictGroupByFeatureId,
   normalizeScenarioDistrictGroupsPayload,
@@ -51,6 +60,8 @@ const SCENARIO_BUNDLE_LEVELS = new Set(["bootstrap", "full"]);
 const SCENARIO_LOAD_TIMEOUT_MS = 12_000;
 const SCENARIO_DETAIL_SOURCE_FALLBACK_ORDER = ["na_v2", "na_v1", "legacy_bak", "highres"];
 const SCENARIO_FATAL_RECOVERY_CODE = "SCENARIO_FATAL_RECOVERY";
+const SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING = 180;
+const SCENARIO_CHUNK_REFRESH_DELAY_MS_IDLE = 60;
 const SCENARIO_OPTIONAL_LAYER_CONFIGS = {
   water: {
     bundleField: "waterRegionsPayload",
@@ -1287,6 +1298,482 @@ function normalizeScenarioRuntimeTopologyPayload(payload) {
   return payload;
 }
 
+function normalizeScenarioRuntimeShell(manifest) {
+  if (!manifest || typeof manifest !== "object") {
+    return null;
+  }
+  const startupTopologyUrl = String(
+    manifest.startup_topology_url
+    || manifest.runtime_bootstrap_topology_url
+    || manifest.runtime_topology_url
+    || ""
+  ).trim();
+  const detailChunkManifestUrl = String(manifest.detail_chunk_manifest_url || "").trim();
+  const runtimeMetaUrl = String(manifest.runtime_meta_url || "").trim();
+  const meshPackUrl = String(manifest.mesh_pack_url || "").trim();
+  const contextLodManifestUrl = String(manifest.context_lod_manifest || "").trim();
+  if (!startupTopologyUrl && !detailChunkManifestUrl && !runtimeMetaUrl && !meshPackUrl && !contextLodManifestUrl) {
+    return null;
+  }
+  return {
+    scenarioId: normalizeScenarioId(manifest.scenario_id),
+    startupTopologyUrl,
+    detailChunkManifestUrl,
+    runtimeMetaUrl,
+    meshPackUrl,
+    contextLodManifestUrl,
+    renderBudgetHints: normalizeScenarioRenderBudgetHints(manifest.render_budget_hints || {}),
+  };
+}
+
+function scenarioSupportsChunkedRuntime(bundleOrManifest) {
+  const manifest = bundleOrManifest?.manifest || bundleOrManifest;
+  return !!normalizeScenarioRuntimeShell(manifest)?.detailChunkManifestUrl;
+}
+
+function scenarioBundleUsesChunkedLayer(bundle, layerKey = "") {
+  if (!bundle || !scenarioSupportsChunkedRuntime(bundle)) {
+    return false;
+  }
+  const normalizedLayerKey = normalizeScenarioOptionalLayerKey(layerKey);
+  if (!normalizedLayerKey) {
+    return Array.isArray(bundle.chunkRegistry?.chunks) && bundle.chunkRegistry.chunks.length > 0;
+  }
+  return Array.isArray(bundle.chunkRegistry?.byLayer?.[normalizedLayerKey])
+    && bundle.chunkRegistry.byLayer[normalizedLayerKey].length > 0;
+}
+
+function ensureRuntimeChunkLoadState() {
+  if (!state.runtimeChunkLoadState || typeof state.runtimeChunkLoadState !== "object") {
+    state.runtimeChunkLoadState = {
+      shellStatus: "idle",
+      registryStatus: "idle",
+      refreshScheduled: false,
+      refreshTimerId: null,
+      inFlightByChunkId: {},
+      errorByChunkId: {},
+      lastSelection: null,
+    };
+  }
+  if (state.runtimeChunkLoadState.refreshTimerId && typeof state.runtimeChunkLoadState.refreshTimerId !== "number") {
+    state.runtimeChunkLoadState.refreshTimerId = null;
+  }
+  state.runtimeChunkLoadState.inFlightByChunkId =
+    state.runtimeChunkLoadState.inFlightByChunkId && typeof state.runtimeChunkLoadState.inFlightByChunkId === "object"
+      ? state.runtimeChunkLoadState.inFlightByChunkId
+      : {};
+  state.runtimeChunkLoadState.errorByChunkId =
+    state.runtimeChunkLoadState.errorByChunkId && typeof state.runtimeChunkLoadState.errorByChunkId === "object"
+      ? state.runtimeChunkLoadState.errorByChunkId
+      : {};
+  return state.runtimeChunkLoadState;
+}
+
+function recordScenarioRenderMetric(name, durationMs, details = {}) {
+  if (!state.renderPerfMetrics || typeof state.renderPerfMetrics !== "object") {
+    state.renderPerfMetrics = {};
+  }
+  state.renderPerfMetrics[String(name || "").trim()] = {
+    durationMs: Math.max(0, Number(durationMs) || 0),
+    recordedAt: Date.now(),
+    ...details,
+  };
+  globalThis.__renderPerfMetrics = state.renderPerfMetrics;
+}
+
+function ensureActiveScenarioChunkState() {
+  if (!state.activeScenarioChunks || typeof state.activeScenarioChunks !== "object") {
+    state.activeScenarioChunks = {
+      scenarioId: "",
+      loadedChunkIds: [],
+      payloadByChunkId: {},
+      mergedLayerPayloads: {},
+      lruChunkIds: [],
+    };
+  }
+  state.activeScenarioChunks.loadedChunkIds = Array.isArray(state.activeScenarioChunks.loadedChunkIds)
+    ? state.activeScenarioChunks.loadedChunkIds
+    : [];
+  state.activeScenarioChunks.payloadByChunkId =
+    state.activeScenarioChunks.payloadByChunkId && typeof state.activeScenarioChunks.payloadByChunkId === "object"
+      ? state.activeScenarioChunks.payloadByChunkId
+      : {};
+  state.activeScenarioChunks.mergedLayerPayloads =
+    state.activeScenarioChunks.mergedLayerPayloads && typeof state.activeScenarioChunks.mergedLayerPayloads === "object"
+      ? state.activeScenarioChunks.mergedLayerPayloads
+      : {};
+  state.activeScenarioChunks.lruChunkIds = Array.isArray(state.activeScenarioChunks.lruChunkIds)
+    ? state.activeScenarioChunks.lruChunkIds
+    : [];
+  return state.activeScenarioChunks;
+}
+
+function touchScenarioChunkLru(chunkId) {
+  const chunkState = ensureActiveScenarioChunkState();
+  const normalizedChunkId = String(chunkId || "").trim();
+  if (!normalizedChunkId) return;
+  chunkState.lruChunkIds = chunkState.lruChunkIds.filter((entry) => entry !== normalizedChunkId);
+  chunkState.lruChunkIds.push(normalizedChunkId);
+}
+
+function resetScenarioChunkRuntimeState({ scenarioId = "" } = {}) {
+  const normalizedScenarioId = normalizeScenarioId(scenarioId);
+  state.activeScenarioChunks = {
+    scenarioId: normalizedScenarioId,
+    loadedChunkIds: [],
+    payloadByChunkId: {},
+    mergedLayerPayloads: {},
+    lruChunkIds: [],
+  };
+  state.runtimeChunkLoadState = {
+    shellStatus: normalizedScenarioId ? "ready" : "idle",
+    registryStatus: normalizedScenarioId ? "ready" : "idle",
+    refreshScheduled: false,
+    refreshTimerId: null,
+    inFlightByChunkId: {},
+    errorByChunkId: {},
+    lastSelection: null,
+  };
+}
+
+async function loadScenarioChunkFile(
+  url,
+  {
+    d3Client = globalThis.d3,
+    scenarioId = "",
+    resourceLabel = "scenario_chunk",
+    useWorker = shouldUseStartupWorker(),
+  } = {}
+) {
+  const normalizedUrl = String(url || "").trim();
+  if (!normalizedUrl) return null;
+  if (useWorker) {
+    try {
+      const workerResult = await decodeRuntimeChunkViaWorker({
+        chunkUrl: normalizedUrl,
+        chunkType: "scenario-chunk",
+      });
+      if (workerResult.chunkPayload) {
+        return {
+          payload: workerResult.chunkPayload,
+          metrics: workerResult.metrics?.chunkPayload || workerResult.metrics || null,
+          reason: "worker",
+        };
+      }
+    } catch (error) {
+      console.warn(`[scenario] Worker chunk load failed for "${normalizedUrl}". Falling back to main thread.`, error);
+    }
+  }
+  const result = await loadMeasuredJsonResource(cacheBust(normalizedUrl), {
+    d3Client,
+    label: `scenario:${resourceLabel}`,
+  });
+  return {
+    payload: result.payload,
+    metrics: result.metrics || null,
+    reason: "main-thread",
+    scenarioId,
+  };
+}
+
+async function ensureScenarioChunkRegistryLoaded(
+  bundle,
+  {
+    d3Client = globalThis.d3,
+  } = {}
+) {
+  if (!bundle?.manifest) return null;
+  const runtimeShell = bundle.runtimeShell || normalizeScenarioRuntimeShell(bundle.manifest);
+  if (!runtimeShell?.detailChunkManifestUrl) {
+    return null;
+  }
+  bundle.runtimeShell = runtimeShell;
+  if (bundle.chunkRegistry && bundle.contextLodManifest) {
+    ensureRuntimeChunkLoadState().registryStatus = "ready";
+    return bundle.chunkRegistry;
+  }
+  const chunkState = ensureRuntimeChunkLoadState();
+  chunkState.registryStatus = "loading";
+  const [chunkManifestResult, contextLodResult, runtimeMetaResult, meshPackResult] = await Promise.all([
+    loadScenarioChunkFile(runtimeShell.detailChunkManifestUrl, {
+      d3Client,
+      scenarioId: runtimeShell.scenarioId,
+      resourceLabel: "detail_chunk_manifest",
+    }),
+    runtimeShell.contextLodManifestUrl
+      ? loadScenarioChunkFile(runtimeShell.contextLodManifestUrl, {
+        d3Client,
+        scenarioId: runtimeShell.scenarioId,
+        resourceLabel: "context_lod_manifest",
+      })
+      : Promise.resolve(null),
+    runtimeShell.runtimeMetaUrl
+      ? loadScenarioChunkFile(runtimeShell.runtimeMetaUrl, {
+        d3Client,
+        scenarioId: runtimeShell.scenarioId,
+        resourceLabel: "runtime_meta",
+      })
+      : Promise.resolve(null),
+    runtimeShell.meshPackUrl
+      ? loadScenarioChunkFile(runtimeShell.meshPackUrl, {
+        d3Client,
+        scenarioId: runtimeShell.scenarioId,
+        resourceLabel: "mesh_pack",
+      })
+      : Promise.resolve(null),
+  ]);
+  bundle.chunkRegistry = normalizeScenarioChunkManifest(chunkManifestResult?.payload || {});
+  bundle.contextLodManifest = normalizeScenarioContextLodManifest(contextLodResult?.payload || {});
+  bundle.runtimeMetaPayload = runtimeMetaResult?.payload || null;
+  bundle.meshPackPayload = meshPackResult?.payload || null;
+  chunkState.registryStatus = "ready";
+  return bundle.chunkRegistry;
+}
+
+function getChunkLayerStatePayload(layerKey) {
+  const config = getScenarioOptionalLayerConfig(layerKey);
+  return config ? state[config.stateField] || null : null;
+}
+
+function applyMergedScenarioChunkLayerPayloads(mergedLayerPayloads, { renderNow = false } = {}) {
+  let changed = false;
+  Object.entries(SCENARIO_OPTIONAL_LAYER_CONFIGS).forEach(([layerKey, config]) => {
+    const nextPayload = mergedLayerPayloads?.[layerKey] || null;
+    const currentPayload = state[config.stateField] || null;
+    if (nextPayload === currentPayload) return;
+    if (config.stateField === "scenarioCityOverridesData") {
+      syncScenarioLocalizationState({ cityOverridesPayload: nextPayload });
+      changed = true;
+      return;
+    }
+    state[config.stateField] = nextPayload;
+    if (config.revisionField) {
+      state[config.revisionField] = (Number(state[config.revisionField]) || 0) + 1;
+    }
+    changed = true;
+  });
+  if (changed && renderNow && typeof state.renderNowFn === "function") {
+    state.renderNowFn();
+  }
+  return changed;
+}
+
+function buildMergedScenarioChunkLayerPayloads(bundle) {
+  const chunkState = ensureActiveScenarioChunkState();
+  const mergedLayerPayloads = {};
+  Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS).forEach((layerKey) => {
+    const layerChunkPayloads = chunkState.loadedChunkIds
+      .map((chunkId) => chunkState.payloadByChunkId?.[chunkId] || null)
+      .filter((entry) => entry && entry.layerKey === layerKey)
+      .map((entry) => entry.payload)
+      .filter(Boolean);
+    if (!layerChunkPayloads.length) {
+      mergedLayerPayloads[layerKey] = null;
+      return;
+    }
+    mergedLayerPayloads[layerKey] = mergeScenarioChunkPayloads(layerKey, layerChunkPayloads);
+  });
+  chunkState.mergedLayerPayloads = mergedLayerPayloads;
+  bundle.chunkMergedLayerPayloads = mergedLayerPayloads;
+  return mergedLayerPayloads;
+}
+
+async function preloadScenarioCoarseChunks(
+  bundle,
+  {
+    d3Client = globalThis.d3,
+  } = {}
+) {
+  if (!scenarioSupportsChunkedRuntime(bundle?.manifest)) return null;
+  await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
+  if (bundle.chunkPreloaded === true) {
+    return bundle.chunkMergedLayerPayloads || null;
+  }
+  bundle.chunkPayloadCacheById = bundle.chunkPayloadCacheById && typeof bundle.chunkPayloadCacheById === "object"
+    ? bundle.chunkPayloadCacheById
+    : {};
+  const visibleLayers = getVisibleScenarioChunkLayers({
+    showWaterRegions: normalizeScenarioPerformanceHints(bundle.manifest).waterRegionsDefault !== false,
+    showScenarioSpecialRegions: normalizeScenarioPerformanceHints(bundle.manifest).specialRegionsDefault !== false,
+    showScenarioReliefOverlays: normalizeScenarioPerformanceHints(bundle.manifest).scenarioReliefOverlaysDefault === true,
+    showCityPoints: state.showCityPoints !== false,
+  });
+  const coarseSelection = selectScenarioChunks({
+    scenarioId: getScenarioBundleId(bundle),
+    chunkRegistry: bundle.chunkRegistry,
+    contextLodManifest: bundle.contextLodManifest,
+    zoom: 1,
+    viewportBbox: [-180, -90, 180, 90],
+    focusCountry: getScenarioDefaultCountryCode(bundle.manifest, bundle.countriesPayload?.countries || {}),
+    renderBudgetHints: bundle.runtimeShell?.renderBudgetHints || bundle.manifest?.render_budget_hints || {},
+    visibleLayers,
+    loadedChunkIds: [],
+  });
+  await Promise.all(
+    coarseSelection.requiredChunks.map(async (chunk) => {
+      if (bundle.chunkPayloadCacheById?.[chunk.id]) return;
+      const result = await loadScenarioChunkFile(chunk.url, {
+        d3Client,
+        scenarioId: getScenarioBundleId(bundle),
+        resourceLabel: `chunk:${chunk.layer}:${chunk.id}`,
+      });
+      bundle.chunkPayloadCacheById[chunk.id] = {
+        layerKey: chunk.layer,
+        payload: result?.payload || null,
+      };
+    })
+  );
+  bundle.chunkMergedLayerPayloads = {};
+  Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS).forEach((layerKey) => {
+    const layerPayloads = coarseSelection.requiredChunks
+      .filter((chunk) => chunk.layer === layerKey)
+      .map((chunk) => bundle.chunkPayloadCacheById?.[chunk.id]?.payload || null)
+      .filter(Boolean);
+    bundle.chunkMergedLayerPayloads[layerKey] = layerPayloads.length
+      ? mergeScenarioChunkPayloads(layerKey, layerPayloads)
+      : null;
+  });
+  bundle.chunkPreloaded = true;
+  return bundle.chunkMergedLayerPayloads;
+}
+
+async function loadScenarioChunkPayload(bundle, chunkMeta, { d3Client = globalThis.d3 } = {}) {
+  const normalizedChunkId = String(chunkMeta?.id || "").trim();
+  if (!bundle || !normalizedChunkId) return null;
+  bundle.chunkPayloadCacheById = bundle.chunkPayloadCacheById && typeof bundle.chunkPayloadCacheById === "object"
+    ? bundle.chunkPayloadCacheById
+    : {};
+  if (bundle.chunkPayloadCacheById[normalizedChunkId]) {
+    return bundle.chunkPayloadCacheById[normalizedChunkId];
+  }
+  const loadState = ensureRuntimeChunkLoadState();
+  loadState.inFlightByChunkId[normalizedChunkId] = true;
+  try {
+    const result = await loadScenarioChunkFile(chunkMeta.url, {
+      d3Client,
+      scenarioId: getScenarioBundleId(bundle),
+      resourceLabel: `chunk:${chunkMeta.layer}:${normalizedChunkId}`,
+    });
+    const payload = {
+      layerKey: chunkMeta.layer,
+      payload: result?.payload || null,
+    };
+    bundle.chunkPayloadCacheById[normalizedChunkId] = payload;
+    delete loadState.errorByChunkId[normalizedChunkId];
+    return payload;
+  } catch (error) {
+    loadState.errorByChunkId[normalizedChunkId] = String(error?.message || error || "Unknown chunk load error.");
+    throw error;
+  } finally {
+    delete loadState.inFlightByChunkId[normalizedChunkId];
+  }
+}
+
+async function refreshActiveScenarioChunks({
+  reason = "refresh",
+  d3Client = globalThis.d3,
+  renderNow = true,
+} = {}) {
+  const scenarioId = normalizeScenarioId(state.activeScenarioId);
+  if (!scenarioId) return null;
+  const bundle = getCachedScenarioBundle(scenarioId);
+  if (!bundle || !scenarioBundleUsesChunkedLayer(bundle)) return null;
+  await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
+  const viewportBbox = typeof state.getViewportGeoBoundsFn === "function"
+    ? state.getViewportGeoBoundsFn()
+    : [-180, -90, 180, 90];
+  const visibleLayers = getVisibleScenarioChunkLayers({
+    showWaterRegions: state.showWaterRegions !== false,
+    showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
+    showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
+    showCityPoints: state.showCityPoints !== false,
+  });
+  const chunkState = ensureActiveScenarioChunkState();
+  chunkState.scenarioId = scenarioId;
+  const selection = selectScenarioChunks({
+    scenarioId,
+    chunkRegistry: bundle.chunkRegistry,
+    contextLodManifest: bundle.contextLodManifest,
+    zoom: Number(state.zoomTransform?.k || 1),
+    viewportBbox,
+    focusCountry: state.activeSovereignCode || getScenarioDefaultCountryCode(bundle.manifest, bundle.countriesPayload?.countries || {}),
+    renderBudgetHints: bundle.runtimeShell?.renderBudgetHints || bundle.manifest?.render_budget_hints || {},
+    visibleLayers,
+    loadedChunkIds: chunkState.loadedChunkIds,
+  });
+  ensureRuntimeChunkLoadState().lastSelection = {
+    reason: String(reason || "refresh"),
+    scenarioId,
+    viewportBbox,
+    requiredChunkIds: selection.requiredChunks.map((chunk) => chunk.id),
+    optionalChunkIds: selection.optionalChunks.map((chunk) => chunk.id),
+  };
+  await Promise.all(selection.requiredChunks.map((chunk) => loadScenarioChunkPayload(bundle, chunk, { d3Client })));
+  selection.requiredChunks.forEach((chunk) => {
+    const payload = bundle.chunkPayloadCacheById?.[chunk.id];
+    if (!payload) return;
+    chunkState.payloadByChunkId[chunk.id] = payload;
+    if (!chunkState.loadedChunkIds.includes(chunk.id)) {
+      chunkState.loadedChunkIds.push(chunk.id);
+    }
+    touchScenarioChunkLru(chunk.id);
+  });
+  if (selection.evictableChunkIds.length) {
+    selection.evictableChunkIds.forEach((chunkId) => {
+      delete chunkState.payloadByChunkId[chunkId];
+      chunkState.loadedChunkIds = chunkState.loadedChunkIds.filter((entry) => entry !== chunkId);
+      chunkState.lruChunkIds = chunkState.lruChunkIds.filter((entry) => entry !== chunkId);
+    });
+    recordScenarioRenderMetric("chunkEvictionCount", selection.evictableChunkIds.length, {
+      scenarioId,
+      reason: String(reason || "refresh"),
+    });
+  }
+  const promotionStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
+  const mergedLayerPayloads = buildMergedScenarioChunkLayerPayloads(bundle);
+  applyMergedScenarioChunkLayerPayloads(mergedLayerPayloads, { renderNow });
+  recordScenarioRenderMetric(
+    "chunkPromotionMs",
+    (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - promotionStartedAt,
+    {
+      scenarioId,
+      reason: String(reason || "refresh"),
+      loadedChunkCount: chunkState.loadedChunkIds.length,
+    }
+  );
+  return selection;
+}
+
+function scheduleScenarioChunkRefresh({
+  reason = "refresh",
+  delayMs = null,
+} = {}) {
+  const scenarioId = normalizeScenarioId(state.activeScenarioId);
+  if (!scenarioId) return;
+  const bundle = getCachedScenarioBundle(scenarioId);
+  if (!bundle || !scenarioBundleUsesChunkedLayer(bundle)) return;
+  const loadState = ensureRuntimeChunkLoadState();
+  if (loadState.refreshTimerId) {
+    globalThis.clearTimeout(loadState.refreshTimerId);
+  }
+  const resolvedDelayMs = Number.isFinite(Number(delayMs))
+    ? Number(delayMs)
+    : (String(reason || "").includes("interacting")
+      ? SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING
+      : SCENARIO_CHUNK_REFRESH_DELAY_MS_IDLE);
+  loadState.refreshScheduled = true;
+  loadState.refreshTimerId = globalThis.setTimeout(() => {
+    loadState.refreshTimerId = null;
+    loadState.refreshScheduled = false;
+    void refreshActiveScenarioChunks({
+      reason,
+      renderNow: true,
+    }).catch((error) => {
+      console.warn(`[scenario] Failed to refresh active scenario chunks for "${scenarioId}".`, error);
+    });
+  }, resolvedDelayMs);
+}
+
 function getScenarioTopologyFeatureCollection(topologyPayload, objectName) {
   const object = topologyPayload?.objects?.[objectName];
   if (!object || typeof globalThis.topojson?.feature !== "function") {
@@ -1742,6 +2229,13 @@ async function ensureActiveScenarioOptionalLayerLoaded(
   if (!normalizedKey || !state.activeScenarioId) return null;
   const bundle = state.scenarioBundleCacheById?.[normalizeScenarioId(state.activeScenarioId)];
   if (!bundle) return null;
+  if (scenarioBundleUsesChunkedLayer(bundle, normalizedKey)) {
+    scheduleScenarioChunkRefresh({
+      reason: `visibility:${normalizedKey}`,
+      delayMs: 0,
+    });
+    return state[getScenarioOptionalLayerConfig(normalizedKey)?.stateField] || null;
+  }
   const payload = await loadScenarioOptionalLayerPayload(bundle, normalizedKey, {
     d3Client,
     forceReload,
@@ -1763,8 +2257,19 @@ async function ensureActiveScenarioOptionalLayersForVisibility(
   const activeScenarioId = normalizeScenarioId(state.activeScenarioId);
   const activeBundle = bundle || state.scenarioBundleCacheById?.[activeScenarioId] || null;
   if (!activeScenarioId || !activeBundle) return [];
+  const requestedChunkedLayers = Object.entries(SCENARIO_OPTIONAL_LAYER_CONFIGS)
+    .filter(([, config]) => state[config.visibilityField])
+    .map(([layerKey]) => layerKey)
+    .filter((layerKey) => scenarioBundleUsesChunkedLayer(activeBundle, layerKey));
+  if (requestedChunkedLayers.length) {
+    scheduleScenarioChunkRefresh({
+      reason: "visibility-sync",
+      delayMs: 0,
+    });
+  }
   const requestedLayers = Object.entries(SCENARIO_OPTIONAL_LAYER_CONFIGS)
     .filter(([, config]) => state[config.visibilityField])
+    .filter(([layerKey]) => !scenarioBundleUsesChunkedLayer(activeBundle, layerKey))
     .filter(([layerKey]) => activeBundle.optionalLayerSettledByKey?.[layerKey] !== true)
     .filter(([layerKey, config]) => !activeBundle[config.bundleField] && !state[config.stateField])
     .map(([layerKey]) => layerKey);
@@ -1824,11 +2329,22 @@ function createScenarioBootstrapBundleFromCache({
   geoLocalePatchDescriptor,
   runtimeTopologyUrl,
 } = {}) {
+  const runtimeShell = normalizeScenarioRuntimeShell(manifest);
   const bundle = {
     ...(priorBundle && typeof priorBundle === "object" ? priorBundle : {}),
     meta,
     manifest,
     bundleLevel,
+    runtimeShell,
+    chunkRegistry: priorBundle?.chunkRegistry || null,
+    contextLodManifest: priorBundle?.contextLodManifest || null,
+    runtimeMetaPayload: priorBundle?.runtimeMetaPayload || null,
+    meshPackPayload: priorBundle?.meshPackPayload || null,
+    chunkPayloadCacheById: {
+      ...(priorBundle?.chunkPayloadCacheById || {}),
+    },
+    chunkMergedLayerPayloads: priorBundle?.chunkMergedLayerPayloads || null,
+    chunkPreloaded: !!priorBundle?.chunkPreloaded,
     countriesPayload: cachedPayload?.countriesPayload || null,
     ownersPayload: cachedPayload?.ownersPayload || null,
     controllersPayload: cachedPayload?.controllersPayload || null,
@@ -1900,14 +2416,19 @@ async function loadScenarioRuntimeTopologyForBundle({
   runtimeTopologyUrl,
 } = {}) {
   const runtimeLabel = requestedBundleLevel === "bootstrap" ? "runtime_bootstrap_topology" : "runtime_topology";
-  if (requestedBundleLevel === "bootstrap" && runtimeTopologyUrl && shouldUseStartupWorker()) {
+  const allowWorkerDecode = !!runtimeTopologyUrl && shouldUseStartupWorker();
+  if (allowWorkerDecode) {
     try {
-      const workerResult = await loadScenarioRuntimeBootstrapViaWorker({ runtimeTopologyUrl });
+      const workerResult = requestedBundleLevel === "bootstrap"
+        ? await loadScenarioRuntimeBootstrapViaWorker({ runtimeTopologyUrl })
+        : await decodeRuntimeChunkViaWorker({ runtimeTopologyUrl });
       return {
         ok: !!workerResult.runtimePoliticalTopology,
         value: workerResult.runtimePoliticalTopology || null,
         metrics: workerResult.metrics?.runtimePoliticalTopology || workerResult.metrics || null,
-        reason: workerResult.runtimePoliticalTopology ? "ok" : "empty",
+        reason: workerResult.runtimePoliticalTopology
+          ? (requestedBundleLevel === "bootstrap" ? "worker-bootstrap" : "worker-full")
+          : "empty",
         errorMessage: "",
         runtimePoliticalMeta: workerResult.runtimePoliticalMeta || null,
         decodedCollections: workerResult.decodedCollections || null,
@@ -1946,6 +2467,7 @@ function hydrateActiveScenarioBundle(
       ? runtimeTopologyPayload
       : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null);
     state.runtimePoliticalMetaSeed = bundle.runtimePoliticalMeta || null;
+    state.runtimePoliticalFeatureCollectionSeed = getScenarioDecodedCollection(bundle, "politicalData") || null;
     state.scenarioLandMaskData =
       getScenarioDecodedCollection(bundle, "scenarioLandMaskData")
       || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land_mask")
@@ -1957,13 +2479,15 @@ function hydrateActiveScenarioBundle(
       || state.scenarioContextLandMaskData
       || null;
     state.scenarioWaterRegionsData =
-      getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData")
+      bundle.chunkMergedLayerPayloads?.water
+      || getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData")
       || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water")
       || bundle.waterRegionsPayload
       || state.scenarioWaterRegionsData
       || null;
     state.scenarioSpecialRegionsData =
-      getScenarioDecodedCollection(bundle, "scenarioSpecialRegionsData")
+      bundle.chunkMergedLayerPayloads?.special
+      || getScenarioDecodedCollection(bundle, "scenarioSpecialRegionsData")
       || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land")
       || bundle.specialRegionsPayload
       || state.scenarioSpecialRegionsData
@@ -1983,6 +2507,13 @@ function hydrateActiveScenarioBundle(
       loading: false,
       loadedForScenarioId: bundleScenarioId,
       errorMessage: "",
+    });
+  }
+  state.scenarioReliefOverlaysData = bundle.chunkMergedLayerPayloads?.relief || bundle.reliefOverlaysPayload || state.scenarioReliefOverlaysData || null;
+  if (bundle.chunkMergedLayerPayloads?.cities || bundle.cityOverridesPayload) {
+    syncScenarioLocalizationState({
+      cityOverridesPayload: bundle.chunkMergedLayerPayloads?.cities || bundle.cityOverridesPayload || null,
+      geoLocalePatchPayload: bundle.geoLocalePatchPayload || state.scenarioGeoLocalePatchData || null,
     });
   }
   syncScenarioUi();
@@ -2038,7 +2569,7 @@ async function loadScenarioBundle(
   }
   const cachedBundle = state.scenarioBundleCacheById?.[targetId] || null;
   if (!forceReload && cachedBundle && scenarioBundleSatisfiesLevel(cachedBundle, requestedBundleLevel)) {
-    if (normalizeScenarioBundleLevel(cachedBundle.bundleLevel) === "full") {
+    if (normalizeScenarioBundleLevel(cachedBundle.bundleLevel) === "full" && !scenarioSupportsChunkedRuntime(cachedBundle)) {
       prewarmScenarioOptionalLayersOnCacheHit(cachedBundle, { d3Client });
     }
     recordScenarioPerfMetric(
@@ -2069,10 +2600,11 @@ async function loadScenarioBundle(
   const priorBundle = !forceReload && cachedBundle ? cachedBundle : null;
   const geoLocalePatchDescriptor = getScenarioGeoLocalePatchDescriptor(manifest);
   const hints = normalizeScenarioPerformanceHints(manifest);
+  const runtimeShell = normalizeScenarioRuntimeShell(manifest);
   const runtimeTopologyUrl = String(
     requestedBundleLevel === "bootstrap"
-      ? manifest.runtime_bootstrap_topology_url || manifest.runtime_topology_url || ""
-      : manifest.runtime_topology_url || manifest.runtime_bootstrap_topology_url || ""
+      ? runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || manifest.runtime_topology_url || ""
+      : runtimeShell?.startupTopologyUrl || manifest.runtime_topology_url || manifest.runtime_bootstrap_topology_url || ""
   ).trim();
   const scenarioBootstrapCacheKey =
     requestedBundleLevel === "bootstrap" && isStartupCacheEnabled()
@@ -2105,6 +2637,11 @@ async function loadScenarioBundle(
           geoLocalePatchDescriptor,
           runtimeTopologyUrl,
         });
+        bundle.runtimeShell = runtimeShell;
+        if (requestedBundleLevel === "full" && scenarioSupportsChunkedRuntime(bundle)) {
+          await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
+          await preloadScenarioCoarseChunks(bundle, { d3Client });
+        }
         state.scenarioBundleCacheById[targetId] = bundle;
         recordScenarioPerfMetric(
           "loadScenarioBundle",
@@ -2199,6 +2736,16 @@ async function loadScenarioBundle(
     meta,
     manifest,
     bundleLevel: requestedBundleLevel,
+    runtimeShell,
+    chunkRegistry: priorBundle?.chunkRegistry || null,
+    contextLodManifest: priorBundle?.contextLodManifest || null,
+    runtimeMetaPayload: priorBundle?.runtimeMetaPayload || null,
+    meshPackPayload: priorBundle?.meshPackPayload || null,
+    chunkPayloadCacheById: {
+      ...(priorBundle?.chunkPayloadCacheById || {}),
+    },
+    chunkMergedLayerPayloads: priorBundle?.chunkMergedLayerPayloads || null,
+    chunkPreloaded: !!priorBundle?.chunkPreloaded,
     countriesPayload: countriesResult.payload,
     ownersPayload: ownersResult.payload,
     controllersPayload: controllersResult.payload,
@@ -2278,12 +2825,25 @@ async function loadScenarioBundle(
     }
   }
   if (requestedBundleLevel === "full") {
-    const eagerOptionalLayers = Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
-      .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, bundle.runtimeTopologyPayload, hints));
-    if (eagerOptionalLayers.length) {
-      await Promise.all(
-        eagerOptionalLayers.map((layerKey) => loadScenarioOptionalLayerPayload(bundle, layerKey, { d3Client }))
-      );
+    if (scenarioSupportsChunkedRuntime(bundle)) {
+      await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
+      await preloadScenarioCoarseChunks(bundle, { d3Client });
+      const eagerFallbackLayers = Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
+        .filter((layerKey) => !scenarioBundleUsesChunkedLayer(bundle, layerKey))
+        .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, bundle.runtimeTopologyPayload, hints));
+      if (eagerFallbackLayers.length) {
+        await Promise.all(
+          eagerFallbackLayers.map((layerKey) => loadScenarioOptionalLayerPayload(bundle, layerKey, { d3Client }))
+        );
+      }
+    } else {
+      const eagerOptionalLayers = Object.keys(SCENARIO_OPTIONAL_LAYER_CONFIGS)
+        .filter((layerKey) => shouldEagerLoadScenarioOptionalLayer(layerKey, manifest, bundle.runtimeTopologyPayload, hints));
+      if (eagerOptionalLayers.length) {
+        await Promise.all(
+          eagerOptionalLayers.map((layerKey) => loadScenarioOptionalLayerPayload(bundle, layerKey, { d3Client }))
+        );
+      }
     }
   }
   const ownerCount = Object.keys(bundle.ownersPayload?.owners || {}).length;
@@ -2334,6 +2894,9 @@ async function loadScenarioBundle(
     countryCount,
     ownerCount,
     controllerCount,
+    workerDecodeMs: Number(runtimeTopologyResult.workerMetrics?.runtimePoliticalTopology?.totalMs || 0),
+    workerMetaBuildMs: Number(runtimeTopologyResult.workerMetrics?.runtimePoliticalMeta?.buildMs || 0),
+    runtimeTopologyDecodePath: String(runtimeTopologyResult.reason || "main-thread"),
     resourceMetrics: {
       manifest: manifestResult.metrics || null,
       runtimeTopology: runtimeTopologyResult.metrics || null,
@@ -2757,6 +3320,11 @@ function captureScenarioApplyRollbackSnapshot() {
     geoAliasToStableKey: cloneScenarioStateValue(state.geoAliasToStableKey),
     scenarioDisplaySettingsBeforeActivate: cloneScenarioStateValue(state.scenarioDisplaySettingsBeforeActivate),
     activeScenarioPerformanceHints: cloneScenarioStateValue(state.activeScenarioPerformanceHints),
+    activeScenarioChunks: cloneScenarioStateValue(state.activeScenarioChunks),
+    runtimeChunkLoadState: cloneScenarioStateValue({
+      ...(state.runtimeChunkLoadState || {}),
+      refreshTimerId: null,
+    }),
     renderProfile: String(state.renderProfile || "auto"),
     dynamicBordersEnabled: state.dynamicBordersEnabled !== false,
     showCityPoints: state.showCityPoints !== false,
@@ -2781,6 +3349,9 @@ function restoreScenarioApplyRollbackSnapshot(snapshot, { renderNow = false } = 
   if (!snapshot || typeof snapshot !== "object") return;
   if (consumeScenarioTestHook("failRollbackRestoreOnce")) {
     throw new Error("Injected rollback restore failure.");
+  }
+  if (state.runtimeChunkLoadState?.refreshTimerId) {
+    globalThis.clearTimeout(state.runtimeChunkLoadState.refreshTimerId);
   }
 
   state.activeScenarioId = snapshot.activeScenarioId;
@@ -2861,6 +3432,22 @@ function restoreScenarioApplyRollbackSnapshot(snapshot, { renderNow = false } = 
   state.scenarioDisplaySettingsBeforeActivate =
     cloneScenarioStateValue(snapshot.scenarioDisplaySettingsBeforeActivate);
   state.activeScenarioPerformanceHints = cloneScenarioStateValue(snapshot.activeScenarioPerformanceHints);
+  state.activeScenarioChunks = cloneScenarioStateValue(snapshot.activeScenarioChunks) || {
+    scenarioId: "",
+    loadedChunkIds: [],
+    payloadByChunkId: {},
+    mergedLayerPayloads: {},
+    lruChunkIds: [],
+  };
+  state.runtimeChunkLoadState = cloneScenarioStateValue(snapshot.runtimeChunkLoadState) || {
+    shellStatus: "idle",
+    registryStatus: "idle",
+    refreshScheduled: false,
+    refreshTimerId: null,
+    inFlightByChunkId: {},
+    errorByChunkId: {},
+    lastSelection: null,
+  };
   state.renderProfile = String(snapshot.renderProfile || "auto");
   state.dynamicBordersEnabled = snapshot.dynamicBordersEnabled !== false;
   state.showCityPoints = snapshot.showCityPoints !== false;
@@ -2879,6 +3466,7 @@ function restoreScenarioApplyRollbackSnapshot(snapshot, { renderNow = false } = 
   state.paletteLibraryEntries = cloneScenarioStateValue(snapshot.paletteLibraryEntries) || [];
   state.paletteQuickSwatches = cloneScenarioStateValue(snapshot.paletteQuickSwatches) || [];
   state.paletteLoadErrorById = cloneScenarioStateValue(snapshot.paletteLoadErrorById) || {};
+  state.scheduleScenarioChunkRefreshFn = snapshot.activeScenarioId ? scheduleScenarioChunkRefresh : null;
   syncResolvedDefaultCountryPalette({ overwriteCountryPalette: false });
   if (typeof state.renderPaletteFn === "function") {
     state.renderPaletteFn(state.currentPaletteTheme);
@@ -2999,11 +3587,14 @@ async function prepareScenarioApplyState(
   };
   const runtimeTopologyPayload = bundle.runtimeTopologyPayload || null;
   const districtGroupsPayload = normalizeScenarioDistrictGroupsPayload(bundle.districtGroupsPayload, scenarioId);
+  const chunkMergedLayerPayloads = bundle.chunkMergedLayerPayloads || {};
   const scenarioWaterRegionsFromTopology =
-    getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData")
+    chunkMergedLayerPayloads.water
+    || getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData")
     || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water");
   const scenarioSpecialRegionsFromTopology =
-    getScenarioDecodedCollection(bundle, "scenarioSpecialRegionsData")
+    chunkMergedLayerPayloads.special
+    || getScenarioDecodedCollection(bundle, "scenarioSpecialRegionsData")
     || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land");
   const scenarioContextLandMaskFromTopology =
     getScenarioDecodedCollection(bundle, "scenarioContextLandMaskData")
@@ -3056,6 +3647,8 @@ async function prepareScenarioApplyState(
     scenarioSpecialRegionsFromTopology,
     scenarioContextLandMaskFromTopology,
     scenarioLandMaskFromTopology,
+    scenarioReliefOverlaysPayload: chunkMergedLayerPayloads.relief || bundle.reliefOverlaysPayload || null,
+    scenarioCityOverridesPayload: chunkMergedLayerPayloads.cities || bundle.cityOverridesPayload || null,
     scenarioNameMap,
     scenarioColorMap,
     scenarioOwnerBackfill,
@@ -3109,16 +3702,17 @@ async function applyScenarioBundle(
       ? staged.runtimeTopologyPayload
       : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null);
     state.runtimePoliticalMetaSeed = bundle.runtimePoliticalMeta || null;
+    state.runtimePoliticalFeatureCollectionSeed = getScenarioDecodedCollection(bundle, "politicalData") || null;
     state.scenarioLandMaskData = staged.scenarioLandMaskFromTopology || null;
     state.scenarioContextLandMaskData = staged.scenarioContextLandMaskFromTopology || null;
     state.scenarioWaterRegionsData = staged.scenarioWaterRegionsFromTopology || bundle.waterRegionsPayload || null;
     state.scenarioSpecialRegionsData = staged.scenarioSpecialRegionsFromTopology || bundle.specialRegionsPayload || null;
-    state.scenarioReliefOverlaysData = bundle.reliefOverlaysPayload || null;
+    state.scenarioReliefOverlaysData = staged.scenarioReliefOverlaysPayload || null;
     state.scenarioReliefOverlayRevision = (Number(state.scenarioReliefOverlayRevision) || 0) + 1;
     state.scenarioDistrictGroupsData = staged.districtGroupsPayload;
     state.scenarioDistrictGroupByFeatureId = buildScenarioDistrictGroupByFeatureId(staged.districtGroupsPayload);
     syncScenarioLocalizationState({
-      cityOverridesPayload: staged.mapSemanticMode === "blank" ? null : (bundle.cityOverridesPayload || null),
+      cityOverridesPayload: staged.mapSemanticMode === "blank" ? null : (staged.scenarioCityOverridesPayload || null),
       geoLocalePatchPayload: staged.mapSemanticMode === "blank" ? null : (bundle.geoLocalePatchPayload || null),
     });
     if (staged.mapSemanticMode === "blank") {
@@ -3164,6 +3758,21 @@ async function applyScenarioBundle(
     applyScenarioPaintMode();
     syncScenarioOceanFillForActivation(bundle.manifest);
     applyScenarioPerformanceHints(bundle.manifest);
+    state.scheduleScenarioChunkRefreshFn = scheduleScenarioChunkRefresh;
+    if (scenarioBundleUsesChunkedLayer(bundle)) {
+      resetScenarioChunkRuntimeState({ scenarioId: staged.scenarioId });
+      const chunkIds = Object.keys(bundle.chunkPayloadCacheById || {});
+      if (chunkIds.length) {
+        state.activeScenarioChunks.loadedChunkIds = [...chunkIds];
+        state.activeScenarioChunks.payloadByChunkId = { ...(bundle.chunkPayloadCacheById || {}) };
+        state.activeScenarioChunks.mergedLayerPayloads = cloneScenarioStateValue(bundle.chunkMergedLayerPayloads) || {};
+        state.activeScenarioChunks.lruChunkIds = [...chunkIds];
+      }
+      ensureRuntimeChunkLoadState().shellStatus = "ready";
+      ensureRuntimeChunkLoadState().registryStatus = bundle.chunkRegistry ? "ready" : "idle";
+    } else {
+      resetScenarioChunkRuntimeState();
+    }
     if (Object.keys(staged.scenarioOwnerBackfill).length) {
       console.info(
         `[scenario] Applied HOI4 Far East owner backfill for "${staged.scenarioId}": ${Object.keys(staged.scenarioOwnerBackfill).length} missing RU runtime features -> SOV.`
@@ -3198,10 +3807,17 @@ async function applyScenarioBundle(
     });
 
     refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario:${staged.scenarioId}` });
-    ensureActiveScenarioOptionalLayersForVisibility({ bundle, renderNow })
-      .catch((error) => {
-        console.warn(`[scenario] Optional layer visibility sync failed for "${staged.scenarioId}".`, error);
+    if (scenarioBundleUsesChunkedLayer(bundle)) {
+      scheduleScenarioChunkRefresh({
+        reason: "scenario-apply",
+        delayMs: 0,
       });
+    } else {
+      ensureActiveScenarioOptionalLayersForVisibility({ bundle, renderNow })
+        .catch((error) => {
+          console.warn(`[scenario] Optional layer visibility sync failed for "${staged.scenarioId}".`, error);
+        });
+    }
     const dataHealth = refreshScenarioDataHealth({
       showWarningToast: true,
       showErrorToast: true,
@@ -3436,6 +4052,9 @@ function clearActiveScenario(
 ) {
   assertScenarioInteractionsAllowed("exit the active scenario");
   const previousScenarioId = normalizeScenarioId(state.activeScenarioId);
+  if (state.runtimeChunkLoadState?.refreshTimerId) {
+    globalThis.clearTimeout(state.runtimeChunkLoadState.refreshTimerId);
+  }
   releaseScenarioAuditPayload(previousScenarioId, { syncUi: false });
   state.activeScenarioId = "";
   state.scenarioBorderMode = "canonical";
@@ -3447,6 +4066,23 @@ function clearActiveScenario(
   state.scenarioContextLandMaskData = null;
   state.mapSemanticMode = "blank";
   state.runtimePoliticalTopology = state.defaultRuntimePoliticalTopology || null;
+  state.activeScenarioChunks = {
+    scenarioId: "",
+    loadedChunkIds: [],
+    payloadByChunkId: {},
+    mergedLayerPayloads: {},
+    lruChunkIds: [],
+  };
+  state.runtimeChunkLoadState = {
+    shellStatus: "idle",
+    registryStatus: "idle",
+    refreshScheduled: false,
+    refreshTimerId: null,
+    inFlightByChunkId: {},
+    errorByChunkId: {},
+    lastSelection: null,
+  };
+  state.scheduleScenarioChunkRefreshFn = null;
   state.scenarioWaterRegionsData = null;
   state.scenarioSpecialRegionsData = null;
   state.scenarioReliefOverlaysData = null;

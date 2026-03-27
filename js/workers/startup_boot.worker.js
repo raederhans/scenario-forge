@@ -5,8 +5,10 @@ importScripts("/vendor/topojson-client.min.js");
 const MESSAGE_TYPES = Object.freeze({
   LOAD_BASE_STARTUP: "LOAD_BASE_STARTUP",
   LOAD_SCENARIO_RUNTIME_BOOTSTRAP: "LOAD_SCENARIO_RUNTIME_BOOTSTRAP",
+  DECODE_RUNTIME_CHUNK: "DECODE_RUNTIME_CHUNK",
   BASE_STARTUP_READY: "BASE_STARTUP_READY",
   SCENARIO_RUNTIME_BOOTSTRAP_READY: "SCENARIO_RUNTIME_BOOTSTRAP_READY",
+  RUNTIME_CHUNK_READY: "RUNTIME_CHUNK_READY",
   ERROR: "ERROR",
 });
 
@@ -236,6 +238,59 @@ async function handleLoadScenarioRuntimeBootstrap(message) {
     runtimePoliticalTopology: runtimeTopologyResult.payload,
     runtimePoliticalMeta,
     decodedCollections: {
+      politicalData: decodeTopologyObject(runtimeTopologyResult.payload, "political"),
+      scenarioLandMaskData:
+        decodeTopologyObject(runtimeTopologyResult.payload, "land_mask")
+        || decodeTopologyObject(runtimeTopologyResult.payload, "land"),
+      scenarioContextLandMaskData: decodeTopologyObject(runtimeTopologyResult.payload, "context_land_mask"),
+      scenarioWaterRegionsData: decodeTopologyObject(runtimeTopologyResult.payload, "scenario_water"),
+      scenarioSpecialRegionsData: decodeTopologyObject(runtimeTopologyResult.payload, "scenario_special_land"),
+    },
+    metrics: {
+      totalMs: nowMs() - startedAt,
+      runtimePoliticalTopology: {
+        ...(runtimeTopologyResult.metrics || {}),
+        featureCount: getPoliticalGeometryCount(runtimeTopologyResult.payload),
+      },
+      runtimePoliticalMeta: {
+        featureCount: Array.isArray(runtimePoliticalMeta.featureIds)
+          ? runtimePoliticalMeta.featureIds.length
+          : 0,
+        buildMs: metaCompletedAt - metaStartedAt,
+      },
+    },
+  });
+}
+
+async function handleDecodeRuntimeChunk(message) {
+  const taskId = String(message?.taskId || "").trim();
+  const runtimeTopologyUrl = String(message?.runtimeTopologyUrl || "").trim();
+  const chunkUrl = String(message?.chunkUrl || "").trim();
+  const chunkType = String(message?.chunkType || "").trim().toLowerCase();
+  const startedAt = nowMs();
+  if (chunkType && chunkType !== "runtime-topology") {
+    const chunkResult = await fetchJsonResource(chunkUrl, chunkType || "scenarioChunk");
+    postWorkerMessage(MESSAGE_TYPES.RUNTIME_CHUNK_READY, {
+      taskId,
+      chunkPayload: chunkResult.payload || null,
+      metrics: {
+        totalMs: nowMs() - startedAt,
+        chunkPayload: chunkResult.metrics || null,
+      },
+    });
+    return;
+  }
+  const runtimeTopologyResult = await fetchJsonResource(runtimeTopologyUrl, "runtimePoliticalTopology");
+  const metaStartedAt = nowMs();
+  const runtimePoliticalMeta = buildRuntimePoliticalMeta(runtimeTopologyResult.payload);
+  const metaCompletedAt = nowMs();
+
+  postWorkerMessage(MESSAGE_TYPES.RUNTIME_CHUNK_READY, {
+    taskId,
+    runtimePoliticalTopology: runtimeTopologyResult.payload,
+    runtimePoliticalMeta,
+    decodedCollections: {
+      politicalData: decodeTopologyObject(runtimeTopologyResult.payload, "political"),
       scenarioLandMaskData:
         decodeTopologyObject(runtimeTopologyResult.payload, "land_mask")
         || decodeTopologyObject(runtimeTopologyResult.payload, "land"),
@@ -266,6 +321,9 @@ async function dispatchMessage(message) {
       return;
     case MESSAGE_TYPES.LOAD_SCENARIO_RUNTIME_BOOTSTRAP:
       await handleLoadScenarioRuntimeBootstrap(message);
+      return;
+    case MESSAGE_TYPES.DECODE_RUNTIME_CHUNK:
+      await handleDecodeRuntimeChunk(message);
       return;
     default:
       throw new Error(`[startup_worker] Unsupported message type: ${String(message?.type || "") || "<empty>"}`);

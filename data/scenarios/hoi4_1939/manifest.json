@@ -107,5 +107,15 @@
     }
   },
   "city_overrides_url": "data/scenarios/hoi4_1939/city_overrides.json",
-  "capital_hints_url": "data/scenarios/hoi4_1939/capital_hints.json"
+  "capital_hints_url": "data/scenarios/hoi4_1939/capital_hints.json",
+  "startup_topology_url": "data/europe_topology.runtime_political_v1.json",
+  "detail_chunk_manifest_url": "data/scenarios/hoi4_1939/detail_chunks.manifest.json",
+  "runtime_meta_url": "data/scenarios/hoi4_1939/runtime_meta.json",
+  "mesh_pack_url": "data/scenarios/hoi4_1939/mesh_pack.json",
+  "context_lod_manifest": "data/scenarios/hoi4_1939/context_lod.manifest.json",
+  "render_budget_hints": {
+    "max_required_chunks": 6,
+    "max_optional_chunks": 3,
+    "detail_zoom_threshold": 1.7
+  }
 }

@@ -1,0 +1,241 @@
+{
+  "version": 1,
+  "scenario_id": "tno_1962",
+  "generated_at": "2026-03-22T23:59:29Z",
+  "chunks": [
+    {
+      "id": "water.coarse.r0c0",
+      "layer": "water",
+      "lod": "coarse",
+      "url": "data/scenarios/tno_1962/chunks/water.coarse.r0c0.json",
+      "min_zoom": 0.0,
+      "max_zoom": 1.7,
+      "bounds": [
+        -180.0,
+        -90.0,
+        180.0,
+        90.0
+      ],
+      "priority": 1,
+      "feature_count": 21,
+      "data_format": "geojson",
+      "global_coverage": true
+    },
+    {
+      "id": "water.detail.r0c0",
+      "layer": "water",
+      "lod": "detail",
+      "url": "data/scenarios/tno_1962/chunks/water.detail.r0c0.json",
+      "min_zoom": 1.7,
+      "max_zoom": 99.0,
+      "bounds": [
+        -180.0,
+        -90.0,
+        -90.0,
+        0.0
+      ],
+      "priority": 2,
+      "feature_count": 2,
+      "data_format": "geojson",
+      "global_coverage": false
+    },
+    {
+      "id": "water.detail.r0c1",
+      "layer": "water",
+      "lod": "detail",
+      "url": "data/scenarios/tno_1962/chunks/water.detail.r0c1.json",
+      "min_zoom": 1.7,
+      "max_zoom": 99.0,
+      "bounds": [
+        -90.0,
+        -90.0,
+        0.0,
+        0.0
+      ],
+      "priority": 2,
+      "feature_count": 5,
+      "data_format": "geojson",
+      "global_coverage": false
+    },
+    {
+      "id": "water.detail.r0c2",
+      "layer": "water",
+      "lod": "detail",
+      "url": "data/scenarios/tno_1962/chunks/water.detail.r0c2.json",
+      "min_zoom": 1.7,
+      "max_zoom": 99.0,
+      "bounds": [
+        0.0,
+        -90.0,
+        90.0,
+        0.0
+      ],
+      "priority": 2,
+      "feature_count": 5,
+      "data_format": "geojson",
+      "global_coverage": false
+    },
+    {
+      "id": "water.detail.r0c3",
+      "layer": "water",
+      "lod": "detail",
+      "url": "data/scenarios/tno_1962/chunks/water.detail.r0c3.json",
+      "min_zoom": 1.7,
+      "max_zoom": 99.0,
+      "bounds": [
+        90.0,
+        -90.0,
+        180.0,
+        0.0
+      ],
+      "priority": 2,
+      "feature_count": 3,
+      "data_format": "geojson",
+      "global_coverage": false
+    },
+    {
+      "id": "water.detail.r1c0",
+      "layer": "water",
+      "lod": "detail",
+      "url": "data/scenarios/tno_1962/chunks/water.detail.r1c0.json",
+      "min_zoom": 1.7,
+      "max_zoom": 99.0,
+      "bounds": [
+        -180.0,
+        0.0,
+        -90.0,
+        90.0
+      ],
+      "priority": 2,
+      "feature_count": 2,
+      "data_format": "geojson",
+      "global_coverage": false
+    },
+    {
+      "id": "water.detail.r1c1",
+      "layer": "water",
+      "lod": "detail",
+      "url": "data/scenarios/tno_1962/chunks/water.detail.r1c1.json",
+      "min_zoom": 1.7,
+      "max_zoom": 99.0,
+      "bounds": [
+        -90.0,
+        0.0,
+        0.0,
+        90.0
+      ],
+      "priority": 2,
+      "feature_count": 9,
+      "data_format": "geojson",
+      "global_coverage": false
+    },
+    {
+      "id": "water.detail.r1c2",
+      "layer": "water",
+      "lod": "detail",
+      "url": "data/scenarios/tno_1962/chunks/water.detail.r1c2.json",
+      "min_zoom": 1.7,
+      "max_zoom": 99.0,
+      "bounds": [
+        0.0,
+        0.0,
+        90.0,
+        90.0
+      ],
+      "priority": 2,
+      "feature_count": 12,
+      "data_format": "geojson",
+      "global_coverage": false
+    },
+    {
+      "id": "water.detail.r1c3",
+      "layer": "water",
+      "lod": "detail",
+      "url": "data/scenarios/tno_1962/chunks/water.detail.r1c3.json",
+      "min_zoom": 1.7,
+      "max_zoom": 99.0,
+      "bounds": [
+        90.0,
+        0.0,
+        180.0,
+        90.0
+      ],
+      "priority": 2,
+      "feature_count": 3,
+      "data_format": "geojson",
+      "global_coverage": false
+    },
+    {
+      "id": "relief.coarse.r0c0",
+      "layer": "relief",
+      "lod": "coarse",
+      "url": "data/scenarios/tno_1962/chunks/relief.coarse.r0c0.json",
+      "min_zoom": 0.0,
+      "max_zoom": 1.7,
+      "bounds": [
+        -180.0,
+        -90.0,
+        180.0,
+        90.0
+      ],
+      "priority": 1,
+      "feature_count": 25,
+      "data_format": "geojson",
+      "global_coverage": true
+    },
+    {
+      "id": "relief.detail.r0c2",
+      "layer": "relief",
+      "lod": "detail",
+      "url": "data/scenarios/tno_1962/chunks/relief.detail.r0c2.json",
+      "min_zoom": 1.7,
+      "max_zoom": 99.0,
+      "bounds": [
+        0.0,
+        -90.0,
+        90.0,
+        0.0
+      ],
+      "priority": 2,
+      "feature_count": 3,
+      "data_format": "geojson",
+      "global_coverage": false
+    },
+    {
+      "id": "relief.detail.r1c1",
+      "layer": "relief",
+      "lod": "detail",
+      "url": "data/scenarios/tno_1962/chunks/relief.detail.r1c1.json",
+      "min_zoom": 1.7,
+      "max_zoom": 99.0,
+      "bounds": [
+        -90.0,
+        0.0,
+        0.0,
+        90.0
+      ],
+      "priority": 2,
+      "feature_count": 2,
+      "data_format": "geojson",
+      "global_coverage": false
+    },
+    {
+      "id": "relief.detail.r1c2",
+      "layer": "relief",
+      "lod": "detail",
+      "url": "data/scenarios/tno_1962/chunks/relief.detail.r1c2.json",
+      "min_zoom": 1.7,
+      "max_zoom": 99.0,
+      "bounds": [
+        0.0,
+        0.0,
+        90.0,
+        90.0
+      ],
+      "priority": 2,
+      "feature_count": 24,
+      "data_format": "geojson",
+      "global_coverage": false
+    }
+  ]
+}

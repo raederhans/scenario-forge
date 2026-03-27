@@ -4,8 +4,10 @@ const STARTUP_WORKER_TIMEOUT_MS = 20_000;
 const MESSAGE_TYPES = Object.freeze({
   LOAD_BASE_STARTUP: "LOAD_BASE_STARTUP",
   LOAD_SCENARIO_RUNTIME_BOOTSTRAP: "LOAD_SCENARIO_RUNTIME_BOOTSTRAP",
+  DECODE_RUNTIME_CHUNK: "DECODE_RUNTIME_CHUNK",
   BASE_STARTUP_READY: "BASE_STARTUP_READY",
   SCENARIO_RUNTIME_BOOTSTRAP_READY: "SCENARIO_RUNTIME_BOOTSTRAP_READY",
+  RUNTIME_CHUNK_READY: "RUNTIME_CHUNK_READY",
   ERROR: "ERROR",
 });
 
@@ -146,6 +148,26 @@ export async function loadScenarioRuntimeBootstrapViaWorker({
     runtimePoliticalTopology: message.runtimePoliticalTopology || null,
     runtimePoliticalMeta: message.runtimePoliticalMeta || null,
     decodedCollections: message.decodedCollections || null,
+    metrics: message.metrics || null,
+  };
+}
+
+export async function decodeRuntimeChunkViaWorker({
+  runtimeTopologyUrl,
+  chunkUrl,
+  chunkType = "runtime-topology",
+  timeoutMs = STARTUP_WORKER_TIMEOUT_MS,
+} = {}) {
+  const message = await dispatchTask(MESSAGE_TYPES.DECODE_RUNTIME_CHUNK, {
+    runtimeTopologyUrl,
+    chunkUrl,
+    chunkType,
+  }, { timeoutMs });
+  return {
+    runtimePoliticalTopology: message.runtimePoliticalTopology || null,
+    runtimePoliticalMeta: message.runtimePoliticalMeta || null,
+    decodedCollections: message.decodedCollections || null,
+    chunkPayload: message.chunkPayload || null,
     metrics: message.metrics || null,
   };
 }

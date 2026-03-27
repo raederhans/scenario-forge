@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "scenario_id": "hoi4_1939",
+  "generated_at": "2026-03-17T00:59:45.665709+00:00",
+  "coastline_source": "",
+  "mesh_summary": {
+    "runtime_topology_url": "",
+    "startup_topology_url": "data/europe_topology.runtime_political_v1.json"
+  }
+}

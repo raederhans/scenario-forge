@@ -649,6 +649,15 @@ function getRenderPassCacheState() {
       valid: false,
       reason: "init",
     };
+  cache.lastGoodFrame = cache.lastGoodFrame && typeof cache.lastGoodFrame === "object"
+    ? cache.lastGoodFrame
+    : {
+      canvas: null,
+      referenceTransform: null,
+      valid: false,
+      capturedAt: 0,
+      reason: "init",
+    };
   cache.partialPoliticalDirtyIds = cache.partialPoliticalDirtyIds instanceof Set
     ? cache.partialPoliticalDirtyIds
     : new Set();
@@ -708,6 +717,8 @@ function getRenderPassCacheState() {
     politicalPathWarmupBuild: 0,
     politicalPathWarmupSlices: 0,
     politicalPathWarmupCancels: 0,
+    blackFrameCount: 0,
+    lastGoodFrameReuses: 0,
   };
   Object.entries(counterDefaults).forEach(([counterName, initialValue]) => {
     if (!Number.isFinite(Number(cache.counters[counterName]))) {
@@ -1004,6 +1015,77 @@ function ensureRenderPassCanvas(passName) {
   }
   resizeRenderPassCanvases();
   return cache.canvases[passName];
+}
+
+function ensureLastGoodFrameCanvas() {
+  const cache = getRenderPassCacheState();
+  if (!cache.lastGoodFrame.canvas) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1;
+    canvas.height = 1;
+    cache.lastGoodFrame.canvas = canvas;
+  }
+  const targetCanvas = cache.lastGoodFrame.canvas;
+  const width = Math.max(1, Number(context?.canvas?.width || 1));
+  const height = Math.max(1, Number(context?.canvas?.height || 1));
+  if (targetCanvas.width !== width) targetCanvas.width = width;
+  if (targetCanvas.height !== height) targetCanvas.height = height;
+  return targetCanvas;
+}
+
+function captureLastGoodFrame(reason = "frame", transform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
+  if (!context?.canvas) return false;
+  const targetCanvas = ensureLastGoodFrameCanvas();
+  const targetContext = targetCanvas.getContext("2d");
+  if (!targetContext) return false;
+  targetContext.setTransform(1, 0, 0, 1, 0, 0);
+  targetContext.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+  targetContext.drawImage(context.canvas, 0, 0);
+  const cache = getRenderPassCacheState();
+  cache.lastGoodFrame.referenceTransform = cloneZoomTransform(transform);
+  cache.lastGoodFrame.capturedAt = Date.now();
+  cache.lastGoodFrame.valid = true;
+  cache.lastGoodFrame.reason = String(reason || "frame");
+  return true;
+}
+
+function noteBlackFrame(reason = "unknown") {
+  incrementPerfCounter("blackFrameCount");
+  const cache = getRenderPassCacheState();
+  const count = Number(cache.counters.blackFrameCount || 0);
+  ensureRenderPerfMetrics().blackFrameCount = {
+    count,
+    reason: String(reason || "unknown"),
+    recordedAt: Date.now(),
+  };
+}
+
+function drawLastGoodFrameFallback(currentTransform = state.zoomTransform || globalThis.d3?.zoomIdentity) {
+  const cache = getRenderPassCacheState();
+  const fallbackCanvas = cache.lastGoodFrame?.canvas;
+  const referenceTransform = cache.lastGoodFrame?.referenceTransform;
+  if (!fallbackCanvas || !cache.lastGoodFrame?.valid || !referenceTransform) {
+    return false;
+  }
+  const current = cloneZoomTransform(currentTransform);
+  const reference = cloneZoomTransform(referenceTransform);
+  const scaleRatio = current.k / Math.max(reference.k, 0.0001);
+  const dx = current.x - (reference.x * scaleRatio);
+  const dy = current.y - (reference.y * scaleRatio);
+  resetMainCanvas();
+  context.save();
+  context.setTransform(1, 0, 0, 1, 0, 0);
+  context.translate(dx * state.dpr, dy * state.dpr);
+  context.scale(scaleRatio, scaleRatio);
+  context.drawImage(fallbackCanvas, 0, 0);
+  context.restore();
+  incrementPerfCounter("lastGoodFrameReuses");
+  const ageMs = Math.max(0, Date.now() - Number(cache.lastGoodFrame?.capturedAt || 0));
+  recordRenderPerfMetric("dragVisibleStaleFrameMs", ageMs, {
+    phase: state.renderPhase,
+    reason: String(cache.lastGoodFrame?.reason || "last-good-frame"),
+  });
+  return true;
 }
 
 function buildInteractionBorderSnapshotLayout() {
@@ -2946,7 +3028,13 @@ function getPoliticalFeatureCollection(topology, sourceName) {
   if (cachedCollections?.has(sourceName)) {
     return cachedCollections.get(sourceName);
   }
-  const collection = globalThis.topojson.feature(topology, topology.objects.political);
+  const seededCollection =
+    sourceName === "runtime"
+    && topology === state.runtimePoliticalTopology
+    && Array.isArray(state.runtimePoliticalFeatureCollectionSeed?.features)
+      ? state.runtimePoliticalFeatureCollectionSeed
+      : null;
+  const collection = seededCollection || globalThis.topojson.feature(topology, topology.objects.political);
   const features = Array.isArray(collection?.features) ? collection.features : [];
   const normalizedCollection = {
     type: "FeatureCollection",
@@ -2965,6 +3053,9 @@ function getPoliticalFeatureCollection(topology, sourceName) {
   const nextCollections = cachedCollections || new Map();
   nextCollections.set(sourceName, normalizedCollection);
   politicalFeatureCollectionCache.set(topology, nextCollections);
+  if (seededCollection) {
+    state.runtimePoliticalFeatureCollectionSeed = normalizedCollection;
+  }
   return normalizedCollection;
 }
 
@@ -13592,12 +13683,26 @@ function drawCanvas() {
     state.renderPhase === RENDER_PHASE_INTERACTING
     || state.renderPhase === RENDER_PHASE_SETTLING
     || (state.renderPhase === RENDER_PHASE_IDLE && state.deferExactAfterSettle);
+  let drewFrame = false;
+  if (useTransformedFrame) {
+    drewFrame = drawTransformedFrameFromCaches(frameTimings, {
+      interactiveBorders: state.renderPhase !== RENDER_PHASE_IDLE || state.deferExactAfterSettle,
+    });
+    if (!drewFrame) {
+      drewFrame = drawLastGoodFrameFallback(state.zoomTransform || globalThis.d3.zoomIdentity);
+      if (!drewFrame) {
+        const cache = getRenderPassCacheState();
+        if (cache.lastGoodFrame?.valid) {
+          noteBlackFrame("missing-fast-frame-and-fallback");
+        }
+      }
+    }
+  }
 
-  if (!useTransformedFrame || !drawTransformedFrameFromCaches(frameTimings, {
-    interactiveBorders: state.renderPhase !== RENDER_PHASE_IDLE || state.deferExactAfterSettle,
-  })) {
+  if (!useTransformedFrame || !drewFrame) {
     ensureIdleRenderPasses(frameTimings);
     composeCachedPasses(RENDER_PASS_NAMES);
+    drewFrame = true;
   }
 
   const cache = getRenderPassCacheState();
@@ -13607,6 +13712,9 @@ function drawCanvas() {
     timings: frameTimings,
     transform: cloneZoomTransform(state.zoomTransform),
   };
+  if (drewFrame) {
+    captureLastGoodFrame(useTransformedFrame ? "fast-frame" : "exact-frame", state.zoomTransform);
+  }
   incrementPerfCounter("frames");
 }
 
@@ -18885,6 +18993,45 @@ function updateZoomTranslateExtent() {
   zoomBehavior.translateExtent(calculatePanExtent());
 }
 
+function getViewportGeoBounds() {
+  if (!projection || typeof projection.invert !== "function") {
+    return [-180, -90, 180, 90];
+  }
+  const transform = state.zoomTransform || globalThis.d3?.zoomIdentity || { x: 0, y: 0, k: 1 };
+  const samplePoints = [
+    [0, 0],
+    [state.width, 0],
+    [0, state.height],
+    [state.width, state.height],
+    [state.width * 0.5, state.height * 0.5],
+  ];
+  const longitudes = [];
+  const latitudes = [];
+  samplePoints.forEach(([screenX, screenY]) => {
+    try {
+      const mapX = (Number(screenX || 0) - Number(transform.x || 0)) / Math.max(0.0001, Number(transform.k || 1));
+      const mapY = (Number(screenY || 0) - Number(transform.y || 0)) / Math.max(0.0001, Number(transform.k || 1));
+      const inverted = projection.invert([mapX, mapY]);
+      if (!Array.isArray(inverted) || inverted.length < 2) return;
+      const [lon, lat] = inverted.map((value) => Number(value));
+      if (!Number.isFinite(lon) || !Number.isFinite(lat)) return;
+      longitudes.push(Math.max(-180, Math.min(180, lon)));
+      latitudes.push(Math.max(-90, Math.min(90, lat)));
+    } catch (_error) {
+      // Ignore failed projection inversion and continue.
+    }
+  });
+  if (!longitudes.length || !latitudes.length) {
+    return [-180, -90, 180, 90];
+  }
+  return [
+    Math.min(...longitudes),
+    Math.min(...latitudes),
+    Math.max(...longitudes),
+    Math.max(...latitudes),
+  ];
+}
+
 function updateMap(transform) {
   state.zoomTransform = transform;
   state.hitCanvasDirty = true;
@@ -18896,6 +19043,11 @@ function updateMap(transform) {
   }
   syncUnitCounterScalesDuringZoom();
   drawCanvas();
+  if (typeof state.scheduleScenarioChunkRefreshFn === "function") {
+    state.scheduleScenarioChunkRefreshFn({
+      reason: state.renderPhase || "zoom",
+    });
+  }
 }
 
 function resetZoomToFit() {
@@ -19078,6 +19230,9 @@ function initMap({
   const renderPassCache = getRenderPassCacheState();
   renderPassCache.referenceTransform = null;
   renderPassCache.referenceTransforms = {};
+  renderPassCache.lastGoodFrame.valid = false;
+  renderPassCache.lastGoodFrame.referenceTransform = null;
+  renderPassCache.lastGoodFrame.reason = "init-map";
   renderPassCache.perfOverlayEnabled = isPerfOverlayEnabled();
   ensureLayerDataFromTopology();
   rebuildPoliticalLandCollections();
@@ -19138,6 +19293,7 @@ function initMap({
   fitProjection({ skipSpatialIndex: shouldDeferInteractionInfrastructure });
   initZoom();
   bindEvents();
+  state.getViewportGeoBoundsFn = getViewportGeoBounds;
   if (!shouldDeferInteractionInfrastructure) {
     setInteractionInfrastructureState("ready", {
       ready: true,
@@ -19183,8 +19339,12 @@ function setMapData({
   state.devClipboardPreviewFormat = "names_with_ids";
   resetPhysicalLandClipPathCache();
   state.topologyRevision = Number(state.topologyRevision || 0) + 1;
-  getRenderPassCacheState().referenceTransform = null;
-  getRenderPassCacheState().referenceTransforms = {};
+  const renderPassCache = getRenderPassCacheState();
+  renderPassCache.referenceTransform = null;
+  renderPassCache.referenceTransforms = {};
+  renderPassCache.lastGoodFrame.valid = false;
+  renderPassCache.lastGoodFrame.referenceTransform = null;
+  renderPassCache.lastGoodFrame.reason = "set-map-data";
   invalidateAllRenderPasses("set-map-data");
   markAllOverlaysDirty();
   queueTooltipUpdate({ visible: false });

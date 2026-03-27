@@ -169,6 +169,34 @@ function createRenderDispatcher(renderFn) {
   return { schedule, flush };
 }
 
+function initLongAnimationFrameObserver() {
+  if (typeof globalThis.PerformanceObserver !== "function") return;
+  try {
+    const observer = new globalThis.PerformanceObserver((list) => {
+      const entries = list.getEntries ? list.getEntries() : [];
+      if (!entries.length) return;
+      const latest = entries[entries.length - 1];
+      if (!latest) return;
+      if (!state.renderPerfMetrics || typeof state.renderPerfMetrics !== "object") {
+        state.renderPerfMetrics = {};
+      }
+      state.renderPerfMetrics.longAnimationFrameBlockingDuration = {
+        durationMs: Math.max(0, Number(latest.duration || 0)),
+        blockingDuration: Math.max(0, Number(latest.blockingDuration || 0)),
+        startTime: Math.max(0, Number(latest.startTime || 0)),
+        renderStart: Math.max(0, Number(latest.renderStart || 0)),
+        firstUIEventTimestamp: Math.max(0, Number(latest.firstUIEventTimestamp || 0)),
+        recordedAt: Date.now(),
+      };
+      globalThis.__renderPerfMetrics = state.renderPerfMetrics;
+    });
+    observer.observe({ type: "long-animation-frame", buffered: true });
+    state.longAnimationFrameObserver = observer;
+  } catch (_error) {
+    // Experimental API; ignore unsupported browsers.
+  }
+}
+
 function getDeferredPromotionDelay(profile) {
   if (profile === "balanced") return 250;
   if (profile === "auto") return 1200;
@@ -1511,6 +1539,7 @@ async function bootstrap() {
     await scenarioRegistryPromise;
 
     initPresetState();
+    initLongAnimationFrameObserver();
     const startupInteractionLevel = state.startupInteractionMode === "readonly" ? "readonly-startup" : "full";
     initMap({
       suppressRender: true,
