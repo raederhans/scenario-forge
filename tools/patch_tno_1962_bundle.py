@@ -96,49 +96,204 @@ TNO_ROOT_CANDIDATES = [
     Path("C:/Program Files (x86)/Steam/steamapps/workshop/content/394360/3583339918"),
     Path("/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/394360/3583339918"),
 ]
+TNO_ATLANTIC_OPEN_OCEAN_IDS = (
+    "tno_northwest_atlantic_ocean",
+    "tno_northeast_atlantic_ocean",
+    "tno_west_central_atlantic_ocean",
+    "tno_east_central_atlantic_ocean",
+    "tno_southwest_atlantic_ocean",
+    "tno_southeast_atlantic_ocean",
+)
+TNO_PACIFIC_OPEN_OCEAN_IDS = (
+    "tno_northwest_pacific_ocean",
+    "tno_northeast_pacific_ocean",
+    "tno_west_central_pacific_ocean",
+    "tno_east_central_pacific_ocean",
+    "tno_southwest_pacific_ocean",
+    "tno_southeast_pacific_ocean",
+)
+TNO_INDIAN_OPEN_OCEAN_IDS = (
+    "tno_western_indian_ocean",
+    "tno_eastern_indian_ocean",
+    "tno_southern_indian_ocean",
+)
+TNO_ARCTIC_OPEN_OCEAN_IDS = (
+    "tno_western_arctic_ocean",
+    "tno_eastern_arctic_ocean",
+)
+TNO_SOUTHERN_OPEN_OCEAN_IDS = (
+    "tno_south_atlantic_antarctic_ocean",
+    "tno_south_indian_antarctic_ocean",
+    "tno_south_pacific_antarctic_ocean",
+)
 TNO_OPEN_OCEAN_SPLIT_SPECS = (
     {
         "source_id": "marine_atlantic_ocean",
+        "source_ids": (
+            "marine_atlantic_ocean",
+            "marine_greenland_sea",
+            "marine_norwegian_sea",
+            "marine_labrador_sea",
+            "marine_baffin_bay",
+            "marine_bay_of_biscay",
+            "marine_north_sea",
+            "marine_irish_sea",
+            "marine_caribbean_sea",
+            "marine_gulf_of_mexico",
+            "marine_gulf_of_guinea",
+        ),
         "children": (
             {
-                "id": "tno_northwest_atlantic_ocean",
+                "id": TNO_ATLANTIC_OPEN_OCEAN_IDS[0],
                 "name": "Northwest Atlantic Ocean",
-                "bbox": (-180.0, 0.0, -35.0, 90.0),
+                "bbox": (-180.0, 20.0, -40.0, 90.0),
+                "supplement_bboxes": ((-70.0, 20.0, -40.0, 55.0),),
             },
             {
-                "id": "tno_northeast_atlantic_ocean",
+                "id": TNO_ATLANTIC_OPEN_OCEAN_IDS[1],
                 "name": "Northeast Atlantic Ocean",
-                "bbox": (-35.0, 0.0, 180.0, 90.0),
+                "bbox": (-40.0, 20.0, 180.0, 90.0),
+                "supplement_bboxes": ((-40.0, 20.0, 20.0, 50.0),),
             },
             {
-                "id": "tno_south_atlantic_ocean",
-                "name": "South Atlantic Ocean",
-                "bbox": (-180.0, -90.0, 180.0, 0.0),
+                "id": TNO_ATLANTIC_OPEN_OCEAN_IDS[2],
+                "name": "West Central Atlantic Ocean",
+                "bbox": (-100.0, 0.0, -20.0, 20.0),
+            },
+            {
+                "id": TNO_ATLANTIC_OPEN_OCEAN_IDS[3],
+                "name": "East Central Atlantic Ocean",
+                "bbox": (-20.0, 0.0, 20.0, 20.0),
+            },
+            {
+                "id": TNO_ATLANTIC_OPEN_OCEAN_IDS[4],
+                "name": "Southwest Atlantic Ocean",
+                "bbox": (-180.0, -90.0, -20.0, 0.0),
+            },
+            {
+                "id": TNO_ATLANTIC_OPEN_OCEAN_IDS[5],
+                "name": "Southeast Atlantic Ocean",
+                "bbox": (-20.0, -90.0, 180.0, 0.0),
             },
         ),
     },
     {
         "source_id": "marine_pacific_ocean",
+        "source_ids": (
+            "marine_pacific_ocean",
+            "marine_sea_of_okhotsk",
+            "marine_east_china_sea",
+            "marine_yellow_sea",
+            "marine_south_china_sea",
+            "marine_philippine_sea",
+            "marine_sulu_sea",
+            "marine_celebes_sea",
+            "marine_gulf_of_alaska",
+            "marine_tasman_sea",
+        ),
         "children": (
             {
-                "id": "tno_north_pacific_ocean",
-                "name": "North Pacific Ocean",
-                "bbox": (-180.0, 0.0, 180.0, 90.0),
+                "id": TNO_PACIFIC_OPEN_OCEAN_IDS[0],
+                "name": "Northwest Pacific Ocean",
+                "bbox": (100.0, 20.0, 180.0, 90.0),
+                "supplement_bboxes": ((130.0, 20.0, 180.0, 50.0),),
             },
             {
-                "id": "tno_south_pacific_ocean",
-                "name": "South Pacific Ocean",
-                "bbox": (-180.0, -90.0, 180.0, 0.0),
+                "id": TNO_PACIFIC_OPEN_OCEAN_IDS[1],
+                "name": "Northeast Pacific Ocean",
+                "bbox": (-180.0, 20.0, -100.0, 90.0),
+                "supplement_bboxes": ((-170.0, 20.0, -120.0, 60.0),),
+            },
+            {
+                "id": TNO_PACIFIC_OPEN_OCEAN_IDS[2],
+                "name": "West Central Pacific Ocean",
+                "bboxes": ((110.0, -20.0, 180.0, 20.0), (-180.0, -20.0, -150.0, 20.0)),
+            },
+            {
+                "id": TNO_PACIFIC_OPEN_OCEAN_IDS[3],
+                "name": "East Central Pacific Ocean",
+                "bbox": (-150.0, -20.0, -80.0, 20.0),
+            },
+            {
+                "id": TNO_PACIFIC_OPEN_OCEAN_IDS[4],
+                "name": "Southwest Pacific Ocean",
+                "bboxes": ((120.0, -90.0, 180.0, -20.0), (-180.0, -90.0, -160.0, -20.0)),
+            },
+            {
+                "id": TNO_PACIFIC_OPEN_OCEAN_IDS[5],
+                "name": "Southeast Pacific Ocean",
+                "bbox": (-160.0, -90.0, -70.0, -20.0),
+            },
+        ),
+    },
+    {
+        "source_id": "marine_indian_ocean",
+        "source_ids": (
+            "marine_indian_ocean",
+            "marine_arabian_sea",
+            "marine_bay_of_bengal",
+            "marine_red_sea",
+            "marine_gulf_of_aden",
+            "marine_gulf_of_oman",
+            "marine_persian_gulf",
+            "marine_mozambique_channel",
+            "marine_andaman_sea",
+            "marine_great_australian_bight",
+        ),
+        "children": (
+            {
+                "id": TNO_INDIAN_OPEN_OCEAN_IDS[0],
+                "name": "Western Indian Ocean",
+                "bbox": (20.0, -20.0, 80.0, 30.0),
+            },
+            {
+                "id": TNO_INDIAN_OPEN_OCEAN_IDS[1],
+                "name": "Eastern Indian Ocean",
+                "bbox": (80.0, -20.0, 180.0, 30.0),
+            },
+            {
+                "id": TNO_INDIAN_OPEN_OCEAN_IDS[2],
+                "name": "Southern Indian Ocean",
+                "bbox": (20.0, -90.0, 180.0, -20.0),
+            },
+        ),
+    },
+    {
+        "source_id": "marine_arctic_ocean",
+        "children": (
+            {
+                "id": TNO_ARCTIC_OPEN_OCEAN_IDS[0],
+                "name": "Western Arctic Ocean",
+                "bbox": (-180.0, 60.0, 0.0, 90.0),
+            },
+            {
+                "id": TNO_ARCTIC_OPEN_OCEAN_IDS[1],
+                "name": "Eastern Arctic Ocean",
+                "bbox": (0.0, 60.0, 180.0, 90.0),
+            },
+        ),
+    },
+    {
+        "source_id": "marine_southern_ocean",
+        "children": (
+            {
+                "id": TNO_SOUTHERN_OPEN_OCEAN_IDS[0],
+                "name": "South Atlantic Antarctic Ocean",
+                "bbox": (-70.0, -90.0, 20.0, -45.0),
+            },
+            {
+                "id": TNO_SOUTHERN_OPEN_OCEAN_IDS[1],
+                "name": "South Indian Antarctic Ocean",
+                "bbox": (20.0, -90.0, 147.0, -45.0),
+            },
+            {
+                "id": TNO_SOUTHERN_OPEN_OCEAN_IDS[2],
+                "name": "South Pacific Antarctic Ocean",
+                "bboxes": ((147.0, -90.0, 180.0, -45.0), (-180.0, -90.0, -70.0, -45.0)),
             },
         ),
     },
 )
-TNO_EXCLUDED_BASE_WATER_REGION_IDS = [
-    spec["source_id"] for spec in TNO_OPEN_OCEAN_SPLIT_SPECS
-] + [
-    "marine_black_sea",
-    "marine_sea_of_azov",
-]
 MARINE_REGIONS_WFS_URL = "https://geo.vliz.be/geoserver/MarineRegions/ows"
 MARINE_REGIONS_REQUEST_TIMEOUT_SECONDS = 60
 MARINE_REGIONS_SOURCES_URL = "https://marineregions.org/sources.php"
@@ -203,7 +358,10 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid_l3='23651'",
         "source_standard": "marine_regions_seavox_v19",
         "subtract_base_ids": (),
-        "clip_open_ocean_ids": ("tno_north_pacific_ocean",),
+        "clip_open_ocean_ids": (
+            "tno_northwest_pacific_ocean",
+            "tno_northeast_pacific_ocean",
+        ),
         "simplify_tolerance": 0.01,
     },
     {
@@ -217,7 +375,7 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid=4307",
         "source_standard": "marine_regions_iho_v3",
         "subtract_base_ids": ("marine_yellow_sea", "marine_east_china_sea", "marine_sea_of_okhotsk"),
-        "clip_open_ocean_ids": ("tno_north_pacific_ocean",),
+        "clip_open_ocean_ids": ("tno_northwest_pacific_ocean",),
         "simplify_tolerance": 0.01,
     },
     {
@@ -230,7 +388,7 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "source_query": "mrgid_l3='23650'",
         "source_standard": "marine_regions_seavox_v19",
         "subtract_base_ids": ("marine_tasman_sea",),
-        "clip_open_ocean_ids": ("tno_south_pacific_ocean",),
+        "clip_open_ocean_ids": ("tno_southwest_pacific_ocean",),
         "simplify_tolerance": 0.01,
     },
     {
@@ -354,7 +512,317 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "global_source_id": "marine_sea_of_azov",
         "source_standard": "tno_cloned_from_global_water_regions",
     },
+    {
+        "id": "tno_greenland_sea",
+        "name": "Greenland Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_greenland_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS + TNO_ARCTIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_norwegian_sea",
+        "name": "Norwegian Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_norwegian_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS + TNO_ARCTIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_barents_sea",
+        "name": "Barents Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_barents_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_ARCTIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_beaufort_sea",
+        "name": "Beaufort Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_beaufort_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_ARCTIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_labrador_sea",
+        "name": "Labrador Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_labrador_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS + TNO_ARCTIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_baffin_bay",
+        "name": "Baffin Bay",
+        "water_type": "gulf",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_baffin_bay",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS + TNO_ARCTIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_bay_of_biscay",
+        "name": "Bay of Biscay",
+        "water_type": "gulf",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_bay_of_biscay",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_north_sea",
+        "name": "North Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_north_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "subtract_named_ids": ("tno_english_channel", "tno_strait_of_dover", "tno_skagerrak", "tno_kattegat"),
+        "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_irish_sea",
+        "name": "Irish Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_irish_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "subtract_named_ids": ("tno_north_channel",),
+        "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_caribbean_sea",
+        "name": "Caribbean Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_caribbean_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_gulf_of_mexico",
+        "name": "Gulf of Mexico",
+        "water_type": "gulf",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_gulf_of_mexico",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_gulf_of_guinea",
+        "name": "Gulf of Guinea",
+        "water_type": "gulf",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_gulf_of_guinea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_ATLANTIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_sea_of_okhotsk",
+        "name": "Sea of Okhotsk",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_sea_of_okhotsk",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_east_china_sea",
+        "name": "East China Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_east_china_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_yellow_sea",
+        "name": "Yellow Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_yellow_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_south_china_sea",
+        "name": "South China Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_south_china_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_philippine_sea",
+        "name": "Philippine Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_philippine_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_sulu_sea",
+        "name": "Sulu Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_sulu_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_celebes_sea",
+        "name": "Celebes Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_celebes_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_gulf_of_alaska",
+        "name": "Gulf of Alaska",
+        "water_type": "gulf",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_gulf_of_alaska",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_tasman_sea",
+        "name": "Tasman Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_tasman_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_PACIFIC_OPEN_OCEAN_IDS + TNO_SOUTHERN_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_great_australian_bight",
+        "name": "Great Australian Bight",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_great_australian_bight",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS + TNO_SOUTHERN_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_arabian_sea",
+        "name": "Arabian Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_arabian_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_bay_of_bengal",
+        "name": "Bay of Bengal",
+        "water_type": "gulf",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_bay_of_bengal",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_red_sea",
+        "name": "Red Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_red_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_gulf_of_aden",
+        "name": "Gulf of Aden",
+        "water_type": "gulf",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_gulf_of_aden",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_gulf_of_oman",
+        "name": "Gulf of Oman",
+        "water_type": "gulf",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_gulf_of_oman",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_persian_gulf",
+        "name": "Persian Gulf",
+        "water_type": "gulf",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_persian_gulf",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_mozambique_channel",
+        "name": "Mozambique Channel",
+        "water_type": "channel",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_mozambique_channel",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS + TNO_SOUTHERN_OPEN_OCEAN_IDS,
+    },
+    {
+        "id": "tno_andaman_sea",
+        "name": "Andaman Sea",
+        "water_type": "sea",
+        "region_group": "marine_macro",
+        "is_chokepoint": False,
+        "global_source_id": "marine_andaman_sea",
+        "source_standard": "tno_cloned_from_global_water_regions",
+        "clip_open_ocean_ids": TNO_INDIAN_OPEN_OCEAN_IDS,
+    },
 )
+TNO_EXCLUDED_BASE_WATER_REGION_IDS = sorted({
+    spec["source_id"]
+    for spec in TNO_OPEN_OCEAN_SPLIT_SPECS
+} | {
+    str(spec.get("global_source_id") or "").strip()
+    for spec in TNO_NAMED_MARGINAL_WATER_SPECS
+    if str(spec.get("global_source_id") or "").strip()
+})
 
 ATL_TAG = "ATL"
 ATL_COLOR_HEX = "#d8c7a6"
@@ -3275,20 +3743,51 @@ def buffer_polygonal(geom, buffer_distance: float) -> object:
     return normalize_polygonal(candidate.buffer(buffer_distance))
 
 
-def build_tno_open_ocean_split_features() -> list[dict]:
+def build_tno_open_ocean_split_features(land_mask_geom=None) -> list[dict]:
     feature_index = load_global_water_regions_feature_index()
+    land_mask_geom = normalize_polygonal(land_mask_geom)
     split_features: list[dict] = []
     for split_spec in TNO_OPEN_OCEAN_SPLIT_SPECS:
         source_id = split_spec["source_id"]
-        source_feature = feature_index.get(source_id)
-        if source_feature is None:
-            raise ValueError(f"Unable to locate base water region '{source_id}' for TNO ocean split.")
-        source_props = dict(source_feature.get("properties", {}))
-        source_geom = normalize_polygonal(shape(source_feature.get("geometry")))
+        source_ids = tuple(
+            str(region_id).strip()
+            for region_id in (split_spec.get("source_ids") or (source_id,))
+            if str(region_id).strip()
+        )
+        source_features = []
+        for region_id in source_ids:
+            source_feature = feature_index.get(region_id)
+            if source_feature is None:
+                raise ValueError(f"Unable to locate base water region '{region_id}' for TNO ocean split.")
+            source_features.append(source_feature)
+        source_props = dict(source_features[0].get("properties", {}))
+        source_geom = normalize_polygonal(safe_unary_union([
+            shape(feature.get("geometry"))
+            for feature in source_features
+            if feature.get("geometry")
+        ]))
         if source_geom is None:
             raise ValueError(f"Base water region '{source_id}' has empty geometry.")
         for child_spec in split_spec["children"]:
-            child_geom = normalize_polygonal(source_geom.intersection(box(*child_spec["bbox"])))
+            child_boxes = child_spec.get("bboxes") or (child_spec.get("bbox"),)
+            child_parts = []
+            for child_bbox in child_boxes:
+                if not child_bbox:
+                    continue
+                part_geom = normalize_polygonal(source_geom.intersection(box(*child_bbox)))
+                if part_geom is not None:
+                    child_parts.append(part_geom)
+            for supplement_bbox in child_spec.get("supplement_bboxes", ()) or ():
+                if not supplement_bbox:
+                    continue
+                supplement_geom = normalize_polygonal(box(*supplement_bbox))
+                if supplement_geom is None:
+                    continue
+                if land_mask_geom is not None:
+                    supplement_geom = normalize_polygonal(supplement_geom.difference(land_mask_geom))
+                if supplement_geom is not None:
+                    child_parts.append(supplement_geom)
+            child_geom = normalize_polygonal(safe_unary_union(child_parts))
             if child_geom is None:
                 raise ValueError(
                     f"TNO ocean split '{child_spec['id']}' produced empty geometry from '{source_id}'."
@@ -7699,26 +8198,33 @@ def build_countries_stage_state(
         audit_payload,
     )
 
-    congo_props = {}
-    if current_water_regions.get("features"):
-        congo_props = dict(current_water_regions["features"][0].get("properties", {}))
-    congo_props.update({
+    congo_props = {
         "id": "congo_lake",
-        "name": congo_props.get("name") or "Congo Lake",
-        "label": congo_props.get("label") or "Congo Lake",
+        "name": "Congo Lake",
+        "label": "Congo Lake",
         "water_type": "lake",
         "region_group": "tno_congo_basin",
+        "parent_id": "",
+        "neighbors": "",
+        "is_chokepoint": False,
         "interactive": True,
         "scenario_id": SCENARIO_ID,
         "source_standard": "tno_lake_provinces_contour_extracted",
         "source_province_ids": lake_component_ids,
         "topology_mode": "true_water",
         "render_as_base_geography": True,
-    })
+    }
     congo_feature = make_feature(lake_geom, congo_props)
     named_marginal_water_features, named_water_diagnostics = build_tno_named_marginal_water_features(
         named_water_snapshot_payload
     )
+    base_land_union = safe_unary_union(runtime_political_full_gdf.geometry.tolist())
+    atl_land_union = safe_unary_union(atl_political_gdf.geometry.tolist())
+    if base_land_union is None or atl_land_union is None:
+        raise ValueError("Unable to assemble land unions for runtime topology.")
+    ocean_land_mask_geom = safe_unary_union([base_land_union, atl_land_union])
+    if ocean_land_mask_geom is None:
+        raise ValueError("Open-ocean land mask collapsed to empty geometry.")
     clip_open_ocean_geometries_by_id: dict[str, list] = {}
     for spec, feature in zip(TNO_NAMED_MARGINAL_WATER_SPECS, named_marginal_water_features):
         clip_geom = normalize_polygonal(shape(feature.get("geometry")))
@@ -7727,7 +8233,7 @@ def build_countries_stage_state(
         for split_id in spec.get("clip_open_ocean_ids", ()) or ():
             clip_open_ocean_geometries_by_id.setdefault(str(split_id).strip(), []).append(clip_geom)
     scenario_water_features = clip_tno_open_ocean_split_features(
-        build_tno_open_ocean_split_features(),
+        build_tno_open_ocean_split_features(land_mask_geom=ocean_land_mask_geom),
         clip_open_ocean_geometries_by_id,
     )
     scenario_water_features.extend(named_marginal_water_features)
@@ -7735,10 +8241,6 @@ def build_countries_stage_state(
     water_feature_collection = feature_collection_from_features(scenario_water_features)
     water_gdf = geopandas_from_features(water_feature_collection["features"])
 
-    base_land_union = safe_unary_union(runtime_political_full_gdf.geometry.tolist())
-    atl_land_union = safe_unary_union(atl_political_gdf.geometry.tolist())
-    if base_land_union is None or atl_land_union is None:
-        raise ValueError("Unable to assemble land unions for runtime topology.")
     land_without_lake = normalize_polygonal(base_land_union.difference(lake_geom))
     if land_without_lake is None:
         raise ValueError("Scenario land mask lost all land after Congo cut.")
