@@ -1,6 +1,10 @@
+affine
+contourpy
 geopandas
 matplotlib
 mapclassify
+numpy
+pillow
 requests
 shapely
 topojson

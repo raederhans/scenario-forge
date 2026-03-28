@@ -546,9 +546,10 @@ let scenarioPoliticalBackgroundCache = {
   sovereigntyRevision: 0,
   controllerRevision: 0,
   shellRevision: 0,
+  colorRevision: 0,
   canvasWidth: 0,
   canvasHeight: 0,
-  semanticSignature: "",
+  cacheKey: "",
   entries: [],
 };
 let scenarioOpeningOwnerBorderCache = {
@@ -606,8 +607,11 @@ let dayNightClockTimerId = null;
 let lastDayNightClockToken = "";
 let pendingIndexUiRefreshHandle = null;
 let pendingIndexUiRefreshState = null;
+let deferredIndexUiRefreshHandle = null;
+let deferredIndexUiRefreshState = null;
 let pendingSidebarRefreshHandle = null;
 let pendingSidebarRefreshState = null;
+let secondarySpatialBuildHandle = null;
 
 function readSearchParam(name) {
   const search = globalThis?.location?.search || "";
@@ -2549,8 +2553,10 @@ function cancelDeferredWork(handle) {
 function clearStagedMapDataTasks() {
   cancelDeferredWork(state.stagedContextBaseHandle);
   cancelDeferredWork(state.stagedHitCanvasHandle);
+  cancelDeferredWork(secondarySpatialBuildHandle);
   state.stagedContextBaseHandle = null;
   state.stagedHitCanvasHandle = null;
+  secondarySpatialBuildHandle = null;
 }
 
 function cancelExactAfterSettleRefresh({ clearDefer = true } = {}) {
@@ -6550,7 +6556,15 @@ function getWaterHitFromPointer(
   pointer,
   { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX } = {}
 ) {
-  if (!state.showWaterRegions || !state.waterSpatialItems?.length) return createHitResult();
+  if (!state.showWaterRegions) return createHitResult();
+  if (!state.waterSpatialItems?.length) {
+    if (state.waterRegionsById?.size) {
+      scheduleSecondarySpatialIndexBuild({
+        reason: "water-hit-demand",
+      });
+    }
+    return createHitResult();
+  }
 
   const strictCandidates = collectWaterGridCandidates(pointer.px, pointer.py, 0);
   const strictRanked = rankCandidates(strictCandidates, pointer.lonLat);
@@ -6594,7 +6608,15 @@ function getSpecialHitFromPointer(
   pointer,
   { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX } = {}
 ) {
-  if (!state.showScenarioSpecialRegions || !state.specialSpatialItems?.length) return createHitResult();
+  if (!state.showScenarioSpecialRegions) return createHitResult();
+  if (!state.specialSpatialItems?.length) {
+    if (state.specialRegionsById?.size) {
+      scheduleSecondarySpatialIndexBuild({
+        reason: "special-hit-demand",
+      });
+    }
+    return createHitResult();
+  }
 
   const strictCandidates = collectSpecialGridCandidates(pointer.px, pointer.py, 0);
   const strictRanked = rankCandidates(strictCandidates, pointer.lonLat);
@@ -6629,6 +6651,15 @@ function getSpecialHitFromPointer(
 }
 
 function cancelPendingIndexUiRefresh() {
+  if (deferredIndexUiRefreshHandle !== null && deferredIndexUiRefreshHandle !== undefined) {
+    if (typeof globalThis.cancelAnimationFrame === "function") {
+      globalThis.cancelAnimationFrame(deferredIndexUiRefreshHandle);
+    } else {
+      globalThis.clearTimeout(deferredIndexUiRefreshHandle);
+    }
+    deferredIndexUiRefreshHandle = null;
+  }
+  deferredIndexUiRefreshState = null;
   if (pendingIndexUiRefreshHandle === null || pendingIndexUiRefreshHandle === undefined) {
     pendingIndexUiRefreshState = null;
     return;
@@ -6677,6 +6708,49 @@ function scheduleIndexUiRefresh({
   pendingIndexUiRefreshHandle = typeof globalThis.requestAnimationFrame === "function"
     ? globalThis.requestAnimationFrame(callback)
     : globalThis.setTimeout(callback, 0);
+}
+
+function flushDeferredIndexUiRefresh() {
+  const pending = deferredIndexUiRefreshState;
+  deferredIndexUiRefreshHandle = null;
+  deferredIndexUiRefreshState = null;
+  if (!pending) return;
+  scheduleIndexUiRefresh(pending);
+}
+
+function scheduleIndexUiRefreshAfterCoarseFrame({
+  renderCountryList = false,
+  renderWaterRegionList = false,
+  renderSpecialRegionList = false,
+} = {}) {
+  deferredIndexUiRefreshState = {
+    renderCountryList: !!(deferredIndexUiRefreshState?.renderCountryList || renderCountryList),
+    renderWaterRegionList: !!(deferredIndexUiRefreshState?.renderWaterRegionList || renderWaterRegionList),
+    renderSpecialRegionList: !!(deferredIndexUiRefreshState?.renderSpecialRegionList || renderSpecialRegionList),
+  };
+  if (deferredIndexUiRefreshHandle !== null && deferredIndexUiRefreshHandle !== undefined) {
+    return;
+  }
+  const callback = () => {
+    flushDeferredIndexUiRefresh();
+  };
+  deferredIndexUiRefreshHandle = typeof globalThis.requestAnimationFrame === "function"
+    ? globalThis.requestAnimationFrame(callback)
+    : globalThis.setTimeout(callback, 0);
+}
+
+function queueIndexUiRefresh(
+  refreshOptions,
+  scheduleUiMode = "immediate",
+) {
+  if (scheduleUiMode === "none") {
+    return;
+  }
+  if (scheduleUiMode === "deferred") {
+    scheduleIndexUiRefreshAfterCoarseFrame(refreshOptions);
+    return;
+  }
+  scheduleIndexUiRefresh(refreshOptions);
 }
 
 function normalizeSidebarRefreshIds(values) {
@@ -6801,11 +6875,7 @@ async function yieldToMain() {
   });
 }
 
-function buildIndex() {
-  state.landIndex.clear();
-  state.countryToFeatureIds.clear();
-  state.idToKey.clear();
-  state.keyToId.clear();
+function rebuildAuxiliaryRegionIndexes() {
   state.waterRegionsById = new Map();
   state.specialRegionsById = new Map();
 
@@ -6838,12 +6908,26 @@ function buildIndex() {
       state.selectedSpecialRegionId = "";
     }
   }
+}
+
+function finalizeIndexBuildEffects() {
+  state.devSelectionOverlayDirty = true;
+  notifyDevWorkspace();
+  state.hitCanvasDirty = true;
+}
+
+function buildIndex({ scheduleUiMode = "immediate" } = {}) {
+  state.landIndex.clear();
+  state.countryToFeatureIds.clear();
+  state.idToKey.clear();
+  state.keyToId.clear();
+  rebuildAuxiliaryRegionIndexes();
 
   if (!state.landData || !state.landData.features) {
-    scheduleIndexUiRefresh({
+    queueIndexUiRefresh({
       renderWaterRegionList: true,
       renderSpecialRegionList: true,
-    });
+    }, scheduleUiMode);
     return;
   }
   state.landData.features.forEach((feature, index) => {
@@ -6861,14 +6945,12 @@ function buildIndex() {
     state.keyToId.set(key, id);
   });
 
-  scheduleIndexUiRefresh({
+  queueIndexUiRefresh({
     renderCountryList: true,
     renderWaterRegionList: true,
     renderSpecialRegionList: true,
-  });
-  state.devSelectionOverlayDirty = true;
-  notifyDevWorkspace();
-  state.hitCanvasDirty = true;
+  }, scheduleUiMode);
+  finalizeIndexBuildEffects();
 }
 
 function adoptRuntimePoliticalMeta(payload) {
@@ -6928,13 +7010,7 @@ function buildRuntimePoliticalMeta() {
   state.runtimePoliticalMetaSeed = null;
 }
 
-function buildSpatialIndex() {
-  const startedAt = nowMs();
-  state.spatialItems = [];
-  state.spatialIndex = null;
-  state.spatialGrid = new Map();
-  state.spatialGridMeta = null;
-  state.spatialItemsById = new Map();
+function resetSecondarySpatialIndexState() {
   state.waterSpatialItems = [];
   state.waterSpatialIndex = null;
   state.waterSpatialGrid = new Map();
@@ -6945,43 +7021,12 @@ function buildSpatialIndex() {
   state.specialSpatialGrid = new Map();
   state.specialSpatialGridMeta = null;
   state.specialSpatialItemsById = new Map();
-  if (!state.landData || !state.landData.features || !pathSVG) {
-    recordRenderPerfMetric("buildSpatialIndex", nowMs() - startedAt, {
-      landCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
-      spatialItems: 0,
-      waterItems: 0,
-      specialItems: 0,
-      skipped: true,
-    });
-    return;
-  }
+}
+
+function buildSecondarySpatialIndexes({
+  allowComputeMissingBounds = true,
+} = {}) {
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
-
-  for (const [drawOrder, feature] of state.landData.features.entries()) {
-    const id = getFeatureId(feature);
-    if (!id) continue;
-    if (shouldExcludePoliticalInteractionFeature(feature, id)) continue;
-    if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) continue;
-    const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: false })
-      || getProjectedFeatureBounds(feature, { featureId: id });
-    if (!bounds) continue;
-
-    state.spatialItems.push({
-      id,
-      drawOrder,
-      feature,
-      countryCode: getFeatureCountryCodeNormalized(feature),
-      source: String(feature?.properties?.__source || "primary"),
-      minX: bounds.minX,
-      minY: bounds.minY,
-      maxX: bounds.maxX,
-      maxY: bounds.maxY,
-      bboxArea: bounds.area,
-    });
-  }
-
-  buildSpatialGrid(state.spatialItems, canvasWidth, canvasHeight);
-  state.spatialIndex = null;
   const buildSecondarySpatialGrid = (items, assign) => {
     const previousGrid = state.spatialGrid;
     const previousMeta = state.spatialGridMeta;
@@ -6996,8 +7041,7 @@ function buildSpatialIndex() {
   getEffectiveWaterRegionFeatures().forEach((feature) => {
     const id = getFeatureId(feature);
     if (!id) return;
-    const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: false })
-      || getProjectedFeatureBounds(feature, { featureId: id });
+    const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: allowComputeMissingBounds });
     if (!bounds) return;
     state.waterSpatialItems.push({
       id,
@@ -7020,8 +7064,7 @@ function buildSpatialIndex() {
   getEffectiveSpecialRegionFeatures().forEach((feature) => {
     const id = getFeatureId(feature);
     if (!id) return;
-    const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: false })
-      || getProjectedFeatureBounds(feature, { featureId: id });
+    const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: allowComputeMissingBounds });
     if (!bounds) return;
     state.specialSpatialItems.push({
       id,
@@ -7040,6 +7083,174 @@ function buildSpatialIndex() {
     state.specialSpatialGridMeta = state.spatialGridMeta;
     state.specialSpatialItemsById = state.spatialItemsById;
   });
+}
+
+function scheduleSecondarySpatialIndexBuild({
+  timeout = 48,
+  reason = "deferred-secondary-spatial",
+} = {}) {
+  cancelDeferredWork(secondarySpatialBuildHandle);
+  secondarySpatialBuildHandle = scheduleDeferredWork(() => {
+    secondarySpatialBuildHandle = null;
+    if (state.renderPhase !== RENDER_PHASE_IDLE || state.deferExactAfterSettle) {
+      scheduleSecondarySpatialIndexBuild({ timeout, reason });
+      return;
+    }
+    const startedAt = nowMs();
+    resetSecondarySpatialIndexState();
+    buildSecondarySpatialIndexes({
+      allowComputeMissingBounds: true,
+    });
+    state.hitCanvasDirty = true;
+    recordRenderPerfMetric("buildSecondarySpatialIndex", nowMs() - startedAt, {
+      reason,
+      waterItems: state.waterSpatialItems.length,
+      specialItems: state.specialSpatialItems.length,
+    });
+  }, { timeout });
+}
+
+function rebuildRuntimeDerivedState({
+  includeRuntimePoliticalMeta = false,
+  scheduleUiMode = "immediate",
+  buildSpatial = true,
+  includeSecondarySpatial = true,
+} = {}) {
+  if (includeRuntimePoliticalMeta) {
+    buildRuntimePoliticalMeta();
+  }
+
+  state.landIndex.clear();
+  state.countryToFeatureIds.clear();
+  state.idToKey.clear();
+  state.keyToId.clear();
+  rebuildAuxiliaryRegionIndexes();
+
+  ensureSovereigntyState();
+  migrateLegacyColorState();
+  state.sovereignBaseColors = sanitizeCountryColorMap(state.sovereignBaseColors);
+  state.visualOverrides = sanitizeColorMap(state.visualOverrides);
+  state.waterRegionOverrides = sanitizeColorMap(state.waterRegionOverrides);
+  state.specialRegionOverrides = sanitizeColorMap(state.specialRegionOverrides);
+  state.countryBaseColors = { ...state.sovereignBaseColors };
+  state.featureOverrides = { ...state.visualOverrides };
+
+  clearProjectedBoundsCache();
+  const projectedBoundsCache = ensureProjectedBoundsCache();
+  const nextColors = {};
+  const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
+
+  if (state.landData?.features?.length) {
+    state.landData.features.forEach((feature, index) => {
+      const id = getFeatureId(feature) || `feature-${index}`;
+      if (!id) return;
+      state.landIndex.set(id, feature);
+      if (!shouldExcludePoliticalInteractionFeature(feature, id)) {
+        const countryCode = getFeatureCountryCodeNormalized(feature);
+        if (countryCode) {
+          const ids = state.countryToFeatureIds.get(countryCode) || [];
+          ids.push(id);
+          state.countryToFeatureIds.set(countryCode, ids);
+        }
+        const key = index + 1;
+        state.idToKey.set(id, key);
+        state.keyToId.set(key, id);
+      }
+      const bounds = computeProjectedFeatureBounds(feature);
+      if (bounds) {
+        projectedBoundsCache.set(id, bounds);
+      }
+      if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) {
+        return;
+      }
+      const resolvedColor = getResolvedFeatureColor(feature, id);
+      if (resolvedColor) {
+        nextColors[id] = resolvedColor;
+      }
+    });
+  }
+
+  if (state.riversData?.features?.length) {
+    state.riversData.features.forEach((feature) => {
+      const featureId = getFeatureId(feature);
+      if (!featureId) return;
+      const bounds = computeProjectedFeatureBounds(feature);
+      if (!bounds) return;
+      projectedBoundsCache.set(featureId, bounds);
+    });
+  }
+
+  state.colors = nextColors;
+  state.colorRevision = Number(state.colorRevision || 0) + 1;
+  invalidateRenderPasses("political", "rebuild-colors");
+  queueIndexUiRefresh({
+    renderCountryList: true,
+    renderWaterRegionList: true,
+    renderSpecialRegionList: true,
+  }, scheduleUiMode);
+  finalizeIndexBuildEffects();
+
+  if (buildSpatial) {
+    buildSpatialIndex({
+      includeSecondary: includeSecondarySpatial,
+      allowComputeMissingBounds: false,
+    });
+  }
+  return nextColors;
+}
+
+function buildSpatialIndex({
+  includeSecondary = true,
+  allowComputeMissingBounds = true,
+} = {}) {
+  const startedAt = nowMs();
+  state.spatialItems = [];
+  state.spatialIndex = null;
+  state.spatialGrid = new Map();
+  state.spatialGridMeta = null;
+  state.spatialItemsById = new Map();
+  resetSecondarySpatialIndexState();
+  if (!state.landData || !state.landData.features || !pathSVG) {
+    recordRenderPerfMetric("buildSpatialIndex", nowMs() - startedAt, {
+      landCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
+      spatialItems: 0,
+      waterItems: 0,
+      specialItems: 0,
+      skipped: true,
+    });
+    return;
+  }
+  const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
+
+  for (const [drawOrder, feature] of state.landData.features.entries()) {
+    const id = getFeatureId(feature);
+    if (!id) continue;
+    if (shouldExcludePoliticalInteractionFeature(feature, id)) continue;
+    if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) continue;
+    const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: allowComputeMissingBounds });
+    if (!bounds) continue;
+
+    state.spatialItems.push({
+      id,
+      drawOrder,
+      feature,
+      countryCode: getFeatureCountryCodeNormalized(feature),
+      source: String(feature?.properties?.__source || "primary"),
+      minX: bounds.minX,
+      minY: bounds.minY,
+      maxX: bounds.maxX,
+      maxY: bounds.maxY,
+      bboxArea: bounds.area,
+    });
+  }
+
+  buildSpatialGrid(state.spatialItems, canvasWidth, canvasHeight);
+  state.spatialIndex = null;
+  if (includeSecondary) {
+    buildSecondarySpatialIndexes({
+      allowComputeMissingBounds,
+    });
+  }
   state.hitCanvasDirty = true;
   recordRenderPerfMetric("buildSpatialIndex", nowMs() - startedAt, {
     landCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
@@ -7050,23 +7261,29 @@ function buildSpatialIndex() {
   });
 }
 
-async function buildIndexChunked() {
+async function buildIndexChunked({ scheduleUiMode = "immediate" } = {}) {
   setInteractionInfrastructureState("building-index", {
     ready: false,
     inFlight: true,
   });
   await yieldToMain();
-  buildIndex();
+  buildIndex({ scheduleUiMode });
   await yieldToMain();
 }
 
-async function buildSpatialIndexChunked() {
+async function buildSpatialIndexChunked({
+  includeSecondary = true,
+  allowComputeMissingBounds = true,
+} = {}) {
   setInteractionInfrastructureState("building-spatial", {
     ready: false,
     inFlight: true,
   });
   await yieldToMain();
-  buildSpatialIndex();
+  buildSpatialIndex({
+    includeSecondary,
+    allowComputeMissingBounds,
+  });
   await yieldToMain();
 }
 
@@ -7095,17 +7312,27 @@ async function buildInteractionInfrastructureAfterStartup({ chunked = true } = {
     try {
       state.deferHitCanvasBuild = false;
       if (chunked) {
-        await buildIndexChunked();
+        await buildIndexChunked({ scheduleUiMode: "deferred" });
       } else {
-        buildIndex();
+        buildIndex({ scheduleUiMode: "deferred" });
       }
       ensureSovereigntyState({ force: true });
       rebuildResolvedColors();
       if (chunked) {
-        await buildSpatialIndexChunked();
+        await buildSpatialIndexChunked({
+          includeSecondary: false,
+        });
+      } else {
+        buildSpatialIndex({
+          includeSecondary: false,
+        });
+      }
+      scheduleSecondarySpatialIndexBuild({
+        reason: chunked ? "startup-deferred-secondary-spatial" : "startup-secondary-spatial",
+      });
+      if (chunked) {
         await buildHitCanvasAfterStartup();
       } else {
-        buildSpatialIndex();
         ensureHitCanvasUpToDate({ force: true });
       }
       setInteractionInfrastructureState("ready", {
@@ -12295,6 +12522,23 @@ function shouldFallbackScenarioPoliticalBackgroundMergeShape(
   return true;
 }
 
+function getScenarioPoliticalBackgroundCacheKey({
+  canvasWidth = 0,
+  canvasHeight = 0,
+} = {}) {
+  return [
+    String(state.activeScenarioId || ""),
+    String(state.scenarioViewMode || "ownership"),
+    getAtlantropaSeaPoliticalFillColor(),
+    Number(state.sovereigntyRevision || 0),
+    Number(state.scenarioControllerRevision || 0),
+    Number(state.scenarioShellOverlayRevision || 0),
+    Number(state.colorRevision || 0),
+    Math.round(Number(canvasWidth || 0)),
+    Math.round(Number(canvasHeight || 0)),
+  ].join("::");
+}
+
 function buildScenarioPoliticalBackgroundEntries() {
   const startedAt = nowMs();
   if (!shouldUseScenarioPoliticalBackgroundMerge()) {
@@ -12311,20 +12555,30 @@ function buildScenarioPoliticalBackgroundEntries() {
   const landCollection = state.landData;
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
   const featureCount = Array.isArray(landCollection?.features) ? landCollection.features.length : 0;
-  const includedFeatureIds = new Set(
-    getRenderableLandFeatures(canvasWidth, canvasHeight, { forceProd: true })
-      .map((feature) => getFeatureId(feature))
-      .filter(Boolean)
-  );
+  const cacheKey = getScenarioPoliticalBackgroundCacheKey({
+    canvasWidth,
+    canvasHeight,
+  });
+  if (
+    scenarioPoliticalBackgroundCache.runtimeRef === topology
+    && scenarioPoliticalBackgroundCache.cacheKey === cacheKey
+  ) {
+    recordRenderPerfMetric("drawScenarioPoliticalBackgroundEntries", nowMs() - startedAt, {
+      cacheHit: true,
+      entryCount: scenarioPoliticalBackgroundCache.entries.length,
+      featureCount,
+    });
+    return scenarioPoliticalBackgroundCache.entries;
+  }
+
   const groupedGeometries = new Map();
-  const semanticSignatureParts = [];
   const geometries = Array.isArray(topology?.objects?.political?.geometries)
     ? topology.objects.political.geometries
     : [];
   geometries.forEach((geometry, index) => {
     const id = getFeatureId(geometry) || `feature-${index}`;
-    if (!includedFeatureIds.has(id)) return;
     if (shouldExcludePoliticalInteractionFeature(geometry, id)) return;
+    if (shouldSkipFeature(geometry, canvasWidth, canvasHeight, { forceProd: true })) return;
 
     const displayCode =
       getDisplayOwnerCode(geometry, id) ||
@@ -12337,34 +12591,13 @@ function buildScenarioPoliticalBackgroundEntries() {
       getSafeCanvasColor(state.colors?.[id], null) ||
       getSafeCanvasColor(getResolvedFeatureColor(geometry, id), null) ||
       LAND_FILL_COLOR;
-    semanticSignatureParts.push(`${id}\u0001${displayCode}\u0001${fillColor}`);
     const groupKey = `${displayCode}::${fillColor}`;
     if (!groupedGeometries.has(groupKey)) {
       groupedGeometries.set(groupKey, { displayCode, fillColor, geometries: [] });
     }
     groupedGeometries.get(groupKey).geometries.push(geometry);
   });
-  const semanticSignature = semanticSignatureParts.join("\u0002");
-  const cacheMatches =
-    scenarioPoliticalBackgroundCache.runtimeRef === topology &&
-    scenarioPoliticalBackgroundCache.scenarioId === state.activeScenarioId &&
-    scenarioPoliticalBackgroundCache.viewMode === String(state.scenarioViewMode || "ownership") &&
-    scenarioPoliticalBackgroundCache.oceanFillColor === getAtlantropaSeaPoliticalFillColor() &&
-    scenarioPoliticalBackgroundCache.sovereigntyRevision === Number(state.sovereigntyRevision || 0) &&
-    scenarioPoliticalBackgroundCache.controllerRevision === Number(state.scenarioControllerRevision || 0) &&
-    scenarioPoliticalBackgroundCache.shellRevision === Number(state.scenarioShellOverlayRevision || 0) &&
-    scenarioPoliticalBackgroundCache.canvasWidth === canvasWidth &&
-    scenarioPoliticalBackgroundCache.canvasHeight === canvasHeight &&
-    scenarioPoliticalBackgroundCache.semanticSignature === semanticSignature;
-  if (cacheMatches) {
-    recordRenderPerfMetric("drawScenarioPoliticalBackgroundEntries", nowMs() - startedAt, {
-      cacheHit: true,
-      entryCount: scenarioPoliticalBackgroundCache.entries.length,
-      featureCount,
-    });
-    return scenarioPoliticalBackgroundCache.entries;
-  }
-  if (!includedFeatureIds.size) {
+  if (!groupedGeometries.size) {
     scenarioPoliticalBackgroundCache = {
       runtimeRef: topology,
       scenarioId: state.activeScenarioId || "",
@@ -12373,9 +12606,10 @@ function buildScenarioPoliticalBackgroundEntries() {
       sovereigntyRevision: Number(state.sovereigntyRevision || 0),
       controllerRevision: Number(state.scenarioControllerRevision || 0),
       shellRevision: Number(state.scenarioShellOverlayRevision || 0),
+      colorRevision: Number(state.colorRevision || 0),
       canvasWidth,
       canvasHeight,
-      semanticSignature,
+      cacheKey,
       entries: [],
     };
     recordRenderPerfMetric("drawScenarioPoliticalBackgroundEntries", nowMs() - startedAt, {
@@ -12474,9 +12708,10 @@ function buildScenarioPoliticalBackgroundEntries() {
     sovereigntyRevision: Number(state.sovereigntyRevision || 0),
     controllerRevision: Number(state.scenarioControllerRevision || 0),
     shellRevision: Number(state.scenarioShellOverlayRevision || 0),
+    colorRevision: Number(state.colorRevision || 0),
     canvasWidth,
     canvasHeight,
-    semanticSignature,
+    cacheKey,
     entries,
   };
   recordRenderPerfMetric("drawScenarioPoliticalBackgroundEntries", nowMs() - startedAt, {
@@ -13258,6 +13493,23 @@ function drawPoliticalPass(k) {
   drawPoliticalBackgroundFills();
   if (!state.landData?.features?.length) return;
   const islandNeighbors = debugMode === "ISLANDS" ? getIslandNeighborGraph() : null;
+  const visibleItems = debugMode === "PROD" ? collectVisibleLandSpatialItems() : null;
+  if (Array.isArray(visibleItems)) {
+    visibleItems.forEach((item) => {
+      drawPoliticalFeature(item.feature, item.drawOrder, {
+        k,
+        canvasWidth,
+        canvasHeight,
+        islandNeighbors,
+        transform,
+        skipScreenCheck: true,
+        useCachedPath: true,
+        allowBuildPath: false,
+        countPathBuild: false,
+      });
+    });
+    return;
+  }
   state.landData.features.forEach((feature, index) => {
     drawPoliticalFeature(feature, index, {
       k,
@@ -13265,7 +13517,7 @@ function drawPoliticalPass(k) {
       canvasHeight,
       islandNeighbors,
       transform,
-      useCachedPath: false,
+      useCachedPath: true,
       allowBuildPath: false,
       countPathBuild: false,
     });
@@ -19434,6 +19686,8 @@ function setMapData({
   cancelExactAfterSettleRefresh();
   cancelDeferredWork(state.hitCanvasBuildScheduled);
   state.hitCanvasBuildScheduled = null;
+  cancelDeferredWork(secondarySpatialBuildHandle);
+  secondarySpatialBuildHandle = null;
   state.deferContextBasePass = false;
   state.deferHitCanvasBuild = false;
   state.deferExactAfterSettle = false;
@@ -19613,24 +19867,27 @@ function refreshMapDataForScenarioApply({
   resetPhysicalLandClipPathCache();
   ensureLayerDataFromTopology();
   rebuildPoliticalLandCollections();
-  buildRuntimePoliticalMeta();
-  buildIndex();
-  ensureSovereigntyState();
+  rebuildRuntimeDerivedState({
+    includeRuntimePoliticalMeta: true,
+    scheduleUiMode: "deferred",
+    buildSpatial: true,
+    includeSecondarySpatial: false,
+  });
   state.topologyRevision = Number(state.topologyRevision || 0) + 1;
   state.hitCanvasDirty = true;
   const targetPasses = ["background", "political", "contextBase", "contextScenario", "dayNight", "borders", "labels"];
   invalidateRenderPasses(targetPasses, "scenario-apply-refresh");
   clearRenderPassReferenceTransforms(targetPasses);
   markAllOverlaysDirty();
-  rebuildProjectedBoundsCache();
   rebuildStaticMeshes();
   invalidateBorderCache();
   updateDynamicBorderStatusUI();
-  rebuildResolvedColors();
-  buildSpatialIndex();
   updateSpecialZonesPaths();
   renderSpecialZoneEditorOverlay();
   updateZoomTranslateExtent();
+  scheduleSecondarySpatialIndexBuild({
+    reason: "scenario-apply-secondary-spatial",
+  });
   if (!suppressRender) {
     render();
   }
