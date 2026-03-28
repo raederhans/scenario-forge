@@ -1116,6 +1116,33 @@ input[type="checkbox"].checkbox-input {
   gap: 10px;
 }
 
+.appearance-filter-row {
+  display: flex;
+}
+
+.appearance-filter-input {
+  width: 100%;
+}
+
+.appearance-prop-group {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.appearance-prop-heading {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.special-zone-style-section {
+  margin-top: 4px;
+}
+
 .mode-toggle-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1511,80 +1538,14 @@ details.card[open] > summary::after {
   min-width: 0;
 }
 
+body:not(.developer-mode) .dev-only {
+  display: none !important;
+}
+
 .app-title-row-compact .app-title {
   font-size: 1.1rem;
   letter-spacing: -0.03em;
   line-height: 1.05;
-}
-
-.workspace-status-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.workspace-status-block {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-  padding: 11px 12px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.72);
-}
-
-.workspace-status-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-.workspace-status-block-secondary {
-  gap: 6px;
-}
-
-.workspace-status-kicker {
-  display: block;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-}
-
-.workspace-status-label {
-  display: block;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-}
-
-.workspace-status-value {
-  display: block;
-  min-width: 0;
-  color: var(--text-primary);
-  font-size: 0.84rem;
-  font-weight: 600;
-  line-height: 1.35;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.workspace-status-value-selection {
-  white-space: normal;
-  word-break: break-word;
-}
-
-.workspace-status-note {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 0.76rem;
-  line-height: 1.45;
 }
 
 .sidebar-left {
@@ -1615,6 +1576,17 @@ details.card[open] > summary::after {
 
 .sidebar-details-card {
   padding-top: 18px;
+}
+
+.sidebar-secondary-card {
+  opacity: 0.94;
+}
+
+.palette-library-secondary-note {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  line-height: 1.45;
 }
 
 .sidebar-details-body {
@@ -3555,19 +3527,6 @@ body.counter-editor-modal-open {
   min-width: 0;
 }
 
-.dock-paint-summary {
-  flex: 1 1 150px;
-  min-width: 120px;
-  padding: 8px 10px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.9);
-  color: var(--text-primary);
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 1.35;
-}
-
 .dock-political-panel {
   display: flex;
   flex-direction: row;
@@ -3826,7 +3785,7 @@ body.counter-editor-modal-open {
 
 .bottom-dock-primary {
   display: grid;
-  grid-template-columns: auto minmax(120px, 0.5fr) minmax(340px, 1.15fr) minmax(290px, 1fr);
+  grid-template-columns: auto minmax(120px, 0.42fr) minmax(220px, 0.72fr) minmax(240px, 0.9fr) minmax(290px, 1fr);
   align-items: center;
   gap: 10px;
 }
@@ -3843,7 +3802,8 @@ body.counter-editor-modal-open {
 }
 
 .dock-group-mode,
-.dock-group-actions,
+.dock-group-config,
+.dock-group-map-actions,
 .dock-group-history-colors {
   min-width: 0;
 }
@@ -3901,19 +3861,6 @@ body.counter-editor-modal-open {
   width: 32px;
   min-width: 32px;
   height: 32px;
-}
-
-.dock-paint-summary {
-  flex: 0 1 140px;
-  min-width: 112px;
-  padding: 7px 9px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  color: var(--text-primary);
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1.3;
 }
 
 .dock-paint-secondary,
@@ -3985,7 +3932,8 @@ body.counter-editor-modal-open {
 }
 
 .bottom-dock.is-collapsed .dock-group-mode,
-.bottom-dock.is-collapsed .dock-group-actions,
+.bottom-dock.is-collapsed .dock-group-config,
+.bottom-dock.is-collapsed .dock-group-map-actions,
 .bottom-dock.is-collapsed .dock-group-history-colors {
   display: none !important;
 }
@@ -5806,7 +5754,8 @@ body.right-drawer-open::after {
     grid-column: 2;
   }
 
-  .dock-group-actions {
+  .dock-group-config,
+  .dock-group-map-actions {
     grid-column: 1 / span 2;
   }
 
@@ -5817,15 +5766,12 @@ body.right-drawer-open::after {
 }
 
 @media (max-width: 1023px) {
-  .workspace-status-grid {
-    grid-template-columns: 1fr;
-  }
-
   .bottom-dock-primary {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .dock-group-actions,
+  .dock-group-config,
+  .dock-group-map-actions,
   .dock-group-tools,
   .dock-group-mode,
   .dock-group-history-colors {
@@ -5874,8 +5820,7 @@ body.right-drawer-open::after {
 
   .dock-action-btn,
   .dock-clear-btn,
-  .dock-segmented-control,
-  .dock-paint-summary {
+  .dock-segmented-control {
     width: 100%;
   }
 

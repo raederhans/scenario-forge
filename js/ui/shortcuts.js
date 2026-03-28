@@ -114,6 +114,38 @@ function initShortcuts() {
       return;
     }
 
+    if (modifier && event.shiftKey && lower === "d") {
+      if (typeof state.toggleDeveloperModeFn === "function") {
+        event.preventDefault();
+        state.toggleDeveloperModeFn();
+      }
+      return;
+    }
+
+    if (modifier && key === "\\") {
+      if (typeof state.toggleRightPanelFn === "function") {
+        event.preventDefault();
+        state.toggleRightPanelFn();
+      }
+      return;
+    }
+
+    if (!modifier && key === "\\") {
+      if (typeof state.toggleLeftPanelFn === "function") {
+        event.preventDefault();
+        state.toggleLeftPanelFn();
+      }
+      return;
+    }
+
+    if (!modifier && key === "`") {
+      if (typeof state.toggleDockFn === "function") {
+        event.preventDefault();
+        state.toggleDockFn();
+      }
+      return;
+    }
+
     if (key === "Shift") {
       setBrushPanModifier(true);
     }

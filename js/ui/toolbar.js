@@ -252,9 +252,11 @@ function initToolbar({ render } = {}) {
   const scenarioContextScenarioItem = document.getElementById("scenarioContextScenarioItem");
   const scenarioContextModeItem = document.getElementById("scenarioContextModeItem");
   const scenarioContextActiveItem = document.getElementById("scenarioContextActiveItem");
+  const scenarioContextSelectionItem = document.getElementById("scenarioContextSelectionItem");
   const scenarioContextScenarioText = document.getElementById("scenarioContextScenarioText");
   const scenarioContextModeText = document.getElementById("scenarioContextModeText");
   const scenarioContextActiveText = document.getElementById("scenarioContextActiveText");
+  const scenarioContextSelectionText = document.getElementById("scenarioContextSelectionText");
   const scenarioGuideBtn = document.getElementById("scenarioGuideBtn");
   const scenarioGuidePopover = document.getElementById("scenarioGuidePopover");
   const scenarioGuideStatus = document.getElementById("scenarioGuideStatus");
@@ -266,7 +268,6 @@ function initToolbar({ render } = {}) {
   const devWorkspaceToggleBtn = document.getElementById("devWorkspaceToggleBtn");
   const leftPanelToggle = document.getElementById("leftPanelToggle");
   const rightPanelToggle = document.getElementById("rightPanelToggle");
-  const dockPaintSummary = document.getElementById("dockPaintSummary");
   const paintGranularitySelect = document.getElementById("paintGranularitySelect");
   const dockQuickFillRow = document.getElementById("dockQuickFillRow");
   const quickFillParentBtn = document.getElementById("quickFillParentBtn");
@@ -322,10 +323,6 @@ function initToolbar({ render } = {}) {
   const referenceScale = document.getElementById("referenceScale");
   const referenceOffsetX = document.getElementById("referenceOffsetX");
   const referenceOffsetY = document.getElementById("referenceOffsetY");
-  const workspaceScenarioValue = document.getElementById("workspaceScenarioValue");
-  const workspaceModeValue = document.getElementById("workspaceModeValue");
-  const workspaceSelectionValue = document.getElementById("workspaceSelectionValue");
-  const workspaceSelectionHint = document.getElementById("workspaceSelectionHint");
   const paletteLibraryToggleLabel = document.getElementById("paletteLibraryToggleLabel");
 
   const internalBorderOpacityValue = document.getElementById("internalBorderOpacityValue");
@@ -386,13 +383,15 @@ function initToolbar({ render } = {}) {
   const referenceScaleValue = document.getElementById("referenceScaleValue");
   const referenceOffsetXValue = document.getElementById("referenceOffsetXValue");
   const referenceOffsetYValue = document.getElementById("referenceOffsetYValue");
+  const appearanceLayerFilter = document.getElementById("appearanceLayerFilter");
   const appearanceTabButtons = Array.from(document.querySelectorAll("[data-appearance-tab]"));
   const appearanceTabPanels = Array.from(document.querySelectorAll("[data-appearance-panel]"));
+  const appearanceFilterItems = Array.from(document.querySelectorAll("[data-appearance-filter-item]"));
   const appearanceSpecialZoneBtn = document.getElementById("appearanceSpecialZoneBtn");
   const specialZonePopover = document.getElementById("specialZonePopover");
   const specialZoneEditorInline = specialZonePopover?.dataset.inlineEditor === "true";
-
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const DEVELOPER_MODE_STORAGE_KEY = "map_creator_developer_mode";
   const physicalClassToggleMap = {
     mountain_high_relief: physicalClassMountain,
     upland_plateau: physicalClassPlateau,
@@ -428,6 +427,9 @@ function initToolbar({ render } = {}) {
   state.ui.scenarioGuideDismissed = !!state.ui.scenarioGuideDismissed;
   state.ui.politicalEditingExpanded = !!state.ui.politicalEditingExpanded;
   state.ui.scenarioVisualAdjustmentsOpen = !!state.ui.scenarioVisualAdjustmentsOpen;
+  state.ui.developerMode = !!state.ui.developerMode;
+  state.ui.tutorialEntryVisible = state.ui.tutorialEntryVisible !== false;
+  state.ui.tutorialDismissed = !!state.ui.tutorialDismissed;
   state.ui.responsiveChromeTier = String(state.ui.responsiveChromeTier || "");
   if (!state.ui.paletteLibrarySections || typeof state.ui.paletteLibrarySections !== "object") {
     state.ui.paletteLibrarySections = {};
@@ -450,6 +452,50 @@ function initToolbar({ render } = {}) {
     state.ui.responsiveChromeTier = nextTier;
   };
   applyResponsiveChromeDefaults();
+
+  const persistDeveloperMode = () => {
+    try {
+      globalThis.localStorage?.setItem(
+        DEVELOPER_MODE_STORAGE_KEY,
+        state.ui.developerMode ? "true" : "false"
+      );
+    } catch {}
+  };
+
+  const syncDeveloperModeUi = () => {
+    document.body?.classList.toggle("developer-mode", !!state.ui.developerMode);
+    if (!state.ui.developerMode && state.ui.devWorkspaceExpanded && devWorkspaceToggleBtn) {
+      devWorkspaceToggleBtn.click();
+    }
+  };
+
+  const setDeveloperMode = (nextValue) => {
+    const normalized = !!nextValue;
+    if (state.ui.developerMode === normalized) {
+      syncDeveloperModeUi();
+      return;
+    }
+    state.ui.developerMode = normalized;
+    persistDeveloperMode();
+    syncDeveloperModeUi();
+  };
+
+  try {
+    const storedDeveloperMode = globalThis.localStorage?.getItem(DEVELOPER_MODE_STORAGE_KEY);
+    if (storedDeveloperMode === "true" || storedDeveloperMode === "false") {
+      state.ui.developerMode = storedDeveloperMode === "true";
+    }
+  } catch {}
+  syncDeveloperModeUi();
+
+  const applyAppearanceFilter = () => {
+    const query = String(appearanceLayerFilter?.value || "").trim().toLowerCase();
+    appearanceFilterItems.forEach((item) => {
+      const label = String(item.getAttribute("data-appearance-filter-label") || item.textContent || "").toLowerCase();
+      const matches = !query || label.includes(query);
+      item.classList.toggle("hidden", !matches);
+    });
+  };
 
   const getFocusableElements = (container) => {
     if (!(container instanceof HTMLElement)) return [];
@@ -533,21 +579,20 @@ function initToolbar({ render } = {}) {
     return t("No selection", "ui");
   };
 
+  const refreshScenarioSelectionChip = () => {
+    const selectionLabel = getWorkspaceSelectionLabel();
+    const hasSelection = selectionLabel !== t("No selection", "ui");
+    if (scenarioContextSelectionItem) {
+      scenarioContextSelectionItem.classList.toggle("hidden", !hasSelection);
+    }
+    if (scenarioContextSelectionText) {
+      scenarioContextSelectionText.textContent = selectionLabel;
+      scenarioContextSelectionText.setAttribute("title", `${t("Selection", "ui")}: ${selectionLabel}`);
+    }
+  };
+
   const refreshWorkspaceStatus = () => {
-    if (workspaceScenarioValue) {
-      workspaceScenarioValue.textContent = String(
-        state.activeScenarioManifest?.display_name || state.activeScenarioId || t("None", "ui")
-      ).trim() || t("None", "ui");
-    }
-    if (workspaceModeValue) {
-      workspaceModeValue.textContent = getPaintModeLabel();
-    }
-    if (workspaceSelectionValue) {
-      workspaceSelectionValue.textContent = getWorkspaceSelectionLabel();
-    }
-    if (workspaceSelectionHint) {
-      workspaceSelectionHint.textContent = t("Choose a country, water region, or special region.", "ui");
-    }
+    refreshScenarioSelectionChip();
     renderOceanCoastalAccentUi();
   };
   state.updateWorkspaceStatusFn = refreshWorkspaceStatus;
@@ -622,10 +667,6 @@ function initToolbar({ render } = {}) {
     const isOwnershipMode = String(state.paintMode || "visual") === "sovereignty";
     const showPoliticalPanel = !isScenarioMode && (state.ui.politicalEditingExpanded || isOwnershipMode);
     const showBorderMaintenance = isScenarioMode || state.ui.politicalEditingExpanded || isOwnershipMode;
-
-    if (dockPaintSummary) {
-      dockPaintSummary.textContent = `${getPaintModeLabel()} ${t("Brush", "ui")}`;
-    }
 
     if (document.getElementById("labelPresetPolitical")) {
       document.getElementById("labelPresetPolitical").textContent = getPrimaryActionLabel();
@@ -839,14 +880,12 @@ function initToolbar({ render } = {}) {
       : t("Ownership", "ui");
     const showScenarioState = !!activeScenario;
     const activeValue = activeCode ? `${activeLabel} (${activeCode})` : t("None", "ui");
-    scenarioContextBar.classList.toggle("is-scenario", showScenarioState);
+    scenarioContextBar.classList.toggle("is-scenario", !!activeScenario);
     scenarioContextBar.classList.toggle("is-collapsed", !!state.ui.scenarioBarCollapsed);
-    scenarioContextScenarioItem?.classList.toggle("hidden", !showScenarioState);
-    scenarioContextModeItem?.classList.toggle("hidden", showScenarioState);
-    scenarioContextActiveItem?.classList.toggle("hidden", !showScenarioState);
     if (scenarioContextScenarioText) {
-      scenarioContextScenarioText.textContent = activeScenario || t("None", "ui");
-      scenarioContextScenarioText.setAttribute("title", `${t("Scenario", "ui")}: ${activeScenario || t("None", "ui")}`);
+      const scenarioValue = activeScenario || t("None", "ui");
+      scenarioContextScenarioText.textContent = scenarioValue;
+      scenarioContextScenarioText.setAttribute("title", `${t("Scenario", "ui")}: ${scenarioValue}`);
     }
     if (scenarioContextModeText) {
       scenarioContextModeText.textContent = modeLabel;
@@ -868,10 +907,12 @@ function initToolbar({ render } = {}) {
         : t("Collapse", "ui"));
     }
     if (scenarioGuideBtn) {
+      scenarioGuideBtn.classList.toggle("hidden", !state.ui.tutorialEntryVisible);
       scenarioGuideBtn.textContent = "?";
       const isGuideOpen = !!(scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden"));
       scenarioGuideBtn.setAttribute("title", isGuideOpen ? t("Hide guide", "ui") : t("Show guide", "ui"));
     }
+    refreshScenarioSelectionChip();
     renderScenarioGuideStatus({
       activeScenario,
       modeLabel,
@@ -975,6 +1016,45 @@ function initToolbar({ render } = {}) {
     }
   };
   state.closeDockPopoverFn = closeDockPopover;
+
+  const syncPanelToggleButtons = () => {
+    leftPanelToggle?.setAttribute("aria-expanded", String(document.body.classList.contains("left-drawer-open")));
+    rightPanelToggle?.setAttribute("aria-expanded", String(document.body.classList.contains("right-drawer-open")));
+  };
+
+  const toggleLeftPanel = (force) => {
+    closeDockPopover();
+    const next = typeof force === "boolean" ? force : !document.body.classList.contains("left-drawer-open");
+    document.body.classList.toggle("left-drawer-open", next);
+    document.body.classList.toggle("right-drawer-open", false);
+    syncPanelToggleButtons();
+    refreshScenarioContextBar();
+    return next;
+  };
+
+  const toggleRightPanel = (force) => {
+    closeDockPopover();
+    const next = typeof force === "boolean" ? force : !document.body.classList.contains("right-drawer-open");
+    document.body.classList.toggle("right-drawer-open", next);
+    document.body.classList.toggle("left-drawer-open", false);
+    syncPanelToggleButtons();
+    refreshScenarioContextBar();
+    return next;
+  };
+
+  const toggleDock = (force) => {
+    state.ui.dockCollapsed = typeof force === "boolean" ? force : !state.ui.dockCollapsed;
+    updateDockCollapsedUi();
+    return state.ui.dockCollapsed;
+  };
+
+  state.toggleLeftPanelFn = toggleLeftPanel;
+  state.toggleRightPanelFn = toggleRightPanel;
+  state.toggleDockFn = toggleDock;
+  state.toggleDeveloperModeFn = () => {
+    setDeveloperMode(!state.ui.developerMode);
+    return state.ui.developerMode;
+  };
 
   const openDockPopover = (kind) => {
     const target = kind === "reference" ? dockReferencePopover : dockExportPopover;
@@ -2805,26 +2885,14 @@ function initToolbar({ render } = {}) {
 
   if (leftPanelToggle && !leftPanelToggle.dataset.bound) {
     leftPanelToggle.addEventListener("click", () => {
-      closeDockPopover();
-      const next = !document.body.classList.contains("left-drawer-open");
-      document.body.classList.toggle("left-drawer-open", next);
-      document.body.classList.remove("right-drawer-open");
-      leftPanelToggle.setAttribute("aria-expanded", String(next));
-      rightPanelToggle?.setAttribute("aria-expanded", "false");
-      refreshScenarioContextBar();
+      toggleLeftPanel();
     });
     leftPanelToggle.dataset.bound = "true";
   }
 
   if (rightPanelToggle && !rightPanelToggle.dataset.bound) {
     rightPanelToggle.addEventListener("click", () => {
-      closeDockPopover();
-      const next = !document.body.classList.contains("right-drawer-open");
-      document.body.classList.toggle("right-drawer-open", next);
-      document.body.classList.remove("left-drawer-open");
-      rightPanelToggle.setAttribute("aria-expanded", String(next));
-      leftPanelToggle?.setAttribute("aria-expanded", "false");
-      refreshScenarioContextBar();
+      toggleRightPanel();
     });
     rightPanelToggle.dataset.bound = "true";
   }
@@ -2874,16 +2942,14 @@ function initToolbar({ render } = {}) {
 
   if (dockCollapseBtn && !dockCollapseBtn.dataset.bound) {
     dockCollapseBtn.addEventListener("click", () => {
-      state.ui.dockCollapsed = !state.ui.dockCollapsed;
-      updateDockCollapsedUi();
+      toggleDock();
     });
     dockCollapseBtn.dataset.bound = "true";
   }
 
   if (devDockCollapseBtn && !devDockCollapseBtn.dataset.bound) {
     devDockCollapseBtn.addEventListener("click", () => {
-      state.ui.dockCollapsed = !state.ui.dockCollapsed;
-      updateDockCollapsedUi();
+      toggleDock();
     });
     devDockCollapseBtn.dataset.bound = "true";
   }
@@ -2947,6 +3013,13 @@ function initToolbar({ render } = {}) {
     });
     button.dataset.bound = "true";
   });
+
+  if (appearanceLayerFilter && !appearanceLayerFilter.dataset.bound) {
+    appearanceLayerFilter.addEventListener("input", () => {
+      applyAppearanceFilter();
+    });
+    appearanceLayerFilter.dataset.bound = "true";
+  }
 
   bindDockPopoverDismiss();
 
@@ -4448,12 +4521,12 @@ function initToolbar({ render } = {}) {
   syncPaletteSourceControls();
   renderPalette(state.currentPaletteTheme);
   renderPaletteLibrary();
-  leftPanelToggle?.setAttribute("aria-expanded", "false");
-  rightPanelToggle?.setAttribute("aria-expanded", "false");
+  syncPanelToggleButtons();
   state.updatePaintModeUIFn();
   state.updateDockCollapsedUiFn = updateDockCollapsedUi;
   updateDockCollapsedUi();
   setAppearanceTab("ocean");
+  applyAppearanceFilter();
   refreshScenarioContextBar();
   renderRecentColors();
   renderParentBorderCountryList();
