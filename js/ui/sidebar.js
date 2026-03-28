@@ -2648,7 +2648,7 @@ function initSidebar({ render } = {}) {
     unitCounterHoi4SourceBtn.type = "button";
     unitCounterHoi4SourceBtn.className = "counter-editor-source-btn";
     unitCounterHoi4SourceBtn.dataset.counterCatalogSource = "hoi4";
-    unitCounterHoi4SourceBtn.textContent = "HOI4 Library";
+    unitCounterHoi4SourceBtn.textContent = t("HOI4 Library", "ui");
     unitCounterCatalogSourceTabs.append(unitCounterInternalSourceBtn, unitCounterHoi4SourceBtn);
     const unitCounterCatalogSearchInput = buildInput("unitCounterCatalogSearchInput", "Search symbols");
     unitCounterCatalogSearchInput.classList.add("counter-editor-symbol-search");

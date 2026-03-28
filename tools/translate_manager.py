@@ -79,6 +79,7 @@ MANUAL_UI_DICT = {
     "Export Map": "导出地图",
     "Highlight Capitals": "高亮首都",
     "History": "历史记录",
+    "HOI4 Library": "HOI4 图标库",
     "HOI4 Vanilla": "钢铁雄心4原版",
     "Download Snapshot": "下载快照",
     "Inspector": "检查器",

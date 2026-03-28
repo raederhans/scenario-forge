@@ -14477,7 +14477,22 @@ function getFrontlineLabelAnchors() {
     || !globalThis.topojson
   ) {
     state.cachedFrontlineLabelAnchors = [];
+    state.cachedFrontlineLabelAnchorsHash = "";
     return [];
+  }
+  const nextHash = [
+    `scenario:${String(state.activeScenarioId || "")}`,
+    `ctrl:${Number(state.scenarioControllerRevision || 0)}`,
+    `shell:${Number(state.scenarioShellOverlayRevision || 0)}`,
+    `sov:${Number(state.sovereigntyRevision || 0)}`,
+    `placement:${String(state.annotationView?.labelPlacementMode || "midpoint")}`,
+    `lang:${String(state.currentLanguage || "")}`,
+  ].join("|");
+  if (
+    Array.isArray(state.cachedFrontlineLabelAnchors)
+    && state.cachedFrontlineLabelAnchorsHash === nextHash
+  ) {
+    return state.cachedFrontlineLabelAnchors;
   }
   const topology = state.runtimePoliticalTopology;
   const object = topology?.objects?.political;
@@ -14518,6 +14533,7 @@ function getFrontlineLabelAnchors() {
     });
   });
 
+  state.cachedFrontlineLabelAnchorsHash = nextHash;
   state.cachedFrontlineLabelAnchors = anchors;
   return anchors;
 }
@@ -14855,6 +14871,7 @@ function renderFrontlineOverlay() {
     state.cachedFrontlineMesh = null;
     state.cachedFrontlineMeshHash = "";
     state.cachedFrontlineLabelAnchors = [];
+    state.cachedFrontlineLabelAnchorsHash = "";
     frontlineOverlayGroup.selectAll("*").remove();
     frontlineLabelsGroup.selectAll("*").remove();
     frontlineOverlayGroup.attr("aria-hidden", "true");
@@ -15611,6 +15628,16 @@ function getUnitCounterSlotOffset(slotIndex = 0, stackCount = 1, metrics = UNIT_
   return [x, y];
 }
 
+function compareUnitCounterRenderOrder(left, right) {
+  const zDelta = Number(left?.zIndex || 0) - Number(right?.zIndex || 0);
+  if (zDelta !== 0) return zDelta;
+  const leftId = String(left?.id || "");
+  const rightId = String(right?.id || "");
+  if (leftId < rightId) return -1;
+  if (leftId > rightId) return 1;
+  return 0;
+}
+
 function getUnitCounterRenderEntries() {
   const counters = Array.isArray(state.unitCounters) ? state.unitCounters : [];
   const grouped = new Map();
@@ -15625,11 +15652,7 @@ function getUnitCounterRenderEntries() {
   return Array.from(grouped.values()).flatMap((bucket) => {
     const sortedBucket = bucket.counters
       .slice()
-      .sort((a, b) => {
-        const zDelta = Number(a?.zIndex || 0) - Number(b?.zIndex || 0);
-        if (zDelta !== 0) return zDelta;
-        return String(a?.id || "").localeCompare(String(b?.id || ""));
-      });
+      .sort(compareUnitCounterRenderOrder);
     return sortedBucket.map((counter, slotIndex) => ({
       counter,
       stackCount: sortedBucket.length,
@@ -15664,6 +15687,13 @@ function getUnitCounterRenderScale(metrics, zoomK) {
 }
 
 // 在缩放过程中轻量更新兵牌 transform，避免 localScale 陈旧导致跳变
+function getUnitCounterNodeTransform(entry) {
+  const projected = Array.isArray(entry?.projected) ? entry.projected : [0, 0];
+  const slotOffset = Array.isArray(entry?.slotOffset) ? entry.slotOffset : [0, 0];
+  const localScale = Number(entry?.scaleModel?.localScale || 1);
+  return `translate(${projected[0]},${projected[1]}) scale(${localScale}) translate(${slotOffset[0]},${slotOffset[1]})`;
+}
+
 function syncUnitCounterScalesDuringZoom() {
   if (!unitCountersGroup) return;
   const zoomK = Math.max(0.1, Number(state.zoomTransform?.k || 1));
@@ -15672,10 +15702,7 @@ function syncUnitCounterScalesDuringZoom() {
     const sc = getUnitCounterRenderScale(d.model.metrics, zoomK);
     d.scaleModel = sc;
     const node = this;
-    node.setAttribute(
-      "transform",
-      `translate(${d.projected[0]},${d.projected[1]}) scale(${sc.localScale}) translate(${d.slotOffset[0]},${d.slotOffset[1]})`,
-    );
+    node.setAttribute("transform", getUnitCounterNodeTransform(d));
     node.setAttribute("opacity", sc.opacity);
     node.setAttribute("display", sc.hidden ? "none" : "");
   });
@@ -15705,7 +15732,7 @@ function renderUnitCountersOverlay() {
       };
     })
     .filter(Boolean)
-    .sort((a, b) => Number(a.counter.zIndex || 0) - Number(b.counter.zIndex || 0));
+    .sort((a, b) => compareUnitCounterRenderOrder(a.counter, b.counter));
 
   const groups = unitCountersGroup
     .selectAll("g.unit-counter")
@@ -15739,9 +15766,7 @@ function renderUnitCountersOverlay() {
   groupEnter.append("text").attr("class", "unit-counter-stack-text");
 
   const merged = groupEnter.merge(groups)
-    .attr("transform", (d) => {
-      return `translate(${d.projected[0]},${d.projected[1]}) scale(${d.scaleModel.localScale}) translate(${d.slotOffset[0]},${d.slotOffset[1]})`;
-    })
+    .attr("transform", (d) => getUnitCounterNodeTransform(d))
     .attr("data-counter-id", (d) => d.counter.id)
     .attr("display", "")
     .attr("opacity", (d) => d.scaleModel.opacity)
@@ -16056,7 +16081,11 @@ function renderUnitCountersOverlay() {
             lat: coord[1],
           };
           state.unitCountersDirty = true;
-          renderUnitCountersIfNeeded({ force: true });
+          const projected = getProjectedPoint(coord);
+          if (projected) {
+            datum.projected = projected;
+            this.setAttribute("transform", getUnitCounterNodeTransform(datum));
+          }
         })
         .on("end", function onEnd(event, datum) {
           globalThis.d3.select(this).style("cursor", "grab");

@@ -204,7 +204,27 @@ function getHoi4UnitIconVariantPath(entry, variant = "small") {
   if (variant === "large") {
     return normalizeVariantPath(entry?.variants?.large);
   }
-  return normalizeVariantPath(entry?.variants?.small) || normalizeVariantPath(entry?.variants?.ship);
+  return normalizeVariantPath(entry?.variants?.small)
+    || (entry?.domain === "naval" ? normalizeVariantPath(entry?.variants?.ship) : null);
+}
+
+/**
+ * Keep the default HOI4 catalog focused on map-relevant unit icons.
+ * Meta/category entries, inverted alternates, and known non-unit markers stay in the manifest
+ * but are hidden from the default picker until we have an explicit use for them.
+ *
+ * @param {Hoi4UnitIconEntry} entry
+ * @returns {boolean}
+ */
+function isHoi4UnitIconCatalogEntryVisible(entry) {
+  const canonicalKey = String(entry?.canonicalKey || "").trim().toLowerCase();
+  if (!canonicalKey) return false;
+  if (canonicalKey.startsWith("category_")) return false;
+  if (canonicalKey.endsWith("_inverted")) return false;
+  if (canonicalKey === "no_intel_icon") return false;
+  if (canonicalKey.includes("fake_intel")) return false;
+  if (canonicalKey.includes("mothership")) return false;
+  return true;
 }
 
 /**
@@ -216,6 +236,9 @@ function filterHoi4UnitIconEntries(entries, { query = "", filter = "all", curren
   const normalizedFilter = String(filter || "all").trim().toLowerCase() || "all";
   const normalizedPresetId = String(currentPresetId || "").trim().toLowerCase();
   return entries.filter((entry) => {
+    if (!isHoi4UnitIconCatalogEntryVisible(entry)) {
+      return false;
+    }
     const mappedPresetIds = typeof getMappedPresetIds === "function"
       ? normalizePresetIds(getMappedPresetIds(entry))
       : normalizePresetIds(entry.mappedPresetIds);

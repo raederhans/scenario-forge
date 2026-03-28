@@ -1343,6 +1343,7 @@ export const state = {
   cachedFrontlineMesh: null,
   cachedFrontlineMeshHash: "",
   cachedFrontlineLabelAnchors: [],
+  cachedFrontlineLabelAnchorsHash: "",
   cachedProvinceBorders: null,
   cachedLocalBorders: null,
   cachedDetailAdmBorders: null,
