@@ -1,11 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { test, expect } = require("@playwright/test");
-const { getAppUrl, waitForAppInteractive } = require("./support/playwright-app");
-
-function resolveBaseUrl() {
-  return getAppUrl();
-}
+const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
 
 async function waitForScenarioUiReady(page) {
   await page.waitForFunction(() => {
@@ -151,7 +147,6 @@ async function attemptLockedScenarioAction(page) {
 
 test('scenario apply rollback keeps prior stable state on palette failure', async ({ page }) => {
   test.setTimeout(120000);
-  const APP_URL = resolveBaseUrl();
   const pageErrors = [];
   const unhandledConsoleErrors = [];
   let forcedPaletteFailureCount = 0;
@@ -177,7 +172,7 @@ test('scenario apply rollback keeps prior stable state on palette failure', asyn
     await route.continue();
   });
 
-  await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
+  await gotoApp(page, '/', { waitUntil: 'domcontentloaded' });
   await waitForAppInteractive(page);
   await waitForScenarioUiReady(page);
   await applyScenario(page, 'hoi4_1939');
@@ -245,7 +240,6 @@ test('scenario apply rollback keeps prior stable state on palette failure', asyn
 
 test('scenario apply fatal recovery locks controls when rollback restore fails', async ({ page }) => {
   test.setTimeout(120000);
-  const APP_URL = resolveBaseUrl();
   let forcedPaletteFailureCount = 0;
   let shouldAbortTnoPalette = false;
 
@@ -258,7 +252,7 @@ test('scenario apply fatal recovery locks controls when rollback restore fails',
     await route.continue();
   });
 
-  await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
+  await gotoApp(page, '/', { waitUntil: 'domcontentloaded' });
   await waitForAppInteractive(page);
   await waitForScenarioUiReady(page);
   await applyScenario(page, 'hoi4_1939');
@@ -301,7 +295,6 @@ test('scenario apply fatal recovery locks controls when rollback restore fails',
 
 test('scenario apply fatal recovery locks controls when rollback consistency fails', async ({ page }) => {
   test.setTimeout(120000);
-  const APP_URL = resolveBaseUrl();
   let forcedPaletteFailureCount = 0;
   let shouldAbortTnoPalette = false;
 
@@ -314,7 +307,7 @@ test('scenario apply fatal recovery locks controls when rollback consistency fai
     await route.continue();
   });
 
-  await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
+  await gotoApp(page, '/', { waitUntil: 'domcontentloaded' });
   await waitForAppInteractive(page);
   await waitForScenarioUiReady(page);
   await applyScenario(page, 'hoi4_1939');

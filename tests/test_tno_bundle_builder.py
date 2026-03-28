@@ -10,12 +10,14 @@ import geopandas as gpd
 from shapely.geometry import Polygon, mapping
 
 from tools.check_scenario_contracts import validate_publish_bundle_dir
+from tools import patch_tno_1962_bundle as tno_bundle
 from tools.patch_tno_1962_bundle import (
     ATLANTROPA_REGION_CONFIGS,
     MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
     MANUAL_SYNC_POLICY_STRICT_BLOCK,
     TNO_1962_GREECE_COARSE_OWNER_BACKFILL,
     apply_tno_greece_coarse_owner_backfill,
+    apply_tno_feature_assignment_overrides,
     apply_dev_manual_overrides,
     build_relief_overlays,
     build_tno_bathymetry_payload,
@@ -24,6 +26,7 @@ from tools.patch_tno_1962_bundle import (
     build_runtime_topology_payload,
     build_single_antarctic_feature,
     detect_unsynced_manual_edits,
+    rebuild_feature_maps_from_political_gdf,
     normalize_feature_core_map,
     resolve_tno_palette_color,
     resolve_publish_filenames,
@@ -779,6 +782,50 @@ class TnoBundleBuilderTest(unittest.TestCase):
             errors = validate_publish_bundle_dir(bundle_dir)
 
             self.assertEqual(errors, [])
+
+    def test_rebuild_feature_maps_skips_runtime_shell_fragments_before_explicit_or_source_map_resolution(self) -> None:
+        political_gdf = gpd.GeoDataFrame(
+            [
+                {"id": "RU_ARCTIC_FB_001", "name": "Russia Shell Fallback 1", "geometry": _square(0, 0)},
+                {"id": "F-1", "name": "Alpha", "geometry": _square(2, 0)},
+            ],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+
+        owners_payload, controllers_payload, cores_payload = rebuild_feature_maps_from_political_gdf(
+            political_gdf,
+            source_feature_id_by_new_id={"RU_ARCTIC_FB_001": "SRC-SHELL", "F-1": "SRC-F1"},
+            source_owners={"SRC-SHELL": "SOV", "SRC-F1": "AAA"},
+            source_controllers={"SRC-SHELL": "SOV", "SRC-F1": "AAA"},
+            source_cores={"SRC-SHELL": ["SOV"], "SRC-F1": ["AAA"]},
+            explicit_assignments={"RU_ARCTIC_FB_001": {"owner": "SOV", "controller": "SOV", "core": ["SOV"]}},
+        )
+
+        self.assertEqual(owners_payload["owners"], {"F-1": "AAA"})
+        self.assertEqual(controllers_payload["controllers"], {"F-1": "AAA"})
+        self.assertEqual(cores_payload["cores"], {"F-1": ["AAA"]})
+
+    def test_apply_tno_feature_assignment_overrides_rejects_runtime_shell_fragments(self) -> None:
+        political_gdf = gpd.GeoDataFrame(
+            [
+                {"id": "RU_ARCTIC_FB_096", "name": "Russia Shell Fallback 96", "geometry": _square(0, 0)},
+            ],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+        original_overrides = tno_bundle.TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES
+        tno_bundle.TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {"TAT": ["RU_ARCTIC_FB_096"]}
+        try:
+            with self.assertRaisesRegex(ValueError, "cannot target runtime shell fragments"):
+                apply_tno_feature_assignment_overrides(
+                    owners_payload={"owners": {}},
+                    controllers_payload={"controllers": {}},
+                    cores_payload={"cores": {}},
+                    scenario_political_gdf=political_gdf,
+                )
+        finally:
+            tno_bundle.TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = original_overrides
 
     def test_validate_publish_bundle_dir_rejects_strict_contract_failures(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

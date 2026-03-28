@@ -1,15 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 const { test, expect } = require("@playwright/test");
-const { getAppUrl, waitForAppInteractive } = require("./support/playwright-app");
-
-function resolveBaseUrl() {
-  return getAppUrl();
-}
+const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
 
 test("main shell static i18n updates visible labels and aria text", async ({ page }) => {
   test.setTimeout(90_000);
-  await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
+  await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
 
   const currentTool = page.locator("#lblCurrentTool");

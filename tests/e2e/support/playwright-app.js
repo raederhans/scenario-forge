@@ -1,7 +1,12 @@
 const path = require("path");
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
-const DEFAULT_APP_ORIGIN = "http://127.0.0.1:8000";
+const DEFAULT_TEST_SERVER_PORT = String(
+  process.env.PLAYWRIGHT_TEST_SERVER_PORT
+  || process.env.MAPCREATOR_DEV_PORT
+  || "8810"
+).trim();
+const DEFAULT_APP_ORIGIN = `http://127.0.0.1:${DEFAULT_TEST_SERVER_PORT}`;
 const DEFAULT_OPEN_PATH = "/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1";
 
 function normalizeAppOrigin(value) {
@@ -19,6 +24,17 @@ function getConfiguredAppOrigin() {
     || process.env.MAPCREATOR_APP_URL
     || DEFAULT_APP_ORIGIN
   );
+}
+
+function shouldReuseExistingServer() {
+  const normalized = String(process.env.PLAYWRIGHT_REUSE_EXISTING_SERVER || "").trim().toLowerCase();
+  if (["1", "true", "yes"].includes(normalized)) {
+    return true;
+  }
+  if (["0", "false", "no"].includes(normalized)) {
+    return false;
+  }
+  return !process.env.CI;
 }
 
 function getAppUrl(targetPath = "/") {
@@ -57,9 +73,10 @@ function getWebServerConfig() {
     cwd: REPO_ROOT,
     url: getAppUrl("/"),
     timeout: 120_000,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: shouldReuseExistingServer(),
     env: {
       ...process.env,
+      MAPCREATOR_DEV_PORT: process.env.MAPCREATOR_DEV_PORT || DEFAULT_TEST_SERVER_PORT,
       MAPCREATOR_OPEN_PATH: process.env.MAPCREATOR_OPEN_PATH || DEFAULT_OPEN_PATH,
       MAPCREATOR_OPEN_BROWSER: "0",
       MAPCREATOR_DEV_CACHE_MODE: process.env.MAPCREATOR_DEV_CACHE_MODE || "revalidate-static",

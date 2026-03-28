@@ -2253,6 +2253,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         allow_abbrev=False,
     )
     parser.add_argument(
+        "--port",
+        type=int,
+        default=0,
+        help="Bind to a fixed port instead of scanning the default port range.",
+    )
+    parser.add_argument(
         "open_path",
         nargs="?",
         default="",
@@ -2565,8 +2571,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             )
 
 
-def start_server(open_path="/"):
-    for port in range(PORT_START, PORT_END + 1):
+def start_server(open_path="/", preferred_port: int | None = None):
+    candidate_ports = [preferred_port] if preferred_port else list(range(PORT_START, PORT_END + 1))
+    for port in candidate_ports:
         try:
             # Attempt to create the server
             # allow_reuse_address=False on Windows helps avoid some zombie socket issues,
@@ -2592,19 +2599,28 @@ def start_server(open_path="/"):
         except OSError as e:
             # WinError 10048 is "Address already in use"
             if e.errno == 10048 or "Address already in use" in str(e) or "閫氬父姣忎釜濂楁帴瀛楀湴鍧€" in str(e):
+                if preferred_port:
+                    print(f"[ERROR] Requested port {port} is busy.")
+                    sys.exit(1)
                 print(f"[WARN] Port {port} is busy. Trying {port + 1}...")
                 continue
             # Some other error occurred
             print(f"[ERROR] Unexpected error on port {port}: {e}")
             raise e
 
+    if preferred_port:
+        print(f"[FATAL] Could not bind the requested port {preferred_port}.")
+        sys.exit(1)
     print(f"[FATAL] Could not find any open port between {PORT_START} and {PORT_END}.")
     sys.exit(1)
 
 
 def main(argv: list[str] | None = None) -> None:
     args = parse_args(argv)
-    start_server(resolve_open_path(args.open_path))
+    preferred_port = int(os.environ.get("MAPCREATOR_DEV_PORT") or args.port or 0)
+    if preferred_port < 0 or preferred_port > 65535:
+        raise SystemExit(f"Invalid --port value: {preferred_port}")
+    start_server(resolve_open_path(args.open_path), preferred_port=preferred_port or None)
 
 
 if __name__ == "__main__":

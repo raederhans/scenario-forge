@@ -1341,22 +1341,23 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "RS127",
     ],
     "RKO": [
-        "RU_RAY_50074027B5223158268211",
-        "RU_RAY_50074027B99227036451137",
-        "RU_RAY_50074027B49278461872326",
         "RU_RAY_50074027B12162041502673",
-        "RU_RAY_50074027B5631740772865",
-        "RU_RAY_50074027B64055482679717",
-        "RU_RAY_50074027B11673707761487",
-        "RU_RAY_50074027B87627181065564",
-        "RU_RAY_50074027B58076034090645",
-        "RU_RAY_50074027B71157437388348",
-        "RU_RAY_50074027B99894122533642",
         "BY_RAY_67162791B52564132020414",
+        "PL_POW_2001",
+        "PL_POW_2009",
     ],
     "RKM": [
         "RU_RAY_50074027B44154738908147",
-        "RU_RAY_50074027B93805213208185",
+        "RU_RAY_50074027B11673707761487",
+        "RU_RAY_50074027B49278461872326",
+        "RU_RAY_50074027B5223158268211",
+        "RU_RAY_50074027B5631740772865",
+        "RU_RAY_50074027B58076034090645",
+        "RU_RAY_50074027B64055482679717",
+        "RU_RAY_50074027B71157437388348",
+        "RU_RAY_50074027B87627181065564",
+        "RU_RAY_50074027B99227036451137",
+        "RU_RAY_50074027B99894122533642",
     ],
     "RKK": [
         "RU_RAY_50074027B17781956857402",
@@ -1442,11 +1443,6 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
     ],
     "GCE": [
         "UKK30",
-        "UKK43",
-        "UKK23",
-        "UKK25",
-        "UKK12",
-        "UKK11",
     ],
     "TAN": [
         "MNG-3322",
@@ -1952,18 +1948,10 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
     ],
     "FFR": [
         "CI_ADM1_83157122B96959932745266",
-        "CI_ADM1_83157122B69310198422077",
-        "CI_ADM1_83157122B74959515955757",
-        "CI_ADM1_83157122B58892240487392",
-        "CI_ADM1_83157122B79983119233374",
-        "CI_ADM1_83157122B20352934117266",
         "CI_ADM1_83157122B34711482467037",
         "CI_ADM1_83157122B73612976130091",
         "CI_ADM1_83157122B96325295181308",
         "CI_ADM1_83157122B76853064397847",
-        "CI_ADM1_83157122B28791092437733",
-        "CI_ADM1_83157122B62906982633778",
-        "CI_ADM1_83157122B12160353323799",
     ],
     "AFA": [
         "NE_ADM1_NER-800",
@@ -2473,8 +2461,6 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "RU_RAY_50074027B2525901146145",
         "RU_RAY_50074027B30901293245460",
         "RU_RAY_50074027B77142948304680",
-        "RU_ARCTIC_FB_096",
-        "RU_ARCTIC_FB_114",
     ],
     "URA": [
         "RU_RAY_50074027B5850936607294",
@@ -7072,6 +7058,22 @@ def apply_tno_feature_assignment_overrides(
         raise ValueError(
             f"TNO 1962 feature assignment overrides reference unknown feature ids: {preview}"
         )
+    if scenario_political_gdf is not None and not scenario_political_gdf.empty:
+        shell_fragment_override_ids = sorted(
+            feature_id
+            for feature_id in override_map
+            if feature_id in {
+                str(row.get("id") or "").strip()
+                for row in scenario_political_gdf.to_dict("records")
+                if is_runtime_shell_fragment_row(row)
+            }
+        )
+        if shell_fragment_override_ids:
+            preview = ", ".join(shell_fragment_override_ids[:10])
+            raise ValueError(
+                "TNO 1962 feature assignment overrides cannot target runtime shell fragments: "
+                f"{preview}"
+            )
 
     owners = owners_payload.setdefault("owners", {})
     controllers = controllers_payload.setdefault("controllers", {})
@@ -7479,6 +7481,8 @@ def rebuild_feature_maps_from_political_gdf(
         feature_id = str(row.get("id") or "").strip()
         if not feature_id:
             continue
+        if is_runtime_shell_fragment_row(row):
+            continue
         explicit = explicit_assignments.get(feature_id)
         source_feature_id = source_feature_id_by_new_id.get(feature_id) or SCENARIO_SPLIT_SUFFIX_RE.sub("", feature_id)
         if not explicit and source_feature_id in explicit_assignments:
@@ -7494,8 +7498,6 @@ def rebuild_feature_maps_from_political_gdf(
             cores[feature_id] = core_tags
             continue
         if source_feature_id not in source_owners:
-            if is_runtime_shell_fragment_row(row):
-                continue
             raise KeyError(f"Missing owner mapping for source feature id {source_feature_id} (new id {feature_id}).")
         owners[feature_id] = str(source_owners[source_feature_id]).strip().upper()
         controllers[feature_id] = str(source_controllers.get(source_feature_id) or owners[feature_id]).strip().upper()
@@ -8954,6 +8956,7 @@ def build_geo_locale_stage(
         scenario_dir=checkpoint_dir,
         locales_path=ROOT / "data/locales.json",
         manual_overrides_path=scenario_dir / "geo_name_overrides.manual.json",
+        reviewed_exceptions_path=scenario_dir / "geo_locale_reviewed_exceptions.json",
         output_path=checkpoint_dir / CHECKPOINT_GEO_LOCALE_FILENAME,
     )
     ensure_geo_locale_variant_checkpoints(checkpoint_dir)

@@ -3,6 +3,7 @@ from __future__ import annotations
 import gzip
 import io
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -1030,6 +1031,37 @@ class DevServerTest(unittest.TestCase):
             self.assertTrue(apply_result["ok"])
             self.assertEqual(call_count["value"], 1)
             self.assertEqual(district_payload["tags"]["AAA"]["districts"]["alpha"]["feature_ids"], ["DE-1", "DE-3", "AAA-1"])
+
+    def test_parse_args_accepts_fixed_port(self) -> None:
+        args = dev_server.parse_args(["/", "--port", "8010"])
+
+        self.assertEqual(args.port, 8010)
+        self.assertEqual(args.open_path, "/")
+
+    def test_start_server_prefers_requested_port_and_exits_when_busy(self) -> None:
+        busy_error = OSError("Address already in use")
+        busy_error.errno = 10048
+
+        with (
+            mock.patch.object(dev_server, "DevServerTCPServer", side_effect=busy_error) as server_cls,
+            self.assertRaises(SystemExit) as exc_info,
+        ):
+            dev_server.start_server("/", preferred_port=8010)
+
+        self.assertEqual(exc_info.exception.code, 1)
+        self.assertEqual(server_cls.call_count, 1)
+        self.assertEqual(server_cls.call_args.args[0], (dev_server.BIND_ADDRESS, 8010))
+
+    def test_main_prefers_environment_port_over_cli_port(self) -> None:
+        with (
+            mock.patch.dict(os.environ, {"MAPCREATOR_DEV_PORT": "8011"}, clear=False),
+            mock.patch.object(dev_server, "start_server") as start_server_mock,
+            mock.patch.object(dev_server, "resolve_open_path", return_value="/") as resolve_open_path_mock,
+        ):
+            dev_server.main(["/", "--port", "8010"])
+
+        resolve_open_path_mock.assert_called_once_with("/")
+        start_server_mock.assert_called_once_with("/", preferred_port=8011)
 
 
 if __name__ == "__main__":

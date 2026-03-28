@@ -193,9 +193,14 @@ class ScenarioContractTest(unittest.TestCase):
                         "collision_candidates": [
                             {"feature_id": "FEATURE-1", "raw_name": "Pool", "reason": "non_unique_raw_name"}
                         ],
-                        "collision_candidate_count": 4,
+                        "collision_candidate_count": 1,
                         "cross_base_collision_count": 3,
                         "split_clone_safe_copy_count": 1,
+                        "reviewed_collision_exception_count": 0,
+                        "reviewed_collision_candidates": [],
+                        "excluded_feature_count": 0,
+                        "excluded_feature_prefixes": [],
+                        "excluded_features": [],
                     },
                 },
             )
@@ -212,6 +217,7 @@ class ScenarioContractTest(unittest.TestCase):
             self.assertEqual(len(geo_locale_tracks), 1)
             self.assertEqual(geo_locale_tracks[0]["cross_base_collision_count"], 3)
             self.assertEqual(geo_locale_tracks[0]["split_clone_safe_copy_count"], 1)
+            self.assertEqual(geo_locale_tracks[0]["reviewed_collision_exception_count"], 0)
 
     def test_validate_scenario_contract_warns_when_locale_audit_counts_are_not_numeric(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -344,7 +350,14 @@ class ScenarioContractTest(unittest.TestCase):
             previous_project_root = check_scenario_contracts.PROJECT_ROOT
             check_scenario_contracts.PROJECT_ROOT = tmp_root
             scenario_dir = _create_scenario_dir(tmp_root, "authoring_safe")
-            _write_strict_bundle_files(scenario_dir)
+            _write_strict_bundle_files(
+                scenario_dir,
+                owners={"F-1": "AAA"},
+                controllers={"F-1": "AAA"},
+                cores={"F-1": ["AAA"]},
+                runtime_feature_ids=["F-1"],
+                manifest_feature_count=1,
+            )
 
             try:
                 errors, warnings = validate_scenario_contract(scenario_dir, {}, strict=False)
@@ -380,6 +393,191 @@ class ScenarioContractTest(unittest.TestCase):
             self.assertTrue(any("must store arrays for every feature" in error for error in errors))
             self.assertTrue(any("feature_count must equal owners feature count" in error for error in errors))
             self.assertTrue(any("may only exceed the feature maps with shell fallback ids" in error for error in errors))
+
+    def test_validate_scenario_contract_strict_mode_rejects_unreviewed_geo_locale_collisions(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            scenario_dir = _create_scenario_dir(tmp_root, "strict_locale")
+            manifest_path = scenario_dir / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["geo_locale_patch_url"] = "data/scenarios/strict_locale/geo_locale_patch.json"
+            _write_json(manifest_path, manifest)
+            _write_json(
+                scenario_dir / "geo_locale_patch.json",
+                {
+                    "version": 1,
+                    "scenario_id": "strict_locale",
+                    "geo": {},
+                    "audit": {
+                        "collision_candidates": [
+                            {"feature_id": "FEATURE-1", "raw_name": "Pool", "reason": "non_unique_raw_name"}
+                        ],
+                        "collision_candidate_count": 1,
+                        "cross_base_collision_count": 1,
+                        "split_clone_safe_copy_count": 0,
+                        "reviewed_collision_exception_count": 0,
+                    },
+                },
+            )
+            _write_strict_bundle_files(
+                scenario_dir,
+                owners={"F-1": "AAA"},
+                controllers={"F-1": "AAA"},
+                cores={"F-1": ["AAA"]},
+                runtime_feature_ids=["F-1"],
+                manifest_feature_count=1,
+            )
+
+            try:
+                errors, warnings = validate_scenario_contract(scenario_dir, {}, strict=True)
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            self.assertEqual(warnings, [])
+            self.assertTrue(any("unresolved locale collision candidates" in error for error in errors))
+
+    def test_validate_scenario_contract_strict_mode_accepts_geo_locale_when_only_reviewed_exceptions_remain(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            scenario_dir = _create_scenario_dir(tmp_root, "strict_locale_reviewed")
+            manifest_path = scenario_dir / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["geo_locale_patch_url"] = "data/scenarios/strict_locale_reviewed/geo_locale_patch.json"
+            _write_json(manifest_path, manifest)
+            _write_json(
+                scenario_dir / "geo_locale_patch.json",
+                {
+                    "version": 1,
+                    "scenario_id": "strict_locale_reviewed",
+                    "geo": {},
+                    "audit": {
+                        "collision_candidates": [],
+                        "collision_candidate_count": 0,
+                        "cross_base_collision_count": 0,
+                        "split_clone_safe_copy_count": 0,
+                        "reviewed_collision_exception_count": 1,
+                        "reviewed_collision_candidates": [
+                            {"feature_id": "FEATURE-1", "raw_name": "Pool", "reason": "non_unique_raw_name"}
+                        ],
+                    },
+                },
+            )
+            _write_strict_bundle_files(
+                scenario_dir,
+                owners={"F-1": "AAA"},
+                controllers={"F-1": "AAA"},
+                cores={"F-1": ["AAA"]},
+                runtime_feature_ids=["F-1"],
+                manifest_feature_count=1,
+            )
+
+            try:
+                errors, warnings = validate_scenario_contract(scenario_dir, {}, strict=True)
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            self.assertEqual(errors, [])
+            self.assertEqual(warnings, [])
+
+    def test_validate_scenario_contract_strict_mode_rejects_reviewed_exception_count_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            scenario_dir = _create_scenario_dir(tmp_root, "strict_locale_reviewed_mismatch")
+            manifest_path = scenario_dir / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["geo_locale_patch_url"] = "data/scenarios/strict_locale_reviewed_mismatch/geo_locale_patch.json"
+            _write_json(manifest_path, manifest)
+            _write_json(
+                scenario_dir / "geo_locale_patch.json",
+                {
+                    "version": 1,
+                    "scenario_id": "strict_locale_reviewed_mismatch",
+                    "geo": {},
+                    "audit": {
+                        "collision_candidates": [],
+                        "collision_candidate_count": 0,
+                        "cross_base_collision_count": 0,
+                        "split_clone_safe_copy_count": 0,
+                        "reviewed_collision_exception_count": 2,
+                        "reviewed_collision_candidates": [
+                            {"feature_id": "FEATURE-1", "raw_name": "Pool", "reason": "non_unique_raw_name"}
+                        ],
+                    },
+                },
+            )
+            _write_strict_bundle_files(
+                scenario_dir,
+                owners={"F-1": "AAA"},
+                controllers={"F-1": "AAA"},
+                cores={"F-1": ["AAA"]},
+                runtime_feature_ids=["F-1"],
+                manifest_feature_count=1,
+            )
+
+            try:
+                errors, warnings = validate_scenario_contract(scenario_dir, {}, strict=True)
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            self.assertEqual(warnings, [])
+            self.assertTrue(
+                any("reviewed_collision_exception_count must equal the reviewed_collision_candidates list length" in error for error in errors)
+            )
+
+    def test_validate_scenario_contract_strict_mode_rejects_excluded_feature_prefix_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            scenario_dir = _create_scenario_dir(tmp_root, "strict_locale_excluded_mismatch")
+            manifest_path = scenario_dir / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["geo_locale_patch_url"] = "data/scenarios/strict_locale_excluded_mismatch/geo_locale_patch.json"
+            _write_json(manifest_path, manifest)
+            _write_json(
+                scenario_dir / "geo_locale_patch.json",
+                {
+                    "version": 1,
+                    "scenario_id": "strict_locale_excluded_mismatch",
+                    "geo": {},
+                    "audit": {
+                        "collision_candidates": [],
+                        "collision_candidate_count": 0,
+                        "cross_base_collision_count": 0,
+                        "split_clone_safe_copy_count": 0,
+                        "reviewed_collision_exception_count": 0,
+                        "excluded_feature_count": 1,
+                        "excluded_feature_prefixes": ["ATLSEA_FILL_"],
+                        "excluded_features": [
+                            {"feature_id": "FEATURE-1", "raw_name": "Pool", "reason": "synthetic"}
+                        ],
+                    },
+                },
+            )
+            _write_strict_bundle_files(
+                scenario_dir,
+                owners={"F-1": "AAA"},
+                controllers={"F-1": "AAA"},
+                cores={"F-1": ["AAA"]},
+                runtime_feature_ids=["F-1"],
+                manifest_feature_count=1,
+            )
+
+            try:
+                errors, warnings = validate_scenario_contract(scenario_dir, {}, strict=True)
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            self.assertEqual(warnings, [])
+            self.assertTrue(
+                any("excluded_features may only include ids that match excluded_feature_prefixes" in error for error in errors)
+            )
 
     def test_inspect_scenario_contract_strict_mode_collects_repair_tracks(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

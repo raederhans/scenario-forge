@@ -266,8 +266,24 @@ def validate_locale_patch(
     manifest: dict,
     errors: list[str],
     warnings: list[str],
+    strict: bool = False,
     repair_tracks: dict[str, Any] | None = None,
 ) -> None:
+    def _parse_audit_count(audit_payload: dict[str, Any], field: str, fallback: int) -> int:
+        raw_value = audit_payload.get(field)
+        if raw_value in (None, ""):
+            return fallback
+        try:
+            return int(raw_value)
+        except (TypeError, ValueError):
+            warning_key = f"{field}:{fallback}"
+            if warning_key not in warned_invalid_audit_counts:
+                warnings.append(
+                    f"audit.{field} must be numeric when present; using fallback value {fallback}."
+                )
+                warned_invalid_audit_counts.add(warning_key)
+            return fallback
+
     patch_descriptors = [
         ("geo_locale_patch_url", str(manifest.get("geo_locale_patch_url") or "").strip()),
         ("geo_locale_patch_url_en", str(manifest.get("geo_locale_patch_url_en") or "").strip()),
@@ -304,32 +320,90 @@ def validate_locale_patch(
 
         audit = payload.get("audit") if isinstance(payload.get("audit"), dict) else {}
         collision_candidates = audit.get("collision_candidates", [])
-        if collision_candidates and isinstance(collision_candidates, list):
-            def _parse_audit_count(field: str, fallback: int) -> int:
-                raw_value = audit.get(field)
-                if raw_value in (None, ""):
-                    return fallback
-                try:
-                    return int(raw_value)
-                except (TypeError, ValueError):
-                    warning_key = f"{field}:{fallback}"
-                    if warning_key not in warned_invalid_audit_counts:
-                        warnings.append(
-                            f"{field_name} audit.{field} must be numeric when present; using fallback value {fallback}."
-                        )
-                        warned_invalid_audit_counts.add(warning_key)
-                    return fallback
+        if collision_candidates not in (None, [], {}) and not isinstance(collision_candidates, list):
+            errors.append(f"{field_name} audit.collision_candidates must be a list when present.")
+            continue
+        collision_candidates = collision_candidates if isinstance(collision_candidates, list) else []
+        reviewed_collision_candidates = audit.get("reviewed_collision_candidates", [])
+        if reviewed_collision_candidates not in (None, [], {}) and not isinstance(reviewed_collision_candidates, list):
+            errors.append(f"{field_name} audit.reviewed_collision_candidates must be a list when present.")
+            continue
+        reviewed_collision_candidates = (
+            reviewed_collision_candidates if isinstance(reviewed_collision_candidates, list) else []
+        )
+        excluded_feature_prefixes = audit.get("excluded_feature_prefixes", [])
+        if excluded_feature_prefixes not in (None, [], {}) and not isinstance(excluded_feature_prefixes, list):
+            errors.append(f"{field_name} audit.excluded_feature_prefixes must be a list when present.")
+            continue
+        excluded_feature_prefixes = [
+            str(prefix).strip().upper()
+            for prefix in (excluded_feature_prefixes if isinstance(excluded_feature_prefixes, list) else [])
+            if str(prefix).strip()
+        ]
+        excluded_features = audit.get("excluded_features", [])
+        if excluded_features not in (None, [], {}) and not isinstance(excluded_features, list):
+            errors.append(f"{field_name} audit.excluded_features must be a list when present.")
+            continue
+        excluded_features = excluded_features if isinstance(excluded_features, list) else []
 
-            if not audit_reported:
-                sample = audit.get("collision_candidates_sample") if isinstance(audit.get("collision_candidates_sample"), list) else collision_candidates[:5]
-                collision_count = _parse_audit_count("collision_candidate_count", len(collision_candidates))
-                cross_base_collision_count = _parse_audit_count("cross_base_collision_count", collision_count)
-                split_clone_safe_copy_count = _parse_audit_count("split_clone_safe_copy_count", 0)
-                warnings.append(
-                    f"{field_name} recorded locale collision candidates for manual review. "
-                    f"{cross_base_collision_count} cross-base collisions remain after "
-                    f"{split_clone_safe_copy_count} split-clone safe copies. Sample: {sample[:5]!r}."
+        collision_count = _parse_audit_count(audit, "collision_candidate_count", len(collision_candidates))
+        cross_base_collision_count = _parse_audit_count(audit, "cross_base_collision_count", collision_count)
+        split_clone_safe_copy_count = _parse_audit_count(audit, "split_clone_safe_copy_count", 0)
+        reviewed_collision_exception_count = _parse_audit_count(
+            audit,
+            "reviewed_collision_exception_count",
+            len(reviewed_collision_candidates),
+        )
+        excluded_feature_count = _parse_audit_count(audit, "excluded_feature_count", len(excluded_features))
+
+        if collision_count != len(collision_candidates):
+            errors.append(
+                f"{field_name} audit.collision_candidate_count must equal the collision_candidates list length."
+            )
+        if reviewed_collision_exception_count != len(reviewed_collision_candidates):
+            errors.append(
+                f"{field_name} audit.reviewed_collision_exception_count must equal the reviewed_collision_candidates list length."
+            )
+        if excluded_feature_count != len(excluded_features):
+            errors.append(
+                f"{field_name} audit.excluded_feature_count must equal the excluded_features list length."
+            )
+        if excluded_features and not excluded_feature_prefixes:
+            errors.append(
+                f"{field_name} audit.excluded_features requires non-empty excluded_feature_prefixes."
+            )
+        for excluded_row in excluded_features:
+            if not isinstance(excluded_row, dict):
+                errors.append(f"{field_name} audit.excluded_features must only contain objects.")
+                break
+            feature_id = str(excluded_row.get("feature_id") or "").strip().upper()
+            if not feature_id:
+                errors.append(f"{field_name} audit.excluded_features must include feature_id values.")
+                break
+            if excluded_feature_prefixes and not feature_id.startswith(tuple(excluded_feature_prefixes)):
+                errors.append(
+                    f"{field_name} audit.excluded_features may only include ids that match excluded_feature_prefixes. "
+                    f"Offending feature: {feature_id}."
                 )
+                break
+
+        if collision_candidates:
+            if not audit_reported:
+                sample = (
+                    audit.get("collision_candidates_sample")
+                    if isinstance(audit.get("collision_candidates_sample"), list)
+                    else collision_candidates[:5]
+                )
+                message = (
+                    f"{field_name} recorded unresolved locale collision candidates. "
+                    f"{cross_base_collision_count} cross-base collisions remain after "
+                    f"{split_clone_safe_copy_count} split-clone safe copies and "
+                    f"{reviewed_collision_exception_count} reviewed exceptions. Sample: {sample[:5]!r}."
+                )
+                if strict:
+                    errors.append(message)
+                else:
+                    warnings.append(message)
                 if repair_tracks is not None:
                     geo_locale_tracks = repair_tracks.setdefault("geo_locale_collision_candidates", [])
                     if isinstance(geo_locale_tracks, list):
@@ -339,12 +413,11 @@ def validate_locale_patch(
                                 "collision_candidate_count": collision_count,
                                 "cross_base_collision_count": cross_base_collision_count,
                                 "split_clone_safe_copy_count": split_clone_safe_copy_count,
+                                "reviewed_collision_exception_count": reviewed_collision_exception_count,
                                 "sample": sample[:5],
                             }
                         )
                 audit_reported = True
-        elif collision_candidates not in (None, [], {}):
-            errors.append(f"{field_name} audit.collision_candidates must be a list when present.")
 
         suspicious_samples: list[str] = []
         for feature_id, entry in geo_payload.items():
@@ -571,7 +644,7 @@ def inspect_scenario_contract(
     validate_manifest_version_matrix(manifest, errors)
     validate_manifest_urls(expected_scenario_id, manifest, errors)
     validate_runtime_capitals(expected_scenario_id, manifest, errors)
-    validate_locale_patch(expected_scenario_id, manifest, errors, warnings, repair_tracks=repair_tracks)
+    validate_locale_patch(expected_scenario_id, manifest, errors, warnings, strict=strict, repair_tracks=repair_tracks)
     if strict:
         validate_strict_bundle_contract(scenario_dir, errors, repair_tracks=repair_tracks)
     report["status"] = "failed" if errors else "ok"
@@ -643,6 +716,7 @@ def render_repair_track_lines(repair_tracks: dict[str, Any], strict: bool) -> li
                 f"field={entry.get('field_name', '')} "
                 f"remaining={entry.get('cross_base_collision_count', 0)} "
                 f"safe_copies={entry.get('split_clone_safe_copy_count', 0)} "
+                f"reviewed_exceptions={entry.get('reviewed_collision_exception_count', 0)} "
                 f"sample={entry.get('sample', [])[:2]}"
             )
     return lines

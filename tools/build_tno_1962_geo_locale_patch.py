@@ -17,6 +17,7 @@ from map_builder.io.writers import write_json_atomic
 DEFAULT_SCENARIO_ID = "tno_1962"
 DEFAULT_SCENARIO_DIR = ROOT / "data" / "scenarios" / DEFAULT_SCENARIO_ID
 DEFAULT_LOCALES_PATH = ROOT / "data" / "locales.json"
+DEFAULT_REVIEWED_EXCEPTIONS_FILENAME = "geo_locale_reviewed_exceptions.json"
 
 
 def parse_args() -> argparse.Namespace:
@@ -25,6 +26,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--scenario-dir", default=str(DEFAULT_SCENARIO_DIR))
     parser.add_argument("--locales", default=str(DEFAULT_LOCALES_PATH))
     parser.add_argument("--manual-overrides", default="")
+    parser.add_argument("--reviewed-exceptions", default="")
     parser.add_argument("--output", default="")
     return parser.parse_args()
 
@@ -100,12 +102,56 @@ def base_feature_id(feature_id: object) -> str:
     return SPLIT_FEATURE_SUFFIX_RE.sub("", normalized)
 
 
-def build_patch(*, scenario_id: str, scenario_dir: Path, locales_path: Path, manual_overrides_path: Path, output_path: Path) -> dict[str, object]:
+def load_reviewed_exceptions(path: Path, *, expected_scenario_id: str = "") -> dict[str, object]:
+    payload = read_json(path) if path.exists() else {}
+    if not isinstance(payload, dict):
+        return {}
+    reviewed_collision_feature_ids = sorted(
+        {
+            normalize_text(feature_id)
+            for feature_id in payload.get("reviewed_collision_feature_ids", [])
+            if normalize_text(feature_id)
+        }
+    )
+    excluded_feature_prefixes = sorted(
+        {
+            normalize_text(prefix)
+            for prefix in payload.get("excluded_feature_prefixes", [])
+            if normalize_text(prefix)
+        }
+    )
+    scenario_id = normalize_text(payload.get("scenario_id"))
+    if expected_scenario_id and scenario_id and scenario_id != expected_scenario_id:
+        raise ValueError(
+            f"Reviewed geo locale exceptions at {path} must target scenario `{expected_scenario_id}`, "
+            f"found `{scenario_id}`."
+        )
+    return {
+        "version": int(payload.get("version") or 1),
+        "scenario_id": scenario_id,
+        "reviewed_collision_feature_ids": reviewed_collision_feature_ids,
+        "excluded_feature_prefixes": excluded_feature_prefixes,
+    }
+
+
+def build_patch(
+    *,
+    scenario_id: str,
+    scenario_dir: Path,
+    locales_path: Path,
+    manual_overrides_path: Path,
+    reviewed_exceptions_path: Path,
+    output_path: Path,
+) -> dict[str, object]:
     locales_payload = read_json(locales_path)
     base_geo_locales = locales_payload.get("geo", {}) if isinstance(locales_payload, dict) else {}
     topology_payload = read_json(scenario_dir / "runtime_topology.topo.json")
     owners_payload = read_json(scenario_dir / "owners.by_feature.json")
     manual_payload = read_json(manual_overrides_path) if manual_overrides_path.exists() else {}
+    reviewed_exceptions_payload = load_reviewed_exceptions(
+        reviewed_exceptions_path,
+        expected_scenario_id=scenario_id,
+    )
 
     owners_by_feature = owners_payload.get("owners", {}) if isinstance(owners_payload, dict) else {}
     manual_geo_raw = manual_payload.get("geo", {}) if isinstance(manual_payload, dict) else {}
@@ -114,6 +160,10 @@ def build_patch(*, scenario_id: str, scenario_dir: Path, locales_path: Path, man
         for feature_id, raw_entry in manual_geo_raw.items()
         if (locale_entry := normalize_locale_entry(raw_entry))
     }
+    reviewed_collision_feature_ids = set(reviewed_exceptions_payload.get("reviewed_collision_feature_ids", []))
+    excluded_feature_prefixes = tuple(
+        prefix.upper() for prefix in reviewed_exceptions_payload.get("excluded_feature_prefixes", [])
+    )
 
     political_geometries = (
         topology_payload.get("objects", {})
@@ -123,7 +173,9 @@ def build_patch(*, scenario_id: str, scenario_dir: Path, locales_path: Path, man
 
     geo: dict[str, dict[str, str]] = {}
     collision_candidates: list[dict[str, str]] = []
+    reviewed_collision_candidates: list[dict[str, str]] = []
     omitted_features: list[dict[str, str]] = []
+    excluded_features: list[dict[str, str]] = []
     safe_feature_copies = 0
     manual_feature_overrides = 0
     raw_name_feature_ids: dict[str, list[str]] = {}
@@ -159,6 +211,16 @@ def build_patch(*, scenario_id: str, scenario_dir: Path, locales_path: Path, man
         owner_tag = normalize_text(owners_by_feature.get(feature_id)).upper()
         if not feature_id:
             continue
+        if excluded_feature_prefixes and feature_id.upper().startswith(excluded_feature_prefixes):
+            excluded_features.append(
+                {
+                    "feature_id": feature_id,
+                    "owner_tag": owner_tag,
+                    "raw_name": raw_name,
+                    "reason": "reviewed_exception_prefix",
+                }
+            )
+            continue
 
         if feature_id in manual_geo:
             geo[feature_id] = manual_geo[feature_id]
@@ -193,32 +255,36 @@ def build_patch(*, scenario_id: str, scenario_dir: Path, locales_path: Path, man
             continue
 
         if raw_name and locale_zh and locale_en == raw_name and not raw_name_is_unique:
+            collision_row = {
+                "feature_id": feature_id,
+                "owner_tag": owner_tag,
+                "raw_name": raw_name,
+                "locale_en": locale_en,
+                "locale_zh": locale_zh,
+                "reason": "non_unique_raw_name",
+                "matching_feature_ids": ambiguous_group.get("feature_ids", []) if ambiguous_group else [],
+                "matching_base_feature_ids": ambiguous_group.get("base_feature_ids", []) if ambiguous_group else [],
+            }
+            if feature_id in reviewed_collision_feature_ids:
+                reviewed_collision_candidates.append(collision_row)
+                continue
             cross_base_collision_count += 1
-            collision_candidates.append(
-                {
-                    "feature_id": feature_id,
-                    "owner_tag": owner_tag,
-                    "raw_name": raw_name,
-                    "locale_en": locale_en,
-                    "locale_zh": locale_zh,
-                    "reason": "non_unique_raw_name",
-                    "matching_feature_ids": ambiguous_group.get("feature_ids", []) if ambiguous_group else [],
-                    "matching_base_feature_ids": ambiguous_group.get("base_feature_ids", []) if ambiguous_group else [],
-                }
-            )
+            collision_candidates.append(collision_row)
             continue
 
         if raw_name and locale_en and locale_en != raw_name:
-            collision_candidates.append(
-                {
-                    "feature_id": feature_id,
-                    "owner_tag": owner_tag,
-                    "raw_name": raw_name,
-                    "locale_en": locale_en,
-                    "locale_zh": locale_zh,
-                    "reason": "locale_en_mismatch",
-                }
-            )
+            collision_row = {
+                "feature_id": feature_id,
+                "owner_tag": owner_tag,
+                "raw_name": raw_name,
+                "locale_en": locale_en,
+                "locale_zh": locale_zh,
+                "reason": "locale_en_mismatch",
+            }
+            if feature_id in reviewed_collision_feature_ids:
+                reviewed_collision_candidates.append(collision_row)
+                continue
+            collision_candidates.append(collision_row)
             continue
 
         omitted_features.append(
@@ -244,6 +310,8 @@ def build_patch(*, scenario_id: str, scenario_dir: Path, locales_path: Path, man
         "audit": {
             "safe_feature_copies": safe_feature_copies,
             "manual_feature_overrides": manual_feature_overrides,
+            "reviewed_collision_exception_count": len(reviewed_collision_candidates),
+            "excluded_feature_count": len(excluded_features),
             "unique_raw_name_safe_copy_count": unique_raw_name_safe_copies,
             "split_clone_safe_copy_count": split_clone_safe_copies,
             "collision_candidate_count": len(collision_candidates),
@@ -253,8 +321,17 @@ def build_patch(*, scenario_id: str, scenario_dir: Path, locales_path: Path, man
                 "non_unique_raw_name": sum(1 for row in collision_candidates if row.get("reason") == "non_unique_raw_name"),
                 "locale_en_mismatch": sum(1 for row in collision_candidates if row.get("reason") == "locale_en_mismatch"),
             },
+            "reviewed_collision_reason_counts": {
+                "non_unique_raw_name": sum(
+                    1 for row in reviewed_collision_candidates if row.get("reason") == "non_unique_raw_name"
+                ),
+                "locale_en_mismatch": sum(
+                    1 for row in reviewed_collision_candidates if row.get("reason") == "locale_en_mismatch"
+                ),
+            },
             "duplicate_raw_name_count": len(ambiguous_raw_names),
             "ambiguous_raw_name_count": len(cross_base_ambiguous_raw_names),
+            "excluded_feature_prefixes": list(excluded_feature_prefixes),
             "ambiguous_raw_name_sample": [
                 {
                     "raw_name": raw_name,
@@ -269,6 +346,22 @@ def build_patch(*, scenario_id: str, scenario_dir: Path, locales_path: Path, man
             )[:200],
             "collision_candidates": sorted(
                 collision_candidates,
+                key=lambda row: (row.get("owner_tag", ""), row.get("feature_id", "")),
+            ),
+            "reviewed_collision_candidates_sample": sorted(
+                reviewed_collision_candidates,
+                key=lambda row: (row.get("owner_tag", ""), row.get("feature_id", "")),
+            )[:200],
+            "reviewed_collision_candidates": sorted(
+                reviewed_collision_candidates,
+                key=lambda row: (row.get("owner_tag", ""), row.get("feature_id", "")),
+            ),
+            "excluded_features_sample": sorted(
+                excluded_features,
+                key=lambda row: (row.get("owner_tag", ""), row.get("feature_id", "")),
+            )[:200],
+            "excluded_features": sorted(
+                excluded_features,
                 key=lambda row: (row.get("owner_tag", ""), row.get("feature_id", "")),
             ),
             "omitted_features": sorted(
@@ -292,6 +385,11 @@ def main() -> None:
     scenario_dir = Path(args.scenario_dir)
     locales_path = Path(args.locales)
     manual_overrides_path = Path(args.manual_overrides) if args.manual_overrides else scenario_dir / "geo_name_overrides.manual.json"
+    reviewed_exceptions_path = (
+        Path(args.reviewed_exceptions)
+        if args.reviewed_exceptions
+        else scenario_dir / DEFAULT_REVIEWED_EXCEPTIONS_FILENAME
+    )
     output_path = Path(args.output) if args.output else scenario_dir / "geo_locale_patch.json"
 
     payload = build_patch(
@@ -299,15 +397,18 @@ def main() -> None:
         scenario_dir=scenario_dir,
         locales_path=locales_path,
         manual_overrides_path=manual_overrides_path,
+        reviewed_exceptions_path=reviewed_exceptions_path,
         output_path=output_path,
     )
     audit = payload.get("audit", {}) if isinstance(payload, dict) else {}
     print(
         f"[geo-locale-patch] Wrote {output_path} with {len(payload.get('geo', {}))} feature locales "
         f"({audit.get('safe_feature_copies', 0)} safe copies, {audit.get('manual_feature_overrides', 0)} manual overrides, "
+        f"{audit.get('reviewed_collision_exception_count', 0)} reviewed exceptions, "
         f"{audit.get('cross_base_collision_count', len(audit.get('collision_candidates', [])))} cross-base collisions, "
         f"{audit.get('split_clone_safe_copy_count', 0)} split-clone safe copies, "
-        f"{audit.get('omitted_feature_count', len(audit.get('omitted_features', [])))} omitted)."
+        f"{audit.get('omitted_feature_count', len(audit.get('omitted_features', [])))} omitted, "
+        f"{audit.get('excluded_feature_count', 0)} excluded)."
     )
 
 

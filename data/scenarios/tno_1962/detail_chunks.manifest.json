@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "tno_1962",
-  "generated_at": "2026-03-27T19:16:05Z",
+  "generated_at": "2026-03-28T21:25:26Z",
   "chunks": [
     {
       "id": "political.coarse.r0c0",
@@ -4121,7 +4121,7 @@
         72.99702114732112
       ],
       "priority": 95,
-      "feature_count": 1878,
+      "feature_count": 1880,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -4661,13 +4661,13 @@
       "min_zoom": 1.35,
       "max_zoom": 99.0,
       "bounds": [
-        29.74160974160975,
+        46.70518670518672,
         54.85940938070938,
         52.96199296199296,
         59.36039773469771
       ],
       "priority": 95,
-      "feature_count": 72,
+      "feature_count": 70,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [

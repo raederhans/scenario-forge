@@ -45,8 +45,8 @@ jobs:
       - name: Run Python unit tests
         run: python -m unittest discover -s tests -p "test_*.py"
 
-      - name: Run non-strict scenario contract gate
-        run: python tools/check_scenario_contracts.py --scenario-dir data/scenarios/tno_1962
+      - name: Run strict TNO scenario contract gate
+        run: python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/tno_1962 --report-path .runtime/reports/generated/tno_1962.strict_contract_report.json
 
       - name: Run smoke E2E
         run: npm run test:e2e:smoke
