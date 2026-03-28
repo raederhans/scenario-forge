@@ -25,9 +25,7 @@ import {
   loadScenarioRegistry,
   syncScenarioLocalizationState,
 } from "./core/scenario_manager.js";
-import { initSidebar, initPresetState } from "./ui/sidebar.js";
-import { initShortcuts } from "./ui/shortcuts.js";
-import { initToolbar } from "./ui/toolbar.js";
+import { initPresetState } from "./core/preset_state.js";
 import { initTranslations } from "./ui/i18n.js";
 import { initToast } from "./ui/toast.js";
 import { bindBeforeUnload } from "./core/dirty_state.js";
@@ -208,6 +206,8 @@ let bootOverlayBound = false;
 let bootContinueHandler = null;
 let bootProgressAnimationHandle = null;
 let bootProgressPhaseStartedAt = nowMs();
+let milsymbolLoadPromise = null;
+let deferredUiBootstrapPromise = null;
 let postReadyContextWarmupScheduled = false;
 let postReadyHydrationScheduled = false;
 let startupReadonlyUnlockHandle = null;
@@ -343,6 +343,16 @@ function getBootLanguage() {
   return String(state.currentLanguage || "en").trim().toLowerCase().startsWith("zh") ? "zh" : "en";
 }
 
+function getConfiguredDefaultScenarioId() {
+  if (typeof document === "undefined") {
+    return "";
+  }
+  const configured = document
+    .querySelector('meta[name="default-scenario"]')
+    ?.getAttribute("content");
+  return String(configured || "").trim();
+}
+
 function getBootCopy(phase = state.bootPhase) {
   const language = getBootLanguage();
   return BOOT_COPY[language]?.[phase] || BOOT_COPY.en[phase] || BOOT_COPY.en.shell;
@@ -415,6 +425,11 @@ function setStartupReadonlyState(active, { reason = "", unlockInFlight = false }
   syncBootOverlay();
 }
 
+function setBootPreviewVisible(active) {
+  state.bootPreviewVisible = !!active;
+  syncBootOverlay();
+}
+
 function getBootProgressWindow(phase = state.bootPhase) {
   return BOOT_PHASE_WINDOWS[phase] || BOOT_PHASE_WINDOWS.shell;
 }
@@ -470,12 +485,14 @@ function syncBootOverlay() {
   }
   const copy = getBootCopy(state.bootPhase);
   const progress = Math.max(0, Math.min(100, Number(state.bootProgress) || 0));
+  const showPreviewPeek = !!state.bootPreviewVisible && state.bootPhase !== "ready" && state.bootPhase !== "error";
   document.body?.classList.toggle("app-booting", !!state.bootBlocking);
   document.body?.classList.toggle("app-startup-readonly", !!state.startupReadonly);
   if (dom.appShell) {
     dom.appShell.setAttribute("aria-busy", state.bootPhase === "ready" ? "false" : "true");
   }
   dom.overlay.classList.toggle("hidden", state.bootPhase === "ready");
+  dom.overlay.classList.toggle("is-peek", showPreviewPeek);
   dom.overlay.setAttribute("aria-busy", state.bootPhase === "ready" ? "false" : "true");
   if (dom.title) {
     dom.title.textContent = copy.title;
@@ -558,6 +575,9 @@ function setBootState(
   if (phase !== previousPhase) {
     bootProgressPhaseStartedAt = nowMs();
   }
+  if (phase === "ready" || phase === "error") {
+    state.bootPreviewVisible = false;
+  }
   if (progress !== undefined) {
     state.bootProgress = Math.max(0, Math.min(100, Number(progress) || 0));
   } else if (phase === "ready") {
@@ -612,6 +632,13 @@ function checkpointBootMetric(name) {
   return state.bootMetrics[name];
 }
 
+function checkpointBootMetricOnce(name) {
+  if (state.bootMetrics?.[name]) {
+    return state.bootMetrics[name];
+  }
+  return checkpointBootMetric(name);
+}
+
 function logBootMetrics() {
   const summary = Object.entries(state.bootMetrics || {}).reduce((accumulator, [name, metric]) => {
     if (Number.isFinite(metric?.durationMs)) {
@@ -634,6 +661,83 @@ function completeBootSequenceLogging() {
   finishBootMetric("total");
   logBootMetrics();
   console.log("Initial render complete.");
+}
+
+function yieldToMain() {
+  return new Promise((resolve) => {
+    globalThis.setTimeout(resolve, 0);
+  });
+}
+
+function loadDeferredMilsymbol() {
+  if (globalThis.ms?.Symbol) {
+    return Promise.resolve(true);
+  }
+  if (milsymbolLoadPromise) {
+    return milsymbolLoadPromise;
+  }
+  if (typeof document === "undefined") {
+    return Promise.resolve(false);
+  }
+
+  const existingScript = Array.from(document.scripts || []).find((script) => (
+    String(script?.src || "").endsWith("/vendor/milsymbol.js")
+    || String(script?.getAttribute?.("src") || "").trim() === "vendor/milsymbol.js"
+  ));
+  if (existingScript) {
+    milsymbolLoadPromise = new Promise((resolve) => {
+      const finalize = (loaded) => resolve(loaded && !!globalThis.ms?.Symbol);
+      existingScript.addEventListener("load", () => finalize(true), { once: true });
+      existingScript.addEventListener("error", () => finalize(false), { once: true });
+      if (globalThis.ms?.Symbol) {
+        finalize(true);
+      }
+    });
+    return milsymbolLoadPromise;
+  }
+
+  milsymbolLoadPromise = new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = "vendor/milsymbol.js";
+    script.async = true;
+    script.onload = () => resolve(!!globalThis.ms?.Symbol);
+    script.onerror = () => {
+      console.warn("[boot] Failed to load deferred milsymbol renderer.");
+      resolve(false);
+    };
+    document.body?.appendChild(script);
+  });
+  return milsymbolLoadPromise;
+}
+
+function bootstrapDeferredUi(renderApp) {
+  if (deferredUiBootstrapPromise) {
+    return deferredUiBootstrapPromise;
+  }
+  deferredUiBootstrapPromise = (async () => {
+    const [
+      { initToolbar },
+      { initSidebar },
+      { initShortcuts },
+    ] = await Promise.all([
+      import("./ui/toolbar.js"),
+      import("./ui/sidebar.js"),
+      import("./ui/shortcuts.js"),
+    ]);
+    await yieldToMain();
+    initToolbar({ render: renderApp });
+    await yieldToMain();
+    initSidebar({ render: renderApp });
+    await yieldToMain();
+    initScenarioManager({ render: renderApp });
+    initTranslations();
+    initShortcuts();
+    return true;
+  })().catch((error) => {
+    deferredUiBootstrapPromise = null;
+    throw error;
+  });
+  return deferredUiBootstrapPromise;
 }
 
 async function ensureBaseCityDataReady({ reason = "manual", renderNow = true } = {}) {
@@ -1330,14 +1434,15 @@ async function bootstrap() {
   }
 
   hydrateLanguage();
-  initializeBootOverlay();
   resetBootMetrics();
+  state.bootPreviewVisible = false;
   setBootState("shell", {
     progress: BOOT_PHASE_WINDOWS.shell.min,
     canContinueWithoutScenario: false,
   });
   bootContinueHandler = null;
   bootMetricsLogged = false;
+  deferredUiBootstrapPromise = null;
   postReadyContextWarmupScheduled = false;
   postReadyHydrationScheduled = false;
   state.startupInteractionMode = resolveStartupInteractionMode();
@@ -1349,15 +1454,20 @@ async function bootstrap() {
     setBootState("base-data");
     startBootMetric("base-data");
     const d3Client = globalThis.d3;
+    const configuredDefaultScenarioId = getConfiguredDefaultScenarioId();
     const scenarioRegistryPromise = loadScenarioRegistry({ d3Client });
-    const defaultScenarioIdPromise = scenarioRegistryPromise.then((registry) => {
+    const registryDefaultScenarioIdPromise = scenarioRegistryPromise.then((registry) => {
       const defaultScenarioId = String(registry?.default_scenario_id || "").trim();
       if (!defaultScenarioId) {
         throw new Error("Default scenario is not configured in data/scenarios/index.json.");
       }
       return defaultScenarioId;
     });
-    const scenarioBundlePromise = defaultScenarioIdPromise
+    const requestedDefaultScenarioIdPromise = configuredDefaultScenarioId
+      ? Promise.resolve(configuredDefaultScenarioId)
+      : registryDefaultScenarioIdPromise;
+    startBootMetric("scenario-bundle");
+    const scenarioBundlePromise = requestedDefaultScenarioIdPromise
       .then((defaultScenarioId) => loadScenarioBundle(defaultScenarioId, {
         d3Client,
         bundleLevel: "bootstrap",
@@ -1536,9 +1646,12 @@ async function bootstrap() {
       topologyDecodeMs: baseTopologyDecodeMs,
       resourceMetrics: resourceMetrics || {},
     });
-    await scenarioRegistryPromise;
-
-    initPresetState();
+    const registryDefaultScenarioId = await registryDefaultScenarioIdPromise;
+    if (configuredDefaultScenarioId && registryDefaultScenarioId !== configuredDefaultScenarioId) {
+      console.warn(
+        `[boot] Configured default scenario "${configuredDefaultScenarioId}" differs from registry default "${registryDefaultScenarioId}".`
+      );
+    }
     initLongAnimationFrameObserver();
     const startupInteractionLevel = state.startupInteractionMode === "readonly" ? "readonly-startup" : "full";
     initMap({
@@ -1566,14 +1679,15 @@ async function bootstrap() {
       });
 
     initToast();
-    initToolbar({ render: renderApp });
-    initTranslations();
-    initSidebar({ render: renderApp });
-    initScenarioManager({ render: renderApp });
-    initShortcuts();
+    renderDispatcher.flush();
+    checkpointBootMetricOnce("first-visible");
+    checkpointBootMetricOnce("first-visible-base");
+    setBootPreviewVisible(true);
+    initPresetState();
+    void loadDeferredMilsymbol();
+    deferredUiBootstrapPromise = bootstrapDeferredUi(renderApp);
 
     setBootState("scenario-bundle");
-    startBootMetric("scenario-bundle");
     const scenarioBundleResult = await scenarioBundlePromise;
     if (!scenarioBundleResult.ok) {
       throw scenarioBundleResult.error;
@@ -1598,6 +1712,7 @@ async function bootstrap() {
         },
     });
 
+    await deferredUiBootstrapPromise;
     setBootState("scenario-apply");
     startBootMetric("scenario-apply");
     await applyScenarioBundle(defaultScenarioBundle, {
@@ -1613,7 +1728,7 @@ async function bootstrap() {
 
     setBootState("warmup");
     renderDispatcher.flush();
-    checkpointBootMetric("first-visible");
+    checkpointBootMetricOnce("first-visible-scenario");
     finalizeReadyState(renderDispatcher);
   } catch (error) {
     finishBootMetric("total", { failed: true });
@@ -1625,6 +1740,9 @@ async function bootstrap() {
       && !!renderDispatcher?.flush;
     bootContinueHandler = canContinueWithoutScenario
       ? async () => {
+        if (deferredUiBootstrapPromise) {
+          await deferredUiBootstrapPromise;
+        }
         setBootState("warmup", {
           message: getBootLanguage() === "zh"
             ? "正在以基础地图模式继续。"
@@ -1632,7 +1750,8 @@ async function bootstrap() {
           canContinueWithoutScenario: false,
         });
         renderDispatcher.flush();
-        checkpointBootMetric("first-visible");
+        checkpointBootMetricOnce("first-visible");
+        checkpointBootMetricOnce("first-visible-base");
         finalizeReadyState(renderDispatcher);
       }
       : null;

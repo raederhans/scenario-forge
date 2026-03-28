@@ -3,9 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="default-scenario" content="tno_1962" />
     <title data-i18n="Map Creator">Map Creator</title>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="modulepreload" href="js/main.js" />
+    <link rel="preload" href="data/europe_topology.json" as="fetch" crossorigin />
+    <link rel="preload" href="data/locales.startup.json" as="fetch" crossorigin />
+    <link rel="preload" href="data/geo_aliases.startup.json" as="fetch" crossorigin />
+    <link rel="preload" href="data/scenarios/index.json" as="fetch" crossorigin />
+    <link rel="preload" href="data/scenarios/tno_1962/manifest.json" as="fetch" crossorigin />
   </head>
   <body class="app-booting">
     <div id="appShell" class="app-layout">
@@ -1855,7 +1861,6 @@
 
     <script src="vendor/d3.v7.min.js"></script>
     <script src="vendor/topojson-client.min.js"></script>
-    <script src="vendor/milsymbol.js"></script>
     <script type="module" src="js/main.js"></script>
   </body>
 </html>

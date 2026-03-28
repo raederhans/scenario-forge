@@ -9,6 +9,10 @@ import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 const FEATURE_MIGRATION_URLS = ["data/feature-migrations/by_hybrid_v1.json"];
 let featureMigrationMapPromise = null;
 
+function markLegacyColorStateDirty() {
+  state.legacyColorStateDirty = true;
+}
+
 function normalizeOwnerCode(rawCode) {
   return normalizeCountryCodeAlias(rawCode);
 }
@@ -74,6 +78,9 @@ function seedSovereigntyFromLandData(featureCollection) {
 }
 
 function migrateLegacyColorState() {
+  if (state.legacyColorStateDirty === false) {
+    return;
+  }
   state.sovereignBaseColors = {
     ...(state.countryBaseColors || {}),
     ...(state.sovereignBaseColors || {}),
@@ -82,6 +89,7 @@ function migrateLegacyColorState() {
     ...(state.featureOverrides || {}),
     ...(state.visualOverrides || {}),
   };
+  state.legacyColorStateDirty = false;
 }
 
 function ensureOwnerIndexMaps() {
@@ -425,6 +433,7 @@ export {
   resetFeatureOwnerCodes,
   resetAllFeatureOwnersToCanonical,
   getFeatureIdsForOwner,
+  markLegacyColorStateDirty,
   migrateLegacyColorState,
   migrateImportedProjectData,
   migrateFeatureScopedProjectDataToCurrentTopology,

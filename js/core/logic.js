@@ -4,6 +4,7 @@ import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import { syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { refreshColorState, refreshResolvedColorsForOwners } from "./map_renderer.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
+import { markLegacyColorStateDirty } from "./sovereignty_manager.js";
 
 function normalizeCountryCode(rawCode) {
   return normalizeCountryCodeAlias(rawCode);
@@ -28,6 +29,7 @@ function applyCountryColor(code, color) {
   state.countryPalette[target] = color;
   state.sovereignBaseColors[target] = color;
   state.countryBaseColors[target] = color;
+  markLegacyColorStateDirty();
   refreshResolvedColorsForOwners([target], { renderNow: true });
   pushHistoryEntry({
     kind: "inspector-country-color",
@@ -68,6 +70,7 @@ function resetCountryColors() {
   state.colors = {};
   state.visualOverrides = {};
   state.featureOverrides = {};
+  markLegacyColorStateDirty();
   refreshColorState({ renderNow: true });
   pushHistoryEntry({
     kind: "reset-country-colors",
@@ -93,6 +96,9 @@ function applyPaletteToMap() {
       state.countryBaseColors[code] = color;
       touchedOwners.add(code);
     }
+  }
+  if (touchedOwners.size > 0) {
+    markLegacyColorStateDirty();
   }
   refreshResolvedColorsForOwners([...touchedOwners], { renderNow: true });
 }

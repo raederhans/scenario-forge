@@ -39,6 +39,7 @@ import {
   ensureSovereigntyState,
   getFeatureOwnerCode,
   getFeatureIdsForOwner,
+  markLegacyColorStateDirty,
   migrateLegacyColorState,
   setFeatureOwnerCodes,
   resetFeatureOwnerCodes,
@@ -16519,6 +16520,7 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
   state.featureOverrides = {};
   state.sovereignBaseColors = sanitizeCountryColorMap(nextCountryBaseColors);
   state.countryBaseColors = { ...state.sovereignBaseColors };
+  markLegacyColorStateDirty();
   if (styleUpdates && typeof styleUpdates === "object") {
     Object.entries(styleUpdates).forEach(([path, value]) => {
       const segments = String(path || "").split(".").filter(Boolean);
@@ -17876,6 +17878,7 @@ function eraseVisualOverridesForIds(targetIds, { kind, dirtyReason } = {}) {
     delete state.visualOverrides[targetId];
     delete state.featureOverrides[targetId];
   });
+  markLegacyColorStateDirty();
   refreshResolvedColorsForFeatures(resolvedIds, { renderNow: false });
   markDirty(dirtyReason || kind || "erase-feature-color");
   commitHistoryEntry({
@@ -18253,6 +18256,7 @@ function applyVisualSubdivisionFill(targetIds, selectedColor, { kind = "fill-fea
     state.visualOverrides[targetId] = color;
     state.featureOverrides[targetId] = color;
   });
+  markLegacyColorStateDirty();
   refreshResolvedColorsForFeatures(resolvedIds, { renderNow: false });
   markDirty(dirtyReason);
   commitHistoryEntry({
@@ -18449,6 +18453,7 @@ function applyBrushHit(hit) {
       brushSession.affectedOwnerCodes.add(countryCode);
       delete state.sovereignBaseColors[countryCode];
       delete state.countryBaseColors[countryCode];
+      markLegacyColorStateDirty();
       refreshResolvedColorsForOwners([countryCode], { renderNow: false });
       brushSession.changed = true;
       return true;
@@ -18462,6 +18467,7 @@ function applyBrushHit(hit) {
       delete state.visualOverrides[targetId];
       delete state.featureOverrides[targetId];
     });
+    markLegacyColorStateDirty();
     refreshResolvedColorsForFeatures(freshIds, { renderNow: false });
     brushSession.changed = true;
     return true;
@@ -18490,6 +18496,7 @@ function applyBrushHit(hit) {
     brushSession.affectedOwnerCodes.add(countryCode);
     state.sovereignBaseColors[countryCode] = selectedColor;
     state.countryBaseColors[countryCode] = selectedColor;
+    markLegacyColorStateDirty();
     refreshResolvedColorsForOwners([countryCode], { renderNow: false });
     brushSession.changed = true;
     return true;
@@ -18504,6 +18511,7 @@ function applyBrushHit(hit) {
     state.visualOverrides[targetId] = selectedColor;
     state.featureOverrides[targetId] = selectedColor;
   });
+  markLegacyColorStateDirty();
   refreshResolvedColorsForFeatures(freshIds, { renderNow: false });
   brushSession.changed = true;
   return true;
@@ -18815,6 +18823,7 @@ async function handleClick(event) {
       });
       delete state.sovereignBaseColors[countryCode];
       delete state.countryBaseColors[countryCode];
+      markLegacyColorStateDirty();
       refreshResolvedColorsForOwners([countryCode], { renderNow: false });
       markDirty("erase-country-color");
       commitHistoryEntry({
@@ -18832,6 +18841,7 @@ async function handleClick(event) {
         delete state.visualOverrides[targetId];
         delete state.featureOverrides[targetId];
       });
+      markLegacyColorStateDirty();
       refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
       markDirty("erase-feature-color");
       commitHistoryEntry({
@@ -18921,6 +18931,7 @@ async function handleClick(event) {
     });
     state.sovereignBaseColors[countryCode] = selectedColor;
     state.countryBaseColors[countryCode] = selectedColor;
+    markLegacyColorStateDirty();
     refreshResolvedColorsForOwners([countryCode], { renderNow: false });
     markDirty("fill-country-color");
     commitHistoryEntry({

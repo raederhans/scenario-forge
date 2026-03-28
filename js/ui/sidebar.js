@@ -2,7 +2,6 @@
 import {
   state,
   countryNames,
-  PRESET_STORAGE_KEY,
   defaultCountryPalette,
   normalizeCityLayerStyleConfig,
   normalizeDayNightStyleConfig,
@@ -35,6 +34,7 @@ import { initDevWorkspace } from "./dev_workspace.js";
 import {
   setFeatureOwnerCodes,
   ensureSovereigntyState,
+  markLegacyColorStateDirty,
   migrateFeatureScopedProjectDataToCurrentTopology,
 } from "../core/sovereignty_manager.js";
 import { markDirty } from "../core/dirty_state.js";
@@ -298,23 +298,6 @@ function ensureCountryPaletteColor(code, fallbackIndex = 0) {
     ColorManager.getPoliticalFallbackColor(normalizedCode, fallbackIndex) || "#cccccc";
   state.countryPalette[normalizedCode] = generated;
   return generated;
-}
-
-function loadCustomPresets() {
-  try {
-    const raw = localStorage.getItem(PRESET_STORAGE_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === "object" ? parsed : {};
-  } catch (error) {
-    console.warn("Unable to load custom presets:", error);
-    return {};
-  }
-}
-
-function initPresetState() {
-  state.customPresets = loadCustomPresets();
-  rebuildPresetState();
 }
 
 function getScenarioCountryMeta(entryOrCode) {
@@ -753,6 +736,7 @@ function applyVisualOverridesToFeatureIds(
     state.visualOverrides[id] = colorToApply;
     state.featureOverrides[id] = colorToApply;
   });
+  markLegacyColorStateDirty();
   mapRenderer.refreshResolvedColorsForFeatures(normalizedTargetIds, { renderNow: false });
   if (render) render();
   if (addToRecent) {
@@ -824,6 +808,7 @@ function clearVisualOverridesForFeatureIds(
     delete state.visualOverrides[id];
     delete state.featureOverrides[id];
   });
+  markLegacyColorStateDirty();
   mapRenderer.refreshResolvedColorsForFeatures(changedIds, { renderNow: false });
   if (render) render();
   markDirty(dirtyReason);
@@ -8758,6 +8743,7 @@ function initSidebar({ render } = {}) {
         state.countryBaseColors = { ...state.sovereignBaseColors };
         state.visualOverrides = data.visualOverrides || data.featureOverrides || {};
         state.featureOverrides = { ...state.visualOverrides };
+        markLegacyColorStateDirty();
         state.waterRegionOverrides = data.waterRegionOverrides || {};
         state.specialRegionOverrides = data.specialRegionOverrides || {};
         state.sovereigntyByFeatureId = data.sovereigntyByFeatureId || {};
@@ -9180,4 +9166,4 @@ function initSidebar({ render } = {}) {
   scheduleAdaptiveInspectorHeights();
 }
 
-export { initSidebar, initPresetState };
+export { initSidebar };

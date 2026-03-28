@@ -42,7 +42,7 @@ import {
 } from "../core/palette_manager.js";
 import { ensureActiveScenarioOptionalLayerLoaded, resetToScenarioBaseline } from "../core/scenario_manager.js";
 import { toggleLanguage, updateUIText, t } from "./i18n.js";
-import { resetAllFeatureOwnersToCanonical } from "../core/sovereignty_manager.js";
+import { markLegacyColorStateDirty, resetAllFeatureOwnersToCanonical } from "../core/sovereignty_manager.js";
 import { showToast } from "./toast.js";
 import { showAppDialog } from "./app_dialog.js";
 import { markDirty, updateDirtyIndicator } from "../core/dirty_state.js";
@@ -4009,6 +4009,7 @@ function initToolbar({ render } = {}) {
         state.featureOverrides = {};
         state.countryBaseColors = {};
         state.sovereignBaseColors = {};
+        markLegacyColorStateDirty();
       }
       refreshColorState({ renderNow: true });
       refreshActiveSovereignLabel();

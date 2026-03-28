@@ -1,7 +1,7 @@
 import { state } from "../core/state.js";
 import * as mapRenderer from "../core/map_renderer.js";
 import { recalculateScenarioOwnerControllerDiffCount, syncScenarioLocalizationState } from "../core/scenario_manager.js";
-import { getFeatureOwnerCode } from "../core/sovereignty_manager.js";
+import { getFeatureOwnerCode, markLegacyColorStateDirty } from "../core/sovereignty_manager.js";
 import {
   applyOwnerControllerAssignmentsToFeatureIds,
   applyOwnerToFeatureIds,
@@ -1034,6 +1034,7 @@ function upsertScenarioCountryRuntimeEntry(tag, entry) {
       ...(state.countryBaseColors || {}),
       [normalizedTag]: colorHex,
     };
+    markLegacyColorStateDirty();
   }
   syncActiveScenarioBundleCountryEntry(normalizedTag, nextEntry);
   return nextEntry;

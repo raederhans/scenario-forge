@@ -1,5 +1,5 @@
 ﻿import { countryNames, defaultCountryPalette, state } from "./state.js";
-import { ensureSovereigntyState } from "./sovereignty_manager.js";
+import { ensureSovereigntyState, markLegacyColorStateDirty } from "./sovereignty_manager.js";
 import { normalizeMapSemanticMode } from "./state.js";
 import {
   recomputeDynamicBordersNow,
@@ -63,6 +63,7 @@ const SCENARIO_DETAIL_SOURCE_FALLBACK_ORDER = ["na_v2", "na_v1", "legacy_bak", "
 const SCENARIO_FATAL_RECOVERY_CODE = "SCENARIO_FATAL_RECOVERY";
 const SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING = 180;
 const SCENARIO_CHUNK_REFRESH_DELAY_MS_IDLE = 60;
+let scenarioRegistryPromise = null;
 const SCENARIO_OPTIONAL_LAYER_CONFIGS = {
   water: {
     bundleField: "waterRegionsPayload",
@@ -1054,14 +1055,24 @@ async function loadScenarioRegistry({ d3Client = globalThis.d3 } = {}) {
   if (state.scenarioRegistry) {
     return state.scenarioRegistry;
   }
+  if (scenarioRegistryPromise) {
+    return scenarioRegistryPromise;
+  }
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available for scenario registry loading.");
   }
-  const registry = await loadScenarioJsonWithTimeout(d3Client, SCENARIO_REGISTRY_URL, {
+  scenarioRegistryPromise = loadScenarioJsonWithTimeout(d3Client, SCENARIO_REGISTRY_URL, {
     resourceLabel: "scenario_registry",
-  });
-  state.scenarioRegistry = registry || { version: 1, default_scenario_id: "", scenarios: [] };
-  return state.scenarioRegistry;
+  })
+    .then((registry) => {
+      state.scenarioRegistry = registry || { version: 1, default_scenario_id: "", scenarios: [] };
+      return state.scenarioRegistry;
+    })
+    .catch((error) => {
+      scenarioRegistryPromise = null;
+      throw error;
+    });
+  return scenarioRegistryPromise;
 }
 
 function getScenarioMetaById(scenarioId) {
@@ -3496,6 +3507,7 @@ function restoreScenarioApplyRollbackSnapshot(snapshot, { renderNow = false } = 
   state.featureOverrides = cloneScenarioStateValue(snapshot.featureOverrides);
   state.sovereignBaseColors = cloneScenarioStateValue(snapshot.sovereignBaseColors);
   state.countryBaseColors = cloneScenarioStateValue(snapshot.countryBaseColors);
+  markLegacyColorStateDirty();
   state.activeSovereignCode = String(snapshot.activeSovereignCode || "");
   state.selectedWaterRegionId = String(snapshot.selectedWaterRegionId || "");
   state.selectedSpecialRegionId = String(snapshot.selectedSpecialRegionId || "");
@@ -3851,6 +3863,7 @@ async function applyScenarioBundle(
     state.featureOverrides = {};
     state.sovereignBaseColors = { ...staged.scenarioColorMap };
     state.countryBaseColors = { ...staged.scenarioColorMap };
+    markLegacyColorStateDirty();
     state.activeSovereignCode = staged.mapSemanticMode === "blank" ? "" : staged.defaultCountryCode;
     state.selectedWaterRegionId = "";
     state.selectedSpecialRegionId = "";
@@ -4116,6 +4129,7 @@ function resetToScenarioBaseline(
   state.featureOverrides = {};
   state.sovereignBaseColors = { ...(state.scenarioFixedOwnerColors || {}) };
   state.countryBaseColors = { ...state.sovereignBaseColors };
+  markLegacyColorStateDirty();
   state.activeSovereignCode = state.mapSemanticMode === "blank"
     ? ""
     : (
@@ -4248,6 +4262,7 @@ function clearActiveScenario(
   const defaults = syncResolvedDefaultCountryPalette({ overwriteCountryPalette: false });
   state.sovereignBaseColors = { ...(defaults || state.resolvedDefaultCountryPalette || defaultCountryPalette) };
   state.countryBaseColors = { ...state.sovereignBaseColors };
+  markLegacyColorStateDirty();
   state.activeSovereignCode = "";
   syncScenarioInspectorSelection("");
   restoreParentBordersAfterScenario();

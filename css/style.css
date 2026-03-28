@@ -140,6 +140,16 @@ body.app-startup-readonly #mapOnboardingHint {
   visibility: hidden;
 }
 
+.boot-overlay.is-peek {
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 18px;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0) 28%),
+    rgba(231, 237, 242, 0.14);
+  backdrop-filter: blur(4px);
+}
+
 .boot-overlay__panel {
   width: min(440px, 100%);
   padding: 28px 30px 24px;
@@ -147,6 +157,14 @@ body.app-startup-readonly #mapOnboardingHint {
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 24px 48px rgba(15, 23, 42, 0.12);
+}
+
+.boot-overlay.is-peek .boot-overlay__panel {
+  width: min(360px, calc(100vw - 36px));
+  padding: 18px 20px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.1);
 }
 
 .boot-overlay__eyebrow {
@@ -158,6 +176,11 @@ body.app-startup-readonly #mapOnboardingHint {
   color: var(--color-map-accent);
 }
 
+.boot-overlay.is-peek .boot-overlay__eyebrow {
+  margin-bottom: 6px;
+  font-size: 0.68rem;
+}
+
 .boot-overlay__title {
   margin: 0;
   font-size: 1.4rem;
@@ -166,11 +189,21 @@ body.app-startup-readonly #mapOnboardingHint {
   color: var(--text-primary);
 }
 
+.boot-overlay.is-peek .boot-overlay__title {
+  font-size: 1.02rem;
+}
+
 .boot-overlay__message {
   margin: 12px 0 0;
   font-size: 0.97rem;
   line-height: 1.65;
   color: var(--text-secondary);
+}
+
+.boot-overlay.is-peek .boot-overlay__message {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  line-height: 1.5;
 }
 
 .boot-overlay__progress {
@@ -181,6 +214,11 @@ body.app-startup-readonly #mapOnboardingHint {
   overflow: hidden;
   border-radius: 999px;
   background: rgba(22, 35, 51, 0.08);
+}
+
+.boot-overlay.is-peek .boot-overlay__progress {
+  margin-top: 14px;
+  height: 8px;
 }
 
 .boot-overlay__progress-bar {
@@ -196,6 +234,11 @@ body.app-startup-readonly #mapOnboardingHint {
   font-size: 0.86rem;
   font-weight: 600;
   color: var(--text-secondary);
+}
+
+.boot-overlay.is-peek .boot-overlay__progress-text {
+  margin-top: 8px;
+  font-size: 0.78rem;
 }
 
 .boot-overlay__actions {

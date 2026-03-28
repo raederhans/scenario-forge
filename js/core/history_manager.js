@@ -1,5 +1,5 @@
 import { state } from "./state.js";
-import { rebuildOwnerIndex } from "./sovereignty_manager.js";
+import { markLegacyColorStateDirty, rebuildOwnerIndex } from "./sovereignty_manager.js";
 import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_manager.js";
 
 function uniqueKeys(values) {
@@ -248,6 +248,14 @@ function applyHistorySnapshot(snapshot, direction, entry) {
   applyEntries(state.countryPalette, snapshot.countryPalette);
   applyEntries(state.sovereigntyByFeatureId, snapshot.sovereigntyByFeatureId);
   applyEntries(state.scenarioControllersByFeatureId, snapshot.scenarioControllersByFeatureId);
+  if (
+    snapshot.visualOverrides
+    || snapshot.featureOverrides
+    || snapshot.sovereignBaseColors
+    || snapshot.countryBaseColors
+  ) {
+    markLegacyColorStateDirty();
+  }
   applyStyleSnapshot(snapshot.styleConfig);
   if (snapshot.annotationView && typeof snapshot.annotationView === "object") {
     state.annotationView = cloneStructuredValue(snapshot.annotationView);
