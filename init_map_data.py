@@ -81,6 +81,7 @@ else:  # pragma: no cover - palettes mode does not touch GIS stack
     unary_union = None
 
 from map_builder import config as cfg
+from map_builder.contracts import DATA_ARTIFACT_SPECS_BY_PATH
 
 if REQUESTED_MODE != "palettes":
     from map_builder.cities import (
@@ -2904,36 +2905,6 @@ def _validate_dependent_hoi4_assets(
 
 
 def write_data_manifest(output_dir: Path) -> Path:
-    roles = {
-        "europe_topology.json": "primary_topology",
-        "europe_topology.na_v1.json": "detail_topology_na_v1",
-        "europe_topology.na_v2.json": "detail_topology_na_v2",
-        "europe_topology.runtime_political_v1.json": "runtime_political_topology",
-        "global_physical_semantics.topo.json": "physical_semantics_topology",
-        "global_contours.major.topo.json": "terrain_contours_major_topology",
-        "global_contours.minor.topo.json": "terrain_contours_minor_topology",
-        "hierarchy.json": "hierarchy",
-        "geo_aliases.json": "geo_aliases",
-        "world_cities.geojson": "world_cities",
-        "city_aliases.json": "city_aliases",
-        "locales.json": "locales",
-        "palettes/index.json": "palette_registry",
-        "palettes/hoi4_vanilla.palette.json": "palette_pack",
-        "palettes/kaiserreich.palette.json": "palette_pack",
-        "palettes/tno.palette.json": "palette_pack",
-        "palettes/red_flood.palette.json": "palette_pack",
-        "palette-maps/hoi4_vanilla.map.json": "palette_map",
-        "palette-maps/kaiserreich.map.json": "palette_map",
-        "palette-maps/tno.map.json": "palette_map",
-        "palette-maps/red_flood.map.json": "palette_map",
-        "palette-maps/hoi4_vanilla.audit.json": "palette_audit",
-        "palette-maps/kaiserreich.audit.json": "palette_audit",
-        "palette-maps/tno.audit.json": "palette_audit",
-        "palette-maps/red_flood.audit.json": "palette_audit",
-        "js/core/city_lights_modern_asset.js": "modern_city_lights_asset",
-        "js/core/city_lights_historical_1930_asset.js": "historical_1930_city_lights_asset",
-    }
-
     def resolve_manifest_path(file_name: str) -> Path:
         if file_name.startswith("js/"):
             return PROJECT_ROOT / file_name
@@ -2989,12 +2960,15 @@ def write_data_manifest(output_dir: Path) -> Path:
         return float(raw_value) if "." in raw_value else int(raw_value)
 
     outputs: dict[str, dict] = {}
-    for file_name, role in roles.items():
+    for file_name, artifact_spec in DATA_ARTIFACT_SPECS_BY_PATH.items():
         path = resolve_manifest_path(file_name)
         if not path.exists():
             continue
         item: dict[str, object] = {
-            "role": role,
+            "role": artifact_spec.role,
+            "artifact_class": artifact_spec.artifact_class,
+            "owner": artifact_spec.owner,
+            "description": artifact_spec.description,
             "size_bytes": path.stat().st_size,
             "sha256": _sha256_file(path),
         }

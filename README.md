@@ -43,10 +43,14 @@
 
 - `package.json` is the source of truth for the Playwright-based browser inspection and regression test toolchain.
 - Run `npm install` at repo root to restore `playwright` and `@playwright/test` from scratch.
+- By default, Playwright now owns the test server lifecycle through `playwright.config.cjs`. If `MAPCREATOR_BASE_URL` or `PLAYWRIGHT_TEST_BASE_URL` is set, Playwright will target that existing server instead of starting its own.
+- Local runs reuse an already-running dev server when possible. CI starts its own isolated server and waits for the configured base URL.
 - Run `npm run test:e2e` for the full suite, or use the targeted scripts:
+  - `npm run test:e2e:smoke`
   - `npm run test:e2e:project-save-load`
   - `npm run test:e2e:scenario-resilience`
 - Run `npm run playwright:install` if Playwright asks for browser binaries on a fresh machine.
+- Run `npm run playwright:install:chromium` for CI-style smoke validation.
 - The project-level browser MCP helpers now prefer the repo-local `node_modules/playwright/cli.js` before falling back to npm cache or `npx`.
 
 ## Runtime Output Policy

@@ -1,8 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-const { test, expect } = require('@playwright/test');
+const fs = require("fs");
+const path = require("path");
+const { test, expect } = require("@playwright/test");
+const { getAppUrl } = require("./support/playwright-app");
 
-const APP_URL = 'http://127.0.0.1:18080';
+const APP_URL = getAppUrl();
 
 const SAMPLE_POINTS = [
   { id: 'volgograd', lon: 44.515, lat: 48.708 },

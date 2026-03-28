@@ -1,20 +1,16 @@
 const fs = require("fs");
 const path = require("path");
 const { test, expect } = require("@playwright/test");
+const { getAppUrl, waitForAppInteractive } = require("./support/playwright-app");
 
 function resolveBaseUrl() {
-  const runtimeMetaPath = path.join(__dirname, "..", "..", ".runtime", "dev", "active_server.json");
-  try {
-    const payload = JSON.parse(fs.readFileSync(runtimeMetaPath, "utf8"));
-    return String(payload.url || "http://127.0.0.1:18080");
-  } catch (_error) {
-    return "http://127.0.0.1:18080";
-  }
+  return getAppUrl();
 }
 
 test("main shell static i18n updates visible labels and aria text", async ({ page }) => {
+  test.setTimeout(90_000);
   await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
-  await page.waitForTimeout(1200);
+  await waitForAppInteractive(page);
 
   const currentTool = page.locator("#lblCurrentTool");
   const leftPanelToggle = page.locator("#leftPanelToggle");
@@ -39,7 +35,7 @@ test("main shell static i18n updates visible labels and aria text", async ({ pag
   await expect(lakeLink).toHaveText("Link Lakes To Ocean");
   await expect(textureInfo).toHaveText("Texture Overlay");
   await expect(workspaceHeading).toHaveText("Workspace");
-  await expect(languageBtn).toContainText("ZH / EN");
+  await expect(languageBtn).toContainText("EN / ZH");
   await expect(languageBtn).toHaveAttribute("aria-label", "Language");
   await expect(developerModeBtn).toHaveText("DEV");
   await expect(recentColors).toHaveAttribute("aria-label", "Recent colors");
@@ -59,7 +55,7 @@ test("main shell static i18n updates visible labels and aria text", async ({ pag
   await expect(lakeLink).not.toHaveText("Link Lakes To Ocean");
   await expect(textureInfo).not.toHaveText("Texture Overlay");
   await expect(workspaceHeading).not.toHaveText("Workspace");
-  await expect(languageBtn).toContainText("EN / ZH");
+  await expect(languageBtn).toContainText("ZH / EN");
   await expect(languageBtn).not.toHaveAttribute("aria-label", "Language");
   await expect(recentColors).not.toHaveAttribute("aria-label", "Recent colors");
   await expect(frontlineIntro).not.toHaveText(

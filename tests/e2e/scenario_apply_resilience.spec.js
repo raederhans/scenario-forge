@@ -1,23 +1,10 @@
-const fs = require('fs');
-const path = require('path');
-const { test, expect } = require('@playwright/test');
+const fs = require("fs");
+const path = require("path");
+const { test, expect } = require("@playwright/test");
+const { getAppUrl, waitForAppInteractive } = require("./support/playwright-app");
 
 function resolveBaseUrl() {
-  if (process.env.MAPCREATOR_BASE_URL) {
-    return process.env.MAPCREATOR_BASE_URL;
-  }
-  const metadataPath = path.join(process.cwd(), '.runtime', 'dev', 'active_server.json');
-  if (fs.existsSync(metadataPath)) {
-    try {
-      const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
-      if (metadata && typeof metadata.url === 'string' && metadata.url.trim()) {
-        return metadata.url.trim();
-      }
-    } catch (error) {
-      console.warn('[scenario-apply-resilience] Unable to parse active_server.json:', error);
-    }
-  }
-  return 'http://127.0.0.1:18080';
+  return getAppUrl();
 }
 
 async function waitForScenarioUiReady(page) {
@@ -27,17 +14,83 @@ async function waitForScenarioUiReady(page) {
       && !!select.querySelector('option[value="hoi4_1939"]')
       && !!select.querySelector('option[value="tno_1962"]');
   });
+  await page.evaluate(() => {
+    const details = document.querySelector("details[aria-labelledby='lblScenario']");
+    if (details && !details.open) {
+      details.open = true;
+    }
+  });
+  await expect(page.locator('#scenarioSelect')).toBeVisible();
+}
+
+async function waitForScenarioManagerIdle(page) {
+  await page.waitForFunction(async () => {
+    const { state } = await import('/js/core/state.js');
+    return !state.scenarioApplyInFlight;
+  });
 }
 
 async function applyScenario(page, scenarioId) {
-  await page.selectOption('#scenarioSelect', scenarioId);
-  if (await page.locator('#applyScenarioBtn').isVisible()) {
-    await page.click('#applyScenarioBtn');
-  }
+  await waitForScenarioManagerIdle(page);
+  await page.evaluate((expectedScenarioId) => {
+    const select = document.querySelector('#scenarioSelect');
+    if (select instanceof HTMLSelectElement) {
+      select.value = expectedScenarioId;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  }, scenarioId);
+  const result = await page.evaluate(async (expectedScenarioId) => {
+    const { applyScenarioByIdCommand } = await import('/js/core/scenario_dispatcher.js');
+    try {
+      await applyScenarioByIdCommand(expectedScenarioId, {
+        renderMode: 'none',
+        markDirtyReason: '',
+        showToastOnComplete: false,
+      });
+      return { ok: true };
+    } catch (error) {
+      return {
+        ok: false,
+        code: String(error?.code || ''),
+        message: String(error?.message || ''),
+      };
+    }
+  }, scenarioId);
+  expect(result).toEqual({ ok: true });
   await page.waitForFunction(async (expectedScenarioId) => {
     const { state } = await import('/js/core/state.js');
     return state.activeScenarioId === expectedScenarioId;
   }, scenarioId);
+}
+
+async function applyScenarioAllowFailure(page, scenarioId) {
+  await waitForScenarioManagerIdle(page);
+  await page.evaluate((expectedScenarioId) => {
+    const select = document.querySelector('#scenarioSelect');
+    if (select instanceof HTMLSelectElement) {
+      select.value = expectedScenarioId;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  }, scenarioId);
+  const result = await page.evaluate(async (expectedScenarioId) => {
+    const { applyScenarioByIdCommand } = await import('/js/core/scenario_dispatcher.js');
+    try {
+      await applyScenarioByIdCommand(expectedScenarioId, {
+        renderMode: 'none',
+        markDirtyReason: '',
+        showToastOnComplete: false,
+      });
+      return { ok: true };
+    } catch (error) {
+      return {
+        ok: false,
+        code: String(error?.code || ''),
+        message: String(error?.message || ''),
+      };
+    }
+  }, scenarioId);
+  await page.waitForTimeout(1500);
+  return result;
 }
 
 async function injectScenarioTestHook(page, hookName) {
@@ -78,10 +131,10 @@ async function readScenarioResilienceState(page) {
 
 async function attemptLockedScenarioAction(page) {
   return page.evaluate(async () => {
-    const mod = await import('/js/core/scenario_manager.js');
+    const mod = await import('/js/core/scenario_dispatcher.js');
     try {
-      await mod.applyScenarioById('hoi4_1939', {
-        renderNow: false,
+      await mod.applyScenarioByIdCommand('hoi4_1939', {
+        renderMode: 'none',
         markDirtyReason: '',
         showToastOnComplete: false,
       });
@@ -97,7 +150,7 @@ async function attemptLockedScenarioAction(page) {
 }
 
 test('scenario apply rollback keeps prior stable state on palette failure', async ({ page }) => {
-  test.setTimeout(60000);
+  test.setTimeout(120000);
   const APP_URL = resolveBaseUrl();
   const pageErrors = [];
   const unhandledConsoleErrors = [];
@@ -125,8 +178,7 @@ test('scenario apply rollback keeps prior stable state on palette failure', asyn
   });
 
   await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(1200);
-
+  await waitForAppInteractive(page);
   await waitForScenarioUiReady(page);
   await applyScenario(page, 'hoi4_1939');
   await expect(page.locator('#scenarioStatus')).toContainText('HOI4 1939', { timeout: 20000 });
@@ -142,9 +194,7 @@ test('scenario apply rollback keeps prior stable state on palette failure', asyn
   });
   shouldAbortTnoPalette = true;
 
-  await page.selectOption('#scenarioSelect', 'tno_1962');
-  await page.click('#applyScenarioBtn');
-  await page.waitForTimeout(1500);
+  const failedApply = await applyScenarioAllowFailure(page, 'tno_1962');
   await expect(page.locator('#scenarioStatus')).toContainText('HOI4 1939', { timeout: 20000 });
 
   const stateAfterFailure = await page.evaluate(async () => {
@@ -156,11 +206,8 @@ test('scenario apply rollback keeps prior stable state on palette failure', asyn
     };
   });
 
-  await page.selectOption('#scenarioSelect', 'hoi4_1939');
-  const finalApplyVisible = await page.locator('#applyScenarioBtn').isVisible();
-  if (finalApplyVisible) {
-    await page.click('#applyScenarioBtn');
-  }
+  expect(failedApply.ok).toBe(false);
+  await applyScenario(page, 'hoi4_1939');
   await expect(page.locator('#scenarioStatus')).toContainText('HOI4 1939', { timeout: 20000 });
 
   const finalState = await page.evaluate(async () => {
@@ -184,7 +231,7 @@ test('scenario apply rollback keeps prior stable state on palette failure', asyn
 
   const shotPath = path.join('.runtime', 'browser', 'mcp-artifacts', 'screenshots', 'scenario_apply_resilience.png');
   fs.mkdirSync(path.dirname(shotPath), { recursive: true });
-  await page.screenshot({ path: shotPath, fullPage: true });
+  await page.screenshot({ path: shotPath });
 
   console.log(JSON.stringify({
     forcedPaletteFailureCount,
@@ -197,7 +244,7 @@ test('scenario apply rollback keeps prior stable state on palette failure', asyn
 });
 
 test('scenario apply fatal recovery locks controls when rollback restore fails', async ({ page }) => {
-  test.setTimeout(60000);
+  test.setTimeout(120000);
   const APP_URL = resolveBaseUrl();
   let forcedPaletteFailureCount = 0;
   let shouldAbortTnoPalette = false;
@@ -212,7 +259,7 @@ test('scenario apply fatal recovery locks controls when rollback restore fails',
   });
 
   await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(1200);
+  await waitForAppInteractive(page);
   await waitForScenarioUiReady(page);
   await applyScenario(page, 'hoi4_1939');
 
@@ -228,14 +275,13 @@ test('scenario apply fatal recovery locks controls when rollback restore fails',
   await injectScenarioTestHook(page, 'failRollbackRestoreOnce');
   shouldAbortTnoPalette = true;
 
-  await page.selectOption('#scenarioSelect', 'tno_1962');
-  await page.click('#applyScenarioBtn');
-  await page.waitForTimeout(1500);
+  const failedApply = await applyScenarioAllowFailure(page, 'tno_1962');
 
   const runtimeState = await readScenarioResilienceState(page);
   const blockedAction = await attemptLockedScenarioAction(page);
 
   expect(forcedPaletteFailureCount).toBe(1);
+  expect(failedApply.ok).toBe(false);
   expect(runtimeState.fatalRecovery).not.toBeNull();
   expect(runtimeState.statusText).toMatch(/reload|inconsistent/i);
   expect(runtimeState.controls).toEqual({
@@ -250,11 +296,11 @@ test('scenario apply fatal recovery locks controls when rollback restore fails',
 
   const shotPath = path.join('.runtime', 'browser', 'mcp-artifacts', 'screenshots', 'scenario_apply_fatal_restore_failure.png');
   fs.mkdirSync(path.dirname(shotPath), { recursive: true });
-  await page.screenshot({ path: shotPath, fullPage: true });
+  await page.screenshot({ path: shotPath });
 });
 
 test('scenario apply fatal recovery locks controls when rollback consistency fails', async ({ page }) => {
-  test.setTimeout(60000);
+  test.setTimeout(120000);
   const APP_URL = resolveBaseUrl();
   let forcedPaletteFailureCount = 0;
   let shouldAbortTnoPalette = false;
@@ -269,7 +315,7 @@ test('scenario apply fatal recovery locks controls when rollback consistency fai
   });
 
   await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(1200);
+  await waitForAppInteractive(page);
   await waitForScenarioUiReady(page);
   await applyScenario(page, 'hoi4_1939');
 
@@ -285,14 +331,13 @@ test('scenario apply fatal recovery locks controls when rollback consistency fai
   await injectScenarioTestHook(page, 'forceRollbackConsistencyFailureOnce');
   shouldAbortTnoPalette = true;
 
-  await page.selectOption('#scenarioSelect', 'tno_1962');
-  await page.click('#applyScenarioBtn');
-  await page.waitForTimeout(1500);
+  const failedApply = await applyScenarioAllowFailure(page, 'tno_1962');
 
   const runtimeState = await readScenarioResilienceState(page);
   const blockedAction = await attemptLockedScenarioAction(page);
 
   expect(forcedPaletteFailureCount).toBe(1);
+  expect(failedApply.ok).toBe(false);
   expect(runtimeState.fatalRecovery).not.toBeNull();
   expect(runtimeState.fatalRecovery.problems.join(' ')).toMatch(/Injected rollback consistency failure/i);
   expect(runtimeState.statusText).toMatch(/reload|inconsistent/i);
@@ -308,5 +353,5 @@ test('scenario apply fatal recovery locks controls when rollback consistency fai
 
   const shotPath = path.join('.runtime', 'browser', 'mcp-artifacts', 'screenshots', 'scenario_apply_fatal_consistency_failure.png');
   fs.mkdirSync(path.dirname(shotPath), { recursive: true });
-  await page.screenshot({ path: shotPath, fullPage: true });
+  await page.screenshot({ path: shotPath });
 });

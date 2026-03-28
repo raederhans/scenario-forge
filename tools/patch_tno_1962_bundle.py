@@ -34,6 +34,31 @@ if str(ROOT) not in sys.path:
 from map_builder.geo.topology import compute_neighbor_graph
 from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
+from map_builder.contracts import (
+    SCENARIO_CHECKPOINT_BATHYMETRY_FILENAME as CONTRACT_CHECKPOINT_BATHYMETRY_FILENAME,
+    SCENARIO_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME as CONTRACT_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME,
+    SCENARIO_CHECKPOINT_GEO_LOCALE_EN_FILENAME as CONTRACT_CHECKPOINT_GEO_LOCALE_EN_FILENAME,
+    SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME as CONTRACT_CHECKPOINT_GEO_LOCALE_FILENAME,
+    SCENARIO_CHECKPOINT_GEO_LOCALE_ZH_FILENAME as CONTRACT_CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
+    SCENARIO_CHECKPOINT_LAND_MASK_FILENAME as CONTRACT_CHECKPOINT_LAND_MASK_FILENAME,
+    SCENARIO_CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME as CONTRACT_CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME,
+    SCENARIO_CHECKPOINT_POLITICAL_FILENAME as CONTRACT_CHECKPOINT_POLITICAL_FILENAME,
+    SCENARIO_CHECKPOINT_RELIEF_FILENAME as CONTRACT_CHECKPOINT_RELIEF_FILENAME,
+    SCENARIO_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME as CONTRACT_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME,
+    SCENARIO_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME as CONTRACT_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME,
+    SCENARIO_CHECKPOINT_STAGE_METADATA_FILENAME as CONTRACT_CHECKPOINT_STAGE_METADATA_FILENAME,
+    SCENARIO_CHECKPOINT_WATER_FILENAME as CONTRACT_CHECKPOINT_WATER_FILENAME,
+    SCENARIO_CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME as CONTRACT_CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME,
+    SCENARIO_CHECKPOINT_WATER_SEED_FILENAME as CONTRACT_CHECKPOINT_WATER_SEED_FILENAME,
+    SCENARIO_COUNTRIES_STAGE_ARTIFACTS,
+    SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS,
+    SCENARIO_PUBLISH_FILENAMES_BY_SCOPE as CONTRACT_PUBLISH_FILENAMES_BY_SCOPE,
+    SCENARIO_PUBLISH_SCOPE_ALL as CONTRACT_PUBLISH_SCOPE_ALL,
+    SCENARIO_PUBLISH_SCOPE_POLAR_RUNTIME as CONTRACT_PUBLISH_SCOPE_POLAR_RUNTIME,
+    SCENARIO_PUBLISH_SCOPE_SCENARIO_DATA as CONTRACT_PUBLISH_SCOPE_SCENARIO_DATA,
+    SCENARIO_RUNTIME_STAGE_EXTRA_ARTIFACTS,
+    resolve_scenario_publish_filenames,
+)
 from scenario_builder.hoi4.audit import read_bmp24
 from tools.build_tno_1962_geo_locale_patch import build_patch as build_tno_geo_locale_patch
 from tools.build_startup_bootstrap_assets import build_bootstrap_runtime_topology, build_startup_bootstrap_assets
@@ -58,9 +83,9 @@ STAGE_COUNTRIES = "countries"
 STAGE_RUNTIME_TOPOLOGY = "runtime_topology"
 STAGE_GEO_LOCALE = "geo_locale"
 STAGE_WRITE_BUNDLE = "write_bundle"
-PUBLISH_SCOPE_POLAR_RUNTIME = "polar_runtime"
-PUBLISH_SCOPE_SCENARIO_DATA = "scenario_data"
-PUBLISH_SCOPE_ALL = "all"
+PUBLISH_SCOPE_POLAR_RUNTIME = CONTRACT_PUBLISH_SCOPE_POLAR_RUNTIME
+PUBLISH_SCOPE_SCENARIO_DATA = CONTRACT_PUBLISH_SCOPE_SCENARIO_DATA
+PUBLISH_SCOPE_ALL = CONTRACT_PUBLISH_SCOPE_ALL
 STAGE_CHOICES = [
     STAGE_ALL,
     STAGE_COUNTRIES,
@@ -4403,47 +4428,21 @@ def load_checkpoint_gdf(checkpoint_dir: Path, filename: str) -> gpd.GeoDataFrame
     return geopandas_from_features(payload.get("features", []))
 
 
-CHECKPOINT_STAGE_METADATA_FILENAME = "stage_metadata.json"
-CHECKPOINT_SCENARIO_POLITICAL_FILENAME = "scenario_political.geojson"
-CHECKPOINT_SCENARIO_WATER_SEED_FILENAME = "scenario_water_seed.geojson"
-CHECKPOINT_WATER_FILENAME = "water_regions.geojson"
-CHECKPOINT_RELIEF_FILENAME = "relief_overlays.geojson"
-CHECKPOINT_BATHYMETRY_FILENAME = "bathymetry.topo.json"
-CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME = "runtime_topology.bootstrap.topo.json"
-CHECKPOINT_GEO_LOCALE_FILENAME = "geo_locale_patch.json"
-CHECKPOINT_GEO_LOCALE_EN_FILENAME = "geo_locale_patch.en.json"
-CHECKPOINT_GEO_LOCALE_ZH_FILENAME = "geo_locale_patch.zh.json"
-CHECKPOINT_LAND_MASK_FILENAME = "land_mask.geojson"
-CHECKPOINT_CONTEXT_LAND_MASK_FILENAME = "context_land_mask.geojson"
-CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME = MARINE_REGIONS_NAMED_WATER_SNAPSHOT_FILENAME
-CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME = TNO_WATER_REGIONS_PROVENANCE_FILENAME
-PUBLISH_FILENAMES_BY_SCOPE = {
-    PUBLISH_SCOPE_POLAR_RUNTIME: (
-        "runtime_topology.topo.json",
-    ),
-    PUBLISH_SCOPE_SCENARIO_DATA: (
-        "countries.json",
-        "owners.by_feature.json",
-        "controllers.by_feature.json",
-        "cores.by_feature.json",
-        "manifest.json",
-        "audit.json",
-        "special_regions.geojson",
-        "water_regions.geojson",
-        "relief_overlays.geojson",
-        "bathymetry.topo.json",
-        CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
-        CHECKPOINT_GEO_LOCALE_FILENAME,
-        CHECKPOINT_GEO_LOCALE_EN_FILENAME,
-        CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
-        CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME,
-        CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME,
-    ),
-}
-PUBLISH_FILENAMES_BY_SCOPE[PUBLISH_SCOPE_ALL] = (
-    *PUBLISH_FILENAMES_BY_SCOPE[PUBLISH_SCOPE_SCENARIO_DATA],
-    *PUBLISH_FILENAMES_BY_SCOPE[PUBLISH_SCOPE_POLAR_RUNTIME],
-)
+CHECKPOINT_STAGE_METADATA_FILENAME = CONTRACT_CHECKPOINT_STAGE_METADATA_FILENAME
+CHECKPOINT_SCENARIO_POLITICAL_FILENAME = CONTRACT_CHECKPOINT_POLITICAL_FILENAME
+CHECKPOINT_SCENARIO_WATER_SEED_FILENAME = CONTRACT_CHECKPOINT_WATER_SEED_FILENAME
+CHECKPOINT_WATER_FILENAME = CONTRACT_CHECKPOINT_WATER_FILENAME
+CHECKPOINT_RELIEF_FILENAME = CONTRACT_CHECKPOINT_RELIEF_FILENAME
+CHECKPOINT_BATHYMETRY_FILENAME = CONTRACT_CHECKPOINT_BATHYMETRY_FILENAME
+CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME = CONTRACT_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME
+CHECKPOINT_GEO_LOCALE_FILENAME = CONTRACT_CHECKPOINT_GEO_LOCALE_FILENAME
+CHECKPOINT_GEO_LOCALE_EN_FILENAME = CONTRACT_CHECKPOINT_GEO_LOCALE_EN_FILENAME
+CHECKPOINT_GEO_LOCALE_ZH_FILENAME = CONTRACT_CHECKPOINT_GEO_LOCALE_ZH_FILENAME
+CHECKPOINT_LAND_MASK_FILENAME = CONTRACT_CHECKPOINT_LAND_MASK_FILENAME
+CHECKPOINT_CONTEXT_LAND_MASK_FILENAME = CONTRACT_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME
+CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME = CONTRACT_CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME
+CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME = CONTRACT_CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME
+PUBLISH_FILENAMES_BY_SCOPE = CONTRACT_PUBLISH_FILENAMES_BY_SCOPE
 
 
 def normalize_locale_override_entry(source: object) -> dict[str, str] | None:
@@ -4517,9 +4516,7 @@ def ensure_geo_locale_variant_checkpoints(checkpoint_dir: Path) -> None:
 
 
 def resolve_publish_filenames(scope: str) -> tuple[str, ...]:
-    if scope not in PUBLISH_FILENAMES_BY_SCOPE:
-        raise ValueError(f"Unsupported publish scope: {scope}")
-    return PUBLISH_FILENAMES_BY_SCOPE[scope]
+    return resolve_scenario_publish_filenames(scope)
 
 
 def validate_geo_locale_manual_overrides(geo_locale_payload: dict, manual_overrides_payload: dict) -> None:
@@ -8806,71 +8803,37 @@ def build_bundle_state(
 
 def write_countries_stage_checkpoints(state: dict[str, object], checkpoint_dir: Path) -> None:
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
-    write_checkpoint_json(checkpoint_dir, "countries.json", state["countries_payload"])
-    write_checkpoint_json(checkpoint_dir, "owners.by_feature.json", state["owners_payload"])
-    write_checkpoint_json(checkpoint_dir, "controllers.by_feature.json", state["controllers_payload"])
-    write_checkpoint_json(checkpoint_dir, "cores.by_feature.json", state["cores_payload"])
-    write_checkpoint_json(checkpoint_dir, "manifest.json", state["manifest_payload"])
-    write_checkpoint_json(checkpoint_dir, "audit.json", state["audit_payload"])
-    write_checkpoint_json(checkpoint_dir, CHECKPOINT_STAGE_METADATA_FILENAME, state["stage_metadata"])
-    write_checkpoint_gdf(checkpoint_dir, CHECKPOINT_SCENARIO_POLITICAL_FILENAME, state["scenario_political_gdf"])
-    write_checkpoint_gdf(checkpoint_dir, CHECKPOINT_SCENARIO_WATER_SEED_FILENAME, state["water_gdf"])
-    write_checkpoint_json(checkpoint_dir, CHECKPOINT_RELIEF_FILENAME, state["relief_overlays_payload"])
-    write_checkpoint_json(checkpoint_dir, CHECKPOINT_BATHYMETRY_FILENAME, state["bathymetry_payload"])
-    runtime_bootstrap_topology_payload = state.get("runtime_bootstrap_topology_payload")
-    if isinstance(runtime_bootstrap_topology_payload, dict):
-        write_checkpoint_json(
-            checkpoint_dir,
-            CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
-            runtime_bootstrap_topology_payload,
-        )
-    write_checkpoint_json(checkpoint_dir, CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME, state["named_water_snapshot_payload"])
-    write_checkpoint_json(
-        checkpoint_dir,
-        CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME,
-        state["water_regions_provenance_payload"],
-    )
-    write_checkpoint_gdf(checkpoint_dir, CHECKPOINT_LAND_MASK_FILENAME, state["land_mask_gdf"])
-    write_checkpoint_gdf(checkpoint_dir, CHECKPOINT_CONTEXT_LAND_MASK_FILENAME, state["context_land_mask_gdf"])
+    for artifact in SCENARIO_COUNTRIES_STAGE_ARTIFACTS:
+        payload = state[artifact.state_key]
+        if artifact.payload_kind == "gdf":
+            write_checkpoint_gdf(checkpoint_dir, artifact.filename, payload)
+        else:
+            write_checkpoint_json(checkpoint_dir, artifact.filename, payload)
+    for artifact in SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS:
+        payload = state.get(artifact.state_key)
+        if isinstance(payload, dict):
+            write_checkpoint_json(checkpoint_dir, artifact.filename, payload)
 
 
 def load_countries_stage_checkpoints(checkpoint_dir: Path) -> dict[str, object]:
-    return {
-        "countries_payload": load_checkpoint_json(checkpoint_dir, "countries.json"),
-        "owners_payload": load_checkpoint_json(checkpoint_dir, "owners.by_feature.json"),
-        "controllers_payload": load_checkpoint_json(checkpoint_dir, "controllers.by_feature.json"),
-        "cores_payload": load_checkpoint_json(checkpoint_dir, "cores.by_feature.json"),
-        "manifest_payload": load_checkpoint_json(checkpoint_dir, "manifest.json"),
-        "audit_payload": load_checkpoint_json(checkpoint_dir, "audit.json"),
-        "scenario_political_gdf": load_checkpoint_gdf(checkpoint_dir, CHECKPOINT_SCENARIO_POLITICAL_FILENAME),
-        "water_gdf": load_checkpoint_gdf(checkpoint_dir, CHECKPOINT_SCENARIO_WATER_SEED_FILENAME),
-        "relief_overlays_payload": load_checkpoint_json(checkpoint_dir, CHECKPOINT_RELIEF_FILENAME),
-        "bathymetry_payload": load_checkpoint_json(checkpoint_dir, CHECKPOINT_BATHYMETRY_FILENAME),
-        "named_water_snapshot_payload": load_checkpoint_json(checkpoint_dir, CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME),
-        "water_regions_provenance_payload": load_checkpoint_json(
-            checkpoint_dir,
-            CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME,
-        ),
-        "land_mask_gdf": load_checkpoint_gdf(checkpoint_dir, CHECKPOINT_LAND_MASK_FILENAME),
-        "context_land_mask_gdf": load_checkpoint_gdf(checkpoint_dir, CHECKPOINT_CONTEXT_LAND_MASK_FILENAME),
-        "stage_metadata": load_checkpoint_json(checkpoint_dir, CHECKPOINT_STAGE_METADATA_FILENAME),
-    }
+    state: dict[str, object] = {}
+    for artifact in SCENARIO_COUNTRIES_STAGE_ARTIFACTS:
+        if artifact.payload_kind == "gdf":
+            state[artifact.state_key] = load_checkpoint_gdf(checkpoint_dir, artifact.filename)
+        else:
+            state[artifact.state_key] = load_checkpoint_json(checkpoint_dir, artifact.filename)
+    for artifact in SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS:
+        path = checkpoint_path(checkpoint_dir, artifact.filename)
+        if path.exists():
+            state[artifact.state_key] = load_checkpoint_json(checkpoint_dir, artifact.filename)
+    return state
 
 
 def write_runtime_topology_stage_checkpoints(state: dict[str, object], checkpoint_dir: Path) -> None:
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     write_countries_stage_checkpoints(state, checkpoint_dir)
-    write_checkpoint_json(checkpoint_dir, "special_regions.geojson", state["runtime_special_regions"])
-    write_checkpoint_json(checkpoint_dir, CHECKPOINT_WATER_FILENAME, state["runtime_water_regions"])
-    write_checkpoint_json(checkpoint_dir, CHECKPOINT_RELIEF_FILENAME, state["relief_overlays_payload"])
-    write_checkpoint_json(checkpoint_dir, CHECKPOINT_BATHYMETRY_FILENAME, state["bathymetry_payload"])
-    write_checkpoint_json(checkpoint_dir, CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME, state["named_water_snapshot_payload"])
-    write_checkpoint_json(
-        checkpoint_dir,
-        CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME,
-        state["water_regions_provenance_payload"],
-    )
-    write_checkpoint_json(checkpoint_dir, "runtime_topology.topo.json", state["runtime_topology_payload"])
+    for artifact in SCENARIO_RUNTIME_STAGE_EXTRA_ARTIFACTS:
+        write_checkpoint_json(checkpoint_dir, artifact.filename, state[artifact.state_key])
 
 
 def ensure_runtime_topology_checkpoints(
@@ -8878,27 +8841,11 @@ def ensure_runtime_topology_checkpoints(
     checkpoint_dir: Path,
     refresh_named_water_snapshot: bool = False,
 ) -> None:
-    countries_stage_required = [
-        "countries.json",
-        "owners.by_feature.json",
-        "controllers.by_feature.json",
-        "cores.by_feature.json",
-        "manifest.json",
-        "audit.json",
-        CHECKPOINT_SCENARIO_POLITICAL_FILENAME,
-        CHECKPOINT_SCENARIO_WATER_SEED_FILENAME,
-        CHECKPOINT_RELIEF_FILENAME,
-        CHECKPOINT_BATHYMETRY_FILENAME,
-        CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME,
-        CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME,
-        CHECKPOINT_LAND_MASK_FILENAME,
-        CHECKPOINT_CONTEXT_LAND_MASK_FILENAME,
-        CHECKPOINT_STAGE_METADATA_FILENAME,
-    ]
+    countries_stage_required = [artifact.filename for artifact in SCENARIO_COUNTRIES_STAGE_ARTIFACTS]
     required = [
         *countries_stage_required,
-        "runtime_topology.topo.json",
-        CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
+        *(artifact.filename for artifact in SCENARIO_RUNTIME_STAGE_EXTRA_ARTIFACTS),
+        *(artifact.filename for artifact in SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS),
     ]
     if all(checkpoint_path(checkpoint_dir, filename).exists() for filename in required):
         return

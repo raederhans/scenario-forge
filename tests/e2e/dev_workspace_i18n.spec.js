@@ -1,15 +1,10 @@
 const fs = require("fs");
 const path = require("path");
 const { test, expect } = require("@playwright/test");
+const { getAppUrl } = require("./support/playwright-app");
 
 function resolveBaseUrl() {
-  const runtimeMetaPath = path.join(__dirname, "..", "..", ".runtime", "dev", "active_server.json");
-  try {
-    const payload = JSON.parse(fs.readFileSync(runtimeMetaPath, "utf8"));
-    return String(payload.url || "http://127.0.0.1:18080");
-  } catch (_error) {
-    return "http://127.0.0.1:18080";
-  }
+  return getAppUrl();
 }
 
 test("dev workspace declarative i18n updates static labels and placeholders", async ({ page }) => {

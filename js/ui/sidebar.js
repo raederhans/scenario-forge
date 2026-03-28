@@ -17,16 +17,18 @@ import { FileManager } from "../core/file_manager.js";
 import { canUndoHistory, captureHistoryState, clearHistory, pushHistoryEntry, undoHistory } from "../core/history_manager.js";
 import { LegendManager } from "../core/legend_manager.js";
 import {
-  applyScenarioById,
-  clearActiveScenario,
   ensureActiveScenarioOptionalLayerLoaded,
   loadScenarioAuditPayload,
   recalculateScenarioOwnerControllerDiffCount,
   releaseScenarioAuditPayload,
   refreshScenarioShellOverlays,
-  setScenarioViewMode,
   validateImportedScenarioBaseline,
 } from "../core/scenario_manager.js";
+import {
+  applyScenarioByIdCommand,
+  clearActiveScenarioCommand,
+  setScenarioViewModeCommand,
+} from "../core/scenario_dispatcher.js";
 import { getGeoFeatureDisplayLabel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 import { showAppDialog } from "./app_dialog.js";
@@ -8722,18 +8724,18 @@ function initSidebar({ render } = {}) {
               };
             }
           }
-          await applyScenarioById(data.scenario.id, {
-            renderNow: false,
+          await applyScenarioByIdCommand(data.scenario.id, {
+            renderMode: "none",
             markDirtyReason: "",
             showToastOnComplete: false,
           });
-          setScenarioViewMode(data.scenario.viewMode || "ownership", {
-            renderNow: false,
+          setScenarioViewModeCommand(data.scenario.viewMode || "ownership", {
+            renderMode: "none",
             markDirtyReason: "",
           });
         } else if (state.activeScenarioId) {
-          clearActiveScenario({
-            renderNow: false,
+          clearActiveScenarioCommand({
+            renderMode: "none",
             markDirtyReason: "",
             showToastOnComplete: false,
           });

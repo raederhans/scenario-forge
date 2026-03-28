@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import copy
 import gzip
 import http.server
@@ -51,6 +52,16 @@ class DevServerError(Exception):
         self.message = message
         self.status = status
         self.details = details
+
+
+class DevServerTCPServer(socketserver.TCPServer):
+    allow_reuse_address = False
+
+    def handle_error(self, request, client_address):
+        _, error, _ = sys.exc_info()
+        if isinstance(error, (BrokenPipeError, ConnectionAbortedError, ConnectionResetError)):
+            return
+        super().handle_error(request, client_address)
 
 
 def _read_json(path: Path) -> object:
@@ -2236,8 +2247,22 @@ def save_scenario_geo_locale_entry(
     }
 
 
-def resolve_open_path():
-    cli_path = sys.argv[1].strip() if len(sys.argv) > 1 and sys.argv[1] else ""
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Run the local MapCreator development server.",
+        allow_abbrev=False,
+    )
+    parser.add_argument(
+        "open_path",
+        nargs="?",
+        default="",
+        help="Optional initial path to open in the browser, such as /?render_profile=balanced.",
+    )
+    return parser.parse_args(argv)
+
+
+def resolve_open_path(cli_path: str = ""):
+    cli_path = str(cli_path or "").strip()
     env_path = os.environ.get("MAPCREATOR_OPEN_PATH", "").strip()
     raw_path = cli_path or env_path or "/"
     if not raw_path.startswith("/"):
@@ -2250,6 +2275,11 @@ def resolve_runtime_active_server_path():
     if runtime_root:
         return Path(runtime_root) / "dev" / "active_server.json"
     return RUNTIME_ACTIVE_SERVER_PATH
+
+
+def should_open_browser() -> bool:
+    raw = str(os.environ.get("MAPCREATOR_OPEN_BROWSER", "1") or "").strip().lower()
+    return raw not in {"0", "false", "no", "off"}
 
 
 def write_active_server_metadata(base_url, open_path, port):
@@ -2541,18 +2571,19 @@ def start_server(open_path="/"):
             # Attempt to create the server
             # allow_reuse_address=False on Windows helps avoid some zombie socket issues,
             # but binding to a new port is the safest bet.
-            httpd = socketserver.TCPServer((BIND_ADDRESS, port), Handler)
+            httpd = DevServerTCPServer((BIND_ADDRESS, port), Handler)
 
             base_url = f"http://{BIND_ADDRESS}:{port}"
             open_url = f"{base_url}{open_path}"
             metadata_path = write_active_server_metadata(base_url, open_path, port)
             print(f"[INFO] Success! Server started at {base_url}")
-            print(f"[INFO] Opening browser at {open_url}")
             print(f"[INFO] Active server metadata written to {metadata_path}")
-            print(f"[INFO] (If the browser doesn't open, please visit the URL manually)")
-
-            # Open browser
-            webbrowser.open(open_url)
+            if should_open_browser():
+                print(f"[INFO] Opening browser at {open_url}")
+                print(f"[INFO] (If the browser doesn't open, please visit the URL manually)")
+                webbrowser.open(open_url)
+            else:
+                print(f"[INFO] Browser auto-open disabled. Visit {open_url} manually if needed.")
 
             # Start serving
             httpd.serve_forever()
@@ -2571,5 +2602,10 @@ def start_server(open_path="/"):
     sys.exit(1)
 
 
+def main(argv: list[str] | None = None) -> None:
+    args = parse_args(argv)
+    start_server(resolve_open_path(args.open_path))
+
+
 if __name__ == "__main__":
-    start_server(resolve_open_path())
+    main()

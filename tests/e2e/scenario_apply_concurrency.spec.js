@@ -1,6 +1,7 @@
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require("@playwright/test");
+const { getAppUrl } = require("./support/playwright-app");
 
-const APP_URL = 'http://127.0.0.1:18080';
+const APP_URL = getAppUrl();
 
 test('scenario apply is single-flight and english ui uses entry.en overrides', async ({ page }) => {
   const pageErrors = [];

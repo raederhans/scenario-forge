@@ -1,6 +1,7 @@
-const fs = require('fs');
-const path = require('path');
-const { test, expect } = require('@playwright/test');
+const fs = require("fs");
+const path = require("path");
+const { test, expect } = require("@playwright/test");
+const { getAppUrl } = require("./support/playwright-app");
 
 test.setTimeout(120000);
 
@@ -62,51 +63,7 @@ function getMeanRgbDiff(snapshotA, snapshotB) {
 }
 
 async function resolveBaseUrl() {
-  const candidates = [];
-  const pushCandidate = (value) => {
-    const normalized = String(value || '').trim();
-    if (!normalized || candidates.includes(normalized)) return;
-    candidates.push(normalized);
-  };
-
-  pushCandidate(process.env.MAPCREATOR_BASE_URL);
-  pushCandidate(process.env.PLAYWRIGHT_TEST_BASE_URL);
-
-  const metadataPaths = [
-    path.join(__dirname, '..', '..', '.runtime', 'dev', 'active_server.json'),
-    path.join(process.cwd(), '.runtime', 'dev', 'active_server.json'),
-  ];
-  for (const metadataPath of metadataPaths) {
-    if (!fs.existsSync(metadataPath)) continue;
-    try {
-      const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
-      pushCandidate(metadata?.url);
-    } catch (error) {
-      console.warn('[tno-1962-ui-smoke] Unable to parse active_server.json:', error);
-    }
-  }
-
-  pushCandidate('http://127.0.0.1:18080');
-  pushCandidate('http://127.0.0.1:8000');
-
-  for (const candidate of candidates) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2000);
-      const response = await fetch(candidate, {
-        method: 'GET',
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-      if (response.ok || response.status < 500) {
-        return candidate;
-      }
-    } catch (_error) {
-      // Try the next candidate.
-    }
-  }
-
-  return candidates[0] || 'http://127.0.0.1:18080';
+  return getAppUrl();
 }
 
 test('tno 1962 releasable catalog smoke', async ({ page }) => {

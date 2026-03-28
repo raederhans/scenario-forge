@@ -42,6 +42,7 @@ import {
   buildScenarioDistrictGroupByFeatureId,
   normalizeScenarioDistrictGroupsPayload,
 } from "./scenario_districts.js";
+import { ensureDetailTopologyBoundary, flushRenderBoundary } from "./render_boundary.js";
 import { setActivePaletteSource, syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { markDirty } from "./dirty_state.js";
 import {
@@ -962,8 +963,8 @@ function refreshScenarioShellOverlays({ renderNow = false, borderReason = "scena
     renderNow: false,
     reason: borderReason ? `${borderReason}:opening` : "scenario-shell-opening",
   });
-  if (renderNow && typeof state.renderNowFn === "function") {
-    state.renderNowFn();
+  if (renderNow) {
+    flushRenderBoundary(borderReason ? `${borderReason}:shell-overlay` : "scenario-shell-overlay");
   }
   return {
     changed,
@@ -1596,8 +1597,8 @@ function applyMergedScenarioChunkLayerPayloads(mergedLayerPayloads, { renderNow 
     }
     changed = true;
   });
-  if (changed && renderNow && typeof state.renderNowFn === "function") {
-    state.renderNowFn();
+  if (changed && renderNow) {
+    flushRenderBoundary("scenario-optional-layer-apply");
   }
   return changed;
 }
@@ -2347,8 +2348,8 @@ async function ensureActiveScenarioOptionalLayerLoaded(
     forceReload,
     applyToActiveScenario: true,
   });
-  if (renderNow && typeof state.renderNowFn === "function") {
-    state.renderNowFn();
+  if (renderNow) {
+    flushRenderBoundary(`scenario-optional-layer:${normalizedKey}`);
   }
   return payload;
 }
@@ -2388,8 +2389,8 @@ async function ensureActiveScenarioOptionalLayersForVisibility(
       })
     )
   );
-  if (renderNow && typeof state.renderNowFn === "function") {
-    state.renderNowFn();
+  if (renderNow) {
+    flushRenderBoundary("scenario-optional-layers-visibility");
   }
   return payloads;
 }
@@ -3174,8 +3175,8 @@ function syncCountryUi({ renderNow = false } = {}) {
     state.updateScenarioContextBarFn();
   }
   syncScenarioUi();
-  if (renderNow && typeof state.renderNowFn === "function") {
-    state.renderNowFn();
+  if (renderNow) {
+    flushRenderBoundary("scenario-country-ui");
   }
 }
 
@@ -3207,8 +3208,8 @@ function setScenarioViewMode(
 }
 
 async function ensureScenarioDetailTopologyLoaded({ applyMapData = true } = {}) {
-  if (typeof state.ensureDetailTopologyFn === "function") {
-    const promoted = await state.ensureDetailTopologyFn({ applyMapData });
+  {
+    const promoted = await ensureDetailTopologyBoundary({ applyMapData });
     if (promoted) return true;
   }
   const hasDetailNow = hasUsablePoliticalTopology(state.topologyDetail);
@@ -4461,9 +4462,6 @@ function initScenarioManager({ render } = {}) {
           showToastOnComplete: true,
         });
         renderScenarioControls();
-        if (typeof render === "function") {
-          render();
-        }
       } catch (error) {
         console.error("Failed to apply scenario:", error);
         const message = String(error?.message || "").trim() || t("Unable to apply scenario.", "ui");
@@ -4486,9 +4484,6 @@ function initScenarioManager({ render } = {}) {
         showToastOnComplete: true,
       });
       renderScenarioControls();
-      if (typeof render === "function") {
-        render();
-      }
     });
     resetScenarioBtn.dataset.bound = "true";
   }
@@ -4502,9 +4497,6 @@ function initScenarioManager({ render } = {}) {
         showToastOnComplete: true,
       });
       renderScenarioControls();
-      if (typeof render === "function") {
-        render();
-      }
     });
     clearScenarioBtn.dataset.bound = "true";
   }

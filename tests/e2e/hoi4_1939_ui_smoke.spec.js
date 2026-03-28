@@ -1,6 +1,7 @@
-const fs = require('fs');
-const path = require('path');
-const { test, expect } = require('@playwright/test');
+const fs = require("fs");
+const path = require("path");
+const { test, expect } = require("@playwright/test");
+const { gotoApp } = require("./support/playwright-app");
 
 test('hoi4 1939 owner-sync smoke', async ({ page }) => {
   const consoleIssues = [];
@@ -28,7 +29,7 @@ test('hoi4 1939 owner-sync smoke', async ({ page }) => {
     });
   });
 
-  await page.goto('http://127.0.0.1:18080', { waitUntil: 'domcontentloaded' });
+  await gotoApp(page, '/', { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1200);
 
   await page.waitForFunction(() => {

@@ -3,11 +3,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from collections import defaultdict
 from pathlib import Path, PurePosixPath
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from map_builder.contracts import SCENARIO_STRICT_REQUIRED_FILENAMES
+
 DEFAULT_SCENARIOS_ROOT = PROJECT_ROOT / "data/scenarios"
 IGNORED_DIR_NAMES = {"expectations"}
 COMMON_REQUIRED_MANIFEST_FIELDS = (
@@ -366,13 +371,17 @@ def _extract_runtime_political_feature_ids(runtime_payload: dict, errors: list[s
 
 
 def validate_strict_bundle_contract(target_dir: Path, errors: list[str]) -> None:
-    manifest = _load_required_local_json(target_dir / "manifest.json", errors)
-    owners_payload = _load_required_local_json(target_dir / "owners.by_feature.json", errors)
-    controllers_payload = _load_required_local_json(target_dir / "controllers.by_feature.json", errors)
-    cores_payload = _load_required_local_json(target_dir / "cores.by_feature.json", errors)
-    runtime_payload = _load_required_local_json(target_dir / "runtime_topology.topo.json", errors)
-    if any(payload is None for payload in (manifest, owners_payload, controllers_payload, cores_payload, runtime_payload)):
+    required_payloads = {
+        filename: _load_required_local_json(target_dir / filename, errors)
+        for filename in SCENARIO_STRICT_REQUIRED_FILENAMES
+    }
+    if any(payload is None for payload in required_payloads.values()):
         return
+    manifest = required_payloads["manifest.json"]
+    owners_payload = required_payloads["owners.by_feature.json"]
+    controllers_payload = required_payloads["controllers.by_feature.json"]
+    cores_payload = required_payloads["cores.by_feature.json"]
+    runtime_payload = required_payloads["runtime_topology.topo.json"]
 
     owners = owners_payload.get("owners")
     controllers = controllers_payload.get("controllers")

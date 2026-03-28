@@ -18,13 +18,14 @@ import {
 } from "./core/map_renderer.js";
 import { applyActivePaletteState } from "./core/palette_manager.js";
 import {
-  applyScenarioBundle,
   initScenarioManager,
   hydrateActiveScenarioBundle,
   loadScenarioBundle,
   loadScenarioRegistry,
   syncScenarioLocalizationState,
 } from "./core/scenario_manager.js";
+import { bindRenderBoundary, flushRenderBoundary } from "./core/render_boundary.js";
+import { applyScenarioBundleCommand } from "./core/scenario_dispatcher.js";
 import { initPresetState } from "./core/preset_state.js";
 import { initTranslations } from "./ui/i18n.js";
 import { initToast } from "./ui/toast.js";
@@ -1295,8 +1296,8 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
     if (activeScenarioId) {
       const cachedBundle = state.scenarioBundleCacheById?.[activeScenarioId] || null;
       if (cachedBundle?.manifest) {
-        await applyScenarioBundle(cachedBundle, {
-          renderNow: false,
+        await applyScenarioBundleCommand(cachedBundle, {
+          renderMode: "none",
           suppressRender: true,
           markDirtyReason: "",
           showToastOnComplete: false,
@@ -1686,8 +1687,18 @@ async function bootstrap() {
       renderDispatcher.schedule();
     };
     globalThis.renderApp = renderApp;
-    globalThis.renderNow = renderDispatcher.flush;
-    state.renderNowFn = renderDispatcher.flush;
+    bindRenderBoundary({
+      scheduleRender: () => renderDispatcher.schedule(),
+      flushRender: () => renderDispatcher.flush(),
+      ensureDetailTopology: (options = {}) =>
+        ensureDetailTopologyReady({
+          renderDispatcher,
+          ...options,
+        }),
+    });
+    const flushRenderNow = () => flushRenderBoundary("legacy-render-now");
+    globalThis.renderNow = flushRenderNow;
+    state.renderNowFn = flushRenderNow;
     state.ensureDetailTopologyFn = (options = {}) =>
       ensureDetailTopologyReady({
         renderDispatcher,
@@ -1731,8 +1742,8 @@ async function bootstrap() {
     await deferredUiBootstrapPromise;
     setBootState("scenario-apply");
     startBootMetric("scenario-apply");
-    await applyScenarioBundle(defaultScenarioBundle, {
-      renderNow: false,
+    await applyScenarioBundleCommand(defaultScenarioBundle, {
+      renderMode: "none",
       suppressRender: true,
       markDirtyReason: "",
       showToastOnComplete: false,

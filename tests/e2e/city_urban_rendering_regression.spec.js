@@ -1,8 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-const { test, expect } = require('@playwright/test');
+const fs = require("fs");
+const path = require("path");
+const { test, expect } = require("@playwright/test");
+const { getAppUrl } = require("./support/playwright-app");
 
-const APP_URL = 'http://127.0.0.1:18080';
+const APP_URL = getAppUrl();
 const LEGACY_RADIUS = 6.8;
 const IGNORED_CONSOLE_PATTERNS = [
   /\[map_renderer\] Scenario political background merge fallback engaged:/i,

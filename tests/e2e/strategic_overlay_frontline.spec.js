@@ -1,26 +1,12 @@
 const fs = require("fs");
 const path = require("path");
 const { test, expect } = require("@playwright/test");
-
+const { getAppUrl } = require("./support/playwright-app");
 function resolveBaseUrl() {
-  if (process.env.MAPCREATOR_BASE_URL) {
-    return process.env.MAPCREATOR_BASE_URL;
-  }
-  const metadataPath = path.join(process.cwd(), ".runtime", "dev", "active_server.json");
-  if (fs.existsSync(metadataPath)) {
-    try {
-      const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf8"));
-      if (metadata && typeof metadata.url === "string" && metadata.url.trim()) {
-        return metadata.url.trim();
-      }
-    } catch (_error) {
-      // Fall through to default.
-    }
-  }
-  return "http://127.0.0.1:18080";
+  return getAppUrl();
 }
 
-const BASE_URL = resolveBaseUrl();
+const BASE_URL = getAppUrl();
 
 async function waitForProjectUiReady(page) {
   await page.waitForFunction(async () => {
