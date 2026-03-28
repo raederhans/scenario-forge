@@ -250,7 +250,7 @@ function updateUIText() {
     ["lblTextureDraftLatOffset", "Latitude Tilt"],
     ["lblTextureDraftRoll", "Roll"],
     ["lblMapStyle", "Auto-Fill"],
-    ["dockCollapseBtn", "Collapse"],
+    ["dockHandleLabel", "Collapse"],
     ["labelMapStyle", "Appearance"],
     ["appearanceTabOcean", "Ocean"],
     ["appearanceTabBorders", "Borders"],

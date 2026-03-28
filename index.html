@@ -1189,6 +1189,21 @@
             <input id="zoomPercentInput" type="text" name="zoom-percent" autocomplete="off" spellcheck="false" inputmode="numeric" class="input dock-zoom-input" aria-label="Zoom percentage" value="100%" />
             <button id="zoomInBtn" type="button" class="zoom-btn" aria-label="Zoom in" title="Zoom in">+</button>
             <button id="zoomResetBtn" type="button" class="zoom-btn zoom-btn-reset" aria-label="Reset zoom" data-i18n-aria-label="Reset zoom" title="Fit">Fit</button>
+            <button id="btnToggleLang" class="zoom-btn zoom-pill-btn zoom-language-btn" type="button" aria-label="Language" data-i18n-aria-label="Language" title="Language" data-i18n-title="Language">
+              ZH / EN
+            </button>
+            <button
+              id="developerModeBtn"
+              class="zoom-btn zoom-pill-btn developer-mode-btn"
+              type="button"
+              aria-pressed="false"
+              aria-label="Developer mode"
+              data-i18n-aria-label="Developer mode"
+              title="Developer mode"
+              data-i18n-title="Developer mode"
+            >
+              DEV
+            </button>
             <button
               id="devWorkspaceToggleBtn"
               class="zoom-btn dev-workspace-toggle dev-only"
@@ -1201,31 +1216,17 @@
             >
               Dev
             </button>
-            <button
-              id="devDockCollapseBtn"
-              class="zoom-btn dev-workspace-toggle dev-workspace-dock-toggle dev-only hidden"
-              type="button"
-              aria-controls="bottomDock"
-              aria-pressed="false"
-              title="Collapse development dock"
-              data-i18n-title="Collapse development dock"
-            >
-              Collapse
-            </button>
           </div>
 
           <section id="bottomDock" class="bottom-dock" aria-labelledby="bottomDockHeading">
             <h2 id="bottomDockHeading" class="visually-hidden" data-i18n="Quick edit dock">Quick edit dock</h2>
-            <div class="dock-header-row">
-              <div class="dock-header-copy">
-                <span class="dock-shell-kicker" data-i18n="Quick Actions">Quick Actions</span>
-                <span class="dock-shell-hint" data-i18n="Current tool, paint mode, and map actions">Current tool, paint mode, and map actions</span>
-              </div>
-              <button id="dockCollapseBtn" type="button" class="dock-collapse-btn" aria-label="Collapse quick dock" data-i18n="Collapse" data-i18n-aria-label="Collapse quick dock">Collapse</button>
-            </div>
+            <button id="dockCollapseBtn" type="button" class="dock-handle-btn" aria-label="Collapse quick dock" data-i18n-aria-label="Collapse quick dock" title="Collapse" data-i18n-title="Collapse">
+              <span id="dockHandleChevron" class="dock-handle-chevron" aria-hidden="true">v</span>
+              <span id="dockHandleLabel" class="visually-hidden" data-i18n="Collapse">Collapse</span>
+            </button>
             <div class="bottom-dock-primary">
-              <div class="dock-group dock-group-tools">
-                <div id="lblCurrentTool" class="dock-group-label">Tools</div>
+              <div class="dock-group dock-group-tools" role="group" aria-label="Tools" data-i18n-aria-label="Tools" title="Tools" data-i18n-title="Tools">
+                <span id="lblCurrentTool" class="visually-hidden">Tools</span>
                 <div class="dock-button-row dock-button-row-tools" role="toolbar" data-i18n-aria-label="Current tool">
                   <button id="toolFillBtn" class="btn-tool dock-tool-btn" data-tool="fill" type="button" data-i18n-aria-label="Fill tool" data-i18n-title="Fill tool">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -1254,24 +1255,37 @@
                 </div>
               </div>
 
-              <div class="dock-group dock-group-mode">
-                <div id="lblCurrentMode" class="dock-group-label" data-i18n="Mode">Mode</div>
+              <div class="dock-group dock-group-mode" role="group" aria-label="Mode" data-i18n-aria-label="Mode" title="Mode" data-i18n-title="Mode">
+                <span id="lblCurrentMode" class="visually-hidden" data-i18n="Mode">Mode</span>
                 <div class="dock-segmented-control" role="group" aria-label="Paint mode" data-i18n-aria-label="Paint mode">
-                  <button id="paintModeVisualBtn" type="button" class="dock-segment-btn" data-paint-mode="visual" data-i18n="Visual">Visual Color</button>
-                  <button id="paintModePoliticalBtn" type="button" class="dock-segment-btn" data-paint-mode="sovereignty" data-i18n="Political">Political</button>
+                  <button id="paintModeVisualBtn" type="button" class="dock-segment-btn dock-segment-icon-btn" data-paint-mode="visual" aria-label="Visual Color" data-i18n-aria-label="Visual Color" title="Visual Color" data-i18n-title="Visual Color">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M4.5 12c2.2-4 4.9-6 7.5-6s5.3 2 7.5 6c-2.2 4-4.9 6-7.5 6s-5.3-2-7.5-6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
+                      <circle cx="12" cy="12" r="2.4" fill="currentColor"></circle>
+                    </svg>
+                    <span class="visually-hidden" data-i18n="Visual Color">Visual Color</span>
+                  </button>
+                  <button id="paintModePoliticalBtn" type="button" class="dock-segment-btn dock-segment-icon-btn" data-paint-mode="sovereignty" aria-label="Political Ownership" data-i18n-aria-label="Political Ownership" title="Political Ownership" data-i18n-title="Political Ownership">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M6 4v16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                      <path d="M7 5.5h10l-1.8 3L17 11H7" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
+                    </svg>
+                    <span class="visually-hidden" data-i18n="Political Ownership">Political Ownership</span>
+                  </button>
                 </div>
               </div>
 
-              <div class="dock-group dock-group-config">
-                <div id="lblEditingRules" class="dock-group-label" data-i18n="Edit Config">Edit Config</div>
-                <div class="dock-action-stack">
-                  <div class="dock-action-main-row">
-                    <button id="politicalEditingToggleBtn" type="button" class="dock-icon-btn dock-mode-icon-btn" data-i18n-aria-label="Political Editing" data-i18n-title="Political Editing">
+              <div class="dock-group dock-group-config" role="group" aria-label="Edit Config" data-i18n-aria-label="Edit Config" title="Edit Config" data-i18n-title="Edit Config">
+                <span id="lblEditingRules" class="visually-hidden" data-i18n="Edit Config">Edit Config</span>
+                <div class="dock-icon-row dock-cluster-row">
+                    <button id="dockEditPopoverBtn" type="button" class="dock-icon-btn dock-mode-icon-btn" aria-label="Edit Config" data-i18n-aria-label="Edit Config" title="Edit Config" data-i18n-title="Edit Config">
                       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M5 4v16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                        <path d="M6 5.5h8l-1.6 2.5L14 10.5H6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
-                        <path d="M10 14.5h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                        <path d="M10 18.5h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <path d="M6 7h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <path d="M6 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <path d="M6 17h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <circle cx="9" cy="7" r="1.7" fill="currentColor"></circle>
+                        <circle cx="15" cy="12" r="1.7" fill="currentColor"></circle>
+                        <circle cx="11" cy="17" r="1.7" fill="currentColor"></circle>
                       </svg>
                     </button>
                     <button id="scenarioVisualAdjustmentsBtn" type="button" class="dock-icon-btn dock-mode-icon-btn hidden" data-i18n-aria-label="Visual Adjustments" data-i18n-title="Visual Adjustments">
@@ -1284,53 +1298,82 @@
                         <circle cx="11" cy="18" r="1.8" fill="currentColor"></circle>
                       </svg>
                     </button>
+                </div>
+                <div id="dockEditPopover" class="dock-utility-popover dock-editor-popover hidden" role="dialog" aria-label="Edit Config">
+                  <div id="dockGranularityField" class="dock-popover-field">
+                    <label for="paintGranularitySelect" class="dock-popover-label" data-i18n="Editing Scope">Editing Scope</label>
                     <select id="paintGranularitySelect" name="paint-granularity" autocomplete="off" class="select-input dock-select">
                       <option id="optPaintSubdivision" value="subdivision">By Subdivision</option>
                       <option id="optPaintCountry" value="country">By Country</option>
                     </select>
+                  </div>
+                  <div id="dockColorModeField" class="dock-popover-field">
+                    <label for="colorModeSelect" class="dock-popover-label" data-i18n="Color Rule">Color Rule</label>
                     <select id="colorModeSelect" name="color-mode" autocomplete="off" class="select-input dock-select">
                       <option id="optColorModeRegion" value="region">By Region</option>
                       <option id="optColorModePolitical" value="political" selected>By Neighbor (Political)</option>
                     </select>
-                    <div id="dockPoliticalEditingPanel" class="dock-political-panel hidden">
-                      <label class="visually-hidden" for="paintModeSelect" data-i18n="Paint mode">Paint mode</label>
-                      <select id="paintModeSelect" name="paint-mode" autocomplete="off" class="select-input dock-select dock-select-hidden">
-                        <option id="optPaintMeaningVisual" value="visual">Visual Color</option>
-                        <option id="optPaintMeaningSovereignty" value="sovereignty">Political Ownership</option>
-                      </select>
-                      <div id="activeSovereignLabel" class="dock-political-owner">None selected</div>
-                    </div>
+                  </div>
+                  <div class="dock-popover-field">
+                    <button id="politicalEditingToggleBtn" type="button" class="dock-inline-btn" data-i18n="Political Editing">Political Editing</button>
+                  </div>
+                  <div id="dockPoliticalEditingPanel" class="dock-political-panel hidden">
+                    <label class="visually-hidden" for="paintModeSelect" data-i18n="Paint mode">Paint mode</label>
+                    <select id="paintModeSelect" name="paint-mode" autocomplete="off" class="select-input dock-select dock-select-hidden">
+                      <option id="optPaintMeaningVisual" value="visual">Visual Color</option>
+                      <option id="optPaintMeaningSovereignty" value="sovereignty">Political Ownership</option>
+                    </select>
+                    <div id="activeSovereignLabel" class="dock-political-owner">None selected</div>
                   </div>
                 </div>
               </div>
 
-              <div class="dock-group dock-group-map-actions">
-                <div class="dock-group-label" data-i18n="Map Actions">Map Actions</div>
-                <div class="dock-action-stack">
-                  <div class="dock-action-main-row">
-                    <button id="presetPolitical" class="btn-primary dock-action-btn" type="button">
+              <div class="dock-group dock-group-map-actions" role="group" aria-label="Map Actions" data-i18n-aria-label="Map Actions" title="Map Actions" data-i18n-title="Map Actions">
+                <span class="visually-hidden" data-i18n="Map Actions">Map Actions</span>
+                <div class="dock-icon-row dock-cluster-row">
+                    <button id="presetPolitical" class="dock-icon-btn dock-action-icon-btn dock-action-icon-btn-primary" type="button" aria-label="Auto-Fill Countries" data-i18n-aria-label="Auto-Fill Countries" title="Auto-Fill Countries" data-i18n-title="Auto-Fill Countries">
                       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                         <path d="M5 3h9l-1.5 2H5v6h7l-1.5 2H5v8H3V3h2z" />
                         <path d="M13.5 3H21l-2 3 2 3h-7.5l2-3-2-3z" />
                       </svg>
-                      <span id="labelPresetPolitical">Auto-Fill Countries</span>
+                      <span id="labelPresetPolitical" class="visually-hidden">Auto-Fill Countries</span>
                     </button>
-                    <button id="presetClear" class="btn-secondary dock-clear-btn" type="button">Clear Map</button>
-                  </div>
-                  <div id="dockQuickFillRow" class="dock-paint-secondary hidden">
-                    <div id="dockQuickFillLabel" class="dock-paint-mini-label">Double-Click Quick Fill</div>
+                    <button id="presetClear" class="dock-icon-btn dock-action-icon-btn" type="button" aria-label="Clear Map" data-i18n-aria-label="Clear Map" title="Clear Map" data-i18n-title="Clear Map">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M6 7h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <path d="M9 7V5.5h6V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M8.5 10.5v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <path d="M12 10.5v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <path d="M15.5 10.5v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <path d="M7.5 7h9l-.8 11a1 1 0 0 1-1 .9H9.3a1 1 0 0 1-1-.9L7.5 7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
+                      </svg>
+                      <span class="visually-hidden" data-i18n="Clear Map">Clear Map</span>
+                    </button>
+                    <button id="dockQuickFillBtn" class="dock-icon-btn dock-action-icon-btn hidden" type="button" aria-label="Quick Fill" data-i18n-aria-label="Quick Fill" title="Quick Fill" data-i18n-title="Quick Fill">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M7 6h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <path d="M7 12h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <path d="M7 18h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+                        <path d="m16 16 3 3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" transform="translate(-1 -1)"></path>
+                      </svg>
+                      <span id="dockQuickFillLabel" class="visually-hidden">Double-Click Quick Fill</span>
+                    </button>
+                </div>
+                <div id="dockQuickFillRow" class="dock-utility-popover dock-quick-fill-popover hidden" role="dialog" aria-label="Quick Fill">
+                    <div class="dock-popover-copy">
+                      <div class="dock-popover-title" data-i18n="Double-Click Quick Fill">Double-Click Quick Fill</div>
+                      <div id="dockQuickFillHint" class="dock-popover-hint" data-i18n="Single-click: one subdivision | Double-click: parent">Single-click: one subdivision | Double-click: parent</div>
+                    </div>
                     <div class="mode-toggle-row dock-paint-toggle-row" role="group" data-i18n-aria-label="Double-click quick fill scope">
                       <button id="quickFillParentBtn" type="button" class="mode-toggle-btn" data-i18n="By Parent">By Parent</button>
                       <button id="quickFillCountryBtn" type="button" class="mode-toggle-btn" data-i18n="By Country">By Country</button>
                     </div>
-                    <div id="dockQuickFillHint" class="dock-paint-hint" data-i18n="Single-click: one subdivision | Double-click: parent">Single-click: one subdivision | Double-click: parent</div>
-                  </div>
                 </div>
-              </div>
+                </div>
 
-              <div class="dock-group dock-group-history-colors">
+              <div class="dock-group dock-group-history-colors" role="group" aria-label="History and Color" data-i18n-aria-label="History and Color" title="History and Color" data-i18n-title="History and Color">
+                <span id="lblHistory" class="visually-hidden">History</span>
                 <div class="dock-inline-cluster dock-inline-cluster-history">
-                  <div id="lblHistory" class="dock-group-label">History</div>
                   <div class="dock-icon-row">
                     <button id="undoBtn" class="dock-icon-btn" type="button" data-i18n-aria-label="Undo" data-i18n-title="Undo">
                       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -1348,16 +1391,15 @@
                 </div>
                 <div class="dock-inline-divider" aria-hidden="true"></div>
                 <div class="dock-inline-cluster dock-inline-cluster-colors">
-                  <div id="lblQuickPalette" class="dock-group-label" data-i18n="Current Color">Current Color</div>
+                  <span id="lblQuickPalette" class="visually-hidden" data-i18n="Current Color">Current Color</span>
                   <div class="dock-color-stack">
-                    <div class="dock-color-row">
+                    <div class="dock-color-row dock-cluster-row">
                       <button id="selectedColorPreview" class="selected-color-preview" type="button" data-i18n-aria-label="Selected color preview"></button>
                       <div class="dock-color-current-copy">
                         <div id="selectedColorValue" class="dock-color-value">#1f3a5f</div>
-                        <div class="dock-color-hint" data-i18n="Selected color">Selected color</div>
                       </div>
                       <input id="customColor" type="color" value="#1f3a5f" class="color-input dock-custom-color" data-i18n-aria-label="Custom color" />
-                      <div id="recentColors" class="dock-recent-swatches" aria-label="Recent colors" data-i18n-aria-label="Recent colors"></div>
+                      <div id="recentColors" class="dock-recent-swatches hidden" aria-label="Recent colors" data-i18n-aria-label="Recent colors"></div>
                     </div>
                     <div id="paletteGrid" class="color-grid dock-inline-swatches dock-palette-grid-hidden"></div>
                   </div>
@@ -1748,23 +1790,6 @@
                         <path d="m8 10 4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
                         <path d="M5 18h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
                       </svg>
-                    </button>
-                    <button id="btnToggleLang" class="dock-icon-btn inspector-utility-btn" type="button" aria-label="Language" data-i18n-aria-label="Language" title="Language" data-i18n-title="Language">
-                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.6"></circle>
-                        <path d="M4 12h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                        <path d="M12 4c2 2.2 3 5 3 8s-1 5.8-3 8c-2-2.2-3-5-3-8s1-5.8 3-8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
-                      </svg>
-                    </button>
-                    <button
-                      id="inspectorDevWorkspaceBtn"
-                      class="btn-secondary inspector-utility-dev-btn dev-only"
-                      type="button"
-                      title="Open development workspace"
-                      data-i18n-title="Open development workspace"
-                      data-i18n="Dev"
-                    >
-                      Dev
                     </button>
                   </div>
 

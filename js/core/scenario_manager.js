@@ -4,6 +4,8 @@ import { normalizeMapSemanticMode } from "./state.js";
 import {
   recomputeDynamicBordersNow,
   refreshColorState,
+  refreshResolvedColorsForFeatures,
+  refreshMapDataForScenarioApply,
   refreshMapDataForScenarioChunkPromotion,
   refreshScenarioOpeningOwnerBorders,
   setMapData,
@@ -945,8 +947,16 @@ function refreshScenarioShellOverlays({ renderNow = false, borderReason = "scena
   state.scenarioAutoShellControllerByFeatureId = nextControllerMap;
   if (changed) {
     state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
+    const affectedFeatureIds = Array.from(new Set([
+      ...Object.keys(previousOwnerMap),
+      ...Object.keys(previousControllerMap),
+      ...Object.keys(nextOwnerMap),
+      ...Object.keys(nextControllerMap),
+    ]));
+    if (affectedFeatureIds.length) {
+      refreshMapDataColorsForScenarioShell(affectedFeatureIds);
+    }
   }
-  refreshColorState({ renderNow: false });
   recomputeDynamicBordersNow({ renderNow: false, reason: borderReason });
   refreshScenarioOpeningOwnerBorders({
     renderNow: false,
@@ -1202,6 +1212,18 @@ function validateScenarioRuntimeConsistency({ expectedScenarioId = "", phase = "
     expectedScenarioId: normalizedExpectedScenarioId,
     phase,
   };
+}
+
+function refreshMapDataColorsForScenarioShell(featureIds) {
+  const targetIds = Array.from(new Set(
+    (Array.isArray(featureIds) ? featureIds : [])
+      .map((value) => String(value || "").trim())
+      .filter(Boolean)
+  ));
+  if (!targetIds.length) {
+    return;
+  }
+  refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
 }
 
 function enterScenarioFatalRecovery({
@@ -3897,7 +3919,14 @@ async function applyScenarioBundle(
     }
     recalculateScenarioOwnerControllerDiffCount();
     refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: `scenario-opening:${staged.scenarioId}` });
-    setMapData({ refitProjection: false, resetZoom: false, suppressRender });
+    let scenarioMapRefreshMode = "light";
+    try {
+      refreshMapDataForScenarioApply({ suppressRender });
+    } catch (refreshError) {
+      scenarioMapRefreshMode = "setMapData-fallback";
+      console.warn("[scenario] Lightweight scenario apply refresh failed; falling back to setMapData.", refreshError);
+      setMapData({ refitProjection: false, resetZoom: false, suppressRender });
+    }
     bundle.chunkLifecycle = {
       applyStartedAt,
       politicalCoreReadyRecorded: false,
@@ -3908,6 +3937,7 @@ async function applyScenarioBundle(
       {
         scenarioId: staged.scenarioId,
         hasChunkedRuntime: scenarioBundleUsesChunkedLayer(bundle),
+        mapRefreshMode: scenarioMapRefreshMode,
       }
     );
     rebuildPresetState();
@@ -3926,14 +3956,16 @@ async function applyScenarioBundle(
       "CN_CITY_17275852B74586174185496",
       "CN_CITY_17275852B2295538790743",
     ];
-    spotChecks.forEach((fid) => {
-      const owner = state.sovereigntyByFeatureId[fid];
-      const controller = state.scenarioControllersByFeatureId?.[fid] || owner;
-      if (owner) {
-        const color = staged.scenarioColorMap[owner] || "(no color)";
-        console.log(`[scenario] Spot-check: ${fid} -> owner=${owner}, controller=${controller}, color=${color}`);
-      }
-    });
+    if (String(state.debugMode || "PROD") !== "PROD") {
+      spotChecks.forEach((fid) => {
+        const owner = state.sovereigntyByFeatureId[fid];
+        const controller = state.scenarioControllersByFeatureId?.[fid] || owner;
+        if (owner) {
+          const color = staged.scenarioColorMap[owner] || "(no color)";
+          console.log(`[scenario] Spot-check: ${fid} -> owner=${owner}, controller=${controller}, color=${color}`);
+        }
+      });
+    }
 
     refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario:${staged.scenarioId}` });
     if (scenarioBundleUsesChunkedLayer(bundle)) {
@@ -3990,6 +4022,7 @@ async function applyScenarioBundle(
       expectedFeatureCount: Number(bundle.manifest?.summary?.feature_count || 0),
       runtimeFeatureCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
       topologyDecodeMs,
+      mapRefreshMode: scenarioMapRefreshMode,
       applyMs: (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - applyStartedAt,
     });
   } catch (error) {

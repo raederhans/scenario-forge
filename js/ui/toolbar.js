@@ -230,10 +230,12 @@ function initToolbar({ render } = {}) {
   const dockRecentDivider = document.getElementById("dockRecentDivider");
   const presetPolitical = document.getElementById("presetPolitical");
   const presetClear = document.getElementById("presetClear");
+  const dockQuickFillBtn = document.getElementById("dockQuickFillBtn");
   const colorModeSelect = document.getElementById("colorModeSelect");
   const bottomDock = document.getElementById("bottomDock");
   const dockCollapseBtn = document.getElementById("dockCollapseBtn");
-  const devDockCollapseBtn = document.getElementById("devDockCollapseBtn");
+  const dockHandleChevron = document.getElementById("dockHandleChevron");
+  const dockHandleLabel = document.getElementById("dockHandleLabel");
   const mapContainer = document.getElementById("mapContainer");
   const selectedColorPreview = document.getElementById("selectedColorPreview");
   const selectedColorValue = document.getElementById("selectedColorValue");
@@ -245,6 +247,7 @@ function initToolbar({ render } = {}) {
   const zoomResetBtn = document.getElementById("zoomResetBtn");
   const zoomPercentInput = document.getElementById("zoomPercentInput");
   const zoomControls = document.getElementById("zoomControls");
+  const developerModeBtn = document.getElementById("developerModeBtn");
   const toolHudChip = document.getElementById("toolHudChip");
   const mapOnboardingHint = document.getElementById("mapOnboardingHint");
   const scenarioContextBar = document.getElementById("scenarioContextBar");
@@ -263,12 +266,15 @@ function initToolbar({ render } = {}) {
   const scenarioGuideStatusChips = document.getElementById("scenarioGuideStatusChips");
   const dockReferenceBtn = document.getElementById("dockReferenceBtn");
   const dockExportBtn = document.getElementById("dockExportBtn");
+  const dockEditPopoverBtn = document.getElementById("dockEditPopoverBtn");
   const dockReferencePopover = document.getElementById("dockReferencePopover");
   const dockExportPopover = document.getElementById("dockExportPopover");
+  const dockEditPopover = document.getElementById("dockEditPopover");
   const devWorkspaceToggleBtn = document.getElementById("devWorkspaceToggleBtn");
   const leftPanelToggle = document.getElementById("leftPanelToggle");
   const rightPanelToggle = document.getElementById("rightPanelToggle");
   const paintGranularitySelect = document.getElementById("paintGranularitySelect");
+  const dockGranularityField = document.getElementById("dockGranularityField");
   const dockQuickFillRow = document.getElementById("dockQuickFillRow");
   const quickFillParentBtn = document.getElementById("quickFillParentBtn");
   const quickFillCountryBtn = document.getElementById("quickFillCountryBtn");
@@ -279,6 +285,7 @@ function initToolbar({ render } = {}) {
   const politicalEditingToggleBtn = document.getElementById("politicalEditingToggleBtn");
   const scenarioVisualAdjustmentsBtn = document.getElementById("scenarioVisualAdjustmentsBtn");
   const dockPoliticalEditingPanel = document.getElementById("dockPoliticalEditingPanel");
+  const dockColorModeField = document.getElementById("dockColorModeField");
   const activeSovereignLabel = document.getElementById("activeSovereignLabel");
   const recalculateBordersBtn = document.getElementById("recalculateBordersBtn");
   const dynamicBorderStatus = document.getElementById("dynamicBorderStatus");
@@ -462,8 +469,24 @@ function initToolbar({ render } = {}) {
     } catch {}
   };
 
+  const updateLanguageToggleUi = () => {
+    if (!toggleLang) return;
+    const nextLang = state.currentLanguage === "zh" ? "EN" : "ZH";
+    const buttonLabel = state.currentLanguage === "zh" ? "ZH / EN" : "EN / ZH";
+    toggleLang.textContent = buttonLabel;
+    toggleLang.setAttribute("title", `${t("Language", "ui")}: ${nextLang}`);
+  };
+
   const syncDeveloperModeUi = () => {
     document.body?.classList.toggle("developer-mode", !!state.ui.developerMode);
+    if (developerModeBtn) {
+      developerModeBtn.classList.toggle("is-active", !!state.ui.developerMode);
+      developerModeBtn.setAttribute("aria-pressed", state.ui.developerMode ? "true" : "false");
+      developerModeBtn.setAttribute(
+        "title",
+        state.ui.developerMode ? t("Exit developer mode", "ui") : t("Developer mode", "ui")
+      );
+    }
     if (!state.ui.developerMode && state.ui.devWorkspaceExpanded && devWorkspaceToggleBtn) {
       devWorkspaceToggleBtn.click();
     }
@@ -486,6 +509,7 @@ function initToolbar({ render } = {}) {
       state.ui.developerMode = storedDeveloperMode === "true";
     }
   } catch {}
+  updateLanguageToggleUi();
   syncDeveloperModeUi();
 
   const applyAppearanceFilter = () => {
@@ -592,6 +616,7 @@ function initToolbar({ render } = {}) {
   };
 
   const refreshWorkspaceStatus = () => {
+    updateLanguageToggleUi();
     refreshScenarioSelectionChip();
     renderOceanCoastalAccentUi();
   };
@@ -638,8 +663,18 @@ function initToolbar({ render } = {}) {
       || activePolicy.quickFillScopes.includes("country");
     const isVisible = !isScenarioMode && !isOwnershipMode && isSubdivisionMode;
 
+    if (dockQuickFillBtn) {
+      dockQuickFillBtn.classList.toggle("hidden", !isVisible);
+      dockQuickFillBtn.setAttribute("aria-hidden", isVisible ? "false" : "true");
+      dockQuickFillBtn.setAttribute("aria-expanded", state.activeDockPopover === "quickfill" ? "true" : "false");
+    }
     if (dockQuickFillRow) {
-      dockQuickFillRow.classList.toggle("hidden", !isVisible);
+      const shouldShowPopover = isVisible && state.activeDockPopover === "quickfill";
+      dockQuickFillRow.classList.toggle("hidden", !shouldShowPopover);
+      dockQuickFillRow.setAttribute("aria-hidden", shouldShowPopover ? "false" : "true");
+    }
+    if (!isVisible && state.activeDockPopover === "quickfill") {
+      closeDockPopover();
     }
     if (quickFillParentBtn) {
       quickFillParentBtn.textContent = getQuickFillParentLabel(activePolicy);
@@ -667,13 +702,22 @@ function initToolbar({ render } = {}) {
     const isOwnershipMode = String(state.paintMode || "visual") === "sovereignty";
     const showPoliticalPanel = !isScenarioMode && (state.ui.politicalEditingExpanded || isOwnershipMode);
     const showBorderMaintenance = isScenarioMode || state.ui.politicalEditingExpanded || isOwnershipMode;
+    const primaryActionLabel = getPrimaryActionLabel();
 
     if (document.getElementById("labelPresetPolitical")) {
-      document.getElementById("labelPresetPolitical").textContent = getPrimaryActionLabel();
+      document.getElementById("labelPresetPolitical").textContent = primaryActionLabel;
+    }
+    if (presetPolitical) {
+      presetPolitical.setAttribute("aria-label", primaryActionLabel);
+      presetPolitical.setAttribute("title", primaryActionLabel);
     }
 
-    if (paintGranularitySelect) {
-      paintGranularitySelect.classList.toggle("hidden", isScenarioMode);
+    if (dockGranularityField) {
+      dockGranularityField.classList.toggle("hidden", isScenarioMode);
+    }
+
+    if (dockColorModeField) {
+      dockColorModeField.classList.toggle("hidden", isOwnershipMode);
     }
 
     if (politicalEditingToggleBtn) {
@@ -707,17 +751,18 @@ function initToolbar({ render } = {}) {
     if (!bottomDock) return;
     bottomDock.classList.toggle("is-collapsed", !!state.ui.dockCollapsed);
     if (dockCollapseBtn) {
-      dockCollapseBtn.textContent = state.ui.dockCollapsed ? t("Expand", "ui") : t("Collapse", "ui");
       dockCollapseBtn.setAttribute("aria-pressed", state.ui.dockCollapsed ? "true" : "false");
-      dockCollapseBtn.classList.toggle("hidden", !!state.ui.devWorkspaceExpanded);
+      dockCollapseBtn.setAttribute(
+        "aria-label",
+        state.ui.dockCollapsed ? t("Expand quick dock", "ui") : t("Collapse quick dock", "ui")
+      );
+      dockCollapseBtn.setAttribute("title", state.ui.dockCollapsed ? t("Expand", "ui") : t("Collapse", "ui"));
     }
-    if (devDockCollapseBtn) {
-      const label = state.ui.dockCollapsed ? t("Expand", "ui") : t("Collapse", "ui");
-      devDockCollapseBtn.textContent = label;
-      devDockCollapseBtn.setAttribute("aria-pressed", state.ui.dockCollapsed ? "true" : "false");
-      devDockCollapseBtn.setAttribute("aria-label", label);
-      devDockCollapseBtn.setAttribute("title", label);
-      devDockCollapseBtn.classList.toggle("hidden", !state.ui.devWorkspaceExpanded);
+    if (dockHandleChevron) {
+      dockHandleChevron.textContent = state.ui.dockCollapsed ? "^" : "v";
+    }
+    if (dockHandleLabel) {
+      dockHandleLabel.textContent = state.ui.dockCollapsed ? t("Expand", "ui") : t("Collapse", "ui");
     }
   };
 
@@ -995,8 +1040,20 @@ function initToolbar({ render } = {}) {
     "ui"
   );
 
-  const getDockPopoverByKind = (kind) => (kind === "reference" ? dockReferencePopover : kind === "export" ? dockExportPopover : null);
-  const getDockPopoverTrigger = (kind) => (kind === "reference" ? dockReferenceBtn : kind === "export" ? dockExportBtn : null);
+  const getDockPopoverByKind = (kind) => {
+    if (kind === "reference") return dockReferencePopover;
+    if (kind === "export") return dockExportPopover;
+    if (kind === "edit") return dockEditPopover;
+    if (kind === "quickfill") return dockQuickFillRow;
+    return null;
+  };
+  const getDockPopoverTrigger = (kind) => {
+    if (kind === "reference") return dockReferenceBtn;
+    if (kind === "export") return dockExportBtn;
+    if (kind === "edit") return dockEditPopoverBtn;
+    if (kind === "quickfill") return dockQuickFillBtn;
+    return null;
+  };
 
   const closeDockPopover = ({ restoreFocus = false } = {}) => {
     const activeKind = String(state.activeDockPopover || "");
@@ -1005,12 +1062,20 @@ function initToolbar({ render } = {}) {
     state.activeDockPopover = "";
     dockReferencePopover?.classList.add("hidden");
     dockExportPopover?.classList.add("hidden");
+    dockEditPopover?.classList.add("hidden");
+    dockQuickFillRow?.classList.add("hidden");
     dockReferencePopover?.setAttribute("aria-hidden", "true");
     dockExportPopover?.setAttribute("aria-hidden", "true");
+    dockEditPopover?.setAttribute("aria-hidden", "true");
+    dockQuickFillRow?.setAttribute("aria-hidden", "true");
     dockReferenceBtn?.classList.remove("is-active");
     dockExportBtn?.classList.remove("is-active");
+    dockEditPopoverBtn?.classList.remove("is-active");
+    dockQuickFillBtn?.classList.remove("is-active");
     dockReferenceBtn?.setAttribute("aria-expanded", "false");
     dockExportBtn?.setAttribute("aria-expanded", "false");
+    dockEditPopoverBtn?.setAttribute("aria-expanded", "false");
+    dockQuickFillBtn?.setAttribute("aria-expanded", "false");
     if (restoreFocus && activePopover) {
       restoreOverlayTriggerFocus(activePopover, activeTrigger);
     }
@@ -1044,6 +1109,9 @@ function initToolbar({ render } = {}) {
 
   const toggleDock = (force) => {
     state.ui.dockCollapsed = typeof force === "boolean" ? force : !state.ui.dockCollapsed;
+    if (state.ui.dockCollapsed) {
+      closeDockPopover();
+    }
     updateDockCollapsedUi();
     return state.ui.dockCollapsed;
   };
@@ -1057,7 +1125,7 @@ function initToolbar({ render } = {}) {
   };
 
   const openDockPopover = (kind) => {
-    const target = kind === "reference" ? dockReferencePopover : dockExportPopover;
+    const target = getDockPopoverByKind(kind);
     const trigger = getDockPopoverTrigger(kind);
     if (!target) return;
     const nextKind = state.activeDockPopover === kind ? "" : kind;
@@ -1067,13 +1135,8 @@ function initToolbar({ render } = {}) {
     rememberOverlayTrigger(target, trigger);
     target.classList.remove("hidden");
     target.setAttribute("aria-hidden", "false");
-    if (nextKind === "reference") {
-      dockReferenceBtn?.classList.add("is-active");
-      dockReferenceBtn?.setAttribute("aria-expanded", "true");
-    } else {
-      dockExportBtn?.classList.add("is-active");
-      dockExportBtn?.setAttribute("aria-expanded", "true");
-    }
+    trigger?.classList.add("is-active");
+    trigger?.setAttribute("aria-expanded", "true");
     focusOverlaySurface(target);
   };
 
@@ -1082,7 +1145,9 @@ function initToolbar({ render } = {}) {
     document.addEventListener("click", (event) => {
       const target = event.target;
       if (!(target instanceof Element)) return;
-      const insideDockPopover = target.closest("#dockReferencePopover, #dockExportPopover, #dockReferenceBtn, #dockExportBtn");
+      const insideDockPopover = target.closest(
+        "#dockReferencePopover, #dockExportPopover, #dockEditPopover, #dockQuickFillRow, #dockReferenceBtn, #dockExportBtn, #dockEditPopoverBtn, #dockQuickFillBtn"
+      );
       if (state.activeDockPopover && !insideDockPopover) {
         closeDockPopover();
       }
@@ -2902,6 +2967,13 @@ function initToolbar({ render } = {}) {
     toggleLang.dataset.bound = "true";
   }
 
+  if (developerModeBtn && !developerModeBtn.dataset.bound) {
+    developerModeBtn.addEventListener("click", () => {
+      state.toggleDeveloperModeFn?.();
+    });
+    developerModeBtn.dataset.bound = "true";
+  }
+
   [paintModeVisualBtn, paintModePoliticalBtn].forEach((button) => {
     if (!button || button.dataset.bound === "true") return;
     button.addEventListener("click", () => {
@@ -2947,18 +3019,23 @@ function initToolbar({ render } = {}) {
     dockCollapseBtn.dataset.bound = "true";
   }
 
-  if (devDockCollapseBtn && !devDockCollapseBtn.dataset.bound) {
-    devDockCollapseBtn.addEventListener("click", () => {
-      toggleDock();
+  if (dockEditPopoverBtn && !dockEditPopoverBtn.dataset.bound) {
+    dockEditPopoverBtn.setAttribute("aria-haspopup", "dialog");
+    dockEditPopoverBtn.setAttribute("aria-controls", "dockEditPopover");
+    dockEditPopoverBtn.addEventListener("click", () => {
+      openDockPopover("edit");
     });
-    devDockCollapseBtn.dataset.bound = "true";
+    dockEditPopoverBtn.dataset.bound = "true";
   }
 
-  if (inspectorDevWorkspaceBtn && !inspectorDevWorkspaceBtn.dataset.bound) {
-    inspectorDevWorkspaceBtn.addEventListener("click", () => {
-      devWorkspaceToggleBtn?.click();
+  if (dockQuickFillBtn && !dockQuickFillBtn.dataset.bound) {
+    dockQuickFillBtn.setAttribute("aria-haspopup", "dialog");
+    dockQuickFillBtn.setAttribute("aria-controls", "dockQuickFillRow");
+    dockQuickFillBtn.addEventListener("click", () => {
+      if (dockQuickFillBtn.classList.contains("hidden")) return;
+      openDockPopover("quickfill");
     });
-    inspectorDevWorkspaceBtn.dataset.bound = "true";
+    dockQuickFillBtn.dataset.bound = "true";
   }
 
   if (politicalEditingToggleBtn && !politicalEditingToggleBtn.dataset.bound) {
@@ -3925,6 +4002,7 @@ function initToolbar({ render } = {}) {
   if (quickFillParentBtn) {
     quickFillParentBtn.addEventListener("click", () => {
       state.batchFillScope = "parent";
+      closeDockPopover();
       if (typeof state.updatePaintModeUIFn === "function") {
         state.updatePaintModeUIFn();
       }
@@ -3934,6 +4012,7 @@ function initToolbar({ render } = {}) {
   if (quickFillCountryBtn) {
     quickFillCountryBtn.addEventListener("click", () => {
       state.batchFillScope = "country";
+      closeDockPopover();
       if (typeof state.updatePaintModeUIFn === "function") {
         state.updatePaintModeUIFn();
       }

@@ -2570,8 +2570,8 @@ function createDevWorkspacePanel(bottomDock) {
     </div>
   `;
 
-  const headerRow = bottomDock.querySelector(".dock-header-row");
-  bottomDock.insertBefore(section, headerRow?.nextSibling || bottomDock.firstChild || null);
+  const dockPrimary = bottomDock.querySelector(".bottom-dock-primary");
+  bottomDock.insertBefore(section, dockPrimary || null);
   applyDeclarativeTranslations(section);
   return section;
 }
@@ -2629,8 +2629,8 @@ function createDevWorkspaceQuickbar(bottomDock) {
     </div>
   `;
 
-  const headerRow = bottomDock.querySelector(".dock-header-row");
-  bottomDock.insertBefore(quickbar, headerRow?.nextSibling || bottomDock.firstChild || null);
+  const dockPrimary = bottomDock.querySelector(".bottom-dock-primary");
+  bottomDock.insertBefore(quickbar, dockPrimary || null);
   applyDeclarativeTranslations(quickbar);
   return quickbar;
 }
@@ -2661,8 +2661,9 @@ function syncDockState(bottomDock, expanded) {
   bottomDock.classList.remove("is-collapsed");
   const dockCollapseBtn = document.getElementById("dockCollapseBtn");
   if (dockCollapseBtn) {
-    dockCollapseBtn.textContent = t("Collapse", "ui");
     dockCollapseBtn.setAttribute("aria-pressed", "false");
+    dockCollapseBtn.setAttribute("aria-label", t("Collapse quick dock", "ui"));
+    dockCollapseBtn.setAttribute("title", t("Collapse", "ui"));
   }
 }
 

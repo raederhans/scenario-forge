@@ -12,7 +12,7 @@ import {
 import {
   buildInteractionInfrastructureAfterStartup,
   initMap,
-  invalidateContextLayerVisualState,
+  invalidateContextLayerVisualStateBatch,
   setMapData,
   render,
 } from "./core/map_renderer.js";
@@ -991,6 +991,7 @@ async function ensureContextLayerDataReady(
 ) {
   const layerNames = expandDeferredContextLayerNames(requestedLayerNames);
   const results = {};
+  const pendingEntries = [];
   for (const layerName of layerNames) {
     if (Array.isArray(state.contextLayerExternalDataByName?.[layerName]?.features)) {
       results[layerName] = state.contextLayerExternalDataByName[layerName];
@@ -1002,7 +1003,10 @@ async function ensureContextLayerDataReady(
       continue;
     }
     if (state.contextLayerLoadPromiseByName?.[layerName]) {
-      results[layerName] = await state.contextLayerLoadPromiseByName[layerName];
+      pendingEntries.push({
+        layerName,
+        promise: state.contextLayerLoadPromiseByName[layerName],
+      });
       continue;
     }
     state.contextLayerLoadStateByName[layerName] = "loading";
@@ -1026,12 +1030,6 @@ async function ensureContextLayerDataReady(
           featureCount: collection.features.length,
           reason,
         });
-        invalidateContextLayerVisualState(layerName, `context-layer:${reason}`, {
-          renderNow,
-        });
-        if (renderNow) {
-          checkpointBootMetric(`layer:${layerName}:first-render-after-load`);
-        }
         return collection;
       })
       .catch((error) => {
@@ -1048,7 +1046,30 @@ async function ensureContextLayerDataReady(
         delete state.contextLayerLoadPromiseByName[layerName];
       });
     state.contextLayerLoadPromiseByName[layerName] = promise;
-    results[layerName] = await promise;
+    pendingEntries.push({ layerName, promise });
+  }
+
+  if (pendingEntries.length) {
+    const settled = await Promise.allSettled(pendingEntries.map(({ promise }) => promise));
+    const loadedLayerNames = [];
+    settled.forEach((entry, index) => {
+      const { layerName } = pendingEntries[index];
+      const value = entry.status === "fulfilled" ? entry.value : null;
+      results[layerName] = value;
+      if (Array.isArray(value?.features)) {
+        loadedLayerNames.push(layerName);
+      }
+    });
+    if (loadedLayerNames.length) {
+      invalidateContextLayerVisualStateBatch(loadedLayerNames, `context-layer:${reason}`, {
+        renderNow,
+      });
+      if (renderNow) {
+        loadedLayerNames.forEach((layerName) => {
+          checkpointBootMetric(`layer:${layerName}:first-render-after-load`);
+        });
+      }
+    }
   }
   return results;
 }
@@ -1085,48 +1106,43 @@ function schedulePostReadyDeferredContextWarmup() {
   if (state.bootBlocking || postReadyContextWarmupScheduled) {
     return;
   }
-  const queue = [];
+  const requestedLayerNames = [];
   if (state.showRivers) {
-    queue.push(() => ensureContextLayerDataReady("rivers", { reason: "post-ready", renderNow: true }));
+    requestedLayerNames.push("rivers");
   }
   if (state.showUrban) {
-    queue.push(() => ensureContextLayerDataReady("urban", { reason: "post-ready", renderNow: true }));
+    requestedLayerNames.push("urban");
   }
   if (state.showPhysical) {
-    queue.push(() => ensureContextLayerDataReady("physical-set", { reason: "post-ready", renderNow: true }));
+    requestedLayerNames.push("physical-set");
   }
-  if (
+  const shouldWarmCities =
     state.showCityPoints !== false
     && state.baseCityDataState === "idle"
-    && typeof state.ensureBaseCityDataFn === "function"
-  ) {
-    queue.push(() => state.ensureBaseCityDataFn({ reason: "post-ready", renderNow: true }));
-  }
-  if (!queue.length) {
+    && typeof state.ensureBaseCityDataFn === "function";
+  if (!requestedLayerNames.length && !shouldWarmCities) {
     return;
   }
   postReadyContextWarmupScheduled = true;
-  let cursor = 0;
-  const runNext = () => {
-    if (cursor >= queue.length || state.bootBlocking) {
+  scheduleIdleTask(async () => {
+    if (state.bootBlocking) {
       return;
     }
-    const task = queue[cursor];
-    cursor += 1;
-    scheduleIdleTask(async () => {
-      try {
-        await task();
-      } catch (_error) {
-        // Error state is already recorded by the layer loader.
-      } finally {
-        runNext();
-      }
-    }, {
-      timeout: cursor === 1 ? 1000 : 1800,
-      delayMs: cursor === 1 ? 120 : 180,
-    });
-  };
-  runNext();
+    const tasks = [];
+    if (requestedLayerNames.length) {
+      tasks.push(ensureContextLayerDataReady(requestedLayerNames, {
+        reason: "post-ready",
+        renderNow: true,
+      }));
+    }
+    if (shouldWarmCities && state.baseCityDataState === "idle" && typeof state.ensureBaseCityDataFn === "function") {
+      tasks.push(state.ensureBaseCityDataFn({ reason: "post-ready", renderNow: true }));
+    }
+    await Promise.allSettled(tasks);
+  }, {
+    timeout: 1000,
+    delayMs: 120,
+  });
 }
 
 function schedulePostReadyCityWarmup() {

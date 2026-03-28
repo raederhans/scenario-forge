@@ -5902,6 +5902,472 @@ body.right-drawer-open::after {
   }
 }
 
+/* Dock + top overlay compaction overrides */
+.scenario-context-bar,
+.zoom-controls {
+  min-height: 54px;
+  padding: 8px 10px;
+  border-radius: 16px;
+  border: 1px solid rgba(37, 54, 73, 0.14);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.09);
+}
+
+.scenario-context-bar {
+  top: 16px;
+  left: 16px;
+  gap: 8px;
+}
+
+.zoom-controls {
+  top: 16px;
+  right: 24px;
+  gap: 6px;
+}
+
+.zoom-btn,
+.scenario-context-icon-btn,
+.panel-toggle,
+.dock-icon-btn,
+.dock-tool-btn {
+  min-width: 38px;
+  min-height: 38px;
+  border-radius: 11px;
+}
+
+.zoom-btn svg,
+.dock-icon-btn svg,
+.dock-tool-btn svg,
+.dock-segment-icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.dock-zoom-input {
+  min-width: 76px;
+  min-height: 38px;
+  padding: 7px 10px;
+  border-radius: 11px;
+}
+
+.zoom-btn-reset {
+  min-width: 50px;
+  padding: 0 12px;
+}
+
+.zoom-pill-btn {
+  min-width: 0;
+  padding: 0 12px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.zoom-language-btn {
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+}
+
+.developer-mode-btn.is-active {
+  border-color: rgba(32, 76, 119, 0.28);
+  background: rgba(32, 76, 119, 0.12);
+  color: var(--color-accent);
+}
+
+.dev-workspace-toggle {
+  min-width: 42px;
+  padding: 0 10px;
+}
+
+.bottom-dock {
+  left: 22px;
+  right: 22px;
+  bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 18px 14px 12px;
+  border-radius: 24px;
+  background: rgba(248, 250, 252, 0.94);
+  box-shadow: 0 22px 42px rgba(10, 18, 30, 0.14);
+  overflow: visible;
+}
+
+.bottom-dock-primary {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.dock-handle-btn {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(37, 54, 73, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.98);
+  color: var(--text-secondary);
+  box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08);
+  cursor: pointer;
+  z-index: 2;
+}
+
+.dock-handle-btn:hover {
+  color: var(--text-primary);
+  border-color: rgba(32, 76, 119, 0.22);
+}
+
+.dock-handle-chevron {
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.dock-group {
+  position: relative;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.bottom-dock-primary > .dock-group + .dock-group {
+  padding-left: 10px;
+  border-left: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.dock-group-tools {
+  flex: 0 0 auto;
+}
+
+.dock-group-mode,
+.dock-group-config,
+.dock-group-map-actions {
+  flex: 0 0 auto;
+}
+
+.dock-group-history-colors {
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+.dock-cluster-row,
+.dock-inline-cluster,
+.dock-color-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.dock-segmented-control {
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+}
+
+.dock-segment-btn {
+  min-width: 42px;
+  min-height: 38px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.dock-segment-icon-btn {
+  padding: 0;
+}
+
+.dock-mode-icon-btn,
+.dock-action-icon-btn {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+}
+
+.dock-action-icon-btn-primary {
+  background: rgba(32, 76, 119, 0.96);
+  border-color: rgba(18, 50, 82, 0.3);
+  color: #ffffff;
+}
+
+.dock-action-icon-btn-primary:hover {
+  background: rgba(32, 76, 119, 1);
+  color: #ffffff;
+}
+
+.dock-color-stack {
+  gap: 6px;
+}
+
+.dock-color-current-copy {
+  min-width: 0;
+}
+
+.dock-color-value {
+  white-space: nowrap;
+  font-size: 0.78rem;
+}
+
+.dock-custom-color.color-input,
+.selected-color-preview {
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+
+.dock-inline-divider {
+  height: 26px;
+  align-self: center;
+}
+
+.dock-recent-swatches.hidden {
+  display: none !important;
+}
+
+.dock-utility-popover {
+  right: auto;
+  left: 0;
+  bottom: calc(100% + 12px);
+  width: min(280px, calc(100vw - 40px));
+  padding: 14px;
+  border-radius: 16px;
+}
+
+.dock-editor-popover {
+  width: min(268px, calc(100vw - 40px));
+}
+
+.dock-quick-fill-popover {
+  width: min(288px, calc(100vw - 40px));
+}
+
+.dock-popover-field,
+.dock-popover-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dock-editor-popover,
+.dock-quick-fill-popover {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dock-popover-label,
+.dock-popover-title {
+  color: var(--text-primary);
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.dock-popover-hint {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.dock-inline-btn {
+  width: 100%;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(37, 54, 73, 0.12);
+  border-radius: 11px;
+  background: rgba(244, 247, 250, 0.92);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dock-inline-btn.is-active {
+  border-color: rgba(32, 76, 119, 0.24);
+  background: rgba(32, 76, 119, 0.08);
+  color: var(--color-accent);
+}
+
+.dock-political-panel {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.dock-political-owner {
+  min-width: 0;
+  width: 100%;
+}
+
+.bottom-dock.is-collapsed {
+  padding: 8px 14px 6px;
+  min-height: 32px;
+  align-items: center;
+}
+
+.bottom-dock.is-collapsed .dock-group-tools,
+.bottom-dock.is-collapsed .dock-group-mode,
+.bottom-dock.is-collapsed .dock-group-config,
+.bottom-dock.is-collapsed .dock-group-map-actions,
+.bottom-dock.is-collapsed .dock-inline-cluster-history,
+.bottom-dock.is-collapsed .dock-inline-divider,
+.bottom-dock.is-collapsed .dock-color-current-copy,
+.bottom-dock.is-collapsed .dock-custom-color,
+.bottom-dock.is-collapsed #recentColors,
+.bottom-dock.is-collapsed #paletteGrid {
+  display: none !important;
+}
+
+.bottom-dock.is-collapsed .bottom-dock-primary {
+  justify-content: flex-end;
+}
+
+.bottom-dock.is-collapsed .dock-group-history-colors {
+  margin-left: auto;
+  padding-left: 0;
+  border-left: none;
+}
+
+.bottom-dock.is-collapsed .selected-color-preview {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+}
+
+@media (max-width: 1279px) {
+  .bottom-dock-primary {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .dock-group-history-colors {
+    flex: 1 1 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+    padding-left: 0;
+    border-left: none;
+    padding-top: 10px;
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+  }
+
+  .dock-color-current-copy {
+    min-width: 0;
+  }
+
+  .dock-color-value {
+    display: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  .bottom-dock {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    padding: 18px 12px 12px;
+  }
+
+  .bottom-dock-primary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .bottom-dock-primary > .dock-group + .dock-group {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .dock-group {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .dock-group-history-colors {
+    grid-column: 1 / span 2;
+    padding-top: 10px;
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+  }
+
+  .zoom-controls,
+  .scenario-context-bar {
+    min-height: 50px;
+  }
+}
+
+@media (max-width: 767px) {
+  .scenario-context-bar {
+    top: 14px;
+    left: 12px;
+    max-width: calc(100% - 148px);
+    overflow-x: auto;
+  }
+
+  .zoom-controls {
+    top: 14px;
+    right: 10px;
+    gap: 4px;
+    padding: 6px;
+  }
+
+  .zoom-btn,
+  .scenario-context-icon-btn,
+  .dock-icon-btn,
+  .dock-tool-btn {
+    min-width: 34px;
+    min-height: 34px;
+  }
+
+  .dock-zoom-input {
+    min-width: 64px;
+  }
+
+  .bottom-dock {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    padding: 16px 10px 10px;
+    max-height: min(42svh, 320px);
+    overflow-y: auto;
+  }
+
+  .bottom-dock-primary {
+    grid-template-columns: 1fr;
+  }
+
+  .dock-group-history-colors {
+    grid-column: auto;
+  }
+
+  .dock-group {
+    gap: 6px;
+  }
+
+  .dock-utility-popover,
+  .inspector-utilities-shell .dock-utility-popover {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    top: auto;
+    bottom: 94px;
+    width: auto;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -4221,16 +4221,25 @@ function ensureLayerDataFromTopology() {
 }
 
 function invalidateContextLayerVisualState(layerName, reason = "context-layer-loaded", { renderNow = true } = {}) {
+  return invalidateContextLayerVisualStateBatch([layerName], reason, { renderNow });
+}
+
+function invalidateContextLayerVisualStateBatch(layerNames, reason = "context-layer-loaded", { renderNow = true } = {}) {
   layerResolverCache.primaryRef = null;
   layerResolverCache.detailRef = null;
   layerResolverCache.bundleMode = null;
   layerResolverCache.contextRevision = Number.NaN;
-  const targetPasses = ["contextBase"];
-  if (layerName === "urban" || layerName === "physical" || layerName === "physical_semantics") {
-    targetPasses.push("dayNight");
-  }
-  invalidateRenderPasses(targetPasses, reason);
-  clearRenderPassReferenceTransforms(targetPasses);
+  const targetPasses = new Set(["contextBase"]);
+  const normalizedLayerNames = Array.isArray(layerNames) ? layerNames : [layerNames];
+  normalizedLayerNames.forEach((layerName) => {
+    const normalized = String(layerName || "").trim().toLowerCase();
+    if (normalized === "urban" || normalized === "physical" || normalized === "physical_semantics") {
+      targetPasses.add("dayNight");
+    }
+  });
+  const resolvedPasses = Array.from(targetPasses);
+  invalidateRenderPasses(resolvedPasses, reason);
+  clearRenderPassReferenceTransforms(resolvedPasses);
   if (renderNow && typeof state.renderNowFn === "function") {
     state.renderNowFn();
   }
@@ -15697,15 +15706,40 @@ function getUnitCounterNodeTransform(entry) {
 
 function syncUnitCounterScalesDuringZoom() {
   if (!unitCountersGroup) return;
+  const rootNode = typeof unitCountersGroup.node === "function" ? unitCountersGroup.node() : null;
+  if (!rootNode?.children?.length) return;
   const zoomK = Math.max(0.1, Number(state.zoomTransform?.k || 1));
   unitCountersGroup.selectAll("g.unit-counter").each(function (d) {
     if (!d || !d.model) return;
+    const previousScaleModel = d.scaleModel && typeof d.scaleModel === "object" ? d.scaleModel : null;
     const sc = getUnitCounterRenderScale(d.model.metrics, zoomK);
     d.scaleModel = sc;
     const node = this;
-    node.setAttribute("transform", getUnitCounterNodeTransform(d));
-    node.setAttribute("opacity", sc.opacity);
-    node.setAttribute("display", sc.hidden ? "none" : "");
+    const wasHidden = !!previousScaleModel?.hidden;
+    if (sc.hidden) {
+      if (!wasHidden || node.getAttribute("display") !== "none") {
+        node.setAttribute("display", "none");
+      }
+      return;
+    }
+    if (wasHidden || node.getAttribute("display") === "none") {
+      node.setAttribute("display", "");
+    }
+    const localScaleChanged =
+      !previousScaleModel
+      || Number(previousScaleModel.localScale || 1) !== Number(sc.localScale || 1);
+    if (localScaleChanged || wasHidden) {
+      node.setAttribute("transform", getUnitCounterNodeTransform(d));
+    }
+    const nextOpacity = String(sc.opacity);
+    if (
+      !previousScaleModel
+      || wasHidden
+      || String(previousScaleModel.opacity) !== nextOpacity
+      || node.getAttribute("opacity") !== nextOpacity
+    ) {
+      node.setAttribute("opacity", nextOpacity);
+    }
   });
 }
 
@@ -19533,6 +19567,10 @@ function refreshMapDataForScenarioChunkPromotion({
   updateSpecialZonesPaths();
   renderSpecialZoneEditorOverlay();
   updateZoomTranslateExtent();
+  setInteractionInfrastructureState("ready", {
+    ready: true,
+    inFlight: false,
+  });
   if (!suppressRender) {
     render();
   }
@@ -19545,10 +19583,69 @@ function refreshMapDataForScenarioChunkPromotion({
   });
 }
 
+function refreshMapDataForScenarioApply({
+  suppressRender = false,
+} = {}) {
+  const startedAt = nowMs();
+  clearPendingDynamicBorderTimer();
+  clearRenderPhaseTimer();
+  cancelPendingIndexUiRefresh();
+  cancelPendingSidebarRefresh();
+  setRenderPhase(RENDER_PHASE_IDLE);
+  resetRenderDiagnostics();
+  clearStagedMapDataTasks();
+  cancelExactAfterSettleRefresh();
+  cancelDeferredWork(state.hitCanvasBuildScheduled);
+  state.hitCanvasBuildScheduled = null;
+  state.deferContextBasePass = false;
+  state.deferHitCanvasBuild = false;
+  state.deferExactAfterSettle = false;
+  layerResolverCache.primaryRef = null;
+  layerResolverCache.detailRef = null;
+  layerResolverCache.bundleMode = null;
+  layerResolverCache.contextRevision = 0;
+  state.devHoverHit = null;
+  state.devSelectedHit = null;
+  state.devSelectionFeatureIds = new Set();
+  state.devSelectionOrder = [];
+  state.devClipboardFallbackText = "";
+  state.devClipboardPreviewFormat = "names_with_ids";
+  resetPhysicalLandClipPathCache();
+  ensureLayerDataFromTopology();
+  rebuildPoliticalLandCollections();
+  buildRuntimePoliticalMeta();
+  buildIndex();
+  ensureSovereigntyState();
+  state.topologyRevision = Number(state.topologyRevision || 0) + 1;
+  state.hitCanvasDirty = true;
+  const targetPasses = ["background", "political", "contextBase", "contextScenario", "dayNight", "borders", "labels"];
+  invalidateRenderPasses(targetPasses, "scenario-apply-refresh");
+  clearRenderPassReferenceTransforms(targetPasses);
+  markAllOverlaysDirty();
+  rebuildProjectedBoundsCache();
+  rebuildStaticMeshes();
+  invalidateBorderCache();
+  updateDynamicBorderStatusUI();
+  rebuildResolvedColors();
+  buildSpatialIndex();
+  updateSpecialZonesPaths();
+  renderSpecialZoneEditorOverlay();
+  updateZoomTranslateExtent();
+  if (!suppressRender) {
+    render();
+  }
+  recordRenderPerfMetric("scenarioApplyMapRefresh", nowMs() - startedAt, {
+    activeScenarioId: String(state.activeScenarioId || ""),
+    suppressRender: !!suppressRender,
+    landCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
+  });
+}
+
 export {
   initMap,
   setMapData,
   refreshMapDataForScenarioChunkPromotion,
+  refreshMapDataForScenarioApply,
   buildInteractionInfrastructureAfterStartup,
   render,
   autoFillMap,
@@ -19591,6 +19688,7 @@ export {
   recomputeDynamicBordersNow,
   scheduleDynamicBorderRecompute,
   invalidateContextLayerVisualState,
+  invalidateContextLayerVisualStateBatch,
   invalidateOceanBackgroundVisualState,
   invalidateOceanTextureVisualState,
   invalidateOceanWaterInteractionVisualState,
