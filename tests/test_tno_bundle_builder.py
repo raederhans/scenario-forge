@@ -14,6 +14,8 @@ from tools.patch_tno_1962_bundle import (
     ATLANTROPA_REGION_CONFIGS,
     MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
     MANUAL_SYNC_POLICY_STRICT_BLOCK,
+    TNO_1962_GREECE_COARSE_OWNER_BACKFILL,
+    apply_tno_greece_coarse_owner_backfill,
     apply_dev_manual_overrides,
     build_relief_overlays,
     build_tno_bathymetry_payload,
@@ -120,6 +122,71 @@ def _write_publish_bundle_dir(
 
 
 class TnoBundleBuilderTest(unittest.TestCase):
+    def test_apply_tno_greece_coarse_owner_backfill_requires_controller_core_consistency(self) -> None:
+        owners_payload = {"owners": {}}
+        controllers_payload = {
+            "controllers": dict(TNO_1962_GREECE_COARSE_OWNER_BACKFILL)
+        }
+        cores_payload = {
+            "cores": {
+                feature_id: [tag]
+                for feature_id, tag in TNO_1962_GREECE_COARSE_OWNER_BACKFILL.items()
+            }
+        }
+        scenario_political_gdf = gpd.GeoDataFrame(
+            {
+                "id": [
+                    "GR_ADM1_GRC-2883",
+                    "GR_ADM1_GRC-2884",
+                    "GR_ADM1_GRC-2885",
+                    "GR_ADM1_GRC-2886",
+                    "GR_ADM1_GRC-2892",
+                    "GR_ADM1_GRC-2900",
+                    "GR_ADM1_GRC-2949",
+                    "GR_ADM1_GRC-2989",
+                    "GR_ADM1_GRC-2991",
+                    "GR_ADM1_GRC-2992",
+                    "GR_ADM1_GRC-3001",
+                ],
+                "geometry": [_square(float(index), 0.0) for index in range(11)],
+            },
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+
+        diagnostics = apply_tno_greece_coarse_owner_backfill(
+            owners_payload,
+            controllers_payload,
+            cores_payload,
+            scenario_political_gdf,
+        )
+
+        self.assertEqual(diagnostics["feature_count"], 11)
+        self.assertEqual(owners_payload["owners"]["GR_ADM1_GRC-2883"], "GRE")
+        self.assertEqual(owners_payload["owners"]["GR_ADM1_GRC-2992"], "BUL")
+        self.assertEqual(owners_payload["owners"]["GR_ADM1_GRC-3001"], "BUL")
+
+    def test_apply_tno_greece_coarse_owner_backfill_rejects_missing_controller_or_core(self) -> None:
+        owners_payload = {"owners": {}}
+        controllers_payload = {"controllers": {}}
+        cores_payload = {"cores": {}}
+        scenario_political_gdf = gpd.GeoDataFrame(
+            {
+                "id": list(TNO_1962_GREECE_COARSE_OWNER_BACKFILL.keys()),
+                "geometry": [_square(float(index), 0.0) for index in range(11)],
+            },
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+
+        with self.assertRaisesRegex(ValueError, "requires controller tag"):
+            apply_tno_greece_coarse_owner_backfill(
+                owners_payload,
+                controllers_payload,
+                cores_payload,
+                scenario_political_gdf,
+            )
+
     def test_apply_dev_manual_overrides_can_create_override_and_assign_feature_maps(self) -> None:
         countries_payload = {
             "countries": {

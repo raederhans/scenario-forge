@@ -80,6 +80,14 @@
 - 后续前端止血边界阶段，只允许围绕这四块做 ownership 收束。
 - 本轮 Python/契约治理不直接改前端文件，只把 owner baseline 留档。
 
+## 持续追踪表
+
+| 问题编号 | 当前状态 | 权威文件 | 验收命令 | 下一步负责人 |
+| --- | --- | --- | --- | --- |
+| `TRACK-DATA-001` | `data/` 资产分类基线已冻结；`source/manual/derived/publish/runtime-cache` 只读规则已落档，但默认验证链还没有逐项覆盖全部资产类型。 | `docs/BUILD_AND_SCENARIO_CONTRACT_BASELINE_2026-03-28.md` `map_builder/contracts.py` | `python tools/check_scenario_contracts.py --scenario-dir data/scenarios/tno_1962` | 主线 A：契约/构建治理 |
+| `TRACK-STAGE-001` | build/scenario stage owner 已明确；`init_map_data.py` 与 `tools/patch_tno_1962_bundle.py` 仍偏重，但新的 stage/file 契约不再允许继续散落。 | `map_builder/contracts.py` `init_map_data.py` `tools/patch_tno_1962_bundle.py` | `python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/tno_1962` | 主线 A：Python 编排 seam |
+| `TRACK-FRONTEND-001` | 前端高风险 ownership 已冻结成只读基线；场景事务和渲染边界已起步，但点击/双击/导入恢复仍未全部 funnel 化。 | `docs/BUILD_AND_SCENARIO_CONTRACT_BASELINE_2026-03-28.md` `js/core/scenario_dispatcher.js` `js/core/render_boundary.js` | `npm run test:e2e:smoke` | 主线 B：交互入口收口 |
+
 ## 当前共享契约落点
 
 本轮新增共享契约，不改现有输出路径：

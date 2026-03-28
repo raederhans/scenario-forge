@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from tools import check_scenario_contracts
-from tools.check_scenario_contracts import validate_scenario_contract
+from tools.check_scenario_contracts import inspect_scenario_contract, validate_scenario_contract
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -172,6 +172,46 @@ class ScenarioContractTest(unittest.TestCase):
 
             self.assertEqual(errors, [])
             self.assertTrue(any("collision candidates" in warning for warning in warnings))
+
+    def test_inspect_scenario_contract_collects_geo_locale_collision_repair_track(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            scenario_dir = _create_scenario_dir(tmp_root, "repair_track_warning")
+            manifest_path = scenario_dir / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["geo_locale_patch_url"] = "data/scenarios/repair_track_warning/geo_locale_patch.json"
+            _write_json(manifest_path, manifest)
+            _write_json(
+                scenario_dir / "geo_locale_patch.json",
+                {
+                    "version": 1,
+                    "scenario_id": "repair_track_warning",
+                    "geo": {},
+                    "audit": {
+                        "collision_candidates": [
+                            {"feature_id": "FEATURE-1", "raw_name": "Pool", "reason": "non_unique_raw_name"}
+                        ],
+                        "collision_candidate_count": 4,
+                        "cross_base_collision_count": 3,
+                        "split_clone_safe_copy_count": 1,
+                    },
+                },
+            )
+
+            try:
+                report = inspect_scenario_contract(scenario_dir, {}, strict=False)
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            repair_tracks = report["repair_tracks"]
+            geo_locale_tracks = repair_tracks["geo_locale_collision_candidates"]
+            self.assertEqual(report["status"], "ok")
+            self.assertEqual(report["errors"], [])
+            self.assertEqual(len(geo_locale_tracks), 1)
+            self.assertEqual(geo_locale_tracks[0]["cross_base_collision_count"], 3)
+            self.assertEqual(geo_locale_tracks[0]["split_clone_safe_copy_count"], 1)
 
     def test_validate_scenario_contract_warns_when_locale_audit_counts_are_not_numeric(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -340,6 +380,32 @@ class ScenarioContractTest(unittest.TestCase):
             self.assertTrue(any("must store arrays for every feature" in error for error in errors))
             self.assertTrue(any("feature_count must equal owners feature count" in error for error in errors))
             self.assertTrue(any("may only exceed the feature maps with shell fallback ids" in error for error in errors))
+
+    def test_inspect_scenario_contract_strict_mode_collects_repair_tracks(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            previous_project_root = check_scenario_contracts.PROJECT_ROOT
+            check_scenario_contracts.PROJECT_ROOT = tmp_root
+            scenario_dir = _create_scenario_dir(tmp_root, "strict_repair_tracks")
+            _write_strict_bundle_files(
+                scenario_dir,
+                owners={"F-1": "AAA"},
+                controllers={"F-1": "AAA", "F-2": "AAA"},
+                cores={"F-1": ["AAA"], "F-3": ["AAA"]},
+                runtime_feature_ids=["F-1", "F-2", "BAD-1"],
+                manifest_feature_count=1,
+            )
+
+            try:
+                report = inspect_scenario_contract(scenario_dir, {}, strict=True)
+            finally:
+                check_scenario_contracts.PROJECT_ROOT = previous_project_root
+
+            repair_tracks = report["repair_tracks"]
+            self.assertEqual(report["status"], "failed")
+            self.assertEqual(repair_tracks["owners_controllers_keyset"]["controller_only_count"], 1)
+            self.assertEqual(repair_tracks["owners_cores_keyset"]["core_only_count"], 1)
+            self.assertEqual(repair_tracks["runtime_topology_extra_ids"]["extra_runtime_id_count"], 2)
 
 
 if __name__ == "__main__":

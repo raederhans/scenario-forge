@@ -2556,6 +2556,20 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
     ],
 }
 
+TNO_1962_GREECE_COARSE_OWNER_BACKFILL = {
+    "GR_ADM1_GRC-2883": "GRE",
+    "GR_ADM1_GRC-2884": "GRE",
+    "GR_ADM1_GRC-2885": "GRE",
+    "GR_ADM1_GRC-2886": "GRE",
+    "GR_ADM1_GRC-2892": "GRE",
+    "GR_ADM1_GRC-2900": "GRE",
+    "GR_ADM1_GRC-2949": "GRE",
+    "GR_ADM1_GRC-2989": "GRE",
+    "GR_ADM1_GRC-2991": "GRE",
+    "GR_ADM1_GRC-2992": "BUL",
+    "GR_ADM1_GRC-3001": "BUL",
+}
+
 TNO_1962_MANUAL_COUNTRY_OVERRIDES = {
     "WRS": {
         "display_name": "West Russian Revolutionary Front",
@@ -7082,6 +7096,55 @@ def apply_tno_feature_assignment_overrides(
     }
 
 
+def apply_tno_greece_coarse_owner_backfill(
+    owners_payload: dict,
+    controllers_payload: dict,
+    cores_payload: dict,
+    scenario_political_gdf: gpd.GeoDataFrame | None = None,
+) -> dict[str, object]:
+    owners = owners_payload.setdefault("owners", {})
+    controllers = controllers_payload.setdefault("controllers", {})
+    cores = cores_payload.setdefault("cores", {})
+    runtime_feature_ids: set[str] = set()
+    if scenario_political_gdf is not None and not scenario_political_gdf.empty:
+        runtime_feature_ids = {
+            str(feature_id).strip()
+            for feature_id in scenario_political_gdf["id"].astype(str).tolist()
+            if str(feature_id).strip()
+        }
+
+    applied: dict[str, str] = {}
+    for feature_id, owner_tag in TNO_1962_GREECE_COARSE_OWNER_BACKFILL.items():
+        if runtime_feature_ids and feature_id not in runtime_feature_ids:
+            raise ValueError(f"TNO Greece coarse owner backfill references missing runtime feature id: {feature_id}")
+        controller_tag = normalize_tag(controllers.get(feature_id))
+        if not controller_tag:
+            raise ValueError(f"TNO Greece coarse owner backfill requires controller tag for {feature_id}")
+        if controller_tag != owner_tag:
+            raise ValueError(
+                f"TNO Greece coarse owner backfill disagrees with controller tag for {feature_id}: "
+                f"{controller_tag} vs {owner_tag}"
+            )
+        core_tags = normalize_core_tags(cores.get(feature_id))
+        if not core_tags:
+            raise ValueError(f"TNO Greece coarse owner backfill requires core tags for {feature_id}")
+        if owner_tag not in core_tags:
+            raise ValueError(
+                f"TNO Greece coarse owner backfill disagrees with core tags for {feature_id}: "
+                f"{core_tags} vs {owner_tag}"
+            )
+        owners[feature_id] = owner_tag
+        applied[feature_id] = owner_tag
+
+    return {
+        "feature_count": len(applied),
+        "by_tag": {
+            tag: sorted(feature_id for feature_id, applied_tag in applied.items() if applied_tag == tag)
+            for tag in sorted(set(applied.values()))
+        },
+    }
+
+
 def load_runtime_political_gdf() -> gpd.GeoDataFrame:
     topology_payload = load_json(RUNTIME_POLITICAL_PATH)
     runtime_gdf = topology_object_to_gdf(topology_payload, "political")
@@ -8362,6 +8425,12 @@ def build_countries_stage_state(
         cores_payload,
         scenario_political_gdf,
     )
+    greece_coarse_owner_backfill_diagnostics = apply_tno_greece_coarse_owner_backfill(
+        owners_payload,
+        controllers_payload,
+        cores_payload,
+        scenario_political_gdf,
+    )
     polar_feature_diagnostics = build_polar_feature_diagnostics(scenario_political_gdf)
 
     countries_payload.setdefault("countries", {})[ATL_TAG] = build_atl_country_entry(
@@ -8530,6 +8599,7 @@ def build_countries_stage_state(
         "restore_diagnostics": restore_diagnostics,
         "polar_feature_diagnostics": polar_feature_diagnostics,
         "feature_assignment_override_diagnostics": feature_assignment_override_diagnostics,
+        "greece_coarse_owner_backfill_diagnostics": greece_coarse_owner_backfill_diagnostics,
         "dev_manual_override_diagnostics": dev_manual_override_diagnostics,
         "atl_feature_ids": sorted(atl_feature_ids),
         "atl_sea_feature_ids": sorted(atl_sea_feature_ids),
@@ -8766,6 +8836,10 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
         "atl_sea_feature_count": len(stage_metadata["atl_sea_feature_ids"]),
         "coastal_restore_stats": stage_metadata["restore_diagnostics"],
         "feature_assignment_override_diagnostics": stage_metadata["feature_assignment_override_diagnostics"],
+        "greece_coarse_owner_backfill_diagnostics": stage_metadata.get(
+            "greece_coarse_owner_backfill_diagnostics",
+            {"feature_count": 0, "by_tag": {}},
+        ),
     })
 
     stage_metadata["owner_baseline_hash"] = owner_baseline_hash

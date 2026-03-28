@@ -6,6 +6,7 @@ import json
 import sys
 from collections import defaultdict
 from pathlib import Path, PurePosixPath
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -73,7 +74,33 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Enable strict bundle/runtime validation for publish-ready scenario or checkpoint directories.",
     )
+    parser.add_argument(
+        "--report-path",
+        default="",
+        help="Optional JSON report output path. Writes a structured validation report when provided.",
+    )
     return parser.parse_args()
+
+
+def create_repair_tracks() -> dict[str, Any]:
+    return {
+        "owners_controllers_keyset": None,
+        "owners_cores_keyset": None,
+        "runtime_topology_extra_ids": None,
+        "geo_locale_collision_candidates": [],
+    }
+
+
+def build_scenario_report(scenario_dir: Path, strict: bool) -> dict[str, Any]:
+    return {
+        "scenario_id": scenario_dir.name,
+        "scenario_dir": str(scenario_dir),
+        "strict_mode": strict,
+        "status": "ok",
+        "errors": [],
+        "warnings": [],
+        "repair_tracks": create_repair_tracks(),
+    }
 
 
 def load_json(path: Path) -> dict:
@@ -239,6 +266,7 @@ def validate_locale_patch(
     manifest: dict,
     errors: list[str],
     warnings: list[str],
+    repair_tracks: dict[str, Any] | None = None,
 ) -> None:
     patch_descriptors = [
         ("geo_locale_patch_url", str(manifest.get("geo_locale_patch_url") or "").strip()),
@@ -302,6 +330,18 @@ def validate_locale_patch(
                     f"{cross_base_collision_count} cross-base collisions remain after "
                     f"{split_clone_safe_copy_count} split-clone safe copies. Sample: {sample[:5]!r}."
                 )
+                if repair_tracks is not None:
+                    geo_locale_tracks = repair_tracks.setdefault("geo_locale_collision_candidates", [])
+                    if isinstance(geo_locale_tracks, list):
+                        geo_locale_tracks.append(
+                            {
+                                "field_name": field_name,
+                                "collision_candidate_count": collision_count,
+                                "cross_base_collision_count": cross_base_collision_count,
+                                "split_clone_safe_copy_count": split_clone_safe_copy_count,
+                                "sample": sample[:5],
+                            }
+                        )
                 audit_reported = True
         elif collision_candidates not in (None, [], {}):
             errors.append(f"{field_name} audit.collision_candidates must be a list when present.")
@@ -370,7 +410,11 @@ def _extract_runtime_political_feature_ids(runtime_payload: dict, errors: list[s
     return feature_ids
 
 
-def validate_strict_bundle_contract(target_dir: Path, errors: list[str]) -> None:
+def validate_strict_bundle_contract(
+    target_dir: Path,
+    errors: list[str],
+    repair_tracks: dict[str, Any] | None = None,
+) -> None:
     required_payloads = {
         filename: _load_required_local_json(target_dir / filename, errors)
         for filename in SCENARIO_STRICT_REQUIRED_FILENAMES
@@ -407,18 +451,40 @@ def validate_strict_bundle_contract(target_dir: Path, errors: list[str]) -> None
     controller_ids = {str(feature_id).strip() for feature_id in controllers.keys() if str(feature_id).strip()}
     core_ids = {str(feature_id).strip() for feature_id in cores.keys() if str(feature_id).strip()}
     if owner_ids != controller_ids:
+        controller_only_ids = sorted(controller_ids - owner_ids)
+        owner_only_ids = sorted(owner_ids - controller_ids)
+        if repair_tracks is not None:
+            repair_tracks["owners_controllers_keyset"] = {
+                "owners_count": len(owner_ids),
+                "controllers_count": len(controller_ids),
+                "controller_only_count": len(controller_only_ids),
+                "controller_only_sample": controller_only_ids[:10],
+                "owner_only_count": len(owner_only_ids),
+                "owner_only_sample": owner_only_ids[:10],
+            }
         errors.append(
             "owners/controllers feature keysets must match in strict mode. "
             f"owners={len(owner_ids)} controllers={len(controller_ids)} "
-            f"controller_only={sorted(controller_ids - owner_ids)[:10]} "
-            f"owner_only={sorted(owner_ids - controller_ids)[:10]}."
+            f"controller_only={controller_only_ids[:10]} "
+            f"owner_only={owner_only_ids[:10]}."
         )
     if owner_ids != core_ids:
+        core_only_ids = sorted(core_ids - owner_ids)
+        owner_only_ids = sorted(owner_ids - core_ids)
+        if repair_tracks is not None:
+            repair_tracks["owners_cores_keyset"] = {
+                "owners_count": len(owner_ids),
+                "cores_count": len(core_ids),
+                "core_only_count": len(core_only_ids),
+                "core_only_sample": core_only_ids[:10],
+                "owner_only_count": len(owner_only_ids),
+                "owner_only_sample": owner_only_ids[:10],
+            }
         errors.append(
             "owners/cores feature keysets must match in strict mode. "
             f"owners={len(owner_ids)} cores={len(core_ids)} "
-            f"core_only={sorted(core_ids - owner_ids)[:10]} "
-            f"owner_only={sorted(owner_ids - core_ids)[:10]}."
+            f"core_only={core_only_ids[:10]} "
+            f"owner_only={owner_only_ids[:10]}."
         )
 
     manifest_summary = manifest.get("summary") if isinstance(manifest.get("summary"), dict) else {}
@@ -448,6 +514,12 @@ def validate_strict_bundle_contract(target_dir: Path, errors: list[str]) -> None
         if not any(feature_id.startswith(prefix) for prefix in STRICT_RUNTIME_ONLY_FEATURE_ID_PREFIXES)
     )
     if illegal_runtime_only_ids:
+        if repair_tracks is not None:
+            repair_tracks["runtime_topology_extra_ids"] = {
+                "extra_runtime_id_count": len(illegal_runtime_only_ids),
+                "extra_runtime_id_sample": illegal_runtime_only_ids[:10],
+                "allowed_runtime_only_prefixes": list(STRICT_RUNTIME_ONLY_FEATURE_ID_PREFIXES),
+            }
         errors.append(
             "runtime_topology political geometries may only exceed the feature maps with shell fallback ids in strict mode. "
             f"Sample: {illegal_runtime_only_ids[:10]}."
@@ -460,21 +532,27 @@ def validate_publish_bundle_dir(target_dir: Path) -> list[str]:
     return errors
 
 
-def validate_scenario_contract(
+def inspect_scenario_contract(
     scenario_dir: Path,
     duplicate_scenario_dirs: dict[str, list[str]],
     strict: bool = False,
-) -> tuple[list[str], list[str]]:
-    errors: list[str] = []
-    warnings: list[str] = []
+) -> dict[str, Any]:
+    report = build_scenario_report(scenario_dir, strict)
+    errors: list[str] = report["errors"]
+    warnings: list[str] = report["warnings"]
+    repair_tracks: dict[str, Any] = report["repair_tracks"]
     manifest_path = scenario_dir / "manifest.json"
     if not manifest_path.exists():
-        return [f"manifest.json is missing at {manifest_path}."], warnings
+        report["errors"] = [f"manifest.json is missing at {manifest_path}."]
+        report["status"] = "failed"
+        return report
 
     try:
         manifest = load_json(manifest_path)
     except Exception as exc:
-        return [str(exc)], warnings
+        report["errors"] = [str(exc)]
+        report["status"] = "failed"
+        return report
     expected_scenario_id = scenario_dir.name
     actual_scenario_id = str(manifest.get("scenario_id") or "").strip()
 
@@ -493,10 +571,20 @@ def validate_scenario_contract(
     validate_manifest_version_matrix(manifest, errors)
     validate_manifest_urls(expected_scenario_id, manifest, errors)
     validate_runtime_capitals(expected_scenario_id, manifest, errors)
-    validate_locale_patch(expected_scenario_id, manifest, errors, warnings)
+    validate_locale_patch(expected_scenario_id, manifest, errors, warnings, repair_tracks=repair_tracks)
     if strict:
-        validate_strict_bundle_contract(scenario_dir, errors)
-    return errors, warnings
+        validate_strict_bundle_contract(scenario_dir, errors, repair_tracks=repair_tracks)
+    report["status"] = "failed" if errors else "ok"
+    return report
+
+
+def validate_scenario_contract(
+    scenario_dir: Path,
+    duplicate_scenario_dirs: dict[str, list[str]],
+    strict: bool = False,
+) -> tuple[list[str], list[str]]:
+    report = inspect_scenario_contract(scenario_dir, duplicate_scenario_dirs, strict=strict)
+    return list(report["errors"]), list(report["warnings"])
 
 
 def collect_duplicate_scenario_dirs(scenario_dirs: list[Path]) -> dict[str, list[str]]:
@@ -520,6 +608,56 @@ def collect_duplicate_scenario_dirs(scenario_dirs: list[Path]) -> dict[str, list
     return duplicates
 
 
+def render_repair_track_lines(repair_tracks: dict[str, Any], strict: bool) -> list[str]:
+    lines: list[str] = []
+    owners_controllers = repair_tracks.get("owners_controllers_keyset")
+    if strict and isinstance(owners_controllers, dict):
+        lines.append(
+            "owners/controllers keyset "
+            f"controller_only={owners_controllers.get('controller_only_count', 0)} "
+            f"owner_only={owners_controllers.get('owner_only_count', 0)} "
+            f"sample={owners_controllers.get('controller_only_sample', [])[:5]}"
+        )
+    owners_cores = repair_tracks.get("owners_cores_keyset")
+    if strict and isinstance(owners_cores, dict):
+        lines.append(
+            "owners/cores keyset "
+            f"core_only={owners_cores.get('core_only_count', 0)} "
+            f"owner_only={owners_cores.get('owner_only_count', 0)} "
+            f"sample={owners_cores.get('core_only_sample', [])[:5]}"
+        )
+    runtime_topology_extra_ids = repair_tracks.get("runtime_topology_extra_ids")
+    if strict and isinstance(runtime_topology_extra_ids, dict):
+        lines.append(
+            "runtime_topology extra ids "
+            f"count={runtime_topology_extra_ids.get('extra_runtime_id_count', 0)} "
+            f"sample={runtime_topology_extra_ids.get('extra_runtime_id_sample', [])[:5]}"
+        )
+    geo_locale_collision_candidates = repair_tracks.get("geo_locale_collision_candidates")
+    if isinstance(geo_locale_collision_candidates, list):
+        for entry in geo_locale_collision_candidates:
+            if not isinstance(entry, dict):
+                continue
+            lines.append(
+                "geo_locale collision candidates "
+                f"field={entry.get('field_name', '')} "
+                f"remaining={entry.get('cross_base_collision_count', 0)} "
+                f"safe_copies={entry.get('split_clone_safe_copy_count', 0)} "
+                f"sample={entry.get('sample', [])[:2]}"
+            )
+    return lines
+
+
+def write_validation_report(report_path: Path, reports: list[dict[str, Any]], strict: bool) -> None:
+    payload = {
+        "mode": "strict" if strict else "default",
+        "scenario_count": len(reports),
+        "reports": reports,
+    }
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 def main() -> int:
     args = parse_args()
     scenarios_root = Path(args.scenarios_root).resolve()
@@ -529,8 +667,12 @@ def main() -> int:
 
     duplicate_scenario_dirs = collect_duplicate_scenario_dirs(discover_scenario_dirs(scenarios_root, []))
     any_errors = False
+    reports: list[dict[str, Any]] = []
     for scenario_dir in scenario_dirs:
-        errors, warnings = validate_scenario_contract(scenario_dir, duplicate_scenario_dirs, strict=args.strict)
+        report = inspect_scenario_contract(scenario_dir, duplicate_scenario_dirs, strict=args.strict)
+        reports.append(report)
+        errors = list(report["errors"])
+        warnings = list(report["warnings"])
         if errors:
             any_errors = True
             print(f"[scenario-contract] FAILED {scenario_dir.name}")
@@ -538,10 +680,19 @@ def main() -> int:
                 print(f"- {error}")
             for warning in warnings:
                 print(f"! {warning}")
+            repair_track_lines = render_repair_track_lines(report.get("repair_tracks", {}), strict=args.strict)
+            for line in repair_track_lines:
+                print(f"~ {line}")
             continue
         print(f"[scenario-contract] OK {scenario_dir.name}")
         for warning in warnings:
             print(f"! {warning}")
+        repair_track_lines = render_repair_track_lines(report.get("repair_tracks", {}), strict=args.strict)
+        for line in repair_track_lines:
+            print(f"~ {line}")
+
+    if args.report_path:
+        write_validation_report(Path(args.report_path).resolve(), reports, strict=args.strict)
 
     return 1 if any_errors else 0
 

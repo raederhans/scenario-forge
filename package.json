@@ -9,6 +9,8 @@
   "scripts": {
     "playwright:install": "playwright install",
     "playwright:install:chromium": "playwright install --with-deps chromium",
+    "verify:scenario-contracts": "python tools/check_scenario_contracts.py --scenario-dir data/scenarios/tno_1962",
+    "verify:scenario-contracts:strict": "python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/tno_1962 --report-path .runtime/reports/generated/tno_1962.strict_contract_report.json",
     "test:e2e": "node node_modules/@playwright/test/cli.js test",
     "test:e2e:smoke": "node node_modules/@playwright/test/cli.js test tests/e2e/main_shell_i18n.spec.js tests/e2e/scenario_apply_resilience.spec.js --reporter=list --workers=1",
     "test:e2e:project-save-load": "node node_modules/@playwright/test/cli.js test tests/e2e/project_save_load_roundtrip.spec.js --reporter=list --workers=1",
