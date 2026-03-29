@@ -8,7 +8,6 @@ import hashlib
 import json
 import math
 import re
-import shutil
 import sys
 from collections import Counter, deque
 from datetime import datetime, timezone
@@ -34,6 +33,7 @@ if str(ROOT) not in sys.path:
 from map_builder.geo.topology import compute_neighbor_graph
 from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
+from map_builder import scenario_bundle_platform
 from map_builder.contracts import (
     SCENARIO_CHECKPOINT_BATHYMETRY_FILENAME as CONTRACT_CHECKPOINT_BATHYMETRY_FILENAME,
     SCENARIO_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME as CONTRACT_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME,
@@ -50,13 +50,10 @@ from map_builder.contracts import (
     SCENARIO_CHECKPOINT_WATER_FILENAME as CONTRACT_CHECKPOINT_WATER_FILENAME,
     SCENARIO_CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME as CONTRACT_CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME,
     SCENARIO_CHECKPOINT_WATER_SEED_FILENAME as CONTRACT_CHECKPOINT_WATER_SEED_FILENAME,
-    SCENARIO_COUNTRIES_STAGE_ARTIFACTS,
-    SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS,
     SCENARIO_PUBLISH_FILENAMES_BY_SCOPE as CONTRACT_PUBLISH_FILENAMES_BY_SCOPE,
     SCENARIO_PUBLISH_SCOPE_ALL as CONTRACT_PUBLISH_SCOPE_ALL,
     SCENARIO_PUBLISH_SCOPE_POLAR_RUNTIME as CONTRACT_PUBLISH_SCOPE_POLAR_RUNTIME,
     SCENARIO_PUBLISH_SCOPE_SCENARIO_DATA as CONTRACT_PUBLISH_SCOPE_SCENARIO_DATA,
-    SCENARIO_RUNTIME_STAGE_EXTRA_ARTIFACTS,
     resolve_scenario_publish_filenames,
 )
 from scenario_builder.hoi4.audit import read_bmp24
@@ -4395,27 +4392,34 @@ def parse_args() -> argparse.Namespace:
 
 
 def checkpoint_path(checkpoint_dir: Path, filename: str) -> Path:
-    return checkpoint_dir / filename
+    return scenario_bundle_platform.checkpoint_path(checkpoint_dir, filename)
 
 
 def write_checkpoint_json(checkpoint_dir: Path, filename: str, payload: dict) -> None:
-    path = checkpoint_path(checkpoint_dir, filename)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    write_json(path, payload)
+    scenario_bundle_platform.write_checkpoint_json(
+        checkpoint_dir,
+        filename,
+        payload,
+        write_json=write_json,
+    )
 
 
 def write_checkpoint_gdf(checkpoint_dir: Path, filename: str, gdf: gpd.GeoDataFrame) -> None:
-    write_checkpoint_json(checkpoint_dir, filename, gdf_to_feature_collection(gdf))
+    scenario_bundle_platform.write_checkpoint_gdf(
+        checkpoint_dir,
+        filename,
+        gdf,
+        write_json=write_json,
+        gdf_to_feature_collection=gdf_to_feature_collection,
+    )
 
 
 def load_checkpoint_json(checkpoint_dir: Path, filename: str) -> dict:
-    path = checkpoint_path(checkpoint_dir, filename)
-    if not path.exists():
-        raise FileNotFoundError(f"Missing checkpoint artifact: {path}")
-    payload = load_json(path)
-    if not isinstance(payload, dict):
-        raise TypeError(f"Checkpoint artifact must be a JSON object: {path}")
-    return payload
+    return scenario_bundle_platform.load_checkpoint_json(
+        checkpoint_dir,
+        filename,
+        load_json=load_json,
+    )
 
 
 def gdf_to_feature_collection(gdf: gpd.GeoDataFrame) -> dict:
@@ -4424,8 +4428,12 @@ def gdf_to_feature_collection(gdf: gpd.GeoDataFrame) -> dict:
     return json.loads(gdf.to_json())
 
 def load_checkpoint_gdf(checkpoint_dir: Path, filename: str) -> gpd.GeoDataFrame:
-    payload = load_checkpoint_json(checkpoint_dir, filename)
-    return geopandas_from_features(payload.get("features", []))
+    return scenario_bundle_platform.load_checkpoint_gdf(
+        checkpoint_dir,
+        filename,
+        load_json=load_json,
+        geopandas_from_features=geopandas_from_features,
+    )
 
 
 CHECKPOINT_STAGE_METADATA_FILENAME = CONTRACT_CHECKPOINT_STAGE_METADATA_FILENAME
@@ -8878,38 +8886,29 @@ def build_bundle_state(
 
 
 def write_countries_stage_checkpoints(state: dict[str, object], checkpoint_dir: Path) -> None:
-    checkpoint_dir.mkdir(parents=True, exist_ok=True)
-    for artifact in SCENARIO_COUNTRIES_STAGE_ARTIFACTS:
-        payload = state[artifact.state_key]
-        if artifact.payload_kind == "gdf":
-            write_checkpoint_gdf(checkpoint_dir, artifact.filename, payload)
-        else:
-            write_checkpoint_json(checkpoint_dir, artifact.filename, payload)
-    for artifact in SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS:
-        payload = state.get(artifact.state_key)
-        if isinstance(payload, dict):
-            write_checkpoint_json(checkpoint_dir, artifact.filename, payload)
+    scenario_bundle_platform.write_countries_stage_checkpoints(
+        state,
+        checkpoint_dir,
+        write_json=write_json,
+        gdf_to_feature_collection=gdf_to_feature_collection,
+    )
 
 
 def load_countries_stage_checkpoints(checkpoint_dir: Path) -> dict[str, object]:
-    state: dict[str, object] = {}
-    for artifact in SCENARIO_COUNTRIES_STAGE_ARTIFACTS:
-        if artifact.payload_kind == "gdf":
-            state[artifact.state_key] = load_checkpoint_gdf(checkpoint_dir, artifact.filename)
-        else:
-            state[artifact.state_key] = load_checkpoint_json(checkpoint_dir, artifact.filename)
-    for artifact in SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS:
-        path = checkpoint_path(checkpoint_dir, artifact.filename)
-        if path.exists():
-            state[artifact.state_key] = load_checkpoint_json(checkpoint_dir, artifact.filename)
-    return state
+    return scenario_bundle_platform.load_countries_stage_checkpoints(
+        checkpoint_dir,
+        load_json=load_json,
+        geopandas_from_features=geopandas_from_features,
+    )
 
 
 def write_runtime_topology_stage_checkpoints(state: dict[str, object], checkpoint_dir: Path) -> None:
-    checkpoint_dir.mkdir(parents=True, exist_ok=True)
-    write_countries_stage_checkpoints(state, checkpoint_dir)
-    for artifact in SCENARIO_RUNTIME_STAGE_EXTRA_ARTIFACTS:
-        write_checkpoint_json(checkpoint_dir, artifact.filename, state[artifact.state_key])
+    scenario_bundle_platform.write_runtime_topology_stage_checkpoints(
+        state,
+        checkpoint_dir,
+        write_json=write_json,
+        gdf_to_feature_collection=gdf_to_feature_collection,
+    )
 
 
 def ensure_runtime_topology_checkpoints(
@@ -8917,24 +8916,15 @@ def ensure_runtime_topology_checkpoints(
     checkpoint_dir: Path,
     refresh_named_water_snapshot: bool = False,
 ) -> None:
-    countries_stage_required = [artifact.filename for artifact in SCENARIO_COUNTRIES_STAGE_ARTIFACTS]
-    required = [
-        *countries_stage_required,
-        *(artifact.filename for artifact in SCENARIO_RUNTIME_STAGE_EXTRA_ARTIFACTS),
-        *(artifact.filename for artifact in SCENARIO_OPTIONAL_RUNTIME_STAGE_ARTIFACTS),
-    ]
-    if all(checkpoint_path(checkpoint_dir, filename).exists() for filename in required):
-        return
-    if all(checkpoint_path(checkpoint_dir, filename).exists() for filename in countries_stage_required):
-        state = build_runtime_topology_stage(checkpoint_dir)
-    else:
-        state = build_runtime_topology_state_from_countries_state(
-            build_countries_stage_state(
-                scenario_dir,
-                refresh_named_water_snapshot=refresh_named_water_snapshot,
-            )
-        )
-    write_runtime_topology_stage_checkpoints(state, checkpoint_dir)
+    scenario_bundle_platform.ensure_runtime_topology_checkpoints(
+        scenario_dir,
+        checkpoint_dir,
+        refresh_named_water_snapshot=refresh_named_water_snapshot,
+        build_countries_stage_state=build_countries_stage_state,
+        build_runtime_topology_state_from_countries_state=build_runtime_topology_state_from_countries_state,
+        load_countries_stage_checkpoints=load_countries_stage_checkpoints,
+        write_runtime_topology_stage_checkpoints=write_runtime_topology_stage_checkpoints,
+    )
 
 
 def build_runtime_topology_stage(checkpoint_dir: Path) -> dict[str, object]:
@@ -8974,50 +8964,13 @@ def build_geo_locale_stage(
 
 
 def _build_manual_sync_file_report(filename: str, scenario_payload: dict, checkpoint_payload: dict) -> dict[str, object]:
-    if filename == "countries.json":
-        scenario_countries = scenario_payload.get("countries", {}) if isinstance(scenario_payload, dict) else {}
-        checkpoint_countries = checkpoint_payload.get("countries", {}) if isinstance(checkpoint_payload, dict) else {}
-        changed_keys = sorted(
-            key
-            for key in set(scenario_countries.keys()) | set(checkpoint_countries.keys())
-            if scenario_countries.get(key) != checkpoint_countries.get(key)
-        )
-        kind = "countries"
-    elif filename in {"owners.by_feature.json", "controllers.by_feature.json"}:
-        key = "owners" if filename.startswith("owners") else "controllers"
-        scenario_map = scenario_payload.get(key, {}) if isinstance(scenario_payload, dict) else {}
-        checkpoint_map = checkpoint_payload.get(key, {}) if isinstance(checkpoint_payload, dict) else {}
-        changed_keys = sorted(
-            feature_id
-            for feature_id in set(scenario_map.keys()) | set(checkpoint_map.keys())
-            if scenario_map.get(feature_id) != checkpoint_map.get(feature_id)
-        )
-        kind = key
-    elif filename == "cores.by_feature.json":
-        scenario_map = scenario_payload.get("cores", {}) if isinstance(scenario_payload, dict) else {}
-        checkpoint_map = checkpoint_payload.get("cores", {}) if isinstance(checkpoint_payload, dict) else {}
-        changed_keys = sorted(
-            feature_id
-            for feature_id in set(scenario_map.keys()) | set(checkpoint_map.keys())
-            if normalize_core_tags(scenario_map.get(feature_id)) != normalize_core_tags(checkpoint_map.get(feature_id))
-        )
-        kind = "cores"
-    else:
-        scenario_geo = scenario_payload.get("geo", {}) if isinstance(scenario_payload, dict) else {}
-        checkpoint_geo = checkpoint_payload.get("geo", {}) if isinstance(checkpoint_payload, dict) else {}
-        changed_keys = sorted(
-            feature_id
-            for feature_id in set(scenario_geo.keys()) | set(checkpoint_geo.keys())
-            if normalize_locale_override_entry(scenario_geo.get(feature_id))
-            != normalize_locale_override_entry(checkpoint_geo.get(feature_id))
-        )
-        kind = "geo_locale_patch"
-    return {
-        "file": filename,
-        "kind": kind,
-        "changed_keys_sample": changed_keys[:25],
-        "changed_key_count": len(changed_keys),
-    }
+    return scenario_bundle_platform.build_manual_sync_file_report(
+        filename,
+        scenario_payload,
+        checkpoint_payload,
+        normalize_core_tags=normalize_core_tags,
+        normalize_locale_override_entry=normalize_locale_override_entry,
+    )
 
 
 def detect_unsynced_manual_edits(
@@ -9028,56 +8981,22 @@ def detect_unsynced_manual_edits(
     report_dir: Path | None = None,
     backup_root: Path | None = None,
 ) -> dict[str, object]:
-    monitored_filenames = (
-        "countries.json",
-        "owners.by_feature.json",
-        "controllers.by_feature.json",
-        "cores.by_feature.json",
-        "geo_locale_patch.json",
+    return scenario_bundle_platform.detect_unsynced_manual_edits(
+        scenario_dir,
+        checkpoint_dir,
+        manual_sources,
+        scenario_id=SCENARIO_ID,
+        policy=policy,
+        load_json=load_json,
+        write_json=write_json,
+        utc_timestamp=utc_timestamp,
+        normalize_core_tags=normalize_core_tags,
+        normalize_locale_override_entry=normalize_locale_override_entry,
+        report_dir=report_dir or MANUAL_SYNC_REPORT_DIR,
+        backup_root=backup_root or MANUAL_SYNC_BACKUP_ROOT,
+        backup_continue_policy=MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
+        strict_block_policy=MANUAL_SYNC_POLICY_STRICT_BLOCK,
     )
-    drift_files: list[dict[str, object]] = []
-    for filename in monitored_filenames:
-        scenario_path = scenario_dir / filename
-        checkpoint_payload_path = checkpoint_dir / filename
-        if not scenario_path.exists() or not checkpoint_payload_path.exists():
-            continue
-        scenario_payload = load_json(scenario_path)
-        checkpoint_payload = load_json(checkpoint_payload_path)
-        if scenario_payload == checkpoint_payload:
-            continue
-        drift_files.append(_build_manual_sync_file_report(filename, scenario_payload, checkpoint_payload))
-
-    timestamp = utc_timestamp().replace(":", "").replace("-", "")
-    report = {
-        "scenario_id": SCENARIO_ID,
-        "generated_at": utc_timestamp(),
-        "policy": policy,
-        "has_drift": bool(drift_files),
-        "manual_sources": {key: str(path) for key, path in manual_sources.items()},
-        "files": drift_files,
-    }
-    report_dir = report_dir or MANUAL_SYNC_REPORT_DIR
-    backup_root = backup_root or MANUAL_SYNC_BACKUP_ROOT
-    report_dir.mkdir(parents=True, exist_ok=True)
-    report_path = report_dir / f"{SCENARIO_ID}-{timestamp}.json"
-    write_json(report_path, report)
-    report["report_path"] = str(report_path)
-    if not drift_files:
-        return report
-
-    if policy == MANUAL_SYNC_POLICY_BACKUP_CONTINUE:
-        backup_dir = backup_root / SCENARIO_ID / timestamp
-        backup_dir.mkdir(parents=True, exist_ok=True)
-        for filename in resolve_publish_filenames(PUBLISH_SCOPE_SCENARIO_DATA):
-            source_path = scenario_dir / filename
-            if source_path.exists():
-                backup_path = backup_dir / filename
-                backup_path.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(source_path, backup_path)
-        report["backup_path"] = str(backup_dir)
-    if policy == MANUAL_SYNC_POLICY_STRICT_BLOCK:
-        raise ValueError(f"Unsynced manual edits detected. See report: {report_path}")
-    return report
 
 
 def write_bundle_stage(
@@ -9086,14 +9005,14 @@ def write_bundle_stage(
     publish_scope: str = PUBLISH_SCOPE_POLAR_RUNTIME,
     manual_sync_policy: str = MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
 ) -> None:
-    scenario_dir.mkdir(parents=True, exist_ok=True)
     if publish_scope in {PUBLISH_SCOPE_SCENARIO_DATA, PUBLISH_SCOPE_ALL}:
-        strict_contract_errors = validate_publish_bundle_dir(checkpoint_dir)
-        if strict_contract_errors:
-            raise ValueError(
-                "Strict bundle validation failed for publish checkpoint:\n- "
-                + "\n- ".join(strict_contract_errors)
-            )
+        scenario_bundle_platform.validate_strict_publish_bundle(
+            checkpoint_dir,
+            publish_scope,
+            scenario_data_scope=PUBLISH_SCOPE_SCENARIO_DATA,
+            all_scope=PUBLISH_SCOPE_ALL,
+            validate_publish_bundle_dir=validate_publish_bundle_dir,
+        )
         validate_geo_locale_checkpoint(checkpoint_dir, scenario_dir / "geo_name_overrides.manual.json")
         detect_unsynced_manual_edits(
             scenario_dir,
@@ -9105,11 +9024,13 @@ def write_bundle_stage(
             },
             policy=manual_sync_policy,
         )
-    for filename in resolve_publish_filenames(publish_scope):
-        payload = load_checkpoint_json(checkpoint_dir, filename)
-        output_path = scenario_dir / filename
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        write_json(output_path, payload)
+    scenario_bundle_platform.publish_checkpoint_bundle(
+        scenario_dir,
+        checkpoint_dir,
+        publish_scope,
+        load_checkpoint_json=load_checkpoint_json,
+        write_json=write_json,
+    )
     if publish_scope in {PUBLISH_SCOPE_SCENARIO_DATA, PUBLISH_SCOPE_ALL}:
         rebuild_published_scenario_chunk_assets(scenario_dir, checkpoint_dir)
 

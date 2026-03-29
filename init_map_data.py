@@ -53,6 +53,55 @@ def _peek_requested_mode(argv: list[str]) -> str:
     return "all"
 
 
+def _read_json_strict_light(path: Path) -> object:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _read_json_optional_light(path: Path | None, *, default: object = None) -> object:
+    if path is None or not path.exists():
+        return default
+    try:
+        return _read_json_strict_light(path)
+    except (OSError, ValueError, json.JSONDecodeError):
+        return default
+
+
+def _write_json_atomic_light(
+    path: Path,
+    payload: object,
+    *,
+    ensure_ascii: bool = False,
+    indent: int | None = 2,
+    separators: tuple[str, str] | None = None,
+    allow_nan: bool = True,
+    trailing_newline: bool = False,
+) -> None:
+    text = json.dumps(
+        payload,
+        ensure_ascii=ensure_ascii,
+        indent=indent,
+        separators=separators,
+        allow_nan=allow_nan,
+    )
+    if trailing_newline:
+        text += "\n"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temp_name = tempfile.mkstemp(
+        dir=path.parent,
+        prefix=f".{path.name}.",
+        suffix=".tmp",
+        text=True,
+    )
+    temp_path = Path(temp_name)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="") as handle:
+            handle.write(text)
+        temp_path.replace(path)
+    except Exception:
+        temp_path.unlink(missing_ok=True)
+        raise
+
+
 REQUESTED_MODE = _peek_requested_mode(sys.argv[1:])
 
 if REQUESTED_MODE != "palettes":
@@ -80,7 +129,7 @@ else:  # pragma: no cover - palettes mode does not touch GIS stack
     box = None
     unary_union = None
 
-from map_builder import config as cfg
+from map_builder import build_orchestrator, config as cfg
 from map_builder.contracts import DATA_ARTIFACT_SPECS_BY_PATH
 
 if REQUESTED_MODE != "palettes":
@@ -158,6 +207,9 @@ else:  # pragma: no cover - palettes mode avoids GIS/runtime build imports
     generate_hierarchy = None
     geo_key_normalizer = None
     translate_manager = None
+    read_json_optional = _read_json_optional_light
+    read_json_strict = _read_json_strict_light
+    write_json_atomic = _write_json_atomic_light
     LOCAL_CANONICAL_COUNTRY_CODES = ()
     collect_topology_country_metrics = None
 
@@ -3564,7 +3616,362 @@ def rebuild_derived_hoi4_assets(output_dir: Path, strict: bool = False) -> bool:
     return True
 
 
-def main() -> None:
+def run_optional_machine_translation(
+    output_dir: Path,
+    *,
+    stage_timings: dict[str, dict] | None = None,
+) -> None:
+    build_mt_mode = str(os.environ.get("MAPCREATOR_BUILD_MT", "off")).strip().lower()
+    if build_mt_mode not in {"auto", "on"}:
+        return
+    print(f"[INFO] Running optional machine translation pass (mode={build_mt_mode})....")
+    machine_translation_start = time.perf_counter()
+    translation_result = translate_manager.sync_translations(
+        topology_path=output_dir / "europe_topology.na_v2.json",
+        output_path=output_dir / "locales.json",
+        geo_aliases_path=output_dir / "geo_aliases.json",
+        hierarchy_path=output_dir / "hierarchy.json",
+        runtime_topology_path=output_dir / "europe_topology.runtime_political_v1.json",
+        scenarios_root=output_dir / "scenarios",
+        machine_translate=True,
+        translator_delay_seconds=0.05,
+        max_machine_translations=2500,
+        auto_country_codes="visible-missing",
+        network_mode=build_mt_mode,
+    )
+    print(
+        "[INFO] Optional translation result: "
+        f"geo_missing_like={translation_result['geo_missing_like']}, "
+        f"todo_markers={translation_result['geo_literal_todo_markers']}, "
+        f"mt_requests={translation_result['mt_requests']}"
+    )
+    if stage_timings is not None:
+        _record_stage_timing(
+            stage_timings,
+            "machine_translation",
+            machine_translation_start,
+            mode=build_mt_mode,
+            mt_requests=translation_result.get("mt_requests"),
+        )
+
+
+def build_primary_topology_bundle(
+    script_dir: Path,
+    output_dir: Path,
+    *,
+    stage_timings: dict[str, dict] | None = None,
+    build_stage_cache: dict[str, dict] | None = None,
+    timings_root: Path | None = None,
+) -> dict[str, object]:
+    del script_dir, build_stage_cache, timings_root
+    borders = fetch_ne_zip(cfg.BORDERS_URL, "borders")
+    borders = clip_to_map_bounds(borders, "borders")
+    primary_pipeline_start = time.perf_counter()
+
+    if getattr(cfg, "GLOBAL_SKELETON_MODE", False):
+        filtered = filter_countries(borders)
+        filtered = filtered.copy()
+        filtered["geometry"] = filtered.geometry.simplify(
+            tolerance=cfg.SIMPLIFY_BORDERS, preserve_topology=True
+        )
+    else:
+        data = fetch_geojson(cfg.URL)
+        gdf = build_geodataframe(data)
+        gdf = clip_to_map_bounds(gdf, "nuts")
+        filtered = filter_countries(gdf)
+        filtered = filtered.copy()
+        filtered["geometry"] = filtered.geometry.simplify(
+            tolerance=cfg.SIMPLIFY_NUTS3, preserve_topology=True
+        )
+    filtered = build_antarctic_sectors(filtered)
+    validate_political_schema(filtered, "Political Filter")
+
+    rivers_clipped = load_rivers()
+    border_lines = build_border_lines()
+    ocean = fetch_ne_zip(cfg.OCEAN_URL, "ocean")
+    ocean = clip_to_map_bounds(ocean, "ocean")
+    marine_polys = fetch_ne_zip(cfg.MARINE_POLYS_URL, "marine polygons")
+    marine_polys = clip_to_map_bounds(marine_polys, "marine polygons")
+    lakes = fetch_ne_zip(cfg.LAKES_URL, "lakes")
+    lakes = clip_to_map_bounds(lakes, "lakes")
+    land_bg = fetch_ne_zip(cfg.LAND_BG_URL, "land")
+    land_bg = clip_to_map_bounds(land_bg, "land background")
+    ocean = ensure_ocean_coverage(
+        ocean,
+        land_bg,
+        target_bounds=getattr(cfg, "MAP_BOUNDS", cfg.GLOBAL_BOUNDS),
+        stage_label="initial",
+    )
+
+    # Keep raw ocean geometry until political bounds are finalized to avoid early bbox clipping artifacts.
+    ocean_clipped = ocean.copy()
+    ocean_clipped["geometry"] = ocean_clipped.geometry.simplify(
+        tolerance=cfg.SIMPLIFY_BACKGROUND, preserve_topology=True
+    )
+    # Keep raw land background geometry until political bounds are finalized.
+    land_bg_clipped = land_bg.copy()
+    land_bg_clipped["geometry"] = land_bg_clipped.geometry.simplify(
+        tolerance=cfg.SIMPLIFY_BACKGROUND, preserve_topology=True
+    )
+    water_regions = build_water_regions(marine_polys, lakes)
+    water_regions["geometry"] = water_regions.geometry.simplify(
+        tolerance=cfg.SIMPLIFY_BACKGROUND, preserve_topology=True
+    )
+    urban_clipped = load_urban()
+    urban_clipped = urban_clipped.copy()
+    urban_clipped["geometry"] = urban_clipped.geometry.simplify(
+        tolerance=cfg.SIMPLIFY_URBAN, preserve_topology=True
+    )
+    physical_filtered = load_physical()
+    if physical_filtered.empty:
+        print("Physical regions filter returned empty dataset, keeping all clipped features.")
+        physical_filtered = fetch_ne_zip(cfg.PHYSICAL_URL, "physical")
+        physical_filtered = clip_to_map_bounds(physical_filtered, "physical")
+    physical_filtered = physical_filtered.copy()
+    physical_filtered["geometry"] = physical_filtered.geometry.simplify(
+        tolerance=cfg.SIMPLIFY_PHYSICAL, preserve_topology=True
+    )
+    keep_cols = [
+        "name",
+        "name_en",
+        "NAME",
+        "NAME_EN",
+        "featurecla",
+        "FEATURECLA",
+        "geometry",
+    ]
+    physical_filtered = physical_filtered[[col for col in keep_cols if col in physical_filtered.columns]]
+
+    nuts_hybrid = filtered.copy()
+    special_zones = gpd.GeoDataFrame(
+        columns=["id", "name", "type", "label", "claimants", "cntr_code", "geometry"],
+        crs="EPSG:4326",
+    )
+    hybrid = nuts_hybrid.copy()
+
+    if not getattr(cfg, "GLOBAL_SKELETON_MODE", False):
+        extension_hybrid = build_extension_admin1(filtered)
+        hybrid = gpd.GeoDataFrame(
+            pd.concat([nuts_hybrid, extension_hybrid], ignore_index=True),
+            crs="EPSG:4326",
+        )
+        balkan_fallback = build_balkan_fallback(hybrid, admin0=borders)
+        if not balkan_fallback.empty:
+            hybrid = gpd.GeoDataFrame(
+                pd.concat([hybrid, balkan_fallback], ignore_index=True),
+                crs="EPSG:4326",
+            )
+        hybrid = apply_holistic_replacements(hybrid)
+        hybrid = apply_denmark_border_detail(hybrid)
+        hybrid = apply_russia_ukraine_replacement(hybrid)
+        hybrid = apply_poland_replacement(hybrid)
+        hybrid = apply_china_replacement(hybrid)
+        hybrid = apply_south_asia_replacement(hybrid, land_bg_clipped)
+        hybrid = apply_north_america_replacement(hybrid)
+
+    try:
+        print("Downloading India ADM2 (raw) for special zones...")
+        india_raw = fetch_or_load_geojson(
+            cfg.IND_ADM2_URL,
+            cfg.IND_ADM2_FILENAME,
+            fallback_urls=cfg.IND_ADM2_FALLBACK_URLS,
+        )
+        if india_raw.empty:
+            print("[Special Zones] India ADM2 GeoDataFrame is empty; skipping disputed zone.")
+        else:
+            if india_raw.crs is None:
+                india_raw = india_raw.set_crs("EPSG:4326", allow_override=True)
+            if india_raw.crs.to_epsg() != 4326:
+                india_raw = india_raw.to_crs("EPSG:4326")
+            china_gdf = hybrid[hybrid["cntr_code"].astype(str).str.upper() == "CN"].copy()
+            special_zones = build_special_zones(china_gdf, india_raw)
+            if special_zones.empty:
+                print("[Special Zones] No special zones were generated.")
+            else:
+                print(f"[Special Zones] Generated {len(special_zones)} special zones.")
+    except Exception as exc:
+        print(f"[Special Zones] Failed to build special zones; continuing without: {exc}")
+
+    final_hybrid = hybrid.copy()
+    final_hybrid["cntr_code"] = final_hybrid["cntr_code"].fillna("").astype(str).str.strip()
+    final_hybrid.loc[final_hybrid["cntr_code"] == "", "cntr_code"] = None
+    missing_mask = final_hybrid["cntr_code"].isna()
+    if missing_mask.any() and "id" in final_hybrid.columns:
+        final_hybrid.loc[missing_mask, "cntr_code"] = final_hybrid.loc[missing_mask, "id"].apply(
+            extract_country_code
+        )
+    final_hybrid["cntr_code"] = final_hybrid["cntr_code"].fillna("").astype(str).str.strip()
+    final_hybrid.loc[final_hybrid["cntr_code"] == "", "cntr_code"] = None
+
+    missing_mask = final_hybrid["cntr_code"].isna()
+    if missing_mask.any():
+        borders_ll = borders.to_crs("EPSG:4326")
+        code_col = pick_column(
+            borders_ll,
+            ["iso_a2", "ISO_A2", "adm0_a2", "ADM0_A2", "iso_3166_1_", "ISO_3166_1_"],
+        )
+        if not code_col:
+            print("Borders dataset missing ISO A2 column; spatial join skipped.")
+        else:
+            try:
+                missing = final_hybrid.loc[missing_mask].copy().to_crs("EPSG:4326")
+                missing["geometry"] = missing.geometry.representative_point()
+                joined = gpd.sjoin(
+                    missing,
+                    borders_ll[[code_col, "geometry"]],
+                    how="left",
+                    predicate="within",
+                )
+                filled = joined[code_col]
+                filled = filled.where(~filled.isin(["-99", "", None]))
+                filled = filled.groupby(level=0).first()
+                final_hybrid.loc[filled.index, "cntr_code"] = filled
+            except Exception as exc:
+                print(f"Spatial join failed: {exc}")
+
+    final_hybrid["cntr_code"] = (
+        final_hybrid["cntr_code"].fillna("").astype(str).str.strip().str.upper()
+    )
+    final_hybrid.loc[final_hybrid["cntr_code"] == "", "cntr_code"] = None
+    if getattr(cfg, "ENABLE_SUBDIVISION_ENRICHMENT", False):
+        final_hybrid = apply_config_subdivisions(final_hybrid)
+
+    try:
+        hybrid_bounds = final_hybrid.to_crs("EPSG:4326").total_bounds
+        if (
+            len(hybrid_bounds) == 4
+            and all(math.isfinite(v) for v in hybrid_bounds)
+            and hybrid_bounds[2] > hybrid_bounds[0]
+            and hybrid_bounds[3] > hybrid_bounds[1]
+        ):
+            ocean_clipped = clip_to_bounds(ocean_clipped, hybrid_bounds, "ocean")
+            land_bg_clipped = clip_to_bounds(land_bg_clipped, hybrid_bounds, "land background")
+            water_regions = clip_to_bounds(water_regions, hybrid_bounds, "water regions")
+    except Exception as exc:
+        print(f"Background layer clip-to-political-bounds skipped: {exc}")
+
+    ocean_clipped = ensure_ocean_coverage(
+        ocean_clipped,
+        land_bg_clipped,
+        target_bounds=getattr(cfg, "MAP_BOUNDS", cfg.GLOBAL_BOUNDS),
+        stage_label="pre-topology",
+    )
+
+    filtered_group_col = "id" if "id" in filtered.columns else "NUTS_ID"
+    filtered = cull_small_geometries(filtered, "land", group_col=filtered_group_col)
+    ocean_clipped = cull_small_geometries(ocean_clipped, "ocean")
+    land_bg_clipped = cull_small_geometries(land_bg_clipped, "land background")
+    water_regions = cull_small_geometries(water_regions, "water regions", group_col="id")
+    urban_clipped = cull_small_geometries(urban_clipped, "urban")
+    physical_filtered = cull_small_geometries(physical_filtered, "physical")
+    hybrid = cull_small_geometries(hybrid, "hybrid", group_col="id")
+    final_hybrid = cull_small_geometries(final_hybrid, "political", group_col="id")
+    special_zones = cull_small_geometries(special_zones, "special zones", group_col="id")
+    urban_clipped = assign_stable_urban_area_ids(urban_clipped)
+
+    target_bounds = getattr(cfg, "MAP_BOUNDS", cfg.GLOBAL_BOUNDS)
+    log_layer_coverage("political", final_hybrid, target_bounds)
+    log_layer_coverage("ocean", ocean_clipped, target_bounds)
+    log_layer_coverage("land", land_bg_clipped, target_bounds)
+    log_layer_coverage("water_regions", water_regions, target_bounds)
+    log_layer_coverage("urban", urban_clipped, target_bounds)
+    log_layer_coverage("physical", physical_filtered, target_bounds)
+    log_layer_coverage("rivers", rivers_clipped, target_bounds)
+    log_layer_coverage("special_zones", special_zones, target_bounds)
+
+    print("[INFO] Building derived physical atlas semantics and contour assets....")
+    physical_semantics, contour_major, contour_minor = build_and_save_physical_context_layers(
+        physical_filtered,
+        output_dir,
+    )
+    log_layer_coverage("physical_semantics", physical_semantics, target_bounds)
+    log_layer_coverage("contours_major", contour_major, target_bounds)
+    log_layer_coverage("contours_minor", contour_minor, target_bounds)
+
+    if "id" in final_hybrid.columns:
+        final_hybrid["id"] = final_hybrid["id"].fillna("").astype(str).str.strip()
+        empty_id_mask = final_hybrid["id"] == ""
+        if empty_id_mask.any():
+            for idx in final_hybrid.index[empty_id_mask]:
+                cc = str(final_hybrid.loc[idx, "cntr_code"] or "UNK").upper()
+                final_hybrid.loc[idx, "id"] = f"{cc}_{idx}"
+            print(f"[ID Fix] Filled {empty_id_mask.sum()} empty IDs")
+        seen: dict[str, int] = {}
+        dup_count = 0
+        for idx in final_hybrid.index:
+            fid = final_hybrid.loc[idx, "id"]
+            if fid in seen:
+                seen[fid] += 1
+                final_hybrid.loc[idx, "id"] = f"{fid}__d{seen[fid]}"
+                dup_count += 1
+            else:
+                seen[fid] = 0
+        if dup_count:
+            print(f"[ID Fix] De-duplicated {dup_count} IDs")
+        print(f"[ID Validation] {len(final_hybrid)} features, {final_hybrid['id'].nunique()} unique IDs")
+    else:
+        print("[ID Validation] WARNING: 'id' column missing from final_hybrid!")
+
+    world_cities_start = time.perf_counter()
+    print("[INFO] Building global city assets....")
+    world_cities = build_world_cities(
+        political=final_hybrid,
+        urban=urban_clipped,
+    )
+    city_aliases = build_city_aliases_payload(world_cities)
+    if stage_timings is not None:
+        _record_stage_timing(
+            stage_timings,
+            "world_cities",
+            world_cities_start,
+            city_count=len(world_cities),
+            alias_count=city_aliases.get("alias_count"),
+        )
+
+    save_outputs(
+        filtered,
+        rivers_clipped,
+        border_lines,
+        ocean_clipped,
+        water_regions,
+        land_bg_clipped,
+        urban_clipped,
+        physical_filtered,
+        hybrid,
+        final_hybrid,
+        world_cities,
+        city_aliases,
+        output_dir,
+    )
+
+    city_lights_assets_start = time.perf_counter()
+    build_city_lights_assets(output_dir)
+    if stage_timings is not None:
+        _record_stage_timing(stage_timings, "city_lights_assets", city_lights_assets_start)
+
+    topology_path = output_dir / "europe_topology.json"
+    build_topology(
+        political=final_hybrid,
+        ocean=ocean_clipped,
+        land=land_bg_clipped,
+        urban=urban_clipped,
+        physical=physical_filtered,
+        rivers=rivers_clipped,
+        special_zones=special_zones,
+        water_regions=water_regions,
+        output_path=topology_path,
+        quantization=cfg.TOPOLOGY_QUANTIZATION,
+    )
+    if stage_timings is not None:
+        _record_stage_timing(stage_timings, "primary_topology_bundle", primary_pipeline_start)
+    return {
+        "final_hybrid": final_hybrid,
+        "world_cities": world_cities,
+        "missing_cntr_code_count": int(final_hybrid["cntr_code"].isnull().sum()),
+    }
+
+
+def _legacy_main_impl() -> None:
     args = parse_args()
     script_dir = Path(__file__).resolve().parent
     output_dir = script_dir / "data"
@@ -4071,6 +4478,13 @@ def main() -> None:
     print(f"Features with missing CNTR_CODE: {final_hybrid['cntr_code'].isnull().sum()}")
     print("Done.")
     finalize_build()
+
+
+def main() -> None:
+    args = parse_args()
+    script_dir = Path(__file__).resolve().parent
+    output_dir = script_dir / "data"
+    build_orchestrator.run(args, script_dir, output_dir, stage_ops=sys.modules[__name__])
 
 
 if __name__ == "__main__":
