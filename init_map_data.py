@@ -3419,6 +3419,22 @@ def _resolve_palette_source_root(candidates: list[Path]) -> Path | None:
     return None
 
 
+def _build_cross_platform_source_candidates(windows_path: str) -> list[Path]:
+    normalized = Path(windows_path)
+    candidates = [normalized]
+    raw_text = str(normalized)
+    if len(raw_text) >= 3 and raw_text[1:3] == ":\\":
+        drive = raw_text[0].lower()
+        suffix = raw_text[2:].replace("\\", "/")
+        candidates.append(Path(f"/mnt/{drive}{suffix}"))
+    return candidates
+
+
+def _resolve_palette_job_source_root(windows_path: str) -> tuple[Path | None, list[Path]]:
+    candidates = _build_cross_platform_source_candidates(windows_path)
+    return _resolve_palette_source_root(candidates), candidates
+
+
 def run_palette_imports(output_dir: Path, strict: bool = False) -> None:
     importer = PROJECT_ROOT / "tools" / "import_country_palette.py"
     primary_topology = output_dir / "europe_topology.json"
@@ -3430,10 +3446,9 @@ def run_palette_imports(output_dir: Path, strict: bool = False) -> None:
     if not runtime_topology.exists():
         raise SystemExit(f"Runtime topology required for palette import: {runtime_topology}")
 
-    vanilla_root = _resolve_palette_source_root([
-        Path(r"/mnt/c/Program Files (x86)/Steam/steamapps/common/Hearts of Iron IV"),
-        Path(r"C:\Program Files (x86)\Steam\steamapps\common\Hearts of Iron IV"),
-    ])
+    vanilla_root, vanilla_candidates = _resolve_palette_job_source_root(
+        r"C:\Program Files (x86)\Steam\steamapps\common\Hearts of Iron IV"
+    )
     palette_jobs = [
         {
             "palette_id": "hoi4_vanilla",
@@ -3441,6 +3456,7 @@ def run_palette_imports(output_dir: Path, strict: bool = False) -> None:
             "source_variant": "vanilla",
             "manual_map": PROJECT_ROOT / "data/palette-maps/hoi4_vanilla.manual.json",
             "source_root": vanilla_root,
+            "source_root_candidates": vanilla_candidates,
             "source_workshop_id": "",
         },
         {
@@ -3448,7 +3464,12 @@ def run_palette_imports(output_dir: Path, strict: bool = False) -> None:
             "display_name": "Kaiserreich",
             "source_variant": "kaiserreich",
             "manual_map": PROJECT_ROOT / "data/palette-maps/kaiserreich.manual.json",
-            "source_root": Path(r"/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/394360/1521695605"),
+            "source_root": _resolve_palette_job_source_root(
+                r"C:\Program Files (x86)\Steam\steamapps\workshop\content\394360\1521695605"
+            )[0],
+            "source_root_candidates": _build_cross_platform_source_candidates(
+                r"C:\Program Files (x86)\Steam\steamapps\workshop\content\394360\1521695605"
+            ),
             "source_workshop_id": "1521695605",
         },
         {
@@ -3456,7 +3477,12 @@ def run_palette_imports(output_dir: Path, strict: bool = False) -> None:
             "display_name": "The New Order",
             "source_variant": "tno",
             "manual_map": PROJECT_ROOT / "data/palette-maps/tno.manual.json",
-            "source_root": Path(r"/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/394360/2438003901"),
+            "source_root": _resolve_palette_job_source_root(
+                r"C:\Program Files (x86)\Steam\steamapps\workshop\content\394360\2438003901"
+            )[0],
+            "source_root_candidates": _build_cross_platform_source_candidates(
+                r"C:\Program Files (x86)\Steam\steamapps\workshop\content\394360\2438003901"
+            ),
             "source_workshop_id": "2438003901",
         },
         {
@@ -3464,7 +3490,12 @@ def run_palette_imports(output_dir: Path, strict: bool = False) -> None:
             "display_name": "Red Flood",
             "source_variant": "red_flood",
             "manual_map": PROJECT_ROOT / "data/palette-maps/red_flood.manual.json",
-            "source_root": Path(r"/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/394360/2815832636"),
+            "source_root": _resolve_palette_job_source_root(
+                r"C:\Program Files (x86)\Steam\steamapps\workshop\content\394360\2815832636"
+            )[0],
+            "source_root_candidates": _build_cross_platform_source_candidates(
+                r"C:\Program Files (x86)\Steam\steamapps\workshop\content\394360\2815832636"
+            ),
             "source_workshop_id": "2815832636",
         },
     ]
@@ -3472,7 +3503,12 @@ def run_palette_imports(output_dir: Path, strict: bool = False) -> None:
     for job in palette_jobs:
         source_root = job["source_root"]
         if source_root is None or not source_root.exists():
-            message = f"[Palette] Source root missing for {job['palette_id']}: {source_root}"
+            tried_paths = ", ".join(str(path) for path in job["source_root_candidates"])
+            message = (
+                f"[Palette] Source root missing for {job['palette_id']}. "
+                f"Tried: {tried_paths}. "
+                "Install or sync the mod into one of those directories."
+            )
             if strict:
                 raise SystemExit(message)
             print(f"{message}. Skipping.")

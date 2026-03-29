@@ -25,13 +25,13 @@ Expected: repo root now has `node_modules/playwright/cli.js` and `node_modules/@
 ```bash
 codex mcp list
 ```
-Expected: `playwright` appears and is enabled.
+Expected: do not require a project-local `playwright` MCP entry on this machine. The current Codex desktop build treats `@playwright/mcp` resource-list failures as fatal here.
 
 2. Verify project config exists:
 ```bash
 cat .codex/config.toml
 ```
-Expected: `--browser msedge`, localhost restrictions, `--output-dir .runtime/browser/mcp-artifacts`, and `startup_timeout_sec = 60`.
+Expected: the project file keeps only comments explaining that Codex-side Playwright MCP is temporarily disabled on this machine.
 
 3. Verify artifacts folder is ignored:
 ```bash
@@ -59,12 +59,13 @@ bash ops/browser-mcp/run-smoke-browser-inspection.sh --profile ops/browser-mcp/i
 ```
 
 ## Run modes
-### A) STDIO mode (default)
-Codex starts Playwright MCP directly from `.codex/config.toml`.
+### A) Codex-side MCP
+Codex-side Playwright MCP is currently disabled on this machine.
 
-Use this first.
-
-The project launcher now prefers the repo-local `node_modules/playwright/cli.js` and only falls back to npm cache or `npx` when the local package is missing.
+Important:
+- The current Codex desktop build treats `resources/list` and `resources/templates/list` failures from `@playwright/mcp` as fatal here.
+- The repo-local `node_modules/playwright/cli.js` remains reserved for this project's own Playwright tests and helper scripts.
+- Do not point Codex MCP at `ops/browser-mcp/start-playwright-mcp-stdio.sh` unless you are explicitly debugging the project launcher itself.
 
 ### B) Standalone HTTP mode (WSL/headed fallback)
 Use when STDIO mode cannot start browser reliably.
@@ -145,6 +146,6 @@ In another project:
 - Ensure no external process locks screenshot/log files.
 
 ### Codex cannot use Playwright in STDIO mode
-- Re-run `npm install` at repo root so `node_modules/playwright/cli.js` exists.
-- Start standalone server and switch config to URL mode.
-- Re-run smoke script.
+- Current local default: keep Codex-side Playwright MCP disabled.
+- Re-run `npm install` at repo root only for the repository's own Playwright tests and scripts.
+- Use the repository smoke scripts or standalone browser inspection flows instead.

@@ -32,7 +32,13 @@ def _utc_now() -> str:
 
 
 def _write_json(path: Path, payload: Any) -> None:
-    write_json_atomic(path, payload, ensure_ascii=False, indent=2, trailing_newline=True)
+    try:
+        write_json_atomic(path, payload, ensure_ascii=False, indent=2, trailing_newline=True)
+    except PermissionError as exc:
+        raise PermissionError(
+            f"Scenario chunk write is blocked for {path}. "
+            "Stop any local dev server or browser tab serving this scenario, then retry the publish."
+        ) from exc
 
 
 def _normalize_relative_url(raw_url: Any) -> str:

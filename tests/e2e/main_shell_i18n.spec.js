@@ -33,7 +33,7 @@ test("main shell static i18n updates visible labels and aria text", async ({ pag
   await expect(workspaceHeading).toHaveText("Workspace");
   await expect(languageBtn).toContainText("EN / ZH");
   await expect(languageBtn).toHaveAttribute("aria-label", "Language");
-  await expect(developerModeBtn).toHaveText("DEV");
+  await expect(developerModeBtn).toHaveText("Dev");
   await expect(recentColors).toHaveAttribute("aria-label", "Recent colors");
   await expect(frontlineIntro).toHaveText(
     "Derived frontlines stay optional and project-local. Enable them only when you want a conflict view."

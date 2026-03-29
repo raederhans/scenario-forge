@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from collections import Counter
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import geopandas as gpd
 from shapely.geometry import Polygon, mapping
@@ -870,6 +872,36 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 )
 
             self.assertFalse((scenario_dir / "owners.by_feature.json").exists())
+
+    def test_write_bundle_stage_blocks_publish_when_live_dev_server_targets_workspace(self) -> None:
+        runtime_tmp_root = tno_bundle.ROOT / ".runtime" / "tmp"
+        runtime_tmp_root.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime_tmp_root) as tmp_dir:
+            root = Path(tmp_dir)
+            scenario_dir = root / "scenario"
+            checkpoint_dir = root / "checkpoint"
+            metadata_path = root / "active_server.json"
+            _write_publish_bundle_dir(checkpoint_dir)
+            metadata_path.write_text(
+                json.dumps(
+                    {
+                        "pid": os.getpid(),
+                        "cwd": str(tno_bundle.ROOT),
+                        "url": "http://127.0.0.1:8810",
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+
+            with patch.object(tno_bundle, "RUNTIME_ACTIVE_SERVER_METADATA_PATH", metadata_path):
+                with self.assertRaisesRegex(RuntimeError, "live dev server"):
+                    write_bundle_stage(
+                        scenario_dir,
+                        checkpoint_dir,
+                        publish_scope="scenario_data",
+                        manual_sync_policy=MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
+                    )
 
 
 if __name__ == "__main__":

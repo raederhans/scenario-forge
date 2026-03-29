@@ -126,6 +126,17 @@ def _country_union_geometry(gdf: gpd.GeoDataFrame | None, country_code: str):
     return union_geom
 
 
+def _intersect_feature_geometry(geom, clip_geom, *, country_code: str, feature_id: str):
+    if geom is None or clip_geom is None:
+        return geom
+    try:
+        return _make_valid(geom.intersection(clip_geom))
+    except Exception as exc:
+        raise ValueError(
+            f"{country_code}: clip intersection failed for feature '{feature_id}': {exc}"
+        ) from exc
+
+
 def _topology_object_to_gdf(topo_dict: dict, object_name: str) -> gpd.GeoDataFrame:
     source = topo_dict.get("objects", {})
     if object_name not in source:
@@ -221,9 +232,16 @@ def canonicalize_country_boundaries(
         clip_geom = _country_union_geometry(shell_gdf, country_code)
         allowed_geom = _country_union_geometry(allowed_area_gdf, country_code)
         if clip_geom is not None and allowed_geom is not None:
-            clip_geom = _make_valid(clip_geom.intersection(allowed_geom))
+            clip_geom = _intersect_feature_geometry(
+                _make_valid(clip_geom),
+                _make_valid(allowed_geom),
+                country_code=country_code,
+                feature_id="__country_clip__",
+            )
         elif allowed_geom is not None:
-            clip_geom = allowed_geom
+            clip_geom = _make_valid(allowed_geom)
+        if clip_geom is not None:
+            clip_geom = _round_geometry(_make_valid(clip_geom), snap_precision)
 
         before_count = len(subset)
         original_ids = set(subset["id"].astype(str))
@@ -231,9 +249,17 @@ def canonicalize_country_boundaries(
             lambda geom: _round_geometry(_make_valid(geom), snap_precision)
         )
         if clip_geom is not None:
-            subset["geometry"] = subset.geometry.apply(
-                lambda geom: _make_valid(geom.intersection(clip_geom)) if geom is not None else None
-            )
+            clipped_geometries = []
+            for feature_id, geom in zip(subset["id"].astype(str), subset.geometry):
+                clipped_geometries.append(
+                    _intersect_feature_geometry(
+                        _make_valid(geom),
+                        clip_geom,
+                        country_code=country_code,
+                        feature_id=feature_id,
+                    )
+                )
+            subset["geometry"] = clipped_geometries
         subset = _prepare_political_gdf(subset)
         if subset.empty:
             reports.append(

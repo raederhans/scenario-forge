@@ -7,6 +7,7 @@ import csv
 import hashlib
 import json
 import math
+import os
 import re
 import sys
 from collections import Counter, deque
@@ -114,6 +115,7 @@ MODERN_WORLD_COUNTRIES_PATH = ROOT / "data/scenarios/modern_world/countries.json
 MANUAL_OVERRIDE_FILENAME = "scenario_manual_overrides.json"
 MANUAL_SYNC_REPORT_DIR = ROOT / ".runtime" / "reports" / "generated" / "manual-sync"
 MANUAL_SYNC_BACKUP_ROOT = ROOT / ".runtime" / "backups" / "scenario-rebuild"
+RUNTIME_ACTIVE_SERVER_METADATA_PATH = ROOT / ".runtime" / "dev" / "active_server.json"
 HGO_ROOT = ROOT / "historic geographic overhaul"
 TNO_ROOT_CANDIDATES = [
     Path("C:/Program Files (x86)/Steam/steamapps/workshop/content/394360/2438003901"),
@@ -3735,6 +3737,57 @@ def load_json(path: Path) -> dict:
     if not isinstance(payload, dict):
         raise ValueError(f"Expected JSON object in {path}, found {type(payload).__name__}.")
     return payload
+
+
+def _pid_is_alive(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    except OSError:
+        return False
+    return True
+
+
+def _load_active_server_metadata(path: Path = RUNTIME_ACTIVE_SERVER_METADATA_PATH) -> dict[str, object] | None:
+    if not path.exists():
+        return None
+    try:
+        payload = load_json(path)
+    except Exception:
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def _ensure_scenario_publish_target_offline(
+    scenario_dir: Path,
+    metadata_path: Path | None = None,
+) -> None:
+    metadata_path = metadata_path or RUNTIME_ACTIVE_SERVER_METADATA_PATH
+    metadata = _load_active_server_metadata(metadata_path)
+    if not metadata:
+        return
+    raw_pid = metadata.get("pid")
+    try:
+        pid = int(raw_pid)
+    except (TypeError, ValueError):
+        return
+    if pid <= 0 or not _pid_is_alive(pid):
+        return
+    raw_cwd = str(metadata.get("cwd") or "").strip()
+    if not raw_cwd:
+        return
+    server_root = Path(raw_cwd).resolve()
+    target_dir = scenario_dir.resolve()
+    if not target_dir.is_relative_to(server_root):
+        return
+    raise RuntimeError(
+        "Scenario data publish is blocked because a live dev server is serving this workspace. "
+        f"Stop the local dev server or close browser tabs using {metadata.get('url') or 'the active preview'}, "
+        f"then retry publishing {target_dir}."
+    )
 
 
 _mediterranean_template_water_gdf: gpd.GeoDataFrame | None = None
@@ -9006,6 +9059,7 @@ def write_bundle_stage(
     manual_sync_policy: str = MANUAL_SYNC_POLICY_BACKUP_CONTINUE,
 ) -> None:
     if publish_scope in {PUBLISH_SCOPE_SCENARIO_DATA, PUBLISH_SCOPE_ALL}:
+        _ensure_scenario_publish_target_offline(scenario_dir)
         scenario_bundle_platform.validate_strict_publish_bundle(
             checkpoint_dir,
             publish_scope,

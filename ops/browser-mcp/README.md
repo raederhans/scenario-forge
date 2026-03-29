@@ -15,7 +15,9 @@ npm install
 bash ops/browser-mcp/run-smoke-browser-inspection.sh
 ```
 
-The launcher prefers the repo-local `node_modules/playwright/cli.js` first. npm cache and `npx` remain fallback-only paths.
+These scripts are for the repository's own browser inspection and regression flows.
+They may use the repo-local `node_modules/playwright/cli.js` when available.
+Codex MCP is currently disabled on this machine because the current Codex desktop build treats `@playwright/mcp` resource-list failures as fatal.
 
 ## CLI options
 ```bash
