@@ -4,17 +4,13 @@ import {
   countryNames,
   defaultCountryPalette,
   normalizeCityLayerStyleConfig,
-  normalizeDayNightStyleConfig,
-  normalizeLakeStyleConfig,
   normalizeAnnotationView,
-  normalizeMapSemanticMode,
-  normalizePhysicalStyleConfig,
 } from "../core/state.js";
 import { ColorManager } from "../core/color_manager.js";
 import * as mapRenderer from "../core/map_renderer.js";
 import { applyCountryColor, resetCountryColors } from "../core/logic.js";
 import { FileManager } from "../core/file_manager.js";
-import { canUndoHistory, captureHistoryState, clearHistory, pushHistoryEntry, undoHistory } from "../core/history_manager.js";
+import { canUndoHistory, captureHistoryState, pushHistoryEntry, undoHistory } from "../core/history_manager.js";
 import { LegendManager } from "../core/legend_manager.js";
 import {
   ensureActiveScenarioOptionalLayerLoaded,
@@ -22,27 +18,18 @@ import {
   recalculateScenarioOwnerControllerDiffCount,
   releaseScenarioAuditPayload,
   refreshScenarioShellOverlays,
-  validateImportedScenarioBaseline,
 } from "../core/scenario_manager.js";
-import {
-  applyScenarioByIdCommand,
-  clearActiveScenarioCommand,
-  setScenarioViewModeCommand,
-} from "../core/scenario_dispatcher.js";
 import { getGeoFeatureDisplayLabel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 import { showAppDialog } from "./app_dialog.js";
 import { initDevWorkspace } from "./dev_workspace.js";
+import { importProjectThroughFunnel } from "../core/interaction_funnel.js";
 import {
   setFeatureOwnerCodes,
-  ensureSovereigntyState,
   markLegacyColorStateDirty,
-  migrateFeatureScopedProjectDataToCurrentTopology,
 } from "../core/sovereignty_manager.js";
 import { markDirty } from "../core/dirty_state.js";
 import {
-  buildScenarioReleasableIndex,
-  getScenarioReleasableCountries,
   getResolvedReleasableBoundaryVariant,
   normalizeCountryCode,
   normalizePresetName,
@@ -52,7 +39,6 @@ import {
   setReleasableBoundaryVariant,
 } from "../core/releasable_manager.js";
 import { getScenarioCountryDisplayName } from "../core/scenario_country_display.js";
-import { setActivePaletteSource } from "../core/palette_manager.js";
 import {
   DEFAULT_UNIT_COUNTER_PRESET_ID,
   getUnitCounterCatalogCategories,
@@ -8681,468 +8667,16 @@ function initSidebar({ render } = {}) {
       if (projectFileName) {
         projectFileName.textContent = file.name;
       }
-      FileManager.importProject(file, async (data) => {
-        clearHistory();
-        let scenarioImportAudit = data.scenario?.importAudit || null;
-        if (data.scenario?.id) {
-          const validation = await validateImportedScenarioBaseline(data.scenario);
-          if (!validation.ok) {
-            const shouldContinue = validation.reason === "baseline_mismatch"
-              ? await showAppDialog({
-                title: t("Scenario Baseline Mismatch", "ui"),
-                message: validation.message,
-                details: t(
-                  "The saved project was created against a different scenario baseline. Continue only if you are comfortable loading it against current assets.",
-                  "ui"
-                ),
-                confirmLabel: t("Load Anyway", "ui"),
-                cancelLabel: t("Cancel Import", "ui"),
-                tone: "warning",
-              })
-              : false;
-            if (!shouldContinue) {
-              const error = new Error("Project import cancelled.");
-              error.code = "IMPORT_ABORTED";
-              error.toastTitle = t("Import cancelled", "ui");
-              error.toastTone = validation.reason === "baseline_mismatch" ? "warning" : "error";
-              error.userMessage = validation.reason === "missing_scenario"
-                ? validation.message
-                : t(
-                  "Project import cancelled because the saved scenario baseline does not match the current assets.",
-                  "ui"
-                );
-              throw error;
-            }
-            if (validation.reason === "baseline_mismatch") {
-              scenarioImportAudit = {
-                scenarioId: String(data.scenario.id || "").trim(),
-                savedVersion: Number(data.scenario.version || 1) || 1,
-                currentVersion: Number(validation.currentVersion || 1) || 1,
-                savedBaselineHash: String(data.scenario.baselineHash || "").trim(),
-                currentBaselineHash: String(validation.currentBaselineHash || "").trim(),
-                acceptedAt: new Date().toISOString(),
-              };
-            }
-          }
-          await applyScenarioByIdCommand(data.scenario.id, {
-            renderMode: "none",
-            markDirtyReason: "",
-            showToastOnComplete: false,
-          });
-          setScenarioViewModeCommand(data.scenario.viewMode || "ownership", {
-            renderMode: "none",
-            markDirtyReason: "",
-          });
-        } else if (state.activeScenarioId) {
-          clearActiveScenarioCommand({
-            renderMode: "none",
-            markDirtyReason: "",
-            showToastOnComplete: false,
-          });
-        }
-        data = await migrateFeatureScopedProjectDataToCurrentTopology(data, state.landData);
-        state.sovereignBaseColors = data.sovereignBaseColors || data.countryBaseColors || {};
-        state.countryBaseColors = { ...state.sovereignBaseColors };
-        state.visualOverrides = data.visualOverrides || data.featureOverrides || {};
-        state.featureOverrides = { ...state.visualOverrides };
-        markLegacyColorStateDirty();
-        state.waterRegionOverrides = data.waterRegionOverrides || {};
-        state.specialRegionOverrides = data.specialRegionOverrides || {};
-        state.sovereigntyByFeatureId = data.sovereigntyByFeatureId || {};
-        state.mapSemanticMode = normalizeMapSemanticMode(data.mapSemanticMode, state.activeScenarioId ? state.mapSemanticMode : "political");
-        if (state.activeScenarioId) {
-          if (data.scenarioControllersByFeatureId) {
-            state.scenarioControllersByFeatureId = { ...data.scenarioControllersByFeatureId };
-          }
-        } else {
-          state.scenarioControllersByFeatureId = data.scenarioControllersByFeatureId
-            ? { ...data.scenarioControllersByFeatureId }
-            : {};
-        }
-        state.sovereigntyInitialized = false;
-        state.paintMode = data.paintMode || "visual";
-        state.activeSovereignCode = data.activeSovereignCode || "";
-        state.selectedInspectorCountryCode = data.activeSovereignCode || state.selectedInspectorCountryCode || "";
-        state.inspectorHighlightCountryCode = state.selectedInspectorCountryCode;
-        state.releasableBoundaryVariantByTag =
-          data.releasableBoundaryVariantByTag && typeof data.releasableBoundaryVariantByTag === "object"
-            ? { ...data.releasableBoundaryVariantByTag }
-            : {};
-        if (state.activeScenarioId) {
-          const existingTags = Object.keys(state.scenarioCountriesByTag || {});
-          state.scenarioReleasableIndex = buildScenarioReleasableIndex(state.activeScenarioId);
-          state.scenarioCountriesByTag = {
-            ...(state.scenarioCountriesByTag || {}),
-            ...getScenarioReleasableCountries(state.activeScenarioId, {
-              excludeTags: existingTags,
-            }),
-          };
-        }
-        state.inspectorExpansionInitialized = false;
-        if (state.expandedInspectorContinents instanceof Set) {
-          state.expandedInspectorContinents.clear();
-        }
-        if (state.expandedInspectorReleaseParents instanceof Set) {
-          state.expandedInspectorReleaseParents.clear();
-        }
-        state.dynamicBordersDirty = !!data.dynamicBordersDirty;
-        state.dynamicBordersDirtyReason = data.dynamicBordersDirtyReason || "";
-        state.devHoverHit = null;
-        state.devSelectedHit = null;
-        state.devSelectionFeatureIds = new Set();
-        state.devSelectionOrder = [];
-        state.devClipboardFallbackText = "";
-        state.devClipboardPreviewFormat = "names_with_ids";
-        ensureSovereigntyState({ force: true });
-        state.specialZoneEditor = {
-          active: false,
-          vertices: [],
-          zoneType: "custom",
-          label: "",
-          selectedId: null,
-          counter: 1,
-        };
-        state.annotationView = normalizeAnnotationView({
-          ...(state.annotationView || {}),
-          ...(data.annotationView || {}),
-        });
-        state.operationalLines = Array.isArray(data.operationalLines) ? data.operationalLines : [];
-        state.operationGraphics = Array.isArray(data.operationGraphics) ? data.operationGraphics : [];
-        state.unitCounters = Array.isArray(data.unitCounters) ? data.unitCounters : [];
-        state.operationalLineEditor = {
-          active: false,
-          mode: "idle",
-          points: [],
-          kind: "frontline",
-          label: "",
-          stylePreset: "frontline",
-          stroke: "",
-          width: 0,
-          opacity: 1,
-          selectedId: null,
-          selectedVertexIndex: -1,
-          counter: 1,
-        };
-        state.operationGraphicsEditor = {
-          active: false,
-          mode: "idle",
-          collection: "operationGraphics",
-          points: [],
-          kind: "attack",
-          label: "",
-          stylePreset: "attack",
-          stroke: "",
-          width: 0,
-          opacity: 1,
-          selectedId: null,
-          selectedVertexIndex: -1,
-          counter: 1,
-        };
-        state.unitCounterEditor = {
-          active: false,
-          renderer: String(state.annotationView?.unitRendererDefault || "game"),
-          label: "",
-          sidc: "",
-          symbolCode: "",
-          nationTag: "",
-          nationSource: "display",
-          presetId: "inf",
-          iconId: "",
-          unitType: "",
-          echelon: "",
-          subLabel: "",
-          strengthText: "",
-          layoutAnchor: { kind: "feature", key: "", slotIndex: null },
-          attachment: null,
-          baseFillColor: "",
-          organizationPct: 78,
-          equipmentPct: 74,
-          statsPresetId: "regular",
-          statsSource: "preset",
-          size: "medium",
-          selectedId: null,
-          counter: 1,
-        };
-        state.strategicOverlayUi = {
-          activeMode: "idle",
-          modalOpen: false,
-          modalSection: "line",
-          modalEntityId: "",
-          modalEntityType: "",
-          counterEditorModalOpen: false,
-          counterCatalogSource: "internal",
-          counterCatalogCategory: "all",
-          counterCatalogQuery: "",
-          hoi4CounterCategory: "all",
-          hoi4CounterQuery: "",
-          hoi4CounterVariant: "small",
-        };
-        invalidateFrontlineOverlayState();
-        state.operationalLinesDirty = true;
-        state.operationGraphicsDirty = true;
-        state.unitCountersDirty = true;
-        state.specialZones = data.specialZones || {};
-        state.manualSpecialZones =
-          data.manualSpecialZones && data.manualSpecialZones.type === "FeatureCollection"
-            ? data.manualSpecialZones
-            : { type: "FeatureCollection", features: [] };
-        const supportedCountries = Array.isArray(state.parentBorderSupportedCountries)
-          ? state.parentBorderSupportedCountries
-          : [];
-        const importedParentEnabled =
-          data.parentBorderEnabledByCountry && typeof data.parentBorderEnabledByCountry === "object"
-            ? data.parentBorderEnabledByCountry
-            : {};
-        const normalizedParentEnabled = {};
-        supportedCountries.forEach((countryCode) => {
-          normalizedParentEnabled[countryCode] = !!importedParentEnabled[countryCode];
-        });
-        state.parentBorderEnabledByCountry = normalizedParentEnabled;
-        state.styleConfig.internalBorders = {
-          color: "#cccccc",
-          opacity: 1,
-          width: 0.5,
-        };
-        state.styleConfig.empireBorders = {
-          color: "#666666",
-          width: 1,
-        };
-        state.styleConfig.coastlines = {
-          color: "#333333",
-          width: 1.2,
-        };
-        if (
-          data.styleConfig?.internalBorders &&
-          typeof data.styleConfig.internalBorders === "object"
-        ) {
-          state.styleConfig.internalBorders = {
-            ...(state.styleConfig.internalBorders || {}),
-            ...data.styleConfig.internalBorders,
-          };
-        }
-        if (
-          data.styleConfig?.empireBorders &&
-          typeof data.styleConfig.empireBorders === "object"
-        ) {
-          state.styleConfig.empireBorders = {
-            ...(state.styleConfig.empireBorders || {}),
-            ...data.styleConfig.empireBorders,
-          };
-        }
-        if (
-          data.styleConfig?.coastlines &&
-          typeof data.styleConfig.coastlines === "object"
-        ) {
-          state.styleConfig.coastlines = {
-            ...(state.styleConfig.coastlines || {}),
-            ...data.styleConfig.coastlines,
-          };
-        }
-        if (
-          data.styleConfig?.parentBorders &&
-          typeof data.styleConfig.parentBorders === "object"
-        ) {
-          state.styleConfig.parentBorders = {
-            ...(state.styleConfig.parentBorders || {}),
-            ...data.styleConfig.parentBorders,
-          };
-        }
-        if (data.styleConfig?.ocean && typeof data.styleConfig.ocean === "object") {
-          state.styleConfig.ocean = {
-            ...(state.styleConfig.ocean || {}),
-            ...data.styleConfig.ocean,
-          };
-        }
-        state.styleConfig.lakes = normalizeLakeStyleConfig(data.styleConfig?.lakes);
-        if (data.styleConfig?.cityPoints && typeof data.styleConfig.cityPoints === "object") {
-          state.styleConfig.cityPoints = normalizeCityLayerStyleConfig({
-            ...(state.styleConfig.cityPoints || {}),
-            ...data.styleConfig.cityPoints,
-          });
-        }
-        if (data.styleConfig?.urban && typeof data.styleConfig.urban === "object") {
-          state.styleConfig.urban = {
-            ...(state.styleConfig.urban || {}),
-            ...data.styleConfig.urban,
-          };
-        }
-        if (data.styleConfig?.physical && typeof data.styleConfig.physical === "object") {
-          state.styleConfig.physical = normalizePhysicalStyleConfig({
-            ...(state.styleConfig.physical || {}),
-            ...data.styleConfig.physical,
-          });
-        }
-        if (data.styleConfig?.rivers && typeof data.styleConfig.rivers === "object") {
-          state.styleConfig.rivers = {
-            ...(state.styleConfig.rivers || {}),
-            ...data.styleConfig.rivers,
-          };
-        }
-        if (data.styleConfig?.specialZones && typeof data.styleConfig.specialZones === "object") {
-          state.styleConfig.specialZones = {
-            ...(state.styleConfig.specialZones || {}),
-            ...data.styleConfig.specialZones,
-          };
-        }
-        if (data.styleConfig?.texture && typeof data.styleConfig.texture === "object") {
-          state.styleConfig.texture = {
-            ...(state.styleConfig.texture || {}),
-            ...data.styleConfig.texture,
-            paper: {
-              ...(state.styleConfig.texture?.paper || {}),
-              ...(data.styleConfig.texture.paper || {}),
-            },
-            graticule: {
-              ...(state.styleConfig.texture?.graticule || {}),
-              ...(data.styleConfig.texture.graticule || {}),
-            },
-            draftGrid: {
-              ...(state.styleConfig.texture?.draftGrid || {}),
-              ...(data.styleConfig.texture.draftGrid || {}),
-            },
-          };
-        }
-        if (data.styleConfig?.dayNight && typeof data.styleConfig.dayNight === "object") {
-          state.styleConfig.dayNight = normalizeDayNightStyleConfig({
-            ...(state.styleConfig.dayNight || {}),
-            ...data.styleConfig.dayNight,
-          });
-        }
-        if (data.layerVisibility && typeof data.layerVisibility === "object") {
-          state.showWaterRegions =
-            data.layerVisibility.showWaterRegions === undefined
-              ? true
-              : !!data.layerVisibility.showWaterRegions;
-          state.showOpenOceanRegions =
-            data.layerVisibility.showOpenOceanRegions === undefined
-              ? false
-              : !!data.layerVisibility.showOpenOceanRegions;
-          state.showScenarioSpecialRegions =
-            data.layerVisibility.showScenarioSpecialRegions === undefined
-              ? true
-              : !!data.layerVisibility.showScenarioSpecialRegions;
-          state.showScenarioReliefOverlays =
-            data.layerVisibility.showScenarioReliefOverlays === undefined
-              ? true
-              : !!data.layerVisibility.showScenarioReliefOverlays;
-          state.showCityPoints =
-            data.layerVisibility.showCityPoints === undefined
-              ? true
-              : !!data.layerVisibility.showCityPoints;
-          state.showUrban = !!data.layerVisibility.showUrban;
-          state.showPhysical = !!data.layerVisibility.showPhysical;
-          state.showRivers = !!data.layerVisibility.showRivers;
-          state.showSpecialZones =
-            data.layerVisibility.showSpecialZones === undefined
-              ? false
-              : !!data.layerVisibility.showSpecialZones;
-        }
-        state.recentColors = Array.isArray(data.recentColors) ? [...data.recentColors] : [];
-        state.interactionGranularity = data.interactionGranularity || "subdivision";
-        state.batchFillScope = data.batchFillScope || "parent";
-        state.referenceImageState = {
-          ...(state.referenceImageState || {}),
-          ...(data.referenceImageState || {}),
-        };
-        state.customPresets =
-          data.customPresets && typeof data.customPresets === "object"
-            ? data.customPresets
-            : {};
-        const paletteRestoreTarget = String(data.activePaletteId || "").trim();
-        const shouldRestorePalette = !!paletteRestoreTarget && (
-          paletteRestoreTarget !== String(state.activePaletteId || "").trim()
-          || !state.activePaletteMeta
-          || !state.activePalettePack
-          || !state.activePaletteMap
-        );
-        if (shouldRestorePalette) {
-          const paletteRestored = await setActivePaletteSource(paletteRestoreTarget, {
-            syncUI: true,
-            overwriteCountryPalette: false,
-          });
-          if (!paletteRestored) {
-            console.warn(`[project-import] Unable to restore saved palette source: ${paletteRestoreTarget}`);
-            showToast(t("Saved palette could not be restored. Keeping the current palette.", "ui"), {
-              title: t("Palette restore skipped", "ui"),
-              tone: "warning",
-              duration: 3600,
-            });
-          }
-        }
-        if (state.activeScenarioId && state.showCityPoints) {
-          if (typeof state.ensureBaseCityDataFn === "function") {
-            await state.ensureBaseCityDataFn({ reason: "project-import", renderNow: false });
-          }
-          await ensureActiveScenarioOptionalLayerLoaded("cities", { renderNow: false });
-        }
-        if (state.showRivers && typeof state.ensureContextLayerDataFn === "function") {
-          await state.ensureContextLayerDataFn("rivers", { reason: "project-import", renderNow: false });
-        }
-        if (state.showUrban && typeof state.ensureContextLayerDataFn === "function") {
-          await state.ensureContextLayerDataFn("urban", { reason: "project-import", renderNow: false });
-        }
-        if (state.showPhysical && typeof state.ensureContextLayerDataFn === "function") {
-          await state.ensureContextLayerDataFn("physical-set", { reason: "project-import", renderNow: false });
-        }
-        state.scenarioImportAudit = state.activeScenarioId ? scenarioImportAudit : null;
-        if (typeof state.updateParentBorderCountryListFn === "function") {
-          state.updateParentBorderCountryListFn();
-        }
-        if (typeof state.updateSpecialZoneEditorUIFn === "function") {
-          state.updateSpecialZoneEditorUIFn();
-        }
-        if (typeof state.updateStrategicOverlayUIFn === "function") {
-          state.updateStrategicOverlayUIFn();
-        }
-        if (typeof state.updateWaterInteractionUIFn === "function") {
-          state.updateWaterInteractionUIFn();
-        }
-        if (typeof state.updateScenarioSpecialRegionUIFn === "function") {
-          state.updateScenarioSpecialRegionUIFn();
-        }
-        if (typeof state.updateActiveSovereignUIFn === "function") {
-          state.updateActiveSovereignUIFn();
-        }
-        if (typeof state.updatePaintModeUIFn === "function") {
-          state.updatePaintModeUIFn();
-        }
-        if (typeof state.updateDynamicBorderStatusUIFn === "function") {
-          state.updateDynamicBorderStatusUIFn();
-        }
-        if (typeof state.updateToolbarInputsFn === "function") {
-          state.updateToolbarInputsFn();
-        }
-        if (typeof state.updateRecentUI === "function") {
-          state.updateRecentUI();
-        }
-        if (typeof state.updateScenarioContextBarFn === "function") {
-          state.updateScenarioContextBarFn();
-        }
-        state.persistViewSettingsFn?.();
-        rebuildPresetState();
-        mapRenderer.refreshColorState({ renderNow: false });
-        if (render) render();
-        if (typeof state.renderCountryListFn === "function") {
-          state.renderCountryListFn();
-        }
-        if (typeof state.refreshCountryInspectorDetailFn === "function") {
-          state.refreshCountryInspectorDetailFn();
-        }
-        if (typeof state.renderWaterRegionListFn === "function") {
-          state.renderWaterRegionListFn();
-        }
-        if (typeof state.renderSpecialRegionListFn === "function") {
-          state.renderSpecialRegionListFn();
-        }
-        if (typeof state.renderPresetTreeFn === "function") {
-          state.renderPresetTreeFn();
-        }
-        if (typeof state.updateLegendUI === "function") {
-          state.updateLegendUI();
-        }
-        if (typeof state.renderScenarioAuditPanelFn === "function") {
-          state.renderScenarioAuditPanelFn();
-        }
+      importProjectThroughFunnel(file, {
+        ui: {
+          t,
+          showAppDialog,
+          showToast,
+        },
+        hooks: {
+          refreshColorState: mapRenderer.refreshColorState,
+          invalidateFrontlineOverlayState,
+        },
       });
       projectFileInput.value = "";
     });

@@ -53,6 +53,12 @@ import {
   normalizeUnitCounterSizeToken,
   UNIT_COUNTER_SCREEN_SIZE,
 } from "./unit_counter_presets.js";
+import { flushRenderBoundary } from "./render_boundary.js";
+import {
+  bindInteractionFunnel,
+  dispatchMapClick,
+  dispatchMapDoubleClick,
+} from "./interaction_funnel.js";
 
 const DEFAULT_UNIT_COUNTER_ORGANIZATION_PCT = 78;
 const DEFAULT_UNIT_COUNTER_EQUIPMENT_PCT = 74;
@@ -17973,6 +17979,10 @@ function refreshSidebarAfterPaint({
   });
 }
 
+function flushInteractionRender(reason = "interaction") {
+  return flushRenderBoundary(reason);
+}
+
 function notifyDevWorkspace() {
   if (typeof state.updateDevWorkspaceUIFn === "function") {
     state.updateDevWorkspaceUIFn();
@@ -18071,9 +18081,7 @@ function addFeatureToDevSelection(featureId) {
   state.devSelectionFeatureIds.add(id);
   state.devSelectionOrder.push(id);
   setDevSelectionDirty();
-  if (context) {
-    render();
-  }
+  flushInteractionRender("dev-selection-add");
   return true;
 }
 
@@ -18089,9 +18097,7 @@ function toggleFeatureInDevSelection(featureId) {
     state.devSelectionFeatureIds.delete(id);
     state.devSelectionOrder = state.devSelectionOrder.filter((value) => value !== id);
     setDevSelectionDirty();
-    if (context) {
-      render();
-    }
+    flushInteractionRender("dev-selection-toggle");
     return true;
   }
   return addFeatureToDevSelection(id);
@@ -18104,9 +18110,7 @@ function removeLastDevSelection() {
   state.devSelectionFeatureIds.delete(lastId);
   state.devSelectionOrder = ids.slice(0, -1);
   setDevSelectionDirty();
-  if (context) {
-    render();
-  }
+  flushInteractionRender("dev-selection-remove-last");
   return true;
 }
 
@@ -18116,9 +18120,7 @@ function clearDevSelection() {
   state.devSelectionOrder = [];
   if (hadEntries) {
     setDevSelectionDirty();
-    if (context) {
-      render();
-    }
+    flushInteractionRender("dev-selection-clear");
   } else {
     notifyDevWorkspace();
   }
@@ -18553,9 +18555,7 @@ function applyVisualSubdivisionFill(targetIds, selectedColor, { kind = "fill-fea
     }),
   });
   addRecentColor(color);
-  if (context) {
-    render();
-  }
+  flushInteractionRender(kind);
   refreshSidebarAfterPaint({ featureIds: resolvedIds });
   noteRenderAction(kind, actionStart);
   return true;
@@ -18588,9 +18588,7 @@ function applyWaterRegionFill(targetId, selectedColor, { kind = "fill-water-regi
     }),
   });
   addRecentColor(color);
-  if (context) {
-    render();
-  }
+  flushInteractionRender(kind);
   refreshSidebarAfterPaint({ waterRegionIds: [resolvedId] });
   noteRenderAction(kind, actionStart);
   return true;
@@ -18881,7 +18879,7 @@ function handleBrushPointerMove(event) {
   }
 }
 
-async function handleClick(event) {
+async function handleClick(event, _interactionContext = null) {
   if (state.startupReadonly) {
     if (event?.preventDefault) event.preventDefault();
     blockStartupReadonlyInteraction();
@@ -18943,9 +18941,7 @@ async function handleClick(event) {
         before: historyBefore,
         after: captureHistoryState({ specialRegionIds: [id] }),
       });
-      if (context) {
-        render();
-      }
+      flushInteractionRender("click-erase-special");
       refreshSidebarAfterPaint({ specialRegionIds: [id] });
       noteRenderAction("click-erase-special", actionStart);
       return;
@@ -18973,9 +18969,7 @@ async function handleClick(event) {
         after: captureHistoryState({ specialRegionIds: [id] }),
       });
       addRecentColor(nextColor);
-      if (context) {
-        render();
-      }
+      flushInteractionRender("click-fill-special");
       refreshSidebarAfterPaint({ specialRegionIds: [id] });
     }
     noteRenderAction("click-fill-special", actionStart);
@@ -19001,9 +18995,7 @@ async function handleClick(event) {
         before: historyBefore,
         after: captureHistoryState({ waterRegionIds: [id] }),
       });
-      if (context) {
-        render();
-      }
+      flushInteractionRender("click-erase-water");
       refreshSidebarAfterPaint({ waterRegionIds: [id] });
       noteRenderAction("click-erase-water", actionStart);
       return;
@@ -19043,9 +19035,6 @@ async function handleClick(event) {
   if (!feature) return;
   if (state.devSelectionModeEnabled && (event?.ctrlKey || event?.metaKey)) {
     toggleFeatureInDevSelection(landId);
-    if (context) {
-      render();
-    }
     noteRenderAction("dev-selection-toggle", actionStart);
     return;
   }
@@ -19138,9 +19127,7 @@ async function handleClick(event) {
         }),
       });
     }
-    if (context) {
-      render();
-    }
+    flushInteractionRender("click-erase");
     if (shouldRefreshCountryList) {
       refreshSidebarAfterPaint({
         featureIds: targetIds,
@@ -19239,9 +19226,7 @@ async function handleClick(event) {
     return;
   }
   addRecentColor(selectedColor);
-  if (context) {
-    render();
-  }
+  flushInteractionRender("click-fill");
   if (isSovereigntyModeActive() || (state.interactionGranularity === "country" && countryCode)) {
     refreshSidebarAfterPaint({
       featureIds: targetIds,
@@ -19251,7 +19236,7 @@ async function handleClick(event) {
   noteRenderAction("click-fill", actionStart);
 }
 
-async function handleDoubleClick(event) {
+async function handleDoubleClick(event, _interactionContext = null) {
   if (state.startupReadonly) {
     if (event?.preventDefault) event.preventDefault();
     blockStartupReadonlyInteraction();
@@ -19522,6 +19507,10 @@ function initZoom() {
 
 function bindEvents() {
   if (!interactionRect) return;
+  bindInteractionFunnel({
+    mapClick: handleClick,
+    mapDoubleClick: handleDoubleClick,
+  });
   interactionRect.on("mousemove", handleMouseMove);
   interactionRect.on("mousedown.brush", handleBrushPointerDown);
   interactionRect.on("mousemove.brush", handleBrushPointerMove);
@@ -19534,8 +19523,8 @@ function bindEvents() {
     renderHoverOverlayIfNeeded();
     queueTooltipUpdate({ visible: false });
   });
-  interactionRect.on("click", handleClick);
-  interactionRect.on("dblclick", handleDoubleClick);
+  interactionRect.on("click", dispatchMapClick);
+  interactionRect.on("dblclick", dispatchMapDoubleClick);
   window.addEventListener("mouseup", flushBrushSession);
   window.addEventListener("resize", handleResize);
 }

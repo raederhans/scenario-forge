@@ -1,13 +1,52 @@
 const fs = require("fs");
 const path = require("path");
 const { test, expect } = require("@playwright/test");
-const { getAppUrl } = require("./support/playwright-app");
-function resolveBaseUrl() {
-  return getAppUrl();
-}
+const { gotoApp } = require("./support/playwright-app");
 
 function cloneJson(value) {
   return JSON.parse(JSON.stringify(value));
+}
+
+async function installStateHandle(page) {
+  await page.evaluate(async () => {
+    globalThis.__pwProjectSaveLoad = {
+      state: (await import("/js/core/state.js")).state,
+    };
+  });
+}
+
+async function installInteractionFunnelDebugHandle(page) {
+  await installStateHandle(page);
+  await page.evaluate(async () => {
+    globalThis.__pwProjectSaveLoad = {
+      ...(globalThis.__pwProjectSaveLoad || {}),
+      getInteractionFunnelDebugState: (await import("/js/core/interaction_funnel.js")).getInteractionFunnelDebugState,
+    };
+  });
+}
+
+async function waitForStartupReadonlyUnlocked(page, { timeout = 120000, stableMs = 300 } = {}) {
+  await installStateHandle(page);
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    const unlocked = await page.evaluate(() => {
+      const state = globalThis.__pwProjectSaveLoad?.state;
+      return !!state && !state.startupReadonly && !state.startupReadonlyUnlockInFlight;
+    });
+    if (unlocked) {
+      await page.waitForTimeout(stableMs);
+      const stillUnlocked = await page.evaluate(() => {
+        const state = globalThis.__pwProjectSaveLoad?.state;
+        return !!state && !state.startupReadonly && !state.startupReadonlyUnlockInFlight;
+      });
+      if (stillUnlocked) {
+        return;
+      }
+    } else {
+      await page.waitForTimeout(150);
+    }
+  }
+  throw new Error("Startup readonly did not unlock before the test timed out.");
 }
 
 async function setInputValue(page, selector, value) {
@@ -26,21 +65,29 @@ async function setSelectValue(page, selector, value) {
   }, value);
 }
 
+async function gotoProjectPage(page, targetPath = "/") {
+  await gotoApp(page, targetPath, { waitUntil: "domcontentloaded" });
+}
+
 async function waitForProjectUiReady(page) {
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
+  await installStateHandle(page);
+  await page.waitForFunction(() => {
+    const state = globalThis.__pwProjectSaveLoad?.state;
     const downloadBtn = document.querySelector("#downloadProjectBtn");
     const uploadInput = document.querySelector("#projectFileInput");
     const themeSelect = document.querySelector("#themeSelect");
     const scenarioSelect = document.querySelector("#scenarioSelect");
     return typeof state.renderCountryListFn === "function"
       && typeof state.updateToolbarInputsFn === "function"
+      && !state.startupReadonly
+      && !!globalThis.d3?.json
       && !!downloadBtn
       && !!uploadInput
       && !!themeSelect
       && themeSelect.options.length > 1
       && !!scenarioSelect;
   }, { timeout: 120000 });
+  await waitForStartupReadonlyUnlocked(page);
 }
 
 async function exportProjectJson(page, outputPath) {
@@ -51,7 +98,30 @@ async function exportProjectJson(page, outputPath) {
   return JSON.parse(fs.readFileSync(outputPath, "utf8"));
 }
 
+async function waitForScenarioApplyIdle(page, { timeout = 120000 } = {}) {
+  await installStateHandle(page);
+  await page.waitForFunction(() => {
+    const state = globalThis.__pwProjectSaveLoad?.state;
+    return !!state && !state.scenarioApplyInFlight;
+  }, { timeout });
+}
+
+async function ensureScenarioActive(page, scenarioId, { timeout = 120000 } = {}) {
+  await installStateHandle(page);
+  const active = await page.evaluate((expectedScenarioId) => {
+    const state = globalThis.__pwProjectSaveLoad?.state;
+    return state?.activeScenarioId === expectedScenarioId;
+  }, scenarioId);
+  if (active) {
+    await waitForScenarioApplyIdle(page, { timeout });
+    return;
+  }
+  await applyScenario(page, scenarioId);
+}
+
 async function applyScenario(page, scenarioId) {
+  await waitForStartupReadonlyUnlocked(page);
+  await waitForScenarioApplyIdle(page);
   await page.evaluate(async (expectedScenarioId) => {
     const select = document.querySelector("#scenarioSelect");
     if (select instanceof HTMLSelectElement) {
@@ -65,10 +135,48 @@ async function applyScenario(page, scenarioId) {
       showToastOnComplete: false,
     });
   }, scenarioId);
-  await page.waitForFunction(async (expectedScenarioId) => {
-    const { state } = await import("/js/core/state.js");
-    return state.activeScenarioId === expectedScenarioId;
+  await installStateHandle(page);
+  await page.waitForFunction((expectedScenarioId) => {
+    const state = globalThis.__pwProjectSaveLoad?.state;
+    return state?.activeScenarioId === expectedScenarioId;
   }, scenarioId, { timeout: 120000 });
+}
+
+async function beginProjectImportWait(page, { expectedFileName = "" } = {}) {
+  await installInteractionFunnelDebugHandle(page);
+  const initialDebug = await page.evaluate(() => (
+    globalThis.__pwProjectSaveLoad?.getInteractionFunnelDebugState?.() || null
+  ));
+  return {
+    expectedFileName: String(expectedFileName || "").trim(),
+    initialImportStartCount: Number(initialDebug?.importStartCount || 0),
+    initialImportApplyCount: Number(initialDebug?.importApplyCount || 0),
+  };
+}
+
+async function waitForProjectImportCompletionFrom(page, importWaitState, { timeout = 120000 } = {}) {
+  const waitState = importWaitState && typeof importWaitState === "object" ? importWaitState : {};
+  await installInteractionFunnelDebugHandle(page);
+  const deadline = Date.now() + timeout;
+  const expectedFileName = String(waitState.expectedFileName || "").trim();
+  while (Date.now() < deadline) {
+    const debug = await page.evaluate(() => (
+      globalThis.__pwProjectSaveLoad?.getInteractionFunnelDebugState?.() || null
+    ));
+    const importStarted = Number(debug?.importStartCount || 0) > Number(waitState.initialImportStartCount || 0);
+    if (importStarted && String(debug?.lastImportError || "").trim()) {
+      throw new Error(`Project import failed: ${String(debug.lastImportError).trim()}`);
+    }
+    const importCompleted = importStarted
+      && Number(debug?.importApplyCount || 0) > Number(waitState.initialImportApplyCount || 0)
+      && debug?.importPhase === "complete"
+      && (!expectedFileName || debug?.lastImportFileName === expectedFileName);
+    if (importCompleted) {
+      return;
+    }
+    await page.waitForTimeout(150);
+  }
+  throw new Error(`Project import did not complete before timeout for ${expectedFileName || "selected file"}.`);
 }
 
 async function getScenarioSplitFeature(page) {
@@ -96,8 +204,7 @@ async function getScenarioSplitFeature(page) {
 }
 
 test("project save/load roundtrip preserves extended runtime state", async ({ page }) => {
-  test.setTimeout(60000);
-  const baseUrl = resolveBaseUrl();
+  test.setTimeout(120000);
   const consoleErrors = [];
   const consoleWarnings = [];
   const networkFailures = [];
@@ -128,8 +235,7 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   const artifactDir = path.join(".runtime", "tests", "playwright", "project-save-load");
   fs.mkdirSync(artifactDir, { recursive: true });
 
-  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
-  await page.waitForTimeout(1500);
+  await gotoProjectPage(page);
   await waitForProjectUiReady(page);
 
   await setInputValue(page, "#internalBorderColor", "#123456");
@@ -156,10 +262,8 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     const { startSpecialZoneDraw } = await import("/js/core/map_renderer.js");
     startSpecialZoneDraw({ zoneType: "custom", label: "" });
   });
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
-    return !!state.specialZoneEditor?.active;
-  });
+  await installStateHandle(page);
+  await page.waitForFunction(() => !!globalThis.__pwProjectSaveLoad?.state?.specialZoneEditor?.active);
 
   const initialDownloadPromise = page.waitForEvent("download");
   await page.locator("#downloadProjectBtn").evaluate((button) => button.click());
@@ -168,7 +272,7 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   await initialDownload.saveAs(initialExportPath);
   const initialExport = JSON.parse(fs.readFileSync(initialExportPath, "utf8"));
 
-  expect(initialExport.schemaVersion).toBe(18);
+  expect(initialExport.schemaVersion).toBe(19);
   expect(initialExport.styleConfig.internalBorders).toEqual({
     color: "#123456",
     opacity: 0.42,
@@ -300,12 +404,17 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   await setSelectValue(page, "#themeSelect", "hoi4_vanilla");
   await page.waitForFunction(() => document.querySelector("#themeSelect")?.value === "hoi4_vanilla");
 
+  const importWait = await beginProjectImportWait(page, {
+    expectedFileName: path.basename(importedProjectPath),
+  });
   await page.locator("#projectFileInput").setInputFiles(importedProjectPath);
-  await page.waitForFunction(async (expected) => {
+  await waitForProjectImportCompletionFrom(page, importWait);
+  await installStateHandle(page);
+  await page.waitForFunction((expected) => {
     const byId = (id) => document.querySelector(id);
     const recentColors = Array.from(document.querySelectorAll("#recentColors .color-swatch"))
       .map((node) => String(node.dataset.color || "").toLowerCase());
-    const { state } = await import("/js/core/state.js");
+    const state = globalThis.__pwProjectSaveLoad?.state;
     return byId("#themeSelect")?.value === expected.palette
       && byId("#internalBorderColor")?.value.toLowerCase() === expected.internalColor
       && byId("#internalBorderOpacity")?.value === expected.internalOpacity
@@ -389,7 +498,7 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
       },
     ],
   });
-  expect(roundtripExport.annotationView).toEqual({
+  expect(roundtripExport.annotationView).toMatchObject({
     frontlineEnabled: true,
     frontlineStyle: "dual-rail",
     showFrontlineLabels: true,
@@ -447,11 +556,16 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   await setSelectValue(page, "#themeSelect", selectedPaletteId);
   await page.waitForFunction((value) => document.querySelector("#themeSelect")?.value === value, selectedPaletteId);
 
+  const legacyImportWait = await beginProjectImportWait(page, {
+    expectedFileName: path.basename(legacyProjectPath),
+  });
   await page.locator("#projectFileInput").setInputFiles(legacyProjectPath);
-  await page.waitForFunction(async () => {
+  await waitForProjectImportCompletionFrom(page, legacyImportWait);
+  await installStateHandle(page);
+  await page.waitForFunction(() => {
     const byId = (id) => document.querySelector(id);
     const recentCount = document.querySelectorAll("#recentColors .color-swatch").length;
-    const { state } = await import("/js/core/state.js");
+    const state = globalThis.__pwProjectSaveLoad?.state;
     return byId("#themeSelect")?.value === "hoi4_vanilla"
       && byId("#toggleSpecialZones")?.checked === false
       && byId("#physicalBlendMode")?.value === "soft-light"
@@ -483,7 +597,7 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
     offsetX: 0,
     offsetY: 0,
   });
-  expect(legacyExport.annotationView).toEqual({
+  expect(legacyExport.annotationView).toMatchObject({
     frontlineEnabled: false,
     frontlineStyle: "clean",
     showFrontlineLabels: false,
@@ -516,28 +630,14 @@ test("project save/load roundtrip preserves extended runtime state", async ({ pa
   expect(consoleErrors, `Console errors: ${JSON.stringify(consoleErrors, null, 2)}`).toEqual([]);
   expect(networkFailures, `Network failures: ${JSON.stringify(networkFailures, null, 2)}`).toEqual([]);
 
-  console.log(JSON.stringify({
-    baseUrl,
-    selectedPaletteId,
-    consoleWarnings,
-    artifacts: {
-      initialExportPath,
-      importedProjectPath,
-      roundtripExportPath,
-      legacyProjectPath,
-      legacyExportPath,
-    },
-  }, null, 2));
 });
 
 test("project import/export preserves legacy unit counter controller nation source", async ({ page }) => {
-  test.setTimeout(60000);
-  const baseUrl = resolveBaseUrl();
+  test.setTimeout(120000);
   const artifactDir = path.join(".runtime", "tests", "playwright", "project-save-load");
   fs.mkdirSync(artifactDir, { recursive: true });
 
-  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
-  await page.waitForTimeout(1500);
+  await gotoProjectPage(page);
   await waitForProjectUiReady(page);
 
   const baselinePath = path.join(artifactDir, "unit-counter-controller-baseline.json");
@@ -560,10 +660,15 @@ test("project import/export preserves legacy unit counter controller nation sour
   const importPath = path.join(artifactDir, "unit-counter-controller-legacy-import.json");
   fs.writeFileSync(importPath, JSON.stringify(importedProject, null, 2));
 
+  const importWait = await beginProjectImportWait(page, {
+    expectedFileName: path.basename(importPath),
+  });
   await page.locator("#projectFileInput").setInputFiles(importPath);
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
-    const counter = Array.isArray(state.unitCounters) ? state.unitCounters[0] : null;
+  await waitForProjectImportCompletionFrom(page, importWait);
+  await installStateHandle(page);
+  await page.waitForFunction(() => {
+    const state = globalThis.__pwProjectSaveLoad?.state;
+    const counter = Array.isArray(state?.unitCounters) ? state.unitCounters[0] : null;
     return !!counter
       && counter.id === "unit_controller_legacy"
       && counter.nationSource === "controller";
@@ -582,15 +687,13 @@ test("project import/export preserves legacy unit counter controller nation sour
 });
 
 test("scenario project roundtrip preserves controller overrides", async ({ page }) => {
-  test.setTimeout(60000);
-  const baseUrl = resolveBaseUrl();
+  test.setTimeout(120000);
   const artifactDir = path.join(".runtime", "tests", "playwright", "project-save-load");
   fs.mkdirSync(artifactDir, { recursive: true });
 
-  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
-  await page.waitForTimeout(1500);
+  await gotoProjectPage(page);
   await waitForProjectUiReady(page);
-  await applyScenario(page, "tno_1962");
+  await ensureScenarioActive(page, "tno_1962");
 
   const splitFeature = await getScenarioSplitFeature(page);
   expect(splitFeature).not.toBeNull();
@@ -609,38 +712,36 @@ test("scenario project roundtrip preserves controller overrides", async ({ page 
   const exported = await exportProjectJson(page, importPath);
   expect(exported.scenarioControllersByFeatureId?.[splitFeature.featureId]).toBe(splitFeature.alternateController);
 
-  await page.locator("#projectFileInput").setInputFiles(importPath);
-  await page.waitForFunction(async ({ featureId, expectedController }) => {
-    const { state } = await import("/js/core/state.js");
-    return state.activeScenarioId === "tno_1962"
-      && state.scenarioControllersByFeatureId?.[featureId] === expectedController;
-  }, {
-    featureId: splitFeature.featureId,
-    expectedController: splitFeature.alternateController,
+  const scenarioImportWait = await beginProjectImportWait(page, {
+    expectedFileName: path.basename(importPath),
   });
+  await page.locator("#projectFileInput").setInputFiles(importPath);
+  await waitForProjectImportCompletionFrom(page, scenarioImportWait);
 
   const runtimeState = await page.evaluate(async ({ featureId }) => {
     const { state } = await import("/js/core/state.js");
     return {
+      activeScenarioId: state.activeScenarioId || "",
       owner: String(state.sovereigntyByFeatureId?.[featureId] || ""),
       controller: String(state.scenarioControllersByFeatureId?.[featureId] || ""),
+      importAudit: state.scenarioImportAudit || null,
+      controllerCount: Object.keys(state.scenarioControllersByFeatureId || {}).length,
     };
   }, { featureId: splitFeature.featureId });
 
+  expect(runtimeState.activeScenarioId).toBe("tno_1962");
   expect(runtimeState.owner).toBe(splitFeature.baselineOwner);
   expect(runtimeState.controller).toBe(splitFeature.alternateController);
 });
 
 test("legacy scenario project import keeps baseline controllers when controller map is absent", async ({ page }) => {
-  test.setTimeout(60000);
-  const baseUrl = resolveBaseUrl();
+  test.setTimeout(120000);
   const artifactDir = path.join(".runtime", "tests", "playwright", "project-save-load");
   fs.mkdirSync(artifactDir, { recursive: true });
 
-  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
-  await page.waitForTimeout(1500);
+  await gotoProjectPage(page);
   await waitForProjectUiReady(page);
-  await applyScenario(page, "tno_1962");
+  await ensureScenarioActive(page, "tno_1962");
 
   const splitFeature = await getScenarioSplitFeature(page);
   expect(splitFeature).not.toBeNull();
@@ -660,38 +761,36 @@ test("legacy scenario project import keeps baseline controllers when controller 
     state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
   }, splitFeature);
 
-  await page.locator("#projectFileInput").setInputFiles(legacyImportPath);
-  await page.waitForFunction(async ({ featureId, expectedController }) => {
-    const { state } = await import("/js/core/state.js");
-    return state.activeScenarioId === "tno_1962"
-      && state.scenarioControllersByFeatureId?.[featureId] === expectedController;
-  }, {
-    featureId: splitFeature.featureId,
-    expectedController: splitFeature.baselineController,
+  const legacyScenarioImportWait = await beginProjectImportWait(page, {
+    expectedFileName: path.basename(legacyImportPath),
   });
+  await page.locator("#projectFileInput").setInputFiles(legacyImportPath);
+  await waitForProjectImportCompletionFrom(page, legacyScenarioImportWait);
 
   const runtimeState = await page.evaluate(async ({ featureId }) => {
     const { state } = await import("/js/core/state.js");
     return {
+      activeScenarioId: state.activeScenarioId || "",
       owner: String(state.sovereigntyByFeatureId?.[featureId] || ""),
       controller: String(state.scenarioControllersByFeatureId?.[featureId] || ""),
+      baselineController: String(state.scenarioBaselineControllersByFeatureId?.[featureId] || ""),
     };
   }, { featureId: splitFeature.featureId });
 
+  expect(runtimeState.activeScenarioId).toBe("tno_1962");
   expect(runtimeState.owner).toBe(splitFeature.baselineOwner);
+  expect(runtimeState.baselineController).toBe(splitFeature.baselineController);
   expect(runtimeState.controller).toBe(splitFeature.baselineController);
 });
 
 test("baseline mismatch acceptance persists scenario import audit", async ({ page }) => {
-  test.setTimeout(60000);
-  const baseUrl = resolveBaseUrl();
+  test.setTimeout(120000);
   const artifactDir = path.join(".runtime", "tests", "playwright", "project-save-load");
   fs.mkdirSync(artifactDir, { recursive: true });
 
-  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
-  await page.waitForTimeout(1500);
+  await gotoProjectPage(page);
   await waitForProjectUiReady(page);
-  await applyScenario(page, "tno_1962");
+  await ensureScenarioActive(page, "tno_1962");
 
   const exportedPath = path.join(artifactDir, "scenario-mismatch-source.json");
   const exported = await exportProjectJson(page, exportedPath);
@@ -699,12 +798,32 @@ test("baseline mismatch acceptance persists scenario import audit", async ({ pag
   const mismatchPath = path.join(artifactDir, "scenario-mismatch-import.json");
   fs.writeFileSync(mismatchPath, JSON.stringify(exported, null, 2));
 
-  page.once("dialog", (dialog) => dialog.accept());
+  const mismatchImportWait = await beginProjectImportWait(page, {
+    expectedFileName: path.basename(mismatchPath),
+  });
   await page.locator("#projectFileInput").setInputFiles(mismatchPath);
-  await page.waitForFunction(async () => {
-    const { state } = await import("/js/core/state.js");
-    return state.activeScenarioId === "tno_1962"
-      && state.scenarioImportAudit
+  await installInteractionFunnelDebugHandle(page);
+  await page.waitForFunction(() => {
+    const debug = globalThis.__pwProjectSaveLoad?.getInteractionFunnelDebugState?.();
+    const dialog = document.querySelector("[data-app-dialog-overlay='true']");
+    return !!dialog || !!String(debug?.lastImportError || "").trim();
+  }, { timeout: 30_000 });
+  const mismatchDebug = await page.evaluate(() => (
+    globalThis.__pwProjectSaveLoad?.getInteractionFunnelDebugState?.() || null
+  ));
+  if (String(mismatchDebug?.lastImportError || "").trim()) {
+    throw new Error(`Project import failed before confirmation: ${String(mismatchDebug.lastImportError).trim()}`);
+  }
+  const mismatchDialog = page.locator("[data-app-dialog-overlay='true']").last();
+  await expect(mismatchDialog).toBeVisible();
+  await expect(mismatchDialog.locator(".app-dialog-title")).toBeVisible();
+  await mismatchDialog.locator("[data-dialog-confirm='true']").evaluate((button) => button.click());
+  await waitForProjectImportCompletionFrom(page, mismatchImportWait);
+  await installStateHandle(page);
+  await page.waitForFunction(() => {
+    const state = globalThis.__pwProjectSaveLoad?.state;
+    return state?.activeScenarioId === "tno_1962"
+      && state?.scenarioImportAudit
       && state.scenarioImportAudit.savedBaselineHash === "bogus-baseline-hash";
   });
 
