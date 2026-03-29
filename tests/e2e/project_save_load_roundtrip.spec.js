@@ -639,6 +639,7 @@ test("project import/export preserves legacy unit counter controller nation sour
 
   await gotoProjectPage(page);
   await waitForProjectUiReady(page);
+  await ensureScenarioActive(page, "tno_1962");
 
   const baselinePath = path.join(artifactDir, "unit-counter-controller-baseline.json");
   const baselineExport = await exportProjectJson(page, baselinePath);
@@ -817,7 +818,7 @@ test("baseline mismatch acceptance persists scenario import audit", async ({ pag
   const mismatchDialog = page.locator("[data-app-dialog-overlay='true']").last();
   await expect(mismatchDialog).toBeVisible();
   await expect(mismatchDialog.locator(".app-dialog-title")).toBeVisible();
-  await mismatchDialog.locator("[data-dialog-confirm='true']").evaluate((button) => button.click());
+  await mismatchDialog.locator("[data-dialog-confirm='true']").click();
   await waitForProjectImportCompletionFrom(page, mismatchImportWait);
   await installStateHandle(page);
   await page.waitForFunction(() => {

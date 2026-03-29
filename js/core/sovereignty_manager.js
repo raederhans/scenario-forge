@@ -17,6 +17,23 @@ function normalizeOwnerCode(rawCode) {
   return normalizeCountryCodeAlias(rawCode);
 }
 
+function normalizeFeatureOwnershipMap(entries) {
+  const source =
+    entries && typeof entries === "object" && !Array.isArray(entries) ? entries : {};
+  const normalized = {};
+  Object.entries(source).forEach(([featureId, ownerCode]) => {
+    const id = String(featureId || "").trim();
+    const code = normalizeOwnerCode(ownerCode);
+    if (!id || !code) return;
+    normalized[id] = code;
+  });
+  return normalized;
+}
+
+function hasFeatureOwnershipMap(entries) {
+  return !!entries && typeof entries === "object" && !Array.isArray(entries);
+}
+
 function getCanonicalCountryCodeForFeature(feature) {
   if (!feature) return "";
   const props = feature.properties || {};
@@ -254,6 +271,7 @@ function getFeatureIdsForOwner(ownerCode) {
 
 function migrateImportedProjectData(data) {
   const payload = data && typeof data === "object" ? { ...data } : {};
+  const hasScenarioControllerMap = hasFeatureOwnershipMap(payload.scenarioControllersByFeatureId);
   payload.sovereignBaseColors =
     payload.sovereignBaseColors && typeof payload.sovereignBaseColors === "object"
       ? payload.sovereignBaseColors
@@ -266,10 +284,15 @@ function migrateImportedProjectData(data) {
       : payload.featureOverrides && typeof payload.featureOverrides === "object"
         ? payload.featureOverrides
         : {};
-  payload.sovereigntyByFeatureId =
-    payload.sovereigntyByFeatureId && typeof payload.sovereigntyByFeatureId === "object"
-      ? payload.sovereigntyByFeatureId
-      : {};
+  payload.sovereigntyByFeatureId = normalizeFeatureOwnershipMap(payload.sovereigntyByFeatureId);
+  if (hasScenarioControllerMap) {
+    payload.scenarioControllersByFeatureId =
+      payload.scenarioControllersByFeatureId
+      && typeof payload.scenarioControllersByFeatureId === "object"
+      && !Array.isArray(payload.scenarioControllersByFeatureId)
+        ? normalizeFeatureOwnershipMap(payload.scenarioControllersByFeatureId)
+        : null;
+  }
   payload.paintMode =
     payload.paintMode === "sovereignty" ? "sovereignty" : "visual";
   payload.mapSemanticMode = normalizeMapSemanticMode(payload.mapSemanticMode);
@@ -401,10 +424,7 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
   { fetchImpl = globalThis.fetch, validFeatureIds = null, landData = null } = {}
 ) {
   const payload = data && typeof data === "object" ? { ...data } : {};
-  const hasScenarioControllerMap = Object.prototype.hasOwnProperty.call(
-    payload,
-    "scenarioControllersByFeatureId"
-  );
+  const hasScenarioControllerMap = hasFeatureOwnershipMap(payload.scenarioControllersByFeatureId);
   const normalizedValidFeatureIds = (() => {
     if (validFeatureIds instanceof Set) {
       return new Set(Array.from(validFeatureIds).map((value) => String(value || "").trim()).filter(Boolean));
@@ -450,6 +470,14 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
 
   const migrationMap = await loadFeatureMigrationMap({ fetchImpl });
   if (!migrationMap || typeof migrationMap !== "object") {
+    payload.sovereigntyByFeatureId = { ...sovereigntyPartition.retained };
+    if (hasScenarioControllerMap) {
+      payload.scenarioControllersByFeatureId = { ...scenarioControllerPartition.retained };
+    } else {
+      delete payload.scenarioControllersByFeatureId;
+    }
+    payload.visualOverrides = { ...visualPartition.retained };
+    payload.featureOverrides = { ...payload.visualOverrides };
     return payload;
   }
 
@@ -503,6 +531,8 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
 
 export {
   normalizeOwnerCode,
+  normalizeFeatureOwnershipMap,
+  hasFeatureOwnershipMap,
   getCanonicalCountryCodeForFeature,
   getFeatureId,
   shouldExcludeScenarioPoliticalFeature,

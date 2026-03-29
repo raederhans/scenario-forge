@@ -5,17 +5,26 @@ const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
 
 test.setTimeout(90_000);
 
-async function installTestHandles(page) {
+async function installStateHandle(page) {
   await page.evaluate(async () => {
     globalThis.__pwInteractionFunnel = {
       state: (await import("/js/core/state.js")).state,
+    };
+  });
+}
+
+async function installInteractionFunnelDebugHandle(page) {
+  await installStateHandle(page);
+  await page.evaluate(async () => {
+    globalThis.__pwInteractionFunnel = {
+      ...(globalThis.__pwInteractionFunnel || {}),
       getInteractionFunnelDebugState: (await import("/js/core/interaction_funnel.js")).getInteractionFunnelDebugState,
     };
   });
 }
 
 async function waitForStartupReadonlyUnlocked(page, { timeout = 120000, stableMs = 300 } = {}) {
-  await installTestHandles(page);
+  await installStateHandle(page);
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
     const unlocked = await page.evaluate(() => {
@@ -40,28 +49,11 @@ async function waitForStartupReadonlyUnlocked(page, { timeout = 120000, stableMs
 
 async function gotoAppReady(page, targetPath = "/") {
   await gotoApp(page, targetPath, { waitUntil: "domcontentloaded" });
-  let lastError = null;
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    try {
-      await waitForAppInteractive(page, { timeout: 45_000 });
-      return;
-    } catch (error) {
-      lastError = error;
-      const retryVisible = await page
-        .locator("#bootRetryBtn")
-        .isVisible()
-        .catch(() => false);
-      if (!retryVisible || attempt === 2) {
-        throw lastError;
-      }
-      await page.locator("#bootRetryBtn").click();
-    }
-  }
-  throw lastError;
+  await waitForAppInteractive(page, { timeout: 45_000 });
 }
 
 async function waitForProjectUiReady(page) {
-  await installTestHandles(page);
+  await installStateHandle(page);
   await page.waitForFunction(() => {
     const state = globalThis.__pwInteractionFunnel?.state;
     const uploadBtn = document.querySelector("#uploadProjectBtn");
@@ -79,7 +71,7 @@ async function waitForProjectUiReady(page) {
 }
 
 async function waitForScenarioIdle(page) {
-  await installTestHandles(page);
+  await installStateHandle(page);
   await page.waitForFunction(() => {
     const state = globalThis.__pwInteractionFunnel?.state;
     return !state?.scenarioApplyInFlight;
@@ -92,6 +84,28 @@ async function exportProjectJson(page, outputPath) {
   const download = await downloadPromise;
   await download.saveAs(outputPath);
   return JSON.parse(fs.readFileSync(outputPath, "utf8"));
+}
+
+async function waitForInteractionFunnelImportComplete(page, { expectedFileName = "", timeout = 120000 } = {}) {
+  await installInteractionFunnelDebugHandle(page);
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    const debug = await page.evaluate(() => (
+      globalThis.__pwInteractionFunnel?.getInteractionFunnelDebugState?.() || null
+    ));
+    if (String(debug?.lastImportError || "").trim()) {
+      throw new Error(`Interaction funnel import failed: ${String(debug.lastImportError).trim()}`);
+    }
+    const isComplete = debug?.importPhase === "complete"
+      && Number(debug?.importStartCount || 0) >= 1
+      && Number(debug?.importApplyCount || 0) >= 1
+      && (!expectedFileName || debug?.lastImportFileName === expectedFileName);
+    if (isComplete) {
+      return;
+    }
+    await page.waitForTimeout(150);
+  }
+  throw new Error(`Interaction funnel import did not complete before timeout for ${expectedFileName || "selected file"}.`);
 }
 
 test("render boundary contract routes scenario dispatcher render modes", async ({ page }) => {
@@ -188,7 +202,7 @@ test("upload button dirty confirm and import path go through interaction funnel"
     const { markDirty } = await import("/js/core/dirty_state.js");
     markDirty("playwright-import-dirty");
   });
-  await installTestHandles(page);
+  await installStateHandle(page);
   await page.waitForFunction(() => {
     const state = globalThis.__pwInteractionFunnel?.state;
     return !!state?.isDirty;
@@ -199,18 +213,10 @@ test("upload button dirty confirm and import path go through interaction funnel"
   await page.locator("[data-dialog-confirm='true']").click();
   await page.locator("#projectFileInput").setInputFiles(exportPath);
 
-  await installTestHandles(page);
-  await page.waitForFunction(({ expectedFileName }) => {
-    const debug = globalThis.__pwInteractionFunnel?.getInteractionFunnelDebugState?.();
-    return debug.importStartCount >= 1
-      && debug.importApplyCount >= 1
-      && debug.importPhase === "complete"
-      && !debug.lastImportError
-      && debug.lastImportFileName === expectedFileName
-      && !!document.querySelector("#projectFileName")?.textContent;
-  }, {
+  await waitForInteractionFunnelImportComplete(page, {
     expectedFileName: path.basename(exportPath),
-  }, { timeout: 120_000 });
+  });
+  await expect(page.locator("#projectFileName")).toHaveText(path.basename(exportPath));
 
   const snapshot = await page.evaluate(async () => {
     const { getInteractionFunnelDebugState } = await import("/js/core/interaction_funnel.js");
@@ -254,6 +260,7 @@ test("map interaction layer click and dblclick bindings dispatch through interac
       },
     });
   });
+  await installInteractionFunnelDebugHandle(page);
 
   await page.locator("rect.interaction-layer").evaluate((node) => {
     node.dispatchEvent(new MouseEvent("click", {

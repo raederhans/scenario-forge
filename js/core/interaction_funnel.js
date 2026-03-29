@@ -20,8 +20,10 @@ import { setActivePaletteSource } from "./palette_manager.js";
 import {
   ensureSovereigntyState,
   getFeatureId,
+  hasFeatureOwnershipMap,
   markLegacyColorStateDirty,
   migrateFeatureScopedProjectDataToCurrentTopology,
+  normalizeFeatureOwnershipMap,
 } from "./sovereignty_manager.js";
 import {
   normalizeAnnotationView,
@@ -163,6 +165,31 @@ function getScenarioImportValidFeatureIds() {
     );
   }
   return null;
+}
+
+function resolveImportedOwnershipState(data) {
+  const hasScenarioControllerMap = hasFeatureOwnershipMap(data?.scenarioControllersByFeatureId);
+  const importedOwnersByFeatureId = normalizeFeatureOwnershipMap(data.sovereigntyByFeatureId);
+  const importedControllersByFeatureId = hasScenarioControllerMap
+    ? normalizeFeatureOwnershipMap(data.scenarioControllersByFeatureId)
+    : null;
+  if (state.activeScenarioId) {
+    return {
+      sovereigntyByFeatureId: {
+        ...(state.scenarioBaselineOwnersByFeatureId || {}),
+        ...importedOwnersByFeatureId,
+      },
+      scenarioControllersByFeatureId: hasScenarioControllerMap
+        ? importedControllersByFeatureId
+        : { ...(state.scenarioBaselineControllersByFeatureId || {}) },
+      shouldRestoreScenarioBaselineControllers: !hasScenarioControllerMap,
+    };
+  }
+  return {
+    sovereigntyByFeatureId: importedOwnersByFeatureId,
+    scenarioControllersByFeatureId: hasScenarioControllerMap ? importedControllersByFeatureId : {},
+    shouldRestoreScenarioBaselineControllers: false,
+  };
 }
 
 function syncProjectImportUiState({ scenarioImportAudit, hooks }) {
@@ -320,13 +347,12 @@ async function applyImportedProjectState(data, { ui, hooks }) {
 
   debugState.importPhase = "migration";
   const scenarioImportValidFeatureIds = getScenarioImportValidFeatureIds();
-  const shouldRestoreScenarioBaselineControllers =
-    !!state.activeScenarioId && !data.scenarioControllersByFeatureId;
   data = await migrateFeatureScopedProjectDataToCurrentTopology(data, {
     landData: scenarioImportValidFeatureIds ? null : state.landData,
     validFeatureIds: scenarioImportValidFeatureIds,
   });
   debugState.importPhase = "migration-done";
+  const importedOwnershipState = resolveImportedOwnershipState(data);
   state.sovereignBaseColors = data.sovereignBaseColors || data.countryBaseColors || {};
   state.countryBaseColors = { ...state.sovereignBaseColors };
   state.visualOverrides = data.visualOverrides || data.featureOverrides || {};
@@ -334,29 +360,13 @@ async function applyImportedProjectState(data, { ui, hooks }) {
   markLegacyColorStateDirty();
   state.waterRegionOverrides = data.waterRegionOverrides || {};
   state.specialRegionOverrides = data.specialRegionOverrides || {};
-  state.sovereigntyByFeatureId = state.activeScenarioId
-    ? {
-        ...(state.scenarioBaselineOwnersByFeatureId || {}),
-        ...(data.sovereigntyByFeatureId || {}),
-      }
-    : (data.sovereigntyByFeatureId || {});
+  state.sovereigntyByFeatureId = importedOwnershipState.sovereigntyByFeatureId;
   state.mapSemanticMode = normalizeMapSemanticMode(
     data.mapSemanticMode,
     state.activeScenarioId ? state.mapSemanticMode : "political"
   );
-  if (state.activeScenarioId) {
-    if (data.scenarioControllersByFeatureId) {
-      state.scenarioControllersByFeatureId = { ...data.scenarioControllersByFeatureId };
-    } else {
-      state.scenarioControllersByFeatureId = {
-        ...(state.scenarioBaselineControllersByFeatureId || {}),
-      };
-    }
-  } else {
-    state.scenarioControllersByFeatureId = data.scenarioControllersByFeatureId
-      ? { ...data.scenarioControllersByFeatureId }
-      : {};
-  }
+  state.scenarioControllersByFeatureId = importedOwnershipState.scenarioControllersByFeatureId;
+  state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
   state.sovereigntyInitialized = false;
   state.paintMode = data.paintMode || "visual";
   state.activeSovereignCode = data.activeSovereignCode || "";
@@ -688,13 +698,12 @@ async function applyImportedProjectState(data, { ui, hooks }) {
       renderNow: false,
     });
   }
-  if (shouldRestoreScenarioBaselineControllers) {
+  if (importedOwnershipState.shouldRestoreScenarioBaselineControllers) {
     state.scenarioControllersByFeatureId = {
       ...(state.scenarioBaselineControllersByFeatureId || {}),
     };
     state.scenarioControllerRevision = (Number(state.scenarioControllerRevision) || 0) + 1;
   }
-
   debugState.importPhase = "ui-sync";
   debugState.importApplyCount += 1;
   debugState.lastImportedScenarioId = String(state.activeScenarioId || "");
