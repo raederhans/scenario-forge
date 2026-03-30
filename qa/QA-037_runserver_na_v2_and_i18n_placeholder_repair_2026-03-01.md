@@ -28,7 +28,7 @@
 - `init_map_data.py`
   - Default build runs offline translation sync only.
   - Optional machine translation pass is controlled by `MAPCREATOR_BUILD_MT=auto|on`.
-- `sync_i18n_machine.bat`
+- `sync_i18n.bat --machine`
   - Now runs targeted machine translation with `--network-mode auto --auto-country-codes visible-missing`.
 
 ## Verification

@@ -26,7 +26,7 @@
 
 当前显式入口如下：
 
-- 开发启动：`start_dev.bat`、`start_dev_fast.bat`、`run_server.bat`
+- 开发启动：`start_dev.bat`（现统一承载 full / fast / fresh 模式）、`run_server.bat`
 - 数据构建：`init_map_data.py`
 - 前端回归：`package.json` 中的 Playwright 脚本
 - GitHub Pages 发布：`.github/workflows/deploy.yml`

@@ -3424,7 +3424,7 @@ function initToolbar({ render } = {}) {
       state.showCityPoints = !!event.target.checked;
       if (state.showCityPoints) {
         if (typeof state.ensureBaseCityDataFn === "function") {
-          void state.ensureBaseCityDataFn({ reason: "toolbar-toggle", renderNow: false });
+          void state.ensureBaseCityDataFn({ reason: "toolbar-toggle", renderNow: true });
         }
         void ensureActiveScenarioOptionalLayerLoaded("cities", { renderNow: true });
       }

@@ -53,7 +53,7 @@ import {
   normalizeUnitCounterSizeToken,
   UNIT_COUNTER_SCREEN_SIZE,
 } from "./unit_counter_presets.js";
-import { flushRenderBoundary } from "./render_boundary.js";
+import { flushRenderBoundary, requestRender } from "./render_boundary.js";
 import {
   bindInteractionFunnel,
   dispatchMapClick,
@@ -4252,8 +4252,8 @@ function invalidateContextLayerVisualStateBatch(layerNames, reason = "context-la
   const resolvedPasses = Array.from(targetPasses);
   invalidateRenderPasses(resolvedPasses, reason);
   clearRenderPassReferenceTransforms(resolvedPasses);
-  if (renderNow && typeof state.renderNowFn === "function") {
-    state.renderNowFn();
+  if (renderNow) {
+    requestRendererRender(`context-layer-visual:${reason}`, { flush: true });
   }
 }
 
@@ -10969,13 +10969,13 @@ function getTextureStyleConfig() {
 }
 
 function requestTextureRerender() {
-  if (typeof state.renderNowFn === "function") {
-    state.renderNowFn();
-    return;
-  }
-  if (context) {
-    drawCanvas();
-  }
+  requestRendererRender("texture-rerender", {
+    fallback: () => {
+      if (context) {
+        drawCanvas();
+      }
+    },
+  });
 }
 
 function getDayNightStyleConfig() {
@@ -11986,11 +11986,13 @@ function ensureDayNightClockTimer() {
       return;
     }
     invalidateRenderPasses("dayNight", "day-night-clock");
-    if (typeof state.renderNowFn === "function") {
-      state.renderNowFn();
-    } else if (context) {
-      render();
-    }
+    requestRendererRender("day-night-clock", {
+      fallback: () => {
+        if (context) {
+          render();
+        }
+      },
+    });
   }, DAY_NIGHT_CLOCK_INTERVAL_MS);
 }
 
@@ -17983,6 +17985,18 @@ function flushInteractionRender(reason = "interaction") {
   return flushRenderBoundary(reason);
 }
 
+function requestRendererRender(reason = "renderer", { flush = false, fallback = null } = {}) {
+  const requested = flush ? flushRenderBoundary(reason) : requestRender(reason);
+  if (requested) {
+    return true;
+  }
+  if (typeof fallback === "function") {
+    fallback();
+    return true;
+  }
+  return false;
+}
+
 function notifyDevWorkspace() {
   if (typeof state.updateDevWorkspaceUIFn === "function") {
     state.updateDevWorkspaceUIFn();
@@ -18834,9 +18848,7 @@ function flushBrushSession() {
     specialRegionIds,
     ownerCodes,
   });
-  if (typeof state.renderNowFn === "function") {
-    state.renderNowFn();
-  }
+  requestRendererRender("brush-stroke", { flush: true });
   noteRenderAction("brush-stroke", actionStart);
 }
 

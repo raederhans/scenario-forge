@@ -24,7 +24,7 @@ import {
   loadScenarioRegistry,
   syncScenarioLocalizationState,
 } from "./core/scenario_manager.js";
-import { bindRenderBoundary, flushRenderBoundary } from "./core/render_boundary.js";
+import { bindRenderBoundary, flushRenderBoundary, requestRender } from "./core/render_boundary.js";
 import { applyScenarioBundleCommand } from "./core/scenario_dispatcher.js";
 import { initPresetState } from "./core/preset_state.js";
 import { initTranslations } from "./ui/i18n.js";
@@ -34,6 +34,10 @@ import { normalizeCountryCodeAlias } from "./core/country_code_aliases.js";
 
 const VALID_BATCH_FILL_SCOPES = new Set(["parent", "country"]);
 const VIEW_SETTINGS_STORAGE_KEY = "map_view_settings_v1";
+
+function requestMainRender(reason = "", { flush = false } = {}) {
+  return flush ? flushRenderBoundary(reason) : requestRender(reason);
+}
 
 function normalizeCountryCode(rawCode) {
   return normalizeCountryCodeAlias(rawCode);
@@ -743,8 +747,8 @@ function bootstrapDeferredUi(renderApp) {
 
 async function ensureBaseCityDataReady({ reason = "manual", renderNow = true } = {}) {
   if (state.worldCitiesData && state.baseCityDataState === "loaded") {
-    if (renderNow && typeof state.renderNowFn === "function") {
-      state.renderNowFn();
+    if (renderNow) {
+      requestMainRender(`base-city-ready:${reason}`, { flush: true });
     }
     return state.worldCitiesData;
   }
@@ -802,8 +806,8 @@ async function ensureBaseCityDataReady({ reason = "manual", renderNow = true } =
       if (typeof state.updateDevWorkspaceUIFn === "function") {
         state.updateDevWorkspaceUIFn();
       }
-      if (renderNow && typeof state.renderNowFn === "function") {
-        state.renderNowFn();
+      if (renderNow) {
+        requestMainRender(`base-city-loaded:${reason}`, { flush: true });
       }
       console.info(`[boot] Base city support data loaded on demand. reason=${reason}`);
       return state.worldCitiesData;
@@ -879,8 +883,8 @@ async function ensureFullLocalizationDataReady({ reason = "post-ready", renderNo
       if (typeof state.updateDevWorkspaceUIFn === "function") {
         state.updateDevWorkspaceUIFn();
       }
-      if (renderNow && typeof state.renderNowFn === "function") {
-        state.renderNowFn();
+      if (renderNow) {
+        requestMainRender(`localization-full-ready:${reason}`, { flush: true });
       }
       return result;
     })
@@ -1097,8 +1101,8 @@ function schedulePostReadyVisualWarmup() {
     return;
   }
   globalThis.requestAnimationFrame?.(() => {
-    if (!state.bootBlocking && typeof state.renderNowFn === "function") {
-      state.renderNowFn();
+    if (!state.bootBlocking) {
+      requestMainRender("post-ready-visual-warmup");
     }
   });
 }
@@ -1186,8 +1190,8 @@ async function ensureDetailTopologyReady({
         setMapData({ refitProjection: false, resetZoom: false });
         if (renderDispatcher?.schedule) {
           renderDispatcher.schedule();
-        } else if (typeof state.renderNowFn === "function") {
-          state.renderNowFn();
+        } else {
+          requestMainRender("detail-topology-ready");
         }
       }
     }
@@ -1235,8 +1239,8 @@ async function ensureDetailTopologyReady({
       setMapData({ refitProjection: false, resetZoom: false });
       if (renderDispatcher?.schedule) {
         renderDispatcher.schedule();
-      } else if (typeof state.renderNowFn === "function") {
-        state.renderNowFn();
+      } else {
+        requestMainRender("detail-topology-promoted");
       }
     }
     return true;

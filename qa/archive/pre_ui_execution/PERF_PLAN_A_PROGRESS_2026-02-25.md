@@ -24,8 +24,8 @@
   - `calculatePanExtent`
 
 4. 快速开发启动档位已新增。
-- 新增：`start_dev_fast.bat`
-- 行为：不跑 `build_data.bat`，默认以 `/?detail_layer=off` 打开。
+- 新增：`start_dev.bat fast`
+- 行为：不跑 `build_data.bat`，默认以 readonly 启动交互模式打开，并启用 startup worker 与 startup cache。
 - 为此扩展了 `tools/dev_server.py`：支持从 `MAPCREATOR_OPEN_PATH` 或 CLI 参数决定浏览器打开路径。
 
 5. 状态字段补齐。

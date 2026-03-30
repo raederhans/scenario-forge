@@ -1,12 +1,13 @@
 const fs = require("fs");
 const path = require("path");
 const { test, expect } = require("@playwright/test");
-const { getAppUrl } = require("./support/playwright-app");
+const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
 
-const APP_URL = getAppUrl();
+test.setTimeout(90_000);
 const LEGACY_RADIUS = 6.8;
 const IGNORED_CONSOLE_PATTERNS = [
   /\[map_renderer\] Scenario political background merge fallback engaged:/i,
+  /was preloaded using link preload but not used within a few seconds from the window's load event/i,
 ];
 
 function countChangedPixels(left, right, threshold = 14) {
@@ -109,6 +110,62 @@ async function captureCanvasSample(page) {
   });
 }
 
+async function flushPendingRender(page) {
+  await page.evaluate(async () => {
+    const { state } = await import('/js/core/state.js');
+    state.renderNowFn?.();
+  });
+}
+
+async function waitForStableExactRender(page, { timeout = 20_000 } = {}) {
+  await page.waitForFunction(async () => {
+    const { state } = await import('/js/core/state.js');
+    return String(state.renderPhase || '') === 'idle'
+      && !state.deferExactAfterSettle
+      && !state.exactAfterSettleHandle;
+  }, { timeout });
+}
+
+async function waitForCityLayerVisibility(page, visible, { timeout = 20_000 } = {}) {
+  await page.waitForFunction(async (targetVisible) => {
+    const { state } = await import('/js/core/state.js');
+    if (String(state.renderPhase || '') !== 'idle' || state.deferExactAfterSettle || state.exactAfterSettleHandle) {
+      return false;
+    }
+    if (!!state.showCityPoints !== !!targetVisible) {
+      return false;
+    }
+    const metric = globalThis.__renderPerfMetrics?.contextBreakdown?.drawCityPointsLayer;
+    if (!metric || typeof metric !== 'object') {
+      return false;
+    }
+    if (targetVisible) {
+      return state.baseCityDataState === 'loaded'
+        && !metric.skipped
+        && Number(metric.visibleFeatureCount || 0) > 0;
+    }
+    return !!metric.skipped
+      && String(metric.reason || '') === 'hidden'
+      && Number(metric.visibleFeatureCount || 0) === 0;
+  }, visible, { timeout });
+}
+
+async function waitForBaseCityDataLoaded(page, { reason = 'e2e-city-regression', timeout = 120_000 } = {}) {
+  await page.evaluate(async (loadReason) => {
+    const { state } = await import('/js/core/state.js');
+    if (typeof state.ensureBaseCityDataFn === 'function') {
+      await state.ensureBaseCityDataFn({ reason: loadReason, renderNow: true });
+    }
+  }, reason);
+  await page.waitForFunction(async () => {
+    const { state } = await import('/js/core/state.js');
+    return state.baseCityDataState === 'loaded'
+      && Array.isArray(state.worldCitiesData?.features)
+      && state.worldCitiesData.features.length > 0;
+  }, { timeout });
+  await waitForStableExactRender(page, { timeout });
+}
+
 test('city and urban rendering regression smoke', async ({ page }) => {
   const consoleIssues = [];
   const networkFailures = [];
@@ -144,9 +201,11 @@ test('city and urban rendering regression smoke', async ({ page }) => {
     });
   });
 
-  await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
+  await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
   await waitForMapReady(page);
   await ensureScenario(page, 'tno_1962', 'TNO 1962');
+  await waitForAppInteractive(page);
+  await waitForStableExactRender(page);
   consoleIssues.length = 0;
   networkFailures.length = 0;
   pageErrors.length = 0;
@@ -169,23 +228,31 @@ test('city and urban rendering regression smoke', async ({ page }) => {
       cityLightsEnabled: !!state.styleConfig?.dayNight?.cityLightsEnabled,
     };
   }, { radius: LEGACY_RADIUS });
-  await page.waitForTimeout(500);
+  await waitForStableExactRender(page);
 
   expect(hydratedConfig.radius).toBeCloseTo(LEGACY_RADIUS, 1);
   expect(hydratedConfig.markerScale).toBeCloseTo(1, 2);
   expect(hydratedConfig.showCityPoints).toBe(true);
   expect(hydratedConfig.showUrban).toBe(true);
 
+  await waitForBaseCityDataLoaded(page);
+
   await setCheckbox(page, 'toggleCityPoints', true);
   await setCheckbox(page, 'toggleUrban', true);
-  await page.waitForTimeout(500);
+  await flushPendingRender(page);
+  await waitForStableExactRender(page);
+  await waitForCityLayerVisibility(page, true);
 
   const cityPointsOn = await captureCanvasSample(page);
   await setCheckbox(page, 'toggleCityPoints', false);
-  await page.waitForTimeout(500);
+  await flushPendingRender(page);
+  await waitForStableExactRender(page);
+  await waitForCityLayerVisibility(page, false);
   const cityPointsOff = await captureCanvasSample(page);
   await setCheckbox(page, 'toggleCityPoints', true);
-  await page.waitForTimeout(500);
+  await flushPendingRender(page);
+  await waitForStableExactRender(page);
+  await waitForCityLayerVisibility(page, true);
   const cityPointsRestored = await captureCanvasSample(page);
 
   const cityPointDiff = countChangedPixels(cityPointsOn.pixels, cityPointsOff.pixels);
@@ -196,7 +263,8 @@ test('city and urban rendering regression smoke', async ({ page }) => {
 
   const urbanOn = await captureCanvasSample(page);
   await setCheckbox(page, 'toggleUrban', false);
-  await page.waitForTimeout(500);
+  await flushPendingRender(page);
+  await waitForStableExactRender(page);
   const urbanOff = await captureCanvasSample(page);
   const urbanDisabledState = await page.evaluate(async () => {
     const { state } = await import('/js/core/state.js');
@@ -205,7 +273,8 @@ test('city and urban rendering regression smoke', async ({ page }) => {
     };
   });
   await setCheckbox(page, 'toggleUrban', true);
-  await page.waitForTimeout(500);
+  await flushPendingRender(page);
+  await waitForStableExactRender(page);
   const urbanRestore = await captureCanvasSample(page);
   const urbanRestoredState = await page.evaluate(async () => {
     const { state } = await import('/js/core/state.js');
@@ -221,12 +290,14 @@ test('city and urban rendering regression smoke', async ({ page }) => {
   await setCheckbox(page, 'dayNightEnabled', true);
   await setCheckbox(page, 'dayNightCityLightsEnabled', false);
   await setInputValue(page, 'dayNightManualTime', 0);
-  await page.waitForTimeout(700);
+  await flushPendingRender(page);
+  await waitForStableExactRender(page);
   const lightsOff = await captureCanvasSample(page);
 
   await setInputValue(page, 'dayNightCityLightsStyle', 'modern');
   await setCheckbox(page, 'dayNightCityLightsEnabled', true);
-  await page.waitForTimeout(900);
+  await flushPendingRender(page);
+  await waitForStableExactRender(page);
   const lightsOn = await captureCanvasSample(page);
   const lightsDiff = countChangedPixels(lightsOff.pixels, lightsOn.pixels, 10);
   expect(lightsDiff).toBeGreaterThan(120);

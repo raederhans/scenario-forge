@@ -124,8 +124,8 @@ Ocean 相关已落地能力包括：
   - hover 在非 idle 阶段降级
 - `projectedBoundsById` 缓存
 - 开发快速启动档位
-  - `start_dev_fast.bat`
-  - `detail_layer=off` 友好路径
+  - `start_dev.bat fast`
+  - readonly 启动交互 + startup worker/cache 友好路径
 
 这些改动没有改变数据 schema，但显著改善了缩放、平移和大图层下的交互稳定性。
 

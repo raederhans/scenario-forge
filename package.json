@@ -14,7 +14,6 @@
     "test:e2e": "node node_modules/@playwright/test/cli.js test",
     "test:e2e:smoke": "node node_modules/@playwright/test/cli.js test tests/e2e/main_shell_i18n.spec.js tests/e2e/scenario_apply_resilience.spec.js --reporter=list --workers=1",
     "test:e2e:project-save-load": "node node_modules/@playwright/test/cli.js test tests/e2e/project_save_load_roundtrip.spec.js --reporter=list --workers=1",
-    "test:e2e:project-import": "node node_modules/@playwright/test/cli.js test tests/e2e/project_save_load_roundtrip.spec.js --reporter=list --workers=1 --retries=0",
     "test:e2e:interaction-funnel": "node node_modules/@playwright/test/cli.js test tests/e2e/interaction_funnel_contract.spec.js --reporter=list --workers=1 --retries=0",
     "test:e2e:scenario-resilience": "node node_modules/@playwright/test/cli.js test tests/e2e/scenario_apply_resilience.spec.js --reporter=list --workers=1"
   },

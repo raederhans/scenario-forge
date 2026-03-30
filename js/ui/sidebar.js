@@ -24,6 +24,7 @@ import { showToast } from "./toast.js";
 import { showAppDialog } from "./app_dialog.js";
 import { initDevWorkspace } from "./dev_workspace.js";
 import { importProjectThroughFunnel } from "../core/interaction_funnel.js";
+import { flushRenderBoundary } from "../core/render_boundary.js";
 import {
   setFeatureOwnerCodes,
   markLegacyColorStateDirty,
@@ -57,6 +58,10 @@ import {
   loadHoi4UnitIconManifest,
   saveHoi4UnitIconReviewDraft,
 } from "../core/unit_counter_icon_libraries.js";
+
+function flushSidebarRender(reason = "") {
+  return flushRenderBoundary(reason);
+}
 
 function extractCountryCodeFromId(value) {
   const text = String(value || "").trim().toUpperCase();
@@ -3858,9 +3863,7 @@ function initSidebar({ render } = {}) {
     if (typeof state.updatePaintModeUIFn === "function") {
       state.updatePaintModeUIFn();
     }
-    if (typeof state.renderNowFn === "function") {
-      state.renderNowFn();
-    }
+    flushSidebarRender(`sidebar-paint-mode:${normalizedMode}`);
   };
 
   const applyVisualColorToOwnedRegions = (countryState, { renderNow = render, color = null } = {}) => {
@@ -4319,9 +4322,7 @@ function initSidebar({ render } = {}) {
     if (typeof state.updatePaintModeUIFn === "function") {
       state.updatePaintModeUIFn();
     }
-    if (typeof state.renderNowFn === "function") {
-      state.renderNowFn();
-    }
+    flushSidebarRender(`sidebar-inspector-country:${normalized}`);
     if (requiresListRebuild) {
       renderList();
       return;
@@ -5717,9 +5718,9 @@ function initSidebar({ render } = {}) {
       if (typeof state.updateActiveSovereignUIFn === "function") {
         state.updateActiveSovereignUIFn();
       }
-      if (typeof state.renderNowFn === "function") {
-        state.renderNowFn();
-      }
+      flushSidebarRender(
+        isCurrentlyActive ? "sidebar-active-sovereign:clear" : `sidebar-active-sovereign:${selectedCode}`
+      );
       refreshCountryRows({
         countryCodes: [previousActiveCode, selectedCode],
         refreshInspector: true,
@@ -8603,9 +8604,7 @@ function initSidebar({ render } = {}) {
       if (typeof state.renderCountryListFn === "function") {
         state.renderCountryListFn();
       }
-      if (typeof state.renderNowFn === "function") {
-        state.renderNowFn();
-      }
+      flushSidebarRender("sidebar-reset-country-colors");
       scheduleAdaptiveInspectorHeights();
       showToast(t("Country colors were reset.", "ui"), {
         title: t("Colors reset", "ui"),

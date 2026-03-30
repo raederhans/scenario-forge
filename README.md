@@ -2,9 +2,14 @@
 
 ## Dev Entrypoints
 
-- `start_dev.bat`: build data first, then start the local server.
-- `start_dev_fast.bat`: skip the rebuild and start the local server immediately.
-- `build_data.bat` and `run_server.bat`: low-level helpers used by the two root entrypoints.
+- `start_dev.bat`: primary dev entrypoint.
+  - `start_dev.bat`: build data first, then start the local server.
+  - `start_dev.bat fast`: skip the rebuild and start the local server with the fast readonly startup profile.
+  - `start_dev.bat fresh`: skip the rebuild and start the local server with caches and startup worker disabled for clean repro.
+- `build_data.bat` and `run_server.bat`: low-level helpers used by the main dev entrypoint.
+- `sync_i18n.bat`: i18n entrypoint.
+  - `sync_i18n.bat`: alias generation + translation sync + coverage audit.
+  - `sync_i18n.bat --machine ...`: machine-translation-assisted sync.
 
 ## Python Test Environment
 
