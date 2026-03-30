@@ -1,5 +1,6 @@
 import { state } from "./state.js";
 import { markLegacyColorStateDirty, rebuildOwnerIndex } from "./sovereignty_manager.js";
+import { flushRenderBoundary } from "./render_boundary.js";
 import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_manager.js";
 
 function uniqueKeys(values) {
@@ -37,6 +38,10 @@ function captureStylePaths(paths) {
 
 function cloneStructuredValue(value) {
   return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+}
+
+function flushHistoryRender(reason = "history-apply") {
+  return flushRenderBoundary(reason);
 }
 
 function captureHistoryState({
@@ -221,9 +226,7 @@ function refreshUiAfterHistory(direction, entry) {
   if (typeof state.updateStrategicOverlayUIFn === "function") {
     state.updateStrategicOverlayUIFn();
   }
-  if (typeof state.renderNowFn === "function") {
-    state.renderNowFn();
-  }
+  flushHistoryRender(`history-${direction}`);
 }
 
 function applyHistorySnapshot(snapshot, direction, entry) {

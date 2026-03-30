@@ -2,6 +2,7 @@ import { state } from "./state.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import * as mapRenderer from "./map_renderer.js";
 import { markDirty } from "./dirty_state.js";
+import { flushRenderBoundary } from "./render_boundary.js";
 import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_manager.js";
 import {
   getFeatureOwnerCode,
@@ -16,6 +17,10 @@ function uniqueIds(featureIds = []) {
       .map((value) => String(value || "").trim())
       .filter(Boolean)
   ));
+}
+
+function flushScenarioOwnershipRender(reason = "scenario-ownership") {
+  return flushRenderBoundary(reason);
 }
 
 function filterEditableOwnershipFeatureIds(featureIds = []) {
@@ -106,8 +111,8 @@ function applyOwnerToFeatureIds(
       },
     });
   }
-  if (render && typeof state.renderNowFn === "function") {
-    state.renderNowFn();
+  if (render) {
+    flushScenarioOwnershipRender("scenario-ownership-apply-owner");
   }
   return {
     applied: true,
@@ -206,8 +211,8 @@ function resetOwnersToScenarioBaselineForFeatureIds(
       },
     });
   }
-  if (render && typeof state.renderNowFn === "function") {
-    state.renderNowFn();
+  if (render) {
+    flushScenarioOwnershipRender("scenario-ownership-reset-baseline");
   }
   return {
     applied: true,
@@ -316,8 +321,8 @@ function applyOwnerControllerAssignmentsToFeatureIds(
       },
     });
   }
-  if (render && typeof state.renderNowFn === "function") {
-    state.renderNowFn();
+  if (render) {
+    flushScenarioOwnershipRender("scenario-ownership-apply-owner-controller");
   }
   return {
     applied: true,

@@ -18,6 +18,7 @@ import {
   normalizeScenarioDistrictTag,
 } from "../core/scenario_districts.js";
 import { getScenarioCountryDisplayName } from "../core/scenario_country_display.js";
+import { flushRenderBoundary } from "../core/render_boundary.js";
 import { applyDeclarativeTranslations, buildTooltipModel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 
@@ -42,6 +43,10 @@ const DEFAULT_TAG_CREATOR_COLOR = TAG_CREATOR_FALLBACK_SWATCHES[0];
 
 function ui(key) {
   return t(key, "ui");
+}
+
+function flushDevWorkspaceRender(reason = "dev-workspace") {
+  return flushRenderBoundary(reason);
 }
 
 function formatUi(key, replacements = {}) {
@@ -864,9 +869,7 @@ function applyScenarioTagCreatorSuccess(response, payload, targetIds = []) {
   recalculateScenarioOwnerControllerDiffCount();
   mapRenderer.refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
   mapRenderer.scheduleDynamicBorderRecompute("dev-workspace-tag-create", 90);
-  if (typeof state.renderNowFn === "function") {
-    state.renderNowFn();
-  }
+  flushDevWorkspaceRender("dev-workspace-tag-create");
   if (typeof state.updateScenarioUIFn === "function") {
     state.updateScenarioUIFn();
   }
@@ -1136,9 +1139,7 @@ function sampleScenarioTagColorFromContext() {
 function clearScenarioTagCreatorSelectionTarget() {
   mapRenderer.clearDevSelection();
   state.devSelectedHit = null;
-  if (typeof state.renderNowFn === "function") {
-    state.renderNowFn();
-  }
+  flushDevWorkspaceRender("dev-workspace-tag-clear-target");
 }
 
 function resolveCountryEditorModel() {
@@ -3851,9 +3852,7 @@ function initDevWorkspace() {
         throw new Error(String(result?.message || `HTTP ${response.status}`));
       }
       applyScenarioCountrySaveSuccess(result, built.payload);
-      if (typeof state.renderNowFn === "function") {
-        state.renderNowFn();
-      }
+      flushDevWorkspaceRender("dev-workspace-country-save");
       if (typeof state.updateScenarioUIFn === "function") {
         state.updateScenarioUIFn();
       }
@@ -3883,9 +3882,7 @@ function initDevWorkspace() {
 
   bindButtonAction(panel.querySelector("#devScenarioTagInspectorClearHighlightBtn"), () => {
     state.inspectorHighlightCountryCode = "";
-    if (typeof state.renderNowFn === "function") {
-      state.renderNowFn();
-    }
+    flushDevWorkspaceRender("dev-workspace-tag-inspector-clear-highlight");
     renderWorkspace();
   });
 
@@ -3919,9 +3916,7 @@ function initDevWorkspace() {
         throw new Error(String(result?.message || `HTTP ${response.status}`));
       }
       applyScenarioCapitalSaveSuccess(result, built.payload);
-      if (typeof state.renderNowFn === "function") {
-        state.renderNowFn();
-      }
+      flushDevWorkspaceRender("dev-workspace-capital-save");
       if (typeof state.updateScenarioUIFn === "function") {
         state.updateScenarioUIFn();
       }
@@ -4130,9 +4125,7 @@ function initDevWorkspace() {
         district_groups_url: String(result.districtGroupsUrl || state.activeScenarioManifest?.district_groups_url || ""),
       };
       mapRenderer.rebuildStaticMeshes();
-      if (typeof state.renderNowFn === "function") {
-        state.renderNowFn();
-      }
+      flushDevWorkspaceRender("dev-workspace-district-save");
       showToast(ui("Scenario districts file saved."), {
         title: ui("Scenario District Editor"),
         tone: "success",
@@ -4362,9 +4355,7 @@ function initDevWorkspace() {
         lastSaveMessage: `${ui("Saved")}: ${String(result.filePath || "")}`,
         lastSaveTone: "success",
       };
-      if (typeof state.renderNowFn === "function") {
-        state.renderNowFn();
-      }
+      flushDevWorkspaceRender("dev-workspace-locale-save");
       showToast(ui("Scenario localized names saved."), {
         title: ui("Scenario Locale Editor"),
         tone: "success",
@@ -4848,9 +4839,7 @@ function initDevWorkspace() {
       };
       state.selectedInspectorCountryCode = tag;
       state.inspectorHighlightCountryCode = tag;
-      if (typeof state.renderNowFn === "function") {
-        state.renderNowFn();
-      }
+      flushDevWorkspaceRender("dev-workspace-tag-inspector-select");
       renderWorkspace();
     });
     scenarioTagInspectorSelect.dataset.bound = "true";

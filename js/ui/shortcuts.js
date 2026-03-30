@@ -1,6 +1,7 @@
 import { state } from "../core/state.js";
 import { FileManager } from "../core/file_manager.js";
 import { redoHistory, undoHistory } from "../core/history_manager.js";
+import { flushRenderBoundary } from "../core/render_boundary.js";
 import {
   cancelActiveStrategicInteractionModes,
   cancelSpecialZoneDraw,
@@ -16,6 +17,10 @@ function isEditableTarget(target) {
     return true;
   }
   return false;
+}
+
+function flushShortcutRender(reason = "shortcut") {
+  return flushRenderBoundary(reason);
 }
 
 function setCurrentTool(tool) {
@@ -37,9 +42,7 @@ function refreshAfterSpecialZoneShortcut() {
   if (typeof state.updateSpecialZoneEditorUIFn === "function") {
     state.updateSpecialZoneEditorUIFn();
   }
-  if (typeof state.renderNowFn === "function") {
-    state.renderNowFn();
-  }
+  flushShortcutRender("shortcut-special-zone-cancel");
 }
 
 function syncToolUi() {
@@ -276,9 +279,7 @@ function initShortcuts() {
         if (typeof state.updateStrategicOverlayUIFn === "function") {
           state.updateStrategicOverlayUIFn();
         }
-        if (typeof state.renderNowFn === "function") {
-          state.renderNowFn();
-        }
+        flushShortcutRender("shortcut-strategic-overlay-cancel");
         return;
       }
       if (state.specialZoneEditor?.active) {

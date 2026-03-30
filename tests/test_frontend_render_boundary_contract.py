@@ -11,6 +11,10 @@ class FrontendRenderBoundaryContractTest(unittest.TestCase):
             REPO_ROOT / "js" / "main.js",
             REPO_ROOT / "js" / "ui" / "sidebar.js",
             REPO_ROOT / "js" / "core" / "map_renderer.js",
+            REPO_ROOT / "js" / "ui" / "dev_workspace.js",
+            REPO_ROOT / "js" / "core" / "scenario_ownership_editor.js",
+            REPO_ROOT / "js" / "core" / "history_manager.js",
+            REPO_ROOT / "js" / "ui" / "shortcuts.js",
         ]
 
         offenders = []
