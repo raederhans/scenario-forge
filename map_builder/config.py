@@ -30,14 +30,16 @@ CGLS_LC100_2019_FOREST_TYPE_URL = (
     "PROBAV_LC100_global_v3.0.1_2019-nrt_Forest-Type-layer_EPSG-4326.tif/content"
 )
 
-FR_ARR_URL = "https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/arrondissements.geojson"
-FR_ARR_FALLBACK_URLS = [
-    "https://cdn.jsdelivr.net/gh/gregoiredavid/france-geojson@master/arrondissements.geojson",
-]
-PL_POWIATY_URL = "https://raw.githubusercontent.com/jusuff/PolandGeoJson/main/data/poland.counties.json"
-PL_POWIATY_FALLBACK_URLS = [
-    "https://cdn.jsdelivr.net/gh/jusuff/PolandGeoJson@main/data/poland.counties.json",
-]
+FR_ARR_URL = (
+    "https://raw.githubusercontent.com/gregoiredavid/france-geojson/"
+    "5d34ee6d0140c29f785fdb047d9329f1aab58833/arrondissements.geojson"
+)
+FR_ARR_FALLBACK_URLS: list[str] = []
+PL_POWIATY_URL = (
+    "https://raw.githubusercontent.com/jusuff/PolandGeoJson/"
+    "d96c034dbd0ac545a5daddfac5a45d1807c63e09/data/poland.counties.json"
+)
+PL_POWIATY_FALLBACK_URLS: list[str] = []
 CHINA_CITY_URL = (
     "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/CHN/ADM2/"
     "geoBoundaries-CHN-ADM2.geojson"

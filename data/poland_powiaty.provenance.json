@@ -1,0 +1,11 @@
+{
+  "filename": "poland_powiaty.geojson",
+  "configured_source_url": "https://raw.githubusercontent.com/jusuff/PolandGeoJson/d96c034dbd0ac545a5daddfac5a45d1807c63e09/data/poland.counties.json",
+  "resolved_source_url": null,
+  "fallback_candidates": [],
+  "sha256": "fdf9381e109195bb321bac4cd5d8c9ed0e1f9a8503c095785d03bf023cf48659",
+  "content_length": 1213596,
+  "captured_at_utc": "2026-03-30T21:30:24Z",
+  "capture_mode": "cache_backfill",
+  "validator_name": "_validate_json_bytes"
+}

@@ -2,10 +2,13 @@
 from __future__ import annotations
 
 import concurrent.futures
+import hashlib
 import json
+import os
 import shutil
 import tempfile
 import zipfile
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
@@ -13,6 +16,10 @@ import geopandas as gpd
 import requests
 
 from map_builder import config as cfg
+from map_builder.io.writers import write_bytes_atomic, write_json_atomic
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 def get_headers() -> dict:
@@ -67,10 +74,106 @@ def fetch_ne_zip(url: str, label: str) -> gpd.GeoDataFrame:
     return gdf
 
 
-def _cache_path(filename: str) -> Path:
-    cache_dir = Path(__file__).resolve().parents[2] / "data"
+def _cache_root() -> Path:
+    override = str(os.environ.get("MAPCREATOR_DATA_CACHE_DIR") or "").strip()
+    if override:
+        cache_dir = Path(override).expanduser()
+        if not cache_dir.is_absolute():
+            cache_dir = PROJECT_ROOT / cache_dir
+    else:
+        cache_dir = PROJECT_ROOT / "data"
     cache_dir.mkdir(parents=True, exist_ok=True)
-    return cache_dir / filename
+    return cache_dir
+
+
+def _cache_path(filename: str) -> Path:
+    return _cache_root() / filename
+
+
+def _provenance_path(cache_path: Path) -> Path:
+    suffix = cache_path.suffix
+    stem = cache_path.name[:-len(suffix)] if suffix else cache_path.name
+    return cache_path.with_name(f"{stem}.provenance.json")
+
+
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def _sha256_path(path: Path) -> str:
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            if not chunk:
+                break
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _validator_name(validator, fallback_name: str = "none") -> str:
+    if isinstance(validator, str):
+        return validator
+    name = getattr(validator, "__name__", "")
+    return str(name or fallback_name)
+
+
+def _write_source_provenance(
+    *,
+    cache_path: Path,
+    configured_source_url: str,
+    fallback_candidates: list[str] | None,
+    resolved_source_url: str | None,
+    capture_mode: str,
+    validator_name: str,
+    status_code: int | None = None,
+    content_type: str | None = None,
+) -> None:
+    payload = {
+        "filename": cache_path.name,
+        "configured_source_url": configured_source_url,
+        "resolved_source_url": resolved_source_url,
+        "fallback_candidates": list(fallback_candidates or []),
+        "sha256": _sha256_path(cache_path),
+        "content_length": int(cache_path.stat().st_size),
+        "captured_at_utc": _utc_now(),
+        "capture_mode": capture_mode,
+        "validator_name": validator_name,
+    }
+    if status_code is not None:
+        payload["status_code"] = int(status_code)
+    if content_type:
+        payload["content_type"] = str(content_type)
+    write_json_atomic(_provenance_path(cache_path), payload, ensure_ascii=False, indent=2, trailing_newline=True)
+
+
+def _ensure_cache_backfill_provenance(
+    *,
+    cache_path: Path,
+    configured_source_url: str,
+    fallback_candidates: list[str] | None,
+    validator_name: str,
+) -> None:
+    provenance_path = _provenance_path(cache_path)
+    if provenance_path.exists():
+        return
+    _write_source_provenance(
+        cache_path=cache_path,
+        configured_source_url=configured_source_url,
+        fallback_candidates=fallback_candidates,
+        resolved_source_url=None,
+        capture_mode="cache_backfill",
+        validator_name=validator_name,
+    )
+
+
+def _validate_cached_payload(cache_path: Path, validator, filename: str) -> None:
+    try:
+        content = cache_path.read_bytes()
+    except OSError as exc:
+        raise SystemExit(f"Failed to read cached {filename}: {exc}") from exc
+    error = validator(content)
+    if error:
+        raise SystemExit(f"Cached {filename} failed validation: {error}")
 
 
 def _build_download_sources(url: str, fallback_urls: list[str] | None = None) -> list[str]:
@@ -99,6 +202,14 @@ def _download_to_cache(
 ) -> Path:
     cache_path = _cache_path(filename)
     if cache_path.exists():
+        print(f"   [Cache] Loading {filename} from local file...")
+        _validate_cached_payload(cache_path, validator, filename)
+        _ensure_cache_backfill_provenance(
+            cache_path=cache_path,
+            configured_source_url=url,
+            fallback_candidates=fallback_urls,
+            validator_name=_validator_name(validator),
+        )
         return cache_path
 
     print(f"   [Download] Fetching {filename} from remote...")
@@ -118,7 +229,17 @@ def _download_to_cache(
                 if error:
                     print(f"[ERROR] Downloaded {filename} is invalid: {error}")
                     continue
-                cache_path.write_bytes(content)
+                write_bytes_atomic(cache_path, content)
+                _write_source_provenance(
+                    cache_path=cache_path,
+                    configured_source_url=url,
+                    fallback_candidates=fallback_urls,
+                    resolved_source_url=source,
+                    capture_mode="downloaded",
+                    validator_name=_validator_name(validator),
+                    status_code=response.status_code,
+                    content_type=response.headers.get("Content-Type"),
+                )
                 return True
             except requests.RequestException as exc:
                 print(f"   [Download] {source} attempt {attempt}/{attempts} failed: {exc}")
@@ -296,6 +417,12 @@ def fetch_or_cache_binary(
 ) -> Path:
     cache_path = _cache_path(filename)
     if cache_path.exists() and cache_path.stat().st_size >= min_size_bytes:
+        _ensure_cache_backfill_provenance(
+            cache_path=cache_path,
+            configured_source_url=url,
+            fallback_candidates=fallback_urls,
+            validator_name=f"binary_min_size:{min_size_bytes}",
+        )
         return cache_path
     partial_path = cache_path.with_name(f"{cache_path.name}.part")
 
@@ -312,11 +439,20 @@ def fetch_or_cache_binary(
                         f"   [Download] {filename}: server supports range requests; using parallel download "
                         f"for {total_size / (1024 * 1024):.0f} MiB payload."
                     )
-                    return _download_binary_ranges(
+                    range_path = _download_binary_ranges(
                         source=source,
                         cache_path=cache_path,
                         total_size=total_size,
                     )
+                    _write_source_provenance(
+                        cache_path=range_path,
+                        configured_source_url=url,
+                        fallback_candidates=fallback_urls,
+                        resolved_source_url=source,
+                        capture_mode="downloaded",
+                        validator_name=f"binary_min_size:{min_size_bytes}",
+                    )
+                    return range_path
             request_headers = get_headers()
             if resume_size > 0:
                 request_headers["Range"] = f"bytes={resume_size}-"
@@ -329,6 +465,12 @@ def fetch_or_cache_binary(
                 if resume_size > 0 and response.status_code == 416:
                     partial_path.replace(cache_path)
                     if cache_path.stat().st_size >= min_size_bytes:
+                        _ensure_cache_backfill_provenance(
+                            cache_path=cache_path,
+                            configured_source_url=url,
+                            fallback_candidates=fallback_urls,
+                            validator_name=f"binary_min_size:{min_size_bytes}",
+                        )
                         return cache_path
                     cache_path.unlink(missing_ok=True)
                     resume_size = 0
@@ -362,6 +504,16 @@ def fetch_or_cache_binary(
                 )
                 continue
             temp_path.replace(cache_path)
+            _write_source_provenance(
+                cache_path=cache_path,
+                configured_source_url=url,
+                fallback_candidates=fallback_urls,
+                resolved_source_url=source,
+                capture_mode="downloaded",
+                validator_name=f"binary_min_size:{min_size_bytes}",
+                status_code=response.status_code,
+                content_type=response.headers.get("Content-Type"),
+            )
             return cache_path
         except requests.RequestException as exc:
             print(f"   [Download] {source} failed for {filename}: {exc}")
@@ -373,16 +525,6 @@ def fetch_or_cache_binary(
 
 
 def fetch_or_load_geojson(url: str, filename: str, fallback_urls: list[str] | None = None) -> gpd.GeoDataFrame:
-    cache_path = _cache_path(filename)
-
-    if cache_path.exists():
-        print(f"   [Cache] Loading {filename} from local file...")
-        try:
-            return gpd.read_file(cache_path)
-        except Exception as exc:
-            print(f"Failed to read cached {filename}: {exc}")
-            raise SystemExit(1) from exc
-
     cache_path = _download_to_cache(
         url=url,
         filename=filename,

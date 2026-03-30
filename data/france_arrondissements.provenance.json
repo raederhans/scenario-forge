@@ -1,0 +1,11 @@
+{
+  "filename": "france_arrondissements.geojson",
+  "configured_source_url": "https://raw.githubusercontent.com/gregoiredavid/france-geojson/5d34ee6d0140c29f785fdb047d9329f1aab58833/arrondissements.geojson",
+  "resolved_source_url": null,
+  "fallback_candidates": [],
+  "sha256": "6ed2c7b7ebb07b83c2e0067416819859d8bbd3d8e3d48660307c1e04b1953e42",
+  "content_length": 5739022,
+  "captured_at_utc": "2026-03-30T21:30:24Z",
+  "capture_mode": "cache_backfill",
+  "validator_name": "_validate_json_bytes"
+}
