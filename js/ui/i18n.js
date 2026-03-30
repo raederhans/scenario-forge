@@ -682,7 +682,7 @@ function toggleLanguage() {
   if (typeof state.updateSpecialZoneEditorUIFn === "function") {
     state.updateSpecialZoneEditorUIFn();
   }
-  import("../core/scenario_manager.js")
+  import("../core/scenario_resources.js")
     .then(({ ensureScenarioGeoLocalePatchForLanguage }) => {
       if (typeof ensureScenarioGeoLocalePatchForLanguage === "function") {
         return ensureScenarioGeoLocalePatchForLanguage(nextLang, { renderNow: false });

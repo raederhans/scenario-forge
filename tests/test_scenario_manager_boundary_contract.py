@@ -16,6 +16,16 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
         self.assertNotIn("initScenarioManager", content)
         self.assertNotIn("recalculateScenarioOwnerControllerDiffCount,", content)
         self.assertNotIn("syncScenarioLocalizationState,", content)
+        self.assertNotIn("ensureActiveScenarioOptionalLayerLoaded,", content)
+        self.assertNotIn("ensureActiveScenarioOptionalLayersForVisibility,", content)
+        self.assertNotIn("ensureScenarioGeoLocalePatchForLanguage,", content)
+        self.assertNotIn("hydrateActiveScenarioBundle,", content)
+        self.assertNotIn("loadScenarioAuditPayload,", content)
+        self.assertNotIn("loadScenarioBundle,", content)
+        self.assertNotIn("loadScenarioRegistry,", content)
+        self.assertNotIn("releaseScenarioAuditPayload,", content)
+        self.assertNotIn("validateImportedScenarioBaseline,", content)
+        self.assertNotIn("function syncScenarioUi()", content)
 
 
 if __name__ == "__main__":

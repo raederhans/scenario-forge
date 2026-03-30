@@ -40,7 +40,7 @@ import {
   normalizeHexColor,
   setActivePaletteSource,
 } from "../core/palette_manager.js";
-import { ensureActiveScenarioOptionalLayerLoaded } from "../core/scenario_manager.js";
+import { ensureActiveScenarioOptionalLayerLoaded } from "../core/scenario_resources.js";
 import { resetScenarioToBaselineCommand } from "../core/scenario_dispatcher.js";
 import { toggleLanguage, updateUIText, t } from "./i18n.js";
 import { markLegacyColorStateDirty, resetAllFeatureOwnersToCanonical } from "../core/sovereignty_manager.js";

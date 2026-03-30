@@ -3,7 +3,7 @@ import { clearHistory } from "./history_manager.js";
 import {
   ensureActiveScenarioOptionalLayerLoaded,
   validateImportedScenarioBaseline,
-} from "./scenario_manager.js";
+} from "./scenario_resources.js";
 import {
   applyScenarioByIdCommand,
   clearActiveScenarioCommand,

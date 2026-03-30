@@ -16,6 +16,8 @@ import {
   ensureActiveScenarioOptionalLayerLoaded,
   loadScenarioAuditPayload,
   releaseScenarioAuditPayload,
+} from "../core/scenario_resources.js";
+import {
   refreshScenarioShellOverlays,
 } from "../core/scenario_manager.js";
 import { recalculateScenarioOwnerControllerDiffCount } from "../core/scenario_owner_metrics.js";

@@ -21,7 +21,7 @@ import {
   hydrateActiveScenarioBundle,
   loadScenarioBundle,
   loadScenarioRegistry,
-} from "./core/scenario_manager.js";
+} from "./core/scenario_resources.js";
 import { bindRenderBoundary, flushRenderBoundary, requestRender } from "./core/render_boundary.js";
 import { applyScenarioBundleCommand } from "./core/scenario_dispatcher.js";
 import { initPresetState } from "./core/preset_state.js";

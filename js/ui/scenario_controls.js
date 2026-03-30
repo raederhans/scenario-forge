@@ -12,10 +12,10 @@ import {
   getScenarioDisplayName,
   getScenarioFatalRecoveryState,
   getScenarioRegistryEntries,
-  loadScenarioRegistry,
   normalizeScenarioId,
   normalizeScenarioViewMode,
 } from "../core/scenario_manager.js";
+import { loadScenarioRegistry } from "../core/scenario_resources.js";
 import { t } from "./i18n.js";
 import { showToast } from "./toast.js";
 
