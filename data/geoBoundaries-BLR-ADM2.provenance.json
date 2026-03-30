@@ -1,0 +1,11 @@
+{
+  "filename": "geoBoundaries-BLR-ADM2.geojson",
+  "configured_source_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BLR/ADM2/geoBoundaries-BLR-ADM2.geojson",
+  "resolved_source_url": null,
+  "fallback_candidates": [],
+  "sha256": "434ee95fb9dcbdd19ae1e0c236daad18951b9c6cb23cd63aa87ef63f1d552d42",
+  "content_length": 2058410,
+  "captured_at_utc": "2026-03-30T22:18:17Z",
+  "capture_mode": "cache_backfill",
+  "validator_name": "_validate_json_bytes"
+}

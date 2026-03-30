@@ -1,7 +1,7 @@
 import { state } from "./state.js";
 import { markLegacyColorStateDirty, rebuildOwnerIndex } from "./sovereignty_manager.js";
 import { flushRenderBoundary } from "./render_boundary.js";
-import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_manager.js";
+import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_owner_metrics.js";
 
 function uniqueKeys(values) {
   return Array.from(new Set((Array.isArray(values) ? values : []).map((value) => String(value || "").trim()).filter(Boolean)));

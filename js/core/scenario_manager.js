@@ -11,7 +11,6 @@ import {
   setMapData,
 } from "./map_renderer.js";
 import {
-  buildCityLocalizationPatch,
   loadDeferredDetailBundle,
   loadMeasuredJsonResource,
   normalizeCityText,
@@ -43,6 +42,7 @@ import {
   normalizeScenarioDistrictGroupsPayload,
 } from "./scenario_districts.js";
 import { ensureDetailTopologyBoundary, flushRenderBoundary } from "./render_boundary.js";
+import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_owner_metrics.js";
 import { setActivePaletteSource, syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { markDirty } from "./dirty_state.js";
 import {
@@ -50,6 +50,7 @@ import {
   getScenarioReleasableCountries,
   rebuildPresetState,
 } from "./releasable_manager.js";
+import { syncScenarioLocalizationState } from "./scenario_localization_state.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
@@ -636,44 +637,6 @@ function getPoliticalGeometryCount(topology) {
 
 function hasUsablePoliticalTopology(topology, { minFeatures = DETAIL_POLITICAL_MIN_FEATURES } = {}) {
   return getPoliticalGeometryCount(topology) >= Math.max(1, Number(minFeatures) || 1);
-}
-
-function countOwnerControllerSplit({
-  ownersByFeatureId = state.sovereigntyByFeatureId || {},
-  controllersByFeatureId = state.scenarioControllersByFeatureId || {},
-} = {}) {
-  let split = 0;
-  const seen = new Set();
-  Object.entries(ownersByFeatureId || {}).forEach(([featureId, owner]) => {
-    const normalizedId = String(featureId || "").trim();
-    if (!normalizedId) return;
-    seen.add(normalizedId);
-    const ownerTag = String(owner || "").trim().toUpperCase();
-    const controllerTag = String(controllersByFeatureId?.[normalizedId] || ownerTag || "").trim().toUpperCase();
-    if (ownerTag && controllerTag && ownerTag !== controllerTag) {
-      split += 1;
-    }
-  });
-  Object.entries(controllersByFeatureId || {}).forEach(([featureId, controller]) => {
-    const normalizedId = String(featureId || "").trim();
-    if (!normalizedId || seen.has(normalizedId)) return;
-    const controllerTag = String(controller || "").trim().toUpperCase();
-    const ownerTag = String(ownersByFeatureId?.[normalizedId] || controllerTag || "").trim().toUpperCase();
-    if (ownerTag && controllerTag && ownerTag !== controllerTag) {
-      split += 1;
-    }
-  });
-  return split;
-}
-
-function recalculateScenarioOwnerControllerDiffCount() {
-  state.scenarioOwnerControllerDiffCount = state.activeScenarioId
-    ? countOwnerControllerSplit({
-      ownersByFeatureId: state.sovereigntyByFeatureId,
-      controllersByFeatureId: state.scenarioControllersByFeatureId,
-    })
-    : 0;
-  return state.scenarioOwnerControllerDiffCount;
 }
 
 function evaluateScenarioDataHealth(
@@ -1919,196 +1882,10 @@ function getScenarioBundleId(bundle) {
   return normalizeScenarioId(bundle?.manifest?.scenario_id || bundle?.meta?.scenario_id);
 }
 
-function getScenarioOverrideLocaleEntry(overrideEntry) {
-  const displayName = overrideEntry?.display_name && typeof overrideEntry.display_name === "object"
-    ? overrideEntry.display_name
-    : {};
-  const en = normalizeCityText(displayName.en || overrideEntry?.name_en || overrideEntry?.name || "");
-  const zh = normalizeCityText(displayName.zh || overrideEntry?.name_zh || "");
-  if (!en && !zh) return null;
-  return {
-    en: en || zh,
-    zh: zh || en,
-  };
-}
-
-function getScenarioOverrideSourceCityFeature(overrideEntry) {
-  const features = Array.isArray(state.worldCitiesData?.features) ? state.worldCitiesData.features : [];
-  if (!features.length) return null;
-  const candidates = new Set([
-    normalizeCityText(overrideEntry?.city_id),
-    normalizeCityText(overrideEntry?.stable_key),
-  ].filter(Boolean));
-  if (!candidates.size) return null;
-  return features.find((feature) => {
-    const props = feature?.properties || {};
-    return candidates.has(normalizeCityText(props.__city_id || props.id || feature?.id))
-      || candidates.has(normalizeCityText(props.__city_stable_key || props.stable_key));
-  }) || null;
-}
-
-function getFeaturePointCoordinates(feature) {
-  const geometry = feature?.geometry;
-  if (!geometry) return null;
-  if (geometry.type === "Point" && Array.isArray(geometry.coordinates) && geometry.coordinates.length >= 2) {
-    return geometry.coordinates;
-  }
-  if (geometry.type === "MultiPoint" && Array.isArray(geometry.coordinates) && geometry.coordinates[0]?.length >= 2) {
-    return geometry.coordinates[0];
-  }
-  return null;
-}
-
-function getAngularDistanceDegrees(left, right) {
-  if (!Array.isArray(left) || !Array.isArray(right) || left.length < 2 || right.length < 2) {
-    return Number.POSITIVE_INFINITY;
-  }
-  const avgLatRad = (((Number(left[1]) || 0) + ((Number(right[1]) || 0))) * 0.5) * (Math.PI / 180);
-  const dx = ((Number(left[0]) || 0) - (Number(right[0]) || 0)) * Math.cos(avgLatRad);
-  const dy = (Number(left[1]) || 0) - (Number(right[1]) || 0);
-  return Math.hypot(dx, dy);
-}
-
-function resolveScenarioGeoFeatureIdForCityFeature(cityFeature) {
-  const point = getFeaturePointCoordinates(cityFeature);
-  const overrideFeatures = Array.isArray(state.ruCityOverrides?.features) ? state.ruCityOverrides.features : [];
-  if (!point || !overrideFeatures.length) return "";
-
-  const geoContains = globalThis.d3?.geoContains;
-  const geoCentroid = globalThis.d3?.geoCentroid;
-  let nearestId = "";
-  let nearestDistance = Number.POSITIVE_INFINITY;
-
-  for (const feature of overrideFeatures) {
-    const featureId = normalizeCityText(feature?.properties?.id || feature?.id);
-    if (!featureId || !feature?.geometry) continue;
-    try {
-      if (typeof geoContains === "function" && geoContains(feature, point)) {
-        return featureId;
-      }
-    } catch (_error) {
-      // Ignore invalid geometries and fall back to centroid proximity.
-    }
-    try {
-      if (typeof geoCentroid !== "function") continue;
-      const centroid = geoCentroid(feature);
-      const distance = getAngularDistanceDegrees(point, centroid);
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
-        nearestId = featureId;
-      }
-    } catch (_error) {
-      // Ignore centroid failures for malformed features.
-    }
-  }
-
-  return nearestDistance <= 1.5 ? nearestId : "";
-}
-
-function buildScenarioCityNameSyncPatch({ baseGeoLocales = {}, scenarioGeoPatch = {} } = {}) {
-  const geo = {};
-  const conflicts = [];
-  let preservedExplicitPatchCount = 0;
-  const overrideEntries = Object.values(state.scenarioCityOverridesData?.cities || {});
-
-  overrideEntries.forEach((overrideEntry) => {
-    const localeEntry = getScenarioOverrideLocaleEntry(overrideEntry);
-    if (!localeEntry?.en && !localeEntry?.zh) return;
-    const sourceFeature = getScenarioOverrideSourceCityFeature(overrideEntry);
-    if (!sourceFeature) return;
-
-    const sourceProps = sourceFeature?.properties || {};
-    const targetIds = new Set([
-      normalizeCityText(sourceProps.__city_host_feature_id || sourceProps.host_feature_id),
-      resolveScenarioGeoFeatureIdForCityFeature(sourceFeature),
-    ].filter(Boolean));
-
-    targetIds.forEach((targetId) => {
-      const explicitPatchEntry = scenarioGeoPatch[targetId] || null;
-      if (explicitPatchEntry) {
-        const explicitEn = normalizeCityText(explicitPatchEntry?.en || "");
-        const explicitZh = normalizeCityText(explicitPatchEntry?.zh || "");
-        if (explicitEn !== localeEntry.en || explicitZh !== localeEntry.zh) {
-          preservedExplicitPatchCount += 1;
-        }
-        return;
-      }
-
-      const existingEntry = baseGeoLocales[targetId] || null;
-      const existingEn = normalizeCityText(existingEntry?.en || "");
-      const existingZh = normalizeCityText(existingEntry?.zh || "");
-      if (existingEn === localeEntry.en && existingZh === localeEntry.zh) {
-        return;
-      }
-      geo[targetId] = { ...localeEntry };
-      conflicts.push({
-        targetId,
-        previous: existingEntry,
-        next: localeEntry,
-      });
-    });
-  });
-
-  return { geo, conflicts, preservedExplicitPatchCount };
-}
-
-function applyScenarioGeoLocalization() {
-  const baseGeoLocales = state.baseGeoLocales && typeof state.baseGeoLocales === "object"
-    ? state.baseGeoLocales
-    : {};
-  const baseAliasMap = state.baseGeoAliasToStableKey && typeof state.baseGeoAliasToStableKey === "object"
-    ? state.baseGeoAliasToStableKey
-    : {};
-  const scenarioGeoPatch = state.scenarioGeoLocalePatchData?.geo
-    && typeof state.scenarioGeoLocalePatchData.geo === "object"
-    ? state.scenarioGeoLocalePatchData.geo
-    : {};
-  const overrideEntries = Object.values(state.scenarioCityOverridesData?.cities || {});
-  const patch = buildCityLocalizationPatch({
-    cityCollection: state.scenarioCityOverridesData?.featureCollection || null,
-    cityAliases: { cities: overrideEntries },
-  });
-  const synchronizedNamePatch = buildScenarioCityNameSyncPatch({
-    baseGeoLocales,
-    scenarioGeoPatch,
-  });
-  if (!state.locales || typeof state.locales !== "object") {
-    state.locales = { ui: {}, geo: {} };
-  }
-  state.locales.geo = {
-    ...baseGeoLocales,
-    ...patch.geo,
-    ...synchronizedNamePatch.geo,
-    ...scenarioGeoPatch,
-  };
-  state.geoAliasToStableKey = {
-    ...baseAliasMap,
-    ...patch.aliasToStableKey,
-  };
-  if (synchronizedNamePatch.conflicts.length > 0) {
-    const preservedSuffix = synchronizedNamePatch.preservedExplicitPatchCount > 0
-      ? ` Preserved ${synchronizedNamePatch.preservedExplicitPatchCount} explicit scenario patch override${synchronizedNamePatch.preservedExplicitPatchCount === 1 ? "" : "s"}.`
-      : "";
-    console.info(
-      `[scenario] Synchronized ${synchronizedNamePatch.conflicts.length} geo locale entr${synchronizedNamePatch.conflicts.length === 1 ? "y" : "ies"} from scenario city overrides.${preservedSuffix}`
-    );
-  }
-}
-
 function getScenarioDecodedCollection(bundle, collectionKey) {
   const decodedCollections = bundle?.runtimeDecodedCollections;
   const collection = decodedCollections?.[collectionKey];
   return Array.isArray(collection?.features) ? collection : null;
-}
-
-function syncScenarioLocalizationState({
-  cityOverridesPayload = state.scenarioCityOverridesData,
-  geoLocalePatchPayload = state.scenarioGeoLocalePatchData,
-} = {}) {
-  state.scenarioCityOverridesData = cityOverridesPayload || null;
-  state.scenarioGeoLocalePatchData = geoLocalePatchPayload || null;
-  state.cityLayerRevision = (Number(state.cityLayerRevision) || 0) + 1;
-  applyScenarioGeoLocalization();
 }
 
 async function ensureScenarioGeoLocalePatchForLanguage(
@@ -4350,167 +4127,6 @@ function formatScenarioAuditText() {
   return t("No frontline control split in current scenario.", "ui");
 }
 
-function initScenarioManager({ render } = {}) {
-  const scenarioSelect = document.getElementById("scenarioSelect");
-  const applyScenarioBtn = document.getElementById("applyScenarioBtn");
-  const resetScenarioBtn = document.getElementById("resetScenarioBtn");
-  const clearScenarioBtn = document.getElementById("clearScenarioBtn");
-  const scenarioStatus = document.getElementById("scenarioStatus");
-  const scenarioAuditHint = document.getElementById("scenarioAuditHint");
-  const scenarioViewModeLabel = document.getElementById("lblScenarioViewMode");
-  const scenarioViewModeSelect = document.getElementById("scenarioViewModeSelect");
-
-  const renderScenarioControls = () => {
-    const entries = getScenarioRegistryEntries();
-    const isApplyInFlight = !!state.scenarioApplyInFlight;
-    const fatalState = getScenarioFatalRecoveryState();
-    const isFatalLocked = !!fatalState;
-    const fatalMessage = formatScenarioFatalRecoveryMessage(fatalState);
-    if (scenarioSelect) {
-      const pendingValue = normalizeScenarioId(scenarioSelect.value);
-      const activeValue = normalizeScenarioId(state.activeScenarioId);
-      const currentValue = pendingValue || activeValue;
-      scenarioSelect.replaceChildren();
-      const emptyOption = document.createElement("option");
-      emptyOption.value = "";
-      emptyOption.textContent = t("None", "ui");
-      scenarioSelect.appendChild(emptyOption);
-      entries.forEach((entry) => {
-        const option = document.createElement("option");
-        option.value = normalizeScenarioId(entry.scenario_id);
-        option.textContent = getScenarioDisplayName(entry, entry.scenario_id);
-        scenarioSelect.appendChild(option);
-      });
-      scenarioSelect.value = currentValue || "";
-      scenarioSelect.disabled = isApplyInFlight || isFatalLocked;
-      scenarioSelect.title = isFatalLocked ? fatalMessage : "";
-    }
-
-    if (scenarioStatus) {
-      scenarioStatus.textContent = formatScenarioStatusText();
-    }
-    if (scenarioAuditHint) {
-      const auditText = formatScenarioAuditText();
-      scenarioAuditHint.textContent = auditText;
-      scenarioAuditHint.classList.toggle("hidden", !auditText);
-    }
-    if (scenarioViewModeSelect) {
-      const hasScenario = !!state.activeScenarioId;
-      const hasControllerData = Object.keys(state.scenarioControllersByFeatureId || {}).length > 0;
-      const hasSplit = Number(state.activeScenarioManifest?.summary?.owner_controller_split_feature_count || 0) > 0;
-      scenarioViewModeSelect.value = normalizeScenarioViewMode(state.scenarioViewMode);
-      scenarioViewModeSelect.disabled = isFatalLocked || !hasScenario || !hasControllerData || !hasSplit;
-      scenarioViewModeSelect.classList.toggle("hidden", !hasScenario);
-      scenarioViewModeLabel?.classList.toggle("hidden", !hasScenario);
-      scenarioViewModeSelect.title = isFatalLocked
-        ? fatalMessage
-        : hasSplit
-        ? t("Toggle legal ownership vs frontline control.", "ui")
-        : t("No frontline control split in current scenario.", "ui");
-    }
-    if (resetScenarioBtn) {
-      resetScenarioBtn.textContent = t("Reset", "ui");
-      resetScenarioBtn.disabled = !state.activeScenarioId || isApplyInFlight || isFatalLocked;
-      resetScenarioBtn.classList.toggle("hidden", !state.activeScenarioId);
-      resetScenarioBtn.title = isFatalLocked ? fatalMessage : "";
-    }
-    if (clearScenarioBtn) {
-      clearScenarioBtn.textContent = t("Exit Scenario", "ui");
-      clearScenarioBtn.disabled = !state.activeScenarioId || isApplyInFlight || isFatalLocked;
-      clearScenarioBtn.classList.toggle("hidden", !state.activeScenarioId);
-      clearScenarioBtn.title = isFatalLocked ? fatalMessage : "";
-    }
-    if (applyScenarioBtn) {
-      const selectedScenarioId = normalizeScenarioId(scenarioSelect?.value);
-      const isSelectedScenarioActive =
-        !!selectedScenarioId && selectedScenarioId === normalizeScenarioId(state.activeScenarioId);
-      applyScenarioBtn.textContent = t("Apply", "ui");
-      applyScenarioBtn.disabled = !selectedScenarioId || isSelectedScenarioActive || isApplyInFlight || isFatalLocked;
-      applyScenarioBtn.classList.toggle("hidden", isSelectedScenarioActive);
-      applyScenarioBtn.title = isFatalLocked ? fatalMessage : "";
-    }
-  };
-  state.updateScenarioUIFn = renderScenarioControls;
-
-  if (scenarioSelect && !scenarioSelect.dataset.bound) {
-    scenarioSelect.addEventListener("change", () => {
-      renderScenarioControls();
-    });
-    scenarioSelect.dataset.bound = "true";
-  }
-
-  if (scenarioViewModeSelect && !scenarioViewModeSelect.dataset.bound) {
-    scenarioViewModeSelect.addEventListener("change", (event) => {
-      const changed = setScenarioViewMode(event?.target?.value, {
-        renderNow: true,
-      });
-      if (changed) {
-        renderScenarioControls();
-      }
-    });
-    scenarioViewModeSelect.dataset.bound = "true";
-  }
-
-  if (applyScenarioBtn && !applyScenarioBtn.dataset.bound) {
-    applyScenarioBtn.addEventListener("click", async () => {
-      const scenarioId = normalizeScenarioId(scenarioSelect?.value);
-      if (!scenarioId) return;
-      try {
-        await applyScenarioById(scenarioId, {
-          renderNow: true,
-          markDirtyReason: "scenario-apply",
-          showToastOnComplete: true,
-        });
-        renderScenarioControls();
-      } catch (error) {
-        console.error("Failed to apply scenario:", error);
-        const message = String(error?.message || "").trim() || t("Unable to apply scenario.", "ui");
-        showToast(message, {
-          title: t("Scenario failed", "ui"),
-          tone: "error",
-          duration: 5200,
-        });
-      }
-    });
-    applyScenarioBtn.dataset.bound = "true";
-  }
-
-  if (resetScenarioBtn && !resetScenarioBtn.dataset.bound) {
-    resetScenarioBtn.addEventListener("click", () => {
-      if (!state.activeScenarioId || state.scenarioApplyInFlight) return;
-      resetToScenarioBaseline({
-        renderNow: true,
-        markDirtyReason: "scenario-reset",
-        showToastOnComplete: true,
-      });
-      renderScenarioControls();
-    });
-    resetScenarioBtn.dataset.bound = "true";
-  }
-
-  if (clearScenarioBtn && !clearScenarioBtn.dataset.bound) {
-    clearScenarioBtn.addEventListener("click", () => {
-      if (!state.activeScenarioId || state.scenarioApplyInFlight) return;
-      clearActiveScenario({
-        renderNow: true,
-        markDirtyReason: "scenario-clear",
-        showToastOnComplete: true,
-      });
-      renderScenarioControls();
-    });
-    clearScenarioBtn.dataset.bound = "true";
-  }
-
-  loadScenarioRegistry()
-    .then(() => {
-      renderScenarioControls();
-    })
-    .catch((error) => {
-      console.warn("Unable to load scenario registry:", error);
-      renderScenarioControls();
-    });
-}
-
 export {
   applyScenarioBundle,
   applyDefaultScenarioOnStartup,
@@ -4519,18 +4135,23 @@ export {
   ensureActiveScenarioOptionalLayerLoaded,
   ensureActiveScenarioOptionalLayersForVisibility,
   ensureScenarioGeoLocalePatchForLanguage,
+  formatScenarioAuditText,
+  formatScenarioFatalRecoveryMessage,
+  formatScenarioStatusText,
   getDefaultScenarioId,
+  getScenarioDisplayName,
   getScenarioDisplayOwnerByFeatureId,
+  getScenarioFatalRecoveryState,
+  getScenarioRegistryEntries,
   hydrateActiveScenarioBundle,
-  initScenarioManager,
   loadScenarioAuditPayload,
   loadScenarioBundle,
   loadScenarioRegistry,
-  recalculateScenarioOwnerControllerDiffCount,
+  normalizeScenarioId,
+  normalizeScenarioViewMode,
   releaseScenarioAuditPayload,
   refreshScenarioShellOverlays,
   resetToScenarioBaseline,
   setScenarioViewMode,
-  syncScenarioLocalizationState,
   validateImportedScenarioBaseline,
 };

@@ -3,7 +3,7 @@ import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import * as mapRenderer from "./map_renderer.js";
 import { markDirty } from "./dirty_state.js";
 import { flushRenderBoundary } from "./render_boundary.js";
-import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_manager.js";
+import { recalculateScenarioOwnerControllerDiffCount } from "./scenario_owner_metrics.js";
 import {
   getFeatureOwnerCode,
   normalizeOwnerCode,

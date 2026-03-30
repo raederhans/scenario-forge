@@ -1,0 +1,11 @@
+{
+  "filename": "geoBoundaries-GIN-ADM1.geojson",
+  "configured_source_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GIN/ADM1/geoBoundaries-GIN-ADM1.geojson",
+  "resolved_source_url": null,
+  "fallback_candidates": [],
+  "sha256": "60a8c39e2f66d51cd20876a079e076b5fb9bc3c753ae4a7127d1272ccc4083fa",
+  "content_length": 352359,
+  "captured_at_utc": "2026-03-30T22:18:18Z",
+  "capture_mode": "cache_backfill",
+  "validator_name": "_validate_json_bytes"
+}

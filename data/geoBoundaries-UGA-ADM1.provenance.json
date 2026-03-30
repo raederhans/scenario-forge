@@ -1,0 +1,11 @@
+{
+  "filename": "geoBoundaries-UGA-ADM1.geojson",
+  "configured_source_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/UGA/ADM1/geoBoundaries-UGA-ADM1.geojson",
+  "resolved_source_url": null,
+  "fallback_candidates": [],
+  "sha256": "44e303862627447e7564d02c17f69679695267a19b9b8a84c87a4202677f718d",
+  "content_length": 1764219,
+  "captured_at_utc": "2026-03-30T22:18:18Z",
+  "capture_mode": "cache_backfill",
+  "validator_name": "_validate_json_bytes"
+}

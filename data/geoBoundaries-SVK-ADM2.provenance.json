@@ -1,0 +1,11 @@
+{
+  "filename": "geoBoundaries-SVK-ADM2.geojson",
+  "configured_source_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SVK/ADM2/geoBoundaries-SVK-ADM2.geojson",
+  "resolved_source_url": null,
+  "fallback_candidates": [],
+  "sha256": "ccc6ae7bda2b88f0b7cb56fa6048ffeb1de178d80fcdb9d58956087b29406261",
+  "content_length": 8838982,
+  "captured_at_utc": "2026-03-30T22:18:17Z",
+  "capture_mode": "cache_backfill",
+  "validator_name": "_validate_json_bytes"
+}

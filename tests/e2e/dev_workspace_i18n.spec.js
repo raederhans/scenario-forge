@@ -3,15 +3,38 @@ const path = require("path");
 const { test, expect } = require("@playwright/test");
 const { getAppUrl } = require("./support/playwright-app");
 
+test.setTimeout(60000);
+
 function resolveBaseUrl() {
   return getAppUrl();
+}
+
+async function openDevWorkspace(page) {
+  await page.waitForFunction(() => {
+    const overlay = document.querySelector("#bootOverlay");
+    return !overlay || overlay.classList.contains("hidden");
+  });
+  await page.waitForFunction(() => {
+    const developerModeBtn = document.querySelector("#developerModeBtn");
+    const workspaceToggleBtn = document.querySelector("#devWorkspaceToggleBtn");
+    return !!developerModeBtn && !!workspaceToggleBtn;
+  });
+  const developerModeBtn = page.locator("#developerModeBtn");
+  if ((await developerModeBtn.getAttribute("aria-pressed")) !== "true") {
+    await developerModeBtn.click();
+  }
+  const workspaceToggleBtn = page.locator("#devWorkspaceToggleBtn");
+  await expect(workspaceToggleBtn).toBeVisible();
+  if ((await workspaceToggleBtn.getAttribute("aria-expanded")) !== "true") {
+    await workspaceToggleBtn.click();
+  }
+  await expect(workspaceToggleBtn).toHaveAttribute("aria-expanded", "true");
 }
 
 test("dev workspace declarative i18n updates static labels and placeholders", async ({ page }) => {
   await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(1200);
-
-  await page.locator("#devWorkspaceToggleBtn").click();
+  await openDevWorkspace(page);
 
   const clipboardLabel = page.locator("#devSelectionClipboardLabel");
   const selectionPreview = page.locator("#devSelectionPreview");
@@ -70,9 +93,9 @@ test("explicit scenario geo locale patch wins over derived city override sync", 
 
   const result = await page.evaluate(async () => {
     const stateModuleUrl = new URL("/js/core/state.js", window.location.href).href;
-    const scenarioManagerModuleUrl = new URL("/js/core/scenario_manager.js", window.location.href).href;
+    const scenarioLocalizationModuleUrl = new URL("/js/core/scenario_localization_state.js", window.location.href).href;
     const { state } = await import(stateModuleUrl);
-    const { syncScenarioLocalizationState } = await import(scenarioManagerModuleUrl);
+    const { syncScenarioLocalizationState } = await import(scenarioLocalizationModuleUrl);
 
     state.baseGeoLocales = {
       TEST_HOST: { en: "Base Host", zh: "基础主机" },
@@ -132,7 +155,7 @@ test("explicit scenario geo locale patch wins over derived city override sync", 
 test("dev workspace select option labels render injected markup as literal text", async ({ page }) => {
   await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(1200);
-  await page.locator("#devWorkspaceToggleBtn").click();
+  await openDevWorkspace(page);
   await expect(page.locator("#devScenarioTagGroupSelect")).toHaveCount(1);
   await expect(page.locator("#devScenarioCountrySelect")).toHaveCount(1);
   await expect(page.locator("#devScenarioDistrictSelect")).toHaveCount(1);
@@ -217,7 +240,7 @@ test("dev workspace select option labels render injected markup as literal text"
 test("dev workspace reinit keeps one tracked color-popover document click listener", async ({ page }) => {
   await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(1200);
-  await page.locator("#devWorkspaceToggleBtn").click();
+  await openDevWorkspace(page);
 
   const stats = await page.evaluate(async () => {
     const workspaceModuleUrl = new URL("/js/ui/dev_workspace.js", window.location.href).href;
@@ -256,6 +279,10 @@ test("dev workspace reinit keeps one tracked color-popover document click listen
     const { state } = await import(stateModuleUrl);
     state.activeScenarioId = "listener_test";
     state.activeScenarioManifest = { display_name: "Listener Test" };
+    state.ui = {
+      ...(state.ui || {}),
+      devWorkspaceCategory: "scenario",
+    };
     state.devSelectionFeatureIds = new Set(["AAA-1"]);
     state.devSelectionOrder = ["AAA-1"];
     state.landIndex = new Map([["AAA-1", { properties: {} }]]);
@@ -266,6 +293,7 @@ test("dev workspace reinit keeps one tracked color-popover document click listen
     state.updateDevWorkspaceUIFn?.();
   });
 
+  await expect(page.locator("#devScenarioTagColorPreviewBtn")).toBeVisible();
   await page.locator("#devScenarioTagColorPreviewBtn").click();
   await expect(page.locator("#devScenarioTagColorPopover")).toBeVisible();
   await page.mouse.click(5, 5);
@@ -275,7 +303,7 @@ test("dev workspace reinit keeps one tracked color-popover document click listen
 test("dev workspace Add Hovered only enables land hits and ignores non-land fallbacks", async ({ page }) => {
   await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(1200);
-  await page.locator("#devWorkspaceToggleBtn").click();
+  await openDevWorkspace(page);
 
   const featureId = await page.evaluate(async () => {
     const stateModuleUrl = new URL("/js/core/state.js", window.location.href).href;
@@ -335,7 +363,7 @@ test("dev workspace Add Hovered only enables land hits and ignores non-land fall
 test("dev workspace district remove no-op stays informational instead of error-like", async ({ page }) => {
   await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(1200);
-  await page.locator("#devWorkspaceToggleBtn").click();
+  await openDevWorkspace(page);
 
   const featureId = await page.evaluate(async () => {
     const stateModuleUrl = new URL("/js/core/state.js", window.location.href).href;

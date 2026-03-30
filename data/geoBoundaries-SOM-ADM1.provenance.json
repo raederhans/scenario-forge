@@ -1,0 +1,11 @@
+{
+  "filename": "geoBoundaries-SOM-ADM1.geojson",
+  "configured_source_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SOM/ADM1/geoBoundaries-SOM-ADM1.geojson",
+  "resolved_source_url": null,
+  "fallback_candidates": [],
+  "sha256": "8f6598d14632d2998b2a4f72ea77e75d1d966a9386f26773675b98e95e415b80",
+  "content_length": 1431027,
+  "captured_at_utc": "2026-03-30T22:18:18Z",
+  "capture_mode": "cache_backfill",
+  "validator_name": "_validate_json_bytes"
+}

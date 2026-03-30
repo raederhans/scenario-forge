@@ -1,0 +1,11 @@
+{
+  "filename": "geoBoundaries-DNK-ADM2.geojson",
+  "configured_source_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/DNK/ADM2/geoBoundaries-DNK-ADM2.geojson",
+  "resolved_source_url": null,
+  "fallback_candidates": [],
+  "sha256": "3da1348ab3c9149593ef5384d5b5819373b34481bd67d5bcf2a9af8bbf079eed",
+  "content_length": 383154,
+  "captured_at_utc": "2026-03-30T22:18:17Z",
+  "capture_mode": "cache_backfill",
+  "validator_name": "_validate_json_bytes"
+}

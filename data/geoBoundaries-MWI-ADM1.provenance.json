@@ -1,0 +1,11 @@
+{
+  "filename": "geoBoundaries-MWI-ADM1.geojson",
+  "configured_source_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MWI/ADM1/geoBoundaries-MWI-ADM1.geojson",
+  "resolved_source_url": null,
+  "fallback_candidates": [],
+  "sha256": "33260c97251dd3a8efdb0fb08850187f208ab838767f674b21f172ebae4d290a",
+  "content_length": 813932,
+  "captured_at_utc": "2026-03-30T22:18:18Z",
+  "capture_mode": "cache_backfill",
+  "validator_name": "_validate_json_bytes"
+}

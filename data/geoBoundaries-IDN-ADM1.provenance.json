@@ -1,0 +1,11 @@
+{
+  "filename": "geoBoundaries-IDN-ADM1.geojson",
+  "configured_source_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IDN/ADM1/geoBoundaries-IDN-ADM1.geojson",
+  "resolved_source_url": null,
+  "fallback_candidates": [],
+  "sha256": "9a2c93ed5c956d7b9afeab4882e9aab9c3fceb8be4cafaae6e198223c2cbb3af",
+  "content_length": 15316278,
+  "captured_at_utc": "2026-03-30T22:18:18Z",
+  "capture_mode": "cache_backfill",
+  "validator_name": "_validate_json_bytes"
+}

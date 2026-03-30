@@ -1,0 +1,11 @@
+{
+  "filename": "china_adm2.geojson",
+  "configured_source_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CHN/ADM2/geoBoundaries-CHN-ADM2.geojson",
+  "resolved_source_url": null,
+  "fallback_candidates": [],
+  "sha256": "2b68d8a808742fc6d7acd769584db960d8fc2c25b9f1d20e3e98c72e9f1c4d34",
+  "content_length": 7618692,
+  "captured_at_utc": "2026-03-30T22:18:17Z",
+  "capture_mode": "cache_backfill",
+  "validator_name": "_validate_json_bytes"
+}

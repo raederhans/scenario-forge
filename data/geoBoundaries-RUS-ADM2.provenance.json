@@ -1,0 +1,11 @@
+{
+  "filename": "geoBoundaries-RUS-ADM2.geojson",
+  "configured_source_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/RUS/ADM2/geoBoundaries-RUS-ADM2.geojson",
+  "resolved_source_url": null,
+  "fallback_candidates": [],
+  "sha256": "74012237384e53061aa63b6e20b9be24f94facfe615b52bbe72e62a81fa68ff0",
+  "content_length": 120489189,
+  "captured_at_utc": "2026-03-30T22:18:17Z",
+  "capture_mode": "cache_backfill",
+  "validator_name": "_validate_json_bytes"
+}

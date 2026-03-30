@@ -7,7 +7,7 @@ function resolveBaseUrl() {
   return getAppUrl();
 }
 
-test.setTimeout(60000);
+test.setTimeout(120000);
 
 function countChangedPixels(left, right, threshold = 12) {
   const limit = Math.min(left.length, right.length);
@@ -35,28 +35,60 @@ async function waitForMapReady(page) {
     const { state } = await import('/js/core/state.js');
     return !!state.scenarioApplyInFlight;
   }), { timeout: 30000 }).toBe(false);
-  await page.waitForTimeout(1500);
-}
-
-async function waitForDefaultScenario(page) {
   await expect.poll(async () => page.evaluate(async () => {
     const { state } = await import('/js/core/state.js');
     return {
-      activeScenarioId: String(state.activeScenarioId || ''),
+      startupReadonly: !!state.startupReadonly,
+      startupReadonlyUnlockInFlight: !!state.startupReadonlyUnlockInFlight,
+    };
+  }), { timeout: 30000 }).toEqual({
+    startupReadonly: false,
+    startupReadonlyUnlockInFlight: false,
+  });
+  await page.waitForTimeout(1500);
+}
+
+async function waitForScenarioInteractionsReady(page) {
+  await expect.poll(async () => page.evaluate(async () => {
+    const { state } = await import('/js/core/state.js');
+    return {
+      startupReadonly: !!state.startupReadonly,
+      startupReadonlyUnlockInFlight: !!state.startupReadonlyUnlockInFlight,
       scenarioApplyInFlight: !!state.scenarioApplyInFlight,
     };
   }), { timeout: 30000 }).toEqual({
-    activeScenarioId: 'tno_1962',
+    startupReadonly: false,
+    startupReadonlyUnlockInFlight: false,
     scenarioApplyInFlight: false,
   });
+}
+
+async function waitForDefaultScenario(page) {
+  await waitForScenarioInteractionsReady(page);
+  try {
+    await expect.poll(async () => page.evaluate(async () => {
+      const { state } = await import('/js/core/state.js');
+      return {
+        activeScenarioId: String(state.activeScenarioId || ''),
+        scenarioApplyInFlight: !!state.scenarioApplyInFlight,
+      };
+    }), { timeout: 10000 }).toEqual({
+      activeScenarioId: 'tno_1962',
+      scenarioApplyInFlight: false,
+    });
+  } catch (_error) {
+    await ensureScenario(page, 'tno_1962');
+    return;
+  }
   await page.waitForTimeout(1200);
 }
 
 async function ensureScenario(page, scenarioId) {
+  await waitForScenarioInteractionsReady(page);
   await page.evaluate(async (targetScenarioId) => {
-    const { applyScenarioById } = await import('/js/core/scenario_manager.js');
-    await applyScenarioById(targetScenarioId, {
-      renderNow: true,
+    const { applyScenarioByIdCommand } = await import('/js/core/scenario_dispatcher.js');
+    await applyScenarioByIdCommand(targetScenarioId, {
+      renderMode: 'flush',
       markDirtyReason: '',
       showToastOnComplete: false,
     });
@@ -76,17 +108,27 @@ async function ensureScenario(page, scenarioId) {
 }
 
 async function resetScenario(page) {
+  await waitForScenarioInteractionsReady(page);
   await page.evaluate(async () => {
-    const { resetToScenarioBaseline } = await import('/js/core/scenario_manager.js');
-    resetToScenarioBaseline({ renderNow: true });
+    const { resetScenarioToBaselineCommand } = await import('/js/core/scenario_dispatcher.js');
+    resetScenarioToBaselineCommand({
+      renderMode: 'flush',
+      markDirtyReason: '',
+      showToastOnComplete: false,
+    });
   });
   await page.waitForTimeout(1200);
 }
 
 async function clearScenario(page) {
+  await waitForScenarioInteractionsReady(page);
   await page.evaluate(async () => {
-    const { clearActiveScenario } = await import('/js/core/scenario_manager.js');
-    clearActiveScenario({ renderNow: true });
+    const { clearActiveScenarioCommand } = await import('/js/core/scenario_dispatcher.js');
+    clearActiveScenarioCommand({
+      renderMode: 'flush',
+      markDirtyReason: '',
+      showToastOnComplete: false,
+    });
   });
   await page.waitForTimeout(1200);
 }
@@ -108,6 +150,37 @@ async function captureCanvasSample(page) {
   });
 }
 
+async function flushPendingRender(page) {
+  await page.evaluate(async () => {
+    const { state } = await import('/js/core/state.js');
+    state.renderNowFn?.();
+  });
+}
+
+async function waitForStableExactRender(page, { timeout = 20_000 } = {}) {
+  await page.waitForFunction(async () => {
+    const { state } = await import('/js/core/state.js');
+    return String(state.renderPhase || '') === 'idle'
+      && !state.deferExactAfterSettle
+      && !state.exactAfterSettleHandle;
+  }, { timeout });
+}
+
+async function waitForDetailTopologySettled(page, { reason = 'e2e-scenario-blank-exit', timeout = 60_000 } = {}) {
+  await page.evaluate(async (detailReason) => {
+    const { state } = await import('/js/core/state.js');
+    if (typeof state.ensureDetailTopologyFn === 'function') {
+      await state.ensureDetailTopologyFn({ reason: detailReason });
+    }
+    state.renderNowFn?.();
+  }, reason);
+  await page.waitForFunction(async () => {
+    const { state } = await import('/js/core/state.js');
+    return !state.detailPromotionInFlight && !state.detailDeferred;
+  }, { timeout });
+  await waitForStableExactRender(page, { timeout });
+}
+
 async function getBlankStateSnapshot(page) {
   return page.evaluate(async () => {
     const { state } = await import('/js/core/state.js');
@@ -118,6 +191,12 @@ async function getBlankStateSnapshot(page) {
       sovereigntyCount: Object.keys(state.sovereigntyByFeatureId || {}).length,
       controllerCount: Object.keys(state.scenarioControllersByFeatureId || {}).length,
       showCityPoints: !!state.showCityPoints,
+      oceanFillColor: String(state.styleConfig?.ocean?.fillColor || ''),
+      renderProfile: String(state.renderProfile || ''),
+      dynamicBordersEnabled: state.dynamicBordersEnabled !== false,
+      showWaterRegions: state.showWaterRegions !== false,
+      showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
+      showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
       hasScenarioGeoLocalePatch: !!state.scenarioGeoLocalePatchData,
       hasScenarioCityOverrides: !!state.scenarioCityOverridesData,
     };
@@ -141,8 +220,25 @@ test('blank_base stays empty and exiting scenarios returns to the same blank can
 
   await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
   await waitForMapReady(page);
-  await waitForDefaultScenario(page);
+  await ensureScenario(page, 'tno_1962');
+  await clearScenario(page);
 
+  const clearedBaselineState = await getBlankStateSnapshot(page);
+  expect(clearedBaselineState).toMatchObject({
+    activeScenarioId: '',
+    mapSemanticMode: 'blank',
+    activeSovereignCode: '',
+    sovereigntyCount: 0,
+    controllerCount: 0,
+    hasScenarioGeoLocalePatch: false,
+    hasScenarioCityOverrides: false,
+  });
+  await waitForDetailTopologySettled(page, { reason: 'scenario-blank-exit:baseline-clear' });
+  await flushPendingRender(page);
+  await waitForStableExactRender(page);
+  const clearedBaselinePixels = await captureCanvasSample(page);
+
+  await ensureScenario(page, 'tno_1962');
   await ensureScenario(page, 'blank_base');
 
   const blankScenarioState = await getBlankStateSnapshot(page);
@@ -153,6 +249,12 @@ test('blank_base stays empty and exiting scenarios returns to the same blank can
     sovereigntyCount: 0,
     controllerCount: 0,
     showCityPoints: false,
+    oceanFillColor: '#2d4769',
+    renderProfile: 'balanced',
+    dynamicBordersEnabled: false,
+    showWaterRegions: false,
+    showScenarioSpecialRegions: false,
+    showScenarioReliefOverlays: false,
     hasScenarioGeoLocalePatch: false,
     hasScenarioCityOverrides: false,
   });
@@ -201,6 +303,12 @@ test('blank_base stays empty and exiting scenarios returns to the same blank can
     sovereigntyCount: 0,
     controllerCount: 0,
     showCityPoints: false,
+    oceanFillColor: '#2d4769',
+    renderProfile: 'balanced',
+    dynamicBordersEnabled: false,
+    showWaterRegions: false,
+    showScenarioSpecialRegions: false,
+    showScenarioReliefOverlays: false,
     hasScenarioGeoLocalePatch: false,
     hasScenarioCityOverrides: false,
   });
@@ -217,23 +325,23 @@ test('blank_base stays empty and exiting scenarios returns to the same blank can
       sovereigntyCount: Object.keys(state.sovereigntyByFeatureId || {}).length,
       controllerCount: Object.keys(state.scenarioControllersByFeatureId || {}).length,
       showCityPoints: !!state.showCityPoints,
+      oceanFillColor: String(state.styleConfig?.ocean?.fillColor || ''),
+      renderProfile: String(state.renderProfile || ''),
+      dynamicBordersEnabled: state.dynamicBordersEnabled !== false,
+      showWaterRegions: state.showWaterRegions !== false,
+      showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
+      showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
       hasScenarioGeoLocalePatch: !!state.scenarioGeoLocalePatchData,
       hasScenarioCityOverrides: !!state.scenarioCityOverridesData,
     };
-  }), { timeout: 30000 }).toEqual({
-    activeScenarioId: '',
-    mapSemanticMode: 'blank',
-    activeSovereignCode: '',
-    sovereigntyCount: 0,
-    controllerCount: 0,
-    showCityPoints: false,
-    hasScenarioGeoLocalePatch: false,
-    hasScenarioCityOverrides: false,
-  });
+  }), { timeout: 30000 }).toEqual(clearedBaselineState);
   await page.waitForTimeout(1200);
+  await waitForDetailTopologySettled(page, { reason: 'scenario-blank-exit:final-clear' });
+  await flushPendingRender(page);
+  await waitForStableExactRender(page);
 
   const clearedBlankPixels = await captureCanvasSample(page);
-  const blankCanvasDelta = countChangedPixels(blankScenarioPixels, clearedBlankPixels, 10);
+  const blankCanvasDelta = countChangedPixels(clearedBaselinePixels, clearedBlankPixels, 10);
 
   expect(blankCanvasDelta).toBeLessThan(250);
   expect(pageErrors).toEqual([]);

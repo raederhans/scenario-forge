@@ -15,10 +15,10 @@ import { LegendManager } from "../core/legend_manager.js";
 import {
   ensureActiveScenarioOptionalLayerLoaded,
   loadScenarioAuditPayload,
-  recalculateScenarioOwnerControllerDiffCount,
   releaseScenarioAuditPayload,
   refreshScenarioShellOverlays,
 } from "../core/scenario_manager.js";
+import { recalculateScenarioOwnerControllerDiffCount } from "../core/scenario_owner_metrics.js";
 import { getGeoFeatureDisplayLabel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 import { showAppDialog } from "./app_dialog.js";

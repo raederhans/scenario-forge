@@ -13,27 +13,12 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from map_builder import config as cfg
 from map_builder.io.fetch import fetch_or_load_geojson
+from tools.source_smoke_catalog import SOURCE_GROUPS, SOURCE_SPECS
 
 
 CANONICAL_DATA_DIR = PROJECT_ROOT / "data"
 SMOKE_CACHE_DIR = PROJECT_ROOT / ".runtime" / "tmp" / "source_smoke"
-
-SOURCE_SPECS = {
-    "fr_arr": {
-        "label": "France arrondissements",
-        "url": cfg.FR_ARR_URL,
-        "filename": cfg.FR_ARR_FILENAME,
-        "fallback_urls": cfg.FR_ARR_FALLBACK_URLS,
-    },
-    "pl_powiaty": {
-        "label": "Poland powiaty",
-        "url": cfg.PL_POWIATY_URL,
-        "filename": cfg.PL_POWIATY_FILENAME,
-        "fallback_urls": cfg.PL_POWIATY_FALLBACK_URLS,
-    },
-}
 
 
 def _sha256_path(path: Path) -> str:
@@ -103,14 +88,26 @@ def parse_args() -> argparse.Namespace:
         "--source",
         action="append",
         choices=sorted(SOURCE_SPECS),
-        help="Source key to validate. Defaults to all supported keys.",
+        help="Source key to validate. Defaults to phase1_foundation.",
+    )
+    parser.add_argument(
+        "--group",
+        action="append",
+        choices=sorted(SOURCE_GROUPS),
+        help="Named source group to validate. Can be combined with --source.",
     )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    selected_sources = args.source or sorted(SOURCE_SPECS)
+    selected_sources: list[str] = []
+    for group_name in args.group or []:
+        selected_sources.extend(SOURCE_GROUPS[group_name])
+    selected_sources.extend(args.source or [])
+    if not selected_sources:
+        selected_sources = list(SOURCE_GROUPS["phase1_foundation"])
+    selected_sources = list(dict.fromkeys(selected_sources))
     shutil.rmtree(SMOKE_CACHE_DIR, ignore_errors=True)
     SMOKE_CACHE_DIR.mkdir(parents=True, exist_ok=True)
     os.environ["MAPCREATOR_DATA_CACHE_DIR"] = str(SMOKE_CACHE_DIR)

@@ -41,78 +41,46 @@ PL_POWIATY_URL = (
 )
 PL_POWIATY_FALLBACK_URLS: list[str] = []
 CHINA_CITY_URL = (
-    "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/CHN/ADM2/"
+    "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CHN/ADM2/"
     "geoBoundaries-CHN-ADM2.geojson"
 )
-CHINA_CITY_FALLBACK_URLS = [
-    "https://raw.githubusercontent.com/wmgeolab/geoBoundaries/main/releaseData/gbOpen/CHN/ADM2/"
-    "geoBoundaries-CHN-ADM2.geojson",
-    "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/CHN/ADM2/"
-    "geoBoundaries-CHN-ADM2.geojson",
-]
+CHINA_CITY_FALLBACK_URLS: list[str] = []
 CZE_ADM2_URL = (
-    "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/main/releaseData/gbOpen/CZE/ADM2/"
+    "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CZE/ADM2/"
     "geoBoundaries-CZE-ADM2.geojson"
 )
-CZE_ADM2_FALLBACK_URLS = [
-    "https://raw.githubusercontent.com/wmgeolab/geoBoundaries/main/releaseData/gbOpen/CZE/ADM2/"
-    "geoBoundaries-CZE-ADM2.geojson",
-    "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/CZE/ADM2/"
-    "geoBoundaries-CZE-ADM2.geojson",
-]
+CZE_ADM2_FALLBACK_URLS: list[str] = []
 DNK_ADM2_URL = (
-    "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/main/releaseData/gbOpen/DNK/ADM2/"
+    "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/DNK/ADM2/"
     "geoBoundaries-DNK-ADM2.geojson"
 )
-DNK_ADM2_FALLBACK_URLS = [
-    "https://raw.githubusercontent.com/wmgeolab/geoBoundaries/main/releaseData/gbOpen/DNK/ADM2/"
-    "geoBoundaries-DNK-ADM2.geojson",
-    "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/DNK/ADM2/"
-    "geoBoundaries-DNK-ADM2.geojson",
-]
+DNK_ADM2_FALLBACK_URLS: list[str] = []
 SVK_ADM2_URL = (
-    "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/main/releaseData/gbOpen/SVK/ADM2/"
+    "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SVK/ADM2/"
     "geoBoundaries-SVK-ADM2.geojson"
 )
-SVK_ADM2_FALLBACK_URLS = [
-    "https://raw.githubusercontent.com/wmgeolab/geoBoundaries/main/releaseData/gbOpen/SVK/ADM2/"
-    "geoBoundaries-SVK-ADM2.geojson",
-    "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/SVK/ADM2/"
-    "geoBoundaries-SVK-ADM2.geojson",
-]
+SVK_ADM2_FALLBACK_URLS: list[str] = []
 RUS_ADM2_URL = (
-    "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/RUS/ADM2/"
+    "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/RUS/ADM2/"
     "geoBoundaries-RUS-ADM2.geojson"
 )
-RUS_ADM2_FALLBACK_URLS = [
-    "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/RUS/ADM2/"
-    "geoBoundaries-RUS-ADM2.geojson",
-]
+RUS_ADM2_FALLBACK_URLS: list[str] = []
 UKR_ADM2_URL = (
-    "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/UKR/ADM2/"
+    "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/UKR/ADM2/"
     "geoBoundaries-UKR-ADM2.geojson"
 )
-UKR_ADM2_FALLBACK_URLS = [
-    "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/UKR/ADM2/"
-    "geoBoundaries-UKR-ADM2.geojson",
-]
+UKR_ADM2_FALLBACK_URLS: list[str] = []
 BLR_ADM2_URL = (
-    "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/BLR/ADM2/"
+    "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BLR/ADM2/"
     "geoBoundaries-BLR-ADM2.geojson"
 )
-BLR_ADM2_FALLBACK_URLS = [
-    "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/BLR/ADM2/"
-    "geoBoundaries-BLR-ADM2.geojson",
-]
+BLR_ADM2_FALLBACK_URLS: list[str] = []
 
 IND_ADM2_URL = (
-    "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/IND/ADM2/"
+    "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IND/ADM2/"
     "geoBoundaries-IND-ADM2.geojson"
 )
-IND_ADM2_FALLBACK_URLS = [
-    "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/IND/ADM2/"
-    "geoBoundaries-IND-ADM2.geojson",
-]
+IND_ADM2_FALLBACK_URLS: list[str] = []
 
 CA_FED_2023_URL = (
     "https://ftp.maps.canada.ca/pub/elections_elections/"
@@ -125,13 +93,10 @@ CA_FED_2023_FALLBACK_URLS = [
     "federal_electoral_districts_boundaries_2023/FED_CA_2023_EN-SHP.zip",
 ]
 MEX_ADM2_URL = (
-    "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/MEX/ADM2/"
+    "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MEX/ADM2/"
     "geoBoundaries-MEX-ADM2.geojson"
 )
-MEX_ADM2_FALLBACK_URLS = [
-    "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/MEX/ADM2/"
-    "geoBoundaries-MEX-ADM2.geojson",
-]
+MEX_ADM2_FALLBACK_URLS: list[str] = []
 US_COUNTY_2024_500K_URL = "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip"
 US_STATE_2024_500K_URL = "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_state_500k.zip"
 US_COUNTY_POP_2024_URL = (
@@ -143,21 +108,15 @@ GB_NUTS1_2021_URL = (
     "NUTS_RG_10M_2021_4326_LEVL_1.geojson"
 )
 BIH_ADM1_URL = (
-    "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/BIH/ADM1/"
+    "https://github.com/wmgeolab/geoBoundaries/raw/90a1d52/releaseData/gbOpen/BIH/ADM1/"
     "geoBoundaries-BIH-ADM1.geojson"
 )
-BIH_ADM1_FALLBACK_URLS = [
-    "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/BIH/ADM1/"
-    "geoBoundaries-BIH-ADM1.geojson",
-]
+BIH_ADM1_FALLBACK_URLS: list[str] = []
 IDN_ADM1_URL = (
-    "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/IDN/ADM1/"
+    "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IDN/ADM1/"
     "geoBoundaries-IDN-ADM1.geojson"
 )
-IDN_ADM1_FALLBACK_URLS = [
-    "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/IDN/ADM1/"
-    "geoBoundaries-IDN-ADM1.geojson",
-]
+IDN_ADM1_FALLBACK_URLS: list[str] = []
 ABS_SUA_2021_GDA94_URL = (
     "https://www.abs.gov.au/statistics/standards/"
     "australian-statistical-geography-standard-asgs-edition-3/"
@@ -442,78 +401,60 @@ AFRICA_BASIC_GB_OVERRIDES = {
     "BF": {
         "iso3": "BFA",
         "url": (
-            "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/BFA/ADM1/"
+            "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BFA/ADM1/"
             "geoBoundaries-BFA-ADM1.geojson"
         ),
-        "fallback_urls": [
-            "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/BFA/ADM1/"
-            "geoBoundaries-BFA-ADM1.geojson",
-        ],
+        "fallback_urls": [],
         "filename": "geoBoundaries-BFA-ADM1.geojson",
         "expected_count": 13,
     },
     "GN": {
         "iso3": "GIN",
         "url": (
-            "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/GIN/ADM1/"
+            "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GIN/ADM1/"
             "geoBoundaries-GIN-ADM1.geojson"
         ),
-        "fallback_urls": [
-            "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/GIN/ADM1/"
-            "geoBoundaries-GIN-ADM1.geojson",
-        ],
+        "fallback_urls": [],
         "filename": "geoBoundaries-GIN-ADM1.geojson",
         "expected_count": 8,
     },
     "CI": {
         "iso3": "CIV",
         "url": (
-            "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/CIV/ADM1/"
+            "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CIV/ADM1/"
             "geoBoundaries-CIV-ADM1.geojson"
         ),
-        "fallback_urls": [
-            "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/CIV/ADM1/"
-            "geoBoundaries-CIV-ADM1.geojson",
-        ],
+        "fallback_urls": [],
         "filename": "geoBoundaries-CIV-ADM1.geojson",
         "expected_count": 14,
     },
     "MW": {
         "iso3": "MWI",
         "url": (
-            "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/MWI/ADM1/"
+            "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MWI/ADM1/"
             "geoBoundaries-MWI-ADM1.geojson"
         ),
-        "fallback_urls": [
-            "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/MWI/ADM1/"
-            "geoBoundaries-MWI-ADM1.geojson",
-        ],
+        "fallback_urls": [],
         "filename": "geoBoundaries-MWI-ADM1.geojson",
         "expected_count": 3,
     },
     "UG": {
         "iso3": "UGA",
         "url": (
-            "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/UGA/ADM1/"
+            "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/UGA/ADM1/"
             "geoBoundaries-UGA-ADM1.geojson"
         ),
-        "fallback_urls": [
-            "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/UGA/ADM1/"
-            "geoBoundaries-UGA-ADM1.geojson",
-        ],
+        "fallback_urls": [],
         "filename": "geoBoundaries-UGA-ADM1.geojson",
         "expected_count": 4,
     },
     "SO": {
         "iso3": "SOM",
         "url": (
-            "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/gbOpen/SOM/ADM1/"
+            "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SOM/ADM1/"
             "geoBoundaries-SOM-ADM1.geojson"
         ),
-        "fallback_urls": [
-            "https://cdn.jsdelivr.net/gh/wmgeolab/geoBoundaries@main/releaseData/gbOpen/SOM/ADM1/"
-            "geoBoundaries-SOM-ADM1.geojson",
-        ],
+        "fallback_urls": [],
         "filename": "geoBoundaries-SOM-ADM1.geojson",
         "expected_count": 18,
     },

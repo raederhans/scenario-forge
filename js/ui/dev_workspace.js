@@ -1,6 +1,6 @@
 import { state } from "../core/state.js";
 import * as mapRenderer from "../core/map_renderer.js";
-import { recalculateScenarioOwnerControllerDiffCount, syncScenarioLocalizationState } from "../core/scenario_manager.js";
+import { recalculateScenarioOwnerControllerDiffCount } from "../core/scenario_owner_metrics.js";
 import { getFeatureOwnerCode, markLegacyColorStateDirty } from "../core/sovereignty_manager.js";
 import {
   applyOwnerControllerAssignmentsToFeatureIds,
@@ -19,6 +19,7 @@ import {
 } from "../core/scenario_districts.js";
 import { getScenarioCountryDisplayName } from "../core/scenario_country_display.js";
 import { flushRenderBoundary } from "../core/render_boundary.js";
+import { syncScenarioLocalizationState } from "../core/scenario_localization_state.js";
 import { applyDeclarativeTranslations, buildTooltipModel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 
@@ -4990,7 +4991,7 @@ function initDevWorkspace() {
     scenarioLocaleZhInput.dataset.bound = "true";
   }
 
-  const initialExpanded = false;
+  const initialExpanded = !!state.ui.devWorkspaceExpanded;
   setExpandedState(initialExpanded, {
     bottomDock,
     panel,

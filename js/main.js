@@ -18,15 +18,14 @@ import {
 } from "./core/map_renderer.js";
 import { applyActivePaletteState } from "./core/palette_manager.js";
 import {
-  initScenarioManager,
   hydrateActiveScenarioBundle,
   loadScenarioBundle,
   loadScenarioRegistry,
-  syncScenarioLocalizationState,
 } from "./core/scenario_manager.js";
 import { bindRenderBoundary, flushRenderBoundary, requestRender } from "./core/render_boundary.js";
 import { applyScenarioBundleCommand } from "./core/scenario_dispatcher.js";
 import { initPresetState } from "./core/preset_state.js";
+import { syncScenarioLocalizationState } from "./core/scenario_localization_state.js";
 import { initTranslations } from "./ui/i18n.js";
 import { initToast } from "./ui/toast.js";
 import { bindBeforeUnload } from "./core/dirty_state.js";
@@ -723,10 +722,12 @@ function bootstrapDeferredUi(renderApp) {
     const [
       { initToolbar },
       { initSidebar },
+      { initScenarioControls },
       { initShortcuts },
     ] = await Promise.all([
       import("./ui/toolbar.js"),
       import("./ui/sidebar.js"),
+      import("./ui/scenario_controls.js"),
       import("./ui/shortcuts.js"),
     ]);
     await yieldToMain();
@@ -734,7 +735,7 @@ function bootstrapDeferredUi(renderApp) {
     await yieldToMain();
     initSidebar({ render: renderApp });
     await yieldToMain();
-    initScenarioManager({ render: renderApp });
+    initScenarioControls();
     initTranslations();
     initShortcuts();
     return true;
