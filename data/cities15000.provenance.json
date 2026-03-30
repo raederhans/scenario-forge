@@ -1,0 +1,11 @@
+{
+  "filename": "cities15000.zip",
+  "configured_source_url": "https://download.geonames.org/export/dump/cities15000.zip",
+  "resolved_source_url": null,
+  "fallback_candidates": [],
+  "sha256": "de3b169ad0bbc5bbc7c09006561b01ac4d191689d66210c68161fe8903885e63",
+  "content_length": 3068961,
+  "captured_at_utc": "2026-03-30T22:43:19Z",
+  "capture_mode": "cache_backfill",
+  "validator_name": "binary_min_size:65536"
+}

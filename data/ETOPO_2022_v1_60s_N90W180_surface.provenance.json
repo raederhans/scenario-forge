@@ -1,0 +1,11 @@
+{
+  "filename": "ETOPO_2022_v1_60s_N90W180_surface.tif",
+  "configured_source_url": "https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO2022/data/60s/60s_surface_elev_gtif/ETOPO_2022_v1_60s_N90W180_surface.tif",
+  "resolved_source_url": null,
+  "fallback_candidates": [],
+  "sha256": "9d27d4b8ea8e76977e2988bca667d7c8fa68b927355feffcddd6b4875a7fd08e",
+  "content_length": 465969062,
+  "captured_at_utc": "2026-03-30T22:43:14Z",
+  "capture_mode": "cache_backfill",
+  "validator_name": "binary_min_size:50000000"
+}

@@ -1,0 +1,415 @@
+[
+  {
+    "source_id": "cgls_lc100_2019_forest_type",
+    "local_path": "data/PROBAV_LC100_global_v3.0.1_2019_forest_type.tif",
+    "origin_kind": "download",
+    "upstream_url": "https://zenodo.org/api/records/3939050/files/PROBAV_LC100_global_v3.0.1_2019-nrt_Forest-Type-layer_EPSG-4326.tif/content",
+    "immutable_ref": "Zenodo 3939050 / V3.0.1",
+    "current_local_sha256": "d908a2558f638a8a5f0a0e8caba215ce735f9524e9e97f3513f94493b171515b",
+    "license": "",
+    "citation": "https://zenodo.org/records/3939050",
+    "consumers": [
+      "map_builder/processors/physical_context.py",
+      "data/global_physical_semantics.topo.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/PROBAV_LC100_global_v3.0.1_2019_forest_type.provenance.json",
+    "status": "frozen_local_only"
+  },
+  {
+    "source_id": "etopo_2022_surface_60s",
+    "local_path": "data/ETOPO_2022_v1_60s_N90W180_surface.tif",
+    "origin_kind": "download",
+    "upstream_url": "https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO2022/data/60s/60s_surface_elev_gtif/ETOPO_2022_v1_60s_N90W180_surface.tif",
+    "immutable_ref": "ETOPO 2022 v1 60s",
+    "current_local_sha256": "9d27d4b8ea8e76977e2988bca667d7c8fa68b927355feffcddd6b4875a7fd08e",
+    "license": "",
+    "citation": "https://www.ncei.noaa.gov/products/etopo-global-relief-model",
+    "consumers": [
+      "map_builder/processors/physical_context.py",
+      "tools/build_global_bathymetry_asset.py",
+      "data/global_bathymetry.topo.json"
+    ],
+    "rebuild_command": "python tools/build_global_bathymetry_asset.py",
+    "provenance_sidecar": "data/ETOPO_2022_v1_60s_N90W180_surface.provenance.json",
+    "status": "frozen_local_only"
+  },
+  {
+    "source_id": "fr_arr",
+    "local_path": "data/france_arrondissements.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://raw.githubusercontent.com/gregoiredavid/france-geojson/5d34ee6d0140c29f785fdb047d9329f1aab58833/arrondissements.geojson",
+    "immutable_ref": "5d34ee6d0140c29f785fdb047d9329f1aab58833",
+    "current_local_sha256": "6ed2c7b7ebb07b83c2e0067416819859d8bbd3d8e3d48660307c1e04b1953e42",
+    "license": "",
+    "citation": "https://github.com/gregoiredavid/france-geojson",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/france_arrondissements.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_bfa_adm1",
+    "local_path": "data/geoBoundaries-BFA-ADM1.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BFA/ADM1/geoBoundaries-BFA-ADM1.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "07278161d8bfedf694914c2761caf673dd771ce3809ce417616b1c49813054d3",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/BFA/ADM1/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/geoBoundaries-BFA-ADM1.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_bih_adm1",
+    "local_path": "data/geoBoundaries-BIH-ADM1.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/90a1d52/releaseData/gbOpen/BIH/ADM1/geoBoundaries-BIH-ADM1.geojson",
+    "immutable_ref": "90a1d52",
+    "current_local_sha256": "39008bc48f8a8bad48f816a8d6a474d5a3fa8d8ae37d2431ac904deeb20f6f48",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/BIH/ADM1/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/geoBoundaries-BIH-ADM1.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_blr_adm2",
+    "local_path": "data/geoBoundaries-BLR-ADM2.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BLR/ADM2/geoBoundaries-BLR-ADM2.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "434ee95fb9dcbdd19ae1e0c236daad18951b9c6cb23cd63aa87ef63f1d552d42",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/BLR/ADM2/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/geoBoundaries-BLR-ADM2.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_chn_adm2",
+    "local_path": "data/china_adm2.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CHN/ADM2/geoBoundaries-CHN-ADM2.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "2b68d8a808742fc6d7acd769584db960d8fc2c25b9f1d20e3e98c72e9f1c4d34",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/CHN/ADM2/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/china_adm2.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_civ_adm1",
+    "local_path": "data/geoBoundaries-CIV-ADM1.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CIV/ADM1/geoBoundaries-CIV-ADM1.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "70c70589b509e477355f1ba81f73d6338d97549620c8e5b8a898483781ec88be",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/CIV/ADM1/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/geoBoundaries-CIV-ADM1.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_cze_adm2",
+    "local_path": "data/geoBoundaries-CZE-ADM2.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CZE/ADM2/geoBoundaries-CZE-ADM2.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "892b7025f121847912b13e2a055d95cf38a5d5869deaa82a90c15936595a0789",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/CZE/ADM2/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/geoBoundaries-CZE-ADM2.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_dnk_adm2",
+    "local_path": "data/geoBoundaries-DNK-ADM2.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/DNK/ADM2/geoBoundaries-DNK-ADM2.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "3da1348ab3c9149593ef5384d5b5819373b34481bd67d5bcf2a9af8bbf079eed",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/DNK/ADM2/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/geoBoundaries-DNK-ADM2.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_gin_adm1",
+    "local_path": "data/geoBoundaries-GIN-ADM1.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GIN/ADM1/geoBoundaries-GIN-ADM1.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "60a8c39e2f66d51cd20876a079e076b5fb9bc3c753ae4a7127d1272ccc4083fa",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/GIN/ADM1/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/geoBoundaries-GIN-ADM1.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_idn_adm1",
+    "local_path": "data/geoBoundaries-IDN-ADM1.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IDN/ADM1/geoBoundaries-IDN-ADM1.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "9a2c93ed5c956d7b9afeab4882e9aab9c3fceb8be4cafaae6e198223c2cbb3af",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/IDN/ADM1/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/geoBoundaries-IDN-ADM1.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_ind_adm2",
+    "local_path": "data/geoBoundaries-IND-ADM2.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IND/ADM2/geoBoundaries-IND-ADM2.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "8bef6929fd65432e7dc775e7c44473e84efff064ebddbfd6b834e6291546db40",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/IND/ADM2/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/geoBoundaries-IND-ADM2.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_mex_adm2",
+    "local_path": "data/geoBoundaries-MEX-ADM2.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MEX/ADM2/geoBoundaries-MEX-ADM2.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "91546fe7ebc6cc02e5a6acc8d5aadd3fb082d99429f6e884db0fc327f9c1aa9b",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/MEX/ADM2/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/geoBoundaries-MEX-ADM2.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_mwi_adm1",
+    "local_path": "data/geoBoundaries-MWI-ADM1.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MWI/ADM1/geoBoundaries-MWI-ADM1.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "33260c97251dd3a8efdb0fb08850187f208ab838767f674b21f172ebae4d290a",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/MWI/ADM1/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/geoBoundaries-MWI-ADM1.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_rus_adm2",
+    "local_path": "data/geoBoundaries-RUS-ADM2.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/RUS/ADM2/geoBoundaries-RUS-ADM2.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "74012237384e53061aa63b6e20b9be24f94facfe615b52bbe72e62a81fa68ff0",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/RUS/ADM2/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/geoBoundaries-RUS-ADM2.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_som_adm1",
+    "local_path": "data/geoBoundaries-SOM-ADM1.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SOM/ADM1/geoBoundaries-SOM-ADM1.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "8f6598d14632d2998b2a4f72ea77e75d1d966a9386f26773675b98e95e415b80",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/SOM/ADM1/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/geoBoundaries-SOM-ADM1.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_svk_adm2",
+    "local_path": "data/geoBoundaries-SVK-ADM2.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SVK/ADM2/geoBoundaries-SVK-ADM2.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "ccc6ae7bda2b88f0b7cb56fa6048ffeb1de178d80fcdb9d58956087b29406261",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/SVK/ADM2/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/geoBoundaries-SVK-ADM2.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_uga_adm1",
+    "local_path": "data/geoBoundaries-UGA-ADM1.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/UGA/ADM1/geoBoundaries-UGA-ADM1.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "44e303862627447e7564d02c17f69679695267a19b9b8a84c87a4202677f718d",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/UGA/ADM1/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/geoBoundaries-UGA-ADM1.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "gb_ukr_adm2",
+    "local_path": "data/geoBoundaries-UKR-ADM2.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/UKR/ADM2/geoBoundaries-UKR-ADM2.geojson",
+    "immutable_ref": "9469f09",
+    "current_local_sha256": "34f1a1486c1b6126a3d79c010dbb8398edf495d1688066e3e975c25573dbad10",
+    "license": "",
+    "citation": "https://www.geoboundaries.org/api/current/gbOpen/UKR/ADM2/",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/geoBoundaries-UKR-ADM2.provenance.json",
+    "status": "frozen_verified"
+  },
+  {
+    "source_id": "geonames_cities15000",
+    "local_path": "data/cities15000.zip",
+    "origin_kind": "download",
+    "upstream_url": "https://download.geonames.org/export/dump/cities15000.zip",
+    "immutable_ref": "",
+    "current_local_sha256": "de3b169ad0bbc5bbc7c09006561b01ac4d191689d66210c68161fe8903885e63",
+    "license": "CC BY 4.0",
+    "citation": "https://download.geonames.org/export/dump/readme.txt",
+    "consumers": [
+      "map_builder/cities.py",
+      "data/world_cities.geojson",
+      "data/city_aliases.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/cities15000.provenance.json",
+    "status": "pending_upgrade_review"
+  },
+  {
+    "source_id": "natural_earth_populated_places_10m",
+    "local_path": "data/ne_10m_populated_places.zip",
+    "origin_kind": "download",
+    "upstream_url": "https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_populated_places.zip",
+    "immutable_ref": "version 5.1.2",
+    "current_local_sha256": "cd149186f03d2603e0410da399b980a4357d0ac32d3a2305a49ed3dffcc41d7b",
+    "license": "public domain",
+    "citation": "https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-populated-places/",
+    "consumers": [
+      "map_builder/cities.py",
+      "data/world_cities.geojson",
+      "data/city_aliases.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/ne_10m_populated_places.provenance.json",
+    "status": "frozen_local_only"
+  },
+  {
+    "source_id": "pl_powiaty",
+    "local_path": "data/poland_powiaty.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://raw.githubusercontent.com/jusuff/PolandGeoJson/d96c034dbd0ac545a5daddfac5a45d1807c63e09/data/poland.counties.json",
+    "immutable_ref": "d96c034dbd0ac545a5daddfac5a45d1807c63e09",
+    "current_local_sha256": "fdf9381e109195bb321bac4cd5d8c9ed0e1f9a8503c095785d03bf023cf48659",
+    "license": "",
+    "citation": "https://github.com/jusuff/PolandGeoJson",
+    "consumers": [
+      "map_builder/config.py",
+      "init_map_data.py",
+      "data/europe_topology.json"
+    ],
+    "rebuild_command": "python init_map_data.py --mode primary --strict",
+    "provenance_sidecar": "data/poland_powiaty.provenance.json",
+    "status": "frozen_verified"
+  }
+]

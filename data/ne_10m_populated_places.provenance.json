@@ -1,0 +1,11 @@
+{
+  "filename": "ne_10m_populated_places.zip",
+  "configured_source_url": "https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_populated_places.zip",
+  "resolved_source_url": null,
+  "fallback_candidates": [],
+  "sha256": "cd149186f03d2603e0410da399b980a4357d0ac32d3a2305a49ed3dffcc41d7b",
+  "content_length": 2811199,
+  "captured_at_utc": "2026-03-30T22:43:19Z",
+  "capture_mode": "cache_backfill",
+  "validator_name": "_validate_vector_archive_bytes"
+}
