@@ -1888,10 +1888,10 @@
               <button id="transportWorkbenchInfoBtn" type="button" class="transport-workbench-icon-btn" aria-haspopup="dialog" aria-controls="transportWorkbenchInfoPopover" aria-expanded="false">Info</button>
               <button id="transportWorkbenchCloseBtn" type="button" class="transport-workbench-close-btn" aria-label="Close transport workbench">Close</button>
             </div>
-            <div id="transportWorkbenchInfoPopover" class="transport-workbench-info-popover hidden" role="dialog" aria-labelledby="transportWorkbenchInfoTitle" aria-hidden="true">
+              <div id="transportWorkbenchInfoPopover" class="transport-workbench-info-popover hidden" role="dialog" aria-labelledby="transportWorkbenchInfoTitle" aria-hidden="true">
               <div id="transportWorkbenchInfoTitle" class="transport-workbench-info-title">Workbench notes</div>
               <p class="transport-workbench-info-text">
-                This shell only settles the UI frame, panel hierarchy, and preview-first layout. It still avoids fabricated transport values.
+                The workbench now uses a real simplified Japan corridor carrier, but still avoids fabricated transport values and guessed overlay geometry.
               </p>
               <p class="transport-workbench-info-text">
                 Real road, rail, airport, port, and facility parameters will appear only after the first family schema is wired.
@@ -1917,7 +1917,7 @@
                   </div>
                   <div class="transport-workbench-meta-pill">
                     <span class="transport-workbench-meta-label">Mode</span>
-                    <strong id="transportWorkbenchPreviewMode" class="transport-workbench-meta-value">Static carrier</strong>
+                    <strong id="transportWorkbenchPreviewMode" class="transport-workbench-meta-value">Bounded zoom/pan</strong>
                   </div>
                 </div>
                 <div class="transport-workbench-parameter-stack">
@@ -1939,17 +1939,17 @@
               <section class="transport-workbench-column transport-workbench-column-preview" aria-labelledby="transportWorkbenchPreviewTitle">
                 <h3 id="transportWorkbenchPreviewTitle" class="visually-hidden">Japan preview</h3>
                 <div class="transport-workbench-preview-shell">
-                  <div class="transport-workbench-preview-meta">
-                    <span id="transportWorkbenchPreviewCountryBadge" class="transport-workbench-preview-badge">Japan</span>
-                    <span id="transportWorkbenchPreviewFamilyBadge" class="transport-workbench-preview-badge transport-workbench-preview-badge-muted">Road</span>
+                  <div id="transportWorkbenchPreviewCanvas" class="transport-workbench-preview-canvas" aria-hidden="true">
+                    <div class="transport-workbench-preview-hud">
+                      <span id="transportWorkbenchPreviewCountryBadge" class="transport-workbench-preview-badge">Japan</span>
+                      <span id="transportWorkbenchPreviewFamilyBadge" class="transport-workbench-preview-badge transport-workbench-preview-badge-muted">Road</span>
+                    </div>
+                    <div id="transportWorkbenchCarrierMount" class="transport-workbench-carrier-mount"></div>
+                    <div class="transport-workbench-preview-canvas-frame"></div>
+                    <p id="transportWorkbenchPreviewCaption" class="transport-workbench-preview-caption">
+                      The Japan corridor carrier is real simplified geometry, but transport overlays remain empty until the first family schema is wired.
+                    </p>
                   </div>
-                  <div class="transport-workbench-preview-canvas" aria-hidden="true">
-                    <div class="transport-workbench-preview-country">JP</div>
-                    <div class="transport-workbench-preview-crosshair"></div>
-                  </div>
-                  <p id="transportWorkbenchPreviewCaption" class="transport-workbench-preview-caption">
-                    This pane is only a static carrier for the shell milestone. Real road, rail, airport, and facility geometry will not appear here until the first family schema is wired.
-                  </p>
                 </div>
               </section>
 

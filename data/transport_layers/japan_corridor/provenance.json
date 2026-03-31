@@ -1,0 +1,74 @@
+{
+  "generatedAt": "2026-03-31T03:20:22.936404+00:00",
+  "source": "data/scenarios/tno_1962/chunks/political.detail.country.jp.json",
+  "corridorBounds": {
+    "lon_min": 129.2,
+    "lon_max": 141.4,
+    "lat_min": 32.2,
+    "lat_max": 37.3
+  },
+  "projection": {
+    "type": "local_equirectangular",
+    "center": {
+      "lon": 136.5,
+      "lat": 35.0
+    },
+    "rotationDegreesClockwise": 8.0
+  },
+  "simplifyTolerance": 0.045,
+  "minRenderIslandArea": 12.0,
+  "viewBox": {
+    "width": 1600,
+    "height": 900,
+    "padding": 40
+  },
+  "composition": {
+    "overfillScale": 1.08,
+    "shiftX": 0,
+    "shiftY": 42
+  },
+  "protectedDetailRegions": {
+    "tokyo_bay": {
+      "lon_min": 139.35,
+      "lon_max": 140.35,
+      "lat_min": 34.95,
+      "lat_max": 35.85
+    },
+    "ise_bay": {
+      "lon_min": 136.45,
+      "lon_max": 137.45,
+      "lat_min": 34.25,
+      "lat_max": 35.15
+    },
+    "osaka_bay": {
+      "lon_min": 134.75,
+      "lon_max": 135.7,
+      "lat_min": 34.05,
+      "lat_max": 34.95
+    },
+    "seto_inland_sea": {
+      "lon_min": 131.35,
+      "lon_max": 134.95,
+      "lat_min": 33.55,
+      "lat_max": 34.85
+    }
+  },
+  "namedWaterAnchors": {
+    "tokyo_bay": {
+      "lon": 139.92,
+      "lat": 35.45
+    },
+    "ise_bay": {
+      "lon": 136.92,
+      "lat": 34.73
+    },
+    "osaka_bay": {
+      "lon": 135.22,
+      "lat": 34.52
+    },
+    "seto_inland_sea": {
+      "lon": 133.78,
+      "lat": 34.28
+    }
+  }
+}

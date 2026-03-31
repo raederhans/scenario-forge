@@ -47,6 +47,13 @@ import { markLegacyColorStateDirty, resetAllFeatureOwnersToCanonical } from "../
 import { showToast } from "./toast.js";
 import { showAppDialog } from "./app_dialog.js";
 import { markDirty, updateDirtyIndicator } from "../core/dirty_state.js";
+import {
+  destroyTransportWorkbenchCarrier,
+  ensureTransportWorkbenchCarrier,
+  resetTransportWorkbenchCarrierView,
+  resizeTransportWorkbenchCarrier,
+  setTransportWorkbenchCarrierFamily,
+} from "./transport_workbench_carrier.js";
 
 const TRANSPORT_WORKBENCH_FAMILIES = [
   {
@@ -57,7 +64,7 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     lensBody: "Road is the best first real wire because it defines the base corridor logic and the first country-level debug surface for the whole pack.",
     lensNext: "When real schema work starts, road should establish corridor classes, continuity checks, and country handoff review before other families join.",
     previewTitle: "Static road carrier",
-    previewCaption: "This shell milestone does not render fabricated road geometry. Japan stays here only as a static carrier until the first real road schema is wired.",
+    previewCaption: "The Japan corridor carrier now uses real simplified geometry, but road overlays stay intentionally empty until the first road schema is wired.",
     inspectorTitle: "Road controls reserved",
     inspectorBody: "No fake sliders or guessed counts are shown here. Road parameters will only appear after the real schema is agreed.",
     inspectorEmptyTitle: "Awaiting road schema",
@@ -71,7 +78,7 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     lensBody: "Rail stays visible here as a separate family shell so route continuity and logistics semantics can be discussed without leaking into the road model.",
     lensNext: "Rail should follow after road so shared preview and country handoff patterns can be reused rather than invented twice.",
     previewTitle: "Static rail carrier",
-    previewCaption: "No rail geometry is drawn in the shell phase. The preview remains a static carrier until rail-specific schema and rendering rules exist.",
+    previewCaption: "The Japan corridor carrier is real, but no rail overlay geometry is fabricated here before rail-specific schema and rendering rules exist.",
     inspectorTitle: "Rail controls reserved",
     inspectorBody: "This panel stays intentionally empty until real rail attributes and preview controls are defined.",
     inspectorEmptyTitle: "Awaiting rail schema",
@@ -85,7 +92,7 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     lensBody: "Airport gets its own shell now so later facility review can stay separate from corridor families and focus on site-level semantics.",
     lensNext: "Airport can reuse the same shell chrome once road proves the first real inspector and preview loop.",
     previewTitle: "Static airport carrier",
-    previewCaption: "No airport markers are fabricated here. Japan remains only the sample carrier while airport schema is still undefined.",
+    previewCaption: "The Japan corridor carrier is real, but airport markers are still withheld until the airport schema is defined.",
     inspectorTitle: "Airport controls reserved",
     inspectorBody: "The inspector is intentionally placeholder-only until real airport categories, symbology, and application logic are decided.",
     inspectorEmptyTitle: "Awaiting airport schema",
@@ -99,7 +106,7 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     lensBody: "Port remains a separate family shell so maritime facilities can later be tuned without mixing corridor and node semantics.",
     lensNext: "Port should connect only after the first shared facility conventions are agreed from airport or another node-based family.",
     previewTitle: "Static port carrier",
-    previewCaption: "The shell phase avoids invented port symbols and counts. This preview stays honest and static until the real family wire exists.",
+    previewCaption: "The Japan corridor carrier is real, but port symbols and maritime overlays remain empty until the real family wire exists.",
     inspectorTitle: "Port controls reserved",
     inspectorBody: "No fabricated port values appear here. The inspector will open up only after the true schema is in place.",
     inspectorEmptyTitle: "Awaiting port schema",
@@ -113,7 +120,7 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     lensBody: "Mineral resources stay separate from transport corridors so extraction and facility semantics can be designed on their own terms.",
     lensNext: "This family should attach after the first corridor or facility shell proves the inspector and preview pipeline.",
     previewTitle: "Static mineral carrier",
-    previewCaption: "No mine sites or resource markers are invented here. The shell only keeps the slot warm for the eventual real schema.",
+    previewCaption: "The Japan corridor carrier is real, but mine sites and resource overlays remain empty until the eventual real schema exists.",
     inspectorTitle: "Mineral controls reserved",
     inspectorBody: "The inspector is intentionally empty until the real mineral resource attributes and application rules are agreed.",
     inspectorEmptyTitle: "Awaiting mineral schema",
@@ -127,7 +134,7 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     lensBody: "Energy facilities need their own family shell because they behave like infrastructure nodes, not transport corridors.",
     lensNext: "This slot is ready for later power and energy-site tuning once the first shared facility inspector pattern is stable.",
     previewTitle: "Static energy carrier",
-    previewCaption: "No fabricated plants, grids, or symbols are shown in this shell phase. The preview stays static until a real schema is wired.",
+    previewCaption: "The Japan corridor carrier is real, but plants, grids, and energy overlays stay hidden until a real schema is wired.",
     inspectorTitle: "Energy controls reserved",
     inspectorBody: "This side remains honest and empty until true energy-facility parameters exist.",
     inspectorEmptyTitle: "Awaiting energy schema",
@@ -141,7 +148,7 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     lensBody: "Industrial zones need a reserved shell because they will likely mix area-based preview rules with facility-style debugging.",
     lensNext: "This family should connect only after the first transport and first node-based family validate the shared workbench behavior.",
     previewTitle: "Static industrial carrier",
-    previewCaption: "The shell phase does not draw guessed industrial footprints or counts. Japan remains only a neutral sample carrier.",
+    previewCaption: "The Japan corridor carrier is real, but guessed industrial footprints and counts are still excluded until the industrial schema is confirmed.",
     inspectorTitle: "Industrial controls reserved",
     inspectorBody: "This inspector stays empty until the actual industrial-zone schema and application logic are defined.",
     inspectorEmptyTitle: "Awaiting industrial schema",
@@ -163,7 +170,15 @@ function ensureTransportWorkbenchUiState() {
   state.transportWorkbenchUi.open = !!state.transportWorkbenchUi.open;
   state.transportWorkbenchUi.activeFamily = normalizeTransportWorkbenchFamily(state.transportWorkbenchUi.activeFamily);
   state.transportWorkbenchUi.sampleCountry = "Japan";
-  state.transportWorkbenchUi.previewMode = "static";
+  state.transportWorkbenchUi.previewMode = "bounded_zoom_pan";
+  state.transportWorkbenchUi.previewAssetId = "japan_corridor_v1";
+  state.transportWorkbenchUi.previewInteractionMode = "bounded_zoom_pan";
+  if (!state.transportWorkbenchUi.previewCamera || typeof state.transportWorkbenchUi.previewCamera !== "object") {
+    state.transportWorkbenchUi.previewCamera = {};
+  }
+  state.transportWorkbenchUi.previewCamera.scale = Number(state.transportWorkbenchUi.previewCamera.scale) || 1;
+  state.transportWorkbenchUi.previewCamera.translateX = Number(state.transportWorkbenchUi.previewCamera.translateX) || 0;
+  state.transportWorkbenchUi.previewCamera.translateY = Number(state.transportWorkbenchUi.previewCamera.translateY) || 0;
   state.transportWorkbenchUi.shellPhase = "no-real-params";
   state.transportWorkbenchUi.restoreLeftDrawer = !!state.transportWorkbenchUi.restoreLeftDrawer;
   state.transportWorkbenchUi.restoreRightDrawer = !!state.transportWorkbenchUi.restoreRightDrawer;
@@ -412,6 +427,8 @@ function initToolbar({ render } = {}) {
   const transportWorkbenchCountryStatus = document.getElementById("transportWorkbenchCountryStatus");
   const transportWorkbenchPreviewMode = document.getElementById("transportWorkbenchPreviewMode");
   const transportWorkbenchPreviewTitle = document.getElementById("transportWorkbenchPreviewTitle");
+  const transportWorkbenchPreviewCountryBadge = document.getElementById("transportWorkbenchPreviewCountryBadge");
+  const transportWorkbenchCarrierMount = document.getElementById("transportWorkbenchCarrierMount");
   const transportWorkbenchPreviewFamilyBadge = document.getElementById("transportWorkbenchPreviewFamilyBadge");
   const transportWorkbenchPreviewCaption = document.getElementById("transportWorkbenchPreviewCaption");
   const transportWorkbenchInspectorTitle = document.getElementById("transportWorkbenchInspectorTitle");
@@ -762,10 +779,26 @@ function initToolbar({ render } = {}) {
     transportWorkbenchLensNext.textContent = family.lensNext;
     transportWorkbenchFamilyStatus.textContent = family.label;
     transportWorkbenchCountryStatus.textContent = uiState.sampleCountry;
-    transportWorkbenchPreviewMode.textContent = uiState.previewMode === "static" ? "Static carrier" : uiState.previewMode;
+    transportWorkbenchPreviewMode.textContent = uiState.previewMode === "bounded_zoom_pan"
+      ? "Bounded zoom/pan"
+      : uiState.previewMode;
     transportWorkbenchPreviewTitle.textContent = `${uiState.sampleCountry} preview`;
-    transportWorkbenchPreviewFamilyBadge.textContent = family.label;
-    transportWorkbenchPreviewCaption.textContent = family.previewCaption;
+    if (transportWorkbenchPreviewCountryBadge) {
+      transportWorkbenchPreviewCountryBadge.textContent = uiState.sampleCountry;
+    }
+    if (transportWorkbenchPreviewFamilyBadge) {
+      transportWorkbenchPreviewFamilyBadge.textContent = family.label;
+    }
+    if (transportWorkbenchPreviewCaption) {
+      transportWorkbenchPreviewCaption.textContent = family.previewCaption;
+    }
+    setTransportWorkbenchCarrierFamily(family.id);
+    if (isOpen && transportWorkbenchCarrierMount) {
+      ensureTransportWorkbenchCarrier(transportWorkbenchCarrierMount).catch((error) => {
+        console.error("[transport-workbench] Failed to mount Japan carrier preview.", error);
+      });
+      resizeTransportWorkbenchCarrier();
+    }
     transportWorkbenchInspectorTitle.textContent = family.inspectorTitle;
     transportWorkbenchInspectorBody.textContent = family.inspectorBody;
     transportWorkbenchInspectorEmptyTitle.textContent = family.inspectorEmptyTitle;
@@ -810,6 +843,7 @@ function initToolbar({ render } = {}) {
       focusOverlaySurface(transportWorkbenchPanel);
       return;
     }
+    destroyTransportWorkbenchCarrier();
     closeTransportWorkbenchInfoPopover({ restoreFocus: false });
     state.toggleLeftPanelFn?.(uiState.restoreLeftDrawer);
     state.toggleRightPanelFn?.(!uiState.restoreLeftDrawer && uiState.restoreRightDrawer);
@@ -822,11 +856,7 @@ function initToolbar({ render } = {}) {
 
   const resetTransportWorkbenchView = () => {
     ensureTransportWorkbenchUiState();
-    state.transportWorkbenchUi.activeFamily = "road";
-    state.transportWorkbenchUi.sampleCountry = "Japan";
-    state.transportWorkbenchUi.previewMode = "static";
-    state.transportWorkbenchUi.shellPhase = "no-real-params";
-    renderTransportWorkbenchUi();
+    resetTransportWorkbenchCarrierView();
   };
 
   state.openTransportWorkbenchFn = (trigger = null) => {

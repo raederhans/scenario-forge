@@ -3522,20 +3522,14 @@ body.counter-editor-modal-open {
 }
 
 .transport-workbench-preview-shell {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
   flex: 1 1 auto;
   min-height: 0;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.54);
-}
-
-.transport-workbench-preview-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 2px 2px 0;
+  padding: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 250, 252, 0.84)),
+    rgba(255, 255, 255, 0.58);
 }
 
 .transport-workbench-preview-badge {
@@ -3557,64 +3551,72 @@ body.counter-editor-modal-open {
 
 .transport-workbench-preview-canvas {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   flex: 1 1 auto;
   min-height: 460px;
   border-radius: 22px;
   background:
-    radial-gradient(circle at 50% 42%, rgba(137, 176, 215, 0.22), rgba(10, 19, 34, 0.92) 64%),
-    linear-gradient(180deg, #112033 0%, #08111d 100%);
+    radial-gradient(circle at 18% 14%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 34%),
+    linear-gradient(180deg, #dfe8ef 0%, #d4e0ea 100%);
   overflow: hidden;
 }
 
-.transport-workbench-preview-canvas::before {
-  content: "";
+.transport-workbench-preview-canvas-frame {
   position: absolute;
   inset: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 18px;
+  pointer-events: none;
 }
 
-.transport-workbench-preview-country {
+.transport-workbench-preview-hud {
   position: relative;
-  z-index: 1;
-  font-size: clamp(4.6rem, 9vw, 7.8rem);
-  font-weight: 800;
-  letter-spacing: -0.06em;
-  color: rgba(255, 255, 255, 0.92);
-}
-
-.transport-workbench-preview-crosshair {
   position: absolute;
-  inset: 50% auto auto 50%;
-  width: 180px;
-  height: 180px;
-  transform: translate(-50%, -50%);
-  border: 1px dashed rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-}
-
-.transport-workbench-preview-crosshair::before,
-.transport-workbench-preview-crosshair::after {
-  content: "";
-  position: absolute;
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.transport-workbench-preview-crosshair::before {
-  top: 50%;
-  left: 16px;
-  right: 16px;
-  height: 1px;
-}
-
-.transport-workbench-preview-crosshair::after {
-  left: 50%;
   top: 16px;
-  bottom: 16px;
-  width: 1px;
+  left: 16px;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: calc(100% - 32px);
+  pointer-events: none;
+}
+
+.transport-workbench-carrier-mount {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.transport-workbench-carrier-mount.is-draggable {
+  cursor: grab;
+}
+
+.transport-workbench-carrier-svg {
+  filter: drop-shadow(0 18px 28px rgba(27, 45, 67, 0.08));
+}
+
+.transport-workbench-carrier-mount > svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.transport-workbench-preview-caption {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  z-index: 3;
+  margin: 0;
+  max-width: min(460px, calc(100% - 32px));
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(247, 250, 252, 0.76);
+  border: 1px solid rgba(37, 54, 73, 0.08);
+  color: #425567;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  backdrop-filter: blur(10px);
+  pointer-events: none;
 }
 
 .transport-workbench-footer {
