@@ -1889,14 +1889,9 @@
               <button id="transportWorkbenchCloseBtn" type="button" class="transport-workbench-close-btn" aria-label="Close transport workbench">Close</button>
             </div>
               <div id="transportWorkbenchInfoPopover" class="transport-workbench-info-popover hidden" role="dialog" aria-labelledby="transportWorkbenchInfoTitle" aria-hidden="true">
-              <div id="transportWorkbenchInfoTitle" class="transport-workbench-info-title">Workbench notes</div>
-              <p class="transport-workbench-info-text">
-                The workbench now uses a real simplified Japan corridor carrier, but still avoids fabricated transport values and guessed overlay geometry.
-              </p>
-              <p class="transport-workbench-info-text">
-                Real road, rail, airport, port, and facility parameters will appear only after the first family schema is wired.
-              </p>
-            </div>
+                <div id="transportWorkbenchInfoTitle" class="transport-workbench-info-title">Workbench notes</div>
+                <div id="transportWorkbenchInfoBody" class="transport-workbench-info-body"></div>
+              </div>
           </div>
 
           <div class="transport-workbench-body">
@@ -1921,24 +1916,21 @@
                   </div>
                 </div>
                 <div class="transport-workbench-parameter-stack">
-                  <div class="transport-workbench-note-card transport-workbench-note-card-emphasis">
-                    <div class="transport-workbench-note-title">Connection status</div>
-                    <p id="transportWorkbenchLensBody" class="transport-workbench-note-text">
-                      The shell is reserving space for the first real family wire. No transport-specific parameter schema is attached yet.
-                    </p>
-                  </div>
-                  <div class="transport-workbench-note-card">
-                    <div class="transport-workbench-note-title">Next likely wire</div>
-                    <p id="transportWorkbenchLensNext" class="transport-workbench-note-text">
-                      Road is the most suitable first connection because it will define the baseline corridor and routing debug surface for the rest of the pack.
-                    </p>
-                  </div>
+                  <div id="transportWorkbenchLensSections" class="transport-workbench-control-sections" aria-live="polite"></div>
                 </div>
               </section>
 
               <section class="transport-workbench-column transport-workbench-column-preview" aria-labelledby="transportWorkbenchPreviewTitle">
                 <h3 id="transportWorkbenchPreviewTitle" class="visually-hidden">Japan preview</h3>
                 <div class="transport-workbench-preview-shell">
+                  <div class="transport-workbench-preview-actions">
+                    <button id="transportWorkbenchCompareBtn" type="button" class="transport-workbench-compare-btn">
+                      Hold to Compare Baseline
+                    </button>
+                    <span id="transportWorkbenchCompareStatus" class="transport-workbench-preview-compare-status">
+                      Current working state
+                    </span>
+                  </div>
                   <div id="transportWorkbenchPreviewCanvas" class="transport-workbench-preview-canvas" aria-hidden="true">
                     <div class="transport-workbench-preview-hud">
                       <span id="transportWorkbenchPreviewCountryBadge" class="transport-workbench-preview-badge">Japan</span>
@@ -1946,9 +1938,6 @@
                     </div>
                     <div id="transportWorkbenchCarrierMount" class="transport-workbench-carrier-mount"></div>
                     <div class="transport-workbench-preview-canvas-frame"></div>
-                    <p id="transportWorkbenchPreviewCaption" class="transport-workbench-preview-caption">
-                      The Japan corridor carrier is real simplified geometry, but transport overlays remain empty until the first family schema is wired.
-                    </p>
                   </div>
                 </div>
               </section>
@@ -1959,12 +1948,7 @@
                   <h3 id="transportWorkbenchInspectorTitle" class="transport-workbench-column-title">Road controls reserved</h3>
                 </div>
                 <div class="transport-workbench-inspector-stack">
-                  <div class="transport-workbench-note-card">
-                    <div class="transport-workbench-note-title">Why this is empty</div>
-                    <p id="transportWorkbenchInspectorBody" class="transport-workbench-note-text">
-                      The first pass keeps this inspector honest: no fake sliders, no fabricated counts, and no guessed transport statistics before the real parameter model is agreed.
-                    </p>
-                  </div>
+                  <div id="transportWorkbenchInspectorDetails" class="transport-workbench-inspector-detail-list" aria-live="polite"></div>
                   <div class="transport-workbench-empty-card">
                     <div id="transportWorkbenchInspectorEmptyTitle" class="transport-workbench-empty-title">Awaiting real family schema</div>
                     <p id="transportWorkbenchInspectorEmptyBody" class="transport-workbench-empty-text">
@@ -1977,7 +1961,6 @@
           </div>
 
           <div class="transport-workbench-footer">
-            <div class="transport-workbench-footer-note">Main map application unlocks after the first real parameter wire.</div>
             <div class="transport-workbench-footer-actions">
               <button id="transportWorkbenchResetBtn" type="button" class="btn-secondary">Reset View</button>
               <button id="transportWorkbenchApplyBtn" type="button" class="btn-secondary" disabled aria-disabled="true">Apply to Main Map</button>

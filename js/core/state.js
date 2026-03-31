@@ -1342,12 +1342,21 @@ export const state = {
     activeFamily: "road",
     sampleCountry: "Japan",
     previewMode: "bounded_zoom_pan",
-    previewAssetId: "japan_corridor_v1",
+    previewAssetId: "japan_carrier_v3",
     previewInteractionMode: "bounded_zoom_pan",
     previewCamera: {
       scale: 1,
       translateX: 0,
       translateY: 0,
+    },
+    compareHeld: false,
+    familyConfigs: {
+      road: {},
+      rail: {},
+    },
+    sectionOpen: {
+      road: {},
+      rail: {},
     },
     shellPhase: "no-real-params",
     restoreLeftDrawer: false,

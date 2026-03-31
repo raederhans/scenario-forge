@@ -1,12 +1,9 @@
 {
-  "generatedAt": "2026-03-31T14:08:13.020003+00:00",
+  "generatedAt": "2026-03-31T18:27:21.433973+00:00",
   "source": "data/ne_10m_admin_1_states_provinces.shp",
   "sourceKind": "Natural Earth 10m admin1",
   "excludedCodes": [
     "JP-47"
-  ],
-  "hokkaidoCodes": [
-    "JP-01"
   ],
   "projection": {
     "proj4": "+proj=lcc +lat_1=33.0 +lat_2=37.0 +lat_0=35.0 +lon_0=136.5 +datum=WGS84 +units=m +no_defs",
@@ -89,6 +86,7 @@
         "JP-27",
         "JP-33",
         "JP-34",
+        "JP-01",
         "JP-10",
         "JP-20",
         "JP-09",
@@ -97,18 +95,6 @@
         "JP-11",
         "JP-19",
         "JP-29"
-      ]
-    },
-    "hokkaidoInset": {
-      "type": "inset",
-      "extent": {
-        "x": 42,
-        "y": 54,
-        "width": 356,
-        "height": 216
-      },
-      "prefectureCodes": [
-        "JP-01"
       ]
     }
   },

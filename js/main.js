@@ -19,6 +19,7 @@ import {
 import { applyActivePaletteState } from "./core/palette_manager.js";
 import {
   hydrateActiveScenarioBundle,
+  createStartupScenarioBundleFromPayload,
   loadScenarioBundle,
   loadScenarioRegistry,
 } from "./core/scenario_resources.js";
@@ -30,6 +31,7 @@ import { initTranslations } from "./ui/i18n.js";
 import { initToast } from "./ui/toast.js";
 import { bindBeforeUnload } from "./core/dirty_state.js";
 import { normalizeCountryCodeAlias } from "./core/country_code_aliases.js";
+import { loadStartupBundleViaWorker } from "./core/startup_worker_client.js";
 
 const VALID_BATCH_FILL_SCOPES = new Set(["parent", "country"]);
 const VIEW_SETTINGS_STORAGE_KEY = "map_view_settings_v1";
@@ -355,6 +357,114 @@ function getConfiguredDefaultScenarioId() {
     .querySelector('meta[name="default-scenario"]')
     ?.getAttribute("content");
   return String(configured || "").trim();
+}
+
+function getStartupBundleLanguage() {
+  return getBootLanguage() === "zh" ? "zh" : "en";
+}
+
+function getStartupBundleUrl(scenarioId, language = getStartupBundleLanguage()) {
+  const normalizedScenarioId = String(scenarioId || "").trim();
+  if (!normalizedScenarioId) {
+    return "";
+  }
+  const bundleLanguage = String(language || "en").trim().toLowerCase().startsWith("zh") ? "zh" : "en";
+  return `data/scenarios/${normalizedScenarioId}/startup.bundle.${bundleLanguage}.json`;
+}
+
+function createStartupBundleLoadDiagnostics({
+  startupBundleUrl = "",
+  language = "en",
+  metrics = null,
+} = {}) {
+  return {
+    optionalResources: {
+      runtime_topology: {
+        ok: true,
+        reason: "startup-bundle",
+        errorMessage: "",
+        metrics: metrics?.runtimeTopology || null,
+        url: startupBundleUrl,
+      },
+      geo_locale_patch: {
+        ok: !!metrics?.geoLocalePatch?.present,
+        reason: "startup-bundle",
+        errorMessage: "",
+        language,
+        localeSpecific: true,
+        metrics: metrics?.geoLocalePatch || null,
+      },
+    },
+    requiredResources: {
+      manifest: metrics?.startupBundle || null,
+      countries: metrics?.countries || null,
+      owners: metrics?.owners || null,
+      controllers: metrics?.controllers || null,
+      cores: metrics?.cores || null,
+    },
+    bundleLevel: "bootstrap",
+    startupBundle: true,
+  };
+}
+
+function createStartupBootArtifactsOverride({
+  payload = null,
+  baseDecodedCollections = null,
+  metrics = null,
+} = {}) {
+  return {
+    topologyPrimary: payload?.base?.topology_primary || null,
+    locales: payload?.base?.locales || { ui: {}, geo: {} },
+    geoAliases: payload?.base?.geo_aliases || { alias_to_stable_key: {} },
+    localeLevel: "startup",
+    startupBootCacheState: {
+      enabled: false,
+      baseTopology: "startup-bundle",
+      localization: "startup-bundle",
+      scenarioBootstrap: "startup-bundle",
+    },
+    startupWorkerUsed: true,
+    decodedCollections: baseDecodedCollections || null,
+    resourceMetrics: {
+      topologyPrimary: metrics?.topologyPrimary || null,
+      locales: null,
+      geoAliases: null,
+    },
+  };
+}
+
+function warnOnStartupBundleIntegrity(bundle, { source = "" } = {}) {
+  if (String(source || "").trim() !== "startup-bundle") {
+    return;
+  }
+  const missingCollections = [];
+  const baseObjects = state.topologyPrimary?.objects || {};
+  const runtimeObjects = bundle?.runtimeTopologyPayload?.objects || {};
+  if (baseObjects.ocean && !Array.isArray(state.oceanData?.features)) {
+    missingCollections.push("base.ocean");
+  }
+  if (baseObjects.land && !Array.isArray(state.landBgData?.features)) {
+    missingCollections.push("base.land");
+  }
+  if (baseObjects.water_regions && !Array.isArray(state.waterRegionsData?.features)) {
+    missingCollections.push("base.water_regions");
+  }
+  if (runtimeObjects.scenario_water && !Array.isArray(state.scenarioWaterRegionsData?.features)) {
+    missingCollections.push("scenario.scenario_water");
+  }
+  if (runtimeObjects.context_land_mask && !Array.isArray(state.scenarioContextLandMaskData?.features)) {
+    missingCollections.push("scenario.context_land_mask");
+  }
+  if (!missingCollections.length) {
+    return;
+  }
+  console.warn(
+    `[startup-bundle] Boot completed with missing startup collections: ${missingCollections.join(", ")}.`,
+    {
+      activeScenarioId: String(state.activeScenarioId || bundle?.manifest?.scenario_id || ""),
+      topologyBundleMode: String(state.topologyBundleMode || ""),
+    }
+  );
 }
 
 function getBootCopy(phase = state.bootPhase) {
@@ -1308,6 +1418,9 @@ async function unlockStartupReadonlyWithDetail(renderDispatcher) {
           showToastOnComplete: false,
           interactionLevel: "full",
         });
+        warnOnStartupBundleIntegrity(cachedBundle, {
+          source: cachedBundle?.loadDiagnostics?.startupBundle ? "startup-bundle" : "legacy",
+        });
       }
     }
     renderDispatcher?.flush?.();
@@ -1477,24 +1590,90 @@ async function bootstrap() {
     startBootMetric("base-data");
     const d3Client = globalThis.d3;
     const configuredDefaultScenarioId = getConfiguredDefaultScenarioId();
-    const scenarioRegistryPromise = loadScenarioRegistry({ d3Client });
-    const registryDefaultScenarioIdPromise = scenarioRegistryPromise.then((registry) => {
-      const defaultScenarioId = String(registry?.default_scenario_id || "").trim();
-      if (!defaultScenarioId) {
-        throw new Error("Default scenario is not configured in data/scenarios/index.json.");
-      }
-      return defaultScenarioId;
-    });
+    const scenarioRegistryPromise = configuredDefaultScenarioId
+      ? Promise.resolve(null)
+      : loadScenarioRegistry({ d3Client });
+    const registryDefaultScenarioIdPromise = configuredDefaultScenarioId
+      ? Promise.resolve(configuredDefaultScenarioId)
+      : scenarioRegistryPromise.then((registry) => {
+        const defaultScenarioId = String(registry?.default_scenario_id || "").trim();
+        if (!defaultScenarioId) {
+          throw new Error("Default scenario is not configured in data/scenarios/index.json.");
+        }
+        return defaultScenarioId;
+      });
     const requestedDefaultScenarioIdPromise = configuredDefaultScenarioId
       ? Promise.resolve(configuredDefaultScenarioId)
       : registryDefaultScenarioIdPromise;
+    const startupBundleLanguage = getStartupBundleLanguage();
     startBootMetric("scenario-bundle");
+    const startupBundleResultPromise = requestedDefaultScenarioIdPromise
+      .then(async (defaultScenarioId) => {
+        const startupBundleUrl = getStartupBundleUrl(defaultScenarioId, startupBundleLanguage);
+        if (!startupBundleUrl) {
+          throw new Error("Default startup scenario bundle URL could not be resolved.");
+        }
+        const startupBundleResult = await loadStartupBundleViaWorker({
+          startupBundleUrl,
+          scenarioId: defaultScenarioId,
+          language: startupBundleLanguage,
+        });
+        if (!startupBundleResult.payload) {
+          throw new Error(`Startup bundle "${startupBundleUrl}" did not return a payload.`);
+        }
+        const loadDiagnostics = createStartupBundleLoadDiagnostics({
+          startupBundleUrl,
+          language: startupBundleLanguage,
+          metrics: startupBundleResult.metrics,
+        });
+        return {
+          ok: true,
+          scenarioId: defaultScenarioId,
+          source: "startup-bundle",
+          startupBundleUrl,
+          startupBootArtifactsOverride: createStartupBootArtifactsOverride({
+            payload: startupBundleResult.payload,
+            baseDecodedCollections: startupBundleResult.baseDecodedCollections,
+            metrics: startupBundleResult.metrics,
+          }),
+          bundle: createStartupScenarioBundleFromPayload({
+            scenarioId: defaultScenarioId,
+            language: startupBundleLanguage,
+            payload: startupBundleResult.payload,
+            runtimeDecodedCollections: startupBundleResult.runtimeDecodedCollections,
+            runtimePoliticalMeta: startupBundleResult.runtimePoliticalMeta,
+            loadDiagnostics,
+          }),
+        };
+      })
+      .catch((error) => ({
+        ok: false,
+        source: "startup-bundle",
+        error,
+      }));
     const scenarioBundlePromise = requestedDefaultScenarioIdPromise
-      .then((defaultScenarioId) => loadScenarioBundle(defaultScenarioId, {
-        d3Client,
-        bundleLevel: "bootstrap",
-      }))
-      .then((bundle) => ({ ok: true, bundle }))
+      .then(async (defaultScenarioId) => {
+        const startupBundleResult = await startupBundleResultPromise;
+        if (startupBundleResult.ok && startupBundleResult.bundle?.manifest) {
+          return startupBundleResult;
+        }
+        if (startupBundleResult.error) {
+          console.warn(
+            `[boot] Startup bundle failed for "${defaultScenarioId}", falling back to legacy bootstrap bundle.`,
+            startupBundleResult.error
+          );
+        }
+        const bundle = await loadScenarioBundle(defaultScenarioId, {
+          d3Client,
+          bundleLevel: "bootstrap",
+        });
+        return {
+          ok: true,
+          scenarioId: defaultScenarioId,
+          source: "legacy",
+          bundle,
+        };
+      })
       .catch((error) => ({ ok: false, error }));
     const {
       topology,
@@ -1527,6 +1706,9 @@ async function bootstrap() {
       localeLevel: "startup",
       useStartupWorker: true,
       useStartupCache: true,
+      startupBootArtifactsOverride: startupBundleResultPromise.then((result) => (
+        result.ok ? result.startupBootArtifactsOverride : null
+      )),
     });
     state.topology = topology || topologyPrimary || topologyDetail;
     state.topologyPrimary = topologyPrimary || state.topology;
@@ -1635,10 +1817,12 @@ async function bootstrap() {
     if (state.specialZonesExternalData?.features) {
       state.specialZonesData = state.specialZonesExternalData;
     } else if (objects.special_zones) {
-      state.specialZonesData = globalThis.topojson.feature(state.topologyPrimary, objects.special_zones);
+      state.specialZonesData = startupDecodedCollections?.specialZonesData
+        || globalThis.topojson.feature(state.topologyPrimary, objects.special_zones);
     }
     if (objects.rivers) {
-      state.riversData = globalThis.topojson.feature(state.topologyPrimary, objects.rivers);
+      state.riversData = startupDecodedCollections?.riversData
+        || globalThis.topojson.feature(state.topologyPrimary, objects.rivers);
     } else if (Array.isArray(state.contextLayerExternalDataByName?.rivers?.features)) {
       state.riversData = state.contextLayerExternalDataByName.rivers;
     }
@@ -1651,12 +1835,14 @@ async function bootstrap() {
         || globalThis.topojson.feature(state.topologyPrimary, objects.land);
     }
     if (objects.urban) {
-      state.urbanData = globalThis.topojson.feature(state.topologyPrimary, objects.urban);
+      state.urbanData = startupDecodedCollections?.urbanData
+        || globalThis.topojson.feature(state.topologyPrimary, objects.urban);
     } else if (Array.isArray(state.contextLayerExternalDataByName?.urban?.features)) {
       state.urbanData = state.contextLayerExternalDataByName.urban;
     }
     if (objects.physical) {
-      state.physicalData = globalThis.topojson.feature(state.topologyPrimary, objects.physical);
+      state.physicalData = startupDecodedCollections?.physicalData
+        || globalThis.topojson.feature(state.topologyPrimary, objects.physical);
     } else if (Array.isArray(state.contextLayerExternalDataByName?.physical?.features)) {
       state.physicalData = state.contextLayerExternalDataByName.physical;
     }
@@ -1668,7 +1854,9 @@ async function bootstrap() {
       topologyDecodeMs: baseTopologyDecodeMs,
       resourceMetrics: resourceMetrics || {},
     });
-    const registryDefaultScenarioId = await registryDefaultScenarioIdPromise;
+    const registryDefaultScenarioId = configuredDefaultScenarioId
+      ? configuredDefaultScenarioId
+      : await registryDefaultScenarioIdPromise;
     if (configuredDefaultScenarioId && registryDefaultScenarioId !== configuredDefaultScenarioId) {
       console.warn(
         `[boot] Configured default scenario "${configuredDefaultScenarioId}" differs from registry default "${registryDefaultScenarioId}".`
@@ -1729,6 +1917,7 @@ async function bootstrap() {
       throw new Error("Default scenario bundle did not include a manifest.");
     }
     finishBootMetric("scenario-bundle", {
+      source: scenarioBundleResult.source || "legacy",
       requiresDetailTopology: false,
       expectedScenarioFeatureCount: Number(defaultScenarioBundle.manifest?.summary?.feature_count || 0),
       bundleLevel: defaultScenarioBundle?.bundleLevel || "bootstrap",
@@ -1753,6 +1942,9 @@ async function bootstrap() {
       markDirtyReason: "",
       showToastOnComplete: false,
       interactionLevel: state.startupInteractionMode === "readonly" ? "readonly-startup" : "full",
+    });
+    warnOnStartupBundleIntegrity(defaultScenarioBundle, {
+      source: scenarioBundleResult.source,
     });
     finishBootMetric("scenario-apply", {
       activeScenarioId: String(state.activeScenarioId || ""),

@@ -40,6 +40,8 @@ from map_builder.contracts import (
     SCENARIO_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME as CONTRACT_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME,
     SCENARIO_CHECKPOINT_GEO_LOCALE_EN_FILENAME as CONTRACT_CHECKPOINT_GEO_LOCALE_EN_FILENAME,
     SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME as CONTRACT_CHECKPOINT_GEO_LOCALE_FILENAME,
+    SCENARIO_CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME as CONTRACT_CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME,
+    SCENARIO_CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME as CONTRACT_CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME,
     SCENARIO_CHECKPOINT_GEO_LOCALE_ZH_FILENAME as CONTRACT_CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
     SCENARIO_CHECKPOINT_LAND_MASK_FILENAME as CONTRACT_CHECKPOINT_LAND_MASK_FILENAME,
     SCENARIO_CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME as CONTRACT_CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME,
@@ -60,6 +62,7 @@ from map_builder.contracts import (
 from scenario_builder.hoi4.audit import read_bmp24
 from tools.build_tno_1962_geo_locale_patch import build_patch as build_tno_geo_locale_patch
 from tools.build_startup_bootstrap_assets import build_bootstrap_runtime_topology, build_startup_bootstrap_assets
+from tools.build_startup_bundle import build_startup_bundles
 from tools.check_scenario_contracts import validate_publish_bundle_dir
 from tools.scenario_chunk_assets import build_and_write_scenario_chunk_assets
 
@@ -115,6 +118,7 @@ MODERN_WORLD_COUNTRIES_PATH = ROOT / "data/scenarios/modern_world/countries.json
 MANUAL_OVERRIDE_FILENAME = "scenario_manual_overrides.json"
 MANUAL_SYNC_REPORT_DIR = ROOT / ".runtime" / "reports" / "generated" / "manual-sync"
 MANUAL_SYNC_BACKUP_ROOT = ROOT / ".runtime" / "backups" / "scenario-rebuild"
+STARTUP_BUNDLE_REPORT_PATH = ROOT / ".runtime" / "reports" / "generated" / "startup_bundle_report.json"
 RUNTIME_ACTIVE_SERVER_METADATA_PATH = ROOT / ".runtime" / "dev" / "active_server.json"
 HGO_ROOT = ROOT / "historic geographic overhaul"
 TNO_ROOT_CANDIDATES = [
@@ -4499,6 +4503,8 @@ CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME = CONTRACT_CHECKPOINT_RUNTIME_BOO
 CHECKPOINT_GEO_LOCALE_FILENAME = CONTRACT_CHECKPOINT_GEO_LOCALE_FILENAME
 CHECKPOINT_GEO_LOCALE_EN_FILENAME = CONTRACT_CHECKPOINT_GEO_LOCALE_EN_FILENAME
 CHECKPOINT_GEO_LOCALE_ZH_FILENAME = CONTRACT_CHECKPOINT_GEO_LOCALE_ZH_FILENAME
+CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME = CONTRACT_CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME
+CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME = CONTRACT_CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME
 CHECKPOINT_LAND_MASK_FILENAME = CONTRACT_CHECKPOINT_LAND_MASK_FILENAME
 CHECKPOINT_CONTEXT_LAND_MASK_FILENAME = CONTRACT_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME
 CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME = CONTRACT_CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME
@@ -8774,6 +8780,12 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
     manifest_payload["geo_locale_patch_url"] = f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_GEO_LOCALE_FILENAME}"
     manifest_payload["geo_locale_patch_url_en"] = f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_GEO_LOCALE_EN_FILENAME}"
     manifest_payload["geo_locale_patch_url_zh"] = f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_GEO_LOCALE_ZH_FILENAME}"
+    manifest_payload["startup_bundle_url_en"] = (
+        f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME}"
+    )
+    manifest_payload["startup_bundle_url_zh"] = (
+        f"data/scenarios/{SCENARIO_ID}/{CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME}"
+    )
     manifest_payload["performance_hints"] = {
         "render_profile_default": "balanced",
         "dynamic_borders_default": False,
@@ -9013,6 +9025,23 @@ def build_geo_locale_stage(
         runtime_bootstrap_output_path=checkpoint_dir / CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
         startup_locales_output_path=ROOT / "data/locales.startup.json",
         startup_geo_aliases_output_path=ROOT / "data/geo_aliases.startup.json",
+    )
+    build_startup_bundles(
+        scenario_manifest_path=checkpoint_dir / "manifest.json",
+        data_manifest_path=ROOT / "data/manifest.json",
+        topology_primary_path=ROOT / "data/europe_topology.json",
+        startup_locales_path=ROOT / "data/locales.startup.json",
+        geo_aliases_path=ROOT / "data/geo_aliases.startup.json",
+        runtime_bootstrap_topology_path=checkpoint_dir / CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME,
+        countries_path=checkpoint_dir / "countries.json",
+        owners_path=checkpoint_dir / "owners.by_feature.json",
+        controllers_path=checkpoint_dir / "controllers.by_feature.json",
+        cores_path=checkpoint_dir / "cores.by_feature.json",
+        geo_locale_patch_en_path=checkpoint_dir / CHECKPOINT_GEO_LOCALE_EN_FILENAME,
+        geo_locale_patch_zh_path=checkpoint_dir / CHECKPOINT_GEO_LOCALE_ZH_FILENAME,
+        output_en_path=checkpoint_dir / CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME,
+        output_zh_path=checkpoint_dir / CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME,
+        report_path=STARTUP_BUNDLE_REPORT_PATH,
     )
 
 

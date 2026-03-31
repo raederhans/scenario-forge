@@ -118,6 +118,8 @@
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
   "relief_overlays_url": "data/scenarios/tno_1962/relief_overlays.geojson",
   "runtime_topology_url": "data/scenarios/tno_1962/runtime_topology.topo.json",
+  "startup_bundle_url_en": "data/scenarios/tno_1962/startup.bundle.en.json",
+  "startup_bundle_url_zh": "data/scenarios/tno_1962/startup.bundle.zh.json",
   "performance_hints": {
     "render_profile_default": "balanced",
     "dynamic_borders_default": false,

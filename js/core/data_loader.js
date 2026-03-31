@@ -1233,6 +1233,7 @@ export async function loadMapData({
   localeLevel = "full",
   useStartupWorker = false,
   useStartupCache = false,
+  startupBootArtifactsOverride = null,
 } = {}) {
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available. Ensure D3 is loaded before calling loadMapData().");
@@ -1246,31 +1247,25 @@ export async function loadMapData({
   });
   const shouldUseStartupBootPath =
     normalizeLocaleLevel(localeLevel) === "startup" && (useStartupWorker || useStartupCache);
-  const startupBootArtifacts = shouldUseStartupBootPath
-    ? await loadStartupBootArtifacts({
-      topologyUrl,
-      localesUrl,
-      geoAliasesUrl,
-      localeLevel,
-      d3Client,
-      useWorker: useStartupWorker,
-      useStartupCache,
-    })
-    : null;
-  const topologyBundle = await loadTopologyBundle({
-    topologyUrl,
-    d3Client,
-    renderProfile,
-    prefetchedPrimaryTopology: startupBootArtifacts?.topologyPrimary || null,
-    prefetchedPrimaryMetrics: startupBootArtifacts?.resourceMetrics?.topologyPrimary || null,
+  const startupBootArtifactsPromise = startupBootArtifactsOverride
+    ? Promise.resolve(startupBootArtifactsOverride)
+    : (
+      shouldUseStartupBootPath
+        ? loadStartupBootArtifacts({
+          topologyUrl,
+          localesUrl,
+          geoAliasesUrl,
+          localeLevel,
+          d3Client,
+          useWorker: useStartupWorker,
+          useStartupCache,
+        })
+        : Promise.resolve(null)
+    );
+  const hierarchyPromise = d3Client.json(hierarchyUrl).catch((err) => {
+    console.warn("Hierarchy file missing or invalid, using defaults.", err);
+    return null;
   });
-  const runtimePoliticalPromise = topologyBundle.detailDeferred
-    ? Promise.resolve(null)
-    : d3Client.json(runtimePoliticalUrl).catch((err) => {
-      console.warn("Runtime political topology missing or invalid, continuing without dynamic sovereignty.", err);
-      return null;
-    });
-
   const paletteRegistryPromise = d3Client.json(paletteRegistryUrl).catch((err) => {
     console.warn("Palette registry missing or invalid, continuing with legacy palette fallback.", err);
     return null;
@@ -1280,6 +1275,32 @@ export async function loadMapData({
     return null;
   });
   const contextLayerPackPromise = loadOptionalContextLayerPacks(d3Client, includeContextLayers);
+  const ruCityOverridesPromise = d3Client.json(ruCityOverridesUrl).then((payload) => {
+    if (!Array.isArray(payload?.features)) {
+      console.warn(`[data_loader] RU city overrides payload invalid at ${ruCityOverridesUrl}. Ignoring.`);
+      return null;
+    }
+    return {
+      type: "FeatureCollection",
+      features: payload.features,
+    };
+  }).catch((err) => {
+    console.warn("RU city overrides file missing or invalid, continuing without overrides.", err);
+    return null;
+  });
+  const specialZonesPromise = d3Client.json(specialZonesUrl).then((payload) => {
+    if (!Array.isArray(payload?.features)) {
+      console.warn(`[data_loader] Special zones payload invalid at ${specialZonesUrl}. Ignoring.`);
+      return null;
+    }
+    return {
+      type: "FeatureCollection",
+      features: payload.features,
+    };
+  }).catch((err) => {
+    console.warn("Special zones file missing or invalid, falling back to topology layer.", err);
+    return null;
+  });
 
   const cityDataPromises = includeCityData
     ? [
@@ -1294,23 +1315,44 @@ export async function loadMapData({
     ]
     : [Promise.resolve(null), Promise.resolve(null)];
 
-  const localizationPromise = startupBootArtifacts
-    ? Promise.resolve({
-      localeLevel: startupBootArtifacts.localeLevel,
-      locales: startupBootArtifacts.locales,
-      geoAliases: startupBootArtifacts.geoAliases,
-      resourceMetrics: {
-        locales: startupBootArtifacts.resourceMetrics?.locales || null,
-        geoAliases: startupBootArtifacts.resourceMetrics?.geoAliases || null,
-      },
-    })
-    : loadLocalizationData({
+  const localizationPromise = startupBootArtifactsPromise.then((startupBootArtifacts) => (
+    startupBootArtifacts
+      ? {
+        localeLevel: startupBootArtifacts.localeLevel || localizationUrls.localeLevel,
+        locales: startupBootArtifacts.locales,
+        geoAliases: startupBootArtifacts.geoAliases,
+        resourceMetrics: {
+          locales: startupBootArtifacts.resourceMetrics?.locales || null,
+          geoAliases: startupBootArtifacts.resourceMetrics?.geoAliases || null,
+        },
+      }
+      : loadLocalizationData({
+        d3Client,
+        localeLevel: localizationUrls.localeLevel,
+        localesUrl: localizationUrls.localesUrl,
+        geoAliasesUrl: localizationUrls.geoAliasesUrl,
+      })
+  ));
+  const topologyBundlePromise = startupBootArtifactsPromise.then((startupBootArtifacts) => (
+    loadTopologyBundle({
+      topologyUrl,
       d3Client,
-      localeLevel: localizationUrls.localeLevel,
-      localesUrl: localizationUrls.localesUrl,
-      geoAliasesUrl: localizationUrls.geoAliasesUrl,
-    });
+      renderProfile,
+      prefetchedPrimaryTopology: startupBootArtifacts?.topologyPrimary || null,
+      prefetchedPrimaryMetrics: startupBootArtifacts?.resourceMetrics?.topologyPrimary || null,
+    })
+  ));
+  const runtimePoliticalPromise = topologyBundlePromise.then((topologyBundle) => (
+    topologyBundle.detailDeferred
+      ? null
+      : d3Client.json(runtimePoliticalUrl).catch((err) => {
+        console.warn("Runtime political topology missing or invalid, continuing without dynamic sovereignty.", err);
+        return null;
+      })
+  ));
   const [
+    startupBootArtifacts,
+    topologyBundle,
     localizationBundle,
     worldCities,
     cityAliases,
@@ -1322,38 +1364,13 @@ export async function loadMapData({
     releasableCatalog,
     contextLayerExternal,
   ] = await Promise.all([
+    startupBootArtifactsPromise,
+    topologyBundlePromise,
     localizationPromise,
     ...cityDataPromises,
-    d3Client.json(hierarchyUrl).catch((err) => {
-      console.warn("Hierarchy file missing or invalid, using defaults.", err);
-      return null;
-    }),
-    d3Client.json(ruCityOverridesUrl).then((payload) => {
-      if (!Array.isArray(payload?.features)) {
-        console.warn(`[data_loader] RU city overrides payload invalid at ${ruCityOverridesUrl}. Ignoring.`);
-        return null;
-      }
-      return {
-        type: "FeatureCollection",
-        features: payload.features,
-      };
-      }).catch((err) => {
-        console.warn("RU city overrides file missing or invalid, continuing without overrides.", err);
-        return null;
-      }),
-    d3Client.json(specialZonesUrl).then((payload) => {
-      if (!Array.isArray(payload?.features)) {
-        console.warn(`[data_loader] Special zones payload invalid at ${specialZonesUrl}. Ignoring.`);
-        return null;
-      }
-      return {
-        type: "FeatureCollection",
-        features: payload.features,
-      };
-    }).catch((err) => {
-      console.warn("Special zones file missing or invalid, falling back to topology layer.", err);
-      return null;
-    }),
+    hierarchyPromise,
+    ruCityOverridesPromise,
+    specialZonesPromise,
     runtimePoliticalPromise,
     paletteRegistryPromise,
     releasableCatalogPromise,
@@ -1414,7 +1431,7 @@ export async function loadMapData({
     activePaletteMeta,
     activePalettePack,
     activePaletteMap,
-    localeLevel: localizationUrls.localeLevel,
+    localeLevel: startupBootArtifacts?.localeLevel || localizationBundle.localeLevel || localizationUrls.localeLevel,
     startupBootCacheState: startupBootArtifacts?.startupBootCacheState || createDefaultStartupBootCacheState(false),
     startupWorkerUsed: !!startupBootArtifacts?.startupWorkerUsed,
     startupDecodedCollections: startupBootArtifacts?.decodedCollections || null,

@@ -2,6 +2,7 @@
 import { ensureSovereigntyState, markLegacyColorStateDirty } from "./sovereignty_manager.js";
 import { normalizeMapSemanticMode } from "./state.js";
 import {
+  invalidateOceanBackgroundVisualState,
   recomputeDynamicBordersNow,
   refreshColorState,
   refreshResolvedColorsForFeatures,
@@ -549,9 +550,29 @@ function getScenarioOceanFillOverride(manifest) {
   return rawValue ? normalizeScenarioOceanFillColor(rawValue, "") : "";
 }
 
+function updateScenarioOceanFill(fillColor, reason) {
+  if (!state.styleConfig || typeof state.styleConfig !== "object") {
+    state.styleConfig = {};
+  }
+  if (!state.styleConfig.ocean || typeof state.styleConfig.ocean !== "object") {
+    state.styleConfig.ocean = {};
+  }
+  const previousFill = normalizeScenarioOceanFillColor(state.styleConfig.ocean.fillColor);
+  const nextFill = normalizeScenarioOceanFillColor(fillColor);
+  state.styleConfig.ocean.fillColor = nextFill;
+  if (previousFill !== nextFill) {
+    invalidateOceanBackgroundVisualState(reason);
+    return true;
+  }
+  return false;
+}
+
 function syncScenarioOceanFillForActivation(manifest) {
   const nextOverride = getScenarioOceanFillOverride(manifest);
   const previousOverride = getScenarioOceanFillOverride(state.activeScenarioManifest);
+  if (!state.styleConfig || typeof state.styleConfig !== "object") {
+    state.styleConfig = {};
+  }
   if (!state.styleConfig.ocean || typeof state.styleConfig.ocean !== "object") {
     state.styleConfig.ocean = {};
   }
@@ -559,9 +580,12 @@ function syncScenarioOceanFillForActivation(manifest) {
     state.scenarioOceanFillBeforeActivate = normalizeScenarioOceanFillColor(state.styleConfig.ocean.fillColor);
   }
   if (nextOverride) {
-    state.styleConfig.ocean.fillColor = nextOverride;
+    updateScenarioOceanFill(nextOverride, "scenario-ocean-fill-activate");
   } else if (previousOverride && state.scenarioOceanFillBeforeActivate !== null) {
-    state.styleConfig.ocean.fillColor = normalizeScenarioOceanFillColor(state.scenarioOceanFillBeforeActivate);
+    updateScenarioOceanFill(
+      state.scenarioOceanFillBeforeActivate,
+      "scenario-ocean-fill-restore-baseline"
+    );
   }
   if (typeof state.updateToolbarInputsFn === "function") {
     state.updateToolbarInputsFn();
@@ -572,10 +596,7 @@ function restoreScenarioOceanFillAfterExit() {
   if (state.scenarioOceanFillBeforeActivate === null) {
     return;
   }
-  if (!state.styleConfig.ocean || typeof state.styleConfig.ocean !== "object") {
-    state.styleConfig.ocean = {};
-  }
-  state.styleConfig.ocean.fillColor = normalizeScenarioOceanFillColor(state.scenarioOceanFillBeforeActivate);
+  updateScenarioOceanFill(state.scenarioOceanFillBeforeActivate, "scenario-ocean-fill-clear");
   state.scenarioOceanFillBeforeActivate = null;
   if (typeof state.updateToolbarInputsFn === "function") {
     state.updateToolbarInputsFn();
@@ -1144,8 +1165,17 @@ async function prepareScenarioApplyState(
   const cores = bundle.coresPayload?.cores && typeof bundle.coresPayload.cores === "object"
     ? normalizeScenarioCoreMap(bundle.coresPayload.cores)
     : {};
-  const defaultCountryCode = getScenarioDefaultCountryCode(bundle.manifest, baseCountryMap);
-  const mapSemanticMode = getScenarioMapSemanticMode(bundle.manifest);
+  const startupApplySeed = bundle.startupApplySeed && typeof bundle.startupApplySeed === "object"
+    ? bundle.startupApplySeed
+    : null;
+  const defaultCountryCode = String(
+    startupApplySeed?.default_country_code
+    || getScenarioDefaultCountryCode(bundle.manifest, baseCountryMap)
+  ).trim().toUpperCase();
+  const mapSemanticMode = String(
+    startupApplySeed?.map_semantic_mode
+    || getScenarioMapSemanticMode(bundle.manifest)
+  ).trim().toLowerCase() || "political";
   const releasableIndex = buildScenarioReleasableIndex(scenarioId, {
     excludeTags: baseCountryTags,
   });
@@ -1180,21 +1210,31 @@ async function prepareScenarioApplyState(
     getScenarioDecodedCollection(bundle, "scenarioLandMaskData")
     || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land_mask")
     || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land");
-  const scenarioNameMap = getScenarioNameMap(countryMap);
-  const scenarioColorMap = getScenarioFixedOwnerColors(countryMap);
-  const scenarioOwnerBackfill = buildHoi4FarEastSovietOwnerBackfill(scenarioId, {
-    runtimeTopology: runtimeTopologyPayload?.objects?.political
-      ? runtimeTopologyPayload
-      : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null),
-    ownersByFeatureId: owners,
-    controllersByFeatureId: controllers,
-  });
-  const resolvedOwners = Object.keys(scenarioOwnerBackfill).length
-    ? {
-      ...owners,
-      ...scenarioOwnerBackfill,
-    }
-    : { ...owners };
+  const scenarioNameMap = startupApplySeed?.scenario_name_map && typeof startupApplySeed.scenario_name_map === "object"
+    ? { ...startupApplySeed.scenario_name_map }
+    : getScenarioNameMap(countryMap);
+  const scenarioColorMap = startupApplySeed?.scenario_color_map && typeof startupApplySeed.scenario_color_map === "object"
+    ? { ...startupApplySeed.scenario_color_map }
+    : getScenarioFixedOwnerColors(countryMap);
+  const scenarioOwnerBackfill = startupApplySeed?.resolved_owners && typeof startupApplySeed.resolved_owners === "object"
+    ? {}
+    : buildHoi4FarEastSovietOwnerBackfill(scenarioId, {
+      runtimeTopology: runtimeTopologyPayload?.objects?.political
+        ? runtimeTopologyPayload
+        : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null),
+      ownersByFeatureId: owners,
+      controllersByFeatureId: controllers,
+    });
+  const resolvedOwners = startupApplySeed?.resolved_owners && typeof startupApplySeed.resolved_owners === "object"
+    ? { ...startupApplySeed.resolved_owners }
+    : (
+      Object.keys(scenarioOwnerBackfill).length
+        ? {
+          ...owners,
+          ...scenarioOwnerBackfill,
+        }
+        : { ...owners }
+    );
   const scenarioParentBorderEnabledBeforeActivate =
     state.scenarioParentBorderEnabledBeforeActivate === null && !state.activeScenarioId
       ? { ...(state.parentBorderEnabledByCountry || {}) }

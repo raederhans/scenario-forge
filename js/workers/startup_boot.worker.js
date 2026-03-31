@@ -4,9 +4,11 @@ importScripts("/vendor/topojson-client.min.js");
 
 const MESSAGE_TYPES = Object.freeze({
   LOAD_BASE_STARTUP: "LOAD_BASE_STARTUP",
+  LOAD_STARTUP_BUNDLE: "LOAD_STARTUP_BUNDLE",
   LOAD_SCENARIO_RUNTIME_BOOTSTRAP: "LOAD_SCENARIO_RUNTIME_BOOTSTRAP",
   DECODE_RUNTIME_CHUNK: "DECODE_RUNTIME_CHUNK",
   BASE_STARTUP_READY: "BASE_STARTUP_READY",
+  STARTUP_BUNDLE_READY: "STARTUP_BUNDLE_READY",
   SCENARIO_RUNTIME_BOOTSTRAP_READY: "SCENARIO_RUNTIME_BOOTSTRAP_READY",
   RUNTIME_CHUNK_READY: "RUNTIME_CHUNK_READY",
   ERROR: "ERROR",
@@ -189,6 +191,12 @@ function postWorkerMessage(type, payload) {
   });
 }
 
+function countObjectKeys(value) {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? Object.keys(value).length
+    : 0;
+}
+
 async function handleLoadBaseStartup(message) {
   const taskId = String(message?.taskId || "").trim();
   const topologyUrl = String(message?.topologyUrl || "").trim();
@@ -209,8 +217,12 @@ async function handleLoadBaseStartup(message) {
     geoAliases: geoAliasesResult.payload || { alias_to_stable_key: {} },
     decodedCollections: {
       landData: decodeTopologyObject(topologyResult.payload, "political"),
+      specialZonesData: decodeTopologyObject(topologyResult.payload, "special_zones"),
+      riversData: decodeTopologyObject(topologyResult.payload, "rivers"),
       oceanData: decodeTopologyObject(topologyResult.payload, "ocean"),
       landBgData: decodeTopologyObject(topologyResult.payload, "land"),
+      urbanData: decodeTopologyObject(topologyResult.payload, "urban"),
+      physicalData: decodeTopologyObject(topologyResult.payload, "physical"),
     },
     metrics: {
       totalMs: nowMs() - startedAt,
@@ -220,6 +232,108 @@ async function handleLoadBaseStartup(message) {
       },
       locales: localesResult.metrics || null,
       geoAliases: geoAliasesResult.metrics || null,
+    },
+  });
+}
+
+async function handleLoadStartupBundle(message) {
+  const taskId = String(message?.taskId || "").trim();
+  const startupBundleUrl = String(message?.startupBundleUrl || "").trim();
+  const expectedScenarioId = String(message?.scenarioId || "").trim();
+  const language = String(message?.language || "en").trim().toLowerCase().startsWith("zh") ? "zh" : "en";
+  const startedAt = nowMs();
+  const startupBundleResult = await fetchJsonResource(startupBundleUrl, "startupBundle");
+  const payload = startupBundleResult.payload && typeof startupBundleResult.payload === "object"
+    ? startupBundleResult.payload
+    : null;
+  if (!payload) {
+    throw new Error(`[startup_worker] Startup bundle payload missing or invalid at ${startupBundleUrl}.`);
+  }
+  const scenarioId = String(payload.scenario_id || payload.manifest_subset?.scenario_id || "").trim();
+  if (!scenarioId) {
+    throw new Error("[startup_worker] Startup bundle is missing scenario_id.");
+  }
+  if (expectedScenarioId && expectedScenarioId !== scenarioId) {
+    throw new Error(
+      `[startup_worker] Startup bundle scenario mismatch. Expected "${expectedScenarioId}" but received "${scenarioId}".`
+    );
+  }
+  const topologyPrimary = payload.base?.topology_primary || null;
+  const runtimeTopology = payload.scenario?.runtime_topology_bootstrap || null;
+  if (!topologyPrimary?.objects?.political) {
+    throw new Error("[startup_worker] Startup bundle is missing base topology.");
+  }
+  if (!runtimeTopology?.objects?.political) {
+    throw new Error("[startup_worker] Startup bundle is missing runtime bootstrap topology.");
+  }
+  const baseDecodeStartedAt = nowMs();
+  const baseDecodedCollections = {
+    landData: decodeTopologyObject(topologyPrimary, "political"),
+    specialZonesData: decodeTopologyObject(topologyPrimary, "special_zones"),
+    riversData: decodeTopologyObject(topologyPrimary, "rivers"),
+    oceanData: decodeTopologyObject(topologyPrimary, "ocean"),
+    landBgData: decodeTopologyObject(topologyPrimary, "land"),
+    urbanData: decodeTopologyObject(topologyPrimary, "urban"),
+    physicalData: decodeTopologyObject(topologyPrimary, "physical"),
+  };
+  const baseDecodeCompletedAt = nowMs();
+  const runtimeDecodeStartedAt = nowMs();
+  const runtimeDecodedCollections = {
+    politicalData: decodeTopologyObject(runtimeTopology, "political"),
+    scenarioLandMaskData:
+      decodeTopologyObject(runtimeTopology, "land_mask")
+      || decodeTopologyObject(runtimeTopology, "land"),
+    scenarioContextLandMaskData: decodeTopologyObject(runtimeTopology, "context_land_mask"),
+    scenarioWaterRegionsData: decodeTopologyObject(runtimeTopology, "scenario_water"),
+    scenarioSpecialRegionsData: decodeTopologyObject(runtimeTopology, "scenario_special_land"),
+  };
+  const runtimeDecodeCompletedAt = nowMs();
+  const runtimePoliticalMeta = buildRuntimePoliticalMeta(runtimeTopology);
+  const metaCompletedAt = nowMs();
+  postWorkerMessage(MESSAGE_TYPES.STARTUP_BUNDLE_READY, {
+    taskId,
+    payload,
+    baseDecodedCollections,
+    runtimeDecodedCollections,
+    runtimePoliticalMeta,
+    metrics: {
+      totalMs: nowMs() - startedAt,
+      startupBundle: {
+        ...(startupBundleResult.metrics || {}),
+        scenarioId,
+        language,
+      },
+      topologyPrimary: {
+        featureCount: getPoliticalGeometryCount(topologyPrimary),
+        decodeMs: baseDecodeCompletedAt - baseDecodeStartedAt,
+      },
+      runtimeTopology: {
+        featureCount: getPoliticalGeometryCount(runtimeTopology),
+        decodeMs: runtimeDecodeCompletedAt - runtimeDecodeStartedAt,
+      },
+      runtimePoliticalMeta: {
+        featureCount: Array.isArray(runtimePoliticalMeta.featureIds)
+          ? runtimePoliticalMeta.featureIds.length
+          : 0,
+        buildMs: metaCompletedAt - runtimeDecodeCompletedAt,
+      },
+      geoLocalePatch: {
+        present: !!payload?.scenario?.geo_locale_patch,
+        language,
+        localeSpecific: true,
+      },
+      countries: {
+        count: countObjectKeys(payload?.scenario?.countries?.countries),
+      },
+      owners: {
+        count: countObjectKeys(payload?.scenario?.owners?.owners),
+      },
+      controllers: {
+        count: countObjectKeys(payload?.scenario?.controllers?.controllers),
+      },
+      cores: {
+        count: countObjectKeys(payload?.scenario?.cores?.cores),
+      },
     },
   });
 }
@@ -318,6 +432,9 @@ async function dispatchMessage(message) {
   switch (message?.type) {
     case MESSAGE_TYPES.LOAD_BASE_STARTUP:
       await handleLoadBaseStartup(message);
+      return;
+    case MESSAGE_TYPES.LOAD_STARTUP_BUNDLE:
+      await handleLoadStartupBundle(message);
       return;
     case MESSAGE_TYPES.LOAD_SCENARIO_RUNTIME_BOOTSTRAP:
       await handleLoadScenarioRuntimeBootstrap(message);

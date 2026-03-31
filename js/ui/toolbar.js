@@ -59,30 +59,54 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
   {
     id: "road",
     label: "Road",
-    title: "Road workbench shell",
-    lensTitle: "Road corridor lens",
-    lensBody: "Road is the best first real wire because it defines the base corridor logic and the first country-level debug surface for the whole pack.",
-    lensNext: "When real schema work starts, road should establish corridor classes, continuity checks, and country handoff review before other families join.",
-    previewTitle: "Static road carrier",
-    previewCaption: "The two-frame Japan carrier now uses a full mainland preview plus a Hokkaido inset, but road overlays stay intentionally empty until the first road schema is wired.",
-    inspectorTitle: "Road controls reserved",
-    inspectorBody: "No fake sliders or guessed counts are shown here. Road parameters will only appear after the real schema is agreed.",
-    inspectorEmptyTitle: "Awaiting road schema",
-    inspectorEmptyBody: "This inspector will later host road hierarchy, density, style, and application controls.",
+    title: "Road workbench",
+    lensTitle: "Japan road adapter",
+    /*
+    lensBody: "Japan road 首版固定为 OSM / Geofabrik Japan 主几何，加上 N06 高速身份加固。",
+    lensNext: "只做 motorway / trunk / primary，加 road_labels，不碰互通、routing 和 secondary 及以下。",
+    previewTitle: "Road carrier",
+    previewCaption: "Japan carrier 已就位。road 的真实 overlay 还没接线，所以这里先调规则和样式，不伪造 geometry。",
+    inspectorTitle: "Road inspector",
+    inspectorBody: "当前还没有真实 road 要素可选。右侧先解释你现在这套 Japan road 规则会怎样进入 pack。",
+    inspectorEmptyTitle: "Waiting for real road packs",
+    inspectorEmptyBody: "roads 和 road_labels Japan packs 一旦接入，这里就切到真实段落和 ref 的要素检查。",
+    supportsDetailedControls: true,
+    */
+    lensBody: "Japan road baseline uses OSM / Geofabrik Japan as primary geometry with N06 motorway hardening.",
+    lensNext: "Scope stays on motorway, trunk, primary, and road_labels. No routing, interchanges, or secondary and below.",
+    previewTitle: "Road carrier",
+    previewCaption: "The Japan carrier is ready. Real road overlays are not wired yet, so this pass focuses on pack rules and style controls only.",
+    inspectorTitle: "Road inspector",
+    inspectorBody: "No real road feature is selectable yet. This side explains how the current Japan road rules would enter the pack.",
+    inspectorEmptyTitle: "Waiting for real road packs",
+    inspectorEmptyBody: "Once roads and road_labels Japan packs are wired, this side will switch to real segment and ref inspection.",
+    supportsDetailedControls: true,
   },
   {
     id: "rail",
     label: "Rail",
-    title: "Rail workbench shell",
-    lensTitle: "Rail network lens",
-    lensBody: "Rail stays visible here as a separate family shell so route continuity and logistics semantics can be discussed without leaking into the road model.",
-    lensNext: "Rail should follow after road so shared preview and country handoff patterns can be reused rather than invented twice.",
-    previewTitle: "Static rail carrier",
-    previewCaption: "The two-frame Japan carrier is now real, but no rail overlay geometry is fabricated here before rail-specific schema and rendering rules exist.",
-    inspectorTitle: "Rail controls reserved",
-    inspectorBody: "This panel stays intentionally empty until real rail attributes and preview controls are defined.",
-    inspectorEmptyTitle: "Awaiting rail schema",
-    inspectorEmptyBody: "Once wired, this side will expose route class, visibility, and review controls for rail.",
+    title: "Rail workbench",
+    lensTitle: "Japan rail adapter",
+    /*
+    lensBody: "Japan rail 首版固定为官方 active 主网络，加 OSM lifecycle / gap patch。",
+    lensNext: "只做 railways 和 major stations，不碰全量站点、routing、时序运行图和复杂运营指标。",
+    previewTitle: "Rail carrier",
+    previewCaption: "Japan carrier 已就位。rail 的真实 overlay 还没接线，所以这里先把状态、等级和 station 规则压实。",
+    inspectorTitle: "Rail inspector",
+    inspectorBody: "当前还没有真实 rail 要素可选。右侧先解释你现在这套 Japan rail 规则会怎样落到官方源和 OSM patch 上。",
+    inspectorEmptyTitle: "Waiting for real rail packs",
+    inspectorEmptyBody: "railways 和 rail_stations_major Japan packs 接入后，这里会显示真实线路和主要车站解释。",
+    supportsDetailedControls: true,
+    */
+    lensBody: "Japan rail baseline uses the official active network with OSM lifecycle and gap patches.",
+    lensNext: "Scope stays on railways and major stations. No full station product, routing, timetable, or heavy operations metrics.",
+    previewTitle: "Rail carrier",
+    previewCaption: "The Japan carrier is ready. Real rail overlays are not wired yet, so this pass locks status, class, and major-station rules.",
+    inspectorTitle: "Rail inspector",
+    inspectorBody: "No real rail feature is selectable yet. This side explains how the current Japan rail rules reconcile official data and OSM patches.",
+    inspectorEmptyTitle: "Waiting for real rail packs",
+    inspectorEmptyBody: "Once railways and rail_stations_major Japan packs are wired, this side will switch to real line and station inspection.",
+    supportsDetailedControls: true,
   },
   {
     id: "airport",
@@ -158,9 +182,167 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
 
 const TRANSPORT_WORKBENCH_FAMILY_IDS = new Set(TRANSPORT_WORKBENCH_FAMILIES.map((family) => family.id));
 
+const ROAD_CLASS_OPTIONS = [
+  { value: "motorway", label: "Motorway" },
+  { value: "trunk", label: "Trunk" },
+  { value: "primary", label: "Primary" },
+];
+
+const RAIL_STATUS_OPTIONS = [
+  { value: "active", label: "Active" },
+  { value: "disused", label: "Disused" },
+  { value: "abandoned", label: "Abandoned" },
+  { value: "construction", label: "Construction" },
+];
+
+const RAIL_CLASS_OPTIONS = [
+  { value: "high_speed", label: "High speed" },
+  { value: "trunk", label: "Trunk" },
+  { value: "branch", label: "Branch" },
+  { value: "service", label: "Service" },
+];
+
+const TRANSPORT_WORKBENCH_DEFAULT_CONFIGS = {
+  road: {
+    roadClass: ["motorway", "trunk", "primary"],
+    excludeLinks: true,
+    excludeServiceLike: true,
+    zoomGate: "balanced",
+    motorwayIdentitySource: "osm_plus_n06",
+    preferOfficialRef: true,
+    preferOfficialNameWhenPresent: true,
+    showSourceConflicts: false,
+    mergeContiguousSegments: true,
+    minProjectedSegmentPx: 6,
+    suppressShortPrimarySegments: true,
+    denseMetroGuard: "balanced",
+    showRefs: true,
+    refClasses: ["motorway", "trunk"],
+    labelDensityPreset: "balanced",
+    allowPrimaryRefsAtHighZoom: true,
+    strokePreset: "corridor",
+    selectedEmphasis: "outline",
+    baseOpacity: 88,
+    refOpacity: 82,
+  },
+  rail: {
+    status: ["active"],
+    class: ["high_speed", "trunk", "branch"],
+    showServiceAtHighZoomOnly: true,
+    showOsmPatchSegments: true,
+    officialActiveNetworkLocked: true,
+    allowOsmActiveGapFill: false,
+    strictDedupMode: "strict",
+    showReconciliationConflicts: false,
+    showMajorStations: true,
+    importanceThreshold: "regional_core",
+    singlePrimaryStationPerCity: true,
+    showStationLabels: true,
+    statusEncoding: "line_style",
+    showBranchAtCurrentZoom: true,
+    showServiceLines: false,
+    stationSymbolPreset: "dot_ring",
+    lineOpacity: 92,
+    stationOpacity: 86,
+    inactiveFadeStrength: 72,
+  },
+};
+
+const TRANSPORT_WORKBENCH_BASELINE_CONFIGS = {
+  road: JSON.parse(JSON.stringify(TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road)),
+  rail: JSON.parse(JSON.stringify(TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.rail)),
+};
+
+const TRANSPORT_WORKBENCH_SECTION_DEFAULTS = {
+  road: {
+    inclusion: true,
+    source_hardening: true,
+    noise_control: false,
+    labels: false,
+    style: false,
+    diagnostics: false,
+  },
+  rail: {
+    network_scope: true,
+    source_reconciliation: true,
+    major_stations: false,
+    line_presentation: false,
+    style: false,
+    diagnostics: false,
+  },
+};
+
+const TRANSPORT_WORKBENCH_INLINE_HELP_SECTIONS = {
+  road: new Set(["source_hardening", "noise_control"]),
+  rail: new Set(["source_reconciliation", "line_presentation"]),
+};
+
 function normalizeTransportWorkbenchFamily(value) {
   const normalized = String(value || "").trim().toLowerCase();
   return TRANSPORT_WORKBENCH_FAMILY_IDS.has(normalized) ? normalized : "road";
+}
+
+function normalizeTransportWorkbenchEnum(value, allowedValues, fallback) {
+  const normalized = String(value || "").trim();
+  return allowedValues.includes(normalized) ? normalized : fallback;
+}
+
+function normalizeTransportWorkbenchMulti(value, allowedValues, fallbackValues) {
+  const next = Array.isArray(value)
+    ? value.map((entry) => String(entry || "").trim()).filter((entry) => allowedValues.includes(entry))
+    : [];
+  return next.length ? Array.from(new Set(next)) : [...fallbackValues];
+}
+
+function normalizeRoadTransportWorkbenchConfig(value) {
+  const source = value && typeof value === "object" ? value : {};
+  return {
+    roadClass: normalizeTransportWorkbenchMulti(source.roadClass, ROAD_CLASS_OPTIONS.map((option) => option.value), TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.roadClass),
+    excludeLinks: source.excludeLinks !== false,
+    excludeServiceLike: source.excludeServiceLike !== false,
+    zoomGate: normalizeTransportWorkbenchEnum(source.zoomGate, ["strict", "balanced", "loose"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.zoomGate),
+    motorwayIdentitySource: normalizeTransportWorkbenchEnum(source.motorwayIdentitySource, ["osm_plus_n06", "osm_only"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.motorwayIdentitySource),
+    preferOfficialRef: source.preferOfficialRef !== false,
+    preferOfficialNameWhenPresent: source.preferOfficialNameWhenPresent !== false,
+    showSourceConflicts: !!source.showSourceConflicts,
+    mergeContiguousSegments: source.mergeContiguousSegments !== false,
+    minProjectedSegmentPx: Math.max(2, Math.min(16, Number(source.minProjectedSegmentPx) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.minProjectedSegmentPx)),
+    suppressShortPrimarySegments: source.suppressShortPrimarySegments !== false,
+    denseMetroGuard: normalizeTransportWorkbenchEnum(source.denseMetroGuard, ["light", "balanced", "strict"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.denseMetroGuard),
+    showRefs: source.showRefs !== false,
+    refClasses: normalizeTransportWorkbenchMulti(source.refClasses, ROAD_CLASS_OPTIONS.map((option) => option.value), TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.refClasses),
+    labelDensityPreset: normalizeTransportWorkbenchEnum(source.labelDensityPreset, ["sparse", "balanced", "dense"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.labelDensityPreset),
+    allowPrimaryRefsAtHighZoom: source.allowPrimaryRefsAtHighZoom !== false,
+    strokePreset: normalizeTransportWorkbenchEnum(source.strokePreset, ["corridor", "review", "quiet"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.strokePreset),
+    selectedEmphasis: normalizeTransportWorkbenchEnum(source.selectedEmphasis, ["outline", "glow", "mute_others"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.selectedEmphasis),
+    baseOpacity: Math.max(40, Math.min(100, Number(source.baseOpacity) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.baseOpacity)),
+    refOpacity: Math.max(30, Math.min(100, Number(source.refOpacity) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road.refOpacity)),
+  };
+}
+
+function normalizeRailTransportWorkbenchConfig(value) {
+  const source = value && typeof value === "object" ? value : {};
+  return {
+    status: normalizeTransportWorkbenchMulti(source.status, RAIL_STATUS_OPTIONS.map((option) => option.value), TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.rail.status),
+    class: normalizeTransportWorkbenchMulti(source.class, RAIL_CLASS_OPTIONS.map((option) => option.value), TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.rail.class),
+    showServiceAtHighZoomOnly: source.showServiceAtHighZoomOnly !== false,
+    showOsmPatchSegments: source.showOsmPatchSegments !== false,
+    officialActiveNetworkLocked: source.officialActiveNetworkLocked !== false,
+    allowOsmActiveGapFill: !!source.allowOsmActiveGapFill,
+    strictDedupMode: normalizeTransportWorkbenchEnum(source.strictDedupMode, ["strict", "strict_plus_name"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.rail.strictDedupMode),
+    showReconciliationConflicts: !!source.showReconciliationConflicts,
+    showMajorStations: source.showMajorStations !== false,
+    importanceThreshold: normalizeTransportWorkbenchEnum(source.importanceThreshold, ["capital_core", "regional_core", "broad_major"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.rail.importanceThreshold),
+    singlePrimaryStationPerCity: source.singlePrimaryStationPerCity !== false,
+    showStationLabels: source.showStationLabels !== false,
+    statusEncoding: normalizeTransportWorkbenchEnum(source.statusEncoding, ["line_style", "line_style_plus_hue"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.rail.statusEncoding),
+    showBranchAtCurrentZoom: source.showBranchAtCurrentZoom !== false,
+    showServiceLines: !!source.showServiceLines,
+    stationSymbolPreset: normalizeTransportWorkbenchEnum(source.stationSymbolPreset, ["dot_ring", "solid_dot", "quiet_square"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.rail.stationSymbolPreset),
+    lineOpacity: Math.max(40, Math.min(100, Number(source.lineOpacity) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.rail.lineOpacity)),
+    stationOpacity: Math.max(35, Math.min(100, Number(source.stationOpacity) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.rail.stationOpacity)),
+    inactiveFadeStrength: Math.max(0, Math.min(100, Number(source.inactiveFadeStrength) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.rail.inactiveFadeStrength)),
+  };
 }
 
 function ensureTransportWorkbenchUiState() {
@@ -171,7 +353,7 @@ function ensureTransportWorkbenchUiState() {
   state.transportWorkbenchUi.activeFamily = normalizeTransportWorkbenchFamily(state.transportWorkbenchUi.activeFamily);
   state.transportWorkbenchUi.sampleCountry = "Japan";
   state.transportWorkbenchUi.previewMode = "bounded_zoom_pan";
-  state.transportWorkbenchUi.previewAssetId = "japan_carrier_v2";
+  state.transportWorkbenchUi.previewAssetId = "japan_carrier_v3";
   state.transportWorkbenchUi.previewInteractionMode = "bounded_zoom_pan";
   if (!state.transportWorkbenchUi.previewCamera || typeof state.transportWorkbenchUi.previewCamera !== "object") {
     state.transportWorkbenchUi.previewCamera = {};
@@ -179,11 +361,192 @@ function ensureTransportWorkbenchUiState() {
   state.transportWorkbenchUi.previewCamera.scale = Number(state.transportWorkbenchUi.previewCamera.scale) || 1;
   state.transportWorkbenchUi.previewCamera.translateX = Number(state.transportWorkbenchUi.previewCamera.translateX) || 0;
   state.transportWorkbenchUi.previewCamera.translateY = Number(state.transportWorkbenchUi.previewCamera.translateY) || 0;
-  state.transportWorkbenchUi.shellPhase = "no-real-params";
+  state.transportWorkbenchUi.compareHeld = !!state.transportWorkbenchUi.compareHeld;
+  if (!state.transportWorkbenchUi.familyConfigs || typeof state.transportWorkbenchUi.familyConfigs !== "object") {
+    state.transportWorkbenchUi.familyConfigs = {};
+  }
+  state.transportWorkbenchUi.familyConfigs.road = normalizeRoadTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.road);
+  state.transportWorkbenchUi.familyConfigs.rail = normalizeRailTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.rail);
+  if (!state.transportWorkbenchUi.sectionOpen || typeof state.transportWorkbenchUi.sectionOpen !== "object") {
+    state.transportWorkbenchUi.sectionOpen = {};
+  }
+  ["road", "rail"].forEach((familyId) => {
+    const defaults = TRANSPORT_WORKBENCH_SECTION_DEFAULTS[familyId];
+    const source = state.transportWorkbenchUi.sectionOpen[familyId] && typeof state.transportWorkbenchUi.sectionOpen[familyId] === "object"
+      ? state.transportWorkbenchUi.sectionOpen[familyId]
+      : {};
+    state.transportWorkbenchUi.sectionOpen[familyId] = Object.fromEntries(
+      Object.entries(defaults).map(([sectionKey, defaultValue]) => [sectionKey, source[sectionKey] !== undefined ? !!source[sectionKey] : defaultValue])
+    );
+  });
+  state.transportWorkbenchUi.shellPhase = "japan-road-rail-spec";
   state.transportWorkbenchUi.restoreLeftDrawer = !!state.transportWorkbenchUi.restoreLeftDrawer;
   state.transportWorkbenchUi.restoreRightDrawer = !!state.transportWorkbenchUi.restoreRightDrawer;
   return state.transportWorkbenchUi;
 }
+
+function resetTransportWorkbenchSectionState() {
+  ensureTransportWorkbenchUiState();
+  state.transportWorkbenchUi.sectionOpen = {
+    road: { ...TRANSPORT_WORKBENCH_SECTION_DEFAULTS.road },
+    rail: { ...TRANSPORT_WORKBENCH_SECTION_DEFAULTS.rail },
+  };
+}
+
+const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = {
+  road: [
+    {
+      key: "inclusion",
+      title: "Inclusion",
+      description: "Decide what enters the Japan road pack before any style rule runs.",
+      controls: [
+        { type: "multi", key: "roadClass", label: "Road classes", options: ROAD_CLASS_OPTIONS, description: "Pilot scope stays on motorway, trunk, and primary." },
+        { type: "toggle", key: "excludeLinks", label: "Exclude *_link", description: "Keep motorway_link, trunk_link, and primary_link out by default." },
+        { type: "toggle", key: "excludeServiceLike", label: "Exclude service-like roads", description: "Keep service, residential, and track out of the first pack." },
+        { type: "select", key: "zoomGate", label: "Zoom gate", description: "Controls low, mid, and high-zoom reveal behavior.", options: [
+          { value: "strict", label: "Strict corridor" },
+          { value: "balanced", label: "Balanced" },
+          { value: "loose", label: "Loose reveal" },
+        ] },
+      ],
+    },
+    {
+      key: "source_hardening",
+      title: "Source Hardening",
+      description: "Bind OSM geometry and N06 motorway hardening into one Japan adapter.",
+      controls: [
+        { type: "select", key: "motorwayIdentitySource", label: "Motorway identity source", description: "Japan baseline defaults to OSM geometry plus N06 hardening.", options: [
+          { value: "osm_plus_n06", label: "OSM + N06 hardening" },
+          { value: "osm_only", label: "OSM only" },
+        ] },
+        { type: "toggle", key: "preferOfficialRef", label: "Prefer official ref", description: "Use official motorway refs when they exist." },
+        { type: "toggle", key: "preferOfficialNameWhenPresent", label: "Prefer official name", description: "Use official names when source values disagree." },
+        { type: "toggle", key: "showSourceConflicts", label: "Show source conflicts", description: "Expose OSM versus N06 conflicts instead of hiding them." },
+      ],
+    },
+    {
+      key: "noise_control",
+      title: "Noise Control",
+      description: "Use explicit rules. Do not lean on fuzzy post-fix cleanup.",
+      controls: [
+        { type: "toggle", key: "mergeContiguousSegments", label: "Merge contiguous segments", description: "Safely merge same-class runs before rendering." },
+        { type: "range", key: "minProjectedSegmentPx", label: "Min projected segment", description: "Very short projected segments drop out to reduce spark noise.", min: 2, max: 16, step: 1, unit: "px" },
+        { type: "toggle", key: "suppressShortPrimarySegments", label: "Suppress short primary", description: "Hide extra-short primary stubs in the first pass." },
+        { type: "select", key: "denseMetroGuard", label: "Dense metro guard", description: "Extra denoise strength for Tokyo and Osaka density.", options: [
+          { value: "light", label: "Light" },
+          { value: "balanced", label: "Balanced" },
+          { value: "strict", label: "Strict" },
+        ] },
+      ],
+    },
+    {
+      key: "labels",
+      title: "Labels",
+      description: "road_labels remains a separate pack focused on motorway and national refs.",
+      controls: [
+        { type: "toggle", key: "showRefs", label: "Show refs", description: "Turns road_labels on or off." },
+        { type: "multi", key: "refClasses", label: "Ref classes", options: ROAD_CLASS_OPTIONS, description: "Default refs stay on motorway and trunk until higher zoom." },
+        { type: "select", key: "labelDensityPreset", label: "Label density", description: "Controls how aggressively refs fill the corridor.", options: [
+          { value: "sparse", label: "Sparse" },
+          { value: "balanced", label: "Balanced" },
+          { value: "dense", label: "Dense" },
+        ] },
+        { type: "toggle", key: "allowPrimaryRefsAtHighZoom", label: "Allow primary refs at high zoom", description: "Primary refs stay gated until closer inspection." },
+      ],
+    },
+    {
+      key: "style",
+      title: "Style",
+      description: "These controls style only the transport overlay shell, not the carrier base map.",
+      controls: [
+        { type: "select", key: "strokePreset", label: "Stroke preset", description: "Sets motorway, trunk, and primary emphasis.", options: [
+          { value: "corridor", label: "Corridor" },
+          { value: "review", label: "Review" },
+          { value: "quiet", label: "Quiet" },
+        ] },
+        { type: "select", key: "selectedEmphasis", label: "Selected emphasis", description: "How a chosen segment should stand out later.", options: [
+          { value: "outline", label: "Outline" },
+          { value: "glow", label: "Glow" },
+          { value: "mute_others", label: "Mute others" },
+        ] },
+        { type: "range", key: "baseOpacity", label: "Base opacity", description: "Overall road line opacity.", min: 40, max: 100, step: 1, unit: "%" },
+        { type: "range", key: "refOpacity", label: "Ref opacity", description: "Overall road_labels opacity.", min: 30, max: 100, step: 1, unit: "%" },
+      ],
+    },
+    { key: "diagnostics", title: "Diagnostics", description: "Explain rule intent only. Do not fabricate pack statistics.", kind: "diagnostics" },
+  ],
+  rail: [
+    {
+      key: "network_scope",
+      title: "Network Scope",
+      description: "Lock what enters the Japan rail pack before render style.",
+      controls: [
+        { type: "multi", key: "status", label: "Statuses", options: RAIL_STATUS_OPTIONS, description: "Japan rail baseline opens only active by default." },
+        { type: "multi", key: "class", label: "Classes", options: RAIL_CLASS_OPTIONS, description: "Low zoom should favor high_speed and trunk." },
+        { type: "toggle", key: "showServiceAtHighZoomOnly", label: "Service only at high zoom", description: "Keep service lines from dominating national views." },
+        { type: "toggle", key: "showOsmPatchSegments", label: "Show OSM patch segments", description: "Display only explicit lifecycle or gap patches." },
+      ],
+    },
+    {
+      key: "source_reconciliation",
+      title: "Source Reconciliation",
+      description: "Official active network stays locked. OSM only patches lifecycle and gaps.",
+      controls: [
+        { type: "toggle", key: "officialActiveNetworkLocked", label: "Official active network locked", description: "Official Japan source defines active network boundaries." },
+        { type: "toggle", key: "allowOsmActiveGapFill", label: "Allow OSM active gap fill", description: "Permit OSM to fill only obvious official gaps." },
+        { type: "select", key: "strictDedupMode", label: "Dedup mode", description: "Keep reconciliation strict rather than heuristic.", options: [
+          { value: "strict", label: "Strict" },
+          { value: "strict_plus_name", label: "Strict + name" },
+        ] },
+        { type: "toggle", key: "showReconciliationConflicts", label: "Show reconciliation conflicts", description: "Expose official-versus-OSM conflicts instead of hiding them." },
+      ],
+    },
+    {
+      key: "major_stations",
+      title: "Major Stations",
+      description: "Only major stations are in scope, not a full station product.",
+      controls: [
+        { type: "toggle", key: "showMajorStations", label: "Show major stations", description: "Turn the major station layer on or off." },
+        { type: "select", key: "importanceThreshold", label: "Importance threshold", description: "Controls the lowest station importance that survives.", options: [
+          { value: "capital_core", label: "Capital core" },
+          { value: "regional_core", label: "Regional core" },
+          { value: "broad_major", label: "Broad major" },
+        ] },
+        { type: "toggle", key: "singlePrimaryStationPerCity", label: "Single primary station per city", description: "Keep one main station per city by default." },
+        { type: "toggle", key: "showStationLabels", label: "Show station labels", description: "Expose names only for retained major stations." },
+      ],
+    },
+    {
+      key: "line_presentation",
+      title: "Line Presentation",
+      description: "Differentiate lifecycle by line style, brightness, and opacity first.",
+      controls: [
+        { type: "select", key: "statusEncoding", label: "Status encoding", description: "How inactive lines fade away in preview.", options: [
+          { value: "line_style", label: "Line style" },
+          { value: "line_style_plus_hue", label: "Line style + hue" },
+        ] },
+        { type: "toggle", key: "showBranchAtCurrentZoom", label: "Show branch at current zoom", description: "Whether branch lines participate at the current zoom gate." },
+        { type: "toggle", key: "showServiceLines", label: "Show service lines", description: "Keep service lines off unless deliberately reviewing them." },
+        { type: "select", key: "stationSymbolPreset", label: "Station symbol", description: "Symbol treatment for major stations.", options: [
+          { value: "dot_ring", label: "Dot ring" },
+          { value: "solid_dot", label: "Solid dot" },
+          { value: "quiet_square", label: "Quiet square" },
+        ] },
+      ],
+    },
+    {
+      key: "style",
+      title: "Style",
+      description: "These controls style only the future rail overlay shell.",
+      controls: [
+        { type: "range", key: "lineOpacity", label: "Line opacity", description: "Overall rail line opacity.", min: 40, max: 100, step: 1, unit: "%" },
+        { type: "range", key: "stationOpacity", label: "Station opacity", description: "Overall major-station opacity.", min: 35, max: 100, step: 1, unit: "%" },
+        { type: "range", key: "inactiveFadeStrength", label: "Inactive fade strength", description: "How strongly inactive lifecycle states fade.", min: 0, max: 100, step: 1, unit: "%" },
+      ],
+    },
+    { key: "diagnostics", title: "Diagnostics", description: "Explain reconciliation intent only. Do not fabricate pack statistics.", kind: "diagnostics" },
+  ],
+};
 
 function renderPalette(themeName) {
   const paletteGrid = document.getElementById("paletteGrid");
@@ -416,13 +779,13 @@ function initToolbar({ render } = {}) {
   const transportWorkbenchPanel = document.getElementById("transportWorkbenchPanel");
   const transportWorkbenchInfoBtn = document.getElementById("transportWorkbenchInfoBtn");
   const transportWorkbenchInfoPopover = document.getElementById("transportWorkbenchInfoPopover");
+  const transportWorkbenchInfoBody = document.getElementById("transportWorkbenchInfoBody");
   const transportWorkbenchCloseBtn = document.getElementById("transportWorkbenchCloseBtn");
   const transportWorkbenchResetBtn = document.getElementById("transportWorkbenchResetBtn");
   const transportWorkbenchApplyBtn = document.getElementById("transportWorkbenchApplyBtn");
   const transportWorkbenchTitle = document.getElementById("transportWorkbenchTitle");
   const transportWorkbenchLensTitle = document.getElementById("transportWorkbenchLensTitle");
-  const transportWorkbenchLensBody = document.getElementById("transportWorkbenchLensBody");
-  const transportWorkbenchLensNext = document.getElementById("transportWorkbenchLensNext");
+  const transportWorkbenchLensSections = document.getElementById("transportWorkbenchLensSections");
   const transportWorkbenchFamilyStatus = document.getElementById("transportWorkbenchFamilyStatus");
   const transportWorkbenchCountryStatus = document.getElementById("transportWorkbenchCountryStatus");
   const transportWorkbenchPreviewMode = document.getElementById("transportWorkbenchPreviewMode");
@@ -430,9 +793,10 @@ function initToolbar({ render } = {}) {
   const transportWorkbenchPreviewCountryBadge = document.getElementById("transportWorkbenchPreviewCountryBadge");
   const transportWorkbenchCarrierMount = document.getElementById("transportWorkbenchCarrierMount");
   const transportWorkbenchPreviewFamilyBadge = document.getElementById("transportWorkbenchPreviewFamilyBadge");
-  const transportWorkbenchPreviewCaption = document.getElementById("transportWorkbenchPreviewCaption");
+  const transportWorkbenchCompareBtn = document.getElementById("transportWorkbenchCompareBtn");
+  const transportWorkbenchCompareStatus = document.getElementById("transportWorkbenchCompareStatus");
   const transportWorkbenchInspectorTitle = document.getElementById("transportWorkbenchInspectorTitle");
-  const transportWorkbenchInspectorBody = document.getElementById("transportWorkbenchInspectorBody");
+  const transportWorkbenchInspectorDetails = document.getElementById("transportWorkbenchInspectorDetails");
   const transportWorkbenchInspectorEmptyTitle = document.getElementById("transportWorkbenchInspectorEmptyTitle");
   const transportWorkbenchInspectorEmptyBody = document.getElementById("transportWorkbenchInspectorEmptyBody");
   const transportWorkbenchFamilyTabs = Array.from(document.querySelectorAll(".transport-workbench-family-tab"));
@@ -733,24 +1097,402 @@ function initToolbar({ render } = {}) {
     }
   };
 
-  const toggleTransportWorkbenchInfoPopover = () => {
+  const renderTransportWorkbenchInfoPopover = (family, { focusSectionKey = null } = {}) => {
+    if (!transportWorkbenchInfoBody) return;
+    transportWorkbenchInfoBody.replaceChildren();
+    const sectionGlossary = TRANSPORT_WORKBENCH_CONTROL_SCHEMAS[family.id] || [];
+
+    const blocks = [
+      {
+        title: "Overview",
+        body: family.lensBody,
+      },
+      {
+        title: "Baseline",
+        body: family.lensNext,
+      },
+      family.supportsDetailedControls
+        ? {
+          title: "Compare",
+          body: `Hold to Compare Baseline 只用于对照当前 baseline，不会改写你正在调的 ${family.label.toLowerCase()} 参数。`,
+        }
+        : {
+          title: "Status",
+          body: `${family.label} 目前还是保留位，等真实 schema 接线后才会开放细项调试。`,
+        },
+    ];
+
+    blocks.forEach((block) => {
+      const node = document.createElement("section");
+      node.className = "transport-workbench-info-block";
+      const title = document.createElement("div");
+      title.className = "transport-workbench-info-subtitle";
+      title.textContent = block.title;
+      const body = document.createElement("p");
+      body.className = "transport-workbench-info-text";
+      body.textContent = block.body;
+      node.append(title, body);
+      transportWorkbenchInfoBody.appendChild(node);
+    });
+
+    if (!sectionGlossary.length) return;
+    const glossary = document.createElement("section");
+    glossary.className = "transport-workbench-info-block";
+    const glossaryTitle = document.createElement("div");
+    glossaryTitle.className = "transport-workbench-info-subtitle";
+    glossaryTitle.textContent = "Section glossary";
+    glossary.appendChild(glossaryTitle);
+
+    sectionGlossary.forEach((section) => {
+      const item = document.createElement("div");
+      item.className = "transport-workbench-info-item";
+      item.id = `transportWorkbenchInfoSection-${family.id}-${section.key}`;
+      if (section.key === focusSectionKey) {
+        item.classList.add("is-focus-target");
+      }
+      const title = document.createElement("div");
+      title.className = "transport-workbench-info-item-title";
+      title.textContent = section.title;
+      const body = document.createElement("p");
+      body.className = "transport-workbench-info-text";
+      body.textContent = section.description;
+      item.append(title, body);
+      glossary.appendChild(item);
+    });
+    transportWorkbenchInfoBody.appendChild(glossary);
+  };
+
+  const toggleTransportWorkbenchInfoPopover = ({ focusSectionKey = null } = {}) => {
     if (!transportWorkbenchInfoPopover) return;
     const willOpen = transportWorkbenchInfoPopover.classList.contains("hidden");
-    if (!willOpen) {
+    if (!willOpen && !focusSectionKey) {
       closeTransportWorkbenchInfoPopover({ restoreFocus: true });
       return;
     }
+    renderTransportWorkbenchInfoPopover(getTransportWorkbenchFamilyMeta(), { focusSectionKey });
     rememberOverlayTrigger(transportWorkbenchInfoPopover, transportWorkbenchInfoBtn);
     transportWorkbenchInfoPopover.classList.remove("hidden");
     transportWorkbenchInfoPopover.setAttribute("aria-hidden", "false");
     transportWorkbenchInfoBtn?.setAttribute("aria-expanded", "true");
     focusOverlaySurface(transportWorkbenchInfoPopover);
+    if (focusSectionKey && transportWorkbenchInfoBody) {
+      const focusTarget = transportWorkbenchInfoBody.querySelector(`#transportWorkbenchInfoSection-${getTransportWorkbenchFamilyMeta().id}-${focusSectionKey}`);
+      focusTarget?.scrollIntoView({ block: "nearest" });
+    }
   };
 
   const getTransportWorkbenchFamilyMeta = () => {
     ensureTransportWorkbenchUiState();
     const activeFamily = normalizeTransportWorkbenchFamily(state.transportWorkbenchUi.activeFamily);
     return TRANSPORT_WORKBENCH_FAMILIES.find((family) => family.id === activeFamily) || TRANSPORT_WORKBENCH_FAMILIES[0];
+  };
+
+  const getTransportWorkbenchWorkingConfig = (familyId, { baseline = false } = {}) => {
+    ensureTransportWorkbenchUiState();
+    if (baseline) {
+      return TRANSPORT_WORKBENCH_BASELINE_CONFIGS[familyId]
+        ? JSON.parse(JSON.stringify(TRANSPORT_WORKBENCH_BASELINE_CONFIGS[familyId]))
+        : null;
+    }
+    if (familyId === "road") return state.transportWorkbenchUi.familyConfigs.road;
+    if (familyId === "rail") return state.transportWorkbenchUi.familyConfigs.rail;
+    return null;
+  };
+
+  const formatTransportWorkbenchOptionLabels = (values, options) => {
+    const labelByValue = new Map((options || []).map((option) => [option.value, option.label]));
+    return (values || []).map((value) => labelByValue.get(value) || value).join(", ");
+  };
+
+  const setTransportWorkbenchCompareHeld = (nextHeld) => {
+    ensureTransportWorkbenchUiState();
+    const family = getTransportWorkbenchFamilyMeta();
+    if (!family.supportsDetailedControls) return;
+    const normalized = !!nextHeld;
+    if (state.transportWorkbenchUi.compareHeld === normalized) return;
+    state.transportWorkbenchUi.compareHeld = normalized;
+    renderTransportWorkbenchUi();
+  };
+
+  const updateTransportWorkbenchFamilyConfig = (familyId, key, nextValue, { appendValue = null } = {}) => {
+    ensureTransportWorkbenchUiState();
+    const family = TRANSPORT_WORKBENCH_FAMILIES.find((entry) => entry.id === familyId);
+    if (!family?.supportsDetailedControls || state.transportWorkbenchUi.compareHeld) return;
+    const current = JSON.parse(JSON.stringify(getTransportWorkbenchWorkingConfig(familyId) || {}));
+    if (appendValue !== null) {
+      const currentValues = Array.isArray(current[key]) ? [...current[key]] : [];
+      const index = currentValues.indexOf(appendValue);
+      if (nextValue) {
+        if (index === -1) currentValues.push(appendValue);
+      } else if (index !== -1) {
+        currentValues.splice(index, 1);
+      }
+      current[key] = currentValues;
+    } else {
+      current[key] = nextValue;
+    }
+    if (familyId === "road") {
+      state.transportWorkbenchUi.familyConfigs.road = normalizeRoadTransportWorkbenchConfig(current);
+    } else if (familyId === "rail") {
+      state.transportWorkbenchUi.familyConfigs.rail = normalizeRailTransportWorkbenchConfig(current);
+    }
+    markDirty("transport-workbench-config");
+    renderTransportWorkbenchUi();
+  };
+
+  const toggleTransportWorkbenchSection = (familyId, sectionKey, nextOpen) => {
+    ensureTransportWorkbenchUiState();
+    if (!state.transportWorkbenchUi.sectionOpen[familyId]) {
+      state.transportWorkbenchUi.sectionOpen[familyId] = {};
+    }
+    state.transportWorkbenchUi.sectionOpen[familyId][sectionKey] = !!nextOpen;
+  };
+
+  const createTransportWorkbenchInspectorRow = (label, value) => {
+    const row = document.createElement("div");
+    row.className = "transport-workbench-inspector-row";
+    const labelNode = document.createElement("span");
+    labelNode.className = "transport-workbench-inspector-key";
+    labelNode.textContent = label;
+    const valueNode = document.createElement("span");
+    valueNode.className = "transport-workbench-inspector-value";
+    valueNode.textContent = value;
+    row.appendChild(labelNode);
+    row.appendChild(valueNode);
+    return row;
+  };
+
+  const buildTransportWorkbenchDiagnosticRows = (familyId, config) => {
+    if (familyId === "road") {
+      return [
+        ["Data intake", `${formatTransportWorkbenchOptionLabels(config.roadClass, ROAD_CLASS_OPTIONS)} only`],
+        ["Source recipe", config.motorwayIdentitySource === "osm_only" ? "OSM only" : "OSM + N06 hardening"],
+        ["Label scope", config.showRefs ? `${formatTransportWorkbenchOptionLabels(config.refClasses, ROAD_CLASS_OPTIONS)} refs` : "Refs hidden"],
+        ["Noise gate", `${config.denseMetroGuard} metro guard / ${config.minProjectedSegmentPx}px min segment`],
+      ];
+    }
+    if (familyId === "rail") {
+      return [
+        ["Network scope", formatTransportWorkbenchOptionLabels(config.class, RAIL_CLASS_OPTIONS)],
+        ["Status scope", formatTransportWorkbenchOptionLabels(config.status, RAIL_STATUS_OPTIONS)],
+        ["Reconciliation", config.allowOsmActiveGapFill ? "Official active + OSM gap fill" : "Official active locked"],
+        ["Station policy", config.showMajorStations ? `${config.importanceThreshold} threshold` : "Major stations hidden"],
+      ];
+    }
+    return [];
+  };
+
+  const renderTransportWorkbenchDiagnosticsBody = (familyId, config) => {
+    const body = document.createElement("div");
+    body.className = "transport-workbench-section-body transport-workbench-section-body-diagnostics";
+    buildTransportWorkbenchDiagnosticRows(familyId, config).forEach(([label, value]) => {
+      body.appendChild(createTransportWorkbenchInspectorRow(label, value));
+    });
+    return body;
+  };
+
+  const createTransportWorkbenchSectionHelpButton = (familyId, section) => {
+    if (!TRANSPORT_WORKBENCH_INLINE_HELP_SECTIONS[familyId]?.has(section.key)) {
+      return null;
+    }
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "transport-workbench-section-help-btn";
+    button.textContent = "?";
+    button.setAttribute("aria-label", `Open ${section.title} help`);
+    button.setAttribute("title", `Open ${section.title} help`);
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleTransportWorkbenchInfoPopover({ focusSectionKey: section.key });
+    });
+    return button;
+  };
+
+  const renderTransportWorkbenchControl = (familyId, control, config, compareHeld) => {
+    const field = document.createElement("div");
+    field.className = "transport-workbench-field";
+    const title = document.createElement("div");
+    title.className = "transport-workbench-field-title";
+    title.textContent = control.label;
+    field.appendChild(title);
+
+    if (control.type === "toggle") {
+      const label = document.createElement("label");
+      label.className = "transport-workbench-toggle";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = !!config[control.key];
+      input.disabled = compareHeld;
+      input.addEventListener("change", () => updateTransportWorkbenchFamilyConfig(familyId, control.key, input.checked));
+      const text = document.createElement("span");
+      text.textContent = input.checked ? "Enabled" : "Disabled";
+      input.addEventListener("change", () => {
+        text.textContent = input.checked ? "Enabled" : "Disabled";
+      });
+      label.appendChild(input);
+      label.appendChild(text);
+      field.appendChild(label);
+      return field;
+    }
+
+    if (control.type === "select") {
+      const select = document.createElement("select");
+      select.className = "select-input transport-workbench-select";
+      select.disabled = compareHeld;
+      (control.options || []).forEach((option) => {
+        const optionNode = document.createElement("option");
+        optionNode.value = option.value;
+        optionNode.textContent = option.label;
+        optionNode.selected = option.value === config[control.key];
+        select.appendChild(optionNode);
+      });
+      select.addEventListener("change", () => updateTransportWorkbenchFamilyConfig(familyId, control.key, select.value));
+      field.appendChild(select);
+      return field;
+    }
+
+    if (control.type === "range") {
+      const rangeRow = document.createElement("div");
+      rangeRow.className = "transport-workbench-range-row";
+      const range = document.createElement("input");
+      range.type = "range";
+      range.className = "transport-workbench-range";
+      range.min = String(control.min);
+      range.max = String(control.max);
+      range.step = String(control.step || 1);
+      range.value = String(config[control.key]);
+      range.disabled = compareHeld;
+      const value = document.createElement("span");
+      value.className = "transport-workbench-range-value";
+      value.textContent = `${config[control.key]}${control.unit || ""}`;
+      range.addEventListener("input", () => {
+        value.textContent = `${range.value}${control.unit || ""}`;
+      });
+      range.addEventListener("change", () => {
+        updateTransportWorkbenchFamilyConfig(familyId, control.key, Number(range.value));
+      });
+      rangeRow.appendChild(range);
+      rangeRow.appendChild(value);
+      field.appendChild(rangeRow);
+      return field;
+    }
+
+    if (control.type === "multi") {
+      const optionGrid = document.createElement("div");
+      optionGrid.className = "transport-workbench-option-grid";
+      (control.options || []).forEach((option) => {
+        const label = document.createElement("label");
+        label.className = "transport-workbench-option-pill";
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.checked = Array.isArray(config[control.key]) && config[control.key].includes(option.value);
+        input.disabled = compareHeld;
+        input.addEventListener("change", () => {
+          updateTransportWorkbenchFamilyConfig(familyId, control.key, input.checked, { appendValue: option.value });
+        });
+        const text = document.createElement("span");
+        text.textContent = option.label;
+        label.appendChild(input);
+        label.appendChild(text);
+        optionGrid.appendChild(label);
+      });
+      field.appendChild(optionGrid);
+      return field;
+    }
+
+    return field;
+  };
+
+  const renderTransportWorkbenchLensSections = (family, config, compareHeld) => {
+    if (!transportWorkbenchLensSections) return;
+    transportWorkbenchLensSections.replaceChildren();
+    if (!family.supportsDetailedControls) {
+      const card = document.createElement("div");
+      card.className = "transport-workbench-empty-card";
+      const title = document.createElement("div");
+      title.className = "transport-workbench-empty-title";
+      title.textContent = "Future family mapping";
+      const body = document.createElement("p");
+      body.className = "transport-workbench-empty-text";
+      body.textContent = "Road and rail are the only Japan families with detailed controls right now. This family keeps only its reserved shell.";
+      card.appendChild(title);
+      card.appendChild(body);
+      transportWorkbenchLensSections.appendChild(card);
+      return;
+    }
+    const sections = TRANSPORT_WORKBENCH_CONTROL_SCHEMAS[family.id] || [];
+    sections.forEach((section) => {
+      const details = document.createElement("details");
+      details.className = "transport-workbench-section";
+      details.open = !!state.transportWorkbenchUi.sectionOpen?.[family.id]?.[section.key];
+      details.addEventListener("toggle", () => {
+        toggleTransportWorkbenchSection(family.id, section.key, details.open);
+      });
+      const summary = document.createElement("summary");
+      summary.className = "transport-workbench-section-summary";
+      const heading = document.createElement("div");
+      heading.className = "transport-workbench-section-heading";
+      const title = document.createElement("div");
+      title.className = "transport-workbench-section-title";
+      title.textContent = section.title;
+      const actions = document.createElement("div");
+      actions.className = "transport-workbench-section-actions";
+      const helpButton = createTransportWorkbenchSectionHelpButton(family.id, section);
+      if (helpButton) {
+        actions.appendChild(helpButton);
+      }
+      const chevron = document.createElement("span");
+      chevron.className = "transport-workbench-section-chevron";
+      chevron.setAttribute("aria-hidden", "true");
+      chevron.textContent = "▾";
+      actions.appendChild(chevron);
+      heading.appendChild(title);
+      summary.appendChild(heading);
+      summary.appendChild(actions);
+      details.appendChild(summary);
+      const body = section.kind === "diagnostics"
+        ? renderTransportWorkbenchDiagnosticsBody(family.id, config)
+        : document.createElement("div");
+      if (section.kind !== "diagnostics") {
+        body.className = "transport-workbench-section-body";
+        (section.controls || []).forEach((control) => {
+          body.appendChild(renderTransportWorkbenchControl(family.id, control, config, compareHeld));
+        });
+      }
+      details.appendChild(body);
+      transportWorkbenchLensSections.appendChild(details);
+    });
+  };
+
+  const renderTransportWorkbenchInspector = (family, config, compareHeld) => {
+    if (transportWorkbenchInspectorDetails) {
+      transportWorkbenchInspectorDetails.replaceChildren();
+      const rows = family.id === "road"
+        ? [
+          ["Adapter", config.motorwayIdentitySource === "osm_only" ? "OSM only" : "OSM + N06 hardening"],
+          ["Classes", formatTransportWorkbenchOptionLabels(config.roadClass, ROAD_CLASS_OPTIONS)],
+          ["Labels", config.showRefs ? `${formatTransportWorkbenchOptionLabels(config.refClasses, ROAD_CLASS_OPTIONS)} refs` : "Hidden"],
+          ["Compare mode", compareHeld ? "Holding baseline" : "Working state"],
+          ["Pack status", "Waiting for roads + road_labels Japan packs"],
+        ]
+        : family.id === "rail"
+          ? [
+            ["Adapter", config.allowOsmActiveGapFill ? "Official active + OSM gap fill" : "Official active locked"],
+            ["Statuses", formatTransportWorkbenchOptionLabels(config.status, RAIL_STATUS_OPTIONS)],
+            ["Classes", formatTransportWorkbenchOptionLabels(config.class, RAIL_CLASS_OPTIONS)],
+            ["Stations", config.showMajorStations ? `${config.importanceThreshold} threshold` : "Hidden"],
+            ["Pack status", "Waiting for railways + rail_stations_major Japan packs"],
+          ]
+          : [
+            ["Adapter", "Reserved shell only"],
+            ["Compare mode", "No baseline yet"],
+            ["Pack status", `Waiting for ${family.label} Japan adapter`],
+          ];
+      rows.forEach(([label, value]) => {
+        transportWorkbenchInspectorDetails.appendChild(createTransportWorkbenchInspectorRow(label, value));
+      });
+    }
   };
 
   const renderTransportWorkbenchUi = () => {
@@ -768,6 +1510,8 @@ function initToolbar({ render } = {}) {
     const uiState = state.transportWorkbenchUi;
     const family = getTransportWorkbenchFamilyMeta();
     const isOpen = !!uiState.open;
+    const compareHeld = !!uiState.compareHeld && !!family.supportsDetailedControls;
+    const config = getTransportWorkbenchWorkingConfig(family.id, { baseline: compareHeld });
     document.body.classList.toggle("transport-workbench-open", isOpen);
     transportWorkbenchOverlay?.classList.toggle("hidden", !isOpen);
     transportWorkbenchOverlay?.setAttribute("aria-hidden", isOpen ? "false" : "true");
@@ -775,8 +1519,6 @@ function initToolbar({ render } = {}) {
     scenarioTransportWorkbenchBtn?.setAttribute("title", isOpen ? "Close transport workbench" : "Open transport workbench");
     transportWorkbenchTitle.textContent = family.title;
     transportWorkbenchLensTitle.textContent = family.lensTitle;
-    transportWorkbenchLensBody.textContent = family.lensBody;
-    transportWorkbenchLensNext.textContent = family.lensNext;
     transportWorkbenchFamilyStatus.textContent = family.label;
     transportWorkbenchCountryStatus.textContent = uiState.sampleCountry;
     transportWorkbenchPreviewMode.textContent = uiState.previewMode === "bounded_zoom_pan"
@@ -789,8 +1531,23 @@ function initToolbar({ render } = {}) {
     if (transportWorkbenchPreviewFamilyBadge) {
       transportWorkbenchPreviewFamilyBadge.textContent = family.label;
     }
-    if (transportWorkbenchPreviewCaption) {
-      transportWorkbenchPreviewCaption.textContent = family.previewCaption;
+    if (transportWorkbenchCompareBtn) {
+      transportWorkbenchCompareBtn.disabled = !family.supportsDetailedControls;
+      transportWorkbenchCompareBtn.setAttribute("aria-disabled", family.supportsDetailedControls ? "false" : "true");
+      transportWorkbenchCompareBtn.classList.toggle("is-held", compareHeld);
+      transportWorkbenchCompareBtn.textContent = family.supportsDetailedControls
+        ? "Hold to Compare Baseline"
+        : "Baseline compare unavailable";
+    }
+    if (transportWorkbenchCompareStatus) {
+      transportWorkbenchCompareStatus.textContent = !family.supportsDetailedControls
+        ? "Detailed baseline not defined for this family"
+        : compareHeld
+          ? "Showing baseline snapshot"
+          : "Current working state";
+    }
+    if (transportWorkbenchInfoPopover && !transportWorkbenchInfoPopover.classList.contains("hidden")) {
+      renderTransportWorkbenchInfoPopover(family);
     }
     setTransportWorkbenchCarrierFamily(family.id);
     if (isOpen && transportWorkbenchCarrierMount) {
@@ -799,10 +1556,11 @@ function initToolbar({ render } = {}) {
       });
       resizeTransportWorkbenchCarrier();
     }
+    renderTransportWorkbenchLensSections(family, config, compareHeld);
     transportWorkbenchInspectorTitle.textContent = family.inspectorTitle;
-    transportWorkbenchInspectorBody.textContent = family.inspectorBody;
     transportWorkbenchInspectorEmptyTitle.textContent = family.inspectorEmptyTitle;
     transportWorkbenchInspectorEmptyBody.textContent = family.inspectorEmptyBody;
+    renderTransportWorkbenchInspector(family, config, compareHeld);
     transportWorkbenchFamilyTabs.forEach((button) => {
       const isActive = String(button.dataset.transportFamily || "") === family.id;
       button.classList.toggle("is-active", isActive);
@@ -829,6 +1587,8 @@ function initToolbar({ render } = {}) {
     if (willOpen) {
       uiState.restoreLeftDrawer = document.body.classList.contains("left-drawer-open");
       uiState.restoreRightDrawer = document.body.classList.contains("right-drawer-open");
+      uiState.compareHeld = false;
+      resetTransportWorkbenchSectionState();
       state.toggleLeftPanelFn?.(false);
       state.toggleRightPanelFn?.(false);
       state.closeDockPopoverFn?.({ restoreFocus: false });
@@ -843,6 +1603,7 @@ function initToolbar({ render } = {}) {
       focusOverlaySurface(transportWorkbenchPanel);
       return;
     }
+    uiState.compareHeld = false;
     destroyTransportWorkbenchCarrier();
     closeTransportWorkbenchInfoPopover({ restoreFocus: false });
     state.toggleLeftPanelFn?.(uiState.restoreLeftDrawer);
@@ -3324,11 +4085,35 @@ function initToolbar({ render } = {}) {
     transportWorkbenchResetBtn.dataset.bound = "true";
   }
 
+  if (transportWorkbenchCompareBtn && !transportWorkbenchCompareBtn.dataset.bound) {
+    transportWorkbenchCompareBtn.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0) return;
+      setTransportWorkbenchCompareHeld(true);
+    });
+    ["pointerup", "pointercancel", "pointerleave", "blur"].forEach((eventName) => {
+      transportWorkbenchCompareBtn.addEventListener(eventName, () => {
+        setTransportWorkbenchCompareHeld(false);
+      });
+    });
+    transportWorkbenchCompareBtn.addEventListener("keydown", (event) => {
+      if (event.key !== " " && event.key !== "Enter") return;
+      event.preventDefault();
+      setTransportWorkbenchCompareHeld(true);
+    });
+    transportWorkbenchCompareBtn.addEventListener("keyup", (event) => {
+      if (event.key !== " " && event.key !== "Enter") return;
+      event.preventDefault();
+      setTransportWorkbenchCompareHeld(false);
+    });
+    transportWorkbenchCompareBtn.dataset.bound = "true";
+  }
+
   transportWorkbenchFamilyTabs.forEach((button) => {
     if (!button || button.dataset.bound === "true") return;
     button.addEventListener("click", () => {
       ensureTransportWorkbenchUiState();
       state.transportWorkbenchUi.activeFamily = normalizeTransportWorkbenchFamily(button.dataset.transportFamily || "road");
+      state.transportWorkbenchUi.compareHeld = false;
       renderTransportWorkbenchUi();
     });
     button.dataset.bound = "true";

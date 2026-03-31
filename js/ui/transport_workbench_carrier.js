@@ -7,9 +7,6 @@ const COLOR_TOKENS = {
   coastline: "#6c7b8a",
   shoreGlow: "rgba(255, 255, 255, 0.28)",
   prefecture: "rgba(113, 126, 142, 0.33)",
-  insetSea: "rgba(244, 248, 251, 0.92)",
-  insetBorder: "rgba(40, 59, 81, 0.16)",
-  insetShadow: "rgba(27, 45, 67, 0.08)",
 };
 
 let assetPromise = null;
@@ -25,8 +22,8 @@ let currentLodKey = "overview";
 let frameContexts = {};
 
 const overlayRoots = {
-  land: { main: null, hokkaidoInset: null },
-  sea: { main: null, hokkaidoInset: null },
+  land: { main: null },
+  sea: { main: null },
 };
 
 function getD3() {
@@ -260,29 +257,6 @@ function buildFrame(frameId, frameDefinition, defs, scene) {
   const frameLayer = createSvgNode("g");
   frameLayer.classList.add("transport-workbench-carrier-frame", `transport-workbench-carrier-frame-${frameId}`);
 
-  if (frameDefinition.type === "inset") {
-    const insetShadow = createSvgNode("rect");
-    insetShadow.setAttribute("x", String(frameDefinition.extent.x));
-    insetShadow.setAttribute("y", String(frameDefinition.extent.y + 5));
-    insetShadow.setAttribute("width", String(frameDefinition.extent.width));
-    insetShadow.setAttribute("height", String(frameDefinition.extent.height));
-    insetShadow.setAttribute("rx", "20");
-    insetShadow.setAttribute("fill", COLOR_TOKENS.insetShadow);
-    insetShadow.setAttribute("opacity", "0.68");
-    frameLayer.appendChild(insetShadow);
-
-    const insetRect = createSvgNode("rect");
-    insetRect.setAttribute("x", String(frameDefinition.extent.x));
-    insetRect.setAttribute("y", String(frameDefinition.extent.y));
-    insetRect.setAttribute("width", String(frameDefinition.extent.width));
-    insetRect.setAttribute("height", String(frameDefinition.extent.height));
-    insetRect.setAttribute("rx", "20");
-    insetRect.setAttribute("fill", COLOR_TOKENS.insetSea);
-    insetRect.setAttribute("stroke", COLOR_TOKENS.insetBorder);
-    insetRect.setAttribute("stroke-width", "1.2");
-    frameLayer.appendChild(insetRect);
-  }
-
   const landDefinitionId = `transportWorkbenchCarrierLandDef-${frameId}`;
   const landClipId = `transportWorkbenchCarrierLandClip-${frameId}`;
   const seaClipId = `transportWorkbenchCarrierSeaClip-${frameId}`;
@@ -310,7 +284,7 @@ function buildFrame(frameId, frameDefinition, defs, scene) {
   seaWash.setAttribute("fill", COLOR_TOKENS.seaWash);
   seaWash.setAttribute("fill-rule", "evenodd");
   seaWash.setAttribute("clip-rule", "evenodd");
-  seaWash.setAttribute("opacity", frameDefinition.type === "inset" ? "0.25" : "0.42");
+  seaWash.setAttribute("opacity", "0.42");
 
   const seaOverlay = createSvgNode("g");
   seaOverlay.classList.add("transport-workbench-carrier-overlay", "transport-workbench-carrier-overlay-sea");
@@ -322,8 +296,8 @@ function buildFrame(frameId, frameDefinition, defs, scene) {
   shoreGlow.setAttribute("stroke", COLOR_TOKENS.shoreGlow);
   shoreGlow.setAttribute("stroke-linecap", "round");
   shoreGlow.setAttribute("stroke-linejoin", "round");
-  shoreGlow.setAttribute("stroke-width", frameDefinition.type === "inset" ? "5" : "8");
-  shoreGlow.setAttribute("opacity", frameDefinition.type === "inset" ? "0.2" : "0.34");
+  shoreGlow.setAttribute("stroke-width", "8");
+  shoreGlow.setAttribute("opacity", "0.34");
   shoreGlow.setAttribute("vector-effect", "non-scaling-stroke");
 
   const landBase = createSvgNode("use");
@@ -335,7 +309,7 @@ function buildFrame(frameId, frameDefinition, defs, scene) {
   prefectureLines.setAttribute("stroke", COLOR_TOKENS.prefecture);
   prefectureLines.setAttribute("stroke-linecap", "round");
   prefectureLines.setAttribute("stroke-linejoin", "round");
-  prefectureLines.setAttribute("stroke-width", frameDefinition.type === "inset" ? "0.55" : "0.65");
+  prefectureLines.setAttribute("stroke-width", "0.65");
   prefectureLines.setAttribute("vector-effect", "non-scaling-stroke");
 
   const coastline = createSvgNode("use");
@@ -344,7 +318,7 @@ function buildFrame(frameId, frameDefinition, defs, scene) {
   coastline.setAttribute("stroke", COLOR_TOKENS.coastline);
   coastline.setAttribute("stroke-linecap", "round");
   coastline.setAttribute("stroke-linejoin", "round");
-  coastline.setAttribute("stroke-width", frameDefinition.type === "inset" ? "1.2" : "1.8");
+  coastline.setAttribute("stroke-width", "1.8");
   coastline.setAttribute("opacity", "0.9");
   coastline.setAttribute("vector-effect", "non-scaling-stroke");
 
@@ -414,16 +388,7 @@ function resolveTransportWorkbenchCarrierFrame(lon, lat, preferredFrame) {
   if (preferredFrame && frameContexts[preferredFrame]) {
     return d3.geoContains(frameContexts[preferredFrame].routeMask, [lon, lat]) ? preferredFrame : null;
   }
-
-  const frameOrder = ["hokkaidoInset", "main"];
-  for (const frameId of frameOrder) {
-    const frameContext = frameContexts[frameId];
-    if (!frameContext) continue;
-    if (d3.geoContains(frameContext.routeMask, [lon, lat])) {
-      return frameId;
-    }
-  }
-  return null;
+  return frameContexts.main && d3.geoContains(frameContexts.main.routeMask, [lon, lat]) ? "main" : null;
 }
 
 export function projectTransportWorkbenchCarrierPoint(lon, lat, preferredFrame = null) {
@@ -522,9 +487,7 @@ export function destroyTransportWorkbenchCarrier() {
   sceneNode = null;
   frameContexts = {};
   overlayRoots.land.main = null;
-  overlayRoots.land.hokkaidoInset = null;
   overlayRoots.sea.main = null;
-  overlayRoots.sea.hokkaidoInset = null;
 }
 
 export function getTransportWorkbenchCarrierOverlayRoots() {

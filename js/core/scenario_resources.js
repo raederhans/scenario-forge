@@ -1761,6 +1761,114 @@ function createScenarioBootstrapBundleFromCache({
   return bundle;
 }
 
+function createStartupScenarioBundleFromPayload({
+  scenarioId = "",
+  language = "en",
+  payload = null,
+  runtimeDecodedCollections = null,
+  runtimePoliticalMeta = null,
+  loadDiagnostics = null,
+} = {}) {
+  const normalizedScenarioId = normalizeScenarioId(
+    scenarioId
+    || payload?.scenario_id
+    || payload?.manifest_subset?.scenario_id
+  );
+  if (!normalizedScenarioId) {
+    throw new Error("Startup bundle is missing a valid scenario id.");
+  }
+  const manifestSubset = payload?.manifest_subset && typeof payload.manifest_subset === "object"
+    ? payload.manifest_subset
+    : {};
+  const manifest = {
+    ...manifestSubset,
+    scenario_id: normalizedScenarioId,
+    display_name: String(
+      manifestSubset.display_name
+      || payload?.display_name
+      || normalizedScenarioId
+    ).trim(),
+    generated_at: String(
+      payload?.generated_at
+      || manifestSubset.generated_at
+      || ""
+    ).trim(),
+    baseline_hash: String(
+      payload?.baseline_hash
+      || manifestSubset.baseline_hash
+      || ""
+    ).trim(),
+  };
+  const geoLocalePatchPayload = normalizeScenarioGeoLocalePatchPayload(payload?.scenario?.geo_locale_patch);
+  const bundle = {
+    meta: {
+      scenario_id: normalizedScenarioId,
+      display_name: manifest.display_name,
+      manifest_url: "",
+    },
+    manifest,
+    bundleLevel: "bootstrap",
+    runtimeShell: normalizeScenarioRuntimeShell(manifest),
+    chunkRegistry: null,
+    contextLodManifest: null,
+    runtimeMetaPayload: null,
+    meshPackPayload: null,
+    chunkPayloadCacheById: {},
+    chunkMergedLayerPayloads: null,
+    chunkPreloaded: false,
+    countriesPayload: payload?.scenario?.countries || null,
+    ownersPayload: payload?.scenario?.owners || null,
+    controllersPayload: payload?.scenario?.controllers || null,
+    coresPayload: payload?.scenario?.cores || null,
+    waterRegionsPayload: null,
+    specialRegionsPayload: null,
+    reliefOverlaysPayload: null,
+    cityOverridesPayload: null,
+    geoLocalePatchPayload,
+    geoLocalePatchPayloadsByLanguage: geoLocalePatchPayload ? { [language === "zh" ? "zh" : "en"]: geoLocalePatchPayload } : {},
+    runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(payload?.scenario?.runtime_topology_bootstrap),
+    runtimePoliticalMeta: runtimePoliticalMeta || null,
+    runtimeDecodedCollections: runtimeDecodedCollections || null,
+    releasableCatalog: null,
+    districtGroupsPayload: null,
+    auditPayload: null,
+    startupApplySeed: payload?.scenario?.apply_seed && typeof payload.scenario.apply_seed === "object"
+      ? payload.scenario.apply_seed
+      : null,
+    optionalLayerPromises: {},
+    optionalLayerSettledByKey: {},
+    loadDiagnostics: loadDiagnostics || {
+      optionalResources: {
+        runtime_topology: {
+          ok: true,
+          reason: "startup-bundle",
+          errorMessage: "",
+          metrics: payload?.metrics?.runtimeTopology || null,
+          url: "",
+        },
+        geo_locale_patch: {
+          ok: !!geoLocalePatchPayload,
+          reason: "startup-bundle",
+          errorMessage: "",
+          language,
+          localeSpecific: true,
+          metrics: payload?.metrics?.geoLocalePatch || null,
+        },
+      },
+      requiredResources: {
+        manifest: payload?.metrics?.startupBundle || null,
+        countries: null,
+        owners: null,
+        controllers: null,
+        cores: null,
+      },
+      bundleLevel: "bootstrap",
+      startupBundle: true,
+    },
+  };
+  return bundle;
+}
+
 async function loadScenarioRuntimeTopologyForBundle({
   d3Client,
   scenarioId,
@@ -2396,6 +2504,7 @@ async function validateImportedScenarioBaseline(projectScenario, { d3Client = gl
 
 export {
   applyBlankScenarioPresentationDefaults,
+  createStartupScenarioBundleFromPayload,
   ensureRuntimeChunkLoadState,
   resetScenarioChunkRuntimeState,
   scheduleScenarioChunkRefresh,

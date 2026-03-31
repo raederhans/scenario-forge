@@ -1,0 +1,344 @@
+from __future__ import annotations
+
+import argparse
+import copy
+import gzip
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from map_builder.io.readers import read_json_strict
+from map_builder.io.writers import write_json_atomic
+
+SUPPORTED_LANGUAGES = ("en", "zh")
+STARTUP_BUNDLE_VERSION = 1
+
+
+def _normalize_text(value: object) -> str:
+    return str(value or "").strip()
+
+
+def _read_json(path: Path) -> dict:
+    payload = read_json_strict(path)
+    if not isinstance(payload, dict):
+        raise TypeError(f"Expected JSON object at {path}")
+    return payload
+
+
+def _sha256_path(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _gzip_size(payload: object) -> int:
+    raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    return len(gzip.compress(raw, compresslevel=9))
+
+
+def _extract_language_entry(value: object, language: str) -> object:
+    if isinstance(value, dict):
+        preferred = _normalize_text(value.get(language))
+        fallback = _normalize_text(value.get("en" if language == "zh" else "zh"))
+        if preferred or fallback:
+            return {language: preferred or fallback}
+    return value
+
+
+def build_single_language_locales_payload(startup_locales: dict, language: str) -> dict:
+    if language not in SUPPORTED_LANGUAGES:
+        raise ValueError(f"Unsupported startup bundle language: {language}")
+    next_payload = {"ui": {}, "geo": {}}
+    for section_name in ("ui", "geo"):
+        source_section = startup_locales.get(section_name, {})
+        if not isinstance(source_section, dict):
+            continue
+        section_target = next_payload[section_name]
+        for key, value in source_section.items():
+            narrowed = _extract_language_entry(value, language)
+            if narrowed in (None, "", {}):
+                continue
+            section_target[key] = narrowed
+    return next_payload
+
+
+def _resolve_display_name(entry: dict, fallback: str) -> str:
+    display_name = entry.get("display_name")
+    if isinstance(display_name, dict):
+        return _normalize_text(display_name.get("en") or display_name.get("zh") or fallback)
+    resolved = _normalize_text(display_name or entry.get("displayName") or fallback)
+    return resolved or fallback
+
+
+def build_startup_apply_seed(
+    scenario_id: str,
+    scenario_manifest: dict,
+    countries_payload: dict,
+    owners_payload: dict,
+) -> dict:
+    countries = countries_payload.get("countries", {}) if isinstance(countries_payload, dict) else {}
+    owners = owners_payload.get("owners", {}) if isinstance(owners_payload, dict) else {}
+    if not isinstance(countries, dict):
+        countries = {}
+    if not isinstance(owners, dict):
+        owners = {}
+    scenario_name_map = {}
+    scenario_color_map = {}
+    for raw_tag, raw_entry in countries.items():
+        tag = _normalize_text(raw_tag).upper()
+        entry = raw_entry if isinstance(raw_entry, dict) else {}
+        if not tag:
+            continue
+        scenario_name_map[tag] = _resolve_display_name(entry, tag)
+        color_hex = _normalize_text(entry.get("color_hex") or entry.get("colorHex")).lower()
+        if color_hex.startswith("#") and len(color_hex) == 7:
+            scenario_color_map[tag] = color_hex
+    return {
+        "scenario_id": scenario_id,
+        "default_country_code": _normalize_text(
+            scenario_manifest.get("default_active_country_code")
+            or scenario_manifest.get("default_country")
+        ).upper(),
+        "map_semantic_mode": _normalize_text(scenario_manifest.get("map_mode") or "political") or "political",
+        "scenario_name_map": scenario_name_map,
+        "scenario_color_map": scenario_color_map,
+        "resolved_owners": copy.deepcopy(owners),
+    }
+
+
+def build_startup_bundle_payload(
+    *,
+    language: str,
+    scenario_manifest: dict,
+    data_manifest: dict,
+    topology_primary_path: Path,
+    startup_locales_path: Path,
+    startup_locales_payload: dict,
+    geo_aliases_path: Path,
+    runtime_bootstrap_topology_path: Path,
+    countries_path: Path,
+    owners_path: Path,
+    controllers_path: Path,
+    cores_path: Path,
+    geo_locale_patch_path: Path,
+) -> dict:
+    scenario_id = _normalize_text(scenario_manifest.get("scenario_id"))
+    if not scenario_id:
+        raise ValueError("Scenario manifest is missing scenario_id.")
+
+    topology_primary = _read_json(topology_primary_path)
+    geo_aliases = _read_json(geo_aliases_path)
+    runtime_bootstrap_topology = _read_json(runtime_bootstrap_topology_path)
+    countries_payload = _read_json(countries_path)
+    owners_payload = _read_json(owners_path)
+    controllers_payload = _read_json(controllers_path)
+    cores_payload = _read_json(cores_path)
+    geo_locale_patch = _read_json(geo_locale_patch_path)
+    apply_seed = build_startup_apply_seed(
+        scenario_id,
+        scenario_manifest,
+        countries_payload,
+        owners_payload,
+    )
+
+    manifest_subset = copy.deepcopy(scenario_manifest)
+    manifest_subset["baseline_hash"] = _normalize_text(scenario_manifest.get("baseline_hash"))
+    manifest_subset["generated_at"] = _normalize_text(scenario_manifest.get("generated_at"))
+    manifest_subset["startup_bundle_version"] = STARTUP_BUNDLE_VERSION
+
+    return {
+        "version": STARTUP_BUNDLE_VERSION,
+        "scenario_id": scenario_id,
+        "language": language,
+        "generated_at": _normalize_text(scenario_manifest.get("generated_at")),
+        "baseline_hash": _normalize_text(scenario_manifest.get("baseline_hash")),
+        "source": {
+            "data_manifest_version": data_manifest.get("version"),
+            "data_manifest_generated_at": _normalize_text(data_manifest.get("generated_at")),
+            "startup_locales_sha256": _sha256_path(startup_locales_path),
+            "base_topology_sha256": _sha256_path(topology_primary_path),
+            "runtime_bootstrap_topology_sha256": _sha256_path(runtime_bootstrap_topology_path),
+            "geo_aliases_sha256": _sha256_path(geo_aliases_path),
+            "countries_sha256": _sha256_path(countries_path),
+            "owners_sha256": _sha256_path(owners_path),
+            "controllers_sha256": _sha256_path(controllers_path),
+            "cores_sha256": _sha256_path(cores_path),
+            "geo_locale_patch_sha256": _sha256_path(geo_locale_patch_path),
+        },
+        "manifest_subset": manifest_subset,
+        "base": {
+            "topology_primary": topology_primary,
+            "locales": startup_locales_payload,
+            "geo_aliases": geo_aliases,
+        },
+        "scenario": {
+            "runtime_topology_bootstrap": runtime_bootstrap_topology,
+            "countries": countries_payload,
+            "owners": owners_payload,
+            "controllers": controllers_payload,
+            "cores": cores_payload,
+            "geo_locale_patch": geo_locale_patch,
+            "apply_seed": apply_seed,
+        },
+    }
+
+
+def build_startup_bundle_report(
+    *,
+    payload_by_language: dict[str, dict],
+    output_paths_by_language: dict[str, Path],
+    report_path: Path | None,
+) -> dict:
+    report = {
+        "version": STARTUP_BUNDLE_VERSION,
+        "generated_at": next(iter(payload_by_language.values())).get("generated_at", ""),
+        "scenario_id": next(iter(payload_by_language.values())).get("scenario_id", ""),
+        "languages": {},
+    }
+    for language, payload in payload_by_language.items():
+        output_path = output_paths_by_language[language]
+        raw_bytes = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        report["languages"][language] = {
+            "output_path": str(output_path),
+            "raw_bytes": len(raw_bytes),
+            "gzip_bytes": len(gzip.compress(raw_bytes, compresslevel=9)),
+            "sections": {
+                "base_topology_raw_bytes": len(
+                    json.dumps(payload["base"]["topology_primary"], ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+                ),
+                "locales_raw_bytes": len(
+                    json.dumps(payload["base"]["locales"], ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+                ),
+                "geo_aliases_raw_bytes": len(
+                    json.dumps(payload["base"]["geo_aliases"], ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+                ),
+                "runtime_bootstrap_raw_bytes": len(
+                    json.dumps(payload["scenario"]["runtime_topology_bootstrap"], ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+                ),
+                "apply_seed_raw_bytes": len(
+                    json.dumps(payload["scenario"]["apply_seed"], ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+                ),
+            },
+        }
+    if report_path is not None:
+        write_json_atomic(report_path, report, ensure_ascii=False, indent=2, trailing_newline=True)
+    return report
+
+
+def build_startup_bundles(
+    *,
+    scenario_manifest_path: Path,
+    data_manifest_path: Path,
+    topology_primary_path: Path,
+    startup_locales_path: Path,
+    geo_aliases_path: Path,
+    runtime_bootstrap_topology_path: Path,
+    countries_path: Path,
+    owners_path: Path,
+    controllers_path: Path,
+    cores_path: Path,
+    geo_locale_patch_en_path: Path,
+    geo_locale_patch_zh_path: Path,
+    output_en_path: Path,
+    output_zh_path: Path,
+    report_path: Path | None = None,
+) -> dict:
+    scenario_manifest = _read_json(scenario_manifest_path)
+    data_manifest = _read_json(data_manifest_path)
+    startup_locales = _read_json(startup_locales_path)
+
+    payload_by_language = {}
+    output_paths_by_language = {
+        "en": output_en_path,
+        "zh": output_zh_path,
+    }
+    patch_paths_by_language = {
+        "en": geo_locale_patch_en_path,
+        "zh": geo_locale_patch_zh_path,
+    }
+    for language in SUPPORTED_LANGUAGES:
+        payload = build_startup_bundle_payload(
+            language=language,
+            scenario_manifest=scenario_manifest,
+            data_manifest=data_manifest,
+            topology_primary_path=topology_primary_path,
+            startup_locales_path=startup_locales_path,
+            startup_locales_payload=build_single_language_locales_payload(startup_locales, language),
+            geo_aliases_path=geo_aliases_path,
+            runtime_bootstrap_topology_path=runtime_bootstrap_topology_path,
+            countries_path=countries_path,
+            owners_path=owners_path,
+            controllers_path=controllers_path,
+            cores_path=cores_path,
+            geo_locale_patch_path=patch_paths_by_language[language],
+        )
+        payload_by_language[language] = payload
+        write_json_atomic(
+            output_paths_by_language[language],
+            payload,
+            ensure_ascii=False,
+            indent=None,
+            separators=(",", ":"),
+            trailing_newline=True,
+        )
+
+    report = build_startup_bundle_report(
+        payload_by_language=payload_by_language,
+        output_paths_by_language=output_paths_by_language,
+        report_path=report_path,
+    )
+    return {
+        "scenario_id": _normalize_text(scenario_manifest.get("scenario_id")),
+        "outputs": {language: str(path) for language, path in output_paths_by_language.items()},
+        "report_path": str(report_path) if report_path else "",
+        "report": report,
+    }
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Build language-specific startup bundles for the default startup scenario.")
+    parser.add_argument("--scenario-manifest", required=True)
+    parser.add_argument("--data-manifest", default=str(ROOT / "data/manifest.json"))
+    parser.add_argument("--topology-primary", default=str(ROOT / "data/europe_topology.json"))
+    parser.add_argument("--startup-locales", default=str(ROOT / "data/locales.startup.json"))
+    parser.add_argument("--geo-aliases", default=str(ROOT / "data/geo_aliases.startup.json"))
+    parser.add_argument("--runtime-bootstrap-topology", required=True)
+    parser.add_argument("--countries", required=True)
+    parser.add_argument("--owners", required=True)
+    parser.add_argument("--controllers", required=True)
+    parser.add_argument("--cores", required=True)
+    parser.add_argument("--geo-locale-patch-en", required=True)
+    parser.add_argument("--geo-locale-patch-zh", required=True)
+    parser.add_argument("--output-en", required=True)
+    parser.add_argument("--output-zh", required=True)
+    parser.add_argument("--report-path", default="")
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    result = build_startup_bundles(
+        scenario_manifest_path=Path(args.scenario_manifest).resolve(),
+        data_manifest_path=Path(args.data_manifest).resolve(),
+        topology_primary_path=Path(args.topology_primary).resolve(),
+        startup_locales_path=Path(args.startup_locales).resolve(),
+        geo_aliases_path=Path(args.geo_aliases).resolve(),
+        runtime_bootstrap_topology_path=Path(args.runtime_bootstrap_topology).resolve(),
+        countries_path=Path(args.countries).resolve(),
+        owners_path=Path(args.owners).resolve(),
+        controllers_path=Path(args.controllers).resolve(),
+        cores_path=Path(args.cores).resolve(),
+        geo_locale_patch_en_path=Path(args.geo_locale_patch_en).resolve(),
+        geo_locale_patch_zh_path=Path(args.geo_locale_patch_zh).resolve(),
+        output_en_path=Path(args.output_en).resolve(),
+        output_zh_path=Path(args.output_zh).resolve(),
+        report_path=Path(args.report_path).resolve() if _normalize_text(args.report_path) else None,
+    )
+    print(json.dumps(result, ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    main()

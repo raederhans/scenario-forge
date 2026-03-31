@@ -3,9 +3,11 @@ const STARTUP_WORKER_TIMEOUT_MS = 20_000;
 
 const MESSAGE_TYPES = Object.freeze({
   LOAD_BASE_STARTUP: "LOAD_BASE_STARTUP",
+  LOAD_STARTUP_BUNDLE: "LOAD_STARTUP_BUNDLE",
   LOAD_SCENARIO_RUNTIME_BOOTSTRAP: "LOAD_SCENARIO_RUNTIME_BOOTSTRAP",
   DECODE_RUNTIME_CHUNK: "DECODE_RUNTIME_CHUNK",
   BASE_STARTUP_READY: "BASE_STARTUP_READY",
+  STARTUP_BUNDLE_READY: "STARTUP_BUNDLE_READY",
   SCENARIO_RUNTIME_BOOTSTRAP_READY: "SCENARIO_RUNTIME_BOOTSTRAP_READY",
   RUNTIME_CHUNK_READY: "RUNTIME_CHUNK_READY",
   ERROR: "ERROR",
@@ -133,6 +135,26 @@ export async function loadBaseStartupViaWorker({
     locales: message.locales || { ui: {}, geo: {} },
     geoAliases: message.geoAliases || { alias_to_stable_key: {} },
     decodedCollections: message.decodedCollections || null,
+    metrics: message.metrics || null,
+  };
+}
+
+export async function loadStartupBundleViaWorker({
+  startupBundleUrl,
+  scenarioId = "",
+  language = "en",
+  timeoutMs = STARTUP_WORKER_TIMEOUT_MS,
+} = {}) {
+  const message = await dispatchTask(MESSAGE_TYPES.LOAD_STARTUP_BUNDLE, {
+    startupBundleUrl,
+    scenarioId,
+    language,
+  }, { timeoutMs });
+  return {
+    payload: message.payload || null,
+    baseDecodedCollections: message.baseDecodedCollections || null,
+    runtimeDecodedCollections: message.runtimeDecodedCollections || null,
+    runtimePoliticalMeta: message.runtimePoliticalMeta || null,
     metrics: message.metrics || null,
   };
 }

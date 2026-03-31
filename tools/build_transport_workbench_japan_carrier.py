@@ -44,29 +44,21 @@ DEFAULT_CAMERA = {
 }
 
 LOD_SWITCH = {
-    "detailOn": 1.65,
-    "overviewOn": 1.45,
+    "detailOn": 1.4,
+    "overviewOn": 1.25,
 }
 
 FRAME_SPECS = {
     "main": {
         "type": "main",
-        "label": "Japan Main Islands",
+        "label": "Japan four islands",
         "extent": {"x": 18, "y": 18, "width": 1564, "height": 864},
-        "include_codes": "all_mainland",
-        "clipBounds": {"lonMin": 129.0, "latMin": 30.75, "lonMax": 146.5, "latMax": 41.6},
-    },
-    "hokkaidoInset": {
-        "type": "inset",
-        "label": "Hokkaido inset",
-        "extent": {"x": 42, "y": 54, "width": 356, "height": 216},
-        "include_codes": {"JP-01"},
-        "clipBounds": {"lonMin": 139.25, "latMin": 41.2, "lonMax": 146.6, "latMax": 45.7},
+        "include_codes": "all_japan_visible",
+        "clipBounds": {"lonMin": 129.0, "latMin": 30.75, "lonMax": 146.6, "latMax": 45.9},
     },
 }
 
 EXCLUDED_CODES = {"JP-47"}
-HOKKAIDO_CODES = {"JP-01"}
 
 LOD_SPECS = {
     "overview": {"toleranceMeters": 1400.0, "minAreaSqMeters": 6_000_000.0},
@@ -209,8 +201,8 @@ def load_prefectures() -> gpd.GeoDataFrame:
 def select_frame_prefectures(prefectures: gpd.GeoDataFrame, frame_id: str) -> gpd.GeoDataFrame:
     spec = FRAME_SPECS[frame_id]
     include_codes = spec["include_codes"]
-    if include_codes == "all_mainland":
-        return prefectures[~prefectures["iso_3166_2"].isin(HOKKAIDO_CODES)].copy()
+    if include_codes == "all_japan_visible":
+        return prefectures.copy()
     return prefectures[prefectures["iso_3166_2"].isin(include_codes)].copy()
 
 
@@ -265,7 +257,7 @@ def main() -> None:
     frames = {frame_id: build_frame_payload(frame_id, prefectures) for frame_id in FRAME_SPECS}
 
     carrier_payload = {
-        "version": "japan_carrier_v2",
+        "version": "japan_carrier_v3",
         "source": {
             "kind": "natural_earth_admin1",
             "path": str(SOURCE_PATH.relative_to(ROOT)).replace("\\", "/"),
@@ -290,7 +282,6 @@ def main() -> None:
         "source": str(SOURCE_PATH.relative_to(ROOT)).replace("\\", "/"),
         "sourceKind": "Natural Earth 10m admin1",
         "excludedCodes": sorted(EXCLUDED_CODES),
-        "hokkaidoCodes": sorted(HOKKAIDO_CODES),
         "projection": {
             "proj4": LCC_PROJ4,
             **PROJECTION,
