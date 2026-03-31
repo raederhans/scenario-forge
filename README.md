@@ -1,13 +1,13 @@
 <p align="right">
   <a href="./README.md"><img src="https://img.shields.io/badge/English-111111?style=for-the-badge" alt="English"></a>
-  <a href="./README.zh-CN.md"><img src="https://img.shields.io/badge/%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-2563eb?style=for-the-badge" alt="简体中文"></a>
+  <a href="./README.zh-CN.md"><img src="https://img.shields.io/badge/%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-2563eb?style=for-the-badge" alt="Chinese"></a>
 </p>
 
-# Map Creator
+# Scenario Forge
 
 Create political maps that feel alive.
 
-Map Creator is a scenario-first map workbench for alternate history, strategy modding, and geopolitical storytelling. It lets you switch between ready-made world states, repaint control and ownership, build overlays, tune presentation layers, and export a clean snapshot or a reusable project file.
+Scenario Forge is a scenario-first map workbench for alternate history, strategy modding, and geopolitical storytelling. It lets you switch between ready-made world states, repaint control and ownership, build overlays, tune presentation layers, and export a clean snapshot or a reusable project file.
 
 **Live demo:** https://raederhans.github.io/mapcreator/
 
@@ -26,7 +26,7 @@ Map Creator is a scenario-first map workbench for alternate history, strategy mo
 
 Most map workflows split your work across too many tools: one for painting, one for labels, one for exports, one for scenario state, and another for presentation polish.
 
-Map Creator brings those jobs into one workspace. If you are building an alternate timeline, a strategy scenario, a mod concept, or a map-led presentation, you can move from idea to usable visual much faster.
+Scenario Forge brings those jobs into one workspace. If you are building an alternate timeline, a strategy scenario, a mod concept, or a map-led presentation, you can move from idea to usable visual much faster.
 
 ## Who it is for
 

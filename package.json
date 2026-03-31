@@ -1,8 +1,8 @@
 {
-  "name": "mapcreator-browser-tooling",
+  "name": "scenario-forge-browser-tooling",
   "private": true,
   "version": "0.1.0",
-  "description": "Local Playwright tooling for mapcreator browser inspection and e2e regression tests.",
+  "description": "Local Playwright tooling for Scenario Forge browser inspection and e2e regression tests.",
   "engines": {
     "node": ">=18"
   },

@@ -194,7 +194,7 @@ def defaults_map():
         "DEFAULT_BASE_HOST": get_str(defaults, "base_host", "localhost"),
         "DEFAULT_PORT_START": get_int(defaults, "port_range_start", 8000),
         "DEFAULT_PORT_END": get_int(defaults, "port_range_end", 8010),
-        "DEFAULT_SERVER_TITLE_PATTERN": get_str(defaults, "server_title_pattern", "Map Creator"),
+        "DEFAULT_SERVER_TITLE_PATTERN": get_str(defaults, "server_title_pattern", "Scenario Forge"),
         "DEFAULT_WSL_WINDOWS_FALLBACK": get_bool(defaults, "wsl_windows_fallback", True),
 
         "DECISION_DEFAULT_MODE": get_str(decision, "default_mode", "auto"),

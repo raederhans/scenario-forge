@@ -1,7 +1,7 @@
 # ARCH System Reference
 
 ## Purpose
-This document is a technical reference for contributors and future agents working on the current Map Creator architecture (Python data pipeline + browser hybrid renderer).
+This document is a technical reference for contributors and future agents working on the current Scenario Forge architecture (Python data pipeline + browser hybrid renderer).
 
 ## Directory Structure
 

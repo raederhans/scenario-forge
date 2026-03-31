@@ -297,7 +297,7 @@ DEFAULT_MANUAL_UI_DICT = {
     "Texture": "纹理",
     "Overlay": "覆盖层",
     "Map Style": "地图样式",
-    "Map Creator": "地图创建器",
+    "Scenario Forge": "Scenario Forge",
     "Internal Borders": "内部边界",
     "Empire Borders": "帝国边界",
     "Coastlines": "海岸线",

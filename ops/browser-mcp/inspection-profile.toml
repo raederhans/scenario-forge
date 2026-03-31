@@ -4,7 +4,7 @@ version = 1
 base_host = "localhost"
 port_range_start = 8000
 port_range_end = 8010
-server_title_pattern = "Map Creator"
+server_title_pattern = "Scenario Forge"
 wsl_windows_fallback = true
 
 [decision]

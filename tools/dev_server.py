@@ -2249,7 +2249,7 @@ def save_scenario_geo_locale_entry(
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run the local MapCreator development server.",
+        description="Run the local Scenario Forge development server.",
         allow_abbrev=False,
     )
     parser.add_argument(

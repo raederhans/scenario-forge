@@ -1,4 +1,4 @@
-"""Initialize and prepare NUTS-3 map data for Map Creator."""
+"""Initialize and prepare NUTS-3 map data for Scenario Forge."""
 from __future__ import annotations
 
 import argparse
@@ -2344,7 +2344,7 @@ def apply_config_subdivisions(hybrid: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Build Map Creator data artifacts.")
+    parser = argparse.ArgumentParser(description="Build Scenario Forge data artifacts.")
     parser.add_argument(
         "--mode",
         choices=["all", "primary", "detail", "i18n", "palettes"],

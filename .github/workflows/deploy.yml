@@ -1,4 +1,4 @@
-name: Build and Deploy Map
+name: Build and Deploy Scenario Forge
 
 on:
   push:

@@ -123,7 +123,7 @@ def normalize_playwright_url(url: str) -> str:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Benchmark Map Creator editor performance via Playwright CLI.")
+    parser = argparse.ArgumentParser(description="Benchmark Scenario Forge editor performance via Playwright CLI.")
     parser.add_argument("--url", default="http://127.0.0.1:8000/?perf_overlay=1", help="Benchmark target URL.")
     parser.add_argument(
         "--out",
