@@ -3,7 +3,7 @@
   "family": "road",
   "country": "Japan",
   "schema_version": 1,
-  "generated_at": "2026-03-31T21:25:16.475758Z",
+  "generated_at": "2026-03-31T21:35:45.663725Z",
   "recipe_path": "data/transport_layers/japan_road/source_recipe.manual.json",
   "paths": {
     "roads": "data/transport_layers/japan_road/roads.topo.json",
