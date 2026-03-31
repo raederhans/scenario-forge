@@ -50,9 +50,12 @@ import { markDirty, updateDirtyIndicator } from "../core/dirty_state.js";
 import {
   destroyTransportWorkbenchCarrier,
   ensureTransportWorkbenchCarrier,
+  getTransportWorkbenchCarrierViewState,
   resetTransportWorkbenchCarrierView,
   resizeTransportWorkbenchCarrier,
   setTransportWorkbenchCarrierFamily,
+  stepTransportWorkbenchCarrierZoom,
+  toggleTransportWorkbenchCarrierQuarterTurn,
 } from "./transport_workbench_carrier.js";
 
 const TRANSPORT_WORKBENCH_FAMILIES = [
@@ -275,6 +278,50 @@ const TRANSPORT_WORKBENCH_SECTION_DEFAULTS = {
 const TRANSPORT_WORKBENCH_INLINE_HELP_SECTIONS = {
   road: new Set(["source_hardening", "noise_control"]),
   rail: new Set(["source_reconciliation", "line_presentation"]),
+};
+
+const TRANSPORT_WORKBENCH_INLINE_HELP_COPY = {
+  road: {
+    source_hardening: {
+      title: "Source hardening",
+      body: "This block decides how Japan road identity is stabilized before the pack is emitted. Keep geometry on the shared OSM corridor and use N06 only where motorway identity or official refs need deterministic reinforcement.",
+    },
+    noise_control: {
+      title: "Noise control",
+      body: "This block suppresses short or dense segments before they crowd the preview. The goal is not to invent heuristics, but to make motorway, trunk, and primary stay readable across Tokyo and Osaka at the same review zooms.",
+    },
+  },
+  rail: {
+    source_reconciliation: {
+      title: "Source reconciliation",
+      body: "This block explains how the official active network and OSM lifecycle patches resolve conflicts. Keep the official active backbone authoritative, and only let OSM fill explicit gaps or non-active status where the official source is silent.",
+    },
+    line_presentation: {
+      title: "Line presentation",
+      body: "This block decides how status and class differences are shown once the rail pack is wired. Active lines should stay structurally clear first, while branch, service, and inactive states remain secondary and never overpower the trunk network.",
+    },
+  },
+};
+
+const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
+  road: {
+    country: "Japan",
+    adapterId: "japan_road_v1",
+    packs: ["roads", "road_labels"],
+    geometrySource: "OSM / Geofabrik Japan",
+    hardeningSource: "N06 motorway identity",
+    governance: "Deferred layer packs with reproducible build inputs and explicit diagnostics.",
+    pendingStatus: "Waiting for roads + road_labels Japan packs",
+  },
+  rail: {
+    country: "Japan",
+    adapterId: "japan_rail_v1",
+    packs: ["railways", "rail_stations_major"],
+    geometrySource: "Official active network",
+    hardeningSource: "OSM lifecycle / gap patch",
+    governance: "Deferred layer packs with reproducible build inputs and explicit diagnostics.",
+    pendingStatus: "Waiting for railways + rail_stations_major Japan packs",
+  },
 };
 
 function normalizeTransportWorkbenchFamily(value) {
@@ -780,6 +827,9 @@ function initToolbar({ render } = {}) {
   const transportWorkbenchInfoBtn = document.getElementById("transportWorkbenchInfoBtn");
   const transportWorkbenchInfoPopover = document.getElementById("transportWorkbenchInfoPopover");
   const transportWorkbenchInfoBody = document.getElementById("transportWorkbenchInfoBody");
+  const transportWorkbenchSectionHelpPopover = document.getElementById("transportWorkbenchSectionHelpPopover");
+  const transportWorkbenchSectionHelpTitle = document.getElementById("transportWorkbenchSectionHelpTitle");
+  const transportWorkbenchSectionHelpBody = document.getElementById("transportWorkbenchSectionHelpBody");
   const transportWorkbenchCloseBtn = document.getElementById("transportWorkbenchCloseBtn");
   const transportWorkbenchResetBtn = document.getElementById("transportWorkbenchResetBtn");
   const transportWorkbenchApplyBtn = document.getElementById("transportWorkbenchApplyBtn");
@@ -790,11 +840,12 @@ function initToolbar({ render } = {}) {
   const transportWorkbenchCountryStatus = document.getElementById("transportWorkbenchCountryStatus");
   const transportWorkbenchPreviewMode = document.getElementById("transportWorkbenchPreviewMode");
   const transportWorkbenchPreviewTitle = document.getElementById("transportWorkbenchPreviewTitle");
-  const transportWorkbenchPreviewCountryBadge = document.getElementById("transportWorkbenchPreviewCountryBadge");
   const transportWorkbenchCarrierMount = document.getElementById("transportWorkbenchCarrierMount");
-  const transportWorkbenchPreviewFamilyBadge = document.getElementById("transportWorkbenchPreviewFamilyBadge");
   const transportWorkbenchCompareBtn = document.getElementById("transportWorkbenchCompareBtn");
   const transportWorkbenchCompareStatus = document.getElementById("transportWorkbenchCompareStatus");
+  const transportWorkbenchZoomOutBtn = document.getElementById("transportWorkbenchZoomOutBtn");
+  const transportWorkbenchZoomInBtn = document.getElementById("transportWorkbenchZoomInBtn");
+  const transportWorkbenchRotateBtn = document.getElementById("transportWorkbenchRotateBtn");
   const transportWorkbenchInspectorTitle = document.getElementById("transportWorkbenchInspectorTitle");
   const transportWorkbenchInspectorDetails = document.getElementById("transportWorkbenchInspectorDetails");
   const transportWorkbenchInspectorEmptyTitle = document.getElementById("transportWorkbenchInspectorEmptyTitle");
@@ -1097,10 +1148,82 @@ function initToolbar({ render } = {}) {
     }
   };
 
-  const renderTransportWorkbenchInfoPopover = (family, { focusSectionKey = null } = {}) => {
+  let transportWorkbenchSectionHelpState = null;
+
+  const closeTransportWorkbenchSectionHelpPopover = ({ restoreFocus = false } = {}) => {
+    if (!transportWorkbenchSectionHelpPopover) return;
+    transportWorkbenchSectionHelpPopover.classList.add("hidden");
+    transportWorkbenchSectionHelpPopover.setAttribute("aria-hidden", "true");
+    if (transportWorkbenchSectionHelpState?.trigger instanceof HTMLElement) {
+      transportWorkbenchSectionHelpState.trigger.setAttribute("aria-expanded", "false");
+      if (restoreFocus && typeof transportWorkbenchSectionHelpState.trigger.focus === "function") {
+        transportWorkbenchSectionHelpState.trigger.focus({ preventScroll: true });
+      }
+    }
+    transportWorkbenchSectionHelpState = null;
+  };
+
+  const positionTransportWorkbenchSectionHelpPopover = (trigger) => {
+    if (!(trigger instanceof HTMLElement) || !(transportWorkbenchSectionHelpPopover instanceof HTMLElement) || !(transportWorkbenchPanel instanceof HTMLElement)) {
+      return;
+    }
+    const panelRect = transportWorkbenchPanel.getBoundingClientRect();
+    const triggerRect = trigger.getBoundingClientRect();
+    const popoverWidth = transportWorkbenchSectionHelpPopover.offsetWidth || 280;
+    const popoverHeight = transportWorkbenchSectionHelpPopover.offsetHeight || 140;
+    let left = triggerRect.right + 10;
+    let top = triggerRect.top - 4;
+    const minInset = 18;
+    if (left + popoverWidth > panelRect.right - minInset) {
+      left = triggerRect.left - popoverWidth - 10;
+    }
+    left = Math.min(Math.max(left, panelRect.left + minInset), Math.max(panelRect.left + minInset, panelRect.right - popoverWidth - minInset));
+    top = Math.min(Math.max(top, panelRect.top + minInset), Math.max(panelRect.top + minInset, panelRect.bottom - popoverHeight - minInset));
+    transportWorkbenchSectionHelpPopover.style.left = `${left}px`;
+    transportWorkbenchSectionHelpPopover.style.top = `${top}px`;
+  };
+
+  const renderTransportWorkbenchSectionHelpPopover = (familyId, sectionKey) => {
+    if (!transportWorkbenchSectionHelpTitle || !transportWorkbenchSectionHelpBody) return;
+    const helpCopy = TRANSPORT_WORKBENCH_INLINE_HELP_COPY[familyId]?.[sectionKey];
+    if (!helpCopy) return;
+    transportWorkbenchSectionHelpTitle.textContent = t(helpCopy.title, "ui");
+    transportWorkbenchSectionHelpBody.replaceChildren();
+    const body = document.createElement("p");
+    body.className = "transport-workbench-info-text";
+    body.textContent = t(helpCopy.body, "ui");
+    transportWorkbenchSectionHelpBody.appendChild(body);
+  };
+
+  const toggleTransportWorkbenchSectionHelpPopover = (trigger, familyId, sectionKey) => {
+    if (!transportWorkbenchSectionHelpPopover) return;
+    const isSameTarget = transportWorkbenchSectionHelpState
+      && transportWorkbenchSectionHelpState.familyId === familyId
+      && transportWorkbenchSectionHelpState.sectionKey === sectionKey
+      && transportWorkbenchSectionHelpState.trigger === trigger
+      && !transportWorkbenchSectionHelpPopover.classList.contains("hidden");
+    if (isSameTarget) {
+      closeTransportWorkbenchSectionHelpPopover({ restoreFocus: true });
+      return;
+    }
+    closeTransportWorkbenchInfoPopover({ restoreFocus: false });
+    closeTransportWorkbenchSectionHelpPopover({ restoreFocus: false });
+    renderTransportWorkbenchSectionHelpPopover(familyId, sectionKey);
+    transportWorkbenchSectionHelpState = { familyId, sectionKey, trigger };
+    transportWorkbenchSectionHelpPopover.classList.remove("hidden");
+    transportWorkbenchSectionHelpPopover.setAttribute("aria-hidden", "false");
+    if (trigger instanceof HTMLElement) {
+      trigger.setAttribute("aria-expanded", "true");
+    }
+    positionTransportWorkbenchSectionHelpPopover(trigger);
+  };
+
+  const getTransportWorkbenchDataContract = (familyId) => TRANSPORT_WORKBENCH_DATA_CONTRACTS[familyId] || null;
+
+  const renderTransportWorkbenchInfoPopoverLegacy = (family) => {
     if (!transportWorkbenchInfoBody) return;
     transportWorkbenchInfoBody.replaceChildren();
-    const sectionGlossary = TRANSPORT_WORKBENCH_CONTROL_SCHEMAS[family.id] || [];
+    const dataContract = getTransportWorkbenchDataContract(family.id);
 
     const blocks = [
       {
@@ -1121,64 +1244,103 @@ function initToolbar({ render } = {}) {
           body: `${family.label} 目前还是保留位，等真实 schema 接线后才会开放细项调试。`,
         },
     ];
+    blocks[2] = family.supportsDetailedControls
+      ? {
+        title: "Compare",
+        body: `Hold to Compare Baseline only shows the current baseline snapshot for ${family.label.toLowerCase()}. It does not rewrite your working controls.`,
+      }
+      : {
+        title: "Status",
+        body: `${family.label} is still a reserved shell. Detailed controls open only after its schema is wired.`,
+      };
+    if (dataContract) {
+      blocks.push({
+        title: "Data path",
+        body: `${dataContract.country} ${family.label.toLowerCase()} stays on ${dataContract.packs.join(" + ")} deferred packs, using ${dataContract.geometrySource} for geometry and ${dataContract.hardeningSource} for hardening. ${dataContract.governance}`,
+      });
+    }
+    blocks.push({
+      title: "Preview controls",
+      body: "Use the bottom-right controls for zoom and a 90-degree turn. Reset View always restores the framed standard view.",
+    });
 
     blocks.forEach((block) => {
       const node = document.createElement("section");
       node.className = "transport-workbench-info-block";
       const title = document.createElement("div");
       title.className = "transport-workbench-info-subtitle";
-      title.textContent = block.title;
+      title.textContent = t(block.title, "ui");
       const body = document.createElement("p");
       body.className = "transport-workbench-info-text";
-      body.textContent = block.body;
+      body.textContent = t(block.body, "ui");
       node.append(title, body);
       transportWorkbenchInfoBody.appendChild(node);
     });
 
-    if (!sectionGlossary.length) return;
-    const glossary = document.createElement("section");
-    glossary.className = "transport-workbench-info-block";
-    const glossaryTitle = document.createElement("div");
-    glossaryTitle.className = "transport-workbench-info-subtitle";
-    glossaryTitle.textContent = "Section glossary";
-    glossary.appendChild(glossaryTitle);
-
-    sectionGlossary.forEach((section) => {
-      const item = document.createElement("div");
-      item.className = "transport-workbench-info-item";
-      item.id = `transportWorkbenchInfoSection-${family.id}-${section.key}`;
-      if (section.key === focusSectionKey) {
-        item.classList.add("is-focus-target");
-      }
-      const title = document.createElement("div");
-      title.className = "transport-workbench-info-item-title";
-      title.textContent = section.title;
-      const body = document.createElement("p");
-      body.className = "transport-workbench-info-text";
-      body.textContent = section.description;
-      item.append(title, body);
-      glossary.appendChild(item);
-    });
-    transportWorkbenchInfoBody.appendChild(glossary);
   };
 
-  const toggleTransportWorkbenchInfoPopover = ({ focusSectionKey = null } = {}) => {
+  const renderTransportWorkbenchInfoContent = (family) => {
+    if (!transportWorkbenchInfoBody) return;
+    transportWorkbenchInfoBody.replaceChildren();
+    const dataContract = getTransportWorkbenchDataContract(family.id);
+    const blocks = [
+      {
+        title: "Overview",
+        body: family.lensBody,
+      },
+      {
+        title: "Baseline",
+        body: family.lensNext,
+      },
+      family.supportsDetailedControls
+        ? {
+          title: "Compare",
+          body: `Hold to Compare Baseline only swaps the preview to the locked ${family.label.toLowerCase()} baseline while the control is held. It never overwrites the working values in the left column.`,
+        }
+        : {
+          title: "Status",
+          body: `${family.label} is still a reserved shell. Detailed controls stay closed until the real Japan schema and packs are wired.`,
+        },
+      {
+        title: "Preview controls",
+        body: "Use mouse wheel or the + / - controls to zoom. The 90° button rotates the carrier for alternate inspection, and Reset View returns pan, zoom, and rotation to the default frame.",
+      },
+      dataContract
+        ? {
+          title: "Data path",
+          body: `${dataContract.adapterId} stays on ${dataContract.packs.join(" + ")} using ${dataContract.geometrySource} with ${dataContract.hardeningSource}. Keep the pack build reproducible and diagnostics-friendly so rule changes can be traced later.`,
+        }
+        : null,
+    ];
+
+    blocks.filter(Boolean).forEach((block) => {
+      const node = document.createElement("section");
+      node.className = "transport-workbench-info-block";
+      const title = document.createElement("div");
+      title.className = "transport-workbench-info-subtitle";
+      title.textContent = t(block.title, "ui");
+      const body = document.createElement("p");
+      body.className = "transport-workbench-info-text";
+      body.textContent = t(block.body, "ui");
+      node.append(title, body);
+      transportWorkbenchInfoBody.appendChild(node);
+    });
+  };
+
+  const toggleTransportWorkbenchInfoPopover = () => {
     if (!transportWorkbenchInfoPopover) return;
     const willOpen = transportWorkbenchInfoPopover.classList.contains("hidden");
-    if (!willOpen && !focusSectionKey) {
+    if (!willOpen) {
       closeTransportWorkbenchInfoPopover({ restoreFocus: true });
       return;
     }
-    renderTransportWorkbenchInfoPopover(getTransportWorkbenchFamilyMeta(), { focusSectionKey });
+    closeTransportWorkbenchSectionHelpPopover({ restoreFocus: false });
+    renderTransportWorkbenchInfoContent(getTransportWorkbenchFamilyMeta());
     rememberOverlayTrigger(transportWorkbenchInfoPopover, transportWorkbenchInfoBtn);
     transportWorkbenchInfoPopover.classList.remove("hidden");
     transportWorkbenchInfoPopover.setAttribute("aria-hidden", "false");
     transportWorkbenchInfoBtn?.setAttribute("aria-expanded", "true");
     focusOverlaySurface(transportWorkbenchInfoPopover);
-    if (focusSectionKey && transportWorkbenchInfoBody) {
-      const focusTarget = transportWorkbenchInfoBody.querySelector(`#transportWorkbenchInfoSection-${getTransportWorkbenchFamilyMeta().id}-${focusSectionKey}`);
-      focusTarget?.scrollIntoView({ block: "nearest" });
-    }
   };
 
   const getTransportWorkbenchFamilyMeta = () => {
@@ -1299,12 +1461,15 @@ function initToolbar({ render } = {}) {
     button.type = "button";
     button.className = "transport-workbench-section-help-btn";
     button.textContent = "?";
-    button.setAttribute("aria-label", `Open ${section.title} help`);
-    button.setAttribute("title", `Open ${section.title} help`);
+    const helpLabel = t("Open section help", "ui");
+    button.setAttribute("aria-label", helpLabel);
+    button.setAttribute("title", helpLabel);
+    button.setAttribute("aria-haspopup", "dialog");
+    button.setAttribute("aria-expanded", "false");
     button.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
-      toggleTransportWorkbenchInfoPopover({ focusSectionKey: section.key });
+      toggleTransportWorkbenchSectionHelpPopover(button, familyId, section.key);
     });
     return button;
   };
@@ -1406,16 +1571,17 @@ function initToolbar({ render } = {}) {
 
   const renderTransportWorkbenchLensSections = (family, config, compareHeld) => {
     if (!transportWorkbenchLensSections) return;
+    closeTransportWorkbenchSectionHelpPopover({ restoreFocus: false });
     transportWorkbenchLensSections.replaceChildren();
     if (!family.supportsDetailedControls) {
       const card = document.createElement("div");
       card.className = "transport-workbench-empty-card";
       const title = document.createElement("div");
       title.className = "transport-workbench-empty-title";
-      title.textContent = "Future family mapping";
+      title.textContent = t("Future family mapping", "ui");
       const body = document.createElement("p");
       body.className = "transport-workbench-empty-text";
-      body.textContent = "Road and rail are the only Japan families with detailed controls right now. This family keeps only its reserved shell.";
+      body.textContent = t("Road and rail are the only Japan families with detailed controls right now. This family keeps only its reserved shell.", "ui");
       card.appendChild(title);
       card.appendChild(body);
       transportWorkbenchLensSections.appendChild(card);
@@ -1468,13 +1634,15 @@ function initToolbar({ render } = {}) {
   const renderTransportWorkbenchInspector = (family, config, compareHeld) => {
     if (transportWorkbenchInspectorDetails) {
       transportWorkbenchInspectorDetails.replaceChildren();
+      const dataContract = getTransportWorkbenchDataContract(family.id);
       const rows = family.id === "road"
         ? [
           ["Adapter", config.motorwayIdentitySource === "osm_only" ? "OSM only" : "OSM + N06 hardening"],
           ["Classes", formatTransportWorkbenchOptionLabels(config.roadClass, ROAD_CLASS_OPTIONS)],
           ["Labels", config.showRefs ? `${formatTransportWorkbenchOptionLabels(config.refClasses, ROAD_CLASS_OPTIONS)} refs` : "Hidden"],
           ["Compare mode", compareHeld ? "Holding baseline" : "Working state"],
-          ["Pack status", "Waiting for roads + road_labels Japan packs"],
+          ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+          ["Pack status", dataContract?.pendingStatus || "Waiting for roads + road_labels Japan packs"],
         ]
         : family.id === "rail"
           ? [
@@ -1482,7 +1650,8 @@ function initToolbar({ render } = {}) {
             ["Statuses", formatTransportWorkbenchOptionLabels(config.status, RAIL_STATUS_OPTIONS)],
             ["Classes", formatTransportWorkbenchOptionLabels(config.class, RAIL_CLASS_OPTIONS)],
             ["Stations", config.showMajorStations ? `${config.importanceThreshold} threshold` : "Hidden"],
-            ["Pack status", "Waiting for railways + rail_stations_major Japan packs"],
+            ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+            ["Pack status", dataContract?.pendingStatus || "Waiting for railways + rail_stations_major Japan packs"],
           ]
           : [
             ["Adapter", "Reserved shell only"],
@@ -1493,6 +1662,16 @@ function initToolbar({ render } = {}) {
         transportWorkbenchInspectorDetails.appendChild(createTransportWorkbenchInspectorRow(label, value));
       });
     }
+  };
+
+  const syncTransportWorkbenchPreviewControls = () => {
+    const carrierViewState = getTransportWorkbenchCarrierViewState();
+    const isQuarterTurn = carrierViewState.quarterTurns === 1;
+    if (transportWorkbenchZoomOutBtn) transportWorkbenchZoomOutBtn.textContent = "-";
+    if (transportWorkbenchZoomInBtn) transportWorkbenchZoomInBtn.textContent = "+";
+    if (transportWorkbenchRotateBtn) transportWorkbenchRotateBtn.textContent = "90°";
+    transportWorkbenchRotateBtn?.classList.toggle("is-active", isQuarterTurn);
+    transportWorkbenchRotateBtn?.setAttribute("aria-pressed", isQuarterTurn ? "true" : "false");
   };
 
   const renderTransportWorkbenchUi = () => {
@@ -1516,50 +1695,47 @@ function initToolbar({ render } = {}) {
     transportWorkbenchOverlay?.classList.toggle("hidden", !isOpen);
     transportWorkbenchOverlay?.setAttribute("aria-hidden", isOpen ? "false" : "true");
     scenarioTransportWorkbenchBtn?.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    scenarioTransportWorkbenchBtn?.setAttribute("title", isOpen ? "Close transport workbench" : "Open transport workbench");
-    transportWorkbenchTitle.textContent = family.title;
-    transportWorkbenchLensTitle.textContent = family.lensTitle;
-    transportWorkbenchFamilyStatus.textContent = family.label;
+    scenarioTransportWorkbenchBtn?.setAttribute("title", isOpen ? t("Close transport workbench", "ui") : t("Open transport workbench", "ui"));
+    transportWorkbenchTitle.textContent = t(family.title, "ui");
+    transportWorkbenchLensTitle.textContent = t(family.lensTitle, "ui");
+    transportWorkbenchFamilyStatus.textContent = t(family.label, "ui");
     transportWorkbenchCountryStatus.textContent = uiState.sampleCountry;
     transportWorkbenchPreviewMode.textContent = uiState.previewMode === "bounded_zoom_pan"
-      ? "Bounded zoom/pan"
+      ? t("Zoom / pan / quarter-turn", "ui")
       : uiState.previewMode;
-    transportWorkbenchPreviewTitle.textContent = `${uiState.sampleCountry} preview`;
-    if (transportWorkbenchPreviewCountryBadge) {
-      transportWorkbenchPreviewCountryBadge.textContent = uiState.sampleCountry;
-    }
-    if (transportWorkbenchPreviewFamilyBadge) {
-      transportWorkbenchPreviewFamilyBadge.textContent = family.label;
-    }
+    transportWorkbenchPreviewTitle.textContent = t("Japan preview", "ui");
     if (transportWorkbenchCompareBtn) {
       transportWorkbenchCompareBtn.disabled = !family.supportsDetailedControls;
       transportWorkbenchCompareBtn.setAttribute("aria-disabled", family.supportsDetailedControls ? "false" : "true");
       transportWorkbenchCompareBtn.classList.toggle("is-held", compareHeld);
       transportWorkbenchCompareBtn.textContent = family.supportsDetailedControls
-        ? "Hold to Compare Baseline"
-        : "Baseline compare unavailable";
+        ? t("Hold to Compare Baseline", "ui")
+        : t("Baseline compare unavailable", "ui");
     }
     if (transportWorkbenchCompareStatus) {
       transportWorkbenchCompareStatus.textContent = !family.supportsDetailedControls
-        ? "Detailed baseline not defined for this family"
+        ? t("Detailed baseline not defined for this family", "ui")
         : compareHeld
-          ? "Showing baseline snapshot"
-          : "Current working state";
+          ? t("Showing baseline snapshot", "ui")
+          : t("Current working state", "ui");
     }
     if (transportWorkbenchInfoPopover && !transportWorkbenchInfoPopover.classList.contains("hidden")) {
-      renderTransportWorkbenchInfoPopover(family);
+      renderTransportWorkbenchInfoContent(family);
     }
     setTransportWorkbenchCarrierFamily(family.id);
     if (isOpen && transportWorkbenchCarrierMount) {
       ensureTransportWorkbenchCarrier(transportWorkbenchCarrierMount).catch((error) => {
         console.error("[transport-workbench] Failed to mount Japan carrier preview.", error);
+      }).finally(() => {
+        syncTransportWorkbenchPreviewControls();
       });
       resizeTransportWorkbenchCarrier();
     }
+    syncTransportWorkbenchPreviewControls();
     renderTransportWorkbenchLensSections(family, config, compareHeld);
-    transportWorkbenchInspectorTitle.textContent = family.inspectorTitle;
-    transportWorkbenchInspectorEmptyTitle.textContent = family.inspectorEmptyTitle;
-    transportWorkbenchInspectorEmptyBody.textContent = family.inspectorEmptyBody;
+    transportWorkbenchInspectorTitle.textContent = t(family.inspectorTitle, "ui");
+    transportWorkbenchInspectorEmptyTitle.textContent = t(family.inspectorEmptyTitle, "ui");
+    transportWorkbenchInspectorEmptyBody.textContent = t(family.inspectorEmptyBody, "ui");
     renderTransportWorkbenchInspector(family, config, compareHeld);
     transportWorkbenchFamilyTabs.forEach((button) => {
       const isActive = String(button.dataset.transportFamily || "") === family.id;
@@ -1593,6 +1769,7 @@ function initToolbar({ render } = {}) {
       state.toggleRightPanelFn?.(false);
       state.closeDockPopoverFn?.({ restoreFocus: false });
       closeTransportWorkbenchInfoPopover({ restoreFocus: false });
+      closeTransportWorkbenchSectionHelpPopover({ restoreFocus: false });
       if (trigger instanceof HTMLElement && transportWorkbenchOverlay instanceof HTMLElement) {
         rememberOverlayTrigger(transportWorkbenchOverlay, trigger);
       }
@@ -1606,6 +1783,7 @@ function initToolbar({ render } = {}) {
     uiState.compareHeld = false;
     destroyTransportWorkbenchCarrier();
     closeTransportWorkbenchInfoPopover({ restoreFocus: false });
+    closeTransportWorkbenchSectionHelpPopover({ restoreFocus: false });
     state.toggleLeftPanelFn?.(uiState.restoreLeftDrawer);
     state.toggleRightPanelFn?.(!uiState.restoreLeftDrawer && uiState.restoreRightDrawer);
     uiState.restoreLeftDrawer = false;
@@ -1618,6 +1796,7 @@ function initToolbar({ render } = {}) {
   const resetTransportWorkbenchView = () => {
     ensureTransportWorkbenchUiState();
     resetTransportWorkbenchCarrierView();
+    syncTransportWorkbenchPreviewControls();
   };
 
   state.openTransportWorkbenchFn = (trigger = null) => {
@@ -2029,10 +2208,10 @@ function initToolbar({ render } = {}) {
     }
     if (scenarioTransportWorkbenchBtn) {
       scenarioTransportWorkbenchBtn.classList.toggle("hidden", !!state.ui.scenarioBarCollapsed);
-      scenarioTransportWorkbenchBtn.textContent = "Transport";
+      scenarioTransportWorkbenchBtn.textContent = t("Transport", "ui");
       scenarioTransportWorkbenchBtn.setAttribute("title", state.transportWorkbenchUi?.open
-        ? "Close transport workbench"
-        : "Open transport workbench");
+        ? t("Close transport workbench", "ui")
+        : t("Open transport workbench", "ui"));
     }
     refreshScenarioSelectionChip();
     renderScenarioGuideStatus({
@@ -2245,6 +2424,10 @@ function initToolbar({ render } = {}) {
       const insideTransportWorkbenchInfo = target.closest("#transportWorkbenchInfoPopover, #transportWorkbenchInfoBtn");
       if (transportWorkbenchInfoPopover && !transportWorkbenchInfoPopover.classList.contains("hidden") && !insideTransportWorkbenchInfo) {
         closeTransportWorkbenchInfoPopover();
+      }
+      const insideTransportWorkbenchSectionHelp = target.closest("#transportWorkbenchSectionHelpPopover, .transport-workbench-section-help-btn");
+      if (transportWorkbenchSectionHelpPopover && !transportWorkbenchSectionHelpPopover.classList.contains("hidden") && !insideTransportWorkbenchSectionHelp) {
+        closeTransportWorkbenchSectionHelpPopover();
       }
     });
     document.addEventListener("keydown", (event) => {
@@ -4108,6 +4291,30 @@ function initToolbar({ render } = {}) {
     transportWorkbenchCompareBtn.dataset.bound = "true";
   }
 
+  if (transportWorkbenchZoomOutBtn && !transportWorkbenchZoomOutBtn.dataset.bound) {
+    transportWorkbenchZoomOutBtn.addEventListener("click", () => {
+      stepTransportWorkbenchCarrierZoom(-1);
+      syncTransportWorkbenchPreviewControls();
+    });
+    transportWorkbenchZoomOutBtn.dataset.bound = "true";
+  }
+
+  if (transportWorkbenchZoomInBtn && !transportWorkbenchZoomInBtn.dataset.bound) {
+    transportWorkbenchZoomInBtn.addEventListener("click", () => {
+      stepTransportWorkbenchCarrierZoom(1);
+      syncTransportWorkbenchPreviewControls();
+    });
+    transportWorkbenchZoomInBtn.dataset.bound = "true";
+  }
+
+  if (transportWorkbenchRotateBtn && !transportWorkbenchRotateBtn.dataset.bound) {
+    transportWorkbenchRotateBtn.addEventListener("click", () => {
+      toggleTransportWorkbenchCarrierQuarterTurn();
+      syncTransportWorkbenchPreviewControls();
+    });
+    transportWorkbenchRotateBtn.dataset.bound = "true";
+  }
+
   transportWorkbenchFamilyTabs.forEach((button) => {
     if (!button || button.dataset.bound === "true") return;
     button.addEventListener("click", () => {
@@ -4122,6 +4329,11 @@ function initToolbar({ render } = {}) {
   if (!document.body.dataset.transportWorkbenchEscapeBound) {
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape" || !state.transportWorkbenchUi?.open) return;
+      if (transportWorkbenchSectionHelpPopover && !transportWorkbenchSectionHelpPopover.classList.contains("hidden")) {
+        event.preventDefault();
+        closeTransportWorkbenchSectionHelpPopover({ restoreFocus: true });
+        return;
+      }
       if (transportWorkbenchInfoPopover && !transportWorkbenchInfoPopover.classList.contains("hidden")) {
         event.preventDefault();
         closeTransportWorkbenchInfoPopover({ restoreFocus: true });

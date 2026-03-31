@@ -131,6 +131,73 @@ async function fetchJsonResource(url, label) {
   };
 }
 
+async function decompressGzipBytes(bytes) {
+  if (typeof DecompressionStream !== "function") {
+    throw new Error("DecompressionStream is not available.");
+  }
+  const blob = new Blob([bytes], { type: "application/gzip" });
+  const stream = blob.stream().pipeThrough(new DecompressionStream("gzip"));
+  return new Response(stream).text();
+}
+
+function buildGzipCandidateUrl(url) {
+  const normalized = String(url || "").trim();
+  if (!normalized || normalized.endsWith(".gz") || !normalized.endsWith(".json")) {
+    return "";
+  }
+  return `${normalized}.gz`;
+}
+
+async function fetchJsonResourceWithOptionalGzip(url, label) {
+  const gzipUrl = buildGzipCandidateUrl(url);
+  if (gzipUrl) {
+    try {
+      const resolvedUrl = new URL(gzipUrl, `${self.location.origin}/`).toString();
+      const startedAt = nowMs();
+      const response = await fetch(resolvedUrl, {
+        cache: "default",
+        credentials: "same-origin",
+      });
+      const headersReceivedAt = nowMs();
+      if (response.ok) {
+        const compressedBytes = await response.arrayBuffer();
+        const fetchCompletedAt = nowMs();
+        const rawText = await decompressGzipBytes(compressedBytes);
+        const decompressedAt = nowMs();
+        const payload = rawText ? JSON.parse(rawText) : null;
+        const parsedAt = nowMs();
+        return {
+          payload,
+          metrics: {
+            url: resolvedUrl,
+            label,
+            transferMs: headersReceivedAt - startedAt,
+            fetchMs: fetchCompletedAt - startedAt,
+            decompressMs: decompressedAt - fetchCompletedAt,
+            jsonParseMs: parsedAt - decompressedAt,
+            totalMs: parsedAt - startedAt,
+            bytes: rawText.length,
+            compressedBytes: compressedBytes.byteLength,
+            compressed: true,
+          },
+        };
+      }
+    } catch (_error) {
+      // Fall back to plain JSON below.
+    }
+  }
+  const plainResult = await fetchJsonResource(url, label);
+  return {
+    ...plainResult,
+    metrics: {
+      ...(plainResult.metrics || {}),
+      compressed: false,
+      compressedBytes: 0,
+      decompressMs: 0,
+    },
+  };
+}
+
 function getPoliticalGeometryCount(topology) {
   return Array.isArray(topology?.objects?.political?.geometries)
     ? topology.objects.political.geometries.length
@@ -219,6 +286,7 @@ async function handleLoadBaseStartup(message) {
       landData: decodeTopologyObject(topologyResult.payload, "political"),
       specialZonesData: decodeTopologyObject(topologyResult.payload, "special_zones"),
       riversData: decodeTopologyObject(topologyResult.payload, "rivers"),
+      waterRegionsData: decodeTopologyObject(topologyResult.payload, "water_regions"),
       oceanData: decodeTopologyObject(topologyResult.payload, "ocean"),
       landBgData: decodeTopologyObject(topologyResult.payload, "land"),
       urbanData: decodeTopologyObject(topologyResult.payload, "urban"),
@@ -242,7 +310,7 @@ async function handleLoadStartupBundle(message) {
   const expectedScenarioId = String(message?.scenarioId || "").trim();
   const language = String(message?.language || "en").trim().toLowerCase().startsWith("zh") ? "zh" : "en";
   const startedAt = nowMs();
-  const startupBundleResult = await fetchJsonResource(startupBundleUrl, "startupBundle");
+  const startupBundleResult = await fetchJsonResourceWithOptionalGzip(startupBundleUrl, "startupBundle");
   const payload = startupBundleResult.payload && typeof startupBundleResult.payload === "object"
     ? startupBundleResult.payload
     : null;
@@ -271,6 +339,7 @@ async function handleLoadStartupBundle(message) {
     landData: decodeTopologyObject(topologyPrimary, "political"),
     specialZonesData: decodeTopologyObject(topologyPrimary, "special_zones"),
     riversData: decodeTopologyObject(topologyPrimary, "rivers"),
+    waterRegionsData: decodeTopologyObject(topologyPrimary, "water_regions"),
     oceanData: decodeTopologyObject(topologyPrimary, "ocean"),
     landBgData: decodeTopologyObject(topologyPrimary, "land"),
     urbanData: decodeTopologyObject(topologyPrimary, "urban"),

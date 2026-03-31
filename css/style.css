@@ -155,13 +155,10 @@ body.transport-workbench-open.right-drawer-open::after {
 }
 
 .boot-overlay.is-peek {
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding: 18px;
   background:
-    radial-gradient(circle at top right, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0) 28%),
-    rgba(231, 237, 242, 0.14);
-  backdrop-filter: blur(4px);
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0) 40%),
+    rgba(231, 237, 242, 0.68);
+  backdrop-filter: blur(8px);
 }
 
 .boot-overlay__panel {
@@ -174,11 +171,8 @@ body.transport-workbench-open.right-drawer-open::after {
 }
 
 .boot-overlay.is-peek .boot-overlay__panel {
-  width: min(360px, calc(100vw - 36px));
-  padding: 18px 20px 16px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.1);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 22px 42px rgba(15, 23, 42, 0.11);
 }
 
 .boot-overlay__eyebrow {
@@ -3265,7 +3259,7 @@ body.counter-editor-modal-open {
 }
 
 .transport-workbench-panel {
-  --transport-workbench-preview-height: 560px;
+  --transport-workbench-preview-height: 640px;
   width: min(1320px, calc(100vw - 84px));
   max-width: calc(100vw - 84px);
   max-height: calc(100vh - 88px);
@@ -3330,14 +3324,28 @@ body.counter-editor-modal-open {
 .transport-workbench-info-popover {
   position: absolute;
   top: calc(100% + 10px);
-  right: 0;
-  z-index: 2;
-  width: min(340px, calc(100vw - 120px));
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  z-index: 4;
+  width: min(420px, calc(100vw - 140px));
   padding: 14px 15px;
   border: 1px solid rgba(37, 54, 73, 0.14);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.98);
   box-shadow: 0 18px 42px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(12px);
+}
+
+.transport-workbench-section-help-popover {
+  position: fixed;
+  z-index: 5;
+  width: min(280px, calc(100vw - 140px));
+  padding: 12px 13px;
+  border: 1px solid rgba(37, 54, 73, 0.14);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.11);
   backdrop-filter: blur(12px);
 }
 
@@ -3358,6 +3366,13 @@ body.counter-editor-modal-open {
   max-height: min(56vh, 520px);
   overflow: auto;
   padding-right: 2px;
+}
+
+.transport-workbench-section-help-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .transport-workbench-info-block {
@@ -3753,6 +3768,7 @@ body.counter-editor-modal-open {
 }
 
 .transport-workbench-column-preview {
+  justify-content: stretch;
   padding: 12px;
   background:
     linear-gradient(180deg, rgba(244, 248, 252, 0.9), rgba(237, 243, 249, 0.74)),
@@ -3762,10 +3778,10 @@ body.counter-editor-modal-open {
 .transport-workbench-preview-shell {
   position: relative;
   display: block;
-  flex: 0 0 auto;
-  min-height: min(var(--transport-workbench-preview-height), calc(100vh - 260px));
-  height: min(var(--transport-workbench-preview-height), calc(100vh - 260px));
-  max-height: min(var(--transport-workbench-preview-height), calc(100vh - 260px));
+  flex: 1 1 auto;
+  min-height: min(var(--transport-workbench-preview-height), calc(100vh - 220px));
+  height: auto;
+  max-height: min(var(--transport-workbench-preview-height), calc(100vh - 220px));
   padding: 8px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 250, 252, 0.84)),
@@ -3807,20 +3823,6 @@ body.counter-editor-modal-open {
   inset: 8px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 18px;
-  pointer-events: none;
-}
-
-.transport-workbench-preview-hud {
-  position: relative;
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 3;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px;
-  max-width: calc(100% - 32px);
   pointer-events: none;
 }
 
@@ -3874,6 +3876,48 @@ body.counter-editor-modal-open {
   backdrop-filter: blur(10px);
 }
 
+.transport-workbench-preview-controls {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid rgba(37, 54, 73, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 16px 26px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.transport-workbench-preview-control-btn {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 11px;
+  border: 1px solid rgba(37, 54, 73, 0.1);
+  border-radius: 999px;
+  background: rgba(247, 250, 252, 0.92);
+  color: #223347;
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1;
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+}
+
+.transport-workbench-preview-control-btn:hover,
+.transport-workbench-preview-control-btn:focus-visible,
+.transport-workbench-preview-control-btn.is-active {
+  border-color: rgba(120, 84, 71, 0.24);
+  background: rgba(249, 242, 236, 0.98);
+  color: #6b4134;
+}
+
+.transport-workbench-preview-control-btn-rotate {
+  min-width: 48px;
+}
+
 .transport-workbench-carrier-mount {
   position: absolute;
   inset: 0;
@@ -3915,7 +3959,7 @@ body.counter-editor-modal-open {
 
 @media (max-width: 1180px) {
   .transport-workbench-panel {
-    --transport-workbench-preview-height: 520px;
+    --transport-workbench-preview-height: 600px;
     width: min(1160px, calc(100vw - 56px));
     max-width: calc(100vw - 56px);
   }
@@ -3936,7 +3980,7 @@ body.counter-editor-modal-open {
   }
 
   .transport-workbench-panel {
-    --transport-workbench-preview-height: 460px;
+    --transport-workbench-preview-height: 520px;
     width: calc(100vw - 40px);
     max-width: calc(100vw - 40px);
     max-height: calc(100vh - 40px);
@@ -3975,8 +4019,9 @@ body.counter-editor-modal-open {
   }
 
   .transport-workbench-info-popover {
+    left: 50%;
     right: auto;
-    left: 0;
+    transform: translateX(-50%);
     width: min(320px, calc(100vw - 72px));
   }
 }

@@ -1,5 +1,7 @@
 const DEFAULT_ASSET_URL = "data/transport_layers/japan_corridor/carrier.json";
 
+import { t } from "./i18n.js";
+
 const COLOR_TOKENS = {
   sea: "#d8e4ed",
   seaWash: "rgba(255, 255, 255, 0.42)",
@@ -12,7 +14,9 @@ const COLOR_TOKENS = {
 let assetPromise = null;
 let mountNode = null;
 let svgNode = null;
+let cameraNode = null;
 let sceneNode = null;
+let orientationNode = null;
 let resizeObserver = null;
 let asset = null;
 let activeFamily = "road";
@@ -20,6 +24,8 @@ let pointerDrag = null;
 let camera = { scale: 1, translateX: 0, translateY: 0, minScale: 1, maxScale: 3 };
 let currentLodKey = "overview";
 let frameContexts = {};
+let rotationQuarterTurns = 0;
+let sceneBaseBounds = null;
 
 const overlayRoots = {
   land: { main: null },
@@ -57,6 +63,54 @@ function getViewBoxSize() {
   return {
     width: Number(asset?.viewBox?.width) || 1600,
     height: Number(asset?.viewBox?.height) || 900,
+  };
+}
+
+function getSceneBaseBounds() {
+  if (sceneBaseBounds) return sceneBaseBounds;
+  const extents = Object.values(asset?.frames || {})
+    .map((frameDefinition) => frameDefinition?.extent)
+    .filter((extent) => extent && Number.isFinite(extent.x) && Number.isFinite(extent.y));
+  if (!extents.length) {
+    const { width, height } = getViewBoxSize();
+    sceneBaseBounds = { x: 0, y: 0, width, height };
+    return sceneBaseBounds;
+  }
+  const minX = Math.min(...extents.map((extent) => extent.x));
+  const minY = Math.min(...extents.map((extent) => extent.y));
+  const maxX = Math.max(...extents.map((extent) => extent.x + extent.width));
+  const maxY = Math.max(...extents.map((extent) => extent.y + extent.height));
+  sceneBaseBounds = {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
+  };
+  return sceneBaseBounds;
+}
+
+function getOrientationLayout() {
+  const baseBounds = getSceneBaseBounds();
+  const { width: viewWidth, height: viewHeight } = getViewBoxSize();
+  const quarterTurns = ((rotationQuarterTurns % 4) + 4) % 4;
+  const rotated = quarterTurns % 2 === 1;
+  const rotatedWidth = rotated ? baseBounds.height : baseBounds.width;
+  const rotatedHeight = rotated ? baseBounds.width : baseBounds.height;
+  const fitScale = Math.min(viewWidth / rotatedWidth, viewHeight / rotatedHeight);
+  return {
+    quarterTurns,
+    fitScale,
+    angle: quarterTurns * 90,
+    centerX: viewWidth / 2,
+    centerY: viewHeight / 2,
+    baseCenterX: baseBounds.x + baseBounds.width / 2,
+    baseCenterY: baseBounds.y + baseBounds.height / 2,
+    bounds: {
+      x: (viewWidth - rotatedWidth * fitScale) / 2,
+      y: (viewHeight - rotatedHeight * fitScale) / 2,
+      width: rotatedWidth * fitScale,
+      height: rotatedHeight * fitScale,
+    },
   };
 }
 
@@ -105,20 +159,35 @@ function deriveLodKey(scale) {
 
 function clampCamera(nextCamera) {
   const { width, height } = getViewBoxSize();
+  const orientationBounds = getOrientationLayout().bounds;
   const defaultCamera = asset?.defaultCamera || {};
   const scale = clamp(
     Number(nextCamera.scale) || 1,
     Number(defaultCamera.minScale) || 1,
     Number(defaultCamera.maxScale) || 3
   );
-  const minTranslateX = width * (1 - scale);
-  const minTranslateY = height * (1 - scale);
+  const scaledWidth = orientationBounds.width * scale;
+  const scaledHeight = orientationBounds.height * scale;
+  const centeredTranslateX = (width - scaledWidth) / 2 - orientationBounds.x * scale;
+  const centeredTranslateY = (height - scaledHeight) / 2 - orientationBounds.y * scale;
+  const minTranslateX = scaledWidth <= width
+    ? centeredTranslateX
+    : width - (orientationBounds.x + orientationBounds.width) * scale;
+  const maxTranslateX = scaledWidth <= width
+    ? centeredTranslateX
+    : -orientationBounds.x * scale;
+  const minTranslateY = scaledHeight <= height
+    ? centeredTranslateY
+    : height - (orientationBounds.y + orientationBounds.height) * scale;
+  const maxTranslateY = scaledHeight <= height
+    ? centeredTranslateY
+    : -orientationBounds.y * scale;
   return {
     scale,
     minScale: Number(defaultCamera.minScale) || 1,
     maxScale: Number(defaultCamera.maxScale) || 3,
-    translateX: clamp(Number(nextCamera.translateX) || 0, minTranslateX, 0),
-    translateY: clamp(Number(nextCamera.translateY) || 0, minTranslateY, 0),
+    translateX: clamp(Number(nextCamera.translateX) || 0, minTranslateX, maxTranslateX),
+    translateY: clamp(Number(nextCamera.translateY) || 0, minTranslateY, maxTranslateY),
   };
 }
 
@@ -152,11 +221,16 @@ function renderLodIfNeeded(force = false) {
 }
 
 function applyCamera() {
-  if (!sceneNode) return;
+  if (!cameraNode || !orientationNode) return;
   renderLodIfNeeded();
-  sceneNode.setAttribute(
+  const orientationLayout = getOrientationLayout();
+  cameraNode.setAttribute(
     "transform",
     `translate(${camera.translateX} ${camera.translateY}) scale(${camera.scale})`
+  );
+  orientationNode.setAttribute(
+    "transform",
+    `translate(${orientationLayout.centerX} ${orientationLayout.centerY}) rotate(${orientationLayout.angle}) scale(${orientationLayout.fitScale}) translate(${-orientationLayout.baseCenterX} ${-orientationLayout.baseCenterY})`
   );
   syncInteractiveState();
 }
@@ -352,7 +426,7 @@ function buildCarrierSvg(carrierAsset) {
   svg.setAttribute("viewBox", `0 0 ${carrierAsset.viewBox.width} ${carrierAsset.viewBox.height}`);
   svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
   svg.setAttribute("role", "img");
-  svg.setAttribute("aria-label", "Japan transport workbench carrier");
+  svg.setAttribute("aria-label", t("Japan transport workbench carrier", "ui"));
 
   const defs = createSvgNode("defs");
   const seaBackground = createSvgNode("rect");
@@ -362,16 +436,23 @@ function buildCarrierSvg(carrierAsset) {
   seaBackground.setAttribute("height", String(carrierAsset.viewBox.height));
   seaBackground.setAttribute("fill", COLOR_TOKENS.sea);
 
+  const cameraLayer = createSvgNode("g");
+  cameraLayer.classList.add("transport-workbench-carrier-camera");
+  const orientationLayer = createSvgNode("g");
+  orientationLayer.classList.add("transport-workbench-carrier-orientation");
   const scene = createSvgNode("g");
   scene.classList.add("transport-workbench-carrier-scene");
 
   frameContexts = {};
+  sceneBaseBounds = null;
   Object.entries(carrierAsset.frames || {}).forEach(([frameId, frameDefinition]) => {
     frameContexts[frameId] = buildFrame(frameId, frameDefinition, defs, scene);
   });
 
-  svg.append(defs, seaBackground, scene);
-  return { svg, scene };
+  orientationLayer.appendChild(scene);
+  cameraLayer.appendChild(orientationLayer);
+  svg.append(defs, seaBackground, cameraLayer);
+  return { svg, cameraLayer, scene, orientationLayer };
 }
 
 function ensureResizeObserver() {
@@ -434,7 +515,9 @@ export async function ensureTransportWorkbenchCarrier(nextMountNode) {
   if (!svgNode) {
     const built = buildCarrierSvg(asset);
     svgNode = built.svg;
+    cameraNode = built.cameraLayer;
     sceneNode = built.scene;
+    orientationNode = built.orientationLayer;
     currentLodKey = "overview";
     camera = clampCamera(asset.defaultCamera || camera);
     renderLodIfNeeded(true);
@@ -464,8 +547,33 @@ export function setTransportWorkbenchCarrierFamily(familyId) {
 
 export function resetTransportWorkbenchCarrierView() {
   if (!asset) return;
+  rotationQuarterTurns = 0;
   camera = clampCamera(asset.defaultCamera || camera);
   applyCamera();
+}
+
+export function stepTransportWorkbenchCarrierZoom(direction) {
+  if (!asset || !svgNode) return;
+  const { width, height } = getViewBoxSize();
+  const factor = Number(direction) >= 0 ? 1.16 : 1 / 1.16;
+  zoomAroundPoint(camera.scale * factor, { x: width / 2, y: height / 2 });
+}
+
+export function toggleTransportWorkbenchCarrierQuarterTurn() {
+  if (!asset) return 0;
+  rotationQuarterTurns = rotationQuarterTurns === 1 ? 0 : 1;
+  camera = clampCamera({ ...camera });
+  applyCamera();
+  return rotationQuarterTurns;
+}
+
+export function getTransportWorkbenchCarrierViewState() {
+  return {
+    scale: camera.scale,
+    translateX: camera.translateX,
+    translateY: camera.translateY,
+    quarterTurns: rotationQuarterTurns,
+  };
 }
 
 export function resizeTransportWorkbenchCarrier() {
@@ -474,6 +582,7 @@ export function resizeTransportWorkbenchCarrier() {
 
 export function destroyTransportWorkbenchCarrier() {
   pointerDrag = null;
+  rotationQuarterTurns = 0;
   if (asset?.defaultCamera) {
     camera = clampCamera(asset.defaultCamera);
   }
@@ -484,8 +593,11 @@ export function destroyTransportWorkbenchCarrier() {
   }
   mountNode = null;
   svgNode = null;
+  cameraNode = null;
   sceneNode = null;
+  orientationNode = null;
   frameContexts = {};
+  sceneBaseBounds = null;
   overlayRoots.land.main = null;
   overlayRoots.sea.main = null;
 }

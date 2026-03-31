@@ -48,6 +48,123 @@ def _extract_language_entry(value: object, language: str) -> object:
     return value
 
 
+def _normalize_stable_key(value: object) -> str:
+    text = _normalize_text(value)
+    if text.startswith("id::"):
+        return text[4:]
+    return text
+
+
+def _extract_geometry_key(geometry: object) -> str:
+    if not isinstance(geometry, dict):
+        return ""
+    properties = geometry.get("properties")
+    if not isinstance(properties, dict):
+        properties = {}
+    for candidate in (
+        properties.get("id"),
+        properties.get("NUTS_ID"),
+        geometry.get("id"),
+    ):
+        key = _normalize_stable_key(candidate)
+        if key:
+            return key
+    return ""
+
+
+def _collect_topology_object_keys(topology: dict, object_names: tuple[str, ...]) -> set[str]:
+    if not isinstance(topology, dict):
+        return set()
+    objects = topology.get("objects")
+    if not isinstance(objects, dict):
+        return set()
+    keys: set[str] = set()
+    for object_name in object_names:
+        object_payload = objects.get(object_name)
+        geometries = object_payload.get("geometries") if isinstance(object_payload, dict) else None
+        if not isinstance(geometries, list):
+            continue
+        for geometry in geometries:
+            key = _extract_geometry_key(geometry)
+            if key:
+                keys.add(key)
+    return keys
+
+
+def collect_required_geo_keys(
+    topology_primary: dict,
+    runtime_bootstrap_topology: dict,
+    geo_locale_patch: dict,
+) -> set[str]:
+    required_keys = set()
+    required_keys.update(
+        _collect_topology_object_keys(
+            topology_primary,
+            (
+                "political",
+                "water_regions",
+                "special_zones",
+                "rivers",
+                "urban",
+                "physical",
+            ),
+        )
+    )
+    required_keys.update(
+        _collect_topology_object_keys(
+            runtime_bootstrap_topology,
+            (
+                "political",
+                "land_mask",
+                "context_land_mask",
+                "scenario_water",
+                "scenario_special_land",
+            ),
+        )
+    )
+    geo_patch = geo_locale_patch.get("geo") if isinstance(geo_locale_patch, dict) else None
+    if isinstance(geo_patch, dict):
+        for key in geo_patch.keys():
+            normalized = _normalize_stable_key(key)
+            if normalized:
+                required_keys.add(normalized)
+    return required_keys
+
+
+def prune_startup_geo_locales(startup_locales_payload: dict, required_geo_keys: set[str]) -> dict:
+    next_payload = {
+        "ui": copy.deepcopy(startup_locales_payload.get("ui", {})),
+        "geo": {},
+    }
+    source_geo = startup_locales_payload.get("geo", {})
+    if not isinstance(source_geo, dict):
+        return next_payload
+    for key, value in source_geo.items():
+        normalized = _normalize_stable_key(key)
+        if normalized and normalized in required_geo_keys:
+            next_payload["geo"][key] = value
+    return next_payload
+
+
+def prune_startup_geo_aliases(geo_aliases_payload: dict, required_geo_keys: set[str]) -> dict:
+    alias_map = geo_aliases_payload.get("alias_to_stable_key", {}) if isinstance(geo_aliases_payload, dict) else {}
+    if not isinstance(alias_map, dict):
+        return {"alias_to_stable_key": {}}
+    next_alias_map = {}
+    for alias, stable_key in alias_map.items():
+        normalized_target = _normalize_stable_key(stable_key)
+        if normalized_target and normalized_target in required_geo_keys:
+            next_alias_map[alias] = stable_key
+    return {"alias_to_stable_key": next_alias_map}
+
+
+def write_gzip_sidecar(payload: object, output_path: Path) -> Path:
+    gzip_path = output_path.with_suffix(f"{output_path.suffix}.gz")
+    raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    gzip_path.write_bytes(gzip.compress(raw, compresslevel=9))
+    return gzip_path
+
+
 def build_single_language_locales_payload(startup_locales: dict, language: str) -> dict:
     if language not in SUPPORTED_LANGUAGES:
         raise ValueError(f"Unsupported startup bundle language: {language}")
@@ -130,13 +247,20 @@ def build_startup_bundle_payload(
         raise ValueError("Scenario manifest is missing scenario_id.")
 
     topology_primary = _read_json(topology_primary_path)
-    geo_aliases = _read_json(geo_aliases_path)
     runtime_bootstrap_topology = _read_json(runtime_bootstrap_topology_path)
     countries_payload = _read_json(countries_path)
     owners_payload = _read_json(owners_path)
     controllers_payload = _read_json(controllers_path)
     cores_payload = _read_json(cores_path)
     geo_locale_patch = _read_json(geo_locale_patch_path)
+    geo_aliases = _read_json(geo_aliases_path)
+    required_geo_keys = collect_required_geo_keys(
+        topology_primary,
+        runtime_bootstrap_topology,
+        geo_locale_patch,
+    )
+    pruned_locales_payload = prune_startup_geo_locales(startup_locales_payload, required_geo_keys)
+    pruned_geo_aliases = prune_startup_geo_aliases(geo_aliases, required_geo_keys)
     apply_seed = build_startup_apply_seed(
         scenario_id,
         scenario_manifest,
@@ -171,8 +295,8 @@ def build_startup_bundle_payload(
         "manifest_subset": manifest_subset,
         "base": {
             "topology_primary": topology_primary,
-            "locales": startup_locales_payload,
-            "geo_aliases": geo_aliases,
+            "locales": pruned_locales_payload,
+            "geo_aliases": pruned_geo_aliases,
         },
         "scenario": {
             "runtime_topology_bootstrap": runtime_bootstrap_topology,
@@ -190,6 +314,9 @@ def build_startup_bundle_report(
     *,
     payload_by_language: dict[str, dict],
     output_paths_by_language: dict[str, Path],
+    gzip_paths_by_language: dict[str, Path],
+    startup_locales_payload_by_language: dict[str, dict],
+    original_geo_aliases: dict,
     report_path: Path | None,
 ) -> dict:
     report = {
@@ -200,11 +327,22 @@ def build_startup_bundle_report(
     }
     for language, payload in payload_by_language.items():
         output_path = output_paths_by_language[language]
+        gzip_path = gzip_paths_by_language[language]
         raw_bytes = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        original_locales_payload = startup_locales_payload_by_language[language]
+        original_geo_alias_map = original_geo_aliases.get("alias_to_stable_key", {}) if isinstance(original_geo_aliases, dict) else {}
+        pruned_locales_payload = payload["base"]["locales"]
+        pruned_geo_aliases = payload["base"]["geo_aliases"]
         report["languages"][language] = {
             "output_path": str(output_path),
+            "gzip_output_path": str(gzip_path),
             "raw_bytes": len(raw_bytes),
             "gzip_bytes": len(gzip.compress(raw_bytes, compresslevel=9)),
+            "gzip_file_bytes": gzip_path.stat().st_size if gzip_path.exists() else 0,
+            "locale_geo_keys_before": len(original_locales_payload.get("geo", {})),
+            "locale_geo_keys_after": len(pruned_locales_payload.get("geo", {})),
+            "geo_alias_keys_before": len(original_geo_alias_map),
+            "geo_alias_keys_after": len(pruned_geo_aliases.get("alias_to_stable_key", {})),
             "sections": {
                 "base_topology_raw_bytes": len(
                     json.dumps(payload["base"]["topology_primary"], ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -249,24 +387,29 @@ def build_startup_bundles(
     scenario_manifest = _read_json(scenario_manifest_path)
     data_manifest = _read_json(data_manifest_path)
     startup_locales = _read_json(startup_locales_path)
+    original_geo_aliases = _read_json(geo_aliases_path)
 
     payload_by_language = {}
     output_paths_by_language = {
         "en": output_en_path,
         "zh": output_zh_path,
     }
+    gzip_paths_by_language = {}
+    startup_locales_payload_by_language = {}
     patch_paths_by_language = {
         "en": geo_locale_patch_en_path,
         "zh": geo_locale_patch_zh_path,
     }
     for language in SUPPORTED_LANGUAGES:
+        single_language_locales_payload = build_single_language_locales_payload(startup_locales, language)
+        startup_locales_payload_by_language[language] = single_language_locales_payload
         payload = build_startup_bundle_payload(
             language=language,
             scenario_manifest=scenario_manifest,
             data_manifest=data_manifest,
             topology_primary_path=topology_primary_path,
             startup_locales_path=startup_locales_path,
-            startup_locales_payload=build_single_language_locales_payload(startup_locales, language),
+            startup_locales_payload=single_language_locales_payload,
             geo_aliases_path=geo_aliases_path,
             runtime_bootstrap_topology_path=runtime_bootstrap_topology_path,
             countries_path=countries_path,
@@ -284,15 +427,20 @@ def build_startup_bundles(
             separators=(",", ":"),
             trailing_newline=True,
         )
+        gzip_paths_by_language[language] = write_gzip_sidecar(payload, output_paths_by_language[language])
 
     report = build_startup_bundle_report(
         payload_by_language=payload_by_language,
         output_paths_by_language=output_paths_by_language,
+        gzip_paths_by_language=gzip_paths_by_language,
+        startup_locales_payload_by_language=startup_locales_payload_by_language,
+        original_geo_aliases=original_geo_aliases,
         report_path=report_path,
     )
     return {
         "scenario_id": _normalize_text(scenario_manifest.get("scenario_id")),
         "outputs": {language: str(path) for language, path in output_paths_by_language.items()},
+        "gzip_outputs": {language: str(path) for language, path in gzip_paths_by_language.items()},
         "report_path": str(report_path) if report_path else "",
         "report": report,
     }

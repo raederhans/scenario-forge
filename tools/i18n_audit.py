@@ -28,8 +28,8 @@ except ImportError:
         should_track_geo_missing_like,
     )
 
-UI_T_CALL_RE = re.compile(r"""t\(\s*(['\"])(?P<text>.*?)\1\s*,\s*(['\"])ui\3\s*\)""")
-GEO_T_CALL_RE = re.compile(r"""t\(\s*(['\"])(?P<text>.*?)\1\s*,\s*(['\"])geo\3\s*\)""")
+UI_T_CALL_RE = re.compile(r"""\bt\(\s*(['\"])(?P<text>.*?)\1\s*,\s*(['\"])ui\3\s*\)""")
+GEO_T_CALL_RE = re.compile(r"""\bt\(\s*(['\"])(?P<text>.*?)\1\s*,\s*(['\"])geo\3\s*\)""")
 MODAL_CALL_RE = re.compile(r"""\b(?:alert|confirm|prompt)\(\s*(['\"])(?P<text>.*?)\1\s*\)""")
 UI_MAP_ENTRY_RE = re.compile(
     r"""\[\s*"[^"]+"\s*,\s*"(?P<text>(?:\\.|[^"])*)"\s*\]""",

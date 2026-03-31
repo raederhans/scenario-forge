@@ -1270,6 +1270,42 @@ export async function loadMapData({
     console.warn("Palette registry missing or invalid, continuing with legacy palette fallback.", err);
     return null;
   });
+  const paletteAssetsPromise = paletteRegistryPromise.then((paletteRegistry) => {
+    if (!Array.isArray(paletteRegistry?.palettes) || paletteRegistry.palettes.length === 0) {
+      return {
+        activePaletteMeta: null,
+        activePalettePack: null,
+        activePaletteMap: null,
+      };
+    }
+    const defaultPaletteId = String(
+      paletteRegistry.default_palette_id || paletteRegistry.palettes[0]?.palette_id || ""
+    ).trim();
+    const activePaletteMeta =
+      paletteRegistry.palettes.find((entry) => String(entry?.palette_id || "").trim() === defaultPaletteId)
+      || paletteRegistry.palettes[0]
+      || null;
+    const paletteUrl = String(activePaletteMeta?.palette_url || "").trim();
+    const mapUrl = String(activePaletteMeta?.map_url || "").trim();
+    return Promise.all([
+      paletteUrl
+        ? d3Client.json(paletteUrl).catch((err) => {
+          console.warn(`Palette pack missing or invalid at ${paletteUrl}, continuing without asset palette.`, err);
+          return null;
+        })
+        : Promise.resolve(null),
+      mapUrl
+        ? d3Client.json(mapUrl).catch((err) => {
+          console.warn(`Palette map missing or invalid at ${mapUrl}, continuing without asset palette mapping.`, err);
+          return null;
+        })
+        : Promise.resolve(null),
+    ]).then(([activePalettePack, activePaletteMap]) => ({
+      activePaletteMeta,
+      activePalettePack,
+      activePaletteMap,
+    }));
+  });
   const releasableCatalogPromise = d3Client.json(releasableCatalogUrl).catch((err) => {
     console.warn("Releasable catalog missing or invalid, continuing without releasable overlays.", err);
     return null;
@@ -1361,6 +1397,7 @@ export async function loadMapData({
     specialZones,
     runtimePoliticalTopology,
     paletteRegistry,
+    paletteAssets,
     releasableCatalog,
     contextLayerExternal,
   ] = await Promise.all([
@@ -1373,6 +1410,7 @@ export async function loadMapData({
     specialZonesPromise,
     runtimePoliticalPromise,
     paletteRegistryPromise,
+    paletteAssetsPromise,
     releasableCatalogPromise,
     contextLayerPackPromise,
   ]);
@@ -1385,34 +1423,9 @@ export async function loadMapData({
     cityAliases,
   });
 
-  let activePaletteMeta = null;
-  let activePalettePack = null;
-  let activePaletteMap = null;
-  if (Array.isArray(paletteRegistry?.palettes) && paletteRegistry.palettes.length > 0) {
-    const defaultPaletteId = String(
-      paletteRegistry.default_palette_id || paletteRegistry.palettes[0]?.palette_id || ""
-    ).trim();
-    activePaletteMeta =
-      paletteRegistry.palettes.find((entry) => String(entry?.palette_id || "").trim() === defaultPaletteId)
-      || paletteRegistry.palettes[0]
-      || null;
-    const paletteUrl = String(activePaletteMeta?.palette_url || "").trim();
-    const mapUrl = String(activePaletteMeta?.map_url || "").trim();
-    [activePalettePack, activePaletteMap] = await Promise.all([
-      paletteUrl
-        ? d3Client.json(paletteUrl).catch((err) => {
-          console.warn(`Palette pack missing or invalid at ${paletteUrl}, continuing without asset palette.`, err);
-          return null;
-        })
-        : Promise.resolve(null),
-      mapUrl
-        ? d3Client.json(mapUrl).catch((err) => {
-          console.warn(`Palette map missing or invalid at ${mapUrl}, continuing without asset palette mapping.`, err);
-          return null;
-        })
-        : Promise.resolve(null),
-    ]);
-  }
+  const activePaletteMeta = paletteAssets?.activePaletteMeta || null;
+  const activePalettePack = paletteAssets?.activePalettePack || null;
+  const activePaletteMap = paletteAssets?.activePaletteMap || null;
 
   return {
     ...topologyBundle,

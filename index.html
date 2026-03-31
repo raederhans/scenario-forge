@@ -7,11 +7,35 @@
     <title data-i18n="Map Creator">Map Creator</title>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="modulepreload" href="js/main.js" />
-    <link rel="preload" href="data/europe_topology.json" as="fetch" crossorigin />
-    <link rel="preload" href="data/locales.startup.json" as="fetch" crossorigin />
-    <link rel="preload" href="data/geo_aliases.startup.json" as="fetch" crossorigin />
-    <link rel="preload" href="data/scenarios/index.json" as="fetch" crossorigin />
-    <link rel="preload" href="data/scenarios/tno_1962/manifest.json" as="fetch" crossorigin />
+    <script>
+      (() => {
+        const defaultScenario = document
+          .querySelector('meta[name="default-scenario"]')
+          ?.getAttribute("content");
+        const scenarioId = String(defaultScenario || "").trim();
+        if (!scenarioId) return;
+        let language = "en";
+        try {
+          const storedLanguage = String(localStorage.getItem("map_lang") || "").trim().toLowerCase();
+          if (storedLanguage.startsWith("zh")) {
+            language = "zh";
+          }
+        } catch (_error) {
+          language = "en";
+        }
+        const preload = document.createElement("link");
+        preload.rel = "preload";
+        preload.as = "fetch";
+        preload.crossOrigin = "anonymous";
+        preload.fetchPriority = "high";
+        const supportsClientGzip = typeof DecompressionStream === "function";
+        preload.href = supportsClientGzip
+          ? `data/scenarios/${scenarioId}/startup.bundle.${language}.json.gz`
+          : `data/scenarios/${scenarioId}/startup.bundle.${language}.json`;
+        preload.setAttribute("data-startup-bundle-preload", "true");
+        document.head.appendChild(preload);
+      })();
+    </script>
   </head>
   <body class="app-booting">
     <div id="appShell" class="app-layout">
@@ -1872,47 +1896,51 @@
         aria-modal="true"
         aria-labelledby="transportWorkbenchTitle"
       >
-        <h2 id="transportWorkbenchTitle" class="visually-hidden">Transport workbench</h2>
+        <h2 id="transportWorkbenchTitle" class="visually-hidden" data-i18n="Transport workbench">Transport workbench</h2>
         <div class="transport-workbench-shell">
           <div class="transport-workbench-topbar">
-            <div class="transport-workbench-family-tabs" role="tablist" aria-label="Transport families">
-              <button type="button" class="transport-workbench-family-tab is-active" data-transport-family="road" role="tab" aria-selected="true">Road</button>
-              <button type="button" class="transport-workbench-family-tab" data-transport-family="rail" role="tab" aria-selected="false">Rail</button>
-              <button type="button" class="transport-workbench-family-tab" data-transport-family="airport" role="tab" aria-selected="false">Airport</button>
-              <button type="button" class="transport-workbench-family-tab" data-transport-family="port" role="tab" aria-selected="false">Port</button>
-              <button type="button" class="transport-workbench-family-tab" data-transport-family="mineral_resources" role="tab" aria-selected="false">Mineral Resources</button>
-              <button type="button" class="transport-workbench-family-tab" data-transport-family="energy_facilities" role="tab" aria-selected="false">Energy Facilities</button>
-              <button type="button" class="transport-workbench-family-tab" data-transport-family="industrial_zones" role="tab" aria-selected="false">Industrial Zones</button>
+            <div class="transport-workbench-family-tabs" role="tablist" aria-label="Transport families" data-i18n-aria-label="Transport families">
+              <button type="button" class="transport-workbench-family-tab is-active" data-transport-family="road" role="tab" aria-selected="true" data-i18n="Road">Road</button>
+              <button type="button" class="transport-workbench-family-tab" data-transport-family="rail" role="tab" aria-selected="false" data-i18n="Rail">Rail</button>
+              <button type="button" class="transport-workbench-family-tab" data-transport-family="airport" role="tab" aria-selected="false" data-i18n="Airport">Airport</button>
+              <button type="button" class="transport-workbench-family-tab" data-transport-family="port" role="tab" aria-selected="false" data-i18n="Port">Port</button>
+              <button type="button" class="transport-workbench-family-tab" data-transport-family="mineral_resources" role="tab" aria-selected="false" data-i18n="Mineral Resources">Mineral Resources</button>
+              <button type="button" class="transport-workbench-family-tab" data-transport-family="energy_facilities" role="tab" aria-selected="false" data-i18n="Energy Facilities">Energy Facilities</button>
+              <button type="button" class="transport-workbench-family-tab" data-transport-family="industrial_zones" role="tab" aria-selected="false" data-i18n="Industrial Zones">Industrial Zones</button>
             </div>
             <div class="transport-workbench-topbar-actions">
-              <button id="transportWorkbenchInfoBtn" type="button" class="transport-workbench-icon-btn" aria-haspopup="dialog" aria-controls="transportWorkbenchInfoPopover" aria-expanded="false">Info</button>
-              <button id="transportWorkbenchCloseBtn" type="button" class="transport-workbench-close-btn" aria-label="Close transport workbench">Close</button>
+              <button id="transportWorkbenchInfoBtn" type="button" class="transport-workbench-icon-btn" aria-haspopup="dialog" aria-controls="transportWorkbenchInfoPopover" aria-expanded="false" data-i18n="Info">Info</button>
+              <button id="transportWorkbenchCloseBtn" type="button" class="transport-workbench-close-btn" aria-label="Close transport workbench" data-i18n="Close" data-i18n-aria-label="Close transport workbench">Close</button>
             </div>
-              <div id="transportWorkbenchInfoPopover" class="transport-workbench-info-popover hidden" role="dialog" aria-labelledby="transportWorkbenchInfoTitle" aria-hidden="true">
-                <div id="transportWorkbenchInfoTitle" class="transport-workbench-info-title">Workbench notes</div>
-                <div id="transportWorkbenchInfoBody" class="transport-workbench-info-body"></div>
-              </div>
+            <div id="transportWorkbenchInfoPopover" class="transport-workbench-info-popover hidden" role="dialog" aria-labelledby="transportWorkbenchInfoTitle" aria-hidden="true">
+              <div id="transportWorkbenchInfoTitle" class="transport-workbench-info-title" data-i18n="Workbench notes">Workbench notes</div>
+              <div id="transportWorkbenchInfoBody" class="transport-workbench-info-body"></div>
+            </div>
+            <div id="transportWorkbenchSectionHelpPopover" class="transport-workbench-section-help-popover hidden" role="dialog" aria-labelledby="transportWorkbenchSectionHelpTitle" aria-hidden="true">
+              <div id="transportWorkbenchSectionHelpTitle" class="transport-workbench-info-title"></div>
+              <div id="transportWorkbenchSectionHelpBody" class="transport-workbench-section-help-body"></div>
+            </div>
           </div>
 
           <div class="transport-workbench-body">
             <div class="transport-workbench-grid">
               <section class="transport-workbench-column transport-workbench-column-lens" aria-labelledby="transportWorkbenchLensTitle">
                 <div class="transport-workbench-column-header transport-workbench-column-header-compact">
-                  <div class="transport-workbench-column-kicker">Context Lens</div>
-                  <h3 id="transportWorkbenchLensTitle" class="transport-workbench-column-title">Road corridor lens</h3>
+                  <div class="transport-workbench-column-kicker" data-i18n="Context Lens">Context Lens</div>
+                  <h3 id="transportWorkbenchLensTitle" class="transport-workbench-column-title" data-i18n="Road corridor lens">Road corridor lens</h3>
                 </div>
                 <div class="transport-workbench-meta-strip">
                   <div class="transport-workbench-meta-pill">
-                    <span class="transport-workbench-meta-label">Family</span>
-                    <strong id="transportWorkbenchFamilyStatus" class="transport-workbench-meta-value">Road</strong>
+                    <span class="transport-workbench-meta-label" data-i18n="Family">Family</span>
+                    <strong id="transportWorkbenchFamilyStatus" class="transport-workbench-meta-value" data-i18n="Road">Road</strong>
                   </div>
                   <div class="transport-workbench-meta-pill">
-                    <span class="transport-workbench-meta-label">Sample</span>
-                    <strong id="transportWorkbenchCountryStatus" class="transport-workbench-meta-value">Japan</strong>
+                    <span class="transport-workbench-meta-label" data-i18n="Sample">Sample</span>
+                    <strong id="transportWorkbenchCountryStatus" class="transport-workbench-meta-value" data-i18n="Japan">Japan</strong>
                   </div>
                   <div class="transport-workbench-meta-pill">
-                    <span class="transport-workbench-meta-label">Mode</span>
-                    <strong id="transportWorkbenchPreviewMode" class="transport-workbench-meta-value">Bounded zoom/pan</strong>
+                    <span class="transport-workbench-meta-label" data-i18n="Mode">Mode</span>
+                    <strong id="transportWorkbenchPreviewMode" class="transport-workbench-meta-value" data-i18n="Bounded zoom/pan">Bounded zoom/pan</strong>
                   </div>
                 </div>
                 <div class="transport-workbench-parameter-stack">
@@ -1921,20 +1949,21 @@
               </section>
 
               <section class="transport-workbench-column transport-workbench-column-preview" aria-labelledby="transportWorkbenchPreviewTitle">
-                <h3 id="transportWorkbenchPreviewTitle" class="visually-hidden">Japan preview</h3>
+                <h3 id="transportWorkbenchPreviewTitle" class="visually-hidden" data-i18n="Japan preview">Japan preview</h3>
                 <div class="transport-workbench-preview-shell">
                   <div class="transport-workbench-preview-actions">
-                    <button id="transportWorkbenchCompareBtn" type="button" class="transport-workbench-compare-btn">
+                    <button id="transportWorkbenchCompareBtn" type="button" class="transport-workbench-compare-btn" data-i18n="Hold to Compare Baseline">
                       Hold to Compare Baseline
                     </button>
-                    <span id="transportWorkbenchCompareStatus" class="transport-workbench-preview-compare-status">
+                    <span id="transportWorkbenchCompareStatus" class="transport-workbench-preview-compare-status" data-i18n="Current working state">
                       Current working state
                     </span>
                   </div>
                   <div id="transportWorkbenchPreviewCanvas" class="transport-workbench-preview-canvas" aria-hidden="true">
-                    <div class="transport-workbench-preview-hud">
-                      <span id="transportWorkbenchPreviewCountryBadge" class="transport-workbench-preview-badge">Japan</span>
-                      <span id="transportWorkbenchPreviewFamilyBadge" class="transport-workbench-preview-badge transport-workbench-preview-badge-muted">Road</span>
+                    <div class="transport-workbench-preview-controls" role="group" aria-label="Preview controls" data-i18n-aria-label="Preview controls">
+                      <button id="transportWorkbenchZoomOutBtn" type="button" class="transport-workbench-preview-control-btn" aria-label="Zoom out" data-i18n-aria-label="Zoom out" title="Zoom out">−</button>
+                      <button id="transportWorkbenchZoomInBtn" type="button" class="transport-workbench-preview-control-btn" aria-label="Zoom in" data-i18n-aria-label="Zoom in" title="Zoom in">+</button>
+                      <button id="transportWorkbenchRotateBtn" type="button" class="transport-workbench-preview-control-btn transport-workbench-preview-control-btn-rotate" aria-label="Rotate preview 90 degrees" data-i18n-aria-label="Rotate preview 90 degrees" title="Rotate preview 90 degrees">90°</button>
                     </div>
                     <div id="transportWorkbenchCarrierMount" class="transport-workbench-carrier-mount"></div>
                     <div class="transport-workbench-preview-canvas-frame"></div>
@@ -1944,14 +1973,14 @@
 
               <section class="transport-workbench-column transport-workbench-column-inspector" aria-labelledby="transportWorkbenchInspectorTitle">
                 <div class="transport-workbench-column-header transport-workbench-column-header-compact">
-                  <div class="transport-workbench-column-kicker">Inspector</div>
-                  <h3 id="transportWorkbenchInspectorTitle" class="transport-workbench-column-title">Road controls reserved</h3>
+                  <div class="transport-workbench-column-kicker" data-i18n="Inspector">Inspector</div>
+                  <h3 id="transportWorkbenchInspectorTitle" class="transport-workbench-column-title" data-i18n="Road controls reserved">Road controls reserved</h3>
                 </div>
                 <div class="transport-workbench-inspector-stack">
                   <div id="transportWorkbenchInspectorDetails" class="transport-workbench-inspector-detail-list" aria-live="polite"></div>
                   <div class="transport-workbench-empty-card">
-                    <div id="transportWorkbenchInspectorEmptyTitle" class="transport-workbench-empty-title">Awaiting real family schema</div>
-                    <p id="transportWorkbenchInspectorEmptyBody" class="transport-workbench-empty-text">
+                    <div id="transportWorkbenchInspectorEmptyTitle" class="transport-workbench-empty-title" data-i18n="Awaiting real family schema">Awaiting real family schema</div>
+                    <p id="transportWorkbenchInspectorEmptyBody" class="transport-workbench-empty-text" data-i18n="Once the family schema is confirmed, this side will host parameter groups, preview toggles, and map application controls.">
                       Once the family schema is confirmed, this side will host parameter groups, preview toggles, and map application controls.
                     </p>
                   </div>
@@ -1962,8 +1991,8 @@
 
           <div class="transport-workbench-footer">
             <div class="transport-workbench-footer-actions">
-              <button id="transportWorkbenchResetBtn" type="button" class="btn-secondary">Reset View</button>
-              <button id="transportWorkbenchApplyBtn" type="button" class="btn-secondary" disabled aria-disabled="true">Apply to Main Map</button>
+              <button id="transportWorkbenchResetBtn" type="button" class="btn-secondary" data-i18n="Reset View">Reset View</button>
+              <button id="transportWorkbenchApplyBtn" type="button" class="btn-secondary" disabled aria-disabled="true" data-i18n="Apply to Main Map">Apply to Main Map</button>
             </div>
           </div>
         </div>

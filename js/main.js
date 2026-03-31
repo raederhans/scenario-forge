@@ -1826,6 +1826,10 @@ async function bootstrap() {
     } else if (Array.isArray(state.contextLayerExternalDataByName?.rivers?.features)) {
       state.riversData = state.contextLayerExternalDataByName.rivers;
     }
+    if (objects.water_regions) {
+      state.waterRegionsData = startupDecodedCollections?.waterRegionsData
+        || globalThis.topojson.feature(state.topologyPrimary, objects.water_regions);
+    }
     if (objects.ocean) {
       state.oceanData = startupDecodedCollections?.oceanData
         || globalThis.topojson.feature(state.topologyPrimary, objects.ocean);
