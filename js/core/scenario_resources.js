@@ -371,6 +371,11 @@ function canonicalScenarioCountryCode(rawCode) {
   return normalizeCountryCodeAlias(rawCode);
 }
 
+function getRuntimeGeometryFeatureId(geometry) {
+  const props = geometry?.properties || {};
+  return String(props.id || geometry?.id || "").trim();
+}
+
 function extractScenarioCountryCodeFromId(value) {
   const text = String(value || "").trim().toUpperCase();
   if (!text) return "";
@@ -702,239 +707,6 @@ function refreshScenarioDataHealth({
   return health;
 }
 
-function getRuntimeGeometryFeatureId(geometry) {
-  const props = geometry?.properties || {};
-  return String(props.id || geometry?.id || "").trim();
-}
-
-function getRuntimeGeometryFeatureName(geometry) {
-  const props = geometry?.properties || {};
-  return String(props.name || props.NAME || "").trim();
-}
-
-function isScenarioShellCandidate(featureId, featureName = "") {
-  const normalizedId = String(featureId || "").trim();
-  if (!normalizedId) return false;
-  if (normalizedId.toUpperCase().startsWith("RU_ARCTIC_FB_")) return true;
-  return String(featureName || "").toLowerCase().includes("shell fallback");
-}
-
-function isScenarioShellOverlayEnabled() {
-  return !!state.runtimePoliticalTopology?.objects?.political;
-}
-
-function getScenarioEffectiveOwnerCodeByFeatureId(featureId) {
-  const normalizedId = String(featureId || "").trim();
-  if (!normalizedId) return "";
-  return String(
-    state.sovereigntyByFeatureId?.[normalizedId]
-    || state.runtimeCanonicalCountryByFeatureId?.[normalizedId]
-    || ""
-  ).trim().toUpperCase();
-}
-
-function getScenarioEffectiveControllerCodeByFeatureId(featureId) {
-  const normalizedId = String(featureId || "").trim();
-  if (!normalizedId) return "";
-  return String(
-    state.scenarioControllersByFeatureId?.[normalizedId]
-    || getScenarioEffectiveOwnerCodeByFeatureId(normalizedId)
-    || ""
-  ).trim().toUpperCase();
-}
-
-function getScenarioRuntimeNeighborGraph(geometries) {
-  const runtimeGraph = Array.isArray(state.runtimeNeighborGraph) ? state.runtimeNeighborGraph : [];
-  const hasPopulatedNeighbors = runtimeGraph.some((neighbors) => Array.isArray(neighbors) && neighbors.length > 0);
-  if (runtimeGraph.length === geometries.length && hasPopulatedNeighbors) {
-    return runtimeGraph.map((neighbors) => (Array.isArray(neighbors) ? neighbors : []));
-  }
-  if (typeof globalThis.topojson?.neighbors === "function") {
-    try {
-      const fallback = globalThis.topojson.neighbors(geometries);
-      if (Array.isArray(fallback) && fallback.length === geometries.length) {
-        return fallback.map((neighbors) => (Array.isArray(neighbors) ? neighbors : []));
-      }
-    } catch (error) {
-      console.warn("[scenario] Failed to derive fallback runtime neighbors for shell overlays:", error);
-    }
-  }
-  return new Array(geometries.length).fill(null).map(() => []);
-}
-
-function haveSameScenarioShellMapping(previousMap, nextMap) {
-  const previousKeys = Object.keys(previousMap || {});
-  const nextKeys = Object.keys(nextMap || {});
-  if (previousKeys.length !== nextKeys.length) return false;
-  for (const key of previousKeys) {
-    if (String(previousMap?.[key] || "") !== String(nextMap?.[key] || "")) {
-      return false;
-    }
-  }
-  return true;
-}
-
-function incrementScenarioCodeVote(counterMap, code) {
-  const normalizedCode = canonicalScenarioCountryCode(code);
-  if (!normalizedCode) return;
-  counterMap.set(normalizedCode, (counterMap.get(normalizedCode) || 0) + 1);
-}
-
-function pickScenarioMajorityCode(counterMap) {
-  if (!(counterMap instanceof Map) || !counterMap.size) return "";
-  const ranked = Array.from(counterMap.entries()).sort((a, b) => {
-    if (b[1] !== a[1]) return b[1] - a[1];
-    return String(a[0]).localeCompare(String(b[0]));
-  });
-  if (ranked.length > 1 && ranked[0][1] === ranked[1][1]) {
-    return "";
-  }
-  return String(ranked[0]?.[0] || "").trim().toUpperCase();
-}
-
-function buildScenarioCanonicalFallbackMaps(geometries) {
-  const ownerVotesByCountry = new Map();
-  const controllerVotesByCountry = new Map();
-
-  geometries.forEach((geometry) => {
-    const featureId = getRuntimeGeometryFeatureId(geometry);
-    const featureName = getRuntimeGeometryFeatureName(geometry);
-    if (!featureId || isScenarioShellCandidate(featureId, featureName)) return;
-    const countryCode = getScenarioRuntimeGeometryCountryCode(geometry);
-    if (!countryCode) return;
-
-    const ownerCode = getScenarioEffectiveOwnerCodeByFeatureId(featureId);
-    const controllerCode = getScenarioEffectiveControllerCodeByFeatureId(featureId);
-
-    if (ownerCode) {
-      let counter = ownerVotesByCountry.get(countryCode);
-      if (!counter) {
-        counter = new Map();
-        ownerVotesByCountry.set(countryCode, counter);
-      }
-      incrementScenarioCodeVote(counter, ownerCode);
-    }
-
-    if (controllerCode) {
-      let counter = controllerVotesByCountry.get(countryCode);
-      if (!counter) {
-        counter = new Map();
-        controllerVotesByCountry.set(countryCode, counter);
-      }
-      incrementScenarioCodeVote(counter, controllerCode);
-    }
-  });
-
-  const ownerFallbackByCountry = {};
-  ownerVotesByCountry.forEach((counter, countryCode) => {
-    const winner = pickScenarioMajorityCode(counter);
-    if (winner) ownerFallbackByCountry[countryCode] = winner;
-  });
-
-  const controllerFallbackByCountry = {};
-  controllerVotesByCountry.forEach((counter, countryCode) => {
-    const winner = pickScenarioMajorityCode(counter);
-    if (winner) controllerFallbackByCountry[countryCode] = winner;
-  });
-
-  return {
-    ownerFallbackByCountry,
-    controllerFallbackByCountry,
-  };
-}
-
-function refreshScenarioShellOverlays({ renderNow = false, borderReason = "scenario-shell-overlay" } = {}) {
-  const previousOwnerMap = state.scenarioAutoShellOwnerByFeatureId || {};
-  const previousControllerMap = state.scenarioAutoShellControllerByFeatureId || {};
-  let nextOwnerMap = {};
-  let nextControllerMap = {};
-
-  if (state.activeScenarioId && isScenarioShellOverlayEnabled()) {
-    const geometries = state.runtimePoliticalTopology?.objects?.political?.geometries || [];
-    if (Array.isArray(geometries) && geometries.length) {
-      const neighborGraph = getScenarioRuntimeNeighborGraph(geometries);
-      const {
-        ownerFallbackByCountry,
-        controllerFallbackByCountry,
-      } = buildScenarioCanonicalFallbackMaps(geometries);
-      geometries.forEach((geometry, index) => {
-        const featureId = getRuntimeGeometryFeatureId(geometry);
-        const featureName = getRuntimeGeometryFeatureName(geometry);
-        if (!isScenarioShellCandidate(featureId, featureName)) return;
-        const neighborIndexes = Array.isArray(neighborGraph[index]) ? neighborGraph[index] : [];
-        const ownerVotes = new Map();
-        const controllerVotes = new Map();
-        neighborIndexes.forEach((neighborIndex) => {
-          const neighborGeometry = geometries[neighborIndex];
-          const neighborId = getRuntimeGeometryFeatureId(neighborGeometry);
-          const neighborName = getRuntimeGeometryFeatureName(neighborGeometry);
-          if (!neighborId || isScenarioShellCandidate(neighborId, neighborName)) {
-            return;
-          }
-          const ownerCode = getScenarioEffectiveOwnerCodeByFeatureId(neighborId);
-          const controllerCode = getScenarioEffectiveControllerCodeByFeatureId(neighborId);
-          incrementScenarioCodeVote(ownerVotes, ownerCode);
-          incrementScenarioCodeVote(controllerVotes, controllerCode);
-        });
-
-        const canonicalCountryCode = getScenarioRuntimeGeometryCountryCode(geometry);
-        const directOwnerCode = canonicalScenarioCountryCode(state.sovereigntyByFeatureId?.[featureId] || "");
-        const directControllerCode = canonicalScenarioCountryCode(state.scenarioControllersByFeatureId?.[featureId] || "");
-        const resolvedOwnerCode =
-          directOwnerCode
-          || pickScenarioMajorityCode(ownerVotes)
-          || ownerFallbackByCountry[canonicalCountryCode]
-          || "";
-        const resolvedControllerCode =
-          directControllerCode
-          || pickScenarioMajorityCode(controllerVotes)
-          || controllerFallbackByCountry[canonicalCountryCode]
-          || resolvedOwnerCode
-          || "";
-
-        if (resolvedOwnerCode) {
-          nextOwnerMap[featureId] = resolvedOwnerCode;
-        }
-        if (resolvedControllerCode) {
-          nextControllerMap[featureId] = resolvedControllerCode;
-        }
-      });
-    }
-  }
-
-  const changed =
-    !haveSameScenarioShellMapping(previousOwnerMap, nextOwnerMap)
-    || !haveSameScenarioShellMapping(previousControllerMap, nextControllerMap);
-
-  state.scenarioAutoShellOwnerByFeatureId = nextOwnerMap;
-  state.scenarioAutoShellControllerByFeatureId = nextControllerMap;
-  if (changed) {
-    state.scenarioShellOverlayRevision = (Number(state.scenarioShellOverlayRevision) || 0) + 1;
-    const affectedFeatureIds = Array.from(new Set([
-      ...Object.keys(previousOwnerMap),
-      ...Object.keys(previousControllerMap),
-      ...Object.keys(nextOwnerMap),
-      ...Object.keys(nextControllerMap),
-    ]));
-    if (affectedFeatureIds.length) {
-      refreshMapDataColorsForScenarioShell(affectedFeatureIds);
-    }
-  }
-  recomputeDynamicBordersNow({ renderNow: false, reason: borderReason });
-  refreshScenarioOpeningOwnerBorders({
-    renderNow: false,
-    reason: borderReason ? `${borderReason}:opening` : "scenario-shell-opening",
-  });
-  if (renderNow) {
-    flushRenderBoundary(borderReason ? `${borderReason}:shell-overlay` : "scenario-shell-overlay");
-  }
-  return {
-    changed,
-    ownerCount: Object.keys(nextOwnerMap).length,
-    controllerCount: Object.keys(nextControllerMap).length,
-  };
-}
-
 function getScenarioDisplayOwnerByFeatureId(featureId, { fallbackOwner = "" } = {}) {
   const normalizedId = String(featureId || "").trim();
   if (!normalizedId) return String(fallbackOwner || "").trim().toUpperCase();
@@ -1072,110 +844,6 @@ function getScenarioBaselineHashFromBundle(bundle) {
   return String(bundle?.manifest?.baseline_hash || bundle?.ownersPayload?.baseline_hash || "").trim();
 }
 
-function getScenarioTestHooks() {
-  return globalThis.__scenarioTestHooks && typeof globalThis.__scenarioTestHooks === "object"
-    ? globalThis.__scenarioTestHooks
-    : null;
-}
-
-function consumeScenarioTestHook(name) {
-  const hooks = getScenarioTestHooks();
-  if (!hooks || !hooks[name]) return false;
-  delete hooks[name];
-  return true;
-}
-
-function getScenarioFatalRecoveryState() {
-  return state.scenarioFatalRecovery && typeof state.scenarioFatalRecovery === "object"
-    ? state.scenarioFatalRecovery
-    : null;
-}
-
-function clearScenarioFatalRecoveryState() {
-  state.scenarioFatalRecovery = null;
-}
-
-function formatScenarioFatalRecoveryMessage(fatalState = getScenarioFatalRecoveryState()) {
-  const baseMessage = t("Scenario state is inconsistent. Reload the page before continuing.", "ui");
-  const detail = String(fatalState?.message || "").trim();
-  return detail ? `${baseMessage} ${detail}` : baseMessage;
-}
-
-function buildScenarioFatalRecoveryError(actionLabel = "complete this scenario action") {
-  const message = formatScenarioFatalRecoveryMessage();
-  const error = new Error(message);
-  error.code = SCENARIO_FATAL_RECOVERY_CODE;
-  error.toastTitle = t("Scenario locked", "ui");
-  error.toastTone = "error";
-  error.userMessage = message;
-  error.actionLabel = actionLabel;
-  return error;
-}
-
-function validateScenarioRuntimeConsistency({ expectedScenarioId = "", phase = "apply" } = {}) {
-  const problems = [];
-  const activeScenarioId = normalizeScenarioId(state.activeScenarioId);
-  const manifestScenarioId = normalizeScenarioId(state.activeScenarioManifest?.scenario_id);
-  const normalizedExpectedScenarioId = normalizeScenarioId(expectedScenarioId);
-  const mapSemanticMode = normalizeMapSemanticMode(state.mapSemanticMode);
-  const requiredObjects = [
-    ["sovereigntyByFeatureId", state.sovereigntyByFeatureId],
-    ["scenarioControllersByFeatureId", state.scenarioControllersByFeatureId],
-    ["scenarioBaselineOwnersByFeatureId", state.scenarioBaselineOwnersByFeatureId],
-    ["scenarioBaselineControllersByFeatureId", state.scenarioBaselineControllersByFeatureId],
-  ];
-
-  if (normalizedExpectedScenarioId && activeScenarioId !== normalizedExpectedScenarioId) {
-    problems.push(
-      `active scenario id mismatch (${activeScenarioId || "none"} != ${normalizedExpectedScenarioId}).`
-    );
-  }
-  if (activeScenarioId && manifestScenarioId !== activeScenarioId) {
-    problems.push(
-      `manifest scenario id mismatch (${manifestScenarioId || "none"} != ${activeScenarioId}).`
-    );
-  }
-  if (activeScenarioId && !String(state.scenarioBaselineHash || "").trim()) {
-    problems.push("scenarioBaselineHash is empty while a scenario is active.");
-  }
-  requiredObjects.forEach(([fieldName, value]) => {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
-      problems.push(`${fieldName} must be a plain object while a scenario is active.`);
-    }
-  });
-
-  const sampleFeatureId =
-    Object.keys(state.scenarioBaselineOwnersByFeatureId || {}).find(Boolean)
-    || Object.keys(state.sovereigntyByFeatureId || {}).find(Boolean)
-    || Object.keys(state.scenarioBaselineControllersByFeatureId || {}).find(Boolean)
-    || Object.keys(state.scenarioControllersByFeatureId || {}).find(Boolean)
-    || "";
-  if (activeScenarioId && !sampleFeatureId && mapSemanticMode !== "blank") {
-    problems.push("No feature assignments are available in the active scenario state.");
-  } else if (sampleFeatureId) {
-    if (!getScenarioEffectiveOwnerCodeByFeatureId(sampleFeatureId)) {
-      problems.push(`Effective owner lookup failed for ${sampleFeatureId}.`);
-    }
-    if (!getScenarioEffectiveControllerCodeByFeatureId(sampleFeatureId)) {
-      problems.push(`Effective controller lookup failed for ${sampleFeatureId}.`);
-    }
-  }
-
-  const forcedFailureHookName =
-    phase === "rollback" ? "forceRollbackConsistencyFailureOnce" : "forceApplyConsistencyFailureOnce";
-  if (consumeScenarioTestHook(forcedFailureHookName)) {
-    problems.push(`Injected ${phase} consistency failure.`);
-  }
-
-  return {
-    ok: problems.length === 0,
-    problems,
-    activeScenarioId,
-    manifestScenarioId,
-    expectedScenarioId: normalizedExpectedScenarioId,
-    phase,
-  };
-}
 
 function refreshMapDataColorsForScenarioShell(featureIds) {
   const targetIds = Array.from(new Set(
@@ -1189,47 +857,6 @@ function refreshMapDataColorsForScenarioShell(featureIds) {
   refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
 }
 
-function enterScenarioFatalRecovery({
-  phase = "rollback",
-  rootError = null,
-  rollbackError = null,
-  consistencyReport = null,
-} = {}) {
-  const problemSummary = Array.isArray(consistencyReport?.problems) && consistencyReport.problems.length
-    ? consistencyReport.problems.slice(0, 3).join(" ")
-    : "";
-  const detail = rollbackError
-    ? t("Rollback recovery failed.", "ui")
-    : problemSummary || t("Rollback validation failed.", "ui");
-  state.scenarioFatalRecovery = {
-    phase: String(phase || "rollback"),
-    message: detail,
-    recordedAt: new Date().toISOString(),
-    problems: Array.isArray(consistencyReport?.problems) ? [...consistencyReport.problems] : [],
-    rootErrorMessage: String(rootError?.message || "").trim(),
-    rollbackErrorMessage: String(rollbackError?.message || "").trim(),
-  };
-  showToast(formatScenarioFatalRecoveryMessage(state.scenarioFatalRecovery), {
-    title: t("Scenario recovery failed", "ui"),
-    tone: "error",
-    duration: 7000,
-  });
-  syncScenarioUi();
-  return state.scenarioFatalRecovery;
-}
-
-function assertScenarioInteractionsAllowed(actionLabel = "complete this scenario action") {
-  assertStartupReadonlyUnlocked(actionLabel);
-  if (!getScenarioFatalRecoveryState()) return;
-  throw buildScenarioFatalRecoveryError(actionLabel);
-}
-
-function assertStartupReadonlyUnlocked(actionLabel = "complete this startup action") {
-  if (!state.startupReadonly) return;
-  throw new Error(
-    `Detailed interactions are still loading. Unable to ${actionLabel} while the startup view is read-only.`
-  );
-}
 
 function getScenarioBlockerCount(summary = {}) {
   const flattened = Number(summary.blocker_count);
@@ -2900,6 +2527,14 @@ async function validateImportedScenarioBaseline(projectScenario, { d3Client = gl
 }
 
 export {
+  applyBlankScenarioPresentationDefaults,
+  ensureRuntimeChunkLoadState,
+  resetScenarioChunkRuntimeState,
+  scheduleScenarioChunkRefresh,
+  scenarioBundleHasChunkedData,
+  scenarioBundleUsesChunkedLayer,
+  getScenarioDecodedCollection,
+  getScenarioTopologyFeatureCollection,
   ensureActiveScenarioOptionalLayerLoaded,
   ensureActiveScenarioOptionalLayersForVisibility,
   ensureScenarioGeoLocalePatchForLanguage,

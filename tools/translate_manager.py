@@ -1,28 +1,28 @@
 ﻿import argparse
 import json
 import re
-import subprocess
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 import unicodedata
+from collections import Counter
 from pathlib import Path
 
 try:
     # Attempt absolute import (for when running from root via init_map_data.py)
-    from tools.geo_seeds import EUROPE_GEO_SEEDS
+    from tools.geo_seeds import EUROPE_GEO_SEEDS as DEFAULT_EUROPE_GEO_SEEDS
 except ImportError:
     try:
         # Attempt local import (for when running script directly from tools/ dir)
-        from geo_seeds import EUROPE_GEO_SEEDS
+        from geo_seeds import EUROPE_GEO_SEEDS as DEFAULT_EUROPE_GEO_SEEDS
     except ImportError as exc:
         raise ImportError(
             "Could not import geo_seeds. Ensure execution from root or tools/ directory."
         ) from exc
 
 
-MANUAL_UI_DICT = {
+DEFAULT_MANUAL_UI_DICT = {
     "0 colors": "0 种颜色",
     "1930s Electrification Proxy": "1930年代电气化代理",
     "Active Owner": "当前属主",
@@ -373,7 +373,7 @@ MANUAL_UI_DICT = {
     "e.g. Buffer Zone A...": "例如：缓冲区 A...",
 }
 
-MANUAL_GEO_OVERRIDES = {
+DEFAULT_MANUAL_GEO_OVERRIDES = {
     "United States": "\u7f8e\u56fd",
     "United States of America": "\u7f8e\u56fd",
     "USA": "\u7f8e\u56fd",
@@ -487,6 +487,47 @@ MANUAL_GEO_OVERRIDES = {
     "South Jutland (Remainder) [Sydjylland]": "南日德兰（剩余部分）",
     "Northern-Ireland": "北爱尔兰",
 }
+
+BASE_DIR = Path(__file__).resolve().parents[1]
+I18N_DATA_DIR = BASE_DIR / "data" / "i18n"
+DEFAULT_MANUAL_UI_PATH = I18N_DATA_DIR / "manual_ui.json"
+DEFAULT_MANUAL_GEO_OVERRIDES_PATH = I18N_DATA_DIR / "manual_geo_overrides.json"
+DEFAULT_EUROPE_GEO_SEEDS_PATH = I18N_DATA_DIR / "europe_geo_seeds.json"
+DEFAULT_BASELINE_LOCALES_PATH = I18N_DATA_DIR / "locales_baseline.json"
+EXPERIMENTAL_MACHINE_TRANSLATION_PROVIDER = "experimental_google_web"
+TRANSLATION_SOURCE_ORDER = (
+    "manual_ui",
+    "manual_geo_override",
+    "geo_seed",
+    "baseline_reuse",
+    "existing_reuse",
+    "stable_alias_reuse",
+    "english_fallback",
+    "machine_translation",
+)
+
+
+def load_string_map(path: Path, fallback: dict[str, str]) -> dict[str, str]:
+    if not path.exists():
+        return dict(fallback)
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return dict(fallback)
+    if not isinstance(data, dict):
+        return dict(fallback)
+    payload = {}
+    for raw_key, raw_value in data.items():
+        key = str(raw_key or "").strip()
+        if not key:
+            continue
+        payload[key] = str(raw_value or "")
+    return payload or dict(fallback)
+
+
+MANUAL_UI_DICT = load_string_map(DEFAULT_MANUAL_UI_PATH, DEFAULT_MANUAL_UI_DICT)
+MANUAL_GEO_OVERRIDES = load_string_map(DEFAULT_MANUAL_GEO_OVERRIDES_PATH, DEFAULT_MANUAL_GEO_OVERRIDES)
+EUROPE_GEO_SEEDS = load_string_map(DEFAULT_EUROPE_GEO_SEEDS_PATH, DEFAULT_EUROPE_GEO_SEEDS)
 
 UI_CALL_RE = re.compile(r"""t\(\s*(['\"])(?P<text>.*?)\1\s*,\s*(['\"])ui\3\s*\)""")
 MODAL_CALL_RE = re.compile(
@@ -668,6 +709,31 @@ def get_existing_usable_zh(existing: dict, key: str, fallback_en: str = "") -> s
     if is_missing_like(zh_value, en_value):
         return None
     return strip_placeholder_prefix(zh_value)
+
+
+def get_preferred_existing_zh(
+    current_existing: dict,
+    baseline_existing: dict,
+    *,
+    key: str,
+    en_value: str,
+    primary_name: str = "",
+    stable_key: str = "",
+) -> tuple[str | None, str | None]:
+    for existing, source in (
+        (current_existing, "existing_reuse"),
+        (baseline_existing, "baseline_reuse"),
+    ):
+        existing_zh = get_existing_usable_zh(existing, key, en_value)
+        if existing_zh and not should_ignore_existing_us_geo_zh(
+            key=key,
+            en_value=en_value,
+            existing_zh=existing_zh,
+            primary_name=primary_name,
+            stable_key=stable_key or key,
+        ):
+            return existing_zh, source
+    return None, None
 
 
 def should_drop_geo_entry(
@@ -924,18 +990,27 @@ def detect_visible_missing_country_codes(
     return missing_codes
 
 
-def probe_machine_translation_available(timeout: float = 3.0) -> bool:
+def _build_experimental_google_web_request(text: str, source_language: str) -> urllib.request.Request:
     query = urllib.parse.urlencode(
         {
             "client": "gtx",
-            "sl": "en",
+            "sl": source_language,
             "tl": "zh-CN",
             "dt": "t",
-            "q": "test",
+            "q": text,
         }
     )
     url = f"https://translate.googleapis.com/translate_a/single?{query}"
-    req = urllib.request.Request(url, headers={"User-Agent": "mapcreator-translate-manager/1.0"})
+    return urllib.request.Request(url, headers={"User-Agent": "mapcreator-translate-manager/1.0"})
+
+
+def probe_machine_translation_available(
+    provider_name: str = EXPERIMENTAL_MACHINE_TRANSLATION_PROVIDER,
+    timeout: float = 3.0,
+) -> bool:
+    if provider_name != EXPERIMENTAL_MACHINE_TRANSLATION_PROVIDER:
+        return False
+    req = _build_experimental_google_web_request("test", "en")
     try:
         with urllib.request.urlopen(req, timeout=timeout) as response:
             payload = json.loads(response.read().decode("utf-8"))
@@ -1025,20 +1100,24 @@ def is_usable_zh(text: str, en: str = "") -> bool:
     return contains_cjk(value)
 
 
-def load_git_head_locales(repo_root: Path) -> dict:
-    try:
-        payload = subprocess.check_output(
-            ["git", "-C", str(repo_root), "show", "HEAD:data/locales.json"],
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-        )
-        data = json.loads(payload)
-        ui = data.get("ui") if isinstance(data, dict) else {}
-        geo = data.get("geo") if isinstance(data, dict) else {}
-        return {"ui": ui or {}, "geo": geo or {}}
-    except Exception:
-        return {"ui": {}, "geo": {}}
+def load_baseline_locales(path: Path | None) -> dict:
+    target = path or DEFAULT_BASELINE_LOCALES_PATH
+    return load_existing_locales(target)
+
+
+def write_json_atomic(path: Path, payload: object) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp_path = path.with_name(f"{path.name}.tmp")
+    with temp_path.open("w", encoding="utf-8", newline="\n") as file:
+        json.dump(payload, file, ensure_ascii=False, indent=2)
+        file.write("\n")
+    temp_path.replace(path)
+
+
+def path_to_report_string(path: Path | None) -> str:
+    if path is None:
+        return ""
+    return path.as_posix()
 
 
 def merge_locale_snapshots(current_locales: dict, baseline_locales: dict) -> dict:
@@ -1074,10 +1153,12 @@ class MachineTranslator:
         enabled: bool = False,
         delay_seconds: float = 0.0,
         max_requests: int | None = None,
+        provider_name: str = EXPERIMENTAL_MACHINE_TRANSLATION_PROVIDER,
     ):
         self.enabled = enabled
         self.delay_seconds = max(0.0, delay_seconds)
         self.max_requests = max_requests if max_requests and max_requests > 0 else None
+        self.provider_name = provider_name
         self.requests_made = 0
         self.cache = {}
 
@@ -1092,18 +1173,11 @@ class MachineTranslator:
         if self.max_requests is not None and self.requests_made >= self.max_requests:
             return None
 
+        if self.provider_name != EXPERIMENTAL_MACHINE_TRANSLATION_PROVIDER:
+            return None
+
         source_language = detect_translation_source_language(value)
-        query = urllib.parse.urlencode(
-            {
-                "client": "gtx",
-                "sl": source_language,
-                "tl": "zh-CN",
-                "dt": "t",
-                "q": value,
-            }
-        )
-        url = f"https://translate.googleapis.com/translate_a/single?{query}"
-        req = urllib.request.Request(url, headers={"User-Agent": "mapcreator-translate-manager/1.0"})
+        req = _build_experimental_google_web_request(value, source_language)
         translated = None
         try:
             with urllib.request.urlopen(req, timeout=8) as response:
@@ -1124,113 +1198,132 @@ class MachineTranslator:
 
 
 def resolve_zh(
+    section: str,
     key: str,
     en_value: str,
-    existing: dict,
+    current_existing: dict,
+    baseline_existing: dict,
     translator: MachineTranslator,
     alias_to_stable: dict,
     stable_to_primary: dict,
     resolved_primary_zh: dict | None = None,
-) -> str:
-    if key in MANUAL_UI_DICT:
-        return MANUAL_UI_DICT[key]
+) -> tuple[str, str]:
+    if section == "ui" and key in MANUAL_UI_DICT:
+        return MANUAL_UI_DICT[key], "manual_ui"
 
-    if key in EUROPE_GEO_SEEDS:
-        return EUROPE_GEO_SEEDS[key]
-    if en_value in EUROPE_GEO_SEEDS:
-        return EUROPE_GEO_SEEDS[en_value]
+    if section == "geo" and key in EUROPE_GEO_SEEDS:
+        return EUROPE_GEO_SEEDS[key], "geo_seed"
+    if section == "geo" and en_value in EUROPE_GEO_SEEDS:
+        return EUROPE_GEO_SEEDS[en_value], "geo_seed"
 
-    if key in MANUAL_GEO_OVERRIDES:
-        return MANUAL_GEO_OVERRIDES[key]
-    if en_value in MANUAL_GEO_OVERRIDES:
-        return MANUAL_GEO_OVERRIDES[en_value]
+    if section == "geo" and key in MANUAL_GEO_OVERRIDES:
+        return MANUAL_GEO_OVERRIDES[key], "manual_geo_override"
+    if section == "geo" and en_value in MANUAL_GEO_OVERRIDES:
+        return MANUAL_GEO_OVERRIDES[en_value], "manual_geo_override"
 
     primary_name = get_geo_primary_name(key, alias_to_stable, stable_to_primary)
     stable_key = alias_to_stable.get(key)
-    if primary_name and primary_name in MANUAL_GEO_OVERRIDES and key != primary_name:
-        return MANUAL_GEO_OVERRIDES[primary_name]
-    existing_zh = get_existing_usable_zh(existing, key, en_value)
-    if existing_zh and not should_ignore_existing_us_geo_zh(
+    if section == "geo" and primary_name and primary_name in MANUAL_GEO_OVERRIDES and key != primary_name:
+        return MANUAL_GEO_OVERRIDES[primary_name], "manual_geo_override"
+
+    existing_zh, existing_source = get_preferred_existing_zh(
+        current_existing,
+        baseline_existing,
         key=key,
         en_value=en_value,
-        existing_zh=existing_zh,
         primary_name=primary_name,
         stable_key=stable_key or key,
-    ):
-        return existing_zh
+    )
+    if existing_zh:
+        return existing_zh, existing_source or "existing_reuse"
 
     if resolved_primary_zh and primary_name:
         primary_zh = resolved_primary_zh.get(primary_name)
         if primary_zh and not is_missing_like(primary_zh, primary_name):
-            return primary_zh
+            return primary_zh, "stable_alias_reuse"
 
     if stable_key:
-        stable_zh = get_existing_usable_zh(existing, stable_key, stable_to_primary.get(stable_key, stable_key))
-        if stable_zh and not should_ignore_existing_us_geo_zh(
+        stable_zh, _ = get_preferred_existing_zh(
+            current_existing,
+            baseline_existing,
             key=stable_key,
             en_value=stable_to_primary.get(stable_key, stable_key),
-            existing_zh=stable_zh,
             primary_name=primary_name or stable_to_primary.get(stable_key, ""),
             stable_key=stable_key,
-        ):
-            return stable_zh
+        )
+        if stable_zh:
+            return stable_zh, "stable_alias_reuse"
 
     if primary_name:
-        if primary_name in EUROPE_GEO_SEEDS:
-            return EUROPE_GEO_SEEDS[primary_name]
-        primary_existing_zh = get_existing_usable_zh(existing, primary_name, primary_name)
-        if primary_existing_zh and not should_ignore_existing_us_geo_zh(
+        if section == "geo" and primary_name in EUROPE_GEO_SEEDS:
+            return EUROPE_GEO_SEEDS[primary_name], "stable_alias_reuse"
+        primary_existing_zh, _ = get_preferred_existing_zh(
+            current_existing,
+            baseline_existing,
             key=primary_name,
             en_value=primary_name,
-            existing_zh=primary_existing_zh,
             primary_name=primary_name,
             stable_key=stable_key or key,
-        ):
-            return primary_existing_zh
+        )
+        if primary_existing_zh:
+            return primary_existing_zh, "stable_alias_reuse"
 
     if is_shell_fallback_name(key) or is_shell_fallback_name(en_value):
-        return en_value
+        return en_value, "english_fallback"
     if is_corrupted_source_name(key) or is_corrupted_source_name(en_value):
-        return en_value
+        return en_value, "english_fallback"
 
     translated = normalize_translation_candidate(translator.translate(en_value), en_value)
     if translated:
-        return translated
-    return en_value
+        return translated, "machine_translation"
+    return en_value, "english_fallback"
 
 
-def merge_ui(existing_ui: dict, discovered_ui_keys: list[str], translator: MachineTranslator) -> dict:
-    normalized = {key: normalize_entry(key, value) for key, value in (existing_ui or {}).items()}
-    keys = set(discovered_ui_keys) | set(normalized.keys()) | set(MANUAL_UI_DICT.keys())
+def merge_ui(
+    current_ui: dict,
+    baseline_ui: dict,
+    discovered_ui_keys: list[str],
+    translator: MachineTranslator,
+) -> tuple[dict, dict]:
+    current_normalized = {key: normalize_entry(key, value) for key, value in (current_ui or {}).items()}
+    baseline_normalized = {key: normalize_entry(key, value) for key, value in (baseline_ui or {}).items()}
+    keys = set(discovered_ui_keys) | set(current_normalized.keys()) | set(baseline_normalized.keys()) | set(MANUAL_UI_DICT.keys())
     merged = {}
+    source_map = {}
 
     for key in sorted(keys):
-        existing = normalized.get(key, {"en": key, "zh": key})
-        zh = resolve_zh(
+        existing = current_normalized.get(key) or baseline_normalized.get(key) or {"en": key, "zh": key}
+        zh, source = resolve_zh(
+            section="ui",
             key=key,
             en_value=existing["en"],
-            existing=normalized,
+            current_existing=current_normalized,
+            baseline_existing=baseline_normalized,
             translator=translator,
             alias_to_stable={},
             stable_to_primary={},
             resolved_primary_zh={},
         )
         merged[key] = {"en": existing.get("en", key), "zh": zh}
-    return merged
+        source_map[key] = source
+    return merged, source_map
 
 
 def merge_geo(
     geo_names: list[str],
-    existing_geo: dict,
+    current_geo: dict,
+    baseline_geo: dict,
     alias_to_stable: dict,
     stable_to_primary: dict,
     search_only_aliases: set[str],
     translator: MachineTranslator,
     include_stable_geo_keys: bool,
     restrict_scope: bool = False,
-) -> dict:
+) -> tuple[dict, dict]:
     geo_name_set = set(geo_names)
-    normalized = {key: normalize_entry(key, value) for key, value in (existing_geo or {}).items()}
+    current_normalized = {key: normalize_entry(key, value) for key, value in (current_geo or {}).items()}
+    baseline_normalized = {key: normalize_entry(key, value) for key, value in (baseline_geo or {}).items()}
+    merged_existing = merge_locale_snapshots({"geo": current_normalized}, {"geo": baseline_normalized}).get("geo", {})
     if restrict_scope:
         keys = set(geo_names)
         if include_stable_geo_keys:
@@ -1238,13 +1331,14 @@ def merge_geo(
                 stable_key = alias_to_stable.get(alias)
                 if stable_key:
                     keys.add(stable_key)
-        merged = dict(normalized)
+        merged = dict(merged_existing)
     else:
-        keys = set(geo_names) | set(normalized.keys()) | set(alias_to_stable.keys())
+        keys = set(geo_names) | set(merged_existing.keys()) | set(alias_to_stable.keys())
         if include_stable_geo_keys:
             keys.update(alias_to_stable.values())
         keys.difference_update(search_only_aliases)
         merged = {}
+    source_map = {}
 
     primary_names = {
         primary_name
@@ -1253,16 +1347,22 @@ def merge_geo(
     }
     resolved_primary_zh = {}
     for primary_name in sorted(primary_names):
-        existing_primary = normalized.get(primary_name, {"en": primary_name, "zh": primary_name})
-        resolved_primary_zh[primary_name] = resolve_zh(
+        existing_primary = current_normalized.get(primary_name) or baseline_normalized.get(primary_name) or {
+            "en": primary_name,
+            "zh": primary_name,
+        }
+        primary_zh, _ = resolve_zh(
+            section="geo",
             key=primary_name,
             en_value=existing_primary.get("en", primary_name),
-            existing=normalized,
+            current_existing=current_normalized,
+            baseline_existing=baseline_normalized,
             translator=translator,
             alias_to_stable=alias_to_stable,
             stable_to_primary=stable_to_primary,
             resolved_primary_zh={},
         )
+        resolved_primary_zh[primary_name] = primary_zh
 
     for key in sorted(keys):
         stable_key = alias_to_stable.get(key)
@@ -1271,23 +1371,117 @@ def merge_geo(
             en_value = key
         elif key in stable_to_primary:
             en_value = stable_to_primary[key]
-        elif key in normalized:
-            en_value = normalized[key].get("en", key)
+        elif key in current_normalized:
+            en_value = current_normalized[key].get("en", key)
+        elif key in baseline_normalized:
+            en_value = baseline_normalized[key].get("en", key)
 
-        zh = resolve_zh(
+        zh, source = resolve_zh(
+            section="geo",
             key=key,
             en_value=en_value,
-            existing=normalized,
+            current_existing=current_normalized,
+            baseline_existing=baseline_normalized,
             translator=translator,
             alias_to_stable=alias_to_stable,
             stable_to_primary=stable_to_primary,
             resolved_primary_zh=resolved_primary_zh,
         )
         merged[key] = {"en": en_value, "zh": zh}
-    return {
+        source_map[key] = source
+    filtered = {
         key: merged[key]
         for key in sorted(merged.keys())
         if not should_drop_geo_entry(key, geo_name_set, alias_to_stable, stable_to_primary, search_only_aliases)
+    }
+    filtered_sources = {key: source_map[key] for key in filtered.keys()}
+    return filtered, filtered_sources
+
+
+def summarize_source_map(source_map: dict[str, str], limit: int = 10) -> tuple[dict[str, int], dict[str, list[str]]]:
+    counts: dict[str, int] = {}
+    for key in sorted(source_map.keys()):
+        source = str(source_map.get(key) or "unknown")
+        counts[source] = counts.get(source, 0) + 1
+    samples: dict[str, list[str]] = {}
+    for key in sorted(source_map.keys()):
+        source = str(source_map.get(key) or "unknown")
+        bucket = samples.setdefault(source, [])
+        if len(bucket) < limit:
+            bucket.append(key)
+    return counts, samples
+
+
+def build_translation_source_audit(
+    *,
+    ui_payload: dict,
+    geo_payload: dict,
+    ui_sources: dict[str, str],
+    geo_sources: dict[str, str],
+    baseline_locales_path: Path,
+    machine_translate_enabled: bool,
+    machine_translate_available: bool,
+    machine_translation_provider: str,
+    resolved_country_codes: list[str],
+) -> dict:
+    ui_counts, ui_samples = summarize_source_map(ui_sources)
+    geo_counts, geo_samples = summarize_source_map(geo_sources)
+    return {
+        "baseline_locales_path": path_to_report_string(baseline_locales_path),
+        "machine_translate_enabled": machine_translate_enabled,
+        "machine_translate_available": machine_translate_available,
+        "machine_translation_provider": machine_translation_provider,
+        "resolved_country_codes": resolved_country_codes,
+        "ui": {
+            "entry_count": len(ui_payload),
+            "source_counts": ui_counts,
+            "sample_keys_by_source": ui_samples,
+        },
+        "geo": {
+            "entry_count": len(geo_payload),
+            "source_counts": geo_counts,
+            "sample_keys_by_source": geo_samples,
+            "english_fallback_count": geo_counts.get("english_fallback", 0),
+        },
+    }
+
+
+def build_translation_review_queue(
+    *,
+    ui_payload: dict,
+    geo_payload: dict,
+    ui_sources: dict[str, str],
+    geo_sources: dict[str, str],
+) -> dict:
+    entries = []
+    for section, payload, source_map in (
+        ("ui", ui_payload, ui_sources),
+        ("geo", geo_payload, geo_sources),
+    ):
+        for key in sorted(payload.keys()):
+            if source_map.get(key) != "english_fallback":
+                continue
+            entry = payload.get(key) or {}
+            en_value = str(entry.get("en", key) or key)
+            zh_value = str(entry.get("zh", key) or key)
+            if section == "ui":
+                if not is_user_visible_candidate(en_value) or not is_missing_like(zh_value, en_value):
+                    continue
+            else:
+                if not should_track_geo_missing_like(key, en_value) or not is_missing_like(zh_value, en_value):
+                    continue
+            entries.append(
+                {
+                    "section": section,
+                    "key": key,
+                    "en": en_value,
+                    "zh": zh_value,
+                    "source": "english_fallback",
+                }
+            )
+    return {
+        "entry_count": len(entries),
+        "entries": entries,
     }
 
 
@@ -1322,6 +1516,21 @@ def parse_args() -> argparse.Namespace:
         "--scenarios-root",
         type=Path,
         help="Optional scenarios directory for scenario country display names.",
+    )
+    parser.add_argument(
+        "--baseline-locales",
+        type=Path,
+        help="Explicit baseline locales snapshot path.",
+    )
+    parser.add_argument(
+        "--audit-report",
+        type=Path,
+        help="Optional runtime translation source audit output path.",
+    )
+    parser.add_argument(
+        "--review-queue",
+        type=Path,
+        help="Optional runtime review queue output path for English fallbacks.",
     )
     parser.add_argument(
         "--machine-translate",
@@ -1361,6 +1570,12 @@ def parse_args() -> argparse.Namespace:
         default="on",
         help="Machine translation network policy.",
     )
+    parser.add_argument(
+        "--machine-translation-provider",
+        choices=[EXPERIMENTAL_MACHINE_TRANSLATION_PROVIDER],
+        default=EXPERIMENTAL_MACHINE_TRANSLATION_PROVIDER,
+        help="Machine translation provider identifier. The current provider is experimental and opt-in.",
+    )
     return parser.parse_args()
 
 
@@ -1398,6 +1613,9 @@ def sync_translations(
     hierarchy_path: Path,
     runtime_topology_path: Path | None,
     scenarios_root: Path | None,
+    baseline_locales_path: Path | None = None,
+    audit_report_path: Path | None = None,
+    review_queue_path: Path | None = None,
     machine_translate: bool = False,
     translator_delay_seconds: float = 0.0,
     max_machine_translations: int = 0,
@@ -1405,21 +1623,23 @@ def sync_translations(
     country_codes: set[str] | None = None,
     auto_country_codes: str | None = None,
     network_mode: str = "off",
+    machine_translation_provider: str = EXPERIMENTAL_MACHINE_TRANSLATION_PROVIDER,
 ) -> dict:
-    base_dir = Path(__file__).resolve().parents[1]
-    existing = load_existing_locales(output_path)
-    baseline_locales = load_git_head_locales(base_dir)
-    existing = merge_locale_snapshots(existing, baseline_locales)
+    base_dir = BASE_DIR
+    current_locales = load_existing_locales(output_path)
+    resolved_baseline_path = baseline_locales_path or DEFAULT_BASELINE_LOCALES_PATH
+    baseline_locales = load_baseline_locales(resolved_baseline_path)
+    merged_existing = merge_locale_snapshots(current_locales, baseline_locales)
     resolved_country_codes = set(country_codes or set())
     if auto_country_codes == "visible-missing":
         resolved_country_codes |= detect_visible_missing_country_codes(
             topology_path,
-            existing.get("geo", {}),
+            merged_existing.get("geo", {}),
         )
         if runtime_topology_path and runtime_topology_path.exists():
             resolved_country_codes |= detect_visible_missing_country_codes(
                 runtime_topology_path,
-                existing.get("geo", {}),
+                merged_existing.get("geo", {}),
             )
 
     machine_translate_enabled = bool(machine_translate)
@@ -1428,7 +1648,9 @@ def sync_translations(
         if network_mode == "off":
             machine_translate_enabled = False
         elif network_mode == "auto":
-            machine_translate_available = probe_machine_translation_available()
+            machine_translate_available = probe_machine_translation_available(
+                provider_name=machine_translation_provider,
+            )
             machine_translate_enabled = machine_translate_available
         else:
             machine_translate_available = True
@@ -1449,12 +1671,19 @@ def sync_translations(
         enabled=machine_translate_enabled,
         delay_seconds=translator_delay_seconds,
         max_requests=max_machine_translations,
+        provider_name=machine_translation_provider,
     )
 
-    ui_payload = merge_ui(existing.get("ui", {}), discovered_ui_keys, translator)
-    geo_payload = merge_geo(
+    ui_payload, ui_sources = merge_ui(
+        current_locales.get("ui", {}),
+        baseline_locales.get("ui", {}),
+        discovered_ui_keys,
+        translator,
+    )
+    geo_payload, geo_sources = merge_geo(
         geo_names=geo_names,
-        existing_geo=existing.get("geo", {}),
+        current_geo=current_locales.get("geo", {}),
+        baseline_geo=baseline_locales.get("geo", {}),
         alias_to_stable=alias_to_stable,
         stable_to_primary=stable_to_primary,
         search_only_aliases=search_only_aliases,
@@ -1465,12 +1694,29 @@ def sync_translations(
 
     payload = {"ui": ui_payload, "geo": geo_payload}
 
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    temp_output_path = output_path.with_name(f"{output_path.name}.tmp")
-    with temp_output_path.open("w", encoding="utf-8", newline="\n") as file:
-        json.dump(payload, file, ensure_ascii=False, indent=2)
-        file.write("\n")
-    temp_output_path.replace(output_path)
+    write_json_atomic(output_path, payload)
+
+    audit_payload = build_translation_source_audit(
+        ui_payload=ui_payload,
+        geo_payload=geo_payload,
+        ui_sources=ui_sources,
+        geo_sources=geo_sources,
+        baseline_locales_path=resolved_baseline_path,
+        machine_translate_enabled=machine_translate_enabled,
+        machine_translate_available=machine_translate_available,
+        machine_translation_provider=machine_translation_provider,
+        resolved_country_codes=sorted(resolved_country_codes),
+    )
+    review_queue_payload = build_translation_review_queue(
+        ui_payload=ui_payload,
+        geo_payload=geo_payload,
+        ui_sources=ui_sources,
+        geo_sources=geo_sources,
+    )
+    if audit_report_path:
+        write_json_atomic(audit_report_path, audit_payload)
+    if review_queue_path:
+        write_json_atomic(review_queue_path, review_queue_payload)
 
     geo_missing_like = sum(
         1
@@ -1522,14 +1768,19 @@ def sync_translations(
         "corrupted_translation_count": corrupted_translation_count,
         "machine_translate_enabled": machine_translate_enabled,
         "machine_translate_available": machine_translate_available,
+        "machine_translation_provider": machine_translation_provider,
         "resolved_country_codes": sorted(resolved_country_codes),
-        "output_path": str(output_path),
+        "baseline_locales_path": path_to_report_string(resolved_baseline_path),
+        "audit_report_path": path_to_report_string(audit_report_path),
+        "review_queue_path": path_to_report_string(review_queue_path),
+        "review_queue_entries": int(review_queue_payload.get("entry_count", 0)),
+        "output_path": path_to_report_string(output_path),
     }
 
 
 def main() -> None:
     args = parse_args()
-    base_dir = Path(__file__).resolve().parents[1]
+    base_dir = BASE_DIR
 
     default_topology = resolve_default_topology(base_dir)
     default_runtime_topology = resolve_default_runtime_topology(base_dir)
@@ -1539,6 +1790,7 @@ def main() -> None:
     geo_aliases_path = args.geo_aliases or (base_dir / "data" / "geo_aliases.json")
     hierarchy_path = args.hierarchy or (base_dir / "data" / "hierarchy.json")
     scenarios_root = args.scenarios_root or (base_dir / "data" / "scenarios")
+    baseline_locales_path = args.baseline_locales or DEFAULT_BASELINE_LOCALES_PATH
     country_codes = parse_country_codes(args.country_codes)
 
     result = sync_translations(
@@ -1548,6 +1800,9 @@ def main() -> None:
         hierarchy_path=hierarchy_path,
         runtime_topology_path=runtime_topology_path,
         scenarios_root=scenarios_root,
+        baseline_locales_path=baseline_locales_path,
+        audit_report_path=args.audit_report,
+        review_queue_path=args.review_queue,
         machine_translate=args.machine_translate,
         translator_delay_seconds=args.translator_delay_seconds,
         max_machine_translations=args.max_machine_translations,
@@ -1555,6 +1810,7 @@ def main() -> None:
         country_codes=country_codes,
         auto_country_codes=args.auto_country_codes,
         network_mode=args.network_mode,
+        machine_translation_provider=args.machine_translation_provider,
     )
 
     print(

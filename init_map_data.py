@@ -2039,10 +2039,15 @@ def run_hierarchy_locale_stage(
     stage_start = time.perf_counter()
     topology_path = output_dir / "europe_topology.na_v2.json"
     runtime_topology_path = output_dir / "europe_topology.runtime_political_v1.json"
+    baseline_locales_path = PROJECT_ROOT / "data" / "i18n" / "locales_baseline.json"
+    translation_audit_path = PROJECT_ROOT / ".runtime" / "reports" / "generated" / "translation_source_audit.json"
+    translation_review_queue_path = PROJECT_ROOT / ".runtime" / "reports" / "generated" / "translation_review_queue.json"
     outputs = [
         output_dir / "hierarchy.json",
         output_dir / "geo_aliases.json",
         output_dir / "locales.json",
+        translation_audit_path,
+        translation_review_queue_path,
     ]
     signature = _compute_stage_signature(
         stage_name=stage_name,
@@ -2051,6 +2056,10 @@ def run_hierarchy_locale_stage(
             PROJECT_ROOT / "tools" / "generate_hierarchy.py",
             PROJECT_ROOT / "tools" / "geo_key_normalizer.py",
             PROJECT_ROOT / "tools" / "translate_manager.py",
+            PROJECT_ROOT / "data" / "i18n" / "manual_ui.json",
+            PROJECT_ROOT / "data" / "i18n" / "manual_geo_overrides.json",
+            PROJECT_ROOT / "data" / "i18n" / "europe_geo_seeds.json",
+            baseline_locales_path,
             topology_path,
             runtime_topology_path,
         ],
@@ -2081,6 +2090,9 @@ def run_hierarchy_locale_stage(
         hierarchy_path=output_dir / "hierarchy.json",
         runtime_topology_path=runtime_topology_path,
         scenarios_root=output_dir / "scenarios",
+        baseline_locales_path=baseline_locales_path,
+        audit_report_path=translation_audit_path,
+        review_queue_path=translation_review_queue_path,
         machine_translate=False,
         network_mode="off",
     )
@@ -3662,6 +3674,9 @@ def run_optional_machine_translation(
         return
     print(f"[INFO] Running optional machine translation pass (mode={build_mt_mode})....")
     machine_translation_start = time.perf_counter()
+    baseline_locales_path = PROJECT_ROOT / "data" / "i18n" / "locales_baseline.json"
+    translation_audit_path = PROJECT_ROOT / ".runtime" / "reports" / "generated" / "translation_source_audit.machine_translation.json"
+    translation_review_queue_path = PROJECT_ROOT / ".runtime" / "reports" / "generated" / "translation_review_queue.machine_translation.json"
     translation_result = translate_manager.sync_translations(
         topology_path=output_dir / "europe_topology.na_v2.json",
         output_path=output_dir / "locales.json",
@@ -3669,6 +3684,9 @@ def run_optional_machine_translation(
         hierarchy_path=output_dir / "hierarchy.json",
         runtime_topology_path=output_dir / "europe_topology.runtime_political_v1.json",
         scenarios_root=output_dir / "scenarios",
+        baseline_locales_path=baseline_locales_path,
+        audit_report_path=translation_audit_path,
+        review_queue_path=translation_review_queue_path,
         machine_translate=True,
         translator_delay_seconds=0.05,
         max_machine_translations=2500,
@@ -4466,6 +4484,9 @@ def _legacy_main_impl() -> None:
     if build_mt_mode in {"auto", "on"}:
         print(f"[INFO] Running optional machine translation pass (mode={build_mt_mode})....")
         machine_translation_start = time.perf_counter()
+        baseline_locales_path = PROJECT_ROOT / "data" / "i18n" / "locales_baseline.json"
+        translation_audit_path = PROJECT_ROOT / ".runtime" / "reports" / "generated" / "translation_source_audit.machine_translation.json"
+        translation_review_queue_path = PROJECT_ROOT / ".runtime" / "reports" / "generated" / "translation_review_queue.machine_translation.json"
         translation_result = translate_manager.sync_translations(
             topology_path=output_dir / "europe_topology.na_v2.json",
             output_path=output_dir / "locales.json",
@@ -4473,6 +4494,9 @@ def _legacy_main_impl() -> None:
             hierarchy_path=output_dir / "hierarchy.json",
             runtime_topology_path=output_dir / "europe_topology.runtime_political_v1.json",
             scenarios_root=output_dir / "scenarios",
+            baseline_locales_path=baseline_locales_path,
+            audit_report_path=translation_audit_path,
+            review_queue_path=translation_review_queue_path,
             machine_translate=True,
             translator_delay_seconds=0.05,
             max_machine_translations=2500,

@@ -6,7 +6,13 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from tools.translate_manager import MachineTranslator, collect_ui_keys, contains_cjk
+from tools.translate_manager import (
+    MachineTranslator,
+    build_translation_review_queue,
+    build_translation_source_audit,
+    collect_ui_keys,
+    contains_cjk,
+)
 
 
 class TranslateManagerKeyCollectionTest(unittest.TestCase):
@@ -127,6 +133,66 @@ const label = t("Say \"hi\"", "ui");
         self.assertEqual(mocked_urlopen.call_count, 1)
         self.assertEqual(translator.requests_made, 1)
         self.assertEqual(translator.cache, {"Hello": "你好"})
+
+    def test_build_translation_source_audit_reports_source_counts(self) -> None:
+        audit = build_translation_source_audit(
+            ui_payload={"Apply": {"en": "Apply", "zh": "应用"}},
+            geo_payload={"Poland": {"en": "Poland", "zh": "波兰"}},
+            ui_sources={"Apply": "manual_ui"},
+            geo_sources={"Poland": "geo_seed"},
+            baseline_locales_path=Path("data/i18n/locales_baseline.json"),
+            machine_translate_enabled=False,
+            machine_translate_available=False,
+            machine_translation_provider="experimental_google_web",
+            resolved_country_codes=["PL"],
+        )
+
+        self.assertEqual(audit["baseline_locales_path"], "data/i18n/locales_baseline.json")
+        self.assertEqual(audit["machine_translation_provider"], "experimental_google_web")
+        self.assertEqual(audit["ui"]["source_counts"]["manual_ui"], 1)
+        self.assertEqual(audit["geo"]["source_counts"]["geo_seed"], 1)
+        self.assertEqual(audit["geo"]["english_fallback_count"], 0)
+
+    def test_build_translation_review_queue_only_keeps_english_fallback_entries(self) -> None:
+        queue = build_translation_review_queue(
+            ui_payload={
+                "Apply": {"en": "Apply", "zh": "应用"},
+                "Broken": {"en": "Broken", "zh": "Broken"},
+            },
+            geo_payload={
+                "Poland": {"en": "Poland", "zh": "波兰"},
+                "Unknown": {"en": "Unknown", "zh": "Unknown"},
+            },
+            ui_sources={
+                "Apply": "manual_ui",
+                "Broken": "english_fallback",
+            },
+            geo_sources={
+                "Poland": "geo_seed",
+                "Unknown": "english_fallback",
+            },
+        )
+
+        self.assertEqual(queue["entry_count"], 2)
+        self.assertEqual(
+            queue["entries"],
+            [
+                {
+                    "section": "ui",
+                    "key": "Broken",
+                    "en": "Broken",
+                    "zh": "Broken",
+                    "source": "english_fallback",
+                },
+                {
+                    "section": "geo",
+                    "key": "Unknown",
+                    "en": "Unknown",
+                    "zh": "Unknown",
+                    "source": "english_fallback",
+                },
+            ],
+        )
 
 
 if __name__ == "__main__":

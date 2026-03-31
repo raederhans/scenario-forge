@@ -341,19 +341,14 @@ def _record_name_keys(record: dict[str, object]) -> set[str]:
     return keys
 
 
-def _load_geonames_source() -> pd.DataFrame:
-    cache_path = fetch_or_cache_binary(
-        cfg.GEONAMES_CITIES15000_URL,
-        cfg.GEONAMES_CITIES15000_FILENAME,
-        min_size_bytes=64 * 1024,
-    )
-    with zipfile.ZipFile(cache_path) as archive:
+def load_geonames_frame(zip_path: Path) -> pd.DataFrame:
+    with zipfile.ZipFile(zip_path) as archive:
         member = next(
             (name for name in archive.namelist() if name.lower().endswith(".txt")),
             "",
         )
         if not member:
-            raise ValueError(f"GeoNames archive missing text payload: {cache_path}")
+            raise ValueError(f"GeoNames archive missing text payload: {zip_path}")
         with archive.open(member) as handle:
             frame = pd.read_csv(
                 handle,
@@ -364,6 +359,16 @@ def _load_geonames_source() -> pd.DataFrame:
                 low_memory=False,
             )
     return frame
+
+
+def _load_geonames_source(zip_path: Path | None = None) -> pd.DataFrame:
+    if zip_path is None:
+        zip_path = fetch_or_cache_binary(
+            cfg.GEONAMES_CITIES15000_URL,
+            cfg.GEONAMES_CITIES15000_FILENAME,
+            min_size_bytes=64 * 1024,
+        )
+    return load_geonames_frame(Path(zip_path))
 
 
 def _normalize_geonames(frame: pd.DataFrame) -> gpd.GeoDataFrame:
@@ -664,11 +669,19 @@ def _country_city_rank_key(row: dict[str, object]) -> tuple[object, ...]:
     )
 
 
+def build_merged_world_city_dataset(
+    *,
+    geonames_frame: pd.DataFrame | None = None,
+    natural_earth_gdf: gpd.GeoDataFrame | None = None,
+) -> gpd.GeoDataFrame:
+    geonames = _normalize_geonames(geonames_frame if geonames_frame is not None else _load_geonames_source())
+    natural_earth = _normalize_natural_earth() if natural_earth_gdf is None else _ensure_epsg4326(natural_earth_gdf)
+    return merge_world_cities(geonames, natural_earth)
+
+
 @lru_cache(maxsize=1)
 def _load_merged_world_city_dataset() -> gpd.GeoDataFrame:
-    geonames = _normalize_geonames(_load_geonames_source())
-    natural_earth = _normalize_natural_earth()
-    return merge_world_cities(geonames, natural_earth)
+    return build_merged_world_city_dataset()
 
 
 @lru_cache(maxsize=16)
@@ -934,8 +947,9 @@ def build_world_cities(
     *,
     political: gpd.GeoDataFrame,
     urban: gpd.GeoDataFrame,
+    merged_city_dataset: gpd.GeoDataFrame | None = None,
 ) -> gpd.GeoDataFrame:
-    merged = _load_merged_world_city_dataset().copy()
+    merged = (merged_city_dataset.copy() if merged_city_dataset is not None else _load_merged_world_city_dataset().copy())
     merged = _attach_cities_to_political(merged, political)
     merged = _attach_cities_to_urban(merged, urban)
     geonames_mask = merged["source"].fillna("").astype(str).str.casefold() == "geonames"

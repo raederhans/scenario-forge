@@ -16,11 +16,14 @@ python tools\geo_key_normalizer.py
 if errorlevel 1 goto :error
 
 echo [i18n] Step 2/3: Sync translations...
+set "I18N_BASELINE=data\i18n\locales_baseline.json"
+set "I18N_AUDIT=.runtime\reports\generated\translation_source_audit.json"
+set "I18N_REVIEW=.runtime\reports\generated\translation_review_queue.json"
 if "%MACHINE_TRANSLATE%"=="1" (
   echo [i18n] Machine translation fallback enabled.
-  python tools\translate_manager.py --machine-translate --translator-delay-seconds 0.05 %EXTRA_TRANSLATE_ARGS%
+  python tools\translate_manager.py --baseline-locales "%I18N_BASELINE%" --audit-report "%I18N_AUDIT%" --review-queue "%I18N_REVIEW%" --machine-translate --translator-delay-seconds 0.05 %EXTRA_TRANSLATE_ARGS%
 ) else (
-  python tools\translate_manager.py
+  python tools\translate_manager.py --baseline-locales "%I18N_BASELINE%" --audit-report "%I18N_AUDIT%" --review-queue "%I18N_REVIEW%"
 )
 if errorlevel 1 goto :error
 
