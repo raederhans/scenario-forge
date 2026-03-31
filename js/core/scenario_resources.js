@@ -51,9 +51,14 @@ import {
   syncCountryUi,
   syncScenarioUi,
 } from "./scenario_ui_sync.js";
+import {
+  getRuntimeGeometryFeatureId,
+  getScenarioRuntimeGeometryCountryCode,
+  hasExplicitScenarioAssignment,
+  shouldApplyHoi4FarEastSovietBackfill,
+} from "./scenario_runtime_queries.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
-import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 const SCENARIO_REGISTRY_URL = "data/scenarios/index.json";
 const DETAIL_POLITICAL_MIN_FEATURES = 1000;
 const SCENARIO_DETAIL_MIN_RATIO_STRICT = 0.7;
@@ -99,7 +104,6 @@ const SCENARIO_OPTIONAL_LAYER_CONFIGS = {
     revisionField: "cityLayerRevision",
   },
 };
-let activeScenarioApplyPromise = null;
 
 function cacheBust(url) {
   if (!url) return url;
@@ -365,63 +369,6 @@ function getScenarioGeoLocalePatchDescriptor(manifest, language = state.currentL
     language: normalizedLanguage,
     localeSpecific: false,
   };
-}
-
-function canonicalScenarioCountryCode(rawCode) {
-  return normalizeCountryCodeAlias(rawCode);
-}
-
-function getRuntimeGeometryFeatureId(geometry) {
-  const props = geometry?.properties || {};
-  return String(props.id || geometry?.id || "").trim();
-}
-
-function extractScenarioCountryCodeFromId(value) {
-  const text = String(value || "").trim().toUpperCase();
-  if (!text) return "";
-  const prefix = text.split(/[-_]/)[0];
-  if (/^[A-Z]{2,3}$/.test(prefix)) {
-    return prefix;
-  }
-  const alphaPrefix = prefix.match(/^[A-Z]{2,3}/);
-  return alphaPrefix ? alphaPrefix[0] : "";
-}
-
-function getScenarioRuntimeGeometryCountryCode(geometry) {
-  const props = geometry?.properties || {};
-  const direct = (
-    props.cntr_code ||
-    props.CNTR_CODE ||
-    props.iso_a2 ||
-    props.ISO_A2 ||
-    props.iso_a2_eh ||
-    props.ISO_A2_EH ||
-    props.adm0_a2 ||
-    props.ADM0_A2 ||
-    ""
-  );
-  const normalizedDirect = canonicalScenarioCountryCode(direct);
-  if (/^[A-Z]{2,3}$/.test(normalizedDirect) && normalizedDirect !== "ZZ" && normalizedDirect !== "XX") {
-    return normalizedDirect;
-  }
-  return canonicalScenarioCountryCode(
-    extractScenarioCountryCodeFromId(props.id) ||
-    extractScenarioCountryCodeFromId(props.NUTS_ID) ||
-    extractScenarioCountryCodeFromId(geometry?.id)
-  );
-}
-
-function shouldApplyHoi4FarEastSovietBackfill(scenarioId) {
-  const normalizedId = normalizeScenarioId(scenarioId);
-  return normalizedId === "hoi4_1936" || normalizedId === "hoi4_1939";
-}
-
-function hasExplicitScenarioAssignment(featureMap, featureId) {
-  return !!(
-    featureMap &&
-    typeof featureMap === "object" &&
-    Object.prototype.hasOwnProperty.call(featureMap, featureId)
-  );
 }
 
 function buildHoi4FarEastSovietOwnerBackfill(

@@ -383,6 +383,7 @@ function initToolbar({ render } = {}) {
   const scenarioContextModeText = document.getElementById("scenarioContextModeText");
   const scenarioContextActiveText = document.getElementById("scenarioContextActiveText");
   const scenarioContextSelectionText = document.getElementById("scenarioContextSelectionText");
+  const scenarioTransportWorkbenchBtn = document.getElementById("scenarioTransportWorkbenchBtn");
   const scenarioGuideBtn = document.getElementById("scenarioGuideBtn");
   const scenarioGuidePopover = document.getElementById("scenarioGuidePopover");
   const scenarioGuideStatus = document.getElementById("scenarioGuideStatus");
@@ -396,15 +397,14 @@ function initToolbar({ render } = {}) {
   const devWorkspaceToggleBtn = document.getElementById("devWorkspaceToggleBtn");
   const leftPanelToggle = document.getElementById("leftPanelToggle");
   const rightPanelToggle = document.getElementById("rightPanelToggle");
-  const transportWorkbenchOpenBtn = document.getElementById("transportWorkbenchOpenBtn");
-  const transportWorkbenchLauncherBtn = document.getElementById("transportWorkbenchLauncherBtn");
   const transportWorkbenchOverlay = document.getElementById("transportWorkbenchOverlay");
   const transportWorkbenchPanel = document.getElementById("transportWorkbenchPanel");
+  const transportWorkbenchInfoBtn = document.getElementById("transportWorkbenchInfoBtn");
+  const transportWorkbenchInfoPopover = document.getElementById("transportWorkbenchInfoPopover");
   const transportWorkbenchCloseBtn = document.getElementById("transportWorkbenchCloseBtn");
   const transportWorkbenchResetBtn = document.getElementById("transportWorkbenchResetBtn");
   const transportWorkbenchApplyBtn = document.getElementById("transportWorkbenchApplyBtn");
   const transportWorkbenchTitle = document.getElementById("transportWorkbenchTitle");
-  const transportWorkbenchSubtitle = document.getElementById("transportWorkbenchSubtitle");
   const transportWorkbenchLensTitle = document.getElementById("transportWorkbenchLensTitle");
   const transportWorkbenchLensBody = document.getElementById("transportWorkbenchLensBody");
   const transportWorkbenchLensNext = document.getElementById("transportWorkbenchLensNext");
@@ -706,6 +706,30 @@ function initToolbar({ render } = {}) {
     }
   };
 
+  const closeTransportWorkbenchInfoPopover = ({ restoreFocus = false } = {}) => {
+    if (!transportWorkbenchInfoPopover) return;
+    transportWorkbenchInfoPopover.classList.add("hidden");
+    transportWorkbenchInfoPopover.setAttribute("aria-hidden", "true");
+    transportWorkbenchInfoBtn?.setAttribute("aria-expanded", "false");
+    if (restoreFocus && transportWorkbenchInfoBtn && typeof transportWorkbenchInfoBtn.focus === "function") {
+      transportWorkbenchInfoBtn.focus({ preventScroll: true });
+    }
+  };
+
+  const toggleTransportWorkbenchInfoPopover = () => {
+    if (!transportWorkbenchInfoPopover) return;
+    const willOpen = transportWorkbenchInfoPopover.classList.contains("hidden");
+    if (!willOpen) {
+      closeTransportWorkbenchInfoPopover({ restoreFocus: true });
+      return;
+    }
+    rememberOverlayTrigger(transportWorkbenchInfoPopover, transportWorkbenchInfoBtn);
+    transportWorkbenchInfoPopover.classList.remove("hidden");
+    transportWorkbenchInfoPopover.setAttribute("aria-hidden", "false");
+    transportWorkbenchInfoBtn?.setAttribute("aria-expanded", "true");
+    focusOverlaySurface(transportWorkbenchInfoPopover);
+  };
+
   const getTransportWorkbenchFamilyMeta = () => {
     ensureTransportWorkbenchUiState();
     const activeFamily = normalizeTransportWorkbenchFamily(state.transportWorkbenchUi.activeFamily);
@@ -730,18 +754,16 @@ function initToolbar({ render } = {}) {
     document.body.classList.toggle("transport-workbench-open", isOpen);
     transportWorkbenchOverlay?.classList.toggle("hidden", !isOpen);
     transportWorkbenchOverlay?.setAttribute("aria-hidden", isOpen ? "false" : "true");
-    transportWorkbenchLauncherBtn?.classList.toggle("is-active", isOpen);
-    transportWorkbenchLauncherBtn?.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    transportWorkbenchOpenBtn?.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    scenarioTransportWorkbenchBtn?.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    scenarioTransportWorkbenchBtn?.setAttribute("title", isOpen ? "Close transport workbench" : "Open transport workbench");
     transportWorkbenchTitle.textContent = family.title;
-    transportWorkbenchSubtitle.textContent = "First pass only establishes the shell, layout, and entry points. Real family parameters and map-side application stay disconnected for now.";
     transportWorkbenchLensTitle.textContent = family.lensTitle;
     transportWorkbenchLensBody.textContent = family.lensBody;
     transportWorkbenchLensNext.textContent = family.lensNext;
     transportWorkbenchFamilyStatus.textContent = family.label;
     transportWorkbenchCountryStatus.textContent = uiState.sampleCountry;
     transportWorkbenchPreviewMode.textContent = uiState.previewMode === "static" ? "Static carrier" : uiState.previewMode;
-    transportWorkbenchPreviewTitle.textContent = family.previewTitle;
+    transportWorkbenchPreviewTitle.textContent = `${uiState.sampleCountry} preview`;
     transportWorkbenchPreviewFamilyBadge.textContent = family.label;
     transportWorkbenchPreviewCaption.textContent = family.previewCaption;
     transportWorkbenchInspectorTitle.textContent = family.inspectorTitle;
@@ -777,6 +799,7 @@ function initToolbar({ render } = {}) {
       state.toggleLeftPanelFn?.(false);
       state.toggleRightPanelFn?.(false);
       state.closeDockPopoverFn?.({ restoreFocus: false });
+      closeTransportWorkbenchInfoPopover({ restoreFocus: false });
       if (trigger instanceof HTMLElement && transportWorkbenchOverlay instanceof HTMLElement) {
         rememberOverlayTrigger(transportWorkbenchOverlay, trigger);
       }
@@ -787,6 +810,7 @@ function initToolbar({ render } = {}) {
       focusOverlaySurface(transportWorkbenchPanel);
       return;
     }
+    closeTransportWorkbenchInfoPopover({ restoreFocus: false });
     state.toggleLeftPanelFn?.(uiState.restoreLeftDrawer);
     state.toggleRightPanelFn?.(!uiState.restoreLeftDrawer && uiState.restoreRightDrawer);
     uiState.restoreLeftDrawer = false;
@@ -1212,6 +1236,13 @@ function initToolbar({ render } = {}) {
       const isGuideOpen = !!(scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden"));
       scenarioGuideBtn.setAttribute("title", isGuideOpen ? t("Hide guide", "ui") : t("Show guide", "ui"));
     }
+    if (scenarioTransportWorkbenchBtn) {
+      scenarioTransportWorkbenchBtn.classList.toggle("hidden", !!state.ui.scenarioBarCollapsed);
+      scenarioTransportWorkbenchBtn.textContent = "Transport";
+      scenarioTransportWorkbenchBtn.setAttribute("title", state.transportWorkbenchUi?.open
+        ? "Close transport workbench"
+        : "Open transport workbench");
+    }
     refreshScenarioSelectionChip();
     renderScenarioGuideStatus({
       activeScenario,
@@ -1420,6 +1451,10 @@ function initToolbar({ render } = {}) {
       if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden") && !insideScenarioGuide) {
         closeScenarioGuidePopover();
       }
+      const insideTransportWorkbenchInfo = target.closest("#transportWorkbenchInfoPopover, #transportWorkbenchInfoBtn");
+      if (transportWorkbenchInfoPopover && !transportWorkbenchInfoPopover.classList.contains("hidden") && !insideTransportWorkbenchInfo) {
+        closeTransportWorkbenchInfoPopover();
+      }
     });
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
@@ -1437,6 +1472,10 @@ function initToolbar({ render } = {}) {
         }
         if (scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
           closeScenarioGuidePopover({ restoreFocus: true });
+          closedOverlay = true;
+        }
+        if (transportWorkbenchInfoPopover && !transportWorkbenchInfoPopover.classList.contains("hidden")) {
+          closeTransportWorkbenchInfoPopover({ restoreFocus: true });
           closedOverlay = true;
         }
         if (closedOverlay) {
@@ -3223,20 +3262,22 @@ function initToolbar({ render } = {}) {
     rightPanelToggle.dataset.bound = "true";
   }
 
-  if (transportWorkbenchOpenBtn && !transportWorkbenchOpenBtn.dataset.bound) {
-    transportWorkbenchOpenBtn.setAttribute("aria-haspopup", "dialog");
-    transportWorkbenchOpenBtn.setAttribute("aria-controls", "transportWorkbenchOverlay");
-    transportWorkbenchOpenBtn.addEventListener("click", () => {
-      setTransportWorkbenchState(true, { trigger: transportWorkbenchOpenBtn });
+  if (scenarioTransportWorkbenchBtn && !scenarioTransportWorkbenchBtn.dataset.bound) {
+    scenarioTransportWorkbenchBtn.addEventListener("click", () => {
+      if (state.transportWorkbenchUi?.open) {
+        setTransportWorkbenchState(false);
+        return;
+      }
+      setTransportWorkbenchState(true, { trigger: scenarioTransportWorkbenchBtn });
     });
-    transportWorkbenchOpenBtn.dataset.bound = "true";
+    scenarioTransportWorkbenchBtn.dataset.bound = "true";
   }
 
-  if (transportWorkbenchLauncherBtn && !transportWorkbenchLauncherBtn.dataset.bound) {
-    transportWorkbenchLauncherBtn.addEventListener("click", () => {
-      setTransportWorkbenchState(true, { trigger: transportWorkbenchLauncherBtn });
+  if (transportWorkbenchInfoBtn && !transportWorkbenchInfoBtn.dataset.bound) {
+    transportWorkbenchInfoBtn.addEventListener("click", () => {
+      toggleTransportWorkbenchInfoPopover();
     });
-    transportWorkbenchLauncherBtn.dataset.bound = "true";
+    transportWorkbenchInfoBtn.dataset.bound = "true";
   }
 
   if (transportWorkbenchCloseBtn && !transportWorkbenchCloseBtn.dataset.bound) {
@@ -3266,6 +3307,11 @@ function initToolbar({ render } = {}) {
   if (!document.body.dataset.transportWorkbenchEscapeBound) {
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape" || !state.transportWorkbenchUi?.open) return;
+      if (transportWorkbenchInfoPopover && !transportWorkbenchInfoPopover.classList.contains("hidden")) {
+        event.preventDefault();
+        closeTransportWorkbenchInfoPopover({ restoreFocus: true });
+        return;
+      }
       event.preventDefault();
       setTransportWorkbenchState(false);
     });

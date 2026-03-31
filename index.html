@@ -370,26 +370,6 @@
                     class="input appearance-filter-input"
                   />
                 </div>
-                <section
-                  class="transport-workbench-entry mt-3"
-                  aria-labelledby="transportWorkbenchEntryTitle"
-                  data-appearance-filter-item
-                  data-appearance-filter-label="transport facility workbench road rail airport port mineral energy industrial"
-                >
-                  <div class="transport-workbench-entry-copy">
-                    <div id="transportWorkbenchEntryEyebrow" class="transport-workbench-entry-eyebrow">New shell</div>
-                    <h3 id="transportWorkbenchEntryTitle" class="transport-workbench-entry-title">Transport / Facility Workbench</h3>
-                    <p id="transportWorkbenchEntryDescription" class="transport-workbench-entry-description">
-                      Open the dedicated shell for transport and facility layer debugging. This first pass reserves the workspace without wiring real family parameters yet.
-                    </p>
-                  </div>
-                  <div class="transport-workbench-entry-actions">
-                    <div id="transportWorkbenchEntryStatus" class="transport-workbench-entry-status">Shell only · Japan sample carrier</div>
-                    <button id="transportWorkbenchOpenBtn" type="button" class="btn-secondary transport-workbench-entry-btn">
-                      Open Workbench
-                    </button>
-                  </div>
-                </section>
                 <div class="appearance-subsection-stack mt-3">
                   <details class="appearance-mini-section" data-appearance-filter-item data-appearance-filter-label="physical regions terrain atlas terrain contours">
                     <summary id="lblPhysicalPanel" class="section-header">Physical Regions</summary>
@@ -1165,18 +1145,6 @@
             </button>
           </div>
 
-          <button
-            id="transportWorkbenchLauncherBtn"
-            class="transport-workbench-launcher"
-            type="button"
-            aria-haspopup="dialog"
-            aria-controls="transportWorkbenchOverlay"
-            aria-expanded="false"
-          >
-            <span class="transport-workbench-launcher-kicker">Transport</span>
-            <span class="transport-workbench-launcher-title">Open workbench</span>
-          </button>
-
           <div id="toolHudChip" class="tool-hud-chip hidden" aria-live="polite"></div>
           <div id="mapOnboardingHint" class="map-onboarding-hint">
             Click a region to start painting, or use Auto-Fill to color all countries
@@ -1199,6 +1167,16 @@
               <span class="scenario-context-icon" aria-hidden="true">#</span>
               <span id="scenarioContextSelectionText" data-i18n="No selection">No selection</span>
             </div>
+            <button
+              id="scenarioTransportWorkbenchBtn"
+              type="button"
+              class="scenario-context-action-btn"
+              aria-haspopup="dialog"
+              aria-controls="transportWorkbenchOverlay"
+              aria-expanded="false"
+            >
+              Transport
+            </button>
             <button id="scenarioGuideBtn" type="button" class="scenario-context-icon-btn" aria-label="Show scenario guide" data-i18n-aria-label="Show scenario guide">?</button>
           </div>
           <div id="scenarioGuidePopover" class="scenario-guide-popover hidden" role="dialog" aria-labelledby="scenarioGuideTitle">
@@ -1893,112 +1871,117 @@
         role="dialog"
         aria-modal="true"
         aria-labelledby="transportWorkbenchTitle"
-        aria-describedby="transportWorkbenchSubtitle"
       >
-        <div class="transport-workbench-header">
-          <div class="transport-workbench-header-copy">
-            <div class="transport-workbench-eyebrow">Transport / Facility</div>
-            <h2 id="transportWorkbenchTitle" class="transport-workbench-title">Road workbench shell</h2>
-            <p id="transportWorkbenchSubtitle" class="transport-workbench-subtitle">
-              First pass only establishes the shell, layout, and entry points. Real family parameters and map-side application stay disconnected for now.
-            </p>
+        <h2 id="transportWorkbenchTitle" class="visually-hidden">Transport workbench</h2>
+        <div class="transport-workbench-shell">
+          <div class="transport-workbench-topbar">
+            <div class="transport-workbench-family-tabs" role="tablist" aria-label="Transport families">
+              <button type="button" class="transport-workbench-family-tab is-active" data-transport-family="road" role="tab" aria-selected="true">Road</button>
+              <button type="button" class="transport-workbench-family-tab" data-transport-family="rail" role="tab" aria-selected="false">Rail</button>
+              <button type="button" class="transport-workbench-family-tab" data-transport-family="airport" role="tab" aria-selected="false">Airport</button>
+              <button type="button" class="transport-workbench-family-tab" data-transport-family="port" role="tab" aria-selected="false">Port</button>
+              <button type="button" class="transport-workbench-family-tab" data-transport-family="mineral_resources" role="tab" aria-selected="false">Mineral Resources</button>
+              <button type="button" class="transport-workbench-family-tab" data-transport-family="energy_facilities" role="tab" aria-selected="false">Energy Facilities</button>
+              <button type="button" class="transport-workbench-family-tab" data-transport-family="industrial_zones" role="tab" aria-selected="false">Industrial Zones</button>
+            </div>
+            <div class="transport-workbench-topbar-actions">
+              <button id="transportWorkbenchInfoBtn" type="button" class="transport-workbench-icon-btn" aria-haspopup="dialog" aria-controls="transportWorkbenchInfoPopover" aria-expanded="false">Info</button>
+              <button id="transportWorkbenchCloseBtn" type="button" class="transport-workbench-close-btn" aria-label="Close transport workbench">Close</button>
+            </div>
+            <div id="transportWorkbenchInfoPopover" class="transport-workbench-info-popover hidden" role="dialog" aria-labelledby="transportWorkbenchInfoTitle" aria-hidden="true">
+              <div id="transportWorkbenchInfoTitle" class="transport-workbench-info-title">Workbench notes</div>
+              <p class="transport-workbench-info-text">
+                This shell only settles the UI frame, panel hierarchy, and preview-first layout. It still avoids fabricated transport values.
+              </p>
+              <p class="transport-workbench-info-text">
+                Real road, rail, airport, port, and facility parameters will appear only after the first family schema is wired.
+              </p>
+            </div>
           </div>
-          <button id="transportWorkbenchCloseBtn" type="button" class="transport-workbench-close-btn" aria-label="Close transport workbench">
-            Close
-          </button>
-        </div>
 
-        <div class="transport-workbench-family-tabs" role="tablist" aria-label="Transport families">
-          <button type="button" class="transport-workbench-family-tab is-active" data-transport-family="road" role="tab" aria-selected="true">Road</button>
-          <button type="button" class="transport-workbench-family-tab" data-transport-family="rail" role="tab" aria-selected="false">Rail</button>
-          <button type="button" class="transport-workbench-family-tab" data-transport-family="airport" role="tab" aria-selected="false">Airport</button>
-          <button type="button" class="transport-workbench-family-tab" data-transport-family="port" role="tab" aria-selected="false">Port</button>
-          <button type="button" class="transport-workbench-family-tab" data-transport-family="mineral_resources" role="tab" aria-selected="false">Mineral Resources</button>
-          <button type="button" class="transport-workbench-family-tab" data-transport-family="energy_facilities" role="tab" aria-selected="false">Energy Facilities</button>
-          <button type="button" class="transport-workbench-family-tab" data-transport-family="industrial_zones" role="tab" aria-selected="false">Industrial Zones</button>
-        </div>
+          <div class="transport-workbench-body">
+            <div class="transport-workbench-grid">
+              <section class="transport-workbench-column transport-workbench-column-lens" aria-labelledby="transportWorkbenchLensTitle">
+                <div class="transport-workbench-column-header transport-workbench-column-header-compact">
+                  <div class="transport-workbench-column-kicker">Context Lens</div>
+                  <h3 id="transportWorkbenchLensTitle" class="transport-workbench-column-title">Road corridor lens</h3>
+                </div>
+                <div class="transport-workbench-meta-strip">
+                  <div class="transport-workbench-meta-pill">
+                    <span class="transport-workbench-meta-label">Family</span>
+                    <strong id="transportWorkbenchFamilyStatus" class="transport-workbench-meta-value">Road</strong>
+                  </div>
+                  <div class="transport-workbench-meta-pill">
+                    <span class="transport-workbench-meta-label">Sample</span>
+                    <strong id="transportWorkbenchCountryStatus" class="transport-workbench-meta-value">Japan</strong>
+                  </div>
+                  <div class="transport-workbench-meta-pill">
+                    <span class="transport-workbench-meta-label">Mode</span>
+                    <strong id="transportWorkbenchPreviewMode" class="transport-workbench-meta-value">Static carrier</strong>
+                  </div>
+                </div>
+                <div class="transport-workbench-parameter-stack">
+                  <div class="transport-workbench-note-card transport-workbench-note-card-emphasis">
+                    <div class="transport-workbench-note-title">Connection status</div>
+                    <p id="transportWorkbenchLensBody" class="transport-workbench-note-text">
+                      The shell is reserving space for the first real family wire. No transport-specific parameter schema is attached yet.
+                    </p>
+                  </div>
+                  <div class="transport-workbench-note-card">
+                    <div class="transport-workbench-note-title">Next likely wire</div>
+                    <p id="transportWorkbenchLensNext" class="transport-workbench-note-text">
+                      Road is the most suitable first connection because it will define the baseline corridor and routing debug surface for the rest of the pack.
+                    </p>
+                  </div>
+                </div>
+              </section>
 
-        <div class="transport-workbench-grid">
-          <section class="transport-workbench-column transport-workbench-column-lens" aria-labelledby="transportWorkbenchLensTitle">
-            <div class="transport-workbench-column-header">
-              <div class="transport-workbench-column-kicker">Context Lens</div>
-              <h3 id="transportWorkbenchLensTitle" class="transport-workbench-column-title">Road corridor lens</h3>
-            </div>
-            <div class="transport-workbench-status-stack">
-              <div class="transport-workbench-status-card">
-                <div class="transport-workbench-status-label">Family</div>
-                <div id="transportWorkbenchFamilyStatus" class="transport-workbench-status-value">Road</div>
-              </div>
-              <div class="transport-workbench-status-card">
-                <div class="transport-workbench-status-label">Sample country</div>
-                <div id="transportWorkbenchCountryStatus" class="transport-workbench-status-value">Japan</div>
-              </div>
-              <div class="transport-workbench-status-card">
-                <div class="transport-workbench-status-label">Preview mode</div>
-                <div id="transportWorkbenchPreviewMode" class="transport-workbench-status-value">Static carrier</div>
-              </div>
-            </div>
-            <div class="transport-workbench-note-card">
-              <div class="transport-workbench-note-title">Connection status</div>
-              <p id="transportWorkbenchLensBody" class="transport-workbench-note-text">
-                The shell is reserving space for the first real family wire. No transport-specific parameter schema is attached yet.
-              </p>
-            </div>
-            <div class="transport-workbench-note-card">
-              <div class="transport-workbench-note-title">Next likely wire</div>
-              <p id="transportWorkbenchLensNext" class="transport-workbench-note-text">
-                Road is the most suitable first connection because it will define the baseline corridor and routing debug surface for the rest of the pack.
-              </p>
-            </div>
-          </section>
+              <section class="transport-workbench-column transport-workbench-column-preview" aria-labelledby="transportWorkbenchPreviewTitle">
+                <h3 id="transportWorkbenchPreviewTitle" class="visually-hidden">Japan preview</h3>
+                <div class="transport-workbench-preview-shell">
+                  <div class="transport-workbench-preview-meta">
+                    <span id="transportWorkbenchPreviewCountryBadge" class="transport-workbench-preview-badge">Japan</span>
+                    <span id="transportWorkbenchPreviewFamilyBadge" class="transport-workbench-preview-badge transport-workbench-preview-badge-muted">Road</span>
+                  </div>
+                  <div class="transport-workbench-preview-canvas" aria-hidden="true">
+                    <div class="transport-workbench-preview-country">JP</div>
+                    <div class="transport-workbench-preview-crosshair"></div>
+                  </div>
+                  <p id="transportWorkbenchPreviewCaption" class="transport-workbench-preview-caption">
+                    This pane is only a static carrier for the shell milestone. Real road, rail, airport, and facility geometry will not appear here until the first family schema is wired.
+                  </p>
+                </div>
+              </section>
 
-          <section class="transport-workbench-column transport-workbench-column-preview" aria-labelledby="transportWorkbenchPreviewTitle">
-            <div class="transport-workbench-column-header">
-              <div class="transport-workbench-column-kicker">Japan Preview</div>
-              <h3 id="transportWorkbenchPreviewTitle" class="transport-workbench-column-title">Static sample carrier</h3>
+              <section class="transport-workbench-column transport-workbench-column-inspector" aria-labelledby="transportWorkbenchInspectorTitle">
+                <div class="transport-workbench-column-header transport-workbench-column-header-compact">
+                  <div class="transport-workbench-column-kicker">Inspector</div>
+                  <h3 id="transportWorkbenchInspectorTitle" class="transport-workbench-column-title">Road controls reserved</h3>
+                </div>
+                <div class="transport-workbench-inspector-stack">
+                  <div class="transport-workbench-note-card">
+                    <div class="transport-workbench-note-title">Why this is empty</div>
+                    <p id="transportWorkbenchInspectorBody" class="transport-workbench-note-text">
+                      The first pass keeps this inspector honest: no fake sliders, no fabricated counts, and no guessed transport statistics before the real parameter model is agreed.
+                    </p>
+                  </div>
+                  <div class="transport-workbench-empty-card">
+                    <div id="transportWorkbenchInspectorEmptyTitle" class="transport-workbench-empty-title">Awaiting real family schema</div>
+                    <p id="transportWorkbenchInspectorEmptyBody" class="transport-workbench-empty-text">
+                      Once the family schema is confirmed, this side will host parameter groups, preview toggles, and map application controls.
+                    </p>
+                  </div>
+                </div>
+              </section>
             </div>
-            <div class="transport-workbench-preview-shell">
-              <div class="transport-workbench-preview-meta">
-                <span id="transportWorkbenchPreviewCountryBadge" class="transport-workbench-preview-badge">Japan</span>
-                <span id="transportWorkbenchPreviewFamilyBadge" class="transport-workbench-preview-badge transport-workbench-preview-badge-muted">Road</span>
-              </div>
-              <div class="transport-workbench-preview-canvas" aria-hidden="true">
-                <div class="transport-workbench-preview-country">JP</div>
-                <div class="transport-workbench-preview-crosshair"></div>
-              </div>
-              <p id="transportWorkbenchPreviewCaption" class="transport-workbench-preview-caption">
-                This pane is only a static carrier for the shell milestone. Real road, rail, airport, and facility geometry will not appear here until the first family schema is wired.
-              </p>
-            </div>
-          </section>
+          </div>
 
-          <section class="transport-workbench-column transport-workbench-column-inspector" aria-labelledby="transportWorkbenchInspectorTitle">
-            <div class="transport-workbench-column-header">
-              <div class="transport-workbench-column-kicker">Inspector</div>
-              <h3 id="transportWorkbenchInspectorTitle" class="transport-workbench-column-title">Road controls reserved</h3>
-            </div>
-            <div class="transport-workbench-inspector-stack">
-              <div class="transport-workbench-note-card">
-                <div class="transport-workbench-note-title">Why this is empty</div>
-                <p id="transportWorkbenchInspectorBody" class="transport-workbench-note-text">
-                  The first pass keeps this inspector honest: no fake sliders, no fabricated counts, and no guessed transport statistics before the real parameter model is agreed.
-                </p>
-              </div>
-              <div class="transport-workbench-empty-card">
-                <div id="transportWorkbenchInspectorEmptyTitle" class="transport-workbench-empty-title">Awaiting real family schema</div>
-                <p id="transportWorkbenchInspectorEmptyBody" class="transport-workbench-empty-text">
-                  Once the family schema is confirmed, this side will host parameter groups, preview toggles, and map application controls.
-                </p>
-              </div>
-            </div>
-          </section>
-        </div>
-
-        <div class="transport-workbench-footer">
-          <button id="transportWorkbenchResetBtn" type="button" class="btn-secondary">Reset View</button>
-          <div class="transport-workbench-footer-actions">
+          <div class="transport-workbench-footer">
             <div class="transport-workbench-footer-note">Main map application unlocks after the first real parameter wire.</div>
-            <button id="transportWorkbenchApplyBtn" type="button" class="btn-secondary" disabled aria-disabled="true">Apply to Main Map</button>
+            <div class="transport-workbench-footer-actions">
+              <button id="transportWorkbenchResetBtn" type="button" class="btn-secondary">Reset View</button>
+              <button id="transportWorkbenchApplyBtn" type="button" class="btn-secondary" disabled aria-disabled="true">Apply to Main Map</button>
+            </div>
           </div>
         </div>
       </section>

@@ -5,6 +5,108 @@ import { syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { ensureScenarioAuditUiState, setScenarioAuditUiState } from "./scenario_ui_sync.js";
 import { scheduleScenarioChunkRefresh } from "./scenario_resources.js";
 
+const ROLLBACK_REQUIRED_KEYS = Object.freeze([
+  "activeScenarioId",
+  "scenarioBorderMode",
+  "activeScenarioManifest",
+  "scenarioCountriesByTag",
+  "scenarioFixedOwnerColors",
+  "defaultRuntimePoliticalTopology",
+  "scenarioRuntimeTopologyData",
+  "scenarioLandMaskData",
+  "scenarioContextLandMaskData",
+  "runtimePoliticalTopology",
+  "scenarioWaterRegionsData",
+  "scenarioSpecialRegionsData",
+  "scenarioReliefOverlaysData",
+  "scenarioDistrictGroupsData",
+  "scenarioDistrictGroupByFeatureId",
+  "scenarioReliefOverlayRevision",
+  "scenarioGeoLocalePatchData",
+  "scenarioCityOverridesData",
+  "cityLayerRevision",
+  "scenarioReleasableIndex",
+  "releasableCatalog",
+  "scenarioAudit",
+  "scenarioAuditUi",
+  "scenarioImportAudit",
+  "scenarioBaselineHash",
+  "scenarioBaselineOwnersByFeatureId",
+  "scenarioControllersByFeatureId",
+  "scenarioAutoShellOwnerByFeatureId",
+  "scenarioAutoShellControllerByFeatureId",
+  "scenarioBaselineControllersByFeatureId",
+  "scenarioBaselineCoresByFeatureId",
+  "scenarioShellOverlayRevision",
+  "scenarioControllerRevision",
+  "scenarioOwnerControllerDiffCount",
+  "scenarioDataHealth",
+  "scenarioViewMode",
+  "countryNames",
+  "sovereigntyByFeatureId",
+  "sovereigntyInitialized",
+  "visualOverrides",
+  "featureOverrides",
+  "sovereignBaseColors",
+  "countryBaseColors",
+  "activeSovereignCode",
+  "selectedWaterRegionId",
+  "selectedSpecialRegionId",
+  "hoveredWaterRegionId",
+  "hoveredSpecialRegionId",
+  "selectedInspectorCountryCode",
+  "inspectorHighlightCountryCode",
+  "inspectorExpansionInitialized",
+  "expandedInspectorContinents",
+  "expandedInspectorReleaseParents",
+  "scenarioParentBorderEnabledBeforeActivate",
+  "parentBorderEnabledByCountry",
+  "scenarioPaintModeBeforeActivate",
+  "paintMode",
+  "interactionGranularity",
+  "batchFillScope",
+  "scenarioUiState",
+  "scenarioOceanFillBeforeActivate",
+  "styleConfigOcean",
+  "scenarioDisplaySettingsBeforeActivate",
+  "activeScenarioPerformanceHints",
+  "scenarioPoliticalChunkData",
+  "activeScenarioChunks",
+  "runtimeChunkLoadState",
+  "renderProfile",
+  "dynamicBordersEnabled",
+  "showCityPoints",
+  "showWaterRegions",
+  "showScenarioSpecialRegions",
+  "showScenarioReliefOverlays",
+  "activePaletteId",
+  "activePaletteMeta",
+  "activePalettePack",
+  "activePaletteMap",
+  "currentPaletteTheme",
+  "activePaletteOceanMeta",
+  "fixedPaletteColorsByIso2",
+  "resolvedDefaultCountryPalette",
+  "paletteLibraryEntries",
+  "paletteQuickSwatches",
+  "paletteLoadErrorById",
+]);
+
+function validateScenarioApplyRollbackSnapshot(snapshot) {
+  if (!snapshot || typeof snapshot !== "object") {
+    throw new Error("Invalid rollback snapshot: expected an object.");
+  }
+  const missingKeys = ROLLBACK_REQUIRED_KEYS.filter(
+    (key) => !Object.prototype.hasOwnProperty.call(snapshot, key)
+  );
+  if (!missingKeys.length) {
+    return;
+  }
+  const preview = missingKeys.slice(0, 8).join(", ");
+  const suffix = missingKeys.length > 8 ? ` (+${missingKeys.length - 8} more)` : "";
+  throw new Error(`Invalid rollback snapshot: missing required keys: ${preview}${suffix}`);
+}
+
 function cloneScenarioStateValue(value) {
   if (value === null || value === undefined) {
     return value;
@@ -132,7 +234,7 @@ export function restoreScenarioApplyRollbackSnapshot(
     shouldFailRestore = false,
   } = {}
 ) {
-  if (!snapshot || typeof snapshot !== "object") return false;
+  validateScenarioApplyRollbackSnapshot(snapshot);
   if (shouldFailRestore) {
     throw new Error("Injected rollback restore failure.");
   }

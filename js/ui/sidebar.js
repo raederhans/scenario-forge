@@ -17,9 +17,7 @@ import {
   loadScenarioAuditPayload,
   releaseScenarioAuditPayload,
 } from "../core/scenario_resources.js";
-import {
-  refreshScenarioShellOverlays,
-} from "../core/scenario_manager.js";
+import { refreshScenarioShellOverlays } from "../core/scenario_shell_overlay.js";
 import { recalculateScenarioOwnerControllerDiffCount } from "../core/scenario_owner_metrics.js";
 import { getGeoFeatureDisplayLabel, t } from "./i18n.js";
 import { showToast } from "./toast.js";

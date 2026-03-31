@@ -7,14 +7,16 @@ import {
 } from "../core/scenario_dispatcher.js";
 import {
   formatScenarioAuditText,
-  formatScenarioFatalRecoveryMessage,
   formatScenarioStatusText,
   getScenarioDisplayName,
-  getScenarioFatalRecoveryState,
   getScenarioRegistryEntries,
   normalizeScenarioId,
   normalizeScenarioViewMode,
 } from "../core/scenario_manager.js";
+import {
+  formatScenarioFatalRecoveryMessage,
+  getScenarioFatalRecoveryState,
+} from "../core/scenario_recovery.js";
 import { loadScenarioRegistry } from "../core/scenario_resources.js";
 import { t } from "./i18n.js";
 import { showToast } from "./toast.js";

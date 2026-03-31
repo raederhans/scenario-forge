@@ -12,6 +12,8 @@ class ScenarioRollbackBoundaryContractTest(unittest.TestCase):
 
         self.assertIn("export function captureScenarioApplyRollbackSnapshot()", content)
         self.assertIn("export function restoreScenarioApplyRollbackSnapshot(", content)
+        self.assertIn("const ROLLBACK_REQUIRED_KEYS = Object.freeze([", content)
+        self.assertIn("Invalid rollback snapshot: missing required keys:", content)
         self.assertNotIn('from "./scenario_recovery.js"', content)
         self.assertNotIn("setMapData(", content)
         self.assertNotIn("rebuildPresetState(", content)

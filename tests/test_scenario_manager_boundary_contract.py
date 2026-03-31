@@ -28,6 +28,7 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
         self.assertIsNone(re.search(r"^(async\s+)?function\s+loadScenarioRegistry\b", content, re.MULTILINE))
         self.assertIsNone(re.search(r"^function\s+releaseScenarioAuditPayload\b", content, re.MULTILINE))
         self.assertIsNone(re.search(r"^(async\s+)?function\s+validateImportedScenarioBaseline\b", content, re.MULTILINE))
+        self.assertNotIn("SCENARIO_OPTIONAL_LAYER_CONFIGS", content)
         self.assertIsNone(re.search(r"export\s*\{[\s\S]*\bensureActiveScenarioOptionalLayerLoaded\b", content))
         self.assertIsNone(re.search(r"export\s*\{[\s\S]*\bensureActiveScenarioOptionalLayersForVisibility\b", content))
         self.assertIsNone(re.search(r"export\s*\{[\s\S]*\bensureScenarioGeoLocalePatchForLanguage\b", content))
@@ -37,6 +38,10 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
         self.assertIsNone(re.search(r"export\s*\{[\s\S]*\bloadScenarioRegistry\b", content))
         self.assertIsNone(re.search(r"export\s*\{[\s\S]*\breleaseScenarioAuditPayload\b", content))
         self.assertIsNone(re.search(r"export\s*\{[\s\S]*\bvalidateImportedScenarioBaseline\b", content))
+        self.assertIsNone(re.search(r"export\s*\{[\s\S]*\bapplyDefaultScenarioOnStartup\b", content))
+        self.assertIsNone(re.search(r"export\s*\{[\s\S]*\bformatScenarioFatalRecoveryMessage\b", content))
+        self.assertIsNone(re.search(r"export\s*\{[\s\S]*\bgetScenarioFatalRecoveryState\b", content))
+        self.assertIsNone(re.search(r"export\s*\{[\s\S]*\brefreshScenarioShellOverlays\b", content))
 
 
 if __name__ == "__main__":

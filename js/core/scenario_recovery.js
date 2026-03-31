@@ -1,30 +1,10 @@
 import { normalizeMapSemanticMode, state } from "./state.js";
 import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
-
-function getScenarioEffectiveOwnerCodeByFeatureId(featureId) {
-  const normalizedId = String(featureId || "").trim();
-  if (!normalizedId) return "";
-  return String(
-    state.sovereigntyByFeatureId?.[normalizedId] ||
-      state.runtimeCanonicalCountryByFeatureId?.[normalizedId] ||
-      ""
-  )
-    .trim()
-    .toUpperCase();
-}
-
-function getScenarioEffectiveControllerCodeByFeatureId(featureId) {
-  const normalizedId = String(featureId || "").trim();
-  if (!normalizedId) return "";
-  return String(
-    state.scenarioControllersByFeatureId?.[normalizedId] ||
-      getScenarioEffectiveOwnerCodeByFeatureId(normalizedId) ||
-      ""
-  )
-    .trim()
-    .toUpperCase();
-}
+import {
+  getScenarioEffectiveControllerCodeByFeatureId,
+  getScenarioEffectiveOwnerCodeByFeatureId,
+} from "./scenario_runtime_queries.js";
 
 function getScenarioTestHooks() {
   return globalThis.__scenarioTestHooks && typeof globalThis.__scenarioTestHooks === "object"

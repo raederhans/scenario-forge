@@ -34,6 +34,14 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertIn('../core/scenario_resources.js', TOOLBAR_JS.read_text(encoding="utf-8"))
         self.assertIn('../core/scenario_resources.js', SCENARIO_CONTROLS_JS.read_text(encoding="utf-8"))
         self.assertIn('./scenario_resources.js', INTERACTION_FUNNEL_JS.read_text(encoding="utf-8"))
+        self.assertIn('../core/scenario_shell_overlay.js', SIDEBAR_JS.read_text(encoding="utf-8"))
+        self.assertNotIn('../core/scenario_manager.js', SIDEBAR_JS.read_text(encoding="utf-8"))
+        self.assertIn('../core/scenario_recovery.js', SCENARIO_CONTROLS_JS.read_text(encoding="utf-8"))
+
+    def test_resources_module_does_not_keep_orchestration_single_flight_state(self):
+        content = SCENARIO_RESOURCES.read_text(encoding="utf-8")
+
+        self.assertNotIn("let activeScenarioApplyPromise = null;", content)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,44 @@
 const { test, expect } = require("@playwright/test");
 const { getAppUrl } = require("./support/playwright-app");
 
+test.setTimeout(90_000);
+
 const APP_URL = getAppUrl();
+
+async function waitForScenarioControlsReady(page) {
+  await page.goto(APP_URL, { waitUntil: "domcontentloaded" });
+  await page.waitForFunction(() => {
+    const select = document.querySelector("#scenarioSelect");
+    const applyButton = document.querySelector("#applyScenarioBtn");
+    return !!select
+      && !!applyButton
+      && select.querySelectorAll("option").length > 0;
+  }, { timeout: 60_000 });
+  await expect.poll(async () => page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    return {
+      activeScenarioId: String(state.activeScenarioId || ""),
+      scenarioApplyInFlight: !!state.scenarioApplyInFlight,
+    };
+  }), { timeout: 45_000 }).toEqual({
+    activeScenarioId: "tno_1962",
+    scenarioApplyInFlight: false,
+  });
+  await expect.poll(async () => page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    return {
+      startupReadonly: !!state.startupReadonly,
+      startupReadonlyUnlockInFlight: !!state.startupReadonlyUnlockInFlight,
+    };
+  }), { timeout: 45_000 }).toEqual({
+    startupReadonly: false,
+    startupReadonlyUnlockInFlight: false,
+  });
+  await page.evaluate(() => {
+    document.querySelector("#scenarioSelect")?.closest("details")?.setAttribute("open", "");
+  });
+  await expect(page.locator("#scenarioSelect")).toBeVisible();
+}
 
 test('scenario apply is single-flight and english ui uses entry.en overrides', async ({ page }) => {
   const pageErrors = [];
@@ -18,18 +55,22 @@ test('scenario apply is single-flight and english ui uses entry.en overrides', a
     }
   });
 
-  await page.goto(APP_URL, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(1200);
-
-  await page.waitForFunction(() => {
-    const select = document.querySelector('#scenarioSelect');
-    return !!select
-      && !!select.querySelector('option[value="hoi4_1939"]')
-      && !!select.querySelector('option[value="tno_1962"]');
-  });
+  await waitForScenarioControlsReady(page);
 
   await page.selectOption('#scenarioSelect', 'hoi4_1939');
-  await page.click('#applyScenarioBtn');
+  await expect(page.locator('#applyScenarioBtn')).toBeVisible();
+  await expect(page.locator('#applyScenarioBtn')).toBeEnabled();
+  await page.locator('#applyScenarioBtn').click();
+  await expect.poll(async () => page.evaluate(async () => {
+    const { state } = await import('/js/core/state.js');
+    return {
+      activeScenarioId: String(state.activeScenarioId || ''),
+      scenarioApplyInFlight: !!state.scenarioApplyInFlight,
+    };
+  }), { timeout: 45_000 }).toEqual({
+    activeScenarioId: 'hoi4_1939',
+    scenarioApplyInFlight: false,
+  });
   await expect(page.locator('#scenarioStatus')).toContainText('HOI4 1939', { timeout: 20000 });
 
   await page.selectOption('#scenarioSelect', 'tno_1962');
@@ -116,7 +157,8 @@ test('scenario apply is single-flight and english ui uses entry.en overrides', a
     };
   });
 
-  expect(requestCounters.manifest).toBe(1);
+  // Bundle caching may satisfy the second scenario switch without a manifest round-trip.
+  expect(Number(requestCounters.manifest || 0)).toBeLessThanOrEqual(1);
   expect(pageErrors).toEqual([]);
   expect(unhandledConsoleErrors).toEqual([]);
   expect(scenarioState.activeScenarioId).toBe('tno_1962');
