@@ -3770,9 +3770,7 @@ body.counter-editor-modal-open {
 .transport-workbench-column-preview {
   justify-content: stretch;
   padding: 12px;
-  background:
-    linear-gradient(180deg, rgba(244, 248, 252, 0.9), rgba(237, 243, 249, 0.74)),
-    rgba(255, 255, 255, 0.82);
+  background: rgba(242, 247, 251, 0.86);
 }
 
 .transport-workbench-preview-shell {
@@ -3782,10 +3780,8 @@ body.counter-editor-modal-open {
   min-height: min(var(--transport-workbench-preview-height), calc(100vh - 220px));
   height: auto;
   max-height: min(var(--transport-workbench-preview-height), calc(100vh - 220px));
-  padding: 8px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 250, 252, 0.84)),
-    rgba(255, 255, 255, 0.58);
+  padding: 0;
+  background: transparent;
 }
 
 .transport-workbench-preview-badge {
@@ -3812,16 +3808,14 @@ body.counter-editor-modal-open {
   min-height: 0;
   max-height: 100%;
   border-radius: 22px;
-  background:
-    radial-gradient(circle at 18% 14%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 34%),
-    linear-gradient(180deg, #dfe8ef 0%, #d4e0ea 100%);
+  background: #d8e4ed;
   overflow: hidden;
 }
 
 .transport-workbench-preview-canvas-frame {
   position: absolute;
   inset: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(108, 123, 138, 0.12);
   border-radius: 18px;
   pointer-events: none;
 }

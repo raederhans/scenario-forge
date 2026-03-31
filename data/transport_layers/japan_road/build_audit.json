@@ -1,0 +1,49 @@
+{
+  "generated_at": "2026-03-31T21:25:16.409103Z",
+  "adapter_id": "japan_road_v1",
+  "raw_osm_segment_count": 349167,
+  "clipped_osm_segment_count": 364343,
+  "included_by_class": {
+    "motorway": 99554,
+    "trunk": 134958,
+    "primary": 129831
+  },
+  "link_segment_count": 54459,
+  "dense_metro_segment_count": 80423,
+  "n06_feature_count": 1471,
+  "n06_matched_count": 99554,
+  "name_conflict_count": 81098,
+  "merge_before_count": 364343,
+  "merge_after_count": 75824,
+  "label_candidate_count": 4930,
+  "regional_sample_counts": {
+    "kanto": 11505,
+    "kansai": 8158
+  },
+  "recipe_version": "japan_road_sources_v1",
+  "source_policy": "local_source_cache_only",
+  "n06_source_member": "UTF-8/N06-24_HighwaySection.geojson",
+  "n06_encoding": "utf-8",
+  "text_policy": {
+    "storage_encoding": "utf-8",
+    "display_fields_preserve_original": true,
+    "match_key_normalization": "NFKC + whitespace collapse + casefold"
+  },
+  "source_signature": {
+    "geofabrik_japan_osm_pbf": {
+      "filename": "japan-latest.osm.pbf",
+      "size_bytes": 2393678559,
+      "sha256": "3acd8838a0b6f2f499d416bb35316d4c0880e6f160ea05ee533031a8140267c5"
+    },
+    "mlit_n06_2024": {
+      "filename": "N06-24_HighwaySection.geojson",
+      "size_bytes": 4951163,
+      "sha256": "eeeeb8448e29829e556cec87420de0e4f82e112c7235e9fdfe3c2d9395afb43f"
+    }
+  },
+  "notes": [
+    "Only motorway, trunk, primary and their *_link variants are ingested into this first preview pack.",
+    "Service-like roads remain out of the pack and therefore cannot be toggled live yet.",
+    "N06 hardening is applied conservatively to motorway segments using nearest official alignment within a fixed distance threshold."
+  ]
+}

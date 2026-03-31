@@ -4,7 +4,6 @@ import { t } from "./i18n.js";
 
 const COLOR_TOKENS = {
   sea: "#d8e4ed",
-  seaWash: "rgba(255, 255, 255, 0.42)",
   land: "#f8f5f0",
   coastline: "#6c7b8a",
   shoreGlow: "rgba(255, 255, 255, 0.28)",
@@ -26,6 +25,7 @@ let currentLodKey = "overview";
 let frameContexts = {};
 let rotationQuarterTurns = 0;
 let sceneBaseBounds = null;
+let viewChangeListener = null;
 
 const overlayRoots = {
   land: { main: null },
@@ -207,7 +207,6 @@ function renderFrameLod(frameContext) {
 
   frameContext.landDefinition.setAttribute("d", landPath);
   frameContext.seaClipPath.setAttribute("d", seaClipPath);
-  frameContext.seaWash.setAttribute("d", seaClipPath);
   frameContext.prefectureLines.setAttribute("d", prefecturePath);
 }
 
@@ -233,6 +232,7 @@ function applyCamera() {
     `translate(${orientationLayout.centerX} ${orientationLayout.centerY}) rotate(${orientationLayout.angle}) scale(${orientationLayout.fitScale}) translate(${-orientationLayout.baseCenterX} ${-orientationLayout.baseCenterY})`
   );
   syncInteractiveState();
+  viewChangeListener?.(getTransportWorkbenchCarrierViewState());
 }
 
 function getViewBoxPointerPosition(event) {
@@ -354,12 +354,6 @@ function buildFrame(frameId, frameDefinition, defs, scene) {
 
   defs.append(landDefinition, landClip, seaClip);
 
-  const seaWash = createSvgNode("path");
-  seaWash.setAttribute("fill", COLOR_TOKENS.seaWash);
-  seaWash.setAttribute("fill-rule", "evenodd");
-  seaWash.setAttribute("clip-rule", "evenodd");
-  seaWash.setAttribute("opacity", "0.42");
-
   const seaOverlay = createSvgNode("g");
   seaOverlay.classList.add("transport-workbench-carrier-overlay", "transport-workbench-carrier-overlay-sea");
   seaOverlay.setAttribute("clip-path", `url(#${seaClipId})`);
@@ -400,7 +394,7 @@ function buildFrame(frameId, frameDefinition, defs, scene) {
   landOverlay.classList.add("transport-workbench-carrier-overlay", "transport-workbench-carrier-overlay-land");
   landOverlay.setAttribute("clip-path", `url(#${landClipId})`);
 
-  frameLayer.append(seaWash, seaOverlay, shoreGlow, landBase, prefectureLines, coastline, landOverlay);
+  frameLayer.append(seaOverlay, shoreGlow, landBase, prefectureLines, coastline, landOverlay);
   scene.appendChild(frameLayer);
 
   overlayRoots.land[frameId] = landOverlay;
@@ -415,7 +409,6 @@ function buildFrame(frameId, frameDefinition, defs, scene) {
     routeMask: frameDefinition.routeMask,
     landDefinition,
     seaClipPath,
-    seaWash,
     prefectureLines,
   };
 }
@@ -561,7 +554,7 @@ export function stepTransportWorkbenchCarrierZoom(direction) {
 
 export function toggleTransportWorkbenchCarrierQuarterTurn() {
   if (!asset) return 0;
-  rotationQuarterTurns = rotationQuarterTurns === 1 ? 0 : 1;
+  rotationQuarterTurns = rotationQuarterTurns === 0 ? 1 : 0;
   camera = clampCamera({ ...camera });
   applyCamera();
   return rotationQuarterTurns;
@@ -580,9 +573,14 @@ export function resizeTransportWorkbenchCarrier() {
   syncInteractiveState();
 }
 
+export function setTransportWorkbenchCarrierViewChangeListener(listener) {
+  viewChangeListener = typeof listener === "function" ? listener : null;
+}
+
 export function destroyTransportWorkbenchCarrier() {
   pointerDrag = null;
   rotationQuarterTurns = 0;
+  viewChangeListener = null;
   if (asset?.defaultCamera) {
     camera = clampCamera(asset.defaultCamera);
   }

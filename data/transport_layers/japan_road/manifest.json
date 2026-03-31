@@ -1,0 +1,46 @@
+{
+  "adapter_id": "japan_road_v1",
+  "family": "road",
+  "country": "Japan",
+  "schema_version": 1,
+  "generated_at": "2026-03-31T21:25:16.475758Z",
+  "recipe_path": "data/transport_layers/japan_road/source_recipe.manual.json",
+  "paths": {
+    "roads": "data/transport_layers/japan_road/roads.topo.json",
+    "road_labels": "data/transport_layers/japan_road/road_labels.geojson",
+    "build_audit": "data/transport_layers/japan_road/build_audit.json"
+  },
+  "source_signature": {
+    "geofabrik_japan_osm_pbf": {
+      "filename": "japan-latest.osm.pbf",
+      "size_bytes": 2393678559,
+      "sha256": "3acd8838a0b6f2f499d416bb35316d4c0880e6f160ea05ee533031a8140267c5"
+    },
+    "mlit_n06_2024": {
+      "filename": "N06-24_HighwaySection.geojson",
+      "size_bytes": 4951163,
+      "sha256": "eeeeb8448e29829e556cec87420de0e4f82e112c7235e9fdfe3c2d9395afb43f"
+    }
+  },
+  "recipe_version": "japan_road_sources_v1",
+  "feature_counts": {
+    "roads": 75824,
+    "road_labels": 4930
+  },
+  "clip_bbox": [
+    129.0,
+    30.75,
+    145.824962,
+    45.520413
+  ],
+  "build_command": "python tools/build_transport_workbench_japan_roads.py",
+  "runtime_consumer": "transport_workbench_road_preview",
+  "source_policy": "local_source_cache_only",
+  "n06_source_member": "UTF-8/N06-24_HighwaySection.geojson",
+  "n06_encoding": "utf-8",
+  "text_policy": {
+    "storage_encoding": "utf-8",
+    "display_fields_preserve_original": true,
+    "match_key_normalization": "NFKC + whitespace collapse + casefold"
+  }
+}

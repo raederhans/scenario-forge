@@ -53,10 +53,18 @@ import {
   getTransportWorkbenchCarrierViewState,
   resetTransportWorkbenchCarrierView,
   resizeTransportWorkbenchCarrier,
+  setTransportWorkbenchCarrierViewChangeListener,
   setTransportWorkbenchCarrierFamily,
   stepTransportWorkbenchCarrierZoom,
   toggleTransportWorkbenchCarrierQuarterTurn,
 } from "./transport_workbench_carrier.js";
+import {
+  clearJapanRoadPreview,
+  destroyJapanRoadPreview,
+  getJapanRoadPreviewSnapshot,
+  renderJapanRoadPreview,
+  setJapanRoadPreviewSelectionListener,
+} from "./transport_workbench_road_preview.js";
 
 const TRANSPORT_WORKBENCH_FAMILIES = [
   {
@@ -65,24 +73,24 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     title: "Road workbench",
     lensTitle: "Japan road adapter",
     /*
-    lensBody: "Japan road 首版固定为 OSM / Geofabrik Japan 主几何，加上 N06 高速身份加固。",
-    lensNext: "只做 motorway / trunk / primary，加 road_labels，不碰互通、routing 和 secondary 及以下。",
+    lensBody: "Japan road 妫ｆ牜澧楅崶鍝勭暰娑?OSM / Geofabrik Japan 娑撹鍤戞担鏇礉閸旂姳绗?N06 妤傛﹢鈧喕闊╂禒钘夊閸ユ亽鈧?,
+    lensNext: "閸欘亜浠?motorway / trunk / primary閿涘苯濮?road_labels閿涘奔绗夌喊棰佺鞍闁哎鈧购outing 閸?secondary 閸欏﹣浜掓稉瀣ㄢ偓?,
     previewTitle: "Road carrier",
-    previewCaption: "Japan carrier 已就位。road 的真实 overlay 还没接线，所以这里先调规则和样式，不伪造 geometry。",
+    previewCaption: "Japan carrier 瀹告彃姘ㄦ担宥冣偓淇給ad 閻ㄥ嫮婀＄€?overlay 鏉╂ɑ鐥呴幒銉у殠閿涘本澧嶆禒銉ㄧ箹闁插苯鍘涚拫鍐潐閸掓瑥鎷伴弽宄扮础閿涘奔绗夋导顏堚偓?geometry閵?,
     inspectorTitle: "Road inspector",
-    inspectorBody: "当前还没有真实 road 要素可选。右侧先解释你现在这套 Japan road 规则会怎样进入 pack。",
+    inspectorBody: "瑜版挸澧犳潻妯荤梾閺堝婀＄€?road 鐟曚胶绀岄崣顖炩偓澶堚偓鍌氬礁娓氀冨帥鐟欙綁鍣存担鐘靛箛閸︺劏绻栨總?Japan road 鐟欏嫬鍨导姘偓搴㈢壉鏉╂稑鍙?pack閵?,
     inspectorEmptyTitle: "Waiting for real road packs",
-    inspectorEmptyBody: "roads 和 road_labels Japan packs 一旦接入，这里就切到真实段落和 ref 的要素检查。",
+    inspectorEmptyBody: "roads 閸?road_labels Japan packs 娑撯偓閺冿附甯撮崗銉礉鏉╂瑩鍣风亸鍗炲瀼閸掓壆婀＄€圭偞顔岄拃钘夋嫲 ref 閻ㄥ嫯顩︾槐鐘愁梾閺屻儯鈧?,
     supportsDetailedControls: true,
     */
-    lensBody: "Japan road baseline uses OSM / Geofabrik Japan as primary geometry with N06 motorway hardening.",
-    lensNext: "Scope stays on motorway, trunk, primary, and road_labels. No routing, interchanges, or secondary and below.",
+    lensBody: "Japan road now loads a real preview pack built from Geofabrik geometry with N06 motorway hardening.",
+    lensNext: "The live slice stays on motorway, trunk, primary, and road_labels. Links are carried for review but stay filtered by default.",
     previewTitle: "Road carrier",
-    previewCaption: "The Japan carrier is ready. Real road overlays are not wired yet, so this pass focuses on pack rules and style controls only.",
+    previewCaption: "The carrier now shows real Japan road geometry. Use the left column to stress the rules and the inspector to verify real segments and refs.",
     inspectorTitle: "Road inspector",
-    inspectorBody: "No real road feature is selectable yet. This side explains how the current Japan road rules would enter the pack.",
-    inspectorEmptyTitle: "Waiting for real road packs",
-    inspectorEmptyBody: "Once roads and road_labels Japan packs are wired, this side will switch to real segment and ref inspection.",
+    inspectorBody: "The inspector now reads from the live Japan road preview pack and reports why a segment is shown, hidden, or conflict-marked.",
+    inspectorEmptyTitle: "No road feature selected",
+    inspectorEmptyBody: "Click a road segment or ref label in the carrier to inspect real source, class, and hardening details.",
     supportsDetailedControls: true,
   },
   {
@@ -91,14 +99,14 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     title: "Rail workbench",
     lensTitle: "Japan rail adapter",
     /*
-    lensBody: "Japan rail 首版固定为官方 active 主网络，加 OSM lifecycle / gap patch。",
-    lensNext: "只做 railways 和 major stations，不碰全量站点、routing、时序运行图和复杂运营指标。",
+    lensBody: "Japan rail 妫ｆ牜澧楅崶鍝勭暰娑撳搫鐣奸弬?active 娑撹崵缍夌紒婊愮礉閸?OSM lifecycle / gap patch閵?,
+    lensNext: "閸欘亜浠?railways 閸?major stations閿涘奔绗夌喊鏉垮弿闁插繒鐝悙骞库偓涔簅uting閵嗕焦妞傛惔蹇氱箥鐞涘苯娴橀崪灞筋槻閺夊倽绻嶉拃銉﹀瘹閺嶅洢鈧?,
     previewTitle: "Rail carrier",
-    previewCaption: "Japan carrier 已就位。rail 的真实 overlay 还没接线，所以这里先把状态、等级和 station 规则压实。",
+    previewCaption: "Japan carrier 瀹告彃姘ㄦ担宥冣偓淇絘il 閻ㄥ嫮婀＄€?overlay 鏉╂ɑ鐥呴幒銉у殠閿涘本澧嶆禒銉ㄧ箹闁插苯鍘涢幎濠勫Ц閹降鈧胶鐡戠痪褍鎷?station 鐟欏嫬鍨崢瀣杽閵?,
     inspectorTitle: "Rail inspector",
-    inspectorBody: "当前还没有真实 rail 要素可选。右侧先解释你现在这套 Japan rail 规则会怎样落到官方源和 OSM patch 上。",
+    inspectorBody: "瑜版挸澧犳潻妯荤梾閺堝婀＄€?rail 鐟曚胶绀岄崣顖炩偓澶堚偓鍌氬礁娓氀冨帥鐟欙綁鍣存担鐘靛箛閸︺劏绻栨總?Japan rail 鐟欏嫬鍨导姘偓搴㈢壉閽€钘夊煂鐎规ɑ鏌熷┃鎰嫲 OSM patch 娑撳鈧?,
     inspectorEmptyTitle: "Waiting for real rail packs",
-    inspectorEmptyBody: "railways 和 rail_stations_major Japan packs 接入后，这里会显示真实线路和主要车站解释。",
+    inspectorEmptyBody: "railways 閸?rail_stations_major Japan packs 閹恒儱鍙嗛崥搴礉鏉╂瑩鍣锋导姘▔缁€铏规埂鐎圭偟鍤庣捄顖氭嫲娑撴槒顩︽潪锔剧彲鐟欙綁鍣撮妴?,
     supportsDetailedControls: true,
     */
     lensBody: "Japan rail baseline uses the official active network with OSM lifecycle and gap patches.",
@@ -119,7 +127,7 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     lensBody: "Airport gets its own shell now so later facility review can stay separate from corridor families and focus on site-level semantics.",
     lensNext: "Airport can reuse the same shell chrome once road proves the first real inspector and preview loop.",
     previewTitle: "Static airport carrier",
-    previewCaption: "The two-frame Japan carrier is now real, but airport markers are still withheld until the airport schema is defined.",
+    previewCaption: "The single-frame Japan carrier is now real, but airport markers are still withheld until the airport schema is defined.",
     inspectorTitle: "Airport controls reserved",
     inspectorBody: "The inspector is intentionally placeholder-only until real airport categories, symbology, and application logic are decided.",
     inspectorEmptyTitle: "Awaiting airport schema",
@@ -133,7 +141,7 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     lensBody: "Port remains a separate family shell so maritime facilities can later be tuned without mixing corridor and node semantics.",
     lensNext: "Port should connect only after the first shared facility conventions are agreed from airport or another node-based family.",
     previewTitle: "Static port carrier",
-    previewCaption: "The two-frame Japan carrier is now real, but port symbols and maritime overlays remain empty until the real family wire exists.",
+    previewCaption: "The single-frame Japan carrier is now real, but port symbols and maritime overlays remain empty until the real family wire exists.",
     inspectorTitle: "Port controls reserved",
     inspectorBody: "No fabricated port values appear here. The inspector will open up only after the true schema is in place.",
     inspectorEmptyTitle: "Awaiting port schema",
@@ -147,7 +155,7 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     lensBody: "Mineral resources stay separate from transport corridors so extraction and facility semantics can be designed on their own terms.",
     lensNext: "This family should attach after the first corridor or facility shell proves the inspector and preview pipeline.",
     previewTitle: "Static mineral carrier",
-    previewCaption: "The two-frame Japan carrier is now real, but mine sites and resource overlays remain empty until the eventual real schema exists.",
+    previewCaption: "The single-frame Japan carrier is now real, but mine sites and resource overlays remain empty until the eventual real schema exists.",
     inspectorTitle: "Mineral controls reserved",
     inspectorBody: "The inspector is intentionally empty until the real mineral resource attributes and application rules are agreed.",
     inspectorEmptyTitle: "Awaiting mineral schema",
@@ -161,7 +169,7 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     lensBody: "Energy facilities need their own family shell because they behave like infrastructure nodes, not transport corridors.",
     lensNext: "This slot is ready for later power and energy-site tuning once the first shared facility inspector pattern is stable.",
     previewTitle: "Static energy carrier",
-    previewCaption: "The two-frame Japan carrier is now real, but plants, grids, and energy overlays stay hidden until a real schema is wired.",
+    previewCaption: "The single-frame Japan carrier is now real, but plants, grids, and energy overlays stay hidden until a real schema is wired.",
     inspectorTitle: "Energy controls reserved",
     inspectorBody: "This side remains honest and empty until true energy-facility parameters exist.",
     inspectorEmptyTitle: "Awaiting energy schema",
@@ -175,7 +183,7 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     lensBody: "Industrial zones need a reserved shell because they will likely mix area-based preview rules with facility-style debugging.",
     lensNext: "This family should connect only after the first transport and first node-based family validate the shared workbench behavior.",
     previewTitle: "Static industrial carrier",
-    previewCaption: "The two-frame Japan carrier is now real, but guessed industrial footprints and counts are still excluded until the industrial schema is confirmed.",
+    previewCaption: "The single-frame Japan carrier is now real, but guessed industrial footprints and counts are still excluded until the industrial schema is confirmed.",
     inspectorTitle: "Industrial controls reserved",
     inspectorBody: "This inspector stays empty until the actual industrial-zone schema and application logic are defined.",
     inspectorEmptyTitle: "Awaiting industrial schema",
@@ -310,8 +318,8 @@ const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
     packs: ["roads", "road_labels"],
     geometrySource: "OSM / Geofabrik Japan",
     hardeningSource: "N06 motorway identity",
-    governance: "Deferred layer packs with reproducible build inputs and explicit diagnostics.",
-    pendingStatus: "Waiting for roads + road_labels Japan packs",
+    governance: "Local-source-only pack build with reproducible inputs, explicit diagnostics, and UTF-8-first Japanese text handling.",
+    pendingStatus: "Load on demand from roads + road_labels Japan packs",
   },
   rail: {
     country: "Japan",
@@ -426,7 +434,7 @@ function ensureTransportWorkbenchUiState() {
       Object.entries(defaults).map(([sectionKey, defaultValue]) => [sectionKey, source[sectionKey] !== undefined ? !!source[sectionKey] : defaultValue])
     );
   });
-  state.transportWorkbenchUi.shellPhase = "japan-road-rail-spec";
+  state.transportWorkbenchUi.shellPhase = "road-live-preview";
   state.transportWorkbenchUi.restoreLeftDrawer = !!state.transportWorkbenchUi.restoreLeftDrawer;
   state.transportWorkbenchUi.restoreRightDrawer = !!state.transportWorkbenchUi.restoreRightDrawer;
   return state.transportWorkbenchUi;
@@ -1149,6 +1157,8 @@ function initToolbar({ render } = {}) {
   };
 
   let transportWorkbenchSectionHelpState = null;
+  let transportWorkbenchRoadPreviewViewSyncRaf = 0;
+  let transportWorkbenchRoadPreviewLastScale = null;
 
   const closeTransportWorkbenchSectionHelpPopover = ({ restoreFocus = false } = {}) => {
     if (!transportWorkbenchSectionHelpPopover) return;
@@ -1237,11 +1247,11 @@ function initToolbar({ render } = {}) {
       family.supportsDetailedControls
         ? {
           title: "Compare",
-          body: `Hold to Compare Baseline 只用于对照当前 baseline，不会改写你正在调的 ${family.label.toLowerCase()} 参数。`,
+          body: `Hold to Compare Baseline only shows the locked ${family.label.toLowerCase()} baseline for reference. It never overwrites the working values in the left column.`,
         }
         : {
           title: "Status",
-          body: `${family.label} 目前还是保留位，等真实 schema 接线后才会开放细项调试。`,
+          body: `${family.label} is still a reserved shell. Detailed controls stay closed until the real Japan schema is wired.`,
         },
     ];
     blocks[2] = family.supportsDetailedControls
@@ -1303,7 +1313,7 @@ function initToolbar({ render } = {}) {
         },
       {
         title: "Preview controls",
-        body: "Use mouse wheel or the + / - controls to zoom. The 90° button rotates the carrier for alternate inspection, and Reset View returns pan, zoom, and rotation to the default frame.",
+        body: "Use mouse wheel or the + / - controls to zoom. The 90° button toggles between the default north-up workbench view and the alternate quarter-turn inspection view. Reset View restores pan, zoom, and rotation to the default frame.",
       },
       dataContract
         ? {
@@ -1422,6 +1432,18 @@ function initToolbar({ render } = {}) {
     row.appendChild(labelNode);
     row.appendChild(valueNode);
     return row;
+  };
+
+  const formatTransportWorkbenchRoadHiddenReason = (reason) => {
+    const map = {
+      class_filtered: "Filtered by class",
+      link_filtered: "Filtered by link rule",
+      short_projected_segment: "Dropped by min projected length",
+      short_primary: "Dropped as short primary",
+      dense_metro_guard: "Dropped by dense metro guard",
+      zoom_gate: "Hidden by zoom gate",
+    };
+    return map[String(reason || "").trim()] || "Visible";
   };
 
   const buildTransportWorkbenchDiagnosticRows = (familyId, config) => {
@@ -1635,29 +1657,76 @@ function initToolbar({ render } = {}) {
     if (transportWorkbenchInspectorDetails) {
       transportWorkbenchInspectorDetails.replaceChildren();
       const dataContract = getTransportWorkbenchDataContract(family.id);
-      const rows = family.id === "road"
-        ? [
-          ["Adapter", config.motorwayIdentitySource === "osm_only" ? "OSM only" : "OSM + N06 hardening"],
-          ["Classes", formatTransportWorkbenchOptionLabels(config.roadClass, ROAD_CLASS_OPTIONS)],
-          ["Labels", config.showRefs ? `${formatTransportWorkbenchOptionLabels(config.refClasses, ROAD_CLASS_OPTIONS)} refs` : "Hidden"],
+      const roadSnapshot = family.id === "road" ? getJapanRoadPreviewSnapshot(config) : null;
+      let rows;
+      if (family.id === "road" && roadSnapshot?.status === "ready") {
+        rows = [
+          ["Pack version", roadSnapshot.manifest?.adapter_id || "japan_road_v1"],
+          ["Recipe version", roadSnapshot.audit?.recipe_version || "unknown"],
+          ["Source policy", roadSnapshot.manifest?.source_policy || "unknown"],
+          ["N06 member", roadSnapshot.manifest?.n06_source_member || roadSnapshot.audit?.n06_source_member || "unknown"],
+          ["N06 encoding", roadSnapshot.manifest?.n06_encoding || roadSnapshot.audit?.n06_encoding || "unknown"],
+          ["Last build", String(roadSnapshot.manifest?.generated_at || "unknown").replace("T", " ").replace("Z", " UTC")],
+          ["Loaded roads", String(roadSnapshot.stats?.totalRoads || 0)],
+          ["Visible roads", String(roadSnapshot.stats?.visibleRoads || 0)],
+          ["Visible labels", String(roadSnapshot.stats?.visibleLabels || 0)],
+          ["Filtered roads", String(roadSnapshot.stats?.filteredRoads || 0)],
+          ["N06 matched", String(roadSnapshot.audit?.n06_matched_count || 0)],
+          ["Name conflicts", String(roadSnapshot.audit?.name_conflict_count || 0)],
           ["Compare mode", compareHeld ? "Holding baseline" : "Working state"],
+        ];
+        const selected = roadSnapshot.selected;
+        if (selected?.type === "road") {
+          rows.push(
+            ["Selected road", selected.name || "Unnamed segment"],
+            ["Ref", selected.ref || "—"],
+            ["Official name", selected.officialName || "—"],
+            ["Official ref", selected.officialRef || "—"],
+            ["Road class", selected.roadClass || "—"],
+            ["Source", selected.source || "—"],
+            ["Flags", Array.isArray(selected.sourceFlags) && selected.sourceFlags.length ? selected.sourceFlags.join(", ") : "—"],
+            ["Visibility", selected.visible ? "Visible" : formatTransportWorkbenchRoadHiddenReason(selected.hiddenReason)],
+          );
+          if (selected.n06MatchDistanceMeters !== null && selected.n06MatchDistanceMeters !== undefined) {
+            rows.push(["N06 match distance", `${Math.round(selected.n06MatchDistanceMeters)}m`]);
+          }
+        } else if (selected?.type === "label") {
+          rows.push(
+            ["Selected label", selected.ref || "—"],
+            ["Road class", selected.roadClass || "—"],
+            ["Source", selected.source || "—"],
+            ["Priority", String(selected.priority ?? "—")],
+            ["Visibility", selected.visible ? "Visible" : formatTransportWorkbenchRoadHiddenReason(selected.hiddenReason)],
+          );
+        }
+      } else if (family.id === "road" && roadSnapshot?.status === "error") {
+        rows = [
+          ["Pack status", "Road pack failed to load"],
+          ["Error", roadSnapshot.error || "Unknown error"],
           ["Data path", dataContract?.governance || "Deferred pack governance pending"],
-          ["Pack status", dataContract?.pendingStatus || "Waiting for roads + road_labels Japan packs"],
-        ]
-        : family.id === "rail"
-          ? [
-            ["Adapter", config.allowOsmActiveGapFill ? "Official active + OSM gap fill" : "Official active locked"],
-            ["Statuses", formatTransportWorkbenchOptionLabels(config.status, RAIL_STATUS_OPTIONS)],
-            ["Classes", formatTransportWorkbenchOptionLabels(config.class, RAIL_CLASS_OPTIONS)],
-            ["Stations", config.showMajorStations ? `${config.importanceThreshold} threshold` : "Hidden"],
-            ["Data path", dataContract?.governance || "Deferred pack governance pending"],
-            ["Pack status", dataContract?.pendingStatus || "Waiting for railways + rail_stations_major Japan packs"],
-          ]
-          : [
-            ["Adapter", "Reserved shell only"],
-            ["Compare mode", "No baseline yet"],
-            ["Pack status", `Waiting for ${family.label} Japan adapter`],
-          ];
+        ];
+      } else if (family.id === "road") {
+        rows = [
+          ["Pack status", "Loading Japan road pack"],
+          ["Adapter", config.motorwayIdentitySource === "osm_only" ? "OSM only" : "OSM + N06 hardening"],
+          ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+        ];
+      } else if (family.id === "rail") {
+        rows = [
+          ["Adapter", config.allowOsmActiveGapFill ? "Official active + OSM gap fill" : "Official active locked"],
+          ["Statuses", formatTransportWorkbenchOptionLabels(config.status, RAIL_STATUS_OPTIONS)],
+          ["Classes", formatTransportWorkbenchOptionLabels(config.class, RAIL_CLASS_OPTIONS)],
+          ["Stations", config.showMajorStations ? `${config.importanceThreshold} threshold` : "Hidden"],
+          ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+          ["Pack status", dataContract?.pendingStatus || "Waiting for railways + rail_stations_major Japan packs"],
+        ];
+      } else {
+        rows = [
+          ["Adapter", "Reserved shell only"],
+          ["Compare mode", "No baseline yet"],
+          ["Pack status", `Waiting for ${family.label} Japan adapter`],
+        ];
+      }
       rows.forEach(([label, value]) => {
         transportWorkbenchInspectorDetails.appendChild(createTransportWorkbenchInspectorRow(label, value));
       });
@@ -1666,12 +1735,43 @@ function initToolbar({ render } = {}) {
 
   const syncTransportWorkbenchPreviewControls = () => {
     const carrierViewState = getTransportWorkbenchCarrierViewState();
-    const isQuarterTurn = carrierViewState.quarterTurns === 1;
+    const isAlternateTurn = carrierViewState.quarterTurns !== 0;
     if (transportWorkbenchZoomOutBtn) transportWorkbenchZoomOutBtn.textContent = "-";
     if (transportWorkbenchZoomInBtn) transportWorkbenchZoomInBtn.textContent = "+";
     if (transportWorkbenchRotateBtn) transportWorkbenchRotateBtn.textContent = "90°";
-    transportWorkbenchRotateBtn?.classList.toggle("is-active", isQuarterTurn);
-    transportWorkbenchRotateBtn?.setAttribute("aria-pressed", isQuarterTurn ? "true" : "false");
+    transportWorkbenchRotateBtn?.classList.toggle("is-active", isAlternateTurn);
+    transportWorkbenchRotateBtn?.setAttribute("aria-pressed", isAlternateTurn ? "true" : "false");
+  };
+
+  const scheduleTransportWorkbenchRoadPreviewViewSync = () => {
+    ensureTransportWorkbenchUiState();
+    if (!state.transportWorkbenchUi?.open || normalizeTransportWorkbenchFamily(state.transportWorkbenchUi.activeFamily) !== "road") {
+      return;
+    }
+    const currentScale = Number(getTransportWorkbenchCarrierViewState()?.scale) || 1;
+    if (transportWorkbenchRoadPreviewLastScale !== null && Math.abs(currentScale - transportWorkbenchRoadPreviewLastScale) < 0.0001) {
+      return;
+    }
+    transportWorkbenchRoadPreviewLastScale = currentScale;
+    if (transportWorkbenchRoadPreviewViewSyncRaf) {
+      cancelAnimationFrame(transportWorkbenchRoadPreviewViewSyncRaf);
+    }
+    transportWorkbenchRoadPreviewViewSyncRaf = requestAnimationFrame(() => {
+      transportWorkbenchRoadPreviewViewSyncRaf = 0;
+      const family = getTransportWorkbenchFamilyMeta();
+      if (family.id !== "road" || !state.transportWorkbenchUi?.open) return;
+      const compareHeld = !!state.transportWorkbenchUi.compareHeld && !!family.supportsDetailedControls;
+      const config = getTransportWorkbenchWorkingConfig(family.id, { baseline: compareHeld });
+      renderJapanRoadPreview(config)
+        .then(() => {
+          renderTransportWorkbenchInspector(family, config, compareHeld);
+          syncTransportWorkbenchPreviewControls();
+        })
+        .catch((error) => {
+          console.error("[transport-workbench] Failed to refresh Japan road preview after carrier view change.", error);
+          renderTransportWorkbenchInspector(family, config, compareHeld);
+        });
+    });
   };
 
   const renderTransportWorkbenchUi = () => {
@@ -1724,12 +1824,26 @@ function initToolbar({ render } = {}) {
     }
     setTransportWorkbenchCarrierFamily(family.id);
     if (isOpen && transportWorkbenchCarrierMount) {
-      ensureTransportWorkbenchCarrier(transportWorkbenchCarrierMount).catch((error) => {
-        console.error("[transport-workbench] Failed to mount Japan carrier preview.", error);
-      }).finally(() => {
+      ensureTransportWorkbenchCarrier(transportWorkbenchCarrierMount).then(() => {
+        resizeTransportWorkbenchCarrier();
         syncTransportWorkbenchPreviewControls();
+        if (family.id === "road") {
+          return renderJapanRoadPreview(config).then(() => {
+            transportWorkbenchRoadPreviewLastScale = Number(getTransportWorkbenchCarrierViewState()?.scale) || 1;
+            renderTransportWorkbenchInspector(family, config, compareHeld);
+          });
+        }
+        clearJapanRoadPreview();
+        return null;
+      }).catch((error) => {
+        console.error("[transport-workbench] Failed to prepare Japan carrier preview.", error);
+        if (family.id !== "road") {
+          clearJapanRoadPreview();
+        }
+        renderTransportWorkbenchInspector(family, config, compareHeld);
       });
-      resizeTransportWorkbenchCarrier();
+    } else if (!isOpen) {
+      clearJapanRoadPreview();
     }
     syncTransportWorkbenchPreviewControls();
     renderTransportWorkbenchLensSections(family, config, compareHeld);
@@ -1781,6 +1895,12 @@ function initToolbar({ render } = {}) {
       return;
     }
     uiState.compareHeld = false;
+    if (transportWorkbenchRoadPreviewViewSyncRaf) {
+      cancelAnimationFrame(transportWorkbenchRoadPreviewViewSyncRaf);
+      transportWorkbenchRoadPreviewViewSyncRaf = 0;
+    }
+    transportWorkbenchRoadPreviewLastScale = null;
+    destroyJapanRoadPreview();
     destroyTransportWorkbenchCarrier();
     closeTransportWorkbenchInfoPopover({ restoreFocus: false });
     closeTransportWorkbenchSectionHelpPopover({ restoreFocus: false });
@@ -1808,6 +1928,15 @@ function initToolbar({ render } = {}) {
     return false;
   };
   state.refreshTransportWorkbenchUiFn = renderTransportWorkbenchUi;
+  setTransportWorkbenchCarrierViewChangeListener(() => {
+    scheduleTransportWorkbenchRoadPreviewViewSync();
+  });
+  setJapanRoadPreviewSelectionListener(() => {
+    if (!state.transportWorkbenchUi?.open || normalizeTransportWorkbenchFamily(state.transportWorkbenchUi.activeFamily) !== "road") {
+      return;
+    }
+    renderTransportWorkbenchUi();
+  });
 
   const getPaintModeLabel = () => (
     String(state.paintMode || "visual") === "sovereignty"

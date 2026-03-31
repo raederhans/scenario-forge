@@ -1358,7 +1358,7 @@ export const state = {
       road: {},
       rail: {},
     },
-    shellPhase: "no-real-params",
+    shellPhase: "road-live-preview",
     restoreLeftDrawer: false,
     restoreRightDrawer: false,
   },
