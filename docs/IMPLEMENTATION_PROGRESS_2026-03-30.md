@@ -4,11 +4,11 @@
 
 ## 1. 记录范围
 
-这份留档只记录到 2026-03-30 当前工作树中已经完成并验证过的前端场景拆分结果。
+这份留档只记录到 2026-03-30 当前工作树里已经完成并验证过的前端场景拆分结果。
 
 它承接：
 - `docs/IMPLEMENTATION_PROGRESS_2026-03-29.md`
-- 2026-03-30 当天完成的第 4 轮和第 5 阶段准备工作
+- 2026-03-30 当天完成的第 4 轮、第 5 阶段准备，以及 rollback 恢复层拆分
 
 这份文档不覆盖并行中的数据治理改动，也不回写旧留档。
 
@@ -106,13 +106,34 @@
 - fatal recovery message 和 error 构造
 - runtime consistency 校验
 - startup readonly / scenario fatal guard
-- resilience 测试用 hook 消费
+- resilience 测试 hook 消费
 
 当前 `scenario_manager` 通过导入使用这些能力，而不是继续在本地定义一份。
 
-## 3. 2026-03-30 当天新增完成的工作
+### 2.7 rollback 恢复层已经独立
 
-### 3.1 第 4 轮目标已经落地
+今天已经新增：
+
+- `js/core/scenario_rollback.js`
+
+这一轮完成的边界是：
+
+- `captureScenarioApplyRollbackSnapshot(...)` 已经从 `scenario_manager` 挪出
+- `restoreScenarioApplyRollbackSnapshot(...)` 已经从 `scenario_manager` 挪出
+- rollback 模块只负责快照采集与状态恢复
+
+当前 `scenario_manager` 在失败分支里只继续负责：
+
+- 触发 restore
+- restore 后的派生刷新顺序
+- consistency 校验
+- fatal recovery 进入条件
+
+这意味着 rollback snapshot 结构和 restore 状态恢复已经有独立 owner，但 restore 之后的 shell / border / preset / country UI 刷新仍留在事务模块。
+
+## 3. 2026-03-30 当天新完成的工作
+
+### 3.1 第 4 轮资源层外提已经落地
 
 今天完成了资源层和共享 UI 同步的边界收口：
 
@@ -120,65 +141,54 @@
 - 外部模块已经从 `scenario_resources.js` 读取资源能力
 - `scenario_ui_sync.js` 承接共享 UI 同步
 
-### 3.2 第 5 阶段准备中的第一批内部收口已经落地
+### 3.2 `scenario_manager` 内部关键接线已经补齐
 
-原计划里“下一步要继续推进的三块”中，已经先把第 1 块做到了可运行状态：
+在资源入口外提之后，`scenario_manager` 内部还残留一组对旧本地 helper 的直接调用。今天已经把启动链和 apply / clear 主链路里真正仍在使用的关键 helper 显式接回新 owner，包括：
 
-- `scenario_manager` 内部原本还残留一组对旧本地 helper 的直接调用
-- 今天已经把启动和 apply/clear 主链路里真正还在使用的资源层 helper 显式改接到 `scenario_resources.js`
-- 同时把 resilience 测试里需要的 hook 消费显式改接到 `scenario_recovery.js`
+- `getScenarioDecodedCollection`
+- `getScenarioTopologyFeatureCollection`
+- `scenarioBundleUsesChunkedLayer`
+- `scenarioBundleHasChunkedData`
+- `ensureRuntimeChunkLoadState`
+- `resetScenarioChunkRuntimeState`
+- `scheduleScenarioChunkRefresh`
+- `applyBlankScenarioPresentationDefaults`
+- `consumeScenarioTestHook`
+- `normalizeCountryCodeAlias`
 
-这一步没有再新增一层抽象，只是把缺失的内部依赖接回了真正 owner。
+这一轮没有再新增新的中间抽象，只是把缺失的内部依赖重新接回正确 owner。
 
 ### 3.3 启动回归已经修复
 
-第 4 轮完成后，默认启动场景一度无法激活，根因不是资源下载失败，而是：
+第 4 轮完成后，默认启动场景一度无法激活，根因不是资源下载失败，而是 `scenario_manager` 内部还在调用已迁走但未重新导入的 helper。
 
-- `scenario_manager` 内部还在调用已迁走但未重新导入的 helper
-- 具体暴露过的缺失包括：
-  - `getScenarioDecodedCollection`
-  - `getScenarioTopologyFeatureCollection`
-  - `scenarioBundleUsesChunkedLayer`
-  - `scenarioBundleHasChunkedData`
-  - `ensureRuntimeChunkLoadState`
-  - `resetScenarioChunkRuntimeState`
-  - `scheduleScenarioChunkRefresh`
-  - `applyBlankScenarioPresentationDefaults`
-  - `consumeScenarioTestHook`
-  - `normalizeCountryCodeAlias`
-
-这些入口现在都已经接回正确 owner，默认启动场景恢复为：
+这些入口现在都已经接回，默认启动场景恢复为：
 
 - 启动时先激活 `tno_1962`
 - 之后进入 startup readonly 解锁流程
 - detail topology 提升完成后正常解锁
 
-## 4. 当前 `scenario_manager` 还剩下什么
+### 3.4 rollback 恢复层拆分已经验证通过
 
-到这个时间点，`scenario_manager` 还没有完全缩成“纯事务编排器”，剩余问题主要还有三块。
+这一轮的 rollback 拆分已经过静态契约和关键 E2E 验证。
 
-### 4.1 rollback snapshot 仍然留在事务模块
+当前确认成立的是：
 
-以下逻辑仍留在 `scenario_manager`：
+- apply 失败后仍能回到前一个稳定场景
+- rollback restore 失败和 rollback consistency 失败仍会进入 fatal lock
+- `scenario_apply_resilience.spec.js` 三条 resilience 回归继续全绿
 
-- `captureScenarioApplyRollbackSnapshot(...)`
-- `restoreScenarioApplyRollbackSnapshot(...)`
+## 4. 当前 `scenario_manager` 还剩什么
 
-这部分仍然同时知道：
+到这个时间点，`scenario_manager` 还没有完全缩成“纯事务编排器”，剩余问题主要还有两块。
 
-- 场景状态快照结构
-- UI state 恢复
-- border / preset / shell / country UI 的恢复顺序
-
-它已经比之前清楚，但还没有成为独立恢复层 owner。
-
-### 4.2 shell 相关的局部几何辅助仍有少量遗留
+### 4.1 shell 相关的局部几何辅助仍有少量遗留
 
 虽然 `refreshScenarioShellOverlays(...)` 本体已经拆走，但 `scenario_manager` 和 `scenario_resources` 内还残留少量历史 backfill 与邻接辅助逻辑。
 
 这部分不是当前主阻塞，但说明 shell 语义相关工具还没有完全归并到最终 owner。
 
-### 4.3 事务模块仍承担较多派生刷新职责
+### 4.2 事务模块仍承接较多派生刷新
 
 当前 `scenario_manager` 仍直接编排：
 
@@ -186,33 +196,23 @@
 - country UI sync
 - preset rebuild
 - shell overlay refresh 调用
-- 场景退出后的展示状态恢复
+- rollback restore 后的展示状态恢复
 
 这些职责虽然已经比之前集中得多，但还没有继续拆成更细 owner。
 
 ## 5. 风险与推荐顺序
 
-### 5.1 下一步最稳的是先拆 rollback snapshot
+### 5.1 下一步最稳的是先清理 shell 局部 helper
 
-原因：
+这一步的收益是继续清理历史遗留几何辅助函数，让 shell 相关逻辑更完整地归并到 `scenario_shell_overlay.js`。
 
-- 它是 `applyScenarioBundle(...)` 中剩余最重的一块
-- 它已经有清楚的输入输出边界
-- 它正好被 `scenario_apply_resilience.spec.js` 直接覆盖
+rollback 层已经独立之后，接下来最自然的就是把这批局部 helper 彻底归位。
 
-建议下一轮优先把 snapshot capture / restore 收成单独恢复层模块。
-
-### 5.2 shell 局部 helper 其次
-
-这一步的收益是继续清理历史遗留几何工具函数，但对主业务行为的直接收益低于 rollback snapshot。
-
-建议在 rollback 层稳定之后，再评估是否把这组 helper 彻底归并到 `scenario_shell_overlay.js`。
-
-### 5.3 更细的派生刷新拆分放最后
+### 5.2 更细的派生刷新拆分放后面
 
 把 border、preset、country UI、display restore 再继续拆开，主要收益是继续缩短事务主体。
 
-这一步影响面更广，应放在 rollback 层独立之后。
+这一步影响面更广，应该放在 shell 局部 helper 收稳之后。
 
 ## 6. 已验证结果
 
@@ -222,6 +222,7 @@
 
 - `python -m unittest tests.test_scenario_manager_boundary_contract -q`
 - `python -m unittest tests.test_scenario_resources_boundary_contract -q`
+- `python -m unittest tests.test_scenario_rollback_boundary_contract -q`
 - `python -m unittest tests.test_frontend_render_boundary_contract -q`
 
 ### 6.2 关键 E2E
@@ -254,5 +255,6 @@
 - 纯辅助逻辑拆分已经完成
 - 资源层对外边界拆分已经完成
 - shell / fatal / consistency owner 拆分已经完成第一阶段
+- rollback 恢复层拆分已经完成
 - `scenario_manager` 内部对新 owner 的关键接线已经补齐
-- rollback snapshot 仍是下一轮最值得继续处理的核心剩余块
+- shell 局部 helper 和事务后的派生刷新，仍是下一轮最值得继续处理的两块

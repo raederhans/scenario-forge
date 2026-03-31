@@ -48,6 +48,128 @@ import { showToast } from "./toast.js";
 import { showAppDialog } from "./app_dialog.js";
 import { markDirty, updateDirtyIndicator } from "../core/dirty_state.js";
 
+const TRANSPORT_WORKBENCH_FAMILIES = [
+  {
+    id: "road",
+    label: "Road",
+    title: "Road workbench shell",
+    lensTitle: "Road corridor lens",
+    lensBody: "Road is the best first real wire because it defines the base corridor logic and the first country-level debug surface for the whole pack.",
+    lensNext: "When real schema work starts, road should establish corridor classes, continuity checks, and country handoff review before other families join.",
+    previewTitle: "Static road carrier",
+    previewCaption: "This shell milestone does not render fabricated road geometry. Japan stays here only as a static carrier until the first real road schema is wired.",
+    inspectorTitle: "Road controls reserved",
+    inspectorBody: "No fake sliders or guessed counts are shown here. Road parameters will only appear after the real schema is agreed.",
+    inspectorEmptyTitle: "Awaiting road schema",
+    inspectorEmptyBody: "This inspector will later host road hierarchy, density, style, and application controls.",
+  },
+  {
+    id: "rail",
+    label: "Rail",
+    title: "Rail workbench shell",
+    lensTitle: "Rail network lens",
+    lensBody: "Rail stays visible here as a separate family shell so route continuity and logistics semantics can be discussed without leaking into the road model.",
+    lensNext: "Rail should follow after road so shared preview and country handoff patterns can be reused rather than invented twice.",
+    previewTitle: "Static rail carrier",
+    previewCaption: "No rail geometry is drawn in the shell phase. The preview remains a static carrier until rail-specific schema and rendering rules exist.",
+    inspectorTitle: "Rail controls reserved",
+    inspectorBody: "This panel stays intentionally empty until real rail attributes and preview controls are defined.",
+    inspectorEmptyTitle: "Awaiting rail schema",
+    inspectorEmptyBody: "Once wired, this side will expose route class, visibility, and review controls for rail.",
+  },
+  {
+    id: "airport",
+    label: "Airport",
+    title: "Airport workbench shell",
+    lensTitle: "Airport facility lens",
+    lensBody: "Airport gets its own shell now so later facility review can stay separate from corridor families and focus on site-level semantics.",
+    lensNext: "Airport can reuse the same shell chrome once road proves the first real inspector and preview loop.",
+    previewTitle: "Static airport carrier",
+    previewCaption: "No airport markers are fabricated here. Japan remains only the sample carrier while airport schema is still undefined.",
+    inspectorTitle: "Airport controls reserved",
+    inspectorBody: "The inspector is intentionally placeholder-only until real airport categories, symbology, and application logic are decided.",
+    inspectorEmptyTitle: "Awaiting airport schema",
+    inspectorEmptyBody: "Future airport work will connect facility classes, label logic, and site application controls here.",
+  },
+  {
+    id: "port",
+    label: "Port",
+    title: "Port workbench shell",
+    lensTitle: "Port facility lens",
+    lensBody: "Port remains a separate family shell so maritime facilities can later be tuned without mixing corridor and node semantics.",
+    lensNext: "Port should connect only after the first shared facility conventions are agreed from airport or another node-based family.",
+    previewTitle: "Static port carrier",
+    previewCaption: "The shell phase avoids invented port symbols and counts. This preview stays honest and static until the real family wire exists.",
+    inspectorTitle: "Port controls reserved",
+    inspectorBody: "No fabricated port values appear here. The inspector will open up only after the true schema is in place.",
+    inspectorEmptyTitle: "Awaiting port schema",
+    inspectorEmptyBody: "Once connected, this side will host port class, visibility, and application controls.",
+  },
+  {
+    id: "mineral_resources",
+    label: "Mineral Resources",
+    title: "Mineral resource workbench shell",
+    lensTitle: "Mineral resource lens",
+    lensBody: "Mineral resources stay separate from transport corridors so extraction and facility semantics can be designed on their own terms.",
+    lensNext: "This family should attach after the first corridor or facility shell proves the inspector and preview pipeline.",
+    previewTitle: "Static mineral carrier",
+    previewCaption: "No mine sites or resource markers are invented here. The shell only keeps the slot warm for the eventual real schema.",
+    inspectorTitle: "Mineral controls reserved",
+    inspectorBody: "The inspector is intentionally empty until the real mineral resource attributes and application rules are agreed.",
+    inspectorEmptyTitle: "Awaiting mineral schema",
+    inspectorEmptyBody: "Future work will attach extraction-site filters, preview logic, and map application controls here.",
+  },
+  {
+    id: "energy_facilities",
+    label: "Energy Facilities",
+    title: "Energy facility workbench shell",
+    lensTitle: "Energy facility lens",
+    lensBody: "Energy facilities need their own family shell because they behave like infrastructure nodes, not transport corridors.",
+    lensNext: "This slot is ready for later power and energy-site tuning once the first shared facility inspector pattern is stable.",
+    previewTitle: "Static energy carrier",
+    previewCaption: "No fabricated plants, grids, or symbols are shown in this shell phase. The preview stays static until a real schema is wired.",
+    inspectorTitle: "Energy controls reserved",
+    inspectorBody: "This side remains honest and empty until true energy-facility parameters exist.",
+    inspectorEmptyTitle: "Awaiting energy schema",
+    inspectorEmptyBody: "After the schema is confirmed, this inspector can host facility type, visibility, and application controls.",
+  },
+  {
+    id: "industrial_zones",
+    label: "Industrial Zones",
+    title: "Industrial zone workbench shell",
+    lensTitle: "Industrial zone lens",
+    lensBody: "Industrial zones need a reserved shell because they will likely mix area-based preview rules with facility-style debugging.",
+    lensNext: "This family should connect only after the first transport and first node-based family validate the shared workbench behavior.",
+    previewTitle: "Static industrial carrier",
+    previewCaption: "The shell phase does not draw guessed industrial footprints or counts. Japan remains only a neutral sample carrier.",
+    inspectorTitle: "Industrial controls reserved",
+    inspectorBody: "This inspector stays empty until the actual industrial-zone schema and application logic are defined.",
+    inspectorEmptyTitle: "Awaiting industrial schema",
+    inspectorEmptyBody: "Later work can attach area-class controls, preview rules, and application controls here.",
+  },
+];
+
+const TRANSPORT_WORKBENCH_FAMILY_IDS = new Set(TRANSPORT_WORKBENCH_FAMILIES.map((family) => family.id));
+
+function normalizeTransportWorkbenchFamily(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return TRANSPORT_WORKBENCH_FAMILY_IDS.has(normalized) ? normalized : "road";
+}
+
+function ensureTransportWorkbenchUiState() {
+  if (!state.transportWorkbenchUi || typeof state.transportWorkbenchUi !== "object") {
+    state.transportWorkbenchUi = {};
+  }
+  state.transportWorkbenchUi.open = !!state.transportWorkbenchUi.open;
+  state.transportWorkbenchUi.activeFamily = normalizeTransportWorkbenchFamily(state.transportWorkbenchUi.activeFamily);
+  state.transportWorkbenchUi.sampleCountry = "Japan";
+  state.transportWorkbenchUi.previewMode = "static";
+  state.transportWorkbenchUi.shellPhase = "no-real-params";
+  state.transportWorkbenchUi.restoreLeftDrawer = !!state.transportWorkbenchUi.restoreLeftDrawer;
+  state.transportWorkbenchUi.restoreRightDrawer = !!state.transportWorkbenchUi.restoreRightDrawer;
+  return state.transportWorkbenchUi;
+}
+
 function renderPalette(themeName) {
   const paletteGrid = document.getElementById("paletteGrid");
   if (!paletteGrid) return;
@@ -274,6 +396,29 @@ function initToolbar({ render } = {}) {
   const devWorkspaceToggleBtn = document.getElementById("devWorkspaceToggleBtn");
   const leftPanelToggle = document.getElementById("leftPanelToggle");
   const rightPanelToggle = document.getElementById("rightPanelToggle");
+  const transportWorkbenchOpenBtn = document.getElementById("transportWorkbenchOpenBtn");
+  const transportWorkbenchLauncherBtn = document.getElementById("transportWorkbenchLauncherBtn");
+  const transportWorkbenchOverlay = document.getElementById("transportWorkbenchOverlay");
+  const transportWorkbenchPanel = document.getElementById("transportWorkbenchPanel");
+  const transportWorkbenchCloseBtn = document.getElementById("transportWorkbenchCloseBtn");
+  const transportWorkbenchResetBtn = document.getElementById("transportWorkbenchResetBtn");
+  const transportWorkbenchApplyBtn = document.getElementById("transportWorkbenchApplyBtn");
+  const transportWorkbenchTitle = document.getElementById("transportWorkbenchTitle");
+  const transportWorkbenchSubtitle = document.getElementById("transportWorkbenchSubtitle");
+  const transportWorkbenchLensTitle = document.getElementById("transportWorkbenchLensTitle");
+  const transportWorkbenchLensBody = document.getElementById("transportWorkbenchLensBody");
+  const transportWorkbenchLensNext = document.getElementById("transportWorkbenchLensNext");
+  const transportWorkbenchFamilyStatus = document.getElementById("transportWorkbenchFamilyStatus");
+  const transportWorkbenchCountryStatus = document.getElementById("transportWorkbenchCountryStatus");
+  const transportWorkbenchPreviewMode = document.getElementById("transportWorkbenchPreviewMode");
+  const transportWorkbenchPreviewTitle = document.getElementById("transportWorkbenchPreviewTitle");
+  const transportWorkbenchPreviewFamilyBadge = document.getElementById("transportWorkbenchPreviewFamilyBadge");
+  const transportWorkbenchPreviewCaption = document.getElementById("transportWorkbenchPreviewCaption");
+  const transportWorkbenchInspectorTitle = document.getElementById("transportWorkbenchInspectorTitle");
+  const transportWorkbenchInspectorBody = document.getElementById("transportWorkbenchInspectorBody");
+  const transportWorkbenchInspectorEmptyTitle = document.getElementById("transportWorkbenchInspectorEmptyTitle");
+  const transportWorkbenchInspectorEmptyBody = document.getElementById("transportWorkbenchInspectorEmptyBody");
+  const transportWorkbenchFamilyTabs = Array.from(document.querySelectorAll(".transport-workbench-family-tab"));
   const paintGranularitySelect = document.getElementById("paintGranularitySelect");
   const dockGranularityField = document.getElementById("dockGranularityField");
   const dockQuickFillRow = document.getElementById("dockQuickFillRow");
@@ -560,6 +705,115 @@ function initToolbar({ render } = {}) {
       target.focus({ preventScroll: true });
     }
   };
+
+  const getTransportWorkbenchFamilyMeta = () => {
+    ensureTransportWorkbenchUiState();
+    const activeFamily = normalizeTransportWorkbenchFamily(state.transportWorkbenchUi.activeFamily);
+    return TRANSPORT_WORKBENCH_FAMILIES.find((family) => family.id === activeFamily) || TRANSPORT_WORKBENCH_FAMILIES[0];
+  };
+
+  const renderTransportWorkbenchUi = () => {
+    if (
+      !transportWorkbenchOverlay
+      || !transportWorkbenchPanel
+      || !transportWorkbenchTitle
+      || !transportWorkbenchLensTitle
+      || !transportWorkbenchPreviewTitle
+      || !transportWorkbenchInspectorTitle
+    ) {
+      return;
+    }
+    ensureTransportWorkbenchUiState();
+    const uiState = state.transportWorkbenchUi;
+    const family = getTransportWorkbenchFamilyMeta();
+    const isOpen = !!uiState.open;
+    document.body.classList.toggle("transport-workbench-open", isOpen);
+    transportWorkbenchOverlay?.classList.toggle("hidden", !isOpen);
+    transportWorkbenchOverlay?.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    transportWorkbenchLauncherBtn?.classList.toggle("is-active", isOpen);
+    transportWorkbenchLauncherBtn?.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    transportWorkbenchOpenBtn?.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    transportWorkbenchTitle.textContent = family.title;
+    transportWorkbenchSubtitle.textContent = "First pass only establishes the shell, layout, and entry points. Real family parameters and map-side application stay disconnected for now.";
+    transportWorkbenchLensTitle.textContent = family.lensTitle;
+    transportWorkbenchLensBody.textContent = family.lensBody;
+    transportWorkbenchLensNext.textContent = family.lensNext;
+    transportWorkbenchFamilyStatus.textContent = family.label;
+    transportWorkbenchCountryStatus.textContent = uiState.sampleCountry;
+    transportWorkbenchPreviewMode.textContent = uiState.previewMode === "static" ? "Static carrier" : uiState.previewMode;
+    transportWorkbenchPreviewTitle.textContent = family.previewTitle;
+    transportWorkbenchPreviewFamilyBadge.textContent = family.label;
+    transportWorkbenchPreviewCaption.textContent = family.previewCaption;
+    transportWorkbenchInspectorTitle.textContent = family.inspectorTitle;
+    transportWorkbenchInspectorBody.textContent = family.inspectorBody;
+    transportWorkbenchInspectorEmptyTitle.textContent = family.inspectorEmptyTitle;
+    transportWorkbenchInspectorEmptyBody.textContent = family.inspectorEmptyBody;
+    transportWorkbenchFamilyTabs.forEach((button) => {
+      const isActive = String(button.dataset.transportFamily || "") === family.id;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
+    if (transportWorkbenchApplyBtn) {
+      transportWorkbenchApplyBtn.disabled = true;
+      transportWorkbenchApplyBtn.setAttribute("aria-disabled", "true");
+    }
+  };
+
+  const setTransportWorkbenchState = (nextOpen, { trigger = null, restoreFocus = true } = {}) => {
+    if (!transportWorkbenchOverlay || !transportWorkbenchPanel) {
+      return;
+    }
+    ensureTransportWorkbenchUiState();
+    const uiState = state.transportWorkbenchUi;
+    const wasOpen = !!uiState.open;
+    const willOpen = !!nextOpen;
+    if (willOpen === wasOpen && !willOpen) {
+      renderTransportWorkbenchUi();
+      return;
+    }
+    if (willOpen) {
+      uiState.restoreLeftDrawer = document.body.classList.contains("left-drawer-open");
+      uiState.restoreRightDrawer = document.body.classList.contains("right-drawer-open");
+      state.toggleLeftPanelFn?.(false);
+      state.toggleRightPanelFn?.(false);
+      state.closeDockPopoverFn?.({ restoreFocus: false });
+      if (trigger instanceof HTMLElement && transportWorkbenchOverlay instanceof HTMLElement) {
+        rememberOverlayTrigger(transportWorkbenchOverlay, trigger);
+      }
+    }
+    uiState.open = willOpen;
+    renderTransportWorkbenchUi();
+    if (willOpen) {
+      focusOverlaySurface(transportWorkbenchPanel);
+      return;
+    }
+    state.toggleLeftPanelFn?.(uiState.restoreLeftDrawer);
+    state.toggleRightPanelFn?.(!uiState.restoreLeftDrawer && uiState.restoreRightDrawer);
+    uiState.restoreLeftDrawer = false;
+    uiState.restoreRightDrawer = false;
+    if (restoreFocus) {
+      restoreOverlayTriggerFocus(transportWorkbenchOverlay);
+    }
+  };
+
+  const resetTransportWorkbenchView = () => {
+    ensureTransportWorkbenchUiState();
+    state.transportWorkbenchUi.activeFamily = "road";
+    state.transportWorkbenchUi.sampleCountry = "Japan";
+    state.transportWorkbenchUi.previewMode = "static";
+    state.transportWorkbenchUi.shellPhase = "no-real-params";
+    renderTransportWorkbenchUi();
+  };
+
+  state.openTransportWorkbenchFn = (trigger = null) => {
+    setTransportWorkbenchState(true, { trigger });
+    return true;
+  };
+  state.closeTransportWorkbenchFn = ({ restoreFocus = true } = {}) => {
+    setTransportWorkbenchState(false, { restoreFocus });
+    return false;
+  };
+  state.refreshTransportWorkbenchUiFn = renderTransportWorkbenchUi;
 
   const getPaintModeLabel = () => (
     String(state.paintMode || "visual") === "sovereignty"
@@ -1089,6 +1343,9 @@ function initToolbar({ render } = {}) {
   };
 
   const toggleLeftPanel = (force) => {
+    if (state.transportWorkbenchUi?.open && force !== false) {
+      return false;
+    }
     closeDockPopover();
     const next = typeof force === "boolean" ? force : !document.body.classList.contains("left-drawer-open");
     document.body.classList.toggle("left-drawer-open", next);
@@ -1099,6 +1356,9 @@ function initToolbar({ render } = {}) {
   };
 
   const toggleRightPanel = (force) => {
+    if (state.transportWorkbenchUi?.open && force !== false) {
+      return false;
+    }
     closeDockPopover();
     const next = typeof force === "boolean" ? force : !document.body.classList.contains("right-drawer-open");
     document.body.classList.toggle("right-drawer-open", next);
@@ -2963,6 +3223,55 @@ function initToolbar({ render } = {}) {
     rightPanelToggle.dataset.bound = "true";
   }
 
+  if (transportWorkbenchOpenBtn && !transportWorkbenchOpenBtn.dataset.bound) {
+    transportWorkbenchOpenBtn.setAttribute("aria-haspopup", "dialog");
+    transportWorkbenchOpenBtn.setAttribute("aria-controls", "transportWorkbenchOverlay");
+    transportWorkbenchOpenBtn.addEventListener("click", () => {
+      setTransportWorkbenchState(true, { trigger: transportWorkbenchOpenBtn });
+    });
+    transportWorkbenchOpenBtn.dataset.bound = "true";
+  }
+
+  if (transportWorkbenchLauncherBtn && !transportWorkbenchLauncherBtn.dataset.bound) {
+    transportWorkbenchLauncherBtn.addEventListener("click", () => {
+      setTransportWorkbenchState(true, { trigger: transportWorkbenchLauncherBtn });
+    });
+    transportWorkbenchLauncherBtn.dataset.bound = "true";
+  }
+
+  if (transportWorkbenchCloseBtn && !transportWorkbenchCloseBtn.dataset.bound) {
+    transportWorkbenchCloseBtn.addEventListener("click", () => {
+      setTransportWorkbenchState(false);
+    });
+    transportWorkbenchCloseBtn.dataset.bound = "true";
+  }
+
+  if (transportWorkbenchResetBtn && !transportWorkbenchResetBtn.dataset.bound) {
+    transportWorkbenchResetBtn.addEventListener("click", () => {
+      resetTransportWorkbenchView();
+    });
+    transportWorkbenchResetBtn.dataset.bound = "true";
+  }
+
+  transportWorkbenchFamilyTabs.forEach((button) => {
+    if (!button || button.dataset.bound === "true") return;
+    button.addEventListener("click", () => {
+      ensureTransportWorkbenchUiState();
+      state.transportWorkbenchUi.activeFamily = normalizeTransportWorkbenchFamily(button.dataset.transportFamily || "road");
+      renderTransportWorkbenchUi();
+    });
+    button.dataset.bound = "true";
+  });
+
+  if (!document.body.dataset.transportWorkbenchEscapeBound) {
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !state.transportWorkbenchUi?.open) return;
+      event.preventDefault();
+      setTransportWorkbenchState(false);
+    });
+    document.body.dataset.transportWorkbenchEscapeBound = "true";
+  }
+
   if (toggleLang && !toggleLang.dataset.bound) {
     toggleLang.addEventListener("click", toggleLanguage);
     toggleLang.dataset.bound = "true";
@@ -4603,6 +4912,7 @@ function initToolbar({ render } = {}) {
   renderPalette(state.currentPaletteTheme);
   renderPaletteLibrary();
   syncPanelToggleButtons();
+  renderTransportWorkbenchUi();
   state.updatePaintModeUIFn();
   state.updateDockCollapsedUiFn = updateDockCollapsedUi;
   updateDockCollapsedUi();

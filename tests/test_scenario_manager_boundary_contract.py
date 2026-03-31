@@ -17,6 +17,8 @@ class ScenarioManagerBoundaryContractTest(unittest.TestCase):
         self.assertNotIn("recalculateScenarioOwnerControllerDiffCount,", content)
         self.assertNotIn("syncScenarioLocalizationState,", content)
         self.assertNotIn("function syncScenarioUi()", content)
+        self.assertIsNone(re.search(r"^function\s+captureScenarioApplyRollbackSnapshot\b", content, re.MULTILINE))
+        self.assertIsNone(re.search(r"^function\s+restoreScenarioApplyRollbackSnapshot\b", content, re.MULTILINE))
         self.assertIsNone(re.search(r"^(async\s+)?function\s+ensureActiveScenarioOptionalLayerLoaded\b", content, re.MULTILINE))
         self.assertIsNone(re.search(r"^(async\s+)?function\s+ensureActiveScenarioOptionalLayersForVisibility\b", content, re.MULTILINE))
         self.assertIsNone(re.search(r"^(async\s+)?function\s+ensureScenarioGeoLocalePatchForLanguage\b", content, re.MULTILINE))
