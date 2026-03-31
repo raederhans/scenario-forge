@@ -5,9 +5,7 @@ import {
   recomputeDynamicBordersNow,
   refreshColorState,
   refreshResolvedColorsForFeatures,
-  refreshMapDataForScenarioApply,
   refreshMapDataForScenarioChunkPromotion,
-  refreshScenarioOpeningOwnerBorders,
   setMapData,
 } from "./map_renderer.js";
 import {
@@ -48,9 +46,21 @@ import { markDirty } from "./dirty_state.js";
 import {
   buildScenarioReleasableIndex,
   getScenarioReleasableCountries,
-  rebuildPresetState,
 } from "./releasable_manager.js";
+import {
+  DETAIL_POLITICAL_MIN_FEATURES,
+  SCENARIO_DETAIL_MIN_RATIO_STRICT,
+  hasUsablePoliticalTopology,
+  refreshScenarioDataHealth,
+  scenarioNeedsDetailTopology,
+} from "./scenario_data_health.js";
 import { syncScenarioLocalizationState } from "./scenario_localization_state.js";
+import {
+  runPostRollbackRestoreEffects,
+  runPostScenarioApplyEffects,
+  runPostScenarioClearEffects,
+  runPostScenarioResetEffects,
+} from "./scenario_post_apply_effects.js";
 import {
   setScenarioAuditUiState,
   syncCountryUi,
@@ -60,7 +70,6 @@ import {
   applyBlankScenarioPresentationDefaults,
   ensureRuntimeChunkLoadState,
   ensureActiveScenarioOptionalLayerLoaded,
-  ensureActiveScenarioOptionalLayersForVisibility,
   ensureScenarioGeoLocalePatchForLanguage,
   getScenarioDecodedCollection,
   getScenarioTopologyFeatureCollection,
@@ -77,7 +86,6 @@ import {
 } from "./scenario_resources.js";
 import { assertScenarioInteractionsAllowed, buildScenarioFatalRecoveryError, clearScenarioFatalRecoveryState, consumeScenarioTestHook, enterScenarioFatalRecovery, formatScenarioFatalRecoveryMessage, getScenarioFatalRecoveryState, validateScenarioRuntimeConsistency } from "./scenario_recovery.js";
 import { captureScenarioApplyRollbackSnapshot, restoreScenarioApplyRollbackSnapshot } from "./scenario_rollback.js";
-import { refreshScenarioShellOverlays } from "./scenario_shell_overlay.js";
 import {
   getRuntimeGeometryFeatureId,
   getScenarioRuntimeGeometryCountryCode,
@@ -88,9 +96,6 @@ import { t } from "../ui/i18n.js";
 import { showToast } from "../ui/toast.js";
 
 const SCENARIO_REGISTRY_URL = "data/scenarios/index.json";
-const DETAIL_POLITICAL_MIN_FEATURES = 1000;
-const SCENARIO_DETAIL_MIN_RATIO_STRICT = 0.7;
-const SCENARIO_DETAIL_ABSOLUTE_DROP_THRESHOLD = 1000;
 const DEFAULT_OCEAN_FILL_COLOR = "#aadaff";
 const SCENARIO_RENDER_PROFILES = new Set(["auto", "balanced", "full"]);
 const SCENARIO_BUNDLE_LEVELS = new Set(["bootstrap", "full"]);
@@ -575,79 +580,6 @@ function restoreScenarioOceanFillAfterExit() {
   if (typeof state.updateToolbarInputsFn === "function") {
     state.updateToolbarInputsFn();
   }
-}
-
-function getPoliticalGeometryCount(topology) {
-  const geometries = topology?.objects?.political?.geometries;
-  return Array.isArray(geometries) ? geometries.length : 0;
-}
-
-function hasUsablePoliticalTopology(topology, { minFeatures = DETAIL_POLITICAL_MIN_FEATURES } = {}) {
-  return getPoliticalGeometryCount(topology) >= Math.max(1, Number(minFeatures) || 1);
-}
-
-function evaluateScenarioDataHealth(
-  manifest = state.activeScenarioManifest,
-  { minRatio = SCENARIO_DETAIL_MIN_RATIO_STRICT } = {}
-) {
-  const expectedFeatureCount = Number(manifest?.summary?.feature_count || 0);
-  const runtimeFeatureCount = Array.isArray(state.landData?.features) ? state.landData.features.length : 0;
-  const ratio = expectedFeatureCount > 0 ? runtimeFeatureCount / expectedFeatureCount : 1;
-  const normalizedMinRatio = Math.min(Math.max(Number(minRatio) || SCENARIO_DETAIL_MIN_RATIO_STRICT, 0.1), 1);
-  let warning = "";
-  let severity = "";
-  if (expectedFeatureCount >= DETAIL_POLITICAL_MIN_FEATURES) {
-    const severeDrop = runtimeFeatureCount > 0 && ratio < normalizedMinRatio;
-    const absoluteDrop = expectedFeatureCount - runtimeFeatureCount >= SCENARIO_DETAIL_ABSOLUTE_DROP_THRESHOLD;
-    if (severeDrop && absoluteDrop) {
-      warning = t("Detail topology not fully loaded; scenario is shown in coarse mode.", "ui");
-      severity = "error";
-    }
-  }
-  return {
-    expectedFeatureCount,
-    runtimeFeatureCount,
-    ratio,
-    minRatio: normalizedMinRatio,
-    warning,
-    severity,
-  };
-}
-
-function scenarioNeedsDetailTopology(manifest = state.activeScenarioManifest) {
-  return Number(manifest?.summary?.feature_count || 0) >= DETAIL_POLITICAL_MIN_FEATURES;
-}
-
-function refreshScenarioDataHealth({
-  showWarningToast = false,
-  showErrorToast = false,
-  minRatio = SCENARIO_DETAIL_MIN_RATIO_STRICT,
-} = {}) {
-  if (!state.activeScenarioId || !state.activeScenarioManifest) {
-    state.scenarioDataHealth = {
-      expectedFeatureCount: 0,
-      runtimeFeatureCount: 0,
-      ratio: 1,
-      minRatio: SCENARIO_DETAIL_MIN_RATIO_STRICT,
-      warning: "",
-      severity: "",
-    };
-    return state.scenarioDataHealth;
-  }
-  const health = evaluateScenarioDataHealth(state.activeScenarioManifest, { minRatio });
-  state.scenarioDataHealth = health;
-  const shouldToast = health.warning && (showErrorToast || showWarningToast);
-  if (shouldToast) {
-    const errorLevel = showErrorToast || health.severity === "error";
-    showToast(health.warning, {
-      title: errorLevel
-        ? t("Scenario visibility error", "ui")
-        : t("Scenario visibility warning", "ui"),
-      tone: errorLevel ? "error" : "warning",
-      duration: errorLevel ? 6200 : 5200,
-    });
-  }
-  return health;
 }
 
 function getScenarioDisplayOwnerByFeatureId(featureId, { fallbackOwner = "" } = {}) {
@@ -1147,45 +1079,6 @@ function cloneScenarioStateValue(value) {
   return cloned;
 }
 
-function runPostRollbackRestoreEffects({ renderNow = false } = {}) {
-  if (typeof state.renderPaletteFn === "function") {
-    state.renderPaletteFn(state.currentPaletteTheme);
-  }
-  if (typeof state.updatePaletteLibraryUIFn === "function") {
-    state.updatePaletteLibraryUIFn();
-  }
-  if (typeof state.updatePaletteSourceUIFn === "function") {
-    state.updatePaletteSourceUIFn();
-  }
-  if (typeof state.updateParentBorderCountryListFn === "function") {
-    state.updateParentBorderCountryListFn();
-  }
-  if (typeof state.updatePaintModeUIFn === "function") {
-    state.updatePaintModeUIFn();
-  }
-  if (typeof state.updateToolbarInputsFn === "function") {
-    state.updateToolbarInputsFn();
-  }
-  if (typeof state.updateWaterInteractionUIFn === "function") {
-    state.updateWaterInteractionUIFn();
-  }
-  if (typeof state.updateScenarioSpecialRegionUIFn === "function") {
-    state.updateScenarioSpecialRegionUIFn();
-  }
-  if (typeof state.updateScenarioReliefOverlayUIFn === "function") {
-    state.updateScenarioReliefOverlayUIFn();
-  }
-  if (typeof state.updateDynamicBorderStatusUIFn === "function") {
-    state.updateDynamicBorderStatusUIFn();
-  }
-  setMapData({ refitProjection: false, resetZoom: false });
-  rebuildPresetState();
-  refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: "scenario-rollback" });
-  refreshScenarioShellOverlays({ renderNow: false, borderReason: "scenario-rollback" });
-  refreshScenarioDataHealth({ showWarningToast: false, showErrorToast: false });
-  syncCountryUi({ renderNow });
-}
-
 async function prepareScenarioApplyState(
   bundle,
   {
@@ -1465,29 +1358,25 @@ async function applyScenarioBundle(
       );
     }
     recalculateScenarioOwnerControllerDiffCount();
-    refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: `scenario-opening:${staged.scenarioId}` });
-    let scenarioMapRefreshMode = "light";
-    try {
-      refreshMapDataForScenarioApply({ suppressRender });
-    } catch (refreshError) {
-      scenarioMapRefreshMode = "setMapData-fallback";
-      console.warn("[scenario] Lightweight scenario apply refresh failed; falling back to setMapData.", refreshError);
-      setMapData({ refitProjection: false, resetZoom: false, suppressRender });
-    }
     bundle.chunkLifecycle = {
       applyStartedAt,
       politicalCoreReadyRecorded: false,
     };
+    const { dataHealth, scenarioMapRefreshMode, hasChunkedRuntime } = await runPostScenarioApplyEffects({
+      bundle,
+      scenarioId: staged.scenarioId,
+      renderNow,
+      suppressRender,
+    });
     recordScenarioPerfMetric(
       "timeToInteractiveCoarseFrame",
       (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - applyStartedAt,
       {
         scenarioId: staged.scenarioId,
-        hasChunkedRuntime: scenarioBundleUsesChunkedLayer(bundle),
+        hasChunkedRuntime,
         mapRefreshMode: scenarioMapRefreshMode,
       }
     );
-    rebuildPresetState();
     if (typeof document !== "undefined") {
       const presetSection = document.getElementById("selectedCountryActionsSection");
       if (presetSection && "open" in presetSection) {
@@ -1513,24 +1402,6 @@ async function applyScenarioBundle(
         }
       });
     }
-
-    refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario:${staged.scenarioId}` });
-    if (scenarioBundleUsesChunkedLayer(bundle)) {
-      scheduleScenarioChunkRefresh({
-        reason: "scenario-apply",
-        delayMs: 0,
-      });
-    } else {
-      ensureActiveScenarioOptionalLayersForVisibility({ bundle, renderNow })
-        .catch((error) => {
-          console.warn(`[scenario] Optional layer visibility sync failed for "${staged.scenarioId}".`, error);
-        });
-    }
-    const dataHealth = refreshScenarioDataHealth({
-      showWarningToast: true,
-      showErrorToast: true,
-      minRatio: SCENARIO_DETAIL_MIN_RATIO_STRICT,
-    });
     if (dataHealth.warning) {
       console.warn(
         `[scenario] Detail visibility gate triggered for ${staged.scenarioId}: runtime=${dataHealth.runtimeFeatureCount}, expected=${dataHealth.expectedFeatureCount}, ratio=${dataHealth.ratio.toFixed(3)} (min=${dataHealth.minRatio}).`
@@ -1549,7 +1420,6 @@ async function applyScenarioBundle(
     if (markDirtyReason) {
       markDirty(markDirtyReason);
     }
-    syncCountryUi({ renderNow: renderNow && !suppressRender });
     if (typeof state.triggerScenarioGuideFn === "function") {
       state.triggerScenarioGuideFn();
     }
@@ -1739,14 +1609,14 @@ function resetToScenarioBaseline(
     errorMessage: "",
   });
   state.scenarioBorderMode = "scenario_owner_only";
-  refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: `scenario-reset-opening:${state.activeScenarioId}` });
   disableScenarioParentBorders();
-  refreshScenarioShellOverlays({ renderNow: false, borderReason: `scenario-reset:${state.activeScenarioId}` });
-  refreshScenarioDataHealth({ showWarningToast: false });
+  runPostScenarioResetEffects({
+    scenarioId: state.activeScenarioId,
+    renderNow,
+  });
   if (markDirtyReason) {
     markDirty(markDirtyReason);
   }
-  syncCountryUi({ renderNow });
   if (showToastOnComplete) {
     showToast(t("Scenario reset to baseline.", "ui"), {
       title: t("Scenario reset", "ui"),
@@ -1852,14 +1722,10 @@ function clearActiveScenario(
   restorePaintModeAfterScenario();
   restoreScenarioOceanFillAfterExit();
   restoreScenarioDisplaySettingsAfterExit();
-  refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: "scenario-clear-opening" });
-  setMapData({ refitProjection: false, resetZoom: false });
-  rebuildPresetState();
-  refreshScenarioShellOverlays({ renderNow: false, borderReason: "scenario-clear" });
+  runPostScenarioClearEffects({ renderNow });
   if (markDirtyReason) {
     markDirty(markDirtyReason);
   }
-  syncCountryUi({ renderNow });
   if (showToastOnComplete) {
     showToast(t("Scenario cleared.", "ui"), {
       title: t("Scenario cleared", "ui"),

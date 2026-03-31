@@ -40,6 +40,36 @@ async function waitForScenarioControlsReady(page) {
   await expect(page.locator("#scenarioSelect")).toBeVisible();
 }
 
+async function waitForFrontlineViewReady(page) {
+  await expect.poll(async () => page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    const select = document.querySelector("#scenarioViewModeSelect");
+    return {
+      activeScenarioId: String(state.activeScenarioId || ""),
+      scenarioApplyInFlight: !!state.scenarioApplyInFlight,
+      startupReadonly: !!state.startupReadonly,
+      startupReadonlyUnlockInFlight: !!state.startupReadonlyUnlockInFlight,
+      detailPromotionInFlight: !!state.detailPromotionInFlight,
+      hasSplit: Number(state.activeScenarioManifest?.summary?.owner_controller_split_feature_count || 0) > 0,
+      hasControllers: Object.keys(state.scenarioControllersByFeatureId || {}).length > 0,
+      selectDisabled: !!select?.disabled,
+      selectValue: String(select?.value || ""),
+      stateViewMode: String(state.scenarioViewMode || ""),
+    };
+  }), { timeout: 45_000 }).toEqual({
+    activeScenarioId: "tno_1962",
+    scenarioApplyInFlight: false,
+    startupReadonly: false,
+    startupReadonlyUnlockInFlight: false,
+    detailPromotionInFlight: false,
+    hasSplit: true,
+    hasControllers: true,
+    selectDisabled: false,
+    selectValue: "ownership",
+    stateViewMode: "ownership",
+  });
+}
+
 test("scenario controls apply reset and exit stay on dispatcher-backed path", async ({ page }) => {
   await waitForScenarioControlsReady(page);
 
@@ -86,6 +116,7 @@ test("scenario controls apply reset and exit stay on dispatcher-backed path", as
 
 test("scenario controls switch ownership and frontline view modes through dispatcher", async ({ page }) => {
   await waitForScenarioControlsReady(page);
+  await waitForFrontlineViewReady(page);
 
   const viewModeSelect = page.locator("#scenarioViewModeSelect");
   await expect(viewModeSelect).toBeVisible();

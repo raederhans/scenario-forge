@@ -1,72 +1,135 @@
 {
-  "generatedAt": "2026-03-31T03:20:22.936404+00:00",
-  "source": "data/scenarios/tno_1962/chunks/political.detail.country.jp.json",
-  "corridorBounds": {
-    "lon_min": 129.2,
-    "lon_max": 141.4,
-    "lat_min": 32.2,
-    "lat_max": 37.3
-  },
+  "generatedAt": "2026-03-31T14:08:13.020003+00:00",
+  "source": "data/ne_10m_admin_1_states_provinces.shp",
+  "sourceKind": "Natural Earth 10m admin1",
+  "excludedCodes": [
+    "JP-47"
+  ],
+  "hokkaidoCodes": [
+    "JP-01"
+  ],
   "projection": {
-    "type": "local_equirectangular",
-    "center": {
-      "lon": 136.5,
-      "lat": 35.0
-    },
-    "rotationDegreesClockwise": 8.0
+    "proj4": "+proj=lcc +lat_1=33.0 +lat_2=37.0 +lat_0=35.0 +lon_0=136.5 +datum=WGS84 +units=m +no_defs",
+    "type": "geoConicConformal",
+    "center": [
+      136.5,
+      35.0
+    ],
+    "parallels": [
+      33.0,
+      37.0
+    ],
+    "precision": 0.2
   },
-  "simplifyTolerance": 0.045,
-  "minRenderIslandArea": 12.0,
   "viewBox": {
     "width": 1600,
-    "height": 900,
-    "padding": 40
+    "height": 900
   },
-  "composition": {
-    "overfillScale": 1.08,
-    "shiftX": 0,
-    "shiftY": 42
+  "defaultCamera": {
+    "scale": 1.0,
+    "translateX": 0.0,
+    "translateY": 0.0,
+    "minScale": 1.0,
+    "maxScale": 3.0
   },
-  "protectedDetailRegions": {
-    "tokyo_bay": {
-      "lon_min": 139.35,
-      "lon_max": 140.35,
-      "lat_min": 34.95,
-      "lat_max": 35.85
+  "lod": {
+    "overview": {
+      "toleranceMeters": 1400.0,
+      "minAreaSqMeters": 6000000.0
     },
-    "ise_bay": {
-      "lon_min": 136.45,
-      "lon_max": 137.45,
-      "lat_min": 34.25,
-      "lat_max": 35.15
+    "detail": {
+      "toleranceMeters": 220.0,
+      "minAreaSqMeters": 700000.0
+    }
+  },
+  "frames": {
+    "main": {
+      "type": "main",
+      "extent": {
+        "x": 18,
+        "y": 18,
+        "width": 1564,
+        "height": 864
+      },
+      "prefectureCodes": [
+        "JP-46",
+        "JP-44",
+        "JP-40",
+        "JP-41",
+        "JP-42",
+        "JP-43",
+        "JP-45",
+        "JP-36",
+        "JP-37",
+        "JP-38",
+        "JP-39",
+        "JP-32",
+        "JP-35",
+        "JP-31",
+        "JP-28",
+        "JP-26",
+        "JP-18",
+        "JP-17",
+        "JP-16",
+        "JP-15",
+        "JP-06",
+        "JP-05",
+        "JP-02",
+        "JP-03",
+        "JP-04",
+        "JP-07",
+        "JP-08",
+        "JP-12",
+        "JP-13",
+        "JP-14",
+        "JP-22",
+        "JP-23",
+        "JP-24",
+        "JP-30",
+        "JP-27",
+        "JP-33",
+        "JP-34",
+        "JP-10",
+        "JP-20",
+        "JP-09",
+        "JP-21",
+        "JP-25",
+        "JP-11",
+        "JP-19",
+        "JP-29"
+      ]
     },
-    "osaka_bay": {
-      "lon_min": 134.75,
-      "lon_max": 135.7,
-      "lat_min": 34.05,
-      "lat_max": 34.95
-    },
-    "seto_inland_sea": {
-      "lon_min": 131.35,
-      "lon_max": 134.95,
-      "lat_min": 33.55,
-      "lat_max": 34.85
+    "hokkaidoInset": {
+      "type": "inset",
+      "extent": {
+        "x": 42,
+        "y": 54,
+        "width": 356,
+        "height": 216
+      },
+      "prefectureCodes": [
+        "JP-01"
+      ]
     }
   },
   "namedWaterAnchors": {
     "tokyo_bay": {
+      "frameId": "main",
       "lon": 139.92,
       "lat": 35.45
     },
     "ise_bay": {
+      "frameId": "main",
       "lon": 136.92,
       "lat": 34.73
     },
     "osaka_bay": {
+      "frameId": "main",
       "lon": 135.22,
       "lat": 34.52
     },
     "seto_inland_sea": {
+      "frameId": "main",
       "lon": 133.78,
       "lat": 34.28
     }

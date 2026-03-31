@@ -3562,7 +3562,7 @@ body.counter-editor-modal-open {
 
 .transport-workbench-preview-canvas-frame {
   position: absolute;
-  inset: 12px;
+  inset: 8px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 18px;
   pointer-events: none;
@@ -3572,10 +3572,11 @@ body.counter-editor-modal-open {
   position: relative;
   position: absolute;
   top: 16px;
-  left: 16px;
+  right: 16px;
   z-index: 3;
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 8px;
   max-width: calc(100% - 32px);
   pointer-events: none;

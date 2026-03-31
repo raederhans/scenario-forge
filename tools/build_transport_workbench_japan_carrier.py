@@ -1,146 +1,116 @@
 from __future__ import annotations
 
 import json
-import math
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterable
+from typing import Any
 
-from shapely import affinity
-from shapely.geometry import GeometryCollection, LineString, MultiLineString, MultiPolygon, Point, Polygon, box, shape
-from shapely.ops import transform, unary_union
+try:
+    import geopandas as gpd
+except ImportError as exc:
+    raise SystemExit("geopandas is required. Install with: uv pip install geopandas") from exc
+
+try:
+    from pyproj import Transformer
+except ImportError as exc:
+    raise SystemExit("pyproj is required. Install with: uv pip install pyproj") from exc
+
+from shapely.geometry import GeometryCollection, LineString, MultiLineString, MultiPolygon, Polygon, box, mapping
+from shapely.ops import linemerge, transform, unary_union
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE_PATH = ROOT / "data" / "scenarios" / "tno_1962" / "chunks" / "political.detail.country.jp.json"
+SOURCE_PATH = ROOT / "data" / "ne_10m_admin_1_states_provinces.shp"
 OUTPUT_DIR = ROOT / "data" / "transport_layers" / "japan_corridor"
 CARRIER_PATH = OUTPUT_DIR / "carrier.json"
 PROVENANCE_PATH = OUTPUT_DIR / "provenance.json"
 
 VIEWBOX_WIDTH = 1600
 VIEWBOX_HEIGHT = 900
-FRAME_PADDING = 40
-OVERFILL_SCALE = 1.08
-COMPOSITION_SHIFT_X = 0
-COMPOSITION_SHIFT_Y = 42
 
-CORRIDOR_BOUNDS = {
-    "lon_min": 129.2,
-    "lon_max": 141.4,
-    "lat_min": 32.2,
-    "lat_max": 37.3,
+PROJECTION = {
+    "type": "geoConicConformal",
+    "center": [136.5, 35.0],
+    "parallels": [33.0, 37.0],
+    "precision": 0.2,
 }
 
-PROTECTED_DETAIL_REGIONS = {
-    "tokyo_bay": {"lon_min": 139.35, "lon_max": 140.35, "lat_min": 34.95, "lat_max": 35.85},
-    "ise_bay": {"lon_min": 136.45, "lon_max": 137.45, "lat_min": 34.25, "lat_max": 35.15},
-    "osaka_bay": {"lon_min": 134.75, "lon_max": 135.7, "lat_min": 34.05, "lat_max": 34.95},
-    "seto_inland_sea": {"lon_min": 131.35, "lon_max": 134.95, "lat_min": 33.55, "lat_max": 34.85},
+DEFAULT_CAMERA = {
+    "scale": 1.0,
+    "translateX": 0.0,
+    "translateY": 0.0,
+    "minScale": 1.0,
+    "maxScale": 3.0,
 }
 
-PROJECTION_CENTER = {"lon": 136.5, "lat": 35.0}
-ROTATION_DEGREES_CLOCKWISE = 8.0
-SIMPLIFY_TOLERANCE = 0.045
-MIN_RENDER_ISLAND_AREA = 12.0
-MIN_SCALE = 1.0
-MAX_SCALE = 3.4
+LOD_SWITCH = {
+    "detailOn": 1.65,
+    "overviewOn": 1.45,
+}
+
+FRAME_SPECS = {
+    "main": {
+        "type": "main",
+        "label": "Japan Main Islands",
+        "extent": {"x": 18, "y": 18, "width": 1564, "height": 864},
+        "include_codes": "all_mainland",
+        "clipBounds": {"lonMin": 129.0, "latMin": 30.75, "lonMax": 146.5, "latMax": 41.6},
+    },
+    "hokkaidoInset": {
+        "type": "inset",
+        "label": "Hokkaido inset",
+        "extent": {"x": 42, "y": 54, "width": 356, "height": 216},
+        "include_codes": {"JP-01"},
+        "clipBounds": {"lonMin": 139.25, "latMin": 41.2, "lonMax": 146.6, "latMax": 45.7},
+    },
+}
+
+EXCLUDED_CODES = {"JP-47"}
+HOKKAIDO_CODES = {"JP-01"}
+
+LOD_SPECS = {
+    "overview": {"toleranceMeters": 1400.0, "minAreaSqMeters": 6_000_000.0},
+    "detail": {"toleranceMeters": 220.0, "minAreaSqMeters": 700_000.0},
+}
 
 NAMED_WATER_ANCHORS = {
-    "tokyo_bay": {"lon": 139.92, "lat": 35.45},
-    "ise_bay": {"lon": 136.92, "lat": 34.73},
-    "osaka_bay": {"lon": 135.22, "lat": 34.52},
-    "seto_inland_sea": {"lon": 133.78, "lat": 34.28},
+    "tokyo_bay": {"frameId": "main", "lon": 139.92, "lat": 35.45},
+    "ise_bay": {"frameId": "main", "lon": 136.92, "lat": 34.73},
+    "osaka_bay": {"frameId": "main", "lon": 135.22, "lat": 34.52},
+    "seto_inland_sea": {"frameId": "main", "lon": 133.78, "lat": 34.28},
 }
 
-
-@dataclass
-class ProjectionConfig:
-    lon0: float
-    lat0: float
-    cos_lat0: float
-    rotation_degrees_clockwise: float
-
-
-def load_japan_union() -> Polygon | MultiPolygon:
-    with SOURCE_PATH.open("r", encoding="utf-8") as source_file:
-        payload = json.load(source_file)
-    geometries = [shape(feature["geometry"]) for feature in payload.get("features", [])]
-    unioned = unary_union(geometries)
-    if unioned.is_empty:
-        raise RuntimeError("Japan source geometry is empty.")
-    return unioned
+LCC_PROJ4 = (
+    f"+proj=lcc +lat_1={PROJECTION['parallels'][0]} +lat_2={PROJECTION['parallels'][1]} "
+    f"+lat_0={PROJECTION['center'][1]} +lon_0={PROJECTION['center'][0]} "
+    "+datum=WGS84 +units=m +no_defs"
+)
+FORWARD_TRANSFORMER = Transformer.from_crs("EPSG:4326", LCC_PROJ4, always_xy=True)
+INVERSE_TRANSFORMER = Transformer.from_crs(LCC_PROJ4, "EPSG:4326", always_xy=True)
 
 
-def build_projection_config() -> ProjectionConfig:
-    lat0 = PROJECTION_CENTER["lat"]
-    return ProjectionConfig(
-        lon0=PROJECTION_CENTER["lon"],
-        lat0=lat0,
-        cos_lat0=math.cos(math.radians(lat0)),
-        rotation_degrees_clockwise=ROTATION_DEGREES_CLOCKWISE,
-    )
+def round_nested(value: Any, digits: int = 6) -> Any:
+    if isinstance(value, float):
+        return round(value, digits)
+    if isinstance(value, list):
+        return [round_nested(item, digits) for item in value]
+    if isinstance(value, tuple):
+        return [round_nested(item, digits) for item in value]
+    if isinstance(value, dict):
+        return {key: round_nested(item, digits) for key, item in value.items()}
+    return value
 
 
-def local_project(geom, config: ProjectionConfig):
-    def projector(x, y, z=None):
-        local_x = (x - config.lon0) * config.cos_lat0
-        local_y = y - config.lat0
-        return (local_x, local_y)
-
-    projected = transform(projector, geom)
-    return affinity.rotate(projected, -config.rotation_degrees_clockwise, origin=(0.0, 0.0))
+def geometry_to_geojson(geom) -> dict[str, Any]:
+    return round_nested(mapping(geom), 6)
 
 
-def normalize_to_viewbox(geom, *, width: float, height: float, padding: float):
-    min_x, min_y, max_x, max_y = geom.bounds
-    geom_width = max(max_x - min_x, 1e-9)
-    geom_height = max(max_y - min_y, 1e-9)
-    scale = min((width - padding * 2) / geom_width, (height - padding * 2) / geom_height)
-
-    def normalizer(x, y, z=None):
-        normalized_x = (x - min_x) * scale + padding
-        normalized_y = (max_y - y) * scale + padding
-        return (normalized_x, normalized_y)
-
-    normalized = transform(normalizer, geom)
-    meta = {
-        "scale": scale,
-        "sourceBounds": {
-            "minX": min_x,
-            "minY": min_y,
-            "maxX": max_x,
-            "maxY": max_y,
-        },
-    }
-    return normalized, meta
+def project_geometry(geom):
+    return transform(FORWARD_TRANSFORMER.transform, geom)
 
 
-def normalize_point(point: Point, *, normalization_meta: dict, padding: float) -> Point:
-    scale = normalization_meta["scale"]
-    bounds = normalization_meta["sourceBounds"]
-    normalized_x = (point.x - bounds["minX"]) * scale + padding
-    normalized_y = (bounds["maxY"] - point.y) * scale + padding
-    return Point(normalized_x, normalized_y)
-
-
-def normalize_with_meta(geom, *, normalization_meta: dict, padding: float):
-    scale = normalization_meta["scale"]
-    bounds = normalization_meta["sourceBounds"]
-
-    def normalizer(x, y, z=None):
-        normalized_x = (x - bounds["minX"]) * scale + padding
-        normalized_y = (bounds["maxY"] - y) * scale + padding
-        return (normalized_x, normalized_y)
-
-    return transform(normalizer, geom)
-
-
-def apply_composition_transform(geom):
-    if geom.is_empty:
-        return geom
-    composed = affinity.scale(geom, xfact=OVERFILL_SCALE, yfact=OVERFILL_SCALE, origin=(VIEWBOX_WIDTH / 2, VIEWBOX_HEIGHT / 2))
-    return affinity.translate(composed, xoff=COMPOSITION_SHIFT_X, yoff=COMPOSITION_SHIFT_Y)
+def unproject_geometry(geom):
+    return transform(INVERSE_TRANSFORMER.transform, geom)
 
 
 def iter_polygons(geom):
@@ -158,181 +128,184 @@ def iter_polygons(geom):
         for child in geom.geoms:
             yield from iter_polygons(child)
         return
-    raise TypeError(f"Unsupported polygonal geometry: {type(geom)!r}")
+    raise TypeError(f"Unsupported polygon geometry: {type(geom)!r}")
 
 
-def collect_protected_render_regions(config: ProjectionConfig, normalization_meta: dict):
-    regions = []
-    for bounds in PROTECTED_DETAIL_REGIONS.values():
-        region = box(bounds["lon_min"], bounds["lat_min"], bounds["lon_max"], bounds["lat_max"])
-        region = local_project(region, config)
-        region = normalize_with_meta(region, normalization_meta=normalization_meta, padding=FRAME_PADDING)
-        regions.append(apply_composition_transform(region))
-    return unary_union(regions)
-
-
-def prune_micro_islands(geom, *, min_area: float, protected_regions):
-    kept_polygons = []
-    for polygon in iter_polygons(geom):
-        if polygon.area >= min_area or polygon.intersects(protected_regions):
-            kept_polygons.append(polygon)
-    if not kept_polygons:
-        return GeometryCollection()
-    if len(kept_polygons) == 1:
-        return kept_polygons[0]
-    return MultiPolygon(kept_polygons)
-
-
-def format_num(value: float) -> str:
-    if abs(value) < 1e-9:
-        value = 0.0
-    text = f"{value:.3f}".rstrip("0").rstrip(".")
-    return text or "0"
-
-
-def ring_to_path(ring: Iterable[tuple[float, float]]) -> str:
-    coords = list(ring)
-    if not coords:
-        return ""
-    if coords[0] == coords[-1]:
-        coords = coords[:-1]
-    if len(coords) < 3:
-        return ""
-    segments = [f"M {format_num(coords[0][0])} {format_num(coords[0][1])}"]
-    segments.extend(f"L {format_num(x)} {format_num(y)}" for x, y in coords[1:])
-    segments.append("Z")
-    return " ".join(segments)
-
-
-def geometry_to_path_data(geom) -> str:
+def iter_lines(geom):
     if geom.is_empty:
-        return ""
-    if isinstance(geom, Polygon):
-        parts = [ring_to_path(geom.exterior.coords)]
-        parts.extend(ring_to_path(interior.coords) for interior in geom.interiors)
-        return " ".join(part for part in parts if part)
-    if isinstance(geom, MultiPolygon):
-        return " ".join(geometry_to_path_data(part) for part in geom.geoms if not part.is_empty)
+        return
     if isinstance(geom, LineString):
-        coords = list(geom.coords)
-        if len(coords) < 2:
-            return ""
-        segments = [f"M {format_num(coords[0][0])} {format_num(coords[0][1])}"]
-        segments.extend(f"L {format_num(x)} {format_num(y)}" for x, y in coords[1:])
-        return " ".join(segments)
+        yield geom
+        return
     if isinstance(geom, MultiLineString):
-        return " ".join(geometry_to_path_data(part) for part in geom.geoms if not part.is_empty)
+        for line in geom.geoms:
+            if not line.is_empty:
+                yield line
+        return
     if isinstance(geom, GeometryCollection):
-        return " ".join(geometry_to_path_data(part) for part in geom.geoms if not part.is_empty)
-    raise TypeError(f"Unsupported geometry for path conversion: {type(geom)!r}")
+        for child in geom.geoms:
+            yield from iter_lines(child)
+        return
+    raise TypeError(f"Unsupported line geometry: {type(geom)!r}")
 
 
-def extract_anchor_points(config: ProjectionConfig, normalization_meta: dict) -> dict[str, dict[str, float]]:
-    anchors: dict[str, dict[str, float]] = {}
-    for anchor_id, anchor in NAMED_WATER_ANCHORS.items():
-        projected = local_project(Point(anchor["lon"], anchor["lat"]), config)
-        point = normalize_point(projected, normalization_meta=normalization_meta, padding=FRAME_PADDING)
-        point = apply_composition_transform(point)
-        anchors[anchor_id] = {
-            "x": round(point.x, 3),
-            "y": round(point.y, 3),
-            "lon": anchor["lon"],
-            "lat": anchor["lat"],
+def collect_polygon(parts) -> Polygon | MultiPolygon | GeometryCollection:
+    if not parts:
+        return GeometryCollection()
+    if len(parts) == 1:
+        return parts[0]
+    return MultiPolygon(parts)
+
+
+def collect_lines(parts) -> LineString | MultiLineString | GeometryCollection:
+    if not parts:
+        return GeometryCollection()
+    if len(parts) == 1:
+        return parts[0]
+    return MultiLineString(parts)
+
+
+def prune_micro_polygons(geom, *, min_area: float):
+    parts = [polygon for polygon in iter_polygons(geom) if polygon.area >= min_area]
+    return collect_polygon(parts)
+
+
+def simplify_polygon_geometry(geom, *, tolerance_meters: float, min_area_sq_meters: float):
+    projected = project_geometry(geom)
+    simplified = projected.simplify(tolerance_meters, preserve_topology=True)
+    simplified = prune_micro_polygons(simplified, min_area=min_area_sq_meters)
+    return unproject_geometry(simplified)
+
+
+def build_internal_border_lines(prefecture_geometries, country_union, *, tolerance_meters: float):
+    projected_boundaries = unary_union([project_geometry(geom).boundary for geom in prefecture_geometries])
+    projected_coastline = project_geometry(country_union).boundary.buffer(max(tolerance_meters * 0.6, 50.0))
+    internal = projected_boundaries.difference(projected_coastline)
+    if internal.is_empty:
+        return GeometryCollection()
+    if isinstance(internal, GeometryCollection):
+        line_parts = [line for line in iter_lines(internal)]
+        internal = unary_union(line_parts) if line_parts else GeometryCollection()
+    merged = linemerge(internal)
+    simplified = merged.simplify(max(tolerance_meters * 0.55, 70.0), preserve_topology=True)
+    return unproject_geometry(simplified)
+
+
+def load_prefectures() -> gpd.GeoDataFrame:
+    if not SOURCE_PATH.exists():
+        raise FileNotFoundError(f"Natural Earth admin1 source not found: {SOURCE_PATH}")
+    gdf = gpd.read_file(SOURCE_PATH)
+    japan = gdf[gdf["adm0_a3"].astype(str) == "JPN"].copy()
+    if japan.empty:
+        raise RuntimeError("No Japan prefectures found in Natural Earth admin1 source.")
+    japan["iso_3166_2"] = japan["iso_3166_2"].astype(str).str.strip()
+    japan = japan[~japan["iso_3166_2"].isin(EXCLUDED_CODES)].copy()
+    if japan.empty:
+        raise RuntimeError("Japan prefecture source became empty after exclusions.")
+    japan = japan.to_crs("EPSG:4326")
+    return japan
+
+
+def select_frame_prefectures(prefectures: gpd.GeoDataFrame, frame_id: str) -> gpd.GeoDataFrame:
+    spec = FRAME_SPECS[frame_id]
+    include_codes = spec["include_codes"]
+    if include_codes == "all_mainland":
+        return prefectures[~prefectures["iso_3166_2"].isin(HOKKAIDO_CODES)].copy()
+    return prefectures[prefectures["iso_3166_2"].isin(include_codes)].copy()
+
+
+def build_frame_payload(frame_id: str, prefectures: gpd.GeoDataFrame) -> dict[str, Any]:
+    selected = select_frame_prefectures(prefectures, frame_id)
+    if selected.empty:
+        raise RuntimeError(f"No prefectures selected for frame '{frame_id}'.")
+
+    clip_spec = FRAME_SPECS[frame_id].get("clipBounds")
+    if clip_spec:
+        clip_box = box(clip_spec["lonMin"], clip_spec["latMin"], clip_spec["lonMax"], clip_spec["latMax"])
+        selected = selected.copy()
+        selected["geometry"] = selected.geometry.intersection(clip_box)
+        selected = selected[~selected.geometry.is_empty].copy()
+
+    frame_union = unary_union(selected.geometry.tolist())
+    if frame_union.is_empty:
+        raise RuntimeError(f"Frame '{frame_id}' union geometry is empty.")
+
+    lod_payload = {}
+    for lod_name, lod_spec in LOD_SPECS.items():
+        land_geom = simplify_polygon_geometry(
+            frame_union,
+            tolerance_meters=lod_spec["toleranceMeters"],
+            min_area_sq_meters=lod_spec["minAreaSqMeters"],
+        )
+        prefecture_lines = build_internal_border_lines(
+            selected.geometry.tolist(),
+            frame_union,
+            tolerance_meters=lod_spec["toleranceMeters"],
+        )
+        lod_payload[lod_name] = {
+            "land": geometry_to_geojson(land_geom),
+            "prefectureLines": geometry_to_geojson(prefecture_lines),
         }
-    return anchors
+
+    return {
+        "type": FRAME_SPECS[frame_id]["type"],
+        "label": FRAME_SPECS[frame_id]["label"],
+        "extent": FRAME_SPECS[frame_id]["extent"],
+        "prefectureCodes": selected["iso_3166_2"].astype(str).tolist(),
+        "fitGeometry": geometry_to_geojson(frame_union),
+        "routeMask": geometry_to_geojson(frame_union),
+        "lod": lod_payload,
+    }
 
 
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    japan_union = load_japan_union()
-    crop_box = box(
-        CORRIDOR_BOUNDS["lon_min"],
-        CORRIDOR_BOUNDS["lat_min"],
-        CORRIDOR_BOUNDS["lon_max"],
-        CORRIDOR_BOUNDS["lat_max"],
-    )
-    corridor_land = japan_union.intersection(crop_box)
-    if corridor_land.is_empty:
-        raise RuntimeError("Corridor clip removed the entire Japan geometry.")
-
-    projection = build_projection_config()
-    projected_land = local_project(corridor_land, projection)
-    projected_land = projected_land.simplify(SIMPLIFY_TOLERANCE, preserve_topology=True)
-    normalized_land, normalization_meta = normalize_to_viewbox(
-        projected_land,
-        width=VIEWBOX_WIDTH,
-        height=VIEWBOX_HEIGHT,
-        padding=FRAME_PADDING,
-    )
-
-    frame = box(0, 0, VIEWBOX_WIDTH, VIEWBOX_HEIGHT)
-    composed_land = apply_composition_transform(normalized_land)
-    protected_regions = collect_protected_render_regions(projection, normalization_meta)
-    composed_land = prune_micro_islands(
-        composed_land,
-        min_area=MIN_RENDER_ISLAND_AREA,
-        protected_regions=protected_regions,
-    )
-    land_bounds = composed_land.bounds
-    coastline = composed_land.boundary
-    sea_mask = frame.difference(composed_land)
-    named_waters = extract_anchor_points(projection, normalization_meta)
+    prefectures = load_prefectures()
+    frames = {frame_id: build_frame_payload(frame_id, prefectures) for frame_id in FRAME_SPECS}
 
     carrier_payload = {
-        "version": "japan_corridor_v1",
-        "viewBox": {
-            "width": VIEWBOX_WIDTH,
-            "height": VIEWBOX_HEIGHT,
+        "version": "japan_carrier_v2",
+        "source": {
+            "kind": "natural_earth_admin1",
+            "path": str(SOURCE_PATH.relative_to(ROOT)).replace("\\", "/"),
         },
-        "defaultCamera": {
-            "scale": 1,
-            "translateX": 0,
-            "translateY": 0,
-            "minScale": MIN_SCALE,
-            "maxScale": MAX_SCALE,
+        "viewBox": {"width": VIEWBOX_WIDTH, "height": VIEWBOX_HEIGHT},
+        "defaultCamera": DEFAULT_CAMERA,
+        "projection": {
+            **PROJECTION,
+            "lodSwitch": LOD_SWITCH,
         },
-        "bounds": {
-            "frame": {"minX": 0, "minY": 0, "maxX": VIEWBOX_WIDTH, "maxY": VIEWBOX_HEIGHT},
-            "land": {
-                "minX": round(land_bounds[0], 3),
-                "minY": round(land_bounds[1], 3),
-                "maxX": round(land_bounds[2], 3),
-                "maxY": round(land_bounds[3], 3),
-            },
-        },
-        "paths": {
-            "land": geometry_to_path_data(composed_land),
-            "landMask": geometry_to_path_data(composed_land),
-            "coastline": geometry_to_path_data(coastline),
-            "seaMask": geometry_to_path_data(sea_mask),
-        },
-        "namedWaterAnchors": named_waters,
+        "frames": frames,
+        "namedWaterAnchors": NAMED_WATER_ANCHORS,
         "clipPolicy": {
             "land": "strict",
             "sea": "strict",
-            "crossMask": "split-geometry-required",
+            "crossMask": "caller-must-provide-frame-for-lines-and-polygons",
         },
     }
 
     provenance_payload = {
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "source": str(SOURCE_PATH.relative_to(ROOT)).replace("\\", "/"),
-        "corridorBounds": CORRIDOR_BOUNDS,
+        "sourceKind": "Natural Earth 10m admin1",
+        "excludedCodes": sorted(EXCLUDED_CODES),
+        "hokkaidoCodes": sorted(HOKKAIDO_CODES),
         "projection": {
-            "type": "local_equirectangular",
-            "center": PROJECTION_CENTER,
-            "rotationDegreesClockwise": ROTATION_DEGREES_CLOCKWISE,
+            "proj4": LCC_PROJ4,
+            **PROJECTION,
         },
-        "simplifyTolerance": SIMPLIFY_TOLERANCE,
-        "minRenderIslandArea": MIN_RENDER_ISLAND_AREA,
-        "viewBox": {"width": VIEWBOX_WIDTH, "height": VIEWBOX_HEIGHT, "padding": FRAME_PADDING},
-        "composition": {
-            "overfillScale": OVERFILL_SCALE,
-            "shiftX": COMPOSITION_SHIFT_X,
-            "shiftY": COMPOSITION_SHIFT_Y,
+        "viewBox": {"width": VIEWBOX_WIDTH, "height": VIEWBOX_HEIGHT},
+        "defaultCamera": DEFAULT_CAMERA,
+        "lod": LOD_SPECS,
+        "frames": {
+            frame_id: {
+                "type": payload["type"],
+                "extent": payload["extent"],
+                "prefectureCodes": payload["prefectureCodes"],
+            }
+            for frame_id, payload in frames.items()
         },
-        "protectedDetailRegions": PROTECTED_DETAIL_REGIONS,
         "namedWaterAnchors": NAMED_WATER_ANCHORS,
     }
 
