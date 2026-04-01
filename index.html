@@ -1920,6 +1920,7 @@
               <button type="button" class="transport-workbench-family-tab" data-transport-family="mineral_resources" role="tab" aria-selected="false" data-i18n="Mineral Resources">Mineral Resources</button>
               <button type="button" class="transport-workbench-family-tab" data-transport-family="energy_facilities" role="tab" aria-selected="false" data-i18n="Energy Facilities">Energy Facilities</button>
               <button type="button" class="transport-workbench-family-tab" data-transport-family="industrial_zones" role="tab" aria-selected="false" data-i18n="Industrial Zones">Industrial Zones</button>
+              <button type="button" class="transport-workbench-family-tab" data-transport-family="layers" role="tab" aria-selected="false">Layers</button>
             </div>
             <div class="transport-workbench-topbar-actions">
               <button id="transportWorkbenchInfoBtn" type="button" class="transport-workbench-icon-btn" aria-haspopup="dialog" aria-controls="transportWorkbenchInfoPopover" aria-expanded="false" data-i18n="Info">Info</button>
@@ -1964,7 +1965,7 @@
               <section class="transport-workbench-column transport-workbench-column-preview" aria-labelledby="transportWorkbenchPreviewTitle">
                 <h3 id="transportWorkbenchPreviewTitle" class="visually-hidden" data-i18n="Japan preview">Japan preview</h3>
                 <div class="transport-workbench-preview-shell">
-                  <div class="transport-workbench-preview-actions">
+                  <div id="transportWorkbenchPreviewActions" class="transport-workbench-preview-actions">
                     <button id="transportWorkbenchCompareBtn" type="button" class="transport-workbench-compare-btn" data-i18n="Hold to Compare Baseline">
                       Hold to Compare Baseline
                     </button>
@@ -1973,12 +1974,20 @@
                     </span>
                   </div>
                   <div id="transportWorkbenchPreviewCanvas" class="transport-workbench-preview-canvas" aria-hidden="true">
-                    <div class="transport-workbench-preview-controls" role="group" aria-label="Preview controls" data-i18n-aria-label="Preview controls">
+                    <div id="transportWorkbenchPreviewControls" class="transport-workbench-preview-controls" role="group" aria-label="Preview controls" data-i18n-aria-label="Preview controls">
                       <button id="transportWorkbenchZoomOutBtn" type="button" class="transport-workbench-preview-control-btn" aria-label="Zoom out" data-i18n-aria-label="Zoom out" title="Zoom out">&minus;</button>
                       <button id="transportWorkbenchZoomInBtn" type="button" class="transport-workbench-preview-control-btn" aria-label="Zoom in" data-i18n-aria-label="Zoom in" title="Zoom in">+</button>
                       <button id="transportWorkbenchRotateBtn" type="button" class="transport-workbench-preview-control-btn transport-workbench-preview-control-btn-rotate" aria-label="Rotate preview 90 degrees" data-i18n-aria-label="Rotate preview 90 degrees" title="Rotate preview 90 degrees">90&deg;</button>
                     </div>
                     <div id="transportWorkbenchCarrierMount" class="transport-workbench-carrier-mount"></div>
+                    <div id="transportWorkbenchLayerOrderPanel" class="transport-workbench-layer-order hidden" aria-live="polite">
+                      <div class="transport-workbench-layer-order-header">
+                        <div class="transport-workbench-layer-order-kicker">Layer Order</div>
+                        <h4 class="transport-workbench-layer-order-title">Reorder transport layers</h4>
+                        <p class="transport-workbench-layer-order-text">Drag rows to define the future draw order. Only the road family is live right now, so the rest stay as structural placeholders.</p>
+                      </div>
+                      <div id="transportWorkbenchLayerOrderList" class="transport-workbench-layer-order-list" role="list"></div>
+                    </div>
                     <div class="transport-workbench-preview-canvas-frame"></div>
                   </div>
                 </div>

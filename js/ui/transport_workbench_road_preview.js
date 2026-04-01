@@ -36,10 +36,20 @@ const PRIMARY_REVEAL_SCALE = {
   balanced: 1.38,
   loose: 1.18,
 };
+const PRIMARY_LABEL_REVEAL_SCALE = {
+  strict: 1.34,
+  balanced: 1.16,
+  loose: 1.04,
+};
 const TRUNK_REVEAL_SCALE = {
   strict: 1.08,
   balanced: 1.0,
   loose: 1.0,
+};
+const TRUNK_LABEL_REVEAL_SCALE = {
+  strict: 1.0,
+  balanced: 0.96,
+  loose: 0.92,
 };
 const METRO_GUARD_BONUS = {
   light: 0,
@@ -67,12 +77,15 @@ let projectedPacks = {
 let activePack = null;
 let activePackMode = null;
 let rootGroup = null;
+let labelRootGroup = null;
 let roadsGroup = null;
+let labelPathsGroup = null;
 let labelsGroup = null;
 let selectedGroup = null;
 let selectedHighlightNode = null;
 let roadNodeById = new Map();
 let labelNodeById = new Map();
+let labelPathNodeById = new Map();
 let renderStats = {
   visibleRoads: 0,
   visibleLabels: 0,
@@ -131,6 +144,11 @@ function createPathD(geometry) {
   return "";
 }
 
+function createPathDFromLine(line) {
+  if (!Array.isArray(line) || !line.length) return "";
+  return line.map((point, index) => `${index === 0 ? "M" : "L"} ${point[0]} ${point[1]}`).join(" ");
+}
+
 function measureProjectedLength(geometry) {
   if (!geometry || typeof geometry !== "object") return 0;
   const lines = geometry.type === "LineString" ? [geometry.coordinates || []] : (geometry.coordinates || []);
@@ -145,10 +163,93 @@ function measureProjectedLength(geometry) {
   return length;
 }
 
+function buildProjectedLines(geometry) {
+  if (!geometry || typeof geometry !== "object") return [];
+  const rawLines = geometry.type === "LineString"
+    ? [geometry.coordinates || []]
+    : (geometry.coordinates || []);
+  return rawLines
+    .filter((line) => Array.isArray(line) && line.length >= 2)
+    .map((line) => {
+      let length = 0;
+      const segments = [];
+      for (let index = 1; index < line.length; index += 1) {
+        const start = line[index - 1];
+        const end = line[index];
+        const dx = end[0] - start[0];
+        const dy = end[1] - start[1];
+        const segmentLength = Math.hypot(dx, dy);
+        segments.push({
+          start,
+          end,
+          startDistance: length,
+          length: segmentLength,
+          angle: Math.atan2(dy, dx) * (180 / Math.PI),
+        });
+        length += segmentLength;
+      }
+      return {
+        points: line,
+        pathD: createPathDFromLine(line),
+        reversedPathD: createPathDFromLine([...line].reverse()),
+        length,
+        segments,
+      };
+    })
+    .filter((line) => line.length > 0);
+}
+
+function sanitizeSvgId(value, fallback) {
+  const normalized = String(value || "").trim().replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
+  return normalized || fallback;
+}
+
+function resolveLabelPlacement(road, projectedPoint) {
+  if (!road || !projectedPoint || !Array.isArray(road.projectedLines) || !road.projectedLines.length) return null;
+  let bestMatch = null;
+  road.projectedLines.forEach((line, lineIndex) => {
+    line.segments.forEach((segment, segmentIndex) => {
+      if (!segment.length) return;
+      const dx = segment.end[0] - segment.start[0];
+      const dy = segment.end[1] - segment.start[1];
+      const dot = ((projectedPoint.x - segment.start[0]) * dx) + ((projectedPoint.y - segment.start[1]) * dy);
+      const rawT = dot / (segment.length * segment.length);
+      const t = Math.max(0, Math.min(1, rawT));
+      const nearestX = segment.start[0] + dx * t;
+      const nearestY = segment.start[1] + dy * t;
+      const distance = Math.hypot(projectedPoint.x - nearestX, projectedPoint.y - nearestY);
+      const distanceAlong = segment.startDistance + segment.length * t;
+      if (!bestMatch || distance < bestMatch.distance) {
+        bestMatch = {
+          lineIndex,
+          segmentIndex,
+          distance,
+          distanceAlong,
+          angle: segment.angle,
+        };
+      }
+    });
+  });
+  if (!bestMatch) return null;
+  const line = road.projectedLines[bestMatch.lineIndex];
+  const reverse = bestMatch.angle > 90 || bestMatch.angle < -90;
+  const distanceAlong = reverse ? Math.max(0, line.length - bestMatch.distanceAlong) : bestMatch.distanceAlong;
+  const startOffsetPercent = line.length > 0
+    ? Math.max(8, Math.min(92, (distanceAlong / line.length) * 100))
+    : 50;
+  return {
+    id: `transportWorkbenchRoadLabelPath-${sanitizeSvgId(road.id, `road-${bestMatch.lineIndex}`)}`,
+    pathD: reverse ? line.reversedPathD : line.pathD,
+    pathLength: line.length,
+    startOffsetPercent,
+  };
+}
+
 function createRoadFeature(rawFeature) {
   const properties = rawFeature?.properties || {};
   const projected = projectTransportWorkbenchCarrierGeometry(rawFeature.geometry, "main");
   if (!projected?.geometry) return null;
+  const projectedLines = buildProjectedLines(projected.geometry);
   return {
     id: String(properties.id || rawFeature.id || ""),
     name: String(properties.name || "").trim(),
@@ -169,24 +270,29 @@ function createRoadFeature(rawFeature) {
     projectedGeometry: projected.geometry,
     pathD: createPathD(projected.geometry),
     projectedLength: measureProjectedLength(projected.geometry),
+    projectedLines,
   };
 }
 
-function createLabelFeature(rawFeature) {
+function createLabelFeature(rawFeature, roadFeatureById) {
   const properties = rawFeature?.properties || {};
   const coordinates = rawFeature?.geometry?.coordinates;
   if (!Array.isArray(coordinates) || coordinates.length < 2) return null;
   const projected = projectTransportWorkbenchCarrierPoint(coordinates[0], coordinates[1], "main");
   if (!projected) return null;
+  const roadId = String(properties.road_id || "").trim();
+  const linkedRoad = roadFeatureById?.get(roadId) || null;
+  const placement = resolveLabelPlacement(linkedRoad, projected);
   return {
     id: String(properties.id || rawFeature.id || ""),
-    roadId: String(properties.road_id || "").trim(),
+    roadId,
     ref: String(properties.ref || "").trim(),
     roadClass: String(properties.road_class || "").trim(),
     source: String(properties.source || "").trim(),
     priority: normalizeNumber(properties.priority, 0),
     x: projected.x,
     y: projected.y,
+    placement,
   };
 }
 
@@ -274,14 +380,17 @@ async function loadJapanRoadPack(mode = PACK_MODE_PREVIEW) {
       }
       const decodedRoads = globalThis.topojson.feature(roadsTopology, roadsObject);
       const roadFeatures = (decodedRoads?.features || []).map(createRoadFeature).filter(Boolean);
-      const labelFeatures = (labelsCollection?.features || []).map(createLabelFeature).filter(Boolean);
+      const roadFeatureById = new Map(roadFeatures.map((feature) => [feature.id, feature]));
+      const labelFeatures = (labelsCollection?.features || [])
+        .map((feature) => createLabelFeature(feature, roadFeatureById))
+        .filter(Boolean);
       const pack = {
         mode,
         manifest,
         audit: loadState.audit,
         roadFeatures,
         labelFeatures,
-        roadFeatureById: new Map(roadFeatures.map((feature) => [feature.id, feature])),
+        roadFeatureById,
         labelFeatureById: new Map(labelFeatures.map((feature) => [feature.id, feature])),
       };
       projectedPacks[mode] = pack;
@@ -342,11 +451,16 @@ function getRoadVisibilityReason(feature, config, scale) {
 function getRoadStyle(feature, config, selectedRoadId) {
   const preset = ROAD_STYLE_PRESETS[config.strokePreset] || ROAD_STYLE_PRESETS.corridor;
   const base = preset[feature.roadClass] || preset.primary;
+  const configuredWidth = feature.roadClass === "motorway"
+    ? normalizeNumber(config.motorwayWidth, base.width)
+    : feature.roadClass === "trunk"
+      ? normalizeNumber(config.trunkWidth, base.width)
+      : normalizeNumber(config.primaryWidth, base.width);
   const isSelected = selectedRoadId && selectedRoadId === feature.id;
   const hasConflict = config.showSourceConflicts && feature.sourceFlags.includes("name_conflict");
   return {
     stroke: hasConflict ? CONFLICT_STROKE : base.stroke,
-    width: isSelected ? base.width + 1.15 : base.width,
+    width: isSelected ? configuredWidth + 1.1 : configuredWidth,
     opacity: isSelected && config.selectedEmphasis === "mute_others"
       ? 1
       : normalizeNumber(config.baseOpacity, 88) / 100,
@@ -357,8 +471,9 @@ function getLabelClassGate(feature, config, scale) {
   if (!config.showRefs) return false;
   if (!config.refClasses?.includes(feature.roadClass)) return false;
   if (feature.roadClass === "primary" && !config.allowPrimaryRefsAtHighZoom) return false;
-  if (feature.roadClass === "primary" && scale < Math.max(1.55, PRIMARY_REVEAL_SCALE[config.zoomGate] || 1.38)) return false;
-  if (feature.roadClass === "trunk" && scale < 1.02) return false;
+  if (!feature.placement?.pathD || feature.placement?.pathLength < Math.max(28, String(feature.ref || "").length * 7)) return false;
+  if (feature.roadClass === "primary" && scale < (PRIMARY_LABEL_REVEAL_SCALE[config.zoomGate] || 1.16)) return false;
+  if (feature.roadClass === "trunk" && scale < (TRUNK_LABEL_REVEAL_SCALE[config.zoomGate] || 0.96)) return false;
   return true;
 }
 
@@ -413,16 +528,23 @@ function handleLabelGroupClick(event) {
 
 function ensureGroups() {
   const landRoot = getTransportWorkbenchCarrierOverlayRoots()?.land?.main;
-  if (!landRoot) return null;
-  if (rootGroup && rootGroup.parentNode === landRoot) return rootGroup;
+  const labelRoot = getTransportWorkbenchCarrierOverlayRoots()?.labels?.main;
+  if (!landRoot || !labelRoot) return null;
+  if (rootGroup && rootGroup.parentNode === landRoot && labelRootGroup && labelRootGroup.parentNode === labelRoot) return rootGroup;
   rootGroup?.remove();
+  labelRootGroup?.remove();
   roadNodeById = new Map();
   labelNodeById = new Map();
+  labelPathNodeById = new Map();
   rootGroup = createSvgNode("g");
   rootGroup.classList.add("transport-workbench-road-preview-root");
+  labelRootGroup = createSvgNode("g");
+  labelRootGroup.classList.add("transport-workbench-road-preview-label-root");
   roadsGroup = createSvgNode("g");
   roadsGroup.classList.add("transport-workbench-road-preview-roads");
   roadsGroup.addEventListener("click", handleRoadGroupClick);
+  labelPathsGroup = createSvgNode("g");
+  labelPathsGroup.classList.add("transport-workbench-road-preview-label-paths");
   labelsGroup = createSvgNode("g");
   labelsGroup.classList.add("transport-workbench-road-preview-labels");
   labelsGroup.addEventListener("click", handleLabelGroupClick);
@@ -439,16 +561,20 @@ function ensureGroups() {
   selectedHighlightNode.classList.add("transport-workbench-road-selected-highlight");
   selectedHighlightNode.style.display = "none";
   selectedGroup.appendChild(selectedHighlightNode);
-  rootGroup.append(roadsGroup, labelsGroup, selectedGroup);
+  rootGroup.append(roadsGroup, selectedGroup);
+  labelRootGroup.append(labelPathsGroup, labelsGroup);
   landRoot.appendChild(rootGroup);
+  labelRoot.appendChild(labelRootGroup);
   return rootGroup;
 }
 
 function clearGroups() {
   roadNodeById.forEach((node) => node.remove());
   labelNodeById.forEach((node) => node.remove());
+  labelPathNodeById.forEach((node) => node.remove());
   roadNodeById.clear();
   labelNodeById.clear();
+  labelPathNodeById.clear();
   if (selectedHighlightNode) {
     selectedHighlightNode.removeAttribute("d");
     selectedHighlightNode.style.display = "none";
@@ -521,12 +647,20 @@ function updateRoadNode(path, feature, style) {
   path.setAttribute("class", `transport-workbench-road-path road-class-${feature.roadClass}`);
 }
 
+function updateLabelPathNode(path, label) {
+  path.setAttribute("id", `${label.placement.id}-${sanitizeSvgId(label.id, "label")}`);
+  path.setAttribute("d", label.placement.pathD);
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", "none");
+}
+
 function updateLabelNode(text, label, config) {
-  text.textContent = label.ref;
-  text.setAttribute("x", String(label.x));
-  text.setAttribute("y", String(label.y));
+  let textPath = text.querySelector("textPath");
+  if (!textPath) {
+    textPath = createSvgNode("textPath");
+    text.appendChild(textPath);
+  }
   text.setAttribute("text-anchor", "middle");
-  text.setAttribute("dominant-baseline", "middle");
   text.setAttribute("font-size", label.roadClass === "motorway" ? "11" : "10");
   text.setAttribute("font-weight", label.roadClass === "motorway" ? "700" : "600");
   text.setAttribute("fill", "#233141");
@@ -537,7 +671,12 @@ function updateLabelNode(text, label, config) {
   text.setAttribute("opacity", String(normalizeNumber(config.refOpacity, 82) / 100));
   text.dataset.labelId = label.id;
   text.dataset.roadId = label.roadId;
+  text.dataset.roadClass = label.roadClass;
   text.setAttribute("class", "transport-workbench-road-label");
+  textPath.setAttribute("href", `#${label.placement.id}-${sanitizeSvgId(label.id, "label")}`);
+  textPath.setAttribute("startOffset", `${label.placement.startOffsetPercent}%`);
+  textPath.setAttribute("text-anchor", "middle");
+  textPath.textContent = label.ref;
 }
 
 function syncGroupOrder(group, orderedNodes) {
@@ -582,22 +721,36 @@ function syncRoadNodes(visibleRoads, config, selectedRoadId) {
 
 function syncLabelNodes(visibleLabels, config) {
   const visibleIds = new Set();
-  const orderedNodes = [];
+  const orderedTextNodes = [];
+  const orderedPathNodes = [];
   visibleLabels.forEach((label) => {
+    let path = labelPathNodeById.get(label.id);
+    if (!path) {
+      path = createSvgNode("path");
+      labelPathNodeById.set(label.id, path);
+    }
     let text = labelNodeById.get(label.id);
     if (!text) {
       text = createSvgNode("text");
       labelNodeById.set(label.id, text);
     }
+    updateLabelPathNode(path, label);
     updateLabelNode(text, label, config);
-    orderedNodes.push(text);
+    orderedPathNodes.push(path);
+    orderedTextNodes.push(text);
     visibleIds.add(label.id);
   });
-  syncGroupOrder(labelsGroup, orderedNodes);
+  syncGroupOrder(labelPathsGroup, orderedPathNodes);
+  syncGroupOrder(labelsGroup, orderedTextNodes);
   Array.from(labelNodeById.entries()).forEach(([labelId, node]) => {
     if (visibleIds.has(labelId)) return;
     node.remove();
     labelNodeById.delete(labelId);
+  });
+  Array.from(labelPathNodeById.entries()).forEach(([labelId, node]) => {
+    if (visibleIds.has(labelId)) return;
+    node.remove();
+    labelPathNodeById.delete(labelId);
   });
 }
 
@@ -694,13 +847,17 @@ export function destroyJapanRoadPreview() {
     filteredRoads: 0,
   };
   rootGroup?.remove();
+  labelRootGroup?.remove();
   rootGroup = null;
+  labelRootGroup = null;
   roadsGroup = null;
+  labelPathsGroup = null;
   labelsGroup = null;
   selectedGroup = null;
   selectedHighlightNode = null;
   roadNodeById.clear();
   labelNodeById.clear();
+  labelPathNodeById.clear();
 }
 
 export function getJapanRoadPreviewSnapshot(config = lastRenderedConfig) {

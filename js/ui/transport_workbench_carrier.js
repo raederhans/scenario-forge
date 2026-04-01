@@ -9,6 +9,8 @@ const COLOR_TOKENS = {
   shoreGlow: "rgba(255, 255, 255, 0.28)",
   prefecture: "rgba(113, 126, 142, 0.33)",
 };
+const FIT_PADDING_PX = 24;
+const MAX_CAMERA_SCALE = 8;
 
 let assetPromise = null;
 let mountNode = null;
@@ -30,6 +32,7 @@ let viewChangeListener = null;
 const overlayRoots = {
   land: { main: null },
   sea: { main: null },
+  labels: { main: null },
 };
 
 function getD3() {
@@ -59,6 +62,19 @@ function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
 
+function getResolvedCameraDefaults() {
+  const defaults = asset?.defaultCamera || {};
+  const minScale = Math.max(1, Number(defaults.minScale) || 1);
+  const configuredMaxScale = Number(defaults.maxScale) || minScale;
+  return {
+    scale: Number(defaults.scale) || 1,
+    translateX: Number(defaults.translateX) || 0,
+    translateY: Number(defaults.translateY) || 0,
+    minScale,
+    maxScale: Math.max(MAX_CAMERA_SCALE, configuredMaxScale),
+  };
+}
+
 function getViewBoxSize() {
   return {
     width: Number(asset?.viewBox?.width) || 1600,
@@ -68,9 +84,14 @@ function getViewBoxSize() {
 
 function getSceneBaseBounds() {
   if (sceneBaseBounds) return sceneBaseBounds;
-  const extents = Object.values(asset?.frames || {})
-    .map((frameDefinition) => frameDefinition?.extent)
-    .filter((extent) => extent && Number.isFinite(extent.x) && Number.isFinite(extent.y));
+  const fitBounds = Object.values(frameContexts || {})
+    .map((frameContext) => frameContext?.fitBounds)
+    .filter((bounds) => bounds && Number.isFinite(bounds.x) && Number.isFinite(bounds.y));
+  const extents = fitBounds.length
+    ? fitBounds
+    : Object.values(asset?.frames || {})
+      .map((frameDefinition) => frameDefinition?.extent)
+      .filter((extent) => extent && Number.isFinite(extent.x) && Number.isFinite(extent.y));
   if (!extents.length) {
     const { width, height } = getViewBoxSize();
     sceneBaseBounds = { x: 0, y: 0, width, height };
@@ -94,9 +115,17 @@ function getOrientationLayout() {
   const { width: viewWidth, height: viewHeight } = getViewBoxSize();
   const quarterTurns = ((rotationQuarterTurns % 4) + 4) % 4;
   const rotated = quarterTurns % 2 === 1;
-  const rotatedWidth = rotated ? baseBounds.height : baseBounds.width;
-  const rotatedHeight = rotated ? baseBounds.width : baseBounds.height;
+  const paddedWidth = baseBounds.width + FIT_PADDING_PX * 2;
+  const paddedHeight = baseBounds.height + FIT_PADDING_PX * 2;
+  const rotatedWidth = rotated ? paddedHeight : paddedWidth;
+  const rotatedHeight = rotated ? paddedWidth : paddedHeight;
   const fitScale = Math.min(viewWidth / rotatedWidth, viewHeight / rotatedHeight);
+  const paddedBounds = {
+    x: baseBounds.x - FIT_PADDING_PX,
+    y: baseBounds.y - FIT_PADDING_PX,
+    width: paddedWidth,
+    height: paddedHeight,
+  };
   return {
     quarterTurns,
     fitScale,
@@ -111,6 +140,7 @@ function getOrientationLayout() {
       width: rotatedWidth * fitScale,
       height: rotatedHeight * fitScale,
     },
+    paddedBounds,
   };
 }
 
@@ -160,11 +190,11 @@ function deriveLodKey(scale) {
 function clampCamera(nextCamera) {
   const { width, height } = getViewBoxSize();
   const orientationBounds = getOrientationLayout().bounds;
-  const defaultCamera = asset?.defaultCamera || {};
+  const defaultCamera = getResolvedCameraDefaults();
   const scale = clamp(
     Number(nextCamera.scale) || 1,
-    Number(defaultCamera.minScale) || 1,
-    Number(defaultCamera.maxScale) || 3
+    defaultCamera.minScale,
+    defaultCamera.maxScale
   );
   const scaledWidth = orientationBounds.width * scale;
   const scaledHeight = orientationBounds.height * scale;
@@ -184,8 +214,8 @@ function clampCamera(nextCamera) {
     : -orientationBounds.y * scale;
   return {
     scale,
-    minScale: Number(defaultCamera.minScale) || 1,
-    maxScale: Number(defaultCamera.maxScale) || 3,
+    minScale: defaultCamera.minScale,
+    maxScale: defaultCamera.maxScale,
     translateX: clamp(Number(nextCamera.translateX) || 0, minTranslateX, maxTranslateX),
     translateY: clamp(Number(nextCamera.translateY) || 0, minTranslateY, maxTranslateY),
   };
@@ -248,11 +278,11 @@ function getViewBoxPointerPosition(event) {
 
 function zoomAroundPoint(targetScale, point) {
   if (!asset || !point) return;
-  const defaultCamera = asset.defaultCamera || {};
+  const defaultCamera = getResolvedCameraDefaults();
   const nextScale = clamp(
     targetScale,
-    Number(defaultCamera.minScale) || 1,
-    Number(defaultCamera.maxScale) || 3
+    defaultCamera.minScale,
+    defaultCamera.maxScale
   );
   const worldX = (point.x - camera.translateX) / camera.scale;
   const worldY = (point.y - camera.translateY) / camera.scale;
@@ -327,6 +357,20 @@ function buildFrame(frameId, frameDefinition, defs, scene) {
   const d3 = getD3();
   const pathGenerator = d3.geoPath(projection);
   const rectPath = getFrameRectPath(frameDefinition);
+  const rawFitBounds = pathGenerator.bounds(frameDefinition.fitGeometry || frameDefinition.routeMask || frameDefinition.extent);
+  const fitBounds = Array.isArray(rawFitBounds) && rawFitBounds.length === 2
+    ? {
+      x: rawFitBounds[0][0],
+      y: rawFitBounds[0][1],
+      width: rawFitBounds[1][0] - rawFitBounds[0][0],
+      height: rawFitBounds[1][1] - rawFitBounds[0][1],
+    }
+    : {
+      x: frameDefinition.extent.x,
+      y: frameDefinition.extent.y,
+      width: frameDefinition.extent.width,
+      height: frameDefinition.extent.height,
+    };
 
   const frameLayer = createSvgNode("g");
   frameLayer.classList.add("transport-workbench-carrier-frame", `transport-workbench-carrier-frame-${frameId}`);
@@ -394,11 +438,15 @@ function buildFrame(frameId, frameDefinition, defs, scene) {
   landOverlay.classList.add("transport-workbench-carrier-overlay", "transport-workbench-carrier-overlay-land");
   landOverlay.setAttribute("clip-path", `url(#${landClipId})`);
 
-  frameLayer.append(seaOverlay, shoreGlow, landBase, prefectureLines, coastline, landOverlay);
+  const labelOverlay = createSvgNode("g");
+  labelOverlay.classList.add("transport-workbench-carrier-overlay", "transport-workbench-carrier-overlay-labels");
+
+  frameLayer.append(seaOverlay, shoreGlow, landBase, prefectureLines, coastline, landOverlay, labelOverlay);
   scene.appendChild(frameLayer);
 
   overlayRoots.land[frameId] = landOverlay;
   overlayRoots.sea[frameId] = seaOverlay;
+  overlayRoots.labels[frameId] = labelOverlay;
 
   return {
     definition: frameDefinition,
@@ -410,6 +458,7 @@ function buildFrame(frameId, frameDefinition, defs, scene) {
     landDefinition,
     seaClipPath,
     prefectureLines,
+    fitBounds,
   };
 }
 
@@ -525,6 +574,7 @@ export async function ensureTransportWorkbenchCarrier(nextMountNode) {
   return {
     land: overlayRoots.land,
     sea: overlayRoots.sea,
+    labels: overlayRoots.labels,
   };
 }
 
@@ -541,7 +591,7 @@ export function setTransportWorkbenchCarrierFamily(familyId) {
 export function resetTransportWorkbenchCarrierView() {
   if (!asset) return;
   rotationQuarterTurns = 0;
-  camera = clampCamera(asset.defaultCamera || camera);
+  camera = clampCamera(getResolvedCameraDefaults());
   applyCamera();
 }
 
@@ -561,11 +611,15 @@ export function toggleTransportWorkbenchCarrierQuarterTurn() {
 }
 
 export function getTransportWorkbenchCarrierViewState() {
+  const orientationLayout = getOrientationLayout();
   return {
     scale: camera.scale,
     translateX: camera.translateX,
     translateY: camera.translateY,
     quarterTurns: rotationQuarterTurns,
+    fitScale: orientationLayout.fitScale,
+    minScale: camera.minScale,
+    maxScale: camera.maxScale,
   };
 }
 
@@ -581,8 +635,8 @@ export function destroyTransportWorkbenchCarrier() {
   pointerDrag = null;
   rotationQuarterTurns = 0;
   viewChangeListener = null;
-  if (asset?.defaultCamera) {
-    camera = clampCamera(asset.defaultCamera);
+  if (asset) {
+    camera = clampCamera(getResolvedCameraDefaults());
   }
   resizeObserver?.disconnect();
   resizeObserver = null;
@@ -598,12 +652,14 @@ export function destroyTransportWorkbenchCarrier() {
   sceneBaseBounds = null;
   overlayRoots.land.main = null;
   overlayRoots.sea.main = null;
+  overlayRoots.labels.main = null;
 }
 
 export function getTransportWorkbenchCarrierOverlayRoots() {
   return {
     land: overlayRoots.land,
     sea: overlayRoots.sea,
+    labels: overlayRoots.labels,
   };
 }
 
