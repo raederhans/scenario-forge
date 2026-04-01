@@ -1,6 +1,6 @@
 /* global importScripts, self */
 
-importScripts("/vendor/topojson-client.min.js");
+importScripts(new URL("../../vendor/topojson-client.min.js", self.location.href).href);
 
 const MESSAGE_TYPES = Object.freeze({
   LOAD_BASE_STARTUP: "LOAD_BASE_STARTUP",

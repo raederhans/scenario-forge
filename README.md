@@ -9,7 +9,7 @@ Create political maps that feel alive.
 
 Scenario Forge is a scenario-first map workbench for alternate history, strategy modding, and geopolitical storytelling. It lets you switch between ready-made world states, repaint control and ownership, build overlays, tune presentation layers, and export a clean snapshot or a reusable project file.
 
-**Live demo:** https://raederhans.github.io/mapcreator/
+**Live demo:** https://raederhans.github.io/scenario-forge/
 
 ## What you can do
 
@@ -42,7 +42,7 @@ Scenario Forge brings those jobs into one workspace. If you are building an alte
 
 Open the live build:
 
-- https://raederhans.github.io/mapcreator/
+- https://raederhans.github.io/scenario-forge/
 
 ### Run it locally
 
@@ -107,7 +107,7 @@ Maintained by **[@raederhans](https://github.com/raederhans)**.
 
 If something breaks, looks wrong, or feels inconsistent, please open an issue:
 
-- https://github.com/raederhans/mapcreator/issues
+- https://github.com/raederhans/scenario-forge/issues
 
 Helpful bug reports usually include:
 

@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="default-scenario" content="tno_1962" />
     <title data-i18n="Scenario Forge">Scenario Forge</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "/js/": "./js/",
+          "/vendor/": "./vendor/"
+        }
+      }
+    </script>
+    <link rel="preload" href="data/europe_topology.json" as="fetch" crossorigin />
+    <link rel="preload" href="data/locales.startup.json" as="fetch" crossorigin />
+    <link rel="preload" href="data/geo_aliases.startup.json" as="fetch" crossorigin />
+    <link rel="preload" href="data/scenarios/index.json" as="fetch" crossorigin />
+    <link rel="preload" href="data/scenarios/tno_1962/manifest.json" as="fetch" crossorigin />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="modulepreload" href="js/main.js" />
     <script>

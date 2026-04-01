@@ -52,8 +52,10 @@ test("physical layer defaults and atlas rendering regression", async ({ page }) 
   await waitForMapReady(page);
 
   const inspection = await page.evaluate(async () => {
-    const stateModule = await import("/js/core/state.js");
-    const rendererSource = await fetch("/js/core/map_renderer.js").then((response) => response.text());
+    const stateModuleUrl = new URL("js/core/state.js", document.baseURI).href;
+    const rendererSourceUrl = new URL("js/core/map_renderer.js", document.baseURI).href;
+    const stateModule = await import(stateModuleUrl);
+    const rendererSource = await fetch(rendererSourceUrl).then((response) => response.text());
     const {
       normalizePhysicalStyleConfig,
       PHYSICAL_ATLAS_PALETTE,
