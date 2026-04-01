@@ -45,5 +45,12 @@
     "Only motorway, trunk, primary and their *_link variants are ingested into this first preview pack.",
     "Service-like roads remain out of the pack and therefore cannot be toggled live yet.",
     "N06 hardening is applied conservatively to motorway segments using nearest official alignment within a fixed distance threshold."
-  ]
+  ],
+  "preview_feature_count": 4794,
+  "preview_label_candidate_count": 4187,
+  "preview_thresholds_m": {
+    "motorway": 4000.0,
+    "trunk": 9000.0,
+    "primary": 16000.0
+  }
 }

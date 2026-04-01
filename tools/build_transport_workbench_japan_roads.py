@@ -26,6 +26,8 @@ RECIPE_PATH = ROOT / "data" / "transport_layers" / "japan_road" / "source_recipe
 OUTPUT_DIR = ROOT / "data" / "transport_layers" / "japan_road"
 ROADS_TOPO_PATH = OUTPUT_DIR / "roads.topo.json"
 ROAD_LABELS_PATH = OUTPUT_DIR / "road_labels.geojson"
+PREVIEW_ROADS_TOPO_PATH = OUTPUT_DIR / "roads.preview.topo.json"
+PREVIEW_ROAD_LABELS_PATH = OUTPUT_DIR / "road_labels.preview.geojson"
 MANIFEST_PATH = OUTPUT_DIR / "manifest.json"
 AUDIT_PATH = OUTPUT_DIR / "build_audit.json"
 CARRIER_PATH = ROOT / "data" / "transport_layers" / "japan_corridor" / "carrier.json"
@@ -44,6 +46,11 @@ LABEL_MIN_LENGTH_METERS = {
     "motorway": 7_000.0,
     "trunk": 9_000.0,
     "primary": 12_000.0,
+}
+PREVIEW_MIN_LENGTH_METERS = {
+    "motorway": 4_000.0,
+    "trunk": 9_000.0,
+    "primary": 16_000.0,
 }
 CLASS_PRIORITY = {"motorway": 3, "trunk": 2, "primary": 1}
 SIMPLIFY_METERS = 18.0
@@ -76,8 +83,12 @@ def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def write_json(path: Path, payload: Any) -> None:
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
+def write_json(path: Path, payload: Any, *, compact: bool = False) -> None:
+    if compact:
+        text = json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+    else:
+        text = json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False)
+    path.write_text(text, encoding="utf-8")
 
 
 def file_sha256(path: Path) -> str:
@@ -391,6 +402,23 @@ def build_label_candidates(roads: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     return gpd.GeoDataFrame(rows, geometry="geometry", crs="EPSG:4326")
 
 
+def build_preview_roads(roads: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    if roads.empty:
+        return roads.copy()
+    preview = roads.loc[roads["road_class"].isin(PREVIEW_MIN_LENGTH_METERS.keys())].copy()
+    preview["preview_min_length_m"] = preview["road_class"].map(PREVIEW_MIN_LENGTH_METERS).fillna(0.0)
+    preview = preview.loc[preview["length_m"] >= preview["preview_min_length_m"]].copy()
+    preview = preview.loc[
+        (preview["road_class"] != "primary")
+        | (~preview["dense_metro"])
+    ].copy()
+    return gpd.GeoDataFrame(
+        preview.drop(columns=["preview_min_length_m"]),
+        geometry="geometry",
+        crs=roads.crs,
+    )
+
+
 def build_topology_payload(roads: gpd.GeoDataFrame) -> dict[str, Any]:
     safe_roads = roads.copy()
     for column in safe_roads.columns:
@@ -429,6 +457,8 @@ def main() -> None:
     hardened = apply_n06_hardening(osm_raw, n06)
     merged_roads, merge_before_count = merge_roads(hardened)
     road_labels = build_label_candidates(merged_roads)
+    preview_roads = build_preview_roads(merged_roads)
+    preview_road_labels = build_label_candidates(preview_roads)
 
     roads_topology = build_topology_payload(merged_roads[[
         "id",
@@ -446,8 +476,26 @@ def main() -> None:
         "length_m",
         "geometry",
     ]])
-    write_json(ROADS_TOPO_PATH, roads_topology)
-    write_json(ROAD_LABELS_PATH, feature_collection(road_labels))
+    preview_roads_topology = build_topology_payload(preview_roads[[
+        "id",
+        "name",
+        "ref",
+        "official_name",
+        "official_ref",
+        "road_class",
+        "is_link",
+        "dense_metro",
+        "priority",
+        "source",
+        "source_flags",
+        "n06_match_distance_m",
+        "length_m",
+        "geometry",
+    ]])
+    write_json(ROADS_TOPO_PATH, roads_topology, compact=True)
+    write_json(ROAD_LABELS_PATH, feature_collection(road_labels), compact=True)
+    write_json(PREVIEW_ROADS_TOPO_PATH, preview_roads_topology, compact=True)
+    write_json(PREVIEW_ROAD_LABELS_PATH, feature_collection(preview_road_labels), compact=True)
 
     n06_source_info = get_n06_source_info()
     n06_source_path = n06_source_info["path"]
@@ -481,10 +529,13 @@ def main() -> None:
         "merge_before_count": merge_before_count,
         "merge_after_count": int(len(merged_roads)),
         "label_candidate_count": int(len(road_labels)),
+        "preview_feature_count": int(len(preview_roads)),
+        "preview_label_candidate_count": int(len(preview_road_labels)),
         "regional_sample_counts": {
             "kanto": count_region_features(merged_roads, TOKYO_METRO_BOX),
             "kansai": count_region_features(merged_roads, OSAKA_METRO_BOX),
         },
+        "preview_thresholds_m": PREVIEW_MIN_LENGTH_METERS,
         "recipe_version": recipe["version"],
         "source_policy": "local_source_cache_only",
         "n06_source_member": n06_source_info["member"],
@@ -511,15 +562,27 @@ def main() -> None:
         "generated_at": utc_now(),
         "recipe_path": str(RECIPE_PATH.relative_to(ROOT)).replace("\\", "/"),
         "paths": {
-            "roads": str(ROADS_TOPO_PATH.relative_to(ROOT)).replace("\\", "/"),
-            "road_labels": str(ROAD_LABELS_PATH.relative_to(ROOT)).replace("\\", "/"),
+            "preview": {
+                "roads": str(PREVIEW_ROADS_TOPO_PATH.relative_to(ROOT)).replace("\\", "/"),
+                "road_labels": str(PREVIEW_ROAD_LABELS_PATH.relative_to(ROOT)).replace("\\", "/"),
+            },
+            "full": {
+                "roads": str(ROADS_TOPO_PATH.relative_to(ROOT)).replace("\\", "/"),
+                "road_labels": str(ROAD_LABELS_PATH.relative_to(ROOT)).replace("\\", "/"),
+            },
             "build_audit": str(AUDIT_PATH.relative_to(ROOT)).replace("\\", "/"),
         },
         "source_signature": source_signature,
         "recipe_version": recipe["version"],
         "feature_counts": {
-            "roads": int(len(merged_roads)),
-            "road_labels": int(len(road_labels)),
+            "preview": {
+                "roads": int(len(preview_roads)),
+                "road_labels": int(len(preview_road_labels)),
+            },
+            "full": {
+                "roads": int(len(merged_roads)),
+                "road_labels": int(len(road_labels)),
+            },
         },
         "clip_bbox": [round(value, 6) for value in route_mask.bounds],
         "build_command": "python tools/build_transport_workbench_japan_roads.py",
@@ -535,7 +598,9 @@ def main() -> None:
     }
     write_json(MANIFEST_PATH, manifest)
     print(
-        f"Wrote {ROADS_TOPO_PATH.relative_to(ROOT)} ({len(merged_roads)} roads) and "
+        f"Wrote {PREVIEW_ROADS_TOPO_PATH.relative_to(ROOT)} ({len(preview_roads)} roads), "
+        f"{ROADS_TOPO_PATH.relative_to(ROOT)} ({len(merged_roads)} roads), "
+        f"{PREVIEW_ROAD_LABELS_PATH.relative_to(ROOT)} ({len(preview_road_labels)} labels), and "
         f"{ROAD_LABELS_PATH.relative_to(ROOT)} ({len(road_labels)} labels)."
     )
 

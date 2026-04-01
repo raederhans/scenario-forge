@@ -7,6 +7,8 @@ import {
 
 
 const MANIFEST_URL = "data/transport_layers/japan_road/manifest.json";
+const PACK_MODE_PREVIEW = "preview";
+const PACK_MODE_FULL = "full";
 const ROAD_STYLE_PRESETS = {
   corridor: {
     motorway: { stroke: "#cf5d35", width: 2.8 },
@@ -52,12 +54,25 @@ const ROAD_RENDER_PRIORITY = {
   motorway: 3,
 };
 
-let packPromise = null;
-let projectedPack = null;
+let manifestPromise = null;
+let auditPromise = null;
+let packPromises = {
+  [PACK_MODE_PREVIEW]: null,
+  [PACK_MODE_FULL]: null,
+};
+let projectedPacks = {
+  [PACK_MODE_PREVIEW]: null,
+  [PACK_MODE_FULL]: null,
+};
+let activePack = null;
+let activePackMode = null;
 let rootGroup = null;
 let roadsGroup = null;
 let labelsGroup = null;
 let selectedGroup = null;
+let selectedHighlightNode = null;
+let roadNodeById = new Map();
+let labelNodeById = new Map();
 let renderStats = {
   visibleRoads: 0,
   visibleLabels: 0,
@@ -70,9 +85,12 @@ let loadState = {
   error: null,
   manifest: null,
   audit: null,
+  previewStatus: "idle",
+  fullStatus: "idle",
 };
 let selectedFeature = null;
 let selectionChangeListener = null;
+let lastRenderedConfig = null;
 
 
 function ensureTopojsonClient() {
@@ -172,70 +190,122 @@ function createLabelFeature(rawFeature) {
   };
 }
 
-async function loadJapanRoadPack() {
-  if (projectedPack) return projectedPack;
-  if (!packPromise) {
-    packPromise = (async () => {
-      loadState = { status: "loading", error: null, manifest: null, audit: null };
+function getPackPath(manifest, mode, key) {
+  const modePaths = manifest?.paths?.[mode];
+  if (modePaths && typeof modePaths === "object") {
+    return modePaths[key] || "";
+  }
+  return manifest?.paths?.[key] || "";
+}
+
+async function loadManifest() {
+  if (!manifestPromise) {
+    manifestPromise = (async () => {
       ensureTopojsonClient();
       const manifestResponse = await fetch(MANIFEST_URL);
       if (!manifestResponse.ok) {
         throw new Error(`Failed to load Japan road manifest: ${manifestResponse.status}`);
       }
       const manifest = await manifestResponse.json();
-      const roadsResponse = await fetch(manifest?.paths?.roads || "");
+      loadState.manifest = manifest;
+      return manifest;
+    })().catch((error) => {
+      loadState.status = "error";
+      loadState.error = error instanceof Error ? error.message : String(error);
+      throw error;
+    });
+  }
+  return manifestPromise;
+}
+
+function startAuditLoad(manifest) {
+  if (loadState.audit || auditPromise) return auditPromise;
+  const auditPath = manifest?.paths?.build_audit || "";
+  if (!auditPath) return null;
+  auditPromise = fetch(auditPath)
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error(`Failed to load Japan road audit: ${response.status}`);
+      }
+      const audit = await response.json();
+      loadState.audit = audit;
+      if (loadState.status === "ready" && lastRenderedConfig) {
+        emitSelectionChange();
+      }
+      return audit;
+    })
+    .catch((error) => {
+      console.warn("[transport-workbench] Failed to load Japan road audit.", error);
+      return null;
+    });
+  return auditPromise;
+}
+
+async function loadJapanRoadPack(mode = PACK_MODE_PREVIEW) {
+  if (projectedPacks[mode]) return projectedPacks[mode];
+  if (!packPromises[mode]) {
+    packPromises[mode] = (async () => {
+      const isPreview = mode === PACK_MODE_PREVIEW;
+      const previousError = loadState.error;
+      if (isPreview) {
+        loadState.status = "loading";
+        loadState.previewStatus = "loading";
+        loadState.error = null;
+      } else {
+        loadState.fullStatus = "loading";
+      }
+      const manifest = await loadManifest();
+      startAuditLoad(manifest);
+      const roadsPath = getPackPath(manifest, mode, "roads");
+      const labelsPath = getPackPath(manifest, mode, "road_labels");
+      const roadsResponse = await fetch(roadsPath);
       if (!roadsResponse.ok) {
-        throw new Error(`Failed to load Japan road topology: ${roadsResponse.status}`);
+        throw new Error(`Failed to load Japan road topology (${mode}): ${roadsResponse.status}`);
       }
-      const labelsResponse = await fetch(manifest?.paths?.road_labels || "");
+      const labelsResponse = await fetch(labelsPath);
       if (!labelsResponse.ok) {
-        throw new Error(`Failed to load Japan road labels: ${labelsResponse.status}`);
+        throw new Error(`Failed to load Japan road labels (${mode}): ${labelsResponse.status}`);
       }
-      const auditResponse = manifest?.paths?.build_audit ? await fetch(manifest.paths.build_audit) : null;
       const roadsTopology = await roadsResponse.json();
       const labelsCollection = await labelsResponse.json();
-      const audit = auditResponse && auditResponse.ok ? await auditResponse.json() : null;
       const roadsObject = roadsTopology?.objects?.roads;
       if (!roadsObject) {
-        throw new Error("Japan road topology is missing the 'roads' object.");
+        throw new Error(`Japan road topology (${mode}) is missing the 'roads' object.`);
       }
       const decodedRoads = globalThis.topojson.feature(roadsTopology, roadsObject);
       const roadFeatures = (decodedRoads?.features || []).map(createRoadFeature).filter(Boolean);
       const labelFeatures = (labelsCollection?.features || []).map(createLabelFeature).filter(Boolean);
-      projectedPack = { manifest, audit, roadFeatures, labelFeatures };
-      loadState = { status: "ready", error: null, manifest, audit };
-      renderStats.totalRoads = roadFeatures.length;
-      renderStats.totalLabels = labelFeatures.length;
-      return projectedPack;
-    })().catch((error) => {
-      loadState = {
-        status: "error",
-        error: error instanceof Error ? error.message : String(error),
-        manifest: null,
-        audit: null,
+      const pack = {
+        mode,
+        manifest,
+        audit: loadState.audit,
+        roadFeatures,
+        labelFeatures,
+        roadFeatureById: new Map(roadFeatures.map((feature) => [feature.id, feature])),
+        labelFeatureById: new Map(labelFeatures.map((feature) => [feature.id, feature])),
       };
+      projectedPacks[mode] = pack;
+      if (isPreview) {
+        loadState.status = "ready";
+        loadState.previewStatus = "ready";
+        loadState.error = null;
+      } else {
+        loadState.fullStatus = "ready";
+        loadState.error = previousError;
+      }
+      return pack;
+    })().catch((error) => {
+      if (mode === PACK_MODE_PREVIEW) {
+        loadState.status = "error";
+        loadState.previewStatus = "error";
+        loadState.error = error instanceof Error ? error.message : String(error);
+      } else {
+        loadState.fullStatus = "error";
+      }
       throw error;
     });
   }
-  return packPromise;
-}
-
-function ensureGroups() {
-  const landRoot = getTransportWorkbenchCarrierOverlayRoots()?.land?.main;
-  if (!landRoot) return null;
-  if (rootGroup && rootGroup.parentNode === landRoot) return rootGroup;
-  rootGroup?.remove();
-  rootGroup = createSvgNode("g");
-  rootGroup.classList.add("transport-workbench-road-preview-root");
-  roadsGroup = createSvgNode("g");
-  roadsGroup.classList.add("transport-workbench-road-preview-roads");
-  labelsGroup = createSvgNode("g");
-  labelsGroup.classList.add("transport-workbench-road-preview-labels");
-  selectedGroup = createSvgNode("g");
-  selectedGroup.classList.add("transport-workbench-road-preview-selected");
-  rootGroup.append(roadsGroup, labelsGroup, selectedGroup);
-  landRoot.appendChild(rootGroup);
-  return rootGroup;
+  return packPromises[mode];
 }
 
 function getCurrentScale() {
@@ -307,22 +377,94 @@ function filterVisibleLabels(labelFeatures, visibleRoadIds, config, scale) {
     });
 }
 
+function findDatasetNode(startNode, datasetKey, boundaryNode) {
+  let current = startNode instanceof Element ? startNode : startNode?.parentElement;
+  while (current && current !== boundaryNode) {
+    if (current.dataset?.[datasetKey]) return current;
+    current = current.parentElement;
+  }
+  if (boundaryNode?.dataset?.[datasetKey]) return boundaryNode;
+  return null;
+}
+
+function handleRoadGroupClick(event) {
+  const node = findDatasetNode(event.target, "roadId", roadsGroup);
+  const roadId = node?.dataset?.roadId;
+  if (!roadId) return;
+  event.stopPropagation();
+  selectedFeature = { type: "road", id: roadId };
+  const selectedRoad = activePack?.roadFeatureById?.get(roadId) || null;
+  renderSelectedHighlight(selectedRoad);
+  emitSelectionChange();
+}
+
+function handleLabelGroupClick(event) {
+  const node = findDatasetNode(event.target, "labelId", labelsGroup);
+  const labelId = node?.dataset?.labelId;
+  if (!labelId) return;
+  event.stopPropagation();
+  const label = activePack?.labelFeatureById?.get(labelId) || null;
+  if (!label) return;
+  selectedFeature = { type: "label", id: label.id, roadId: label.roadId };
+  const linkedRoad = activePack?.roadFeatureById?.get(label.roadId) || null;
+  renderSelectedHighlight(linkedRoad);
+  emitSelectionChange();
+}
+
+function ensureGroups() {
+  const landRoot = getTransportWorkbenchCarrierOverlayRoots()?.land?.main;
+  if (!landRoot) return null;
+  if (rootGroup && rootGroup.parentNode === landRoot) return rootGroup;
+  rootGroup?.remove();
+  roadNodeById = new Map();
+  labelNodeById = new Map();
+  rootGroup = createSvgNode("g");
+  rootGroup.classList.add("transport-workbench-road-preview-root");
+  roadsGroup = createSvgNode("g");
+  roadsGroup.classList.add("transport-workbench-road-preview-roads");
+  roadsGroup.addEventListener("click", handleRoadGroupClick);
+  labelsGroup = createSvgNode("g");
+  labelsGroup.classList.add("transport-workbench-road-preview-labels");
+  labelsGroup.addEventListener("click", handleLabelGroupClick);
+  selectedGroup = createSvgNode("g");
+  selectedGroup.classList.add("transport-workbench-road-preview-selected");
+  selectedHighlightNode = createSvgNode("path");
+  selectedHighlightNode.setAttribute("fill", "none");
+  selectedHighlightNode.setAttribute("stroke", SELECTED_STROKE);
+  selectedHighlightNode.setAttribute("stroke-width", "2.2");
+  selectedHighlightNode.setAttribute("opacity", "0.9");
+  selectedHighlightNode.setAttribute("stroke-linecap", "round");
+  selectedHighlightNode.setAttribute("stroke-linejoin", "round");
+  selectedHighlightNode.setAttribute("vector-effect", "non-scaling-stroke");
+  selectedHighlightNode.classList.add("transport-workbench-road-selected-highlight");
+  selectedHighlightNode.style.display = "none";
+  selectedGroup.appendChild(selectedHighlightNode);
+  rootGroup.append(roadsGroup, labelsGroup, selectedGroup);
+  landRoot.appendChild(rootGroup);
+  return rootGroup;
+}
+
 function clearGroups() {
-  roadsGroup?.replaceChildren();
-  labelsGroup?.replaceChildren();
-  selectedGroup?.replaceChildren();
+  roadNodeById.forEach((node) => node.remove());
+  labelNodeById.forEach((node) => node.remove());
+  roadNodeById.clear();
+  labelNodeById.clear();
+  if (selectedHighlightNode) {
+    selectedHighlightNode.removeAttribute("d");
+    selectedHighlightNode.style.display = "none";
+  }
 }
 
 function emitSelectionChange() {
-  selectionChangeListener?.(getJapanRoadPreviewSnapshot());
+  selectionChangeListener?.(getJapanRoadPreviewSnapshot(lastRenderedConfig));
 }
 
-function buildSelectedSnapshot(visibleLookup, config) {
-  if (!selectedFeature || !projectedPack) return null;
+function buildSelectedSnapshot(config) {
+  if (!selectedFeature || !activePack) return null;
   if (selectedFeature.type === "label") {
-    const label = projectedPack.labelFeatures.find((entry) => entry.id === selectedFeature.id);
+    const label = activePack.labelFeatureById.get(selectedFeature.id);
     if (!label) return null;
-    const linkedRoad = projectedPack.roadFeatures.find((entry) => entry.id === label.roadId) || null;
+    const linkedRoad = activePack.roadFeatureById.get(label.roadId) || null;
     const hiddenReason = linkedRoad ? getRoadVisibilityReason(linkedRoad, config, getCurrentScale()) : null;
     return {
       type: "label",
@@ -336,7 +478,7 @@ function buildSelectedSnapshot(visibleLookup, config) {
       visible: !hiddenReason,
     };
   }
-  const road = projectedPack.roadFeatures.find((entry) => entry.id === selectedFeature.id);
+  const road = activePack.roadFeatureById.get(selectedFeature.id);
   if (!road) return null;
   const hiddenReason = getRoadVisibilityReason(road, config, getCurrentScale());
   return {
@@ -356,25 +498,121 @@ function buildSelectedSnapshot(visibleLookup, config) {
 }
 
 function renderSelectedHighlight(selectedRoad) {
-  selectedGroup?.replaceChildren();
-  if (!selectedRoad || !selectedGroup) return;
-  const highlight = createSvgNode("path");
-  highlight.setAttribute("d", selectedRoad.pathD);
-  highlight.setAttribute("fill", "none");
-  highlight.setAttribute("stroke", SELECTED_STROKE);
-  highlight.setAttribute("stroke-width", "2.2");
-  highlight.setAttribute("opacity", "0.9");
-  highlight.setAttribute("stroke-linecap", "round");
-  highlight.setAttribute("stroke-linejoin", "round");
-  highlight.setAttribute("vector-effect", "non-scaling-stroke");
-  selectedGroup.appendChild(highlight);
+  if (!selectedHighlightNode) return;
+  if (!selectedRoad) {
+    selectedHighlightNode.removeAttribute("d");
+    selectedHighlightNode.style.display = "none";
+    return;
+  }
+  selectedHighlightNode.setAttribute("d", selectedRoad.pathD);
+  selectedHighlightNode.style.display = "";
+}
+
+function updateRoadNode(path, feature, style) {
+  path.setAttribute("d", feature.pathD);
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", style.stroke);
+  path.setAttribute("stroke-width", String(style.width));
+  path.setAttribute("stroke-linecap", "round");
+  path.setAttribute("stroke-linejoin", "round");
+  path.setAttribute("vector-effect", "non-scaling-stroke");
+  path.setAttribute("opacity", String(style.opacity));
+  path.dataset.roadId = feature.id;
+  path.setAttribute("class", `transport-workbench-road-path road-class-${feature.roadClass}`);
+}
+
+function updateLabelNode(text, label, config) {
+  text.textContent = label.ref;
+  text.setAttribute("x", String(label.x));
+  text.setAttribute("y", String(label.y));
+  text.setAttribute("text-anchor", "middle");
+  text.setAttribute("dominant-baseline", "middle");
+  text.setAttribute("font-size", label.roadClass === "motorway" ? "11" : "10");
+  text.setAttribute("font-weight", label.roadClass === "motorway" ? "700" : "600");
+  text.setAttribute("fill", "#233141");
+  text.setAttribute("stroke", "#f8f5f0");
+  text.setAttribute("stroke-width", "2");
+  text.setAttribute("paint-order", "stroke");
+  text.setAttribute("vector-effect", "non-scaling-stroke");
+  text.setAttribute("opacity", String(normalizeNumber(config.refOpacity, 82) / 100));
+  text.dataset.labelId = label.id;
+  text.dataset.roadId = label.roadId;
+  text.setAttribute("class", "transport-workbench-road-label");
+}
+
+function syncGroupOrder(group, orderedNodes) {
+  let previousNode = null;
+  orderedNodes.forEach((node) => {
+    if (!node.parentNode) {
+      group.appendChild(node);
+      previousNode = node;
+      return;
+    }
+    if (!previousNode) {
+      if (group.firstChild !== node) {
+        group.insertBefore(node, group.firstChild);
+      }
+    } else if (previousNode.nextSibling !== node) {
+      group.insertBefore(node, previousNode.nextSibling);
+    }
+    previousNode = node;
+  });
+}
+
+function syncRoadNodes(visibleRoads, config, selectedRoadId) {
+  const visibleIds = new Set();
+  const orderedNodes = [];
+  visibleRoads.forEach((feature) => {
+    let path = roadNodeById.get(feature.id);
+    if (!path) {
+      path = createSvgNode("path");
+      roadNodeById.set(feature.id, path);
+    }
+    updateRoadNode(path, feature, getRoadStyle(feature, config, selectedRoadId));
+    orderedNodes.push(path);
+    visibleIds.add(feature.id);
+  });
+  syncGroupOrder(roadsGroup, orderedNodes);
+  Array.from(roadNodeById.entries()).forEach(([roadId, node]) => {
+    if (visibleIds.has(roadId)) return;
+    node.remove();
+    roadNodeById.delete(roadId);
+  });
+}
+
+function syncLabelNodes(visibleLabels, config) {
+  const visibleIds = new Set();
+  const orderedNodes = [];
+  visibleLabels.forEach((label) => {
+    let text = labelNodeById.get(label.id);
+    if (!text) {
+      text = createSvgNode("text");
+      labelNodeById.set(label.id, text);
+    }
+    updateLabelNode(text, label, config);
+    orderedNodes.push(text);
+    visibleIds.add(label.id);
+  });
+  syncGroupOrder(labelsGroup, orderedNodes);
+  Array.from(labelNodeById.entries()).forEach(([labelId, node]) => {
+    if (visibleIds.has(labelId)) return;
+    node.remove();
+    labelNodeById.delete(labelId);
+  });
+}
+
+function pickActivePack() {
+  return projectedPacks[PACK_MODE_FULL] || projectedPacks[PACK_MODE_PREVIEW] || null;
 }
 
 function renderRoads(config) {
-  if (!projectedPack || !ensureGroups()) return getJapanRoadPreviewSnapshot();
-  clearGroups();
+  const pack = pickActivePack();
+  if (!pack || !ensureGroups()) return getJapanRoadPreviewSnapshot(config);
+  activePack = pack;
+  activePackMode = pack.mode;
+  lastRenderedConfig = config;
   const scale = getCurrentScale();
-  const visibleRoads = projectedPack.roadFeatures
+  const visibleRoads = pack.roadFeatures
     .filter((feature) => !getRoadVisibilityReason(feature, config, scale))
     .sort((left, right) => {
       const classDelta = (ROAD_RENDER_PRIORITY[left.roadClass] || 0) - (ROAD_RENDER_PRIORITY[right.roadClass] || 0);
@@ -382,75 +620,37 @@ function renderRoads(config) {
       return left.priority - right.priority;
     });
   const visibleRoadIds = new Set(visibleRoads.map((feature) => feature.id));
-  const visibleLabels = filterVisibleLabels(projectedPack.labelFeatures, visibleRoadIds, config, scale);
+  const visibleLabels = filterVisibleLabels(pack.labelFeatures, visibleRoadIds, config, scale);
   const selectedRoadId = selectedFeature?.type === "road"
     ? selectedFeature.id
     : (selectedFeature?.type === "label" ? selectedFeature.roadId : null);
-
-  const roadFragment = document.createDocumentFragment();
-  visibleRoads.forEach((feature) => {
-    const path = createSvgNode("path");
-    const style = getRoadStyle(feature, config, selectedRoadId);
-    path.setAttribute("d", feature.pathD);
-    path.setAttribute("fill", "none");
-    path.setAttribute("stroke", style.stroke);
-    path.setAttribute("stroke-width", String(style.width));
-    path.setAttribute("stroke-linecap", "round");
-    path.setAttribute("stroke-linejoin", "round");
-    path.setAttribute("vector-effect", "non-scaling-stroke");
-    path.setAttribute("opacity", String(style.opacity));
-    path.dataset.roadId = feature.id;
-    path.classList.add("transport-workbench-road-path", `road-class-${feature.roadClass}`);
-    path.addEventListener("click", (event) => {
-      event.stopPropagation();
-      selectedFeature = { type: "road", id: feature.id };
-      renderSelectedHighlight(feature);
-      emitSelectionChange();
-    });
-    roadFragment.appendChild(path);
-  });
-  roadsGroup.appendChild(roadFragment);
-
-  const labelFragment = document.createDocumentFragment();
-  visibleLabels.forEach((label) => {
-    const text = createSvgNode("text");
-    text.textContent = label.ref;
-    text.setAttribute("x", String(label.x));
-    text.setAttribute("y", String(label.y));
-    text.setAttribute("text-anchor", "middle");
-    text.setAttribute("dominant-baseline", "middle");
-    text.setAttribute("font-size", label.roadClass === "motorway" ? "11" : "10");
-    text.setAttribute("font-weight", label.roadClass === "motorway" ? "700" : "600");
-    text.setAttribute("fill", "#233141");
-    text.setAttribute("stroke", "#f8f5f0");
-    text.setAttribute("stroke-width", "2");
-    text.setAttribute("paint-order", "stroke");
-    text.setAttribute("vector-effect", "non-scaling-stroke");
-    text.setAttribute("opacity", String(normalizeNumber(config.refOpacity, 82) / 100));
-    text.classList.add("transport-workbench-road-label");
-    text.addEventListener("click", (event) => {
-      event.stopPropagation();
-      selectedFeature = { type: "label", id: label.id, roadId: label.roadId };
-      const linkedRoad = projectedPack.roadFeatures.find((feature) => feature.id === label.roadId) || null;
-      renderSelectedHighlight(linkedRoad);
-      emitSelectionChange();
-    });
-    labelFragment.appendChild(text);
-  });
-  labelsGroup.appendChild(labelFragment);
-
+  syncRoadNodes(visibleRoads, config, selectedRoadId);
+  syncLabelNodes(visibleLabels, config);
   renderStats = {
     visibleRoads: visibleRoads.length,
     visibleLabels: visibleLabels.length,
-    totalRoads: projectedPack.roadFeatures.length,
-    totalLabels: projectedPack.labelFeatures.length,
-    filteredRoads: projectedPack.roadFeatures.length - visibleRoads.length,
+    totalRoads: pack.roadFeatures.length,
+    totalLabels: pack.labelFeatures.length,
+    filteredRoads: pack.roadFeatures.length - visibleRoads.length,
   };
   const selectedRoad = selectedRoadId
-    ? projectedPack.roadFeatures.find((feature) => feature.id === selectedRoadId) || null
+    ? pack.roadFeatureById.get(selectedRoadId) || null
     : null;
   renderSelectedHighlight(selectedRoad);
   return getJapanRoadPreviewSnapshot(config);
+}
+
+function startBackgroundFullPackLoad() {
+  if (projectedPacks[PACK_MODE_FULL] || packPromises[PACK_MODE_FULL]) return;
+  loadJapanRoadPack(PACK_MODE_FULL)
+    .then(() => {
+      if (!lastRenderedConfig || !rootGroup) return;
+      renderRoads(lastRenderedConfig);
+      emitSelectionChange();
+    })
+    .catch((error) => {
+      console.warn("[transport-workbench] Failed to hydrate full Japan road pack.", error);
+    });
 }
 
 export function setJapanRoadPreviewSelectionListener(listener) {
@@ -458,21 +658,39 @@ export function setJapanRoadPreviewSelectionListener(listener) {
 }
 
 export async function renderJapanRoadPreview(config) {
-  await loadJapanRoadPack();
+  await loadJapanRoadPack(PACK_MODE_PREVIEW);
+  startBackgroundFullPackLoad();
   return renderRoads(config);
 }
 
+export async function warmJapanRoadPreviewPack({ includeFull = false } = {}) {
+  await loadJapanRoadPack(PACK_MODE_PREVIEW);
+  if (includeFull) {
+    startBackgroundFullPackLoad();
+  }
+  return getJapanRoadPreviewSnapshot(lastRenderedConfig);
+}
+
 export function clearJapanRoadPreview() {
+  lastRenderedConfig = null;
   clearGroups();
+  renderStats = {
+    visibleRoads: 0,
+    visibleLabels: 0,
+    totalRoads: activePack?.roadFeatures?.length || projectedPacks[PACK_MODE_PREVIEW]?.roadFeatures?.length || 0,
+    totalLabels: activePack?.labelFeatures?.length || projectedPacks[PACK_MODE_PREVIEW]?.labelFeatures?.length || 0,
+    filteredRoads: 0,
+  };
 }
 
 export function destroyJapanRoadPreview() {
   selectedFeature = null;
+  lastRenderedConfig = null;
   renderStats = {
     visibleRoads: 0,
     visibleLabels: 0,
-    totalRoads: projectedPack?.roadFeatures?.length || 0,
-    totalLabels: projectedPack?.labelFeatures?.length || 0,
+    totalRoads: activePack?.roadFeatures?.length || projectedPacks[PACK_MODE_FULL]?.roadFeatures?.length || projectedPacks[PACK_MODE_PREVIEW]?.roadFeatures?.length || 0,
+    totalLabels: activePack?.labelFeatures?.length || projectedPacks[PACK_MODE_FULL]?.labelFeatures?.length || projectedPacks[PACK_MODE_PREVIEW]?.labelFeatures?.length || 0,
     filteredRoads: 0,
   };
   rootGroup?.remove();
@@ -480,15 +698,21 @@ export function destroyJapanRoadPreview() {
   roadsGroup = null;
   labelsGroup = null;
   selectedGroup = null;
+  selectedHighlightNode = null;
+  roadNodeById.clear();
+  labelNodeById.clear();
 }
 
-export function getJapanRoadPreviewSnapshot(config = null) {
+export function getJapanRoadPreviewSnapshot(config = lastRenderedConfig) {
   return {
     status: loadState.status,
     error: loadState.error,
     manifest: loadState.manifest,
     audit: loadState.audit,
     stats: { ...renderStats },
-    selected: config ? buildSelectedSnapshot(renderStats, config) : selectedFeature,
+    packMode: activePackMode,
+    previewStatus: loadState.previewStatus,
+    fullStatus: loadState.fullStatus,
+    selected: config ? buildSelectedSnapshot(config) : selectedFeature,
   };
 }

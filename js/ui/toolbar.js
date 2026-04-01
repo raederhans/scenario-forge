@@ -64,6 +64,7 @@ import {
   getJapanRoadPreviewSnapshot,
   renderJapanRoadPreview,
   setJapanRoadPreviewSelectionListener,
+  warmJapanRoadPreviewPack,
 } from "./transport_workbench_road_preview.js";
 
 const TRANSPORT_WORKBENCH_FAMILIES = [
@@ -1159,6 +1160,7 @@ function initToolbar({ render } = {}) {
   let transportWorkbenchSectionHelpState = null;
   let transportWorkbenchRoadPreviewViewSyncRaf = 0;
   let transportWorkbenchRoadPreviewLastScale = null;
+  let transportWorkbenchRoadPreviewWarmupScheduled = false;
 
   const closeTransportWorkbenchSectionHelpPopover = ({ restoreFocus = false } = {}) => {
     if (!transportWorkbenchSectionHelpPopover) return;
@@ -1409,7 +1411,9 @@ function initToolbar({ render } = {}) {
       state.transportWorkbenchUi.familyConfigs.rail = normalizeRailTransportWorkbenchConfig(current);
     }
     markDirty("transport-workbench-config");
-    renderTransportWorkbenchUi();
+    const context = getTransportWorkbenchRenderContext();
+    renderTransportWorkbenchInspector(context.family, context.config, context.compareHeld);
+    refreshTransportWorkbenchPreview(context, { allowCarrierPrep: false });
   };
 
   const toggleTransportWorkbenchSection = (familyId, sectionKey, nextOpen) => {
@@ -1743,54 +1747,78 @@ function initToolbar({ render } = {}) {
     transportWorkbenchRotateBtn?.setAttribute("aria-pressed", isAlternateTurn ? "true" : "false");
   };
 
-  const scheduleTransportWorkbenchRoadPreviewViewSync = () => {
-    ensureTransportWorkbenchUiState();
-    if (!state.transportWorkbenchUi?.open || normalizeTransportWorkbenchFamily(state.transportWorkbenchUi.activeFamily) !== "road") {
-      return;
-    }
-    const currentScale = Number(getTransportWorkbenchCarrierViewState()?.scale) || 1;
-    if (transportWorkbenchRoadPreviewLastScale !== null && Math.abs(currentScale - transportWorkbenchRoadPreviewLastScale) < 0.0001) {
-      return;
-    }
-    transportWorkbenchRoadPreviewLastScale = currentScale;
-    if (transportWorkbenchRoadPreviewViewSyncRaf) {
-      cancelAnimationFrame(transportWorkbenchRoadPreviewViewSyncRaf);
-    }
-    transportWorkbenchRoadPreviewViewSyncRaf = requestAnimationFrame(() => {
-      transportWorkbenchRoadPreviewViewSyncRaf = 0;
-      const family = getTransportWorkbenchFamilyMeta();
-      if (family.id !== "road" || !state.transportWorkbenchUi?.open) return;
-      const compareHeld = !!state.transportWorkbenchUi.compareHeld && !!family.supportsDetailedControls;
-      const config = getTransportWorkbenchWorkingConfig(family.id, { baseline: compareHeld });
-      renderJapanRoadPreview(config)
-        .then(() => {
-          renderTransportWorkbenchInspector(family, config, compareHeld);
-          syncTransportWorkbenchPreviewControls();
-        })
+  const scheduleTransportWorkbenchRoadPreviewWarmup = () => {
+    if (transportWorkbenchRoadPreviewWarmupScheduled) return;
+    transportWorkbenchRoadPreviewWarmupScheduled = true;
+    const runWarmup = () => {
+      warmJapanRoadPreviewPack()
         .catch((error) => {
-          console.error("[transport-workbench] Failed to refresh Japan road preview after carrier view change.", error);
-          renderTransportWorkbenchInspector(family, config, compareHeld);
+          console.warn("[transport-workbench] Failed to warm Japan road preview pack.", error);
         });
-    });
+    };
+    window.setTimeout(() => {
+      if (typeof window.requestIdleCallback === "function") {
+        window.requestIdleCallback(() => runWarmup(), { timeout: 2_000 });
+        return;
+      }
+      runWarmup();
+    }, 10_000);
   };
 
-  const renderTransportWorkbenchUi = () => {
-    if (
-      !transportWorkbenchOverlay
-      || !transportWorkbenchPanel
-      || !transportWorkbenchTitle
-      || !transportWorkbenchLensTitle
-      || !transportWorkbenchPreviewTitle
-      || !transportWorkbenchInspectorTitle
-    ) {
-      return;
-    }
+  const getTransportWorkbenchRenderContext = () => {
     ensureTransportWorkbenchUiState();
     const uiState = state.transportWorkbenchUi;
     const family = getTransportWorkbenchFamilyMeta();
     const isOpen = !!uiState.open;
     const compareHeld = !!uiState.compareHeld && !!family.supportsDetailedControls;
     const config = getTransportWorkbenchWorkingConfig(family.id, { baseline: compareHeld });
+    return {
+      uiState,
+      family,
+      isOpen,
+      compareHeld,
+      config,
+    };
+  };
+
+  const refreshTransportWorkbenchPreview = (context, { allowCarrierPrep = true } = {}) => {
+    if (!context.isOpen) {
+      clearJapanRoadPreview();
+      return Promise.resolve(null);
+    }
+    if (!transportWorkbenchCarrierMount) {
+      return Promise.resolve(null);
+    }
+    const prepareCarrier = allowCarrierPrep
+      ? ensureTransportWorkbenchCarrier(transportWorkbenchCarrierMount)
+      : Promise.resolve();
+    return prepareCarrier
+      .then(() => {
+        resizeTransportWorkbenchCarrier();
+        syncTransportWorkbenchPreviewControls();
+        if (context.family.id === "road") {
+          return renderJapanRoadPreview(context.config).then(() => {
+            transportWorkbenchRoadPreviewLastScale = Number(getTransportWorkbenchCarrierViewState()?.scale) || 1;
+            renderTransportWorkbenchInspector(context.family, context.config, context.compareHeld);
+            return null;
+          });
+        }
+        clearJapanRoadPreview();
+        renderTransportWorkbenchInspector(context.family, context.config, context.compareHeld);
+        return null;
+      })
+      .catch((error) => {
+        console.error("[transport-workbench] Failed to prepare Japan carrier preview.", error);
+        if (context.family.id !== "road") {
+          clearJapanRoadPreview();
+        }
+        renderTransportWorkbenchInspector(context.family, context.config, context.compareHeld);
+        return null;
+      });
+  };
+
+  const renderTransportWorkbenchShell = (context) => {
+    const { uiState, family, isOpen, compareHeld } = context;
     document.body.classList.toggle("transport-workbench-open", isOpen);
     transportWorkbenchOverlay?.classList.toggle("hidden", !isOpen);
     transportWorkbenchOverlay?.setAttribute("aria-hidden", isOpen ? "false" : "true");
@@ -1822,35 +1850,11 @@ function initToolbar({ render } = {}) {
     if (transportWorkbenchInfoPopover && !transportWorkbenchInfoPopover.classList.contains("hidden")) {
       renderTransportWorkbenchInfoContent(family);
     }
-    setTransportWorkbenchCarrierFamily(family.id);
-    if (isOpen && transportWorkbenchCarrierMount) {
-      ensureTransportWorkbenchCarrier(transportWorkbenchCarrierMount).then(() => {
-        resizeTransportWorkbenchCarrier();
-        syncTransportWorkbenchPreviewControls();
-        if (family.id === "road") {
-          return renderJapanRoadPreview(config).then(() => {
-            transportWorkbenchRoadPreviewLastScale = Number(getTransportWorkbenchCarrierViewState()?.scale) || 1;
-            renderTransportWorkbenchInspector(family, config, compareHeld);
-          });
-        }
-        clearJapanRoadPreview();
-        return null;
-      }).catch((error) => {
-        console.error("[transport-workbench] Failed to prepare Japan carrier preview.", error);
-        if (family.id !== "road") {
-          clearJapanRoadPreview();
-        }
-        renderTransportWorkbenchInspector(family, config, compareHeld);
-      });
-    } else if (!isOpen) {
-      clearJapanRoadPreview();
-    }
-    syncTransportWorkbenchPreviewControls();
-    renderTransportWorkbenchLensSections(family, config, compareHeld);
     transportWorkbenchInspectorTitle.textContent = t(family.inspectorTitle, "ui");
     transportWorkbenchInspectorEmptyTitle.textContent = t(family.inspectorEmptyTitle, "ui");
     transportWorkbenchInspectorEmptyBody.textContent = t(family.inspectorEmptyBody, "ui");
-    renderTransportWorkbenchInspector(family, config, compareHeld);
+    setTransportWorkbenchCarrierFamily(family.id);
+    syncTransportWorkbenchPreviewControls();
     transportWorkbenchFamilyTabs.forEach((button) => {
       const isActive = String(button.dataset.transportFamily || "") === family.id;
       button.classList.toggle("is-active", isActive);
@@ -1860,6 +1864,45 @@ function initToolbar({ render } = {}) {
       transportWorkbenchApplyBtn.disabled = true;
       transportWorkbenchApplyBtn.setAttribute("aria-disabled", "true");
     }
+  };
+
+  const scheduleTransportWorkbenchRoadPreviewViewSync = () => {
+    ensureTransportWorkbenchUiState();
+    if (!state.transportWorkbenchUi?.open || normalizeTransportWorkbenchFamily(state.transportWorkbenchUi.activeFamily) !== "road") {
+      return;
+    }
+    const currentScale = Number(getTransportWorkbenchCarrierViewState()?.scale) || 1;
+    if (transportWorkbenchRoadPreviewLastScale !== null && Math.abs(currentScale - transportWorkbenchRoadPreviewLastScale) < 0.0001) {
+      return;
+    }
+    transportWorkbenchRoadPreviewLastScale = currentScale;
+    if (transportWorkbenchRoadPreviewViewSyncRaf) {
+      cancelAnimationFrame(transportWorkbenchRoadPreviewViewSyncRaf);
+    }
+    transportWorkbenchRoadPreviewViewSyncRaf = requestAnimationFrame(() => {
+      transportWorkbenchRoadPreviewViewSyncRaf = 0;
+      const context = getTransportWorkbenchRenderContext();
+      if (context.family.id !== "road" || !context.isOpen) return;
+      refreshTransportWorkbenchPreview(context, { allowCarrierPrep: false });
+    });
+  };
+
+  const renderTransportWorkbenchUi = () => {
+    if (
+      !transportWorkbenchOverlay
+      || !transportWorkbenchPanel
+      || !transportWorkbenchTitle
+      || !transportWorkbenchLensTitle
+      || !transportWorkbenchPreviewTitle
+      || !transportWorkbenchInspectorTitle
+    ) {
+      return;
+    }
+    const context = getTransportWorkbenchRenderContext();
+    renderTransportWorkbenchShell(context);
+    renderTransportWorkbenchLensSections(context.family, context.config, context.compareHeld);
+    renderTransportWorkbenchInspector(context.family, context.config, context.compareHeld);
+    refreshTransportWorkbenchPreview(context);
   };
 
   const setTransportWorkbenchState = (nextOpen, { trigger = null, restoreFocus = true } = {}) => {
@@ -1928,14 +1971,16 @@ function initToolbar({ render } = {}) {
     return false;
   };
   state.refreshTransportWorkbenchUiFn = renderTransportWorkbenchUi;
+  scheduleTransportWorkbenchRoadPreviewWarmup();
   setTransportWorkbenchCarrierViewChangeListener(() => {
     scheduleTransportWorkbenchRoadPreviewViewSync();
   });
   setJapanRoadPreviewSelectionListener(() => {
-    if (!state.transportWorkbenchUi?.open || normalizeTransportWorkbenchFamily(state.transportWorkbenchUi.activeFamily) !== "road") {
+    const context = getTransportWorkbenchRenderContext();
+    if (!context.isOpen || context.family.id !== "road") {
       return;
     }
-    renderTransportWorkbenchUi();
+    renderTransportWorkbenchInspector(context.family, context.config, context.compareHeld);
   });
 
   const getPaintModeLabel = () => (

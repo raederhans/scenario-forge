@@ -6,8 +6,14 @@
   "generated_at": "2026-03-31T21:35:45.663725Z",
   "recipe_path": "data/transport_layers/japan_road/source_recipe.manual.json",
   "paths": {
-    "roads": "data/transport_layers/japan_road/roads.topo.json",
-    "road_labels": "data/transport_layers/japan_road/road_labels.geojson",
+    "preview": {
+      "roads": "data/transport_layers/japan_road/roads.preview.topo.json",
+      "road_labels": "data/transport_layers/japan_road/road_labels.preview.geojson"
+    },
+    "full": {
+      "roads": "data/transport_layers/japan_road/roads.topo.json",
+      "road_labels": "data/transport_layers/japan_road/road_labels.geojson"
+    },
     "build_audit": "data/transport_layers/japan_road/build_audit.json"
   },
   "source_signature": {
@@ -24,8 +30,14 @@
   },
   "recipe_version": "japan_road_sources_v1",
   "feature_counts": {
-    "roads": 75824,
-    "road_labels": 4930
+    "preview": {
+      "roads": 4794,
+      "road_labels": 4187
+    },
+    "full": {
+      "roads": 75824,
+      "road_labels": 4930
+    }
   },
   "clip_bbox": [
     129.0,
