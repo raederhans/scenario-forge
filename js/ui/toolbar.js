@@ -59,13 +59,15 @@ import {
   toggleTransportWorkbenchCarrierQuarterTurn,
 } from "./transport_workbench_carrier.js";
 import {
-  clearJapanRoadPreview,
-  destroyJapanRoadPreview,
-  getJapanRoadPreviewSnapshot,
-  renderJapanRoadPreview,
-  setJapanRoadPreviewSelectionListener,
-  warmJapanRoadPreviewPack,
-} from "./transport_workbench_road_preview.js";
+  clearAllTransportWorkbenchFamilyPreviews,
+  destroyAllTransportWorkbenchFamilyPreviews,
+  getTransportWorkbenchFamilyPreviewSnapshot,
+  isTransportWorkbenchFamilyLivePreviewCapable,
+  renderTransportWorkbenchFamilyPreview,
+  setTransportWorkbenchFamilyPreviewSelectionListener,
+  warmTransportWorkbenchFamilyPreview,
+} from "./transport_workbench_family_preview.js";
+import { formatJapanRailVisibilityReason } from "./transport_workbench_rail_preview.js";
 
 const TRANSPORT_WORKBENCH_FAMILIES = [
   {
@@ -113,11 +115,11 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     lensBody: "Japan rail baseline uses the official active network with OSM lifecycle and gap patches.",
     lensNext: "Scope stays on railways and major stations. No full station product, routing, timetable, or heavy operations metrics.",
     previewTitle: "Rail carrier",
-    previewCaption: "The Japan carrier is ready. Real rail overlays are not wired yet, so this pass locks status, class, and major-station rules.",
+    previewCaption: "The Japan carrier now accepts real rail packs when they exist. Until the Japan rail manifest lands, this pass keeps status, class, and major-station rules ready without fabricating geometry.",
     inspectorTitle: "Rail inspector",
-    inspectorBody: "No real rail feature is selectable yet. This side explains how the current Japan rail rules reconcile official data and OSM patches.",
+    inspectorBody: "This side switches to real Japan rail line and station inspection as soon as the deferred packs exist. Until then it reports the pending contract instead of inventing sample data.",
     inspectorEmptyTitle: "Waiting for real rail packs",
-    inspectorEmptyBody: "Once railways and rail_stations_major Japan packs are wired, this side will switch to real line and station inspection.",
+    inspectorEmptyBody: "Once railways and rail_stations_major Japan packs are wired, this side will inspect real lines and major stations.",
     supportsDetailedControls: true,
   },
   {
@@ -341,6 +343,7 @@ const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
   road: {
     country: "Japan",
     adapterId: "japan_road_v1",
+    geometryKind: "line",
     packs: ["roads", "road_labels"],
     geometrySource: "OSM / Geofabrik Japan",
     hardeningSource: "N06 motorway identity",
@@ -350,11 +353,62 @@ const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
   rail: {
     country: "Japan",
     adapterId: "japan_rail_v1",
+    geometryKind: "line",
     packs: ["railways", "rail_stations_major"],
     geometrySource: "Official active network",
     hardeningSource: "OSM lifecycle / gap patch",
     governance: "Deferred layer packs with reproducible build inputs and explicit diagnostics.",
     pendingStatus: "Waiting for railways + rail_stations_major Japan packs",
+  },
+  airport: {
+    country: "Japan",
+    adapterId: "japan_airport_v1",
+    geometryKind: "point",
+    packs: ["airports"],
+    geometrySource: "Official airport point source",
+    hardeningSource: "Administrative category / importance review",
+    governance: "Deferred point pack aligned to the cityPoints-style load and visibility chain.",
+    pendingStatus: "Waiting for airports Japan pack",
+  },
+  port: {
+    country: "Japan",
+    adapterId: "japan_port_v1",
+    geometryKind: "point",
+    packs: ["ports"],
+    geometrySource: "Official or quasi-official major port node source",
+    hardeningSource: "Commercial / strategic importance review",
+    governance: "Deferred point pack for key maritime facilities only. Routes and harbor polygons stay out of v1.",
+    pendingStatus: "Waiting for ports Japan pack",
+  },
+  mineral_resources: {
+    country: "Japan",
+    adapterId: "japan_mineral_resources_v1",
+    geometryKind: "point",
+    packs: ["mineral_resources"],
+    geometrySource: "Official mineral resource distribution point source",
+    hardeningSource: "Manual resource class normalization",
+    governance: "Deferred point pack aligned to the cityPoints-style facility chain.",
+    pendingStatus: "Waiting for mineral_resources Japan pack",
+  },
+  energy_facilities: {
+    country: "Japan",
+    adapterId: "japan_energy_facilities_v1",
+    geometryKind: "point",
+    packs: ["energy_facilities"],
+    geometrySource: "Official energy facility point source",
+    hardeningSource: "Facility subtype and status normalization",
+    governance: "Deferred point pack aligned to the cityPoints-style facility chain.",
+    pendingStatus: "Waiting for energy_facilities Japan pack",
+  },
+  industrial_zones: {
+    country: "Japan",
+    adapterId: "japan_industrial_zones_v1",
+    geometryKind: "polygon",
+    packs: ["industrial_zones"],
+    geometrySource: "Official industrial land / zone polygons",
+    hardeningSource: "Polygon simplification and context-layer style diagnostics",
+    governance: "Deferred polygon pack that should stay on the existing context/polygon render path instead of pointifying zones.",
+    pendingStatus: "Waiting for industrial_zones Japan pack",
   },
 };
 
@@ -467,6 +521,11 @@ function ensureTransportWorkbenchUiState() {
   }
   state.transportWorkbenchUi.familyConfigs.road = normalizeRoadTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.road);
   state.transportWorkbenchUi.familyConfigs.rail = normalizeRailTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.rail);
+  ["airport", "port", "mineral_resources", "energy_facilities", "industrial_zones"].forEach((familyId) => {
+    if (!state.transportWorkbenchUi.familyConfigs[familyId] || typeof state.transportWorkbenchUi.familyConfigs[familyId] !== "object") {
+      state.transportWorkbenchUi.familyConfigs[familyId] = {};
+    }
+  });
   if (!state.transportWorkbenchUi.sectionOpen || typeof state.transportWorkbenchUi.sectionOpen !== "object") {
     state.transportWorkbenchUi.sectionOpen = {};
   }
@@ -490,6 +549,11 @@ function resetTransportWorkbenchSectionState() {
   state.transportWorkbenchUi.sectionOpen = {
     road: { ...TRANSPORT_WORKBENCH_SECTION_DEFAULTS.road },
     rail: { ...TRANSPORT_WORKBENCH_SECTION_DEFAULTS.rail },
+    airport: {},
+    port: {},
+    mineral_resources: {},
+    energy_facilities: {},
+    industrial_zones: {},
   };
 }
 
@@ -1210,9 +1274,9 @@ function initToolbar({ render } = {}) {
   };
 
   let transportWorkbenchSectionHelpState = null;
-  let transportWorkbenchRoadPreviewViewSyncRaf = 0;
-  let transportWorkbenchRoadPreviewLastViewKey = "";
-  let transportWorkbenchRoadPreviewWarmupScheduled = false;
+  let transportWorkbenchPreviewViewSyncRaf = 0;
+  let transportWorkbenchPreviewLastViewKey = "";
+  let transportWorkbenchPreviewWarmupScheduled = false;
   let transportWorkbenchDraggedLayerId = "";
 
   const closeTransportWorkbenchSectionHelpPopover = ({ restoreFocus = false } = {}) => {
@@ -1810,25 +1874,25 @@ function initToolbar({ render } = {}) {
     if (transportWorkbenchInspectorDetails) {
       transportWorkbenchInspectorDetails.replaceChildren();
       const dataContract = getTransportWorkbenchDataContract(family.id);
-      const roadSnapshot = family.id === "road" ? getJapanRoadPreviewSnapshot(config) : null;
+      const previewSnapshot = getTransportWorkbenchFamilyPreviewSnapshot(family.id, config);
       let rows;
-      if (family.id === "road" && roadSnapshot?.status === "ready") {
+      if (family.id === "road" && previewSnapshot?.status === "ready") {
         rows = [
-          ["Pack version", roadSnapshot.manifest?.adapter_id || "japan_road_v1"],
-          ["Recipe version", roadSnapshot.audit?.recipe_version || "unknown"],
-          ["Source policy", roadSnapshot.manifest?.source_policy || "unknown"],
-          ["N06 member", roadSnapshot.manifest?.n06_source_member || roadSnapshot.audit?.n06_source_member || "unknown"],
-          ["N06 encoding", roadSnapshot.manifest?.n06_encoding || roadSnapshot.audit?.n06_encoding || "unknown"],
-          ["Last build", String(roadSnapshot.manifest?.generated_at || "unknown").replace("T", " ").replace("Z", " UTC")],
-          ["Loaded roads", String(roadSnapshot.stats?.totalRoads || 0)],
-          ["Visible roads", String(roadSnapshot.stats?.visibleRoads || 0)],
-          ["Visible labels", String(roadSnapshot.stats?.visibleLabels || 0)],
-          ["Filtered roads", String(roadSnapshot.stats?.filteredRoads || 0)],
-          ["N06 matched", String(roadSnapshot.audit?.n06_matched_count || 0)],
-          ["Name conflicts", String(roadSnapshot.audit?.name_conflict_count || 0)],
+          ["Pack version", previewSnapshot.manifest?.adapter_id || "japan_road_v1"],
+          ["Recipe version", previewSnapshot.audit?.recipe_version || "unknown"],
+          ["Source policy", previewSnapshot.manifest?.source_policy || "unknown"],
+          ["N06 member", previewSnapshot.manifest?.n06_source_member || previewSnapshot.audit?.n06_source_member || "unknown"],
+          ["N06 encoding", previewSnapshot.manifest?.n06_encoding || previewSnapshot.audit?.n06_encoding || "unknown"],
+          ["Last build", String(previewSnapshot.manifest?.generated_at || "unknown").replace("T", " ").replace("Z", " UTC")],
+          ["Loaded roads", String(previewSnapshot.stats?.totalRoads || 0)],
+          ["Visible roads", String(previewSnapshot.stats?.visibleRoads || 0)],
+          ["Visible labels", String(previewSnapshot.stats?.visibleLabels || 0)],
+          ["Filtered roads", String(previewSnapshot.stats?.filteredRoads || 0)],
+          ["N06 matched", String(previewSnapshot.audit?.n06_matched_count || 0)],
+          ["Name conflicts", String(previewSnapshot.audit?.name_conflict_count || 0)],
           ["Compare mode", compareHeld ? "Holding baseline" : "Working state"],
         ];
-        const selected = roadSnapshot.selected;
+        const selected = previewSnapshot.selected;
         if (selected?.type === "road") {
           rows.push(
             ["Selected road", selected.name || "Unnamed segment"],
@@ -1852,16 +1916,56 @@ function initToolbar({ render } = {}) {
             ["Visibility", selected.visible ? "Visible" : formatTransportWorkbenchRoadHiddenReason(selected.hiddenReason)],
           );
         }
-      } else if (family.id === "road" && roadSnapshot?.status === "error") {
+      } else if (family.id === "road" && previewSnapshot?.status === "error") {
         rows = [
           ["Pack status", "Road pack failed to load"],
-          ["Error", roadSnapshot.error || "Unknown error"],
+          ["Error", previewSnapshot.error || "Unknown error"],
           ["Data path", dataContract?.governance || "Deferred pack governance pending"],
         ];
       } else if (family.id === "road") {
         rows = [
           ["Pack status", "Loading Japan road pack"],
           ["Adapter", config.motorwayIdentitySource === "osm_only" ? "OSM only" : "OSM + N06 hardening"],
+          ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+        ];
+      } else if (family.id === "rail" && previewSnapshot?.status === "ready") {
+        rows = [
+          ["Pack version", previewSnapshot.manifest?.adapter_id || "japan_rail_v1"],
+          ["Recipe version", previewSnapshot.audit?.recipe_version || "unknown"],
+          ["Source policy", previewSnapshot.manifest?.source_policy || "unknown"],
+          ["Last build", String(previewSnapshot.manifest?.generated_at || "unknown").replace("T", " ").replace("Z", " UTC")],
+          ["Loaded lines", String(previewSnapshot.stats?.totalLines || 0)],
+          ["Visible lines", String(previewSnapshot.stats?.visibleLines || 0)],
+          ["Loaded stations", String(previewSnapshot.stats?.totalStations || 0)],
+          ["Visible stations", String(previewSnapshot.stats?.visibleStations || 0)],
+          ["Adapter", config.allowOsmActiveGapFill ? "Official active + OSM gap fill" : "Official active locked"],
+          ["Statuses", formatTransportWorkbenchOptionLabels(config.status, RAIL_STATUS_OPTIONS)],
+          ["Classes", formatTransportWorkbenchOptionLabels(config.class, RAIL_CLASS_OPTIONS)],
+        ];
+        const selected = previewSnapshot.selected;
+        if (selected?.type === "line") {
+          rows.push(
+            ["Selected line", selected.name || "Unnamed line"],
+            ["Operator", selected.operator || "—"],
+            ["Status", selected.status || "—"],
+            ["Class", selected.lineClass || "—"],
+            ["Source", selected.source || "—"],
+            ["Flags", Array.isArray(selected.sourceFlags) && selected.sourceFlags.length ? selected.sourceFlags.join(", ") : "—"],
+            ["Visibility", selected.visible ? "Visible" : formatJapanRailVisibilityReason(selected.hiddenReason)],
+          );
+        } else if (selected?.type === "station") {
+          rows.push(
+            ["Selected station", selected.name || "Unnamed station"],
+            ["City key", selected.cityKey || "—"],
+            ["Importance", selected.importance || "—"],
+            ["Source", selected.source || "—"],
+            ["Visibility", selected.visible ? "Visible" : "Hidden by threshold"],
+          );
+        }
+      } else if (family.id === "rail" && previewSnapshot?.status === "error") {
+        rows = [
+          ["Pack status", "Rail pack failed to load"],
+          ["Error", previewSnapshot.error || "Unknown error"],
           ["Data path", dataContract?.governance || "Deferred pack governance pending"],
         ];
       } else if (family.id === "rail") {
@@ -1871,7 +1975,7 @@ function initToolbar({ render } = {}) {
           ["Classes", formatTransportWorkbenchOptionLabels(config.class, RAIL_CLASS_OPTIONS)],
           ["Stations", config.showMajorStations ? `${config.importanceThreshold} threshold` : "Hidden"],
           ["Data path", dataContract?.governance || "Deferred pack governance pending"],
-          ["Pack status", dataContract?.pendingStatus || "Waiting for railways + rail_stations_major Japan packs"],
+          ["Pack status", previewSnapshot?.status === "pending" ? (dataContract?.pendingStatus || "Waiting for railways + rail_stations_major Japan packs") : "Loading Japan rail pack"],
         ];
       } else if (family.id === "layers") {
         rows = state.transportWorkbenchUi.layerOrder.map((layerId, index) => {
@@ -1901,14 +2005,20 @@ function initToolbar({ render } = {}) {
     transportWorkbenchRotateBtn?.setAttribute("aria-pressed", isAlternateTurn ? "true" : "false");
   };
 
-  const scheduleTransportWorkbenchRoadPreviewWarmup = () => {
-    if (transportWorkbenchRoadPreviewWarmupScheduled) return;
-    transportWorkbenchRoadPreviewWarmupScheduled = true;
+  const scheduleTransportWorkbenchFamilyPreviewWarmup = () => {
+    if (transportWorkbenchPreviewWarmupScheduled) return;
+    transportWorkbenchPreviewWarmupScheduled = true;
     const runWarmup = () => {
-      warmJapanRoadPreviewPack()
-        .catch((error) => {
-          console.warn("[transport-workbench] Failed to warm Japan road preview pack.", error);
+      Promise.allSettled([
+        warmTransportWorkbenchFamilyPreview("road"),
+        warmTransportWorkbenchFamilyPreview("rail"),
+      ]).then((results) => {
+        results.forEach((result, index) => {
+          if (result.status === "fulfilled") return;
+          const familyId = index === 0 ? "road" : "rail";
+          console.warn(`[transport-workbench] Failed to warm ${familyId} preview pack.`, result.reason);
         });
+      });
     };
     window.setTimeout(() => {
       if (typeof window.requestIdleCallback === "function") {
@@ -1937,11 +2047,11 @@ function initToolbar({ render } = {}) {
 
   const refreshTransportWorkbenchPreview = (context, { allowCarrierPrep = true } = {}) => {
     if (!context.isOpen) {
-      clearJapanRoadPreview();
+      clearAllTransportWorkbenchFamilyPreviews();
       return Promise.resolve(null);
     }
     if (context.family.id === "layers") {
-      clearJapanRoadPreview();
+      clearAllTransportWorkbenchFamilyPreviews();
       renderTransportWorkbenchLayerOrderPanel();
       return Promise.resolve(null);
     }
@@ -1955,10 +2065,10 @@ function initToolbar({ render } = {}) {
       .then(() => {
         resizeTransportWorkbenchCarrier();
         syncTransportWorkbenchPreviewControls();
-        if (context.family.id === "road") {
-          return renderJapanRoadPreview(context.config).then(() => {
+        if (isTransportWorkbenchFamilyLivePreviewCapable(context.family.id)) {
+          return renderTransportWorkbenchFamilyPreview(context.family.id, context.config).then(() => {
             const viewState = getTransportWorkbenchCarrierViewState() || {};
-            transportWorkbenchRoadPreviewLastViewKey = [
+            transportWorkbenchPreviewLastViewKey = [
               Number(viewState.scale || 1).toFixed(4),
               String(viewState.quarterTurns || 0),
             ].join(":");
@@ -1966,14 +2076,14 @@ function initToolbar({ render } = {}) {
             return null;
           });
         }
-        clearJapanRoadPreview();
+        clearAllTransportWorkbenchFamilyPreviews();
         renderTransportWorkbenchInspector(context.family, context.config, context.compareHeld);
         return null;
       })
       .catch((error) => {
         console.error("[transport-workbench] Failed to prepare Japan carrier preview.", error);
-        if (context.family.id !== "road") {
-          clearJapanRoadPreview();
+        if (!isTransportWorkbenchFamilyLivePreviewCapable(context.family.id)) {
+          clearAllTransportWorkbenchFamilyPreviews();
         }
         renderTransportWorkbenchInspector(context.family, context.config, context.compareHeld);
         return null;
@@ -2038,9 +2148,10 @@ function initToolbar({ render } = {}) {
     }
   };
 
-  const scheduleTransportWorkbenchRoadPreviewViewSync = () => {
+  const scheduleTransportWorkbenchPreviewViewSync = () => {
     ensureTransportWorkbenchUiState();
-    if (!state.transportWorkbenchUi?.open || normalizeTransportWorkbenchFamily(state.transportWorkbenchUi.activeFamily) !== "road") {
+    const activeFamily = normalizeTransportWorkbenchFamily(state.transportWorkbenchUi.activeFamily);
+    if (!state.transportWorkbenchUi?.open || !isTransportWorkbenchFamilyLivePreviewCapable(activeFamily)) {
       return;
     }
     const viewState = getTransportWorkbenchCarrierViewState() || {};
@@ -2048,17 +2159,17 @@ function initToolbar({ render } = {}) {
       Number(viewState.scale || 1).toFixed(4),
       String(viewState.quarterTurns || 0),
     ].join(":");
-    if (transportWorkbenchRoadPreviewLastViewKey === nextViewKey) {
+    if (transportWorkbenchPreviewLastViewKey === nextViewKey) {
       return;
     }
-    transportWorkbenchRoadPreviewLastViewKey = nextViewKey;
-    if (transportWorkbenchRoadPreviewViewSyncRaf) {
-      cancelAnimationFrame(transportWorkbenchRoadPreviewViewSyncRaf);
+    transportWorkbenchPreviewLastViewKey = nextViewKey;
+    if (transportWorkbenchPreviewViewSyncRaf) {
+      cancelAnimationFrame(transportWorkbenchPreviewViewSyncRaf);
     }
-    transportWorkbenchRoadPreviewViewSyncRaf = requestAnimationFrame(() => {
-      transportWorkbenchRoadPreviewViewSyncRaf = 0;
+    transportWorkbenchPreviewViewSyncRaf = requestAnimationFrame(() => {
+      transportWorkbenchPreviewViewSyncRaf = 0;
       const context = getTransportWorkbenchRenderContext();
-      if (context.family.id !== "road" || !context.isOpen) return;
+      if (!context.isOpen || context.family.id !== activeFamily) return;
       refreshTransportWorkbenchPreview(context, { allowCarrierPrep: false });
     });
   };
@@ -2114,12 +2225,12 @@ function initToolbar({ render } = {}) {
       return;
     }
     uiState.compareHeld = false;
-    if (transportWorkbenchRoadPreviewViewSyncRaf) {
-      cancelAnimationFrame(transportWorkbenchRoadPreviewViewSyncRaf);
-      transportWorkbenchRoadPreviewViewSyncRaf = 0;
+    if (transportWorkbenchPreviewViewSyncRaf) {
+      cancelAnimationFrame(transportWorkbenchPreviewViewSyncRaf);
+      transportWorkbenchPreviewViewSyncRaf = 0;
     }
-    transportWorkbenchRoadPreviewLastViewKey = "";
-    destroyJapanRoadPreview();
+    transportWorkbenchPreviewLastViewKey = "";
+    destroyAllTransportWorkbenchFamilyPreviews();
     destroyTransportWorkbenchCarrier();
     closeTransportWorkbenchInfoPopover({ restoreFocus: false });
     closeTransportWorkbenchSectionHelpPopover({ restoreFocus: false });
@@ -2147,16 +2258,23 @@ function initToolbar({ render } = {}) {
     return false;
   };
   state.refreshTransportWorkbenchUiFn = renderTransportWorkbenchUi;
-  scheduleTransportWorkbenchRoadPreviewWarmup();
+  scheduleTransportWorkbenchFamilyPreviewWarmup();
   setTransportWorkbenchCarrierViewChangeListener(() => {
-    scheduleTransportWorkbenchRoadPreviewViewSync();
+    scheduleTransportWorkbenchPreviewViewSync();
   });
-  setJapanRoadPreviewSelectionListener(() => {
-    const context = getTransportWorkbenchRenderContext();
-    if (!context.isOpen || context.family.id !== "road") {
-      return;
+  ["road", "rail"].forEach((familyId) => {
+    setTransportWorkbenchFamilyPreviewSelectionListener(familyId, () => {
+      const context = getTransportWorkbenchRenderContext();
+      if (!context.isOpen || context.family.id !== familyId) {
+        return;
+      }
+      renderTransportWorkbenchInspector(context.family, context.config, context.compareHeld);
+    });
+  });
+  ["airport", "port", "mineral_resources", "energy_facilities", "industrial_zones"].forEach((familyId) => {
+    if (!state.transportWorkbenchUi.sectionOpen[familyId] || typeof state.transportWorkbenchUi.sectionOpen[familyId] !== "object") {
+      state.transportWorkbenchUi.sectionOpen[familyId] = {};
     }
-    renderTransportWorkbenchInspector(context.family, context.config, context.compareHeld);
   });
 
   const getPaintModeLabel = () => (
