@@ -1,0 +1,63 @@
+{
+  "adapter_id": "japan_airport_v1",
+  "family": "airport",
+  "geometry_kind": "point",
+  "country": "Japan",
+  "schema_version": 1,
+  "generated_at": "2026-04-01T22:07:32.349648Z",
+  "recipe_path": "data/transport_layers/japan_airport/source_recipe.manual.json",
+  "paths": {
+    "preview": {
+      "airports": "data/transport_layers/japan_airport/airports.preview.geojson"
+    },
+    "full": {
+      "airports": "data/transport_layers/japan_airport/airports.geojson"
+    },
+    "build_audit": "data/transport_layers/japan_airport/build_audit.json"
+  },
+  "source_signature": {
+    "mlit_c28_2021_airports": {
+      "filename": "C28-21_Airport.geojson",
+      "size_bytes": 300750,
+      "sha256": "ac75cd6765324d0714a7e6cadc5ade29d117a9ae20743083ba017bc0881280be"
+    },
+    "mlit_c28_2021_reference_points": {
+      "filename": "C28-21_AirportReferencePoint.geojson",
+      "size_bytes": 13695,
+      "sha256": "bd45da15f66829cde6fa31f670eb08910a9849a36de3c0da3ebb0551f8c8428a"
+    },
+    "mlit_c28_2021_survey_content": {
+      "filename": "C28-21_SurveyContent.geojson",
+      "size_bytes": 750984,
+      "sha256": "004e0544c5f9eafb328c297d48eaeb8889aa2c6a0185b19cc850fce4efa19f77"
+    }
+  },
+  "recipe_version": "japan_airport_sources_v1",
+  "feature_counts": {
+    "preview": {
+      "airports": 68
+    },
+    "full": {
+      "airports": 75
+    }
+  },
+  "clip_bbox": [
+    129.0,
+    30.75,
+    145.824962,
+    45.520413
+  ],
+  "build_command": "python tools/build_transport_workbench_japan_airports.py",
+  "runtime_consumer": "transport_workbench_airport_preview",
+  "source_policy": "local_source_cache_only",
+  "official_airport_member": "UTF-8/C28-21_Airport.geojson",
+  "official_reference_member": "UTF-8/C28-21_AirportReferencePoint.geojson",
+  "official_survey_member": "UTF-8/C28-21_SurveyContent.geojson",
+  "official_encoding": "utf-8",
+  "text_policy": {
+    "storage_encoding": "utf-8",
+    "display_fields_preserve_original": true,
+    "match_key_normalization": "NFKC + whitespace collapse + casefold"
+  },
+  "scope_policy": "japan_corridor_main_islands"
+}

@@ -75,7 +75,7 @@
         "source": "official_jp",
         "station_code": "000794",
         "group_code": "000792",
-        "linked_line_classes": "high_speed|trunk"
+        "linked_line_classes": "branch|high_speed|trunk"
       },
       "geometry": {
         "type": "Point",
@@ -96,7 +96,7 @@
         "source": "official_jp",
         "station_code": "001183",
         "group_code": "001177",
-        "linked_line_classes": "branch|high_speed|trunk"
+        "linked_line_classes": "high_speed|service|trunk"
       },
       "geometry": {
         "type": "Point",
@@ -159,7 +159,7 @@
         "source": "official_jp",
         "station_code": "001372",
         "group_code": "001373",
-        "linked_line_classes": "high_speed|trunk"
+        "linked_line_classes": "branch|high_speed|trunk"
       },
       "geometry": {
         "type": "Point",
@@ -180,7 +180,7 @@
         "source": "official_jp",
         "station_code": "001925",
         "group_code": "001925",
-        "linked_line_classes": "high_speed|trunk"
+        "linked_line_classes": "branch|high_speed|trunk"
       },
       "geometry": {
         "type": "Point",
@@ -201,7 +201,7 @@
         "source": "official_jp",
         "station_code": "002030",
         "group_code": "002031",
-        "linked_line_classes": "high_speed|trunk"
+        "linked_line_classes": "branch|high_speed|trunk"
       },
       "geometry": {
         "type": "Point",
@@ -222,7 +222,7 @@
         "source": "official_jp",
         "station_code": "002092",
         "group_code": "002092",
-        "linked_line_classes": "high_speed|trunk"
+        "linked_line_classes": "branch|high_speed"
       },
       "geometry": {
         "type": "Point",
@@ -285,7 +285,7 @@
         "source": "official_jp",
         "station_code": "002320",
         "group_code": "002319",
-        "linked_line_classes": "trunk"
+        "linked_line_classes": "branch|trunk"
       },
       "geometry": {
         "type": "Point",
@@ -306,7 +306,7 @@
         "source": "official_jp",
         "station_code": "002688",
         "group_code": "002688",
-        "linked_line_classes": "high_speed|trunk"
+        "linked_line_classes": "branch|high_speed"
       },
       "geometry": {
         "type": "Point",
@@ -327,7 +327,7 @@
         "source": "official_jp",
         "station_code": "002906",
         "group_code": "002914",
-        "linked_line_classes": "branch|high_speed|trunk"
+        "linked_line_classes": "high_speed|service|trunk"
       },
       "geometry": {
         "type": "Point",
@@ -390,7 +390,7 @@
         "source": "official_jp",
         "station_code": "004173",
         "group_code": "004173",
-        "linked_line_classes": "branch|trunk"
+        "linked_line_classes": "service|trunk"
       },
       "geometry": {
         "type": "Point",
@@ -516,7 +516,7 @@
         "source": "official_jp",
         "station_code": "005449",
         "group_code": "005451",
-        "linked_line_classes": "high_speed|trunk"
+        "linked_line_classes": "branch|high_speed|trunk"
       },
       "geometry": {
         "type": "Point",
@@ -600,7 +600,7 @@
         "source": "official_jp",
         "station_code": "006906",
         "group_code": "006905",
-        "linked_line_classes": "trunk"
+        "linked_line_classes": "branch|trunk"
       },
       "geometry": {
         "type": "Point",
@@ -621,7 +621,7 @@
         "source": "official_jp",
         "station_code": "006911",
         "group_code": "006911",
-        "linked_line_classes": "branch|high_speed|trunk"
+        "linked_line_classes": "high_speed|service|trunk"
       },
       "geometry": {
         "type": "Point",
@@ -768,7 +768,7 @@
         "source": "official_jp",
         "station_code": "008476",
         "group_code": "008476",
-        "linked_line_classes": "branch|high_speed|trunk"
+        "linked_line_classes": "high_speed|service|trunk"
       },
       "geometry": {
         "type": "Point",

@@ -2,8 +2,27 @@
   "schema_version": 1,
   "notes": [
     "Keep this file small and versioned. Only add product-level corrections that official N02 rail-type codes cannot express cleanly.",
-    "Keys may be stored in either line_class_by_name or line_class_by_match_key. Both are normalized to NFKC + whitespace collapse + casefold at build time."
+    "Names are normalized to NFKC + whitespace collapse + casefold at build time.",
+    "Urban rail modes stay in service unless a stricter product correction is listed here.",
+    "Third-sector heavy rail that still behaves like regional rail is corrected through operator_type:rail_type pairs."
   ],
   "line_class_by_name": {},
-  "line_class_by_match_key": {}
+  "line_class_by_match_key": {},
+  "line_class_by_rail_type_code": {
+    "13": "service",
+    "14": "service",
+    "15": "service",
+    "16": "service",
+    "17": "service",
+    "21": "service",
+    "22": "service",
+    "23": "service",
+    "24": "service",
+    "25": "high_speed"
+  },
+  "line_class_by_operator_type_code": {},
+  "line_class_by_operator_type_and_rail_type_code": {
+    "5:11": "branch",
+    "5:12": "branch"
+  }
 }

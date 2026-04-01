@@ -1,0 +1,82 @@
+[
+  {
+    "subtype_id": "general_hydroelectric_power_plant",
+    "availability": "local",
+    "feature_count": 93,
+    "group": "power_plant",
+    "distribution_tier": "internal_only",
+    "source_status": "official_local"
+  },
+  {
+    "subtype_id": "geothermal_power_plant",
+    "availability": "local",
+    "feature_count": 15,
+    "group": "power_plant",
+    "distribution_tier": "internal_only",
+    "source_status": "official_local"
+  },
+  {
+    "subtype_id": "nuclear_power_plant",
+    "availability": "local",
+    "feature_count": 62,
+    "group": "power_plant",
+    "distribution_tier": "internal_only",
+    "source_status": "official_local"
+  },
+  {
+    "subtype_id": "photovoltaic_power_plant",
+    "availability": "local",
+    "feature_count": 1,
+    "group": "power_plant",
+    "distribution_tier": "internal_only",
+    "source_status": "official_local"
+  },
+  {
+    "subtype_id": "pumped_storage_hydroelectric_power_plant",
+    "availability": "local",
+    "feature_count": 46,
+    "group": "power_plant",
+    "distribution_tier": "internal_only",
+    "source_status": "official_local"
+  },
+  {
+    "subtype_id": "thermal_power_plant",
+    "availability": "local",
+    "feature_count": 267,
+    "group": "power_plant",
+    "distribution_tier": "internal_only",
+    "source_status": "official_local"
+  },
+  {
+    "subtype_id": "wind_power_plant",
+    "availability": "local",
+    "feature_count": 6,
+    "group": "power_plant",
+    "distribution_tier": "internal_only",
+    "source_status": "official_local"
+  },
+  {
+    "subtype_id": "lng_terminal",
+    "availability": "reference_only",
+    "feature_count": 0,
+    "group": "energy_terminal",
+    "distribution_tier": "reference_only",
+    "source_status": "pending_source_review"
+  },
+  {
+    "subtype_id": "oil_storage",
+    "availability": "reference_only",
+    "feature_count": 0,
+    "group": "hydrocarbon_storage",
+    "distribution_tier": "reference_only",
+    "source_status": "pending_source_review"
+  },
+  {
+    "subtype_id": "refinery",
+    "availability": "reference_only",
+    "feature_count": 0,
+    "group": "hydrocarbon_processing",
+    "distribution_tier": "reference_only",
+    "source_status": "pending_source_review"
+  }
+]

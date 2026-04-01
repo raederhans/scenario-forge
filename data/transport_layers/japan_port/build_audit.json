@@ -1,0 +1,39 @@
+{
+  "generated_at": "2026-04-01T22:10:03.224639Z",
+  "adapter_id": "japan_port_v1",
+  "raw_port_feature_count": 317,
+  "normalized_port_count": 12,
+  "legal_designation_counts": {
+    "11": 0,
+    "12": 0,
+    "13": 12
+  },
+  "manager_type_counts": {
+    "1": 10,
+    "2": 2
+  },
+  "importance_counts": {
+    "national_core": 0,
+    "regional_core": 12
+  },
+  "recipe_version": "japan_port_sources_v1",
+  "source_policy": "local_source_cache_only_internal_trial",
+  "text_policy": {
+    "storage_encoding": "utf-8",
+    "display_fields_preserve_original": true,
+    "source_fallback_encoding": "cp932",
+    "match_key_normalization": "NFKC + whitespace collapse + casefold"
+  },
+  "source_signature": {
+    "mlit_c02_2014_ports": {
+      "filename": "C02-14-g_PortAndHarbor.shp",
+      "size_bytes": 27932,
+      "sha256": "0186c00463256339ecd9502e93abef459ad2c8b0f73ad367b0090d206c26baea"
+    }
+  },
+  "notes": [
+    "Only 国際戦略港湾, 国際拠点港湾, and 重要港湾 survive this first runtime pack.",
+    "The current C02 source is kept for internal trial use only. Public or commercial release must replace or re-license the source path first.",
+    "Port district polygons and harbor district boundaries remain out of scope for v1."
+  ]
+}

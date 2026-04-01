@@ -1,0 +1,75 @@
+{
+  "version": "japan_industrial_zones_sources_v2",
+  "family": "industrial_zones",
+  "country": "Japan",
+  "generated_policy": "local_source_cache_with_download",
+  "notes": [
+    "This family is polygon-native and stays polygon-native.",
+    "The internal variant is built from official MLIT L05 industrial land polygons.",
+    "The open variant is built from OSM industrial land polygons and stays source-separated from L05."
+  ],
+  "encoding_policy": {
+    "display_fields_encoding": "utf-8",
+    "source_fallback_encoding": "cp932",
+    "match_key_normalization": "NFKC",
+    "display_fields_preserve_original_text": true
+  },
+  "sources": [
+    {
+      "id": "mlit_l05_industrial_complex",
+      "kind": "download_many",
+      "role": "polygon_primary_internal",
+      "url": "https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-L05.html",
+      "expected_filename_pattern": "L05-1-09_XX_GML.zip",
+      "preferred_member_pattern": "L05-1-09_XX-g_IndustrialComplex.shp",
+      "license": "MLIT land numerical information terms; internal-first distribution review required",
+      "ingest_mode": "local_file",
+      "encoding": "cp932"
+    },
+    {
+      "id": "mlit_l05_isolated_industrial_site",
+      "kind": "download_many",
+      "role": "polygon_enrichment_internal",
+      "url": "https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-L05.html",
+      "expected_filename_pattern": "L05-2-09_XX_GML.zip",
+      "preferred_member_pattern": "L05-2-09_XX-g_IsolatedIndustrialSite.shp",
+      "license": "MLIT land numerical information terms; internal-first distribution review required",
+      "ingest_mode": "local_file",
+      "encoding": "cp932"
+    },
+    {
+      "id": "osm_industrial_landuse",
+      "kind": "download_many",
+      "role": "polygon_open_variant",
+      "url": "https://download.geofabrik.de/asia/japan.html",
+      "expected_filename_pattern": "<region>-latest-free.shp.zip",
+      "preferred_member_pattern": "gis_osm_landuse_a_free_1.*",
+      "license": "OpenStreetMap ODbL via Geofabrik regional shapefile extracts",
+      "ingest_mode": "local_file",
+      "encoding": "utf-8"
+    },
+    {
+      "id": "osm_industrial_works",
+      "kind": "download_many_optional",
+      "role": "polygon_open_variant_enrichment",
+      "url": "https://download.geofabrik.de/asia/japan.html",
+      "expected_filename_pattern": "<region>-latest-free.shp.zip",
+      "preferred_member_pattern": "gis_osm_pois_a_free_1.*",
+      "license": "OpenStreetMap ODbL via Geofabrik regional shapefile extracts",
+      "ingest_mode": "local_file",
+      "encoding": "utf-8"
+    }
+  ],
+  "output_contract": {
+    "publish": [
+      "industrial_zones.internal.geojson",
+      "industrial_zones.internal.preview.geojson",
+      "industrial_zones.open.geojson",
+      "industrial_zones.open.preview.geojson",
+      "manifest.json",
+      "build_audit.json"
+    ],
+    "runtime_consumer": "transport_workbench_manifest_preview",
+    "adapter_id": "japan_industrial_zones_v2"
+  }
+}

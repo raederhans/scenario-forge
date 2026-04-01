@@ -69,6 +69,18 @@ import {
 } from "./transport_workbench_family_preview.js";
 import { formatJapanRailVisibilityReason } from "./transport_workbench_rail_preview.js";
 
+const TRANSPORT_WORKBENCH_MANIFEST_ONLY_FAMILIES = new Set([
+  "mineral_resources",
+  "energy_facilities",
+  "industrial_zones",
+]);
+const TRANSPORT_WORKBENCH_LIVE_PREVIEW_FAMILIES = new Set([
+  "road",
+  "rail",
+  "airport",
+  "port",
+]);
+
 const TRANSPORT_WORKBENCH_FAMILIES = [
   {
     id: "road",
@@ -115,82 +127,84 @@ const TRANSPORT_WORKBENCH_FAMILIES = [
     lensBody: "Japan rail baseline uses the official active network with OSM lifecycle and gap patches.",
     lensNext: "Scope stays on railways and major stations. No full station product, routing, timetable, or heavy operations metrics.",
     previewTitle: "Rail carrier",
-    previewCaption: "The Japan carrier now accepts real rail packs when they exist. Until the Japan rail manifest lands, this pass keeps status, class, and major-station rules ready without fabricating geometry.",
+    previewCaption: "The Japan carrier now renders the real rail pack and keeps national trunk lines visually ahead of city-scale service rail.",
     inspectorTitle: "Rail inspector",
     inspectorBody: "This side switches to real Japan rail line and station inspection as soon as the deferred packs exist. Until then it reports the pending contract instead of inventing sample data.",
-    inspectorEmptyTitle: "Waiting for real rail packs",
-    inspectorEmptyBody: "Once railways and rail_stations_major Japan packs are wired, this side will inspect real lines and major stations.",
+    inspectorEmptyTitle: "No rail feature selected",
+    inspectorEmptyBody: "Click a rail line or major station in the carrier to inspect the real source, class, and station importance data.",
     supportsDetailedControls: true,
   },
   {
     id: "airport",
     label: "Airport",
-    title: "Airport workbench shell",
+    title: "Airport workbench",
     lensTitle: "Airport facility lens",
-    lensBody: "Airport gets its own shell now so later facility review can stay separate from corridor families and focus on site-level semantics.",
-    lensNext: "Airport can reuse the same shell chrome once road proves the first real inspector and preview loop.",
-    previewTitle: "Static airport carrier",
-    previewCaption: "The single-frame Japan carrier is now real, but airport markers are still withheld until the airport schema is defined.",
-    inspectorTitle: "Airport controls reserved",
-    inspectorBody: "The inspector is intentionally placeholder-only until real airport categories, symbology, and application logic are decided.",
-    inspectorEmptyTitle: "Awaiting airport schema",
-    inspectorEmptyBody: "Future airport work will connect facility classes, label logic, and site application controls here.",
+    lensBody: "Airport now runs on the official C28 source and stays anchored to official airport reference points.",
+    lensNext: "The first live airport pass stays on facility points only. Routes, terminals, and remote outer-island scope remain out of v1.",
+    previewTitle: "Airport carrier",
+    previewCaption: "The carrier now shows real Japan airport points with official class, status, and importance filters.",
+    inspectorTitle: "Airport inspector",
+    inspectorBody: "The inspector now reads directly from the live Japan airport pack and preserves the original Japanese source fields.",
+    inspectorEmptyTitle: "No airport selected",
+    inspectorEmptyBody: "Click an airport point or label in the carrier to inspect the live source attributes.",
+    supportsDetailedControls: true,
   },
   {
     id: "port",
     label: "Port",
-    title: "Port workbench shell",
+    title: "Port workbench",
     lensTitle: "Port facility lens",
-    lensBody: "Port remains a separate family shell so maritime facilities can later be tuned without mixing corridor and node semantics.",
-    lensNext: "Port should connect only after the first shared facility conventions are agreed from airport or another node-based family.",
-    previewTitle: "Static port carrier",
-    previewCaption: "The single-frame Japan carrier is now real, but port symbols and maritime overlays remain empty until the real family wire exists.",
-    inspectorTitle: "Port controls reserved",
-    inspectorBody: "No fabricated port values appear here. The inspector will open up only after the true schema is in place.",
-    inspectorEmptyTitle: "Awaiting port schema",
-    inspectorEmptyBody: "Once connected, this side will host port class, visibility, and application controls.",
+    lensBody: "Port now runs on the official C02 node source with explicit CP932 ingestion and internal-trial-only governance.",
+    lensNext: "The first live port pass stays on major legal designations only. Harbor polygons and district boundaries remain out of v1.",
+    previewTitle: "Port carrier",
+    previewCaption: "The carrier now shows real major port nodes with legal designation and manager filters.",
+    inspectorTitle: "Port inspector",
+    inspectorBody: "The inspector now reads directly from the live Japan port pack and keeps internal-trial release constraints visible.",
+    inspectorEmptyTitle: "No port selected",
+    inspectorEmptyBody: "Click a port point or label in the carrier to inspect the live source attributes.",
+    supportsDetailedControls: true,
   },
   {
     id: "mineral_resources",
     label: "Mineral Resources",
-    title: "Mineral resource workbench shell",
+    title: "Mineral resource workbench",
     lensTitle: "Mineral resource lens",
-    lensBody: "Mineral resources stay separate from transport corridors so extraction and facility semantics can be designed on their own terms.",
-    lensNext: "This family should attach after the first corridor or facility shell proves the inspector and preview pipeline.",
-    previewTitle: "Static mineral carrier",
-    previewCaption: "The single-frame Japan carrier is now real, but mine sites and resource overlays remain empty until the eventual real schema exists.",
-    inspectorTitle: "Mineral controls reserved",
-    inspectorBody: "The inspector is intentionally empty until the real mineral resource attributes and application rules are agreed.",
-    inspectorEmptyTitle: "Awaiting mineral schema",
-    inspectorEmptyBody: "Future work will attach extraction-site filters, preview logic, and map application controls here.",
+    lensBody: "Mineral resources now carry a governed local pack built from the GSJ mine distribution source and clipped to the Japan four-islands carrier mask.",
+    lensNext: "This family is metadata-first in the workbench for now. The inspector reports pack governance, counts, encoding, and build audit instead of inventing density or importance rules.",
+    previewTitle: "Mineral pack status",
+    previewCaption: "The carrier stays clean while the inspector exposes real mineral pack metadata, source lineage, and four-islands clipping results.",
+    inspectorTitle: "Mineral pack inspector",
+    inspectorBody: "This side reports the real mineral pack contract, encoding, counts, and audit instead of pretending a site-level renderer already exists.",
+    inspectorEmptyTitle: "Mineral metadata ready",
+    inspectorEmptyBody: "Use the inspector to verify governance, source lineage, and pack counts while the geometry renderer stays deferred.",
   },
   {
     id: "energy_facilities",
     label: "Energy Facilities",
-    title: "Energy facility workbench shell",
+    title: "Energy facility workbench",
     lensTitle: "Energy facility lens",
-    lensBody: "Energy facilities need their own family shell because they behave like infrastructure nodes, not transport corridors.",
-    lensNext: "This slot is ready for later power and energy-site tuning once the first shared facility inspector pattern is stable.",
-    previewTitle: "Static energy carrier",
-    previewCaption: "The single-frame Japan carrier is now real, but plants, grids, and energy overlays stay hidden until a real schema is wired.",
-    inspectorTitle: "Energy controls reserved",
-    inspectorBody: "This side remains honest and empty until true energy-facility parameters exist.",
-    inspectorEmptyTitle: "Awaiting energy schema",
-    inspectorEmptyBody: "After the schema is confirmed, this inspector can host facility type, visibility, and application controls.",
+    lensBody: "Energy facilities now expose a governed local pack for official MLIT power-plant subtypes while broader energy categories stay split out as reference-only.",
+    lensNext: "The workbench stays metadata-first here too. The inspector shows subtype availability, distribution tier, encoding, and audit counts before any full site renderer is approved.",
+    previewTitle: "Energy pack status",
+    previewCaption: "The carrier stays neutral while the inspector exposes real local subtypes and keeps unverified energy categories out of the map pack.",
+    inspectorTitle: "Energy pack inspector",
+    inspectorBody: "This side reports the real energy pack contract and subtype catalog so local and reference-only categories stay clearly separated.",
+    inspectorEmptyTitle: "Energy metadata ready",
+    inspectorEmptyBody: "Use the inspector to verify which energy subtypes are local now and which still require source review.",
   },
   {
     id: "industrial_zones",
     label: "Industrial Zones",
-    title: "Industrial zone workbench shell",
+    title: "Industrial zone workbench",
     lensTitle: "Industrial zone lens",
-    lensBody: "Industrial zones need a reserved shell because they will likely mix area-based preview rules with facility-style debugging.",
-    lensNext: "This family should connect only after the first transport and first node-based family validate the shared workbench behavior.",
-    previewTitle: "Static industrial carrier",
-    previewCaption: "The single-frame Japan carrier is now real, but guessed industrial footprints and counts are still excluded until the industrial schema is confirmed.",
-    inspectorTitle: "Industrial controls reserved",
-    inspectorBody: "This inspector stays empty until the actual industrial-zone schema and application logic are defined.",
-    inspectorEmptyTitle: "Awaiting industrial schema",
-    inspectorEmptyBody: "Later work can attach area-class controls, preview rules, and application controls here.",
+    lensBody: "Industrial zones are now governed as a pending polygon family with a real source recipe but no fabricated local pack.",
+    lensNext: "The workbench reports that pending state explicitly so L05 can land later without backfilling guessed polygons, centroids, or fake counts.",
+    previewTitle: "Industrial pack status",
+    previewCaption: "The carrier keeps industrial overlays hidden until a verified L05 local source sample is present and a polygon-native build is approved.",
+    inspectorTitle: "Industrial pack inspector",
+    inspectorBody: "This side reports the pending contract honestly. No industrial geometry is invented before the official local source is verified.",
+    inspectorEmptyTitle: "Industrial source pending",
+    inspectorEmptyBody: "Once the verified L05 source lands in the local cache, this family can move from governance-only into a real polygon pack.",
   },
   {
     id: "layers",
@@ -236,6 +250,35 @@ const RAIL_CLASS_OPTIONS = [
   { value: "trunk", label: "Trunk" },
   { value: "branch", label: "Branch" },
   { value: "service", label: "Service" },
+];
+
+const AIRPORT_TYPE_OPTIONS = [
+  { value: "company_managed", label: "Company managed" },
+  { value: "national", label: "National" },
+  { value: "specific_local", label: "Specific local" },
+  { value: "local", label: "Local" },
+  { value: "other", label: "Other" },
+  { value: "shared", label: "Shared" },
+];
+
+const AIRPORT_STATUS_OPTIONS = [
+  { value: "active", label: "Active" },
+  { value: "paused", label: "Paused" },
+  { value: "unknown", label: "Unknown" },
+];
+
+const PORT_DESIGNATION_OPTIONS = [
+  { value: "international_strategy", label: "International strategy" },
+  { value: "international_hub", label: "International hub" },
+  { value: "important", label: "Important" },
+];
+
+const PORT_MANAGER_TYPE_OPTIONS = [
+  { value: "1", label: "Prefecture" },
+  { value: "2", label: "Municipality" },
+  { value: "3", label: "Port authority" },
+  { value: "4", label: "Joint authority" },
+  { value: "5", label: "Other" },
 ];
 
 const TRANSPORT_WORKBENCH_DEFAULT_CONFIGS = {
@@ -285,11 +328,27 @@ const TRANSPORT_WORKBENCH_DEFAULT_CONFIGS = {
     stationOpacity: 86,
     inactiveFadeStrength: 72,
   },
+  airport: {
+    airportTypes: AIRPORT_TYPE_OPTIONS.map((option) => option.value),
+    statuses: ["active", "paused"],
+    importanceThreshold: "regional_core",
+    showLabels: true,
+    baseOpacity: 90,
+  },
+  port: {
+    legalDesignations: PORT_DESIGNATION_OPTIONS.map((option) => option.value),
+    managerTypes: PORT_MANAGER_TYPE_OPTIONS.map((option) => option.value),
+    importanceThreshold: "regional_core",
+    showLabels: true,
+    baseOpacity: 90,
+  },
 };
 
 const TRANSPORT_WORKBENCH_BASELINE_CONFIGS = {
   road: JSON.parse(JSON.stringify(TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.road)),
   rail: JSON.parse(JSON.stringify(TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.rail)),
+  airport: JSON.parse(JSON.stringify(TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.airport)),
+  port: JSON.parse(JSON.stringify(TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.port)),
 };
 
 const TRANSPORT_WORKBENCH_SECTION_DEFAULTS = {
@@ -306,6 +365,18 @@ const TRANSPORT_WORKBENCH_SECTION_DEFAULTS = {
     source_reconciliation: true,
     major_stations: false,
     line_presentation: false,
+    style: false,
+    diagnostics: false,
+  },
+  airport: {
+    facility_scope: true,
+    visibility: true,
+    style: false,
+    diagnostics: false,
+  },
+  port: {
+    facility_scope: true,
+    visibility: true,
     style: false,
     diagnostics: false,
   },
@@ -387,8 +458,8 @@ const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
     packs: ["mineral_resources"],
     geometrySource: "Official mineral resource distribution point source",
     hardeningSource: "Manual resource class normalization",
-    governance: "Deferred point pack aligned to the cityPoints-style facility chain.",
-    pendingStatus: "Waiting for mineral_resources Japan pack",
+    governance: "Local static pack with UTF-8 storage, CP932 source decode, explicit four-islands clipping, and repo-versioned class normalization.",
+    pendingStatus: "Waiting for mineral_resources Japan pack manifest",
   },
   energy_facilities: {
     country: "Japan",
@@ -397,8 +468,8 @@ const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
     packs: ["energy_facilities"],
     geometrySource: "Official energy facility point source",
     hardeningSource: "Facility subtype and status normalization",
-    governance: "Deferred point pack aligned to the cityPoints-style facility chain.",
-    pendingStatus: "Waiting for energy_facilities Japan pack",
+    governance: "Local static pack for verified MLIT power-plant subtypes, with broader energy categories kept in a reference-only subtype catalog until their source chain is approved.",
+    pendingStatus: "Waiting for energy_facilities Japan pack manifest",
   },
   industrial_zones: {
     country: "Japan",
@@ -407,8 +478,8 @@ const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
     packs: ["industrial_zones"],
     geometrySource: "Official industrial land / zone polygons",
     hardeningSource: "Polygon simplification and context-layer style diagnostics",
-    governance: "Deferred polygon pack that should stay on the existing context/polygon render path instead of pointifying zones.",
-    pendingStatus: "Waiting for industrial_zones Japan pack",
+    governance: "Governance-only source recipe for now. The first real build must stay polygon-native and must fail if the verified L05 local source sample is absent.",
+    pendingStatus: "Waiting for verified L05 local source and industrial_zones manifest",
   },
 };
 
@@ -498,6 +569,28 @@ function normalizeRailTransportWorkbenchConfig(value) {
   };
 }
 
+function normalizeAirportTransportWorkbenchConfig(value) {
+  const source = value && typeof value === "object" ? value : {};
+  return {
+    airportTypes: normalizeTransportWorkbenchMulti(source.airportTypes, AIRPORT_TYPE_OPTIONS.map((option) => option.value), TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.airport.airportTypes),
+    statuses: normalizeTransportWorkbenchMulti(source.statuses, AIRPORT_STATUS_OPTIONS.map((option) => option.value), TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.airport.statuses),
+    importanceThreshold: normalizeTransportWorkbenchEnum(source.importanceThreshold, ["national_core", "regional_core", "local_connector"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.airport.importanceThreshold),
+    showLabels: source.showLabels !== false,
+    baseOpacity: Math.max(35, Math.min(100, Number(source.baseOpacity) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.airport.baseOpacity)),
+  };
+}
+
+function normalizePortTransportWorkbenchConfig(value) {
+  const source = value && typeof value === "object" ? value : {};
+  return {
+    legalDesignations: normalizeTransportWorkbenchMulti(source.legalDesignations, PORT_DESIGNATION_OPTIONS.map((option) => option.value), TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.port.legalDesignations),
+    managerTypes: normalizeTransportWorkbenchMulti(source.managerTypes, PORT_MANAGER_TYPE_OPTIONS.map((option) => option.value), TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.port.managerTypes),
+    importanceThreshold: normalizeTransportWorkbenchEnum(source.importanceThreshold, ["national_core", "regional_core"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.port.importanceThreshold),
+    showLabels: source.showLabels !== false,
+    baseOpacity: Math.max(35, Math.min(100, Number(source.baseOpacity) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.port.baseOpacity)),
+  };
+}
+
 function ensureTransportWorkbenchUiState() {
   if (!state.transportWorkbenchUi || typeof state.transportWorkbenchUi !== "object") {
     state.transportWorkbenchUi = {};
@@ -521,6 +614,8 @@ function ensureTransportWorkbenchUiState() {
   }
   state.transportWorkbenchUi.familyConfigs.road = normalizeRoadTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.road);
   state.transportWorkbenchUi.familyConfigs.rail = normalizeRailTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.rail);
+  state.transportWorkbenchUi.familyConfigs.airport = normalizeAirportTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.airport);
+  state.transportWorkbenchUi.familyConfigs.port = normalizePortTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.port);
   ["airport", "port", "mineral_resources", "energy_facilities", "industrial_zones"].forEach((familyId) => {
     if (!state.transportWorkbenchUi.familyConfigs[familyId] || typeof state.transportWorkbenchUi.familyConfigs[familyId] !== "object") {
       state.transportWorkbenchUi.familyConfigs[familyId] = {};
@@ -529,7 +624,7 @@ function ensureTransportWorkbenchUiState() {
   if (!state.transportWorkbenchUi.sectionOpen || typeof state.transportWorkbenchUi.sectionOpen !== "object") {
     state.transportWorkbenchUi.sectionOpen = {};
   }
-  ["road", "rail"].forEach((familyId) => {
+  ["road", "rail", "airport", "port"].forEach((familyId) => {
     const defaults = TRANSPORT_WORKBENCH_SECTION_DEFAULTS[familyId];
     const source = state.transportWorkbenchUi.sectionOpen[familyId] && typeof state.transportWorkbenchUi.sectionOpen[familyId] === "object"
       ? state.transportWorkbenchUi.sectionOpen[familyId]
@@ -549,8 +644,8 @@ function resetTransportWorkbenchSectionState() {
   state.transportWorkbenchUi.sectionOpen = {
     road: { ...TRANSPORT_WORKBENCH_SECTION_DEFAULTS.road },
     rail: { ...TRANSPORT_WORKBENCH_SECTION_DEFAULTS.rail },
-    airport: {},
-    port: {},
+    airport: { ...TRANSPORT_WORKBENCH_SECTION_DEFAULTS.airport },
+    port: { ...TRANSPORT_WORKBENCH_SECTION_DEFAULTS.port },
     mineral_resources: {},
     energy_facilities: {},
     industrial_zones: {},
@@ -713,6 +808,71 @@ const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = {
     },
     { key: "diagnostics", title: "Diagnostics", description: "Explain reconciliation intent only. Do not fabricate pack statistics.", kind: "diagnostics" },
   ],
+  airport: [
+    {
+      key: "facility_scope",
+      title: "Facility Scope",
+      description: "Keep the first airport pass deterministic and point-only.",
+      controls: [
+        { type: "multi", key: "airportTypes", label: "Airport types", options: AIRPORT_TYPE_OPTIONS, description: "Select which official airport classes remain visible." },
+        { type: "multi", key: "statuses", label: "Statuses", options: AIRPORT_STATUS_OPTIONS, description: "Filter airport status using normalized official status categories." },
+        { type: "select", key: "importanceThreshold", label: "Importance threshold", description: "Hide lower-importance airports before render.", options: [
+          { value: "national_core", label: "National core" },
+          { value: "regional_core", label: "Regional core" },
+          { value: "local_connector", label: "Local connector" },
+        ] },
+      ],
+    },
+    {
+      key: "visibility",
+      title: "Visibility",
+      description: "Keep label reveal simple and intentional.",
+      controls: [
+        { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose airport names only when the current zoom can carry them cleanly." },
+      ],
+    },
+    {
+      key: "style",
+      title: "Style",
+      description: "These controls style only the airport overlay shell.",
+      controls: [
+        { type: "range", key: "baseOpacity", label: "Base opacity", description: "Overall airport point opacity.", min: 35, max: 100, step: 1, unit: "%" },
+      ],
+    },
+    { key: "diagnostics", title: "Diagnostics", description: "Expose airport adapter intent and pack status only.", kind: "diagnostics" },
+  ],
+  port: [
+    {
+      key: "facility_scope",
+      title: "Facility Scope",
+      description: "Keep the first port pass on major legal designations only.",
+      controls: [
+        { type: "multi", key: "legalDesignations", label: "Legal designations", options: PORT_DESIGNATION_OPTIONS, description: "Select which official port legal classes remain visible." },
+        { type: "multi", key: "managerTypes", label: "Manager types", options: PORT_MANAGER_TYPE_OPTIONS, description: "Filter by official manager type code." },
+        { type: "select", key: "importanceThreshold", label: "Importance threshold", description: "Hide lower-importance ports before render.", options: [
+          { value: "national_core", label: "National core" },
+          { value: "regional_core", label: "Regional core" },
+        ] },
+      ],
+    },
+    {
+      key: "visibility",
+      title: "Visibility",
+      description: "Keep port names gated by the current zoom and importance.",
+      controls: [
+        { type: "toggle", key: "showLabels", label: "Show labels", description: "Expose port names only when the current zoom can carry them cleanly." },
+      ],
+    },
+    {
+      key: "style",
+      title: "Style",
+      description: "These controls style only the port overlay shell.",
+      controls: [
+        { type: "range", key: "baseOpacity", label: "Base opacity", description: "Overall port point opacity.", min: 35, max: 100, step: 1, unit: "%" },
+      ],
+    },
+    { key: "diagnostics", title: "Diagnostics", description: "Expose port adapter intent and release constraints only.", kind: "diagnostics" },
+  ],
 };
 
 function renderPalette(themeName) {
@@ -825,6 +985,8 @@ function initToolbar({ render } = {}) {
   const toggleUrban = document.getElementById("toggleUrban");
   const togglePhysical = document.getElementById("togglePhysical");
   const toggleRivers = document.getElementById("toggleRivers");
+  const toggleAirports = document.getElementById("toggleAirports");
+  const togglePorts = document.getElementById("togglePorts");
   const toggleCityPoints = document.getElementById("toggleCityPoints");
   const toggleWaterRegions = document.getElementById("toggleWaterRegions");
   const toggleOpenOceanRegions = document.getElementById("toggleOpenOceanRegions");
@@ -1487,12 +1649,67 @@ function initToolbar({ render } = {}) {
     }
     if (familyId === "road") return state.transportWorkbenchUi.familyConfigs.road;
     if (familyId === "rail") return state.transportWorkbenchUi.familyConfigs.rail;
+    if (familyId === "airport") return state.transportWorkbenchUi.familyConfigs.airport;
+    if (familyId === "port") return state.transportWorkbenchUi.familyConfigs.port;
     return null;
   };
 
   const formatTransportWorkbenchOptionLabels = (values, options) => {
     const labelByValue = new Map((options || []).map((option) => [option.value, option.label]));
     return (values || []).map((value) => labelByValue.get(value) || value).join(", ");
+  };
+
+  const formatTransportWorkbenchManifestTimestamp = (value) => {
+    const text = String(value || "").trim();
+    if (!text) return "unknown";
+    return text.replace("T", " ").replace("Z", " UTC");
+  };
+
+  const buildManifestOnlyInspectorRows = (family, previewSnapshot, dataContract) => {
+    if (previewSnapshot?.status === "error") {
+      return [
+        ["Pack status", `${family.label} pack failed to load`],
+        ["Error", previewSnapshot.error || "Unknown error"],
+        ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+      ];
+    }
+    if (previewSnapshot?.status !== "ready") {
+      return [
+        ["Adapter", dataContract?.adapterId || `japan_${family.id}_v1`],
+        ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+        ["Pack status", previewSnapshot?.status === "pending" ? (dataContract?.pendingStatus || `Waiting for ${family.label} Japan pack`) : `Loading ${family.label} Japan pack`],
+      ];
+    }
+
+    const manifest = previewSnapshot.manifest || {};
+    const audit = previewSnapshot.audit || {};
+    const previewCounts = manifest?.feature_counts?.preview || {};
+    const fullCounts = manifest?.feature_counts?.full || {};
+    const rows = [
+      ["Pack version", manifest.adapter_id || dataContract?.adapterId || `japan_${family.id}_v1`],
+      ["Recipe version", manifest.recipe_version || audit.recipe_version || "unknown"],
+      ["Distribution tier", manifest.distribution_tier || "unknown"],
+      ["License tier", manifest.license_tier || "unknown"],
+      ["Coverage scope", manifest.coverage_scope || "unknown"],
+      ["Source policy", manifest.source_policy || "unknown"],
+      ["Last build", formatTransportWorkbenchManifestTimestamp(manifest.generated_at)],
+      ["Preview features", JSON.stringify(previewCounts || {})],
+      ["Full features", JSON.stringify(fullCounts || {})],
+    ];
+
+    if (Array.isArray(previewSnapshot?.subtypeCatalog) && family.id === "energy_facilities") {
+      const localSubtypes = previewSnapshot.subtypeCatalog
+        .filter((entry) => entry.availability === "local")
+        .map((entry) => `${entry.subtype_id} (${entry.feature_count || 0})`);
+      const referenceOnlySubtypes = previewSnapshot.subtypeCatalog
+        .filter((entry) => entry.availability === "reference_only")
+        .map((entry) => entry.subtype_id);
+      rows.push(
+        ["Local subtypes", localSubtypes.length ? localSubtypes.join(", ") : "none"],
+        ["Reference-only subtypes", referenceOnlySubtypes.length ? referenceOnlySubtypes.join(", ") : "none"],
+      );
+    }
+    return rows;
   };
 
   const setTransportWorkbenchCompareHeld = (nextHeld) => {
@@ -1526,6 +1743,10 @@ function initToolbar({ render } = {}) {
       state.transportWorkbenchUi.familyConfigs.road = normalizeRoadTransportWorkbenchConfig(current);
     } else if (familyId === "rail") {
       state.transportWorkbenchUi.familyConfigs.rail = normalizeRailTransportWorkbenchConfig(current);
+    } else if (familyId === "airport") {
+      state.transportWorkbenchUi.familyConfigs.airport = normalizeAirportTransportWorkbenchConfig(current);
+    } else if (familyId === "port") {
+      state.transportWorkbenchUi.familyConfigs.port = normalizePortTransportWorkbenchConfig(current);
     }
     markDirty("transport-workbench-config");
     const context = getTransportWorkbenchRenderContext();
@@ -1583,6 +1804,22 @@ function initToolbar({ render } = {}) {
         ["Status scope", formatTransportWorkbenchOptionLabels(config.status, RAIL_STATUS_OPTIONS)],
         ["Reconciliation", config.allowOsmActiveGapFill ? "Official active + OSM gap fill" : "Official active locked"],
         ["Station policy", config.showMajorStations ? `${config.importanceThreshold} threshold` : "Major stations hidden"],
+      ];
+    }
+    if (familyId === "airport") {
+      return [
+        ["Airport types", formatTransportWorkbenchOptionLabels(config.airportTypes, AIRPORT_TYPE_OPTIONS)],
+        ["Status scope", formatTransportWorkbenchOptionLabels(config.statuses, AIRPORT_STATUS_OPTIONS)],
+        ["Importance", config.importanceThreshold],
+        ["Labels", config.showLabels ? "Enabled" : "Hidden"],
+      ];
+    }
+    if (familyId === "port") {
+      return [
+        ["Legal designations", formatTransportWorkbenchOptionLabels(config.legalDesignations, PORT_DESIGNATION_OPTIONS)],
+        ["Manager types", formatTransportWorkbenchOptionLabels(config.managerTypes, PORT_MANAGER_TYPE_OPTIONS)],
+        ["Importance", config.importanceThreshold],
+        ["Labels", config.showLabels ? "Enabled" : "Hidden"],
       ];
     }
     return [];
@@ -1672,15 +1909,21 @@ function initToolbar({ render } = {}) {
       name.textContent = family.label;
       const caption = document.createElement("div");
       caption.className = "transport-workbench-layer-order-caption";
-      caption.textContent = family.id === "road"
+      caption.textContent = TRANSPORT_WORKBENCH_LIVE_PREVIEW_FAMILIES.has(family.id)
         ? "Live preview is already wired into the Japan carrier."
-        : "Reserved family shell. Real renderer attaches later.";
+        : TRANSPORT_WORKBENCH_MANIFEST_ONLY_FAMILIES.has(family.id)
+          ? "Inspector now reads the live manifest and build audit."
+          : "Reserved family shell. Real renderer attaches later.";
       meta.append(name, caption);
 
       const status = document.createElement("span");
       status.className = "transport-workbench-layer-order-state";
-      status.textContent = family.id === "road" ? "Live now" : "Reserved";
-      if (family.id === "road") {
+      status.textContent = TRANSPORT_WORKBENCH_LIVE_PREVIEW_FAMILIES.has(family.id)
+        ? "Live now"
+        : TRANSPORT_WORKBENCH_MANIFEST_ONLY_FAMILIES.has(family.id)
+          ? "Metadata live"
+          : "Reserved";
+      if (TRANSPORT_WORKBENCH_LIVE_PREVIEW_FAMILIES.has(family.id)) {
         status.classList.add("is-live");
       }
 
@@ -1877,6 +2120,7 @@ function initToolbar({ render } = {}) {
       const previewSnapshot = getTransportWorkbenchFamilyPreviewSnapshot(family.id, config);
       let rows;
       if (family.id === "road" && previewSnapshot?.status === "ready") {
+        const selected = previewSnapshot.selected;
         rows = [
           ["Pack version", previewSnapshot.manifest?.adapter_id || "japan_road_v1"],
           ["Recipe version", previewSnapshot.audit?.recipe_version || "unknown"],
@@ -1885,23 +2129,21 @@ function initToolbar({ render } = {}) {
           ["N06 encoding", previewSnapshot.manifest?.n06_encoding || previewSnapshot.audit?.n06_encoding || "unknown"],
           ["Last build", String(previewSnapshot.manifest?.generated_at || "unknown").replace("T", " ").replace("Z", " UTC")],
           ["Loaded roads", String(previewSnapshot.stats?.totalRoads || 0)],
-          ["Visible roads", String(previewSnapshot.stats?.visibleRoads || 0)],
           ["Visible labels", String(previewSnapshot.stats?.visibleLabels || 0)],
           ["Filtered roads", String(previewSnapshot.stats?.filteredRoads || 0)],
           ["N06 matched", String(previewSnapshot.audit?.n06_matched_count || 0)],
           ["Name conflicts", String(previewSnapshot.audit?.name_conflict_count || 0)],
           ["Compare mode", compareHeld ? "Holding baseline" : "Working state"],
         ];
-        const selected = previewSnapshot.selected;
         if (selected?.type === "road") {
           rows.push(
             ["Selected road", selected.name || "Unnamed segment"],
-            ["Ref", selected.ref || "—"],
-            ["Official name", selected.officialName || "—"],
-            ["Official ref", selected.officialRef || "—"],
-            ["Road class", selected.roadClass || "—"],
-            ["Source", selected.source || "—"],
-            ["Flags", Array.isArray(selected.sourceFlags) && selected.sourceFlags.length ? selected.sourceFlags.join(", ") : "—"],
+            ["Ref", selected.ref || "--"],
+            ["Official name", selected.officialName || "--"],
+            ["Official ref", selected.officialRef || "--"],
+            ["Road class", selected.roadClass || "--"],
+            ["Source", selected.source || "--"],
+            ["Flags", Array.isArray(selected.sourceFlags) && selected.sourceFlags.length ? selected.sourceFlags.join(", ") : "--"],
             ["Visibility", selected.visible ? "Visible" : formatTransportWorkbenchRoadHiddenReason(selected.hiddenReason)],
           );
           if (selected.n06MatchDistanceMeters !== null && selected.n06MatchDistanceMeters !== undefined) {
@@ -1909,10 +2151,10 @@ function initToolbar({ render } = {}) {
           }
         } else if (selected?.type === "label") {
           rows.push(
-            ["Selected label", selected.ref || "—"],
-            ["Road class", selected.roadClass || "—"],
-            ["Source", selected.source || "—"],
-            ["Priority", String(selected.priority ?? "—")],
+            ["Selected label", selected.ref || "--"],
+            ["Road class", selected.roadClass || "--"],
+            ["Source", selected.source || "--"],
+            ["Priority", String(selected.priority ?? "--")],
             ["Visibility", selected.visible ? "Visible" : formatTransportWorkbenchRoadHiddenReason(selected.hiddenReason)],
           );
         }
@@ -1929,6 +2171,7 @@ function initToolbar({ render } = {}) {
           ["Data path", dataContract?.governance || "Deferred pack governance pending"],
         ];
       } else if (family.id === "rail" && previewSnapshot?.status === "ready") {
+        const selected = previewSnapshot.selected;
         rows = [
           ["Pack version", previewSnapshot.manifest?.adapter_id || "japan_rail_v1"],
           ["Recipe version", previewSnapshot.audit?.recipe_version || "unknown"],
@@ -1942,27 +2185,26 @@ function initToolbar({ render } = {}) {
           ["Statuses", formatTransportWorkbenchOptionLabels(config.status, RAIL_STATUS_OPTIONS)],
           ["Classes", formatTransportWorkbenchOptionLabels(config.class, RAIL_CLASS_OPTIONS)],
         ];
-        const selected = previewSnapshot.selected;
         if (selected?.type === "line") {
           rows.push(
             ["Selected line", selected.name || "Unnamed line"],
-            ["Operator", selected.operator || "—"],
-            ["Rail type code", selected.railTypeCode || "—"],
-            ["Operator type code", selected.operatorTypeCode || "—"],
-            ["Status", selected.status || "—"],
-            ["Class", selected.lineClass || "—"],
-            ["Source", selected.source || "—"],
-            ["Flags", Array.isArray(selected.sourceFlags) && selected.sourceFlags.length ? selected.sourceFlags.join(", ") : "—"],
+            ["Operator", selected.operator || "--"],
+            ["Rail type code", selected.railTypeCode || "--"],
+            ["Operator type code", selected.operatorTypeCode || "--"],
+            ["Status", selected.status || "--"],
+            ["Class", selected.lineClass || "--"],
+            ["Source", selected.source || "--"],
+            ["Flags", Array.isArray(selected.sourceFlags) && selected.sourceFlags.length ? selected.sourceFlags.join(", ") : "--"],
             ["Visibility", selected.visible ? "Visible" : formatJapanRailVisibilityReason(selected.hiddenReason)],
           );
         } else if (selected?.type === "station") {
           rows.push(
             ["Selected station", selected.name || "Unnamed station"],
-            ["City key", selected.cityKey || "—"],
-            ["Station code", selected.stationCode || "—"],
-            ["Group code", selected.groupCode || "—"],
-            ["Importance", selected.importance || "—"],
-            ["Source", selected.source || "—"],
+            ["City key", selected.cityKey || "--"],
+            ["Station code", selected.stationCode || "--"],
+            ["Group code", selected.groupCode || "--"],
+            ["Importance", selected.importance || "--"],
+            ["Source", selected.source || "--"],
             ["Visibility", selected.visible ? "Visible" : "Hidden by threshold"],
           );
         }
@@ -1981,10 +2223,104 @@ function initToolbar({ render } = {}) {
           ["Data path", dataContract?.governance || "Deferred pack governance pending"],
           ["Pack status", previewSnapshot?.status === "pending" ? (dataContract?.pendingStatus || "Waiting for railways + rail_stations_major Japan packs") : "Loading Japan rail pack"],
         ];
+      } else if (family.id === "airport" && previewSnapshot?.status === "ready") {
+        const selected = previewSnapshot.selected;
+        const selectedProps = selected?.properties || {};
+        rows = [
+          ["Pack version", previewSnapshot.manifest?.adapter_id || "japan_airport_v1"],
+          ["Recipe version", previewSnapshot.manifest?.recipe_version || previewSnapshot.audit?.recipe_version || "unknown"],
+          ["Source policy", previewSnapshot.manifest?.source_policy || "unknown"],
+          ["Last build", formatTransportWorkbenchManifestTimestamp(previewSnapshot.manifest?.generated_at)],
+          ["Loaded airports", String(previewSnapshot.stats?.totalFeatures || 0)],
+          ["Visible airports", String(previewSnapshot.stats?.visibleFeatures || 0)],
+          ["Visible labels", String(previewSnapshot.stats?.visibleLabels || 0)],
+          ["Airport types", formatTransportWorkbenchOptionLabels(config.airportTypes, AIRPORT_TYPE_OPTIONS)],
+          ["Statuses", formatTransportWorkbenchOptionLabels(config.statuses, AIRPORT_STATUS_OPTIONS)],
+          ["Pack mode", previewSnapshot.packMode || "preview"],
+        ];
+        if (selected) {
+          rows.push(
+            ["Selected airport", selected.name || "Unnamed airport"],
+            ["Airport type", selectedProps.airport_type_label || selectedProps.airport_type || "—"],
+            ["Status", selectedProps.status || "—"],
+            ["Owner", selectedProps.owner || "—"],
+            ["Manager", selectedProps.manager || "—"],
+            ["Scheduled service", selectedProps.scheduled_service_code || "—"],
+            ["Runway max", selectedProps.runway_length_m_max ? `${selectedProps.runway_length_m_max}m` : "—"],
+            ["Passengers / day", selectedProps.passengers_per_day_latest ?? "—"],
+            ["Survey year", selectedProps.survey_year_latest ?? "—"],
+            ["IATA", selectedProps.iata || "—"],
+            ["ICAO", selectedProps.icao || "—"],
+          );
+        }
+      } else if (family.id === "airport" && previewSnapshot?.status === "error") {
+        rows = [
+          ["Pack status", "Airport pack failed to load"],
+          ["Error", previewSnapshot.error || "Unknown error"],
+          ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+        ];
+      } else if (family.id === "airport") {
+        rows = [
+          ["Airport types", formatTransportWorkbenchOptionLabels(config.airportTypes, AIRPORT_TYPE_OPTIONS)],
+          ["Statuses", formatTransportWorkbenchOptionLabels(config.statuses, AIRPORT_STATUS_OPTIONS)],
+          ["Labels", config.showLabels ? "Enabled" : "Hidden"],
+          ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+          ["Pack status", previewSnapshot?.status === "pending" ? (dataContract?.pendingStatus || "Waiting for airport Japan pack") : "Loading Japan airport pack"],
+        ];
+      } else if (family.id === "port" && previewSnapshot?.status === "ready") {
+        const selected = previewSnapshot.selected;
+        const selectedProps = selected?.properties || {};
+        rows = [
+          ["Pack version", previewSnapshot.manifest?.adapter_id || "japan_port_v1"],
+          ["Recipe version", previewSnapshot.manifest?.recipe_version || previewSnapshot.audit?.recipe_version || "unknown"],
+          ["Source policy", previewSnapshot.manifest?.source_policy || "unknown"],
+          ["Release policy", previewSnapshot.manifest?.release_policy || "unknown"],
+          ["Last build", formatTransportWorkbenchManifestTimestamp(previewSnapshot.manifest?.generated_at)],
+          ["Loaded ports", String(previewSnapshot.stats?.totalFeatures || 0)],
+          ["Visible ports", String(previewSnapshot.stats?.visibleFeatures || 0)],
+          ["Visible labels", String(previewSnapshot.stats?.visibleLabels || 0)],
+          ["Legal designations", formatTransportWorkbenchOptionLabels(config.legalDesignations, PORT_DESIGNATION_OPTIONS)],
+          ["Manager types", formatTransportWorkbenchOptionLabels(config.managerTypes, PORT_MANAGER_TYPE_OPTIONS)],
+          ["Pack mode", previewSnapshot.packMode || "preview"],
+        ];
+        if (selected) {
+          rows.push(
+            ["Selected port", selected.name || "Unnamed port"],
+            ["Designation", selectedProps.legal_designation_label || selectedProps.legal_designation || "—"],
+            ["Manager", selectedProps.manager || "—"],
+            ["Manager type", selectedProps.manager_type || selectedProps.manager_type_code || "—"],
+            ["Outer facility", selectedProps.outer_facility_length_m ? `${selectedProps.outer_facility_length_m}m` : "—"],
+            ["Mooring facility", selectedProps.mooring_facility_length_m ? `${selectedProps.mooring_facility_length_m}m` : "—"],
+            ["Ferry service", selectedProps.ferry_service === true ? "Yes" : selectedProps.ferry_service === false ? "No" : "—"],
+            ["Agencies", selectedProps.agency_labels || "—"],
+          );
+        }
+      } else if (family.id === "port" && previewSnapshot?.status === "error") {
+        rows = [
+          ["Pack status", "Port pack failed to load"],
+          ["Error", previewSnapshot.error || "Unknown error"],
+          ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+        ];
+      } else if (family.id === "port") {
+        rows = [
+          ["Legal designations", formatTransportWorkbenchOptionLabels(config.legalDesignations, PORT_DESIGNATION_OPTIONS)],
+          ["Manager types", formatTransportWorkbenchOptionLabels(config.managerTypes, PORT_MANAGER_TYPE_OPTIONS)],
+          ["Labels", config.showLabels ? "Enabled" : "Hidden"],
+          ["Data path", dataContract?.governance || "Deferred pack governance pending"],
+          ["Pack status", previewSnapshot?.status === "pending" ? (dataContract?.pendingStatus || "Waiting for port Japan pack") : "Loading Japan port pack"],
+        ];
+      } else if (TRANSPORT_WORKBENCH_MANIFEST_ONLY_FAMILIES.has(family.id)) {
+        rows = buildManifestOnlyInspectorRows(family, previewSnapshot, dataContract);
       } else if (family.id === "layers") {
         rows = state.transportWorkbenchUi.layerOrder.map((layerId, index) => {
           const entry = getTransportWorkbenchLayerFamilyMeta(layerId);
-          return [`${index + 1}`, layerId === "road" ? `${entry.label} (live)` : `${entry.label} (reserved)`];
+          if (TRANSPORT_WORKBENCH_LIVE_PREVIEW_FAMILIES.has(layerId)) {
+            return [`${index + 1}`, `${entry.label} (live)`];
+          }
+          if (TRANSPORT_WORKBENCH_MANIFEST_ONLY_FAMILIES.has(layerId)) {
+            return [`${index + 1}`, `${entry.label} (metadata)`];
+          }
+          return [`${index + 1}`, `${entry.label} (reserved)`];
         });
       } else {
         rows = [
@@ -2016,10 +2352,15 @@ function initToolbar({ render } = {}) {
       Promise.allSettled([
         warmTransportWorkbenchFamilyPreview("road"),
         warmTransportWorkbenchFamilyPreview("rail"),
+        warmTransportWorkbenchFamilyPreview("airport"),
+        warmTransportWorkbenchFamilyPreview("port"),
+        warmTransportWorkbenchFamilyPreview("mineral_resources"),
+        warmTransportWorkbenchFamilyPreview("energy_facilities"),
+        warmTransportWorkbenchFamilyPreview("industrial_zones"),
       ]).then((results) => {
         results.forEach((result, index) => {
           if (result.status === "fulfilled") return;
-          const familyId = index === 0 ? "road" : "rail";
+          const familyId = ["road", "rail", "airport", "port", "mineral_resources", "energy_facilities", "industrial_zones"][index] || "unknown";
           console.warn(`[transport-workbench] Failed to warm ${familyId} preview pack.`, result.reason);
         });
       });
@@ -2266,7 +2607,7 @@ function initToolbar({ render } = {}) {
   setTransportWorkbenchCarrierViewChangeListener(() => {
     scheduleTransportWorkbenchPreviewViewSync();
   });
-  ["road", "rail"].forEach((familyId) => {
+  ["road", "rail", "airport", "port"].forEach((familyId) => {
     setTransportWorkbenchFamilyPreviewSelectionListener(familyId, () => {
       const context = getTransportWorkbenchRenderContext();
       if (!context.isOpen || context.family.id !== familyId) {
@@ -4164,6 +4505,8 @@ function initToolbar({ render } = {}) {
     if (toggleUrban) toggleUrban.checked = !!state.showUrban;
     if (togglePhysical) togglePhysical.checked = !!state.showPhysical;
     if (toggleRivers) toggleRivers.checked = !!state.showRivers;
+    if (toggleAirports) toggleAirports.checked = !!state.showAirports;
+    if (togglePorts) togglePorts.checked = !!state.showPorts;
     if (toggleSpecialZones) toggleSpecialZones.checked = !!state.showSpecialZones;
 
     const cityPointsConfig = syncCityPointsConfig();
@@ -5269,6 +5612,28 @@ function initToolbar({ render } = {}) {
         void state.ensureContextLayerDataFn("rivers", { reason: "toolbar-toggle", renderNow: true });
       }
       renderDirty("toggle-rivers");
+    });
+  }
+
+  if (toggleAirports) {
+    toggleAirports.checked = !!state.showAirports;
+    toggleAirports.addEventListener("change", (event) => {
+      state.showAirports = !!event.target.checked;
+      if (state.showAirports && typeof state.ensureContextLayerDataFn === "function") {
+        void state.ensureContextLayerDataFn("airports", { reason: "toolbar-toggle", renderNow: true });
+      }
+      renderDirty("toggle-airports");
+    });
+  }
+
+  if (togglePorts) {
+    togglePorts.checked = !!state.showPorts;
+    togglePorts.addEventListener("change", (event) => {
+      state.showPorts = !!event.target.checked;
+      if (state.showPorts && typeof state.ensureContextLayerDataFn === "function") {
+        void state.ensureContextLayerDataFn("ports", { reason: "toolbar-toggle", renderNow: true });
+      }
+      renderDirty("toggle-ports");
     });
   }
 

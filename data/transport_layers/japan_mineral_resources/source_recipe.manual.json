@@ -1,0 +1,58 @@
+{
+  "version": "japan_mineral_resources_sources_v1",
+  "family": "mineral_resources",
+  "country": "Japan",
+  "generated_policy": "manual_source_cache_only",
+  "notes": [
+    "Raw source files stay in .runtime/source-cache and are not committed into the repository.",
+    "Builds must fail clearly when the GSJ mineral source is missing or cannot be decoded.",
+    "The first pack is clipped to the existing Japan four-islands carrier mask. Remote islands outside that mask stay excluded and must be counted in build_audit.json."
+  ],
+  "encoding_policy": {
+    "display_fields_encoding": "utf-8",
+    "source_fallback_encoding": "cp932",
+    "match_key_normalization": "NFKC",
+    "display_fields_preserve_original_text": true
+  },
+  "sources": [
+    {
+      "id": "gsj_mine_distribution_2017",
+      "kind": "download",
+      "role": "geometry_primary",
+      "url": "https://www.gsj.jp/data/interim-report/GSJ_DOC_INR_073_2017_DATA.zip",
+      "expected_filename": "GSJ_DOC_INR_073_2017_DATA.zip",
+      "preferred_member": "GSJ_DOC_INR_073_2017_DATA/mine_jp.csv",
+      "license": "GSJ site terms and dataset-specific review required",
+      "ingest_mode": "local_file",
+      "encoding": "CP932",
+      "field_contract": {
+        "record_id": "id",
+        "resource_code": "mineral",
+        "resource_name_ja": "mineral_j",
+        "mine_name": "mine_name",
+        "resource_class": "legend_name",
+        "work_status": "work_status",
+        "lat": "lat",
+        "lon": "lon"
+      }
+    },
+    {
+      "id": "resource_class_overrides",
+      "kind": "repo_versioned_json",
+      "role": "classification_override_optional",
+      "optional": true,
+      "expected_filename": "resource_class_overrides.json",
+      "expected_path": "data/transport_layers/japan_mineral_resources/overrides/resource_class_overrides.json"
+    }
+  ],
+  "output_contract": {
+    "publish": [
+      "mineral_resources.geojson",
+      "mineral_resources.preview.geojson",
+      "manifest.json",
+      "build_audit.json"
+    ],
+    "runtime_consumer": "transport_workbench_manifest_preview",
+    "adapter_id": "japan_mineral_resources_v1"
+  }
+}

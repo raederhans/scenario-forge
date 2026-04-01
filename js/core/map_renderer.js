@@ -321,6 +321,8 @@ const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
   "drawPhysicalAtlasLayer",
   "drawPhysicalContourLayer",
   "drawCityPointsLayer",
+  "drawAirportsLayer",
+  "drawPortsLayer",
   "drawUrbanLayer",
   "drawRiversLayer",
   "drawScenarioRegionOverlaysPass",
@@ -1557,9 +1559,12 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       `bucket:${zoomBucket}`,
       state.showPhysical ? "physical:on" : "physical:off",
       state.showCityPoints ? "cities:on" : "cities:off",
+      state.showAirports ? "airports:on" : "airports:off",
+      state.showPorts ? "ports:on" : "ports:off",
       state.showUrban ? "urban:on" : "urban:off",
       state.showRivers ? "rivers:on" : "rivers:off",
       `cities:${Number(state.cityLayerRevision || 0)}`,
+      `context:${Number(state.contextLayerRevision || 0)}`,
       `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}`,
       `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
       String(state.renderProfile || "auto"),
@@ -10999,6 +11004,198 @@ function drawCityPointsLayer(k, { interactive = false } = {}) {
   });
 }
 
+function getContextFacilityThresholdRank(threshold, allowed = []) {
+  const normalized = String(threshold || "").trim().toLowerCase();
+  if (allowed.includes(normalized)) {
+    if (normalized === "national_core") return 3;
+    if (normalized === "regional_core") return 2;
+    return 1;
+  }
+  return 1;
+}
+
+function buildContextFacilityEntries(collection, thresholdRank = 1) {
+  const featureCount = getFeatureCollectionFeatureCount(collection);
+  if (!collection?.features?.length || !projection) {
+    return {
+      featureCount,
+      entries: [],
+      skipped: true,
+      reason: !projection ? "no-projection" : "no-data",
+    };
+  }
+  const viewportWidth = Number(canvas?.width || 0);
+  const viewportHeight = Number(canvas?.height || 0);
+  const padding = 28;
+  const entries = [];
+  collection.features.forEach((feature) => {
+    if (feature?.geometry?.type !== "Point") return;
+    const coordinates = feature.geometry.coordinates;
+    if (!Array.isArray(coordinates) || coordinates.length < 2) return;
+    const projected = projection([coordinates[0], coordinates[1]]);
+    if (!Array.isArray(projected) || !Number.isFinite(projected[0]) || !Number.isFinite(projected[1])) return;
+    const properties = feature.properties || {};
+    const importanceRank = Math.max(1, Math.round(Number(properties.importance_rank || 1)));
+    if (importanceRank < thresholdRank) return;
+    const x = projected[0];
+    const y = projected[1];
+    if (
+      viewportWidth > 0
+      && viewportHeight > 0
+      && (x < -padding || x > viewportWidth + padding || y < -padding || y > viewportHeight + padding)
+    ) {
+      return;
+    }
+    entries.push({
+      x,
+      y,
+      label: String(properties.name || "").trim(),
+      importanceRank,
+      properties,
+    });
+  });
+  entries.sort((left, right) => left.importanceRank - right.importanceRank);
+  return {
+    featureCount,
+    entries,
+    skipped: false,
+    reason: "",
+  };
+}
+
+function drawContextFacilityPointLayer(
+  metricName,
+  collection,
+  k,
+  {
+    interactive = false,
+    visible = true,
+    thresholdRank = 1,
+    shape = "diamond",
+    fillStyle = "#2563eb",
+    strokeStyle = "#eff6ff",
+    labelColor = "#1e3a8a",
+    opacity = 0.9,
+    nationalLabelScale = 2.2,
+    regionalLabelScale = 5.2,
+  } = {},
+) {
+  const startedAt = nowMs();
+  if (!visible) {
+    collectContextMetric(metricName, nowMs() - startedAt, {
+      featureCount: getFeatureCollectionFeatureCount(collection),
+      visibleFeatureCount: 0,
+      labelCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: "hidden",
+    });
+    return;
+  }
+  if (interactive) {
+    collectContextMetric(metricName, nowMs() - startedAt, {
+      featureCount: getFeatureCollectionFeatureCount(collection),
+      visibleFeatureCount: 0,
+      labelCount: 0,
+      interactive: true,
+      skipped: true,
+      reason: "interactive-pass",
+    });
+    return;
+  }
+  const renderState = buildContextFacilityEntries(collection, thresholdRank);
+  if (renderState.skipped) {
+    collectContextMetric(metricName, nowMs() - startedAt, {
+      featureCount: renderState.featureCount,
+      visibleFeatureCount: 0,
+      labelCount: 0,
+      interactive: !!interactive,
+      skipped: true,
+      reason: renderState.reason,
+    });
+    return;
+  }
+  let labelCount = 0;
+  context.save();
+  context.lineJoin = "round";
+  context.lineCap = "round";
+  context.globalAlpha = opacity;
+  renderState.entries.forEach((entry) => {
+    const radius = entry.importanceRank >= 3 ? 5.2 : entry.importanceRank === 2 ? 4.3 : 3.5;
+    context.beginPath();
+    if (shape === "square") {
+      context.rect(entry.x - radius, entry.y - radius, radius * 2, radius * 2);
+    } else {
+      context.moveTo(entry.x, entry.y - radius);
+      context.lineTo(entry.x + radius, entry.y);
+      context.lineTo(entry.x, entry.y + radius);
+      context.lineTo(entry.x - radius, entry.y);
+      context.closePath();
+    }
+    context.fillStyle = fillStyle;
+    context.strokeStyle = strokeStyle;
+    context.lineWidth = entry.importanceRank >= 3 ? 1.4 : 1.1;
+    context.fill();
+    context.stroke();
+  });
+  context.restore();
+
+  context.save();
+  context.textAlign = "left";
+  context.textBaseline = "middle";
+  renderState.entries.forEach((entry) => {
+    if (!entry.label) return;
+    const shouldShowLabel = entry.importanceRank >= 3 ? k >= nationalLabelScale : k >= regionalLabelScale;
+    if (!shouldShowLabel) return;
+    context.font = `${entry.importanceRank >= 3 ? 600 : 500} ${entry.importanceRank >= 3 ? 11 : 10}px "IBM Plex Sans", "Noto Sans JP", sans-serif`;
+    context.lineWidth = 3;
+    context.strokeStyle = "rgba(255,255,255,0.92)";
+    context.fillStyle = labelColor;
+    context.strokeText(entry.label, entry.x + 8, entry.y);
+    context.fillText(entry.label, entry.x + 8, entry.y);
+    labelCount += 1;
+  });
+  context.restore();
+
+  collectContextMetric(metricName, nowMs() - startedAt, {
+    featureCount: renderState.featureCount,
+    visibleFeatureCount: renderState.entries.length,
+    labelCount,
+    interactive: !!interactive,
+    skipped: false,
+  });
+}
+
+function drawAirportsLayer(k, { interactive = false } = {}) {
+  drawContextFacilityPointLayer("drawAirportsLayer", state.airportsData, k, {
+    interactive,
+    visible: !!state.showAirports,
+    thresholdRank: getContextFacilityThresholdRank("regional_core", ["national_core", "regional_core", "local_connector"]),
+    shape: "diamond",
+    fillStyle: "#1d4ed8",
+    strokeStyle: "#dbeafe",
+    labelColor: "#15315f",
+    opacity: 0.9,
+    nationalLabelScale: 2.0,
+    regionalLabelScale: 5.0,
+  });
+}
+
+function drawPortsLayer(k, { interactive = false } = {}) {
+  drawContextFacilityPointLayer("drawPortsLayer", state.portsData, k, {
+    interactive,
+    visible: !!state.showPorts,
+    thresholdRank: getContextFacilityThresholdRank("regional_core", ["national_core", "regional_core"]),
+    shape: "square",
+    fillStyle: "#b45309",
+    strokeStyle: "#ffedd5",
+    labelColor: "#7c2d12",
+    opacity: 0.9,
+    nationalLabelScale: 2.2,
+    regionalLabelScale: 5.4,
+  });
+}
+
 function getTextureStyleConfig() {
   if (!state.styleConfig || typeof state.styleConfig !== "object") {
     state.styleConfig = {};
@@ -13700,6 +13897,18 @@ function drawContextBasePass(k, { interactive = false } = {}) {
         skipped: true,
         reason: "staged-apply",
       });
+      collectContextMetric("drawAirportsLayer", 0, {
+        featureCount: getFeatureCollectionFeatureCount(state.airportsData),
+        interactive: false,
+        skipped: true,
+        reason: "staged-apply",
+      });
+      collectContextMetric("drawPortsLayer", 0, {
+        featureCount: getFeatureCollectionFeatureCount(state.portsData),
+        interactive: false,
+        skipped: true,
+        reason: "staged-apply",
+      });
       collectContextMetric("drawRiversLayer", 0, {
         featureCount: getFeatureCollectionFeatureCount(state.riversData),
         interactive: false,
@@ -13710,6 +13919,8 @@ function drawContextBasePass(k, { interactive = false } = {}) {
       drawPhysicalLayer(k, { interactive });
       drawUrbanLayer(k, { interactive });
       drawRiversLayer(k, { interactive });
+      drawAirportsLayer(k, { interactive });
+      drawPortsLayer(k, { interactive });
       drawCityPointsLayer(k, { interactive });
     }
   } finally {

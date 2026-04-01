@@ -1,0 +1,56 @@
+{
+  "local_subtypes": {
+    "general_hydroelectric_power_plant": {
+      "group": "power_plant",
+      "distribution_tier": "internal_only",
+      "source_status": "official_local"
+    },
+    "pumped_storage_hydroelectric_power_plant": {
+      "group": "power_plant",
+      "distribution_tier": "internal_only",
+      "source_status": "official_local"
+    },
+    "thermal_power_plant": {
+      "group": "power_plant",
+      "distribution_tier": "internal_only",
+      "source_status": "official_local"
+    },
+    "nuclear_power_plant": {
+      "group": "power_plant",
+      "distribution_tier": "internal_only",
+      "source_status": "official_local"
+    },
+    "geothermal_power_plant": {
+      "group": "power_plant",
+      "distribution_tier": "internal_only",
+      "source_status": "official_local"
+    },
+    "wind_power_plant": {
+      "group": "power_plant",
+      "distribution_tier": "internal_only",
+      "source_status": "official_local"
+    },
+    "photovoltaic_power_plant": {
+      "group": "power_plant",
+      "distribution_tier": "internal_only",
+      "source_status": "official_local"
+    }
+  },
+  "reference_only_subtypes": {
+    "lng_terminal": {
+      "group": "energy_terminal",
+      "distribution_tier": "reference_only",
+      "source_status": "pending_source_review"
+    },
+    "refinery": {
+      "group": "hydrocarbon_processing",
+      "distribution_tier": "reference_only",
+      "source_status": "pending_source_review"
+    },
+    "oil_storage": {
+      "group": "hydrocarbon_storage",
+      "distribution_tier": "reference_only",
+      "source_status": "pending_source_review"
+    }
+  }
+}

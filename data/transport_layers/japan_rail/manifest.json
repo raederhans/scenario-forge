@@ -4,7 +4,7 @@
   "geometry_kind": "line",
   "country": "Japan",
   "schema_version": 1,
-  "generated_at": "2026-04-01T21:14:13.524750Z",
+  "generated_at": "2026-04-01T22:03:24.327119Z",
   "recipe_path": "data/transport_layers/japan_rail/source_recipe.manual.json",
   "paths": {
     "preview": {
@@ -30,8 +30,8 @@
     },
     "line_class_overrides": {
       "filename": "data/transport_layers/japan_rail/overrides/line_class_overrides.json",
-      "size_bytes": 399,
-      "sha256": "289fee45d6942ec2d116a67fe215d3d1cc1857767820a5d01b11dc765a954633"
+      "size_bytes": 935,
+      "sha256": "6bc5f6197cea044c1994383414a4c384154004fefa27b6d91ca2f95df3c481a1"
     },
     "major_station_overrides": {
       "filename": "data/transport_layers/japan_rail/overrides/major_station_overrides.json",
@@ -42,7 +42,7 @@
   "recipe_version": "japan_rail_sources_v1",
   "feature_counts": {
     "preview": {
-      "railways": 1207,
+      "railways": 1105,
       "rail_stations_major": 47
     },
     "full": {

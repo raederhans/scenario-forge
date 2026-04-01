@@ -10,6 +10,8 @@
     "build:transport-workbench-carrier": "python tools/build_transport_workbench_japan_carrier.py",
     "build:transport-workbench-japan-roads": "python tools/build_transport_workbench_japan_roads.py",
     "build:transport-workbench-japan-rail": "python tools/build_transport_workbench_japan_rail.py",
+    "build:transport-workbench-japan-airports": "python tools/build_transport_workbench_japan_airports.py",
+    "build:transport-workbench-japan-ports": "python tools/build_transport_workbench_japan_ports.py",
     "playwright:install": "playwright install",
     "playwright:install:chromium": "playwright install --with-deps chromium",
     "verify:scenario-contracts": "python tools/check_scenario_contracts.py --scenario-dir data/scenarios/tno_1962",

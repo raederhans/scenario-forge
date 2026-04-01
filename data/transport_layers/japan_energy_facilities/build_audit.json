@@ -1,0 +1,73 @@
+{
+  "generated_at": "2026-04-01T21:52:01.196472Z",
+  "adapter_id": "japan_energy_facilities_v1",
+  "recipe_version": "japan_energy_facilities_sources_v1",
+  "raw_feature_counts_by_subtype": {
+    "general_hydroelectric_power_plant": 93,
+    "pumped_storage_hydroelectric_power_plant": 46,
+    "thermal_power_plant": 376,
+    "nuclear_power_plant": 68,
+    "geothermal_power_plant": 15,
+    "wind_power_plant": 16,
+    "photovoltaic_power_plant": 1
+  },
+  "clipped_feature_counts_by_subtype": {
+    "general_hydroelectric_power_plant": 93,
+    "pumped_storage_hydroelectric_power_plant": 46,
+    "thermal_power_plant": 267,
+    "nuclear_power_plant": 62,
+    "geothermal_power_plant": 15,
+    "wind_power_plant": 6,
+    "photovoltaic_power_plant": 1
+  },
+  "normalized_feature_count": 490,
+  "status_counts": {
+    "construction_preparation": 14,
+    "existing": 453,
+    "under_construction": 23
+  },
+  "source_policy": "local_source_cache_only",
+  "source_archive": ".runtime/source-cache/transport/japan/energy_facilities/P03-07_GML.zip",
+  "source_url": "https://nlftp.mlit.go.jp/ksj/gml/data/P03/P03-07/P03-07_GML.zip",
+  "source_encoding": "cp932",
+  "excluded_source_members": [
+    "P03-07-g_PondInformation.shp"
+  ],
+  "excluded_regions": [
+    {
+      "rule": "outside_japan_main_islands_route_mask",
+      "count": 125
+    }
+  ],
+  "local_subtypes": [
+    "general_hydroelectric_power_plant",
+    "geothermal_power_plant",
+    "nuclear_power_plant",
+    "photovoltaic_power_plant",
+    "pumped_storage_hydroelectric_power_plant",
+    "thermal_power_plant",
+    "wind_power_plant"
+  ],
+  "reference_only_subtypes": [
+    "lng_terminal",
+    "oil_storage",
+    "refinery"
+  ],
+  "source_signature": {
+    "mlit_p03_2007_power_plants": {
+      "filename": "P03-07_GML.zip",
+      "size_bytes": 78622,
+      "sha256": "8d6fcb652816f3ac3f80218099dc70be46be4316044f7347ca5e3ee58b55b7be"
+    },
+    "facility_subtype_reference": {
+      "filename": "data/transport_layers/japan_energy_facilities/overrides/facility_subtype_reference.json",
+      "size_bytes": 1625,
+      "sha256": "1e2aa116bbf79f30d80d36b62f66ced5ab9c6a8964be0d22c41072f75aac28a4"
+    }
+  },
+  "notes": [
+    "The first local energy family pack intentionally contains only official MLIT P03 power-plant subtypes.",
+    "Preview and full outputs are identical for v1 because no approved thinning rule exists yet.",
+    "Reference-only subtypes are governed in subtype_catalog.json and are not fabricated into map features."
+  ]
+}

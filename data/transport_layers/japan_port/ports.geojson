@@ -1,0 +1,473 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "jp-port-50862dbd96b1",
+        "stable_key": "port::油津::45204",
+        "name": "油津",
+        "name_match_key": "油津",
+        "facility_type": "port",
+        "category": "important",
+        "importance": "regional_core",
+        "importance_rank": 2,
+        "source_dataset": "mlit_c02_2014",
+        "source_year": 2014,
+        "port_code": "45204",
+        "admin_code": "45002",
+        "port_class": "甲種",
+        "port_class_code": "1",
+        "legal_designation": "important",
+        "legal_designation_code": "13",
+        "legal_designation_label": "重要港湾",
+        "manager": "宮崎県",
+        "manager_type": "都道府県",
+        "manager_type_code": "1",
+        "date_established": "19520201",
+        "date_designated": "19530225",
+        "agency_codes": "1|2",
+        "agency_labels": "海上保安部|検疫所",
+        "outer_facility_length_m": 7885,
+        "mooring_facility_length_m": 4772,
+        "ferry_service": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          131.40374093,
+          31.56834018
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "jp-port-48fca3dfdbde",
+        "stable_key": "port::尾道糸崎::34204",
+        "name": "尾道糸崎",
+        "name_match_key": "尾道糸崎",
+        "facility_type": "port",
+        "category": "important",
+        "importance": "regional_core",
+        "importance_rank": 2,
+        "source_dataset": "mlit_c02_2014",
+        "source_year": 2014,
+        "port_code": "34204",
+        "admin_code": "34002",
+        "port_class": "甲種",
+        "port_class_code": "1",
+        "legal_designation": "important",
+        "legal_designation_code": "13",
+        "legal_designation_label": "重要港湾",
+        "manager": "広島県",
+        "manager_type": "都道府県",
+        "manager_type_code": "1",
+        "date_established": "19510119",
+        "date_designated": "19530331",
+        "agency_codes": "1|2|3|7",
+        "agency_labels": "海上保安部|検疫所|税関|海上交通センター",
+        "outer_facility_length_m": 59781,
+        "mooring_facility_length_m": 8193,
+        "ferry_service": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          133.18607315,
+          34.39849009
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "jp-port-fa70a347b438",
+        "stable_key": "port::西郷::32528",
+        "name": "西郷",
+        "name_match_key": "西郷",
+        "facility_type": "port",
+        "category": "important",
+        "importance": "regional_core",
+        "importance_rank": 2,
+        "source_dataset": "mlit_c02_2014",
+        "source_year": 2014,
+        "port_code": "32528",
+        "admin_code": "32002",
+        "port_class": "甲種",
+        "port_class_code": "1",
+        "legal_designation": "important",
+        "legal_designation_code": "13",
+        "legal_designation_label": "重要港湾",
+        "manager": "島根県",
+        "manager_type": "都道府県",
+        "manager_type_code": "1",
+        "date_established": "19590611",
+        "date_designated": "19530710",
+        "agency_codes": "1",
+        "agency_labels": "海上保安部",
+        "outer_facility_length_m": 5920,
+        "mooring_facility_length_m": 1728,
+        "ferry_service": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          133.34259812,
+          36.21002104
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "jp-port-f68fc13da5de",
+        "stable_key": "port::高知::39201",
+        "name": "高知",
+        "name_match_key": "高知",
+        "facility_type": "port",
+        "category": "important",
+        "importance": "regional_core",
+        "importance_rank": 2,
+        "source_dataset": "mlit_c02_2014",
+        "source_year": 2014,
+        "port_code": "39201",
+        "admin_code": "39001",
+        "port_class": "甲種",
+        "port_class_code": "1",
+        "legal_designation": "important",
+        "legal_designation_code": "13",
+        "legal_designation_label": "重要港湾",
+        "manager": "高知県",
+        "manager_type": "都道府県",
+        "manager_type_code": "1",
+        "date_established": "19510119",
+        "date_designated": "19540101",
+        "agency_codes": "1|2|3|7",
+        "agency_labels": "海上保安部|検疫所|税関|海上交通センター",
+        "outer_facility_length_m": 44986,
+        "mooring_facility_length_m": 11631,
+        "ferry_service": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          133.56060957,
+          33.51338994
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "jp-port-02c253ea71f5",
+        "stable_key": "port::須崎::39206",
+        "name": "須崎",
+        "name_match_key": "須崎",
+        "facility_type": "port",
+        "category": "important",
+        "importance": "regional_core",
+        "importance_rank": 2,
+        "source_dataset": "mlit_c02_2014",
+        "source_year": 2014,
+        "port_code": "39206",
+        "admin_code": "39002",
+        "port_class": "甲種",
+        "port_class_code": "1",
+        "legal_designation": "important",
+        "legal_designation_code": "13",
+        "legal_designation_label": "重要港湾",
+        "manager": "高知県",
+        "manager_type": "都道府県",
+        "manager_type_code": "1",
+        "date_established": "19650401",
+        "date_designated": "19540101",
+        "agency_codes": "2",
+        "agency_labels": "検疫所",
+        "outer_facility_length_m": 13470,
+        "mooring_facility_length_m": 3588,
+        "ferry_service": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          133.28575173,
+          33.38318194
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "jp-port-b8c63eaac7a3",
+        "stable_key": "port::宇和島::38203",
+        "name": "宇和島",
+        "name_match_key": "宇和島",
+        "facility_type": "port",
+        "category": "important",
+        "importance": "regional_core",
+        "importance_rank": 2,
+        "source_dataset": "mlit_c02_2014",
+        "source_year": 2014,
+        "port_code": "38203",
+        "admin_code": "38002",
+        "port_class": "甲種",
+        "port_class_code": "1",
+        "legal_designation": "important",
+        "legal_designation_code": "13",
+        "legal_designation_label": "重要港湾",
+        "manager": "愛媛県",
+        "manager_type": "都道府県",
+        "manager_type_code": "1",
+        "date_established": "19600609",
+        "date_designated": "19530710",
+        "agency_codes": "1|2|3",
+        "agency_labels": "海上保安部|検疫所|税関",
+        "outer_facility_length_m": 8161,
+        "mooring_facility_length_m": 3363,
+        "ferry_service": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          132.54804989,
+          33.22919365
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "jp-port-61a8826366dc",
+        "stable_key": "port::田子の浦::22210",
+        "name": "田子の浦",
+        "name_match_key": "田子の浦",
+        "facility_type": "port",
+        "category": "important",
+        "importance": "regional_core",
+        "importance_rank": 2,
+        "source_dataset": "mlit_c02_2014",
+        "source_year": 2014,
+        "port_code": "22210",
+        "admin_code": "22002",
+        "port_class": "甲種",
+        "port_class_code": "1",
+        "legal_designation": "important",
+        "legal_designation_code": "13",
+        "legal_designation_label": "重要港湾",
+        "manager": "静岡県",
+        "manager_type": "都道府県",
+        "manager_type_code": "1",
+        "date_established": "19640401",
+        "date_designated": "19521110",
+        "agency_codes": "1|2",
+        "agency_labels": "海上保安部|検疫所",
+        "outer_facility_length_m": 9820,
+        "mooring_facility_length_m": 3287,
+        "ferry_service": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.69435564,
+          35.13989188
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "jp-port-5a63af143853",
+        "stable_key": "port::小木::15224",
+        "name": "小木",
+        "name_match_key": "小木",
+        "facility_type": "port",
+        "category": "important",
+        "importance": "regional_core",
+        "importance_rank": 2,
+        "source_dataset": "mlit_c02_2014",
+        "source_year": 2014,
+        "port_code": "15224",
+        "admin_code": "15012",
+        "port_class": "甲種",
+        "port_class_code": "1",
+        "legal_designation": "important",
+        "legal_designation_code": "13",
+        "legal_designation_label": "重要港湾",
+        "manager": "新潟県",
+        "manager_type": "都道府県",
+        "manager_type_code": "1",
+        "date_established": "19740423",
+        "date_designated": "19520601",
+        "agency_codes": "nan",
+        "agency_labels": "nan",
+        "outer_facility_length_m": 7596,
+        "mooring_facility_length_m": 1889,
+        "ferry_service": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.29094789,
+          37.81489842
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "jp-port-4eb41ef14a4e",
+        "stable_key": "port::厳原::42209",
+        "name": "厳原",
+        "name_match_key": "厳原",
+        "facility_type": "port",
+        "category": "important",
+        "importance": "regional_core",
+        "importance_rank": 2,
+        "source_dataset": "mlit_c02_2014",
+        "source_year": 2014,
+        "port_code": "42209",
+        "admin_code": "42002",
+        "port_class": "甲種",
+        "port_class_code": "1",
+        "legal_designation": "important",
+        "legal_designation_code": "13",
+        "legal_designation_label": "重要港湾",
+        "manager": "長崎県",
+        "manager_type": "都道府県",
+        "manager_type_code": "1",
+        "date_established": "19510922",
+        "date_designated": "19520501",
+        "agency_codes": "1|2|8",
+        "agency_labels": "海上保安部|検疫所|国際戦略港湾等",
+        "outer_facility_length_m": 3116,
+        "mooring_facility_length_m": 3447,
+        "ferry_service": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          129.29375908,
+          34.19187852
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "jp-port-a16d7644ed94",
+        "stable_key": "port::十勝::01642",
+        "name": "十勝",
+        "name_match_key": "十勝",
+        "facility_type": "port",
+        "category": "important",
+        "importance": "regional_core",
+        "importance_rank": 2,
+        "source_dataset": "mlit_c02_2014",
+        "source_year": 2014,
+        "port_code": "01642",
+        "admin_code": "01035",
+        "port_class": "甲種",
+        "port_class_code": "1",
+        "legal_designation": "important",
+        "legal_designation_code": "13",
+        "legal_designation_label": "重要港湾",
+        "manager": "広尾町",
+        "manager_type": "市町村",
+        "manager_type_code": "2",
+        "date_established": "19700501",
+        "date_designated": "19530331",
+        "agency_codes": "1|2",
+        "agency_labels": "海上保安部|検疫所",
+        "outer_facility_length_m": 7477,
+        "mooring_facility_length_m": 4800,
+        "ferry_service": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          143.33444444,
+          42.29555556
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "jp-port-6dc93432dd3c",
+        "stable_key": "port::網走::01211",
+        "name": "網走",
+        "name_match_key": "網走",
+        "facility_type": "port",
+        "category": "important",
+        "importance": "regional_core",
+        "importance_rank": 2,
+        "source_dataset": "mlit_c02_2014",
+        "source_year": 2014,
+        "port_code": "01211",
+        "admin_code": "01030",
+        "port_class": "甲種",
+        "port_class_code": "1",
+        "legal_designation": "important",
+        "legal_designation_code": "13",
+        "legal_designation_label": "重要港湾",
+        "manager": "網走市",
+        "manager_type": "市町村",
+        "manager_type_code": "2",
+        "date_established": "19780415",
+        "date_designated": "19530331",
+        "agency_codes": "1|2",
+        "agency_labels": "海上保安部|検疫所",
+        "outer_facility_length_m": 10067,
+        "mooring_facility_length_m": 4854,
+        "ferry_service": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.28610498,
+          44.02871738
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "jp-port-88dbfa6118ea",
+        "stable_key": "port::宇野::33204",
+        "name": "宇野",
+        "name_match_key": "宇野",
+        "facility_type": "port",
+        "category": "important",
+        "importance": "regional_core",
+        "importance_rank": 2,
+        "source_dataset": "mlit_c02_2014",
+        "source_year": 2014,
+        "port_code": "33204",
+        "admin_code": "33001",
+        "port_class": "甲種",
+        "port_class_code": "1",
+        "legal_designation": "important",
+        "legal_designation_code": "13",
+        "legal_designation_label": "重要港湾",
+        "manager": "岡山県",
+        "manager_type": "都道府県",
+        "manager_type_code": "1",
+        "date_established": "19510119",
+        "date_designated": "19510801",
+        "agency_codes": "1|2|3",
+        "agency_labels": "海上保安部|検疫所|税関",
+        "outer_facility_length_m": 11730,
+        "mooring_facility_length_m": 6268,
+        "ferry_service": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          133.950314,
+          34.48426522
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "adapter_id": "japan_energy_facilities_v1",
+  "family": "energy_facilities",
+  "geometry_kind": "point",
+  "country": "Japan",
+  "schema_version": 1,
+  "generated_at": "2026-04-01T21:52:01.195471Z",
+  "recipe_path": "data/transport_layers/japan_energy_facilities/source_recipe.manual.json",
+  "paths": {
+    "preview": {
+      "energy_facilities": "data/transport_layers/japan_energy_facilities/energy_facilities.preview.geojson"
+    },
+    "full": {
+      "energy_facilities": "data/transport_layers/japan_energy_facilities/energy_facilities.geojson"
+    },
+    "subtype_catalog": "data/transport_layers/japan_energy_facilities/subtype_catalog.json",
+    "build_audit": "data/transport_layers/japan_energy_facilities/build_audit.json"
+  },
+  "source_signature": {
+    "mlit_p03_2007_power_plants": {
+      "filename": "P03-07_GML.zip",
+      "size_bytes": 78622,
+      "sha256": "8d6fcb652816f3ac3f80218099dc70be46be4316044f7347ca5e3ee58b55b7be"
+    },
+    "facility_subtype_reference": {
+      "filename": "data/transport_layers/japan_energy_facilities/overrides/facility_subtype_reference.json",
+      "size_bytes": 1625,
+      "sha256": "1e2aa116bbf79f30d80d36b62f66ced5ab9c6a8964be0d22c41072f75aac28a4"
+    }
+  },
+  "recipe_version": "japan_energy_facilities_sources_v1",
+  "feature_counts": {
+    "preview": {
+      "energy_facilities": 490
+    },
+    "full": {
+      "energy_facilities": 490
+    }
+  },
+  "clip_bbox": [
+    129.0,
+    30.75,
+    145.824962,
+    45.520413
+  ],
+  "build_command": "python tools/build_transport_workbench_japan_energy_facilities.py",
+  "runtime_consumer": "transport_workbench_manifest_preview",
+  "distribution_tier": "internal_only",
+  "license_tier": "review_required",
+  "coverage_scope": "japan_main_islands_v1",
+  "source_policy": "local_source_cache_only",
+  "source_archive": ".runtime/source-cache/transport/japan/energy_facilities/P03-07_GML.zip",
+  "source_url": "https://nlftp.mlit.go.jp/ksj/gml/data/P03/P03-07/P03-07_GML.zip",
+  "source_encoding": "cp932",
+  "excluded_regions": [
+    "outside_japan_main_islands_route_mask",
+    "P03-07-g_PondInformation"
+  ],
+  "text_policy": {
+    "storage_encoding": "utf-8",
+    "display_fields_preserve_original": true,
+    "source_fallback_encoding": "cp932",
+    "match_key_normalization": "NFKC + whitespace collapse + casefold"
+  }
+}

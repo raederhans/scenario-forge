@@ -1081,6 +1081,10 @@ function updateContextLayerDerivedState(layerName, collection) {
   };
   if (layerName === "rivers") {
     state.riversData = collection;
+  } else if (layerName === "airports") {
+    state.airportsData = collection;
+  } else if (layerName === "ports") {
+    state.portsData = collection;
   } else if (layerName === "urban") {
     state.urbanData = collection;
   } else if (layerName === "physical") {
@@ -1227,6 +1231,12 @@ function schedulePostReadyDeferredContextWarmup() {
   const requestedLayerNames = [];
   if (state.showRivers) {
     requestedLayerNames.push("rivers");
+  }
+  if (state.showAirports) {
+    requestedLayerNames.push("airports");
+  }
+  if (state.showPorts) {
+    requestedLayerNames.push("ports");
   }
   if (state.showUrban) {
     requestedLayerNames.push("urban");
@@ -1745,6 +1755,8 @@ async function bootstrap() {
     state.contextLayerLoadStateByName = {
       rivers: "idle",
       urban: "idle",
+      airports: "idle",
+      ports: "idle",
       physical: "idle",
       physical_semantics: "idle",
       physical_contours_major: "idle",
@@ -1755,6 +1767,8 @@ async function bootstrap() {
     state.physicalSemanticsData = null;
     state.physicalContourMajorData = null;
     state.physicalContourMinorData = null;
+    state.airportsData = null;
+    state.portsData = null;
     state.paletteRegistry = paletteRegistry || null;
     state.defaultReleasableCatalog = releasableCatalog || null;
     state.releasableCatalog = releasableCatalog || null;

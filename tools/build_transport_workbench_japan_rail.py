@@ -44,15 +44,15 @@ PREVIEW_MIN_LENGTH_METERS = {
 DEFAULT_LINE_CLASS_BY_RAIL_TYPE_CODE = {
     "11": "trunk",
     "12": "trunk",
-    "13": "branch",
-    "14": "branch",
-    "15": "branch",
-    "16": "branch",
+    "13": "service",
+    "14": "service",
+    "15": "service",
+    "16": "service",
     "17": "service",
-    "21": "branch",
-    "22": "branch",
-    "23": "branch",
-    "24": "branch",
+    "21": "service",
+    "22": "service",
+    "23": "service",
+    "24": "service",
     "25": "high_speed",
 }
 SHINKANSEN_RE = re.compile(r"(?:\u65b0\u5e79\u7dda|shinkansen)", re.IGNORECASE)
@@ -166,8 +166,8 @@ def normalize_override_class(value: Any) -> str:
     return normalized if normalized in {"high_speed", "trunk", "branch", "service"} else ""
 
 
-def build_line_class_override_map(payload: dict[str, Any]) -> dict[str, str]:
-    override_map: dict[str, str] = {}
+def build_line_class_override_map(payload: dict[str, Any]) -> dict[str, dict[str, str]]:
+    by_name: dict[str, str] = {}
     for source_key in ("line_class_by_name", "line_class_by_match_key"):
         source = payload.get(source_key)
         if not isinstance(source, dict):
@@ -176,14 +176,66 @@ def build_line_class_override_map(payload: dict[str, Any]) -> dict[str, str]:
             normalized_key = normalize_match_key(key)
             normalized_class = normalize_override_class(value)
             if normalized_key and normalized_class:
-                override_map[normalized_key] = normalized_class
-    return override_map
+                by_name[normalized_key] = normalized_class
+
+    by_rail_type_code: dict[str, str] = {}
+    rail_type_source = payload.get("line_class_by_rail_type_code")
+    if isinstance(rail_type_source, dict):
+        for key, value in rail_type_source.items():
+            normalized_key = normalize_text(key)
+            normalized_class = normalize_override_class(value)
+            if normalized_key and normalized_class:
+                by_rail_type_code[normalized_key] = normalized_class
+
+    by_operator_type_code: dict[str, str] = {}
+    operator_type_source = payload.get("line_class_by_operator_type_code")
+    if isinstance(operator_type_source, dict):
+        for key, value in operator_type_source.items():
+            normalized_key = normalize_text(key)
+            normalized_class = normalize_override_class(value)
+            if normalized_key and normalized_class:
+                by_operator_type_code[normalized_key] = normalized_class
+
+    by_operator_and_rail_type_code: dict[str, str] = {}
+    pair_source = payload.get("line_class_by_operator_type_and_rail_type_code")
+    if isinstance(pair_source, dict):
+        for key, value in pair_source.items():
+            normalized_key = normalize_text(key)
+            normalized_class = normalize_override_class(value)
+            if normalized_key and normalized_class:
+                by_operator_and_rail_type_code[normalized_key] = normalized_class
+
+    return {
+        "by_name": by_name,
+        "by_rail_type_code": by_rail_type_code,
+        "by_operator_type_code": by_operator_type_code,
+        "by_operator_and_rail_type_code": by_operator_and_rail_type_code,
+    }
 
 
-def classify_line(name: str, rail_type_code: str, class_overrides: dict[str, str]) -> str:
-    override = class_overrides.get(normalize_match_key(name), "")
+def count_line_class_override_entries(payload: dict[str, dict[str, str]]) -> int:
+    return sum(len(source) for source in payload.values() if isinstance(source, dict))
+
+
+def classify_line(
+    name: str,
+    rail_type_code: str,
+    operator_type_code: str,
+    class_overrides: dict[str, dict[str, str]],
+) -> str:
+    override = class_overrides.get("by_name", {}).get(normalize_match_key(name), "")
     if override in {"high_speed", "trunk", "branch", "service"}:
         return override
+    pair_key = f"{operator_type_code}:{rail_type_code}" if operator_type_code and rail_type_code else ""
+    pair_override = class_overrides.get("by_operator_and_rail_type_code", {}).get(pair_key, "")
+    if pair_override in {"high_speed", "trunk", "branch", "service"}:
+        return pair_override
+    rail_type_override = class_overrides.get("by_rail_type_code", {}).get(rail_type_code, "")
+    if rail_type_override in {"high_speed", "trunk", "branch", "service"}:
+        return rail_type_override
+    operator_type_override = class_overrides.get("by_operator_type_code", {}).get(operator_type_code, "")
+    if operator_type_override in {"high_speed", "trunk", "branch", "service"}:
+        return operator_type_override
     if SHINKANSEN_RE.search(name):
         return "high_speed"
     return DEFAULT_LINE_CLASS_BY_RAIL_TYPE_CODE.get(rail_type_code, "trunk")
@@ -206,7 +258,7 @@ def build_station_id(name: str, group_code: str, station_code: str) -> str:
     return f"jp-station-{digest.hexdigest()[:12]}"
 
 
-def normalize_lines(lines: gpd.GeoDataFrame, class_overrides: dict[str, str]) -> gpd.GeoDataFrame:
+def normalize_lines(lines: gpd.GeoDataFrame, class_overrides: dict[str, dict[str, str]]) -> gpd.GeoDataFrame:
     lines = lines.copy()
     lines["rail_type_code"] = lines["N02_001"].map(normalize_text)
     lines["operator_type_code"] = lines["N02_002"].map(normalize_text)
@@ -214,7 +266,7 @@ def normalize_lines(lines: gpd.GeoDataFrame, class_overrides: dict[str, str]) ->
     lines["operator"] = lines["N02_004"].map(normalize_text)
     lines = lines.loc[lines["name"] != ""].copy()
     lines["line_class"] = lines.apply(
-        lambda row: classify_line(row["name"], row["rail_type_code"], class_overrides),
+        lambda row: classify_line(row["name"], row["rail_type_code"], row["operator_type_code"], class_overrides),
         axis=1,
     )
     lines["status"] = "active"
@@ -472,7 +524,7 @@ def main() -> None:
             line_class: int((normalized_lines["line_class"] == line_class).sum())
             for line_class in ("high_speed", "trunk", "branch", "service")
         },
-        "line_class_override_count": int(len(class_overrides)),
+        "line_class_override_count": int(count_line_class_override_entries(class_overrides)),
         "major_station_override_count": int(count_station_override_entries(station_override_payload)),
         "osm_patch_present": OSM_PATCH_PATH.exists(),
         "recipe_version": recipe.get("version", "japan_rail_sources_v1"),
@@ -489,7 +541,7 @@ def main() -> None:
         },
         "notes": [
             "Official N02 lines are the active backbone for the first rail pack.",
-            "Line classes use official rail-type codes first, then repo-versioned overrides for product-level corrections.",
+            "Line classes use explicit repo-versioned overrides before falling back to official N02 rail-type defaults.",
             "Major stations are emitted only from repo-versioned major_station_overrides.json so the first pack never guesses importance silently.",
             "OSM lifecycle patch presence is recorded in the audit, but the first builder does not auto-merge that patch without an explicit local recipe step.",
         ],

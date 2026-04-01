@@ -1017,6 +1017,8 @@ export const state = {
   contextLayerLoadStateByName: {
     rivers: "idle",
     urban: "idle",
+    airports: "idle",
+    ports: "idle",
     physical: "idle",
     physical_semantics: "idle",
     physical_contours_major: "idle",
@@ -1043,6 +1045,8 @@ export const state = {
   scenarioGeoLocalePatchData: null,
   scenarioCityOverridesData: null,
   riversData: null,
+  airportsData: null,
+  portsData: null,
   oceanData: null,
   globalBathymetryTopologyData: null,
   globalBathymetryBandsData: null,
@@ -1254,6 +1258,8 @@ export const state = {
   showUrban: true,
   showPhysical: true,
   showRivers: true,
+  showAirports: false,
+  showPorts: false,
   showSpecialZones: false,
   cityLayerRevision: 0,
   manualSpecialZones: {

@@ -1,0 +1,57 @@
+{
+  "generated_at": "2026-04-01T22:07:32.349648Z",
+  "adapter_id": "japan_airport_v1",
+  "raw_airport_feature_count": 108,
+  "raw_reference_point_count": 97,
+  "normalized_airport_count": 75,
+  "normalized_airport_count_before_scope_clip": 108,
+  "preview_airport_count": 68,
+  "airport_type_counts": {
+    "1": 4,
+    "2": 23,
+    "3": 4,
+    "4": 31,
+    "5": 7,
+    "6": 6
+  },
+  "importance_counts": {
+    "national_core": 33,
+    "regional_core": 35,
+    "local_connector": 7
+  },
+  "scheduled_service_code_counts": {
+    "1": 60,
+    "2": 11,
+    "3": 4
+  },
+  "latest_survey_attached_count": 75,
+  "recipe_version": "japan_airport_sources_v1",
+  "source_policy": "local_source_cache_only",
+  "text_policy": {
+    "storage_encoding": "utf-8",
+    "display_fields_preserve_original": true,
+    "match_key_normalization": "NFKC + whitespace collapse + casefold"
+  },
+  "source_signature": {
+    "mlit_c28_2021_airports": {
+      "filename": "C28-21_Airport.geojson",
+      "size_bytes": 300750,
+      "sha256": "ac75cd6765324d0714a7e6cadc5ade29d117a9ae20743083ba017bc0881280be"
+    },
+    "mlit_c28_2021_reference_points": {
+      "filename": "C28-21_AirportReferencePoint.geojson",
+      "size_bytes": 13695,
+      "sha256": "bd45da15f66829cde6fa31f670eb08910a9849a36de3c0da3ebb0551f8c8428a"
+    },
+    "mlit_c28_2021_survey_content": {
+      "filename": "C28-21_SurveyContent.geojson",
+      "size_bytes": 750984,
+      "sha256": "004e0544c5f9eafb328c297d48eaeb8889aa2c6a0185b19cc850fce4efa19f77"
+    }
+  },
+  "notes": [
+    "Airport geometry is anchored to the official airport reference point layer, not polygon centroids.",
+    "Airport preview keeps national_core and regional_core facilities only so the first carrier view stays readable.",
+    "IATA and ICAO stay blank because the official C28 source does not provide them in this build chain."
+  ]
+}

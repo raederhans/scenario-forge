@@ -1,0 +1,64 @@
+{
+  "adapter_id": "japan_mineral_resources_v1",
+  "family": "mineral_resources",
+  "geometry_kind": "point",
+  "country": "Japan",
+  "schema_version": 1,
+  "generated_at": "2026-04-01T21:49:35.214308Z",
+  "recipe_path": "data/transport_layers/japan_mineral_resources/source_recipe.manual.json",
+  "paths": {
+    "preview": {
+      "mineral_resources": "data/transport_layers/japan_mineral_resources/mineral_resources.preview.geojson"
+    },
+    "full": {
+      "mineral_resources": "data/transport_layers/japan_mineral_resources/mineral_resources.geojson"
+    },
+    "build_audit": "data/transport_layers/japan_mineral_resources/build_audit.json"
+  },
+  "source_signature": {
+    "gsj_mine_distribution_2017": {
+      "filename": "GSJ_DOC_INR_073_2017_DATA.zip",
+      "size_bytes": 236377,
+      "sha256": "2f2a21e6c0efcba25a4da90977845886a922d8068f9f89bca6c982e2bc6c1156",
+      "member": "GSJ_DOC_INR_073_2017_DATA/mine_jp.csv"
+    },
+    "resource_class_overrides": {
+      "filename": "data/transport_layers/japan_mineral_resources/overrides/resource_class_overrides.json",
+      "size_bytes": 214,
+      "sha256": "323c3beefc8e1b62aa1137f0fcd0fe6905687b20d6b66d142d0161b78df09c35"
+    }
+  },
+  "recipe_version": "japan_mineral_resources_sources_v1",
+  "feature_counts": {
+    "preview": {
+      "mineral_resources": 12668
+    },
+    "full": {
+      "mineral_resources": 12668
+    }
+  },
+  "clip_bbox": [
+    129.0,
+    30.75,
+    145.824962,
+    45.520413
+  ],
+  "build_command": "python tools/build_transport_workbench_japan_mineral_resources.py",
+  "runtime_consumer": "transport_workbench_manifest_preview",
+  "distribution_tier": "public_candidate",
+  "license_tier": "review_required",
+  "coverage_scope": "japan_main_islands_v1",
+  "source_policy": "local_source_cache_only",
+  "source_member": "GSJ_DOC_INR_073_2017_DATA/mine_jp.csv",
+  "source_encoding": "cp932",
+  "source_url": "https://www.gsj.jp/data/interim-report/GSJ_DOC_INR_073_2017_DATA.zip",
+  "excluded_regions": [
+    "outside_japan_main_islands_route_mask"
+  ],
+  "text_policy": {
+    "storage_encoding": "utf-8",
+    "display_fields_preserve_original": true,
+    "source_fallback_encoding": "cp932",
+    "match_key_normalization": "NFKC + whitespace collapse + casefold"
+  }
+}

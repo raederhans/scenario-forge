@@ -15,10 +15,10 @@ const LINE_CLASS_PRIORITY = {
   high_speed: 4,
 };
 const LINE_CLASS_STYLE = {
-  high_speed: { stroke: "#155e75", width: 2.8 },
-  trunk: { stroke: "#1f2937", width: 2.1 },
-  branch: { stroke: "#6b4f3b", width: 1.5 },
-  service: { stroke: "#6b7280", width: 1.2 },
+  high_speed: { stroke: "#0f766e", width: 3.2, opacityMultiplier: 1.0 },
+  trunk: { stroke: "#1f2937", width: 2.35, opacityMultiplier: 0.96 },
+  branch: { stroke: "#85644a", width: 1.45, opacityMultiplier: 0.82 },
+  service: { stroke: "#94a3b8", width: 1.05, opacityMultiplier: 0.62 },
 };
 const STATION_STYLE = {
   dot_ring: { radius: 4.2, fill: "#f8fafc", stroke: "#1f2937", strokeWidth: 1.2 },
@@ -29,6 +29,11 @@ const IMPORTANCE_ORDER = {
   broad_major: 1,
   regional_core: 2,
   capital_core: 3,
+};
+const STATION_IMPORTANCE_STYLE = {
+  broad_major: { sizeMultiplier: 0.92, labelScale: 0.95, minLabelScale: 1.22 },
+  regional_core: { sizeMultiplier: 1.0, labelScale: 1.0, minLabelScale: 1.14 },
+  capital_core: { sizeMultiplier: 1.22, labelScale: 1.12, minLabelScale: 1.06 },
 };
 const INACTIVE_STATUS = new Set(["disused", "abandoned", "construction"]);
 const SELECTED_LINE_STROKE = "#0f172a";
@@ -343,9 +348,10 @@ function getImportanceThreshold(config) {
 
 function getLineOpacity(feature, config) {
   const baseOpacity = normalizeNumber(config.lineOpacity, 92) / 100;
-  if (!INACTIVE_STATUS.has(feature.status)) return baseOpacity;
+  const classMultiplier = (LINE_CLASS_STYLE[feature.lineClass] || LINE_CLASS_STYLE.trunk).opacityMultiplier || 1;
+  if (!INACTIVE_STATUS.has(feature.status)) return Math.max(0.2, baseOpacity * classMultiplier);
   const fadeStrength = normalizeNumber(config.inactiveFadeStrength, 72) / 100;
-  return Math.max(0.12, baseOpacity * (1 - fadeStrength));
+  return Math.max(0.1, baseOpacity * classMultiplier * (1 - fadeStrength));
 }
 
 function getLineStyle(feature, config, selectedLineId) {
@@ -359,9 +365,13 @@ function getLineStyle(feature, config, selectedLineId) {
   }
   return {
     stroke,
-    width: isSelected ? base.width + 1.0 : base.width,
+    width: isSelected ? base.width + 1.1 : base.width,
     opacity: getLineOpacity(feature, config),
   };
+}
+
+function getStationImportanceStyle(feature) {
+  return STATION_IMPORTANCE_STYLE[feature?.importance] || STATION_IMPORTANCE_STYLE.broad_major;
 }
 
 function shouldShowStation(feature, config, scale) {
@@ -372,7 +382,7 @@ function shouldShowStation(feature, config, scale) {
 
 function shouldShowStationLabel(feature, config, scale) {
   if (!config.showStationLabels) return false;
-  return shouldShowStation(feature, config, scale) && scale >= 1.14;
+  return shouldShowStation(feature, config, scale) && scale >= getStationImportanceStyle(feature).minLabelScale;
 }
 
 function findDatasetNode(startNode, datasetKey, boundaryNode) {
@@ -544,9 +554,11 @@ function renderSelectedHighlight(selectedLine, selectedStation) {
   }
   if (selectedStationHighlightNode) {
     if (selectedStation) {
+      const selectedPreset = STATION_STYLE[lastRenderedConfig?.stationSymbolPreset] || STATION_STYLE.dot_ring;
+      const selectedRadius = selectedPreset.radius * getStationImportanceStyle(selectedStation).sizeMultiplier;
       selectedStationHighlightNode.setAttribute("cx", String(selectedStation.x));
       selectedStationHighlightNode.setAttribute("cy", String(selectedStation.y));
-      selectedStationHighlightNode.setAttribute("r", "7.2");
+      selectedStationHighlightNode.setAttribute("r", String(selectedRadius + 3));
       selectedStationHighlightNode.style.display = "";
     } else {
       selectedStationHighlightNode.style.display = "none";
@@ -606,7 +618,9 @@ function syncLineNodes(visibleLines, config, selectedLineId) {
 
 function updateStationNode(node, feature, config, isSelected) {
   const preset = STATION_STYLE[config.stationSymbolPreset] || STATION_STYLE.dot_ring;
-  const radius = isSelected ? preset.radius + 1.2 : preset.radius;
+  const importanceStyle = getStationImportanceStyle(feature);
+  const baseRadius = preset.radius * importanceStyle.sizeMultiplier;
+  const radius = isSelected ? baseRadius + 1.35 : baseRadius;
   if (preset.square) {
     node.setAttribute("x", String(feature.x - radius));
     node.setAttribute("y", String(feature.y - radius));
@@ -650,19 +664,23 @@ function syncStationNodes(visibleStations, config, selectedStationId, scale) {
     visibleIds.add(feature.id);
 
     if (shouldShowStationLabel(feature, config, scale)) {
+      const importanceStyle = getStationImportanceStyle(feature);
+      const fontSize = 10 * importanceStyle.labelScale;
+      const textOffsetX = 7 + Math.max(0, fontSize - 10);
+      const textOffsetY = 6 + Math.max(0, fontSize - 10) * 0.35;
       let text = stationLabelNodeById.get(feature.id);
       if (!text) {
         text = createSvgNode("text");
         stationLabelNodeById.set(feature.id, text);
       }
       text.textContent = feature.name || "";
-      text.setAttribute("x", String(feature.x + 7));
-      text.setAttribute("y", String(feature.y - 6));
-      text.setAttribute("font-size", "10");
-      text.setAttribute("font-weight", "600");
-      text.setAttribute("fill", "#1f2937");
-      text.setAttribute("stroke", "#f8fafc");
-      text.setAttribute("stroke-width", "2");
+      text.setAttribute("x", String(feature.x + textOffsetX));
+      text.setAttribute("y", String(feature.y - textOffsetY));
+      text.setAttribute("font-size", String(fontSize));
+      text.setAttribute("font-weight", feature.importance === "capital_core" ? "700" : "600");
+      text.setAttribute("fill", feature.importance === "capital_core" ? "#111827" : "#1f2937");
+      text.setAttribute("stroke", "rgba(248, 250, 252, 0.96)");
+      text.setAttribute("stroke-width", String(feature.importance === "capital_core" ? 2.6 : 2.2));
       text.setAttribute("paint-order", "stroke");
       text.setAttribute("opacity", String(normalizeNumber(config.stationOpacity, 86) / 100));
       text.dataset.railStationId = feature.id;

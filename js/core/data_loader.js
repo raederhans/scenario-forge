@@ -39,6 +39,8 @@ const STARTUP_LOCALES_URL = "data/locales.startup.json";
 const STARTUP_GEO_ALIASES_URL = "data/geo_aliases.startup.json";
 const GLOBAL_RIVERS_CONTEXT_PACK_URL = "data/global_rivers.geojson";
 const CONTEXT_LAYER_PACKS = {
+  airports: { url: "data/transport_layers/japan_airport/airports.geojson", format: "geojson" },
+  ports: { url: "data/transport_layers/japan_port/ports.geojson", format: "geojson" },
   physical: { url: "data/europe_physical.geojson", format: "geojson" },
   urban: { url: "data/europe_urban.geojson", format: "geojson" },
   physical_semantics: {

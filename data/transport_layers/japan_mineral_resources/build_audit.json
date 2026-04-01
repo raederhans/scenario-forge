@@ -1,0 +1,40 @@
+{
+  "generated_at": "2026-04-01T21:49:35.214308Z",
+  "adapter_id": "japan_mineral_resources_v1",
+  "recipe_version": "japan_mineral_resources_sources_v1",
+  "raw_row_count": 12981,
+  "invalid_row_count": 0,
+  "excluded_outside_mask_count": 313,
+  "normalized_feature_count": 12668,
+  "resource_class_override_count": 5,
+  "resource_type_count": 511,
+  "resource_class_count": 198,
+  "source_policy": "local_source_cache_only",
+  "source_member": "GSJ_DOC_INR_073_2017_DATA/mine_jp.csv",
+  "source_encoding": "cp932",
+  "source_url": "https://www.gsj.jp/data/interim-report/GSJ_DOC_INR_073_2017_DATA.zip",
+  "excluded_regions": [
+    {
+      "rule": "outside_japan_main_islands_route_mask",
+      "count": 313
+    }
+  ],
+  "source_signature": {
+    "gsj_mine_distribution_2017": {
+      "filename": "GSJ_DOC_INR_073_2017_DATA.zip",
+      "size_bytes": 236377,
+      "sha256": "2f2a21e6c0efcba25a4da90977845886a922d8068f9f89bca6c982e2bc6c1156",
+      "member": "GSJ_DOC_INR_073_2017_DATA/mine_jp.csv"
+    },
+    "resource_class_overrides": {
+      "filename": "data/transport_layers/japan_mineral_resources/overrides/resource_class_overrides.json",
+      "size_bytes": 214,
+      "sha256": "323c3beefc8e1b62aa1137f0fcd0fe6905687b20d6b66d142d0161b78df09c35"
+    }
+  },
+  "notes": [
+    "The first mineral resource pack uses the GSJ mine distribution CSV exactly as supplied in the local source cache.",
+    "Preview and full outputs are identical for v1 because no stable importance model has been approved yet.",
+    "Historical resource-class spellings are only normalized through the repo-versioned override file."
+  ]
+}

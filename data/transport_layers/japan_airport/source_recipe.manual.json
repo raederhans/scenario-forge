@@ -1,0 +1,61 @@
+{
+  "version": "japan_airport_sources_v1",
+  "family": "airport",
+  "country": "Japan",
+  "generated_policy": "manual_source_cache_only",
+  "notes": [
+    "Raw source files stay in .runtime/source-cache and are not committed into the repository.",
+    "Builds must fail clearly when the official airport polygons, reference points, or survey content source is missing or cannot be decoded.",
+    "Use the UTF-8 C28 members directly. Do not silently fall back to legacy encoded members for the first airport chain."
+  ],
+  "encoding_policy": {
+    "display_fields_encoding": "utf-8",
+    "match_key_normalization": "NFKC",
+    "display_fields_preserve_original_text": true
+  },
+  "sources": [
+    {
+      "id": "mlit_c28_2021_airports",
+      "kind": "download",
+      "role": "facility_attributes_primary",
+      "url": "https://nlftp.mlit.go.jp/ksj/gml/data/C28/C28-21/C28-21_GML.zip",
+      "expected_filename": "C28-21_GML.zip",
+      "preferred_member": "UTF-8/C28-21_Airport.geojson",
+      "license": "CC BY 4.0 with MLIT attribution notice",
+      "ingest_mode": "local_file",
+      "encoding": "utf-8"
+    },
+    {
+      "id": "mlit_c28_2021_reference_points",
+      "kind": "download",
+      "role": "geometry_primary",
+      "url": "https://nlftp.mlit.go.jp/ksj/gml/data/C28/C28-21/C28-21_GML.zip",
+      "expected_filename": "C28-21_GML.zip",
+      "preferred_member": "UTF-8/C28-21_AirportReferencePoint.geojson",
+      "license": "CC BY 4.0 with MLIT attribution notice",
+      "ingest_mode": "local_file",
+      "encoding": "utf-8"
+    },
+    {
+      "id": "mlit_c28_2021_survey_content",
+      "kind": "download",
+      "role": "survey_metrics_within_source",
+      "url": "https://nlftp.mlit.go.jp/ksj/gml/data/C28/C28-21/C28-21_GML.zip",
+      "expected_filename": "C28-21_GML.zip",
+      "preferred_member": "UTF-8/C28-21_SurveyContent.geojson",
+      "license": "CC BY 4.0 with MLIT attribution notice",
+      "ingest_mode": "local_file",
+      "encoding": "utf-8"
+    }
+  ],
+  "output_contract": {
+    "publish": [
+      "airports.geojson",
+      "airports.preview.geojson",
+      "manifest.json",
+      "build_audit.json"
+    ],
+    "runtime_consumer": "transport_workbench_airport_preview",
+    "adapter_id": "japan_airport_v1"
+  }
+}

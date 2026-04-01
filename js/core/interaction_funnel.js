@@ -636,6 +636,8 @@ async function applyImportedProjectState(data, { ui, hooks }) {
     state.showUrban = !!data.layerVisibility.showUrban;
     state.showPhysical = !!data.layerVisibility.showPhysical;
     state.showRivers = !!data.layerVisibility.showRivers;
+    state.showAirports = !!data.layerVisibility.showAirports;
+    state.showPorts = !!data.layerVisibility.showPorts;
     state.showSpecialZones =
       data.layerVisibility.showSpecialZones === undefined
         ? false
@@ -682,6 +684,18 @@ async function applyImportedProjectState(data, { ui, hooks }) {
   }
   if (state.showRivers && typeof state.ensureContextLayerDataFn === "function") {
     await state.ensureContextLayerDataFn("rivers", {
+      reason: "project-import",
+      renderNow: false,
+    });
+  }
+  if (state.showAirports && typeof state.ensureContextLayerDataFn === "function") {
+    await state.ensureContextLayerDataFn("airports", {
+      reason: "project-import",
+      renderNow: false,
+    });
+  }
+  if (state.showPorts && typeof state.ensureContextLayerDataFn === "function") {
+    await state.ensureContextLayerDataFn("ports", {
       reason: "project-import",
       renderNow: false,
     });

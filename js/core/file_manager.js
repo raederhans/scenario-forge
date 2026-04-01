@@ -308,6 +308,8 @@ class FileManager {
         showUrban: !!appState.showUrban,
         showPhysical: !!appState.showPhysical,
         showRivers: !!appState.showRivers,
+        showAirports: !!appState.showAirports,
+        showPorts: !!appState.showPorts,
         showSpecialZones: !!appState.showSpecialZones,
       },
       styleConfig: {
@@ -509,6 +511,10 @@ class FileManager {
           data.layerVisibility.showPhysical === undefined ? true : !!data.layerVisibility.showPhysical;
         data.layerVisibility.showRivers =
           data.layerVisibility.showRivers === undefined ? true : !!data.layerVisibility.showRivers;
+        data.layerVisibility.showAirports =
+          data.layerVisibility.showAirports === undefined ? false : !!data.layerVisibility.showAirports;
+        data.layerVisibility.showPorts =
+          data.layerVisibility.showPorts === undefined ? false : !!data.layerVisibility.showPorts;
         data.layerVisibility.showSpecialZones =
           data.layerVisibility.showSpecialZones === undefined
             ? false
