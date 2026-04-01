@@ -412,10 +412,12 @@ function createStartupBootArtifactsOverride({
   baseDecodedCollections = null,
   metrics = null,
 } = {}) {
+  const hasScenarioRuntimeBootstrap = !!payload?.scenario?.runtime_topology_bootstrap?.objects?.political;
   return {
     topologyPrimary: payload?.base?.topology_primary || null,
     locales: payload?.base?.locales || { ui: {}, geo: {} },
     geoAliases: payload?.base?.geo_aliases || { alias_to_stable_key: {} },
+    hasScenarioRuntimeBootstrap,
     localeLevel: "startup",
     startupBootCacheState: {
       enabled: false,

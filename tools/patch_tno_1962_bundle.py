@@ -17,6 +17,7 @@ from pathlib import Path
 import geopandas as gpd
 import numpy as np
 import requests
+from shapely import make_valid
 from rasterio import features as raster_features
 from rasterio.transform import Affine
 from shapely import affinity
@@ -234,12 +235,14 @@ TNO_OPEN_OCEAN_SPLIT_SPECS = (
                 "name": "Northwest Pacific Ocean",
                 "bbox": (100.0, 20.0, 180.0, 90.0),
                 "supplement_bboxes": ((130.0, 20.0, 180.0, 50.0),),
+                "component_min_area": 0.05,
             },
             {
                 "id": TNO_PACIFIC_OPEN_OCEAN_IDS[1],
                 "name": "Northeast Pacific Ocean",
                 "bbox": (-180.0, 20.0, -100.0, 90.0),
                 "supplement_bboxes": ((-170.0, 20.0, -120.0, 60.0),),
+                "component_min_area": 0.05,
             },
             {
                 "id": TNO_PACIFIC_OPEN_OCEAN_IDS[2],
@@ -4027,7 +4030,6 @@ def build_tno_open_ocean_split_features(
     validate_tno_water_geometries(
         split_features,
         stage_label="scenario_water_seed",
-        feature_ids=TNO_ATLANTIC_OPEN_OCEAN_IDS,
     )
     return split_features
 
@@ -4064,7 +4066,6 @@ def clip_tno_open_ocean_split_features(
     validate_tno_water_geometries(
         clipped_features,
         stage_label="scenario_water_seed_clipped",
-        feature_ids=TNO_ATLANTIC_OPEN_OCEAN_IDS,
     )
     return clipped_features
 
@@ -4190,7 +4191,7 @@ def sanitize_jsonable(value):
 
 def write_json(path: Path, payload: dict) -> None:
     sanitized = sanitize_jsonable(payload)
-    if path.name in {"water_regions.geojson", "relief_overlays.geojson"}:
+    if path.name == "relief_overlays.geojson":
         sanitized = round_geojson_coordinates(sanitized, decimals=6)
     write_json_atomic(
         path,
@@ -4296,7 +4297,6 @@ def rebuild_published_scenario_chunk_assets(scenario_dir: Path, checkpoint_dir: 
         runtime_topology_url=runtime_topology_url,
         generated_at=str(manifest_payload.get("generated_at") or "").strip(),
         default_startup_topology_url=DEFAULT_STARTUP_TOPOLOGY_URL,
-        water_validation_feature_ids=set(TNO_ATLANTIC_OPEN_OCEAN_IDS),
     )
     write_json_atomic(manifest_path, manifest_payload, ensure_ascii=False, indent=2, trailing_newline=True)
 
@@ -5806,7 +5806,7 @@ def normalize_polygonal(geom):
     candidate = geom
     try:
         if not candidate.is_valid:
-            candidate = candidate.buffer(0)
+            candidate = make_valid(candidate)
     except Exception:
         try:
             candidate = geom.buffer(0)
@@ -5814,9 +5814,27 @@ def normalize_polygonal(geom):
             candidate = geom
     parts = []
     for part in iter_polygon_parts(candidate):
-        if part.is_empty or part.area <= 1e-9:
-            continue
-        parts.append(orient(part, sign=-1.0))
+        normalized_part = part
+        try:
+            if not normalized_part.is_valid:
+                normalized_part = make_valid(normalized_part)
+        except Exception:
+            try:
+                normalized_part = part.buffer(0)
+            except Exception:
+                normalized_part = part
+        if isinstance(normalized_part, GeometryCollection):
+            candidate_parts = iter_polygon_parts(normalized_part)
+        elif isinstance(normalized_part, MultiPolygon):
+            candidate_parts = [sub_part for sub_part in normalized_part.geoms if not sub_part.is_empty]
+        elif isinstance(normalized_part, Polygon):
+            candidate_parts = [normalized_part]
+        else:
+            candidate_parts = []
+        for candidate_part in candidate_parts:
+            if candidate_part.is_empty or candidate_part.area <= 1e-9:
+                continue
+            parts.append(orient(candidate_part, sign=-1.0))
     if not parts:
         return None
     return parts[0] if len(parts) == 1 else MultiPolygon(parts)
@@ -5990,6 +6008,48 @@ def topology_object_to_gdf(topo_dict: dict, object_name: str) -> gpd.GeoDataFram
     elif str(gdf.crs).upper() != "EPSG:4326":
         gdf = gdf.to_crs("EPSG:4326")
     return gdf
+
+
+def remap_topology_arc_indexes(value: object, offset: int) -> object:
+    if not offset:
+        return copy.deepcopy(value)
+    if isinstance(value, list):
+        if value and all(isinstance(item, int) for item in value):
+            remapped: list[int] = []
+            for arc_index in value:
+                sign = -1 if arc_index < 0 else 1
+                base_index = abs(arc_index)
+                remapped.append((base_index + offset) * sign)
+            return remapped
+        return [remap_topology_arc_indexes(item, offset) for item in value]
+    if isinstance(value, dict):
+        remapped_dict = {}
+        for key, item in value.items():
+            if key == "arcs" or isinstance(item, (list, dict)):
+                remapped_dict[key] = remap_topology_arc_indexes(item, offset)
+            else:
+                remapped_dict[key] = copy.deepcopy(item)
+        return remapped_dict
+    return copy.deepcopy(value)
+
+
+def merge_topology_bboxes(*bboxes: object) -> list[float] | None:
+    valid_boxes: list[list[float]] = []
+    for bbox in bboxes:
+        if not isinstance(bbox, (list, tuple)) or len(bbox) != 4:
+            continue
+        try:
+            valid_boxes.append([float(bbox[0]), float(bbox[1]), float(bbox[2]), float(bbox[3])])
+        except (TypeError, ValueError):
+            continue
+    if not valid_boxes:
+        return None
+    return [
+        min(box[0] for box in valid_boxes),
+        min(box[1] for box in valid_boxes),
+        max(box[2] for box in valid_boxes),
+        max(box[3] for box in valid_boxes),
+    ]
 
 
 def sanitize_feature_collection_polygonal_geometries(feature_collection: dict) -> dict:
@@ -8315,16 +8375,35 @@ def build_runtime_topology_payload(
     available_columns = [column for column in keep_columns if column in political_gdf.columns]
     runtime_political_gdf = political_gdf.loc[:, available_columns].copy()
     topo = Topology(
-        [runtime_political_gdf, water_gdf, land_mask_gdf, context_land_mask_gdf],
-        object_name=["political", "scenario_water", "land_mask", "context_land_mask"],
+        [runtime_political_gdf, land_mask_gdf, context_land_mask_gdf],
+        object_name=["political", "land_mask", "context_land_mask"],
         topology=True,
-        prequantize=1_000_000,
+        prequantize=False,
         topoquantize=False,
         presimplify=False,
         toposimplify=False,
         shared_coords=False,
     )
     topo_dict = topo.to_dict()
+    water_topo = Topology(
+        [water_gdf],
+        object_name=["scenario_water"],
+        topology=True,
+        prequantize=False,
+        topoquantize=False,
+        presimplify=False,
+        toposimplify=False,
+        shared_coords=False,
+    ).to_dict()
+    arc_offset = len(topo_dict.get("arcs", []))
+    topo_dict.setdefault("objects", {})["scenario_water"] = remap_topology_arc_indexes(
+        water_topo.get("objects", {}).get("scenario_water", {"type": "GeometryCollection", "geometries": []}),
+        arc_offset,
+    )
+    topo_dict["arcs"] = list(topo_dict.get("arcs", [])) + list(water_topo.get("arcs", []))
+    merged_bbox = merge_topology_bboxes(topo_dict.get("bbox"), water_topo.get("bbox"))
+    if merged_bbox is not None:
+        topo_dict["bbox"] = merged_bbox
     topo_dict.setdefault("objects", {})["scenario_special_land"] = {
         "type": "GeometryCollection",
         "geometries": [],
@@ -8613,7 +8692,6 @@ def build_countries_stage_state(
     validate_tno_water_geometries(
         scenario_water_features,
         stage_label="scenario_water_seed_final",
-        feature_ids=TNO_ATLANTIC_OPEN_OCEAN_IDS,
     )
     water_feature_collection = feature_collection_from_features(scenario_water_features)
     water_gdf = geopandas_from_features(water_feature_collection["features"])
@@ -8732,16 +8810,12 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
         context_land_mask_gdf,
     )
     context_land_mask_arc_refs = estimate_topology_object_arc_refs(runtime_topology_payload, "context_land_mask")
-    runtime_water_regions = round_geojson_coordinates(
-        sanitize_feature_collection_polygonal_geometries(
-            topology_object_to_feature_collection(runtime_topology_payload, "scenario_water")
-        ),
-        decimals=6,
+    runtime_water_regions = sanitize_feature_collection_polygonal_geometries(
+        topology_object_to_feature_collection(runtime_topology_payload, "scenario_water")
     )
     validate_tno_water_geometries(
         runtime_water_regions,
         stage_label="runtime_topology.scenario_water",
-        feature_ids=TNO_ATLANTIC_OPEN_OCEAN_IDS,
     )
     runtime_special_regions = feature_collection_from_features([])
     relief_overlays_payload = round_geojson_coordinates(relief_overlays_payload, decimals=6)

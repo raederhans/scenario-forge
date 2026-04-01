@@ -20,10 +20,11 @@ OFFICIAL_LINES_SHP_PATH = SOURCE_CACHE_DIR / "N02-24_GML" / "N02-24_RailroadSect
 OFFICIAL_STATIONS_GEOJSON_PATH = SOURCE_CACHE_DIR / "N02-24_GML" / "UTF-8" / "N02-24_Station.geojson"
 OFFICIAL_STATIONS_SHP_PATH = SOURCE_CACHE_DIR / "N02-24_GML" / "N02-24_Station.shp"
 OSM_PATCH_PATH = SOURCE_CACHE_DIR / "osm_lifecycle_lines.geojson"
-LINE_CLASS_OVERRIDE_PATH = SOURCE_CACHE_DIR / "line_class_overrides.json"
-MAJOR_STATION_OVERRIDE_PATH = SOURCE_CACHE_DIR / "major_station_overrides.json"
 RECIPE_PATH = ROOT / "data" / "transport_layers" / "japan_rail" / "source_recipe.manual.json"
 OUTPUT_DIR = ROOT / "data" / "transport_layers" / "japan_rail"
+OVERRIDE_DIR = OUTPUT_DIR / "overrides"
+LINE_CLASS_OVERRIDE_PATH = OVERRIDE_DIR / "line_class_overrides.json"
+MAJOR_STATION_OVERRIDE_PATH = OVERRIDE_DIR / "major_station_overrides.json"
 RAILWAYS_TOPO_PATH = OUTPUT_DIR / "railways.topo.json"
 RAILWAYS_PREVIEW_TOPO_PATH = OUTPUT_DIR / "railways.preview.topo.json"
 MAJOR_STATIONS_PATH = OUTPUT_DIR / "rail_stations_major.geojson"
@@ -38,6 +39,20 @@ PREVIEW_MIN_LENGTH_METERS = {
     "trunk": 6_000.0,
     "branch": 12_000.0,
     "service": 18_000.0,
+}
+DEFAULT_LINE_CLASS_BY_RAIL_TYPE_CODE = {
+    "11": "trunk",
+    "12": "trunk",
+    "13": "branch",
+    "14": "branch",
+    "15": "branch",
+    "16": "branch",
+    "17": "service",
+    "21": "branch",
+    "22": "branch",
+    "23": "branch",
+    "24": "branch",
+    "25": "high_speed",
 }
 SHINKANSEN_RE = re.compile(r"(?:\u65b0\u5e79\u7dda|shinkansen)", re.IGNORECASE)
 
@@ -145,13 +160,32 @@ def load_optional_json(path: Path) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {}
 
 
-def classify_line(name: str, class_overrides: dict[str, str]) -> str:
-    override = normalize_text(class_overrides.get(name))
+def normalize_override_class(value: Any) -> str:
+    normalized = normalize_text(value)
+    return normalized if normalized in {"high_speed", "trunk", "branch", "service"} else ""
+
+
+def build_line_class_override_map(payload: dict[str, Any]) -> dict[str, str]:
+    override_map: dict[str, str] = {}
+    for source_key in ("line_class_by_name", "line_class_by_match_key"):
+        source = payload.get(source_key)
+        if not isinstance(source, dict):
+            continue
+        for key, value in source.items():
+            normalized_key = normalize_match_key(key)
+            normalized_class = normalize_override_class(value)
+            if normalized_key and normalized_class:
+                override_map[normalized_key] = normalized_class
+    return override_map
+
+
+def classify_line(name: str, rail_type_code: str, class_overrides: dict[str, str]) -> str:
+    override = class_overrides.get(normalize_match_key(name), "")
     if override in {"high_speed", "trunk", "branch", "service"}:
         return override
     if SHINKANSEN_RE.search(name):
         return "high_speed"
-    return "trunk"
+    return DEFAULT_LINE_CLASS_BY_RAIL_TYPE_CODE.get(rail_type_code, "trunk")
 
 
 def build_line_id(name: str, operator: str, geometry_wkb: bytes, index: int) -> str:
@@ -173,10 +207,15 @@ def build_station_id(name: str, group_code: str, station_code: str) -> str:
 
 def normalize_lines(lines: gpd.GeoDataFrame, class_overrides: dict[str, str]) -> gpd.GeoDataFrame:
     lines = lines.copy()
+    lines["rail_type_code"] = lines["N02_001"].map(normalize_text)
+    lines["operator_type_code"] = lines["N02_002"].map(normalize_text)
     lines["name"] = lines["N02_003"].map(normalize_text)
     lines["operator"] = lines["N02_004"].map(normalize_text)
     lines = lines.loc[lines["name"] != ""].copy()
-    lines["line_class"] = lines["name"].map(lambda value: classify_line(value, class_overrides))
+    lines["line_class"] = lines.apply(
+        lambda row: classify_line(row["name"], row["rail_type_code"], class_overrides),
+        axis=1,
+    )
     lines["status"] = "active"
     lines["source"] = "official_jp"
     lines["source_flags"] = ""
@@ -187,7 +226,19 @@ def normalize_lines(lines: gpd.GeoDataFrame, class_overrides: dict[str, str]) ->
         build_line_id(name, operator, geometry.wkb, index)
         for index, (name, operator, geometry) in enumerate(zip(lines["name"], lines["operator"], lines.geometry), start=1)
     ]
-    return lines[["id", "name", "operator", "line_class", "status", "source", "source_flags", "length_m", "geometry"]]
+    return lines[[
+        "id",
+        "name",
+        "operator",
+        "rail_type_code",
+        "operator_type_code",
+        "line_class",
+        "status",
+        "source",
+        "source_flags",
+        "length_m",
+        "geometry",
+    ]]
 
 
 def representative_point(geometry) -> Point:
@@ -200,6 +251,18 @@ def representative_point(geometry) -> Point:
     return geometry.representative_point()
 
 
+def resolve_station_override(
+    station_name: str,
+    group_code: str,
+    overrides_by_group_code: dict[str, Any],
+    overrides_by_name: dict[str, Any],
+) -> dict[str, Any] | None:
+    override = overrides_by_group_code.get(group_code)
+    if isinstance(override, dict):
+        return override
+    return overrides_by_name.get(normalize_match_key(station_name)) if station_name else None
+
+
 def normalize_stations(stations: gpd.GeoDataFrame, station_overrides: dict[str, Any], lines: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     stations = stations.copy()
     stations["station_name"] = stations["N02_005"].map(normalize_text)
@@ -208,7 +271,17 @@ def normalize_stations(stations: gpd.GeoDataFrame, station_overrides: dict[str, 
     stations["line_name"] = stations["N02_003"].map(normalize_text)
     stations = stations.loc[stations["station_name"] != ""].copy()
     if not station_overrides:
-        return gpd.GeoDataFrame(columns=["id", "name", "city_key", "importance", "source", "linked_line_classes", "geometry"], crs="EPSG:4326")
+        return gpd.GeoDataFrame(
+            columns=["id", "name", "city_key", "station_code", "group_code", "importance", "source", "linked_line_classes", "geometry"],
+            crs="EPSG:4326",
+        )
+    overrides_by_group_code = station_overrides.get("stations_by_group_code", {}) if isinstance(station_overrides.get("stations_by_group_code"), dict) else {}
+    overrides_by_name_source = station_overrides.get("stations_by_name", {}) if isinstance(station_overrides.get("stations_by_name"), dict) else {}
+    overrides_by_name = {
+        normalize_match_key(key): value
+        for key, value in overrides_by_name_source.items()
+        if normalize_match_key(key) and isinstance(value, dict)
+    }
     lines_by_name = {
         normalize_match_key(row["name"]): row["line_class"]
         for _, row in lines.iterrows()
@@ -216,7 +289,8 @@ def normalize_stations(stations: gpd.GeoDataFrame, station_overrides: dict[str, 
     groups = []
     for group_key, group in stations.groupby(stations["group_code"].where(stations["group_code"] != "", stations["station_name"])):
         station_name = normalize_text(group["station_name"].iloc[0])
-        override = station_overrides.get(station_name)
+        normalized_group_key = normalize_text(group_key)
+        override = resolve_station_override(station_name, normalized_group_key, overrides_by_group_code, overrides_by_name)
         if not isinstance(override, dict):
             continue
         union = group.geometry.unary_union
@@ -229,15 +303,26 @@ def normalize_stations(stations: gpd.GeoDataFrame, station_overrides: dict[str, 
             if normalize_text(line_name)
         })
         groups.append({
-            "id": build_station_id(station_name, normalize_text(group_key), normalize_text(group["station_code"].iloc[0])),
+            "id": build_station_id(station_name, normalized_group_key, normalize_text(group["station_code"].iloc[0])),
             "name": station_name,
             "city_key": normalize_text(override.get("city_key") or station_name),
             "importance": normalize_text(override.get("importance") or "regional_core"),
             "source": "official_jp",
+            "station_code": normalize_text(group["station_code"].iloc[0]),
+            "group_code": normalized_group_key,
             "linked_line_classes": "|".join(linked_classes),
             "geometry": point,
         })
     return gpd.GeoDataFrame(groups, geometry="geometry", crs="EPSG:4326")
+
+
+def count_station_override_entries(payload: dict[str, Any]) -> int:
+    total = 0
+    for key in ("stations_by_group_code", "stations_by_name"):
+        source = payload.get(key)
+        if isinstance(source, dict):
+            total += sum(1 for value in source.values() if isinstance(value, dict))
+    return total
 
 
 def build_preview_lines(lines: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
@@ -264,8 +349,10 @@ def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     route_mask = load_route_mask()
     recipe = read_json(RECIPE_PATH)
-    class_overrides = load_optional_json(LINE_CLASS_OVERRIDE_PATH).get("line_class_by_name", {})
-    station_overrides = load_optional_json(MAJOR_STATION_OVERRIDE_PATH).get("stations_by_name", {})
+    line_class_override_payload = load_optional_json(LINE_CLASS_OVERRIDE_PATH)
+    station_override_payload = load_optional_json(MAJOR_STATION_OVERRIDE_PATH)
+    class_overrides = build_line_class_override_map(line_class_override_payload)
+    station_overrides = station_override_payload
 
     official_lines, official_lines_info = read_official_lines(route_mask)
     official_stations, official_stations_info = read_official_stations(route_mask)
@@ -295,6 +382,18 @@ def main() -> None:
             "filename": OSM_PATCH_PATH.name,
             "size_bytes": OSM_PATCH_PATH.stat().st_size,
             "sha256": file_sha256(OSM_PATCH_PATH),
+        }
+    if LINE_CLASS_OVERRIDE_PATH.exists():
+        source_signature["line_class_overrides"] = {
+            "filename": str(LINE_CLASS_OVERRIDE_PATH.relative_to(ROOT)).replace("\\", "/"),
+            "size_bytes": LINE_CLASS_OVERRIDE_PATH.stat().st_size,
+            "sha256": file_sha256(LINE_CLASS_OVERRIDE_PATH),
+        }
+    if MAJOR_STATION_OVERRIDE_PATH.exists():
+        source_signature["major_station_overrides"] = {
+            "filename": str(MAJOR_STATION_OVERRIDE_PATH.relative_to(ROOT)).replace("\\", "/"),
+            "size_bytes": MAJOR_STATION_OVERRIDE_PATH.stat().st_size,
+            "sha256": file_sha256(MAJOR_STATION_OVERRIDE_PATH),
         }
 
     manifest = {
@@ -336,9 +435,14 @@ def main() -> None:
         "official_lines_encoding": official_lines_info["encoding"],
         "official_stations_member": official_stations_info["member"],
         "official_stations_encoding": official_stations_info["encoding"],
+        "override_paths": {
+            "line_class_overrides": str(LINE_CLASS_OVERRIDE_PATH.relative_to(ROOT)).replace("\\", "/"),
+            "major_station_overrides": str(MAJOR_STATION_OVERRIDE_PATH.relative_to(ROOT)).replace("\\", "/"),
+        },
         "text_policy": {
             "storage_encoding": "utf-8",
             "display_fields_preserve_original": True,
+            "source_fallback_encoding": "cp932",
             "match_key_normalization": "NFKC + whitespace collapse + casefold",
         },
     }
@@ -355,7 +459,7 @@ def main() -> None:
             for line_class in ("high_speed", "trunk", "branch", "service")
         },
         "line_class_override_count": int(len(class_overrides)),
-        "major_station_override_count": int(len(station_overrides)),
+        "major_station_override_count": int(count_station_override_entries(station_override_payload)),
         "osm_patch_present": OSM_PATCH_PATH.exists(),
         "recipe_version": recipe.get("version", "japan_rail_sources_v1"),
         "source_policy": "local_source_cache_only",
@@ -365,10 +469,14 @@ def main() -> None:
         "official_stations_encoding": official_stations_info["encoding"],
         "preview_thresholds_m": PREVIEW_MIN_LENGTH_METERS,
         "source_signature": source_signature,
+        "override_paths": {
+            "line_class_overrides": str(LINE_CLASS_OVERRIDE_PATH.relative_to(ROOT)).replace("\\", "/"),
+            "major_station_overrides": str(MAJOR_STATION_OVERRIDE_PATH.relative_to(ROOT)).replace("\\", "/"),
+        },
         "notes": [
             "Official N02 lines are the active backbone for the first rail pack.",
-            "Non-shinkansen lines default to trunk unless a local line_class_overrides.json promotes or demotes them explicitly.",
-            "Major stations are emitted only from major_station_overrides.json so the first pack never guesses importance silently.",
+            "Line classes use official rail-type codes first, then repo-versioned overrides for product-level corrections.",
+            "Major stations are emitted only from repo-versioned major_station_overrides.json so the first pack never guesses importance silently.",
             "OSM lifecycle patch presence is recorded in the audit, but the first builder does not auto-merge that patch without an explicit local recipe step.",
         ],
     }

@@ -1,5 +1,11 @@
 const STARTUP_WORKER_URL = new URL("../workers/startup_boot.worker.js", import.meta.url);
 const STARTUP_WORKER_TIMEOUT_MS = 20_000;
+const STARTUP_WORKER_TIMEOUTS_MS = Object.freeze({
+  LOAD_BASE_STARTUP: 20_000,
+  LOAD_STARTUP_BUNDLE: 45_000,
+  LOAD_SCENARIO_RUNTIME_BOOTSTRAP: 30_000,
+  DECODE_RUNTIME_CHUNK: 30_000,
+});
 
 const MESSAGE_TYPES = Object.freeze({
   LOAD_BASE_STARTUP: "LOAD_BASE_STARTUP",
@@ -61,6 +67,24 @@ function rejectAllPending(error) {
   }
 }
 
+function recycleStartupWorker(error = null) {
+  if (startupWorker) {
+    startupWorker.terminate();
+  }
+  startupWorker = null;
+  startupWorkerLoadPromise = null;
+  if (error) {
+    rejectAllPending(error);
+  }
+}
+
+function resolveTaskTimeoutMs(type, timeoutMs = null) {
+  if (Number.isFinite(timeoutMs) && timeoutMs > 0) {
+    return timeoutMs;
+  }
+  return STARTUP_WORKER_TIMEOUTS_MS[type] || STARTUP_WORKER_TIMEOUT_MS;
+}
+
 function ensureStartupWorker() {
   if (startupWorker) {
     return Promise.resolve(startupWorker);
@@ -84,10 +108,7 @@ function ensureStartupWorker() {
         const error = event?.error instanceof Error
           ? event.error
           : new Error(event?.message || "Startup worker crashed.");
-        rejectAllPending(error);
-        startupWorker?.terminate?.();
-        startupWorker = null;
-        startupWorkerLoadPromise = null;
+        recycleStartupWorker(error);
       };
       startupWorker = worker;
       return worker;
@@ -99,13 +120,15 @@ function ensureStartupWorker() {
   return startupWorkerLoadPromise;
 }
 
-function dispatchTask(type, payload, { timeoutMs = STARTUP_WORKER_TIMEOUT_MS } = {}) {
+function dispatchTask(type, payload, { timeoutMs = null } = {}) {
   return ensureStartupWorker().then((worker) => new Promise((resolve, reject) => {
     const taskId = `${type}:${Date.now()}:${++taskCounter}`;
+    const effectiveTimeoutMs = resolveTaskTimeoutMs(type, timeoutMs);
     const timeoutId = globalThis.setTimeout?.(() => {
       cleanupPendingTask(taskId);
+      recycleStartupWorker(new Error(`Startup worker recycled after timeout for ${type}.`));
       reject(new Error(`Startup worker timed out for ${type}.`));
-    }, timeoutMs);
+    }, effectiveTimeoutMs);
     pendingTasks.set(taskId, {
       resolve,
       reject,
@@ -123,17 +146,23 @@ export async function loadBaseStartupViaWorker({
   topologyUrl,
   localesUrl,
   geoAliasesUrl,
-  timeoutMs = STARTUP_WORKER_TIMEOUT_MS,
+  needTopologyPrimary = true,
+  needLocales = true,
+  needGeoAliases = true,
+  timeoutMs = null,
 } = {}) {
   const message = await dispatchTask(MESSAGE_TYPES.LOAD_BASE_STARTUP, {
     topologyUrl,
     localesUrl,
     geoAliasesUrl,
+    needTopologyPrimary,
+    needLocales,
+    needGeoAliases,
   }, { timeoutMs });
   return {
     topologyPrimary: message.topologyPrimary || null,
-    locales: message.locales || { ui: {}, geo: {} },
-    geoAliases: message.geoAliases || { alias_to_stable_key: {} },
+    locales: message.locales === null ? null : (message.locales || { ui: {}, geo: {} }),
+    geoAliases: message.geoAliases === null ? null : (message.geoAliases || { alias_to_stable_key: {} }),
     decodedCollections: message.decodedCollections || null,
     metrics: message.metrics || null,
   };
@@ -143,7 +172,7 @@ export async function loadStartupBundleViaWorker({
   startupBundleUrl,
   scenarioId = "",
   language = "en",
-  timeoutMs = STARTUP_WORKER_TIMEOUT_MS,
+  timeoutMs = null,
 } = {}) {
   const message = await dispatchTask(MESSAGE_TYPES.LOAD_STARTUP_BUNDLE, {
     startupBundleUrl,
@@ -161,7 +190,7 @@ export async function loadStartupBundleViaWorker({
 
 export async function loadScenarioRuntimeBootstrapViaWorker({
   runtimeTopologyUrl,
-  timeoutMs = STARTUP_WORKER_TIMEOUT_MS,
+  timeoutMs = null,
 } = {}) {
   const message = await dispatchTask(MESSAGE_TYPES.LOAD_SCENARIO_RUNTIME_BOOTSTRAP, {
     runtimeTopologyUrl,
@@ -178,7 +207,7 @@ export async function decodeRuntimeChunkViaWorker({
   runtimeTopologyUrl,
   chunkUrl,
   chunkType = "runtime-topology",
-  timeoutMs = STARTUP_WORKER_TIMEOUT_MS,
+  timeoutMs = null,
 } = {}) {
   const message = await dispatchTask(MESSAGE_TYPES.DECODE_RUNTIME_CHUNK, {
     runtimeTopologyUrl,
@@ -195,10 +224,5 @@ export async function decodeRuntimeChunkViaWorker({
 }
 
 export function terminateStartupWorker() {
-  if (startupWorker) {
-    startupWorker.terminate();
-  }
-  rejectAllPending(new Error("Startup worker terminated."));
-  startupWorker = null;
-  startupWorkerLoadPromise = null;
+  recycleStartupWorker(new Error("Startup worker terminated."));
 }

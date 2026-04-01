@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "notes": [
+    "Keep this file small and versioned. It is the explicit truth table for which stations count as major in v1.",
+    "stations_by_group_code wins over stations_by_name so same-name stations in different cities do not collide."
+  ],
+  "stations_by_group_code": {},
+  "stations_by_name": {}
+}

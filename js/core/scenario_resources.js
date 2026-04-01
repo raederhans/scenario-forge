@@ -790,6 +790,10 @@ function normalizeScenarioRuntimeTopologyPayload(payload) {
   return payload;
 }
 
+function hasScenarioRuntimePoliticalPayload(payload) {
+  return !!normalizeScenarioRuntimeTopologyPayload(payload)?.objects?.political;
+}
+
 function normalizeScenarioRuntimeShell(manifest) {
   if (!manifest || typeof manifest !== "object") {
     return null;
@@ -1682,6 +1686,7 @@ function createScenarioBootstrapBundleFromCache({
   runtimeTopologyUrl,
 } = {}) {
   const runtimeShell = normalizeScenarioRuntimeShell(manifest);
+  const runtimeTopologyPayload = normalizeScenarioRuntimeTopologyPayload(cachedPayload?.runtimeTopologyPayload);
   const bundle = {
     ...(priorBundle && typeof priorBundle === "object" ? priorBundle : {}),
     meta,
@@ -1709,7 +1714,7 @@ function createScenarioBootstrapBundleFromCache({
     geoLocalePatchPayloadsByLanguage: {
       ...(priorBundle?.geoLocalePatchPayloadsByLanguage || {}),
     },
-    runtimeTopologyPayload: normalizeScenarioRuntimeTopologyPayload(cachedPayload?.runtimeTopologyPayload),
+    runtimeTopologyPayload,
     runtimePoliticalMeta: cachedPayload?.runtimePoliticalMeta || null,
     runtimeDecodedCollections: priorBundle?.runtimeDecodedCollections || null,
     releasableCatalog: priorBundle?.releasableCatalog || null,
@@ -1724,7 +1729,7 @@ function createScenarioBootstrapBundleFromCache({
     loadDiagnostics: {
       optionalResources: {
         runtime_topology: {
-          ok: !!cachedPayload?.runtimeTopologyPayload,
+          ok: hasScenarioRuntimePoliticalPayload(runtimeTopologyPayload),
           reason: "persistent-cache-hit",
           errorMessage: "",
           metrics: null,
@@ -2088,7 +2093,12 @@ async function loadScenarioBundle(
   if (scenarioBootstrapCacheKey) {
     try {
       const cacheEntry = await readStartupCacheEntry(scenarioBootstrapCacheKey);
-      if (cacheEntry?.payload?.countriesPayload && cacheEntry?.payload?.ownersPayload && cacheEntry?.payload?.coresPayload) {
+      if (
+        cacheEntry?.payload?.countriesPayload
+        && cacheEntry?.payload?.ownersPayload
+        && cacheEntry?.payload?.coresPayload
+        && hasScenarioRuntimePoliticalPayload(cacheEntry?.payload?.runtimeTopologyPayload)
+      ) {
         if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
           state.startupBootCacheState.scenarioBootstrap = "hit";
         }
@@ -2331,38 +2341,42 @@ async function loadScenarioBundle(
   );
   state.scenarioBundleCacheById[targetId] = bundle;
   if (scenarioBootstrapCacheKey && requestedBundleLevel === "bootstrap") {
-    if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
-      state.startupBootCacheState.scenarioBootstrap = "write-pending";
+    if (hasScenarioRuntimePoliticalPayload(bundle.runtimeTopologyPayload)) {
+      if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
+        state.startupBootCacheState.scenarioBootstrap = "write-pending";
+      }
+      void writeStartupCacheEntry({
+        kind: "startup-scenario-bootstrap",
+        cacheKey: scenarioBootstrapCacheKey,
+        payload: createSerializableStartupScenarioBootstrapPayload({
+          manifest,
+          bundleLevel: requestedBundleLevel,
+          countriesPayload: bundle.countriesPayload,
+          ownersPayload: bundle.ownersPayload,
+          controllersPayload: bundle.controllersPayload,
+          coresPayload: bundle.coresPayload,
+          geoLocalePatchPayload: bundle.geoLocalePatchPayload,
+          runtimeTopologyPayload: bundle.runtimeTopologyPayload,
+          runtimePoliticalMeta: bundle.runtimePoliticalMeta,
+        }),
+        keyParts: {
+          scenarioId: targetId,
+          bundleLevel: requestedBundleLevel,
+          language: state.currentLanguage,
+        },
+      }).then(() => {
+        if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
+          state.startupBootCacheState.scenarioBootstrap = "written";
+        }
+      }).catch((error) => {
+        console.warn(`[scenario] Startup bootstrap cache write failed for "${targetId}".`, error);
+        if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
+          state.startupBootCacheState.scenarioBootstrap = "write-error";
+        }
+      });
+    } else if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
+      state.startupBootCacheState.scenarioBootstrap = "skipped-incomplete";
     }
-    void writeStartupCacheEntry({
-      kind: "startup-scenario-bootstrap",
-      cacheKey: scenarioBootstrapCacheKey,
-      payload: createSerializableStartupScenarioBootstrapPayload({
-        manifest,
-        bundleLevel: requestedBundleLevel,
-        countriesPayload: bundle.countriesPayload,
-        ownersPayload: bundle.ownersPayload,
-        controllersPayload: bundle.controllersPayload,
-        coresPayload: bundle.coresPayload,
-        geoLocalePatchPayload: bundle.geoLocalePatchPayload,
-        runtimeTopologyPayload: bundle.runtimeTopologyPayload,
-        runtimePoliticalMeta: bundle.runtimePoliticalMeta,
-      }),
-      keyParts: {
-        scenarioId: targetId,
-        bundleLevel: requestedBundleLevel,
-        language: state.currentLanguage,
-      },
-    }).then(() => {
-      if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
-        state.startupBootCacheState.scenarioBootstrap = "written";
-      }
-    }).catch((error) => {
-      console.warn(`[scenario] Startup bootstrap cache write failed for "${targetId}".`, error);
-      if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
-        state.startupBootCacheState.scenarioBootstrap = "write-error";
-      }
-    });
   }
   recordScenarioPerfMetric("loadScenarioBundle", (globalThis.performance?.now ? globalThis.performance.now() : Date.now()) - loadStartedAt, {
     scenarioId: targetId,

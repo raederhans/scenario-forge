@@ -357,7 +357,7 @@ const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
     packs: ["railways", "rail_stations_major"],
     geometrySource: "Official active network",
     hardeningSource: "OSM lifecycle / gap patch",
-    governance: "Deferred layer packs with reproducible build inputs and explicit diagnostics.",
+    governance: "Local-source-only pack build with UTF-8-first MLIT ingestion, CP932 fallback, repo-versioned overrides, and explicit diagnostics.",
     pendingStatus: "Waiting for railways + rail_stations_major Japan packs",
   },
   airport: {
@@ -1947,6 +1947,8 @@ function initToolbar({ render } = {}) {
           rows.push(
             ["Selected line", selected.name || "Unnamed line"],
             ["Operator", selected.operator || "—"],
+            ["Rail type code", selected.railTypeCode || "—"],
+            ["Operator type code", selected.operatorTypeCode || "—"],
             ["Status", selected.status || "—"],
             ["Class", selected.lineClass || "—"],
             ["Source", selected.source || "—"],
@@ -1957,6 +1959,8 @@ function initToolbar({ render } = {}) {
           rows.push(
             ["Selected station", selected.name || "Unnamed station"],
             ["City key", selected.cityKey || "—"],
+            ["Station code", selected.stationCode || "—"],
+            ["Group code", selected.groupCode || "—"],
             ["Importance", selected.importance || "—"],
             ["Source", selected.source || "—"],
             ["Visibility", selected.visible ? "Visible" : "Hidden by threshold"],

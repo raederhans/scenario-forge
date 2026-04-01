@@ -63,7 +63,7 @@
     "FIC"
   ],
   "palette_id": "tno",
-  "baseline_hash": "71839966d9cae86e93956bd977819fb48887e726df7db17b89aa4aa74c5d6673",
+  "baseline_hash": "741f20a2a025677dc3a9056d3c49c8812bd7b9e06b93348d840020eb9800dbe4",
   "countries_url": "data/scenarios/tno_1962/countries.json",
   "owners_url": "data/scenarios/tno_1962/owners.by_feature.json",
   "controllers_url": "data/scenarios/tno_1962/controllers.by_feature.json",
@@ -109,7 +109,7 @@
     "context_land_mask_tolerance": 0.25,
     "context_land_mask_area_delta_ratio": 0.003948094751666009,
     "context_land_mask_fallback_used": false,
-    "context_land_mask_arc_refs": 64098,
+    "context_land_mask_arc_refs": 75681,
     "tno_bathymetry_band_count": 90,
     "tno_bathymetry_contour_count": 74,
     "tno_named_marginal_water_count": 50
@@ -118,8 +118,6 @@
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
   "relief_overlays_url": "data/scenarios/tno_1962/relief_overlays.geojson",
   "runtime_topology_url": "data/scenarios/tno_1962/runtime_topology.topo.json",
-  "startup_bundle_url_en": "data/scenarios/tno_1962/startup.bundle.en.json",
-  "startup_bundle_url_zh": "data/scenarios/tno_1962/startup.bundle.zh.json",
   "performance_hints": {
     "render_profile_default": "balanced",
     "dynamic_borders_default": false,
@@ -199,5 +197,7 @@
     "max_required_chunks": 6,
     "max_optional_chunks": 3,
     "detail_zoom_threshold": 1.7
-  }
+  },
+  "startup_bundle_url_en": "data/scenarios/tno_1962/startup.bundle.en.json",
+  "startup_bundle_url_zh": "data/scenarios/tno_1962/startup.bundle.zh.json"
 }

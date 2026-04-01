@@ -4,7 +4,8 @@
   "country": "Japan",
   "generated_policy": "manual_source_cache_only",
   "notes": [
-    "Source files stay in .runtime/source-cache and are not committed into the repository.",
+    "Raw source files stay in .runtime/source-cache and are not committed into the repository.",
+    "Small override truth tables are versioned inside data/transport_layers/japan_rail/overrides.",
     "Builds must fail clearly when the official N02 line or station source is missing or cannot be decoded.",
     "OSM lifecycle patches and class / major-station override files are optional inputs. Missing optional inputs must be reported in build_audit.json instead of being guessed silently."
   ],
@@ -23,7 +24,7 @@
       "expected_filename": "N02-24_GML.zip",
       "preferred_member": "UTF-8/N02-24_RailroadSection.geojson",
       "fallback_member": "N02-24_RailroadSection.shp",
-      "license": "MLIT open data terms",
+      "license": "CC BY 4.0 with MLIT attribution notice",
       "ingest_mode": "local_file",
       "encoding": "UTF-8 preferred, CP932 fallback",
       "field_contract": {
@@ -41,7 +42,7 @@
       "expected_filename": "N02-24_GML.zip",
       "preferred_member": "UTF-8/N02-24_Station.geojson",
       "fallback_member": "N02-24_Station.shp",
-      "license": "MLIT open data terms",
+      "license": "CC BY 4.0 with MLIT attribution notice",
       "ingest_mode": "local_file",
       "encoding": "UTF-8 preferred, CP932 fallback",
       "field_contract": {
@@ -62,17 +63,19 @@
     },
     {
       "id": "line_class_overrides",
-      "kind": "local_manual_json",
+      "kind": "repo_versioned_json",
       "role": "classification_override_optional",
       "optional": true,
-      "expected_filename": "line_class_overrides.json"
+      "expected_filename": "line_class_overrides.json",
+      "expected_path": "data/transport_layers/japan_rail/overrides/line_class_overrides.json"
     },
     {
       "id": "major_station_overrides",
-      "kind": "local_manual_json",
+      "kind": "repo_versioned_json",
       "role": "station_selection_override_optional",
       "optional": true,
-      "expected_filename": "major_station_overrides.json"
+      "expected_filename": "major_station_overrides.json",
+      "expected_path": "data/transport_layers/japan_rail/overrides/major_station_overrides.json"
     }
   ],
   "output_contract": {

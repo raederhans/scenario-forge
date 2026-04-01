@@ -269,35 +269,48 @@ async function handleLoadBaseStartup(message) {
   const topologyUrl = String(message?.topologyUrl || "").trim();
   const localesUrl = String(message?.localesUrl || "").trim();
   const geoAliasesUrl = String(message?.geoAliasesUrl || "").trim();
+  const needTopologyPrimary = message?.needTopologyPrimary !== false;
+  const needLocales = message?.needLocales !== false;
+  const needGeoAliases = message?.needGeoAliases !== false;
   const startedAt = nowMs();
 
   const [topologyResult, localesResult, geoAliasesResult] = await Promise.all([
-    fetchJsonResource(topologyUrl, "topologyPrimary"),
-    fetchJsonResource(localesUrl, "locales"),
-    fetchJsonResource(geoAliasesUrl, "geoAliases"),
+    needTopologyPrimary
+      ? fetchJsonResource(topologyUrl, "topologyPrimary")
+      : Promise.resolve({ payload: null, metrics: null }),
+    needLocales
+      ? fetchJsonResource(localesUrl, "locales")
+      : Promise.resolve({ payload: null, metrics: null }),
+    needGeoAliases
+      ? fetchJsonResource(geoAliasesUrl, "geoAliases")
+      : Promise.resolve({ payload: null, metrics: null }),
   ]);
 
   postWorkerMessage(MESSAGE_TYPES.BASE_STARTUP_READY, {
     taskId,
     topologyPrimary: topologyResult.payload,
-    locales: localesResult.payload || { ui: {}, geo: {} },
-    geoAliases: geoAliasesResult.payload || { alias_to_stable_key: {} },
-    decodedCollections: {
-      landData: decodeTopologyObject(topologyResult.payload, "political"),
-      specialZonesData: decodeTopologyObject(topologyResult.payload, "special_zones"),
-      riversData: decodeTopologyObject(topologyResult.payload, "rivers"),
-      waterRegionsData: decodeTopologyObject(topologyResult.payload, "water_regions"),
-      oceanData: decodeTopologyObject(topologyResult.payload, "ocean"),
-      landBgData: decodeTopologyObject(topologyResult.payload, "land"),
-      urbanData: decodeTopologyObject(topologyResult.payload, "urban"),
-      physicalData: decodeTopologyObject(topologyResult.payload, "physical"),
-    },
+    locales: needLocales ? (localesResult.payload || { ui: {}, geo: {} }) : null,
+    geoAliases: needGeoAliases ? (geoAliasesResult.payload || { alias_to_stable_key: {} }) : null,
+    decodedCollections: topologyResult.payload
+      ? {
+        landData: decodeTopologyObject(topologyResult.payload, "political"),
+        specialZonesData: decodeTopologyObject(topologyResult.payload, "special_zones"),
+        riversData: decodeTopologyObject(topologyResult.payload, "rivers"),
+        waterRegionsData: decodeTopologyObject(topologyResult.payload, "water_regions"),
+        oceanData: decodeTopologyObject(topologyResult.payload, "ocean"),
+        landBgData: decodeTopologyObject(topologyResult.payload, "land"),
+        urbanData: decodeTopologyObject(topologyResult.payload, "urban"),
+        physicalData: decodeTopologyObject(topologyResult.payload, "physical"),
+      }
+      : null,
     metrics: {
       totalMs: nowMs() - startedAt,
-      topologyPrimary: {
-        ...(topologyResult.metrics || {}),
-        featureCount: getPoliticalGeometryCount(topologyResult.payload),
-      },
+      topologyPrimary: topologyResult.payload
+        ? {
+          ...(topologyResult.metrics || {}),
+          featureCount: getPoliticalGeometryCount(topologyResult.payload),
+        }
+        : null,
       locales: localesResult.metrics || null,
       geoAliases: geoAliasesResult.metrics || null,
     },

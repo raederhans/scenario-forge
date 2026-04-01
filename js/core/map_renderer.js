@@ -2778,12 +2778,16 @@ function recordProjectedBoundsDiagnostic(feature, reason = "unknown") {
 }
 
 function computeProjectedFeatureBounds(feature) {
+  return computeProjectedGeoBounds(feature);
+}
+
+function computeProjectedGeoBounds(geoObject) {
   const pathRef = pathCanvas || pathSVG;
-  if (!pathRef || !feature) return null;
+  if (!pathRef || !geoObject) return null;
 
   let bounds = null;
   try {
-    bounds = pathRef.bounds(feature);
+    bounds = pathRef.bounds(geoObject);
   } catch (error) {
     return null;
   }
@@ -2806,6 +2810,34 @@ function computeProjectedFeatureBounds(feature) {
     height: featureHeight,
     area: Math.max(0, featureWidth) * Math.max(0, featureHeight),
   };
+}
+
+function collectPolygonalGeometryParts(geometry) {
+  if (!geometry || typeof geometry !== "object") return [];
+  const geometryType = String(geometry.type || "");
+  if (geometryType === "Polygon") {
+    return [geometry];
+  }
+  if (geometryType === "MultiPolygon") {
+    const coordinates = Array.isArray(geometry.coordinates) ? geometry.coordinates : [];
+    return coordinates
+      .filter((partCoordinates) => Array.isArray(partCoordinates) && partCoordinates.length > 0)
+      .map((partCoordinates) => ({
+        type: "Polygon",
+        coordinates: partCoordinates,
+      }));
+  }
+  if (geometryType === "GeometryCollection") {
+    return (Array.isArray(geometry.geometries) ? geometry.geometries : [])
+      .flatMap((partGeometry) => collectPolygonalGeometryParts(partGeometry));
+  }
+  return [];
+}
+
+function collectFeatureHitGeometries(feature) {
+  const geometry = feature?.geometry;
+  const polygonParts = collectPolygonalGeometryParts(geometry);
+  return polygonParts.length ? polygonParts : (geometry ? [geometry] : []);
 }
 
 function rebuildProjectedBoundsCache() {
@@ -6414,10 +6446,11 @@ function rankCandidates(candidates, lonLat) {
 
   const ranked = candidates.map((candidate) => {
     const feature = candidate.item?.feature;
+    const hitGeometry = candidate.item?.hitGeometry || feature;
     let containsGeo = false;
-    if (feature && lonLat && globalThis.d3?.geoContains) {
+    if (hitGeometry && lonLat && globalThis.d3?.geoContains) {
       try {
-        containsGeo = !!globalThis.d3.geoContains(feature, lonLat);
+        containsGeo = !!globalThis.d3.geoContains(hitGeometry, lonLat);
       } catch (error) {
         containsGeo = false;
       }
@@ -6465,9 +6498,10 @@ function getPointerProjectionPosition(event) {
 }
 
 function toHitResult(candidate, { viaSnap = false, strict = false, zoomK = 1, targetType = "land" } = {}) {
-  if (!candidate?.item?.id) return createHitResult();
+  const resolvedId = String(candidate?.item?.featureId || candidate?.item?.id || "").trim();
+  if (!resolvedId) return createHitResult();
   return createHitResult({
-    id: candidate.item.id,
+    id: resolvedId,
     countryCode: candidate.item.countryCode || getFeatureCountryCodeNormalized(candidate.item.feature),
     targetType,
     feature: candidate.item.feature || null,
@@ -7047,18 +7081,23 @@ function buildSecondarySpatialIndexes({
   getEffectiveWaterRegionFeatures().forEach((feature) => {
     const id = getFeatureId(feature);
     if (!id) return;
-    const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: allowComputeMissingBounds });
-    if (!bounds) return;
-    state.waterSpatialItems.push({
-      id,
-      feature,
-      countryCode: "",
-      source: String(feature?.properties?.__source || "primary"),
-      minX: bounds.minX,
-      minY: bounds.minY,
-      maxX: bounds.maxX,
-      maxY: bounds.maxY,
-      bboxArea: bounds.area,
+    const hitGeometries = collectFeatureHitGeometries(feature);
+    hitGeometries.forEach((hitGeometry, partIndex) => {
+      const bounds = computeProjectedGeoBounds(hitGeometry);
+      if (!bounds) return;
+      state.waterSpatialItems.push({
+        id: `${id}::part:${partIndex}`,
+        featureId: id,
+        feature,
+        hitGeometry,
+        countryCode: "",
+        source: String(feature?.properties?.__source || "primary"),
+        minX: bounds.minX,
+        minY: bounds.minY,
+        maxX: bounds.maxX,
+        maxY: bounds.maxY,
+        bboxArea: bounds.area,
+      });
     });
   });
   buildSecondarySpatialGrid(state.waterSpatialItems, () => {
@@ -13561,9 +13600,7 @@ function drawScenarioRegionOverlaysPass(k) {
       const isMacroOcean = isMacroOceanWaterRegion(feature);
       const defaultStyle = getWaterRegionDefaultStyle(feature);
       const isHighlighted = state.selectedWaterRegionId === id || state.hoveredWaterRegionId === id;
-      const fillOpacity = isMacroOcean
-        ? 0
-        : defaultStyle.opacity;
+      const fillOpacity = defaultStyle.opacity;
       context.beginPath();
       pathCanvas(feature);
       if (fillOpacity > 0) {

@@ -1081,20 +1081,23 @@ export async function loadStartupBootArtifacts({
     }
   }
 
-  if (!topologyPrimary && !locales && !geoAliases && workerEnabled) {
+  if (!topologyPrimary && workerEnabled) {
     try {
       const workerResult = await loadBaseStartupViaWorker({
         topologyUrl,
         localesUrl: resolvedLocalization.localesUrl,
         geoAliasesUrl: resolvedLocalization.geoAliasesUrl,
+        needTopologyPrimary: !topologyPrimary,
+        needLocales: !locales,
+        needGeoAliases: !geoAliases,
       });
       topologyPrimary = workerResult.topologyPrimary || null;
-      locales = workerResult.locales || { ui: {}, geo: {} };
-      geoAliases = workerResult.geoAliases || { alias_to_stable_key: {} };
+      locales = locales || workerResult.locales || null;
+      geoAliases = geoAliases || workerResult.geoAliases || null;
       decodedCollections = workerResult.decodedCollections || null;
-      resourceMetrics.topologyPrimary = workerResult.metrics?.topologyPrimary || null;
-      resourceMetrics.locales = workerResult.metrics?.locales || null;
-      resourceMetrics.geoAliases = workerResult.metrics?.geoAliases || null;
+      resourceMetrics.topologyPrimary = resourceMetrics.topologyPrimary || workerResult.metrics?.topologyPrimary || null;
+      resourceMetrics.locales = resourceMetrics.locales || workerResult.metrics?.locales || null;
+      resourceMetrics.geoAliases = resourceMetrics.geoAliases || workerResult.metrics?.geoAliases || null;
     } catch (error) {
       console.warn("[data_loader] Startup worker failed for base artifacts, falling back to main thread.", error);
     }
@@ -1162,6 +1165,7 @@ export async function loadStartupBootArtifacts({
     locales: locales || { ui: {}, geo: {} },
     geoAliases: geoAliases || { alias_to_stable_key: {} },
     decodedCollections,
+    hasScenarioRuntimeBootstrap: false,
     localeLevel: resolvedLocalization.localeLevel,
     resourceMetrics,
     startupBootCacheState,
@@ -1378,14 +1382,17 @@ export async function loadMapData({
       prefetchedPrimaryMetrics: startupBootArtifacts?.resourceMetrics?.topologyPrimary || null,
     })
   ));
-  const runtimePoliticalPromise = topologyBundlePromise.then((topologyBundle) => (
-    topologyBundle.detailDeferred
-      ? null
-      : d3Client.json(runtimePoliticalUrl).catch((err) => {
+  const runtimePoliticalPromise = Promise.all([startupBootArtifactsPromise, topologyBundlePromise]).then(
+    ([startupBootArtifacts, topologyBundle]) => {
+      if (startupBootArtifacts?.hasScenarioRuntimeBootstrap || topologyBundle.detailDeferred) {
+        return null;
+      }
+      return d3Client.json(runtimePoliticalUrl).catch((err) => {
         console.warn("Runtime political topology missing or invalid, continuing without dynamic sovereignty.", err);
         return null;
-      })
-  ));
+      });
+    }
+  );
   const [
     startupBootArtifacts,
     topologyBundle,

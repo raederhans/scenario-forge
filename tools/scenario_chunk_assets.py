@@ -8,7 +8,8 @@ import re
 from typing import Any
 
 from map_builder.io.writers import write_json_atomic
-from shapely.geometry import shape
+from shapely import make_valid
+from shapely.geometry import mapping, shape
 from shapely.validation import explain_validity
 from topojson.utils import serialize_as_geojson
 
@@ -151,6 +152,39 @@ def _topology_object_to_feature_collection(topology_payload: dict[str, Any] | No
     }
 
 
+def _sanitize_feature_collection_polygonal_geometries(feature_collection: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not isinstance(feature_collection, dict) or not isinstance(feature_collection.get("features"), list):
+        return feature_collection
+    sanitized_features: list[dict[str, Any]] = []
+    for feature in feature_collection.get("features") or []:
+        if not isinstance(feature, dict):
+            continue
+        geometry_payload = feature.get("geometry")
+        if not geometry_payload:
+            sanitized_features.append(feature)
+            continue
+        geom = shape(geometry_payload)
+        if geom.is_empty:
+            sanitized_features.append(feature)
+            continue
+        if not geom.is_valid:
+            try:
+                geom = make_valid(geom)
+            except Exception:
+                sanitized_features.append(feature)
+                continue
+        sanitized_features.append({
+            "type": "Feature",
+            "id": feature.get("id"),
+            "properties": dict(feature.get("properties") or {}),
+            "geometry": mapping(geom),
+        })
+    return {
+        "type": "FeatureCollection",
+        "features": sanitized_features,
+    }
+
+
 def _slice_city_override_payload(payload: dict[str, Any], selected_feature_ids: set[str]) -> dict[str, Any]:
     original_feature_collection = payload.get("featureCollection") if isinstance(payload, dict) else None
     feature_collection = None
@@ -274,7 +308,9 @@ def _validate_water_chunk_consistency(
     validation_feature_ids: set[str] | None = None,
 ) -> None:
     water_layer_payload = (layer_payloads or {}).get("water")
-    runtime_water_feature_collection = _topology_object_to_feature_collection(runtime_topology_payload, "scenario_water")
+    runtime_water_feature_collection = _sanitize_feature_collection_polygonal_geometries(
+        _topology_object_to_feature_collection(runtime_topology_payload, "scenario_water")
+    )
     water_chunk_entries = [chunk for chunk in all_chunks if str(chunk.get("layer") or "").strip() == "water"]
 
     if water_layer_payload is None and runtime_water_feature_collection is None and not water_chunk_entries:

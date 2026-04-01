@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "notes": [
+    "Keep this file small and versioned. Only add product-level corrections that official N02 rail-type codes cannot express cleanly.",
+    "Keys may be stored in either line_class_by_name or line_class_by_match_key. Both are normalized to NFKC + whitespace collapse + casefold at build time."
+  ],
+  "line_class_by_name": {},
+  "line_class_by_match_key": {}
+}
