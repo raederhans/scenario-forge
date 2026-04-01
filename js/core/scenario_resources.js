@@ -16,8 +16,11 @@ import {
   normalizeScenarioGeoLocalePatchPayload,
 } from "./data_loader.js";
 import {
-  createSerializableStartupScenarioBootstrapPayload,
-  createStartupScenarioBootstrapCacheKey,
+  STARTUP_CACHE_KINDS,
+  createSerializableStartupScenarioBootstrapCorePayload,
+  createSerializableStartupScenarioBootstrapLocalePayload,
+  createStartupScenarioBootstrapCoreCacheKey,
+  createStartupScenarioBootstrapLocaleCacheKey,
   isStartupCacheEnabled,
   readStartupCacheEntry,
   writeStartupCacheEntry,
@@ -1681,12 +1684,13 @@ function createScenarioBootstrapBundleFromCache({
   meta,
   manifest,
   bundleLevel,
-  cachedPayload,
+  cachedCorePayload,
+  cachedLocalePayload,
   geoLocalePatchDescriptor,
   runtimeTopologyUrl,
 } = {}) {
   const runtimeShell = normalizeScenarioRuntimeShell(manifest);
-  const runtimeTopologyPayload = normalizeScenarioRuntimeTopologyPayload(cachedPayload?.runtimeTopologyPayload);
+  const runtimeTopologyPayload = normalizeScenarioRuntimeTopologyPayload(cachedCorePayload?.runtimeTopologyPayload);
   const bundle = {
     ...(priorBundle && typeof priorBundle === "object" ? priorBundle : {}),
     meta,
@@ -1702,20 +1706,20 @@ function createScenarioBootstrapBundleFromCache({
     },
     chunkMergedLayerPayloads: priorBundle?.chunkMergedLayerPayloads || null,
     chunkPreloaded: !!priorBundle?.chunkPreloaded,
-    countriesPayload: cachedPayload?.countriesPayload || null,
-    ownersPayload: cachedPayload?.ownersPayload || null,
-    controllersPayload: cachedPayload?.controllersPayload || null,
-    coresPayload: cachedPayload?.coresPayload || null,
+    countriesPayload: cachedCorePayload?.countriesPayload || null,
+    ownersPayload: cachedCorePayload?.ownersPayload || null,
+    controllersPayload: cachedCorePayload?.controllersPayload || null,
+    coresPayload: cachedCorePayload?.coresPayload || null,
     waterRegionsPayload: priorBundle?.waterRegionsPayload || null,
     specialRegionsPayload: priorBundle?.specialRegionsPayload || null,
     reliefOverlaysPayload: priorBundle?.reliefOverlaysPayload || null,
     cityOverridesPayload: priorBundle?.cityOverridesPayload || null,
-    geoLocalePatchPayload: normalizeScenarioGeoLocalePatchPayload(cachedPayload?.geoLocalePatchPayload),
+    geoLocalePatchPayload: normalizeScenarioGeoLocalePatchPayload(cachedLocalePayload?.geoLocalePatchPayload),
     geoLocalePatchPayloadsByLanguage: {
       ...(priorBundle?.geoLocalePatchPayloadsByLanguage || {}),
     },
     runtimeTopologyPayload,
-    runtimePoliticalMeta: cachedPayload?.runtimePoliticalMeta || null,
+    runtimePoliticalMeta: cachedCorePayload?.runtimePoliticalMeta || null,
     runtimeDecodedCollections: priorBundle?.runtimeDecodedCollections || null,
     releasableCatalog: priorBundle?.releasableCatalog || null,
     districtGroupsPayload: priorBundle?.districtGroupsPayload || null,
@@ -1736,8 +1740,8 @@ function createScenarioBootstrapBundleFromCache({
           url: runtimeTopologyUrl,
         },
         geo_locale_patch: {
-          ok: !!cachedPayload?.geoLocalePatchPayload,
-          reason: "persistent-cache-hit",
+          ok: !!cachedLocalePayload?.geoLocalePatchPayload,
+          reason: cachedLocalePayload?.geoLocalePatchPayload ? "persistent-cache-hit" : "not-cached",
           errorMessage: "",
           language: geoLocalePatchDescriptor?.language,
           localeSpecific: !!geoLocalePatchDescriptor?.localeSpecific,
@@ -2075,29 +2079,46 @@ async function loadScenarioBundle(
         ? runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || manifest.runtime_topology_url || ""
         : manifest.runtime_topology_url || runtimeShell?.startupTopologyUrl || manifest.runtime_bootstrap_topology_url || ""
   ).trim();
-  const scenarioBootstrapCacheKey =
+  const scenarioBootstrapCoreCacheKey =
     requestedBundleLevel === "bootstrap" && isStartupCacheEnabled()
-      ? createStartupScenarioBootstrapCacheKey({
+      ? createStartupScenarioBootstrapCoreCacheKey({
+        scenarioRegistry: state.scenarioRegistry,
+        scenarioId: targetId,
+        bundleLevel: requestedBundleLevel,
+        manifest,
+        runtimeBootstrapTopologyUrl: runtimeTopologyUrl,
+      })
+      : "";
+  const scenarioBootstrapLocaleCacheKey =
+    requestedBundleLevel === "bootstrap" && isStartupCacheEnabled() && geoLocalePatchDescriptor.url
+      ? createStartupScenarioBootstrapLocaleCacheKey({
         scenarioRegistry: state.scenarioRegistry,
         scenarioId: targetId,
         bundleLevel: requestedBundleLevel,
         manifest,
         currentLanguage: state.currentLanguage,
-        runtimeBootstrapTopologyUrl: runtimeTopologyUrl,
         geoLocalePatchUrl: geoLocalePatchDescriptor.url,
       })
       : "";
   if (requestedBundleLevel === "bootstrap" && state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
-    state.startupBootCacheState.scenarioBootstrap = scenarioBootstrapCacheKey ? "probe" : "disabled";
+    state.startupBootCacheState.scenarioBootstrap = scenarioBootstrapCoreCacheKey ? "probe" : "disabled";
   }
-  if (scenarioBootstrapCacheKey) {
+  if (scenarioBootstrapCoreCacheKey) {
     try {
-      const cacheEntry = await readStartupCacheEntry(scenarioBootstrapCacheKey);
+      const [coreEntry, localeEntry] = await Promise.all([
+        readStartupCacheEntry(scenarioBootstrapCoreCacheKey),
+        scenarioBootstrapLocaleCacheKey
+          ? readStartupCacheEntry(scenarioBootstrapLocaleCacheKey).catch((error) => {
+            console.warn(`[scenario] Startup bootstrap locale cache read failed for "${targetId}".`, error);
+            return null;
+          })
+          : Promise.resolve(null),
+      ]);
       if (
-        cacheEntry?.payload?.countriesPayload
-        && cacheEntry?.payload?.ownersPayload
-        && cacheEntry?.payload?.coresPayload
-        && hasScenarioRuntimePoliticalPayload(cacheEntry?.payload?.runtimeTopologyPayload)
+        coreEntry?.payload?.countriesPayload
+        && coreEntry?.payload?.ownersPayload
+        && coreEntry?.payload?.coresPayload
+        && hasScenarioRuntimePoliticalPayload(coreEntry?.payload?.runtimeTopologyPayload)
       ) {
         if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
           state.startupBootCacheState.scenarioBootstrap = "hit";
@@ -2107,10 +2128,56 @@ async function loadScenarioBundle(
           meta,
           manifest,
           bundleLevel: requestedBundleLevel,
-          cachedPayload: cacheEntry.payload,
+          cachedCorePayload: coreEntry.payload,
+          cachedLocalePayload: localeEntry?.payload || null,
           geoLocalePatchDescriptor,
           runtimeTopologyUrl,
         });
+        if (!bundle.geoLocalePatchPayload && geoLocalePatchDescriptor.url) {
+          const geoLocalePatchResult = await loadOptionalScenarioResource(d3Client, geoLocalePatchDescriptor.url, {
+            scenarioId: targetId,
+            resourceLabel: geoLocalePatchDescriptor.localeSpecific
+              ? `geo_locale_patch_${geoLocalePatchDescriptor.language}`
+              : "geo_locale_patch",
+          });
+          bundle.geoLocalePatchPayload = normalizeScenarioGeoLocalePatchPayload(geoLocalePatchResult.value);
+          bundle.loadDiagnostics.optionalResources.geo_locale_patch = {
+            ok: !!geoLocalePatchResult.ok,
+            reason: geoLocalePatchResult.reason,
+            errorMessage: geoLocalePatchResult.errorMessage,
+            language: geoLocalePatchDescriptor.language,
+            localeSpecific: geoLocalePatchDescriptor.localeSpecific,
+            metrics: geoLocalePatchResult.metrics || null,
+          };
+          if (bundle.geoLocalePatchPayload) {
+            if (geoLocalePatchDescriptor.localeSpecific) {
+              bundle.geoLocalePatchPayloadsByLanguage[geoLocalePatchDescriptor.language] = bundle.geoLocalePatchPayload;
+            } else {
+              bundle.geoLocalePatchPayloadsByLanguage.en = bundle.geoLocalePatchPayload;
+              bundle.geoLocalePatchPayloadsByLanguage.zh = bundle.geoLocalePatchPayload;
+            }
+            if (scenarioBootstrapLocaleCacheKey) {
+              void writeStartupCacheEntry({
+                kind: STARTUP_CACHE_KINDS.SCENARIO_BOOTSTRAP_LOCALE,
+                cacheKey: scenarioBootstrapLocaleCacheKey,
+                payload: createSerializableStartupScenarioBootstrapLocalePayload({
+                  manifest,
+                  bundleLevel: requestedBundleLevel,
+                  language: state.currentLanguage,
+                  geoLocalePatchPayload: bundle.geoLocalePatchPayload,
+                }),
+                keyParts: {
+                  scenarioId: targetId,
+                  bundleLevel: requestedBundleLevel,
+                  role: "locale",
+                  language: state.currentLanguage,
+                },
+              }).catch((error) => {
+                console.warn(`[scenario] Startup bootstrap locale cache write failed for "${targetId}".`, error);
+              });
+            }
+          }
+        }
         bundle.runtimeShell = runtimeShell;
         if (requestedBundleLevel === "full" && scenarioSupportsChunkedRuntime(bundle)) {
           await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
@@ -2340,31 +2407,55 @@ async function loadScenarioBundle(
     `[scenario] Loaded ${requestedBundleLevel} bundle "${targetId}": ${ownerCount} owner entries, ${controllerCount} controller entries, ${countryCount} countries, baseline=${String(manifest?.baseline_hash || "").slice(0, 12)}`
   );
   state.scenarioBundleCacheById[targetId] = bundle;
-  if (scenarioBootstrapCacheKey && requestedBundleLevel === "bootstrap") {
+  if (scenarioBootstrapCoreCacheKey && requestedBundleLevel === "bootstrap") {
     if (hasScenarioRuntimePoliticalPayload(bundle.runtimeTopologyPayload)) {
       if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
         state.startupBootCacheState.scenarioBootstrap = "write-pending";
       }
-      void writeStartupCacheEntry({
-        kind: "startup-scenario-bootstrap",
-        cacheKey: scenarioBootstrapCacheKey,
-        payload: createSerializableStartupScenarioBootstrapPayload({
-          manifest,
-          bundleLevel: requestedBundleLevel,
-          countriesPayload: bundle.countriesPayload,
-          ownersPayload: bundle.ownersPayload,
-          controllersPayload: bundle.controllersPayload,
-          coresPayload: bundle.coresPayload,
-          geoLocalePatchPayload: bundle.geoLocalePatchPayload,
-          runtimeTopologyPayload: bundle.runtimeTopologyPayload,
-          runtimePoliticalMeta: bundle.runtimePoliticalMeta,
+      const cacheWrites = [
+        writeStartupCacheEntry({
+          kind: STARTUP_CACHE_KINDS.SCENARIO_BOOTSTRAP_CORE,
+          cacheKey: scenarioBootstrapCoreCacheKey,
+          payload: createSerializableStartupScenarioBootstrapCorePayload({
+            manifest,
+            bundleLevel: requestedBundleLevel,
+            countriesPayload: bundle.countriesPayload,
+            ownersPayload: bundle.ownersPayload,
+            controllersPayload: bundle.controllersPayload,
+            coresPayload: bundle.coresPayload,
+            runtimeTopologyPayload: bundle.runtimeTopologyPayload,
+            runtimePoliticalMeta: bundle.runtimePoliticalMeta,
+          }),
+          keyParts: {
+            scenarioId: targetId,
+            bundleLevel: requestedBundleLevel,
+            role: "core",
+          },
         }),
-        keyParts: {
-          scenarioId: targetId,
-          bundleLevel: requestedBundleLevel,
-          language: state.currentLanguage,
-        },
-      }).then(() => {
+      ];
+      if (scenarioBootstrapLocaleCacheKey && bundle.geoLocalePatchPayload) {
+        cacheWrites.push(writeStartupCacheEntry({
+          kind: STARTUP_CACHE_KINDS.SCENARIO_BOOTSTRAP_LOCALE,
+          cacheKey: scenarioBootstrapLocaleCacheKey,
+          payload: createSerializableStartupScenarioBootstrapLocalePayload({
+            manifest,
+            bundleLevel: requestedBundleLevel,
+            language: state.currentLanguage,
+            geoLocalePatchPayload: bundle.geoLocalePatchPayload,
+          }),
+          keyParts: {
+            scenarioId: targetId,
+            bundleLevel: requestedBundleLevel,
+            role: "locale",
+            language: state.currentLanguage,
+          },
+        }));
+      }
+      void Promise.allSettled(cacheWrites).then((results) => {
+        const rejected = results.find((result) => result.status === "rejected");
+        if (rejected) {
+          throw rejected.reason;
+        }
         if (state.startupBootCacheState && typeof state.startupBootCacheState === "object") {
           state.startupBootCacheState.scenarioBootstrap = "written";
         }

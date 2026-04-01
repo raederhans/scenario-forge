@@ -2,8 +2,246 @@
   "schema_version": 1,
   "notes": [
     "Keep this file small and versioned. It is the explicit truth table for which stations count as major in v1.",
-    "stations_by_group_code wins over stations_by_name so same-name stations in different cities do not collide."
+    "stations_by_group_code wins over stations_by_name so same-name stations in different cities do not collide.",
+    "The v1 national-core set uses Japan PPLA cities plus Tokyo and Kawasaki, then picks exactly one official N02 station group per city.",
+    "When a city has both a traditional main station and a shinkansen hub, the shinkansen hub wins. If no strict official-name match exists, the city stays out of this file."
   ],
-  "stations_by_group_code": {},
+  "stations_by_group_code": {
+    "000227": {
+      "station_name": "札幌",
+      "city_key": "id::CITY::ne::1159151399",
+      "importance": "capital_core"
+    },
+    "000531": {
+      "station_name": "新青森",
+      "city_key": "id::CITY::ne::1159147171",
+      "importance": "capital_core"
+    },
+    "000783": {
+      "station_name": "秋田",
+      "city_key": "id::CITY::ne::1159147169",
+      "importance": "regional_core"
+    },
+    "000792": {
+      "station_name": "盛岡",
+      "city_key": "id::CITY::ne::1159147181",
+      "importance": "capital_core"
+    },
+    "001177": {
+      "station_name": "仙台",
+      "city_key": "id::CITY::ne::1159149971",
+      "importance": "capital_core"
+    },
+    "001194": {
+      "station_name": "山形",
+      "city_key": "id::CITY::ne::1159141325",
+      "importance": "regional_core"
+    },
+    "001296": {
+      "station_name": "新潟",
+      "city_key": "id::CITY::ne::1159147183",
+      "importance": "capital_core"
+    },
+    "001373": {
+      "station_name": "福島",
+      "city_key": "id::CITY::ne::1159147177",
+      "importance": "capital_core"
+    },
+    "001925": {
+      "station_name": "富山",
+      "city_key": "id::CITY::ne::1159130341",
+      "importance": "capital_core"
+    },
+    "002031": {
+      "station_name": "長野",
+      "city_key": "id::CITY::ne::1159149961",
+      "importance": "capital_core"
+    },
+    "002092": {
+      "station_name": "金沢",
+      "city_key": "id::CITY::ne::1159147157",
+      "importance": "capital_core"
+    },
+    "002113": {
+      "station_name": "宇都宮",
+      "city_key": "id::CITY::ne::1159130371",
+      "importance": "capital_core"
+    },
+    "002297": {
+      "station_name": "前橋",
+      "city_key": "id::CITY::ne::1159130357",
+      "importance": "regional_core"
+    },
+    "002319": {
+      "station_name": "水戸",
+      "city_key": "id::CITY::ne::1159141307",
+      "importance": "regional_core"
+    },
+    "002688": {
+      "station_name": "福井",
+      "city_key": "id::CITY::ne::1159141295",
+      "importance": "capital_core"
+    },
+    "002914": {
+      "station_name": "大宮",
+      "city_key": "id::CITY::gn::6940394",
+      "importance": "capital_core"
+    },
+    "003766": {
+      "station_name": "東京",
+      "city_key": "id::CITY::ne::1159151609",
+      "importance": "capital_core"
+    },
+    "003867": {
+      "station_name": "甲府",
+      "city_key": "id::CITY::ne::1159141313",
+      "importance": "regional_core"
+    },
+    "004173": {
+      "station_name": "千葉",
+      "city_key": "id::CITY::gn::2113015",
+      "importance": "regional_core"
+    },
+    "004432": {
+      "station_name": "川崎",
+      "city_key": "id::CITY::ne::1159130361",
+      "importance": "regional_core"
+    },
+    "004501": {
+      "station_name": "新横浜",
+      "city_key": "id::CITY::ne::1159147167",
+      "importance": "capital_core"
+    },
+    "004541": {
+      "station_name": "鳥取",
+      "city_key": "id::CITY::ne::1159141027",
+      "importance": "regional_core"
+    },
+    "004638": {
+      "station_name": "松江",
+      "city_key": "id::CITY::ne::1159141025",
+      "importance": "regional_core"
+    },
+    "004788": {
+      "station_name": "岐阜",
+      "city_key": "id::CITY::ne::1159141255",
+      "importance": "regional_core"
+    },
+    "005451": {
+      "station_name": "名古屋",
+      "city_key": "id::CITY::ne::1159149959",
+      "importance": "capital_core"
+    },
+    "006000": {
+      "station_name": "大津",
+      "city_key": "id::CITY::ne::1159130353",
+      "importance": "regional_core"
+    },
+    "006079": {
+      "station_name": "京都",
+      "city_key": "id::CITY::ne::1159149967",
+      "importance": "capital_core"
+    },
+    "006128": {
+      "station_name": "静岡",
+      "city_key": "id::CITY::ne::1159141267",
+      "importance": "capital_core"
+    },
+    "006905": {
+      "station_name": "津",
+      "city_key": "id::CITY::ne::1159141259",
+      "importance": "regional_core"
+    },
+    "006911": {
+      "station_name": "新大阪",
+      "city_key": "id::CITY::ne::1159151537",
+      "importance": "capital_core"
+    },
+    "007054": {
+      "station_name": "新神戸",
+      "city_key": "id::CITY::ne::1159147165",
+      "importance": "capital_core"
+    },
+    "007210": {
+      "station_name": "奈良",
+      "city_key": "id::CITY::gn::1855612",
+      "importance": "regional_core"
+    },
+    "007310": {
+      "station_name": "岡山",
+      "city_key": "id::CITY::ne::1159130231",
+      "importance": "capital_core"
+    },
+    "008029": {
+      "station_name": "広島",
+      "city_key": "id::CITY::ne::1159151389",
+      "importance": "capital_core"
+    },
+    "008163": {
+      "station_name": "高松",
+      "city_key": "id::CITY::ne::1159130267",
+      "importance": "regional_core"
+    },
+    "008365": {
+      "station_name": "和歌山",
+      "city_key": "id::CITY::ne::1159141303",
+      "importance": "regional_core"
+    },
+    "008476": {
+      "station_name": "新山口",
+      "city_key": "id::CITY::gn::1848689",
+      "importance": "capital_core"
+    },
+    "008493": {
+      "station_name": "徳島",
+      "city_key": "id::CITY::ne::1159130271",
+      "importance": "regional_core"
+    },
+    "008765": {
+      "station_name": "松山",
+      "city_key": "id::CITY::ne::1159147127",
+      "importance": "regional_core"
+    },
+    "009033": {
+      "station_name": "博多",
+      "city_key": "id::CITY::ne::1159149927",
+      "importance": "capital_core"
+    },
+    "009095": {
+      "station_name": "高知",
+      "city_key": "id::CITY::ne::1159149935",
+      "importance": "regional_core"
+    },
+    "009446": {
+      "station_name": "佐賀",
+      "city_key": "id::CITY::gn::1853303",
+      "importance": "regional_core"
+    },
+    "009479": {
+      "station_name": "大分",
+      "city_key": "id::CITY::ne::1159141105",
+      "importance": "regional_core"
+    },
+    "009785": {
+      "station_name": "熊本",
+      "city_key": "id::CITY::ne::1159141101",
+      "importance": "capital_core"
+    },
+    "009822": {
+      "station_name": "長崎",
+      "city_key": "id::CITY::ne::1159150893",
+      "importance": "capital_core"
+    },
+    "009957": {
+      "station_name": "宮崎",
+      "city_key": "id::CITY::ne::1159149929",
+      "importance": "regional_core"
+    },
+    "010047": {
+      "station_name": "鹿児島中央",
+      "city_key": "id::CITY::ne::1159147123",
+      "importance": "capital_core"
+    }
+  },
   "stations_by_name": {}
 }

@@ -1,0 +1,76 @@
+{
+  "adapter_id": "japan_rail_v1",
+  "family": "rail",
+  "geometry_kind": "line",
+  "country": "Japan",
+  "schema_version": 1,
+  "generated_at": "2026-04-01T21:14:13.524750Z",
+  "recipe_path": "data/transport_layers/japan_rail/source_recipe.manual.json",
+  "paths": {
+    "preview": {
+      "railways": "data/transport_layers/japan_rail/railways.preview.topo.json",
+      "rail_stations_major": "data/transport_layers/japan_rail/rail_stations_major.preview.geojson"
+    },
+    "full": {
+      "railways": "data/transport_layers/japan_rail/railways.topo.json",
+      "rail_stations_major": "data/transport_layers/japan_rail/rail_stations_major.geojson"
+    },
+    "build_audit": "data/transport_layers/japan_rail/build_audit.json"
+  },
+  "source_signature": {
+    "mlit_n02_2024_lines": {
+      "filename": "N02-24_RailroadSection.geojson",
+      "size_bytes": 14292849,
+      "sha256": "c9e2a157224ba258d84c9ee5e5bb15a0911d4d2b93e422e403a2b722c2252780"
+    },
+    "mlit_n02_2024_stations": {
+      "filename": "N02-24_Station.geojson",
+      "size_bytes": 3266354,
+      "sha256": "f88168b3a9199a632705df445209c02456005574c1b28e6d78d62171f42c450a"
+    },
+    "line_class_overrides": {
+      "filename": "data/transport_layers/japan_rail/overrides/line_class_overrides.json",
+      "size_bytes": 399,
+      "sha256": "289fee45d6942ec2d116a67fe215d3d1cc1857767820a5d01b11dc765a954633"
+    },
+    "major_station_overrides": {
+      "filename": "data/transport_layers/japan_rail/overrides/major_station_overrides.json",
+      "size_bytes": 7077,
+      "sha256": "c26e80c321cb7bdd6fd41fcc55af4f2040f38d7c916770e4453005d7ee215d54"
+    }
+  },
+  "recipe_version": "japan_rail_sources_v1",
+  "feature_counts": {
+    "preview": {
+      "railways": 1207,
+      "rail_stations_major": 47
+    },
+    "full": {
+      "railways": 21769,
+      "rail_stations_major": 47
+    }
+  },
+  "clip_bbox": [
+    129.0,
+    30.75,
+    145.824962,
+    45.520413
+  ],
+  "build_command": "python tools/build_transport_workbench_japan_rail.py",
+  "runtime_consumer": "transport_workbench_rail_preview",
+  "source_policy": "local_source_cache_only",
+  "official_lines_member": ".runtime/source-cache/transport/japan/rail/N02-24_GML/UTF-8/N02-24_RailroadSection.geojson",
+  "official_lines_encoding": "utf-8",
+  "official_stations_member": ".runtime/source-cache/transport/japan/rail/N02-24_GML/UTF-8/N02-24_Station.geojson",
+  "official_stations_encoding": "utf-8",
+  "override_paths": {
+    "line_class_overrides": "data/transport_layers/japan_rail/overrides/line_class_overrides.json",
+    "major_station_overrides": "data/transport_layers/japan_rail/overrides/major_station_overrides.json"
+  },
+  "text_policy": {
+    "storage_encoding": "utf-8",
+    "display_fields_preserve_original": true,
+    "source_fallback_encoding": "cp932",
+    "match_key_normalization": "NFKC + whitespace collapse + casefold"
+  }
+}

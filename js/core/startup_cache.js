@@ -9,12 +9,14 @@ const BUILD_MANIFEST_PROXY_OUTPUT_BY_URL = {
   "data/geo_aliases.startup.json": "geo_aliases.json",
 };
 
-export const BOOT_CACHE_SCHEMA_VERSION = 1;
+export const BOOT_CACHE_SCHEMA_VERSION = 2;
 export const BASE_DATA_CACHE_REVISION = 1;
 export const STARTUP_CACHE_KINDS = Object.freeze({
   BASE_TOPOLOGY: "startup-base-topology",
   LOCALIZATION: "startup-localization",
   SCENARIO_BOOTSTRAP: "startup-scenario-bootstrap",
+  SCENARIO_BOOTSTRAP_CORE: "startup-scenario-bootstrap-core",
+  SCENARIO_BOOTSTRAP_LOCALE: "startup-scenario-bootstrap-locale",
 });
 
 let openDbPromise = null;
@@ -269,6 +271,50 @@ export function createStartupScenarioBootstrapCacheKey({
   ].join("|");
 }
 
+export function createStartupScenarioBootstrapCoreCacheKey({
+  scenarioRegistry = null,
+  scenarioId = "",
+  bundleLevel = "bootstrap",
+  manifest = null,
+  runtimeBootstrapTopologyUrl = "",
+  schemaVersion = BOOT_CACHE_SCHEMA_VERSION,
+} = {}) {
+  return [
+    STARTUP_CACHE_KINDS.SCENARIO_BOOTSTRAP_CORE,
+    `schema=${schemaVersion}`,
+    `registry=${normalizeCacheKeyPart(scenarioRegistry?.version, "1")}`,
+    `scenario=${normalizeCacheKeyPart(scenarioId, "unknown")}`,
+    `bundle=${normalizeCacheKeyPart(bundleLevel, "bootstrap")}`,
+    `manifest=${normalizeCacheKeyPart(manifest?.version, "1")}`,
+    `baseline=${normalizeCacheKeyPart(manifest?.baseline_hash, "no-baseline")}`,
+    `generated=${normalizeCacheKeyPart(manifest?.generated_at, "unknown")}`,
+    `runtime=${normalizeCacheKeyPart(runtimeBootstrapTopologyUrl, "unknown")}`,
+  ].join("|");
+}
+
+export function createStartupScenarioBootstrapLocaleCacheKey({
+  scenarioRegistry = null,
+  scenarioId = "",
+  bundleLevel = "bootstrap",
+  manifest = null,
+  currentLanguage = "en",
+  geoLocalePatchUrl = "",
+  schemaVersion = BOOT_CACHE_SCHEMA_VERSION,
+} = {}) {
+  return [
+    STARTUP_CACHE_KINDS.SCENARIO_BOOTSTRAP_LOCALE,
+    `schema=${schemaVersion}`,
+    `registry=${normalizeCacheKeyPart(scenarioRegistry?.version, "1")}`,
+    `scenario=${normalizeCacheKeyPart(scenarioId, "unknown")}`,
+    `bundle=${normalizeCacheKeyPart(bundleLevel, "bootstrap")}`,
+    `manifest=${normalizeCacheKeyPart(manifest?.version, "1")}`,
+    `baseline=${normalizeCacheKeyPart(manifest?.baseline_hash, "no-baseline")}`,
+    `generated=${normalizeCacheKeyPart(manifest?.generated_at, "unknown")}`,
+    `lang=${normalizeCacheKeyPart(currentLanguage, "en")}`,
+    `patch=${normalizeCacheKeyPart(geoLocalePatchUrl, "none")}`,
+  ].join("|");
+}
+
 export function createSerializableStartupBaseTopologyPayload({ topologyPrimary = null } = {}) {
   if (!topologyPrimary || typeof topologyPrimary !== "object") {
     throw new Error("[startup_cache] topologyPrimary is required for startup-base-topology cache payload.");
@@ -306,6 +352,42 @@ export function createSerializableStartupScenarioBootstrapPayload({
     geoLocalePatchPayload: clonePlainObject(geoLocalePatchPayload),
     runtimeTopologyPayload: clonePlainObject(runtimeTopologyPayload),
     runtimePoliticalMeta: clonePlainObject(runtimePoliticalMeta),
+  };
+}
+
+export function createSerializableStartupScenarioBootstrapCorePayload({
+  manifest = null,
+  bundleLevel = "bootstrap",
+  countriesPayload = null,
+  ownersPayload = null,
+  controllersPayload = null,
+  coresPayload = null,
+  runtimeTopologyPayload = null,
+  runtimePoliticalMeta = null,
+} = {}) {
+  return {
+    manifest: clonePlainObject(manifest),
+    bundleLevel: normalizeCacheKeyPart(bundleLevel, "bootstrap"),
+    countriesPayload: clonePlainObject(countriesPayload),
+    ownersPayload: clonePlainObject(ownersPayload),
+    controllersPayload: clonePlainObject(controllersPayload),
+    coresPayload: clonePlainObject(coresPayload),
+    runtimeTopologyPayload: clonePlainObject(runtimeTopologyPayload),
+    runtimePoliticalMeta: clonePlainObject(runtimePoliticalMeta),
+  };
+}
+
+export function createSerializableStartupScenarioBootstrapLocalePayload({
+  manifest = null,
+  bundleLevel = "bootstrap",
+  language = "en",
+  geoLocalePatchPayload = null,
+} = {}) {
+  return {
+    manifest: clonePlainObject(manifest),
+    bundleLevel: normalizeCacheKeyPart(bundleLevel, "bootstrap"),
+    language: normalizeCacheKeyPart(language, "en"),
+    geoLocalePatchPayload: clonePlainObject(geoLocalePatchPayload),
   };
 }
 

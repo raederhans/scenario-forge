@@ -1,0 +1,62 @@
+{
+  "generated_at": "2026-04-01T21:14:13.524750Z",
+  "adapter_id": "japan_rail_v1",
+  "raw_official_line_count": 21769,
+  "raw_official_station_feature_count": 10140,
+  "normalized_line_count": 21769,
+  "preview_line_count": 1207,
+  "major_station_count": 47,
+  "line_class_counts": {
+    "high_speed": 262,
+    "trunk": 19440,
+    "branch": 2067,
+    "service": 0
+  },
+  "line_class_override_count": 0,
+  "major_station_override_count": 47,
+  "osm_patch_present": false,
+  "recipe_version": "japan_rail_sources_v1",
+  "source_policy": "local_source_cache_only",
+  "official_lines_member": ".runtime/source-cache/transport/japan/rail/N02-24_GML/UTF-8/N02-24_RailroadSection.geojson",
+  "official_lines_encoding": "utf-8",
+  "official_stations_member": ".runtime/source-cache/transport/japan/rail/N02-24_GML/UTF-8/N02-24_Station.geojson",
+  "official_stations_encoding": "utf-8",
+  "preview_thresholds_m": {
+    "high_speed": 0.0,
+    "trunk": 6000.0,
+    "branch": 12000.0,
+    "service": 18000.0
+  },
+  "source_signature": {
+    "mlit_n02_2024_lines": {
+      "filename": "N02-24_RailroadSection.geojson",
+      "size_bytes": 14292849,
+      "sha256": "c9e2a157224ba258d84c9ee5e5bb15a0911d4d2b93e422e403a2b722c2252780"
+    },
+    "mlit_n02_2024_stations": {
+      "filename": "N02-24_Station.geojson",
+      "size_bytes": 3266354,
+      "sha256": "f88168b3a9199a632705df445209c02456005574c1b28e6d78d62171f42c450a"
+    },
+    "line_class_overrides": {
+      "filename": "data/transport_layers/japan_rail/overrides/line_class_overrides.json",
+      "size_bytes": 399,
+      "sha256": "289fee45d6942ec2d116a67fe215d3d1cc1857767820a5d01b11dc765a954633"
+    },
+    "major_station_overrides": {
+      "filename": "data/transport_layers/japan_rail/overrides/major_station_overrides.json",
+      "size_bytes": 7077,
+      "sha256": "c26e80c321cb7bdd6fd41fcc55af4f2040f38d7c916770e4453005d7ee215d54"
+    }
+  },
+  "override_paths": {
+    "line_class_overrides": "data/transport_layers/japan_rail/overrides/line_class_overrides.json",
+    "major_station_overrides": "data/transport_layers/japan_rail/overrides/major_station_overrides.json"
+  },
+  "notes": [
+    "Official N02 lines are the active backbone for the first rail pack.",
+    "Line classes use official rail-type codes first, then repo-versioned overrides for product-level corrections.",
+    "Major stations are emitted only from repo-versioned major_station_overrides.json so the first pack never guesses importance silently.",
+    "OSM lifecycle patch presence is recorded in the audit, but the first builder does not auto-merge that patch without an explicit local recipe step."
+  ]
+}

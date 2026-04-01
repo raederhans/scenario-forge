@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import geopandas as gpd
+import pandas as pd
 from shapely.geometry import GeometryCollection, MultiPoint, Point, shape
 from topojson import Topology
 
@@ -293,7 +294,7 @@ def normalize_stations(stations: gpd.GeoDataFrame, station_overrides: dict[str, 
         override = resolve_station_override(station_name, normalized_group_key, overrides_by_group_code, overrides_by_name)
         if not isinstance(override, dict):
             continue
-        union = group.geometry.unary_union
+        union = group.geometry.union_all()
         point = representative_point(union)
         if point.is_empty:
             continue
@@ -335,8 +336,21 @@ def build_preview_lines(lines: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
 
 def topology_from_gdf(gdf: gpd.GeoDataFrame, object_name: str) -> dict[str, Any]:
-    feature_collection = json.loads(gdf.to_json())
-    topology = Topology({object_name: feature_collection}, prequantize=TOPO_PREQUANTIZE)
+    safe_gdf = gdf.copy()
+    for column in safe_gdf.columns:
+        if column == "geometry":
+            continue
+        safe_gdf[column] = safe_gdf[column].astype(object).where(pd.notna(safe_gdf[column]), None)
+    topology = Topology(
+        safe_gdf,
+        object_name=object_name,
+        topology=True,
+        prequantize=TOPO_PREQUANTIZE,
+        topoquantize=False,
+        presimplify=False,
+        toposimplify=False,
+        shared_coords=True,
+    )
     return topology.to_dict()
 
 
