@@ -6,6 +6,8 @@ import {
   normalizeLakeStyleConfig,
   normalizeMapSemanticMode,
   normalizePhysicalStyleConfig,
+  normalizeUrbanStyleConfig,
+  normalizeTransportWorkbenchUiState,
   normalizeTextureStyleConfig,
 } from "./state.js";
 import { t } from "../ui/i18n.js";
@@ -288,6 +290,7 @@ class FileManager {
       dynamicBordersDirty: !!appState.dynamicBordersDirty,
       dynamicBordersDirtyReason: appState.dynamicBordersDirtyReason || "",
       specialZones: appState.specialZones || {},
+      parentBordersVisible: appState.parentBordersVisible !== false,
       parentBorderEnabledByCountry: appState.parentBorderEnabledByCountry || {},
       manualSpecialZones: appState.manualSpecialZones || { type: "FeatureCollection", features: [] },
       annotationView: normalizeAnnotationView(appState.annotationView),
@@ -320,13 +323,14 @@ class FileManager {
         ocean: appState.styleConfig?.ocean || null,
         lakes: normalizeLakeStyleConfig(appState.styleConfig?.lakes),
         cityPoints: normalizeCityLayerStyleConfig(appState.styleConfig?.cityPoints),
-        urban: appState.styleConfig?.urban || null,
+        urban: normalizeUrbanStyleConfig(appState.styleConfig?.urban),
         physical: normalizePhysicalStyleConfig(appState.styleConfig?.physical),
         rivers: appState.styleConfig?.rivers || null,
         specialZones: appState.styleConfig?.specialZones || null,
         texture: normalizeTextureStyleConfig(appState.styleConfig?.texture),
         dayNight: normalizeDayNightStyleConfig(appState.styleConfig?.dayNight),
       },
+      transportWorkbenchUi: normalizeTransportWorkbenchUiState(appState.transportWorkbenchUi),
       scenario: appState.activeScenarioId
         ? {
           id: appState.activeScenarioId,
@@ -419,6 +423,7 @@ class FileManager {
         }
         data.referenceImageState = normalizeReferenceImageState(data.referenceImageState);
         data.recentColors = normalizeRecentColors(data.recentColors);
+        data.parentBordersVisible = data.parentBordersVisible !== false;
         if (!data.parentBorderEnabledByCountry || typeof data.parentBorderEnabledByCountry !== "object") {
           data.parentBorderEnabledByCountry = {};
         }
@@ -442,9 +447,7 @@ class FileManager {
         }
         data.styleConfig.lakes = normalizeLakeStyleConfig(data.styleConfig.lakes);
         data.styleConfig.cityPoints = normalizeCityLayerStyleConfig(data.styleConfig.cityPoints);
-        if (!data.styleConfig.urban || typeof data.styleConfig.urban !== "object") {
-          data.styleConfig.urban = null;
-        }
+        data.styleConfig.urban = normalizeUrbanStyleConfig(data.styleConfig.urban);
         data.styleConfig.physical = normalizePhysicalStyleConfig(data.styleConfig.physical);
         if (!data.styleConfig.rivers || typeof data.styleConfig.rivers !== "object") {
           data.styleConfig.rivers = null;
@@ -454,6 +457,7 @@ class FileManager {
         }
         data.styleConfig.texture = normalizeTextureStyleConfig(data.styleConfig.texture);
         data.styleConfig.dayNight = normalizeDayNightStyleConfig(data.styleConfig.dayNight);
+        data.transportWorkbenchUi = normalizeTransportWorkbenchUiState(data.transportWorkbenchUi);
         if (
           !data.manualSpecialZones ||
           typeof data.manualSpecialZones !== "object" ||
@@ -491,6 +495,9 @@ class FileManager {
           }
         }
         data.releasableBoundaryVariantByTag = normalizeBoundaryVariantSelectionMap(data.releasableBoundaryVariantByTag);
+        if (!data.transportWorkbenchUi || typeof data.transportWorkbenchUi !== "object") {
+          data.transportWorkbenchUi = null;
+        }
         data.layerVisibility.showWaterRegions =
           data.layerVisibility.showWaterRegions === undefined ? true : !!data.layerVisibility.showWaterRegions;
         data.layerVisibility.showOpenOceanRegions =

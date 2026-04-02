@@ -19,36 +19,69 @@ RECIPE_PATH = ROOT / "data" / "transport_layers" / "japan_port" / "source_recipe
 OUTPUT_DIR = ROOT / "data" / "transport_layers" / "japan_port"
 FULL_OUTPUT_PATH = OUTPUT_DIR / "ports.geojson"
 PREVIEW_OUTPUT_PATH = OUTPUT_DIR / "ports.preview.geojson"
+EXPANDED_OUTPUT_PATH = OUTPUT_DIR / "ports.expanded.geojson"
+EXPANDED_PREVIEW_OUTPUT_PATH = OUTPUT_DIR / "ports.expanded.preview.geojson"
+CORE_OUTPUT_PATH = OUTPUT_DIR / "ports.core.geojson"
+CORE_PREVIEW_OUTPUT_PATH = OUTPUT_DIR / "ports.core.preview.geojson"
 MANIFEST_PATH = OUTPUT_DIR / "manifest.json"
 AUDIT_PATH = OUTPUT_DIR / "build_audit.json"
 CARRIER_PATH = ROOT / "data" / "transport_layers" / "japan_corridor" / "carrier.json"
 
 LEGAL_DESIGNATION_MAP = {
-    "11": {"slug": "international_strategy", "label": "国際戦略港湾", "importance": "national_core", "importance_rank": 3},
-    "12": {"slug": "international_hub", "label": "国際拠点港湾", "importance": "national_core", "importance_rank": 3},
-    "13": {"slug": "important", "label": "重要港湾", "importance": "regional_core", "importance_rank": 2},
+    "11": {"slug": "international_strategy", "label": "International strategic port", "importance": "national_core", "importance_rank": 3},
+    "12": {"slug": "international_hub", "label": "International hub port", "importance": "national_core", "importance_rank": 3},
+    "13": {"slug": "important", "label": "Important port", "importance": "regional_core", "importance_rank": 2},
+    "14": {"slug": "local", "label": "Local port", "importance": "local_connector", "importance_rank": 1},
+    "15": {"slug": "shelter", "label": "Shelter / special-use port", "importance": "special_support", "importance_rank": 1},
 }
 PORT_CLASS_MAP = {
-    "0": "その他",
-    "1": "甲種",
-    "2": "乙種",
+    "0": "Unspecified",
+    "1": "Class A",
+    "2": "Class B",
 }
 MANAGER_TYPE_MAP = {
-    "1": "都道府県",
-    "2": "市町村",
-    "3": "港務局",
-    "4": "地方公共団体の組合",
-    "5": "その他",
+    "1": "Prefecture",
+    "2": "Municipality",
+    "3": "Port authority",
+    "4": "Local public body",
+    "5": "Other",
 }
 AGENCY_MAP = {
-    "1": "海上保安部",
-    "2": "検疫所",
-    "3": "税関",
-    "4": "入国管理局",
-    "5": "航路標識事務所",
-    "6": "漁港区",
-    "7": "海上交通センター",
-    "8": "国際戦略港湾等",
+    "1": "Japan Coast Guard",
+    "2": "Quarantine station",
+    "3": "Customs",
+    "4": "Immigration office",
+    "5": "Airport / navigation office",
+    "6": "Harbor office",
+    "7": "Maritime traffic center",
+    "8": "International strategic port office",
+}
+
+COVERAGE_TIERS = {
+    "core": {
+        "label": "core",
+        "description": "International strategic, international hub, and important ports only.",
+        "legal_designation_codes": ["11", "12", "13"],
+        "preview_path": CORE_PREVIEW_OUTPUT_PATH,
+        "full_path": CORE_OUTPUT_PATH,
+        "distribution_tier": "curated_core",
+    },
+    "expanded": {
+        "label": "expanded",
+        "description": "Core ports plus local ports that remain inside the Japan carrier route mask.",
+        "legal_designation_codes": ["11", "12", "13", "14"],
+        "preview_path": EXPANDED_PREVIEW_OUTPUT_PATH,
+        "full_path": EXPANDED_OUTPUT_PATH,
+        "distribution_tier": "official_expanded",
+    },
+    "full_official": {
+        "label": "full_official",
+        "description": "All official port nodes inside the current route mask, including shelter and special-use ports.",
+        "legal_designation_codes": ["11", "12", "13", "14", "15"],
+        "preview_path": PREVIEW_OUTPUT_PATH,
+        "full_path": FULL_OUTPUT_PATH,
+        "distribution_tier": "official_full",
+    },
 }
 
 
@@ -201,6 +234,12 @@ def normalize_ports(ports: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     return gpd.GeoDataFrame(rows, geometry="geometry", crs="EPSG:4326")
 
 
+def select_coverage_tier(normalized: gpd.GeoDataFrame, tier_id: str) -> gpd.GeoDataFrame:
+    tier_meta = COVERAGE_TIERS[tier_id]
+    allowed_codes = set(tier_meta["legal_designation_codes"])
+    return normalized.loc[normalized["legal_designation_code"].isin(allowed_codes)].copy()
+
+
 def main() -> None:
     ensure_required_sources()
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -209,10 +248,15 @@ def main() -> None:
 
     ports = read_official_ports(route_mask)
     normalized = normalize_ports(ports)
-    preview = normalized.copy()
+    tier_packs = {
+        tier_id: select_coverage_tier(normalized, tier_id)
+        for tier_id in COVERAGE_TIERS
+    }
 
-    write_json(FULL_OUTPUT_PATH, feature_collection_payload(normalized), compact=False)
-    write_json(PREVIEW_OUTPUT_PATH, feature_collection_payload(preview), compact=False)
+    for tier_id, tier_meta in COVERAGE_TIERS.items():
+        tier_gdf = tier_packs[tier_id]
+        write_json(tier_meta["full_path"], feature_collection_payload(tier_gdf), compact=False)
+        write_json(tier_meta["preview_path"], feature_collection_payload(tier_gdf), compact=False)
 
     source_signature = {
         "mlit_c02_2014_ports": {
@@ -226,26 +270,55 @@ def main() -> None:
         "family": "port",
         "geometry_kind": "point",
         "country": "Japan",
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": utc_now(),
         "recipe_path": str(RECIPE_PATH.relative_to(ROOT)).replace("\\", "/"),
+        "default_coverage_tier": "core",
+        "distribution_tier": "coverage_tiered",
+        "license_tier": "review_required",
+        "coverage_scope": "japan_main_islands_route_mask",
         "paths": {
             "preview": {
-                "ports": str(PREVIEW_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
+                "ports": str(CORE_PREVIEW_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
             },
             "full": {
                 "ports": str(FULL_OUTPUT_PATH.relative_to(ROOT)).replace("\\", "/"),
             },
             "build_audit": str(AUDIT_PATH.relative_to(ROOT)).replace("\\", "/"),
         },
+        "coverage_variants": {
+            tier_id: {
+                "label": tier_meta["label"],
+                "description": tier_meta["description"],
+                "distribution_tier": tier_meta["distribution_tier"],
+                "legal_designation_codes": list(tier_meta["legal_designation_codes"]),
+                "paths": {
+                    "preview": {
+                        "ports": str(tier_meta["preview_path"].relative_to(ROOT)).replace("\\", "/"),
+                    },
+                    "full": {
+                        "ports": str(tier_meta["full_path"].relative_to(ROOT)).replace("\\", "/"),
+                    },
+                },
+                "feature_counts": {
+                    "preview": {
+                        "ports": int(len(tier_packs[tier_id])),
+                    },
+                    "full": {
+                        "ports": int(len(tier_packs[tier_id])),
+                    },
+                },
+            }
+            for tier_id, tier_meta in COVERAGE_TIERS.items()
+        },
         "source_signature": source_signature,
         "recipe_version": recipe.get("version", "japan_port_sources_v1"),
         "feature_counts": {
             "preview": {
-                "ports": int(len(preview)),
+                "ports": int(len(tier_packs["core"])),
             },
             "full": {
-                "ports": int(len(normalized)),
+                "ports": int(len(tier_packs["full_official"])),
             },
         },
         "clip_bbox": [round(value, 6) for value in route_mask.bounds],
@@ -258,17 +331,22 @@ def main() -> None:
             "storage_encoding": "utf-8",
             "display_fields_preserve_original": True,
             "source_fallback_encoding": "cp932",
-            "match_key_normalization": "NFKC + whitespace collapse + casefold"
+            "match_key_normalization": "NFKC + whitespace collapse + casefold",
         },
         "release_policy": "internal_trial_only",
         "publish_guard": "replace_c02_source_before_public_release",
-        "scope_policy": "japan_corridor_main_islands"
+        "scope_policy": "japan_corridor_main_islands",
     }
     audit = {
         "generated_at": utc_now(),
         "adapter_id": "japan_port_v1",
         "raw_port_feature_count": int(len(ports)),
         "normalized_port_count": int(len(normalized)),
+        "default_coverage_tier": "core",
+        "coverage_tier_counts": {
+            tier_id: int(len(tier_gdf))
+            for tier_id, tier_gdf in tier_packs.items()
+        },
         "legal_designation_counts": {
             code: int((normalized["legal_designation_code"] == code).sum())
             for code in LEGAL_DESIGNATION_MAP.keys()
@@ -280,7 +358,8 @@ def main() -> None:
         },
         "importance_counts": {
             level: int((normalized["importance"] == level).sum())
-            for level in ("national_core", "regional_core")
+            for level in ("national_core", "regional_core", "local_connector", "special_support")
+            if int((normalized["importance"] == level).sum()) > 0
         },
         "recipe_version": recipe.get("version", "japan_port_sources_v1"),
         "source_policy": "local_source_cache_only_internal_trial",
@@ -292,7 +371,8 @@ def main() -> None:
         },
         "source_signature": source_signature,
         "notes": [
-            "Only 国際戦略港湾, 国際拠点港湾, and 重要港湾 survive this first runtime pack.",
+            "Coverage tiers now expose core, expanded, and full official port subsets instead of collapsing the runtime contract to a single curated set.",
+            "The legacy preview path now points at the core tier so existing consumers stay stable while upgraded consumers can opt into expanded or full_official coverage.",
             "The current C02 source is kept for internal trial use only. Public or commercial release must replace or re-license the source path first.",
             "Port district polygons and harbor district boundaries remain out of scope for v1.",
         ],

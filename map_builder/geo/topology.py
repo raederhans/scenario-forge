@@ -198,6 +198,9 @@ def build_topology(
             keep_cols = [
                 "id",
                 "name",
+                "country_owner_id",
+                "country_owner_code",
+                "country_owner_method",
                 "featurecla",
                 "FEATURECLA",
                 "scalerank",

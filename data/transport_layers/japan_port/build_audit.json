@@ -1,20 +1,30 @@
 {
-  "generated_at": "2026-04-01T22:10:03.224639Z",
+  "generated_at": "2026-04-02T14:08:09.195656Z",
   "adapter_id": "japan_port_v1",
   "raw_port_feature_count": 317,
-  "normalized_port_count": 12,
+  "normalized_port_count": 317,
+  "default_coverage_tier": "core",
+  "coverage_tier_counts": {
+    "core": 12,
+    "expanded": 295,
+    "full_official": 317
+  },
   "legal_designation_counts": {
     "11": 0,
     "12": 0,
-    "13": 12
+    "13": 12,
+    "14": 283,
+    "15": 22
   },
   "manager_type_counts": {
-    "1": 10,
-    "2": 2
+    "1": 188,
+    "2": 107,
+    "5": 22
   },
   "importance_counts": {
-    "national_core": 0,
-    "regional_core": 12
+    "regional_core": 12,
+    "local_connector": 283,
+    "special_support": 22
   },
   "recipe_version": "japan_port_sources_v1",
   "source_policy": "local_source_cache_only_internal_trial",
@@ -32,7 +42,8 @@
     }
   },
   "notes": [
-    "Only 国際戦略港湾, 国際拠点港湾, and 重要港湾 survive this first runtime pack.",
+    "Coverage tiers now expose core, expanded, and full official port subsets instead of collapsing the runtime contract to a single curated set.",
+    "The legacy preview path now points at the core tier so existing consumers stay stable while upgraded consumers can opt into expanded or full_official coverage.",
     "The current C02 source is kept for internal trial use only. Public or commercial release must replace or re-license the source path first.",
     "Port district polygons and harbor district boundaries remain out of scope for v1."
   ]

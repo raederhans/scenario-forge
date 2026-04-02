@@ -53,6 +53,13 @@
       "build_audit.json"
     ],
     "runtime_consumer": "transport_workbench_manifest_preview",
-    "adapter_id": "japan_mineral_resources_v1"
+    "adapter_id": "japan_mineral_resources_v1",
+    "taxonomy_contract": {
+      "primary_group_field": "normalized_resource_group",
+      "primary_group_label_field": "normalized_resource_group_label",
+      "source_type_field": "resource_type",
+      "source_type_code_field": "resource_type_code",
+      "stability_policy": "normalized_resource_group is repo-versioned and must remain stable across rebuilds unless the build script mapping changes."
+    }
   }
 }

@@ -6,6 +6,7 @@ import {
   normalizeMapSemanticMode,
   normalizePhysicalStyleConfig,
   normalizeTextureStyleConfig,
+  normalizeUrbanStyleConfig,
   PHYSICAL_ATLAS_PALETTE,
   state,
 } from "./state.js";
@@ -279,6 +280,8 @@ const INTERNAL_BORDER_PROVINCE_MIN_WIDTH = 0.52;
 const INTERNAL_BORDER_LOCAL_MIN_WIDTH = 0.36;
 const INTERNAL_BORDER_LOCAL_ALPHA_SCALE = 0.60;
 const INTERNAL_BORDER_LOCAL_WIDTH_SCALE = 0.75;
+const INTERNAL_BORDER_AUTO_DARK = "#ffffff";
+const INTERNAL_BORDER_AUTO_LIGHT = "#111827";
 const DETAIL_ADM_BORDER_COLOR = "#888888";
 const DETAIL_ADM_BORDER_MIN_ALPHA = 0.24;
 const DETAIL_ADM_BORDER_MAX_ALPHA = 0.34;
@@ -308,6 +311,9 @@ const GB_ID_PATTERN_RE = /^[A-Z]{2}[A-Z0-9]{3}$/;
 const DE_STATE_GROUP_MIN = 12;
 const DE_STATE_GROUP_MAX = 20;
 const DE_CITY_STATES = new Set(["Berlin", "Hamburg", "Bremen"]);
+const BOUNDARY_DEFAULT_LINE_JOIN = "round";
+const BOUNDARY_DEFAULT_LINE_CAP = "round";
+const BOUNDARY_DEFAULT_MITER_LIMIT = 2.4;
 const OCEAN_MASK_MODE_TOPOLOGY = "topology_ocean";
 const OCEAN_MASK_MODE_SPHERE_MINUS_LAND = "sphere_minus_land";
 const OCEAN_MASK_MODE_BATHYMETRY = "bathymetry_features";
@@ -510,6 +516,14 @@ const modernCityLightsGeometryCache = {
   baseEntries: [],
   corridorEntries: [],
 };
+const modernCityLightsPopulationBoostCache = {
+  cityCollection: null,
+  urbanCollection: null,
+  cityLayerRevision: -1,
+  scenarioId: "",
+  urbanEntries: [],
+  cityEntries: [],
+};
 const layerResolverCache = {
   primaryRef: null,
   detailRef: null,
@@ -545,6 +559,12 @@ let staticMeshCache = {
   sourceCountriesSignature: "",
   coastlineDecisionSignature: "",
   snapshot: null,
+};
+let countryDominantFillColorCache = {
+  colorRevision: -1,
+  scenarioViewMode: "",
+  activeScenarioId: "",
+  result: new Map(),
 };
 let scenarioPoliticalBackgroundCache = {
   runtimeRef: null,
@@ -1564,13 +1584,14 @@ function getRenderPassSignature(passName, transform = state.zoomTransform || glo
       state.showUrban ? "urban:on" : "urban:off",
       state.showRivers ? "rivers:on" : "rivers:off",
       `cities:${Number(state.cityLayerRevision || 0)}`,
+      `colors:${Number(state.colorRevision || 0)}`,
       `context:${Number(state.contextLayerRevision || 0)}`,
       `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}`,
       `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
       String(state.renderProfile || "auto"),
       stableJson(normalizePhysicalStyleConfig(state.styleConfig?.physical || {})),
       stableJson(normalizeCityLayerStyleConfig(state.styleConfig?.cityPoints || {})),
-      stableJson(state.styleConfig?.urban || {}),
+      stableJson(normalizeUrbanStyleConfig(state.styleConfig?.urban || {})),
       stableJson(state.styleConfig?.rivers || {}),
     ];
     if (shouldEnableContextBaseTransformReuse()) {
@@ -2363,6 +2384,79 @@ function getCanvasColorRelativeLuminance(value) {
   const g = ColorManager.srgbToLinear(channels.g / 255);
   const b = ColorManager.srgbToLinear(channels.b / 255);
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function mixCanvasColors(baseColor, targetColor, amount) {
+  const base = parseCanvasColorChannels(baseColor);
+  const target = parseCanvasColorChannels(targetColor);
+  if (!base || !target) return null;
+  const mix = clamp(Number(amount) || 0, 0, 1);
+  return ColorManager.rgbToHex(
+    base.r + ((target.r - base.r) * mix),
+    base.g + ((target.g - base.g) * mix),
+    base.b + ((target.b - base.b) * mix),
+  );
+}
+
+function buildCountryDominantFillColorMap() {
+  const cacheMatches =
+    countryDominantFillColorCache.colorRevision === Number(state.colorRevision || 0)
+    && countryDominantFillColorCache.scenarioViewMode === String(state.scenarioViewMode || "ownership")
+    && countryDominantFillColorCache.activeScenarioId === String(state.activeScenarioId || "");
+  if (cacheMatches && countryDominantFillColorCache.result instanceof Map) {
+    return countryDominantFillColorCache.result;
+  }
+
+  const countsByCountry = new Map();
+  getFullLandDataFeatures().forEach((feature, index) => {
+    const countryCode = getFeatureCountryCodeNormalized(feature);
+    const id = getFeatureId(feature) || `feature-${index}`;
+    if (!countryCode || !id || shouldExcludePoliticalInteractionFeature(feature, id)) return;
+    const color = getSafeCanvasColor(state.colors?.[id], null) || getResolvedFeatureColor(feature, id);
+    if (!color) return;
+    const countryCounts = countsByCountry.get(countryCode) || new Map();
+    countryCounts.set(color, (countryCounts.get(color) || 0) + 1);
+    countsByCountry.set(countryCode, countryCounts);
+  });
+
+  const result = new Map();
+  countsByCountry.forEach((countryCounts, countryCode) => {
+    let bestColor = "";
+    let bestCount = -1;
+    countryCounts.forEach((count, color) => {
+      if (count <= bestCount) return;
+      bestColor = color;
+      bestCount = count;
+    });
+    if (bestColor) {
+      result.set(countryCode, bestColor);
+    }
+  });
+
+  countryDominantFillColorCache = {
+    colorRevision: Number(state.colorRevision || 0),
+    scenarioViewMode: String(state.scenarioViewMode || "ownership"),
+    activeScenarioId: String(state.activeScenarioId || ""),
+    result,
+  };
+  return result;
+}
+
+function getInternalBorderStrokeColor(countryCode, fallbackColor) {
+  const colorMode = String(state.styleConfig?.internalBorders?.colorMode || "auto").trim().toLowerCase();
+  const manualColor = getSafeCanvasColor(state.styleConfig?.internalBorders?.color, fallbackColor || "#cccccc");
+  if (colorMode === "manual") {
+    return manualColor;
+  }
+  const dominantFillColor = buildCountryDominantFillColorMap().get(canonicalCountryCode(countryCode));
+  const luminance = getCanvasColorRelativeLuminance(dominantFillColor);
+  if (!Number.isFinite(luminance)) {
+    return manualColor;
+  }
+  const targetColor = luminance >= 0.42 ? INTERNAL_BORDER_AUTO_LIGHT : INTERNAL_BORDER_AUTO_DARK;
+  return mixCanvasColors(dominantFillColor, targetColor, luminance >= 0.42 ? 0.78 : 0.72)
+    || targetColor
+    || manualColor;
 }
 
 function sanitizeColorMap(input) {
@@ -3948,7 +4042,7 @@ function rebuildResolvedColors() {
 
   state.colors = nextColors;
   state.colorRevision = Number(state.colorRevision || 0) + 1;
-  invalidateRenderPasses("political", "rebuild-colors");
+  invalidateRenderPasses(["political", "contextBase"], "rebuild-colors");
   return nextColors;
 }
 
@@ -3976,7 +4070,7 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false } = {}
   });
 
   state.colorRevision = Number(state.colorRevision || 0) + 1;
-  invalidateRenderPasses("political", "refresh-colors");
+  invalidateRenderPasses(["political", "contextBase"], "refresh-colors");
 
   if (renderNow && context) {
     render();
@@ -4619,16 +4713,21 @@ function rebuildDynamicBorders() {
     });
     return;
   }
+  const ownershipContext = {
+    ownershipByFeatureId: state.sovereigntyByFeatureId,
+    controllerByFeatureId: state.scenarioControllersByFeatureId,
+    shellOwnerByFeatureId: state.scenarioAutoShellOwnerByFeatureId,
+    shellControllerByFeatureId: state.scenarioAutoShellControllerByFeatureId,
+    scenarioActive: !!state.activeScenarioId,
+    viewMode: state.scenarioViewMode,
+  };
   state.cachedDynamicOwnerBorders = buildDynamicOwnerBorderMesh(
     state.runtimePoliticalTopology,
-    {
-      ownershipByFeatureId: state.sovereigntyByFeatureId,
-      controllerByFeatureId: state.scenarioControllersByFeatureId,
-      shellOwnerByFeatureId: state.scenarioAutoShellOwnerByFeatureId,
-      shellControllerByFeatureId: state.scenarioAutoShellControllerByFeatureId,
-      scenarioActive: !!state.activeScenarioId,
-      viewMode: state.scenarioViewMode,
-    }
+    ownershipContext
+  );
+  const unresolvedEntityCount = countUnresolvedOwnerBorderEntities(
+    state.runtimePoliticalTopology,
+    ownershipContext
   );
   state.cachedDynamicBordersHash = nextHash;
   state.dynamicBordersDirty = false;
@@ -4638,6 +4737,7 @@ function rebuildDynamicBorders() {
   recordRenderPerfMetric("rebuildDynamicBorders", nowMs() - startedAt, {
     enabled: true,
     cacheHit: false,
+    unresolvedEntityCount,
     segmentCount: Array.isArray(state.cachedDynamicOwnerBorders?.coordinates)
       ? state.cachedDynamicOwnerBorders.coordinates.length
       : 0,
@@ -4827,6 +4927,18 @@ function buildOwnerBorderMesh(runtimeTopology, ownershipContext = {}, { excludeS
 
 function buildDynamicOwnerBorderMesh(runtimeTopology, ownershipContext) {
   return buildOwnerBorderMesh(runtimeTopology, ownershipContext, { excludeSea: true });
+}
+
+function countUnresolvedOwnerBorderEntities(runtimeTopology, ownershipContext = {}) {
+  const geometries = runtimeTopology?.objects?.political?.geometries;
+  if (!Array.isArray(geometries) || !geometries.length) return 0;
+  let unresolvedCount = 0;
+  geometries.forEach((geometry) => {
+    if (shouldExcludeOwnerBorderEntity(geometry, { excludeSea: true })) return;
+    if (resolveOwnerBorderCode(geometry, ownershipContext)) return;
+    unresolvedCount += 1;
+  });
+  return unresolvedCount;
 }
 
 function buildDetailAdmBorderMesh(topology, includedCountries) {
@@ -5242,6 +5354,7 @@ function getCoastlineDecisionSignature(decision = null) {
     String(decision.scenarioId || ""),
     String(decision.primaryObjectName || ""),
     String(decision.runtimeObjectName || ""),
+    String(decision.meshMode || ""),
     Number(decision.primaryFeatureCount || 0),
     Number(decision.runtimeFeatureCount || 0),
     Number(decision.primaryPolygonPartCount || 0),
@@ -5257,7 +5370,9 @@ function captureStaticMeshSnapshot() {
   return {
     cachedCountryBorders: [...(state.cachedCountryBorders || [])],
     cachedProvinceBorders: [...(state.cachedProvinceBorders || [])],
+    cachedProvinceBordersByCountry: new Map(state.cachedProvinceBordersByCountry || []),
     cachedLocalBorders: [...(state.cachedLocalBorders || [])],
+    cachedLocalBordersByCountry: new Map(state.cachedLocalBordersByCountry || []),
     cachedDetailAdmBorders: [...(state.cachedDetailAdmBorders || [])],
     cachedCoastlines: [...(state.cachedCoastlines || [])],
     cachedCoastlinesHigh: [...(state.cachedCoastlinesHigh || [])],
@@ -5275,7 +5390,9 @@ function restoreStaticMeshSnapshot(snapshot) {
   if (!snapshot) return;
   state.cachedCountryBorders = [...(snapshot.cachedCountryBorders || [])];
   state.cachedProvinceBorders = [...(snapshot.cachedProvinceBorders || [])];
+  state.cachedProvinceBordersByCountry = new Map(snapshot.cachedProvinceBordersByCountry || []);
   state.cachedLocalBorders = [...(snapshot.cachedLocalBorders || [])];
+  state.cachedLocalBordersByCountry = new Map(snapshot.cachedLocalBordersByCountry || []);
   state.cachedDetailAdmBorders = [...(snapshot.cachedDetailAdmBorders || [])];
   state.cachedCoastlines = [...(snapshot.cachedCoastlines || [])];
   state.cachedCoastlinesHigh = [...(snapshot.cachedCoastlinesHigh || [])];
@@ -5294,47 +5411,56 @@ function buildSourceBorderMeshes(topology, includedCountries) {
   if (!object || !globalThis.topojson || !includedCountries?.size) {
     return null;
   }
+  const provinceMeshesByCountry = new Map();
+  const localMeshesByCountry = new Map();
+  const provinceMeshes = [];
+  const localMeshes = [];
 
-  const inScope = (entity) => {
-    const code = getFeatureCountryCodeNormalized(entity);
-    return code && includedCountries.has(code);
-  };
-
-  const isProvinceSplit = (a, b) => {
-    const groupA = getAdmin1Group(a);
-    const groupB = getAdmin1Group(b);
-    return !!(groupA && groupB && groupA !== groupB);
-  };
-
-  const provinceMesh = globalThis.topojson.mesh(
-    topology,
-    object,
-    (a, b) => {
-      if (!a || !b) return false;
-      if (!inScope(a) || !inScope(b)) return false;
-      const codeA = getFeatureCountryCodeNormalized(a);
-      const codeB = getFeatureCountryCodeNormalized(b);
-      if (!codeA || !codeB || codeA !== codeB) return false;
-      return isProvinceSplit(a, b);
+  includedCountries.forEach((countryCode) => {
+    const normalizedCode = canonicalCountryCode(countryCode);
+    if (!normalizedCode) return;
+    const provinceMesh = globalThis.topojson.mesh(
+      topology,
+      object,
+      (a, b) => {
+        if (!a || !b) return false;
+        const codeA = getFeatureCountryCodeNormalized(a);
+        const codeB = getFeatureCountryCodeNormalized(b);
+        if (!codeA || !codeB || codeA !== normalizedCode || codeB !== normalizedCode) return false;
+        const groupA = getAdmin1Group(a);
+        const groupB = getAdmin1Group(b);
+        return !!(groupA && groupB && groupA !== groupB);
+      }
+    );
+    if (isUsableMesh(provinceMesh)) {
+      provinceMeshesByCountry.set(normalizedCode, [provinceMesh]);
+      provinceMeshes.push(provinceMesh);
     }
-  );
 
-  const localMesh = globalThis.topojson.mesh(
-    topology,
-    object,
-    (a, b) => {
-      if (!a || !b) return false;
-      if (!inScope(a) || !inScope(b)) return false;
-      const codeA = getFeatureCountryCodeNormalized(a);
-      const codeB = getFeatureCountryCodeNormalized(b);
-      if (!codeA || !codeB || codeA !== codeB) return false;
-      return !isProvinceSplit(a, b);
+    const localMesh = globalThis.topojson.mesh(
+      topology,
+      object,
+      (a, b) => {
+        if (!a || !b) return false;
+        const codeA = getFeatureCountryCodeNormalized(a);
+        const codeB = getFeatureCountryCodeNormalized(b);
+        if (!codeA || !codeB || codeA !== normalizedCode || codeB !== normalizedCode) return false;
+        const groupA = getAdmin1Group(a);
+        const groupB = getAdmin1Group(b);
+        return !(groupA && groupB && groupA !== groupB);
+      }
+    );
+    if (isUsableMesh(localMesh)) {
+      localMeshesByCountry.set(normalizedCode, [localMesh]);
+      localMeshes.push(localMesh);
     }
-  );
+  });
 
   return {
-    provinceMesh,
-    localMesh,
+    provinceMeshes,
+    provinceMeshesByCountry,
+    localMeshes,
+    localMeshesByCountry,
   };
 }
 
@@ -5478,8 +5604,11 @@ function resolveCoastlineTopologySource() {
   }
 
   const primaryMetrics = getCoastlineTopologyMetrics(primaryTopology, ["land_mask", "land"]);
-  const runtimeMetrics = scenarioId
+  const runtimeMaskMetrics = scenarioId
     ? getCoastlineTopologyMetrics(runtimeTopology, ["context_land_mask", "land_mask", "land"])
+    : null;
+  const runtimePoliticalMetrics = scenarioId
+    ? getCoastlineTopologyMetrics(runtimeTopology, ["political"])
     : null;
 
   let decision = {
@@ -5487,32 +5616,45 @@ function resolveCoastlineTopologySource() {
     reason: scenarioId ? "missing_runtime_land_mask" : "no_active_scenario",
     scenarioId,
     primaryObjectName: primaryMetrics.objectName || "",
-    runtimeObjectName: runtimeMetrics?.objectName || "",
+    runtimeObjectName: runtimeMaskMetrics?.objectName || "",
     primaryFeatureCount: Number(primaryMetrics.featureCount || 0),
-    runtimeFeatureCount: Number(runtimeMetrics?.featureCount || 0),
+    runtimeFeatureCount: Number(runtimeMaskMetrics?.featureCount || 0),
     primaryPolygonPartCount: Number(primaryMetrics.polygonPartCount || 0),
-    runtimePolygonPartCount: Number(runtimeMetrics?.polygonPartCount || 0),
+    runtimePolygonPartCount: Number(runtimeMaskMetrics?.polygonPartCount || 0),
     primaryInteriorRingCount: Number(primaryMetrics.interiorRingCount || 0),
-    runtimeInteriorRingCount: Number(runtimeMetrics?.interiorRingCount || 0),
+    runtimeInteriorRingCount: Number(runtimeMaskMetrics?.interiorRingCount || 0),
     runtimeInteriorRingRatio: 0,
     areaDeltaRatio: 0,
+    meshMode: "mask",
     topology: primaryTopology,
   };
 
-  if (scenarioId && runtimeMetrics?.objectName && primaryMetrics.featureCount > 0) {
+  if (scenarioId && runtimePoliticalMetrics?.objectName) {
+    decision = {
+      ...decision,
+      source: "scenario_political_outline",
+      reason: "runtime_political_shell",
+      runtimeObjectName: runtimePoliticalMetrics.objectName || "political",
+      runtimeFeatureCount: Number(runtimePoliticalMetrics.featureCount || 0),
+      runtimePolygonPartCount: Number(runtimePoliticalMetrics.polygonPartCount || 0),
+      runtimeInteriorRingCount: Number(runtimePoliticalMetrics.interiorRingCount || 0),
+      meshMode: "political_outline",
+      topology: runtimeTopology,
+    };
+  } else if (scenarioId && runtimeMaskMetrics?.objectName && primaryMetrics.featureCount > 0) {
     const areaBase = Math.max(1e-9, Number(primaryMetrics.totalArea) || 0);
-    const areaDeltaRatio = Math.abs((Number(runtimeMetrics.totalArea) || 0) - areaBase) / areaBase;
+    const areaDeltaRatio = Math.abs((Number(runtimeMaskMetrics.totalArea) || 0) - areaBase) / areaBase;
     const runtimeInteriorRingRatio =
-      Number(runtimeMetrics.interiorRingCount || 0) / Math.max(1, Number(runtimeMetrics.polygonPartCount || 0));
+      Number(runtimeMaskMetrics.interiorRingCount || 0) / Math.max(1, Number(runtimeMaskMetrics.polygonPartCount || 0));
     let accepted = true;
     let reason = "scenario_accepted";
-    if (runtimeMetrics.worldBounds) {
+    if (runtimeMaskMetrics.worldBounds) {
       accepted = false;
       reason = "runtime_world_bounds";
     } else if (areaDeltaRatio > SCENARIO_COASTLINE_MAX_AREA_DELTA_RATIO) {
       accepted = false;
       reason = "area_delta_exceeded";
-    } else if (Number(runtimeMetrics.interiorRingCount || 0) > SCENARIO_COASTLINE_MAX_INTERIOR_RING_COUNT) {
+    } else if (Number(runtimeMaskMetrics.interiorRingCount || 0) > SCENARIO_COASTLINE_MAX_INTERIOR_RING_COUNT) {
       accepted = false;
       reason = "interior_ring_count_exceeded";
     } else if (runtimeInteriorRingRatio > SCENARIO_COASTLINE_MAX_INTERIOR_RING_RATIO) {
@@ -5521,13 +5663,14 @@ function resolveCoastlineTopologySource() {
     }
     decision = {
       ...decision,
-      source: accepted ? "scenario" : "primary",
-      reason,
-      runtimeInteriorRingRatio,
-      areaDeltaRatio,
-      topology: accepted ? runtimeTopology : primaryTopology,
-    };
-  }
+        source: accepted ? "scenario" : "primary",
+        reason,
+        runtimeInteriorRingRatio,
+        areaDeltaRatio,
+        meshMode: "mask",
+        topology: accepted ? runtimeTopology : primaryTopology,
+      };
+    }
 
   if (scenarioId) {
     const logKey = `${scenarioId}::${decision.source}::${decision.reason}`;
@@ -5549,20 +5692,29 @@ function resolveCoastlineTopologySource() {
 }
 
 function buildGlobalCoastlineMesh(primaryTopology) {
-  if (!primaryTopology?.objects || !globalThis.topojson) return null;
-  if (primaryTopology.objects.context_land_mask) {
-    return globalThis.topojson.mesh(primaryTopology, primaryTopology.objects.context_land_mask);
-  }
-  if (primaryTopology.objects.land_mask) {
-    return globalThis.topojson.mesh(primaryTopology, primaryTopology.objects.land_mask);
-  }
-  if (primaryTopology.objects.land) {
-    return globalThis.topojson.mesh(primaryTopology, primaryTopology.objects.land);
-  }
-  if (primaryTopology.objects.political) {
+  const topology = primaryTopology?.topology || primaryTopology;
+  const meshMode = String(primaryTopology?.meshMode || "mask");
+  if (!topology?.objects || !globalThis.topojson) return null;
+  if (meshMode === "political_outline" && topology.objects.political) {
     return globalThis.topojson.mesh(
-      primaryTopology,
-      primaryTopology.objects.political,
+      topology,
+      topology.objects.political,
+      (a, b) => !!(a && !b && !shouldExcludeOwnerBorderEntity(a, { excludeSea: true }))
+    );
+  }
+  if (topology.objects.context_land_mask) {
+    return globalThis.topojson.mesh(topology, topology.objects.context_land_mask);
+  }
+  if (topology.objects.land_mask) {
+    return globalThis.topojson.mesh(topology, topology.objects.land_mask);
+  }
+  if (topology.objects.land) {
+    return globalThis.topojson.mesh(topology, topology.objects.land);
+  }
+  if (topology.objects.political) {
+    return globalThis.topojson.mesh(
+      topology,
+      topology.objects.political,
       (a, b) => !!(a && !b)
     );
   }
@@ -5815,7 +5967,9 @@ function rebuildStaticMeshes() {
     staticMeshCache.snapshot = null;
     state.cachedCountryBorders = [];
     state.cachedProvinceBorders = [];
+    state.cachedProvinceBordersByCountry = new Map();
     state.cachedLocalBorders = [];
+    state.cachedLocalBordersByCountry = new Map();
     state.cachedDetailAdmBorders = [];
     state.cachedCoastlines = [];
     state.cachedCoastlinesHigh = [];
@@ -5876,7 +6030,9 @@ function rebuildStaticMeshes() {
 
   state.cachedCountryBorders = [];
   state.cachedProvinceBorders = [];
+  state.cachedProvinceBordersByCountry = new Map();
   state.cachedLocalBorders = [];
+  state.cachedLocalBordersByCountry = new Map();
   state.cachedDetailAdmBorders = [];
   state.cachedCoastlines = [];
   state.cachedCoastlinesHigh = [];
@@ -5900,9 +6056,24 @@ function rebuildStaticMeshes() {
     if (!includedCountries.size) return;
     const meshes = buildSourceBorderMeshes(topology, includedCountries);
     if (!meshes) return;
-
-    if (isUsableMesh(meshes.provinceMesh)) state.cachedProvinceBorders.push(meshes.provinceMesh);
-    if (isUsableMesh(meshes.localMesh)) state.cachedLocalBorders.push(meshes.localMesh);
+    (meshes.provinceMeshes || []).forEach((mesh) => {
+      if (isUsableMesh(mesh)) state.cachedProvinceBorders.push(mesh);
+    });
+    (meshes.localMeshes || []).forEach((mesh) => {
+      if (isUsableMesh(mesh)) state.cachedLocalBorders.push(mesh);
+    });
+    if (meshes.provinceMeshesByCountry instanceof Map) {
+      meshes.provinceMeshesByCountry.forEach((countryMeshes, countryCode) => {
+        const existing = state.cachedProvinceBordersByCountry.get(countryCode) || [];
+        state.cachedProvinceBordersByCountry.set(countryCode, [...existing, ...countryMeshes]);
+      });
+    }
+    if (meshes.localMeshesByCountry instanceof Map) {
+      meshes.localMeshesByCountry.forEach((countryMeshes, countryCode) => {
+        const existing = state.cachedLocalBordersByCountry.get(countryCode) || [];
+        state.cachedLocalBordersByCountry.set(countryCode, [...existing, ...countryMeshes]);
+      });
+    }
   });
 
   const detailCountries = sourceCountries.detail || new Set();
@@ -5920,7 +6091,7 @@ function rebuildStaticMeshes() {
     state.cachedCountryBorders.push(countryMesh);
   }
 
-  const coastlineMesh = buildGlobalCoastlineMesh(coastlineSourceDecision?.topology || primaryTopology);
+  const coastlineMesh = buildGlobalCoastlineMesh(coastlineSourceDecision || primaryTopology);
   if (isUsableMesh(coastlineMesh)) {
     state.cachedCoastlines.push(coastlineMesh);
     state.cachedCoastlinesHigh.push(coastlineMesh);
@@ -7241,7 +7412,7 @@ function rebuildRuntimeDerivedState({
 
   state.colors = nextColors;
   state.colorRevision = Number(state.colorRevision || 0) + 1;
-  invalidateRenderPasses("political", "rebuild-colors");
+  invalidateRenderPasses(["political", "contextBase"], "rebuild-colors");
   queueIndexUiRefresh({
     renderCountryList: true,
     renderWaterRegionList: true,
@@ -7461,14 +7632,22 @@ function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
 
-function drawMeshCollection(meshCollection, strokeStyle, lineWidth) {
+function drawMeshCollection(meshCollection, strokeStyle, lineWidth, options = {}) {
   if (!meshCollection || !meshCollection.length) return;
   context.strokeStyle = strokeStyle;
   context.lineWidth = lineWidth;
+  context.lineJoin = options.lineJoin || BOUNDARY_DEFAULT_LINE_JOIN;
+  context.lineCap = options.lineCap || BOUNDARY_DEFAULT_LINE_CAP;
+  context.miterLimit = Number.isFinite(Number(options.miterLimit))
+    ? Number(options.miterLimit)
+    : BOUNDARY_DEFAULT_MITER_LIMIT;
+  const meshTransform = typeof options.transformMesh === "function" ? options.transformMesh : null;
   meshCollection.forEach((mesh) => {
     if (!mesh) return;
+    const renderMesh = meshTransform ? meshTransform(mesh) : mesh;
+    if (!isUsableMesh(renderMesh)) return;
     context.beginPath();
-    pathCanvas(mesh);
+    pathCanvas(renderMesh);
     context.stroke();
   });
 }
@@ -7525,6 +7704,77 @@ function declutterProjectedPolyline(line, minDistancePx, angleThresholdDeg) {
   return result.length >= 2 ? result : sanitized.slice(0, 2);
 }
 
+function getProjectedPolylineMetrics(line) {
+  const sanitized = sanitizePolyline(line);
+  if (sanitized.length < 2 || !projection) {
+    return {
+      lengthPx: 0,
+      bboxAreaPx: 0,
+      maxSpanPx: 0,
+    };
+  }
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  let lengthPx = 0;
+  let previousProjected = null;
+  sanitized.forEach((point) => {
+    const projected = projection(point);
+    if (!projected || !Number.isFinite(projected[0]) || !Number.isFinite(projected[1])) return;
+    minX = Math.min(minX, projected[0]);
+    minY = Math.min(minY, projected[1]);
+    maxX = Math.max(maxX, projected[0]);
+    maxY = Math.max(maxY, projected[1]);
+    if (previousProjected) {
+      lengthPx += Math.hypot(projected[0] - previousProjected[0], projected[1] - previousProjected[1]);
+    }
+    previousProjected = projected;
+  });
+  if (!Number.isFinite(minX) || !Number.isFinite(minY) || !Number.isFinite(maxX) || !Number.isFinite(maxY)) {
+    return {
+      lengthPx,
+      bboxAreaPx: 0,
+      maxSpanPx: 0,
+    };
+  }
+  const widthPx = Math.max(0, maxX - minX);
+  const heightPx = Math.max(0, maxY - minY);
+  return {
+    lengthPx,
+    bboxAreaPx: widthPx * heightPx,
+    maxSpanPx: Math.max(widthPx, heightPx),
+  };
+}
+
+function buildRenderableBoundaryMesh(mesh, {
+  simplifyDistancePx = 0,
+  minLengthPx = 0,
+  minSpanPx = 0,
+  minAreaPx = 0,
+  angleThresholdDeg = COASTLINE_VIEW_SIMPLIFY_COLLINEAR_ANGLE_DEG,
+} = {}) {
+  if (!isUsableMesh(mesh)) return null;
+  const nextCoordinates = mesh.coordinates
+    .map((line) => {
+      const simplified = simplifyDistancePx > 0
+        ? declutterProjectedPolyline(line, simplifyDistancePx, angleThresholdDeg)
+        : sanitizePolyline(line);
+      if (!Array.isArray(simplified) || simplified.length < 2) return null;
+      const metrics = getProjectedPolylineMetrics(simplified);
+      if (minLengthPx > 0 && metrics.lengthPx < minLengthPx) return null;
+      if (minSpanPx > 0 && metrics.maxSpanPx < minSpanPx) return null;
+      if (minAreaPx > 0 && metrics.bboxAreaPx < minAreaPx) return null;
+      return simplified;
+    })
+    .filter((line) => Array.isArray(line) && line.length >= 2);
+  if (!nextCoordinates.length) return null;
+  return {
+    type: "MultiLineString",
+    coordinates: nextCoordinates,
+  };
+}
+
 function getViewportAwareCoastlineCollection(collection, k) {
   const minDistancePx = k < COASTLINE_LOD_LOW_ZOOM_MAX
     ? COASTLINE_VIEW_SIMPLIFY_LOW_MIN_DISTANCE_PX
@@ -7545,6 +7795,85 @@ function getViewportAwareCoastlineCollection(collection, k) {
       coordinates: nextCoordinates,
     };
   });
+}
+
+function getBoundaryMeshTransform(kind, k) {
+  const zoom = Math.max(0, Number(k) || 0);
+  if (kind === "internal-local") {
+    if (zoom < 1.5) {
+      return (mesh) => buildRenderableBoundaryMesh(mesh, {
+        simplifyDistancePx: 3.6,
+        minLengthPx: 22,
+        minSpanPx: 5,
+        minAreaPx: 20,
+      });
+    }
+    if (zoom < 2.4) {
+      return (mesh) => buildRenderableBoundaryMesh(mesh, {
+        simplifyDistancePx: 2.2,
+        minLengthPx: 14,
+        minSpanPx: 3,
+        minAreaPx: 10,
+      });
+    }
+    return (mesh) => buildRenderableBoundaryMesh(mesh, {
+      simplifyDistancePx: 0.75,
+      minLengthPx: 4,
+    });
+  }
+  if (kind === "internal-province") {
+    if (zoom < 1.25) {
+      return (mesh) => buildRenderableBoundaryMesh(mesh, {
+        simplifyDistancePx: 2.4,
+        minLengthPx: 16,
+        minSpanPx: 4,
+        minAreaPx: 12,
+      });
+    }
+    if (zoom < 1.9) {
+      return (mesh) => buildRenderableBoundaryMesh(mesh, {
+        simplifyDistancePx: 1.6,
+        minLengthPx: 10,
+        minSpanPx: 2,
+      });
+    }
+    return (mesh) => buildRenderableBoundaryMesh(mesh, {
+      simplifyDistancePx: 0.6,
+      minLengthPx: 4,
+    });
+  }
+  if (kind === "empire") {
+    if (zoom < 1.4) {
+      return (mesh) => buildRenderableBoundaryMesh(mesh, {
+        simplifyDistancePx: 1.8,
+        minLengthPx: 6,
+      });
+    }
+    if (zoom < 2.2) {
+      return (mesh) => buildRenderableBoundaryMesh(mesh, {
+        simplifyDistancePx: 1.1,
+        minLengthPx: 4,
+      });
+    }
+    return null;
+  }
+  if (kind === "coastline") {
+    if (zoom < COASTLINE_LOD_LOW_ZOOM_MAX) {
+      return (mesh) => buildRenderableBoundaryMesh(mesh, {
+        simplifyDistancePx: 2.4,
+        minLengthPx: 14,
+        minSpanPx: 3,
+      });
+    }
+    if (zoom < COASTLINE_LOD_MID_ZOOM_MAX) {
+      return (mesh) => buildRenderableBoundaryMesh(mesh, {
+        simplifyDistancePx: 1.2,
+        minLengthPx: 8,
+        minSpanPx: 2,
+      });
+    }
+  }
+  return null;
 }
 
 function getProjectedLineDensityStats(line) {
@@ -7592,6 +7921,10 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
   const internalColor = getSafeCanvasColor(internal.color, "#cccccc");
   const coastColor = getSafeCanvasColor(coast.color, "#333333");
   const parentColor = getSafeCanvasColor(parent.color, "#4b5563");
+  const provinceMeshTransform = getBoundaryMeshTransform("internal-province", k);
+  const localMeshTransform = getBoundaryMeshTransform("internal-local", k);
+  const empireMeshTransform = getBoundaryMeshTransform("empire", k);
+  const coastlineMeshTransform = getBoundaryMeshTransform("coastline", k);
 
   const empireWidthBase = Number(empire.width) || 1;
   const internalWidthBase = Number(internal.width) || 0.5;
@@ -7638,10 +7971,10 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
       : (state.cachedCoastlines?.length ? state.cachedCoastlines : state.cachedCoastlinesHigh);
 
     context.globalAlpha = 0.88;
-    drawMeshCollection(empireMeshes, empireColor, countryWidth);
+    drawMeshCollection(empireMeshes, empireColor, countryWidth, { transformMesh: empireMeshTransform });
 
     context.globalAlpha = 0.78;
-    drawMeshCollection(coastlineLow, coastColor, coastWidth);
+    drawMeshCollection(coastlineLow, coastColor, coastWidth, { transformMesh: coastlineMeshTransform });
 
     context.globalAlpha = 1.0;
     return;
@@ -7707,18 +8040,34 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
 
   if (k >= LOCAL_BORDERS_MIN_ZOOM) {
     context.globalAlpha = localAlpha;
-    drawMeshCollection(state.cachedLocalBorders, internalColor, localWidth);
+    state.cachedLocalBordersByCountry?.forEach((meshes, countryCode) => {
+      drawMeshCollection(
+        meshes,
+        getInternalBorderStrokeColor(countryCode, internalColor),
+        localWidth,
+        { transformMesh: localMeshTransform }
+      );
+    });
   }
 
   context.globalAlpha = provinceAlpha;
-  drawMeshCollection(state.cachedProvinceBorders, internalColor, provinceWidth);
+  state.cachedProvinceBordersByCountry?.forEach((meshes, countryCode) => {
+    drawMeshCollection(
+      meshes,
+      getInternalBorderStrokeColor(countryCode, internalColor),
+      provinceWidth,
+      { transformMesh: provinceMeshTransform }
+    );
+  });
 
   if (k >= DETAIL_ADM_BORDERS_MIN_ZOOM) {
     context.globalAlpha = detailAdmAlpha;
     drawMeshCollection(state.cachedDetailAdmBorders, DETAIL_ADM_BORDER_COLOR, detailAdmWidth);
   }
 
-  const enabledParentCountries = (state.parentBorderSupportedCountries || []).filter(
+  const enabledParentCountries = state.parentBordersVisible === false
+    ? []
+    : (state.parentBorderSupportedCountries || []).filter(
     (countryCode) => !!state.parentBorderEnabledByCountry?.[countryCode]
   );
   if (enabledParentCountries.length > 0) {
@@ -7736,10 +8085,10 @@ function drawHierarchicalBorders(k, { interactive = false } = {}) {
   }
 
   context.globalAlpha = countryAlpha;
-  drawMeshCollection(empireMeshes, empireColor, countryWidth);
+  drawMeshCollection(empireMeshes, empireColor, countryWidth, { transformMesh: empireMeshTransform });
 
   context.globalAlpha = coastAlpha;
-  drawMeshCollection(coastlineCollection, coastColor, coastWidth);
+  drawMeshCollection(coastlineCollection, coastColor, coastWidth, { transformMesh: coastlineMeshTransform });
   drawTnoCoastalAccentLayer(k, { interactive });
 
   context.globalAlpha = 1.0;
@@ -9229,6 +9578,58 @@ function drawPhysicalLayer(k, { interactive = false } = {}) {
   context.restore();
 }
 
+function getUrbanFeatureOwnerId(feature) {
+  const props = feature?.properties || {};
+  return String(
+    props.country_owner_id ||
+    props.countryOwnerId ||
+    ""
+  ).trim();
+}
+
+function getUrbanHostFillColor(feature) {
+  const ownerFeatureId = getUrbanFeatureOwnerId(feature);
+  if (!ownerFeatureId) return null;
+  const hostFeature = state.landIndex?.get(ownerFeatureId);
+  if (!hostFeature) return null;
+  return (
+    getSafeCanvasColor(state.colors?.[ownerFeatureId], null) ||
+    getSafeCanvasColor(getResolvedFeatureColor(hostFeature, ownerFeatureId), null)
+  );
+}
+
+function getUrbanAdaptivePaint(feature, config = {}) {
+  const backgroundColor = getUrbanHostFillColor(feature);
+  if (!backgroundColor) return null;
+  const luminance = getCanvasColorRelativeLuminance(backgroundColor);
+  if (!Number.isFinite(luminance)) return null;
+
+  const strength = clamp(Number(config.adaptiveStrength) || 0, 0, 1);
+  const darkCountryBoost = !!config.darkCountryBoost;
+  const isDark = luminance <= 0.30;
+  const isLight = luminance >= 0.62;
+  const boost = isDark && darkCountryBoost ? 0.08 : 0;
+
+  if (isDark) {
+    return {
+      fillColor: mixCanvasColors(backgroundColor, "#f4efe3", 0.52 + (strength * 0.18) + boost),
+      strokeColor: mixCanvasColors(backgroundColor, "#fff9ef", 0.72 + (strength * 0.14) + boost),
+    };
+  }
+  if (isLight) {
+    return {
+      fillColor: mixCanvasColors(backgroundColor, "#20252b", 0.42 + (strength * 0.16)),
+      strokeColor: mixCanvasColors(backgroundColor, "#0f1419", 0.62 + (strength * 0.12)),
+    };
+  }
+  const targetFill = luminance < 0.48 ? "#ede7da" : "#272d34";
+  const targetStroke = luminance < 0.48 ? "#fff7ec" : "#10151a";
+  return {
+    fillColor: mixCanvasColors(backgroundColor, targetFill, 0.46 + (strength * 0.16)),
+    strokeColor: mixCanvasColors(backgroundColor, targetStroke, 0.66 + (strength * 0.12)),
+  };
+}
+
 function drawUrbanLayer(k, { interactive = false } = {}) {
   const startedAt = nowMs();
   if (!state.showUrban || !state.urbanData?.features?.length) {
@@ -9240,23 +9641,36 @@ function drawUrbanLayer(k, { interactive = false } = {}) {
     });
     return;
   }
-  const cfg = state.styleConfig?.urban || {};
-  const color = getSafeCanvasColor(cfg.color, "#4b5563");
-  const opacity = clamp(Number.isFinite(Number(cfg.opacity)) ? Number(cfg.opacity) : 0.22, 0, 1);
+  const cfg = normalizeUrbanStyleConfig(state.styleConfig?.urban || {});
+  const manualColor = getSafeCanvasColor(cfg.color, "#4b5563");
+  const fillOpacity = clamp(Number.isFinite(Number(cfg.fillOpacity)) ? Number(cfg.fillOpacity) : 0.34, 0, 1);
+  const strokeOpacity = clamp(Number.isFinite(Number(cfg.strokeOpacity)) ? Number(cfg.strokeOpacity) : 0.62, 0, 1);
   const minAreaPx = clamp(Number.isFinite(Number(cfg.minAreaPx)) ? Number(cfg.minAreaPx) : 8, 0, 80);
-  const blendMode = getSafeBlendMode(cfg.blendMode, "multiply");
+  const blendMode = cfg.mode === "manual"
+    ? getSafeBlendMode(cfg.blendMode, "multiply")
+    : "source-over";
+  const strokeWidth = clamp(0.85 / Math.max(Math.sqrt(Math.max(Number(k) || 1, 1)), 1), 0.3, 0.85);
 
   context.save();
   context.globalCompositeOperation = blendMode;
-  context.globalAlpha = interactive ? Math.min(opacity, 0.15) : opacity;
-  context.fillStyle = color;
-
   state.urbanData.features.forEach((feature) => {
     if (minAreaPx > 0 && estimateProjectedAreaPx(feature, k) < minAreaPx) return;
     if (!pathBoundsInScreen(feature)) return;
+    const adaptivePaint = cfg.mode === "adaptive" ? getUrbanAdaptivePaint(feature, cfg) : null;
+    const fillColor = getSafeCanvasColor(adaptivePaint?.fillColor, manualColor);
+    const outlineColor = getSafeCanvasColor(adaptivePaint?.strokeColor, null);
+    if (!fillColor) return;
     context.beginPath();
     pathCanvas(feature);
+    context.fillStyle = fillColor;
+    context.globalAlpha = interactive ? Math.min(fillOpacity, 0.15) : fillOpacity;
     context.fill();
+    if (cfg.mode === "adaptive" && outlineColor) {
+      context.strokeStyle = outlineColor;
+      context.lineWidth = strokeWidth;
+      context.globalAlpha = interactive ? Math.min(strokeOpacity, 0.18) : strokeOpacity;
+      context.stroke();
+    }
   });
 
   context.restore();
@@ -11378,11 +11792,11 @@ function getModernCityLightsGridValue(x, y) {
 function getModernCityLightsNormalizationDenominator() {
   const p90 = Number(MODERN_CITY_LIGHTS_STATS?.p90 ?? MODERN_CITY_LIGHTS_STATS?.p90_nonzero ?? 0);
   if (Number.isFinite(p90) && p90 > 0) {
-    return p90;
+    return Math.max(20, p90 * 0.82);
   }
   const maxValue = Number(MODERN_CITY_LIGHTS_STATS?.max ?? 255);
   if (Number.isFinite(maxValue) && maxValue > 0) {
-    return maxValue;
+    return Math.max(20, maxValue * 0.72);
   }
   return 255;
 }
@@ -11594,15 +12008,99 @@ function getModernCityLightsZoomProfile() {
     zoomScale,
     fadeT,
     detailT,
-    textureAlphaScale: 1 - (fadeT * 0.3),
-    corridorAlphaScale: 1 - (fadeT * 0.35),
-    textureRadiusScale: 1.44 + (detailT * 0.26),
-    corridorRadiusScale: 1.24 + (detailT * 0.14),
+    textureAlphaScale: 0.82 + (fadeT * 0.28),
+    corridorAlphaScale: 0.88 + (fadeT * 0.32),
+    textureRadiusScale: 1.24 + (detailT * 0.42),
+    corridorRadiusScale: 1.16 + (detailT * 0.36),
     textureJitterStrength: 0.2 + (detailT * 0.06),
     corridorJitterStrength: 0.12 + (detailT * 0.04),
-    coreAlphaScale: 0.92 + (fadeT * 0.52),
-    coreRadiusScale: 0.96 + (detailT * 0.22),
+    coreAlphaScale: 0.86 + (fadeT * 0.52),
+    coreRadiusScale: 1.08 + (detailT * 0.48),
   };
+}
+
+function getModernPopulationBoostStrength(config) {
+  if (!config?.cityLightsPopulationBoostEnabled) return 0;
+  return clamp(Number(config.cityLightsPopulationBoostStrength) || 0, 0, 1.5);
+}
+
+function getModernCityLightsPopulationBoostData() {
+  const cityCollection = getEffectiveCityCollection();
+  const urbanCollection = state.urbanData;
+  const cityLayerRevision = Number(state.cityLayerRevision || 0);
+  const scenarioId = String(state.activeScenarioId || "");
+  if (
+    modernCityLightsPopulationBoostCache.cityCollection === cityCollection
+    && modernCityLightsPopulationBoostCache.urbanCollection === urbanCollection
+    && modernCityLightsPopulationBoostCache.cityLayerRevision === cityLayerRevision
+    && modernCityLightsPopulationBoostCache.scenarioId === scenarioId
+  ) {
+    return modernCityLightsPopulationBoostCache;
+  }
+
+  const urbanIndex = getUrbanFeatureIndex();
+  const urbanEntriesById = new Map();
+  const unmatchedCityEntries = [];
+  if (Array.isArray(cityCollection?.features)) {
+    cityCollection.features.forEach((feature) => {
+      const props = feature?.properties || {};
+      const population = Math.max(0, Number(props.__city_population || 0));
+      const capitalScore = getCityCapitalScore(feature);
+      const urbanInfo = getCityUrbanRuntimeInfo(feature, urbanIndex);
+      if (urbanInfo.hasUrbanMatch) {
+        const current = urbanEntriesById.get(urbanInfo.urbanMatchId) || {
+          urbanId: urbanInfo.urbanMatchId,
+          urbanFeature: urbanInfo.urbanFeature,
+          populationSum: 0,
+          cityCount: 0,
+          capitalScore: 0,
+        };
+        current.populationSum += population;
+        current.cityCount += 1;
+        current.capitalScore = Math.max(current.capitalScore, capitalScore);
+        urbanEntriesById.set(urbanInfo.urbanMatchId, current);
+        return;
+      }
+      if (capitalScore > 0 || population >= 150000) {
+        unmatchedCityEntries.push({
+          feature,
+          population,
+          capitalScore,
+        });
+      }
+    });
+  }
+
+  const urbanEntries = Array.from(urbanEntriesById.values())
+    .map((entry) => {
+      const areaSqKm = Math.max(
+        0.01,
+        Number(entry.urbanFeature?.properties?.area_sqkm ?? entry.urbanFeature?.properties?.AREA_SQKM ?? 0.01)
+      );
+      return {
+        ...entry,
+        areaSqKm,
+        density: entry.populationSum / areaSqKm,
+      };
+    })
+    .filter((entry) => entry.populationSum >= 100000 || entry.capitalScore > 0)
+    .sort((left, right) => (
+      (right.populationSum + (right.density * 1200))
+      - (left.populationSum + (left.density * 1200))
+    ));
+
+  unmatchedCityEntries.sort((left, right) => (
+    (right.population + (right.capitalScore * 1_000_000))
+    - (left.population + (left.capitalScore * 1_000_000))
+  ));
+
+  modernCityLightsPopulationBoostCache.cityCollection = cityCollection;
+  modernCityLightsPopulationBoostCache.urbanCollection = urbanCollection;
+  modernCityLightsPopulationBoostCache.cityLayerRevision = cityLayerRevision;
+  modernCityLightsPopulationBoostCache.scenarioId = scenarioId;
+  modernCityLightsPopulationBoostCache.urbanEntries = urbanEntries;
+  modernCityLightsPopulationBoostCache.cityEntries = unmatchedCityEntries;
+  return modernCityLightsPopulationBoostCache;
 }
 
 function getSignedHashUnit(seed) {
@@ -11632,32 +12130,32 @@ function drawModernCityLightsTexture(config, intensity) {
   geometry.baseEntries.forEach((entry) => {
     if (shouldCullModernLightEntry(entry, overscan)) return;
     const normalized = normalizeModernCityLightsValue(entry.value);
-    const lumaWeight = Math.pow(normalized, 0.35);
+    const lumaWeight = Math.pow(normalized, 0.52);
     const alpha = clamp(
       intensity
-      * textureOpacity
-      * (0.022 + (lumaWeight * 0.18))
+      * (0.38 + (textureOpacity * 1.04))
+      * (0.08 + (lumaWeight * 0.48))
       * zoomProfile.textureAlphaScale,
       0,
-      0.18
+      0.52
     );
     if (alpha <= 0.002) return;
     const jitter = getModernGridEntryJitter(entry, zoomProfile.textureJitterStrength);
     const baseRadius = Math.max((entry.rx + entry.ry) * 0.5, 0.0001);
-    const radius = baseRadius * (zoomProfile.textureRadiusScale + (lumaWeight * 0.54));
+    const radius = baseRadius * (zoomProfile.textureRadiusScale + 0.18 + (lumaWeight * 0.72));
     drawSoftLightBlob(
       entry.x + jitter.dx,
       entry.y + jitter.dy,
       radius,
-      radius * 0.97,
+      radius * 1.04,
       {
         rotation: 0,
         rgb: textureRgb,
         alpha,
-        innerStop: 0.08,
-        midStop: 0.64,
-        innerAlphaScale: 0.8,
-        midAlphaScale: 0.16,
+        innerStop: 0.06,
+        midStop: 0.7,
+        innerAlphaScale: 0.96,
+        midAlphaScale: 0.28,
       }
     );
   });
@@ -11675,32 +12173,33 @@ function drawModernCityLightsCorridors(config, intensity) {
   geometry.corridorEntries.forEach((entry) => {
     if (shouldCullModernLightEntry(entry, overscan)) return;
     const normalized = normalizeModernCityLightsValue(entry.value);
-    const corridorWeight = Math.pow(normalized, 0.45);
+    const corridorWeight = Math.pow(normalized, 0.56);
     const alpha = clamp(
       intensity
-      * corridorStrength
-      * (0.016 + (corridorWeight * 0.12))
+      * (0.42 + (corridorStrength * 1.12))
+      * (0.06 + (corridorWeight * 0.38))
       * zoomProfile.corridorAlphaScale,
       0,
-      0.15
+      0.56
     );
     if (alpha <= 0.003) return;
     const jitter = getModernGridEntryJitter(entry, zoomProfile.corridorJitterStrength);
     const baseRadius = Math.max((entry.rx + entry.ry) * 0.5, 0.0001);
-    const majorRadius = baseRadius * (zoomProfile.corridorRadiusScale + (corridorStrength * 0.18) + (corridorWeight * 0.18));
+    const majorRadius = baseRadius
+      * (zoomProfile.corridorRadiusScale + 0.2 + (corridorStrength * 0.36) + (corridorWeight * 0.42));
     drawSoftLightBlob(
       entry.x + jitter.dx,
       entry.y + jitter.dy,
       majorRadius,
-      majorRadius * 0.9,
+      majorRadius * 1.02,
       {
         rotation: entry.rotation * 0.18,
         rgb: corridorRgb,
         alpha,
         innerStop: 0.05,
-        midStop: 0.5,
-        innerAlphaScale: 0.84,
-        midAlphaScale: 0.18,
+        midStop: 0.56,
+        innerAlphaScale: 0.94,
+        midAlphaScale: 0.3,
       }
     );
   });
@@ -11729,8 +12228,8 @@ function collectModernUrbanCoreEntries(k, config, intensity) {
     const sample = geographicCentroid
       ? sampleModernCityLightsGridNormalized(geographicCentroid[0], geographicCentroid[1])
       : 0;
-    const sampledBoost = clamp(0.28 + (Math.pow(sample, 0.58) * 1.45), 0.55, 1.6);
-    const weight = clamp(heuristicWeight * sampledBoost, 0.04, 1.22);
+    const sampledBoost = clamp(0.56 + (Math.pow(sample, 0.42) * 2.2), 0.9, 2.5);
+    const weight = clamp(heuristicWeight * sampledBoost, 0.06, 1.4);
     if (sample <= 0.01 && heuristicWeight < 0.34) return;
     if (weight < 0.16) return;
     if (zoomScale <= 1.35 && weight < 0.44) return;
@@ -11759,17 +12258,17 @@ function collectModernUrbanCoreEntries(k, config, intensity) {
       `${cx}:${cy}`
     );
     const orientation = getSignedHashUnit(`${identitySeed}:rotation`) * (Math.PI / 60);
-    const baseRadiusPx = 0.52 + (weight * (0.68 + (coreSharpness * 0.52)));
-    const aspectRatio = clamp(1.03 + (coreSharpness * 0.05) + (sample * 0.04), 1.03, 1.12);
+    const baseRadiusPx = 0.88 + (weight * (1.1 + (coreSharpness * 0.82)));
+    const aspectRatio = clamp(1.04 + (coreSharpness * 0.06) + (sample * 0.06), 1.04, 1.18);
     const haloAlpha = clamp(
-      intensity * weight * (0.026 + (textureOpacity * 0.04) + (sample * 0.05)) * zoomProfile.coreAlphaScale,
+      intensity * weight * (0.14 + (textureOpacity * 0.18) + (sample * 0.22)) * zoomProfile.coreAlphaScale,
       0,
-      0.16
+      0.44
     );
     const coreAlpha = clamp(
-      intensity * weight * (0.09 + (coreSharpness * 0.12) + (sample * 0.12)) * zoomProfile.coreAlphaScale,
+      intensity * weight * (0.42 + (coreSharpness * 0.38) + (sample * 0.34)) * zoomProfile.coreAlphaScale,
       0,
-      0.34
+      0.64
     );
     entries.push({
       feature,
@@ -11799,32 +12298,32 @@ function drawModernCityLightsCores(k, _config, _intensity, coreEntries = null) {
     drawSoftLightBlob(
       entry.cx,
       entry.cy,
-      (entry.baseRadiusPx * entry.aspectRatio * 1.18 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
-      (entry.baseRadiusPx * 1.08 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (entry.baseRadiusPx * entry.aspectRatio * 1.34 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (entry.baseRadiusPx * 1.18 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
       {
         rotation: entry.orientation,
         rgb: haloRgb,
         alpha: entry.haloAlpha,
         innerStop: 0.06,
-        midStop: 0.54,
-        innerAlphaScale: 0.8,
-        midAlphaScale: 0.2,
+        midStop: 0.58,
+        innerAlphaScale: 0.94,
+        midAlphaScale: 0.28,
       }
     );
 
     drawSoftLightBlob(
       entry.cx,
       entry.cy,
-      (entry.baseRadiusPx * entry.aspectRatio * 0.96 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
-      (entry.baseRadiusPx * 0.92 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (entry.baseRadiusPx * entry.aspectRatio * 1.12 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (entry.baseRadiusPx * 1.02 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
       {
         rotation: entry.orientation,
         rgb: coreRgb,
         alpha: entry.coreAlpha,
         innerStop: 0.04,
-        midStop: 0.42,
-        innerAlphaScale: 0.94,
-        midAlphaScale: 0.34,
+        midStop: 0.46,
+        innerAlphaScale: 1,
+        midAlphaScale: 0.46,
       }
     );
   });
@@ -11871,9 +12370,9 @@ function drawModernCityFallbackLights(k, config, intensity, urbanCoreEntries = [
       ? sampleModernCityLightsGridNormalized(geographicCoords[0], geographicCoords[1])
       : 0;
     const weight = clamp(
-      (isCapital ? 0.34 : 0.22) + (populationScore * 0.38) + (sample * 0.28),
-      0.14,
-      0.92
+      (isCapital ? 0.46 : 0.28) + (populationScore * 0.52) + (sample * 0.44),
+      0.2,
+      1.12
     );
     if (zoomScale <= 1.1 && weight < 0.45) return;
 
@@ -11885,10 +12384,18 @@ function drawModernCityFallbackLights(k, config, intensity, urbanCoreEntries = [
       `${anchor[0]}:${anchor[1]}`
     );
     const orientation = getSignedHashUnit(`${identitySeed}:rotation`) * (Math.PI / 80);
-    const baseRadiusPx = 0.32 + (weight * (0.42 + (coreSharpness * 0.22)));
-    const aspectRatio = clamp(1.03 + (coreSharpness * 0.04) + (sample * 0.03), 1.03, 1.1);
-    const haloAlpha = clamp(intensity * weight * (0.016 + (sample * 0.03)) * zoomProfile.coreAlphaScale, 0, 0.09);
-    const coreAlpha = clamp(intensity * weight * (0.042 + (sample * 0.08)) * zoomProfile.coreAlphaScale, 0, 0.18);
+    const baseRadiusPx = 0.58 + (weight * (0.82 + (coreSharpness * 0.46)));
+    const aspectRatio = clamp(1.04 + (coreSharpness * 0.05) + (sample * 0.04), 1.04, 1.14);
+    const haloAlpha = clamp(
+      intensity * weight * (0.08 + (sample * 0.14)) * zoomProfile.coreAlphaScale,
+      0,
+      0.30
+    );
+    const coreAlpha = clamp(
+      intensity * weight * (0.22 + (sample * 0.24)) * zoomProfile.coreAlphaScale,
+      0,
+      0.48
+    );
 
     drawSoftLightBlob(
       anchor[0],
@@ -11900,9 +12407,9 @@ function drawModernCityFallbackLights(k, config, intensity, urbanCoreEntries = [
         rgb: haloRgb,
         alpha: haloAlpha,
         innerStop: 0.05,
-        midStop: 0.52,
-        innerAlphaScale: 0.8,
-        midAlphaScale: 0.2,
+        midStop: 0.54,
+        innerAlphaScale: 0.92,
+        midAlphaScale: 0.28,
       }
     );
 
@@ -11916,9 +12423,158 @@ function drawModernCityFallbackLights(k, config, intensity, urbanCoreEntries = [
         rgb: coreRgb,
         alpha: coreAlpha,
         innerStop: 0.04,
+        midStop: 0.42,
+        innerAlphaScale: 1,
+        midAlphaScale: 0.44,
+      }
+    );
+  });
+}
+
+function drawModernCityLightsPopulationBoostLayer(k, config, intensity) {
+  const boostStrength = getModernPopulationBoostStrength(config);
+  if (boostStrength <= 0) return;
+  const palette = getNightLightPalette("modern");
+  const zoomProfile = getModernCityLightsZoomProfile();
+  const haloRgb = getLightBlobRgb(palette.corridor);
+  const coreRgb = getLightBlobRgb(palette.glint);
+  const data = getModernCityLightsPopulationBoostData();
+  const transform = state.zoomTransform || globalThis.d3?.zoomIdentity || { x: 0, y: 0, k: 1 };
+  const overscan = Math.max(32, Math.min(state.width, state.height) * 0.06);
+
+  data.urbanEntries.forEach((entry) => {
+    const feature = entry.urbanFeature;
+    if (!feature || !pathBoundsInScreen(feature)) return;
+    const centroid = pathCanvas.centroid(feature);
+    const cx = Number(centroid?.[0]);
+    const cy = Number(centroid?.[1]);
+    if (!Number.isFinite(cx) || !Number.isFinite(cy)) return;
+    const screenX = (cx * transform.k) + transform.x;
+    const screenY = (cy * transform.k) + transform.y;
+    if (
+      screenX < -overscan
+      || screenX > state.width + overscan
+      || screenY < -overscan
+      || screenY > state.height + overscan
+    ) {
+      return;
+    }
+
+    const geographicCentroid = getFeatureGeoCentroid(feature);
+    const sampled = geographicCentroid
+      ? sampleModernCityLightsGridNormalized(geographicCentroid[0], geographicCentroid[1])
+      : 0;
+    const populationScore = clamp(Math.log10(entry.populationSum + 1) / 7.35, 0.12, 1.28);
+    const densityScore = clamp(Math.log10(entry.density + 1) / 4.4, 0.08, 1.24);
+    const capitalBoost = entry.capitalScore >= 3 ? 0.18 : entry.capitalScore >= 2 ? 0.1 : 0;
+    const boostWeight = clamp(
+      (populationScore * 0.72) + (densityScore * 0.96) + (sampled * 0.4) + capitalBoost,
+      0.16,
+      2
+    );
+    const areaRadiusBoost = clamp(Math.log10(entry.areaSqKm + 1) * 0.18, 0.08, 0.74);
+    const baseRadiusPx = 0.82 + (boostWeight * 1.02) + areaRadiusBoost;
+    const haloAlpha = clamp(
+      intensity * boostStrength * (0.08 + (boostWeight * 0.16)) * zoomProfile.coreAlphaScale,
+      0,
+      0.36
+    );
+    const coreAlpha = clamp(
+      intensity * boostStrength * (0.16 + (boostWeight * 0.24)) * zoomProfile.coreAlphaScale,
+      0,
+      0.54
+    );
+    const aspectRatio = clamp(1.06 + (sampled * 0.1), 1.06, 1.22);
+    drawSoftLightBlob(
+      cx,
+      cy,
+      (baseRadiusPx * aspectRatio * 1.36 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (baseRadiusPx * 1.18 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      {
+        rotation: 0,
+        rgb: haloRgb,
+        alpha: haloAlpha,
+        innerStop: 0.05,
+        midStop: 0.56,
+        innerAlphaScale: 0.82,
+        midAlphaScale: 0.2,
+      }
+    );
+    drawSoftLightBlob(
+      cx,
+      cy,
+      (baseRadiusPx * aspectRatio * 1.02 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (baseRadiusPx * 0.94 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      {
+        rotation: 0,
+        rgb: coreRgb,
+        alpha: coreAlpha,
+        innerStop: 0.04,
+        midStop: 0.46,
+        innerAlphaScale: 0.94,
+        midAlphaScale: 0.36,
+      }
+    );
+  });
+
+  data.cityEntries.forEach((entry) => {
+    const anchor = getCityAnchor(entry.feature);
+    const screenPoint = getCityScreenPoint(anchor);
+    if (!anchor || !screenPoint) return;
+    if (
+      screenPoint[0] < -overscan
+      || screenPoint[0] > state.width + overscan
+      || screenPoint[1] < -overscan
+      || screenPoint[1] > state.height + overscan
+    ) {
+      return;
+    }
+    const geographicCoords = getCityGeoCoordinates(entry.feature);
+    const sampled = geographicCoords
+      ? sampleModernCityLightsGridNormalized(geographicCoords[0], geographicCoords[1])
+      : 0;
+    const populationScore = clamp(Math.log10(entry.population + 1) / 6.8, 0.12, 1.08);
+    const capitalBoost = entry.capitalScore >= 3 ? 0.24 : entry.capitalScore >= 2 ? 0.14 : 0;
+    const boostWeight = clamp((populationScore * 0.96) + (sampled * 0.48) + capitalBoost, 0.18, 1.48);
+    const baseRadiusPx = 0.54 + (boostWeight * 0.72);
+    const haloAlpha = clamp(
+      intensity * boostStrength * (0.06 + (boostWeight * 0.11)) * zoomProfile.coreAlphaScale,
+      0,
+      0.24
+    );
+    const coreAlpha = clamp(
+      intensity * boostStrength * (0.12 + (boostWeight * 0.18)) * zoomProfile.coreAlphaScale,
+      0,
+      0.40
+    );
+    drawSoftLightBlob(
+      anchor[0],
+      anchor[1],
+      (baseRadiusPx * 1.22 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (baseRadiusPx * 1.08 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      {
+        rotation: 0,
+        rgb: haloRgb,
+        alpha: haloAlpha,
+        innerStop: 0.05,
+        midStop: 0.5,
+        innerAlphaScale: 0.82,
+        midAlphaScale: 0.2,
+      }
+    );
+    drawSoftLightBlob(
+      anchor[0],
+      anchor[1],
+      (baseRadiusPx * 0.98 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (baseRadiusPx * 0.94 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      {
+        rotation: 0,
+        rgb: coreRgb,
+        alpha: coreAlpha,
+        innerStop: 0.04,
         midStop: 0.4,
         innerAlphaScale: 0.94,
-        midAlphaScale: 0.34,
+        midAlphaScale: 0.36,
       }
     );
   });
@@ -11927,7 +12583,7 @@ function drawModernCityFallbackLights(k, config, intensity, urbanCoreEntries = [
 function drawModernNightLightsLayer(k, config, solarState) {
   const nightHemisphere = buildNightHemisphereFeature(solarState, 90);
   if (!nightHemisphere) return;
-  const intensity = clamp(Number(config.cityLightsIntensity) || 0, 0, 1.2);
+  const intensity = clamp(Number(config.cityLightsIntensity) || 0, 0, 1.8);
   if (intensity <= 0) return;
 
   context.save();
@@ -11940,6 +12596,7 @@ function drawModernNightLightsLayer(k, config, solarState) {
   const urbanCoreEntries = collectModernUrbanCoreEntries(k, config, intensity);
   drawModernCityLightsCores(k, config, intensity, urbanCoreEntries);
   drawModernCityFallbackLights(k, config, intensity, urbanCoreEntries);
+  drawModernCityLightsPopulationBoostLayer(k, config, intensity);
   context.restore();
 }
 
@@ -11982,9 +12639,9 @@ function shouldRenderHistoricalCityLightEntry(entry) {
     return true;
   }
   if (capitalKind === "admin_capital") {
-    return population >= 250000 || weight >= 0.42;
+    return population >= 3000000 && weight >= 0.92;
   }
-  return population >= 1250000 && weight >= 0.4;
+  return population >= 5500000 && weight >= 0.96;
 }
 
 function getHistoricalProxyAssetEntries() {
@@ -12027,13 +12684,27 @@ function computeHistoricalFallbackCityLightWeight(feature) {
 function shouldIncludeHistoricalFallbackCity(feature) {
   const props = feature?.properties || {};
   if (!!(props.__city_is_country_capital ?? props.is_country_capital)) return true;
-  if (!!(props.__city_is_admin_capital ?? props.is_admin_capital)) return true;
+  if (
+    !!(props.__city_is_admin_capital ?? props.is_admin_capital)
+    && Math.max(
+      0,
+      Number(
+        props.__city_population
+        ?? props.population
+        ?? props.pop_max
+        ?? props.POP_MAX
+        ?? 0
+      )
+    ) >= 2000000
+  ) {
+    return true;
+  }
   const scalerank = clamp(
     Math.round(Number(props.__city_scalerank ?? props.scalerank ?? props.SCALERANK ?? 8)) || 8,
     1,
     10
   );
-  if (scalerank <= 3) return true;
+  if (scalerank <= 1) return true;
   const population = Math.max(
     0,
     Number(
@@ -12044,7 +12715,7 @@ function shouldIncludeHistoricalFallbackCity(feature) {
       ?? 0
     )
   );
-  return population >= 750000;
+  return population >= 4200000;
 }
 
 function getHistoricalProxyFallbackEntries() {
@@ -12104,7 +12775,7 @@ function drawHistoricalNightLightsLayer(k, config, solarState) {
   if (!nightHemisphere) return;
 
   const variant = "historical_1930s";
-  const intensity = clamp(Number(config.cityLightsIntensity) || 0, 0, 1.2);
+  const intensity = clamp(Number(config.cityLightsIntensity) || 0, 0, 0.36);
   if (intensity <= 0) return;
   const palette = getNightLightPalette(variant);
   const overscan = Math.max(24, Math.min(state.width, state.height) * 0.05);
@@ -12136,10 +12807,10 @@ function drawHistoricalNightLightsLayer(k, config, solarState) {
     }
 
     const capitalBoost = getHistoricalCityLightCapitalBoost(entry.capitalKind);
-    const baseRadiusPx = 0.36 + (weight * (0.8 + capitalBoost));
-    const haloRadiusPx = baseRadiusPx * (1.16 + (capitalBoost * 0.5));
-    const haloAlpha = clamp(intensity * weight * 0.06, 0, 0.12);
-    const coreAlpha = clamp(intensity * weight * 0.12, 0, 0.24);
+    const baseRadiusPx = 0.12 + (weight * (0.16 + (capitalBoost * 0.1)));
+    const haloRadiusPx = baseRadiusPx * (1.05 + (capitalBoost * 0.2));
+    const haloAlpha = clamp(intensity * weight * 0.004, 0, 0.01);
+    const coreAlpha = clamp(intensity * weight * 0.01, 0, 0.022);
     const orientation = (stringHash(
       entry.nameAscii ||
       `${entry.lon}:${entry.lat}`

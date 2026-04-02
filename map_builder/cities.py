@@ -751,6 +751,74 @@ def assign_stable_urban_area_ids(urban_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFram
     return urban
 
 
+def assign_urban_country_owners(
+    urban_gdf: gpd.GeoDataFrame,
+    political_gdf: gpd.GeoDataFrame,
+) -> gpd.GeoDataFrame:
+    urban = _ensure_epsg4326(urban_gdf.copy())
+    if "country_owner_id" not in urban.columns:
+        urban["country_owner_id"] = pd.Series(dtype=str)
+    if "country_owner_code" not in urban.columns:
+        urban["country_owner_code"] = pd.Series(dtype=str)
+    if "country_owner_method" not in urban.columns:
+        urban["country_owner_method"] = pd.Series(dtype=str)
+    urban["country_owner_id"] = urban["country_owner_id"].fillna("").astype(str)
+    urban["country_owner_code"] = urban["country_owner_code"].fillna("").astype(str)
+    urban["country_owner_method"] = urban["country_owner_method"].fillna("").astype(str)
+
+    if urban.empty or political_gdf is None or political_gdf.empty:
+        return urban
+
+    political = _ensure_epsg4326(
+        political_gdf[["id", "cntr_code", "geometry"]].copy()
+    )
+    political = political[political.geometry.notna() & ~political.geometry.is_empty].copy()
+    if political.empty:
+        return urban
+
+    urban_valid = urban[urban.geometry.notna() & ~urban.geometry.is_empty].copy()
+    if urban_valid.empty:
+        return urban
+
+    urban_projected = urban_valid.to_crs("EPSG:6933")
+    political_projected = political.to_crs("EPSG:6933")
+    political_sindex = political_projected.sindex
+
+    for urban_idx, urban_row in urban_projected.iterrows():
+        geom = urban_row.geometry
+        if geom is None or geom.is_empty:
+            continue
+        candidate_positions = list(political_sindex.query(geom, predicate="intersects"))
+        if not candidate_positions:
+            continue
+
+        best_owner_id = ""
+        best_owner_code = ""
+        best_area = 0.0
+        for candidate_position in candidate_positions:
+            candidate = political_projected.iloc[int(candidate_position)]
+            candidate_geom = candidate.geometry
+            if candidate_geom is None or candidate_geom.is_empty:
+                continue
+            overlap = geom.intersection(candidate_geom)
+            if overlap is None or overlap.is_empty:
+                continue
+            overlap_area = float(overlap.area or 0.0)
+            if overlap_area <= best_area:
+                continue
+            best_area = overlap_area
+            best_owner_id = str(candidate.get("id") or "").strip()
+            best_owner_code = str(candidate.get("cntr_code") or "").strip().upper()
+
+        if not best_owner_id:
+            continue
+        urban.loc[urban_idx, "country_owner_id"] = best_owner_id
+        urban.loc[urban_idx, "country_owner_code"] = best_owner_code
+        urban.loc[urban_idx, "country_owner_method"] = "max_overlap"
+
+    return urban
+
+
 def _attach_within(
     points: gpd.GeoDataFrame,
     polygons: gpd.GeoDataFrame,

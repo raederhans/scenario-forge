@@ -4,6 +4,15 @@ import {
   projectTransportWorkbenchCarrierGeometry,
   projectTransportWorkbenchCarrierScenePoint,
 } from "./transport_workbench_carrier.js";
+import {
+  aggregateTransportWorkbenchPoints,
+  resolveTransportWorkbenchAggregateCellSize,
+  resolveTransportWorkbenchDisplayMode,
+  resolveTransportWorkbenchGeoLabel,
+  resolveTransportWorkbenchLabelBudget,
+  resolveTransportWorkbenchLabelSeparation,
+  selectTransportWorkbenchLabels,
+} from "./transport_workbench_density_helpers.js";
 
 const PACK_MODE_PREVIEW = "preview";
 const PACK_MODE_FULL = "full";
@@ -157,7 +166,8 @@ function createPolygonFeature(rawFeature, variantId) {
   const pathData = buildPolygonPath(projected.geometry);
   if (!pathData) return null;
   const bounds = collectGeometryBounds(projected.geometry);
-  if (!bounds) return null;
+  const rawBounds = collectGeometryBounds(rawFeature?.geometry);
+  if (!bounds || !rawBounds) return null;
   return {
     id: String(properties.id || rawFeature?.id || "").trim(),
     name: String(properties.name || "").trim(),
@@ -165,6 +175,10 @@ function createPolygonFeature(rawFeature, variantId) {
     properties,
     pathData,
     bounds,
+    x: bounds.centerX,
+    y: bounds.centerY,
+    lon: rawBounds.centerX,
+    lat: rawBounds.centerY,
   };
 }
 
@@ -241,6 +255,23 @@ function getHiddenReason(feature, config, variantId) {
   return null;
 }
 
+function getIndustrialCategory(feature, variantId) {
+  if (variantId === "open") {
+    return String(feature?.properties?.site_class || feature?.properties?.landuse_category || "").trim();
+  }
+  return String(feature?.properties?.coastal_inland_label || feature?.properties?.site_class || "").trim();
+}
+
+function getIndustrialCategoryLabel(categoryValue, variantId) {
+  const normalized = String(categoryValue || "").trim();
+  if (!normalized) return variantId === "open" ? "工业用地" : "工业区";
+  if (normalized === "coastal") return "沿海工业";
+  if (normalized === "inland") return "内陆工业";
+  if (normalized === "industrial_complex") return "工业综合体";
+  if (normalized === "industrial_landuse") return "工业用地";
+  return normalized;
+}
+
 function createPolygonNode(feature, style, onSelect) {
   const node = createSvgNode("path");
   node.setAttribute("d", feature.pathData);
@@ -256,6 +287,27 @@ function createPolygonNode(feature, style, onSelect) {
     event.preventDefault();
     event.stopPropagation();
     onSelect(feature);
+  });
+  return node;
+}
+
+function createAggregateMarkerNode(aggregateEntry, style, onSelect) {
+  const node = createSvgNode("circle");
+  node.setAttribute("cx", String(aggregateEntry.x));
+  node.setAttribute("cy", String(aggregateEntry.y));
+  node.setAttribute("r", String(style.radius));
+  node.setAttribute("fill", style.fill);
+  node.setAttribute("fill-opacity", String(style.opacity));
+  node.setAttribute("stroke", style.stroke);
+  node.setAttribute("stroke-opacity", String(style.strokeOpacity ?? 1));
+  node.setAttribute("stroke-width", String(style.strokeWidth));
+  node.setAttribute("vector-effect", "non-scaling-stroke");
+  node.dataset.featureId = aggregateEntry.id;
+  node.style.cursor = "pointer";
+  node.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onSelect(aggregateEntry);
   });
   return node;
 }
@@ -284,6 +336,77 @@ function createLabelNode(feature, style, onSelect) {
     onSelect(feature);
   });
   return label;
+}
+
+function createAggregateLabelNode(aggregateEntry, style, onSelect) {
+  const screenPoint = projectTransportWorkbenchCarrierScenePoint(aggregateEntry.x, aggregateEntry.y);
+  if (!screenPoint) return null;
+  const label = createSvgNode("text");
+  label.setAttribute("x", String(screenPoint.x));
+  label.setAttribute("y", String(screenPoint.y));
+  label.setAttribute("fill", style.labelColor);
+  label.setAttribute("font-size", String(style.labelSize || 10.2));
+  label.setAttribute("font-weight", String(style.labelWeight || 700));
+  label.setAttribute("font-family", "IBM Plex Sans, Inter, system-ui, sans-serif");
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("paint-order", "stroke");
+  label.setAttribute("stroke", style.labelHalo);
+  label.setAttribute("stroke-width", "2.8");
+  label.setAttribute("stroke-linejoin", "round");
+  label.textContent = aggregateEntry.label;
+  label.dataset.featureId = aggregateEntry.id;
+  label.style.cursor = "pointer";
+  label.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onSelect(aggregateEntry);
+  });
+  return label;
+}
+
+function createAggregateSelection(aggregateEntry) {
+  const sampleFeature = aggregateEntry.sampleFeature || null;
+  return {
+    id: aggregateEntry.id,
+    name: aggregateEntry.label,
+    variant: sampleFeature?.variant || aggregateEntry.variant || "",
+    aggregateCount: aggregateEntry.aggregateCount,
+    dominantCategory: aggregateEntry.dominantCategory,
+    dominantCategoryLabel: aggregateEntry.dominantCategoryLabel,
+    properties: {
+      aggregate_count: aggregateEntry.aggregateCount,
+      dominant_category: aggregateEntry.dominantCategory,
+      dominant_category_label: aggregateEntry.dominantCategoryLabel,
+    },
+    x: aggregateEntry.x,
+    y: aggregateEntry.y,
+    lon: aggregateEntry.lon,
+    lat: aggregateEntry.lat,
+    kind: "industrial_zone_aggregate",
+    sampleFeatureId: sampleFeature?.id || "",
+  };
+}
+
+function getAggregateMarkerStyle(style, aggregateEntry, config, displayMode) {
+  return {
+    fill: style.fill,
+    stroke: style.stroke,
+    strokeOpacity: style.strokeOpacity,
+    selectedStroke: style.selectedStroke,
+    selectedStrokeWidth: style.selectedStrokeWidth,
+    strokeWidth: displayMode === "density" ? 0.8 : 1.1,
+    radius: Math.min(
+      displayMode === "density" ? 26 : 18,
+      6 + Math.sqrt(aggregateEntry.aggregateCount) * (displayMode === "density" ? 1.62 : 1.18)
+    ),
+    opacity: displayMode === "density"
+      ? Math.max(0.14, Math.min(0.4, normalizeNumber(config?.fillOpacity, 74) / 215 + aggregateEntry.aggregateCount / 270))
+      : Math.max(0.34, Math.min(0.84, normalizeNumber(config?.fillOpacity, 74) / 138 + aggregateEntry.aggregateCount / 168)),
+    labelColor: style.labelColor,
+    labelHalo: style.labelHalo,
+    labelSize: displayMode === "density" ? 10.8 : 10.2,
+    labelWeight: 700,
+  };
 }
 
 function getLabelDensityGridSize(config) {
@@ -375,10 +498,12 @@ const runtime = {
   selectedFeature: null,
   selectionChangeListener: null,
   renderStats: {
+    renderMode: "inspect",
     totalFeatures: 0,
     visibleFeatures: 0,
     filteredFeatures: 0,
     visibleLabels: 0,
+    aggregateUnits: 0,
   },
   renderedConfigSignature: "",
   lastRenderedConfig: null,
@@ -466,7 +591,7 @@ async function loadPack(variantId, mode = PACK_MODE_PREVIEW) {
       }
       const collection = await response.json();
       const sourceFeatures = Array.isArray(collection?.features) ? collection.features : [];
-      const features = (collection?.features || [])
+      const features = sourceFeatures
         .map((feature) => createPolygonFeature(feature, variantId))
         .filter(Boolean);
       if (sourceFeatures.length > 0 && features.length === 0) {
@@ -560,37 +685,98 @@ export async function renderJapanIndustrialZonePreview(config = {}) {
       showLabel: shouldShowLabel(feature, config, variantId, scale),
     });
   });
-  const visibleLabelEntries = selectVisibleLabelEntries(visibleEntries, config);
-  const visibleLabelIds = new Set(visibleLabelEntries.map((entry) => entry.feature.id));
 
-  visibleEntries.forEach(({ feature, showLabel }) => {
-    runtime.rootGroup.appendChild(createPolygonNode(feature, style, (selectedFeature) => {
-      runtime.selectedFeature = {
-        ...selectedFeature,
-        visible: true,
-      };
-      applySelectionHighlight(runtime);
-      emitSelectionChange();
-    }));
-    if (showLabel && visibleLabelIds.has(feature.id)) {
-      const labelNode = createLabelNode(feature, style, (selectedFeature) => {
-        runtime.selectedFeature = {
-          ...selectedFeature,
-          visible: true,
-        };
-        applySelectionHighlight(runtime);
-        emitSelectionChange();
-      });
-      if (labelNode) {
-        runtime.labelsGroup.appendChild(labelNode);
+  const displayMode = resolveTransportWorkbenchDisplayMode(config, "industrial_zones", scale, visibleEntries.length);
+  const onFeatureSelect = (selectedFeature) => {
+    runtime.selectedFeature = {
+      ...selectedFeature,
+      visible: true,
+    };
+    applySelectionHighlight(runtime);
+    emitSelectionChange();
+  };
+  let visibleLabelCount = 0;
+  let aggregateUnits = 0;
+
+  if (displayMode === "inspect") {
+    const visibleLabelEntries = selectVisibleLabelEntries(visibleEntries, config);
+    const visibleLabelIds = new Set(visibleLabelEntries.map((entry) => entry.feature.id));
+    visibleEntries.forEach(({ feature, showLabel }) => {
+      runtime.rootGroup.appendChild(createPolygonNode(feature, style, onFeatureSelect));
+      if (showLabel && visibleLabelIds.has(feature.id)) {
+        const labelNode = createLabelNode(feature, style, onFeatureSelect);
+        if (labelNode) {
+          runtime.labelsGroup.appendChild(labelNode);
+          visibleLabelCount += 1;
+        }
       }
-    }
-  });
+    });
+  } else {
+    const aggregationAlgorithm = String(config?.aggregationAlgorithm || "square").trim();
+    const cellSize = resolveTransportWorkbenchAggregateCellSize(config, scale, "industrial_zones");
+    const aggregates = aggregateTransportWorkbenchPoints(
+      visibleEntries.map((entry) => ({
+        ...entry,
+        x: entry.feature.x,
+        y: entry.feature.y,
+        lon: entry.feature.lon,
+        lat: entry.feature.lat,
+      })),
+      {
+        cellSize,
+        algorithm: aggregationAlgorithm,
+        clusterRadius: Number(config?.aggregationClusterRadiusPx || cellSize),
+        categoryAccessor: (entry) => getIndustrialCategory(entry?.feature || entry, variantId),
+        categoryLabelAccessor: (categoryValue) => getIndustrialCategoryLabel(categoryValue, variantId),
+      }
+    ).map((aggregateEntry) => ({
+      ...aggregateEntry,
+      label: resolveTransportWorkbenchGeoLabel(
+        aggregateEntry.lon,
+        aggregateEntry.lat,
+        aggregateEntry.dominantCategoryLabel,
+        config?.labelLevel
+      ),
+      priority: aggregateEntry.aggregateCount,
+      screenX: aggregateEntry.x,
+      screenY: aggregateEntry.y,
+      variant: variantId,
+    }));
+    const selectedLabels = selectTransportWorkbenchLabels(aggregates, {
+      gridSize: getLabelDensityGridSize(config) * 1.18,
+      budget: resolveTransportWorkbenchLabelBudget(config, "industrial_zones"),
+      labelAccessor: (entry) => entry.label,
+      priorityAccessor: (entry) => entry.priority,
+      separation: resolveTransportWorkbenchLabelSeparation(config),
+      allowAggregation: !!config?.labelAllowAggregation,
+    });
+    const selectedLabelIds = new Set(selectedLabels.map((entry) => entry.id));
+    aggregates
+      .sort((left, right) => left.aggregateCount - right.aggregateCount)
+      .forEach((aggregateEntry) => {
+        const markerStyle = getAggregateMarkerStyle(style, aggregateEntry, config, displayMode);
+        runtime.rootGroup.appendChild(createAggregateMarkerNode(aggregateEntry, markerStyle, () => {
+          onFeatureSelect(createAggregateSelection(aggregateEntry));
+        }));
+        if (!!config?.showLabels && selectedLabelIds.has(aggregateEntry.id)) {
+          const labelNode = createAggregateLabelNode(aggregateEntry, markerStyle, () => {
+            onFeatureSelect(createAggregateSelection(aggregateEntry));
+          });
+          if (labelNode) {
+            runtime.labelsGroup.appendChild(labelNode);
+            visibleLabelCount += 1;
+          }
+        }
+      });
+    aggregateUnits = aggregates.length;
+  }
 
   runtime.renderStats.totalFeatures = pack.features.length;
   runtime.renderStats.visibleFeatures = visibleEntries.length;
   runtime.renderStats.filteredFeatures = Math.max(0, pack.features.length - visibleEntries.length);
-  runtime.renderStats.visibleLabels = visibleLabelEntries.length;
+  runtime.renderStats.visibleLabels = visibleLabelCount;
+  runtime.renderStats.renderMode = displayMode;
+  runtime.renderStats.aggregateUnits = aggregateUnits;
   runtime.renderStats.variant = variantId;
   runtime.renderedConfigSignature = JSON.stringify(config || {});
   applySelectionHighlight(runtime);

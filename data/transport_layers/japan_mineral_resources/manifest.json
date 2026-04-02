@@ -3,8 +3,8 @@
   "family": "mineral_resources",
   "geometry_kind": "point",
   "country": "Japan",
-  "schema_version": 1,
-  "generated_at": "2026-04-01T21:49:35.214308Z",
+  "schema_version": 2,
+  "generated_at": "2026-04-02T14:08:10.176189Z",
   "recipe_path": "data/transport_layers/japan_mineral_resources/source_recipe.manual.json",
   "paths": {
     "preview": {
@@ -60,5 +60,11 @@
     "display_fields_preserve_original": true,
     "source_fallback_encoding": "cp932",
     "match_key_normalization": "NFKC + whitespace collapse + casefold"
+  },
+  "taxonomy_contract": {
+    "primary_group_field": "normalized_resource_group",
+    "primary_group_label_field": "normalized_resource_group_label",
+    "source_type_field": "resource_type",
+    "source_type_code_field": "resource_type_code"
   }
 }

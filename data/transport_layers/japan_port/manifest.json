@@ -3,17 +3,104 @@
   "family": "port",
   "geometry_kind": "point",
   "country": "Japan",
-  "schema_version": 1,
-  "generated_at": "2026-04-01T22:10:03.224639Z",
+  "schema_version": 2,
+  "generated_at": "2026-04-02T14:08:09.194657Z",
   "recipe_path": "data/transport_layers/japan_port/source_recipe.manual.json",
+  "default_coverage_tier": "core",
+  "distribution_tier": "coverage_tiered",
+  "license_tier": "review_required",
+  "coverage_scope": "japan_main_islands_route_mask",
   "paths": {
     "preview": {
-      "ports": "data/transport_layers/japan_port/ports.preview.geojson"
+      "ports": "data/transport_layers/japan_port/ports.core.preview.geojson"
     },
     "full": {
       "ports": "data/transport_layers/japan_port/ports.geojson"
     },
     "build_audit": "data/transport_layers/japan_port/build_audit.json"
+  },
+  "coverage_variants": {
+    "core": {
+      "label": "core",
+      "description": "International strategic, international hub, and important ports only.",
+      "distribution_tier": "curated_core",
+      "legal_designation_codes": [
+        "11",
+        "12",
+        "13"
+      ],
+      "paths": {
+        "preview": {
+          "ports": "data/transport_layers/japan_port/ports.core.preview.geojson"
+        },
+        "full": {
+          "ports": "data/transport_layers/japan_port/ports.core.geojson"
+        }
+      },
+      "feature_counts": {
+        "preview": {
+          "ports": 12
+        },
+        "full": {
+          "ports": 12
+        }
+      }
+    },
+    "expanded": {
+      "label": "expanded",
+      "description": "Core ports plus local ports that remain inside the Japan carrier route mask.",
+      "distribution_tier": "official_expanded",
+      "legal_designation_codes": [
+        "11",
+        "12",
+        "13",
+        "14"
+      ],
+      "paths": {
+        "preview": {
+          "ports": "data/transport_layers/japan_port/ports.expanded.preview.geojson"
+        },
+        "full": {
+          "ports": "data/transport_layers/japan_port/ports.expanded.geojson"
+        }
+      },
+      "feature_counts": {
+        "preview": {
+          "ports": 295
+        },
+        "full": {
+          "ports": 295
+        }
+      }
+    },
+    "full_official": {
+      "label": "full_official",
+      "description": "All official port nodes inside the current route mask, including shelter and special-use ports.",
+      "distribution_tier": "official_full",
+      "legal_designation_codes": [
+        "11",
+        "12",
+        "13",
+        "14",
+        "15"
+      ],
+      "paths": {
+        "preview": {
+          "ports": "data/transport_layers/japan_port/ports.preview.geojson"
+        },
+        "full": {
+          "ports": "data/transport_layers/japan_port/ports.geojson"
+        }
+      },
+      "feature_counts": {
+        "preview": {
+          "ports": 317
+        },
+        "full": {
+          "ports": 317
+        }
+      }
+    }
   },
   "source_signature": {
     "mlit_c02_2014_ports": {
@@ -28,7 +115,7 @@
       "ports": 12
     },
     "full": {
-      "ports": 12
+      "ports": 317
     }
   },
   "clip_bbox": [

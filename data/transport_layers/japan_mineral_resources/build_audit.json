@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-01T21:49:35.214308Z",
+  "generated_at": "2026-04-02T14:08:10.176189Z",
   "adapter_id": "japan_mineral_resources_v1",
   "recipe_version": "japan_mineral_resources_sources_v1",
   "raw_row_count": 12981,
@@ -9,6 +9,16 @@
   "resource_class_override_count": 5,
   "resource_type_count": 511,
   "resource_class_count": 198,
+  "normalized_resource_group_count": 7,
+  "normalized_resource_group_counts": {
+    "precious_metals": 1652,
+    "base_metals": 3128,
+    "ferrous_metals": 2558,
+    "fossil_resources": 2191,
+    "industrial_minerals": 1217,
+    "construction_materials": 1358,
+    "other_resources": 564
+  },
   "source_policy": "local_source_cache_only",
   "source_member": "GSJ_DOC_INR_073_2017_DATA/mine_jp.csv",
   "source_encoding": "cp932",
@@ -35,6 +45,7 @@
   "notes": [
     "The first mineral resource pack uses the GSJ mine distribution CSV exactly as supplied in the local source cache.",
     "Preview and full outputs are identical for v1 because no stable importance model has been approved yet.",
-    "Historical resource-class spellings are only normalized through the repo-versioned override file."
+    "Historical resource-class spellings are only normalized through the repo-versioned override file.",
+    "normalized_resource_group is a stable display taxonomy layer added on top of the original resource_type and resource_type_code fields."
   ]
 }

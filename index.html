@@ -293,6 +293,10 @@
                   <details class="appearance-mini-section">
                     <summary id="lblInternalBorders" class="section-header">Internal Borders</summary>
                     <div class="space-y-3 mt-3">
+                      <label class="toggle-label">
+                        <input id="internalBorderAutoColor" type="checkbox" class="checkbox-input" checked />
+                        <span>Auto Contrast</span>
+                      </label>
                       <div class="flex items-center justify-between gap-3">
                         <label class="range-label" for="internalBorderColor">Color</label>
                         <input id="internalBorderColor" type="color" value="#cccccc" class="color-input" />
@@ -351,6 +355,10 @@
                   <details class="appearance-mini-section">
                     <summary id="lblParentBorders" class="section-header">Parent Unit Borders</summary>
                     <div class="space-y-3 mt-3">
+                      <label class="toggle-label">
+                        <input id="parentBordersVisible" type="checkbox" class="checkbox-input" checked />
+                        <span>Show Parent Unit Borders</span>
+                      </label>
                       <div class="flex items-center justify-between gap-3">
                         <label id="lblParentBorderColor" class="range-label" for="parentBorderColor">Color</label>
                         <input id="parentBorderColor" type="color" value="#4b5563" class="color-input" />
@@ -564,26 +572,57 @@
                         <span id="lblUrbanLayer">Urban Areas</span>
                       </label>
                       <div class="ml-5 space-y-2">
-                        <div class="flex items-center justify-between gap-3">
-                          <label id="lblUrbanColor" class="range-label" for="urbanColor">Color</label>
-                          <input id="urbanColor" type="color" value="#4b5563" class="color-input" />
-                        </div>
                         <div>
                           <div class="range-row">
-                            <label id="lblUrbanOpacity" class="range-label" for="urbanOpacity">Opacity</label>
-                            <span id="urbanOpacityValue" class="range-value">40%</span>
+                            <label class="range-label" for="urbanMode">Mode</label>
                           </div>
-                          <input id="urbanOpacity" type="range" min="0" max="100" value="40" class="range-input" />
-                        </div>
-                        <div>
-                          <div class="range-row">
-                            <label id="lblUrbanBlendMode" class="range-label" for="urbanBlendMode">Blend Mode</label>
-                          </div>
-                          <select id="urbanBlendMode" class="select-input mt-2">
-                            <option id="optUrbanBlendMultiply" value="multiply" selected>Multiply</option>
-                            <option id="optUrbanBlendNormal" value="source-over">Normal</option>
-                            <option id="optUrbanBlendOverlay" value="overlay">Overlay</option>
+                          <select id="urbanMode" class="select-input mt-2">
+                            <option value="adaptive" selected>Adaptive</option>
+                            <option value="manual">Manual</option>
                           </select>
+                        </div>
+                        <div id="urbanAdaptiveControls" class="space-y-2">
+                          <div>
+                            <div class="range-row">
+                              <label class="range-label" for="urbanAdaptiveStrength">Adaptive Strength</label>
+                              <span id="urbanAdaptiveStrengthValue" class="range-value">72%</span>
+                            </div>
+                            <input id="urbanAdaptiveStrength" type="range" min="0" max="100" value="72" class="range-input" />
+                          </div>
+                          <div>
+                            <div class="range-row">
+                              <label class="range-label" for="urbanStrokeOpacity">Stroke Opacity</label>
+                              <span id="urbanStrokeOpacityValue" class="range-value">62%</span>
+                            </div>
+                            <input id="urbanStrokeOpacity" type="range" min="0" max="100" value="62" class="range-input" />
+                          </div>
+                          <label class="toggle-label">
+                            <input id="urbanDarkCountryBoost" type="checkbox" class="checkbox-input" checked />
+                            <span>Boost Deep Colors</span>
+                          </label>
+                        </div>
+                        <div id="urbanManualControls" class="space-y-2 hidden">
+                          <div class="flex items-center justify-between gap-3">
+                            <label id="lblUrbanColor" class="range-label" for="urbanColor">Color</label>
+                            <input id="urbanColor" type="color" value="#4b5563" class="color-input" />
+                          </div>
+                          <div>
+                            <div class="range-row">
+                              <label id="lblUrbanBlendMode" class="range-label" for="urbanBlendMode">Blend Mode</label>
+                            </div>
+                            <select id="urbanBlendMode" class="select-input mt-2">
+                              <option id="optUrbanBlendMultiply" value="multiply" selected>Multiply</option>
+                              <option id="optUrbanBlendNormal" value="source-over">Normal</option>
+                              <option id="optUrbanBlendOverlay" value="overlay">Overlay</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblUrbanOpacity" class="range-label" for="urbanOpacity">Fill Opacity</label>
+                            <span id="urbanOpacityValue" class="range-value">34%</span>
+                          </div>
+                          <input id="urbanOpacity" type="range" min="0" max="100" value="34" class="range-input" />
                         </div>
                         <div>
                           <div class="range-row">
@@ -840,9 +879,9 @@
                       <div>
                         <div class="range-row">
                           <label id="lblDayNightCityLightsIntensity" class="range-label" for="dayNightCityLightsIntensity">Intensity</label>
-                          <span id="dayNightCityLightsIntensityValue" class="range-value">72%</span>
+                          <span id="dayNightCityLightsIntensityValue" class="range-value">78%</span>
                         </div>
-                        <input id="dayNightCityLightsIntensity" type="range" min="0" max="100" value="72" class="range-input" />
+                        <input id="dayNightCityLightsIntensity" type="range" min="0" max="180" value="78" class="range-input" />
                       </div>
                     </div>
                   </div>
@@ -879,14 +918,14 @@
                           >
                             Corridor Strength (Modern only)
                           </label>
-                          <span id="dayNightCityLightsCorridorStrengthValue" class="range-value">58%</span>
+                          <span id="dayNightCityLightsCorridorStrengthValue" class="range-value">62%</span>
                         </div>
                         <input
                           id="dayNightCityLightsCorridorStrength"
                           type="range"
                           min="0"
                           max="100"
-                          value="58"
+                          value="62"
                           class="range-input"
                         />
                       </div>
@@ -899,14 +938,40 @@
                           >
                             Core Sharpness (Modern only)
                           </label>
-                          <span id="dayNightCityLightsCoreSharpnessValue" class="range-value">62%</span>
+                          <span id="dayNightCityLightsCoreSharpnessValue" class="range-value">68%</span>
                         </div>
                         <input
                           id="dayNightCityLightsCoreSharpness"
                           type="range"
                           min="0"
                           max="100"
-                          value="62"
+                          value="68"
+                          class="range-input"
+                        />
+                      </div>
+                      <div>
+                        <label class="toggle-label mt-2">
+                          <input id="dayNightCityLightsPopulationBoostEnabled" type="checkbox" class="checkbox-input" checked />
+                          <span id="lblDayNightPopulationBoostEnabled">Population / City Boost (Modern only)</span>
+                        </label>
+                      </div>
+                      <div>
+                        <div class="range-row">
+                          <label
+                            id="lblDayNightPopulationBoostStrength"
+                            class="range-label"
+                            for="dayNightCityLightsPopulationBoostStrength"
+                          >
+                            Population Boost Strength (Modern only)
+                          </label>
+                          <span id="dayNightCityLightsPopulationBoostStrengthValue" class="range-value">56%</span>
+                        </div>
+                        <input
+                          id="dayNightCityLightsPopulationBoostStrength"
+                          type="range"
+                          min="0"
+                          max="150"
+                          value="56"
                           class="range-input"
                         />
                       </div>
@@ -2022,16 +2087,43 @@
 
               <section class="transport-workbench-column transport-workbench-column-inspector" aria-labelledby="transportWorkbenchInspectorTitle">
                 <div class="transport-workbench-column-header transport-workbench-column-header-compact">
-                  <div class="transport-workbench-column-kicker" data-i18n="Inspector">Inspector</div>
-                  <h3 id="transportWorkbenchInspectorTitle" class="transport-workbench-column-title" data-i18n="Road controls reserved">Road controls reserved</h3>
+                  <div class="transport-workbench-column-kicker" data-i18n="Control Deck">Control Deck</div>
+                  <h3 id="transportWorkbenchInspectorTitle" class="transport-workbench-column-title" data-i18n="Road control deck">Road control deck</h3>
                 </div>
                 <div class="transport-workbench-inspector-stack">
-                  <div id="transportWorkbenchInspectorDetails" class="transport-workbench-inspector-detail-list" aria-live="polite"></div>
-                  <div class="transport-workbench-empty-card">
-                    <div id="transportWorkbenchInspectorEmptyTitle" class="transport-workbench-empty-title" data-i18n="Awaiting real family schema">Awaiting real family schema</div>
-                    <p id="transportWorkbenchInspectorEmptyBody" class="transport-workbench-empty-text" data-i18n="Once the family schema is confirmed, this side will host parameter groups, preview toggles, and map application controls.">
-                      Once the family schema is confirmed, this side will host parameter groups, preview toggles, and map application controls.
-                    </p>
+                  <div id="transportWorkbenchInspectorTabs" class="transport-workbench-inspector-tabs" role="tablist" aria-label="Workbench inspector tabs" data-i18n-aria-label="Workbench inspector tabs">
+                    <button type="button" class="transport-workbench-inspector-tab is-active" data-transport-inspector-tab="inspect" role="tab" aria-selected="true" aria-controls="transportWorkbenchInspectorPanelInspect">Inspect</button>
+                    <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="display" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelDisplay">Display</button>
+                    <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="aggregation" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelAggregation">Aggregation</button>
+                    <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="labels" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelLabels">Labels</button>
+                    <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="coverage" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelCoverage">Coverage</button>
+                    <button type="button" class="transport-workbench-inspector-tab" data-transport-inspector-tab="data" role="tab" aria-selected="false" aria-controls="transportWorkbenchInspectorPanelData">Data</button>
+                  </div>
+                  <div class="transport-workbench-inspector-panels">
+                    <section id="transportWorkbenchInspectorPanelInspect" class="transport-workbench-inspector-panel is-active" role="tabpanel" aria-labelledby="transportWorkbenchInspectorTitle">
+                      <div id="transportWorkbenchInspectorDetails" class="transport-workbench-inspector-detail-list" aria-live="polite"></div>
+                      <div class="transport-workbench-empty-card">
+                        <div id="transportWorkbenchInspectorEmptyTitle" class="transport-workbench-empty-title" data-i18n="Awaiting real family schema">Awaiting real family schema</div>
+                        <p id="transportWorkbenchInspectorEmptyBody" class="transport-workbench-empty-text" data-i18n="Once the family schema is confirmed, this side will host parameter groups, preview toggles, and map application controls.">
+                          Once the family schema is confirmed, this side will host parameter groups, preview toggles, and map application controls.
+                        </p>
+                      </div>
+                    </section>
+                    <section id="transportWorkbenchInspectorPanelDisplay" class="transport-workbench-inspector-panel hidden" role="tabpanel" aria-labelledby="transportWorkbenchInspectorTitle">
+                      <div id="transportWorkbenchDisplaySections" class="transport-workbench-control-sections" aria-live="polite"></div>
+                    </section>
+                    <section id="transportWorkbenchInspectorPanelAggregation" class="transport-workbench-inspector-panel hidden" role="tabpanel" aria-labelledby="transportWorkbenchInspectorTitle">
+                      <div id="transportWorkbenchAggregationSections" class="transport-workbench-control-sections" aria-live="polite"></div>
+                    </section>
+                    <section id="transportWorkbenchInspectorPanelLabels" class="transport-workbench-inspector-panel hidden" role="tabpanel" aria-labelledby="transportWorkbenchInspectorTitle">
+                      <div id="transportWorkbenchLabelSections" class="transport-workbench-control-sections" aria-live="polite"></div>
+                    </section>
+                    <section id="transportWorkbenchInspectorPanelCoverage" class="transport-workbench-inspector-panel hidden" role="tabpanel" aria-labelledby="transportWorkbenchInspectorTitle">
+                      <div id="transportWorkbenchCoverageSections" class="transport-workbench-control-sections" aria-live="polite"></div>
+                    </section>
+                    <section id="transportWorkbenchInspectorPanelData" class="transport-workbench-inspector-panel hidden" role="tabpanel" aria-labelledby="transportWorkbenchInspectorTitle">
+                      <div id="transportWorkbenchDataSections" class="transport-workbench-control-sections" aria-live="polite"></div>
+                    </section>
                   </div>
                 </div>
               </section>

@@ -4,6 +4,15 @@ import {
   projectTransportWorkbenchCarrierPoint,
   projectTransportWorkbenchCarrierScenePoint,
 } from "./transport_workbench_carrier.js";
+import {
+  aggregateTransportWorkbenchPoints,
+  resolveTransportWorkbenchAggregateCellSize,
+  resolveTransportWorkbenchDisplayMode,
+  resolveTransportWorkbenchGeoLabel,
+  resolveTransportWorkbenchLabelBudget,
+  resolveTransportWorkbenchLabelSeparation,
+  selectTransportWorkbenchLabels,
+} from "./transport_workbench_density_helpers.js";
 
 const PACK_MODE_PREVIEW = "preview";
 const PACK_MODE_FULL = "full";
@@ -24,7 +33,35 @@ function normalizeNumber(value, fallback = 0) {
   return Number.isFinite(next) ? next : fallback;
 }
 
-function getPackPath(manifest, mode, key) {
+function resolveVariantId(manifest, definition, config) {
+  if (typeof definition.resolveVariantId === "function") {
+    return String(definition.resolveVariantId(config, manifest) || "").trim();
+  }
+  return "";
+}
+
+function getVariantMeta(manifest, definition, variantId) {
+  if (typeof definition.getVariantMeta === "function") {
+    return definition.getVariantMeta(manifest, variantId) || null;
+  }
+  return null;
+}
+
+function getPackCacheKey(mode, variantId = "") {
+  const normalizedMode = String(mode || PACK_MODE_PREVIEW).trim() || PACK_MODE_PREVIEW;
+  const normalizedVariantId = String(variantId || "").trim();
+  return normalizedVariantId ? `${normalizedVariantId}:${normalizedMode}` : normalizedMode;
+}
+
+function getPackPath(manifest, mode, key, definition, variantId = "") {
+  const variantMeta = getVariantMeta(manifest, definition, variantId);
+  const variantModePaths = variantMeta?.paths?.[mode];
+  if (variantModePaths && typeof variantModePaths === "object") {
+    return variantModePaths[key] || "";
+  }
+  if (variantMeta?.paths?.[key]) {
+    return variantMeta.paths[key] || "";
+  }
   const modePaths = manifest?.paths?.[mode];
   if (modePaths && typeof modePaths === "object") {
     return modePaths[key] || "";
@@ -32,9 +69,9 @@ function getPackPath(manifest, mode, key) {
   return manifest?.paths?.[key] || "";
 }
 
-function isSinglePackPath(manifest, key) {
-  const previewPath = getPackPath(manifest, PACK_MODE_PREVIEW, key);
-  const fullPath = getPackPath(manifest, PACK_MODE_FULL, key);
+function isSinglePackPath(manifest, key, definition, variantId = "") {
+  const previewPath = getPackPath(manifest, PACK_MODE_PREVIEW, key, definition, variantId);
+  const fullPath = getPackPath(manifest, PACK_MODE_FULL, key, definition, variantId);
   return !!previewPath && previewPath === fullPath;
 }
 
@@ -62,7 +99,7 @@ function createDiamondPath(x, y, radius) {
   return `M ${x} ${y - radius} L ${x + radius} ${y} L ${x} ${y + radius} L ${x - radius} ${y} Z`;
 }
 
-function createPointFeature(rawFeature, definition) {
+function createPointFeature(rawFeature, definition, variantId = "") {
   const properties = rawFeature?.properties || {};
   const coordinates = rawFeature?.geometry?.coordinates;
   if (!Array.isArray(coordinates) || coordinates.length < 2) return null;
@@ -87,9 +124,12 @@ function createPointFeature(rawFeature, definition) {
     importanceRank,
     x: projected.x,
     y: projected.y,
+    lon: normalizeNumber(coordinates[0]),
+    lat: normalizeNumber(coordinates[1]),
     properties,
     label: String(featureLabel || "").trim(),
     kind: definition.selectionType,
+    variant: String(variantId || "").trim(),
   };
 }
 
@@ -129,6 +169,8 @@ function clearGroups(runtime) {
 function createMarkerNode(feature, markerStyle, onSelect) {
   const node = markerStyle.shape === "square"
     ? createSvgNode("rect")
+    : markerStyle.shape === "circle"
+      ? createSvgNode("circle")
     : createSvgNode("path");
   if (markerStyle.shape === "square") {
     const radius = normalizeNumber(markerStyle.radius, 4.8);
@@ -137,6 +179,10 @@ function createMarkerNode(feature, markerStyle, onSelect) {
     node.setAttribute("width", String(radius * 2));
     node.setAttribute("height", String(radius * 2));
     node.setAttribute("rx", String(normalizeNumber(markerStyle.cornerRadius, 0.9)));
+  } else if (markerStyle.shape === "circle") {
+    node.setAttribute("cx", String(feature.x));
+    node.setAttribute("cy", String(feature.y));
+    node.setAttribute("r", String(normalizeNumber(markerStyle.radius, 5.2)));
   } else {
     node.setAttribute("d", createDiamondPath(feature.x, feature.y, normalizeNumber(markerStyle.radius, 5.2)));
   }
@@ -146,6 +192,8 @@ function createMarkerNode(feature, markerStyle, onSelect) {
   node.setAttribute("opacity", String(normalizeNumber(markerStyle.opacity, 0.9)));
   node.dataset.featureId = feature.id;
   node.dataset.featureKind = feature.kind;
+  node.dataset.baseStroke = String(markerStyle.stroke || "");
+  node.dataset.baseStrokeWidth = String(normalizeNumber(markerStyle.strokeWidth, 1.2));
   node.style.cursor = "pointer";
   node.addEventListener("click", (event) => {
     event.preventDefault();
@@ -168,6 +216,7 @@ function createLabelNode(feature, markerStyle, onSelect) {
   label.textContent = feature.label;
   label.dataset.featureId = feature.id;
   label.dataset.featureKind = feature.kind;
+  label.dataset.baseLabelWeight = String(normalizeNumber(markerStyle.labelWeight, 600));
   label.style.cursor = "pointer";
   label.addEventListener("click", (event) => {
     event.preventDefault();
@@ -175,6 +224,29 @@ function createLabelNode(feature, markerStyle, onSelect) {
     onSelect(feature);
   });
   return label;
+}
+
+function createAggregateSelection(aggregateEntry, definition) {
+  const dominantFeature = aggregateEntry.sampleFeature || {};
+  return {
+    id: aggregateEntry.id,
+    name: aggregateEntry.label,
+    aggregateCount: aggregateEntry.aggregateCount,
+    dominantCategory: aggregateEntry.dominantCategory,
+    dominantCategoryLabel: aggregateEntry.dominantCategoryLabel,
+    properties: {
+      aggregate_count: aggregateEntry.aggregateCount,
+      dominant_category: aggregateEntry.dominantCategory,
+      dominant_category_label: aggregateEntry.dominantCategoryLabel,
+    },
+    x: aggregateEntry.x,
+    y: aggregateEntry.y,
+    lon: aggregateEntry.lon,
+    lat: aggregateEntry.lat,
+    kind: `${definition.selectionType}_aggregate`,
+    sampleFeatureId: dominantFeature.id || "",
+    variant: String(dominantFeature.variant || "").trim(),
+  };
 }
 
 function getLabelDensityGridSize(config) {
@@ -205,16 +277,16 @@ function selectVisibleLabelEntries(visibleEntries, config) {
 }
 
 function applySelectionHighlight(runtime) {
-  const markerStyle = runtime.definition.getMarkerStyle(getCurrentScale());
+  const markerStyle = runtime.definition.getMarkerStyle(getCurrentScale(), runtime.lastRenderedConfig || {});
   runtime.rootGroup.querySelectorAll("[data-feature-id]").forEach((node) => {
     const id = node.dataset.featureId || "";
     const isSelected = runtime.selectedFeature?.id === id;
-    node.setAttribute("stroke", isSelected ? (markerStyle.selectedStroke || "#111827") : markerStyle.stroke);
-    node.setAttribute("stroke-width", String(isSelected ? normalizeNumber(markerStyle.selectedStrokeWidth, 2.2) : normalizeNumber(markerStyle.strokeWidth, 1.2)));
+    node.setAttribute("stroke", isSelected ? (markerStyle.selectedStroke || "#111827") : (node.dataset.baseStroke || markerStyle.stroke));
+    node.setAttribute("stroke-width", String(isSelected ? normalizeNumber(markerStyle.selectedStrokeWidth, 2.2) : normalizeNumber(node.dataset.baseStrokeWidth, normalizeNumber(markerStyle.strokeWidth, 1.2))));
   });
   runtime.labelsGroup.querySelectorAll("[data-feature-id]").forEach((node) => {
     const id = node.dataset.featureId || "";
-    node.setAttribute("font-weight", runtime.selectedFeature?.id === id ? "700" : String(normalizeNumber(markerStyle.labelWeight, 600)));
+    node.setAttribute("font-weight", runtime.selectedFeature?.id === id ? "700" : (node.dataset.baseLabelWeight || String(normalizeNumber(markerStyle.labelWeight, 600))));
   });
 }
 
@@ -235,16 +307,19 @@ function buildSnapshot(runtime) {
     error: runtime.loadState.error,
     manifest,
     audit,
+    activeVariant: runtime.activeVariantId,
     subtypeCatalog: runtime.loadState.subtypeCatalog,
     packMode: runtime.activePackMode,
     singlePack: !!runtime.loadState.singlePack,
     previewStatus: runtime.loadState.previewStatus,
     fullStatus: runtime.loadState.fullStatus,
     stats: {
+      renderMode: runtime.renderStats.renderMode,
       totalFeatures: runtime.renderStats.totalFeatures,
       visibleFeatures: runtime.renderStats.visibleFeatures,
       filteredFeatures: runtime.renderStats.filteredFeatures,
       visibleLabels: runtime.renderStats.visibleLabels,
+      aggregateUnits: runtime.renderStats.aggregateUnits,
     },
     renderedConfigSignature: runtime.renderedConfigSignature || "",
     selected: runtime.selectedFeature,
@@ -257,18 +332,9 @@ export function createTransportWorkbenchPointPreviewController(definition) {
     manifestPromise: null,
     auditPromise: null,
     subtypeCatalogPromise: null,
-    packPromises: {
-      [PACK_MODE_PREVIEW]: null,
-      [PACK_MODE_FULL]: null,
-    },
-    packPaths: {
-      [PACK_MODE_PREVIEW]: "",
-      [PACK_MODE_FULL]: "",
-    },
-    projectedPacks: {
-      [PACK_MODE_PREVIEW]: null,
-      [PACK_MODE_FULL]: null,
-    },
+    packPromises: new Map(),
+    packPaths: new Map(),
+    projectedPacks: new Map(),
     loadState: {
       status: "idle",
       error: null,
@@ -280,17 +346,21 @@ export function createTransportWorkbenchPointPreviewController(definition) {
       fullStatus: "idle",
     },
     activePackMode: null,
+    activeVariantId: null,
     rootGroup: null,
     labelsGroup: null,
     selectedFeature: null,
     selectionChangeListener: null,
     renderStats: {
+      renderMode: "inspect",
       totalFeatures: 0,
       visibleFeatures: 0,
       filteredFeatures: 0,
       visibleLabels: 0,
+      aggregateUnits: 0,
     },
     renderedConfigSignature: "",
+    lastRenderedConfig: null,
   };
 
   async function loadManifest() {
@@ -330,7 +400,7 @@ export function createTransportWorkbenchPointPreviewController(definition) {
         }
         const audit = await response.json();
         runtime.loadState.audit = audit;
-        runtime.selectionChangeListener?.(buildSnapshot(runtime));
+        emitSelectionChange();
         return audit;
       })
       .catch((error) => {
@@ -361,76 +431,95 @@ export function createTransportWorkbenchPointPreviewController(definition) {
     return runtime.subtypeCatalogPromise;
   }
 
-  async function loadPack(mode = PACK_MODE_PREVIEW) {
-    if (runtime.projectedPacks[mode]) return runtime.projectedPacks[mode];
-    if (!runtime.packPromises[mode]) {
-      runtime.packPromises[mode] = (async () => {
-        const isPreview = mode === PACK_MODE_PREVIEW;
-        if (isPreview) {
-          runtime.loadState.status = "loading";
-          runtime.loadState.previewStatus = "loading";
-          runtime.loadState.error = null;
-        } else {
-          runtime.loadState.fullStatus = "loading";
-        }
-        const manifest = await loadManifest();
-        if (!manifest) {
-          if (isPreview) {
-            runtime.loadState.status = "pending";
-            runtime.loadState.previewStatus = "pending";
-          } else {
-            runtime.loadState.fullStatus = "pending";
-          }
-          return null;
-        }
-        startAuditLoad(manifest);
-        startSubtypeCatalogLoad(manifest);
-        const packPath = getPackPath(manifest, mode, definition.packKey);
-        runtime.loadState.singlePack = isSinglePackPath(manifest, definition.packKey);
-        runtime.packPaths[mode] = packPath;
+  async function loadPack(mode = PACK_MODE_PREVIEW, config = {}) {
+    const isPreview = mode === PACK_MODE_PREVIEW;
+    if (isPreview) {
+      runtime.loadState.status = "loading";
+      runtime.loadState.previewStatus = "loading";
+      runtime.loadState.error = null;
+    } else {
+      runtime.loadState.fullStatus = "loading";
+    }
+    const manifest = await loadManifest();
+    if (!manifest) {
+      runtime.activeVariantId = null;
+      runtime.loadState.singlePack = false;
+      if (isPreview) {
+        runtime.loadState.status = "pending";
+        runtime.loadState.previewStatus = "pending";
+      } else {
+        runtime.loadState.fullStatus = "pending";
+      }
+      return null;
+    }
+    startAuditLoad(manifest);
+    startSubtypeCatalogLoad(manifest);
+    const variantId = resolveVariantId(manifest, definition, config);
+    const cacheKey = getPackCacheKey(mode, variantId);
+    runtime.loadState.singlePack = isSinglePackPath(manifest, definition.packKey, definition, variantId);
+    if (runtime.projectedPacks.has(cacheKey)) {
+      if (isPreview) {
+        runtime.loadState.status = "ready";
+        runtime.loadState.previewStatus = "ready";
+      } else {
+        runtime.loadState.fullStatus = "ready";
+      }
+      return runtime.projectedPacks.get(cacheKey);
+    }
+    if (!runtime.packPromises.has(cacheKey)) {
+      runtime.packPromises.set(cacheKey, (async () => {
+        const packPath = getPackPath(manifest, mode, definition.packKey, definition, variantId);
+        runtime.packPaths.set(cacheKey, packPath);
         const aliasMode = mode === PACK_MODE_PREVIEW ? PACK_MODE_FULL : PACK_MODE_PREVIEW;
-        if (runtime.packPaths[aliasMode] && runtime.packPaths[aliasMode] === packPath) {
-          if (runtime.projectedPacks[aliasMode]) {
-            runtime.projectedPacks[mode] = runtime.projectedPacks[aliasMode];
+        const aliasCacheKey = getPackCacheKey(aliasMode, variantId);
+        if (runtime.packPaths.get(aliasCacheKey) && runtime.packPaths.get(aliasCacheKey) === packPath) {
+          if (runtime.projectedPacks.has(aliasCacheKey)) {
+            const aliasPack = runtime.projectedPacks.get(aliasCacheKey);
+            runtime.projectedPacks.set(cacheKey, aliasPack);
             if (isPreview) {
               runtime.loadState.status = "ready";
               runtime.loadState.previewStatus = "ready";
             } else {
               runtime.loadState.fullStatus = "ready";
             }
-            return runtime.projectedPacks[mode];
+            return aliasPack;
           }
-          if (runtime.packPromises[aliasMode]) {
-            const pack = await runtime.packPromises[aliasMode];
-            runtime.projectedPacks[mode] = pack;
+          if (runtime.packPromises.has(aliasCacheKey)) {
+            const aliasPack = await runtime.packPromises.get(aliasCacheKey);
+            runtime.projectedPacks.set(cacheKey, aliasPack);
             if (isPreview) {
               runtime.loadState.status = "ready";
               runtime.loadState.previewStatus = "ready";
             } else {
               runtime.loadState.fullStatus = "ready";
             }
-            return pack;
+            return aliasPack;
           }
         }
         const response = await fetch(packPath, { cache: "no-cache" });
         if (!response.ok) {
-          throw new Error(`Failed to load ${definition.familyId} pack (${mode}): ${response.status}`);
+          const variantPrefix = variantId ? `${variantId}/` : "";
+          throw new Error(`Failed to load ${definition.familyId} pack (${variantPrefix}${mode}): ${response.status}`);
         }
         const collection = await response.json();
         const sourceFeatures = Array.isArray(collection?.features) ? collection.features : [];
-        const features = sourceFeatures.map((feature) => createPointFeature(feature, definition)).filter(Boolean);
+        const features = sourceFeatures
+          .map((feature) => createPointFeature(feature, definition, variantId))
+          .filter(Boolean);
         if (sourceFeatures.length > 0 && features.length === 0) {
-          throw new Error(`Projected zero ${definition.familyId} features for ${mode}; carrier geometry is not ready.`);
+          const variantPrefix = variantId ? `${variantId}/` : "";
+          throw new Error(`Projected zero ${definition.familyId} features for ${variantPrefix}${mode}; carrier geometry is not ready.`);
         }
         const pack = {
           mode,
           path: packPath,
           manifest,
           audit: runtime.loadState.audit,
+          variantId,
           features,
           featureById: new Map(features.map((feature) => [feature.id, feature])),
         };
-        runtime.projectedPacks[mode] = pack;
+        runtime.projectedPacks.set(cacheKey, pack);
         if (isPreview) {
           runtime.loadState.status = "ready";
           runtime.loadState.previewStatus = "ready";
@@ -439,8 +528,8 @@ export function createTransportWorkbenchPointPreviewController(definition) {
         }
         return pack;
       })().catch((error) => {
-        runtime.packPromises[mode] = null;
-        runtime.projectedPacks[mode] = null;
+        runtime.packPromises.delete(cacheKey);
+        runtime.projectedPacks.delete(cacheKey);
         if (mode === PACK_MODE_PREVIEW) {
           runtime.loadState.status = "error";
           runtime.loadState.previewStatus = "error";
@@ -449,9 +538,9 @@ export function createTransportWorkbenchPointPreviewController(definition) {
           runtime.loadState.fullStatus = "error";
         }
         throw error;
-      });
+      }));
     }
-    return runtime.packPromises[mode];
+    return runtime.packPromises.get(cacheKey);
   }
 
   function emitSelectionChange() {
@@ -460,16 +549,22 @@ export function createTransportWorkbenchPointPreviewController(definition) {
 
   async function render(config = {}) {
     ensureRootGroups(runtime);
+    runtime.lastRenderedConfig = { ...(config || {}) };
     runtime.renderedConfigSignature = "";
     const scale = getCurrentScale();
     const targetMode = shouldUseFullPack(config, definition, scale) ? PACK_MODE_FULL : PACK_MODE_PREVIEW;
-    const pack = await loadPack(targetMode);
+    const pack = await loadPack(targetMode, config);
     if (!pack) {
+      runtime.activeVariantId = null;
       clearGroups(runtime);
       emitSelectionChange();
       return null;
     }
     runtime.activePackMode = targetMode;
+    runtime.activeVariantId = String(pack.variantId || "").trim() || null;
+    if (runtime.selectedFeature && !pack.featureById.has(runtime.selectedFeature.id)) {
+      runtime.selectedFeature = null;
+    }
     clearGroups(runtime);
     const markerStyle = definition.getMarkerStyle(scale, config);
     const thresholdRank = getThresholdRank(config, definition);
@@ -488,29 +583,106 @@ export function createTransportWorkbenchPointPreviewController(definition) {
       }
       visibleEntries.push({ feature, visibility });
     });
-    const visibleLabelEntries = selectVisibleLabelEntries(visibleEntries, config);
-    const visibleLabelIds = new Set(visibleLabelEntries.map((entry) => entry.feature.id));
-    visibleEntries.forEach(({ feature, visibility }) => {
-      runtime.rootGroup.appendChild(createMarkerNode(feature, markerStyle, (selectedFeature) => {
-        runtime.selectedFeature = { ...selectedFeature, visible: true };
-        applySelectionHighlight(runtime);
-        emitSelectionChange();
-      }));
-      if (visibility.showLabel && visibleLabelIds.has(feature.id)) {
-        const labelNode = createLabelNode(feature, markerStyle, (selectedFeature) => {
-          runtime.selectedFeature = { ...selectedFeature, visible: true };
-          applySelectionHighlight(runtime);
-          emitSelectionChange();
-        });
-        if (labelNode) {
-          runtime.labelsGroup.appendChild(labelNode);
+    const displayMode = resolveTransportWorkbenchDisplayMode(config, definition.familyId, scale, visibleEntries.length);
+    const onFeatureSelect = (selectedFeature) => {
+      runtime.selectedFeature = { ...selectedFeature, visible: true };
+      applySelectionHighlight(runtime);
+      emitSelectionChange();
+    };
+    let labelEntries = [];
+    if (displayMode === "inspect") {
+      const visibleLabelEntries = selectVisibleLabelEntries(visibleEntries, config);
+      const visibleLabelIds = new Set(visibleLabelEntries.map((entry) => entry.feature.id));
+      visibleEntries.forEach(({ feature, visibility }) => {
+        const featureMarkerStyle = typeof definition.getFeatureMarkerStyle === "function"
+          ? definition.getFeatureMarkerStyle(feature, markerStyle, config, scale, displayMode) || markerStyle
+          : markerStyle;
+        runtime.rootGroup.appendChild(createMarkerNode(feature, featureMarkerStyle, () => onFeatureSelect(feature)));
+        if (visibility.showLabel && visibleLabelIds.has(feature.id)) {
+          const labelNode = createLabelNode(feature, featureMarkerStyle, () => onFeatureSelect(feature));
+          if (labelNode) {
+            runtime.labelsGroup.appendChild(labelNode);
+            labelEntries.push(feature.id);
+          }
         }
-      }
-    });
+      });
+      runtime.renderStats.aggregateUnits = 0;
+    } else {
+      const aggregationAlgorithm = String(config?.aggregationAlgorithm || "square").trim();
+      const cellSize = resolveTransportWorkbenchAggregateCellSize(config, scale, definition.familyId);
+      const aggregates = aggregateTransportWorkbenchPoints(visibleEntries, {
+        cellSize,
+        algorithm: aggregationAlgorithm,
+        clusterRadius: Number(config?.aggregationClusterRadiusPx || cellSize),
+        categoryAccessor: (feature) => definition.getFeatureCategory?.(feature) || "",
+        categoryLabelAccessor: (categoryValue) => definition.getFeatureCategoryLabel?.(categoryValue) || categoryValue,
+      }).map((aggregateEntry) => {
+        const label = resolveTransportWorkbenchGeoLabel(
+          aggregateEntry.lon,
+          aggregateEntry.lat,
+          aggregateEntry.dominantCategoryLabel || definition.aggregateLabel || "",
+          config?.labelLevel
+        );
+        return {
+          ...aggregateEntry,
+          label,
+          priority: aggregateEntry.aggregateCount,
+          screenX: aggregateEntry.x,
+          screenY: aggregateEntry.y,
+        };
+      });
+      const labelBudget = resolveTransportWorkbenchLabelBudget(config, definition.familyId);
+      const labelSeparation = resolveTransportWorkbenchLabelSeparation(config);
+      const labelGridSize = getLabelDensityGridSize(config) * 1.2;
+      const selectedLabels = selectTransportWorkbenchLabels(aggregates, {
+        gridSize: labelGridSize,
+        budget: labelBudget,
+        labelAccessor: (entry) => entry.label,
+        priorityAccessor: (entry) => entry.priority,
+        separation: labelSeparation,
+        allowAggregation: !!config?.labelAllowAggregation,
+      });
+      const selectedLabelIds = new Set(selectedLabels.map((entry) => entry.id));
+      aggregates
+        .sort((left, right) => left.aggregateCount - right.aggregateCount)
+        .forEach((aggregateEntry) => {
+          const aggregateStyle = typeof definition.getAggregateMarkerStyle === "function"
+            ? definition.getAggregateMarkerStyle(aggregateEntry, scale, config, displayMode)
+            : {
+              shape: "circle",
+              radius: Math.min(displayMode === "density" ? 16 : 13, 5 + Math.sqrt(aggregateEntry.aggregateCount) * (displayMode === "density" ? 1.22 : 0.96)),
+              fill: markerStyle.fill,
+              stroke: markerStyle.stroke,
+              strokeWidth: displayMode === "density" ? 0.8 : 1.1,
+              opacity: displayMode === "density"
+                ? Math.max(0.14, Math.min(0.44, 0.12 + aggregateEntry.aggregateCount / 180))
+                : Math.max(0.42, Math.min(0.88, 0.28 + aggregateEntry.aggregateCount / 90)),
+              labelColor: markerStyle.labelColor || markerStyle.stroke,
+              labelSize: displayMode === "density" ? 10.6 : 10.0,
+              labelWeight: 700,
+              labelOffsetX: 10,
+              labelOffsetY: 2,
+            };
+          runtime.rootGroup.appendChild(createMarkerNode(aggregateEntry, aggregateStyle, () => {
+            onFeatureSelect(createAggregateSelection(aggregateEntry, definition));
+          }));
+          if (!!config?.showLabels && selectedLabelIds.has(aggregateEntry.id)) {
+            const labelNode = createLabelNode(aggregateEntry, aggregateStyle, () => {
+              onFeatureSelect(createAggregateSelection(aggregateEntry, definition));
+            });
+            if (labelNode) {
+              runtime.labelsGroup.appendChild(labelNode);
+              labelEntries.push(aggregateEntry.id);
+            }
+          }
+        });
+      runtime.renderStats.aggregateUnits = aggregates.length;
+    }
     runtime.renderStats.totalFeatures = features.length;
     runtime.renderStats.visibleFeatures = visibleEntries.length;
     runtime.renderStats.filteredFeatures = Math.max(0, features.length - visibleEntries.length);
-    runtime.renderStats.visibleLabels = visibleLabelEntries.length;
+    runtime.renderStats.visibleLabels = labelEntries.length;
+    runtime.renderStats.renderMode = displayMode;
     runtime.renderedConfigSignature = JSON.stringify(config || {});
     applySelectionHighlight(runtime);
     emitSelectionChange();
@@ -518,10 +690,14 @@ export function createTransportWorkbenchPointPreviewController(definition) {
   }
 
   function clear() {
+    runtime.activeVariantId = null;
+    runtime.loadState.singlePack = false;
     clearGroups(runtime);
   }
 
   function destroy() {
+    runtime.activeVariantId = null;
+    runtime.loadState.singlePack = false;
     runtime.rootGroup?.remove();
     runtime.labelsGroup?.remove();
     runtime.rootGroup = null;
@@ -533,9 +709,9 @@ export function createTransportWorkbenchPointPreviewController(definition) {
   }
 
   async function warm(options = {}) {
-    await loadPack(PACK_MODE_PREVIEW);
+    await loadPack(PACK_MODE_PREVIEW, options?.config || {});
     if (options?.includeFull && !runtime.loadState.singlePack) {
-      await loadPack(PACK_MODE_FULL);
+      await loadPack(PACK_MODE_FULL, options?.config || {});
     }
     return true;
   }

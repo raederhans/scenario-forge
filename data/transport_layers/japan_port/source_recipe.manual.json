@@ -29,6 +29,10 @@
   ],
   "output_contract": {
     "publish": [
+      "ports.core.geojson",
+      "ports.core.preview.geojson",
+      "ports.expanded.geojson",
+      "ports.expanded.preview.geojson",
       "ports.geojson",
       "ports.preview.geojson",
       "manifest.json",
@@ -36,6 +40,34 @@
     ],
     "runtime_consumer": "transport_workbench_port_preview",
     "adapter_id": "japan_port_v1",
-    "release_policy": "internal_trial_only"
+    "release_policy": "internal_trial_only",
+    "coverage_tiers": {
+      "core": {
+        "legal_designation_codes": [
+          "11",
+          "12",
+          "13"
+        ],
+        "default_runtime_preview": true
+      },
+      "expanded": {
+        "legal_designation_codes": [
+          "11",
+          "12",
+          "13",
+          "14"
+        ]
+      },
+      "full_official": {
+        "legal_designation_codes": [
+          "11",
+          "12",
+          "13",
+          "14",
+          "15"
+        ],
+        "legacy_full_paths": true
+      }
+    }
   }
 }

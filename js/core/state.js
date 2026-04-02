@@ -612,6 +612,79 @@ function normalizeLakeStyleConfig(rawConfig) {
   };
 }
 
+const LEGACY_URBAN_STYLE_DEFAULTS = Object.freeze({
+  color: "#4b5563",
+  opacity: 0.4,
+  blendMode: "multiply",
+  minAreaPx: 8,
+});
+
+function createDefaultUrbanStyleConfig() {
+  return {
+    mode: "adaptive",
+    color: LEGACY_URBAN_STYLE_DEFAULTS.color,
+    blendMode: LEGACY_URBAN_STYLE_DEFAULTS.blendMode,
+    fillOpacity: 0.34,
+    strokeOpacity: 0.62,
+    adaptiveStrength: 0.72,
+    darkCountryBoost: true,
+    minAreaPx: LEGACY_URBAN_STYLE_DEFAULTS.minAreaPx,
+  };
+}
+
+function normalizeUrbanStyleMode(value, fallback = "adaptive") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "adaptive" || normalized === "manual") return normalized;
+  return fallback === "manual" ? "manual" : "adaptive";
+}
+
+function hasLegacyUrbanManualSignal(rawConfig) {
+  const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
+  if (Object.prototype.hasOwnProperty.call(raw, "mode")) {
+    return false;
+  }
+  const hasLegacyKeys = ["color", "blendMode", "opacity", "minAreaPx"].some((key) =>
+    Object.prototype.hasOwnProperty.call(raw, key)
+  );
+  if (!hasLegacyKeys) return false;
+
+  const color = typeof raw.color === "string" ? raw.color.trim().toLowerCase() : LEGACY_URBAN_STYLE_DEFAULTS.color;
+  const blendMode = String(raw.blendMode || LEGACY_URBAN_STYLE_DEFAULTS.blendMode).trim().toLowerCase();
+  const opacity = clamp(toFiniteNumber(raw.opacity, LEGACY_URBAN_STYLE_DEFAULTS.opacity), 0, 1);
+  const minAreaPx = clamp(toFiniteNumber(raw.minAreaPx, LEGACY_URBAN_STYLE_DEFAULTS.minAreaPx), 0, 80);
+
+  return (
+    color !== LEGACY_URBAN_STYLE_DEFAULTS.color ||
+    blendMode !== LEGACY_URBAN_STYLE_DEFAULTS.blendMode ||
+    Math.abs(opacity - LEGACY_URBAN_STYLE_DEFAULTS.opacity) > 0.0001 ||
+    Math.abs(minAreaPx - LEGACY_URBAN_STYLE_DEFAULTS.minAreaPx) > 0.0001
+  );
+}
+
+function normalizeUrbanStyleConfig(rawConfig) {
+  const defaults = createDefaultUrbanStyleConfig();
+  const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
+  const inferredLegacyMode = hasLegacyUrbanManualSignal(raw) ? "manual" : defaults.mode;
+  const mode = normalizeUrbanStyleMode(raw.mode, inferredLegacyMode);
+  const fillOpacityFallback =
+    mode === "manual"
+      ? clamp(toFiniteNumber(raw.opacity, LEGACY_URBAN_STYLE_DEFAULTS.opacity), 0, 1)
+      : defaults.fillOpacity;
+  const color = typeof raw.color === "string" ? raw.color.trim() : "";
+  const blendMode = String(raw.blendMode || defaults.blendMode).trim().toLowerCase() || defaults.blendMode;
+
+  return {
+    mode,
+    color: color || defaults.color,
+    blendMode,
+    fillOpacity: clamp(toFiniteNumber(raw.fillOpacity, fillOpacityFallback), 0, 1),
+    strokeOpacity: clamp(toFiniteNumber(raw.strokeOpacity, defaults.strokeOpacity), 0, 1),
+    adaptiveStrength: clamp(toFiniteNumber(raw.adaptiveStrength, defaults.adaptiveStrength), 0, 1),
+    darkCountryBoost: raw.darkCountryBoost === undefined ? defaults.darkCountryBoost : !!raw.darkCountryBoost,
+    minAreaPx: clamp(toFiniteNumber(raw.minAreaPx, defaults.minAreaPx), 0, 80),
+  };
+}
+
 function createDefaultCityLayerStyleConfig() {
   return {
     theme: "classic_graphite",
@@ -777,10 +850,12 @@ function createDefaultDayNightStyleConfig() {
     twilightWidthDeg: 10,
     cityLightsEnabled: true,
     cityLightsStyle: "modern",
-    cityLightsIntensity: 0.72,
+    cityLightsIntensity: 0.78,
     cityLightsTextureOpacity: 0.54,
-    cityLightsCorridorStrength: 0.58,
-    cityLightsCoreSharpness: 0.62,
+    cityLightsCorridorStrength: 0.62,
+    cityLightsCoreSharpness: 0.68,
+    cityLightsPopulationBoostEnabled: true,
+    cityLightsPopulationBoostStrength: 0.56,
   };
 }
 
@@ -802,7 +877,7 @@ function normalizeDayNightStyleConfig(rawConfig) {
     twilightWidthDeg: clamp(Math.round(toFiniteNumber(raw.twilightWidthDeg, defaults.twilightWidthDeg)), 2, 28),
     cityLightsEnabled: raw.cityLightsEnabled === undefined ? defaults.cityLightsEnabled : !!raw.cityLightsEnabled,
     cityLightsStyle: cityLightsStyle === "historical_1930s" ? "historical_1930s" : "modern",
-    cityLightsIntensity: clamp(toFiniteNumber(raw.cityLightsIntensity, defaults.cityLightsIntensity), 0, 1.2),
+    cityLightsIntensity: clamp(toFiniteNumber(raw.cityLightsIntensity, defaults.cityLightsIntensity), 0, 1.8),
     cityLightsTextureOpacity: clamp(
       toFiniteNumber(raw.cityLightsTextureOpacity, defaults.cityLightsTextureOpacity),
       0,
@@ -817,6 +892,14 @@ function normalizeDayNightStyleConfig(rawConfig) {
       toFiniteNumber(raw.cityLightsCoreSharpness, defaults.cityLightsCoreSharpness),
       0,
       1
+    ),
+    cityLightsPopulationBoostEnabled: raw.cityLightsPopulationBoostEnabled === undefined
+      ? defaults.cityLightsPopulationBoostEnabled
+      : !!raw.cityLightsPopulationBoostEnabled,
+    cityLightsPopulationBoostStrength: clamp(
+      toFiniteNumber(raw.cityLightsPopulationBoostStrength, defaults.cityLightsPopulationBoostStrength),
+      0,
+      1.5
     ),
   };
 }
@@ -863,6 +946,277 @@ function normalizeAnnotationView(rawConfig) {
   };
 }
 
+const TRANSPORT_WORKBENCH_FAMILY_IDS = Object.freeze([
+  "road",
+  "rail",
+  "airport",
+  "port",
+  "mineral_resources",
+  "energy_facilities",
+  "industrial_zones",
+  "logistics_hubs",
+]);
+
+const TRANSPORT_WORKBENCH_MODE_IDS = new Set(["inspect", "aggregate", "density"]);
+const TRANSPORT_WORKBENCH_PRESET_IDS = new Set([
+  "review_first",
+  "balanced",
+  "pattern_first",
+  "extreme_density",
+]);
+const TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_IDS = new Set([
+  "raw",
+  "cluster",
+  "hex",
+  "square",
+  "density_surface",
+]);
+const TRANSPORT_WORKBENCH_LABEL_MIXED_CATEGORY_MODE_IDS = new Set([
+  "summary",
+  "dominant_only",
+  "top_two",
+]);
+const TRANSPORT_WORKBENCH_COVERAGE_IDS = new Set([
+  "default",
+  "core",
+  "expanded",
+  "full_official",
+]);
+
+function getDefaultTransportWorkbenchAggregationAlgorithm(familyId) {
+  switch (String(familyId || "").trim()) {
+    case "mineral_resources":
+      return "hex";
+    case "industrial_zones":
+      return "square";
+    case "logistics_hubs":
+      return "cluster";
+    case "port":
+      return "raw";
+    case "energy_facilities":
+      return "raw";
+    default:
+      return "raw";
+  }
+}
+
+function createDefaultTransportWorkbenchDisplayConfig(familyId) {
+  const normalizedFamilyId = TRANSPORT_WORKBENCH_FAMILY_IDS.includes(familyId)
+    ? familyId
+    : "road";
+  const coverage =
+    normalizedFamilyId === "port"
+      ? "core"
+      : normalizedFamilyId === "mineral_resources"
+        || normalizedFamilyId === "energy_facilities"
+        || normalizedFamilyId === "industrial_zones"
+        || normalizedFamilyId === "logistics_hubs"
+        ? "default"
+        : null;
+  const mode =
+    normalizedFamilyId === "mineral_resources"
+      || normalizedFamilyId === "industrial_zones"
+      || normalizedFamilyId === "logistics_hubs"
+      ? "aggregate"
+      : "inspect";
+  return {
+    mode,
+    preset: "balanced",
+    aggregation: {
+      algorithm: getDefaultTransportWorkbenchAggregationAlgorithm(normalizedFamilyId),
+      autoSwitch: true,
+      thresholds: {
+        zoomInToInspect: null,
+        zoomOutToDensity: null,
+        viewportDensity: 0.55,
+        localExtremeDensity: 0.78,
+        categoryConcentration: 0.6,
+        labelCollision: 0.35,
+        clusterRadiusPx: 48,
+        cellSizePx: normalizedFamilyId === "industrial_zones" ? 56 : 44,
+      },
+    },
+    labels: {
+      maxLevel: 2,
+      budget: 8,
+      separationStrength: 0.65,
+      allowAggregation: true,
+      dominantCategoryThreshold: 0.62,
+      mixedCategoryMode: "summary",
+    },
+    coverage,
+    filters: {},
+  };
+}
+
+function normalizeTransportWorkbenchDisplayMode(value, fallback = "inspect") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (TRANSPORT_WORKBENCH_MODE_IDS.has(normalized)) return normalized;
+  return TRANSPORT_WORKBENCH_MODE_IDS.has(fallback) ? fallback : "inspect";
+}
+
+function normalizeTransportWorkbenchPreset(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return TRANSPORT_WORKBENCH_PRESET_IDS.has(normalized) ? normalized : "balanced";
+}
+
+function normalizeTransportWorkbenchAggregationAlgorithm(value, familyId) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_IDS.has(normalized)
+    ? normalized
+    : getDefaultTransportWorkbenchAggregationAlgorithm(familyId);
+}
+
+function normalizeTransportWorkbenchCoverage(value, familyId) {
+  if (familyId !== "port") {
+    if (value == null || value === "") return familyId === "road" || familyId === "rail" || familyId === "airport"
+      ? null
+      : "default";
+    return TRANSPORT_WORKBENCH_COVERAGE_IDS.has(String(value || "").trim().toLowerCase())
+      ? String(value || "").trim().toLowerCase()
+      : "default";
+  }
+  const normalized = String(value || "").trim().toLowerCase();
+  return TRANSPORT_WORKBENCH_COVERAGE_IDS.has(normalized) ? normalized : "core";
+}
+
+function normalizeTransportWorkbenchDisplayConfig(rawConfig, familyId) {
+  const defaults = createDefaultTransportWorkbenchDisplayConfig(familyId);
+  const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
+  const rawAggregation = raw.aggregation && typeof raw.aggregation === "object" ? raw.aggregation : {};
+  const rawThresholds = rawAggregation.thresholds && typeof rawAggregation.thresholds === "object"
+    ? rawAggregation.thresholds
+    : {};
+  const rawLabels = raw.labels && typeof raw.labels === "object" ? raw.labels : {};
+  const mixedCategoryMode = String(rawLabels.mixedCategoryMode || defaults.labels.mixedCategoryMode).trim().toLowerCase();
+  const filters = raw.filters && typeof raw.filters === "object" ? { ...raw.filters } : {};
+  return {
+    mode: normalizeTransportWorkbenchDisplayMode(raw.mode, defaults.mode),
+    preset: normalizeTransportWorkbenchPreset(raw.preset),
+    aggregation: {
+      algorithm: normalizeTransportWorkbenchAggregationAlgorithm(rawAggregation.algorithm, familyId),
+      autoSwitch: rawAggregation.autoSwitch === undefined ? defaults.aggregation.autoSwitch : !!rawAggregation.autoSwitch,
+      thresholds: {
+        zoomInToInspect: Number.isFinite(Number(rawThresholds.zoomInToInspect))
+          ? clamp(Number(rawThresholds.zoomInToInspect), 0, 24)
+          : defaults.aggregation.thresholds.zoomInToInspect,
+        zoomOutToDensity: Number.isFinite(Number(rawThresholds.zoomOutToDensity))
+          ? clamp(Number(rawThresholds.zoomOutToDensity), 0, 24)
+          : defaults.aggregation.thresholds.zoomOutToDensity,
+        viewportDensity: clamp(
+          toFiniteNumber(rawThresholds.viewportDensity, defaults.aggregation.thresholds.viewportDensity),
+          0,
+          1
+        ),
+        localExtremeDensity: clamp(
+          toFiniteNumber(rawThresholds.localExtremeDensity, defaults.aggregation.thresholds.localExtremeDensity),
+          0,
+          1
+        ),
+        categoryConcentration: clamp(
+          toFiniteNumber(rawThresholds.categoryConcentration, defaults.aggregation.thresholds.categoryConcentration),
+          0,
+          1
+        ),
+        labelCollision: clamp(
+          toFiniteNumber(rawThresholds.labelCollision, defaults.aggregation.thresholds.labelCollision),
+          0,
+          1
+        ),
+        clusterRadiusPx: clamp(
+          toFiniteNumber(rawThresholds.clusterRadiusPx, defaults.aggregation.thresholds.clusterRadiusPx),
+          8,
+          256
+        ),
+        cellSizePx: clamp(
+          toFiniteNumber(rawThresholds.cellSizePx, defaults.aggregation.thresholds.cellSizePx),
+          8,
+          256
+        ),
+      },
+    },
+    labels: {
+      maxLevel: clamp(Math.round(toFiniteNumber(rawLabels.maxLevel, defaults.labels.maxLevel)), 1, 3),
+      budget: clamp(Math.round(toFiniteNumber(rawLabels.budget, defaults.labels.budget)), 0, 64),
+      separationStrength: clamp(
+        toFiniteNumber(rawLabels.separationStrength, defaults.labels.separationStrength),
+        0,
+        1
+      ),
+      allowAggregation: rawLabels.allowAggregation === undefined
+        ? defaults.labels.allowAggregation
+        : !!rawLabels.allowAggregation,
+      dominantCategoryThreshold: clamp(
+        toFiniteNumber(rawLabels.dominantCategoryThreshold, defaults.labels.dominantCategoryThreshold),
+        0,
+        1
+      ),
+      mixedCategoryMode: TRANSPORT_WORKBENCH_LABEL_MIXED_CATEGORY_MODE_IDS.has(mixedCategoryMode)
+        ? mixedCategoryMode
+        : defaults.labels.mixedCategoryMode,
+    },
+    coverage: normalizeTransportWorkbenchCoverage(raw.coverage, familyId),
+    filters,
+  };
+}
+
+function createDefaultTransportWorkbenchDisplayConfigs() {
+  return Object.fromEntries(
+    TRANSPORT_WORKBENCH_FAMILY_IDS.map((familyId) => [
+      familyId,
+      createDefaultTransportWorkbenchDisplayConfig(familyId),
+    ])
+  );
+}
+
+function normalizeTransportWorkbenchDisplayConfigs(rawConfigs) {
+  const source = rawConfigs && typeof rawConfigs === "object" ? rawConfigs : {};
+  return Object.fromEntries(
+    TRANSPORT_WORKBENCH_FAMILY_IDS.map((familyId) => [
+      familyId,
+      normalizeTransportWorkbenchDisplayConfig(source[familyId], familyId),
+    ])
+  );
+}
+
+function normalizeTransportWorkbenchUiState(rawUi) {
+  const raw = rawUi && typeof rawUi === "object" ? rawUi : {};
+  const rawPreviewCamera = raw.previewCamera && typeof raw.previewCamera === "object" ? raw.previewCamera : {};
+  const familyConfigs = raw.familyConfigs && typeof raw.familyConfigs === "object" ? { ...raw.familyConfigs } : {};
+  const sectionOpen = raw.sectionOpen && typeof raw.sectionOpen === "object" ? { ...raw.sectionOpen } : {};
+  return {
+    open: !!raw.open,
+    activeFamily: raw.activeFamily === "layers" || TRANSPORT_WORKBENCH_FAMILY_IDS.includes(raw.activeFamily)
+      ? raw.activeFamily
+      : "road",
+    activeInspectorTab: ["inspect", "display", "aggregation", "labels", "coverage", "data"].includes(String(raw.activeInspectorTab || "").trim().toLowerCase())
+      ? String(raw.activeInspectorTab || "").trim().toLowerCase()
+      : "inspect",
+    sampleCountry: "Japan",
+    previewMode: "bounded_zoom_pan",
+    previewAssetId: "japan_carrier_v3",
+    previewInteractionMode: "bounded_zoom_pan",
+    previewCamera: {
+      scale: toFiniteNumber(rawPreviewCamera.scale, 1) || 1,
+      translateX: toFiniteNumber(rawPreviewCamera.translateX, 0),
+      translateY: toFiniteNumber(rawPreviewCamera.translateY, 0),
+    },
+    compareHeld: !!raw.compareHeld,
+    layerOrder: TRANSPORT_WORKBENCH_FAMILY_IDS.filter((familyId) => {
+      const savedOrder = Array.isArray(raw.layerOrder) ? raw.layerOrder : [];
+      return savedOrder.includes(familyId);
+    }).concat(
+      TRANSPORT_WORKBENCH_FAMILY_IDS.filter((familyId) => !(Array.isArray(raw.layerOrder) ? raw.layerOrder : []).includes(familyId))
+    ),
+    familyConfigs,
+    displayConfigs: normalizeTransportWorkbenchDisplayConfigs(raw.displayConfigs),
+    sectionOpen,
+    shellPhase: "road-live-preview",
+    restoreLeftDrawer: !!raw.restoreLeftDrawer,
+    restoreRightDrawer: !!raw.restoreRightDrawer,
+  };
+}
+
 export {
   PALETTE_THEMES,
   countryPalette,
@@ -879,6 +1233,8 @@ export {
   normalizePhysicalStyleConfig,
   createDefaultLakeStyleConfig,
   normalizeLakeStyleConfig,
+  createDefaultUrbanStyleConfig,
+  normalizeUrbanStyleConfig,
   createDefaultCityLayerStyleConfig,
   normalizeCityLayerStyleConfig,
   PRESET_STORAGE_KEY,
@@ -889,6 +1245,12 @@ export {
   normalizeDayNightStyleConfig,
   createDefaultAnnotationView,
   normalizeAnnotationView,
+  TRANSPORT_WORKBENCH_FAMILY_IDS,
+  createDefaultTransportWorkbenchDisplayConfig,
+  createDefaultTransportWorkbenchDisplayConfigs,
+  normalizeTransportWorkbenchDisplayConfig,
+  normalizeTransportWorkbenchDisplayConfigs,
+  normalizeTransportWorkbenchUiState,
 };
 
 export function normalizeMapSemanticMode(value, fallback = "political") {
@@ -1003,6 +1365,7 @@ export const state = {
     warning: "",
     severity: "",
   },
+  parentBordersVisible: true,
   scenarioParentBorderEnabledBeforeActivate: null,
   scenarioPaintModeBeforeActivate: null,
   scenarioOceanFillBeforeActivate: null,
@@ -1346,6 +1709,7 @@ export const state = {
   transportWorkbenchUi: {
     open: false,
     activeFamily: "road",
+    activeInspectorTab: "inspect",
     sampleCountry: "Japan",
     previewMode: "bounded_zoom_pan",
     previewAssetId: "japan_carrier_v3",
@@ -1376,6 +1740,7 @@ export const state = {
       industrial_zones: {},
       logistics_hubs: {},
     },
+    displayConfigs: createDefaultTransportWorkbenchDisplayConfigs(),
     sectionOpen: {
       road: {},
       rail: {},
@@ -1399,7 +1764,9 @@ export const state = {
   cachedFrontlineLabelAnchors: [],
   cachedFrontlineLabelAnchorsHash: "",
   cachedProvinceBorders: null,
+  cachedProvinceBordersByCountry: new Map(),
   cachedLocalBorders: null,
+  cachedLocalBordersByCountry: new Map(),
   cachedDetailAdmBorders: null,
   cachedDynamicBordersHash: null,
   cachedCoastlines: null,
@@ -1422,6 +1789,7 @@ export const state = {
   styleConfig: {
     internalBorders: {
       color: "#cccccc",
+      colorMode: "auto",
       opacity: 1,
       width: 0.5,
     },
@@ -1456,12 +1824,7 @@ export const state = {
     cityPoints: {
       ...createDefaultCityLayerStyleConfig(),
     },
-    urban: {
-      color: "#4b5563",
-      opacity: 0.4,
-      blendMode: "multiply",
-      minAreaPx: 8,
-    },
+    urban: createDefaultUrbanStyleConfig(),
     physical: {
       ...createDefaultPhysicalStyleConfig(),
     },

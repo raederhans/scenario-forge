@@ -27,6 +27,16 @@ MANIFEST_PATH = OUTPUT_DIR / "manifest.json"
 AUDIT_PATH = OUTPUT_DIR / "build_audit.json"
 CARRIER_PATH = ROOT / "data" / "transport_layers" / "japan_corridor" / "carrier.json"
 
+RESOURCE_GROUP_LABELS = {
+    "precious_metals": "Precious metals",
+    "base_metals": "Base metals",
+    "ferrous_metals": "Ferrous and alloy metals",
+    "fossil_resources": "Fossil resources",
+    "industrial_minerals": "Industrial minerals",
+    "construction_materials": "Construction materials",
+    "other_resources": "Other resources",
+}
+
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -107,6 +117,36 @@ def read_source_rows() -> list[dict[str, str]]:
     return [{key: normalize_text(value) for key, value in row.items()} for row in reader]
 
 
+def derive_resource_group(resource_type: str, resource_type_code: str, resource_class: str) -> str:
+    code = normalize_match_key(resource_type_code)
+    text = normalize_match_key(resource_type)
+    resource_class_key = normalize_match_key(resource_class)
+
+    if any(token in text for token in ("石油", "ガス", "石炭", "亜炭")) or code in {"oil", "gas", "c", "l"}:
+        return "fossil_resources"
+    if any(token in text for token in ("金", "銀")) or any(token in code for token in ("au", "ag")):
+        return "precious_metals"
+    if any(token in text for token in ("銅", "鉛", "亜鉛", "錫", "水銀", "モリブデン", "アンチモン", "リチウム", "タングステン")):
+        return "base_metals"
+    if any(token in code for token in ("cu", "pb", "zn", "hg", "mo", "sb", "li", "w")):
+        return "base_metals"
+    if any(token in text for token in ("鉄", "マンガン", "クロム", "ニッケル", "コバルト", "チタン", "バナジウム")):
+        return "ferrous_metals"
+    if any(token in code for token in ("fe", "mn", "cr", "ni", "co", "ti", "v")):
+        return "ferrous_metals"
+    if any(token in text for token in ("石灰石", "砂岩", "砂利", "砕石", "砂", "ドロマイト")):
+        return "construction_materials"
+    if code in {"ls", "ps", "pc", "pp", "tc", "py", "pyh"}:
+        return "construction_materials"
+    if any(token in text for token in ("粘土", "耐火粘土", "珪石", "長石", "石こう", "硫黄", "滑石", "珪砂", "ベントナイト", "陶石")):
+        return "industrial_minerals"
+    if code in {"cl", "rc", "fd", "si", "s"}:
+        return "industrial_minerals"
+    if "試錐" in resource_class_key or "試掘" in resource_class_key:
+        return "fossil_resources"
+    return "other_resources"
+
+
 def normalize_row(row: dict[str, str], resource_class_overrides: dict[str, str]) -> dict[str, Any] | None:
     lat = row.get("lat", "")
     lon = row.get("lon", "")
@@ -121,7 +161,9 @@ def normalize_row(row: dict[str, str], resource_class_overrides: dict[str, str])
     resource_class = resource_class_overrides.get(resource_class_raw, resource_class_raw)
     mine_name = row.get("mine_name", "")
     resource_type = row.get("mineral_j", "")
-    display_name = mine_name or resource_class or resource_type or row.get("mineral", "")
+    resource_type_code = row.get("mineral", "")
+    normalized_resource_group = derive_resource_group(resource_type, resource_type_code, resource_class)
+    display_name = mine_name or resource_class or resource_type or resource_type_code
     if not display_name:
         return None
     point = Point(longitude, latitude)
@@ -129,8 +171,10 @@ def normalize_row(row: dict[str, str], resource_class_overrides: dict[str, str])
         "id": f"jp-mineral-{row.get('id', '')}",
         "name": display_name,
         "resource_type": resource_type,
-        "resource_type_code": row.get("mineral", ""),
+        "resource_type_code": resource_type_code,
         "resource_class": resource_class,
+        "normalized_resource_group": normalized_resource_group,
+        "normalized_resource_group_label": RESOURCE_GROUP_LABELS[normalized_resource_group],
         "work_status": row.get("work_status", ""),
         "map_name": row.get("map_name", ""),
         "map_pub_year": row.get("map_pub_year", ""),
@@ -195,7 +239,7 @@ def main() -> None:
         "family": "mineral_resources",
         "geometry_kind": "point",
         "country": "Japan",
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": utc_now(),
         "recipe_path": str(RECIPE_PATH.relative_to(ROOT)).replace("\\", "/"),
         "paths": {
@@ -236,6 +280,12 @@ def main() -> None:
             "source_fallback_encoding": "cp932",
             "match_key_normalization": "NFKC + whitespace collapse + casefold",
         },
+        "taxonomy_contract": {
+            "primary_group_field": "normalized_resource_group",
+            "primary_group_label_field": "normalized_resource_group_label",
+            "source_type_field": "resource_type",
+            "source_type_code_field": "resource_type_code",
+        },
     }
     audit = {
         "generated_at": utc_now(),
@@ -248,6 +298,12 @@ def main() -> None:
         "resource_class_override_count": int(len(resource_class_overrides)),
         "resource_type_count": int(minerals["resource_type"].astype(str).nunique()),
         "resource_class_count": int(minerals["resource_class"].astype(str).nunique()),
+        "normalized_resource_group_count": int(minerals["normalized_resource_group"].astype(str).nunique()),
+        "normalized_resource_group_counts": {
+            group_id: int((minerals["normalized_resource_group"] == group_id).sum())
+            for group_id in RESOURCE_GROUP_LABELS.keys()
+            if int((minerals["normalized_resource_group"] == group_id).sum()) > 0
+        },
         "source_policy": "local_source_cache_only",
         "source_member": SOURCE_MEMBER,
         "source_encoding": "cp932",
@@ -262,7 +318,8 @@ def main() -> None:
         "notes": [
             "The first mineral resource pack uses the GSJ mine distribution CSV exactly as supplied in the local source cache.",
             "Preview and full outputs are identical for v1 because no stable importance model has been approved yet.",
-            "Historical resource-class spellings are only normalized through the repo-versioned override file."
+            "Historical resource-class spellings are only normalized through the repo-versioned override file.",
+            "normalized_resource_group is a stable display taxonomy layer added on top of the original resource_type and resource_type_code fields.",
         ],
     }
     write_json(MANIFEST_PATH, manifest, compact=False)

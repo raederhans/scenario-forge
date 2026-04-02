@@ -32,6 +32,8 @@ import {
   normalizeLakeStyleConfig,
   normalizeMapSemanticMode,
   normalizePhysicalStyleConfig,
+  normalizeUrbanStyleConfig,
+  normalizeTransportWorkbenchUiState,
   state,
 } from "./state.js";
 
@@ -497,7 +499,11 @@ async function applyImportedProjectState(data, { ui, hooks }) {
   state.operationalLinesDirty = true;
   state.operationGraphicsDirty = true;
   state.unitCountersDirty = true;
+  state.transportWorkbenchUi = data.transportWorkbenchUi
+    ? cloneImportedProjectValue(data.transportWorkbenchUi)
+    : cloneImportedProjectValue(state.transportWorkbenchUi);
   state.specialZones = data.specialZones || {};
+  state.parentBordersVisible = data.parentBordersVisible !== false;
   state.manualSpecialZones =
     data.manualSpecialZones && data.manualSpecialZones.type === "FeatureCollection"
       ? data.manualSpecialZones
@@ -516,6 +522,7 @@ async function applyImportedProjectState(data, { ui, hooks }) {
   state.parentBorderEnabledByCountry = normalizedParentEnabled;
   state.styleConfig.internalBorders = {
     color: "#cccccc",
+    colorMode: "auto",
     opacity: 1,
     width: 0.5,
   };
@@ -565,10 +572,10 @@ async function applyImportedProjectState(data, { ui, hooks }) {
     });
   }
   if (data.styleConfig?.urban && typeof data.styleConfig.urban === "object") {
-    state.styleConfig.urban = {
+    state.styleConfig.urban = normalizeUrbanStyleConfig({
       ...(state.styleConfig.urban || {}),
       ...data.styleConfig.urban,
-    };
+    });
   }
   if (data.styleConfig?.physical && typeof data.styleConfig.physical === "object") {
     state.styleConfig.physical = normalizePhysicalStyleConfig({
@@ -650,6 +657,31 @@ async function applyImportedProjectState(data, { ui, hooks }) {
     ...(state.referenceImageState || {}),
     ...(data.referenceImageState || {}),
   };
+  if (data.transportWorkbenchUi && typeof data.transportWorkbenchUi === "object") {
+    const normalizedTransportWorkbenchUi = normalizeTransportWorkbenchUiState({
+      ...(state.transportWorkbenchUi || {}),
+      ...data.transportWorkbenchUi,
+      familyConfigs: {
+        ...((state.transportWorkbenchUi && state.transportWorkbenchUi.familyConfigs) || {}),
+        ...(data.transportWorkbenchUi.familyConfigs || {}),
+      },
+      displayConfigs: {
+        ...((state.transportWorkbenchUi && state.transportWorkbenchUi.displayConfigs) || {}),
+        ...(data.transportWorkbenchUi.displayConfigs || {}),
+      },
+      sectionOpen: {
+        ...((state.transportWorkbenchUi && state.transportWorkbenchUi.sectionOpen) || {}),
+        ...(data.transportWorkbenchUi.sectionOpen || {}),
+      },
+    });
+    state.transportWorkbenchUi = {
+      ...(state.transportWorkbenchUi || {}),
+      ...normalizedTransportWorkbenchUi,
+      familyConfigs: normalizedTransportWorkbenchUi.familyConfigs,
+      displayConfigs: normalizedTransportWorkbenchUi.displayConfigs,
+      sectionOpen: normalizedTransportWorkbenchUi.sectionOpen,
+    };
+  }
   state.customPresets =
     data.customPresets && typeof data.customPresets === "object" ? data.customPresets : {};
   debugState.importPhase = "state-restored";

@@ -454,6 +454,7 @@ function normalizeScenarioPerformanceHints(manifest) {
     return {
       renderProfileDefault: "",
       dynamicBordersDefault: null,
+      parentBordersDefault: null,
       scenarioReliefOverlaysDefault: null,
       waterRegionsDefault: null,
       specialRegionsDefault: null,
@@ -464,6 +465,8 @@ function normalizeScenarioPerformanceHints(manifest) {
     renderProfileDefault: SCENARIO_RENDER_PROFILES.has(renderProfileDefault) ? renderProfileDefault : "",
     dynamicBordersDefault:
       typeof raw.dynamic_borders_default === "boolean" ? raw.dynamic_borders_default : null,
+    parentBordersDefault:
+      typeof raw.parent_borders_default === "boolean" ? raw.parent_borders_default : null,
     scenarioReliefOverlaysDefault:
       typeof raw.scenario_relief_overlays_default === "boolean" ? raw.scenario_relief_overlays_default : null,
     waterRegionsDefault:
@@ -480,6 +483,7 @@ function captureScenarioDisplaySettingsBeforeActivate() {
   state.scenarioDisplaySettingsBeforeActivate = {
     renderProfile: normalizeScenarioRenderProfile(state.renderProfile, "auto"),
     dynamicBordersEnabled: state.dynamicBordersEnabled !== false,
+    parentBordersVisible: state.parentBordersVisible !== false,
     showWaterRegions: state.showWaterRegions !== false,
     showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
     showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
@@ -497,6 +501,9 @@ function applyScenarioPerformanceHints(manifest) {
   if (typeof hints.dynamicBordersDefault === "boolean") {
     state.dynamicBordersEnabled = hints.dynamicBordersDefault;
   }
+  state.parentBordersVisible = typeof hints.parentBordersDefault === "boolean"
+    ? hints.parentBordersDefault
+    : false;
   if (typeof hints.waterRegionsDefault === "boolean") {
     state.showWaterRegions = hints.waterRegionsDefault;
   }
@@ -518,6 +525,9 @@ function applyScenarioPerformanceHints(manifest) {
   if (typeof state.updateDynamicBorderStatusUIFn === "function") {
     state.updateDynamicBorderStatusUIFn();
   }
+  if (typeof state.updateToolbarInputsFn === "function") {
+    state.updateToolbarInputsFn();
+  }
 }
 
 function restoreScenarioDisplaySettingsAfterExit() {
@@ -525,6 +535,7 @@ function restoreScenarioDisplaySettingsAfterExit() {
   if (snapshot && typeof snapshot === "object") {
     state.renderProfile = normalizeScenarioRenderProfile(snapshot.renderProfile, state.renderProfile || "auto");
     state.dynamicBordersEnabled = snapshot.dynamicBordersEnabled !== false;
+    state.parentBordersVisible = snapshot.parentBordersVisible !== false;
     state.showWaterRegions = snapshot.showWaterRegions !== false;
     state.showScenarioSpecialRegions = snapshot.showScenarioSpecialRegions !== false;
     state.showScenarioReliefOverlays = snapshot.showScenarioReliefOverlays !== false;
@@ -542,6 +553,9 @@ function restoreScenarioDisplaySettingsAfterExit() {
   }
   if (typeof state.updateDynamicBorderStatusUIFn === "function") {
     state.updateDynamicBorderStatusUIFn();
+  }
+  if (typeof state.updateToolbarInputsFn === "function") {
+    state.updateToolbarInputsFn();
   }
 }
 
@@ -1244,6 +1258,7 @@ async function prepareScenarioApplyState(
       ? {
         renderProfile: normalizeScenarioRenderProfile(state.renderProfile, "auto"),
         dynamicBordersEnabled: state.dynamicBordersEnabled !== false,
+        parentBordersVisible: state.parentBordersVisible !== false,
         showWaterRegions: state.showWaterRegions !== false,
         showScenarioSpecialRegions: state.showScenarioSpecialRegions !== false,
         showScenarioReliefOverlays: state.showScenarioReliefOverlays !== false,
@@ -1618,6 +1633,7 @@ function resetToScenarioBaseline(
   state.sovereigntyInitialized = false;
   ensureSovereigntyState({ force: true });
   recalculateScenarioOwnerControllerDiffCount();
+  state.parentBordersVisible = false;
   state.visualOverrides = {};
   state.featureOverrides = {};
   state.sovereignBaseColors = { ...(state.scenarioFixedOwnerColors || {}) };

@@ -2,10 +2,13 @@
 import {
   state,
   PALETTE_THEMES,
+  createDefaultTransportWorkbenchDisplayConfig,
   normalizeCityLayerStyleConfig,
   normalizeDayNightStyleConfig,
   normalizeLakeStyleConfig,
   normalizePhysicalStyleConfig,
+  normalizeUrbanStyleConfig,
+  normalizeTransportWorkbenchDisplayConfig,
   normalizeTextureMode,
   normalizeTextureStyleConfig,
 } from "../core/state.js";
@@ -282,6 +285,8 @@ const PORT_DESIGNATION_OPTIONS = [
   { value: "international_strategy", label: "International strategy" },
   { value: "international_hub", label: "International hub" },
   { value: "important", label: "Important" },
+  { value: "local", label: "Local" },
+  { value: "shelter", label: "Shelter / special-use" },
 ];
 
 const PORT_MANAGER_TYPE_OPTIONS = [
@@ -355,6 +360,110 @@ const TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS = [
   { value: "very_dense", label: "Very dense" },
 ];
 const TRANSPORT_WORKBENCH_LABEL_DENSITY_VALUES = TRANSPORT_WORKBENCH_LABEL_DENSITY_OPTIONS.map((option) => option.value);
+const TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS = [
+  { value: "inspect", label: "Inspect" },
+  { value: "aggregate", label: "Aggregate" },
+  { value: "density", label: "Density" },
+];
+const TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS = [
+  { value: "review_first", label: "Review first" },
+  { value: "balanced", label: "Balanced" },
+  { value: "pattern_first", label: "Pattern first" },
+  { value: "extreme_density", label: "Extreme density" },
+];
+const TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS = [
+  { value: "cluster", label: "Cluster" },
+  { value: "hex", label: "Hex grid" },
+  { value: "square", label: "Square grid" },
+  { value: "density_surface", label: "Density surface" },
+];
+const TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS = [
+  { value: "region", label: "Region only" },
+  { value: "anchor", label: "Geographic anchor" },
+  { value: "category", label: "Anchor + category" },
+];
+
+const TRANSPORT_WORKBENCH_INSPECTOR_TABS = [
+  { id: "inspect", label: "Inspect" },
+  { id: "display", label: "Display" },
+  { id: "aggregation", label: "Aggregation" },
+  { id: "labels", label: "Labels" },
+  { id: "coverage", label: "Coverage" },
+  { id: "data", label: "Data" },
+];
+const TRANSPORT_WORKBENCH_INSPECTOR_TAB_IDS = TRANSPORT_WORKBENCH_INSPECTOR_TABS.map((tab) => tab.id);
+const TRANSPORT_WORKBENCH_DENSITY_FAMILY_IDS = new Set([
+  "port",
+  "mineral_resources",
+  "energy_facilities",
+  "industrial_zones",
+  "logistics_hubs",
+]);
+const TRANSPORT_WORKBENCH_TAB_SECTION_MAP = {
+  road: {
+    display: ["style"],
+    aggregation: ["inclusion", "source_hardening", "noise_control"],
+    labels: ["labels"],
+    coverage: [],
+    data: ["diagnostics"],
+  },
+  rail: {
+    display: ["line_presentation", "style"],
+    aggregation: ["network_scope", "source_reconciliation"],
+    labels: ["major_stations"],
+    coverage: [],
+    data: ["diagnostics"],
+  },
+  airport: {
+    display: ["style"],
+    aggregation: [],
+    labels: ["visibility"],
+    coverage: ["facility_scope"],
+    data: ["diagnostics"],
+  },
+  port: {
+    display: ["display_mode", "style"],
+    aggregation: ["aggregation_mode"],
+    labels: ["label_strategy", "visibility"],
+    coverage: ["facility_scope"],
+    data: ["diagnostics"],
+  },
+  mineral_resources: {
+    display: ["display_mode", "style"],
+    aggregation: ["aggregation_mode"],
+    labels: ["label_strategy", "visibility"],
+    coverage: [],
+    data: ["diagnostics"],
+  },
+  energy_facilities: {
+    display: ["display_mode", "style"],
+    aggregation: ["aggregation_mode"],
+    labels: ["label_strategy", "visibility"],
+    coverage: ["facility_scope"],
+    data: ["diagnostics"],
+  },
+  industrial_zones: {
+    display: ["display_mode", "style"],
+    aggregation: ["aggregation_mode"],
+    labels: ["label_strategy", "visibility"],
+    coverage: ["data_variant", "filtering"],
+    data: ["diagnostics"],
+  },
+  logistics_hubs: {
+    display: ["display_mode", "style"],
+    aggregation: ["aggregation_mode"],
+    labels: ["label_strategy", "visibility"],
+    coverage: ["facility_scope"],
+    data: ["diagnostics"],
+  },
+  layers: {
+    display: [],
+    aggregation: [],
+    labels: [],
+    coverage: [],
+    data: [],
+  },
+};
 
 const TRANSPORT_WORKBENCH_DEFAULT_CONFIGS = {
   road: {
@@ -413,6 +522,13 @@ const TRANSPORT_WORKBENCH_DEFAULT_CONFIGS = {
     baseOpacity: 90,
   },
   port: {
+    displayMode: "inspect",
+    displayPreset: "balanced",
+    aggregationAlgorithm: "cluster",
+    labelLevel: "anchor",
+    labelBudget: 8,
+    labelSeparation: 1,
+    labelAllowMerge: true,
     legalDesignations: PORT_DESIGNATION_OPTIONS.map((option) => option.value),
     managerTypes: PORT_MANAGER_TYPE_OPTIONS.map((option) => option.value),
     importanceThreshold: "regional_core",
@@ -421,12 +537,26 @@ const TRANSPORT_WORKBENCH_DEFAULT_CONFIGS = {
     baseOpacity: 90,
   },
   mineral_resources: {
+    displayMode: "aggregate",
+    displayPreset: "balanced",
+    aggregationAlgorithm: "hex",
+    labelLevel: "category",
+    labelBudget: 7,
+    labelSeparation: 1.15,
+    labelAllowMerge: true,
     showLabels: false,
     labelDensityPreset: "sparse",
     pointOpacity: 72,
     pointSize: 92,
   },
   energy_facilities: {
+    displayMode: "inspect",
+    displayPreset: "balanced",
+    aggregationAlgorithm: "cluster",
+    labelLevel: "category",
+    labelBudget: 8,
+    labelSeparation: 1,
+    labelAllowMerge: true,
     facilitySubtypes: [],
     statuses: ENERGY_STATUS_OPTIONS.map((option) => option.value),
     showLabels: true,
@@ -435,6 +565,13 @@ const TRANSPORT_WORKBENCH_DEFAULT_CONFIGS = {
     pointSize: 100,
   },
   industrial_zones: {
+    displayMode: "aggregate",
+    displayPreset: "pattern_first",
+    aggregationAlgorithm: "square",
+    labelLevel: "category",
+    labelBudget: 8,
+    labelSeparation: 1.1,
+    labelAllowMerge: true,
     variant: "internal",
     siteClasses: INDUSTRIAL_SITE_CLASS_OPTIONS.map((option) => option.value),
     coastalModes: INDUSTRIAL_COASTAL_OPTIONS.map((option) => option.value),
@@ -444,6 +581,13 @@ const TRANSPORT_WORKBENCH_DEFAULT_CONFIGS = {
     outlineOpacity: 88,
   },
   logistics_hubs: {
+    displayMode: "aggregate",
+    displayPreset: "pattern_first",
+    aggregationAlgorithm: "cluster",
+    labelLevel: "category",
+    labelBudget: 8,
+    labelSeparation: 1.12,
+    labelAllowMerge: true,
     hubTypes: LOGISTICS_HUB_TYPE_OPTIONS.map((option) => option.value),
     operatorClassifications: LOGISTICS_OPERATOR_CLASSIFICATION_OPTIONS.map((option) => option.value),
     showLabels: false,
@@ -488,23 +632,35 @@ const TRANSPORT_WORKBENCH_SECTION_DEFAULTS = {
     diagnostics: false,
   },
   port: {
+    display_mode: true,
+    aggregation_mode: true,
+    label_strategy: true,
     facility_scope: true,
     visibility: true,
     style: false,
     diagnostics: false,
   },
   mineral_resources: {
+    display_mode: true,
+    aggregation_mode: true,
+    label_strategy: true,
     visibility: true,
     style: false,
     diagnostics: false,
   },
   energy_facilities: {
+    display_mode: true,
+    aggregation_mode: true,
+    label_strategy: true,
     facility_scope: true,
     visibility: true,
     style: false,
     diagnostics: false,
   },
   industrial_zones: {
+    display_mode: true,
+    aggregation_mode: true,
+    label_strategy: true,
     data_variant: true,
     filtering: true,
     visibility: true,
@@ -512,6 +668,9 @@ const TRANSPORT_WORKBENCH_SECTION_DEFAULTS = {
     diagnostics: false,
   },
   logistics_hubs: {
+    display_mode: true,
+    aggregation_mode: true,
+    label_strategy: true,
     facility_scope: true,
     visibility: true,
     style: false,
@@ -584,8 +743,8 @@ const TRANSPORT_WORKBENCH_DATA_CONTRACTS = {
     geometryKind: "point",
     packs: ["ports"],
     geometrySource: "Official or quasi-official major port node source",
-    hardeningSource: "Commercial / strategic importance review",
-    governance: "Deferred point pack for key maritime facilities only. Routes and harbor polygons stay out of v1.",
+    hardeningSource: "Official designation / coverage-tier review",
+    governance: "Deferred point pack with tiered official coverage. Routes and harbor polygons stay out of v1, but the runtime can switch between core, expanded, and full official subsets.",
     pendingStatus: "Waiting for ports Japan pack",
   },
   mineral_resources: {
@@ -635,6 +794,25 @@ function normalizeTransportWorkbenchFamily(value) {
   return TRANSPORT_WORKBENCH_FAMILY_IDS.has(normalized) ? normalized : "road";
 }
 
+function normalizeTransportWorkbenchInspectorTab(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return TRANSPORT_WORKBENCH_INSPECTOR_TAB_IDS.includes(normalized) ? normalized : "inspect";
+}
+
+function mapTransportWorkbenchLabelLevelToMaxLevel(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "region") return 1;
+  if (normalized === "category") return 3;
+  return 2;
+}
+
+function mapTransportWorkbenchMaxLevelToLabelLevel(value) {
+  const numeric = Number(value);
+  if (numeric >= 3) return "category";
+  if (numeric <= 1) return "region";
+  return "anchor";
+}
+
 function normalizeTransportWorkbenchEnum(value, allowedValues, fallback) {
   const normalized = String(value || "").trim();
   return allowedValues.includes(normalized) ? normalized : fallback;
@@ -645,6 +823,37 @@ function normalizeTransportWorkbenchMulti(value, allowedValues, fallbackValues) 
     ? value.map((entry) => String(entry || "").trim()).filter((entry) => allowedValues.includes(entry))
     : [];
   return next.length ? Array.from(new Set(next)) : [...fallbackValues];
+}
+
+function normalizeTransportWorkbenchDensityConfig(source, defaults, {
+  allowedAlgorithms = TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS.map((option) => option.value),
+  defaultDisplayMode = "inspect",
+} = {}) {
+  return {
+    displayMode: normalizeTransportWorkbenchEnum(
+      source.displayMode,
+      TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS.map((option) => option.value),
+      defaults.displayMode || defaultDisplayMode
+    ),
+    displayPreset: normalizeTransportWorkbenchEnum(
+      source.displayPreset,
+      TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS.map((option) => option.value),
+      defaults.displayPreset || "balanced"
+    ),
+    aggregationAlgorithm: normalizeTransportWorkbenchEnum(
+      source.aggregationAlgorithm,
+      allowedAlgorithms,
+      defaults.aggregationAlgorithm || allowedAlgorithms[0]
+    ),
+    labelLevel: normalizeTransportWorkbenchEnum(
+      source.labelLevel,
+      TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS.map((option) => option.value),
+      defaults.labelLevel || "anchor"
+    ),
+    labelBudget: Math.max(3, Math.min(18, Number(source.labelBudget) || defaults.labelBudget || 8)),
+    labelSeparation: Math.max(0.7, Math.min(1.8, Number(source.labelSeparation) || defaults.labelSeparation || 1)),
+    labelAllowMerge: source.labelAllowMerge !== false,
+  };
 }
 
 function normalizeTransportWorkbenchLayerOrder(value) {
@@ -732,9 +941,13 @@ function normalizeAirportTransportWorkbenchConfig(value) {
 function normalizePortTransportWorkbenchConfig(value) {
   const source = value && typeof value === "object" ? value : {};
   return {
+    ...normalizeTransportWorkbenchDensityConfig(source, TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.port, {
+      allowedAlgorithms: ["cluster", "square", "density_surface"],
+      defaultDisplayMode: "inspect",
+    }),
     legalDesignations: normalizeTransportWorkbenchMulti(source.legalDesignations, PORT_DESIGNATION_OPTIONS.map((option) => option.value), TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.port.legalDesignations),
     managerTypes: normalizeTransportWorkbenchMulti(source.managerTypes, PORT_MANAGER_TYPE_OPTIONS.map((option) => option.value), TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.port.managerTypes),
-    importanceThreshold: normalizeTransportWorkbenchEnum(source.importanceThreshold, ["national_core", "regional_core"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.port.importanceThreshold),
+    importanceThreshold: normalizeTransportWorkbenchEnum(source.importanceThreshold, ["national_core", "regional_core", "local_connector"], TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.port.importanceThreshold),
     showLabels: source.showLabels !== false,
     labelDensityPreset: normalizeTransportWorkbenchEnum(source.labelDensityPreset, TRANSPORT_WORKBENCH_LABEL_DENSITY_VALUES, TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.port.labelDensityPreset),
     baseOpacity: Math.max(35, Math.min(100, Number(source.baseOpacity) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.port.baseOpacity)),
@@ -744,6 +957,10 @@ function normalizePortTransportWorkbenchConfig(value) {
 function normalizeMineralResourceTransportWorkbenchConfig(value) {
   const source = value && typeof value === "object" ? value : {};
   return {
+    ...normalizeTransportWorkbenchDensityConfig(source, TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.mineral_resources, {
+      allowedAlgorithms: ["hex", "square", "density_surface"],
+      defaultDisplayMode: "aggregate",
+    }),
     showLabels: !!source.showLabels,
     labelDensityPreset: normalizeTransportWorkbenchEnum(source.labelDensityPreset, TRANSPORT_WORKBENCH_LABEL_DENSITY_VALUES, TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.mineral_resources.labelDensityPreset),
     pointOpacity: Math.max(28, Math.min(100, Number(source.pointOpacity) || TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.mineral_resources.pointOpacity)),
@@ -754,6 +971,10 @@ function normalizeMineralResourceTransportWorkbenchConfig(value) {
 function normalizeEnergyFacilityTransportWorkbenchConfig(value) {
   const source = value && typeof value === "object" ? value : {};
   return {
+    ...normalizeTransportWorkbenchDensityConfig(source, TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.energy_facilities, {
+      allowedAlgorithms: ["cluster", "square", "density_surface"],
+      defaultDisplayMode: "inspect",
+    }),
     facilitySubtypes: Array.isArray(source.facilitySubtypes)
       ? source.facilitySubtypes.map((entry) => String(entry || "").trim()).filter(Boolean)
       : [...TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.energy_facilities.facilitySubtypes],
@@ -772,6 +993,10 @@ function normalizeEnergyFacilityTransportWorkbenchConfig(value) {
 function normalizeIndustrialTransportWorkbenchConfig(value) {
   const source = value && typeof value === "object" ? value : {};
   return {
+    ...normalizeTransportWorkbenchDensityConfig(source, TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.industrial_zones, {
+      allowedAlgorithms: ["square", "hex", "density_surface"],
+      defaultDisplayMode: "aggregate",
+    }),
     variant: normalizeTransportWorkbenchEnum(
       source.variant,
       INDUSTRIAL_VARIANT_OPTIONS.map((option) => option.value),
@@ -797,6 +1022,10 @@ function normalizeIndustrialTransportWorkbenchConfig(value) {
 function normalizeLogisticsHubTransportWorkbenchConfig(value) {
   const source = value && typeof value === "object" ? value : {};
   return {
+    ...normalizeTransportWorkbenchDensityConfig(source, TRANSPORT_WORKBENCH_DEFAULT_CONFIGS.logistics_hubs, {
+      allowedAlgorithms: ["cluster", "square", "density_surface"],
+      defaultDisplayMode: "aggregate",
+    }),
     hubTypes: normalizeTransportWorkbenchMulti(
       source.hubTypes,
       LOGISTICS_HUB_TYPE_OPTIONS.map((option) => option.value),
@@ -831,9 +1060,13 @@ function ensureTransportWorkbenchUiState() {
   state.transportWorkbenchUi.previewCamera.translateX = Number(state.transportWorkbenchUi.previewCamera.translateX) || 0;
   state.transportWorkbenchUi.previewCamera.translateY = Number(state.transportWorkbenchUi.previewCamera.translateY) || 0;
   state.transportWorkbenchUi.compareHeld = !!state.transportWorkbenchUi.compareHeld;
+  state.transportWorkbenchUi.activeInspectorTab = normalizeTransportWorkbenchInspectorTab(state.transportWorkbenchUi.activeInspectorTab);
   state.transportWorkbenchUi.layerOrder = normalizeTransportWorkbenchLayerOrder(state.transportWorkbenchUi.layerOrder);
   if (!state.transportWorkbenchUi.familyConfigs || typeof state.transportWorkbenchUi.familyConfigs !== "object") {
     state.transportWorkbenchUi.familyConfigs = {};
+  }
+  if (!state.transportWorkbenchUi.displayConfigs || typeof state.transportWorkbenchUi.displayConfigs !== "object") {
+    state.transportWorkbenchUi.displayConfigs = {};
   }
   state.transportWorkbenchUi.familyConfigs.road = normalizeRoadTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.road);
   state.transportWorkbenchUi.familyConfigs.rail = normalizeRailTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.rail);
@@ -843,6 +1076,12 @@ function ensureTransportWorkbenchUiState() {
   state.transportWorkbenchUi.familyConfigs.energy_facilities = normalizeEnergyFacilityTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.energy_facilities);
   state.transportWorkbenchUi.familyConfigs.industrial_zones = normalizeIndustrialTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.industrial_zones);
   state.transportWorkbenchUi.familyConfigs.logistics_hubs = normalizeLogisticsHubTransportWorkbenchConfig(state.transportWorkbenchUi.familyConfigs.logistics_hubs);
+  ["road", "rail", "airport", "port", "mineral_resources", "energy_facilities", "industrial_zones", "logistics_hubs"].forEach((familyId) => {
+    state.transportWorkbenchUi.displayConfigs[familyId] = normalizeTransportWorkbenchDisplayConfig(
+      state.transportWorkbenchUi.displayConfigs[familyId],
+      familyId
+    );
+  });
   ["airport", "port", "mineral_resources", "energy_facilities", "industrial_zones", "logistics_hubs"].forEach((familyId) => {
     if (!state.transportWorkbenchUi.familyConfigs[familyId] || typeof state.transportWorkbenchUi.familyConfigs[familyId] !== "object") {
       state.transportWorkbenchUi.familyConfigs[familyId] = {};
@@ -1069,15 +1308,43 @@ const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = {
   ],
   port: [
     {
+      key: "display_mode",
+      title: "Display Mode",
+      description: "Keep ports inspect-first, but allow aggregate and density views when the official layer becomes crowded.",
+      controls: [
+        { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for ports.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
+        { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds, not fixed counts.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
+      ],
+    },
+    {
+      key: "aggregation_mode",
+      title: "Aggregation",
+      description: "Aggregation stays dynamic and only steps in when the current view becomes dense.",
+      controls: [
+        { type: "select", key: "aggregationAlgorithm", label: "Algorithm", description: "Choose how dense port points should be summarized.", options: TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS.filter((option) => ["cluster", "square", "density_surface"].includes(option.value)) },
+      ],
+    },
+    {
+      key: "label_strategy",
+      title: "Label Strategy",
+      description: "Labels use geographic anchors first, then category when the map can carry it.",
+      controls: [
+        { type: "select", key: "labelLevel", label: "Label level", description: "Choose how descriptive aggregated labels should be.", options: TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS },
+        { type: "range", key: "labelBudget", label: "Label budget", description: "Maximum labels to keep on screen before label aggregation kicks in.", min: 3, max: 18, step: 1 },
+        { type: "range", key: "labelSeparation", label: "Label separation", description: "Higher values spread labels further apart.", min: 0.7, max: 1.8, step: 0.05 },
+      ],
+    },
+    {
       key: "facility_scope",
       title: "Facility Scope",
-      description: "Keep the first port pass on major legal designations only.",
+      description: "Filter the currently selected official coverage tier without introducing a second tier control.",
       controls: [
         { type: "multi", key: "legalDesignations", label: "Legal designations", options: PORT_DESIGNATION_OPTIONS, description: "Select which official port legal classes remain visible." },
         { type: "multi", key: "managerTypes", label: "Manager types", options: PORT_MANAGER_TYPE_OPTIONS, description: "Filter by official manager type code." },
         { type: "select", key: "importanceThreshold", label: "Importance threshold", description: "Hide lower-importance ports before render.", options: [
           { value: "national_core", label: "National core" },
           { value: "regional_core", label: "Regional core" },
+          { value: "local_connector", label: "Local connector" },
         ] },
       ],
     },
@@ -1102,6 +1369,33 @@ const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = {
   ],
   mineral_resources: [
     {
+      key: "display_mode",
+      title: "Display Mode",
+      description: "Mineral review defaults to aggregation so dense mine points reveal pattern before single-site inspection.",
+      controls: [
+        { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for mineral resources.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
+        { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds drive when inspect, aggregate, or density takes over.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
+      ],
+    },
+    {
+      key: "aggregation_mode",
+      title: "Aggregation",
+      description: "Grid-based aggregation works better than raw point carpets for dense mineral clusters.",
+      controls: [
+        { type: "select", key: "aggregationAlgorithm", label: "Algorithm", description: "Choose how mineral points should be aggregated.", options: TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS.filter((option) => ["hex", "square", "density_surface"].includes(option.value)) },
+      ],
+    },
+    {
+      key: "label_strategy",
+      title: "Label Strategy",
+      description: "Prefer geographic anchors with dominant resource category, then back off when the map gets crowded.",
+      controls: [
+        { type: "select", key: "labelLevel", label: "Label level", description: "Choose how descriptive aggregated mineral labels should be.", options: TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS },
+        { type: "range", key: "labelBudget", label: "Label budget", description: "Maximum labels kept before geographic label merge takes over.", min: 3, max: 18, step: 1 },
+        { type: "range", key: "labelSeparation", label: "Label separation", description: "Higher values increase spacing between labels.", min: 0.7, max: 1.8, step: 0.05 },
+      ],
+    },
+    {
       key: "visibility",
       title: "Labels",
       description: "Keep mineral labels opt-in so dense point fields stay readable.",
@@ -1122,6 +1416,33 @@ const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = {
     { key: "diagnostics", title: "Data Check", description: "Keep pack scope, visible site count, and source governance visible during review.", kind: "diagnostics" },
   ],
   energy_facilities: [
+    {
+      key: "display_mode",
+      title: "Display Mode",
+      description: "Energy stays inspect-first, but the same mode language is available when facility density rises.",
+      controls: [
+        { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for energy facilities.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
+        { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds decide when aggregation should take over.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
+      ],
+    },
+    {
+      key: "aggregation_mode",
+      title: "Aggregation",
+      description: "Aggregation is optional here, but the mode should still honor subtype-driven density shifts.",
+      controls: [
+        { type: "select", key: "aggregationAlgorithm", label: "Algorithm", description: "Choose how energy facilities should summarize at lower zooms.", options: TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS.filter((option) => ["cluster", "square", "density_surface"].includes(option.value)) },
+      ],
+    },
+    {
+      key: "label_strategy",
+      title: "Label Strategy",
+      description: "Subtype-driven labels should stay sparse and readable instead of repeating raw facility names everywhere.",
+      controls: [
+        { type: "select", key: "labelLevel", label: "Label level", description: "Choose how descriptive aggregated energy labels should be.", options: TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS },
+        { type: "range", key: "labelBudget", label: "Label budget", description: "Maximum labels kept before label merge kicks in.", min: 3, max: 18, step: 1 },
+        { type: "range", key: "labelSeparation", label: "Label separation", description: "Higher values increase spacing between labels.", min: 0.7, max: 1.8, step: 0.05 },
+      ],
+    },
     {
       key: "facility_scope",
       title: "Facility Scope",
@@ -1159,6 +1480,33 @@ const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = {
     { key: "diagnostics", title: "Data Check", description: "Keep local versus reference-only subtype scope and pack state visible during review.", kind: "diagnostics" },
   ],
   industrial_zones: [
+    {
+      key: "display_mode",
+      title: "Display Mode",
+      description: "Industrial land defaults to aggregated pattern reading before raw polygon inspection.",
+      controls: [
+        { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for industrial land.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
+        { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds decide when polygons collapse into pattern views.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
+      ],
+    },
+    {
+      key: "aggregation_mode",
+      title: "Aggregation",
+      description: "Industrial review needs pattern-first summarization without blending internal and open tracks.",
+      controls: [
+        { type: "select", key: "aggregationAlgorithm", label: "Algorithm", description: "Choose how industrial land should summarize at lower zooms.", options: TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS.filter((option) => ["square", "hex", "density_surface"].includes(option.value)) },
+      ],
+    },
+    {
+      key: "label_strategy",
+      title: "Label Strategy",
+      description: "Use geographic anchors and dominant land context before falling back to fewer region labels.",
+      controls: [
+        { type: "select", key: "labelLevel", label: "Label level", description: "Choose how descriptive industrial labels should be.", options: TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS },
+        { type: "range", key: "labelBudget", label: "Label budget", description: "Maximum industrial labels kept before merge and downgrade.", min: 3, max: 18, step: 1 },
+        { type: "range", key: "labelSeparation", label: "Label separation", description: "Higher values increase spacing between labels.", min: 0.7, max: 1.8, step: 0.05 },
+      ],
+    },
     {
       key: "data_variant",
       title: "Source Track",
@@ -1204,6 +1552,33 @@ const TRANSPORT_WORKBENCH_CONTROL_SCHEMAS = {
     { key: "diagnostics", title: "Data Check", description: "Keep the active source track, filter scope, and pack state visible during review.", kind: "diagnostics" },
   ],
   logistics_hubs: [
+    {
+      key: "display_mode",
+      title: "Display Mode",
+      description: "Logistics hubs default to aggregation so you can read corridors and hot zones before drilling into points.",
+      controls: [
+        { type: "select", key: "displayMode", label: "Mode", description: "Choose the current view language for logistics hubs.", options: TRANSPORT_WORKBENCH_DISPLAY_MODE_OPTIONS },
+        { type: "select", key: "displayPreset", label: "Preset", description: "Dynamic thresholds decide when the layer moves between inspect, aggregate, and density.", options: TRANSPORT_WORKBENCH_DISPLAY_PRESET_OPTIONS },
+      ],
+    },
+    {
+      key: "aggregation_mode",
+      title: "Aggregation",
+      description: "Cluster and grid views are both valid here, depending on how aggressively you want to compress the point field.",
+      controls: [
+        { type: "select", key: "aggregationAlgorithm", label: "Algorithm", description: "Choose how logistics hubs should summarize when dense.", options: TRANSPORT_WORKBENCH_AGGREGATION_ALGORITHM_OPTIONS.filter((option) => ["cluster", "square", "density_surface"].includes(option.value)) },
+      ],
+    },
+    {
+      key: "label_strategy",
+      title: "Label Strategy",
+      description: "Use geographic anchors and dominant logistics function, then merge labels when corridor density spikes.",
+      controls: [
+        { type: "select", key: "labelLevel", label: "Label level", description: "Choose how descriptive logistics labels should be.", options: TRANSPORT_WORKBENCH_LABEL_LEVEL_OPTIONS },
+        { type: "range", key: "labelBudget", label: "Label budget", description: "Maximum logistics labels kept before merge.", min: 3, max: 18, step: 1 },
+        { type: "range", key: "labelSeparation", label: "Label separation", description: "Higher values increase spacing between labels.", min: 0.7, max: 1.8, step: 0.05 },
+      ],
+    },
     {
       key: "facility_scope",
       title: "Hub Scope",
@@ -1340,6 +1715,8 @@ function initToolbar({ render } = {}) {
   const dayNightCityLightsTextureOpacity = document.getElementById("dayNightCityLightsTextureOpacity");
   const dayNightCityLightsCorridorStrength = document.getElementById("dayNightCityLightsCorridorStrength");
   const dayNightCityLightsCoreSharpness = document.getElementById("dayNightCityLightsCoreSharpness");
+  const dayNightCityLightsPopulationBoostEnabled = document.getElementById("dayNightCityLightsPopulationBoostEnabled");
+  const dayNightCityLightsPopulationBoostStrength = document.getElementById("dayNightCityLightsPopulationBoostStrength");
   const dayNightShadowOpacity = document.getElementById("dayNightShadowOpacity");
   const dayNightTwilightWidth = document.getElementById("dayNightTwilightWidth");
   const toggleUrban = document.getElementById("toggleUrban");
@@ -1361,9 +1738,16 @@ function initToolbar({ render } = {}) {
   const cityPointLabelsEnabled = document.getElementById("cityPointLabelsEnabled");
   const cityPointsLabelSize = document.getElementById("cityPointsLabelSize");
   const cityCapitalOverlayEnabled = document.getElementById("cityCapitalOverlayEnabled");
+  const urbanMode = document.getElementById("urbanMode");
+  const urbanAdaptiveControls = document.getElementById("urbanAdaptiveControls");
+  const urbanManualControls = document.getElementById("urbanManualControls");
+  const lblUrbanOpacity = document.getElementById("lblUrbanOpacity");
   const urbanColor = document.getElementById("urbanColor");
   const urbanOpacity = document.getElementById("urbanOpacity");
   const urbanBlendMode = document.getElementById("urbanBlendMode");
+  const urbanAdaptiveStrength = document.getElementById("urbanAdaptiveStrength");
+  const urbanStrokeOpacity = document.getElementById("urbanStrokeOpacity");
+  const urbanDarkCountryBoost = document.getElementById("urbanDarkCountryBoost");
   const urbanMinArea = document.getElementById("urbanMinArea");
   const physicalMode = document.getElementById("physicalMode");
   const physicalOpacity = document.getElementById("physicalOpacity");
@@ -1494,9 +1878,18 @@ function initToolbar({ render } = {}) {
   const transportWorkbenchZoomInBtn = document.getElementById("transportWorkbenchZoomInBtn");
   const transportWorkbenchRotateBtn = document.getElementById("transportWorkbenchRotateBtn");
   const transportWorkbenchInspectorTitle = document.getElementById("transportWorkbenchInspectorTitle");
+  const transportWorkbenchInspectorTabButtons = Array.from(document.querySelectorAll(".transport-workbench-inspector-tab"));
+  const transportWorkbenchInspectorPanels = Object.fromEntries(
+    TRANSPORT_WORKBENCH_INSPECTOR_TABS.map((tab) => [tab.id, document.getElementById(`transportWorkbenchInspectorPanel${tab.id.charAt(0).toUpperCase()}${tab.id.slice(1)}`)])
+  );
   const transportWorkbenchInspectorDetails = document.getElementById("transportWorkbenchInspectorDetails");
   const transportWorkbenchInspectorEmptyTitle = document.getElementById("transportWorkbenchInspectorEmptyTitle");
   const transportWorkbenchInspectorEmptyBody = document.getElementById("transportWorkbenchInspectorEmptyBody");
+  const transportWorkbenchDisplaySections = document.getElementById("transportWorkbenchDisplaySections");
+  const transportWorkbenchAggregationSections = document.getElementById("transportWorkbenchAggregationSections");
+  const transportWorkbenchLabelSections = document.getElementById("transportWorkbenchLabelSections");
+  const transportWorkbenchCoverageSections = document.getElementById("transportWorkbenchCoverageSections");
+  const transportWorkbenchDataSections = document.getElementById("transportWorkbenchDataSections");
   const transportWorkbenchFamilyTabs = Array.from(document.querySelectorAll(".transport-workbench-family-tab"));
   const paintGranularitySelect = document.getElementById("paintGranularitySelect");
   const dockGranularityField = document.getElementById("dockGranularityField");
@@ -1514,6 +1907,7 @@ function initToolbar({ render } = {}) {
   const activeSovereignLabel = document.getElementById("activeSovereignLabel");
   const recalculateBordersBtn = document.getElementById("recalculateBordersBtn");
   const dynamicBorderStatus = document.getElementById("dynamicBorderStatus");
+  const internalBorderAutoColor = document.getElementById("internalBorderAutoColor");
   const internalBorderColor = document.getElementById("internalBorderColor");
   const internalBorderOpacity = document.getElementById("internalBorderOpacity");
   const internalBorderWidth = document.getElementById("internalBorderWidth");
@@ -1521,6 +1915,7 @@ function initToolbar({ render } = {}) {
   const empireBorderWidth = document.getElementById("empireBorderWidth");
   const coastlineColor = document.getElementById("coastlineColor");
   const coastlineWidth = document.getElementById("coastlineWidth");
+  const parentBordersVisible = document.getElementById("parentBordersVisible");
   const parentBorderColor = document.getElementById("parentBorderColor");
   const parentBorderOpacity = document.getElementById("parentBorderOpacity");
   const parentBorderWidth = document.getElementById("parentBorderWidth");
@@ -1564,6 +1959,8 @@ function initToolbar({ render } = {}) {
   const parentBorderOpacityValue = document.getElementById("parentBorderOpacityValue");
   const parentBorderWidthValue = document.getElementById("parentBorderWidthValue");
   const urbanOpacityValue = document.getElementById("urbanOpacityValue");
+  const urbanAdaptiveStrengthValue = document.getElementById("urbanAdaptiveStrengthValue");
+  const urbanStrokeOpacityValue = document.getElementById("urbanStrokeOpacityValue");
   const urbanMinAreaValue = document.getElementById("urbanMinAreaValue");
   const cityPointsOpacityValue = document.getElementById("cityPointsOpacityValue");
   const cityPointsMarkerScaleValue = document.getElementById("cityPointsMarkerScaleValue");
@@ -1601,6 +1998,7 @@ function initToolbar({ render } = {}) {
   const dayNightCityLightsTextureOpacityValue = document.getElementById("dayNightCityLightsTextureOpacityValue");
   const dayNightCityLightsCorridorStrengthValue = document.getElementById("dayNightCityLightsCorridorStrengthValue");
   const dayNightCityLightsCoreSharpnessValue = document.getElementById("dayNightCityLightsCoreSharpnessValue");
+  const dayNightCityLightsPopulationBoostStrengthValue = document.getElementById("dayNightCityLightsPopulationBoostStrengthValue");
   const dayNightShadowOpacityValue = document.getElementById("dayNightShadowOpacityValue");
   const dayNightTwilightWidthValue = document.getElementById("dayNightTwilightWidthValue");
   const oceanTextureOpacityValue = document.getElementById("oceanTextureOpacityValue");
@@ -2018,6 +2416,44 @@ function initToolbar({ render } = {}) {
     return null;
   };
 
+  const getTransportWorkbenchDisplayConfig = (familyId, { baseline = false } = {}) => {
+    ensureTransportWorkbenchUiState();
+    if (!TRANSPORT_WORKBENCH_DENSITY_FAMILY_IDS.has(familyId)) {
+      return createDefaultTransportWorkbenchDisplayConfig(familyId);
+    }
+    if (baseline) {
+      return createDefaultTransportWorkbenchDisplayConfig(familyId);
+    }
+    return normalizeTransportWorkbenchDisplayConfig(
+      state.transportWorkbenchUi.displayConfigs?.[familyId],
+      familyId
+    );
+  };
+
+  const buildTransportWorkbenchResolvedConfig = (familyId, familyConfig, displayConfig) => {
+    if (!TRANSPORT_WORKBENCH_DENSITY_FAMILY_IDS.has(familyId)) {
+      return familyConfig;
+    }
+    const resolvedDisplayConfig = normalizeTransportWorkbenchDisplayConfig(displayConfig, familyId);
+    return {
+      ...(familyConfig || {}),
+      displayConfig: resolvedDisplayConfig,
+      displayMode: resolvedDisplayConfig.mode,
+      displayPreset: resolvedDisplayConfig.preset,
+      aggregationAlgorithm: resolvedDisplayConfig.aggregation.algorithm,
+      aggregationAutoSwitch: !!resolvedDisplayConfig.aggregation.autoSwitch,
+      aggregationCellSizePx: Number(resolvedDisplayConfig.aggregation.thresholds?.cellSizePx || 44),
+      aggregationClusterRadiusPx: Number(resolvedDisplayConfig.aggregation.thresholds?.clusterRadiusPx || 48),
+      labelBudget: Number(resolvedDisplayConfig.labels?.budget || 8),
+      labelSeparation: Number(resolvedDisplayConfig.labels?.separationStrength || 0.65),
+      labelLevel: mapTransportWorkbenchMaxLevelToLabelLevel(resolvedDisplayConfig.labels?.maxLevel),
+      labelAllowAggregation: !!resolvedDisplayConfig.labels?.allowAggregation,
+      dominantCategoryThreshold: Number(resolvedDisplayConfig.labels?.dominantCategoryThreshold || 0.62),
+      mixedCategoryMode: resolvedDisplayConfig.labels?.mixedCategoryMode || "summary",
+      coverageTier: resolvedDisplayConfig.coverage || "default",
+    };
+  };
+
   const formatTransportWorkbenchOptionLabels = (values, options) => {
     const labelByValue = new Map((options || []).map((option) => [option.value, option.label]));
     return (values || []).map((value) => labelByValue.get(value) || value).join(", ");
@@ -2142,6 +2578,22 @@ function initToolbar({ render } = {}) {
     markDirty("transport-workbench-config");
     const nextContext = getTransportWorkbenchRenderContext();
     renderTransportWorkbenchLensSections(nextContext.family, nextContext.config, nextContext.compareHeld);
+    renderTransportWorkbenchInspectorTabs(nextContext.family, nextContext.config, nextContext.compareHeld);
+    renderTransportWorkbenchInspector(nextContext.family, nextContext.config, nextContext.compareHeld);
+    refreshTransportWorkbenchPreview(nextContext, { allowCarrierPrep: false });
+  };
+
+  const updateTransportWorkbenchDisplayConfig = (familyId, updateFn) => {
+    ensureTransportWorkbenchUiState();
+    if (!TRANSPORT_WORKBENCH_DENSITY_FAMILY_IDS.has(familyId) || typeof updateFn !== "function") return;
+    const current = getTransportWorkbenchDisplayConfig(familyId);
+    const draft = JSON.parse(JSON.stringify(current));
+    updateFn(draft);
+    state.transportWorkbenchUi.displayConfigs[familyId] = normalizeTransportWorkbenchDisplayConfig(draft, familyId);
+    markDirty("transport-workbench-display-config");
+    const nextContext = getTransportWorkbenchRenderContext();
+    renderTransportWorkbenchLensSections(nextContext.family, nextContext.config, nextContext.compareHeld);
+    renderTransportWorkbenchInspectorTabs(nextContext.family, nextContext.config, nextContext.compareHeld);
     renderTransportWorkbenchInspector(nextContext.family, nextContext.config, nextContext.compareHeld);
     refreshTransportWorkbenchPreview(nextContext, { allowCarrierPrep: false });
   };
@@ -2226,25 +2678,47 @@ function initToolbar({ render } = {}) {
     }
     if (familyId === "port") {
       return [
+        ["Display mode", `${config.displayMode} / ${config.displayPreset}`],
+        ["Aggregation", config.aggregationAlgorithm],
+        ["Coverage tier", config.coverageTier || "core"],
         ["Legal designations", formatTransportWorkbenchOptionLabels(config.legalDesignations, PORT_DESIGNATION_OPTIONS)],
         ["Manager types", formatTransportWorkbenchOptionLabels(config.managerTypes, PORT_MANAGER_TYPE_OPTIONS)],
-        ["Importance", config.importanceThreshold],
-        ["Labels", config.showLabels ? "Enabled" : "Hidden"],
+        ["Labels", config.showLabels ? `Enabled (${config.labelLevel}, budget ${config.labelBudget})` : "Hidden"],
+      ];
+    }
+    if (familyId === "mineral_resources") {
+      return [
+        ["Display mode", `${config.displayMode} / ${config.displayPreset}`],
+        ["Aggregation", config.aggregationAlgorithm],
+        ["Labels", config.showLabels ? `Enabled (${config.labelLevel}, budget ${config.labelBudget})` : "Hidden"],
+        ["Point size", `${config.pointSize}%`],
+      ];
+    }
+    if (familyId === "energy_facilities") {
+      return [
+        ["Display mode", `${config.displayMode} / ${config.displayPreset}`],
+        ["Aggregation", config.aggregationAlgorithm],
+        ["Statuses", formatTransportWorkbenchOptionLabels(config.statuses, ENERGY_STATUS_OPTIONS)],
+        ["Labels", config.showLabels ? `Enabled (${config.labelLevel}, budget ${config.labelBudget})` : "Hidden"],
       ];
     }
     if (familyId === "industrial_zones") {
       return [
+        ["Display mode", `${config.displayMode} / ${config.displayPreset}`],
+        ["Aggregation", config.aggregationAlgorithm],
         ["Source track", normalizeTransportWorkbenchEnum(config.variant, INDUSTRIAL_VARIANT_OPTIONS.map((option) => option.value), "internal")],
         ["Land type", formatTransportWorkbenchOptionLabels(config.siteClasses, INDUSTRIAL_SITE_CLASS_OPTIONS)],
         ["Location context", String(config.variant || "internal") === "internal" ? formatTransportWorkbenchOptionLabels(config.coastalModes, INDUSTRIAL_COASTAL_OPTIONS) : "Not used on open track"],
-        ["Labels", config.showLabels ? "Enabled" : "Hidden"],
+        ["Labels", config.showLabels ? `Enabled (${config.labelLevel}, budget ${config.labelBudget})` : "Hidden"],
       ];
     }
     if (familyId === "logistics_hubs") {
       return [
+        ["Display mode", `${config.displayMode} / ${config.displayPreset}`],
+        ["Aggregation", config.aggregationAlgorithm],
         ["Hub category", formatTransportWorkbenchOptionLabels(config.hubTypes, LOGISTICS_HUB_TYPE_OPTIONS)],
         ["Operator type", formatTransportWorkbenchOptionLabels(config.operatorClassifications, LOGISTICS_OPERATOR_CLASSIFICATION_OPTIONS)],
-        ["Labels", config.showLabels ? "Enabled" : "Hidden"],
+        ["Labels", config.showLabels ? `Enabled (${config.labelLevel}, budget ${config.labelBudget})` : "Hidden"],
         ["Point size", `${config.pointSize}%`],
       ];
     }
@@ -2486,6 +2960,385 @@ function initToolbar({ render } = {}) {
     return field;
   };
 
+  const createTransportWorkbenchSectionNode = (family, section, config, compareHeld) => {
+    const visibleControls = (section.controls || []).filter((control) => (
+      typeof control.showWhen !== "function" || control.showWhen(config)
+    ));
+    if (section.kind !== "diagnostics" && visibleControls.length === 0) {
+      return null;
+    }
+    const details = document.createElement("details");
+    details.className = "transport-workbench-section";
+    details.open = !!state.transportWorkbenchUi.sectionOpen?.[family.id]?.[section.key];
+    details.addEventListener("toggle", () => {
+      toggleTransportWorkbenchSection(family.id, section.key, details.open);
+    });
+    const summary = document.createElement("summary");
+    summary.className = "transport-workbench-section-summary";
+    const heading = document.createElement("div");
+    heading.className = "transport-workbench-section-heading";
+    const title = document.createElement("div");
+    title.className = "transport-workbench-section-title";
+    title.textContent = section.title;
+    const actions = document.createElement("div");
+    actions.className = "transport-workbench-section-actions";
+    const helpButton = createTransportWorkbenchSectionHelpButton(family.id, section);
+    if (helpButton) {
+      actions.appendChild(helpButton);
+    }
+    const chevron = document.createElement("span");
+    chevron.className = "transport-workbench-section-chevron";
+    chevron.setAttribute("aria-hidden", "true");
+    chevron.textContent = "▾";
+    actions.appendChild(chevron);
+    heading.appendChild(title);
+    summary.appendChild(heading);
+    summary.appendChild(actions);
+    details.appendChild(summary);
+    const body = section.kind === "diagnostics"
+      ? renderTransportWorkbenchDiagnosticsBody(family.id, config)
+      : document.createElement("div");
+    if (section.kind !== "diagnostics") {
+      body.className = "transport-workbench-section-body";
+      if (section.description) {
+        const description = document.createElement("p");
+        description.className = "transport-workbench-section-description";
+        description.textContent = section.description;
+        body.appendChild(description);
+      }
+      visibleControls.forEach((control) => {
+        body.appendChild(renderTransportWorkbenchControl(family.id, control, config, compareHeld));
+      });
+    } else if (section.description) {
+      const description = document.createElement("p");
+      description.className = "transport-workbench-section-description transport-workbench-section-description-diagnostics";
+      description.textContent = section.description;
+      body.prepend(description);
+    }
+    details.appendChild(body);
+    return details;
+  };
+
+  const createTransportWorkbenchShellCard = (family, tabId, config) => {
+    if (!TRANSPORT_WORKBENCH_DENSITY_FAMILY_IDS.has(family.id)) {
+      return null;
+    }
+    const displayConfig = getTransportWorkbenchDisplayConfig(family.id);
+    const card = document.createElement("div");
+    card.className = "transport-workbench-note-card transport-workbench-note-card-soft transport-workbench-shell-card";
+    const heading = document.createElement("div");
+    heading.className = "transport-workbench-shell-heading";
+    const title = document.createElement("div");
+    title.className = "transport-workbench-note-title";
+    title.textContent = tabId === "display"
+      ? "Workbench mode shell"
+      : tabId === "aggregation"
+        ? "Aggregation shell"
+        : tabId === "labels"
+          ? "Label shell"
+          : "Coverage shell";
+    const kicker = document.createElement("span");
+    kicker.className = "transport-workbench-shell-kicker";
+    kicker.textContent = "Live config";
+    heading.append(title, kicker);
+    card.appendChild(heading);
+    const grid = document.createElement("div");
+    grid.className = "transport-workbench-shell-grid";
+    const addShellSelect = (labelText, value, options, onChange, mountTarget = grid) => {
+      const control = document.createElement("div");
+      control.className = "transport-workbench-shell-control";
+      const label = document.createElement("div");
+      label.className = "transport-workbench-shell-label";
+      label.textContent = labelText;
+      const select = document.createElement("select");
+      select.className = "select-input transport-workbench-select";
+      options.forEach((option) => {
+        const optionNode = document.createElement("option");
+        optionNode.value = option.value;
+        optionNode.textContent = option.label;
+        optionNode.selected = option.value === value;
+        select.appendChild(optionNode);
+      });
+      select.addEventListener("change", () => onChange(select.value));
+      control.append(label, select);
+      mountTarget.appendChild(control);
+    };
+    const addShellRange = (labelText, value, min, max, step, unit, onChange, mountTarget = grid) => {
+      const control = document.createElement("div");
+      control.className = "transport-workbench-shell-control";
+      const label = document.createElement("div");
+      label.className = "transport-workbench-shell-label";
+      label.textContent = labelText;
+      const row = document.createElement("div");
+      row.className = "transport-workbench-range-row";
+      const input = document.createElement("input");
+      input.type = "range";
+      input.className = "transport-workbench-range";
+      input.min = String(min);
+      input.max = String(max);
+      input.step = String(step);
+      input.value = String(value);
+      const valueNode = document.createElement("span");
+      valueNode.className = "transport-workbench-range-value";
+      valueNode.textContent = `${value}${unit}`;
+      input.addEventListener("input", () => {
+        valueNode.textContent = `${input.value}${unit}`;
+      });
+      input.addEventListener("change", () => onChange(Number(input.value)));
+      row.append(input, valueNode);
+      control.append(label, row);
+      mountTarget.appendChild(control);
+    };
+    const addShellToggle = (labelText, checked, onChange, mountTarget = grid) => {
+      const control = document.createElement("div");
+      control.className = "transport-workbench-shell-control";
+      const label = document.createElement("div");
+      label.className = "transport-workbench-shell-label";
+      label.textContent = labelText;
+      const toggle = document.createElement("label");
+      toggle.className = "transport-workbench-toggle";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = !!checked;
+      const text = document.createElement("span");
+      text.textContent = input.checked ? "Enabled" : "Disabled";
+      input.addEventListener("change", () => {
+        text.textContent = input.checked ? "Enabled" : "Disabled";
+        onChange(input.checked);
+      });
+      toggle.append(input, text);
+      control.append(label, toggle);
+      mountTarget.appendChild(control);
+    };
+    if (tabId === "display") {
+      addShellSelect("Mode", displayConfig.mode, [
+        { value: "inspect", label: "Inspect" },
+        { value: "aggregate", label: "Aggregate" },
+        { value: "density", label: "Density" },
+      ], (nextValue) => updateTransportWorkbenchDisplayConfig(family.id, (draft) => {
+        draft.mode = nextValue;
+      }));
+      addShellSelect("Preset", displayConfig.preset, [
+        { value: "review_first", label: "Review first" },
+        { value: "balanced", label: "Balanced" },
+        { value: "pattern_first", label: "Pattern first" },
+        { value: "extreme_density", label: "Extreme density" },
+      ], (nextValue) => updateTransportWorkbenchDisplayConfig(family.id, (draft) => {
+        draft.preset = nextValue;
+      }));
+    } else if (tabId === "aggregation") {
+      const algorithmOptions = family.id === "mineral_resources"
+        ? [
+          { value: "hex", label: "Hex grid" },
+          { value: "square", label: "Square grid" },
+          { value: "density_surface", label: "Density surface" },
+        ]
+        : family.id === "industrial_zones"
+          ? [
+            { value: "square", label: "Square grid" },
+            { value: "density_surface", label: "Density surface" },
+          ]
+          : [
+            { value: "cluster", label: "Cluster" },
+            { value: "square", label: "Grid" },
+            { value: "density_surface", label: "Density surface" },
+          ];
+      addShellSelect("Algorithm", displayConfig.aggregation.algorithm, algorithmOptions, (nextValue) => {
+        updateTransportWorkbenchDisplayConfig(family.id, (draft) => {
+          draft.aggregation.algorithm = nextValue;
+        });
+      });
+      addShellRange(
+        "Cell size",
+        Number(displayConfig.aggregation.thresholds?.cellSizePx || config?.aggregationCellSizePx || 44),
+        24,
+        96,
+        2,
+        "px",
+        (nextValue) => updateTransportWorkbenchDisplayConfig(family.id, (draft) => {
+          draft.aggregation.thresholds.cellSizePx = nextValue;
+        })
+      );
+    } else if (tabId === "labels") {
+      addShellSelect("Geographic level", mapTransportWorkbenchMaxLevelToLabelLevel(displayConfig.labels.maxLevel), [
+        { value: "region", label: "Level 1 region" },
+        { value: "anchor", label: "Level 2 anchor" },
+        { value: "category", label: "Level 3 category" },
+      ], (nextValue) => updateTransportWorkbenchDisplayConfig(family.id, (draft) => {
+        draft.labels.maxLevel = mapTransportWorkbenchLabelLevelToMaxLevel(nextValue);
+      }));
+      addShellRange(
+        "Label budget",
+        Number(displayConfig.labels.budget || config?.labelBudget || 8),
+        3,
+        18,
+        1,
+        "",
+        (nextValue) => updateTransportWorkbenchDisplayConfig(family.id, (draft) => {
+          draft.labels.budget = nextValue;
+        })
+      );
+      addShellToggle("Allow label aggregation", !!displayConfig.labels.allowAggregation, (nextValue) => {
+        updateTransportWorkbenchDisplayConfig(family.id, (draft) => {
+          draft.labels.allowAggregation = nextValue;
+        });
+      });
+    } else if (tabId === "coverage") {
+      if (family.id === "port") {
+        addShellSelect("Coverage tier", displayConfig.coverage || "core", [
+          { value: "core", label: "Core" },
+          { value: "expanded", label: "Expanded" },
+          { value: "full_official", label: "Full official" },
+        ], (nextValue) => updateTransportWorkbenchDisplayConfig(family.id, (draft) => {
+          draft.coverage = nextValue;
+        }));
+      }
+    }
+    const note = document.createElement("p");
+    note.className = "transport-workbench-shell-note";
+    note.textContent = tabId === "data"
+      ? "Audit and manifest stay read-only here so tuning and source truth do not get mixed."
+      : "The control deck now binds the new display schema on the right side while the left column stays contextual.";
+    card.append(grid, note);
+    return card;
+  };
+
+  const getTransportWorkbenchSectionsForTab = (familyId, tabId) => {
+    const sectionMap = TRANSPORT_WORKBENCH_TAB_SECTION_MAP[familyId] || {};
+    const allowedSectionKeys = new Set(sectionMap[tabId] || []);
+    return (TRANSPORT_WORKBENCH_CONTROL_SCHEMAS[familyId] || []).filter((section) => allowedSectionKeys.has(section.key));
+  };
+
+  const renderTransportWorkbenchTabSections = (family, config, compareHeld, tabId, mountNode) => {
+    if (!(mountNode instanceof HTMLElement)) return;
+    const displayConfig = getTransportWorkbenchDisplayConfig(family.id);
+    const appendShellRange = (labelText, value, min, max, step, unit, onChange, mountTarget) => {
+      const control = document.createElement("div");
+      control.className = "transport-workbench-shell-control";
+      const label = document.createElement("div");
+      label.className = "transport-workbench-shell-label";
+      label.textContent = labelText;
+      const row = document.createElement("div");
+      row.className = "transport-workbench-range-row";
+      const input = document.createElement("input");
+      input.type = "range";
+      input.className = "transport-workbench-range";
+      input.min = String(min);
+      input.max = String(max);
+      input.step = String(step);
+      input.value = String(value);
+      const valueText = document.createElement("span");
+      valueText.className = "transport-workbench-range-value";
+      const formatValue = (nextValue) => `${nextValue}${unit || ""}`;
+      valueText.textContent = formatValue(value);
+      input.addEventListener("input", () => {
+        const nextValue = Number(input.value);
+        valueText.textContent = formatValue(nextValue);
+        onChange(nextValue);
+      });
+      row.append(input, valueText);
+      control.append(label, row);
+      mountTarget.appendChild(control);
+    };
+    mountNode.replaceChildren();
+    const shellCard = createTransportWorkbenchShellCard(family, tabId, config);
+    if (shellCard) {
+      mountNode.appendChild(shellCard);
+    }
+    const skipDefaultSections = TRANSPORT_WORKBENCH_DENSITY_FAMILY_IDS.has(family.id)
+      && (tabId === "aggregation" || tabId === "labels");
+    if (!skipDefaultSections) {
+      getTransportWorkbenchSectionsForTab(family.id, tabId).forEach((section) => {
+        const node = createTransportWorkbenchSectionNode(family, section, config, compareHeld);
+        if (node) {
+          mountNode.appendChild(node);
+        }
+      });
+    }
+    if (tabId === "aggregation" || tabId === "labels") {
+      const advanced = document.createElement("details");
+      advanced.className = "transport-workbench-advanced";
+      const summary = document.createElement("summary");
+      summary.textContent = "Advanced";
+      advanced.appendChild(summary);
+      const body = document.createElement("div");
+      body.className = "transport-workbench-section-body transport-workbench-section-body-advanced";
+      const copy = document.createElement("p");
+      copy.className = "transport-workbench-section-description";
+      copy.textContent = tabId === "aggregation"
+        ? "这里预留给动态阈值、单元尺寸、极密触发等精调项，默认先收起。"
+        : "这里预留给标签预算、分离强度、降级规则和标签聚合阈值，默认先收起。";
+      copy.textContent = tabId === "aggregation"
+        ? "这里预留给动态阈值、单元尺寸、极密触发等精调项，默认先收起。"
+        : "这里预留给标签预算、分离强度、降级规则和标签聚合阈值，默认先收起。";
+      if (tabId === "aggregation") {
+        appendShellRange(
+          "Cluster radius",
+          Number(displayConfig.aggregation.thresholds?.clusterRadiusPx || config?.aggregationClusterRadiusPx || 48),
+          24,
+          120,
+          2,
+          "px",
+          (nextValue) => updateTransportWorkbenchDisplayConfig(family.id, (draft) => {
+            draft.aggregation.thresholds.clusterRadiusPx = nextValue;
+          }),
+          body
+        );
+      } else {
+        appendShellRange(
+          "Label separation",
+          Number(displayConfig.labels.separationStrength || config?.labelSeparation || 1),
+          0.7,
+          1.8,
+          0.05,
+          "",
+          (nextValue) => updateTransportWorkbenchDisplayConfig(family.id, (draft) => {
+            draft.labels.separationStrength = nextValue;
+          }),
+          body
+        );
+      }
+      body.appendChild(copy);
+      advanced.appendChild(body);
+      mountNode.appendChild(advanced);
+    }
+    if (mountNode.childElementCount === 0) {
+      const empty = document.createElement("div");
+      empty.className = "transport-workbench-empty-card";
+      const title = document.createElement("div");
+      title.className = "transport-workbench-empty-title";
+      title.textContent = tabId === "data" ? "No audit payload yet" : "No controls in this tab";
+      const body = document.createElement("p");
+      body.className = "transport-workbench-empty-text";
+      body.textContent = tabId === "data"
+        ? "This family has not exposed extra manifest or audit cards in the current shell."
+        : "This tab is reserved so the right-side deck keeps one stable structure across families.";
+      empty.append(title, body);
+      mountNode.appendChild(empty);
+    }
+  };
+
+  const renderTransportWorkbenchInspectorTabs = (family, config, compareHeld) => {
+    ensureTransportWorkbenchUiState();
+    const activeTab = normalizeTransportWorkbenchInspectorTab(state.transportWorkbenchUi.activeInspectorTab);
+    state.transportWorkbenchUi.activeInspectorTab = activeTab;
+    transportWorkbenchInspectorTabButtons.forEach((button) => {
+      const isActive = String(button.dataset.transportInspectorTab || "") === activeTab;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
+    Object.entries(transportWorkbenchInspectorPanels).forEach(([tabId, panel]) => {
+      if (!(panel instanceof HTMLElement)) return;
+      panel.classList.toggle("hidden", tabId !== activeTab);
+      panel.classList.toggle("is-active", tabId === activeTab);
+    });
+    renderTransportWorkbenchTabSections(family, config, compareHeld, "display", transportWorkbenchDisplaySections);
+    renderTransportWorkbenchTabSections(family, config, compareHeld, "aggregation", transportWorkbenchAggregationSections);
+    renderTransportWorkbenchTabSections(family, config, compareHeld, "labels", transportWorkbenchLabelSections);
+    renderTransportWorkbenchTabSections(family, config, compareHeld, "coverage", transportWorkbenchCoverageSections);
+    renderTransportWorkbenchTabSections(family, config, compareHeld, "data", transportWorkbenchDataSections);
+  };
+
   const renderTransportWorkbenchLensSections = (family, config, compareHeld) => {
     if (!transportWorkbenchLensSections) return;
     closeTransportWorkbenchSectionHelpPopover({ restoreFocus: false });
@@ -2498,84 +3351,36 @@ function initToolbar({ render } = {}) {
       title.textContent = "Future draw stack";
       const body = document.createElement("p");
       body.className = "transport-workbench-empty-text";
-      body.textContent = "Use the center board to sort the seven transport families. This side stays intentionally light so the middle frame remains the working surface.";
+      body.textContent = "Use the center board to sort the seven transport families. Left stays as context only, while the right deck owns all tuning.";
       card.append(title, body);
       transportWorkbenchLensSections.appendChild(card);
       return;
     }
-    if (!family.supportsDetailedControls) {
-      const card = document.createElement("div");
-      card.className = "transport-workbench-empty-card";
-      const title = document.createElement("div");
-      title.className = "transport-workbench-empty-title";
-      title.textContent = t("Family controls not exposed yet", "ui");
-      const body = document.createElement("p");
-      body.className = "transport-workbench-empty-text";
-      body.textContent = t("This family can already load real data, but it does not expose tuning controls yet. Use the preview and inspector to verify the live pack contract.", "ui");
-      card.appendChild(title);
-      card.appendChild(body);
-      transportWorkbenchLensSections.appendChild(card);
-      return;
-    }
-    const sections = TRANSPORT_WORKBENCH_CONTROL_SCHEMAS[family.id] || [];
-    sections.forEach((section) => {
-      const visibleControls = (section.controls || []).filter((control) => (
-        typeof control.showWhen !== "function" || control.showWhen(config)
-      ));
-      if (section.kind !== "diagnostics" && visibleControls.length === 0) {
-        return;
-      }
-      const details = document.createElement("details");
-      details.className = "transport-workbench-section";
-      details.open = !!state.transportWorkbenchUi.sectionOpen?.[family.id]?.[section.key];
-      details.addEventListener("toggle", () => {
-        toggleTransportWorkbenchSection(family.id, section.key, details.open);
-      });
-      const summary = document.createElement("summary");
-      summary.className = "transport-workbench-section-summary";
-      const heading = document.createElement("div");
-      heading.className = "transport-workbench-section-heading";
-      const title = document.createElement("div");
-      title.className = "transport-workbench-section-title";
-      title.textContent = section.title;
-      const actions = document.createElement("div");
-      actions.className = "transport-workbench-section-actions";
-      const helpButton = createTransportWorkbenchSectionHelpButton(family.id, section);
-      if (helpButton) {
-        actions.appendChild(helpButton);
-      }
-      const chevron = document.createElement("span");
-      chevron.className = "transport-workbench-section-chevron";
-      chevron.setAttribute("aria-hidden", "true");
-      chevron.textContent = "▾";
-      actions.appendChild(chevron);
-      heading.appendChild(title);
-      summary.appendChild(heading);
-      summary.appendChild(actions);
-      details.appendChild(summary);
-      const body = section.kind === "diagnostics"
-        ? renderTransportWorkbenchDiagnosticsBody(family.id, config)
-        : document.createElement("div");
-      if (section.kind !== "diagnostics") {
-        body.className = "transport-workbench-section-body";
-        if (section.description) {
-          const description = document.createElement("p");
-          description.className = "transport-workbench-section-description";
-          description.textContent = section.description;
-          body.appendChild(description);
-        }
-        visibleControls.forEach((control) => {
-          body.appendChild(renderTransportWorkbenchControl(family.id, control, config, compareHeld));
-        });
-      } else if (section.description) {
-        const description = document.createElement("p");
-        description.className = "transport-workbench-section-description transport-workbench-section-description-diagnostics";
-        description.textContent = section.description;
-        body.prepend(description);
-      }
-      details.appendChild(body);
-      transportWorkbenchLensSections.appendChild(details);
-    });
+    const previewSnapshot = getTransportWorkbenchFamilyPreviewSnapshot(family.id, config);
+    const dataContract = getTransportWorkbenchDataContract(family.id);
+    const overview = document.createElement("div");
+    overview.className = "transport-workbench-note-card transport-workbench-note-card-emphasis";
+    const overviewTitle = document.createElement("div");
+    overviewTitle.className = "transport-workbench-note-title";
+    overviewTitle.textContent = "Review focus";
+    const overviewBody = document.createElement("p");
+    overviewBody.className = "transport-workbench-note-text";
+    overviewBody.textContent = `${family.lensBody} ${family.lensNext}`;
+    overview.append(overviewTitle, overviewBody);
+    transportWorkbenchLensSections.appendChild(overview);
+    const summaryCard = document.createElement("div");
+    summaryCard.className = "transport-workbench-note-card transport-workbench-note-card-soft transport-workbench-lens-summary";
+    const summaryTitle = document.createElement("div");
+    summaryTitle.className = "transport-workbench-note-title";
+    summaryTitle.textContent = "Current context";
+    summaryCard.appendChild(summaryTitle);
+    summaryCard.appendChild(createTransportWorkbenchInspectorRow("Preview", family.previewTitle || family.label));
+    summaryCard.appendChild(createTransportWorkbenchInspectorRow("Data packs", Array.isArray(dataContract?.packs) && dataContract.packs.length ? dataContract.packs.join(", ") : "Deferred"));
+    summaryCard.appendChild(createTransportWorkbenchInspectorRow("Geometry", dataContract?.geometryKind || "reserved"));
+    summaryCard.appendChild(createTransportWorkbenchInspectorRow("Pack status", previewSnapshot?.status || "pending"));
+    summaryCard.appendChild(createTransportWorkbenchInspectorRow("Right deck", "Display / Aggregation / Labels / Coverage / Data"));
+    summaryCard.appendChild(createTransportWorkbenchInspectorRow("Compare", compareHeld ? "Holding baseline" : "Working state"));
+    transportWorkbenchLensSections.appendChild(summaryCard);
   };
 
   const renderTransportWorkbenchInspector = (family, config, compareHeld) => {
@@ -2746,6 +3551,7 @@ function initToolbar({ render } = {}) {
           ["Loaded ports", String(previewSnapshot.stats?.totalFeatures || 0)],
           ["Visible ports", String(previewSnapshot.stats?.visibleFeatures || 0)],
           ["Visible labels", String(previewSnapshot.stats?.visibleLabels || 0)],
+          ["Coverage tier", previewSnapshot.activeVariant || config.coverageTier || previewSnapshot.manifest?.default_coverage_tier || "core"],
           ["Legal designations", formatTransportWorkbenchOptionLabels(config.legalDesignations, PORT_DESIGNATION_OPTIONS)],
           ["Manager types", formatTransportWorkbenchOptionLabels(config.managerTypes, PORT_MANAGER_TYPE_OPTIONS)],
           ["Pack mode", previewSnapshot.packMode || "preview"],
@@ -2770,6 +3576,7 @@ function initToolbar({ render } = {}) {
         ];
       } else if (family.id === "port") {
         rows = [
+          ["Coverage tier", config.coverageTier || "core"],
           ["Legal designations", formatTransportWorkbenchOptionLabels(config.legalDesignations, PORT_DESIGNATION_OPTIONS)],
           ["Manager types", formatTransportWorkbenchOptionLabels(config.managerTypes, PORT_MANAGER_TYPE_OPTIONS)],
           ["Labels", config.showLabels ? "Enabled" : "Hidden"],
@@ -3064,6 +3871,7 @@ function initToolbar({ render } = {}) {
         inspectorEmptyCard.classList.toggle("hidden", transportWorkbenchInspectorDetails.childElementCount > 0);
       }
     }
+    renderTransportWorkbenchInspectorTabs(family, config, compareHeld);
   };
 
   const syncTransportWorkbenchPreviewControls = () => {
@@ -3106,12 +3914,15 @@ function initToolbar({ render } = {}) {
     const family = getTransportWorkbenchFamilyMeta();
     const isOpen = !!uiState.open;
     const compareHeld = !!uiState.compareHeld && !!family.supportsDetailedControls;
-    const config = getTransportWorkbenchWorkingConfig(family.id, { baseline: compareHeld });
+    const familyConfig = getTransportWorkbenchWorkingConfig(family.id, { baseline: compareHeld });
+    const displayConfig = getTransportWorkbenchDisplayConfig(family.id, { baseline: compareHeld });
+    const config = buildTransportWorkbenchResolvedConfig(family.id, familyConfig, displayConfig);
     return {
       uiState,
       family,
       isOpen,
       compareHeld,
+      displayConfig,
       config,
     };
   };
@@ -3176,9 +3987,11 @@ function initToolbar({ render } = {}) {
     transportWorkbenchCountryStatus.textContent = uiState.sampleCountry;
     transportWorkbenchPreviewMode.textContent = family.id === "layers"
       ? "Drag to reorder"
-      : uiState.previewMode === "bounded_zoom_pan"
-        ? t("Zoom / pan / quarter-turn", "ui")
-        : uiState.previewMode;
+      : TRANSPORT_WORKBENCH_DENSITY_FAMILY_IDS.has(family.id)
+        ? `${String(context.config?.displayMode || "inspect").replace(/_/g, " ")} / ${String(context.config?.displayPreset || "balanced").replace(/_/g, " ")}`
+        : uiState.previewMode === "bounded_zoom_pan"
+          ? t("Zoom / pan / quarter-turn", "ui")
+          : uiState.previewMode;
     transportWorkbenchPreviewTitle.textContent = family.id === "layers"
       ? family.previewTitle
       : t("Japan preview", "ui");
@@ -3200,7 +4013,7 @@ function initToolbar({ render } = {}) {
     if (transportWorkbenchInfoPopover && !transportWorkbenchInfoPopover.classList.contains("hidden")) {
       renderTransportWorkbenchInfoContent(family);
     }
-    transportWorkbenchInspectorTitle.textContent = t(family.inspectorTitle, "ui");
+    transportWorkbenchInspectorTitle.textContent = `${t(family.label, "ui")} control deck`;
     transportWorkbenchInspectorEmptyTitle.textContent = t(family.inspectorEmptyTitle, "ui");
     transportWorkbenchInspectorEmptyBody.textContent = t(family.inspectorEmptyBody, "ui");
     transportWorkbenchPreviewCanvas?.classList.toggle("is-layer-order-mode", family.id === "layers");
@@ -3215,6 +4028,7 @@ function initToolbar({ render } = {}) {
       button.classList.toggle("is-active", isActive);
       button.setAttribute("aria-selected", isActive ? "true" : "false");
     });
+    renderTransportWorkbenchInspectorTabs(family, context.config || uiState.familyConfigs?.[family.id] || {}, compareHeld);
     if (transportWorkbenchApplyBtn) {
       transportWorkbenchApplyBtn.disabled = true;
       transportWorkbenchApplyBtn.setAttribute("aria-disabled", "true");
@@ -4162,6 +4976,14 @@ function initToolbar({ render } = {}) {
     return state.styleConfig.cityPoints;
   };
 
+  const syncUrbanConfig = () => {
+    state.styleConfig.urban = normalizeUrbanStyleConfig(state.styleConfig.urban);
+    if (state.styleConfig.urban.mode === "manual") {
+      state.styleConfig.urban.color = normalizeOceanFillColor(state.styleConfig.urban.color || "#4b5563");
+    }
+    return state.styleConfig.urban;
+  };
+
   const syncPhysicalConfig = () => {
     state.styleConfig.physical = normalizePhysicalStyleConfig(state.styleConfig.physical);
     state.styleConfig.physical.contourColor = normalizeOceanFillColor(
@@ -4173,6 +4995,31 @@ function initToolbar({ render } = {}) {
   const syncDayNightConfig = () => {
     state.styleConfig.dayNight = normalizeDayNightStyleConfig(state.styleConfig.dayNight);
     return state.styleConfig.dayNight;
+  };
+
+  const syncUrbanControls = () => {
+    const urbanConfig = syncUrbanConfig();
+    const isManual = urbanConfig.mode === "manual";
+    if (urbanMode) urbanMode.value = urbanConfig.mode;
+    if (lblUrbanOpacity) lblUrbanOpacity.textContent = isManual ? "Opacity" : "Fill Opacity";
+    if (urbanAdaptiveControls) urbanAdaptiveControls.classList.toggle("hidden", isManual);
+    if (urbanManualControls) urbanManualControls.classList.toggle("hidden", !isManual);
+    if (urbanColor) urbanColor.value = urbanConfig.color;
+    if (urbanOpacity) urbanOpacity.value = String(Math.round(urbanConfig.fillOpacity * 100));
+    if (urbanOpacityValue) urbanOpacityValue.textContent = `${Math.round(urbanConfig.fillOpacity * 100)}%`;
+    if (urbanBlendMode) urbanBlendMode.value = urbanConfig.blendMode;
+    if (urbanAdaptiveStrength) urbanAdaptiveStrength.value = String(Math.round(urbanConfig.adaptiveStrength * 100));
+    if (urbanAdaptiveStrengthValue) {
+      urbanAdaptiveStrengthValue.textContent = `${Math.round(urbanConfig.adaptiveStrength * 100)}%`;
+    }
+    if (urbanStrokeOpacity) urbanStrokeOpacity.value = String(Math.round(urbanConfig.strokeOpacity * 100));
+    if (urbanStrokeOpacityValue) {
+      urbanStrokeOpacityValue.textContent = `${Math.round(urbanConfig.strokeOpacity * 100)}%`;
+    }
+    if (urbanDarkCountryBoost) urbanDarkCountryBoost.checked = !!urbanConfig.darkCountryBoost;
+    if (urbanMinArea) urbanMinArea.value = String(Math.round(urbanConfig.minAreaPx));
+    if (urbanMinAreaValue) urbanMinAreaValue.textContent = `${Math.round(urbanConfig.minAreaPx)}`;
+    return urbanConfig;
   };
 
   const formatUtcMinutes = (rawValue) => {
@@ -4298,6 +5145,21 @@ function initToolbar({ render } = {}) {
     updateTextureValueLabel(
       dayNightCityLightsCoreSharpnessValue,
       `${Math.round(dayNight.cityLightsCoreSharpness * 100)}%`
+    );
+    if (dayNightCityLightsPopulationBoostEnabled) {
+      dayNightCityLightsPopulationBoostEnabled.checked = !!dayNight.cityLightsPopulationBoostEnabled;
+      dayNightCityLightsPopulationBoostEnabled.disabled = !modernLightsControlsEnabled;
+    }
+    const populationBoostControlsEnabled = modernLightsControlsEnabled && !!dayNight.cityLightsPopulationBoostEnabled;
+    if (dayNightCityLightsPopulationBoostStrength) {
+      dayNightCityLightsPopulationBoostStrength.value = String(
+        Math.round(dayNight.cityLightsPopulationBoostStrength * 100)
+      );
+      dayNightCityLightsPopulationBoostStrength.disabled = !populationBoostControlsEnabled;
+    }
+    updateTextureValueLabel(
+      dayNightCityLightsPopulationBoostStrengthValue,
+      `${Math.round(dayNight.cityLightsPopulationBoostStrength * 100)}%`
     );
 
     if (dayNightShadowOpacity) {
@@ -4520,6 +5382,10 @@ function initToolbar({ render } = {}) {
     state.styleConfig.internalBorders = {};
   }
   state.styleConfig.internalBorders.color = normalizeOceanFillColor(state.styleConfig.internalBorders.color || "#cccccc");
+  state.styleConfig.internalBorders.colorMode =
+    String(state.styleConfig.internalBorders.colorMode || "auto").trim().toLowerCase() === "manual"
+      ? "manual"
+      : "auto";
   state.styleConfig.internalBorders.opacity = clamp(
     Number.isFinite(Number(state.styleConfig.internalBorders.opacity))
       ? Number(state.styleConfig.internalBorders.opacity)
@@ -4579,21 +5445,8 @@ function initToolbar({ render } = {}) {
   if (!state.parentBorderEnabledByCountry || typeof state.parentBorderEnabledByCountry !== "object") {
     state.parentBorderEnabledByCountry = {};
   }
-  if (!state.styleConfig.urban || typeof state.styleConfig.urban !== "object") {
-    state.styleConfig.urban = {};
-  }
-  state.styleConfig.urban.color = normalizeOceanFillColor(state.styleConfig.urban.color || "#4b5563");
-  state.styleConfig.urban.opacity = clamp(
-    Number.isFinite(Number(state.styleConfig.urban.opacity)) ? Number(state.styleConfig.urban.opacity) : 0.4,
-    0,
-    1
-  );
-  state.styleConfig.urban.blendMode = String(state.styleConfig.urban.blendMode || "multiply");
-  state.styleConfig.urban.minAreaPx = clamp(
-    Number.isFinite(Number(state.styleConfig.urban.minAreaPx)) ? Number(state.styleConfig.urban.minAreaPx) : 8,
-    0,
-    80
-  );
+  state.parentBordersVisible = state.parentBordersVisible !== false;
+  syncUrbanConfig();
 
   state.styleConfig.physical = normalizePhysicalStyleConfig(state.styleConfig.physical);
   state.styleConfig.physical.contourColor = normalizeOceanFillColor(
@@ -5178,9 +6031,26 @@ function initToolbar({ render } = {}) {
     state.parentBorderEnabledByCountry = next;
   }
 
+  function syncParentBorderVisibilityUI() {
+    const enabled = state.parentBordersVisible !== false;
+    if (parentBordersVisible) {
+      parentBordersVisible.checked = enabled;
+    }
+    if (parentBorderColor) parentBorderColor.disabled = !enabled;
+    if (parentBorderOpacity) parentBorderOpacity.disabled = !enabled;
+    if (parentBorderWidth) parentBorderWidth.disabled = !enabled;
+    if (parentBorderEnableAll) parentBorderEnableAll.disabled = !enabled;
+    if (parentBorderDisableAll) parentBorderDisableAll.disabled = !enabled;
+    if (parentBorderCountryList) {
+      parentBorderCountryList.classList.toggle("opacity-60", !enabled);
+      parentBorderCountryList.classList.toggle("pointer-events-none", !enabled);
+    }
+  }
+
   function renderParentBorderCountryList() {
     if (!parentBorderCountryList) return;
     normalizeParentBorderEnabledMap();
+    syncParentBorderVisibilityUI();
     const supported = Array.isArray(state.parentBorderSupportedCountries)
       ? [...state.parentBorderSupportedCountries]
       : [];
@@ -5214,6 +6084,7 @@ function initToolbar({ render } = {}) {
       checkbox.type = "checkbox";
       checkbox.className = "checkbox-input";
       checkbox.checked = !!state.parentBorderEnabledByCountry?.[code];
+      checkbox.disabled = state.parentBordersVisible === false;
       checkbox.addEventListener("change", (event) => {
         state.parentBorderEnabledByCountry[code] = !!event.target.checked;
         renderDirty("parent-border-country");
@@ -5282,12 +6153,7 @@ function initToolbar({ render } = {}) {
       cityCapitalOverlayEnabled.checked = !!cityPointsConfig.showCapitalOverlay;
     }
 
-    if (urbanColor) urbanColor.value = state.styleConfig.urban.color;
-    if (urbanOpacity) urbanOpacity.value = String(Math.round(state.styleConfig.urban.opacity * 100));
-    if (urbanOpacityValue) urbanOpacityValue.textContent = `${Math.round(state.styleConfig.urban.opacity * 100)}%`;
-    if (urbanBlendMode) urbanBlendMode.value = state.styleConfig.urban.blendMode;
-    if (urbanMinArea) urbanMinArea.value = String(Math.round(state.styleConfig.urban.minAreaPx));
-    if (urbanMinAreaValue) urbanMinAreaValue.textContent = `${Math.round(state.styleConfig.urban.minAreaPx)}`;
+    syncUrbanControls();
 
     state.styleConfig.physical = normalizePhysicalStyleConfig(state.styleConfig.physical);
     if (physicalMode) physicalMode.value = state.styleConfig.physical.mode;
@@ -5593,8 +6459,13 @@ function initToolbar({ render } = {}) {
   state.commitZoomInputValueFn = commitZoomInputValue;
 
   state.updateToolbarInputsFn = () => {
+    const internalAutoColorEnabled = String(state.styleConfig.internalBorders.colorMode || "auto") !== "manual";
+    if (internalBorderAutoColor) {
+      internalBorderAutoColor.checked = internalAutoColorEnabled;
+    }
     if (internalBorderColor) {
       internalBorderColor.value = state.styleConfig.internalBorders.color;
+      internalBorderColor.disabled = internalAutoColorEnabled;
     }
     if (internalBorderOpacity) {
       internalBorderOpacity.value = String(Math.round(state.styleConfig.internalBorders.opacity * 100));
@@ -5626,6 +6497,7 @@ function initToolbar({ render } = {}) {
     if (coastlineWidthValue) {
       coastlineWidthValue.textContent = Number(state.styleConfig.coastlines.width).toFixed(1);
     }
+    syncParentBorderVisibilityUI();
     if (oceanFillColor) {
       oceanFillColor.value = normalizeOceanFillColor(state.styleConfig.ocean.fillColor);
     }
@@ -5868,6 +6740,18 @@ function initToolbar({ render } = {}) {
       state.transportWorkbenchUi.activeFamily = normalizeTransportWorkbenchFamily(button.dataset.transportFamily || "road");
       state.transportWorkbenchUi.compareHeld = false;
       renderTransportWorkbenchUi();
+    });
+    button.dataset.bound = "true";
+  });
+
+  transportWorkbenchInspectorTabButtons.forEach((button) => {
+    if (!button || button.dataset.bound === "true") return;
+    button.addEventListener("click", () => {
+      ensureTransportWorkbenchUiState();
+      state.transportWorkbenchUi.activeInspectorTab = normalizeTransportWorkbenchInspectorTab(button.dataset.transportInspectorTab || "inspect");
+      const context = getTransportWorkbenchRenderContext();
+      renderTransportWorkbenchShell(context);
+      renderTransportWorkbenchInspector(context.family, context.config, context.compareHeld);
     });
     button.dataset.bound = "true";
   });
@@ -6251,7 +7135,7 @@ function initToolbar({ render } = {}) {
     dayNightCityLightsIntensity.addEventListener("input", (event) => {
       const value = Number(event.target.value);
       const dayNight = syncDayNightConfig();
-      dayNight.cityLightsIntensity = clamp(Number.isFinite(value) ? value / 100 : 0.72, 0, 1.2);
+      dayNight.cityLightsIntensity = clamp(Number.isFinite(value) ? value / 100 : 0.78, 0, 1.8);
       renderDayNightUI();
       renderDirty("day-night-city-lights-intensity");
     });
@@ -6273,7 +7157,7 @@ function initToolbar({ render } = {}) {
     dayNightCityLightsCorridorStrength.addEventListener("input", (event) => {
       const value = Number(event.target.value);
       const dayNight = syncDayNightConfig();
-      dayNight.cityLightsCorridorStrength = clamp(Number.isFinite(value) ? value / 100 : 0.58, 0, 1);
+      dayNight.cityLightsCorridorStrength = clamp(Number.isFinite(value) ? value / 100 : 0.62, 0, 1);
       renderDayNightUI();
       renderDirty("day-night-city-lights-corridor-strength");
     });
@@ -6284,11 +7168,32 @@ function initToolbar({ render } = {}) {
     dayNightCityLightsCoreSharpness.addEventListener("input", (event) => {
       const value = Number(event.target.value);
       const dayNight = syncDayNightConfig();
-      dayNight.cityLightsCoreSharpness = clamp(Number.isFinite(value) ? value / 100 : 0.62, 0, 1);
+      dayNight.cityLightsCoreSharpness = clamp(Number.isFinite(value) ? value / 100 : 0.68, 0, 1);
       renderDayNightUI();
       renderDirty("day-night-city-lights-core-sharpness");
     });
     dayNightCityLightsCoreSharpness.dataset.bound = "true";
+  }
+
+  if (dayNightCityLightsPopulationBoostEnabled && !dayNightCityLightsPopulationBoostEnabled.dataset.bound) {
+    dayNightCityLightsPopulationBoostEnabled.addEventListener("change", (event) => {
+      const dayNight = syncDayNightConfig();
+      dayNight.cityLightsPopulationBoostEnabled = !!event.target.checked;
+      renderDayNightUI();
+      renderDirty("day-night-city-lights-population-boost-enabled");
+    });
+    dayNightCityLightsPopulationBoostEnabled.dataset.bound = "true";
+  }
+
+  if (dayNightCityLightsPopulationBoostStrength && !dayNightCityLightsPopulationBoostStrength.dataset.bound) {
+    dayNightCityLightsPopulationBoostStrength.addEventListener("input", (event) => {
+      const value = Number(event.target.value);
+      const dayNight = syncDayNightConfig();
+      dayNight.cityLightsPopulationBoostStrength = clamp(Number.isFinite(value) ? value / 100 : 0.56, 0, 1.5);
+      renderDayNightUI();
+      renderDirty("day-night-city-lights-population-boost-strength");
+    });
+    dayNightCityLightsPopulationBoostStrength.dataset.bound = "true";
   }
 
   if (dayNightShadowOpacity && !dayNightShadowOpacity.dataset.bound) {
@@ -6418,9 +7323,18 @@ function initToolbar({ render } = {}) {
       renderDirty("toggle-special-zones");
     });
   }
+  if (urbanMode) {
+    urbanMode.addEventListener("change", (event) => {
+      const cfg = syncUrbanConfig();
+      cfg.mode = String(event.target.value || "adaptive");
+      syncUrbanControls();
+      renderDirty("urban-mode");
+    });
+  }
   if (urbanColor) {
     urbanColor.addEventListener("input", (event) => {
-      state.styleConfig.urban.color = normalizeOceanFillColor(event.target.value);
+      const cfg = syncUrbanConfig();
+      cfg.color = normalizeOceanFillColor(event.target.value);
       renderDirty("urban-color");
     });
   }
@@ -6522,23 +7436,55 @@ function initToolbar({ render } = {}) {
   }
   if (urbanOpacity) {
     urbanOpacity.addEventListener("input", (event) => {
+      const cfg = syncUrbanConfig();
       const value = Number(event.target.value);
-      state.styleConfig.urban.opacity = clamp(Number.isFinite(value) ? value / 100 : 0.4, 0, 1);
-      if (urbanOpacityValue) urbanOpacityValue.textContent = `${Math.round(state.styleConfig.urban.opacity * 100)}%`;
+      cfg.fillOpacity = clamp(Number.isFinite(value) ? value / 100 : cfg.fillOpacity, 0, 1);
+      if (urbanOpacityValue) urbanOpacityValue.textContent = `${Math.round(cfg.fillOpacity * 100)}%`;
       renderDirty("urban-opacity");
     });
   }
   if (urbanBlendMode) {
     urbanBlendMode.addEventListener("change", (event) => {
-      state.styleConfig.urban.blendMode = String(event.target.value || "multiply");
+      const cfg = syncUrbanConfig();
+      cfg.blendMode = String(event.target.value || "multiply");
       renderDirty("urban-blend");
+    });
+  }
+  if (urbanAdaptiveStrength) {
+    urbanAdaptiveStrength.addEventListener("input", (event) => {
+      const cfg = syncUrbanConfig();
+      const value = Number(event.target.value);
+      cfg.adaptiveStrength = clamp(Number.isFinite(value) ? value / 100 : cfg.adaptiveStrength, 0, 1);
+      if (urbanAdaptiveStrengthValue) {
+        urbanAdaptiveStrengthValue.textContent = `${Math.round(cfg.adaptiveStrength * 100)}%`;
+      }
+      renderDirty("urban-adaptive-strength");
+    });
+  }
+  if (urbanStrokeOpacity) {
+    urbanStrokeOpacity.addEventListener("input", (event) => {
+      const cfg = syncUrbanConfig();
+      const value = Number(event.target.value);
+      cfg.strokeOpacity = clamp(Number.isFinite(value) ? value / 100 : cfg.strokeOpacity, 0, 1);
+      if (urbanStrokeOpacityValue) {
+        urbanStrokeOpacityValue.textContent = `${Math.round(cfg.strokeOpacity * 100)}%`;
+      }
+      renderDirty("urban-stroke-opacity");
+    });
+  }
+  if (urbanDarkCountryBoost) {
+    urbanDarkCountryBoost.addEventListener("change", (event) => {
+      const cfg = syncUrbanConfig();
+      cfg.darkCountryBoost = !!event.target.checked;
+      renderDirty("urban-dark-country-boost");
     });
   }
   if (urbanMinArea) {
     urbanMinArea.addEventListener("input", (event) => {
+      const cfg = syncUrbanConfig();
       const value = Number(event.target.value);
-      state.styleConfig.urban.minAreaPx = clamp(Number.isFinite(value) ? value : 8, 0, 80);
-      if (urbanMinAreaValue) urbanMinAreaValue.textContent = `${Math.round(state.styleConfig.urban.minAreaPx)}`;
+      cfg.minAreaPx = clamp(Number.isFinite(value) ? value : 8, 0, 80);
+      if (urbanMinAreaValue) urbanMinAreaValue.textContent = `${Math.round(cfg.minAreaPx)}`;
       renderDirty("urban-area");
     });
   }
@@ -7103,9 +8049,27 @@ function initToolbar({ render } = {}) {
     });
   }
 
+  if (internalBorderAutoColor) {
+    internalBorderAutoColor.checked = String(state.styleConfig.internalBorders.colorMode || "auto") !== "manual";
+    if (internalBorderColor) {
+      internalBorderColor.disabled = internalBorderAutoColor.checked;
+    }
+    internalBorderAutoColor.addEventListener("change", (event) => {
+      state.styleConfig.internalBorders.colorMode = event.target.checked ? "auto" : "manual";
+      if (internalBorderColor) {
+        internalBorderColor.disabled = event.target.checked;
+      }
+      renderDirty("internal-border-color-mode");
+    });
+  }
   if (internalBorderColor) {
     internalBorderColor.addEventListener("input", (event) => {
       state.styleConfig.internalBorders.color = event.target.value;
+      state.styleConfig.internalBorders.colorMode = "manual";
+      if (internalBorderAutoColor) {
+        internalBorderAutoColor.checked = false;
+      }
+      internalBorderColor.disabled = false;
       renderDirty("internal-border-color");
     });
   }
@@ -7217,6 +8181,15 @@ function initToolbar({ render } = {}) {
         parentBorderWidthValue.textContent = state.styleConfig.parentBorders.width.toFixed(2);
       }
       renderDirty("parent-border-width");
+    });
+  }
+  if (parentBordersVisible) {
+    parentBordersVisible.checked = state.parentBordersVisible !== false;
+    parentBordersVisible.addEventListener("change", (event) => {
+      state.parentBordersVisible = !!event.target.checked;
+      syncParentBorderVisibilityUI();
+      renderParentBorderCountryList();
+      renderDirty("parent-border-visibility");
     });
   }
   if (parentBorderEnableAll) {
@@ -7597,3 +8570,5 @@ function initToolbar({ render } = {}) {
 
 
 export { initToolbar };
+
+

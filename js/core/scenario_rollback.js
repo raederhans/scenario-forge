@@ -59,6 +59,7 @@ const ROLLBACK_REQUIRED_KEYS = Object.freeze([
   "inspectorExpansionInitialized",
   "expandedInspectorContinents",
   "expandedInspectorReleaseParents",
+  "parentBordersVisible",
   "scenarioParentBorderEnabledBeforeActivate",
   "parentBorderEnabledByCountry",
   "scenarioPaintModeBeforeActivate",
@@ -186,6 +187,7 @@ export function captureScenarioApplyRollbackSnapshot() {
     inspectorExpansionInitialized: !!state.inspectorExpansionInitialized,
     expandedInspectorContinents: cloneScenarioStateValue(state.expandedInspectorContinents),
     expandedInspectorReleaseParents: cloneScenarioStateValue(state.expandedInspectorReleaseParents),
+    parentBordersVisible: state.parentBordersVisible !== false,
     scenarioParentBorderEnabledBeforeActivate: cloneScenarioStateValue(state.scenarioParentBorderEnabledBeforeActivate),
     parentBorderEnabledByCountry: cloneScenarioStateValue(state.parentBorderEnabledByCountry),
     scenarioPaintModeBeforeActivate: cloneScenarioStateValue(state.scenarioPaintModeBeforeActivate),
@@ -299,6 +301,7 @@ export function restoreScenarioApplyRollbackSnapshot(
     cloneScenarioStateValue(snapshot.expandedInspectorContinents) || new Set();
   state.expandedInspectorReleaseParents =
     cloneScenarioStateValue(snapshot.expandedInspectorReleaseParents) || new Set();
+  state.parentBordersVisible = snapshot.parentBordersVisible !== false;
   state.scenarioParentBorderEnabledBeforeActivate =
     cloneScenarioStateValue(snapshot.scenarioParentBorderEnabledBeforeActivate);
   state.parentBorderEnabledByCountry = cloneScenarioStateValue(snapshot.parentBorderEnabledByCountry) || {};

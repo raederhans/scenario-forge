@@ -134,6 +134,7 @@ from map_builder.contracts import DATA_ARTIFACT_SPECS_BY_PATH
 
 if REQUESTED_MODE != "palettes":
     from map_builder.cities import (
+        assign_urban_country_owners,
         assign_stable_urban_area_ids,
         build_city_aliases_payload,
         build_world_cities,
@@ -176,6 +177,7 @@ if REQUESTED_MODE != "palettes":
     from map_builder.outputs.save import save_outputs
     from tools import generate_hierarchy, geo_key_normalizer, translate_manager
 else:  # pragma: no cover - palettes mode avoids GIS/runtime build imports
+    assign_urban_country_owners = None
     assign_stable_urban_area_ids = None
     build_city_aliases_payload = None
     build_world_cities = None
@@ -3922,6 +3924,7 @@ def build_primary_topology_bundle(
     final_hybrid = cull_small_geometries(final_hybrid, "political", group_col="id")
     special_zones = cull_small_geometries(special_zones, "special zones", group_col="id")
     urban_clipped = assign_stable_urban_area_ids(urban_clipped)
+    urban_clipped = assign_urban_country_owners(urban_clipped, final_hybrid)
 
     target_bounds = getattr(cfg, "MAP_BOUNDS", cfg.GLOBAL_BOUNDS)
     log_layer_coverage("political", final_hybrid, target_bounds)
@@ -4333,6 +4336,7 @@ def _legacy_main_impl() -> None:
     final_hybrid = cull_small_geometries(final_hybrid, "political", group_col="id")
     special_zones = cull_small_geometries(special_zones, "special zones", group_col="id")
     urban_clipped = assign_stable_urban_area_ids(urban_clipped)
+    urban_clipped = assign_urban_country_owners(urban_clipped, final_hybrid)
 
     target_bounds = getattr(cfg, "MAP_BOUNDS", cfg.GLOBAL_BOUNDS)
     log_layer_coverage("political", final_hybrid, target_bounds)
