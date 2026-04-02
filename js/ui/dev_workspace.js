@@ -2732,7 +2732,7 @@ function copySelectionToClipboard(format, previewEl) {
 function initDevWorkspace() {
   const bottomDock = document.getElementById("bottomDock");
   const toggleBtn = document.getElementById("devWorkspaceToggleBtn");
-  if (!bottomDock || !toggleBtn) return;
+  if (!bottomDock) return;
 
   const quickbar = createDevWorkspaceQuickbar(bottomDock);
   const panel = createDevWorkspacePanel(bottomDock);
@@ -3690,6 +3690,9 @@ function initDevWorkspace() {
   };
 
   state.updateDevWorkspaceUIFn = renderWorkspace;
+  state.setDevWorkspaceExpandedFn = (nextValue) => {
+    setExpandedState(nextValue, { bottomDock, panel, toggleBtn });
+  };
 
   bindButtonAction(toggleBtn, () => {
     const next = !state.ui.devWorkspaceExpanded;
@@ -4991,7 +4994,7 @@ function initDevWorkspace() {
     scenarioLocaleZhInput.dataset.bound = "true";
   }
 
-  const initialExpanded = !!state.ui.devWorkspaceExpanded;
+  const initialExpanded = !!state.ui.developerMode;
   setExpandedState(initialExpanded, {
     bottomDock,
     panel,

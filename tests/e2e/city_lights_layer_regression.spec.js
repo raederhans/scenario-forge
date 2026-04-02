@@ -41,10 +41,12 @@ const DEFAULT_MODERN_LIGHTS_CONFIG = {
   cityLightsIntensity: 0.78,
   cityLightsTextureOpacity: 0.54,
   cityLightsCorridorStrength: 0.62,
-  cityLightsCoreSharpness: 0.68,
+  cityLightsCoreSharpness: 0.54,
   cityLightsPopulationBoostEnabled: true,
   cityLightsPopulationBoostStrength: 0.56,
 };
+
+const EASTERN_NIGHT_UTC_MINUTES = 18 * 60;
 
 const URBAN_SAMPLE_POINTS = [
   { name: 'London', lon: -0.1276, lat: 51.5072 },
@@ -54,6 +56,28 @@ const URBAN_SAMPLE_POINTS = [
 const RURAL_SAMPLE_POINTS = [
   { name: 'Sahara East', lon: 5.0, lat: 25.0 },
   { name: 'Sahara West', lon: -10.0, lat: 23.0 },
+];
+
+const EASTERN_URBAN_SAMPLE_POINTS = [
+  { name: 'Moscow', lon: 37.6173, lat: 55.7558 },
+  { name: 'Delhi', lon: 77.1025, lat: 28.7041 },
+  { name: 'Beijing', lon: 116.4074, lat: 39.9042 },
+  { name: 'Riyadh', lon: 46.6753, lat: 24.7136 },
+  { name: 'Perth', lon: 115.8605, lat: -31.9505 },
+];
+
+const EASTERN_RURAL_SAMPLE_POINTS = [
+  { name: 'Central Siberia', lon: 92.0, lat: 61.0 },
+  { name: 'Tibetan Plateau', lon: 88.0, lat: 33.0 },
+  { name: 'Empty Quarter', lon: 52.0, lat: 20.0 },
+  { name: 'Western Australia Outback', lon: 124.0, lat: -24.0 },
+];
+
+const HISTORICAL_CAPITAL_SAMPLE_POINTS = [
+  { name: 'Moscow', lon: 37.6173, lat: 55.7558 },
+  { name: 'Delhi', lon: 77.1025, lat: 28.7041 },
+  { name: 'Beijing', lon: 116.4074, lat: 39.9042 },
+  { name: 'Cairo', lon: 31.2357, lat: 30.0444 },
 ];
 
 function countChangedPixels(left, right, threshold = 12) {
@@ -181,6 +205,25 @@ async function captureCanvasSample(page) {
 }
 
 async function configureCityLights(page, style, enabled, overrides = {}) {
+  const targetManualUtcMinutes = Number.isFinite(overrides.manualUtcMinutes)
+    ? overrides.manualUtcMinutes
+    : DEFAULT_MODERN_LIGHTS_CONFIG.manualUtcMinutes;
+  const targetPopulationBoostEnabled = overrides.populationBoostEnabled !== false;
+  const targetPopulationBoostStrength = Number.isFinite(overrides.populationBoostStrength)
+    ? overrides.populationBoostStrength
+    : DEFAULT_MODERN_LIGHTS_CONFIG.cityLightsPopulationBoostStrength;
+  const targetIntensity = Number.isFinite(overrides.intensity)
+    ? overrides.intensity
+    : DEFAULT_MODERN_LIGHTS_CONFIG.cityLightsIntensity;
+  const targetTextureOpacity = Number.isFinite(overrides.textureOpacity)
+    ? overrides.textureOpacity
+    : DEFAULT_MODERN_LIGHTS_CONFIG.cityLightsTextureOpacity;
+  const targetCorridorStrength = Number.isFinite(overrides.corridorStrength)
+    ? overrides.corridorStrength
+    : DEFAULT_MODERN_LIGHTS_CONFIG.cityLightsCorridorStrength;
+  const targetCoreSharpness = Number.isFinite(overrides.coreSharpness)
+    ? overrides.coreSharpness
+    : DEFAULT_MODERN_LIGHTS_CONFIG.cityLightsCoreSharpness;
   await page.waitForFunction(async () => {
     const { state } = await import('/js/core/state.js');
     return !state.scenarioApplyInFlight && !state.startupReadonlyUnlockInFlight;
@@ -194,6 +237,7 @@ async function configureCityLights(page, style, enabled, overrides = {}) {
     targetTextureOpacity,
     targetCorridorStrength,
     targetCoreSharpness,
+    targetManualUtcMinutes,
   }) => {
     const [{ state, normalizeDayNightStyleConfig }, { markDirty }] = await Promise.all([
       import('/js/core/state.js'),
@@ -203,28 +247,27 @@ async function configureCityLights(page, style, enabled, overrides = {}) {
       ...(state.styleConfig?.dayNight || {}),
       enabled: true,
       mode: 'manual',
-      manualUtcMinutes: 0,
+      manualUtcMinutes: targetManualUtcMinutes,
       cityLightsEnabled: !!targetEnabled,
       cityLightsStyle: String(targetStyle || 'modern'),
-      cityLightsIntensity: Number.isFinite(targetIntensity) ? targetIntensity : 0.78,
-      cityLightsTextureOpacity: Number.isFinite(targetTextureOpacity) ? targetTextureOpacity : 0.54,
-      cityLightsCorridorStrength: Number.isFinite(targetCorridorStrength) ? targetCorridorStrength : 0.62,
-      cityLightsCoreSharpness: Number.isFinite(targetCoreSharpness) ? targetCoreSharpness : 0.68,
+      cityLightsIntensity: targetIntensity,
+      cityLightsTextureOpacity: targetTextureOpacity,
+      cityLightsCorridorStrength: targetCorridorStrength,
+      cityLightsCoreSharpness: targetCoreSharpness,
       cityLightsPopulationBoostEnabled: !!targetPopulationBoostEnabled,
-      cityLightsPopulationBoostStrength: Number.isFinite(targetPopulationBoostStrength)
-        ? targetPopulationBoostStrength
-        : 0.56,
+      cityLightsPopulationBoostStrength: targetPopulationBoostStrength,
     });
     markDirty('test-day-night-city-lights');
   }, {
     targetStyle: style,
     targetEnabled: enabled,
-    targetPopulationBoostEnabled: overrides.populationBoostEnabled !== false,
-    targetPopulationBoostStrength: overrides.populationBoostStrength,
-    targetIntensity: overrides.intensity,
-    targetTextureOpacity: overrides.textureOpacity,
-    targetCorridorStrength: overrides.corridorStrength,
-    targetCoreSharpness: overrides.coreSharpness,
+    targetPopulationBoostEnabled,
+    targetPopulationBoostStrength,
+    targetIntensity,
+    targetTextureOpacity,
+    targetCorridorStrength,
+    targetCoreSharpness,
+    targetManualUtcMinutes,
   });
   await page.evaluate(() => {
     globalThis.renderApp?.();
@@ -235,13 +278,14 @@ async function configureCityLights(page, style, enabled, overrides = {}) {
     targetPopulationBoostEnabled,
     targetPopulationBoostStrength,
     targetIntensity,
+    targetManualUtcMinutes,
   }) => {
     const { state } = await import('/js/core/state.js');
     const config = state.styleConfig?.dayNight || {};
     return (
       !!config.enabled
       && String(config.mode || '') === 'manual'
-      && Number(config.manualUtcMinutes) === 0
+      && Number(config.manualUtcMinutes) === targetManualUtcMinutes
       && !!config.cityLightsPopulationBoostEnabled === !!targetPopulationBoostEnabled
       && !!config.cityLightsEnabled === !!targetEnabled
       && String(config.cityLightsStyle || '') === String(targetStyle || 'modern')
@@ -251,11 +295,10 @@ async function configureCityLights(page, style, enabled, overrides = {}) {
   }, {
     targetStyle: style,
     targetEnabled: enabled,
-    targetPopulationBoostEnabled: overrides.populationBoostEnabled !== false,
-    targetPopulationBoostStrength: Number.isFinite(overrides.populationBoostStrength)
-      ? overrides.populationBoostStrength
-      : 0.56,
-    targetIntensity: Number.isFinite(overrides.intensity) ? overrides.intensity : 0.78,
+    targetPopulationBoostEnabled,
+    targetPopulationBoostStrength,
+    targetIntensity,
+    targetManualUtcMinutes,
   }, { timeout: 30000 });
   await page.waitForFunction(async () => {
     const { state } = await import('/js/core/state.js');
@@ -509,6 +552,22 @@ test('city lights default scene and intensity regression', async ({ page }) => {
   const modernMeanLuminance = computeMeanLuminance(modernLights.pixels);
   const lightsOffMeanLuminance = computeMeanLuminance(lightsOff.pixels);
 
+  await configureCityLights(page, 'modern', true, {
+    manualUtcMinutes: EASTERN_NIGHT_UTC_MINUTES,
+    populationBoostEnabled: true,
+  });
+  await page.waitForTimeout(250);
+  const easternUrban = await samplePointGroup(page, EASTERN_URBAN_SAMPLE_POINTS, 24);
+  const easternRural = await samplePointGroup(page, EASTERN_RURAL_SAMPLE_POINTS, 24);
+
+  await configureCityLights(page, 'historical_1930s', true, {
+    manualUtcMinutes: EASTERN_NIGHT_UTC_MINUTES,
+    populationBoostEnabled: false,
+  });
+  await page.waitForTimeout(250);
+  const historicalCapitals = await samplePointGroup(page, HISTORICAL_CAPITAL_SAMPLE_POINTS, 18);
+  const historicalRural = await samplePointGroup(page, EASTERN_RURAL_SAMPLE_POINTS, 18);
+
   expect(offToModernChanged).toBeGreaterThan(2000);
   expect(offToModernLuminance).toBeGreaterThan(300000);
   expect(modernToHistoricalChanged).toBeGreaterThan(180);
@@ -525,6 +584,12 @@ test('city lights default scene and intensity regression', async ({ page }) => {
   expect(boostOnUrban.average).toBeGreaterThan(boostOffUrban.average + 1.2);
   expect(boostOnUrban.maxBrightRatio).toBeLessThan(0.42);
   expect(Math.abs(boostOnRural.average - boostOffRural.average)).toBeLessThan(1.5);
+  expect(easternUrban.average).toBeGreaterThan(easternRural.average + 10);
+  expect(easternUrban.averageBrightRatio).toBeGreaterThan(easternRural.averageBrightRatio + 0.003);
+  expect(easternUrban.maxBrightRatio).toBeLessThan(0.18);
+  expect(historicalCapitals.peak).toBeGreaterThan(historicalRural.peak + 20);
+  expect(historicalCapitals.average).toBeLessThan(modernUrban.average);
+  expect(historicalBrightPixelRatio).toBeLessThan(modernBrightPixelRatio);
   expect(pageErrors).toEqual([]);
   expect(consoleIssues).toEqual([]);
   expect(networkFailures).toEqual([]);
@@ -559,6 +624,10 @@ test('city lights default scene and intensity regression', async ({ page }) => {
     boostOffRural,
     boostOnUrban,
     boostOnRural,
+    easternUrban,
+    easternRural,
+    historicalCapitals,
+    historicalRural,
     screenshot: screenshotPath,
     modernLowZoomScreenshot: modernLowZoomScreenshotPath,
     modernHighZoomScreenshot: modernHighZoomScreenshotPath,

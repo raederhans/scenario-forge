@@ -1980,6 +1980,7 @@ function hydrateActiveScenarioBundle(
     state.scenarioWaterRegionsData = nextScenarioWaterRegionsData;
     state.scenarioSpecialRegionsData = nextScenarioSpecialRegionsData;
   }
+  state.activeScenarioMeshPack = bundle.meshPackPayload || state.activeScenarioMeshPack || null;
   state.scenarioPoliticalChunkData = normalizeScenarioFeatureCollection(bundle.chunkMergedLayerPayloads?.political) || null;
   if (bundle.districtGroupsPayload) {
     state.scenarioDistrictGroupsData = bundle.districtGroupsPayload;

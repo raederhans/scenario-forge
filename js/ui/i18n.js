@@ -519,6 +519,9 @@ function updateUIText() {
   if (typeof state.updateDevWorkspaceUIFn === "function") {
     state.updateDevWorkspaceUIFn();
   }
+  if (typeof state.syncDeveloperModeUiFn === "function") {
+    state.syncDeveloperModeUiFn();
+  }
 
   const searchInput = document.getElementById("countrySearch");
   if (searchInput) {
@@ -615,7 +618,6 @@ function updateUIText() {
   }
 
   const confirmableButtons = [
-    ["presetClear", "Clear Map"],
     ["resetCountryColors", "Reset Country Colors"],
     ["specialZoneDeleteBtn", "Delete Selected"],
   ];

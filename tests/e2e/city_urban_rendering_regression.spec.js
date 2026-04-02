@@ -302,6 +302,28 @@ test('city and urban rendering regression smoke', async ({ page }) => {
   const lightsDiff = countChangedPixels(lightsOff.pixels, lightsOn.pixels, 10);
   expect(lightsDiff).toBeGreaterThan(120);
 
+  const syntheticAdaptivePaint = await page.evaluate(async () => {
+    const { computeUrbanAdaptivePaintFromHostColor } = await import('/js/core/map_renderer.js');
+    return {
+      low: computeUrbanAdaptivePaintFromHostColor('#1f2933', {
+        adaptiveStrength: 0,
+        toneBias: 0,
+      }),
+      high: computeUrbanAdaptivePaintFromHostColor('#1f2933', {
+        adaptiveStrength: 1,
+        toneBias: 0.3,
+      }),
+      deep: computeUrbanAdaptivePaintFromHostColor('#e5e7eb', {
+        adaptiveStrength: 0.4,
+        toneBias: -0.3,
+      }),
+    };
+  });
+  expect(syntheticAdaptivePaint.low?.fillColor).toBeTruthy();
+  expect(syntheticAdaptivePaint.low?.strokeColor).toBeTruthy();
+  expect(syntheticAdaptivePaint.low.fillColor).not.toBe(syntheticAdaptivePaint.high.fillColor);
+  expect(syntheticAdaptivePaint.high.strokeColor).not.toBe(syntheticAdaptivePaint.deep.strokeColor);
+
   const finalState = await page.evaluate(async () => {
     const { state } = await import('/js/core/state.js');
     return {
@@ -339,6 +361,7 @@ test('city and urban rendering regression smoke', async ({ page }) => {
     urbanDiff,
     urbanRestoreDiff,
     lightsDiff,
+    syntheticAdaptivePaint,
     finalState,
     consoleIssueCount: consoleIssues.length,
     networkFailureCount: networkFailures.length,

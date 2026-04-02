@@ -6306,6 +6306,15 @@ def make_atl_row(
     donor_province_ids: list[int],
     join_mode: str = ATL_JOIN_MODE_NONE,
 ) -> dict:
+    normalized_join_mode = str(join_mode or ATL_JOIN_MODE_NONE).strip() or ATL_JOIN_MODE_NONE
+    is_explicit_political = (
+        geometry_role in {
+            ATL_GEOMETRY_ROLE_DONOR_LAND,
+            ATL_GEOMETRY_ROLE_DONOR_ISLAND,
+            ATL_GEOMETRY_ROLE_CAUSEWAY,
+        }
+        and normalized_join_mode not in {ATL_JOIN_MODE_GAP_FILL, ATL_JOIN_MODE_BOOLEAN_WELD}
+    )
     return {
         "id": feature_id,
         "name": name,
@@ -6317,7 +6326,8 @@ def make_atl_row(
         "region_id": region_id,
         "assigned_owner_tag": normalize_tag(assigned_owner_tag) or ATL_TAG,
         "atl_geometry_role": geometry_role,
-        "atl_join_mode": str(join_mode or ATL_JOIN_MODE_NONE).strip() or ATL_JOIN_MODE_NONE,
+        "atl_join_mode": normalized_join_mode,
+        "interactive": bool(is_explicit_political),
         "donor_state_ids": [int(value) for value in donor_state_ids],
         "donor_state_names": [str(value).strip() for value in donor_state_names if str(value).strip()],
         "donor_province_ids": [int(value) for value in donor_province_ids],
@@ -6714,7 +6724,7 @@ def build_atl_sea_completion_rows(
                 "atl_geometry_role": ATL_GEOMETRY_ROLE_SEA_COMPLETION,
                 "atl_join_mode": ATL_JOIN_MODE_GAP_FILL,
                 "atl_subbasin_id": f"{region_id}_fill_{index}",
-                "interactive": True,
+                "interactive": False,
                 "render_as_base_geography": False,
                 "owner_tag": ATL_TAG,
                 "synthetic_owner": True,
@@ -7526,6 +7536,11 @@ def build_runtime_shell_fragment_gdf(runtime_political_full_gdf: gpd.GeoDataFram
     ].copy().reset_index(drop=True)
     if shell_gdf.crs is None:
         shell_gdf = shell_gdf.set_crs("EPSG:4326", allow_override=True)
+    if not shell_gdf.empty:
+        shell_gdf["interactive"] = False
+        shell_gdf["scenario_helper_kind"] = "shell_fallback"
+        if "render_as_base_geography" not in shell_gdf.columns:
+            shell_gdf["render_as_base_geography"] = False
     return shell_gdf
 
 
@@ -7875,7 +7890,7 @@ def build_atlantropa_from_hgo(
                 "atl_region_group": row["region_id"],
                 "atl_geometry_role": row["atl_geometry_role"],
                 "atl_join_mode": row.get("atl_join_mode", ATL_JOIN_MODE_NONE),
-                "interactive": True,
+                "interactive": bool(row.get("interactive", True)),
                 "render_as_base_geography": False,
                 "owner_tag": row["assigned_owner_tag"],
                 "synthetic_owner": row["assigned_owner_tag"] == ATL_TAG,
@@ -8021,7 +8036,7 @@ def build_atl_sea_from_hgo(
                 "atl_geometry_role": ATL_GEOMETRY_ROLE_DONOR_SEA,
                 "atl_join_mode": ATL_JOIN_MODE_NONE,
                 "atl_subbasin_id": f"{region_id}_{state_id}_{province_id}_{component_index}",
-                "interactive": True,
+                "interactive": False,
                 "render_as_base_geography": False,
                 "owner_tag": ATL_TAG,
                 "synthetic_owner": True,
@@ -8366,8 +8381,11 @@ def build_runtime_topology_payload(
         "detail_tier",
         "__source",
         "scenario_id",
+        "scenario_helper_kind",
         "region_group",
         "atl_surface_kind",
+        "atl_geometry_role",
+        "atl_join_mode",
         "interactive",
         "render_as_base_geography",
         "geometry",

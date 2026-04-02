@@ -1329,6 +1329,7 @@ async function applyScenarioBundle(
     state.scenarioCountriesByTag = staged.countryMap;
     state.scenarioFixedOwnerColors = staged.scenarioColorMap;
     state.defaultRuntimePoliticalTopology = state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null;
+    state.activeScenarioMeshPack = bundle.meshPackPayload || null;
     state.scenarioRuntimeTopologyData = staged.runtimeTopologyPayload;
     state.runtimePoliticalTopology = staged.runtimeTopologyPayload?.objects?.political
       ? staged.runtimeTopologyPayload
@@ -1698,6 +1699,7 @@ function clearActiveScenario(
   state.activeScenarioId = "";
   state.scenarioBorderMode = "canonical";
   state.activeScenarioManifest = null;
+  state.activeScenarioMeshPack = null;
   state.scenarioCountriesByTag = {};
   state.scenarioFixedOwnerColors = {};
   state.scenarioRuntimeTopologyData = null;

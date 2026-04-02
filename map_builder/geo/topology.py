@@ -12,6 +12,99 @@ import topojson as tp
 from map_builder import config as cfg
 from map_builder.geo.utils import round_geometries
 
+URBAN_CORRUPT_BOUNDS_WIDTH_DEG = 300.0
+URBAN_CORRUPT_BOUNDS_HEIGHT_DEG = 150.0
+
+
+def _validate_urban_layer_input(gdf: gpd.GeoDataFrame) -> None:
+    if gdf is None or gdf.empty:
+        return
+    missing_columns = [
+        column for column in ("id", "country_owner_id")
+        if column not in gdf.columns
+    ]
+    if missing_columns:
+        raise ValueError(
+            "Urban layer schema invalid before topology build: missing columns "
+            + ", ".join(missing_columns)
+        )
+
+    id_series = gdf["id"].fillna("").astype(str).str.strip()
+    owner_series = gdf["country_owner_id"].fillna("").astype(str).str.strip()
+    missing_id_count = int((id_series == "").sum())
+    missing_owner_count = int((owner_series == "").sum())
+    if missing_id_count or missing_owner_count:
+        raise ValueError(
+            "Urban layer schema invalid before topology build: "
+            f"missing id={missing_id_count}, missing country_owner_id={missing_owner_count}"
+        )
+
+    bounds = gdf.geometry.bounds
+    if not bounds.empty:
+        width = bounds["maxx"] - bounds["minx"]
+        height = bounds["maxy"] - bounds["miny"]
+        corrupt_mask = (width >= URBAN_CORRUPT_BOUNDS_WIDTH_DEG) | (height >= URBAN_CORRUPT_BOUNDS_HEIGHT_DEG)
+        corrupt_count = int(corrupt_mask.sum())
+        if corrupt_count:
+            raise ValueError(
+                "Urban layer geometry invalid before topology build: "
+                f"corrupt world-spanning features={corrupt_count}"
+            )
+
+
+def _promote_geometry_ids_for_all_objects(topo_dict: dict) -> None:
+    objects = topo_dict.get("objects", {})
+    if not isinstance(objects, dict):
+        return
+    for object_name, obj in objects.items():
+        geometries = obj.get("geometries", [])
+        if not isinstance(geometries, list):
+            continue
+        seen: set[str] = set()
+        for index, geom in enumerate(geometries):
+            props = geom.get("properties")
+            if not isinstance(props, dict):
+                props = {}
+                geom["properties"] = props
+            preferred = str(props.get("id", "")).strip()
+            candidate = preferred or str(geom.get("id", "")).strip() or f"{object_name}-{index}"
+            if candidate in seen:
+                candidate = f"{candidate}__dup{index}"
+            seen.add(candidate)
+            geom["id"] = candidate
+            if preferred:
+                props["id"] = preferred
+            else:
+                props["id"] = candidate
+
+
+def _validate_urban_topology_output(topo_dict: dict) -> None:
+    urban_obj = topo_dict.get("objects", {}).get("urban", {})
+    geometries = urban_obj.get("geometries", []) if isinstance(urban_obj, dict) else []
+    if not geometries:
+        return
+    missing_geom_id_count = 0
+    missing_prop_id_count = 0
+    missing_owner_count = 0
+    for geom in geometries:
+        props = geom.get("properties", {})
+        geom_id = str(geom.get("id", "")).strip()
+        prop_id = str(props.get("id", "")).strip()
+        owner_id = str(props.get("country_owner_id", "")).strip()
+        if not geom_id:
+            missing_geom_id_count += 1
+        if not prop_id:
+            missing_prop_id_count += 1
+        if not owner_id:
+            missing_owner_count += 1
+    if missing_geom_id_count or missing_prop_id_count or missing_owner_count:
+        raise ValueError(
+            "Urban topology schema invalid: "
+            f"missing geometry id={missing_geom_id_count}, "
+            f"missing properties.id={missing_prop_id_count}, "
+            f"missing country_owner_id={missing_owner_count}"
+        )
+
 
 def compute_neighbor_graph(gdf: gpd.GeoDataFrame) -> list[list[int]]:
     """Compute spatial adjacency graph from a GeoDataFrame.
@@ -337,6 +430,8 @@ def build_topology(
         gdf = round_geometries(gdf)
         # Rounding can create self-intersections on tight rings; scrub again.
         gdf = scrub_geometry(gdf)
+        if name == "urban":
+            _validate_urban_layer_input(gdf)
         if not has_valid_bounds(gdf):
             if name == "political":
                 print("Political layer is empty or invalid; cannot build topology.")
@@ -372,6 +467,7 @@ def build_topology(
 
     # ── Post-process: inject neighbor graph + fix IDs ────────────
     topo_dict = json.loads(topo_json)
+    _promote_geometry_ids_for_all_objects(topo_dict)
     political_obj = topo_dict.get("objects", {}).get("political", {})
     geometries = political_obj.get("geometries", [])
 
@@ -478,6 +574,7 @@ def build_topology(
             f"missing id={missing_id_count}, missing cntr_code={missing_code_count}, "
             f"id mismatches={mismatch_id_count}"
         )
+    _validate_urban_topology_output(topo_dict)
 
     # Verify top-level IDs are strings, not numeric indices
     sample_ids = [g.get("id") for g in geometries[:5]]

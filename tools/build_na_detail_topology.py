@@ -64,6 +64,8 @@ FEATURE_MIGRATION_PATH = PROJECT_ROOT / "data" / "feature-migrations" / "by_hybr
 US_MIGRATION_AUDIT_PATH = PROJECT_ROOT / ".runtime" / "reports" / "generated" / "us_topology_migration_audit.json"
 US_OVERLAP_RATIO_THRESHOLD = 1e-4
 US_ABSOLUTE_OVERLAP_AREA_M2 = 1000.0
+URBAN_CORRUPT_BOUNDS_WIDTH_DEG = 300.0
+URBAN_CORRUPT_BOUNDS_HEIGHT_DEG = 150.0
 
 
 def _get_peak_memory_mb() -> float | None:
@@ -655,6 +657,30 @@ def _load_layers_from_topology(topology_dict: dict) -> dict[str, gpd.GeoDataFram
     return layers
 
 
+def _describe_urban_layer_contract(gdf: gpd.GeoDataFrame | None) -> str:
+    if gdf is None or gdf.empty:
+        return "empty"
+    missing_columns = [column for column in ("id", "country_owner_id") if column not in gdf.columns]
+    if missing_columns:
+        return f"missing-columns:{','.join(missing_columns)}"
+    id_series = gdf["id"].fillna("").astype(str).str.strip()
+    owner_series = gdf["country_owner_id"].fillna("").astype(str).str.strip()
+    if int((id_series == "").sum()) > 0:
+        return "missing-id-values"
+    if int((owner_series == "").sum()) > 0:
+        return "missing-owner-values"
+    bounds = gdf.geometry.bounds
+    if not bounds.empty:
+        width = bounds["maxx"] - bounds["minx"]
+        height = bounds["maxy"] - bounds["miny"]
+        corrupt_count = int(
+            ((width >= URBAN_CORRUPT_BOUNDS_WIDTH_DEG) | (height >= URBAN_CORRUPT_BOUNDS_HEIGHT_DEG)).sum()
+        )
+        if corrupt_count > 0:
+            return f"corrupt-bounds:{corrupt_count}"
+    return ""
+
+
 def _build_topology_dict_from_layers(layers: dict[str, gpd.GeoDataFrame]) -> dict:
     object_names: list[str] = []
     object_layers: list[gpd.GeoDataFrame] = []
@@ -955,6 +981,14 @@ def main() -> None:
                 primary_layer = primary_layers.get(layer_name)
                 if primary_layer is not None and not primary_layer.empty:
                     layers[layer_name] = primary_layer.copy()
+        source_urban_issue = _describe_urban_layer_contract(layers.get("urban"))
+        primary_urban_issue = _describe_urban_layer_contract(primary_layers.get("urban"))
+        if source_urban_issue and not primary_urban_issue:
+            print(
+                "[Detail patch] Replacing invalid urban layer with primary shell copy: "
+                f"source={source_urban_issue}"
+            )
+            layers["urban"] = primary_layers["urban"].copy()
     _record_timing(
         stage_timings,
         "load_inputs",

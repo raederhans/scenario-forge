@@ -582,10 +582,12 @@ let scenarioPoliticalBackgroundCache = {
 };
 let scenarioOpeningOwnerBorderCache = {
   runtimeRef: null,
+  meshPackRef: null,
   scenarioId: "",
   baselineHash: "",
   baselineOwnersRef: null,
   shellRevision: 0,
+  meshSource: "",
   mesh: null,
 };
 let physicalLandClipPathCache = {
@@ -3027,11 +3029,22 @@ function isAdmin0ShellFeature(feature, featureId) {
 }
 
 function isScenarioShellFeature(feature, featureId = null) {
+  if (String(feature?.properties?.scenario_helper_kind || "").trim().toLowerCase() === "shell_fallback") {
+    return true;
+  }
   const candidate = String(
     feature?.properties?.id ?? featureId ?? feature?.id ?? ""
   ).trim().toUpperCase();
   if (candidate.startsWith("RU_ARCTIC_FB_")) return true;
   return String(feature?.properties?.name || "").toLowerCase().includes("shell fallback");
+}
+
+function getAtlantropaGeometryRole(feature) {
+  return String(feature?.properties?.atl_geometry_role || "").trim().toLowerCase();
+}
+
+function getAtlantropaJoinMode(feature) {
+  return String(feature?.properties?.atl_join_mode || "").trim().toLowerCase();
 }
 
 function isAntarcticSectorFeature(feature, featureId = null) {
@@ -3044,8 +3057,40 @@ function isAntarcticSectorFeature(feature, featureId = null) {
   return detailTier === "antarctic_sector" && (countryCode === "AQ" || candidate.startsWith("AQ_"));
 }
 
+function isAtlantropaSupportHelperFeature(feature, featureId = null) {
+  const candidate = String(
+    feature?.properties?.id ?? featureId ?? feature?.id ?? ""
+  ).trim().toUpperCase();
+  if (
+    candidate.startsWith("ATLSHL_")
+    || candidate.startsWith("ATLWLD_")
+    || candidate.startsWith("ATLSEA_FILL_")
+  ) {
+    return true;
+  }
+  const geometryRole = getAtlantropaGeometryRole(feature);
+  const joinMode = getAtlantropaJoinMode(feature);
+  return (
+    geometryRole === "shore_seal"
+    || geometryRole === "sea_completion"
+    || geometryRole === "donor_sea"
+    || joinMode === "gap_fill"
+    || joinMode === "boolean_weld"
+  );
+}
+
+function isPoliticalInteractionRenderableFeature(feature, featureId = null) {
+  if (!feature) return false;
+  if (isAntarcticSectorFeature(feature, featureId)) return false;
+  if (isBaseGeographyScenarioFeature(feature)) return false;
+  if (feature?.properties?.interactive === false) return false;
+  if (isScenarioShellFeature(feature, featureId)) return false;
+  if (isAtlantropaSupportHelperFeature(feature, featureId)) return false;
+  return true;
+}
+
 function shouldExcludePoliticalInteractionFeature(feature, featureId = null) {
-  return isAntarcticSectorFeature(feature, featureId);
+  return !isPoliticalInteractionRenderableFeature(feature, featureId);
 }
 
 function isGiantFeature(feature, canvasWidth, canvasHeight, boundsOverride = null) {
@@ -3551,8 +3596,21 @@ function buildInteractiveLandData(fullCollection) {
     return fullCollection;
   }
 
+  const explicitFeatures = fullCollection.features.filter((feature) =>
+    isPoliticalInteractionRenderableFeature(feature, getFeatureId(feature))
+  );
+  const explicitCollection = explicitFeatures.length === fullCollection.features.length
+    ? fullCollection
+    : {
+      type: "FeatureCollection",
+      features: explicitFeatures,
+    };
+  if (!Array.isArray(explicitCollection?.features) || !explicitCollection.features.length) {
+    return explicitCollection;
+  }
+
   const filterStateByCountry = new Map();
-  fullCollection.features.forEach((feature) => {
+  explicitCollection.features.forEach((feature) => {
     const countryCode = getFeatureCountryCodeNormalized(feature);
     const blockedTiers = INTERACTIVE_AGGREGATE_TIER_FILTERS[countryCode];
     if (!countryCode || !blockedTiers?.size) return;
@@ -3582,18 +3640,18 @@ function buildInteractiveLandData(fullCollection) {
     Array.from(filterStateByCountry.entries()).filter(([, entry]) => entry.hasLeaf && entry.hasBlocked)
   );
   if (!activeFilters.size) {
-    return fullCollection;
+    return explicitCollection;
   }
 
-  const filteredFeatures = fullCollection.features.filter((feature) => {
+  const filteredFeatures = explicitCollection.features.filter((feature) => {
     const countryCode = getFeatureCountryCodeNormalized(feature);
     const entry = activeFilters.get(countryCode);
     if (!entry) return true;
     return !entry.blockedTiers.has(getDetailTier(feature).toLowerCase());
   });
 
-  if (filteredFeatures.length === fullCollection.features.length) {
-    return fullCollection;
+  if (filteredFeatures.length === explicitCollection.features.length) {
+    return explicitCollection;
   }
 
   return {
@@ -4156,6 +4214,112 @@ function computeLayerCoverageScore(collection) {
   }
 }
 
+const URBAN_CORRUPT_BOUNDS_WIDTH_DEG = 300;
+const URBAN_CORRUPT_BOUNDS_HEIGHT_DEG = 150;
+
+function createUrbanLayerCapability(overrides = {}) {
+  return {
+    featureCount: 0,
+    hasGeometry: false,
+    hasStableId: false,
+    hasOwnerMeta: false,
+    hasCorruptBounds: false,
+    missingStableIdCount: 0,
+    missingOwnerCount: 0,
+    corruptBoundsCount: 0,
+    adaptiveAvailable: false,
+    unavailableReason: "Urban layer data unavailable.",
+    ...overrides,
+  };
+}
+
+function getUrbanFeatureGeoBounds(feature) {
+  if (!feature || !globalThis.d3?.geoBounds) return null;
+  try {
+    const bounds = globalThis.d3.geoBounds(feature);
+    if (!Array.isArray(bounds) || bounds.length !== 2) return null;
+    const [[minLon, minLat], [maxLon, maxLat]] = bounds;
+    if (![minLon, minLat, maxLon, maxLat].every(Number.isFinite)) return null;
+    let width = maxLon - minLon;
+    if (width < 0) width += 360;
+    const height = Math.max(0, maxLat - minLat);
+    return {
+      width,
+      height,
+    };
+  } catch (_error) {
+    return null;
+  }
+}
+
+function getUrbanCapabilityUnavailableReason(capability) {
+  if (!capability?.hasGeometry) {
+    return "Urban layer data unavailable.";
+  }
+  if (capability.hasCorruptBounds) {
+    return "Urban layer geometry is corrupt; rebuild the topology before using Adaptive mode.";
+  }
+  if (!capability.hasStableId) {
+    return "Urban layer is missing stable IDs; Adaptive mode is disabled until the topology is rebuilt.";
+  }
+  if (!capability.hasOwnerMeta) {
+    return "Urban layer is missing country owner metadata; Adaptive mode is disabled until the topology is rebuilt.";
+  }
+  return "";
+}
+
+function getUrbanLayerCapability(collection) {
+  const features = Array.isArray(collection?.features) ? collection.features : [];
+  if (!features.length) {
+    return createUrbanLayerCapability();
+  }
+
+  let missingStableIdCount = 0;
+  let missingOwnerCount = 0;
+  let corruptBoundsCount = 0;
+
+  features.forEach((feature) => {
+    if (!getUrbanFeatureStableId(feature)) {
+      missingStableIdCount += 1;
+    }
+    if (!getUrbanFeatureOwnerId(feature)) {
+      missingOwnerCount += 1;
+    }
+    const bounds = getUrbanFeatureGeoBounds(feature);
+    if (
+      bounds
+      && (bounds.width >= URBAN_CORRUPT_BOUNDS_WIDTH_DEG || bounds.height >= URBAN_CORRUPT_BOUNDS_HEIGHT_DEG)
+    ) {
+      corruptBoundsCount += 1;
+    }
+  });
+
+  const capability = createUrbanLayerCapability({
+    featureCount: features.length,
+    hasGeometry: true,
+    hasStableId: missingStableIdCount === 0,
+    hasOwnerMeta: missingOwnerCount === 0,
+    hasCorruptBounds: corruptBoundsCount > 0,
+    missingStableIdCount,
+    missingOwnerCount,
+    corruptBoundsCount,
+  });
+  capability.adaptiveAvailable = capability.hasGeometry
+    && capability.hasStableId
+    && capability.hasOwnerMeta
+    && !capability.hasCorruptBounds;
+  capability.unavailableReason = getUrbanCapabilityUnavailableReason(capability);
+  return capability;
+}
+
+function canRenderUrbanCollection(capability) {
+  return !!capability?.hasGeometry && !capability?.hasCorruptBounds;
+}
+
+function canPreferUrbanDetailCollection(capability) {
+  return canRenderUrbanCollection(capability) && !!capability?.hasStableId && !!capability?.hasOwnerMeta;
+}
+
 function pickBestLayerSource(primaryCollection, detailCollection, policy = {}) {
   const minScore = Number.isFinite(Number(policy.minScore))
     ? Number(policy.minScore)
@@ -4269,10 +4433,18 @@ function resolveContextLayerData(layerName) {
   const detailTopology = state.topologyDetail;
   const primaryCollection = getLayerFeatureCollection(primaryTopology, layerName);
   const detailCollection = getLayerFeatureCollection(detailTopology, layerName);
-  const pick = pickBestLayerSource(primaryCollection, detailCollection, {
+  const isUrbanLayer = layerName === "urban";
+  const primaryUrbanCapability = isUrbanLayer ? getUrbanLayerCapability(primaryCollection) : null;
+  const detailUrbanCapability = isUrbanLayer ? getUrbanLayerCapability(detailCollection) : null;
+  const externalUrbanCapability = isUrbanLayer ? getUrbanLayerCapability(externalContextCollection) : null;
+  const pick = pickBestLayerSource(
+    isUrbanLayer && !canRenderUrbanCollection(primaryUrbanCapability) ? null : primaryCollection,
+    isUrbanLayer && !canPreferUrbanDetailCollection(detailUrbanCapability) ? null : detailCollection,
+    {
     minScore: layerName === "special_zones" ? 0 : CONTEXT_LAYER_MIN_SCORE,
     preferDetailWhenPrimaryEmpty: layerName === "special_zones",
-  });
+    }
+  );
 
   if (!state.layerDataDiagnostics || typeof state.layerDataDiagnostics !== "object") {
     state.layerDataDiagnostics = {};
@@ -4288,9 +4460,31 @@ function resolveContextLayerData(layerName) {
     detailCount: pick.detailCount,
     primaryScore: Number(pick.primaryScore.toFixed(3)),
     detailScore: Number(pick.detailScore.toFixed(3)),
+    ...(isUrbanLayer
+      ? {
+          primaryAdaptiveAvailable: !!primaryUrbanCapability?.adaptiveAvailable,
+          detailAdaptiveAvailable: !!detailUrbanCapability?.adaptiveAvailable,
+          primaryMissingStableIds: Number(primaryUrbanCapability?.missingStableIdCount || 0),
+          primaryMissingOwnerMeta: Number(primaryUrbanCapability?.missingOwnerCount || 0),
+          primaryCorruptBounds: Number(primaryUrbanCapability?.corruptBoundsCount || 0),
+          detailMissingStableIds: Number(detailUrbanCapability?.missingStableIdCount || 0),
+          detailMissingOwnerMeta: Number(detailUrbanCapability?.missingOwnerCount || 0),
+          detailCorruptBounds: Number(detailUrbanCapability?.corruptBoundsCount || 0),
+        }
+      : {}),
   };
 
+  if (isUrbanLayer) {
+    state.urbanLayerCapability = pick.source === "detail"
+      ? detailUrbanCapability
+      : primaryUrbanCapability;
+  }
+
   if (pick.source === "none" && Array.isArray(externalContextCollection?.features)) {
+    if (isUrbanLayer && !canRenderUrbanCollection(externalUrbanCapability)) {
+      state.urbanLayerCapability = externalUrbanCapability;
+      return pick.collection;
+    }
     state.contextLayerSourceByName[layerName] = "external";
     state.layerDataDiagnostics[layerName] = {
       source: "external",
@@ -4298,8 +4492,23 @@ function resolveContextLayerData(layerName) {
       detailCount: externalContextCollection.features.length,
       primaryScore: Number(pick.primaryScore.toFixed(3)),
       detailScore: 1,
+      ...(isUrbanLayer
+        ? {
+            externalAdaptiveAvailable: !!externalUrbanCapability?.adaptiveAvailable,
+            externalMissingStableIds: Number(externalUrbanCapability?.missingStableIdCount || 0),
+            externalMissingOwnerMeta: Number(externalUrbanCapability?.missingOwnerCount || 0),
+            externalCorruptBounds: Number(externalUrbanCapability?.corruptBoundsCount || 0),
+          }
+        : {}),
     };
+    if (isUrbanLayer) {
+      state.urbanLayerCapability = externalUrbanCapability;
+    }
     return externalContextCollection;
+  }
+
+  if (isUrbanLayer && !state.urbanLayerCapability) {
+    state.urbanLayerCapability = createUrbanLayerCapability();
   }
 
   return pick.collection;
@@ -4343,6 +4552,9 @@ function ensureLayerDataFromTopology() {
       + `special_zones=${diag.special_zones?.source || "none"}, `
       + `bathymetry=${state.activeBathymetrySource || "none"}`
   );
+  if (typeof state.updateToolbarInputsFn === "function") {
+    state.updateToolbarInputsFn();
+  }
 
   // Composite mode owns state.landData and must not be overwritten by primary political-only data.
   if (state.topologyBundleMode !== "composite" && primaryTopology?.objects?.political) {
@@ -4764,46 +4976,60 @@ function recomputeDynamicBordersNow({ renderNow = true, reason = "" } = {}) {
 
 function refreshScenarioOpeningOwnerBorders({ renderNow = false, reason = "" } = {}) {
   const startedAt = nowMs();
+  let cacheMatches = false;
+  const meshPackMesh = state.activeScenarioMeshPack?.meshes?.opening_owner_borders;
+  const hasMeshPackMesh = isUsableMesh(meshPackMesh);
   const shouldBuild =
     !!state.activeScenarioId
     && state.scenarioBorderMode === "scenario_owner_only"
     && String(state.scenarioViewMode || "ownership") === "ownership"
-    && !!state.runtimePoliticalTopology?.objects?.political
+    && (hasMeshPackMesh || !!state.runtimePoliticalTopology?.objects?.political)
     && Object.keys(state.scenarioBaselineOwnersByFeatureId || {}).length > 0;
 
   if (shouldBuild) {
     const runtimeRef = state.runtimePoliticalTopology;
+    const meshPackRef = state.activeScenarioMeshPack || null;
     const scenarioId = String(state.activeScenarioId || "");
     const baselineHash = String(state.scenarioBaselineHash || "");
     const shellRevision = Number(state.scenarioShellOverlayRevision) || 0;
-    const cacheMatches =
-      scenarioOpeningOwnerBorderCache.runtimeRef === runtimeRef
+    const meshSource = hasMeshPackMesh ? "mesh_pack" : "runtime";
+    cacheMatches =
+      scenarioOpeningOwnerBorderCache.meshSource === meshSource
       && scenarioOpeningOwnerBorderCache.scenarioId === scenarioId
       && (baselineHash
         ? scenarioOpeningOwnerBorderCache.baselineHash === baselineHash
         : scenarioOpeningOwnerBorderCache.baselineOwnersRef === state.scenarioBaselineOwnersByFeatureId)
       && scenarioOpeningOwnerBorderCache.shellRevision === shellRevision
+      && (meshSource === "mesh_pack"
+        ? scenarioOpeningOwnerBorderCache.meshPackRef === meshPackRef
+        : scenarioOpeningOwnerBorderCache.runtimeRef === runtimeRef)
       && isUsableMesh(scenarioOpeningOwnerBorderCache.mesh);
 
     state.cachedScenarioOpeningOwnerBorders = cacheMatches
       ? scenarioOpeningOwnerBorderCache.mesh
-      : buildOwnerBorderMesh(
-        runtimeRef,
-        {
-          ownershipByFeatureId: state.scenarioBaselineOwnersByFeatureId,
-          shellOwnerByFeatureId: state.scenarioAutoShellOwnerByFeatureId,
-          scenarioActive: false,
-          viewMode: "ownership",
-        },
-        { excludeSea: true }
+      : (
+        hasMeshPackMesh
+          ? meshPackMesh
+          : buildOwnerBorderMesh(
+            runtimeRef,
+            {
+              ownershipByFeatureId: state.scenarioBaselineOwnersByFeatureId,
+              shellOwnerByFeatureId: state.scenarioAutoShellOwnerByFeatureId,
+              scenarioActive: false,
+              viewMode: "ownership",
+            },
+            { excludeSea: true }
+          )
       );
 
     scenarioOpeningOwnerBorderCache = {
       runtimeRef,
+      meshPackRef,
       scenarioId,
       baselineHash,
       baselineOwnersRef: state.scenarioBaselineOwnersByFeatureId,
       shellRevision,
+      meshSource,
       mesh: state.cachedScenarioOpeningOwnerBorders,
     };
   } else {
@@ -4813,6 +5039,8 @@ function refreshScenarioOpeningOwnerBorders({ renderNow = false, reason = "" } =
   invalidateRenderPasses("borders", reason || "scenario-opening-borders");
   recordRenderPerfMetric("refreshScenarioOpeningOwnerBorders", nowMs() - startedAt, {
     enabled: shouldBuild,
+    cacheHit: !!shouldBuild && !!cacheMatches,
+    source: hasMeshPackMesh ? "mesh_pack" : "runtime",
     segmentCount: Array.isArray(state.cachedScenarioOpeningOwnerBorders?.coordinates)
       ? state.cachedScenarioOpeningOwnerBorders.coordinates.length
       : 0,
@@ -4949,6 +5177,9 @@ function buildDetailAdmBorderMesh(topology, includedCountries) {
 
   return globalThis.topojson.mesh(topology, object, (a, b) => {
     if (!a || !b) return false;
+    if (shouldExcludePoliticalInteractionFeature(asFeatureLike(a)) || shouldExcludePoliticalInteractionFeature(asFeatureLike(b))) {
+      return false;
+    }
     const codeA = getEntityCountryCode(a);
     const codeB = getEntityCountryCode(b);
     if (!codeA || !codeB || codeA !== codeB || !includedCountries.has(codeA)) {
@@ -5424,6 +5655,9 @@ function buildSourceBorderMeshes(topology, includedCountries) {
       object,
       (a, b) => {
         if (!a || !b) return false;
+        if (shouldExcludePoliticalInteractionFeature(asFeatureLike(a)) || shouldExcludePoliticalInteractionFeature(asFeatureLike(b))) {
+          return false;
+        }
         const codeA = getFeatureCountryCodeNormalized(a);
         const codeB = getFeatureCountryCodeNormalized(b);
         if (!codeA || !codeB || codeA !== normalizedCode || codeB !== normalizedCode) return false;
@@ -5442,6 +5676,9 @@ function buildSourceBorderMeshes(topology, includedCountries) {
       object,
       (a, b) => {
         if (!a || !b) return false;
+        if (shouldExcludePoliticalInteractionFeature(asFeatureLike(a)) || shouldExcludePoliticalInteractionFeature(asFeatureLike(b))) {
+          return false;
+        }
         const codeA = getFeatureCountryCodeNormalized(a);
         const codeB = getFeatureCountryCodeNormalized(b);
         if (!codeA || !codeB || codeA !== normalizedCode || codeB !== normalizedCode) return false;
@@ -5607,10 +5844,6 @@ function resolveCoastlineTopologySource() {
   const runtimeMaskMetrics = scenarioId
     ? getCoastlineTopologyMetrics(runtimeTopology, ["context_land_mask", "land_mask", "land"])
     : null;
-  const runtimePoliticalMetrics = scenarioId
-    ? getCoastlineTopologyMetrics(runtimeTopology, ["political"])
-    : null;
-
   let decision = {
     source: "primary",
     reason: scenarioId ? "missing_runtime_land_mask" : "no_active_scenario",
@@ -5629,19 +5862,7 @@ function resolveCoastlineTopologySource() {
     topology: primaryTopology,
   };
 
-  if (scenarioId && runtimePoliticalMetrics?.objectName) {
-    decision = {
-      ...decision,
-      source: "scenario_political_outline",
-      reason: "runtime_political_shell",
-      runtimeObjectName: runtimePoliticalMetrics.objectName || "political",
-      runtimeFeatureCount: Number(runtimePoliticalMetrics.featureCount || 0),
-      runtimePolygonPartCount: Number(runtimePoliticalMetrics.polygonPartCount || 0),
-      runtimeInteriorRingCount: Number(runtimePoliticalMetrics.interiorRingCount || 0),
-      meshMode: "political_outline",
-      topology: runtimeTopology,
-    };
-  } else if (scenarioId && runtimeMaskMetrics?.objectName && primaryMetrics.featureCount > 0) {
+  if (scenarioId && runtimeMaskMetrics?.objectName && primaryMetrics.featureCount > 0) {
     const areaBase = Math.max(1e-9, Number(primaryMetrics.totalArea) || 0);
     const areaDeltaRatio = Math.abs((Number(runtimeMaskMetrics.totalArea) || 0) - areaBase) / areaBase;
     const runtimeInteriorRingRatio =
@@ -5699,7 +5920,8 @@ function buildGlobalCoastlineMesh(primaryTopology) {
     return globalThis.topojson.mesh(
       topology,
       topology.objects.political,
-      (a, b) => !!(a && !b && !shouldExcludeOwnerBorderEntity(a, { excludeSea: true }))
+      // TopoJSON reports exterior arcs as a===b for mesh callbacks.
+      (a, b) => !!(a && b && a === b && !shouldExcludeOwnerBorderEntity(a, { excludeSea: true }))
     );
   }
   if (topology.objects.context_land_mask) {
@@ -9598,36 +9820,69 @@ function getUrbanHostFillColor(feature) {
   );
 }
 
-function getUrbanAdaptivePaint(feature, config = {}) {
-  const backgroundColor = getUrbanHostFillColor(feature);
+function computeUrbanAdaptivePaintFromHostColor(backgroundColor, config = {}) {
   if (!backgroundColor) return null;
   const luminance = getCanvasColorRelativeLuminance(backgroundColor);
   if (!Number.isFinite(luminance)) return null;
 
   const strength = clamp(Number(config.adaptiveStrength) || 0, 0, 1);
-  const darkCountryBoost = !!config.darkCountryBoost;
+  const toneBias = clamp(Number(config.toneBias) || 0, -0.3, 0.3);
+  const lightenBias = Math.max(toneBias, 0);
+  const deepenBias = Math.max(-toneBias, 0);
   const isDark = luminance <= 0.30;
   const isLight = luminance >= 0.62;
-  const boost = isDark && darkCountryBoost ? 0.08 : 0;
 
   if (isDark) {
     return {
-      fillColor: mixCanvasColors(backgroundColor, "#f4efe3", 0.52 + (strength * 0.18) + boost),
-      strokeColor: mixCanvasColors(backgroundColor, "#fff9ef", 0.72 + (strength * 0.14) + boost),
+      fillColor: mixCanvasColors(
+        backgroundColor,
+        "#f4efe3",
+        clamp(0.48 + (strength * 0.18) + (lightenBias * 0.56) - (deepenBias * 0.24), 0.18, 0.96)
+      ),
+      strokeColor: mixCanvasColors(
+        backgroundColor,
+        "#fff9ef",
+        clamp(0.66 + (strength * 0.14) + (lightenBias * 0.44) - (deepenBias * 0.18), 0.24, 0.98)
+      ),
     };
   }
   if (isLight) {
     return {
-      fillColor: mixCanvasColors(backgroundColor, "#20252b", 0.42 + (strength * 0.16)),
-      strokeColor: mixCanvasColors(backgroundColor, "#0f1419", 0.62 + (strength * 0.12)),
+      fillColor: mixCanvasColors(
+        backgroundColor,
+        "#20252b",
+        clamp(0.42 + (strength * 0.16) + (deepenBias * 0.34) - (lightenBias * 0.28), 0.16, 0.94)
+      ),
+      strokeColor: mixCanvasColors(
+        backgroundColor,
+        "#0f1419",
+        clamp(0.62 + (strength * 0.12) + (deepenBias * 0.26) - (lightenBias * 0.18), 0.22, 0.96)
+      ),
     };
   }
   const targetFill = luminance < 0.48 ? "#ede7da" : "#272d34";
   const targetStroke = luminance < 0.48 ? "#fff7ec" : "#10151a";
   return {
-    fillColor: mixCanvasColors(backgroundColor, targetFill, 0.46 + (strength * 0.16)),
-    strokeColor: mixCanvasColors(backgroundColor, targetStroke, 0.66 + (strength * 0.12)),
+    fillColor: mixCanvasColors(
+      backgroundColor,
+      targetFill,
+      clamp(0.46 + (strength * 0.16) + (luminance < 0.48 ? (lightenBias * 0.42) - (deepenBias * 0.18) : (deepenBias * 0.26) - (lightenBias * 0.22)), 0.18, 0.95)
+    ),
+    strokeColor: mixCanvasColors(
+      backgroundColor,
+      targetStroke,
+      clamp(0.66 + (strength * 0.12) + (luminance < 0.48 ? (lightenBias * 0.3) - (deepenBias * 0.14) : (deepenBias * 0.22) - (lightenBias * 0.16)), 0.24, 0.97)
+    ),
   };
+}
+
+function getUrbanAdaptivePaint(feature, config = {}) {
+  const backgroundColor = getUrbanHostFillColor(feature);
+  return computeUrbanAdaptivePaintFromHostColor(backgroundColor, config);
+}
+
+function getEffectiveUrbanMode(config = {}, capability = state.urbanLayerCapability) {
+  return config?.mode === "adaptive" && capability?.adaptiveAvailable ? "adaptive" : "manual";
 }
 
 function drawUrbanLayer(k, { interactive = false } = {}) {
@@ -9642,11 +9897,13 @@ function drawUrbanLayer(k, { interactive = false } = {}) {
     return;
   }
   const cfg = normalizeUrbanStyleConfig(state.styleConfig?.urban || {});
+  const capability = state.urbanLayerCapability || getUrbanLayerCapability(state.urbanData);
+  const effectiveMode = getEffectiveUrbanMode(cfg, capability);
   const manualColor = getSafeCanvasColor(cfg.color, "#4b5563");
   const fillOpacity = clamp(Number.isFinite(Number(cfg.fillOpacity)) ? Number(cfg.fillOpacity) : 0.34, 0, 1);
   const strokeOpacity = clamp(Number.isFinite(Number(cfg.strokeOpacity)) ? Number(cfg.strokeOpacity) : 0.62, 0, 1);
   const minAreaPx = clamp(Number.isFinite(Number(cfg.minAreaPx)) ? Number(cfg.minAreaPx) : 8, 0, 80);
-  const blendMode = cfg.mode === "manual"
+  const blendMode = effectiveMode === "manual"
     ? getSafeBlendMode(cfg.blendMode, "multiply")
     : "source-over";
   const strokeWidth = clamp(0.85 / Math.max(Math.sqrt(Math.max(Number(k) || 1, 1)), 1), 0.3, 0.85);
@@ -9656,7 +9913,7 @@ function drawUrbanLayer(k, { interactive = false } = {}) {
   state.urbanData.features.forEach((feature) => {
     if (minAreaPx > 0 && estimateProjectedAreaPx(feature, k) < minAreaPx) return;
     if (!pathBoundsInScreen(feature)) return;
-    const adaptivePaint = cfg.mode === "adaptive" ? getUrbanAdaptivePaint(feature, cfg) : null;
+    const adaptivePaint = effectiveMode === "adaptive" ? getUrbanAdaptivePaint(feature, cfg) : null;
     const fillColor = getSafeCanvasColor(adaptivePaint?.fillColor, manualColor);
     const outlineColor = getSafeCanvasColor(adaptivePaint?.strokeColor, null);
     if (!fillColor) return;
@@ -9665,7 +9922,7 @@ function drawUrbanLayer(k, { interactive = false } = {}) {
     context.fillStyle = fillColor;
     context.globalAlpha = interactive ? Math.min(fillOpacity, 0.15) : fillOpacity;
     context.fill();
-    if (cfg.mode === "adaptive" && outlineColor) {
+    if (effectiveMode === "adaptive" && outlineColor) {
       context.strokeStyle = outlineColor;
       context.lineWidth = strokeWidth;
       context.globalAlpha = interactive ? Math.min(strokeOpacity, 0.18) : strokeOpacity;
@@ -9678,6 +9935,9 @@ function drawUrbanLayer(k, { interactive = false } = {}) {
     featureCount: getFeatureCollectionFeatureCount(state.urbanData),
     interactive: !!interactive,
     skipped: false,
+    mode: effectiveMode,
+    requestedMode: cfg.mode,
+    adaptiveAvailable: !!capability?.adaptiveAvailable,
   });
 }
 
@@ -12176,11 +12436,11 @@ function drawModernCityLightsCorridors(config, intensity) {
     const corridorWeight = Math.pow(normalized, 0.56);
     const alpha = clamp(
       intensity
-      * (0.42 + (corridorStrength * 1.12))
+      * (0.42 + (corridorStrength * 0.88))
       * (0.06 + (corridorWeight * 0.38))
       * zoomProfile.corridorAlphaScale,
       0,
-      0.56
+      0.42
     );
     if (alpha <= 0.003) return;
     const jitter = getModernGridEntryJitter(entry, zoomProfile.corridorJitterStrength);
@@ -12228,7 +12488,7 @@ function collectModernUrbanCoreEntries(k, config, intensity) {
     const sample = geographicCentroid
       ? sampleModernCityLightsGridNormalized(geographicCentroid[0], geographicCentroid[1])
       : 0;
-    const sampledBoost = clamp(0.56 + (Math.pow(sample, 0.42) * 2.2), 0.9, 2.5);
+    const sampledBoost = clamp(0.56 + (Math.pow(sample, 0.52) * 1.4), 0.8, 1.8);
     const weight = clamp(heuristicWeight * sampledBoost, 0.06, 1.4);
     if (sample <= 0.01 && heuristicWeight < 0.34) return;
     if (weight < 0.16) return;
@@ -12263,12 +12523,12 @@ function collectModernUrbanCoreEntries(k, config, intensity) {
     const haloAlpha = clamp(
       intensity * weight * (0.14 + (textureOpacity * 0.18) + (sample * 0.22)) * zoomProfile.coreAlphaScale,
       0,
-      0.44
+      0.32
     );
     const coreAlpha = clamp(
       intensity * weight * (0.42 + (coreSharpness * 0.38) + (sample * 0.34)) * zoomProfile.coreAlphaScale,
       0,
-      0.64
+      0.48
     );
     entries.push({
       feature,
@@ -12298,8 +12558,8 @@ function drawModernCityLightsCores(k, _config, _intensity, coreEntries = null) {
     drawSoftLightBlob(
       entry.cx,
       entry.cy,
-      (entry.baseRadiusPx * entry.aspectRatio * 1.34 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
-      (entry.baseRadiusPx * 1.18 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (entry.baseRadiusPx * entry.aspectRatio * 1.12 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (entry.baseRadiusPx * 1.06 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
       {
         rotation: entry.orientation,
         rgb: haloRgb,
@@ -12314,8 +12574,8 @@ function drawModernCityLightsCores(k, _config, _intensity, coreEntries = null) {
     drawSoftLightBlob(
       entry.cx,
       entry.cy,
-      (entry.baseRadiusPx * entry.aspectRatio * 1.12 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
-      (entry.baseRadiusPx * 1.02 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (entry.baseRadiusPx * entry.aspectRatio * 0.94 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (entry.baseRadiusPx * 0.88 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
       {
         rotation: entry.orientation,
         rgb: coreRgb,
@@ -12488,8 +12748,8 @@ function drawModernCityLightsPopulationBoostLayer(k, config, intensity) {
     drawSoftLightBlob(
       cx,
       cy,
-      (baseRadiusPx * aspectRatio * 1.36 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
-      (baseRadiusPx * 1.18 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (baseRadiusPx * aspectRatio * 1.14 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (baseRadiusPx * 1.02 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
       {
         rotation: 0,
         rgb: haloRgb,
@@ -12503,8 +12763,8 @@ function drawModernCityLightsPopulationBoostLayer(k, config, intensity) {
     drawSoftLightBlob(
       cx,
       cy,
-      (baseRadiusPx * aspectRatio * 1.02 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
-      (baseRadiusPx * 0.94 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (baseRadiusPx * aspectRatio * 0.88 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
+      (baseRadiusPx * 0.82 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
       {
         rotation: 0,
         rgb: coreRgb,
@@ -12639,9 +12899,9 @@ function shouldRenderHistoricalCityLightEntry(entry) {
     return true;
   }
   if (capitalKind === "admin_capital") {
-    return population >= 3000000 && weight >= 0.92;
+    return population >= 1000000 || weight >= 0.7;
   }
-  return population >= 5500000 && weight >= 0.96;
+  return population >= 2200000 || weight >= 0.8;
 }
 
 function getHistoricalProxyAssetEntries() {
@@ -12775,7 +13035,7 @@ function drawHistoricalNightLightsLayer(k, config, solarState) {
   if (!nightHemisphere) return;
 
   const variant = "historical_1930s";
-  const intensity = clamp(Number(config.cityLightsIntensity) || 0, 0, 0.36);
+  const intensity = clamp(Number(config.cityLightsIntensity) || 0, 0, 1.2);
   if (intensity <= 0) return;
   const palette = getNightLightPalette(variant);
   const overscan = Math.max(24, Math.min(state.width, state.height) * 0.05);
@@ -12807,10 +13067,10 @@ function drawHistoricalNightLightsLayer(k, config, solarState) {
     }
 
     const capitalBoost = getHistoricalCityLightCapitalBoost(entry.capitalKind);
-    const baseRadiusPx = 0.12 + (weight * (0.16 + (capitalBoost * 0.1)));
-    const haloRadiusPx = baseRadiusPx * (1.05 + (capitalBoost * 0.2));
-    const haloAlpha = clamp(intensity * weight * 0.004, 0, 0.01);
-    const coreAlpha = clamp(intensity * weight * 0.01, 0, 0.022);
+    const baseRadiusPx = 0.52 + (weight * (0.68 + (capitalBoost * 0.28)));
+    const haloRadiusPx = baseRadiusPx * (1.24 + (capitalBoost * 0.3));
+    const haloAlpha = clamp(intensity * weight * 0.12, 0, 0.28);
+    const coreAlpha = clamp(intensity * weight * 0.22, 0, 0.52);
     const orientation = (stringHash(
       entry.nameAscii ||
       `${entry.lon}:${entry.lat}`
@@ -12822,7 +13082,7 @@ function drawHistoricalNightLightsLayer(k, config, solarState) {
       cx,
       cy,
       (haloRadiusPx * 1.04) / Math.max(0.0001, k),
-      (haloRadiusPx * 0.62) / Math.max(0.0001, k),
+      (haloRadiusPx * 0.78) / Math.max(0.0001, k),
       orientation
     );
 
@@ -12832,7 +13092,7 @@ function drawHistoricalNightLightsLayer(k, config, solarState) {
       cx,
       cy,
       baseRadiusPx / Math.max(0.0001, k),
-      (baseRadiusPx * 0.46) / Math.max(0.0001, k),
+      (baseRadiusPx * 0.64) / Math.max(0.0001, k),
       orientation
     );
   });
@@ -13403,8 +13663,8 @@ function shouldUseScenarioPoliticalBackgroundMerge() {
   return Boolean(
     debugMode === "PROD" &&
     state.activeScenarioId &&
-    state.runtimePoliticalTopology?.objects?.political &&
-    globalThis.topojson?.merge
+    Array.isArray((state.landDataFull || state.landData)?.features) &&
+    (state.landDataFull || state.landData).features.length
   );
 }
 
@@ -13475,8 +13735,7 @@ function buildScenarioPoliticalBackgroundEntries() {
     return [];
   }
 
-  const topology = state.runtimePoliticalTopology;
-  const landCollection = state.landData;
+  const landCollection = state.landDataFull || state.landData;
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
   const featureCount = Array.isArray(landCollection?.features) ? landCollection.features.length : 0;
   const cacheKey = getScenarioPoliticalBackgroundCacheKey({
@@ -13484,7 +13743,7 @@ function buildScenarioPoliticalBackgroundEntries() {
     canvasHeight,
   });
   if (
-    scenarioPoliticalBackgroundCache.runtimeRef === topology
+    scenarioPoliticalBackgroundCache.runtimeRef === landCollection
     && scenarioPoliticalBackgroundCache.cacheKey === cacheKey
   ) {
     recordRenderPerfMetric("drawScenarioPoliticalBackgroundEntries", nowMs() - startedAt, {
@@ -13495,35 +13754,28 @@ function buildScenarioPoliticalBackgroundEntries() {
     return scenarioPoliticalBackgroundCache.entries;
   }
 
-  const groupedGeometries = new Map();
-  const geometries = Array.isArray(topology?.objects?.political?.geometries)
-    ? topology.objects.political.geometries
-    : [];
-  geometries.forEach((geometry, index) => {
-    const id = getFeatureId(geometry) || `feature-${index}`;
-    if (shouldExcludePoliticalInteractionFeature(geometry, id)) return;
-    if (shouldSkipFeature(geometry, canvasWidth, canvasHeight, { forceProd: true })) return;
-
-    const displayCode =
-      getDisplayOwnerCode(geometry, id) ||
-      getFeatureCountryCodeNormalized(geometry) ||
-      "__NONE__";
-    const fillColor =
-      (isAtlantropaSeaFeature(geometry)
-        ? getAtlantropaSeaPoliticalFillColor()
-        : null) ||
-      getSafeCanvasColor(state.colors?.[id], null) ||
-      getSafeCanvasColor(getResolvedFeatureColor(geometry, id), null) ||
-      LAND_FILL_COLOR;
-    const groupKey = `${displayCode}::${fillColor}`;
-    if (!groupedGeometries.has(groupKey)) {
-      groupedGeometries.set(groupKey, { displayCode, fillColor, geometries: [] });
-    }
-    groupedGeometries.get(groupKey).geometries.push(geometry);
+  const entries = [];
+  (landCollection?.features || []).forEach((feature, index) => {
+    const id = getFeatureId(feature) || `feature-${index}`;
+    if (!feature?.geometry) return;
+    if (isAntarcticSectorFeature(feature, id)) return;
+    if (isBaseGeographyScenarioFeature(feature)) return;
+    if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) return;
+    const projectedBounds = getProjectedFeatureBounds(feature, {
+      featureId: id,
+      allowCompute: true,
+    });
+    if (!pathBoundsInScreen(feature)) return;
+    entries.push({
+      feature,
+      index,
+      id,
+      projectedBounds,
+    });
   });
-  if (!groupedGeometries.size) {
+  if (!entries.length) {
     scenarioPoliticalBackgroundCache = {
-      runtimeRef: topology,
+      runtimeRef: landCollection,
       scenarioId: state.activeScenarioId || "",
       viewMode: String(state.scenarioViewMode || "ownership"),
       oceanFillColor: getAtlantropaSeaPoliticalFillColor(),
@@ -13544,88 +13796,8 @@ function buildScenarioPoliticalBackgroundEntries() {
     return scenarioPoliticalBackgroundCache.entries;
   }
 
-  const entries = [];
-  let fallbackCount = 0;
-  groupedGeometries.forEach(({ displayCode, fillColor, geometries: group }) => {
-    if (!Array.isArray(group) || !group.length) return;
-    const buildBatchedEntry = () => {
-      const features = group
-        .map((geometry) => {
-          try {
-            const feature = globalThis.topojson?.feature?.(topology, geometry);
-            return normalizeFeatureGeometry(feature, { sourceLabel: "scenario_background_batch" }) || feature;
-          } catch (_error) {
-            return null;
-          }
-        })
-        .filter((feature) => feature?.geometry);
-      if (!features.length) return;
-      const projectedBounds = mergeProjectedBounds(
-        features.map((feature) => getProjectedFeatureBounds(feature, {
-          featureId: getFeatureId(feature),
-          allowCompute: true,
-        }))
-      );
-      fallbackCount += 1;
-      entries.push({
-        mode: "batched",
-        displayCode,
-        fillColor,
-        features,
-        projectedBounds,
-      });
-    };
-    try {
-      const mergedShape = globalThis.topojson.merge(topology, group);
-      const normalizedMergedFeature = normalizeFeatureGeometry(
-        {
-          type: "Feature",
-          properties: {
-            id: `scenario-background-${state.activeScenarioId || "scenario"}-${displayCode || "unknown"}`,
-          },
-          geometry: mergedShape,
-        },
-        { sourceLabel: "scenario_background_merge" }
-      );
-      const normalizedMergedShape = normalizedMergedFeature?.geometry || mergedShape;
-      if (shouldFallbackScenarioPoliticalBackgroundMergeShape(normalizedMergedShape, {
-        displayCode,
-        fillColor,
-        groupSize: group.length,
-      })) {
-        buildBatchedEntry();
-        return;
-      }
-      entries.push({
-        mode: "merged",
-        displayCode,
-        fillColor,
-        mergedFeature: normalizedMergedFeature || {
-          type: "Feature",
-          properties: {
-            id: `scenario-background-${state.activeScenarioId || "scenario"}-${displayCode || "unknown"}`,
-          },
-          geometry: normalizedMergedShape,
-        },
-        mergedShape: normalizedMergedShape,
-        projectedBounds: getProjectedFeatureBounds(
-          normalizedMergedFeature || {
-            type: "Feature",
-            properties: {
-              id: `scenario-background-${state.activeScenarioId || "scenario"}-${displayCode || "unknown"}`,
-            },
-            geometry: normalizedMergedShape,
-          },
-          { allowCompute: true }
-        ),
-      });
-    } catch (_error) {
-      buildBatchedEntry();
-    }
-  });
-
   scenarioPoliticalBackgroundCache = {
-    runtimeRef: topology,
+    runtimeRef: landCollection,
     scenarioId: state.activeScenarioId || "",
     viewMode: String(state.scenarioViewMode || "ownership"),
     oceanFillColor: getAtlantropaSeaPoliticalFillColor(),
@@ -13642,7 +13814,6 @@ function buildScenarioPoliticalBackgroundEntries() {
     cacheHit: false,
     entryCount: entries.length,
     featureCount,
-    fallbackCount,
   });
   return entries;
 }
@@ -13653,30 +13824,10 @@ function drawScenarioPoliticalBackgroundFills({
 } = {}) {
   const entries = buildScenarioPoliticalBackgroundEntries();
   if (!entries.length) return;
-
-  entries.forEach(({ mode = "merged", fillColor, mergedShape, mergedFeature, features, projectedBounds }) => {
-    if (!projectedBoundsIntersectScreenRects(projectedBounds, screenRects, { transform })) {
-      return;
-    }
-    context.beginPath();
-    if (mode === "batched") {
-      features?.forEach((feature) => {
-        if (feature?.geometry) {
-          pathCanvas(feature);
-        }
-      });
-    } else if (mergedFeature?.geometry) {
-      pathCanvas(mergedFeature);
-    } else if (mergedShape) {
-      pathCanvas({
-        type: "Feature",
-        properties: {},
-        geometry: mergedShape,
-      });
-    }
-    context.fillStyle = fillColor;
-    context.fill();
-  });
+  const visibleEntries = entries.filter(({ projectedBounds }) =>
+    projectedBoundsIntersectScreenRects(projectedBounds, screenRects, { transform })
+  );
+  drawPoliticalBackgroundFillsForEntries(visibleEntries);
 }
 
 function buildAdmin0MergedShapes() {
@@ -20743,6 +20894,10 @@ function refreshMapDataForScenarioChunkPromotion({
   invalidateAllRenderPasses("scenario-chunk-promotion");
   markAllOverlaysDirty();
   rebuildStaticMeshes();
+  refreshScenarioOpeningOwnerBorders({
+    renderNow: false,
+    reason: "scenario-chunk-promotion-opening",
+  });
   invalidateBorderCache();
   updateDynamicBorderStatusUI();
   rebuildResolvedColors();
@@ -20891,6 +21046,9 @@ export {
   applyDevMacroFillCurrentOwnerScope,
   applyDevSelectionFill,
   getWaterRegionColor,
+  getUrbanLayerCapability,
+  computeUrbanAdaptivePaintFromHostColor,
+  getEffectiveUrbanMode,
   getCityScenarioTag,
   getCityLabelRenderStyle,
   getEffectiveCityCollection,

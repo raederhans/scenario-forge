@@ -627,7 +627,7 @@ function createDefaultUrbanStyleConfig() {
     fillOpacity: 0.34,
     strokeOpacity: 0.62,
     adaptiveStrength: 0.72,
-    darkCountryBoost: true,
+    toneBias: 0.12,
     minAreaPx: LEGACY_URBAN_STYLE_DEFAULTS.minAreaPx,
   };
 }
@@ -672,6 +672,9 @@ function normalizeUrbanStyleConfig(rawConfig) {
       : defaults.fillOpacity;
   const color = typeof raw.color === "string" ? raw.color.trim() : "";
   const blendMode = String(raw.blendMode || defaults.blendMode).trim().toLowerCase() || defaults.blendMode;
+  const legacyToneBias = raw.darkCountryBoost === undefined
+    ? defaults.toneBias
+    : (raw.darkCountryBoost ? defaults.toneBias : 0);
 
   return {
     mode,
@@ -680,7 +683,7 @@ function normalizeUrbanStyleConfig(rawConfig) {
     fillOpacity: clamp(toFiniteNumber(raw.fillOpacity, fillOpacityFallback), 0, 1),
     strokeOpacity: clamp(toFiniteNumber(raw.strokeOpacity, defaults.strokeOpacity), 0, 1),
     adaptiveStrength: clamp(toFiniteNumber(raw.adaptiveStrength, defaults.adaptiveStrength), 0, 1),
-    darkCountryBoost: raw.darkCountryBoost === undefined ? defaults.darkCountryBoost : !!raw.darkCountryBoost,
+    toneBias: clamp(toFiniteNumber(raw.toneBias, legacyToneBias), -0.3, 0.3),
     minAreaPx: clamp(toFiniteNumber(raw.minAreaPx, defaults.minAreaPx), 0, 80),
   };
 }
@@ -853,7 +856,7 @@ function createDefaultDayNightStyleConfig() {
     cityLightsIntensity: 0.78,
     cityLightsTextureOpacity: 0.54,
     cityLightsCorridorStrength: 0.62,
-    cityLightsCoreSharpness: 0.68,
+    cityLightsCoreSharpness: 0.54,
     cityLightsPopulationBoostEnabled: true,
     cityLightsPopulationBoostStrength: 0.56,
   };
@@ -1373,6 +1376,7 @@ export const state = {
   activeScenarioPerformanceHints: null,
   landData: null,
   landDataFull: null,
+  activeScenarioMeshPack: null,
   specialZonesData: null,
   specialZonesExternalData: null,
   contextLayerExternalDataByName: {},
@@ -1423,6 +1427,7 @@ export const state = {
   oceanMaskQuality: 1,
   landBgData: null,
   urbanData: null,
+  urbanLayerCapability: null,
   worldCitiesData: null,
   baseCityAliasesData: null,
   baseCityDataState: "idle",

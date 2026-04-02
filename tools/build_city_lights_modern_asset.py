@@ -127,7 +127,7 @@ def load_grid_values(source_path: Path, width: int, height: int) -> list[int]:
                 + (cell_mean * 0.42)
                 + max(0.0, cell_max - cell_mean) * 0.12,
             )))
-            if boosted_value < 3 and cell_max < 6:
+            if boosted_value < 2 and cell_max < 3:
                 boosted_value = 0
             values.append(boosted_value)
     return values

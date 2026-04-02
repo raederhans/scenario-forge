@@ -1747,8 +1747,9 @@ function initToolbar({ render } = {}) {
   const urbanBlendMode = document.getElementById("urbanBlendMode");
   const urbanAdaptiveStrength = document.getElementById("urbanAdaptiveStrength");
   const urbanStrokeOpacity = document.getElementById("urbanStrokeOpacity");
-  const urbanDarkCountryBoost = document.getElementById("urbanDarkCountryBoost");
+  const urbanToneBias = document.getElementById("urbanToneBias");
   const urbanMinArea = document.getElementById("urbanMinArea");
+  const urbanAdaptiveStatus = document.getElementById("urbanAdaptiveStatus");
   const physicalMode = document.getElementById("physicalMode");
   const physicalOpacity = document.getElementById("physicalOpacity");
   const physicalAtlasIntensity = document.getElementById("physicalAtlasIntensity");
@@ -1961,6 +1962,7 @@ function initToolbar({ render } = {}) {
   const urbanOpacityValue = document.getElementById("urbanOpacityValue");
   const urbanAdaptiveStrengthValue = document.getElementById("urbanAdaptiveStrengthValue");
   const urbanStrokeOpacityValue = document.getElementById("urbanStrokeOpacityValue");
+  const urbanToneBiasValue = document.getElementById("urbanToneBiasValue");
   const urbanMinAreaValue = document.getElementById("urbanMinAreaValue");
   const cityPointsOpacityValue = document.getElementById("cityPointsOpacityValue");
   const cityPointsMarkerScaleValue = document.getElementById("cityPointsMarkerScaleValue");
@@ -2103,15 +2105,20 @@ function initToolbar({ render } = {}) {
   const syncDeveloperModeUi = () => {
     document.body?.classList.toggle("developer-mode", !!state.ui.developerMode);
     if (developerModeBtn) {
+      const buttonLabel = state.ui.developerMode
+        ? t("Hide development workspace", "ui")
+        : t("Show development workspace", "ui");
       developerModeBtn.classList.toggle("is-active", !!state.ui.developerMode);
       developerModeBtn.setAttribute("aria-pressed", state.ui.developerMode ? "true" : "false");
-      developerModeBtn.setAttribute(
-        "title",
-        state.ui.developerMode ? t("Exit developer mode", "ui") : t("Developer mode", "ui")
-      );
+      developerModeBtn.setAttribute("aria-label", buttonLabel);
+      developerModeBtn.setAttribute("title", buttonLabel);
     }
-    if (!state.ui.developerMode && state.ui.devWorkspaceExpanded && devWorkspaceToggleBtn) {
-      devWorkspaceToggleBtn.click();
+    if (!state.ui.developerMode && state.ui.devWorkspaceExpanded) {
+      if (typeof state.setDevWorkspaceExpandedFn === "function") {
+        state.setDevWorkspaceExpandedFn(false);
+      } else if (devWorkspaceToggleBtn) {
+        devWorkspaceToggleBtn.click();
+      }
     }
   };
 
@@ -4739,9 +4746,26 @@ function initToolbar({ render } = {}) {
   state.toggleLeftPanelFn = toggleLeftPanel;
   state.toggleRightPanelFn = toggleRightPanel;
   state.toggleDockFn = toggleDock;
+  state.syncDeveloperModeUiFn = syncDeveloperModeUi;
   state.toggleDeveloperModeFn = () => {
-    setDeveloperMode(!state.ui.developerMode);
-    return state.ui.developerMode;
+    const shouldOpen = !state.ui.developerMode;
+    if (shouldOpen) {
+      setDeveloperMode(true);
+      if (typeof state.setDevWorkspaceExpandedFn === "function") {
+        state.setDevWorkspaceExpandedFn(true);
+      } else if (devWorkspaceToggleBtn && !state.ui.devWorkspaceExpanded) {
+        devWorkspaceToggleBtn.click();
+      }
+      return true;
+    }
+
+    if (typeof state.setDevWorkspaceExpandedFn === "function") {
+      state.setDevWorkspaceExpandedFn(false);
+    } else if (devWorkspaceToggleBtn && state.ui.devWorkspaceExpanded) {
+      devWorkspaceToggleBtn.click();
+    }
+    setDeveloperMode(false);
+    return false;
   };
 
   const openDockPopover = (kind) => {
@@ -4984,6 +5008,29 @@ function initToolbar({ render } = {}) {
     return state.styleConfig.urban;
   };
 
+  const getUrbanCapability = () => {
+    const capability = state.urbanLayerCapability && typeof state.urbanLayerCapability === "object"
+      ? state.urbanLayerCapability
+      : null;
+    if (capability) return capability;
+    return {
+      adaptiveAvailable: false,
+      unavailableReason: "Urban layer metadata is still loading.",
+    };
+  };
+
+  const getEffectiveUrbanMode = (urbanConfig, capability = getUrbanCapability()) => {
+    if (urbanConfig?.mode === "adaptive" && !capability?.adaptiveAvailable) {
+      return "manual";
+    }
+    return urbanConfig?.mode === "manual" ? "manual" : "adaptive";
+  };
+
+  const formatUrbanToneBias = (rawValue) => {
+    const percent = Math.round((Number(rawValue) || 0) * 100);
+    return `${percent >= 0 ? "+" : ""}${percent}%`;
+  };
+
   const syncPhysicalConfig = () => {
     state.styleConfig.physical = normalizePhysicalStyleConfig(state.styleConfig.physical);
     state.styleConfig.physical.contourColor = normalizeOceanFillColor(
@@ -4999,8 +5046,20 @@ function initToolbar({ render } = {}) {
 
   const syncUrbanControls = () => {
     const urbanConfig = syncUrbanConfig();
-    const isManual = urbanConfig.mode === "manual";
-    if (urbanMode) urbanMode.value = urbanConfig.mode;
+    const capability = getUrbanCapability();
+    const adaptiveAvailable = !!capability.adaptiveAvailable;
+    const effectiveMode = getEffectiveUrbanMode(urbanConfig, capability);
+    const isManual = effectiveMode === "manual";
+    if (urbanMode) {
+      urbanMode.value = effectiveMode;
+      const adaptiveOption = urbanMode.querySelector('option[value="adaptive"]');
+      if (adaptiveOption) adaptiveOption.disabled = !adaptiveAvailable;
+    }
+    if (urbanAdaptiveStatus) {
+      const statusText = adaptiveAvailable ? "" : String(capability.unavailableReason || "").trim();
+      urbanAdaptiveStatus.textContent = statusText;
+      urbanAdaptiveStatus.classList.toggle("hidden", !statusText);
+    }
     if (lblUrbanOpacity) lblUrbanOpacity.textContent = isManual ? "Opacity" : "Fill Opacity";
     if (urbanAdaptiveControls) urbanAdaptiveControls.classList.toggle("hidden", isManual);
     if (urbanManualControls) urbanManualControls.classList.toggle("hidden", !isManual);
@@ -5016,7 +5075,11 @@ function initToolbar({ render } = {}) {
     if (urbanStrokeOpacityValue) {
       urbanStrokeOpacityValue.textContent = `${Math.round(urbanConfig.strokeOpacity * 100)}%`;
     }
-    if (urbanDarkCountryBoost) urbanDarkCountryBoost.checked = !!urbanConfig.darkCountryBoost;
+    if (urbanToneBias) urbanToneBias.value = String(Math.round(urbanConfig.toneBias * 100));
+    if (urbanToneBiasValue) urbanToneBiasValue.textContent = formatUrbanToneBias(urbanConfig.toneBias);
+    [urbanAdaptiveStrength, urbanStrokeOpacity, urbanToneBias].forEach((element) => {
+      if (element) element.disabled = !adaptiveAvailable;
+    });
     if (urbanMinArea) urbanMinArea.value = String(Math.round(urbanConfig.minAreaPx));
     if (urbanMinAreaValue) urbanMinAreaValue.textContent = `${Math.round(urbanConfig.minAreaPx)}`;
     return urbanConfig;
@@ -7168,7 +7231,7 @@ function initToolbar({ render } = {}) {
     dayNightCityLightsCoreSharpness.addEventListener("input", (event) => {
       const value = Number(event.target.value);
       const dayNight = syncDayNightConfig();
-      dayNight.cityLightsCoreSharpness = clamp(Number.isFinite(value) ? value / 100 : 0.68, 0, 1);
+      dayNight.cityLightsCoreSharpness = clamp(Number.isFinite(value) ? value / 100 : 0.54, 0, 1);
       renderDayNightUI();
       renderDirty("day-night-city-lights-core-sharpness");
     });
@@ -7326,7 +7389,11 @@ function initToolbar({ render } = {}) {
   if (urbanMode) {
     urbanMode.addEventListener("change", (event) => {
       const cfg = syncUrbanConfig();
-      cfg.mode = String(event.target.value || "adaptive");
+      const requestedMode = String(event.target.value || "adaptive");
+      const capability = getUrbanCapability();
+      cfg.mode = requestedMode === "adaptive" && !capability.adaptiveAvailable
+        ? "manual"
+        : requestedMode;
       syncUrbanControls();
       renderDirty("urban-mode");
     });
@@ -7472,11 +7539,15 @@ function initToolbar({ render } = {}) {
       renderDirty("urban-stroke-opacity");
     });
   }
-  if (urbanDarkCountryBoost) {
-    urbanDarkCountryBoost.addEventListener("change", (event) => {
+  if (urbanToneBias) {
+    urbanToneBias.addEventListener("input", (event) => {
       const cfg = syncUrbanConfig();
-      cfg.darkCountryBoost = !!event.target.checked;
-      renderDirty("urban-dark-country-boost");
+      const value = Number(event.target.value);
+      cfg.toneBias = clamp(Number.isFinite(value) ? value / 100 : cfg.toneBias, -0.3, 0.3);
+      if (urbanToneBiasValue) {
+        urbanToneBiasValue.textContent = formatUrbanToneBias(cfg.toneBias);
+      }
+      renderDirty("urban-tone-bias");
     });
   }
   if (urbanMinArea) {

@@ -9,7 +9,8 @@ from typing import Any
 
 from map_builder.io.writers import write_json_atomic
 from shapely import make_valid
-from shapely.geometry import mapping, shape
+from shapely.geometry import LineString, MultiLineString, mapping, shape
+from shapely.ops import unary_union
 from shapely.validation import explain_validity
 from topojson.utils import serialize_as_geojson
 
@@ -84,6 +85,141 @@ def _feature_country_code(feature: dict[str, Any]) -> str:
         if code:
             return code
     return ""
+
+
+def _feature_properties(feature: dict[str, Any]) -> dict[str, Any]:
+    props = feature.get("properties") if isinstance(feature, dict) else None
+    return props if isinstance(props, dict) else {}
+
+
+def _feature_identity(feature: dict[str, Any], fallback_index: int = 0) -> str:
+    props = _feature_properties(feature)
+    preferred = str(props.get("id") or "").strip()
+    return preferred or _feature_id(feature, fallback_index)
+
+
+def _is_antarctic_sector_feature(feature: dict[str, Any]) -> bool:
+    props = _feature_properties(feature)
+    feature_id = _feature_identity(feature, 0).strip().upper()
+    country_code = _feature_country_code(feature)
+    detail_tier = str(props.get("detail_tier") or "").strip().lower()
+    return detail_tier == "antarctic_sector" and (country_code == "AQ" or feature_id.startswith("AQ_"))
+
+
+def _is_shell_helper_feature(feature: dict[str, Any]) -> bool:
+    props = _feature_properties(feature)
+    helper_kind = str(props.get("scenario_helper_kind") or "").strip().lower()
+    feature_id = _feature_identity(feature, 0).strip().upper()
+    name = str(props.get("name") or feature.get("name") or "").strip().lower()
+    return helper_kind == "shell_fallback" or feature_id.startswith("RU_ARCTIC_FB_") or "shell fallback" in name
+
+
+def _feature_atl_geometry_role(feature: dict[str, Any]) -> str:
+    return str(_feature_properties(feature).get("atl_geometry_role") or "").strip().lower()
+
+
+def _feature_atl_join_mode(feature: dict[str, Any]) -> str:
+    return str(_feature_properties(feature).get("atl_join_mode") or "").strip().lower()
+
+
+def _is_atlantropa_helper_feature(feature: dict[str, Any]) -> bool:
+    feature_id = _feature_identity(feature, 0).strip().upper()
+    if feature_id.startswith("ATLSHL_") or feature_id.startswith("ATLWLD_") or feature_id.startswith("ATLSEA_FILL_"):
+        return True
+    geometry_role = _feature_atl_geometry_role(feature)
+    join_mode = _feature_atl_join_mode(feature)
+    return (
+        geometry_role in {"shore_seal", "sea_completion", "donor_sea"}
+        or join_mode in {"gap_fill", "boolean_weld"}
+    )
+
+
+def _is_explicit_political_feature(feature: dict[str, Any]) -> bool:
+    props = _feature_properties(feature)
+    if props.get("render_as_base_geography") is True:
+        return False
+    if props.get("interactive") is False:
+        return False
+    if _is_antarctic_sector_feature(feature):
+        return False
+    if _is_shell_helper_feature(feature):
+        return False
+    if _is_atlantropa_helper_feature(feature):
+        return False
+    return True
+
+
+def _iter_line_coords(geometry) -> list[list[list[float]]]:
+    if geometry is None or geometry.is_empty:
+        return []
+    if isinstance(geometry, LineString):
+        coords = [[float(x), float(y)] for x, y, *_rest in geometry.coords]
+        return [coords] if len(coords) >= 2 else []
+    if isinstance(geometry, MultiLineString):
+        lines: list[list[list[float]]] = []
+        for part in geometry.geoms:
+            lines.extend(_iter_line_coords(part))
+        return lines
+    if hasattr(geometry, "geoms"):
+        lines: list[list[list[float]]] = []
+        for part in geometry.geoms:
+            lines.extend(_iter_line_coords(part))
+        return lines
+    return []
+
+
+def _build_opening_owner_border_mesh(
+    runtime_topology_payload: dict[str, Any] | None,
+    owners_by_feature_id: dict[str, Any] | None,
+) -> dict[str, Any]:
+    feature_collection = _topology_object_to_feature_collection(runtime_topology_payload, "political")
+    if not isinstance(feature_collection, dict) or not isinstance(feature_collection.get("features"), list):
+        return {"type": "MultiLineString", "coordinates": []}
+
+    owners = owners_by_feature_id if isinstance(owners_by_feature_id, dict) else {}
+    geometries_by_owner: dict[str, list[Any]] = defaultdict(list)
+    for index, feature in enumerate(feature_collection.get("features") or []):
+        if not isinstance(feature, dict) or not _is_explicit_political_feature(feature):
+            continue
+        feature_id = _feature_identity(feature, index)
+        owner_tag = str(owners.get(feature_id) or "").strip().upper()
+        if not owner_tag:
+            continue
+        geometry_payload = feature.get("geometry")
+        if not geometry_payload:
+            continue
+        geom = shape(geometry_payload)
+        if geom.is_empty:
+            continue
+        if not geom.is_valid:
+            geom = make_valid(geom)
+        if geom.is_empty:
+            continue
+        geometries_by_owner[owner_tag].append(geom)
+
+    owner_regions: list[tuple[str, Any]] = []
+    for owner_tag in sorted(geometries_by_owner):
+        geom = unary_union(geometries_by_owner[owner_tag])
+        if not geom.is_valid:
+            geom = make_valid(geom)
+        if geom.is_empty:
+            continue
+        owner_regions.append((owner_tag, geom))
+
+    line_coordinates: list[list[list[float]]] = []
+    for index, (_owner_a, geom_a) in enumerate(owner_regions):
+        min_ax, min_ay, max_ax, max_ay = geom_a.bounds
+        for _owner_b, geom_b in owner_regions[index + 1:]:
+            min_bx, min_by, max_bx, max_by = geom_b.bounds
+            if max_ax < min_bx or max_bx < min_ax or max_ay < min_by or max_by < min_ay:
+                continue
+            shared_boundary = geom_a.intersection(geom_b)
+            line_coordinates.extend(_iter_line_coords(shared_boundary))
+
+    return {
+        "type": "MultiLineString",
+        "coordinates": line_coordinates,
+    }
 
 
 def _collect_coordinates(node: Any, sink: list[tuple[float, float]]) -> None:
@@ -608,6 +744,16 @@ def build_and_write_scenario_chunk_assets(
         "runtime_topology_object_names": sorted((runtime_topology_payload or {}).get("objects", {}).keys()) if isinstance(runtime_topology_payload, dict) else [],
         "runtime_topology_object_count": len((runtime_topology_payload or {}).get("objects", {})) if isinstance(runtime_topology_payload, dict) else 0,
     }
+    owners_payload_path = scenario_dir / "owners.by_feature.json"
+    owners_by_feature_id = {}
+    if owners_payload_path.exists():
+        owners_payload = json.loads(owners_payload_path.read_text(encoding="utf-8"))
+        if isinstance(owners_payload, dict) and isinstance(owners_payload.get("owners"), dict):
+            owners_by_feature_id = owners_payload["owners"]
+    opening_owner_borders = _build_opening_owner_border_mesh(
+        runtime_topology_payload,
+        owners_by_feature_id,
+    )
     mesh_pack_payload = {
         "version": 1,
         "scenario_id": scenario_id,
@@ -616,6 +762,9 @@ def build_and_write_scenario_chunk_assets(
         "mesh_summary": {
             "runtime_topology_url": runtime_topology_url,
             "startup_topology_url": startup_topology_url,
+        },
+        "meshes": {
+            "opening_owner_borders": opening_owner_borders,
         },
     }
 

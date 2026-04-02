@@ -10,6 +10,7 @@ import argparse
 import json
 from pathlib import Path
 import sys
+import tempfile
 
 import geopandas as gpd
 import pandas as pd
@@ -21,6 +22,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from map_builder import config as cfg
+from map_builder.geo.topology import build_topology
 from map_builder.processors.detail_shell_coverage import repair_shell_coverage
 from map_builder.processors.ru_city_overrides import CITY_SPECS, build_ru_city_overrides
 
@@ -32,6 +34,8 @@ DEFAULT_ADMIN1_CANDIDATES = (
 )
 
 LAYER_NAMES = ("political", "special_zones", "ocean", "land", "urban", "physical", "rivers")
+URBAN_CORRUPT_BOUNDS_WIDTH_DEG = 300.0
+URBAN_CORRUPT_BOUNDS_HEIGHT_DEG = 150.0
 
 
 def _empty_gdf() -> gpd.GeoDataFrame:
@@ -87,6 +91,30 @@ def _load_layers_from_topology(topology_dict: dict) -> dict[str, gpd.GeoDataFram
     if layers["political"].empty:
         raise ValueError("Source topology has no political layer to patch.")
     return layers
+
+
+def _describe_urban_layer_contract(gdf: gpd.GeoDataFrame | None) -> str:
+    if gdf is None or gdf.empty:
+        return "empty"
+    missing_columns = [column for column in ("id", "country_owner_id") if column not in gdf.columns]
+    if missing_columns:
+        return f"missing-columns:{','.join(missing_columns)}"
+    id_series = gdf["id"].fillna("").astype(str).str.strip()
+    owner_series = gdf["country_owner_id"].fillna("").astype(str).str.strip()
+    if int((id_series == "").sum()) > 0:
+        return "missing-id-values"
+    if int((owner_series == "").sum()) > 0:
+        return "missing-owner-values"
+    bounds = gdf.geometry.bounds
+    if not bounds.empty:
+        width = bounds["maxx"] - bounds["minx"]
+        height = bounds["maxy"] - bounds["miny"]
+        corrupt_count = int(
+            ((width >= URBAN_CORRUPT_BOUNDS_WIDTH_DEG) | (height >= URBAN_CORRUPT_BOUNDS_HEIGHT_DEG)).sum()
+        )
+        if corrupt_count > 0:
+            return f"corrupt-bounds:{corrupt_count}"
+    return ""
 
 
 def _apply_city_overrides(
@@ -186,6 +214,37 @@ def _promote_geometry_ids(topology_dict: dict) -> None:
                 props["id"] = preferred
 
 
+def _write_output_topology(
+    *,
+    output_path: Path,
+    political: gpd.GeoDataFrame,
+    layers: dict[str, gpd.GeoDataFrame],
+) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        prefix=f".{output_path.name}.",
+        suffix=output_path.suffix,
+        dir=output_path.parent,
+        delete=False,
+    ) as handle:
+        temp_path = Path(handle.name)
+    try:
+        build_topology(
+            political=political,
+            ocean=layers.get("ocean", _empty_gdf()),
+            land=layers.get("land", _empty_gdf()),
+            urban=layers.get("urban", _empty_gdf()),
+            physical=layers.get("physical", _empty_gdf()),
+            rivers=layers.get("rivers", _empty_gdf()),
+            special_zones=layers.get("special_zones"),
+            output_path=temp_path,
+            quantization=cfg.TOPOLOGY_QUANTIZATION,
+        )
+        temp_path.replace(output_path)
+    finally:
+        temp_path.unlink(missing_ok=True)
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Inject stable RU city features into detail topology.")
     parser.add_argument(
@@ -231,6 +290,14 @@ def main() -> None:
         print(f"[RU patch] Loading primary topology shell: {primary_topology_path}")
         primary_topology_dict = _load_topology(primary_topology_path)
         primary_layers = _load_layers_from_topology(primary_topology_dict)
+        source_urban_issue = _describe_urban_layer_contract(layers.get("urban"))
+        primary_urban_issue = _describe_urban_layer_contract(primary_layers.get("urban"))
+        if source_urban_issue and not primary_urban_issue:
+            print(
+                "[RU patch] Replacing invalid urban layer with primary shell copy: "
+                f"source={source_urban_issue}"
+            )
+            layers["urban"] = primary_layers["urban"].copy()
 
     admin1_path = _find_admin1_path(data_dir, args.admin1)
     ru_adm2_path = args.ru_adm2
@@ -259,15 +326,14 @@ def main() -> None:
     print(f"[RU patch] Patched political features: {len(patched_political)}")
     layers["political"] = patched_political
 
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    topology_dict = _build_topology_dict_from_layers(layers)
-    _promote_geometry_ids(topology_dict)
-    output_path.write_text(
-        json.dumps(topology_dict, separators=(",", ":")),
-        encoding="utf-8",
+    _write_output_topology(
+        output_path=output_path,
+        political=patched_political,
+        layers=layers,
     )
+    output_dict = _load_topology(output_path)
     political_count = len(
-        topology_dict.get("objects", {}).get("political", {}).get("geometries", [])
+        output_dict.get("objects", {}).get("political", {}).get("geometries", [])
     )
     print(f"[RU patch] Output political features: {political_count}")
 

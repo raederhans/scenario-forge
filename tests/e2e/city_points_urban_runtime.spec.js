@@ -3,11 +3,61 @@ const path = require("path");
 const { test, expect } = require("@playwright/test");
 const { getAppUrl } = require("./support/playwright-app");
 
+test.setTimeout(90_000);
 const APP_URL = getAppUrl();
 const VIEW_SETTINGS_STORAGE_KEY = 'map_view_settings_v1';
 const IGNORED_CONSOLE_PATTERNS = [
   /\[map_renderer\] Scenario political background merge fallback engaged:/i,
 ];
+
+async function activateAppearanceTab(page, tabId, panelId) {
+  await page.evaluate(({ targetTabId }) => {
+    const button = document.getElementById(targetTabId);
+    if (!button) {
+      throw new Error(`Missing appearance tab: ${targetTabId}`);
+    }
+    button.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+  }, { targetTabId: tabId });
+  await expect(page.locator(`#${panelId}`)).toHaveClass(/is-active/);
+}
+
+async function setCheckbox(page, id, checked) {
+  await page.evaluate(({ targetId, targetChecked }) => {
+    const input = document.getElementById(targetId);
+    if (!input) {
+      throw new Error(`Missing checkbox: ${targetId}`);
+    }
+    input.checked = !!targetChecked;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  }, { targetId: id, targetChecked: checked });
+}
+
+async function setSelectValue(page, id, value) {
+  await page.evaluate(({ targetId, targetValue }) => {
+    const select = document.getElementById(targetId);
+    if (!select) {
+      throw new Error(`Missing select: ${targetId}`);
+    }
+    select.value = String(targetValue);
+    select.dispatchEvent(new Event('input', { bubbles: true }));
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+  }, { targetId: id, targetValue: value });
+}
+
+async function ensureBaseCityDataLoaded(page, reason = 'e2e-city-points-runtime') {
+  await page.evaluate(async (loadReason) => {
+    const { state } = await import('/js/core/state.js');
+    if (typeof state.ensureBaseCityDataFn === 'function') {
+      await state.ensureBaseCityDataFn({ reason: loadReason, renderNow: true });
+    }
+  }, reason);
+  await page.waitForFunction(async () => {
+    const { state } = await import('/js/core/state.js');
+    return state.baseCityDataState === 'loaded'
+      && Array.isArray(state.worldCitiesData?.features)
+      && state.worldCitiesData.features.length > 0;
+  }, { timeout: 120000 });
+}
 
 test('city points runtime bridge smoke keeps legacy radius hydration and simplified controls', async ({ page }) => {
   const consoleIssues = [];
@@ -84,8 +134,7 @@ test('city points runtime bridge smoke keeps legacy radius hydration and simplif
     await page.waitForTimeout(1200);
   }
 
-  await page.click('#appearanceTabLayers');
-  await expect(page.locator('#appearancePanelLayers')).toHaveClass(/is-active/);
+  await activateAppearanceTab(page, 'appearanceTabLayers', 'appearancePanelLayers');
   await expect(page.locator('#cityPointsMarkerScale')).toHaveValue('1.14');
   await expect(page.locator('#cityPointsTheme')).toHaveCount(0);
   await expect(page.locator('#cityPointsRadius')).toHaveCount(0);
@@ -93,16 +142,16 @@ test('city points runtime bridge smoke keeps legacy radius hydration and simplif
   const cityPanelText = await page.locator('#appearancePanelLayers').innerText();
   expect(cityPanelText).not.toContain('Point Size');
 
-  await page.click('#appearanceTabDayNight');
-  await expect(page.locator('#appearancePanelDayNight')).toHaveClass(/is-active/);
+  await activateAppearanceTab(page, 'appearanceTabDayNight', 'appearancePanelDayNight');
   if (!(await page.locator('#dayNightEnabled').isChecked())) {
-    await page.click('#dayNightEnabled');
+    await setCheckbox(page, 'dayNightEnabled', true);
   }
   if (!(await page.locator('#dayNightCityLightsEnabled').isChecked())) {
-    await page.click('#dayNightCityLightsEnabled');
+    await setCheckbox(page, 'dayNightCityLightsEnabled', true);
   }
-  await page.selectOption('#dayNightCityLightsStyle', 'modern');
+  await setSelectValue(page, 'dayNightCityLightsStyle', 'modern');
   await page.waitForTimeout(600);
+  await ensureBaseCityDataLoaded(page);
 
   const runtimeSnapshot = await page.evaluate(async () => {
     const { state } = await import('/js/core/state.js');
@@ -177,6 +226,11 @@ test('city points runtime bridge smoke keeps legacy radius hydration and simplif
       rawHiddenTagCityCounts,
       effectiveHiddenTagCityCounts,
       hiddenTagUrbanCounts,
+      urbanCapability: state.urbanLayerCapability || null,
+      urbanStoredMode: String(state.styleConfig?.urban?.mode || ''),
+      urbanModeSelectValue: String(document.getElementById('urbanMode')?.value || ''),
+      urbanAdaptiveStatusText: String(document.getElementById('urbanAdaptiveStatus')?.textContent || '').trim(),
+      urbanAdaptiveOptionDisabled: !!document.querySelector('#urbanMode option[value="adaptive"]')?.disabled,
       totalRawHiddenTagCityCount: Object.values(rawHiddenTagCityCounts).reduce((sum, count) => sum + count, 0),
       dayNightEnabled: !!state.styleConfig?.dayNight?.enabled,
       cityLightsEnabled: !!state.styleConfig?.dayNight?.cityLightsEnabled,
@@ -200,6 +254,12 @@ test('city points runtime bridge smoke keeps legacy radius hydration and simplif
   expect(runtimeSnapshot.totalRawHiddenTagCityCount).toBeGreaterThan(0);
   expect(runtimeSnapshot.effectiveHiddenTagCityCounts.AFA).toBe(0);
   expect(runtimeSnapshot.effectiveHiddenTagCityCounts.RFA).toBe(0);
+  expect(runtimeSnapshot.urbanCapability?.adaptiveAvailable).toBe(false);
+  expect(runtimeSnapshot.urbanCapability?.missingOwnerCount).toBeGreaterThan(0);
+  expect(runtimeSnapshot.urbanStoredMode).toBe('adaptive');
+  expect(runtimeSnapshot.urbanModeSelectValue).toBe('manual');
+  expect(runtimeSnapshot.urbanAdaptiveOptionDisabled).toBe(true);
+  expect(runtimeSnapshot.urbanAdaptiveStatusText).toContain('country owner metadata');
   expect(runtimeSnapshot.dayNightEnabled).toBe(true);
   expect(runtimeSnapshot.cityLightsEnabled).toBe(true);
   expect(runtimeSnapshot.cityLightsStyle).toBe('modern');

@@ -59,7 +59,6 @@
             <div class="sidebar-brand-row">
               <div class="app-title-row app-title-row-compact">
                 <h1 class="app-title" data-i18n="Scenario Forge">Scenario Forge</h1>
-                <span id="appDirtyIndicator" class="app-dirty-indicator hidden" aria-hidden="true">*</span>
               </div>
             </div>
           </div>
@@ -580,6 +579,7 @@
                             <option value="adaptive" selected>Adaptive</option>
                             <option value="manual">Manual</option>
                           </select>
+                          <p id="urbanAdaptiveStatus" class="sidebar-tool-hint mt-2 hidden"></p>
                         </div>
                         <div id="urbanAdaptiveControls" class="space-y-2">
                           <div>
@@ -596,10 +596,13 @@
                             </div>
                             <input id="urbanStrokeOpacity" type="range" min="0" max="100" value="62" class="range-input" />
                           </div>
-                          <label class="toggle-label">
-                            <input id="urbanDarkCountryBoost" type="checkbox" class="checkbox-input" checked />
-                            <span>Boost Deep Colors</span>
-                          </label>
+                          <div>
+                            <div class="range-row">
+                              <label class="range-label" for="urbanToneBias">Tone Bias</label>
+                              <span id="urbanToneBiasValue" class="range-value">+12%</span>
+                            </div>
+                            <input id="urbanToneBias" type="range" min="-30" max="30" value="12" class="range-input" />
+                          </div>
                         </div>
                         <div id="urbanManualControls" class="space-y-2 hidden">
                           <div class="flex items-center justify-between gap-3">
@@ -755,48 +758,6 @@
                     </div>
                   </details>
 
-                  <details class="appearance-mini-section" data-appearance-filter-item data-appearance-filter-label="airports aviation transport">
-                    <summary class="section-header">Airports</summary>
-                    <div class="mt-3">
-                      <label class="toggle-label mt-2">
-                        <input id="toggleAirports" type="checkbox" class="checkbox-input" />
-                        <span>Airports</span>
-                      </label>
-                      <div class="ml-5 space-y-2">
-                        <p class="panel-hint mt-2">Loads the governed Japan airport point pack built from the official C28 source.</p>
-                      </div>
-                    </div>
-                  </details>
-
-                  <details class="appearance-mini-section" data-appearance-filter-item data-appearance-filter-label="ports harbors maritime transport">
-                    <summary class="section-header">Ports</summary>
-                    <div class="mt-3">
-                      <label class="toggle-label mt-2">
-                        <input id="togglePorts" type="checkbox" class="checkbox-input" />
-                        <span>Ports</span>
-                      </label>
-                      <div class="ml-5 space-y-2">
-                        <p class="panel-hint mt-2">Loads the internal-trial Japan major-port point pack from the official C02 source.</p>
-                      </div>
-                    </div>
-                  </details>
-
-                  <details class="appearance-mini-section" data-appearance-filter-item data-appearance-filter-label="water regions open ocean">
-                    <summary id="lblWaterRegionsPanel" class="section-header">Water Regions</summary>
-                    <div class="mt-3">
-                      <label class="toggle-label mt-2">
-                        <input id="toggleWaterRegions" type="checkbox" class="checkbox-input" checked />
-                        <span id="lblWaterRegions">Water Regions</span>
-                      </label>
-                      <div class="ml-5">
-                        <label class="toggle-label mt-2">
-                          <input id="toggleOpenOceanRegions" type="checkbox" class="checkbox-input" />
-                          <span id="lblOpenOceanRegions">Allow Open-Ocean Interaction</span>
-                        </label>
-                      </div>
-                    </div>
-                  </details>
-
                 </div>
               </section>
 
@@ -938,14 +899,14 @@
                           >
                             Core Sharpness (Modern only)
                           </label>
-                          <span id="dayNightCityLightsCoreSharpnessValue" class="range-value">68%</span>
+                          <span id="dayNightCityLightsCoreSharpnessValue" class="range-value">54%</span>
                         </div>
                         <input
                           id="dayNightCityLightsCoreSharpness"
                           type="range"
                           min="0"
                           max="100"
-                          value="68"
+                          value="54"
                           class="range-input"
                         />
                       </div>
@@ -1220,10 +1181,7 @@
 
           <div class="card color-library-card sidebar-secondary-card">
             <div class="palette-library-header-row">
-              <div class="palette-library-header-copy">
-                <h2 id="lblColorLibrary" class="section-header">Color Library</h2>
-                <p class="palette-library-secondary-note" data-i18n="Reference palettes stay available here without crowding the primary editing panels.">Reference palettes stay available here without crowding the primary editing panels.</p>
-              </div>
+              <h2 id="lblColorLibrary" class="section-header">Color Library</h2>
               <button
                 id="paletteLibraryToggle"
                 class="palette-library-toggle-btn"
@@ -1233,9 +1191,7 @@
                 aria-label="Browse All Colors"
                 title="Browse All Colors"
               >
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="m7 10 5 5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
-                </svg>
+                <span class="palette-library-toggle-glyph" aria-hidden="true">▸</span>
                 <span id="paletteLibraryToggleLabel" class="visually-hidden">Browse All Colors</span>
               </button>
             </div>
@@ -1344,7 +1300,7 @@
             </button>
             <button
               id="devWorkspaceToggleBtn"
-              class="zoom-btn dev-workspace-toggle dev-only"
+              class="zoom-btn dev-workspace-toggle dev-only hidden"
               type="button"
               aria-controls="devWorkspacePanel"
               aria-expanded="false"
@@ -1358,10 +1314,6 @@
 
           <section id="bottomDock" class="bottom-dock" aria-labelledby="bottomDockHeading">
             <h2 id="bottomDockHeading" class="visually-hidden" data-i18n="Quick edit dock">Quick edit dock</h2>
-            <button id="dockCollapseBtn" type="button" class="dock-handle-btn" aria-label="Collapse quick dock" data-i18n-aria-label="Collapse quick dock" title="Collapse" data-i18n-title="Collapse">
-              <span id="dockHandleChevron" class="dock-handle-chevron" aria-hidden="true">v</span>
-              <span id="dockHandleLabel" class="visually-hidden" data-i18n="Collapse">Collapse</span>
-            </button>
             <div class="bottom-dock-primary">
               <div class="dock-group dock-group-tools" role="group" aria-label="Tools" data-i18n-aria-label="Tools" title="Tools" data-i18n-title="Tools">
                 <span id="lblCurrentTool" class="visually-hidden">Tools</span>
@@ -1544,6 +1496,10 @@
                 </div>
               </div>
             </div>
+            <button id="dockCollapseBtn" type="button" class="dock-handle-btn" aria-label="Collapse quick dock" data-i18n-aria-label="Collapse quick dock" title="Collapse" data-i18n-title="Collapse">
+              <span id="dockHandleChevron" class="dock-handle-chevron" aria-hidden="true">▾</span>
+              <span id="dockHandleLabel" class="visually-hidden" data-i18n="Collapse">Collapse</span>
+            </button>
           </section>
         </div>
       </main>
