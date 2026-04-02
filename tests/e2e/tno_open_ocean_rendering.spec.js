@@ -29,8 +29,12 @@ async function applyScenario(page, scenarioId) {
 async function setOpenOceanVisibility(page, visible) {
   await page.evaluate(async (nextVisible) => {
     const { state } = await import("/js/core/state.js");
-    const { render } = await import("/js/core/map_renderer.js");
+    const {
+      invalidateOceanWaterInteractionVisualState,
+      render,
+    } = await import("/js/core/map_renderer.js");
     state.showOpenOceanRegions = !!nextVisible;
+    invalidateOceanWaterInteractionVisualState("test-open-ocean-toggle");
     render();
   }, visible);
 }
@@ -70,6 +74,88 @@ async function readOpenOceanRuntime(page, featureId) {
         maxY: item.maxY,
         bboxArea: item.bboxArea,
       })),
+    };
+  }, featureId);
+}
+
+async function sampleFeaturePatchStats(page, featureId) {
+  return page.evaluate(async (targetFeatureId) => {
+    const { state } = await import("/js/core/state.js");
+    const items = Array.isArray(state.waterSpatialItems)
+      ? state.waterSpatialItems
+        .filter((item) => String(item?.featureId || "") === targetFeatureId)
+        .sort((left, right) => Number(right?.bboxArea || 0) - Number(left?.bboxArea || 0))
+      : [];
+    const canvas = document.getElementById("map-canvas");
+    const context = canvas instanceof HTMLCanvasElement
+      ? canvas.getContext("2d", { willReadFrequently: true })
+      : null;
+    const transform = state.zoomTransform || { x: 0, y: 0, k: 1 };
+    const dpr = Number(state.dpr || globalThis.devicePixelRatio || 1);
+    if (!items.length || !canvas || !context) {
+      return null;
+    }
+    const sampleBoxes = items
+      .slice(0, 3)
+      .map((item) => {
+        const minX = Math.max(
+          0,
+          Math.min(
+            canvas.width - 1,
+            Math.floor(((item.minX * transform.k) + transform.x) * dpr)
+          )
+        );
+        const minY = Math.max(
+          0,
+          Math.min(
+            canvas.height - 1,
+            Math.floor(((item.minY * transform.k) + transform.y) * dpr)
+          )
+        );
+        const maxX = Math.max(
+          minX + 1,
+          Math.min(
+            canvas.width,
+            Math.ceil(((item.maxX * transform.k) + transform.x) * dpr)
+          )
+        );
+        const maxY = Math.max(
+          minY + 1,
+          Math.min(
+            canvas.height,
+            Math.ceil(((item.maxY * transform.k) + transform.y) * dpr)
+          )
+        );
+        const width = Math.max(1, maxX - minX);
+        const height = Math.max(1, maxY - minY);
+        if (!(width > 0) || !(height > 0)) return null;
+        return { minX, minY, width, height };
+      })
+      .filter(Boolean);
+    if (!sampleBoxes.length) {
+      return null;
+    }
+    let pixelCount = 0;
+    let red = 0;
+    let green = 0;
+    let blue = 0;
+    sampleBoxes.forEach((box) => {
+      const data = context.getImageData(box.minX, box.minY, box.width, box.height).data;
+      for (let index = 0; index < data.length; index += 4) {
+        red += data[index];
+        green += data[index + 1];
+        blue += data[index + 2];
+        pixelCount += 1;
+      }
+    });
+    if (!pixelCount) {
+      return null;
+    }
+    return {
+      sampledBoxes: sampleBoxes.length,
+      avgRed: red / pixelCount,
+      avgGreen: green / pixelCount,
+      avgBlue: blue / pixelCount,
     };
   }, featureId);
 }
@@ -183,11 +269,15 @@ test("tno open ocean override is visibly rendered and indexed by polygon part", 
   const runtimeBefore = await readOpenOceanRuntime(page, targetFeatureId);
   expect(runtimeBefore.featureInteractive).toBe(false);
   expect(runtimeBefore.itemCount).toBeGreaterThan(1);
+  const patchBefore = await sampleFeaturePatchStats(page, targetFeatureId);
+  expect(patchBefore).not.toBeNull();
+  expect(patchBefore.avgBlue).toBeGreaterThan(patchBefore.avgRed + 10);
+  expect(patchBefore.avgBlue).toBeGreaterThan(patchBefore.avgGreen + 5);
 
   const diffWhileInteractionOff = await measureFeaturePatchDiff(page, targetFeatureId, "#ff00ff");
   expect(diffWhileInteractionOff).not.toBeNull();
-  expect(diffWhileInteractionOff.changedPixelCount).toBeGreaterThan(80);
-  expect(diffWhileInteractionOff.meanChangedChannelDiff).toBeGreaterThan(20);
+  expect(diffWhileInteractionOff.changedPixelCount).toBeLessThan(160);
+  expect(diffWhileInteractionOff.meanChangedChannelDiff).toBeLessThan(18);
 
   await setOpenOceanVisibility(page, true);
   await page.waitForFunction(async () => {
@@ -208,10 +298,15 @@ test("tno open ocean override is visibly rendered and indexed by polygon part", 
   });
   const runtimeAfterToggleOff = await readOpenOceanRuntime(page, targetFeatureId);
   expect(runtimeAfterToggleOff.featureInteractive).toBe(false);
+  const patchAfterToggleOff = await sampleFeaturePatchStats(page, targetFeatureId);
+  expect(patchAfterToggleOff).not.toBeNull();
+  expect(patchAfterToggleOff.avgBlue).toBeGreaterThan(patchAfterToggleOff.avgRed + 10);
+  expect(patchAfterToggleOff.avgBlue).toBeGreaterThan(patchAfterToggleOff.avgGreen + 5);
+  expect(Math.abs(patchAfterToggleOff.avgBlue - patchBefore.avgBlue)).toBeLessThan(30);
   const diffAfterToggleOff = await measureFeaturePatchDiff(page, targetFeatureId, "#ff8800");
   expect(diffAfterToggleOff).not.toBeNull();
-  expect(diffAfterToggleOff.changedPixelCount).toBeGreaterThan(80);
-  expect(diffAfterToggleOff.meanChangedChannelDiff).toBeGreaterThan(20);
+  expect(diffAfterToggleOff.changedPixelCount).toBeLessThan(diffWhileInteractionOn.changedPixelCount * 0.25);
+  expect(diffAfterToggleOff.meanChangedChannelDiff).toBeLessThan(diffWhileInteractionOn.meanChangedChannelDiff * 0.75);
 
   await setWaterOverrideColor(page, targetFeatureId, "");
 });

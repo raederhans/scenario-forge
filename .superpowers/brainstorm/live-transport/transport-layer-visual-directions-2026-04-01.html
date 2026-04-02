@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transport Layer Directions</title>
+    <style>
+      :root {
+        --bg: #f4efe7;
+        --paper: rgba(255, 252, 247, 0.88);
+        --ink: #1f2937;
+        --muted: #5b6472;
+        --line: rgba(31, 41, 55, 0.12);
+        --accent: #8b5e34;
+        --accent-soft: rgba(139, 94, 52, 0.12);
+        --sea: #dce7ef;
+        --land: #fbf7f1;
+        --mount: #ede5d8;
+        --port: #b45309;
+        --mineral: #7c3aed;
+        --energy: #c2410c;
+        --industry: #475569;
+        --logistics: #0f766e;
+        --good: #14532d;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(210, 189, 160, 0.28), transparent 32%),
+          radial-gradient(circle at top right, rgba(124, 58, 237, 0.1), transparent 28%),
+          linear-gradient(180deg, #f7f1e9 0%, #efe6db 100%);
+      }
+
+      .page {
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 32px 28px 40px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 24px;
+        align-items: end;
+        margin-bottom: 24px;
+      }
+
+      .hero-card,
+      .summary-card,
+      .option {
+        background: var(--paper);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        box-shadow: 0 20px 50px rgba(69, 54, 37, 0.08);
+      }
+
+      .hero-card {
+        padding: 28px 30px 26px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        gap: 10px;
+        align-items: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.62);
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 16px 0 12px;
+        font-size: clamp(32px, 4vw, 54px);
+        line-height: 1.02;
+        letter-spacing: -0.04em;
+      }
+
+      .hero p,
+      .summary-card p,
+      .note,
+      .chip,
+      .mini,
+      li {
+        line-height: 1.6;
+      }
+
+      .hero p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+        max-width: 60ch;
+      }
+
+      .summary-card {
+        padding: 22px 22px 18px;
+      }
+
+      .summary-card h2 {
+        margin: 0 0 10px;
+        font-size: 14px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .metric {
+        padding: 12px 13px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.7);
+        border: 1px solid rgba(31, 41, 55, 0.08);
+      }
+
+      .metric strong {
+        display: block;
+        font-size: 22px;
+        margin-bottom: 2px;
+      }
+
+      .metric span {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .board-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 20px;
+        margin: 8px 0 16px;
+      }
+
+      .board-title h2 {
+        margin: 0;
+        font-size: 26px;
+        letter-spacing: -0.03em;
+      }
+
+      .board-title p {
+        margin: 0;
+        color: var(--muted);
+        max-width: 58ch;
+      }
+
+      .options {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .option {
+        padding: 18px;
+        cursor: pointer;
+        transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+      }
+
+      .option:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 24px 54px rgba(69, 54, 37, 0.1);
+      }
+
+      .option.selected {
+        border-color: rgba(20, 83, 45, 0.4);
+        box-shadow: 0 0 0 3px rgba(20, 83, 45, 0.16), 0 24px 54px rgba(69, 54, 37, 0.12);
+      }
+
+      .option-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: start;
+        margin-bottom: 12px;
+      }
+
+      .letter {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-weight: 800;
+      }
+
+      .badge {
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(20, 83, 45, 0.08);
+        color: var(--good);
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .option h3 {
+        margin: 0 0 8px;
+        font-size: 23px;
+        letter-spacing: -0.03em;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        margin: 0 0 12px;
+        font-size: 14px;
+      }
+
+      .map {
+        position: relative;
+        height: 260px;
+        border-radius: 20px;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 65% 35%, rgba(255,255,255,0.9), rgba(255,255,255,0) 20%),
+          linear-gradient(180deg, var(--sea), #cfdbe5 100%);
+        border: 1px solid rgba(31, 41, 55, 0.08);
+      }
+
+      .landmass,
+      .coast-shadow,
+      .region-pill,
+      .blob,
+      .dot,
+      .hex,
+      .strip,
+      .legend-row {
+        position: absolute;
+      }
+
+      .landmass {
+        inset: 18px 18px 22px 18px;
+        background:
+          radial-gradient(circle at 46% 38%, rgba(186, 147, 110, 0.16), transparent 18%),
+          radial-gradient(circle at 36% 68%, rgba(124, 58, 237, 0.1), transparent 16%),
+          linear-gradient(180deg, var(--land), #f3ebdf 100%);
+        clip-path: polygon(47% 4%, 55% 8%, 59% 16%, 58% 28%, 61% 43%, 57% 55%, 55% 71%, 57% 86%, 50% 94%, 44% 86%, 42% 73%, 45% 59%, 40% 46%, 38% 33%, 41% 19%);
+      }
+
+      .coast-shadow {
+        inset: 14px 14px 18px 14px;
+        border-radius: 18px;
+        box-shadow: inset 0 0 0 1px rgba(108, 123, 138, 0.14);
+      }
+
+      .ridge {
+        position: absolute;
+        width: 110px;
+        height: 12px;
+        border-radius: 999px;
+        background: rgba(135, 101, 65, 0.12);
+        transform: rotate(-34deg);
+      }
+
+      .region-pill {
+        padding: 5px 9px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.82);
+        font-size: 11px;
+        font-weight: 700;
+        color: #344054;
+      }
+
+      .blob {
+        border-radius: 50%;
+        filter: blur(8px);
+        opacity: 0.78;
+      }
+
+      .blob.mineral { background: rgba(124, 58, 237, 0.42); }
+      .blob.logistics { background: rgba(15, 118, 110, 0.36); }
+      .blob.industry { background: rgba(71, 85, 105, 0.32); }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        opacity: 0.86;
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.5);
+      }
+
+      .dot.port { background: var(--port); }
+      .dot.mineral { background: var(--mineral); transform: rotate(45deg); border-radius: 0; }
+      .dot.energy { background: var(--energy); }
+      .dot.logistics { background: var(--logistics); }
+
+      .hex {
+        width: 28px;
+        height: 24px;
+        clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0% 50%);
+        opacity: 0.86;
+        border: 1px solid rgba(255,255,255,0.5);
+      }
+
+      .strip {
+        height: 10px;
+        border-radius: 999px;
+        opacity: 0.9;
+      }
+
+      .legend {
+        margin-top: 12px;
+        padding: 12px 12px 10px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.72);
+        border: 1px solid rgba(31, 41, 55, 0.06);
+      }
+
+      .legend-row {
+        position: static;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .swatch {
+        width: 14px;
+        height: 14px;
+        border-radius: 4px;
+        flex: 0 0 auto;
+      }
+
+      .swatch.port { background: var(--port); }
+      .swatch.mineral { background: var(--mineral); }
+      .swatch.energy { background: var(--energy); }
+      .swatch.industry { background: var(--industry); }
+      .swatch.logistics { background: var(--logistics); }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .chip {
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.74);
+        border: 1px solid rgba(31, 41, 55, 0.08);
+        font-size: 12px;
+        color: #344054;
+      }
+
+      ul {
+        margin: 14px 0 0;
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .decision-strip {
+        margin-top: 22px;
+        padding: 18px 20px;
+        border-radius: 20px;
+        background: rgba(31, 41, 55, 0.94);
+        color: rgba(255,255,255,0.92);
+      }
+
+      .decision-strip strong {
+        color: white;
+      }
+
+      .decision-strip p {
+        margin: 6px 0 0;
+        color: rgba(255,255,255,0.76);
+      }
+
+      @media (max-width: 1180px) {
+        .hero,
+        .options {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 700px) {
+        .page { padding: 20px 16px 28px; }
+        .hero-card,
+        .summary-card,
+        .option { border-radius: 18px; }
+        .map { height: 230px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <div class="hero-card">
+          <div class="eyebrow">Transport Workbench / Japan Layers</div>
+          <h1>高密度图层别再只靠原始点阵硬摊开</h1>
+          <p>
+            这页不是最终 UI，而是给你判断方向用的。重点是看：
+            港口要不要分层口径、矿产/能源类别怎么保留、工业/物流这种高密度对象默认到底该先给“整体格局”还是“逐个审查”。
+          </p>
+        </div>
+        <aside class="summary-card">
+          <h2>当前核查到的关键事实</h2>
+          <p>这些数字不是估算，是从当前 pack 和 build audit 里直接读出来的。</p>
+          <div class="summary-grid">
+            <div class="metric"><strong>12</strong><span>当前港口点位，只保留核心口径</span></div>
+            <div class="metric"><strong>12,668</strong><span>矿产点位，但默认没有类别着色</span></div>
+            <div class="metric"><strong>490</strong><span>能源设施，已有 subtype 目录</span></div>
+            <div class="metric"><strong>31,976</strong><span>工业开放版多边形，已超出直摊可读范围</span></div>
+          </div>
+        </aside>
+      </section>
+
+      <div class="board-title">
+        <div>
+          <h2>三种表达方向</h2>
+          <p>点卡片即可选择。我的推荐是 A，因为它最符合你刚才给出的偏好：默认看格局，但随时切回单点/单面审查。</p>
+        </div>
+      </div>
+
+      <section class="options">
+        <article class="option selected" data-choice="a" onclick="toggleSelect(this)">
+          <div class="option-head">
+            <div class="letter">A</div>
+            <div class="badge">推荐</div>
+          </div>
+          <h3>双模式工作流</h3>
+          <p class="subtitle">默认密度视图 + 审查视图切换。全局读图和精查分开，不再互相拖累。</p>
+          <div class="map">
+            <div class="coast-shadow"></div>
+            <div class="landmass"></div>
+            <div class="ridge" style="top:68px; left:45%;"></div>
+            <div class="ridge" style="top:122px; left:43%; width:132px;"></div>
+            <div class="blob logistics" style="left:54%; top:146px; width:118px; height:86px;"></div>
+            <div class="blob mineral" style="left:47%; top:95px; width:82px; height:76px;"></div>
+            <div class="blob industry" style="left:52%; top:166px; width:106px; height:70px;"></div>
+            <div class="region-pill" style="left:57%; top:160px;">东京湾密度核心</div>
+            <div class="region-pill" style="left:45%; top:104px;">东北矿产带</div>
+            <div class="dot port" style="left:60%; top:186px;"></div>
+            <div class="dot port" style="left:61.5%; top:194px;"></div>
+            <div class="dot energy" style="left:58%; top:174px;"></div>
+            <div class="dot mineral" style="left:49%; top:118px;"></div>
+            <div class="dot logistics" style="left:56%; top:200px;"></div>
+          </div>
+          <div class="legend">
+            <div class="legend-row"><span class="swatch port"></span> 港口改成“核心 / 扩展 / 全量官方”三档口径</div>
+            <div class="legend-row"><span class="swatch mineral"></span> 矿产默认按筛选后的类别生成密度层，再切回单点审查</div>
+            <div class="legend-row"><span class="swatch industry"></span> 工业与物流默认看密度分布，需要时进审查模式看单对象</div>
+          </div>
+          <div class="chips">
+            <span class="chip">适合当前工作台</span>
+            <span class="chip">最容易复用到主地图</span>
+            <span class="chip">类别表达清楚</span>
+          </div>
+          <ul>
+            <li>密度视图不强行保留逐点点击，审查视图负责精查。</li>
+            <li>能源继续保留 subtype 过滤，但要补上 subtype 着色规则。</li>
+            <li>工业保持 internal/open 双轨，不把两套数据混成一锅。</li>
+          </ul>
+        </article>
+
+        <article class="option" data-choice="b" onclick="toggleSelect(this)">
+          <div class="option-head">
+            <div class="letter">B</div>
+            <div class="badge">偏观测</div>
+          </div>
+          <h3>纯密度优先</h3>
+          <p class="subtitle">把矿产、工业、物流都先做成连续密度面或位图，单对象检查退到次级入口。</p>
+          <div class="map">
+            <div class="coast-shadow"></div>
+            <div class="landmass"></div>
+            <div class="blob logistics" style="left:53%; top:152px; width:132px; height:100px; filter: blur(14px);"></div>
+            <div class="blob industry" style="left:49%; top:146px; width:120px; height:88px; filter: blur(16px);"></div>
+            <div class="blob mineral" style="left:45%; top:84px; width:96px; height:88px; filter: blur(14px);"></div>
+            <div class="blob mineral" style="left:41%; top:122px; width:64px; height:58px; filter: blur(12px);"></div>
+            <div class="region-pill" style="left:56%; top:174px;">连续密度表面</div>
+            <div class="region-pill" style="left:42%; top:100px;">类别需单独切换</div>
+          </div>
+          <div class="legend">
+            <div class="legend-row"><span class="swatch mineral"></span> 适合快速找“哪里密、哪里空”</div>
+            <div class="legend-row"><span class="swatch logistics"></span> 适合工业/物流这种上万对象的全局观察</div>
+            <div class="legend-row"><span class="swatch energy"></span> 不适合直接承载太多离散类别</div>
+          </div>
+          <div class="chips">
+            <span class="chip">视觉最干净</span>
+            <span class="chip">最依赖预渲染或栅格</span>
+            <span class="chip">单点可检查性最弱</span>
+          </div>
+          <ul>
+            <li>优点是整体态势一眼清楚，尤其适合工业和物流。</li>
+            <li>缺点是类别和单对象信息会被压扁，用户必须频繁切模式。</li>
+            <li>如果港口也走这一套，港口的“设施级意义”会被削弱。</li>
+          </ul>
+        </article>
+
+        <article class="option" data-choice="c" onclick="toggleSelect(this)">
+          <div class="option-head">
+            <div class="letter">C</div>
+            <div class="badge">偏保守</div>
+          </div>
+          <h3>保留原始对象，只做颜色与抽稀升级</h3>
+          <p class="subtitle">不引入新的密度图层，继续以点/面为核心，只补分类着色、分级标签和更强的抽稀。</p>
+          <div class="map">
+            <div class="coast-shadow"></div>
+            <div class="landmass"></div>
+            <div class="hex" style="left:52%; top:176px; background: rgba(71, 85, 105, 0.72);"></div>
+            <div class="hex" style="left:56%; top:188px; background: rgba(15, 118, 110, 0.72);"></div>
+            <div class="dot mineral" style="left:47%; top:108px;"></div>
+            <div class="dot mineral" style="left:48.5%; top:116px;"></div>
+            <div class="dot mineral" style="left:50%; top:124px;"></div>
+            <div class="dot energy" style="left:58%; top:175px;"></div>
+            <div class="dot energy" style="left:60%; top:186px;"></div>
+            <div class="dot logistics" style="left:57%; top:199px;"></div>
+            <div class="dot port" style="left:61%; top:194px;"></div>
+            <div class="region-pill" style="left:54%; top:152px;">对象还在，但仍偏挤</div>
+          </div>
+          <div class="legend">
+            <div class="legend-row"><span class="swatch energy"></span> 能源 subtype 着色可以马上补齐</div>
+            <div class="legend-row"><span class="swatch mineral"></span> 矿产可按 class/type 着色，但高密度区域还是会糊</div>
+            <div class="legend-row"><span class="swatch port"></span> 港口扩容后会继续遇到标签和遮挡问题</div>
+          </div>
+          <div class="chips">
+            <span class="chip">改动最小</span>
+            <span class="chip">风险最低</span>
+            <span class="chip">提升上限也最低</span>
+          </div>
+          <ul>
+            <li>适合“赶紧把当前明显 bug 修平”的短线修补。</li>
+            <li>不适合工业/物流这种本来就密到要换表达的图层。</li>
+            <li>长线大概率还要再做一次真正的密度层重构。</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="decision-strip">
+        <strong>我现在的推荐：</strong>
+        A 作为主方向，B 的“静态位图 / 栅格密度”作为工业与物流的性能后手，C 只保留给港口、机场、能源这类中低密度图层的局部策略。
+        <p>你看页面后，最重要的是告诉我：你是认 A 的总路线，还是你更想把工业/物流直接往 B 这种更“地图态势化”的方向推到底。</p>
+      </section>
+    </div>
+  </body>
+</html>

@@ -2,6 +2,8 @@
 import { ensureSovereigntyState, markLegacyColorStateDirty } from "./sovereignty_manager.js";
 import { normalizeMapSemanticMode } from "./state.js";
 import {
+  invalidateContextLayerVisualStateBatch,
+  invalidateOceanWaterInteractionVisualState,
   recomputeDynamicBordersNow,
   refreshColorState,
   refreshResolvedColorsForFeatures,
@@ -1930,37 +1932,53 @@ function hydrateActiveScenarioBundle(
   }
   const runtimeTopologyPayload =
     normalizeScenarioRuntimeTopologyPayload(bundle.runtimeTopologyPayload) || state.scenarioRuntimeTopologyData || null;
+  let scenarioOverlayChanged = false;
+  let contextBaseChanged = false;
   if (runtimeTopologyPayload) {
-    state.scenarioRuntimeTopologyData = runtimeTopologyPayload;
-    state.runtimePoliticalTopology = runtimeTopologyPayload?.objects?.political
+    const nextRuntimePoliticalTopology = runtimeTopologyPayload?.objects?.political
       ? runtimeTopologyPayload
       : (state.defaultRuntimePoliticalTopology || state.runtimePoliticalTopology || null);
-    state.runtimePoliticalMetaSeed = bundle.runtimePoliticalMeta || null;
-    state.runtimePoliticalFeatureCollectionSeed = getScenarioDecodedCollection(bundle, "politicalData") || null;
-    state.scenarioLandMaskData =
+    const nextScenarioLandMaskData =
       getScenarioDecodedCollection(bundle, "scenarioLandMaskData")
       || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land_mask")
       || state.scenarioLandMaskData
       || null;
-    state.scenarioContextLandMaskData =
+    const nextScenarioContextLandMaskData =
       getScenarioDecodedCollection(bundle, "scenarioContextLandMaskData")
       || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "context_land_mask")
       || state.scenarioContextLandMaskData
       || null;
-    state.scenarioWaterRegionsData =
+    const nextScenarioWaterRegionsData =
       bundle.chunkMergedLayerPayloads?.water
       || bundle.waterRegionsPayload
       || getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData")
       || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water")
       || state.scenarioWaterRegionsData
       || null;
-    state.scenarioSpecialRegionsData =
+    const nextScenarioSpecialRegionsData =
       bundle.chunkMergedLayerPayloads?.special
       || getScenarioDecodedCollection(bundle, "scenarioSpecialRegionsData")
       || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land")
         || bundle.specialRegionsPayload
         || state.scenarioSpecialRegionsData
         || null;
+    scenarioOverlayChanged =
+      state.scenarioRuntimeTopologyData !== runtimeTopologyPayload
+      || state.scenarioWaterRegionsData !== nextScenarioWaterRegionsData
+      || state.scenarioSpecialRegionsData !== nextScenarioSpecialRegionsData;
+    contextBaseChanged =
+      state.scenarioRuntimeTopologyData !== runtimeTopologyPayload
+      || state.runtimePoliticalTopology !== nextRuntimePoliticalTopology
+      || state.scenarioLandMaskData !== nextScenarioLandMaskData
+      || state.scenarioContextLandMaskData !== nextScenarioContextLandMaskData;
+    state.scenarioRuntimeTopologyData = runtimeTopologyPayload;
+    state.runtimePoliticalTopology = nextRuntimePoliticalTopology;
+    state.runtimePoliticalMetaSeed = bundle.runtimePoliticalMeta || null;
+    state.runtimePoliticalFeatureCollectionSeed = getScenarioDecodedCollection(bundle, "politicalData") || null;
+    state.scenarioLandMaskData = nextScenarioLandMaskData;
+    state.scenarioContextLandMaskData = nextScenarioContextLandMaskData;
+    state.scenarioWaterRegionsData = nextScenarioWaterRegionsData;
+    state.scenarioSpecialRegionsData = nextScenarioSpecialRegionsData;
   }
   state.scenarioPoliticalChunkData = normalizeScenarioFeatureCollection(bundle.chunkMergedLayerPayloads?.political) || null;
   if (bundle.districtGroupsPayload) {
@@ -1985,6 +2003,13 @@ function hydrateActiveScenarioBundle(
       cityOverridesPayload: bundle.chunkMergedLayerPayloads?.cities || bundle.cityOverridesPayload || null,
       geoLocalePatchPayload: bundle.geoLocalePatchPayload || state.scenarioGeoLocalePatchData || null,
     });
+  }
+  if (contextBaseChanged) {
+    invalidateContextLayerVisualStateBatch([], "scenario-hydrate-context-base", { renderNow: false });
+  }
+  if (scenarioOverlayChanged) {
+    invalidateOceanWaterInteractionVisualState("scenario-hydrate-water");
+    refreshColorState({ renderNow: false });
   }
   syncScenarioUi();
   syncCountryUi({ renderNow });
