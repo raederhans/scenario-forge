@@ -1364,6 +1364,7 @@ export const state = {
       "mineral_resources",
       "energy_facilities",
       "industrial_zones",
+      "logistics_hubs",
     ],
     familyConfigs: {
       road: {},
@@ -1373,6 +1374,7 @@ export const state = {
       mineral_resources: {},
       energy_facilities: {},
       industrial_zones: {},
+      logistics_hubs: {},
     },
     sectionOpen: {
       road: {},
@@ -1382,6 +1384,7 @@ export const state = {
       mineral_resources: {},
       energy_facilities: {},
       industrial_zones: {},
+      logistics_hubs: {},
     },
     shellPhase: "road-live-preview",
     restoreLeftDrawer: false,

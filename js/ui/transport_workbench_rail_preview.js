@@ -4,10 +4,13 @@ import {
   projectTransportWorkbenchCarrierGeometry,
   projectTransportWorkbenchCarrierPoint,
 } from "./transport_workbench_carrier.js";
+import {
+  createTransportWorkbenchLinePackRuntime,
+  PACK_MODE_FULL,
+  PACK_MODE_PREVIEW,
+} from "./transport_workbench_line_runtime_shared.js";
 
 const MANIFEST_URL = "data/transport_layers/japan_rail/manifest.json";
-const PACK_MODE_PREVIEW = "preview";
-const PACK_MODE_FULL = "full";
 const LINE_CLASS_PRIORITY = {
   service: 1,
   branch: 2,
@@ -39,26 +42,6 @@ const INACTIVE_STATUS = new Set(["disused", "abandoned", "construction"]);
 const SELECTED_LINE_STROKE = "#0f172a";
 const SELECTED_STATION_STROKE = "#0f172a";
 
-let manifestPromise = null;
-let auditPromise = null;
-let packPromises = {
-  [PACK_MODE_PREVIEW]: null,
-  [PACK_MODE_FULL]: null,
-};
-let projectedPacks = {
-  [PACK_MODE_PREVIEW]: null,
-  [PACK_MODE_FULL]: null,
-};
-let activePack = null;
-let activePackMode = null;
-let loadState = {
-  status: "idle",
-  error: null,
-  manifest: null,
-  audit: null,
-  previewStatus: "idle",
-  fullStatus: "idle",
-};
 let rootGroup = null;
 let labelRootGroup = null;
 let linesGroup = null;
@@ -72,18 +55,52 @@ let lineNodeById = new Map();
 let lineLabelNodeById = new Map();
 let stationNodeById = new Map();
 let stationLabelNodeById = new Map();
-let renderStats = {
-  visibleLines: 0,
-  visibleStations: 0,
-  visibleLineLabels: 0,
-  visibleStationLabels: 0,
-  totalLines: 0,
-  totalStations: 0,
-  filteredLines: 0,
-};
-let selectedFeature = null;
-let selectionChangeListener = null;
-let lastRenderedConfig = null;
+const lineRuntime = createTransportWorkbenchLinePackRuntime({
+  familyId: "rail",
+  familyLabel: "Japan rail",
+  manifestUrl: MANIFEST_URL,
+  ensureClient: ensureTopojsonClient,
+  allowPendingManifest: true,
+  initialRenderStats: {
+    visibleLines: 0,
+    visibleStations: 0,
+    visibleLineLabels: 0,
+    visibleStationLabels: 0,
+    totalLines: 0,
+    totalStations: 0,
+    filteredLines: 0,
+  },
+  async buildPack({ mode, manifest, fetchOptions, getPackPath }) {
+    const railwaysPath = getPackPath(manifest, mode, "railways");
+    const stationsPath = getPackPath(manifest, mode, "rail_stations_major");
+    const railwaysResponse = await fetch(railwaysPath, fetchOptions);
+    if (!railwaysResponse.ok) {
+      throw new Error(`Failed to load Japan rail topology (${mode}): ${railwaysResponse.status}`);
+    }
+    const stationsResponse = await fetch(stationsPath, fetchOptions);
+    if (!stationsResponse.ok) {
+      throw new Error(`Failed to load Japan rail stations (${mode}): ${stationsResponse.status}`);
+    }
+    const railwaysTopology = await railwaysResponse.json();
+    const stationsCollection = await stationsResponse.json();
+    const railwaysObject = railwaysTopology?.objects?.railways;
+    if (!railwaysObject) {
+      throw new Error(`Japan rail topology (${mode}) is missing the 'railways' object.`);
+    }
+    const decodedRailways = globalThis.topojson.feature(railwaysTopology, railwaysObject);
+    const lineFeatures = (decodedRailways?.features || []).map(createRailFeature).filter(Boolean);
+    const stationFeatures = (stationsCollection?.features || []).map(createStationFeature).filter(Boolean);
+    return {
+      mode,
+      manifest,
+      lineFeatures,
+      stationFeatures,
+      lineFeatureById: new Map(lineFeatures.map((feature) => [feature.id, feature])),
+      stationFeatureById: new Map(stationFeatures.map((feature) => [feature.id, feature])),
+    };
+  },
+});
+const runtime = lineRuntime.runtime;
 
 function ensureTopojsonClient() {
   if (!globalThis.topojson || typeof globalThis.topojson.feature !== "function") {
@@ -135,63 +152,6 @@ function measureProjectedLength(geometry) {
     }
   });
   return length;
-}
-
-function getPackPath(manifest, mode, key) {
-  const modePaths = manifest?.paths?.[mode];
-  if (modePaths && typeof modePaths === "object") {
-    return modePaths[key] || "";
-  }
-  return manifest?.paths?.[key] || "";
-}
-
-async function loadManifest() {
-  if (!manifestPromise) {
-    manifestPromise = (async () => {
-      ensureTopojsonClient();
-      const response = await fetch(MANIFEST_URL, { cache: "no-cache" });
-      if (response.status === 404) {
-        loadState.status = "pending";
-        loadState.previewStatus = "pending";
-        loadState.error = null;
-        loadState.manifest = null;
-        return null;
-      }
-      if (!response.ok) {
-        throw new Error(`Failed to load Japan rail manifest: ${response.status}`);
-      }
-      const manifest = await response.json();
-      loadState.manifest = manifest;
-      return manifest;
-    })().catch((error) => {
-      loadState.status = "error";
-      loadState.previewStatus = "error";
-      loadState.error = error instanceof Error ? error.message : String(error);
-      throw error;
-    });
-  }
-  return manifestPromise;
-}
-
-function startAuditLoad(manifest) {
-  if (!manifest?.paths?.build_audit || loadState.audit || auditPromise) return auditPromise;
-  auditPromise = fetch(manifest.paths.build_audit)
-    .then(async (response) => {
-      if (!response.ok) {
-        throw new Error(`Failed to load Japan rail audit: ${response.status}`);
-      }
-      const audit = await response.json();
-      loadState.audit = audit;
-      if ((loadState.status === "ready" || loadState.status === "pending") && lastRenderedConfig) {
-        emitSelectionChange();
-      }
-      return audit;
-    })
-    .catch((error) => {
-      console.warn("[transport-workbench] Failed to load Japan rail audit.", error);
-      return null;
-    });
-  return auditPromise;
 }
 
 function normalizeLineClass(value) {
@@ -251,76 +211,11 @@ function createStationFeature(rawFeature) {
 }
 
 async function loadJapanRailPack(mode = PACK_MODE_PREVIEW) {
-  if (projectedPacks[mode]) return projectedPacks[mode];
-  if (!packPromises[mode]) {
-    packPromises[mode] = (async () => {
-      const isPreview = mode === PACK_MODE_PREVIEW;
-      if (isPreview) {
-        loadState.status = "loading";
-        loadState.previewStatus = "loading";
-        loadState.error = null;
-      } else {
-        loadState.fullStatus = "loading";
-      }
-      const manifest = await loadManifest();
-      if (!manifest) {
-        if (isPreview) {
-          loadState.status = "pending";
-          loadState.previewStatus = "pending";
-        } else {
-          loadState.fullStatus = "pending";
-        }
-        return null;
-      }
-      startAuditLoad(manifest);
-      const railwaysPath = getPackPath(manifest, mode, "railways");
-      const stationsPath = getPackPath(manifest, mode, "rail_stations_major");
-      const railwaysResponse = await fetch(railwaysPath);
-      if (!railwaysResponse.ok) {
-        throw new Error(`Failed to load Japan rail topology (${mode}): ${railwaysResponse.status}`);
-      }
-      const stationsResponse = await fetch(stationsPath);
-      if (!stationsResponse.ok) {
-        throw new Error(`Failed to load Japan rail stations (${mode}): ${stationsResponse.status}`);
-      }
-      const railwaysTopology = await railwaysResponse.json();
-      const stationsCollection = await stationsResponse.json();
-      const railwaysObject = railwaysTopology?.objects?.railways;
-      if (!railwaysObject) {
-        throw new Error(`Japan rail topology (${mode}) is missing the 'railways' object.`);
-      }
-      const decodedRailways = globalThis.topojson.feature(railwaysTopology, railwaysObject);
-      const lineFeatures = (decodedRailways?.features || []).map(createRailFeature).filter(Boolean);
-      const stationFeatures = (stationsCollection?.features || []).map(createStationFeature).filter(Boolean);
-      const pack = {
-        mode,
-        manifest,
-        audit: loadState.audit,
-        lineFeatures,
-        stationFeatures,
-        lineFeatureById: new Map(lineFeatures.map((feature) => [feature.id, feature])),
-        stationFeatureById: new Map(stationFeatures.map((feature) => [feature.id, feature])),
-      };
-      projectedPacks[mode] = pack;
-      if (isPreview) {
-        loadState.status = "ready";
-        loadState.previewStatus = "ready";
-      } else {
-        loadState.fullStatus = "ready";
-      }
-      return pack;
-    })().catch((error) => {
-      if (mode === PACK_MODE_PREVIEW) {
-        loadState.status = "error";
-        loadState.previewStatus = "error";
-        loadState.error = error instanceof Error ? error.message : String(error);
-      } else {
-        loadState.fullStatus = "error";
-      }
-      throw error;
-    });
-  }
-  return packPromises[mode];
+  return lineRuntime.loadPack(mode, () => {
+    if ((runtime.loadState.status === "ready" || runtime.loadState.status === "pending") && runtime.lastRenderedConfig) {
+      emitSelectionChange();
+    }
+  });
 }
 
 function getCurrentScale() {
@@ -400,8 +295,8 @@ function handleLineGroupClick(event) {
   const lineId = node?.dataset?.railLineId;
   if (!lineId) return;
   event.stopPropagation();
-  selectedFeature = { type: "line", id: lineId };
-  renderSelectedHighlight(activePack?.lineFeatureById?.get(lineId) || null, null);
+  runtime.selectedFeature = { type: "line", id: lineId };
+  renderSelectedHighlight(runtime.activePack?.lineFeatureById?.get(lineId) || null, null);
   emitSelectionChange();
 }
 
@@ -410,8 +305,8 @@ function handleStationGroupClick(event) {
   const stationId = node?.dataset?.railStationId;
   if (!stationId) return;
   event.stopPropagation();
-  selectedFeature = { type: "station", id: stationId };
-  renderSelectedHighlight(null, activePack?.stationFeatureById?.get(stationId) || null);
+  runtime.selectedFeature = { type: "station", id: stationId };
+  renderSelectedHighlight(null, runtime.activePack?.stationFeatureById?.get(stationId) || null);
   emitSelectionChange();
 }
 
@@ -492,7 +387,7 @@ function clearGroups() {
 }
 
 function emitSelectionChange() {
-  selectionChangeListener?.(getJapanRailPreviewSnapshot(lastRenderedConfig));
+  lineRuntime.emitSelectionChange(buildSelectedSnapshot);
 }
 
 function formatLineVisibilityReason(reason) {
@@ -507,9 +402,9 @@ function formatLineVisibilityReason(reason) {
 }
 
 function buildSelectedSnapshot(config) {
-  if (!selectedFeature || !activePack) return null;
-  if (selectedFeature.type === "station") {
-    const station = activePack.stationFeatureById.get(selectedFeature.id);
+  if (!runtime.selectedFeature || !runtime.activePack) return null;
+  if (runtime.selectedFeature.type === "station") {
+    const station = runtime.activePack.stationFeatureById.get(runtime.selectedFeature.id);
     if (!station) return null;
     return {
       type: "station",
@@ -523,7 +418,7 @@ function buildSelectedSnapshot(config) {
       visible: shouldShowStation(station, config, getCurrentScale()),
     };
   }
-  const line = activePack.lineFeatureById.get(selectedFeature.id);
+  const line = runtime.activePack.lineFeatureById.get(runtime.selectedFeature.id);
   if (!line) return null;
   const hiddenReason = getLineVisibilityReason(line, config, getCurrentScale());
   return {
@@ -554,7 +449,7 @@ function renderSelectedHighlight(selectedLine, selectedStation) {
   }
   if (selectedStationHighlightNode) {
     if (selectedStation) {
-      const selectedPreset = STATION_STYLE[lastRenderedConfig?.stationSymbolPreset] || STATION_STYLE.dot_ring;
+      const selectedPreset = STATION_STYLE[runtime.lastRenderedConfig?.stationSymbolPreset] || STATION_STYLE.dot_ring;
       const selectedRadius = selectedPreset.radius * getStationImportanceStyle(selectedStation).sizeMultiplier;
       selectedStationHighlightNode.setAttribute("cx", String(selectedStation.x));
       selectedStationHighlightNode.setAttribute("cy", String(selectedStation.y));
@@ -704,20 +599,20 @@ function syncStationNodes(visibleStations, config, selectedStationId, scale) {
 }
 
 function pickActivePack() {
-  return projectedPacks[PACK_MODE_FULL] || projectedPacks[PACK_MODE_PREVIEW] || null;
+  return lineRuntime.pickActivePack();
 }
 
 function renderRail(config) {
   const pack = pickActivePack();
   if (!pack || !ensureGroups()) {
-    activePack = null;
-    activePackMode = null;
-    lastRenderedConfig = config;
+    runtime.activePack = null;
+    runtime.activePackMode = null;
+    runtime.lastRenderedConfig = config;
     return getJapanRailPreviewSnapshot(config);
   }
-  activePack = pack;
-  activePackMode = pack.mode;
-  lastRenderedConfig = config;
+  runtime.activePack = pack;
+  runtime.activePackMode = pack.mode;
+  runtime.lastRenderedConfig = config;
   const scale = getCurrentScale();
   const visibleLines = pack.lineFeatures
     .filter((feature) => !getLineVisibilityReason(feature, config, scale))
@@ -727,11 +622,11 @@ function renderRail(config) {
       return left.projectedLength - right.projectedLength;
     });
   const visibleStations = pack.stationFeatures.filter((feature) => shouldShowStation(feature, config, scale));
-  const selectedLineId = selectedFeature?.type === "line" ? selectedFeature.id : null;
-  const selectedStationId = selectedFeature?.type === "station" ? selectedFeature.id : null;
+  const selectedLineId = runtime.selectedFeature?.type === "line" ? runtime.selectedFeature.id : null;
+  const selectedStationId = runtime.selectedFeature?.type === "station" ? runtime.selectedFeature.id : null;
   syncLineNodes(visibleLines, config, selectedLineId);
   syncStationNodes(visibleStations, config, selectedStationId, scale);
-  renderStats = {
+  runtime.renderStats = {
     visibleLines: visibleLines.length,
     visibleStations: visibleStations.length,
     visibleLineLabels: 0,
@@ -748,62 +643,81 @@ function renderRail(config) {
 }
 
 function startBackgroundFullPackLoad() {
-  if (projectedPacks[PACK_MODE_FULL] || packPromises[PACK_MODE_FULL]) return;
-  loadJapanRailPack(PACK_MODE_FULL)
-    .then((pack) => {
-      if (!pack || !lastRenderedConfig || !rootGroup) return;
-      renderRail(lastRenderedConfig);
+  lineRuntime.startBackgroundFullPackLoad({
+    onAuditReady() {
+      if ((runtime.loadState.status === "ready" || runtime.loadState.status === "pending") && runtime.lastRenderedConfig) {
+        emitSelectionChange();
+      }
+    },
+    onHydrated(pack) {
+      if (!pack || !runtime.lastRenderedConfig || !rootGroup) return;
+      renderRail(runtime.lastRenderedConfig);
       emitSelectionChange();
-    })
-    .catch((error) => {
-      console.warn("[transport-workbench] Failed to hydrate full Japan rail pack.", error);
-    });
+    },
+  });
 }
 
 export function setJapanRailPreviewSelectionListener(listener) {
-  selectionChangeListener = typeof listener === "function" ? listener : null;
+  lineRuntime.setSelectionListener(listener);
 }
 
 export async function renderJapanRailPreview(config) {
   await loadJapanRailPack(PACK_MODE_PREVIEW);
-  if (loadState.status === "ready") {
+  if (runtime.loadState.status === "ready") {
     startBackgroundFullPackLoad();
   }
   return renderRail(config);
 }
 
 export async function warmJapanRailPreviewPack({ includeFull = false } = {}) {
-  await loadJapanRailPack(PACK_MODE_PREVIEW);
-  if (includeFull && loadState.status === "ready") {
-    startBackgroundFullPackLoad();
-  }
-  return getJapanRailPreviewSnapshot(lastRenderedConfig);
+  await lineRuntime.warm({
+    includeFull,
+    onAuditReady() {
+      if ((runtime.loadState.status === "ready" || runtime.loadState.status === "pending") && runtime.lastRenderedConfig) {
+        emitSelectionChange();
+      }
+    },
+    onHydrated(pack) {
+      if (!pack || !runtime.lastRenderedConfig || !rootGroup) return;
+      renderRail(runtime.lastRenderedConfig);
+      emitSelectionChange();
+    },
+  });
+  return getJapanRailPreviewSnapshot(runtime.lastRenderedConfig);
 }
 
 export function clearJapanRailPreview() {
-  lastRenderedConfig = null;
+  const totalLines = runtime.activePack?.lineFeatures?.length || runtime.projectedPacks[PACK_MODE_PREVIEW]?.lineFeatures?.length || 0;
+  const totalStations = runtime.activePack?.stationFeatures?.length || runtime.projectedPacks[PACK_MODE_PREVIEW]?.stationFeatures?.length || 0;
+  runtime.lastRenderedConfig = null;
+  runtime.activePack = null;
+  runtime.activePackMode = null;
   clearGroups();
-  renderStats = {
+  runtime.renderStats = {
     visibleLines: 0,
     visibleStations: 0,
     visibleLineLabels: 0,
     visibleStationLabels: 0,
-    totalLines: activePack?.lineFeatures?.length || projectedPacks[PACK_MODE_PREVIEW]?.lineFeatures?.length || 0,
-    totalStations: activePack?.stationFeatures?.length || projectedPacks[PACK_MODE_PREVIEW]?.stationFeatures?.length || 0,
+    totalLines,
+    totalStations,
     filteredLines: 0,
   };
 }
 
 export function destroyJapanRailPreview() {
-  selectedFeature = null;
-  lastRenderedConfig = null;
-  renderStats = {
+  const totalLines = runtime.activePack?.lineFeatures?.length || runtime.projectedPacks[PACK_MODE_FULL]?.lineFeatures?.length || runtime.projectedPacks[PACK_MODE_PREVIEW]?.lineFeatures?.length || 0;
+  const totalStations = runtime.activePack?.stationFeatures?.length || runtime.projectedPacks[PACK_MODE_FULL]?.stationFeatures?.length || runtime.projectedPacks[PACK_MODE_PREVIEW]?.stationFeatures?.length || 0;
+  runtime.selectedFeature = null;
+  runtime.lastRenderedConfig = null;
+  runtime.activePack = null;
+  runtime.activePackMode = null;
+  runtime.renderStats = {
     visibleLines: 0,
     visibleStations: 0,
     visibleLineLabels: 0,
     visibleStationLabels: 0,
-    totalLines: activePack?.lineFeatures?.length || projectedPacks[PACK_MODE_FULL]?.lineFeatures?.length || projectedPacks[PACK_MODE_PREVIEW]?.lineFeatures?.length || 0,
-    totalStations: activePack?.stationFeatures?.length || projectedPacks[PACK_MODE_FULL]?.stationFeatures?.length || projectedPacks[PACK_MODE_PREVIEW]?.stationFeatures?.length || 0,
+    totalLines,
+    totalStations,
     filteredLines: 0,
   };
   rootGroup?.remove();
@@ -823,18 +737,8 @@ export function destroyJapanRailPreview() {
   stationLabelNodeById.clear();
 }
 
-export function getJapanRailPreviewSnapshot(config = lastRenderedConfig) {
-  return {
-    status: loadState.status,
-    error: loadState.error,
-    manifest: loadState.manifest,
-    audit: loadState.audit,
-    stats: { ...renderStats },
-    packMode: activePackMode,
-    previewStatus: loadState.previewStatus,
-    fullStatus: loadState.fullStatus,
-    selected: config ? buildSelectedSnapshot(config) : selectedFeature,
-  };
+export function getJapanRailPreviewSnapshot(config = runtime.lastRenderedConfig) {
+  return lineRuntime.getSnapshot(config ? buildSelectedSnapshot : null);
 }
 
 export function formatJapanRailVisibilityReason(reason) {

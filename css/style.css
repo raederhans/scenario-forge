@@ -3624,6 +3624,17 @@ body.counter-editor-modal-open {
   color: #182235;
 }
 
+.transport-workbench-section-description {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.6;
+  color: #627181;
+}
+
+.transport-workbench-section-description-diagnostics {
+  margin-bottom: 4px;
+}
+
 .transport-workbench-section-actions {
   display: inline-flex;
   align-items: center;
@@ -3751,6 +3762,22 @@ body.counter-editor-modal-open {
   border: 1px solid rgba(37, 54, 73, 0.06);
 }
 
+.transport-workbench-inspector-row.is-summary {
+  background:
+    linear-gradient(180deg, rgba(250, 244, 238, 0.92), rgba(255, 255, 255, 0.92)),
+    rgba(255, 255, 255, 0.92);
+  border-color: rgba(120, 84, 71, 0.14);
+}
+
+.transport-workbench-inspector-row.is-selected {
+  background: rgba(240, 247, 252, 0.96);
+  border-color: rgba(54, 96, 134, 0.16);
+}
+
+.transport-workbench-inspector-row.is-governance {
+  background: rgba(249, 251, 253, 0.94);
+}
+
 .transport-workbench-inspector-key {
   font-size: 0.68rem;
   font-weight: 800;
@@ -3763,6 +3790,20 @@ body.counter-editor-modal-open {
   font-size: 0.76rem;
   line-height: 1.5;
   color: #243345;
+  word-break: break-word;
+}
+
+.transport-workbench-inspector-state-card {
+  border-radius: 16px;
+}
+
+.transport-workbench-inspector-state-card .transport-workbench-note-title {
+  letter-spacing: 0.06em;
+}
+
+.transport-workbench-inspector-state-card .transport-workbench-note-text {
+  margin-top: 6px;
+  line-height: 1.6;
 }
 
 .transport-workbench-column-preview {

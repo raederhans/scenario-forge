@@ -2,6 +2,7 @@ const MANIFEST_URLS = {
   mineral_resources: "data/transport_layers/japan_mineral_resources/manifest.json",
   energy_facilities: "data/transport_layers/japan_energy_facilities/manifest.json",
   industrial_zones: "data/transport_layers/japan_industrial_zones/manifest.json",
+  logistics_hubs: "data/transport_layers/japan_logistics_hubs/manifest.json",
 };
 
 const MANIFEST_ONLY_FAMILIES = new Set(Object.keys(MANIFEST_URLS));

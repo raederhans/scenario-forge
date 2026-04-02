@@ -6,7 +6,7 @@
   "notes": [
     "This family is polygon-native and stays polygon-native.",
     "The internal variant is built from official MLIT L05 industrial land polygons.",
-    "The open variant is built from OSM industrial land polygons and stays source-separated from L05."
+    "The open variant is built from the local Japan OSM PBF and stays provenance-separated from L05."
   ],
   "encoding_policy": {
     "display_fields_encoding": "utf-8",
@@ -38,24 +38,13 @@
       "encoding": "cp932"
     },
     {
-      "id": "osm_industrial_landuse",
-      "kind": "download_many",
+      "id": "osm_japan_industrial_multipolygons",
+      "kind": "local_reference",
       "role": "polygon_open_variant",
-      "url": "https://download.geofabrik.de/asia/japan.html",
-      "expected_filename_pattern": "<region>-latest-free.shp.zip",
-      "preferred_member_pattern": "gis_osm_landuse_a_free_1.*",
-      "license": "OpenStreetMap ODbL via Geofabrik regional shapefile extracts",
-      "ingest_mode": "local_file",
-      "encoding": "utf-8"
-    },
-    {
-      "id": "osm_industrial_works",
-      "kind": "download_many_optional",
-      "role": "polygon_open_variant_enrichment",
-      "url": "https://download.geofabrik.de/asia/japan.html",
-      "expected_filename_pattern": "<region>-latest-free.shp.zip",
-      "preferred_member_pattern": "gis_osm_pois_a_free_1.*",
-      "license": "OpenStreetMap ODbL via Geofabrik regional shapefile extracts",
+      "url": "https://download.geofabrik.de/asia/japan-latest.osm.pbf",
+      "expected_filename_pattern": "japan-latest.osm.pbf",
+      "preferred_member_pattern": "multipolygons where landuse=industrial or man_made=works",
+      "license": "OpenStreetMap contributors, ODbL 1.0",
       "ingest_mode": "local_file",
       "encoding": "utf-8"
     }

@@ -34,7 +34,7 @@
       "manifest.json",
       "build_audit.json"
     ],
-    "runtime_consumer": "transport_workbench_logistics_hub_preview",
+    "runtime_consumer": "transport_workbench_manifest_preview",
     "adapter_id": "japan_logistics_hubs_v1"
   }
 }

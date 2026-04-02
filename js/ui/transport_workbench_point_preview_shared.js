@@ -24,7 +24,16 @@ function getPackPath(manifest, mode, key) {
   return manifest?.paths?.[key] || "";
 }
 
+function isSinglePackPath(manifest, key) {
+  const previewPath = getPackPath(manifest, PACK_MODE_PREVIEW, key);
+  const fullPath = getPackPath(manifest, PACK_MODE_FULL, key);
+  return !!previewPath && previewPath === fullPath;
+}
+
 function getThresholdRank(config, definition) {
+  if (typeof definition.getThresholdRank === "function") {
+    return normalizeNumber(definition.getThresholdRank(config), 1);
+  }
   return definition.importanceOrder?.[String(config?.importanceThreshold || "").trim()] || 1;
 }
 
@@ -33,6 +42,9 @@ function getCurrentScale() {
 }
 
 function shouldUseFullPack(config, definition, scale) {
+  if (typeof definition.shouldUseFullPack === "function") {
+    return !!definition.shouldUseFullPack(config, scale);
+  }
   const threshold = definition.importanceOrder?.[String(config?.importanceThreshold || "").trim()] || 1;
   if (threshold <= 1) return true;
   return scale >= normalizeNumber(definition.fullPackScaleThreshold, 1.26);
@@ -48,15 +60,27 @@ function createPointFeature(rawFeature, definition) {
   if (!Array.isArray(coordinates) || coordinates.length < 2) return null;
   const projected = projectTransportWorkbenchCarrierPoint(coordinates[0], coordinates[1], "main");
   if (!projected) return null;
+  const featureId = typeof definition.getFeatureId === "function"
+    ? definition.getFeatureId(rawFeature)
+    : String(properties.id || rawFeature.id || properties.stable_key || "").trim();
+  const featureName = typeof definition.getFeatureName === "function"
+    ? definition.getFeatureName(rawFeature)
+    : String(properties.name || "").trim();
+  const featureLabel = typeof definition.getFeatureLabel === "function"
+    ? definition.getFeatureLabel(rawFeature)
+    : featureName;
+  const importanceRank = typeof definition.getFeatureImportanceRank === "function"
+    ? normalizeNumber(definition.getFeatureImportanceRank(rawFeature), 1)
+    : normalizeNumber(properties.importance_rank, 1);
   return {
-    id: String(properties.id || rawFeature.id || properties.stable_key || "").trim(),
-    name: String(properties.name || "").trim(),
+    id: String(featureId || "").trim(),
+    name: String(featureName || "").trim(),
     importance: String(properties.importance || "").trim(),
-    importanceRank: normalizeNumber(properties.importance_rank, 1),
+    importanceRank,
     x: projected.x,
     y: projected.y,
     properties,
-    label: String(properties.name || "").trim(),
+    label: String(featureLabel || "").trim(),
     kind: definition.selectionType,
   };
 }
@@ -160,12 +184,23 @@ function applySelectionHighlight(runtime) {
 function buildSnapshot(runtime) {
   const audit = runtime.loadState.audit;
   const manifest = runtime.loadState.manifest;
+  const activePackStatus = runtime.activePackMode === PACK_MODE_FULL
+    ? runtime.loadState.fullStatus
+    : runtime.loadState.previewStatus;
+  const baseStatus = activePackStatus && activePackStatus !== "idle"
+    ? activePackStatus
+    : runtime.loadState.status;
+  const resolvedStatus = (
+    baseStatus === "ready" && !runtime.renderedConfigSignature
+  ) ? "loading" : baseStatus;
   return {
-    status: runtime.loadState.status,
+    status: resolvedStatus,
     error: runtime.loadState.error,
     manifest,
     audit,
+    subtypeCatalog: runtime.loadState.subtypeCatalog,
     packMode: runtime.activePackMode,
+    singlePack: !!runtime.loadState.singlePack,
     previewStatus: runtime.loadState.previewStatus,
     fullStatus: runtime.loadState.fullStatus,
     stats: {
@@ -174,6 +209,7 @@ function buildSnapshot(runtime) {
       filteredFeatures: runtime.renderStats.filteredFeatures,
       visibleLabels: runtime.renderStats.visibleLabels,
     },
+    renderedConfigSignature: runtime.renderedConfigSignature || "",
     selected: runtime.selectedFeature,
   };
 }
@@ -183,9 +219,14 @@ export function createTransportWorkbenchPointPreviewController(definition) {
     definition,
     manifestPromise: null,
     auditPromise: null,
+    subtypeCatalogPromise: null,
     packPromises: {
       [PACK_MODE_PREVIEW]: null,
       [PACK_MODE_FULL]: null,
+    },
+    packPaths: {
+      [PACK_MODE_PREVIEW]: "",
+      [PACK_MODE_FULL]: "",
     },
     projectedPacks: {
       [PACK_MODE_PREVIEW]: null,
@@ -196,6 +237,8 @@ export function createTransportWorkbenchPointPreviewController(definition) {
       error: null,
       manifest: null,
       audit: null,
+      subtypeCatalog: null,
+      singlePack: false,
       previewStatus: "idle",
       fullStatus: "idle",
     },
@@ -210,6 +253,7 @@ export function createTransportWorkbenchPointPreviewController(definition) {
       filteredFeatures: 0,
       visibleLabels: 0,
     },
+    renderedConfigSignature: "",
   };
 
   async function loadManifest() {
@@ -259,6 +303,27 @@ export function createTransportWorkbenchPointPreviewController(definition) {
     return runtime.auditPromise;
   }
 
+  function startSubtypeCatalogLoad(manifest) {
+    if (!manifest?.paths?.subtype_catalog || runtime.loadState.subtypeCatalog || runtime.subtypeCatalogPromise) {
+      return runtime.subtypeCatalogPromise;
+    }
+    runtime.subtypeCatalogPromise = fetch(manifest.paths.subtype_catalog, { cache: "no-cache" })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to load ${definition.familyId} subtype catalog: ${response.status}`);
+        }
+        const subtypeCatalog = await response.json();
+        runtime.loadState.subtypeCatalog = Array.isArray(subtypeCatalog) ? subtypeCatalog : null;
+        emitSelectionChange();
+        return runtime.loadState.subtypeCatalog;
+      })
+      .catch((error) => {
+        console.warn(`[transport-workbench] Failed to load ${definition.familyId} subtype catalog.`, error);
+        return null;
+      });
+    return runtime.subtypeCatalogPromise;
+  }
+
   async function loadPack(mode = PACK_MODE_PREVIEW) {
     if (runtime.projectedPacks[mode]) return runtime.projectedPacks[mode];
     if (!runtime.packPromises[mode]) {
@@ -282,15 +347,47 @@ export function createTransportWorkbenchPointPreviewController(definition) {
           return null;
         }
         startAuditLoad(manifest);
+        startSubtypeCatalogLoad(manifest);
         const packPath = getPackPath(manifest, mode, definition.packKey);
+        runtime.loadState.singlePack = isSinglePackPath(manifest, definition.packKey);
+        runtime.packPaths[mode] = packPath;
+        const aliasMode = mode === PACK_MODE_PREVIEW ? PACK_MODE_FULL : PACK_MODE_PREVIEW;
+        if (runtime.packPaths[aliasMode] && runtime.packPaths[aliasMode] === packPath) {
+          if (runtime.projectedPacks[aliasMode]) {
+            runtime.projectedPacks[mode] = runtime.projectedPacks[aliasMode];
+            if (isPreview) {
+              runtime.loadState.status = "ready";
+              runtime.loadState.previewStatus = "ready";
+            } else {
+              runtime.loadState.fullStatus = "ready";
+            }
+            return runtime.projectedPacks[mode];
+          }
+          if (runtime.packPromises[aliasMode]) {
+            const pack = await runtime.packPromises[aliasMode];
+            runtime.projectedPacks[mode] = pack;
+            if (isPreview) {
+              runtime.loadState.status = "ready";
+              runtime.loadState.previewStatus = "ready";
+            } else {
+              runtime.loadState.fullStatus = "ready";
+            }
+            return pack;
+          }
+        }
         const response = await fetch(packPath, { cache: "no-cache" });
         if (!response.ok) {
           throw new Error(`Failed to load ${definition.familyId} pack (${mode}): ${response.status}`);
         }
         const collection = await response.json();
-        const features = (collection?.features || []).map((feature) => createPointFeature(feature, definition)).filter(Boolean);
+        const sourceFeatures = Array.isArray(collection?.features) ? collection.features : [];
+        const features = sourceFeatures.map((feature) => createPointFeature(feature, definition)).filter(Boolean);
+        if (sourceFeatures.length > 0 && features.length === 0) {
+          throw new Error(`Projected zero ${definition.familyId} features for ${mode}; carrier geometry is not ready.`);
+        }
         const pack = {
           mode,
+          path: packPath,
           manifest,
           audit: runtime.loadState.audit,
           features,
@@ -305,6 +402,8 @@ export function createTransportWorkbenchPointPreviewController(definition) {
         }
         return pack;
       })().catch((error) => {
+        runtime.packPromises[mode] = null;
+        runtime.projectedPacks[mode] = null;
         if (mode === PACK_MODE_PREVIEW) {
           runtime.loadState.status = "error";
           runtime.loadState.previewStatus = "error";
@@ -324,6 +423,7 @@ export function createTransportWorkbenchPointPreviewController(definition) {
 
   async function render(config = {}) {
     ensureRootGroups(runtime);
+    runtime.renderedConfigSignature = "";
     const scale = getCurrentScale();
     const targetMode = shouldUseFullPack(config, definition, scale) ? PACK_MODE_FULL : PACK_MODE_PREVIEW;
     const pack = await loadPack(targetMode);
@@ -336,7 +436,10 @@ export function createTransportWorkbenchPointPreviewController(definition) {
     clearGroups(runtime);
     const markerStyle = definition.getMarkerStyle(scale, config);
     const thresholdRank = getThresholdRank(config, definition);
-    const features = [...pack.features].sort((a, b) => a.importanceRank - b.importanceRank);
+    const sourceFeatures = Array.isArray(pack.features) ? [...pack.features] : [];
+    const features = typeof definition.sortFeatures === "function"
+      ? definition.sortFeatures(sourceFeatures, config)
+      : sourceFeatures.sort((a, b) => a.importanceRank - b.importanceRank);
     const visibleEntries = [];
     features.forEach((feature) => {
       if ((feature.importanceRank || 1) < thresholdRank) {
@@ -366,6 +469,7 @@ export function createTransportWorkbenchPointPreviewController(definition) {
     runtime.renderStats.visibleFeatures = visibleEntries.length;
     runtime.renderStats.filteredFeatures = Math.max(0, features.length - visibleEntries.length);
     runtime.renderStats.visibleLabels = visibleEntries.filter((entry) => entry.visibility.showLabel).length;
+    runtime.renderedConfigSignature = JSON.stringify(config || {});
     applySelectionHighlight(runtime);
     emitSelectionChange();
     return pack;
@@ -386,8 +490,11 @@ export function createTransportWorkbenchPointPreviewController(definition) {
     return buildSnapshot(runtime);
   }
 
-  async function warm() {
+  async function warm(options = {}) {
     await loadPack(PACK_MODE_PREVIEW);
+    if (options?.includeFull && !runtime.loadState.singlePack) {
+      await loadPack(PACK_MODE_FULL);
+    }
     return true;
   }
 

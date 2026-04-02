@@ -1,0 +1,361 @@
+{
+  "generated_at": "2026-04-01T23:04:19.459599Z",
+  "adapter_id": "japan_logistics_hubs_v1",
+  "recipe_version": "japan_logistics_hubs_sources_v1",
+  "raw_feature_counts_by_prefecture": {
+    "01": 475,
+    "02": 92,
+    "03": 70,
+    "04": 222,
+    "05": 68,
+    "06": 50,
+    "07": 89,
+    "08": 183,
+    "09": 54,
+    "10": 53,
+    "11": 106,
+    "12": 431,
+    "13": 500,
+    "14": 585,
+    "15": 156,
+    "16": 78,
+    "17": 67,
+    "18": 56,
+    "19": 23,
+    "20": 61,
+    "21": 47,
+    "22": 368,
+    "23": 559,
+    "24": 150,
+    "25": 53,
+    "26": 66,
+    "27": 644,
+    "28": 500,
+    "29": 13,
+    "30": 52,
+    "31": 53,
+    "32": 67,
+    "33": 145,
+    "34": 247,
+    "35": 221,
+    "36": 49,
+    "37": 141,
+    "38": 214,
+    "39": 46,
+    "40": 444,
+    "41": 80,
+    "42": 156,
+    "43": 94,
+    "44": 80,
+    "45": 67,
+    "46": 218
+  },
+  "clipped_feature_counts_by_prefecture": {
+    "01": 369,
+    "02": 87,
+    "03": 65,
+    "04": 213,
+    "05": 66,
+    "06": 46,
+    "07": 88,
+    "08": 172,
+    "09": 54,
+    "10": 53,
+    "11": 106,
+    "12": 396,
+    "13": 478,
+    "14": 526,
+    "15": 142,
+    "16": 76,
+    "17": 56,
+    "18": 50,
+    "19": 23,
+    "20": 61,
+    "21": 47,
+    "22": 338,
+    "23": 492,
+    "24": 125,
+    "25": 53,
+    "26": 56,
+    "27": 586,
+    "28": 451,
+    "29": 13,
+    "30": 48,
+    "31": 50,
+    "32": 50,
+    "33": 98,
+    "34": 162,
+    "35": 190,
+    "36": 48,
+    "37": 38,
+    "38": 134,
+    "39": 46,
+    "40": 335,
+    "41": 68,
+    "42": 99,
+    "43": 56,
+    "44": 51,
+    "45": 61,
+    "46": 126
+  },
+  "normalized_feature_count": 6948,
+  "hub_type_counts": {
+    "air_cargo_terminal": 59,
+    "bonded_area": 4392,
+    "container_terminal": 768,
+    "rail_cargo_station": 324,
+    "truck_terminal": 1163,
+    "wholesale_market": 242
+  },
+  "operator_classification_counts": {
+    "other": 1,
+    "private": 5834,
+    "public": 1113
+  },
+  "source_policy": "local_source_cache_with_download",
+  "source_url": "https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-P31.html",
+  "source_encoding": "cp932",
+  "excluded_regions": [
+    {
+      "rule": "outside_japan_main_islands_route_mask",
+      "count": 1245
+    }
+  ],
+  "source_signature": {
+    "01": {
+      "filename": "P31-13_01.zip",
+      "size_bytes": 46579,
+      "sha256": "380c62c5236cb13148bba4bdf8714b6a81f46eeccb6cf16d1f85e6d9fd0eaab6"
+    },
+    "02": {
+      "filename": "P31-13_02.zip",
+      "size_bytes": 14216,
+      "sha256": "8aa7517951ac781df14fe59d1abfdee923e7cbd35eddbc680e01eda5a508a590"
+    },
+    "03": {
+      "filename": "P31-13_03.zip",
+      "size_bytes": 12079,
+      "sha256": "381f786c200a09b20df308c06ada8f38e1dc76d666d53095fc6c007d5283a014"
+    },
+    "04": {
+      "filename": "P31-13_04.zip",
+      "size_bytes": 25236,
+      "sha256": "4d8a0593f4edca40842f4576c7e7260eccca44798d4090bf03bb80b6c832e020"
+    },
+    "05": {
+      "filename": "P31-13_05.zip",
+      "size_bytes": 12006,
+      "sha256": "0c6f83a776cf2573d0826cc6cb9f839fa085f39493c910c85c616f983cf3d234"
+    },
+    "06": {
+      "filename": "P31-13_06.zip",
+      "size_bytes": 10252,
+      "sha256": "aaad5b3829bca4fd22a294cef4836b14eda903775afd7395b94da46d670352a2"
+    },
+    "07": {
+      "filename": "P31-13_07.zip",
+      "size_bytes": 14383,
+      "sha256": "ae98d5c29d07806654c702043b9d702652b11f8c43560233fdfad24aa0ca8d11"
+    },
+    "08": {
+      "filename": "P31-13_08.zip",
+      "size_bytes": 22983,
+      "sha256": "28b48b10ec26d583bb6e861103c8da177a4e133e8b34e14b679ad3a7f2325a39"
+    },
+    "09": {
+      "filename": "P31-13_09.zip",
+      "size_bytes": 11147,
+      "sha256": "dfe6ea2cb86bf713882cf5eac7ceb20d1924225988ef02d9570e6ea41fbe7573"
+    },
+    "10": {
+      "filename": "P31-13_10.zip",
+      "size_bytes": 10811,
+      "sha256": "ff7ac643c210312178e0c3a05188500011288a711cad708c245c55fe62939b79"
+    },
+    "11": {
+      "filename": "P31-13_11.zip",
+      "size_bytes": 15828,
+      "sha256": "bcc5819912a0f0477b53141f1bfbc689b36a0e3c2daeb10ac2c764fa9b04780d"
+    },
+    "12": {
+      "filename": "P31-13_12.zip",
+      "size_bytes": 45149,
+      "sha256": "95e09cdba64777e17a5bd77335ac38faaa01f082e0074ed94e62a29215a1f0ec"
+    },
+    "13": {
+      "filename": "P31-13_13.zip",
+      "size_bytes": 44719,
+      "sha256": "24f8fb1b549e0b467b65c037b5e4ad43c9c3885e12c80b289d8f4e5c9be9b4aa"
+    },
+    "14": {
+      "filename": "P31-13_14.zip",
+      "size_bytes": 54371,
+      "sha256": "28d049beac45fd1509e82962235386943c0dd2379c4834b3abaff189ba0dfef5"
+    },
+    "15": {
+      "filename": "P31-13_15.zip",
+      "size_bytes": 20913,
+      "sha256": "f9ba9aa55a5c986f344df2bc7a67a01b53677751498bc3bd5527d521ed267d08"
+    },
+    "16": {
+      "filename": "P31-13_16.zip",
+      "size_bytes": 12932,
+      "sha256": "097e1c491753ba7b947b6370805feaf6cd425dcc9636ffc71c06396def7ba508"
+    },
+    "17": {
+      "filename": "P31-13_17.zip",
+      "size_bytes": 11515,
+      "sha256": "656f69d00c37f68f5f8494d89bdf99585d06dc408dbee04f2d96965029258e1b"
+    },
+    "18": {
+      "filename": "P31-13_18.zip",
+      "size_bytes": 11725,
+      "sha256": "37059c9ef435128abf412766f9103cd424f98bfe5d08df0c5357ec460e0bce68"
+    },
+    "19": {
+      "filename": "P31-13_19.zip",
+      "size_bytes": 7813,
+      "sha256": "2b12a16c4cf5810587a22964eca540e01748383f36f984206b43663fd69b8751"
+    },
+    "20": {
+      "filename": "P31-13_20.zip",
+      "size_bytes": 11380,
+      "sha256": "56d2bfb3a18df883b79fd430ea0550ab812a23295347ab4959d77e9ab238a1a8"
+    },
+    "21": {
+      "filename": "P31-13_21.zip",
+      "size_bytes": 10050,
+      "sha256": "32e0afa0a200c373ee7f64109f3ccdd8291508c47e8502f070af25a2b647cd75"
+    },
+    "22": {
+      "filename": "P31-13_22.zip",
+      "size_bytes": 39731,
+      "sha256": "372f70c65b66dafdf4316c482ef739325308347d7edb582bd770c1168d50572b"
+    },
+    "23": {
+      "filename": "P31-13_23.zip",
+      "size_bytes": 52347,
+      "sha256": "17076625fabe1453dd16d8be4dc2b7be9c9a8e5e312c42e2171ae9e39ff7f081"
+    },
+    "24": {
+      "filename": "P31-13_24.zip",
+      "size_bytes": 19208,
+      "sha256": "c8085edc3e8069445888e0cd6c620b87c1b3f2f84a0ae1eb06a2f94e657055c7"
+    },
+    "25": {
+      "filename": "P31-13_25.zip",
+      "size_bytes": 10946,
+      "sha256": "c8c70b243c47464d5f900957c6902608d3ea417cd6519c04bc5e2f51f7a981b1"
+    },
+    "26": {
+      "filename": "P31-13_26.zip",
+      "size_bytes": 12540,
+      "sha256": "8b95287a2d7e89aff3cff4daa73a433b818bd089c1ccecf56b89458353f99186"
+    },
+    "27": {
+      "filename": "P31-13_27.zip",
+      "size_bytes": 59418,
+      "sha256": "7dbaf48992f4f465c32eaf1834b7225e2c40e24ba2846ce5e82dafc9a1c1a17a"
+    },
+    "28": {
+      "filename": "P31-13_28.zip",
+      "size_bytes": 48090,
+      "sha256": "605366291e82242fe1c94839ffcca7094313fd3a95c924ed5d93d25e0347fc19"
+    },
+    "29": {
+      "filename": "P31-13_29.zip",
+      "size_bytes": 6467,
+      "sha256": "4d5a964640b0a1aa080e3e87f40e3dccc7f3c485e8c761a87fc6885e56b91f25"
+    },
+    "30": {
+      "filename": "P31-13_30.zip",
+      "size_bytes": 10861,
+      "sha256": "97973991b646cdf5c54f9a2a254821e51cfc7a16d4a110ce2ab210e14a6f81b2"
+    },
+    "31": {
+      "filename": "P31-13_31.zip",
+      "size_bytes": 10421,
+      "sha256": "8a04adf3ca0ea7ba1dd3d4930333a29968406bf6f1740c9847b6702c35754d92"
+    },
+    "32": {
+      "filename": "P31-13_32.zip",
+      "size_bytes": 11081,
+      "sha256": "e4df5573bc70fa79289b424c371a0534490dd02edfb758a2bca83e3b2afecd28"
+    },
+    "33": {
+      "filename": "P31-13_33.zip",
+      "size_bytes": 18676,
+      "sha256": "ba6aaf994a7099c31528a6b08566b870eee97e7a7f0dc2bb63a4695dc5c13358"
+    },
+    "34": {
+      "filename": "P31-13_34.zip",
+      "size_bytes": 27359,
+      "sha256": "865c5b29cb1a984d588c2ccf3ec982ba9211fd52187067b6fa68902a863a9cbf"
+    },
+    "35": {
+      "filename": "P31-13_35.zip",
+      "size_bytes": 25200,
+      "sha256": "49fd70a4022483f46903a1381ad011d64b951f038efa471699f141c0abb4c5a5"
+    },
+    "36": {
+      "filename": "P31-13_36.zip",
+      "size_bytes": 10108,
+      "sha256": "df505b17237525470d7b23eb3d3702b982dd1e3fc467697c5441c1377980761b"
+    },
+    "37": {
+      "filename": "P31-13_37.zip",
+      "size_bytes": 17656,
+      "sha256": "c5474a07a945b903213db9edf98751f813196cf4d135944dba5998af2041b291"
+    },
+    "38": {
+      "filename": "P31-13_38.zip",
+      "size_bytes": 24052,
+      "sha256": "e344a61576e786ec4c0d8491098b7936874ee8a2e9c2b7b152fdc07c1e729cdb"
+    },
+    "39": {
+      "filename": "P31-13_39.zip",
+      "size_bytes": 9463,
+      "sha256": "ca45b93d27b856d12531c118ef7d492cac897856ed5cee960d3091f13a5ed957"
+    },
+    "40": {
+      "filename": "P31-13_40.zip",
+      "size_bytes": 43819,
+      "sha256": "10e86e6e964d8eeb87dabacba8905edd68568f9e167b24ad70164195f934b1c3"
+    },
+    "41": {
+      "filename": "P31-13_41.zip",
+      "size_bytes": 13194,
+      "sha256": "d6b7555b89fa0ef113c957ccbc42ad7a16090d1aa2a12ab7aa37a9617cff4958"
+    },
+    "42": {
+      "filename": "P31-13_42.zip",
+      "size_bytes": 18652,
+      "sha256": "8ee49ca1018e8a38f8f5d0ef6640211d1f6ca487cdc3d85f0a0c06ae3403483f"
+    },
+    "43": {
+      "filename": "P31-13_43.zip",
+      "size_bytes": 14201,
+      "sha256": "525528469ed740d294d24d5a4a362adca86b61a435b4f54c743c83c3a3f423fa"
+    },
+    "44": {
+      "filename": "P31-13_44.zip",
+      "size_bytes": 12294,
+      "sha256": "adc31ffbb1fc46c7e6c339ff81abd6b1e1dfa4731a46a4b1ae7a3692b7dedac6"
+    },
+    "45": {
+      "filename": "P31-13_45.zip",
+      "size_bytes": 11274,
+      "sha256": "b7c7102bcbe34629b15fb36b4ab2ac058c402a976f7ea9675947887742c42a95"
+    },
+    "46": {
+      "filename": "P31-13_46.zip",
+      "size_bytes": 24150,
+      "sha256": "ccd3d6241e573ad82fe7f5f9bae8c18038886b56b6856d743545010b4b8c8897"
+    }
+  },
+  "notes": [
+    "This family stays separate from industrial land polygons and is treated as a logistics supplement layer.",
+    "Preview and full outputs are identical for v1 because no approved thinning rule exists yet.",
+    "P31 type, classification, and operator fields are normalized into stable code-plus-label pairs."
+  ]
+}

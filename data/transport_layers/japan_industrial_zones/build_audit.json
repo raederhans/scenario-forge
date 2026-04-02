@@ -1,0 +1,543 @@
+{
+  "generated_at": "2026-04-01T23:21:05.695884Z",
+  "adapter_id": "japan_industrial_zones_v2",
+  "recipe_version": "japan_industrial_zones_sources_v2",
+  "source_policy": "local_source_cache_with_download",
+  "variants": {
+    "internal": {
+      "feature_count": 3458,
+      "site_class_counts": {
+        "industrial_complex": 2124,
+        "isolated_industrial_site": 1334
+      },
+      "excluded_outside_mask_count": 69,
+      "omitted_source_members": [
+        "L05-2-09_29_GML.zip"
+      ]
+    },
+    "open": {
+      "feature_count": 31976,
+      "site_class_counts": {
+        "industrial_landuse": 31976
+      },
+      "excluded_outside_mask_count": 790
+    }
+  },
+  "l05_excluded_by_member": {
+    "L05-1-09_01_GML.zip": 4,
+    "L05-1-09_02_GML.zip": 0,
+    "L05-1-09_03_GML.zip": 0,
+    "L05-1-09_04_GML.zip": 0,
+    "L05-1-09_05_GML.zip": 0,
+    "L05-1-09_06_GML.zip": 0,
+    "L05-1-09_07_GML.zip": 0,
+    "L05-1-09_08_GML.zip": 0,
+    "L05-1-09_09_GML.zip": 0,
+    "L05-1-09_10_GML.zip": 0,
+    "L05-1-09_11_GML.zip": 0,
+    "L05-1-09_12_GML.zip": 0,
+    "L05-1-09_13_GML.zip": 0,
+    "L05-1-09_14_GML.zip": 0,
+    "L05-1-09_15_GML.zip": 0,
+    "L05-1-09_16_GML.zip": 0,
+    "L05-1-09_17_GML.zip": 0,
+    "L05-1-09_18_GML.zip": 0,
+    "L05-1-09_19_GML.zip": 0,
+    "L05-1-09_20_GML.zip": 0,
+    "L05-1-09_21_GML.zip": 0,
+    "L05-1-09_22_GML.zip": 0,
+    "L05-1-09_23_GML.zip": 0,
+    "L05-1-09_24_GML.zip": 4,
+    "L05-1-09_25_GML.zip": 0,
+    "L05-1-09_26_GML.zip": 0,
+    "L05-1-09_27_GML.zip": 0,
+    "L05-1-09_28_GML.zip": 1,
+    "L05-1-09_29_GML.zip": 0,
+    "L05-1-09_30_GML.zip": 2,
+    "L05-1-09_31_GML.zip": 0,
+    "L05-1-09_32_GML.zip": 0,
+    "L05-1-09_33_GML.zip": 3,
+    "L05-1-09_34_GML.zip": 2,
+    "L05-1-09_35_GML.zip": 0,
+    "L05-1-09_36_GML.zip": 0,
+    "L05-1-09_37_GML.zip": 14,
+    "L05-1-09_38_GML.zip": 6,
+    "L05-1-09_39_GML.zip": 0,
+    "L05-1-09_40_GML.zip": 2,
+    "L05-1-09_41_GML.zip": 0,
+    "L05-1-09_42_GML.zip": 1,
+    "L05-1-09_43_GML.zip": 4,
+    "L05-1-09_44_GML.zip": 1,
+    "L05-1-09_45_GML.zip": 1,
+    "L05-1-09_46_GML.zip": 0,
+    "L05-2-09_01_GML.zip": 1,
+    "L05-2-09_02_GML.zip": 0,
+    "L05-2-09_03_GML.zip": 0,
+    "L05-2-09_04_GML.zip": 0,
+    "L05-2-09_05_GML.zip": 0,
+    "L05-2-09_06_GML.zip": 0,
+    "L05-2-09_07_GML.zip": 0,
+    "L05-2-09_08_GML.zip": 0,
+    "L05-2-09_09_GML.zip": 0,
+    "L05-2-09_10_GML.zip": 0,
+    "L05-2-09_11_GML.zip": 0,
+    "L05-2-09_12_GML.zip": 0,
+    "L05-2-09_13_GML.zip": 0,
+    "L05-2-09_14_GML.zip": 0,
+    "L05-2-09_15_GML.zip": 0,
+    "L05-2-09_16_GML.zip": 0,
+    "L05-2-09_17_GML.zip": 0,
+    "L05-2-09_18_GML.zip": 0,
+    "L05-2-09_19_GML.zip": 0,
+    "L05-2-09_20_GML.zip": 0,
+    "L05-2-09_21_GML.zip": 0,
+    "L05-2-09_22_GML.zip": 0,
+    "L05-2-09_23_GML.zip": 3,
+    "L05-2-09_24_GML.zip": 0,
+    "L05-2-09_25_GML.zip": 0,
+    "L05-2-09_26_GML.zip": 0,
+    "L05-2-09_27_GML.zip": 0,
+    "L05-2-09_28_GML.zip": 1,
+    "L05-2-09_30_GML.zip": 0,
+    "L05-2-09_31_GML.zip": 0,
+    "L05-2-09_32_GML.zip": 0,
+    "L05-2-09_33_GML.zip": 1,
+    "L05-2-09_34_GML.zip": 4,
+    "L05-2-09_35_GML.zip": 6,
+    "L05-2-09_36_GML.zip": 0,
+    "L05-2-09_37_GML.zip": 3,
+    "L05-2-09_38_GML.zip": 1,
+    "L05-2-09_39_GML.zip": 0,
+    "L05-2-09_40_GML.zip": 1,
+    "L05-2-09_41_GML.zip": 0,
+    "L05-2-09_42_GML.zip": 1,
+    "L05-2-09_43_GML.zip": 1,
+    "L05-2-09_44_GML.zip": 0,
+    "L05-2-09_45_GML.zip": 0,
+    "L05-2-09_46_GML.zip": 1
+  },
+  "l05_source_signature": {
+    "L05-1-09_01_GML.zip": {
+      "size_bytes": 130032,
+      "sha256": "0e957959b33cbf1f21ef92cddfbc91c45207e44dbee2b243f6f034058f760092"
+    },
+    "L05-1-09_02_GML.zip": {
+      "size_bytes": 49176,
+      "sha256": "5d7e5bb17d85d44f3476c396c9a4deaebc5ff6a5f7bc3941ba1e9dc9d2d3e5e3"
+    },
+    "L05-1-09_03_GML.zip": {
+      "size_bytes": 72268,
+      "sha256": "ab481f119a6ed6a2e78ad95f0a56a760a789be0132fa0288b1a57139ef99126d"
+    },
+    "L05-1-09_04_GML.zip": {
+      "size_bytes": 110100,
+      "sha256": "0cdd2f5e4a0b761226147b78ee7c3e85271c75a028e604b71c03600ae279594b"
+    },
+    "L05-1-09_05_GML.zip": {
+      "size_bytes": 57537,
+      "sha256": "d2997743854fccdbe63e6d3a78f0a0971285d5a011652d6469d32ba78613ef93"
+    },
+    "L05-1-09_06_GML.zip": {
+      "size_bytes": 68429,
+      "sha256": "5daee4dacabd464e3696b14bdb2d1a4875b0a66b9c1d98714e647890da6b6b02"
+    },
+    "L05-1-09_07_GML.zip": {
+      "size_bytes": 253991,
+      "sha256": "772dcee3c139228733d4290b81a50fb81c0de0a082b4979694733b3fb743a1a0"
+    },
+    "L05-1-09_08_GML.zip": {
+      "size_bytes": 247312,
+      "sha256": "84fe610fd3595907baf2df84e6fa4b6b7a8723f3a8316b8da47fb97e47701f55"
+    },
+    "L05-1-09_09_GML.zip": {
+      "size_bytes": 125422,
+      "sha256": "93cec505b607b24d74e0f4c6a21f6783411bc1b85e4f54d375270dac021ed82a"
+    },
+    "L05-1-09_10_GML.zip": {
+      "size_bytes": 94337,
+      "sha256": "7f402cf434e14686073009d43a42a292f81870cb60355536675eadfd96963605"
+    },
+    "L05-1-09_11_GML.zip": {
+      "size_bytes": 103646,
+      "sha256": "0ef45c288db9c6519614a6b02af2fbcbfe1bb55a6dba89b8c306877ee2bab46e"
+    },
+    "L05-1-09_12_GML.zip": {
+      "size_bytes": 184542,
+      "sha256": "5794de70bf12c784871143745a63b435fd19e50c4ba78f042cd6e9b88d3918e5"
+    },
+    "L05-1-09_13_GML.zip": {
+      "size_bytes": 18512,
+      "sha256": "c7105399d5cae738f0977294a222333384581bda4ca88a2635c04c209619bafc"
+    },
+    "L05-1-09_14_GML.zip": {
+      "size_bytes": 71205,
+      "sha256": "85a4a43f83e181fce0567b5955953ab269fb205dcab7edc67369a43b0841b092"
+    },
+    "L05-1-09_15_GML.zip": {
+      "size_bytes": 65264,
+      "sha256": "76fb45df091eec3fa7eb33334e611c9ec5f4f8f429cd604b61ea71ac6bffd625"
+    },
+    "L05-1-09_16_GML.zip": {
+      "size_bytes": 44069,
+      "sha256": "1a29d572519061b32179a03e0fe5f1c53d09bf9e5439a4bc0a2ede21d291fbf3"
+    },
+    "L05-1-09_17_GML.zip": {
+      "size_bytes": 87673,
+      "sha256": "6aa35ab5b8bd221bdd919cc87a057b8e22462a91f79cf0a648c85042c809aef6"
+    },
+    "L05-1-09_18_GML.zip": {
+      "size_bytes": 22868,
+      "sha256": "d19fdb6eedc338cae77774468ecd359b35ec260f4401366fdcb128e0e9449f42"
+    },
+    "L05-1-09_19_GML.zip": {
+      "size_bytes": 27723,
+      "sha256": "39284bef19b9bc4c14dab198b0fd21ebc6e16b7808624266c6e00d1f8e5cee53"
+    },
+    "L05-1-09_20_GML.zip": {
+      "size_bytes": 65278,
+      "sha256": "43b3e268e301ed51e50b84459fdb18c734785a6da262d797ae526f2d0b1358f9"
+    },
+    "L05-1-09_21_GML.zip": {
+      "size_bytes": 58575,
+      "sha256": "2d80b24adc473f8cb3085a8cc1315d5b0e2fbbfeaa3aaf62d77ab8c08f08da5d"
+    },
+    "L05-1-09_22_GML.zip": {
+      "size_bytes": 90135,
+      "sha256": "9ea05a12b19cd283108809fb4965d09666f65408c1e5ce16b90f632d50990db7"
+    },
+    "L05-1-09_23_GML.zip": {
+      "size_bytes": 122912,
+      "sha256": "2ebf3f13564cd59b8c388649f1ed26020e6f6722756d2ffd3bc258759c8688f9"
+    },
+    "L05-1-09_24_GML.zip": {
+      "size_bytes": 129224,
+      "sha256": "ffb0fb97ebf9ce9cfc3e4db09dddb70c7f59268d554d1b0de6d081b887adb544"
+    },
+    "L05-1-09_25_GML.zip": {
+      "size_bytes": 101576,
+      "sha256": "677d63d5df2252688a33fb9030766dedc099ae80854dbabe31c076687073cbe5"
+    },
+    "L05-1-09_26_GML.zip": {
+      "size_bytes": 67091,
+      "sha256": "d3e28a85add26dea42ce73a11e6dac0d439460cba80359a62775c74c0f718587"
+    },
+    "L05-1-09_27_GML.zip": {
+      "size_bytes": 68682,
+      "sha256": "7294ffe2bd7c55dc145977132eceaa6e7ad03856cb7145282cfd5c00e7109eaa"
+    },
+    "L05-1-09_28_GML.zip": {
+      "size_bytes": 160895,
+      "sha256": "864dcd08cc067183c1b3621637600e4a063fa33ca9c3aed51645e2cc52e505f4"
+    },
+    "L05-1-09_29_GML.zip": {
+      "size_bytes": 40538,
+      "sha256": "ce95df36a082d6aba83dd6a3963a046576c064f3e0cf30c27a041f6e866ffe43"
+    },
+    "L05-1-09_30_GML.zip": {
+      "size_bytes": 39188,
+      "sha256": "ef323e1026b0e1158cd4da9fa9535c19521d1db0c6a9a5a715d22d9fbce26537"
+    },
+    "L05-1-09_31_GML.zip": {
+      "size_bytes": 38044,
+      "sha256": "fdfbb454de0c5356580a43298d46c5719c60986c76620c3065db2e2d9a250d02"
+    },
+    "L05-1-09_32_GML.zip": {
+      "size_bytes": 56457,
+      "sha256": "345a9be0f860e354f7adff591704c13ad7682613818b6811675bb6f7c22d3a66"
+    },
+    "L05-1-09_33_GML.zip": {
+      "size_bytes": 98769,
+      "sha256": "98006716260d66d863207581036bfa9c510e7cd41921353a8f8b7a273982c49b"
+    },
+    "L05-1-09_34_GML.zip": {
+      "size_bytes": 167672,
+      "sha256": "db882b9c98ecb6f19ec8a3c9473fbf71ac40c252949448ee4e02fec5db63cc3a"
+    },
+    "L05-1-09_35_GML.zip": {
+      "size_bytes": 88850,
+      "sha256": "21125fa41aa02d8fb2f3566d7a2da954b22a91be78836e77fdf9c86a21cd183b"
+    },
+    "L05-1-09_36_GML.zip": {
+      "size_bytes": 49715,
+      "sha256": "8415cf75866d935daae862177a4c85d9f8e98c9a957a2bef36c51932fa9ec469"
+    },
+    "L05-1-09_37_GML.zip": {
+      "size_bytes": 58973,
+      "sha256": "000bd58d700d6ce9dd6e4ae0bcae16104cf962631c43cccea522dc9415fce3ef"
+    },
+    "L05-1-09_38_GML.zip": {
+      "size_bytes": 45523,
+      "sha256": "94d650c4661f120912c26a9399abc746ce0dba4a581d46a6db28015870f981da"
+    },
+    "L05-1-09_39_GML.zip": {
+      "size_bytes": 24567,
+      "sha256": "4fcfdc6d0b5baff6f9239003315141836944ec19b38ae0fcf164408ed880e796"
+    },
+    "L05-1-09_40_GML.zip": {
+      "size_bytes": 186127,
+      "sha256": "f164866aa83590cf365e62dae8f414045f332e723e06ef45e8acf7b3ca7e7db8"
+    },
+    "L05-1-09_41_GML.zip": {
+      "size_bytes": 62979,
+      "sha256": "ee542679c71dffeb7810ed4e455a6f39b956ce8a12753982f1ccc9ea1e175246"
+    },
+    "L05-1-09_42_GML.zip": {
+      "size_bytes": 64276,
+      "sha256": "84ad06fe26227236754c1ee0dabd89620f370dcf674ff7510e2be291739df753"
+    },
+    "L05-1-09_43_GML.zip": {
+      "size_bytes": 62890,
+      "sha256": "5884e71c56dd5cc94b067c4e5f63091d67d769eee9d6d5204258ff32fe1489e3"
+    },
+    "L05-1-09_44_GML.zip": {
+      "size_bytes": 40165,
+      "sha256": "638d3a4b3875715d374d7bd10bdb8298d524cc94e642c194b7fb48b4bcea4dda"
+    },
+    "L05-1-09_45_GML.zip": {
+      "size_bytes": 45445,
+      "sha256": "407c258f4b30e12bf7b2fd37f3afa5aa135cc2783644d9685d4eafa1c1da027d"
+    },
+    "L05-1-09_46_GML.zip": {
+      "size_bytes": 54374,
+      "sha256": "7fdd27b637fb6936a86878d7ba7e513d87665acf7da5c29b188aeba1c2148411"
+    },
+    "L05-2-09_01_GML.zip": {
+      "size_bytes": 34035,
+      "sha256": "5ae2d1ed291f7813b6caeb31e030d388849775f0c50cf559e0da2c2901c57310"
+    },
+    "L05-2-09_02_GML.zip": {
+      "size_bytes": 5220,
+      "sha256": "ae618574f72842a2ad72492bbee877f9fcdd752eaac393b08c1f9c9776fb1475"
+    },
+    "L05-2-09_03_GML.zip": {
+      "size_bytes": 17838,
+      "sha256": "390671ff6589f1a228125f6a6a222ce3fe1d77427a31d0fb1f23099140742cca"
+    },
+    "L05-2-09_04_GML.zip": {
+      "size_bytes": 14914,
+      "sha256": "346f313636eb09a79d5c93071aa6b163f4a6483ef2813d32f75724d213b0828b"
+    },
+    "L05-2-09_05_GML.zip": {
+      "size_bytes": 11127,
+      "sha256": "074513ec014167354cb4f7b017896cc2443b5d387004a577c8de995733854f63"
+    },
+    "L05-2-09_06_GML.zip": {
+      "size_bytes": 11231,
+      "sha256": "7e29064bed9f2cd4568e1a61bc6fa4d198d3844899ec2283b5b453071e9d4e9c"
+    },
+    "L05-2-09_07_GML.zip": {
+      "size_bytes": 32073,
+      "sha256": "ec72c942e02be0a4da6c8ff63ff50307f62390dcc2a577ed19a193d25af9a7dd"
+    },
+    "L05-2-09_08_GML.zip": {
+      "size_bytes": 85389,
+      "sha256": "e4fd9a53d395678ae3e9a43f66853a2fec01243b4d80bff4fd14fa6163e4d1a9"
+    },
+    "L05-2-09_09_GML.zip": {
+      "size_bytes": 56729,
+      "sha256": "b437b3811845df1981b357d108258be7cabe7f20f18a9bf33760cae4a4424ede"
+    },
+    "L05-2-09_10_GML.zip": {
+      "size_bytes": 28070,
+      "sha256": "b6f91c35c11a3d319f1ca655e1dfe937fc43212e046962f5199c94d624fda693"
+    },
+    "L05-2-09_11_GML.zip": {
+      "size_bytes": 64020,
+      "sha256": "5acf6bf4db7acce95f4955cbdbdd57ccc3108424c7cf99dd7664926a732f8fc6"
+    },
+    "L05-2-09_12_GML.zip": {
+      "size_bytes": 29511,
+      "sha256": "09a3484aafe9e1e9afeb0596395c9bf111d2a8b3bd071c61220f1677f07736ce"
+    },
+    "L05-2-09_13_GML.zip": {
+      "size_bytes": 24544,
+      "sha256": "ced70e63cc4403609ba63b76c8fc8527d40b2c366db48407a492953a890cfdb8"
+    },
+    "L05-2-09_14_GML.zip": {
+      "size_bytes": 84132,
+      "sha256": "f339ca3553616c1c43e157baf29056b076373e9d88de4d21bb1e8880fb2d117a"
+    },
+    "L05-2-09_15_GML.zip": {
+      "size_bytes": 34110,
+      "sha256": "224964befe318627442f44a5976ba539afab725c16197e2953faf3ba848be26b"
+    },
+    "L05-2-09_16_GML.zip": {
+      "size_bytes": 32434,
+      "sha256": "84ce3fd3e5f2a7e5d4302610d782a7ac6faf56cef774e29ce140b2bffc5082ca"
+    },
+    "L05-2-09_17_GML.zip": {
+      "size_bytes": 9955,
+      "sha256": "12afce8f4ab943612711274f61b7423ca11fa239187ca6d1d81ee7859294a67d"
+    },
+    "L05-2-09_18_GML.zip": {
+      "size_bytes": 10811,
+      "sha256": "7d801a45dbc740f1fa3cd0ea388149665ffbe06fba7016915dfb5ac3125abb8b"
+    },
+    "L05-2-09_19_GML.zip": {
+      "size_bytes": 14192,
+      "sha256": "f287f185c146060019be2715784d8e2b31f04398342074e262d544450b1bc2f0"
+    },
+    "L05-2-09_20_GML.zip": {
+      "size_bytes": 12076,
+      "sha256": "dca44ebc062b94ee331776879fddefd65ba54ba637c10f19606be28da2956180"
+    },
+    "L05-2-09_21_GML.zip": {
+      "size_bytes": 56234,
+      "sha256": "2b5e56acbea9e58d008d6aa780bc00716fd29ee400447302dce9388f7402eba0"
+    },
+    "L05-2-09_22_GML.zip": {
+      "size_bytes": 144352,
+      "sha256": "b07738a795e991c2023f01110f2be128b069d94bc81fd5b76f9f11532fbd6b49"
+    },
+    "L05-2-09_23_GML.zip": {
+      "size_bytes": 168408,
+      "sha256": "09d71b94ee7fa9f03963a9480dc9655f66fca679519d162430ef602df0219d04"
+    },
+    "L05-2-09_24_GML.zip": {
+      "size_bytes": 70162,
+      "sha256": "024eca6b9c63a08136df4c0fbd7b2518ac782a32eacd66ef5487f7c162b9ab90"
+    },
+    "L05-2-09_25_GML.zip": {
+      "size_bytes": 76615,
+      "sha256": "f731fc50849aaf257076c057f88e4ea69dea0d915f6448e5e001cde96218a624"
+    },
+    "L05-2-09_26_GML.zip": {
+      "size_bytes": 44250,
+      "sha256": "b2c5f8f1d1e3e195b21d2547909d2489467fd8dbbffece5d45714a62b6db7d5d"
+    },
+    "L05-2-09_27_GML.zip": {
+      "size_bytes": 60869,
+      "sha256": "6560a4990bad171e7e1f4653967e8e1def2e076d306ff39448b1e70bd152516a"
+    },
+    "L05-2-09_28_GML.zip": {
+      "size_bytes": 73129,
+      "sha256": "78dce6d48644d7bc19dccb4fb22484304f45dcb33910e17fd5e13afb66ebc826"
+    },
+    "L05-2-09_30_GML.zip": {
+      "size_bytes": 14161,
+      "sha256": "4b22ee9262d4ed2b25f20807f2daf06708e6bfa90faac21bf7f3796306bc6360"
+    },
+    "L05-2-09_31_GML.zip": {
+      "size_bytes": 9147,
+      "sha256": "2693793a717c6e96fb501c134dafe4e1c20f2d640e1c865929103be6a7e967dc"
+    },
+    "L05-2-09_32_GML.zip": {
+      "size_bytes": 20361,
+      "sha256": "83f418e8a2dd103de4900f16a681ce7997c7be88d81dc1f6d3ade288eba53f25"
+    },
+    "L05-2-09_33_GML.zip": {
+      "size_bytes": 26074,
+      "sha256": "4af7ec2012217a0e9bbb7dbc05d60075ac58a03c3775cea74a4155e30a5c804b"
+    },
+    "L05-2-09_34_GML.zip": {
+      "size_bytes": 57369,
+      "sha256": "3b96c6b05e2f473f5464898292dbdc6cf5b7115a8b6dd73e216426e21f596df3"
+    },
+    "L05-2-09_35_GML.zip": {
+      "size_bytes": 65302,
+      "sha256": "27f062522ff3c585f112d4a2e8484e04c6be95feedc57b0faa42c05a01988f7d"
+    },
+    "L05-2-09_36_GML.zip": {
+      "size_bytes": 13982,
+      "sha256": "b9a6932463d50330b498d6880cccf50ed461246665717498cf3306b929050dfb"
+    },
+    "L05-2-09_37_GML.zip": {
+      "size_bytes": 12932,
+      "sha256": "502cad6def09d58ba803627eec64b3a012bb35a0e2fe784495fd85f29ccdf2af"
+    },
+    "L05-2-09_38_GML.zip": {
+      "size_bytes": 37112,
+      "sha256": "12cd08766926d9daea7f9ab4fe9e3946a6c54a91a96c1ed6ac499a0453f0f8a9"
+    },
+    "L05-2-09_39_GML.zip": {
+      "size_bytes": 6276,
+      "sha256": "be2bb9c41eb494afe4a7a6c8433c33227c6661e2fab9013d4a0cb1fba02d6aa1"
+    },
+    "L05-2-09_40_GML.zip": {
+      "size_bytes": 57625,
+      "sha256": "146ee02f269e3fd6abbacd8ddbf68d682a686d23ea72e1f917a02b4228f442cd"
+    },
+    "L05-2-09_41_GML.zip": {
+      "size_bytes": 15523,
+      "sha256": "175cf6ef163a12dc4dda4ba1cb881edad8dbbe2245cf55ff979bf01f4784bd35"
+    },
+    "L05-2-09_42_GML.zip": {
+      "size_bytes": 19229,
+      "sha256": "8a22bb09409b0d33509db85e0dfea35eb09870fc3fcec165a07b50d83ce10780"
+    },
+    "L05-2-09_43_GML.zip": {
+      "size_bytes": 29533,
+      "sha256": "79c644142a4471622d1c2abc6a3370663bb3f39658c4aaa5e94dc45ad8ad22af"
+    },
+    "L05-2-09_44_GML.zip": {
+      "size_bytes": 28425,
+      "sha256": "e74e907a75029512d9893fc8878a1451bcb15db41feb7dca8aef0f1030eb9e1f"
+    },
+    "L05-2-09_45_GML.zip": {
+      "size_bytes": 16583,
+      "sha256": "5e7cf95e7fcbe432d475a7f27503c029b0cb1f22de2ab2b3457d1bf5b87c4f6d"
+    },
+    "L05-2-09_46_GML.zip": {
+      "size_bytes": 8443,
+      "sha256": "afb57501d35cf87da1a946e581f632b58251bc1e6b8926ef30ff30cba6f93022"
+    }
+  },
+  "osm_source_members": [
+    ".runtime/source-cache/transport/japan/industrial_zones/osm_geofabrik/chubu-latest-free.shp.zip",
+    ".runtime/source-cache/transport/japan/industrial_zones/osm_geofabrik/chugoku-latest-free.shp.zip",
+    ".runtime/source-cache/transport/japan/industrial_zones/osm_geofabrik/hokkaido-latest-free.shp.zip",
+    ".runtime/source-cache/transport/japan/industrial_zones/osm_geofabrik/kansai-latest-free.shp.zip",
+    ".runtime/source-cache/transport/japan/industrial_zones/osm_geofabrik/kanto-latest-free.shp.zip",
+    ".runtime/source-cache/transport/japan/industrial_zones/osm_geofabrik/kyushu-latest-free.shp.zip",
+    ".runtime/source-cache/transport/japan/industrial_zones/osm_geofabrik/shikoku-latest-free.shp.zip",
+    ".runtime/source-cache/transport/japan/industrial_zones/osm_geofabrik/tohoku-latest-free.shp.zip"
+  ],
+  "source_signature": {
+    "l05_official_bundle": {
+      "member_count": 91,
+      "sha256": "d7626831bc93181fb485d9044d49afa111e3c86506cb6d9ba553cf34eb8a4bfe"
+    },
+    "geofabrik_japan_open_variant": {
+      "member_count": 8,
+      "members": {
+        "hokkaido-latest-free.shp.zip": {
+          "size_bytes": 386490868,
+          "sha256": "268216d2f2372fcf42e56ba7bec060016509739c67fcb04392a9c068918d2dd9"
+        },
+        "tohoku-latest-free.shp.zip": {
+          "size_bytes": 545197403,
+          "sha256": "da9d247c9ff9900c837b497be2f638cd85a9c51e80946efb78ef2ca77de43ebd"
+        },
+        "kanto-latest-free.shp.zip": {
+          "size_bytes": 896428398,
+          "sha256": "e3cd90d80271eba2ab7bcba0c6c8e0b43674a7ca74faf53fee5bf586450cab2d"
+        },
+        "chubu-latest-free.shp.zip": {
+          "size_bytes": 936985432,
+          "sha256": "f884732a9907d11d1ca33617545827e6da7295b4d695d2c81406d26a6132002b"
+        },
+        "kansai-latest-free.shp.zip": {
+          "size_bytes": 688584825,
+          "sha256": "e650f2541c0f76db05bf260a6ebf93009c5d1c070a369470fa299f80c526d215"
+        },
+        "chugoku-latest-free.shp.zip": {
+          "size_bytes": 367250438,
+          "sha256": "cd7e0293a554156620e8cd984b8d88fe823017ed4636d3c9b72e8c45fd61da89"
+        },
+        "shikoku-latest-free.shp.zip": {
+          "size_bytes": 166241822,
+          "sha256": "668c53c292fc253b65843f965e81eba064f4d471d42a2d7a04e25aaa4fee07b7"
+        },
+        "kyushu-latest-free.shp.zip": {
+          "size_bytes": 566794291,
+          "sha256": "415496b23d456b54e882f3174b4896e768328a0180a6014cc23e786bb538d55c"
+        }
+      }
+    }
+  },
+  "notes": [
+    "The internal variant uses official L05 polygons only and stays provenance-separated from the open OSM variant.",
+    "The open variant intentionally accepts only multipolygon industrial land and works geometries from OSM.",
+    "Preview and full outputs are identical for both variants until a reviewed thinning policy exists."
+  ]
+}

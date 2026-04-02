@@ -15,6 +15,30 @@ import {
   warmJapanPortPreviewPack,
 } from "./transport_workbench_port_preview.js";
 import {
+  clearJapanLogisticsHubPreview,
+  destroyJapanLogisticsHubPreview,
+  getJapanLogisticsHubPreviewSnapshot,
+  renderJapanLogisticsHubPreview,
+  setJapanLogisticsHubPreviewSelectionListener,
+  warmJapanLogisticsHubPreviewPack,
+} from "./transport_workbench_logistics_hub_preview.js";
+import {
+  clearJapanEnergyFacilityPreview,
+  destroyJapanEnergyFacilityPreview,
+  getJapanEnergyFacilityPreviewSnapshot,
+  renderJapanEnergyFacilityPreview,
+  setJapanEnergyFacilityPreviewSelectionListener,
+  warmJapanEnergyFacilityPreviewPack,
+} from "./transport_workbench_energy_facility_preview.js";
+import {
+  clearJapanIndustrialZonePreview,
+  destroyJapanIndustrialZonePreview,
+  getJapanIndustrialZonePreviewSnapshot,
+  renderJapanIndustrialZonePreview,
+  setJapanIndustrialZonePreviewSelectionListener,
+  warmJapanIndustrialZonePreviewPack,
+} from "./transport_workbench_industrial_zone_preview.js";
+import {
   clearJapanRailPreview,
   destroyJapanRailPreview,
   getJapanRailPreviewSnapshot,
@@ -30,14 +54,16 @@ import {
   setJapanRoadPreviewSelectionListener,
   warmJapanRoadPreviewPack,
 } from "./transport_workbench_road_preview.js";
+import { isManifestOnlyFamily } from "./transport_workbench_manifest_preview.js";
 import {
-  clearJapanManifestOnlyFamilyPreview,
-  destroyJapanManifestOnlyFamilyPreview,
-  getJapanManifestOnlyFamilyPreviewSnapshot,
-  isManifestOnlyFamily,
-  renderJapanManifestOnlyFamilyPreview,
-  warmJapanManifestOnlyFamilyPreview,
-} from "./transport_workbench_manifest_preview.js";
+  clearJapanMineralResourcePreview,
+  destroyJapanMineralResourcePreview,
+  getJapanMineralResourcePreviewSnapshot,
+  renderJapanMineralResourcePreview,
+  setJapanMineralResourcePreviewSelectionListener,
+  warmJapanMineralResourcePreviewPack,
+} from "./transport_workbench_mineral_resource_preview.js";
+import { getTransportWorkbenchFamilyRuntimeConfig } from "./transport_workbench_family_registry.js";
 
 const FAMILY_PREVIEW_HANDLERS = {
   airport: {
@@ -56,6 +82,38 @@ const FAMILY_PREVIEW_HANDLERS = {
     setSelectionListener: setJapanPortPreviewSelectionListener,
     warm: warmJapanPortPreviewPack,
   },
+  logistics_hubs: {
+    clear: clearJapanLogisticsHubPreview,
+    destroy: destroyJapanLogisticsHubPreview,
+    getSnapshot: getJapanLogisticsHubPreviewSnapshot,
+    render: renderJapanLogisticsHubPreview,
+    setSelectionListener: setJapanLogisticsHubPreviewSelectionListener,
+    warm: warmJapanLogisticsHubPreviewPack,
+  },
+  mineral_resources: {
+    clear: clearJapanMineralResourcePreview,
+    destroy: destroyJapanMineralResourcePreview,
+    getSnapshot: getJapanMineralResourcePreviewSnapshot,
+    render: renderJapanMineralResourcePreview,
+    setSelectionListener: setJapanMineralResourcePreviewSelectionListener,
+    warm: warmJapanMineralResourcePreviewPack,
+  },
+  energy_facilities: {
+    clear: clearJapanEnergyFacilityPreview,
+    destroy: destroyJapanEnergyFacilityPreview,
+    getSnapshot: getJapanEnergyFacilityPreviewSnapshot,
+    render: renderJapanEnergyFacilityPreview,
+    setSelectionListener: setJapanEnergyFacilityPreviewSelectionListener,
+    warm: warmJapanEnergyFacilityPreviewPack,
+  },
+  industrial_zones: {
+    clear: clearJapanIndustrialZonePreview,
+    destroy: destroyJapanIndustrialZonePreview,
+    getSnapshot: getJapanIndustrialZonePreviewSnapshot,
+    render: renderJapanIndustrialZonePreview,
+    setSelectionListener: setJapanIndustrialZonePreviewSelectionListener,
+    warm: warmJapanIndustrialZonePreviewPack,
+  },
   road: {
     clear: clearJapanRoadPreview,
     destroy: destroyJapanRoadPreview,
@@ -72,27 +130,6 @@ const FAMILY_PREVIEW_HANDLERS = {
     setSelectionListener: setJapanRailPreviewSelectionListener,
     warm: warmJapanRailPreviewPack,
   },
-  mineral_resources: {
-    clear: () => clearJapanManifestOnlyFamilyPreview("mineral_resources"),
-    destroy: () => destroyJapanManifestOnlyFamilyPreview("mineral_resources"),
-    getSnapshot: () => getJapanManifestOnlyFamilyPreviewSnapshot("mineral_resources"),
-    render: () => renderJapanManifestOnlyFamilyPreview("mineral_resources"),
-    warm: () => warmJapanManifestOnlyFamilyPreview("mineral_resources"),
-  },
-  energy_facilities: {
-    clear: () => clearJapanManifestOnlyFamilyPreview("energy_facilities"),
-    destroy: () => destroyJapanManifestOnlyFamilyPreview("energy_facilities"),
-    getSnapshot: () => getJapanManifestOnlyFamilyPreviewSnapshot("energy_facilities"),
-    render: () => renderJapanManifestOnlyFamilyPreview("energy_facilities"),
-    warm: () => warmJapanManifestOnlyFamilyPreview("energy_facilities"),
-  },
-  industrial_zones: {
-    clear: () => clearJapanManifestOnlyFamilyPreview("industrial_zones"),
-    destroy: () => destroyJapanManifestOnlyFamilyPreview("industrial_zones"),
-    getSnapshot: () => getJapanManifestOnlyFamilyPreviewSnapshot("industrial_zones"),
-    render: () => renderJapanManifestOnlyFamilyPreview("industrial_zones"),
-    warm: () => warmJapanManifestOnlyFamilyPreview("industrial_zones"),
-  },
 };
 
 function getFamilyHandler(familyId) {
@@ -100,7 +137,7 @@ function getFamilyHandler(familyId) {
 }
 
 export function isTransportWorkbenchFamilyLivePreviewCapable(familyId) {
-  return !!getFamilyHandler(familyId) || isManifestOnlyFamily(familyId);
+  return !!getFamilyHandler(familyId) || !!getTransportWorkbenchFamilyRuntimeConfig(familyId) || isManifestOnlyFamily(familyId);
 }
 
 export function setTransportWorkbenchFamilyPreviewSelectionListener(familyId, listener) {
